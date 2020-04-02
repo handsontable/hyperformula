@@ -2,7 +2,7 @@ import {CellValue, DetailedCellError, HyperFormula} from '../src'
 import {AbsoluteCellRange} from '../src/AbsoluteCellRange'
 import {CellError, ErrorType, InternalCellValue, SimpleCellAddress, simpleCellAddress} from '../src/Cell'
 import {Config} from '../src/Config'
-import {DateHelper} from '../src/DateTime'
+import {DateTimeHelper} from '../src/DateTimeHelper'
 import {FormulaCellVertex, MatrixVertex} from '../src/DependencyGraph'
 import {defaultStringifyDate} from '../src/format/format'
 import {
@@ -80,7 +80,7 @@ export function dateNumberToString(dateNumber: CellValue, config: Config): strin
   if(dateNumber instanceof DetailedCellError) {
     return dateNumber
   }
-  const dateHelper = new DateHelper(config)
+  const dateHelper = new DateTimeHelper(config)
   const dateString = defaultStringifyDate(dateHelper.numberToDateTime(dateNumber as number), config.dateFormats[0])
   return dateString ? dateString : ''
 }

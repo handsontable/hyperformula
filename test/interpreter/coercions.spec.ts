@@ -1,7 +1,7 @@
 import {HyperFormula} from '../../src'
 import {CellError, EmptyValue, ErrorType} from '../../src/Cell'
 import {Config} from '../../src/Config'
-import {DateHelper} from '../../src/DateTime'
+import {DateTimeHelper} from '../../src/DateTimeHelper'
 import {
   coerceBooleanToNumber,
   coerceNonDateScalarToMaybeNumber,
@@ -37,7 +37,7 @@ describe('#coerceBooleanToNumber', () => {
 
   it('behaves the same as more general coercion', () => {
     const config = new Config()
-    const dateHelper = new DateHelper(config)
+    const dateHelper = new DateTimeHelper(config)
     const numberLiteralsHelper = new NumberLiteralHelper(config)
     expect(coerceBooleanToNumber(true)).toBe(coerceScalarToNumberOrError(true, dateHelper, numberLiteralsHelper))
     expect(coerceBooleanToNumber(false)).toBe(coerceScalarToNumberOrError(false, dateHelper, numberLiteralsHelper))
@@ -72,7 +72,7 @@ describe('#coerceScalarToBoolean', () => {
 describe('#coerceScalarToNumberOrError', () => {
   it('works', () => {
     const config = new Config()
-    const dateHelper = new DateHelper(config)
+    const dateHelper = new DateTimeHelper(config)
     const numberLiteralsHelper = new NumberLiteralHelper(config)
     expect(coerceScalarToNumberOrError(1, dateHelper, numberLiteralsHelper)).toEqual(1)
 

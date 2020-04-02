@@ -1,5 +1,5 @@
 import {CellError, EmptyValue, ErrorType, InternalCellValue, NoErrorCellValue} from '../Cell'
-import {DateHelper} from '../DateTime'
+import {DateTimeHelper} from '../DateTimeHelper'
 import {Maybe} from '../Maybe'
 import {InterpreterValue, SimpleRangeValue} from './InterpreterValue'
 import {NumberLiteralHelper} from '../NumberLiteralHelper'
@@ -12,14 +12,14 @@ import {NumberLiteralHelper} from '../NumberLiteralHelper'
  * @param dateHelper
  * @param numberLiteralsHelper
  */
-export function coerceScalarToNumberOrError(arg: InternalCellValue, dateHelper: DateHelper, numberLiteralsHelper: NumberLiteralHelper): number | CellError {
+export function coerceScalarToNumberOrError(arg: InternalCellValue, dateHelper: DateTimeHelper, numberLiteralsHelper: NumberLiteralHelper): number | CellError {
   if (arg instanceof CellError) {
     return arg
   }
   return coerceToMaybeNumber(arg, dateHelper, numberLiteralsHelper) ?? new CellError(ErrorType.VALUE)
 }
 
-export function coerceToMaybeNumber(arg: NoErrorCellValue, dateHelper: DateHelper, numberLiteralsHelper: NumberLiteralHelper): Maybe<number> {
+export function coerceToMaybeNumber(arg: NoErrorCellValue, dateHelper: DateTimeHelper, numberLiteralsHelper: NumberLiteralHelper): Maybe<number> {
   return coerceNonDateScalarToMaybeNumber(arg, numberLiteralsHelper) ?? (
       typeof arg === 'string' ? dateHelper.dateStringToDateNumber(arg) : undefined
     )

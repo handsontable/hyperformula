@@ -36,27 +36,22 @@ export function instanceOfSimpleTime(obj: any): obj is SimpleTime {
   }
 }
 
-export function instanceOfSimpleDateTime(obj: any): obj is SimpleDateTime {
-  return instanceOfSimpleDate(obj) && instanceOfSimpleTime(obj)
-}
-
 export const maxDate: SimpleDate = {year: 9999, month: 12, day: 31}
 
-export class DateHelper {
-  private minDateValue: number
-  private maxDateValue: number
-  private epochYearZero: number
-  private parseDateTime: (dateString: string, dateFormat: string, timeFormat: string) => Maybe<DateTime>
+export class DateTimeHelper {
+  private readonly minDateAboluteValue: number
+  private readonly maxDateValue: number
+  private readonly epochYearZero: number
+  private readonly parseDateTime: (dateString: string, dateFormat: string, timeFormat: string) => Maybe<DateTime>
   constructor(private readonly config: Config) {
-    this.config = config
-    this.minDateValue = this.dateToNumber(config.nullDate)
+    this.minDateAboluteValue = this.dateToNumberFromZero(config.nullDate)
     this.maxDateValue = this.dateToNumber(maxDate)
 
     // code below fixes epochYearStart while being leapYear1900 sensitive
     // if nullDate is earlier than fateful 28 Feb 1900 and 1900 is not supposed to be leap year, then we should
     // add two days (this is the config default)
     // otherwise only one day
-    if(!config.leapYear1900 && this.minDateValue <= this.dateToNumber({year: 1900, month: 2, day: 28})) {
+    if(!config.leapYear1900 && 0 <= this.dateToNumber({year: 1900, month: 2, day: 28})) {
       this.epochYearZero = this.numberToDate(2).year
     } else {
       this.epochYearZero = this.numberToDate(1).year
@@ -65,7 +60,7 @@ export class DateHelper {
   }
 
   public getWithinBounds(dayNumber: number) {
-    return (dayNumber <= this.maxDateValue) && (dayNumber >= this.minDateValue)
+    return (dayNumber <= this.maxDateValue) && (dayNumber >= 0)
   }
 
   public dateStringToDateNumber(dateTimeString: string): Maybe<number> {
@@ -133,7 +128,7 @@ export class DateHelper {
   }
 
   public dateToNumber(date: SimpleDate): number {
-    return this.dateToNumberFromZero(date) - this.dateToNumberFromZero(this.config.nullDate)
+    return this.dateToNumberFromZero(date) - this.minDateAboluteValue
   }
 
   public timeToNumber(time: SimpleTime): number {
@@ -141,7 +136,7 @@ export class DateHelper {
   }
 
   public numberToDate(arg: number): SimpleDate {
-    const dateNumber = arg + this.dateToNumberFromZero(this.config.nullDate)
+    const dateNumber = arg + this.minDateAboluteValue
     let year = Math.floor(dateNumber / 365.2425)
     if (this.dateToNumberFromZero({year: year + 1, month: 1, day: 1}) <= dateNumber) {
       year++
@@ -215,137 +210,3 @@ export function offsetMonth(date: SimpleDate, offset: number): SimpleDate {
   const totalM = 12 * date.year + date.month - 1 + offset
   return {year: Math.floor(totalM / 12), month: totalM % 12 + 1, day: date.day}
 }
-
-export function defaultParseToDateTime(dateTimeString: string, dateFormat: string, timeFormat: string): Maybe<DateTime> {
-  dateTimeString = dateTimeString.replace(/\s\s+/g, ' ').trim().toLowerCase()
-  let ampmtoken: string | undefined = dateTimeString.substring(dateTimeString.length-2)
-  if(ampmtoken === 'am' || ampmtoken === 'pm') {
-    dateTimeString = dateTimeString.substring(0, dateTimeString.length-2).trim()
-  } else {
-    ampmtoken = undefined
-  }
-  const dateItems = dateTimeString.split(/[ /.-]/g )
-  const timeItems = dateItems[dateItems.length - 1].split(':')
-  if(ampmtoken !== undefined) {
-    timeItems.push(ampmtoken)
-  }
-
-  if(dateItems.length === 1) {
-    return defaultParseToTime(timeItems, timeFormat)
-  }
-  if(timeItems.length === 1) {
-    return defaultParseToDate(dateItems, dateFormat)
-  }
-  const parsedDate = defaultParseToDate(dateItems.slice(0, dateItems.length-1), dateFormat)
-  const parsedTime = defaultParseToTime(timeItems, timeFormat)
-  if(parsedDate===undefined) {
-    return undefined
-  } else if(parsedTime===undefined) {
-    return undefined
-  } else {
-    return {...parsedDate, ...parsedTime}
-  }
-}
-
-export function defaultParseToTime(timeItems: string[], timeFormat: string): Maybe<SimpleTime> {
-  timeFormat = timeFormat.toLowerCase()
-  if(timeFormat.length >= 1 && timeFormat.endsWith('a')) {
-    timeFormat = timeFormat.substring(0, timeFormat.length-1).trim()
-  }
-  const formatItems = timeFormat.split(':')
-  let ampm = undefined
-  if(timeItems[timeItems.length-1] === 'am') {
-    ampm = false
-    timeItems.pop()
-  } else if(timeItems[timeItems.length-1] === 'pm') {
-    ampm = true
-    timeItems.pop()
-  }
-  if(timeItems.length !== formatItems.length) {
-    return undefined
-  }
-  const hourIndex = formatItems.indexOf('hh')
-  const minuteIndex = formatItems.indexOf('mm')
-  const secondIndex = formatItems.indexOf('ss')
-
-  const hourString = hourIndex!==-1 ? timeItems[hourIndex] : '0'
-  if(! /^\d+$/.test(hourString)) {
-    return undefined
-  }
-  let hour = Number(hourString)
-  if(ampm !== undefined) {
-    if(hour < 0 || hour > 12) {
-      return undefined
-    }
-    hour = hour % 12
-    if(ampm) {
-      hour = hour + 12
-    }
-  }
-
-  const minuteString = minuteIndex!==-1 ? timeItems[minuteIndex] : '0'
-  if(! /^\d+$/.test(minuteString)) {
-    return undefined
-  }
-  const minute = Number(minuteString)
-
-  const secondString = secondIndex!==-1 ? timeItems[secondIndex] : '0'
-  if(! /^\d+$/.test(secondString)) {
-    return undefined
-  }
-  const second = Number(secondString)
-
-  return {hour, minute, second}
-}
-
-export function defaultParseToDate(dateItems: string[], dateFormat: string): Maybe<SimpleDate> {
-  const formatItems = dateFormat.toLowerCase().split(/[ /.-]/g )
-  if(dateItems.length !== formatItems.length) {
-    return undefined
-  }
-  const monthIndex  = formatItems.indexOf('mm')
-  const dayIndex    = formatItems.indexOf('dd')
-  const yearIndexLong   = formatItems.indexOf('yyyy')
-  const yearIndexShort  = formatItems.indexOf('yy')
-  if (!(monthIndex in dateItems) || !(dayIndex in dateItems) ||
-    (!(yearIndexLong in dateItems) && !(yearIndexShort in dateItems))) {
-    return undefined
-  }
-  if (yearIndexLong in dateItems && yearIndexShort in dateItems) {
-    return undefined
-  }
-  let year
-  if (yearIndexLong in dateItems) {
-    const yearString = dateItems[yearIndexLong]
-    if(/^\d+$/.test(yearString)) {
-      year = Number(yearString)
-      if (year < 1000 || year > 9999) {
-        return undefined
-      }
-    } else {
-      return undefined
-    }
-  } else {
-    const yearString = dateItems[yearIndexShort]
-    if(/^\d+$/.test(yearString)) {
-      year = Number(yearString)
-      if (year < 0 || year > 99) {
-        return undefined
-      }
-    } else {
-      return undefined
-    }
-  }
-  const monthString = dateItems[monthIndex]
-  if(! /^\d+$/.test(monthString)) {
-    return undefined
-  }
-  const month = Number(monthString)
-  const dayString = dateItems[dayIndex]
-  if(! /^\d+$/.test(dayString)) {
-    return undefined
-  }
-  const day = Number(dayString)
-  return {year, month, day}
-}
-

@@ -1,5 +1,6 @@
 import {ErrorType} from './Cell'
-import {DateTime, defaultParseToDateTime, instanceOfSimpleDate, SimpleDate, SimpleDateTime} from './DateTime'
+import {defaultParseToDateTime} from './DateTimeDefault'
+import {DateTime, instanceOfSimpleDate, SimpleDate, SimpleDateTime} from './DateTimeHelper'
 import {ExpectedOneOfValues, ExpectedValueOfType} from './errors'
 import {AlwaysDense, ChooseAddressMapping} from './DependencyGraph/AddressMapping/ChooseAddressMappingPolicy'
 import {defaultStringifyDate} from './format/format'

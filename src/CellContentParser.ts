@@ -1,6 +1,6 @@
 import {CellError, EmptyValue, EmptyValueType, ErrorType} from './Cell'
 import {Config} from './Config'
-import {DateHelper} from './DateTime'
+import {DateTimeHelper} from './DateTimeHelper'
 import {UnableToParse} from './errors'
 import {fixNegativeZero, isNumberOverflow} from './interpreter/scalar'
 import {NumberLiteralHelper} from './NumberLiteralHelper'
@@ -91,7 +91,7 @@ export function isError(text: string, errorMapping: Record<string, ErrorType>): 
 export class CellContentParser {
   constructor(
     private readonly config: Config,
-    private readonly dateHelper: DateHelper,
+    private readonly dateHelper: DateTimeHelper,
     private readonly numberLiteralsHelper: NumberLiteralHelper) {
   }
 

@@ -2,7 +2,7 @@ import {CellError, ErrorType, InternalCellValue, SimpleCellAddress} from './Cell
 import {ColumnSearchStrategy} from './ColumnSearch/ColumnSearchStrategy'
 import {Config} from './Config'
 import {ContentChanges} from './ContentChanges'
-import {DateHelper} from './DateTime'
+import {DateTimeHelper} from './DateTimeHelper'
 import {DependencyGraph, FormulaCellVertex, MatrixVertex, RangeVertex, Vertex} from './DependencyGraph'
 import {Interpreter} from './interpreter/Interpreter'
 import {SimpleRangeValue} from './interpreter/InterpreterValue'
@@ -21,7 +21,7 @@ export class Evaluator {
     private readonly columnSearch: ColumnSearchStrategy,
     private readonly config: Config,
     private readonly stats: Statistics,
-    private readonly dateHelper: DateHelper,
+    private readonly dateHelper: DateTimeHelper,
     private readonly numberLiteralsHelper: NumberLiteralHelper,
     private readonly collator: Collator
   ) {

@@ -2,7 +2,7 @@ import {LazilyTransformingAstService} from './'
 import {CellContentParser} from './CellContentParser'
 import {buildColumnSearchStrategy, ColumnSearchStrategy} from './ColumnSearch/ColumnSearchStrategy'
 import {Config, ConfigParams} from './Config'
-import {DateHelper} from './DateTime'
+import {DateTimeHelper} from './DateTimeHelper'
 import {DependencyGraph} from './DependencyGraph'
 import {GraphBuilder, Sheet, Sheets} from './GraphBuilder'
 import {buildLexerConfig, ParserWithCaching, Unparser} from './parser'
@@ -54,7 +54,7 @@ export class BuildEngineFactory {
     const notEmpty = sheetMapping.numberOfSheets() > 0
     const parser = new ParserWithCaching(config, notEmpty ? sheetMapping.get : sheetMapping.fetch)
     const unparser = new Unparser(config, buildLexerConfig(config), sheetMapping.fetchDisplayName)
-    const dateHelper = new DateHelper(config)
+    const dateHelper = new DateTimeHelper(config)
     const numberLiteralHelper = new NumberLiteralHelper(config)
     const collator = collatorFromConfig(config)
     const cellContentParser = new CellContentParser(config, dateHelper, numberLiteralHelper)

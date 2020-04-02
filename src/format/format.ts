@@ -1,10 +1,10 @@
 import {InternalCellValue} from '../Cell'
 import {Config} from '../Config'
-import {DateHelper, SimpleDateTime} from '../DateTime'
+import {DateTimeHelper, SimpleDateTime} from '../DateTimeHelper'
 import {Maybe} from '../Maybe'
 import {FormatToken, parseForDateTimeFormat, parseForNumberFormat, TokenType} from './parser'
 
-export function format(value: number, formatArg: string, config: Config, dateHelper: DateHelper): InternalCellValue {
+export function format(value: number, formatArg: string, config: Config, dateHelper: DateTimeHelper): InternalCellValue {
   const tryString = config.stringifyDate(dateHelper.numberToDateTime(value), formatArg) // default points to defaultStringifyDate()
   if (tryString !== undefined) {
     return tryString
