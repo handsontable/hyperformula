@@ -35,7 +35,7 @@ describe('Config', () => {
       expect(config.getConfig().useStats).toBe(Config.defaultConfig.useStats)
     })
 
-    it('has default settings and and the accent sensitive change is possible', () => {
+    it('has default settings and the accent sensitive change is possible', () => {
         const config = new Config({accentSensitive: true })
     
         expect(config.getConfig().accentSensitive).toBe(true)
@@ -66,7 +66,7 @@ describe('Config', () => {
         expect(config.getConfig().useStats).toBe(Config.defaultConfig.useStats)
       })
 
-      it('has default settings and and the case sensitive change is possible', () => {
+      it('has default settings and the case sensitive change is possible', () => {
         const config = new Config({caseSensitive: true})
     
         expect(config.getConfig().accentSensitive).toBe(Config.defaultConfig.accentSensitive)
@@ -97,7 +97,7 @@ describe('Config', () => {
         expect(config.getConfig().useStats).toBe(Config.defaultConfig.useStats)
       })
 
-      it('has default settings and and the case first is possible', () => {
+      it('has default settings and the case first is possible', () => {
         const config = new Config({caseFirst: 'upper'})
     
         expect(config.getConfig().accentSensitive).toBe(Config.defaultConfig.accentSensitive)
@@ -128,6 +128,6 @@ describe('Config', () => {
         expect(config.getConfig().useStats).toBe(Config.defaultConfig.useStats)
       })
  
-    
+      
 
 })
