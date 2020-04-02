@@ -82,6 +82,7 @@ export namespace MoveCellsDependencyTransformer {
         }
       }
       case AstNodeType.ERROR:
+      case AstNodeType.ERROR_WITH_RAW_INPUT:
       case AstNodeType.NUMBER:
       case AstNodeType.STRING: {
         return ast

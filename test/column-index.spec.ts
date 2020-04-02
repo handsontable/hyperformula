@@ -7,7 +7,7 @@ import {ColumnsSpan} from '../src/ColumnsSpan'
 import {Config} from '../src/Config'
 import {Matrix} from '../src/Matrix'
 import {RowsSpan} from '../src/RowsSpan'
-import {Statistics} from '../src/statistics/Statistics'
+import {Statistics} from '../src/statistics'
 import {adr} from './testUtils'
 
 describe('ColumnIndex#add', () => {

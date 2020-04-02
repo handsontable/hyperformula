@@ -2,7 +2,7 @@ import {simpleCellAddress} from '../../src/Cell'
 import {Config} from '../../src/Config'
 import {SheetMapping} from '../../src/DependencyGraph'
 import {enGB, plPL} from '../../src/i18n'
-import {buildLexerConfig, ParserWithCaching, Unparser} from '../../src/parser'
+import {AstNodeType, buildLexerConfig, ParserWithCaching, Unparser} from '../../src/parser'
 import {adr} from '../testUtils'
 
 describe('Unparse', () => {
@@ -112,10 +112,19 @@ describe('Unparse', () => {
 
   it('#unparse with known error', () => {
     const formula = '=#REF!'
-    const ast = parser.parse(formula, simpleCellAddress(0, 0, 0)).ast
+    const ast = parser.parse(formula, adr('A1')).ast
     const unparsed = unparser.unparse(ast, adr('A1'))
 
     expect(unparsed).toEqual('=#REF!')
+  })
+
+  it('#unparse error with raw input', () => {
+    const formula = '=NotExistingSheet!A1'
+    const ast = parser.parse(formula, adr('A1')).ast
+    const unparsed = unparser.unparse(ast, adr('A1'))
+
+    expect(ast.type).toEqual(AstNodeType.ERROR_WITH_RAW_INPUT)
+    expect(unparsed).toEqual('=NotExistingSheet!A1')
   })
 
   it('#unparse with known error with translation', () => {
