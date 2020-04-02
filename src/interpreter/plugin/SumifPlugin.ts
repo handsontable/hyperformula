@@ -1,7 +1,7 @@
 import {CellError, ErrorType, InternalCellValue, SimpleCellAddress} from '../../Cell'
 import {Maybe} from '../../Maybe'
 import { ProcedureAst} from '../../parser'
-import {coerceToRange} from '../coerce'
+import {coerceToRange} from '../ArithmeticHelper'
 import { CriterionPackage} from '../Criterion'
 import {Condition, CriterionFunctionCompute} from '../CriterionFunctionCompute'
 import { SimpleRangeValue} from '../InterpreterValue'

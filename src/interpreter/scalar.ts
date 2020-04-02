@@ -1,5 +1,5 @@
 import {CellError, ErrorType, InternalCellValue} from '../Cell'
-import {coerceBooleanToNumber} from './coerce'
+import {coerceBooleanToNumber} from './ArithmeticHelper'
 
 /**
  * Adds two numbers

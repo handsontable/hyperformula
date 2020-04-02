@@ -23,9 +23,8 @@ export class Evaluator {
     private readonly stats: Statistics,
     private readonly dateHelper: DateHelper,
     private readonly numberLiteralsHelper: NumberLiteralHelper,
-    private readonly collator: Collator
   ) {
-    this.interpreter = new Interpreter(this.dependencyGraph, this.columnSearch, this.config, this.stats, this.dateHelper, this.numberLiteralsHelper, this.collator)
+    this.interpreter = new Interpreter(this.dependencyGraph, this.columnSearch, this.config, this.stats, this.dateHelper, this.numberLiteralsHelper)
   }
 
   public run() {
