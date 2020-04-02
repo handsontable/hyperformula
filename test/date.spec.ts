@@ -61,7 +61,7 @@ describe('Date helpers', () => {
     const dateHelper2 = new DateHelper(new Config({dateFormats : ['MM/DD/YY', 'YY/MM/DD']}))
     expect(dateHelper2.dateStringToDateNumber('99/12/31')).toBe(36525)
     const dateHelper3 = new DateHelper(new Config({dateFormats : ['YYYY/DD/MM']}))
-    expect(dateHelper3.dateStringToDateNumber('1999/12/31')).toBe(undefined)
+    expect(dateHelper3.dateStringToDateNumber('1999/31/12')).toBe(36525)
     const dateHelper4 = new DateHelper(new Config({dateFormats : ['YYYY/MM/DD']}))
     expect(dateHelper4.dateStringToDateNumber('1999/12/31')).toBe(36525)
     const dateHelper5 = new DateHelper(new Config({dateFormats : ['MM/YYYY/DD']}))
