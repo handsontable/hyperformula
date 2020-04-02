@@ -270,7 +270,7 @@ export interface ConfigParams {
    *
    * @category DateTime
    */
-  stringifyDateTime: (date: SimpleDateTime, dateFormat: string) => Maybe<string>,
+  stringifyDateTime: (dateTime: SimpleDateTime, dateFormat: string) => Maybe<string>,
   /**
    * Sets the rounding.
    *

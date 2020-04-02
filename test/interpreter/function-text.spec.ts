@@ -62,19 +62,6 @@ describe('Text', () => {
     expect(engine.getCellValue(adr('C1'))).toEqual('08 08')
   })
 
-  xit('month formats - not supported',  () => {
-    const engine =  HyperFormula.buildFromArray([[
-      '=DATE(2018, 8, 8)',
-      '=TEXT(A1, "mmm MMM")',
-      '=TEXT(A1, "mmmm MMMM")',
-      '=TEXT(A1, "mmmmm MMMMM")',
-    ]])
-
-    expect(engine.getCellValue(adr('B1'))).toEqual('Aug Aug')
-    expect(engine.getCellValue(adr('C1'))).toEqual('August August')
-    expect(engine.getCellValue(adr('D1'))).toEqual('A A')
-  })
-
   it('year formats',  () => {
     const engine =  HyperFormula.buildFromArray([[
       '=DATE(2018, 8, 8)',
