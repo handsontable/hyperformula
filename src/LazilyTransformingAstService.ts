@@ -1,77 +1,16 @@
-import {AbsoluteCellRange} from './AbsoluteCellRange'
 import {SimpleCellAddress} from './Cell'
-import {ColumnsSpan} from './ColumnsSpan'
-import {AddColumnsDependencyTransformer} from './dependencyTransformers/addColumns'
-import {AddRowsDependencyTransformer} from './dependencyTransformers/addRows'
-import {MoveCellsDependencyTransformer} from './dependencyTransformers/moveCells'
-import {RemoveColumnsDependencyTransformer} from './dependencyTransformers/removeColumns'
-import {RemoveRowsDependencyTransformer} from './dependencyTransformers/removeRows'
-import {RemoveSheetDependencyTransformer} from './dependencyTransformers/removeSheet'
 import {Ast, ParserWithCaching} from './parser'
-import {RowsSpan} from './RowsSpan'
-import {Statistics, StatType} from './statistics'
+import {Statistics} from './statistics/Statistics'
 import {UndoRedo} from './UndoRedo'
-
-export enum TransformationType {
-  ADD_ROWS,
-  ADD_COLUMNS,
-  REMOVE_ROWS,
-  REMOVE_COLUMNS,
-  MOVE_CELLS,
-  REMOVE_SHEET,
-}
-
-export interface AddColumnsTransformation {
-  type: TransformationType.ADD_COLUMNS,
-  addedColumns: ColumnsSpan,
-  sheet: number,
-}
-
-export interface AddRowsTransformation {
-  type: TransformationType.ADD_ROWS,
-  addedRows: RowsSpan,
-  sheet: number,
-}
-
-export interface RemoveRowsTransformation {
-  type: TransformationType.REMOVE_ROWS,
-  removedRows: RowsSpan,
-  sheet: number,
-}
-
-export interface RemoveColumnsTransformation {
-  type: TransformationType.REMOVE_COLUMNS,
-  removedColumns: ColumnsSpan,
-  sheet: number,
-}
-
-export interface MoveCellsTransformation {
-  type: TransformationType.MOVE_CELLS,
-  sourceRange: AbsoluteCellRange,
-  toRight: number,
-  toBottom: number,
-  toSheet: number,
-  sheet: number,
-}
-
-export interface RemoveSheetTransformation {
-  type: TransformationType.REMOVE_SHEET,
-  sheet: number,
-}
-
-export type Transformation =
-    AddRowsTransformation
-    | AddColumnsTransformation
-    | RemoveRowsTransformation
-    | RemoveColumnsTransformation
-    | MoveCellsTransformation
-    | RemoveSheetTransformation
+import {RemoveRowsTransformer} from './dependencyTransformers/RemoveRowsTransformer'
+import {FormulaTransformer} from './dependencyTransformers/Transformer'
+import {StatType} from './statistics'
 
 export class LazilyTransformingAstService {
 
   public parser?: ParserWithCaching
   public undoRedo?: UndoRedo
-  private transformations: Transformation[] = []
+  private transformations: FormulaTransformer[] = []
 
   constructor(
     private readonly stats: Statistics,
@@ -82,36 +21,9 @@ export class LazilyTransformingAstService {
     return this.transformations.length
   }
 
-  public addAddColumnsTransformation(addedColumns: ColumnsSpan) {
-    this.transformations.push({ type: TransformationType.ADD_COLUMNS, addedColumns, sheet: addedColumns.sheet })
-  }
-
-  public addAddRowsTransformation(addedRows: RowsSpan) {
-    this.transformations.push({ type: TransformationType.ADD_ROWS, addedRows, sheet: addedRows.sheet })
-  }
-
-  public addRemoveRowsTransformation(removedRows: RowsSpan): number {
-    this.transformations.push({ type: TransformationType.REMOVE_ROWS, removedRows, sheet: removedRows.sheet })
+  public addTransformation(transformation: FormulaTransformer): number {
+    this.transformations.push(transformation)
     return this.version()
-  }
-
-  public addRemoveColumnsTransformation(removedColumns: ColumnsSpan) {
-    this.transformations.push({ type: TransformationType.REMOVE_COLUMNS, removedColumns, sheet: removedColumns.sheet })
-  }
-
-  public addRemoveSheetTransformation(sheet: number) {
-    this.transformations.push({ type: TransformationType.REMOVE_SHEET, sheet})
-  }
-
-  public addMoveCellsTransformation(sourceRange: AbsoluteCellRange, toRight: number, toBottom: number, toSheet: number) {
-    this.transformations.push({
-      type: TransformationType.MOVE_CELLS,
-      sourceRange,
-      toRight,
-      toBottom,
-      toSheet,
-      sheet: sourceRange.sheet,
-    })
   }
 
   public applyTransformations(ast: Ast, address: SimpleCellAddress, version: number): [Ast, SimpleCellAddress, number] {
@@ -119,43 +31,13 @@ export class LazilyTransformingAstService {
 
     for (let v = version; v < this.transformations.length; v++) {
       const transformation = this.transformations[v]
-      switch (transformation.type) {
-        case TransformationType.ADD_COLUMNS: {
-          const [newAst, newAddress] = AddColumnsDependencyTransformer.transformSingleAst(transformation.addedColumns, ast, address)
-          ast = newAst
-          address = newAddress
-          break
-        }
-        case TransformationType.ADD_ROWS: {
-          const [newAst, newAddress] = AddRowsDependencyTransformer.transformSingleAst(transformation.addedRows, ast, address)
-          ast = newAst
-          address = newAddress
-          break
-        }
-        case TransformationType.REMOVE_COLUMNS: {
-          const [newAst, newAddress] = RemoveColumnsDependencyTransformer.transformSingleAst(transformation.removedColumns, ast, address)
-          ast = newAst
-          address = newAddress
-          break
-        }
-        case TransformationType.REMOVE_ROWS: {
-          const [newAst, newAddress] = RemoveRowsDependencyTransformer.transformSingleAst(transformation.removedRows, ast, address)
-          this.undoRedo!.storeDataForVersion(v, address, this.parser!.computeHashFromAst(ast))
-          ast = newAst
-          address = newAddress
-          break
-        }
-        case TransformationType.MOVE_CELLS: {
-          const [newAst, newAddress] = MoveCellsDependencyTransformer.transformSingleAst(transformation, ast, address)
-          ast = newAst
-          address = newAddress
-          break
-        }
-        case TransformationType.REMOVE_SHEET: {
-          ast = RemoveSheetDependencyTransformer.transformSingleAst(transformation.sheet, ast, address)
-          break
-        }
+      if (transformation instanceof RemoveRowsTransformer) {
+        this.undoRedo!.storeDataForVersion(v, address, this.parser!.computeHashFromAst(ast))
       }
+
+      const [newAst, newAddress] = transformation.transformSingleAst(ast, address)
+      ast = newAst
+      address = newAddress
     }
     const cachedAst = this.parser!.rememberNewAst(ast)
 
@@ -163,7 +45,7 @@ export class LazilyTransformingAstService {
     return [cachedAst, address, this.transformations.length]
   }
 
-  public* getTransformationsFrom(version: number, filter?: (transformation: Transformation) => boolean): IterableIterator<Transformation> {
+  public* getTransformationsFrom(version: number, filter?: (transformation: FormulaTransformer) => boolean): IterableIterator<FormulaTransformer> {
     for (let v = version; v < this.transformations.length; v++) {
       const transformation = this.transformations[v]
       if (!filter || filter(transformation)) {

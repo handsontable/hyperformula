@@ -148,7 +148,7 @@ describe('Interpreter', () => {
         [''],
       ],
     })
-    expect(engine.getCellValue(adr('A1', 1))).toEqual(detailedError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A1', 1))).toEqual(detailedError(ErrorType.REF))
   })
 
   it('expression with parenthesis', () => {
@@ -157,5 +157,27 @@ describe('Interpreter', () => {
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqual(9)
+  })
+
+  it('should return #REF when range is pointing to multiple sheets', () => {
+    const engine = HyperFormula.buildFromSheets({
+      'Sheet1': [
+        ['=SUM(Sheet1!A2:Sheet2!B3)'],
+        ['=SUM(Sheet1!A:Sheet2!B)'],
+        ['=SUM(Sheet1!2:Sheet2!3)'],
+        ['=Sheet1!A2:Sheet2!B3'],
+        ['=Sheet1!A:Sheet2!B'],
+        ['=Sheet1!2:Sheet2!3'],
+      ],
+      'Sheet2': [
+      ]
+    })
+
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.REF))
+    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.REF))
+    expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.REF))
+    expect(engine.getCellValue(adr('A4'))).toEqual(detailedError(ErrorType.REF))
+    expect(engine.getCellValue(adr('A5'))).toEqual(detailedError(ErrorType.REF))
+    expect(engine.getCellValue(adr('A6'))).toEqual(detailedError(ErrorType.REF))
   })
 })

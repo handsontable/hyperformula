@@ -14,12 +14,12 @@ export class EmptyStatistics extends Statistics {
   }
 
   /** @inheritDoc */
-  public start(name: StatType): void {
+  public start(_name: StatType): void {
     // do nothing
   }
 
   /** @inheritDoc */
-  public end(name: StatType): void {
+  public end(_name: StatType): void {
     // do nothing
   }
 }

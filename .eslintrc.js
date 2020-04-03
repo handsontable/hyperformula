@@ -50,7 +50,6 @@ module.exports = {
         "@typescript-eslint/no-inferrable-types": "off",
         "@typescript-eslint/ban-types": "off",
         "@typescript-eslint/no-use-before-define": "off",
-        "@typescript-eslint/no-unused-vars": "off",
         "@typescript-eslint/explicit-function-return-type": "off",
         "@typescript-eslint/no-empty-function": "off",
         "@typescript-eslint/no-namespace": "off",
@@ -59,7 +58,7 @@ module.exports = {
 
         "@typescript-eslint/no-non-null-assertion": "warn",
         "@typescript-eslint/prefer-regexp-exec": "warn",
-        "@typescript-eslint/no-unused-vars": "warn",
+        "@typescript-eslint/no-unused-vars": ["warn", { "argsIgnorePattern": "^_" }],
         "@typescript-eslint/no-explicit-any": "warn",
         "@typescript-eslint/interface-name-prefix": "warn",
     }

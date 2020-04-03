@@ -70,7 +70,7 @@ export class SparseStrategy implements IAddressMappingStrategy {
   }
 
   public addRows(row: number, numberOfRows: number): void {
-    this.mapping.forEach((rowMapping: Map<number, CellVertex>, colNumber: number) => {
+    this.mapping.forEach((rowMapping: Map<number, CellVertex>) => {
       const tmpMapping = new Map()
       rowMapping.forEach((vertex: CellVertex, rowNumber: number) => {
         if (rowNumber >= row) {
@@ -100,7 +100,7 @@ export class SparseStrategy implements IAddressMappingStrategy {
   }
 
   public removeRows(removedRows: RowsSpan): void {
-    this.mapping.forEach((rowMapping: Map<number, CellVertex>, colNumber: number) => {
+    this.mapping.forEach((rowMapping: Map<number, CellVertex>) => {
       const tmpMapping = new Map()
       rowMapping.forEach((vertex: CellVertex, rowNumber: number) => {
         if (rowNumber >= removedRows.rowStart) {

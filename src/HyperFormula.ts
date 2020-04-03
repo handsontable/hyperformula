@@ -1,18 +1,12 @@
-import { AbsoluteCellRange } from './AbsoluteCellRange'
-import {
-  CellType,
-  CellValueType,
-  getCellType,
-  getCellValueType,
-  NoErrorCellValue, SimpleCellAddress,
-} from './Cell'
+import {AbsoluteCellRange} from './AbsoluteCellRange'
+import {CellType, CellValueType, getCellType, getCellValueType, NoErrorCellValue, SimpleCellAddress} from './Cell'
 import {CellContent, CellContentParser, RawCellContent} from './CellContentParser'
 import {CellValue, ExportedChange, Exporter} from './CellValue'
 import {ColumnSearchStrategy} from './ColumnSearch/ColumnSearchStrategy'
 import {Config, ConfigParams} from './Config'
 import {CrudOperations} from './CrudOperations'
 import {buildTranslationPackage, RawTranslationPackage, TranslationPackage} from './i18n'
-import {normalizeRemovedIndexes, normalizeAddedIndexes} from './Operations'
+import {normalizeAddedIndexes, normalizeRemovedIndexes} from './Operations'
 import {
   AddressMapping,
   DependencyGraph,
@@ -22,7 +16,13 @@ import {
   SheetMapping,
   Vertex,
 } from './DependencyGraph'
-import { NamedExpressionDoesNotExist, NamedExpressionNameIsAlreadyTaken, NamedExpressionNameIsInvalid, NoOperationToUndo, EvaluationSuspendedError} from './errors'
+import {
+  EvaluationSuspendedError,
+  NamedExpressionDoesNotExist,
+  NamedExpressionNameIsAlreadyTaken,
+  NamedExpressionNameIsInvalid,
+  NoOperationToUndo,
+} from './errors'
 import {Evaluator} from './Evaluator'
 import {Sheet, Sheets} from './GraphBuilder'
 import {IBatchExecutor} from './IBatchExecutor'
@@ -30,18 +30,16 @@ import {LazilyTransformingAstService} from './LazilyTransformingAstService'
 import {Maybe} from './Maybe'
 import {NamedExpressions} from './NamedExpressions'
 import {
+  Ast,
   AstNodeType,
   ParserWithCaching,
   simpleCellAddressFromString,
   simpleCellAddressToString,
   Unparser,
-  Ast,
 } from './parser'
-import {
-  Serialization
-} from './Serialization'
+import {Serialization} from './Serialization'
 import {Statistics, StatType} from './statistics'
-import {Emitter, TypedEmitter, Listeners, Events} from './Emitter'
+import {Emitter, Events, Listeners, TypedEmitter} from './Emitter'
 import {UndoRedo} from './UndoRedo'
 import {BuildEngineFactory, EngineState} from './BuildEngineFactory'
 
@@ -1551,7 +1549,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Helper
    */
   public validateFormula(formulaString: string): boolean {
-    const [ast, address] = this.extractTemporaryFormula(formulaString)
+    const [ast] = this.extractTemporaryFormula(formulaString)
     if (!ast) {
       return false
     }
@@ -1659,4 +1657,3 @@ export class HyperFormula implements TypedEmitter {
     }
   }
 }
-
