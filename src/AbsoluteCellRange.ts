@@ -16,10 +16,9 @@ export class AbsoluteCellRange {
       return AbsoluteCellRange.fromCellRange(ast, baseAddress)
     } else if (ast.type === AstNodeType.COLUMN_RANGE) {
       return AbsoluteColumnRange.fromColumnRange(ast, baseAddress)
-    } else if (ast.type === AstNodeType.ROW_RANGE) {
+    } else {
       return AbsoluteRowRange.fromRowRange(ast, baseAddress)
     }
-    throw new Error('Unsupported AST type')
   }
 
   public static fromCellRange(x: CellRange, baseAddress: SimpleCellAddress): AbsoluteCellRange {
