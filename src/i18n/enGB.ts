@@ -1,6 +1,6 @@
-import {TranslationPackage} from './'
+import {RawTranslationPackage} from './'
 
-export const enGB: TranslationPackage = {
+export const enGB: RawTranslationPackage = {
   functions: {
     ACOS: 'ACOS',
     AND: 'AND',
@@ -118,7 +118,7 @@ export const enGB: TranslationPackage = {
     REF: '#REF!',
     ERROR: '#ERROR!'
   },
-  interface: {
+  ui: {
     NEW_SHEET_PREFIX: 'Sheet',
   },
 }

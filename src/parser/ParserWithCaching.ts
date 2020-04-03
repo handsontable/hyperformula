@@ -103,7 +103,7 @@ export class ParserWithCaching {
         idx++
       } else if (tokenMatcher(token, ProcedureName)) {
         const procedureName = token.image.toUpperCase().slice(0, -1)
-        const canonicalProcedureName = this.lexerConfig.functionMapping[procedureName] || procedureName
+        const canonicalProcedureName = this.lexerConfig.functionMapping[procedureName] ?? procedureName
         hash = hash.concat(canonicalProcedureName, '(')
         idx++
       } else {
@@ -158,12 +158,9 @@ export class ParserWithCaching {
         return this.computeHashOfAstNode(ast.value) + imageWithWhitespace('%', ast.leadingWhitespace)
       }
       case AstNodeType.ERROR: {
-        let image
-        if (ast.error) {
-          image = this.config.getErrorTranslationFor(ast.error.type)
-        } else {
-          image = this.config.getErrorTranslationFor(ErrorType.ERROR)
-        }
+        const image = this.config.getErrorTranslationFor(
+          ast.error ? ast.error.type : ErrorType.ERROR
+        )
         return imageWithWhitespace(image, ast.leadingWhitespace)
       }
       case AstNodeType.ERROR_WITH_RAW_INPUT: {
