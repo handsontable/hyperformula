@@ -534,7 +534,7 @@ export class HyperFormula implements TypedEmitter {
    * 
    * @fires [[valuesUpdated]]
    * 
-   * @throws an error when the value is not an array of arrays or a raw cell value
+   * @throws [[InvalidArgumentsError]] when the value is not an array of arrays or a raw cell value
    * @throws an error when it is an attempt to set cells content inside matrices during batch operation
    *
    * @category Cell
