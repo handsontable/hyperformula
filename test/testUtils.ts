@@ -97,7 +97,6 @@ const colNumber = (input: string): number => {
   }
 }
 
-
 export function detailedError(errorType: ErrorType, message?: string, config?: Config): DetailedCellError {
   config = new Config(config)
   const error = new CellError(errorType, message)

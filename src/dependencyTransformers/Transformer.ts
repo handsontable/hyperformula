@@ -6,7 +6,7 @@ import {
   CellAddress,
   CellRangeAst,
   CellReferenceAst,
-  ParserWithCaching
+  ParserWithCaching,
 } from '../parser'
 import {ColumnRangeAst, RowRangeAst} from '../parser/Ast'
 import {DependencyGraph} from '../DependencyGraph'
