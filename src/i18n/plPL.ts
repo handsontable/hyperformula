@@ -1,6 +1,6 @@
-import {TranslationPackage} from './'
+import {RawTranslationPackage} from './'
 
-export const plPL: TranslationPackage = {
+export const plPL: RawTranslationPackage = {
   functions: {
     ACOS: 'ACOS',
     AND: 'ORAZ',
@@ -118,7 +118,7 @@ export const plPL: TranslationPackage = {
     REF: '#ADR!',
     ERROR: '#BŁĄD!',
   },
-  interface: {
+  ui: {
     NEW_SHEET_PREFIX: 'Arkusz',
   },
 }
