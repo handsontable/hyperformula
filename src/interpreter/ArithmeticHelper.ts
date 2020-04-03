@@ -1,18 +1,102 @@
-import {CellError, EmptyValue, ErrorType, InternalCellValue, NoErrorCellValue} from '../Cell'
+import {
+  CellError,
+  CellValueTypeOrd,
+  EmptyValue,
+  ErrorType,
+  getCellValueType,
+  InternalCellValue,
+  NoErrorCellValue
+} from '../Cell'
 import {Config} from '../Config'
 import {DateHelper} from '../DateHelper'
 import {Maybe} from '../Maybe'
 import {NumberLiteralHelper} from '../NumberLiteralHelper'
+import {collatorFromConfig} from '../StringHelper'
 import {InterpreterValue, SimpleRangeValue} from './InterpreterValue'
+import {floatCmp, numberCmp} from './scalar'
+import Collator = Intl.Collator
 
 export class ArithmeticHelper {
+  private readonly collator: Collator
+  private readonly actualEps: number
   constructor(
     private readonly config: Config,
     private readonly dateHelper: DateHelper,
     private readonly numberLiteralsHelper: NumberLiteralHelper,
   ) {
-
+    this.collator = collatorFromConfig(config)
+    this.actualEps = config.smartRounding ? config.precisionEpsilon : 0
   }
+
+  public compare(left: NoErrorCellValue, right: NoErrorCellValue): number {
+    if (typeof left === 'string' || typeof right === 'string') {
+      const leftTmp = typeof left === 'string' ? this.dateHelper.dateStringToDateNumber(left) : left
+      const rightTmp = typeof right === 'string' ? this.dateHelper.dateStringToDateNumber(right) : right
+      if (typeof leftTmp === 'number' && typeof rightTmp === 'number') {
+        return floatCmp(leftTmp, rightTmp, this.actualEps)
+      }
+    }
+
+    if(left === EmptyValue) {
+      left = coerceEmptyToValue(right)
+    } else if(right === EmptyValue) {
+      right = coerceEmptyToValue(left)
+    }
+
+    if ( typeof left === 'string' && typeof right === 'string') {
+      return this.collator.compare(left, right)
+    } else if ( typeof left === 'boolean' && typeof right === 'boolean' ) {
+      return numberCmp(coerceBooleanToNumber(left), coerceBooleanToNumber(right))
+    } else if ( typeof left === 'number' && typeof right === 'number' ) {
+      return floatCmp(left, right, this.config.smartRounding ? this.config.precisionEpsilon : 0)
+    } else if ( left === EmptyValue && right === EmptyValue ) {
+      return 0
+    } else {
+      return numberCmp(CellValueTypeOrd(getCellValueType(left)), CellValueTypeOrd(getCellValueType(right)))
+    }
+  }
+
+  public add(left: number | CellError, right: number | CellError): number | CellError {
+    if (left instanceof CellError) {
+      return left
+    } else if (right instanceof CellError) {
+      return right
+    } else {
+      const ret = left + right
+      if (Math.abs(ret) < this.actualEps * Math.abs(left)) {
+        return 0
+      } else {
+        return ret
+      }
+    }
+  }
+
+  /**
+   * Subtracts two numbers
+   *
+   * Implementation of subtracting which is used in interpreter.
+   *
+   * Errors are propagated.
+   *
+   * @param left - left operand of subtraction
+   * @param right - right operand of subtraction
+   * @param eps - precision of comparison
+   */
+  public subtract(left: number | CellError, right: number | CellError): number | CellError {
+    if (left instanceof CellError) {
+      return left
+    } else if (right instanceof CellError) {
+      return right
+    } else {
+      const ret = left - right
+      if (Math.abs(ret) < this.actualEps * Math.abs(left)) {
+        return 0
+      } else {
+        return ret
+      }
+    }
+  }
+
   public coerceScalarToNumberOrError(arg: InternalCellValue): number | CellError {
     if (arg instanceof CellError) {
       return arg

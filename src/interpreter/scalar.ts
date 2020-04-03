@@ -29,46 +29,6 @@ export function nonstrictadd(left: InternalCellValue, right: InternalCellValue):
   }
 }
 
-export function add(left: number | CellError, right: number | CellError, eps: number): number | CellError {
-  if (left instanceof CellError) {
-    return left
-  } else if (right instanceof CellError) {
-    return right
-  } else {
-    const ret = left + right
-    if (Math.abs(ret) < eps * Math.abs(left)) {
-      return 0
-    } else {
-      return ret
-    }
-  }
-}
-
-/**
- * Subtracts two numbers
- *
- * Implementation of subtracting which is used in interpreter.
- *
- * Errors are propagated.
- *
- * @param left - left operand of subtraction
- * @param right - right operand of subtraction
- * @param eps - precision of comparison
- */
-export function subtract(left: number | CellError, right: number | CellError, eps: number): number | CellError {
-  if (left instanceof CellError) {
-    return left
-  } else if (right instanceof CellError) {
-    return right
-  } else {
-    const ret = left - right
-    if (Math.abs(ret) < eps * Math.abs(left)) {
-      return 0
-    } else {
-      return ret
-    }
-  }
-}
 
 /**
  * Multiplies two numbers

@@ -235,7 +235,7 @@ export class BooleanPlugin extends FunctionPlugin {
       if(vals[i] instanceof CellError) {
         continue
       }
-      if( this.interpreter.compare(vals[0], vals[i] as NoErrorCellValue) === 0 ) {
+      if( this.interpreter.arithmeticHelper.compare(vals[0], vals[i] as NoErrorCellValue) === 0 ) {
         return vals[i+1]
       }
     }
