@@ -1,12 +1,19 @@
+import {HyperFormula} from '../../src'
 import {Config} from '../../src/Config'
 import {SheetMapping} from '../../src/DependencyGraph'
-import {enGB, plPL} from '../../src/i18n'
+import {buildTranslationPackage, enGB, plPL} from '../../src/i18n'
 import {buildLexerConfig, FormulaLexer, ParserWithCaching} from '../../src/parser'
 import {adr} from '../testUtils'
 
 describe('Compute hash from ast', () => {
+  beforeEach(() => {
+    HyperFormula.unregisterAllLanguages()
+    HyperFormula.registerLanguage('plPL', plPL)
+    HyperFormula.registerLanguage('enGB', enGB)
+  })
+
   const config = new Config()
-  const sheetMapping = new SheetMapping(enGB)
+  const sheetMapping = new SheetMapping(buildTranslationPackage(enGB))
   sheetMapping.addSheet('Sheet1')
   sheetMapping.addSheet('Sheet2')
   const lexer = new FormulaLexer(buildLexerConfig(config))
@@ -110,8 +117,8 @@ describe('Compute hash from ast', () => {
   })
 
   it('procedure hash using canonical name', () => {
-    const config = new Config({ language: plPL })
-    const sheetMapping = new SheetMapping(plPL)
+    const config = new Config({ language: 'plPL' })
+    const sheetMapping = new SheetMapping(buildTranslationPackage(plPL))
     sheetMapping.addSheet('Sheet1')
     const lexer = new FormulaLexer(buildLexerConfig(config))
     const parser = new ParserWithCaching(config, sheetMapping.get)
@@ -127,8 +134,8 @@ describe('Compute hash from ast', () => {
   })
 
   it('procedure name with missing translation', () => {
-    const config = new Config({ language: plPL })
-    const sheetMapping = new SheetMapping(plPL)
+    const config = new Config({ language: 'plPL' })
+    const sheetMapping = new SheetMapping(buildTranslationPackage(plPL))
     sheetMapping.addSheet('Sheet1')
     const lexer = new FormulaLexer(buildLexerConfig(config))
     const parser = new ParserWithCaching(config, sheetMapping.get)
@@ -161,7 +168,7 @@ describe('Compute hash from ast', () => {
 
   it('should work with decimal separator', () => {
     const config = new Config({ decimalSeparator: ',', functionArgSeparator: ';' })
-    const sheetMapping = new SheetMapping(plPL)
+    const sheetMapping = new SheetMapping(buildTranslationPackage(plPL))
     sheetMapping.addSheet('Sheet1')
     const lexer = new FormulaLexer(buildLexerConfig(config))
     const parser = new ParserWithCaching(config, sheetMapping.get)

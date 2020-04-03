@@ -5,6 +5,7 @@ import {ExpectedOneOfValues, ExpectedValueOfType} from './errors'
 import {AlwaysDense, ChooseAddressMapping} from './DependencyGraph/AddressMapping/ChooseAddressMappingPolicy'
 import {defaultStringifyDateTime} from './format/format'
 import {enGB, TranslationPackage} from './i18n'
+import {HyperFormula} from './index'
 import {AbsPlugin} from './interpreter/plugin/AbsPlugin'
 import {BitShiftPlugin} from './interpreter/plugin/BitShiftPlugin'
 import {BitwiseLogicOperationsPlugin} from './interpreter/plugin/BitwiseLogicOperationsPlugin'
@@ -129,6 +130,12 @@ export interface ConfigParams {
    */
   decimalSeparator: '.' | ',',
   /**
+   * Code for translation package with translations of function and error names.
+   *
+   * @default 'enGB'
+   */
+  language: string,
+  /**
    * A thousand separator used for parsing numeric literals.
    *
    * Can be either empty, ',' or ' ' and must be different from [[decimalSeparator]] and [[functionArgSeparator]].
@@ -138,14 +145,6 @@ export interface ConfigParams {
    * @category Number
    */
   thousandSeparator: '' | ',' | ' ' | '.',
-  /**
-   * Translation package with translations of function and error names.
-   *
-   * @default enGB
-   * 
-   * @category Syntax
-   */
-  language: TranslationPackage,
   /**
    * A list of additional function plugins to use by formula interpreter.
    *
@@ -342,7 +341,7 @@ export class Config implements ConfigParams, ParserConfig {
     functionArgSeparator: ',',
     decimalSeparator: '.',
     thousandSeparator: '',
-    language: enGB,
+    language: 'enGB',
     functionPlugins: [],
     gpuMode: 'gpu',
     leapYear1900: false,
@@ -416,7 +415,7 @@ export class Config implements ConfigParams, ParserConfig {
   /** @inheritDoc */
   public readonly thousandSeparator: '' | ',' | ' ' | '.'
   /** @inheritDoc */
-  public readonly language: TranslationPackage
+  public readonly language: string
   /** @inheritDoc */
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   public readonly functionPlugins: any[]
@@ -458,6 +457,12 @@ export class Config implements ConfigParams, ParserConfig {
    * @internal
    */
   public readonly errorMapping: Record<string, ErrorType>
+  /**
+   * Built automatically based on language.
+   *
+   * @internal
+   */
+  public readonly translationPackage: TranslationPackage
 
   constructor(
     {
@@ -494,15 +499,15 @@ export class Config implements ConfigParams, ParserConfig {
     this.caseSensitive = this.valueFromParam(caseSensitive, 'boolean', 'caseSensitive')
     this.caseFirst = this.valueFromParam(caseFirst, ['upper', 'lower', 'false'], 'caseFirst')
     this.ignorePunctuation = this.valueFromParam(ignorePunctuation, 'boolean', 'ignorePunctuation')
-    this.chooseAddressMappingPolicy = chooseAddressMappingPolicy || Config.defaultConfig.chooseAddressMappingPolicy
+    this.chooseAddressMappingPolicy = chooseAddressMappingPolicy ?? Config.defaultConfig.chooseAddressMappingPolicy
     this.dateFormats = this.valueFromParamCheck(dateFormats, Array.isArray, 'array', 'dateFormats')
     this.timeFormats = this.valueFromParamCheck(timeFormats, Array.isArray, 'array', 'timeFormats')
     this.functionArgSeparator = this.valueFromParam(functionArgSeparator, 'string', 'functionArgSeparator')
     this.decimalSeparator = this.valueFromParam(decimalSeparator, ['.', ','], 'decimalSeparator')
+    this.language = this.valueFromParam(language, 'string', 'language')
     this.thousandSeparator = this.valueFromParam(thousandSeparator, ['', ',', ' ', '.'], 'thousandSeparator')
-    this.language = language || Config.defaultConfig.language
     this.localeLang = this.valueFromParam(localeLang, 'string', 'localeLang')
-    this.functionPlugins = functionPlugins || Config.defaultConfig.functionPlugins
+    this.functionPlugins = functionPlugins ?? Config.defaultConfig.functionPlugins
     this.gpuMode = this.valueFromParam(gpuMode, PossibleGPUModeString, 'gpuMode')
     this.smartRounding = this.valueFromParam(smartRounding, 'boolean', 'smartRounding')
     this.matrixDetection = this.valueFromParam(matrixDetection, 'boolean', 'matrixDetection')
@@ -513,9 +518,10 @@ export class Config implements ConfigParams, ParserConfig {
     this.useColumnIndex = this.valueFromParam(useColumnIndex, 'boolean', 'useColumnIndex')
     this.useStats = this.valueFromParam(useStats, 'boolean', 'useStats')
     this.vlookupThreshold = this.valueFromParam(vlookupThreshold, 'number', 'vlookupThreshold')
-    this.errorMapping = this.buildErrorMapping(this.language)
     this.parseDateTime = this.valueFromParam(parseDateTime, 'function', 'parseDateTime')
     this.stringifyDateTime = this.valueFromParam(stringifyDateTime, 'function', 'stringifyDateTime')
+    this.translationPackage = HyperFormula.getLanguage(this.language)
+    this.errorMapping = this.translationPackage.buildErrorMapping()
     this.nullDate = this.valueFromParamCheck(nullDate, instanceOfSimpleDate, 'IDate', 'nullDate')
     this.leapYear1900 = this.valueFromParam(leapYear1900, 'boolean', 'leapYear1900')
 
@@ -526,22 +532,30 @@ export class Config implements ConfigParams, ParserConfig {
     )
   }
 
+  public getConfig(): ConfigParams { //TODO: avoid pollution
+    return this
+  }
+
   public mergeConfig(init: Partial<ConfigParams>): Config {
-    const mergedConfig = Object.assign({}, this.getConfig(), init)
+    const mergedConfig: ConfigParams = Object.assign({}, this.getConfig(), init)
 
     return new Config(mergedConfig)
   }
 
-  public getConfig(): ConfigParams {
-    return this
-  }
-
   public getFunctionTranslationFor = (functionTranslationKey: string): string => {
-    return this.language.functions[functionTranslationKey]
+    const translation = this.translationPackage.getFunctionTranslation(functionTranslationKey)
+    if(translation === undefined) {
+      throw new Error('No translation for function.')
+    }
+    return translation
   }
 
   public getErrorTranslationFor = (functionTranslationKey: ErrorType): string => {
-    return this.language.errors[functionTranslationKey]
+    const translation = this.translationPackage.getErrorTranslation(functionTranslationKey)
+    if(translation === undefined) {
+      throw new Error('No translation for error.')
+    }
+    return translation
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -600,13 +614,6 @@ export class Config implements ConfigParams, ParserConfig {
       })
     }
     return ret
-  }
-
-  private buildErrorMapping(language: TranslationPackage): Record<string, ErrorType> {
-    return Object.keys(language.errors).reduce((ret, key) => {
-      ret[language.errors[key as ErrorType]] = key as ErrorType
-      return ret
-    }, {} as Record<string, ErrorType>)
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

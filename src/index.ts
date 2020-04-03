@@ -10,6 +10,7 @@ import {
 } from './errors'
 import {Sheets} from './GraphBuilder'
 import {HyperFormula} from './HyperFormula'
+import {enGB} from './i18n'
 import {LazilyTransformingAstService} from './LazilyTransformingAstService'
 
 class HyperFormulaNS extends HyperFormula {
@@ -24,6 +25,8 @@ class HyperFormulaNS extends HyperFormula {
   public static ExportedNamedExpressionChange = ExportedNamedExpressionChange
   public static EvaluationSuspendedError = EvaluationSuspendedError
 }
+
+HyperFormula.registerLanguage('enGB', enGB)
 
 export default HyperFormulaNS
 
