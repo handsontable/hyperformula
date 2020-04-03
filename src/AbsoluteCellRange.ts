@@ -94,24 +94,14 @@ export class AbsoluteCellRange {
     if (this.sheet !== address.sheet) {
       return false
     }
-
-    if (this.start.col <= address.col && this.end.col >= address.col) {
-      return true
-    }
-
-    return false
+    return this.start.col <= address.col && this.end.col >= address.col
   }
 
   public rowInRange(address: SimpleRowAddress): boolean {
     if (this.sheet !== address.sheet) {
       return false
     }
-
-    if (this.start.row <= address.row && this.end.row >= address.row) {
-      return true
-    }
-
-    return false
+    return this.start.row <= address.row && this.end.row >= address.row
   }
 
   public containsRange(range: AbsoluteCellRange): boolean {
