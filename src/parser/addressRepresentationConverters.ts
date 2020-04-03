@@ -51,7 +51,7 @@ export const cellAddressFromString = (sheetMapping: SheetMappingFn, stringAddres
 export const columnAddressFromString = (sheetMapping: SheetMappingFn, stringAddress: string, baseAddress: SimpleCellAddress): Maybe<ColumnAddress> => {
   const result = columnRegex.exec(stringAddress)!
 
-  const sheet = extractColumnNumber(result, sheetMapping)
+  const sheet = extractSheetNumber(result, sheetMapping)
   if (sheet === undefined) {
     return undefined
   }
@@ -68,7 +68,7 @@ export const columnAddressFromString = (sheetMapping: SheetMappingFn, stringAddr
 export const rowAddressFromString = (sheetMapping: SheetMappingFn, stringAddress: string, baseAddress: SimpleCellAddress): Maybe<RowAddress> => {
   const result = rowRegex.exec(stringAddress)!
 
-  const sheet = extractColumnNumber(result, sheetMapping)
+  const sheet = extractSheetNumber(result, sheetMapping)
   if (sheet === undefined) {
     return undefined
   }
@@ -169,7 +169,7 @@ export function columnIndexToLabel(column: number) {
   return result.toUpperCase()
 }
 
-function extractColumnNumber(regexResult: RegExpExecArray, sheetMapping: SheetMappingFn): number | null | undefined {
+function extractSheetNumber(regexResult: RegExpExecArray, sheetMapping: SheetMappingFn): number | null | undefined {
   const maybeSheetName = regexResult[3] || regexResult[4]
 
   let sheet = null
