@@ -108,7 +108,7 @@ export class ArithmeticHelper {
       return right
     } else if (typeof left === 'number') {
       if (typeof right === 'number') {
-        return this.addWithEpsilon(left,right)
+        return this.addWithEpsilon(left, right)
       } else {
         return left
       }
