@@ -5,7 +5,6 @@ import {coerceToRange} from '../ArithmeticHelper'
 import { CriterionPackage} from '../Criterion'
 import {Condition, CriterionFunctionCompute} from '../CriterionFunctionCompute'
 import { SimpleRangeValue} from '../InterpreterValue'
-import {nonstrictadd} from '../scalar'
 import {FunctionPlugin} from './FunctionPlugin'
 
 class AverageResult {
@@ -117,7 +116,7 @@ export class SumifPlugin extends FunctionPlugin {
       this.interpreter,
       sumifCacheKey,
       0,
-      (left, right) => nonstrictadd(left, right),
+      (left, right) => this.interpreter.arithmeticHelper.nonstrictadd(left, right),
       (arg) => arg,
     ).compute(valuesArg, [new Condition(conditionArg, criterion)])
 
@@ -158,7 +157,7 @@ export class SumifPlugin extends FunctionPlugin {
       this.interpreter,
       sumifCacheKey,
       0,
-      (left, right) => nonstrictadd(left, right),
+      (left, right) => this.interpreter.arithmeticHelper.nonstrictadd(left, right),
       (arg) => arg,
     ).compute(valuesArg, conditions)
 

@@ -2,10 +2,7 @@ import GPU from 'gpu.js'
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
 import {
   CellError,
-  CellValueTypeOrd,
-  EmptyValue,
   ErrorType,
-  getCellValueType, InternalCellValue,
   invalidSimpleCellAddress, NoErrorCellValue,
   SimpleCellAddress,
 } from '../Cell'
@@ -19,10 +16,9 @@ import {Maybe} from '../Maybe'
 import {Ast, AstNodeType} from '../parser/Ast'
 import {Statistics} from '../statistics/Statistics'
 import {
-  ArithmeticHelper,
+  ArithmeticHelper, divide, multiply, percent, power, unaryminus,
 } from './ArithmeticHelper'
 import {InterpreterValue, SimpleRangeValue} from './InterpreterValue'
-import {divide, multiply, percent, power, unaryminus} from './scalar'
 import {concatenate} from './text'
 import {NumberLiteralHelper} from '../NumberLiteralHelper'
 
@@ -254,5 +250,4 @@ export class Interpreter {
       return undefined
     }
   }
-
 }

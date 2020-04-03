@@ -14,7 +14,6 @@ import {NumberLiteralHelper} from './NumberLiteralHelper'
 import {buildLexerConfig, ParserWithCaching, Unparser} from './parser'
 import {Serialization} from './Serialization'
 import {EmptyStatistics, Statistics, StatType} from './statistics'
-import {collatorFromConfig} from './StringHelper'
 import {UndoRedo} from './UndoRedo'
 
 export type EngineState = {
