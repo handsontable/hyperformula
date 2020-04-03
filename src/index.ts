@@ -7,6 +7,7 @@ import {
   NoSheetWithNameError,
   NoOperationToUndo,
   EvaluationSuspendedError,
+  NotAFormulaError
 } from './errors'
 import {Sheets} from './GraphBuilder'
 import {HyperFormula} from './HyperFormula'
@@ -23,6 +24,7 @@ class HyperFormulaNS extends HyperFormula {
   public static ExportedCellChange = ExportedCellChange
   public static ExportedNamedExpressionChange = ExportedNamedExpressionChange
   public static EvaluationSuspendedError = EvaluationSuspendedError
+  public static NotAFormulaError = NotAFormulaError
 }
 
 export default HyperFormulaNS
@@ -34,6 +36,7 @@ export {
   InvalidAddressError,
   InvalidArgumentsError,
   NoSheetWithNameError,
+  NotAFormulaError,
   CellValue,
   EmptyValue,
   CellError,
