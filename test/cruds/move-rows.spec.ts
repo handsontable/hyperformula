@@ -9,7 +9,7 @@ import {
   extractReference,
   extractRowRange,
   rowEnd,
-  rowStart
+  rowStart,
 } from '../testUtils'
 
 describe('Ensure it is possible to move rows', () => {
@@ -303,4 +303,3 @@ describe('Move rows - column ranges', () => {
     expect(engine.getCellValue(adr('A1'))).toEqual(10)
   })
 })
-

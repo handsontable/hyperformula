@@ -8,7 +8,7 @@ import {
   normalizeAddedIndexes,
   normalizeRemovedIndexes,
   Operations,
-  RemoveRowsCommand
+  RemoveRowsCommand,
 } from './Operations'
 import {ColumnSearchStrategy} from './ColumnSearch/ColumnSearchStrategy'
 import {ColumnsSpan} from './ColumnsSpan'

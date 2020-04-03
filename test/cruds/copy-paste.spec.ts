@@ -9,7 +9,7 @@ import {
   detailedError,
   expectArrayWithSameContent,
   extractReference, rowEnd,
-  rowStart
+  rowStart,
 } from '../testUtils'
 
 describe('Copy - paste integration', () => {

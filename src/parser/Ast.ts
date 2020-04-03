@@ -169,7 +169,7 @@ export const buildColumnRangeAst = (start: ColumnAddress, end: ColumnAddress, sh
     start,
     end,
     sheetReferenceType,
-    leadingWhitespace: extractImage(leadingWhitespace)
+    leadingWhitespace: extractImage(leadingWhitespace),
   }
 }
 
@@ -187,7 +187,7 @@ export const buildRowRangeAst = (start: RowAddress, end: RowAddress, sheetRefere
     start,
     end,
     sheetReferenceType,
-    leadingWhitespace: extractImage(leadingWhitespace)
+    leadingWhitespace: extractImage(leadingWhitespace),
   }
 }
 

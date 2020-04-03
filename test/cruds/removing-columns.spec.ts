@@ -7,7 +7,8 @@ import {simpleCellAddress} from '../../src/Cell'
 import '../testConfig'
 import {
   adr,
-  expectArrayWithSameContent, expectEngineToBeTheSameAs,
+  expectArrayWithSameContent,
+  expectEngineToBeTheSameAs,
   expectFunctionToHaveRefError,
   expectReferenceToHaveRefError,
   extractMatrixRange,

@@ -5,7 +5,7 @@ import {
   cellAddressFromString,
   columnAddressFromString,
   rowAddressFromString,
-  SheetMappingFn
+  SheetMappingFn,
 } from './addressRepresentationConverters'
 import {Ast, AstNodeType, imageWithWhitespace, ParsingError, ParsingErrorType, RangeSheetReferenceType} from './Ast'
 import {binaryOpTokenMap} from './binaryOpTokenMap'
@@ -18,7 +18,7 @@ import {
   ILexerConfig,
   ProcedureName,
   RowRange,
-  WhiteSpace
+  WhiteSpace,
 } from './LexerConfig'
 import {ParserConfig} from './ParserConfig'
 import {formatNumber} from './Unparser'

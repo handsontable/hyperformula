@@ -7,7 +7,8 @@ import {InvalidArgumentsError} from '../../src'
 import {CellAddress} from '../../src/parser'
 import '../testConfig'
 import {
-  adr, expectArrayWithSameContent, expectEngineToBeTheSameAs,
+  adr, expectArrayWithSameContent,
+  expectEngineToBeTheSameAs,
   expectFunctionToHaveRefError,
   expectReferenceToHaveRefError,
   extractMatrixRange,

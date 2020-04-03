@@ -6,7 +6,7 @@ import {
   ColumnRangeAst,
   imageWithWhitespace,
   RangeSheetReferenceType,
-  RowRangeAst
+  RowRangeAst,
 } from './Ast'
 import {binaryOpTokenMap} from './binaryOpTokenMap'
 import {additionalCharactersAllowedInQuotes, ILexerConfig} from './LexerConfig'

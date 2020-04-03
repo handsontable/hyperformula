@@ -6,7 +6,7 @@ import {
   cellAddressFromString,
   columnAddressFromString,
   rowAddressFromString,
-  SheetMappingFn
+  SheetMappingFn,
 } from './addressRepresentationConverters'
 import {
   Ast,
@@ -33,7 +33,8 @@ import {
   buildPlusOpAst,
   buildPlusUnaryOpAst,
   buildPowerOpAst,
-  buildProcedureAst, buildRowRangeAst,
+  buildProcedureAst, 
+  buildRowRangeAst,
   buildStringAst,
   buildTimesOpAst,
   CellReferenceAst,
@@ -66,7 +67,8 @@ import {
   PlusOp,
   PowerOp,
   ProcedureName,
-  RangeSeparator, RowRange,
+  RangeSeparator, 
+  RowRange,
   RParen,
   StringLiteral,
   TimesOp,

@@ -2,7 +2,6 @@ import {absoluteSheetReference, SimpleCellAddress, simpleColumnAddress, SimpleCo
 import {columnIndexToLabel} from './addressRepresentationConverters'
 import {AddressWithColumn} from './Address'
 
-
 export enum ReferenceType {
   RELATIVE = 'RELATIVE',
   ABSOLUTE = 'ABSOLUTE',
@@ -26,6 +25,7 @@ export class ColumnAddress implements AddressWithColumn {
   public isColumnAbsolute(): boolean {
     return (this.type === ReferenceType.ABSOLUTE)
   }
+
   public isColumnRelative(): boolean {
     return (this.type === ReferenceType.RELATIVE)
   }

@@ -18,7 +18,7 @@ import {
   ParsingErrorVertex,
   RangeVertex,
   ValueCellVertex,
-  Vertex
+  Vertex,
 } from './'
 import {AddressMapping} from './AddressMapping/AddressMapping'
 import {collectAddressesDependentToMatrix} from './collectAddressesDependentToMatrix'

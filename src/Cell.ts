@@ -122,7 +122,6 @@ export interface SimpleColumnAddress {
 
 export const simpleColumnAddress = (sheet: number, col: number): SimpleColumnAddress => ({sheet, col})
 
-
 export interface SimpleCellAddress {
   col: number,
   row: number,

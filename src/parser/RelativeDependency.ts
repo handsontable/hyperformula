@@ -9,7 +9,7 @@ export enum RelativeDependencyType {
   CellAddress,
   CellRange,
   ColumnRange,
-  RowRange
+  RowRange,
 }
 
 export interface AddressDependency {

@@ -5,7 +5,7 @@ import {
   simpleColumnAddress,
   SimpleColumnAddress,
   simpleRowAddress,
-  SimpleRowAddress
+  SimpleRowAddress,
 } from '../Cell'
 import {columnIndexToLabel} from './addressRepresentationConverters'
 import {AddressWithColumn, AddressWithRow} from './Address'

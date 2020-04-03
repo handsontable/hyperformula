@@ -12,7 +12,13 @@ import {
   expectEngineToBeTheSameAs,
   extractMatrixRange,
   extractRange,
-  extractReference, extractColumnRange, colStart, colEnd, rowStart, rowEnd, extractRowRange,
+  extractReference,
+  extractColumnRange,
+  colStart,
+  colEnd,
+  rowStart,
+  rowEnd,
+  extractRowRange,
 } from '../testUtils'
 
 describe('Moving rows - checking if its possible', () => {
@@ -984,7 +990,7 @@ describe('row ranges', () => {
       ['=SUM(3:4)'],
       [null],
       ['1'],
-      ['2']
+      ['2'],
     ])
 
     engine.moveCells(adr('A1'), 1, 1, adr('B2'))
@@ -995,4 +1001,3 @@ describe('row ranges', () => {
     expect(range.end).toEqual(rowEnd(4))
   })
 })
-
