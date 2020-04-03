@@ -42,7 +42,7 @@ export class ColumnAddress implements AddressWithColumn {
   public toSimpleColumnAddress(baseAddress: SimpleCellAddress): SimpleColumnAddress {
     const sheet = absoluteSheetReference(this, baseAddress)
     let column = this.col
-    if (this.type === ReferenceType.RELATIVE) {
+    if (this.isColumnRelative()) {
       column = baseAddress.col + this.col
     }
     return simpleColumnAddress(sheet, column)
