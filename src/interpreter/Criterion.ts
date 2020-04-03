@@ -52,6 +52,7 @@ export const parseCriterion = (criterion: InternalCellValue): Maybe<Criterion> =
       } else if (isNaN(value)) {
         switch (regexResult[1]) {
           case '=': return buildCriterion(CriterionType.EQUAL, regexResult[2])
+          case '<>': return buildCriterion(CriterionType.NOT_EQUAL, regexResult[2])
         }
       } else {
         switch (regexResult[1]) {
@@ -116,7 +117,7 @@ export const buildCriterionLambda = (criterion: Criterion, arithmeticHelper: Ari
         if (typeof cellValue === 'number') {
           return arithmeticHelper.floatCmp(cellValue, criterion.value as number) === 0
         } else if(typeof cellValue === 'string') {
-          return arithmeticHelper.collator.compare(cellValue, criterion.value as string) === 0
+          return arithmeticHelper.stringCmp(cellValue, criterion.value as string) === 0
         } else {
           return null
         }
@@ -126,6 +127,8 @@ export const buildCriterionLambda = (criterion: Criterion, arithmeticHelper: Ari
       return (cellValue) => {
         if (typeof cellValue === 'number') {
           return arithmeticHelper.floatCmp(cellValue, criterion.value as number) !== 0
+        } else if(typeof cellValue === 'string') {
+          return arithmeticHelper.stringCmp(cellValue, criterion.value as string) !== 0
         } else {
           return null
         }

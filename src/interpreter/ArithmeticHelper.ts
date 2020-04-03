@@ -16,7 +16,7 @@ import {InterpreterValue, SimpleRangeValue} from './InterpreterValue'
 import Collator = Intl.Collator
 
 export class ArithmeticHelper {
-  public readonly collator: Collator
+  private readonly collator: Collator
   private readonly actualEps: number
   constructor(
     private readonly config: Config,
@@ -43,7 +43,7 @@ export class ArithmeticHelper {
     }
 
     if ( typeof left === 'string' && typeof right === 'string') {
-      return this.collator.compare(left, right)
+      return this.stringCmp(left, right)
     } else if ( typeof left === 'boolean' && typeof right === 'boolean' ) {
       return numberCmp(coerceBooleanToNumber(left), coerceBooleanToNumber(right))
     } else if ( typeof left === 'number' && typeof right === 'number' ) {
@@ -68,18 +68,26 @@ export class ArithmeticHelper {
     }
   }
 
+  public stringCmp(left: string, right: string): number {
+    return this.collator.compare(left, right)
+  }
+
   public add(left: number | CellError, right: number | CellError): number | CellError {
     if (left instanceof CellError) {
       return left
     } else if (right instanceof CellError) {
       return right
     } else {
-      const ret = left + right
-      if (Math.abs(ret) < this.actualEps * Math.abs(left)) {
-        return 0
-      } else {
-        return ret
-      }
+      return this.addWithEpsilon(left, right)
+    }
+  }
+
+  private addWithEpsilon(left: number, right: number): number {
+    const ret = left + right
+    if (Math.abs(ret) < this.actualEps * Math.abs(left)) {
+      return 0
+    } else {
+      return ret
     }
   }
 
@@ -100,7 +108,7 @@ export class ArithmeticHelper {
       return right
     } else if (typeof left === 'number') {
       if (typeof right === 'number') {
-        return left + right
+        return this.addWithEpsilon(left,right)
       } else {
         return left
       }

@@ -260,6 +260,17 @@ describe('Function SUMIF(S) - calculations and optimizations', () => {
     expect(engine.getCellValue(adr('A4'))).toEqual(6)
   })
 
+  it('case insensitive inequality', () => {
+    const engine = HyperFormula.buildFromArray( [
+      ['abcd', '1'],
+      ['ABCD', '2'],
+      ['abc', '4'],
+      ['=SUMIF(A1:A3, "<>abcd", B1:B3)']
+    ])
+
+    expect(engine.getCellValue(adr('A4'))).toEqual(4)
+  })
+
   it('case insensitive', () => {
     const engine = HyperFormula.buildFromArray( [
       ['abcd', '1'],
