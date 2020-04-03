@@ -1,12 +1,14 @@
 import GPU from 'gpu.js'
-import {AbsoluteCellRange} from '../AbsoluteCellRange'
+import {AbsoluteCellRange, AbsoluteColumnRange, AbsoluteRowRange} from '../AbsoluteCellRange'
 import {
   CellError,
   CellValueTypeOrd,
   EmptyValue,
   ErrorType,
-  getCellValueType, InternalCellValue,
-  invalidSimpleCellAddress, NoErrorCellValue,
+  getCellValueType,
+  InternalCellValue,
+  invalidSimpleCellAddress,
+  NoErrorCellValue,
   SimpleCellAddress,
 } from '../Cell'
 import {ColumnSearchStrategy} from '../ColumnSearch/ColumnSearchStrategy'
@@ -16,14 +18,14 @@ import {DependencyGraph} from '../DependencyGraph'
 import {Matrix, NotComputedMatrix} from '../Matrix'
 import {Maybe} from '../Maybe'
 // noinspection TypeScriptPreferShortImport
-import {Ast, AstNodeType} from '../parser/Ast'
+import {Ast, AstNodeType, CellRangeAst, ColumnRangeAst, RowRangeAst} from '../parser/Ast'
 import {Statistics} from '../statistics/Statistics'
 import {coerceBooleanToNumber, coerceEmptyToValue, coerceScalarToNumberOrError} from './coerce'
 import {InterpreterValue, SimpleRangeValue} from './InterpreterValue'
 import {add, divide, floatCmp, multiply, numberCmp, percent, power, subtract, unaryminus} from './scalar'
 import {concatenate} from './text'
-import Collator = Intl.Collator
 import {NumberLiteralHelper} from '../NumberLiteralHelper'
+import Collator = Intl.Collator
 
 export class Interpreter {
   private gpu?: GPU.GPU
@@ -218,6 +220,9 @@ export class Interpreter {
         }
       }
       case AstNodeType.CELL_RANGE: {
+        if (!this.rangeSpansOneSheet(ast)) {
+          return new CellError(ErrorType.REF)
+        }
         const range = AbsoluteCellRange.fromCellRange(ast, formulaAddress)
         const matrixVertex = this.dependencyGraph.getMatrix(range)
         if (matrixVertex) {
@@ -234,6 +239,20 @@ export class Interpreter {
         } else {
           return SimpleRangeValue.onlyRange(range, this.dependencyGraph)
         }
+      }
+      case AstNodeType.COLUMN_RANGE: {
+        if (!this.rangeSpansOneSheet(ast)) {
+          return new CellError(ErrorType.REF)
+        }
+        const range = AbsoluteColumnRange.fromColumnRange(ast, formulaAddress)
+        return SimpleRangeValue.onlyRange(range, this.dependencyGraph)
+      }
+      case AstNodeType.ROW_RANGE: {
+        if (!this.rangeSpansOneSheet(ast)) {
+          return new CellError(ErrorType.REF)
+        }
+        const range = AbsoluteRowRange.fromRowRange(ast, formulaAddress)
+        return SimpleRangeValue.onlyRange(range, this.dependencyGraph)
       }
       case AstNodeType.PARENTHESIS: {
         return this.evaluateAst(ast.expression, formulaAddress)
@@ -274,6 +293,10 @@ export class Interpreter {
         this.pluginCache.set(functionName, [pluginInstance, pluginFunction])
       })
     }
+  }
+
+  private rangeSpansOneSheet(ast: CellRangeAst | ColumnRangeAst | RowRangeAst): boolean {
+    return ast.start.sheet === ast.end.sheet
   }
 
   private passErrors(left: InterpreterValue, right: InterpreterValue): Maybe<CellError> {

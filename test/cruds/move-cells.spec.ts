@@ -13,6 +13,12 @@ import {
   extractMatrixRange,
   extractRange,
   extractReference,
+  extractColumnRange,
+  colStart,
+  colEnd,
+  rowStart,
+  rowEnd,
+  extractRowRange,
 } from '../testUtils'
 
 describe('Moving rows - checking if its possible', () => {
@@ -46,8 +52,6 @@ describe('Moving rows - checking if its possible', () => {
     expect(engine.isItPossibleToMoveCells(adr('A1'), 1.5, 1, adr('A2'))).toBe(false)
     expect(engine.isItPossibleToMoveCells(adr('A1'), 0, 1, adr('A2'))).toBe(false)
     expect(engine.isItPossibleToMoveCells(adr('A1'), NaN, 1, adr('A2'))).toBe(false)
-    expect(engine.isItPossibleToMoveCells(adr('A1'), Infinity, 1, adr('A2'))).toBe(false)
-    expect(engine.isItPossibleToMoveCells(adr('A1'), -Infinity, 1, adr('A2'))).toBe(false)
   })
 
   it('height should be positive integer', () => {
@@ -56,8 +60,16 @@ describe('Moving rows - checking if its possible', () => {
     expect(engine.isItPossibleToMoveCells(adr('A1'), 1, 1.5, adr('A2'))).toBe(false)
     expect(engine.isItPossibleToMoveCells(adr('A1'), 1, 0, adr('A2'))).toBe(false)
     expect(engine.isItPossibleToMoveCells(adr('A1'), 1, NaN, adr('A2'))).toBe(false)
-    expect(engine.isItPossibleToMoveCells(adr('A1'), 1, Infinity, adr('A2'))).toBe(false)
-    expect(engine.isItPossibleToMoveCells(adr('A1'), 1, -Infinity, adr('A2'))).toBe(false)
+  })
+
+  it('rectangle can be valid column or row range', () => {
+    const engine = HyperFormula.buildFromArray([[]])
+
+    expect(engine.isItPossibleToMoveCells(adr('A1'), 1, Infinity, adr('A2'))).toBe(true)
+    expect(engine.isItPossibleToMoveCells(adr('A1'), Infinity, 1, adr('A2'))).toBe(true)
+    expect(engine.isItPossibleToMoveCells(adr('A1'), Infinity, Infinity, adr('A2'))).toBe(false)
+    expect(engine.isItPossibleToMoveCells(adr('B2'), Infinity, 1, adr('A2'))).toBe(false)
+    expect(engine.isItPossibleToMoveCells(adr('B2'), 1, Infinity, adr('A2'))).toBe(false)
   })
 
   it('no if we move the range which overlaps with matrix', () => {
@@ -912,5 +924,80 @@ describe('move cells with matrices', () => {
     expect(engine.getCellValue(adr('B1'))).toEqual(EmptyValue)
     expect(engine.getCellValue(adr('A3'))).toEqual(1)
     expect(engine.getCellValue(adr('B3'))).toEqual(2)
+  })
+})
+
+describe('column ranges', () => {
+  it('should not update range when only part of it is moved', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1', '3', '=SUM(A:B)'],
+    ])
+
+    engine.moveCells(adr('A1'), 1, 1, adr('C2'))
+
+    const range = extractColumnRange(engine, adr('C1'))
+    expect(range.start).toEqual(colStart('A'))
+    expect(range.end).toEqual(colEnd('B'))
+    expect(engine.getCellValue(adr('C1'))).toEqual(3)
+
+    const a1 = engine.addressMapping.fetchCell(adr('A1'))
+    const b1 = engine.addressMapping.fetchCell(adr('B1'))
+    const ab = engine.rangeMapping.fetchRange(colStart('A'), colEnd('B'))
+    expect(a1).toBeInstanceOf(EmptyCellVertex)
+    expect(engine.graph.existsEdge(a1, ab)).toBe(true)
+    expect(engine.graph.existsEdge(b1, ab)).toBe(true)
+  })
+
+  it('should transform relative column references', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=SUM(C:D)', '', '1', '2']
+    ])
+
+    engine.moveCells(adr('A1'), 1, 1, adr('B2'))
+
+    const range = extractColumnRange(engine, adr('B2'))
+    expect(engine.getCellValue(adr('B2'))).toEqual(3)
+    expect(range.start).toEqual(colStart('C'))
+    expect(range.end).toEqual(colEnd('D'))
+  })
+})
+
+describe('row ranges', () => {
+  it('should not update range when only part of it is moved', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1'],
+      ['3'],
+      ['=SUM(1:2)'],
+    ])
+
+    engine.moveCells(adr('A1'), 1, 1, adr('B3'))
+
+    const range = extractRowRange(engine, adr('A3'))
+    expect(range.start).toEqual(rowStart(1))
+    expect(range.end).toEqual(rowEnd(2))
+    expect(engine.getCellValue(adr('A3'))).toEqual(3)
+
+    const a1 = engine.addressMapping.fetchCell(adr('A1'))
+    const a2 = engine.addressMapping.fetchCell(adr('A2'))
+    const ab = engine.rangeMapping.fetchRange(rowStart(1), rowEnd(2))
+    expect(a1).toBeInstanceOf(EmptyCellVertex)
+    expect(engine.graph.existsEdge(a1, ab)).toBe(true)
+    expect(engine.graph.existsEdge(a2, ab)).toBe(true)
+  })
+
+  it('should transform relative column references', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=SUM(3:4)'],
+      [null],
+      ['1'],
+      ['2'],
+    ])
+
+    engine.moveCells(adr('A1'), 1, 1, adr('B2'))
+
+    const range = extractRowRange(engine, adr('B2'))
+    expect(engine.getCellValue(adr('B2'))).toEqual(3)
+    expect(range.start).toEqual(rowStart(3))
+    expect(range.end).toEqual(rowEnd(4))
   })
 })
