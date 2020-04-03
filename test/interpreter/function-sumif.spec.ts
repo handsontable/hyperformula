@@ -253,11 +253,33 @@ describe('Function SUMIF(S) - calculations and optimizations', () => {
     const engine = HyperFormula.buildFromArray([
         ['1.0000000001', '1'],
         ['1.00000000000005', '2'],
-        ['1.00000000000005', '3'],
+        ['1.00000000000005', '4'],
         ['=SUMIF(A1:A3, "=1", B1:B3)']
       ])
 
     expect(engine.getCellValue(adr('A4'))).toEqual(6)
+  })
+
+  it('case insensitive', () => {
+    const engine = HyperFormula.buildFromArray( [
+      ['abcd', '1'],
+      ['ABCD', '2'],
+      ['abc', '4'],
+      ['=SUMIF(A1:A3, "=abcd", B1:B3)']
+    ])
+
+    expect(engine.getCellValue(adr('A4'))).toEqual(3)
+  })
+
+  it('case sensitive', () => {
+    const engine = HyperFormula.buildFromArray( [
+      ['abcd', '1'],
+      ['ABCD', '2'],
+      ['abc', '4'],
+      ['=SUMIF(A1:A3, "=abcd", B1:B3)']
+    ], {caseSensitive: true})
+
+    expect(engine.getCellValue(adr('A4'))).toEqual(1)
   })
 
   it('ignore errors', () => {

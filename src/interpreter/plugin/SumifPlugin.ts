@@ -97,8 +97,8 @@ export class SumifPlugin extends FunctionPlugin {
     } else if (criterionValue instanceof CellError) {
       return criterionValue
     }
-    const criterionPackage = CriterionPackage.fromCellValue(criterionValue)
-    if (criterionPackage === undefined) {
+    const criterion = CriterionPackage.fromCellValue(criterionValue, this.interpreter.arithmeticHelper)
+    if (criterion === undefined) {
       return new CellError(ErrorType.VALUE)
     }
 
@@ -119,7 +119,7 @@ export class SumifPlugin extends FunctionPlugin {
       0,
       (left, right) => nonstrictadd(left, right),
       (arg) => arg,
-    ).compute(valuesArg, [new Condition(conditionArg, criterionPackage)])
+    ).compute(valuesArg, [new Condition(conditionArg, criterion)])
 
     return result
   }
@@ -147,7 +147,7 @@ export class SumifPlugin extends FunctionPlugin {
       } else if (criterionValue instanceof CellError) {
         return criterionValue
       }
-      const criterionPackage = CriterionPackage.fromCellValue(criterionValue)
+      const criterionPackage = CriterionPackage.fromCellValue(criterionValue, this.interpreter.arithmeticHelper)
       if (criterionPackage === undefined) {
         return new CellError(ErrorType.VALUE)
       }
@@ -181,7 +181,7 @@ export class SumifPlugin extends FunctionPlugin {
     } else if (criterionValue instanceof CellError) {
       return criterionValue
     }
-    const criterionPackage = CriterionPackage.fromCellValue(criterionValue)
+    const criterionPackage = CriterionPackage.fromCellValue(criterionValue, this.interpreter.arithmeticHelper)
     if (criterionPackage === undefined) {
       return new CellError(ErrorType.VALUE)
     }
@@ -245,7 +245,7 @@ export class SumifPlugin extends FunctionPlugin {
     } else if (criterionValue instanceof CellError) {
       return criterionValue
     }
-    const criterionPackage = CriterionPackage.fromCellValue(criterionValue)
+    const criterionPackage = CriterionPackage.fromCellValue(criterionValue, this.interpreter.arithmeticHelper)
     if (criterionPackage === undefined) {
       return new CellError(ErrorType.VALUE)
     }
@@ -279,7 +279,7 @@ export class SumifPlugin extends FunctionPlugin {
       } else if (criterionValue instanceof CellError) {
         return criterionValue
       }
-      const criterionPackage = CriterionPackage.fromCellValue(criterionValue)
+      const criterionPackage = CriterionPackage.fromCellValue(criterionValue, this.interpreter.arithmeticHelper)
       if (criterionPackage === undefined) {
         return new CellError(ErrorType.VALUE)
       }

@@ -200,19 +200,6 @@ export function mina(left: InternalCellValue, right: InternalCellValue): Interna
   }
 }
 
-export function floatCmp(left: number, right: number, eps: number): number {
-  const mod = (1 + eps)
-  if ((right >= 0) && (left * mod >= right) && (left <= right * mod)) {
-    return 0
-  } else if ((right <= 0) && (left * mod <= right) && (left >= right * mod)) {
-    return 0
-  } else if (left > right) {
-    return 1
-  } else {
-    return -1
-  }
-}
-
 export function numberCmp(left: number, right: number): number {
   if (left > right) {
     return 1

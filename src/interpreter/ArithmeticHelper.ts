@@ -13,11 +13,11 @@ import {Maybe} from '../Maybe'
 import {NumberLiteralHelper} from '../NumberLiteralHelper'
 import {collatorFromConfig} from '../StringHelper'
 import {InterpreterValue, SimpleRangeValue} from './InterpreterValue'
-import {floatCmp, numberCmp} from './scalar'
+import {numberCmp} from './scalar'
 import Collator = Intl.Collator
 
 export class ArithmeticHelper {
-  private readonly collator: Collator
+  public readonly collator: Collator
   private readonly actualEps: number
   constructor(
     private readonly config: Config,
@@ -33,7 +33,7 @@ export class ArithmeticHelper {
       const leftTmp = typeof left === 'string' ? this.dateHelper.dateStringToDateNumber(left) : left
       const rightTmp = typeof right === 'string' ? this.dateHelper.dateStringToDateNumber(right) : right
       if (typeof leftTmp === 'number' && typeof rightTmp === 'number') {
-        return floatCmp(leftTmp, rightTmp, this.actualEps)
+        return this.floatCmp(leftTmp, rightTmp)
       }
     }
 
@@ -48,11 +48,24 @@ export class ArithmeticHelper {
     } else if ( typeof left === 'boolean' && typeof right === 'boolean' ) {
       return numberCmp(coerceBooleanToNumber(left), coerceBooleanToNumber(right))
     } else if ( typeof left === 'number' && typeof right === 'number' ) {
-      return floatCmp(left, right, this.config.smartRounding ? this.config.precisionEpsilon : 0)
+      return this.floatCmp(left, right)
     } else if ( left === EmptyValue && right === EmptyValue ) {
       return 0
     } else {
       return numberCmp(CellValueTypeOrd(getCellValueType(left)), CellValueTypeOrd(getCellValueType(right)))
+    }
+  }
+
+  public floatCmp(left: number, right: number): number {
+    const mod = (1 + this.actualEps)
+    if ((right >= 0) && (left * mod >= right) && (left <= right * mod)) {
+      return 0
+    } else if ((right <= 0) && (left * mod <= right) && (left >= right * mod)) {
+      return 0
+    } else if (left > right) {
+      return 1
+    } else {
+      return -1
     }
   }
 
