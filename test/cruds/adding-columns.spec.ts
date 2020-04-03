@@ -203,7 +203,7 @@ describe('Adding column - FormulaCellVertex#address update', () => {
   })
 })
 
-describe('Adding column', () => {
+describe('Adding column - MatrixVertex', () => {
   it('MatrixVertex#formula should be updated', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '2', '{=TRANSPOSE(A1:B2)}', '{=TRANSPOSE(A1:B2)}'],
@@ -245,7 +245,7 @@ describe('Adding column', () => {
   })
 })
 
-describe('Adding column', () => {
+describe('Adding column - numeric matrix', () => {
   it('add column inside numeric matrix, expand matrix', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '2'],

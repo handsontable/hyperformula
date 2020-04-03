@@ -196,6 +196,9 @@ describe('remove sheet - adjust formula dependencies', () => {
     const engine = HyperFormula.buildFromSheets({
       Sheet1: [
         ['=Sheet2!A1'],
+        ['=Sheet2!A1:A2'],
+        ['=Sheet2!A:B'],
+        ['=Sheet2!1:2'],
       ],
       Sheet2: [
         ['1'],
@@ -205,6 +208,9 @@ describe('remove sheet - adjust formula dependencies', () => {
     engine.removeSheet('Sheet2')
 
     expectReferenceToHaveRefError(engine, adr('A1'))
+    expectReferenceToHaveRefError(engine, adr('A2'))
+    expectReferenceToHaveRefError(engine, adr('A3'))
+    expectReferenceToHaveRefError(engine, adr('A4'))
   })
 
   it('should return changed values', () => {

@@ -60,23 +60,20 @@ export class SumprodPlugin extends FunctionPlugin {
  * @param rangeMapping - range mapping dependency
  * @param ranges - ranges to find smaller range in
  */
-export const findSmallerRange = (dependencyGraph: DependencyGraph, ranges: AbsoluteCellRange[]): { smallerRangeVertex: RangeVertex | null, restRanges: AbsoluteCellRange[] } => {
-  if (ranges[0].height() > 1) {
-    const valuesRangeEndRowLess = simpleCellAddress(ranges[0].end.sheet, ranges[0].end.col, ranges[0].end.row - 1)
-    const rowLessVertex = dependencyGraph.getRange(ranges[0].start, valuesRangeEndRowLess)
+export const findSmallerRange = (dependencyGraph: DependencyGraph, range: AbsoluteCellRange): { smallerRangeVertex: RangeVertex | null, restRange: AbsoluteCellRange } => {
+  if (range.height() > 1 && Number.isFinite(range.height())) {
+    const valuesRangeEndRowLess = simpleCellAddress(range.end.sheet, range.end.col, range.end.row - 1)
+    const rowLessVertex = dependencyGraph.getRange(range.start, valuesRangeEndRowLess)
     if (rowLessVertex) {
-      const restRanges = ranges.map((range) => {
-        return new AbsoluteCellRange(simpleCellAddress(range.start.sheet, range.start.col, range.end.row), range.end)
-      })
-
+      const restRange = new AbsoluteCellRange(simpleCellAddress(range.start.sheet, range.start.col, range.end.row), range.end)
       return {
         smallerRangeVertex: rowLessVertex,
-        restRanges,
+        restRange,
       }
     }
   }
   return {
     smallerRangeVertex: null,
-    restRanges: ranges,
+    restRange: range,
   }
 }

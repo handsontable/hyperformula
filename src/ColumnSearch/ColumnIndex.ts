@@ -3,12 +3,15 @@ import {CellError, InternalCellValue, movedSimpleCellAddress, SimpleCellAddress}
 import {ColumnsSpan} from '../ColumnsSpan'
 import {Config} from '../Config'
 import {DependencyGraph} from '../DependencyGraph'
-import {LazilyTransformingAstService, Transformation, TransformationType} from '../LazilyTransformingAstService'
+import {LazilyTransformingAstService} from '../LazilyTransformingAstService'
 import {Matrix} from '../Matrix'
 import {RowsSpan} from '../RowsSpan'
 import {Statistics, StatType} from '../statistics'
 import {ColumnBinarySearch} from './ColumnBinarySearch'
 import {ColumnSearchStrategy} from './ColumnSearchStrategy'
+import {AddRowsTransformer} from '../dependencyTransformers/AddRowsTransformer'
+import {RemoveRowsTransformer} from '../dependencyTransformers/RemoveRowsTransformer'
+import {FormulaTransformer} from '../dependencyTransformers/Transformer'
 
 type ColumnMap = Map<InternalCellValue, ValueIndex>
 
@@ -158,16 +161,14 @@ export class ColumnIndex implements ColumnSearchStrategy {
     if (valueIndex.version === actualVersion) {
       return
     }
-    const relevantTransformations = this.transformingService.getTransformationsFrom(valueIndex.version, (transformation: Transformation) => {
-      return transformation.sheet === sheet && (transformation.type === TransformationType.ADD_ROWS || transformation.type === TransformationType.REMOVE_ROWS)
+    const relevantTransformations = this.transformingService.getTransformationsFrom(valueIndex.version, (transformation: FormulaTransformer) => {
+      return transformation.sheet === sheet && (transformation instanceof AddRowsTransformer || transformation instanceof  RemoveRowsTransformer)
     })
     for (const transformation of relevantTransformations) {
-      switch (transformation.type) {
-        case TransformationType.ADD_ROWS:
-          this.addRows(col, transformation.addedRows, value)
-          break
-        case TransformationType.REMOVE_ROWS:
-          this.removeRows(col, transformation.removedRows, value)
+      if (transformation instanceof AddRowsTransformer) {
+        this.addRows(col, transformation.rowsSpan, value)
+      } else if (transformation instanceof RemoveRowsTransformer) {
+        this.removeRows(col, transformation.rowsSpan, value)
       }
     }
     valueIndex.version = actualVersion

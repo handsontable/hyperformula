@@ -22,6 +22,7 @@ export class Graph<T> {
   public specialNodes: Set<T> = new Set()
   public specialNodesStructuralChanges: Set<T> = new Set()
   public specialNodesRecentlyChanged: Set<T> = new Set()
+  public infiniteRanges: Set<T> = new Set()
 
   /** Nodes adjacency mapping. */
   private edges: Map<T, Set<T>> = new Map()
@@ -148,6 +149,7 @@ export class Graph<T> {
     this.specialNodes.delete(node)
     this.specialNodesRecentlyChanged.delete(node)
     this.specialNodesStructuralChanges.delete(node)
+    this.infiniteRanges.delete(node)
     this.removeDependencies(node)
   }
 
@@ -167,6 +169,10 @@ export class Graph<T> {
 
   public clearSpecialNodesRecentlyChanged() {
     this.specialNodesRecentlyChanged.clear()
+  }
+
+  public markNodeAsInfiniteRange(node: T) {
+    this.infiniteRanges.add(node)
   }
 
   /**

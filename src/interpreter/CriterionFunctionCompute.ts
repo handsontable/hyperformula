@@ -3,9 +3,9 @@ import {CellError, ErrorType, InternalCellValue, simpleCellAddress} from '../Cel
 import {CriterionCache, DependencyGraph, RangeVertex} from '../DependencyGraph'
 import {split} from '../generatorUtils'
 import {Maybe} from '../Maybe'
-import { CriterionLambda, CriterionPackage} from './Criterion'
+import {CriterionLambda, CriterionPackage} from './Criterion'
 import {Interpreter} from './Interpreter'
-import { SimpleRangeValue} from './InterpreterValue'
+import {SimpleRangeValue} from './InterpreterValue'
 
 const findSmallerRange = (dependencyGraph: DependencyGraph, conditionRanges: AbsoluteCellRange[], valuesRange: AbsoluteCellRange): {smallerRangeVertex: RangeVertex | null, restConditionRanges: AbsoluteCellRange[], restValuesRange: AbsoluteCellRange} => {
   if (valuesRange.end.row > valuesRange.start.row) {
@@ -140,7 +140,7 @@ export class Condition {
 }
 
 function * getRangeValues(dependencyGraph: DependencyGraph, cellRange: AbsoluteCellRange): IterableIterator<InternalCellValue> {
-  for (const cellFromRange of cellRange.addresses()) {
+  for (const cellFromRange of cellRange.addresses(dependencyGraph)) {
     yield dependencyGraph.getCellValue(cellFromRange)
   }
 }

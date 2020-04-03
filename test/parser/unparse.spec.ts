@@ -354,6 +354,70 @@ describe('Unparse', () => {
 
     expect(unparsed).toEqual(formula)
   })
+
+  it('#unparse column range', () => {
+    const formula = '=A:B'
+    const ast = parser.parse(formula, simpleCellAddress(1, 0, 0)).ast
+    const unparsed = unparser.unparse(ast, adr('A1', 1))
+
+    expect(unparsed).toEqual(formula)
+  })
+
+  it('#unparse absolute column range', () => {
+    const formula = '=$A:B'
+    const ast = parser.parse(formula, simpleCellAddress(1, 0, 0)).ast
+    const unparsed = unparser.unparse(ast, adr('A1', 1))
+
+    expect(unparsed).toEqual(formula)
+  })
+
+  it('#unparse column range from other sheet', () => {
+    const formula = '=Sheet1!$A:B'
+    const ast = parser.parse(formula, simpleCellAddress(1, 0, 0)).ast
+    const unparsed = unparser.unparse(ast, adr('A1', 1))
+
+    expect(unparsed).toEqual(formula)
+  })
+
+  it('#unparse column range from other sheet - both sides', () => {
+    const formula = '=Sheet1!$A:Sheet1!B'
+    const ast = parser.parse(formula, simpleCellAddress(1, 0, 0)).ast
+    const unparsed = unparser.unparse(ast, adr('A1', 1))
+
+    expect(unparsed).toEqual(formula)
+  })
+
+  it('#unparse row range', () => {
+    const formula = '=1:2'
+    const ast = parser.parse(formula, simpleCellAddress(1, 0, 0)).ast
+    const unparsed = unparser.unparse(ast, adr('A1', 1))
+
+    expect(unparsed).toEqual(formula)
+  })
+
+  it('#unparse absolute row range', () => {
+    const formula = '=$1:2'
+    const ast = parser.parse(formula, simpleCellAddress(1, 0, 0)).ast
+    const unparsed = unparser.unparse(ast, adr('A1', 1))
+
+    expect(unparsed).toEqual(formula)
+  })
+
+  it('#unparse row range from other sheet', () => {
+    const formula = '=Sheet1!$1:2'
+    const ast = parser.parse(formula, simpleCellAddress(1, 0, 0)).ast
+    const unparsed = unparser.unparse(ast, adr('A1', 1))
+
+    expect(unparsed).toEqual(formula)
+  })
+
+  it('#unparse row range from other sheet - both sides', () => {
+    const formula = '=Sheet1!$1:Sheet1!2'
+    const ast = parser.parse(formula, simpleCellAddress(1, 0, 0)).ast
+    const unparsed = unparser.unparse(ast, adr('A1', 1))
+
+    expect(unparsed).toEqual(formula)
+  })
 })
 
 describe('whitespaces', () => {
