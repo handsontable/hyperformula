@@ -116,7 +116,7 @@ export class Operations {
     let version: number
     this.stats.measure(StatType.TRANSFORM_ASTS, () => {
       const transformation = new RemoveRowsTransformer(rowsToRemove)
-      transformation.transform(this.dependencyGraph, this.parser)
+      transformation.performEagerTransformations(this.dependencyGraph, this.parser)
       version = this.lazilyTransformingAstService.addTransformation(transformation)
     })
     return { version: version!, removedCells, rowFrom: rowsToRemove.rowStart, rowCount: rowsToRemove.numberOfRows }
@@ -139,7 +139,7 @@ export class Operations {
 
     this.stats.measure(StatType.TRANSFORM_ASTS, () => {
       const transformation = new AddRowsTransformer(addedRows)
-      transformation.transform(this.dependencyGraph, this.parser)
+      transformation.performEagerTransformations(this.dependencyGraph, this.parser)
       this.lazilyTransformingAstService.addTransformation(transformation)
     })
 

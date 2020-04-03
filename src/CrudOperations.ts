@@ -118,7 +118,7 @@ export class CrudOperations {
 
     this.stats.measure(StatType.TRANSFORM_ASTS, () => {
       const transformation = new MoveCellsTransformer(sourceRange, toRight, toBottom, toSheet)
-      transformation.transform(this.dependencyGraph, this.parser)
+      transformation.performEagerTransformations(this.dependencyGraph, this.parser)
       this.lazilyTransformingAstService.addTransformation(transformation)
     })
 
@@ -190,7 +190,7 @@ export class CrudOperations {
 
     this.stats.measure(StatType.TRANSFORM_ASTS, () => {
       const transformation = new RemoveSheetTransformer(sheetId)
-      transformation.transform(this.dependencyGraph, this.parser)
+      transformation.performEagerTransformations(this.dependencyGraph, this.parser)
       this.lazilyTransformingAstService.addTransformation(transformation)
     })
 
@@ -533,7 +533,7 @@ export class CrudOperations {
 
     this.stats.measure(StatType.TRANSFORM_ASTS, () => {
       const transformation = new AddColumnsTransformer(addedColumns)
-      transformation.transform(this.dependencyGraph, this.parser)
+      transformation.performEagerTransformations(this.dependencyGraph, this.parser)
       this.lazilyTransformingAstService.addTransformation(transformation)
     })
   }
@@ -558,7 +558,7 @@ export class CrudOperations {
 
     this.stats.measure(StatType.TRANSFORM_ASTS, () => {
       const transformation = new RemoveColumnsTransformer(removedColumns)
-      transformation.transform(this.dependencyGraph, this.parser)
+      transformation.performEagerTransformations(this.dependencyGraph, this.parser)
       this.lazilyTransformingAstService.addTransformation(transformation)
     })
   }

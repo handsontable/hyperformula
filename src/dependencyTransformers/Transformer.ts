@@ -15,14 +15,14 @@ import {RowAddress} from '../parser/RowAddress'
 
 export interface FormulaTransformer {
   sheet: number,
-  transform(graph: DependencyGraph, parser: ParserWithCaching): void,
+  performEagerTransformations(graph: DependencyGraph, parser: ParserWithCaching): void,
   transformSingleAst(ast: Ast, address: SimpleCellAddress): [Ast, SimpleCellAddress],
 }
 
 export abstract class Transformer implements FormulaTransformer {
   public abstract get sheet(): number
 
-  public transform(graph: DependencyGraph, parser: ParserWithCaching): void {
+  public performEagerTransformations(graph: DependencyGraph, parser: ParserWithCaching): void {
     for (const node of graph.matrixFormulaNodes()) {
       const [newAst, newAddress] = this.transformSingleAst(node.getFormula()!, node.getAddress())
       const cachedAst = parser.rememberNewAst(newAst)
