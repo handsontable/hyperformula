@@ -49,6 +49,15 @@ describe('SUM', () => {
     expect(engine.getCellValue(adr('A9'))).toEqual(0)
   })
 
+  it( 'precision', () => {
+    const engine = HyperFormula.buildFromArray( [
+      ['1.00000000000005', '-1'],
+      ['=SUM(A1:B1)']
+    ])
+
+    expect(engine.getCellValue(adr('A2'))).toEqual(0)
+  })
+
   it('explicitly called does coercions',  () => {
     const engine =  HyperFormula.buildFromArray([
       ['=SUM(2,TRUE())'],
