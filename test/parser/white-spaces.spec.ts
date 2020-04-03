@@ -2,7 +2,7 @@ import {Config} from '../../src/Config'
 import {SheetMapping} from '../../src/DependencyGraph'
 import {enGB} from '../../src/i18n'
 import {buildLexerConfig, FormulaLexer} from '../../src/parser'
-import {WhiteSpace} from '../../src/parser/LexerConfig'
+import {CellReference, EqualsOp, ProcedureName, RangeSeparator, RParen, WhiteSpace} from '../../src/parser/LexerConfig'
 import {bindWhitespacesToTokens} from '../../src/parser/ParserWithCaching'
 import {expectArrayWithSameContent} from '../testUtils'
 
@@ -87,6 +87,10 @@ describe('processWhitespaces', () => {
     const processed = bindWhitespacesToTokens(tokens)
     expect(processed.length).toBe(6)
     expect(processed.map(processed => processed.leadingWhitespace).every(processed => processed === undefined)).toBe(true)
+    expectArrayWithSameContent(
+      [EqualsOp, ProcedureName, CellReference, RangeSeparator, CellReference, RParen],
+      processed.map(token => token.tokenType)
+    )
   })
 
   it('should add leading whitespace to token', () => {
@@ -95,6 +99,10 @@ describe('processWhitespaces', () => {
     expect(processed.length).toBe(6)
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     expect(processed[1].leadingWhitespace!.image).toBe(' ')
+    expectArrayWithSameContent(
+      [EqualsOp, ProcedureName, CellReference, RangeSeparator, CellReference, RParen],
+      processed.map(token => token.tokenType)
+    )
   })
 
   it('should work for multiple whitespaces', () => {
@@ -103,6 +111,10 @@ describe('processWhitespaces', () => {
     expect(processed.length).toBe(6)
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     expect(processed[1].leadingWhitespace!.image).toBe('    ')
+    expectArrayWithSameContent(
+      [EqualsOp, ProcedureName, CellReference, RangeSeparator, CellReference, RParen],
+      processed.map(token => token.tokenType)
+    )
   })
 
   it('should work for whitespace at the beginning', () => {
@@ -111,12 +123,19 @@ describe('processWhitespaces', () => {
     expect(processed.length).toBe(6)
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     expect(processed[0].leadingWhitespace!.image).toBe(' ')
+    expectArrayWithSameContent(
+      [EqualsOp, ProcedureName, CellReference, RangeSeparator, CellReference, RParen],
+      processed.map(token => token.tokenType)
+    )
   })
 
   it('should not include whitespaces directly on the list', () => {
     const tokens = lexer.tokenizeFormula('=   SUM(   A1:A2)   ').tokens
     const processed = bindWhitespacesToTokens(tokens)
     expect(processed.length).toBe(6)
-    expect(processed.map(token => token.tokenType).find(tokenType => tokenType === WhiteSpace)).toBe(undefined)
+    expectArrayWithSameContent(
+      [EqualsOp, ProcedureName, CellReference, RangeSeparator, CellReference, RParen],
+      processed.map(token => token.tokenType)
+    )
   })
 })
