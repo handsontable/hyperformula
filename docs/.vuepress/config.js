@@ -15,14 +15,14 @@ module.exports = {
   ],
   base: '/hyperformula/',
   plugins: [
-    [
-      'vuepress-plugin-clean-urls',
-      {
-        normalSuffix: '',
-        indexSuffix: '/',
-        notFoundPath: '/404.html',
-      },
-    ],
+    // [
+    //   'vuepress-plugin-clean-urls',
+    //   {
+    //     normalSuffix: '',
+    //     indexSuffix: '/',
+    //     notFoundPath: '/404.html',
+    //   },
+    // ],
     {
       extendPageData ($page) {
         // inject current HF version as {{ $page.version }} variable
