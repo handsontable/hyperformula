@@ -321,6 +321,9 @@ export class AbsoluteColumnRange extends AbsoluteCellRange {
   public static fromColumnRange(x: ColumnRangeAst, baseAddress: SimpleCellAddress): AbsoluteColumnRange {
     const start = x.start.toSimpleColumnAddress(baseAddress)
     const end = x.end.toSimpleColumnAddress(baseAddress)
+    if (start.sheet !== end.sheet) {
+      throw new Error(DIFFERENT_SHEETS_ERROR)
+    }
     return new AbsoluteColumnRange(start.sheet, start.col, end.col)
   }
 
@@ -365,6 +368,9 @@ export class AbsoluteRowRange extends AbsoluteCellRange {
   public static fromRowRange(x: RowRangeAst, baseAddress: SimpleCellAddress): AbsoluteRowRange {
     const start = x.start.toSimpleRowAddress(baseAddress)
     const end = x.end.toSimpleRowAddress(baseAddress)
+    if (start.sheet !== end.sheet) {
+      throw new Error(DIFFERENT_SHEETS_ERROR)
+    }
     return new AbsoluteRowRange(start.sheet, start.row, end.row)
   }
 

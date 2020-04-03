@@ -345,7 +345,7 @@ export class NumericAggregationPlugin extends FunctionPlugin {
       range = AbsoluteCellRange.fromAst(ast, formulaAddress)
     } catch (err) {
       if (err.message === DIFFERENT_SHEETS_ERROR) {
-        return mapFunction(new CellError(ErrorType.VALUE))
+        return mapFunction(new CellError(ErrorType.REF))
       } else {
         throw err
       }
