@@ -1,11 +1,10 @@
-import {EmptyValue, HyperFormula, ExportedCellChange} from '../../src'
+import {EmptyValue, ExportedCellChange, HyperFormula, InvalidArgumentsError} from '../../src'
 import {ErrorType, simpleCellAddress} from '../../src/Cell'
-import {InvalidArgumentsError} from '../../src'
 import {CellAddress} from '../../src/parser'
 import {
-  adr,
-  detailedError,
-  extractColumnRange,
+  adr, colEnd,
+  colStart,
+  detailedError, extractColumnRange,
   extractRange,
   extractReference,
   extractRowRange,
@@ -231,7 +230,7 @@ describe('Move rows', () => {
   })
 })
 
-describe('Move rows - Column ranges', () => {
+describe('Move rows - row ranges', () => {
   it('should adjust relative references of dependent formulas', () => {
     const engine = HyperFormula.buildFromArray([
       ['=SUM(2:3)'],
@@ -246,4 +245,62 @@ describe('Move rows - Column ranges', () => {
     expect(range.end).toEqual(rowEnd(4))
     expect(engine.getCellValue(adr('A1'))).toEqual(3)
   })
+
+  it('should adjust relative dependencies of moved formulas', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=SUM(2:3)'],
+      ['1'],
+      ['2']
+    ])
+
+    engine.moveRows(0, 0, 1, 3)
+
+    const range = extractRowRange(engine, adr('A3'))
+    expect(range.start).toEqual(rowStart(1))
+    expect(range.end).toEqual(rowEnd(2))
+    expect(engine.getCellValue(adr('A3'))).toEqual(3)
+  })
+
+  it('should return #CYCLE when moving formula onto referred range', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=SUM(2:3)'],
+      ['1'],
+      ['2']
+    ])
+
+    engine.moveRows(0, 0, 1, 2)
+
+    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.CYCLE))
+    expect(engine.getCellFormula(adr('A2'))).toEqual('=SUM(1:3)')
+  })
 })
+
+describe('Move rows - column ranges', () => {
+  it('should not affect moved column range', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=SUM(B:C)', '1', '2'],
+    ])
+
+    engine.moveRows(0, 0, 1, 2)
+
+    const range = extractColumnRange(engine, adr('A2'))
+    expect(range.start).toEqual(colStart('B'))
+    expect(range.end).toEqual(colEnd('C'))
+    expect(engine.getCellValue(adr('A2'))).toEqual(3)
+  })
+
+  it('should not affect dependent column range', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=SUM(B:C)', '1', '2'],
+      [null, '3', '4'],
+    ])
+
+    engine.moveRows(0, 1, 1, 3)
+
+    const range = extractColumnRange(engine, adr('A1'))
+    expect(range.start).toEqual(colStart('B'))
+    expect(range.end).toEqual(colEnd('C'))
+    expect(engine.getCellValue(adr('A1'))).toEqual(10)
+  })
+})
+
