@@ -56,7 +56,7 @@ module.exports = {
     docsBranch: 'develop',
     editLinks: false,
     lastUpdated: false,
-    smoothScroll: true,
+    smoothScroll: false,
     searchPlaceholder: 'Search...',
     // algolia: {
     //   apiKey: '<API_KEY>',
