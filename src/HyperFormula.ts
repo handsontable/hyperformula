@@ -5,6 +5,7 @@ import {CellValue, ExportedChange, Exporter} from './CellValue'
 import {ColumnSearchStrategy} from './ColumnSearch/ColumnSearchStrategy'
 import {Config, ConfigParams} from './Config'
 import {CrudOperations} from './CrudOperations'
+import {buildTranslationPackage, RawTranslationPackage, TranslationPackage} from './i18n'
 import {normalizeAddedIndexes, normalizeRemovedIndexes} from './Operations'
 import {
   AddressMapping,
@@ -187,6 +188,53 @@ export class HyperFormula implements TypedEmitter {
    */
   public static buildFromSheets(sheets: Sheets, configInput?: Partial<ConfigParams>): HyperFormula {
     return this.buildFromEngineState(BuildEngineFactory.buildFromSheets(sheets, configInput))
+  }
+
+  private static registeredLanguages: Map<string, TranslationPackage> = new Map()
+
+  /**
+   * Returns registered language from its code string.
+   * @param {string} code - code string of the translation package
+   */
+  public static getLanguage(code: string): TranslationPackage {
+    const val = this.registeredLanguages.get(code)
+    if(val === undefined) {
+      throw new Error('Language not registered.')
+    } else {
+      return val
+    }
+  }
+
+  /**
+   * Registers language from under given code string.
+   * @param {string} code - code string of the translation package
+   * @param {RawTranslationPackage} lang - translation package to be registered
+   */
+  public static registerLanguage(code: string, lang: RawTranslationPackage): void {
+    if(this.registeredLanguages.has(code)) {
+      throw new Error('Language already registered.')
+    } else {
+      this.registeredLanguages.set(code, buildTranslationPackage(lang))
+    }
+  }
+
+  public static unregisterLanguage(code: string): void {
+    if(this.registeredLanguages.has(code)) {
+      this.registeredLanguages.delete(code)
+    } else {
+      throw new Error('Language not registered.')
+    }
+  }
+
+  public static unregisterAllLanguages(): void {
+    this.registeredLanguages = new Map()
+  }
+
+  /**
+   * Returns all registered languages codes.
+   */
+  public static getRegisteredLanguagesCodes(): string[] {
+    return Array.from(this.registeredLanguages.keys())
   }
 
   /**

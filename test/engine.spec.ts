@@ -1,7 +1,7 @@
 import {DetailedCellError, HyperFormula} from '../src'
 import {CellType, CellValueType, EmptyValue, ErrorType} from '../src/Cell'
-import {enGB, plPL} from '../src/i18n'
 import './testConfig.ts'
+import {plPL} from '../src/i18n'
 import {adr, detailedError} from './testUtils'
 
 describe('Integration', () => {
@@ -418,7 +418,7 @@ describe('Integration', () => {
   it('exporting translated errors', () => {
     const engine = HyperFormula.buildFromArray([
       ['=#VALUE!'],
-    ], {language: enGB})
+    ], {language: 'enGB'})
 
     const error = engine.getCellValue(adr('A1')) as DetailedCellError
     expect(error.type).toEqual(ErrorType.VALUE)
@@ -426,9 +426,10 @@ describe('Integration', () => {
   })
 
   it('exporting detailed errors with translations', () => {
+    HyperFormula.registerLanguage('plPL', plPL)
     const engine = HyperFormula.buildFromArray([
       ['=#ARG!'],
-    ], {language: plPL})
+    ], {language: 'plPL'})
 
     const error = engine.getCellValue(adr('A1')) as DetailedCellError
     expect(error.type).toEqual(ErrorType.VALUE)

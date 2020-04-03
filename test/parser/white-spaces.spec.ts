@@ -1,6 +1,6 @@
 import {Config} from '../../src/Config'
 import {SheetMapping} from '../../src/DependencyGraph'
-import {enGB} from '../../src/i18n'
+import {buildTranslationPackage, enGB} from '../../src/i18n'
 import {buildLexerConfig, FormulaLexer} from '../../src/parser'
 import {CellReference, EqualsOp, ProcedureName, RangeSeparator, RParen, WhiteSpace} from '../../src/parser/LexerConfig'
 import {bindWhitespacesToTokens} from '../../src/parser/ParserWithCaching'
@@ -8,7 +8,7 @@ import {expectArrayWithSameContent} from '../testUtils'
 
 describe('tokenizeFormula', () => {
   const config = new Config()
-  const sheetMapping = new SheetMapping(enGB)
+  const sheetMapping = new SheetMapping(buildTranslationPackage(enGB))
   sheetMapping.addSheet('Sheet1')
   const lexer = new FormulaLexer(buildLexerConfig(config))
 
@@ -78,7 +78,7 @@ describe('tokenizeFormula', () => {
 
 describe('processWhitespaces', () => {
   const config = new Config()
-  const sheetMapping = new SheetMapping(enGB)
+  const sheetMapping = new SheetMapping(buildTranslationPackage(enGB))
   sheetMapping.addSheet('Sheet1')
   const lexer = new FormulaLexer(buildLexerConfig(config))
 

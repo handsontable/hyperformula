@@ -36,7 +36,7 @@ export class Unparser {
       }
       case AstNodeType.FUNCTION_CALL: {
         const args = ast.args.map((arg) => this.unparseAst(arg, address)).join(this.config.functionArgSeparator)
-        const procedureName = this.config.getFunctionTranslationFor(ast.procedureName) || ast.procedureName
+        const procedureName = this.config.translationPackage.getFunctionTranslation(ast.procedureName) ?? ast.procedureName
         const rightPart = procedureName + '(' + args + imageWithWhitespace(')', ast.internalWhitespace)
         return imageWithWhitespace(rightPart, ast.leadingWhitespace)
       }
@@ -66,12 +66,9 @@ export class Unparser {
         return this.unparseAst(ast.value, address) + imageWithWhitespace('%', ast.leadingWhitespace)
       }
       case AstNodeType.ERROR: {
-        let image
-        if (ast.error) {
-          image = this.config.getErrorTranslationFor(ast.error.type)
-        } else {
-          image = this.config.getErrorTranslationFor(ErrorType.ERROR)
-        }
+        const image = this.config.getErrorTranslationFor(
+          ast.error ? ast.error.type : ErrorType.ERROR
+        )
         return imageWithWhitespace(image, ast.leadingWhitespace)
       }
       case AstNodeType.ERROR_WITH_RAW_INPUT: {

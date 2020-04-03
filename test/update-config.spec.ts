@@ -42,10 +42,11 @@ describe('update config', () => {
     expect(engine.getCellValue(adr('C1'))).toEqual(0)
   })
   it('language reload', () => {
+    HyperFormula.registerLanguage('plPL', plPL)
     const engine = HyperFormula.buildFromArray([
       ['=FOO()', '=SUM()', '=SUMA()', 'SUM()', '=SUM('],
     ])
-    engine.updateConfig({language: plPL})
+    engine.updateConfig({language: 'plPL'})
 
     expect(engine.getCellFormula(adr('A1'))).toBe('=FOO()')
     expect(engine.getCellFormula(adr('B1'))).toBe('=SUMA()')

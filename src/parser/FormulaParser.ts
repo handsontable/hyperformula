@@ -395,7 +395,7 @@ export class FormulaParser extends EmbeddedActionsParser {
   private procedureExpression: AstRule = this.RULE('procedureExpression', () => {
     const procedureNameToken = this.CONSUME(ProcedureName) as IExtendedToken
     const procedureName = procedureNameToken.image.toUpperCase().slice(0, -1)
-    const canonicalProcedureName = this.lexerConfig.functionMapping[procedureName] || procedureName
+    const canonicalProcedureName = this.lexerConfig.functionMapping[procedureName] ?? procedureName
     const args: Ast[] = []
     this.MANY_SEP({
       SEP: this.lexerConfig.ArgSeparator,

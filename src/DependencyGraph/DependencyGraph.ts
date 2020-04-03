@@ -42,7 +42,7 @@ export class DependencyGraph {
       addressMapping,
       rangeMapping,
       new Graph<Vertex>(new GetDependenciesQuery(rangeMapping, addressMapping, lazilyTransformingAstService, config.functionsWhichDoesNotNeedArgumentsToBeComputed())),
-      new SheetMapping(config.language),
+      new SheetMapping(config.translationPackage),
       new MatrixMapping(),
       stats,
       lazilyTransformingAstService,
