@@ -70,124 +70,83 @@ export class Interpreter {
       case AstNodeType.EQUALS_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
         const rightResult = this.evaluateAst(ast.right, formulaAddress)
-        return this.passErrors(leftResult, rightResult) ?? this.arithmeticHelper.compare( leftResult as NoErrorCellValue, rightResult as NoErrorCellValue) === 0
+        return this.passErrors(leftResult, rightResult) ??
+          this.arithmeticHelper.compare( leftResult as NoErrorCellValue, rightResult as NoErrorCellValue) === 0
       }
       case AstNodeType.NOT_EQUAL_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
         const rightResult = this.evaluateAst(ast.right, formulaAddress)
-        return this.passErrors(leftResult, rightResult) ?? this.arithmeticHelper.compare( leftResult as NoErrorCellValue, rightResult as NoErrorCellValue) !== 0
+        return this.passErrors(leftResult, rightResult) ??
+          this.arithmeticHelper.compare( leftResult as NoErrorCellValue, rightResult as NoErrorCellValue) !== 0
       }
       case AstNodeType.GREATER_THAN_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
         const rightResult = this.evaluateAst(ast.right, formulaAddress)
-        return this.passErrors(leftResult, rightResult) ?? this.arithmeticHelper.compare( leftResult as NoErrorCellValue, rightResult as NoErrorCellValue) > 0
+        return this.passErrors(leftResult, rightResult) ??
+          this.arithmeticHelper.compare( leftResult as NoErrorCellValue, rightResult as NoErrorCellValue) > 0
       }
       case AstNodeType.LESS_THAN_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
         const rightResult = this.evaluateAst(ast.right, formulaAddress)
-        return this.passErrors(leftResult, rightResult) ?? this.arithmeticHelper.compare( leftResult as NoErrorCellValue, rightResult as NoErrorCellValue) < 0
+        return this.passErrors(leftResult, rightResult) ??
+          this.arithmeticHelper.compare( leftResult as NoErrorCellValue, rightResult as NoErrorCellValue) < 0
       }
       case AstNodeType.GREATER_THAN_OR_EQUAL_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
         const rightResult = this.evaluateAst(ast.right, formulaAddress)
-        return this.passErrors(leftResult, rightResult) ?? this.arithmeticHelper.compare( leftResult as NoErrorCellValue, rightResult as NoErrorCellValue) >= 0
+        return this.passErrors(leftResult, rightResult) ??
+          this.arithmeticHelper.compare( leftResult as NoErrorCellValue, rightResult as NoErrorCellValue) >= 0
       }
       case AstNodeType.LESS_THAN_OR_EQUAL_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
         const rightResult = this.evaluateAst(ast.right, formulaAddress)
-        return this.passErrors(leftResult, rightResult) ?? this.arithmeticHelper.compare( leftResult as NoErrorCellValue, rightResult as NoErrorCellValue) <= 0
+        return this.passErrors(leftResult, rightResult) ??
+          this.arithmeticHelper.compare( leftResult as NoErrorCellValue, rightResult as NoErrorCellValue) <= 0
       }
       case AstNodeType.PLUS_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
         const rightResult = this.evaluateAst(ast.right, formulaAddress)
-
-        if (leftResult instanceof CellError) {
-          return leftResult
-        }
-        if (leftResult instanceof SimpleRangeValue) {
-          return new CellError(ErrorType.VALUE)
-        }
-        if (rightResult instanceof CellError) {
-          return rightResult
-        }
-        if (rightResult instanceof SimpleRangeValue) {
-          return new CellError(ErrorType.VALUE)
-        }
-        return this.arithmeticHelper.add(
-          this.arithmeticHelper.coerceScalarToNumberOrError(leftResult),
-          this.arithmeticHelper.coerceScalarToNumberOrError(rightResult)
-        )
+        return this.passErrors(leftResult, rightResult) ??
+          this.arithmeticHelper.add(
+            this.arithmeticHelper.coerceScalarToNumberOrError(leftResult as NoErrorCellValue),
+            this.arithmeticHelper.coerceScalarToNumberOrError(rightResult as NoErrorCellValue)
+          )
       }
       case AstNodeType.MINUS_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
         const rightResult = this.evaluateAst(ast.right, formulaAddress)
-        if (leftResult instanceof CellError) {
-          return leftResult
-        }
-        if (leftResult instanceof SimpleRangeValue) {
-          return new CellError(ErrorType.VALUE)
-        }
-        if (rightResult instanceof CellError) {
-          return rightResult
-        }
-        if (rightResult instanceof SimpleRangeValue) {
-          return new CellError(ErrorType.VALUE)
-        }
-        return this.arithmeticHelper.subtract(
-          this.arithmeticHelper.coerceScalarToNumberOrError(leftResult),
-          this.arithmeticHelper.coerceScalarToNumberOrError(rightResult)
-        )
+        return this.passErrors(leftResult, rightResult) ??
+          this.arithmeticHelper.subtract(
+            this.arithmeticHelper.coerceScalarToNumberOrError(leftResult as NoErrorCellValue),
+            this.arithmeticHelper.coerceScalarToNumberOrError(rightResult as NoErrorCellValue)
+          )
       }
       case AstNodeType.TIMES_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
         const rightResult = this.evaluateAst(ast.right, formulaAddress)
-        if (leftResult instanceof CellError) {
-          return leftResult
-        }
-        if (leftResult instanceof SimpleRangeValue) {
-          return new CellError(ErrorType.VALUE)
-        }
-        if (rightResult instanceof CellError) {
-          return rightResult
-        }
-        if (rightResult instanceof SimpleRangeValue) {
-          return new CellError(ErrorType.VALUE)
-        }
-        return multiply(this.arithmeticHelper.coerceScalarToNumberOrError(leftResult), this.arithmeticHelper.coerceScalarToNumberOrError(rightResult))
+        return this.passErrors(leftResult, rightResult) ??
+          multiply(
+            this.arithmeticHelper.coerceScalarToNumberOrError(leftResult as NoErrorCellValue),
+            this.arithmeticHelper.coerceScalarToNumberOrError(rightResult as NoErrorCellValue)
+          )
       }
       case AstNodeType.POWER_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
         const rightResult = this.evaluateAst(ast.right, formulaAddress)
-        if (leftResult instanceof CellError) {
-          return leftResult
-        }
-        if (leftResult instanceof SimpleRangeValue) {
-          return new CellError(ErrorType.VALUE)
-        }
-        if (rightResult instanceof CellError) {
-          return rightResult
-        }
-        if (rightResult instanceof SimpleRangeValue) {
-          return new CellError(ErrorType.VALUE)
-        }
-        return power(this.arithmeticHelper.coerceScalarToNumberOrError(leftResult), this.arithmeticHelper.coerceScalarToNumberOrError(rightResult))
+        return this.passErrors(leftResult, rightResult) ??
+          power(
+            this.arithmeticHelper.coerceScalarToNumberOrError(leftResult as NoErrorCellValue),
+            this.arithmeticHelper.coerceScalarToNumberOrError(rightResult as NoErrorCellValue)
+          )
       }
       case AstNodeType.DIV_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
         const rightResult = this.evaluateAst(ast.right, formulaAddress)
-        if (leftResult instanceof CellError) {
-          return leftResult
-        }
-        if (leftResult instanceof SimpleRangeValue) {
-          return new CellError(ErrorType.VALUE)
-        }
-        if (rightResult instanceof CellError) {
-          return rightResult
-        }
-        if (rightResult instanceof SimpleRangeValue) {
-          return new CellError(ErrorType.VALUE)
-        }
-        return divide(this.arithmeticHelper.coerceScalarToNumberOrError(leftResult), this.arithmeticHelper.coerceScalarToNumberOrError(rightResult))
+        return this.passErrors(leftResult, rightResult) ??
+          divide(
+            this.arithmeticHelper.coerceScalarToNumberOrError(leftResult as NoErrorCellValue),
+            this.arithmeticHelper.coerceScalarToNumberOrError(rightResult as NoErrorCellValue)
+          )
       }
       case AstNodeType.PLUS_UNARY_OP: {
         const result = this.evaluateAst(ast.value, formulaAddress)
