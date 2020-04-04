@@ -332,6 +332,10 @@ export class UndoRedo {
         this.redoAddColumns(operation)
         break
       }
+      case UndoStackElementType.REMOVE_COLUMNS: {
+        this.redoRemoveColumns(operation)
+        break
+      }
     }
 
     this.undoStack.push(operation)
@@ -341,6 +345,13 @@ export class UndoRedo {
     const { sheet, rowsRemovals } = operation
     for (const rowsRemoval of rowsRemovals) {
       this.crudOperations!.operations.removeRows(new RemoveRowsCommand(sheet, [[rowsRemoval.rowFrom, rowsRemoval.rowCount]]))
+    }
+  }
+
+  private redoRemoveColumns(operation: RemoveColumnsUndoData) {
+    const { sheet, columnsRemovals } = operation
+    for (const columnsRemoval of columnsRemovals) {
+      this.crudOperations!.operations.removeColumns(new RemoveColumnsCommand(sheet, [[columnsRemoval.columnFrom, columnsRemoval.columnCount]]))
     }
   }
 

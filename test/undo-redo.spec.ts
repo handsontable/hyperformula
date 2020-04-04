@@ -827,6 +827,61 @@ describe('Redo - adding columns', () => {
   })
 })
 
+describe('Redo - removing column', () => {
+  it('works for empty column', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1', null, '3'],
+    ])
+    engine.removeColumns(0, [1, 1])
+    const snapshot = engine.getAllSheetsSerialized()
+    engine.undo()
+
+    engine.redo()
+
+    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromSheets(snapshot))
+  })
+
+  it('works for other values', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1', '2'],
+      ['=B1']
+    ])
+    engine.removeColumns(0, [0, 1])
+    const snapshot = engine.getAllSheetsSerialized()
+    engine.undo()
+
+    engine.redo()
+
+    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromSheets(snapshot))
+  })
+
+  it('works for more removal segments', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1', '2', '3', '4'],
+    ])
+    engine.removeColumns(0, [1, 1], [3, 1])
+    const snapshot = engine.getAllSheetsSerialized()
+    engine.undo()
+
+    engine.redo()
+
+    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromSheets(snapshot))
+  })
+
+  it('dummy operation should also be redoable', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1']
+    ])
+    engine.removeColumns(0, [1000, 1])
+    const snapshot = engine.getAllSheetsSerialized()
+    engine.undo()
+
+    engine.redo()
+
+    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromSheets(snapshot))
+  })
+})
+
 describe('Redo', () => {
   it('when there is no operation to redo', () => {
     const engine = HyperFormula.buildEmpty()
