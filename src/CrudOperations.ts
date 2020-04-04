@@ -89,6 +89,7 @@ export class CrudOperations {
     this.ensureItIsPossibleToAddColumns(sheet, ...indexes)
     this.clipboardOperations.abortCut()
     this.operations.addColumns(addColumnsCommand)
+    this.undoRedo.saveOperationAddColumns(addColumnsCommand)
   }
 
   public removeColumns(sheet: number, ...indexes: Index[]): void {

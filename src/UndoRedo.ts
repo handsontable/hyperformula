@@ -6,13 +6,14 @@
 import {simpleCellAddress, SimpleCellAddress, NoErrorCellValue} from './Cell'
 import {ClipboardCell, ClipboardCellType} from './ClipboardOperations'
 import {RawCellContent} from './CellContentParser'
-import {RowsRemoval, RemoveRowsCommand, AddRowsCommand} from './Operations'
+import {RemoveColumnsCommand, AddColumnsCommand, RowsRemoval, RemoveRowsCommand, AddRowsCommand} from './Operations'
 import {CrudOperations} from './CrudOperations'
 
 enum UndoStackElementType {
   REMOVE_ROWS = 'REMOVE_ROWS',
   ADD_ROWS = 'ADD_ROWS',
   MOVE_ROWS = 'MOVE_ROWS',
+  ADD_COLUMNS = 'ADD_COLUMNS',
   SET_CELL_CONTENTS = 'SET_CELL_CONTENTS',
   ADD_SHEET = 'ADD_SHEET',
   REMOVE_SHEET = 'REMOVE_SHEET',
@@ -36,6 +37,11 @@ interface MoveRowsUndoData {
   startRow: number,
   numberOfRows: number,
   targetRow: number,
+}
+
+interface AddColumnsUndoData {
+  type: UndoStackElementType.ADD_COLUMNS,
+  command: AddColumnsCommand,
 }
 
 interface AddSheetUndoData {
@@ -70,6 +76,7 @@ type UndoStackElement
   = RemoveRowsUndoData
   | AddRowsUndoData
   | MoveRowsUndoData
+  | AddColumnsUndoData
   | SetCellContentsUndoData
   | AddSheetUndoData
   | RemoveSheetUndoData
@@ -85,6 +92,10 @@ export class UndoRedo {
   public crudOperations?: CrudOperations
 
   public oldData: Map<number, [SimpleCellAddress, string][]> = new Map()
+
+  public saveOperationAddColumns(addColumnsCommand: AddColumnsCommand) {
+    this.undoStack.push({ type: UndoStackElementType.ADD_COLUMNS, command: addColumnsCommand })
+  }
 
   public saveOperationRemoveRows(removeRowsCommand: RemoveRowsCommand, rowsRemovals: RowsRemoval[]) {
     this.undoStack.push({ type: UndoStackElementType.REMOVE_ROWS, sheet: removeRowsCommand.sheet, rowsRemovals })
@@ -165,6 +176,10 @@ export class UndoRedo {
         this.undoClearSheet(operation)
         break
       }
+      case UndoStackElementType.ADD_COLUMNS: {
+        this.undoAddColumns(operation)
+        break
+      }
     }
     this.redoStack.push(operation)
   }
@@ -194,6 +209,14 @@ export class UndoRedo {
     for (let i = addedRowsSpans.length - 1; i >= 0; --i) {
       const addedRows = addedRowsSpans[i]
       this.crudOperations!.operations.removeRows(new RemoveRowsCommand(operation.command.sheet, [[addedRows.rowStart, addedRows.numberOfRows]]))
+    }
+  }
+
+  private undoAddColumns(operation: AddColumnsUndoData) {
+    const addedColumnsSpans = operation.command.columnsSpans()
+    for (let i = addedColumnsSpans.length - 1; i >= 0; --i) {
+      const addedColumns = addedColumnsSpans[i]
+      this.crudOperations!.operations.removeColumns(new RemoveColumnsCommand(operation.command.sheet, [[addedColumns.columnStart, addedColumns.numberOfColumns]]))
     }
   }
 

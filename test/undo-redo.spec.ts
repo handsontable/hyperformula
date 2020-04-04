@@ -177,6 +177,44 @@ describe('Undo - moving rows', () => {
   })
 })
 
+describe('Undo - adding columns', () => {
+  it('works', () => {
+    const sheet = [
+      ['1', /* */ '3'],
+    ]
+    const engine = HyperFormula.buildFromArray(sheet)
+    engine.addColumns(0, [1, 1])
+
+    engine.undo()
+
+    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray(sheet))
+  })
+
+  it('dummy operation should also be undoable', () => {
+    const sheet = [
+      ['1']
+    ]
+    const engine = HyperFormula.buildFromArray(sheet)
+    engine.addColumns(0, [1000, 1])
+
+    engine.undo()
+
+    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray(sheet))
+  })
+
+  it('works for more addition segments', () => {
+    const sheet = [
+      ['1', '2', '3'],
+    ]
+    const engine = HyperFormula.buildFromArray(sheet)
+    engine.addColumns(0, [1, 1], [2, 1])
+
+    engine.undo()
+
+    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray(sheet))
+  })
+})
+
 describe('Undo - removing sheet', () => {
   it('works for empty sheet', () => {
     const engine = HyperFormula.buildFromArray([])
