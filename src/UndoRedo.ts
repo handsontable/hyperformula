@@ -335,6 +335,10 @@ export class UndoRedo {
         this.redoMoveRows(operation)
         break
       }
+      case UndoStackElementType.MOVE_COLUMNS: {
+        this.redoMoveColumns(operation)
+        break
+      }
       case UndoStackElementType.SET_CELL_CONTENTS: {
         this.redoSetCellContents(operation)
         break
@@ -405,6 +409,11 @@ export class UndoRedo {
   private redoMoveRows(operation: MoveRowsUndoData) {
     const { sheet } = operation
     this.crudOperations!.operations.moveRows(sheet, operation.startRow, operation.numberOfRows, operation.targetRow)
+  }
+
+  private redoMoveColumns(operation: MoveColumnsUndoData) {
+    const { sheet } = operation
+    this.crudOperations!.operations.moveColumns(sheet, operation.startColumn, operation.numberOfColumns, operation.targetColumn)
   }
 
   private redoClearSheet(operation: ClearSheetUndoData) {
