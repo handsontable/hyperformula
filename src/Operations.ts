@@ -8,6 +8,7 @@ import {ClipboardCell, ClipboardCellType} from './ClipboardOperations'
 import {SimpleCellAddress, EmptyValue, simpleCellAddress, invalidSimpleCellAddress} from './Cell'
 import {CellContent, CellContentParser, RawCellContent, isMatrix} from './CellContentParser'
 import {RowsSpan} from './RowsSpan'
+import {ColumnsSpan} from './ColumnsSpan'
 import {ContentChanges} from './ContentChanges'
 import {ColumnSearchStrategy} from './ColumnSearch/ColumnSearchStrategy'
 import {absolutizeDependencies} from './absolutizeDependencies'
@@ -21,6 +22,7 @@ import {ParserWithCaching, ProcedureAst} from './parser'
 import {ParsingError} from './parser/Ast'
 import {AddRowsTransformer} from './dependencyTransformers/AddRowsTransformer'
 import {RemoveRowsTransformer} from './dependencyTransformers/RemoveRowsTransformer'
+import {AddColumnsTransformer} from './dependencyTransformers/AddColumnsTransformer'
 import {MoveCellsTransformer} from './dependencyTransformers/MoveCellsTransformer'
 import {RemoveSheetTransformer} from './dependencyTransformers/RemoveSheetTransformer'
 import {AbsoluteCellRange} from './AbsoluteCellRange'
@@ -57,6 +59,24 @@ export class AddRowsCommand {
   public rowsSpans(): RowsSpan[] {
     return this.normalizedIndexes().map(normalizedIndex =>
       RowsSpan.fromNumberOfRows(this.sheet, normalizedIndex[0], normalizedIndex[1])
+    )
+  }
+}
+
+export class AddColumnsCommand {
+  constructor(
+    public readonly sheet: number,
+    public readonly indexes: Index[]
+  ) {
+  }
+
+  public normalizedIndexes(): Index[] {
+    return normalizeAddedIndexes(this.indexes)
+  }
+
+  public columnsSpans(): ColumnsSpan[] {
+    return this.normalizedIndexes().map(normalizedIndex =>
+      ColumnsSpan.fromNumberOfColumns(this.sheet, normalizedIndex[0], normalizedIndex[1])
     )
   }
 }
@@ -100,6 +120,12 @@ export class Operations {
   public addRows(cmd: AddRowsCommand) {
     for (const addedRows of cmd.rowsSpans()) {
       this.doAddRows(addedRows)
+    }
+  }
+
+  public addColumns(cmd: AddColumnsCommand) {
+    for (const addedColumns of cmd.columnsSpans()) {
+      this.doAddColumns(addedColumns)
     }
   }
 
@@ -264,6 +290,29 @@ export class Operations {
     })
   }
 
+  /**
+   * Add multiple columns to sheet </br>
+   * Does nothing if columns are outside of effective sheet size
+   *
+   * @param sheet - sheet id in which columns will be added
+   * @param column - column number above which the columns will be added
+   * @param numberOfColumns - number of columns to add
+   */
+  public doAddColumns(addedColumns: ColumnsSpan): void {
+    if (this.columnEffectivelyNotInSheet(addedColumns.columnStart, addedColumns.sheet)) {
+      return
+    }
+
+    this.dependencyGraph.addColumns(addedColumns)
+    this.columnSearch.addColumns(addedColumns)
+
+    this.stats.measure(StatType.TRANSFORM_ASTS, () => {
+      const transformation = new AddColumnsTransformer(addedColumns)
+      transformation.performEagerTransformations(this.dependencyGraph, this.parser)
+      this.lazilyTransformingAstService.addTransformation(transformation)
+    })
+  }
+
   public getClipboardCell(address: SimpleCellAddress): ClipboardCell {
     const vertex = this.dependencyGraph.getCell(address)
 
@@ -395,6 +444,17 @@ export class Operations {
 
   public forceApplyPostponedTransformations(): void {
     this.dependencyGraph.forceApplyPostponedTransformations()
+  }
+
+  /**
+   * Returns true if row number is outside of given sheet.
+   *
+   * @param column - row number
+   * @param sheet - sheet id number
+   */
+  private columnEffectivelyNotInSheet(column: number, sheet: number): boolean {
+    const width = this.dependencyGraph.addressMapping.getWidth(sheet)
+    return column >= width
   }
 }
 

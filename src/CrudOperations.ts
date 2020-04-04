@@ -10,6 +10,7 @@ import {CellContent, CellContentParser, isMatrix, RawCellContent} from './CellCo
 import {ClipboardCell, ClipboardOperations} from './ClipboardOperations'
 import {
   AddRowsCommand,
+  AddColumnsCommand,
   normalizeAddedIndexes,
   normalizeRemovedIndexes,
   Operations,
@@ -84,12 +85,10 @@ export class CrudOperations {
   }
 
   public addColumns(sheet: number, ...indexes: Index[]): void {
-    const normalizedIndexes = normalizeAddedIndexes(indexes)
+    const addColumnsCommand = new AddColumnsCommand(sheet, indexes)
     this.ensureItIsPossibleToAddColumns(sheet, ...indexes)
     this.clipboardOperations.abortCut()
-    for (const index of normalizedIndexes) {
-      this.doAddColumns(sheet, index[0], index[1])
-    }
+    this.operations.addColumns(addColumnsCommand)
   }
 
   public removeColumns(sheet: number, ...indexes: Index[]): void {
@@ -387,31 +386,6 @@ export class CrudOperations {
     if (!this.sheetMapping.hasSheetWithName(sheetName)) {
       throw new NoSheetWithNameError(sheetName)
     }
-  }
-
-  /**
-   * Add multiple columns to sheet </br>
-   * Does nothing if columns are outside of effective sheet size
-   *
-   * @param sheet - sheet id in which columns will be added
-   * @param column - column number above which the columns will be added
-   * @param numberOfColumns - number of columns to add
-   */
-  private doAddColumns(sheet: number, column: number, numberOfColumns: number = 1): void {
-    if (this.columnEffectivelyNotInSheet(column, sheet)) {
-      return
-    }
-
-    const addedColumns = ColumnsSpan.fromNumberOfColumns(sheet, column, numberOfColumns)
-
-    this.dependencyGraph.addColumns(addedColumns)
-    this.columnSearch.addColumns(addedColumns)
-
-    this.stats.measure(StatType.TRANSFORM_ASTS, () => {
-      const transformation = new AddColumnsTransformer(addedColumns)
-      transformation.performEagerTransformations(this.dependencyGraph, this.parser)
-      this.lazilyTransformingAstService.addTransformation(transformation)
-    })
   }
 
   /**
