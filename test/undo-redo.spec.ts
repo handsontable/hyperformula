@@ -497,6 +497,20 @@ describe('Undo - clearing sheet', () => {
   })
 })
 
+describe('Undo - moving cells', () => {
+  it('works for simple case', () => {
+    const sheet = [
+      ['foo'],
+      [null],
+    ]
+    const engine = HyperFormula.buildFromArray(sheet)
+    engine.moveCells(adr('A1'), 1, 1, adr('A2'))
+    engine.undo()
+
+    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray(sheet))
+  })
+})
+
 describe('Undo', () => {
   it('when there is no operation to undo', () => {
     const engine = HyperFormula.buildEmpty()

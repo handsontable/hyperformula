@@ -20,12 +20,21 @@ enum UndoStackElementType {
   ADD_SHEET = 'ADD_SHEET',
   REMOVE_SHEET = 'REMOVE_SHEET',
   CLEAR_SHEET = 'CLEAR_SHEET',
+  MOVE_CELLS = 'MOVE_CELLS',
 }
 
 interface RemoveRowsUndoData {
   type: UndoStackElementType.REMOVE_ROWS,
   sheet: number,
   rowsRemovals: RowsRemoval[],
+}
+
+interface MoveCellsUndoData {
+  type: UndoStackElementType.MOVE_CELLS,
+  sourceLeftCorner: SimpleCellAddress,
+  width: number,
+  height: number,
+  destinationLeftCorner: SimpleCellAddress,
 }
 
 interface AddRowsUndoData {
@@ -99,6 +108,7 @@ type UndoStackElement
   | AddSheetUndoData
   | RemoveSheetUndoData
   | ClearSheetUndoData
+  | MoveCellsUndoData
 
 export class UndoRedo {
 
@@ -113,6 +123,10 @@ export class UndoRedo {
 
   public saveOperationAddColumns(addColumnsCommand: AddColumnsCommand) {
     this.undoStack.push({ type: UndoStackElementType.ADD_COLUMNS, command: addColumnsCommand })
+  }
+
+  public saveOperationMoveCells(sourceLeftCorner: SimpleCellAddress, width: number, height: number, destinationLeftCorner: SimpleCellAddress) {
+    this.undoStack.push({ type: UndoStackElementType.MOVE_CELLS, sourceLeftCorner, width, height, destinationLeftCorner })
   }
 
   public saveOperationRemoveColumns(removeColumnsCommand: RemoveColumnsCommand, columnsRemovals: ColumnsRemoval[]) {
@@ -214,6 +228,10 @@ export class UndoRedo {
         this.undoMoveColumns(operation)
         break
       }
+      case UndoStackElementType.MOVE_CELLS: {
+        this.undoMoveCells(operation)
+        break
+      }
     }
     this.redoStack.push(operation)
   }
@@ -280,6 +298,10 @@ export class UndoRedo {
   private undoMoveColumns(operation: MoveColumnsUndoData) {
     const { sheet } = operation
     this.crudOperations!.operations.moveColumns(sheet, operation.targetColumn - operation.numberOfColumns, operation.numberOfColumns, operation.startColumn)
+  }
+
+  public undoMoveCells(operation: MoveCellsUndoData): void {
+    this.crudOperations!.operations.moveCells(operation.destinationLeftCorner, operation.width, operation.height, operation.sourceLeftCorner)
   }
 
   private undoAddSheet(operation: AddSheetUndoData) {

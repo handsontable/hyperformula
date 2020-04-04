@@ -103,6 +103,7 @@ export class CrudOperations {
   public moveCells(sourceLeftCorner: SimpleCellAddress, width: number, height: number, destinationLeftCorner: SimpleCellAddress): void {
     this.clipboardOperations.abortCut()
     this.operations.moveCells(sourceLeftCorner, width, height, destinationLeftCorner)
+    this.undoRedo.saveOperationMoveCells(sourceLeftCorner, width, height, destinationLeftCorner)
   }
 
   public moveRows(sheet: number, startRow: number, numberOfRows: number, targetRow: number): void {
