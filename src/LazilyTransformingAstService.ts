@@ -8,6 +8,7 @@ import {Ast, ParserWithCaching} from './parser'
 import {Statistics} from './statistics/Statistics'
 import {UndoRedo} from './UndoRedo'
 import {RemoveRowsTransformer} from './dependencyTransformers/RemoveRowsTransformer'
+import {RemoveSheetTransformer} from './dependencyTransformers/RemoveSheetTransformer'
 import {FormulaTransformer} from './dependencyTransformers/Transformer'
 import {StatType} from './statistics'
 
@@ -36,7 +37,7 @@ export class LazilyTransformingAstService {
 
     for (let v = version; v < this.transformations.length; v++) {
       const transformation = this.transformations[v]
-      if (transformation instanceof RemoveRowsTransformer) {
+      if (transformation instanceof RemoveRowsTransformer || transformation instanceof RemoveSheetTransformer) {
         this.undoRedo!.storeDataForVersion(v, address, this.parser!.computeHashFromAst(ast))
       }
 

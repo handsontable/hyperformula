@@ -117,14 +117,16 @@ export class Operations {
 
     this.dependencyGraph.removeSheet(sheetId)
 
+    let version: number
     this.stats.measure(StatType.TRANSFORM_ASTS, () => {
       const transformation = new RemoveSheetTransformer(sheetId)
       transformation.performEagerTransformations(this.dependencyGraph, this.parser)
-      this.lazilyTransformingAstService.addTransformation(transformation)
+      version = this.lazilyTransformingAstService.addTransformation(transformation)
     })
 
     this.sheetMapping.removeSheet(sheetId)
     this.columnSearch.removeSheet(sheetId)
+    return version!
   }
 
   public clearSheet(sheetId: number) {

@@ -49,6 +49,7 @@ interface RemoveSheetUndoData {
   sheetName: string,
   sheetId: number,
   oldSheetContent: ClipboardCell[][],
+  version: number,
 }
 
 interface ClearSheetUndoData {
@@ -102,8 +103,8 @@ export class UndoRedo {
     this.undoStack.push({ type: UndoStackElementType.SET_CELL_CONTENTS, cellContents })
   }
 
-  public saveOperationRemoveSheet(sheetName: string, sheetId: number, oldSheetContent: ClipboardCell[][]): void {
-    this.undoStack.push({ type: UndoStackElementType.REMOVE_SHEET, sheetName, sheetId, oldSheetContent })
+  public saveOperationRemoveSheet(sheetName: string, sheetId: number, oldSheetContent: ClipboardCell[][], version: number): void {
+    this.undoStack.push({ type: UndoStackElementType.REMOVE_SHEET, sheetName, sheetId, oldSheetContent, version })
   }
 
   public saveOperationAddSheet(sheetName: string): void {
@@ -223,6 +224,12 @@ export class UndoRedo {
         const address = simpleCellAddress(sheetId, col, rowIndex)
         this.crudOperations!.operations.restoreCell(address, cellType)
       }
+    }
+
+    const oldDataToRestore = this.oldData.get(operation.version - 1) || []
+    for (const entryToRestore of oldDataToRestore) {
+      const [ address, hash ] = entryToRestore
+      this.crudOperations!.operations.setFormulaToCellFromCache(hash, address)
     }
   }
 

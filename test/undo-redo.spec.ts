@@ -219,6 +219,19 @@ describe('Undo - removing sheet', () => {
 
     expect(engine.getSheetName(0)).toEqual("Sheet1")
   })
+
+  it('restores dependent cell formulas', () => {
+    const sheets = {
+      Sheet1: [['=Sheet2!A1']],
+      Sheet2: [['42']],
+    }
+    const engine = HyperFormula.buildFromSheets(sheets)
+    engine.removeSheet("Sheet2")
+
+    engine.undo()
+
+    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromSheets(sheets))
+  })
 })
 
 describe('Undo - setting cell content', () => {

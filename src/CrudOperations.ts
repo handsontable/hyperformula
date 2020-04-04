@@ -160,8 +160,8 @@ export class CrudOperations {
     const sheetId = this.sheetMapping.fetch(sheetName)
     const originalName = this.sheetMapping.fetchDisplayName(sheetId)
     const oldSheetContent = this.operations.getSheetClipboardCells(sheetId)
-    this.operations.removeSheet(sheetName)
-    this.undoRedo.saveOperationRemoveSheet(originalName, sheetId, oldSheetContent)
+    const version = this.operations.removeSheet(sheetName)
+    this.undoRedo.saveOperationRemoveSheet(originalName, sheetId, oldSheetContent, version)
   }
 
   public clearSheet(sheetName: string): void {
