@@ -215,6 +215,106 @@ describe('Undo - adding columns', () => {
   })
 })
 
+describe('Undo - removing columns', () => {
+  it('works for empty column', () => {
+    const sheet = [
+      ['1', null, '3'],
+    ]
+    const engine = HyperFormula.buildFromArray(sheet)
+    engine.removeColumns(0, [1, 1])
+
+    engine.undo()
+
+    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray(sheet))
+  })
+
+  it('works for simple values', () => {
+    const sheet = [
+      ['1', '2', '3'],
+    ]
+    const engine = HyperFormula.buildFromArray(sheet)
+    engine.removeColumns(0, [1, 1])
+
+    engine.undo()
+
+    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray(sheet))
+  })
+
+  it('works with formula in removed columns', () => {
+    const sheet = [
+      ['1', '=SUM(A1)', '3'],
+    ]
+    const engine = HyperFormula.buildFromArray(sheet)
+    engine.removeColumns(0, [1, 1])
+
+    engine.undo()
+
+    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray(sheet))
+  })
+
+  it('restores dependent cell formulas', () => {
+    const sheet = [
+      ['=A2', '42', '3'],
+    ]
+    const engine = HyperFormula.buildFromArray(sheet)
+    engine.removeColumns(0, [1, 1])
+
+    engine.undo()
+
+    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray(sheet))
+  })
+
+  it('formulas are built correctly when there was a pause in computation', () => {
+    const sheet = [
+      ['=A2', '42', '3'],
+    ]
+    const engine = HyperFormula.buildFromArray(sheet)
+    engine.suspendEvaluation()
+    engine.removeColumns(0, [1, 1])
+
+    engine.undo()
+    engine.resumeEvaluation()
+
+    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray(sheet))
+  })
+
+  it('restores ranges when removing columns', () => {
+    const sheet = [
+      ['=SUM(B1:C1)', '2', '3'],
+    ]
+    const engine = HyperFormula.buildFromArray(sheet)
+    engine.removeColumns(0, [1, 2])
+
+    engine.undo()
+
+    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray(sheet))
+  })
+
+  it('dummy operation should also be undoable', () => {
+    const sheet = [
+      ['1']
+    ]
+    const engine = HyperFormula.buildFromArray(sheet)
+    engine.removeColumns(0, [1000, 1])
+
+    engine.undo()
+
+    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray(sheet))
+  })
+
+  it('works for more removal segments', () => {
+    const sheet = [
+      ['1', '2', '3', '4'],
+    ]
+    const engine = HyperFormula.buildFromArray(sheet)
+    engine.removeColumns(0, [1, 1], [3, 1])
+
+    engine.undo()
+
+    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray(sheet))
+  })
+})
+
 describe('Undo - removing sheet', () => {
   it('works for empty sheet', () => {
     const engine = HyperFormula.buildFromArray([])

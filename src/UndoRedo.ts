@@ -6,7 +6,7 @@
 import {simpleCellAddress, SimpleCellAddress, NoErrorCellValue} from './Cell'
 import {ClipboardCell, ClipboardCellType} from './ClipboardOperations'
 import {RawCellContent} from './CellContentParser'
-import {RemoveColumnsCommand, AddColumnsCommand, RowsRemoval, RemoveRowsCommand, AddRowsCommand} from './Operations'
+import {RemoveColumnsCommand, AddColumnsCommand, RowsRemoval, ColumnsRemoval, RemoveRowsCommand, AddRowsCommand} from './Operations'
 import {CrudOperations} from './CrudOperations'
 
 enum UndoStackElementType {
@@ -14,6 +14,7 @@ enum UndoStackElementType {
   ADD_ROWS = 'ADD_ROWS',
   MOVE_ROWS = 'MOVE_ROWS',
   ADD_COLUMNS = 'ADD_COLUMNS',
+  REMOVE_COLUMNS = 'REMOVE_COLUMNS',
   SET_CELL_CONTENTS = 'SET_CELL_CONTENTS',
   ADD_SHEET = 'ADD_SHEET',
   REMOVE_SHEET = 'REMOVE_SHEET',
@@ -42,6 +43,12 @@ interface MoveRowsUndoData {
 interface AddColumnsUndoData {
   type: UndoStackElementType.ADD_COLUMNS,
   command: AddColumnsCommand,
+}
+
+interface RemoveColumnsUndoData {
+  type: UndoStackElementType.REMOVE_COLUMNS,
+  sheet: number,
+  columnsRemovals: ColumnsRemoval[],
 }
 
 interface AddSheetUndoData {
@@ -77,6 +84,7 @@ type UndoStackElement
   | AddRowsUndoData
   | MoveRowsUndoData
   | AddColumnsUndoData
+  | RemoveColumnsUndoData
   | SetCellContentsUndoData
   | AddSheetUndoData
   | RemoveSheetUndoData
@@ -95,6 +103,10 @@ export class UndoRedo {
 
   public saveOperationAddColumns(addColumnsCommand: AddColumnsCommand) {
     this.undoStack.push({ type: UndoStackElementType.ADD_COLUMNS, command: addColumnsCommand })
+  }
+
+  public saveOperationRemoveColumns(removeColumnsCommand: RemoveColumnsCommand, columnsRemovals: ColumnsRemoval[]) {
+    this.undoStack.push({ type: UndoStackElementType.REMOVE_COLUMNS, sheet: removeColumnsCommand.sheet, columnsRemovals })
   }
 
   public saveOperationRemoveRows(removeRowsCommand: RemoveRowsCommand, rowsRemovals: RowsRemoval[]) {
@@ -180,6 +192,10 @@ export class UndoRedo {
         this.undoAddColumns(operation)
         break
       }
+      case UndoStackElementType.REMOVE_COLUMNS: {
+        this.undoRemoveColumns(operation)
+        break
+      }
     }
     this.redoStack.push(operation)
   }
@@ -197,6 +213,26 @@ export class UndoRedo {
       }
 
       const oldDataToRestore = this.oldData.get(rowsRemoval.version - 1) || []
+      for (const entryToRestore of oldDataToRestore) {
+        const [ address, hash ] = entryToRestore
+        this.crudOperations!.operations.setFormulaToCellFromCache(hash, address)
+      }
+    }
+  }
+
+  private undoRemoveColumns(operation: RemoveColumnsUndoData) {
+    this.crudOperations!.operations.forceApplyPostponedTransformations()
+
+    const { sheet, columnsRemovals } = operation
+    for (let i = columnsRemovals.length - 1; i >= 0; --i) {
+      const columnsRemoval = columnsRemovals[i]
+      this.crudOperations!.operations.addColumns(new AddColumnsCommand(sheet, [[columnsRemoval.columnFrom, columnsRemoval.columnCount]]))
+
+      for (const { address, cellType } of columnsRemoval.removedCells) {
+        this.crudOperations!.operations.restoreCell(address, cellType)
+      }
+
+      const oldDataToRestore = this.oldData.get(columnsRemoval.version - 1) || []
       for (const entryToRestore of oldDataToRestore) {
         const [ address, hash ] = entryToRestore
         this.crudOperations!.operations.setFormulaToCellFromCache(hash, address)

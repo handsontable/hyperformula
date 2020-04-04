@@ -96,7 +96,8 @@ export class CrudOperations {
     const removeColumnsCommand = new RemoveColumnsCommand(sheet, indexes)
     this.ensureItIsPossibleToRemoveColumns(sheet, ...indexes)
     this.clipboardOperations.abortCut()
-    this.operations.removeColumns(removeColumnsCommand)
+    const columnsRemovals = this.operations.removeColumns(removeColumnsCommand)
+    this.undoRedo.saveOperationRemoveColumns(removeColumnsCommand, columnsRemovals)
   }
 
   public moveCells(sourceLeftCorner: SimpleCellAddress, width: number, height: number, destinationLeftCorner: SimpleCellAddress): void {
