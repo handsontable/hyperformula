@@ -92,7 +92,7 @@ export class ClipboardOperations {
       content[y] = []
 
       for (let x = 0; x < width; ++x) {
-        const clipboardCell = this.getClipboardCell(simpleCellAddress(leftCorner.sheet, leftCorner.col + x, leftCorner.row + y))
+        const clipboardCell = this.operations.getClipboardCell(simpleCellAddress(leftCorner.sheet, leftCorner.col + x, leftCorner.row + y))
         content[y].push(clipboardCell)
       }
     }
@@ -156,24 +156,5 @@ export class ClipboardOperations {
     if (this.dependencyGraph.matrixMapping.isFormulaMatrixInRange(targetRange)) {
       throw new Error('It is not possible to paste onto matrix')
     }
-  }
-
-  private getClipboardCell(address: SimpleCellAddress): ClipboardCell {
-    const vertex = this.dependencyGraph.getCell(address)
-
-    if (vertex === null || vertex instanceof EmptyCellVertex) {
-      return { type: ClipboardCellType.EMPTY }
-    } else if (vertex instanceof ValueCellVertex) {
-      /* TODO should we copy errors? */
-      return { type: ClipboardCellType.VALUE, value: vertex.getCellValue() }
-    } else if (vertex instanceof MatrixVertex) {
-      return { type: ClipboardCellType.VALUE, value: vertex.getMatrixCellValue(address) }
-    } else if (vertex instanceof FormulaCellVertex) {
-      return { type: ClipboardCellType.FORMULA, hash: this.parser.computeHashFromAst(vertex.getFormula(this.lazilyTransformingAstService)) }
-    } else if (vertex instanceof ParsingErrorVertex) {
-      return { type: ClipboardCellType.PARSING_ERROR, rawInput: vertex.rawInput, errors: vertex.errors }
-    }
-
-    throw Error('Trying to copy unsupported type')
   }
 }

@@ -63,7 +63,7 @@ interface SetCellContentsUndoData {
   cellContents: {
     address: SimpleCellAddress,
     newContent: RawCellContent,
-    oldContent: NoErrorCellValue,
+    oldContent: ClipboardCell,
   }[],
 }
 
@@ -99,7 +99,7 @@ export class UndoRedo {
     this.undoStack.push({ type: UndoStackElementType.MOVE_ROWS, sheet, startRow, numberOfRows, targetRow })
   }
 
-  public saveOperationSetCellContents(cellContents: { address: SimpleCellAddress, newContent: RawCellContent, oldContent: NoErrorCellValue }[]) {
+  public saveOperationSetCellContents(cellContents: { address: SimpleCellAddress, newContent: RawCellContent, oldContent: ClipboardCell }[]) {
     this.undoStack.push({ type: UndoStackElementType.SET_CELL_CONTENTS, cellContents })
   }
 
@@ -200,7 +200,7 @@ export class UndoRedo {
 
   private undoSetCellContents(operation: SetCellContentsUndoData) {
     for (const cellContentData of operation.cellContents) {
-      this.crudOperations!.operations.setCellContent(cellContentData.address, cellContentData.oldContent)
+      this.crudOperations!.operations.restoreCell(cellContentData.address, cellContentData.oldContent)
     }
   }
 

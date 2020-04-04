@@ -7,7 +7,7 @@ import {AbsoluteCellRange} from './AbsoluteCellRange'
 import {absolutizeDependencies} from './absolutizeDependencies'
 import {EmptyValue, invalidSimpleCellAddress, simpleCellAddress, SimpleCellAddress, NoErrorCellValue} from './Cell'
 import {CellContent, CellContentParser, isMatrix, RawCellContent} from './CellContentParser'
-import {ClipboardOperations} from './ClipboardOperations'
+import {ClipboardCell, ClipboardOperations} from './ClipboardOperations'
 import {
   AddRowsCommand,
   normalizeAddedIndexes,
@@ -40,7 +40,6 @@ import {AddColumnsTransformer} from './dependencyTransformers/AddColumnsTransfor
 import {RemoveColumnsTransformer} from './dependencyTransformers/RemoveColumnsTransformer'
 import {MoveCellsTransformer} from './dependencyTransformers/MoveCellsTransformer'
 import {RemoveSheetTransformer} from './dependencyTransformers/RemoveSheetTransformer'
-import { Serialization } from './Serialization'
 
 export class CrudOperations {
 
@@ -173,7 +172,7 @@ export class CrudOperations {
     this.undoRedo.saveOperationClearSheet(sheetId, oldSheetContent)
   }
 
-  public setCellContents(serialization: Serialization, topLeftCornerAddress: SimpleCellAddress, cellContents: RawCellContent[][] | RawCellContent): void {
+  public setCellContents(topLeftCornerAddress: SimpleCellAddress, cellContents: RawCellContent[][] | RawCellContent): void {
     if (!(cellContents instanceof Array)) {
       cellContents = [[cellContents]]
     } else {
@@ -189,7 +188,7 @@ export class CrudOperations {
       }
     }
 
-    const modifiedCellContents: { address: SimpleCellAddress, newContent: RawCellContent, oldContent: NoErrorCellValue }[] = []
+    const modifiedCellContents: { address: SimpleCellAddress, newContent: RawCellContent, oldContent: ClipboardCell }[] = []
     for (let i = 0; i < cellContents.length; i++) {
       for (let j = 0; j < cellContents[i].length; j++) {
         const address = {
@@ -199,7 +198,7 @@ export class CrudOperations {
         }
         this.ensureItIsPossibleToChangeContent(address)
         this.clipboardOperations.abortCut()
-        const oldContent = serialization.getCellSerialized(address)
+        const oldContent = this.operations.getClipboardCell(address)
         this.operations.setCellContent(address, cellContents[i][j])
         modifiedCellContents.push({ address, newContent: cellContents[i][j], oldContent })
       }

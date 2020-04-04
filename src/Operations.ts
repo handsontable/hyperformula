@@ -216,6 +216,10 @@ export class Operations {
         this.setFormulaToCellFromCache(clipboardCell.hash, address)
         break
       }
+      case ClipboardCellType.EMPTY: {
+        this.setCellEmpty(address)
+        break
+      }
     }
   }
 
@@ -272,7 +276,7 @@ export class Operations {
     return { afterRow: addedRows.rowStart, rowCount: addedRows.numberOfRows }
   }
 
-  private getClipboardCell(address: SimpleCellAddress): ClipboardCell {
+  public getClipboardCell(address: SimpleCellAddress): ClipboardCell {
     const vertex = this.dependencyGraph.getCell(address)
 
     if (vertex === null || vertex instanceof EmptyCellVertex) {
@@ -284,6 +288,8 @@ export class Operations {
       return { type: ClipboardCellType.VALUE, value: vertex.getMatrixCellValue(address) }
     } else if (vertex instanceof FormulaCellVertex) {
       return { type: ClipboardCellType.FORMULA, hash: this.parser.computeHashFromAst(vertex.getFormula(this.lazilyTransformingAstService)) }
+    } else if (vertex instanceof ParsingErrorVertex) {
+      return { type: ClipboardCellType.PARSING_ERROR, rawInput: vertex.rawInput, errors: vertex.errors }
     }
 
     throw Error('Trying to copy unsupported type')
