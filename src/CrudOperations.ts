@@ -460,11 +460,6 @@ export class CrudOperations {
   }
 }
 
-function isRowOrColumnRange(leftCorner: SimpleCellAddress, width: number, height: number): boolean {
-  return (leftCorner.row === 0 && isPositiveInteger(width) && height === Number.POSITIVE_INFINITY)
-    || (leftCorner.col === 0 && isPositiveInteger(height) && width === Number.POSITIVE_INFINITY)
-}
-
 function isPositiveInteger(x: number): boolean {
   return Number.isInteger(x) && x > 0
 }
