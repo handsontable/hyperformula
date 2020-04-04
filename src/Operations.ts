@@ -288,6 +288,10 @@ export class Operations {
         this.setCellEmpty(address)
         break
       }
+      case ClipboardCellType.PARSING_ERROR: {
+        this.setParsingErrorToCell(clipboardCell.rawInput, clipboardCell.errors, address)
+        break
+      }
     }
   }
 

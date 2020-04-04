@@ -112,15 +112,7 @@ export class ClipboardOperations {
         this.dependencyGraph.breakNumericMatricesInRange(targetRange)
 
         for (const [address, clipboardCell] of this.clipboard.getContent(destinationLeftCorner)) {
-          if (clipboardCell.type === ClipboardCellType.VALUE) {
-            this.operations.setValueToCell(clipboardCell.value, address)
-          } else if (clipboardCell.type === ClipboardCellType.EMPTY) {
-            this.operations.setCellEmpty(address)
-          } else if (clipboardCell.type === ClipboardCellType.PARSING_ERROR) {
-            this.operations.setParsingErrorToCell(clipboardCell.rawInput, clipboardCell.errors, address)
-          } else {
-            this.operations.setFormulaToCellFromCache(clipboardCell.hash, address)
-          }
+          this.operations.restoreCell(address, clipboardCell)
         }
         break
       }
