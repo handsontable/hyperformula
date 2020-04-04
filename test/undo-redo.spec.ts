@@ -686,6 +686,47 @@ describe('Redo - clearing sheet', () => {
   })
 })
 
+describe('Redo - adding columns', () => {
+  it('works', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1', '3'],
+    ])
+    engine.addColumns(0, [1, 1])
+    const snapshot = engine.getAllSheetsSerialized()
+    engine.undo()
+
+    engine.redo()
+
+    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromSheets(snapshot))
+  })
+
+  it('dummy operation should also be redoable', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1'],
+    ])
+    engine.addColumns(0, [1000, 1])
+    const snapshot = engine.getAllSheetsSerialized()
+    engine.undo()
+
+    engine.redo()
+
+    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromSheets(snapshot))
+  })
+
+  it('works for more addition segments', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1', '2', '3'],
+    ])
+    engine.addColumns(0, [1, 1], [2, 1])
+    const snapshot = engine.getAllSheetsSerialized()
+    engine.undo()
+
+    engine.redo()
+
+    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromSheets(snapshot))
+  })
+})
+
 describe('Redo', () => {
   it('when there is no operation to redo', () => {
     const engine = HyperFormula.buildEmpty()

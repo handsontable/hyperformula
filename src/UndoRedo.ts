@@ -304,6 +304,10 @@ export class UndoRedo {
         this.redoClearSheet(operation)
         break
       }
+      case UndoStackElementType.ADD_COLUMNS: {
+        this.redoAddColumns(operation)
+        break
+      }
     }
 
     this.undoStack.push(operation)
@@ -324,6 +328,10 @@ export class UndoRedo {
 
   private redoAddRows(operation: AddRowsUndoData) {
     this.crudOperations!.operations.addRows(operation.command)
+  }
+
+  private redoAddColumns(operation: AddColumnsUndoData) {
+    this.crudOperations!.operations.addColumns(operation.command)
   }
 
   private redoRemoveSheet(operation: RemoveSheetUndoData) {
