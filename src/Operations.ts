@@ -209,6 +209,21 @@ export class Operations {
     this.doRemoveRows(rowsToRemove)
   }
 
+  public moveColumns(sheet: number, startColumn: number, numberOfColumns: number, targetColumn: number): void {
+    const columnsToAdd = ColumnsSpan.fromNumberOfColumns(sheet, targetColumn, numberOfColumns)
+    this.doAddColumns(columnsToAdd)
+
+    if (targetColumn < startColumn) {
+      startColumn += numberOfColumns
+    }
+
+    const startAddress = simpleCellAddress(sheet, startColumn, 0)
+    const targetAddress = simpleCellAddress(sheet, targetColumn, 0)
+    this.moveCells(startAddress, numberOfColumns, Number.POSITIVE_INFINITY, targetAddress)
+    const columnsToRemove = ColumnsSpan.fromNumberOfColumns(sheet, startColumn, numberOfColumns)
+    this.doRemoveColumns(columnsToRemove)
+  }
+
   public moveCells(sourceLeftCorner: SimpleCellAddress, width: number, height: number, destinationLeftCorner: SimpleCellAddress): void {
     this.ensureItIsPossibleToMoveCells(sourceLeftCorner, width, height, destinationLeftCorner)
 

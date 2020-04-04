@@ -114,17 +114,7 @@ export class CrudOperations {
 
   public moveColumns(sheet: number, startColumn: number, numberOfColumns: number, targetColumn: number): void {
     this.ensureItIsPossibleToMoveColumns(sheet, startColumn, numberOfColumns, targetColumn)
-
-    this.addColumns(sheet, [targetColumn, numberOfColumns])
-
-    if (targetColumn < startColumn) {
-      startColumn += numberOfColumns
-    }
-
-    const startAddress = simpleCellAddress(sheet, startColumn, 0)
-    const targetAddress = simpleCellAddress(sheet, targetColumn, 0)
-    this.moveCells(startAddress, numberOfColumns, Number.POSITIVE_INFINITY, targetAddress)
-    this.removeColumns(sheet, [startColumn, numberOfColumns])
+    this.operations.moveColumns(sheet, startColumn, numberOfColumns, targetColumn)
   }
 
   public cut(sourceLeftCorner: SimpleCellAddress, width: number, height: number): void {
