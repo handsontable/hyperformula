@@ -6,13 +6,14 @@
 import {AbsoluteCellRange} from './AbsoluteCellRange'
 import {invalidSimpleCellAddress, simpleCellAddress, SimpleCellAddress} from './Cell'
 import {Operations} from './Operations'
-import {DependencyGraph, EmptyCellVertex, FormulaCellVertex, MatrixVertex, ValueCellVertex} from './DependencyGraph'
+import {DependencyGraph, ParsingErrorVertex, EmptyCellVertex, FormulaCellVertex, MatrixVertex, ValueCellVertex} from './DependencyGraph'
 import {ValueCellVertexValue} from './DependencyGraph/ValueCellVertex'
 import {InvalidArgumentsError} from './errors'
 import {LazilyTransformingAstService} from './LazilyTransformingAstService'
 import {ParserWithCaching} from './parser'
+import {ParsingError} from './parser/Ast'
 
-export type ClipboardCell = ClipboardCellValue | ClipboardCellFormula | ClipboardCellEmpty
+export type ClipboardCell = ClipboardCellValue | ClipboardCellFormula | ClipboardCellEmpty | ClipboardCellParsingError
 
 enum ClipboardOperationType {
   COPY,
@@ -23,6 +24,7 @@ export enum ClipboardCellType {
   VALUE,
   EMPTY,
   FORMULA,
+  PARSING_ERROR,
 }
 
 export interface ClipboardCellValue {
@@ -37,6 +39,12 @@ export interface ClipboardCellEmpty {
 export interface ClipboardCellFormula {
   type: ClipboardCellType.FORMULA,
   hash: string,
+}
+
+export interface ClipboardCellParsingError {
+  type: ClipboardCellType.PARSING_ERROR,
+  rawInput: string,
+  errors: ParsingError[],
 }
 
 class Clipboard {
@@ -108,6 +116,8 @@ export class ClipboardOperations {
             this.operations.setValueToCell(clipboardCell.value, address)
           } else if (clipboardCell.type === ClipboardCellType.EMPTY) {
             this.operations.setCellEmpty(address)
+          } else if (clipboardCell.type === ClipboardCellType.PARSING_ERROR) {
+            this.operations.setParsingErrorToCell(clipboardCell.rawInput, clipboardCell.errors, address)
           } else {
             this.operations.setFormulaToCellFromCache(clipboardCell.hash, address)
           }
@@ -160,6 +170,8 @@ export class ClipboardOperations {
       return { type: ClipboardCellType.VALUE, value: vertex.getMatrixCellValue(address) }
     } else if (vertex instanceof FormulaCellVertex) {
       return { type: ClipboardCellType.FORMULA, hash: this.parser.computeHashFromAst(vertex.getFormula(this.lazilyTransformingAstService)) }
+    } else if (vertex instanceof ParsingErrorVertex) {
+      return { type: ClipboardCellType.PARSING_ERROR, rawInput: vertex.rawInput, errors: vertex.errors }
     }
 
     throw Error('Trying to copy unsupported type')

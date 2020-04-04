@@ -57,6 +57,18 @@ describe('Copy - paste integration', () => {
     expect(engine.getCellValue(adr('B1'))).toEqual(1)
   })
 
+  it('should work for parsing error', () => {
+    const sheet = [
+      ['=SUM('],
+    ]
+    const engine = HyperFormula.buildFromArray(sheet)
+
+    engine.copy(adr('A1'), 1, 1)
+    engine.paste(adr('B1'))
+
+    expect(engine.getCellFormula(adr('B1'))).toEqual('=SUM(')
+  })
+
   it('should work for area', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '2'],

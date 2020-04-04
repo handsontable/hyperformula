@@ -18,6 +18,7 @@ import {DependencyGraph, SheetMapping, EmptyCellVertex, FormulaCellVertex, Matri
 import {ValueCellVertexValue} from './DependencyGraph/ValueCellVertex'
 import {InvalidAddressError, InvalidArgumentsError, NoSheetWithIdError, NoSheetWithNameError} from './errors'
 import {ParserWithCaching, ProcedureAst} from './parser'
+import {ParsingError} from './parser/Ast'
 import {AddRowsTransformer} from './dependencyTransformers/AddRowsTransformer'
 import {RemoveRowsTransformer} from './dependencyTransformers/RemoveRowsTransformer'
 import {MoveCellsTransformer} from './dependencyTransformers/MoveCellsTransformer'
@@ -371,6 +372,10 @@ export class Operations {
   public setFormulaToCellFromCache(formulaHash: string, address: SimpleCellAddress) {
     const {ast, hasVolatileFunction, hasStructuralChangeFunction, dependencies} = this.parser.fetchCachedResult(formulaHash)
     this.dependencyGraph.setFormulaToCell(address, ast, absolutizeDependencies(dependencies, address), hasVolatileFunction, hasStructuralChangeFunction)
+  }
+
+  public setParsingErrorToCell(rawInput: string, errors: ParsingError[], address: SimpleCellAddress) {
+    this.dependencyGraph.setParsingErrorToCell(address, new ParsingErrorVertex(errors, rawInput))
   }
 
   /**
