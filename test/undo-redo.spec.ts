@@ -232,6 +232,21 @@ describe('Undo - removing sheet', () => {
 
     expectEngineToBeTheSameAs(engine, HyperFormula.buildFromSheets(sheets))
   })
+
+  it('formulas are built correctly when there was a pause in computation', () => {
+    const sheets = {
+      Sheet1: [['=Sheet2!A1']],
+      Sheet2: [['42']],
+    }
+    const engine = HyperFormula.buildFromSheets(sheets)
+    engine.suspendEvaluation()
+    engine.removeSheet("Sheet2")
+
+    engine.undo()
+    engine.resumeEvaluation()
+
+    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromSheets(sheets))
+  })
 })
 
 describe('Undo - setting cell content', () => {

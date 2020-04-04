@@ -215,6 +215,7 @@ export class UndoRedo {
   }
 
   private undoRemoveSheet(operation: RemoveSheetUndoData) {
+    this.crudOperations!.operations.forceApplyPostponedTransformations()
     const { oldSheetContent, sheetId } = operation
     this.crudOperations!.operations.addSheet(operation.sheetName)
     for (let rowIndex = 0; rowIndex < oldSheetContent.length; rowIndex++) {
