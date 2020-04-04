@@ -6,7 +6,7 @@
 import {simpleCellAddress, SimpleCellAddress, NoErrorCellValue} from './Cell'
 import {ClipboardCell, ClipboardCellType} from './ClipboardOperations'
 import {RawCellContent} from './CellContentParser'
-import {RowsRemoval, RemoveRowsCommand, RowsAddition, AddRowsCommand} from './Operations'
+import {RowsRemoval, RemoveRowsCommand, AddRowsCommand} from './Operations'
 import {CrudOperations} from './CrudOperations'
 
 enum UndoStackElementType {
@@ -27,8 +27,7 @@ interface RemoveRowsUndoData {
 
 interface AddRowsUndoData {
   type: UndoStackElementType.ADD_ROWS,
-  sheet: number,
-  rowsAdditions: RowsAddition[],
+  command: AddRowsCommand,
 }
 
 interface MoveRowsUndoData {
@@ -91,8 +90,8 @@ export class UndoRedo {
     this.undoStack.push({ type: UndoStackElementType.REMOVE_ROWS, sheet: removeRowsCommand.sheet, rowsRemovals })
   }
 
-  public saveOperationAddRows(addRowsCommand: AddRowsCommand, rowsAdditions: RowsAddition[]) {
-    this.undoStack.push({ type: UndoStackElementType.ADD_ROWS, sheet: addRowsCommand.sheet, rowsAdditions })
+  public saveOperationAddRows(addRowsCommand: AddRowsCommand) {
+    this.undoStack.push({ type: UndoStackElementType.ADD_ROWS, command: addRowsCommand })
   }
 
   public saveOperationMoveRows(sheet: number, startRow: number, numberOfRows: number, targetRow: number): void {
@@ -191,10 +190,10 @@ export class UndoRedo {
   }
 
   private undoAddRows(operation: AddRowsUndoData) {
-    const { sheet, rowsAdditions } = operation
-    for (let i = rowsAdditions.length - 1; i >= 0; --i) {
-      const rowsAddition = rowsAdditions[i]
-      this.crudOperations!.operations.removeRows(new RemoveRowsCommand(sheet, [[rowsAddition.afterRow, rowsAddition.rowCount]]))
+    const addedRowsSpans = operation.command.rowsSpans()
+    for (let i = addedRowsSpans.length - 1; i >= 0; --i) {
+      const addedRows = addedRowsSpans[i]
+      this.crudOperations!.operations.removeRows(new RemoveRowsCommand(operation.command.sheet, [[addedRows.rowStart, addedRows.numberOfRows]]))
     }
   }
 
@@ -301,10 +300,7 @@ export class UndoRedo {
   }
 
   private redoAddRows(operation: AddRowsUndoData) {
-    const { sheet, rowsAdditions } = operation
-    for (const rowsAddition of rowsAdditions) {
-      this.crudOperations!.operations.addRows(new AddRowsCommand(sheet, [[rowsAddition.afterRow, rowsAddition.rowCount]]))
-    }
+    this.crudOperations!.operations.addRows(operation.command)
   }
 
   private redoRemoveSheet(operation: RemoveSheetUndoData) {

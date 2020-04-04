@@ -71,8 +71,8 @@ export class CrudOperations {
     const addRowsCommand = new AddRowsCommand(sheet, indexes)
     this.ensureItIsPossibleToAddRows(sheet, ...indexes)
     this.clipboardOperations.abortCut()
-    const rowsAdditions = this.operations.addRows(addRowsCommand)
-    this.undoRedo.saveOperationAddRows(addRowsCommand, rowsAdditions)
+    this.operations.addRows(addRowsCommand)
+    this.undoRedo.saveOperationAddRows(addRowsCommand)
   }
 
   public removeRows(sheet: number, ...indexes: Index[]): void {

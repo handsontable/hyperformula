@@ -73,11 +73,6 @@ export interface RowsRemoval {
   removedCells: ChangedCell[],
 }
 
-export interface RowsAddition {
-  afterRow: number,
-  rowCount: number,
-}
-
 export class Operations {
   private changes: ContentChanges = ContentChanges.empty()
 
@@ -102,15 +97,10 @@ export class Operations {
     return rowsRemovals
   }
 
-  public addRows(cmd: AddRowsCommand): RowsAddition[] {
-    const rowsAdditions: RowsAddition[] = []
+  public addRows(cmd: AddRowsCommand) {
     for (const addedRows of cmd.rowsSpans()) {
-      const rowAddition = this.doAddRows(addedRows)
-      if (rowAddition) {
-        rowsAdditions.push(rowAddition)
-      }
+      this.doAddRows(addedRows)
     }
-    return rowsAdditions
   }
 
   public removeSheet(sheetName: string) {
@@ -260,7 +250,7 @@ export class Operations {
    * @param row - row number above which the rows will be added
    * @param numberOfRowsToAdd - number of rows to add
    */
-  private doAddRows(addedRows: RowsSpan): RowsAddition | undefined {
+  private doAddRows(addedRows: RowsSpan) {
     if (this.rowEffectivelyNotInSheet(addedRows.rowStart, addedRows.sheet)) {
       return
     }
@@ -272,8 +262,6 @@ export class Operations {
       transformation.performEagerTransformations(this.dependencyGraph, this.parser)
       this.lazilyTransformingAstService.addTransformation(transformation)
     })
-
-    return { afterRow: addedRows.rowStart, rowCount: addedRows.numberOfRows }
   }
 
   public getClipboardCell(address: SimpleCellAddress): ClipboardCell {
