@@ -25,6 +25,7 @@ import {RemoveRowsTransformer} from './dependencyTransformers/RemoveRowsTransfor
 import {AddColumnsTransformer} from './dependencyTransformers/AddColumnsTransformer'
 import {MoveCellsTransformer} from './dependencyTransformers/MoveCellsTransformer'
 import {RemoveSheetTransformer} from './dependencyTransformers/RemoveSheetTransformer'
+import {RemoveColumnsTransformer} from './dependencyTransformers/RemoveColumnsTransformer'
 import {AbsoluteCellRange} from './AbsoluteCellRange'
 
 export class RemoveRowsCommand {
@@ -81,6 +82,24 @@ export class AddColumnsCommand {
   }
 }
 
+export class RemoveColumnsCommand {
+  constructor(
+    public readonly sheet: number,
+    public readonly indexes: Index[]
+  ) {
+  }
+
+  public normalizedIndexes(): Index[] {
+    return normalizeRemovedIndexes(this.indexes)
+  }
+
+  public columnsSpans(): ColumnsSpan[] {
+    return this.normalizedIndexes().map(normalizedIndex =>
+      ColumnsSpan.fromNumberOfColumns(this.sheet, normalizedIndex[0], normalizedIndex[1])
+    )
+  }
+}
+
 export interface ChangedCell {
   address: SimpleCellAddress,
   cellType: ClipboardCell,
@@ -89,6 +108,13 @@ export interface ChangedCell {
 export interface RowsRemoval {
   rowFrom: number,
   rowCount: number,
+  version: number,
+  removedCells: ChangedCell[],
+}
+
+export interface ColumnsRemoval {
+  columnFrom: number,
+  columnCount: number,
   version: number,
   removedCells: ChangedCell[],
 }
@@ -127,6 +153,17 @@ export class Operations {
     for (const addedColumns of cmd.columnsSpans()) {
       this.doAddColumns(addedColumns)
     }
+  }
+
+  public removeColumns(cmd: RemoveColumnsCommand): ColumnsRemoval[] {
+    const columnsRemovals: ColumnsRemoval[] = []
+    for (const columnsToRemove of cmd.columnsSpans()) {
+      const columnsRemoval = this.doRemoveColumns(columnsToRemove)
+      if (columnsRemoval) {
+        columnsRemovals.push(columnsRemoval)
+      }
+    }
+    return columnsRemovals
   }
 
   public removeSheet(sheetName: string) {
@@ -266,6 +303,36 @@ export class Operations {
       version = this.lazilyTransformingAstService.addTransformation(transformation)
     })
     return { version: version!, removedCells, rowFrom: rowsToRemove.rowStart, rowCount: rowsToRemove.numberOfRows }
+  }
+
+  /**
+   * Removes multiple columns from sheet. </br>
+   * Does nothing if columns are outside of effective sheet size.
+   *
+   * @param sheet - sheet id from which columns will be removed
+   * @param columnStart - number of the first column to be deleted
+   * @param columnEnd - number of the last row to be deleted
+   */
+  private doRemoveColumns(columnsToRemove: ColumnsSpan): ColumnsRemoval | undefined {
+    if (this.columnEffectivelyNotInSheet(columnsToRemove.columnStart, columnsToRemove.sheet)) {
+      return
+    }
+
+    const removedCells: ChangedCell[] = []
+    for (const [address] of this.dependencyGraph.entriesFromColumnsSpan(columnsToRemove)) {
+      removedCells.push({ address, cellType: this.getClipboardCell(address) })
+    }
+
+    this.dependencyGraph.removeColumns(columnsToRemove)
+    this.columnSearch.removeColumns(columnsToRemove)
+
+    let version: number
+    this.stats.measure(StatType.TRANSFORM_ASTS, () => {
+      const transformation = new RemoveColumnsTransformer(columnsToRemove)
+      transformation.performEagerTransformations(this.dependencyGraph, this.parser)
+      version = this.lazilyTransformingAstService.addTransformation(transformation)
+    })
+    return { version: version!, removedCells, columnFrom: columnsToRemove.columnStart, columnCount: columnsToRemove.numberOfColumns }
   }
 
   /**

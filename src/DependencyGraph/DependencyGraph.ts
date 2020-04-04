@@ -538,6 +538,10 @@ export class DependencyGraph {
     yield* this.addressMapping.entriesFromRowsSpan(rowsSpan)
   }
 
+  public* entriesFromColumnsSpan(columnsSpan: ColumnsSpan): IterableIterator<[SimpleCellAddress, CellVertex]> {
+    yield* this.addressMapping.entriesFromColumnsSpan(columnsSpan)
+  }
+
   public existsVertex(address: SimpleCellAddress): boolean {
     return this.addressMapping.has(address)
   }

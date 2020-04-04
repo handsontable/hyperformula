@@ -15,6 +15,7 @@ import {
   normalizeRemovedIndexes,
   Operations,
   RemoveRowsCommand,
+  RemoveColumnsCommand,
 } from './Operations'
 import {ColumnSearchStrategy} from './ColumnSearch/ColumnSearchStrategy'
 import {ColumnsSpan} from './ColumnsSpan'
@@ -38,7 +39,6 @@ import {RowsSpan} from './RowsSpan'
 import {Statistics, StatType} from './statistics'
 import {UndoRedo} from './UndoRedo'
 import {AddColumnsTransformer} from './dependencyTransformers/AddColumnsTransformer'
-import {RemoveColumnsTransformer} from './dependencyTransformers/RemoveColumnsTransformer'
 import {MoveCellsTransformer} from './dependencyTransformers/MoveCellsTransformer'
 import {RemoveSheetTransformer} from './dependencyTransformers/RemoveSheetTransformer'
 
@@ -92,12 +92,10 @@ export class CrudOperations {
   }
 
   public removeColumns(sheet: number, ...indexes: Index[]): void {
-    const normalizedIndexes = normalizeRemovedIndexes(indexes)
+    const removeColumnsCommand = new RemoveColumnsCommand(sheet, indexes)
     this.ensureItIsPossibleToRemoveColumns(sheet, ...indexes)
     this.clipboardOperations.abortCut()
-    for (const index of normalizedIndexes) {
-      this.doRemoveColumns(sheet, index[0], index[0] + index[1] - 1)
-    }
+    this.operations.removeColumns(removeColumnsCommand)
   }
 
   public moveCells(sourceLeftCorner: SimpleCellAddress, width: number, height: number, destinationLeftCorner: SimpleCellAddress): void {
@@ -386,42 +384,6 @@ export class CrudOperations {
     if (!this.sheetMapping.hasSheetWithName(sheetName)) {
       throw new NoSheetWithNameError(sheetName)
     }
-  }
-
-  /**
-   * Removes multiple columns from sheet. </br>
-   * Does nothing if columns are outside of effective sheet size.
-   *
-   * @param sheet - sheet id from which columns will be removed
-   * @param columnStart - number of the first column to be deleted
-   * @param columnEnd - number of the last row to be deleted
-   */
-  private doRemoveColumns(sheet: number, columnStart: number, columnEnd: number = columnStart): void {
-    if (this.columnEffectivelyNotInSheet(columnStart, sheet) || columnEnd < columnStart) {
-      return
-    }
-
-    const removedColumns = ColumnsSpan.fromColumnStartAndEnd(sheet, columnStart, columnEnd)
-
-    this.dependencyGraph.removeColumns(removedColumns)
-    this.columnSearch.removeColumns(removedColumns)
-
-    this.stats.measure(StatType.TRANSFORM_ASTS, () => {
-      const transformation = new RemoveColumnsTransformer(removedColumns)
-      transformation.performEagerTransformations(this.dependencyGraph, this.parser)
-      this.lazilyTransformingAstService.addTransformation(transformation)
-    })
-  }
-
-  /**
-   * Returns true if row number is outside of given sheet.
-   *
-   * @param column - row number
-   * @param sheet - sheet id number
-   */
-  private columnEffectivelyNotInSheet(column: number, sheet: number): boolean {
-    const width = this.addressMapping.getWidth(sheet)
-    return column >= width
   }
 
   private get addressMapping(): AddressMapping {
