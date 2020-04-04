@@ -384,7 +384,7 @@ export class Operations {
    * @param column - column number above which the columns will be added
    * @param numberOfColumns - number of columns to add
    */
-  public doAddColumns(addedColumns: ColumnsSpan): void {
+  private doAddColumns(addedColumns: ColumnsSpan): void {
     if (this.columnEffectivelyNotInSheet(addedColumns.columnStart, addedColumns.sheet)) {
       return
     }
