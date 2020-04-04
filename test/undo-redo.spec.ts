@@ -177,6 +177,20 @@ describe('Undo - moving rows', () => {
   })
 })
 
+describe('Undo - moving columns', () => {
+  it('works', () => {
+    const sheet = [
+      ['1', '2', '3'],
+    ]
+    const engine = HyperFormula.buildFromArray(sheet)
+    engine.moveColumns(0, 0, 1, 2)
+
+    engine.undo()
+
+    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray(sheet))
+  })
+})
+
 describe('Undo - adding columns', () => {
   it('works', () => {
     const sheet = [

@@ -15,6 +15,7 @@ enum UndoStackElementType {
   MOVE_ROWS = 'MOVE_ROWS',
   ADD_COLUMNS = 'ADD_COLUMNS',
   REMOVE_COLUMNS = 'REMOVE_COLUMNS',
+  MOVE_COLUMNS = 'MOVE_COLUMNS',
   SET_CELL_CONTENTS = 'SET_CELL_CONTENTS',
   ADD_SHEET = 'ADD_SHEET',
   REMOVE_SHEET = 'REMOVE_SHEET',
@@ -38,6 +39,14 @@ interface MoveRowsUndoData {
   startRow: number,
   numberOfRows: number,
   targetRow: number,
+}
+
+interface MoveColumnsUndoData {
+  type: UndoStackElementType.MOVE_COLUMNS,
+  sheet: number,
+  startColumn: number,
+  numberOfColumns: number,
+  targetColumn: number,
 }
 
 interface AddColumnsUndoData {
@@ -83,6 +92,7 @@ type UndoStackElement
   = RemoveRowsUndoData
   | AddRowsUndoData
   | MoveRowsUndoData
+  | MoveColumnsUndoData
   | AddColumnsUndoData
   | RemoveColumnsUndoData
   | SetCellContentsUndoData
@@ -119,6 +129,10 @@ export class UndoRedo {
 
   public saveOperationMoveRows(sheet: number, startRow: number, numberOfRows: number, targetRow: number): void {
     this.undoStack.push({ type: UndoStackElementType.MOVE_ROWS, sheet, startRow, numberOfRows, targetRow })
+  }
+
+  public saveOperationMoveColumns(sheet: number, startColumn: number, numberOfColumns: number, targetColumn: number): void {
+    this.undoStack.push({ type: UndoStackElementType.MOVE_COLUMNS, sheet, startColumn, numberOfColumns, targetColumn })
   }
 
   public saveOperationSetCellContents(cellContents: { address: SimpleCellAddress, newContent: RawCellContent, oldContent: ClipboardCell }[]) {
@@ -196,6 +210,10 @@ export class UndoRedo {
         this.undoRemoveColumns(operation)
         break
       }
+      case UndoStackElementType.MOVE_COLUMNS: {
+        this.undoMoveColumns(operation)
+        break
+      }
     }
     this.redoStack.push(operation)
   }
@@ -257,6 +275,11 @@ export class UndoRedo {
   private undoMoveRows(operation: MoveRowsUndoData) {
     const { sheet } = operation
     this.crudOperations!.operations.moveRows(sheet, operation.targetRow - operation.numberOfRows, operation.numberOfRows, operation.startRow)
+  }
+
+  private undoMoveColumns(operation: MoveColumnsUndoData) {
+    const { sheet } = operation
+    this.crudOperations!.operations.moveColumns(sheet, operation.targetColumn - operation.numberOfColumns, operation.numberOfColumns, operation.startColumn)
   }
 
   private undoAddSheet(operation: AddSheetUndoData) {
