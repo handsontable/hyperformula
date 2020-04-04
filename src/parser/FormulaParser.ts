@@ -2,13 +2,19 @@ import {EmbeddedActionsParser, ILexingResult, IOrAlt, IToken, Lexer, OrMethodOpt
 
 import {CellError, ErrorType, simpleCellAddress, SimpleCellAddress} from '../Cell'
 import {Maybe} from '../Maybe'
-import {cellAddressFromString, SheetMappingFn} from './addressRepresentationConverters'
+import {
+  cellAddressFromString,
+  columnAddressFromString,
+  rowAddressFromString,
+  SheetMappingFn,
+} from './addressRepresentationConverters'
 import {
   Ast,
   AstNodeType,
   buildCellErrorAst,
   buildCellRangeAst,
   buildCellReferenceAst,
+  buildColumnRangeAst,
   buildConcatenateOpAst,
   buildDivOpAst,
   buildEqualsOpAst,
@@ -27,7 +33,8 @@ import {
   buildPlusOpAst,
   buildPlusUnaryOpAst,
   buildPowerOpAst,
-  buildProcedureAst,
+  buildProcedureAst, 
+  buildRowRangeAst,
   buildStringAst,
   buildTimesOpAst,
   CellReferenceAst,
@@ -42,6 +49,7 @@ import {
   AdditionOp,
   BooleanOp,
   CellReference,
+  ColumnRange,
   ConcatenateOp,
   DivOp,
   EqualsOp,
@@ -59,7 +67,8 @@ import {
   PlusOp,
   PowerOp,
   ProcedureName,
-  RangeSeparator,
+  RangeSeparator, 
+  RowRange,
   RParen,
   StringLiteral,
   TimesOp,
@@ -339,6 +348,12 @@ export class FormulaParser extends EmbeddedActionsParser {
         ALT: () => this.SUBRULE(this.cellRangeExpression),
       },
       {
+        ALT: () => this.SUBRULE(this.columnRangeExpression),
+      },
+      {
+        ALT: () => this.SUBRULE(this.rowRangeExpression),
+      },
+      {
         ALT: () => this.SUBRULE(this.offsetExpression),
       },
       {
@@ -380,7 +395,7 @@ export class FormulaParser extends EmbeddedActionsParser {
   private procedureExpression: AstRule = this.RULE('procedureExpression', () => {
     const procedureNameToken = this.CONSUME(ProcedureName) as IExtendedToken
     const procedureName = procedureNameToken.image.toUpperCase().slice(0, -1)
-    const canonicalProcedureName = this.lexerConfig.functionMapping[procedureName] || procedureName
+    const canonicalProcedureName = this.lexerConfig.functionMapping[procedureName] ?? procedureName
     const args: Ast[] = []
     this.MANY_SEP({
       SEP: this.lexerConfig.ArgSeparator,
@@ -444,6 +459,66 @@ export class FormulaParser extends EmbeddedActionsParser {
     const start = this.CONSUME(CellReference)
     this.CONSUME2(RangeSeparator)
     return this.SUBRULE(this.endOfRangeExpression, { ARGS: [start]})
+  })
+
+  /*
+  * Rule for column range, e.g. A:B, Sheet1!A:B, Sheet1!A:Sheet1!B
+  * */
+  private columnRangeExpression: AstRule = this.RULE('columnRangeExpression', () => {
+    const range = this.CONSUME(ColumnRange) as IExtendedToken
+    const [startImage, endImage] = range.image.split(':')
+
+    const start = this.ACTION(() => {
+      return columnAddressFromString(this.sheetMapping, startImage, this.formulaAddress)
+    })
+    let end = this.ACTION(() => {
+      return columnAddressFromString(this.sheetMapping, endImage, this.formulaAddress)
+    })
+
+    if (start === undefined || end === undefined) {
+      return buildCellErrorAst(new CellError(ErrorType.REF))
+    }
+    if (start.sheet === null && end.sheet !== null) {
+      return this.parsingError(ParsingErrorType.ParserError, 'Malformed range expression')
+    }
+
+    const sheetReferenceType = this.rangeSheetReferenceType(start.sheet, end.sheet)
+
+    if (start.sheet !== null && end.sheet === null) {
+      end = end.withAbsoluteSheet(start.sheet)
+    }
+
+    return buildColumnRangeAst(start, end, sheetReferenceType, range.leadingWhitespace)
+  })
+
+  /*
+* Rule for row range, e.g. 1:2, Sheet1!1:2, Sheet1!1:Sheet1!2
+* */
+  private rowRangeExpression: AstRule = this.RULE('rowRangeExpression', () => {
+    const range = this.CONSUME(RowRange) as IExtendedToken
+    const [startImage, endImage] = range.image.split(':')
+
+    const start = this.ACTION(() => {
+      return rowAddressFromString(this.sheetMapping, startImage, this.formulaAddress)
+    })
+    let end = this.ACTION(() => {
+      return rowAddressFromString(this.sheetMapping, endImage, this.formulaAddress)
+    })
+
+    if (start === undefined || end === undefined) {
+      return buildCellErrorAst(new CellError(ErrorType.REF))
+    }
+    if (start.sheet === null && end.sheet !== null) {
+      return this.parsingError(ParsingErrorType.ParserError, 'Malformed range expression')
+    }
+
+    const sheetReferenceType = this.rangeSheetReferenceType(start.sheet, end.sheet)
+
+    if (start.sheet !== null && end.sheet === null) {
+      end = end.withAbsoluteSheet(start.sheet)
+    }
+
+    return buildRowRangeAst(start, end, sheetReferenceType, range.leadingWhitespace)
   })
 
   /**
@@ -576,14 +651,7 @@ export class FormulaParser extends EmbeddedActionsParser {
       return this.parsingError(ParsingErrorType.ParserError, 'Malformed range expression')
     }
 
-    let sheetReferenceType: RangeSheetReferenceType
-    if (startAddress.sheet === null) {
-      sheetReferenceType = RangeSheetReferenceType.RELATIVE
-    } else if (endAddress.sheet === null) {
-      sheetReferenceType = RangeSheetReferenceType.START_ABSOLUTE
-    } else {
-      sheetReferenceType = RangeSheetReferenceType.BOTH_ABSOLUTE
-    }
+    const sheetReferenceType = this.rangeSheetReferenceType(startAddress.sheet, endAddress.sheet)
 
     if (startAddress.sheet !== null && endAddress.sheet === null) {
       endAddress = endAddress.withAbsoluteSheet(startAddress.sheet)
@@ -702,6 +770,16 @@ export class FormulaParser extends EmbeddedActionsParser {
   private parsingError(type: ParsingErrorType, message: string): ErrorAst {
     this.customParsingError = parsingError(type, message)
     return buildParsingErrorAst()
+  }
+
+  private rangeSheetReferenceType(start: number | null, end: number | null): RangeSheetReferenceType {
+    if (start === null) {
+      return RangeSheetReferenceType.RELATIVE
+    } else if (end === null) {
+      return RangeSheetReferenceType.START_ABSOLUTE
+    } else {
+      return RangeSheetReferenceType.BOTH_ABSOLUTE
+    }
   }
 
   public numericStringToNumber = (input: string): number => {

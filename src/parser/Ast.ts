@@ -2,32 +2,37 @@ import {IToken} from 'chevrotain'
 import {CellError} from '../Cell'
 import {Maybe} from '../Maybe'
 import {CellAddress} from './CellAddress'
+import {ColumnAddress} from './ColumnAddress'
 import {IExtendedToken} from './FormulaParser'
+import {RowAddress} from './RowAddress'
+import {AddressWithSheet} from './Address'
 
 export type Ast =
-    NumberAst
-    | StringAst
-    | CellReferenceAst
-    | CellRangeAst
-    | ConcatenateOpAst
-    | MinusUnaryOpAst
-    | PlusUnaryOpAst
-    | PercentOpAst
-    | EqualsOpAst
-    | NotEqualOpAst
-    | GreaterThanOpAst
-    | LessThanOpAst
-    | LessThanOrEqualOpAst
-    | GreaterThanOrEqualOpAst
-    | PlusOpAst
-    | MinusOpAst
-    | TimesOpAst
-    | DivOpAst
-    | PowerOpAst
-    | ProcedureAst
-    | ParenthesisAst
-    | ErrorAst
-    | ErrorWithRawInputAst
+  NumberAst
+  | StringAst
+  | CellReferenceAst
+  | CellRangeAst
+  | ColumnRangeAst
+  | RowRangeAst
+  | ConcatenateOpAst
+  | MinusUnaryOpAst
+  | PlusUnaryOpAst
+  | PercentOpAst
+  | EqualsOpAst
+  | NotEqualOpAst
+  | GreaterThanOpAst
+  | LessThanOpAst
+  | LessThanOrEqualOpAst
+  | GreaterThanOrEqualOpAst
+  | PlusOpAst
+  | MinusOpAst
+  | TimesOpAst
+  | DivOpAst
+  | PowerOpAst
+  | ProcedureAst
+  | ParenthesisAst
+  | ErrorAst
+  | ErrorWithRawInputAst
 
 export interface ParsingError {
   type: ParsingErrorType,
@@ -77,6 +82,8 @@ export enum AstNodeType {
   CELL_REFERENCE = 'CELL_REFERENCE',
 
   CELL_RANGE = 'CELL_RANGE',
+  COLUMN_RANGE = 'COLUMN_RANGE',
+  ROW_RANGE = 'ROW_RANGE',
 
   ERROR = 'ERROR',
 
@@ -138,19 +145,49 @@ export interface CellRangeAst extends AstWithWhitespace {
 }
 
 export const buildCellRangeAst = (start: CellAddress, end: CellAddress, sheetReferenceType: RangeSheetReferenceType, leadingWhitespace?: string): CellRangeAst => {
-  if ((start.sheet !== null && end.sheet === null) || (start.sheet === null && end.sheet !== null)) {
-    throw new Error('Start address inconsistent with end address')
-  }
-  if ((start.sheet === null && sheetReferenceType !== RangeSheetReferenceType.RELATIVE)
-      || (start.sheet !== null && sheetReferenceType === RangeSheetReferenceType.RELATIVE)) {
-    throw new Error('Sheet address inconsistent with sheet reference type')
-  }
+  assertRangeConsistency(start, end, sheetReferenceType)
   return {
     type: AstNodeType.CELL_RANGE,
     start,
     end,
     sheetReferenceType,
     leadingWhitespace
+  }
+}
+
+export interface ColumnRangeAst extends AstWithWhitespace{
+  type: AstNodeType.COLUMN_RANGE,
+  start: ColumnAddress,
+  end: ColumnAddress,
+  sheetReferenceType: RangeSheetReferenceType,
+}
+
+export const buildColumnRangeAst = (start: ColumnAddress, end: ColumnAddress, sheetReferenceType: RangeSheetReferenceType, leadingWhitespace?: IToken): ColumnRangeAst => {
+  assertRangeConsistency(start, end, sheetReferenceType)
+  return {
+    type: AstNodeType.COLUMN_RANGE,
+    start,
+    end,
+    sheetReferenceType,
+    leadingWhitespace: extractImage(leadingWhitespace),
+  }
+}
+
+export interface RowRangeAst extends AstWithWhitespace{
+  type: AstNodeType.ROW_RANGE,
+  start: RowAddress,
+  end: RowAddress,
+  sheetReferenceType: RangeSheetReferenceType,
+}
+
+export const buildRowRangeAst = (start: RowAddress, end: RowAddress, sheetReferenceType: RangeSheetReferenceType, leadingWhitespace?: IToken): RowRangeAst => {
+  assertRangeConsistency(start, end, sheetReferenceType)
+  return {
+    type: AstNodeType.ROW_RANGE,
+    start,
+    end,
+    sheetReferenceType,
+    leadingWhitespace: extractImage(leadingWhitespace),
   }
 }
 
@@ -381,6 +418,16 @@ export const buildParsingErrorAst = (): ErrorAst => ({
 
 function extractImage(token: Maybe<IToken>): Maybe<string> {
   return token !== undefined ? token.image : undefined
+}
+
+function assertRangeConsistency(start: AddressWithSheet, end: AddressWithSheet, sheetReferenceType: RangeSheetReferenceType) {
+  if ((start.sheet !== null && end.sheet === null) || (start.sheet === null && end.sheet !== null)) {
+    throw new Error('Start address inconsistent with end address')
+  }
+  if ((start.sheet === null && sheetReferenceType !== RangeSheetReferenceType.RELATIVE)
+    || (start.sheet !== null && sheetReferenceType === RangeSheetReferenceType.RELATIVE)) {
+    throw new Error('Sheet address inconsistent with sheet reference type')
+  }
 }
 
 export function imageWithWhitespace(image: string, leadingWhitespace?: string) {

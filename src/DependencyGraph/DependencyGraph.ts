@@ -1,6 +1,6 @@
 import assert from 'assert'
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
-import {InternalCellValue, simpleCellAddress, SimpleCellAddress} from '../Cell'
+import {EmptyValue, InternalCellValue, simpleCellAddress, SimpleCellAddress} from '../Cell'
 import {CellDependency} from '../CellDependency'
 import {ColumnsSpan} from '../ColumnsSpan'
 import {Config} from '../Config'
@@ -10,7 +10,16 @@ import {Maybe} from '../Maybe'
 import {Ast} from '../parser'
 import {RowsSpan} from '../RowsSpan'
 import {Statistics, StatType} from '../statistics'
-import {CellVertex, EmptyCellVertex, FormulaCellVertex, MatrixVertex, ParsingErrorVertex, RangeVertex, ValueCellVertex, Vertex} from './'
+import {
+  CellVertex,
+  EmptyCellVertex,
+  FormulaCellVertex,
+  MatrixVertex,
+  ParsingErrorVertex,
+  RangeVertex,
+  ValueCellVertex,
+  Vertex,
+} from './'
 import {AddressMapping} from './AddressMapping/AddressMapping'
 import {collectAddressesDependentToMatrix} from './collectAddressesDependentToMatrix'
 import {GetDependenciesQuery} from './GetDependenciesQuery'
@@ -33,7 +42,7 @@ export class DependencyGraph {
       addressMapping,
       rangeMapping,
       new Graph<Vertex>(new GetDependenciesQuery(rangeMapping, addressMapping, lazilyTransformingAstService, config.functionsWhichDoesNotNeedArgumentsToBeComputed())),
-      new SheetMapping(config.language),
+      new SheetMapping(config.translationPackage),
       new MatrixMapping(),
       stats,
       lazilyTransformingAstService,
@@ -69,6 +78,7 @@ export class DependencyGraph {
     if (hasStructuralChangeFunction) {
       this.markAsDependentOnStructureChange(newVertex)
     }
+    this.correctInfiniteRangesDependency(address)
   }
 
   public setParsingErrorToCell(address: SimpleCellAddress, errorVertex: ParsingErrorVertex) {
@@ -77,6 +87,7 @@ export class DependencyGraph {
     this.graph.exchangeOrAddNode(vertex, errorVertex)
     this.addressMapping.setCell(address, errorVertex)
     this.graph.markNodeAsSpecialRecentlyChanged(errorVertex)
+    this.correctInfiniteRangesDependency(address)
   }
 
   public setValueToCell(address: SimpleCellAddress, newValue: ValueCellVertexValue) {
@@ -95,6 +106,8 @@ export class DependencyGraph {
       this.addressMapping.setCell(address, newVertex)
       this.graph.markNodeAsSpecialRecentlyChanged(newVertex)
     }
+
+    this.correctInfiniteRangesDependency(address)
   }
 
   public setCellEmpty(address: SimpleCellAddress) {
@@ -138,9 +151,11 @@ export class DependencyGraph {
         }
 
         this.graph.addNode(rangeVertex)
+        if (!range.isFinite()) {
+          this.graph.markNodeAsInfiniteRange(rangeVertex)
+        }
 
-        const {smallerRangeVertex, restRanges} = findSmallerRange(this, [range])
-        const restRange = restRanges[0]
+        const {smallerRangeVertex, restRange} = findSmallerRange(this, range)
         if (smallerRangeVertex) {
           this.graph.addEdge(smallerRangeVertex, rangeVertex)
         }
@@ -149,15 +164,43 @@ export class DependencyGraph {
         if (matrix !== undefined) {
           this.graph.addEdge(matrix, rangeVertex)
         } else {
-          for (const cellFromRange of restRange.addresses()) {
+          for (const cellFromRange of restRange.addresses(this)) {
             this.graph.addEdge(this.fetchCellOrCreateEmpty(cellFromRange), rangeVertex)
           }
         }
         this.graph.addEdge(rangeVertex, endVertex)
+
+        if (range.isFinite()) {
+          this.correctInfiniteRangesDependenciesByRangeVertex(rangeVertex)
+        }
       } else {
         this.graph.addEdge(this.fetchCellOrCreateEmpty(absStartCell), endVertex)
       }
     })
+  }
+
+  private correctInfiniteRangesDependenciesByRangeVertex(vertex: RangeVertex) {
+    for (const range of this.graph.infiniteRanges) {
+      const infiniteRangeVertex = (range as RangeVertex)
+      const intersection = vertex.range.intersectionWith(infiniteRangeVertex.range)
+      if (intersection === null) {
+        continue
+      }
+      for (const address of intersection.addresses(this)) {
+        this.graph.addEdge(this.fetchCellOrCreateEmpty(address), range)
+      }
+    }
+  }
+
+  public correctInfiniteRangesDependency(address: SimpleCellAddress) {
+    let vertex: Vertex | null = null
+    for (const range of this.graph.infiniteRanges) {
+      const infiniteRangeVertex = (range as RangeVertex)
+      if (infiniteRangeVertex.range.addressInRange(address)) {
+        vertex = vertex || this.fetchCellOrCreateEmpty(address)
+        this.graph.addEdge(vertex, infiniteRangeVertex)
+      }
+    }
   }
 
   public fetchCellOrCreateEmpty(address: SimpleCellAddress): CellVertex {
@@ -338,7 +381,7 @@ export class DependencyGraph {
   }
 
   public moveCells(sourceRange: AbsoluteCellRange, toRight: number, toBottom: number, toSheet: number) {
-    for (const sourceAddress of sourceRange.addressesWithDirection(toRight, toBottom)) {
+    for (const sourceAddress of sourceRange.addressesWithDirection(toRight, toBottom, this)) {
       const targetAddress = simpleCellAddress(toSheet, sourceAddress.col + toRight, sourceAddress.row + toBottom)
       let sourceVertex = this.addressMapping.getCell(sourceAddress)
       const targetVertex = this.addressMapping.getCell(targetAddress)
@@ -380,7 +423,7 @@ export class DependencyGraph {
         if (adjacentNode instanceof RangeVertex && !sourceRange.containsRange(adjacentNode.range)) {
           this.graph.removeEdge(rangeVertex, adjacentNode)
 
-          for (const address of rangeVertex.range.addresses()) {
+          for (const address of rangeVertex.range.addresses(this)) {
             const newEmptyVertex = this.fetchCellOrCreateEmpty(address)
             this.graph.addEdge(newEmptyVertex, adjacentNode)
             this.addressMapping.setCell(address, newEmptyVertex)
@@ -409,14 +452,14 @@ export class DependencyGraph {
     const matrixRange = AbsoluteCellRange.spanFrom(matrixVertex.getAddress(), matrixVertex.width, matrixVertex.height)
     const adjacentNodes = this.graph.adjacentNodes(matrixVertex)
 
-    for (const address of matrixRange.addresses()) {
+    for (const address of matrixRange.addresses(this)) {
       const value = this.getCellValue(address) as number // We wouldn't need that typecast if we would take values from Matrix
       const valueVertex = new ValueCellVertex(value)
       this.addVertex(address, valueVertex)
     }
 
     for (const adjacentNode of adjacentNodes.values()) {
-      const nodeDependencies = collectAddressesDependentToMatrix(this.functionsWhichDoesNotNeedArgumentsToBeComputed, adjacentNode, matrixVertex, this.lazilyTransformingAstService)
+      const nodeDependencies = collectAddressesDependentToMatrix(this.functionsWhichDoesNotNeedArgumentsToBeComputed, adjacentNode, matrixVertex, this.lazilyTransformingAstService, this)
       for (const address of nodeDependencies) {
         const vertex = this.fetchCell(address)
         this.graph.addEdge(vertex, adjacentNode)
@@ -431,12 +474,12 @@ export class DependencyGraph {
     const matrixRange = AbsoluteCellRange.spanFrom(matrixVertex.getAddress(), matrixVertex.width, matrixVertex.height)
     const adjacentNodes = this.graph.adjacentNodes(matrixVertex)
 
-    for (const address of matrixRange.addresses()) {
+    for (const address of matrixRange.addresses(this)) {
       this.addressMapping.removeCell(address)
     }
 
     for (const adjacentNode of adjacentNodes.values()) {
-      const nodeDependencies = collectAddressesDependentToMatrix(this.functionsWhichDoesNotNeedArgumentsToBeComputed, adjacentNode, matrixVertex, this.lazilyTransformingAstService)
+      const nodeDependencies = collectAddressesDependentToMatrix(this.functionsWhichDoesNotNeedArgumentsToBeComputed, adjacentNode, matrixVertex, this.lazilyTransformingAstService, this)
       for (const address of nodeDependencies) {
         const vertex = this.fetchCellOrCreateEmpty(address)
         this.graph.addEdge(vertex, adjacentNode)
@@ -462,7 +505,7 @@ export class DependencyGraph {
 
   public addNewMatrixVertex(matrixVertex: MatrixVertex): void {
     const range = AbsoluteCellRange.spanFrom(matrixVertex.getAddress(), matrixVertex.width, matrixVertex.height)
-    for (const vertex of this.addressMapping.verticesFromRange(range)) {
+    for (const vertex of this.verticesFromRange(range)) {
       if (vertex instanceof MatrixVertex) {
         throw Error('You cannot modify only part of an array')
       }
@@ -470,7 +513,7 @@ export class DependencyGraph {
 
     this.setMatrix(range, matrixVertex)
 
-    for (const [address, vertex] of this.addressMapping.entriesFromRange(range)) {
+    for (const [address, vertex] of this.entriesFromRange(range)) {
       if (vertex) {
         this.graph.exchangeNode(vertex, matrixVertex)
       }
@@ -585,8 +628,8 @@ export class DependencyGraph {
       if (rangeVertex.range.includesRow(row)) {
         const anyVertexInRow = this.addressMapping.getCell(simpleCellAddress(sheet, rangeVertex.start.col, row + numberOfRows))!
         if (this.graph.existsEdge(anyVertexInRow, rangeVertex)) {
-          const addedSubrangeInThatRange = AbsoluteCellRange.spanFrom(simpleCellAddress(sheet, rangeVertex.start.col, row), rangeVertex.range.width(), numberOfRows)
-          for (const address of addedSubrangeInThatRange.addresses()) {
+          const addedSubrangeInThatRange = rangeVertex.range.rangeWithSameWidth(row, numberOfRows)
+          for (const address of addedSubrangeInThatRange.addresses(this)) {
             this.graph.addEdge(this.fetchCellOrCreateEmpty(address), rangeVertex)
           }
         }
@@ -599,8 +642,8 @@ export class DependencyGraph {
       if (rangeVertex.range.includesColumn(column)) {
         const anyVertexInColumn = this.addressMapping.fetchCell(simpleCellAddress(sheet, column + numberOfColumns, rangeVertex.start.row))
         if (this.graph.existsEdge(anyVertexInColumn, rangeVertex)) {
-          const addedSubrangeInThatRange = AbsoluteCellRange.spanFrom(simpleCellAddress(sheet, column, rangeVertex.start.row), numberOfColumns, rangeVertex.range.height())
-          for (const address of addedSubrangeInThatRange.addresses()) {
+          const addedSubrangeInThatRange = rangeVertex.range.rangeWithSameHeight(column, numberOfColumns)
+          for (const address of addedSubrangeInThatRange.addresses(this)) {
             this.graph.addEdge(this.fetchCellOrCreateEmpty(address), rangeVertex)
           }
         }
@@ -618,7 +661,7 @@ export class DependencyGraph {
     const range = AbsoluteCellRange.spanFrom(formulaAddress, vertex.width, vertex.height)
     this.setMatrix(range, vertex)
 
-    for (const address of range.addresses()) {
+    for (const address of range.addresses(this)) {
       this.setVertexAddress(address, vertex)
     }
   }
@@ -655,7 +698,7 @@ export class DependencyGraph {
     for (const [, matrix] of this.matrixMapping.numericMatricesInRows(RowsSpan.fromRowStartAndEnd(sheet, rowStart, rowStart))) {
       matrix.addRows(sheet, rowStart, numberOfRows)
       const addedRange = AbsoluteCellRange.spanFrom(simpleCellAddress(sheet, matrix.getAddress().col, rowStart), matrix.width, numberOfRows)
-      for (const address of addedRange.addresses()) {
+      for (const address of addedRange.addresses(this)) {
         this.addressMapping.setCell(address, matrix)
       }
     }
@@ -665,9 +708,33 @@ export class DependencyGraph {
     for (const [, matrix] of this.matrixMapping.numericMatricesInColumns(ColumnsSpan.fromColumnStartAndEnd(sheet, columnStart, columnStart))) {
       matrix.addColumns(sheet, columnStart, numberOfColumns)
       const addedRange = AbsoluteCellRange.spanFrom(simpleCellAddress(sheet, columnStart, matrix.getAddress().row), numberOfColumns, matrix.height)
-      for (const address of addedRange.addresses()) {
+      for (const address of addedRange.addresses(this)) {
         this.addressMapping.setCell(address, matrix)
       }
+    }
+  }
+
+  public* verticesFromRange(range: AbsoluteCellRange): IterableIterator<CellVertex> {
+    for (const address of range.addresses(this)) {
+      const vertex = this.getCell(address)
+      if (vertex) {
+        yield vertex
+      }
+    }
+  }
+
+  public* valuesFromRange(range: AbsoluteCellRange): IterableIterator<[InternalCellValue, SimpleCellAddress]> {
+    for (const address of range.addresses(this)) {
+      const value = this.getCellValue(address)
+      if (value !== EmptyValue) {
+        yield [value, address]
+      }
+    }
+  }
+
+  public* entriesFromRange(range: AbsoluteCellRange): IterableIterator<[SimpleCellAddress, CellVertex | null]> {
+    for (const address of range.addresses(this)) {
+      yield [address, this.getCell(address)]
     }
   }
 }

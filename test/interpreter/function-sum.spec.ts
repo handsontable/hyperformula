@@ -17,8 +17,18 @@ describe('SUM', () => {
   })
 
   it('SUM with range args',  () => {
-    const engine =  HyperFormula.buildFromArray([['1', '2', '5'],
-      ['3', '4', '=SUM(A1:B2)']])
+    const engine =  HyperFormula.buildFromArray([
+      ['1', '2', '5'],
+      ['3', '4', '=SUM(A1:B2)']
+    ])
+    expect(engine.getCellValue(adr('C2'))).toEqual(10)
+  })
+
+  it('SUM with column range args',  () => {
+    const engine =  HyperFormula.buildFromArray([
+      ['1', '2', '5'],
+      ['3', '4', '=SUM(A:B)']
+    ])
     expect(engine.getCellValue(adr('C2'))).toEqual(10)
   })
 

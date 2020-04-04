@@ -1,5 +1,4 @@
-import {AbsoluteCellRange} from '../../AbsoluteCellRange'
-import {EmptyValue, InternalCellValue, SimpleCellAddress, simpleCellAddress} from '../../Cell'
+import {EmptyValue, InternalCellValue, SimpleCellAddress} from '../../Cell'
 import {ColumnsSpan} from '../../ColumnsSpan'
 import {Sheet} from '../../GraphBuilder'
 import {RowsSpan} from '../../RowsSpan'
@@ -182,43 +181,12 @@ export class AddressMapping {
     sheetMapping.removeColumns(removedColumns)
   }
 
-  public* verticesFromRange(range: AbsoluteCellRange): IterableIterator<CellVertex> {
-    for (const address of range.addresses()) {
-      const vertex = this.getCell(address)
-      if (vertex) {
-        yield vertex
-      }
-    }
-  }
-
-  public* verticesFromColumnsSpan(columnsSpan: ColumnsSpan): IterableIterator<CellVertex> {
-    yield* this.mapping.get(columnsSpan.sheet)!.verticesFromColumnsSpan(columnsSpan) // eslint-disable-line @typescript-eslint/no-non-null-assertion
-  }
-
   public* verticesFromRowsSpan(rowsSpan: RowsSpan): IterableIterator<CellVertex> {
     yield* this.mapping.get(rowsSpan.sheet)!.verticesFromRowsSpan(rowsSpan) // eslint-disable-line @typescript-eslint/no-non-null-assertion
   }
 
-  public* valuesFromSheet(sheet: number): IterableIterator<[InternalCellValue, SimpleCellAddress]> {
-    const sheetMapping = this.mapping.get(sheet)
-    if (sheetMapping) {
-      yield* this.valuesFromRange(AbsoluteCellRange.spanFrom(simpleCellAddress(sheet, 0, 0), sheetMapping.getWidth(), sheetMapping.getHeight()))
-    }
-  }
-
-  public* valuesFromRange(range: AbsoluteCellRange): IterableIterator<[InternalCellValue, SimpleCellAddress]> {
-    for (const address of range.addresses()) {
-      const value = this.getCellValue(address)
-      if (value !== EmptyValue) {
-        yield [value, address]
-      }
-    }
-  }
-
-  public* entriesFromRange(range: AbsoluteCellRange): IterableIterator<[SimpleCellAddress, CellVertex | null]> {
-    for (const address of range.addresses()) {
-      yield [address, this.getCell(address)]
-    }
+  public* verticesFromColumnsSpan(columnsSpan: ColumnsSpan): IterableIterator<CellVertex> {
+    yield* this.mapping.get(columnsSpan.sheet)!.verticesFromColumnsSpan(columnsSpan) // eslint-disable-line @typescript-eslint/no-non-null-assertion
   }
 
   public* entriesFromRowsSpan(rowsSpan: RowsSpan): IterableIterator<[SimpleCellAddress, CellVertex]> {
@@ -238,14 +206,6 @@ export class AddressMapping {
     } else {
       throw new Error('Sheet does not exists')
     }
-  }
-
-  public* verticesFromColumn(sheet: number, column: number): IterableIterator<CellVertex> {
-    yield* this.mapping.get(sheet)!.verticesFromColumn(column) // eslint-disable-line @typescript-eslint/no-non-null-assertion
-  }
-
-  public* verticesFromRow(sheet: number, row: number): IterableIterator<CellVertex> {
-    yield* this.mapping.get(sheet)!.verticesFromRow(row) // eslint-disable-line @typescript-eslint/no-non-null-assertion
   }
 
   public destroy(): void {
