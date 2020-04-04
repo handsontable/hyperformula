@@ -212,11 +212,7 @@ export class UndoRedo {
         this.crudOperations!.operations.restoreCell(address, cellType)
       }
 
-      const oldDataToRestore = this.oldData.get(rowsRemoval.version - 1) || []
-      for (const entryToRestore of oldDataToRestore) {
-        const [ address, hash ] = entryToRestore
-        this.crudOperations!.operations.setFormulaToCellFromCache(hash, address)
-      }
+      this.restoreOldDataFromVersion(rowsRemoval.version - 1)
     }
   }
 
@@ -232,11 +228,7 @@ export class UndoRedo {
         this.crudOperations!.operations.restoreCell(address, cellType)
       }
 
-      const oldDataToRestore = this.oldData.get(columnsRemoval.version - 1) || []
-      for (const entryToRestore of oldDataToRestore) {
-        const [ address, hash ] = entryToRestore
-        this.crudOperations!.operations.setFormulaToCellFromCache(hash, address)
-      }
+      this.restoreOldDataFromVersion(columnsRemoval.version - 1)
     }
   }
 
@@ -285,11 +277,7 @@ export class UndoRedo {
       }
     }
 
-    const oldDataToRestore = this.oldData.get(operation.version - 1) || []
-    for (const entryToRestore of oldDataToRestore) {
-      const [ address, hash ] = entryToRestore
-      this.crudOperations!.operations.setFormulaToCellFromCache(hash, address)
-    }
+    this.restoreOldDataFromVersion(operation.version - 1)
   }
 
   private undoClearSheet(operation: ClearSheetUndoData) {
@@ -388,5 +376,13 @@ export class UndoRedo {
   private redoClearSheet(operation: ClearSheetUndoData) {
     const { sheetId } = operation
     this.crudOperations!.operations.clearSheet(sheetId)
+  }
+
+  private restoreOldDataFromVersion(version: number) {
+    const oldDataToRestore = this.oldData.get(version) || []
+    for (const entryToRestore of oldDataToRestore) {
+      const [ address, hash ] = entryToRestore
+      this.crudOperations!.operations.setFormulaToCellFromCache(hash, address)
+    }
   }
 }
