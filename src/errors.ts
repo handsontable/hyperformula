@@ -116,11 +116,8 @@ export class UnableToParse extends Error {
 
 /**
  * Error thrown when the expected value type differs from the given value type.
- * 
  * It also displays the expected type.
- * 
  * This error might be thrown while setting or updating the [[ConfigParams]].
- * 
  * The following methods accept [[ConfigParams]] as a parameter:
  * 
  * @see [[buildEmpty]]
@@ -136,11 +133,8 @@ export class ExpectedValueOfType extends Error {
 
 /**
  * Error thrown when the value was expected to be set for a config parameter.
- * 
  * It also displays the expected value.
- * 
  * This error might be thrown while setting or updating the [[ConfigParams]].
- * 
  * The following methods accept [[ConfigParams]] as a parameter:
  * 
  * @see [[buildEmpty]]
@@ -156,9 +150,7 @@ export class ExpectedOneOfValues extends Error {
 
 /**
  * Error thrown when computations become suspended.
- * 
  * To perform any other action wait for the batch to complete or resume the evaluation.
- * 
  * Relates to:
  * 
  * @see [[batch]]
