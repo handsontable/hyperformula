@@ -1,6 +1,13 @@
 import {ErrorType, SimpleCellAddress} from '../Cell'
-import {cellAddressToString} from './addressRepresentationConverters'
-import {Ast, AstNodeType, CellRangeAst, imageWithWhitespace, RangeSheetReferenceType} from './Ast'
+import {
+  Ast,
+  AstNodeType,
+  CellRangeAst,
+  ColumnRangeAst,
+  imageWithWhitespace,
+  RangeSheetReferenceType,
+  RowRangeAst,
+} from './Ast'
 import {binaryOpTokenMap} from './binaryOpTokenMap'
 import {additionalCharactersAllowedInQuotes, ILexerConfig} from './LexerConfig'
 import {ParserConfig} from './ParserConfig'
@@ -29,19 +36,21 @@ export class Unparser {
       }
       case AstNodeType.FUNCTION_CALL: {
         const args = ast.args.map((arg) => this.unparseAst(arg, address)).join(this.config.functionArgSeparator)
-        const procedureName = this.config.getFunctionTranslationFor(ast.procedureName) || ast.procedureName
+        const procedureName = this.config.translationPackage.getFunctionTranslation(ast.procedureName) ?? ast.procedureName
         const rightPart = procedureName + '(' + args + imageWithWhitespace(')', ast.internalWhitespace)
         return imageWithWhitespace(rightPart, ast.leadingWhitespace)
       }
       case AstNodeType.CELL_REFERENCE: {
         let image
         if (ast.reference.sheet !== null) {
-          image = this.unparseSheetName(ast.reference.sheet) + '!' + cellAddressToString(ast.reference, address)
+          image = this.unparseSheetName(ast.reference.sheet) + '!' + ast.reference.unparse(address)
         } else {
-          image = cellAddressToString(ast.reference, address)
+          image = ast.reference.unparse(address)
         }
         return imageWithWhitespace(image, ast.leadingWhitespace)
       }
+      case AstNodeType.COLUMN_RANGE:
+      case AstNodeType.ROW_RANGE:
       case AstNodeType.CELL_RANGE: {
         return imageWithWhitespace(this.formatRange(ast, address), ast.leadingWhitespace)
       }
@@ -57,12 +66,9 @@ export class Unparser {
         return this.unparseAst(ast.value, address) + imageWithWhitespace('%', ast.leadingWhitespace)
       }
       case AstNodeType.ERROR: {
-        let image
-        if (ast.error) {
-          image = this.config.getErrorTranslationFor(ast.error.type)
-        } else {
-          image = this.config.getErrorTranslationFor(ErrorType.ERROR)
-        }
+        const image = this.config.getErrorTranslationFor(
+          ast.error ? ast.error.type : ErrorType.ERROR
+        )
         return imageWithWhitespace(image, ast.leadingWhitespace)
       }
       case AstNodeType.ERROR_WITH_RAW_INPUT: {
@@ -90,7 +96,7 @@ export class Unparser {
     }
   }
 
-  private formatRange(ast: CellRangeAst, baseAddress: SimpleCellAddress): string {
+  private formatRange(ast: CellRangeAst | ColumnRangeAst | RowRangeAst, baseAddress: SimpleCellAddress): string {
     let startSheeet = ''
     let endSheet = ''
 
@@ -102,7 +108,7 @@ export class Unparser {
       endSheet = this.unparseSheetName(ast.end.sheet) + '!'
     }
 
-    return `${startSheeet}${cellAddressToString(ast.start, baseAddress)}:${endSheet}${cellAddressToString(ast.end, baseAddress)}`
+    return `${startSheeet}${ast.start.unparse(baseAddress)}:${endSheet}${ast.end.unparse(baseAddress)}`
   }
 }
 

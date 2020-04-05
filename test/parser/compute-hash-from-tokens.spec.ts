@@ -1,19 +1,25 @@
+import {HyperFormula} from '../../src'
 import {simpleCellAddress, SimpleCellAddress} from '../../src/Cell'
 import {Config} from '../../src/Config'
 import {SheetMapping} from '../../src/DependencyGraph'
-import {enGB, plPL, TranslationPackage} from '../../src/i18n'
+import {enGB, plPL} from '../../src/i18n'
 import {buildLexerConfig, FormulaLexer, ParserWithCaching} from '../../src/parser'
 
 describe('computeHashFromTokens', () => {
-  const computeFunc = (code: string, address: SimpleCellAddress, language: TranslationPackage = enGB): string => {
-    const config = new Config({ language})
-    const sheetMapping = new SheetMapping(language)
+  const computeFunc = (code: string, address: SimpleCellAddress, language: string = 'enGB'): string => {
+    const config = new Config({language})
+    const sheetMapping = new SheetMapping(HyperFormula.getLanguage(language))
     sheetMapping.addSheet('Sheet1')
     sheetMapping.addSheet('Sheet2')
     const parser = new ParserWithCaching(config, sheetMapping.get)
     const tokens = new FormulaLexer(buildLexerConfig(config)).tokenizeFormula(code).tokens
     return parser.computeHashFromTokens(tokens, address)
   }
+  beforeEach(() => {
+    HyperFormula.unregisterAllLanguages()
+    HyperFormula.registerLanguage('plPL', plPL)
+    HyperFormula.registerLanguage('enGB', enGB)
+  })
 
   it('simple case', () => {
     const code = '=42'
@@ -93,6 +99,42 @@ describe('computeHashFromTokens', () => {
     expect(computeFunc(code, simpleCellAddress(0, 1, 1))).toEqual('=#0#3R-1:#1#14R0')
   })
 
+  it('column range', () => {
+    const code = '=A:$B'
+
+    expect(computeFunc(code, simpleCellAddress(0, 1, 1))).toEqual('=#COLR-1:#COLA1')
+  })
+
+  it('column range with sheet on the left', () => {
+    const code = '=Sheet1!A:B'
+
+    expect(computeFunc(code, simpleCellAddress(0, 1, 1))).toEqual('=#0#COLR-1:#COLR0')
+  })
+
+  it('column range with sheet on both sides', () => {
+    const code = '=Sheet1!A:Sheet2!B'
+
+    expect(computeFunc(code, simpleCellAddress(0, 1, 1))).toEqual('=#0#COLR-1:#1#COLR0')
+  })
+
+  it('row range', () => {
+    const code = '=1:$2'
+
+    expect(computeFunc(code, simpleCellAddress(0, 1, 1))).toEqual('=#ROWR-1:#ROWA1')
+  })
+
+  it('row range with sheet on the left', () => {
+    const code = '=Sheet1!1:2'
+
+    expect(computeFunc(code, simpleCellAddress(0, 1, 1))).toEqual('=#0#ROWR-1:#ROWR0')
+  })
+
+  it('row range with sheet on both sides', () => {
+    const code = '=Sheet1!1:Sheet2!2'
+
+    expect(computeFunc(code, simpleCellAddress(0, 1, 1))).toEqual('=#0#ROWR-1:#1#ROWR0')
+  })
+
   it('do not ignores whitespace', () => {
     const code = '= 42'
 
@@ -123,13 +165,13 @@ describe('computeHashFromTokens', () => {
   it('function call in canonical form', () => {
     const code = '=SUMA()'
 
-    expect(computeFunc(code, simpleCellAddress(0, 1, 1), plPL)).toEqual('=SUM()')
+    expect(computeFunc(code, simpleCellAddress(0, 1, 1), 'plPL')).toEqual('=SUM()')
   })
 
   it('function call when missing translation', () => {
     const code = '=fooBAR()'
 
-    expect(computeFunc(code, simpleCellAddress(0, 1, 1), plPL)).toEqual('=FOOBAR()')
+    expect(computeFunc(code, simpleCellAddress(0, 1, 1), 'plPL')).toEqual('=FOOBAR()')
   })
 
   it('should work with whitespaces', () => {
