@@ -3,10 +3,11 @@
  * Copyright (c) 2020 Handsoncode. All rights reserved.
  */
 
-import {AbsoluteCellRange} from './AbsoluteCellRange'
+import {AbsoluteCellRange, AbsoluteColumnRange, AbsoluteRowRange} from './AbsoluteCellRange'
 import {SimpleCellAddress} from './Cell'
 import {CellDependency} from './CellDependency'
 import {RelativeDependency} from './parser'
+import {RelativeDependencyType} from './parser/RelativeDependency'
 
 /**
  * Converts dependencies from maybe relative addressing to absolute addressing.
@@ -16,10 +17,18 @@ import {RelativeDependency} from './parser'
  */
 export const absolutizeDependencies = (deps: RelativeDependency[], baseAddress: SimpleCellAddress): CellDependency[] => {
   return deps.map((dep) => {
-    if (Array.isArray(dep)) {
-      return new AbsoluteCellRange(dep[0].toSimpleCellAddress(baseAddress), dep[1].toSimpleCellAddress(baseAddress))
+    if (dep.type === RelativeDependencyType.CellRange) {
+      return new AbsoluteCellRange(dep.dependency[0].toSimpleCellAddress(baseAddress), dep.dependency[1].toSimpleCellAddress(baseAddress))
+    } else if (dep.type === RelativeDependencyType.ColumnRange) {
+      const start = dep.dependency[0].toSimpleColumnAddress(baseAddress)
+      const end = dep.dependency[1].toSimpleColumnAddress(baseAddress)
+      return new AbsoluteColumnRange(start.sheet, start.col, end.col)
+    } else if (dep.type === RelativeDependencyType.RowRange) {
+      const start = dep.dependency[0].toSimpleRowAddress(baseAddress)
+      const end = dep.dependency[1].toSimpleRowAddress(baseAddress)
+      return new AbsoluteRowRange(start.sheet, start.row, end.row)
     } else {
-      return dep.toSimpleCellAddress(baseAddress)
+      return dep.dependency.toSimpleCellAddress(baseAddress)
     }
   })
 }

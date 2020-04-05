@@ -10,13 +10,19 @@ import {FormulaCellVertex} from './FormulaCellVertex'
 import {MatrixVertex} from './MatrixVertex'
 import {RangeVertex} from './RangeVertex'
 import {Vertex} from './Vertex'
+import {DependencyGraph} from './DependencyGraph'
+import {RelativeDependencyType} from '../parser/RelativeDependency'
 
-export const collectAddressesDependentToMatrix = (functionsWhichDoesNotNeedArgumentsToBeComputed: Set<string>, vertex: Vertex, matrix: MatrixVertex, lazilyTransformingAstService: LazilyTransformingAstService): SimpleCellAddress[] => {
+export const collectAddressesDependentToMatrix = (functionsWhichDoesNotNeedArgumentsToBeComputed: Set<string>, vertex: Vertex, matrix: MatrixVertex, lazilyTransformingAstService: LazilyTransformingAstService, dependencyGraph: DependencyGraph): SimpleCellAddress[] => {
   const range = matrix.getRange()
 
   if (vertex instanceof RangeVertex) {
-    /* TODO range intersection */
-    return [...vertex.range.addresses()].filter((d) => range.addressInRange(d))
+    const intersection = vertex.range.intersectionWith(range)
+    if (intersection !== null) {
+      return Array.from(intersection.addresses(dependencyGraph))
+    } else {
+      return []
+    }
   }
 
   let formula: Ast
@@ -33,7 +39,7 @@ export const collectAddressesDependentToMatrix = (functionsWhichDoesNotNeedArgum
   }
 
   return collectDependencies(formula, functionsWhichDoesNotNeedArgumentsToBeComputed)
-    .filter((d) => !Array.isArray(d))
-    .map((d) => (d as CellAddress).toSimpleCellAddress(address))
+    .filter((d) => d.type === RelativeDependencyType.CellAddress)
+    .map((d) => (d.dependency as CellAddress).toSimpleCellAddress(address))
     .filter((d) => range.addressInRange(d))
 }

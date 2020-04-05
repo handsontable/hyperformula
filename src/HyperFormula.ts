@@ -3,20 +3,15 @@
  * Copyright (c) 2020 Handsoncode. All rights reserved.
  */
 
-import { AbsoluteCellRange } from './AbsoluteCellRange'
-import {
-  CellType,
-  CellValueType,
-  getCellType,
-  getCellValueType,
-  NoErrorCellValue, SimpleCellAddress,
-} from './Cell'
-import {CellContent, CellContentParser, isMatrix, RawCellContent} from './CellContentParser'
+import {AbsoluteCellRange} from './AbsoluteCellRange'
+import {CellType, CellValueType, getCellType, getCellValueType, NoErrorCellValue, SimpleCellAddress} from './Cell'
+import {CellContent, CellContentParser, RawCellContent} from './CellContentParser'
 import {CellValue, ExportedChange, Exporter} from './CellValue'
 import {ColumnSearchStrategy} from './ColumnSearch/ColumnSearchStrategy'
 import {Config, ConfigParams} from './Config'
 import {CrudOperations} from './CrudOperations'
-import {normalizeRemovedIndexes, normalizeAddedIndexes} from './Operations'
+import {buildTranslationPackage, RawTranslationPackage, TranslationPackage} from './i18n'
+import {normalizeAddedIndexes, normalizeRemovedIndexes} from './Operations'
 import {
   AddressMapping,
   DependencyGraph,
@@ -26,7 +21,13 @@ import {
   SheetMapping,
   Vertex,
 } from './DependencyGraph'
-import { NamedExpressionDoesNotExist, NamedExpressionNameIsAlreadyTaken, NamedExpressionNameIsInvalid, NoOperationToUndo, EvaluationSuspendedError} from './errors'
+import {
+  EvaluationSuspendedError,
+  NamedExpressionDoesNotExist,
+  NamedExpressionNameIsAlreadyTaken,
+  NamedExpressionNameIsInvalid,
+  NoOperationToUndo,
+} from './errors'
 import {Evaluator} from './Evaluator'
 import {Sheet, Sheets} from './GraphBuilder'
 import {IBatchExecutor} from './IBatchExecutor'
@@ -34,18 +35,16 @@ import {LazilyTransformingAstService} from './LazilyTransformingAstService'
 import {Maybe} from './Maybe'
 import {NamedExpressions} from './NamedExpressions'
 import {
+  Ast,
   AstNodeType,
   ParserWithCaching,
   simpleCellAddressFromString,
   simpleCellAddressToString,
   Unparser,
-  Ast,
 } from './parser'
-import {
-  Serialization
-} from './Serialization'
+import {Serialization} from './Serialization'
 import {Statistics, StatType} from './statistics'
-import {Emitter, TypedEmitter, Listeners, Events} from './Emitter'
+import {Emitter, Events, Listeners, TypedEmitter} from './Emitter'
 import {UndoRedo} from './UndoRedo'
 import {BuildEngineFactory, EngineState} from './BuildEngineFactory'
 
@@ -194,6 +193,53 @@ export class HyperFormula implements TypedEmitter {
    */
   public static buildFromSheets(sheets: Sheets, configInput?: Partial<ConfigParams>): HyperFormula {
     return this.buildFromEngineState(BuildEngineFactory.buildFromSheets(sheets, configInput))
+  }
+
+  private static registeredLanguages: Map<string, TranslationPackage> = new Map()
+
+  /**
+   * Returns registered language from its code string.
+   * @param {string} code - code string of the translation package
+   */
+  public static getLanguage(code: string): TranslationPackage {
+    const val = this.registeredLanguages.get(code)
+    if(val === undefined) {
+      throw new Error('Language not registered.')
+    } else {
+      return val
+    }
+  }
+
+  /**
+   * Registers language from under given code string.
+   * @param {string} code - code string of the translation package
+   * @param {RawTranslationPackage} lang - translation package to be registered
+   */
+  public static registerLanguage(code: string, lang: RawTranslationPackage): void {
+    if(this.registeredLanguages.has(code)) {
+      throw new Error('Language already registered.')
+    } else {
+      this.registeredLanguages.set(code, buildTranslationPackage(lang))
+    }
+  }
+
+  public static unregisterLanguage(code: string): void {
+    if(this.registeredLanguages.has(code)) {
+      this.registeredLanguages.delete(code)
+    } else {
+      throw new Error('Language not registered.')
+    }
+  }
+
+  public static unregisterAllLanguages(): void {
+    this.registeredLanguages = new Map()
+  }
+
+  /**
+   * Returns all registered languages codes.
+   */
+  public static getRegisteredLanguagesCodes(): string[] {
+    return Array.from(this.registeredLanguages.keys())
   }
 
   /**
@@ -1310,15 +1356,42 @@ export class HyperFormula implements TypedEmitter {
     return this.resumeEvaluation()
   }
 
+  /**
+   * Suspends the dependency graph recalculation.
+   * 
+   * It allows optimizing the performance.
+   * 
+   * With this method, multiple CRUD operations can be done without triggering recalculation after every operation.
+   * 
+   * Suspending evaluation should result in an overall faster calculation compared to recalculating after each operation separately.
+   * 
+   * To resume the evaluation use [[resumeEvaluation]].
+   * 
+   * @category Batch
+   */
   public suspendEvaluation(): void {
     this._evaluationSuspended = true
   }
 
+  /**
+   * Resumes the dependency graph recalculation that was suspended with [[suspendEvaluation]].
+   * 
+   * It also triggers the recalculation and returns changes that are a result of all batched operations.
+   * 
+   * @fires [[valuesUpdated]]
+   *
+   * @category Batch
+   */
   public resumeEvaluation(): ExportedChange[] {
     this._evaluationSuspended = false
     return this.recomputeIfDependencyGraphNeedsIt()
   }
 
+  /**
+   * Checks if the dependency graph recalculation process is suspended or not.
+   *
+   * @category Batch
+   */
   public isEvaluationSuspended(): boolean {
     return this._evaluationSuspended
   }
@@ -1481,7 +1554,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Helper
    */
   public validateFormula(formulaString: string): boolean {
-    const [ast, address] = this.extractTemporaryFormula(formulaString)
+    const [ast] = this.extractTemporaryFormula(formulaString)
     if (!ast) {
       return false
     }
@@ -1508,19 +1581,37 @@ export class HyperFormula implements TypedEmitter {
   }
 
   /**
-   * A method that listens on events.
+   * A method that subscribes to an event.
    * 
-   * @param {Event} event to listen on
-   * @param {Listener} handler to be called on event
+   * @param {Event} event the name of the event to subscribe to
+   * @param {Listener} listener to be called when event is emitted
+   * 
+   * @category Events
    */
   public on<Event extends keyof Listeners>(event: Event, listener: Listeners[Event]): void {
     this._emitter.on(event, listener)
   }
 
+  /**
+   * A method that subscribes to an event once.
+   * 
+   * @param {Event} event the name of the event to subscribe to
+   * @param {Listener} listener to be called when event is emitted
+   * 
+   * @category Events
+   */
   public once<Event extends keyof Listeners>(event: Event, listener: Listeners[Event]): void {
     this._emitter.once(event, listener)
   }
 
+  /**
+   * A method that unsubscribe from an event or all events.
+   * 
+   * @param {Event} event the name of the event to subscribe to
+   * @param {Listener} listener to be called when event is emitted
+   * 
+   * @category Events
+   */
   public off<Event extends keyof Listeners>(event: Event, listener: Listeners[Event]): void {
     this._emitter.off(event, listener)
   }

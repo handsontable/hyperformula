@@ -57,10 +57,6 @@ export class OnlyRangeData {
   ) {
   }
 
-  public range(): AbsoluteCellRange {
-    return this._range
-  }
-
   public raw(): InternalCellValue[][] {
     this.ensureThatComputed()
 
@@ -92,6 +88,10 @@ export class OnlyRangeData {
     return this._hasOnlyNumbers
   }
 
+  public range() {
+    return this._range
+  }
+
   public* valuesFromTopLeftCorner(): IterableIterator<InternalCellValue> {
     this.ensureThatComputed()
 
@@ -114,7 +114,7 @@ export class OnlyRangeData {
 
     let i = 0
     let row = []
-    for (const cellFromRange of this._range.addresses()) {
+    for (const cellFromRange of this._range.addresses(this.dependencyGraph)) {
       const value = this.dependencyGraph.getCellValue(cellFromRange)
       if (typeof value === 'number') {
         row.push(value)
@@ -124,7 +124,7 @@ export class OnlyRangeData {
       }
       ++i
 
-      if (i % this._range.width() === 0) {
+      if (i % this.size.width === 0) {
         i = 0
         result.push([...row])
         row = []

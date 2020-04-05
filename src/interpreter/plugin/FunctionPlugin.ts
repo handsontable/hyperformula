@@ -63,7 +63,7 @@ export abstract class FunctionPlugin {
 
   protected computeListOfValuesInRange(range: AbsoluteCellRange): InternalCellValue[] {
     const values: InternalCellValue[] = []
-    for (const cellFromRange of range.addresses()) {
+    for (const cellFromRange of range.addresses(this.dependencyGraph)) {
       const value = this.dependencyGraph.getCellValue(cellFromRange)
       values.push(value)
     }

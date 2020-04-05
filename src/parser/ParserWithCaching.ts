@@ -6,13 +6,25 @@
 import {IToken, tokenMatcher} from 'chevrotain'
 import {ErrorType, SimpleCellAddress} from '../Cell'
 import {buildParsingErrorAst, RelativeDependency} from './'
-import {cellAddressFromString, SheetMappingFn} from './addressRepresentationConverters'
+import {
+  cellAddressFromString,
+  columnAddressFromString,
+  rowAddressFromString,
+  SheetMappingFn,
+} from './addressRepresentationConverters'
 import {Ast, AstNodeType, imageWithWhitespace, ParsingError, ParsingErrorType, RangeSheetReferenceType} from './Ast'
 import {binaryOpTokenMap} from './binaryOpTokenMap'
 import {Cache} from './Cache'
-import {CellAddress, CellReferenceType} from './CellAddress'
 import {FormulaLexer, FormulaParser, IExtendedToken} from './FormulaParser'
-import {buildLexerConfig, CellReference, ILexerConfig, ProcedureName, WhiteSpace} from './LexerConfig'
+import {
+  buildLexerConfig,
+  CellReference,
+  ColumnRange,
+  ILexerConfig,
+  ProcedureName,
+  RowRange,
+  WhiteSpace,
+} from './LexerConfig'
 import {ParserConfig} from './ParserConfig'
 import {formatNumber} from './Unparser'
 
@@ -103,18 +115,34 @@ export class ParserWithCaching {
         if (cellAddress === undefined) {
           hash = hash.concat(token.image)
         } else {
-          hash = hash.concat(referenceHashFromCellAddress(cellAddress, true))
+          hash = hash.concat(cellAddress.hash(true))
         }
-        idx++
       } else if (tokenMatcher(token, ProcedureName)) {
         const procedureName = token.image.toUpperCase().slice(0, -1)
-        const canonicalProcedureName = this.lexerConfig.functionMapping[procedureName] || procedureName
+        const canonicalProcedureName = this.lexerConfig.functionMapping[procedureName] ?? procedureName
         hash = hash.concat(canonicalProcedureName, '(')
-        idx++
+      } else if (tokenMatcher(token, ColumnRange)){
+        const [start, end] = token.image.split(':')
+        const startAddress = columnAddressFromString(this.sheetMapping, start, baseAddress)
+        const endAddress = columnAddressFromString(this.sheetMapping, end, baseAddress)
+        if (startAddress === undefined || endAddress === undefined) {
+          hash = hash.concat('!REF')
+        } else {
+          hash = hash.concat(startAddress.hash(true), ':', endAddress.hash(true))
+        }
+      } else if (tokenMatcher(token, RowRange)){
+      const [start, end] = token.image.split(':')
+      const startAddress = rowAddressFromString(this.sheetMapping, start, baseAddress)
+      const endAddress = rowAddressFromString(this.sheetMapping, end, baseAddress)
+      if (startAddress === undefined || endAddress === undefined) {
+        hash = hash.concat('!REF')
+      } else {
+        hash = hash.concat(startAddress.hash(true), ':', endAddress.hash(true))
+      }
       } else {
         hash = hash.concat(token.image)
-        idx++
       }
+      idx++
     }
     return hash
   }
@@ -146,11 +174,13 @@ export class ParserWithCaching {
         return imageWithWhitespace(rightPart, ast.leadingWhitespace)
       }
       case AstNodeType.CELL_REFERENCE: {
-        return imageWithWhitespace(referenceHashFromCellAddress(ast.reference, true), ast.leadingWhitespace)
+        return imageWithWhitespace(ast.reference.hash(true), ast.leadingWhitespace)
       }
+      case AstNodeType.COLUMN_RANGE:
+      case AstNodeType.ROW_RANGE:
       case AstNodeType.CELL_RANGE: {
-        const start = referenceHashFromCellAddress(ast.start, ast.sheetReferenceType !== RangeSheetReferenceType.RELATIVE)
-        const end = referenceHashFromCellAddress(ast.end, ast.sheetReferenceType === RangeSheetReferenceType.BOTH_ABSOLUTE)
+        const start = ast.start.hash(ast.sheetReferenceType !== RangeSheetReferenceType.RELATIVE)
+        const end = ast.end.hash(ast.sheetReferenceType === RangeSheetReferenceType.BOTH_ABSOLUTE)
         return imageWithWhitespace(start + ':' + end, ast.leadingWhitespace)
       }
       case AstNodeType.MINUS_UNARY_OP: {
@@ -163,12 +193,9 @@ export class ParserWithCaching {
         return this.computeHashOfAstNode(ast.value) + imageWithWhitespace('%', ast.leadingWhitespace)
       }
       case AstNodeType.ERROR: {
-        let image
-        if (ast.error) {
-          image = this.config.getErrorTranslationFor(ast.error.type)
-        } else {
-          image = this.config.getErrorTranslationFor(ErrorType.ERROR)
-        }
+        const image = this.config.getErrorTranslationFor(
+          ast.error ? ast.error.type : ErrorType.ERROR
+        )
         return imageWithWhitespace(image, ast.leadingWhitespace)
       }
       case AstNodeType.ERROR_WITH_RAW_INPUT: {
@@ -182,24 +209,6 @@ export class ParserWithCaching {
       default: {
         return this.computeHashOfAstNode(ast.left) + imageWithWhitespace(binaryOpTokenMap[ast.type], ast.leadingWhitespace) + this.computeHashOfAstNode(ast.right)
       }
-    }
-  }
-}
-
-export const referenceHashFromCellAddress = (cellAddress: CellAddress, withSheet: boolean): string => {
-  const sheetPart = withSheet && cellAddress.sheet !== null ? `#${cellAddress.sheet}` : ''
-  switch (cellAddress.type) {
-    case CellReferenceType.CELL_REFERENCE_RELATIVE: {
-      return `${sheetPart}#${cellAddress.row}R${cellAddress.col}`
-    }
-    case CellReferenceType.CELL_REFERENCE_ABSOLUTE: {
-      return `${sheetPart}#${cellAddress.row}A${cellAddress.col}`
-    }
-    case CellReferenceType.CELL_REFERENCE_ABSOLUTE_COL: {
-      return `${sheetPart}#${cellAddress.row}AC${cellAddress.col}`
-    }
-    case CellReferenceType.CELL_REFERENCE_ABSOLUTE_ROW: {
-      return `${sheetPart}#${cellAddress.row}AR${cellAddress.col}`
     }
   }
 }

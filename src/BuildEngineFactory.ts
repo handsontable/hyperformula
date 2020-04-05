@@ -5,21 +5,22 @@
 
 import {LazilyTransformingAstService} from './'
 import {CellContentParser} from './CellContentParser'
+import {Exporter} from './CellValue'
 import {buildColumnSearchStrategy, ColumnSearchStrategy} from './ColumnSearch/ColumnSearchStrategy'
 import {Config, ConfigParams} from './Config'
+import {CrudOperations} from './CrudOperations'
 import {DateHelper} from './DateHelper'
 import {DependencyGraph} from './DependencyGraph'
-import {GraphBuilder, Sheet, Sheets} from './GraphBuilder'
-import {buildLexerConfig, ParserWithCaching, Unparser} from './parser'
 import {Evaluator} from './Evaluator'
-import {Statistics, EmptyStatistics, StatType} from './statistics'
+import {GraphBuilder, Sheet, Sheets} from './GraphBuilder'
+import {UIElement} from './i18n'
+import {NamedExpressions} from './NamedExpressions'
+import {NumberLiteralHelper} from './NumberLiteralHelper'
+import {buildLexerConfig, ParserWithCaching, Unparser} from './parser'
+import {Serialization} from './Serialization'
+import {EmptyStatistics, Statistics, StatType} from './statistics'
 import {collatorFromConfig} from './StringHelper'
 import {UndoRedo} from './UndoRedo'
-import {NumberLiteralHelper} from './NumberLiteralHelper'
-import {CrudOperations} from './CrudOperations'
-import {NamedExpressions} from './NamedExpressions'
-import {Exporter} from './CellValue'
-import {Serialization} from './Serialization'
 
 export type EngineState = {
   config: Config,
@@ -108,7 +109,7 @@ export class BuildEngineFactory {
 
   public static buildFromSheet(sheet: Sheet, configInput?: Partial<ConfigParams>): EngineState {
     const config = new Config(configInput)
-    const newsheetprefix = config.language.interface.NEW_SHEET_PREFIX + '1'
+    const newsheetprefix = config.translationPackage.getUITranslation(UIElement.NEW_SHEET_PREFIX)! + '1'
     return this.buildEngine(config, {[newsheetprefix]: sheet})
   }
 

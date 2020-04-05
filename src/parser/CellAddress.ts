@@ -3,7 +3,17 @@
  * Copyright (c) 2020 Handsoncode. All rights reserved.
  */
 
-import {absoluteSheetReference, simpleCellAddress, SimpleCellAddress} from '../Cell'
+import {
+  absoluteSheetReference,
+  simpleCellAddress,
+  SimpleCellAddress,
+  simpleColumnAddress,
+  SimpleColumnAddress,
+  simpleRowAddress,
+  SimpleRowAddress,
+} from '../Cell'
+import {columnIndexToLabel} from './addressRepresentationConverters'
+import {AddressWithColumn, AddressWithRow} from './Address'
 
 /** Possible kinds of cell references */
 export enum CellReferenceType {
@@ -20,7 +30,7 @@ export enum CellReferenceType {
   CELL_REFERENCE_ABSOLUTE_ROW = 'CELL_REFERENCE_ABSOLUTE_ROW',
 }
 
-export class CellAddress {
+export class CellAddress implements AddressWithColumn, AddressWithRow {
 
   public static relative(sheet: number | null, col: number, row: number) {
     return new CellAddress(sheet, col, row, CellReferenceType.CELL_REFERENCE_RELATIVE)
@@ -61,6 +71,24 @@ export class CellAddress {
     } else {
       return simpleCellAddress(sheet, baseAddress.col + this.col, baseAddress.row + this.row)
     }
+  }
+
+  public toSimpleColumnAddress(baseAddress: SimpleCellAddress): SimpleColumnAddress {
+    const sheet = absoluteSheetReference(this, baseAddress)
+    let column = this.col
+    if (this.isColumnRelative()) {
+      column += baseAddress.col
+    }
+    return simpleColumnAddress(sheet, column)
+  }
+
+  public toSimpleRowAddress(baseAddress: SimpleCellAddress): SimpleRowAddress {
+    const sheet = absoluteSheetReference(this, baseAddress)
+    let row = this.row
+    if (this.isRowRelative()) {
+      row += baseAddress.row
+    }
+    return simpleRowAddress(sheet, row)
   }
 
   public isRowAbsolute(): boolean {
@@ -106,5 +134,31 @@ export class CellAddress {
     const col = this.isColumnRelative() ? this.col : this.col + toRight
     const row = this.isRowRelative() ? this.row : this.row + toBottom
     return new CellAddress(this.sheet, col, row, this.type)
+  }
+
+  public hash(withSheet: boolean): string {
+    const sheetPart = withSheet && this.sheet !== null ? `#${this.sheet}` : ''
+    switch (this.type) {
+      case CellReferenceType.CELL_REFERENCE_RELATIVE: {
+        return `${sheetPart}#${this.row}R${this.col}`
+      }
+      case CellReferenceType.CELL_REFERENCE_ABSOLUTE: {
+        return `${sheetPart}#${this.row}A${this.col}`
+      }
+      case CellReferenceType.CELL_REFERENCE_ABSOLUTE_COL: {
+        return `${sheetPart}#${this.row}AC${this.col}`
+      }
+      case CellReferenceType.CELL_REFERENCE_ABSOLUTE_ROW: {
+        return `${sheetPart}#${this.row}AR${this.col}`
+      }
+    }
+  }
+
+  public unparse(baseAddress: SimpleCellAddress): string {
+    const simpleAddress = this.toSimpleCellAddress(baseAddress)
+    const column = columnIndexToLabel(simpleAddress.col)
+    const rowDollar = this.type === CellReferenceType.CELL_REFERENCE_ABSOLUTE || this.type === CellReferenceType.CELL_REFERENCE_ABSOLUTE_ROW ? '$' : ''
+    const colDollar = this.type === CellReferenceType.CELL_REFERENCE_ABSOLUTE || this.type === CellReferenceType.CELL_REFERENCE_ABSOLUTE_COL ? '$' : ''
+    return `${colDollar}${column}${rowDollar}${simpleAddress.row + 1}`
   }
 }

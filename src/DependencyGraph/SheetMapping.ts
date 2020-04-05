@@ -3,7 +3,7 @@
  * Copyright (c) 2020 Handsoncode. All rights reserved.
  */
 
-import {TranslationPackage} from '../i18n'
+import {TranslationPackage, UIElement} from '../i18n'
 import {Maybe} from '../Maybe'
 
 function canonicalize(sheetDisplayName: string): string {
@@ -27,11 +27,15 @@ export class SheetMapping {
 
   private readonly mappingFromCanonicalName: Map<string, Sheet> = new Map()
   private readonly mappingFromId: Map<number, Sheet> = new Map()
-  private readonly sheetNamePrefix: string = 'Sheet'
+  private readonly sheetNamePrefix: string
   private lastSheetId = -1
 
   constructor(private languages: TranslationPackage) {
-    this.sheetNamePrefix = languages.interface.NEW_SHEET_PREFIX || this.sheetNamePrefix
+    const sheetNamePrefix = languages.getUITranslation(UIElement.NEW_SHEET_PREFIX)
+    if(sheetNamePrefix===undefined) {
+      throw new Error('No translation for sheet prefix.')
+    }
+    this.sheetNamePrefix = sheetNamePrefix
   }
 
   public addSheet(newSheetDisplayName: string = `${this.sheetNamePrefix}${this.lastSheetId + 2}`): number {

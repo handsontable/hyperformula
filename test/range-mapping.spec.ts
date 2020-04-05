@@ -1,6 +1,6 @@
-import {AbsoluteCellRange} from '../src/AbsoluteCellRange'
+import {AbsoluteCellRange, AbsoluteColumnRange} from '../src/AbsoluteCellRange'
 import {RangeMapping, RangeVertex} from '../src/DependencyGraph'
-import {adr} from './testUtils'
+import {adr, colEnd, colStart} from './testUtils'
 
 describe('RangeMapping', () => {
   it('range mapping when there is none', () => {
@@ -16,6 +16,17 @@ describe('RangeMapping', () => {
     const start = adr('A1')
     const end = adr('U50')
     const vertex = new RangeVertex(new AbsoluteCellRange(start, end))
+
+    mapping.setRange(vertex)
+
+    expect(mapping.getRange(start, end)).toBe(vertex)
+  })
+
+  it('set column range', () => {
+    const mapping = new RangeMapping()
+    const start = colStart('A')
+    const end = colEnd('U')
+    const vertex = new RangeVertex(new AbsoluteColumnRange(start.sheet, start.col, end.col))
 
     mapping.setRange(vertex)
 

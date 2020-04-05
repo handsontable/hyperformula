@@ -2,7 +2,7 @@ import { HyperFormula} from '../../src'
 import {EmptyCellVertex} from '../../src/DependencyGraph'
 import {CellAddress} from '../../src/parser'
 import '../testConfig'
-import {adr, expectEngineToBeTheSameAs, extractReference} from '../testUtils'
+import {adr, colEnd, colStart, expectEngineToBeTheSameAs, extractReference, rowEnd, rowStart} from '../testUtils'
 
 describe('Adding row - fixing dependencies', () => {
   describe('all in same sheet (case 1)', () => {
@@ -540,6 +540,100 @@ describe('Adding row, ranges', () => {
       ['2', '=SUM(A3:A3)'],
       ['3', null],
       ['4', null],
+    ]))
+  })
+})
+
+describe('Adding row, column range', () => {
+  it('column range should not be affected', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1', '1', '=SUM(A:B)'],
+      // new row
+      ['2', '2'],
+      ['3', '3'],
+    ])
+
+    engine.addRows(0, [1, 1])
+
+    expect(engine.rangeMapping.getRange(colStart('A'), colEnd('B'))).not.toBe(null)
+
+    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
+      ['1', '1', '=SUM(A:B)'],
+      [null, null],
+      ['2', '2'],
+      ['3', '3'],
+    ]))
+  })
+})
+
+describe('Adding row, fixing row ranges', () => {
+  it('insert row in middle of row range', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1'],
+      /* new row */
+      ['2'],
+      ['3'],
+      ['=SUM(1:3)'],
+    ])
+
+    expect(engine.rangeMapping.getRange(rowStart(1), rowEnd(3))).not.toBe(null)
+
+    engine.addRows(0, [1, 1])
+
+    expect(engine.rangeMapping.getRange(rowStart(1), rowEnd(3))).toBe(null)
+    expect(engine.rangeMapping.getRange(rowStart(1), rowEnd(4))).not.toBe(null)
+
+    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
+      ['1'],
+      [null],
+      ['2'],
+      ['3'],
+      ['=SUM(1:4)'],
+    ]))
+  })
+
+  it('insert row before row range', () => {
+    const engine = HyperFormula.buildFromArray([
+      /* new row */
+      ['1'],
+      ['2'],
+      ['3'],
+      ['=SUM(1:3)'],
+    ])
+
+    expect(engine.rangeMapping.getRange(rowStart(1), rowEnd(3))).not.toBe(null)
+    engine.addRows(0, [0, 1])
+    expect(engine.rangeMapping.getRange(rowStart(1), rowEnd(3))).toBe(null)
+    expect(engine.rangeMapping.getRange(rowStart(2), rowEnd(4))).not.toBe(null)
+
+    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
+      [null],
+      ['1'],
+      ['2'],
+      ['3'],
+      ['=SUM(2:4)'],
+    ]))
+  })
+
+  it('insert row after row range', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1'],
+      ['2'],
+      ['3'],
+      /* new row */
+      ['=SUM(1:3)'],
+    ])
+
+    expect(engine.rangeMapping.getRange(rowStart(1), rowEnd(3))).not.toBe(null)
+    engine.addRows(0, [3, 1])
+    expect(engine.rangeMapping.getRange(rowStart(1), rowEnd(3))).not.toBe(null)
+
+    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
+      ['1'],
+      ['2'],
+      ['3'],
+      [null],
+      ['=SUM(1:3)'],
     ]))
   })
 })

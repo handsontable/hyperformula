@@ -60,11 +60,11 @@ export class RangeMapping {
     this.updateVerticesFromSheet(rowsSpan.sheet, (key: string, vertex: RangeVertex): RangeVertex | void => {
       if (rowsSpan.rowStart <= vertex.range.end.row) {
         vertex.range.removeRows(rowsSpan.rowStart, rowsSpan.rowEnd)
-        if (vertex.range.height() > 0) {
-          return vertex
-        } else {
+        if (vertex.range.shouldBeRemoved()) {
           rangesToRemove.push(vertex)
           this.removeByKey(rowsSpan.sheet, key)
+        } else {
+          return vertex
         }
       }
     })
@@ -78,11 +78,11 @@ export class RangeMapping {
     this.updateVerticesFromSheet(columnsSpan.sheet, (key: string, vertex: RangeVertex): RangeVertex | void => {
       if (columnsSpan.columnStart <= vertex.range.end.col) {
         vertex.range.removeColumns(columnsSpan.columnStart, columnsSpan.columnEnd)
-        if (vertex.range.width() > 0) {
-          return vertex
-        } else {
+        if (vertex.range.shouldBeRemoved()) {
           rangesToRemove.push(vertex)
           this.removeByKey(columnsSpan.sheet, key)
+        } else {
+          return vertex
         }
       }
     })
