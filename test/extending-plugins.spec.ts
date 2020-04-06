@@ -25,11 +25,9 @@ describe('Plugins', () => {
     ], {functionPlugins: [FooPlugin]})
 
     expect(engine.getCellValue(adr('A1'))).toBe(42)
-    HyperFormula.unregisterLanguage('enGB')
-    HyperFormula.registerLanguage('enGB', enGB)
   })
 
-  it('cleanup - broken',  () => { //TODO: loading plugin automatically adds translation to plugin cache
+  it('cleanup - broken',  () => {
     const engine = HyperFormula.buildFromArray([
       ['=foo()'],
     ], {functionPlugins: [FooPlugin]})

@@ -9,6 +9,7 @@ describe('Compute hash from ast', () => {
   beforeEach(() => {
     unregisterAllLanguages()
     HyperFormula.registerLanguage('plPL', plPL)
+    HyperFormula.registerLanguage('enGB', enGB)
   })
 
   const config = new Config()

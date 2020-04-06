@@ -19,6 +19,7 @@ describe('computeHashFromTokens', () => {
   beforeEach(() => {
     unregisterAllLanguages()
     HyperFormula.registerLanguage('plPL', plPL)
+    HyperFormula.registerLanguage('enGB', enGB)
   })
 
   it('simple case', () => {

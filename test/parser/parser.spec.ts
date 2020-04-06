@@ -29,11 +29,13 @@ import {
 import {ColumnAddress} from '../../src/parser/ColumnAddress'
 import {adr, unregisterAllLanguages} from '../testUtils'
 import {RowAddress} from '../../src/parser/RowAddress'
+import '../testConfig'
 
-describe('ParserWithCaching', () => {
+  describe('ParserWithCaching', () => {
   beforeEach(() => {
     unregisterAllLanguages()
     HyperFormula.registerLanguage('plPL', plPL)
+    HyperFormula.registerLanguage('enGB', enGB)
   })
 
   it('integer literal', () => {
