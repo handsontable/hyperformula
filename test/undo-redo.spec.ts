@@ -523,6 +523,19 @@ describe('Undo - moving cells', () => {
 
     expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray(sheet))
   })
+
+  it('restores dependent cell formulas', () => {
+    const sheet = [
+      ['=A2'],
+      ['42'],
+    ]
+    const engine = HyperFormula.buildFromArray(sheet)
+    engine.moveCells(adr('A1'), 1, 1, adr('A2'))
+
+    engine.undo()
+
+    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray(sheet))
+  })
 })
 
 describe('Undo', () => {

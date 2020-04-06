@@ -224,7 +224,7 @@ export class Operations {
     this.doRemoveColumns(columnsToRemove)
   }
 
-  public moveCells(sourceLeftCorner: SimpleCellAddress, width: number, height: number, destinationLeftCorner: SimpleCellAddress): [SimpleCellAddress, ClipboardCell][] {
+  public moveCells(sourceLeftCorner: SimpleCellAddress, width: number, height: number, destinationLeftCorner: SimpleCellAddress): { version: number, overwrittenCellsData: [SimpleCellAddress, ClipboardCell][] } {
     this.ensureItIsPossibleToMoveCells(sourceLeftCorner, width, height, destinationLeftCorner)
 
     const sourceRange = AbsoluteCellRange.spanFrom(sourceLeftCorner, width, height)
@@ -244,15 +244,16 @@ export class Operations {
     const valuesToMove = this.dependencyGraph.valuesFromRange(sourceRange)
     this.columnSearch.moveValues(valuesToMove, toRight, toBottom, toSheet)
 
+    let version: number
     this.stats.measure(StatType.TRANSFORM_ASTS, () => {
       const transformation = new MoveCellsTransformer(sourceRange, toRight, toBottom, toSheet)
       transformation.performEagerTransformations(this.dependencyGraph, this.parser)
-      this.lazilyTransformingAstService.addTransformation(transformation)
+      version = this.lazilyTransformingAstService.addTransformation(transformation)
     })
 
     this.dependencyGraph.moveCells(sourceRange, toRight, toBottom, toSheet)
 
-    return currentDataAtTarget
+    return { version: version!, overwrittenCellsData: currentDataAtTarget }
   }
 
   public ensureItIsPossibleToMoveCells(sourceLeftCorner: SimpleCellAddress, width: number, height: number, destinationLeftCorner: SimpleCellAddress): void {

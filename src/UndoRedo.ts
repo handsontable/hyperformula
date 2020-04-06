@@ -36,6 +36,7 @@ interface MoveCellsUndoData {
   height: number,
   destinationLeftCorner: SimpleCellAddress,
   overwrittenCellsData: [SimpleCellAddress, ClipboardCell][],
+  version: number,
 }
 
 interface AddRowsUndoData {
@@ -126,8 +127,8 @@ export class UndoRedo {
     this.undoStack.push({ type: UndoStackElementType.ADD_COLUMNS, command: addColumnsCommand })
   }
 
-  public saveOperationMoveCells(sourceLeftCorner: SimpleCellAddress, width: number, height: number, destinationLeftCorner: SimpleCellAddress, overwrittenCellsData: [SimpleCellAddress, ClipboardCell][]) {
-    this.undoStack.push({ type: UndoStackElementType.MOVE_CELLS, sourceLeftCorner, width, height, destinationLeftCorner, overwrittenCellsData })
+  public saveOperationMoveCells(sourceLeftCorner: SimpleCellAddress, width: number, height: number, destinationLeftCorner: SimpleCellAddress, overwrittenCellsData: [SimpleCellAddress, ClipboardCell][], version: number) {
+    this.undoStack.push({ type: UndoStackElementType.MOVE_CELLS, sourceLeftCorner, width, height, destinationLeftCorner, overwrittenCellsData, version })
   }
 
   public saveOperationRemoveColumns(removeColumnsCommand: RemoveColumnsCommand, columnsRemovals: ColumnsRemoval[]) {
@@ -307,6 +308,8 @@ export class UndoRedo {
     for (const [ address, clipboardCell ] of operation.overwrittenCellsData) {
       this.crudOperations!.operations.restoreCell(address, clipboardCell)
     }
+
+    this.restoreOldDataFromVersion(operation.version - 1)
   }
 
   private undoAddSheet(operation: AddSheetUndoData) {

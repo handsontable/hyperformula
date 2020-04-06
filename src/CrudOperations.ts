@@ -102,8 +102,8 @@ export class CrudOperations {
 
   public moveCells(sourceLeftCorner: SimpleCellAddress, width: number, height: number, destinationLeftCorner: SimpleCellAddress): void {
     this.clipboardOperations.abortCut()
-    const overwrittenCellsData = this.operations.moveCells(sourceLeftCorner, width, height, destinationLeftCorner)
-    this.undoRedo.saveOperationMoveCells(sourceLeftCorner, width, height, destinationLeftCorner, overwrittenCellsData)
+    const { version, overwrittenCellsData } = this.operations.moveCells(sourceLeftCorner, width, height, destinationLeftCorner)
+    this.undoRedo.saveOperationMoveCells(sourceLeftCorner, width, height, destinationLeftCorner, overwrittenCellsData, version)
   }
 
   public moveRows(sheet: number, startRow: number, numberOfRows: number, targetRow: number): void {
