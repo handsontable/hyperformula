@@ -49,7 +49,7 @@ export class AddressMapping {
   public getCell(address: SimpleCellAddress): CellVertex | null {
     const sheetMapping = this.mapping.get(address.sheet)
     if (!sheetMapping) {
-      throw Error('Unknown sheet id')
+      throw new NoSheetWithIdError(address.sheet)
     }
     return sheetMapping.getCell(address)
   }
@@ -57,7 +57,7 @@ export class AddressMapping {
   public fetchCell(address: SimpleCellAddress): CellVertex {
     const sheetMapping = this.mapping.get(address.sheet)
     if (!sheetMapping) {
-      throw Error('Unknown sheet id')
+      throw  new NoSheetWithIdError(address.sheet)
     }
     const vertex = sheetMapping.getCell(address)
     if (!vertex) {
@@ -69,7 +69,7 @@ export class AddressMapping {
   public strategyFor(sheetId: number): IAddressMappingStrategy {
     const strategy = this.mapping.get(sheetId)
     if (!strategy) {
-      throw Error('Unknown sheet id')
+      throw new NoSheetWithIdError(sheetId)
     }
 
     return strategy
