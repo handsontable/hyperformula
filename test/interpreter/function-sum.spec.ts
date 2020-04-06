@@ -59,7 +59,7 @@ describe('SUM', () => {
     expect(engine.getCellValue(adr('A9'))).toEqual(0)
   })
 
-  it( 'precision', () => {
+  it( 'works when precision (default setting)', () => {
     const engine = HyperFormula.buildFromArray( [
       ['1.00000000000005', '-1'],
       ['=SUM(A1:B1)']

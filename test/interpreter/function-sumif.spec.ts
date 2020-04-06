@@ -249,7 +249,7 @@ describe('Function SUMIF(S) - calculations and optimizations', () => {
     expect(engine.getStats().get(StatType.CRITERION_FUNCTION_FULL_CACHE_USED)).toEqual(0)
   })
 
-  it('precision', () => {
+  it('works when precision sensitive (default setting)', () => {
     const engine = HyperFormula.buildFromArray([
         ['1.0000000001', '1'],
         ['1.00000000000005', '2'],
@@ -271,7 +271,7 @@ describe('Function SUMIF(S) - calculations and optimizations', () => {
     expect(engine.getCellValue(adr('A4'))).toEqual(4)
   })
 
-  it('case insensitive', () => {
+  it('works when case insensitive', () => {
     const engine = HyperFormula.buildFromArray( [
       ['abcd', '1'],
       ['ABCD', '2'],
@@ -282,7 +282,7 @@ describe('Function SUMIF(S) - calculations and optimizations', () => {
     expect(engine.getCellValue(adr('A4'))).toEqual(3)
   })
 
-  it('case sensitive', () => {
+  it('works when case sensitive', () => {
     const engine = HyperFormula.buildFromArray( [
       ['abcd', '1'],
       ['ABCD', '2'],
