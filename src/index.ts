@@ -25,6 +25,9 @@ class HyperFormulaNS extends HyperFormula {
   public static ExportedCellChange = ExportedCellChange
   public static ExportedNamedExpressionChange = ExportedNamedExpressionChange
   public static EvaluationSuspendedError = EvaluationSuspendedError
+  public static ErrorType = ErrorType
+  public static CellError = CellError
+  public static InvalidArgumentsError = InvalidArgumentsError
 }
 
 const defaultLanguage = Config.defaultConfig.language

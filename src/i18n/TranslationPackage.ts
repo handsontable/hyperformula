@@ -1,4 +1,5 @@
 import {ErrorType} from '../Cell'
+import {MissingTranslationError} from '../errors'
 import {ErrorTranslationSet, TranslationSet, UIElement, UITranslationSet} from './index'
 
 export interface RawTranslationPackage {
@@ -42,7 +43,7 @@ export class TranslationPackage {
   public getFunctionTranslation(key: string): string {
     const val = this.functions[key]
     if(val === undefined) {
-      throw new Error(`No translation for function ${key}.`)
+      throw new MissingTranslationError(`functions.${key}`)
     } else {
       return val
     }
@@ -50,7 +51,7 @@ export class TranslationPackage {
   public getErrorTranslation(key: ErrorType): string {
     const val = this.errors[key]
     if(val === undefined) {
-      throw new Error(`No translation for error ${key}.`)
+      throw new MissingTranslationError(`errors.${key}`)
     } else {
       return val
     }
@@ -58,23 +59,23 @@ export class TranslationPackage {
   public getUITranslation(key: UIElement): string {
     const val = this.ui[key]
     if(val === undefined) {
-      throw new Error(`No translation for ui ${key}.`)
+      throw new MissingTranslationError(`ui.${key}`)
     } else {
       return val
     }
   }
 
   private checkUI(): void {
-    for(const iter of Object.values(UIElement)){
-      if(! (iter in this.ui)){
-        throw new Error(`Translation for ui ${iter} is required.`)
+    for(const key of Object.values(UIElement)){
+      if(! (key in this.ui)){
+        throw new MissingTranslationError(`ui.${key}`)
       }
     }
   }
   private checkErrors(): void {
-    for(const iter of Object.values(ErrorType)){
-      if(! (iter in this.errors)){
-        throw new Error(`Translation for error ${iter} is required.`)
+    for(const key of Object.values(ErrorType)){
+      if(! (key in this.errors)){
+        throw new MissingTranslationError(`errors.${key}`)
       }
     }
   }

@@ -161,3 +161,9 @@ export class EvaluationSuspendedError extends Error {
     super('Computations are suspended')
   }
 }
+
+export class MissingTranslationError extends Error {
+  constructor(key: string) {
+    super(`Translation for ${key} is missing in the translation package you're using.`)
+  }
+}
