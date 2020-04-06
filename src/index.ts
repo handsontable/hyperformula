@@ -48,6 +48,5 @@ export {
   ExportedNamedExpressionChange,
   NoOperationToUndo,
   EvaluationSuspendedError,
-  Config,
   ErrorType
 }

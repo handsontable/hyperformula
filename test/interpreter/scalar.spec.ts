@@ -1,5 +1,5 @@
 import {CellError, ErrorType} from '../../src'
-import {Config} from '../../src'
+import {Config} from '../../src/Config'
 import {DateHelper} from '../../src/DateHelper'
 import {ArithmeticHelper, max, min} from '../../src/interpreter/ArithmeticHelper'
 import {NumberLiteralHelper} from '../../src/NumberLiteralHelper'
