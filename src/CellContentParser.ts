@@ -2,7 +2,7 @@ import {CellError, EmptyValue, EmptyValueType, ErrorType} from './Cell'
 import {Config} from './Config'
 import {DateHelper} from './DateHelper'
 import {UnableToParse} from './errors'
-import {fixNegativeZero, isNumberOverflow} from './interpreter/scalar'
+import {fixNegativeZero, isNumberOverflow} from './interpreter/ArithmeticHelper'
 import {NumberLiteralHelper} from './NumberLiteralHelper'
 
 export type RawCellContent = Date | string | number | boolean | EmptyValueType | null | undefined

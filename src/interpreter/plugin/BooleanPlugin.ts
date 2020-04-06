@@ -1,6 +1,6 @@
 import {CellError, ErrorType, InternalCellValue, NoErrorCellValue, SimpleCellAddress} from '../../Cell'
 import {ProcedureAst} from '../../parser'
-import {coerceScalarToBoolean, coerceToMaybeNumber} from '../coerce'
+import {coerceScalarToBoolean} from '../ArithmeticHelper'
 import {InterpreterValue, SimpleRangeValue} from '../InterpreterValue'
 import {FunctionPlugin} from './FunctionPlugin'
 
@@ -235,7 +235,7 @@ export class BooleanPlugin extends FunctionPlugin {
       if(vals[i] instanceof CellError) {
         continue
       }
-      if( this.interpreter.compare(vals[0], vals[i] as NoErrorCellValue) === 0 ) {
+      if( this.interpreter.arithmeticHelper.compare(vals[0], vals[i] as NoErrorCellValue) === 0 ) {
         return vals[i+1]
       }
     }
@@ -302,7 +302,7 @@ export class BooleanPlugin extends FunctionPlugin {
       return vals[0]
     }
 
-    const selector = coerceToMaybeNumber(vals[0], this.interpreter.dateHelper, this.interpreter.numberLiteralsHelper)
+    const selector = this.interpreter.arithmeticHelper.coerceToMaybeNumber(vals[0])
 
     if(selector === undefined || selector != Math.round(selector) || selector < 1 || selector >= n) {
       return new CellError(ErrorType.NUM)
