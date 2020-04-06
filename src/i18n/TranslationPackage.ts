@@ -1,5 +1,4 @@
 import {ErrorType} from '../Cell'
-import {Maybe} from '../Maybe'
 import {ErrorTranslationSet, TranslationSet, UIElement, UITranslationSet} from './index'
 
 export interface RawTranslationPackage {

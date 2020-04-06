@@ -1,4 +1,4 @@
-import {LazilyTransformingAstService} from './'
+import {LazilyTransformingAstService} from './LazilyTransformingAstService'
 import {CellContentParser} from './CellContentParser'
 import {Exporter} from './CellValue'
 import {buildColumnSearchStrategy, ColumnSearchStrategy} from './ColumnSearch/ColumnSearchStrategy'

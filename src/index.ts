@@ -1,4 +1,4 @@
-import { CellError, EmptyValue } from './Cell'
+import { CellError, EmptyValue, ErrorType } from './Cell'
 import { CellValue, DetailedCellError, ExportedCellChange, ExportedNamedExpressionChange } from './CellValue'
 import {
   InvalidAddressError,
@@ -48,4 +48,6 @@ export {
   ExportedNamedExpressionChange,
   NoOperationToUndo,
   EvaluationSuspendedError,
+  Config,
+  ErrorType
 }

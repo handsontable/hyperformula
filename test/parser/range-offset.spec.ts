@@ -1,9 +1,9 @@
 import {simpleCellAddress} from '../../src/Cell'
-import {Config} from '../../src/Config'
 import {SheetMapping} from '../../src/DependencyGraph'
 import {buildTranslationPackage, enGB} from '../../src/i18n'
 import {AstNodeType, CellRangeAst, ParserWithCaching, ParsingErrorType} from '../../src/parser'
 import {RangeSheetReferenceType} from '../../src/parser/Ast'
+import {Config} from '../../src'
 
 describe('Parser - range offset', () => {
   it('OFFSET - usage with range', () => {

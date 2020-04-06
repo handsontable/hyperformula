@@ -1,4 +1,4 @@
-import {Config} from '../../src/Config'
+import {Config} from '../../src'
 import {DateHelper} from '../../src/DateHelper'
 import {format} from '../../src/format/format'
 

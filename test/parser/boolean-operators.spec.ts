@@ -1,5 +1,5 @@
 import {simpleCellAddress} from '../../src/Cell'
-import {Config} from '../../src/Config'
+import {Config} from '../../src'
 import {SheetMapping} from '../../src/DependencyGraph'
 import {buildTranslationPackage, enGB} from '../../src/i18n'
 import {
