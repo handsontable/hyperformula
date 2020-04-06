@@ -1,15 +1,15 @@
 import {CellError, ErrorType} from '../../src/Cell'
 import {Config} from '../../src/Config'
-import {DateHelper} from '../../src/DateHelper'
+import {DateTimeHelper} from '../../src/DateTimeHelper'
 import {ArithmeticHelper, max, min} from '../../src/interpreter/ArithmeticHelper'
 import '../testConfig'
 import {NumberLiteralHelper} from '../../src/NumberLiteralHelper'
 
 describe('nonstrictadd', () => {
   const config = new Config()
-  const dateHelper = new DateHelper(config)
+  const dateTimeHelper = new DateTimeHelper(config)
   const numberLiteralsHelper = new NumberLiteralHelper(config)
-  const arithmeticHelper = new ArithmeticHelper(config, dateHelper, numberLiteralsHelper)
+  const arithmeticHelper = new ArithmeticHelper(config, dateTimeHelper, numberLiteralsHelper)
   it('adds', () => {
     expect(arithmeticHelper.nonstrictadd(2, 3)).toEqual(5)
   })
