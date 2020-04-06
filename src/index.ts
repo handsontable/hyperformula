@@ -1,6 +1,5 @@
 import { CellError, EmptyValue } from './Cell'
 import { CellValue, DetailedCellError, ExportedCellChange, ExportedNamedExpressionChange } from './CellValue'
-import {Config} from './Config'
 import {
   InvalidAddressError,
   InvalidArgumentsError,
@@ -11,6 +10,7 @@ import {
 } from './errors'
 import {Sheets} from './GraphBuilder'
 import {HyperFormula} from './HyperFormula'
+import {Config} from './Config'
 import {languages} from './i18n'
 import {LazilyTransformingAstService} from './LazilyTransformingAstService'
 

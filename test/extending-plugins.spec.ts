@@ -1,5 +1,6 @@
 import {HyperFormula} from '../src'
 import {ErrorType} from '../src/Cell'
+import {enGB} from '../src/i18n'
 import {FunctionPlugin, PluginFunctionType} from '../src/interpreter/plugin/FunctionPlugin'
 import './testConfig.ts'
 import {adr, detailedError} from './testUtils'
@@ -24,6 +25,8 @@ describe('Plugins', () => {
     ], {functionPlugins: [FooPlugin]})
 
     expect(engine.getCellValue(adr('A1'))).toBe(42)
+    HyperFormula.unregisterLanguage('enGB')
+    HyperFormula.registerLanguage('enGB', enGB)
   })
 
   it('cleanup - broken',  () => { //TODO: loading plugin automatically adds translation to plugin cache

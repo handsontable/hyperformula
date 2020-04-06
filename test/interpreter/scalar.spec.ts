@@ -2,7 +2,6 @@ import {CellError, ErrorType} from '../../src/Cell'
 import {Config} from '../../src/Config'
 import {DateHelper} from '../../src/DateHelper'
 import {ArithmeticHelper, max, min} from '../../src/interpreter/ArithmeticHelper'
-import '../testConfig'
 import {NumberLiteralHelper} from '../../src/NumberLiteralHelper'
 
 describe('nonstrictadd', () => {
