@@ -30,7 +30,7 @@ describe('Config', () => {
   it('can translate functions', () => {
     const config = new Config({ language: 'plPL' })
 
-    expect(config.getFunctionTranslationFor('SUM')).toEqual('SUMA')
+    expect(config.translationPackage.getFunctionTranslation('SUM')).toEqual('SUMA')
   })
 
   it( 'validation: boolean params', () => {

@@ -36,20 +36,39 @@ export class TranslationPackage {
     }, {} as Record<string, ErrorType>)
   }
 
-  public getFunctionTranslation(key: string): Maybe<string> {
-    return this.functions[key]
+  public isFunctionTranslated(key: string): boolean {
+    return this.functions[key] !== undefined
   }
-  public getErrorTranslation(key: ErrorType): Maybe<string> {
-    return this.errors[key]
+
+  public getFunctionTranslation(key: string): string {
+    const val = this.functions[key]
+    if(val === undefined) {
+      throw new Error('No translation for function.')
+    } else {
+      return val
+    }
   }
-  public getUITranslation(key: UIElement): Maybe<string> {
-    return this.ui[key]
+  public getErrorTranslation(key: ErrorType): string {
+    const val = this.errors[key]
+    if(val === undefined) {
+      throw new Error('No translation for error.')
+    } else {
+      return val
+    }
+  }
+  public getUITranslation(key: UIElement): string {
+    const val = this.ui[key]
+    if(val === undefined) {
+      throw new Error('No translation for ui.')
+    } else {
+      return val
+    }
   }
 
   private checkUI(): void {
     for(const err of Object.values(UIElement)){
       if(! (err in this.ui)){
-        throw new Error('No translation for error.')
+        throw new Error('No translation for ui.')
       }
     }
   }

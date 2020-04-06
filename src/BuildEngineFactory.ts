@@ -102,7 +102,7 @@ export class BuildEngineFactory {
 
   public static buildFromSheet(sheet: Sheet, configInput?: Partial<ConfigParams>): EngineState {
     const config = new Config(configInput)
-    const newsheetprefix = config.translationPackage.getUITranslation(UIElement.NEW_SHEET_PREFIX)! + '1'
+    const newsheetprefix = config.translationPackage.getUITranslation(UIElement.NEW_SHEET_PREFIX) + '1'
     return this.buildEngine(config, {[newsheetprefix]: sheet})
   }
 
