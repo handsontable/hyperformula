@@ -27,12 +27,13 @@ import {
   RowRangeAst
 } from '../../src/parser/Ast'
 import {ColumnAddress} from '../../src/parser/ColumnAddress'
-import {adr} from '../testUtils'
+import {adr, unregisterAllLanguages} from '../testUtils'
 import {RowAddress} from '../../src/parser/RowAddress'
+import '../testConfig'
 
-describe('ParserWithCaching', () => {
+  describe('ParserWithCaching', () => {
   beforeEach(() => {
-    HyperFormula.unregisterAllLanguages()
+    unregisterAllLanguages()
     HyperFormula.registerLanguage('plPL', plPL)
     HyperFormula.registerLanguage('enGB', enGB)
   })

@@ -9,6 +9,4 @@ export interface ParserConfig {
   volatileFunctions(): Set<string>,
   structuralChangeFunctions(): Set<string>,
   functionsWhichDoesNotNeedArgumentsToBeComputed(): Set<string>,
-  getErrorTranslationFor(errorType: ErrorType): string,
-  getFunctionTranslationFor(functionName: string): string,
 }
