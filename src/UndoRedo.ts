@@ -394,6 +394,10 @@ export class UndoRedo {
         this.redoRemoveColumns(operation)
         break
       }
+      case UndoStackElementType.MOVE_CELLS: {
+        this.redoMoveCells(operation)
+        break
+      }
     }
 
     this.undoStack.push(operation)
@@ -404,6 +408,10 @@ export class UndoRedo {
     for (const rowsRemoval of rowsRemovals) {
       this.crudOperations!.operations.removeRows(new RemoveRowsCommand(sheet, [[rowsRemoval.rowFrom, rowsRemoval.rowCount]]))
     }
+  }
+
+  private redoMoveCells(operation: MoveCellsUndoData) {
+    this.crudOperations!.operations.moveCells(operation.sourceLeftCorner, operation.width, operation.height, operation.destinationLeftCorner)
   }
 
   private redoRemoveColumns(operation: RemoveColumnsUndoData) {

@@ -761,6 +761,22 @@ describe('Redo - moving columns', () => {
   })
 })
 
+describe('Redo - moving cells', () => {
+  it('works', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['42'],
+      ['45'],
+    ])
+    engine.moveCells(adr('A1'), 1, 1, adr('A2'))
+    const snapshot = engine.getAllSheetsSerialized()
+    engine.undo()
+
+    engine.redo()
+
+    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromSheets(snapshot))
+  })
+})
+
 describe('Redo - setting cell content', () => {
   it('works for simple values', () => {
     const engine = HyperFormula.buildFromArray([
