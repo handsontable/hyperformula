@@ -218,6 +218,10 @@ export class HyperFormula implements TypedEmitter {
     }
   }
 
+  /**
+   * Unregisters language that is registered under given code string.
+   * @param {string} code - code string of the translation package
+   */
   public static unregisterLanguage(code: string): void {
     if(this.registeredLanguages.has(code)) {
       this.registeredLanguages.delete(code)

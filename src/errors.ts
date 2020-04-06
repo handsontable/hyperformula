@@ -162,6 +162,11 @@ export class EvaluationSuspendedError extends Error {
   }
 }
 
+/**
+ * Error thrown when translation is missing in translation package.
+ *
+ * TODO
+ */
 export class MissingTranslationError extends Error {
   constructor(key: string) {
     super(`Translation for ${key} is missing in the translation package you're using.`)
