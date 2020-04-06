@@ -1,12 +1,10 @@
 import GPU from 'gpu.js'
-import {AbsoluteCellRange} from '../AbsoluteCellRange'
+import {AbsoluteCellRange, AbsoluteColumnRange, AbsoluteRowRange} from '../AbsoluteCellRange'
 import {
   CellError,
-  CellValueTypeOrd,
-  EmptyValue,
   ErrorType,
-  getCellValueType, InternalCellValue,
-  invalidSimpleCellAddress, NoErrorCellValue,
+  invalidSimpleCellAddress,
+  NoErrorCellValue,
   SimpleCellAddress,
 } from '../Cell'
 import {ColumnSearchStrategy} from '../ColumnSearch/ColumnSearchStrategy'
@@ -16,18 +14,19 @@ import {DependencyGraph} from '../DependencyGraph'
 import {Matrix, NotComputedMatrix} from '../Matrix'
 import {Maybe} from '../Maybe'
 // noinspection TypeScriptPreferShortImport
-import {Ast, AstNodeType} from '../parser/Ast'
+import {Ast, AstNodeType, CellRangeAst, ColumnRangeAst, RowRangeAst} from '../parser/Ast'
 import {Statistics} from '../statistics/Statistics'
-import {coerceBooleanToNumber, coerceEmptyToValue, coerceScalarToNumberOrError} from './coerce'
+import {
+  ArithmeticHelper, divide, multiply, percent, power, unaryminus,
+} from './ArithmeticHelper'
 import {InterpreterValue, SimpleRangeValue} from './InterpreterValue'
-import {add, divide, floatCmp, multiply, numberCmp, percent, power, subtract, unaryminus} from './scalar'
 import {concatenate} from './text'
-import Collator = Intl.Collator
 import {NumberLiteralHelper} from '../NumberLiteralHelper'
 
 export class Interpreter {
   private gpu?: GPU.GPU
   private readonly pluginCache: Map<string, [any, string]> = new Map()
+  public readonly arithmeticHelper: ArithmeticHelper
 
   constructor(
     public readonly dependencyGraph: DependencyGraph,
@@ -36,9 +35,9 @@ export class Interpreter {
     public readonly stats: Statistics,
     public readonly dateHelper: DateHelper,
     public readonly numberLiteralsHelper: NumberLiteralHelper,
-    public readonly collator: Collator
   ) {
     this.registerPlugins(this.config.allFunctionPlugins())
+    this.arithmeticHelper = new ArithmeticHelper(config, dateHelper, numberLiteralsHelper)
   }
 
   /**
@@ -68,120 +67,83 @@ export class Interpreter {
       case AstNodeType.EQUALS_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
         const rightResult = this.evaluateAst(ast.right, formulaAddress)
-        return this.passErrors(leftResult, rightResult) ?? this.compare( leftResult as NoErrorCellValue, rightResult as NoErrorCellValue) === 0
+        return this.passErrors(leftResult, rightResult) ??
+          this.arithmeticHelper.compare( leftResult as NoErrorCellValue, rightResult as NoErrorCellValue) === 0
       }
       case AstNodeType.NOT_EQUAL_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
         const rightResult = this.evaluateAst(ast.right, formulaAddress)
-        return this.passErrors(leftResult, rightResult) ?? this.compare( leftResult as NoErrorCellValue, rightResult as NoErrorCellValue) !== 0
+        return this.passErrors(leftResult, rightResult) ??
+          this.arithmeticHelper.compare( leftResult as NoErrorCellValue, rightResult as NoErrorCellValue) !== 0
       }
       case AstNodeType.GREATER_THAN_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
         const rightResult = this.evaluateAst(ast.right, formulaAddress)
-        return this.passErrors(leftResult, rightResult) ?? this.compare( leftResult as NoErrorCellValue, rightResult as NoErrorCellValue) > 0
+        return this.passErrors(leftResult, rightResult) ??
+          this.arithmeticHelper.compare( leftResult as NoErrorCellValue, rightResult as NoErrorCellValue) > 0
       }
       case AstNodeType.LESS_THAN_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
         const rightResult = this.evaluateAst(ast.right, formulaAddress)
-        return this.passErrors(leftResult, rightResult) ?? this.compare( leftResult as NoErrorCellValue, rightResult as NoErrorCellValue) < 0
+        return this.passErrors(leftResult, rightResult) ??
+          this.arithmeticHelper.compare( leftResult as NoErrorCellValue, rightResult as NoErrorCellValue) < 0
       }
       case AstNodeType.GREATER_THAN_OR_EQUAL_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
         const rightResult = this.evaluateAst(ast.right, formulaAddress)
-        return this.passErrors(leftResult, rightResult) ?? this.compare( leftResult as NoErrorCellValue, rightResult as NoErrorCellValue) >= 0
+        return this.passErrors(leftResult, rightResult) ??
+          this.arithmeticHelper.compare( leftResult as NoErrorCellValue, rightResult as NoErrorCellValue) >= 0
       }
       case AstNodeType.LESS_THAN_OR_EQUAL_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
         const rightResult = this.evaluateAst(ast.right, formulaAddress)
-        return this.passErrors(leftResult, rightResult) ?? this.compare( leftResult as NoErrorCellValue, rightResult as NoErrorCellValue) <= 0
+        return this.passErrors(leftResult, rightResult) ??
+          this.arithmeticHelper.compare( leftResult as NoErrorCellValue, rightResult as NoErrorCellValue) <= 0
       }
       case AstNodeType.PLUS_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
         const rightResult = this.evaluateAst(ast.right, formulaAddress)
-
-        if (leftResult instanceof CellError) {
-          return leftResult
-        }
-        if (leftResult instanceof SimpleRangeValue) {
-          return new CellError(ErrorType.VALUE)
-        }
-        if (rightResult instanceof CellError) {
-          return rightResult
-        }
-        if (rightResult instanceof SimpleRangeValue) {
-          return new CellError(ErrorType.VALUE)
-        }
-        return add(this.coerceScalarToNumberOrError(leftResult), this.coerceScalarToNumberOrError(rightResult),
-          this.config.smartRounding ? this.config.precisionEpsilon : 0)
+        return this.passErrors(leftResult, rightResult) ??
+          this.arithmeticHelper.add(
+            this.arithmeticHelper.coerceScalarToNumberOrError(leftResult as NoErrorCellValue),
+            this.arithmeticHelper.coerceScalarToNumberOrError(rightResult as NoErrorCellValue)
+          )
       }
       case AstNodeType.MINUS_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
         const rightResult = this.evaluateAst(ast.right, formulaAddress)
-        if (leftResult instanceof CellError) {
-          return leftResult
-        }
-        if (leftResult instanceof SimpleRangeValue) {
-          return new CellError(ErrorType.VALUE)
-        }
-        if (rightResult instanceof CellError) {
-          return rightResult
-        }
-        if (rightResult instanceof SimpleRangeValue) {
-          return new CellError(ErrorType.VALUE)
-        }
-        return subtract(this.coerceScalarToNumberOrError(leftResult), this.coerceScalarToNumberOrError(rightResult),
-          this.config.smartRounding ? this.config.precisionEpsilon : 0)
+        return this.passErrors(leftResult, rightResult) ??
+          this.arithmeticHelper.subtract(
+            this.arithmeticHelper.coerceScalarToNumberOrError(leftResult as NoErrorCellValue),
+            this.arithmeticHelper.coerceScalarToNumberOrError(rightResult as NoErrorCellValue)
+          )
       }
       case AstNodeType.TIMES_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
         const rightResult = this.evaluateAst(ast.right, formulaAddress)
-        if (leftResult instanceof CellError) {
-          return leftResult
-        }
-        if (leftResult instanceof SimpleRangeValue) {
-          return new CellError(ErrorType.VALUE)
-        }
-        if (rightResult instanceof CellError) {
-          return rightResult
-        }
-        if (rightResult instanceof SimpleRangeValue) {
-          return new CellError(ErrorType.VALUE)
-        }
-        return multiply(this.coerceScalarToNumberOrError(leftResult), this.coerceScalarToNumberOrError(rightResult))
+        return this.passErrors(leftResult, rightResult) ??
+          multiply(
+            this.arithmeticHelper.coerceScalarToNumberOrError(leftResult as NoErrorCellValue),
+            this.arithmeticHelper.coerceScalarToNumberOrError(rightResult as NoErrorCellValue)
+          )
       }
       case AstNodeType.POWER_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
         const rightResult = this.evaluateAst(ast.right, formulaAddress)
-        if (leftResult instanceof CellError) {
-          return leftResult
-        }
-        if (leftResult instanceof SimpleRangeValue) {
-          return new CellError(ErrorType.VALUE)
-        }
-        if (rightResult instanceof CellError) {
-          return rightResult
-        }
-        if (rightResult instanceof SimpleRangeValue) {
-          return new CellError(ErrorType.VALUE)
-        }
-        return power(this.coerceScalarToNumberOrError(leftResult), this.coerceScalarToNumberOrError(rightResult))
+        return this.passErrors(leftResult, rightResult) ??
+          power(
+            this.arithmeticHelper.coerceScalarToNumberOrError(leftResult as NoErrorCellValue),
+            this.arithmeticHelper.coerceScalarToNumberOrError(rightResult as NoErrorCellValue)
+          )
       }
       case AstNodeType.DIV_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
         const rightResult = this.evaluateAst(ast.right, formulaAddress)
-        if (leftResult instanceof CellError) {
-          return leftResult
-        }
-        if (leftResult instanceof SimpleRangeValue) {
-          return new CellError(ErrorType.VALUE)
-        }
-        if (rightResult instanceof CellError) {
-          return rightResult
-        }
-        if (rightResult instanceof SimpleRangeValue) {
-          return new CellError(ErrorType.VALUE)
-        }
-        return divide(this.coerceScalarToNumberOrError(leftResult), this.coerceScalarToNumberOrError(rightResult))
+        return this.passErrors(leftResult, rightResult) ??
+          divide(
+            this.arithmeticHelper.coerceScalarToNumberOrError(leftResult as NoErrorCellValue),
+            this.arithmeticHelper.coerceScalarToNumberOrError(rightResult as NoErrorCellValue)
+          )
       }
       case AstNodeType.PLUS_UNARY_OP: {
         const result = this.evaluateAst(ast.value, formulaAddress)
@@ -196,7 +158,7 @@ export class Interpreter {
         if (result instanceof SimpleRangeValue) {
           return new CellError(ErrorType.VALUE)
         } else {
-          return unaryminus(this.coerceScalarToNumberOrError(result))
+          return unaryminus(this.arithmeticHelper.coerceScalarToNumberOrError(result))
         }
       }
       case AstNodeType.PERCENT_OP: {
@@ -204,7 +166,7 @@ export class Interpreter {
         if (result instanceof SimpleRangeValue) {
           return new CellError(ErrorType.VALUE)
         } else {
-          return percent(this.coerceScalarToNumberOrError(result))
+          return percent(this.arithmeticHelper.coerceScalarToNumberOrError(result))
         }
       }
       case AstNodeType.FUNCTION_CALL: {
@@ -218,6 +180,9 @@ export class Interpreter {
         }
       }
       case AstNodeType.CELL_RANGE: {
+        if (!this.rangeSpansOneSheet(ast)) {
+          return new CellError(ErrorType.REF)
+        }
         const range = AbsoluteCellRange.fromCellRange(ast, formulaAddress)
         const matrixVertex = this.dependencyGraph.getMatrix(range)
         if (matrixVertex) {
@@ -234,6 +199,20 @@ export class Interpreter {
         } else {
           return SimpleRangeValue.onlyRange(range, this.dependencyGraph)
         }
+      }
+      case AstNodeType.COLUMN_RANGE: {
+        if (!this.rangeSpansOneSheet(ast)) {
+          return new CellError(ErrorType.REF)
+        }
+        const range = AbsoluteColumnRange.fromColumnRange(ast, formulaAddress)
+        return SimpleRangeValue.onlyRange(range, this.dependencyGraph)
+      }
+      case AstNodeType.ROW_RANGE: {
+        if (!this.rangeSpansOneSheet(ast)) {
+          return new CellError(ErrorType.REF)
+        }
+        const range = AbsoluteRowRange.fromRowRange(ast, formulaAddress)
+        return SimpleRangeValue.onlyRange(range, this.dependencyGraph)
       }
       case AstNodeType.PARENTHESIS: {
         return this.evaluateAst(ast.expression, formulaAddress)
@@ -276,6 +255,10 @@ export class Interpreter {
     }
   }
 
+  private rangeSpansOneSheet(ast: CellRangeAst | ColumnRangeAst | RowRangeAst): boolean {
+    return ast.start.sheet === ast.end.sheet
+  }
+
   private passErrors(left: InterpreterValue, right: InterpreterValue): Maybe<CellError> {
     if (left instanceof CellError) {
       return left
@@ -287,38 +270,6 @@ export class Interpreter {
       return new CellError(ErrorType.VALUE)
     } else {
       return undefined
-    }
-  }
-
-  public coerceScalarToNumberOrError = (arg: InternalCellValue): number | CellError  => {
-    return coerceScalarToNumberOrError(arg, this.dateHelper, this.numberLiteralsHelper)
-  }
-
-  public compare(left: NoErrorCellValue, right: NoErrorCellValue): number {
-    if (typeof left === 'string' || typeof right === 'string') {
-      const leftTmp = typeof left === 'string' ? this.dateHelper.dateStringToDateNumber(left) : left
-      const rightTmp = typeof right === 'string' ? this.dateHelper.dateStringToDateNumber(right) : right
-      if (typeof leftTmp === 'number' && typeof rightTmp === 'number') {
-        return floatCmp(leftTmp, rightTmp, this.config.smartRounding ? this.config.precisionEpsilon : 0)
-      }
-    }
-
-    if(left === EmptyValue) {
-      left = coerceEmptyToValue(right)
-    } else if(right === EmptyValue) {
-      right = coerceEmptyToValue(left)
-    }
-
-    if ( typeof left === 'string' && typeof right === 'string') {
-      return this.collator.compare(left, right)
-    } else if ( typeof left === 'boolean' && typeof right === 'boolean' ) {
-      return numberCmp(coerceBooleanToNumber(left), coerceBooleanToNumber(right))
-    } else if ( typeof left === 'number' && typeof right === 'number' ) {
-      return floatCmp(left, right, this.config.smartRounding ? this.config.precisionEpsilon : 0)
-    } else if ( left === EmptyValue && right === EmptyValue ) {
-      return 0
-    } else {
-      return numberCmp(CellValueTypeOrd(getCellValueType(left)), CellValueTypeOrd(getCellValueType(right)))
     }
   }
 }

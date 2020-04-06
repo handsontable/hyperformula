@@ -1,8 +1,16 @@
-import {EmptyValue, HyperFormula, ExportedCellChange} from '../../src'
+import {EmptyValue, ExportedCellChange, HyperFormula, InvalidArgumentsError} from '../../src'
 import {ErrorType, simpleCellAddress} from '../../src/Cell'
-import {InvalidArgumentsError} from '../../src'
 import {CellAddress} from '../../src/parser'
-import {adr, detailedError, extractRange, extractReference} from '../testUtils'
+import {
+  adr,
+  colEnd,
+  colStart,
+  detailedError,
+  extractColumnRange,
+  extractRange,
+  extractReference,
+  extractRowRange, rowEnd, rowStart
+} from '../testUtils'
 
 describe('Ensure it is possible to move columns', () => {
   it('should return false when target makes no sense', () => {
@@ -140,13 +148,17 @@ describe('Move columns', () => {
   it('should adjust reference when swapping formula with dependency ', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '=A1'],
+      ['=B2', '1'],
     ])
 
     engine.moveColumns(0, 1, 1, 0)
 
     expect(engine.getCellValue(adr('A1'))).toEqual(1)
+    expect(engine.getCellValue(adr('A2'))).toEqual(1)
     expect(engine.getCellValue(adr('B1'))).toEqual(1)
+    expect(engine.getCellValue(adr('B2'))).toEqual(1)
     expect(extractReference(engine, adr('A1'))).toEqual(CellAddress.relative(null, 1, 0))
+    expect(extractReference(engine, adr('B2'))).toEqual(CellAddress.relative(null, -1, 0))
   })
 
   it('should adjust absolute references', () => {
@@ -206,5 +218,87 @@ describe('Move columns', () => {
     engine.moveColumns(0, 3, 1, 1)
 
     expect(engine.getCellValue(adr('E1'))).toEqual(10)
+  })
+
+  it('should return #CYCLE when moving formula onto referred range, simple case', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=SUM(B1:C1)', '1', '2']
+    ])
+
+    engine.moveColumns(0, 0, 1, 2)
+
+    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.CYCLE))
+    expect(engine.getCellFormula(adr('B1'))).toEqual('=SUM(A1:C1)')
+  })
+})
+
+describe('Move columns - column ranges', () => {
+  it('should adjust relative references of dependent formulas', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=SUM(B:C)', '1', '2']
+    ])
+
+    engine.moveColumns(0, 1, 2, 4)
+
+    const range = extractColumnRange(engine, adr('A1'))
+    expect(range.start).toEqual(colStart('C'))
+    expect(range.end).toEqual(colEnd('D'))
+    expect(engine.getCellValue(adr('A1'))).toEqual(3)
+  })
+
+  it('should adjust relative dependencies of moved formulas', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=SUM(B:C)', '1', '2']
+    ])
+
+    engine.moveColumns(0, 0, 1, 3)
+
+    const range = extractColumnRange(engine, adr('C1'))
+    expect(range.start).toEqual(colStart('A'))
+    expect(range.end).toEqual(colEnd('B'))
+    expect(engine.getCellValue(adr('C1'))).toEqual(3)
+  })
+
+  it('should return #CYCLE when moving formula onto referred range', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=SUM(B:C)', '1', '2']
+    ])
+
+    engine.moveColumns(0, 0, 1, 2)
+
+    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.CYCLE))
+    expect(engine.getCellFormula(adr('B1'))).toEqual('=SUM(A:C)')
+  })
+})
+
+describe('Move columns - row ranges', () => {
+  it('should not affect moved row range', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=SUM(2:3)'],
+      ['1'],
+      ['2']
+    ])
+
+    engine.moveColumns(0, 0, 1, 2)
+
+    const range = extractRowRange(engine, adr('B1'))
+    expect(range.start).toEqual(rowStart(2))
+    expect(range.end).toEqual(rowEnd(3))
+    expect(engine.getCellValue(adr('B1'))).toEqual(3)
+  })
+
+  it('should not affect dependent row range', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=SUM(2:3)'],
+      ['1', '3'],
+      ['2', '4']
+    ])
+
+    engine.moveColumns(0, 1, 1, 3)
+
+    const range = extractRowRange(engine, adr('A1'))
+    expect(range.start).toEqual(rowStart(2))
+    expect(range.end).toEqual(rowEnd(3))
+    expect(engine.getCellValue(adr('A1'))).toEqual(10)
   })
 })

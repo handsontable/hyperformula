@@ -19,7 +19,16 @@ import {
   ProcedureAst,
   StringAst,
 } from '../../src/parser'
-import {ErrorWithRawInputAst, ParenthesisAst} from '../../src/parser/Ast'
+import {
+  ColumnRangeAst,
+  ErrorWithRawInputAst,
+  ParenthesisAst,
+  RangeSheetReferenceType,
+  RowRangeAst
+} from '../../src/parser/Ast'
+import {ColumnAddress} from '../../src/parser/ColumnAddress'
+import {adr} from '../testUtils'
+import {RowAddress} from '../../src/parser/RowAddress'
 
 describe('ParserWithCaching', () => {
   beforeEach(() => {
@@ -487,6 +496,110 @@ describe('cell references and ranges', () => {
   })
 })
 
+describe('Column ranges', () => {
+  const sheetMapping = new SheetMapping(buildTranslationPackage(enGB))
+  sheetMapping.addSheet('Sheet1')
+  sheetMapping.addSheet('Sheet2')
+  const parser = new ParserWithCaching(new Config(), sheetMapping.get)
+
+  it('column range', () => {
+    const ast = parser.parse('=C:D', adr('A1')).ast as ColumnRangeAst
+    expect(ast.type).toEqual(AstNodeType.COLUMN_RANGE)
+    expect(ast.sheetReferenceType).toEqual(RangeSheetReferenceType.RELATIVE)
+    expect(ast.start).toEqual(ColumnAddress.relative(null, 2))
+    expect(ast.end).toEqual(ColumnAddress.relative(null, 3))
+  })
+
+  it('column range with sheet absolute', () => {
+    const ast = parser.parse('=Sheet1!C:D', adr('A1')).ast as ColumnRangeAst
+    expect(ast.type).toEqual(AstNodeType.COLUMN_RANGE)
+    expect(ast.sheetReferenceType).toEqual(RangeSheetReferenceType.START_ABSOLUTE)
+    expect(ast.start).toEqual(ColumnAddress.relative(0, 2))
+    expect(ast.end).toEqual(ColumnAddress.relative(0, 3))
+  })
+
+  it('column range with both sheets absolute - same sheet', () => {
+    const ast = parser.parse('=Sheet1!C:Sheet1!D', adr('A1')).ast as ColumnRangeAst
+    expect(ast.type).toEqual(AstNodeType.COLUMN_RANGE)
+    expect(ast.sheetReferenceType).toEqual(RangeSheetReferenceType.BOTH_ABSOLUTE)
+    expect(ast.start).toEqual(ColumnAddress.relative(0, 2))
+    expect(ast.end).toEqual(ColumnAddress.relative(0, 3))
+  })
+
+  it('column range with both sheets absolute - different sheet', () => {
+    const ast = parser.parse('=Sheet1!C:Sheet2!D', adr('A1')).ast as ColumnRangeAst
+    expect(ast.type).toEqual(AstNodeType.COLUMN_RANGE)
+    expect(ast.sheetReferenceType).toEqual(RangeSheetReferenceType.BOTH_ABSOLUTE)
+    expect(ast.start).toEqual(ColumnAddress.relative(0, 2))
+    expect(ast.end).toEqual(ColumnAddress.relative(1, 3))
+  })
+
+  it('column range with absolute column address', () => {
+    const ast = parser.parse('=$C:D', adr('A1')).ast as ColumnRangeAst
+    expect(ast.type).toEqual(AstNodeType.COLUMN_RANGE)
+    expect(ast.sheetReferenceType).toEqual(RangeSheetReferenceType.RELATIVE)
+    expect(ast.start).toEqual(ColumnAddress.absolute(null, 2))
+    expect(ast.end).toEqual(ColumnAddress.relative(null, 3))
+  })
+
+  it('column range with absolute sheet only on end side is a parsing error', () => {
+    const { errors } = parser.parse('=A:Sheet2!B', adr('A1'))
+    expect(errors[0].type).toBe(ParsingErrorType.ParserError)
+  })
+})
+
+describe('Row ranges', () => {
+  const sheetMapping = new SheetMapping(buildTranslationPackage(enGB))
+  sheetMapping.addSheet('Sheet1')
+  sheetMapping.addSheet('Sheet2')
+  const parser = new ParserWithCaching(new Config(), sheetMapping.get)
+
+  it('row range', () => {
+    const ast = parser.parse('=3:4', adr('A1')).ast as RowRangeAst
+    expect(ast.type).toEqual(AstNodeType.ROW_RANGE)
+    expect(ast.sheetReferenceType).toEqual(RangeSheetReferenceType.RELATIVE)
+    expect(ast.start).toEqual(RowAddress.relative(null, 2))
+    expect(ast.end).toEqual(RowAddress.relative(null, 3))
+  })
+
+  it('row range with sheet absolute', () => {
+    const ast = parser.parse('=Sheet1!3:4', adr('A1')).ast as RowRangeAst
+    expect(ast.type).toEqual(AstNodeType.ROW_RANGE)
+    expect(ast.sheetReferenceType).toEqual(RangeSheetReferenceType.START_ABSOLUTE)
+    expect(ast.start).toEqual(RowAddress.relative(0, 2))
+    expect(ast.end).toEqual(RowAddress.relative(0, 3))
+  })
+
+  it('row range with both sheets absolute - same sheet', () => {
+    const ast = parser.parse('=Sheet1!3:Sheet1!4', adr('A1')).ast as RowRangeAst
+    expect(ast.type).toEqual(AstNodeType.ROW_RANGE)
+    expect(ast.sheetReferenceType).toEqual(RangeSheetReferenceType.BOTH_ABSOLUTE)
+    expect(ast.start).toEqual(RowAddress.relative(0, 2))
+    expect(ast.end).toEqual(RowAddress.relative(0, 3))
+  })
+
+  it('row range with both sheets absolute - different sheet', () => {
+    const ast = parser.parse('=Sheet1!3:Sheet2!4', adr('A1')).ast as RowRangeAst
+    expect(ast.type).toEqual(AstNodeType.ROW_RANGE)
+    expect(ast.sheetReferenceType).toEqual(RangeSheetReferenceType.BOTH_ABSOLUTE)
+    expect(ast.start).toEqual(RowAddress.relative(0, 2))
+    expect(ast.end).toEqual(RowAddress.relative(1, 3))
+  })
+
+  it('row range with absolute row address', () => {
+    const ast = parser.parse('=$3:4', adr('A1')).ast as RowRangeAst
+    expect(ast.type).toEqual(AstNodeType.ROW_RANGE)
+    expect(ast.sheetReferenceType).toEqual(RangeSheetReferenceType.RELATIVE)
+    expect(ast.start).toEqual(RowAddress.absolute(null, 2))
+    expect(ast.end).toEqual(RowAddress.relative(null, 3))
+  })
+
+  it('row range with absolute sheet only on end side is a parsing error', () => {
+    const { errors } = parser.parse('=1:Sheet2!2', adr('A1'))
+    expect(errors[0].type).toBe(ParsingErrorType.ParserError)
+  })
+})
+
 
 describe('Parsing errors', () => {
   it('errors - lexing errors', () => {
@@ -501,22 +614,19 @@ describe('Parsing errors', () => {
     })
   })
 
-  it('lexing error - unexpected token', () => {
+  it('parsing error - column name without whole range', () => {
     const parser = new ParserWithCaching(new Config(), new SheetMapping(buildTranslationPackage(enGB)).get)
 
     const { ast, errors } = parser.parse('=A', simpleCellAddress(0, 0, 0))
     expect(ast.type).toBe(AstNodeType.ERROR)
     expect(errors[0].type).toBe(ParsingErrorType.LexingError)
-    expect(errors[0].message).toMatch(/unexpected character/)
   })
 
-  it('lexing error - unexpected token', () => {
+  it('parsing error - column name in procedure without whole range', () => {
     const parser = new ParserWithCaching(new Config(), new SheetMapping(buildTranslationPackage(enGB)).get)
 
     const { errors } = parser.parse('=SUM(A)', simpleCellAddress(0, 0, 0))
     expect(errors[0].type).toBe(ParsingErrorType.LexingError)
-    expect(errors[0].message).toMatch(/unexpected character/)
-
   })
 
   it('parsing error - not all input parsed', () => {

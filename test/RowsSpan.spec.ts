@@ -3,13 +3,13 @@ import {RowsSpan} from '../src/RowsSpan'
 describe('RowsSpan', () => {
   it('raise error when starting row is less than 0', () => {
     expect(() => {
-      const span = new RowsSpan(0, -1, 0)
+      new RowsSpan(0, -1, 0)
     }).toThrow('Starting row cant be less than 0')
   })
 
   it('raise error when row end before row start', () => {
     expect(() => {
-      const span = new RowsSpan(0, 1, 0)
+      new RowsSpan(0, 1, 0)
     }).toThrow('Row span cant end before start')
   })
 
