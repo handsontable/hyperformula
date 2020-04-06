@@ -505,6 +505,20 @@ describe('Undo - moving cells', () => {
     ]
     const engine = HyperFormula.buildFromArray(sheet)
     engine.moveCells(adr('A1'), 1, 1, adr('A2'))
+
+    engine.undo()
+
+    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray(sheet))
+  })
+
+  it('restores data', () => {
+    const sheet = [
+      ['foo'],
+      ['42'],
+    ]
+    const engine = HyperFormula.buildFromArray(sheet)
+    engine.moveCells(adr('A1'), 1, 1, adr('A2'))
+
     engine.undo()
 
     expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray(sheet))

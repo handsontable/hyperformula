@@ -224,7 +224,7 @@ export class Operations {
     this.doRemoveColumns(columnsToRemove)
   }
 
-  public moveCells(sourceLeftCorner: SimpleCellAddress, width: number, height: number, destinationLeftCorner: SimpleCellAddress): void {
+  public moveCells(sourceLeftCorner: SimpleCellAddress, width: number, height: number, destinationLeftCorner: SimpleCellAddress): [SimpleCellAddress, ClipboardCell][] {
     this.ensureItIsPossibleToMoveCells(sourceLeftCorner, width, height, destinationLeftCorner)
 
     const sourceRange = AbsoluteCellRange.spanFrom(sourceLeftCorner, width, height)
@@ -236,6 +236,8 @@ export class Operations {
     const toRight = destinationLeftCorner.col - sourceLeftCorner.col
     const toBottom = destinationLeftCorner.row - sourceLeftCorner.row
     const toSheet = destinationLeftCorner.sheet
+
+    const currentDataAtTarget = this.getRangeClipboardCells(targetRange)
 
     const valuesToRemove = this.dependencyGraph.valuesFromRange(targetRange)
     this.columnSearch.removeValues(valuesToRemove)
@@ -249,6 +251,8 @@ export class Operations {
     })
 
     this.dependencyGraph.moveCells(sourceRange, toRight, toBottom, toSheet)
+
+    return currentDataAtTarget
   }
 
   public ensureItIsPossibleToMoveCells(sourceLeftCorner: SimpleCellAddress, width: number, height: number, destinationLeftCorner: SimpleCellAddress): void {
@@ -432,6 +436,14 @@ export class Operations {
       }
     }
     return arr
+  }
+
+  public getRangeClipboardCells(range: AbsoluteCellRange): [SimpleCellAddress, ClipboardCell][] {
+    const result: [SimpleCellAddress, ClipboardCell][] = []
+    for (const address of range.addresses(this.dependencyGraph)) {
+      result.push([address, this.getClipboardCell(address)])
+    }
+    return result
   }
 
   public setCellContent(address: SimpleCellAddress, newCellContent: RawCellContent): void {
