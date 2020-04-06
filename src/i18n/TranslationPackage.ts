@@ -43,7 +43,7 @@ export class TranslationPackage {
   public getFunctionTranslation(key: string): string {
     const val = this.functions[key]
     if(val === undefined) {
-      throw new Error('No translation for function.')
+      throw new Error(`No translation for function ${key}.`)
     } else {
       return val
     }
@@ -51,7 +51,7 @@ export class TranslationPackage {
   public getErrorTranslation(key: ErrorType): string {
     const val = this.errors[key]
     if(val === undefined) {
-      throw new Error('No translation for error.')
+      throw new Error(`No translation for error ${key}.`)
     } else {
       return val
     }
@@ -59,23 +59,23 @@ export class TranslationPackage {
   public getUITranslation(key: UIElement): string {
     const val = this.ui[key]
     if(val === undefined) {
-      throw new Error('No translation for ui.')
+      throw new Error(`No translation for ui ${key}.`)
     } else {
       return val
     }
   }
 
   private checkUI(): void {
-    for(const err of Object.values(UIElement)){
-      if(! (err in this.ui)){
-        throw new Error('No translation for ui.')
+    for(const iter of Object.values(UIElement)){
+      if(! (iter in this.ui)){
+        throw new Error(`Translation for ui ${iter} is required.`)
       }
     }
   }
   private checkErrors(): void {
-    for(const err of Object.values(ErrorType)){
-      if(! (err in this.errors)){
-        throw new Error('No translation for error.')
+    for(const iter of Object.values(ErrorType)){
+      if(! (iter in this.errors)){
+        throw new Error(`Translation for error ${iter} is required.`)
       }
     }
   }
