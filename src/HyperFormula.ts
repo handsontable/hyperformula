@@ -53,12 +53,12 @@ export class HyperFormula implements TypedEmitter {
   /**
    * Version of the HyperFormula.
    */
-  public static version = (process.env.HT_VERSION || '')
+  public static version = (process.env.HT_VERSION ?? '')
 
   /**
    * Latest build date.
    */
-  public static buildDate = (process.env.HT_BUILD_DATE || '')
+  public static buildDate = (process.env.HT_BUILD_DATE ?? '')
 
   /**
    * Calls the `graph` method on the dependency graph.
