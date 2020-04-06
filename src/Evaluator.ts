@@ -4,13 +4,12 @@ import {Config} from './Config'
 import {ContentChanges} from './ContentChanges'
 import {DateTimeHelper} from './DateTimeHelper'
 import {DependencyGraph, FormulaCellVertex, MatrixVertex, RangeVertex, Vertex} from './DependencyGraph'
+import {fixNegativeZero, isNumberOverflow} from './interpreter/ArithmeticHelper'
 import {Interpreter} from './interpreter/Interpreter'
 import {SimpleRangeValue} from './interpreter/InterpreterValue'
-import {fixNegativeZero, isNumberOverflow} from './interpreter/scalar'
 import {Matrix} from './Matrix'
 import {Ast} from './parser'
 import {Statistics, StatType} from './statistics'
-import Collator = Intl.Collator
 import {NumberLiteralHelper} from './NumberLiteralHelper'
 
 export class Evaluator {
@@ -23,9 +22,8 @@ export class Evaluator {
     private readonly stats: Statistics,
     private readonly dateHelper: DateTimeHelper,
     private readonly numberLiteralsHelper: NumberLiteralHelper,
-    private readonly collator: Collator
   ) {
-    this.interpreter = new Interpreter(this.dependencyGraph, this.columnSearch, this.config, this.stats, this.dateHelper, this.numberLiteralsHelper, this.collator)
+    this.interpreter = new Interpreter(this.dependencyGraph, this.columnSearch, this.config, this.stats, this.dateHelper, this.numberLiteralsHelper)
   }
 
   public run() {

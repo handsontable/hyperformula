@@ -14,7 +14,6 @@ import {NumberLiteralHelper} from './NumberLiteralHelper'
 import {buildLexerConfig, ParserWithCaching, Unparser} from './parser'
 import {Serialization} from './Serialization'
 import {EmptyStatistics, Statistics, StatType} from './statistics'
-import {collatorFromConfig} from './StringHelper'
 import {UndoRedo} from './UndoRedo'
 
 export type EngineState = {
@@ -57,7 +56,6 @@ export class BuildEngineFactory {
     const unparser = new Unparser(config, buildLexerConfig(config), sheetMapping.fetchDisplayName)
     const dateHelper = new DateTimeHelper(config)
     const numberLiteralHelper = new NumberLiteralHelper(config)
-    const collator = collatorFromConfig(config)
     const cellContentParser = new CellContentParser(config, dateHelper, numberLiteralHelper)
 
     stats.measure(StatType.GRAPH_BUILD, () => {
@@ -68,7 +66,7 @@ export class BuildEngineFactory {
     lazilyTransformingAstService.undoRedo = undoRedo
     lazilyTransformingAstService.parser = parser
 
-    const evaluator = new Evaluator(dependencyGraph, columnSearch, config, stats, dateHelper, numberLiteralHelper, collator)
+    const evaluator = new Evaluator(dependencyGraph, columnSearch, config, stats, dateHelper, numberLiteralHelper)
     evaluator.run()
 
     const crudOperations = new CrudOperations(config, stats, dependencyGraph, columnSearch, parser, cellContentParser, lazilyTransformingAstService, undoRedo)
