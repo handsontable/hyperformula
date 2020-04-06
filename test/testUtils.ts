@@ -124,3 +124,11 @@ export function expectCloseTo(actual: InternalCellValue, expected: number, preci
     expect(Math.abs(actual - expected)).toBeLessThan(precision)
   }
 }
+
+export function unregisterAllLanguages() {
+  for (const langCode of HyperFormula.getRegisteredLanguagesCodes()) {
+    if (langCode !== Config.defaultConfig.language) {
+      HyperFormula.unregisterLanguage(langCode)
+    }
+  }
+}

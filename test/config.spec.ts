@@ -1,12 +1,12 @@
 import {EmptyValue, HyperFormula} from '../src'
 import {Config} from '../src/Config'
 import {enGB, plPL} from '../src/i18n'
+import {unregisterAllLanguages} from './testUtils'
 
 describe('Config', () => {
   beforeEach(() => {
-    HyperFormula.unregisterAllLanguages()
+    unregisterAllLanguages()
     HyperFormula.registerLanguage('plPL', plPL)
-    HyperFormula.registerLanguage('enGB', enGB)
   })
 
   it('works', () => {

@@ -4,6 +4,7 @@ import {Config} from '../../src/Config'
 import {SheetMapping} from '../../src/DependencyGraph'
 import {enGB, plPL} from '../../src/i18n'
 import {buildLexerConfig, FormulaLexer, ParserWithCaching} from '../../src/parser'
+import {unregisterAllLanguages} from '../testUtils'
 
 describe('computeHashFromTokens', () => {
   const computeFunc = (code: string, address: SimpleCellAddress, language: string = 'enGB'): string => {
@@ -16,9 +17,8 @@ describe('computeHashFromTokens', () => {
     return parser.computeHashFromTokens(tokens, address)
   }
   beforeEach(() => {
-    HyperFormula.unregisterAllLanguages()
+    unregisterAllLanguages()
     HyperFormula.registerLanguage('plPL', plPL)
-    HyperFormula.registerLanguage('enGB', enGB)
   })
 
   it('simple case', () => {

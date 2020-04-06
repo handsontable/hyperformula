@@ -226,10 +226,6 @@ export class HyperFormula implements TypedEmitter {
     }
   }
 
-  public static unregisterAllLanguages(): void {
-    this.registeredLanguages = new Map()
-  }
-
   /**
    * Returns all registered languages codes.
    */
