@@ -100,7 +100,7 @@ const colNumber = (input: string): number => {
 export function detailedError(errorType: ErrorType, message?: string, config?: Config): DetailedCellError {
   config = new Config(config)
   const error = new CellError(errorType, message)
-  return new DetailedCellError(error, config.getErrorTranslationFor(errorType))
+  return new DetailedCellError(error, config.translationPackage.getErrorTranslation(errorType))
 }
 
 export const expectEngineToBeTheSameAs = (actual: HyperFormula, expected: HyperFormula) => {
@@ -122,5 +122,14 @@ export function expectCloseTo(actual: InternalCellValue, expected: number, preci
     expect(true).toBe(false)
   } else {
     expect(Math.abs(actual - expected)).toBeLessThan(precision)
+  }
+}
+
+export function unregisterAllLanguages() {
+  for (const langCode of HyperFormula.getRegisteredLanguagesCodes()) {
+//    if (langCode !== Config.defaultConfig.language)
+    {
+      HyperFormula.unregisterLanguage(langCode)
+    }
   }
 }

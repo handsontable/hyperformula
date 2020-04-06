@@ -4,8 +4,8 @@ import {DateTime, instanceOfSimpleDate, SimpleDate, SimpleDateTime} from './Date
 import {ExpectedOneOfValues, ExpectedValueOfType} from './errors'
 import {AlwaysDense, ChooseAddressMapping} from './DependencyGraph/AddressMapping/ChooseAddressMappingPolicy'
 import {defaultStringifyDateTime} from './format/format'
-import {enGB, TranslationPackage} from './i18n'
-import {HyperFormula} from './index'
+import {HyperFormula} from './HyperFormula'
+import {TranslationPackage} from './i18n'
 import {AbsPlugin} from './interpreter/plugin/AbsPlugin'
 import {BitShiftPlugin} from './interpreter/plugin/BitShiftPlugin'
 import {BitwiseLogicOperationsPlugin} from './interpreter/plugin/BitwiseLogicOperationsPlugin'
@@ -542,22 +542,6 @@ export class Config implements ConfigParams, ParserConfig {
     return new Config(mergedConfig)
   }
 
-  public getFunctionTranslationFor = (functionTranslationKey: string): string => {
-    const translation = this.translationPackage.getFunctionTranslation(functionTranslationKey)
-    if(translation === undefined) {
-      throw new Error('No translation for function.')
-    }
-    return translation
-  }
-
-  public getErrorTranslationFor = (functionTranslationKey: ErrorType): string => {
-    const translation = this.translationPackage.getErrorTranslation(functionTranslationKey)
-    if(translation === undefined) {
-      throw new Error('No translation for error.')
-    }
-    return translation
-  }
-
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   public allFunctionPlugins(): any[] {
     return [...Config.defaultPlugins, ...this.functionPlugins]
@@ -570,7 +554,7 @@ export class Config implements ConfigParams, ParserConfig {
       for (const functionKey in plugin.implementedFunctions) {
         const pluginFunctionData = plugin.implementedFunctions[functionKey]
         if (pluginFunctionData.isVolatile) {
-          volatileFunctions.add(this.getFunctionTranslationFor(pluginFunctionData.translationKey))
+          volatileFunctions.add(this.translationPackage.getFunctionTranslation(pluginFunctionData.translationKey))
         }
       }
     }
@@ -585,7 +569,7 @@ export class Config implements ConfigParams, ParserConfig {
       for (const functionKey in plugin.implementedFunctions) {
         const pluginFunctionData = plugin.implementedFunctions[functionKey]
         if (pluginFunctionData.isDependentOnSheetStructureChange) {
-          structuralChangeFunctions.add(this.getFunctionTranslationFor(pluginFunctionData.translationKey))
+          structuralChangeFunctions.add(this.translationPackage.getFunctionTranslation(pluginFunctionData.translationKey))
         }
       }
     }
@@ -599,7 +583,7 @@ export class Config implements ConfigParams, ParserConfig {
       for (const functionKey in plugin.implementedFunctions) {
         const pluginFunctionData = plugin.implementedFunctions[functionKey]
         if (pluginFunctionData.doesNotNeedArgumentsToBeComputed) {
-          functionsWhichDoesNotNeedArgumentsToBeComputed.add(this.getFunctionTranslationFor(pluginFunctionData.translationKey))
+          functionsWhichDoesNotNeedArgumentsToBeComputed.add(this.translationPackage.getFunctionTranslation(pluginFunctionData.translationKey))
         }
       }
     }

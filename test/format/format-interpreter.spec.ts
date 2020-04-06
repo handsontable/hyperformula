@@ -1,6 +1,7 @@
 import {Config} from '../../src/Config'
 import {DateTimeHelper} from '../../src/DateTimeHelper'
 import {format} from '../../src/format/format'
+import '../testConfig'
 
 describe('FormatInterpreter', () => {
   const config = new Config()
