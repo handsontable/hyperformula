@@ -42,6 +42,7 @@ import {Statistics, StatType} from './statistics'
 import {Emitter, Events, Listeners, TypedEmitter} from './Emitter'
 import {UndoRedo} from './UndoRedo'
 import {BuildEngineFactory, EngineState} from './BuildEngineFactory'
+import {Dimensions} from './_types'
 
 export type Index = [number, number]
 
@@ -335,13 +336,13 @@ export class HyperFormula implements TypedEmitter {
    * 
    * @throws Throws an error if the given sheet ID does not exist.
    * 
-   * @param {number} sheet - sheet ID number
+   * @param {number} sheetId - sheet ID number
    *
    * @category Sheet
    */
-  public getSheetValues(sheet: number): CellValue[][] {
+  public getSheetValues(sheetId: number): CellValue[][] {
     this.ensureEvaluationIsNotSuspended()
-    return this._serialization.getSheetValues(sheet)
+    return this._serialization.getSheetValues(sheetId)
   }
 
   /**
@@ -351,12 +352,12 @@ export class HyperFormula implements TypedEmitter {
    *
    * Unparses AST.
    *
-   * @param {SimpleCellAddress} sheet - sheet ID number
+   * @param {SimpleCellAddress} sheetId - sheet ID number
    *
    * @category Sheet
    */
-  public getSheetFormulas(sheet: number): Maybe<string>[][] {
-    return this._serialization.getSheetFormulas(sheet)
+  public getSheetFormulas(sheetId: number): Maybe<string>[][] {
+    return this._serialization.getSheetFormulas(sheetId)
   }
 
   /**
@@ -366,13 +367,13 @@ export class HyperFormula implements TypedEmitter {
    *
    * Unparses AST. Applies post-processing.
    *
-   * @param {SimpleCellAddress} sheet - sheet ID number
+   * @param {SimpleCellAddress} sheetId - sheet ID number
    *
    * @category Sheet
    */
-  public getSheetSerialized(sheet: number): NoErrorCellValue[][] {
+  public getSheetSerialized(sheetId: number): NoErrorCellValue[][] {
     this.ensureEvaluationIsNotSuspended()
-    return this._serialization.getSheetSerialized(sheet)
+    return this._serialization.getSheetSerialized(sheetId)
   }
 
   /**
@@ -384,7 +385,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * @category Sheet
    */
-  public getAllSheetsDimensions(): Record<string, { width: number, height: number }> {
+  public getAllSheetsDimensions(): Record<string, Dimensions> {
     return this._serialization.genericAllSheetsGetter((arg) => this.getSheetDimensions(arg))
   }
 
@@ -395,14 +396,14 @@ export class HyperFormula implements TypedEmitter {
    * 
    * @throws Throws an error if the given sheet ID does not exist.
    *
-   * @param {number} sheet - sheet ID number
+   * @param {number} sheetId - sheet ID number
    *
    * @category Sheet
    */
-  public getSheetDimensions(sheet: number): { width: number, height: number } {
+  public getSheetDimensions(sheetId: number): Dimensions {
     return {
-      width: this.dependencyGraph.getSheetWidth(sheet),
-      height: this.dependencyGraph.getSheetHeight(sheet),
+      width: this.dependencyGraph.getSheetWidth(sheetId),
+      height: this.dependencyGraph.getSheetHeight(sheetId),
     }
   }
 
@@ -571,17 +572,17 @@ export class HyperFormula implements TypedEmitter {
    * 
    * If returns `true`, doing [[addRows]] operation won't throw any errors.
    * 
-   * @param {number} sheet - sheet ID in which rows will be added
+   * @param {number} sheetId - sheet ID in which rows will be added
    * @param {Index[]} indexes - non-contiguous indexes with format [row, amount], where row is a row number above which the rows will be added
    * 
    * @returns `true` if the action is possible, `false` if the operation might be disrupted and causes side-effects by the fact that there is a matrix inside the selected rows.
    *
    * @category Row
    */
-  public isItPossibleToAddRows(sheet: number, ...indexes: Index[]): boolean {
+  public isItPossibleToAddRows(sheetId: number, ...indexes: Index[]): boolean {
     const normalizedIndexes = normalizeAddedIndexes(indexes)
     try {
-      this._crudOperations.ensureItIsPossibleToAddRows(sheet, ...normalizedIndexes)
+      this._crudOperations.ensureItIsPossibleToAddRows(sheetId, ...normalizedIndexes)
       return true
     } catch (e) {
       return false
@@ -595,15 +596,15 @@ export class HyperFormula implements TypedEmitter {
    * 
    * Note that this method may trigger dependency graph recalculation.
    *
-   * @param {number} sheet - sheet ID in which rows will be added
+   * @param {number} sheetId - sheet ID in which rows will be added
    * @param {Index[]} indexes - non-contiguous indexes with format [row, amount], where row is a row number above which the rows will be added
    * 
    * @fires [[valuesUpdated]]
    *
    * @category Row
    */
-  public addRows(sheet: number, ...indexes: Index[]): ExportedChange[] {
-    this._crudOperations.addRows(sheet, ...indexes)
+  public addRows(sheetId: number, ...indexes: Index[]): ExportedChange[] {
+    this._crudOperations.addRows(sheetId, ...indexes)
     return this.recomputeIfDependencyGraphNeedsIt()
   }
 
@@ -614,17 +615,17 @@ export class HyperFormula implements TypedEmitter {
    * 
    * If returns `true`, doing [[removeRows]] operation won't throw any errors.
    *
-   * @param {number} sheet - sheet ID from which rows will be removed
+   * @param {number} sheetId - sheet ID from which rows will be removed
    * @param {Index[]} indexes - non-contiguous indexes with format: [row, amount]
    * 
    * @returns `true` if the action is possible, `false` if the operation might be disrupted and causes side-effects by the fact that there is a matrix inside the selected rows.
    *
    * @category Row
    */
-  public isItPossibleToRemoveRows(sheet: number, ...indexes: Index[]): boolean {
+  public isItPossibleToRemoveRows(sheetId: number, ...indexes: Index[]): boolean {
     const normalizedIndexes = normalizeRemovedIndexes(indexes)
     try {
-      this._crudOperations.ensureItIsPossibleToRemoveRows(sheet, ...normalizedIndexes)
+      this._crudOperations.ensureItIsPossibleToRemoveRows(sheetId, ...normalizedIndexes)
       return true
     } catch (e) {
       return false
@@ -638,15 +639,15 @@ export class HyperFormula implements TypedEmitter {
    * 
    * Note that this method may trigger dependency graph recalculation.
    *
-   * @param {number} sheet - sheet ID from which rows will be removed
+   * @param {number} sheetId - sheet ID from which rows will be removed
    * @param {Index[]} indexes - non-contiguous indexes with format: [row, amount]
    * 
    * @fires [[valuesUpdated]]
    *
    * @category Row
    */
-  public removeRows(sheet: number, ...indexes: Index[]): ExportedChange[] {
-    this._crudOperations.removeRows(sheet, ...indexes)
+  public removeRows(sheetId: number, ...indexes: Index[]): ExportedChange[] {
+    this._crudOperations.removeRows(sheetId, ...indexes)
     return this.recomputeIfDependencyGraphNeedsIt()
   }
 
@@ -657,17 +658,17 @@ export class HyperFormula implements TypedEmitter {
    * 
    * If returns `true`, doing [[addColumns]] operation won't throw any errors.
    *
-   * @param {number} sheet - sheet ID in which columns will be added
+   * @param {number} sheetId - sheet ID in which columns will be added
    * @param {Index[]} indexes - non-contiguous indexes with format: [column, amount], where column is a column number from which new columns will be added
    * 
    * @returns `true` if the action is possible, `false` if the operation might be disrupted and causes side-effects by the fact that there is a matrix inside the selected columns.
    *
    * @category Column
    */
-  public isItPossibleToAddColumns(sheet: number, ...indexes: Index[]): boolean {
+  public isItPossibleToAddColumns(sheetId: number, ...indexes: Index[]): boolean {
     const normalizedIndexes = normalizeAddedIndexes(indexes)
     try {
-      this._crudOperations.ensureItIsPossibleToAddColumns(sheet, ...normalizedIndexes)
+      this._crudOperations.ensureItIsPossibleToAddColumns(sheetId, ...normalizedIndexes)
       return true
     } catch (e) {
       return false
@@ -681,15 +682,15 @@ export class HyperFormula implements TypedEmitter {
    * 
    * Note that this method may trigger dependency graph recalculation.
    *
-   * @param {number} sheet - sheet ID in which columns will be added
+   * @param {number} sheetId - sheet ID in which columns will be added
    * @param {Index[]} indexes - non-contiguous indexes with format: [column, amount], where column is a column number from which new columns will be added
    * 
    * @fires [[valuesUpdated]]
    *
    * @category Column
    */
-  public addColumns(sheet: number, ...indexes: Index[]): ExportedChange[] {
-    this._crudOperations.addColumns(sheet, ...indexes)
+  public addColumns(sheetId: number, ...indexes: Index[]): ExportedChange[] {
+    this._crudOperations.addColumns(sheetId, ...indexes)
     return this.recomputeIfDependencyGraphNeedsIt()
   }
 
@@ -700,17 +701,17 @@ export class HyperFormula implements TypedEmitter {
    * 
    * If returns `true`, doing [[removeColumns]] operation won't throw any errors.
    *
-   * @param {number} sheet - sheet ID from which columns will be removed
+   * @param {number} sheetId - sheet ID from which columns will be removed
    * @param {Index[]} indexes - non-contiguous indexes with format [column, amount]
    * 
    * @returns `true` if the action is possible, `false` if the operation might be disrupted and causes side-effects by the fact that there is a matrix inside the selected columns.
    *
    * @category Column
    */
-  public isItPossibleToRemoveColumns(sheet: number, ...indexes: Index[]): boolean {
+  public isItPossibleToRemoveColumns(sheetId: number, ...indexes: Index[]): boolean {
     const normalizedIndexes = normalizeRemovedIndexes(indexes)
     try {
-      this._crudOperations.ensureItIsPossibleToRemoveColumns(sheet, ...normalizedIndexes)
+      this._crudOperations.ensureItIsPossibleToRemoveColumns(sheetId, ...normalizedIndexes)
       return true
     } catch (e) {
       return false
@@ -724,15 +725,15 @@ export class HyperFormula implements TypedEmitter {
    * 
    * Note that this method may trigger dependency graph recalculation.
    *
-   * @param {number} sheet - sheet ID from which columns will be removed
+   * @param {number} sheetId - sheet ID from which columns will be removed
    * @param {Index[]} indexes - non-contiguous indexes with format: [column, amount]
    * 
    * @fires [[valuesUpdated]]
    *
    * @category Column
    */
-  public removeColumns(sheet: number, ...indexes: Index[]): ExportedChange[] {
-    this._crudOperations.removeColumns(sheet, ...indexes)
+  public removeColumns(sheetId: number, ...indexes: Index[]): ExportedChange[] {
+    this._crudOperations.removeColumns(sheetId, ...indexes)
     return this.recomputeIfDependencyGraphNeedsIt()
   }
 
@@ -787,7 +788,7 @@ export class HyperFormula implements TypedEmitter {
    * 
    * If returns `true`, doing [[moveRows]] operation won't throw any errors.
    *
-   * @param {number} sheet - a sheet number in which the operation will be performed
+   * @param {number} sheetId - a sheet number in which the operation will be performed
    * @param {number} startRow - number of the first row to move
    * @param {number} numberOfRows - number of rows to move
    * @param {number} targetRow - row number before which rows will be moved
@@ -796,9 +797,9 @@ export class HyperFormula implements TypedEmitter {
    *
    * @category Row
    */
-  public isItPossibleToMoveRows(sheet: number, startRow: number, numberOfRows: number, targetRow: number): boolean {
+  public isItPossibleToMoveRows(sheetId: number, startRow: number, numberOfRows: number, targetRow: number): boolean {
     try {
-      this._crudOperations.ensureItIsPossibleToMoveRows(sheet, startRow, numberOfRows, targetRow)
+      this._crudOperations.ensureItIsPossibleToMoveRows(sheetId, startRow, numberOfRows, targetRow)
       return true
     } catch (e) {
       return false
@@ -810,7 +811,7 @@ export class HyperFormula implements TypedEmitter {
    * 
    * Note that this method may trigger dependency graph recalculation.
    *
-   * @param {number} sheet - a sheet number in which the operation will be performed
+   * @param {number} sheetId - a sheet number in which the operation will be performed
    * @param {number} startRow - number of the first row to move
    * @param {number} numberOfRows - number of rows to move
    * @param {number} targetRow - row number before which rows will be moved
@@ -819,8 +820,8 @@ export class HyperFormula implements TypedEmitter {
    *
    * @category Row
    */
-  public moveRows(sheet: number, startRow: number, numberOfRows: number, targetRow: number): ExportedChange[] {
-    this._crudOperations.moveRows(sheet, startRow, numberOfRows, targetRow)
+  public moveRows(sheetId: number, startRow: number, numberOfRows: number, targetRow: number): ExportedChange[] {
+    this._crudOperations.moveRows(sheetId, startRow, numberOfRows, targetRow)
     return this.recomputeIfDependencyGraphNeedsIt()
   }
 
@@ -831,7 +832,7 @@ export class HyperFormula implements TypedEmitter {
    * 
    * If returns `true`, doing [[moveColumns]] operation won't throw any errors.
    *
-   * @param {number} sheet - a sheet number in which the operation will be performed
+   * @param {number} sheetId - a sheet number in which the operation will be performed
    * @param {number} startColumn - number of the first column to move
    * @param {number} numberOfColumns - number of columns to move
    * @param {number} targetColumn - column number before which columns will be moved
@@ -840,9 +841,9 @@ export class HyperFormula implements TypedEmitter {
    *
    * @category Column
    */
-  public isItPossibleToMoveColumns(sheet: number, startColumn: number, numberOfColumns: number, targetColumn: number): boolean {
+  public isItPossibleToMoveColumns(sheetId: number, startColumn: number, numberOfColumns: number, targetColumn: number): boolean {
     try {
-      this._crudOperations.ensureItIsPossibleToMoveColumns(sheet, startColumn, numberOfColumns, targetColumn)
+      this._crudOperations.ensureItIsPossibleToMoveColumns(sheetId, startColumn, numberOfColumns, targetColumn)
       return true
     } catch (e) {
       return false
@@ -854,7 +855,7 @@ export class HyperFormula implements TypedEmitter {
    * 
    * Note that this method may trigger dependency graph recalculation.
    *
-   * @param {number} sheet - a sheet number in which the operation will be performed
+   * @param {number} sheetId - a sheet number in which the operation will be performed
    * @param {number} startColumn - number of the first column to move
    * @param {number} numberOfColumns - number of columns to move
    * @param {number} targetColumn - column number before which columns will be moved
@@ -863,8 +864,8 @@ export class HyperFormula implements TypedEmitter {
    *
    * @category Column
    */
-  public moveColumns(sheet: number, startColumn: number, numberOfColumns: number, targetColumn: number): ExportedChange[] {
-    this._crudOperations.moveColumns(sheet, startColumn, numberOfColumns, targetColumn)
+  public moveColumns(sheetId: number, startColumn: number, numberOfColumns: number, targetColumn: number): ExportedChange[] {
+    this._crudOperations.moveColumns(sheetId, startColumn, numberOfColumns, targetColumn)
     return this.recomputeIfDependencyGraphNeedsIt()
   }
 
@@ -986,15 +987,15 @@ export class HyperFormula implements TypedEmitter {
    * 
    * If returns `true`, doing [[addSheet]] operation won't throw any errors.
    * 
-   * @param {string} name - sheet name, case insensitive
+   * @param {string} sheetName - sheet name, case insensitive
    * 
    * @returns `true` if it possible to add sheet with provided name, meaning the name does not already exists in the instance, `false` if the chosen name is already used
    *
    * @category Sheet
    */
-  public isItPossibleToAddSheet(name: string): boolean {
+  public isItPossibleToAddSheet(sheetName: string): boolean {
     try {
-      this._crudOperations.ensureItIsPossibleToAddSheet(name)
+      this._crudOperations.ensureItIsPossibleToAddSheet(sheetName)
       return true
     } catch (e) {
       return false
@@ -1004,7 +1005,7 @@ export class HyperFormula implements TypedEmitter {
   /**
    * Adds a new sheet to the engine.
    * 
-   * @param {string} [name] - if not specified, name will be autogenerated
+   * @param {string} sheetName - if not specified, name will be autogenerated
    * 
    * @fires [[sheetAdded]]
    * 
@@ -1012,8 +1013,8 @@ export class HyperFormula implements TypedEmitter {
    *
    * @category Sheet
    */
-  public addSheet(name?: string): string {
-    const addedSheetName = this._crudOperations.addSheet(name)
+  public addSheet(sheetName?: string): string {
+    const addedSheetName = this._crudOperations.addSheet(sheetName)
     this._emitter.emit(Events.SheetAdded, addedSheetName)
     return addedSheetName
   }
@@ -1023,15 +1024,15 @@ export class HyperFormula implements TypedEmitter {
    * 
    * If returns true, doing [[removeSheet]] operation won't throw any errors.
    * 
-   * @param {string} name - sheet name, case insensitive
+   * @param {string} sheetName - sheet name, case insensitive
    * 
    * @returns `true` if the provided name of a sheet exists and then it can be removed, `false` if there is no sheet with a given name
    *
    * @category Sheet
    */
-  public isItPossibleToRemoveSheet(name: string): boolean {
+  public isItPossibleToRemoveSheet(sheetName: string): boolean {
     try {
-      this._crudOperations.ensureSheetExists(name)
+      this._crudOperations.ensureSheetExists(sheetName)
       return true
     } catch (e) {
       return false
@@ -1043,16 +1044,16 @@ export class HyperFormula implements TypedEmitter {
    * 
    * Note that this method may trigger dependency graph recalculation.
    * 
-   * @param {string} name - sheet name, case insensitive
+   * @param {string} sheetName - sheet name, case insensitive
    * 
    * @fires [[sheetRemoved]]
    * @fires [[valuesUpdated]]
    *
    * @category Sheet
    */
-  public removeSheet(name: string): ExportedChange[] {
-    const displayName = this.sheetMapping.getDisplayNameByName(name)!
-    this._crudOperations.removeSheet(name)
+  public removeSheet(sheetName: string): ExportedChange[] {
+    const displayName = this.sheetMapping.getDisplayNameByName(sheetName)!
+    this._crudOperations.removeSheet(sheetName)
     const changes = this.recomputeIfDependencyGraphNeedsIt()
     this._emitter.emit(Events.SheetRemoved, displayName, changes)
     return changes
@@ -1063,15 +1064,15 @@ export class HyperFormula implements TypedEmitter {
    * 
    * If returns `true`, doing [[clearSheet]] operation won't throw any errors.
    * 
-   * @param {string} name - sheet name, case insensitive.
+   * @param {string} sheetName - sheet name, case insensitive.
    * 
    * @returns `true` if the provided name of a sheet exists and then its content can be cleared, `false` if there is no sheet with a given name
    *
    * @category Sheet
    */
-  public isItPossibleToClearSheet(name: string): boolean {
+  public isItPossibleToClearSheet(sheetName: string): boolean {
     try {
-      this._crudOperations.ensureSheetExists(name)
+      this._crudOperations.ensureSheetExists(sheetName)
       return true
     } catch (e) {
       return false
@@ -1087,15 +1088,15 @@ export class HyperFormula implements TypedEmitter {
    * 
    * Note that this method may trigger dependency graph recalculation.
    * 
-   * @param {string} name - sheet name, case insensitive.
+   * @param {string} sheetName - sheet name, case insensitive.
    * 
    * @fires [[valuesUpdated]]
    *
    * @category Sheet
    */
-  public clearSheet(name: string): ExportedChange[] {
-    this._crudOperations.ensureSheetExists(name)
-    this._crudOperations.clearSheet(name)
+  public clearSheet(sheetName: string): ExportedChange[] {
+    this._crudOperations.ensureSheetExists(sheetName)
+    this._crudOperations.clearSheet(sheetName)
     return this.recomputeIfDependencyGraphNeedsIt()
   }
 
@@ -1104,15 +1105,15 @@ export class HyperFormula implements TypedEmitter {
    * 
    * If returns `true`, doing [[setSheetContent]] operation won't throw any errors.
    *
-   * @param {string} name - sheet name, case insensitive.
+   * @param {string} sheetName - sheet name, case insensitive.
    * 
    * @returns `true` if the provided name of a sheet exists and then its content can be replaced, `false` if there is no sheet with a given name
    *
    * @category Sheet
    */
-  public isItPossibleToReplaceSheetContent(name: string): boolean {
+  public isItPossibleToReplaceSheetContent(sheetName: string): boolean {
     try {
-      this._crudOperations.ensureSheetExists(name)
+      this._crudOperations.ensureSheetExists(sheetName)
       return true
     } catch (e) {
       return false
@@ -1144,28 +1145,28 @@ export class HyperFormula implements TypedEmitter {
    * If sheet name is not present in string representation, returns the sheet number.
    *
    * @param {string} stringAddress - string representation of cell address, e.g. 'C64'
-   * @param {number} sheet - override sheet index regardless of sheet mapping
+   * @param {number} sheetId - override sheet index regardless of sheet mapping
    * 
    * @returns absolute representation of address, e.g. `{ sheet: 0, col: 1, row: 1 }`
    *
    * @category Helper
    */
-  public simpleCellAddressFromString(stringAddress: string, sheet: number) {
-    return simpleCellAddressFromString(this.sheetMapping.get, stringAddress, sheet)
+  public simpleCellAddressFromString(stringAddress: string, sheetId: number) {
+    return simpleCellAddressFromString(this.sheetMapping.get, stringAddress, sheetId)
   }
 
   /**
    * Returns string representation of an absolute address in A1 notation.
    * 
    * @param {SimpleCellAddress} address - object representation of an absolute address
-   * @param {number} sheet - if is not equal with address sheet index, string representation will contain sheet name
+   * @param {number} sheetId - if is not equal with address sheet index, string representation will contain sheet name
    * 
    * @returns absolute address in string or `undefined` if the sheet index is not present in the engine
    *
    * @category Helper
    */
-  public simpleCellAddressToString(address: SimpleCellAddress, sheet: number): Maybe<string> {
-    return simpleCellAddressToString(this.sheetMapping.fetchDisplayName, address, sheet)
+  public simpleCellAddressToString(address: SimpleCellAddress, sheetId: number): Maybe<string> {
+    return simpleCellAddressToString(this.sheetMapping.fetchDisplayName, address, sheetId)
   }
 
   /**
