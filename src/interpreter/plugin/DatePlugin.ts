@@ -1,5 +1,5 @@
 import {CellError, ErrorType, InternalCellValue, SimpleCellAddress} from '../../Cell'
-import {endOfMonth, offsetMonth} from '../../DateHelper'
+import {endOfMonth, offsetMonth} from '../../DateTimeHelper'
 import {format} from '../../format/format'
 import {ProcedureAst} from '../../parser'
 import {SimpleRangeValue} from '../InterpreterValue'

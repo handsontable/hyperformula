@@ -2,9 +2,9 @@ import {CellValue, DetailedCellError, HyperFormula} from '../src'
 import {AbsoluteCellRange, AbsoluteColumnRange, AbsoluteRowRange} from '../src/AbsoluteCellRange'
 import {CellError, ErrorType, InternalCellValue, SimpleCellAddress, simpleCellAddress} from '../src/Cell'
 import {Config} from '../src/Config'
-import {DateHelper} from '../src/DateHelper'
+import {DateTimeHelper} from '../src/DateTimeHelper'
 import {FormulaCellVertex, MatrixVertex} from '../src/DependencyGraph'
-import {defaultPrintDate} from '../src/format/format'
+import {defaultStringifyDateTime} from '../src/format/format'
 import {
   AstNodeType,
   buildCellErrorAst,
@@ -112,8 +112,8 @@ export function dateNumberToString(dateNumber: CellValue, config: Config): strin
   if(dateNumber instanceof DetailedCellError) {
     return dateNumber
   }
-  const dateHelper = new DateHelper(config)
-  const dateString = defaultPrintDate(dateHelper.numberToDate(dateNumber as number), config.dateFormats[0])
+  const dateHelper = new DateTimeHelper(config)
+  const dateString = defaultStringifyDateTime(dateHelper.numberToDateTime(dateNumber as number), config.dateFormats[0])
   return dateString ? dateString : ''
 }
 

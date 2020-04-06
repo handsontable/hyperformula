@@ -9,7 +9,7 @@ import {
 } from '../Cell'
 import {ColumnSearchStrategy} from '../ColumnSearch/ColumnSearchStrategy'
 import {Config} from '../Config'
-import {DateHelper} from '../DateHelper'
+import {DateTimeHelper} from '../DateTimeHelper'
 import {DependencyGraph} from '../DependencyGraph'
 import {Matrix, NotComputedMatrix} from '../Matrix'
 import {Maybe} from '../Maybe'
@@ -33,7 +33,7 @@ export class Interpreter {
     public readonly columnSearch: ColumnSearchStrategy,
     public readonly config: Config,
     public readonly stats: Statistics,
-    public readonly dateHelper: DateHelper,
+    public readonly dateHelper: DateTimeHelper,
     public readonly numberLiteralsHelper: NumberLiteralHelper,
   ) {
     this.registerPlugins(this.config.allFunctionPlugins())

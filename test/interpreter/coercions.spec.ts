@@ -1,7 +1,7 @@
 import {HyperFormula} from '../../src'
 import {CellError, EmptyValue, ErrorType} from '../../src/Cell'
 import {Config} from '../../src/Config'
-import {DateHelper} from '../../src/DateHelper'
+import {DateTimeHelper} from '../../src/DateTimeHelper'
 import {
   ArithmeticHelper,
   coerceBooleanToNumber,
@@ -14,9 +14,9 @@ import {NumberLiteralHelper} from '../../src/NumberLiteralHelper'
 
 describe('#coerceNonDateScalarToMaybeNumber', () => {
   const config = new Config()
-  const dateHelper = new DateHelper(config)
+  const dateTimeHelper = new DateTimeHelper(config)
   const numberLiteralsHelper = new NumberLiteralHelper(config)
-  const arithmeticHelper = new ArithmeticHelper(config, dateHelper, numberLiteralsHelper)
+  const arithmeticHelper = new ArithmeticHelper(config, dateTimeHelper, numberLiteralsHelper)
   it('works', () => {
     expect(arithmeticHelper.coerceNonDateScalarToMaybeNumber(42)).toBe(42)
     expect(arithmeticHelper.coerceNonDateScalarToMaybeNumber('42')).toBe(42)
@@ -39,7 +39,7 @@ describe('#coerceBooleanToNumber', () => {
 
   it('behaves the same as more general coercion', () => {
     const config = new Config()
-    const dateHelper = new DateHelper(config)
+    const dateHelper = new DateTimeHelper(config)
     const numberLiteralsHelper = new NumberLiteralHelper(config)
     const arithmeticHelper = new ArithmeticHelper(config, dateHelper, numberLiteralsHelper)
     expect(coerceBooleanToNumber(true)).toBe(arithmeticHelper.coerceScalarToNumberOrError(true))
@@ -75,7 +75,7 @@ describe('#coerceScalarToBoolean', () => {
 describe('#coerceScalarToNumberOrError', () => {
   it('works', () => {
     const config = new Config()
-    const dateHelper = new DateHelper(config)
+    const dateHelper = new DateTimeHelper(config)
     const numberLiteralsHelper = new NumberLiteralHelper(config)
     const arithmeticHelper = new ArithmeticHelper(config, dateHelper, numberLiteralsHelper)
     expect(arithmeticHelper.coerceScalarToNumberOrError(1)).toEqual(1)
@@ -83,6 +83,7 @@ describe('#coerceScalarToNumberOrError', () => {
     expect(arithmeticHelper.coerceScalarToNumberOrError(new CellError(ErrorType.DIV_BY_ZERO))).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
 
     expect(arithmeticHelper.coerceScalarToNumberOrError('12/31/1899')).toEqual(1)
+    expect(arithmeticHelper.coerceScalarToNumberOrError('00:00:00')).toEqual(0)
     expect(arithmeticHelper.coerceScalarToNumberOrError(true)).toEqual(1)
 
     expect(arithmeticHelper.coerceScalarToNumberOrError('foo42')).toEqual(new CellError(ErrorType.VALUE))

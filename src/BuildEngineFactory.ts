@@ -3,8 +3,8 @@ import {CellContentParser} from './CellContentParser'
 import {Exporter} from './CellValue'
 import {buildColumnSearchStrategy, ColumnSearchStrategy} from './ColumnSearch/ColumnSearchStrategy'
 import {Config, ConfigParams} from './Config'
+import {DateTimeHelper} from './DateTimeHelper'
 import {CrudOperations} from './CrudOperations'
-import {DateHelper} from './DateHelper'
 import {DependencyGraph} from './DependencyGraph'
 import {Evaluator} from './Evaluator'
 import {GraphBuilder, Sheet, Sheets} from './GraphBuilder'
@@ -54,7 +54,7 @@ export class BuildEngineFactory {
     const notEmpty = sheetMapping.numberOfSheets() > 0
     const parser = new ParserWithCaching(config, notEmpty ? sheetMapping.get : sheetMapping.fetch)
     const unparser = new Unparser(config, buildLexerConfig(config), sheetMapping.fetchDisplayName)
-    const dateHelper = new DateHelper(config)
+    const dateHelper = new DateTimeHelper(config)
     const numberLiteralHelper = new NumberLiteralHelper(config)
     const cellContentParser = new CellContentParser(config, dateHelper, numberLiteralHelper)
 

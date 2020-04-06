@@ -85,10 +85,10 @@ describe('Config', () => {
   it( 'validation: function params', () => {
     // eslint-disable-next-line
     // @ts-ignore
-    expect(() => new Config({parseDate: true})).toThrow('Expected value of type: function for config parameter: parseDate')
+    expect(() => new Config({parseDateTime: true})).toThrow('Expected value of type: function for config parameter: parseDateTime')
     // eslint-disable-next-line
     // @ts-ignore
-    expect(() => new Config({stringifyDate: 1})).toThrow('Expected value of type: function for config parameter: stringifyDate')
+    expect(() => new Config({stringifyDateTime: 1})).toThrow('Expected value of type: function for config parameter: stringifyDateTime')
   })
 
   it( 'validation: other params', () => {
