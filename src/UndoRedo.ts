@@ -303,6 +303,7 @@ export class UndoRedo {
   }
 
   public undoMoveCells(operation: MoveCellsUndoData): void {
+    this.crudOperations!.operations.forceApplyPostponedTransformations()
     this.crudOperations!.operations.moveCells(operation.destinationLeftCorner, operation.width, operation.height, operation.sourceLeftCorner)
 
     for (const [ address, clipboardCell ] of operation.overwrittenCellsData) {

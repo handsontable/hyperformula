@@ -536,6 +536,21 @@ describe('Undo - moving cells', () => {
 
     expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray(sheet))
   })
+
+  it('formulas are built correctly when there was a pause in computation', () => {
+    const sheet = [
+      ['=A2'],
+      ['3'],
+    ]
+    const engine = HyperFormula.buildFromArray(sheet)
+    engine.suspendEvaluation()
+    engine.moveCells(adr('A1'), 1, 1, adr('A2'))
+
+    engine.undo()
+    engine.resumeEvaluation()
+
+    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray(sheet))
+  })
 })
 
 describe('Undo', () => {
