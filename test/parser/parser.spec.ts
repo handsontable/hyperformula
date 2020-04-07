@@ -31,7 +31,7 @@ import {adr, unregisterAllLanguages} from '../testUtils'
 import {RowAddress} from '../../src/parser/RowAddress'
 import '../testConfig'
 
-  describe('ParserWithCaching', () => {
+describe('ParserWithCaching', () => {
   beforeEach(() => {
     unregisterAllLanguages()
     HyperFormula.registerLanguage('plPL', plPL)

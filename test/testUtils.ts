@@ -127,9 +127,6 @@ export function expectCloseTo(actual: InternalCellValue, expected: number, preci
 
 export function unregisterAllLanguages() {
   for (const langCode of HyperFormula.getRegisteredLanguagesCodes()) {
-//    if (langCode !== Config.defaultConfig.language)
-    {
-      HyperFormula.unregisterLanguage(langCode)
-    }
+    HyperFormula.unregisterLanguage(langCode)
   }
 }
