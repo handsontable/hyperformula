@@ -93,7 +93,7 @@ export interface ILexerConfig {
 }
 
 export const buildLexerConfig = (config: ParserConfig): ILexerConfig => {
-  const offsetProcedureNameLiteral = config.getFunctionTranslationFor('OFFSET')
+  const offsetProcedureNameLiteral = config.translationPackage.getFunctionTranslation('OFFSET')
   const errorMapping = config.errorMapping
   const functionMapping = config.translationPackage.buildFunctionMapping()
 

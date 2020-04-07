@@ -31,11 +31,7 @@ export class SheetMapping {
   private lastSheetId = -1
 
   constructor(private languages: TranslationPackage) {
-    const sheetNamePrefix = languages.getUITranslation(UIElement.NEW_SHEET_PREFIX)
-    if(sheetNamePrefix===undefined) {
-      throw new Error('No translation for sheet prefix.')
-    }
-    this.sheetNamePrefix = sheetNamePrefix
+    this.sheetNamePrefix = languages.getUITranslation(UIElement.NEW_SHEET_PREFIX)
   }
 
   public addSheet(newSheetDisplayName: string = `${this.sheetNamePrefix}${this.lastSheetId + 2}`): number {

@@ -8,12 +8,8 @@ import {AbsoluteCellRange, DIFFERENT_SHEETS_ERROR} from '../../AbsoluteCellRange
 import {CellError, EmptyValue, ErrorType, InternalCellValue, SimpleCellAddress} from '../../Cell'
 import {Maybe} from '../../Maybe'
 import {AstNodeType, CellRangeAst, ProcedureAst} from '../../parser'
-import {
-  coerceNonDateScalarToMaybeNumber,
-  coerceToRange
-} from '../coerce'
+import {coerceToRange, max, maxa, min, mina} from '../ArithmeticHelper'
 import {SimpleRangeValue} from '../InterpreterValue'
-import {max, maxa, min, mina, nonstrictadd} from '../scalar'
 import {FunctionPlugin} from './FunctionPlugin'
 import {findSmallerRange} from './SumprodPlugin'
 import {ColumnRangeAst, RowRangeAst} from '../../parser/Ast'
@@ -117,14 +113,14 @@ export class NumericAggregationPlugin extends FunctionPlugin {
    * @param formulaAddress
    */
   public sum(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
-    return this.reduce(ast, formulaAddress, 0, 'SUM', nonstrictadd, idMap, (arg) => this.coerceScalarToNumberOrError(arg))
+    return this.reduce(ast, formulaAddress, 0, 'SUM', this.interpreter.arithmeticHelper.nonstrictadd, idMap, (arg) => this.coerceScalarToNumberOrError(arg))
   }
 
   public sumsq(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
     if (ast.args.length < 1) {
       return new CellError(ErrorType.NA)
     }
-    return this.reduce(ast, formulaAddress, 0, 'SUMSQ', nonstrictadd, square, (arg) => this.coerceScalarToNumberOrError(arg))
+    return this.reduce(ast, formulaAddress, 0, 'SUMSQ', this.interpreter.arithmeticHelper.nonstrictadd, square, (arg) => this.coerceScalarToNumberOrError(arg))
   }
 
   public countblank(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
@@ -270,7 +266,7 @@ export class NumericAggregationPlugin extends FunctionPlugin {
       } else if (arg instanceof CellError) {
         return arg
       } else {
-        const coercedArg = coerceNonDateScalarToMaybeNumber(arg, this.interpreter.numberLiteralsHelper)
+        const coercedArg = this.interpreter.arithmeticHelper.coerceNonDateScalarToMaybeNumber(arg)
         if (coercedArg === undefined) {
           return AverageResult.empty
         } else {

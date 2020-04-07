@@ -9,7 +9,7 @@ import {ColumnSearchStrategy} from '../../ColumnSearch/ColumnSearchStrategy'
 import {Config} from '../../Config'
 import {DependencyGraph} from '../../DependencyGraph'
 import {Ast, ProcedureAst} from '../../parser'
-import {coerceScalarToString} from '../coerce'
+import {coerceScalarToString} from '../ArithmeticHelper'
 import {Interpreter} from '../Interpreter'
 import {InterpreterValue, SimpleRangeValue} from '../InterpreterValue'
 
@@ -125,7 +125,7 @@ export abstract class FunctionPlugin {
   }
 
   protected coerceScalarToNumberOrError(arg: InternalCellValue): number | CellError  {
-    return this.interpreter.coerceScalarToNumberOrError(arg)
+    return this.interpreter.arithmeticHelper.coerceScalarToNumberOrError(arg)
   }
 
   private templateWithOneArgumentCoercion(

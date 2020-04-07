@@ -4,7 +4,7 @@
  */
 
 import {ErrorType} from '../Cell'
-import {Maybe} from '../Maybe'
+import {MissingTranslationError} from '../errors'
 import {ErrorTranslationSet, TranslationSet, UIElement, UITranslationSet} from './index'
 
 export interface RawTranslationPackage {
@@ -41,27 +41,46 @@ export class TranslationPackage {
     }, {} as Record<string, ErrorType>)
   }
 
-  public getFunctionTranslation(key: string): Maybe<string> {
-    return this.functions[key]
+  public isFunctionTranslated(key: string): boolean {
+    return this.functions[key] !== undefined
   }
-  public getErrorTranslation(key: ErrorType): Maybe<string> {
-    return this.errors[key]
+
+  public getFunctionTranslation(key: string): string {
+    const val = this.functions[key]
+    if(val === undefined) {
+      throw new MissingTranslationError(`functions.${key}`)
+    } else {
+      return val
+    }
   }
-  public getUITranslation(key: UIElement): Maybe<string> {
-    return this.ui[key]
+  public getErrorTranslation(key: ErrorType): string {
+    const val = this.errors[key]
+    if(val === undefined) {
+      throw new MissingTranslationError(`errors.${key}`)
+    } else {
+      return val
+    }
+  }
+  public getUITranslation(key: UIElement): string {
+    const val = this.ui[key]
+    if(val === undefined) {
+      throw new MissingTranslationError(`ui.${key}`)
+    } else {
+      return val
+    }
   }
 
   private checkUI(): void {
-    for(const err of Object.values(UIElement)){
-      if(! (err in this.ui)){
-        throw new Error('No translation for error.')
+    for(const key of Object.values(UIElement)){
+      if(! (key in this.ui)){
+        throw new MissingTranslationError(`ui.${key}`)
       }
     }
   }
   private checkErrors(): void {
-    for(const err of Object.values(ErrorType)){
-      if(! (err in this.errors)){
-        throw new Error('No translation for error.')
+    for(const key of Object.values(ErrorType)){
+      if(! (key in this.errors)){
+        throw new MissingTranslationError(`errors.${key}`)
       }
     }
   }

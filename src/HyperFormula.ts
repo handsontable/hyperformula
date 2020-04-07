@@ -3,7 +3,7 @@
  * Copyright (c) 2020 Handsoncode. All rights reserved.
  */
 
-import {AbsoluteCellRange} from './AbsoluteCellRange'
+import { AbsoluteCellRange } from './AbsoluteCellRange'
 import {CellType, CellValueType, getCellType, getCellValueType, NoErrorCellValue, SimpleCellAddress} from './Cell'
 import {CellContent, CellContentParser, RawCellContent} from './CellContentParser'
 import {CellValue, ExportedChange, Exporter} from './CellValue'
@@ -58,12 +58,12 @@ export class HyperFormula implements TypedEmitter {
   /**
    * Version of the HyperFormula.
    */
-  public static version = (process.env.HT_VERSION || '')
+  public static version = (process.env.HT_VERSION ?? '')
 
   /**
    * Latest build date.
    */
-  public static buildDate = (process.env.HT_BUILD_DATE || '')
+  public static buildDate = (process.env.HT_BUILD_DATE ?? '')
 
   /**
    * Calls the `graph` method on the dependency graph.
@@ -223,16 +223,16 @@ export class HyperFormula implements TypedEmitter {
     }
   }
 
+  /**
+   * Unregisters language that is registered under given code string.
+   * @param {string} code - code string of the translation package
+   */
   public static unregisterLanguage(code: string): void {
     if(this.registeredLanguages.has(code)) {
       this.registeredLanguages.delete(code)
     } else {
       throw new Error('Language not registered.')
     }
-  }
-
-  public static unregisterAllLanguages(): void {
-    this.registeredLanguages = new Map()
   }
 
   /**
@@ -1662,3 +1662,4 @@ export class HyperFormula implements TypedEmitter {
     }
   }
 }
+

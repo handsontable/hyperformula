@@ -1,6 +1,10 @@
 import {AbsoluteCellRange} from '../src/AbsoluteCellRange'
+import {Config} from '../src/Config'
+import {DateTimeHelper} from '../src/DateTimeHelper'
 import {CriterionCache, RangeVertex} from '../src/DependencyGraph'
+import {ArithmeticHelper} from '../src/interpreter/ArithmeticHelper'
 import {buildCriterionLambda, parseCriterion} from '../src/interpreter/Criterion'
+import {NumberLiteralHelper} from '../src/NumberLiteralHelper'
 import {adr} from './testUtils'
 
 describe('RangeVertex with cache', () => {
@@ -11,15 +15,20 @@ describe('RangeVertex with cache', () => {
   })
 
   it('cache for functions with criterion basic usage', () => {
+    const config = new Config()
+    const dateHelper = new DateTimeHelper(config)
+    const numberLiteralsHelper = new NumberLiteralHelper(config)
+    const arithmeticHelper = new ArithmeticHelper(config, dateHelper, numberLiteralsHelper)
+
     const rangeVertex = new RangeVertex(new AbsoluteCellRange(adr('B2'), adr('B11')))
 
     const criterionString1 = '>=0'
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const criterion1 = buildCriterionLambda(parseCriterion(criterionString1)!)
+    const criterion1 = buildCriterionLambda(parseCriterion(criterionString1)!, arithmeticHelper)
 
     const criterionString2 = '=1'
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const criterion2 = buildCriterionLambda(parseCriterion(criterionString2)!)
+    const criterion2 = buildCriterionLambda(parseCriterion(criterionString2)!, arithmeticHelper)
 
     const criterionCache: CriterionCache = new Map()
 
