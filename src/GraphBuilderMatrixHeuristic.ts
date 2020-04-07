@@ -106,7 +106,7 @@ export class GraphBuilderMatrixHeuristic {
       values[i] = new Array(range.width())
     }
 
-    for (const address of range.addresses()) {
+    for (const address of range.addresses(this.dependencyGraph)) {
       const cellContent = sheet[address.row][address.col]
       const parsedCellContent = this.cellContentParser.parse(cellContent)
       if (parsedCellContent instanceof CellContent.Number) {

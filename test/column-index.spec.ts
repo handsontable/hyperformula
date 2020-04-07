@@ -7,8 +7,10 @@ import {ColumnsSpan} from '../src/ColumnsSpan'
 import {Config} from '../src/Config'
 import {Matrix} from '../src/Matrix'
 import {RowsSpan} from '../src/RowsSpan'
-import {Statistics} from '../src/statistics/Statistics'
+import {Statistics} from '../src/statistics'
 import {adr} from './testUtils'
+import {AddRowsTransformer} from '../src/dependencyTransformers/AddRowsTransformer'
+import {RemoveRowsTransformer} from '../src/dependencyTransformers/RemoveRowsTransformer'
 
 describe('ColumnIndex#add', () => {
   const statistics = new Statistics()
@@ -288,8 +290,8 @@ describe('ColumnIndex#addRows', () => {
     index.add(1, adr('A1'))
     index.add(2, adr('B3'))
 
-    transformingService.addAddRowsTransformation(RowsSpan.fromNumberOfRows(0, 0, 1))
-    transformingService.addAddRowsTransformation(RowsSpan.fromNumberOfRows(1, 0, 1))
+    transformingService.addTransformation(new AddRowsTransformer(RowsSpan.fromNumberOfRows(0, 0, 1)))
+    transformingService.addTransformation(new AddRowsTransformer(RowsSpan.fromNumberOfRows(1, 0, 1)))
 
     index.ensureRecentData(0, 0, 1)
     expect(index.getValueIndex(0, 0, 1).index).toEqual([1])
@@ -303,7 +305,7 @@ describe('ColumnIndex#addRows', () => {
     const index = ColumnIndex.buildEmpty(transformingService, new Config(), statistics)
     index.add(1, adr('A1'))
 
-    transformingService.addAddRowsTransformation(RowsSpan.fromNumberOfRows(0, 1, 1))
+    transformingService.addTransformation(new AddRowsTransformer(RowsSpan.fromNumberOfRows(0, 1, 1)))
     index.ensureRecentData(0, 0, 1)
 
     expect(index.getValueIndex(0, 0, 1).index).toEqual([0])
@@ -318,7 +320,7 @@ describe('ColumnIndex#addRows', () => {
     index.add(1, adr('A3'))
     index.add(1, adr('A4'))
 
-    transformingService.addAddRowsTransformation(RowsSpan.fromNumberOfRows(0, 1, 2))
+    transformingService.addTransformation(new AddRowsTransformer(RowsSpan.fromNumberOfRows(0, 1, 2)))
     index.ensureRecentData(0, 0, 1)
 
     expect(index.getValueIndex(0, 0, 1).index).toEqual([0, 3, 4, 5])
@@ -332,7 +334,7 @@ describe('ColumnIndex#addRows', () => {
     index.add(1, adr('B2'))
     index.add(2, adr('C2'))
 
-    transformingService.addAddRowsTransformation(RowsSpan.fromNumberOfRows(0, 1, 2))
+    transformingService.addTransformation(new AddRowsTransformer(RowsSpan.fromNumberOfRows(0, 1, 2)))
     index.ensureRecentData(0, 0, 1)
     index.ensureRecentData(0, 1, 1)
     index.ensureRecentData(0, 2, 2)
@@ -352,7 +354,7 @@ describe('ColumnIndex#addRows', () => {
     index.add(4, adr('B1'))
     index.add(4, adr('B5'))
 
-    transformingService.addAddRowsTransformation(RowsSpan.fromNumberOfRows(0, 1, 2))
+    transformingService.addTransformation(new AddRowsTransformer(RowsSpan.fromNumberOfRows(0, 1, 2)))
     index.ensureRecentData(0, 0, 1)
     index.ensureRecentData(0, 0, 2)
     index.ensureRecentData(0, 0, 3)
@@ -372,7 +374,7 @@ describe('ColumnIndex#removeRows', () => {
     const index = ColumnIndex.buildEmpty(transformingService, new Config(), statistics)
     index.add(1, adr('A1'))
 
-    transformingService.addRemoveRowsTransformation(RowsSpan.fromNumberOfRows(0, 0, 1))
+    transformingService.addTransformation(new RemoveRowsTransformer(RowsSpan.fromNumberOfRows(0, 0, 1)))
     index.ensureRecentData(0, 0, 1)
 
     expect(index.getValueIndex(0, 0, 1).index).toEqual([])
@@ -387,7 +389,7 @@ describe('ColumnIndex#removeRows', () => {
     index.add(1, adr('A3'))
     index.add(1, adr('A4'))
 
-    transformingService.addRemoveRowsTransformation(RowsSpan.fromNumberOfRows(0, 1, 2))
+    transformingService.addTransformation(new RemoveRowsTransformer(RowsSpan.fromNumberOfRows(0, 1, 2)))
     index.ensureRecentData(0, 0, 1)
 
     expect(index.getValueIndex(0, 0, 1).index).toEqual([0, 1])
@@ -401,7 +403,7 @@ describe('ColumnIndex#removeRows', () => {
     index.add(1, adr('B2'))
     index.add(1, adr('C2'))
 
-    transformingService.addRemoveRowsTransformation(RowsSpan.fromNumberOfRows(0, 0, 1))
+    transformingService.addTransformation(new RemoveRowsTransformer(RowsSpan.fromNumberOfRows(0, 0, 1)))
     index.ensureRecentData(0, 0, 1)
     index.ensureRecentData(0, 1, 1)
     index.ensureRecentData(0, 2, 1)
@@ -420,7 +422,7 @@ describe('ColumnIndex#removeRows', () => {
     index.add(3, adr('A4'))
     index.add(4, adr('B3'))
 
-    transformingService.addRemoveRowsTransformation(RowsSpan.fromNumberOfRows(0, 0, 2))
+    transformingService.addTransformation(new RemoveRowsTransformer(RowsSpan.fromNumberOfRows(0, 0, 2)))
     index.ensureRecentData(0, 0, 1)
     index.ensureRecentData(0, 0, 2)
     index.ensureRecentData(0, 0, 3)
@@ -439,7 +441,7 @@ describe('ColumnIndex#removeRows', () => {
     index.add(1, adr('A2'))
     index.add(1, adr('A2', 1))
 
-    transformingService.addRemoveRowsTransformation(RowsSpan.fromNumberOfRows(0, 0, 1))
+    transformingService.addTransformation(new RemoveRowsTransformer(RowsSpan.fromNumberOfRows(0, 0, 1)))
     index.ensureRecentData(0, 0, 1)
     index.ensureRecentData(1, 0, 1)
 
@@ -456,7 +458,7 @@ describe('ColumnIndex#removeRows', () => {
     index.add(1, adr('A4'))
     index.add(1, adr('A6'))
 
-    transformingService.addRemoveRowsTransformation(RowsSpan.fromNumberOfRows(0, 1, 4))
+    transformingService.addTransformation(new RemoveRowsTransformer(RowsSpan.fromNumberOfRows(0, 1, 4)))
     index.ensureRecentData(0, 0, 1)
 
     expect(index.getValueIndex(0, 0, 1).index).toEqual([0, 1])
@@ -471,7 +473,7 @@ describe('ColumnIndex - lazy cruds', () => {
     index.add(1, adr('A1'))
     index.add(1, adr('B1'))
 
-    transformService.addAddRowsTransformation(RowsSpan.fromNumberOfRows(0, 0, 1))
+    transformService.addTransformation(new AddRowsTransformer(RowsSpan.fromNumberOfRows(0, 0, 1)))
 
     const rowA = index.find(1, new AbsoluteCellRange(adr('A1'), adr('A2')), true)
     expect(rowA).toEqual(1)
@@ -491,7 +493,7 @@ describe('ColumnIndex - lazy cruds', () => {
     index.add(1, adr('A1'))
     index.add(2, adr('A2'))
 
-    transformService.addAddRowsTransformation(RowsSpan.fromNumberOfRows(0, 0, 1))
+    transformService.addTransformation(new AddRowsTransformer(RowsSpan.fromNumberOfRows(0, 0, 1)))
 
     const row1 = index.find(1, new AbsoluteCellRange(adr('A1'), adr('A3')), true)
     expect(row1).toEqual(1)

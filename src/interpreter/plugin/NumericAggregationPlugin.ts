@@ -3,14 +3,11 @@ import {AbsoluteCellRange, DIFFERENT_SHEETS_ERROR} from '../../AbsoluteCellRange
 import {CellError, EmptyValue, ErrorType, InternalCellValue, SimpleCellAddress} from '../../Cell'
 import {Maybe} from '../../Maybe'
 import {AstNodeType, CellRangeAst, ProcedureAst} from '../../parser'
-import {
-  coerceNonDateScalarToMaybeNumber,
-  coerceToRange
-} from '../coerce'
+import {coerceToRange, max, maxa, min, mina} from '../ArithmeticHelper'
 import {SimpleRangeValue} from '../InterpreterValue'
-import {max, maxa, min, mina, nonstrictadd} from '../scalar'
 import {FunctionPlugin} from './FunctionPlugin'
 import {findSmallerRange} from './SumprodPlugin'
+import {ColumnRangeAst, RowRangeAst} from '../../parser/Ast'
 
 export type BinaryOperation<T> = (left: T, right: T) => T
 
@@ -111,14 +108,14 @@ export class NumericAggregationPlugin extends FunctionPlugin {
    * @param formulaAddress
    */
   public sum(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
-    return this.reduce(ast, formulaAddress, 0, 'SUM', nonstrictadd, idMap, (arg) => this.coerceScalarToNumberOrError(arg))
+    return this.reduce(ast, formulaAddress, 0, 'SUM', this.interpreter.arithmeticHelper.nonstrictadd, idMap, (arg) => this.coerceScalarToNumberOrError(arg))
   }
 
   public sumsq(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
     if (ast.args.length < 1) {
       return new CellError(ErrorType.NA)
     }
-    return this.reduce(ast, formulaAddress, 0, 'SUMSQ', nonstrictadd, square, (arg) => this.coerceScalarToNumberOrError(arg))
+    return this.reduce(ast, formulaAddress, 0, 'SUMSQ', this.interpreter.arithmeticHelper.nonstrictadd, square, (arg) => this.coerceScalarToNumberOrError(arg))
   }
 
   public countblank(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
@@ -264,7 +261,7 @@ export class NumericAggregationPlugin extends FunctionPlugin {
       } else if (arg instanceof CellError) {
         return arg
       } else {
-        const coercedArg = coerceNonDateScalarToMaybeNumber(arg, this.interpreter.numberLiteralsHelper)
+        const coercedArg = this.interpreter.arithmeticHelper.coerceNonDateScalarToMaybeNumber(arg)
         if (coercedArg === undefined) {
           return AverageResult.empty
         } else {
@@ -294,7 +291,7 @@ export class NumericAggregationPlugin extends FunctionPlugin {
   private reduce<T>(ast: ProcedureAst, formulaAddress: SimpleCellAddress, initialAccValue: T, functionName: string, reducingFunction: BinaryOperation<T>, mapFunction: MapOperation<T>, coerceFunction: (arg: InternalCellValue) => InternalCellValue): T {
     return ast.args.reduce((acc: T, arg) => {
       let value
-      if (arg.type === AstNodeType.CELL_RANGE) {
+      if (arg.type === AstNodeType.CELL_RANGE || arg.type === AstNodeType.COLUMN_RANGE || arg.type === AstNodeType.ROW_RANGE) {
         value = this.evaluateRange(arg, formulaAddress, acc, functionName, reducingFunction, mapFunction)
       } else {
         value = this.evaluateAst(arg, formulaAddress)
@@ -338,13 +335,13 @@ export class NumericAggregationPlugin extends FunctionPlugin {
    * @param functionName - function name to use as cache key
    * @param reducingFunction - reducing function
    */
-  private evaluateRange<T>(ast: CellRangeAst, formulaAddress: SimpleCellAddress, initialAccValue: T, functionName: string, reducingFunction: BinaryOperation<T>, mapFunction: MapOperation<T>): T {
+  private evaluateRange<T>(ast: CellRangeAst | ColumnRangeAst | RowRangeAst, formulaAddress: SimpleCellAddress, initialAccValue: T, functionName: string, reducingFunction: BinaryOperation<T>, mapFunction: MapOperation<T>): T {
     let range
     try {
-      range = AbsoluteCellRange.fromCellRange(ast, formulaAddress)
+      range = AbsoluteCellRange.fromAst(ast, formulaAddress)
     } catch (err) {
       if (err.message === DIFFERENT_SHEETS_ERROR) {
-        return mapFunction(new CellError(ErrorType.VALUE))
+        return mapFunction(new CellError(ErrorType.REF))
       } else {
         throw err
       }
@@ -375,20 +372,19 @@ export class NumericAggregationPlugin extends FunctionPlugin {
    */
   private getRangeValues<T>(functionName: string, range: AbsoluteCellRange, mapFunction: MapOperation<T>): T[] {
     const rangeResult: T[] = []
-    const {smallerRangeVertex, restRanges} = findSmallerRange(this.dependencyGraph, [range])
-    const restRange = restRanges[0]
+    const {smallerRangeVertex, restRange} = findSmallerRange(this.dependencyGraph, range)
     const currentRangeVertex = this.dependencyGraph.getRange(range.start, range.end)!
     if (smallerRangeVertex && this.dependencyGraph.existsEdge(smallerRangeVertex, currentRangeVertex)) {
       const cachedValue: T = smallerRangeVertex.getFunctionValue(functionName) as T
       if (cachedValue) {
         rangeResult.push(cachedValue)
       } else {
-        for (const cellFromRange of smallerRangeVertex.range.addresses()) {
+        for (const cellFromRange of smallerRangeVertex.range.addresses(this.dependencyGraph)) {
           rangeResult.push(mapFunction(this.dependencyGraph.getCellValue(cellFromRange)))
         }
       }
     }
-    for (const cellFromRange of restRange.addresses()) {
+    for (const cellFromRange of restRange.addresses(this.dependencyGraph)) {
       rangeResult.push(mapFunction(this.dependencyGraph.getCellValue(cellFromRange)))
     }
 

@@ -48,7 +48,7 @@ describe('Criterion', () => {
   })
 
   it('null when unknown operator', () => {
-    expect(parseCriterion('><0')).toEqual(null)
+    expect(parseCriterion('><0')).toEqual(undefined)
   })
 
   it('defaults to equal when unparsable string', () => {
@@ -61,7 +61,7 @@ describe('Criterion', () => {
   })
 
   it('null when criterion being error', () => {
-    expect(parseCriterion(detailedError(ErrorType.VALUE))).toEqual(null)
+    expect(parseCriterion(detailedError(ErrorType.VALUE))).toEqual(undefined)
   })
 
   it('works with criterion being just value', () => {

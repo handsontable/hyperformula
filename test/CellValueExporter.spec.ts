@@ -1,8 +1,8 @@
-import {CellError, DetailedCellError, EmptyValue} from '../src'
+import {CellError, DetailedCellError, EmptyValue, HyperFormula} from '../src'
 import {ErrorType} from '../src/Cell'
 import {Exporter} from '../src/CellValue'
 import {Config} from '../src/Config'
-import {enGB, plPL} from '../src/i18n'
+import {plPL} from '../src/i18n'
 import {detailedError} from './testUtils'
 import {NamedExpressions} from '../src/NamedExpressions'
 
@@ -42,7 +42,7 @@ describe( 'rounding', () => {
 
 describe('detailed error', () => {
   it('should return detailed errors', () => {
-    const config = new Config({ language: enGB })
+    const config = new Config({ language: 'enGB' })
     const cellValueExporter = new Exporter(config, namedExpressionsMock)
 
     const error = cellValueExporter.exportValue(new CellError(ErrorType.VALUE)) as DetailedCellError
@@ -51,11 +51,12 @@ describe('detailed error', () => {
   })
 
   it('should return detailed errors with translation', () => {
-    const config = new Config({ language: plPL })
+    HyperFormula.registerLanguage('plPL', plPL)
+    const config = new Config({ language: 'plPL' })
     const cellValueExporter = new Exporter(config, namedExpressionsMock)
 
     const error = cellValueExporter.exportValue(new CellError(ErrorType.VALUE)) as DetailedCellError
     expect(error).toEqual(detailedError(ErrorType.VALUE, undefined, config))
-    expect(error.value).toEqual('#ARG!')  
+    expect(error.value).toEqual('#ARG!')
   })
 })

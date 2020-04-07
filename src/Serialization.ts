@@ -5,7 +5,6 @@ import {DependencyGraph, FormulaCellVertex, MatrixVertex, ParsingErrorVertex} fr
 import {Maybe} from './Maybe'
 import {buildLexerConfig, Unparser} from './parser'
 
-
 export class Serialization {
   constructor(
     public readonly dependencyGraph: DependencyGraph,
@@ -37,7 +36,7 @@ export class Serialization {
     } else {
       const value: CellValue = this.getCellValue(address)
       if(value instanceof DetailedCellError) {
-        return this.config.getErrorTranslationFor(value.error.type)
+        return this.config.translationPackage.getErrorTranslation(value.error.type)
       } else {
         return value
       }

@@ -2,15 +2,14 @@ import {CellError, ErrorType, InternalCellValue, SimpleCellAddress} from './Cell
 import {ColumnSearchStrategy} from './ColumnSearch/ColumnSearchStrategy'
 import {Config} from './Config'
 import {ContentChanges} from './ContentChanges'
-import {DateHelper} from './DateHelper'
+import {DateTimeHelper} from './DateTimeHelper'
 import {DependencyGraph, FormulaCellVertex, MatrixVertex, RangeVertex, Vertex} from './DependencyGraph'
+import {fixNegativeZero, isNumberOverflow} from './interpreter/ArithmeticHelper'
 import {Interpreter} from './interpreter/Interpreter'
 import {SimpleRangeValue} from './interpreter/InterpreterValue'
-import {fixNegativeZero, isNumberOverflow} from './interpreter/scalar'
 import {Matrix} from './Matrix'
 import {Ast} from './parser'
-import {Statistics, StatType} from './statistics/Statistics'
-import Collator = Intl.Collator
+import {Statistics, StatType} from './statistics'
 import {NumberLiteralHelper} from './NumberLiteralHelper'
 
 export class Evaluator {
@@ -21,11 +20,10 @@ export class Evaluator {
     private readonly columnSearch: ColumnSearchStrategy,
     private readonly config: Config,
     private readonly stats: Statistics,
-    private readonly dateHelper: DateHelper,
+    private readonly dateHelper: DateTimeHelper,
     private readonly numberLiteralsHelper: NumberLiteralHelper,
-    private readonly collator: Collator
   ) {
-    this.interpreter = new Interpreter(this.dependencyGraph, this.columnSearch, this.config, this.stats, this.dateHelper, this.numberLiteralsHelper, this.collator)
+    this.interpreter = new Interpreter(this.dependencyGraph, this.columnSearch, this.config, this.stats, this.dateHelper, this.numberLiteralsHelper)
   }
 
   public run() {

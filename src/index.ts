@@ -1,4 +1,4 @@
-import { CellError, EmptyValue } from './Cell'
+import { CellError, EmptyValue, ErrorType } from './Cell'
 import { CellValue, DetailedCellError, ExportedCellChange, ExportedNamedExpressionChange } from './CellValue'
 import {
   InvalidAddressError,
@@ -10,6 +10,8 @@ import {
 } from './errors'
 import {Sheets} from './GraphBuilder'
 import {HyperFormula} from './HyperFormula'
+import {Config} from './Config'
+import {languages} from './i18n'
 import {LazilyTransformingAstService} from './LazilyTransformingAstService'
 
 class HyperFormulaNS extends HyperFormula {
@@ -23,7 +25,13 @@ class HyperFormulaNS extends HyperFormula {
   public static ExportedCellChange = ExportedCellChange
   public static ExportedNamedExpressionChange = ExportedNamedExpressionChange
   public static EvaluationSuspendedError = EvaluationSuspendedError
+  public static ErrorType = ErrorType
+  public static CellError = CellError
+  public static InvalidArgumentsError = InvalidArgumentsError
 }
+
+const defaultLanguage = Config.defaultConfig.language
+HyperFormula.registerLanguage(defaultLanguage, languages[defaultLanguage])
 
 export default HyperFormulaNS
 
@@ -43,4 +51,5 @@ export {
   ExportedNamedExpressionChange,
   NoOperationToUndo,
   EvaluationSuspendedError,
+  ErrorType
 }

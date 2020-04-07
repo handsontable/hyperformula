@@ -4,7 +4,7 @@ import {ColumnSearchStrategy} from '../../ColumnSearch/ColumnSearchStrategy'
 import {Config} from '../../Config'
 import {DependencyGraph} from '../../DependencyGraph'
 import {Ast, ProcedureAst} from '../../parser'
-import {coerceScalarToString} from '../coerce'
+import {coerceScalarToString} from '../ArithmeticHelper'
 import {Interpreter} from '../Interpreter'
 import {InterpreterValue, SimpleRangeValue} from '../InterpreterValue'
 
@@ -58,7 +58,7 @@ export abstract class FunctionPlugin {
 
   protected computeListOfValuesInRange(range: AbsoluteCellRange): InternalCellValue[] {
     const values: InternalCellValue[] = []
-    for (const cellFromRange of range.addresses()) {
+    for (const cellFromRange of range.addresses(this.dependencyGraph)) {
       const value = this.dependencyGraph.getCellValue(cellFromRange)
       values.push(value)
     }
@@ -120,7 +120,7 @@ export abstract class FunctionPlugin {
   }
 
   protected coerceScalarToNumberOrError(arg: InternalCellValue): number | CellError  {
-    return this.interpreter.coerceScalarToNumberOrError(arg)
+    return this.interpreter.arithmeticHelper.coerceScalarToNumberOrError(arg)
   }
 
   private templateWithOneArgumentCoercion(

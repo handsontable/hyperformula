@@ -1,19 +1,13 @@
-import {Statistics, StatType} from './statistics/Statistics'
+import {Statistics, StatType} from './statistics'
 import {ClipboardCell, ClipboardCellType} from './ClipboardOperations'
 import {SimpleCellAddress} from './Cell'
 import {RowsSpan} from './RowsSpan'
 import {LazilyTransformingAstService} from './LazilyTransformingAstService'
 import {Index} from './HyperFormula'
-import {
-  DependencyGraph,
-  EmptyCellVertex,
-  FormulaCellVertex,
-  MatrixVertex,
-  ValueCellVertex,
-} from './DependencyGraph'
+import {DependencyGraph, EmptyCellVertex, FormulaCellVertex, MatrixVertex, ValueCellVertex} from './DependencyGraph'
 import {ParserWithCaching} from './parser'
-import {RemoveRowsDependencyTransformer} from './dependencyTransformers/removeRows'
-import {AddRowsDependencyTransformer} from './dependencyTransformers/addRows'
+import {AddRowsTransformer} from './dependencyTransformers/AddRowsTransformer'
+import {RemoveRowsTransformer} from './dependencyTransformers/RemoveRowsTransformer'
 
 export class RemoveRowsCommand {
   constructor(
@@ -113,7 +107,7 @@ export class Operations {
     }
 
     const removedCells: ChangedCell[] = []
-    for (const [address, vertex] of this.dependencyGraph.entriesFromRowsSpan(rowsToRemove)) {
+    for (const [address] of this.dependencyGraph.entriesFromRowsSpan(rowsToRemove)) {
       removedCells.push({ address, cellType: this.getClipboardCell(address) })
     }
 
@@ -121,8 +115,9 @@ export class Operations {
 
     let version: number
     this.stats.measure(StatType.TRANSFORM_ASTS, () => {
-      RemoveRowsDependencyTransformer.transform(rowsToRemove, this.dependencyGraph, this.parser)
-      version = this.lazilyTransformingAstService.addRemoveRowsTransformation(rowsToRemove)
+      const transformation = new RemoveRowsTransformer(rowsToRemove)
+      transformation.performEagerTransformations(this.dependencyGraph, this.parser)
+      version = this.lazilyTransformingAstService.addTransformation(transformation)
     })
     return { version: version!, removedCells, rowFrom: rowsToRemove.rowStart, rowCount: rowsToRemove.numberOfRows }
   }
@@ -143,8 +138,9 @@ export class Operations {
     this.dependencyGraph.addRows(addedRows)
 
     this.stats.measure(StatType.TRANSFORM_ASTS, () => {
-      AddRowsDependencyTransformer.transform(addedRows, this.dependencyGraph, this.parser)
-      this.lazilyTransformingAstService.addAddRowsTransformation(addedRows)
+      const transformation = new AddRowsTransformer(addedRows)
+      transformation.performEagerTransformations(this.dependencyGraph, this.parser)
+      this.lazilyTransformingAstService.addTransformation(transformation)
     })
 
     return { afterRow: addedRows.rowStart, rowCount: addedRows.numberOfRows }

@@ -2,6 +2,7 @@ import {HyperFormula} from '../../src'
 import {ErrorType} from '../../src/Cell'
 import '../testConfig'
 import {adr, detailedError} from '../testUtils'
+import {StatType} from '../../src/statistics'
 
 describe('Function SUMIF - argument validations and combinations', () => {
   it('requires 2 or 3 arguments', () => {
@@ -222,7 +223,7 @@ describe('Function SUMIF(S) - calculations and optimizations', () => {
 
     expect(engine.getCellValue(adr('A4'))).toEqual(5)
     expect(engine.getCellValue(adr('A5'))).toEqual(5)
-    expect(engine.stats.criterionFunctionFullCacheUsed).toEqual(1)
+    expect(engine.getStats().get(StatType.CRITERION_FUNCTION_FULL_CACHE_USED)).toEqual(1)
   })
 
   it('works with different sheets',  () => {
@@ -245,7 +246,51 @@ describe('Function SUMIF(S) - calculations and optimizations', () => {
     expect(engine.getCellValue(adr('A4', 0))).toEqual(5)
     expect(engine.getCellValue(adr('A5', 0))).toEqual(7)
     expect(engine.getCellValue(adr('A4', 1))).toEqual(70)
-    expect(engine.stats.criterionFunctionFullCacheUsed).toEqual(0)
+    expect(engine.getStats().get(StatType.CRITERION_FUNCTION_FULL_CACHE_USED)).toEqual(0)
+  })
+
+  it('works when precision sensitive (default setting)', () => {
+    const engine = HyperFormula.buildFromArray([
+        ['1.0000000001', '1'],
+        ['1.00000000000005', '2'],
+        ['1.00000000000005', '4'],
+        ['=SUMIF(A1:A3, "=1", B1:B3)']
+      ])
+
+    expect(engine.getCellValue(adr('A4'))).toEqual(6)
+  })
+
+  it('case insensitive inequality', () => {
+    const engine = HyperFormula.buildFromArray( [
+      ['abcd', '1'],
+      ['ABCD', '2'],
+      ['abc', '4'],
+      ['=SUMIF(A1:A3, "<>abcd", B1:B3)']
+    ])
+
+    expect(engine.getCellValue(adr('A4'))).toEqual(4)
+  })
+
+  it('works when case insensitive', () => {
+    const engine = HyperFormula.buildFromArray( [
+      ['abcd', '1'],
+      ['ABCD', '2'],
+      ['abc', '4'],
+      ['=SUMIF(A1:A3, "=abcd", B1:B3)']
+    ])
+
+    expect(engine.getCellValue(adr('A4'))).toEqual(3)
+  })
+
+  it('works when case sensitive', () => {
+    const engine = HyperFormula.buildFromArray( [
+      ['abcd', '1'],
+      ['ABCD', '2'],
+      ['abc', '4'],
+      ['=SUMIF(A1:A3, "=abcd", B1:B3)']
+    ], {caseSensitive: true})
+
+    expect(engine.getCellValue(adr('A4'))).toEqual(1)
   })
 
   it('ignore errors', () => {

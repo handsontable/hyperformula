@@ -1,9 +1,15 @@
 import {AbsoluteCellRange} from './AbsoluteCellRange'
 import {absolutizeDependencies} from './absolutizeDependencies'
 import {EmptyValue, invalidSimpleCellAddress, simpleCellAddress, SimpleCellAddress} from './Cell'
-import {CellContent, CellContentParser, RawCellContent, isMatrix} from './CellContentParser'
+import {CellContent, CellContentParser, isMatrix, RawCellContent} from './CellContentParser'
 import {ClipboardOperations} from './ClipboardOperations'
-import {Operations, RemoveRowsCommand, normalizeRemovedIndexes, normalizeAddedIndexes, AddRowsCommand} from './Operations'
+import {
+  AddRowsCommand,
+  normalizeAddedIndexes,
+  normalizeRemovedIndexes,
+  Operations,
+  RemoveRowsCommand,
+} from './Operations'
 import {ColumnSearchStrategy} from './ColumnSearch/ColumnSearchStrategy'
 import {ColumnsSpan} from './ColumnsSpan'
 import {Config} from './Config'
@@ -12,24 +18,23 @@ import {
   AddressMapping,
   DependencyGraph,
   MatrixVertex,
+  ParsingErrorVertex,
   SheetMapping,
   ValueCellVertex,
-  ParsingErrorVertex,
 } from './DependencyGraph'
 import {ValueCellVertexValue} from './DependencyGraph/ValueCellVertex'
-import {AddColumnsDependencyTransformer} from './dependencyTransformers/addColumns'
-import {MoveCellsDependencyTransformer} from './dependencyTransformers/moveCells'
-import {RemoveColumnsDependencyTransformer} from './dependencyTransformers/removeColumns'
-import {RemoveSheetDependencyTransformer} from './dependencyTransformers/removeSheet'
 import {InvalidAddressError, InvalidArgumentsError, NoSheetWithIdError, NoSheetWithNameError} from './errors'
 import {buildMatrixVertex} from './GraphBuilder'
 import {Index} from './HyperFormula'
-import {IBatchExecutor} from './IBatchExecutor'
 import {LazilyTransformingAstService} from './LazilyTransformingAstService'
 import {ParserWithCaching, ProcedureAst} from './parser'
 import {RowsSpan} from './RowsSpan'
-import {Statistics, StatType} from './statistics/Statistics'
+import {Statistics, StatType} from './statistics'
 import {UndoRedo} from './UndoRedo'
+import {AddColumnsTransformer} from './dependencyTransformers/AddColumnsTransformer'
+import {RemoveColumnsTransformer} from './dependencyTransformers/RemoveColumnsTransformer'
+import {MoveCellsTransformer} from './dependencyTransformers/MoveCellsTransformer'
+import {RemoveSheetTransformer} from './dependencyTransformers/RemoveSheetTransformer'
 
 export class CrudOperations {
 
@@ -106,14 +111,15 @@ export class CrudOperations {
     const toBottom = destinationLeftCorner.row - sourceLeftCorner.row
     const toSheet = destinationLeftCorner.sheet
 
-    const valuesToRemove = this.dependencyGraph.addressMapping.valuesFromRange(targetRange)
+    const valuesToRemove = this.dependencyGraph.valuesFromRange(targetRange)
     this.columnSearch.removeValues(valuesToRemove)
-    const valuesToMove = this.dependencyGraph.addressMapping.valuesFromRange(sourceRange)
+    const valuesToMove = this.dependencyGraph.valuesFromRange(sourceRange)
     this.columnSearch.moveValues(valuesToMove, toRight, toBottom, toSheet)
 
     this.stats.measure(StatType.TRANSFORM_ASTS, () => {
-      MoveCellsDependencyTransformer.transform(sourceRange, toRight, toBottom, toSheet, this.dependencyGraph, this.parser)
-      this.lazilyTransformingAstService.addMoveCellsTransformation(sourceRange, toRight, toBottom, toSheet)
+      const transformation = new MoveCellsTransformer(sourceRange, toRight, toBottom, toSheet)
+      transformation.performEagerTransformations(this.dependencyGraph, this.parser)
+      this.lazilyTransformingAstService.addTransformation(transformation)
     })
 
     this.dependencyGraph.moveCells(sourceRange, toRight, toBottom, toSheet)
@@ -122,7 +128,6 @@ export class CrudOperations {
   public moveRows(sheet: number, startRow: number, numberOfRows: number, targetRow: number): void {
     this.ensureItIsPossibleToMoveRows(sheet, startRow, numberOfRows, targetRow)
 
-    const width = this.dependencyGraph.getSheetWidth(sheet)
     this.addRows(sheet, [targetRow, numberOfRows])
 
     if (targetRow < startRow) {
@@ -131,14 +136,13 @@ export class CrudOperations {
 
     const startAddress = simpleCellAddress(sheet, 0, startRow)
     const targetAddress = simpleCellAddress(sheet, 0, targetRow)
-    this.moveCells(startAddress, width, numberOfRows, targetAddress)
+    this.moveCells(startAddress, Number.POSITIVE_INFINITY, numberOfRows, targetAddress)
     this.removeRows(sheet, [startRow, numberOfRows])
   }
 
   public moveColumns(sheet: number, startColumn: number, numberOfColumns: number, targetColumn: number): void {
     this.ensureItIsPossibleToMoveColumns(sheet, startColumn, numberOfColumns, targetColumn)
 
-    const height = this.dependencyGraph.getSheetHeight(sheet)
     this.addColumns(sheet, [targetColumn, numberOfColumns])
 
     if (targetColumn < startColumn) {
@@ -147,7 +151,7 @@ export class CrudOperations {
 
     const startAddress = simpleCellAddress(sheet, startColumn, 0)
     const targetAddress = simpleCellAddress(sheet, targetColumn, 0)
-    this.moveCells(startAddress, numberOfColumns, height, targetAddress)
+    this.moveCells(startAddress, numberOfColumns, Number.POSITIVE_INFINITY, targetAddress)
     this.removeColumns(sheet, [startColumn, numberOfColumns])
   }
 
@@ -185,8 +189,9 @@ export class CrudOperations {
     this.dependencyGraph.removeSheet(sheetId)
 
     this.stats.measure(StatType.TRANSFORM_ASTS, () => {
-      RemoveSheetDependencyTransformer.transform(sheetId, this.dependencyGraph)
-      this.lazilyTransformingAstService.addRemoveSheetTransformation(sheetId)
+      const transformation = new RemoveSheetTransformer(sheetId)
+      transformation.performEagerTransformations(this.dependencyGraph, this.parser)
+      this.lazilyTransformingAstService.addTransformation(transformation)
     })
 
     this.sheetMapping.removeSheet(sheetId)
@@ -409,8 +414,7 @@ export class CrudOperations {
   public ensureItIsPossibleToMoveCells(sourceLeftCorner: SimpleCellAddress, width: number, height: number, destinationLeftCorner: SimpleCellAddress): void {
     if (
       invalidSimpleCellAddress(sourceLeftCorner) ||
-      !isPositiveInteger(width) ||
-      !isPositiveInteger(height) ||
+      !((isPositiveInteger(width) && isPositiveInteger(height)) || isRowOrColumnRange(sourceLeftCorner, width, height)) ||
       invalidSimpleCellAddress(destinationLeftCorner) ||
       !this.sheetMapping.hasSheetWithId(sourceLeftCorner.sheet) ||
       !this.sheetMapping.hasSheetWithId(destinationLeftCorner.sheet)
@@ -528,8 +532,9 @@ export class CrudOperations {
     this.columnSearch.addColumns(addedColumns)
 
     this.stats.measure(StatType.TRANSFORM_ASTS, () => {
-      AddColumnsDependencyTransformer.transform(addedColumns, this.dependencyGraph, this.parser)
-      this.lazilyTransformingAstService.addAddColumnsTransformation(addedColumns)
+      const transformation = new AddColumnsTransformer(addedColumns)
+      transformation.performEagerTransformations(this.dependencyGraph, this.parser)
+      this.lazilyTransformingAstService.addTransformation(transformation)
     })
   }
 
@@ -552,8 +557,9 @@ export class CrudOperations {
     this.columnSearch.removeColumns(removedColumns)
 
     this.stats.measure(StatType.TRANSFORM_ASTS, () => {
-      RemoveColumnsDependencyTransformer.transform(removedColumns, this.dependencyGraph, this.parser)
-      this.lazilyTransformingAstService.addRemoveColumnsTransformation(removedColumns)
+      const transformation = new RemoveColumnsTransformer(removedColumns)
+      transformation.performEagerTransformations(this.dependencyGraph, this.parser)
+      this.lazilyTransformingAstService.addTransformation(transformation)
     })
   }
 
@@ -575,6 +581,11 @@ export class CrudOperations {
   private get sheetMapping(): SheetMapping {
     return this.dependencyGraph.sheetMapping
   }
+}
+
+function isRowOrColumnRange(leftCorner: SimpleCellAddress, width: number, height: number): boolean {
+  return (leftCorner.row === 0 && isPositiveInteger(width) && height === Number.POSITIVE_INFINITY)
+    || (leftCorner.col === 0 && isPositiveInteger(height) && width === Number.POSITIVE_INFINITY)
 }
 
 function isPositiveInteger(x: number): boolean {

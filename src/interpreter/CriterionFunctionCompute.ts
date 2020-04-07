@@ -3,9 +3,9 @@ import {CellError, ErrorType, InternalCellValue, simpleCellAddress} from '../Cel
 import {CriterionCache, DependencyGraph, RangeVertex} from '../DependencyGraph'
 import {split} from '../generatorUtils'
 import {Maybe} from '../Maybe'
-import { CriterionLambda, CriterionPackage} from './Criterion'
+import {CriterionLambda, CriterionPackage} from './Criterion'
 import {Interpreter} from './Interpreter'
-import { SimpleRangeValue} from './InterpreterValue'
+import {SimpleRangeValue} from './InterpreterValue'
 
 const findSmallerRange = (dependencyGraph: DependencyGraph, conditionRanges: AbsoluteCellRange[], valuesRange: AbsoluteCellRange): {smallerRangeVertex: RangeVertex | null, restConditionRanges: AbsoluteCellRange[], restValuesRange: AbsoluteCellRange} => {
   if (valuesRange.end.row > valuesRange.start.row) {
@@ -53,7 +53,7 @@ export class CriterionFunctionCompute<T> {
       const fullCriterionString = conditions.map((c) => c.criterionPackage.raw).join(',')
       const cachedResult = this.findAlreadyComputedValueInCache(valuesRangeVertex, this.cacheKey(conditions), fullCriterionString)
       if (cachedResult) {
-        this.interpreter.stats.criterionFunctionFullCacheUsed++
+        this.interpreter.stats.incrementCriterionFunctionFullCacheUsed()
         return cachedResult
       }
 
@@ -123,7 +123,7 @@ export class CriterionFunctionCompute<T> {
     smallerCache.forEach(([value, criterionLambdas]: [T, CriterionLambda[]], key: string) => {
       const filteredValues = ifFilter(criterionLambdas, restConditionRanges.map((rcr) => getRangeValues(this.dependencyGraph, rcr)), Array.from(getRangeValues(this.dependencyGraph, restValuesRange)).map(this.mapFunction)[Symbol.iterator]())
       const newCacheValue = this.composeFunction(value, this.reduceFunction(filteredValues))
-      this.interpreter.stats.criterionFunctionPartialCacheUsed++
+      this.interpreter.stats.incrementCriterionFunctionPartialCacheUsed()
       newCache.set(key, [newCacheValue, criterionLambdas])
     })
 
@@ -140,7 +140,7 @@ export class Condition {
 }
 
 function * getRangeValues(dependencyGraph: DependencyGraph, cellRange: AbsoluteCellRange): IterableIterator<InternalCellValue> {
-  for (const cellFromRange of cellRange.addresses()) {
+  for (const cellFromRange of cellRange.addresses(dependencyGraph)) {
     yield dependencyGraph.getCellValue(cellFromRange)
   }
 }
