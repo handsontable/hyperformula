@@ -4,6 +4,7 @@ import {SheetMapping} from '../../src/DependencyGraph'
 import {buildTranslationPackage, enGB} from '../../src/i18n'
 import {AstNodeType, MinusUnaryOpAst, ParserWithCaching, PlusUnaryOpAst, PlusOpAst} from '../../src/parser'
 import {PercentOpAst, TimesOpAst} from '../../src/parser/Ast'
+import '../testConfig'
 
 describe('percent', () => {
   it('should parse % as operator', () => {

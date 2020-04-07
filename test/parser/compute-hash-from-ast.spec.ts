@@ -3,11 +3,11 @@ import {Config} from '../../src/Config'
 import {SheetMapping} from '../../src/DependencyGraph'
 import {buildTranslationPackage, enGB, plPL} from '../../src/i18n'
 import {buildLexerConfig, FormulaLexer, ParserWithCaching} from '../../src/parser'
-import {adr} from '../testUtils'
+import {adr, unregisterAllLanguages} from '../testUtils'
 
 describe('Compute hash from ast', () => {
   beforeEach(() => {
-    HyperFormula.unregisterAllLanguages()
+    unregisterAllLanguages()
     HyperFormula.registerLanguage('plPL', plPL)
     HyperFormula.registerLanguage('enGB', enGB)
   })

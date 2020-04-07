@@ -2,9 +2,9 @@ import {CellValue, DetailedCellError, HyperFormula} from '../src'
 import {AbsoluteCellRange, AbsoluteColumnRange, AbsoluteRowRange} from '../src/AbsoluteCellRange'
 import {CellError, ErrorType, InternalCellValue, SimpleCellAddress, simpleCellAddress} from '../src/Cell'
 import {Config} from '../src/Config'
-import {DateHelper} from '../src/DateHelper'
+import {DateTimeHelper} from '../src/DateTimeHelper'
 import {FormulaCellVertex, MatrixVertex} from '../src/DependencyGraph'
-import {defaultPrintDate} from '../src/format/format'
+import {defaultStringifyDateTime} from '../src/format/format'
 import {
   AstNodeType,
   buildCellErrorAst,
@@ -100,7 +100,7 @@ const colNumber = (input: string): number => {
 export function detailedError(errorType: ErrorType, message?: string, config?: Config): DetailedCellError {
   config = new Config(config)
   const error = new CellError(errorType, message)
-  return new DetailedCellError(error, config.getErrorTranslationFor(errorType))
+  return new DetailedCellError(error, config.translationPackage.getErrorTranslation(errorType))
 }
 
 export const expectEngineToBeTheSameAs = (actual: HyperFormula, expected: HyperFormula) => {
@@ -112,8 +112,8 @@ export function dateNumberToString(dateNumber: CellValue, config: Config): strin
   if(dateNumber instanceof DetailedCellError) {
     return dateNumber
   }
-  const dateHelper = new DateHelper(config)
-  const dateString = defaultPrintDate(dateHelper.numberToDate(dateNumber as number), config.dateFormats[0])
+  const dateHelper = new DateTimeHelper(config)
+  const dateString = defaultStringifyDateTime(dateHelper.numberToDateTime(dateNumber as number), config.dateFormats[0])
   return dateString ? dateString : ''
 }
 
@@ -122,5 +122,11 @@ export function expectCloseTo(actual: InternalCellValue, expected: number, preci
     expect(true).toBe(false)
   } else {
     expect(Math.abs(actual - expected)).toBeLessThan(precision)
+  }
+}
+
+export function unregisterAllLanguages() {
+  for (const langCode of HyperFormula.getRegisteredLanguagesCodes()) {
+    HyperFormula.unregisterLanguage(langCode)
   }
 }
