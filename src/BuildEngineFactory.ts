@@ -1,20 +1,20 @@
-import {LazilyTransformingAstService} from './'
+import {LazilyTransformingAstService} from './LazilyTransformingAstService'
 import {CellContentParser} from './CellContentParser'
+import {Exporter} from './CellValue'
 import {buildColumnSearchStrategy, ColumnSearchStrategy} from './ColumnSearch/ColumnSearchStrategy'
 import {Config, ConfigParams} from './Config'
-import {DateHelper} from './DateHelper'
-import {DependencyGraph} from './DependencyGraph'
-import {GraphBuilder, Sheet, Sheets} from './GraphBuilder'
-import {buildLexerConfig, ParserWithCaching, Unparser} from './parser'
-import {Evaluator} from './Evaluator'
-import {Statistics, EmptyStatistics, StatType} from './statistics'
-import {collatorFromConfig} from './StringHelper'
-import {UndoRedo} from './UndoRedo'
-import {NumberLiteralHelper} from './NumberLiteralHelper'
+import {DateTimeHelper} from './DateTimeHelper'
 import {CrudOperations} from './CrudOperations'
+import {DependencyGraph} from './DependencyGraph'
+import {Evaluator} from './Evaluator'
+import {GraphBuilder, Sheet, Sheets} from './GraphBuilder'
+import {UIElement} from './i18n'
 import {NamedExpressions} from './NamedExpressions'
-import {Exporter} from './CellValue'
+import {NumberLiteralHelper} from './NumberLiteralHelper'
+import {buildLexerConfig, ParserWithCaching, Unparser} from './parser'
 import {Serialization} from './Serialization'
+import {EmptyStatistics, Statistics, StatType} from './statistics'
+import {UndoRedo} from './UndoRedo'
 
 export type EngineState = {
   config: Config,
@@ -54,9 +54,8 @@ export class BuildEngineFactory {
     const notEmpty = sheetMapping.numberOfSheets() > 0
     const parser = new ParserWithCaching(config, notEmpty ? sheetMapping.get : sheetMapping.fetch)
     const unparser = new Unparser(config, buildLexerConfig(config), sheetMapping.fetchDisplayName)
-    const dateHelper = new DateHelper(config)
+    const dateHelper = new DateTimeHelper(config)
     const numberLiteralHelper = new NumberLiteralHelper(config)
-    const collator = collatorFromConfig(config)
     const cellContentParser = new CellContentParser(config, dateHelper, numberLiteralHelper)
 
     stats.measure(StatType.GRAPH_BUILD, () => {
@@ -67,7 +66,7 @@ export class BuildEngineFactory {
     lazilyTransformingAstService.undoRedo = undoRedo
     lazilyTransformingAstService.parser = parser
 
-    const evaluator = new Evaluator(dependencyGraph, columnSearch, config, stats, dateHelper, numberLiteralHelper, collator)
+    const evaluator = new Evaluator(dependencyGraph, columnSearch, config, stats, dateHelper, numberLiteralHelper)
     evaluator.run()
 
     const crudOperations = new CrudOperations(config, stats, dependencyGraph, columnSearch, parser, cellContentParser, lazilyTransformingAstService, undoRedo)
@@ -103,7 +102,7 @@ export class BuildEngineFactory {
 
   public static buildFromSheet(sheet: Sheet, configInput?: Partial<ConfigParams>): EngineState {
     const config = new Config(configInput)
-    const newsheetprefix = config.language.interface.NEW_SHEET_PREFIX + '1'
+    const newsheetprefix = config.translationPackage.getUITranslation(UIElement.NEW_SHEET_PREFIX) + '1'
     return this.buildEngine(config, {[newsheetprefix]: sheet})
   }
 

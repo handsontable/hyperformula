@@ -8,6 +8,7 @@ import '../testConfig'
 import {
   adr,
   expectArrayWithSameContent,
+  expectEngineToBeTheSameAs,
   expectFunctionToHaveRefError,
   expectReferenceToHaveRefError,
   extractMatrixRange,
@@ -722,21 +723,21 @@ describe('Removing columns - ranges', function() {
     expect(ranges.length).toBe(0)
     expect(engine.graph.hasNode(range)).toBe(false)
   })
-})
 
-it('does not truncate any ranges if columns are removed from different sheet', () => {
-  const engine = HyperFormula.buildFromSheets({
-    Sheet1: [
-      ['1', '2', '=SUM(A1:B1)'],
-    ],
-    Sheet2: [
-      ['1'],
-    ],
+  it('does not truncate any ranges if columns are removed from different sheet', () => {
+    const engine = HyperFormula.buildFromSheets({
+      Sheet1: [
+        ['1', '2', '=SUM(A1:B1)'],
+      ],
+      Sheet2: [
+        ['1'],
+      ],
+    })
+
+    engine.removeColumns(1, [0, 1])
+
+    expect(extractRange(engine, adr('C1'))).toEqual(new AbsoluteCellRange(adr('A1'), adr('B1')))
   })
-
-  engine.removeColumns(1, [0, 1])
-
-  expect(extractRange(engine, adr('C1'))).toEqual(new AbsoluteCellRange(adr('A1'), adr('B1')))
 })
 
 describe('Removing columns - sheet dimensions', () => {
@@ -776,5 +777,61 @@ describe('Removing columns - column index', () => {
 
     const index = (engine.columnSearch as ColumnIndex)
     expectArrayWithSameContent([0], index.getValueIndex(0, 0, 1).index)
+  })
+})
+
+describe('Removing columns - column range', () => {
+  it('removing column in the middle of column range', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1', '2', '3', '=SUM(A:C)']
+    ])
+
+    engine.removeColumns(0, [1, 1])
+
+    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
+      ['1', '3', '=SUM(A:B)']
+    ]))
+  })
+
+  it('removing column in at the start of column range', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1', '2', '3', '=SUM(A:C)']
+    ])
+
+    engine.removeColumns(0, [0, 1])
+
+    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
+      ['2', '3', '=SUM(A:B)']
+    ]))
+  })
+
+  it('removing column in at the end of column range', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1', '2', '3', '=SUM(A:C)']
+    ])
+
+    engine.removeColumns(0, [2, 1])
+
+    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
+      ['1', '2', '=SUM(A:B)']
+    ]))
+  })
+})
+
+describe('Removing columns - row range', () => {
+  it('should not affect row range', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1', '1', '1'],
+      ['2', '2', '2'],
+      [null, null, '=SUM(1:2)']
+    ])
+
+    engine.removeColumns(0, [0, 1])
+
+    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
+      ['1', '1'],
+      ['2', '2'],
+      [null, '=SUM(1:2)']
+    ]))
   })
 })

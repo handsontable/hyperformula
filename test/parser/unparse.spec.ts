@@ -1,19 +1,27 @@
+import {HyperFormula} from '../../src'
 import {simpleCellAddress} from '../../src/Cell'
 import {Config} from '../../src/Config'
 import {SheetMapping} from '../../src/DependencyGraph'
-import {enGB, plPL} from '../../src/i18n'
+import {buildTranslationPackage, enGB, plPL} from '../../src/i18n'
 import {AstNodeType, buildLexerConfig, ParserWithCaching, Unparser} from '../../src/parser'
-import {adr} from '../testUtils'
+import {adr, unregisterAllLanguages} from '../testUtils'
 
 describe('Unparse', () => {
   const config = new Config()
   const lexerConfig = buildLexerConfig(config)
-  const sheetMapping = new SheetMapping(enGB)
+  const sheetMapping = new SheetMapping(buildTranslationPackage(enGB))
   sheetMapping.addSheet('Sheet1')
   sheetMapping.addSheet('Sheet2')
   sheetMapping.addSheet('Sheet with spaces')
   const parser = new ParserWithCaching(config, sheetMapping.get)
   const unparser = new Unparser(config, lexerConfig, sheetMapping.fetchDisplayName)
+
+
+  beforeEach(() => {
+    unregisterAllLanguages()
+    HyperFormula.registerLanguage('plPL', plPL)
+    HyperFormula.registerLanguage('enGB', enGB)
+  })
 
   it('#unparse', () => {
     const formula = '=1+SUM(1,2,3)*3'
@@ -128,7 +136,7 @@ describe('Unparse', () => {
   })
 
   it('#unparse with known error with translation', () => {
-    const config = new Config({language: plPL})
+    const config = new Config({language: 'plPL'})
     const parser = new ParserWithCaching(config, sheetMapping.get)
     const unparser = new Unparser(config, buildLexerConfig(config), sheetMapping.fetchDisplayName)
     const formula = '=#ADR!'
@@ -273,8 +281,8 @@ describe('Unparse', () => {
   })
 
   it('#unparse use language configuration', () => {
-    const configEN = new Config({language: enGB})
-    const configPL = new Config({language: plPL})
+    const configEN = new Config({language: 'enGB'})
+    const configPL = new Config({language: 'plPL'})
 
     const parser = new ParserWithCaching(configPL, sheetMapping.get)
 
@@ -335,7 +343,7 @@ describe('Unparse', () => {
   it('unparsing numbers with decimal separator', () => {
     const config = new Config({ decimalSeparator: ',', functionArgSeparator: ';' })
     const lexerConfig = buildLexerConfig(config)
-    const sheetMapping = new SheetMapping(enGB)
+    const sheetMapping = new SheetMapping(buildTranslationPackage(enGB))
     sheetMapping.addSheet('Sheet1')
     const parser = new ParserWithCaching(config, sheetMapping.get)
     const unparser = new Unparser(config, lexerConfig, sheetMapping.fetchDisplayName)
@@ -346,12 +354,76 @@ describe('Unparse', () => {
 
     expect(unparsed).toEqual(formula)
   })
+
+  it('#unparse column range', () => {
+    const formula = '=A:B'
+    const ast = parser.parse(formula, simpleCellAddress(1, 0, 0)).ast
+    const unparsed = unparser.unparse(ast, adr('A1', 1))
+
+    expect(unparsed).toEqual(formula)
+  })
+
+  it('#unparse absolute column range', () => {
+    const formula = '=$A:B'
+    const ast = parser.parse(formula, simpleCellAddress(1, 0, 0)).ast
+    const unparsed = unparser.unparse(ast, adr('A1', 1))
+
+    expect(unparsed).toEqual(formula)
+  })
+
+  it('#unparse column range from other sheet', () => {
+    const formula = '=Sheet1!$A:B'
+    const ast = parser.parse(formula, simpleCellAddress(1, 0, 0)).ast
+    const unparsed = unparser.unparse(ast, adr('A1', 1))
+
+    expect(unparsed).toEqual(formula)
+  })
+
+  it('#unparse column range from other sheet - both sides', () => {
+    const formula = '=Sheet1!$A:Sheet1!B'
+    const ast = parser.parse(formula, simpleCellAddress(1, 0, 0)).ast
+    const unparsed = unparser.unparse(ast, adr('A1', 1))
+
+    expect(unparsed).toEqual(formula)
+  })
+
+  it('#unparse row range', () => {
+    const formula = '=1:2'
+    const ast = parser.parse(formula, simpleCellAddress(1, 0, 0)).ast
+    const unparsed = unparser.unparse(ast, adr('A1', 1))
+
+    expect(unparsed).toEqual(formula)
+  })
+
+  it('#unparse absolute row range', () => {
+    const formula = '=$1:2'
+    const ast = parser.parse(formula, simpleCellAddress(1, 0, 0)).ast
+    const unparsed = unparser.unparse(ast, adr('A1', 1))
+
+    expect(unparsed).toEqual(formula)
+  })
+
+  it('#unparse row range from other sheet', () => {
+    const formula = '=Sheet1!$1:2'
+    const ast = parser.parse(formula, simpleCellAddress(1, 0, 0)).ast
+    const unparsed = unparser.unparse(ast, adr('A1', 1))
+
+    expect(unparsed).toEqual(formula)
+  })
+
+  it('#unparse row range from other sheet - both sides', () => {
+    const formula = '=Sheet1!$1:Sheet1!2'
+    const ast = parser.parse(formula, simpleCellAddress(1, 0, 0)).ast
+    const unparsed = unparser.unparse(ast, adr('A1', 1))
+
+    expect(unparsed).toEqual(formula)
+  })
 })
 
 describe('whitespaces', () => {
   const config = new Config()
   const lexerConfig = buildLexerConfig(config)
-  const sheetMapping = new SheetMapping(enGB)
+  const sheetMapping = new SheetMapping(buildTranslationPackage(enGB))
   sheetMapping.addSheet('Sheet1')
   sheetMapping.addSheet('Sheet2')
   sheetMapping.addSheet('Sheet with spaces')

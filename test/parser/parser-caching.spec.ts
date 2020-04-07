@@ -1,14 +1,15 @@
 import {simpleCellAddress} from '../../src/Cell'
 import {Config} from '../../src/Config'
 import {SheetMapping} from '../../src/DependencyGraph'
-import {enGB} from '../../src/i18n'
+import {buildTranslationPackage, enGB} from '../../src/i18n'
 import {
   ParserWithCaching,
 } from '../../src/parser'
+import '../testConfig'
 
 describe('ParserWithCaching - caching', () => {
   it('it use cache for similar formulas', () => {
-    const parser = new ParserWithCaching(new Config(), new SheetMapping(enGB).get)
+    const parser = new ParserWithCaching(new Config(), new SheetMapping(buildTranslationPackage(enGB)).get)
 
     const ast1 = parser.parse('=A1', simpleCellAddress(0, 0, 0)).ast
     const ast2 = parser.parse('=A2', simpleCellAddress(0, 0, 1)).ast
@@ -18,7 +19,7 @@ describe('ParserWithCaching - caching', () => {
   })
 
   it("doesn't count cache for different formulas", () => {
-    const parser = new ParserWithCaching(new Config(), new SheetMapping(enGB).get)
+    const parser = new ParserWithCaching(new Config(), new SheetMapping(buildTranslationPackage(enGB)).get)
 
     // eslint-disable-next-line
     const bast1 = parser.parse('=A1', simpleCellAddress(0, 0, 0)).ast

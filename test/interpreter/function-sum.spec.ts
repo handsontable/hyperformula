@@ -17,8 +17,18 @@ describe('SUM', () => {
   })
 
   it('SUM with range args',  () => {
-    const engine =  HyperFormula.buildFromArray([['1', '2', '5'],
-      ['3', '4', '=SUM(A1:B2)']])
+    const engine =  HyperFormula.buildFromArray([
+      ['1', '2', '5'],
+      ['3', '4', '=SUM(A1:B2)']
+    ])
+    expect(engine.getCellValue(adr('C2'))).toEqual(10)
+  })
+
+  it('SUM with column range args',  () => {
+    const engine =  HyperFormula.buildFromArray([
+      ['1', '2', '5'],
+      ['3', '4', '=SUM(A:B)']
+    ])
     expect(engine.getCellValue(adr('C2'))).toEqual(10)
   })
 
@@ -47,6 +57,15 @@ describe('SUM', () => {
     expect(engine.getCellValue(adr('A7'))).toEqual(0)
     expect(engine.getCellValue(adr('A8'))).toEqual(0)
     expect(engine.getCellValue(adr('A9'))).toEqual(0)
+  })
+
+  it( 'works when precision (default setting)', () => {
+    const engine = HyperFormula.buildFromArray( [
+      ['1.00000000000005', '-1'],
+      ['=SUM(A1:B1)']
+    ])
+
+    expect(engine.getCellValue(adr('A2'))).toEqual(0)
   })
 
   it('explicitly called does coercions',  () => {

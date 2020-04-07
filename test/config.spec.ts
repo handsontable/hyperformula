@@ -1,12 +1,19 @@
-import {EmptyValue} from '../src'
+import {EmptyValue, HyperFormula} from '../src'
 import {Config} from '../src/Config'
-import {plPL} from '../src/i18n'
+import {enGB, plPL} from '../src/i18n'
+import {unregisterAllLanguages} from './testUtils'
 
 describe('Config', () => {
-  it('works', () => {
-    const config = new Config({language: plPL})
+  beforeEach(() => {
+    unregisterAllLanguages()
+    HyperFormula.registerLanguage('plPL', plPL)
+    HyperFormula.registerLanguage('enGB', enGB)
+  })
 
-    expect(config.language).toBe(plPL)
+  it('works', () => {
+    const config = new Config({language: 'plPL'})
+
+    expect(config.language).toBe('plPL')
   })
 
   it('has some defaults', () => {
@@ -16,15 +23,15 @@ describe('Config', () => {
   })
 
   it('computes list of volatile functions according to translation', () => {
-    const config = new Config({ language: plPL })
+    const config = new Config({ language: 'plPL' })
 
     expect(config.volatileFunctions()).toContain('LOSUJ')
   })
 
   it('can translate functions', () => {
-    const config = new Config({ language: plPL })
+    const config = new Config({ language: 'plPL' })
 
-    expect(config.getFunctionTranslationFor('SUM')).toEqual('SUMA')
+    expect(config.translationPackage.getFunctionTranslation('SUM')).toEqual('SUMA')
   })
 
   it( 'validation: boolean params', () => {
@@ -78,10 +85,10 @@ describe('Config', () => {
   it( 'validation: function params', () => {
     // eslint-disable-next-line
     // @ts-ignore
-    expect(() => new Config({parseDate: true})).toThrow('Expected value of type: function for config parameter: parseDate')
+    expect(() => new Config({parseDateTime: true})).toThrow('Expected value of type: function for config parameter: parseDateTime')
     // eslint-disable-next-line
     // @ts-ignore
-    expect(() => new Config({stringifyDate: 1})).toThrow('Expected value of type: function for config parameter: stringifyDate')
+    expect(() => new Config({stringifyDateTime: 1})).toThrow('Expected value of type: function for config parameter: stringifyDateTime')
   })
 
   it( 'validation: other params', () => {

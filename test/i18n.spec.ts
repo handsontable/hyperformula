@@ -1,18 +1,22 @@
 import {HyperFormula} from '../src'
 import {Config} from '../src/Config'
-import {enGB, languages, plPL} from '../src/i18n'
+import {languages, plPL, TranslationPackage} from '../src/i18n'
 import {CellAddress} from '../src/parser'
 import './testConfig.ts'
 import {adr, extractReference} from './testUtils'
 
 describe('i18n', () => {
+  beforeEach(() => {
+    HyperFormula.registerLanguage('plPL', plPL)
+  })
+
   it('using functions in different languages', () => {
     const enginePL = HyperFormula.buildFromArray([
       ['=SUMA(42)'],
-    ], {language: plPL})
+    ], {language: 'plPL'})
     const engineEN = HyperFormula.buildFromArray([
       ['=SUM(42)'],
-    ], {language: enGB})
+    ], {language: 'enGB'})
 
     expect(enginePL.getCellValue(adr('A1'))).toBe(42)
     expect(engineEN.getCellValue(adr('A1'))).toBe(42)
@@ -24,13 +28,13 @@ describe('i18n', () => {
       ['1'],
       ['2'],
       ['=LICZ.JEŻELI(A1:A3, ">=1")'],
-    ], {language: plPL})
+    ], {language: 'plPL'})
     const engineEN = HyperFormula.buildFromArray([
       ['0'],
       ['1'],
       ['2'],
       ['=COUNTIF(A1:A3, ">=1")'],
-    ], {language: enGB})
+    ], {language: 'enGB'})
 
     expect(enginePL.getCellValue(adr('A4'))).toBe(2)
     expect(engineEN.getCellValue(adr('A4'))).toBe(2)
@@ -39,7 +43,7 @@ describe('i18n', () => {
   it('translation works for parser hardcoded offset procedure', () => {
     const enginePL = HyperFormula.buildFromArray([
       ['=PRZESUNIĘCIE(A1, 1, 1)'],
-    ], {language: plPL})
+    ], {language: 'plPL'})
     const engineEN = HyperFormula.buildFromArray([
       ['=OFFSET(A1, 1, 1)'],
     ])
@@ -49,7 +53,7 @@ describe('i18n', () => {
   })
 
   it('all function translation keys has to be upper cased', () => {
-    for (const lang in languages) {
+      for (const lang in languages) {
       const translationPackage = languages[lang]
       for (const translationKey in translationPackage.functions) {
         expect(translationPackage.functions[translationKey]).toEqual(translationPackage.functions[translationKey].toUpperCase())
@@ -65,5 +69,11 @@ describe('i18n', () => {
       const translatedFunctionsInLang = new Set(Object.keys(languages[lang].functions))
       expect(translatedFunctionsInLang).toEqual(implementedFunctions)
     }
+  })
+
+  it('translation package sanitization', () => {
+    // eslint-disable-next-line
+    // @ts-ignore
+    expect(() => new TranslationPackage({}, {}, {})).toThrow()
   })
 })

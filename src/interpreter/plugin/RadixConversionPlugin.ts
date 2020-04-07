@@ -1,7 +1,7 @@
 import {CellError, ErrorType, InternalCellValue, SimpleCellAddress} from '../../Cell'
 import {padLeft} from '../../format/format'
 import {ProcedureAst} from '../../parser'
-import { coerceScalarToString} from '../coerce'
+import {coerceScalarToString} from '../ArithmeticHelper'
 import {SimpleRangeValue} from '../InterpreterValue'
 import {FunctionPlugin} from './FunctionPlugin'
 

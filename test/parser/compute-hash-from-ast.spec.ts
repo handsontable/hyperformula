@@ -1,12 +1,19 @@
+import {HyperFormula} from '../../src'
 import {Config} from '../../src/Config'
 import {SheetMapping} from '../../src/DependencyGraph'
-import {enGB, plPL} from '../../src/i18n'
+import {buildTranslationPackage, enGB, plPL} from '../../src/i18n'
 import {buildLexerConfig, FormulaLexer, ParserWithCaching} from '../../src/parser'
-import {adr} from '../testUtils'
+import {adr, unregisterAllLanguages} from '../testUtils'
 
 describe('Compute hash from ast', () => {
+  beforeEach(() => {
+    unregisterAllLanguages()
+    HyperFormula.registerLanguage('plPL', plPL)
+    HyperFormula.registerLanguage('enGB', enGB)
+  })
+
   const config = new Config()
-  const sheetMapping = new SheetMapping(enGB)
+  const sheetMapping = new SheetMapping(buildTranslationPackage(enGB))
   sheetMapping.addSheet('Sheet1')
   sheetMapping.addSheet('Sheet2')
   const lexer = new FormulaLexer(buildLexerConfig(config))
@@ -68,9 +75,38 @@ describe('Compute hash from ast', () => {
     expectHashFromAstMatchHashFromTokens(formula)
   })
 
-
   it('cell range with sheet on both sides', () => {
     const formula = '=Sheet1!A5:Sheet2!B16'
+    expectHashFromAstMatchHashFromTokens(formula)
+  })
+
+  it('column range',  () => {
+    const formula = '=$A:B'
+    expectHashFromAstMatchHashFromTokens(formula)
+  })
+
+  it('column range with sheet on the left', () => {
+    const formula = '=Sheet1!A:B'
+    expectHashFromAstMatchHashFromTokens(formula)
+  })
+
+  it('column range with sheet on both sides', () => {
+    const formula = '=Sheet1!A:Sheet2!B'
+    expectHashFromAstMatchHashFromTokens(formula)
+  })
+
+  it('row range',  () => {
+    const formula = '=$1:2'
+    expectHashFromAstMatchHashFromTokens(formula)
+  })
+
+  it('row range with sheet on the left', () => {
+    const formula = '=Sheet1!1:2'
+    expectHashFromAstMatchHashFromTokens(formula)
+  })
+
+  it('row range with sheet on both sides', () => {
+    const formula = '=Sheet1!1:Sheet2!2'
     expectHashFromAstMatchHashFromTokens(formula)
   })
 
@@ -110,8 +146,8 @@ describe('Compute hash from ast', () => {
   })
 
   it('procedure hash using canonical name', () => {
-    const config = new Config({ language: plPL })
-    const sheetMapping = new SheetMapping(plPL)
+    const config = new Config({ language: 'plPL' })
+    const sheetMapping = new SheetMapping(buildTranslationPackage(plPL))
     sheetMapping.addSheet('Sheet1')
     const lexer = new FormulaLexer(buildLexerConfig(config))
     const parser = new ParserWithCaching(config, sheetMapping.get)
@@ -127,8 +163,8 @@ describe('Compute hash from ast', () => {
   })
 
   it('procedure name with missing translation', () => {
-    const config = new Config({ language: plPL })
-    const sheetMapping = new SheetMapping(plPL)
+    const config = new Config({ language: 'plPL' })
+    const sheetMapping = new SheetMapping(buildTranslationPackage(plPL))
     sheetMapping.addSheet('Sheet1')
     const lexer = new FormulaLexer(buildLexerConfig(config))
     const parser = new ParserWithCaching(config, sheetMapping.get)
@@ -161,7 +197,7 @@ describe('Compute hash from ast', () => {
 
   it('should work with decimal separator', () => {
     const config = new Config({ decimalSeparator: ',', functionArgSeparator: ';' })
-    const sheetMapping = new SheetMapping(plPL)
+    const sheetMapping = new SheetMapping(buildTranslationPackage(plPL))
     sheetMapping.addSheet('Sheet1')
     const lexer = new FormulaLexer(buildLexerConfig(config))
     const parser = new ParserWithCaching(config, sheetMapping.get)

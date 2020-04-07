@@ -3,7 +3,7 @@ import {ErrorType, simpleCellAddress} from '../../src/Cell'
 import {ColumnIndex} from '../../src/ColumnSearch/ColumnIndex'
 import {EmptyCellVertex, MatrixVertex} from '../../src/DependencyGraph'
 import '../testConfig'
-import {adr, detailedError} from '../testUtils'
+import {adr, colEnd, colStart, detailedError, rowEnd, rowStart} from '../testUtils'
 
 describe('Changing cell content - checking if its possible', () => {
   it('address should have valid coordinates', () => {
@@ -226,7 +226,7 @@ describe('changing cell content', () => {
     expect(engine.getCellValue(adr('A3'))).toBe(7)
   })
 
-  it('#loadSheet - changing value inside range', () => {
+  it('changing value inside range', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '0'],
       ['2', '0'],
@@ -236,6 +236,30 @@ describe('changing cell content', () => {
 
     engine.setCellContents({sheet: 0, col: 0, row: 0}, '3')
     expect(engine.getCellValue(adr('B3'))).toEqual(8)
+  })
+
+  it('changing value inside column range', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1', '0'],
+      ['2', '0'],
+      ['3', '0', '=SUM(A:B)'],
+    ])
+    expect(engine.getCellValue(adr('C3'))).toEqual(6)
+
+    engine.setCellContents({sheet: 0, col: 1, row: 0}, '3')
+    expect(engine.getCellValue(adr('C3'))).toEqual(9)
+  })
+
+  it('changing value inside row range', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1', '0'],
+      ['2', '0'],
+      ['=SUM(1:2)'],
+    ])
+    expect(engine.getCellValue(adr('A3'))).toEqual(3)
+
+    engine.setCellContents({sheet: 0, col: 1, row: 0}, '3')
+    expect(engine.getCellValue(adr('A3'))).toEqual(6)
   })
 
   it('set formula for the first time', () => {
@@ -695,5 +719,91 @@ describe('numeric matrices', () => {
     expect(engine.graph.nodesCount()).toBe(5)
     expect(Array.from(engine.matrixMapping.numericMatrices()).length).toBe(1)
     expect(engine.getCellValue(adr('A1'))).toBe('foo')
+  })
+})
+
+describe('column ranges', () => {
+  it('works', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1', '2', '=SUM(A:B)']
+    ])
+
+    engine.setCellContents(adr('A1'), '3')
+
+    expect(engine.getCellValue(adr('C1'))).toEqual(5)
+  })
+
+  it('works when new content is added beyond previous sheet size', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1', '2', '=SUM(A:B)']
+    ])
+
+    engine.setCellContents(adr('A2'), '3')
+
+    const range = engine.rangeMapping.fetchRange(colStart('A'), colEnd('B'))
+    const a2 = engine.addressMapping.fetchCell(adr('A2'))
+    expect(engine.graph.existsEdge(a2, range)).toEqual(true)
+    expect(engine.getCellValue(adr('C1'))).toEqual(6)
+  })
+
+  it('works when adding matrix', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=SUM(B:C)'],
+      ['1'],
+      ['2'],
+    ])
+
+    engine.setCellContents(adr('B1'), '{=TRANSPOSE(A2:A3)}')
+
+    const range = engine.rangeMapping.fetchRange(colStart('B'), colEnd('C'))
+    const b1 = engine.addressMapping.fetchCell(adr('B1'))
+    const c1 = engine.addressMapping.fetchCell(adr('C1'))
+    expect(engine.graph.existsEdge(b1, range)).toEqual(true)
+    expect(engine.graph.existsEdge(c1, range)).toEqual(true)
+    expect(engine.getCellValue(adr('A1'))).toEqual(3)
+  })
+})
+
+describe('row ranges', () => {
+  it('works', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1'],
+      ['2'],
+      ['=SUM(1:2)']
+    ])
+
+    engine.setCellContents(adr('A1'), '3')
+
+    expect(engine.getCellValue(adr('A3'))).toEqual(5)
+  })
+
+  it('works when new content is added beyond previous sheet size', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1'],
+      ['2'],
+      ['=SUM(1:2)']
+    ])
+
+    engine.setCellContents(adr('B1'), '3')
+
+    const range = engine.rangeMapping.fetchRange(rowStart(1), rowEnd(2))
+    const b1 = engine.addressMapping.fetchCell(adr('B1'))
+    expect(engine.graph.existsEdge(b1, range)).toEqual(true)
+    expect(engine.getCellValue(adr('A3'))).toEqual(6)
+  })
+
+  it('works when adding matrix', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=SUM(2:3)', '1', '2'],
+    ])
+
+    engine.setCellContents(adr('A2'), '{=TRANSPOSE(B1:C1)}')
+
+    const range = engine.rangeMapping.fetchRange(rowStart(2), rowEnd(3))
+    const a2 = engine.addressMapping.fetchCell(adr('A2'))
+    const a3 = engine.addressMapping.fetchCell(adr('A3'))
+    expect(engine.graph.existsEdge(a2, range)).toEqual(true)
+    expect(engine.graph.existsEdge(a3, range)).toEqual(true)
+    expect(engine.getCellValue(adr('A1'))).toEqual(3)
   })
 })
