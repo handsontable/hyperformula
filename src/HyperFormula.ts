@@ -40,13 +40,21 @@ import {BuildEngineFactory, EngineState} from './BuildEngineFactory'
 export type Index = [number, number]
 
 /**
- * This is a class for creating HyperFormula instance. 
- * The instance can be seen as a workbook where worksheets can be created and methods are called.
- * All of the following methods are HyperFormula instance methods only.
- * The instance can be created only by calling one of the static methods: `buildFromArray`, `buildFromSheets` or `buildEmpty`.
- * It triggers the creation of dependency graph which is recalculated upon using CRUD methods.
- * Methods that fire events are marked accordingly, as well as thrown errors so they can be handled.
- * When no longer needed, the instance should be destroyed with `destroy` method.
+ * This is a class for creating HyperFormula instance, all the following public methods
+ * ale related to this class.
+ * 
+ * The instance can be created only by calling one of the static methods
+ * `buildFromArray`, `buildFromSheets` or `buildEmpty` and should be disposed of with
+ * `destroy` method when it's no longer needed to free the resources.
+ * 
+ * The instance can be seen as a workbook where worksheets can be created and
+ * manipulated. They are organized within a widely know structure of columns and rows
+ * which can be manipulated as well. The smallest possible data unit are the cells, which
+ * may contain simple values or formulas to be calculated.
+ * 
+ * All CRUD methods are called directly on HyperFormula instance and will trigger
+ * corresponding lifecycle events. The events are marked accordingly, as well as thrown
+ * errors so they can be correctly handled.
  */
 export class HyperFormula implements TypedEmitter {
 
