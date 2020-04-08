@@ -936,6 +936,11 @@ export class HyperFormula implements TypedEmitter {
     return this.recomputeIfDependencyGraphNeedsIt()
   }
 
+  public isClipboardEmpty(): boolean {
+    return this._crudOperations.isClipboardEmpty()
+  }
+
+
   /**
    * Clears the clipboard content by setting the content to `undefined`.
    *

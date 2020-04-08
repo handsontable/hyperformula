@@ -137,6 +137,10 @@ export class CrudOperations {
     }
   }
 
+  public isClipboardEmpty(): boolean {
+    return this.clipboardOperations.clipboard === undefined
+  }
+
   public clearClipboard(): void {
     this.clipboardOperations.clear()
   }
