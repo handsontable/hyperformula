@@ -451,6 +451,10 @@ export class UndoRedo {
         this.redoSetSheetContent(operation)
         break
       }
+      case UndoStackElementType.PASTE: {
+        this.redoPaste(operation)
+        break
+      }
     }
 
     this.undoStack.push(operation)
@@ -471,6 +475,18 @@ export class UndoRedo {
     const { sheet, columnsRemovals } = operation
     for (const columnsRemoval of columnsRemovals) {
       this.crudOperations!.operations.removeColumns(new RemoveColumnsCommand(sheet, [[columnsRemoval.columnFrom, columnsRemoval.columnCount]]))
+    }
+  }
+
+  private redoPaste(operation: PasteUndoData) {
+    const { targetLeftCorner, newContent } = operation
+    const height = newContent.length
+    const width = newContent[0].length
+    for (let y = 0; y < height; ++y) {
+      for (let x = 0; x < width; ++x) {
+        const address = simpleCellAddress(targetLeftCorner.sheet, targetLeftCorner.col + x, targetLeftCorner.row + y)
+        this.crudOperations!.operations.restoreCell(address, newContent[y][x])
+      }
     }
   }
 

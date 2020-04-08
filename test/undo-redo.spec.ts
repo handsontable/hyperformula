@@ -1052,6 +1052,40 @@ describe('Redo - removing column', () => {
   })
 })
 
+describe('Redo - cut-paste', () => {
+  it('works', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['foo'],
+      ['bar'],
+    ])
+    engine.cut(adr('A1'), 1, 1)
+    engine.paste(adr('A2'))
+    const snapshot = engine.getAllSheetsSerialized()
+    engine.undo()
+
+    engine.redo()
+
+    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromSheets(snapshot))
+  })
+})
+
+describe('Redo - copy-paste', () => {
+  it('works', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['foo', 'baz'],
+      ['bar', 'faz'],
+    ])
+    engine.copy(adr('A1'), 2, 2)
+    engine.paste(adr('C3'))
+    const snapshot = engine.getAllSheetsSerialized()
+    engine.undo()
+
+    engine.redo()
+
+    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromSheets(snapshot))
+  })
+})
+
 describe('Redo - setting sheet contents', () => {
   it('works for basic case', () => {
     const engine = HyperFormula.buildFromArray([['13']])
