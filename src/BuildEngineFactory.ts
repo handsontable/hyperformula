@@ -1,3 +1,8 @@
+/**
+ * @license
+ * Copyright (c) 2020 Handsoncode. All rights reserved.
+ */
+
 import {LazilyTransformingAstService} from './LazilyTransformingAstService'
 import {CellContentParser} from './CellContentParser'
 import {Exporter} from './CellValue'

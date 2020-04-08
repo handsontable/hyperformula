@@ -1,3 +1,8 @@
+/**
+ * @license
+ * Copyright (c) 2020 Handsoncode. All rights reserved.
+ */
+
 import {CellRange, simpleCellAddress, SimpleCellAddress, SimpleColumnAddress, SimpleRowAddress} from './Cell'
 import {DependencyGraph} from './DependencyGraph'
 import {AstNodeType, CellAddress, CellRangeAst} from './parser'

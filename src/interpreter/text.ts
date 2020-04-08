@@ -1,3 +1,8 @@
+/**
+ * @license
+ * Copyright (c) 2020 Handsoncode. All rights reserved.
+ */
+
 import {CellError, EmptyValue, ErrorType, InternalCellValue} from '../Cell'
 import {InterpreterValue, SimpleRangeValue} from './InterpreterValue'
 

@@ -1,3 +1,8 @@
+/**
+ * @license
+ * Copyright (c) 2020 Handsoncode. All rights reserved.
+ */
+
 import {InternalCellValue} from '../Cell'
 import {Config} from '../Config'
 import {DateTimeHelper, SimpleDateTime} from '../DateTimeHelper'

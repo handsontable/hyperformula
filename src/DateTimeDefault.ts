@@ -1,3 +1,8 @@
+/**
+ * @license
+ * Copyright (c) 2020 Handsoncode. All rights reserved.
+ */
+
 import {DateTime, SimpleDate, SimpleTime} from './DateTimeHelper'
 import {Maybe} from './Maybe'
 
