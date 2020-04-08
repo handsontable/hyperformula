@@ -41,8 +41,8 @@ export class InvalidAddressError extends Error {
  * Error thrown when the given arguments are invalid
  */
 export class InvalidArgumentsError extends Error {
-  constructor() {
-    super('Invalid arguments')
+  constructor(expectedArguments?: string) {
+    super(`Invalid arguments, expected ${expectedArguments}`)
   }
 }
 
