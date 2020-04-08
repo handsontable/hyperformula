@@ -1007,6 +1007,30 @@ describe('Redo - removing column', () => {
   })
 })
 
+describe('Redo - setting sheet contents', () => {
+  it('works for basic case', () => {
+    const engine = HyperFormula.buildFromArray([['13']])
+    engine.setSheetContent("Sheet1", [['42']])
+    const snapshot = engine.getAllSheetsSerialized()
+    engine.undo()
+
+    engine.redo()
+
+    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromSheets(snapshot))
+  })
+
+  it('also clears sheet when redoing', () => {
+    const engine = HyperFormula.buildFromArray([['13', '14']])
+    engine.setSheetContent("Sheet1", [['42']])
+    const snapshot = engine.getAllSheetsSerialized()
+    engine.undo()
+
+    engine.redo()
+
+    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromSheets(snapshot))
+  })
+})
+
 describe('Redo', () => {
   it('when there is no operation to redo', () => {
     const engine = HyperFormula.buildEmpty()

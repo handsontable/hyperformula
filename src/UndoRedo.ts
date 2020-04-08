@@ -428,6 +428,10 @@ export class UndoRedo {
         this.redoMoveCells(operation)
         break
       }
+      case UndoStackElementType.SET_SHEET_CONTENT: {
+        this.redoSetSheetContent(operation)
+        break
+      }
     }
 
     this.undoStack.push(operation)
@@ -488,6 +492,17 @@ export class UndoRedo {
   private redoClearSheet(operation: ClearSheetUndoData) {
     const { sheetId } = operation
     this.crudOperations!.operations.clearSheet(sheetId)
+  }
+
+  private redoSetSheetContent(operation: SetSheetContentUndoData) {
+    const { sheetId, newSheetContent } = operation
+    this.crudOperations!.operations.clearSheet(sheetId)
+    for (let row = 0; row < newSheetContent.length; row++) {
+      for (let col = 0; col < newSheetContent[row].length; col++) {
+        const address = simpleCellAddress(sheetId, col, row)
+        this.crudOperations!.operations.setCellContent(address, newSheetContent[row][col])
+      }
+    }
   }
 
   private restoreOldDataFromVersion(version: number) {
