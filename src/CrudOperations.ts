@@ -89,6 +89,7 @@ export class CrudOperations {
   public addColumns(sheet: number, ...indexes: Index[]): void {
     const addColumnsCommand = new AddColumnsCommand(sheet, indexes)
     this.ensureItIsPossibleToAddColumns(sheet, ...indexes)
+    this.undoRedo.clearRedoStack()
     this.clipboardOperations.abortCut()
     this.operations.addColumns(addColumnsCommand)
     this.undoRedo.saveOperationAddColumns(addColumnsCommand)
