@@ -228,6 +228,7 @@ export class CrudOperations {
 
   public setSheetContent(sheetName: string, values: RawCellContent[][]): void {
     this.ensureSheetExists(sheetName)
+    this.undoRedo.clearRedoStack()
     this.clipboardOperations.abortCut()
     if (!(values instanceof Array)) {
       throw new Error('Expected an array of arrays.')
