@@ -199,24 +199,20 @@ export class CrudOperations {
 
   public setSheetContent(sheetName: string, values: RawCellContent[][]): void {
     this.ensureSheetExists(sheetName)
-    const sheetId = this.sheetMapping.fetch(sheetName)
-
-    this.clearSheet(sheetName)
+    this.clipboardOperations.abortCut()
     if (!(values instanceof Array)) {
       throw new Error('Expected an array of arrays.')
     }
+    const sheetId = this.sheetMapping.fetch(sheetName)
+    const oldSheetContent = this.operations.getSheetClipboardCells(sheetId)
+    this.operations.clearSheet(sheetId)
     for (let i = 0; i < values.length; i++) {
       if (!(values[i] instanceof Array)) {
         throw new Error('Expected an array of arrays.')
       }
       for (let j = 0; j < values[i].length; j++) {
-        const address = {
-          sheet: sheetId,
-          row: i,
-          col: j,
-        }
+        const address = simpleCellAddress(sheetId, j, i)
         this.ensureItIsPossibleToChangeContent(address)
-        this.clipboardOperations.abortCut()
         this.operations.setCellContent(address, values[i][j])
       }
     }
