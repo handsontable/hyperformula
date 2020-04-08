@@ -107,7 +107,6 @@ export class ClipboardOperations {
 
     switch (this.clipboard.type) {
       case ClipboardOperationType.COPY: {
-        this.ensureItIsPossibleToCopyPaste(destinationLeftCorner)
         const targetRange = AbsoluteCellRange.spanFrom(destinationLeftCorner, this.clipboard.width, this.clipboard.height)
         this.dependencyGraph.breakNumericMatricesInRange(targetRange)
 
@@ -152,5 +151,9 @@ export class ClipboardOperations {
 
   public isCutClipboard(): boolean {
     return this.clipboard !== undefined && this.clipboard.type === ClipboardOperationType.CUT
+  }
+
+  public isCopyClipboard(): boolean {
+    return this.clipboard !== undefined && this.clipboard.type === ClipboardOperationType.COPY
   }
 }

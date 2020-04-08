@@ -606,6 +606,22 @@ describe('Undo - cut-paste', () => {
   })
 })
 
+describe('Undo - copy-paste', () => {
+  it('works', () => {
+    const sheet = [
+      ['foo'],
+      ['bar'],
+    ]
+    const engine = HyperFormula.buildFromArray(sheet)
+    engine.copy(adr('A1'), 1, 1)
+    engine.paste(adr('A2'))
+
+    engine.undo()
+
+    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray(sheet))
+  })
+})
+
 describe('Undo', () => {
   it('when there is no operation to undo', () => {
     const engine = HyperFormula.buildEmpty()

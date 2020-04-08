@@ -22,6 +22,7 @@ enum UndoStackElementType {
   CLEAR_SHEET = 'CLEAR_SHEET',
   MOVE_CELLS = 'MOVE_CELLS',
   SET_SHEET_CONTENT = 'SET_SHEET_CONTENT',
+  PASTE = 'PASTE',
 }
 
 interface RemoveRowsUndoData {
@@ -107,6 +108,13 @@ interface SetCellContentsUndoData {
   }[],
 }
 
+interface PasteUndoData {
+  type: UndoStackElementType.PASTE,
+  targetLeftCorner: SimpleCellAddress,
+  oldContent: [SimpleCellAddress, ClipboardCell][],
+  newContent: ClipboardCell[][],
+}
+
 type UndoStackElement
   = RemoveRowsUndoData
   | AddRowsUndoData
@@ -120,6 +128,7 @@ type UndoStackElement
   | ClearSheetUndoData
   | MoveCellsUndoData
   | SetSheetContentUndoData
+  | PasteUndoData
 
 export class UndoRedo {
 
@@ -162,6 +171,10 @@ export class UndoRedo {
 
   public saveOperationSetCellContents(cellContents: { address: SimpleCellAddress, newContent: RawCellContent, oldContent: ClipboardCell }[]) {
     this.undoStack.push({ type: UndoStackElementType.SET_CELL_CONTENTS, cellContents })
+  }
+
+  public saveOperationPaste(targetLeftCorner: SimpleCellAddress, newContent: ClipboardCell[][], oldContent: [SimpleCellAddress, ClipboardCell][]) {
+    this.undoStack.push({ type: UndoStackElementType.PASTE, targetLeftCorner, oldContent, newContent })
   }
 
   public saveOperationRemoveSheet(sheetName: string, sheetId: number, oldSheetContent: ClipboardCell[][], version: number): void {
@@ -251,6 +264,10 @@ export class UndoRedo {
         this.undoSetSheetContent(operation)
         break
       }
+      case UndoStackElementType.PASTE: {
+        this.undoPaste(operation)
+        break
+      }
     }
     this.redoStack.push(operation)
   }
@@ -306,6 +323,12 @@ export class UndoRedo {
   private undoSetCellContents(operation: SetCellContentsUndoData) {
     for (const cellContentData of operation.cellContents) {
       this.crudOperations!.operations.restoreCell(cellContentData.address, cellContentData.oldContent)
+    }
+  }
+
+  private undoPaste(operation: PasteUndoData) {
+    for (const [address, clipboardCell] of operation.oldContent) {
+      this.crudOperations!.operations.restoreCell(address, clipboardCell)
     }
   }
 

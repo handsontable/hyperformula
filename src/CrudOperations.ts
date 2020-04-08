@@ -133,8 +133,13 @@ export class CrudOperations {
       const { version, overwrittenCellsData } = this.operations.moveCells(clipboard.sourceLeftCorner, clipboard.width, clipboard.height, targetLeftCorner)
       this.clipboardOperations.abortCut()
       this.undoRedo.saveOperationMoveCells(clipboard.sourceLeftCorner, clipboard.width, clipboard.height, targetLeftCorner, overwrittenCellsData, version)
-    } else {
+    } else if (this.clipboardOperations.isCopyClipboard()) {
+      const clipboard = this.clipboardOperations.clipboard!
+      this.clipboardOperations.ensureItIsPossibleToCopyPaste(targetLeftCorner)
+      const targetRange = AbsoluteCellRange.spanFrom(targetLeftCorner, clipboard.width, clipboard.height)
+      const oldContent = this.operations.getRangeClipboardCells(targetRange)
       this.clipboardOperations.paste(targetLeftCorner)
+      this.undoRedo.saveOperationPaste(targetLeftCorner, clipboard.content!, oldContent)
     }
   }
 
