@@ -132,6 +132,7 @@ export class CrudOperations {
       const clipboard = this.clipboardOperations.clipboard!
       const { version, overwrittenCellsData } = this.operations.moveCells(clipboard.sourceLeftCorner, clipboard.width, clipboard.height, targetLeftCorner)
       this.clipboardOperations.abortCut()
+      this.undoRedo.saveOperationMoveCells(clipboard.sourceLeftCorner, clipboard.width, clipboard.height, targetLeftCorner, overwrittenCellsData, version)
     } else {
       this.clipboardOperations.paste(targetLeftCorner)
     }

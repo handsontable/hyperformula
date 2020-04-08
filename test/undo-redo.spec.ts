@@ -577,6 +577,35 @@ describe('Undo - moving cells', () => {
   })
 })
 
+describe('Undo - cut-paste', () => {
+  it('works for static content', () => {
+    const sheet = [
+      ['foo'],
+      ['bar'],
+    ]
+    const engine = HyperFormula.buildFromArray(sheet)
+    engine.cut(adr('A1'), 1, 1)
+    engine.paste(adr('A2'))
+
+    engine.undo()
+
+    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray(sheet))
+  })
+
+  it('undoing doesnt roll back clipboard', () => {
+    const sheet = [
+      ['foo'],
+      ['bar'],
+    ]
+    const engine = HyperFormula.buildFromArray(sheet)
+    engine.cut(adr('A1'), 1, 1)
+    engine.paste(adr('A2'))
+    engine.undo()
+
+    expect(engine.isClipboardEmpty()).toBe(true)
+  })
+})
+
 describe('Undo', () => {
   it('when there is no operation to undo', () => {
     const engine = HyperFormula.buildEmpty()
