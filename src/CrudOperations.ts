@@ -98,6 +98,7 @@ export class CrudOperations {
   public removeColumns(sheet: number, ...indexes: Index[]): void {
     const removeColumnsCommand = new RemoveColumnsCommand(sheet, indexes)
     this.ensureItIsPossibleToRemoveColumns(sheet, ...indexes)
+    this.undoRedo.clearRedoStack()
     this.clipboardOperations.abortCut()
     const columnsRemovals = this.operations.removeColumns(removeColumnsCommand)
     this.undoRedo.saveOperationRemoveColumns(removeColumnsCommand, columnsRemovals)

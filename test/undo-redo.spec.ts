@@ -1150,6 +1150,16 @@ describe('Redo - removing column', () => {
 
     expectEngineToBeTheSameAs(engine, HyperFormula.buildFromSheets(snapshot))
   })
+
+  it('clears redo stack', () => {
+    const engine = HyperFormula.buildFromArray([])
+    engine.setCellContents(adr('A1'), 42)
+    engine.undo()
+
+    engine.removeColumns(0, [1000, 1])
+
+    expect(engine.isThereSomethingToRedo()).toBe(false)
+  })
 })
 
 describe('Redo - cut-paste', () => {
