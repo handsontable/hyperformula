@@ -1177,6 +1177,27 @@ describe('Redo - cut-paste', () => {
 
     expectEngineToBeTheSameAs(engine, HyperFormula.buildFromSheets(snapshot))
   })
+
+  it('cut does not clear redo stack', () => {
+    const engine = HyperFormula.buildFromArray([])
+    engine.setCellContents(adr('A1'), 42)
+    engine.undo()
+
+    engine.cut(adr('A1'), 1, 1)
+
+    expect(engine.isThereSomethingToRedo()).toBe(true)
+  })
+
+  it('cut-paste clears redo stack', () => {
+    const engine = HyperFormula.buildFromArray([])
+    engine.setCellContents(adr('A1'), 42)
+    engine.undo()
+
+    engine.cut(adr('A1'), 1, 1)
+    engine.paste(adr('A2'))
+
+    expect(engine.isThereSomethingToRedo()).toBe(false)
+  })
 })
 
 describe('Redo - copy-paste', () => {

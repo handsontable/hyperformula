@@ -137,6 +137,7 @@ export class CrudOperations {
   public paste(targetLeftCorner: SimpleCellAddress): void {
     if (this.clipboardOperations.isCutClipboard()) {
       const clipboard = this.clipboardOperations.clipboard!
+      this.undoRedo.clearRedoStack()
       const { version, overwrittenCellsData } = this.operations.moveCells(clipboard.sourceLeftCorner, clipboard.width, clipboard.height, targetLeftCorner)
       this.clipboardOperations.abortCut()
       this.undoRedo.saveOperationMoveCells(clipboard.sourceLeftCorner, clipboard.width, clipboard.height, targetLeftCorner, overwrittenCellsData, version)
