@@ -7,7 +7,7 @@ import {simpleCellAddress, SimpleCellAddress, NoErrorCellValue} from './Cell'
 import {ClipboardCell, ClipboardCellType} from './ClipboardOperations'
 import {RawCellContent} from './CellContentParser'
 import {RemoveColumnsCommand, AddColumnsCommand, RowsRemoval, ColumnsRemoval, RemoveRowsCommand, AddRowsCommand} from './Operations'
-import {CrudOperations} from './CrudOperations'
+import {Operations} from './Operations'
 
 enum UndoStackElementType {
   REMOVE_ROWS = 'REMOVE_ROWS',
@@ -133,7 +133,11 @@ type UndoStackElement
 export class UndoRedo {
   private readonly undoStack: UndoStackElement[] = []
   private redoStack: UndoStackElement[] = []
-  public crudOperations?: CrudOperations
+
+  constructor(
+    public readonly operations: Operations
+  ) {
+  }
 
   public oldData: Map<number, [SimpleCellAddress, string][]> = new Map()
 
@@ -273,15 +277,15 @@ export class UndoRedo {
   }
 
   private undoRemoveRows(operation: RemoveRowsUndoData) {
-    this.crudOperations!.operations.forceApplyPostponedTransformations()
+    this.operations.forceApplyPostponedTransformations()
 
     const { sheet, rowsRemovals } = operation
     for (let i = rowsRemovals.length - 1; i >= 0; --i) {
       const rowsRemoval = rowsRemovals[i]
-      this.crudOperations!.operations.addRows(new AddRowsCommand(sheet, [[rowsRemoval.rowFrom, rowsRemoval.rowCount]]))
+      this.operations.addRows(new AddRowsCommand(sheet, [[rowsRemoval.rowFrom, rowsRemoval.rowCount]]))
 
       for (const { address, cellType } of rowsRemoval.removedCells) {
-        this.crudOperations!.operations.restoreCell(address, cellType)
+        this.operations.restoreCell(address, cellType)
       }
 
       this.restoreOldDataFromVersion(rowsRemoval.version - 1)
@@ -289,15 +293,15 @@ export class UndoRedo {
   }
 
   private undoRemoveColumns(operation: RemoveColumnsUndoData) {
-    this.crudOperations!.operations.forceApplyPostponedTransformations()
+    this.operations.forceApplyPostponedTransformations()
 
     const { sheet, columnsRemovals } = operation
     for (let i = columnsRemovals.length - 1; i >= 0; --i) {
       const columnsRemoval = columnsRemovals[i]
-      this.crudOperations!.operations.addColumns(new AddColumnsCommand(sheet, [[columnsRemoval.columnFrom, columnsRemoval.columnCount]]))
+      this.operations.addColumns(new AddColumnsCommand(sheet, [[columnsRemoval.columnFrom, columnsRemoval.columnCount]]))
 
       for (const { address, cellType } of columnsRemoval.removedCells) {
-        this.crudOperations!.operations.restoreCell(address, cellType)
+        this.operations.restoreCell(address, cellType)
       }
 
       this.restoreOldDataFromVersion(columnsRemoval.version - 1)
@@ -308,7 +312,7 @@ export class UndoRedo {
     const addedRowsSpans = operation.command.rowsSpans()
     for (let i = addedRowsSpans.length - 1; i >= 0; --i) {
       const addedRows = addedRowsSpans[i]
-      this.crudOperations!.operations.removeRows(new RemoveRowsCommand(operation.command.sheet, [[addedRows.rowStart, addedRows.numberOfRows]]))
+      this.operations.removeRows(new RemoveRowsCommand(operation.command.sheet, [[addedRows.rowStart, addedRows.numberOfRows]]))
     }
   }
 
@@ -316,38 +320,38 @@ export class UndoRedo {
     const addedColumnsSpans = operation.command.columnsSpans()
     for (let i = addedColumnsSpans.length - 1; i >= 0; --i) {
       const addedColumns = addedColumnsSpans[i]
-      this.crudOperations!.operations.removeColumns(new RemoveColumnsCommand(operation.command.sheet, [[addedColumns.columnStart, addedColumns.numberOfColumns]]))
+      this.operations.removeColumns(new RemoveColumnsCommand(operation.command.sheet, [[addedColumns.columnStart, addedColumns.numberOfColumns]]))
     }
   }
 
   private undoSetCellContents(operation: SetCellContentsUndoData) {
     for (const cellContentData of operation.cellContents) {
-      this.crudOperations!.operations.restoreCell(cellContentData.address, cellContentData.oldContent)
+      this.operations.restoreCell(cellContentData.address, cellContentData.oldContent)
     }
   }
 
   private undoPaste(operation: PasteUndoData) {
     for (const [address, clipboardCell] of operation.oldContent) {
-      this.crudOperations!.operations.restoreCell(address, clipboardCell)
+      this.operations.restoreCell(address, clipboardCell)
     }
   }
 
   private undoMoveRows(operation: MoveRowsUndoData) {
     const { sheet } = operation
-    this.crudOperations!.operations.moveRows(sheet, operation.targetRow - operation.numberOfRows, operation.numberOfRows, operation.startRow)
+    this.operations.moveRows(sheet, operation.targetRow - operation.numberOfRows, operation.numberOfRows, operation.startRow)
   }
 
   private undoMoveColumns(operation: MoveColumnsUndoData) {
     const { sheet } = operation
-    this.crudOperations!.operations.moveColumns(sheet, operation.targetColumn - operation.numberOfColumns, operation.numberOfColumns, operation.startColumn)
+    this.operations.moveColumns(sheet, operation.targetColumn - operation.numberOfColumns, operation.numberOfColumns, operation.startColumn)
   }
 
   public undoMoveCells(operation: MoveCellsUndoData): void {
-    this.crudOperations!.operations.forceApplyPostponedTransformations()
-    this.crudOperations!.operations.moveCells(operation.destinationLeftCorner, operation.width, operation.height, operation.sourceLeftCorner)
+    this.operations.forceApplyPostponedTransformations()
+    this.operations.moveCells(operation.destinationLeftCorner, operation.width, operation.height, operation.sourceLeftCorner)
 
     for (const [ address, clipboardCell ] of operation.overwrittenCellsData) {
-      this.crudOperations!.operations.restoreCell(address, clipboardCell)
+      this.operations.restoreCell(address, clipboardCell)
     }
 
     this.restoreOldDataFromVersion(operation.version - 1)
@@ -355,19 +359,19 @@ export class UndoRedo {
 
   private undoAddSheet(operation: AddSheetUndoData) {
     const { sheetName } = operation
-    this.crudOperations!.operations.removeSheet(sheetName)
+    this.operations.removeSheet(sheetName)
   }
 
   private undoRemoveSheet(operation: RemoveSheetUndoData) {
-    this.crudOperations!.operations.forceApplyPostponedTransformations()
+    this.operations.forceApplyPostponedTransformations()
     const { oldSheetContent, sheetId } = operation
-    this.crudOperations!.operations.addSheet(operation.sheetName)
+    this.operations.addSheet(operation.sheetName)
     for (let rowIndex = 0; rowIndex < oldSheetContent.length; rowIndex++) {
       const row = oldSheetContent[rowIndex]
       for (let col = 0; col < row.length; col++) {
         const cellType = row[col]
         const address = simpleCellAddress(sheetId, col, rowIndex)
-        this.crudOperations!.operations.restoreCell(address, cellType)
+        this.operations.restoreCell(address, cellType)
       }
     }
 
@@ -381,20 +385,20 @@ export class UndoRedo {
       for (let col = 0; col < row.length; col++) {
         const cellType = row[col]
         const address = simpleCellAddress(sheetId, col, rowIndex)
-        this.crudOperations!.operations.restoreCell(address, cellType)
+        this.operations.restoreCell(address, cellType)
       }
     }
   }
 
   private undoSetSheetContent(operation: SetSheetContentUndoData) {
     const { oldSheetContent, newSheetContent, sheetId } = operation
-    this.crudOperations!.operations.clearSheet(sheetId)
+    this.operations.clearSheet(sheetId)
     for (let rowIndex = 0; rowIndex < oldSheetContent.length; rowIndex++) {
       const row = oldSheetContent[rowIndex]
       for (let col = 0; col < row.length; col++) {
         const cellType = row[col]
         const address = simpleCellAddress(sheetId, col, rowIndex)
-        this.crudOperations!.operations.restoreCell(address, cellType)
+        this.operations.restoreCell(address, cellType)
       }
     }
   }
@@ -467,18 +471,18 @@ export class UndoRedo {
   private redoRemoveRows(operation: RemoveRowsUndoData) {
     const { sheet, rowsRemovals } = operation
     for (const rowsRemoval of rowsRemovals) {
-      this.crudOperations!.operations.removeRows(new RemoveRowsCommand(sheet, [[rowsRemoval.rowFrom, rowsRemoval.rowCount]]))
+      this.operations.removeRows(new RemoveRowsCommand(sheet, [[rowsRemoval.rowFrom, rowsRemoval.rowCount]]))
     }
   }
 
   private redoMoveCells(operation: MoveCellsUndoData) {
-    this.crudOperations!.operations.moveCells(operation.sourceLeftCorner, operation.width, operation.height, operation.destinationLeftCorner)
+    this.operations.moveCells(operation.sourceLeftCorner, operation.width, operation.height, operation.destinationLeftCorner)
   }
 
   private redoRemoveColumns(operation: RemoveColumnsUndoData) {
     const { sheet, columnsRemovals } = operation
     for (const columnsRemoval of columnsRemovals) {
-      this.crudOperations!.operations.removeColumns(new RemoveColumnsCommand(sheet, [[columnsRemoval.columnFrom, columnsRemoval.columnCount]]))
+      this.operations.removeColumns(new RemoveColumnsCommand(sheet, [[columnsRemoval.columnFrom, columnsRemoval.columnCount]]))
     }
   }
 
@@ -489,57 +493,57 @@ export class UndoRedo {
     for (let y = 0; y < height; ++y) {
       for (let x = 0; x < width; ++x) {
         const address = simpleCellAddress(targetLeftCorner.sheet, targetLeftCorner.col + x, targetLeftCorner.row + y)
-        this.crudOperations!.operations.restoreCell(address, newContent[y][x])
+        this.operations.restoreCell(address, newContent[y][x])
       }
     }
   }
 
   private redoSetCellContents(operation: SetCellContentsUndoData) {
     for (const cellContentData of operation.cellContents) {
-      this.crudOperations!.operations.setCellContent(cellContentData.address, cellContentData.newContent)
+      this.operations.setCellContent(cellContentData.address, cellContentData.newContent)
     }
   }
 
   private redoAddRows(operation: AddRowsUndoData) {
-    this.crudOperations!.operations.addRows(operation.command)
+    this.operations.addRows(operation.command)
   }
 
   private redoAddColumns(operation: AddColumnsUndoData) {
-    this.crudOperations!.operations.addColumns(operation.command)
+    this.operations.addColumns(operation.command)
   }
 
   private redoRemoveSheet(operation: RemoveSheetUndoData) {
     const { sheetName } = operation
-    this.crudOperations!.operations.removeSheet(sheetName)
+    this.operations.removeSheet(sheetName)
   }
 
   private redoAddSheet(operation: AddSheetUndoData) {
     const { sheetName } = operation
-    this.crudOperations!.operations.addSheet(sheetName)
+    this.operations.addSheet(sheetName)
   }
 
   private redoMoveRows(operation: MoveRowsUndoData) {
     const { sheet } = operation
-    this.crudOperations!.operations.moveRows(sheet, operation.startRow, operation.numberOfRows, operation.targetRow)
+    this.operations.moveRows(sheet, operation.startRow, operation.numberOfRows, operation.targetRow)
   }
 
   private redoMoveColumns(operation: MoveColumnsUndoData) {
     const { sheet } = operation
-    this.crudOperations!.operations.moveColumns(sheet, operation.startColumn, operation.numberOfColumns, operation.targetColumn)
+    this.operations.moveColumns(sheet, operation.startColumn, operation.numberOfColumns, operation.targetColumn)
   }
 
   private redoClearSheet(operation: ClearSheetUndoData) {
     const { sheetId } = operation
-    this.crudOperations!.operations.clearSheet(sheetId)
+    this.operations.clearSheet(sheetId)
   }
 
   private redoSetSheetContent(operation: SetSheetContentUndoData) {
     const { sheetId, newSheetContent } = operation
-    this.crudOperations!.operations.clearSheet(sheetId)
+    this.operations.clearSheet(sheetId)
     for (let row = 0; row < newSheetContent.length; row++) {
       for (let col = 0; col < newSheetContent[row].length; col++) {
         const address = simpleCellAddress(sheetId, col, row)
-        this.crudOperations!.operations.setCellContent(address, newSheetContent[row][col])
+        this.operations.setCellContent(address, newSheetContent[row][col])
       }
     }
   }
@@ -548,7 +552,7 @@ export class UndoRedo {
     const oldDataToRestore = this.oldData.get(version) || []
     for (const entryToRestore of oldDataToRestore) {
       const [ address, hash ] = entryToRestore
-      this.crudOperations!.operations.setFormulaToCellFromCache(hash, address)
+      this.operations.setFormulaToCellFromCache(hash, address)
     }
   }
 }
