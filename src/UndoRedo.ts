@@ -131,10 +131,6 @@ type UndoStackElement
   | PasteUndoData
 
 export class UndoRedo {
-
-  constructor() {
-  }
-
   public readonly undoStack: UndoStackElement[] = []
   public readonly redoStack: UndoStackElement[] = []
   public crudOperations?: CrudOperations
