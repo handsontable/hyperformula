@@ -1009,6 +1009,16 @@ describe('Redo - adding sheet', () => {
     expect(engine.getSheetName(1)).toEqual("Sheet2")
     expectEngineToBeTheSameAs(engine, HyperFormula.buildFromSheets(snapshot))
   })
+
+  it('cancels redo stack', () => {
+    const engine = HyperFormula.buildFromArray([])
+    engine.setCellContents(adr('A1'), 42)
+    engine.undo()
+
+    engine.addSheet()
+
+    expect(engine.isThereSomethingToRedo()).toBe(false)
+  })
 })
 
 describe('Redo - clearing sheet', () => {
@@ -1023,6 +1033,16 @@ describe('Redo - clearing sheet', () => {
     engine.redo()
 
     expectEngineToBeTheSameAs(engine, HyperFormula.buildFromSheets(snapshot))
+  })
+
+  it('cancels redo stack', () => {
+    const engine = HyperFormula.buildFromArray([])
+    engine.setCellContents(adr('A1'), 42)
+    engine.undo()
+
+    engine.clearSheet("Sheet1")
+
+    expect(engine.isThereSomethingToRedo()).toBe(false)
   })
 })
 
