@@ -131,8 +131,8 @@ type UndoStackElement
   | PasteUndoData
 
 export class UndoRedo {
-  public readonly undoStack: UndoStackElement[] = []
-  public redoStack: UndoStackElement[] = []
+  private readonly undoStack: UndoStackElement[] = []
+  private redoStack: UndoStackElement[] = []
   public crudOperations?: CrudOperations
 
   public oldData: Map<number, [SimpleCellAddress, string][]> = new Map()
