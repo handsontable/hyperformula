@@ -118,6 +118,7 @@ export class CrudOperations {
 
   public moveColumns(sheet: number, startColumn: number, numberOfColumns: number, targetColumn: number): void {
     this.ensureItIsPossibleToMoveColumns(sheet, startColumn, numberOfColumns, targetColumn)
+    this.undoRedo.clearRedoStack()
     this.operations.moveColumns(sheet, startColumn, numberOfColumns, targetColumn)
     this.undoRedo.saveOperationMoveColumns(sheet, startColumn, numberOfColumns, targetColumn)
   }
