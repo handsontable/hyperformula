@@ -132,7 +132,7 @@ type UndoStackElement
 
 export class UndoRedo {
   public readonly undoStack: UndoStackElement[] = []
-  public readonly redoStack: UndoStackElement[] = []
+  public redoStack: UndoStackElement[] = []
   public crudOperations?: CrudOperations
 
   public oldData: Map<number, [SimpleCellAddress, string][]> = new Map()
@@ -195,6 +195,10 @@ export class UndoRedo {
     }
     const currentOldData = this.oldData.get(version)!
     currentOldData.push([address, astHash])
+  }
+
+  public clearRedoStack() {
+    this.redoStack = []
   }
 
   public isUndoStackEmpty(): boolean {

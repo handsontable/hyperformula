@@ -752,6 +752,16 @@ describe('Redo - removing rows', () => {
 
     expectEngineToBeTheSameAs(engine, HyperFormula.buildFromSheets(snapshot))
   })
+
+  it('cancels redo stack', () => {
+    const engine = HyperFormula.buildFromArray([])
+    engine.setCellContents(adr('A1'), 42)
+    engine.undo()
+
+    engine.removeRows(0, [1000, 1])
+
+    expect(engine.isThereSomethingToRedo()).toBe(false)
+  })
 })
 
 describe('Redo - adding rows', () => {

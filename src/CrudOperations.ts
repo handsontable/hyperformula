@@ -79,6 +79,7 @@ export class CrudOperations {
   public removeRows(sheet: number, ...indexes: Index[]): void {
     const removeRowsCommand = new RemoveRowsCommand(sheet, indexes)
     this.ensureItIsPossibleToRemoveRows(sheet, ...indexes)
+    this.undoRedo.clearRedoStack()
     this.clipboardOperations.abortCut()
     const rowsRemovals = this.operations.removeRows(removeRowsCommand)
     this.undoRedo.saveOperationRemoveRows(removeRowsCommand, rowsRemovals)
