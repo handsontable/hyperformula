@@ -11,6 +11,24 @@ describe('Temporary formulas - normalization', () => {
 
     expect(normalizedFormula).toEqual('=Sheet1!A1+10')
   })
+
+  it('fail with a typo', () => { 
+    const engine = HyperFormula.buildFromArray([])
+
+    const normalizedFormula = engine.normalizeFormula('=SHET1!A1+10')
+    const normalizedFormula2 = engine.normalizeFormula('=SUM(SHET1!A1:A100)')
+   
+    expect(normalizedFormula).toEqual('=SHET1!A1+10')
+    expect(normalizedFormula2).toEqual('=SUM(SHET1!A1:A100)')
+  })
+
+  it('works with absolute addressing', () => { 
+    const engine = HyperFormula.buildFromArray([])
+
+    const normalizedFormula = engine.normalizeFormula('=3*$a$1')
+
+    expect(normalizedFormula).toEqual('=3*$A$1')
+  })
 })
 
 describe('Temporary formulas - validation', () => {
@@ -35,31 +53,11 @@ describe('Temporary formulas - validation', () => {
     expect(engine.validateFormula('=SOME SYNTAX ERROR')).toBe(false)
   })
 
-  it('fail with a typo', () => { 
-    const engine = HyperFormula.buildFromArray([])
-
-    const normalizedFormula = engine.normalizeFormula('=SHET1!A1+10')
-    const normalizedFormula2 = engine.normalizeFormula('=SUM(SHET1!A1:A100)')
-   
-
-    expect(normalizedFormula).toEqual('=SHET1!A1+10')
-    expect(normalizedFormula2).toEqual('=SUM(SHET1!A1:A100)')
-  })
-
   it('ok when literal error', () => {
     const engine = HyperFormula.buildFromArray([])
 
     expect(engine.validateFormula('=#N/A')).toBe(true)
   })
-
-  it('works with absolute addressing', () => { 
-    const engine = HyperFormula.buildFromArray([])
-
-    const normalizedFormula = engine.normalizeFormula('=3*$a$1')
-
-    expect(normalizedFormula).toEqual('=3*$A$1')
-  })
-})
 
 describe('Temporary formulas - calculation', () => {
   it('basic usage', () => {
