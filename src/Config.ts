@@ -54,7 +54,6 @@ const PossibleGPUModeString: GPUMode[] = ['gpu', 'cpu', 'dev']
 export interface ConfigParams {
   /**
    * Specifies if the string comparison is accent sensitive or not.
-   *
    * Applies to comparison operators only.
    *
    * @default false
@@ -64,7 +63,6 @@ export interface ConfigParams {
   accentSensitive: boolean,
   /**
    * Specifies if the string comparison is case-sensitive or not.
-   *
    * Applies to comparison operators only.
    *
    * @default false
@@ -74,7 +72,6 @@ export interface ConfigParams {
   caseSensitive: boolean,
   /**
    * Allows to define if upper case or lower case should sort first.
-   *
    * When set to `false` uses the locale's default.
    *
    * @default 'lower'
@@ -84,12 +81,9 @@ export interface ConfigParams {
   caseFirst: 'upper' | 'lower' | 'false',
   /**
    * Determines which address mapping policy will be used. Built in implementations:
-   *
-   * DenseSparseChooseBasedOnThreshold - will choose address mapping for each sheet separately based on fill ratio.
-   *
-   * AlwaysDense - will use DenseStrategy for all sheets.
-   *
-   * AlwaysSparse - will use SparseStrategy for all sheets.
+   * - DenseSparseChooseBasedOnThreshold - will choose address mapping for each sheet separately based on fill ratio.
+   * - AlwaysDense - will use DenseStrategy for all sheets.
+   * - AlwaysSparse - will use SparseStrategy for all sheets.
    *
    * @default AlwaysDense
    */
@@ -126,7 +120,6 @@ export interface ConfigParams {
   functionArgSeparator: string,
   /**
    * A decimal separator used for parsing numeric literals.
-   *
    * Can be either '.' or ',' and must be different from [[thousandSeparator]] and [[functionArgSeparator]].
    *
    * @default '.'
@@ -142,7 +135,6 @@ export interface ConfigParams {
   language: string,
   /**
    * A thousand separator used for parsing numeric literals.
-   *
    * Can be either empty, ',' or ' ' and must be different from [[decimalSeparator]] and [[functionArgSeparator]].
    *
    * @default ''
@@ -161,9 +153,7 @@ export interface ConfigParams {
   functionPlugins: any[],
   /**
    * Allows to set GPU or CPU for use in matrix calculations.
-   *
    * When set to 'gpu' it will try to use GPU for matrix calculations. Setting it to 'cpu' will force CPU usage.
-   *
    * Other values should be used for debugging purposes only. More info can be found in GPU.js documentation.
    *
    * @default 'gpu'
@@ -181,9 +171,7 @@ export interface ConfigParams {
   ignorePunctuation: boolean,
   /**
    * Preserves an option for setting 1900 as a leap year.
-   *
    * 1900 was not a leap year, but in Lotus 1-2-3 it was faulty interpreted as a leap year.
-   *
    * Set to `true` for compatibility with Lotus 1-2-3 and Excel. See [[nullDate]] for complete solution.
    *
    * @default false
@@ -201,9 +189,7 @@ export interface ConfigParams {
   localeLang: string,
   /**
    * Enables numeric matrix detection feature when set to 'true'.
-   *
    * During build phase each rectangular area of numbers will be treated as one matrix vertex in order to optimize further calculations.
-   *
    * Some CRUD operations may break numeric matrices into individual vertices if needed.
    *
    * @default true
@@ -221,7 +207,6 @@ export interface ConfigParams {
   matrixDetectionThreshold: number,
   /**
    * Two-digit values when interpreted as a year can be either 19xx or 20xx.
-   *
    * If `xx <= nullYear` its latter, otherwise its former.
    *
    * @default 30
@@ -239,17 +224,11 @@ export interface ConfigParams {
   parseDateTime: (dateTimeString: string, dateFormat: string, timeFormat: string) => Maybe<DateTime>,
   /**
    * Controls how far two numerical values need to be from each other to be treated as non-equal.
-   *
    * `a` and `b` are equal if they are of the same sign and:
-   *
    * `abs(a) <= (1+precisionEpsilon) * abs(b)`
-   *
    * and
-   *
-   * `abs(b) <= (1+precisionEpsilon) * abs(a)`
-   *
+   * `abs(b) <= (1+precisionEpsilon) * abs(a)`.
    * It also controls snap-to-zero behavior for additions/subtractions:
-   *
    * for `c=a+b` or `c=a-b`, if `abs(c) <= precisionEpsilon * abs(a)`, then `c` is set to `0`
    *
    * @default 1e-13
@@ -259,7 +238,6 @@ export interface ConfigParams {
   precisionEpsilon: number,
   /**
    * Sets how precise the calculation should be.
-   *
    * Numerical outputs are rounded to `precisionRounding` many digits after the decimal.
    *
    * @default 14
@@ -277,7 +255,6 @@ export interface ConfigParams {
   stringifyDateTime: (dateTime: SimpleDateTime, dateFormat: string) => Maybe<string>,
   /**
    * Sets the rounding.
-   *
    * If `false`, no rounding happens, and numbers are equal if and only if they are truly identical value (see: [[precisionEpsilon]]).
    *
    * @default true
@@ -287,11 +264,8 @@ export interface ConfigParams {
   smartRounding: boolean,
   /**
    * Switches column search strategy from binary search to column index.
-   *
    * Used by VLOOKUP and MATCH functions.
-   *
    * Using column index may improve time efficiency but it will increase memory usage.
-   *
    * In some scenarios column index may fall back to binary search despite this flag.
    *
    * @default false
@@ -309,9 +283,7 @@ export interface ConfigParams {
   useStats: boolean,
   /**
    * Determines minimum number of elements a range must have in order to use binary search.
-   *
    * Shorter ranges will be searched naively.
-   *
    * Used by VLOOKUP and MATCH functions.
    *
    * @default 20
@@ -321,7 +293,6 @@ export interface ConfigParams {
   vlookupThreshold: number,
   /**
    * Allows to set a specific date from which the number of days will be counted.
-   *
    * Dates are represented internally as a number of days that passed since this `nullDate`.
    *
    * @default {year: 1899, month: 12, day: 30}
