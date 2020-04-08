@@ -908,9 +908,8 @@ describe('aborting cut paste', () => {
 
     engine.cut(adr('A1'), 1, 1)
     engine.addRows(0, [1, 1])
-    engine.paste(adr('C2'))
 
-    expect(engine.getCellValue(adr('C2'))).toEqual(EmptyValue)
+    expect(engine.isClipboardEmpty()).toBe(true)
   })
 
   it('should be aborted when removeRows is done before paste', () => {
@@ -921,9 +920,8 @@ describe('aborting cut paste', () => {
 
     engine.cut(adr('A1'), 1, 1)
     engine.removeRows(0, [1, 1])
-    engine.paste(adr('C2'))
 
-    expect(engine.getCellValue(adr('C2'))).toEqual(EmptyValue)
+    expect(engine.isClipboardEmpty()).toBe(true)
   })
 
   it('should be aborted when addColumns is done before paste', () => {
@@ -933,9 +931,8 @@ describe('aborting cut paste', () => {
 
     engine.cut(adr('A1'), 1, 1)
     engine.addColumns(0, [1, 1])
-    engine.paste(adr('A2'))
 
-    expect(engine.getCellValue(adr('A2'))).toEqual(EmptyValue)
+    expect(engine.isClipboardEmpty()).toBe(true)
   })
 
   it('should be aborted when addColumns is done before paste', () => {
@@ -945,9 +942,8 @@ describe('aborting cut paste', () => {
 
     engine.cut(adr('A1'), 1, 1)
     engine.removeColumns(0, [1, 1])
-    engine.paste(adr('A2'))
 
-    expect(engine.getCellValue(adr('A2'))).toEqual(EmptyValue)
+    expect(engine.isClipboardEmpty()).toBe(true)
   })
 
   it('should be aborted when moveCells is done before paste', () => {
@@ -957,9 +953,8 @@ describe('aborting cut paste', () => {
 
     engine.cut(adr('A1'), 1, 1)
     engine.moveCells(adr('B1'), 1, 1, adr('C1'))
-    engine.paste(adr('A2'))
 
-    expect(engine.getCellValue(adr('A2'))).toEqual(EmptyValue)
+    expect(engine.isClipboardEmpty()).toBe(true)
   })
 
   it('should be aborted when sheet is removed', () => {
@@ -970,9 +965,8 @@ describe('aborting cut paste', () => {
 
     engine.cut(adr('A1'), 1, 1)
     engine.removeSheet('Sheet2')
-    engine.paste(adr('A2'))
 
-    expect(engine.getCellValue(adr('A2'))).toEqual(EmptyValue)
+    expect(engine.isClipboardEmpty()).toBe(true)
   })
 
   it('should be aborted when setCellContents is done', () => {
@@ -982,9 +976,8 @@ describe('aborting cut paste', () => {
 
     engine.cut(adr('A1'), 1, 1)
     engine.setCellContents(adr('B1'), 'foo')
-    engine.paste(adr('A2'))
 
-    expect(engine.getCellValue(adr('A2'))).toEqual(EmptyValue)
+    expect(engine.isClipboardEmpty()).toBe(true)
   })
 
   it('should be aborted when sheet is cleared', () => {
@@ -995,9 +988,8 @@ describe('aborting cut paste', () => {
 
     engine.cut(adr('A1'), 1, 1)
     engine.clearSheet('Sheet2')
-    engine.paste(adr('A2'))
 
-    expect(engine.getCellValue(adr('A2'))).toEqual(EmptyValue)
+    expect(engine.isClipboardEmpty()).toBe(true)
   })
 
   it('should be aborted when sheet content is replaced', () => {
@@ -1008,9 +1000,8 @@ describe('aborting cut paste', () => {
 
     engine.cut(adr('A1'), 1, 1)
     engine.setSheetContent('Sheet2', [])
-    engine.paste(adr('A2'))
 
-    expect(engine.getCellValue(adr('A2'))).toEqual(EmptyValue)
+    expect(engine.isClipboardEmpty()).toBe(true)
   })
 
   it('should not be aborted when adding new sheet', () => {
@@ -1018,9 +1009,8 @@ describe('aborting cut paste', () => {
 
     engine.cut(adr('A1'), 1, 1)
     engine.addSheet()
-    engine.paste(adr('A2', 1))
 
-    expect(engine.getCellValue(adr('A2', 1))).toEqual(1)
+    expect(engine.isClipboardEmpty()).toBe(false)
   })
 
   it('should not be aborted when addRows is not successful', () => {
@@ -1032,9 +1022,7 @@ describe('aborting cut paste', () => {
       engine.addRows(1, [1, 1])
     }).toThrowError(new NoSheetWithIdError(1))
 
-    engine.paste(adr('A2'))
-
-    expect(engine.getCellValue(adr('A2'))).toEqual(1)
+    expect(engine.isClipboardEmpty()).toBe(false)
   })
 
   it('should be aborted when doing undo', () => {
