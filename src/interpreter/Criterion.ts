@@ -1,5 +1,11 @@
+/**
+ * @license
+ * Copyright (c) 2020 Handsoncode. All rights reserved.
+ */
+
 import {InternalCellValue} from '../Cell'
 import {Maybe} from '../Maybe'
+import {ArithmeticHelper} from './ArithmeticHelper'
 
 export enum CriterionType {
   GREATER_THAN = 'GREATER_THAN',
@@ -17,17 +23,17 @@ export const buildCriterion = (operator: CriterionType, value: number | string) 
 
 export class CriterionPackage {
 
-  public static fromCellValue(raw: InternalCellValue): Maybe<CriterionPackage> {
+  public static fromCellValue(raw: InternalCellValue, arithmeticHelper: ArithmeticHelper): Maybe<CriterionPackage> {
     if (typeof raw !== 'string') {
       return undefined
     }
 
     const criterion = parseCriterion(raw)
-    if (criterion === null) {
+    if (criterion === undefined) {
       return undefined
     }
 
-    return new CriterionPackage(raw, buildCriterionLambda(criterion))
+    return new CriterionPackage(raw, buildCriterionLambda(criterion, arithmeticHelper))
   }
   constructor(
     public readonly raw: string,
@@ -38,7 +44,7 @@ export class CriterionPackage {
 
 const ANY_CRITERION_REGEX = /([<>=]+)(.*)/
 
-export const parseCriterion = (criterion: InternalCellValue): Criterion | null => {
+export const parseCriterion = (criterion: InternalCellValue): Maybe<Criterion> => {
   if (typeof criterion === 'number') {
     return buildCriterion(CriterionType.EQUAL, criterion)
   } else if (typeof criterion === 'string') {
@@ -51,6 +57,7 @@ export const parseCriterion = (criterion: InternalCellValue): Criterion | null =
       } else if (isNaN(value)) {
         switch (regexResult[1]) {
           case '=': return buildCriterion(CriterionType.EQUAL, regexResult[2])
+          case '<>': return buildCriterion(CriterionType.NOT_EQUAL, regexResult[2])
         }
       } else {
         switch (regexResult[1]) {
@@ -60,7 +67,7 @@ export const parseCriterion = (criterion: InternalCellValue): Criterion | null =
           case '<=': return buildCriterion(CriterionType.LESS_THAN_OR_EQUAL, value)
           case '<>': return buildCriterion(CriterionType.NOT_EQUAL, value)
           case '=': return buildCriterion(CriterionType.EQUAL, value)
-          default: return null
+          default: return undefined
         }
       }
     } else {
@@ -68,16 +75,16 @@ export const parseCriterion = (criterion: InternalCellValue): Criterion | null =
     }
   }
 
-  return null
+  return undefined
 }
 
 export type CriterionLambda = (cellValue: InternalCellValue) => boolean | null
-export const buildCriterionLambda = (criterion: Criterion): CriterionLambda => {
+export const buildCriterionLambda = (criterion: Criterion, arithmeticHelper: ArithmeticHelper): CriterionLambda => {
   switch (criterion.operator) {
     case CriterionType.GREATER_THAN: {
       return (cellValue) => {
         if (typeof cellValue === 'number') {
-          return cellValue > criterion.value
+          return arithmeticHelper.floatCmp(cellValue, criterion.value as number) > 0
         } else {
           return null
         }
@@ -86,7 +93,7 @@ export const buildCriterionLambda = (criterion: Criterion): CriterionLambda => {
     case CriterionType.GREATER_THAN_OR_EQUAL: {
       return (cellValue) => {
         if (typeof cellValue === 'number') {
-          return cellValue >= criterion.value
+          return arithmeticHelper.floatCmp(cellValue, criterion.value as number) >= 0
         } else {
           return null
         }
@@ -95,7 +102,7 @@ export const buildCriterionLambda = (criterion: Criterion): CriterionLambda => {
     case CriterionType.LESS_THAN: {
       return (cellValue) => {
         if (typeof cellValue === 'number') {
-          return cellValue < criterion.value
+          return arithmeticHelper.floatCmp(cellValue, criterion.value as number) < 0
         } else {
           return null
         }
@@ -104,7 +111,7 @@ export const buildCriterionLambda = (criterion: Criterion): CriterionLambda => {
     case CriterionType.LESS_THAN_OR_EQUAL: {
       return (cellValue) => {
         if (typeof cellValue === 'number') {
-          return cellValue <= criterion.value
+          return arithmeticHelper.floatCmp(cellValue, criterion.value as number) <= 0
         } else {
           return null
         }
@@ -112,8 +119,10 @@ export const buildCriterionLambda = (criterion: Criterion): CriterionLambda => {
     }
     case CriterionType.EQUAL: {
       return (cellValue) => {
-        if (typeof cellValue === 'number' || typeof cellValue === 'string') {
-          return cellValue === criterion.value
+        if (typeof cellValue === 'number') {
+          return arithmeticHelper.floatCmp(cellValue, criterion.value as number) === 0
+        } else if(typeof cellValue === 'string') {
+          return arithmeticHelper.stringCmp(cellValue, criterion.value as string) === 0
         } else {
           return null
         }
@@ -122,7 +131,9 @@ export const buildCriterionLambda = (criterion: Criterion): CriterionLambda => {
     case CriterionType.NOT_EQUAL: {
       return (cellValue) => {
         if (typeof cellValue === 'number') {
-          return cellValue !== criterion.value
+          return arithmeticHelper.floatCmp(cellValue, criterion.value as number) !== 0
+        } else if(typeof cellValue === 'string') {
+          return arithmeticHelper.stringCmp(cellValue, criterion.value as string) !== 0
         } else {
           return null
         }

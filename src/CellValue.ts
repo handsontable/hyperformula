@@ -1,3 +1,8 @@
+/**
+ * @license
+ * Copyright (c) 2020 Handsoncode. All rights reserved.
+ */
+
 import {CellError, ErrorType, InternalCellValue, NoErrorCellValue, simpleCellAddress, SimpleCellAddress} from './Cell'
 import {Config} from './Config'
 import {CellValueChange} from './ContentChanges'
@@ -87,7 +92,7 @@ export class Exporter {
   }
 
   private detailedError(error: CellError): DetailedCellError {
-    return new DetailedCellError(error, this.config.getErrorTranslationFor(error.type))
+    return new DetailedCellError(error, this.config.translationPackage.getErrorTranslation(error.type))
   }
 
   private cellValueRounding(value: number): number {

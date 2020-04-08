@@ -1,11 +1,15 @@
+/**
+ * @license
+ * Copyright (c) 2020 Handsoncode. All rights reserved.
+ */
+
 import {CellError, ErrorType, InternalCellValue, SimpleCellAddress} from '../../Cell'
 import {Maybe} from '../../Maybe'
 import { ProcedureAst} from '../../parser'
-import {coerceToRange} from '../coerce'
+import {coerceToRange} from '../ArithmeticHelper'
 import { CriterionPackage} from '../Criterion'
 import {Condition, CriterionFunctionCompute} from '../CriterionFunctionCompute'
 import { SimpleRangeValue} from '../InterpreterValue'
-import {nonstrictadd} from '../scalar'
 import {FunctionPlugin} from './FunctionPlugin'
 
 class AverageResult {
@@ -97,8 +101,8 @@ export class SumifPlugin extends FunctionPlugin {
     } else if (criterionValue instanceof CellError) {
       return criterionValue
     }
-    const criterionPackage = CriterionPackage.fromCellValue(criterionValue)
-    if (criterionPackage === undefined) {
+    const criterion = CriterionPackage.fromCellValue(criterionValue, this.interpreter.arithmeticHelper)
+    if (criterion === undefined) {
       return new CellError(ErrorType.VALUE)
     }
 
@@ -117,9 +121,9 @@ export class SumifPlugin extends FunctionPlugin {
       this.interpreter,
       sumifCacheKey,
       0,
-      (left, right) => nonstrictadd(left, right),
+      (left, right) => this.interpreter.arithmeticHelper.nonstrictadd(left, right),
       (arg) => arg,
-    ).compute(valuesArg, [new Condition(conditionArg, criterionPackage)])
+    ).compute(valuesArg, [new Condition(conditionArg, criterion)])
 
     return result
   }
@@ -147,7 +151,7 @@ export class SumifPlugin extends FunctionPlugin {
       } else if (criterionValue instanceof CellError) {
         return criterionValue
       }
-      const criterionPackage = CriterionPackage.fromCellValue(criterionValue)
+      const criterionPackage = CriterionPackage.fromCellValue(criterionValue, this.interpreter.arithmeticHelper)
       if (criterionPackage === undefined) {
         return new CellError(ErrorType.VALUE)
       }
@@ -158,7 +162,7 @@ export class SumifPlugin extends FunctionPlugin {
       this.interpreter,
       sumifCacheKey,
       0,
-      (left, right) => nonstrictadd(left, right),
+      (left, right) => this.interpreter.arithmeticHelper.nonstrictadd(left, right),
       (arg) => arg,
     ).compute(valuesArg, conditions)
 
@@ -181,7 +185,7 @@ export class SumifPlugin extends FunctionPlugin {
     } else if (criterionValue instanceof CellError) {
       return criterionValue
     }
-    const criterionPackage = CriterionPackage.fromCellValue(criterionValue)
+    const criterionPackage = CriterionPackage.fromCellValue(criterionValue, this.interpreter.arithmeticHelper)
     if (criterionPackage === undefined) {
       return new CellError(ErrorType.VALUE)
     }
@@ -245,7 +249,7 @@ export class SumifPlugin extends FunctionPlugin {
     } else if (criterionValue instanceof CellError) {
       return criterionValue
     }
-    const criterionPackage = CriterionPackage.fromCellValue(criterionValue)
+    const criterionPackage = CriterionPackage.fromCellValue(criterionValue, this.interpreter.arithmeticHelper)
     if (criterionPackage === undefined) {
       return new CellError(ErrorType.VALUE)
     }
@@ -279,7 +283,7 @@ export class SumifPlugin extends FunctionPlugin {
       } else if (criterionValue instanceof CellError) {
         return criterionValue
       }
-      const criterionPackage = CriterionPackage.fromCellValue(criterionValue)
+      const criterionPackage = CriterionPackage.fromCellValue(criterionValue, this.interpreter.arithmeticHelper)
       if (criterionPackage === undefined) {
         return new CellError(ErrorType.VALUE)
       }

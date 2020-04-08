@@ -1,10 +1,11 @@
 import {EmptyValue, HyperFormula} from '../src'
 import {Config} from '../src/Config'
 import {enGB, plPL} from '../src/i18n'
+import {unregisterAllLanguages} from './testUtils'
 
 describe('Config', () => {
   beforeEach(() => {
-    HyperFormula.unregisterAllLanguages()
+    unregisterAllLanguages()
     HyperFormula.registerLanguage('plPL', plPL)
     HyperFormula.registerLanguage('enGB', enGB)
   })
@@ -30,7 +31,7 @@ describe('Config', () => {
   it('can translate functions', () => {
     const config = new Config({ language: 'plPL' })
 
-    expect(config.getFunctionTranslationFor('SUM')).toEqual('SUMA')
+    expect(config.translationPackage.getFunctionTranslation('SUM')).toEqual('SUMA')
   })
 
   it( 'validation: boolean params', () => {
@@ -84,10 +85,10 @@ describe('Config', () => {
   it( 'validation: function params', () => {
     // eslint-disable-next-line
     // @ts-ignore
-    expect(() => new Config({parseDate: true})).toThrow('Expected value of type: function for config parameter: parseDate')
+    expect(() => new Config({parseDateTime: true})).toThrow('Expected value of type: function for config parameter: parseDateTime')
     // eslint-disable-next-line
     // @ts-ignore
-    expect(() => new Config({stringifyDate: 1})).toThrow('Expected value of type: function for config parameter: stringifyDate')
+    expect(() => new Config({stringifyDateTime: 1})).toThrow('Expected value of type: function for config parameter: stringifyDateTime')
   })
 
   it( 'validation: other params', () => {

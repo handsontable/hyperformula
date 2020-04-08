@@ -1,11 +1,16 @@
+/**
+ * @license
+ * Copyright (c) 2020 Handsoncode. All rights reserved.
+ */
+
 import {InternalCellValue} from '../Cell'
 import {Config} from '../Config'
-import {DateHelper, SimpleDate} from '../DateHelper'
+import {DateTimeHelper, SimpleDateTime} from '../DateTimeHelper'
 import {Maybe} from '../Maybe'
-import {FormatToken, parseForDateFormat, parseForNumberFormat, TokenType} from './parser'
+import {FormatToken, parseForDateTimeFormat, parseForNumberFormat, TokenType} from './parser'
 
-export function format(value: number, formatArg: string, config: Config, dateHelper: DateHelper): InternalCellValue {
-  const tryString = config.stringifyDate(dateHelper.numberToDate(value), formatArg) // default points to defaultStringifyDate()
+export function format(value: number, formatArg: string, config: Config, dateHelper: DateTimeHelper): InternalCellValue {
+  const tryString = config.stringifyDateTime(dateHelper.numberToDateTime(value), formatArg) // default points to defaultStringifyDateTime()
   if (tryString !== undefined) {
     return tryString
   } else {
@@ -73,17 +78,18 @@ function numberFormat(tokens: FormatToken[], value: number): InternalCellValue {
   return result
 }
 
-export function defaultPrintDate(date: SimpleDate, formatArg: string): Maybe<string> {
-  const expression = parseForDateFormat(formatArg)
+export function defaultStringifyDateTime(date: SimpleDateTime, formatArg: string): Maybe<string> {
+  const expression = parseForDateTimeFormat(formatArg)
   if (expression === undefined) {
     return undefined
   }
   const tokens = expression.tokens
   let result = ''
-  //  let minutes: boolean = false
+  let minutes: boolean = false
 
-  for (let i = 0; i < tokens.length; ++i) {
-    const token = tokens[i]
+  const ampm = tokens.some( (token) => token.type === TokenType.FORMAT && (token.value === 'a' || token.value === 'A') )
+
+  for (const token of tokens){
     if (token.type === TokenType.FREE_TEXT) {
       result += token.value
       continue
@@ -91,14 +97,14 @@ export function defaultPrintDate(date: SimpleDate, formatArg: string): Maybe<str
 
     switch (token.value) {
       /* hours*/
-      //      case 'h':
-      //      case 'H':
-      //      case 'hh':
-      //      case 'HH': {
-      //        minutes = true
-      //        result += date.format(token.value)
-      //        break
-      //      }
+      case 'h':
+      case 'H':
+      case 'hh':
+      case 'HH': {
+        minutes = true
+        result += padLeft( ampm? (date.hour+11)%12+1 : date.hour, token.value.length)
+        break
+      }
 
       /* days */
       case 'd':
@@ -108,44 +114,26 @@ export function defaultPrintDate(date: SimpleDate, formatArg: string): Maybe<str
         result += padLeft(date.day, token.value.length)
         break
       }
-      //      case 'ddd':
-      //      case 'DDD':
-      //        result += date.format('ddd')
-      //        break
-      //      case 'dddd':
-      //      case 'DDDD': {
-      //        result += date.format('dddd')
-      //        break
-      //      }
+
+      /* seconds */
+      case 's':
+      case 'ss': {
+        result += padLeft(date.second, token.value.length)
+        break
+      }
 
       /* minutes / months */
       case 'M':
       case 'm':
       case 'MM':
       case 'mm': {
-        //        if (minutes) {
-        //          result += padLeft(date.minute(), token.value.length)
-        //          break
-        //        } else {
-        result += padLeft(date.month, token.value.length)
+        if (minutes) {
+          result += padLeft(date.minute, token.value.length)
+        } else {
+          result += padLeft(date.month, token.value.length)
+        }
         break
-        //        }
       }
-      // case 'mmm':
-      // case 'MMM': {
-      //   result += date.format('MMM')
-      //   break
-      // }
-      // case 'mmmm':
-      // case 'MMMM': {
-      //   result += date.format('MMMM')
-      //   break
-      // }
-      // case 'mmmmm':
-      // case 'MMMMM': {
-      //   result += date.format('MMMM')[0]
-      //   break
-      // }
 
       /* years */
       case 'yy':
@@ -159,11 +147,12 @@ export function defaultPrintDate(date: SimpleDate, formatArg: string): Maybe<str
         break
       }
 
-      // /* AM / PM */
-      // case 'AM/PM': {
-      //  result += date.format('A')
-      //  break
-      // }
+      /* AM / PM */
+      case 'a':
+      case 'A': {
+       result += date.hour < 12 ? 'am' : 'pm'
+       break
+      }
       default:
         throw new Error('Mismatched token type')
     }

@@ -1,10 +1,11 @@
 import {Config} from '../../src/Config'
-import {DateHelper} from '../../src/DateHelper'
+import {DateTimeHelper} from '../../src/DateTimeHelper'
 import {format} from '../../src/format/format'
+import '../testConfig'
 
 describe('FormatInterpreter', () => {
   const config = new Config()
-  const dateHelper = new DateHelper(config)
+  const dateHelper = new DateTimeHelper(config)
   it('works for expression without significant tokens', () => {
     expect(format(2, 'Foo', config, dateHelper)).toEqual('Foo')
   })

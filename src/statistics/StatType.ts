@@ -1,3 +1,8 @@
+/**
+ * @license
+ * Copyright (c) 2020 Handsoncode. All rights reserved.
+ */
+
 export enum StatType {
   /* build engine */
   BUILD_ENGINE_TOTAL = 'BUILD_ENGINE_TOTAL',

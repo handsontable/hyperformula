@@ -1,3 +1,8 @@
+/**
+ * @license
+ * Copyright (c) 2020 Handsoncode. All rights reserved.
+ */
+
 import {CellError} from '../Cell'
 
 export type ValueCellVertexValue = number | boolean | string | CellError

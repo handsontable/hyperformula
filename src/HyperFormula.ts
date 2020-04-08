@@ -1,4 +1,9 @@
-import {AbsoluteCellRange} from './AbsoluteCellRange'
+/**
+ * @license
+ * Copyright (c) 2020 Handsoncode. All rights reserved.
+ */
+
+import { AbsoluteCellRange } from './AbsoluteCellRange'
 import {CellType, CellValueType, getCellType, getCellValueType, NoErrorCellValue, SimpleCellAddress} from './Cell'
 import {CellContent, CellContentParser, RawCellContent} from './CellContentParser'
 import {CellValue, ExportedChange, Exporter} from './CellValue'
@@ -16,13 +21,7 @@ import {
   SheetMapping,
   Vertex,
 } from './DependencyGraph'
-import {
-  EvaluationSuspendedError,
-  NamedExpressionDoesNotExist,
-  NamedExpressionNameIsAlreadyTaken,
-  NamedExpressionNameIsInvalid,
-  NoOperationToUndo,
-} from './errors'
+import {NamedExpressionDoesNotExist, NamedExpressionNameIsAlreadyTaken, NamedExpressionNameIsInvalid, NoOperationToUndo, EvaluationSuspendedError, NotAFormulaError} from './errors'
 import {Evaluator} from './Evaluator'
 import {Sheet, Sheets} from './GraphBuilder'
 import {IBatchExecutor} from './IBatchExecutor'
@@ -46,23 +45,36 @@ import {BuildEngineFactory, EngineState} from './BuildEngineFactory'
 export type Index = [number, number]
 
 /**
- * Engine for one sheet
+ * This is a class for creating HyperFormula instance, all the following public methods
+ * ale related to this class.
+ * 
+ * The instance can be created only by calling one of the static methods
+ * `buildFromArray`, `buildFromSheets` or `buildEmpty` and should be disposed of with
+ * `destroy` method when it's no longer needed to free the resources.
+ * 
+ * The instance can be seen as a workbook where worksheets can be created and
+ * manipulated. They are organized within a widely know structure of columns and rows
+ * which can be manipulated as well. The smallest possible data unit are the cells, which
+ * may contain simple values or formulas to be calculated.
+ * 
+ * All CRUD methods are called directly on HyperFormula instance and will trigger
+ * corresponding lifecycle events. The events are marked accordingly, as well as thrown
+ * errors so they can be correctly handled.
  */
 export class HyperFormula implements TypedEmitter {
 
   /**
    * Version of the HyperFormula.
    */
-  public static version = (process.env.HT_VERSION || '')
+  public static version = (process.env.HT_VERSION ?? '')
 
   /**
    * Latest build date.
    */
-  public static buildDate = (process.env.HT_BUILD_DATE || '')
+  public static buildDate = (process.env.HT_BUILD_DATE ?? '')
 
   /**
    * Calls the `graph` method on the dependency graph.
-   * 
    * Allows to execute `graph` directly without a need to refer to `dependencyGraph`.
    * 
    * @internal
@@ -73,7 +85,6 @@ export class HyperFormula implements TypedEmitter {
 
   /**
    * Calls the `rangeMapping` method on the dependency graph.
-   * 
    * Allows to execute `rangeMapping` directly without a need to refer to `dependencyGraph`.
    * 
    * @internal
@@ -84,7 +95,6 @@ export class HyperFormula implements TypedEmitter {
 
   /**
    * Calls the `matrixMapping` method on the dependency graph.
-   * 
    * Allows to execute `matrixMapping` directly without a need to refer to `dependencyGraph`.
    * 
    * @internal
@@ -95,7 +105,6 @@ export class HyperFormula implements TypedEmitter {
 
   /**
    * Calls the `sheetMapping` method on the dependency graph.
-   * 
    * Allows to execute `sheetMapping` directly without a need to refer to `dependencyGraph`.
    * 
    * @internal
@@ -106,8 +115,7 @@ export class HyperFormula implements TypedEmitter {
 
   /**
    * Calls the `addressMapping` method on the dependency graph.
-   * 
-   * Allows to execute `addressMapping` directly without a need to refer to dependencyGraph.
+   * Allows to execute `addressMapping` directly without a need to refer to `dependencyGraph`.
    * 
    * @internal
    */
@@ -155,13 +163,10 @@ export class HyperFormula implements TypedEmitter {
   }
 
   /**
-   * Builds the engine for sheet from a two-dimensional array representation.
-   * 
+   * Builds the engine for a sheet from a two-dimensional array representation.
    * The engine is created with a single sheet.
-   * 
    * Can be configured with the optional second parameter that represents a [[ConfigParams]].
-   * 
-   * If not specified the engine will be built with the default configuration.
+   * If not specified, the engine will be built with the default configuration.
    *
    * @param {Sheet} sheet - two-dimensional array representation of sheet
    * @param {Partial<ConfigParams>} [configInput] - engine configuration
@@ -174,11 +179,8 @@ export class HyperFormula implements TypedEmitter {
 
   /**
    * Builds the engine from an object containing multiple sheets with names.
-   * 
    * The engine is created with one or more sheets.
-   * 
    * Can be configured with the optional second parameter that represents a [[ConfigParams]].
-   * 
    * If not specified the engine will be built with the default configuration.
    *
    * @param {Sheet} sheets - object with sheets definition
@@ -218,16 +220,16 @@ export class HyperFormula implements TypedEmitter {
     }
   }
 
+  /**
+   * Unregisters language that is registered under given code string.
+   * @param {string} code - code string of the translation package
+   */
   public static unregisterLanguage(code: string): void {
     if(this.registeredLanguages.has(code)) {
       this.registeredLanguages.delete(code)
     } else {
       throw new Error('Language not registered.')
     }
-  }
-
-  public static unregisterAllLanguages(): void {
-    this.registeredLanguages = new Map()
   }
 
   /**
@@ -239,9 +241,7 @@ export class HyperFormula implements TypedEmitter {
 
   /**
    * Builds an empty engine instance.
-   * 
    * Can be configured with the optional parameter that represents a [[ConfigParams]].
-   * 
    * If not specified the engine will be built with the default configuration.
    *
    * @param {Partial<ConfigParams>} [configInput] - engine configuration
@@ -275,13 +275,13 @@ export class HyperFormula implements TypedEmitter {
 
   /**
    * Returns the cell value of a given address.
-   * 
    * Applies rounding and post-processing.
    * 
-   * @throws Throws an error if the given sheet ID does not exist.
-   *
    * @param {SimpleCellAddress} address - cell coordinates
-   *
+   * 
+   * @throws Throws an error if the sheet ID is unknown
+   * @throws [[EvaluationSuspendedError]] when the evaluation is suspended
+   * 
    * @category Cell
    */
   public getCellValue(address: SimpleCellAddress): CellValue {
@@ -296,10 +296,7 @@ export class HyperFormula implements TypedEmitter {
   }
 
   /**
-   * Returns a normalized formula string from the cell of a given address
-   * 
-   * or `undefined` for an address that does not exist and empty values.
-   * 
+   * Returns a normalized formula string from the cell of a given address or `undefined` for an address that does not exist and empty values.
    * Unparses AST.
    * 
    * @param {SimpleCellAddress} address - cell coordinates
@@ -311,15 +308,12 @@ export class HyperFormula implements TypedEmitter {
   }
 
   /**
-   * Returns a serialized content of the cell of a given address
-   *
-   * either a cell formula or an explicit value.
-   *
-   * Unparses AST. Applies post-processing.
+   * Returns [[CellValue]] which a serialized content of the cell of a given address either a cell formula, an explicit value, or an error.
+   * Unparses AST and applies post-processing.
    *
    * @param {SimpleCellAddress} address - cell coordinates
    *
-   * @returns a [[CellValue]] which is a value of a cell or an error
+   * @throws [[EvaluationSuspendedError]] when the evaluation is suspended
    *
    * @category Cell
    */
@@ -329,11 +323,11 @@ export class HyperFormula implements TypedEmitter {
   }
 
   /**
-   * Returns array with values of all cells from Sheet
-   *
+   * Returns an array of arrays of [[CellValue]] with values of all cells from [[Sheet]].
    * Applies rounding and post-processing.
    * 
-   * @throws Throws an error if the given sheet ID does not exist.
+   * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
+   * @throws [[EvaluationSuspendedError]] when the evaluation is suspended
    * 
    * @param {number} sheet - sheet ID number
    *
@@ -345,13 +339,12 @@ export class HyperFormula implements TypedEmitter {
   }
 
   /**
-   * Returns an array with normalized formula strings from Sheet,
-   *
-   * or `undefined` for a cells that have no value.
-   *
+   * Returns an array with normalized formula strings from [[Sheet]] or `undefined` for a cells that have no value.
    * Unparses AST.
    *
    * @param {SimpleCellAddress} sheet - sheet ID number
+   * 
+   * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
    *
    * @category Sheet
    */
@@ -360,13 +353,13 @@ export class HyperFormula implements TypedEmitter {
   }
 
   /**
-   * Returns an array with serialized content of cells from Sheet,
-   *
-   * either a cell formula or an explicit value.
-   *
+   * Returns an array of arrays of [[NoErrorCellValue]] with serialized content of cells from [[Sheet]], either a cell formula or an explicit value.
    * Unparses AST. Applies post-processing.
    *
    * @param {SimpleCellAddress} sheet - sheet ID number
+   * 
+   * @throws [[EvaluationSuspendedError]] when the evaluation is suspended
+   * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
    *
    * @category Sheet
    */
@@ -376,12 +369,10 @@ export class HyperFormula implements TypedEmitter {
   }
 
   /**
-   * Returns a map containing dimensions of all sheets for the engine instance
-   * 
-   * represented as a key-value pairs where keys are sheet IDs and dimensions are returned as numbers, width and height respectively.
-   * 
-   * @returns key-value pairs where keys are sheet IDs and dimensions are returned as numbers, width and height respectively.
+   * Returns a map containing dimensions of all sheets for the engine instance represented as a key-value pairs where keys are sheet IDs and dimensions are returned as numbers, width and height respectively.
    *
+   * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
+   * 
    * @category Sheet
    */
   public getAllSheetsDimensions(): Record<string, { width: number, height: number }> {
@@ -390,10 +381,9 @@ export class HyperFormula implements TypedEmitter {
 
   /**
    * Returns dimensions of a specified sheet.
-   * 
    * The sheet dimensions is represented with numbers: width and height.
    * 
-   * @throws Throws an error if the given sheet ID does not exist.
+   * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
    *
    * @param {number} sheet - sheet ID number
    *
@@ -407,9 +397,9 @@ export class HyperFormula implements TypedEmitter {
   }
 
   /**
-   * Returns map containing values of all sheets.
+   * Returns values of all sheets in a form of an object which property keys are strings and values are arrays of arrays of [[CellValue]]
    * 
-   * @returns an object which property keys are strings and values are arrays of arrays of [[CellValue]]
+   * @throws [[EvaluationSuspendedError]] when the evaluation is suspended
    *
    * @category Sheet
    */
@@ -419,9 +409,7 @@ export class HyperFormula implements TypedEmitter {
   }
 
   /**
-   * Returns map containing formulas of all sheets.
-   * 
-   * @returns an object which property keys are strings and values are arrays of arrays of strings or possibly `undefined`
+   * Returns formulas of all sheets in a form of an object which property keys are strings and values are arrays of arrays of strings or possibly `undefined`
    *
    * @category Sheet
    */
@@ -430,10 +418,10 @@ export class HyperFormula implements TypedEmitter {
   }
 
   /**
-   * Returns map containing formulas or values of all sheets.
+   * Returns formulas or values of all sheets in a form of an object which property keys are strings and values are arrays of arrays of [[CellValue]]
    * 
-   * @returns an object which property keys are strings and values are arrays of arrays of [[CellValue]]
-   *
+   * @throws [[EvaluationSuspendedError]] when the evaluation is suspended
+   * 
    * @category Sheet
    */
   public getAllSheetsSerialized(): Record<string, NoErrorCellValue[][]> {
@@ -491,8 +479,7 @@ export class HyperFormula implements TypedEmitter {
   }
 
   /**
-   * Returns snapshot of a computation time statistics.
-   * 
+   * Returns a snapshot of computation time statistics.
    * It returns a map with key-value pairs where keys are enums for stat type and time (number)
    *
    * @category Instance
@@ -502,6 +489,14 @@ export class HyperFormula implements TypedEmitter {
   }
 
   /**
+   * Undo the previous operation.
+   * 
+   * Note that this method may trigger dependency graph recalculation.
+   * 
+   * @fires [[valuesUpdated]]
+   * 
+   * @throws [[NoOperationToUndo]] when there is no operation running that can be undone
+   * 
    * @category UndoRedo
    */
   public undo() {
@@ -513,6 +508,8 @@ export class HyperFormula implements TypedEmitter {
   }
 
   /**
+   * Checks if there is at least one operation that can be undone.
+   * 
    * @category UndoRedo
    */
   public isThereSomethingToUndo() {
@@ -521,14 +518,16 @@ export class HyperFormula implements TypedEmitter {
 
   /**
    * Returns information whether it is possible to change the content in a rectangular area bounded by the box.
-   * 
    * If returns `true`, doing [[setCellContents]] operation won't throw any errors.
+   * Returns `false` if the operation might be disrupted and causes side-effects by the fact that there is a matrix inside selected cells, the address is invalid or the sheet does not exist
    * 
    * @param {SimpleCellAddress} address - cell coordinates (top left corner)
    * @param {number} width - width of the box
    * @param {number} height - height of the box
    * 
-   * @returns `true` if the action is possible, `false` if the operation might be disrupted and causes side-effects by the fact that there is a matrix inside selected cells, the address is invalid or the sheet does not exist
+   * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
+   * @throws [[InvalidAddressError]] when the given address is invalid
+   * @throws an error when there is a matrix inside selected cells
    *
    * @category Cell
    */
@@ -555,7 +554,8 @@ export class HyperFormula implements TypedEmitter {
    * 
    * @fires [[valuesUpdated]]
    * 
-   * @returns an array of [[ExportedChange]]
+   * @throws [[InvalidArgumentsError]] when the value is not an array of arrays or a raw cell value
+   * @throws an error when it is an attempt to set cells content inside matrices during batch operation
    *
    * @category Cell
    */
@@ -566,16 +566,13 @@ export class HyperFormula implements TypedEmitter {
 
   /**
    * Returns information whether it is possible to add rows into a specified position in a given sheet.
-   * 
    * Checks against particular rules to ascertain that addRows can be called.
-   * 
    * If returns `true`, doing [[addRows]] operation won't throw any errors.
+   * Returns `false` if the operation might be disrupted and causes side-effects by the fact that there is a matrix inside the selected rows.
    * 
    * @param {number} sheet - sheet ID in which rows will be added
    * @param {Index[]} indexes - non-contiguous indexes with format [row, amount], where row is a row number above which the rows will be added
    * 
-   * @returns `true` if the action is possible, `false` if the operation might be disrupted and causes side-effects by the fact that there is a matrix inside the selected rows.
-   *
    * @category Row
    */
   public isItPossibleToAddRows(sheet: number, ...indexes: Index[]): boolean {
@@ -590,7 +587,6 @@ export class HyperFormula implements TypedEmitter {
 
   /**
    * Adds multiple rows into a specified position in a given sheet.
-   * 
    * Does nothing if rows are outside of effective sheet size.
    * 
    * Note that this method may trigger dependency graph recalculation.
@@ -599,6 +595,9 @@ export class HyperFormula implements TypedEmitter {
    * @param {Index[]} indexes - non-contiguous indexes with format [row, amount], where row is a row number above which the rows will be added
    * 
    * @fires [[valuesUpdated]]
+   * 
+   * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
+   * @throws an error if the selected position has matrix inside
    *
    * @category Row
    */
@@ -609,15 +608,12 @@ export class HyperFormula implements TypedEmitter {
 
   /**
    * Returns information whether it is possible to remove rows from a specified position in a given sheet.
-   * 
    * Checks against particular rules to ascertain that removeRows can be called.
-   * 
    * If returns `true`, doing [[removeRows]] operation won't throw any errors.
+   * Returns `false` if the operation might be disrupted and causes side-effects by the fact that there is a matrix inside the selected rows.
    *
    * @param {number} sheet - sheet ID from which rows will be removed
    * @param {Index[]} indexes - non-contiguous indexes with format: [row, amount]
-   * 
-   * @returns `true` if the action is possible, `false` if the operation might be disrupted and causes side-effects by the fact that there is a matrix inside the selected rows.
    *
    * @category Row
    */
@@ -633,7 +629,6 @@ export class HyperFormula implements TypedEmitter {
 
   /**
    * Removes multiple rows from a specified position in a given sheet.
-   * 
    * Does nothing if rows are outside of the effective sheet size.
    * 
    * Note that this method may trigger dependency graph recalculation.
@@ -642,7 +637,11 @@ export class HyperFormula implements TypedEmitter {
    * @param {Index[]} indexes - non-contiguous indexes with format: [row, amount]
    * 
    * @fires [[valuesUpdated]]
-   *
+   * 
+   * @throws [[InvalidArgumentsError]] when the given arguments are invalid
+   * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
+   * @throws an error when the selected position has matrix inside
+   * 
    * @category Row
    */
   public removeRows(sheet: number, ...indexes: Index[]): ExportedChange[] {
@@ -652,15 +651,12 @@ export class HyperFormula implements TypedEmitter {
 
   /**
    * Returns information whether it is possible to add columns into a specified position in a given sheet.
-   * 
    * Checks against particular rules to ascertain that addColumns can be called.
-   * 
    * If returns `true`, doing [[addColumns]] operation won't throw any errors.
+   * Returns `false` if the operation might be disrupted and causes side-effects by the fact that there is a matrix inside the selected columns.
    *
    * @param {number} sheet - sheet ID in which columns will be added
    * @param {Index[]} indexes - non-contiguous indexes with format: [column, amount], where column is a column number from which new columns will be added
-   * 
-   * @returns `true` if the action is possible, `false` if the operation might be disrupted and causes side-effects by the fact that there is a matrix inside the selected columns.
    *
    * @category Column
    */
@@ -676,7 +672,6 @@ export class HyperFormula implements TypedEmitter {
 
   /**
    * Adds multiple columns into a specified position in a given sheet.
-   * 
    * Does nothing if the columns are outside of the effective sheet size.
    * 
    * Note that this method may trigger dependency graph recalculation.
@@ -685,7 +680,11 @@ export class HyperFormula implements TypedEmitter {
    * @param {Index[]} indexes - non-contiguous indexes with format: [column, amount], where column is a column number from which new columns will be added
    * 
    * @fires [[valuesUpdated]]
-   *
+   * 
+   * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
+   * @throws [[InvalidArgumentsError]] when the given arguments are invalid
+   * @throws an error when the selected position has matrix inside
+   * 
    * @category Column
    */
   public addColumns(sheet: number, ...indexes: Index[]): ExportedChange[] {
@@ -695,15 +694,12 @@ export class HyperFormula implements TypedEmitter {
 
   /**
    * Returns information whether it is possible to remove columns from a specified position in a given sheet.
-   * 
    * Checks against particular rules to ascertain that removeColumns can be called.
-   * 
    * If returns `true`, doing [[removeColumns]] operation won't throw any errors.
+   * Returns `false` if the operation might be disrupted and causes side-effects by the fact that there is a matrix inside the selected columns.
    *
    * @param {number} sheet - sheet ID from which columns will be removed
    * @param {Index[]} indexes - non-contiguous indexes with format [column, amount]
-   * 
-   * @returns `true` if the action is possible, `false` if the operation might be disrupted and causes side-effects by the fact that there is a matrix inside the selected columns.
    *
    * @category Column
    */
@@ -719,7 +715,6 @@ export class HyperFormula implements TypedEmitter {
 
   /**
    * Removes multiple columns from a specified position in a given sheet.
-   * 
    * Does nothing if columns are outside of the effective sheet size.
    * 
    * Note that this method may trigger dependency graph recalculation.
@@ -728,6 +723,10 @@ export class HyperFormula implements TypedEmitter {
    * @param {Index[]} indexes - non-contiguous indexes with format: [column, amount]
    * 
    * @fires [[valuesUpdated]]
+   * 
+   * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
+   * @throws [[InvalidArgumentsError]] when the given arguments are invalid
+   * @throws an error when the selected position has matrix inside
    *
    * @category Column
    */
@@ -738,17 +737,14 @@ export class HyperFormula implements TypedEmitter {
 
   /**
    * Returns information whether it is possible to move cells to a specified position in a given sheet.
-   * 
    * Checks against particular rules to ascertain that moveCells can be called.
-   * 
    * If returns `true`, doing [[moveCells]] operation won't throw any errors.
+   * Returns `false` if the operation might be disrupted and causes side-effects by the fact that there is a matrix inside the selected columns, the target location has matrix or the provided address is invalid.
    *
    * @param {SimpleCellAddress} sourceLeftCorner - address of the upper left corner of a moved block
    * @param {number} width - width of the cell block that is being moved
    * @param {number} height - height of the cell block that is being moved
    * @param {SimpleCellAddress} destinationLeftCorner - upper left address of the target cell block
-   * 
-   * @returns `true` if the action is possible, `false` if the operation might be disrupted and causes side-effects by the fact that there is a matrix inside the selected columns, the target location has matrix or the provided address is invalid.
    *
    * @category Cell
    */
@@ -772,6 +768,10 @@ export class HyperFormula implements TypedEmitter {
    * @param {SimpleCellAddress} destinationLeftCorner - upper left address of the target cell block
    * 
    * @fires [[valuesUpdated]]
+   * 
+   * @throws [[InvalidArgumentsError]] when the given arguments are invalid
+   * @throws an error when the source location has matrix inside - matrix cannot be moved
+   * @throws an error when the target location has matrix inside - cells cannot be replaced by the matrix
    *
    * @category Cell
    */
@@ -782,17 +782,14 @@ export class HyperFormula implements TypedEmitter {
 
   /**
    * Returns information whether it is possible to move a particular number of rows to a specified position in a given sheet.
-   * 
    * Checks against particular rules to ascertain that moveRows can be called.
-   * 
    * If returns `true`, doing [[moveRows]] operation won't throw any errors.
+   * Returns `false` if the operation might be disrupted and causes side-effects by the fact that there is a matrix inside the selected rows, the target location has matrix or the provided address is invalid.
    *
    * @param {number} sheet - a sheet number in which the operation will be performed
    * @param {number} startRow - number of the first row to move
    * @param {number} numberOfRows - number of rows to move
    * @param {number} targetRow - row number before which rows will be moved
-   * 
-   * @returns `true` if the action is possible, `false` if the operation might be disrupted and causes side-effects by the fact that there is a matrix inside the selected rows, the target location has matrix or the provided address is invalid.
    *
    * @category Row
    */
@@ -816,7 +813,10 @@ export class HyperFormula implements TypedEmitter {
    * @param {number} targetRow - row number before which rows will be moved
    * 
    * @fires [[valuesUpdated]]
-   *
+   * 
+   * @throws [[InvalidArgumentsError]] when the given arguments are invalid
+   * @throws an error when the source location has matrix inside - matrix cannot be moved
+   * 
    * @category Row
    */
   public moveRows(sheet: number, startRow: number, numberOfRows: number, targetRow: number): ExportedChange[] {
@@ -826,17 +826,14 @@ export class HyperFormula implements TypedEmitter {
 
   /**
    * Returns information whether it is possible to move a particular number of columns to a specified position in a given sheet.
-   * 
    * Checks against particular rules to ascertain that moveColumns can be called.
-   * 
    * If returns `true`, doing [[moveColumns]] operation won't throw any errors.
+   * Returns `false` if the operation might be disrupted and causes side-effects by the fact that there is a matrix inside the selected columns, the target location has matrix or the provided address is invalid.
    *
    * @param {number} sheet - a sheet number in which the operation will be performed
    * @param {number} startColumn - number of the first column to move
    * @param {number} numberOfColumns - number of columns to move
    * @param {number} targetColumn - column number before which columns will be moved
-   * 
-   * @returns `true` if the action is possible, `false` if the operation might be disrupted and causes side-effects by the fact that there is a matrix inside the selected columns, the target location has matrix or the provided address is invalid.
    *
    * @category Column
    */
@@ -860,6 +857,9 @@ export class HyperFormula implements TypedEmitter {
    * @param {number} targetColumn - column number before which columns will be moved
    * 
    * @fires [[valuesUpdated]]
+   * 
+   * @throws [[InvalidArgumentsError]] when the given arguments are invalid
+   * @throws an error when the source location has matrix inside - matrix cannot be moved
    *
    * @category Column
    */
@@ -870,12 +870,13 @@ export class HyperFormula implements TypedEmitter {
 
   /**
    * Stores a copy of the cell block in internal clipboard for the further paste.
-   * 
    * Returns values of cells for use in external clipboard.
    *
    * @param {SimpleCellAddress} sourceLeftCorner - address of the upper left corner of a copied block
    * @param {number} width - width of the cell block being copied
    * @param {number} height - height of the cell block being copied
+   * 
+   * @throws an error while attempting to copy unsupported content type
    *
    * @category Clipboard
   */
@@ -886,11 +887,8 @@ export class HyperFormula implements TypedEmitter {
 
   /**
    * Stores information of the cell block in internal clipboard for further paste.
-   * 
    * Calling [[paste]] right after this method is equivalent to call [[moveCells]].
-   * 
    * Almost any CRUD operation called after this method will abort the cut operation.
-   * 
    * Returns values of cells for use in external clipboard.
    *
    * @param {SimpleCellAddress} sourceLeftCorner - address of the upper left corner of a copied block
@@ -906,9 +904,7 @@ export class HyperFormula implements TypedEmitter {
 
   /**
    * When called after [[copy]] it will paste copied values and formulas into a cell block.
-   * 
    * When called after [[paste]] it will perform [[moveCells]] operation into the cell block.
-   * 
    * Does nothing if the clipboard is empty.
    * 
    * Note that this method may trigger dependency graph recalculation.
@@ -916,6 +912,9 @@ export class HyperFormula implements TypedEmitter {
    * @param {SimpleCellAddress} targetLeftCorner - upper left address of the target cell block
    * 
    * @fires [[valuesUpdated]]
+   * 
+   * @throws an error while attempting to paste onto a matrix
+   * @throws [[EvaluationSuspendedError]] when the evaluation is suspended
    *
    * @category Clipboard
    */
@@ -935,7 +934,7 @@ export class HyperFormula implements TypedEmitter {
   }
 
   /**
-   * Returns the cell content of a given range in a [[InternalCellValue]][][] format.
+   * Returns the cell content of a given range in a [[CellValue]][][] format.
    *
    * @param {AbsoluteCellRange} range absolute cell range
    *
@@ -981,15 +980,12 @@ export class HyperFormula implements TypedEmitter {
 
   /**
    * Returns information whether it is possible to add a sheet to the engine.
-   * 
    * Checks against particular rules to ascertain that addSheet can be called.
-   * 
-   * If returns `true`, doing [[addSheet]] operation won't throw any errors.
+   * If returns `true`, doing [[addSheet]] operation won't throw any errors and it possible to add sheet with provided name.
+   * Returns `false` if the chosen name is already used.
    * 
    * @param {string} name - sheet name, case insensitive
    * 
-   * @returns `true` if it possible to add sheet with provided name, meaning the name does not already exists in the instance, `false` if the chosen name is already used
-   *
    * @category Sheet
    */
   public isItPossibleToAddSheet(name: string): boolean {
@@ -1002,13 +998,13 @@ export class HyperFormula implements TypedEmitter {
   }
 
   /**
-   * Adds a new sheet to the engine.
+   * Adds a new sheet to the HyperFormula instance. Returns given or autogenerated name of a new sheet.
    * 
    * @param {string} [name] - if not specified, name will be autogenerated
    * 
    * @fires [[sheetAdded]]
    * 
-   * @returns given or autogenerated name of a new sheet
+   * @throws an error when sheet with a given name already exists
    *
    * @category Sheet
    */
@@ -1020,12 +1016,10 @@ export class HyperFormula implements TypedEmitter {
 
   /**
    * Returns information whether it is possible to remove sheet for the engine.
-   * 
-   * If returns true, doing [[removeSheet]] operation won't throw any errors.
+   * Returns `true` if the provided name of a sheet exists and therefore it can be removed, doing [[removeSheet]] operation won't throw any errors.
+   * Returns `false` if there is no sheet with a given name
    * 
    * @param {string} name - sheet name, case insensitive
-   * 
-   * @returns `true` if the provided name of a sheet exists and then it can be removed, `false` if there is no sheet with a given name
    *
    * @category Sheet
    */
@@ -1047,6 +1041,8 @@ export class HyperFormula implements TypedEmitter {
    * 
    * @fires [[sheetRemoved]]
    * @fires [[valuesUpdated]]
+   * 
+   * @throws [[NoSheetWithNameError]] when the given sheet name does not exists
    *
    * @category Sheet
    */
@@ -1060,12 +1056,10 @@ export class HyperFormula implements TypedEmitter {
 
   /**
    * Returns information whether it is possible to clear a specified sheet.
-   * 
-   * If returns `true`, doing [[clearSheet]] operation won't throw any errors.
+   * If returns `true`, doing [[clearSheet]] operation won't throw any errors, provided name of a sheet exists and then its content can be cleared.
+   * Returns `false` if there is no sheet with a given name
    * 
    * @param {string} name - sheet name, case insensitive.
-   * 
-   * @returns `true` if the provided name of a sheet exists and then its content can be cleared, `false` if there is no sheet with a given name
    *
    * @category Sheet
    */
@@ -1079,10 +1073,7 @@ export class HyperFormula implements TypedEmitter {
   }
 
   /**
-   * Clears the sheet content.
-   * 
-   * Based on that the method finds the ID of a sheet to be cleared.
-   * 
+   * Clears the sheet content. Based on that the method finds the ID of a sheet to be cleared.
    * Double-checks if the sheet exists.
    * 
    * Note that this method may trigger dependency graph recalculation.
@@ -1090,6 +1081,8 @@ export class HyperFormula implements TypedEmitter {
    * @param {string} name - sheet name, case insensitive.
    * 
    * @fires [[valuesUpdated]]
+   * 
+   * @throws [[NoSheetWithNameError]] when the given sheet name does not exists
    *
    * @category Sheet
    */
@@ -1101,12 +1094,10 @@ export class HyperFormula implements TypedEmitter {
 
   /**
    * Returns information whether it is possible to replace the sheet content.
-   * 
-   * If returns `true`, doing [[setSheetContent]] operation won't throw any errors.
+   * If returns `true`, doing [[setSheetContent]] operation won't throw any errors, the provided name of a sheet exists and then its content can be replaced.
+   * Returns `false` if there is no sheet with a given name
    *
    * @param {string} name - sheet name, case insensitive.
-   * 
-   * @returns `true` if the provided name of a sheet exists and then its content can be replaced, `false` if there is no sheet with a given name
    *
    * @category Sheet
    */
@@ -1121,14 +1112,14 @@ export class HyperFormula implements TypedEmitter {
 
   /**
    * Replaces the sheet content with new values.
-   * 
    * The new value is to be provided as an array of arrays of [[RawCellContent]]
-   * 
    * The method finds sheet ID based on the provided sheet name.
    *
    * @param {string} sheetName - sheet name, case insensitive.
    * @param {RawCellContent[][]} values - array of new values
-   *
+   * 
+   * @throws [[NoSheetWithNameError]] when the given sheet name does not exists
+   * 
    * @category Sheet
    */
   public setSheetContent(sheetName: string, values: RawCellContent[][]): ExportedChange[] {
@@ -1138,16 +1129,13 @@ export class HyperFormula implements TypedEmitter {
 
   /**
    * Computes simple (absolute) address of a cell address based on its string representation.
-   * 
    * If sheet name is present in string representation but not present in the engine, returns `undefined`.
-   * 
    * If sheet name is not present in string representation, returns the sheet number.
+   * Returns an absolute representation of address, e.g. `{ sheet: 0, col: 1, row: 1 }` for `Sheet1!B2`
    *
-   * @param {string} stringAddress - string representation of cell address, e.g. 'C64'
+   * @param {string} stringAddress - string representation of cell address in A1 notation, e.g. 'C64'
    * @param {number} sheet - override sheet index regardless of sheet mapping
    * 
-   * @returns absolute representation of address, e.g. `{ sheet: 0, col: 1, row: 1 }`
-   *
    * @category Helper
    */
   public simpleCellAddressFromString(stringAddress: string, sheet: number) {
@@ -1155,12 +1143,10 @@ export class HyperFormula implements TypedEmitter {
   }
 
   /**
-   * Returns string representation of an absolute address in A1 notation.
+   * Returns string representation of an absolute address in A1 notation or `undefined` if the sheet index is not present in the engine.
    * 
    * @param {SimpleCellAddress} address - object representation of an absolute address
    * @param {number} sheet - if is not equal with address sheet index, string representation will contain sheet name
-   * 
-   * @returns absolute address in string or `undefined` if the sheet index is not present in the engine
    *
    * @category Helper
    */
@@ -1169,14 +1155,10 @@ export class HyperFormula implements TypedEmitter {
   }
 
   /**
-   * Returns a unique sheet name assigned to the sheet of a given ID.
-   * 
-   * Or `undefined` if the there is no sheet with a given ID.
+   * Returns a unique sheet name assigned to the sheet of a given ID or `undefined` if the there is no sheet with a given ID.
    * 
    * @param {number} sheetId - ID of the sheet, for which we want to retrieve name
    * 
-   * @returns name of the sheet or `undefined` if the sheet does not exist
-   *
    * @category Sheet
    */
   public getSheetName(sheetId: number): Maybe<string> {
@@ -1184,13 +1166,9 @@ export class HyperFormula implements TypedEmitter {
   }
 
   /**
-   * Returns a unique sheet ID assigned to the sheet with a given name.
-   * 
-   * Returns `undefined` if the there's no sheet with a given name.
+   * Returns a unique sheet ID assigned to the sheet with a given name or `undefined` if the sheet does not exist.
    * 
    * @param {string} sheetName - name of the sheet, for which we want to retrieve ID, case insensitive.
-   * 
-   * @returns ID of the sheet or `undefined` if the sheet does not exist
    *
    * @category Sheet
    */
@@ -1199,14 +1177,10 @@ export class HyperFormula implements TypedEmitter {
   }
 
   /**
-   * Returns true whether sheet with a given name exists.
-   * 
-   * The methods accepts sheet name to be checked.
+   * Returns `true` whether sheet with a given name exists. The methods accepts sheet name to be checked.
    * 
    * @param {string} sheetName - name of the sheet, case insensitive.
    * 
-   * @returns `true` if a given sheet exists
-   *
    * @category Sheet
    */
   public doesSheetExist(sheetName: string): boolean {
@@ -1215,10 +1189,11 @@ export class HyperFormula implements TypedEmitter {
 
   /**
    * Returns type of a specified cell of a given address.
-   * 
    * The methods accepts cell coordinates as object with column, row and sheet numbers.
    *
    * @param {SimpleCellAddress} address - cell coordinates
+   * 
+   * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
    *
    * @category Cell
    */
@@ -1228,14 +1203,11 @@ export class HyperFormula implements TypedEmitter {
   }
 
   /**
-   * Checks if the specified cell contains a simple value.
-   * 
+   * Returns `true` if the specified cell contains a simple value.
    * The methods accepts cell coordinates as object with column, row and sheet numbers.
    * 
    * @param {SimpleCellAddress} address - cell coordinates
    * 
-   * @returns `true` if cell contains a simple value
-   *
    * @category Cell
    */
   public doesCellHaveSimpleValue(address: SimpleCellAddress): boolean {
@@ -1243,14 +1215,11 @@ export class HyperFormula implements TypedEmitter {
   }
 
   /**
-   * Checks if the specified cell contains a formula.
-   * 
+   * Returns `true` if the specified cell contains a formula.
    * The methods accepts cell coordinates as object with column, row and sheet numbers.
-   *
+   * 
    * @param {SimpleCellAddress} address - cell coordinates
    * 
-   * @returns `true` if cell contains a formula
-   *
    * @category Cell
    */
   public doesCellHaveFormula(address: SimpleCellAddress): boolean {
@@ -1258,14 +1227,11 @@ export class HyperFormula implements TypedEmitter {
   }
 
   /**
-   * Checks if the specified cell is empty.
-   * 
+   * Returns`true` if the specified cell is empty.
    * The methods accepts cell coordinates as object with column, row and sheet numbers.
    *
    * @param {SimpleCellAddress} address - cell coordinates
    * 
-   * @returns `true` if the cell is empty
-   *
    * @category Cell
    */
   public isCellEmpty(address: SimpleCellAddress): boolean {
@@ -1273,8 +1239,7 @@ export class HyperFormula implements TypedEmitter {
   }
 
   /**
-   * Returns true if a given cell is a part of a matrix.
-   * 
+   * Returns `true` if a given cell is a part of a matrix.
    * The methods accepts cell coordinates as object with column, row and sheet numbers.
    *
    * @param {SimpleCellAddress} address - cell coordinates
@@ -1287,10 +1252,11 @@ export class HyperFormula implements TypedEmitter {
 
   /**
    * Returns type of the cell value of a given address.
-   * 
    * The methods accepts cell coordinates as object with column, row and sheet numbers.
    * 
    * @param {SimpleCellAddress} address - cell coordinates
+   * 
+   * @throws [[EvaluationSuspendedError]] when the evaluation is suspended
    *
    * @category Cell
    */
@@ -1303,8 +1269,6 @@ export class HyperFormula implements TypedEmitter {
   /**
    * Returns the number of existing sheets.
    * 
-   * @returns which is a number of sheets
-   *
    * @category Sheet
    */
   public countSheets(): number {
@@ -1353,13 +1317,9 @@ export class HyperFormula implements TypedEmitter {
 
   /**
    * Suspends the dependency graph recalculation.
-   * 
    * It allows optimizing the performance.
-   * 
    * With this method, multiple CRUD operations can be done without triggering recalculation after every operation.
-   * 
    * Suspending evaluation should result in an overall faster calculation compared to recalculating after each operation separately.
-   * 
    * To resume the evaluation use [[resumeEvaluation]].
    * 
    * @category Batch
@@ -1370,7 +1330,6 @@ export class HyperFormula implements TypedEmitter {
 
   /**
    * Resumes the dependency graph recalculation that was suspended with [[suspendEvaluation]].
-   * 
    * It also triggers the recalculation and returns changes that are a result of all batched operations.
    * 
    * @fires [[valuesUpdated]]
@@ -1393,7 +1352,7 @@ export class HyperFormula implements TypedEmitter {
 
   /**
    * Adds a specified named expression.
-   *
+   * 
    * Note that this method may trigger dependency graph recalculation.
    *
    * @param {string} expressionName - a name of the expression to be added
@@ -1422,10 +1381,9 @@ export class HyperFormula implements TypedEmitter {
 
   /**
    * Gets specified named expression value.
+   * Returns a [[CellValue]] or null if the given named expression does not exists
    *
    * @param {string} expressionName - expression name, case insensitive.
-   * 
-   * @returns a [[CellValue]] or null if the given named expression does not exists
    *
    * @category Named Expression
    */
@@ -1441,14 +1399,14 @@ export class HyperFormula implements TypedEmitter {
   /**
    * Changes a given named expression to a specified formula.
    * 
-   * @throws Throws an error if the given expression does not exist.
-   * 
    * Note that this method may trigger dependency graph recalculation.
    *
    * @param {string} expressionName - an expression name, case insensitive.
    * @param {RawCellContent} newExpression - a new expression
    * 
    * @fires [[valuesUpdated]]
+   * 
+   * @throws [[NamedExpressionDoesNotExist]] when the given expression does not exist.
    *
    * @category Named Expression
    */
@@ -1486,11 +1444,8 @@ export class HyperFormula implements TypedEmitter {
 
   /**
    * Lists all named expressions.
+   * Returns an array of expression names as strings
    * 
-   * The method does not accept any parameters.
-   * 
-   * @returns an array of expression names as strings
-   *
    * @category Named Expression
    */
   public listNamedExpressions(): string[] {
@@ -1498,31 +1453,30 @@ export class HyperFormula implements TypedEmitter {
   }
 
   /**
-   * Normalizes the formula.
-   * 
-   * @throws Throws an error if the provided parameter is not a valid formula.
+   * Returns a normalized formula.
    *
-   * @param {string} formulaString - a formula, ex. "=SUM(Sheet1!A1:A100)"
+   * @param {string} formulaString - a formula, ex. =SUM(Sheet1!A1:A100)"
    *
-   * @returns a normalized formula, throws an error if the provided string is not a formula, i.e does not start with "="
+   * @throws [[NotAFormulaError]] when the provided string is not a valid formula, i.e does not start with "="
    *
    * @category Helper
    */
   public normalizeFormula(formulaString: string): string {
     const [ast, address] = this.extractTemporaryFormula(formulaString)
     if (!ast) {
-      throw new Error('This is not a formula')
+      throw new NotAFormulaError()
     }
     return this._unparser.unparse(ast, address)
   }
 
   /**
-   * Calculates fire-and-forget formula
+   * Calculates fire-and-forget formula, returns the calculated value.
    *
    * @param {string} formulaString - a formula, ex. "=SUM(Sheet1!A1:A100)"
    * @param {string} sheetName - a name of the sheet in context of which we evaluate formula, case insensitive.
    * 
-   * @returns value of the formula
+   * @throws [[NotAFormulaError]] when the provided string is not a valid formula, i.e does not start with "="
+   * @throws [[NoSheetWithNameError]] when the given sheet name does not exists
    *
    * @category Helper
    */
@@ -1531,7 +1485,7 @@ export class HyperFormula implements TypedEmitter {
     const sheetId = this.sheetMapping.fetch(sheetName)
     const [ast, address] = this.extractTemporaryFormula(formulaString, sheetId)
     if (!ast) {
-      throw new Error('This is not a formula')
+      throw new NotAFormulaError()
     }
     const internalCellValue = this.evaluator.runAndForget(ast, address)
     return this._exporter.exportValue(internalCellValue)
@@ -1539,12 +1493,9 @@ export class HyperFormula implements TypedEmitter {
 
   /**
    * Validates the formula.
-   * 
-   * If the provided string starts with "=" and is a parsable formula the method returns true.
+   * If the provided string starts with "=" and is a parsable formula the method returns `true`.
    *
    * @param {string} formulaString - a formula, ex. "=SUM(Sheet1!A1:A100)"
-   *
-   * @returns `true` if the string is a parsable formula
    *
    * @category Helper
    */
@@ -1612,9 +1563,8 @@ export class HyperFormula implements TypedEmitter {
   }
 
   /**
-   *  Destroys instance of HyperFormula.
-   * 
-   *  Dependency graph, optimization indexes, statistics and parser are removed.
+   * Destroys instance of HyperFormula.
+   * Dependency graph, optimization indexes, statistics and parser are removed.
    *
    * @category Instance
    */
@@ -1657,3 +1607,4 @@ export class HyperFormula implements TypedEmitter {
     }
   }
 }
+

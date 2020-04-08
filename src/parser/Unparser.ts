@@ -1,3 +1,8 @@
+/**
+ * @license
+ * Copyright (c) 2020 Handsoncode. All rights reserved.
+ */
+
 import {ErrorType, SimpleCellAddress} from '../Cell'
 import {
   Ast,
@@ -36,7 +41,9 @@ export class Unparser {
       }
       case AstNodeType.FUNCTION_CALL: {
         const args = ast.args.map((arg) => this.unparseAst(arg, address)).join(this.config.functionArgSeparator)
-        const procedureName = this.config.translationPackage.getFunctionTranslation(ast.procedureName) ?? ast.procedureName
+        const procedureName = this.config.translationPackage.isFunctionTranslated(ast.procedureName) ?
+          this.config.translationPackage.getFunctionTranslation(ast.procedureName) :
+          ast.procedureName
         const rightPart = procedureName + '(' + args + imageWithWhitespace(')', ast.internalWhitespace)
         return imageWithWhitespace(rightPart, ast.leadingWhitespace)
       }
@@ -66,7 +73,7 @@ export class Unparser {
         return this.unparseAst(ast.value, address) + imageWithWhitespace('%', ast.leadingWhitespace)
       }
       case AstNodeType.ERROR: {
-        const image = this.config.getErrorTranslationFor(
+        const image = this.config.translationPackage.getErrorTranslation(
           ast.error ? ast.error.type : ErrorType.ERROR
         )
         return imageWithWhitespace(image, ast.leadingWhitespace)

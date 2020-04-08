@@ -1,4 +1,9 @@
-import {ISerializedGast, IToken, tokenMatcher} from 'chevrotain'
+/**
+ * @license
+ * Copyright (c) 2020 Handsoncode. All rights reserved.
+ */
+
+import {IToken, tokenMatcher} from 'chevrotain'
 import {ErrorType, SimpleCellAddress} from '../Cell'
 import {buildParsingErrorAst, RelativeDependency} from './'
 import {
@@ -49,13 +54,6 @@ export class ParserWithCaching {
     this.lexer = new FormulaLexer(this.lexerConfig)
     this.formulaParser = new FormulaParser(this.lexerConfig, this.sheetMapping)
     this.cache = new Cache(this.config.volatileFunctions(), this.config.structuralChangeFunctions(), this.config.functionsWhichDoesNotNeedArgumentsToBeComputed())
-  }
-
-  /**
-   * Get serialized AST top nodes for chevrotain diagram generator.
-   */
-  public getSerializedGastProductions(): ISerializedGast[] {
-    return this.formulaParser.getSerializedGastProductions()
   }
 
   /**
@@ -195,7 +193,7 @@ export class ParserWithCaching {
         return this.computeHashOfAstNode(ast.value) + imageWithWhitespace('%', ast.leadingWhitespace)
       }
       case AstNodeType.ERROR: {
-        const image = this.config.getErrorTranslationFor(
+        const image = this.config.translationPackage.getErrorTranslation(
           ast.error ? ast.error.type : ErrorType.ERROR
         )
         return imageWithWhitespace(image, ast.leadingWhitespace)

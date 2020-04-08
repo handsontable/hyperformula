@@ -1,7 +1,12 @@
+/**
+ * @license
+ * Copyright (c) 2020 Handsoncode. All rights reserved.
+ */
+
 import {CellError, ErrorType, SimpleCellAddress} from '../../Cell'
 import {matrixSizeForMultiplication, matrixSizeForPoolFunction, matrixSizeForTranspose} from '../../Matrix'
 import {Ast, AstNodeType, NumberAst, ProcedureAst} from '../../parser'
-import {coerceToRangeNumbersOrError} from '../coerce'
+import {coerceToRangeNumbersOrError} from '../ArithmeticHelper'
 import {SimpleRangeValue} from '../InterpreterValue'
 import {FunctionPlugin} from './FunctionPlugin'
 

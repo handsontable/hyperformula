@@ -1,13 +1,11 @@
 import {HyperFormula} from '../src'
 import {Config} from '../src/Config'
 import {AlwaysSparse} from '../src/DependencyGraph/AddressMapping/ChooseAddressMappingPolicy'
-import {enGB} from '../src/i18n'
+import {languages} from '../src/i18n'
+import {unregisterAllLanguages} from './testUtils'
 
 Config.defaultConfig = Object.assign({}, Config.defaultConfig, {
   chooseAddressMappingPolicy: new AlwaysSparse(),
-  dateFormats: ['MM/DD/YYYY'],
-  functionArgSeparator: ',',
-  language: 'enGB',
   functionPlugins: [],
   gpuMode: 'cpu',
   matrixDetection: false,
@@ -15,6 +13,7 @@ Config.defaultConfig = Object.assign({}, Config.defaultConfig, {
 })
 
 beforeEach(() => {
-  HyperFormula.unregisterAllLanguages()
-  HyperFormula.registerLanguage('enGB', enGB)
+  unregisterAllLanguages()
+  const defaultLanguage = Config.defaultConfig.language
+  HyperFormula.registerLanguage(defaultLanguage, languages[defaultLanguage])
 })

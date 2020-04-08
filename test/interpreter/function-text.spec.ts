@@ -1,8 +1,8 @@
 import {HyperFormula} from '../../src'
 import {ErrorType} from '../../src/Cell'
 import '../testConfig'
-import {SimpleDate} from '../../src/DateHelper'
-import {defaultPrintDate} from '../../src/format/format'
+import {SimpleDateTime} from '../../src/DateTimeHelper'
+import {defaultStringifyDateTime} from '../../src/format/format'
 import {Maybe} from '../../src/Maybe'
 import {adr, detailedError} from '../testUtils'
 
@@ -51,17 +51,6 @@ describe('Text', () => {
     expect(engine.getCellValue(adr('C1'))).toEqual('08 08')
   })
 
-  xit('day formats - not supported',  () => {
-    const engine =  HyperFormula.buildFromArray([[
-      '=DATE(2018, 8, 8)',
-      '=TEXT(A1, "ddd DDD")',
-      '=TEXT(A1, "dddd DDDD")',
-    ]])
-
-    expect(engine.getCellValue(adr('B1'))).toEqual('Wed Wed')
-    expect(engine.getCellValue(adr('C1'))).toEqual('Wednesday Wednesday')
-  })
-
   it('month formats',  () => {
     const engine =  HyperFormula.buildFromArray([[
       '=DATE(2018, 8, 8)',
@@ -71,19 +60,6 @@ describe('Text', () => {
 
     expect(engine.getCellValue(adr('B1'))).toEqual('8 8')
     expect(engine.getCellValue(adr('C1'))).toEqual('08 08')
-  })
-
-  xit('month formats - not supported',  () => {
-    const engine =  HyperFormula.buildFromArray([[
-      '=DATE(2018, 8, 8)',
-      '=TEXT(A1, "mmm MMM")',
-      '=TEXT(A1, "mmmm MMMM")',
-      '=TEXT(A1, "mmmmm MMMMM")',
-    ]])
-
-    expect(engine.getCellValue(adr('B1'))).toEqual('Aug Aug')
-    expect(engine.getCellValue(adr('C1'))).toEqual('August August')
-    expect(engine.getCellValue(adr('D1'))).toEqual('A A')
   })
 
   it('year formats',  () => {
@@ -97,34 +73,41 @@ describe('Text', () => {
     expect(engine.getCellValue(adr('C1'))).toEqual('2018 2018')
   })
 
-  xit('12 hours - not supported',  () => {
-    const engine =  HyperFormula.buildFromArray([[
-      '=DATE(2018, 8, 8)',
-      '=TEXT(A1, "hh:mm AM/PM")',
-    ]])
-    expect(engine.getCellValue(adr('B1'))).toEqual('12:00 AM')
+  it('12 hours',  () => {
+    const engine =  HyperFormula.buildFromArray([
+      [
+        '8/8/2018 14:00',
+        '=TEXT(A1, "hh:mm A")',
+      ],
+      [
+        '8/8/2018 00:30',
+        '=TEXT(A2, "hh:mm A")',
+      ]
+    ])
+    expect(engine.getCellValue(adr('B1'))).toEqual('02:00 pm')
+    expect(engine.getCellValue(adr('B2'))).toEqual('12:30 am')
   })
 
-  xit('24 hours - not supported',  () => {
-    const engine =  HyperFormula.buildFromArray([[
-      '=DATE(2018, 8, 8)',
-      '=TEXT(A1, "HH:mm")',
-    ]])
-    expect(engine.getCellValue(adr('B1'))).toEqual('00:00')
+  it('24 hours',  () => {
+    const engine =  HyperFormula.buildFromArray([
+      [
+        '8/8/2018 13:59',
+        '=TEXT(A1, "HH:mm")',
+      ]
+    ])
+    expect(engine.getCellValue(adr('B1'))).toEqual('13:59')
   })
 
-  xit('distinguishes between months and minutes - not supported',  () => {
+  it('distinguishes between months and minutes - not supported',  () => {
     const engine =  HyperFormula.buildFromArray([[
       '=DATE(2018, 8, 8)',
       '=TEXT(A1, "mm")',
       '=TEXT(A1, "HH:mm")',
       '=TEXT(A1, "H:m")',
-      '=TEXT(A1, "h:M")',
     ]])
     expect(engine.getCellValue(adr('B1'))).toEqual('08')
     expect(engine.getCellValue(adr('C1'))).toEqual('00:00')
     expect(engine.getCellValue(adr('D1'))).toEqual('0:0')
-    expect(engine.getCellValue(adr('E1'))).toEqual('12:0')
   })
 
   it('works for number format',  () => {
@@ -141,8 +124,8 @@ describe('Text', () => {
 })
 
 describe( 'Custom date printing', () => {
-  function customPrintDate(date: SimpleDate, dateFormat: string): Maybe<string> {
-    const str = defaultPrintDate(date, dateFormat)
+  function customPrintDate(date: SimpleDateTime, dateFormat: string): Maybe<string> {
+    const str = defaultStringifyDateTime(date, dateFormat)
     if(str === undefined) {
       return undefined
     } else {
@@ -153,7 +136,7 @@ describe( 'Custom date printing', () => {
     const engine =  HyperFormula.buildFromArray([[
       '2',
       '=TEXT(A1, "mm/dd/yyyy")',
-    ]], {stringifyDate: customPrintDate})
+    ]], {stringifyDateTime: customPrintDate})
 
     expect(engine.getCellValue(adr('B1'))).toEqual('fancy 01/01/1900 fancy')
   })
@@ -163,7 +146,7 @@ describe( 'Custom date printing', () => {
       '12.45',
       '=TEXT(A1, "###.###")',
       '=TEXT(A1, "000.000")',
-    ]], {stringifyDate: customPrintDate})
+    ]], {stringifyDateTime: customPrintDate})
 
     expect(engine.getCellValue(adr('B1'))).toEqual('12.45')
     expect(engine.getCellValue(adr('C1'))).toEqual('012.450')

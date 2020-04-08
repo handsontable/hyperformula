@@ -1,3 +1,8 @@
+/**
+ * @license
+ * Copyright (c) 2020 Handsoncode. All rights reserved.
+ */
+
 import {SimpleCellAddress} from './Cell'
 import {RawCellContent} from './CellContentParser'
 import {Index} from './HyperFormula'

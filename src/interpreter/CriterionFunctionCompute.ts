@@ -1,3 +1,8 @@
+/**
+ * @license
+ * Copyright (c) 2020 Handsoncode. All rights reserved.
+ */
+
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
 import {CellError, ErrorType, InternalCellValue, simpleCellAddress} from '../Cell'
 import {CriterionCache, DependencyGraph, RangeVertex} from '../DependencyGraph'

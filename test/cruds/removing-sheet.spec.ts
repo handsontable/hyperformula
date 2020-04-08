@@ -236,7 +236,7 @@ describe('remove sheet - adjust address mapping', () => {
 
     engine.removeSheet('Sheet1')
 
-    expect(() => engine.addressMapping.strategyFor(0)).toThrow(new Error('Unknown sheet id'))
+    expect(() => engine.addressMapping.strategyFor(0)).toThrow(new Error("There's no sheet with id = 0"))
   })
 })
 

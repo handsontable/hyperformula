@@ -2,12 +2,12 @@ import {EmptyValue} from '../src'
 import {ErrorType} from '../src/Cell'
 import {CellContent, CellContentParser} from '../src/CellContentParser'
 import {Config} from '../src/Config'
-import {DateHelper} from '../src/DateHelper'
+import {DateTimeHelper} from '../src/DateTimeHelper'
 import {NumberLiteralHelper} from '../src/NumberLiteralHelper'
 
 describe('CellContentParser', () => {
   const config = new Config()
-  const cellContentParser = new CellContentParser(config, new DateHelper(config), new NumberLiteralHelper(config))
+  const cellContentParser = new CellContentParser(config, new DateTimeHelper(config), new NumberLiteralHelper(config))
 
   it('a matrix', () => {
     expect(cellContentParser.parse('{=FOO()}')).toStrictEqual(new CellContent.MatrixFormula('=FOO()'))
@@ -52,7 +52,7 @@ describe('CellContentParser', () => {
 
   it('numbers with different decimal separators', () => {
     const config = new Config({ decimalSeparator: ',', functionArgSeparator: ';' })
-    const cellContentParser = new CellContentParser(config, new DateHelper(config), new NumberLiteralHelper(config))
+    const cellContentParser = new CellContentParser(config, new DateTimeHelper(config), new NumberLiteralHelper(config))
 
     expect(cellContentParser.parse('42')).toStrictEqual(new CellContent.Number(42))
     expect(cellContentParser.parse('42,13')).toStrictEqual(new CellContent.Number(42.13))
@@ -65,7 +65,7 @@ describe('CellContentParser', () => {
 
   it('numbers with thousand separators', () => {
     const config = new Config({ thousandSeparator: ' ', functionArgSeparator: ';' })
-    const cellContentParser = new CellContentParser(config, new DateHelper(config), new NumberLiteralHelper(config))
+    const cellContentParser = new CellContentParser(config, new DateTimeHelper(config), new NumberLiteralHelper(config))
 
     expect(cellContentParser.parse('42')).toStrictEqual(new CellContent.Number(42))
     expect(cellContentParser.parse('1234567')).toStrictEqual(new CellContent.Number(1234567))

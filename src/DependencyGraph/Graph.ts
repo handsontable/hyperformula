@@ -1,3 +1,7 @@
+/**
+ * @license
+ * Copyright (c) 2020 Handsoncode. All rights reserved.
+ */
 
 export interface IGetDependenciesQuery<T> {
   call(node: T): Set<T> | null,

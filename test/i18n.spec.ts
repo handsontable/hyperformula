@@ -1,5 +1,4 @@
 import {HyperFormula} from '../src'
-import {ErrorType} from '../src/Cell'
 import {Config} from '../src/Config'
 import {languages, plPL, TranslationPackage} from '../src/i18n'
 import {CellAddress} from '../src/parser'

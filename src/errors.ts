@@ -1,3 +1,8 @@
+/**
+ * @license
+ * Copyright (c) 2020 Handsoncode. All rights reserved.
+ */
+
 import {SimpleCellAddress} from './Cell'
 
 
@@ -20,6 +25,15 @@ export class NoSheetWithNameError extends Error {
 }
 
 /**
+ * Error thrown when the the provided string is not a valid formula, i.e does not start with "="
+ */
+export class NotAFormulaError extends Error {
+  constructor() {
+    super('This is not a formula')
+  }
+}
+
+/**
  * Error thrown when the given address is invalid. 
  */
 export class InvalidAddressError extends Error {
@@ -32,8 +46,8 @@ export class InvalidAddressError extends Error {
  * Error thrown when the given arguments are invalid
  */
 export class InvalidArgumentsError extends Error {
-  constructor() {
-    super('Invalid arguments')
+  constructor(expectedArguments?: string) {
+    super(`Invalid arguments, expected ${expectedArguments}`)
   }
 }
 
@@ -107,11 +121,8 @@ export class UnableToParse extends Error {
 
 /**
  * Error thrown when the expected value type differs from the given value type.
- * 
  * It also displays the expected type.
- * 
  * This error might be thrown while setting or updating the [[ConfigParams]].
- * 
  * The following methods accept [[ConfigParams]] as a parameter:
  * 
  * @see [[buildEmpty]]
@@ -127,11 +138,8 @@ export class ExpectedValueOfType extends Error {
 
 /**
  * Error thrown when the value was expected to be set for a config parameter.
- * 
  * It also displays the expected value.
- * 
  * This error might be thrown while setting or updating the [[ConfigParams]].
- * 
  * The following methods accept [[ConfigParams]] as a parameter:
  * 
  * @see [[buildEmpty]]
@@ -147,9 +155,7 @@ export class ExpectedOneOfValues extends Error {
 
 /**
  * Error thrown when computations become suspended.
- * 
  * To perform any other action wait for the batch to complete or resume the evaluation.
- * 
  * Relates to:
  * 
  * @see [[batch]]
@@ -159,5 +165,16 @@ export class ExpectedOneOfValues extends Error {
 export class EvaluationSuspendedError extends Error {
   constructor() {
     super('Computations are suspended')
+  }
+}
+
+/**
+ * Error thrown when translation is missing in translation package.
+ *
+ * TODO
+ */
+export class MissingTranslationError extends Error {
+  constructor(key: string) {
+    super(`Translation for ${key} is missing in the translation package you're using.`)
   }
 }
