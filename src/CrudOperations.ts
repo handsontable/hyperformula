@@ -247,6 +247,16 @@ export class CrudOperations {
     this.undoRedo.saveOperationSetSheetContent(sheetId, oldSheetContent, values)
   }
 
+  public undo() {
+    this.clipboardOperations.abortCut()
+    this.undoRedo.undo()
+  }
+
+  public redo() {
+    this.clipboardOperations.abortCut()
+    this.undoRedo.redo()
+  }
+
   public ensureItIsPossibleToAddRows(sheet: number, ...indexes: Index[]): void {
     for (const [row, numberOfRowsToAdd] of indexes) {
       if (!isNonnegativeInteger(row) || !isPositiveInteger(numberOfRowsToAdd)) {

@@ -503,7 +503,7 @@ export class HyperFormula implements TypedEmitter {
     if (this._undoRedo.isUndoStackEmpty()) {
       throw new NoOperationToUndo()
     }
-    this._undoRedo.undo()
+    this._crudOperations.undo()
     return this.recomputeIfDependencyGraphNeedsIt()
   }
 
@@ -516,7 +516,7 @@ export class HyperFormula implements TypedEmitter {
     if (this._undoRedo.isRedoStackEmpty()) {
       throw new NoOperationToRedo()
     }
-    this._undoRedo.redo()
+    this._crudOperations.redo()
     return this.recomputeIfDependencyGraphNeedsIt()
   }
 

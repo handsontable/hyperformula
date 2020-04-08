@@ -1036,4 +1036,25 @@ describe('aborting cut paste', () => {
 
     expect(engine.getCellValue(adr('A2'))).toEqual(1)
   })
+
+  it('should be aborted when doing undo', () => {
+    const engine = HyperFormula.buildFromArray([['1']])
+    engine.setCellContents(adr('A1'), 42)
+    engine.cut(adr('A1'), 1, 1)
+
+    engine.undo()
+
+    expect(engine.isClipboardEmpty()).toBe(true)
+  })
+
+  it('should be aborted when doing redo', () => {
+    const engine = HyperFormula.buildFromArray([['1']])
+    engine.setCellContents(adr('A1'), 42)
+    engine.undo()
+    engine.cut(adr('A1'), 1, 1)
+
+    engine.redo()
+
+    expect(engine.isClipboardEmpty()).toBe(true)
+  })
 })
