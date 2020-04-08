@@ -110,6 +110,7 @@ export class CrudOperations {
 
   public moveRows(sheet: number, startRow: number, numberOfRows: number, targetRow: number): void {
     this.ensureItIsPossibleToMoveRows(sheet, startRow, numberOfRows, targetRow)
+    this.undoRedo.clearRedoStack()
     this.clipboardOperations.abortCut()
     this.operations.moveRows(sheet, startRow, numberOfRows, targetRow)
     this.undoRedo.saveOperationMoveRows(sheet, startRow, numberOfRows, targetRow)
