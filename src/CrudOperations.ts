@@ -146,6 +146,7 @@ export class CrudOperations {
       this.clipboardOperations.ensureItIsPossibleToCopyPaste(targetLeftCorner)
       const targetRange = AbsoluteCellRange.spanFrom(targetLeftCorner, clipboard.width, clipboard.height)
       const oldContent = this.operations.getRangeClipboardCells(targetRange)
+      this.undoRedo.clearRedoStack()
       this.clipboardOperations.paste(targetLeftCorner)
       this.undoRedo.saveOperationPaste(targetLeftCorner, clipboard.content!, oldContent)
     }

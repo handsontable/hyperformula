@@ -1215,6 +1215,27 @@ describe('Redo - copy-paste', () => {
 
     expectEngineToBeTheSameAs(engine, HyperFormula.buildFromSheets(snapshot))
   })
+
+  it('copy does not clear redo stack', () => {
+    const engine = HyperFormula.buildFromArray([])
+    engine.setCellContents(adr('A1'), 42)
+    engine.undo()
+
+    engine.copy(adr('A1'), 1, 1)
+
+    expect(engine.isThereSomethingToRedo()).toBe(true)
+  })
+
+  it('copy-paste clears redo stack', () => {
+    const engine = HyperFormula.buildFromArray([])
+    engine.setCellContents(adr('A1'), 42)
+    engine.undo()
+
+    engine.copy(adr('A1'), 1, 1)
+    engine.paste(adr('A2'))
+
+    expect(engine.isThereSomethingToRedo()).toBe(false)
+  })
 })
 
 describe('Redo - setting sheet contents', () => {
