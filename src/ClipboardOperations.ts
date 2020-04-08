@@ -71,7 +71,7 @@ class Clipboard {
 }
 
 export class ClipboardOperations {
-  private clipboard?: Clipboard
+  public clipboard?: Clipboard
 
   constructor(
     private readonly dependencyGraph: DependencyGraph,
@@ -148,5 +148,9 @@ export class ClipboardOperations {
     if (this.dependencyGraph.matrixMapping.isFormulaMatrixInRange(targetRange)) {
       throw new Error('It is not possible to paste onto matrix')
     }
+  }
+
+  public isCutClipboard(): boolean {
+    return this.clipboard !== undefined && this.clipboard.type === ClipboardOperationType.CUT
   }
 }

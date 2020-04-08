@@ -128,7 +128,13 @@ export class CrudOperations {
   }
 
   public paste(targetLeftCorner: SimpleCellAddress): void {
-    this.clipboardOperations.paste(targetLeftCorner)
+    if (this.clipboardOperations.isCutClipboard()) {
+      const clipboard = this.clipboardOperations.clipboard!
+      const { version, overwrittenCellsData } = this.operations.moveCells(clipboard.sourceLeftCorner, clipboard.width, clipboard.height, targetLeftCorner)
+      this.clipboardOperations.abortCut()
+    } else {
+      this.clipboardOperations.paste(targetLeftCorner)
+    }
   }
 
   public clearClipboard(): void {
