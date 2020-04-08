@@ -39,7 +39,6 @@ import {
 import {Serialization} from './Serialization'
 import {Statistics, StatType} from './statistics'
 import {Emitter, Events, Listeners, TypedEmitter} from './Emitter'
-import {UndoRedo} from './UndoRedo'
 import {BuildEngineFactory, EngineState} from './BuildEngineFactory'
 
 export type Index = [number, number]
@@ -154,7 +153,6 @@ export class HyperFormula implements TypedEmitter {
       engine.cellContentParser,
       engine.evaluator,
       engine.lazilyTransformingAstService,
-      engine.undoRedo,
       engine.crudOperations,
       engine.exporter,
       engine.namedExpressions,
@@ -265,7 +263,6 @@ export class HyperFormula implements TypedEmitter {
     private _cellContentParser: CellContentParser,
     private _evaluator: Evaluator,
     private _lazilyTransformingAstService: LazilyTransformingAstService,
-    private _undoRedo: UndoRedo,
     private _crudOperations: CrudOperations,
     private _exporter: Exporter,
     private _namedExpressions: NamedExpressions,
@@ -453,7 +450,6 @@ export class HyperFormula implements TypedEmitter {
     this._cellContentParser = newEngine.cellContentParser
     this._evaluator = newEngine.evaluator
     this._lazilyTransformingAstService = newEngine.lazilyTransformingAstService
-    this._undoRedo = newEngine.undoRedo
     this._crudOperations = newEngine.crudOperations
     this._exporter = newEngine.exporter
     this._namedExpressions = newEngine.namedExpressions

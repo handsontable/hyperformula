@@ -45,6 +45,7 @@ import {RemoveSheetTransformer} from './dependencyTransformers/RemoveSheetTransf
 export class CrudOperations {
 
   private readonly clipboardOperations: ClipboardOperations
+  public readonly undoRedo: UndoRedo
   public readonly operations: Operations
 
   constructor(
@@ -62,10 +63,11 @@ export class CrudOperations {
     private readonly cellContentParser: CellContentParser,
     /** Service handling postponed CRUD transformations */
     private readonly lazilyTransformingAstService: LazilyTransformingAstService,
-    private readonly undoRedo: UndoRedo,
   ) {
     this.operations = new Operations(this.dependencyGraph, this.columnSearch, this.cellContentParser, this.parser, this.stats, this.lazilyTransformingAstService)
     this.clipboardOperations = new ClipboardOperations(this.dependencyGraph, this.operations, this.parser, this.lazilyTransformingAstService)
+    this.undoRedo = new UndoRedo()
+    this.undoRedo.crudOperations = this
   }
 
   public addRows(sheet: number, ...indexes: Index[]): void {
