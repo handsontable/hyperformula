@@ -21,7 +21,7 @@ import {
   SheetMapping,
   Vertex,
 } from './DependencyGraph'
-import {NamedExpressionDoesNotExist, NamedExpressionNameIsAlreadyTaken, NamedExpressionNameIsInvalid, NoOperationToUndo, NoOperationToRedo, EvaluationSuspendedError, NotAFormulaError} from './errors'
+import {NamedExpressionDoesNotExist, NamedExpressionNameIsAlreadyTaken, NamedExpressionNameIsInvalid, NoOperationToRedo, EvaluationSuspendedError, NotAFormulaError} from './errors'
 import {Evaluator} from './Evaluator'
 import {Sheet, Sheets} from './GraphBuilder'
 import {IBatchExecutor} from './IBatchExecutor'
@@ -500,9 +500,6 @@ export class HyperFormula implements TypedEmitter {
    * @category UndoRedo
    */
   public undo(): ExportedChange[] {
-    if (this._undoRedo.isUndoStackEmpty()) {
-      throw new NoOperationToUndo()
-    }
     this._crudOperations.undo()
     return this.recomputeIfDependencyGraphNeedsIt()
   }

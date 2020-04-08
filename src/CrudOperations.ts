@@ -30,7 +30,7 @@ import {
   ValueCellVertex,
 } from './DependencyGraph'
 import {ValueCellVertexValue} from './DependencyGraph/ValueCellVertex'
-import {InvalidAddressError, InvalidArgumentsError, NoSheetWithIdError, NoSheetWithNameError} from './errors'
+import {InvalidAddressError, InvalidArgumentsError, NoSheetWithIdError, NoSheetWithNameError, NoOperationToUndo} from './errors'
 import {buildMatrixVertex} from './GraphBuilder'
 import {Index} from './HyperFormula'
 import {LazilyTransformingAstService} from './LazilyTransformingAstService'
@@ -250,6 +250,9 @@ export class CrudOperations {
   }
 
   public undo() {
+    if (this.undoRedo.isUndoStackEmpty()) {
+      throw new NoOperationToUndo()
+    }
     this.clipboardOperations.abortCut()
     this.undoRedo.undo()
   }
