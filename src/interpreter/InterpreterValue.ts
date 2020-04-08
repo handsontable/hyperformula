@@ -143,7 +143,7 @@ export class SimpleRangeValue {
     return this.data.size
   }
 
-  public static onlyNumbersDataWithRange(data: number[][], size: MatrixSize, range: AbsoluteCellRange): SimpleRangeValue {
+  public static onlyNumbersDataWithRange(data: number[][], size: MatrixSize, range: _AbsoluteCellRange): SimpleRangeValue {
     return new SimpleRangeValue(new ArrayData(size, data, true))
   }
 
