@@ -103,6 +103,7 @@ export class CrudOperations {
   }
 
   public moveCells(sourceLeftCorner: SimpleCellAddress, width: number, height: number, destinationLeftCorner: SimpleCellAddress): void {
+    this.undoRedo.clearRedoStack()
     this.clipboardOperations.abortCut()
     const { version, overwrittenCellsData } = this.operations.moveCells(sourceLeftCorner, width, height, destinationLeftCorner)
     this.undoRedo.saveOperationMoveCells(sourceLeftCorner, width, height, destinationLeftCorner, overwrittenCellsData, version)

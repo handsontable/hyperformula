@@ -884,6 +884,16 @@ describe('Redo - moving cells', () => {
 
     expectEngineToBeTheSameAs(engine, HyperFormula.buildFromSheets(snapshot))
   })
+
+  it('cancels redo stack', () => {
+    const engine = HyperFormula.buildFromArray([])
+    engine.setCellContents(adr('A1'), 42)
+    engine.undo()
+
+    engine.moveCells(adr('A1'), 1, 1, adr('A2'))
+
+    expect(engine.isThereSomethingToRedo()).toBe(false)
+  })
 })
 
 describe('Redo - setting cell content', () => {
