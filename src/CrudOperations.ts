@@ -71,6 +71,7 @@ export class CrudOperations {
   public addRows(sheet: number, ...indexes: Index[]): void {
     const addRowsCommand = new AddRowsCommand(sheet, indexes)
     this.ensureItIsPossibleToAddRows(sheet, ...indexes)
+    this.undoRedo.clearRedoStack()
     this.clipboardOperations.abortCut()
     this.operations.addRows(addRowsCommand)
     this.undoRedo.saveOperationAddRows(addRowsCommand)
