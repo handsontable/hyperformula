@@ -216,6 +216,7 @@ export class CrudOperations {
         this.operations.setCellContent(address, values[i][j])
       }
     }
+    this.undoRedo.saveOperationSetSheetContent(sheetId, oldSheetContent, values)
   }
 
   public ensureItIsPossibleToAddRows(sheet: number, ...indexes: Index[]): void {

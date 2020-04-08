@@ -497,6 +497,30 @@ describe('Undo - clearing sheet', () => {
   })
 })
 
+describe('Undo - setting sheet contents', () => {
+  it('works for basic case', () => {
+    const sheet = [['13']]
+    const engine = HyperFormula.buildFromArray(sheet)
+    engine.setSheetContent("Sheet1", [['42']])
+
+    engine.undo()
+
+    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray(sheet))
+  })
+
+  it('also clears sheet when undoing', () => {
+    const sheet = [
+      ['1'],
+    ]
+    const engine = HyperFormula.buildFromArray(sheet)
+    engine.setSheetContent("Sheet1", [['42', '43']])
+
+    engine.undo()
+
+    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray(sheet))
+  })
+})
+
 describe('Undo - moving cells', () => {
   it('works for simple case', () => {
     const sheet = [

@@ -21,6 +21,7 @@ enum UndoStackElementType {
   REMOVE_SHEET = 'REMOVE_SHEET',
   CLEAR_SHEET = 'CLEAR_SHEET',
   MOVE_CELLS = 'MOVE_CELLS',
+  SET_SHEET_CONTENT = 'SET_SHEET_CONTENT',
 }
 
 interface RemoveRowsUndoData {
@@ -42,6 +43,13 @@ interface MoveCellsUndoData {
 interface AddRowsUndoData {
   type: UndoStackElementType.ADD_ROWS,
   command: AddRowsCommand,
+}
+
+interface SetSheetContentUndoData {
+  type: UndoStackElementType.SET_SHEET_CONTENT,
+  sheetId: number,
+  oldSheetContent: ClipboardCell[][],
+  newSheetContent: RawCellContent[][],
 }
 
 interface MoveRowsUndoData {
@@ -111,6 +119,7 @@ type UndoStackElement
   | RemoveSheetUndoData
   | ClearSheetUndoData
   | MoveCellsUndoData
+  | SetSheetContentUndoData
 
 export class UndoRedo {
 
@@ -165,6 +174,10 @@ export class UndoRedo {
 
   public saveOperationClearSheet(sheetId: number, oldSheetContent: ClipboardCell[][]) {
     this.undoStack.push({ type: UndoStackElementType.CLEAR_SHEET, sheetId, oldSheetContent })
+  }
+
+  public saveOperationSetSheetContent(sheetId: number, oldSheetContent: ClipboardCell[][], newSheetContent: RawCellContent[][]) {
+    this.undoStack.push({ type: UndoStackElementType.SET_SHEET_CONTENT, sheetId, oldSheetContent, newSheetContent })
   }
 
   public storeDataForVersion(version: number, address: SimpleCellAddress, astHash: string) {
@@ -232,6 +245,10 @@ export class UndoRedo {
       }
       case UndoStackElementType.MOVE_CELLS: {
         this.undoMoveCells(operation)
+        break
+      }
+      case UndoStackElementType.SET_SHEET_CONTENT: {
+        this.undoSetSheetContent(operation)
         break
       }
     }
@@ -336,6 +353,19 @@ export class UndoRedo {
 
   private undoClearSheet(operation: ClearSheetUndoData) {
     const { oldSheetContent, sheetId } = operation
+    for (let rowIndex = 0; rowIndex < oldSheetContent.length; rowIndex++) {
+      const row = oldSheetContent[rowIndex]
+      for (let col = 0; col < row.length; col++) {
+        const cellType = row[col]
+        const address = simpleCellAddress(sheetId, col, rowIndex)
+        this.crudOperations!.operations.restoreCell(address, cellType)
+      }
+    }
+  }
+
+  private undoSetSheetContent(operation: SetSheetContentUndoData) {
+    const { oldSheetContent, newSheetContent, sheetId } = operation
+    this.crudOperations!.operations.clearSheet(sheetId)
     for (let rowIndex = 0; rowIndex < oldSheetContent.length; rowIndex++) {
       const row = oldSheetContent[rowIndex]
       for (let col = 0; col < row.length; col++) {
