@@ -413,6 +413,14 @@ export class CrudOperations {
     }
   }
 
+  public isThereSomethingToUndo() {
+    return !this.undoRedo.isUndoStackEmpty()
+  }
+
+  public isThereSomethingToRedo() {
+    return !this.undoRedo.isRedoStackEmpty()
+  }
+
   public getAndClearContentChanges(): ContentChanges {
     return this.operations.getAndClearContentChanges()
   }

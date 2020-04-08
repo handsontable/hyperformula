@@ -515,11 +515,11 @@ export class HyperFormula implements TypedEmitter {
   }
 
   public isThereSomethingToUndo() {
-    return !this._undoRedo.isUndoStackEmpty()
+    return this._crudOperations.isThereSomethingToUndo()
   }
 
   public isThereSomethingToRedo() {
-    return !this._undoRedo.isRedoStackEmpty()
+    return this._crudOperations.isThereSomethingToRedo()
   }
 
   /**
