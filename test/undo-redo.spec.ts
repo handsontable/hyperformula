@@ -753,7 +753,7 @@ describe('Redo - removing rows', () => {
     expectEngineToBeTheSameAs(engine, HyperFormula.buildFromSheets(snapshot))
   })
 
-  it('cancels redo stack', () => {
+  it('clears redo stack', () => {
     const engine = HyperFormula.buildFromArray([])
     engine.setCellContents(adr('A1'), 42)
     engine.undo()
@@ -807,7 +807,7 @@ describe('Redo - adding rows', () => {
     expectEngineToBeTheSameAs(engine, HyperFormula.buildFromSheets(snapshot))
   })
 
-  it('cancels redo stack', () => {
+  it('clears redo stack', () => {
     const engine = HyperFormula.buildFromArray([])
     engine.setCellContents(adr('A1'), 42)
     engine.undo()
@@ -834,7 +834,7 @@ describe('Redo - moving rows', () => {
     expectEngineToBeTheSameAs(engine, HyperFormula.buildFromSheets(snapshot))
   })
 
-  it('cancels redo stack', () => {
+  it('clears redo stack', () => {
     const engine = HyperFormula.buildFromArray([])
     engine.setCellContents(adr('A1'), 42)
     engine.undo()
@@ -859,7 +859,7 @@ describe('Redo - moving columns', () => {
     expectEngineToBeTheSameAs(engine, HyperFormula.buildFromSheets(snapshot))
   })
 
-  it('cancels redo stack', () => {
+  it('clears redo stack', () => {
     const engine = HyperFormula.buildFromArray([])
     engine.setCellContents(adr('A1'), 42)
     engine.undo()
@@ -885,7 +885,7 @@ describe('Redo - moving cells', () => {
     expectEngineToBeTheSameAs(engine, HyperFormula.buildFromSheets(snapshot))
   })
 
-  it('cancels redo stack', () => {
+  it('clears redo stack', () => {
     const engine = HyperFormula.buildFromArray([])
     engine.setCellContents(adr('A1'), 42)
     engine.undo()
@@ -949,7 +949,7 @@ describe('Redo - setting cell content', () => {
     expectEngineToBeTheSameAs(engine, HyperFormula.buildFromSheets(snapshot))
   })
 
-  it('cancels redo stack', () => {
+  it('clears redo stack', () => {
     const engine = HyperFormula.buildFromArray([])
     engine.setCellContents(adr('A1'), 42)
     engine.undo()
@@ -974,7 +974,7 @@ describe('Redo - removing sheet', () => {
     expectEngineToBeTheSameAs(engine, HyperFormula.buildFromSheets(snapshot))
   })
 
-  it('cancels redo stack', () => {
+  it('clears redo stack', () => {
     const engine = HyperFormula.buildFromArray([])
     engine.setCellContents(adr('A1'), 42)
     engine.undo()
@@ -1010,7 +1010,7 @@ describe('Redo - adding sheet', () => {
     expectEngineToBeTheSameAs(engine, HyperFormula.buildFromSheets(snapshot))
   })
 
-  it('cancels redo stack', () => {
+  it('clears redo stack', () => {
     const engine = HyperFormula.buildFromArray([])
     engine.setCellContents(adr('A1'), 42)
     engine.undo()
@@ -1035,7 +1035,7 @@ describe('Redo - clearing sheet', () => {
     expectEngineToBeTheSameAs(engine, HyperFormula.buildFromSheets(snapshot))
   })
 
-  it('cancels redo stack', () => {
+  it('clears redo stack', () => {
     const engine = HyperFormula.buildFromArray([])
     engine.setCellContents(adr('A1'), 42)
     engine.undo()
