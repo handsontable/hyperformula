@@ -973,6 +973,16 @@ describe('Redo - removing sheet', () => {
 
     expectEngineToBeTheSameAs(engine, HyperFormula.buildFromSheets(snapshot))
   })
+
+  it('cancels redo stack', () => {
+    const engine = HyperFormula.buildFromArray([])
+    engine.setCellContents(adr('A1'), 42)
+    engine.undo()
+
+    engine.removeSheet("Sheet1")
+
+    expect(engine.isThereSomethingToRedo()).toBe(false)
+  })
 })
 
 describe('Redo - adding sheet', () => {

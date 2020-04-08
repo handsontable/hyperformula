@@ -167,6 +167,7 @@ export class CrudOperations {
 
   public removeSheet(sheetName: string): void {
     this.ensureSheetExists(sheetName)
+    this.undoRedo.clearRedoStack()
     this.clipboardOperations.abortCut()
     const sheetId = this.sheetMapping.fetch(sheetName)
     const originalName = this.sheetMapping.fetchDisplayName(sheetId)
