@@ -200,6 +200,7 @@ export class CrudOperations {
       }
     }
 
+    this.undoRedo.clearRedoStack()
     const modifiedCellContents: { address: SimpleCellAddress, newContent: RawCellContent, oldContent: ClipboardCell }[] = []
     for (let i = 0; i < cellContents.length; i++) {
       for (let j = 0; j < cellContents[i].length; j++) {
