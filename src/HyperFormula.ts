@@ -41,7 +41,7 @@ import {Statistics, StatType} from './statistics'
 import {Emitter, Events, Listeners, TypedEmitter} from './Emitter'
 import {UndoRedo} from './UndoRedo'
 import {BuildEngineFactory, EngineState} from './BuildEngineFactory'
-import {Dimensions} from './_types'
+import {SheetDimensions} from './_types'
 
 export type Index = [number, number]
 
@@ -494,7 +494,7 @@ export class HyperFormula implements TypedEmitter {
    * 
    * Note that this method may trigger dependency graph recalculation.
    * 
-   * @fires [[valuesUpdated]]
+   * @fires [[valuesUpdated]] if recalculation was triggered by this change
    * 
    * @throws [[NoOperationToUndo]] when there is no operation running that can be undone
    * 
@@ -553,7 +553,7 @@ export class HyperFormula implements TypedEmitter {
    * @param {SimpleCellAddress} topLeftCornerAddress - top left corner of block of cells
    * @param {(RawCellContent[][]|RawCellContent)} cellContents - array with content
    * 
-   * @fires [[valuesUpdated]]
+   * @fires [[valuesUpdated]] if recalculation was triggered by this change
    * 
    * @throws [[InvalidArgumentsError]] when the value is not an array of arrays or a raw cell value
    * @throws an error when it is an attempt to set cells content inside matrices during batch operation
@@ -595,7 +595,7 @@ export class HyperFormula implements TypedEmitter {
    * @param {number} sheetId - sheet ID in which rows will be added
    * @param {Index[]} indexes - non-contiguous indexes with format [row, amount], where row is a row number above which the rows will be added
    * 
-   * @fires [[valuesUpdated]]
+   * @fires [[valuesUpdated]] if recalculation was triggered by this change
    * 
    * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
    * @throws an error if the selected position has matrix inside
@@ -637,7 +637,7 @@ export class HyperFormula implements TypedEmitter {
    * @param {number} sheetId - sheet ID from which rows will be removed
    * @param {Index[]} indexes - non-contiguous indexes with format: [row, amount]
    * 
-   * @fires [[valuesUpdated]]
+   * @fires [[valuesUpdated]] if recalculation was triggered by this change
    * 
    * @throws [[InvalidArgumentsError]] when the given arguments are invalid
    * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
@@ -680,7 +680,7 @@ export class HyperFormula implements TypedEmitter {
    * @param {number} sheetId - sheet ID in which columns will be added
    * @param {Index[]} indexes - non-contiguous indexes with format: [column, amount], where column is a column number from which new columns will be added
    * 
-   * @fires [[valuesUpdated]]
+   * @fires [[valuesUpdated]] if recalculation was triggered by this change
    * 
    * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
    * @throws [[InvalidArgumentsError]] when the given arguments are invalid
@@ -723,7 +723,7 @@ export class HyperFormula implements TypedEmitter {
    * @param {number} sheetId - sheet ID from which columns will be removed
    * @param {Index[]} indexes - non-contiguous indexes with format: [column, amount]
    * 
-   * @fires [[valuesUpdated]]
+   * @fires [[valuesUpdated]] if recalculation was triggered by this change
    * 
    * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
    * @throws [[InvalidArgumentsError]] when the given arguments are invalid
@@ -768,7 +768,7 @@ export class HyperFormula implements TypedEmitter {
    * @param {number} height - height of the cell block that is being moved
    * @param {SimpleCellAddress} destinationLeftCorner - upper left address of the target cell block
    * 
-   * @fires [[valuesUpdated]]
+   * @fires [[valuesUpdated]] if recalculation was triggered by this change
    * 
    * @throws [[InvalidArgumentsError]] when the given arguments are invalid
    * @throws an error when the source location has matrix inside - matrix cannot be moved
@@ -813,7 +813,7 @@ export class HyperFormula implements TypedEmitter {
    * @param {number} numberOfRows - number of rows to move
    * @param {number} targetRow - row number before which rows will be moved
    * 
-   * @fires [[valuesUpdated]]
+   * @fires [[valuesUpdated]] if recalculation was triggered by this change
    * 
    * @throws [[InvalidArgumentsError]] when the given arguments are invalid
    * @throws an error when the source location has matrix inside - matrix cannot be moved
@@ -857,7 +857,7 @@ export class HyperFormula implements TypedEmitter {
    * @param {number} numberOfColumns - number of columns to move
    * @param {number} targetColumn - column number before which columns will be moved
    * 
-   * @fires [[valuesUpdated]]
+   * @fires [[valuesUpdated]] if recalculation was triggered by this change
    * 
    * @throws [[InvalidArgumentsError]] when the given arguments are invalid
    * @throws an error when the source location has matrix inside - matrix cannot be moved
@@ -912,7 +912,7 @@ export class HyperFormula implements TypedEmitter {
    * 
    * @param {SimpleCellAddress} targetLeftCorner - upper left address of the target cell block
    * 
-   * @fires [[valuesUpdated]]
+   * @fires [[valuesUpdated]] if recalculation was triggered by this change
    * 
    * @throws an error while attempting to paste onto a matrix
    * @throws [[EvaluationSuspendedError]] when the evaluation is suspended
@@ -1041,7 +1041,7 @@ export class HyperFormula implements TypedEmitter {
    * @param {string} sheetName - sheet name, case insensitive
    * 
    * @fires [[sheetRemoved]]
-   * @fires [[valuesUpdated]]
+   * @fires [[valuesUpdated]] if recalculation was triggered by this change
    * 
    * @throws [[NoSheetWithNameError]] when the given sheet name does not exists
    *
@@ -1081,7 +1081,7 @@ export class HyperFormula implements TypedEmitter {
    * 
    * @param {string} sheetName - sheet name, case insensitive.
    * 
-   * @fires [[valuesUpdated]]
+   * @fires [[valuesUpdated]] if recalculation was triggered by this change
    * 
    * @throws [[NoSheetWithNameError]] when the given sheet name does not exists
    *
@@ -1301,7 +1301,7 @@ export class HyperFormula implements TypedEmitter {
    * Note that this method may trigger dependency graph recalculation.
    * 
    * @param {(e: IBatchExecutor) => void} batchOperations
-   * @fires [[valuesUpdated]]
+   * @fires [[valuesUpdated]] if recalculation was triggered by this change
    *
    * @category Instance
    */
@@ -1333,7 +1333,7 @@ export class HyperFormula implements TypedEmitter {
    * Resumes the dependency graph recalculation that was suspended with [[suspendEvaluation]].
    * It also triggers the recalculation and returns changes that are a result of all batched operations.
    * 
-   * @fires [[valuesUpdated]]
+   * @fires [[valuesUpdated]] if recalculation was triggered by this change
    *
    * @category Batch
    */
@@ -1405,7 +1405,7 @@ export class HyperFormula implements TypedEmitter {
    * @param {string} expressionName - an expression name, case insensitive.
    * @param {RawCellContent} newExpression - a new expression
    * 
-   * @fires [[valuesUpdated]]
+   * @fires [[valuesUpdated]] if recalculation was triggered by this change
    * 
    * @throws [[NamedExpressionDoesNotExist]] when the given expression does not exist.
    *
@@ -1427,7 +1427,7 @@ export class HyperFormula implements TypedEmitter {
    * @param {string} expressionName - expression name, case insensitive.
    * 
    * @fires [[namedExpressionRemoved]]
-   * @fires [[valuesUpdated]]
+   * @fires [[valuesUpdated]] if recalculation was triggered by this change
    *
    * @category Named Expression
    */
@@ -1584,7 +1584,7 @@ export class HyperFormula implements TypedEmitter {
    * 
    * Note that this method may trigger dependency graph recalculation.
    * 
-   * @fires [[valuesUpdated]]
+   * @fires [[valuesUpdated]] if recalculation was triggered by this change
    */
   private recomputeIfDependencyGraphNeedsIt(): ExportedChange[] {
     if (!this._evaluationSuspended) {

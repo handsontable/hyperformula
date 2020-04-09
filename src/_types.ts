@@ -1,4 +1,4 @@
-export type Dimensions = {
+export type SheetDimensions = {
   width: number,
   height: number,
 }
