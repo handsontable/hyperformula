@@ -1,3 +1,8 @@
+/**
+ * @license
+ * Copyright (c) 2020 Handsoncode. All rights reserved.
+ */
+
 import {SimpleCellAddress} from './Cell'
 import {ClipboardCellType} from './ClipboardOperations'
 import {RowsRemoval, RemoveRowsCommand, RowsAddition, AddRowsCommand} from './Operations'

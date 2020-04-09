@@ -1,3 +1,8 @@
+/**
+ * @license
+ * Copyright (c) 2020 Handsoncode. All rights reserved.
+ */
+
 import {AbsoluteCellRange} from './AbsoluteCellRange'
 import {absolutizeDependencies} from './absolutizeDependencies'
 import {EmptyValue, invalidSimpleCellAddress, simpleCellAddress, SimpleCellAddress} from './Cell'
@@ -216,7 +221,7 @@ export class CrudOperations {
     }
     for (let i = 0; i < cellContents.length; i++) {
       if (!(cellContents[i] instanceof Array)) {
-        throw new Error('Expected an array of arrays or a raw cell value.')
+        throw new InvalidArgumentsError('an array of arrays or a raw cell value')
       }
       for (let j = 0; j < cellContents[i].length; j++) {
         if (isMatrix(cellContents[i][j])) {

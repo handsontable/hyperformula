@@ -1,3 +1,8 @@
+/**
+ * @license
+ * Copyright (c) 2020 Handsoncode. All rights reserved.
+ */
+
 import {NoErrorCellValue, simpleCellAddress, SimpleCellAddress} from './Cell'
 import {CellValue, DetailedCellError, Exporter} from './CellValue'
 import {Config} from './Config'
@@ -36,7 +41,7 @@ export class Serialization {
     } else {
       const value: CellValue = this.getCellValue(address)
       if(value instanceof DetailedCellError) {
-        return this.config.getErrorTranslationFor(value.error.type)
+        return this.config.translationPackage.getErrorTranslation(value.error.type)
       } else {
         return value
       }

@@ -1,3 +1,8 @@
+/**
+ * @license
+ * Copyright (c) 2020 Handsoncode. All rights reserved.
+ */
+
 import {ColumnsSpan} from '../ColumnsSpan'
 import {Ast, CellAddress} from '../parser'
 import {absoluteSheetReference, ErrorType, SimpleCellAddress} from '../Cell'
@@ -18,7 +23,7 @@ export class RemoveColumnsTransformer extends Transformer {
     return this.columnsSpan.sheet
   }
 
-  protected transformRowRangeAst(ast: RowRangeAst, formulaAddress: SimpleCellAddress): Ast {
+  protected transformRowRangeAst(ast: RowRangeAst, _formulaAddress: SimpleCellAddress): Ast {
     return ast
   }
 
@@ -26,7 +31,7 @@ export class RemoveColumnsTransformer extends Transformer {
     return this.transformRange(start, end, formulaAddress)
   }
 
-  protected transformRowRange(start: RowAddress, end: RowAddress, formulaAddress: SimpleCellAddress): [RowAddress, RowAddress] | ErrorType.REF | false {
+  protected transformRowRange(_start: RowAddress, _end: RowAddress, _formulaAddress: SimpleCellAddress): [RowAddress, RowAddress] | ErrorType.REF | false {
     throw Error('Not implemented')
   }
 

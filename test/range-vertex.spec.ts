@@ -1,6 +1,6 @@
 import {AbsoluteCellRange} from '../src/AbsoluteCellRange'
 import {Config} from '../src/Config'
-import {DateHelper} from '../src/DateHelper'
+import {DateTimeHelper} from '../src/DateTimeHelper'
 import {CriterionCache, RangeVertex} from '../src/DependencyGraph'
 import {ArithmeticHelper} from '../src/interpreter/ArithmeticHelper'
 import {buildCriterionLambda, parseCriterion} from '../src/interpreter/Criterion'
@@ -16,7 +16,7 @@ describe('RangeVertex with cache', () => {
 
   it('cache for functions with criterion basic usage', () => {
     const config = new Config()
-    const dateHelper = new DateHelper(config)
+    const dateHelper = new DateTimeHelper(config)
     const numberLiteralsHelper = new NumberLiteralHelper(config)
     const arithmeticHelper = new ArithmeticHelper(config, dateHelper, numberLiteralsHelper)
 

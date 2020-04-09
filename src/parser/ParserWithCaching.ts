@@ -1,3 +1,8 @@
+/**
+ * @license
+ * Copyright (c) 2020 Handsoncode. All rights reserved.
+ */
+
 import {IToken, tokenMatcher} from 'chevrotain'
 import {ErrorType, SimpleCellAddress} from '../Cell'
 import {buildParsingErrorAst, RelativeDependency} from './'
@@ -188,7 +193,7 @@ export class ParserWithCaching {
         return this.computeHashOfAstNode(ast.value) + imageWithWhitespace('%', ast.leadingWhitespace)
       }
       case AstNodeType.ERROR: {
-        const image = this.config.getErrorTranslationFor(
+        const image = this.config.translationPackage.getErrorTranslation(
           ast.error ? ast.error.type : ErrorType.ERROR
         )
         return imageWithWhitespace(image, ast.leadingWhitespace)

@@ -1,3 +1,8 @@
+/**
+ * @license
+ * Copyright (c) 2020 Handsoncode. All rights reserved.
+ */
+
 import {Transformer} from './Transformer'
 import {Ast, CellAddress} from '../parser'
 import {ErrorType, simpleCellAddress, SimpleCellAddress} from '../Cell'

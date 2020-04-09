@@ -1,3 +1,8 @@
+/**
+ * @license
+ * Copyright (c) 2020 Handsoncode. All rights reserved.
+ */
+
 import {EmbeddedActionsParser, ILexingResult, IOrAlt, IToken, Lexer, OrMethodOpts, tokenMatcher} from 'chevrotain'
 
 import {CellError, ErrorType, simpleCellAddress, SimpleCellAddress} from '../Cell'

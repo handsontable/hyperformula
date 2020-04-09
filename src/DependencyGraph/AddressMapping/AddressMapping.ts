@@ -1,3 +1,8 @@
+/**
+ * @license
+ * Copyright (c) 2020 Handsoncode. All rights reserved.
+ */
+
 import {EmptyValue, InternalCellValue, SimpleCellAddress} from '../../Cell'
 import {ColumnsSpan} from '../../ColumnsSpan'
 import {Sheet} from '../../GraphBuilder'
@@ -6,6 +11,7 @@ import {MatrixVertex} from '../index'
 import {CellVertex} from '../Vertex'
 import {ChooseAddressMapping} from './ChooseAddressMappingPolicy'
 import {IAddressMappingStrategy} from './IAddressMappingStrategy'
+import {NoSheetWithIdError} from '../../errors'
 
 /**
  * Returns actual width, height and fill ratio of a sheet
@@ -48,7 +54,7 @@ export class AddressMapping {
   public getCell(address: SimpleCellAddress): CellVertex | null {
     const sheetMapping = this.mapping.get(address.sheet)
     if (!sheetMapping) {
-      throw Error('Unknown sheet id')
+      throw new NoSheetWithIdError(address.sheet)
     }
     return sheetMapping.getCell(address)
   }
@@ -56,7 +62,7 @@ export class AddressMapping {
   public fetchCell(address: SimpleCellAddress): CellVertex {
     const sheetMapping = this.mapping.get(address.sheet)
     if (!sheetMapping) {
-      throw Error('Unknown sheet id')
+      throw  new NoSheetWithIdError(address.sheet)
     }
     const vertex = sheetMapping.getCell(address)
     if (!vertex) {
@@ -68,7 +74,7 @@ export class AddressMapping {
   public strategyFor(sheetId: number): IAddressMappingStrategy {
     const strategy = this.mapping.get(sheetId)
     if (!strategy) {
-      throw Error('Unknown sheet id')
+      throw new NoSheetWithIdError(sheetId)
     }
 
     return strategy
@@ -130,7 +136,7 @@ export class AddressMapping {
   public getHeight(sheetId: number): number {
     const sheetMapping = this.mapping.get(sheetId)
     if (!sheetMapping) {
-      throw Error('Sheet does not exist')
+      throw new NoSheetWithIdError(sheetId)
     }
     return sheetMapping.getHeight()
   }
@@ -139,7 +145,7 @@ export class AddressMapping {
   public getWidth(sheetId: number): number {
     const sheetMapping = this.mapping.get(sheetId)
     if (!sheetMapping) {
-      throw Error('Sheet does not exist')
+      throw new NoSheetWithIdError(sheetId)
     }
     return sheetMapping.getWidth()
   }

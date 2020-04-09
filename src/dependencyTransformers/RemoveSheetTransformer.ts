@@ -1,3 +1,8 @@
+/**
+ * @license
+ * Copyright (c) 2020 Handsoncode. All rights reserved.
+ */
+
 import {Transformer} from './Transformer'
 import {ErrorType, SimpleCellAddress} from '../Cell'
 import {DependencyGraph} from '../DependencyGraph'
@@ -12,7 +17,7 @@ export class RemoveSheetTransformer extends Transformer {
     super()
   }
 
-  public performEagerTransformations(graph: DependencyGraph, parser: ParserWithCaching): void {
+  public performEagerTransformations(graph: DependencyGraph, _parser: ParserWithCaching): void {
     for (const node of graph.matrixFormulaNodes()) {
       const [newAst] = this.transformSingleAst(node.getFormula()!, node.getAddress())
       node.setFormula(newAst)

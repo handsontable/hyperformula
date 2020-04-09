@@ -1,8 +1,13 @@
+/**
+ * @license
+ * Copyright (c) 2020 Handsoncode. All rights reserved.
+ */
+
 import {CellError, ErrorType, InternalCellValue, SimpleCellAddress} from './Cell'
 import {ColumnSearchStrategy} from './ColumnSearch/ColumnSearchStrategy'
 import {Config} from './Config'
 import {ContentChanges} from './ContentChanges'
-import {DateHelper} from './DateHelper'
+import {DateTimeHelper} from './DateTimeHelper'
 import {DependencyGraph, FormulaCellVertex, MatrixVertex, RangeVertex, Vertex} from './DependencyGraph'
 import {fixNegativeZero, isNumberOverflow} from './interpreter/ArithmeticHelper'
 import {Interpreter} from './interpreter/Interpreter'
@@ -20,7 +25,7 @@ export class Evaluator {
     private readonly columnSearch: ColumnSearchStrategy,
     private readonly config: Config,
     private readonly stats: Statistics,
-    private readonly dateHelper: DateHelper,
+    private readonly dateHelper: DateTimeHelper,
     private readonly numberLiteralsHelper: NumberLiteralHelper,
   ) {
     this.interpreter = new Interpreter(this.dependencyGraph, this.columnSearch, this.config, this.stats, this.dateHelper, this.numberLiteralsHelper)

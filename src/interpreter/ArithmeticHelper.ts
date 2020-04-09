@@ -1,3 +1,8 @@
+/**
+ * @license
+ * Copyright (c) 2020 Handsoncode. All rights reserved.
+ */
+
 import {
   CellError,
   CellValueTypeOrd,
@@ -8,7 +13,7 @@ import {
   NoErrorCellValue
 } from '../Cell'
 import {Config} from '../Config'
-import {DateHelper} from '../DateHelper'
+import {DateTimeHelper} from '../DateTimeHelper'
 import {Maybe} from '../Maybe'
 import {NumberLiteralHelper} from '../NumberLiteralHelper'
 import {collatorFromConfig} from '../StringHelper'
@@ -20,7 +25,7 @@ export class ArithmeticHelper {
   private readonly actualEps: number
   constructor(
     private readonly config: Config,
-    private readonly dateHelper: DateHelper,
+    private readonly dateTimeHelper: DateTimeHelper,
     private readonly numberLiteralsHelper: NumberLiteralHelper,
   ) {
     this.collator = collatorFromConfig(config)
@@ -29,8 +34,8 @@ export class ArithmeticHelper {
 
   public compare(left: NoErrorCellValue, right: NoErrorCellValue): number {
     if (typeof left === 'string' || typeof right === 'string') {
-      const leftTmp = typeof left === 'string' ? this.dateHelper.dateStringToDateNumber(left) : left
-      const rightTmp = typeof right === 'string' ? this.dateHelper.dateStringToDateNumber(right) : right
+      const leftTmp = typeof left === 'string' ? this.dateTimeHelper.dateStringToDateNumber(left) : left
+      const rightTmp = typeof right === 'string' ? this.dateTimeHelper.dateStringToDateNumber(right) : right
       if (typeof leftTmp === 'number' && typeof rightTmp === 'number') {
         return this.floatCmp(leftTmp, rightTmp)
       }
@@ -154,7 +159,7 @@ export class ArithmeticHelper {
 
   public coerceToMaybeNumber(arg: NoErrorCellValue): Maybe<number> {
     return this.coerceNonDateScalarToMaybeNumber(arg) ?? (
-      typeof arg === 'string' ? this.dateHelper.dateStringToDateNumber(arg) : undefined
+      typeof arg === 'string' ? this.dateTimeHelper.dateStringToDateNumber(arg) : undefined
     )
   }
 

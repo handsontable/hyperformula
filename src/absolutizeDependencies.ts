@@ -1,3 +1,8 @@
+/**
+ * @license
+ * Copyright (c) 2020 Handsoncode. All rights reserved.
+ */
+
 import {AbsoluteCellRange, AbsoluteColumnRange, AbsoluteRowRange} from './AbsoluteCellRange'
 import {SimpleCellAddress} from './Cell'
 import {CellDependency} from './CellDependency'

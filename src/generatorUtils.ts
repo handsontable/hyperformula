@@ -1,3 +1,8 @@
+/**
+ * @license
+ * Copyright (c) 2020 Handsoncode. All rights reserved.
+ */
+
 import {Maybe} from './Maybe'
 
 export function * empty<T>(): IterableIterator<T> { }

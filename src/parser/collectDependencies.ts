@@ -1,3 +1,8 @@
+/**
+ * @license
+ * Copyright (c) 2020 Handsoncode. All rights reserved.
+ */
+
 import {Ast, AstNodeType, RelativeDependency} from './'
 import {RelativeDependencyType} from './RelativeDependency'
 
