@@ -1043,7 +1043,7 @@ export class HyperFormula implements TypedEmitter {
    * 
    * @param {string} sheetName - sheet name, case insensitive
    * 
-   * @fires [[sheetRemoved]] after the sheet was added
+   * @fires [[sheetRemoved]] after the sheet was removed
    * @fires [[valuesUpdated]] if recalculation was triggered by this change
    * 
    * @throws [[NoSheetWithNameError]] when the given sheet name does not exists
