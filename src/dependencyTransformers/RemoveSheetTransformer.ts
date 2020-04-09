@@ -17,7 +17,7 @@ export class RemoveSheetTransformer extends Transformer {
     super()
   }
 
-  public performEagerTransformations(graph: DependencyGraph, parser: ParserWithCaching): void {
+  public performEagerTransformations(graph: DependencyGraph, _parser: ParserWithCaching): void {
     for (const node of graph.matrixFormulaNodes()) {
       const [newAst] = this.transformSingleAst(node.getFormula()!, node.getAddress())
       node.setFormula(newAst)
