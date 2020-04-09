@@ -185,7 +185,7 @@ export class HyperFormula implements TypedEmitter {
    * If not specified the engine will be built with the default configuration.
    *
    * @param {Sheet} sheets - object with sheets definition
-   * @param {Partial<ConfigParams>} [configInput]- engine configuration
+   * @param {Partial<ConfigParams>} [configInput] - engine configuration
    *
    * @category Factory
    */
@@ -197,7 +197,8 @@ export class HyperFormula implements TypedEmitter {
 
   /**
    * Returns registered language from its code string.
-   * @param {string} code - code string of the translation package
+   * 
+   * @param {string} code - code string of the translation package, for example: 'enGB'
    */
   public static getLanguage(code: string): TranslationPackage {
     const val = this.registeredLanguages.get(code)
@@ -210,7 +211,8 @@ export class HyperFormula implements TypedEmitter {
 
   /**
    * Registers language from under given code string.
-   * @param {string} code - code string of the translation package
+   * 
+   * @param {string} code - code string of the translation package, for example: 'enGB'
    * @param {RawTranslationPackage} lang - translation package to be registered
    */
   public static registerLanguage(code: string, lang: RawTranslationPackage): void {
@@ -223,7 +225,8 @@ export class HyperFormula implements TypedEmitter {
 
   /**
    * Unregisters language that is registered under given code string.
-   * @param {string} code - code string of the translation package
+   * 
+   * @param {string} code - code string of the translation package, for example: 'enGB'
    */
   public static unregisterLanguage(code: string): void {
     if(this.registeredLanguages.has(code)) {
@@ -278,16 +281,16 @@ export class HyperFormula implements TypedEmitter {
    * Returns the cell value of a given address.
    * Applies rounding and post-processing.
    * 
-   * @param {SimpleCellAddress} address - cell coordinates
+   * @param {SimpleCellAddress} cellAddress - cell coordinates
    * 
    * @throws Throws an error if the sheet ID is unknown
    * @throws [[EvaluationSuspendedError]] when the evaluation is suspended
    * 
    * @category Cell
    */
-  public getCellValue(address: SimpleCellAddress): CellValue {
+  public getCellValue(cellAddress: SimpleCellAddress): CellValue {
     this.ensureEvaluationIsNotSuspended()
-    return this._serialization.getCellValue(address)
+    return this._serialization.getCellValue(cellAddress)
   }
 
   private ensureEvaluationIsNotSuspended() {
@@ -300,27 +303,27 @@ export class HyperFormula implements TypedEmitter {
    * Returns a normalized formula string from the cell of a given address or `undefined` for an address that does not exist and empty values.
    * Unparses AST.
    * 
-   * @param {SimpleCellAddress} address - cell coordinates
+   * @param {SimpleCellAddress} cellAddress - cell coordinates
    *
    * @category Cell
    */
-  public getCellFormula(address: SimpleCellAddress): Maybe<string> {
-    return this._serialization.getCellFormula(address)
+  public getCellFormula(cellAddress: SimpleCellAddress): Maybe<string> {
+    return this._serialization.getCellFormula(cellAddress)
   }
 
   /**
    * Returns [[CellValue]] which a serialized content of the cell of a given address either a cell formula, an explicit value, or an error.
    * Unparses AST and applies post-processing.
    *
-   * @param {SimpleCellAddress} address - cell coordinates
+   * @param {SimpleCellAddress} cellAddress - cell coordinates
    *
    * @throws [[EvaluationSuspendedError]] when the evaluation is suspended
    *
    * @category Cell
    */
-  public getCellSerialized(address: SimpleCellAddress): NoErrorCellValue {
+  public getCellSerialized(cellAddress: SimpleCellAddress): NoErrorCellValue {
     this.ensureEvaluationIsNotSuspended()
-    return this._serialization.getCellSerialized(address)
+    return this._serialization.getCellSerialized(cellAddress)
   }
 
   /**
@@ -433,7 +436,7 @@ export class HyperFormula implements TypedEmitter {
   /**
    * Updates the config with given new parameters.
    *
-   * @param newParams
+   * @param {Partial<ConfigParams>} newParams configuration options to be updated or added
    *
    * @category Instance
    */
@@ -522,7 +525,7 @@ export class HyperFormula implements TypedEmitter {
    * If returns `true`, doing [[setCellContents]] operation won't throw any errors.
    * Returns `false` if the operation might be disrupted and causes side-effects by the fact that there is a matrix inside selected cells, the address is invalid or the sheet does not exist
    * 
-   * @param {SimpleCellAddress} address - cell coordinates (top left corner)
+   * @param {SimpleCellAddress} topLeftCornerAddress -  top left corner of block of cells
    * @param {number} width - width of the box
    * @param {number} height - height of the box
    * 
@@ -532,11 +535,11 @@ export class HyperFormula implements TypedEmitter {
    *
    * @category Cell
    */
-  public isItPossibleToSetCellContents(address: SimpleCellAddress, width: number = 1, height: number = 1): boolean {
+  public isItPossibleToSetCellContents(topLeftCornerAddress: SimpleCellAddress, width: number = 1, height: number = 1): boolean {
     try {
       for (let i = 0; i < width; i++) {
         for (let j = 0; j < height; j++) {
-          this._crudOperations.ensureItIsPossibleToChangeContent({ col: address.col + i, row: address.row + j, sheet: address.sheet })
+          this._crudOperations.ensureItIsPossibleToChangeContent({ col: topLeftCornerAddress.col + i, row: topLeftCornerAddress.row + j, sheet: topLeftCornerAddress.sheet })
         }
       }
     } catch (e) {
@@ -937,12 +940,12 @@ export class HyperFormula implements TypedEmitter {
   /**
    * Returns the cell content of a given range in a [[CellValue]][][] format.
    *
-   * @param {AbsoluteCellRange} range absolute cell range
+   * @param {AbsoluteCellRange} cellRange absolute cell range
    *
    * @category Range
    */
-  public getRangeValues(range: AbsoluteCellRange): CellValue[][] {
-    return range.arrayOfAddressesInRange().map(
+  public getRangeValues(cellRange: AbsoluteCellRange): CellValue[][] {
+    return cellRange.arrayOfAddressesInRange().map(
       (subarray) => subarray.map(
         (address) => this.getCellValue(address)
       )
@@ -950,14 +953,14 @@ export class HyperFormula implements TypedEmitter {
   }
 
   /**
-   * Returns cell formulas in given range
+   * Returns cell formulas in given range.
    *
-   * @param range
+   * @param {AbsoluteCellRange} cellRange absolute cell range
    *
    * @category Range
    */
-  public getRangeFormulas(range: AbsoluteCellRange): Maybe<string>[][] {
-    return range.arrayOfAddressesInRange().map(
+  public getRangeFormulas(cellRange: AbsoluteCellRange): Maybe<string>[][] {
+    return cellRange.arrayOfAddressesInRange().map(
       (subarray) => subarray.map(
         (address) => this.getCellFormula(address)
       )
@@ -965,14 +968,14 @@ export class HyperFormula implements TypedEmitter {
   }
 
   /**
-   * Returns serialized cell in given range
+   * Returns serialized cell in given range.
    *
-   * @param range
+   * @param {AbsoluteCellRange} cellRange absolute cell range
    *
    * @category Range
    */
-  public getRangeSerialized(range: AbsoluteCellRange): CellValue[][] {
-    return range.arrayOfAddressesInRange().map(
+  public getRangeSerialized(cellRange: AbsoluteCellRange): CellValue[][] {
+    return cellRange.arrayOfAddressesInRange().map(
       (subarray) => subarray.map(
         (address) => this.getCellSerialized(address)
       )
@@ -1003,7 +1006,7 @@ export class HyperFormula implements TypedEmitter {
    * 
    * @param {string} [sheetName] - if not specified, name will be autogenerated
    * 
-   * @fires [[sheetAdded]]
+   * @fires [[sheetAdded]] after the sheet was added
    * 
    * @throws an error when sheet with a given name already exists
    *
@@ -1040,7 +1043,7 @@ export class HyperFormula implements TypedEmitter {
    * 
    * @param {string} sheetName - sheet name, case insensitive
    * 
-   * @fires [[sheetRemoved]]
+   * @fires [[sheetRemoved]] after the sheet was added
    * @fires [[valuesUpdated]] if recalculation was triggered by this change
    * 
    * @throws [[NoSheetWithNameError]] when the given sheet name does not exists
@@ -1134,25 +1137,25 @@ export class HyperFormula implements TypedEmitter {
    * If sheet name is not present in string representation, returns the sheet number.
    * Returns an absolute representation of address, e.g. `{ sheet: 0, col: 1, row: 1 }` for `Sheet1!B2`
    *
-   * @param {string} stringAddress - string representation of cell address in A1 notation, e.g. 'C64'
+   * @param {string} cellAddress - string representation of cell address in A1 notation, e.g. 'C64'
    * @param {number} sheetId - override sheet index regardless of sheet mapping
    * 
    * @category Helper
    */
-  public simpleCellAddressFromString(stringAddress: string, sheetId: number) {
-    return simpleCellAddressFromString(this.sheetMapping.get, stringAddress, sheetId)
+  public simpleCellAddressFromString(cellAddress: string, sheetId: number) {
+    return simpleCellAddressFromString(this.sheetMapping.get, cellAddress, sheetId)
   }
 
   /**
    * Returns string representation of an absolute address in A1 notation or `undefined` if the sheet index is not present in the engine.
    * 
-   * @param {SimpleCellAddress} address - object representation of an absolute address
+   * @param {SimpleCellAddress} cellAddress - object representation of an absolute address
    * @param {number} sheetId - if is not equal with address sheet index, string representation will contain sheet name
    *
    * @category Helper
    */
-  public simpleCellAddressToString(address: SimpleCellAddress, sheetId: number): Maybe<string> {
-    return simpleCellAddressToString(this.sheetMapping.fetchDisplayName, address, sheetId)
+  public simpleCellAddressToString(cellAddress: SimpleCellAddress, sheetId: number): Maybe<string> {
+    return simpleCellAddressToString(this.sheetMapping.fetchDisplayName, cellAddress, sheetId)
   }
 
   /**
@@ -1192,14 +1195,14 @@ export class HyperFormula implements TypedEmitter {
    * Returns type of a specified cell of a given address.
    * The methods accepts cell coordinates as object with column, row and sheet numbers.
    *
-   * @param {SimpleCellAddress} address - cell coordinates
+   * @param {SimpleCellAddress} cellAddress - cell coordinates
    * 
    * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
    *
    * @category Cell
    */
-  public getCellType(address: SimpleCellAddress): CellType {
-    const vertex = this.dependencyGraph.getCell(address)
+  public getCellType(cellAddress: SimpleCellAddress): CellType {
+    const vertex = this.dependencyGraph.getCell(cellAddress)
     return getCellType(vertex)
   }
 
@@ -1207,63 +1210,63 @@ export class HyperFormula implements TypedEmitter {
    * Returns `true` if the specified cell contains a simple value.
    * The methods accepts cell coordinates as object with column, row and sheet numbers.
    * 
-   * @param {SimpleCellAddress} address - cell coordinates
+   * @param {SimpleCellAddress} cellAddress - cell coordinates
    * 
    * @category Cell
    */
-  public doesCellHaveSimpleValue(address: SimpleCellAddress): boolean {
-    return this.getCellType(address) === CellType.VALUE
+  public doesCellHaveSimpleValue(cellAddress: SimpleCellAddress): boolean {
+    return this.getCellType(cellAddress) === CellType.VALUE
   }
 
   /**
    * Returns `true` if the specified cell contains a formula.
    * The methods accepts cell coordinates as object with column, row and sheet numbers.
    * 
-   * @param {SimpleCellAddress} address - cell coordinates
+   * @param {SimpleCellAddress} cellAddress - cell coordinates
    * 
    * @category Cell
    */
-  public doesCellHaveFormula(address: SimpleCellAddress): boolean {
-    return this.getCellType(address) === CellType.FORMULA
+  public doesCellHaveFormula(cellAddress: SimpleCellAddress): boolean {
+    return this.getCellType(cellAddress) === CellType.FORMULA
   }
 
   /**
    * Returns`true` if the specified cell is empty.
    * The methods accepts cell coordinates as object with column, row and sheet numbers.
    *
-   * @param {SimpleCellAddress} address - cell coordinates
+   * @param {SimpleCellAddress} cellAddress - cell coordinates
    * 
    * @category Cell
    */
-  public isCellEmpty(address: SimpleCellAddress): boolean {
-    return this.getCellType(address) === CellType.EMPTY
+  public isCellEmpty(cellAddress: SimpleCellAddress): boolean {
+    return this.getCellType(cellAddress) === CellType.EMPTY
   }
 
   /**
    * Returns `true` if a given cell is a part of a matrix.
    * The methods accepts cell coordinates as object with column, row and sheet numbers.
    *
-   * @param {SimpleCellAddress} address - cell coordinates
+   * @param {SimpleCellAddress} cellAddress - cell coordinates
    *
    * @category Cell
    */
-  public isCellPartOfMatrix(address: SimpleCellAddress): boolean {
-    return this.getCellType(address) === CellType.MATRIX
+  public isCellPartOfMatrix(cellAddress: SimpleCellAddress): boolean {
+    return this.getCellType(cellAddress) === CellType.MATRIX
   }
 
   /**
    * Returns type of the cell value of a given address.
    * The methods accepts cell coordinates as object with column, row and sheet numbers.
    * 
-   * @param {SimpleCellAddress} address - cell coordinates
+   * @param {SimpleCellAddress} cellAddress - cell coordinates
    * 
    * @throws [[EvaluationSuspendedError]] when the evaluation is suspended
    *
    * @category Cell
    */
-  public getCellValueType(address: SimpleCellAddress): CellValueType {
+  public getCellValueType(cellAddress: SimpleCellAddress): CellValueType {
     this.ensureEvaluationIsNotSuspended()
-    const value = this.dependencyGraph.getCellValue(address)
+    const value = this.dependencyGraph.getCellValue(cellAddress)
     return getCellValueType(value)
   }
 
