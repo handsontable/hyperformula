@@ -1,7 +1,4 @@
-// Alias `excel-formula` plugin to `hf` and `formula` tags.
-Prism.languages.hf = Prism.languages['excel-formula'];
-Prism.languages.formula = Prism.languages['excel-formula'];
-
+const highlight = require('./highlight');
 const regexPlugin = require('markdown-it-regex').default;
 const HyperFormula = require('../../dist/hyperformula.full');
 const fs = require('fs');
@@ -29,6 +26,13 @@ module.exports = {
         $page.version = HyperFormula.version
         // inject current HF buildDate as {{ $page.buildDate }} variable
         $page.buildDate = HyperFormula.buildDate
+      },
+      chainMarkdown (config) {
+        // inject custom markdown highlight with our aliases to formula syntax
+        config
+          .options
+          .highlight(highlight)
+          .end()
       }
     },
   ],

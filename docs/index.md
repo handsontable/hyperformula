@@ -39,17 +39,16 @@ engine.getCellValue('A1')
 ### Formulas syntax
 Formula Syntax is supported with `formula` and `hf` syntax.
 ```formula
-=SUM(A1:C64)
+=COUNTIFS($C$7:$C$350;"<>S";$F$7:$F$350;2;S$7:S$350;"*C")+COUNTIFS($C$7:$C$350;"<>S";$F$7:$F$350;3;S$7:S$350;"*C")
 ```
 
 ```hf
-<body></body>
+=COUNTIFS($C$7:$C$350;"<>S";$F$7:$F$350;2;S$7:S$350;"*C")+COUNTIFS($C$7:$C$350;"<>S";$F$7:$F$350;3;S$7:S$350;"*C")
 ```
 
-::: warning
-Current Prims.js (v1.19) does not have the language support yet. it's merged to master. Prism.js will supports the formula syntax after they publish a new release. 
-:::
-
+```hyperformula
+=COUNTIFS($C$7:$C$350;"<>S";$F$7:$F$350;2;S$7:S$350;"*C")+COUNTIFS($C$7:$C$350;"<>S";$F$7:$F$350;3;S$7:S$350;"*C")
+```
 
 ### Github style tables
 
