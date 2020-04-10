@@ -53,7 +53,7 @@ export class CrudOperations {
     private readonly lazilyTransformingAstService: LazilyTransformingAstService,
   ) {
     this.operations = new Operations(this.dependencyGraph, this.columnSearch, this.cellContentParser, this.parser, this.stats, this.lazilyTransformingAstService, this.config)
-    this.clipboardOperations = new ClipboardOperations(this.dependencyGraph, this.operations, this.parser, this.lazilyTransformingAstService)
+    this.clipboardOperations = new ClipboardOperations(this.dependencyGraph, this.operations, this.parser, this.lazilyTransformingAstService, this.config)
     this.undoRedo = new UndoRedo(this.operations)
   }
 

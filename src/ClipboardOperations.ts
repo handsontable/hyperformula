@@ -8,10 +8,11 @@ import {invalidSimpleCellAddress, simpleCellAddress, SimpleCellAddress} from './
 import {Operations} from './Operations'
 import {DependencyGraph, ParsingErrorVertex, EmptyCellVertex, FormulaCellVertex, MatrixVertex, ValueCellVertex} from './DependencyGraph'
 import {ValueCellVertexValue} from './DependencyGraph/ValueCellVertex'
-import {InvalidArgumentsError} from './errors'
+import {InvalidArgumentsError, SheetSizeLimitExceededError} from './errors'
 import {LazilyTransformingAstService} from './LazilyTransformingAstService'
 import {ParserWithCaching} from './parser'
 import {ParsingError} from './parser/Ast'
+import {Config} from './Config'
 
 export type ClipboardCell = ClipboardCellValue | ClipboardCellFormula | ClipboardCellEmpty | ClipboardCellParsingError
 
@@ -78,6 +79,7 @@ export class ClipboardOperations {
     private readonly operations: Operations,
     private readonly parser: ParserWithCaching,
     private readonly lazilyTransformingAstService: LazilyTransformingAstService,
+    private readonly config: Config,
   ) {
   }
 
@@ -121,6 +123,9 @@ export class ClipboardOperations {
     }
 
     const targetRange = AbsoluteCellRange.spanFrom(destinationLeftCorner, this.clipboard.width, this.clipboard.height)
+    if (targetRange.exceedsSheetSizeLimits(this.config.maxColumns, this.config.maxRows)) {
+      throw new SheetSizeLimitExceededError()
+    }
 
     if (this.dependencyGraph.matrixMapping.isFormulaMatrixInRange(targetRange)) {
       throw new Error('It is not possible to paste onto matrix')
