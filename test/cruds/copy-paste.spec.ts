@@ -13,6 +13,34 @@ import {
 } from '../testUtils'
 
 describe('Copy - paste integration', () => {
+  it('copy should validate arguments', () => {
+    const engine = HyperFormula.buildFromArray([])
+
+    expect(() => {
+      engine.copy(adr('A1'), 0, 42)
+    }).toThrowError('Invalid arguments, expected width to be positive integer')
+
+    expect(() => {
+      engine.copy(adr('A1'), -1, 42)
+    }).toThrowError('Invalid arguments, expected width to be positive integer')
+
+    expect(() => {
+      engine.copy(adr('A1'), 3.14, 42)
+    }).toThrowError('Invalid arguments, expected width to be positive integer')
+
+    expect(() => {
+      engine.copy(adr('A1'), 42, 0)
+    }).toThrowError('Invalid arguments, expected height to be positive integer')
+
+    expect(() => {
+      engine.copy(adr('A1'), 42, -1)
+    }).toThrowError('Invalid arguments, expected height to be positive integer')
+
+    expect(() => {
+      engine.copy(adr('A1'), 42, 3.14)
+    }).toThrowError('Invalid arguments, expected height to be positive integer')
+  })
+
   it('copy should return values', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '2'],
