@@ -68,17 +68,4 @@ describe('Nonexistent parameters', () => {
     expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NUM))
     expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.NUM))
   })
-
-  it('serializes with whitespace+optional parameters', () => {
-    const engine = HyperFormula.buildFromArray([
-      ['=DATE( ,1,1900)'],
-      ['=LOG(10, )'],
-      ['=SUM( ,1)'],
-      ['=PI( )']
-    ])
-    expect(engine.getCellFormula(adr('A1'))).toEqual('=DATE( ,1,1900)')
-    expect(engine.getCellFormula(adr('A2'))).toEqual('=LOG(10, )')
-    expect(engine.getCellFormula(adr('A3'))).toEqual('=SUM( ,1)')
-    expect(engine.getCellFormula(adr('A4'))).toEqual('=PI( )')
-  })
 })

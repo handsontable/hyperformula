@@ -164,15 +164,6 @@ describe('Unparse', () => {
     expect(unparsed).toEqual('= 1 + SUM( 1,2,   3) +A1 / 2')
   })
 
-  it('#unparse should not forget about spaces in missing parameters', () => {
-    const formula = '= 1 + sum( ,2,   3) +A1 / 2'
-    const ast = parser.parse(formula, simpleCellAddress(0, 0, 0)).ast
-
-    const unparsed = unparser.unparse(ast, adr('A1'))
-
-    expect(unparsed).toEqual('= 1 + SUM( ,2,   3) +A1 / 2')
-  })
-
   it('#unparse forgets about OFFSET', () => {
     const formula = '=OFFSET(C3, 1, 1)'
     const ast = parser.parse(formula, simpleCellAddress(0, 0, 0)).ast
