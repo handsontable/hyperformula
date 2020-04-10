@@ -1,6 +1,6 @@
 import {findBoundaries} from '../src/Sheet'
 
-describe('findSheetBoundaries', () => {
+describe('findBoundaries', () => {
   it('find correct dimensions', () => {
     expect(findBoundaries([
       ['1', '2'],
