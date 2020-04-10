@@ -113,7 +113,7 @@ export interface AstWithInternalWhitespace extends AstWithWhitespace {
 }
 
 export interface EmptyArgAst extends AstWithWhitespace {
-  type: AstNodeType.EMPTY
+  type: AstNodeType.EMPTY,
 }
 
 export const buildEmptyArgAst = (leadingWhitespace?: IToken): EmptyArgAst => ({
