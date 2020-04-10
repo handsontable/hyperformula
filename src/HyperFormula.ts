@@ -23,7 +23,6 @@ import {
 } from './DependencyGraph'
 import {NamedExpressionDoesNotExist, NamedExpressionNameIsAlreadyTaken, NamedExpressionNameIsInvalid, NoOperationToUndo, EvaluationSuspendedError, NotAFormulaError} from './errors'
 import {Evaluator} from './Evaluator'
-import {Sheet, Sheets} from './GraphBuilder'
 import {IBatchExecutor} from './IBatchExecutor'
 import {LazilyTransformingAstService} from './LazilyTransformingAstService'
 import {Maybe} from './Maybe'
@@ -41,6 +40,7 @@ import {Statistics, StatType} from './statistics'
 import {Emitter, Events, Listeners, TypedEmitter} from './Emitter'
 import {UndoRedo} from './UndoRedo'
 import {BuildEngineFactory, EngineState} from './BuildEngineFactory'
+import {Sheet, Sheets} from './Sheet'
 
 export type Index = [number, number]
 

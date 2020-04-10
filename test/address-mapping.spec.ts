@@ -3,6 +3,7 @@ import {AddressMapping, DenseStrategy, EmptyCellVertex, SparseStrategy, ValueCel
 import {AlwaysDense, AlwaysSparse, DenseSparseChooseBasedOnThreshold} from '../src/DependencyGraph/AddressMapping/ChooseAddressMappingPolicy'
 import {RowsSpan} from '../src/RowsSpan'
 import {adr} from './testUtils'
+import {findSheetBoundaries} from '../src/Sheet'
 
 const sharedExamples = (builder: (width: number, height: number) => AddressMapping) => {
   it('simple set', () => {
@@ -350,20 +351,22 @@ describe('DenseStrategy', () => {
 describe('AddressMapping', () => {
   it('#buildAddresMapping - when sparse matrix', () => {
     const addressMapping = new AddressMapping(new DenseSparseChooseBasedOnThreshold(0.8))
-    addressMapping.autoAddSheet(0, [
+    const sheet = [
       ['', '', ''],
       ['', '', '1'],
-    ])
+    ]
+    addressMapping.autoAddSheet(0, sheet, findSheetBoundaries(sheet))
 
     expect(addressMapping.strategyFor(0)).toBeInstanceOf(SparseStrategy)
   })
 
   it('#buildAddresMapping - when dense matrix', () => {
     const addressMapping = new AddressMapping(new DenseSparseChooseBasedOnThreshold(0.8))
-    addressMapping.autoAddSheet(0, [
+    const sheet = [
       ['1', '1'],
       ['1', '1'],
-    ])
+    ]
+    addressMapping.autoAddSheet(0, sheet, findSheetBoundaries(sheet))
 
     expect(addressMapping.strategyFor(0)).toBeInstanceOf(DenseStrategy)
   })

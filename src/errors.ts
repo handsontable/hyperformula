@@ -25,6 +25,15 @@ export class NoSheetWithNameError extends Error {
 }
 
 /**
+ * Error thrown when loaded sheet size exceeds configured limits.
+ */
+export class SheetSizeLimitExceededError extends Error {
+  constructor() {
+    super('Sheet size limit exceeded')
+  }
+}
+
+/**
  * Error thrown when the the provided string is not a valid formula, i.e does not start with "="
  */
 export class NotAFormulaError extends Error {

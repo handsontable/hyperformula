@@ -14,11 +14,11 @@ import {
   EvaluationSuspendedError,
   NotAFormulaError
 } from './errors'
-import {Sheets} from './GraphBuilder'
 import {HyperFormula} from './HyperFormula'
 import {Config} from './Config'
 import {languages} from './i18n'
 import {LazilyTransformingAstService} from './LazilyTransformingAstService'
+import {Sheets} from './Sheet'
 
 class HyperFormulaNS extends HyperFormula {
   public static HyperFormula = HyperFormula

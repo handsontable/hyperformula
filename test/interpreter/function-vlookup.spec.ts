@@ -1,9 +1,9 @@
 import {HyperFormula} from '../../src'
 import {ErrorType} from '../../src/Cell'
 import {ConfigParams} from '../../src/Config'
-import {Sheet} from '../../src/GraphBuilder'
 import '../testConfig.ts'
 import {adr, detailedError} from '../testUtils'
+import {Sheet} from '../../src/Sheet'
 
 const sharedExamples = (builder: (sheet: Sheet, config?: Partial<ConfigParams>) => HyperFormula) => {
   describe('VLOOKUP - args validation', () => {

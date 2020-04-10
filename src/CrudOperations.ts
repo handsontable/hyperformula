@@ -40,6 +40,7 @@ import {AddColumnsTransformer} from './dependencyTransformers/AddColumnsTransfor
 import {RemoveColumnsTransformer} from './dependencyTransformers/RemoveColumnsTransformer'
 import {MoveCellsTransformer} from './dependencyTransformers/MoveCellsTransformer'
 import {RemoveSheetTransformer} from './dependencyTransformers/RemoveSheetTransformer'
+import {findSheetBoundaries, Sheet} from './Sheet'
 
 export class CrudOperations {
 
@@ -181,7 +182,8 @@ export class CrudOperations {
       this.ensureItIsPossibleToAddSheet(name)
     }
     const sheetId = this.sheetMapping.addSheet(name)
-    this.addressMapping.autoAddSheet(sheetId, [])
+    const sheet: Sheet = []
+    this.addressMapping.autoAddSheet(sheetId, sheet, findSheetBoundaries(sheet))
     return this.sheetMapping.fetchDisplayName(sheetId)
   }
 
