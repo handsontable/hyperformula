@@ -118,6 +118,12 @@ export class BatchUndoData {
   public add(operation: UndoStackElement) {
     this.operations.push(operation)
   }
+
+  public* reversedOperations() {
+    for (let i = this.operations.length - 1; i >= 0; i--) {
+      yield this.operations[i]
+    }
+  }
 }
 
 type UndoStackElement
@@ -232,7 +238,7 @@ export class UndoRedo {
   }
 
   private undoBatch(batchOperation: BatchUndoData) {
-    for (const operation of batchOperation.operations) {
+    for (const operation of batchOperation.reversedOperations()) {
       if (operation instanceof RemoveRowsUndoData) {
         this.undoRemoveRows(operation)
       } else if (operation instanceof RemoveRowsUndoData) {
