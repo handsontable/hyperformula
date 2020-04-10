@@ -463,7 +463,7 @@ export class FormulaParser extends EmbeddedActionsParser {
   private cellRangeExpression: AstRule = this.RULE('cellRangeExpression', () => {
     const start = this.CONSUME(CellReference)
     this.CONSUME2(RangeSeparator)
-    return this.SUBRULE(this.endOfRangeExpression, { ARGS: [start]})
+    return this.SUBRULE(this.endOfRangeExpression, {ARGS: [start]})
   })
 
   /*
@@ -628,6 +628,11 @@ export class FormulaParser extends EmbeddedActionsParser {
     if (startAddress === undefined || endAddress === undefined) {
       return this.ACTION(() => {
         return buildErrorWithRawInputAst(`${start.image}:${end.image}`, new CellError(ErrorType.REF), start.leadingWhitespace)
+      })
+    } else if (startAddress.isBeyondLimits(this.lexerConfig.maxColumns, this.lexerConfig.maxRows)
+              || endAddress.isBeyondLimits(this.lexerConfig.maxColumns, this.lexerConfig.maxRows)) {
+      return this.ACTION(() => {
+        return buildErrorWithRawInputAst(`${start.image}:${end.image}`, new CellError(ErrorType.NAME), start.leadingWhitespace)
       })
     }
 

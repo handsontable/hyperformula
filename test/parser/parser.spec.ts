@@ -528,6 +528,42 @@ describe('cell references and ranges', () => {
     expect(maxColumnPlusOneAst.rawInput).toEqual(`${columnIndexToLabel(maxColumns)}1`)
     expect(maxColumnPlusOneAst.error).toEqual(new CellError(ErrorType.NAME))
   })
+
+  it('cell range start beyond maximum column/row limit is #NAME', () => {
+    const sheetMapping = new SheetMapping(buildTranslationPackage(enGB))
+    sheetMapping.addSheet('Sheet1')
+    const parser = new ParserWithCaching(new Config(), sheetMapping.get)
+    const maxRow = Config.defaultConfig.maxRows
+    const maxColumns = Config.defaultConfig.maxColumns
+
+    const ast1 = parser.parse(`=A${maxRow + 1}:B2`, adr('A1')).ast as ErrorWithRawInputAst
+    const ast2 = parser.parse(`=${columnIndexToLabel(maxColumns)}1:B2`, adr('A1')).ast as ErrorWithRawInputAst
+
+    expect(ast1.type).toEqual(AstNodeType.ERROR_WITH_RAW_INPUT)
+    expect(ast1.rawInput).toEqual(`A${maxRow + 1}:B2`)
+    expect(ast1.error).toEqual(new CellError(ErrorType.NAME))
+    expect(ast2.type).toEqual(AstNodeType.ERROR_WITH_RAW_INPUT)
+    expect(ast2.rawInput).toEqual(`${columnIndexToLabel(maxColumns)}1:B2`)
+    expect(ast2.error).toEqual(new CellError(ErrorType.NAME))
+  })
+
+  it('cell range end beyond maximum column/row limit is #NAME', () => {
+    const sheetMapping = new SheetMapping(buildTranslationPackage(enGB))
+    sheetMapping.addSheet('Sheet1')
+    const parser = new ParserWithCaching(new Config(), sheetMapping.get)
+    const maxRow = Config.defaultConfig.maxRows
+    const maxColumns = Config.defaultConfig.maxColumns
+
+    const ast1 = parser.parse(`=A1:B${maxRow + 1}`, adr('A1')).ast as ErrorWithRawInputAst
+    const ast2 = parser.parse(`=A1:${columnIndexToLabel(maxColumns)}1`, adr('A1')).ast as ErrorWithRawInputAst
+
+    expect(ast1.type).toEqual(AstNodeType.ERROR_WITH_RAW_INPUT)
+    expect(ast1.rawInput).toEqual(`A1:B${maxRow + 1}`)
+    expect(ast1.error).toEqual(new CellError(ErrorType.NAME))
+    expect(ast2.type).toEqual(AstNodeType.ERROR_WITH_RAW_INPUT)
+    expect(ast2.rawInput).toEqual(`A1:${columnIndexToLabel(maxColumns)}1`)
+    expect(ast2.error).toEqual(new CellError(ErrorType.NAME))
+  })
 })
 
 describe('Column ranges', () => {
