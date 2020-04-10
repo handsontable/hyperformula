@@ -5,7 +5,6 @@ import {buildTranslationPackage, enGB} from '../../src/i18n'
 import {
   ParserWithCaching,
 } from '../../src/parser'
-import '../testConfig'
 
 describe('ParserWithCaching - volatile functions detection', () => {
   it('detects volatile functions', () => {

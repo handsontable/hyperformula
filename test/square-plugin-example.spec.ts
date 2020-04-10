@@ -2,7 +2,6 @@ import {HyperFormula} from '../src'
 import {CellError, ErrorType, SimpleCellAddress} from '../src/Cell'
 import {FunctionPlugin} from '../src/interpreter/plugin/FunctionPlugin'
 import {ProcedureAst} from '../src/parser'
-import './testConfig.ts'
 import {adr, detailedError} from './testUtils'
 
 class SquarePlugin extends FunctionPlugin {

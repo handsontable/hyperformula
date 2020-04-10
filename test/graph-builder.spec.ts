@@ -1,6 +1,5 @@
 import {HyperFormula} from '../src'
 import {EmptyCellVertex, MatrixVertex, ValueCellVertex} from '../src/DependencyGraph'
-import './testConfig.ts'
 import {adr, colEnd, colStart} from './testUtils'
 
 describe('GraphBuilder', () => {

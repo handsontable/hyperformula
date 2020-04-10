@@ -1,5 +1,4 @@
 import {HyperFormula, NoOperationToUndo} from '../src'
-import './testConfig'
 import {
   expectEngineToBeTheSameAs,
 } from './testUtils'

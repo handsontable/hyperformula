@@ -2,7 +2,6 @@ import {EmptyValue, ExportedCellChange, HyperFormula, InvalidAddressError, NoShe
 import {ErrorType, simpleCellAddress} from '../../src/Cell'
 import {ColumnIndex} from '../../src/ColumnSearch/ColumnIndex'
 import {EmptyCellVertex, MatrixVertex} from '../../src/DependencyGraph'
-import '../testConfig'
 import {adr, colEnd, colStart, detailedError, rowEnd, rowStart} from '../testUtils'
 
 describe('Changing cell content - checking if its possible', () => {

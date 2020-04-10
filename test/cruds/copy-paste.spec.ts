@@ -1,7 +1,6 @@
 import {EmptyValue, HyperFormula, ExportedCellChange} from '../../src'
 import {ErrorType, simpleCellAddress} from '../../src/Cell'
 import {CellAddress} from '../../src/parser'
-import '../testConfig'
 import {
   adr,
   colEnd,
