@@ -200,6 +200,12 @@ export class UndoRedo {
       throw 'Attempted to undo without operation on stack'
     }
 
+    this.undoEntry(operation)
+
+    this.redoStack.push(operation)
+  }
+
+  private undoEntry(operation: UndoStackElement) {
     if (operation instanceof RemoveRowsUndoData) {
       this.undoRemoveRows(operation)
     } else if (operation instanceof RemoveRowsUndoData) {
@@ -233,45 +239,11 @@ export class UndoRedo {
     } else {
       throw "Unknown element"
     }
-
-    this.redoStack.push(operation)
   }
 
   private undoBatch(batchOperation: BatchUndoData) {
     for (const operation of batchOperation.reversedOperations()) {
-      if (operation instanceof RemoveRowsUndoData) {
-        this.undoRemoveRows(operation)
-      } else if (operation instanceof RemoveRowsUndoData) {
-        this.undoRemoveRows(operation)
-      } else if (operation instanceof AddRowsUndoData) {
-        this.undoAddRows(operation)
-      } else if (operation instanceof SetCellContentsUndoData) {
-        this.undoSetCellContents(operation)
-      } else if (operation instanceof MoveRowsUndoData) {
-        this.undoMoveRows(operation)
-      } else if (operation instanceof AddSheetUndoData) {
-        this.undoAddSheet(operation)
-      } else if (operation instanceof RemoveSheetUndoData) {
-        this.undoRemoveSheet(operation)
-      } else if (operation instanceof ClearSheetUndoData) {
-        this.undoClearSheet(operation)
-      } else if (operation instanceof AddColumnsUndoData) {
-        this.undoAddColumns(operation)
-      } else if (operation instanceof RemoveColumnsUndoData) {
-        this.undoRemoveColumns(operation)
-      } else if (operation instanceof MoveColumnsUndoData) {
-        this.undoMoveColumns(operation)
-      } else if (operation instanceof MoveCellsUndoData) {
-        this.undoMoveCells(operation)
-      } else if (operation instanceof SetSheetContentUndoData) {
-        this.undoSetSheetContent(operation)
-      } else if (operation instanceof PasteUndoData) {
-        this.undoPaste(operation)
-      } else if (operation instanceof BatchUndoData) {
-        this.undoBatch(operation)
-      } else {
-        throw "Unknown element"
-      }
+      this.undoEntry(operation)
     }
   }
 
