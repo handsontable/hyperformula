@@ -114,9 +114,9 @@ export class PasteUndoEntry {
 }
 
 export class BatchUndoEntry {
-  public readonly operations: UndoStackElement[] = []
+  public readonly operations: UndoStackEntry[] = []
 
-  public add(operation: UndoStackElement) {
+  public add(operation: UndoStackEntry) {
     this.operations.push(operation)
   }
 
@@ -127,7 +127,7 @@ export class BatchUndoEntry {
   }
 }
 
-type UndoStackElement
+type UndoStackEntry
   = RemoveRowsUndoEntry
   | AddRowsUndoEntry
   | MoveRowsUndoEntry
@@ -144,8 +144,8 @@ type UndoStackElement
   | BatchUndoEntry
 
 export class UndoRedo {
-  private readonly undoStack: UndoStackElement[] = []
-  private redoStack: UndoStackElement[] = []
+  private readonly undoStack: UndoStackEntry[] = []
+  private redoStack: UndoStackEntry[] = []
   private readonly undoLimit: number
   private batchUndoEntry?: BatchUndoEntry
 
@@ -158,7 +158,7 @@ export class UndoRedo {
 
   public oldData: Map<number, [SimpleCellAddress, string][]> = new Map()
 
-  public saveOperation(operation: UndoStackElement) {
+  public saveOperation(operation: UndoStackEntry) {
     if (this.batchUndoEntry !== undefined) {
       this.batchUndoEntry.add(operation)
     } else {
@@ -170,7 +170,7 @@ export class UndoRedo {
     this.batchUndoEntry = new BatchUndoEntry()
   }
 
-  private addUndoEntry(operation: UndoStackElement) {
+  private addUndoEntry(operation: UndoStackEntry) {
     this.undoStack.push(operation)
     this.undoStack.splice(0, Math.max(0, this.undoStack.length - this.undoLimit))
   }
@@ -214,7 +214,7 @@ export class UndoRedo {
     this.redoStack.push(operation)
   }
 
-  private undoEntry(operation: UndoStackElement) {
+  private undoEntry(operation: UndoStackEntry) {
     if (operation instanceof RemoveRowsUndoEntry) {
       this.undoRemoveRows(operation)
     } else if (operation instanceof RemoveRowsUndoEntry) {
@@ -395,7 +395,7 @@ export class UndoRedo {
     this.undoStack.push(operation)
   }
 
-  private redoEntry(operation: UndoStackElement) {
+  private redoEntry(operation: UndoStackEntry) {
     if (operation instanceof RemoveRowsUndoEntry) {
       this.redoRemoveRows(operation)
     } else if (operation instanceof RemoveRowsUndoEntry) {
