@@ -38,7 +38,7 @@ import {
   buildPlusOpAst,
   buildPlusUnaryOpAst,
   buildPowerOpAst,
-  buildProcedureAst, 
+  buildProcedureAst,
   buildRowRangeAst,
   buildStringAst,
   buildTimesOpAst,
@@ -72,7 +72,7 @@ import {
   PlusOp,
   PowerOp,
   ProcedureName,
-  RangeSeparator, 
+  RangeSeparator,
   RowRange,
   RParen,
   StringLiteral,
@@ -536,6 +536,8 @@ export class FormulaParser extends EmbeddedActionsParser {
     })
     if (address === undefined) {
       return buildErrorWithRawInputAst(cell.image, new CellError(ErrorType.REF), cell.leadingWhitespace)
+    } else if (address.isBeyondLimits(this.lexerConfig.maxColumns, this.lexerConfig.maxRows)) {
+      return buildErrorWithRawInputAst(cell.image, new CellError(ErrorType.NAME), cell.leadingWhitespace)
     } else {
       return buildCellReferenceAst(address, cell.leadingWhitespace)
     }

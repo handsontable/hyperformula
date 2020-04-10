@@ -1,5 +1,5 @@
-import {HyperFormula} from '../../src'
-import {CellError, ErrorType, simpleCellAddress} from '../../src/Cell'
+import {ErrorType, HyperFormula} from '../../src'
+import {CellError, simpleCellAddress} from '../../src/Cell'
 import {Config} from '../../src/Config'
 import {SheetMapping} from '../../src/DependencyGraph'
 import {buildTranslationPackage, enGB, plPL} from '../../src/i18n'
@@ -30,6 +30,7 @@ import {ColumnAddress} from '../../src/parser/ColumnAddress'
 import {adr, unregisterAllLanguages} from '../testUtils'
 import {RowAddress} from '../../src/parser/RowAddress'
 import '../testConfig'
+import {columnIndexToLabel} from '../../src/parser/addressRepresentationConverters'
 
 describe('ParserWithCaching', () => {
   beforeEach(() => {
@@ -494,6 +495,38 @@ describe('cell references and ranges', () => {
     expect(ast.type).toBe(AstNodeType.ERROR_WITH_RAW_INPUT)
     expect(ast.rawInput).toBe('Sheet2!A1:Sheet3!B2')
     expect(ast.error.type).toBe(ErrorType.REF)
+  })
+
+  it('cell reference beyond maximum row limit is #NAME', () => {
+    const sheetMapping = new SheetMapping(buildTranslationPackage(enGB))
+    sheetMapping.addSheet('Sheet1')
+    const parser = new ParserWithCaching(new Config(), sheetMapping.get)
+    const maxRow = Config.defaultConfig.maxRows
+
+    const maxRowAst = parser.parse(`=A${maxRow}`, adr('A1')).ast as CellReferenceAst
+    const maxRowPlusOneAst = parser.parse(`=A${maxRow + 1}`, adr('A1')).ast as ErrorWithRawInputAst
+
+    expect(maxRowAst.type).toEqual(AstNodeType.CELL_REFERENCE)
+    expect(maxRowAst.reference.row).toEqual(maxRow - 1)
+    expect(maxRowPlusOneAst.type).toEqual(AstNodeType.ERROR_WITH_RAW_INPUT)
+    expect(maxRowPlusOneAst.rawInput).toEqual(`A${maxRow + 1}`)
+    expect(maxRowPlusOneAst.error).toEqual(new CellError(ErrorType.NAME))
+  })
+
+  it('cell reference beyond maximum column limit is #NAME', () => {
+    const sheetMapping = new SheetMapping(buildTranslationPackage(enGB))
+    sheetMapping.addSheet('Sheet1')
+    const parser = new ParserWithCaching(new Config(), sheetMapping.get)
+    const maxColumns = Config.defaultConfig.maxColumns
+
+    const maxColumnAst = parser.parse(`=${columnIndexToLabel(maxColumns - 1)}1`, adr('A1')).ast as CellReferenceAst
+    const maxColumnPlusOneAst = parser.parse(`=${columnIndexToLabel(maxColumns)}1`, adr('A1')).ast as ErrorWithRawInputAst
+
+    expect(maxColumnAst.type).toEqual(AstNodeType.CELL_REFERENCE)
+    expect(maxColumnAst.reference.col).toEqual(maxColumns - 1)
+    expect(maxColumnPlusOneAst.type).toEqual(AstNodeType.ERROR_WITH_RAW_INPUT)
+    expect(maxColumnPlusOneAst.rawInput).toEqual(`${columnIndexToLabel(maxColumns)}1`)
+    expect(maxColumnPlusOneAst.error).toEqual(new CellError(ErrorType.NAME))
   })
 })
 

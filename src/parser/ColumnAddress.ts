@@ -85,4 +85,8 @@ export class ColumnAddress implements AddressWithColumn {
     const dollar = this.type === ReferenceType.ABSOLUTE ? '$' : ''
     return `${dollar}${column}`
   }
+
+  public isBeyondLimits(maxColumns: number): boolean {
+    return this.col >= maxColumns
+  }
 }
