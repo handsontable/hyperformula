@@ -162,7 +162,7 @@ export class CellAddress implements AddressWithColumn, AddressWithRow {
     return `${colDollar}${column}${rowDollar}${simpleAddress.row + 1}`
   }
 
-  public isBeyondLimits(maxColumns: number, maxRows: number): boolean {
+  public exceedsSheetSizeLimits(maxColumns: number, maxRows: number): boolean {
     return this.row >= maxRows || this.col >= maxColumns
   }
 }

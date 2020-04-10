@@ -451,6 +451,10 @@ export class CrudOperations {
     const sourceRange = AbsoluteCellRange.spanFrom(sourceLeftCorner, width, height)
     const targetRange = AbsoluteCellRange.spanFrom(destinationLeftCorner, width, height)
 
+    if (targetRange.exceedsSheetSizeLimits(this.config.maxColumns, this.config.maxRows)) {
+      throw new SheetSizeLimitExceededError()
+    }
+
     if (this.dependencyGraph.matrixMapping.isFormulaMatrixInRange(sourceRange)) {
       throw new Error('It is not possible to move matrix')
     }

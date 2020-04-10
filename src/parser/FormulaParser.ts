@@ -483,7 +483,7 @@ export class FormulaParser extends EmbeddedActionsParser {
     if (start === undefined || end === undefined) {
       return buildCellErrorAst(new CellError(ErrorType.REF))
     }
-    if (start.isBeyondLimits(this.lexerConfig.maxColumns) || end.isBeyondLimits(this.lexerConfig.maxColumns)) {
+    if (start.exceedsSheetSizeLimits(this.lexerConfig.maxColumns) || end.exceedsSheetSizeLimits(this.lexerConfig.maxColumns)) {
       return buildErrorWithRawInputAst(range.image, new CellError(ErrorType.NAME), range.leadingWhitespace)
     }
     if (start.sheet === null && end.sheet !== null) {
@@ -516,7 +516,7 @@ export class FormulaParser extends EmbeddedActionsParser {
     if (start === undefined || end === undefined) {
       return buildCellErrorAst(new CellError(ErrorType.REF))
     }
-    if (start.isBeyondLimits(this.lexerConfig.maxRows) || end.isBeyondLimits(this.lexerConfig.maxRows)) {
+    if (start.exceedsSheetSizeLimits(this.lexerConfig.maxRows) || end.exceedsSheetSizeLimits(this.lexerConfig.maxRows)) {
       return buildErrorWithRawInputAst(range.image, new CellError(ErrorType.NAME), range.leadingWhitespace)
     }
     if (start.sheet === null && end.sheet !== null) {
@@ -542,7 +542,7 @@ export class FormulaParser extends EmbeddedActionsParser {
     })
     if (address === undefined) {
       return buildErrorWithRawInputAst(cell.image, new CellError(ErrorType.REF), cell.leadingWhitespace)
-    } else if (address.isBeyondLimits(this.lexerConfig.maxColumns, this.lexerConfig.maxRows)) {
+    } else if (address.exceedsSheetSizeLimits(this.lexerConfig.maxColumns, this.lexerConfig.maxRows)) {
       return buildErrorWithRawInputAst(cell.image, new CellError(ErrorType.NAME), cell.leadingWhitespace)
     } else {
       return buildCellReferenceAst(address, cell.leadingWhitespace)
@@ -635,8 +635,8 @@ export class FormulaParser extends EmbeddedActionsParser {
       return this.ACTION(() => {
         return buildErrorWithRawInputAst(`${start.image}:${end.image}`, new CellError(ErrorType.REF), start.leadingWhitespace)
       })
-    } else if (startAddress.isBeyondLimits(this.lexerConfig.maxColumns, this.lexerConfig.maxRows)
-              || endAddress.isBeyondLimits(this.lexerConfig.maxColumns, this.lexerConfig.maxRows)) {
+    } else if (startAddress.exceedsSheetSizeLimits(this.lexerConfig.maxColumns, this.lexerConfig.maxRows)
+              || endAddress.exceedsSheetSizeLimits(this.lexerConfig.maxColumns, this.lexerConfig.maxRows)) {
       return this.ACTION(() => {
         return buildErrorWithRawInputAst(`${start.image}:${end.image}`, new CellError(ErrorType.NAME), start.leadingWhitespace)
       })

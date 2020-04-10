@@ -80,7 +80,7 @@ export class RowAddress implements AddressWithRow {
     return `${dollar}${simpleAddress.row + 1}`
   }
 
-  public isBeyondLimits(maxRows: number): boolean {
+  public exceedsSheetSizeLimits(maxRows: number): boolean {
     return this.row >= maxRows
   }
 }

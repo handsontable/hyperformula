@@ -86,7 +86,7 @@ export class ColumnAddress implements AddressWithColumn {
     return `${dollar}${column}`
   }
 
-  public isBeyondLimits(maxColumns: number): boolean {
+  public exceedsSheetSizeLimits(maxColumns: number): boolean {
     return this.col >= maxColumns
   }
 }

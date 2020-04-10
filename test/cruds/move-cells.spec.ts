@@ -20,6 +20,8 @@ import {
   rowEnd,
   extractRowRange,
 } from '../testUtils'
+import {Config} from '../../src/Config'
+import {SheetSizeLimitExceededError} from '../../src/errors'
 
 describe('Moving rows - checking if its possible', () => {
   it('source top left corner should have valid coordinates', () => {
@@ -94,6 +96,20 @@ describe('Moving rows - checking if its possible', () => {
     ])
 
     expect(engine.isItPossibleToMoveCells(adr('A1'), 1, 2, adr('B2'))).toBe(false)
+  })
+
+  it('no if we move beyond sheet size limits ', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1', '2'],
+      ['3', '4'],
+    ])
+
+    const cellInLastColumn = simpleCellAddress(0, Config.defaultConfig.maxColumns - 1, 0)
+    const cellInLastRow = simpleCellAddress(0, 0, Config.defaultConfig.maxRows - 1)
+    expect(engine.isItPossibleToMoveCells(adr('A1'), 1, 1, cellInLastColumn)).toEqual(true)
+    expect(engine.isItPossibleToMoveCells(adr('A1'), 2, 1, cellInLastColumn)).toEqual(false)
+    expect(engine.isItPossibleToMoveCells(adr('A1'), 1, 1, cellInLastRow)).toEqual(true)
+    expect(engine.isItPossibleToMoveCells(adr('A1'), 1, 2, cellInLastRow)).toEqual(false)
   })
 
   it('yes otherwise', () => {
@@ -340,6 +356,19 @@ describe('Move cells', () => {
     expect(engine.graph.existsEdge(target, b2)).toBe(true)
     expect(engine.graph.existsEdge(target, b1)).toBe(true)
     expect(engine.getCellValue(adr('A2'))).toBe(1)
+  })
+
+  it('should throw error trying to move cells beyond sheet limits', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1', '2'],
+      ['3', '4'],
+    ])
+
+    const cellInLastColumn = simpleCellAddress(0, Config.defaultConfig.maxColumns - 1, 0)
+    const cellInLastRow = simpleCellAddress(0, 0, Config.defaultConfig.maxRows - 1)
+
+    expect(() => engine.moveCells(adr('A1'), 2, 1, cellInLastColumn)).toThrow(new SheetSizeLimitExceededError())
+    expect(() => engine.moveCells(adr('A1'), 1, 2, cellInLastRow)).toThrow(new SheetSizeLimitExceededError())
   })
 })
 
