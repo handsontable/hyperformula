@@ -66,7 +66,7 @@ export class CrudOperations {
   ) {
     this.operations = new Operations(this.dependencyGraph, this.columnSearch, this.cellContentParser, this.parser, this.stats, this.lazilyTransformingAstService)
     this.clipboardOperations = new ClipboardOperations(this.dependencyGraph, this.operations, this.parser, this.lazilyTransformingAstService)
-    this.undoRedo = new UndoRedo(this.operations)
+    this.undoRedo = new UndoRedo(this.config, this.operations)
   }
 
   public addRows(sheet: number, ...indexes: Index[]): void {

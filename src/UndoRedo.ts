@@ -8,6 +8,7 @@ import {ClipboardCell, ClipboardCellType} from './ClipboardOperations'
 import {RawCellContent} from './CellContentParser'
 import {RemoveColumnsCommand, AddColumnsCommand, RowsRemoval, ColumnsRemoval, RemoveRowsCommand, AddRowsCommand} from './Operations'
 import {Operations} from './Operations'
+import {Config} from './Config'
 
 export class RemoveRowsUndoData {
   constructor(
@@ -145,11 +146,14 @@ type UndoStackElement
 export class UndoRedo {
   private readonly undoStack: UndoStackElement[] = []
   private redoStack: UndoStackElement[] = []
+  private readonly undoLimit: number
   private batchUndoEntry?: BatchUndoData
 
   constructor(
-    public readonly operations: Operations
+    config: Config,
+    public readonly operations: Operations,
   ) {
+    this.undoLimit = config.undoLimit
   }
 
   public oldData: Map<number, [SimpleCellAddress, string][]> = new Map()
@@ -158,19 +162,24 @@ export class UndoRedo {
     if (this.batchUndoEntry !== undefined) {
       this.batchUndoEntry.add(operation)
     } else {
-      this.undoStack.push(operation)
+      this.addUndoEntry(operation)
     }
   }
 
   public beginBatchMode() {
     this.batchUndoEntry = new BatchUndoData()
   }
+
+  private addUndoEntry(operation: UndoStackElement) {
+    this.undoStack.push(operation)
+    this.undoStack.splice(0, Math.max(0, this.undoStack.length - this.undoLimit))
+  }
   
   public commitBatchMode() {
     if (this.batchUndoEntry === undefined) {
       throw "Batch mode wasn't started"
     }
-    this.undoStack.push(this.batchUndoEntry)
+    this.addUndoEntry(this.batchUndoEntry)
     this.batchUndoEntry = undefined
   }
 
