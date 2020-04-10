@@ -28,7 +28,7 @@ import {ParserWithCaching} from './parser'
 import {RowsSpan} from './RowsSpan'
 import {Statistics} from './statistics'
 import {UndoRedo} from './UndoRedo'
-import {findBoundaries, Sheet} from './Sheet'
+import {findBoundaries} from './Sheet'
 
 export class CrudOperations {
 
@@ -232,7 +232,7 @@ export class CrudOperations {
     this.operations.clearSheet(sheetId)
     for (let i = 0; i < values.length; i++) {
       if (!(values[i] instanceof Array)) {
-        throw new Error('Expected an array of arrays.')/**/
+        throw new Error('Expected an array of arrays.')
       }
       for (let j = 0; j < values[i].length; j++) {
         const address = simpleCellAddress(sheetId, j, i)
