@@ -9,110 +9,107 @@ import {RawCellContent} from './CellContentParser'
 import {RemoveColumnsCommand, AddColumnsCommand, RowsRemoval, ColumnsRemoval, RemoveRowsCommand, AddRowsCommand} from './Operations'
 import {Operations} from './Operations'
 
-enum UndoStackElementType {
-  REMOVE_ROWS = 'REMOVE_ROWS',
-  ADD_ROWS = 'ADD_ROWS',
-  MOVE_ROWS = 'MOVE_ROWS',
-  ADD_COLUMNS = 'ADD_COLUMNS',
-  REMOVE_COLUMNS = 'REMOVE_COLUMNS',
-  MOVE_COLUMNS = 'MOVE_COLUMNS',
-  SET_CELL_CONTENTS = 'SET_CELL_CONTENTS',
-  ADD_SHEET = 'ADD_SHEET',
-  REMOVE_SHEET = 'REMOVE_SHEET',
-  CLEAR_SHEET = 'CLEAR_SHEET',
-  MOVE_CELLS = 'MOVE_CELLS',
-  SET_SHEET_CONTENT = 'SET_SHEET_CONTENT',
-  PASTE = 'PASTE',
+export class RemoveRowsUndoData {
+  constructor(
+    public readonly command: RemoveRowsCommand,
+    public readonly rowsRemovals: RowsRemoval[],
+  ) { }
 }
 
-interface RemoveRowsUndoData {
-  type: UndoStackElementType.REMOVE_ROWS,
-  command: RemoveRowsCommand,
-  rowsRemovals: RowsRemoval[],
+export class MoveCellsUndoData {
+  constructor(
+    public readonly sourceLeftCorner: SimpleCellAddress,
+    public readonly width: number,
+    public readonly height: number,
+    public readonly destinationLeftCorner: SimpleCellAddress,
+    public readonly overwrittenCellsData: [SimpleCellAddress, ClipboardCell][],
+    public readonly version: number,
+  ) { }
 }
 
-interface MoveCellsUndoData {
-  type: UndoStackElementType.MOVE_CELLS,
-  sourceLeftCorner: SimpleCellAddress,
-  width: number,
-  height: number,
-  destinationLeftCorner: SimpleCellAddress,
-  overwrittenCellsData: [SimpleCellAddress, ClipboardCell][],
-  version: number,
+export class AddRowsUndoData {
+  constructor(
+    public readonly command: AddRowsCommand,
+  ) { }
 }
 
-interface AddRowsUndoData {
-  type: UndoStackElementType.ADD_ROWS,
-  command: AddRowsCommand,
+export class SetSheetContentUndoData {
+  constructor(
+    public readonly sheetId: number,
+    public readonly oldSheetContent: ClipboardCell[][],
+    public readonly newSheetContent: RawCellContent[][],
+  ) { }
 }
 
-interface SetSheetContentUndoData {
-  type: UndoStackElementType.SET_SHEET_CONTENT,
-  sheetId: number,
-  oldSheetContent: ClipboardCell[][],
-  newSheetContent: RawCellContent[][],
+export class MoveRowsUndoData {
+  constructor(
+    public readonly sheet: number,
+    public readonly startRow: number,
+    public readonly numberOfRows: number,
+    public readonly targetRow: number,
+  ) { }
 }
 
-interface MoveRowsUndoData {
-  type: UndoStackElementType.MOVE_ROWS,
-  sheet: number,
-  startRow: number,
-  numberOfRows: number,
-  targetRow: number,
+export class MoveColumnsUndoData {
+  constructor(
+    public readonly sheet: number,
+    public readonly startColumn: number,
+    public readonly numberOfColumns: number,
+    public readonly targetColumn: number,
+  ) { }
 }
 
-interface MoveColumnsUndoData {
-  type: UndoStackElementType.MOVE_COLUMNS,
-  sheet: number,
-  startColumn: number,
-  numberOfColumns: number,
-  targetColumn: number,
+export class AddColumnsUndoData {
+  constructor(
+    public readonly command: AddColumnsCommand,
+  ) { }
 }
 
-interface AddColumnsUndoData {
-  type: UndoStackElementType.ADD_COLUMNS,
-  command: AddColumnsCommand,
+export class RemoveColumnsUndoData {
+  constructor(
+    public readonly command: RemoveColumnsCommand,
+    public readonly columnsRemovals: ColumnsRemoval[],
+  ) { }
 }
 
-interface RemoveColumnsUndoData {
-  type: UndoStackElementType.REMOVE_COLUMNS,
-  command: RemoveColumnsCommand,
-  columnsRemovals: ColumnsRemoval[],
+export class AddSheetUndoData {
+  constructor(
+    public readonly sheetName: string,
+  ) { }
 }
 
-interface AddSheetUndoData {
-  type: UndoStackElementType.ADD_SHEET,
-  sheetName: string,
+export class RemoveSheetUndoData {
+  constructor(
+    public readonly sheetName: string,
+    public readonly sheetId: number,
+    public readonly oldSheetContent: ClipboardCell[][],
+    public readonly version: number,
+  ) { }
 }
 
-interface RemoveSheetUndoData {
-  type: UndoStackElementType.REMOVE_SHEET,
-  sheetName: string,
-  sheetId: number,
-  oldSheetContent: ClipboardCell[][],
-  version: number,
+export class ClearSheetUndoData {
+  constructor(
+    public readonly sheetId: number,
+    public readonly oldSheetContent: ClipboardCell[][],
+  ) { }
 }
 
-interface ClearSheetUndoData {
-  type: UndoStackElementType.CLEAR_SHEET,
-  sheetId: number,
-  oldSheetContent: ClipboardCell[][],
+export class SetCellContentsUndoData {
+  constructor(
+    public readonly cellContents: {
+      address: SimpleCellAddress,
+      newContent: RawCellContent,
+      oldContent: ClipboardCell,
+    }[],
+  ) { }
 }
 
-interface SetCellContentsUndoData {
-  type: UndoStackElementType.SET_CELL_CONTENTS,
-  cellContents: {
-    address: SimpleCellAddress,
-    newContent: RawCellContent,
-    oldContent: ClipboardCell,
-  }[],
-}
-
-interface PasteUndoData {
-  type: UndoStackElementType.PASTE,
-  targetLeftCorner: SimpleCellAddress,
-  oldContent: [SimpleCellAddress, ClipboardCell][],
-  newContent: ClipboardCell[][],
+export class PasteUndoData {
+  constructor(
+    public readonly targetLeftCorner: SimpleCellAddress,
+    public readonly oldContent: [SimpleCellAddress, ClipboardCell][],
+    public readonly newContent: ClipboardCell[][],
+  ) { }
 }
 
 type UndoStackElement
@@ -141,56 +138,8 @@ export class UndoRedo {
 
   public oldData: Map<number, [SimpleCellAddress, string][]> = new Map()
 
-  public saveOperationAddColumns(addColumnsCommand: AddColumnsCommand) {
-    this.undoStack.push({ type: UndoStackElementType.ADD_COLUMNS, command: addColumnsCommand })
-  }
-
-  public saveOperationMoveCells(sourceLeftCorner: SimpleCellAddress, width: number, height: number, destinationLeftCorner: SimpleCellAddress, overwrittenCellsData: [SimpleCellAddress, ClipboardCell][], version: number) {
-    this.undoStack.push({ type: UndoStackElementType.MOVE_CELLS, sourceLeftCorner, width, height, destinationLeftCorner, overwrittenCellsData, version })
-  }
-
-  public saveOperationRemoveColumns(command: RemoveColumnsCommand, columnsRemovals: ColumnsRemoval[]) {
-    this.undoStack.push({ type: UndoStackElementType.REMOVE_COLUMNS, command, columnsRemovals })
-  }
-
-  public saveOperationRemoveRows(command: RemoveRowsCommand, rowsRemovals: RowsRemoval[]) {
-    this.undoStack.push({ type: UndoStackElementType.REMOVE_ROWS, command, rowsRemovals })
-  }
-
-  public saveOperationAddRows(addRowsCommand: AddRowsCommand) {
-    this.undoStack.push({ type: UndoStackElementType.ADD_ROWS, command: addRowsCommand })
-  }
-
-  public saveOperationMoveRows(sheet: number, startRow: number, numberOfRows: number, targetRow: number): void {
-    this.undoStack.push({ type: UndoStackElementType.MOVE_ROWS, sheet, startRow, numberOfRows, targetRow })
-  }
-
-  public saveOperationMoveColumns(sheet: number, startColumn: number, numberOfColumns: number, targetColumn: number): void {
-    this.undoStack.push({ type: UndoStackElementType.MOVE_COLUMNS, sheet, startColumn, numberOfColumns, targetColumn })
-  }
-
-  public saveOperationSetCellContents(cellContents: { address: SimpleCellAddress, newContent: RawCellContent, oldContent: ClipboardCell }[]) {
-    this.undoStack.push({ type: UndoStackElementType.SET_CELL_CONTENTS, cellContents })
-  }
-
-  public saveOperationPaste(targetLeftCorner: SimpleCellAddress, newContent: ClipboardCell[][], oldContent: [SimpleCellAddress, ClipboardCell][]) {
-    this.undoStack.push({ type: UndoStackElementType.PASTE, targetLeftCorner, oldContent, newContent })
-  }
-
-  public saveOperationRemoveSheet(sheetName: string, sheetId: number, oldSheetContent: ClipboardCell[][], version: number): void {
-    this.undoStack.push({ type: UndoStackElementType.REMOVE_SHEET, sheetName, sheetId, oldSheetContent, version })
-  }
-
-  public saveOperationAddSheet(sheetName: string): void {
-    this.undoStack.push({ type: UndoStackElementType.ADD_SHEET, sheetName })
-  }
-
-  public saveOperationClearSheet(sheetId: number, oldSheetContent: ClipboardCell[][]) {
-    this.undoStack.push({ type: UndoStackElementType.CLEAR_SHEET, sheetId, oldSheetContent })
-  }
-
-  public saveOperationSetSheetContent(sheetId: number, oldSheetContent: ClipboardCell[][], newSheetContent: RawCellContent[][]) {
-    this.undoStack.push({ type: UndoStackElementType.SET_SHEET_CONTENT, sheetId, oldSheetContent, newSheetContent })
+  public saveOperation(operation: UndoStackElement) {
+    this.undoStack.push(operation)
   }
 
   public storeDataForVersion(version: number, address: SimpleCellAddress, astHash: string) {
@@ -219,60 +168,36 @@ export class UndoRedo {
       throw 'Attempted to undo without operation on stack'
     }
 
-    switch(operation.type) {
-      case UndoStackElementType.REMOVE_ROWS: {
-        this.undoRemoveRows(operation)
-        break
-      }
-      case UndoStackElementType.ADD_ROWS: {
-        this.undoAddRows(operation)
-        break
-      }
-      case UndoStackElementType.SET_CELL_CONTENTS: {
-        this.undoSetCellContents(operation)
-        break
-      }
-      case UndoStackElementType.MOVE_ROWS: {
-        this.undoMoveRows(operation)
-        break
-      }
-      case UndoStackElementType.ADD_SHEET: {
-        this.undoAddSheet(operation)
-        break
-      }
-      case UndoStackElementType.REMOVE_SHEET: {
-        this.undoRemoveSheet(operation)
-        break
-      }
-      case UndoStackElementType.CLEAR_SHEET: {
-        this.undoClearSheet(operation)
-        break
-      }
-      case UndoStackElementType.ADD_COLUMNS: {
-        this.undoAddColumns(operation)
-        break
-      }
-      case UndoStackElementType.REMOVE_COLUMNS: {
-        this.undoRemoveColumns(operation)
-        break
-      }
-      case UndoStackElementType.MOVE_COLUMNS: {
-        this.undoMoveColumns(operation)
-        break
-      }
-      case UndoStackElementType.MOVE_CELLS: {
-        this.undoMoveCells(operation)
-        break
-      }
-      case UndoStackElementType.SET_SHEET_CONTENT: {
-        this.undoSetSheetContent(operation)
-        break
-      }
-      case UndoStackElementType.PASTE: {
-        this.undoPaste(operation)
-        break
-      }
+    if (operation instanceof RemoveRowsUndoData) {
+      this.undoRemoveRows(operation)
+    } else if (operation instanceof RemoveRowsUndoData) {
+      this.undoRemoveRows(operation)
+    } else if (operation instanceof AddRowsUndoData) {
+      this.undoAddRows(operation)
+    } else if (operation instanceof SetCellContentsUndoData) {
+      this.undoSetCellContents(operation)
+    } else if (operation instanceof MoveRowsUndoData) {
+      this.undoMoveRows(operation)
+    } else if (operation instanceof AddSheetUndoData) {
+      this.undoAddSheet(operation)
+    } else if (operation instanceof RemoveSheetUndoData) {
+      this.undoRemoveSheet(operation)
+    } else if (operation instanceof ClearSheetUndoData) {
+      this.undoClearSheet(operation)
+    } else if (operation instanceof AddColumnsUndoData) {
+      this.undoAddColumns(operation)
+    } else if (operation instanceof RemoveColumnsUndoData) {
+      this.undoRemoveColumns(operation)
+    } else if (operation instanceof MoveColumnsUndoData) {
+      this.undoMoveColumns(operation)
+    } else if (operation instanceof MoveCellsUndoData) {
+      this.undoMoveCells(operation)
+    } else if (operation instanceof SetSheetContentUndoData) {
+      this.undoSetSheetContent(operation)
+    } else if (operation instanceof PasteUndoData) {
+      this.undoPaste(operation)
     }
+
     this.redoStack.push(operation)
   }
 
@@ -410,59 +335,34 @@ export class UndoRedo {
       throw 'Attempted to redo without operation on stack'
     }
 
-    switch(operation.type) {
-      case UndoStackElementType.REMOVE_ROWS: {
-        this.redoRemoveRows(operation)
-        break
-      }
-      case UndoStackElementType.ADD_ROWS: {
-        this.redoAddRows(operation)
-        break
-      }
-      case UndoStackElementType.MOVE_ROWS: {
-        this.redoMoveRows(operation)
-        break
-      }
-      case UndoStackElementType.MOVE_COLUMNS: {
-        this.redoMoveColumns(operation)
-        break
-      }
-      case UndoStackElementType.SET_CELL_CONTENTS: {
-        this.redoSetCellContents(operation)
-        break
-      }
-      case UndoStackElementType.ADD_SHEET: {
-        this.redoAddSheet(operation)
-        break
-      }
-      case UndoStackElementType.REMOVE_SHEET: {
-        this.redoRemoveSheet(operation)
-        break
-      }
-      case UndoStackElementType.CLEAR_SHEET: {
-        this.redoClearSheet(operation)
-        break
-      }
-      case UndoStackElementType.ADD_COLUMNS: {
-        this.redoAddColumns(operation)
-        break
-      }
-      case UndoStackElementType.REMOVE_COLUMNS: {
-        this.redoRemoveColumns(operation)
-        break
-      }
-      case UndoStackElementType.MOVE_CELLS: {
-        this.redoMoveCells(operation)
-        break
-      }
-      case UndoStackElementType.SET_SHEET_CONTENT: {
-        this.redoSetSheetContent(operation)
-        break
-      }
-      case UndoStackElementType.PASTE: {
-        this.redoPaste(operation)
-        break
-      }
+    if (operation instanceof RemoveRowsUndoData) {
+      this.redoRemoveRows(operation)
+    } else if (operation instanceof RemoveRowsUndoData) {
+      this.redoRemoveRows(operation)
+    } else if (operation instanceof AddRowsUndoData) {
+      this.redoAddRows(operation)
+    } else if (operation instanceof SetCellContentsUndoData) {
+      this.redoSetCellContents(operation)
+    } else if (operation instanceof MoveRowsUndoData) {
+      this.redoMoveRows(operation)
+    } else if (operation instanceof AddSheetUndoData) {
+      this.redoAddSheet(operation)
+    } else if (operation instanceof RemoveSheetUndoData) {
+      this.redoRemoveSheet(operation)
+    } else if (operation instanceof ClearSheetUndoData) {
+      this.redoClearSheet(operation)
+    } else if (operation instanceof AddColumnsUndoData) {
+      this.redoAddColumns(operation)
+    } else if (operation instanceof RemoveColumnsUndoData) {
+      this.redoRemoveColumns(operation)
+    } else if (operation instanceof MoveColumnsUndoData) {
+      this.redoMoveColumns(operation)
+    } else if (operation instanceof MoveCellsUndoData) {
+      this.redoMoveCells(operation)
+    } else if (operation instanceof SetSheetContentUndoData) {
+      this.redoSetSheetContent(operation)
+    } else if (operation instanceof PasteUndoData) {
+      this.redoPaste(operation)
     }
 
     this.undoStack.push(operation)
