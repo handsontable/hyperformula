@@ -1303,6 +1303,41 @@ describe('Redo - setting sheet contents', () => {
   })
 })
 
+describe('Redo - batch mode', () => {
+  it('multiple batched operations are one redo', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1', '2'],
+    ])
+    engine.batch(() => {
+      engine.setCellContents(adr('A1'), '10')
+      engine.setCellContents(adr('A2'), '20')
+    })
+    const snapshot = engine.getAllSheetsSerialized()
+    engine.undo()
+
+    engine.redo()
+
+    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromSheets(snapshot))
+    expect(engine.isThereSomethingToRedo()).toBe(false)
+  })
+
+  it('operations in batch mode are re-done in correct order', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1'],
+    ])
+    engine.batch(() => {
+      engine.setCellContents(adr('A1'), '10')
+      engine.removeRows(0, [0, 1])
+    })
+    const snapshot = engine.getAllSheetsSerialized()
+    engine.undo()
+
+    engine.redo()
+
+    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromSheets(snapshot))
+  })
+})
+
 describe('Redo', () => {
   it('when there is no operation to redo', () => {
     const engine = HyperFormula.buildEmpty()

@@ -437,11 +437,51 @@ export class UndoRedo {
       this.redoSetSheetContent(operation)
     } else if (operation instanceof PasteUndoData) {
       this.redoPaste(operation)
+    } else if (operation instanceof BatchUndoData) {
+      this.redoBatch(operation)
     } else {
       throw "Unknown element"
     }
 
     this.undoStack.push(operation)
+  }
+
+  private redoBatch(batchOperation: BatchUndoData) {
+    for (const operation of batchOperation.operations) {
+      if (operation instanceof RemoveRowsUndoData) {
+        this.redoRemoveRows(operation)
+      } else if (operation instanceof RemoveRowsUndoData) {
+        this.redoRemoveRows(operation)
+      } else if (operation instanceof AddRowsUndoData) {
+        this.redoAddRows(operation)
+      } else if (operation instanceof SetCellContentsUndoData) {
+        this.redoSetCellContents(operation)
+      } else if (operation instanceof MoveRowsUndoData) {
+        this.redoMoveRows(operation)
+      } else if (operation instanceof AddSheetUndoData) {
+        this.redoAddSheet(operation)
+      } else if (operation instanceof RemoveSheetUndoData) {
+        this.redoRemoveSheet(operation)
+      } else if (operation instanceof ClearSheetUndoData) {
+        this.redoClearSheet(operation)
+      } else if (operation instanceof AddColumnsUndoData) {
+        this.redoAddColumns(operation)
+      } else if (operation instanceof RemoveColumnsUndoData) {
+        this.redoRemoveColumns(operation)
+      } else if (operation instanceof MoveColumnsUndoData) {
+        this.redoMoveColumns(operation)
+      } else if (operation instanceof MoveCellsUndoData) {
+        this.redoMoveCells(operation)
+      } else if (operation instanceof SetSheetContentUndoData) {
+        this.redoSetSheetContent(operation)
+      } else if (operation instanceof PasteUndoData) {
+        this.redoPaste(operation)
+      } else if (operation instanceof BatchUndoData) {
+        this.redoBatch(operation)
+      } else {
+        throw "Unknown element"
+      }
+    }
   }
 
   private redoRemoveRows(operation: RemoveRowsUndoData) {
