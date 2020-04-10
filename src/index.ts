@@ -21,6 +21,7 @@ import {Config} from './Config'
 import {languages} from './i18n'
 import {LazilyTransformingAstService} from './LazilyTransformingAstService'
 
+/** @internal */
 class HyperFormulaNS extends HyperFormula {
   public static HyperFormula = HyperFormula
   public static NoSheetWithIdError = NoSheetWithIdError
