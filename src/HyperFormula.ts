@@ -1346,12 +1346,15 @@ export class HyperFormula implements TypedEmitter {
    */
   public batch(batchOperations: (e: IBatchExecutor) => void): ExportedChange[] {
     this.suspendEvaluation()
+    this._crudOperations.beginUndoRedoBatchMode()
     try {
       batchOperations(this)
     } catch (e) {
+      this._crudOperations.commitUndoRedoBatchMode()
       this.resumeEvaluation()
       throw (e)
     }
+    this._crudOperations.commitUndoRedoBatchMode()
     return this.resumeEvaluation()
   }
 
