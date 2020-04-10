@@ -237,7 +237,7 @@ export class UndoRedo {
     } else if (operation instanceof BatchUndoData) {
       this.undoBatch(operation)
     } else {
-      throw "Unknown element"
+      throw 'Unknown element'
     }
   }
 
@@ -418,7 +418,7 @@ export class UndoRedo {
     } else if (operation instanceof BatchUndoData) {
       this.redoBatch(operation)
     } else {
-      throw "Unknown element"
+      throw 'Unknown element'
     }
   }
 
