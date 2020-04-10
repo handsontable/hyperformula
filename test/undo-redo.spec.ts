@@ -642,6 +642,37 @@ describe('Undo', () => {
     expect(engine.getCellValue(adr('B1'))).toEqual(3)
     expect(changes.length).toBe(2)
   })
+
+  it('operations in batch mode are one undo', () => {
+    const sheet = [
+      ['1', '2'],
+    ]
+    const engine = HyperFormula.buildFromArray(sheet)
+    engine.batch(() => {
+      engine.setCellContents(adr('A1'), '10')
+      engine.setCellContents(adr('A2'), '20')
+    })
+
+    engine.undo()
+
+    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray(sheet))
+    expect(engine.isThereSomethingToUndo()).toBe(false)
+  })
+
+  it('operations in batch mode are undone in correct order', () => {
+    const sheet = [
+      ['1'],
+    ]
+    const engine = HyperFormula.buildFromArray(sheet)
+    engine.batch(() => {
+      engine.setCellContents(adr('A1'), '10')
+      engine.removeRows(0, [0, 1])
+    })
+
+    engine.undo()
+
+    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray(sheet))
+  })
 })
 
 describe('UndoRedo', () => {
@@ -1269,6 +1300,41 @@ describe('Redo - setting sheet contents', () => {
     engine.setSheetContent('Sheet1', [['42']])
 
     expect(engine.isThereSomethingToRedo()).toBe(false)
+  })
+})
+
+describe('Redo - batch mode', () => {
+  it('multiple batched operations are one redo', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1', '2'],
+    ])
+    engine.batch(() => {
+      engine.setCellContents(adr('A1'), '10')
+      engine.setCellContents(adr('A2'), '20')
+    })
+    const snapshot = engine.getAllSheetsSerialized()
+    engine.undo()
+
+    engine.redo()
+
+    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromSheets(snapshot))
+    expect(engine.isThereSomethingToRedo()).toBe(false)
+  })
+
+  it('operations in batch mode are re-done in correct order', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1'],
+    ])
+    engine.batch(() => {
+      engine.setCellContents(adr('A1'), '10')
+      engine.removeRows(0, [0, 1])
+    })
+    const snapshot = engine.getAllSheetsSerialized()
+    engine.undo()
+
+    engine.redo()
+
+    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromSheets(snapshot))
   })
 })
 
