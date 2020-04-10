@@ -28,7 +28,13 @@ import {
   ValueCellVertex,
 } from './DependencyGraph'
 import {ValueCellVertexValue} from './DependencyGraph/ValueCellVertex'
-import {InvalidAddressError, InvalidArgumentsError, NoSheetWithIdError, NoSheetWithNameError} from './errors'
+import {
+  InvalidAddressError,
+  InvalidArgumentsError,
+  NoSheetWithIdError,
+  NoSheetWithNameError,
+  SheetSizeLimitExceededError
+} from './errors'
 import {buildMatrixVertex} from './GraphBuilder'
 import {Index} from './HyperFormula'
 import {LazilyTransformingAstService} from './LazilyTransformingAstService'
@@ -338,13 +344,19 @@ export class CrudOperations {
   }
 
   public ensureItIsPossibleToAddRows(sheet: number, ...indexes: Index[]): void {
+    if (!this.sheetMapping.hasSheetWithId(sheet)) {
+      throw new NoSheetWithIdError(sheet)
+    }
+
+    const sheetHeight = this.dependencyGraph.getSheetHeight(sheet)
+    const newRowsCount = indexes.map(index => index[1]).reduce((a, b) => a + b, 0)
+    if (sheetHeight + newRowsCount > this.config.maxRows) {
+      throw new SheetSizeLimitExceededError()
+    }
+
     for (const [row, numberOfRowsToAdd] of indexes) {
       if (!isNonnegativeInteger(row) || !isPositiveInteger(numberOfRowsToAdd)) {
         throw new InvalidArgumentsError()
-      }
-
-      if (!this.sheetMapping.hasSheetWithId(sheet)) {
-        throw new NoSheetWithIdError(sheet)
       }
 
       if (isPositiveInteger(row)
@@ -354,6 +366,7 @@ export class CrudOperations {
         throw Error('It is not possible to add row in row with matrix')
       }
     }
+
   }
 
   public ensureItIsPossibleToRemoveRows(sheet: number, ...indexes: Index[]): void {
@@ -378,13 +391,19 @@ export class CrudOperations {
   }
 
   public ensureItIsPossibleToAddColumns(sheet: number, ...indexes: Index[]): void {
+    if (!this.sheetMapping.hasSheetWithId(sheet)) {
+      throw new NoSheetWithIdError(sheet)
+    }
+
+    const sheetWidth = this.dependencyGraph.getSheetWidth(sheet)
+    const newColumnsCount = indexes.map(index => index[1]).reduce((a, b) => a + b, 0)
+    if (sheetWidth + newColumnsCount > this.config.maxColumns) {
+      throw new SheetSizeLimitExceededError()
+    }
+
     for (const [column, numberOfColumnsToAdd] of indexes) {
       if (!isNonnegativeInteger(column) || !isPositiveInteger(numberOfColumnsToAdd)) {
         throw new InvalidArgumentsError()
-      }
-
-      if (!this.sheetMapping.hasSheetWithId(sheet)) {
-        throw new NoSheetWithIdError(sheet)
       }
 
       if (isPositiveInteger(column)
