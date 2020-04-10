@@ -501,7 +501,13 @@ export class HyperFormula implements TypedEmitter {
   }
 
   /**
-   * Checks if there is at least one operation that can be undone.
+   * Re-do recently undone operation.
+   * 
+   * Note that this method may trigger dependency graph recalculation.
+   * 
+   * @fires [[valuesUpdated]]
+   * 
+   * @throws [[NoOperationToRedo]] when there is no operation running that can be re-done
    * 
    * @category UndoRedo
    */
@@ -510,10 +516,20 @@ export class HyperFormula implements TypedEmitter {
     return this.recomputeIfDependencyGraphNeedsIt()
   }
 
+  /**
+   * Checks if there is at least one operation that can be undone.
+   * 
+   * @category UndoRedo
+   */
   public isThereSomethingToUndo() {
     return this._crudOperations.isThereSomethingToUndo()
   }
 
+  /**
+   * Checks if there is at least one operation that can be re-done.
+   * 
+   * @category UndoRedo
+   */
   public isThereSomethingToRedo() {
     return this._crudOperations.isThereSomethingToRedo()
   }
