@@ -148,7 +148,10 @@ export class CrudOperations {
       const targetRange = AbsoluteCellRange.spanFrom(targetLeftCorner, clipboard.width, clipboard.height)
       const oldContent = this.operations.getRangeClipboardCells(targetRange)
       this.undoRedo.clearRedoStack()
-      this.clipboardOperations.paste(targetLeftCorner)
+      this.dependencyGraph.breakNumericMatricesInRange(targetRange)
+      for (const [address, clipboardCell] of clipboard.getContent(targetLeftCorner)) {
+        this.operations.restoreCell(address, clipboardCell)
+      }
       this.undoRedo.saveOperationPaste(targetLeftCorner, clipboard.content!, oldContent)
     }
   }

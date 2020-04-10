@@ -100,28 +100,6 @@ export class ClipboardOperations {
     this.clipboard = new Clipboard(leftCorner, width, height, ClipboardOperationType.COPY, content)
   }
 
-  public paste(destinationLeftCorner: SimpleCellAddress): void {
-    if (this.clipboard === undefined) {
-      return
-    }
-
-    switch (this.clipboard.type) {
-      case ClipboardOperationType.COPY: {
-        const targetRange = AbsoluteCellRange.spanFrom(destinationLeftCorner, this.clipboard.width, this.clipboard.height)
-        this.dependencyGraph.breakNumericMatricesInRange(targetRange)
-
-        for (const [address, clipboardCell] of this.clipboard.getContent(destinationLeftCorner)) {
-          this.operations.restoreCell(address, clipboardCell)
-        }
-        break
-      }
-      case ClipboardOperationType.CUT: {
-        this.operations.moveCells(this.clipboard.sourceLeftCorner, this.clipboard.width, this.clipboard.height, destinationLeftCorner)
-        this.abortCut()
-      }
-    }
-  }
-
   public abortCut(): void {
     if (this.clipboard && this.clipboard.type === ClipboardOperationType.CUT) {
       this.clear()
