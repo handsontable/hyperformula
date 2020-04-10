@@ -27,7 +27,7 @@ enum UndoStackElementType {
 
 interface RemoveRowsUndoData {
   type: UndoStackElementType.REMOVE_ROWS,
-  sheet: number,
+  command: RemoveRowsCommand,
   rowsRemovals: RowsRemoval[],
 }
 
@@ -153,8 +153,8 @@ export class UndoRedo {
     this.undoStack.push({ type: UndoStackElementType.REMOVE_COLUMNS, command, columnsRemovals })
   }
 
-  public saveOperationRemoveRows(removeRowsCommand: RemoveRowsCommand, rowsRemovals: RowsRemoval[]) {
-    this.undoStack.push({ type: UndoStackElementType.REMOVE_ROWS, sheet: removeRowsCommand.sheet, rowsRemovals })
+  public saveOperationRemoveRows(command: RemoveRowsCommand, rowsRemovals: RowsRemoval[]) {
+    this.undoStack.push({ type: UndoStackElementType.REMOVE_ROWS, command, rowsRemovals })
   }
 
   public saveOperationAddRows(addRowsCommand: AddRowsCommand) {
@@ -279,7 +279,7 @@ export class UndoRedo {
   private undoRemoveRows(operation: RemoveRowsUndoData) {
     this.operations.forceApplyPostponedTransformations()
 
-    const { sheet, rowsRemovals } = operation
+    const { command: { sheet }, rowsRemovals } = operation
     for (let i = rowsRemovals.length - 1; i >= 0; --i) {
       const rowsRemoval = rowsRemovals[i]
       this.operations.addRows(new AddRowsCommand(sheet, [[rowsRemoval.rowFrom, rowsRemoval.rowCount]]))
@@ -295,8 +295,7 @@ export class UndoRedo {
   private undoRemoveColumns(operation: RemoveColumnsUndoData) {
     this.operations.forceApplyPostponedTransformations()
 
-    const { command, columnsRemovals } = operation
-    const sheet = command.sheet
+    const { command: { sheet }, columnsRemovals } = operation
     for (let i = columnsRemovals.length - 1; i >= 0; --i) {
       const columnsRemoval = columnsRemovals[i]
       this.operations.addColumns(new AddColumnsCommand(sheet, [[columnsRemoval.columnFrom, columnsRemoval.columnCount]]))
@@ -470,10 +469,7 @@ export class UndoRedo {
   }
 
   private redoRemoveRows(operation: RemoveRowsUndoData) {
-    const { sheet, rowsRemovals } = operation
-    for (const rowsRemoval of rowsRemovals) {
-      this.operations.removeRows(new RemoveRowsCommand(sheet, [[rowsRemoval.rowFrom, rowsRemoval.rowCount]]))
-    }
+    this.operations.removeRows(operation.command)
   }
 
   private redoMoveCells(operation: MoveCellsUndoData) {
