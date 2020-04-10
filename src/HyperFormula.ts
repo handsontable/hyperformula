@@ -533,11 +533,7 @@ export class HyperFormula implements TypedEmitter {
    */
   public isItPossibleToSetCellContents(address: SimpleCellAddress, width: number = 1, height: number = 1): boolean {
     try {
-      for (let i = 0; i < width; i++) {
-        for (let j = 0; j < height; j++) {
-          this._crudOperations.ensureItIsPossibleToChangeContent({ col: address.col + i, row: address.row + j, sheet: address.sheet })
-        }
-      }
+      this._crudOperations.ensureItIsPossibleToChangeContents(address, width, height)
     } catch (e) {
       return false
     }

@@ -4,6 +4,7 @@ import {ColumnIndex} from '../../src/ColumnSearch/ColumnIndex'
 import {EmptyCellVertex, MatrixVertex} from '../../src/DependencyGraph'
 import '../testConfig'
 import {adr, colEnd, colStart, detailedError, rowEnd, rowStart} from '../testUtils'
+import {Config} from '../../src/Config'
 
 describe('Changing cell content - checking if its possible', () => {
   it('address should have valid coordinates', () => {
@@ -31,6 +32,16 @@ describe('Changing cell content - checking if its possible', () => {
     expect(engine.isItPossibleToSetCellContents(adr('A3'), 1, 1)).toBe(false)
     expect(engine.isItPossibleToSetCellContents(adr('A1'), 2, 2)).toBe(true)
     expect(engine.isItPossibleToSetCellContents(adr('A2'), 2, 2)).toBe(false)
+  })
+
+  it('no if content exceeds sheet size limits', () => {
+    const engine = HyperFormula.buildFromArray([])
+    const cellInLastColumn = simpleCellAddress(0, Config.defaultConfig.maxColumns - 1, 0)
+    const cellInLastRow = simpleCellAddress(0, 0, Config.defaultConfig.maxRows - 1)
+    expect(engine.isItPossibleToSetCellContents(cellInLastColumn, 1, 1)).toEqual(true)
+    expect(engine.isItPossibleToSetCellContents(cellInLastColumn, 2, 1)).toEqual(false)
+    expect(engine.isItPossibleToSetCellContents(cellInLastRow, 1, 1)).toEqual(true)
+    expect(engine.isItPossibleToSetCellContents(cellInLastRow, 1, 2)).toEqual(false)
   })
 
   it('yes if numeric matrix', () => {

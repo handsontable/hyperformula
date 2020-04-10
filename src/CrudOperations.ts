@@ -259,7 +259,7 @@ export class CrudOperations {
     }
     for (let i = 0; i < values.length; i++) {
       if (!(values[i] instanceof Array)) {
-        throw new Error('Expected an array of arrays.')
+        throw new Error('Expected an array of arrays.')/**/
       }
       for (let j = 0; j < values[i].length; j++) {
         this.setCellContent({
@@ -528,6 +528,19 @@ export class CrudOperations {
 
     if (this.dependencyGraph.matrixMapping.isFormulaMatrixAtAddress(address)) {
       throw Error('It is not possible to change part of a matrix')
+    }
+  }
+
+  public ensureItIsPossibleToChangeContents(address: SimpleCellAddress, width: number, height: number): void {
+    const targetRange = AbsoluteCellRange.spanFrom(address, width, height)
+    if (targetRange.exceedsSheetSizeLimits(this.config.maxColumns, this.config.maxRows)) {
+      throw new SheetSizeLimitExceededError()
+    }
+
+    for (let i = 0; i < width; i++) {
+      for (let j = 0; j < height; j++) {
+        this.ensureItIsPossibleToChangeContent({ col: address.col + i, row: address.row + j, sheet: address.sheet })
+      }
     }
   }
 
