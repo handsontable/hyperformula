@@ -483,6 +483,9 @@ export class FormulaParser extends EmbeddedActionsParser {
     if (start === undefined || end === undefined) {
       return buildCellErrorAst(new CellError(ErrorType.REF))
     }
+    if (start.isBeyondLimits(this.lexerConfig.maxColumns) || end.isBeyondLimits(this.lexerConfig.maxColumns)) {
+      return buildErrorWithRawInputAst(range.image, new CellError(ErrorType.NAME), range.leadingWhitespace)
+    }
     if (start.sheet === null && end.sheet !== null) {
       return this.parsingError(ParsingErrorType.ParserError, 'Malformed range expression')
     }
@@ -512,6 +515,9 @@ export class FormulaParser extends EmbeddedActionsParser {
 
     if (start === undefined || end === undefined) {
       return buildCellErrorAst(new CellError(ErrorType.REF))
+    }
+    if (start.isBeyondLimits(this.lexerConfig.maxRows) || end.isBeyondLimits(this.lexerConfig.maxRows)) {
+      return buildErrorWithRawInputAst(range.image, new CellError(ErrorType.NAME), range.leadingWhitespace)
     }
     if (start.sheet === null && end.sheet !== null) {
       return this.parsingError(ParsingErrorType.ParserError, 'Malformed range expression')
