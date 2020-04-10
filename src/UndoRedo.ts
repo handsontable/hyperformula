@@ -76,7 +76,7 @@ interface AddColumnsUndoData {
 
 interface RemoveColumnsUndoData {
   type: UndoStackElementType.REMOVE_COLUMNS,
-  sheet: number,
+  command: RemoveColumnsCommand,
   columnsRemovals: ColumnsRemoval[],
 }
 
@@ -149,8 +149,8 @@ export class UndoRedo {
     this.undoStack.push({ type: UndoStackElementType.MOVE_CELLS, sourceLeftCorner, width, height, destinationLeftCorner, overwrittenCellsData, version })
   }
 
-  public saveOperationRemoveColumns(removeColumnsCommand: RemoveColumnsCommand, columnsRemovals: ColumnsRemoval[]) {
-    this.undoStack.push({ type: UndoStackElementType.REMOVE_COLUMNS, sheet: removeColumnsCommand.sheet, columnsRemovals })
+  public saveOperationRemoveColumns(command: RemoveColumnsCommand, columnsRemovals: ColumnsRemoval[]) {
+    this.undoStack.push({ type: UndoStackElementType.REMOVE_COLUMNS, command, columnsRemovals })
   }
 
   public saveOperationRemoveRows(removeRowsCommand: RemoveRowsCommand, rowsRemovals: RowsRemoval[]) {
@@ -295,7 +295,8 @@ export class UndoRedo {
   private undoRemoveColumns(operation: RemoveColumnsUndoData) {
     this.operations.forceApplyPostponedTransformations()
 
-    const { sheet, columnsRemovals } = operation
+    const { command, columnsRemovals } = operation
+    const sheet = command.sheet
     for (let i = columnsRemovals.length - 1; i >= 0; --i) {
       const columnsRemoval = columnsRemovals[i]
       this.operations.addColumns(new AddColumnsCommand(sheet, [[columnsRemoval.columnFrom, columnsRemoval.columnCount]]))
@@ -480,10 +481,7 @@ export class UndoRedo {
   }
 
   private redoRemoveColumns(operation: RemoveColumnsUndoData) {
-    const { sheet, columnsRemovals } = operation
-    for (const columnsRemoval of columnsRemovals) {
-      this.operations.removeColumns(new RemoveColumnsCommand(sheet, [[columnsRemoval.columnFrom, columnsRemoval.columnCount]]))
-    }
+    this.operations.removeColumns(operation.command)
   }
 
   private redoPaste(operation: PasteUndoData) {
