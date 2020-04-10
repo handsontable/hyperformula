@@ -43,13 +43,6 @@ export class EngineComparator {
     const actualWidth = this.actual.addressMapping.getWidth(sheet)
     const actualHeight = this.actual.addressMapping.getHeight(sheet)
 
-    if (expectedHeight !== actualHeight) {
-      console.warn(`Expected sheet of height ${expectedHeight}, actual: ${actualHeight}`)
-    }
-    if (expectedWidth !== actualWidth) {
-      console.warn(`Expected sheet of width ${expectedWidth}, actual: ${actualWidth}`)
-    }
-
     for (let x = 0; x < Math.max(expectedWidth, actualWidth); ++x) {
       for (let y = 0; y < Math.max(expectedHeight, actualHeight); ++y) {
         const address = simpleCellAddress(sheet, x, y)
