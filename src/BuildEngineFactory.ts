@@ -19,7 +19,6 @@ import {NumberLiteralHelper} from './NumberLiteralHelper'
 import {buildLexerConfig, ParserWithCaching, Unparser} from './parser'
 import {Serialization} from './Serialization'
 import {EmptyStatistics, Statistics, StatType} from './statistics'
-import {UndoRedo} from './UndoRedo'
 
 export type EngineState = {
   config: Config,
@@ -31,7 +30,6 @@ export type EngineState = {
   cellContentParser: CellContentParser,
   evaluator: Evaluator,
   lazilyTransformingAstService: LazilyTransformingAstService,
-  undoRedo: UndoRedo,
   crudOperations: CrudOperations,
   exporter: Exporter,
   namedExpressions: NamedExpressions,
@@ -42,7 +40,6 @@ export class BuildEngineFactory {
   private static buildEngine(config: Config, sheets: Sheets = {}, stats: Statistics = config.useStats ? new Statistics() : new EmptyStatistics()): EngineState {
     stats.start(StatType.BUILD_ENGINE_TOTAL)
 
-    const undoRedo: UndoRedo = new UndoRedo()
     const lazilyTransformingAstService = new LazilyTransformingAstService(stats)
     const dependencyGraph = DependencyGraph.buildEmpty(lazilyTransformingAstService, config, stats)
     const columnSearch = buildColumnSearchStrategy(dependencyGraph, config, stats)
@@ -68,14 +65,13 @@ export class BuildEngineFactory {
       graphBuilder.buildGraph(sheets)
     })
 
-    lazilyTransformingAstService.undoRedo = undoRedo
+    const crudOperations = new CrudOperations(config, stats, dependencyGraph, columnSearch, parser, cellContentParser, lazilyTransformingAstService)
+    lazilyTransformingAstService.undoRedo = crudOperations.undoRedo
     lazilyTransformingAstService.parser = parser
 
     const evaluator = new Evaluator(dependencyGraph, columnSearch, config, stats, dateHelper, numberLiteralHelper)
     evaluator.run()
 
-    const crudOperations = new CrudOperations(config, stats, dependencyGraph, columnSearch, parser, cellContentParser, lazilyTransformingAstService, undoRedo)
-    undoRedo.crudOperations = crudOperations
     const namedExpressions = new NamedExpressions(cellContentParser, dependencyGraph, parser, crudOperations)
     const exporter = new Exporter(config, namedExpressions)
     const serialization = new Serialization(dependencyGraph, unparser, config, exporter)
@@ -92,7 +88,6 @@ export class BuildEngineFactory {
       cellContentParser,
       evaluator,
       lazilyTransformingAstService,
-      undoRedo,
       crudOperations,
       exporter,
       namedExpressions,

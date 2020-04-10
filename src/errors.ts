@@ -81,9 +81,15 @@ export class NamedExpressionDoesNotExist extends Error {
 /**
  * Error thrown when there are no operations to be undone by the [[undo]] method.
  */
-export class NoOperationToUndo extends Error {
+export class NoOperationToUndoError extends Error {
   constructor() {
     super('There is no operation to undo')
+  }
+}
+
+export class NoOperationToRedoError extends Error {
+  constructor() {
+    super('There is no operation to redo')
   }
 }
 
