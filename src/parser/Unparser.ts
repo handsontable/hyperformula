@@ -33,6 +33,9 @@ export class Unparser {
 
   private unparseAst(ast: Ast, address: SimpleCellAddress): string {
     switch (ast.type) {
+      case AstNodeType.EMPTY: {
+        return imageWithWhitespace('',ast.leadingWhitespace)
+      }
       case AstNodeType.NUMBER: {
         return imageWithWhitespace(formatNumber(ast.value, this.config.decimalSeparator), ast.leadingWhitespace)
       }

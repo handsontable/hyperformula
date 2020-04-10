@@ -30,7 +30,7 @@ import {
   buildCellReferenceAst,
   buildColumnRangeAst,
   buildConcatenateOpAst,
-  buildDivOpAst,
+  buildDivOpAst, buildEmptyArgAst,
   buildEqualsOpAst,
   buildErrorWithRawInputAst,
   buildGreaterThanOpAst,
@@ -229,7 +229,7 @@ export class FormulaParser extends EmbeddedActionsParser {
   private booleanExpressionOrEmpty: AstRule = this.RULE( 'booleanExpressionOrEmpty', () => {
     return this.OR([
       {ALT: () => this.SUBRULE(this.booleanExpression)},
-      {ALT: EMPTY_ALT(undefined)}
+      {ALT: EMPTY_ALT(buildEmptyArgAst())}
     ])
   })
 
@@ -424,7 +424,7 @@ export class FormulaParser extends EmbeddedActionsParser {
         args.push(this.SUBRULE(this.booleanExpressionOrEmpty))
       },
     })
-    if(args.length === 1 && args[0] === undefined) {
+    if(args.length === 1 && args[0].type === AstNodeType.EMPTY) {
       args.length = 0
     }
     const rParenToken = this.CONSUME(RParen) as IExtendedToken

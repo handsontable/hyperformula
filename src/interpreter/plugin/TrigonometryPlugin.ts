@@ -4,7 +4,7 @@
  */
 
 import {CellError, ErrorType, InternalCellValue, SimpleCellAddress} from '../../Cell'
-import {ProcedureAst} from '../../parser'
+import {AstNodeType, ProcedureAst} from '../../parser'
 import {SimpleRangeValue} from '../InterpreterValue'
 import {FunctionPlugin} from './FunctionPlugin'
 
@@ -95,6 +95,9 @@ export class TrigonometryPlugin extends FunctionPlugin {
   public atan2(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
     if (ast.args.length !== 2) {
       return new CellError(ErrorType.NA)
+    }
+    if(ast.args.some((ast) => ast.type===AstNodeType.EMPTY)) {
+      return new CellError(ErrorType.NUM)
     }
 
     const arg1 = this.evaluateAst(ast.args[0], formulaAddress)

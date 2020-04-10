@@ -4,7 +4,7 @@
  */
 
 import {CellError, EmptyValueType, ErrorType, InternalCellValue, SimpleCellAddress} from '../../Cell'
-import {ProcedureAst} from '../../parser'
+import {AstNodeType, ProcedureAst} from '../../parser'
 import {FunctionPlugin} from './FunctionPlugin'
 
 /**
@@ -28,6 +28,9 @@ export class CountUniquePlugin extends FunctionPlugin {
   public countunique(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
     if (ast.args.length === 0) {
       return new CellError(ErrorType.NA)
+    }
+    if(ast.args.some((ast) => ast.type===AstNodeType.EMPTY)) {
+      return new CellError(ErrorType.NUM)
     }
 
     const valuesSet = new Set<number | string | boolean | EmptyValueType>()

@@ -6,7 +6,7 @@
 import {CellError, ErrorType, InternalCellValue, SimpleCellAddress} from '../../Cell'
 import {endOfMonth, offsetMonth} from '../../DateTimeHelper'
 import {format} from '../../format/format'
-import {ProcedureAst} from '../../parser'
+import {AstNodeType, ProcedureAst} from '../../parser'
 import {SimpleRangeValue} from '../InterpreterValue'
 import {FunctionPlugin} from './FunctionPlugin'
 
@@ -49,6 +49,9 @@ export class DatePlugin extends FunctionPlugin {
   public date(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
     if (ast.args.length !== 3) {
       return new CellError(ErrorType.NA)
+    }
+    if(ast.args.some((ast) => ast.type===AstNodeType.EMPTY)) {
+      return new CellError(ErrorType.NUM)
     }
 
     const year = this.evaluateAst(ast.args[0], formulaAddress)
@@ -97,6 +100,9 @@ export class DatePlugin extends FunctionPlugin {
     if (ast.args.length !== 2) {
       return new CellError(ErrorType.NA)
     }
+    if(ast.args.some((ast) => ast.type===AstNodeType.EMPTY)) {
+      return new CellError(ErrorType.NUM)
+    }
 
     const arg = this.evaluateAst(ast.args[0], formulaAddress)
     if (arg instanceof SimpleRangeValue) {
@@ -124,6 +130,9 @@ export class DatePlugin extends FunctionPlugin {
     if (ast.args.length !== 1) {
       return new CellError(ErrorType.NA)
     }
+    if(ast.args.some((ast) => ast.type===AstNodeType.EMPTY)) {
+      return new CellError(ErrorType.NUM)
+    }
 
     const arg = this.evaluateAst(ast.args[0], formulaAddress)
     if (arg instanceof SimpleRangeValue) {
@@ -139,6 +148,9 @@ export class DatePlugin extends FunctionPlugin {
   public days(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
     if (ast.args.length !== 2) {
       return new CellError(ErrorType.NA)
+    }
+    if(ast.args.some((ast) => ast.type===AstNodeType.EMPTY)) {
+      return new CellError(ErrorType.NUM)
     }
 
     const endDate = this.evaluateAst(ast.args[0], formulaAddress)
@@ -174,6 +186,9 @@ export class DatePlugin extends FunctionPlugin {
     if (ast.args.length !== 1) {
       return new CellError(ErrorType.NA)
     }
+    if(ast.args.some((ast) => ast.type===AstNodeType.EMPTY)) {
+      return new CellError(ErrorType.NUM)
+    }
 
     const arg = this.evaluateAst(ast.args[0], formulaAddress)
     if (arg instanceof SimpleRangeValue) {
@@ -199,6 +214,9 @@ export class DatePlugin extends FunctionPlugin {
     if (ast.args.length !== 1) {
       return new CellError(ErrorType.NA)
     }
+    if(ast.args.some((ast) => ast.type===AstNodeType.EMPTY)) {
+      return new CellError(ErrorType.NUM)
+    }
 
     const arg = this.evaluateAst(ast.args[0], formulaAddress)
     if (arg instanceof SimpleRangeValue) {
@@ -223,6 +241,9 @@ export class DatePlugin extends FunctionPlugin {
   public text(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
     if (ast.args.length !== 2) {
       return new CellError(ErrorType.NA)
+    }
+    if(ast.args.some((ast) => ast.type===AstNodeType.EMPTY)) {
+      return new CellError(ErrorType.NUM)
     }
 
     const dateArg = this.evaluateAst(ast.args[0], formulaAddress)

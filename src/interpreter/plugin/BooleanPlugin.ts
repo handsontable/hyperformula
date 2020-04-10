@@ -4,7 +4,7 @@
  */
 
 import {CellError, ErrorType, InternalCellValue, NoErrorCellValue, SimpleCellAddress} from '../../Cell'
-import {ProcedureAst} from '../../parser'
+import {AstNodeType, ProcedureAst} from '../../parser'
 import {coerceScalarToBoolean} from '../ArithmeticHelper'
 import {InterpreterValue, SimpleRangeValue} from '../InterpreterValue'
 import {FunctionPlugin} from './FunctionPlugin'
@@ -95,7 +95,7 @@ export class BooleanPlugin extends FunctionPlugin {
     if (ast.args.length > 3 || ast.args.length < 2) {
       return new CellError(ErrorType.NA)
     }
-    if(ast.args[0] === undefined) {
+    if(ast.args.some((ast) => ast.type===AstNodeType.EMPTY)) {
       return new CellError(ErrorType.NUM)
     }
     const conditionValue = this.evaluateAst(ast.args[0], formulaAddress)
@@ -104,12 +104,9 @@ export class BooleanPlugin extends FunctionPlugin {
     }
     const condition = coerceScalarToBoolean(conditionValue)
     if (condition === true) {
-      if(ast.args[1] === undefined) {
-        return new CellError(ErrorType.NUM)
-      }
       return this.evaluateAst(ast.args[1], formulaAddress)
     } else if (condition === false) {
-      if (ast.args[2]) {
+      if (ast.args[2]!==undefined) {
         return this.evaluateAst(ast.args[2], formulaAddress)
       } else {
         return false
@@ -132,6 +129,9 @@ export class BooleanPlugin extends FunctionPlugin {
   public and(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
     if (ast.args.length < 1) {
       return new CellError(ErrorType.NA)
+    }
+    if(ast.args.some((ast) => ast.type===AstNodeType.EMPTY)) {
+      return new CellError(ErrorType.NUM)
     }
 
     let result: InternalCellValue = true
@@ -164,6 +164,9 @@ export class BooleanPlugin extends FunctionPlugin {
     if (ast.args.length < 1) {
       return new CellError(ErrorType.NA)
     }
+    if(ast.args.some((ast) => ast.type===AstNodeType.EMPTY)) {
+      return new CellError(ErrorType.NUM)
+    }
 
     let result: InternalCellValue | null = null
     for (const scalarValue of this.iterateOverScalarValues(ast.args, formulaAddress)) {
@@ -185,6 +188,9 @@ export class BooleanPlugin extends FunctionPlugin {
     if (ast.args.length !== 1) {
       return new CellError(ErrorType.NA)
     }
+    if(ast.args.some((ast) => ast.type===AstNodeType.EMPTY)) {
+      return new CellError(ErrorType.NUM)
+    }
 
     const argValue = this.evaluateAst(ast.args[0], formulaAddress)
     if (argValue instanceof SimpleRangeValue) {
@@ -202,6 +208,9 @@ export class BooleanPlugin extends FunctionPlugin {
   public xor(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
     if (ast.args.length < 1) {
       return new CellError(ErrorType.NA)
+    }
+    if(ast.args.some((ast) => ast.type===AstNodeType.EMPTY)) {
+      return new CellError(ErrorType.NUM)
     }
 
     let truesCount = 0
@@ -226,6 +235,9 @@ export class BooleanPlugin extends FunctionPlugin {
   public switch(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
     if (ast.args.length < 3) {
       return new CellError(ErrorType.NA)
+    }
+    if(ast.args.some((ast) => ast.type===AstNodeType.EMPTY)) {
+      return new CellError(ErrorType.NUM)
     }
 
     const vals: InternalCellValue[] = []
@@ -261,6 +273,9 @@ export class BooleanPlugin extends FunctionPlugin {
     if (ast.args.length !== 2) {
       return new CellError(ErrorType.NA)
     }
+    if(ast.args.some((ast) => ast.type===AstNodeType.EMPTY)) {
+      return new CellError(ErrorType.NUM)
+    }
     const left: InterpreterValue = this.evaluateAst(ast.args[0], formulaAddress)
     const right: InterpreterValue = this.evaluateAst(ast.args[1], formulaAddress)
 
@@ -279,6 +294,9 @@ export class BooleanPlugin extends FunctionPlugin {
     if (ast.args.length !== 2) {
       return new CellError(ErrorType.NA)
     }
+    if(ast.args.some((ast) => ast.type===AstNodeType.EMPTY)) {
+      return new CellError(ErrorType.NUM)
+    }
     const left: InterpreterValue = this.evaluateAst(ast.args[0], formulaAddress)
     const right: InterpreterValue = this.evaluateAst(ast.args[1], formulaAddress)
 
@@ -296,6 +314,9 @@ export class BooleanPlugin extends FunctionPlugin {
   public choose(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
     if (ast.args.length < 2) {
       return new CellError(ErrorType.NA)
+    }
+    if(ast.args.some((ast) => ast.type===AstNodeType.EMPTY)) {
+      return new CellError(ErrorType.NUM)
     }
 
     const vals: InternalCellValue[] = []

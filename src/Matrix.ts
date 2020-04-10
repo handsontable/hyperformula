@@ -41,14 +41,11 @@ export function checkMatrixSize(ast: Ast, formulaAddress: SimpleCellAddress): Ma
         if (ast.args.length !== 2) {
           return new CellError(ErrorType.NA)
         }
-        if(ast.args[0]===undefined) {
+        if(ast.args.some((ast) => ast.type===AstNodeType.EMPTY)) {
           return new CellError(ErrorType.NUM)
         }
 
         const left = checkMatrixSize(ast.args[0], formulaAddress)
-        if(ast.args[1]===undefined) {
-          return new CellError(ErrorType.NUM)
-        }
         const right = checkMatrixSize(ast.args[1], formulaAddress)
 
         if (left instanceof CellError) {
@@ -66,14 +63,11 @@ export function checkMatrixSize(ast: Ast, formulaAddress: SimpleCellAddress): Ma
         if (ast.args.length < 2 || ast.args.length > 3) {
           return new CellError(ErrorType.NA)
         }
+        if(ast.args.some((ast) => ast.type===AstNodeType.EMPTY)) {
+          return new CellError(ErrorType.NUM)
+        }
 
-        if(ast.args[0]===undefined) {
-          return new CellError(ErrorType.NUM)
-        }
         const matrix = checkMatrixSize(ast.args[0], formulaAddress)
-        if(ast.args[1]===undefined) {
-          return new CellError(ErrorType.NUM)
-        }
         const windowArg = ast.args[1]
 
         if (matrix instanceof CellError) {
@@ -86,9 +80,6 @@ export function checkMatrixSize(ast: Ast, formulaAddress: SimpleCellAddress): Ma
         let stride = windowArg.value
 
         if (ast.args.length === 3) {
-          if(ast.args[2]===undefined) {
-            return new CellError(ErrorType.NUM)
-          }
           const strideArg = ast.args[2]
           if (strideArg.type === AstNodeType.NUMBER) {
             stride = strideArg.value
@@ -110,7 +101,7 @@ export function checkMatrixSize(ast: Ast, formulaAddress: SimpleCellAddress): Ma
           return new CellError(ErrorType.NA)
         }
 
-        if(ast.args[0]===undefined) {
+        if(ast.args[0].type===AstNodeType.EMPTY) {
           return new CellError(ErrorType.NUM)
         }
         const size = checkMatrixSize(ast.args[0], formulaAddress)

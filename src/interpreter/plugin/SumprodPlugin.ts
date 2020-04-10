@@ -6,7 +6,7 @@
 import {AbsoluteCellRange} from '../../AbsoluteCellRange'
 import {CellError, ErrorType, InternalCellValue, simpleCellAddress, SimpleCellAddress} from '../../Cell'
 import {DependencyGraph, RangeVertex} from '../../DependencyGraph'
-import {ProcedureAst} from '../../parser'
+import {AstNodeType, ProcedureAst} from '../../parser'
 import {coerceToRange} from '../ArithmeticHelper'
 import {SimpleRangeValue} from '../InterpreterValue'
 import {FunctionPlugin} from './FunctionPlugin'
@@ -21,6 +21,9 @@ export class SumprodPlugin extends FunctionPlugin {
   public sumprod(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
     if (ast.args.length !== 2) {
       return new CellError(ErrorType.NA)
+    }
+    if(ast.args.some((ast) => ast.type===AstNodeType.EMPTY)) {
+      return new CellError(ErrorType.NUM)
     }
     const [left, right] = ast.args
 

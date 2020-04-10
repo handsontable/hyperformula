@@ -5,14 +5,14 @@
 
 import {IToken, tokenMatcher} from 'chevrotain'
 import {ErrorType, SimpleCellAddress} from '../Cell'
-import {buildParsingErrorAst, RelativeDependency} from './'
+import {AstNodeType, buildParsingErrorAst, RelativeDependency} from './'
 import {
   cellAddressFromString,
   columnAddressFromString,
   rowAddressFromString,
   SheetMappingFn,
 } from './addressRepresentationConverters'
-import {Ast, AstNodeType, imageWithWhitespace, ParsingError, ParsingErrorType, RangeSheetReferenceType} from './Ast'
+import {Ast, imageWithWhitespace, ParsingError, ParsingErrorType, RangeSheetReferenceType} from './Ast'
 import {binaryOpTokenMap} from './binaryOpTokenMap'
 import {Cache} from './Cache'
 import {FormulaLexer, FormulaParser, IExtendedToken} from './FormulaParser'
@@ -162,6 +162,9 @@ export class ParserWithCaching {
 
   private computeHashOfAstNode(ast: Ast): string {
     switch (ast.type) {
+      case AstNodeType.EMPTY: {
+        return ' '
+      }
       case AstNodeType.NUMBER: {
         return imageWithWhitespace(formatNumber(ast.value, this.config.decimalSeparator), ast.leadingWhitespace)
       }
@@ -169,7 +172,7 @@ export class ParserWithCaching {
         return imageWithWhitespace('"' + ast.value + '"', ast.leadingWhitespace)
       }
       case AstNodeType.FUNCTION_CALL: {
-        const args = ast.args.map((arg) => arg!==undefined?this.computeHashOfAstNode(arg):'').join(this.config.functionArgSeparator)
+        const args = ast.args.map((arg) => this.computeHashOfAstNode(arg)).join(this.config.functionArgSeparator)
         const rightPart = ast.procedureName + '(' + args + imageWithWhitespace(')', ast.internalWhitespace)
         return imageWithWhitespace(rightPart, ast.leadingWhitespace)
       }

@@ -113,6 +113,9 @@ export class NumericAggregationPlugin extends FunctionPlugin {
    * @param formulaAddress
    */
   public sum(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
+    if(ast.args.some((ast) => ast.type===AstNodeType.EMPTY)) {
+      return new CellError(ErrorType.NUM)
+    }
     return this.reduce(ast, formulaAddress, 0, 'SUM', this.interpreter.arithmeticHelper.nonstrictadd, idMap, (arg) => this.coerceScalarToNumberOrError(arg))
   }
 
@@ -120,12 +123,18 @@ export class NumericAggregationPlugin extends FunctionPlugin {
     if (ast.args.length < 1) {
       return new CellError(ErrorType.NA)
     }
+    if(ast.args.some((ast) => ast.type===AstNodeType.EMPTY)) {
+      return new CellError(ErrorType.NUM)
+    }
     return this.reduce(ast, formulaAddress, 0, 'SUMSQ', this.interpreter.arithmeticHelper.nonstrictadd, square, (arg) => this.coerceScalarToNumberOrError(arg))
   }
 
   public countblank(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
     if (ast.args.length < 1) {
       return new CellError(ErrorType.NA)
+    }
+    if(ast.args.some((ast) => ast.type===AstNodeType.EMPTY)) {
+      return new CellError(ErrorType.NUM)
     }
     let counter = 0
     for (const arg of ast.args) {
@@ -151,6 +160,9 @@ export class NumericAggregationPlugin extends FunctionPlugin {
     if (ast.args.length < 1) {
       return new CellError(ErrorType.NA)
     }
+    if(ast.args.some((ast) => ast.type===AstNodeType.EMPTY)) {
+      return new CellError(ErrorType.NUM)
+    }
     const value = this.reduce(ast, formulaAddress, Number.NEGATIVE_INFINITY, 'MAX', max, idMap, (arg) => this.coerceScalarToNumberOrError(arg))
 
     return zeroForInfinite(value)
@@ -159,6 +171,9 @@ export class NumericAggregationPlugin extends FunctionPlugin {
   public maxa(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
     if (ast.args.length < 1) {
       return new CellError(ErrorType.NA)
+    }
+    if(ast.args.some((ast) => ast.type===AstNodeType.EMPTY)) {
+      return new CellError(ErrorType.NUM)
     }
     const value = this.reduce(ast, formulaAddress, Number.NEGATIVE_INFINITY, 'MAXA', maxa, idMap, (arg) => this.coerceScalarToNumberOrError(arg))
 
@@ -177,6 +192,9 @@ export class NumericAggregationPlugin extends FunctionPlugin {
     if (ast.args.length < 1) {
       return new CellError(ErrorType.NA)
     }
+    if(ast.args.some((ast) => ast.type===AstNodeType.EMPTY)) {
+      return new CellError(ErrorType.NUM)
+    }
     const value = this.reduce(ast, formulaAddress, Number.POSITIVE_INFINITY, 'MIN', min, idMap, (arg) => this.coerceScalarToNumberOrError(arg))
 
     return zeroForInfinite(value)
@@ -186,6 +204,9 @@ export class NumericAggregationPlugin extends FunctionPlugin {
     if (ast.args.length < 1) {
       return new CellError(ErrorType.NA)
     }
+    if(ast.args.some((ast) => ast.type===AstNodeType.EMPTY)) {
+      return new CellError(ErrorType.NUM)
+    }
     const value = this.reduce(ast, formulaAddress, Number.POSITIVE_INFINITY, 'MINA', mina, idMap, (arg) => this.coerceScalarToNumberOrError(arg))
 
     return zeroForInfinite(value)
@@ -194,6 +215,9 @@ export class NumericAggregationPlugin extends FunctionPlugin {
   public count(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
     if (ast.args.length < 1) {
       return new CellError(ErrorType.NA)
+    }
+    if(ast.args.some((ast) => ast.type===AstNodeType.EMPTY)) {
+      return new CellError(ErrorType.NUM)
     }
     const value = this.reduce(ast, formulaAddress, 0, 'COUNT', (left, right) => {
       return left + right
@@ -208,6 +232,9 @@ export class NumericAggregationPlugin extends FunctionPlugin {
     if (ast.args.length < 1) {
       return new CellError(ErrorType.NA)
     }
+    if(ast.args.some((ast) => ast.type===AstNodeType.EMPTY)) {
+      return new CellError(ErrorType.NUM)
+    }
     const value = this.reduce(ast, formulaAddress, 0, 'COUNTA', (left, right) => {
       return left + right
     }, (arg): number => {
@@ -220,6 +247,9 @@ export class NumericAggregationPlugin extends FunctionPlugin {
   public average(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
     if (ast.args.length < 1) {
       return new CellError(ErrorType.NA)
+    }
+    if(ast.args.some((ast) => ast.type===AstNodeType.EMPTY)) {
+      return new CellError(ErrorType.NUM)
     }
 
     const result = this.reduce<AverageResult | CellError>(ast, formulaAddress, AverageResult.empty, 'AVERAGE', (left, right) => {
@@ -250,6 +280,9 @@ export class NumericAggregationPlugin extends FunctionPlugin {
   public averagea(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
     if (ast.args.length < 1) {
       return new CellError(ErrorType.NA)
+    }
+    if(ast.args.some((ast) => ast.type===AstNodeType.EMPTY)) {
+      return new CellError(ErrorType.NUM)
     }
 
     const result = this.reduce<AverageResult | CellError>(ast, formulaAddress, AverageResult.empty, 'AVERAGE', (left, right) => {

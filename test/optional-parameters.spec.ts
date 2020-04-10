@@ -1,10 +1,10 @@
-import {CellError, EmptyValue, ErrorType, HyperFormula} from '../src'
+import {CellError, ErrorType, HyperFormula} from '../src'
 import {SimpleCellAddress} from '../src/Cell'
 import {coerceScalarToString} from '../src/interpreter/ArithmeticHelper'
 import {SimpleRangeValue} from '../src/interpreter/InterpreterValue'
 import {FunctionPlugin} from '../src/interpreter/plugin/FunctionPlugin'
-import {ProcedureAst} from '../src/parser'
-import {adr} from './testUtils'
+import {AstNodeType, ProcedureAst} from '../src/parser'
+import {adr, detailedError} from './testUtils'
 
 class FooPlugin extends FunctionPlugin {
   public static implementedFunctions = {
@@ -18,11 +18,11 @@ class FooPlugin extends FunctionPlugin {
       return new CellError(ErrorType.NA)
     }
 
-    const arg1 = ast.args[0] !== undefined ? this.evaluateAst(ast.args[0], formulaAddress) : 'default1'
+    const arg1 = ast.args[0].type !== AstNodeType.EMPTY ? this.evaluateAst(ast.args[0], formulaAddress) : 'default1'
     if (arg1 instanceof SimpleRangeValue) {
       return new CellError(ErrorType.VALUE)
     }
-    const arg2 = ast.args[1] !== undefined ? this.evaluateAst(ast.args[1], formulaAddress) : 'default2'
+    const arg2 = ast.args[1].type !== AstNodeType.EMPTY ? this.evaluateAst(ast.args[1], formulaAddress) : 'default2'
     if (arg2 instanceof SimpleRangeValue) {
       return new CellError(ErrorType.VALUE)
     }
@@ -55,5 +55,30 @@ describe('Nonexistent parameters', () => {
     expect(engine.getCellValue(adr('A3'))).toBe('default1+2')
     expect(engine.getCellValue(adr('A4'))).toBe('1+default2')
     expect(engine.getCellValue(adr('A5'))).toBe('default1+default2')
+  })
+
+  it('typical function do not accept', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=DATE(,1,1900)'],
+      ['=LOG(10,)'],
+      ['=SUM(,1)']
+    ])
+
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM))
+    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NUM))
+    expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.NUM))
+  })
+
+  it('serializes with whitespace+optional parameters', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=DATE( ,1,1900)'],
+      ['=LOG(10, )'],
+      ['=SUM( ,1)'],
+      ['=PI( )']
+    ])
+    expect(engine.getCellFormula(adr('A1'))).toEqual('=DATE( ,1,1900)')
+    expect(engine.getCellFormula(adr('A2'))).toEqual('=LOG(10, )')
+    expect(engine.getCellFormula(adr('A3'))).toEqual('=SUM( ,1)')
+    expect(engine.getCellFormula(adr('A4'))).toEqual('=PI( )')
   })
 })

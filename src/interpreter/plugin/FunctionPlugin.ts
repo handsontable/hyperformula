@@ -8,7 +8,7 @@ import {CellError, ErrorType, InternalCellValue, SimpleCellAddress} from '../../
 import {ColumnSearchStrategy} from '../../ColumnSearch/ColumnSearchStrategy'
 import {Config} from '../../Config'
 import {DependencyGraph} from '../../DependencyGraph'
-import {Ast, ProcedureAst} from '../../parser'
+import {Ast, AstNodeType, ProcedureAst} from '../../parser'
 import {coerceScalarToString} from '../ArithmeticHelper'
 import {Interpreter} from '../Interpreter'
 import {InterpreterValue, SimpleRangeValue} from '../InterpreterValue'
@@ -83,7 +83,7 @@ export abstract class FunctionPlugin {
     if (ast.args.length !== 2) {
       return new CellError(ErrorType.NA)
     }
-    if(ast.args[0] === undefined) {
+    if(ast.args.some((ast) => ast.type===AstNodeType.EMPTY)) {
       return new CellError(ErrorType.NUM)
     }
     const left = this.evaluateAst(ast.args[0], formulaAddress)
@@ -95,9 +95,6 @@ export abstract class FunctionPlugin {
       return coercedLeft
     }
 
-    if(ast.args[1] === undefined) {
-      return new CellError(ErrorType.NUM)
-    }
     const right = this.evaluateAst(ast.args[1], formulaAddress)
     if (right instanceof SimpleRangeValue) {
       return new CellError(ErrorType.VALUE)
@@ -115,7 +112,7 @@ export abstract class FunctionPlugin {
     if (position > ast.args.length - 1) {
       return new CellError(ErrorType.NA)
     }
-    if(ast.args[position] === undefined) {
+    if(ast.args[position].type===AstNodeType.EMPTY) {
       return new CellError(ErrorType.NUM)
     }
     const arg = this.evaluateAst(ast.args[position]!, formulaAddress)
@@ -145,10 +142,10 @@ export abstract class FunctionPlugin {
     if (ast.args.length !== 1) {
       return new CellError(ErrorType.NA)
     }
-
-    if(ast.args[0]===undefined) {
+    if(ast.args.some((ast) => ast.type===AstNodeType.EMPTY)) {
       return new CellError(ErrorType.NUM)
     }
+
     const arg = this.evaluateAst(ast.args[0], formulaAddress)
     if (arg instanceof SimpleRangeValue) {
       return new CellError(ErrorType.VALUE)

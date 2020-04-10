@@ -31,6 +31,10 @@ export class VlookupPlugin extends FunctionPlugin {
       return new CellError(ErrorType.NA)
     }
 
+    if(ast.args.some((ast) => ast.type===AstNodeType.EMPTY)) {
+      return new CellError(ErrorType.NUM)
+    }
+
     const key = this.evaluateAst(ast.args[0], formulaAddress)
     if (typeof key !== 'string' && typeof key !== 'number' && typeof key !== 'boolean') {
       return new CellError(ErrorType.VALUE)

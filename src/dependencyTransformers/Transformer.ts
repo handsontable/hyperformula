@@ -88,7 +88,7 @@ export abstract class Transformer implements FormulaTransformer {
           ...ast,
           type: ast.type,
           procedureName: ast.procedureName,
-          args: ast.args.map((arg) => arg!==undefined?this.transformAst(arg, address):undefined),
+          args: ast.args.map((arg) => this.transformAst(arg, address)),
         }
       }
       case AstNodeType.PARENTHESIS: {
@@ -96,6 +96,12 @@ export abstract class Transformer implements FormulaTransformer {
           ...ast,
           type: ast.type,
           expression: this.transformAst(ast.expression, address),
+        }
+      }
+      case AstNodeType.EMPTY: {
+        return {
+          ...ast,
+          type: ast.type,
         }
       }
       default: {

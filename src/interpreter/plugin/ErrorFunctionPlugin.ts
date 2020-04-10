@@ -4,7 +4,7 @@
  */
 
 import {CellError, ErrorType, InternalCellValue, SimpleCellAddress} from '../../Cell'
-import {ProcedureAst} from '../../parser'
+import {AstNodeType, ProcedureAst} from '../../parser'
 import {FunctionPlugin} from './FunctionPlugin'
 
 export class ErrorFunctionPlugin extends FunctionPlugin {
@@ -20,6 +20,9 @@ export class ErrorFunctionPlugin extends FunctionPlugin {
   public erf(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
     if (ast.args.length < 1 || ast.args.length > 2) {
       return new CellError(ErrorType.NA)
+    }
+    if(ast.args.some((ast) => ast.type===AstNodeType.EMPTY)) {
+      return new CellError(ErrorType.NUM)
     }
 
     const lowerBound = this.getNumericArgument(ast, formulaAddress, 0)
