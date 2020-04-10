@@ -7,15 +7,17 @@ import {AbsoluteCellRange} from './AbsoluteCellRange'
 import {invalidSimpleCellAddress, simpleCellAddress, SimpleCellAddress} from './Cell'
 import {CellContentParser, isMatrix, RawCellContent} from './CellContentParser'
 import {ClipboardCell, ClipboardOperations} from './ClipboardOperations'
-import {AddColumnsCommand, AddRowsCommand, Operations, RemoveColumnsCommand, RemoveRowsCommand,} from './Operations'
+import {AddColumnsCommand, AddRowsCommand, Operations, RemoveColumnsCommand, RemoveRowsCommand} from './Operations'
 import {ColumnSearchStrategy} from './ColumnSearch/ColumnSearchStrategy'
 import {ColumnsSpan} from './ColumnsSpan'
 import {Config} from './Config'
 import {ContentChanges} from './ContentChanges'
-import {AddressMapping, DependencyGraph, SheetMapping,} from './DependencyGraph'
+import {AddressMapping, DependencyGraph, SheetMapping} from './DependencyGraph'
 import {
   InvalidAddressError,
-  InvalidArgumentsError, NoOperationToRedoError, NoOperationToUndoError,
+  InvalidArgumentsError,
+  NoOperationToRedoError,
+  NoOperationToUndoError,
   NoSheetWithIdError,
   NoSheetWithNameError,
   SheetSizeLimitExceededError
@@ -26,6 +28,7 @@ import {ParserWithCaching} from './parser'
 import {RowsSpan} from './RowsSpan'
 import {Statistics} from './statistics'
 import {UndoRedo} from './UndoRedo'
+import {findBoundaries, Sheet} from './Sheet'
 
 export class CrudOperations {
 
@@ -196,6 +199,8 @@ export class CrudOperations {
       }
     }
 
+    this.ensureItIsPossibleToChangeCellContents(topLeftCornerAddress, cellContents)
+
     this.undoRedo.clearRedoStack()
     const modifiedCellContents: { address: SimpleCellAddress, newContent: RawCellContent, oldContent: ClipboardCell }[] = []
     for (let i = 0; i < cellContents.length; i++) {
@@ -205,7 +210,6 @@ export class CrudOperations {
           row: topLeftCornerAddress.row + i,
           col: topLeftCornerAddress.col + j,
         }
-        this.ensureItIsPossibleToChangeContent(address)
         this.clipboardOperations.abortCut()
         const oldContent = this.operations.getClipboardCell(address)
         this.operations.setCellContent(address, cellContents[i][j])
@@ -216,13 +220,14 @@ export class CrudOperations {
   }
 
   public setSheetContent(sheetName: string, values: RawCellContent[][]): void {
-    this.ensureSheetExists(sheetName)
+    const sheetId = this.ensureSheetExists(sheetName)
+    this.ensureItIsPossibleToChangeSheetContents(sheetId, values)
+
     this.undoRedo.clearRedoStack()
     this.clipboardOperations.abortCut()
     if (!(values instanceof Array)) {
       throw new Error('Expected an array of arrays.')
     }
-    const sheetId = this.sheetMapping.fetch(sheetName)
     const oldSheetContent = this.operations.getSheetClipboardCells(sheetId)
     this.operations.clearSheet(sheetId)
     for (let i = 0; i < values.length; i++) {
@@ -231,7 +236,6 @@ export class CrudOperations {
       }
       for (let j = 0; j < values[i].length; j++) {
         const address = simpleCellAddress(sheetId, j, i)
-        this.ensureItIsPossibleToChangeContent(address)
         this.operations.setCellContent(address, values[i][j])
       }
     }
@@ -415,6 +419,27 @@ export class CrudOperations {
     }
   }
 
+  public ensureItIsPossibleToChangeCellContents(address: SimpleCellAddress, content: RawCellContent[][]) {
+    const boundaries = findBoundaries(content)
+    const targetRange = AbsoluteCellRange.spanFrom(address, boundaries.width, boundaries.height)
+    this.ensureRangeInSizeLimits(targetRange)
+    for (const address of targetRange.addresses(this.dependencyGraph)) {
+      this.ensureItIsPossibleToChangeContent(address)
+    }
+  }
+
+  public ensureItIsPossibleToChangeSheetContents(sheetId: number, content: RawCellContent[][]) {
+    const boundaries = findBoundaries(content)
+    const targetRange = AbsoluteCellRange.spanFrom(simpleCellAddress(sheetId, 0, 0), boundaries.width, boundaries.height)
+    this.ensureRangeInSizeLimits(targetRange)
+  }
+
+  public ensureRangeInSizeLimits(range: AbsoluteCellRange): void {
+    if (range.exceedsSheetSizeLimits(this.config.maxColumns, this.config.maxRows)) {
+      throw new SheetSizeLimitExceededError()
+    }
+  }
+
   public isThereSomethingToUndo() {
     return !this.undoRedo.isUndoStackEmpty()
   }
@@ -423,27 +448,16 @@ export class CrudOperations {
     return !this.undoRedo.isRedoStackEmpty()
   }
 
-  public ensureItIsPossibleToChangeContents(address: SimpleCellAddress, width: number, height: number): void {
-    const targetRange = AbsoluteCellRange.spanFrom(address, width, height)
-    if (targetRange.exceedsSheetSizeLimits(this.config.maxColumns, this.config.maxRows)) {
-      throw new SheetSizeLimitExceededError()
-    }
-
-    for (let i = 0; i < width; i++) {
-      for (let j = 0; j < height; j++) {
-        this.ensureItIsPossibleToChangeContent({ col: address.col + i, row: address.row + j, sheet: address.sheet })
-      }
-    }
-  }
-
   public getAndClearContentChanges(): ContentChanges {
     return this.operations.getAndClearContentChanges()
   }
 
-  public ensureSheetExists(sheetName: string): void {
-    if (!this.sheetMapping.hasSheetWithName(sheetName)) {
+  public ensureSheetExists(sheetName: string): number {
+    const sheetId = this.sheetMapping.get(sheetName)
+    if (sheetId === undefined) {
       throw new NoSheetWithNameError(sheetName)
     }
+    return sheetId
   }
 
   private get addressMapping(): AddressMapping {

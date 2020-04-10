@@ -561,7 +561,12 @@ export class HyperFormula implements TypedEmitter {
    */
   public isItPossibleToSetCellContents(topLeftCornerAddress: SimpleCellAddress, width: number = 1, height: number = 1): boolean {
     try {
-      this._crudOperations.ensureItIsPossibleToChangeContents(topLeftCornerAddress, width, height)
+      this._crudOperations.ensureRangeInSizeLimits(AbsoluteCellRange.spanFrom(topLeftCornerAddress, width, height))
+      for (let i = 0; i < width; i++) {
+        for (let j = 0; j < height; j++) {
+          this._crudOperations.ensureItIsPossibleToChangeContent({ col: topLeftCornerAddress.col + i, row: topLeftCornerAddress.row + j, sheet: topLeftCornerAddress.sheet })
+        }
+      }
     } catch (e) {
       return false
     }
@@ -1131,12 +1136,14 @@ export class HyperFormula implements TypedEmitter {
    * Returns `false` if there is no sheet with a given name
    *
    * @param {string} sheetName - sheet name, case insensitive.
+   * @param {RawCellContent[][]} values - array of new values
    *
    * @category Sheet
    */
-  public isItPossibleToReplaceSheetContent(sheetName: string): boolean {
+  public isItPossibleToReplaceSheetContent(sheetName: string, values: RawCellContent[][]): boolean {
     try {
-      this._crudOperations.ensureSheetExists(sheetName)
+      const sheetId = this._crudOperations.ensureSheetExists(sheetName)
+      this._crudOperations.ensureItIsPossibleToChangeSheetContents(sheetId, values)
       return true
     } catch (e) {
       return false

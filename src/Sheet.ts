@@ -26,7 +26,7 @@ export interface SheetBoundaries {
  *
  * @param sheet - two-dimmensional array sheet representation
  */
-export function findSheetBoundaries(sheet: Sheet): SheetBoundaries {
+export function findBoundaries(sheet: Sheet): SheetBoundaries {
   let maxWidth = 0
   let cellsCount = 0
   for (let currentRow = 0; currentRow < sheet.length; currentRow++) {

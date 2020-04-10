@@ -5,6 +5,7 @@ import {EmptyCellVertex, MatrixVertex} from '../../src/DependencyGraph'
 import '../testConfig'
 import {adr, colEnd, colStart, detailedError, rowEnd, rowStart} from '../testUtils'
 import {Config} from '../../src/Config'
+import {SheetSizeLimitExceededError} from '../../src/errors'
 
 describe('Changing cell content - checking if its possible', () => {
   it('address should have valid coordinates', () => {
@@ -570,6 +571,16 @@ describe('changing cell content', () => {
     expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.ERROR, 'Parsing error'))
     expect(engine.getCellFormula(adr('A1'))).toEqual('{=TRANSPOSE(}')
   })
+
+  it('should throw when trying to set cell content outside sheet limits', () => {
+    const engine = HyperFormula.buildFromArray([])
+    const cellInLastColumn = simpleCellAddress(0, Config.defaultConfig.maxColumns, 0)
+    const cellInLastRow = simpleCellAddress(0, 0, Config.defaultConfig.maxRows)
+
+    expect(() => engine.setCellContents(cellInLastColumn, '1')).toThrow(new SheetSizeLimitExceededError())
+    expect(() => engine.setCellContents(cellInLastRow, '1')).toThrow(new SheetSizeLimitExceededError())
+  })
+
 })
 
 describe('change multiple cells contents', () => {
@@ -660,6 +671,15 @@ describe('change multiple cells contents', () => {
 
     expect(changes.length).toEqual(6)
     expect(changes.map((change) => change.newValue)).toEqual(expect.arrayContaining([7, 8, 9, 10, 15, 18]))
+  })
+
+  it('should throw when trying to set cell contents outside sheet limits', () => {
+    const engine = HyperFormula.buildFromArray([])
+    const cellInLastColumn = simpleCellAddress(0, Config.defaultConfig.maxColumns - 1, 0)
+    const cellInLastRow = simpleCellAddress(0, 0, Config.defaultConfig.maxRows - 1)
+
+    expect(() => engine.setCellContents(cellInLastColumn, [['1', '2']])).toThrow(new SheetSizeLimitExceededError())
+    expect(() => engine.setCellContents(cellInLastRow, [['1'], ['2']])).toThrow(new SheetSizeLimitExceededError())
   })
 })
 
