@@ -642,6 +642,22 @@ describe('Undo', () => {
     expect(engine.getCellValue(adr('B1'))).toEqual(3)
     expect(changes.length).toBe(2)
   })
+
+  it('operations in batch mode are one undo', () => {
+    const sheet = [
+      ['1', '2'],
+    ]
+    const engine = HyperFormula.buildFromArray(sheet)
+    engine.batch(() => {
+      engine.setCellContents(adr('A1'), '10')
+      engine.setCellContents(adr('A2'), '20')
+    })
+
+    engine.undo()
+
+    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray(sheet))
+    expect(engine.isThereSomethingToUndo()).toBe(false)
+  })
 })
 
 describe('UndoRedo', () => {

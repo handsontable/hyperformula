@@ -156,6 +156,14 @@ export class CrudOperations {
     }
   }
 
+  public beginUndoRedoBatchMode(): void {
+    this.undoRedo.beginBatchMode()
+  }
+
+  public commitUndoRedoBatchMode(): void {
+    this.undoRedo.commitBatchMode()
+  }
+
   public isClipboardEmpty(): boolean {
     return this.clipboardOperations.clipboard === undefined
   }

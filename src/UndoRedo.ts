@@ -112,6 +112,14 @@ export class PasteUndoData {
   ) { }
 }
 
+export class BatchUndoData {
+  public readonly operations: UndoStackElement[] = []
+
+  public add(operation: UndoStackElement) {
+    this.operations.push(operation)
+  }
+}
+
 type UndoStackElement
   = RemoveRowsUndoData
   | AddRowsUndoData
@@ -126,10 +134,12 @@ type UndoStackElement
   | MoveCellsUndoData
   | SetSheetContentUndoData
   | PasteUndoData
+  | BatchUndoData
 
 export class UndoRedo {
   private readonly undoStack: UndoStackElement[] = []
   private redoStack: UndoStackElement[] = []
+  private batchUndoEntry?: BatchUndoData
 
   constructor(
     public readonly operations: Operations
@@ -139,7 +149,23 @@ export class UndoRedo {
   public oldData: Map<number, [SimpleCellAddress, string][]> = new Map()
 
   public saveOperation(operation: UndoStackElement) {
-    this.undoStack.push(operation)
+    if (this.batchUndoEntry !== undefined) {
+      this.batchUndoEntry.add(operation)
+    } else {
+      this.undoStack.push(operation)
+    }
+  }
+
+  public beginBatchMode() {
+    this.batchUndoEntry = new BatchUndoData()
+  }
+  
+  public commitBatchMode() {
+    if (this.batchUndoEntry === undefined) {
+      throw "Batch mode wasn't started"
+    }
+    this.undoStack.push(this.batchUndoEntry)
+    this.batchUndoEntry = undefined
   }
 
   public storeDataForVersion(version: number, address: SimpleCellAddress, astHash: string) {
@@ -196,9 +222,51 @@ export class UndoRedo {
       this.undoSetSheetContent(operation)
     } else if (operation instanceof PasteUndoData) {
       this.undoPaste(operation)
+    } else if (operation instanceof BatchUndoData) {
+      this.undoBatch(operation)
+    } else {
+      throw "Unknown element"
     }
 
     this.redoStack.push(operation)
+  }
+
+  private undoBatch(batchOperation: BatchUndoData) {
+    for (const operation of batchOperation.operations) {
+      if (operation instanceof RemoveRowsUndoData) {
+        this.undoRemoveRows(operation)
+      } else if (operation instanceof RemoveRowsUndoData) {
+        this.undoRemoveRows(operation)
+      } else if (operation instanceof AddRowsUndoData) {
+        this.undoAddRows(operation)
+      } else if (operation instanceof SetCellContentsUndoData) {
+        this.undoSetCellContents(operation)
+      } else if (operation instanceof MoveRowsUndoData) {
+        this.undoMoveRows(operation)
+      } else if (operation instanceof AddSheetUndoData) {
+        this.undoAddSheet(operation)
+      } else if (operation instanceof RemoveSheetUndoData) {
+        this.undoRemoveSheet(operation)
+      } else if (operation instanceof ClearSheetUndoData) {
+        this.undoClearSheet(operation)
+      } else if (operation instanceof AddColumnsUndoData) {
+        this.undoAddColumns(operation)
+      } else if (operation instanceof RemoveColumnsUndoData) {
+        this.undoRemoveColumns(operation)
+      } else if (operation instanceof MoveColumnsUndoData) {
+        this.undoMoveColumns(operation)
+      } else if (operation instanceof MoveCellsUndoData) {
+        this.undoMoveCells(operation)
+      } else if (operation instanceof SetSheetContentUndoData) {
+        this.undoSetSheetContent(operation)
+      } else if (operation instanceof PasteUndoData) {
+        this.undoPaste(operation)
+      } else if (operation instanceof BatchUndoData) {
+        this.undoBatch(operation)
+      } else {
+        throw "Unknown element"
+      }
+    }
   }
 
   private undoRemoveRows(operation: RemoveRowsUndoData) {
@@ -363,6 +431,8 @@ export class UndoRedo {
       this.redoSetSheetContent(operation)
     } else if (operation instanceof PasteUndoData) {
       this.redoPaste(operation)
+    } else {
+      throw "Unknown element"
     }
 
     this.undoStack.push(operation)
