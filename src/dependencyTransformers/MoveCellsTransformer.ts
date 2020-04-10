@@ -22,6 +22,10 @@ export class MoveCellsTransformer extends Transformer {
     this.dependentFormulaTransformer = new DependentFormulaTransformer(sourceRange, toRight, toBottom, toSheet)
   }
 
+  public isIrreversible() {
+    return true
+  }
+
   public get sheet(): number {
     return this.sourceRange.sheet
   }
@@ -98,6 +102,10 @@ class DependentFormulaTransformer extends Transformer {
 
   public get sheet(): number {
     return this.sourceRange.sheet
+  }
+
+  public isIrreversible() {
+    return true
   }
 
   protected fixNodeAddress(address: SimpleCellAddress): SimpleCellAddress {

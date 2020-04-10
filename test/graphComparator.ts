@@ -1,4 +1,4 @@
-import {deepStrictEqual} from 'assert'
+import {equal, deepStrictEqual} from 'assert'
 import {HyperFormula} from '../src'
 import {AbsoluteCellRange} from '../src/AbsoluteCellRange'
 import {SimpleCellAddress, simpleCellAddress} from '../src/Cell'
@@ -30,13 +30,17 @@ export class EngineComparator {
     this.actual.dependencyGraph.forceApplyPostponedTransformations()
 
     for (let sheet = 0; sheet < numberOfSheets; ++sheet) {
-      this.compareSheets(sheet)
+      this.compareSheet(sheet)
     }
   }
 
-  private compareSheets(sheet: number = 0) {
+  private compareSheet(sheet: number) {
     const expectedGraph = this.expected.graph
     const actualGraph = this.actual.graph
+
+    const expectedSheetName = this.expected.getSheetName(sheet)
+    const actualSheetName = this.actual.getSheetName(sheet)
+    equal(expectedSheetName, actualSheetName, `Expected sheet name '${expectedSheetName}', actual '${actualSheetName}'`)
 
     const expectedWidth = this.expected.addressMapping.getWidth(sheet)
     const expectedHeight = this.expected.addressMapping.getHeight(sheet)

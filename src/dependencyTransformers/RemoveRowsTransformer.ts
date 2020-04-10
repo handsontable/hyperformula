@@ -23,6 +23,10 @@ export class RemoveRowsTransformer extends Transformer {
     return this.rowsSpan.sheet
   }
 
+  public isIrreversible() {
+    return true
+  }
+
   protected transformColumnRangeAst(ast: ColumnRangeAst, _formulaAddress: SimpleCellAddress): Ast {
     return ast
   }

@@ -21,7 +21,7 @@ import {
   SheetMapping,
   Vertex,
 } from './DependencyGraph'
-import {NamedExpressionDoesNotExist, NamedExpressionNameIsAlreadyTaken, NamedExpressionNameIsInvalid, NoOperationToUndo, EvaluationSuspendedError, NotAFormulaError} from './errors'
+import {NamedExpressionDoesNotExist, NamedExpressionNameIsAlreadyTaken, NamedExpressionNameIsInvalid, EvaluationSuspendedError, NotAFormulaError} from './errors'
 import {Evaluator} from './Evaluator'
 import {Sheet, Sheets} from './GraphBuilder'
 import {IBatchExecutor} from './IBatchExecutor'
@@ -39,7 +39,6 @@ import {
 import {Serialization} from './Serialization'
 import {Statistics, StatType} from './statistics'
 import {Emitter, Events, Listeners, TypedEmitter} from './Emitter'
-import {UndoRedo} from './UndoRedo'
 import {BuildEngineFactory, EngineState} from './BuildEngineFactory'
 
 export type Index = [number, number]
@@ -154,7 +153,6 @@ export class HyperFormula implements TypedEmitter {
       engine.cellContentParser,
       engine.evaluator,
       engine.lazilyTransformingAstService,
-      engine.undoRedo,
       engine.crudOperations,
       engine.exporter,
       engine.namedExpressions,
@@ -265,7 +263,6 @@ export class HyperFormula implements TypedEmitter {
     private _cellContentParser: CellContentParser,
     private _evaluator: Evaluator,
     private _lazilyTransformingAstService: LazilyTransformingAstService,
-    private _undoRedo: UndoRedo,
     private _crudOperations: CrudOperations,
     private _exporter: Exporter,
     private _namedExpressions: NamedExpressions,
@@ -453,7 +450,6 @@ export class HyperFormula implements TypedEmitter {
     this._cellContentParser = newEngine.cellContentParser
     this._evaluator = newEngine.evaluator
     this._lazilyTransformingAstService = newEngine.lazilyTransformingAstService
-    this._undoRedo = newEngine.undoRedo
     this._crudOperations = newEngine.crudOperations
     this._exporter = newEngine.exporter
     this._namedExpressions = newEngine.namedExpressions
@@ -499,12 +495,25 @@ export class HyperFormula implements TypedEmitter {
    * 
    * @category UndoRedo
    */
-  public undo() {
-    if (this._undoRedo.isUndoStackEmpty()) {
-      throw new NoOperationToUndo()
-    }
-    this._undoRedo.undo()
-    this.recomputeIfDependencyGraphNeedsIt()
+  public undo(): ExportedChange[] {
+    this._crudOperations.undo()
+    return this.recomputeIfDependencyGraphNeedsIt()
+  }
+
+  /**
+   * Re-do recently undone operation.
+   * 
+   * Note that this method may trigger dependency graph recalculation.
+   * 
+   * @fires [[valuesUpdated]]
+   * 
+   * @throws [[NoOperationToRedo]] when there is no operation running that can be re-done
+   * 
+   * @category UndoRedo
+   */
+  public redo(): ExportedChange[] {
+    this._crudOperations.redo()
+    return this.recomputeIfDependencyGraphNeedsIt()
   }
 
   /**
@@ -513,7 +522,16 @@ export class HyperFormula implements TypedEmitter {
    * @category UndoRedo
    */
   public isThereSomethingToUndo() {
-    return !this._undoRedo.isUndoStackEmpty()
+    return this._crudOperations.isThereSomethingToUndo()
+  }
+
+  /**
+   * Checks if there is at least one operation that can be re-done.
+   * 
+   * @category UndoRedo
+   */
+  public isThereSomethingToRedo() {
+    return this._crudOperations.isThereSomethingToRedo()
   }
 
   /**
@@ -750,7 +768,7 @@ export class HyperFormula implements TypedEmitter {
    */
   public isItPossibleToMoveCells(sourceLeftCorner: SimpleCellAddress, width: number, height: number, destinationLeftCorner: SimpleCellAddress): boolean {
     try {
-      this._crudOperations.ensureItIsPossibleToMoveCells(sourceLeftCorner, width, height, destinationLeftCorner)
+      this._crudOperations.operations.ensureItIsPossibleToMoveCells(sourceLeftCorner, width, height, destinationLeftCorner)
       return true
     } catch (e) {
       return false
@@ -922,6 +940,15 @@ export class HyperFormula implements TypedEmitter {
     this.ensureEvaluationIsNotSuspended()
     this._crudOperations.paste(targetLeftCorner)
     return this.recomputeIfDependencyGraphNeedsIt()
+  }
+
+  /**
+   * Returns information whether there is something in the clipboard.
+   *
+   * @category Clipboard
+   */
+  public isClipboardEmpty(): boolean {
+    return this._crudOperations.isClipboardEmpty()
   }
 
   /**
