@@ -23,8 +23,6 @@ class Sheet {
 }
 
 export class SheetMapping {
-  public static NO_CHANGE = Symbol()
-
   private readonly mappingFromCanonicalName: Map<string, Sheet> = new Map()
   private readonly mappingFromId: Map<number, Sheet> = new Map()
   private readonly sheetNamePrefix: string

@@ -203,6 +203,17 @@ export class SparseStrategy implements IAddressMappingStrategy {
     }
   }
 
+  public* entriesFromColumnsSpan(columnsSpan: ColumnsSpan): IterableIterator<[SimpleCellAddress, CellVertex]> {
+    for (const col of columnsSpan.columns()) {
+      const colMapping = this.mapping.get(col)
+      if (colMapping) {
+        for (const [row, vertex] of colMapping.entries()) {
+          yield [simpleCellAddress(columnsSpan.sheet, col, row), vertex]
+        }
+      }
+    }
+  }
+
   public* vertices(): IterableIterator<CellVertex> {
     for (const [_, col] of this.mapping) {
       for (const [_, value] of col) {
