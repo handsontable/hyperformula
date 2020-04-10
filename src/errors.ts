@@ -87,7 +87,7 @@ export class NoOperationToUndoError extends Error {
   }
 }
 
-export class NoOperationToRedo extends Error {
+export class NoOperationToRedoError extends Error {
   constructor() {
     super('There is no operation to redo')
   }

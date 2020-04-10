@@ -507,7 +507,7 @@ export class HyperFormula implements TypedEmitter {
    * 
    * @fires [[valuesUpdated]]
    * 
-   * @throws [[NoOperationToRedo]] when there is no operation running that can be re-done
+   * @throws [[NoOperationToRedoError]] when there is no operation running that can be re-done
    * 
    * @category UndoRedo
    */
