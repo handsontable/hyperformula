@@ -1,4 +1,4 @@
-import {HyperFormula, NoOperationToUndo, NoOperationToRedo} from '../src'
+import {HyperFormula, NoOperationToUndoError, NoOperationToRedo} from '../src'
 import './testConfig'
 import {
   expectEngineToBeTheSameAs,
@@ -628,7 +628,7 @@ describe('Undo', () => {
 
     expect(() => {
       engine.undo()
-    }).toThrowError(new NoOperationToUndo())
+    }).toThrowError(new NoOperationToUndoError())
   })
 
   it('undo recomputes and return changes', () => {
