@@ -673,6 +673,33 @@ describe('Undo', () => {
 
     expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray(sheet))
   })
+
+  it('keeps elements within limit', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1'],
+    ], { undoLimit: 3 })
+    engine.setCellContents(adr('A1'), '2')
+    engine.setCellContents(adr('A1'), '3')
+    engine.setCellContents(adr('A1'), '4')
+    engine.setCellContents(adr('A1'), '5')
+
+    engine.undo()
+    engine.undo()
+    engine.undo()
+
+    expect(engine.isThereSomethingToUndo()).toBe(false)
+  })
+
+  it('undo limit works with infinity', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1'],
+    ], { undoLimit: Infinity })
+    engine.setCellContents(adr('A1'), '2')
+    engine.setCellContents(adr('A1'), '3')
+    engine.setCellContents(adr('A1'), '4')
+
+    expect(engine.isThereSomethingToUndo()).toBe(true)
+  })
 })
 
 describe('UndoRedo', () => {

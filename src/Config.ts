@@ -300,6 +300,14 @@ export interface ConfigParams {
    * @category DateTime
    */
   nullDate: SimpleDate,
+  /**
+   * A number of kept elements in undo history.
+   *
+   * @default 20
+   *
+   * @category UndoRedo
+   */
+  undoLimit: number,
 }
 
 type ConfigParamsList = keyof ConfigParams
@@ -334,6 +342,7 @@ export class Config implements ConfigParams, ParserConfig {
     useStats: false,
     vlookupThreshold: 20,
     nullDate: {year: 1899, month: 12, day: 30},
+    undoLimit: 20,
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -427,6 +436,8 @@ export class Config implements ConfigParams, ParserConfig {
   public readonly vlookupThreshold: number
   /** @inheritDoc */
   public readonly nullDate: SimpleDate
+  /** @inheritDoc */
+  public readonly undoLimit: number
   /**
    * Built automatically based on translation package.
    * 
@@ -468,7 +479,8 @@ export class Config implements ConfigParams, ParserConfig {
       useColumnIndex,
       vlookupThreshold,
       nullDate,
-      useStats
+      useStats,
+      undoLimit,
     }: Partial<ConfigParams> = {},
   ) {
     this.accentSensitive = this.valueFromParam(accentSensitive, 'boolean', 'accentSensitive')
@@ -500,6 +512,7 @@ export class Config implements ConfigParams, ParserConfig {
     this.errorMapping = this.translationPackage.buildErrorMapping()
     this.nullDate = this.valueFromParamCheck(nullDate, instanceOfSimpleDate, 'IDate', 'nullDate')
     this.leapYear1900 = this.valueFromParam(leapYear1900, 'boolean', 'leapYear1900')
+    this.undoLimit = this.valueFromParam(undoLimit, 'number', 'undoLimit')
 
     this.checkIfParametersNotInConflict(
       {value: this.decimalSeparator, name: 'decimalSeparator'},

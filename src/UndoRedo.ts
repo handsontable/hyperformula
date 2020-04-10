@@ -8,15 +8,16 @@ import {ClipboardCell, ClipboardCellType} from './ClipboardOperations'
 import {RawCellContent} from './CellContentParser'
 import {RemoveColumnsCommand, AddColumnsCommand, RowsRemoval, ColumnsRemoval, RemoveRowsCommand, AddRowsCommand} from './Operations'
 import {Operations} from './Operations'
+import {Config} from './Config'
 
-export class RemoveRowsUndoData {
+export class RemoveRowsUndoEntry {
   constructor(
     public readonly command: RemoveRowsCommand,
     public readonly rowsRemovals: RowsRemoval[],
   ) { }
 }
 
-export class MoveCellsUndoData {
+export class MoveCellsUndoEntry {
   constructor(
     public readonly sourceLeftCorner: SimpleCellAddress,
     public readonly width: number,
@@ -27,13 +28,13 @@ export class MoveCellsUndoData {
   ) { }
 }
 
-export class AddRowsUndoData {
+export class AddRowsUndoEntry {
   constructor(
     public readonly command: AddRowsCommand,
   ) { }
 }
 
-export class SetSheetContentUndoData {
+export class SetSheetContentUndoEntry {
   constructor(
     public readonly sheetId: number,
     public readonly oldSheetContent: ClipboardCell[][],
@@ -41,7 +42,7 @@ export class SetSheetContentUndoData {
   ) { }
 }
 
-export class MoveRowsUndoData {
+export class MoveRowsUndoEntry {
   constructor(
     public readonly sheet: number,
     public readonly startRow: number,
@@ -50,7 +51,7 @@ export class MoveRowsUndoData {
   ) { }
 }
 
-export class MoveColumnsUndoData {
+export class MoveColumnsUndoEntry {
   constructor(
     public readonly sheet: number,
     public readonly startColumn: number,
@@ -59,26 +60,26 @@ export class MoveColumnsUndoData {
   ) { }
 }
 
-export class AddColumnsUndoData {
+export class AddColumnsUndoEntry {
   constructor(
     public readonly command: AddColumnsCommand,
   ) { }
 }
 
-export class RemoveColumnsUndoData {
+export class RemoveColumnsUndoEntry {
   constructor(
     public readonly command: RemoveColumnsCommand,
     public readonly columnsRemovals: ColumnsRemoval[],
   ) { }
 }
 
-export class AddSheetUndoData {
+export class AddSheetUndoEntry {
   constructor(
     public readonly sheetName: string,
   ) { }
 }
 
-export class RemoveSheetUndoData {
+export class RemoveSheetUndoEntry {
   constructor(
     public readonly sheetName: string,
     public readonly sheetId: number,
@@ -87,14 +88,14 @@ export class RemoveSheetUndoData {
   ) { }
 }
 
-export class ClearSheetUndoData {
+export class ClearSheetUndoEntry {
   constructor(
     public readonly sheetId: number,
     public readonly oldSheetContent: ClipboardCell[][],
   ) { }
 }
 
-export class SetCellContentsUndoData {
+export class SetCellContentsUndoEntry {
   constructor(
     public readonly cellContents: {
       address: SimpleCellAddress,
@@ -104,7 +105,7 @@ export class SetCellContentsUndoData {
   ) { }
 }
 
-export class PasteUndoData {
+export class PasteUndoEntry {
   constructor(
     public readonly targetLeftCorner: SimpleCellAddress,
     public readonly oldContent: [SimpleCellAddress, ClipboardCell][],
@@ -112,10 +113,10 @@ export class PasteUndoData {
   ) { }
 }
 
-export class BatchUndoData {
-  public readonly operations: UndoStackElement[] = []
+export class BatchUndoEntry {
+  public readonly operations: UndoStackEntry[] = []
 
-  public add(operation: UndoStackElement) {
+  public add(operation: UndoStackEntry) {
     this.operations.push(operation)
   }
 
@@ -126,51 +127,59 @@ export class BatchUndoData {
   }
 }
 
-type UndoStackElement
-  = RemoveRowsUndoData
-  | AddRowsUndoData
-  | MoveRowsUndoData
-  | MoveColumnsUndoData
-  | AddColumnsUndoData
-  | RemoveColumnsUndoData
-  | SetCellContentsUndoData
-  | AddSheetUndoData
-  | RemoveSheetUndoData
-  | ClearSheetUndoData
-  | MoveCellsUndoData
-  | SetSheetContentUndoData
-  | PasteUndoData
-  | BatchUndoData
+type UndoStackEntry
+  = RemoveRowsUndoEntry
+  | AddRowsUndoEntry
+  | MoveRowsUndoEntry
+  | MoveColumnsUndoEntry
+  | AddColumnsUndoEntry
+  | RemoveColumnsUndoEntry
+  | SetCellContentsUndoEntry
+  | AddSheetUndoEntry
+  | RemoveSheetUndoEntry
+  | ClearSheetUndoEntry
+  | MoveCellsUndoEntry
+  | SetSheetContentUndoEntry
+  | PasteUndoEntry
+  | BatchUndoEntry
 
 export class UndoRedo {
-  private readonly undoStack: UndoStackElement[] = []
-  private redoStack: UndoStackElement[] = []
-  private batchUndoEntry?: BatchUndoData
+  private readonly undoStack: UndoStackEntry[] = []
+  private redoStack: UndoStackEntry[] = []
+  private readonly undoLimit: number
+  private batchUndoEntry?: BatchUndoEntry
 
   constructor(
-    public readonly operations: Operations
+    config: Config,
+    public readonly operations: Operations,
   ) {
+    this.undoLimit = config.undoLimit
   }
 
   public oldData: Map<number, [SimpleCellAddress, string][]> = new Map()
 
-  public saveOperation(operation: UndoStackElement) {
+  public saveOperation(operation: UndoStackEntry) {
     if (this.batchUndoEntry !== undefined) {
       this.batchUndoEntry.add(operation)
     } else {
-      this.undoStack.push(operation)
+      this.addUndoEntry(operation)
     }
   }
 
   public beginBatchMode() {
-    this.batchUndoEntry = new BatchUndoData()
+    this.batchUndoEntry = new BatchUndoEntry()
+  }
+
+  private addUndoEntry(operation: UndoStackEntry) {
+    this.undoStack.push(operation)
+    this.undoStack.splice(0, Math.max(0, this.undoStack.length - this.undoLimit))
   }
   
   public commitBatchMode() {
     if (this.batchUndoEntry === undefined) {
       throw "Batch mode wasn't started"
     }
-    this.undoStack.push(this.batchUndoEntry)
+    this.addUndoEntry(this.batchUndoEntry)
     this.batchUndoEntry = undefined
   }
 
@@ -205,49 +214,49 @@ export class UndoRedo {
     this.redoStack.push(operation)
   }
 
-  private undoEntry(operation: UndoStackElement) {
-    if (operation instanceof RemoveRowsUndoData) {
+  private undoEntry(operation: UndoStackEntry) {
+    if (operation instanceof RemoveRowsUndoEntry) {
       this.undoRemoveRows(operation)
-    } else if (operation instanceof RemoveRowsUndoData) {
+    } else if (operation instanceof RemoveRowsUndoEntry) {
       this.undoRemoveRows(operation)
-    } else if (operation instanceof AddRowsUndoData) {
+    } else if (operation instanceof AddRowsUndoEntry) {
       this.undoAddRows(operation)
-    } else if (operation instanceof SetCellContentsUndoData) {
+    } else if (operation instanceof SetCellContentsUndoEntry) {
       this.undoSetCellContents(operation)
-    } else if (operation instanceof MoveRowsUndoData) {
+    } else if (operation instanceof MoveRowsUndoEntry) {
       this.undoMoveRows(operation)
-    } else if (operation instanceof AddSheetUndoData) {
+    } else if (operation instanceof AddSheetUndoEntry) {
       this.undoAddSheet(operation)
-    } else if (operation instanceof RemoveSheetUndoData) {
+    } else if (operation instanceof RemoveSheetUndoEntry) {
       this.undoRemoveSheet(operation)
-    } else if (operation instanceof ClearSheetUndoData) {
+    } else if (operation instanceof ClearSheetUndoEntry) {
       this.undoClearSheet(operation)
-    } else if (operation instanceof AddColumnsUndoData) {
+    } else if (operation instanceof AddColumnsUndoEntry) {
       this.undoAddColumns(operation)
-    } else if (operation instanceof RemoveColumnsUndoData) {
+    } else if (operation instanceof RemoveColumnsUndoEntry) {
       this.undoRemoveColumns(operation)
-    } else if (operation instanceof MoveColumnsUndoData) {
+    } else if (operation instanceof MoveColumnsUndoEntry) {
       this.undoMoveColumns(operation)
-    } else if (operation instanceof MoveCellsUndoData) {
+    } else if (operation instanceof MoveCellsUndoEntry) {
       this.undoMoveCells(operation)
-    } else if (operation instanceof SetSheetContentUndoData) {
+    } else if (operation instanceof SetSheetContentUndoEntry) {
       this.undoSetSheetContent(operation)
-    } else if (operation instanceof PasteUndoData) {
+    } else if (operation instanceof PasteUndoEntry) {
       this.undoPaste(operation)
-    } else if (operation instanceof BatchUndoData) {
+    } else if (operation instanceof BatchUndoEntry) {
       this.undoBatch(operation)
     } else {
       throw 'Unknown element'
     }
   }
 
-  private undoBatch(batchOperation: BatchUndoData) {
+  private undoBatch(batchOperation: BatchUndoEntry) {
     for (const operation of batchOperation.reversedOperations()) {
       this.undoEntry(operation)
     }
   }
 
-  private undoRemoveRows(operation: RemoveRowsUndoData) {
+  private undoRemoveRows(operation: RemoveRowsUndoEntry) {
     this.operations.forceApplyPostponedTransformations()
 
     const { command: { sheet }, rowsRemovals } = operation
@@ -263,7 +272,7 @@ export class UndoRedo {
     }
   }
 
-  private undoRemoveColumns(operation: RemoveColumnsUndoData) {
+  private undoRemoveColumns(operation: RemoveColumnsUndoEntry) {
     this.operations.forceApplyPostponedTransformations()
 
     const { command: { sheet }, columnsRemovals } = operation
@@ -279,7 +288,7 @@ export class UndoRedo {
     }
   }
 
-  private undoAddRows(operation: AddRowsUndoData) {
+  private undoAddRows(operation: AddRowsUndoEntry) {
     const addedRowsSpans = operation.command.rowsSpans()
     for (let i = addedRowsSpans.length - 1; i >= 0; --i) {
       const addedRows = addedRowsSpans[i]
@@ -287,7 +296,7 @@ export class UndoRedo {
     }
   }
 
-  private undoAddColumns(operation: AddColumnsUndoData) {
+  private undoAddColumns(operation: AddColumnsUndoEntry) {
     const addedColumnsSpans = operation.command.columnsSpans()
     for (let i = addedColumnsSpans.length - 1; i >= 0; --i) {
       const addedColumns = addedColumnsSpans[i]
@@ -295,29 +304,29 @@ export class UndoRedo {
     }
   }
 
-  private undoSetCellContents(operation: SetCellContentsUndoData) {
+  private undoSetCellContents(operation: SetCellContentsUndoEntry) {
     for (const cellContentData of operation.cellContents) {
       this.operations.restoreCell(cellContentData.address, cellContentData.oldContent)
     }
   }
 
-  private undoPaste(operation: PasteUndoData) {
+  private undoPaste(operation: PasteUndoEntry) {
     for (const [address, clipboardCell] of operation.oldContent) {
       this.operations.restoreCell(address, clipboardCell)
     }
   }
 
-  private undoMoveRows(operation: MoveRowsUndoData) {
+  private undoMoveRows(operation: MoveRowsUndoEntry) {
     const { sheet } = operation
     this.operations.moveRows(sheet, operation.targetRow - operation.numberOfRows, operation.numberOfRows, operation.startRow)
   }
 
-  private undoMoveColumns(operation: MoveColumnsUndoData) {
+  private undoMoveColumns(operation: MoveColumnsUndoEntry) {
     const { sheet } = operation
     this.operations.moveColumns(sheet, operation.targetColumn - operation.numberOfColumns, operation.numberOfColumns, operation.startColumn)
   }
 
-  public undoMoveCells(operation: MoveCellsUndoData): void {
+  public undoMoveCells(operation: MoveCellsUndoEntry): void {
     this.operations.forceApplyPostponedTransformations()
     this.operations.moveCells(operation.destinationLeftCorner, operation.width, operation.height, operation.sourceLeftCorner)
 
@@ -328,12 +337,12 @@ export class UndoRedo {
     this.restoreOldDataFromVersion(operation.version - 1)
   }
 
-  private undoAddSheet(operation: AddSheetUndoData) {
+  private undoAddSheet(operation: AddSheetUndoEntry) {
     const { sheetName } = operation
     this.operations.removeSheet(sheetName)
   }
 
-  private undoRemoveSheet(operation: RemoveSheetUndoData) {
+  private undoRemoveSheet(operation: RemoveSheetUndoEntry) {
     this.operations.forceApplyPostponedTransformations()
     const { oldSheetContent, sheetId } = operation
     this.operations.addSheet(operation.sheetName)
@@ -349,7 +358,7 @@ export class UndoRedo {
     this.restoreOldDataFromVersion(operation.version - 1)
   }
 
-  private undoClearSheet(operation: ClearSheetUndoData) {
+  private undoClearSheet(operation: ClearSheetUndoEntry) {
     const { oldSheetContent, sheetId } = operation
     for (let rowIndex = 0; rowIndex < oldSheetContent.length; rowIndex++) {
       const row = oldSheetContent[rowIndex]
@@ -361,7 +370,7 @@ export class UndoRedo {
     }
   }
 
-  private undoSetSheetContent(operation: SetSheetContentUndoData) {
+  private undoSetSheetContent(operation: SetSheetContentUndoEntry) {
     const { oldSheetContent, newSheetContent, sheetId } = operation
     this.operations.clearSheet(sheetId)
     for (let rowIndex = 0; rowIndex < oldSheetContent.length; rowIndex++) {
@@ -386,61 +395,61 @@ export class UndoRedo {
     this.undoStack.push(operation)
   }
 
-  private redoEntry(operation: UndoStackElement) {
-    if (operation instanceof RemoveRowsUndoData) {
+  private redoEntry(operation: UndoStackEntry) {
+    if (operation instanceof RemoveRowsUndoEntry) {
       this.redoRemoveRows(operation)
-    } else if (operation instanceof RemoveRowsUndoData) {
+    } else if (operation instanceof RemoveRowsUndoEntry) {
       this.redoRemoveRows(operation)
-    } else if (operation instanceof AddRowsUndoData) {
+    } else if (operation instanceof AddRowsUndoEntry) {
       this.redoAddRows(operation)
-    } else if (operation instanceof SetCellContentsUndoData) {
+    } else if (operation instanceof SetCellContentsUndoEntry) {
       this.redoSetCellContents(operation)
-    } else if (operation instanceof MoveRowsUndoData) {
+    } else if (operation instanceof MoveRowsUndoEntry) {
       this.redoMoveRows(operation)
-    } else if (operation instanceof AddSheetUndoData) {
+    } else if (operation instanceof AddSheetUndoEntry) {
       this.redoAddSheet(operation)
-    } else if (operation instanceof RemoveSheetUndoData) {
+    } else if (operation instanceof RemoveSheetUndoEntry) {
       this.redoRemoveSheet(operation)
-    } else if (operation instanceof ClearSheetUndoData) {
+    } else if (operation instanceof ClearSheetUndoEntry) {
       this.redoClearSheet(operation)
-    } else if (operation instanceof AddColumnsUndoData) {
+    } else if (operation instanceof AddColumnsUndoEntry) {
       this.redoAddColumns(operation)
-    } else if (operation instanceof RemoveColumnsUndoData) {
+    } else if (operation instanceof RemoveColumnsUndoEntry) {
       this.redoRemoveColumns(operation)
-    } else if (operation instanceof MoveColumnsUndoData) {
+    } else if (operation instanceof MoveColumnsUndoEntry) {
       this.redoMoveColumns(operation)
-    } else if (operation instanceof MoveCellsUndoData) {
+    } else if (operation instanceof MoveCellsUndoEntry) {
       this.redoMoveCells(operation)
-    } else if (operation instanceof SetSheetContentUndoData) {
+    } else if (operation instanceof SetSheetContentUndoEntry) {
       this.redoSetSheetContent(operation)
-    } else if (operation instanceof PasteUndoData) {
+    } else if (operation instanceof PasteUndoEntry) {
       this.redoPaste(operation)
-    } else if (operation instanceof BatchUndoData) {
+    } else if (operation instanceof BatchUndoEntry) {
       this.redoBatch(operation)
     } else {
       throw 'Unknown element'
     }
   }
 
-  private redoBatch(batchOperation: BatchUndoData) {
+  private redoBatch(batchOperation: BatchUndoEntry) {
     for (const operation of batchOperation.operations) {
       this.redoEntry(operation)
     }
   }
 
-  private redoRemoveRows(operation: RemoveRowsUndoData) {
+  private redoRemoveRows(operation: RemoveRowsUndoEntry) {
     this.operations.removeRows(operation.command)
   }
 
-  private redoMoveCells(operation: MoveCellsUndoData) {
+  private redoMoveCells(operation: MoveCellsUndoEntry) {
     this.operations.moveCells(operation.sourceLeftCorner, operation.width, operation.height, operation.destinationLeftCorner)
   }
 
-  private redoRemoveColumns(operation: RemoveColumnsUndoData) {
+  private redoRemoveColumns(operation: RemoveColumnsUndoEntry) {
     this.operations.removeColumns(operation.command)
   }
 
-  private redoPaste(operation: PasteUndoData) {
+  private redoPaste(operation: PasteUndoEntry) {
     const { targetLeftCorner, newContent } = operation
     const height = newContent.length
     const width = newContent[0].length
@@ -452,46 +461,46 @@ export class UndoRedo {
     }
   }
 
-  private redoSetCellContents(operation: SetCellContentsUndoData) {
+  private redoSetCellContents(operation: SetCellContentsUndoEntry) {
     for (const cellContentData of operation.cellContents) {
       this.operations.setCellContent(cellContentData.address, cellContentData.newContent)
     }
   }
 
-  private redoAddRows(operation: AddRowsUndoData) {
+  private redoAddRows(operation: AddRowsUndoEntry) {
     this.operations.addRows(operation.command)
   }
 
-  private redoAddColumns(operation: AddColumnsUndoData) {
+  private redoAddColumns(operation: AddColumnsUndoEntry) {
     this.operations.addColumns(operation.command)
   }
 
-  private redoRemoveSheet(operation: RemoveSheetUndoData) {
+  private redoRemoveSheet(operation: RemoveSheetUndoEntry) {
     const { sheetName } = operation
     this.operations.removeSheet(sheetName)
   }
 
-  private redoAddSheet(operation: AddSheetUndoData) {
+  private redoAddSheet(operation: AddSheetUndoEntry) {
     const { sheetName } = operation
     this.operations.addSheet(sheetName)
   }
 
-  private redoMoveRows(operation: MoveRowsUndoData) {
+  private redoMoveRows(operation: MoveRowsUndoEntry) {
     const { sheet } = operation
     this.operations.moveRows(sheet, operation.startRow, operation.numberOfRows, operation.targetRow)
   }
 
-  private redoMoveColumns(operation: MoveColumnsUndoData) {
+  private redoMoveColumns(operation: MoveColumnsUndoEntry) {
     const { sheet } = operation
     this.operations.moveColumns(sheet, operation.startColumn, operation.numberOfColumns, operation.targetColumn)
   }
 
-  private redoClearSheet(operation: ClearSheetUndoData) {
+  private redoClearSheet(operation: ClearSheetUndoEntry) {
     const { sheetId } = operation
     this.operations.clearSheet(sheetId)
   }
 
-  private redoSetSheetContent(operation: SetSheetContentUndoData) {
+  private redoSetSheetContent(operation: SetSheetContentUndoEntry) {
     const { sheetId, newSheetContent } = operation
     this.operations.clearSheet(sheetId)
     for (let row = 0; row < newSheetContent.length; row++) {
