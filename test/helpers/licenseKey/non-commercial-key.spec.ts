@@ -6,13 +6,13 @@
 import {HyperFormula} from '../../../src'
 
 describe('license key', () => {
-  it('should warn message about invalid key', async () => {
+  it('should warn message about invalid key', () => {
     spyOn(console, 'warn')
 
     HyperFormula.buildEmpty({
       licenseKey: 'non-commercial-and-evaluation',
     })
 
-    expect(console.warn).not.toHaveBeenCalled();
+    expect(console.warn).not.toHaveBeenCalled()
   })
 })

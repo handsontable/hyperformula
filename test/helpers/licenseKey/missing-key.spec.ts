@@ -6,13 +6,13 @@
 import {HyperFormula} from '../../../src'
 
 describe('license key', () => {
-  it('should warn message about missing key', async () => {
+  it('should warn message about missing key', () => {
     spyOn(console, 'warn')
 
     HyperFormula.buildEmpty({
       licenseKey: '',
     })
 
-    expect(console.warn).toHaveBeenCalledWith('The license key for HyperFormula is missing.');
+    expect(console.warn).toHaveBeenCalledWith('The license key for HyperFormula is missing.')
   })
 })
