@@ -3,7 +3,16 @@
  * Copyright (c) 2020 Handsoncode. All rights reserved.
  */
 
-import {EmbeddedActionsParser, ILexingResult, IOrAlt, IToken, Lexer, OrMethodOpts, tokenMatcher} from 'chevrotain'
+import {
+  EmbeddedActionsParser,
+  EMPTY_ALT,
+  ILexingResult,
+  IOrAlt,
+  IToken,
+  Lexer,
+  OrMethodOpts,
+  tokenMatcher
+} from 'chevrotain'
 
 import {CellError, ErrorType, simpleCellAddress, SimpleCellAddress} from '../Cell'
 import {Maybe} from '../Maybe'
@@ -38,7 +47,7 @@ import {
   buildPlusOpAst,
   buildPlusUnaryOpAst,
   buildPowerOpAst,
-  buildProcedureAst, 
+  buildProcedureAst,
   buildRowRangeAst,
   buildStringAst,
   buildTimesOpAst,
@@ -215,6 +224,13 @@ export class FormulaParser extends EmbeddedActionsParser {
     })
 
     return lhs
+  })
+
+  private booleanExpressionOrEmpty: AstRule = this.RULE( 'booleanExpressionOrEmpty', () => {
+    return this.OR([
+      {ALT: () => this.SUBRULE(this.booleanExpression)},
+      {ALT: EMPTY_ALT(undefined)}
+    ])
   })
 
   /**
@@ -405,9 +421,12 @@ export class FormulaParser extends EmbeddedActionsParser {
     this.MANY_SEP({
       SEP: this.lexerConfig.ArgSeparator,
       DEF: () => {
-        args.push(this.SUBRULE(this.booleanExpression))
+        args.push(this.SUBRULE(this.booleanExpressionOrEmpty))
       },
     })
+    if(args.length === 1 && args[0] === undefined) {
+      args.length = 0
+    }
     const rParenToken = this.CONSUME(RParen) as IExtendedToken
     return buildProcedureAst(canonicalProcedureName, args, procedureNameToken.leadingWhitespace, rParenToken.leadingWhitespace)
   })

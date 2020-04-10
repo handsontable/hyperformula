@@ -3,6 +3,7 @@
  * Copyright (c) 2020 Handsoncode. All rights reserved.
  */
 
+import {Maybe} from '../Maybe'
 import {Ast, AstNodeType, RelativeDependency} from './'
 import {RelativeDependencyType} from './RelativeDependency'
 
@@ -69,7 +70,9 @@ const collectDependenciesFn = (ast: Ast, functionsWhichDoesNotNeedArgumentsToBeC
       return
     case AstNodeType.FUNCTION_CALL:
       if (!functionsWhichDoesNotNeedArgumentsToBeComputed.has(ast.procedureName)) {
-        ast.args.forEach((argAst: Ast) => collectDependenciesFn(argAst, functionsWhichDoesNotNeedArgumentsToBeComputed, dependenciesSet))
+        ast.args.forEach((argAst: Maybe<Ast>) =>
+          argAst!==undefined ? collectDependenciesFn(argAst, functionsWhichDoesNotNeedArgumentsToBeComputed, dependenciesSet) : {}
+        )
       }
       return
   }

@@ -169,7 +169,7 @@ export class ParserWithCaching {
         return imageWithWhitespace('"' + ast.value + '"', ast.leadingWhitespace)
       }
       case AstNodeType.FUNCTION_CALL: {
-        const args = ast.args.map((arg) => this.computeHashOfAstNode(arg)).join(this.config.functionArgSeparator)
+        const args = ast.args.map((arg) => arg!==undefined?this.computeHashOfAstNode(arg):'').join(this.config.functionArgSeparator)
         const rightPart = ast.procedureName + '(' + args + imageWithWhitespace(')', ast.internalWhitespace)
         return imageWithWhitespace(rightPart, ast.leadingWhitespace)
       }

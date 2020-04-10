@@ -95,12 +95,18 @@ export class BooleanPlugin extends FunctionPlugin {
     if (ast.args.length > 3 || ast.args.length < 2) {
       return new CellError(ErrorType.NA)
     }
+    if(ast.args[0] === undefined) {
+      return new CellError(ErrorType.NUM)
+    }
     const conditionValue = this.evaluateAst(ast.args[0], formulaAddress)
     if (conditionValue instanceof SimpleRangeValue) {
       return new CellError(ErrorType.VALUE)
     }
     const condition = coerceScalarToBoolean(conditionValue)
     if (condition === true) {
+      if(ast.args[1] === undefined) {
+        return new CellError(ErrorType.NUM)
+      }
       return this.evaluateAst(ast.args[1], formulaAddress)
     } else if (condition === false) {
       if (ast.args[2]) {

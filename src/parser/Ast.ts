@@ -92,7 +92,7 @@ export enum AstNodeType {
 
   ERROR = 'ERROR',
 
-  ERROR_WITH_RAW_INPUT = 'ERROR_WITH_RAW_INPUT'
+  ERROR_WITH_RAW_INPUT = 'ERROR_WITH_RAW_INPUT',
 }
 
 export enum RangeSheetReferenceType {
@@ -369,7 +369,7 @@ export const buildPercentOpAst = (value: Ast, leadingWhitespace?: IToken): Perce
 export interface ProcedureAst extends AstWithInternalWhitespace {
   type: AstNodeType.FUNCTION_CALL,
   procedureName: string,
-  args: Ast[],
+  args: Maybe<Ast>[],
 }
 
 export const buildProcedureAst = (procedureName: string, args: Ast[], leadingWhitespace?: IToken, internalWhitespace?: IToken): ProcedureAst => ({

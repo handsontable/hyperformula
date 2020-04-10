@@ -85,7 +85,9 @@ export const doesContainFunctions = (ast: Ast, interestingFunctions: Set<string>
       if (interestingFunctions.has(ast.procedureName)) {
         return true
       }
-      return ast.args.some((arg) => doesContainFunctions(arg, interestingFunctions))
+      return ast.args.some((arg) =>
+        arg!==undefined ? doesContainFunctions(arg, interestingFunctions) : false
+      )
     }
   }
 }
