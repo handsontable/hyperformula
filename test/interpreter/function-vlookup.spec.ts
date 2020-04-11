@@ -2,7 +2,7 @@ import {HyperFormula} from '../../src'
 import {ErrorType} from '../../src/Cell'
 import {ConfigParams} from '../../src/Config'
 import {Sheet} from '../../src/GraphBuilder'
-import '../testConfig.ts'
+import '../testConfig'
 import {adr, detailedError} from '../testUtils'
 
 const sharedExamples = (builder: (sheet: Sheet, config?: Partial<ConfigParams>) => HyperFormula) => {

@@ -1,7 +1,7 @@
 import {HyperFormula} from '../src'
 import {ErrorType} from '../src'
 import {FunctionPlugin, PluginFunctionType} from '../src/interpreter/plugin/FunctionPlugin'
-import './testConfig.ts'
+import './testConfig'
 import {adr, detailedError} from './testUtils'
 
 class FooPlugin extends FunctionPlugin {

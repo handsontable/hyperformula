@@ -1,6 +1,6 @@
 import {DetailedCellError, HyperFormula} from '../src'
 import {CellType, CellValueType, EmptyValue, ErrorType} from '../src/Cell'
-import './testConfig.ts'
+import './testConfig'
 import {plPL} from '../src/i18n'
 import {adr, detailedError} from './testUtils'
 

@@ -1,7 +1,7 @@
 import {HyperFormula} from '../../src'
 import {ErrorType} from '../../src/Cell'
 import {ColumnBinarySearch} from '../../src/ColumnSearch/ColumnBinarySearch'
-import '../testConfig.ts'
+import '../testConfig'
 import {adr, detailedError} from '../testUtils'
 
 describe('Function MATCH', () => {

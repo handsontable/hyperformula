@@ -4,4 +4,5 @@ coverage
 script
 lib
 *.config.js
+*.conf.ts
 doc
