@@ -6,3 +6,4 @@ lib
 *.config.js
 *.conf.ts
 doc
+test-main.js
