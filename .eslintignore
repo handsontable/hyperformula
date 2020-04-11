@@ -4,6 +4,6 @@ coverage
 script
 lib
 *.config.js
-*.conf.ts
+*.conf.js
 doc
 test-main.js
