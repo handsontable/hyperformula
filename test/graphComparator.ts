@@ -1,4 +1,4 @@
-import {deepStrictEqual} from 'assert'
+import {equal, deepStrictEqual} from 'assert'
 import {HyperFormula} from '../src'
 import {AbsoluteCellRange} from '../src/AbsoluteCellRange'
 import {SimpleCellAddress, simpleCellAddress} from '../src/Cell'
@@ -30,25 +30,22 @@ export class EngineComparator {
     this.actual.dependencyGraph.forceApplyPostponedTransformations()
 
     for (let sheet = 0; sheet < numberOfSheets; ++sheet) {
-      this.compareSheets(sheet)
+      this.compareSheet(sheet)
     }
   }
 
-  private compareSheets(sheet: number = 0) {
+  private compareSheet(sheet: number) {
     const expectedGraph = this.expected.graph
     const actualGraph = this.actual.graph
+
+    const expectedSheetName = this.expected.getSheetName(sheet)
+    const actualSheetName = this.actual.getSheetName(sheet)
+    equal(expectedSheetName, actualSheetName, `Expected sheet name '${expectedSheetName}', actual '${actualSheetName}'`)
 
     const expectedWidth = this.expected.addressMapping.getWidth(sheet)
     const expectedHeight = this.expected.addressMapping.getHeight(sheet)
     const actualWidth = this.actual.addressMapping.getWidth(sheet)
     const actualHeight = this.actual.addressMapping.getHeight(sheet)
-
-    if (expectedHeight !== actualHeight) {
-      console.warn(`Expected sheet of height ${expectedHeight}, actual: ${actualHeight}`)
-    }
-    if (expectedWidth !== actualWidth) {
-      console.warn(`Expected sheet of width ${expectedWidth}, actual: ${actualWidth}`)
-    }
 
     for (let x = 0; x < Math.max(expectedWidth, actualWidth); ++x) {
       for (let y = 0; y < Math.max(expectedHeight, actualHeight); ++y) {
