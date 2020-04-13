@@ -6,15 +6,6 @@ window.expect['arrayContaining'] = jasmine.arrayContaining;
 
 beforeAll(() => {
   jasmine.addMatchers({
-    toStrictEqual: function(util) {
-      return {
-        compare: function(actual, expected) {
-          return {
-            pass: util.equals(actual, expected),
-          };
-        },
-      };
-    },
     toContainEqual: function(util) {
       return {
         compare: function(actual, expected) {
@@ -24,11 +15,26 @@ beforeAll(() => {
         },
       };
     },
-    toMatchObject: function(util) {
+    toMatchObject: function() {
+      return {
+        compare: function(actual, expected) {
+          let result = false;
+
+          Object.keys(expected).forEach((key) => {
+            result = actual[key] === expected[key];
+          });
+
+          return {
+            pass: result,
+          };
+        },
+      };
+    },
+    toStrictEqual: function(util) {
       return {
         compare: function(actual, expected) {
           return {
-            pass: util.contains(actual, expected),
+            pass: util.equals(actual, expected),
           };
         },
       };
