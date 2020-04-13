@@ -84,7 +84,7 @@ describe('Basic Graph manipulation', () => {
 
     expect(() => {
       graph.addEdge(identifiableString(0, 'origin'), node)
-    }).toThrowError('Unknown node')
+    }).toThrowError(/Unknown node/)
   })
 
   it('#addEdge is raising an error when the target node not present', () => {
@@ -94,7 +94,7 @@ describe('Basic Graph manipulation', () => {
 
     expect(() => {
       graph.addEdge(node, identifiableString(1, 'target'))
-    }).toThrowError('Unknown node')
+    }).toThrowError(/Unknown node/)
   })
 
   it('#existsEdge works', () => {
@@ -374,7 +374,7 @@ describe('Graph cruds', () => {
     graph.addNode(node0)
     graph.addNode(node1)
 
-    expect(() => graph.removeEdge(node0, node1)).toThrowError(new Error('Edge does not exist'))
+    expect(() => graph.removeEdge(node0, node1)).toThrowError('Edge does not exist')
   })
 
   it('#removeEdge removes edge from graph', () => {

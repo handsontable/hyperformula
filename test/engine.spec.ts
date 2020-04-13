@@ -261,7 +261,7 @@ describe('Integration', () => {
 
     expect(() => {
       engine.renameSheet(0, 'bar')
-    }).toThrow('Sheet with id 0 doesn\'t exist')
+    }).toThrowError('Sheet with id 0 doesn\'t exist')
   })
 
   it('#renameSheet when new sheet name is already taken', () => {
@@ -271,7 +271,7 @@ describe('Integration', () => {
 
     expect(() => {
       engine.renameSheet(0, 'bar')
-    }).toThrow('Sheet \'bar\' already exists')
+    }).toThrowError('Sheet \'bar\' already exists')
   })
 
   it('#renameSheet for the same name', () => {

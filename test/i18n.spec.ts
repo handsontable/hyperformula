@@ -74,6 +74,6 @@ describe('i18n', () => {
   it('translation package sanitization', () => {
     // eslint-disable-next-line
     // @ts-ignore
-    expect(() => new TranslationPackage({}, {}, {})).toThrow()
+    expect(() => new TranslationPackage({}, {}, {})).toThrowError()
   })
 })

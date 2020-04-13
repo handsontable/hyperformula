@@ -197,10 +197,10 @@ describe('Named expressions', () => {
     expect(engine.getNamedExpressionValue('MYname')).toEqual(42)
     expect(() => {
       engine.changeNamedExpression('MYname', '=43')
-    }).not.toThrow()
+    }).not.toThrowError()
     expect(() => {
       engine.removeNamedExpression('MYname')
-    }).not.toThrow()
+    }).not.toThrowError()
   })
 
   it('allow even 255 character named expressions', () => {
@@ -211,7 +211,7 @@ describe('Named expressions', () => {
     expect(longExpressionName.length).toBe(255)
     expect(() => {
       engine.addNamedExpression(longExpressionName, '=42')
-    }).not.toThrow()
+    }).not.toThrowError()
   })
 
   it('validates characters which are allowed in name', () => {

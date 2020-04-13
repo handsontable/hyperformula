@@ -37,89 +37,89 @@ describe('Config', () => {
   it( 'validation: boolean params', () => {
     // eslint-disable-next-line
     // @ts-ignore
-    expect( () => new Config({ignorePunctuation: 1})).toThrow('Expected value of type: boolean for config parameter: ignorePunctuation')
+    expect( () => new Config({ignorePunctuation: 1})).toThrowError('Expected value of type: boolean for config parameter: ignorePunctuation')
     // eslint-disable-next-line
     // @ts-ignore
-    expect(() => new Config({accentSensitive: 'abcd'})).toThrow('Expected value of type: boolean for config parameter: accentSensitive')
+    expect(() => new Config({accentSensitive: 'abcd'})).toThrowError('Expected value of type: boolean for config parameter: accentSensitive')
     // eslint-disable-next-line
     // @ts-ignore
-    expect(() => new Config({caseSensitive: 'abcd'})).toThrow('Expected value of type: boolean for config parameter: caseSensitive')
+    expect(() => new Config({caseSensitive: 'abcd'})).toThrowError('Expected value of type: boolean for config parameter: caseSensitive')
     // eslint-disable-next-line
     // @ts-ignore
-    expect( () => new Config({smartRounding: []})).toThrow('Expected value of type: boolean for config parameter: smartRounding')
+    expect( () => new Config({smartRounding: []})).toThrowError('Expected value of type: boolean for config parameter: smartRounding')
     // eslint-disable-next-line
     // @ts-ignore
-    expect( () => new Config({matrixDetection: 0})).toThrow('Expected value of type: boolean for config parameter: matrixDetection')
+    expect( () => new Config({matrixDetection: 0})).toThrowError('Expected value of type: boolean for config parameter: matrixDetection')
     // eslint-disable-next-line
     // @ts-ignore
-    expect( () => new Config({useColumnIndex: Symbol()})).toThrow('Expected value of type: boolean for config parameter: useColumnIndex')
+    expect( () => new Config({useColumnIndex: Symbol()})).toThrowError('Expected value of type: boolean for config parameter: useColumnIndex')
     // eslint-disable-next-line
     // @ts-ignore
-    expect( () => new Config({leapYear1900: () => 1})).toThrow('Expected value of type: boolean for config parameter: leapYear1900')
+    expect( () => new Config({leapYear1900: () => 1})).toThrowError('Expected value of type: boolean for config parameter: leapYear1900')
   })
 
   it( 'validation: number params', () => {
     // eslint-disable-next-line
     // @ts-ignore
-    expect(() => new Config({matrixDetectionThreshold: 'abcd'})).toThrow('Expected value of type: number for config parameter: matrixDetectionThreshold')
+    expect(() => new Config({matrixDetectionThreshold: 'abcd'})).toThrowError('Expected value of type: number for config parameter: matrixDetectionThreshold')
     // eslint-disable-next-line
     // @ts-ignore
-    expect(() => new Config({nullYear: true})).toThrow('Expected value of type: number for config parameter: nullYear')
+    expect(() => new Config({nullYear: true})).toThrowError('Expected value of type: number for config parameter: nullYear')
     // eslint-disable-next-line
     // @ts-ignore
-    expect(() => new Config({precisionRounding: /abcd/})).toThrow('Expected value of type: number for config parameter: precisionRounding')
+    expect(() => new Config({precisionRounding: /abcd/})).toThrowError('Expected value of type: number for config parameter: precisionRounding')
     // eslint-disable-next-line
     // @ts-ignore
-    expect(() => new Config({precisionEpsilon: {}})).toThrow('Expected value of type: number for config parameter: precisionEpsilon')
+    expect(() => new Config({precisionEpsilon: {}})).toThrowError('Expected value of type: number for config parameter: precisionEpsilon')
   })
 
   it( 'validation: string params', () => {
     // eslint-disable-next-line
     // @ts-ignore
-    expect(() => new Config({functionArgSeparator: 123})).toThrow('Expected value of type: string for config parameter: functionArgSeparator')
+    expect(() => new Config({functionArgSeparator: 123})).toThrowError('Expected value of type: string for config parameter: functionArgSeparator')
     // eslint-disable-next-line
     // @ts-ignore
-    expect(() => new Config({localeLang: EmptyValue})).toThrow('Expected value of type: string for config parameter: localeLang')
+    expect(() => new Config({localeLang: EmptyValue})).toThrowError('Expected value of type: string for config parameter: localeLang')
   })
 
   it( 'validation: function params', () => {
     // eslint-disable-next-line
     // @ts-ignore
-    expect(() => new Config({parseDateTime: true})).toThrow('Expected value of type: function for config parameter: parseDateTime')
+    expect(() => new Config({parseDateTime: true})).toThrowError('Expected value of type: function for config parameter: parseDateTime')
     // eslint-disable-next-line
     // @ts-ignore
-    expect(() => new Config({stringifyDateTime: 1})).toThrow('Expected value of type: function for config parameter: stringifyDateTime')
+    expect(() => new Config({stringifyDateTime: 1})).toThrowError('Expected value of type: function for config parameter: stringifyDateTime')
   })
 
   it( 'validation: other params', () => {
     // eslint-disable-next-line
     // @ts-ignore
     expect(() => new Config({nullDate: { year: 123, month: 123, day: true }
-    })).toThrow('Expected value of type: IDate for config parameter: nullDate')
+    })).toThrowError('Expected value of type: IDate for config parameter: nullDate')
     // eslint-disable-next-line
     // @ts-ignore
-    expect(() => new Config({dateFormats: {}})).toThrow('Expected value of type: array for config parameter: dateFormats')
+    expect(() => new Config({dateFormats: {}})).toThrowError('Expected value of type: array for config parameter: dateFormats')
     // eslint-disable-next-line
     // @ts-ignore
-    expect(() => new Config({gpuMode: 'abcd'})).toThrow('Expected one of \'gpu\' \'cpu\' \'dev\' for config parameter: gpuMode')
+    expect(() => new Config({gpuMode: 'abcd'})).toThrowError('Expected one of \'gpu\' \'cpu\' \'dev\' for config parameter: gpuMode')
     // eslint-disable-next-line
     // @ts-ignore
-    expect(() => new Config({caseFirst: 'abcd'})).toThrow('Expected one of \'upper\' \'lower\' \'false\' for config parameter: caseFirst')
+    expect(() => new Config({caseFirst: 'abcd'})).toThrowError('Expected one of \'upper\' \'lower\' \'false\' for config parameter: caseFirst')
   })
 
   it('should throw error when there is a conflict between separators', () => {
     expect(() => {
       new Config({ decimalSeparator: ',', functionArgSeparator: ',', thousandSeparator: ' ' })
-    }).toThrow('Config initialization failed. Parameters in conflict: [decimalSeparator,functionArgSeparator]')
+    }).toThrowError('Config initialization failed. Parameters in conflict: [decimalSeparator,functionArgSeparator]')
     expect(() => {
       new Config({ decimalSeparator: ',', functionArgSeparator: ';', thousandSeparator: ',' })
-    }).toThrow('Config initialization failed. Parameters in conflict: [decimalSeparator,thousandSeparator]')
+    }).toThrowError('Config initialization failed. Parameters in conflict: [decimalSeparator,thousandSeparator]')
     expect(() => {
       new Config({ decimalSeparator: '.', functionArgSeparator: ',', thousandSeparator: ',' })
-    }).toThrow('Config initialization failed. Parameters in conflict: [functionArgSeparator,thousandSeparator]')
+    }).toThrowError('Config initialization failed. Parameters in conflict: [functionArgSeparator,thousandSeparator]')
     expect(() => {
       new Config({ decimalSeparator: ',', functionArgSeparator: ',', thousandSeparator: ',' })
-    }).toThrow('Config initialization failed. Parameters in conflict: [decimalSeparator,functionArgSeparator,thousandSeparator]')
+    }).toThrowError('Config initialization failed. Parameters in conflict: [decimalSeparator,functionArgSeparator,thousandSeparator]')
   })
 
 
@@ -128,7 +128,7 @@ describe('Config', () => {
       // eslint-disable-next-line
       // @ts-ignore
       new Config({ decimalSeparator: ';' })
-    }).toThrow('Expected one of \'.\' \',\' for config parameter: decimalSeparator')
+    }).toThrowError('Expected one of \'.\' \',\' for config parameter: decimalSeparator')
   })
 
   it('should throw error when thousand separator is not correct', () => {
@@ -136,6 +136,6 @@ describe('Config', () => {
       // eslint-disable-next-line
       // @ts-ignore
       new Config({ thousandSeparator: ';' })
-    }).toThrow('Expected one of \'\' \',\' \' \' \'.\' for config parameter: thousandSeparator')
+    }).toThrowError('Expected one of \'\' \',\' \' \' \'.\' for config parameter: thousandSeparator')
   })
 })

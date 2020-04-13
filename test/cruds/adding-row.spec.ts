@@ -103,7 +103,7 @@ describe('Adding row - matrix check', () => {
 
     expect(() => {
       engine.addRows(0, [3, 1])
-    }).toThrow(new Error('It is not possible to add row in row with matrix'))
+    }).toThrowError('It is not possible to add row in row with matrix')
   })
 
   it('should be possible to add row right above matrix', () => {

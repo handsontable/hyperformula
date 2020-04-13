@@ -75,7 +75,7 @@ describe('add sheet to engine', () => {
 
     expect(() => {
       engine.addSheet('FOO')
-    }).toThrow(/already exists/)
+    }).toThrowError(/already exists/)
     expect(engine.sheetMapping.numberOfSheets()).toEqual(1)
     expect(Array.from(engine.sheetMapping.displayNames())).toEqual(['foo'])
   })

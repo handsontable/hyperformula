@@ -406,7 +406,7 @@ describe('moving ranges', () => {
 
     expect(() => {
       engine.moveCells(adr('A2'), 2, 2, adr('C1'))
-    }).toThrow('It is not possible to move matrix')
+    }).toThrowError('It is not possible to move matrix')
   })
 
   it('should not be possible to move cells to area with matrix', () => {
@@ -417,7 +417,7 @@ describe('moving ranges', () => {
 
     expect(() => {
       engine.moveCells(adr('A1'), 2, 1, adr('A2'))
-    }).toThrow('It is not possible to replace cells with matrix')
+    }).toThrowError('It is not possible to replace cells with matrix')
   })
 
   it('should adjust edges when moving part of range', () => {

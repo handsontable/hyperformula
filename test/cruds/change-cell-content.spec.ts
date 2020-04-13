@@ -406,7 +406,7 @@ describe('changing cell content', () => {
 
     expect(() => {
       engine.setCellContents(adr('A2'), '{=TRANSPOSE(C1:C2)}')
-    }).toThrow('You cannot modify only part of an array')
+    }).toThrowError('You cannot modify only part of an array')
   })
 
   it('is not possible to set cell content in sheet which does not exist', () => {
@@ -618,7 +618,7 @@ describe('change multiple cells contents', () => {
 
     expect(() => {
       engine.setCellContents(adr('A1'), [['42', '{=MMULT(A1:B2,A1:B2)}']])
-    }).toThrow('Cant change matrices in batch operation')
+    }).toThrowError('Cant change matrices in batch operation')
     expect(engine.getCellValue(adr('A1'))).toBe(1)
   })
 

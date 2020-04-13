@@ -150,7 +150,7 @@ describe('UndoRedo', () => {
 
     expect(() => {
       engine.undo()
-    }).toThrowError(new NoOperationToUndo())
+    }).toThrow(new NoOperationToUndo())
   })
 })
 

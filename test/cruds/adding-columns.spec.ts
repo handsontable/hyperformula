@@ -100,7 +100,7 @@ describe('Adding column - matrix check', () => {
 
     expect(() => {
       engine.addColumns(0, [1, 1])
-    }).toThrow(new Error('It is not possible to add column in column with matrix'))
+    }).toThrowError('It is not possible to add column in column with matrix')
   })
 
   it('should be possible to add row right before matrix', () => {

@@ -27,7 +27,7 @@ module.exports = function(config) {
     // preprocess matching files before serving them to the browser
     // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
     preprocessors: {
-      'test-main.js': ['webpack'],
+      'test-main.js': ['webpack', 'sourcemap'],
     },
 
 
@@ -56,7 +56,8 @@ module.exports = function(config) {
 
     // start these browsers
     // available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
-    browsers: ['Chrome', 'Firefox'],
+    // browsers: ['Chrome', 'Firefox'],
+    browsers: ['Chrome'],
 
 
     // Continuous Integration mode
@@ -67,7 +68,8 @@ module.exports = function(config) {
     // how many browser should be started simultaneous
     concurrency: Infinity,
     webpack: {
-      
+      mode: 'development',
+      devtool: 'inline-source-map',
     }
   })
 }
