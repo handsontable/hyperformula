@@ -82,7 +82,7 @@ import {
   PlusOp,
   PowerOp,
   ProcedureName,
-  RangeSeparator, 
+  RangeSeparator,
   RowRange,
   RParen,
   StringLiteral,
@@ -227,7 +227,7 @@ export class FormulaParser extends EmbeddedActionsParser {
     return lhs
   })
 
-  private booleanExpressionOrEmpty: AstRule = this.RULE( 'booleanExpressionOrEmpty', () => {
+  private booleanExpressionOrEmpty: AstRule = this.RULE('booleanExpressionOrEmpty', () => {
     return this.OR([
       {ALT: () => this.SUBRULE(this.booleanExpression)},
       {ALT: EMPTY_ALT(buildEmptyArgAst())}
@@ -425,7 +425,7 @@ export class FormulaParser extends EmbeddedActionsParser {
         args.push(this.SUBRULE(this.booleanExpressionOrEmpty))
       },
     })
-    if(args.length === 1 && args[0].type === AstNodeType.EMPTY) {
+    if (args.length === 1 && args[0].type === AstNodeType.EMPTY) {
       args.length = 0
     }
     const rParenToken = this.CONSUME(RParen) as IExtendedToken
@@ -483,7 +483,7 @@ export class FormulaParser extends EmbeddedActionsParser {
   private cellRangeExpression: AstRule = this.RULE('cellRangeExpression', () => {
     const start = this.CONSUME(CellReference)
     this.CONSUME2(RangeSeparator)
-    return this.SUBRULE(this.endOfRangeExpression, { ARGS: [start]})
+    return this.SUBRULE(this.endOfRangeExpression, {ARGS: [start]})
   })
 
   /*
@@ -833,50 +833,56 @@ export class FormulaLexer {
    * @param text - string representation of a formula
    */
   public tokenizeFormula(text: string): ILexingResult {
-    const tokens = this.lexer.tokenize(text)
-    this.skipWhitespacesInsideRanges(tokens)
-    this.skipWhitespacesBeforeArgSeparators(tokens)
-    this.trimTrailingWhitespaces(tokens)
-    return tokens
+    const lexingResult = this.lexer.tokenize(text)
+    let tokens = lexingResult.tokens
+    tokens = this.trimTrailingWhitespaces(tokens)
+    tokens = this.skipWhitespacesInsideRanges(tokens)
+    tokens = this.skipWhitespacesBeforeArgSeparators(tokens)
+    lexingResult.tokens = tokens
+
+    return lexingResult
   }
 
-  private skipWhitespacesInsideRanges(lexingResult: ILexingResult): void {
-    const tokens = lexingResult.tokens
+  private skipWhitespacesInsideRanges(tokens: IToken[]): IToken[] {
+    return this.filterTokensByNeighbors(tokens, (previous: IToken, current: IToken, next: IToken) => {
+      return (tokenMatcher(previous, CellReference) || tokenMatcher(previous, RangeSeparator))
+        && tokenMatcher(current, WhiteSpace)
+        && (tokenMatcher(next, CellReference) || tokenMatcher(next, RangeSeparator))
+    })
+  }
+
+  private skipWhitespacesBeforeArgSeparators(tokens: IToken[]): IToken[] {
+    return this.filterTokensByNeighbors(tokens, (previous: IToken, current: IToken, next: IToken) => {
+      return !tokenMatcher(previous, this.lexerConfig.ArgSeparator)
+        && tokenMatcher(current, WhiteSpace)
+        && tokenMatcher(next, this.lexerConfig.ArgSeparator)
+    })
+  }
+
+  private filterTokensByNeighbors(tokens: IToken[], shouldBeSkipped: (previous: IToken, current: IToken, next: IToken) => boolean): IToken[] {
     if (tokens.length < 3) {
-      return
+      return tokens
     }
 
     let i = 0
-    while (i < tokens.length - 2) {
-      if ((tokenMatcher(tokens[i], CellReference) || tokenMatcher(tokens[i], RangeSeparator))
-        && tokenMatcher(tokens[i + 1], WhiteSpace)
-        && (tokenMatcher(tokens[i + 2], CellReference) || tokenMatcher(tokens[i + 2], RangeSeparator))) {
-        tokens.splice(i + 1, 1)
+    const filteredTokens: IToken[] = [tokens[i++]]
+
+    while (i < tokens.length - 1) {
+      if (!shouldBeSkipped(tokens[i - 1], tokens[i], tokens[i + 1])) {
+        filteredTokens.push(tokens[i])
       }
       ++i
     }
+
+    filteredTokens.push(tokens[i])
+
+    return filteredTokens
   }
 
-  private skipWhitespacesBeforeArgSeparators(lexingResult: ILexingResult): void {
-    const tokens = lexingResult.tokens
-    if (tokens.length < 2) {
-      return
-    }
-
-    let i = 0
-    while (i < tokens.length - 2) {
-      if (tokenMatcher(tokens[i], WhiteSpace) && tokenMatcher(tokens[i + 1], this.lexerConfig.ArgSeparator)) {
-        tokens.splice(i, 1)
-      } else {
-        ++i
-      }
-    }
-  }
-
-  private trimTrailingWhitespaces(lexingResult: ILexingResult): void {
-    const tokens = lexingResult.tokens
+  private trimTrailingWhitespaces(tokens: IToken[]): IToken[] {
     if (tokens.length > 0 && tokenMatcher(tokens[tokens.length - 1], WhiteSpace)) {
       tokens.pop()
     }
+    return tokens
   }
 }
