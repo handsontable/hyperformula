@@ -308,6 +308,10 @@ export interface ConfigParams {
    * @category UndoRedo
    */
   undoLimit: number,
+
+  regexpType: 'none' | 'wildcards' | 'full',
+
+  matchWholeCell: boolean,
 }
 
 type ConfigParamsList = keyof ConfigParams
@@ -343,6 +347,8 @@ export class Config implements ConfigParams, ParserConfig {
     vlookupThreshold: 20,
     nullDate: {year: 1899, month: 12, day: 30},
     undoLimit: 20,
+    regexpType: 'wildcards',
+    matchWholeCell: true,
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -450,6 +456,8 @@ export class Config implements ConfigParams, ParserConfig {
    * @internal
    */
   public readonly translationPackage: TranslationPackage
+  public readonly regexpType: 'none' | 'wildcards' | 'full'
+  public readonly matchWholeCell: boolean
 
   constructor(
     {
@@ -481,6 +489,8 @@ export class Config implements ConfigParams, ParserConfig {
       nullDate,
       useStats,
       undoLimit,
+      regexpType,
+      matchWholeCell,
     }: Partial<ConfigParams> = {},
   ) {
     this.accentSensitive = this.valueFromParam(accentSensitive, 'boolean', 'accentSensitive')
@@ -513,6 +523,8 @@ export class Config implements ConfigParams, ParserConfig {
     this.nullDate = this.valueFromParamCheck(nullDate, instanceOfSimpleDate, 'IDate', 'nullDate')
     this.leapYear1900 = this.valueFromParam(leapYear1900, 'boolean', 'leapYear1900')
     this.undoLimit = this.valueFromParam(undoLimit, 'number', 'undoLimit')
+    this.regexpType = this.valueFromParam(regexpType, ['none', 'wildcards', 'full'], 'regexpType')
+    this.matchWholeCell = this.valueFromParam(matchWholeCell, 'boolean', 'matchWholeCell')
 
     this.checkIfParametersNotInConflict(
       {value: this.decimalSeparator, name: 'decimalSeparator'},

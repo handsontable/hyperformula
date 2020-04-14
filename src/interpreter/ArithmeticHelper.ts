@@ -32,6 +32,32 @@ export class ArithmeticHelper {
     this.actualEps = config.smartRounding ? config.precisionEpsilon : 0
   }
 
+  public buildRegex(pattern: string): Maybe<RegExp> {
+    let regexpStr
+    switch(this.config.regexpType) {
+      case 'full': {
+        regexpStr = escapeAllCharacters(pattern)
+        break
+      }
+      case 'none': {
+        regexpStr = pattern
+        break
+      }
+      case 'wildcards': {
+        regexpStr = escapeNonWildcards(pattern)
+        if(regexpStr === undefined) {
+          return undefined
+        }
+        break
+      }
+    }
+    if(this.config.matchWholeCell) {
+      return RegExp(regexpStr)
+    } else {
+      return RegExp('.*' + regexpStr + '.*')
+    }
+  }
+
   public compare(left: NoErrorCellValue, right: NoErrorCellValue): number {
     if (typeof left === 'string' || typeof right === 'string') {
       const leftTmp = typeof left === 'string' ? this.dateTimeHelper.dateStringToDateNumber(left) : left
@@ -442,57 +468,87 @@ export function fixNegativeZero(arg: number): number {
   }
 }
 
-export function buildRegex(pattern: string): Maybe<RegExp> {
-  let regexpStr = ''
-  for(let i=0;i<pattern.length;i++) {
-    let c = pattern.charAt(i)
-    switch (c) {
-      case '~': {
-        if(i==pattern.length-1) {
-          return undefined
-        }
-        let d = pattern.charAt(i+1)
-        if(d==='*' || d==='?') {
-          regexpStr += '\\' + d
-          i++
-          continue
-        }
-        if(d==='~') {
-          regexpStr += '~'
-          i++
-          continue
-        }
-        return undefined
-      }
-      case '*':
-      case '?': {
-        regexpStr += '.'+c
-        continue
-      }
-      case '{':
-      case '}':
-      case '[':
-      case ']':
-      case '(':
-      case ')':
-      case '<':
-      case '>':
-      case '=':
-      case '.':
-      case '+':
-      case '-':
-      case ',':
-      case '\\':
-      case '$':
-      case '^':
-      case '!': {
-        regexpStr += '\\' + c
-        continue
-      }
-      default: {
-        regexpStr += '\\' + c
-      }
+function isWildcard(c: string): boolean {
+  switch(c) {
+    case '*':
+    case '?': {
+      return true
+    }
+    default: {
+      return false
     }
   }
-  return RegExp(regexpStr)
+}
+
+function needsEscape(c: string): boolean {
+  switch(c) {
+    case '{':
+    case '}':
+    case '[':
+    case ']':
+    case '(':
+    case ')':
+    case '<':
+    case '>':
+    case '=':
+    case '.':
+    case '+':
+    case '-':
+    case ',':
+    case '\\':
+    case '$':
+    case '^':
+    case '!': {
+      return true
+    }
+    default: {
+      return false
+    }
+  }
+}
+
+function escapeNonWildcards(pattern: string): Maybe<string> {
+  let str = ''
+  for (let i = 0; i < pattern.length; i++) {
+    let c = pattern.charAt(i)
+    if (c === '~') {
+      if (i == pattern.length - 1) {
+        return undefined
+      }
+      let d = pattern.charAt(i + 1)
+      if (d === '*' || d === '?') {
+        str += '\\' + d
+        i++
+        continue
+      }
+      if (d === '~') {
+        str += '~'
+        i++
+        continue
+      }
+      return undefined
+    } else if (isWildcard(c)) {
+      str += '.' + c
+      continue
+    } else if (needsEscape(c)) {
+      str += '\\' + c
+      continue
+    } else {
+      str += c
+    }
+  }
+  return str
+}
+
+function escapeAllCharacters(pattern: string): string {
+  let str = ''
+  for (let i = 0; i < pattern.length; i++) {
+    let c = pattern.charAt(i)
+    if(isWildcard(c) || needsEscape(c)) {
+      str += '\\' + c
+    } else {
+      str += c
+    }
+  }
+  return str
 }
