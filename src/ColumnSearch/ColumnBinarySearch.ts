@@ -4,7 +4,7 @@
  */
 
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
-import {InternalCellValue, SimpleCellAddress} from '../Cell'
+import {InternalCellValue, NoErrorCellValue, SimpleCellAddress} from '../Cell'
 import {ColumnsSpan} from '../ColumnsSpan'
 import {Config} from '../Config'
 import {DependencyGraph} from '../DependencyGraph'
@@ -36,7 +36,7 @@ export class ColumnBinarySearch implements ColumnSearchStrategy {
 
   public destroy(): void {}
 
-  public find(key: InternalCellValue, range: AbsoluteCellRange, sorted: boolean): number {
+  public find(key: NoErrorCellValue, range: AbsoluteCellRange, sorted: boolean): number {
     if (range.height() < this.config.vlookupThreshold || !sorted) {
       const values = this.computeListOfValuesInRange(range)
       const index =  values.indexOf(key)

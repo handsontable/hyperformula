@@ -441,3 +441,58 @@ export function fixNegativeZero(arg: number): number {
     return arg
   }
 }
+
+export function buildRegex(pattern: string): Maybe<RegExp> {
+  let regexpStr = ''
+  for(let i=0;i<pattern.length;i++) {
+    let c = pattern.charAt(i)
+    switch (c) {
+      case '~': {
+        if(i==pattern.length-1) {
+          return undefined
+        }
+        let d = pattern.charAt(i+1)
+        if(d==='*' || d==='?') {
+          regexpStr += '\\' + d
+          i++
+          continue
+        }
+        if(d==='~') {
+          regexpStr += '~'
+          i++
+          continue
+        }
+        return undefined
+      }
+      case '*':
+      case '?': {
+        regexpStr += '.'+c
+        continue
+      }
+      case '{':
+      case '}':
+      case '[':
+      case ']':
+      case '(':
+      case ')':
+      case '<':
+      case '>':
+      case '=':
+      case '.':
+      case '+':
+      case '-':
+      case ',':
+      case '\\':
+      case '$':
+      case '^':
+      case '!': {
+        regexpStr += '\\' + c
+        continue
+      }
+      default: {
+        regexpStr += '\\' + c
+      }
+    }
+  }
+  return RegExp(regexpStr)
+}

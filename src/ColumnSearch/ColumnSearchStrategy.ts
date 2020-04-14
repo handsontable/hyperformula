@@ -4,7 +4,7 @@
  */
 
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
-import {InternalCellValue, SimpleCellAddress} from '../Cell'
+import {InternalCellValue, NoErrorCellValue, SimpleCellAddress} from '../Cell'
 import {ColumnsSpan} from '../ColumnsSpan'
 import {Config} from '../Config'
 import {DependencyGraph} from '../DependencyGraph'
@@ -30,7 +30,7 @@ export interface ColumnSearchStrategy {
 
   removeValues(range: IterableIterator<[InternalCellValue, SimpleCellAddress]>): void,
 
-  find(key: InternalCellValue, range: AbsoluteCellRange, sorted: boolean): number,
+  find(key: NoErrorCellValue, range: AbsoluteCellRange, sorted: boolean): number,
 
   destroy(): void,
 }

@@ -4,7 +4,7 @@
  */
 
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
-import {CellError, InternalCellValue, movedSimpleCellAddress, SimpleCellAddress} from '../Cell'
+import {CellError, InternalCellValue, movedSimpleCellAddress, NoErrorCellValue, SimpleCellAddress} from '../Cell'
 import {ColumnsSpan} from '../ColumnsSpan'
 import {Config} from '../Config'
 import {DependencyGraph} from '../DependencyGraph'
@@ -92,7 +92,7 @@ export class ColumnIndex implements ColumnSearchStrategy {
     }
   }
 
-  public find(key: InternalCellValue, range: AbsoluteCellRange, sorted: boolean): number {
+  public find(key: NoErrorCellValue, range: AbsoluteCellRange, sorted: boolean): number {
     this.ensureRecentData(range.sheet, range.start.col, key)
 
     const columnMap = this.getColumnMap(range.sheet, range.start.col)
