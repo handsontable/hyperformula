@@ -78,42 +78,42 @@ export const parseCriterion = (criterion: InternalCellValue): Maybe<Criterion> =
   return undefined
 }
 
-export type CriterionLambda = (cellValue: InternalCellValue) => Maybe<boolean>
+export type CriterionLambda = (cellValue: InternalCellValue) => boolean
 export const buildCriterionLambda = (criterion: Criterion, arithmeticHelper: ArithmeticHelper): CriterionLambda => {
   switch (criterion.operator) {
     case CriterionType.GREATER_THAN: {
       return (cellValue) => {
-        if (typeof cellValue === 'number') {
-          return arithmeticHelper.floatCmp(cellValue, criterion.value as number) > 0
+        if (typeof cellValue === 'number' && typeof criterion.value === 'number') {
+          return arithmeticHelper.floatCmp(cellValue, criterion.value) > 0
         } else {
-          return undefined
+          return false
         }
       }
     }
     case CriterionType.GREATER_THAN_OR_EQUAL: {
       return (cellValue) => {
-        if (typeof cellValue === 'number') {
-          return arithmeticHelper.floatCmp(cellValue, criterion.value as number) >= 0
+        if (typeof cellValue === 'number' && typeof criterion.value === 'number') {
+          return arithmeticHelper.floatCmp(cellValue, criterion.value) >= 0
         } else {
-          return undefined
+          return false
         }
       }
     }
     case CriterionType.LESS_THAN: {
       return (cellValue) => {
-        if (typeof cellValue === 'number') {
-          return arithmeticHelper.floatCmp(cellValue, criterion.value as number) < 0
+        if (typeof cellValue === 'number' && typeof criterion.value === 'number') {
+          return arithmeticHelper.floatCmp(cellValue, criterion.value) < 0
         } else {
-          return undefined
+          return false
         }
       }
     }
     case CriterionType.LESS_THAN_OR_EQUAL: {
       return (cellValue) => {
-        if (typeof cellValue === 'number') {
-          return arithmeticHelper.floatCmp(cellValue, criterion.value as number) <= 0
+        if (typeof cellValue === 'number' && typeof criterion.value === 'number') {
+          return arithmeticHelper.floatCmp(cellValue, criterion.value) <= 0
         } else {
-          return undefined
+          return false
         }
       }
     }
@@ -124,7 +124,7 @@ export const buildCriterionLambda = (criterion: Criterion, arithmeticHelper: Ari
         } else if(typeof cellValue === 'string' && typeof criterion.value === 'string') {
           return arithmeticHelper.stringCmp(cellValue, criterion.value) === 0
         } else {
-          return undefined
+          return false
         }
       }
     }
@@ -135,7 +135,7 @@ export const buildCriterionLambda = (criterion: Criterion, arithmeticHelper: Ari
         } else if(typeof cellValue === 'string' && typeof criterion.value === 'string') {
           return arithmeticHelper.stringCmp(cellValue, criterion.value) !== 0
         } else {
-          return undefined
+          return true
         }
       }
     }
