@@ -27,10 +27,10 @@ coverage: ## Run tests and show coverage
 	@npm run coverage
 
 doc: ## Generate documentation
-	@npm run docs:build
+	@npm run typedoc:build
 
 servedoc: ## Run server with documentation
-	@npm run docs:serve
+	@npm run typedoc:serve
 
 clean: ## Clean compiled files
 	@npm run clean

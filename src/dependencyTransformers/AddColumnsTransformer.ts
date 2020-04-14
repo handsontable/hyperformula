@@ -23,6 +23,10 @@ export class AddColumnsTransformer extends Transformer {
     return this.columnsSpan.sheet
   }
 
+  public isIrreversible() {
+    return false
+  }
+
   protected transformRowRangeAst(ast: RowRangeAst, _formulaAddress: SimpleCellAddress): Ast {
     return ast
   }

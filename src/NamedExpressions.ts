@@ -174,9 +174,9 @@ export class NamedExpressions {
       const {ast, hasVolatileFunction, hasStructuralChangeFunction, dependencies} = this.parser.parse(parsedCellContent.formula, address)
       this.dependencyGraph.setFormulaToCell(address, ast, absolutizeDependencies(dependencies, address), hasVolatileFunction, hasStructuralChangeFunction)
     } else if (parsedCellContent instanceof CellContent.Empty) {
-      this.crudOperations.setCellEmpty(address)
+      this.crudOperations.operations.setCellEmpty(address)
     } else {
-      this.crudOperations.setValueToCell(parsedCellContent.value, address)
+      this.crudOperations.operations.setValueToCell(parsedCellContent.value, address)
     }
   }
 }

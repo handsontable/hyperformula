@@ -56,6 +56,18 @@ describe('Copy - paste integration', () => {
     expect(engine.getCellValue(adr('B1'))).toEqual(1)
   })
 
+  it('should work for parsing error', () => {
+    const sheet = [
+      ['=SUM('],
+    ]
+    const engine = HyperFormula.buildFromArray(sheet)
+
+    engine.copy(adr('A1'), 1, 1)
+    engine.paste(adr('B1'))
+
+    expect(engine.getCellFormula(adr('B1'))).toEqual('=SUM(')
+  })
+
   it('should work for area', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '2'],
@@ -365,5 +377,53 @@ describe('Copy - paste integration', () => {
 
     expect(engine.getCellValue(adr('A2'))).toEqual(EmptyValue)
     expect(engine.getCellValue(adr('B2'))).toEqual(EmptyValue)
+  })
+})
+
+describe('isClipboardEmpty', () => {
+  it('when just engine initialized', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1'],
+    ])
+
+    expect(engine.isClipboardEmpty()).toBe(true)
+  })
+
+  it('after copy', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1'],
+    ])
+    engine.copy(adr('A1'), 1, 1)
+
+    expect(engine.isClipboardEmpty()).toBe(false)
+  })
+
+  it('after copy-paste', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1'],
+    ])
+    engine.copy(adr('A1'), 1, 1)
+    engine.paste(adr('A2'))
+
+    expect(engine.isClipboardEmpty()).toBe(false)
+  })
+
+  it('after cut', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1'],
+    ])
+    engine.cut(adr('A1'), 1, 1)
+
+    expect(engine.isClipboardEmpty()).toBe(false)
+  })
+
+  it('after cut-paste', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1'],
+    ])
+    engine.cut(adr('A1'), 1, 1)
+    engine.paste(adr('A2'))
+
+    expect(engine.isClipboardEmpty()).toBe(true)
   })
 })

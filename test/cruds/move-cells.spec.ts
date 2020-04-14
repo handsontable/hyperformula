@@ -787,6 +787,20 @@ describe('overlapping areas', () => {
 
     expect(extractMatrixRange(engine, adr('A1', 1))).toEqual(new AbsoluteCellRange(adr('C1'), adr('D2')))
   })
+
+  it('overlapped formulas', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=A2'],
+      ['42']
+    ])
+
+    engine.moveCells(adr('A1'), 1, 1, adr('A2'))
+
+    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
+      [null],
+      ['=#REF!']
+    ]))
+  })
 })
 
 describe('column index', () => {
