@@ -6,7 +6,7 @@
 import {HyperFormula} from '../../../src'
 
 describe('license key', () => {
-  it('should warn message about invalid key', () => {
+  it('should warn a message about invalid key when wrong "agpl" license version is used', () => {
     spyOn(console, 'warn')
 
     HyperFormula.buildEmpty({

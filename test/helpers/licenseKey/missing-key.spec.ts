@@ -6,7 +6,7 @@
 import {HyperFormula} from '../../../src'
 
 describe('license key', () => {
-  it('should warn message about missing key', () => {
+  it('should warn a message about missing key', () => {
     spyOn(console, 'warn')
 
     HyperFormula.buildEmpty({
