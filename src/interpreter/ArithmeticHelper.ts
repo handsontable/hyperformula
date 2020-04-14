@@ -510,12 +510,12 @@ function needsEscape(c: string): boolean {
 function escapeNonWildcards(pattern: string): Maybe<string> {
   let str = ''
   for (let i = 0; i < pattern.length; i++) {
-    let c = pattern.charAt(i)
+    const c = pattern.charAt(i)
     if (c === '~') {
       if (i == pattern.length - 1) {
         return undefined
       }
-      let d = pattern.charAt(i + 1)
+      const d = pattern.charAt(i + 1)
       if (d === '*' || d === '?') {
         str += '\\' + d
         i++
@@ -543,7 +543,7 @@ function escapeNonWildcards(pattern: string): Maybe<string> {
 function escapeAllCharacters(pattern: string): string {
   let str = ''
   for (let i = 0; i < pattern.length; i++) {
-    let c = pattern.charAt(i)
+    const c = pattern.charAt(i)
     if(isWildcard(c) || needsEscape(c)) {
       str += '\\' + c
     } else {
