@@ -32,7 +32,7 @@ export class ArithmeticHelper {
     this.actualEps = config.smartRounding ? config.precisionEpsilon : 0
   }
 
-  public buildRegex(pattern: string): Maybe<RegExp> {
+  public buildRegex(pattern: string): RegExp {
     let regexpStr
     switch(this.config.regexpType) {
       case 'full': {
@@ -45,16 +45,13 @@ export class ArithmeticHelper {
       }
       case 'wildcards': {
         regexpStr = escapeNonWildcards(pattern)
-        if(regexpStr === undefined) {
-          return undefined
-        }
         break
       }
     }
     if(this.config.matchWholeCell) {
-      return RegExp(regexpStr)
+      return RegExp(regexpStr, 'g')
     } else {
-      return RegExp('.*' + regexpStr + '.*')
+      return RegExp(regexpStr)
     }
   }
 
@@ -507,32 +504,27 @@ function needsEscape(c: string): boolean {
   }
 }
 
-function escapeNonWildcards(pattern: string): Maybe<string> {
+function escapeNonWildcards(pattern: string): string {
   let str = ''
   for (let i = 0; i < pattern.length; i++) {
     const c = pattern.charAt(i)
     if (c === '~') {
       if (i == pattern.length - 1) {
-        return undefined
+        str += '~'
+        continue
       }
       const d = pattern.charAt(i + 1)
-      if (d === '*' || d === '?') {
+      if (isWildcard(d) || needsEscape(d)) {
         str += '\\' + d
         i++
-        continue
-      }
-      if (d === '~') {
-        str += '~'
+      } else {
+        str += d
         i++
-        continue
       }
-      return undefined
     } else if (isWildcard(c)) {
       str += '.' + c
-      continue
     } else if (needsEscape(c)) {
       str += '\\' + c
-      continue
     } else {
       str += c
     }

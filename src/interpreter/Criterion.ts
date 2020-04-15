@@ -113,14 +113,16 @@ export const buildCriterionLambda = (criterion: Criterion, arithmeticHelper: Ari
       if(typeof criterion.value === 'number') {
         return (cellValue) => (typeof cellValue === 'number' && arithmeticHelper.floatCmp(cellValue, criterion.value as number) === 0)
       } else {
-        return (cellValue) => (typeof cellValue === 'string' && arithmeticHelper.stringCmp(cellValue, criterion.value as string) === 0)
+        const regexp = arithmeticHelper.buildRegex(criterion.value)
+        return (cellValue) => (typeof cellValue === 'string' && regexp.test(cellValue))
       }
     }
     case CriterionType.NOT_EQUAL: {
       if (typeof criterion.value === 'number') {
         return (cellValue) => (typeof cellValue !== 'number' || arithmeticHelper.floatCmp(cellValue, criterion.value as number) !== 0)
       } else {
-        return (cellValue) => (typeof cellValue !== 'string' || arithmeticHelper.stringCmp(cellValue, criterion.value as string) !== 0)
+        const regexp = arithmeticHelper.buildRegex(criterion.value)
+        return (cellValue) => (typeof cellValue !== 'string' || !regexp.test(cellValue))
       }
     }
   }
