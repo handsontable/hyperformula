@@ -46,7 +46,7 @@ import {TrigonometryPlugin} from './interpreter/plugin/TrigonometryPlugin'
 import {VlookupPlugin} from './interpreter/plugin/VlookupPlugin'
 import {Maybe} from './Maybe'
 import {ParserConfig} from './parser/ParserConfig'
-import {LicenseKeyValidityState, checkLicenseKeyValidity} from './helpers/licenseKey'
+import {LicenseKeyValidityState, checkLicenseKeyValidity} from './helpers/licenseKeyValidator'
 
 type GPUMode = 'gpu' | 'cpu' | 'dev'
 
