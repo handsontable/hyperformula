@@ -473,7 +473,7 @@ export class Config implements ConfigParams, ParserConfig {
    * @internal
    */
   public get licenseKeyValidityState() {
-    return this.#licenseKeyValidityState;
+    return this.#licenseKeyValidityState
   }
 
   constructor(
@@ -520,7 +520,7 @@ export class Config implements ConfigParams, ParserConfig {
     this.decimalSeparator = this.valueFromParam(decimalSeparator, ['.', ','], 'decimalSeparator')
     this.language = this.valueFromParam(language, 'string', 'language')
     this.licenseKey = this.valueFromParam(licenseKey, 'string', 'licenseKey')
-    this.#licenseKeyValidityState = checkLicenseKeyValidity(this.licenseKey);
+    this.#licenseKeyValidityState = checkLicenseKeyValidity(this.licenseKey)
     this.thousandSeparator = this.valueFromParam(thousandSeparator, ['', ',', ' ', '.'], 'thousandSeparator')
     this.localeLang = this.valueFromParam(localeLang, 'string', 'localeLang')
     this.functionPlugins = functionPlugins ?? Config.defaultConfig.functionPlugins
