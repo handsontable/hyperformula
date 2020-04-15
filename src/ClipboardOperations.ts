@@ -6,7 +6,7 @@
 import {AbsoluteCellRange} from './AbsoluteCellRange'
 import {invalidSimpleCellAddress, simpleCellAddress, SimpleCellAddress} from './Cell'
 import {Operations} from './Operations'
-import {DependencyGraph, ParsingErrorVertex, EmptyCellVertex, FormulaCellVertex, MatrixVertex, ValueCellVertex} from './DependencyGraph'
+import {DependencyGraph} from './DependencyGraph'
 import {ValueCellVertexValue} from './DependencyGraph/ValueCellVertex'
 import {InvalidArgumentsError} from './errors'
 import {LazilyTransformingAstService} from './LazilyTransformingAstService'

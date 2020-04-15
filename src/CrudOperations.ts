@@ -4,15 +4,12 @@
  */
 
 import {AbsoluteCellRange} from './AbsoluteCellRange'
-import {absolutizeDependencies} from './absolutizeDependencies'
-import {EmptyValue, invalidSimpleCellAddress, simpleCellAddress, SimpleCellAddress, NoErrorCellValue} from './Cell'
-import {CellContent, CellContentParser, isMatrix, RawCellContent} from './CellContentParser'
+import {invalidSimpleCellAddress, simpleCellAddress, SimpleCellAddress} from './Cell'
+import {CellContentParser, isMatrix, RawCellContent} from './CellContentParser'
 import {ClipboardCell, ClipboardOperations} from './ClipboardOperations'
 import {
   AddRowsCommand,
   AddColumnsCommand,
-  normalizeAddedIndexes,
-  normalizeRemovedIndexes,
   Operations,
   RemoveRowsCommand,
   RemoveColumnsCommand,
@@ -24,23 +21,15 @@ import {ContentChanges} from './ContentChanges'
 import {
   AddressMapping,
   DependencyGraph,
-  MatrixVertex,
-  ParsingErrorVertex,
   SheetMapping,
-  ValueCellVertex,
 } from './DependencyGraph'
-import {ValueCellVertexValue} from './DependencyGraph/ValueCellVertex'
 import {InvalidAddressError, InvalidArgumentsError, NoSheetWithIdError, NoSheetWithNameError, NoOperationToUndoError, NoOperationToRedoError} from './errors'
-import {buildMatrixVertex} from './GraphBuilder'
 import {Index} from './HyperFormula'
 import {LazilyTransformingAstService} from './LazilyTransformingAstService'
 import {ParserWithCaching, ProcedureAst} from './parser'
 import {RowsSpan} from './RowsSpan'
-import {Statistics, StatType} from './statistics'
+import {Statistics} from './statistics'
 import {UndoRedo, AddSheetUndoEntry, RemoveSheetUndoEntry, AddRowsUndoEntry, RemoveRowsUndoEntry, MoveRowsUndoEntry, AddColumnsUndoEntry, RemoveColumnsUndoEntry, MoveColumnsUndoEntry, MoveCellsUndoEntry, SetCellContentsUndoEntry, SetSheetContentUndoEntry, ClearSheetUndoEntry, PasteUndoEntry} from './UndoRedo'
-import {AddColumnsTransformer} from './dependencyTransformers/AddColumnsTransformer'
-import {MoveCellsTransformer} from './dependencyTransformers/MoveCellsTransformer'
-import {RemoveSheetTransformer} from './dependencyTransformers/RemoveSheetTransformer'
 
 export class CrudOperations {
 

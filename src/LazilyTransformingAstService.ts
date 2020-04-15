@@ -7,8 +7,6 @@ import {SimpleCellAddress} from './Cell'
 import {Ast, ParserWithCaching} from './parser'
 import {Statistics} from './statistics/Statistics'
 import {UndoRedo} from './UndoRedo'
-import {RemoveRowsTransformer} from './dependencyTransformers/RemoveRowsTransformer'
-import {RemoveSheetTransformer} from './dependencyTransformers/RemoveSheetTransformer'
 import {FormulaTransformer} from './dependencyTransformers/Transformer'
 import {StatType} from './statistics'
 

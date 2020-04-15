@@ -3,8 +3,8 @@
  * Copyright (c) 2020 Handsoncode. All rights reserved.
  */
 
-import {simpleCellAddress, SimpleCellAddress, NoErrorCellValue} from './Cell'
-import {ClipboardCell, ClipboardCellType} from './ClipboardOperations'
+import {simpleCellAddress, SimpleCellAddress} from './Cell'
+import {ClipboardCell} from './ClipboardOperations'
 import {RawCellContent} from './CellContentParser'
 import {RemoveColumnsCommand, AddColumnsCommand, RowsRemoval, ColumnsRemoval, RemoveRowsCommand, AddRowsCommand} from './Operations'
 import {Operations} from './Operations'
