@@ -19,7 +19,6 @@ import {NumberLiteralHelper} from './NumberLiteralHelper'
 import {buildLexerConfig, ParserWithCaching, Unparser} from './parser'
 import {Serialization} from './Serialization'
 import {EmptyStatistics, Statistics, StatType} from './statistics'
-import {checkLicenseKeyValidity} from './helpers/licenseKey'
 
 export type EngineState = {
   config: Config,
@@ -39,8 +38,6 @@ export type EngineState = {
 
 export class BuildEngineFactory {
   private static buildEngine(config: Config, sheets: Sheets = {}, stats: Statistics = config.useStats ? new Statistics() : new EmptyStatistics()): EngineState {
-    checkLicenseKeyValidity(config.licenseKey)
-
     stats.start(StatType.BUILD_ENGINE_TOTAL)
 
     const lazilyTransformingAstService = new LazilyTransformingAstService(stats)

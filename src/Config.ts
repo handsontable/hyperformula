@@ -46,6 +46,7 @@ import {TrigonometryPlugin} from './interpreter/plugin/TrigonometryPlugin'
 import {VlookupPlugin} from './interpreter/plugin/VlookupPlugin'
 import {Maybe} from './Maybe'
 import {ParserConfig} from './parser/ParserConfig'
+import {LicenseKeyValidityState, checkLicenseKeyValidity} from './helpers/licenseKey'
 
 type GPUMode = 'gpu' | 'cpu' | 'dev'
 
@@ -459,6 +460,21 @@ export class Config implements ConfigParams, ParserConfig {
    * @internal
    */
   public readonly translationPackage: TranslationPackage
+  /**
+   * Set automatically based on licenseKey checking result.
+   *
+   * @internal
+   */
+  #licenseKeyValidityState: LicenseKeyValidityState
+  /**
+   * Proxied property to its private counterpart. This makes the property
+   * as accessible as the other Config options but without ability to change the value.
+   *
+   * @internal
+   */
+  public get licenseKeyValidityState() {
+    return this.#licenseKeyValidityState;
+  }
 
   constructor(
     {
@@ -504,6 +520,7 @@ export class Config implements ConfigParams, ParserConfig {
     this.decimalSeparator = this.valueFromParam(decimalSeparator, ['.', ','], 'decimalSeparator')
     this.language = this.valueFromParam(language, 'string', 'language')
     this.licenseKey = this.valueFromParam(licenseKey, 'string', 'licenseKey')
+    this.#licenseKeyValidityState = checkLicenseKeyValidity(this.licenseKey);
     this.thousandSeparator = this.valueFromParam(thousandSeparator, ['', ',', ' ', '.'], 'thousandSeparator')
     this.localeLang = this.valueFromParam(localeLang, 'string', 'localeLang')
     this.functionPlugins = functionPlugins ?? Config.defaultConfig.functionPlugins
