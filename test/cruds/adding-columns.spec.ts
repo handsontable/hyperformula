@@ -3,7 +3,6 @@ import {AbsoluteCellRange} from '../../src/AbsoluteCellRange'
 import { simpleCellAddress} from '../../src/Cell'
 import {ColumnIndex} from '../../src/ColumnSearch/ColumnIndex'
 import { FormulaCellVertex, MatrixVertex} from '../../src/DependencyGraph'
-import '../testConfig'
 import {adr, expectArrayWithSameContent, extractMatrixRange, extractRange} from '../testUtils'
 
 describe('Adding column - checking if its possible', () => {

@@ -1,5 +1,4 @@
 import {HyperFormula, NoOperationToUndoError, NoOperationToRedoError} from '../src'
-import './testConfig'
 import {
   expectEngineToBeTheSameAs,
   adr

@@ -1,6 +1,5 @@
 import {HyperFormula} from '../../src'
 import {ErrorType} from '../../src/Cell'
-import '../testConfig'
 import {SimpleDateTime} from '../../src/DateTimeHelper'
 import {defaultStringifyDateTime} from '../../src/format/format'
 import {Maybe} from '../../src/Maybe'

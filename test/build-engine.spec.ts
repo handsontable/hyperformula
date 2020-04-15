@@ -1,5 +1,4 @@
 import {HyperFormula} from '../src'
-import './testConfig.ts'
 import {plPL} from '../src/i18n'
 import {adr} from './testUtils'
 

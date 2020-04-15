@@ -56,6 +56,7 @@
     "compile": "tsc",
     "coverage": "cross-env NODE_ICU_DATA=node_modules/full-icu jest --coverage",
     "test": "cross-env NODE_ICU_DATA=node_modules/full-icu jest",
+    "test.watch": "cross-env NODE_ICU_DATA=node_modules/full-icu jest --watch",
     "test:ci": "cross-env NODE_ICU_DATA=node_modules/full-icu jest --maxWorkers=2",
     "typedoc:build": "typedoc --options .typedoc.js",
     "typedoc:serve": "npm run typedoc:build && serve doc -p 5005",

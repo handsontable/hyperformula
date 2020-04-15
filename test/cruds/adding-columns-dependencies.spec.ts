@@ -1,7 +1,7 @@
 import { HyperFormula} from '../../src'
 import {EmptyCellVertex} from '../../src/DependencyGraph'
 import {CellAddress} from '../../src/parser'
-import '../testConfig'
+
 import {
   adr,
   colEnd,

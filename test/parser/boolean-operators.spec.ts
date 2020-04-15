@@ -12,7 +12,6 @@ import {
   NotEqualOpAst,
   ParserWithCaching,
 } from '../../src/parser'
-import '../testConfig'
 
 describe('Parser - Boolean operators', () => {
   it('Equals operator', () => {

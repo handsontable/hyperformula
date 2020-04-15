@@ -1,6 +1,5 @@
 import {HyperFormula} from '../../src'
 import {ErrorType} from '../../src/Cell'
-import '../testConfig'
 import {adr, detailedError} from '../testUtils'
 
 describe('Error literals', () => {
@@ -35,7 +34,7 @@ describe('Error literals', () => {
     expect(engine.getCellValue(adr('D1'))).toEqual(detailedError(ErrorType.NA)) // GT
     expect(engine.getCellValue(adr('E1'))).toEqual(detailedError(ErrorType.NA)) // LT
     expect(engine.getCellValue(adr('F1'))).toEqual(detailedError(ErrorType.NA)) // GTE
-    expect(engine.getCellValue(adr('G1'))).toEqual(detailedError(ErrorType.NA)) // LTE 
+    expect(engine.getCellValue(adr('G1'))).toEqual(detailedError(ErrorType.NA)) // LTE
     expect(engine.getCellValue(adr('H1'))).toEqual(detailedError(ErrorType.NA)) // NOT EQUAL
     expect(engine.getCellValue(adr('I1'))).toEqual(detailedError(ErrorType.NA)) // ADD
     expect(engine.getCellValue(adr('J1'))).toEqual(detailedError(ErrorType.NA)) // SUB
