@@ -36,11 +36,11 @@ export class ArithmeticHelper {
     let regexpStr
     switch(this.config.regexpType) {
       case 'full': {
-        regexpStr = escapeAllCharacters(pattern)
+        regexpStr = pattern
         break
       }
       case 'none': {
-        regexpStr = pattern
+        regexpStr = escapeAllCharacters(pattern)
         break
       }
       case 'wildcards': {

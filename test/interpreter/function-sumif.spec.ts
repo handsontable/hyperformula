@@ -282,6 +282,42 @@ describe('Function SUMIF(S) - calculations and optimizations', () => {
     expect(engine.getCellValue(adr('A4'))).toEqual(1)
   })
 
+  it('usage of wildcards', () => {
+    const engine = HyperFormula.buildFromArray( [
+      ['abcd', '1'],
+      ['ABCD', '2'],
+      ['abc', '4'],
+      [0, 8],
+      ['=SUMIF(A1:A4, "=a?c*", B1:B4)']
+    ])
+
+    expect(engine.getCellValue(adr('A5'))).toEqual(5)
+  })
+
+  it('wildcards instead of regexps', () => {
+    const engine = HyperFormula.buildFromArray( [
+      ['a+?*', '1'],
+      ['a?*', '2'],
+      ['aa~?~*', '4'],
+      [0, 8],
+      ['=SUMIF(A1:A4, "=a+~?~*", B1:B4)']
+    ])
+
+    expect(engine.getCellValue(adr('A5'))).toEqual(1)
+  })
+
+  it('regexps', () => {
+    const engine = HyperFormula.buildFromArray( [
+      ['abcd', '1'],
+      ['abd', '2'],
+      ['.*c.*', '4'],
+      [0, 8],
+      ['=SUMIF(A1:A4, "<>.*c.*", B1:B4)']
+    ], {regexpType: 'full'})
+
+    expect(engine.getCellValue(adr('A5'))).toEqual(10)
+  })
+
   it('ignore errors', () => {
     const engine =  HyperFormula.buildFromArray([
       ['1', '3'],
