@@ -18,7 +18,7 @@ export const enum LicenseKeyValidityState {
 type LicenseKeyInvalidState = Exclude<LicenseKeyValidityState, LicenseKeyValidityState.VALID>
 
 interface TemplateVars {
-  [key: string]: string;
+  [key: string]: string,
 }
 
 type ConsoleMessages = {
@@ -26,8 +26,8 @@ type ConsoleMessages = {
 }
 
 type MessageDescriptor = {
-  template: LicenseKeyValidityState
-  vars: TemplateVars
+  template: LicenseKeyValidityState,
+  vars: TemplateVars,
 }
 
 /**
@@ -79,7 +79,7 @@ export function checkLicenseKeyValidity(licenseKey: string): LicenseKeyValidityS
     _notified = true
   }
 
-  return messageDescriptor.template;
+  return messageDescriptor.template
 }
 
 /**
@@ -92,9 +92,9 @@ function formatDate(date: Date): string {
   const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
     'July', 'August', 'September', 'October', 'November', 'December'
   ]
-  const month = monthNames[date.getMonth()];
-  const day = date.getDate();
-  const year = date.getFullYear();
+  const month = monthNames[date.getMonth()]
+  const day = date.getDate()
+  const year = date.getFullYear()
 
   return `${month} ${day}, ${year}`
 }
