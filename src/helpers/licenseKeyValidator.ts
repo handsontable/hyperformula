@@ -3,7 +3,7 @@
  * Copyright (c) 2020 Handsoncode. All rights reserved.
  */
 
-import {extractTime, checkKeySchema} from './_licenseKey'
+import {extractTime, checkKeySchema} from './licenseKeyHelper'
 
 /**
  * The list of all available states which the license checker can return.
