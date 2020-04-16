@@ -3,7 +3,6 @@ import {Config} from '../../src/Config'
 import {SheetMapping} from '../../src/DependencyGraph'
 import {buildTranslationPackage, enGB} from '../../src/i18n'
 import {AstNodeType, ConcatenateOpAst, ParserWithCaching, ProcedureAst} from '../../src/parser'
-import '../testConfig'
 
 describe('Parser - Concatenate operators', () => {
   it('Greater than operator', () => {

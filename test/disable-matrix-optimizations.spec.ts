@@ -1,7 +1,6 @@
 import {HyperFormula} from '../src'
 import {AbsoluteCellRange} from '../src/AbsoluteCellRange'
 import {EmptyCellVertex, MatrixVertex, ValueCellVertex} from '../src/DependencyGraph'
-import './testConfig.ts'
 import {adr} from './testUtils'
 
 describe('Disable matrix optimizatoins', () => {

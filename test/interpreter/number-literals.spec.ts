@@ -1,7 +1,6 @@
 import {HyperFormula} from '../../src'
 import {adr, detailedError} from '../testUtils'
 import {ErrorType} from '../../src/Cell'
-import '../testConfig'
 import {Config} from '../../src/Config'
 
 describe('Number literals', () => {
@@ -42,7 +41,7 @@ describe('Number literals', () => {
     }))
     expect(engine.getCellValue(adr('A1'))).toEqual(1002.2)
   })
-  
+
   it('should work for multiple thousand separator in one literal', () => {
     const engine = HyperFormula.buildFromArray([['="1 000 000" + 2']], new Config({
       thousandSeparator: ' '

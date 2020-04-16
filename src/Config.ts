@@ -46,6 +46,7 @@ import {TrigonometryPlugin} from './interpreter/plugin/TrigonometryPlugin'
 import {VlookupPlugin} from './interpreter/plugin/VlookupPlugin'
 import {Maybe} from './Maybe'
 import {ParserConfig} from './parser/ParserConfig'
+import {LicenseKeyValidityState, checkLicenseKeyValidity} from './helpers/licenseKeyValidator'
 
 type GPUMode = 'gpu' | 'cpu' | 'dev'
 
@@ -57,7 +58,7 @@ export interface ConfigParams {
    * Applies to comparison operators only.
    *
    * @default false
-   * 
+   *
    * @category String
    */
   accentSensitive: boolean,
@@ -66,7 +67,7 @@ export interface ConfigParams {
    * Applies to comparison operators only.
    *
    * @default false
-   * 
+   *
    * @category String
    */
   caseSensitive: boolean,
@@ -75,7 +76,7 @@ export interface ConfigParams {
    * When set to `false` uses the locale's default.
    *
    * @default 'lower'
-   * 
+   *
    * @category String
    */
   caseFirst: 'upper' | 'lower' | 'false',
@@ -96,7 +97,7 @@ export interface ConfigParams {
    * Any order of YY, MM, DD is accepted as a date, and YY can be replaced with YYYY.
    *
    * @default ['MM/DD/YYYY', 'MM/DD/YY']
-   * 
+   *
    * @category DateTime
    */
   dateFormats: string[],
@@ -114,7 +115,7 @@ export interface ConfigParams {
    * A separator character used to separate arguments of procedures in formulas. Must be different from [[decimalSeparator]] and [[thousandSeparator]].
    *
    * @default ','
-   * 
+   *
    * @category Syntax
    */
   functionArgSeparator: string,
@@ -123,7 +124,7 @@ export interface ConfigParams {
    * Can be either '.' or ',' and must be different from [[thousandSeparator]] and [[functionArgSeparator]].
    *
    * @default '.'
-   * 
+   *
    * @category Number
    */
   decimalSeparator: '.' | ',',
@@ -134,11 +135,17 @@ export interface ConfigParams {
    */
   language: string,
   /**
+   * License key for commercial version of HyperFormula.
+   *
+   * @default ''
+   */
+  licenseKey: string,
+  /**
    * A thousand separator used for parsing numeric literals.
    * Can be either empty, ',' or ' ' and must be different from [[decimalSeparator]] and [[functionArgSeparator]].
    *
    * @default ''
-   * 
+   *
    * @category Number
    */
   thousandSeparator: '' | ',' | ' ' | '.',
@@ -146,7 +153,7 @@ export interface ConfigParams {
    * A list of additional function plugins to use by formula interpreter.
    *
    * @default []
-   * 
+   *
    * @category Syntax
    */
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -157,7 +164,7 @@ export interface ConfigParams {
    * Other values should be used for debugging purposes only. More info can be found in GPU.js documentation.
    *
    * @default 'gpu'
-   * 
+   *
    * @category Engine
    */
   gpuMode: GPUMode,
@@ -175,7 +182,7 @@ export interface ConfigParams {
    * Set to `true` for compatibility with Lotus 1-2-3 and Excel. See [[nullDate]] for complete solution.
    *
    * @default false
-   * 
+   *
    * @category DateTime
    */
   leapYear1900: boolean,
@@ -193,7 +200,7 @@ export interface ConfigParams {
    * Some CRUD operations may break numeric matrices into individual vertices if needed.
    *
    * @default true
-   * 
+   *
    * @category Engine
    */
   matrixDetection: boolean,
@@ -201,8 +208,8 @@ export interface ConfigParams {
    * Specifies how many cells an area must have in order to be treated as a matrix. Relevant only if [[matrixDetection]] is set to `true`.
    *
    * @default 100
-   * 
-   * @category Engine 
+   *
+   * @category Engine
    */
   matrixDetectionThreshold: number,
   /**
@@ -210,7 +217,7 @@ export interface ConfigParams {
    * If `xx <= nullYear` its latter, otherwise its former.
    *
    * @default 30
-   * 
+   *
    * @category DateTime
    */
   nullYear: number,
@@ -232,8 +239,8 @@ export interface ConfigParams {
    * for `c=a+b` or `c=a-b`, if `abs(c) <= precisionEpsilon * abs(a)`, then `c` is set to `0`
    *
    * @default 1e-13
-   * 
-   * @category Number 
+   *
+   * @category Number
    */
   precisionEpsilon: number,
   /**
@@ -241,7 +248,7 @@ export interface ConfigParams {
    * Numerical outputs are rounded to `precisionRounding` many digits after the decimal.
    *
    * @default 14
-   * 
+   *
    * @category Number
    */
   precisionRounding: number,
@@ -258,7 +265,7 @@ export interface ConfigParams {
    * If `false`, no rounding happens, and numbers are equal if and only if they are truly identical value (see: [[precisionEpsilon]]).
    *
    * @default true
-   * 
+   *
    * @category Number
    */
   smartRounding: boolean,
@@ -269,7 +276,7 @@ export interface ConfigParams {
    * In some scenarios column index may fall back to binary search despite this flag.
    *
    * @default false
-   * 
+   *
    * @category Engine
    */
   useColumnIndex: boolean,
@@ -287,7 +294,7 @@ export interface ConfigParams {
    * Used by VLOOKUP and MATCH functions.
    *
    * @default 20
-   * 
+   *
    * @category Engine
    */
   vlookupThreshold: number,
@@ -330,6 +337,7 @@ export class Config implements ConfigParams, ParserConfig {
     decimalSeparator: '.',
     thousandSeparator: '',
     language: 'enGB',
+    licenseKey: '',
     functionPlugins: [],
     gpuMode: 'gpu',
     leapYear1900: false,
@@ -408,6 +416,8 @@ export class Config implements ConfigParams, ParserConfig {
   /** @inheritDoc */
   public readonly language: string
   /** @inheritDoc */
+  public readonly licenseKey: string
+  /** @inheritDoc */
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   public readonly functionPlugins: any[]
   /** @inheritDoc */
@@ -446,7 +456,7 @@ export class Config implements ConfigParams, ParserConfig {
   public readonly undoLimit: number
   /**
    * Built automatically based on translation package.
-   * 
+   *
    * @internal
    */
   public readonly errorMapping: Record<string, ErrorType>
@@ -458,6 +468,21 @@ export class Config implements ConfigParams, ParserConfig {
   public readonly translationPackage: TranslationPackage
   public readonly regexpType: 'none' | 'wildcards' | 'full'
   public readonly matchWholeCell: boolean
+  /**
+   * Set automatically based on licenseKey checking result.
+   *
+   * @internal
+   */
+  #licenseKeyValidityState: LicenseKeyValidityState
+  /**
+   * Proxied property to its private counterpart. This makes the property
+   * as accessible as the other Config options but without ability to change the value.
+   *
+   * @internal
+   */
+  public get licenseKeyValidityState() {
+    return this.#licenseKeyValidityState
+  }
 
   constructor(
     {
@@ -471,6 +496,7 @@ export class Config implements ConfigParams, ParserConfig {
       decimalSeparator,
       thousandSeparator,
       language,
+      licenseKey,
       functionPlugins,
       gpuMode,
       ignorePunctuation,
@@ -503,6 +529,8 @@ export class Config implements ConfigParams, ParserConfig {
     this.functionArgSeparator = this.valueFromParam(functionArgSeparator, 'string', 'functionArgSeparator')
     this.decimalSeparator = this.valueFromParam(decimalSeparator, ['.', ','], 'decimalSeparator')
     this.language = this.valueFromParam(language, 'string', 'language')
+    this.licenseKey = this.valueFromParam(licenseKey, 'string', 'licenseKey')
+    this.#licenseKeyValidityState = checkLicenseKeyValidity(this.licenseKey)
     this.thousandSeparator = this.valueFromParam(thousandSeparator, ['', ',', ' ', '.'], 'thousandSeparator')
     this.localeLang = this.valueFromParam(localeLang, 'string', 'localeLang')
     this.functionPlugins = functionPlugins ?? Config.defaultConfig.functionPlugins

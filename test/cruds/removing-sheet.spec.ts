@@ -5,7 +5,6 @@ import {ColumnIndex} from '../../src/ColumnSearch/ColumnIndex'
 import {MatrixVertex} from '../../src/DependencyGraph'
 import {NoSheetWithNameError} from '../../src'
 import {CellAddress} from '../../src/parser'
-import '../testConfig'
 import {
   adr, detailedError,
   expectArrayWithSameContent,
