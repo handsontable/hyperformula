@@ -601,7 +601,6 @@ describe('Row ranges', () => {
   })
 })
 
-
 describe('Parsing errors', () => {
   it('errors - lexing errors', () => {
     const parser = new ParserWithCaching(new Config(), new SheetMapping(buildTranslationPackage(enGB)).get)

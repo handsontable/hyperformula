@@ -163,7 +163,7 @@ export class ParserWithCaching {
   private computeHashOfAstNode(ast: Ast): string {
     switch (ast.type) {
       case AstNodeType.EMPTY: {
-        return ' '
+        return ast.leadingWhitespace || ''
       }
       case AstNodeType.NUMBER: {
         return imageWithWhitespace(formatNumber(ast.value, this.config.decimalSeparator), ast.leadingWhitespace)

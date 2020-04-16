@@ -195,6 +195,11 @@ describe('Compute hash from ast', () => {
     expect(hash).toEqual('=SUM(#0R0, #1R0)')
   })
 
+  it('should not skip whitespaces when there is empty arg', () => {
+    const formula = '=PV(1 ,2,3,   ,A2)'
+    expectHashFromAstMatchHashFromTokens(formula)
+  })
+
   it('should work with decimal separator', () => {
     const config = new Config({ decimalSeparator: ',', functionArgSeparator: ';' })
     const sheetMapping = new SheetMapping(buildTranslationPackage(plPL))

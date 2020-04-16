@@ -419,15 +419,23 @@ export class FormulaParser extends EmbeddedActionsParser {
     const procedureName = procedureNameToken.image.toUpperCase().slice(0, -1)
     const canonicalProcedureName = this.lexerConfig.functionMapping[procedureName] ?? procedureName
     const args: Ast[] = []
-    this.MANY_SEP({
-      SEP: this.lexerConfig.ArgSeparator,
-      DEF: () => {
-        args.push(this.SUBRULE(this.booleanExpressionOrEmpty))
-      },
+
+    let argument = this.SUBRULE(this.booleanExpressionOrEmpty)
+    this.MANY(() => {
+      const separator = this.CONSUME(this.lexerConfig.ArgSeparator) as IExtendedToken
+      if (argument.type === AstNodeType.EMPTY) {
+        argument.leadingWhitespace = separator.leadingWhitespace?.image
+      }
+      args.push(argument)
+      argument = this.SUBRULE2(this.booleanExpressionOrEmpty)
     })
+
+    args.push(argument)
+
     if (args.length === 1 && args[0].type === AstNodeType.EMPTY) {
       args.length = 0
     }
+
     const rParenToken = this.CONSUME(RParen) as IExtendedToken
     return buildProcedureAst(canonicalProcedureName, args, procedureNameToken.leadingWhitespace, rParenToken.leadingWhitespace)
   })
@@ -628,7 +636,6 @@ export class FormulaParser extends EmbeddedActionsParser {
       },
     ])
   })
-
 
   /**
    * Rule for end range reference expression with additional checks considering range start
