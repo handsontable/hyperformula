@@ -260,6 +260,28 @@ describe('Function SUMIF(S) - calculations and optimizations', () => {
     expect(engine.getCellValue(adr('A4'))).toEqual(6)
   })
 
+  it('criterions are not accent sensitive', () => {
+    const engine = HyperFormula.buildFromArray( [
+      ['abcd', '1'],
+      ['ABCD', '2'],
+      ['abc', '4'],
+      ['=SUMIF(A1:A3, "=ąbcd", B1:B3)']
+    ])
+
+    expect(engine.getCellValue(adr('A4'))).toEqual(1)
+  })
+
+  it('criterions are accent sensitive if specified', () => {
+    const engine = HyperFormula.buildFromArray( [
+      ['abcd', '1'],
+      ['ABCD', '2'],
+      ['abc', '4'],
+      ['=SUMIF(A1:A3, "=ąbcd", B1:B3)']
+    ], {accentSensitive: true})
+
+    expect(engine.getCellValue(adr('A4'))).toEqual(0)
+  })
+
   it('criterions are case sensitive', () => {
     const engine = HyperFormula.buildFromArray( [
       ['abcd', '1'],
