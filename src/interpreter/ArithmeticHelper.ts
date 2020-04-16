@@ -33,6 +33,7 @@ export class ArithmeticHelper {
   }
 
   public buildRegex(pattern: string): RegExp {
+    pattern = this.normalizeAccents(pattern)
     let regexpStr
     switch(this.config.regexpType) {
       case 'full': {
@@ -52,6 +53,14 @@ export class ArithmeticHelper {
       return RegExp(regexpStr, 'g')
     } else {
       return RegExp(regexpStr)
+    }
+  }
+
+  public normalizeAccents(str: string): string {
+    if(this.config.accentSensitive) {
+      return str
+    } else {
+      return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '')
     }
   }
 

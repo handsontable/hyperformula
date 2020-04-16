@@ -114,7 +114,7 @@ export const buildCriterionLambda = (criterion: Criterion, arithmeticHelper: Ari
         return (cellValue) => (typeof cellValue === 'number' && arithmeticHelper.floatCmp(cellValue, criterion.value as number) === 0)
       } else {
         const regexp = arithmeticHelper.buildRegex(criterion.value)
-        return (cellValue) => (typeof cellValue === 'string' && regexp.test(cellValue))
+        return (cellValue) => (typeof cellValue === 'string' && regexp.test(arithmeticHelper.normalizeAccents(cellValue)))
       }
     }
     case CriterionType.NOT_EQUAL: {
@@ -122,7 +122,7 @@ export const buildCriterionLambda = (criterion: Criterion, arithmeticHelper: Ari
         return (cellValue) => (typeof cellValue !== 'number' || arithmeticHelper.floatCmp(cellValue, criterion.value as number) !== 0)
       } else {
         const regexp = arithmeticHelper.buildRegex(criterion.value)
-        return (cellValue) => (typeof cellValue !== 'string' || !regexp.test(cellValue))
+        return (cellValue) => (typeof cellValue !== 'string' || !regexp.test(arithmeticHelper.normalizeAccents(cellValue)))
       }
     }
   }
