@@ -1430,6 +1430,14 @@ export class HyperFormula implements TypedEmitter {
     }
   }
 
+  /**
+   * Returns a normalized formula string for given named expression or `undefined` for a named expression that does not exist or does not hold a formula.
+   * Unparses AST.
+   *
+   * @param {string} expressionName - expression name, case insensitive.
+   *
+   * @category Named Expression
+   */
   public getNamedExpressionFormula(expressionName: string): Maybe<string> {
     const namedExpressionAddress = this._namedExpressions.getInternalNamedExpressionAddress(expressionName)
     if (namedExpressionAddress === null) {
