@@ -12,13 +12,15 @@ import {DateTimeHelper} from './DateTimeHelper'
 import {CrudOperations} from './CrudOperations'
 import {DependencyGraph} from './DependencyGraph'
 import {Evaluator} from './Evaluator'
-import {GraphBuilder, Sheet, Sheets} from './GraphBuilder'
+import {GraphBuilder} from './GraphBuilder'
 import {UIElement} from './i18n'
 import {NamedExpressions} from './NamedExpressions'
 import {NumberLiteralHelper} from './NumberLiteralHelper'
 import {buildLexerConfig, ParserWithCaching, Unparser} from './parser'
 import {Serialization} from './Serialization'
 import {EmptyStatistics, Statistics, StatType} from './statistics'
+import {SheetSizeLimitExceededError} from './errors'
+import {findBoundaries, Sheet, Sheets} from './Sheet'
 
 export type EngineState = {
   config: Config,
@@ -48,8 +50,13 @@ export class BuildEngineFactory {
 
     for (const sheetName in sheets) {
       if (Object.prototype.hasOwnProperty.call(sheets, sheetName)) {
+        const sheet = sheets[sheetName]
+        const boundaries = findBoundaries(sheet)
+        if (boundaries.height > config.maxRows || boundaries.width > config.maxColumns) {
+          throw new SheetSizeLimitExceededError()
+        }
         const sheetId = sheetMapping.addSheet(sheetName)
-        addressMapping.autoAddSheet(sheetId, sheets[sheetName])
+        addressMapping.autoAddSheet(sheetId, sheet, boundaries)
       }
     }
 

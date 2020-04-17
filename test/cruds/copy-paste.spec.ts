@@ -10,6 +10,8 @@ import {
   extractReference, rowEnd,
   rowStart,
 } from '../testUtils'
+import {Config} from '../../src/Config'
+import {SheetSizeLimitExceededError} from '../../src/errors'
 
 describe('Copy - paste integration', () => {
   it('copy should validate arguments', () => {
@@ -394,7 +396,7 @@ describe('Copy - paste integration', () => {
     expect(extractReference(engine, adr('A1', 1))).toEqual(CellAddress.relative(null, 0, 1))
   })
 
-  it('should do nothing when clipboard is cleard after copy', () => {
+  it('should do nothing when clipboard is cleared after copy', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '=A1'],
     ])
@@ -405,6 +407,18 @@ describe('Copy - paste integration', () => {
 
     expect(engine.getCellValue(adr('A2'))).toEqual(EmptyValue)
     expect(engine.getCellValue(adr('B2'))).toEqual(EmptyValue)
+  })
+
+  it('should throw error when trying to paste beyond sheet size limit', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1', '2'],
+      ['3', '4'],
+    ])
+
+    engine.copy(adr('A1'), 2, 2)
+
+    expect(() => engine.paste(simpleCellAddress(0, Config.defaultConfig.maxColumns, 0))).toThrow(new SheetSizeLimitExceededError())
+    expect(() => engine.paste(simpleCellAddress(0, 0, Config.defaultConfig.maxRows))).toThrow(new SheetSizeLimitExceededError())
   })
 })
 

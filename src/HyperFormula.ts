@@ -3,7 +3,7 @@
  * Copyright (c) 2020 Handsoncode. All rights reserved.
  */
 
-import { AbsoluteCellRange } from './AbsoluteCellRange'
+import {AbsoluteCellRange} from './AbsoluteCellRange'
 import {CellType, CellValueType, getCellType, getCellValueType, NoErrorCellValue, SimpleCellAddress} from './Cell'
 import {CellContent, CellContentParser, RawCellContent} from './CellContentParser'
 import {CellValue, ExportedChange, Exporter} from './CellValue'
@@ -21,9 +21,14 @@ import {
   SheetMapping,
   Vertex,
 } from './DependencyGraph'
-import {NamedExpressionDoesNotExist, NamedExpressionNameIsAlreadyTaken, NamedExpressionNameIsInvalid, EvaluationSuspendedError, NotAFormulaError} from './errors'
+import {
+  EvaluationSuspendedError,
+  NamedExpressionDoesNotExist,
+  NamedExpressionNameIsAlreadyTaken,
+  NamedExpressionNameIsInvalid,
+  NotAFormulaError
+} from './errors'
 import {Evaluator} from './Evaluator'
-import {Sheet, Sheets} from './GraphBuilder'
 import {IBatchExecutor} from './IBatchExecutor'
 import {LazilyTransformingAstService} from './LazilyTransformingAstService'
 import {Maybe} from './Maybe'
@@ -40,6 +45,7 @@ import {Serialization} from './Serialization'
 import {Statistics, StatType} from './statistics'
 import {Emitter, Events, Listeners, TypedEmitter} from './Emitter'
 import {BuildEngineFactory, EngineState} from './BuildEngineFactory'
+import {Sheet, Sheets} from './Sheet'
 import {SheetDimensions} from './_types'
 
 export type Index = [number, number]
@@ -170,6 +176,8 @@ export class HyperFormula implements TypedEmitter {
    * @param {Sheet} sheet - two-dimensional array representation of sheet
    * @param {Partial<ConfigParams>} [configInput] - engine configuration
    *
+   * @throws [[SheetSizeLimitExceededError]] when sheet size exceeds the limits
+   *
    * @category Factory
    */
   public static buildFromArray(sheet: Sheet, configInput?: Partial<ConfigParams>): HyperFormula {
@@ -184,6 +192,8 @@ export class HyperFormula implements TypedEmitter {
    *
    * @param {Sheet} sheets - object with sheets definition
    * @param {Partial<ConfigParams>} [configInput] - engine configuration
+   *
+   * @throws [[SheetSizeLimitExceededError]] when sheet size exceeds the limits
    *
    * @category Factory
    */
@@ -547,14 +557,11 @@ export class HyperFormula implements TypedEmitter {
    * @param {number} width - width of the box
    * @param {number} height - height of the box
    *
-   * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
-   * @throws [[InvalidAddressError]] when the given address is invalid
-   * @throws an error when there is a matrix inside selected cells
-   *
    * @category Cell
    */
   public isItPossibleToSetCellContents(topLeftCornerAddress: SimpleCellAddress, width: number = 1, height: number = 1): boolean {
     try {
+      this._crudOperations.ensureRangeInSizeLimits(AbsoluteCellRange.spanFrom(topLeftCornerAddress, width, height))
       for (let i = 0; i < width; i++) {
         for (let j = 0; j < height; j++) {
           this._crudOperations.ensureItIsPossibleToChangeContent({ col: topLeftCornerAddress.col + i, row: topLeftCornerAddress.row + j, sheet: topLeftCornerAddress.sheet })
@@ -577,6 +584,7 @@ export class HyperFormula implements TypedEmitter {
    * @fires [[valuesUpdated]] if recalculation was triggered by this change
    *
    * @throws [[InvalidArgumentsError]] when the value is not an array of arrays or a raw cell value
+   * @throws [[SheetSizeLimitExceededError]] when performing this operation would result in sheet size limits exceeding
    * @throws an error when it is an attempt to set cells content inside matrices during batch operation
    *
    * @category Cell
@@ -619,6 +627,7 @@ export class HyperFormula implements TypedEmitter {
    * @fires [[valuesUpdated]] if recalculation was triggered by this change
    *
    * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
+   * @throws [[SheetSizeLimitExceededError]] when performing this operation would result in sheet size limits exceeding
    * @throws an error if the selected position has matrix inside
    *
    * @category Row
@@ -705,6 +714,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
    * @throws [[InvalidArgumentsError]] when the given arguments are invalid
+   * @throws [[SheetSizeLimitExceededError]] when performing this operation would result in sheet size limits exceeding
    * @throws an error when the selected position has matrix inside
    *
    * @category Column
@@ -792,6 +802,7 @@ export class HyperFormula implements TypedEmitter {
    * @fires [[valuesUpdated]] if recalculation was triggered by this change
    *
    * @throws [[InvalidArgumentsError]] when the given arguments are invalid
+   * @throws [[SheetSizeLimitExceededError]] when performing this operation would result in sheet size limits exceeding
    * @throws an error when the source location has matrix inside - matrix cannot be moved
    * @throws an error when the target location has matrix inside - cells cannot be replaced by the matrix
    *
@@ -937,6 +948,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * @throws an error while attempting to paste onto a matrix
    * @throws [[EvaluationSuspendedError]] when the evaluation is suspended
+   * @throws [[SheetSizeLimitExceededError]] when performing this operation would result in sheet size limits exceeding
    *
    * @category Clipboard
    */
@@ -1129,12 +1141,15 @@ export class HyperFormula implements TypedEmitter {
    * Returns `false` if there is no sheet with a given name
    *
    * @param {string} sheetName - sheet name, case insensitive.
+   * @param {RawCellContent[][]} values - array of new values
    *
    * @category Sheet
    */
-  public isItPossibleToReplaceSheetContent(sheetName: string): boolean {
+  public isItPossibleToReplaceSheetContent(sheetName: string, values: RawCellContent[][]): boolean {
     try {
       this._crudOperations.ensureSheetExists(sheetName)
+      const sheetId = this.sheetMapping.fetch(sheetName)
+      this._crudOperations.ensureItIsPossibleToChangeSheetContents(sheetId, values)
       return true
     } catch (e) {
       return false

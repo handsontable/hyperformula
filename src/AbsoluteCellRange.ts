@@ -313,6 +313,10 @@ export class AbsoluteCellRange {
     return simpleCellAddress(this.start.sheet, this.start.col + col, this.start.row + row)
   }
 
+  public exceedsSheetSizeLimits(maxColumns: number, maxRows: number): boolean {
+    return this.end.col >= maxColumns || this.end.row >= maxRows
+  }
+
   protected effectiveEndColumn(_dependencyGraph: DependencyGraph): number {
     return this.end.col
   }
@@ -364,6 +368,10 @@ export class AbsoluteColumnRange extends AbsoluteCellRange {
     return new AbsoluteColumnRange(this.sheet, startColumn, startColumn + numberOfColumns - 1)
   }
 
+  public exceedsSheetSizeLimits(maxColumns: number, _maxRows: number): boolean {
+    return this.end.col >= maxColumns
+  }
+
   protected effectiveEndRow(dependencyGraph: DependencyGraph): number {
     return dependencyGraph.getSheetHeight(this.sheet) - 1
   }
@@ -408,6 +416,10 @@ export class AbsoluteRowRange extends AbsoluteCellRange {
 
   public rangeWithSameWidth(startRow: number, numberOfRows: number): AbsoluteCellRange {
     return new AbsoluteRowRange(this.sheet, startRow, startRow + numberOfRows - 1)
+  }
+
+  public exceedsSheetSizeLimits(_maxColumns: number, maxRows: number): boolean {
+    return this.end.row >= maxRows
   }
 
   protected effectiveEndColumn(dependencyGraph: DependencyGraph): number {

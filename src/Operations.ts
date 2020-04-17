@@ -5,7 +5,7 @@
 
 import {Statistics, StatType} from './statistics'
 import {ClipboardCell, ClipboardCellType} from './ClipboardOperations'
-import {SimpleCellAddress, EmptyValue, simpleCellAddress, invalidSimpleCellAddress} from './Cell'
+import {EmptyValue, invalidSimpleCellAddress, simpleCellAddress, SimpleCellAddress} from './Cell'
 import {CellContent, CellContentParser, RawCellContent} from './CellContentParser'
 import {RowsSpan} from './RowsSpan'
 import {ColumnsSpan} from './ColumnsSpan'
@@ -15,9 +15,17 @@ import {absolutizeDependencies} from './absolutizeDependencies'
 import {LazilyTransformingAstService} from './LazilyTransformingAstService'
 import {Index} from './HyperFormula'
 import {buildMatrixVertex} from './GraphBuilder'
-import {DependencyGraph, SheetMapping, EmptyCellVertex, FormulaCellVertex, MatrixVertex, ValueCellVertex, ParsingErrorVertex} from './DependencyGraph'
+import {
+  DependencyGraph,
+  EmptyCellVertex,
+  FormulaCellVertex,
+  MatrixVertex,
+  ParsingErrorVertex,
+  SheetMapping,
+  ValueCellVertex
+} from './DependencyGraph'
 import {ValueCellVertexValue} from './DependencyGraph/ValueCellVertex'
-import {InvalidArgumentsError} from './errors'
+import {InvalidArgumentsError, SheetSizeLimitExceededError} from './errors'
 import {ParserWithCaching, ProcedureAst} from './parser'
 import {ParsingError} from './parser/Ast'
 import {AddRowsTransformer} from './dependencyTransformers/AddRowsTransformer'
@@ -27,6 +35,8 @@ import {MoveCellsTransformer} from './dependencyTransformers/MoveCellsTransforme
 import {RemoveSheetTransformer} from './dependencyTransformers/RemoveSheetTransformer'
 import {RemoveColumnsTransformer} from './dependencyTransformers/RemoveColumnsTransformer'
 import {AbsoluteCellRange} from './AbsoluteCellRange'
+import {findBoundaries, Sheet} from './Sheet'
+import {Config} from './Config'
 
 export class RemoveRowsCommand {
   constructor(
@@ -129,6 +139,7 @@ export class Operations {
     private readonly parser: ParserWithCaching,
     private readonly stats: Statistics,
     private readonly lazilyTransformingAstService: LazilyTransformingAstService,
+    private readonly config: Config
   ) {
   }
 
@@ -190,7 +201,8 @@ export class Operations {
 
   public addSheet(name?: string) {
     const sheetId = this.sheetMapping.addSheet(name)
-    this.dependencyGraph.addressMapping.autoAddSheet(sheetId, [])
+    const sheet: Sheet = []
+    this.dependencyGraph.addressMapping.autoAddSheet(sheetId, sheet, findBoundaries(sheet))
     return this.sheetMapping.fetchDisplayName(sheetId)
   }
 
@@ -269,6 +281,10 @@ export class Operations {
 
     const sourceRange = AbsoluteCellRange.spanFrom(sourceLeftCorner, width, height)
     const targetRange = AbsoluteCellRange.spanFrom(destinationLeftCorner, width, height)
+
+    if (targetRange.exceedsSheetSizeLimits(this.config.maxColumns, this.config.maxRows)) {
+      throw new SheetSizeLimitExceededError()
+    }
 
     if (this.dependencyGraph.matrixMapping.isFormulaMatrixInRange(sourceRange)) {
       throw new Error('It is not possible to move matrix')

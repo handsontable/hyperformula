@@ -511,6 +511,9 @@ export class FormulaParser extends EmbeddedActionsParser {
     if (start === undefined || end === undefined) {
       return buildCellErrorAst(new CellError(ErrorType.REF))
     }
+    if (start.exceedsSheetSizeLimits(this.lexerConfig.maxColumns) || end.exceedsSheetSizeLimits(this.lexerConfig.maxColumns)) {
+      return buildErrorWithRawInputAst(range.image, new CellError(ErrorType.NAME), range.leadingWhitespace)
+    }
     if (start.sheet === null && end.sheet !== null) {
       return this.parsingError(ParsingErrorType.ParserError, 'Malformed range expression')
     }
@@ -541,6 +544,9 @@ export class FormulaParser extends EmbeddedActionsParser {
     if (start === undefined || end === undefined) {
       return buildCellErrorAst(new CellError(ErrorType.REF))
     }
+    if (start.exceedsSheetSizeLimits(this.lexerConfig.maxRows) || end.exceedsSheetSizeLimits(this.lexerConfig.maxRows)) {
+      return buildErrorWithRawInputAst(range.image, new CellError(ErrorType.NAME), range.leadingWhitespace)
+    }
     if (start.sheet === null && end.sheet !== null) {
       return this.parsingError(ParsingErrorType.ParserError, 'Malformed range expression')
     }
@@ -564,6 +570,8 @@ export class FormulaParser extends EmbeddedActionsParser {
     })
     if (address === undefined) {
       return buildErrorWithRawInputAst(cell.image, new CellError(ErrorType.REF), cell.leadingWhitespace)
+    } else if (address.exceedsSheetSizeLimits(this.lexerConfig.maxColumns, this.lexerConfig.maxRows)) {
+      return buildErrorWithRawInputAst(cell.image, new CellError(ErrorType.NAME), cell.leadingWhitespace)
     } else {
       return buildCellReferenceAst(address, cell.leadingWhitespace)
     }
@@ -653,6 +661,11 @@ export class FormulaParser extends EmbeddedActionsParser {
     if (startAddress === undefined || endAddress === undefined) {
       return this.ACTION(() => {
         return buildErrorWithRawInputAst(`${start.image}:${end.image}`, new CellError(ErrorType.REF), start.leadingWhitespace)
+      })
+    } else if (startAddress.exceedsSheetSizeLimits(this.lexerConfig.maxColumns, this.lexerConfig.maxRows)
+              || endAddress.exceedsSheetSizeLimits(this.lexerConfig.maxColumns, this.lexerConfig.maxRows)) {
+      return this.ACTION(() => {
+        return buildErrorWithRawInputAst(`${start.image}:${end.image}`, new CellError(ErrorType.NAME), start.leadingWhitespace)
       })
     }
 

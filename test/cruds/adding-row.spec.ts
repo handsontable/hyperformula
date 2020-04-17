@@ -1,9 +1,10 @@
-import {EmptyValue, HyperFormula, ExportedCellChange} from '../../src'
+import {EmptyValue, ExportedCellChange, HyperFormula, SheetSizeLimitExceededError} from '../../src'
 import {AbsoluteCellRange} from '../../src/AbsoluteCellRange'
 import {simpleCellAddress} from '../../src/Cell'
 import {ColumnIndex} from '../../src/ColumnSearch/ColumnIndex'
-import { FormulaCellVertex, MatrixVertex} from '../../src/DependencyGraph'
+import {FormulaCellVertex, MatrixVertex} from '../../src/DependencyGraph'
 import {adr, expectArrayWithSameContent, extractMatrixRange} from '../testUtils'
+import {Config} from '../../src/Config'
 
 describe('Adding row - checking if its possible', () => {
   it('no if starting row is negative', () => {
@@ -70,6 +71,15 @@ describe('Adding row - checking if its possible', () => {
     expect(engine.isItPossibleToAddRows(0, [2, 1])).toEqual(true)
     expect(engine.isItPossibleToAddRows(0, [3, 1])).toEqual(false)
     expect(engine.isItPossibleToAddRows(0, [4, 1])).toEqual(true)
+  })
+
+  it('no if adding row would exceed sheet size limit', () => {
+    const engine = HyperFormula.buildFromArray(
+      Array(Config.defaultConfig.maxRows - 1).fill([''])
+    )
+
+    expect(engine.isItPossibleToAddRows(0, [0, 2])).toEqual(false)
+    expect(engine.isItPossibleToAddRows(0, [0, 1], [5, 1])).toEqual(false)
   })
 
   it('yes if theres a numeric matrix in place where we add', () => {
@@ -331,6 +341,18 @@ describe('Adding row - sheet dimensions', () => {
       height: 1,
     })
   })
+
+  it('should throw error when trying to expand sheet beyond limits', () => {
+    const engine = HyperFormula.buildFromArray(Array(Config.defaultConfig.maxRows - 1).fill(['']))
+
+    expect(() => {
+      engine.addRows(0, [0, 2])
+    }).toThrow(new SheetSizeLimitExceededError())
+
+    expect(() => {
+      engine.addRows(0, [0, 1], [5, 1])
+    }).toThrow(new SheetSizeLimitExceededError())
+  })
 })
 
 describe('Adding row - column index', () => {
@@ -338,7 +360,7 @@ describe('Adding row - column index', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '=VLOOKUP(2, A1:A10, 1, TRUE())'],
       ['2'],
-    ], { useColumnIndex: true })
+    ], {useColumnIndex: true})
 
     engine.addRows(0, [1, 1])
 

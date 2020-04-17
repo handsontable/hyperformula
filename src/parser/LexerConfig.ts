@@ -90,6 +90,8 @@ export interface ILexerConfig {
   errorMapping: Record<string, ErrorType>,
   functionMapping: Record<string, string>,
   decimalSeparator: '.' | ',',
+  maxColumns: number,
+  maxRows: number,
 }
 
 export const buildLexerConfig = (config: ParserConfig): ILexerConfig => {
@@ -142,7 +144,9 @@ export const buildLexerConfig = (config: ParserConfig): ILexerConfig => {
     allTokens,
     errorMapping,
     functionMapping,
-    decimalSeparator: config.decimalSeparator
+    decimalSeparator: config.decimalSeparator,
+    maxColumns: config.maxColumns,
+    maxRows: config.maxRows
   }
 }
 

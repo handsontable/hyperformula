@@ -1,5 +1,5 @@
-import {HyperFormula} from '../../src'
-import {CellError, ErrorType, simpleCellAddress} from '../../src/Cell'
+import {ErrorType, HyperFormula} from '../../src'
+import {CellError, simpleCellAddress} from '../../src/Cell'
 import {Config} from '../../src/Config'
 import {SheetMapping} from '../../src/DependencyGraph'
 import {buildTranslationPackage, enGB, plPL} from '../../src/i18n'
@@ -29,6 +29,7 @@ import {
 import {ColumnAddress} from '../../src/parser/ColumnAddress'
 import {adr, unregisterAllLanguages} from '../testUtils'
 import {RowAddress} from '../../src/parser/RowAddress'
+import {columnIndexToLabel} from '../../src/parser/addressRepresentationConverters'
 
 describe('ParserWithCaching', () => {
   beforeEach(() => {
@@ -494,6 +495,74 @@ describe('cell references and ranges', () => {
     expect(ast.rawInput).toBe('Sheet2!A1:Sheet3!B2')
     expect(ast.error.type).toBe(ErrorType.REF)
   })
+
+  it('cell reference beyond maximum row limit is #NAME', () => {
+    const sheetMapping = new SheetMapping(buildTranslationPackage(enGB))
+    sheetMapping.addSheet('Sheet1')
+    const parser = new ParserWithCaching(new Config(), sheetMapping.get)
+    const maxRow = Config.defaultConfig.maxRows
+
+    const maxRowAst = parser.parse(`=A${maxRow}`, adr('A1')).ast as CellReferenceAst
+    const maxRowPlusOneAst = parser.parse(`=A${maxRow + 1}`, adr('A1')).ast as ErrorWithRawInputAst
+
+    expect(maxRowAst.type).toEqual(AstNodeType.CELL_REFERENCE)
+    expect(maxRowAst.reference.row).toEqual(maxRow - 1)
+    expect(maxRowPlusOneAst.type).toEqual(AstNodeType.ERROR_WITH_RAW_INPUT)
+    expect(maxRowPlusOneAst.rawInput).toEqual(`A${maxRow + 1}`)
+    expect(maxRowPlusOneAst.error).toEqual(new CellError(ErrorType.NAME))
+  })
+
+  it('cell reference beyond maximum column limit is #NAME', () => {
+    const sheetMapping = new SheetMapping(buildTranslationPackage(enGB))
+    sheetMapping.addSheet('Sheet1')
+    const parser = new ParserWithCaching(new Config(), sheetMapping.get)
+    const maxColumns = Config.defaultConfig.maxColumns
+
+    const maxColumnAst = parser.parse(`=${columnIndexToLabel(maxColumns - 1)}1`, adr('A1')).ast as CellReferenceAst
+    const maxColumnPlusOneAst = parser.parse(`=${columnIndexToLabel(maxColumns)}1`, adr('A1')).ast as ErrorWithRawInputAst
+
+    expect(maxColumnAst.type).toEqual(AstNodeType.CELL_REFERENCE)
+    expect(maxColumnAst.reference.col).toEqual(maxColumns - 1)
+    expect(maxColumnPlusOneAst.type).toEqual(AstNodeType.ERROR_WITH_RAW_INPUT)
+    expect(maxColumnPlusOneAst.rawInput).toEqual(`${columnIndexToLabel(maxColumns)}1`)
+    expect(maxColumnPlusOneAst.error).toEqual(new CellError(ErrorType.NAME))
+  })
+
+  it('cell range start beyond maximum column/row limit is #NAME', () => {
+    const sheetMapping = new SheetMapping(buildTranslationPackage(enGB))
+    sheetMapping.addSheet('Sheet1')
+    const parser = new ParserWithCaching(new Config(), sheetMapping.get)
+    const maxRow = Config.defaultConfig.maxRows
+    const maxColumns = Config.defaultConfig.maxColumns
+
+    const ast1 = parser.parse(`=A${maxRow + 1}:B2`, adr('A1')).ast as ErrorWithRawInputAst
+    const ast2 = parser.parse(`=${columnIndexToLabel(maxColumns)}1:B2`, adr('A1')).ast as ErrorWithRawInputAst
+
+    expect(ast1.type).toEqual(AstNodeType.ERROR_WITH_RAW_INPUT)
+    expect(ast1.rawInput).toEqual(`A${maxRow + 1}:B2`)
+    expect(ast1.error).toEqual(new CellError(ErrorType.NAME))
+    expect(ast2.type).toEqual(AstNodeType.ERROR_WITH_RAW_INPUT)
+    expect(ast2.rawInput).toEqual(`${columnIndexToLabel(maxColumns)}1:B2`)
+    expect(ast2.error).toEqual(new CellError(ErrorType.NAME))
+  })
+
+  it('cell range end beyond maximum column/row limit is #NAME', () => {
+    const sheetMapping = new SheetMapping(buildTranslationPackage(enGB))
+    sheetMapping.addSheet('Sheet1')
+    const parser = new ParserWithCaching(new Config(), sheetMapping.get)
+    const maxRow = Config.defaultConfig.maxRows
+    const maxColumns = Config.defaultConfig.maxColumns
+
+    const ast1 = parser.parse(`=A1:B${maxRow + 1}`, adr('A1')).ast as ErrorWithRawInputAst
+    const ast2 = parser.parse(`=A1:${columnIndexToLabel(maxColumns)}1`, adr('A1')).ast as ErrorWithRawInputAst
+
+    expect(ast1.type).toEqual(AstNodeType.ERROR_WITH_RAW_INPUT)
+    expect(ast1.rawInput).toEqual(`A1:B${maxRow + 1}`)
+    expect(ast1.error).toEqual(new CellError(ErrorType.NAME))
+    expect(ast2.type).toEqual(AstNodeType.ERROR_WITH_RAW_INPUT)
+    expect(ast2.rawInput).toEqual(`A1:${columnIndexToLabel(maxColumns)}1`)
+    expect(ast2.error).toEqual(new CellError(ErrorType.NAME))
+  })
 })
 
 describe('Column ranges', () => {
@@ -545,6 +614,21 @@ describe('Column ranges', () => {
   it('column range with absolute sheet only on end side is a parsing error', () => {
     const { errors } = parser.parse('=A:Sheet2!B', adr('A1'))
     expect(errors[0].type).toBe(ParsingErrorType.ParserError)
+  })
+
+  it('column range beyond size limits is #NAME', () => {
+    const maxColumns = Config.defaultConfig.maxColumns
+    const ast1 = parser.parse(`=A:${columnIndexToLabel(maxColumns - 1)}`, adr('A1')).ast as ColumnRangeAst
+    const ast2 = parser.parse(`=A:${columnIndexToLabel(maxColumns)}`, adr('A1')).ast as ErrorWithRawInputAst
+    const ast3 = parser.parse(`=${columnIndexToLabel(maxColumns)}:B`, adr('A1')).ast as ErrorWithRawInputAst
+
+    expect(ast1.type).toEqual(AstNodeType.COLUMN_RANGE)
+    expect(ast2.type).toEqual(AstNodeType.ERROR_WITH_RAW_INPUT)
+    expect(ast2.rawInput).toEqual(`A:${columnIndexToLabel(maxColumns)}`)
+    expect(ast2.error).toEqual(new CellError(ErrorType.NAME))
+    expect(ast3.type).toEqual(AstNodeType.ERROR_WITH_RAW_INPUT)
+    expect(ast3.rawInput).toEqual(`${columnIndexToLabel(maxColumns)}:B`)
+    expect(ast3.error).toEqual(new CellError(ErrorType.NAME))
   })
 })
 

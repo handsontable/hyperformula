@@ -315,6 +315,22 @@ export interface ConfigParams {
    * @category UndoRedo
    */
   undoLimit: number,
+  /**
+   * Maximum number of rows
+   *
+   * @default 40,000
+   *
+   * @category Engine
+   * */
+  maxRows: number,
+  /**
+   * Maximum number of columns
+   *
+   * @default 18,278
+   *
+   * @category Engine
+   * */
+  maxColumns: number,
 }
 
 type ConfigParamsList = keyof ConfigParams
@@ -351,6 +367,8 @@ export class Config implements ConfigParams, ParserConfig {
     vlookupThreshold: 20,
     nullDate: {year: 1899, month: 12, day: 30},
     undoLimit: 20,
+    maxRows: 40_000,
+    maxColumns: 18_278
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -454,6 +472,10 @@ export class Config implements ConfigParams, ParserConfig {
    * @internal
    */
   public readonly errorMapping: Record<string, ErrorType>
+  /** @inheritDoc */
+  public readonly maxRows: number
+  /** @inheritDoc */
+  public readonly maxColumns: number
   /**
    * Built automatically based on language.
    *
@@ -507,6 +529,8 @@ export class Config implements ConfigParams, ParserConfig {
       nullDate,
       useStats,
       undoLimit,
+      maxRows,
+      maxColumns
     }: Partial<ConfigParams> = {},
   ) {
     this.accentSensitive = this.valueFromParam(accentSensitive, 'boolean', 'accentSensitive')
@@ -541,6 +565,8 @@ export class Config implements ConfigParams, ParserConfig {
     this.nullDate = this.valueFromParamCheck(nullDate, instanceOfSimpleDate, 'IDate', 'nullDate')
     this.leapYear1900 = this.valueFromParam(leapYear1900, 'boolean', 'leapYear1900')
     this.undoLimit = this.valueFromParam(undoLimit, 'number', 'undoLimit')
+    this.maxRows = this.valueFromParam(maxRows, 'number', 'maxRows')
+    this.maxColumns = this.valueFromParam(maxColumns, 'number', 'maxColumns')
 
     this.checkIfParametersNotInConflict(
       {value: this.decimalSeparator, name: 'decimalSeparator'},
