@@ -120,7 +120,17 @@ export class CrudOperations {
     this.clipboardOperations.cut(sourceLeftCorner, width, height)
   }
 
+  public ensureItIsPossibleToCopy(sourceLeftCorner: SimpleCellAddress, width: number, height: number): void {
+    if (!isPositiveInteger(width)) {
+      throw new InvalidArgumentsError('width to be positive integer')
+    }
+    if (!isPositiveInteger(height)) {
+      throw new InvalidArgumentsError('height to be positive integer')
+    }
+  }
+
   public copy(sourceLeftCorner: SimpleCellAddress, width: number, height: number): void {
+    this.ensureItIsPossibleToCopy(sourceLeftCorner, width, height)
     this.clipboardOperations.copy(sourceLeftCorner, width, height)
   }
 
