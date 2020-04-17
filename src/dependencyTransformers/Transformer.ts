@@ -57,6 +57,7 @@ export abstract class Transformer implements FormulaTransformer {
       case AstNodeType.ROW_RANGE: {
         return this.transformRowRangeAst(ast, address)
       }
+      case AstNodeType.EMPTY:
       case AstNodeType.ERROR:
       case AstNodeType.NUMBER:
       case AstNodeType.ERROR_WITH_RAW_INPUT:
@@ -97,12 +98,6 @@ export abstract class Transformer implements FormulaTransformer {
           ...ast,
           type: ast.type,
           expression: this.transformAst(ast.expression, address),
-        }
-      }
-      case AstNodeType.EMPTY: {
-        return {
-          ...ast,
-          type: ast.type,
         }
       }
       default: {
