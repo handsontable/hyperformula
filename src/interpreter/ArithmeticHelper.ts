@@ -32,6 +32,16 @@ export class ArithmeticHelper {
     this.actualEps = config.smartRounding ? config.precisionEpsilon : 0
   }
 
+  public eqMatcherFunction(pattern: string): (arg: InternalCellValue) => boolean {
+    const regexp = this.buildRegex(pattern)
+    return (cellValue) => (typeof cellValue === 'string' && regexp.test(this.normalizeAccents(cellValue)))
+  }
+
+  public neqMatcherFunction(pattern: string): (arg: InternalCellValue) => boolean {
+    const regexp = this.buildRegex(pattern)
+    return (cellValue) => (typeof cellValue !== 'string' || !regexp.test(this.normalizeAccents(cellValue)))
+  }
+
   public requiresRegex(pattern: string): boolean {
     if(this.config.regexpType === 'none') {
       return true
@@ -45,7 +55,7 @@ export class ArithmeticHelper {
     return false
   }
 
-  public buildRegex(pattern: string): RegExp {
+  private buildRegex(pattern: string): RegExp {
     pattern = this.normalizeAccents(pattern)
     let regexpStr
     switch(this.config.regexpType) {

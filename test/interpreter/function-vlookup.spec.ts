@@ -13,7 +13,7 @@ const sharedExamples = (builder: (sheet: Sheet, config?: Partial<ConfigParams>) 
       expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA))
     })
 
-    it('to many parameters', function() {
+    it('too many parameters', function() {
       const engine = builder([
         ['=VLOOKUP(1, A2:B3, 2, TRUE(), "foo")'],
       ])
@@ -87,6 +87,19 @@ const sharedExamples = (builder: (sheet: Sheet, config?: Partial<ConfigParams>) 
       ])
 
       expect(engine.getCellValue(adr('A6'))).toEqual('b')
+    })
+
+    it('works with wildcards', () => {
+      const engine = builder([
+        ['"abd"', 'a'],
+        [1, 'b'],
+        ['"aaaa"', 'c'],
+        ['"ddaa"', 'd'],
+        ['"abcd"', 'e'],
+        ['=VLOOKUP("*c*", A1:B5, 2)'],
+      ])
+
+      expect(engine.getCellValue(adr('A6'))).toEqual('e')
     })
 
     it('should find value in unsorted range using linearSearch', () => {

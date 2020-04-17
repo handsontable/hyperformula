@@ -120,9 +120,8 @@ export class VlookupPlugin extends FunctionPlugin {
     const searchedRange = AbsoluteCellRange.spanFrom(range.start, 1, range.height())
     let rowIndex
     if(typeof key === 'string' && this.interpreter.arithmeticHelper.requiresRegex(key)) {
-      const regexp = this.interpreter.arithmeticHelper.buildRegex(key)
       rowIndex = this.columnSearch.advancedFind(
-        (arg: InternalCellValue) => (typeof arg === 'string' && regexp.test(this.interpreter.arithmeticHelper.normalizeAccents(arg))),
+        this.interpreter.arithmeticHelper.eqMatcherFunction(key),
         searchedRange
       )
     } else {
