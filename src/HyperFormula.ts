@@ -176,6 +176,8 @@ export class HyperFormula implements TypedEmitter {
    * @param {Sheet} sheet - two-dimensional array representation of sheet
    * @param {Partial<ConfigParams>} [configInput] - engine configuration
    *
+   * @throws [[SheetSizeLimitExceededError]] when sheet size exceeds the limits
+   *
    * @category Factory
    */
   public static buildFromArray(sheet: Sheet, configInput?: Partial<ConfigParams>): HyperFormula {
@@ -190,6 +192,8 @@ export class HyperFormula implements TypedEmitter {
    *
    * @param {Sheet} sheets - object with sheets definition
    * @param {Partial<ConfigParams>} [configInput] - engine configuration
+   *
+   * @throws [[SheetSizeLimitExceededError]] when sheet size exceeds the limits
    *
    * @category Factory
    */
@@ -580,6 +584,7 @@ export class HyperFormula implements TypedEmitter {
    * @fires [[valuesUpdated]] if recalculation was triggered by this change
    *
    * @throws [[InvalidArgumentsError]] when the value is not an array of arrays or a raw cell value
+   * @throws [[SheetSizeLimitExceededError]] when performing this operation would result in sheet size limits exceeding
    * @throws an error when it is an attempt to set cells content inside matrices during batch operation
    *
    * @category Cell
@@ -622,6 +627,7 @@ export class HyperFormula implements TypedEmitter {
    * @fires [[valuesUpdated]] if recalculation was triggered by this change
    *
    * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
+   * @throws [[SheetSizeLimitExceededError]] when performing this operation would result in sheet size limits exceeding
    * @throws an error if the selected position has matrix inside
    *
    * @category Row
@@ -708,6 +714,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
    * @throws [[InvalidArgumentsError]] when the given arguments are invalid
+   * @throws [[SheetSizeLimitExceededError]] when performing this operation would result in sheet size limits exceeding
    * @throws an error when the selected position has matrix inside
    *
    * @category Column
@@ -795,6 +802,7 @@ export class HyperFormula implements TypedEmitter {
    * @fires [[valuesUpdated]] if recalculation was triggered by this change
    *
    * @throws [[InvalidArgumentsError]] when the given arguments are invalid
+   * @throws [[SheetSizeLimitExceededError]] when performing this operation would result in sheet size limits exceeding
    * @throws an error when the source location has matrix inside - matrix cannot be moved
    * @throws an error when the target location has matrix inside - cells cannot be replaced by the matrix
    *
@@ -940,6 +948,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * @throws an error while attempting to paste onto a matrix
    * @throws [[EvaluationSuspendedError]] when the evaluation is suspended
+   * @throws [[SheetSizeLimitExceededError]] when performing this operation would result in sheet size limits exceeding
    *
    * @category Clipboard
    */
