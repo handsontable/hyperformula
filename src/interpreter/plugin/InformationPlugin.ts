@@ -58,13 +58,16 @@ export class InformationPlugin extends FunctionPlugin {
   public iserror(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
     if (ast.args.length != 1) {
       return new CellError(ErrorType.NA)
-    } else {
-      const arg = this.evaluateAst(ast.args[0], formulaAddress)
-      if (arg instanceof SimpleRangeValue) {
-        return new CellError(ErrorType.VALUE)
-      }
-      return (arg instanceof CellError)
     }
+    if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
+      return new CellError(ErrorType.NUM)
+    }
+    const arg = this.evaluateAst(ast.args[0], formulaAddress)
+    if (arg instanceof SimpleRangeValue) {
+      return new CellError(ErrorType.VALUE)
+    }
+    return (arg instanceof CellError)
+
   }
 
   /**
@@ -78,6 +81,9 @@ export class InformationPlugin extends FunctionPlugin {
   public isblank(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
     if (ast.args.length != 1) {
       return new CellError(ErrorType.NA)
+    }
+    if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
+      return new CellError(ErrorType.NUM)
     }
     const arg = ast.args[0]
     const value = this.evaluateAst(arg, formulaAddress)
@@ -99,12 +105,15 @@ export class InformationPlugin extends FunctionPlugin {
     if (ast.args.length != 1) {
       return new CellError(ErrorType.NA)
     }
+    if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
+      return new CellError(ErrorType.NUM)
+    }
     const arg = ast.args[0]
     const value = this.evaluateAst(arg, formulaAddress)
     if (value instanceof SimpleRangeValue) {
       return new CellError(ErrorType.VALUE)
     }
-    return (typeof value ===  'number')
+    return (typeof value === 'number')
   }
 
   /**
@@ -119,12 +128,15 @@ export class InformationPlugin extends FunctionPlugin {
     if (ast.args.length != 1) {
       return new CellError(ErrorType.NA)
     }
+    if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
+      return new CellError(ErrorType.NUM)
+    }
     const arg = ast.args[0]
     const value = this.evaluateAst(arg, formulaAddress)
     if (value instanceof SimpleRangeValue) {
       return new CellError(ErrorType.VALUE)
     }
-    return (typeof value ===  'boolean')
+    return (typeof value === 'boolean')
   }
 
   /**
@@ -139,12 +151,15 @@ export class InformationPlugin extends FunctionPlugin {
     if (ast.args.length != 1) {
       return new CellError(ErrorType.NA)
     }
+    if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
+      return new CellError(ErrorType.NUM)
+    }
     const arg = ast.args[0]
     const value = this.evaluateAst(arg, formulaAddress)
     if (value instanceof SimpleRangeValue) {
       return new CellError(ErrorType.VALUE)
     }
-    return (typeof value ===  'string')
+    return (typeof value === 'string')
   }
 
   /**
@@ -159,12 +174,15 @@ export class InformationPlugin extends FunctionPlugin {
     if (ast.args.length != 1) {
       return new CellError(ErrorType.NA)
     }
+    if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
+      return new CellError(ErrorType.NUM)
+    }
     const arg = ast.args[0]
     const value = this.evaluateAst(arg, formulaAddress)
     if (value instanceof SimpleRangeValue) {
       return new CellError(ErrorType.VALUE)
     }
-    return (typeof value !==  'string')
+    return (typeof value !== 'string')
   }
 
   /**
@@ -179,6 +197,9 @@ export class InformationPlugin extends FunctionPlugin {
   public columns(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
     if (ast.args.length !== 1) {
       return new CellError(ErrorType.NA)
+    }
+    if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
+      return new CellError(ErrorType.NUM)
     }
     const rangeAst = ast.args[0]
     if (rangeAst.type === AstNodeType.CELL_RANGE) {
@@ -201,6 +222,9 @@ export class InformationPlugin extends FunctionPlugin {
     if (ast.args.length !== 1) {
       return new CellError(ErrorType.NA)
     }
+    if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
+      return new CellError(ErrorType.NUM)
+    }
     const rangeAst = ast.args[0]
     if (rangeAst.type === AstNodeType.CELL_RANGE) {
       return (rangeAst.end.row - rangeAst.start.row + 1)
@@ -213,6 +237,9 @@ export class InformationPlugin extends FunctionPlugin {
     const rangeArg = ast.args[0]
     if (ast.args.length < 1 || ast.args.length > 3) {
       return new CellError(ErrorType.NA)
+    }
+    if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
+      return new CellError(ErrorType.NUM)
     }
 
     let width, height

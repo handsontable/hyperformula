@@ -4,7 +4,7 @@
  */
 
 import {CellError, ErrorType, InternalCellValue, SimpleCellAddress} from '../../Cell'
-import {ProcedureAst} from '../../parser'
+import {AstNodeType, ProcedureAst} from '../../parser'
 import {FunctionPlugin} from './FunctionPlugin'
 
 export class RandomPlugin extends FunctionPlugin {
@@ -28,8 +28,11 @@ export class RandomPlugin extends FunctionPlugin {
   public rand(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
     if (ast.args.length !== 0) {
       return new CellError(ErrorType.NA)
-    } else {
-      return Math.random()
     }
+
+    if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
+      return new CellError(ErrorType.NUM)
+    }
+    return Math.random()
   }
 }
