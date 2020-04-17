@@ -32,6 +32,8 @@ export interface ColumnSearchStrategy {
 
   find(key: NoErrorCellValue, range: AbsoluteCellRange, sorted: boolean): number,
 
+  advancedFind(keyMatcher: (arg: InternalCellValue) => boolean, range: AbsoluteCellRange): number,
+
   destroy(): void,
 }
 

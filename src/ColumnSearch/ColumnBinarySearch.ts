@@ -46,6 +46,17 @@ export class ColumnBinarySearch implements ColumnSearchStrategy {
     }
   }
 
+
+  public advancedFind(keyMatcher: (arg: InternalCellValue) => boolean, range: AbsoluteCellRange): number {
+    const values = this.computeListOfValuesInRange(range)
+    for(let i=0; i<values.length; i++) {
+      if(keyMatcher(values[i])) {
+        return i + range.start.row
+      }
+    }
+    return -1
+  }
+
   private computeListOfValuesInRange(range: AbsoluteCellRange): InternalCellValue[] {
     const values: InternalCellValue[] = []
     for (const cellFromRange of range.addresses(this.dependencyGraph)) {

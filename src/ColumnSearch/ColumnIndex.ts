@@ -110,6 +110,10 @@ export class ColumnIndex implements ColumnSearchStrategy {
     return rowNumber <= range.end.row ? rowNumber : this.binarySearchStrategy.find(key, range, sorted)
   }
 
+  public advancedFind(keyMatcher: (arg: InternalCellValue) => boolean, range: AbsoluteCellRange): number {
+    return this.binarySearchStrategy.advancedFind(keyMatcher, range)
+  }
+
   public addColumns(columnsSpan: ColumnsSpan) {
     const sheetIndex = this.index.get(columnsSpan.sheet)
     if (!sheetIndex) {

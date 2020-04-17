@@ -118,7 +118,16 @@ export class VlookupPlugin extends FunctionPlugin {
     this.dependencyGraph.stats.start(StatType.VLOOKUP)
 
     const searchedRange = AbsoluteCellRange.spanFrom(range.start, 1, range.height())
-    const rowIndex = this.columnSearch.find(key, searchedRange, sorted)
+    let rowIndex
+    if(typeof key === 'string' && this.interpreter.arithmeticHelper.requiresRegex(key)) {
+      const regexp = this.interpreter.arithmeticHelper.buildRegex(key)
+      rowIndex = this.columnSearch.advancedFind(
+        (arg: InternalCellValue) => (typeof arg === 'string' && regexp.test(this.interpreter.arithmeticHelper.normalizeAccents(arg))),
+        searchedRange
+      )
+    } else {
+      rowIndex = this.columnSearch.find(key, searchedRange, sorted)
+    }
 
     this.dependencyGraph.stats.end(StatType.VLOOKUP)
 

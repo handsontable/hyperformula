@@ -32,6 +32,19 @@ export class ArithmeticHelper {
     this.actualEps = config.smartRounding ? config.precisionEpsilon : 0
   }
 
+  public requiresRegex(pattern: string): boolean {
+    if(this.config.regexpType === 'none') {
+      return true
+    }
+    for(let i=0;i<pattern.length;i++) {
+      const c = pattern.charAt(i)
+      if(isWildcard(c) || (this.config.regexpType === 'full' && needsEscape(c))) {
+        return true
+      }
+    }
+    return false
+  }
+
   public buildRegex(pattern: string): RegExp {
     pattern = this.normalizeAccents(pattern)
     let regexpStr
