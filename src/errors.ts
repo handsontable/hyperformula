@@ -161,6 +161,38 @@ export class ExpectedValueOfType extends Error {
 }
 
 /**
+ * Error thrown when supplied config parameter value is too small.
+ * This error might be thrown while setting or updating the [[ConfigParams]].
+ * The following methods accept [[ConfigParams]] as a parameter:
+ * 
+ * @see [[buildEmpty]]
+ * @see [[buildFromArray]]
+ * @see [[buildFromSheets]]
+ * @see [[updateConfig]]
+ */
+export class ConfigValueTooSmall extends Error {
+  constructor(paramName: string, minimum: number) {
+    super(`Config parameter ${paramName} should be at least ${minimum}`)
+  }
+}
+
+/**
+ * Error thrown when supplied config parameter value is too big.
+ * This error might be thrown while setting or updating the [[ConfigParams]].
+ * The following methods accept [[ConfigParams]] as a parameter:
+ * 
+ * @see [[buildEmpty]]
+ * @see [[buildFromArray]]
+ * @see [[buildFromSheets]]
+ * @see [[updateConfig]]
+ */
+export class ConfigValueTooBig extends Error {
+  constructor(paramName: string, maximum: number) {
+    super(`Config parameter ${paramName} should be at most ${maximum}`)
+  }
+}
+
+/**
  * Error thrown when the value was expected to be set for a config parameter.
  * It also displays the expected value.
  * This error might be thrown while setting or updating the [[ConfigParams]].

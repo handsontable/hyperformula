@@ -6,7 +6,7 @@
 import {ErrorType} from './Cell'
 import {defaultParseToDateTime} from './DateTimeDefault'
 import {DateTime, instanceOfSimpleDate, SimpleDate, SimpleDateTime} from './DateTimeHelper'
-import {ExpectedOneOfValues, ExpectedValueOfType} from './errors'
+import {ExpectedOneOfValues, ExpectedValueOfType, ConfigValueTooSmall, ConfigValueTooBig} from './errors'
 import {AlwaysDense, ChooseAddressMapping} from './DependencyGraph/AddressMapping/ChooseAddressMappingPolicy'
 import {defaultStringifyDateTime} from './format/format'
 import {HyperFormula} from './HyperFormula'
@@ -552,12 +552,18 @@ export class Config implements ConfigParams, ParserConfig {
     this.smartRounding = this.valueFromParam(smartRounding, 'boolean', 'smartRounding')
     this.matrixDetection = this.valueFromParam(matrixDetection, 'boolean', 'matrixDetection')
     this.matrixDetectionThreshold = this.valueFromParam(matrixDetectionThreshold, 'number', 'matrixDetectionThreshold')
+    this.validateNumberToBeAtLeast(this.matrixDetectionThreshold, 'matrixDetectionThreshold', 1)
     this.nullYear = this.valueFromParam(nullYear, 'number', 'nullYear')
+    this.validateNumberToBeAtLeast(this.nullYear, 'nullYear', 0)
+    this.validateNumberToBeAtMost(this.nullYear, 'nullYear', 100)
     this.precisionRounding = this.valueFromParam(precisionRounding, 'number', 'precisionRounding')
+    this.validateNumberToBeAtLeast(this.precisionRounding, 'precisionRounding', 0)
     this.precisionEpsilon = this.valueFromParam(precisionEpsilon, 'number', 'precisionEpsilon')
+    this.validateNumberToBeAtLeast(this.precisionEpsilon, 'precisionEpsilon', 0)
     this.useColumnIndex = this.valueFromParam(useColumnIndex, 'boolean', 'useColumnIndex')
     this.useStats = this.valueFromParam(useStats, 'boolean', 'useStats')
     this.vlookupThreshold = this.valueFromParam(vlookupThreshold, 'number', 'vlookupThreshold')
+    this.validateNumberToBeAtLeast(this.vlookupThreshold, 'vlookupThreshold', 1)
     this.parseDateTime = this.valueFromParam(parseDateTime, 'function', 'parseDateTime')
     this.stringifyDateTime = this.valueFromParam(stringifyDateTime, 'function', 'stringifyDateTime')
     this.translationPackage = HyperFormula.getLanguage(this.language)
@@ -565,8 +571,12 @@ export class Config implements ConfigParams, ParserConfig {
     this.nullDate = this.valueFromParamCheck(nullDate, instanceOfSimpleDate, 'IDate', 'nullDate')
     this.leapYear1900 = this.valueFromParam(leapYear1900, 'boolean', 'leapYear1900')
     this.undoLimit = this.valueFromParam(undoLimit, 'number', 'undoLimit')
+    this.validateNumberToBeAtLeast(this.undoLimit, 'undoLimit', 0)
     this.maxRows = this.valueFromParam(maxRows, 'number', 'maxRows')
+    this.validateNumberToBeAtLeast(this.maxRows, 'maxRows', 1)
     this.maxColumns = this.valueFromParam(maxColumns, 'number', 'maxColumns')
+    this.validateNumberToBeAtLeast(this.maxColumns, 'maxColumns', 1)
+
 
     this.checkIfParametersNotInConflict(
       {value: this.decimalSeparator, name: 'decimalSeparator'},
@@ -692,6 +702,18 @@ export class Config implements ConfigParams, ParserConfig {
     if (duplicates.length > 0) {
       const paramNames = duplicates.map(entry => `[${entry.sort()}]`).join('; ')
       throw new Error(`Config initialization failed. Parameters in conflict: ${paramNames}`)
+    }
+  }
+
+  private validateNumberToBeAtLeast(value: number, paramName: string, minimum: number) {
+    if (value < minimum) {
+      throw new ConfigValueTooSmall(paramName, minimum)
+    }
+  }
+
+  private validateNumberToBeAtMost(value: number, paramName: string, maximum: number) {
+    if (value > maximum) {
+      throw new ConfigValueTooBig(paramName, maximum)
     }
   }
 }
