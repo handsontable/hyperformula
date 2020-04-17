@@ -5,48 +5,19 @@
 
 import {EmptyValue, InternalCellValue, SimpleCellAddress} from '../../Cell'
 import {ColumnsSpan} from '../../ColumnsSpan'
-import {Sheet} from '../../GraphBuilder'
 import {RowsSpan} from '../../RowsSpan'
 import {MatrixVertex} from '../index'
 import {CellVertex} from '../Vertex'
 import {ChooseAddressMapping} from './ChooseAddressMappingPolicy'
 import {IAddressMappingStrategy} from './IAddressMappingStrategy'
 import {NoSheetWithIdError} from '../../errors'
-
-/**
- * Returns actual width, height and fill ratio of a sheet
- *
- * @param sheet - two-dimmensional array sheet representation
- */
-export function findBoundaries(sheet: Sheet): ({ width: number, height: number, fill: number }) {
-  let maxWidth = 0
-  let cellsCount = 0
-  for (let currentRow = 0; currentRow < sheet.length; currentRow++) {
-    const currentRowWidth = sheet[currentRow].length
-    if (maxWidth === undefined || maxWidth < currentRowWidth) {
-      maxWidth = currentRowWidth
-    }
-    for (let currentCol = 0; currentCol < currentRowWidth; currentCol++) {
-      const currentValue = sheet[currentRow][currentCol]
-      if (currentValue !== '') {
-        cellsCount++
-      }
-    }
-  }
-  const sheetSize = sheet.length * maxWidth
-
-  return {
-    height: sheet.length,
-    width: maxWidth,
-    fill: sheetSize === 0 ? 0 : cellsCount / sheetSize,
-  }
-}
+import {Sheet, SheetBoundaries} from '../../Sheet'
 
 export class AddressMapping {
   private mapping: Map<number, IAddressMappingStrategy> = new Map()
 
   constructor(
-    private readonly policy: ChooseAddressMapping,
+    private readonly policy: ChooseAddressMapping
   ) {
   }
 
@@ -88,8 +59,8 @@ export class AddressMapping {
     this.mapping.set(sheetId, strategy)
   }
 
-  public autoAddSheet(sheetId: number, sheet: Sheet) {
-    const {height, width, fill} = findBoundaries(sheet)
+  public autoAddSheet(sheetId: number, sheet: Sheet, sheetBoundaries: SheetBoundaries) {
+    const {height, width, fill} = sheetBoundaries
     const strategyConstructor = this.policy.call(fill)
     this.addSheet(sheetId, new strategyConstructor(width, height))
   }

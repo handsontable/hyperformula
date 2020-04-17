@@ -4,6 +4,8 @@ import { simpleCellAddress} from '../../src/Cell'
 import {ColumnIndex} from '../../src/ColumnSearch/ColumnIndex'
 import { FormulaCellVertex, MatrixVertex} from '../../src/DependencyGraph'
 import {adr, expectArrayWithSameContent, extractMatrixRange, extractRange} from '../testUtils'
+import {Config} from '../../src/Config'
+import {SheetSizeLimitExceededError} from '../../src/errors'
 
 describe('Adding column - checking if its possible', () => {
   it('no if starting column is negative', () => {
@@ -67,6 +69,15 @@ describe('Adding column - checking if its possible', () => {
     expect(engine.isItPossibleToAddColumns(0, [2, 1])).toEqual(true)
     expect(engine.isItPossibleToAddColumns(0, [3, 1])).toEqual(false)
     expect(engine.isItPossibleToAddColumns(0, [4, 1])).toEqual(true)
+  })
+
+  it('no if adding column would exceed sheet size limit', () => {
+    const engine = HyperFormula.buildFromArray([
+      Array(Config.defaultConfig.maxColumns - 1).fill('')
+    ])
+
+    expect(engine.isItPossibleToAddColumns(0, [0, 2])).toEqual(false)
+    expect(engine.isItPossibleToAddColumns(0, [0, 1], [5, 1])).toEqual(false)
   })
 
   it('yes if theres a numeric matrix in place where we add', () => {
@@ -313,6 +324,20 @@ describe('Adding column - sheet dimensions', () => {
       width: 1,
       height: 1,
     })
+  })
+
+  it('should throw error when trying to expand sheet beyond limits', () => {
+    const engine = HyperFormula.buildFromArray([
+      Array(Config.defaultConfig.maxColumns - 1).fill('')
+    ])
+
+    expect(() => {
+      engine.addColumns(0, [0, 2])
+    }).toThrow(new SheetSizeLimitExceededError())
+
+    expect(() => {
+      engine.addColumns(0, [0, 1], [5, 1])
+    }).toThrow(new SheetSizeLimitExceededError())
   })
 })
 

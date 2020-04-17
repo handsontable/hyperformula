@@ -319,6 +319,22 @@ export interface ConfigParams {
   regexpType: 'none' | 'wildcards' | 'full',
 
   matchWholeCell: boolean,
+  /**
+   * Maximum number of rows
+   *
+   * @default 40,000
+   *
+   * @category Engine
+   * */
+  maxRows: number,
+  /**
+   * Maximum number of columns
+   *
+   * @default 18,278
+   *
+   * @category Engine
+   * */
+  maxColumns: number,
 }
 
 type ConfigParamsList = keyof ConfigParams
@@ -357,6 +373,8 @@ export class Config implements ConfigParams, ParserConfig {
     undoLimit: 20,
     regexpType: 'wildcards',
     matchWholeCell: true,
+    maxRows: 40_000,
+    maxColumns: 18_278
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -460,6 +478,10 @@ export class Config implements ConfigParams, ParserConfig {
    * @internal
    */
   public readonly errorMapping: Record<string, ErrorType>
+  /** @inheritDoc */
+  public readonly maxRows: number
+  /** @inheritDoc */
+  public readonly maxColumns: number
   /**
    * Built automatically based on language.
    *
@@ -517,6 +539,8 @@ export class Config implements ConfigParams, ParserConfig {
       undoLimit,
       regexpType,
       matchWholeCell,
+      maxRows,
+      maxColumns
     }: Partial<ConfigParams> = {},
   ) {
     this.accentSensitive = this.valueFromParam(accentSensitive, 'boolean', 'accentSensitive')
@@ -553,6 +577,8 @@ export class Config implements ConfigParams, ParserConfig {
     this.undoLimit = this.valueFromParam(undoLimit, 'number', 'undoLimit')
     this.regexpType = this.valueFromParam(regexpType, ['none', 'wildcards', 'full'], 'regexpType')
     this.matchWholeCell = this.valueFromParam(matchWholeCell, 'boolean', 'matchWholeCell')
+    this.maxRows = this.valueFromParam(maxRows, 'number', 'maxRows')
+    this.maxColumns = this.valueFromParam(maxColumns, 'number', 'maxColumns')
 
     this.checkIfParametersNotInConflict(
       {value: this.decimalSeparator, name: 'decimalSeparator'},

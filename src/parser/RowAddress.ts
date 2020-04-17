@@ -79,4 +79,8 @@ export class RowAddress implements AddressWithRow {
     const dollar = this.type === ReferenceType.ABSOLUTE ? '$' : ''
     return `${dollar}${simpleAddress.row + 1}`
   }
+
+  public exceedsSheetSizeLimits(maxRows: number): boolean {
+    return this.row >= maxRows
+  }
 }

@@ -7,29 +7,43 @@ import {AbsoluteCellRange} from './AbsoluteCellRange'
 import {invalidSimpleCellAddress, simpleCellAddress, SimpleCellAddress} from './Cell'
 import {CellContentParser, isMatrix, RawCellContent} from './CellContentParser'
 import {ClipboardCell, ClipboardOperations} from './ClipboardOperations'
-import {
-  AddRowsCommand,
-  AddColumnsCommand,
-  Operations,
-  RemoveRowsCommand,
-  RemoveColumnsCommand,
-} from './Operations'
+import {AddColumnsCommand, AddRowsCommand, Operations, RemoveColumnsCommand, RemoveRowsCommand} from './Operations'
 import {ColumnSearchStrategy} from './ColumnSearch/ColumnSearchStrategy'
 import {ColumnsSpan} from './ColumnsSpan'
 import {Config} from './Config'
 import {ContentChanges} from './ContentChanges'
+import {AddressMapping, DependencyGraph, SheetMapping} from './DependencyGraph'
 import {
-  AddressMapping,
-  DependencyGraph,
-  SheetMapping,
-} from './DependencyGraph'
-import {InvalidAddressError, InvalidArgumentsError, NoSheetWithIdError, NoSheetWithNameError, NoOperationToUndoError, NoOperationToRedoError} from './errors'
+  InvalidAddressError,
+  InvalidArgumentsError,
+  NoOperationToRedoError,
+  NoOperationToUndoError,
+  NoSheetWithIdError,
+  NoSheetWithNameError,
+  SheetSizeLimitExceededError
+} from './errors'
 import {Index} from './HyperFormula'
 import {LazilyTransformingAstService} from './LazilyTransformingAstService'
-import {ParserWithCaching, ProcedureAst} from './parser'
+import {ParserWithCaching} from './parser'
 import {RowsSpan} from './RowsSpan'
 import {Statistics} from './statistics'
-import {UndoRedo, AddSheetUndoEntry, RemoveSheetUndoEntry, AddRowsUndoEntry, RemoveRowsUndoEntry, MoveRowsUndoEntry, AddColumnsUndoEntry, RemoveColumnsUndoEntry, MoveColumnsUndoEntry, MoveCellsUndoEntry, SetCellContentsUndoEntry, SetSheetContentUndoEntry, ClearSheetUndoEntry, PasteUndoEntry} from './UndoRedo'
+import {
+  AddColumnsUndoEntry,
+  AddRowsUndoEntry,
+  AddSheetUndoEntry,
+  ClearSheetUndoEntry,
+  MoveCellsUndoEntry,
+  MoveColumnsUndoEntry,
+  MoveRowsUndoEntry,
+  PasteUndoEntry,
+  RemoveColumnsUndoEntry,
+  RemoveRowsUndoEntry,
+  RemoveSheetUndoEntry,
+  SetCellContentsUndoEntry,
+  SetSheetContentUndoEntry,
+  UndoRedo
+} from './UndoRedo'
+import {findBoundaries} from './Sheet'
 
 export class CrudOperations {
 
@@ -53,8 +67,8 @@ export class CrudOperations {
     /** Service handling postponed CRUD transformations */
     private readonly lazilyTransformingAstService: LazilyTransformingAstService,
   ) {
-    this.operations = new Operations(this.dependencyGraph, this.columnSearch, this.cellContentParser, this.parser, this.stats, this.lazilyTransformingAstService)
-    this.clipboardOperations = new ClipboardOperations(this.dependencyGraph, this.operations, this.parser, this.lazilyTransformingAstService)
+    this.operations = new Operations(this.dependencyGraph, this.columnSearch, this.cellContentParser, this.parser, this.stats, this.lazilyTransformingAstService, this.config)
+    this.clipboardOperations = new ClipboardOperations(this.dependencyGraph, this.operations, this.parser, this.lazilyTransformingAstService, this.config)
     this.undoRedo = new UndoRedo(this.config, this.operations)
   }
 
@@ -218,6 +232,8 @@ export class CrudOperations {
       }
     }
 
+    this.ensureItIsPossibleToChangeCellContents(topLeftCornerAddress, cellContents)
+
     this.undoRedo.clearRedoStack()
     const modifiedCellContents: { address: SimpleCellAddress, newContent: RawCellContent, oldContent: ClipboardCell }[] = []
     for (let i = 0; i < cellContents.length; i++) {
@@ -227,7 +243,6 @@ export class CrudOperations {
           row: topLeftCornerAddress.row + i,
           col: topLeftCornerAddress.col + j,
         }
-        this.ensureItIsPossibleToChangeContent(address)
         this.clipboardOperations.abortCut()
         const oldContent = this.operations.getClipboardCell(address)
         this.operations.setCellContent(address, cellContents[i][j])
@@ -239,12 +254,14 @@ export class CrudOperations {
 
   public setSheetContent(sheetName: string, values: RawCellContent[][]): void {
     this.ensureSheetExists(sheetName)
+    const sheetId = this.sheetMapping.fetch(sheetName)
+    this.ensureItIsPossibleToChangeSheetContents(sheetId, values)
+
     this.undoRedo.clearRedoStack()
     this.clipboardOperations.abortCut()
     if (!(values instanceof Array)) {
       throw new Error('Expected an array of arrays.')
     }
-    const sheetId = this.sheetMapping.fetch(sheetName)
     const oldSheetContent = this.operations.getSheetClipboardCells(sheetId)
     this.operations.clearSheet(sheetId)
     for (let i = 0; i < values.length; i++) {
@@ -253,7 +270,6 @@ export class CrudOperations {
       }
       for (let j = 0; j < values[i].length; j++) {
         const address = simpleCellAddress(sheetId, j, i)
-        this.ensureItIsPossibleToChangeContent(address)
         this.operations.setCellContent(address, values[i][j])
       }
     }
@@ -277,13 +293,19 @@ export class CrudOperations {
   }
 
   public ensureItIsPossibleToAddRows(sheet: number, ...indexes: Index[]): void {
+    if (!this.sheetMapping.hasSheetWithId(sheet)) {
+      throw new NoSheetWithIdError(sheet)
+    }
+
+    const sheetHeight = this.dependencyGraph.getSheetHeight(sheet)
+    const newRowsCount = indexes.map(index => index[1]).reduce((a, b) => a + b, 0)
+    if (sheetHeight + newRowsCount > this.config.maxRows) {
+      throw new SheetSizeLimitExceededError()
+    }
+
     for (const [row, numberOfRowsToAdd] of indexes) {
       if (!isNonnegativeInteger(row) || !isPositiveInteger(numberOfRowsToAdd)) {
         throw new InvalidArgumentsError()
-      }
-
-      if (!this.sheetMapping.hasSheetWithId(sheet)) {
-        throw new NoSheetWithIdError(sheet)
       }
 
       if (isPositiveInteger(row)
@@ -317,13 +339,19 @@ export class CrudOperations {
   }
 
   public ensureItIsPossibleToAddColumns(sheet: number, ...indexes: Index[]): void {
+    if (!this.sheetMapping.hasSheetWithId(sheet)) {
+      throw new NoSheetWithIdError(sheet)
+    }
+
+    const sheetWidth = this.dependencyGraph.getSheetWidth(sheet)
+    const newColumnsCount = indexes.map(index => index[1]).reduce((a, b) => a + b, 0)
+    if (sheetWidth + newColumnsCount > this.config.maxColumns) {
+      throw new SheetSizeLimitExceededError()
+    }
+
     for (const [column, numberOfColumnsToAdd] of indexes) {
       if (!isNonnegativeInteger(column) || !isPositiveInteger(numberOfColumnsToAdd)) {
         throw new InvalidArgumentsError()
-      }
-
-      if (!this.sheetMapping.hasSheetWithId(sheet)) {
-        throw new NoSheetWithIdError(sheet)
       }
 
       if (isPositiveInteger(column)
@@ -421,6 +449,27 @@ export class CrudOperations {
 
     if (this.dependencyGraph.matrixMapping.isFormulaMatrixAtAddress(address)) {
       throw Error('It is not possible to change part of a matrix')
+    }
+  }
+
+  public ensureItIsPossibleToChangeCellContents(address: SimpleCellAddress, content: RawCellContent[][]) {
+    const boundaries = findBoundaries(content)
+    const targetRange = AbsoluteCellRange.spanFrom(address, boundaries.width, boundaries.height)
+    this.ensureRangeInSizeLimits(targetRange)
+    for (const address of targetRange.addresses(this.dependencyGraph)) {
+      this.ensureItIsPossibleToChangeContent(address)
+    }
+  }
+
+  public ensureItIsPossibleToChangeSheetContents(sheetId: number, content: RawCellContent[][]) {
+    const boundaries = findBoundaries(content)
+    const targetRange = AbsoluteCellRange.spanFrom(simpleCellAddress(sheetId, 0, 0), boundaries.width, boundaries.height)
+    this.ensureRangeInSizeLimits(targetRange)
+  }
+
+  public ensureRangeInSizeLimits(range: AbsoluteCellRange): void {
+    if (range.exceedsSheetSizeLimits(this.config.maxColumns, this.config.maxRows)) {
+      throw new SheetSizeLimitExceededError()
     }
   }
 

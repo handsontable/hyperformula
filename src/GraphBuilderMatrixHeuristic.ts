@@ -9,8 +9,8 @@ import {CellContent, CellContentParser, RawCellContent} from './CellContentParse
 import {CellDependency} from './CellDependency'
 import {ColumnSearchStrategy} from './ColumnSearch/ColumnSearchStrategy'
 import {DependencyGraph, MatrixVertex, Vertex} from './DependencyGraph'
-import {Sheets} from './GraphBuilder'
 import {Matrix, MatrixSize} from './Matrix'
+import {Sheets} from './Sheet'
 
 export class Array2d<T> {
   public static fromArray<T>(input: T[][]): Array2d<T> {
