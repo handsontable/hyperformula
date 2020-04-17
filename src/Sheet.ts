@@ -4,6 +4,7 @@
  */
 
 import {RawCellContent} from './CellContentParser'
+import {EmptyValue} from './Cell'
 
 /**
  * Two-dimenstional array representation of sheet
@@ -27,25 +28,32 @@ export interface SheetBoundaries {
  * @param sheet - two-dimmensional array sheet representation
  */
 export function findBoundaries(sheet: Sheet): SheetBoundaries {
-  let maxWidth = 0
+  let width = 0
+  let height = 0
   let cellsCount = 0
+
   for (let currentRow = 0; currentRow < sheet.length; currentRow++) {
-    const currentRowWidth = sheet[currentRow].length
-    if (maxWidth === undefined || maxWidth < currentRowWidth) {
-      maxWidth = currentRowWidth
-    }
-    for (let currentCol = 0; currentCol < currentRowWidth; currentCol++) {
+    let currentRowWidth = 0
+    for (let currentCol = 0; currentCol < sheet[currentRow].length; currentCol++) {
       const currentValue = sheet[currentRow][currentCol]
-      if (currentValue !== '') {
-        cellsCount++
+      if (currentValue === undefined || currentValue === null || currentValue === EmptyValue) {
+        continue
       }
+      currentRowWidth = currentCol + 1
+      ++cellsCount
+    }
+
+    width = Math.max(width, currentRowWidth)
+    if (currentRowWidth > 0) {
+      height = currentRow + 1
     }
   }
-  const sheetSize = sheet.length * maxWidth
+
+  const sheetSize = width * height
 
   return {
-    height: sheet.length,
-    width: maxWidth,
+    height: height,
+    width: width,
     fill: sheetSize === 0 ? 0 : cellsCount / sheetSize,
   }
 }

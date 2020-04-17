@@ -580,6 +580,14 @@ describe('changing cell content', () => {
     expect(() => engine.setCellContents(cellInLastRow, '1')).toThrow(new SheetSizeLimitExceededError())
   })
 
+  it('setting empty cells outside sheet limits does not produce error', () => {
+    const engine = HyperFormula.buildFromArray([])
+    const cellInLastColumn = simpleCellAddress(0, Config.defaultConfig.maxColumns, 0)
+    const cellInLastRow = simpleCellAddress(0, 0, Config.defaultConfig.maxRows)
+
+    expect(() => engine.setCellContents(cellInLastColumn, EmptyValue)).not.toThrow()
+    expect(() => engine.setCellContents(cellInLastRow, EmptyValue)).not.toThrow()
+  })
 })
 
 describe('change multiple cells contents', () => {

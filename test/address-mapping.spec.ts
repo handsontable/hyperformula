@@ -352,8 +352,8 @@ describe('AddressMapping', () => {
   it('#buildAddresMapping - when sparse matrix', () => {
     const addressMapping = new AddressMapping(new DenseSparseChooseBasedOnThreshold(0.8))
     const sheet = [
-      ['', '', ''],
-      ['', '', '1'],
+      [null, null, null],
+      [null, null, '1'],
     ]
     addressMapping.autoAddSheet(0, sheet, findBoundaries(sheet))
 
