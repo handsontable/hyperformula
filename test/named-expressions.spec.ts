@@ -229,4 +229,26 @@ describe('Named expressions', () => {
     expect(() => engine.addNamedExpression('$A$50', '=42')).toThrowError(/Name .* is invalid/)
     expect(() => engine.addNamedExpression('SheetName!$A$50', '=42')).toThrowError(/Name .* is invalid/)
   })
+
+  it('#getNamedExpressionFormula when it exists', () => {
+    const engine = HyperFormula.buildFromArray([])
+
+    engine.addNamedExpression('myName.1', '=Sheet1!A1+10')
+
+    expect(engine.getNamedExpressionFormula('myName.1')).toEqual('=Sheet1!A1+10')
+  })
+
+  it('#getNamedExpressionFormula when there is no such named expression', () => {
+    const engine = HyperFormula.buildFromArray([])
+
+    expect(engine.getNamedExpressionFormula('not.existing')).toBeUndefined()
+  })
+
+  it('#getNamedExpressionFormula when named expression is not formula', () => {
+    const engine = HyperFormula.buildFromArray([])
+
+    engine.addNamedExpression('myName.1', '42')
+
+    expect(engine.getNamedExpressionFormula('not.existing')).toBeUndefined()
+  })
 })

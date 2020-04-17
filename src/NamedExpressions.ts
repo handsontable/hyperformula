@@ -121,7 +121,7 @@ export class NamedExpressions {
     this.workbookStore.add(namedExpression)
   }
 
-  private getInternalNamedExpressionAddress(expressionName: string): SimpleCellAddress | null {
+  public getInternalNamedExpressionAddress(expressionName: string): SimpleCellAddress | null {
     const namedExpression = this.workbookStore.get(expressionName)
     if (namedExpression === undefined) {
       return null

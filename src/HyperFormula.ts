@@ -1430,6 +1430,15 @@ export class HyperFormula implements TypedEmitter {
     }
   }
 
+  public getNamedExpressionFormula(expressionName: string): Maybe<string> {
+    const namedExpressionAddress = this._namedExpressions.getInternalNamedExpressionAddress(expressionName)
+    if (namedExpressionAddress === null) {
+      return undefined
+    } else {
+      return this._serialization.getCellFormula(namedExpressionAddress)
+    }
+  }
+
   /**
    * Changes a given named expression to a specified formula.
    * 
