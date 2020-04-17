@@ -1,4 +1,4 @@
-import {EmptyValue, HyperFormula, ExportedCellChange} from '../../src'
+import {EmptyValue, HyperFormula, ExportedCellChange, NothingToPasteError} from '../../src'
 import {ErrorType, simpleCellAddress} from '../../src/Cell'
 import {CellAddress} from '../../src/parser'
 import {
@@ -40,6 +40,14 @@ describe('Copy - paste integration', () => {
     expect(() => {
       engine.copy(adr('A1'), 42, 3.14)
     }).toThrowError('Invalid arguments, expected height to be positive integer')
+  })
+
+  it('paste raise error when there is nothing in clipboard', () => {
+    const engine = HyperFormula.buildFromArray([])
+
+    expect(() => {
+      engine.paste(adr('A2'))
+    }).toThrowError(new NothingToPasteError())
   })
 
   it('copy should return values', () => {
@@ -349,16 +357,6 @@ describe('Copy - paste integration', () => {
     }).toThrowError('It is not possible to paste onto matrix')
   })
 
-  it('should do nothing when empty clipboard', () => {
-    const engine = HyperFormula.buildFromArray([
-      ['1']
-    ])
-
-    engine.paste(adr('A1'))
-
-    expect(engine.getCellValue(adr('A1'))).toEqual(1)
-  })
-
   it('should not be possible to paste to not existing sheet', () => {
     const engine = HyperFormula.buildFromSheets({
       'Sheet1': [['=Sheet1!A2', '=Sheet2!A2']],
@@ -394,19 +392,6 @@ describe('Copy - paste integration', () => {
     engine.paste(adr('A1', 1))
 
     expect(extractReference(engine, adr('A1', 1))).toEqual(CellAddress.relative(null, 0, 1))
-  })
-
-  it('should do nothing when clipboard is cleared after copy', () => {
-    const engine = HyperFormula.buildFromArray([
-      ['1', '=A1'],
-    ])
-
-    engine.copy(adr('A1'), 2, 1)
-    engine.clearClipboard()
-    engine.paste(adr('A2'))
-
-    expect(engine.getCellValue(adr('A2'))).toEqual(EmptyValue)
-    expect(engine.getCellValue(adr('B2'))).toEqual(EmptyValue)
   })
 
   it('should throw error when trying to paste beyond sheet size limit', () => {
@@ -465,6 +450,16 @@ describe('isClipboardEmpty', () => {
     ])
     engine.cut(adr('A1'), 1, 1)
     engine.paste(adr('A2'))
+
+    expect(engine.isClipboardEmpty()).toBe(true)
+  })
+
+  it('after clearClipboard', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1', '=A1'],
+    ])
+    engine.copy(adr('A1'), 2, 1)
+    engine.clearClipboard()
 
     expect(engine.isClipboardEmpty()).toBe(true)
   })
