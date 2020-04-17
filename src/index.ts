@@ -3,17 +3,18 @@
  * Copyright (c) 2020 Handsoncode. All rights reserved.
  */
 
-import { CellError, EmptyValue, ErrorType } from './Cell'
-import { CellValue, DetailedCellError, ExportedCellChange, ExportedNamedExpressionChange } from './CellValue'
+import {CellError, EmptyValue, ErrorType} from './Cell'
+import {CellValue, DetailedCellError, ExportedCellChange, ExportedNamedExpressionChange} from './CellValue'
 import {
+  EvaluationSuspendedError,
   InvalidAddressError,
   InvalidArgumentsError,
+  NoOperationToRedoError,
+  NoOperationToUndoError,
   NoSheetWithIdError,
   NoSheetWithNameError,
-  NoOperationToUndoError,
-  NoOperationToRedoError,
-  EvaluationSuspendedError,
-  NotAFormulaError
+  NotAFormulaError,
+  SheetSizeLimitExceededError
 } from './errors'
 import {HyperFormula} from './HyperFormula'
 import {Config} from './Config'
@@ -25,6 +26,8 @@ import {Sheets} from './Sheet'
 class HyperFormulaNS extends HyperFormula {
   public static HyperFormula = HyperFormula
   public static NoSheetWithIdError = NoSheetWithIdError
+  public static NoSheetWithNameError = NoSheetWithNameError
+  public static SheetSizeLimitExceededError = SheetSizeLimitExceededError
   public static InvalidAddressError = InvalidAddressError
   public static EmptyValue = EmptyValue
   public static DetailedCellError = DetailedCellError
@@ -49,9 +52,10 @@ export {
   Sheets,
   HyperFormula,
   NoSheetWithIdError,
+  NoSheetWithNameError,
+  SheetSizeLimitExceededError,
   InvalidAddressError,
   InvalidArgumentsError,
-  NoSheetWithNameError,
   NotAFormulaError,
   CellValue,
   EmptyValue,
