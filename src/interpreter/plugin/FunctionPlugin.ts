@@ -83,7 +83,7 @@ export abstract class FunctionPlugin {
     if (ast.args.length !== 2) {
       return new CellError(ErrorType.NA)
     }
-    if(ast.args.some((ast) => ast.type===AstNodeType.EMPTY)) {
+    if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
       return new CellError(ErrorType.NUM)
     }
     const left = this.evaluateAst(ast.args[0], formulaAddress)
@@ -112,7 +112,7 @@ export abstract class FunctionPlugin {
     if (position > ast.args.length - 1) {
       return new CellError(ErrorType.NA)
     }
-    if(ast.args[position].type===AstNodeType.EMPTY) {
+    if (ast.args[position].type === AstNodeType.EMPTY) {
       return new CellError(ErrorType.NUM)
     }
     const arg = this.evaluateAst(ast.args[position]!, formulaAddress)
@@ -129,7 +129,7 @@ export abstract class FunctionPlugin {
     return value
   }
 
-  protected coerceScalarToNumberOrError(arg: InternalCellValue): number | CellError  {
+  protected coerceScalarToNumberOrError(arg: InternalCellValue): number | CellError {
     return this.interpreter.arithmeticHelper.coerceScalarToNumberOrError(arg)
   }
 
@@ -142,7 +142,7 @@ export abstract class FunctionPlugin {
     if (ast.args.length !== 1) {
       return new CellError(ErrorType.NA)
     }
-    if(ast.args.some((ast) => ast.type===AstNodeType.EMPTY)) {
+    if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
       return new CellError(ErrorType.NUM)
     }
 

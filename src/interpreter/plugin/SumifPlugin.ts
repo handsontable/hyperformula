@@ -7,9 +7,9 @@ import {CellError, ErrorType, InternalCellValue, SimpleCellAddress} from '../../
 import {Maybe} from '../../Maybe'
 import {AstNodeType, ProcedureAst} from '../../parser'
 import {coerceToRange} from '../ArithmeticHelper'
-import { CriterionPackage} from '../Criterion'
+import {CriterionPackage} from '../Criterion'
 import {Condition, CriterionFunctionCompute} from '../CriterionFunctionCompute'
-import { SimpleRangeValue} from '../InterpreterValue'
+import {SimpleRangeValue} from '../InterpreterValue'
 import {FunctionPlugin} from './FunctionPlugin'
 
 class AverageResult {
@@ -19,10 +19,12 @@ class AverageResult {
   public static single(arg: number): AverageResult {
     return new AverageResult(arg, 1)
   }
+
   constructor(
     public readonly sum: number,
     public readonly count: number,
-  ) { }
+  ) {
+  }
 
   public compose(other: AverageResult) {
     return new AverageResult(this.sum + other.sum, this.count + other.count)
@@ -89,7 +91,7 @@ export class SumifPlugin extends FunctionPlugin {
     if (ast.args.length < 2 || ast.args.length > 3) {
       return new CellError(ErrorType.NA)
     }
-    if(ast.args.some((ast) => ast.type===AstNodeType.EMPTY)) {
+    if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
       return new CellError(ErrorType.NUM)
     }
     const conditionArgValue = this.evaluateAst(ast.args[0], formulaAddress)
@@ -135,7 +137,7 @@ export class SumifPlugin extends FunctionPlugin {
     if (ast.args.length < 3 || ast.args.length % 2 === 0) {
       return new CellError(ErrorType.NA)
     }
-    if(ast.args.some((ast) => ast.type===AstNodeType.EMPTY)) {
+    if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
       return new CellError(ErrorType.NUM)
     }
     const valueArgValue = this.evaluateAst(ast.args[0], formulaAddress)
@@ -179,7 +181,7 @@ export class SumifPlugin extends FunctionPlugin {
     if (ast.args.length < 2 || ast.args.length > 3) {
       return new CellError(ErrorType.NA)
     }
-    if(ast.args.some((ast) => ast.type===AstNodeType.EMPTY)) {
+    if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
       return new CellError(ErrorType.NUM)
     }
     const conditionArgValue = this.evaluateAst(ast.args[0], formulaAddress)
@@ -246,7 +248,7 @@ export class SumifPlugin extends FunctionPlugin {
       return new CellError(ErrorType.NA)
     }
 
-    if(ast.args.some((ast) => ast.type===AstNodeType.EMPTY)) {
+    if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
       return new CellError(ErrorType.NUM)
     }
     const conditionArgValue = this.evaluateAst(ast.args[0], formulaAddress)
@@ -282,7 +284,7 @@ export class SumifPlugin extends FunctionPlugin {
       return new CellError(ErrorType.NA)
     }
 
-    if(ast.args.some((ast) => ast.type===AstNodeType.EMPTY)) {
+    if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
       return new CellError(ErrorType.NUM)
     }
     const conditions: Condition[] = []

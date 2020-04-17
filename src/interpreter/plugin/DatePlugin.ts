@@ -50,7 +50,7 @@ export class DatePlugin extends FunctionPlugin {
     if (ast.args.length !== 3) {
       return new CellError(ErrorType.NA)
     }
-    if(ast.args.some((ast) => ast.type===AstNodeType.EMPTY)) {
+    if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
       return new CellError(ErrorType.NUM)
     }
 
@@ -79,15 +79,15 @@ export class DatePlugin extends FunctionPlugin {
     const d = Math.trunc(coercedDay)
     let m = Math.trunc(coercedMonth)
     let y = Math.trunc(coercedYear)
-    if(y<this.interpreter.dateHelper.getEpochYearZero()) {
+    if (y < this.interpreter.dateHelper.getEpochYearZero()) {
       y += this.interpreter.dateHelper.getEpochYearZero()
     }
-    const delta = Math.floor( (m - 1) / 12 )
+    const delta = Math.floor((m - 1) / 12)
     y += delta
     m -= delta * 12
 
     const date = {year: y, month: m, day: 1}
-    if ( this.interpreter.dateHelper.isValidDate(date) ) {
+    if (this.interpreter.dateHelper.isValidDate(date)) {
       const ret = this.interpreter.dateHelper.dateToNumber(date) + (d - 1)
       if (this.interpreter.dateHelper.getWithinBounds(ret)) {
         return ret
@@ -100,7 +100,7 @@ export class DatePlugin extends FunctionPlugin {
     if (ast.args.length !== 2) {
       return new CellError(ErrorType.NA)
     }
-    if(ast.args.some((ast) => ast.type===AstNodeType.EMPTY)) {
+    if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
       return new CellError(ErrorType.NUM)
     }
 
@@ -130,7 +130,7 @@ export class DatePlugin extends FunctionPlugin {
     if (ast.args.length !== 1) {
       return new CellError(ErrorType.NA)
     }
-    if(ast.args.some((ast) => ast.type===AstNodeType.EMPTY)) {
+    if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
       return new CellError(ErrorType.NUM)
     }
 
@@ -149,7 +149,7 @@ export class DatePlugin extends FunctionPlugin {
     if (ast.args.length !== 2) {
       return new CellError(ErrorType.NA)
     }
-    if(ast.args.some((ast) => ast.type===AstNodeType.EMPTY)) {
+    if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
       return new CellError(ErrorType.NUM)
     }
 
@@ -186,7 +186,7 @@ export class DatePlugin extends FunctionPlugin {
     if (ast.args.length !== 1) {
       return new CellError(ErrorType.NA)
     }
-    if(ast.args.some((ast) => ast.type===AstNodeType.EMPTY)) {
+    if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
       return new CellError(ErrorType.NUM)
     }
 
@@ -214,7 +214,7 @@ export class DatePlugin extends FunctionPlugin {
     if (ast.args.length !== 1) {
       return new CellError(ErrorType.NA)
     }
-    if(ast.args.some((ast) => ast.type===AstNodeType.EMPTY)) {
+    if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
       return new CellError(ErrorType.NUM)
     }
 
@@ -242,7 +242,7 @@ export class DatePlugin extends FunctionPlugin {
     if (ast.args.length !== 2) {
       return new CellError(ErrorType.NA)
     }
-    if(ast.args.some((ast) => ast.type===AstNodeType.EMPTY)) {
+    if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
       return new CellError(ErrorType.NUM)
     }
 

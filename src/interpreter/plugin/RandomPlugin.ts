@@ -30,7 +30,7 @@ export class RandomPlugin extends FunctionPlugin {
       return new CellError(ErrorType.NA)
     }
 
-    if(ast.args.some((ast) => ast.type===AstNodeType.EMPTY)) {
+    if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
       return new CellError(ErrorType.NUM)
     }
     return Math.random()
