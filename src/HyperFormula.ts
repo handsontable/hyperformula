@@ -553,10 +553,6 @@ export class HyperFormula implements TypedEmitter {
    * @param {number} width - width of the box
    * @param {number} height - height of the box
    *
-   * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
-   * @throws [[InvalidAddressError]] when the given address is invalid
-   * @throws an error when there is a matrix inside selected cells
-   *
    * @category Cell
    */
   public isItPossibleToSetCellContents(topLeftCornerAddress: SimpleCellAddress, width: number = 1, height: number = 1): boolean {
