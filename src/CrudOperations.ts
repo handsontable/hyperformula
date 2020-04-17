@@ -20,6 +20,7 @@ import {
   NoOperationToUndoError,
   NoSheetWithIdError,
   NoSheetWithNameError,
+  NothingToPasteError,
   SheetSizeLimitExceededError
 } from './errors'
 import {Index} from './HyperFormula'
@@ -149,14 +150,15 @@ export class CrudOperations {
   }
 
   public paste(targetLeftCorner: SimpleCellAddress): void {
-    if (this.clipboardOperations.isCutClipboard()) {
-      const clipboard = this.clipboardOperations.clipboard!
+    const clipboard = this.clipboardOperations.clipboard
+    if (clipboard === undefined) {
+      throw new NothingToPasteError()
+    } else if (this.clipboardOperations.isCutClipboard()) {
       this.undoRedo.clearRedoStack()
       const { version, overwrittenCellsData } = this.operations.moveCells(clipboard.sourceLeftCorner, clipboard.width, clipboard.height, targetLeftCorner)
       this.clipboardOperations.abortCut()
       this.undoRedo.saveOperation(new MoveCellsUndoEntry(clipboard.sourceLeftCorner, clipboard.width, clipboard.height, targetLeftCorner, overwrittenCellsData, version))
     } else if (this.clipboardOperations.isCopyClipboard()) {
-      const clipboard = this.clipboardOperations.clipboard!
       this.clipboardOperations.ensureItIsPossibleToCopyPaste(targetLeftCorner)
       const targetRange = AbsoluteCellRange.spanFrom(targetLeftCorner, clipboard.width, clipboard.height)
       const oldContent = this.operations.getRangeClipboardCells(targetRange)

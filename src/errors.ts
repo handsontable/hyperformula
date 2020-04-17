@@ -102,6 +102,15 @@ export class NoOperationToRedoError extends Error {
   }
 }
 
+/**
+ * Error thrown when there is nothing to paste by the [[paste]] method.
+ */
+export class NothingToPasteError extends Error {
+  constructor() {
+    super('There is nothing to paste')
+  }
+}
+
 function replacer(key: any, val: any): any {
   switch (typeof val) {
     case 'function':
