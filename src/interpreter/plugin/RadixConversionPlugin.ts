@@ -5,7 +5,7 @@
 
 import {CellError, ErrorType, InternalCellValue, SimpleCellAddress} from '../../Cell'
 import {padLeft} from '../../format/format'
-import {ProcedureAst} from '../../parser'
+import {AstNodeType, ProcedureAst} from '../../parser'
 import {coerceScalarToString} from '../ArithmeticHelper'
 import {SimpleRangeValue} from '../InterpreterValue'
 import {FunctionPlugin} from './FunctionPlugin'
@@ -81,6 +81,9 @@ export class RadixConversionPlugin extends FunctionPlugin {
     if (ast.args.length < 2 || ast.args.length > 3) {
       return new CellError(ErrorType.NA)
     }
+    if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
+      return new CellError(ErrorType.NUM)
+    }
 
     const value = this.getNumericArgument(ast, formulaAddress, 0)
     if (value instanceof CellError) {
@@ -111,6 +114,9 @@ export class RadixConversionPlugin extends FunctionPlugin {
     if (ast.args.length !== 2) {
       return new CellError(ErrorType.NA)
     }
+    if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
+      return new CellError(ErrorType.NUM)
+    }
 
     const base = this.getNumericArgument(ast, formulaAddress, 1, MIN_BASE, MAX_BASE)
     if (base instanceof CellError) {
@@ -128,6 +134,9 @@ export class RadixConversionPlugin extends FunctionPlugin {
   private bin2base(ast: ProcedureAst, formulaAddress: SimpleCellAddress, base: number): InternalCellValue {
     if (ast.args.length < 1 || ast.args.length > 2) {
       return new CellError(ErrorType.NA)
+    }
+    if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
+      return new CellError(ErrorType.NUM)
     }
 
     const binaryWithSign = this.getFirstArgumentAsNumberInBase(ast, formulaAddress, 2, NUMBER_OF_BITS)
@@ -150,6 +159,9 @@ export class RadixConversionPlugin extends FunctionPlugin {
   private dec2base(ast: ProcedureAst, formulaAddress: SimpleCellAddress, base: number): InternalCellValue {
     if (ast.args.length < 1 || ast.args.length > 2) {
       return new CellError(ErrorType.NA)
+    }
+    if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
+      return new CellError(ErrorType.NUM)
     }
 
     let places

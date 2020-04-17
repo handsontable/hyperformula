@@ -4,7 +4,7 @@
  */
 
 import {CellError, ErrorType, InternalCellValue, SimpleCellAddress} from '../../Cell'
-import {ProcedureAst} from '../../parser'
+import {AstNodeType, ProcedureAst} from '../../parser'
 import {FunctionPlugin} from './FunctionPlugin'
 
 const PI = parseFloat(Math.PI.toFixed(14))
@@ -25,6 +25,9 @@ export class MathConstantsPlugin extends FunctionPlugin {
     if (ast.args.length > 0) {
       return new CellError(ErrorType.NA)
     }
+    if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
+      return new CellError(ErrorType.NUM)
+    }
     return PI
   }
 
@@ -32,6 +35,9 @@ export class MathConstantsPlugin extends FunctionPlugin {
   public e(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
     if (ast.args.length > 0) {
       return new CellError(ErrorType.NA)
+    }
+    if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
+      return new CellError(ErrorType.NUM)
     }
     return E
   }

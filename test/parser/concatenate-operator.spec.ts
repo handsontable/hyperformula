@@ -19,6 +19,6 @@ describe('Parser - Concatenate operators', () => {
 
     const ast = parser.parse('=CONCATENATE("="&A6,"foo")', simpleCellAddress(0, 0, 0)).ast as ProcedureAst
     expect(ast.type).toBe(AstNodeType.FUNCTION_CALL)
-    expect(ast.args[0].type).toBe(AstNodeType.CONCATENATE_OP)
+    expect(ast.args[0]!.type).toBe(AstNodeType.CONCATENATE_OP)
   })
 })

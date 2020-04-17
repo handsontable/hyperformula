@@ -4,6 +4,7 @@
  */
 
 import {CellError, ErrorType, SimpleCellAddress} from '../Cell'
+import {DependencyGraph} from '../DependencyGraph'
 import {
   Ast,
   AstNodeType,
@@ -14,7 +15,6 @@ import {
   ParserWithCaching,
 } from '../parser'
 import {ColumnRangeAst, RowRangeAst} from '../parser/Ast'
-import {DependencyGraph} from '../DependencyGraph'
 import {ColumnAddress} from '../parser/ColumnAddress'
 import {RowAddress} from '../parser/RowAddress'
 
@@ -57,6 +57,7 @@ export abstract class Transformer implements FormulaTransformer {
       case AstNodeType.ROW_RANGE: {
         return this.transformRowRangeAst(ast, address)
       }
+      case AstNodeType.EMPTY:
       case AstNodeType.ERROR:
       case AstNodeType.NUMBER:
       case AstNodeType.ERROR_WITH_RAW_INPUT:
