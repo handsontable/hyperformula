@@ -206,10 +206,10 @@ export class HyperFormula implements TypedEmitter {
   /**
    * Returns registered language from its code string.
    *
-   * @param {string} code - code string of the translation package, for example: 'enGB'
+   * @param {string} languageCode - code string of the translation package, for example: `'enGB'`
    */
-  public static getLanguage(code: string): TranslationPackage {
-    const val = this.registeredLanguages.get(code)
+  public static getLanguage(languageCode: string): TranslationPackage {
+    const val = this.registeredLanguages.get(languageCode)
     if(val === undefined) {
       throw new Error('Language not registered.')
     } else {
@@ -220,25 +220,26 @@ export class HyperFormula implements TypedEmitter {
   /**
    * Registers language from under given code string.
    *
-   * @param {string} code - code string of the translation package, for example: 'enGB'
-   * @param {RawTranslationPackage} lang - translation package to be registered
+   * @param {string} languageCode - code string of the translation package, for example: `'enGB'`
+   * @param {RawTranslationPackage} languagePackage - translation package to be registered
    */
-  public static registerLanguage(code: string, lang: RawTranslationPackage): void {
-    if(this.registeredLanguages.has(code)) {
+  public static registerLanguage(languageCode: string, languagePackage: RawTranslationPackage): void {
+    if(this.registeredLanguages.has(languageCode)) {
       throw new Error('Language already registered.')
     } else {
-      this.registeredLanguages.set(code, buildTranslationPackage(lang))
+      this.registeredLanguages.set(languageCode, buildTranslationPackage(languagePackage))
     }
   }
 
   /**
    * Unregisters language that is registered under given code string.
    *
-   * @param {string} code - code string of the translation package, for example: 'enGB'
+   * @param {string} languageCode - code string of the translation package, for example: `'enGB'`
+   * 
    */
-  public static unregisterLanguage(code: string): void {
-    if(this.registeredLanguages.has(code)) {
-      this.registeredLanguages.delete(code)
+  public static unregisterLanguage(languageCode: string): void {
+    if(this.registeredLanguages.has(languageCode)) {
+      this.registeredLanguages.delete(languageCode)
     } else {
       throw new Error('Language not registered.')
     }
