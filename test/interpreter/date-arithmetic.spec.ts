@@ -1,5 +1,4 @@
 import {HyperFormula} from '../../src'
-import '../testConfig'
 import {adr} from '../testUtils'
 
 describe('Date arithmetic', () => {

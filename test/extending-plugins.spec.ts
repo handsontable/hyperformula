@@ -1,7 +1,6 @@
 import {HyperFormula} from '../src'
 import {ErrorType} from '../src'
 import {FunctionPlugin, PluginFunctionType} from '../src/interpreter/plugin/FunctionPlugin'
-import './testConfig.ts'
 import {adr, detailedError} from './testUtils'
 
 class FooPlugin extends FunctionPlugin {
@@ -26,7 +25,7 @@ describe('Plugins', () => {
     expect(engine.getCellValue(adr('A1'))).toBe(42)
   })
 
-  it('cleanup - broken',  () => {
+  it('cleanup',  () => {
     const engine = HyperFormula.buildFromArray([
       ['=foo()'],
     ], {functionPlugins: [FooPlugin]})

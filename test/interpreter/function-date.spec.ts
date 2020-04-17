@@ -1,6 +1,5 @@
 import {EmptyValue, HyperFormula} from '../../src'
 import {ErrorType} from '../../src/Cell'
-import '../testConfig'
 import {Config} from '../../src/Config'
 import {adr, dateNumberToString, detailedError} from '../testUtils'
 

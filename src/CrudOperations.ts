@@ -28,19 +28,19 @@ import {ParserWithCaching} from './parser'
 import {RowsSpan} from './RowsSpan'
 import {Statistics} from './statistics'
 import {
-  AddColumnsUndoData,
-  AddRowsUndoData,
-  AddSheetUndoData,
-  ClearSheetUndoData,
-  MoveCellsUndoData,
-  MoveColumnsUndoData,
-  MoveRowsUndoData,
-  PasteUndoData,
-  RemoveColumnsUndoData,
-  RemoveRowsUndoData,
-  RemoveSheetUndoData,
-  SetCellContentsUndoData,
-  SetSheetContentUndoData,
+  AddColumnsUndoEntry,
+  AddRowsUndoEntry,
+  AddSheetUndoEntry,
+  ClearSheetUndoEntry,
+  MoveCellsUndoEntry,
+  MoveColumnsUndoEntry,
+  MoveRowsUndoEntry,
+  PasteUndoEntry,
+  RemoveColumnsUndoEntry,
+  RemoveRowsUndoEntry,
+  RemoveSheetUndoEntry,
+  SetCellContentsUndoEntry,
+  SetSheetContentUndoEntry,
   UndoRedo
 } from './UndoRedo'
 import {findBoundaries} from './Sheet'
@@ -69,7 +69,7 @@ export class CrudOperations {
   ) {
     this.operations = new Operations(this.dependencyGraph, this.columnSearch, this.cellContentParser, this.parser, this.stats, this.lazilyTransformingAstService, this.config)
     this.clipboardOperations = new ClipboardOperations(this.dependencyGraph, this.operations, this.parser, this.lazilyTransformingAstService, this.config)
-    this.undoRedo = new UndoRedo(this.operations)
+    this.undoRedo = new UndoRedo(this.config, this.operations)
   }
 
   public addRows(sheet: number, ...indexes: Index[]): void {
@@ -78,7 +78,7 @@ export class CrudOperations {
     this.undoRedo.clearRedoStack()
     this.clipboardOperations.abortCut()
     this.operations.addRows(addRowsCommand)
-    this.undoRedo.saveOperation(new AddRowsUndoData(addRowsCommand))
+    this.undoRedo.saveOperation(new AddRowsUndoEntry(addRowsCommand))
   }
 
   public removeRows(sheet: number, ...indexes: Index[]): void {
@@ -87,7 +87,7 @@ export class CrudOperations {
     this.undoRedo.clearRedoStack()
     this.clipboardOperations.abortCut()
     const rowsRemovals = this.operations.removeRows(removeRowsCommand)
-    this.undoRedo.saveOperation(new RemoveRowsUndoData(removeRowsCommand, rowsRemovals))
+    this.undoRedo.saveOperation(new RemoveRowsUndoEntry(removeRowsCommand, rowsRemovals))
   }
 
   public addColumns(sheet: number, ...indexes: Index[]): void {
@@ -96,7 +96,7 @@ export class CrudOperations {
     this.undoRedo.clearRedoStack()
     this.clipboardOperations.abortCut()
     this.operations.addColumns(addColumnsCommand)
-    this.undoRedo.saveOperation(new AddColumnsUndoData(addColumnsCommand))
+    this.undoRedo.saveOperation(new AddColumnsUndoEntry(addColumnsCommand))
   }
 
   public removeColumns(sheet: number, ...indexes: Index[]): void {
@@ -105,14 +105,14 @@ export class CrudOperations {
     this.undoRedo.clearRedoStack()
     this.clipboardOperations.abortCut()
     const columnsRemovals = this.operations.removeColumns(removeColumnsCommand)
-    this.undoRedo.saveOperation(new RemoveColumnsUndoData(removeColumnsCommand, columnsRemovals))
+    this.undoRedo.saveOperation(new RemoveColumnsUndoEntry(removeColumnsCommand, columnsRemovals))
   }
 
   public moveCells(sourceLeftCorner: SimpleCellAddress, width: number, height: number, destinationLeftCorner: SimpleCellAddress): void {
     this.undoRedo.clearRedoStack()
     this.clipboardOperations.abortCut()
     const { version, overwrittenCellsData } = this.operations.moveCells(sourceLeftCorner, width, height, destinationLeftCorner)
-    this.undoRedo.saveOperation(new MoveCellsUndoData(sourceLeftCorner, width, height, destinationLeftCorner, overwrittenCellsData, version))
+    this.undoRedo.saveOperation(new MoveCellsUndoEntry(sourceLeftCorner, width, height, destinationLeftCorner, overwrittenCellsData, version))
   }
 
   public moveRows(sheet: number, startRow: number, numberOfRows: number, targetRow: number): void {
@@ -120,21 +120,31 @@ export class CrudOperations {
     this.undoRedo.clearRedoStack()
     this.clipboardOperations.abortCut()
     this.operations.moveRows(sheet, startRow, numberOfRows, targetRow)
-    this.undoRedo.saveOperation(new MoveRowsUndoData(sheet, startRow, numberOfRows, targetRow))
+    this.undoRedo.saveOperation(new MoveRowsUndoEntry(sheet, startRow, numberOfRows, targetRow))
   }
 
   public moveColumns(sheet: number, startColumn: number, numberOfColumns: number, targetColumn: number): void {
     this.ensureItIsPossibleToMoveColumns(sheet, startColumn, numberOfColumns, targetColumn)
     this.undoRedo.clearRedoStack()
     this.operations.moveColumns(sheet, startColumn, numberOfColumns, targetColumn)
-    this.undoRedo.saveOperation(new MoveColumnsUndoData(sheet, startColumn, numberOfColumns, targetColumn))
+    this.undoRedo.saveOperation(new MoveColumnsUndoEntry(sheet, startColumn, numberOfColumns, targetColumn))
   }
 
   public cut(sourceLeftCorner: SimpleCellAddress, width: number, height: number): void {
     this.clipboardOperations.cut(sourceLeftCorner, width, height)
   }
 
+  public ensureItIsPossibleToCopy(sourceLeftCorner: SimpleCellAddress, width: number, height: number): void {
+    if (!isPositiveInteger(width)) {
+      throw new InvalidArgumentsError('width to be positive integer')
+    }
+    if (!isPositiveInteger(height)) {
+      throw new InvalidArgumentsError('height to be positive integer')
+    }
+  }
+
   public copy(sourceLeftCorner: SimpleCellAddress, width: number, height: number): void {
+    this.ensureItIsPossibleToCopy(sourceLeftCorner, width, height)
     this.clipboardOperations.copy(sourceLeftCorner, width, height)
   }
 
@@ -144,7 +154,7 @@ export class CrudOperations {
       this.undoRedo.clearRedoStack()
       const { version, overwrittenCellsData } = this.operations.moveCells(clipboard.sourceLeftCorner, clipboard.width, clipboard.height, targetLeftCorner)
       this.clipboardOperations.abortCut()
-      this.undoRedo.saveOperation(new MoveCellsUndoData(clipboard.sourceLeftCorner, clipboard.width, clipboard.height, targetLeftCorner, overwrittenCellsData, version))
+      this.undoRedo.saveOperation(new MoveCellsUndoEntry(clipboard.sourceLeftCorner, clipboard.width, clipboard.height, targetLeftCorner, overwrittenCellsData, version))
     } else if (this.clipboardOperations.isCopyClipboard()) {
       const clipboard = this.clipboardOperations.clipboard!
       this.clipboardOperations.ensureItIsPossibleToCopyPaste(targetLeftCorner)
@@ -155,7 +165,7 @@ export class CrudOperations {
       for (const [address, clipboardCell] of clipboard.getContent(targetLeftCorner)) {
         this.operations.restoreCell(address, clipboardCell)
       }
-      this.undoRedo.saveOperation(new PasteUndoData(targetLeftCorner, oldContent, clipboard.content!))
+      this.undoRedo.saveOperation(new PasteUndoEntry(targetLeftCorner, oldContent, clipboard.content!))
     }
   }
 
@@ -181,7 +191,7 @@ export class CrudOperations {
     }
     this.undoRedo.clearRedoStack()
     const addedSheetName = this.operations.addSheet(name)
-    this.undoRedo.saveOperation(new AddSheetUndoData(addedSheetName))
+    this.undoRedo.saveOperation(new AddSheetUndoEntry(addedSheetName))
     return addedSheetName
   }
 
@@ -193,7 +203,7 @@ export class CrudOperations {
     const originalName = this.sheetMapping.fetchDisplayName(sheetId)
     const oldSheetContent = this.operations.getSheetClipboardCells(sheetId)
     const version = this.operations.removeSheet(sheetName)
-    this.undoRedo.saveOperation(new RemoveSheetUndoData(originalName, sheetId, oldSheetContent, version))
+    this.undoRedo.saveOperation(new RemoveSheetUndoEntry(originalName, sheetId, oldSheetContent, version))
   }
 
   public clearSheet(sheetName: string): void {
@@ -203,7 +213,7 @@ export class CrudOperations {
     const sheetId = this.sheetMapping.fetch(sheetName)
     const oldSheetContent = this.operations.getSheetClipboardCells(sheetId)
     this.operations.clearSheet(sheetId)
-    this.undoRedo.saveOperation(new ClearSheetUndoData(sheetId, oldSheetContent))
+    this.undoRedo.saveOperation(new ClearSheetUndoEntry(sheetId, oldSheetContent))
   }
 
   public setCellContents(topLeftCornerAddress: SimpleCellAddress, cellContents: RawCellContent[][] | RawCellContent): void {
@@ -239,7 +249,7 @@ export class CrudOperations {
         modifiedCellContents.push({ address, newContent: cellContents[i][j], oldContent })
       }
     }
-    this.undoRedo.saveOperation(new SetCellContentsUndoData(modifiedCellContents))
+    this.undoRedo.saveOperation(new SetCellContentsUndoEntry(modifiedCellContents))
   }
 
   public setSheetContent(sheetName: string, values: RawCellContent[][]): void {
@@ -263,7 +273,7 @@ export class CrudOperations {
         this.operations.setCellContent(address, values[i][j])
       }
     }
-    this.undoRedo.saveOperation(new SetSheetContentUndoData(sheetId, oldSheetContent, values))
+    this.undoRedo.saveOperation(new SetSheetContentUndoEntry(sheetId, oldSheetContent, values))
   }
 
   public undo() {

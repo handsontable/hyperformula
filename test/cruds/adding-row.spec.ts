@@ -1,12 +1,10 @@
-import {EmptyValue, ExportedCellChange, HyperFormula} from '../../src'
+import {EmptyValue, ExportedCellChange, HyperFormula, SheetSizeLimitExceededError} from '../../src'
 import {AbsoluteCellRange} from '../../src/AbsoluteCellRange'
 import {simpleCellAddress} from '../../src/Cell'
 import {ColumnIndex} from '../../src/ColumnSearch/ColumnIndex'
 import {FormulaCellVertex, MatrixVertex} from '../../src/DependencyGraph'
-import '../testConfig'
 import {adr, expectArrayWithSameContent, extractMatrixRange} from '../testUtils'
 import {Config} from '../../src/Config'
-import {SheetSizeLimitExceededError} from '../../src/errors'
 
 describe('Adding row - checking if its possible', () => {
   it('no if starting row is negative', () => {

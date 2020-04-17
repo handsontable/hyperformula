@@ -198,4 +198,10 @@ describe('computeHashFromTokens', () => {
     const hash = computeFunc(formula, simpleCellAddress(0, 0, 0))
     expect(hash).toEqual('=SUM(#0R0, #1R0)')
   })
+
+  it('should not skip whitespaces when there is empty arg', () => {
+    const formula = '=PV(A1 ,2,3,   ,A2)'
+    const hash = computeFunc(formula, simpleCellAddress(0, 0, 0))
+    expect(hash).toEqual('=PV(#0R0,2,3,   ,#1R0)')
+  })
 })

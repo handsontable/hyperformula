@@ -8,7 +8,6 @@ import {
   coerceScalarToBoolean,
   coerceScalarToString
 } from '../../src/interpreter/ArithmeticHelper'
-import '../testConfig'
 import {adr, detailedError} from '../testUtils'
 import {NumberLiteralHelper} from '../../src/NumberLiteralHelper'
 

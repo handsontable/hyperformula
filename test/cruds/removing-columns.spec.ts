@@ -4,7 +4,6 @@ import {ColumnIndex} from '../../src/ColumnSearch/ColumnIndex'
 import {MatrixVertex, RangeVertex} from '../../src/DependencyGraph'
 import {CellAddress} from '../../src/parser'
 import {simpleCellAddress} from '../../src/Cell'
-import '../testConfig'
 import {
   adr,
   expectArrayWithSameContent,

@@ -1,5 +1,4 @@
 import {HyperFormula, ExportedNamedExpressionChange, EmptyValue} from '../src'
-import './testConfig'
 import {adr, detailedError} from './testUtils'
 import {ErrorType} from '../src/Cell'
 

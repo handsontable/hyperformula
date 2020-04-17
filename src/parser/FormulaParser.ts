@@ -3,7 +3,16 @@
  * Copyright (c) 2020 Handsoncode. All rights reserved.
  */
 
-import {EmbeddedActionsParser, ILexingResult, IOrAlt, IToken, Lexer, OrMethodOpts, tokenMatcher} from 'chevrotain'
+import {
+  EmbeddedActionsParser,
+  EMPTY_ALT,
+  ILexingResult,
+  IOrAlt,
+  IToken,
+  Lexer,
+  OrMethodOpts,
+  tokenMatcher
+} from 'chevrotain'
 
 import {CellError, ErrorType, simpleCellAddress, SimpleCellAddress} from '../Cell'
 import {Maybe} from '../Maybe'
@@ -22,6 +31,7 @@ import {
   buildColumnRangeAst,
   buildConcatenateOpAst,
   buildDivOpAst,
+  buildEmptyArgAst,
   buildEqualsOpAst,
   buildErrorWithRawInputAst,
   buildGreaterThanOpAst,
@@ -217,6 +227,13 @@ export class FormulaParser extends EmbeddedActionsParser {
     return lhs
   })
 
+  private booleanExpressionOrEmpty: AstRule = this.RULE('booleanExpressionOrEmpty', () => {
+    return this.OR([
+      {ALT: () => this.SUBRULE(this.booleanExpression)},
+      {ALT: EMPTY_ALT(buildEmptyArgAst())}
+    ])
+  })
+
   /**
    * Rule for concatenation operator expression (e.g. "=" & A1)
    */
@@ -402,12 +419,23 @@ export class FormulaParser extends EmbeddedActionsParser {
     const procedureName = procedureNameToken.image.toUpperCase().slice(0, -1)
     const canonicalProcedureName = this.lexerConfig.functionMapping[procedureName] ?? procedureName
     const args: Ast[] = []
-    this.MANY_SEP({
-      SEP: this.lexerConfig.ArgSeparator,
-      DEF: () => {
-        args.push(this.SUBRULE(this.booleanExpression))
-      },
+
+    let argument = this.SUBRULE(this.booleanExpressionOrEmpty)
+    this.MANY(() => {
+      const separator = this.CONSUME(this.lexerConfig.ArgSeparator) as IExtendedToken
+      if (argument.type === AstNodeType.EMPTY) {
+        argument.leadingWhitespace = separator.leadingWhitespace?.image
+      }
+      args.push(argument)
+      argument = this.SUBRULE2(this.booleanExpressionOrEmpty)
     })
+
+    args.push(argument)
+
+    if (args.length === 1 && args[0].type === AstNodeType.EMPTY) {
+      args.length = 0
+    }
+
     const rParenToken = this.CONSUME(RParen) as IExtendedToken
     return buildProcedureAst(canonicalProcedureName, args, procedureNameToken.leadingWhitespace, rParenToken.leadingWhitespace)
   })
@@ -617,7 +645,6 @@ export class FormulaParser extends EmbeddedActionsParser {
     ])
   })
 
-
   /**
    * Rule for end range reference expression with additional checks considering range start
    */
@@ -826,50 +853,56 @@ export class FormulaLexer {
    * @param text - string representation of a formula
    */
   public tokenizeFormula(text: string): ILexingResult {
-    const tokens = this.lexer.tokenize(text)
-    this.skipWhitespacesInsideRanges(tokens)
-    this.skipWhitespacesBeforeArgSeparators(tokens)
-    this.trimTrailingWhitespaces(tokens)
-    return tokens
+    const lexingResult = this.lexer.tokenize(text)
+    let tokens = lexingResult.tokens
+    tokens = this.trimTrailingWhitespaces(tokens)
+    tokens = this.skipWhitespacesInsideRanges(tokens)
+    tokens = this.skipWhitespacesBeforeArgSeparators(tokens)
+    lexingResult.tokens = tokens
+
+    return lexingResult
   }
 
-  private skipWhitespacesInsideRanges(lexingResult: ILexingResult): void {
-    const tokens = lexingResult.tokens
+  private skipWhitespacesInsideRanges(tokens: IToken[]): IToken[] {
+    return this.filterTokensByNeighbors(tokens, (previous: IToken, current: IToken, next: IToken) => {
+      return (tokenMatcher(previous, CellReference) || tokenMatcher(previous, RangeSeparator))
+        && tokenMatcher(current, WhiteSpace)
+        && (tokenMatcher(next, CellReference) || tokenMatcher(next, RangeSeparator))
+    })
+  }
+
+  private skipWhitespacesBeforeArgSeparators(tokens: IToken[]): IToken[] {
+    return this.filterTokensByNeighbors(tokens, (previous: IToken, current: IToken, next: IToken) => {
+      return !tokenMatcher(previous, this.lexerConfig.ArgSeparator)
+        && tokenMatcher(current, WhiteSpace)
+        && tokenMatcher(next, this.lexerConfig.ArgSeparator)
+    })
+  }
+
+  private filterTokensByNeighbors(tokens: IToken[], shouldBeSkipped: (previous: IToken, current: IToken, next: IToken) => boolean): IToken[] {
     if (tokens.length < 3) {
-      return
+      return tokens
     }
 
     let i = 0
-    while (i < tokens.length - 2) {
-      if ((tokenMatcher(tokens[i], CellReference) || tokenMatcher(tokens[i], RangeSeparator))
-        && tokenMatcher(tokens[i + 1], WhiteSpace)
-        && (tokenMatcher(tokens[i + 2], CellReference) || tokenMatcher(tokens[i + 2], RangeSeparator))) {
-        tokens.splice(i + 1, 1)
+    const filteredTokens: IToken[] = [tokens[i++]]
+
+    while (i < tokens.length - 1) {
+      if (!shouldBeSkipped(tokens[i - 1], tokens[i], tokens[i + 1])) {
+        filteredTokens.push(tokens[i])
       }
       ++i
     }
+
+    filteredTokens.push(tokens[i])
+
+    return filteredTokens
   }
 
-  private skipWhitespacesBeforeArgSeparators(lexingResult: ILexingResult): void {
-    const tokens = lexingResult.tokens
-    if (tokens.length < 2) {
-      return
-    }
-
-    let i = 0
-    while (i < tokens.length - 2) {
-      if (tokenMatcher(tokens[i], WhiteSpace) && tokenMatcher(tokens[i + 1], this.lexerConfig.ArgSeparator)) {
-        tokens.splice(i, 1)
-      } else {
-        ++i
-      }
-    }
-  }
-
-  private trimTrailingWhitespaces(lexingResult: ILexingResult): void {
-    const tokens = lexingResult.tokens
+  private trimTrailingWhitespaces(tokens: IToken[]): IToken[] {
     if (tokens.length > 0 && tokenMatcher(tokens[tokens.length - 1], WhiteSpace)) {
       tokens.pop()
     }
+    return tokens
   }
 }

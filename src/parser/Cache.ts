@@ -3,8 +3,8 @@
  * Copyright (c) 2020 Handsoncode. All rights reserved.
  */
 
-import {collectDependencies, RelativeDependency} from './'
-import {Ast, AstNodeType} from './Ast'
+import {AstNodeType, collectDependencies, RelativeDependency} from './'
+import {Ast} from './Ast'
 
 export interface CacheEntry {
   ast: Ast,
@@ -52,6 +52,7 @@ export class Cache {
 
 export const doesContainFunctions = (ast: Ast, interestingFunctions: Set<string>): boolean => {
   switch (ast.type) {
+    case AstNodeType.EMPTY:
     case AstNodeType.NUMBER:
     case AstNodeType.STRING:
     case AstNodeType.ERROR:
@@ -85,7 +86,9 @@ export const doesContainFunctions = (ast: Ast, interestingFunctions: Set<string>
       if (interestingFunctions.has(ast.procedureName)) {
         return true
       }
-      return ast.args.some((arg) => doesContainFunctions(arg, interestingFunctions))
+      return ast.args.some((arg) =>
+        doesContainFunctions(arg, interestingFunctions)
+      )
     }
   }
 }

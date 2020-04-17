@@ -51,7 +51,7 @@ export const expectReferenceToHaveRefError = (engine: HyperFormula, address: Sim
 
 export const expectFunctionToHaveRefError = (engine: HyperFormula, address: SimpleCellAddress) => {
   const formula = (engine.addressMapping.fetchCell(address) as FormulaCellVertex).getFormula(engine.lazilyTransformingAstService) as ProcedureAst
-  expect(formula.args.find((arg) => arg.type === AstNodeType.ERROR)).toEqual(buildCellErrorAst(new CellError(ErrorType.REF)))
+  expect(formula.args.find((arg) => arg!==undefined && arg.type === AstNodeType.ERROR)).toEqual(buildCellErrorAst(new CellError(ErrorType.REF)))
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

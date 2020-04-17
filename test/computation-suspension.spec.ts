@@ -1,7 +1,6 @@
 import {HyperFormula, EvaluationSuspendedError, ExportedCellChange} from '../src'
 import { AbsoluteCellRange } from '../src/AbsoluteCellRange'
 import { CellType } from '../src/Cell'
-import './testConfig'
 import {adr} from './testUtils'
 
 describe('Evaluation suspension', () => {
