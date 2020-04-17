@@ -27,6 +27,7 @@ import {
 import {InterpreterValue, SimpleRangeValue} from './InterpreterValue'
 import {concatenate} from './text'
 import {NumberLiteralHelper} from '../NumberLiteralHelper'
+import {FunctionPluginDefinition} from './plugin/FunctionPlugin'
 
 export class Interpreter {
   private gpu?: GPU.GPU
@@ -41,7 +42,7 @@ export class Interpreter {
     public readonly dateHelper: DateTimeHelper,
     public readonly numberLiteralsHelper: NumberLiteralHelper,
   ) {
-    this.registerPlugins(this.config.allFunctionPlugins())
+    this.registerPlugins(this.config.functionPlugins())
     this.arithmeticHelper = new ArithmeticHelper(config, dateHelper, numberLiteralsHelper)
   }
 
@@ -251,7 +252,7 @@ export class Interpreter {
    *
    * @param plugins - list of plugin modules
    */
-  private registerPlugins(plugins: any[]) {
+  private registerPlugins(plugins: FunctionPluginDefinition[]) {
     for (const pluginClass of plugins) {
       const pluginInstance = new pluginClass(this)
       Object.keys(pluginClass.implementedFunctions).forEach((pluginFunction) => {

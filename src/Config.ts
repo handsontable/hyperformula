@@ -47,6 +47,7 @@ import {VlookupPlugin} from './interpreter/plugin/VlookupPlugin'
 import {Maybe} from './Maybe'
 import {ParserConfig} from './parser/ParserConfig'
 import {LicenseKeyValidityState, checkLicenseKeyValidity} from './helpers/licenseKeyValidator'
+import {FunctionPlugin, FunctionPluginDefinition} from './interpreter/plugin/FunctionPlugin'
 
 type GPUMode = 'gpu' | 'cpu' | 'dev'
 
@@ -372,7 +373,7 @@ export class Config implements ConfigParams, ParserConfig {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  private static defaultPlugins: any[] = [
+  private static defaultPlugins: FunctionPluginDefinition[] = [
     SumifPlugin,
     TextPlugin,
     NumericAggregationPlugin,
@@ -431,7 +432,7 @@ export class Config implements ConfigParams, ParserConfig {
   public readonly licenseKey: string
   /** @inheritDoc */
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  public readonly functionPlugins: any[]
+  public readonly functionPlugins: FunctionPluginDefinition[]
   /** @inheritDoc */
   public readonly gpuMode: GPUMode
   /** @inheritDoc */
@@ -586,8 +587,8 @@ export class Config implements ConfigParams, ParserConfig {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  public allFunctionPlugins(): any[] {
-    return [...Config.defaultPlugins, ...this.functionPlugins]
+  public allFunctionPlugins(): FunctionPluginDefinition[] {
+    return Config.defaultPlugins
   }
 
   public volatileFunctions(): Set<string> {

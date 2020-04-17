@@ -20,6 +20,11 @@ interface IImplementedFunctions {
   },
 }
 
+export interface FunctionPluginDefinition {
+  new (interpreter: Interpreter): FunctionPlugin,
+  implementedFunctions: IImplementedFunctions,
+}
+
 export type PluginFunctionType = (ast: ProcedureAst, formulaAddress: SimpleCellAddress) => InternalCellValue
 
 /**
@@ -37,7 +42,7 @@ export abstract class FunctionPlugin {
   protected readonly columnSearch: ColumnSearchStrategy
   protected readonly config: Config
 
-  protected constructor(interpreter: Interpreter) {
+  constructor(interpreter: Interpreter) {
     this.interpreter = interpreter
     this.dependencyGraph = interpreter.dependencyGraph
     this.columnSearch = interpreter.columnSearch

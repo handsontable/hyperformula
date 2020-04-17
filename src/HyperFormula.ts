@@ -47,6 +47,7 @@ import {Emitter, Events, Listeners, TypedEmitter} from './Emitter'
 import {BuildEngineFactory, EngineState} from './BuildEngineFactory'
 import {Sheet, Sheets} from './Sheet'
 import {SheetDimensions} from './_types'
+import {FunctionPluginDefinition} from './interpreter/plugin/FunctionPlugin'
 
 export type Index = [number, number]
 
@@ -262,6 +263,10 @@ export class HyperFormula implements TypedEmitter {
    */
   public static buildEmpty(configInput?: Partial<ConfigParams>): HyperFormula {
     return this.buildFromEngineState(BuildEngineFactory.buildEmpty(configInput))
+  }
+
+  public static registerFunctionPlugin(plugin: FunctionPluginDefinition): void {
+    Config.registerFunctionPlugin(plugin: FunctionPluginDefinition)
   }
 
   private readonly _emitter: Emitter = new Emitter()
