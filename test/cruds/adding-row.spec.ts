@@ -73,7 +73,7 @@ describe('Adding row - checking if its possible', () => {
     expect(engine.isItPossibleToAddRows(0, [4, 1])).toEqual(true)
   })
 
-  it('no if adding column would exceed sheet size limit', () => {
+  it('no if adding row would exceed sheet size limit', () => {
     const engine = HyperFormula.buildFromArray(
       Array(Config.defaultConfig.maxRows - 1).fill([''])
     )
