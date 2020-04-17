@@ -79,7 +79,7 @@ export class ArithmeticHelper {
     }
   }
 
-  public normalizeAccents(str: string): string {
+  private normalizeAccents(str: string): string {
     if(this.config.accentSensitive) {
       return str
     } else {

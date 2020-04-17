@@ -103,14 +103,25 @@ export class VlookupPlugin extends FunctionPlugin {
 
       return rowIndex - searchedRange.start.row + 1
     } else {
-      const valuesInRange = this.computeListOfValuesInRange(searchedRange)
-      const columnIndex = valuesInRange.indexOf(key)
-
+      //const valuesInRange = this.computeListOfValuesInRange(searchedRange)
+      //const columnIndex = valuesInRange.indexOf(key)
+      const columnIndex = this.searchInRange(key, searchedRange, false)
       if (columnIndex === -1) {
         return new CellError(ErrorType.NA)
       }
 
-      return columnIndex + 1
+      return (columnIndex-searchedRange.start.row) + 1
+    }
+  }
+
+  private searchInRange(key: any, range: AbsoluteCellRange, sorted: boolean): number {
+    if(typeof key === 'string' && this.interpreter.arithmeticHelper.requiresRegex(key)) {
+      return this.columnSearch.advancedFind(
+        this.interpreter.arithmeticHelper.eqMatcherFunction(key),
+        range
+      )
+    } else {
+      return this.columnSearch.find(key, range, sorted)
     }
   }
 
@@ -118,15 +129,7 @@ export class VlookupPlugin extends FunctionPlugin {
     this.dependencyGraph.stats.start(StatType.VLOOKUP)
 
     const searchedRange = AbsoluteCellRange.spanFrom(range.start, 1, range.height())
-    let rowIndex
-    if(typeof key === 'string' && this.interpreter.arithmeticHelper.requiresRegex(key)) {
-      rowIndex = this.columnSearch.advancedFind(
-        this.interpreter.arithmeticHelper.eqMatcherFunction(key),
-        searchedRange
-      )
-    } else {
-      rowIndex = this.columnSearch.find(key, searchedRange, sorted)
-    }
+    const rowIndex = this.searchInRange(key, searchedRange, sorted)
 
     this.dependencyGraph.stats.end(StatType.VLOOKUP)
 
