@@ -1142,7 +1142,8 @@ export class HyperFormula implements TypedEmitter {
    */
   public isItPossibleToReplaceSheetContent(sheetName: string, values: RawCellContent[][]): boolean {
     try {
-      const sheetId = this._crudOperations.ensureSheetExists(sheetName)
+      this._crudOperations.ensureSheetExists(sheetName)
+      const sheetId = this.sheetMapping.fetch(sheetName)
       this._crudOperations.ensureItIsPossibleToChangeSheetContents(sheetId, values)
       return true
     } catch (e) {

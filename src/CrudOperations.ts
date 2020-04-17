@@ -243,7 +243,8 @@ export class CrudOperations {
   }
 
   public setSheetContent(sheetName: string, values: RawCellContent[][]): void {
-    const sheetId = this.ensureSheetExists(sheetName)
+    this.ensureSheetExists(sheetName)
+    const sheetId = this.sheetMapping.fetch(sheetName)
     this.ensureItIsPossibleToChangeSheetContents(sheetId, values)
 
     this.undoRedo.clearRedoStack()
@@ -474,12 +475,10 @@ export class CrudOperations {
     return this.operations.getAndClearContentChanges()
   }
 
-  public ensureSheetExists(sheetName: string): number {
-    const sheetId = this.sheetMapping.get(sheetName)
-    if (sheetId === undefined) {
+  public ensureSheetExists(sheetName: string): void {
+    if (!this.sheetMapping.hasSheetWithName(sheetName)) {
       throw new NoSheetWithNameError(sheetName)
     }
-    return sheetId
   }
 
   private get addressMapping(): AddressMapping {
