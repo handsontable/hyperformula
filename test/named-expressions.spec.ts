@@ -121,7 +121,7 @@ describe('Named expressions', () => {
   it('retrieving non-existing named expression', () => {
     const engine = HyperFormula.buildEmpty()
 
-    expect(engine.getNamedExpressionValue('nonExistentNameExpression')).toBe(null)
+    expect(engine.getNamedExpressionValue('nonExistentNameExpression')).toBe(undefined)
   })
 
   it('removing named expression', () => {
@@ -132,7 +132,7 @@ describe('Named expressions', () => {
 
     engine.removeNamedExpression('myName')
 
-    expect(engine.getNamedExpressionValue('myName')).toBe(null)
+    expect(engine.getNamedExpressionValue('myName')).toBe(undefined)
     expect(engine.setCellContents(adr('A1'), '43').length).toBe(1)
   })
 

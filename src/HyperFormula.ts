@@ -1415,16 +1415,16 @@ export class HyperFormula implements TypedEmitter {
 
   /**
    * Gets specified named expression value.
-   * Returns a [[CellValue]] or null if the given named expression does not exists
+   * Returns a [[CellValue]] or undefined if the given named expression does not exists
    *
    * @param {string} expressionName - expression name, case insensitive.
    *
    * @category Named Expression
    */
-  public getNamedExpressionValue(expressionName: string): CellValue | null {
+  public getNamedExpressionValue(expressionName: string): Maybe<CellValue> {
     const namedExpressionValue = this._namedExpressions.getNamedExpressionValue(expressionName)
     if (namedExpressionValue === null) {
-      return null
+      return undefined
     } else {
       return this._exporter.exportValue(namedExpressionValue)
     }
