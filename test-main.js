@@ -1,9 +1,8 @@
-window.jest = {
-  spyOn: spyOn,
-  fn: jasmine.createSpy,
-};
-window.expect['arrayContaining'] = jasmine.arrayContaining;
+import sinon from 'sinon';
 
+window['expect']['arrayContaining'] = jasmine.arrayContaining;
+
+// We have to add missing matchers into Jasmine
 beforeAll(() => {
   jasmine.addMatchers({
     toContainEqual: function(util) {
@@ -42,8 +41,13 @@ beforeAll(() => {
   });
 });
 
-// require all modules ending in "_test" from the
-// current directory and all subdirectories
+// We have to restore all spies after each spec
+afterEach(() => {
+  sinon.restore();
+});
+
+// require all modules ending in ".spec.js" from the
+// './lib/test' directory and all subdirectories
 const testsContext = require.context('./lib/test', true, /.spec.js$/);
  
 testsContext.keys().forEach(testsContext);

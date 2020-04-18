@@ -1,3 +1,4 @@
+import sinon from 'sinon'
 import {EmptyValue, ExportedCellChange, HyperFormula, InvalidAddressError, NoSheetWithIdError} from '../../src'
 import {ErrorType, simpleCellAddress} from '../../src/Cell'
 import {ColumnIndex} from '../../src/ColumnSearch/ColumnIndex'
@@ -168,15 +169,15 @@ describe('changing cell content', () => {
     const engine = HyperFormula.buildFromArray(sheet)
     const b1 = engine.addressMapping.getCell(adr('B1'))
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const b1setCellValueSpy = jest.spyOn(b1 as any, 'setCellValue')
+    const b1setCellValueSpy = sinon.spy(b1 as any, 'setCellValue')
     const c1 = engine.addressMapping.getCell(adr('C1'))
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const c1setCellValueSpy = jest.spyOn(c1 as any, 'setCellValue')
+    const c1setCellValueSpy = sinon.spy(c1 as any, 'setCellValue')
 
     engine.setCellContents(adr('B1'), [['2']])
 
-    expect(b1setCellValueSpy).not.toHaveBeenCalled()
-    expect(c1setCellValueSpy).not.toHaveBeenCalled()
+    expect(b1setCellValueSpy.notCalled).toBe(true)
+    expect(c1setCellValueSpy.notCalled).toBe(true)
   })
 
   it('update value cell to empty', () => {
@@ -389,13 +390,13 @@ describe('changing cell content', () => {
     const a2 = engine.addressMapping.getCell(adr('A2'))
     const b2 = engine.addressMapping.getCell(adr('B2'))
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const a2setCellValueSpy = jest.spyOn(a2 as any, 'setCellValue')
+    const a2setCellValueSpy = sinon.spy(a2 as any, 'setCellValue')
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const b2setCellValueSpy = jest.spyOn(b2 as any, 'setCellValue')
+    const b2setCellValueSpy = sinon.spy(b2 as any, 'setCellValue')
 
     engine.setCellContents(adr('A1'), '3')
-    expect(a2setCellValueSpy).toHaveBeenCalled()
-    expect(b2setCellValueSpy).not.toHaveBeenCalled()
+    expect(a2setCellValueSpy.called).toBe(true)
+    expect(b2setCellValueSpy.notCalled).toBe(true)
   })
 
   it('should not be possible to edit part of a Matrix', () => {
@@ -441,10 +442,10 @@ describe('changing cell content', () => {
     engine.setCellContents(adr('C1'), '=COLUMNS(A1:B1)')
     const c1 = engine.addressMapping.getCell(adr('C1'))
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const c1setCellValueSpy = jest.spyOn(c1 as any, 'setCellValue')
+    const c1setCellValueSpy = sinon.spy(c1 as any, 'setCellValue')
     engine.removeRows(0, [1, 1])
 
-    expect(c1setCellValueSpy).toHaveBeenCalled()
+    expect(c1setCellValueSpy.called).toBe(true)
   })
 
   it('returns cell value change', () => {
@@ -599,7 +600,7 @@ describe('change multiple cells contents', () => {
     ]
     const engine = HyperFormula.buildFromArray(sheet)
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const evaluatorCallSpy = jest.spyOn(engine.evaluator as any, 'partialRun')
+    const evaluatorCallSpy = sinon.spy(engine.evaluator as any, 'partialRun')
 
     engine.setCellContents(adr('B1'), [
       ['12', '13'],
@@ -607,7 +608,7 @@ describe('change multiple cells contents', () => {
       ['18', '19'],
     ])
 
-    expect(evaluatorCallSpy).toHaveBeenCalledTimes(1)
+    expect(evaluatorCallSpy.calledOnce).toBe(true)
   })
 
   it('it not possible to change matrices', () => {

@@ -1,3 +1,4 @@
+import sinon from 'sinon'
 import {HyperFormula, ExportedCellChange} from '../../src'
 import {simpleCellAddress} from '../../src/Cell'
 import {AbsoluteCellRange} from '../../src/AbsoluteCellRange'
@@ -517,14 +518,14 @@ describe('Removing rows - reevaluation', () => {
     const b1 = engine.addressMapping.getCell(adr('B1'))
     const c1 = engine.addressMapping.getCell(adr('C1'))
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const b1setCellValueSpy = jest.spyOn(b1 as any, 'setCellValue')
+    const b1setCellValueSpy = sinon.spy(b1 as any, 'setCellValue')
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const c1setCellValueSpy = jest.spyOn(c1 as any, 'setCellValue')
+    const c1setCellValueSpy = sinon.spy(c1 as any, 'setCellValue')
 
     engine.removeRows(0, [1, 1])
 
-    expect(b1setCellValueSpy).toHaveBeenCalled()
-    expect(c1setCellValueSpy).not.toHaveBeenCalled()
+    expect(b1setCellValueSpy.called).toBe(true)
+    expect(c1setCellValueSpy.notCalled).toBe(true)
   })
 
   it('reevaluates cells which are dependent on structure changes', () => {
@@ -534,11 +535,11 @@ describe('Removing rows - reevaluation', () => {
     ])
     const c1 = engine.addressMapping.getCell(adr('C1'))
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const c1setCellValueSpy = jest.spyOn(c1 as any, 'setCellValue')
+    const c1setCellValueSpy = sinon.spy(c1 as any, 'setCellValue')
 
     engine.removeRows(0, [1, 1])
 
-    expect(c1setCellValueSpy).toHaveBeenCalled()
+    expect(c1setCellValueSpy.called).toBe(true)
   })
 
   it('should reevaluate formula when range reduced to zero', () => {
@@ -550,11 +551,11 @@ describe('Removing rows - reevaluation', () => {
 
     const a3 = engine.addressMapping.getCell(adr('A3'))
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const a3setCellValueSpy = jest.spyOn(a3 as any, 'setCellValue')
+    const a3setCellValueSpy = sinon.spy(a3 as any, 'setCellValue')
 
     engine.removeRows(0, [0, 2])
 
-    expect(a3setCellValueSpy).toHaveBeenCalled()
+    expect(a3setCellValueSpy.called).toBe(true)
     expectFunctionToHaveRefError(engine, adr('A1'))
   })
 })
@@ -794,11 +795,11 @@ describe('Removing rows - sheet dimensions', () => {
     ])
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const recalcSpy = jest.spyOn(engine.evaluator as any, 'partialRun')
+    const recalcSpy = sinon.spy(engine.evaluator as any, 'partialRun')
     engine.removeRows(0, [1, 1])
     engine.removeRows(0, [10, 6])
 
-    expect(recalcSpy).not.toHaveBeenCalled()
+    expect(recalcSpy.notCalled).toBe(true)
     expect(engine.getSheetDimensions(0)).toEqual({
       width: 1,
       height: 1,

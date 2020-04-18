@@ -1,3 +1,4 @@
+import sinon from 'sinon'
 import {Graph} from '../src/DependencyGraph'
 import {DummyGetDependenciesQuery} from './DummyGetDependenciesQuery'
 
@@ -259,12 +260,12 @@ describe('Graph#getTopologicallySortedSubgraphFrom', () => {
     graph.addNode(node0)
     graph.addNode(node1)
 
-    const fn = jest.fn(() => true)
-    const fn2 = jest.fn( () => {})
+    const fn = sinon.fake.returns(true)
+    const fn2 = sinon.fake()
     graph.getTopSortedWithSccSubgraphFrom([node0], fn, fn2)
 
-    expect(fn).toHaveBeenCalledTimes(1)
-    expect(fn).toHaveBeenCalledWith(node0)
+    expect(fn.calledOnce).toBe(true)
+    expect(fn.calledOnceWith(node0)).toBe(true)
   })
 
   it('case with obvious edge', () => {
@@ -275,13 +276,13 @@ describe('Graph#getTopologicallySortedSubgraphFrom', () => {
     graph.addNode(node1)
     graph.addEdge(node0, node1)
 
-    const fn = jest.fn(() => true)
-    const fn2 = jest.fn( () => {})
+    const fn = sinon.fake.returns(true)
+    const fn2 = sinon.fake()
     graph.getTopSortedWithSccSubgraphFrom([node0], fn, fn2)
 
-    expect(fn).toHaveBeenCalledTimes(2)
-    expect(fn).toHaveBeenNthCalledWith(1, node0)
-    expect(fn).toHaveBeenNthCalledWith(2, node1)
+    expect(fn.calledTwice).toBe(true)
+    expect(fn.getCall(0).calledWithExactly(node0)).toBe(true)
+    expect(fn.getCall(1).calledWithExactly(node1)).toBe(true)
   })
 
   it('it doesnt call other if didnt change', () => {
@@ -292,12 +293,12 @@ describe('Graph#getTopologicallySortedSubgraphFrom', () => {
     graph.addNode(node1)
     graph.addEdge(node0, node1)
 
-    const fn = jest.fn(() => false)
-    const fn2 = jest.fn( () => {})
+    const fn = sinon.fake.returns(false)
+    const fn2 = sinon.fake()
     graph.getTopSortedWithSccSubgraphFrom([node0], fn, fn2)
 
-    expect(fn).toHaveBeenCalledTimes(1)
-    expect(fn).toHaveBeenNthCalledWith(1, node0)
+    expect(fn.calledOnce).toBe(true)
+    expect(fn.getCall(0).calledWithExactly(node0)).toBe(true)
   })
 
   it('does call if some previous vertex marked as changed', () => {
@@ -307,12 +308,12 @@ describe('Graph#getTopologicallySortedSubgraphFrom', () => {
     graph.addEdge(nodes[0], nodes[2])
     graph.addEdge(nodes[1], nodes[2])
 
-    const fn = jest.fn((node: string) => node === nodes[0])
-    const fn2 = jest.fn( () => {})
+    const fn = sinon.fake((node: string) => node === nodes[0])
+    const fn2 = sinon.fake()
     graph.getTopSortedWithSccSubgraphFrom([nodes[0], nodes[1]], fn, fn2)
 
-    expect(fn).toHaveBeenCalledTimes(3)
-    expect(fn).toHaveBeenLastCalledWith(nodes[2])
+    expect(fn.calledThrice).toBe(true)
+    expect(fn.getCall(2).calledWithExactly(nodes[2])).toBe(true)
   })
 
   it('returns cycled vertices', () => {
@@ -324,11 +325,11 @@ describe('Graph#getTopologicallySortedSubgraphFrom', () => {
     graph.addEdge(nodes[2], nodes[3])
     graph.addEdge(nodes[3], nodes[1])
 
-    const fn = jest.fn(() => true)
-    const fn2 = jest.fn( () => {})
+    const fn = sinon.fake.returns(true)
+    const fn2 = sinon.fake()
     const cycled = graph.getTopSortedWithSccSubgraphFrom([nodes[0]], fn, fn2).cycled
 
-    expect(fn).toHaveBeenCalledTimes(1)
+    expect(fn.calledOnce).toBe(true)
     expect(cycled).toEqual(['c0', 'c1', 'c2'])
   })
 
@@ -340,11 +341,11 @@ describe('Graph#getTopologicallySortedSubgraphFrom', () => {
     graph.addEdge(nodes[1], nodes[2])
     graph.addEdge(nodes[2], nodes[0])
 
-    const fn = jest.fn(() => true)
-    const fn2 = jest.fn( () => {})
+    const fn = sinon.fake.returns(true)
+    const fn2 = sinon.fake()
     const cycled = graph.getTopSortedWithSccSubgraphFrom([nodes[0]], fn, fn2).cycled
 
-    expect(fn).toHaveBeenCalledTimes(0)
+    expect(fn.notCalled).toBe(true)
     expect(cycled).toEqual(['c0', 'c1', 'c2'])
   })
 
@@ -357,11 +358,11 @@ describe('Graph#getTopologicallySortedSubgraphFrom', () => {
     graph.addEdge(nodes[2], nodes[3])
     graph.addEdge(nodes[3], nodes[1])
 
-    const fn = jest.fn(() => false)
-    const fn2 = jest.fn( () => {})
+    const fn = sinon.fake.returns(false)
+    const fn2 = sinon.fake()
     const cycled = graph.getTopSortedWithSccSubgraphFrom([nodes[0]], fn, fn2).cycled
 
-    expect(fn).toHaveBeenCalledTimes(1)
+    expect(fn.calledOnce).toBe(true)
     expect(cycled).toEqual(['c0', 'c1', 'c2'])
   })
 })

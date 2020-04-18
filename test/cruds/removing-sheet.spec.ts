@@ -1,3 +1,4 @@
+import sinon from 'sinon'
 import {HyperFormula, ExportedCellChange} from '../../src'
 import {AbsoluteCellRange} from '../../src/AbsoluteCellRange'
 import {ErrorType, simpleCellAddress} from '../../src/Cell'
@@ -295,11 +296,11 @@ describe('remove sheet - adjust column index', () => {
       ['1'],
     ], { useColumnIndex: true })
     const index = engine.columnSearch as ColumnIndex
-    const removeSheetSpy = jest.spyOn(index, 'removeSheet')
+    const removeSheetSpy = sinon.spy(index, 'removeSheet')
 
     engine.removeSheet('Sheet1')
 
-    expect(removeSheetSpy).toHaveBeenCalled()
+    expect(removeSheetSpy.called).toBe(true)
     expectArrayWithSameContent([], index.getValueIndex(0, 0, 1).index)
   })
 })

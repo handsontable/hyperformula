@@ -1,3 +1,4 @@
+import sinon from 'sinon'
 import {HyperFormula} from '../src'
 import {Config} from '../src/Config'
 import {AlwaysSparse} from '../src/DependencyGraph/AddressMapping/ChooseAddressMappingPolicy'
@@ -16,4 +17,8 @@ beforeEach(() => {
   unregisterAllLanguages()
   const defaultLanguage = Config.defaultConfig.language
   HyperFormula.registerLanguage(defaultLanguage, languages[defaultLanguage])
+})
+
+afterEach(() => {
+  sinon.restore()
 })

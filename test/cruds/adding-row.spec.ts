@@ -1,3 +1,4 @@
+import sinon from 'sinon'
 import {EmptyValue, HyperFormula, ExportedCellChange} from '../../src'
 import {AbsoluteCellRange} from '../../src/AbsoluteCellRange'
 import {simpleCellAddress} from '../../src/Cell'
@@ -161,14 +162,14 @@ describe('Adding row - reevaluation', () => {
     const b1 = engine.addressMapping.getCell(adr('B1'))
     const c1 = engine.addressMapping.getCell(adr('C1'))
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const b1setCellValueSpy = jest.spyOn(b1 as any, 'setCellValue')
+    const b1setCellValueSpy = sinon.spy(b1 as any, 'setCellValue')
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const c1setCellValueSpy = jest.spyOn(c1 as any, 'setCellValue')
+    const c1setCellValueSpy = sinon.spy(c1 as any, 'setCellValue')
 
     engine.addRows(0, [1, 1])
 
-    expect(b1setCellValueSpy).toHaveBeenCalled()
-    expect(c1setCellValueSpy).not.toHaveBeenCalled()
+    expect(b1setCellValueSpy.called).toBe(true)
+    expect(c1setCellValueSpy.notCalled).toBe(true)
   })
 
   it('reevaluates cells which are dependent on structure changes', () => {
@@ -178,11 +179,11 @@ describe('Adding row - reevaluation', () => {
     ])
     const c1 = engine.addressMapping.getCell(adr('C1'))
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const c1setCellValueSpy = jest.spyOn(c1 as any, 'setCellValue')
+    const c1setCellValueSpy = sinon.spy(c1 as any, 'setCellValue')
 
     engine.addRows(0, [0, 1])
 
-    expect(c1setCellValueSpy).toHaveBeenCalled()
+    expect(c1setCellValueSpy.called).toBe(true)
   })
 
   it('returns changed values', () => {
@@ -322,11 +323,11 @@ describe('Adding row - sheet dimensions', () => {
     ])
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const recalcSpy = jest.spyOn(engine.evaluator as any, 'partialRun')
+    const recalcSpy = sinon.spy(engine.evaluator as any, 'partialRun')
     engine.addRows(0, [1, 1])
     engine.addRows(0, [10, 15])
 
-    expect(recalcSpy).not.toHaveBeenCalled()
+    expect(recalcSpy.notCalled).toBe(true)
     expect(engine.getSheetDimensions(0)).toEqual({
       width: 1,
       height: 1,
