@@ -8,15 +8,12 @@ import {HyperFormula} from '../../../src'
 
 describe('license key', () => {
   it('should warn a message about invalid key when wrong "agpl" license version is used', () => {
-    // const stub = sinon.stub(console, 'warn')
-    const stub = sinon.fake()
+    const spy = sinon.spy(console, 'warn')
 
     HyperFormula.buildEmpty({
       licenseKey: 'agpl-v1',
     })
 
-    expect(stub.calledOnce).toBe(true)
-    expect(stub.calledWith('The license key for HyperFormula is invalid.')).toBe(true)
-    // stub.restore()
+    expect(spy.calledWith('The license key for HyperFormula is invalid.')).toBe(true)
   })
 })
