@@ -47,7 +47,7 @@ describe('Copy - paste integration', () => {
 
     expect(() => {
       engine.paste(adr('A2'))
-    }).toThrowError(new NothingToPasteError())
+    }).toThrow(new NothingToPasteError())
   })
 
   it('copy should return values', () => {
@@ -366,7 +366,7 @@ describe('Copy - paste integration', () => {
 
     expect(() => {
       engine.paste(adr('A1', 1))
-    }).toThrowError('Invalid arguments')
+    }).toThrowError('Invalid arguments, expected undefined')
   })
 
   it('should copy references with absolute sheet id', () => {

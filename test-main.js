@@ -1,5 +1,3 @@
-import sinon from 'sinon';
-
 window['expect']['arrayContaining'] = jasmine.arrayContaining;
 
 // We have to add missing matchers into Jasmine
@@ -41,10 +39,7 @@ beforeAll(() => {
   });
 });
 
-// We have to restore all spies after each spec
-afterEach(() => {
-  sinon.restore();
-});
+import './lib/test/_setupFiles/bootstrap';
 
 // require all modules ending in ".spec.js" from the
 // './lib/test' directory and all subdirectories

@@ -3,16 +3,17 @@
  * Jest provides complete isolation between files only. That is why the test
  * contains only one case about "console.warn" message.
  */
+import sinon from 'sinon'
 import {HyperFormula} from '../../../src'
 
 describe('license key', () => {
   it('should warn a message about missing key', () => {
-    spyOn(console, 'warn')
+    const spy = sinon.spy(console, 'warn')
 
     HyperFormula.buildEmpty({
       licenseKey: '',
     })
 
-    expect(console.warn).toHaveBeenCalledWith('The license key for HyperFormula is missing.')
+    expect(spy.calledWithExactly('The license key for HyperFormula is missing.')).toBe(true)
   })
 })
