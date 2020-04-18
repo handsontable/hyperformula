@@ -193,3 +193,6 @@ export class MissingTranslationError extends Error {
     super(`Translation for ${key} is missing in the translation package you're using.`)
   }
 }
+
+export class FormulaPluginValidationError extends Error {
+}

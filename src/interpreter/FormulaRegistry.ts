@@ -7,6 +7,7 @@ import {FunctionPlugin, FunctionPluginDefinition, IImplementedFunction} from './
 import {Interpreter} from './Interpreter'
 import {Maybe} from '../Maybe'
 import {Config} from '../Config'
+import {FormulaPluginValidationError} from '../errors'
 
 export class FormulaRegistry {
   public static plugins: Map<string, [string, FunctionPluginDefinition]> = new Map()
@@ -14,6 +15,15 @@ export class FormulaRegistry {
   public static registerFormulaPlugin(...plugins: FunctionPluginDefinition[]) {
     for (const plugin of plugins) {
       this.loadPluginFormulas(plugin, this.plugins)
+    }
+  }
+
+  public static registerFormula(functionId: string, plugin: FunctionPluginDefinition) {
+    const entry = Object.keys(plugin.implementedFunctions).find(entry => plugin.implementedFunctions[entry].translationKey === functionId)
+    if (entry !== undefined) {
+      this.loadPluginFormula(plugin, entry, this.plugins)
+    } else {
+      throw new FormulaPluginValidationError()
     }
   }
 
@@ -25,12 +35,21 @@ export class FormulaRegistry {
     return this.plugins.get(formulaId)?.[1]
   }
 
-  private static loadPluginFormulas(plugin: FunctionPluginDefinition, register: Map<string, [string, FunctionPluginDefinition]>): void {
+  private static loadPluginFormulas(plugin: FunctionPluginDefinition, registry: Map<string, [string, FunctionPluginDefinition]>): void {
     Object.keys(plugin.implementedFunctions).forEach((functionName) => {
+      this.loadPluginFormula(plugin, functionName, registry)
+    })
+  }
+
+  private static loadPluginFormula(plugin: FunctionPluginDefinition, functionName: string, registry: Map<string, [string, FunctionPluginDefinition]>): void {
+    // eslint-disable-next-line no-prototype-builtins
+    if (plugin.prototype.hasOwnProperty(functionName)) {
       const pluginFunctionData = plugin.implementedFunctions[functionName]
       const formulaId = pluginFunctionData.translationKey.toUpperCase()
-      register.set(formulaId, [functionName, plugin])
-    })
+      registry.set(formulaId, [functionName, plugin])
+    } else {
+      throw new FormulaPluginValidationError()
+    }
   }
 
   private readonly plugins: Map<string, [string, FunctionPluginDefinition]>
