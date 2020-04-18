@@ -12,8 +12,9 @@ import {RangeVertex} from './RangeVertex'
 import {Vertex} from './Vertex'
 import {DependencyGraph} from './DependencyGraph'
 import {RelativeDependencyType} from '../parser/RelativeDependency'
+import {FormulaRegistry} from '../interpreter/FormulaRegistry'
 
-export const collectAddressesDependentToMatrix = (functionsWhichDoesNotNeedArgumentsToBeComputed: Set<string>, vertex: Vertex, matrix: MatrixVertex, lazilyTransformingAstService: LazilyTransformingAstService, dependencyGraph: DependencyGraph): SimpleCellAddress[] => {
+export const collectAddressesDependentToMatrix = (formulaRegistry: FormulaRegistry, vertex: Vertex, matrix: MatrixVertex, lazilyTransformingAstService: LazilyTransformingAstService, dependencyGraph: DependencyGraph): SimpleCellAddress[] => {
   const range = matrix.getRange()
 
   if (vertex instanceof RangeVertex) {
@@ -38,7 +39,7 @@ export const collectAddressesDependentToMatrix = (functionsWhichDoesNotNeedArgum
     return []
   }
 
-  return collectDependencies(formula, functionsWhichDoesNotNeedArgumentsToBeComputed)
+  return collectDependencies(formula, formulaRegistry)
     .filter((d) => d.type === RelativeDependencyType.CellAddress)
     .map((d) => (d.dependency as CellAddress).toSimpleCellAddress(address))
     .filter((d) => range.addressInRange(d))

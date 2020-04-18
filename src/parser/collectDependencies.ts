@@ -3,11 +3,11 @@
  * Copyright (c) 2020 Handsoncode. All rights reserved.
  */
 
-import {Maybe} from '../Maybe'
 import {Ast, AstNodeType, RelativeDependency} from './'
 import {RelativeDependencyType} from './RelativeDependency'
+import {FormulaRegistry} from '../interpreter/FormulaRegistry'
 
-const collectDependenciesFn = (ast: Ast, functionsWhichDoesNotNeedArgumentsToBeComputed: Set<string>, dependenciesSet: RelativeDependency[]) => {
+const collectDependenciesFn = (ast: Ast, formulaRegistry: FormulaRegistry, dependenciesSet: RelativeDependency[]) => {
   switch (ast.type) {
     case AstNodeType.EMPTY:
     case AstNodeType.NUMBER:
@@ -51,7 +51,7 @@ const collectDependenciesFn = (ast: Ast, functionsWhichDoesNotNeedArgumentsToBeC
     case AstNodeType.PERCENT_OP:
     case AstNodeType.PLUS_UNARY_OP:
     case AstNodeType.MINUS_UNARY_OP: {
-      collectDependenciesFn(ast.value, functionsWhichDoesNotNeedArgumentsToBeComputed, dependenciesSet)
+      collectDependenciesFn(ast.value, formulaRegistry, dependenciesSet)
       return
     }
     case AstNodeType.CONCATENATE_OP:
@@ -66,21 +66,21 @@ const collectDependenciesFn = (ast: Ast, functionsWhichDoesNotNeedArgumentsToBeC
     case AstNodeType.TIMES_OP:
     case AstNodeType.DIV_OP:
     case AstNodeType.POWER_OP:
-      collectDependenciesFn(ast.left, functionsWhichDoesNotNeedArgumentsToBeComputed, dependenciesSet)
-      collectDependenciesFn(ast.right, functionsWhichDoesNotNeedArgumentsToBeComputed, dependenciesSet)
+      collectDependenciesFn(ast.left, formulaRegistry, dependenciesSet)
+      collectDependenciesFn(ast.right, formulaRegistry, dependenciesSet)
       return
     case AstNodeType.FUNCTION_CALL:
-      if (!functionsWhichDoesNotNeedArgumentsToBeComputed.has(ast.procedureName)) {
+      if (!formulaRegistry.doesFormulaNeedArgumentToBeComputed(ast.procedureName)) {
         ast.args.forEach((argAst: Ast) =>
-          collectDependenciesFn(argAst, functionsWhichDoesNotNeedArgumentsToBeComputed, dependenciesSet)
+          collectDependenciesFn(argAst, formulaRegistry, dependenciesSet)
         )
       }
       return
   }
 }
 
-export const collectDependencies = (ast: Ast, functionsWhichDoesNotNeedArgumentsToBeComputed: Set<string>) => {
+export const collectDependencies = (ast: Ast, formulaRegistry: FormulaRegistry) => {
   const result = new Array<RelativeDependency>()
-  collectDependenciesFn(ast, functionsWhichDoesNotNeedArgumentsToBeComputed, result)
+  collectDependenciesFn(ast, formulaRegistry, result)
   return result
 }

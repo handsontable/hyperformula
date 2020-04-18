@@ -46,8 +46,8 @@ import {TrigonometryPlugin} from './interpreter/plugin/TrigonometryPlugin'
 import {VlookupPlugin} from './interpreter/plugin/VlookupPlugin'
 import {Maybe} from './Maybe'
 import {ParserConfig} from './parser/ParserConfig'
-import {LicenseKeyValidityState, checkLicenseKeyValidity} from './helpers/licenseKeyValidator'
-import {FunctionPlugin, FunctionPluginDefinition} from './interpreter/plugin/FunctionPlugin'
+import {checkLicenseKeyValidity, LicenseKeyValidityState} from './helpers/licenseKeyValidator'
+import {FunctionPluginDefinition} from './interpreter/plugin/FunctionPlugin'
 
 type GPUMode = 'gpu' | 'cpu' | 'dev'
 
@@ -584,54 +584,6 @@ export class Config implements ConfigParams, ParserConfig {
     const mergedConfig: ConfigParams = Object.assign({}, this.getConfig(), init)
 
     return new Config(mergedConfig)
-  }
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  public allFunctionPlugins(): FunctionPluginDefinition[] {
-    return Config.defaultPlugins
-  }
-
-  public volatileFunctions(): Set<string> {
-    const volatileFunctions = new Set<string>()
-
-    for (const plugin of this.allFunctionPlugins()) {
-      for (const functionKey in plugin.implementedFunctions) {
-        const pluginFunctionData = plugin.implementedFunctions[functionKey]
-        if (pluginFunctionData.isVolatile) {
-          volatileFunctions.add(this.translationPackage.getFunctionTranslation(pluginFunctionData.translationKey))
-        }
-      }
-    }
-
-    return volatileFunctions
-  }
-
-  public structuralChangeFunctions(): Set<string> {
-    const structuralChangeFunctions = new Set<string>()
-
-    for (const plugin of this.allFunctionPlugins()) {
-      for (const functionKey in plugin.implementedFunctions) {
-        const pluginFunctionData = plugin.implementedFunctions[functionKey]
-        if (pluginFunctionData.isDependentOnSheetStructureChange) {
-          structuralChangeFunctions.add(this.translationPackage.getFunctionTranslation(pluginFunctionData.translationKey))
-        }
-      }
-    }
-    return structuralChangeFunctions
-  }
-
-  public functionsWhichDoesNotNeedArgumentsToBeComputed(): Set<string> {
-    const functionsWhichDoesNotNeedArgumentsToBeComputed = new Set<string>()
-
-    for (const plugin of this.allFunctionPlugins()) {
-      for (const functionKey in plugin.implementedFunctions) {
-        const pluginFunctionData = plugin.implementedFunctions[functionKey]
-        if (pluginFunctionData.doesNotNeedArgumentsToBeComputed) {
-          functionsWhichDoesNotNeedArgumentsToBeComputed.add(this.translationPackage.getFunctionTranslation(pluginFunctionData.translationKey))
-        }
-      }
-    }
-    return functionsWhichDoesNotNeedArgumentsToBeComputed
   }
 
   public static getRegisteredFunctions(): Set<String> {

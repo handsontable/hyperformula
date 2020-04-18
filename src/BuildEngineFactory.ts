@@ -21,6 +21,7 @@ import {Serialization} from './Serialization'
 import {EmptyStatistics, Statistics, StatType} from './statistics'
 import {SheetSizeLimitExceededError} from './errors'
 import {findBoundaries, Sheet, Sheets} from './Sheet'
+import {FormulaRegistry} from './interpreter/FormulaRegistry'
 
 export type EngineState = {
   config: Config,
@@ -42,8 +43,9 @@ export class BuildEngineFactory {
   private static buildEngine(config: Config, sheets: Sheets = {}, stats: Statistics = config.useStats ? new Statistics() : new EmptyStatistics()): EngineState {
     stats.start(StatType.BUILD_ENGINE_TOTAL)
 
+    const formulaRegistry = new FormulaRegistry(config)
     const lazilyTransformingAstService = new LazilyTransformingAstService(stats)
-    const dependencyGraph = DependencyGraph.buildEmpty(lazilyTransformingAstService, config, stats)
+    const dependencyGraph = DependencyGraph.buildEmpty(lazilyTransformingAstService, config, formulaRegistry, stats)
     const columnSearch = buildColumnSearchStrategy(dependencyGraph, config, stats)
     const sheetMapping = dependencyGraph.sheetMapping
     const addressMapping = dependencyGraph.addressMapping
@@ -61,7 +63,7 @@ export class BuildEngineFactory {
     }
 
     const notEmpty = sheetMapping.numberOfSheets() > 0
-    const parser = new ParserWithCaching(config, notEmpty ? sheetMapping.get : sheetMapping.fetch)
+    const parser = new ParserWithCaching(config, formulaRegistry, notEmpty ? sheetMapping.get : sheetMapping.fetch)
     const unparser = new Unparser(config, buildLexerConfig(config), sheetMapping.fetchDisplayName)
     const dateHelper = new DateTimeHelper(config)
     const numberLiteralHelper = new NumberLiteralHelper(config)
@@ -76,7 +78,7 @@ export class BuildEngineFactory {
     lazilyTransformingAstService.undoRedo = crudOperations.undoRedo
     lazilyTransformingAstService.parser = parser
 
-    const evaluator = new Evaluator(dependencyGraph, columnSearch, config, stats, dateHelper, numberLiteralHelper)
+    const evaluator = new Evaluator(dependencyGraph, columnSearch, config, stats, dateHelper, numberLiteralHelper, formulaRegistry)
     evaluator.run()
 
     const namedExpressions = new NamedExpressions(cellContentParser, dependencyGraph, parser, crudOperations)

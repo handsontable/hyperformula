@@ -14,10 +14,14 @@ import {Interpreter} from '../Interpreter'
 import {InterpreterValue, SimpleRangeValue} from '../InterpreterValue'
 
 interface IImplementedFunctions {
-  [functionName: string]: {
-    translationKey: string,
-    isVolatile?: boolean,
-  },
+  [functionName: string]: IImplementedFunction,
+}
+
+export interface IImplementedFunction {
+  translationKey: string,
+  isVolatile?: boolean,
+  isDependentOnSheetStructureChange?: boolean,
+  doesNotNeedArgumentsToBeComputed?: boolean,
 }
 
 export interface FunctionPluginDefinition {

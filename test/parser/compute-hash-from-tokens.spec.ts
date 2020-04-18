@@ -3,8 +3,9 @@ import {simpleCellAddress, SimpleCellAddress} from '../../src/Cell'
 import {Config} from '../../src/Config'
 import {SheetMapping} from '../../src/DependencyGraph'
 import {enGB, plPL} from '../../src/i18n'
-import {buildLexerConfig, FormulaLexer, ParserWithCaching} from '../../src/parser'
+import {buildLexerConfig, FormulaLexer} from '../../src/parser'
 import {unregisterAllLanguages} from '../testUtils'
+import {buildEmptyParserWithCaching} from './common'
 
 describe('computeHashFromTokens', () => {
   const computeFunc = (code: string, address: SimpleCellAddress, language: string = 'enGB'): string => {
@@ -12,7 +13,7 @@ describe('computeHashFromTokens', () => {
     const sheetMapping = new SheetMapping(HyperFormula.getLanguage(language))
     sheetMapping.addSheet('Sheet1')
     sheetMapping.addSheet('Sheet2')
-    const parser = new ParserWithCaching(config, sheetMapping.get)
+    const parser = buildEmptyParserWithCaching(config, sheetMapping)
     const tokens = new FormulaLexer(buildLexerConfig(config)).tokenizeFormula(code).tokens
     return parser.computeHashFromTokens(tokens, address)
   }

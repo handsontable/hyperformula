@@ -265,10 +265,6 @@ export class HyperFormula implements TypedEmitter {
     return this.buildFromEngineState(BuildEngineFactory.buildEmpty(configInput))
   }
 
-  public static registerFunctionPlugin(plugin: FunctionPluginDefinition): void {
-    Config.registerFunctionPlugin(plugin: FunctionPluginDefinition)
-  }
-
   private readonly _emitter: Emitter = new Emitter()
   private _evaluationSuspended: boolean = false
 

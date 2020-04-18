@@ -5,13 +5,7 @@
 
 import GPU from 'gpu.js'
 import {AbsoluteCellRange, AbsoluteColumnRange, AbsoluteRowRange} from '../AbsoluteCellRange'
-import {
-  CellError,
-  ErrorType,
-  invalidSimpleCellAddress,
-  NoErrorCellValue,
-  SimpleCellAddress,
-} from '../Cell'
+import {CellError, ErrorType, invalidSimpleCellAddress, NoErrorCellValue, SimpleCellAddress,} from '../Cell'
 import {ColumnSearchStrategy} from '../ColumnSearch/ColumnSearchStrategy'
 import {Config} from '../Config'
 import {DateTimeHelper} from '../DateTimeHelper'
@@ -21,17 +15,14 @@ import {Maybe} from '../Maybe'
 // noinspection TypeScriptPreferShortImport
 import {Ast, AstNodeType, CellRangeAst, ColumnRangeAst, RowRangeAst} from '../parser/Ast'
 import {Statistics} from '../statistics/Statistics'
-import {
-  ArithmeticHelper, divide, multiply, percent, power, unaryminus,
-} from './ArithmeticHelper'
+import {ArithmeticHelper, divide, multiply, percent, power, unaryminus,} from './ArithmeticHelper'
 import {InterpreterValue, SimpleRangeValue} from './InterpreterValue'
 import {concatenate} from './text'
 import {NumberLiteralHelper} from '../NumberLiteralHelper'
-import {FunctionPluginDefinition} from './plugin/FunctionPlugin'
+import {FormulaRegistry} from './FormulaRegistry'
 
 export class Interpreter {
   private gpu?: GPU.GPU
-  private readonly pluginCache: Map<string, [any, string]> = new Map()
   public readonly arithmeticHelper: ArithmeticHelper
 
   constructor(
@@ -41,8 +32,9 @@ export class Interpreter {
     public readonly stats: Statistics,
     public readonly dateHelper: DateTimeHelper,
     public readonly numberLiteralsHelper: NumberLiteralHelper,
+    public readonly formulaRegistry: FormulaRegistry
   ) {
-    this.registerPlugins(this.config.functionPlugins())
+    this.formulaRegistry.init(this)
     this.arithmeticHelper = new ArithmeticHelper(config, dateHelper, numberLiteralsHelper)
   }
 
@@ -179,10 +171,9 @@ export class Interpreter {
         }
       }
       case AstNodeType.FUNCTION_CALL: {
-        const pluginEntry = this.pluginCache.get(ast.procedureName)
-        if (pluginEntry && this.config.translationPackage.isFunctionTranslated(ast.procedureName)) {
-          const [pluginInstance, pluginFunction] = pluginEntry
-          return pluginInstance[pluginFunction](ast, formulaAddress)
+        const formula = this.formulaRegistry.getFormula(ast.procedureName)
+        if (formula && this.config.translationPackage.isFunctionTranslated(ast.procedureName)) {
+          return formula(ast, formulaAddress)
         } else {
           return new CellError(ErrorType.NAME)
         }
@@ -241,27 +232,26 @@ export class Interpreter {
   }
 
   public destroy() {
-    this.pluginCache.clear()
     if (this.gpu) {
       this.gpu.destroy()
     }
   }
 
-  /**
-   * Registers plugins with functions to use
-   *
-   * @param plugins - list of plugin modules
-   */
-  private registerPlugins(plugins: FunctionPluginDefinition[]) {
-    for (const pluginClass of plugins) {
-      const pluginInstance = new pluginClass(this)
-      Object.keys(pluginClass.implementedFunctions).forEach((pluginFunction) => {
-        const pluginFunctionData = pluginClass.implementedFunctions[pluginFunction]
-        const functionName = pluginFunctionData.translationKey.toUpperCase()
-        this.pluginCache.set(functionName, [pluginInstance, pluginFunction])
-      })
-    }
-  }
+  // /**
+  //  * Registers plugins with functions to use
+  //  *
+  //  * @param plugins - list of plugin modules
+  //  */
+  // private registerPlugins(plugins: FunctionPluginDefinition[]) {
+  //   for (const pluginClass of plugins) {
+  //     const pluginInstance = new pluginClass(this)
+  //     Object.keys(pluginClass.implementedFunctions).forEach((pluginFunction) => {
+  //       const pluginFunctionData = pluginClass.implementedFunctions[pluginFunction]
+  //       const functionName = pluginFunctionData.translationKey.toUpperCase()
+  //       this.pluginCache.set(functionName, [pluginInstance, pluginFunction])
+  //     })
+  //   }
+  // }
 
   private rangeSpansOneSheet(ast: CellRangeAst | ColumnRangeAst | RowRangeAst): boolean {
     return ast.start.sheet === ast.end.sheet

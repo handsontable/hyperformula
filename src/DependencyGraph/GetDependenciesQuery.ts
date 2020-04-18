@@ -13,13 +13,14 @@ import {FormulaCellVertex, MatrixVertex, Vertex} from './'
 import {AddressMapping} from './AddressMapping/AddressMapping'
 import {IGetDependenciesQuery} from './Graph'
 import {RangeMapping} from './RangeMapping'
+import {FormulaRegistry} from '../interpreter/FormulaRegistry'
 
 export class GetDependenciesQuery implements IGetDependenciesQuery<Vertex> {
   constructor(
     private readonly rangeMapping: RangeMapping,
     private readonly addressMapping: AddressMapping,
     private readonly lazilyTransformingAstService: LazilyTransformingAstService,
-    private readonly functionsWhichDoesNotNeedArgumentsToBeComputed: Set<string>,
+    private readonly formulaRegistry: FormulaRegistry,
   ) {
   }
 
@@ -37,7 +38,7 @@ export class GetDependenciesQuery implements IGetDependenciesQuery<Vertex> {
       return null
     }
 
-    const deps = collectDependencies(formula!, this.functionsWhichDoesNotNeedArgumentsToBeComputed)
+    const deps = collectDependencies(formula!, this.formulaRegistry)
     const absoluteDeps = absolutizeDependencies(deps, address)
     return new Set(absoluteDeps.map((dep: CellDependency) => {
       if (dep instanceof AbsoluteCellRange) {

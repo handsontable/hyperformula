@@ -29,10 +29,6 @@ type SheetIndex = ColumnMap[]
 
 export class ColumnIndex implements ColumnSearchStrategy {
 
-  public static buildEmpty(transformingService: LazilyTransformingAstService, config: Config, statistics: Statistics) {
-    const dependencyGraph = DependencyGraph.buildEmpty(transformingService, config, statistics)
-    return new ColumnIndex(dependencyGraph, config, statistics)
-  }
   private readonly index: Map<number, SheetIndex> = new Map()
   private readonly transformingService: LazilyTransformingAstService
   private readonly binarySearchStrategy: ColumnBinarySearch

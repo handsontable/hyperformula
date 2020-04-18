@@ -3,8 +3,9 @@ import {simpleCellAddress} from '../../src/Cell'
 import {Config} from '../../src/Config'
 import {SheetMapping} from '../../src/DependencyGraph'
 import {buildTranslationPackage, enGB, plPL} from '../../src/i18n'
-import {AstNodeType, buildLexerConfig, ParserWithCaching, Unparser} from '../../src/parser'
+import {AstNodeType, buildLexerConfig, Unparser} from '../../src/parser'
 import {adr, unregisterAllLanguages} from '../testUtils'
+import {buildEmptyParserWithCaching} from './common'
 
 describe('Unparse', () => {
   const config = new Config()
@@ -13,7 +14,7 @@ describe('Unparse', () => {
   sheetMapping.addSheet('Sheet1')
   sheetMapping.addSheet('Sheet2')
   sheetMapping.addSheet('Sheet with spaces')
-  const parser = new ParserWithCaching(config, sheetMapping.get)
+  const parser = buildEmptyParserWithCaching(config, sheetMapping)
   const unparser = new Unparser(config, lexerConfig, sheetMapping.fetchDisplayName)
 
 
@@ -137,7 +138,7 @@ describe('Unparse', () => {
 
   it('#unparse with known error with translation', () => {
     const config = new Config({language: 'plPL'})
-    const parser = new ParserWithCaching(config, sheetMapping.get)
+    const parser = buildEmptyParserWithCaching(config, sheetMapping)
     const unparser = new Unparser(config, buildLexerConfig(config), sheetMapping.fetchDisplayName)
     const formula = '=#ADR!'
     const ast = parser.parse(formula, simpleCellAddress(0, 0, 0)).ast
@@ -284,7 +285,7 @@ describe('Unparse', () => {
     const configEN = new Config({language: 'enGB'})
     const configPL = new Config({language: 'plPL'})
 
-    const parser = new ParserWithCaching(configPL, sheetMapping.get)
+    const parser = buildEmptyParserWithCaching(configPL, sheetMapping)
 
     const unparserPL = new Unparser(configPL, buildLexerConfig(configPL), sheetMapping.fetchDisplayName)
     const unparserEN = new Unparser(configEN, buildLexerConfig(configEN), sheetMapping.fetchDisplayName)
@@ -345,7 +346,7 @@ describe('Unparse', () => {
     const lexerConfig = buildLexerConfig(config)
     const sheetMapping = new SheetMapping(buildTranslationPackage(enGB))
     sheetMapping.addSheet('Sheet1')
-    const parser = new ParserWithCaching(config, sheetMapping.get)
+    const parser = buildEmptyParserWithCaching(config, sheetMapping)
     const unparser = new Unparser(config, lexerConfig, sheetMapping.fetchDisplayName)
     const formula = '=1+1234,567'
 
@@ -427,7 +428,7 @@ describe('whitespaces', () => {
   sheetMapping.addSheet('Sheet1')
   sheetMapping.addSheet('Sheet2')
   sheetMapping.addSheet('Sheet with spaces')
-  const parser = new ParserWithCaching(config, sheetMapping.get)
+  const parser = buildEmptyParserWithCaching(config, sheetMapping)
   const unparser = new Unparser(config, lexerConfig, sheetMapping.fetchDisplayName)
 
   it('should unparse with original whitespaces', () => {
