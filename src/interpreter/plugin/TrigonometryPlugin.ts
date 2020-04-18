@@ -1,5 +1,10 @@
+/**
+ * @license
+ * Copyright (c) 2020 Handsoncode. All rights reserved.
+ */
+
 import {CellError, ErrorType, InternalCellValue, SimpleCellAddress} from '../../Cell'
-import {ProcedureAst} from '../../parser'
+import {AstNodeType, ProcedureAst} from '../../parser'
 import {SimpleRangeValue} from '../InterpreterValue'
 import {FunctionPlugin} from './FunctionPlugin'
 
@@ -91,6 +96,9 @@ export class TrigonometryPlugin extends FunctionPlugin {
     if (ast.args.length !== 2) {
       return new CellError(ErrorType.NA)
     }
+    if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
+      return new CellError(ErrorType.NUM)
+    }
 
     const arg1 = this.evaluateAst(ast.args[0], formulaAddress)
     if (arg1 instanceof SimpleRangeValue) {
@@ -101,7 +109,7 @@ export class TrigonometryPlugin extends FunctionPlugin {
       return new CellError(ErrorType.VALUE)
     }
     const coercedArg1 = this.coerceScalarToNumberOrError(arg1)
-    if (coercedArg1 instanceof CellError)  {
+    if (coercedArg1 instanceof CellError) {
       return coercedArg1
     }
     const coercedArg2 = this.coerceScalarToNumberOrError(arg2)

@@ -1,23 +1,29 @@
+/**
+ * @license
+ * Copyright (c) 2020 Handsoncode. All rights reserved.
+ */
+
 import {absolutizeDependencies} from './absolutizeDependencies'
 import {CellError, simpleCellAddress, SimpleCellAddress} from './Cell'
-import {CellContent, CellContentParser, RawCellContent} from './CellContentParser'
+import {CellContent, CellContentParser} from './CellContentParser'
 import {CellDependency} from './CellDependency'
 import {ColumnSearchStrategy} from './ColumnSearch/ColumnSearchStrategy'
 import {Config} from './Config'
-import {DependencyGraph, FormulaCellVertex, MatrixVertex, ParsingErrorVertex, ValueCellVertex, Vertex} from './DependencyGraph'
+import {
+  DependencyGraph,
+  FormulaCellVertex,
+  MatrixVertex,
+  ParsingErrorVertex,
+  ValueCellVertex,
+  Vertex
+} from './DependencyGraph'
 import {GraphBuilderMatrixHeuristic} from './GraphBuilderMatrixHeuristic'
 import {checkMatrixSize} from './Matrix'
 import {ParserWithCaching, ProcedureAst} from './parser'
 import {Statistics, StatType} from './statistics'
-
-/**
- * Two-dimenstional array representation of sheet
- */
-export type Sheet = RawCellContent[][]
+import {Sheets} from './Sheet'
 
 export type Dependencies = Map<Vertex, CellDependency[]>
-
-export type Sheets = Record<string, Sheet>
 
 /**
  * Service building the graph and mappings.

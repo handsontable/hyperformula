@@ -6,7 +6,6 @@ import {ColumnIndex} from '../../src/ColumnSearch/ColumnIndex'
 import {MatrixVertex} from '../../src/DependencyGraph'
 import {InvalidArgumentsError} from '../../src'
 import {CellAddress} from '../../src/parser'
-import '../testConfig'
 import {
   adr, expectArrayWithSameContent,
   expectEngineToBeTheSameAs,

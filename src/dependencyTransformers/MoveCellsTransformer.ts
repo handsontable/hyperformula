@@ -1,3 +1,8 @@
+/**
+ * @license
+ * Copyright (c) 2020 Handsoncode. All rights reserved.
+ */
+
 import {Transformer} from './Transformer'
 import {Ast, CellAddress} from '../parser'
 import {ErrorType, simpleCellAddress, SimpleCellAddress} from '../Cell'
@@ -15,6 +20,10 @@ export class MoveCellsTransformer extends Transformer {
   ) {
     super()
     this.dependentFormulaTransformer = new DependentFormulaTransformer(sourceRange, toRight, toBottom, toSheet)
+  }
+
+  public isIrreversible() {
+    return true
   }
 
   public get sheet(): number {
@@ -93,6 +102,10 @@ class DependentFormulaTransformer extends Transformer {
 
   public get sheet(): number {
     return this.sourceRange.sheet
+  }
+
+  public isIrreversible() {
+    return true
   }
 
   protected fixNodeAddress(address: SimpleCellAddress): SimpleCellAddress {

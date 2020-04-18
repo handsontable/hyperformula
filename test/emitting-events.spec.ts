@@ -2,7 +2,7 @@ import sinon from 'sinon'
 import {HyperFormula, ExportedCellChange, ExportedNamedExpressionChange} from '../src'
 import {Events} from '../src/Emitter'
 import {ErrorType} from '../src/Cell'
-import './testConfig'
+
 import { adr, detailedError } from './testUtils'
 
 describe('Events', () => {

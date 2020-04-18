@@ -4,7 +4,6 @@ import {simpleCellAddress} from '../../src/Cell'
 import {ColumnIndex} from '../../src/ColumnSearch/ColumnIndex'
 import {EmptyCellVertex, ValueCellVertex} from '../../src/DependencyGraph'
 import {CellAddress} from '../../src/parser'
-import '../testConfig'
 import {
   adr,
   expectArrayWithSameContent,
@@ -886,20 +885,6 @@ describe('move cells with matrices', () => {
 })
 
 describe('aborting cut paste', () => {
-  it('should do nothing when clipboard is cleared', () => {
-    const engine = HyperFormula.buildFromArray([
-      ['1'],
-      ['2']
-    ])
-
-    engine.cut(adr('A1'), 1, 2)
-    engine.clearClipboard()
-    engine.paste(adr('B2'))
-
-    expect(engine.getCellValue(adr('B1'))).toEqual(EmptyValue)
-    expect(engine.getCellValue(adr('B2'))).toEqual(EmptyValue)
-  })
-
   it('should be aborted when addRows is done before paste', () => {
     const engine = HyperFormula.buildFromArray([
       ['1'],
@@ -908,9 +893,8 @@ describe('aborting cut paste', () => {
 
     engine.cut(adr('A1'), 1, 1)
     engine.addRows(0, [1, 1])
-    engine.paste(adr('C2'))
 
-    expect(engine.getCellValue(adr('C2'))).toEqual(EmptyValue)
+    expect(engine.isClipboardEmpty()).toBe(true)
   })
 
   it('should be aborted when removeRows is done before paste', () => {
@@ -921,9 +905,8 @@ describe('aborting cut paste', () => {
 
     engine.cut(adr('A1'), 1, 1)
     engine.removeRows(0, [1, 1])
-    engine.paste(adr('C2'))
 
-    expect(engine.getCellValue(adr('C2'))).toEqual(EmptyValue)
+    expect(engine.isClipboardEmpty()).toBe(true)
   })
 
   it('should be aborted when addColumns is done before paste', () => {
@@ -933,9 +916,8 @@ describe('aborting cut paste', () => {
 
     engine.cut(adr('A1'), 1, 1)
     engine.addColumns(0, [1, 1])
-    engine.paste(adr('A2'))
 
-    expect(engine.getCellValue(adr('A2'))).toEqual(EmptyValue)
+    expect(engine.isClipboardEmpty()).toBe(true)
   })
 
   it('should be aborted when addColumns is done before paste', () => {
@@ -945,9 +927,8 @@ describe('aborting cut paste', () => {
 
     engine.cut(adr('A1'), 1, 1)
     engine.removeColumns(0, [1, 1])
-    engine.paste(adr('A2'))
 
-    expect(engine.getCellValue(adr('A2'))).toEqual(EmptyValue)
+    expect(engine.isClipboardEmpty()).toBe(true)
   })
 
   it('should be aborted when moveCells is done before paste', () => {
@@ -957,21 +938,8 @@ describe('aborting cut paste', () => {
 
     engine.cut(adr('A1'), 1, 1)
     engine.moveCells(adr('B1'), 1, 1, adr('C1'))
-    engine.paste(adr('A2'))
 
-    expect(engine.getCellValue(adr('A2'))).toEqual(EmptyValue)
-  })
-
-  it('should be aborted when moveCells is done before paste', () => {
-    const engine = HyperFormula.buildFromArray([
-      ['1', '2']
-    ])
-
-    engine.cut(adr('A1'), 1, 1)
-    engine.moveCells(adr('B1'), 1, 1, adr('C1'))
-    engine.paste(adr('A2'))
-
-    expect(engine.getCellValue(adr('A2'))).toEqual(EmptyValue)
+    expect(engine.isClipboardEmpty()).toBe(true)
   })
 
   it('should be aborted when sheet is removed', () => {
@@ -982,9 +950,8 @@ describe('aborting cut paste', () => {
 
     engine.cut(adr('A1'), 1, 1)
     engine.removeSheet('Sheet2')
-    engine.paste(adr('A2'))
 
-    expect(engine.getCellValue(adr('A2'))).toEqual(EmptyValue)
+    expect(engine.isClipboardEmpty()).toBe(true)
   })
 
   it('should be aborted when setCellContents is done', () => {
@@ -994,9 +961,8 @@ describe('aborting cut paste', () => {
 
     engine.cut(adr('A1'), 1, 1)
     engine.setCellContents(adr('B1'), 'foo')
-    engine.paste(adr('A2'))
 
-    expect(engine.getCellValue(adr('A2'))).toEqual(EmptyValue)
+    expect(engine.isClipboardEmpty()).toBe(true)
   })
 
   it('should be aborted when sheet is cleared', () => {
@@ -1007,9 +973,8 @@ describe('aborting cut paste', () => {
 
     engine.cut(adr('A1'), 1, 1)
     engine.clearSheet('Sheet2')
-    engine.paste(adr('A2'))
 
-    expect(engine.getCellValue(adr('A2'))).toEqual(EmptyValue)
+    expect(engine.isClipboardEmpty()).toBe(true)
   })
 
   it('should be aborted when sheet content is replaced', () => {
@@ -1020,9 +985,8 @@ describe('aborting cut paste', () => {
 
     engine.cut(adr('A1'), 1, 1)
     engine.setSheetContent('Sheet2', [])
-    engine.paste(adr('A2'))
 
-    expect(engine.getCellValue(adr('A2'))).toEqual(EmptyValue)
+    expect(engine.isClipboardEmpty()).toBe(true)
   })
 
   it('should not be aborted when adding new sheet', () => {
@@ -1030,9 +994,8 @@ describe('aborting cut paste', () => {
 
     engine.cut(adr('A1'), 1, 1)
     engine.addSheet()
-    engine.paste(adr('A2', 1))
 
-    expect(engine.getCellValue(adr('A2', 1))).toEqual(1)
+    expect(engine.isClipboardEmpty()).toBe(false)
   })
 
   it('should not be aborted when addRows is not successful', () => {
@@ -1044,8 +1007,27 @@ describe('aborting cut paste', () => {
       engine.addRows(1, [1, 1])
     }).toThrow(new NoSheetWithIdError(1))
 
-    engine.paste(adr('A2'))
+    expect(engine.isClipboardEmpty()).toBe(false)
+  })
 
-    expect(engine.getCellValue(adr('A2'))).toEqual(1)
+  it('should be aborted when doing undo', () => {
+    const engine = HyperFormula.buildFromArray([['1']])
+    engine.setCellContents(adr('A1'), 42)
+    engine.cut(adr('A1'), 1, 1)
+
+    engine.undo()
+
+    expect(engine.isClipboardEmpty()).toBe(true)
+  })
+
+  it('should be aborted when doing redo', () => {
+    const engine = HyperFormula.buildFromArray([['1']])
+    engine.setCellContents(adr('A1'), 42)
+    engine.undo()
+    engine.cut(adr('A1'), 1, 1)
+
+    engine.redo()
+
+    expect(engine.isClipboardEmpty()).toBe(true)
   })
 })

@@ -1,3 +1,8 @@
+/**
+ * @license
+ * Copyright (c) 2020 Handsoncode. All rights reserved.
+ */
+
 import {
   absoluteSheetReference,
   simpleCellAddress,
@@ -155,5 +160,9 @@ export class CellAddress implements AddressWithColumn, AddressWithRow {
     const rowDollar = this.type === CellReferenceType.CELL_REFERENCE_ABSOLUTE || this.type === CellReferenceType.CELL_REFERENCE_ABSOLUTE_ROW ? '$' : ''
     const colDollar = this.type === CellReferenceType.CELL_REFERENCE_ABSOLUTE || this.type === CellReferenceType.CELL_REFERENCE_ABSOLUTE_COL ? '$' : ''
     return `${colDollar}${column}${rowDollar}${simpleAddress.row + 1}`
+  }
+
+  public exceedsSheetSizeLimits(maxColumns: number, maxRows: number): boolean {
+    return this.row >= maxRows || this.col >= maxColumns
   }
 }

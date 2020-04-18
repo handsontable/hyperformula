@@ -1,3 +1,7 @@
+/**
+ * @license
+ * Copyright (c) 2020 Handsoncode. All rights reserved.
+ */
 
 /*
  * A class representing a set of columns in specific sheet

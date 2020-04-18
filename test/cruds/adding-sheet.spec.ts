@@ -1,5 +1,4 @@
 import {EmptyValue, HyperFormula} from '../../src'
-import '../testConfig'
 import {plPL} from '../../src/i18n'
 import {adr} from '../testUtils'
 

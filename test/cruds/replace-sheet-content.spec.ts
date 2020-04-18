@@ -6,13 +6,13 @@ describe('Replace sheet content - checking if its possible', () => {
   it('no if theres no such sheet', () => {
     const engine = HyperFormula.buildFromArray([[]])
 
-    expect(engine.isItPossibleToReplaceSheetContent('foo')).toEqual(false)
+    expect(engine.isItPossibleToReplaceSheetContent('foo', [])).toEqual(false)
   })
 
   it('yes otherwise', () => {
     const engine = HyperFormula.buildFromArray([[]])
 
-    expect(engine.isItPossibleToReplaceSheetContent('Sheet1')).toEqual(true)
+    expect(engine.isItPossibleToReplaceSheetContent('Sheet1', [])).toEqual(true)
   })
 })
 

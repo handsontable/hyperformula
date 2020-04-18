@@ -1,11 +1,16 @@
+/**
+ * @license
+ * Copyright (c) 2020 Handsoncode. All rights reserved.
+ */
+
 import {AbsoluteCellRange} from './AbsoluteCellRange'
 import {simpleCellAddress, SimpleCellAddress} from './Cell'
 import {CellContent, CellContentParser, RawCellContent} from './CellContentParser'
 import {CellDependency} from './CellDependency'
 import {ColumnSearchStrategy} from './ColumnSearch/ColumnSearchStrategy'
 import {DependencyGraph, MatrixVertex, Vertex} from './DependencyGraph'
-import {Sheets} from './GraphBuilder'
 import {Matrix, MatrixSize} from './Matrix'
+import {Sheets} from './Sheet'
 
 export class Array2d<T> {
   public static fromArray<T>(input: T[][]): Array2d<T> {

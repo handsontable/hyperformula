@@ -1,3 +1,8 @@
+/**
+ * @license
+ * Copyright (c) 2020 Handsoncode. All rights reserved.
+ */
+
 import {CellError} from '../Cell'
 import {ParsingError} from '../parser/Ast'
 

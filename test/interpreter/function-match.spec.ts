@@ -2,7 +2,6 @@ import sinon from 'sinon'
 import {HyperFormula} from '../../src'
 import {ErrorType} from '../../src/Cell'
 import {ColumnBinarySearch} from '../../src/ColumnSearch/ColumnBinarySearch'
-import '../testConfig'
 import {adr, detailedError} from '../testUtils'
 
 describe('Function MATCH', () => {

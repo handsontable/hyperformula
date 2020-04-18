@@ -2,7 +2,6 @@ import {HyperFormula} from '../src'
 import {Config} from '../src/Config'
 import {languages, plPL, TranslationPackage} from '../src/i18n'
 import {CellAddress} from '../src/parser'
-import './testConfig'
 import {adr, extractReference} from './testUtils'
 
 describe('i18n', () => {

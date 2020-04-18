@@ -6,7 +6,6 @@ import {ColumnIndex} from '../../src/ColumnSearch/ColumnIndex'
 import {MatrixVertex} from '../../src/DependencyGraph'
 import {NoSheetWithNameError} from '../../src'
 import {CellAddress} from '../../src/parser'
-import '../testConfig'
 import {
   adr, detailedError,
   expectArrayWithSameContent,
@@ -237,7 +236,7 @@ describe('remove sheet - adjust address mapping', () => {
 
     engine.removeSheet('Sheet1')
 
-    expect(() => engine.addressMapping.strategyFor(0)).toThrowError('Unknown sheet id')
+    expect(() => engine.addressMapping.strategyFor(0)).toThrowError("There's no sheet with id = 0")
   })
 })
 

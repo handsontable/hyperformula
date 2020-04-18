@@ -1,10 +1,15 @@
+/**
+ * @license
+ * Copyright (c) 2020 Handsoncode. All rights reserved.
+ */
+
 import {CellError, ErrorType, InternalCellValue, SimpleCellAddress} from '../../Cell'
 import {Maybe} from '../../Maybe'
-import { ProcedureAst} from '../../parser'
+import {AstNodeType, ProcedureAst} from '../../parser'
 import {coerceToRange} from '../ArithmeticHelper'
-import { CriterionPackage} from '../Criterion'
+import {CriterionPackage} from '../Criterion'
 import {Condition, CriterionFunctionCompute} from '../CriterionFunctionCompute'
-import { SimpleRangeValue} from '../InterpreterValue'
+import {SimpleRangeValue} from '../InterpreterValue'
 import {FunctionPlugin} from './FunctionPlugin'
 
 class AverageResult {
@@ -14,10 +19,12 @@ class AverageResult {
   public static single(arg: number): AverageResult {
     return new AverageResult(arg, 1)
   }
+
   constructor(
     public readonly sum: number,
     public readonly count: number,
-  ) { }
+  ) {
+  }
 
   public compose(other: AverageResult) {
     return new AverageResult(this.sum + other.sum, this.count + other.count)
@@ -84,6 +91,9 @@ export class SumifPlugin extends FunctionPlugin {
     if (ast.args.length < 2 || ast.args.length > 3) {
       return new CellError(ErrorType.NA)
     }
+    if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
+      return new CellError(ErrorType.NUM)
+    }
     const conditionArgValue = this.evaluateAst(ast.args[0], formulaAddress)
     if (conditionArgValue instanceof CellError) {
       return conditionArgValue
@@ -127,6 +137,9 @@ export class SumifPlugin extends FunctionPlugin {
     if (ast.args.length < 3 || ast.args.length % 2 === 0) {
       return new CellError(ErrorType.NA)
     }
+    if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
+      return new CellError(ErrorType.NUM)
+    }
     const valueArgValue = this.evaluateAst(ast.args[0], formulaAddress)
     if (valueArgValue instanceof CellError) {
       return valueArgValue
@@ -167,6 +180,9 @@ export class SumifPlugin extends FunctionPlugin {
   public averageif(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
     if (ast.args.length < 2 || ast.args.length > 3) {
       return new CellError(ErrorType.NA)
+    }
+    if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
+      return new CellError(ErrorType.NUM)
     }
     const conditionArgValue = this.evaluateAst(ast.args[0], formulaAddress)
     if (conditionArgValue instanceof CellError) {
@@ -232,6 +248,9 @@ export class SumifPlugin extends FunctionPlugin {
       return new CellError(ErrorType.NA)
     }
 
+    if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
+      return new CellError(ErrorType.NUM)
+    }
     const conditionArgValue = this.evaluateAst(ast.args[0], formulaAddress)
     if (conditionArgValue instanceof CellError) {
       return conditionArgValue
@@ -265,6 +284,9 @@ export class SumifPlugin extends FunctionPlugin {
       return new CellError(ErrorType.NA)
     }
 
+    if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
+      return new CellError(ErrorType.NUM)
+    }
     const conditions: Condition[] = []
     for (let i = 0; i < ast.args.length; i += 2) {
       const conditionArgValue = this.evaluateAst(ast.args[i], formulaAddress)

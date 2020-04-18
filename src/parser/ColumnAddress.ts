@@ -1,3 +1,8 @@
+/**
+ * @license
+ * Copyright (c) 2020 Handsoncode. All rights reserved.
+ */
+
 import {absoluteSheetReference, SimpleCellAddress, simpleColumnAddress, SimpleColumnAddress} from '../Cell'
 import {columnIndexToLabel} from './addressRepresentationConverters'
 import {AddressWithColumn} from './Address'
@@ -79,5 +84,9 @@ export class ColumnAddress implements AddressWithColumn {
     const column = columnIndexToLabel(simpleAddress.col)
     const dollar = this.type === ReferenceType.ABSOLUTE ? '$' : ''
     return `${dollar}${column}`
+  }
+
+  public exceedsSheetSizeLimits(maxColumns: number): boolean {
+    return this.col >= maxColumns
   }
 }

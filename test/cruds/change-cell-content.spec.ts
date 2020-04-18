@@ -3,8 +3,9 @@ import {EmptyValue, ExportedCellChange, HyperFormula, InvalidAddressError, NoShe
 import {ErrorType, simpleCellAddress} from '../../src/Cell'
 import {ColumnIndex} from '../../src/ColumnSearch/ColumnIndex'
 import {EmptyCellVertex, MatrixVertex} from '../../src/DependencyGraph'
-import '../testConfig'
 import {adr, colEnd, colStart, detailedError, rowEnd, rowStart} from '../testUtils'
+import {Config} from '../../src/Config'
+import {SheetSizeLimitExceededError} from '../../src/errors'
 
 describe('Changing cell content - checking if its possible', () => {
   it('address should have valid coordinates', () => {
@@ -32,6 +33,16 @@ describe('Changing cell content - checking if its possible', () => {
     expect(engine.isItPossibleToSetCellContents(adr('A3'), 1, 1)).toBe(false)
     expect(engine.isItPossibleToSetCellContents(adr('A1'), 2, 2)).toBe(true)
     expect(engine.isItPossibleToSetCellContents(adr('A2'), 2, 2)).toBe(false)
+  })
+
+  it('no if content exceeds sheet size limits', () => {
+    const engine = HyperFormula.buildFromArray([])
+    const cellInLastColumn = simpleCellAddress(0, Config.defaultConfig.maxColumns - 1, 0)
+    const cellInLastRow = simpleCellAddress(0, 0, Config.defaultConfig.maxRows - 1)
+    expect(engine.isItPossibleToSetCellContents(cellInLastColumn, 1, 1)).toEqual(true)
+    expect(engine.isItPossibleToSetCellContents(cellInLastColumn, 2, 1)).toEqual(false)
+    expect(engine.isItPossibleToSetCellContents(cellInLastRow, 1, 1)).toEqual(true)
+    expect(engine.isItPossibleToSetCellContents(cellInLastRow, 1, 2)).toEqual(false)
   })
 
   it('yes if numeric matrix', () => {
@@ -560,6 +571,24 @@ describe('changing cell content', () => {
     expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.ERROR, 'Parsing error'))
     expect(engine.getCellFormula(adr('A1'))).toEqual('{=TRANSPOSE(}')
   })
+
+  it('should throw when trying to set cell content outside sheet limits', () => {
+    const engine = HyperFormula.buildFromArray([])
+    const cellInLastColumn = simpleCellAddress(0, Config.defaultConfig.maxColumns, 0)
+    const cellInLastRow = simpleCellAddress(0, 0, Config.defaultConfig.maxRows)
+
+    expect(() => engine.setCellContents(cellInLastColumn, '1')).toThrow(new SheetSizeLimitExceededError())
+    expect(() => engine.setCellContents(cellInLastRow, '1')).toThrow(new SheetSizeLimitExceededError())
+  })
+
+  it('setting empty cells outside sheet limits does not produce error', () => {
+    const engine = HyperFormula.buildFromArray([])
+    const cellInLastColumn = simpleCellAddress(0, Config.defaultConfig.maxColumns, 0)
+    const cellInLastRow = simpleCellAddress(0, 0, Config.defaultConfig.maxRows)
+
+    expect(() => engine.setCellContents(cellInLastColumn, EmptyValue)).not.toThrow()
+    expect(() => engine.setCellContents(cellInLastRow, EmptyValue)).not.toThrow()
+  })
 })
 
 describe('change multiple cells contents', () => {
@@ -650,6 +679,15 @@ describe('change multiple cells contents', () => {
 
     expect(changes.length).toEqual(6)
     expect(changes.map((change) => change.newValue)).toEqual(expect.arrayContaining([7, 8, 9, 10, 15, 18]))
+  })
+
+  it('should throw when trying to set cell contents outside sheet limits', () => {
+    const engine = HyperFormula.buildFromArray([])
+    const cellInLastColumn = simpleCellAddress(0, Config.defaultConfig.maxColumns - 1, 0)
+    const cellInLastRow = simpleCellAddress(0, 0, Config.defaultConfig.maxRows - 1)
+
+    expect(() => engine.setCellContents(cellInLastColumn, [['1', '2']])).toThrow(new SheetSizeLimitExceededError())
+    expect(() => engine.setCellContents(cellInLastRow, [['1'], ['2']])).toThrow(new SheetSizeLimitExceededError())
   })
 })
 

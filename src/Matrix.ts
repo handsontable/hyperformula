@@ -1,3 +1,8 @@
+/**
+ * @license
+ * Copyright (c) 2020 Handsoncode. All rights reserved.
+ */
+
 import {AbsoluteCellRange} from './AbsoluteCellRange'
 import {CellError, ErrorType, SimpleCellAddress, simpleCellAddress} from './Cell'
 import {Ast, AstNodeType} from './parser'
@@ -12,6 +17,7 @@ export class MatrixSize {
     }
   }
 }
+
 export type MatrixSizeCheck = MatrixSize | CellError
 
 export function matrixSizeForTranspose(inputSize: MatrixSize): MatrixSize {
@@ -36,15 +42,18 @@ export function checkMatrixSize(ast: Ast, formulaAddress: SimpleCellAddress): Ma
         if (ast.args.length !== 2) {
           return new CellError(ErrorType.NA)
         }
+        if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
+          return new CellError(ErrorType.NUM)
+        }
 
         const left = checkMatrixSize(ast.args[0], formulaAddress)
         const right = checkMatrixSize(ast.args[1], formulaAddress)
 
         if (left instanceof CellError) {
           return left
-        } else if(right instanceof CellError) {
+        } else if (right instanceof CellError) {
           return right
-        } else if(left.width !== right.height) {
+        } else if (left.width !== right.height) {
           return new CellError(ErrorType.VALUE)
         } else {
           return matrixSizeForMultiplication(left, right)
@@ -55,13 +64,16 @@ export function checkMatrixSize(ast: Ast, formulaAddress: SimpleCellAddress): Ma
         if (ast.args.length < 2 || ast.args.length > 3) {
           return new CellError(ErrorType.NA)
         }
+        if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
+          return new CellError(ErrorType.NUM)
+        }
 
         const matrix = checkMatrixSize(ast.args[0], formulaAddress)
         const windowArg = ast.args[1]
 
         if (matrix instanceof CellError) {
           return matrix
-        } else if(windowArg.type !== AstNodeType.NUMBER) {
+        } else if (windowArg.type !== AstNodeType.NUMBER) {
           return new CellError(ErrorType.VALUE)
         }
 
@@ -78,8 +90,8 @@ export function checkMatrixSize(ast: Ast, formulaAddress: SimpleCellAddress): Ma
         }
 
         if (window > matrix.width || window > matrix.height
-            || stride > window
-            || (matrix.width - window) % stride !== 0 || (matrix.height - window) % stride !== 0) {
+          || stride > window
+          || (matrix.width - window) % stride !== 0 || (matrix.height - window) % stride !== 0) {
           return new CellError(ErrorType.VALUE)
         }
 
@@ -90,6 +102,9 @@ export function checkMatrixSize(ast: Ast, formulaAddress: SimpleCellAddress): Ma
           return new CellError(ErrorType.NA)
         }
 
+        if (ast.args[0].type === AstNodeType.EMPTY) {
+          return new CellError(ErrorType.NUM)
+        }
         const size = checkMatrixSize(ast.args[0], formulaAddress)
 
         return size instanceof CellError ? size : matrixSizeForTranspose(size)
@@ -100,9 +115,9 @@ export function checkMatrixSize(ast: Ast, formulaAddress: SimpleCellAddress): Ma
     }
   } else if (ast.type === AstNodeType.CELL_RANGE) {
     const range = AbsoluteCellRange.fromCellRange(ast, formulaAddress)
-    return { width: range.width(), height: range.height() }
+    return {width: range.width(), height: range.height()}
   } else if (ast.type === AstNodeType.NUMBER || ast.type === AstNodeType.CELL_REFERENCE) {
-    return { width: 1, height: 1 }
+    return {width: 1, height: 1}
   } else {
     return new CellError(ErrorType.VALUE)
   }
@@ -110,8 +125,11 @@ export function checkMatrixSize(ast: Ast, formulaAddress: SimpleCellAddress): Ma
 
 export interface IMatrix {
   size: MatrixSize,
+
   width(): number,
+
   height(): number,
+
   get(col: number, row: number): number | CellError,
 }
 
@@ -126,6 +144,7 @@ export class NotComputedMatrix implements IMatrix {
   public height(): number {
     return this.size.height
   }
+
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public get(col: number, row: number): number {
     throw Error('Matrix not computed yet.')
@@ -226,6 +245,7 @@ export class ErroredMatrix implements IMatrix {
     public readonly size: MatrixSize,
   ) {
   }
+
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public get(col: number, row: number): CellError {
     return this.error

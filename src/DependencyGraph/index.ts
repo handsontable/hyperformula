@@ -1,5 +1,10 @@
+/**
+ * @license
+ * Copyright (c) 2020 Handsoncode. All rights reserved.
+ */
+
 export {DependencyGraph} from './DependencyGraph'
-export {AddressMapping, findBoundaries} from './AddressMapping/AddressMapping'
+export {AddressMapping} from './AddressMapping/AddressMapping'
 export {Graph, IGetDependenciesQuery} from './Graph'
 export {RangeMapping} from './RangeMapping'
 export {SheetMapping} from './SheetMapping'

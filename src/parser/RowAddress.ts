@@ -1,3 +1,8 @@
+/**
+ * @license
+ * Copyright (c) 2020 Handsoncode. All rights reserved.
+ */
+
 import {absoluteSheetReference, SimpleCellAddress, simpleRowAddress, SimpleRowAddress} from '../Cell'
 import {ReferenceType} from './ColumnAddress'
 import {AddressWithRow} from './Address'
@@ -73,5 +78,9 @@ export class RowAddress implements AddressWithRow {
     const simpleAddress = this.toSimpleRowAddress(baseAddress)
     const dollar = this.type === ReferenceType.ABSOLUTE ? '$' : ''
     return `${dollar}${simpleAddress.row + 1}`
+  }
+
+  public exceedsSheetSizeLimits(maxRows: number): boolean {
+    return this.row >= maxRows
   }
 }

@@ -1,3 +1,8 @@
+/**
+ * @license
+ * Copyright (c) 2020 Handsoncode. All rights reserved.
+ */
+
 import assert from 'assert'
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
 import {EmptyValue, InternalCellValue, simpleCellAddress, SimpleCellAddress} from '../Cell'
@@ -410,9 +415,11 @@ export class DependencyGraph {
           this.addressMapping.removeCell(targetAddress)
         }
         for (const adjacentNode of this.graph.adjacentNodes(targetVertex)) {
-          sourceVertex = sourceVertex || this.fetchCellOrCreateEmpty(targetAddress)
-          this.graph.addEdge(sourceVertex, adjacentNode)
-          this.graph.markNodeAsSpecialRecentlyChanged(sourceVertex)
+          if (adjacentNode !== sourceVertex) {
+            sourceVertex = sourceVertex || this.fetchCellOrCreateEmpty(targetAddress)
+            this.graph.addEdge(sourceVertex, adjacentNode)
+            this.graph.markNodeAsSpecialRecentlyChanged(sourceVertex)
+          }
         }
         this.graph.removeNode(targetVertex)
       }
@@ -531,6 +538,10 @@ export class DependencyGraph {
 
   public* entriesFromRowsSpan(rowsSpan: RowsSpan): IterableIterator<[SimpleCellAddress, CellVertex]> {
     yield* this.addressMapping.entriesFromRowsSpan(rowsSpan)
+  }
+
+  public* entriesFromColumnsSpan(columnsSpan: ColumnsSpan): IterableIterator<[SimpleCellAddress, CellVertex]> {
+    yield* this.addressMapping.entriesFromColumnsSpan(columnsSpan)
   }
 
   public existsVertex(address: SimpleCellAddress): boolean {

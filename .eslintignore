@@ -1,9 +1,18 @@
+# Common files
 node_modules
-dist
-coverage
-script
-lib
+
+# Configurations
 *.config.js
 *.conf.js
 doc
 test-main.js
+
+# Aut-generated directiories
+commonjs
+coverage
+dist
+doc
+es
+lib
+script
+typings

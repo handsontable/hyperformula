@@ -1,13 +1,12 @@
 import {HyperFormula} from '../../src'
 import {ErrorType} from '../../src/Cell'
 import {ConfigParams} from '../../src/Config'
-import {Sheet} from '../../src/GraphBuilder'
-import '../testConfig'
 import {adr, detailedError} from '../testUtils'
+import {Sheet} from '../../src/Sheet'
 
 const sharedExamples = (builder: (sheet: Sheet, config?: Partial<ConfigParams>) => HyperFormula) => {
   describe('VLOOKUP - args validation', () => {
-    it('not enough parameters', function() {
+    it('not enough parameters', () => {
       const engine = builder([
         ['=VLOOKUP(1, A2:B3)'],
       ])
@@ -15,7 +14,7 @@ const sharedExamples = (builder: (sheet: Sheet, config?: Partial<ConfigParams>) 
       expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA))
     })
 
-    it('to many parameters', function() {
+    it('to many parameters', () => {
       const engine = builder([
         ['=VLOOKUP(1, A2:B3, 2, TRUE(), "foo")'],
       ])
@@ -23,7 +22,7 @@ const sharedExamples = (builder: (sheet: Sheet, config?: Partial<ConfigParams>) 
       expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA))
     })
 
-    it('wrong type of first argument', function() {
+    it('wrong type of first argument', () => {
       const engine = builder([
         ['=VLOOKUP(D1:D2, A2:B3, 2, TRUE())'],
       ])
@@ -31,7 +30,7 @@ const sharedExamples = (builder: (sheet: Sheet, config?: Partial<ConfigParams>) 
       expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE))
     })
 
-    it('wrong type of second argument', function() {
+    it('wrong type of second argument', () => {
       const engine = builder([
         ['=VLOOKUP(1, "foo", 2, TRUE())'],
       ])
@@ -39,7 +38,7 @@ const sharedExamples = (builder: (sheet: Sheet, config?: Partial<ConfigParams>) 
       expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE))
     })
 
-    it('wrong type of third argument', function() {
+    it('wrong type of third argument', () => {
       const engine = builder([
         ['=VLOOKUP(1, A2:B3, "foo", TRUE())'],
       ])
@@ -47,7 +46,7 @@ const sharedExamples = (builder: (sheet: Sheet, config?: Partial<ConfigParams>) 
       expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE))
     })
 
-    it('wrong type of fourth argument', function() {
+    it('wrong type of fourth argument', () => {
       const engine = builder([
         ['=VLOOKUP(1, A2:B3, 2, "bar")'],
       ])
@@ -268,7 +267,7 @@ describe('BinarySearchStrategy', () => {
       ['3'],
       ['4'],
       ['5'],
-    ], { useColumnIndex: false, vlookupThreshold: 1})
+    ], {useColumnIndex: false, vlookupThreshold: 1})
 
     expect(engine.getCellValue(adr('A1'))).toEqual(4)
   })
@@ -284,7 +283,7 @@ describe('BinarySearchStrategy', () => {
       ['3'],
       ['4'],
       ['5'],
-    ], { useColumnIndex: false })
+    ], {useColumnIndex: false})
 
     expect(engine.getCellValue(adr('A1'))).toEqual(4)
   })
