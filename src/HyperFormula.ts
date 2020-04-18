@@ -167,17 +167,33 @@ export class HyperFormula implements TypedEmitter {
     )
   }
 
+  
+
   /**
    * Builds the engine for a sheet from a two-dimensional array representation.
    * The engine is created with a single sheet.
    * Can be configured with the optional second parameter that represents a [[ConfigParams]].
    * If not specified, the engine will be built with the default configuration.
-   *
+   * 
    * @param {Sheet} sheet - two-dimensional array representation of sheet
-   * @param {Partial<ConfigParams>} [configInput] - engine configuration
+   * @param {Partial<ConfigParams>} configInput - engine configuration
    *
    * @throws [[SheetSizeLimitExceededError]] when sheet size exceeds the limits
-   *
+   * 
+   * @example
+   * ```js
+   * 
+   * // data represented as an array
+   * const sheetData = [
+      ['1'],
+      ['2'],
+      ['3'],
+    ];
+   * // method with optional config parameter maxColumns
+   * const HF = HyperFormula.buildFromArray(sheetData, {maxColumns: 1000);
+   * 
+   * ```
+   * 
    * @category Factory
    */
   public static buildFromArray(sheet: Sheet, configInput?: Partial<ConfigParams>): HyperFormula {
@@ -191,9 +207,28 @@ export class HyperFormula implements TypedEmitter {
    * If not specified the engine will be built with the default configuration.
    *
    * @param {Sheet} sheets - object with sheets definition
-   * @param {Partial<ConfigParams>} [configInput] - engine configuration
+   * @param {Partial<ConfigParams>} configInput - engine configuration
    *
    * @throws [[SheetSizeLimitExceededError]] when sheet size exceeds the limits
+   * 
+   * @example
+   * ```js
+   * 
+   * // data represented as an object with sheets: Sheet1 and Sheet2
+   * const sheetData = {
+      'Sheet1': [
+        ['1'],
+        ['2'],
+      ],
+      'Sheet2': [
+        ['10'],
+        ['20'],
+      ],
+    };
+   * // method with optional config parameter useColumnIndex
+   * const HF = HyperFormula.buildFromArray(sheetData, {useColumnIndex: true);
+   * 
+   * ```
    *
    * @category Factory
    */
@@ -206,7 +241,19 @@ export class HyperFormula implements TypedEmitter {
   /**
    * Returns registered language from its code string.
    *
-   * @param {string} languageCode - code string of the translation package, for example: `'enGB'`
+   * @param {string} languageCode - code string of the translation package
+   * 
+   * @example
+   * ```js
+   * 
+   * // have a HyperFormula instance built, for example:
+   * const HF = HyperFormula.buildEmpty();
+   *  
+   * 
+   * // return registered language
+   * const language = HF.getLanguage('enGB');
+   * 
+   * ```
    */
   public static getLanguage(languageCode: string): TranslationPackage {
     const val = this.registeredLanguages.get(languageCode)
@@ -220,8 +267,20 @@ export class HyperFormula implements TypedEmitter {
   /**
    * Registers language from under given code string.
    *
-   * @param {string} languageCode - code string of the translation package, for example: `'enGB'`
+   * @param {string} languageCode - code string of the translation package
    * @param {RawTranslationPackage} languagePackage - translation package to be registered
+   * 
+   * @example
+   * ```js
+   * 
+   * // have a HyperFormula instance built, for example:
+   * const HF = HyperFormula.buildEmpty();
+   *  
+   * 
+   * // return registered language
+   * const HF_PL = HF.registerLanguage('plPL', plPL)
+   * 
+   * ```
    */
   public static registerLanguage(languageCode: string, languagePackage: RawTranslationPackage): void {
     if(this.registeredLanguages.has(languageCode)) {
@@ -234,8 +293,21 @@ export class HyperFormula implements TypedEmitter {
   /**
    * Unregisters language that is registered under given code string.
    *
-   * @param {string} languageCode - code string of the translation package, for example: `'enGB'`
+   * @param {string} languageCode - code string of the translation package
    * 
+   * @example
+   * ```js
+   * 
+   * // have a HyperFormula instance built, for example:
+   * const HF = HyperFormula.buildEmpty();
+   *  
+   * // register the language for the instance
+   * const HF_PL = HF.registerLanguage('plPL', plPL)
+   * 
+   * // unregister plPL
+   * const HF = HF_PL.unregisterLanguage('plPL').
+   * 
+   * ```
    */
   public static unregisterLanguage(languageCode: string): void {
     if(this.registeredLanguages.has(languageCode)) {
@@ -247,6 +319,18 @@ export class HyperFormula implements TypedEmitter {
 
   /**
    * Returns all registered languages codes.
+   * 
+   * @example
+   * ```js
+   * 
+   * // have a HyperFormula instance built, for example:
+   * const HF = HyperFormula.buildEmpty();
+   * 
+   * // should return all registered language codes:
+   * 
+   * const registeredLangugaes = HF.getRegisteredLanguagesCodes(); 
+   * 
+   * ```
    */
   public static getRegisteredLanguagesCodes(): string[] {
     return Array.from(this.registeredLanguages.keys())
@@ -257,7 +341,16 @@ export class HyperFormula implements TypedEmitter {
    * Can be configured with the optional parameter that represents a [[ConfigParams]].
    * If not specified the engine will be built with the default configuration.
    *
-   * @param {Partial<ConfigParams>} [configInput] - engine configuration
+   * @param {Partial<ConfigParams>} configInput - engine configuration
+   * 
+   * 
+   * @example
+   * ```js
+   * 
+   * // build with no initial data and with optional config parameter maxColumns
+   * const HF = HyperFormula.buildEmpty({maxColumns: 1000);
+   * 
+   * ```
    *
    * @category Factory
    */
@@ -293,6 +386,23 @@ export class HyperFormula implements TypedEmitter {
    *
    * @throws Throws an error if the sheet ID is unknown
    * @throws [[EvaluationSuspendedError]] when the evaluation is suspended
+   * 
+   * @example
+   * ```js
+   * 
+   * // build from arrays, only one sheet 
+   * const HF = HyperFormula.buildFromArray([
+   * ['1'],
+   * ['2'],
+   * ]);
+   *
+   * // get the cell address
+   * const cellAddress = HF.simpleCellAddressFromString('A1', 0);
+   * 
+   * // get value of the cell, should be '1'
+   * const cellValue = HF.getCellValue(cellAddress);
+   * 
+   * ```
    *
    * @category Cell
    */
