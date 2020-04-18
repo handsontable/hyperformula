@@ -48,6 +48,7 @@ import {BuildEngineFactory, EngineState} from './BuildEngineFactory'
 import {Sheet, Sheets} from './Sheet'
 import {SheetDimensions} from './_types'
 import {FunctionPluginDefinition} from './interpreter/plugin/FunctionPlugin'
+import {FormulaRegistry} from './interpreter/FormulaRegistry'
 
 export type Index = [number, number]
 
@@ -250,6 +251,10 @@ export class HyperFormula implements TypedEmitter {
    */
   public static getRegisteredLanguagesCodes(): string[] {
     return Array.from(this.registeredLanguages.keys())
+  }
+
+  public static registerFormulas(...plugins: FunctionPluginDefinition[]): void {
+    FormulaRegistry.registerFormulaPlugin(...plugins)
   }
 
   /**

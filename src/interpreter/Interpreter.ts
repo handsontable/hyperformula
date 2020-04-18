@@ -171,9 +171,10 @@ export class Interpreter {
         }
       }
       case AstNodeType.FUNCTION_CALL: {
-        const formula = this.formulaRegistry.getFormula(ast.procedureName)
-        if (formula && this.config.translationPackage.isFunctionTranslated(ast.procedureName)) {
-          return formula(ast, formulaAddress)
+        const pluginEntry = this.formulaRegistry.getFormula(ast.procedureName)
+        if (pluginEntry && this.config.translationPackage.isFunctionTranslated(ast.procedureName)) {
+          const [pluginFunction, pluginInstance] = pluginEntry as [string, any]
+          return pluginInstance[pluginFunction](ast, formulaAddress)
         } else {
           return new CellError(ErrorType.NAME)
         }

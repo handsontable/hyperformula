@@ -3,7 +3,7 @@
  * Copyright (c) 2020 Handsoncode. All rights reserved.
  */
 
-import {FunctionPluginDefinition, IImplementedFunction, PluginFunctionType} from './plugin/FunctionPlugin'
+import {FunctionPlugin, FunctionPluginDefinition, IImplementedFunction} from './plugin/FunctionPlugin'
 import {Interpreter} from './Interpreter'
 import {Maybe} from '../Maybe'
 import {Config} from '../Config'
@@ -11,8 +11,10 @@ import {Config} from '../Config'
 export class FormulaRegistry {
   public static plugins: Map<string, [string, FunctionPluginDefinition]> = new Map()
 
-  public static registerFormulaPlugin(plugin: FunctionPluginDefinition) {
-    this.loadPluginFormulas(plugin, this.plugins)
+  public static registerFormulaPlugin(...plugins: FunctionPluginDefinition[]) {
+    for (const plugin of plugins) {
+      this.loadPluginFormulas(plugin, this.plugins)
+    }
   }
 
   public static getFormulas(): IterableIterator<string> {
@@ -32,7 +34,7 @@ export class FormulaRegistry {
   }
 
   private readonly plugins: Map<string, [string, FunctionPluginDefinition]>
-  private readonly formulas: Map<string, PluginFunctionType> = new Map()
+  private readonly formulas: Map<string, [string, FunctionPlugin]> = new Map()
 
   private readonly volatileFunctions: Set<string> = new Set()
   private readonly structuralChangeFunctions: Set<string> = new Set()
@@ -48,25 +50,25 @@ export class FormulaRegistry {
       this.plugins = new Map(FormulaRegistry.plugins)
     }
 
-    for (const [formulaId, [, plugin]] of this.plugins.entries()) {
-      this.categorizeFunction(formulaId, plugin.implementedFunctions[formulaId])
+    for (const [formulaId, [functionName, plugin]] of this.plugins.entries()) {
+      this.categorizeFunction(formulaId, plugin.implementedFunctions[functionName])
     }
   }
 
   public init(interpreter: Interpreter) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const instances: Map<FunctionPluginDefinition, any> = new Map()
+    const instances: any[] = []
     for (const [formulaId, [functionName, plugin]] of this.plugins.entries()) {
-      let pluginInstance = instances.get(plugin)
+      let pluginInstance = instances.find(pluginInstance => pluginInstance instanceof plugin)
       if (pluginInstance === undefined) {
         pluginInstance = new plugin(interpreter)
-        instances.set(plugin, pluginInstance)
+        instances.push(pluginInstance)
       }
-      this.formulas.set(formulaId, pluginInstance[functionName] as PluginFunctionType)
+      this.formulas.set(formulaId, [functionName, pluginInstance])
     }
   }
 
-  public getFormula(formulaId: string): Maybe<PluginFunctionType> {
+  public getFormula(formulaId: string): Maybe<[string, FunctionPlugin]> {
     return this.formulas.get(formulaId)
   }
 
