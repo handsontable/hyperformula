@@ -1,4 +1,4 @@
-name: Test
+name: Test browsers
 
 on: [push]
 
@@ -22,6 +22,10 @@ jobs:
         run: |
           npm ci
 
+      - name: Install xvfb
+        run: |
+          sudo apt-get install xvfb
+
       - name: Run tests
         run: |
-          npm run test:browser
+          xvfb-run --auto-servernum npm run test:browser
