@@ -50,7 +50,7 @@ describe( 'unsupported types should result in error', () => {
     // eslint-disable-next-line
     // @ts-ignore
     expect( () => HyperFormula.buildFromArray([[Symbol(Symbol())]])
-    ).toThrowError('Cannot convert a Symbol value to a string')
+    ).toThrowError()
   })
   it('should give parsing error #9', () => {
     // eslint-disable-next-line
