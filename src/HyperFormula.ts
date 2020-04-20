@@ -488,10 +488,10 @@ export class HyperFormula implements TypedEmitter {
    * // build from arrays, only one sheet 
    * const hfInstance = HyperFormula.buildFromArray([
    * ['=SUM(1,2,3)'],
-   * ['2'],
+   * ['=A1+5`],
    * ]);
    * 
-   * // should return all values of a sheet [['1'], ['2']]
+   * // should return all values of a sheet [['=SUM(1,2,3)'], ['=A1+5']]
    * const sheetFormulas = hfInstance.getSheetFormulas(0);
    * ```
    *
@@ -509,6 +509,18 @@ export class HyperFormula implements TypedEmitter {
    *
    * @throws [[EvaluationSuspendedError]] when the evaluation is suspended
    * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
+   * 
+   * @example
+   * ```js
+   * // build from arrays, only one sheet 
+   * const hfInstance = HyperFormula.buildFromArray([
+   * ['=SUM(1,2,3)'],
+   * ['=A1+5`],
+   * ]);
+   * 
+   * // TODO
+   * const serializedContent = hfInstance.getSheetSerialized(0);
+   * ```
    *
    * @category Sheet
    */
@@ -521,7 +533,20 @@ export class HyperFormula implements TypedEmitter {
    * Returns a map containing dimensions of all sheets for the engine instance represented as a key-value pairs where keys are sheet IDs and dimensions are returned as numbers, width and height respectively.
    *
    * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
-   *
+   * 
+   * @example
+   * ```js
+   * // build from arrays, only one sheet 
+   * const hfInstance = HyperFormula.buildFromArray([
+   * ['1'],
+   * ['2'],
+   * ]);
+   * 
+   * // TO CHECK
+   * // should return {'Sheet1': {'height': 1, 'width': 2}}
+   * const allSheetsDimensions = hfInstance.getAllSheetsDimensions();
+   * ```
+   * 
    * @category Sheet
    */
   public getAllSheetsDimensions(): Record<string, SheetDimensions> {
@@ -535,6 +560,19 @@ export class HyperFormula implements TypedEmitter {
    * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
    *
    * @param {number} sheetId - sheet ID number
+   * 
+   * @example
+   * ```js
+   * // build from arrays, only one sheet 
+   * const hfInstance = HyperFormula.buildFromArray([
+   * ['1'],
+   * ['2'],
+   * ]);
+   * 
+   * // TO CHECK
+   * // should return {'Sheet1': {'height': 1, 'width': 2}}
+   * const sheetDimensions = hfInstance.getSheetDimensions(0);
+   * ```
    *
    * @category Sheet
    */
@@ -549,6 +587,19 @@ export class HyperFormula implements TypedEmitter {
    * Returns values of all sheets in a form of an object which property keys are strings and values are arrays of arrays of [[CellValue]]
    *
    * @throws [[EvaluationSuspendedError]] when the evaluation is suspended
+   * 
+   * @example
+   * ```js
+   * // build from arrays, only one sheet 
+   * const hfInstance = HyperFormula.buildFromArray([
+   * ['1'],
+   * ['2'],
+   * ]);
+   * 
+   * // TO CHECK
+   * // should return {'Sheet1': [['1'], ['2']]}
+   * const allSheetsValues = hfInstance.getAllSheetsValues();
+   * ```
    *
    * @category Sheet
    */
