@@ -74,6 +74,6 @@ describe('Building engine from arrays', () => {
         null, // broken sheet
         [6, 7]
       ] as any)
-    }).toThrowError()
+    }).toThrowError(/^Cannot read property 'length' of null$/)
   })
 })
