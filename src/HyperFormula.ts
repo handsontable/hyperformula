@@ -182,7 +182,6 @@ export class HyperFormula implements TypedEmitter {
    * 
    * @example
    * ```js
-   * 
    * // data represented as an array
    * const sheetData = [
       ['1'],
@@ -190,8 +189,7 @@ export class HyperFormula implements TypedEmitter {
       ['3'],
     ];
    * // method with optional config parameter maxColumns
-   * const HF = HyperFormula.buildFromArray(sheetData, {maxColumns: 1000);
-   * 
+   * const hfInstance = HyperFormula.buildFromArray(sheetData, {maxColumns: 1000);
    * ```
    * 
    * @category Factory
@@ -213,7 +211,6 @@ export class HyperFormula implements TypedEmitter {
    * 
    * @example
    * ```js
-   * 
    * // data represented as an object with sheets: Sheet1 and Sheet2
    * const sheetData = {
       'Sheet1': [
@@ -226,8 +223,7 @@ export class HyperFormula implements TypedEmitter {
       ],
     };
    * // method with optional config parameter useColumnIndex
-   * const HF = HyperFormula.buildFromArray(sheetData, {useColumnIndex: true);
-   * 
+   * const hfInstance = HyperFormula.buildFromArray(sheetData, {useColumnIndex: true);
    * ```
    *
    * @category Factory
@@ -245,14 +241,11 @@ export class HyperFormula implements TypedEmitter {
    * 
    * @example
    * ```js
-   * 
    * // have a HyperFormula instance built, for example:
-   * const HF = HyperFormula.buildEmpty();
+   * const hfInstance = HyperFormula.buildEmpty();
    *  
-   * 
    * // return registered language
-   * const language = HF.getLanguage('enGB');
-   * 
+   * const language = hfInstance.getLanguage('enGB');
    * ```
    */
   public static getLanguage(languageCode: string): TranslationPackage {
@@ -272,14 +265,12 @@ export class HyperFormula implements TypedEmitter {
    * 
    * @example
    * ```js
-   * 
    * // have a HyperFormula instance built, for example:
-   * const HF = HyperFormula.buildEmpty();
+   * const hfInstance = HyperFormula.buildEmpty();
    *  
    * 
    * // return registered language
-   * const HF_PL = HF.registerLanguage('plPL', plPL)
-   * 
+   * const hfInstance_PL = hfInstance.registerLanguage('plPL', plPL);
    * ```
    */
   public static registerLanguage(languageCode: string, languagePackage: RawTranslationPackage): void {
@@ -297,16 +288,14 @@ export class HyperFormula implements TypedEmitter {
    * 
    * @example
    * ```js
-   * 
    * // have a HyperFormula instance built, for example:
-   * const HF = HyperFormula.buildEmpty();
+   * const hfInstance = HyperFormula.buildEmpty();
    *  
    * // register the language for the instance
-   * HF.registerLanguage('plPL', plPL)
+   * hfInstance.registerLanguage('plPL', plPL)
    * 
    * // unregister plPL
-   * HF.unregisterLanguage('plPL').
-   * 
+   * hfInstance.unregisterLanguage('plPL').
    * ```
    */
   public static unregisterLanguage(languageCode: string): void {
@@ -323,11 +312,10 @@ export class HyperFormula implements TypedEmitter {
    * @example
    * ```js
    * // have a HyperFormula instance built, for example:
-   * const HF = HyperFormula.buildEmpty();
+   * const hfInstance = HyperFormula.buildEmpty();
    * 
    * // should return all registered language codes:
-   * 
-   * const registeredLangugaes = HF.getRegisteredLanguagesCodes(); 
+   * const registeredLangugaes = hfInstance.getRegisteredLanguagesCodes(); 
    * ```
    */
   public static getRegisteredLanguagesCodes(): string[] {
@@ -344,10 +332,8 @@ export class HyperFormula implements TypedEmitter {
    * 
    * @example
    * ```js
-   * 
    * // build with no initial data and with optional config parameter maxColumns
-   * const HF = HyperFormula.buildEmpty({maxColumns: 1000);
-   * 
+   * const hfInstance = HyperFormula.buildEmpty({maxColumns: 1000);
    * ```
    *
    * @category Factory
@@ -387,7 +373,6 @@ export class HyperFormula implements TypedEmitter {
    * 
    * @example
    * ```js
-   * 
    * // build from arrays, only one sheet 
    * const HF = HyperFormula.buildFromArray([
    * ['1'],
@@ -396,7 +381,6 @@ export class HyperFormula implements TypedEmitter {
    *
    * // get value of the cell, should be '1'
    * const cellValue = HF.getCellValue({ column: 0, row: 0, sheet: 0 });
-   * 
    * ```
    *
    * @category Cell
@@ -417,6 +401,18 @@ export class HyperFormula implements TypedEmitter {
    * Unparses AST.
    *
    * @param {SimpleCellAddress} cellAddress - cell coordinates
+   * 
+   * @example
+   * ```js
+   * // build from arrays, only one sheet 
+   * const hfInstance = HyperFormula.buildFromArray([
+   * ['=SUM(1,2,3)'],
+   * ['0'],
+   * ]);
+   *
+   * // should return a normalized cell formula '=SUM(1,2,3)'
+   * const cellFormula = hfInstance.getCellFormula({ column: 0, row: 0, sheet: 0 });
+   * ```
    *
    * @category Cell
    */
@@ -431,6 +427,18 @@ export class HyperFormula implements TypedEmitter {
    * @param {SimpleCellAddress} cellAddress - cell coordinates
    *
    * @throws [[EvaluationSuspendedError]] when the evaluation is suspended
+   * 
+   * @example
+   * ```js
+   * // build from arrays, only one sheet 
+   * const hfInstance = HyperFormula.buildFromArray([
+   * ['=SUM(1,2,3)'],
+   * ['0'],
+   * ]);
+   *
+   * // TODO
+   * const serializedCellContent = hfInstance.getCellSerialized({ column: 0, row: 0, sheet: 0 });
+   * ```
    *
    * @category Cell
    */
@@ -447,6 +455,18 @@ export class HyperFormula implements TypedEmitter {
    * @throws [[EvaluationSuspendedError]] when the evaluation is suspended
    *
    * @param {number} sheetId - sheet ID number
+   * 
+   * @example
+   * ```js
+   * // build from arrays, only one sheet 
+   * const hfInstance = HyperFormula.buildFromArray([
+   * ['1'],
+   * ['2'],
+   * ]);
+   * 
+   * // should return all values of a sheet [['1'], ['2']]
+   * const sheetValues = hfInstance.getSheetValues(0);
+   * ```
    *
    * @category Sheet
    */
@@ -462,6 +482,18 @@ export class HyperFormula implements TypedEmitter {
    * @param {SimpleCellAddress} sheetId - sheet ID number
    *
    * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
+   * 
+   * @example
+   * ```js
+   * // build from arrays, only one sheet 
+   * const hfInstance = HyperFormula.buildFromArray([
+   * ['=SUM(1,2,3)'],
+   * ['2'],
+   * ]);
+   * 
+   * // should return all values of a sheet [['1'], ['2']]
+   * const sheetFormulas = hfInstance.getSheetFormulas(0);
+   * ```
    *
    * @category Sheet
    */
