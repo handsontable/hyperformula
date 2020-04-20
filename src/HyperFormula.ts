@@ -302,10 +302,10 @@ export class HyperFormula implements TypedEmitter {
    * const HF = HyperFormula.buildEmpty();
    *  
    * // register the language for the instance
-   * const HF_PL = HF.registerLanguage('plPL', plPL)
+   * HF.registerLanguage('plPL', plPL)
    * 
    * // unregister plPL
-   * const HF = HF_PL.unregisterLanguage('plPL').
+   * HF.unregisterLanguage('plPL').
    * 
    * ```
    */
@@ -322,14 +322,12 @@ export class HyperFormula implements TypedEmitter {
    * 
    * @example
    * ```js
-   * 
    * // have a HyperFormula instance built, for example:
    * const HF = HyperFormula.buildEmpty();
    * 
    * // should return all registered language codes:
    * 
    * const registeredLangugaes = HF.getRegisteredLanguagesCodes(); 
-   * 
    * ```
    */
   public static getRegisteredLanguagesCodes(): string[] {
@@ -396,11 +394,8 @@ export class HyperFormula implements TypedEmitter {
    * ['2'],
    * ]);
    *
-   * // get the cell address
-   * const cellAddress = HF.simpleCellAddressFromString('A1', 0);
-   * 
    * // get value of the cell, should be '1'
-   * const cellValue = HF.getCellValue(cellAddress);
+   * const cellValue = HF.getCellValue({ column: 0, row: 0, sheet: 0 });
    * 
    * ```
    *
