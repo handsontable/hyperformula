@@ -1,7 +1,7 @@
 /**
  * If not equal environment script. Checks if the passed environment variables
  * are not equal with the variables stored in the system. If detected, the script
- * is terminated with an error otherwise terminates without error.
+ * is terminated without an error otherwise terminates with error.
  */
 const { parse } = require('querystring')
 
