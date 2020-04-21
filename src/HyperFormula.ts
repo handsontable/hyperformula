@@ -491,7 +491,7 @@ export class HyperFormula implements TypedEmitter {
    * ['=A1+5`],
    * ]);
    * 
-   * // should return all values of a sheet [['=SUM(1,2,3)'], ['=A1+5']]
+   * // should return all formulas of a sheet [['=SUM(1,2,3)'], ['=A1+5']]
    * const sheetFormulas = hfInstance.getSheetFormulas(0);
    * ```
    *
