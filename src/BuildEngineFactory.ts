@@ -37,6 +37,7 @@ export type EngineState = {
   exporter: Exporter,
   namedExpressions: NamedExpressions,
   serialization: Serialization,
+  formulaRegistry: FormulaRegistry,
 }
 
 export class BuildEngineFactory {
@@ -100,7 +101,8 @@ export class BuildEngineFactory {
       crudOperations,
       exporter,
       namedExpressions,
-      serialization
+      serialization,
+      formulaRegistry,
     }
   }
 

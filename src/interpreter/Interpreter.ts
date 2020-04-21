@@ -5,7 +5,7 @@
 
 import GPU from 'gpu.js'
 import {AbsoluteCellRange, AbsoluteColumnRange, AbsoluteRowRange} from '../AbsoluteCellRange'
-import {CellError, ErrorType, invalidSimpleCellAddress, NoErrorCellValue, SimpleCellAddress,} from '../Cell'
+import {CellError, ErrorType, invalidSimpleCellAddress, NoErrorCellValue, SimpleCellAddress, } from '../Cell'
 import {ColumnSearchStrategy} from '../ColumnSearch/ColumnSearchStrategy'
 import {Config} from '../Config'
 import {DateTimeHelper} from '../DateTimeHelper'
@@ -15,7 +15,7 @@ import {Maybe} from '../Maybe'
 // noinspection TypeScriptPreferShortImport
 import {Ast, AstNodeType, CellRangeAst, ColumnRangeAst, RowRangeAst} from '../parser/Ast'
 import {Statistics} from '../statistics/Statistics'
-import {ArithmeticHelper, divide, multiply, percent, power, unaryminus,} from './ArithmeticHelper'
+import {ArithmeticHelper, divide, multiply, percent, power, unaryminus, } from './ArithmeticHelper'
 import {InterpreterValue, SimpleRangeValue} from './InterpreterValue'
 import {concatenate} from './text'
 import {NumberLiteralHelper} from '../NumberLiteralHelper'

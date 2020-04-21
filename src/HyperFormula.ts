@@ -165,7 +165,8 @@ export class HyperFormula implements TypedEmitter {
       engine.crudOperations,
       engine.exporter,
       engine.namedExpressions,
-      engine.serialization
+      engine.serialization,
+      engine.formulaRegistry,
     )
   }
 
@@ -298,7 +299,8 @@ export class HyperFormula implements TypedEmitter {
     private _crudOperations: CrudOperations,
     private _exporter: Exporter,
     private _namedExpressions: NamedExpressions,
-    private _serialization: Serialization
+    private _serialization: Serialization,
+    private _formulaRegistry: FormulaRegistry,
   ) {
   }
 
@@ -486,6 +488,7 @@ export class HyperFormula implements TypedEmitter {
     this._exporter = newEngine.exporter
     this._namedExpressions = newEngine.namedExpressions
     this._serialization = newEngine.serialization
+    this._formulaRegistry = newEngine.formulaRegistry
   }
 
   /**
@@ -1575,6 +1578,10 @@ export class HyperFormula implements TypedEmitter {
       return false
     }
     return true
+  }
+
+  public getFormulas(): string[] {
+    return this._formulaRegistry.getFormulas()
   }
 
   private extractTemporaryFormula(formulaString: string, sheetId: number = 1): [Ast | false, SimpleCellAddress] {
