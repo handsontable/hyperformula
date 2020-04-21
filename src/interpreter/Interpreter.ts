@@ -34,7 +34,7 @@ export class Interpreter {
     public readonly numberLiteralsHelper: NumberLiteralHelper,
     public readonly formulaRegistry: FormulaRegistry
   ) {
-    this.formulaRegistry.init(this)
+    this.formulaRegistry.initializePlugins(this)
     this.arithmeticHelper = new ArithmeticHelper(config, dateHelper, numberLiteralsHelper)
   }
 

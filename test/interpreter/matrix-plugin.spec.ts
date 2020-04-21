@@ -5,7 +5,7 @@ import {adr, detailedError} from '../testUtils'
 
 describe('Matrix plugin', () => {
   beforeAll(() => {
-    HyperFormula.registerFormulas(MatrixPlugin)
+    HyperFormula.registerFormulaPlugins(MatrixPlugin)
   })
 
   it('matrix multiplication', () => {

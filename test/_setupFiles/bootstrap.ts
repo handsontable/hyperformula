@@ -6,7 +6,7 @@ import {HyperFormula} from '../../src'
 import {Config} from '../../src/Config'
 import {AlwaysSparse} from '../../src/DependencyGraph/AddressMapping/ChooseAddressMappingPolicy'
 import {languages} from '../../src/i18n'
-import {unregisterAllLanguages} from './../testUtils'
+import {unregisterAllFormulas, unregisterAllLanguages} from './../testUtils'
 import {SumifPlugin} from '../../src/interpreter/plugin/SumifPlugin'
 import {TextPlugin} from '../../src/interpreter/plugin/TextPlugin'
 import {NumericAggregationPlugin} from '../../src/interpreter/plugin/NumericAggregationPlugin'
@@ -56,7 +56,9 @@ beforeEach(() => {
   const defaultLanguage = Config.defaultConfig.language
 
   HyperFormula.registerLanguage(defaultLanguage, languages[defaultLanguage])
-  HyperFormula.registerFormulas(
+
+  unregisterAllFormulas()
+  HyperFormula.registerFormulaPlugins(
     SumifPlugin,
     TextPlugin,
     NumericAggregationPlugin,

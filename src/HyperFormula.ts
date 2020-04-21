@@ -253,8 +253,20 @@ export class HyperFormula implements TypedEmitter {
     return Array.from(this.registeredLanguages.keys())
   }
 
-  public static registerFormulas(...plugins: FunctionPluginDefinition[]): void {
-    FormulaRegistry.registerFormulaPlugin(...plugins)
+  public static registerFormulaPlugins(...plugins: FunctionPluginDefinition[]): void {
+    FormulaRegistry.registerFormulaPlugins(...plugins)
+  }
+
+  public static registerFormula(formulaId: string, plugin: FunctionPluginDefinition): void {
+    FormulaRegistry.registerFormula(formulaId, plugin)
+  }
+
+  public static unregisterFormula(formulaId: string): void {
+    FormulaRegistry.unregisterFormula(formulaId)
+  }
+
+  public static getFormulas(): string[] {
+    return FormulaRegistry.getFormulas()
   }
 
   /**

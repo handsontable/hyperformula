@@ -12,23 +12,27 @@ import {FormulaPluginValidationError} from '../errors'
 export class FormulaRegistry {
   public static plugins: Map<string, [string, FunctionPluginDefinition]> = new Map()
 
-  public static registerFormulaPlugin(...plugins: FunctionPluginDefinition[]) {
+  public static registerFormulaPlugins(...plugins: FunctionPluginDefinition[]): void {
     for (const plugin of plugins) {
       this.loadPluginFormulas(plugin, this.plugins)
     }
   }
 
-  public static registerFormula(functionId: string, plugin: FunctionPluginDefinition) {
-    const entry = Object.keys(plugin.implementedFunctions).find(entry => plugin.implementedFunctions[entry].translationKey === functionId)
+  public static registerFormula(formulaId: string, plugin: FunctionPluginDefinition): void {
+    const entry = Object.keys(plugin.implementedFunctions).find(entry => plugin.implementedFunctions[entry].translationKey === formulaId)
     if (entry !== undefined) {
       this.loadPluginFormula(plugin, entry, this.plugins)
     } else {
-      throw new FormulaPluginValidationError()
+      throw FormulaPluginValidationError.formulaNotDeclaredInPlugin(formulaId, plugin.name)
     }
   }
 
-  public static getFormulas(): IterableIterator<string> {
-    return this.plugins.keys()
+  public static unregisterFormula(functionId: string): void {
+    this.plugins.delete(functionId)
+  }
+
+  public static getFormulas(): string[] {
+    return Array.from(this.plugins.keys())
   }
 
   public static getFormulaPlugin(formulaId: string): Maybe<FunctionPluginDefinition> {
@@ -48,7 +52,7 @@ export class FormulaRegistry {
       const formulaId = pluginFunctionData.translationKey.toUpperCase()
       registry.set(formulaId, [functionName, plugin])
     } else {
-      throw new FormulaPluginValidationError()
+      throw FormulaPluginValidationError.formulaMethodNotFound(functionName, plugin.name)
     }
   }
 
@@ -74,7 +78,7 @@ export class FormulaRegistry {
     }
   }
 
-  public init(interpreter: Interpreter) {
+  public initializePlugins(interpreter: Interpreter): void {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const instances: any[] = []
     for (const [formulaId, [functionName, plugin]] of this.plugins.entries()) {
@@ -91,8 +95,8 @@ export class FormulaRegistry {
     return this.formulas.get(formulaId)
   }
 
-  public getFormulas(): IterableIterator<string> {
-    return this.formulas.keys()
+  public getFormulas(): string[] {
+    return Array.from(this.formulas.keys())
   }
 
   public doesFormulaNeedArgumentToBeComputed = (formulaId: string): boolean => {
@@ -107,7 +111,7 @@ export class FormulaRegistry {
     return this.structuralChangeFunctions.has(formulaId)
   }
 
-  private categorizeFunction(functionId: string, functionMetadata: IImplementedFunction) {
+  private categorizeFunction(functionId: string, functionMetadata: IImplementedFunction): void {
     if (functionMetadata.isVolatile) {
       this.volatileFunctions.add(functionId)
     }

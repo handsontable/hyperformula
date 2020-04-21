@@ -15,6 +15,7 @@ import {
 } from '../src/parser'
 import {EngineComparator} from './graphComparator'
 import {ColumnRangeAst, RowRangeAst} from '../src/parser/Ast'
+import {FormulaRegistry} from '../src/interpreter/FormulaRegistry'
 
 export const extractReference = (engine: HyperFormula, address: SimpleCellAddress): CellAddress => {
   return ((engine.addressMapping.fetchCell(address) as FormulaCellVertex).getFormula(engine.lazilyTransformingAstService) as CellReferenceAst).reference
@@ -128,5 +129,11 @@ export function expectCloseTo(actual: InternalCellValue, expected: number, preci
 export function unregisterAllLanguages() {
   for (const langCode of HyperFormula.getRegisteredLanguagesCodes()) {
     HyperFormula.unregisterLanguage(langCode)
+  }
+}
+
+export function unregisterAllFormulas() {
+  for (const formulaId of FormulaRegistry.getFormulas()) {
+    HyperFormula.unregisterFormula(formulaId)
   }
 }
