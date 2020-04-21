@@ -12,7 +12,7 @@ try {
 
   const engine = HyperFormula.buildFromArray([
     ['42', '=A1 + 2']
-  ], { gpuMode: 'cpu', licenseKey: 'agpl-v3' })
+  ], { gpuMode: 'cpu', licenseKey: 'non-commercial-and-evaluation' })
 
   const valueA1 = engine.getCellValue({ sheet: 0, row: 0, col: 0 })
   const valueB1 = engine.getCellValue({ sheet: 0, row: 0, col: 1 })
