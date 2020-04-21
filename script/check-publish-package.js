@@ -51,6 +51,7 @@ process.stdin.on('data', function(data) {
     console.log(`Publish package check: \u001b[0;32mOK\u001b[0m`)
   }).catch((err) => {
     console.log(`Publish package check: \u001b[0;31mERROR\u001b[0m (${err.message})`)
+    process.exit(1)
   }).finally(() => {
     return Promise.all([
       removePackage(packageName),
@@ -58,6 +59,7 @@ process.stdin.on('data', function(data) {
     ])
   }).catch((err) => {
     console.log(`Publish package check: Error while cleanup the stuff (${err.message})`)
+    process.exit(1)
   })
 })
 process.stdout.on('error', (err) => {
