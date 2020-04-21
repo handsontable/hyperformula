@@ -949,6 +949,7 @@ export class HyperFormula implements TypedEmitter {
    * @throws an error while attempting to paste onto a matrix
    * @throws [[EvaluationSuspendedError]] when the evaluation is suspended
    * @throws [[SheetSizeLimitExceededError]] when performing this operation would result in sheet size limits exceeding
+   * @throws [[NothingToPasteError]] when clipboard is empty
    *
    * @category Clipboard
    */
@@ -1430,18 +1431,35 @@ export class HyperFormula implements TypedEmitter {
 
   /**
    * Gets specified named expression value.
-   * Returns a [[CellValue]] or null if the given named expression does not exists
+   * Returns a [[CellValue]] or undefined if the given named expression does not exists
    *
    * @param {string} expressionName - expression name, case insensitive.
    *
    * @category Named Expression
    */
-  public getNamedExpressionValue(expressionName: string): CellValue | null {
+  public getNamedExpressionValue(expressionName: string): Maybe<CellValue> {
     const namedExpressionValue = this._namedExpressions.getNamedExpressionValue(expressionName)
     if (namedExpressionValue === null) {
-      return null
+      return undefined
     } else {
       return this._exporter.exportValue(namedExpressionValue)
+    }
+  }
+
+  /**
+   * Returns a normalized formula string for given named expression or `undefined` for a named expression that does not exist or does not hold a formula.
+   * Unparses AST.
+   *
+   * @param {string} expressionName - expression name, case insensitive.
+   *
+   * @category Named Expression
+   */
+  public getNamedExpressionFormula(expressionName: string): Maybe<string> {
+    const namedExpressionAddress = this._namedExpressions.getInternalNamedExpressionAddress(expressionName)
+    if (namedExpressionAddress === null) {
+      return undefined
+    } else {
+      return this._serialization.getCellFormula(namedExpressionAddress)
     }
   }
 

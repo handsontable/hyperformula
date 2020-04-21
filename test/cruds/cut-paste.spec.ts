@@ -885,20 +885,6 @@ describe('move cells with matrices', () => {
 })
 
 describe('aborting cut paste', () => {
-  it('should do nothing when clipboard is cleared', () => {
-    const engine = HyperFormula.buildFromArray([
-      ['1'],
-      ['2']
-    ])
-
-    engine.cut(adr('A1'), 1, 2)
-    engine.clearClipboard()
-    engine.paste(adr('B2'))
-
-    expect(engine.getCellValue(adr('B1'))).toEqual(EmptyValue)
-    expect(engine.getCellValue(adr('B2'))).toEqual(EmptyValue)
-  })
-
   it('should be aborted when addRows is done before paste', () => {
     const engine = HyperFormula.buildFromArray([
       ['1'],

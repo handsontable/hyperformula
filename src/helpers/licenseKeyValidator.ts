@@ -54,7 +54,7 @@ export function checkLicenseKeyValidity(licenseKey: string): LicenseKeyValidityS
     vars: {},
   }
 
-  if (licenseKey === 'non-commercial-and-evaluation' || licenseKey === 'agpl-v3') {
+  if (licenseKey === 'non-commercial-and-evaluation' || licenseKey === 'agpl-v3' || licenseKey === 'internal-use-in-handsontable') {
     messageDescriptor.template = LicenseKeyValidityState.VALID
 
   } else if (typeof licenseKey === 'string' && checkKeySchema(licenseKey)) {

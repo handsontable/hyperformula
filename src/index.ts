@@ -14,6 +14,7 @@ import {
   NoSheetWithIdError,
   NoSheetWithNameError,
   NotAFormulaError,
+  NothingToPasteError,
   SheetSizeLimitExceededError
 } from './errors'
 import {HyperFormula} from './HyperFormula'
@@ -33,6 +34,7 @@ class HyperFormulaNS extends HyperFormula {
   public static DetailedCellError = DetailedCellError
   public static NoOperationToUndoError = NoOperationToUndoError
   public static NoOperationToRedoError = NoOperationToRedoError
+  public static NothingToPasteError = NothingToPasteError
   public static LazilyTransformingAstService = LazilyTransformingAstService
   public static ExportedCellChange = ExportedCellChange
   public static ExportedNamedExpressionChange = ExportedNamedExpressionChange
@@ -66,6 +68,7 @@ export {
   ExportedNamedExpressionChange,
   NoOperationToUndoError,
   NoOperationToRedoError,
+  NothingToPasteError,
   EvaluationSuspendedError,
   ErrorType
 }
