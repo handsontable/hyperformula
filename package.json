@@ -70,6 +70,7 @@
     "verify:umd:full": "node script/check-file.js dist/hyperformula.full.js",
     "verify:umd:full.min": "node script/check-file.js dist/hyperformula.full.min.js",
     "verify:cjs": "node script/check-file.js commonjs",
+    "verify:publish-package": "npm pack | node script/check-publish-package.js",
     "check:licenses": "license-checker --production --excludePackages=\"hyperformula@0.0.1\" --onlyAllow=\"MIT; Apache-2.0; BSD-3-Clause; BSD-2-Clause; ISC; BSD; Unlicense\""
   },
   "devDependencies": {
@@ -99,6 +100,7 @@
     "npm-run-all": "^4.1.5",
     "rimraf": "^3.0.2",
     "serve": "^11.3.0",
+    "tar": "^6.0.1",
     "ts-jest": "^25.2.1",
     "ts-node": "^8.0.1",
     "typedoc": "^0.17.3",
