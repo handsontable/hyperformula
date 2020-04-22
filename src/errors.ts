@@ -170,7 +170,7 @@ export class ExpectedValueOfType extends Error {
  * @see [[buildFromSheets]]
  * @see [[updateConfig]]
  */
-export class ConfigValueTooSmall extends Error {
+export class ConfigValueTooSmallError extends Error {
   constructor(paramName: string, minimum: number) {
     super(`Config parameter ${paramName} should be at least ${minimum}`)
   }
@@ -186,7 +186,7 @@ export class ConfigValueTooSmall extends Error {
  * @see [[buildFromSheets]]
  * @see [[updateConfig]]
  */
-export class ConfigValueTooBig extends Error {
+export class ConfigValueTooBigError extends Error {
   constructor(paramName: string, maximum: number) {
     super(`Config parameter ${paramName} should be at most ${maximum}`)
   }

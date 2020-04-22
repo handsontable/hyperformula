@@ -6,7 +6,7 @@
 import {ErrorType} from './Cell'
 import {defaultParseToDateTime} from './DateTimeDefault'
 import {DateTime, instanceOfSimpleDate, SimpleDate, SimpleDateTime} from './DateTimeHelper'
-import {ExpectedOneOfValues, ExpectedValueOfType, ConfigValueTooSmall, ConfigValueTooBig} from './errors'
+import {ExpectedOneOfValues, ExpectedValueOfType, ConfigValueTooSmallError, ConfigValueTooBigError} from './errors'
 import {AlwaysDense, ChooseAddressMapping} from './DependencyGraph/AddressMapping/ChooseAddressMappingPolicy'
 import {defaultStringifyDateTime} from './format/format'
 import {HyperFormula} from './HyperFormula'
@@ -707,13 +707,13 @@ export class Config implements ConfigParams, ParserConfig {
 
   private validateNumberToBeAtLeast(value: number, paramName: string, minimum: number) {
     if (value < minimum) {
-      throw new ConfigValueTooSmall(paramName, minimum)
+      throw new ConfigValueTooSmallError(paramName, minimum)
     }
   }
 
   private validateNumberToBeAtMost(value: number, paramName: string, maximum: number) {
     if (value > maximum) {
-      throw new ConfigValueTooBig(paramName, maximum)
+      throw new ConfigValueTooBigError(paramName, maximum)
     }
   }
 }
