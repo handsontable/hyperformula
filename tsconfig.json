@@ -1,5 +1,5 @@
 {
-  "include": ["src", "test"],
+  "include": ["src"], /* This should be set to "src" only. Otherwise, "lib/" output is disturbed with other transpiled files. */
   "exclude": ["node_modules"],
   "compilerOptions": {
     /* Basic Options */
