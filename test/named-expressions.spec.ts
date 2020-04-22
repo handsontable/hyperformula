@@ -248,6 +248,6 @@ describe('Named expressions', () => {
 
     engine.addNamedExpression('myName.1', '42')
 
-    expect(engine.getNamedExpressionFormula('not.existing')).toBeUndefined()
+    expect(engine.getNamedExpressionFormula('myName.1')).toBeUndefined()
   })
 })

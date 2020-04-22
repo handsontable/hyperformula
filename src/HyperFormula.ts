@@ -80,6 +80,11 @@ export class HyperFormula implements TypedEmitter {
   public static buildDate = process.env.HT_BUILD_DATE
 
   /**
+   * A release date.
+   */
+  public static releaseDate = process.env.HT_RELEASE_DATE
+
+  /**
    * Calls the `graph` method on the dependency graph.
    * Allows to execute `graph` directly without a need to refer to `dependencyGraph`.
    *
