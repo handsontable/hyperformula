@@ -51,6 +51,9 @@ export class Unparser {
         const rightPart = procedureName + '(' + args + imageWithWhitespace(')', ast.internalWhitespace)
         return imageWithWhitespace(rightPart, ast.leadingWhitespace)
       }
+      case AstNodeType.NAMED_EXPRESSION: {
+        return imageWithWhitespace(ast.namedExpression, ast.leadingWhitespace)
+      }
       case AstNodeType.CELL_REFERENCE: {
         let image
         if (ast.reference.sheet !== null) {

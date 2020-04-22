@@ -186,6 +186,9 @@ export class Interpreter {
           return new CellError(ErrorType.NAME)
         }
       }
+      case AstNodeType.NAMED_EXPRESSION: {
+        throw "Not implemented yet"
+      }
       case AstNodeType.CELL_RANGE: {
         if (!this.rangeSpansOneSheet(ast)) {
           return new CellError(ErrorType.REF)

@@ -33,6 +33,7 @@ export {
   ParsingErrorType,
 
   ProcedureAst,
+  NamedExpressionAst,
   ErrorAst,
   CellReferenceAst,
   CellRangeAst,

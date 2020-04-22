@@ -17,6 +17,7 @@ import {
   PlusOpAst,
   PowerOpAst,
   ProcedureAst,
+  NamedExpressionAst,
   StringAst,
 } from '../../src/parser'
 import {
@@ -263,6 +264,25 @@ describe('ParserWithCaching', () => {
     expect(ast.type).toBe(AstNodeType.ERROR_WITH_RAW_INPUT)
     expect(ast.rawInput).toBe('Sheet2!A1')
     expect(ast.error.type).toBe(ErrorType.REF)
+  })
+
+  it('named expression ast', () => {
+    const parser = new ParserWithCaching(new Config(), new SheetMapping(buildTranslationPackage(enGB)).get)
+
+    const ast = parser.parse('= true', simpleCellAddress(0, 0, 0)).ast as NamedExpressionAst
+
+    expect(ast.type).toBe(AstNodeType.NAMED_EXPRESSION)
+    expect(ast.namedExpression).toBe('true')
+    expect(ast.leadingWhitespace).toBe(' ')
+  })
+
+  it('named expression name is normalized', () => {
+    const parser = new ParserWithCaching(new Config(), new SheetMapping(buildTranslationPackage(enGB)).get)
+
+    const ast = parser.parse('=TRuE', simpleCellAddress(0, 0, 0)).ast as NamedExpressionAst
+
+    expect(ast.type).toBe(AstNodeType.NAMED_EXPRESSION)
+    expect(ast.namedExpression).toBe('true')
   })
 })
 
