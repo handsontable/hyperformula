@@ -261,13 +261,13 @@ export class CrudOperations {
 
     this.undoRedo.clearRedoStack()
     this.clipboardOperations.abortCut()
-    if (!(values instanceof Array)) {
+    if (!Array.isArray(values)) {
       throw new Error('Expected an array of arrays.')
     }
     const oldSheetContent = this.operations.getSheetClipboardCells(sheetId)
     this.operations.clearSheet(sheetId)
     for (let i = 0; i < values.length; i++) {
-      if (!(values[i] instanceof Array)) {
+      if (!Array.isArray(values[i])) {
         throw new Error('Expected an array of arrays.')
       }
       for (let j = 0; j < values[i].length; j++) {
