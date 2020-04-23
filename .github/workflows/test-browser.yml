@@ -22,10 +22,6 @@ jobs:
         run: |
           npm ci
 
-      - name: Install xvfb
-        run: |
-          sudo apt-get install xvfb
-
       - name: Run tests
         run: |
-          xvfb-run --auto-servernum npm run test:browser
+          npm run test:browser

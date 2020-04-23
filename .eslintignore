@@ -3,7 +3,7 @@ node_modules
 
 # Configurations
 *.config.js
-*.conf.js
+karma.*.js
 doc
 test-main.js
 
@@ -15,4 +15,5 @@ doc
 es
 lib
 script
+temp-lib
 typings

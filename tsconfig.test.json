@@ -1,0 +1,7 @@
+{
+  "compilerOptions": {
+    "outDir": "./temp-lib", 
+  },
+  "extends": "./tsconfig",
+  "include": ["src", "test"]
+}
