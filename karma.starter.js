@@ -1,5 +1,3 @@
-window['expect']['arrayContaining'] = jasmine.arrayContaining;
-
 // We have to add missing matchers into Jasmine
 beforeAll(() => {
   jasmine.addMatchers({
@@ -39,10 +37,10 @@ beforeAll(() => {
   });
 });
 
-import './lib/test/_setupFiles/bootstrap';
+import './temp-lib/test/_setupFiles/bootstrap';
 
 // require all modules ending in ".spec.js" from the
-// './lib/test' directory and all subdirectories
-const testsContext = require.context('./lib/test', true, /.spec.js$/);
+// './temp-lib/test' directory and all subdirectories
+const testsContext = require.context('./temp-lib', true, /.spec.js$/);
  
 testsContext.keys().forEach(testsContext);

@@ -3,7 +3,7 @@ node_modules
 
 # Configurations
 *.config.js
-*.conf.js
+karma.*.js
 doc
 test-main.js
 
