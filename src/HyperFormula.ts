@@ -1038,7 +1038,7 @@ export class HyperFormula implements TypedEmitter {
    * ]);
    * 
    * // should return true for this example
-   * const isItPossibleToAddColumns = hfInstance.isItPossibleToAddColumns(0, [1, 1]);
+   * const isAddable = hfInstance.isItPossibleToAddColumns(0, [1, 1]);
    * ```
    * 
    * @category Column
@@ -1104,7 +1104,7 @@ export class HyperFormula implements TypedEmitter {
    * ]);
    * 
    * // should return true for this example
-   * const isItPossibleToRemoveColumns = hfInstance.isItPossibleToRemoveColumns(0, [1, 1]);
+   * const isRemovable = hfInstance.isItPossibleToRemoveColumns(0, [1, 1]);
    * ```
    *
    * @category Column
@@ -1171,7 +1171,7 @@ export class HyperFormula implements TypedEmitter {
    * ]);
    * 
    * // should return true for this example
-   * hfInstance.isItPossibleToMoveCells({ column: 1, row: 0, sheet: 0 }, 1, 1, { column: 3, row: 0, sheet: 0 })
+   * const isMovable = hfInstance.isItPossibleToMoveCells({ col: 1, row: 0, sheet: 0 }, 1, 1, { col: 3, row: 0, sheet: 0 })
    * ```
    *
    * @category Cell
@@ -1210,7 +1210,7 @@ export class HyperFormula implements TypedEmitter {
    * ]);
    * 
    * // should return ???
-   * hfInstance.moveCells({ column: 1, row: 0, sheet: 0 }, 1, 1, { column: 3, row: 0, sheet: 0 })
+   * const changes = hfInstance.moveCells({ col: 1, row: 0, sheet: 0 }, 1, 1, { col: 3, row: 0, sheet: 0 })
    * ```
    *
    * @category Cell
@@ -1240,7 +1240,7 @@ export class HyperFormula implements TypedEmitter {
    * ]);
    * 
    * // should return true for this example
-   * hfInstance.isItPossibleToMoveRows(0, 0, 1, 2);
+   * const isMovable = hfInstance.isItPossibleToMoveRows(0, 0, 1, 2);
    * ```
    *
    * @category Row
@@ -1371,8 +1371,8 @@ export class HyperFormula implements TypedEmitter {
    * ['1', '2']
    * ]);
    * 
-   * // should return [['2']]
-   * hfInstance.copy({ column: 1, row: 0, sheet: 0 }, 1, 1);
+   * // should return [ [ 2 ] ]
+   * const clipboardContent = hfInstance.copy({ col: 1, row: 0, sheet: 0 }, 1, 1);
    * ```
    *
    * @category Clipboard
@@ -1399,8 +1399,8 @@ export class HyperFormula implements TypedEmitter {
    * ['1', '2']
    * ]);
    * 
-   * // should return values that were cut: [['2']]
-   * const clipboardContent = hfInstance.cut({ column: 1, row: 0, sheet: 0 }, 1, 1);
+   * // should return values that were cut: [ [ 1 ] ]
+   * const clipboardContent = hfInstance.cut({ col: 0, row: 0, sheet: 0 }, 1, 1);
    * ```
    *
    * @category Clipboard
@@ -1433,11 +1433,11 @@ export class HyperFormula implements TypedEmitter {
    * ['1', '2']
    * ]);
    * 
-   * // do a copy, [['2']] was copied
-   * hfInstance.cut({ column: 1, row: 0, sheet: 0 }, 1, 1);
+   * // do a copy, [ [ 2 ] ] was copied
+   * hfInstance.cut({ col: 1, row: 0, sheet: 0 }, 1, 1);
    * 
    * // do a paste, should return ???
-   * const changes = hfInstance.paste({ column: 1, row: 0, sheet: 0 });
+   * const changes = hfInstance.paste({ col: 1, row: 0, sheet: 0 });
    * ```
    *
    * @category Clipboard
@@ -1485,6 +1485,9 @@ export class HyperFormula implements TypedEmitter {
    * 
    * @example
    * ```js
+   * // remember to import AbsoluteCellRange 
+   * import {AbsoluteCellRange} from 'hyperformula';
+   * 
    * // build from arrays, only one sheet
    * const hfInstance = HyperFormula.buildFromArray([
    * ['1', '2'],
@@ -1492,8 +1495,8 @@ export class HyperFormula implements TypedEmitter {
    * ['7', '8']
    * ]);
    * 
-   * // returns the cells content: [['1', '2'], ['5', '6']]
-   * const rangeValues = hfInstance.getRangeValues(new AbsoluteCellRange({ column: 0, row: 0, sheet: 0 }, { column: 1, row: 1, sheet: 0 };
+   * // returns the cells content: [ [ 1, 2 ], [ 5, 6 ] ]
+   * const rangeValues = hfInstance.getRangeValues(new AbsoluteCellRange({ col: 0, row: 0, sheet: 0 }, { col: 1, row: 1, sheet: 0 }));
    * ```
    *
    * @category Range
@@ -1513,14 +1516,17 @@ export class HyperFormula implements TypedEmitter {
    * 
    * @example
    * ```js
+   * // remember to import AbsoluteCellRange 
+   * import {AbsoluteCellRange} from 'hyperformula';
+   * 
    * // build from arrays, only one sheet
    * const hfInstance = HyperFormula.buildFromArray([
    * ['=SUM(1:2)', '2'],
    * ['5', '6']
    * ]);
    * 
-   * // returns cell formulas: [['=SUM(1:2)']]
-   * const rangeFormulas = hfInstance.getRangeFormulas(new AbsoluteCellRange({ column: 0, row: 0, sheet: 0 }, { column: 1, row: 1, sheet: 0 };
+   * // returns cell formulas only: [ [ '=SUM(1:2)', undefined ], [ undefined, undefined ] ]
+   * const rangeFormulas = hfInstance.getRangeFormulas(new AbsoluteCellRange({ col: 0, row: 0, sheet: 0 }, { col: 1, row: 1, sheet: 0 }));
    * ```
    *
    * @category Range
@@ -1540,6 +1546,9 @@ export class HyperFormula implements TypedEmitter {
    * 
    * @example
    * ```js
+   * // remember to import AbsoluteCellRange 
+   * import {AbsoluteCellRange} from 'hyperformula';
+   * 
    * // build from arrays, only one sheet
    * const hfInstance = HyperFormula.buildFromArray([
    * ['=SUM(1:2)'], ['2'],
@@ -1547,8 +1556,8 @@ export class HyperFormula implements TypedEmitter {
    * ['7'], ['8'],
    * ]);
    * 
-   * // should return cell values for the given range
-   * const rangeSerialized = hfInstance.getRangeSerialized(new AbsoluteCellRange({ column: 0, row: 0, sheet: 0 }, { column: 1, row: 1, sheet: 0 }));
+   * // should return serialized cell values for the given range: [ [ '=SUM(1:2)', Symbol() ], [ 2, Symbol() ] ]
+   * const rangeSerialized = hfInstance.getRangeSerialized(new AbsoluteCellRange({ col: 0, row: 0, sheet: 0 }, { col: 1, row: 1, sheet: 0 }));
    * ```
    *
    * @category Range
@@ -1584,7 +1593,7 @@ export class HyperFormula implements TypedEmitter {
    *  })
    * 
    * // should return false because 'MySheet2' already exists
-   * const isItPossibleToAddSheet = hfInstance.isItPossibleToAddSheet('MySheet2');
+   * const isAddable = hfInstance.isItPossibleToAddSheet('MySheet2');
    * ```
    *
    * @category Sheet
@@ -1624,7 +1633,7 @@ export class HyperFormula implements TypedEmitter {
    * // should return 'MySheet3'
    * const nameProvided = hfInstance.addSheet('MySheet3');
    * 
-   * // should return autogenerated 'Sheet3'
+   * // should return autogenerated 'Sheet4'
    * const generatedName = hfInstance.addSheet();
    * ```
    *
@@ -1658,7 +1667,7 @@ export class HyperFormula implements TypedEmitter {
    *  })
    * 
    * // should return true
-   * const isItPossibleToRemoveSheet = hfInstance.isItPossibleToRemoveSheet('MySheet2');
+   * const isRemovable = hfInstance.isItPossibleToRemoveSheet('MySheet2');
    * ```
    *
    * @category Sheet
@@ -1734,7 +1743,7 @@ export class HyperFormula implements TypedEmitter {
    *  })
    * 
    * // should return true
-   * const isItPossibleToClearSheet = hfInstance.isItPossibleToClearSheet('MySheet2');
+   * const isClearable = hfInstance.isItPossibleToClearSheet('MySheet2');
    * ```
    *
    * @category Sheet
@@ -1809,7 +1818,7 @@ export class HyperFormula implements TypedEmitter {
    *  })
    * 
    * // should return true
-   * const isItPossibleToReplaceSheetContent = hfInstance.isItPossibleToReplaceSheetContent('MySheet1', [['50'],['60']]);
+   * const isReplaceable = hfInstance.isItPossibleToReplaceSheetContent('MySheet1', [['50'], ['60']]);
    * ```
    *
    * @category Sheet
@@ -1849,8 +1858,8 @@ export class HyperFormula implements TypedEmitter {
    *  ],
    *  });
    * 
-   * // should return ????
-   * const isItPossibleToReplaceSheetContent = hfInstance.isItPossibleToReplaceSheetContent('MySheet1', [['50'],['60']]);
+   * // should return []
+   * const changes = hfInstance.isItPossibleToReplaceSheetContent('MySheet1', [['50'],['60']]);
    * ```
    *
    * @category Sheet
@@ -1913,8 +1922,8 @@ export class HyperFormula implements TypedEmitter {
    *  ],
    *  });
    * 
-   * // should return 'A1'
-   * const A1Notation = hfInstance.simpleCellAddressToString({ sheet: 0, col: 0, row: 0 }, 0);
+   * // should return 'B2'
+   * const A1Notation = hfInstance.simpleCellAddressToString({ sheet: 0, col: 1, row: 1 }, 0);
    * ```
    *
    * @category Helper
@@ -2033,7 +2042,7 @@ export class HyperFormula implements TypedEmitter {
    *  });
    * 
    * // should return 'VALUE'
-   * hfInstance.getCellType({ sheet: 1, col: 1, row: 1 });
+   * const cellType = hfInstance.getCellType({ sheet: 1, col: 0, row: 1 });
    * ```
    *
    * @category Cell
@@ -2064,7 +2073,7 @@ export class HyperFormula implements TypedEmitter {
    *  });
    * 
    * // should return true since the selcted cell contains a simple value
-   * hfInstance.doesCellHaveSimpleValue({ sheet: 1, col: 1, row: 1 });
+   * const isSimpleVal = hfInstance.doesCellHaveSimpleValue({ sheet: 1, col: 0, row: 1 });
    * ```
    *
    * @category Cell
@@ -2088,12 +2097,12 @@ export class HyperFormula implements TypedEmitter {
    *   ['2'],
    *  ],
    *  MySheet2: [
-   *   ['=SUM(A2:A3)']
+   *   ['=SUM(A2:A3)'],
    *   ['20'],
    *  ],
    *  });
    * 
-   * // should return true since the sheet named "MySheet2" contains a formula
+   * // should return true since the specified cell contains a formula
    * hfInstance.doesCellHaveFormula({ sheet: 1, col: 0, row: 0 });
    * ```
    *
@@ -2118,13 +2127,13 @@ export class HyperFormula implements TypedEmitter {
    *   ['2'],
    *  ],
    *  MySheet2: [
-   *   ['=SUM(A2:A3)']
+   *   ['=SUM(A2:A3)'],
    *   ['20'],
    *  ],
    *  });
    * 
    * // should return true
-   * hfInstance.doesCellHaveFormula({ sheet: 1, col: 0, row: 0 });
+   * const isEmpty = hfInstance.doesCellHaveFormula({ sheet: 1, col: 0, row: 0 });
    * ```
    *
    * @category Cell
@@ -2145,7 +2154,7 @@ export class HyperFormula implements TypedEmitter {
    * const hfInstance = HyperFormula.buildFromArray([['{=TRANSPOSE(B1:B1)}']])
    * 
    * // should return true
-   * hfInstance.isCellPartOfMatrix({ sheet: 0, col: 0, row: 0 });
+   * const hasMatrix = hfInstance.isCellPartOfMatrix({ sheet: 0, col: 0, row: 0 });
    * ```
    *
    * @category Cell
@@ -2169,7 +2178,7 @@ export class HyperFormula implements TypedEmitter {
    * ['1', '2']
    * ]);
    * 
-   * // should return 'STRING'
+   * // should return 'NUMBER'
    * hfInstance.getCellValueType({ sheet: 0, col: 0, row: 0 });
    * ```
    *
@@ -2192,7 +2201,7 @@ export class HyperFormula implements TypedEmitter {
    * ]);
    * 
    * // should return the number of sheets: 1
-   * hfInstance.countSheets();
+   * const sheets = hfInstance.countSheets();
    * ```
    *
    * @category Sheet
