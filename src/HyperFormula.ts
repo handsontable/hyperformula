@@ -457,13 +457,13 @@ export class HyperFormula implements TypedEmitter {
    * 
    * @example
    * ```js
-   * // build from arrays, only one sheet 
    * const hfInstance = HyperFormula.buildFromArray([
-   * ['1'],
-   * ['2'],
+   *  ['0', '=SUM(1,2,3)', '=A1'],
+   *  ['1', '=TEXT(A2)', '=C1'],
+   *  ['2', '=SUM(A1:C1)', '=C1'],
    * ]);
    * 
-   * // should return all values of a sheet [['1'], ['2']]
+   * // should return all values of a sheet: [[0, 6, 0], [1, '"1"', 0], [2, 6, 0]]
    * const sheetValues = hfInstance.getSheetValues(0);
    * ```
    *
@@ -486,11 +486,12 @@ export class HyperFormula implements TypedEmitter {
    * ```js
    * // build from arrays, only one sheet 
    * const hfInstance = HyperFormula.buildFromArray([
-   * ['=SUM(1,2,3)'],
-   * ['=A1+5'],
+   *  ['0', '=SUM(1,2,3)', '=A1'],
+   *  ['1', '=TEXT(A2)', '=C1'],
+   *  ['2', '=SUM(A1:C1)', '=C1'],
    * ]);
    * 
-   * // should return all formulas of a sheet [['=SUM(1,2,3)'], ['=A1+5']]
+   * // should return all formulas of a sheet: [[null, '=SUM(1,2,3)', '=A1'], [null, '=TEXT(A2)', '=C1'], [null, '=SUM(A1:C1)', '=C1']]
    * const sheetFormulas = hfInstance.getSheetFormulas(0);
    * ```
    *
@@ -513,11 +514,12 @@ export class HyperFormula implements TypedEmitter {
    * ```js
    * // build from arrays, only one sheet 
    * const hfInstance = HyperFormula.buildFromArray([
-   * ['=SUM(1,2,3)'],
-   * ['=A1+5'],
+   *  ['0', '=SUM(1,2,3)', '=A1'],
+   *  ['1', '=TEXT(A2)', '=C1'],
+   *  ['2', '=SUM(A1:C1)', '=C1'],
    * ]);
    * 
-   * // should return [['=SUM(1,2,3)'], ['=A1+5']]
+   * // should return [['0', '=SUM(1,2,3)', '=A1'], ['1', '=TEXT(A2)', '=C1'], ['2', '=SUM(A1:C1)', '=C1']]
    * const serializedContent = hfInstance.getSheetSerialized(0);
    * ```
    *
