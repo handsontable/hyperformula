@@ -9,6 +9,7 @@ import {Config} from './Config'
 import {DependencyGraph, FormulaCellVertex, MatrixVertex, ParsingErrorVertex} from './DependencyGraph'
 import {Maybe} from './Maybe'
 import {buildLexerConfig, Unparser} from './parser'
+import {NamedExpressionsStore} from './NamedExpressions'
 
 export class Serialization {
   constructor(
@@ -101,8 +102,8 @@ export class Serialization {
     return this.genericAllSheetsGetter((arg) => this.getSheetSerialized(arg))
   }
 
-  public withNewConfig(newConfig: Config): Serialization {
-    const newUnparser = new Unparser(newConfig, buildLexerConfig(newConfig), this.dependencyGraph.sheetMapping.fetchDisplayName)
+  public withNewConfig(newConfig: Config, namedExpressionsStore: NamedExpressionsStore): Serialization {
+    const newUnparser = new Unparser(newConfig, buildLexerConfig(newConfig), this.dependencyGraph.sheetMapping.fetchDisplayName, namedExpressionsStore)
     return new Serialization(this.dependencyGraph, newUnparser, newConfig, this.exporter)
   }
 }

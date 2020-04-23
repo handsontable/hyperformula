@@ -2,6 +2,7 @@ import {HyperFormula} from '../../src'
 import {simpleCellAddress} from '../../src/Cell'
 import {Config} from '../../src/Config'
 import {SheetMapping} from '../../src/DependencyGraph'
+import {NamedExpressionsStore, NamedExpression} from '../../src/NamedExpressions'
 import {buildTranslationPackage, enGB, plPL} from '../../src/i18n'
 import {AstNodeType, buildLexerConfig, ParserWithCaching, Unparser} from '../../src/parser'
 import {adr, unregisterAllLanguages} from '../testUtils'
@@ -14,7 +15,8 @@ describe('Unparse', () => {
   sheetMapping.addSheet('Sheet2')
   sheetMapping.addSheet('Sheet with spaces')
   const parser = new ParserWithCaching(config, sheetMapping.get)
-  const unparser = new Unparser(config, lexerConfig, sheetMapping.fetchDisplayName)
+  const namedExpressionsStore = new NamedExpressionsStore()
+  const unparser = new Unparser(config, lexerConfig, sheetMapping.fetchDisplayName, namedExpressionsStore)
 
 
   beforeEach(() => {
@@ -138,7 +140,7 @@ describe('Unparse', () => {
   it('#unparse with known error with translation', () => {
     const config = new Config({language: 'plPL'})
     const parser = new ParserWithCaching(config, sheetMapping.get)
-    const unparser = new Unparser(config, buildLexerConfig(config), sheetMapping.fetchDisplayName)
+    const unparser = new Unparser(config, buildLexerConfig(config), sheetMapping.fetchDisplayName, new NamedExpressionsStore())
     const formula = '=#ADR!'
     const ast = parser.parse(formula, simpleCellAddress(0, 0, 0)).ast
     const unparsed = unparser.unparse(ast, adr('A1'))
@@ -171,6 +173,18 @@ describe('Unparse', () => {
     const unparsed = unparser.unparse(ast, adr('A1'))
 
     expect(unparsed).toEqual('=true')
+  })
+
+  it('#unparse named expression returns original form', () => {
+    const namedExpressionsStore = new NamedExpressionsStore()
+    namedExpressionsStore.add(new NamedExpression("SomeWEIRD_name", 42))
+    const unparser = new Unparser(config, lexerConfig, sheetMapping.fetchDisplayName, namedExpressionsStore)
+    const formula = '=someWeird_Name'
+    const ast = parser.parse(formula, simpleCellAddress(0, 0, 0)).ast
+
+    const unparsed = unparser.unparse(ast, adr('A1'))
+
+    expect(unparsed).toEqual('=SomeWEIRD_name')
   })
 
   it('#unparse forgets about OFFSET', () => {
@@ -295,8 +309,8 @@ describe('Unparse', () => {
 
     const parser = new ParserWithCaching(configPL, sheetMapping.get)
 
-    const unparserPL = new Unparser(configPL, buildLexerConfig(configPL), sheetMapping.fetchDisplayName)
-    const unparserEN = new Unparser(configEN, buildLexerConfig(configEN), sheetMapping.fetchDisplayName)
+    const unparserPL = new Unparser(configPL, buildLexerConfig(configPL), sheetMapping.fetchDisplayName, new NamedExpressionsStore())
+    const unparserEN = new Unparser(configEN, buildLexerConfig(configEN), sheetMapping.fetchDisplayName, new NamedExpressionsStore())
 
     const formula = '=SUMA(1,2)'
 
@@ -355,7 +369,7 @@ describe('Unparse', () => {
     const sheetMapping = new SheetMapping(buildTranslationPackage(enGB))
     sheetMapping.addSheet('Sheet1')
     const parser = new ParserWithCaching(config, sheetMapping.get)
-    const unparser = new Unparser(config, lexerConfig, sheetMapping.fetchDisplayName)
+    const unparser = new Unparser(config, lexerConfig, sheetMapping.fetchDisplayName, new NamedExpressionsStore())
     const formula = '=1+1234,567'
 
     const ast = parser.parse(formula, adr('A1')).ast
@@ -437,7 +451,7 @@ describe('whitespaces', () => {
   sheetMapping.addSheet('Sheet2')
   sheetMapping.addSheet('Sheet with spaces')
   const parser = new ParserWithCaching(config, sheetMapping.get)
-  const unparser = new Unparser(config, lexerConfig, sheetMapping.fetchDisplayName)
+  const unparser = new Unparser(config, lexerConfig, sheetMapping.fetchDisplayName, new NamedExpressionsStore())
 
   it('should unparse with original whitespaces', () => {
     const formula = '= 1'

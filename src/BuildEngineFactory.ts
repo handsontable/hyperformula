@@ -14,7 +14,7 @@ import {DependencyGraph} from './DependencyGraph'
 import {Evaluator} from './Evaluator'
 import {GraphBuilder} from './GraphBuilder'
 import {UIElement} from './i18n'
-import {NamedExpressions} from './NamedExpressions'
+import {NamedExpressions, NamedExpressionsStore} from './NamedExpressions'
 import {NumberLiteralHelper} from './NumberLiteralHelper'
 import {buildLexerConfig, ParserWithCaching, Unparser} from './parser'
 import {Serialization} from './Serialization'
@@ -47,7 +47,6 @@ export class BuildEngineFactory {
     const columnSearch = buildColumnSearchStrategy(dependencyGraph, config, stats)
     const sheetMapping = dependencyGraph.sheetMapping
     const addressMapping = dependencyGraph.addressMapping
-    const namedExpressions = new NamedExpressions()
 
     for (const sheetName in sheets) {
       if (Object.prototype.hasOwnProperty.call(sheets, sheetName)) {
@@ -63,8 +62,10 @@ export class BuildEngineFactory {
     }
 
     const notEmpty = sheetMapping.numberOfSheets() > 0
+    const namedExpressionsStore = new NamedExpressionsStore()
+    const namedExpressions = new NamedExpressions(namedExpressionsStore)
     const parser = new ParserWithCaching(config, notEmpty ? sheetMapping.get : sheetMapping.fetch)
-    const unparser = new Unparser(config, buildLexerConfig(config), sheetMapping.fetchDisplayName)
+    const unparser = new Unparser(config, buildLexerConfig(config), sheetMapping.fetchDisplayName, namedExpressionsStore)
     const dateHelper = new DateTimeHelper(config)
     const numberLiteralHelper = new NumberLiteralHelper(config)
     const cellContentParser = new CellContentParser(config, dateHelper, numberLiteralHelper)

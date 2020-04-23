@@ -16,6 +16,7 @@ import {
 import {binaryOpTokenMap} from './binaryOpTokenMap'
 import {additionalCharactersAllowedInQuotes, ILexerConfig} from './LexerConfig'
 import {ParserConfig} from './ParserConfig'
+import {NamedExpressionsStore} from '../NamedExpressions'
 
 export type SheetMappingFn = (sheetId: number) => string
 
@@ -24,6 +25,7 @@ export class Unparser {
     private readonly config: ParserConfig,
     private readonly lexerConfig: ILexerConfig,
     private readonly sheetMappingFn: SheetMappingFn,
+    private readonly namedExpressionsStore: NamedExpressionsStore,
   ) {
   }
 
@@ -52,7 +54,8 @@ export class Unparser {
         return imageWithWhitespace(rightPart, ast.leadingWhitespace)
       }
       case AstNodeType.NAMED_EXPRESSION: {
-        return imageWithWhitespace(ast.namedExpression, ast.leadingWhitespace)
+        const originalNamedExpressionName = this.namedExpressionsStore.get(ast.namedExpression)?.name
+        return imageWithWhitespace(originalNamedExpressionName || ast.namedExpression, ast.leadingWhitespace)
       }
       case AstNodeType.CELL_REFERENCE: {
         let image

@@ -455,7 +455,7 @@ export class HyperFormula implements TypedEmitter {
     const newConfig = this._config.mergeConfig(newParams)
 
     const configNewLanguage = this._config.mergeConfig({language: newParams.language})
-    const serializedSheets = this._serialization.withNewConfig(configNewLanguage).getAllSheetsSerialized()
+    const serializedSheets = this._serialization.withNewConfig(configNewLanguage, this._namedExpressions.workbookStore).getAllSheetsSerialized()
 
     const newEngine = BuildEngineFactory.rebuildWithConfig(newConfig, serializedSheets, this._stats)
 

@@ -6,7 +6,7 @@
 import {simpleCellAddress, SimpleCellAddress} from './Cell'
 import {Maybe} from './Maybe'
 
-class NamedExpression {
+export class NamedExpression {
   constructor(
     public readonly name: string,
     public readonly row: number,
@@ -14,7 +14,7 @@ class NamedExpression {
   }
 }
 
-class NamedExpressionsStore {
+export class NamedExpressionsStore {
   private readonly mapping = new Map<string, NamedExpression>()
   private readonly rowMapping = new Map<number, NamedExpression>()
 
@@ -60,9 +60,9 @@ class NamedExpressionsStore {
 export class NamedExpressions {
   public static SHEET_FOR_WORKBOOK_EXPRESSIONS = -1
   private nextNamedExpressionRow: number = 0
-  private workbookStore = new NamedExpressionsStore()
 
   constructor(
+    public readonly workbookStore: NamedExpressionsStore,
   ) {
   }
 
