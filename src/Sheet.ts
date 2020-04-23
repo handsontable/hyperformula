@@ -32,7 +32,13 @@ export function findBoundaries(sheet: Sheet): SheetBoundaries {
   let height = 0
   let cellsCount = 0
 
+  if(!Array.isArray(sheet)) {
+    throw new Error('Expected an array of arrays.')
+  }
   for (let currentRow = 0; currentRow < sheet.length; currentRow++) {
+    if(!Array.isArray(sheet[currentRow])) {
+      throw new Error('Expected an array of arrays.')
+    }
     let currentRowWidth = 0
     for (let currentCol = 0; currentCol < sheet[currentRow].length; currentCol++) {
       const currentValue = sheet[currentRow][currentCol]
