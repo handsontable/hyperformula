@@ -223,7 +223,7 @@ export class HyperFormula implements TypedEmitter {
    *   ],
    * };
    * // method with optional config parameter useColumnIndex
-   * const hfInstance = HyperFormula.buildFromArray(sheetData, { useColumnIndex: true });
+   * const hfInstance = HyperFormula.buildFromSheets(sheetData, { useColumnIndex: true });
    * ```
    *
    * @category Factory
@@ -379,7 +379,7 @@ export class HyperFormula implements TypedEmitter {
    * ]);
    *
    * // get value of the cell, should be '1'
-   * const cellValue = hfInstance.getCellValue({ column: 0, row: 0, sheet: 0 });
+   * const cellValue = hfInstance.getCellValue({ col: 0, row: 0, sheet: 0 });
    * ```
    *
    * @category Cell
@@ -410,7 +410,7 @@ export class HyperFormula implements TypedEmitter {
    * ]);
    *
    * // should return a normalized cell formula '=SUM(1,2,3)'
-   * const cellFormula = hfInstance.getCellFormula({ column: 0, row: 0, sheet: 0 });
+   * const cellFormula = hfInstance.getCellFormula({ col: 0, row: 0, sheet: 0 });
    * ```
    *
    * @category Cell
@@ -435,8 +435,8 @@ export class HyperFormula implements TypedEmitter {
    * ['0'],
    * ]);
    *
-   * // should return cell value, 6 for this example
-   * const serializedCellContent = hfInstance.getCellSerialized({ column: 0, row: 0, sheet: 0 });
+   * // should return serialized content of the cell, =SUM(1,2,3) for this example
+   * const serializedCellContent = hfInstance.getCellSerialized({ col: 0, row: 0, sheet: 0 });
    * ```
    *
    * @category Cell
@@ -459,11 +459,11 @@ export class HyperFormula implements TypedEmitter {
    * ```js
    * const hfInstance = HyperFormula.buildFromArray([
    *  ['0', '=SUM(1,2,3)', '=A1'],
-   *  ['1', '=TEXT(A2)', '=C1'],
+   *  ['1', '=TEXT(A2, "0.0%")', '=C1'],
    *  ['2', '=SUM(A1:C1)', '=C1'],
    * ]);
    * 
-   * // should return all values of a sheet: [[0, 6, 0], [1, '"1"', 0], [2, 6, 0]]
+   * // should return all values of a sheet: [[0, 6, 0], [1, '1.0%', 0], [2, 6, 0]]
    * const sheetValues = hfInstance.getSheetValues(0);
    * ```
    *
@@ -487,11 +487,11 @@ export class HyperFormula implements TypedEmitter {
    * // build from arrays, only one sheet 
    * const hfInstance = HyperFormula.buildFromArray([
    *  ['0', '=SUM(1,2,3)', '=A1'],
-   *  ['1', '=TEXT(A2)', '=C1'],
+   *  ['1', '=TEXT(A2, "0.0%")', '=C1'],
    *  ['2', '=SUM(A1:C1)', '=C1'],
    * ]);
    * 
-   * // should return all formulas of a sheet: [[null, '=SUM(1,2,3)', '=A1'], [null, '=TEXT(A2)', '=C1'], [null, '=SUM(A1:C1)', '=C1']]
+   * // should return all formulas of a sheet: [[undefined, '=SUM(1,2,3)', '=A1'], [undefined, '=TEXT(A2, "0.0%")', '=C1'], [undefined, '=SUM(A1:C1)', '=C1']]
    * const sheetFormulas = hfInstance.getSheetFormulas(0);
    * ```
    *
@@ -515,11 +515,11 @@ export class HyperFormula implements TypedEmitter {
    * // build from arrays, only one sheet 
    * const hfInstance = HyperFormula.buildFromArray([
    *  ['0', '=SUM(1,2,3)', '=A1'],
-   *  ['1', '=TEXT(A2)', '=C1'],
+   *  ['1', '=TEXT(A2, "0.0%")', '=C1'],
    *  ['2', '=SUM(A1:C1)', '=C1'],
    * ]);
    * 
-   * // should return [['0', '=SUM(1,2,3)', '=A1'], ['1', '=TEXT(A2)', '=C1'], ['2', '=SUM(A1:C1)', '=C1']]
+   * // should return [['0', '=SUM(1,2,3)', '=A1'], ['1', '=TEXT(A2, "0.0%")', '=C1'], ['2', '=SUM(A1:C1)', '=C1']]
    * const serializedContent = hfInstance.getSheetSerialized(0);
    * ```
    *
@@ -543,7 +543,7 @@ export class HyperFormula implements TypedEmitter {
    * ['2'],
    * ]);
    * 
-   * // should return {'Sheet1': {'height': 2, 'width': 1}}
+   * // should return {Sheet1: {'width': 1,'height': 2}}
    * const allSheetsDimensions = hfInstance.getAllSheetsDimensions();
    * ```
    * 
@@ -564,12 +564,17 @@ export class HyperFormula implements TypedEmitter {
    * @example
    * ```js
    * // build from arrays, only one sheet 
-   * const hfInstance = HyperFormula.buildFromArray([
-   * ['1'],
-   * ['2'],
-   * ]);
+   * const hfInstance = HyperFormula.buildFromSheets({
+   *   Sheet1: [
+   *    ['1', '2', '=Sheet2!$A1'],  
+   *   ],
+   *   Sheet2: [
+   *     ['3'],
+   *     ['4'],
+   *   ],
+   * })
    * 
-   * // should return {'Sheet1': {'height': 2, 'width': 1}}
+   * // should return { width: 3, height: 1 }
    * const sheetDimensions = hfInstance.getSheetDimensions(0);
    * ```
    *
@@ -595,7 +600,7 @@ export class HyperFormula implements TypedEmitter {
    * ['2'],
    * ]);
    * 
-   * // should return {'Sheet1': [['1'], ['2']]}
+   * // should return { Sheet1: [ [ 1 ], [ 2 ] ] }
    * const allSheetsValues = hfInstance.getAllSheetsValues();
    * ```
    *
@@ -616,8 +621,8 @@ export class HyperFormula implements TypedEmitter {
    *  ['1', '2', '=A1+10']
    * ]);
    * 
-   * // should return { Sheet1: [[undefined, undefined, '=A1+10']] }
-   * const allSheetsValues = hfInstance.getAllSheetsFormulas();
+   * // should return { Sheet1: [ [ undefined, undefined, '=A1+10' ] ] }
+   * const allSheetsFormulas = hfInstance.getAllSheetsFormulas();
    * ```
    * @category Sheet
    */
@@ -637,7 +642,7 @@ export class HyperFormula implements TypedEmitter {
    *  ['1', '2', '=A1+10']
    * ]);
    * 
-   * // should return { Sheet1: [['1', '2', '=A1+10']] }
+   * // should return { Sheet1: [ [ 1, 2, 11 ] ] }
    * const allSheetsSerialized = hfInstance.getAllSheetsValues();
    * ```
    *
@@ -656,9 +661,9 @@ export class HyperFormula implements TypedEmitter {
    * @example
    * ```js
    * // build from arrays, only one sheet 
-   * const hfInstance = HyperFormula.buildFromArray(['1', '2']);
+   * const hfInstance = HyperFormula.buildFromArray([['1'], ['2'], ['3']]);
    * 
-   * // add a config param, for example maxColumns, you can check the configuration with [[getConfig]]
+   * // add a config param, for example maxColumns, you can check the configuration with getConfig method
    * hfInstance.updateConfig({maxColumns: 1000})
    * ```
    *
@@ -833,7 +838,7 @@ export class HyperFormula implements TypedEmitter {
    * ]);
    * 
    * // should return true for this example
-   * const isItPossible = hfInstance.isItPossibleToSetCellContents({ column: 0, row: 0, sheet: 0 }, 2, 1);
+   * const isSettable = hfInstance.isItPossibleToSetCellContents({ col: 0, row: 0, sheet: 0 }, 2, 1);
    * ```
    *
    * @category Cell
@@ -873,8 +878,8 @@ export class HyperFormula implements TypedEmitter {
    * ['1', '2', '=A1'],
    * ]);
    * 
-   * // should return calculated new values: [['1', '2', '2']]
-   * hfInstance.setCellContents({ column: 3, row: 0, sheet: 0 }, [['=B1']]);
+   * // should set the content, returns: [ ExportedCellChange { address: { sheet: 0, col: 3, row: 0 }, newValue: 2 } ]
+   * hfInstance.setCellContents({ col: 3, row: 0, sheet: 0 }, [['=B1']]);
    * ```
    *
    * @category Cell
@@ -901,7 +906,7 @@ export class HyperFormula implements TypedEmitter {
    * ]);
    * 
    * // should return true for this example
-   * const isItPossibleToAddRows = hfInstance.isItPossibleToAddRows(0, [1, 1]));
+   * const isAddable = hfInstance.isItPossibleToAddRows(0, [1, 1]);
    * ```
    * @category Row
    */
@@ -939,7 +944,7 @@ export class HyperFormula implements TypedEmitter {
    * ]);
    * 
    * // should return return an array of cells that were affected by this operation: [['1'], [null], ['1']]
-   * const changes = hfInstance.addRows(0, [1, 1]);
+   * const changes = hfInstance.addRows(0, [0, 1])
    * ```
    *
    * @category Row
@@ -967,7 +972,7 @@ export class HyperFormula implements TypedEmitter {
    * ]);
    * 
    * // should return true for this example
-   * const isItPossibleToRemoveRows = hfInstance.isItPossibleToRemoveRows(0, [1, 1])
+   * const isRemovable = hfInstance.isItPossibleToRemoveRows(0, [1, 1])
    * ```
    *
    * @category Row
