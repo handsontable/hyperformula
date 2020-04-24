@@ -60,7 +60,7 @@ export const ColumnReference = createToken({
 
 export const RowReference = createToken({
   name: 'RowRange',
-  pattern: new RegExp(`\(${sheetNameRegexp}\)\\$?[0-9]+`),
+  pattern: new RegExp(`\(\(${sheetNameRegexp}\)\\$?|\(${sheetNameRegexp}\)?\\$\)[0-9]+`),
 })
 
 export const RangeSeparator = createToken({name: 'RangeSeparator', pattern: /:/})

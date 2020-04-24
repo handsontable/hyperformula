@@ -5,6 +5,7 @@
 
 import {Ast, AstNodeType, RelativeDependency} from './'
 import {RelativeDependencyType} from './RelativeDependency'
+import {RowAddress} from './RowAddress'
 
 const collectDependenciesFn = (ast: Ast, functionsWhichDoesNotNeedArgumentsToBeComputed: Set<string>, dependenciesSet: RelativeDependency[]) => {
   switch (ast.type) {
@@ -40,11 +41,18 @@ const collectDependenciesFn = (ast: Ast, functionsWhichDoesNotNeedArgumentsToBeC
           })
         }
         return
-      } else if (ast.left.type === AstNodeType.ROW_REFERENCE && ast.right.type === AstNodeType.ROW_REFERENCE) {
-        if (ast.left.reference.sheet === ast.right.reference.sheet) {
+      } else if ((ast.left.type === AstNodeType.NUMBER || ast.left.type === AstNodeType.ROW_REFERENCE) && (ast.right.type === AstNodeType.NUMBER || ast.right.type === AstNodeType.ROW_REFERENCE)) {
+        const left = ast.left.type === AstNodeType.ROW_REFERENCE ? ast.left.reference : RowAddress.relative(null, ast.left.value)
+        const right = ast.right.type === AstNodeType.ROW_REFERENCE ? ast.right.reference : RowAddress.relative(null, ast.right.value)
+        if (right.sheet === undefined) {
           dependenciesSet.push({
             type: RelativeDependencyType.RowRange,
-            dependency: [ast.left.reference, ast.right.reference]
+            dependency: [left, right]
+          })
+        } else if (left.sheet === right.sheet) {
+          dependenciesSet.push({
+            type: RelativeDependencyType.RowRange,
+            dependency: [left, right]
           })
         }
         return

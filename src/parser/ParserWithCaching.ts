@@ -181,7 +181,7 @@ export class ParserWithCaching {
       }
       case AstNodeType.COLUMN_REFERENCE_OR_NAMED_EXPRESSION:
       case AstNodeType.ROW_REFERENCE: {
-        throw Error('TODO')
+        throw 'cant happen'
       }
       case AstNodeType.MINUS_UNARY_OP: {
         return imageWithWhitespace('-' + this.computeHashOfAstNode(ast.value), ast.leadingWhitespace)
@@ -193,7 +193,15 @@ export class ParserWithCaching {
         return this.computeHashOfAstNode(ast.value) + imageWithWhitespace('%', ast.leadingWhitespace)
       }
       case AstNodeType.RANGE_OP: {
-        throw Error('TODO')
+        if (ast.left.type === AstNodeType.CELL_REFERENCE && ast.right.type === AstNodeType.CELL_REFERENCE) {
+          const start = ast.left.address.hash(true)
+          const end = ast.right.end.hash(true)
+          return imageWithWhitespace(start + ':' + end, ast.leadingWhitespace)
+        }
+        // throw Error('TODO')
+        const left = this.computeHashOfAstNode(ast.left)
+        const right = this.computeHashOfAstNode(ast.right)
+        return imageWithWhitespace(left + ':' + right, ast.leadingWhitespace)
           // const start = ast.left.address.hash(ast.sheetReferenceType !== RangeSheetReferenceType.RELATIVE)
           // const end = ast.right.end.hash(ast.sheetReferenceType === RangeSheetReferenceType.BOTH_ABSOLUTE)
           // return imageWithWhitespace(start + ':' + end, ast.leadingWhitespace)
