@@ -182,9 +182,6 @@ export class Interpreter {
           return new CellError(ErrorType.NAME)
         }
       }
-      case AstNodeType.NAMED_EXPRESSION: {
-        throw 'Not implemented yet'
-      }
       case AstNodeType.RANGE_OP: {
         if (this.isValidRange(ast)) {
           const range = AbsoluteCellRange.fromAst(ast.left, ast.right, formulaAddress)

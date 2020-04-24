@@ -449,18 +449,20 @@ export class FormulaParser extends EmbeddedActionsParser {
     return buildProcedureAst(canonicalProcedureName, args, procedureNameToken.leadingWhitespace, rParenToken.leadingWhitespace)
   })
 
-  private columnReferenceExpression: AstRule = this.RULE('namedExpressionExpression', () => {
+  private columnReferenceExpression: AstRule = this.RULE('columnReferenceExpression', () => {
     const token = this.CONSUME(ColumnReference) as IExtendedToken
     const address = this.ACTION(() => {
       return columnAddressFromString(this.sheetMapping, token.image, this.formulaAddress)
     })
-    if (address === undefined) {
-      throw Error('TODO')
-    }
-    return buildColumnReferenceAst(token.image, address, token.leadingWhitespace)
+    this.ACTION(() => {
+      if (address === undefined) {
+        throw Error('TODO')
+      }
+    })
+    return buildColumnReferenceAst(token.image, address!, token.leadingWhitespace)
   })
 
-  private rowReferenceExpression: AstRule = this.RULE('namedExpressionExpression', () => {
+  private rowReferenceExpression: AstRule = this.RULE('rowReferenceExpression', () => {
     const token = this.CONSUME(RowReference) as IExtendedToken
     const address = this.ACTION(() => {
       return rowAddressFromString(this.sheetMapping, token.image, this.formulaAddress)

@@ -5,16 +5,9 @@ import {Config} from '../src/Config'
 import {DateTimeHelper} from '../src/DateTimeHelper'
 import {FormulaCellVertex, MatrixVertex} from '../src/DependencyGraph'
 import {defaultStringifyDateTime} from '../src/format/format'
-import {
-  AstNodeType,
-  buildCellErrorAst,
-  CellAddress,
-  CellRangeAst,
-  CellReferenceAst,
-  ProcedureAst,
-} from '../src/parser'
+import {AstNodeType, buildCellErrorAst, CellAddress, CellReferenceAst, ProcedureAst,} from '../src/parser'
 import {EngineComparator} from './graphComparator'
-import {ColumnReferenceOrNamedExperssionAst, RowReferenceAst} from '../src/parser/Ast'
+import {RangeOpAst} from '../src/parser/Ast'
 
 export const extractReference = (engine: HyperFormula, address: SimpleCellAddress): CellAddress => {
   return ((engine.addressMapping.fetchCell(address) as FormulaCellVertex).getFormula(engine.lazilyTransformingAstService) as CellReferenceAst).reference
@@ -22,26 +15,26 @@ export const extractReference = (engine: HyperFormula, address: SimpleCellAddres
 
 export const extractRange = (engine: HyperFormula, address: SimpleCellAddress): AbsoluteCellRange => {
   const formula = (engine.addressMapping.fetchCell(address) as FormulaCellVertex).getFormula(engine.lazilyTransformingAstService) as ProcedureAst
-  const rangeAst = formula.args[0] as CellRangeAst
-  return new AbsoluteCellRange(rangeAst.reference.toSimpleCellAddress(address), rangeAst.end.toSimpleCellAddress(address))
+  const rangeAst = formula.args[0] as RangeOpAst
+  return AbsoluteCellRange.fromAst(rangeAst.left, rangeAst.right, address)
 }
 
 export const extractColumnRange = (engine: HyperFormula, address: SimpleCellAddress): AbsoluteColumnRange => {
   const formula = (engine.addressMapping.fetchCell(address) as FormulaCellVertex).getFormula(engine.lazilyTransformingAstService) as ProcedureAst
-  const rangeAst = formula.args[0] as ColumnReferenceOrNamedExperssionAst
-  return AbsoluteColumnRange.fromColumnRange(rangeAst, address)
+  const rangeAst = formula.args[0] as RangeOpAst
+  return AbsoluteCellRange.fromAst(rangeAst.left, rangeAst.right, address) as AbsoluteColumnRange
 }
 
 export const extractRowRange = (engine: HyperFormula, address: SimpleCellAddress): AbsoluteRowRange => {
   const formula = (engine.addressMapping.fetchCell(address) as FormulaCellVertex).getFormula(engine.lazilyTransformingAstService) as ProcedureAst
-  const rangeAst = formula.args[0] as RowReferenceAst
-  return AbsoluteRowRange.fromRowRange(rangeAst, address)
+  const rangeAst = formula.args[0] as RangeOpAst
+  return AbsoluteCellRange.fromAst(rangeAst.left, rangeAst.right, address) as AbsoluteRowRange
 }
 
 export const extractMatrixRange = (engine: HyperFormula, address: SimpleCellAddress): AbsoluteCellRange => {
   const formula = (engine.addressMapping.fetchCell(address) as MatrixVertex).getFormula() as ProcedureAst
-  const rangeAst = formula.args[0] as CellRangeAst
-  return AbsoluteCellRange.fromCellRange(rangeAst, address)
+  const rangeAst = formula.args[0] as RangeOpAst
+  return AbsoluteCellRange.fromAst(rangeAst.left, rangeAst.right, address)
 }
 
 export const expectReferenceToHaveRefError = (engine: HyperFormula, address: SimpleCellAddress) => {

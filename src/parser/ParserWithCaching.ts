@@ -193,7 +193,7 @@ export class ParserWithCaching {
         return this.computeHashOfAstNode(ast.value) + imageWithWhitespace('%', ast.leadingWhitespace)
       }
       case AstNodeType.RANGE_OP: {
-        throw Error("TODO")
+        throw Error('TODO')
           // const start = ast.left.address.hash(ast.sheetReferenceType !== RangeSheetReferenceType.RELATIVE)
           // const end = ast.right.end.hash(ast.sheetReferenceType === RangeSheetReferenceType.BOTH_ABSOLUTE)
           // return imageWithWhitespace(start + ':' + end, ast.leadingWhitespace)

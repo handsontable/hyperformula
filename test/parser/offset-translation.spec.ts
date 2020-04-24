@@ -3,7 +3,7 @@ import {ErrorType, simpleCellAddress} from '../../src/Cell'
 import {Config} from '../../src/Config'
 import {SheetMapping} from '../../src/DependencyGraph'
 import {buildTranslationPackage, enGB} from '../../src/i18n'
-import {AstNodeType, CellAddress, CellRangeAst, CellReferenceAst, ErrorAst, ParserWithCaching} from '../../src/parser'
+import {AstNodeType, CellAddress, CellReferenceAst, ErrorAst, ParserWithCaching} from '../../src/parser'
 
 describe('Parser - OFFSET to reference translation', () => {
   it('OFFSET parsing into cell reference', () => {

@@ -13,7 +13,6 @@ const collectDependenciesFn = (ast: Ast, functionsWhichDoesNotNeedArgumentsToBeC
     case AstNodeType.STRING:
     case AstNodeType.COLUMN_REFERENCE_OR_NAMED_EXPRESSION:
     case AstNodeType.ERROR_WITH_RAW_INPUT:
-    case AstNodeType.NAMED_EXPRESSION:
     case AstNodeType.ROW_REFERENCE:
     case AstNodeType.ERROR:
       return

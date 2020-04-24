@@ -202,8 +202,13 @@ export class InformationPlugin extends FunctionPlugin {
       return new CellError(ErrorType.NUM)
     }
     const rangeAst = ast.args[0]
-    if (rangeAst.type === AstNodeType.CELL_RANGE) {
-      return (rangeAst.end.col - rangeAst.address.col + 1)
+    if (rangeAst.type === AstNodeType.RANGE_OP) {
+      try {
+        const range = AbsoluteCellRange.fromAst(rangeAst.left, rangeAst.right, formulaAddress)
+        return range.width()
+      } catch {
+        throw Error('TODO')
+      }
     } else {
       return new CellError(ErrorType.VALUE)
     }
@@ -226,8 +231,13 @@ export class InformationPlugin extends FunctionPlugin {
       return new CellError(ErrorType.NUM)
     }
     const rangeAst = ast.args[0]
-    if (rangeAst.type === AstNodeType.CELL_RANGE) {
-      return (rangeAst.end.row - rangeAst.address.row + 1)
+    if (rangeAst.type === AstNodeType.RANGE_OP) {
+      try {
+        const range = AbsoluteCellRange.fromAst(rangeAst.left, rangeAst.right, formulaAddress)
+        return range.height()
+      } catch {
+        throw Error('TODO')
+      }
     } else {
       return new CellError(ErrorType.VALUE)
     }
@@ -244,10 +254,14 @@ export class InformationPlugin extends FunctionPlugin {
 
     let width, height
     let range
-    if (rangeArg.type === AstNodeType.CELL_RANGE) {
-      range = AbsoluteCellRange.fromCellRange(rangeArg, formulaAddress)
-      width = range.width()
-      height = range.height()
+    if (rangeArg.type === AstNodeType.RANGE_OP) {
+      try {
+        range = AbsoluteCellRange.fromAst(rangeArg.left, rangeArg.right, formulaAddress)
+        width = range.width()
+        height = range.height()
+      } catch {
+        throw Error('TODO')
+      }
     } else {
       width = 1
       height = 1

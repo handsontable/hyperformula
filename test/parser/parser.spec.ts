@@ -6,7 +6,6 @@ import {buildTranslationPackage, enGB, plPL} from '../../src/i18n'
 import {
   AstNodeType,
   CellAddress,
-  CellRangeAst,
   CellReferenceAst,
   ErrorAst,
   MinusOpAst,

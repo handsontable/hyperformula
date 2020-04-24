@@ -5,18 +5,10 @@
 
 import {CellError, ErrorType, SimpleCellAddress} from '../Cell'
 import {DependencyGraph} from '../DependencyGraph'
-import {
-  Ast,
-  AstNodeType,
-  buildCellErrorAst,
-  CellAddress,
-  CellReferenceAst,
-  ParserWithCaching,
-} from '../parser'
-import {ColumnReferenceOrNamedExperssionAst, RangeOpAst, RowReferenceAst} from '../parser/Ast'
+import {Ast, AstNodeType, buildCellErrorAst, CellAddress, CellReferenceAst, ParserWithCaching,} from '../parser'
+import {RangeOpAst} from '../parser/Ast'
 import {ColumnAddress} from '../parser/ColumnAddress'
 import {RowAddress} from '../parser/RowAddress'
-import {AbsoluteColumnRange, AbsoluteRowRange} from '../AbsoluteCellRange'
 
 export interface FormulaTransformer {
   sheet: number,

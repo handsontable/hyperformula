@@ -41,8 +41,15 @@ export class VlookupPlugin extends FunctionPlugin {
     }
 
     const rangeArg = ast.args[1]
-    if (rangeArg.type !== AstNodeType.CELL_RANGE) {
+    if (rangeArg.type !== AstNodeType.RANGE_OP) {
       /* gsheet returns REF */
+      return new CellError(ErrorType.VALUE)
+    }
+
+    let range
+    try {
+      range = AbsoluteCellRange.fromAst(rangeArg.left, rangeArg.right, formulaAddress)
+    } catch {
       return new CellError(ErrorType.VALUE)
     }
 
@@ -61,7 +68,6 @@ export class VlookupPlugin extends FunctionPlugin {
       }
     }
 
-    const range = AbsoluteCellRange.fromCellRange(rangeArg, formulaAddress)
     if (index > range.width()) {
       return new CellError(ErrorType.REF)
     }
@@ -80,7 +86,15 @@ export class VlookupPlugin extends FunctionPlugin {
     }
 
     const rangeArg = ast.args[1]
-    if (rangeArg.type !== AstNodeType.CELL_RANGE) {
+    if (rangeArg.type !== AstNodeType.RANGE_OP) {
+      /* gsheet returns REF */
+      return new CellError(ErrorType.VALUE)
+    }
+
+    let searchedRange
+    try {
+      searchedRange = AbsoluteCellRange.fromAst(rangeArg.left, rangeArg.right, formulaAddress)
+    } catch {
       return new CellError(ErrorType.VALUE)
     }
 
@@ -91,8 +105,6 @@ export class VlookupPlugin extends FunctionPlugin {
         return new CellError(ErrorType.VALUE)
       }
     }
-
-    const searchedRange = AbsoluteCellRange.fromCellRange(rangeArg, formulaAddress)
 
     if (searchedRange.width() === 1) {
       const rowIndex = this.columnSearch.find(key, searchedRange, sorted !== 0)
