@@ -50,7 +50,7 @@ describe('Temporary formulas - validation', () => {
   it('fail when not a formula', () => {
     const engine = HyperFormula.buildFromArray([])
 
-    expect(engine.validateFormula('=SOME SYNTAX ERROR')).toBe(false)
+    expect(engine.validateFormula('=SOME SYNTAX ERRORS')).toBe(false)
   })
 
   it('ok when literal error', () => {
