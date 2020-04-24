@@ -27,16 +27,12 @@ export class RemoveColumnsTransformer extends Transformer {
     return this.columnsSpan.sheet
   }
 
-  protected transformRowRangeAst(ast: RowReferenceAst, _formulaAddress: SimpleCellAddress): Ast {
-    return ast
-  }
-
   protected transformCellRange(start: CellAddress, end: CellAddress, formulaAddress: SimpleCellAddress): [CellAddress, CellAddress] | ErrorType.REF | false {
     return this.transformRange(start, end, formulaAddress)
   }
 
   protected transformRowRange(_start: RowAddress, _end: RowAddress, _formulaAddress: SimpleCellAddress): [RowAddress, RowAddress] | ErrorType.REF | false {
-    throw Error('Not implemented')
+    return false
   }
 
   protected transformColumnRange(start: ColumnAddress, end: ColumnAddress, formulaAddress: SimpleCellAddress): [ColumnAddress, ColumnAddress] | ErrorType.REF | false {

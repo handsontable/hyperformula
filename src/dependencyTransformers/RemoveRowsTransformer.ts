@@ -27,10 +27,6 @@ export class RemoveRowsTransformer extends Transformer {
     return true
   }
 
-  protected transformColumnRangeAst(ast: ColumnReferenceOrNamedExperssionAst, _formulaAddress: SimpleCellAddress): Ast {
-    return ast
-  }
-
   protected transformCellAddress<T extends AddressWithRow>(dependencyAddress: T, formulaAddress: SimpleCellAddress): T | ErrorType.REF | false {
     const absoluteDependencySheet = absoluteSheetReference(dependencyAddress, formulaAddress)
     // Case 4
@@ -100,7 +96,7 @@ export class RemoveRowsTransformer extends Transformer {
   }
 
   protected transformColumnRange(_start: ColumnAddress, _end: ColumnAddress, _formulaAddress: SimpleCellAddress): [ColumnAddress, ColumnAddress] | ErrorType.REF | false {
-    throw Error('Not implemented')
+    return false
   }
 
   protected fixNodeAddress(address: SimpleCellAddress): SimpleCellAddress {

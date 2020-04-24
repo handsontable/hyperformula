@@ -158,11 +158,11 @@ export const buildCellReferenceAst = (reference: CellAddress, leadingWhitespace?
 
 export interface ColumnReferenceOrNamedExperssionAst extends AstWithWhitespace{
   type: AstNodeType.COLUMN_REFERENCE_OR_NAMED_EXPRESSION,
-  reference?: ColumnAddress,
+  reference: ColumnAddress,
   rawInput: string,
 }
 
-export const buildColumnReferenceAst = (rawInput: string, address?: ColumnAddress, leadingWhitespace?: IToken): ColumnReferenceOrNamedExperssionAst => {
+export const buildColumnReferenceAst = (rawInput: string, address: ColumnAddress, leadingWhitespace?: IToken): ColumnReferenceOrNamedExperssionAst => {
   // assertRangeConsistency(start, end, sheetReferenceType)
   return {
     type: AstNodeType.COLUMN_REFERENCE_OR_NAMED_EXPRESSION,

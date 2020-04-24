@@ -35,7 +35,6 @@ export {
   ProcedureAst,
   ErrorAst,
   CellReferenceAst,
-  CellRangeAst,
   StringAst,
   PowerOpAst,
   PlusOpAst,
@@ -52,7 +51,6 @@ export {
   EqualsOpAst,
 
   buildProcedureAst,
-  buildCellRangeAst,
   buildParsingErrorAst,
   buildCellErrorAst,
 } from './Ast'

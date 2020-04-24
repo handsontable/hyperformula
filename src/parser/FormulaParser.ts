@@ -26,7 +26,6 @@ import {
   Ast,
   AstNodeType,
   buildCellErrorAst,
-  buildCellRangeAst,
   buildCellReferenceAst,
   buildColumnReferenceAst,
   buildConcatenateOpAst,
@@ -455,6 +454,9 @@ export class FormulaParser extends EmbeddedActionsParser {
     const address = this.ACTION(() => {
       return columnAddressFromString(this.sheetMapping, token.image, this.formulaAddress)
     })
+    if (address === undefined) {
+      throw Error('TODO')
+    }
     return buildColumnReferenceAst(token.image, address, token.leadingWhitespace)
   })
 
@@ -478,51 +480,51 @@ export class FormulaParser extends EmbeddedActionsParser {
    *
    * Proper {@link Ast} node type is built depending on the presence of {@link RangeSeparator}
    */
-  private offsetExpression: AstRule = this.RULE('offsetExpression', () => {
-    const offsetProcedure = this.SUBRULE(this.offsetProcedureExpression)
+  // private offsetExpression: AstRule = this.RULE('offsetExpression', () => {
+  //   const offsetProcedure = this.SUBRULE(this.offsetProcedureExpression)
+  //
+  //   let end: Maybe<Ast>
+  //   this.OPTION(() => {
+  //     this.CONSUME(RangeSeparator)
+  //     if (offsetProcedure.type === AstNodeType.CELL_RANGE) {
+  //       end = this.parsingError(ParsingErrorType.RangeOffsetNotAllowed, 'Range offset not allowed here')
+  //     } else {
+  //       end = this.SUBRULE(this.endOfRangeWithOffsetStartExpression, {ARGS: [offsetProcedure]})
+  //     }
+  //   })
+  //
+  //   if (end !== undefined) {
+  //     return end
+  //   }
+  //
+  //   return offsetProcedure
+  // })
 
-    let end: Maybe<Ast>
-    this.OPTION(() => {
-      this.CONSUME(RangeSeparator)
-      if (offsetProcedure.type === AstNodeType.CELL_RANGE) {
-        end = this.parsingError(ParsingErrorType.RangeOffsetNotAllowed, 'Range offset not allowed here')
-      } else {
-        end = this.SUBRULE(this.endOfRangeWithOffsetStartExpression, {ARGS: [offsetProcedure]})
-      }
-    })
-
-    if (end !== undefined) {
-      return end
-    }
-
-    return offsetProcedure
-  })
-
-  /**
-   * Rule for OFFSET() function expression
-   */
-  private offsetProcedureExpression: AstRule = this.RULE('offsetProcedureExpression', () => {
-    const args: Ast[] = []
-    this.CONSUME(this.lexerConfig.OffsetProcedureName)
-    this.CONSUME(LParen)
-    this.MANY_SEP({
-      SEP: this.lexerConfig.ArgSeparator,
-      DEF: () => {
-        args.push(this.SUBRULE(this.booleanExpression))
-      },
-    })
-    this.CONSUME(RParen)
-    return this.handleOffsetHeuristic(args)
-  })
-
-  /**
-   * Rule for cell ranges (e.g. A1:B$3, A1:OFFSET())
-   */
-  private cellRangeExpression: AstRule = this.RULE('cellRangeExpression', () => {
-    const start = this.CONSUME(CellReference)
-    this.CONSUME2(RangeSeparator)
-    return this.SUBRULE(this.endOfRangeExpression, {ARGS: [start]})
-  })
+  // /**
+  //  * Rule for OFFSET() function expression
+  //  */
+  // private offsetProcedureExpression: AstRule = this.RULE('offsetProcedureExpression', () => {
+  //   const args: Ast[] = []
+  //   this.CONSUME(this.lexerConfig.OffsetProcedureName)
+  //   this.CONSUME(LParen)
+  //   this.MANY_SEP({
+  //     SEP: this.lexerConfig.ArgSeparator,
+  //     DEF: () => {
+  //       args.push(this.SUBRULE(this.booleanExpression))
+  //     },
+  //   })
+  //   this.CONSUME(RParen)
+  //   return this.handleOffsetHeuristic(args)
+  // })
+  //
+  // /**
+  //  * Rule for cell ranges (e.g. A1:B$3, A1:OFFSET())
+  //  */
+  // private cellRangeExpression: AstRule = this.RULE('cellRangeExpression', () => {
+  //   const start = this.CONSUME(CellReference)
+  //   this.CONSUME2(RangeSeparator)
+  //   return this.SUBRULE(this.endOfRangeExpression, {ARGS: [start]})
+  // })
 
   /*
   * Rule for column range, e.g. A:B, Sheet1!A:B, Sheet1!A:Sheet1!B
@@ -607,133 +609,133 @@ export class FormulaParser extends EmbeddedActionsParser {
     }
   })
 
-  /**
-   * Rule for end of range expression
-   *
-   * End of range may be a cell reference or OFFSET() function call
-   */
-  private endOfRangeExpression: AstRule = this.RULE('endOfRangeExpression', (start: IExtendedToken) => {
-    return this.OR([
-      {
-        ALT: () => {
-          return this.SUBRULE(this.endRangeReference, {ARGS: [start]})
-        },
-      },
-      {
-        ALT: () => {
-          const offsetProcedure = this.SUBRULE(this.offsetProcedureExpression)
-          const startAddress = this.ACTION(() => {
-            return cellAddressFromString(this.sheetMapping, start.image, this.formulaAddress)
-          })
-          if (startAddress === undefined) {
-            return buildCellErrorAst(new CellError(ErrorType.REF))
-          }
-          if (offsetProcedure.type === AstNodeType.CELL_REFERENCE) {
-            let end = offsetProcedure.reference
-            let sheetReferenceType = RangeSheetReferenceType.RELATIVE
-            if (startAddress.sheet !== null) {
-              sheetReferenceType = RangeSheetReferenceType.START_ABSOLUTE
-              end = end.withAbsoluteSheet(startAddress.sheet)
-            }
-            return buildCellRangeAst(startAddress, end, sheetReferenceType, start.leadingWhitespace?.image)
-          } else {
-            return this.parsingError(ParsingErrorType.RangeOffsetNotAllowed, 'Range offset not allowed here')
-          }
-        },
-      },
-    ])
-  })
+  // /**
+  //  * Rule for end of range expression
+  //  *
+  //  * End of range may be a cell reference or OFFSET() function call
+  //  */
+  // private endOfRangeExpression: AstRule = this.RULE('endOfRangeExpression', (start: IExtendedToken) => {
+  //   return this.OR([
+  //     {
+  //       ALT: () => {
+  //         return this.SUBRULE(this.endRangeReference, {ARGS: [start]})
+  //       },
+  //     },
+  //     {
+  //       ALT: () => {
+  //         const offsetProcedure = this.SUBRULE(this.offsetProcedureExpression)
+  //         const startAddress = this.ACTION(() => {
+  //           return cellAddressFromString(this.sheetMapping, start.image, this.formulaAddress)
+  //         })
+  //         if (startAddress === undefined) {
+  //           return buildCellErrorAst(new CellError(ErrorType.REF))
+  //         }
+  //         if (offsetProcedure.type === AstNodeType.CELL_REFERENCE) {
+  //           let end = offsetProcedure.reference
+  //           let sheetReferenceType = RangeSheetReferenceType.RELATIVE
+  //           if (startAddress.sheet !== null) {
+  //             sheetReferenceType = RangeSheetReferenceType.START_ABSOLUTE
+  //             end = end.withAbsoluteSheet(startAddress.sheet)
+  //           }
+  //           return buildCellRangeAst(startAddress, end, sheetReferenceType, start.leadingWhitespace?.image)
+  //         } else {
+  //           return this.parsingError(ParsingErrorType.RangeOffsetNotAllowed, 'Range offset not allowed here')
+  //         }
+  //       },
+  //     },
+  //   ])
+  // })
 
-  /**
-   * Rule for end of range expression
-   *
-   * End of range may be a cell reference or OFFSET() function call
-   */
-  private endOfRangeWithOffsetStartExpression: AstRule = this.RULE('endOfRangeWithOffsetStartExpression', (start: CellReferenceAst) => {
-    return this.OR([
-      {
-        ALT: () => {
-          return this.SUBRULE(this.endRangeWithOffsetStartReference, {ARGS: [start]})
-        },
-      },
-      {
-        ALT: () => {
-          const offsetProcedure = this.SUBRULE(this.offsetProcedureExpression)
-          if (offsetProcedure.type === AstNodeType.CELL_REFERENCE) {
-            let end = offsetProcedure.reference
-            let sheetReferenceType = RangeSheetReferenceType.RELATIVE
-            if (start.reference.sheet !== null) {
-              sheetReferenceType = RangeSheetReferenceType.START_ABSOLUTE
-              end = end.withAbsoluteSheet(start.reference.sheet)
-            }
-            return buildCellRangeAst(start.reference, end, sheetReferenceType, start.leadingWhitespace)
-          } else {
-            return this.parsingError(ParsingErrorType.RangeOffsetNotAllowed, 'Range offset not allowed here')
-          }
-        },
-      },
-    ])
-  })
+  // /**
+  //  * Rule for end of range expression
+  //  *
+  //  * End of range may be a cell reference or OFFSET() function call
+  //  */
+  // private endOfRangeWithOffsetStartExpression: AstRule = this.RULE('endOfRangeWithOffsetStartExpression', (start: CellReferenceAst) => {
+  //   return this.OR([
+  //     {
+  //       ALT: () => {
+  //         return this.SUBRULE(this.endRangeWithOffsetStartReference, {ARGS: [start]})
+  //       },
+  //     },
+  //     {
+  //       ALT: () => {
+  //         const offsetProcedure = this.SUBRULE(this.offsetProcedureExpression)
+  //         if (offsetProcedure.type === AstNodeType.CELL_REFERENCE) {
+  //           let end = offsetProcedure.reference
+  //           let sheetReferenceType = RangeSheetReferenceType.RELATIVE
+  //           if (start.reference.sheet !== null) {
+  //             sheetReferenceType = RangeSheetReferenceType.START_ABSOLUTE
+  //             end = end.withAbsoluteSheet(start.reference.sheet)
+  //           }
+  //           return buildCellRangeAst(start.reference, end, sheetReferenceType, start.leadingWhitespace)
+  //         } else {
+  //           return this.parsingError(ParsingErrorType.RangeOffsetNotAllowed, 'Range offset not allowed here')
+  //         }
+  //       },
+  //     },
+  //   ])
+  // })
 
-  /**
-   * Rule for end range reference expression with additional checks considering range start
-   */
-  private endRangeReference: AstRule = this.RULE('endRangeReference', (start: IExtendedToken) => {
-    const end = this.CONSUME(CellReference) as IExtendedToken
+  // /**
+  //  * Rule for end range reference expression with additional checks considering range start
+  //  */
+  // private endRangeReference: AstRule = this.RULE('endRangeReference', (start: IExtendedToken) => {
+  //   const end = this.CONSUME(CellReference) as IExtendedToken
+  //
+  //   const startAddress = this.ACTION(() => {
+  //     return cellAddressFromString(this.sheetMapping, start.image, this.formulaAddress)
+  //   })
+  //   const endAddress = this.ACTION(() => {
+  //     return cellAddressFromString(this.sheetMapping, end.image, this.formulaAddress)
+  //   })
+  //
+  //   if (startAddress === undefined || endAddress === undefined) {
+  //     return this.ACTION(() => {
+  //       return buildErrorWithRawInputAst(`${start.image}:${end.image}`, new CellError(ErrorType.REF), start.leadingWhitespace)
+  //     })
+  //   } else if (startAddress.exceedsSheetSizeLimits(this.lexerConfig.maxColumns, this.lexerConfig.maxRows)
+  //             || endAddress.exceedsSheetSizeLimits(this.lexerConfig.maxColumns, this.lexerConfig.maxRows)) {
+  //     return this.ACTION(() => {
+  //       return buildErrorWithRawInputAst(`${start.image}:${end.image}`, new CellError(ErrorType.NAME), start.leadingWhitespace)
+  //     })
+  //   }
+  //
+  //   return this.buildCellRange(startAddress, endAddress, start.leadingWhitespace?.image)
+  // })
 
-    const startAddress = this.ACTION(() => {
-      return cellAddressFromString(this.sheetMapping, start.image, this.formulaAddress)
-    })
-    const endAddress = this.ACTION(() => {
-      return cellAddressFromString(this.sheetMapping, end.image, this.formulaAddress)
-    })
-
-    if (startAddress === undefined || endAddress === undefined) {
-      return this.ACTION(() => {
-        return buildErrorWithRawInputAst(`${start.image}:${end.image}`, new CellError(ErrorType.REF), start.leadingWhitespace)
-      })
-    } else if (startAddress.exceedsSheetSizeLimits(this.lexerConfig.maxColumns, this.lexerConfig.maxRows)
-              || endAddress.exceedsSheetSizeLimits(this.lexerConfig.maxColumns, this.lexerConfig.maxRows)) {
-      return this.ACTION(() => {
-        return buildErrorWithRawInputAst(`${start.image}:${end.image}`, new CellError(ErrorType.NAME), start.leadingWhitespace)
-      })
-    }
-
-    return this.buildCellRange(startAddress, endAddress, start.leadingWhitespace?.image)
-  })
-
-  /**
-   * Rule for end range reference expression starting with offset procedure with additional checks considering range start
-   */
-  private endRangeWithOffsetStartReference: AstRule = this.RULE('endRangeWithOffsetStartReference', (start: CellReferenceAst) => {
-    const end = this.CONSUME(CellReference) as IExtendedToken
-
-    const endAddress = this.ACTION(() => {
-      return cellAddressFromString(this.sheetMapping, end.image, this.formulaAddress)
-    })
-
-    if (endAddress === undefined) {
-      return this.ACTION(() => {
-        return buildCellErrorAst(new CellError(ErrorType.REF))
-      })
-    }
-
-    return this.buildCellRange(start.reference, endAddress, start.leadingWhitespace)
-  })
-
-  private buildCellRange(startAddress: CellAddress, endAddress: CellAddress, leadingWhitespace?: string): Ast {
-    if (startAddress.sheet === null && endAddress.sheet !== null) {
-      return this.parsingError(ParsingErrorType.ParserError, 'Malformed range expression')
-    }
-
-    const sheetReferenceType = this.rangeSheetReferenceType(startAddress.sheet, endAddress.sheet)
-
-    if (startAddress.sheet !== null && endAddress.sheet === null) {
-      endAddress = endAddress.withAbsoluteSheet(startAddress.sheet)
-    }
-
-    return buildCellRangeAst(startAddress, endAddress, sheetReferenceType, leadingWhitespace)
-  }
+  // /**
+  //  * Rule for end range reference expression starting with offset procedure with additional checks considering range start
+  //  */
+  // private endRangeWithOffsetStartReference: AstRule = this.RULE('endRangeWithOffsetStartReference', (start: CellReferenceAst) => {
+  //   const end = this.CONSUME(CellReference) as IExtendedToken
+  //
+  //   const endAddress = this.ACTION(() => {
+  //     return cellAddressFromString(this.sheetMapping, end.image, this.formulaAddress)
+  //   })
+  //
+  //   if (endAddress === undefined) {
+  //     return this.ACTION(() => {
+  //       return buildCellErrorAst(new CellError(ErrorType.REF))
+  //     })
+  //   }
+  //
+  //   return this.buildCellRange(start.reference, endAddress, start.leadingWhitespace)
+  // })
+  //
+  // private buildCellRange(startAddress: CellAddress, endAddress: CellAddress, leadingWhitespace?: string): Ast {
+  //   if (startAddress.sheet === null && endAddress.sheet !== null) {
+  //     return this.parsingError(ParsingErrorType.ParserError, 'Malformed range expression')
+  //   }
+  //
+  //   const sheetReferenceType = this.rangeSheetReferenceType(startAddress.sheet, endAddress.sheet)
+  //
+  //   if (startAddress.sheet !== null && endAddress.sheet === null) {
+  //     endAddress = endAddress.withAbsoluteSheet(startAddress.sheet)
+  //   }
+  //
+  //   return buildCellRangeAst(startAddress, endAddress, sheetReferenceType, leadingWhitespace)
+  // }
 
   /**
    * Rule for parenthesis expression
@@ -750,112 +752,112 @@ export class FormulaParser extends EmbeddedActionsParser {
    *
    * @param args - OFFSET function arguments
    */
-  private handleOffsetHeuristic(args: Ast[]): Ast {
-    const cellArg = args[0]
-    if (cellArg.type !== AstNodeType.CELL_REFERENCE) {
-      return this.parsingError(ParsingErrorType.StaticOffsetError, 'First argument to OFFSET is not a reference')
-    }
-    const rowsArg = args[1]
-    let rowShift
-    if (rowsArg.type === AstNodeType.NUMBER && Number.isInteger(rowsArg.value)) {
-      rowShift = rowsArg.value
-    } else if (rowsArg.type === AstNodeType.PLUS_UNARY_OP && rowsArg.value.type === AstNodeType.NUMBER && Number.isInteger(rowsArg.value.value)) {
-      rowShift = rowsArg.value.value
-    } else if (rowsArg.type === AstNodeType.MINUS_UNARY_OP && rowsArg.value.type === AstNodeType.NUMBER && Number.isInteger(rowsArg.value.value)) {
-      rowShift = -rowsArg.value.value
-    } else {
-      return this.parsingError(ParsingErrorType.StaticOffsetError, 'Second argument to OFFSET is not a static number')
-    }
-    const columnsArg = args[2]
-    let colShift
-    if (columnsArg.type === AstNodeType.NUMBER && Number.isInteger(columnsArg.value)) {
-      colShift = columnsArg.value
-    } else if (columnsArg.type === AstNodeType.PLUS_UNARY_OP && columnsArg.value.type === AstNodeType.NUMBER && Number.isInteger(columnsArg.value.value)) {
-      colShift = columnsArg.value.value
-    } else if (columnsArg.type === AstNodeType.MINUS_UNARY_OP && columnsArg.value.type === AstNodeType.NUMBER && Number.isInteger(columnsArg.value.value)) {
-      colShift = -columnsArg.value.value
-    } else {
-      return this.parsingError(ParsingErrorType.StaticOffsetError, 'Third argument to OFFSET is not a static number')
-    }
-    const heightArg = args[3]
-    let height
-    if (heightArg === undefined) {
-      height = 1
-    } else if (heightArg.type === AstNodeType.NUMBER) {
-      height = heightArg.value
-      if (height < 1) {
-        return this.parsingError(ParsingErrorType.StaticOffsetError, 'Fourth argument to OFFSET is too small number')
-      } else if (!Number.isInteger(height)) {
-        return this.parsingError(ParsingErrorType.StaticOffsetError, 'Fourth argument to OFFSET is not integer')
-      }
-    } else {
-      return this.parsingError(ParsingErrorType.StaticOffsetError, 'Fourth argument to OFFSET is not a static number')
-    }
-    const widthArg = args[4]
-    let width
-    if (widthArg === undefined) {
-      width = 1
-    } else if (widthArg.type === AstNodeType.NUMBER) {
-      width = widthArg.value
-      if (width < 1) {
-        return this.parsingError(ParsingErrorType.StaticOffsetError, 'Fifth argument to OFFSET is too small number')
-      } else if (!Number.isInteger(width)) {
-        return this.parsingError(ParsingErrorType.StaticOffsetError, 'Fifth argument to OFFSET is not integer')
-      }
-    } else {
-      return this.parsingError(ParsingErrorType.StaticOffsetError, 'Fifth argument to OFFSET is not a static number')
-    }
-
-    const topLeftCorner = new CellAddress(
-      null,
-      cellArg.reference.col + colShift,
-      cellArg.reference.row + rowShift,
-      cellArg.reference.type,
-    )
-
-    let absoluteCol = topLeftCorner.col
-    let absoluteRow = topLeftCorner.row
-
-    if (cellArg.reference.type === CellReferenceType.CELL_REFERENCE_RELATIVE
-      || cellArg.reference.type === CellReferenceType.CELL_REFERENCE_ABSOLUTE_COL) {
-      absoluteRow = absoluteRow + this.formulaAddress.row
-    }
-    if (cellArg.reference.type === CellReferenceType.CELL_REFERENCE_RELATIVE
-      || cellArg.reference.type === CellReferenceType.CELL_REFERENCE_ABSOLUTE_ROW) {
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      absoluteCol = absoluteCol + this.formulaAddress.col
-    }
-
-    if (absoluteCol < 0 || absoluteRow < 0) {
-      return buildCellErrorAst(new CellError(ErrorType.REF, 'Resulting reference is out of the sheet'))
-    }
-    if (width === 1 && height === 1) {
-      return buildCellReferenceAst(topLeftCorner)
-    } else {
-      const bottomRightCorner = new CellAddress(
-        null,
-        topLeftCorner.col + width - 1,
-        topLeftCorner.row + height - 1,
-        topLeftCorner.type,
-      )
-      return buildCellRangeAst(topLeftCorner, bottomRightCorner, RangeSheetReferenceType.RELATIVE)
-    }
-  }
+  // private handleOffsetHeuristic(args: Ast[]): Ast {
+  //   const cellArg = args[0]
+  //   if (cellArg.type !== AstNodeType.CELL_REFERENCE) {
+  //     return this.parsingError(ParsingErrorType.StaticOffsetError, 'First argument to OFFSET is not a reference')
+  //   }
+  //   const rowsArg = args[1]
+  //   let rowShift
+  //   if (rowsArg.type === AstNodeType.NUMBER && Number.isInteger(rowsArg.value)) {
+  //     rowShift = rowsArg.value
+  //   } else if (rowsArg.type === AstNodeType.PLUS_UNARY_OP && rowsArg.value.type === AstNodeType.NUMBER && Number.isInteger(rowsArg.value.value)) {
+  //     rowShift = rowsArg.value.value
+  //   } else if (rowsArg.type === AstNodeType.MINUS_UNARY_OP && rowsArg.value.type === AstNodeType.NUMBER && Number.isInteger(rowsArg.value.value)) {
+  //     rowShift = -rowsArg.value.value
+  //   } else {
+  //     return this.parsingError(ParsingErrorType.StaticOffsetError, 'Second argument to OFFSET is not a static number')
+  //   }
+  //   const columnsArg = args[2]
+  //   let colShift
+  //   if (columnsArg.type === AstNodeType.NUMBER && Number.isInteger(columnsArg.value)) {
+  //     colShift = columnsArg.value
+  //   } else if (columnsArg.type === AstNodeType.PLUS_UNARY_OP && columnsArg.value.type === AstNodeType.NUMBER && Number.isInteger(columnsArg.value.value)) {
+  //     colShift = columnsArg.value.value
+  //   } else if (columnsArg.type === AstNodeType.MINUS_UNARY_OP && columnsArg.value.type === AstNodeType.NUMBER && Number.isInteger(columnsArg.value.value)) {
+  //     colShift = -columnsArg.value.value
+  //   } else {
+  //     return this.parsingError(ParsingErrorType.StaticOffsetError, 'Third argument to OFFSET is not a static number')
+  //   }
+  //   const heightArg = args[3]
+  //   let height
+  //   if (heightArg === undefined) {
+  //     height = 1
+  //   } else if (heightArg.type === AstNodeType.NUMBER) {
+  //     height = heightArg.value
+  //     if (height < 1) {
+  //       return this.parsingError(ParsingErrorType.StaticOffsetError, 'Fourth argument to OFFSET is too small number')
+  //     } else if (!Number.isInteger(height)) {
+  //       return this.parsingError(ParsingErrorType.StaticOffsetError, 'Fourth argument to OFFSET is not integer')
+  //     }
+  //   } else {
+  //     return this.parsingError(ParsingErrorType.StaticOffsetError, 'Fourth argument to OFFSET is not a static number')
+  //   }
+  //   const widthArg = args[4]
+  //   let width
+  //   if (widthArg === undefined) {
+  //     width = 1
+  //   } else if (widthArg.type === AstNodeType.NUMBER) {
+  //     width = widthArg.value
+  //     if (width < 1) {
+  //       return this.parsingError(ParsingErrorType.StaticOffsetError, 'Fifth argument to OFFSET is too small number')
+  //     } else if (!Number.isInteger(width)) {
+  //       return this.parsingError(ParsingErrorType.StaticOffsetError, 'Fifth argument to OFFSET is not integer')
+  //     }
+  //   } else {
+  //     return this.parsingError(ParsingErrorType.StaticOffsetError, 'Fifth argument to OFFSET is not a static number')
+  //   }
+  //
+  //   const topLeftCorner = new CellAddress(
+  //     null,
+  //     cellArg.reference.col + colShift,
+  //     cellArg.reference.row + rowShift,
+  //     cellArg.reference.type,
+  //   )
+  //
+  //   let absoluteCol = topLeftCorner.col
+  //   let absoluteRow = topLeftCorner.row
+  //
+  //   if (cellArg.reference.type === CellReferenceType.CELL_REFERENCE_RELATIVE
+  //     || cellArg.reference.type === CellReferenceType.CELL_REFERENCE_ABSOLUTE_COL) {
+  //     absoluteRow = absoluteRow + this.formulaAddress.row
+  //   }
+  //   if (cellArg.reference.type === CellReferenceType.CELL_REFERENCE_RELATIVE
+  //     || cellArg.reference.type === CellReferenceType.CELL_REFERENCE_ABSOLUTE_ROW) {
+  //     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  //     absoluteCol = absoluteCol + this.formulaAddress.col
+  //   }
+  //
+  //   if (absoluteCol < 0 || absoluteRow < 0) {
+  //     return buildCellErrorAst(new CellError(ErrorType.REF, 'Resulting reference is out of the sheet'))
+  //   }
+  //   if (width === 1 && height === 1) {
+  //     return buildCellReferenceAst(topLeftCorner)
+  //   } else {
+  //     const bottomRightCorner = new CellAddress(
+  //       null,
+  //       topLeftCorner.col + width - 1,
+  //       topLeftCorner.row + height - 1,
+  //       topLeftCorner.type,
+  //     )
+  //     return buildCellRangeAst(topLeftCorner, bottomRightCorner, RangeSheetReferenceType.RELATIVE)
+  //   }
+  // }
 
   private parsingError(type: ParsingErrorType, message: string): ErrorAst {
     this.customParsingError = parsingError(type, message)
     return buildParsingErrorAst()
   }
 
-  private rangeSheetReferenceType(start: number | null, end: number | null): RangeSheetReferenceType {
-    if (start === null) {
-      return RangeSheetReferenceType.RELATIVE
-    } else if (end === null) {
-      return RangeSheetReferenceType.START_ABSOLUTE
-    } else {
-      return RangeSheetReferenceType.BOTH_ABSOLUTE
-    }
-  }
+  // private rangeSheetReferenceType(start: number | null, end: number | null): RangeSheetReferenceType {
+  //   if (start === null) {
+  //     return RangeSheetReferenceType.RELATIVE
+  //   } else if (end === null) {
+  //     return RangeSheetReferenceType.START_ABSOLUTE
+  //   } else {
+  //     return RangeSheetReferenceType.BOTH_ABSOLUTE
+  //   }
+  // }
 
   public numericStringToNumber = (input: string): number => {
     const normalized = input.replace(this.lexerConfig.decimalSeparator, '.')

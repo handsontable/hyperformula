@@ -10,13 +10,13 @@ import {
   AstNodeType,
   buildCellErrorAst,
   CellAddress,
-  CellRangeAst,
   CellReferenceAst,
   ParserWithCaching,
 } from '../parser'
-import {ColumnReferenceOrNamedExperssionAst, RowReferenceAst} from '../parser/Ast'
+import {ColumnReferenceOrNamedExperssionAst, RangeOpAst, RowReferenceAst} from '../parser/Ast'
 import {ColumnAddress} from '../parser/ColumnAddress'
 import {RowAddress} from '../parser/RowAddress'
+import {AbsoluteColumnRange, AbsoluteRowRange} from '../AbsoluteCellRange'
 
 export interface FormulaTransformer {
   sheet: number,
@@ -48,14 +48,12 @@ export abstract class Transformer implements FormulaTransformer {
       case AstNodeType.CELL_REFERENCE: {
         return this.transformCellReferenceAst(ast, address)
       }
-      case AstNodeType.CELL_RANGE: {
-        return this.transformCellRangeAst(ast, address)
-      }
-      case AstNodeType.COLUMN_REFERENCE_OR_NAMED_EXPRESSION: {
-        return this.transformColumnRangeAst(ast, address)
-      }
+      case AstNodeType.COLUMN_REFERENCE_OR_NAMED_EXPRESSION:
       case AstNodeType.ROW_REFERENCE: {
-        return this.transformRowRangeAst(ast, address)
+        throw  Error('Shouldnt happen')
+      }
+      case AstNodeType.RANGE_OP: {
+        return this.transformCellRangeAst(ast, address)
       }
       case AstNodeType.EMPTY:
       case AstNodeType.ERROR:
@@ -122,33 +120,21 @@ export abstract class Transformer implements FormulaTransformer {
     }
   }
 
-  protected transformCellRangeAst(ast: CellRangeAst, formulaAddress: SimpleCellAddress): Ast {
-    const newRange = this.transformCellRange(ast.reference, ast.end, formulaAddress)
-    if (Array.isArray(newRange)) {
-      return {...ast, start: newRange[0], end: newRange[1]}
-    } else if (newRange === ErrorType.REF) {
-      return buildCellErrorAst(new CellError(ErrorType.REF))
+  protected transformCellRangeAst(ast: RangeOpAst, formulaAddress: SimpleCellAddress): Ast {
+    let references: any
+    if (ast.left.type === AstNodeType.CELL_REFERENCE && ast.right.type === AstNodeType.CELL_REFERENCE) {
+      references = this.transformCellRange(ast.left.reference, ast.right.reference, formulaAddress)
+    } else if (ast.left.type === AstNodeType.COLUMN_REFERENCE_OR_NAMED_EXPRESSION && ast.right.type === AstNodeType.COLUMN_REFERENCE_OR_NAMED_EXPRESSION) {
+      references = this.transformColumnRange(ast.left.reference, ast.right.reference, formulaAddress)
+    } else if (ast.left.type === AstNodeType.ROW_REFERENCE && ast.right.type === AstNodeType.ROW_REFERENCE) {
+      references = this.transformRowRange(ast.left.reference, ast.right.reference, formulaAddress)
     } else {
-      return ast
+      throw Error('WUT')
     }
-  }
 
-  protected transformColumnRangeAst(ast: ColumnReferenceOrNamedExperssionAst, formulaAddress: SimpleCellAddress): Ast {
-    const newRange = this.transformColumnRange(ast.reference, ast.end, formulaAddress)
-    if (Array.isArray(newRange)) {
-      return {...ast, start: newRange[0], end: newRange[1]}
-    } else if (newRange === ErrorType.REF) {
-      return buildCellErrorAst(new CellError(ErrorType.REF))
-    } else {
-      return ast
-    }
-  }
-
-  protected transformRowRangeAst(ast: RowReferenceAst, formulaAddress: SimpleCellAddress): Ast {
-    const newRange = this.transformRowRange(ast.reference, ast.end, formulaAddress)
-    if (Array.isArray(newRange)) {
-      return {...ast, start: newRange[0], end: newRange[1]}
-    } else if (newRange === ErrorType.REF) {
+    if (Array.isArray(references)) {
+      return {...ast, left: references[0], right: references[1]}
+    } else if (references === ErrorType.REF) {
       return buildCellErrorAst(new CellError(ErrorType.REF))
     } else {
       return ast

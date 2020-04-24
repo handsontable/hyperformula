@@ -3,9 +3,9 @@
  * Copyright (c) 2020 Handsoncode. All rights reserved.
  */
 
-import {CellRange, simpleCellAddress, SimpleCellAddress, SimpleColumnAddress, SimpleRowAddress} from './Cell'
+import {simpleCellAddress, SimpleCellAddress, SimpleColumnAddress, SimpleRowAddress} from './Cell'
 import {DependencyGraph} from './DependencyGraph'
-import {Ast, AstNodeType, CellAddress, CellRangeAst, CellReferenceAst} from './parser'
+import {Ast, AstNodeType, CellAddress, CellReferenceAst} from './parser'
 import {ColumnReferenceOrNamedExperssionAst, RowReferenceAst} from './parser/Ast'
 
 export const DIFFERENT_SHEETS_ERROR = 'AbsoluteCellRange: Start and end are in different sheets'

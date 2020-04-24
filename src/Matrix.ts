@@ -113,8 +113,8 @@ export function checkMatrixSize(ast: Ast, formulaAddress: SimpleCellAddress): Ma
         return new CellError(ErrorType.VALUE)
       }
     }
-  } else if (ast.type === AstNodeType.CELL_RANGE) {
-    const range = AbsoluteCellRange.fromCellRange(ast, formulaAddress)
+  } else if (ast.type === AstNodeType.RANGE_OP) {
+    const range = AbsoluteCellRange.fromAst(ast.left, ast.right, formulaAddress)
     return {width: range.width(), height: range.height()}
   } else if (ast.type === AstNodeType.NUMBER || ast.type === AstNodeType.CELL_REFERENCE) {
     return {width: 1, height: 1}

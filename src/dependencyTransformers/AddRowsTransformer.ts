@@ -27,10 +27,6 @@ export class AddRowsTransformer extends Transformer {
     return false
   }
 
-  protected transformColumnRangeAst(ast: ColumnReferenceOrNamedExperssionAst, _formulaAddress: SimpleCellAddress): Ast {
-    return ast
-  }
-
   protected transformCellRange(start: CellAddress, end: CellAddress, formulaAddress: SimpleCellAddress): [CellAddress, CellAddress] | ErrorType.REF | false {
     return this.transformRange(start, end, formulaAddress)
   }
@@ -40,7 +36,7 @@ export class AddRowsTransformer extends Transformer {
   }
 
   protected transformColumnRange(_start: ColumnAddress, _end: ColumnAddress, _formulaAddress: SimpleCellAddress): [ColumnAddress, ColumnAddress] | ErrorType.REF | false {
-    throw Error('Not implemented')
+    return false
   }
 
   protected transformCellAddress<T extends AddressWithRow>(dependencyAddress: T, formulaAddress: SimpleCellAddress): T | ErrorType.REF | false {

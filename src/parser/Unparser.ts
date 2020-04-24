@@ -7,9 +7,8 @@ import {ErrorType, SimpleCellAddress} from '../Cell'
 import {
   Ast,
   AstNodeType,
-  CellRangeAst,
   ColumnReferenceOrNamedExperssionAst,
-  imageWithWhitespace,
+  imageWithWhitespace, RangeOpAst,
   RangeSheetReferenceType,
   RowReferenceAst,
 } from './Ast'
@@ -61,8 +60,10 @@ export class Unparser {
         return imageWithWhitespace(image, ast.leadingWhitespace)
       }
       case AstNodeType.COLUMN_REFERENCE_OR_NAMED_EXPRESSION:
-      case AstNodeType.ROW_REFERENCE:
-      case AstNodeType.CELL_RANGE: {
+      case AstNodeType.ROW_REFERENCE: {
+        throw Error('TODO')
+      }
+      case AstNodeType.RANGE_OP: {
         return imageWithWhitespace(this.formatRange(ast, address), ast.leadingWhitespace)
       }
       case AstNodeType.PLUS_UNARY_OP: {
@@ -107,19 +108,21 @@ export class Unparser {
     }
   }
 
-  private formatRange(ast: CellRangeAst | ColumnReferenceOrNamedExperssionAst | RowReferenceAst, baseAddress: SimpleCellAddress): string {
-    let startSheeet = ''
-    let endSheet = ''
+  private formatRange(ast: RangeOpAst, baseAddress: SimpleCellAddress): string {
+    // let startSheeet = ''
+    // let endSheet = ''
 
-    if (ast.reference.sheet !== null && (ast.sheetReferenceType !== RangeSheetReferenceType.RELATIVE)) {
-      startSheeet = this.unparseSheetName(ast.reference.sheet) + '!'
-    }
+    throw  Error('TODO')
 
-    if (ast.end.sheet !== null && ast.sheetReferenceType === RangeSheetReferenceType.BOTH_ABSOLUTE) {
-      endSheet = this.unparseSheetName(ast.end.sheet) + '!'
-    }
-
-    return `${startSheeet}${ast.reference.unparse(baseAddress)}:${endSheet}${ast.end.unparse(baseAddress)}`
+    // if (ast.reference.sheet !== null && (ast.sheetReferenceType !== RangeSheetReferenceType.RELATIVE)) {
+    //   startSheeet = this.unparseSheetName(ast.reference.sheet) + '!'
+    // }
+    //
+    // if (ast.end.sheet !== null && ast.sheetReferenceType === RangeSheetReferenceType.BOTH_ABSOLUTE) {
+    //   endSheet = this.unparseSheetName(ast.end.sheet) + '!'
+    // }
+    //
+    // return `${startSheeet}${ast.reference.unparse(baseAddress)}:${endSheet}${ast.end.unparse(baseAddress)}`
   }
 }
 
