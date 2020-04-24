@@ -12,7 +12,7 @@ import {
   rowAddressFromString,
   SheetMappingFn,
 } from './addressRepresentationConverters'
-import {Ast, imageWithWhitespace, ParsingError, ParsingErrorType} from './Ast'
+import {Ast, imageWithWhitespace, ParsingError, ParsingErrorType, RangeSheetReferenceType} from './Ast'
 import {binaryOpTokenMap} from './binaryOpTokenMap'
 import {Cache} from './Cache'
 import {FormulaLexer, FormulaParser, IExtendedToken} from './FormulaParser'
@@ -27,6 +27,7 @@ import {
 } from './LexerConfig'
 import {ParserConfig} from './ParserConfig'
 import {formatNumber} from './Unparser'
+import {RowAddress} from './RowAddress'
 
 export interface ParsingResult {
   ast: Ast,
@@ -193,18 +194,21 @@ export class ParserWithCaching {
         return this.computeHashOfAstNode(ast.value) + imageWithWhitespace('%', ast.leadingWhitespace)
       }
       case AstNodeType.RANGE_OP: {
-        if (ast.left.type === AstNodeType.CELL_REFERENCE && ast.right.type === AstNodeType.CELL_REFERENCE) {
-          const start = ast.left.address.hash(true)
-          const end = ast.right.end.hash(true)
+        if ((ast.left.type === AstNodeType.CELL_REFERENCE && ast.right.type === AstNodeType.CELL_REFERENCE) || (ast.left.type === AstNodeType.COLUMN_REFERENCE_OR_NAMED_EXPRESSION && ast.right.type === AstNodeType.COLUMN_REFERENCE_OR_NAMED_EXPRESSION)) {
+          const sheetReferenceType = this.rangeSheetReferenceType(ast.left.reference.sheet, ast.right.reference.sheet)
+          const start = ast.left.reference.hash(sheetReferenceType !== RangeSheetReferenceType.RELATIVE)
+          const end = ast.right.reference.hash(sheetReferenceType === RangeSheetReferenceType.BOTH_ABSOLUTE)
           return imageWithWhitespace(start + ':' + end, ast.leadingWhitespace)
+        } else if ((ast.left.type === AstNodeType.ROW_REFERENCE || ast.left.type === AstNodeType.NUMBER) && (ast.right.type === AstNodeType.ROW_REFERENCE || ast.right.type === AstNodeType.NUMBER)) {
+          const leftSheet = ast.left.type === AstNodeType.ROW_REFERENCE ? ast.left.reference.sheet : null
+          const rightSheet = ast.right.type === AstNodeType.ROW_REFERENCE ? ast.right.reference.sheet : null
+          const sheetReferenceType = this.rangeSheetReferenceType(leftSheet, rightSheet)
+          const start = ast.left.type == AstNodeType.ROW_REFERENCE ? ast.left.reference : RowAddress.relative(null, ast.left.value)
+          const end = ast.right.type == AstNodeType.ROW_REFERENCE ? ast.right.reference : RowAddress.relative(null, ast.right.value)
+          return imageWithWhitespace(`${start.hash(sheetReferenceType !== RangeSheetReferenceType.RELATIVE)}:${end.hash(sheetReferenceType === RangeSheetReferenceType.BOTH_ABSOLUTE)}`, ast.leadingWhitespace)
+        } else {
+          throw Error('WUT')
         }
-        // throw Error('TODO')
-        const left = this.computeHashOfAstNode(ast.left)
-        const right = this.computeHashOfAstNode(ast.right)
-        return imageWithWhitespace(left + ':' + right, ast.leadingWhitespace)
-          // const start = ast.left.address.hash(ast.sheetReferenceType !== RangeSheetReferenceType.RELATIVE)
-          // const end = ast.right.end.hash(ast.sheetReferenceType === RangeSheetReferenceType.BOTH_ABSOLUTE)
-          // return imageWithWhitespace(start + ':' + end, ast.leadingWhitespace)
       }
       case AstNodeType.ERROR: {
         const image = this.config.translationPackage.getErrorTranslation(
@@ -223,6 +227,16 @@ export class ParserWithCaching {
       default: {
         return this.computeHashOfAstNode(ast.left) + imageWithWhitespace(binaryOpTokenMap[ast.type], ast.leadingWhitespace) + this.computeHashOfAstNode(ast.right)
       }
+    }
+  }
+
+  private rangeSheetReferenceType(start: number | null, end: number | null): RangeSheetReferenceType {
+    if (start === null) {
+      return RangeSheetReferenceType.RELATIVE
+    } else if (end === null) {
+      return RangeSheetReferenceType.START_ABSOLUTE
+    } else {
+      return RangeSheetReferenceType.BOTH_ABSOLUTE
     }
   }
 }
