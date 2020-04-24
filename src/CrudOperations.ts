@@ -49,7 +49,7 @@ import {
   SetSheetContentUndoEntry,
   UndoRedo
 } from './UndoRedo'
-import {findBoundaries} from './Sheet'
+import {findBoundaries, validateAsSheet} from './Sheet'
 
 export class CrudOperations {
 
@@ -268,17 +268,12 @@ export class CrudOperations {
     const sheetId = this.sheetMapping.fetch(sheetName)
     this.ensureItIsPossibleToChangeSheetContents(sheetId, values)
 
+    validateAsSheet(values)
     this.undoRedo.clearRedoStack()
     this.clipboardOperations.abortCut()
-    if (!Array.isArray(values)) {
-      throw new Error('Expected an array of arrays.')
-    }
     const oldSheetContent = this.operations.getSheetClipboardCells(sheetId)
     this.operations.clearSheet(sheetId)
     for (let i = 0; i < values.length; i++) {
-      if (!Array.isArray(values[i])) {
-        throw new Error('Expected an array of arrays.')
-      }
       for (let j = 0; j < values[i].length; j++) {
         const address = simpleCellAddress(sheetId, j, i)
         this.operations.setCellContent(address, values[i][j])
