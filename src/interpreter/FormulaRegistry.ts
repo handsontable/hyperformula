@@ -47,8 +47,7 @@ export class FormulaRegistry {
 
   private static loadPluginFormula(plugin: FunctionPluginDefinition, formulaId: string, registry: Map<string, [string, FunctionPluginDefinition]>): void {
     const methodName = plugin.implementedFunctions[formulaId].method
-    // eslint-disable-next-line no-prototype-builtins
-    if (plugin.prototype.hasOwnProperty(methodName)) {
+    if (Object.prototype.hasOwnProperty.call(plugin.prototype, methodName)) {
       registry.set(formulaId, [methodName, plugin])
     } else {
       throw FormulaPluginValidationError.formulaMethodNotFound(methodName, plugin.name)
