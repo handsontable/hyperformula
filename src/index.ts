@@ -14,7 +14,8 @@ import {
   NoSheetWithIdError,
   NoSheetWithNameError,
   NotAFormulaError,
-  SheetSizeLimitExceededError
+  SheetSizeLimitExceededError,
+  FunctionPluginValidationError
 } from './errors'
 import {HyperFormula} from './HyperFormula'
 import {Config} from './Config'
@@ -41,6 +42,7 @@ class HyperFormulaNS extends HyperFormula {
   public static ErrorType = ErrorType
   public static CellError = CellError
   public static InvalidArgumentsError = InvalidArgumentsError
+  public static FunctionPluginValidationError = FunctionPluginValidationError
 }
 
 const defaultLanguage = Config.defaultConfig.language
@@ -67,5 +69,6 @@ export {
   NoOperationToUndoError,
   NoOperationToRedoError,
   EvaluationSuspendedError,
+  FunctionPluginValidationError,
   ErrorType
 }
