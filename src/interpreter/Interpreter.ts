@@ -238,22 +238,6 @@ export class Interpreter {
     }
   }
 
-  // /**
-  //  * Registers plugins with functions to use
-  //  *
-  //  * @param plugins - list of plugin modules
-  //  */
-  // private registerPlugins(plugins: FunctionPluginDefinition[]) {
-  //   for (const pluginClass of plugins) {
-  //     const pluginInstance = new pluginClass(this)
-  //     Object.keys(pluginClass.implementedFunctions).forEach((pluginFunction) => {
-  //       const pluginFunctionData = pluginClass.implementedFunctions[pluginFunction]
-  //       const functionName = pluginFunctionData.translationKey.toUpperCase()
-  //       this.pluginCache.set(functionName, [pluginInstance, pluginFunction])
-  //     })
-  //   }
-  // }
-
   private rangeSpansOneSheet(ast: CellRangeAst | ColumnRangeAst | RowRangeAst): boolean {
     return ast.start.sheet === ast.end.sheet
   }
