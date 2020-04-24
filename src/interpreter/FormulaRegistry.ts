@@ -19,9 +19,9 @@ export class FormulaRegistry {
   }
 
   public static registerFormula(formulaId: string, plugin: FunctionPluginDefinition): void {
-    const entry = Object.keys(plugin.implementedFunctions).find(entry => plugin.implementedFunctions[entry].translationKey === formulaId)
+    const entry = plugin.implementedFunctions[formulaId]
     if (entry !== undefined) {
-      this.loadPluginFormula(plugin, entry, this.plugins)
+      this.loadPluginFormula(plugin, formulaId, this.plugins)
     } else {
       throw FormulaPluginValidationError.formulaNotDeclaredInPlugin(formulaId, plugin.name)
     }
@@ -45,14 +45,13 @@ export class FormulaRegistry {
     })
   }
 
-  private static loadPluginFormula(plugin: FunctionPluginDefinition, functionName: string, registry: Map<string, [string, FunctionPluginDefinition]>): void {
+  private static loadPluginFormula(plugin: FunctionPluginDefinition, formulaId: string, registry: Map<string, [string, FunctionPluginDefinition]>): void {
+    const methodName = plugin.implementedFunctions[formulaId].method
     // eslint-disable-next-line no-prototype-builtins
-    if (plugin.prototype.hasOwnProperty(functionName)) {
-      const pluginFunctionData = plugin.implementedFunctions[functionName]
-      const formulaId = pluginFunctionData.translationKey.toUpperCase()
-      registry.set(formulaId, [functionName, plugin])
+    if (plugin.prototype.hasOwnProperty(methodName)) {
+      registry.set(formulaId, [methodName, plugin])
     } else {
-      throw FormulaPluginValidationError.formulaMethodNotFound(functionName, plugin.name)
+      throw FormulaPluginValidationError.formulaMethodNotFound(methodName, plugin.name)
     }
   }
 
@@ -73,8 +72,8 @@ export class FormulaRegistry {
       this.plugins = new Map(FormulaRegistry.plugins)
     }
 
-    for (const [formulaId, [functionName, plugin]] of this.plugins.entries()) {
-      this.categorizeFunction(formulaId, plugin.implementedFunctions[functionName])
+    for (const [formulaId, [, plugin]] of this.plugins.entries()) {
+      this.categorizeFunction(formulaId, plugin.implementedFunctions[formulaId])
     }
   }
 

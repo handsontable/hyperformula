@@ -8,11 +8,11 @@ import {SumifPlugin} from '../src/interpreter/plugin/SumifPlugin'
 
 class FooPlugin extends FunctionPlugin {
   public static implementedFunctions = {
-    foo: {
-      translationKey: 'FOO',
+    'FOO': {
+      method: 'foo',
     },
-    bar: {
-      translationKey: 'BAR'
+    'BAR': {
+      method: 'bar'
     }
   }
 
@@ -27,8 +27,8 @@ class FooPlugin extends FunctionPlugin {
 
 class SumWithExtra extends FunctionPlugin {
   public static implementedFunctions = {
-    sum: {
-      translationKey: 'SUM',
+    'SUM': {
+      method: 'sum',
     }
   }
 
@@ -41,8 +41,8 @@ class SumWithExtra extends FunctionPlugin {
 
 class InvalidPlugin extends FunctionPlugin {
   public static implementedFunctions = {
-    foo: {
-      translationKey: 'FOO',
+    'FOO': {
+      method: 'foo',
     }
   }
 

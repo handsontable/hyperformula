@@ -14,11 +14,11 @@ import {Interpreter} from '../Interpreter'
 import {InterpreterValue, SimpleRangeValue} from '../InterpreterValue'
 
 interface IImplementedFunctions {
-  [functionName: string]: IImplementedFunction,
+  [formulaId: string]: IImplementedFunction,
 }
 
 export interface IImplementedFunction {
-  translationKey: string,
+  method: string,
   isVolatile?: boolean,
   isDependentOnSheetStructureChange?: boolean,
   doesNotNeedArgumentsToBeComputed?: boolean,

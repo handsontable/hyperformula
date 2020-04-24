@@ -9,8 +9,8 @@ import {FunctionPlugin} from './FunctionPlugin'
 
 export class PowerPlugin extends FunctionPlugin {
   public static implementedFunctions = {
-    power: {
-      translationKey: 'POWER',
+    'POWER': {
+      method: 'power',
     },
   }
 

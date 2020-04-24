@@ -10,8 +10,8 @@ import {FunctionPlugin} from './FunctionPlugin'
 
 export class IsEvenPlugin extends FunctionPlugin {
   public static implementedFunctions = {
-    iseven: {
-      translationKey: 'ISEVEN',
+    'ISEVEN': {
+      method: 'iseven',
     },
   }
 

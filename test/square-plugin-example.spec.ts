@@ -8,8 +8,8 @@ import {enGB} from '../src/i18n'
 class SquarePlugin extends FunctionPlugin {
   public static implementedFunctions = {
     // Key of the mapping describes which function will be used to compute it
-    square: {
-      translationKey: 'SQUARE',
+    'SQUARE': {
+      method: 'square',
     },
   }
 

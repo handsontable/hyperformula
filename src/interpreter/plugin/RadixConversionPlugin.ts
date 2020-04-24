@@ -18,29 +18,29 @@ const ALPHABET = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'
 
 export class RadixConversionPlugin extends FunctionPlugin {
   public static implementedFunctions = {
-    dec2bin: {
-      translationKey: 'DEC2BIN',
+    'DEC2BIN': {
+      method: 'dec2bin',
     },
-    dec2oct: {
-      translationKey: 'DEC2OCT',
+    'DEC2OCT': {
+      method: 'dec2oct',
     },
-    dec2hex: {
-      translationKey: 'DEC2HEX',
+    'DEC2HEX': {
+      method: 'dec2hex',
     },
-    bin2dec: {
-      translationKey: 'BIN2DEC',
+    'BIN2DEC': {
+      method: 'bin2dec',
     },
-    bin2oct: {
-      translationKey: 'BIN2OCT',
+    'BIN2OCT': {
+      method: 'bin2oct',
     },
-    bin2hex: {
-      translationKey: 'BIN2HEX',
+    'BIN2HEX': {
+      method: 'bin2hex',
     },
-    decimal: {
-      translationKey: 'DECIMAL',
+    'DECIMAL': {
+      method: 'decimal',
     },
-    base: {
-      translationKey: 'BASE',
+    'BASE': {
+      method: 'base',
     },
   }
 

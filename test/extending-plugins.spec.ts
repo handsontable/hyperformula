@@ -6,8 +6,8 @@ import {SimpleCellAddress} from '../src/Cell'
 
 class FooPlugin extends FunctionPlugin {
   public static implementedFunctions = {
-    foo: {
-      translationKey: 'FOO',
+    'FOO': {
+      method: 'foo',
     },
   }
 
