@@ -10,7 +10,7 @@ import {Config} from '../Config'
 import {FunctionPluginValidationError} from '../errors'
 
 export class FunctionRegistry {
-  public static plugins: Map<string, [string, FunctionPluginDefinition]> = new Map()
+  public static plugins: Map<string, FunctionPluginDefinition> = new Map()
 
   public static registerFunctionPlugins(...plugins: FunctionPluginDefinition[]): void {
     for (const plugin of plugins) {
@@ -36,25 +36,25 @@ export class FunctionRegistry {
   }
 
   public static getFunctionPlugin(functionId: string): Maybe<FunctionPluginDefinition> {
-    return this.plugins.get(functionId)?.[1]
+    return this.plugins.get(functionId)
   }
 
-  private static loadPluginFunctions(plugin: FunctionPluginDefinition, registry: Map<string, [string, FunctionPluginDefinition]>): void {
+  private static loadPluginFunctions(plugin: FunctionPluginDefinition, registry: Map<string, FunctionPluginDefinition>): void {
     Object.keys(plugin.implementedFunctions).forEach((functionName) => {
       this.loadPluginFunction(plugin, functionName, registry)
     })
   }
 
-  private static loadPluginFunction(plugin: FunctionPluginDefinition, functionId: string, registry: Map<string, [string, FunctionPluginDefinition]>): void {
+  private static loadPluginFunction(plugin: FunctionPluginDefinition, functionId: string, registry: Map<string, FunctionPluginDefinition>): void {
     const methodName = plugin.implementedFunctions[functionId].method
     if (Object.prototype.hasOwnProperty.call(plugin.prototype, methodName)) {
-      registry.set(functionId, [methodName, plugin])
+      registry.set(functionId, plugin)
     } else {
       throw FunctionPluginValidationError.functionMethodNotFound(methodName, plugin.name)
     }
   }
 
-  private readonly plugins: Map<string, [string, FunctionPluginDefinition]>
+  private readonly plugins: Map<string, FunctionPluginDefinition>
   private readonly functions: Map<string, [string, FunctionPlugin]> = new Map()
 
   private readonly volatileFunctions: Set<string> = new Set()
@@ -71,7 +71,7 @@ export class FunctionRegistry {
       this.plugins = new Map(FunctionRegistry.plugins)
     }
 
-    for (const [functionId, [, plugin]] of this.plugins.entries()) {
+    for (const [functionId, plugin] of this.plugins.entries()) {
       this.categorizeFunction(functionId, plugin.implementedFunctions[functionId])
     }
   }
@@ -79,18 +79,19 @@ export class FunctionRegistry {
   public initializePlugins(interpreter: Interpreter): void {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const instances: any[] = []
-    for (const [functionId, [methodName, plugin]] of this.plugins.entries()) {
+    for (const [functionId, plugin] of this.plugins.entries()) {
       let pluginInstance = instances.find(pluginInstance => pluginInstance instanceof plugin)
       if (pluginInstance === undefined) {
         pluginInstance = new plugin(interpreter)
         instances.push(pluginInstance)
       }
+      const methodName = plugin.implementedFunctions[functionId].method
       this.functions.set(functionId, [methodName, pluginInstance])
     }
   }
 
   public getFunctionPlugin(functionId: string): Maybe<FunctionPluginDefinition> {
-    return this.plugins.get(functionId)?.[1]
+    return this.plugins.get(functionId)
   }
 
   public getFunction(functionId: string): Maybe<[string, FunctionPlugin]> {
