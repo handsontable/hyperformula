@@ -50,16 +50,18 @@ export const CellReference = createToken({
   pattern: new RegExp(`\(${sheetNameRegexp}\)?\\$?[A-Za-z]+\\$?[0-9]+`),
 })
 
-export const ColumnRange = createToken({
+/* named expressions */
+export const NamedExpression = createToken({name: 'NamedExpression', pattern: /[A-Za-z\u00C0-\u02AF_][0-9\.A-Za-z_\u00C0-\u02AF_]+/})
+
+export const ColumnReference = createToken({
   name: 'ColumnRange',
-  pattern: new RegExp(`\(${sheetNameRegexp}\)?\\$?[A-Za-z]+:\(${sheetNameRegexp}\)?\\$?[A-Za-z]+`),
+  pattern: new RegExp(`\(${sheetNameRegexp}\)?\\$?[A-Za-z]+`),
 })
 
-export const RowRange = createToken({
+export const RowReference = createToken({
   name: 'RowRange',
-  pattern: new RegExp(`\(${sheetNameRegexp}\)?\\$?[0-9]+:\(${sheetNameRegexp}\)?\\$?[0-9]+`),
+  pattern: new RegExp(`\(${sheetNameRegexp}\)?\\$?[0-9]+`),
 })
-
 
 export const RangeSeparator = createToken({name: 'RangeSeparator', pattern: /:/})
 
@@ -125,8 +127,8 @@ export const buildLexerConfig = (config: ParserConfig): ILexerConfig => {
     ProcedureName,
     RangeSeparator,
     ArgSeparator,
-    ColumnRange,
-    RowRange,
+    // ColumnRange,
+    // RowRange,
     NumberLiteral,
     StringLiteral,
     ErrorLiteral,
@@ -135,6 +137,9 @@ export const buildLexerConfig = (config: ParserConfig): ILexerConfig => {
     AdditionOp,
     MultiplicationOp,
     CellReference,
+    ColumnReference,
+    RowReference,
+    NamedExpression,
   ]
 
   return {

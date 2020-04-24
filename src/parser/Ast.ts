@@ -16,9 +16,9 @@ export type Ast =
   NumberAst
   | StringAst
   | CellReferenceAst
-  | CellRangeAst
-  | ColumnRangeAst
-  | RowRangeAst
+  // | CellRangeAst
+  | ColumnReferenceOrNamedExperssionAst
+  | RowReferenceAst
   | ConcatenateOpAst
   | MinusUnaryOpAst
   | PlusUnaryOpAst
@@ -34,6 +34,7 @@ export type Ast =
   | TimesOpAst
   | DivOpAst
   | PowerOpAst
+  | RangeOpAst
   | ProcedureAst
   | ParenthesisAst
   | ErrorAst
@@ -82,6 +83,7 @@ export enum AstNodeType {
   TIMES_OP = 'TIMES_OP',
   DIV_OP = 'DIV_OP',
   POWER_OP = 'POWER_OP',
+  RANGE_OP = 'RANGE_OP',
 
   FUNCTION_CALL = 'FUNCTION_CALL',
 
@@ -90,8 +92,8 @@ export enum AstNodeType {
   CELL_REFERENCE = 'CELL_REFERENCE',
 
   CELL_RANGE = 'CELL_RANGE',
-  COLUMN_RANGE = 'COLUMN_RANGE',
-  ROW_RANGE = 'ROW_RANGE',
+  COLUMN_REFERENCE_OR_NAMED_EXPRESSION = 'COLUMN_REFERENCE_OR_NAMED_EXPRESSION',
+  ROW_REFERENCE = 'ROW_REFERENCE',
 
   ERROR = 'ERROR',
 
@@ -154,56 +156,31 @@ export const buildCellReferenceAst = (reference: CellAddress, leadingWhitespace?
   leadingWhitespace: leadingWhitespace?.image,
 })
 
-export interface CellRangeAst extends AstWithWhitespace {
-  type: AstNodeType.CELL_RANGE,
-  start: CellAddress,
-  end: CellAddress,
-  sheetReferenceType: RangeSheetReferenceType,
+export interface ColumnReferenceOrNamedExperssionAst extends AstWithWhitespace{
+  type: AstNodeType.COLUMN_REFERENCE_OR_NAMED_EXPRESSION,
+  reference?: ColumnAddress,
+  rawInput: string,
 }
 
-export const buildCellRangeAst = (start: CellAddress, end: CellAddress, sheetReferenceType: RangeSheetReferenceType, leadingWhitespace?: string): CellRangeAst => {
-  assertRangeConsistency(start, end, sheetReferenceType)
+export const buildColumnReferenceAst = (rawInput: string, address?: ColumnAddress, leadingWhitespace?: IToken): ColumnReferenceOrNamedExperssionAst => {
+  // assertRangeConsistency(start, end, sheetReferenceType)
   return {
-    type: AstNodeType.CELL_RANGE,
-    start,
-    end,
-    sheetReferenceType,
-    leadingWhitespace
+    type: AstNodeType.COLUMN_REFERENCE_OR_NAMED_EXPRESSION,
+    reference: address,
+    rawInput: rawInput
   }
 }
 
-export interface ColumnRangeAst extends AstWithWhitespace{
-  type: AstNodeType.COLUMN_RANGE,
-  start: ColumnAddress,
-  end: ColumnAddress,
-  sheetReferenceType: RangeSheetReferenceType,
+export interface RowReferenceAst extends AstWithWhitespace{
+  type: AstNodeType.ROW_REFERENCE,
+  reference: RowAddress,
 }
 
-export const buildColumnRangeAst = (start: ColumnAddress, end: ColumnAddress, sheetReferenceType: RangeSheetReferenceType, leadingWhitespace?: IToken): ColumnRangeAst => {
-  assertRangeConsistency(start, end, sheetReferenceType)
+export const buildRowReferenceAst = (address: RowAddress, leadingWhitespace?: IToken): RowReferenceAst => {
+  // assertRangeConsistency(start, end, sheetReferenceType)
   return {
-    type: AstNodeType.COLUMN_RANGE,
-    start,
-    end,
-    sheetReferenceType,
-    leadingWhitespace: leadingWhitespace?.image,
-  }
-}
-
-export interface RowRangeAst extends AstWithWhitespace{
-  type: AstNodeType.ROW_RANGE,
-  start: RowAddress,
-  end: RowAddress,
-  sheetReferenceType: RangeSheetReferenceType,
-}
-
-export const buildRowRangeAst = (start: RowAddress, end: RowAddress, sheetReferenceType: RangeSheetReferenceType, leadingWhitespace?: IToken): RowRangeAst => {
-  assertRangeConsistency(start, end, sheetReferenceType)
-  return {
-    type: AstNodeType.ROW_RANGE,
-    start,
-    end,
-    sheetReferenceType,
+    type: AstNodeType.ROW_REFERENCE,
+    reference: address,
     leadingWhitespace: leadingWhitespace?.image,
   }
 }
@@ -340,6 +317,17 @@ export interface PowerOpAst extends BinaryOpAst {
 
 export const buildPowerOpAst = (left: Ast, right: Ast, leadingWhitespace?: IToken): PowerOpAst => ({
   type: AstNodeType.POWER_OP,
+  left,
+  right,
+  leadingWhitespace: leadingWhitespace?.image,
+})
+
+export interface RangeOpAst extends BinaryOpAst {
+  type: AstNodeType.RANGE_OP,
+}
+
+export const buildRangeOpAst = (left: Ast, right: Ast, leadingWhitespace?: IToken): RangeOpAst => ({
+  type: AstNodeType.RANGE_OP,
   left,
   right,
   leadingWhitespace: leadingWhitespace?.image,

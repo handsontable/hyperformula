@@ -51,7 +51,7 @@ describe('Parser - OFFSET to reference translation', () => {
 
     const ast = parser.parse('=OFFSET(F16, 2, 0, 3)', simpleCellAddress(0, 1, 2)).ast as CellRangeAst
     expect(ast.type).toBe(AstNodeType.CELL_RANGE)
-    expect(ast.start).toEqual(CellAddress.relative(null, 4, 15))
+    expect(ast.reference).toEqual(CellAddress.relative(null, 4, 15))
     expect(ast.end).toEqual(CellAddress.relative(null, 4, 17))
   })
 
@@ -60,7 +60,7 @@ describe('Parser - OFFSET to reference translation', () => {
 
     const ast = parser.parse('=OFFSET(F16, 0, 2, 1, 3)', simpleCellAddress(0, 1, 2)).ast as CellRangeAst
     expect(ast.type).toBe(AstNodeType.CELL_RANGE)
-    expect(ast.start).toEqual(CellAddress.relative(null, 6, 13))
+    expect(ast.reference).toEqual(CellAddress.relative(null, 6, 13))
     expect(ast.end).toEqual(CellAddress.relative(null, 8, 13))
   })
 

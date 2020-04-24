@@ -14,7 +14,7 @@ import {
   ProcedureAst,
 } from '../src/parser'
 import {EngineComparator} from './graphComparator'
-import {ColumnRangeAst, RowRangeAst} from '../src/parser/Ast'
+import {ColumnReferenceOrNamedExperssionAst, RowReferenceAst} from '../src/parser/Ast'
 
 export const extractReference = (engine: HyperFormula, address: SimpleCellAddress): CellAddress => {
   return ((engine.addressMapping.fetchCell(address) as FormulaCellVertex).getFormula(engine.lazilyTransformingAstService) as CellReferenceAst).reference
@@ -23,18 +23,18 @@ export const extractReference = (engine: HyperFormula, address: SimpleCellAddres
 export const extractRange = (engine: HyperFormula, address: SimpleCellAddress): AbsoluteCellRange => {
   const formula = (engine.addressMapping.fetchCell(address) as FormulaCellVertex).getFormula(engine.lazilyTransformingAstService) as ProcedureAst
   const rangeAst = formula.args[0] as CellRangeAst
-  return new AbsoluteCellRange(rangeAst.start.toSimpleCellAddress(address), rangeAst.end.toSimpleCellAddress(address))
+  return new AbsoluteCellRange(rangeAst.reference.toSimpleCellAddress(address), rangeAst.end.toSimpleCellAddress(address))
 }
 
 export const extractColumnRange = (engine: HyperFormula, address: SimpleCellAddress): AbsoluteColumnRange => {
   const formula = (engine.addressMapping.fetchCell(address) as FormulaCellVertex).getFormula(engine.lazilyTransformingAstService) as ProcedureAst
-  const rangeAst = formula.args[0] as ColumnRangeAst
+  const rangeAst = formula.args[0] as ColumnReferenceOrNamedExperssionAst
   return AbsoluteColumnRange.fromColumnRange(rangeAst, address)
 }
 
 export const extractRowRange = (engine: HyperFormula, address: SimpleCellAddress): AbsoluteRowRange => {
   const formula = (engine.addressMapping.fetchCell(address) as FormulaCellVertex).getFormula(engine.lazilyTransformingAstService) as ProcedureAst
-  const rangeAst = formula.args[0] as RowRangeAst
+  const rangeAst = formula.args[0] as RowReferenceAst
   return AbsoluteRowRange.fromRowRange(rangeAst, address)
 }
 

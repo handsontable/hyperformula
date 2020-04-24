@@ -12,7 +12,7 @@ import {coerceToRange, max, maxa, min, mina} from '../ArithmeticHelper'
 import {SimpleRangeValue} from '../InterpreterValue'
 import {FunctionPlugin} from './FunctionPlugin'
 import {findSmallerRange} from './SumprodPlugin'
-import {ColumnRangeAst, RowRangeAst} from '../../parser/Ast'
+import {ColumnReferenceOrNamedExperssionAst, RowReferenceAst} from '../../parser/Ast'
 
 export type BinaryOperation<T> = (left: T, right: T) => T
 
@@ -329,7 +329,7 @@ export class NumericAggregationPlugin extends FunctionPlugin {
   private reduce<T>(ast: ProcedureAst, formulaAddress: SimpleCellAddress, initialAccValue: T, functionName: string, reducingFunction: BinaryOperation<T>, mapFunction: MapOperation<T>, coerceFunction: (arg: InternalCellValue) => InternalCellValue): T {
     return ast.args.reduce((acc: T, arg) => {
       let value
-      if (arg.type === AstNodeType.CELL_RANGE || arg.type === AstNodeType.COLUMN_RANGE || arg.type === AstNodeType.ROW_RANGE) {
+      if (arg.type === AstNodeType.CELL_RANGE || arg.type === AstNodeType.COLUMN_REFERENCE_OR_NAMED_EXPRESSION || arg.type === AstNodeType.ROW_REFERENCE) {
         value = this.evaluateRange(arg, formulaAddress, acc, functionName, reducingFunction, mapFunction)
       } else {
         value = this.evaluateAst(arg, formulaAddress)
@@ -373,7 +373,7 @@ export class NumericAggregationPlugin extends FunctionPlugin {
    * @param functionName - function name to use as cache key
    * @param reducingFunction - reducing function
    */
-  private evaluateRange<T>(ast: CellRangeAst | ColumnRangeAst | RowRangeAst, formulaAddress: SimpleCellAddress, initialAccValue: T, functionName: string, reducingFunction: BinaryOperation<T>, mapFunction: MapOperation<T>): T {
+  private evaluateRange<T>(ast: CellRangeAst | ColumnReferenceOrNamedExperssionAst | RowReferenceAst, formulaAddress: SimpleCellAddress, initialAccValue: T, functionName: string, reducingFunction: BinaryOperation<T>, mapFunction: MapOperation<T>): T {
     let range
     try {
       range = AbsoluteCellRange.fromAst(ast, formulaAddress)

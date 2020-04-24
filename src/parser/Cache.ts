@@ -58,9 +58,8 @@ export const doesContainFunctions = (ast: Ast, interestingFunctions: Set<string>
     case AstNodeType.ERROR:
     case AstNodeType.ERROR_WITH_RAW_INPUT:
     case AstNodeType.CELL_REFERENCE:
-    case AstNodeType.CELL_RANGE:
-    case AstNodeType.COLUMN_RANGE:
-    case AstNodeType.ROW_RANGE:
+    case AstNodeType.COLUMN_REFERENCE_OR_NAMED_EXPRESSION:
+    case AstNodeType.ROW_REFERENCE:
       return false
     case AstNodeType.PERCENT_OP:
     case AstNodeType.PLUS_UNARY_OP:
@@ -79,6 +78,7 @@ export const doesContainFunctions = (ast: Ast, interestingFunctions: Set<string>
     case AstNodeType.TIMES_OP:
     case AstNodeType.DIV_OP:
     case AstNodeType.POWER_OP:
+    case AstNodeType.RANGE_OP:
       return doesContainFunctions(ast.left, interestingFunctions) || doesContainFunctions(ast.right, interestingFunctions)
     case AstNodeType.PARENTHESIS:
       return doesContainFunctions(ast.expression, interestingFunctions)

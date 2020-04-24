@@ -6,7 +6,7 @@
 import {ColumnsSpan} from '../ColumnsSpan'
 import {Ast, CellAddress} from '../parser'
 import {absoluteSheetReference, ErrorType, SimpleCellAddress} from '../Cell'
-import {RowRangeAst} from '../parser/Ast'
+import {RowReferenceAst} from '../parser/Ast'
 import {Transformer} from './Transformer'
 import {RowAddress} from '../parser/RowAddress'
 import {ColumnAddress} from '../parser/ColumnAddress'
@@ -27,7 +27,7 @@ export class RemoveColumnsTransformer extends Transformer {
     return this.columnsSpan.sheet
   }
 
-  protected transformRowRangeAst(ast: RowRangeAst, _formulaAddress: SimpleCellAddress): Ast {
+  protected transformRowRangeAst(ast: RowReferenceAst, _formulaAddress: SimpleCellAddress): Ast {
     return ast
   }
 

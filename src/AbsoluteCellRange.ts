@@ -5,31 +5,36 @@
 
 import {CellRange, simpleCellAddress, SimpleCellAddress, SimpleColumnAddress, SimpleRowAddress} from './Cell'
 import {DependencyGraph} from './DependencyGraph'
-import {AstNodeType, CellAddress, CellRangeAst} from './parser'
-import {ColumnRangeAst, RowRangeAst} from './parser/Ast'
+import {Ast, AstNodeType, CellAddress, CellRangeAst, CellReferenceAst} from './parser'
+import {ColumnReferenceOrNamedExperssionAst, RowReferenceAst} from './parser/Ast'
 
 export const DIFFERENT_SHEETS_ERROR = 'AbsoluteCellRange: Start and end are in different sheets'
 export const WRONG_RANGE_SIZE = 'AbsoluteCellRange: Wrong range size'
+
+
+export type ReferenceAst = CellReferenceAst | ColumnReferenceOrNamedExperssionAst | RowReferenceAst
 
 export class AbsoluteCellRange {
   public get sheet() {
     return this.start.sheet
   }
 
-  public static fromAst(ast: CellRangeAst | ColumnRangeAst | RowRangeAst, baseAddress: SimpleCellAddress): AbsoluteCellRange {
-    if (ast.type === AstNodeType.CELL_RANGE) {
-      return AbsoluteCellRange.fromCellRange(ast, baseAddress)
-    } else if (ast.type === AstNodeType.COLUMN_RANGE) {
-      return AbsoluteColumnRange.fromColumnRange(ast, baseAddress)
+  public static fromAst(left: Ast, right: Ast, baseAddress: SimpleCellAddress): AbsoluteCellRange {
+    if (left.type === AstNodeType.CELL_REFERENCE && right.type === AstNodeType.CELL_REFERENCE) {
+      return AbsoluteCellRange.fromCellRange(left, right, baseAddress)
+    } else if (left.type === AstNodeType.COLUMN_REFERENCE_OR_NAMED_EXPRESSION && right.type === AstNodeType.COLUMN_REFERENCE_OR_NAMED_EXPRESSION) {
+      return AbsoluteColumnRange.fromColumnRange(left, right, baseAddress)
+    } else if (left.type === AstNodeType.ROW_REFERENCE && right.type === AstNodeType.ROW_REFERENCE) {
+      return AbsoluteRowRange.fromRowRange(left, right, baseAddress)
     } else {
-      return AbsoluteRowRange.fromRowRange(ast, baseAddress)
+      throw Error('WUT')
     }
   }
 
-  public static fromCellRange(x: CellRange, baseAddress: SimpleCellAddress): AbsoluteCellRange {
+  public static fromCellRange(left: CellReferenceAst, right: CellReferenceAst, baseAddress: SimpleCellAddress): AbsoluteCellRange {
     return new AbsoluteCellRange(
-      new CellAddress(x.start.sheet, x.start.col, x.start.row, x.start.type).toSimpleCellAddress(baseAddress),
-      new CellAddress(x.end.sheet, x.end.col, x.end.row, x.end.type).toSimpleCellAddress(baseAddress),
+      new CellAddress(left.reference.sheet, left.reference.col, left.reference.row, left.reference.type).toSimpleCellAddress(baseAddress),
+      new CellAddress(right.reference.sheet, right.reference.col, right.reference.row, right.reference.type).toSimpleCellAddress(baseAddress),
     )
   }
 
@@ -327,9 +332,12 @@ export class AbsoluteCellRange {
 }
 
 export class AbsoluteColumnRange extends AbsoluteCellRange {
-  public static fromColumnRange(x: ColumnRangeAst, baseAddress: SimpleCellAddress): AbsoluteColumnRange {
-    const start = x.start.toSimpleColumnAddress(baseAddress)
-    const end = x.end.toSimpleColumnAddress(baseAddress)
+  public static fromColumnRange(left: ColumnReferenceOrNamedExperssionAst, right: ColumnReferenceOrNamedExperssionAst, baseAddress: SimpleCellAddress): AbsoluteColumnRange {
+    if (left.reference === undefined || right.reference === undefined) {
+      throw Error('Propably named expression')
+    }
+    const start = left.reference.toSimpleColumnAddress(baseAddress)
+    const end = right.reference.toSimpleColumnAddress(baseAddress)
     if (start.sheet !== end.sheet) {
       throw new Error(DIFFERENT_SHEETS_ERROR)
     }
@@ -378,9 +386,9 @@ export class AbsoluteColumnRange extends AbsoluteCellRange {
 }
 
 export class AbsoluteRowRange extends AbsoluteCellRange {
-  public static fromRowRange(x: RowRangeAst, baseAddress: SimpleCellAddress): AbsoluteRowRange {
-    const start = x.start.toSimpleRowAddress(baseAddress)
-    const end = x.end.toSimpleRowAddress(baseAddress)
+  public static fromRowRange(left: RowReferenceAst, right: RowReferenceAst, baseAddress: SimpleCellAddress): AbsoluteRowRange {
+    const start = left.reference.toSimpleRowAddress(baseAddress)
+    const end = right.reference.toSimpleRowAddress(baseAddress)
     if (start.sheet !== end.sheet) {
       throw new Error(DIFFERENT_SHEETS_ERROR)
     }

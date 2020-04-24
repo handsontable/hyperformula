@@ -4,14 +4,8 @@
  */
 
 import GPU from 'gpu.js'
-import {AbsoluteCellRange, AbsoluteColumnRange, AbsoluteRowRange} from '../AbsoluteCellRange'
-import {
-  CellError,
-  ErrorType,
-  invalidSimpleCellAddress,
-  NoErrorCellValue,
-  SimpleCellAddress,
-} from '../Cell'
+import {AbsoluteCellRange} from '../AbsoluteCellRange'
+import {CellError, ErrorType, invalidSimpleCellAddress, NoErrorCellValue, SimpleCellAddress} from '../Cell'
 import {ColumnSearchStrategy} from '../ColumnSearch/ColumnSearchStrategy'
 import {Config} from '../Config'
 import {DateTimeHelper} from '../DateTimeHelper'
@@ -19,11 +13,9 @@ import {DependencyGraph} from '../DependencyGraph'
 import {Matrix, NotComputedMatrix} from '../Matrix'
 import {Maybe} from '../Maybe'
 // noinspection TypeScriptPreferShortImport
-import {Ast, AstNodeType, CellRangeAst, ColumnRangeAst, RowRangeAst} from '../parser/Ast'
+import {Ast, AstNodeType, RangeOpAst} from '../parser/Ast'
 import {Statistics} from '../statistics/Statistics'
-import {
-  ArithmeticHelper, divide, multiply, percent, power, unaryminus,
-} from './ArithmeticHelper'
+import {ArithmeticHelper, divide, multiply, percent, power, unaryminus} from './ArithmeticHelper'
 import {InterpreterValue, SimpleRangeValue} from './InterpreterValue'
 import {concatenate} from './text'
 import {NumberLiteralHelper} from '../NumberLiteralHelper'
@@ -63,6 +55,10 @@ export class Interpreter {
         }
         return this.dependencyGraph.getCellValue(address)
       }
+      case AstNodeType.ROW_REFERENCE:
+      case AstNodeType.COLUMN_REFERENCE_OR_NAMED_EXPRESSION: {
+        throw Error('Shouldnt happen')
+      }
       case AstNodeType.NUMBER:
       case AstNodeType.STRING: {
         return ast.value
@@ -76,37 +72,37 @@ export class Interpreter {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
         const rightResult = this.evaluateAst(ast.right, formulaAddress)
         return this.passErrors(leftResult, rightResult) ??
-          this.arithmeticHelper.compare( leftResult as NoErrorCellValue, rightResult as NoErrorCellValue) === 0
+          this.arithmeticHelper.compare(leftResult as NoErrorCellValue, rightResult as NoErrorCellValue) === 0
       }
       case AstNodeType.NOT_EQUAL_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
         const rightResult = this.evaluateAst(ast.right, formulaAddress)
         return this.passErrors(leftResult, rightResult) ??
-          this.arithmeticHelper.compare( leftResult as NoErrorCellValue, rightResult as NoErrorCellValue) !== 0
+          this.arithmeticHelper.compare(leftResult as NoErrorCellValue, rightResult as NoErrorCellValue) !== 0
       }
       case AstNodeType.GREATER_THAN_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
         const rightResult = this.evaluateAst(ast.right, formulaAddress)
         return this.passErrors(leftResult, rightResult) ??
-          this.arithmeticHelper.compare( leftResult as NoErrorCellValue, rightResult as NoErrorCellValue) > 0
+          this.arithmeticHelper.compare(leftResult as NoErrorCellValue, rightResult as NoErrorCellValue) > 0
       }
       case AstNodeType.LESS_THAN_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
         const rightResult = this.evaluateAst(ast.right, formulaAddress)
         return this.passErrors(leftResult, rightResult) ??
-          this.arithmeticHelper.compare( leftResult as NoErrorCellValue, rightResult as NoErrorCellValue) < 0
+          this.arithmeticHelper.compare(leftResult as NoErrorCellValue, rightResult as NoErrorCellValue) < 0
       }
       case AstNodeType.GREATER_THAN_OR_EQUAL_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
         const rightResult = this.evaluateAst(ast.right, formulaAddress)
         return this.passErrors(leftResult, rightResult) ??
-          this.arithmeticHelper.compare( leftResult as NoErrorCellValue, rightResult as NoErrorCellValue) >= 0
+          this.arithmeticHelper.compare(leftResult as NoErrorCellValue, rightResult as NoErrorCellValue) >= 0
       }
       case AstNodeType.LESS_THAN_OR_EQUAL_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
         const rightResult = this.evaluateAst(ast.right, formulaAddress)
         return this.passErrors(leftResult, rightResult) ??
-          this.arithmeticHelper.compare( leftResult as NoErrorCellValue, rightResult as NoErrorCellValue) <= 0
+          this.arithmeticHelper.compare(leftResult as NoErrorCellValue, rightResult as NoErrorCellValue) <= 0
       }
       case AstNodeType.PLUS_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
@@ -186,40 +182,30 @@ export class Interpreter {
           return new CellError(ErrorType.NAME)
         }
       }
-      case AstNodeType.CELL_RANGE: {
-        if (!this.rangeSpansOneSheet(ast)) {
-          return new CellError(ErrorType.REF)
-        }
-        const range = AbsoluteCellRange.fromCellRange(ast, formulaAddress)
-        const matrixVertex = this.dependencyGraph.getMatrix(range)
-        if (matrixVertex) {
-          const matrix = matrixVertex.matrix
-          if (matrix instanceof NotComputedMatrix) {
-            throw new Error('Matrix should be already computed')
-          } else if (matrix instanceof CellError) {
-            return matrix
-          } else if (matrix instanceof Matrix) {
-            return SimpleRangeValue.onlyNumbersDataWithRange(matrix.raw(), matrix.size, range)
+      case AstNodeType.NAMED_EXPRESSION: {
+        throw 'Not implemented yet'
+      }
+      case AstNodeType.RANGE_OP: {
+        if (this.isValidRange(ast)) {
+          const range = AbsoluteCellRange.fromAst(ast.left, ast.right, formulaAddress)
+          const matrixVertex = this.dependencyGraph.getMatrix(range)
+          if (matrixVertex) {
+            const matrix = matrixVertex.matrix
+            if (matrix instanceof NotComputedMatrix) {
+              throw new Error('Matrix should be already computed')
+            } else if (matrix instanceof CellError) {
+              return matrix
+            } else if (matrix instanceof Matrix) {
+              return SimpleRangeValue.onlyNumbersDataWithRange(matrix.raw(), matrix.size, range)
+            } else {
+              throw new Error('Unknown matrix')
+            }
           } else {
-            throw new Error('Unknown matrix')
+            return SimpleRangeValue.onlyRange(range, this.dependencyGraph)
           }
         } else {
-          return SimpleRangeValue.onlyRange(range, this.dependencyGraph)
-        }
-      }
-      case AstNodeType.COLUMN_RANGE: {
-        if (!this.rangeSpansOneSheet(ast)) {
           return new CellError(ErrorType.REF)
         }
-        const range = AbsoluteColumnRange.fromColumnRange(ast, formulaAddress)
-        return SimpleRangeValue.onlyRange(range, this.dependencyGraph)
-      }
-      case AstNodeType.ROW_RANGE: {
-        if (!this.rangeSpansOneSheet(ast)) {
-          return new CellError(ErrorType.REF)
-        }
-        const range = AbsoluteRowRange.fromRowRange(ast, formulaAddress)
-        return SimpleRangeValue.onlyRange(range, this.dependencyGraph)
       }
       case AstNodeType.PARENTHESIS: {
         return this.evaluateAst(ast.expression, formulaAddress)
@@ -234,7 +220,7 @@ export class Interpreter {
   public getGpuInstance(): GPU.GPU {
     if (!this.gpu) {
       const GPUConstructor = GPU.GPU || GPU
-      this.gpu = new GPUConstructor({mode: this.config.gpuMode })
+      this.gpu = new GPUConstructor({mode: this.config.gpuMode})
     }
     return this.gpu
   }
@@ -262,8 +248,11 @@ export class Interpreter {
     }
   }
 
-  private rangeSpansOneSheet(ast: CellRangeAst | ColumnRangeAst | RowRangeAst): boolean {
-    return ast.start.sheet === ast.end.sheet
+  private isValidRange(ast: RangeOpAst): boolean {
+    return ((ast.left.type === AstNodeType.CELL_REFERENCE && ast.right.type === AstNodeType.CELL_REFERENCE) ||
+      (ast.left.type === AstNodeType.COLUMN_REFERENCE_OR_NAMED_EXPRESSION && ast.right.type === AstNodeType.COLUMN_REFERENCE_OR_NAMED_EXPRESSION) ||
+      (ast.left.type === AstNodeType.ROW_REFERENCE && ast.right.type === AstNodeType.ROW_REFERENCE)) &&
+      (ast.left.reference?.sheet === ast.right.reference?.sheet)
   }
 
   private passErrors(left: InterpreterValue, right: InterpreterValue): Maybe<CellError> {

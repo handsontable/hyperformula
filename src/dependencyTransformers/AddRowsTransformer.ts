@@ -5,7 +5,7 @@
 
 import {Ast, CellAddress} from '../parser'
 import {absoluteSheetReference, ErrorType, SimpleCellAddress} from '../Cell'
-import {ColumnRangeAst} from '../parser/Ast'
+import {ColumnReferenceOrNamedExperssionAst} from '../parser/Ast'
 import {Transformer} from './Transformer'
 import {RowsSpan} from '../RowsSpan'
 import {RowAddress} from '../parser/RowAddress'
@@ -27,7 +27,7 @@ export class AddRowsTransformer extends Transformer {
     return false
   }
 
-  protected transformColumnRangeAst(ast: ColumnRangeAst, _formulaAddress: SimpleCellAddress): Ast {
+  protected transformColumnRangeAst(ast: ColumnReferenceOrNamedExperssionAst, _formulaAddress: SimpleCellAddress): Ast {
     return ast
   }
 

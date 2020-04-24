@@ -3,7 +3,6 @@
  * Copyright (c) 2020 Handsoncode. All rights reserved.
  */
 
-import {Maybe} from '../Maybe'
 import {Ast, AstNodeType, RelativeDependency} from './'
 import {RelativeDependencyType} from './RelativeDependency'
 
@@ -12,6 +11,10 @@ const collectDependenciesFn = (ast: Ast, functionsWhichDoesNotNeedArgumentsToBeC
     case AstNodeType.EMPTY:
     case AstNodeType.NUMBER:
     case AstNodeType.STRING:
+    case AstNodeType.COLUMN_REFERENCE_OR_NAMED_EXPRESSION:
+    case AstNodeType.ERROR_WITH_RAW_INPUT:
+    case AstNodeType.NAMED_EXPRESSION:
+    case AstNodeType.ROW_REFERENCE:
     case AstNodeType.ERROR:
       return
     case AstNodeType.CELL_REFERENCE: {
@@ -21,32 +24,34 @@ const collectDependenciesFn = (ast: Ast, functionsWhichDoesNotNeedArgumentsToBeC
       })
       return
     }
-    case AstNodeType.CELL_RANGE: {
-      if (ast.start.sheet === ast.end.sheet) {
-        dependenciesSet.push({
-          type: RelativeDependencyType.CellRange,
-          dependency: [ast.start, ast.end]
-        })
+    case AstNodeType.RANGE_OP: {
+      if (ast.left.type === AstNodeType.CELL_REFERENCE && ast.right.type === AstNodeType.CELL_REFERENCE) {
+        if (ast.left.reference.sheet === ast.right.reference.sheet) {
+          dependenciesSet.push({
+            type: RelativeDependencyType.CellRange,
+            dependency: [ast.left.reference, ast.right.reference]
+          })
+        }
+        return
+      } else if (ast.left.type === AstNodeType.COLUMN_REFERENCE_OR_NAMED_EXPRESSION && ast.right.type === AstNodeType.COLUMN_REFERENCE_OR_NAMED_EXPRESSION) {
+        if (ast.left.reference && ast.right.reference && ast.left.reference.sheet === ast.right.reference.sheet) {
+          dependenciesSet.push({
+            type: RelativeDependencyType.ColumnRange,
+            dependency: [ast.left.reference, ast.right.reference]
+          })
+        }
+        return
+      } else if (ast.left.type === AstNodeType.ROW_REFERENCE && ast.right.type === AstNodeType.ROW_REFERENCE) {
+        if (ast.left.reference.sheet === ast.right.reference.sheet) {
+          dependenciesSet.push({
+            type: RelativeDependencyType.RowRange,
+            dependency: [ast.left.reference, ast.right.reference]
+          })
+        }
+        return
+      } else {
+        throw Error('WUT')
       }
-      return
-    }
-    case AstNodeType.COLUMN_RANGE: {
-      if (ast.start.sheet === ast.end.sheet) {
-        dependenciesSet.push({
-          type: RelativeDependencyType.ColumnRange,
-          dependency: [ast.start, ast.end]
-        })
-      }
-      return
-    }
-    case AstNodeType.ROW_RANGE: {
-      if (ast.start.sheet === ast.end.sheet) {
-        dependenciesSet.push({
-          type: RelativeDependencyType.RowRange,
-          dependency: [ast.start, ast.end]
-        })
-      }
-      return
     }
     case AstNodeType.PERCENT_OP:
     case AstNodeType.PLUS_UNARY_OP:
@@ -69,13 +74,18 @@ const collectDependenciesFn = (ast: Ast, functionsWhichDoesNotNeedArgumentsToBeC
       collectDependenciesFn(ast.left, functionsWhichDoesNotNeedArgumentsToBeComputed, dependenciesSet)
       collectDependenciesFn(ast.right, functionsWhichDoesNotNeedArgumentsToBeComputed, dependenciesSet)
       return
-    case AstNodeType.FUNCTION_CALL:
+    case AstNodeType.FUNCTION_CALL: {
       if (!functionsWhichDoesNotNeedArgumentsToBeComputed.has(ast.procedureName)) {
         ast.args.forEach((argAst: Ast) =>
           collectDependenciesFn(argAst, functionsWhichDoesNotNeedArgumentsToBeComputed, dependenciesSet)
         )
       }
       return
+    }
+    case AstNodeType.PARENTHESIS: {
+      /* TODO */
+      return
+    }
   }
 }
 

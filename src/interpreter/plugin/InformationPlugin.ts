@@ -203,7 +203,7 @@ export class InformationPlugin extends FunctionPlugin {
     }
     const rangeAst = ast.args[0]
     if (rangeAst.type === AstNodeType.CELL_RANGE) {
-      return (rangeAst.end.col - rangeAst.start.col + 1)
+      return (rangeAst.end.col - rangeAst.address.col + 1)
     } else {
       return new CellError(ErrorType.VALUE)
     }
@@ -227,7 +227,7 @@ export class InformationPlugin extends FunctionPlugin {
     }
     const rangeAst = ast.args[0]
     if (rangeAst.type === AstNodeType.CELL_RANGE) {
-      return (rangeAst.end.row - rangeAst.start.row + 1)
+      return (rangeAst.end.row - rangeAst.address.row + 1)
     } else {
       return new CellError(ErrorType.VALUE)
     }

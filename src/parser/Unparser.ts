@@ -8,10 +8,10 @@ import {
   Ast,
   AstNodeType,
   CellRangeAst,
-  ColumnRangeAst,
+  ColumnReferenceOrNamedExperssionAst,
   imageWithWhitespace,
   RangeSheetReferenceType,
-  RowRangeAst,
+  RowReferenceAst,
 } from './Ast'
 import {binaryOpTokenMap} from './binaryOpTokenMap'
 import {additionalCharactersAllowedInQuotes, ILexerConfig} from './LexerConfig'
@@ -60,8 +60,8 @@ export class Unparser {
         }
         return imageWithWhitespace(image, ast.leadingWhitespace)
       }
-      case AstNodeType.COLUMN_RANGE:
-      case AstNodeType.ROW_RANGE:
+      case AstNodeType.COLUMN_REFERENCE_OR_NAMED_EXPRESSION:
+      case AstNodeType.ROW_REFERENCE:
       case AstNodeType.CELL_RANGE: {
         return imageWithWhitespace(this.formatRange(ast, address), ast.leadingWhitespace)
       }
@@ -107,19 +107,19 @@ export class Unparser {
     }
   }
 
-  private formatRange(ast: CellRangeAst | ColumnRangeAst | RowRangeAst, baseAddress: SimpleCellAddress): string {
+  private formatRange(ast: CellRangeAst | ColumnReferenceOrNamedExperssionAst | RowReferenceAst, baseAddress: SimpleCellAddress): string {
     let startSheeet = ''
     let endSheet = ''
 
-    if (ast.start.sheet !== null && (ast.sheetReferenceType !== RangeSheetReferenceType.RELATIVE)) {
-      startSheeet = this.unparseSheetName(ast.start.sheet) + '!'
+    if (ast.reference.sheet !== null && (ast.sheetReferenceType !== RangeSheetReferenceType.RELATIVE)) {
+      startSheeet = this.unparseSheetName(ast.reference.sheet) + '!'
     }
 
     if (ast.end.sheet !== null && ast.sheetReferenceType === RangeSheetReferenceType.BOTH_ABSOLUTE) {
       endSheet = this.unparseSheetName(ast.end.sheet) + '!'
     }
 
-    return `${startSheeet}${ast.start.unparse(baseAddress)}:${endSheet}${ast.end.unparse(baseAddress)}`
+    return `${startSheeet}${ast.reference.unparse(baseAddress)}:${endSheet}${ast.end.unparse(baseAddress)}`
   }
 }
 

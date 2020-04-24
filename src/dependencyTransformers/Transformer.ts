@@ -14,7 +14,7 @@ import {
   CellReferenceAst,
   ParserWithCaching,
 } from '../parser'
-import {ColumnRangeAst, RowRangeAst} from '../parser/Ast'
+import {ColumnReferenceOrNamedExperssionAst, RowReferenceAst} from '../parser/Ast'
 import {ColumnAddress} from '../parser/ColumnAddress'
 import {RowAddress} from '../parser/RowAddress'
 
@@ -51,10 +51,10 @@ export abstract class Transformer implements FormulaTransformer {
       case AstNodeType.CELL_RANGE: {
         return this.transformCellRangeAst(ast, address)
       }
-      case AstNodeType.COLUMN_RANGE: {
+      case AstNodeType.COLUMN_REFERENCE_OR_NAMED_EXPRESSION: {
         return this.transformColumnRangeAst(ast, address)
       }
-      case AstNodeType.ROW_RANGE: {
+      case AstNodeType.ROW_REFERENCE: {
         return this.transformRowRangeAst(ast, address)
       }
       case AstNodeType.EMPTY:
@@ -123,7 +123,7 @@ export abstract class Transformer implements FormulaTransformer {
   }
 
   protected transformCellRangeAst(ast: CellRangeAst, formulaAddress: SimpleCellAddress): Ast {
-    const newRange = this.transformCellRange(ast.start, ast.end, formulaAddress)
+    const newRange = this.transformCellRange(ast.reference, ast.end, formulaAddress)
     if (Array.isArray(newRange)) {
       return {...ast, start: newRange[0], end: newRange[1]}
     } else if (newRange === ErrorType.REF) {
@@ -133,8 +133,8 @@ export abstract class Transformer implements FormulaTransformer {
     }
   }
 
-  protected transformColumnRangeAst(ast: ColumnRangeAst, formulaAddress: SimpleCellAddress): Ast {
-    const newRange = this.transformColumnRange(ast.start, ast.end, formulaAddress)
+  protected transformColumnRangeAst(ast: ColumnReferenceOrNamedExperssionAst, formulaAddress: SimpleCellAddress): Ast {
+    const newRange = this.transformColumnRange(ast.reference, ast.end, formulaAddress)
     if (Array.isArray(newRange)) {
       return {...ast, start: newRange[0], end: newRange[1]}
     } else if (newRange === ErrorType.REF) {
@@ -144,8 +144,8 @@ export abstract class Transformer implements FormulaTransformer {
     }
   }
 
-  protected transformRowRangeAst(ast: RowRangeAst, formulaAddress: SimpleCellAddress): Ast {
-    const newRange = this.transformRowRange(ast.start, ast.end, formulaAddress)
+  protected transformRowRangeAst(ast: RowReferenceAst, formulaAddress: SimpleCellAddress): Ast {
+    const newRange = this.transformRowRange(ast.reference, ast.end, formulaAddress)
     if (Array.isArray(newRange)) {
       return {...ast, start: newRange[0], end: newRange[1]}
     } else if (newRange === ErrorType.REF) {

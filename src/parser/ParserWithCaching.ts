@@ -12,17 +12,17 @@ import {
   rowAddressFromString,
   SheetMappingFn,
 } from './addressRepresentationConverters'
-import {Ast, imageWithWhitespace, ParsingError, ParsingErrorType, RangeSheetReferenceType} from './Ast'
+import {Ast, imageWithWhitespace, ParsingError, ParsingErrorType} from './Ast'
 import {binaryOpTokenMap} from './binaryOpTokenMap'
 import {Cache} from './Cache'
 import {FormulaLexer, FormulaParser, IExtendedToken} from './FormulaParser'
 import {
   buildLexerConfig,
   CellReference,
-  ColumnRange,
+  ColumnReference,
   ILexerConfig,
   ProcedureName,
-  RowRange,
+  RowReference,
   WhiteSpace,
 } from './LexerConfig'
 import {ParserConfig} from './ParserConfig'
@@ -121,7 +121,7 @@ export class ParserWithCaching {
         const procedureName = token.image.toUpperCase().slice(0, -1)
         const canonicalProcedureName = this.lexerConfig.functionMapping[procedureName] ?? procedureName
         hash = hash.concat(canonicalProcedureName, '(')
-      } else if (tokenMatcher(token, ColumnRange)){
+      } else if (tokenMatcher(token, ColumnReference)){
         const [start, end] = token.image.split(':')
         const startAddress = columnAddressFromString(this.sheetMapping, start, baseAddress)
         const endAddress = columnAddressFromString(this.sheetMapping, end, baseAddress)
@@ -130,7 +130,7 @@ export class ParserWithCaching {
         } else {
           hash = hash.concat(startAddress.hash(true), ':', endAddress.hash(true))
         }
-      } else if (tokenMatcher(token, RowRange)){
+      } else if (tokenMatcher(token, RowReference)){
       const [start, end] = token.image.split(':')
       const startAddress = rowAddressFromString(this.sheetMapping, start, baseAddress)
       const endAddress = rowAddressFromString(this.sheetMapping, end, baseAddress)
@@ -179,12 +179,9 @@ export class ParserWithCaching {
       case AstNodeType.CELL_REFERENCE: {
         return imageWithWhitespace(ast.reference.hash(true), ast.leadingWhitespace)
       }
-      case AstNodeType.COLUMN_RANGE:
-      case AstNodeType.ROW_RANGE:
-      case AstNodeType.CELL_RANGE: {
-        const start = ast.start.hash(ast.sheetReferenceType !== RangeSheetReferenceType.RELATIVE)
-        const end = ast.end.hash(ast.sheetReferenceType === RangeSheetReferenceType.BOTH_ABSOLUTE)
-        return imageWithWhitespace(start + ':' + end, ast.leadingWhitespace)
+      case AstNodeType.COLUMN_REFERENCE_OR_NAMED_EXPRESSION:
+      case AstNodeType.ROW_REFERENCE: {
+        throw Error('TODO')
       }
       case AstNodeType.MINUS_UNARY_OP: {
         return imageWithWhitespace('-' + this.computeHashOfAstNode(ast.value), ast.leadingWhitespace)
@@ -194,6 +191,12 @@ export class ParserWithCaching {
       }
       case AstNodeType.PERCENT_OP: {
         return this.computeHashOfAstNode(ast.value) + imageWithWhitespace('%', ast.leadingWhitespace)
+      }
+      case AstNodeType.RANGE_OP: {
+        throw Error("TODO")
+          // const start = ast.left.address.hash(ast.sheetReferenceType !== RangeSheetReferenceType.RELATIVE)
+          // const end = ast.right.end.hash(ast.sheetReferenceType === RangeSheetReferenceType.BOTH_ABSOLUTE)
+          // return imageWithWhitespace(start + ':' + end, ast.leadingWhitespace)
       }
       case AstNodeType.ERROR: {
         const image = this.config.translationPackage.getErrorTranslation(
