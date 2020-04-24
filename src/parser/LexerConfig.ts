@@ -60,7 +60,7 @@ export const ColumnReference = createToken({
 
 export const RowReference = createToken({
   name: 'RowRange',
-  pattern: new RegExp(`\(${sheetNameRegexp}\)?\\$?[0-9]+`),
+  pattern: new RegExp(`\(${sheetNameRegexp}\)\\$?[0-9]+`),
 })
 
 export const RangeSeparator = createToken({name: 'RangeSeparator', pattern: /:/})
@@ -127,8 +127,7 @@ export const buildLexerConfig = (config: ParserConfig): ILexerConfig => {
     ProcedureName,
     RangeSeparator,
     ArgSeparator,
-    // ColumnRange,
-    // RowRange,
+    RowReference,
     NumberLiteral,
     StringLiteral,
     ErrorLiteral,
@@ -138,7 +137,6 @@ export const buildLexerConfig = (config: ParserConfig): ILexerConfig => {
     MultiplicationOp,
     CellReference,
     ColumnReference,
-    RowReference,
     NamedExpression,
   ]
 

@@ -5,7 +5,7 @@
 
 import {simpleCellAddress, SimpleCellAddress, SimpleColumnAddress, SimpleRowAddress} from './Cell'
 import {DependencyGraph} from './DependencyGraph'
-import {Ast, AstNodeType, CellAddress, CellReferenceAst} from './parser'
+import {Ast, AstNodeType, CellAddress, CellReferenceAst, NumberAst} from './parser'
 import {ColumnReferenceOrNamedExperssionAst, RowReferenceAst} from './parser/Ast'
 
 export const DIFFERENT_SHEETS_ERROR = 'AbsoluteCellRange: Start and end are in different sheets'
@@ -24,7 +24,7 @@ export class AbsoluteCellRange {
       return AbsoluteCellRange.fromCellRange(left, right, baseAddress)
     } else if (left.type === AstNodeType.COLUMN_REFERENCE_OR_NAMED_EXPRESSION && right.type === AstNodeType.COLUMN_REFERENCE_OR_NAMED_EXPRESSION) {
       return AbsoluteColumnRange.fromColumnRange(left, right, baseAddress)
-    } else if (left.type === AstNodeType.ROW_REFERENCE && right.type === AstNodeType.ROW_REFERENCE) {
+    } else if ((left.type === AstNodeType.ROW_REFERENCE || left.type === AstNodeType.NUMBER) && (right.type === AstNodeType.ROW_REFERENCE || right.type === AstNodeType.NUMBER)) {
       return AbsoluteRowRange.fromRowRange(left, right, baseAddress)
     } else {
       throw Error('WUT')
@@ -386,9 +386,9 @@ export class AbsoluteColumnRange extends AbsoluteCellRange {
 }
 
 export class AbsoluteRowRange extends AbsoluteCellRange {
-  public static fromRowRange(left: RowReferenceAst, right: RowReferenceAst, baseAddress: SimpleCellAddress): AbsoluteRowRange {
-    const start = left.reference.toSimpleRowAddress(baseAddress)
-    const end = right.reference.toSimpleRowAddress(baseAddress)
+  public static fromRowRange(left: RowReferenceAst | NumberAst, right: RowReferenceAst | NumberAst, baseAddress: SimpleCellAddress): AbsoluteRowRange {
+    const start = left.type === AstNodeType.NUMBER ? {sheet: baseAddress.sheet, row: left.value } : left.reference.toSimpleRowAddress(baseAddress)
+    const end = right.type === AstNodeType.NUMBER ? {sheet: baseAddress.sheet, row: right.value } : right.reference.toSimpleRowAddress(baseAddress)
     if (start.sheet !== end.sheet) {
       throw new Error(DIFFERENT_SHEETS_ERROR)
     }

@@ -122,23 +122,23 @@ export class ParserWithCaching {
         const canonicalProcedureName = this.lexerConfig.functionMapping[procedureName] ?? procedureName
         hash = hash.concat(canonicalProcedureName, '(')
       } else if (tokenMatcher(token, ColumnReference)){
-        const [start, end] = token.image.split(':')
-        const startAddress = columnAddressFromString(this.sheetMapping, start, baseAddress)
-        const endAddress = columnAddressFromString(this.sheetMapping, end, baseAddress)
-        if (startAddress === undefined || endAddress === undefined) {
+        // const [start, end] = token.image.split(':')
+        const startAddress = columnAddressFromString(this.sheetMapping, token.image, baseAddress)
+        // const endAddress = columnAddressFromString(this.sheetMapping, end, baseAddress)
+        if (startAddress === undefined) {
           hash = hash.concat('!REF')
         } else {
-          hash = hash.concat(startAddress.hash(true), ':', endAddress.hash(true))
+          hash = hash.concat(startAddress.hash(true))
         }
       } else if (tokenMatcher(token, RowReference)){
-      const [start, end] = token.image.split(':')
-      const startAddress = rowAddressFromString(this.sheetMapping, start, baseAddress)
-      const endAddress = rowAddressFromString(this.sheetMapping, end, baseAddress)
-      if (startAddress === undefined || endAddress === undefined) {
-        hash = hash.concat('!REF')
-      } else {
-        hash = hash.concat(startAddress.hash(true), ':', endAddress.hash(true))
-      }
+        // const [start, end] = token.image.split(':')
+        const startAddress = rowAddressFromString(this.sheetMapping, token.image, baseAddress)
+        // const endAddress = rowAddressFromString(this.sheetMapping, end, baseAddress)
+        if (startAddress === undefined) {
+          hash = hash.concat('!REF')
+        } else {
+          hash = hash.concat(startAddress.hash(true))
+        }
       } else {
         hash = hash.concat(token.image)
       }
