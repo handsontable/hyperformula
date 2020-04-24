@@ -21,7 +21,7 @@ import {Serialization} from './Serialization'
 import {EmptyStatistics, Statistics, StatType} from './statistics'
 import {SheetSizeLimitExceededError} from './errors'
 import {findBoundaries, Sheet, Sheets} from './Sheet'
-import {FormulaRegistry} from './interpreter/FormulaRegistry'
+import {FunctionRegistry} from './interpreter/FunctionRegistry'
 
 export type EngineState = {
   config: Config,
@@ -37,14 +37,14 @@ export type EngineState = {
   exporter: Exporter,
   namedExpressions: NamedExpressions,
   serialization: Serialization,
-  formulaRegistry: FormulaRegistry,
+  formulaRegistry: FunctionRegistry,
 }
 
 export class BuildEngineFactory {
   private static buildEngine(config: Config, sheets: Sheets = {}, stats: Statistics = config.useStats ? new Statistics() : new EmptyStatistics()): EngineState {
     stats.start(StatType.BUILD_ENGINE_TOTAL)
 
-    const formulaRegistry = new FormulaRegistry(config)
+    const formulaRegistry = new FunctionRegistry(config)
     const lazilyTransformingAstService = new LazilyTransformingAstService(stats)
     const dependencyGraph = DependencyGraph.buildEmpty(lazilyTransformingAstService, config, formulaRegistry, stats)
     const columnSearch = buildColumnSearchStrategy(dependencyGraph, config, stats)

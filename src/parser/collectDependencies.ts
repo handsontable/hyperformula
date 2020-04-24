@@ -5,9 +5,9 @@
 
 import {Ast, AstNodeType, RelativeDependency} from './'
 import {RelativeDependencyType} from './RelativeDependency'
-import {FormulaRegistry} from '../interpreter/FormulaRegistry'
+import {FunctionRegistry} from '../interpreter/FunctionRegistry'
 
-const collectDependenciesFn = (ast: Ast, formulaRegistry: FormulaRegistry, dependenciesSet: RelativeDependency[]) => {
+const collectDependenciesFn = (ast: Ast, formulaRegistry: FunctionRegistry, dependenciesSet: RelativeDependency[]) => {
   switch (ast.type) {
     case AstNodeType.EMPTY:
     case AstNodeType.NUMBER:
@@ -70,7 +70,7 @@ const collectDependenciesFn = (ast: Ast, formulaRegistry: FormulaRegistry, depen
       collectDependenciesFn(ast.right, formulaRegistry, dependenciesSet)
       return
     case AstNodeType.FUNCTION_CALL:
-      if (!formulaRegistry.doesFormulaNeedArgumentToBeComputed(ast.procedureName)) {
+      if (!formulaRegistry.doesFunctionNeedArgumentToBeComputed(ast.procedureName)) {
         ast.args.forEach((argAst: Ast) =>
           collectDependenciesFn(argAst, formulaRegistry, dependenciesSet)
         )
@@ -79,7 +79,7 @@ const collectDependenciesFn = (ast: Ast, formulaRegistry: FormulaRegistry, depen
   }
 }
 
-export const collectDependencies = (ast: Ast, formulaRegistry: FormulaRegistry) => {
+export const collectDependencies = (ast: Ast, formulaRegistry: FunctionRegistry) => {
   const result = new Array<RelativeDependency>()
   collectDependenciesFn(ast, formulaRegistry, result)
   return result

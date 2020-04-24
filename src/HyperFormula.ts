@@ -48,7 +48,7 @@ import {BuildEngineFactory, EngineState} from './BuildEngineFactory'
 import {Sheet, Sheets} from './Sheet'
 import {SheetDimensions} from './_types'
 import {FunctionPluginDefinition} from './interpreter/plugin/FunctionPlugin'
-import {FormulaRegistry} from './interpreter/FormulaRegistry'
+import {FunctionRegistry} from './interpreter/FunctionRegistry'
 
 export type Index = [number, number]
 
@@ -254,20 +254,24 @@ export class HyperFormula implements TypedEmitter {
     return Array.from(this.registeredLanguages.keys())
   }
 
-  public static registerFormulaPlugins(...plugins: FunctionPluginDefinition[]): void {
-    FormulaRegistry.registerFormulaPlugins(...plugins)
+  public static registerFunctionPlugins(...plugins: FunctionPluginDefinition[]): void {
+    FunctionRegistry.registerFunctionPlugins(...plugins)
   }
 
-  public static registerFormula(formulaId: string, plugin: FunctionPluginDefinition): void {
-    FormulaRegistry.registerFormula(formulaId, plugin)
+  public static registerFunction(functionId: string, plugin: FunctionPluginDefinition): void {
+    FunctionRegistry.registerFunction(functionId, plugin)
   }
 
-  public static unregisterFormula(formulaId: string): void {
-    FormulaRegistry.unregisterFormula(formulaId)
+  public static unregisterFunction(functionId: string): void {
+    FunctionRegistry.unregisterFunction(functionId)
   }
 
-  public static getFormulas(): string[] {
-    return FormulaRegistry.getFormulas()
+  public static getRegisteredFunctions(): string[] {
+    return FunctionRegistry.getRegisteredFunctions()
+  }
+
+  public static getFunctionPlugin(functionId: string): Maybe<FunctionPluginDefinition> {
+    return FunctionRegistry.getFunctionPlugin(functionId)
   }
 
   /**
@@ -300,7 +304,7 @@ export class HyperFormula implements TypedEmitter {
     private _exporter: Exporter,
     private _namedExpressions: NamedExpressions,
     private _serialization: Serialization,
-    private _formulaRegistry: FormulaRegistry,
+    private _formulaRegistry: FunctionRegistry,
   ) {
   }
 
@@ -1580,8 +1584,12 @@ export class HyperFormula implements TypedEmitter {
     return true
   }
 
-  public getFormulas(): string[] {
-    return this._formulaRegistry.getFormulas()
+  public getRegisteredFunctions(): string[] {
+    return this._formulaRegistry.getRegisteredFunctions()
+  }
+
+  public getFunctionPlugin(functionId: string): Maybe<FunctionPluginDefinition> {
+    return this._formulaRegistry.getFunctionPlugin(functionId)
   }
 
   private extractTemporaryFormula(formulaString: string, sheetId: number = 1): [Ast | false, SimpleCellAddress] {

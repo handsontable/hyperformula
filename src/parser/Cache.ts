@@ -5,7 +5,7 @@
 
 import {AstNodeType, collectDependencies, RelativeDependency} from './'
 import {Ast} from './Ast'
-import {FormulaRegistry} from '../interpreter/FormulaRegistry'
+import {FunctionRegistry} from '../interpreter/FunctionRegistry'
 
 export interface CacheEntry {
   ast: Ast,
@@ -19,13 +19,13 @@ export class Cache {
   private cache: Map<string, CacheEntry> = new Map()
 
   constructor(
-    private readonly formulaRegistry: FormulaRegistry,
+    private readonly formulaRegistry: FunctionRegistry,
   ) {
   }
 
   public set(hash: string, ast: Ast): CacheEntry {
     const astRelativeDependencies = collectDependencies(ast, this.formulaRegistry)
-    const cacheEntry = buildCacheEntry(ast, astRelativeDependencies, doesContainFunctions(ast, this.formulaRegistry.isFormulaVolatile), doesContainFunctions(ast, this.formulaRegistry.isFormulaDependentOnSheetStructureChange))
+    const cacheEntry = buildCacheEntry(ast, astRelativeDependencies, doesContainFunctions(ast, this.formulaRegistry.isFunctionVolatile), doesContainFunctions(ast, this.formulaRegistry.isFunctionDependentOnSheetStructureChange))
     this.cache.set(hash, cacheEntry)
     return cacheEntry
   }

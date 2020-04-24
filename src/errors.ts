@@ -194,12 +194,12 @@ export class MissingTranslationError extends Error {
   }
 }
 
-export class FormulaPluginValidationError extends Error {
-  public static formulaNotDeclaredInPlugin(formulaId: string, pluginName: string): FormulaPluginValidationError {
-    return new FormulaPluginValidationError(`Formula with id ${formulaId} not declared in plugin ${pluginName}`)
+export class FunctionPluginValidationError extends Error {
+  public static functionNotDeclaredInPlugin(formulaId: string, pluginName: string): FunctionPluginValidationError {
+    return new FunctionPluginValidationError(`Formula with id ${formulaId} not declared in plugin ${pluginName}`)
   }
 
-  public static formulaMethodNotFound(functionName: string, pluginName: string): FormulaPluginValidationError {
-    return new FormulaPluginValidationError(`Formula method ${functionName} not found in plugin ${pluginName}`)
+  public static functionMethodNotFound(functionName: string, pluginName: string): FunctionPluginValidationError {
+    return new FunctionPluginValidationError(`Formula method ${functionName} not found in plugin ${pluginName}`)
   }
 }

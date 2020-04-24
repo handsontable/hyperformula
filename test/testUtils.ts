@@ -15,7 +15,7 @@ import {
 } from '../src/parser'
 import {EngineComparator} from './graphComparator'
 import {ColumnRangeAst, RowRangeAst} from '../src/parser/Ast'
-import {FormulaRegistry} from '../src/interpreter/FormulaRegistry'
+import {FunctionRegistry} from '../src/interpreter/FunctionRegistry'
 
 export const extractReference = (engine: HyperFormula, address: SimpleCellAddress): CellAddress => {
   return ((engine.addressMapping.fetchCell(address) as FormulaCellVertex).getFormula(engine.lazilyTransformingAstService) as CellReferenceAst).reference
@@ -133,7 +133,7 @@ export function unregisterAllLanguages() {
 }
 
 export function unregisterAllFormulas() {
-  for (const formulaId of FormulaRegistry.getFormulas()) {
-    HyperFormula.unregisterFormula(formulaId)
+  for (const formulaId of FunctionRegistry.getRegisteredFunctions()) {
+    HyperFormula.unregisterFunction(formulaId)
   }
 }

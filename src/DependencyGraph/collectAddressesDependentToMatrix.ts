@@ -12,9 +12,9 @@ import {RangeVertex} from './RangeVertex'
 import {Vertex} from './Vertex'
 import {DependencyGraph} from './DependencyGraph'
 import {RelativeDependencyType} from '../parser/RelativeDependency'
-import {FormulaRegistry} from '../interpreter/FormulaRegistry'
+import {FunctionRegistry} from '../interpreter/FunctionRegistry'
 
-export const collectAddressesDependentToMatrix = (formulaRegistry: FormulaRegistry, vertex: Vertex, matrix: MatrixVertex, lazilyTransformingAstService: LazilyTransformingAstService, dependencyGraph: DependencyGraph): SimpleCellAddress[] => {
+export const collectAddressesDependentToMatrix = (formulaRegistry: FunctionRegistry, vertex: Vertex, matrix: MatrixVertex, lazilyTransformingAstService: LazilyTransformingAstService, dependencyGraph: DependencyGraph): SimpleCellAddress[] => {
   const range = matrix.getRange()
 
   if (vertex instanceof RangeVertex) {

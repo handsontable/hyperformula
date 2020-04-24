@@ -16,7 +16,7 @@ import {Matrix} from './Matrix'
 import {Ast} from './parser'
 import {Statistics, StatType} from './statistics'
 import {NumberLiteralHelper} from './NumberLiteralHelper'
-import {FormulaRegistry} from './interpreter/FormulaRegistry'
+import {FunctionRegistry} from './interpreter/FunctionRegistry'
 
 export class Evaluator {
   private interpreter: Interpreter
@@ -28,7 +28,7 @@ export class Evaluator {
     private readonly stats: Statistics,
     private readonly dateHelper: DateTimeHelper,
     private readonly numberLiteralsHelper: NumberLiteralHelper,
-    private readonly formulaRegistry: FormulaRegistry
+    private readonly formulaRegistry: FunctionRegistry
   ) {
     this.interpreter = new Interpreter(this.dependencyGraph, this.columnSearch, this.config, this.stats, this.dateHelper, this.numberLiteralsHelper, this.formulaRegistry)
   }

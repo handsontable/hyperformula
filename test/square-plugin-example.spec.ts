@@ -40,7 +40,7 @@ class SquarePlugin extends FunctionPlugin {
 
 describe('Documentation example spec', () => {
   beforeEach(() => {
-    HyperFormula.registerFormulaPlugins(SquarePlugin)
+    HyperFormula.registerFunctionPlugins(SquarePlugin)
   })
 
   it('works', () => {

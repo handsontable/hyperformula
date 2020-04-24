@@ -13,14 +13,14 @@ import {FormulaCellVertex, MatrixVertex, Vertex} from './'
 import {AddressMapping} from './AddressMapping/AddressMapping'
 import {IGetDependenciesQuery} from './Graph'
 import {RangeMapping} from './RangeMapping'
-import {FormulaRegistry} from '../interpreter/FormulaRegistry'
+import {FunctionRegistry} from '../interpreter/FunctionRegistry'
 
 export class GetDependenciesQuery implements IGetDependenciesQuery<Vertex> {
   constructor(
     private readonly rangeMapping: RangeMapping,
     private readonly addressMapping: AddressMapping,
     private readonly lazilyTransformingAstService: LazilyTransformingAstService,
-    private readonly formulaRegistry: FormulaRegistry,
+    private readonly formulaRegistry: FunctionRegistry,
   ) {
   }
 

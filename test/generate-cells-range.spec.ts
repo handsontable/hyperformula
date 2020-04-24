@@ -5,11 +5,11 @@ import {DependencyGraph} from '../src/DependencyGraph'
 import {LazilyTransformingAstService} from '../src'
 import {Config} from '../src/Config'
 import {Statistics} from '../src/statistics/Statistics'
-import {FormulaRegistry} from '../src/interpreter/FormulaRegistry'
+import {FunctionRegistry} from '../src/interpreter/FunctionRegistry'
 
 describe('generateCellsFromRange', () => {
   const config = new Config()
-  const formulaRegistry = new FormulaRegistry(config)
+  const formulaRegistry = new FunctionRegistry(config)
   const stats = new Statistics()
   const lazilyTransformingAstService = new LazilyTransformingAstService(stats)
   const dependencyGraph = DependencyGraph.buildEmpty(lazilyTransformingAstService, config, formulaRegistry, stats)

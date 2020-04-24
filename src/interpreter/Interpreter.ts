@@ -19,7 +19,7 @@ import {ArithmeticHelper, divide, multiply, percent, power, unaryminus, } from '
 import {InterpreterValue, SimpleRangeValue} from './InterpreterValue'
 import {concatenate} from './text'
 import {NumberLiteralHelper} from '../NumberLiteralHelper'
-import {FormulaRegistry} from './FormulaRegistry'
+import {FunctionRegistry} from './FunctionRegistry'
 
 export class Interpreter {
   private gpu?: GPU.GPU
@@ -32,7 +32,7 @@ export class Interpreter {
     public readonly stats: Statistics,
     public readonly dateHelper: DateTimeHelper,
     public readonly numberLiteralsHelper: NumberLiteralHelper,
-    public readonly formulaRegistry: FormulaRegistry
+    public readonly formulaRegistry: FunctionRegistry
   ) {
     this.formulaRegistry.initializePlugins(this)
     this.arithmeticHelper = new ArithmeticHelper(config, dateHelper, numberLiteralsHelper)
@@ -171,7 +171,7 @@ export class Interpreter {
         }
       }
       case AstNodeType.FUNCTION_CALL: {
-        const pluginEntry = this.formulaRegistry.getFormula(ast.procedureName)
+        const pluginEntry = this.formulaRegistry.getFunction(ast.procedureName)
         if (pluginEntry && this.config.translationPackage.isFunctionTranslated(ast.procedureName)) {
           const [pluginFunction, pluginInstance] = pluginEntry as [string, any]
           return pluginInstance[pluginFunction](ast, formulaAddress)

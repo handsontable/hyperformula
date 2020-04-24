@@ -58,7 +58,7 @@ beforeEach(() => {
   HyperFormula.registerLanguage(defaultLanguage, languages[defaultLanguage])
 
   unregisterAllFormulas()
-  HyperFormula.registerFormulaPlugins(
+  HyperFormula.registerFunctionPlugins(
     SumifPlugin,
     TextPlugin,
     NumericAggregationPlugin,

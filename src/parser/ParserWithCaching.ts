@@ -27,7 +27,7 @@ import {
 } from './LexerConfig'
 import {ParserConfig} from './ParserConfig'
 import {formatNumber} from './Unparser'
-import {FormulaRegistry} from '../interpreter/FormulaRegistry'
+import {FunctionRegistry} from '../interpreter/FunctionRegistry'
 
 export interface ParsingResult {
   ast: Ast,
@@ -49,7 +49,7 @@ export class ParserWithCaching {
 
   constructor(
     private readonly config: ParserConfig,
-    private readonly formulaRegistry: FormulaRegistry,
+    private readonly formulaRegistry: FunctionRegistry,
     private readonly sheetMapping: SheetMappingFn,
   ) {
     this.lexerConfig = buildLexerConfig(config)

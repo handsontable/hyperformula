@@ -6,7 +6,7 @@ import {buildTranslationPackage, enGB} from '../src/i18n'
 import {checkMatrixSize, MatrixSize} from '../src/Matrix'
 import {ParserWithCaching} from '../src/parser'
 import {adr} from './testUtils'
-import {FormulaRegistry} from '../src/interpreter/FormulaRegistry'
+import {FunctionRegistry} from '../src/interpreter/FunctionRegistry'
 import {buildEmptyParserWithCaching} from './parser/common'
 
 

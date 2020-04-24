@@ -3,7 +3,7 @@ import {ProcedureAst} from '../src/parser'
 import {ErrorType, InternalCellValue, SimpleCellAddress} from '../src/Cell'
 import {HyperFormula} from '../src'
 import {adr, detailedError, expectArrayWithSameContent, unregisterAllFormulas} from './testUtils'
-import {FormulaPluginValidationError} from '../src/errors'
+import {FunctionPluginValidationError} from '../src/errors'
 import {SumifPlugin} from '../src/interpreter/plugin/SumifPlugin'
 
 class FooPlugin extends FunctionPlugin {
@@ -60,39 +60,39 @@ describe('Register static custom plugin', () => {
 
   it('should return registered formula ids', () => {
     unregisterAllFormulas()
-    HyperFormula.registerFormulaPlugins(SumifPlugin, FooPlugin)
-    const formulaIds = HyperFormula.getFormulas()
+    HyperFormula.registerFunctionPlugins(SumifPlugin, FooPlugin)
+    const formulaIds = HyperFormula.getRegisteredFunctions()
 
     expectArrayWithSameContent(['FOO', 'BAR', 'SUMIF', 'COUNTIF', 'AVERAGEIF', 'SUMIFS', 'COUNTIFS'], formulaIds)
   })
 
   it('should register all formulas from plugin', () => {
-    HyperFormula.registerFormulaPlugins(FooPlugin)
+    HyperFormula.registerFunctionPlugins(FooPlugin)
 
     const engine = HyperFormula.buildFromArray([
       ['=foo()', '=bar()']
     ])
 
-    expect(HyperFormula.getFormulas()).toContain('FOO')
-    expect(HyperFormula.getFormulas()).toContain('BAR')
+    expect(HyperFormula.getRegisteredFunctions()).toContain('FOO')
+    expect(HyperFormula.getRegisteredFunctions()).toContain('BAR')
     expect(engine.getCellValue(adr('A1'))).toEqual('foo')
     expect(engine.getCellValue(adr('B1'))).toEqual('bar')
   })
 
   it('should register single formula from plugin', () => {
-    HyperFormula.registerFormula('BAR', FooPlugin)
+    HyperFormula.registerFunction('BAR', FooPlugin)
     const engine = HyperFormula.buildFromArray([
       ['=foo()', '=bar()']
     ])
 
-    expect(HyperFormula.getFormulas()).not.toContain('FOO')
-    expect(HyperFormula.getFormulas()).toContain('BAR')
+    expect(HyperFormula.getRegisteredFunctions()).not.toContain('FOO')
+    expect(HyperFormula.getRegisteredFunctions()).toContain('BAR')
     expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NAME))
     expect(engine.getCellValue(adr('B1'))).toEqual('bar')
   })
 
   it('should override one formula with custom implementation', () => {
-    HyperFormula.registerFormula('SUM', SumWithExtra)
+    HyperFormula.registerFunction('SUM', SumWithExtra)
     const engine = HyperFormula.buildFromArray([
       ['=SUM(1, 2)', '=MAX(1, 2)']
     ])
@@ -103,16 +103,16 @@ describe('Register static custom plugin', () => {
 
   it('should throw plugin validation error', () => {
     expect(() => {
-      HyperFormula.registerFormulaPlugins(InvalidPlugin)
-    }).toThrow(FormulaPluginValidationError.formulaMethodNotFound('foo', 'InvalidPlugin'))
+      HyperFormula.registerFunctionPlugins(InvalidPlugin)
+    }).toThrow(FunctionPluginValidationError.functionMethodNotFound('foo', 'InvalidPlugin'))
 
     expect(() => {
-      HyperFormula.registerFormula('FOO', InvalidPlugin)
-    }).toThrow(FormulaPluginValidationError.formulaMethodNotFound('foo', 'InvalidPlugin'))
+      HyperFormula.registerFunction('FOO', InvalidPlugin)
+    }).toThrow(FunctionPluginValidationError.functionMethodNotFound('foo', 'InvalidPlugin'))
 
     expect(() => {
-      HyperFormula.registerFormula('BAR', InvalidPlugin)
-    }).toThrow(FormulaPluginValidationError.formulaNotDeclaredInPlugin('BAR', 'InvalidPlugin'))
+      HyperFormula.registerFunction('BAR', InvalidPlugin)
+    }).toThrow(FunctionPluginValidationError.functionNotDeclaredInPlugin('BAR', 'InvalidPlugin'))
   })
 })
 
@@ -125,7 +125,7 @@ describe('Instance level formula registry', () => {
   it('should return registered formula ids', () => {
     const engine = HyperFormula.buildFromArray([], {functionPlugins: [FooPlugin, SumWithExtra]})
 
-    expectArrayWithSameContent(engine.getFormulas(), ['SUM', 'FOO', 'BAR'])
+    expectArrayWithSameContent(engine.getRegisteredFunctions(), ['SUM', 'FOO', 'BAR'])
   })
 
   it('should create engine only with plugins passed to configuration', () => {
@@ -133,18 +133,18 @@ describe('Instance level formula registry', () => {
       ['=foo()', '=bar()', '=SUM(1, 2)']
     ], {functionPlugins: [FooPlugin]})
 
-    expectArrayWithSameContent(['FOO', 'BAR'], engine.getFormulas())
+    expectArrayWithSameContent(['FOO', 'BAR'], engine.getRegisteredFunctions())
     expect(engine.getCellValue(adr('A1'))).toEqual('foo')
     expect(engine.getCellValue(adr('B1'))).toEqual('bar')
     expect(engine.getCellValue(adr('C1'))).toEqual(detailedError(ErrorType.NAME))
   })
 
   it('modifying static plugins should not affect existing engine instance registry', () => {
-    HyperFormula.registerFormulaPlugins(FooPlugin)
+    HyperFormula.registerFunctionPlugins(FooPlugin)
     const engine = HyperFormula.buildFromArray([
       ['=foo()', '=bar()']
     ])
-    HyperFormula.unregisterFormula('FOO')
+    HyperFormula.unregisterFunction('FOO')
 
     engine.setCellContents(adr('C1'), '=A1')
 
