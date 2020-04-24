@@ -1,3 +1,8 @@
+/**
+ * @license
+ * Copyright (c) 2020 Handsoncode. All rights reserved.
+ */
+
 import {InternalCellValue, SimpleCellAddress} from '../../Cell'
 import {ProcedureAst} from '../../parser'
 import {FunctionPlugin} from './FunctionPlugin'

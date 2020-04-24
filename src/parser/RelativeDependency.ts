@@ -1,3 +1,8 @@
+/**
+ * @license
+ * Copyright (c) 2020 Handsoncode. All rights reserved.
+ */
+
 import {CellAddress} from './'
 import {ColumnAddress} from './ColumnAddress'
 import {RowAddress} from './RowAddress'

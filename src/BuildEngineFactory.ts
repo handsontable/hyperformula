@@ -1,3 +1,8 @@
+/**
+ * @license
+ * Copyright (c) 2020 Handsoncode. All rights reserved.
+ */
+
 import {LazilyTransformingAstService} from './LazilyTransformingAstService'
 import {CellContentParser} from './CellContentParser'
 import {Exporter} from './CellValue'
@@ -7,14 +12,15 @@ import {DateTimeHelper} from './DateTimeHelper'
 import {CrudOperations} from './CrudOperations'
 import {DependencyGraph} from './DependencyGraph'
 import {Evaluator} from './Evaluator'
-import {GraphBuilder, Sheet, Sheets} from './GraphBuilder'
+import {GraphBuilder} from './GraphBuilder'
 import {UIElement} from './i18n'
 import {NamedExpressions} from './NamedExpressions'
 import {NumberLiteralHelper} from './NumberLiteralHelper'
 import {buildLexerConfig, ParserWithCaching, Unparser} from './parser'
 import {Serialization} from './Serialization'
 import {EmptyStatistics, Statistics, StatType} from './statistics'
-import {UndoRedo} from './UndoRedo'
+import {SheetSizeLimitExceededError} from './errors'
+import {findBoundaries, Sheet, Sheets} from './Sheet'
 
 export type EngineState = {
   config: Config,
@@ -26,7 +32,6 @@ export type EngineState = {
   cellContentParser: CellContentParser,
   evaluator: Evaluator,
   lazilyTransformingAstService: LazilyTransformingAstService,
-  undoRedo: UndoRedo,
   crudOperations: CrudOperations,
   exporter: Exporter,
   namedExpressions: NamedExpressions,
@@ -37,7 +42,6 @@ export class BuildEngineFactory {
   private static buildEngine(config: Config, sheets: Sheets = {}, stats: Statistics = config.useStats ? new Statistics() : new EmptyStatistics()): EngineState {
     stats.start(StatType.BUILD_ENGINE_TOTAL)
 
-    const undoRedo: UndoRedo = new UndoRedo()
     const lazilyTransformingAstService = new LazilyTransformingAstService(stats)
     const dependencyGraph = DependencyGraph.buildEmpty(lazilyTransformingAstService, config, stats)
     const columnSearch = buildColumnSearchStrategy(dependencyGraph, config, stats)
@@ -46,8 +50,13 @@ export class BuildEngineFactory {
 
     for (const sheetName in sheets) {
       if (Object.prototype.hasOwnProperty.call(sheets, sheetName)) {
+        const sheet = sheets[sheetName]
+        const boundaries = findBoundaries(sheet)
+        if (boundaries.height > config.maxRows || boundaries.width > config.maxColumns) {
+          throw new SheetSizeLimitExceededError()
+        }
         const sheetId = sheetMapping.addSheet(sheetName)
-        addressMapping.autoAddSheet(sheetId, sheets[sheetName])
+        addressMapping.autoAddSheet(sheetId, sheet, boundaries)
       }
     }
 
@@ -63,14 +72,13 @@ export class BuildEngineFactory {
       graphBuilder.buildGraph(sheets)
     })
 
-    lazilyTransformingAstService.undoRedo = undoRedo
+    const crudOperations = new CrudOperations(config, stats, dependencyGraph, columnSearch, parser, cellContentParser, lazilyTransformingAstService)
+    lazilyTransformingAstService.undoRedo = crudOperations.undoRedo
     lazilyTransformingAstService.parser = parser
 
     const evaluator = new Evaluator(dependencyGraph, columnSearch, config, stats, dateHelper, numberLiteralHelper)
     evaluator.run()
 
-    const crudOperations = new CrudOperations(config, stats, dependencyGraph, columnSearch, parser, cellContentParser, lazilyTransformingAstService, undoRedo)
-    undoRedo.crudOperations = crudOperations
     const namedExpressions = new NamedExpressions(cellContentParser, dependencyGraph, parser, crudOperations)
     const exporter = new Exporter(config, namedExpressions)
     const serialization = new Serialization(dependencyGraph, unparser, config, exporter)
@@ -87,7 +95,6 @@ export class BuildEngineFactory {
       cellContentParser,
       evaluator,
       lazilyTransformingAstService,
-      undoRedo,
       crudOperations,
       exporter,
       namedExpressions,

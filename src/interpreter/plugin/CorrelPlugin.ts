@@ -1,5 +1,10 @@
+/**
+ * @license
+ * Copyright (c) 2020 Handsoncode. All rights reserved.
+ */
+
 import {CellError, ErrorType, InternalCellValue, SimpleCellAddress} from '../../Cell'
-import {ProcedureAst} from '../../parser'
+import {AstNodeType, ProcedureAst} from '../../parser'
 import {coerceToRange} from '../ArithmeticHelper'
 import {SimpleRangeValue} from '../InterpreterValue'
 import {FunctionPlugin} from './FunctionPlugin'
@@ -14,6 +19,9 @@ export class CorrelPlugin extends FunctionPlugin {
   public correl(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
     if (ast.args.length != 2) {
       return new CellError(ErrorType.NA)
+    }
+    if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
+      return new CellError(ErrorType.NUM)
     }
 
     const dataX = coerceToRange(this.evaluateAst(ast.args[0], formulaAddress))

@@ -1,3 +1,7 @@
+/**
+ * @license
+ * Copyright (c) 2020 Handsoncode. All rights reserved.
+ */
 
 export interface IGetDependenciesQuery<T> {
   call(node: T): Set<T> | null,
@@ -193,7 +197,7 @@ export class Graph<T> {
    * return a topological sort order, but separates vertices that exist in some cycle
    */
   public topSortWithScc(): TopSortResult<T> {
-    return this.getTopSortedWithSccSubgraphFrom(Array.from(this.nodes), (node: T) => true, (node: T) => {})
+    return this.getTopSortedWithSccSubgraphFrom(Array.from(this.nodes), (_node: T) => true, (_node: T) => {})
   }
 
   public getTopSortedWithSccSubgraphFrom(vertices: T[], operatingFunction: (node: T) => boolean, onCycle: (node: T) => void): TopSortResult<T> {

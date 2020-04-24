@@ -1,7 +1,8 @@
 import {HyperFormula} from '../src'
 import {EmptyCellVertex, MatrixVertex, ValueCellVertex} from '../src/DependencyGraph'
-import './testConfig.ts'
 import {adr, colEnd, colStart} from './testUtils'
+import {Config} from '../src/Config'
+import {SheetSizeLimitExceededError} from '../src/errors'
 
 describe('GraphBuilder', () => {
   it('build sheet with simple number cell', () => {
@@ -182,5 +183,25 @@ describe('GraphBuilder with matrix detection', () => {
     expect(engine.addressMapping.fetchCell(adr('A1'))).toBeInstanceOf(ValueCellVertex)
     expect(engine.addressMapping.fetchCell(adr('B2'))).toBeInstanceOf(ValueCellVertex)
     expect(engine.addressMapping.fetchCell(adr('A4'))).toBeInstanceOf(MatrixVertex)
+  })
+})
+
+describe('Sheet size limits', () => {
+  it('should throw error when trying to build engine with too many columns', () => {
+    const maxColumns = Config.defaultConfig.maxColumns
+    const sheet = [new Array(maxColumns + 1).fill('')]
+
+    expect(() => {
+      HyperFormula.buildFromArray(sheet)
+    }).toThrow(new SheetSizeLimitExceededError())
+  })
+
+  it('should throw error when trying to build engine with too many rows', () => {
+    const maxRows = Config.defaultConfig.maxRows
+    const sheet = new Array(maxRows + 1).fill([''])
+
+    expect(() => {
+      HyperFormula.buildFromArray(sheet)
+    }).toThrow(new SheetSizeLimitExceededError())
   })
 })

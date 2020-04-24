@@ -1,9 +1,14 @@
+/**
+ * @license
+ * Copyright (c) 2020 Handsoncode. All rights reserved.
+ */
+
 import {AbsoluteCellRange} from '../../AbsoluteCellRange'
 import {CellError, ErrorType, InternalCellValue, SimpleCellAddress} from '../../Cell'
 import {ColumnSearchStrategy} from '../../ColumnSearch/ColumnSearchStrategy'
 import {Config} from '../../Config'
 import {DependencyGraph} from '../../DependencyGraph'
-import {Ast, ProcedureAst} from '../../parser'
+import {Ast, AstNodeType, ProcedureAst} from '../../parser'
 import {coerceScalarToString} from '../ArithmeticHelper'
 import {Interpreter} from '../Interpreter'
 import {InterpreterValue, SimpleRangeValue} from '../InterpreterValue'
@@ -78,6 +83,9 @@ export abstract class FunctionPlugin {
     if (ast.args.length !== 2) {
       return new CellError(ErrorType.NA)
     }
+    if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
+      return new CellError(ErrorType.NUM)
+    }
     const left = this.evaluateAst(ast.args[0], formulaAddress)
     if (left instanceof SimpleRangeValue) {
       return new CellError(ErrorType.VALUE)
@@ -104,8 +112,10 @@ export abstract class FunctionPlugin {
     if (position > ast.args.length - 1) {
       return new CellError(ErrorType.NA)
     }
-
-    const arg = this.evaluateAst(ast.args[position], formulaAddress)
+    if (ast.args[position].type === AstNodeType.EMPTY) {
+      return new CellError(ErrorType.NUM)
+    }
+    const arg = this.evaluateAst(ast.args[position]!, formulaAddress)
 
     if (arg instanceof SimpleRangeValue) {
       return new CellError(ErrorType.VALUE)
@@ -119,7 +129,7 @@ export abstract class FunctionPlugin {
     return value
   }
 
-  protected coerceScalarToNumberOrError(arg: InternalCellValue): number | CellError  {
+  protected coerceScalarToNumberOrError(arg: InternalCellValue): number | CellError {
     return this.interpreter.arithmeticHelper.coerceScalarToNumberOrError(arg)
   }
 
@@ -131,6 +141,9 @@ export abstract class FunctionPlugin {
   ) {
     if (ast.args.length !== 1) {
       return new CellError(ErrorType.NA)
+    }
+    if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
+      return new CellError(ErrorType.NUM)
     }
 
     const arg = this.evaluateAst(ast.args[0], formulaAddress)

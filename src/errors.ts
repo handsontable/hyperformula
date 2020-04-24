@@ -1,3 +1,8 @@
+/**
+ * @license
+ * Copyright (c) 2020 Handsoncode. All rights reserved.
+ */
+
 import {SimpleCellAddress} from './Cell'
 
 
@@ -20,6 +25,24 @@ export class NoSheetWithNameError extends Error {
 }
 
 /**
+ * Error thrown when loaded sheet size exceeds configured limits.
+ */
+export class SheetSizeLimitExceededError extends Error {
+  constructor() {
+    super('Sheet size limit exceeded')
+  }
+}
+
+/**
+ * Error thrown when the the provided string is not a valid formula, i.e does not start with "="
+ */
+export class NotAFormulaError extends Error {
+  constructor() {
+    super('This is not a formula')
+  }
+}
+
+/**
  * Error thrown when the given address is invalid. 
  */
 export class InvalidAddressError extends Error {
@@ -32,8 +55,8 @@ export class InvalidAddressError extends Error {
  * Error thrown when the given arguments are invalid
  */
 export class InvalidArgumentsError extends Error {
-  constructor() {
-    super('Invalid arguments')
+  constructor(expectedArguments?: string) {
+    super(`Invalid arguments, expected ${expectedArguments}`)
   }
 }
 
@@ -67,9 +90,24 @@ export class NamedExpressionDoesNotExist extends Error {
 /**
  * Error thrown when there are no operations to be undone by the [[undo]] method.
  */
-export class NoOperationToUndo extends Error {
+export class NoOperationToUndoError extends Error {
   constructor() {
     super('There is no operation to undo')
+  }
+}
+
+export class NoOperationToRedoError extends Error {
+  constructor() {
+    super('There is no operation to redo')
+  }
+}
+
+/**
+ * Error thrown when there is nothing to paste by the [[paste]] method.
+ */
+export class NothingToPasteError extends Error {
+  constructor() {
+    super('There is nothing to paste')
   }
 }
 
@@ -107,11 +145,8 @@ export class UnableToParse extends Error {
 
 /**
  * Error thrown when the expected value type differs from the given value type.
- * 
  * It also displays the expected type.
- * 
  * This error might be thrown while setting or updating the [[ConfigParams]].
- * 
  * The following methods accept [[ConfigParams]] as a parameter:
  * 
  * @see [[buildEmpty]]
@@ -127,11 +162,8 @@ export class ExpectedValueOfType extends Error {
 
 /**
  * Error thrown when the value was expected to be set for a config parameter.
- * 
  * It also displays the expected value.
- * 
  * This error might be thrown while setting or updating the [[ConfigParams]].
- * 
  * The following methods accept [[ConfigParams]] as a parameter:
  * 
  * @see [[buildEmpty]]
@@ -147,9 +179,7 @@ export class ExpectedOneOfValues extends Error {
 
 /**
  * Error thrown when computations become suspended.
- * 
  * To perform any other action wait for the batch to complete or resume the evaluation.
- * 
  * Relates to:
  * 
  * @see [[batch]]

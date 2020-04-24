@@ -1,3 +1,8 @@
+/**
+ * @license
+ * Copyright (c) 2020 Handsoncode. All rights reserved.
+ */
+
 import {TranslationPackage, UIElement} from '../i18n'
 import {Maybe} from '../Maybe'
 
@@ -18,8 +23,6 @@ class Sheet {
 }
 
 export class SheetMapping {
-  public static NO_CHANGE = Symbol()
-
   private readonly mappingFromCanonicalName: Map<string, Sheet> = new Map()
   private readonly mappingFromId: Map<number, Sheet> = new Map()
   private readonly sheetNamePrefix: string

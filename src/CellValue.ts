@@ -1,3 +1,8 @@
+/**
+ * @license
+ * Copyright (c) 2020 Handsoncode. All rights reserved.
+ */
+
 import {CellError, ErrorType, InternalCellValue, NoErrorCellValue, simpleCellAddress, SimpleCellAddress} from './Cell'
 import {Config} from './Config'
 import {CellValueChange} from './ContentChanges'
@@ -7,6 +12,9 @@ export type CellValue = NoErrorCellValue | DetailedCellError
 
 export type ExportedChange = ExportedCellChange | ExportedNamedExpressionChange
 
+  /**
+   * A list of cells which values changed after the operation, their absolute addresses and new values.
+   */
 export class ExportedCellChange {
   constructor(
     public readonly address: SimpleCellAddress,

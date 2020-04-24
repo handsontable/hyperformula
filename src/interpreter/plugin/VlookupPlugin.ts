@@ -1,3 +1,8 @@
+/**
+ * @license
+ * Copyright (c) 2020 Handsoncode. All rights reserved.
+ */
+
 import {AbsoluteCellRange} from '../../AbsoluteCellRange'
 import {CellError, ErrorType, InternalCellValue, simpleCellAddress, SimpleCellAddress} from '../../Cell'
 import {AstNodeType, ProcedureAst} from '../../parser'
@@ -24,6 +29,10 @@ export class VlookupPlugin extends FunctionPlugin {
   public vlookup(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
     if (ast.args.length < 3 || ast.args.length > 4) {
       return new CellError(ErrorType.NA)
+    }
+
+    if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
+      return new CellError(ErrorType.NUM)
     }
 
     const key = this.evaluateAst(ast.args[0], formulaAddress)

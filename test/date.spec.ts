@@ -2,7 +2,6 @@ import {Config} from '../src/Config'
 import {DateTimeHelper, SimpleDate} from '../src/DateTimeHelper'
 import moment from 'moment'
 import {Maybe} from '../src/Maybe'
-import './testConfig'
 
 describe('Date helpers', () => {
   it('#dateToNumber should return number representation of a date', () => {

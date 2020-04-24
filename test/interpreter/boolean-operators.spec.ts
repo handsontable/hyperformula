@@ -1,6 +1,5 @@
 import {HyperFormula} from '../../src'
 import {ErrorType} from '../../src/Cell'
-import '../testConfig'
 import {adr, detailedError} from '../testUtils'
 
 describe('Interpreter - Boolean operators', () => {
@@ -338,4 +337,3 @@ describe('Interpreter - Boolean operators', () => {
     expect(engine.getCellValue(adr('F1'))).toEqual(detailedError(ErrorType.DIV_BY_ZERO))
   })
 })
-

@@ -1,3 +1,8 @@
+/**
+ * @license
+ * Copyright (c) 2020 Handsoncode. All rights reserved.
+ */
+
 import {ColumnsSpan} from '../ColumnsSpan'
 import {Ast, CellAddress} from '../parser'
 import {absoluteSheetReference, ErrorType, SimpleCellAddress} from '../Cell'
@@ -16,6 +21,10 @@ export class AddColumnsTransformer extends Transformer {
 
   public get sheet(): number {
     return this.columnsSpan.sheet
+  }
+
+  public isIrreversible() {
+    return false
   }
 
   protected transformRowRangeAst(ast: RowRangeAst, _formulaAddress: SimpleCellAddress): Ast {

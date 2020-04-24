@@ -1,3 +1,8 @@
+/**
+ * @license
+ * Copyright (c) 2020 Handsoncode. All rights reserved.
+ */
+
 import {ErrorType} from '../Cell'
 import {TranslationPackage} from '../i18n'
 
@@ -6,6 +11,8 @@ export interface ParserConfig {
   decimalSeparator: '.' | ',',
   translationPackage: TranslationPackage,
   errorMapping: Record<string, ErrorType>,
+  maxColumns: number,
+  maxRows: number,
   volatileFunctions(): Set<string>,
   structuralChangeFunctions(): Set<string>,
   functionsWhichDoesNotNeedArgumentsToBeComputed(): Set<string>,

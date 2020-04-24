@@ -1,3 +1,8 @@
+/**
+ * @license
+ * Copyright (c) 2020 Handsoncode. All rights reserved.
+ */
+
 import {SheetCellAddress, SimpleCellAddress} from '../../Cell'
 import {ColumnsSpan} from '../../ColumnsSpan'
 import {RowsSpan} from '../../RowsSpan'
@@ -61,6 +66,8 @@ export interface IAddressMappingStrategy {
   verticesFromRowsSpan(rowsSpan: RowsSpan): IterableIterator<CellVertex>,
 
   entriesFromRowsSpan(rowsSpan: RowsSpan): IterableIterator<[SimpleCellAddress, CellVertex]>,
+  
+  entriesFromColumnsSpan(columnsSpan: ColumnsSpan): IterableIterator<[SimpleCellAddress, CellVertex]>,
 
   vertices(): IterableIterator<CellVertex>,
 }

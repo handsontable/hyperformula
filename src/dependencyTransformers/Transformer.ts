@@ -1,4 +1,10 @@
+/**
+ * @license
+ * Copyright (c) 2020 Handsoncode. All rights reserved.
+ */
+
 import {CellError, ErrorType, SimpleCellAddress} from '../Cell'
+import {DependencyGraph} from '../DependencyGraph'
 import {
   Ast,
   AstNodeType,
@@ -9,12 +15,12 @@ import {
   ParserWithCaching,
 } from '../parser'
 import {ColumnRangeAst, RowRangeAst} from '../parser/Ast'
-import {DependencyGraph} from '../DependencyGraph'
 import {ColumnAddress} from '../parser/ColumnAddress'
 import {RowAddress} from '../parser/RowAddress'
 
 export interface FormulaTransformer {
   sheet: number,
+  isIrreversible(): boolean,
   performEagerTransformations(graph: DependencyGraph, parser: ParserWithCaching): void,
   transformSingleAst(ast: Ast, address: SimpleCellAddress): [Ast, SimpleCellAddress],
 }
@@ -51,6 +57,7 @@ export abstract class Transformer implements FormulaTransformer {
       case AstNodeType.ROW_RANGE: {
         return this.transformRowRangeAst(ast, address)
       }
+      case AstNodeType.EMPTY:
       case AstNodeType.ERROR:
       case AstNodeType.NUMBER:
       case AstNodeType.ERROR_WITH_RAW_INPUT:
@@ -153,4 +160,5 @@ export abstract class Transformer implements FormulaTransformer {
   protected abstract transformRowRange(start: RowAddress, end: RowAddress, formulaAddress: SimpleCellAddress): [RowAddress, RowAddress] | ErrorType.REF | false
   protected abstract transformColumnRange(start: ColumnAddress, end: ColumnAddress, formulaAddress: SimpleCellAddress): [ColumnAddress, ColumnAddress] | ErrorType.REF | false
   protected abstract fixNodeAddress(address: SimpleCellAddress): SimpleCellAddress
+  public abstract isIrreversible(): boolean
 }

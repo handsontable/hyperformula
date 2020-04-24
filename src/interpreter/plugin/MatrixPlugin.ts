@@ -1,3 +1,8 @@
+/**
+ * @license
+ * Copyright (c) 2020 Handsoncode. All rights reserved.
+ */
+
 import {CellError, ErrorType, SimpleCellAddress} from '../../Cell'
 import {matrixSizeForMultiplication, matrixSizeForPoolFunction, matrixSizeForTranspose} from '../../Matrix'
 import {Ast, AstNodeType, NumberAst, ProcedureAst} from '../../parser'
@@ -24,6 +29,9 @@ export class MatrixPlugin extends FunctionPlugin {
   public mmult(ast: ProcedureAst, formulaAddress: SimpleCellAddress): SimpleRangeValue | CellError {
     if (ast.args.length !== 2) {
       return new CellError(ErrorType.NA)
+    }
+    if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
+      return new CellError(ErrorType.NUM)
     }
     const [left, right] = ast.args
 
@@ -63,6 +71,9 @@ export class MatrixPlugin extends FunctionPlugin {
     const windowSize = sizeArg.value
     let stride = windowSize
 
+    if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
+      return new CellError(ErrorType.NUM)
+    }
     if (ast.args.length === 3) {
       const strideArg = ast.args[2]
       if (strideArg.type === AstNodeType.NUMBER) {
@@ -104,6 +115,9 @@ export class MatrixPlugin extends FunctionPlugin {
   public medianpool(ast: ProcedureAst, formulaAddress: SimpleCellAddress): SimpleRangeValue | CellError {
     const [rangeArg, sizeArg] = ast.args as [Ast, NumberAst]
 
+    if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
+      return new CellError(ErrorType.NUM)
+    }
     const rangeMatrix = coerceToRangeNumbersOrError(this.evaluateAst(rangeArg, formulaAddress))
     const windowSize = sizeArg.value
     let stride = windowSize
@@ -191,6 +205,9 @@ export class MatrixPlugin extends FunctionPlugin {
   public transpose(ast: ProcedureAst, formulaAddress: SimpleCellAddress): SimpleRangeValue | CellError {
     if (ast.args.length !== 1) {
       return new CellError(ErrorType.NA)
+    }
+    if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
+      return new CellError(ErrorType.NUM)
     }
     const value = coerceToRangeNumbersOrError(this.evaluateAst(ast.args[0], formulaAddress))
 

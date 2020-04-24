@@ -1,3 +1,8 @@
+/**
+ * @license
+ * Copyright (c) 2020 Handsoncode. All rights reserved.
+ */
+
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
 import {InternalCellValue} from '../Cell'
 import {DependencyGraph} from '../DependencyGraph'
@@ -138,7 +143,7 @@ export class SimpleRangeValue {
     return this.data.size
   }
 
-  public static onlyNumbersDataWithRange(data: number[][], size: MatrixSize, range: AbsoluteCellRange): SimpleRangeValue {
+  public static onlyNumbersDataWithRange(data: number[][], size: MatrixSize, _range: AbsoluteCellRange): SimpleRangeValue {
     return new SimpleRangeValue(new ArrayData(size, data, true))
   }
 

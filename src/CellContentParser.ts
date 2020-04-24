@@ -1,3 +1,8 @@
+/**
+ * @license
+ * Copyright (c) 2020 Handsoncode. All rights reserved.
+ */
+
 import {CellError, EmptyValue, EmptyValueType, ErrorType} from './Cell'
 import {Config} from './Config'
 import {DateTimeHelper} from './DateTimeHelper'

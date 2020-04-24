@@ -1,6 +1,5 @@
 import {HyperFormula} from '../../src'
 import {ErrorType} from '../../src/Cell'
-import '../testConfig'
 import {adr, detailedError} from '../testUtils'
 
 describe('Function FALSE', () => {

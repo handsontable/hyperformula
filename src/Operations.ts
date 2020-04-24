@@ -1,13 +1,42 @@
+/**
+ * @license
+ * Copyright (c) 2020 Handsoncode. All rights reserved.
+ */
+
 import {Statistics, StatType} from './statistics'
 import {ClipboardCell, ClipboardCellType} from './ClipboardOperations'
-import {SimpleCellAddress} from './Cell'
+import {EmptyValue, invalidSimpleCellAddress, simpleCellAddress, SimpleCellAddress} from './Cell'
+import {CellContent, CellContentParser, RawCellContent} from './CellContentParser'
 import {RowsSpan} from './RowsSpan'
+import {ColumnsSpan} from './ColumnsSpan'
+import {ContentChanges} from './ContentChanges'
+import {ColumnSearchStrategy} from './ColumnSearch/ColumnSearchStrategy'
+import {absolutizeDependencies} from './absolutizeDependencies'
 import {LazilyTransformingAstService} from './LazilyTransformingAstService'
 import {Index} from './HyperFormula'
-import {DependencyGraph, EmptyCellVertex, FormulaCellVertex, MatrixVertex, ValueCellVertex} from './DependencyGraph'
-import {ParserWithCaching} from './parser'
+import {buildMatrixVertex} from './GraphBuilder'
+import {
+  DependencyGraph,
+  EmptyCellVertex,
+  FormulaCellVertex,
+  MatrixVertex,
+  ParsingErrorVertex,
+  SheetMapping,
+  ValueCellVertex
+} from './DependencyGraph'
+import {ValueCellVertexValue} from './DependencyGraph/ValueCellVertex'
+import {InvalidArgumentsError, SheetSizeLimitExceededError} from './errors'
+import {ParserWithCaching, ProcedureAst} from './parser'
+import {ParsingError} from './parser/Ast'
 import {AddRowsTransformer} from './dependencyTransformers/AddRowsTransformer'
 import {RemoveRowsTransformer} from './dependencyTransformers/RemoveRowsTransformer'
+import {AddColumnsTransformer} from './dependencyTransformers/AddColumnsTransformer'
+import {MoveCellsTransformer} from './dependencyTransformers/MoveCellsTransformer'
+import {RemoveSheetTransformer} from './dependencyTransformers/RemoveSheetTransformer'
+import {RemoveColumnsTransformer} from './dependencyTransformers/RemoveColumnsTransformer'
+import {AbsoluteCellRange} from './AbsoluteCellRange'
+import {findBoundaries, Sheet} from './Sheet'
+import {Config} from './Config'
 
 export class RemoveRowsCommand {
   constructor(
@@ -45,6 +74,42 @@ export class AddRowsCommand {
   }
 }
 
+export class AddColumnsCommand {
+  constructor(
+    public readonly sheet: number,
+    public readonly indexes: Index[]
+  ) {
+  }
+
+  public normalizedIndexes(): Index[] {
+    return normalizeAddedIndexes(this.indexes)
+  }
+
+  public columnsSpans(): ColumnsSpan[] {
+    return this.normalizedIndexes().map(normalizedIndex =>
+      ColumnsSpan.fromNumberOfColumns(this.sheet, normalizedIndex[0], normalizedIndex[1])
+    )
+  }
+}
+
+export class RemoveColumnsCommand {
+  constructor(
+    public readonly sheet: number,
+    public readonly indexes: Index[]
+  ) {
+  }
+
+  public normalizedIndexes(): Index[] {
+    return normalizeRemovedIndexes(this.indexes)
+  }
+
+  public columnsSpans(): ColumnsSpan[] {
+    return this.normalizedIndexes().map(normalizedIndex =>
+      ColumnsSpan.fromNumberOfColumns(this.sheet, normalizedIndex[0], normalizedIndex[1])
+    )
+  }
+}
+
 export interface ChangedCell {
   address: SimpleCellAddress,
   cellType: ClipboardCell,
@@ -57,17 +122,24 @@ export interface RowsRemoval {
   removedCells: ChangedCell[],
 }
 
-export interface RowsAddition {
-  afterRow: number,
-  rowCount: number,
+export interface ColumnsRemoval {
+  columnFrom: number,
+  columnCount: number,
+  version: number,
+  removedCells: ChangedCell[],
 }
 
 export class Operations {
+  private changes: ContentChanges = ContentChanges.empty()
+
   constructor(
     private readonly dependencyGraph: DependencyGraph,
+    private readonly columnSearch: ColumnSearchStrategy,
+    private readonly cellContentParser: CellContentParser,
     private readonly parser: ParserWithCaching,
     private readonly stats: Statistics,
     private readonly lazilyTransformingAstService: LazilyTransformingAstService,
+    private readonly config: Config
   ) {
   }
 
@@ -82,15 +154,166 @@ export class Operations {
     return rowsRemovals
   }
 
-  public addRows(cmd: AddRowsCommand): RowsAddition[] {
-    const rowsAdditions: RowsAddition[] = []
+  public addRows(cmd: AddRowsCommand) {
     for (const addedRows of cmd.rowsSpans()) {
-      const rowAddition = this.doAddRows(addedRows)
-      if (rowAddition) {
-        rowsAdditions.push(rowAddition)
+      this.doAddRows(addedRows)
+    }
+  }
+
+  public addColumns(cmd: AddColumnsCommand) {
+    for (const addedColumns of cmd.columnsSpans()) {
+      this.doAddColumns(addedColumns)
+    }
+  }
+
+  public removeColumns(cmd: RemoveColumnsCommand): ColumnsRemoval[] {
+    const columnsRemovals: ColumnsRemoval[] = []
+    for (const columnsToRemove of cmd.columnsSpans()) {
+      const columnsRemoval = this.doRemoveColumns(columnsToRemove)
+      if (columnsRemoval) {
+        columnsRemovals.push(columnsRemoval)
       }
     }
-    return rowsAdditions
+    return columnsRemovals
+  }
+
+  public removeSheet(sheetName: string) {
+    const sheetId = this.sheetMapping.fetch(sheetName)
+
+    this.dependencyGraph.removeSheet(sheetId)
+
+    let version: number
+    this.stats.measure(StatType.TRANSFORM_ASTS, () => {
+      const transformation = new RemoveSheetTransformer(sheetId)
+      transformation.performEagerTransformations(this.dependencyGraph, this.parser)
+      version = this.lazilyTransformingAstService.addTransformation(transformation)
+    })
+
+    this.sheetMapping.removeSheet(sheetId)
+    this.columnSearch.removeSheet(sheetId)
+    return version!
+  }
+
+  public clearSheet(sheetId: number) {
+    this.dependencyGraph.clearSheet(sheetId)
+    this.columnSearch.removeSheet(sheetId)
+  }
+
+  public addSheet(name?: string) {
+    const sheetId = this.sheetMapping.addSheet(name)
+    const sheet: Sheet = []
+    this.dependencyGraph.addressMapping.autoAddSheet(sheetId, sheet, findBoundaries(sheet))
+    return this.sheetMapping.fetchDisplayName(sheetId)
+  }
+
+  public moveRows(sheet: number, startRow: number, numberOfRows: number, targetRow: number): void {
+    const rowsToAdd = RowsSpan.fromNumberOfRows(sheet, targetRow, numberOfRows)
+    this.doAddRows(rowsToAdd)
+
+    if (targetRow < startRow) {
+      startRow += numberOfRows
+    }
+
+    const startAddress = simpleCellAddress(sheet, 0, startRow)
+    const targetAddress = simpleCellAddress(sheet, 0, targetRow)
+    this.moveCells(startAddress, Number.POSITIVE_INFINITY, numberOfRows, targetAddress)
+    const rowsToRemove = RowsSpan.fromNumberOfRows(sheet, startRow, numberOfRows)
+    this.doRemoveRows(rowsToRemove)
+  }
+
+  public moveColumns(sheet: number, startColumn: number, numberOfColumns: number, targetColumn: number): void {
+    const columnsToAdd = ColumnsSpan.fromNumberOfColumns(sheet, targetColumn, numberOfColumns)
+    this.doAddColumns(columnsToAdd)
+
+    if (targetColumn < startColumn) {
+      startColumn += numberOfColumns
+    }
+
+    const startAddress = simpleCellAddress(sheet, startColumn, 0)
+    const targetAddress = simpleCellAddress(sheet, targetColumn, 0)
+    this.moveCells(startAddress, numberOfColumns, Number.POSITIVE_INFINITY, targetAddress)
+    const columnsToRemove = ColumnsSpan.fromNumberOfColumns(sheet, startColumn, numberOfColumns)
+    this.doRemoveColumns(columnsToRemove)
+  }
+
+  public moveCells(sourceLeftCorner: SimpleCellAddress, width: number, height: number, destinationLeftCorner: SimpleCellAddress): { version: number, overwrittenCellsData: [SimpleCellAddress, ClipboardCell][] } {
+    this.ensureItIsPossibleToMoveCells(sourceLeftCorner, width, height, destinationLeftCorner)
+
+    const sourceRange = AbsoluteCellRange.spanFrom(sourceLeftCorner, width, height)
+    const targetRange = AbsoluteCellRange.spanFrom(destinationLeftCorner, width, height)
+
+    this.dependencyGraph.breakNumericMatricesInRange(sourceRange)
+    this.dependencyGraph.breakNumericMatricesInRange(targetRange)
+
+    const toRight = destinationLeftCorner.col - sourceLeftCorner.col
+    const toBottom = destinationLeftCorner.row - sourceLeftCorner.row
+    const toSheet = destinationLeftCorner.sheet
+
+    const currentDataAtTarget = this.getRangeClipboardCells(targetRange)
+
+    const valuesToRemove = this.dependencyGraph.valuesFromRange(targetRange)
+    this.columnSearch.removeValues(valuesToRemove)
+    const valuesToMove = this.dependencyGraph.valuesFromRange(sourceRange)
+    this.columnSearch.moveValues(valuesToMove, toRight, toBottom, toSheet)
+
+    let version: number
+    this.stats.measure(StatType.TRANSFORM_ASTS, () => {
+      const transformation = new MoveCellsTransformer(sourceRange, toRight, toBottom, toSheet)
+      transformation.performEagerTransformations(this.dependencyGraph, this.parser)
+      version = this.lazilyTransformingAstService.addTransformation(transformation)
+    })
+
+    this.dependencyGraph.moveCells(sourceRange, toRight, toBottom, toSheet)
+
+    return { version: version!, overwrittenCellsData: currentDataAtTarget }
+  }
+
+  public ensureItIsPossibleToMoveCells(sourceLeftCorner: SimpleCellAddress, width: number, height: number, destinationLeftCorner: SimpleCellAddress): void {
+    if (
+      invalidSimpleCellAddress(sourceLeftCorner) ||
+      !((isPositiveInteger(width) && isPositiveInteger(height)) || isRowOrColumnRange(sourceLeftCorner, width, height)) ||
+      invalidSimpleCellAddress(destinationLeftCorner) ||
+      !this.sheetMapping.hasSheetWithId(sourceLeftCorner.sheet) ||
+      !this.sheetMapping.hasSheetWithId(destinationLeftCorner.sheet)
+    ) {
+      throw new InvalidArgumentsError()
+    }
+
+    const sourceRange = AbsoluteCellRange.spanFrom(sourceLeftCorner, width, height)
+    const targetRange = AbsoluteCellRange.spanFrom(destinationLeftCorner, width, height)
+
+    if (targetRange.exceedsSheetSizeLimits(this.config.maxColumns, this.config.maxRows)) {
+      throw new SheetSizeLimitExceededError()
+    }
+
+    if (this.dependencyGraph.matrixMapping.isFormulaMatrixInRange(sourceRange)) {
+      throw new Error('It is not possible to move matrix')
+    }
+
+    if (this.dependencyGraph.matrixMapping.isFormulaMatrixInRange(targetRange)) {
+      throw new Error('It is not possible to replace cells with matrix')
+    }
+  }
+
+  public restoreCell(address: SimpleCellAddress, clipboardCell: ClipboardCell) {
+    switch (clipboardCell.type) {
+      case ClipboardCellType.VALUE: {
+        this.setValueToCell(clipboardCell.value, address)
+        break
+      }
+      case ClipboardCellType.FORMULA: {
+        this.setFormulaToCellFromCache(clipboardCell.hash, address)
+        break
+      }
+      case ClipboardCellType.EMPTY: {
+        this.setCellEmpty(address)
+        break
+      }
+      case ClipboardCellType.PARSING_ERROR: {
+        this.setParsingErrorToCell(clipboardCell.rawInput, clipboardCell.errors, address)
+        break
+      }
+    }
   }
 
   /**
@@ -123,6 +346,36 @@ export class Operations {
   }
 
   /**
+   * Removes multiple columns from sheet. </br>
+   * Does nothing if columns are outside of effective sheet size.
+   *
+   * @param sheet - sheet id from which columns will be removed
+   * @param columnStart - number of the first column to be deleted
+   * @param columnEnd - number of the last row to be deleted
+   */
+  private doRemoveColumns(columnsToRemove: ColumnsSpan): ColumnsRemoval | undefined {
+    if (this.columnEffectivelyNotInSheet(columnsToRemove.columnStart, columnsToRemove.sheet)) {
+      return
+    }
+
+    const removedCells: ChangedCell[] = []
+    for (const [address] of this.dependencyGraph.entriesFromColumnsSpan(columnsToRemove)) {
+      removedCells.push({ address, cellType: this.getClipboardCell(address) })
+    }
+
+    this.dependencyGraph.removeColumns(columnsToRemove)
+    this.columnSearch.removeColumns(columnsToRemove)
+
+    let version: number
+    this.stats.measure(StatType.TRANSFORM_ASTS, () => {
+      const transformation = new RemoveColumnsTransformer(columnsToRemove)
+      transformation.performEagerTransformations(this.dependencyGraph, this.parser)
+      version = this.lazilyTransformingAstService.addTransformation(transformation)
+    })
+    return { version: version!, removedCells, columnFrom: columnsToRemove.columnStart, columnCount: columnsToRemove.numberOfColumns }
+  }
+
+  /**
    * Add multiple rows to sheet. </br>
    * Does nothing if rows are outside of effective sheet size.
    *
@@ -130,7 +383,7 @@ export class Operations {
    * @param row - row number above which the rows will be added
    * @param numberOfRowsToAdd - number of rows to add
    */
-  private doAddRows(addedRows: RowsSpan): RowsAddition | undefined {
+  private doAddRows(addedRows: RowsSpan) {
     if (this.rowEffectivelyNotInSheet(addedRows.rowStart, addedRows.sheet)) {
       return
     }
@@ -142,11 +395,32 @@ export class Operations {
       transformation.performEagerTransformations(this.dependencyGraph, this.parser)
       this.lazilyTransformingAstService.addTransformation(transformation)
     })
-
-    return { afterRow: addedRows.rowStart, rowCount: addedRows.numberOfRows }
   }
 
-  private getClipboardCell(address: SimpleCellAddress): ClipboardCell {
+  /**
+   * Add multiple columns to sheet </br>
+   * Does nothing if columns are outside of effective sheet size
+   *
+   * @param sheet - sheet id in which columns will be added
+   * @param column - column number above which the columns will be added
+   * @param numberOfColumns - number of columns to add
+   */
+  private doAddColumns(addedColumns: ColumnsSpan): void {
+    if (this.columnEffectivelyNotInSheet(addedColumns.columnStart, addedColumns.sheet)) {
+      return
+    }
+
+    this.dependencyGraph.addColumns(addedColumns)
+    this.columnSearch.addColumns(addedColumns)
+
+    this.stats.measure(StatType.TRANSFORM_ASTS, () => {
+      const transformation = new AddColumnsTransformer(addedColumns)
+      transformation.performEagerTransformations(this.dependencyGraph, this.parser)
+      this.lazilyTransformingAstService.addTransformation(transformation)
+    })
+  }
+
+  public getClipboardCell(address: SimpleCellAddress): ClipboardCell {
     const vertex = this.dependencyGraph.getCell(address)
 
     if (vertex === null || vertex instanceof EmptyCellVertex) {
@@ -158,9 +432,108 @@ export class Operations {
       return { type: ClipboardCellType.VALUE, value: vertex.getMatrixCellValue(address) }
     } else if (vertex instanceof FormulaCellVertex) {
       return { type: ClipboardCellType.FORMULA, hash: this.parser.computeHashFromAst(vertex.getFormula(this.lazilyTransformingAstService)) }
+    } else if (vertex instanceof ParsingErrorVertex) {
+      return { type: ClipboardCellType.PARSING_ERROR, rawInput: vertex.rawInput, errors: vertex.errors }
     }
 
     throw Error('Trying to copy unsupported type')
+  }
+
+  public getSheetClipboardCells(sheet: number): ClipboardCell[][] {
+    const sheetHeight = this.dependencyGraph.getSheetHeight(sheet)
+    const sheetWidth = this.dependencyGraph.getSheetWidth(sheet)
+
+    const arr: ClipboardCell[][] = new Array(sheetHeight)
+    for (let i = 0; i < sheetHeight; i++) {
+      arr[i] = new Array(sheetWidth)
+
+      for (let j = 0; j < sheetWidth; j++) {
+        const address = simpleCellAddress(sheet, j, i)
+        arr[i][j] = this.getClipboardCell(address)
+      }
+    }
+    return arr
+  }
+
+  public getRangeClipboardCells(range: AbsoluteCellRange): [SimpleCellAddress, ClipboardCell][] {
+    const result: [SimpleCellAddress, ClipboardCell][] = []
+    for (const address of range.addresses(this.dependencyGraph)) {
+      result.push([address, this.getClipboardCell(address)])
+    }
+    return result
+  }
+
+  public setCellContent(address: SimpleCellAddress, newCellContent: RawCellContent): void {
+    const parsedCellContent = this.cellContentParser.parse(newCellContent)
+
+    let vertex = this.dependencyGraph.getCell(address)
+
+    if (vertex instanceof MatrixVertex && !vertex.isFormula() && !(parsedCellContent instanceof CellContent.Number)) {
+      this.dependencyGraph.breakNumericMatrix(vertex)
+      vertex = this.dependencyGraph.getCell(address)
+    }
+
+    if (vertex instanceof MatrixVertex && !vertex.isFormula() && parsedCellContent instanceof CellContent.Number) {
+      const newValue = parsedCellContent.value
+      const oldValue = this.dependencyGraph.getCellValue(address)
+      this.dependencyGraph.graph.markNodeAsSpecialRecentlyChanged(vertex)
+      vertex.setMatrixCellValue(address, newValue)
+      this.columnSearch.change(oldValue, newValue, address)
+      this.changes.addChange(newValue, address)
+    } else if (!(vertex instanceof MatrixVertex) && parsedCellContent instanceof CellContent.MatrixFormula) {
+      const {ast, errors, dependencies} = this.parser.parse(parsedCellContent.formula, address)
+      if (errors.length > 0) {
+        this.dependencyGraph.setParsingErrorToCell(address, new ParsingErrorVertex(errors, parsedCellContent.formulaWithBraces()))
+      } else {
+        const newVertex = buildMatrixVertex(ast as ProcedureAst, address)
+        if (newVertex instanceof ValueCellVertex) {
+          throw Error('What if new matrix vertex is not properly constructed?')
+        }
+        this.dependencyGraph.addNewMatrixVertex(newVertex)
+        this.dependencyGraph.processCellDependencies(absolutizeDependencies(dependencies, address), newVertex)
+        this.dependencyGraph.graph.markNodeAsSpecialRecentlyChanged(newVertex)
+      }
+    } else if (!(vertex instanceof MatrixVertex)) {
+      if (parsedCellContent instanceof CellContent.Formula) {
+        const {ast, errors, hasVolatileFunction, hasStructuralChangeFunction, dependencies} = this.parser.parse(parsedCellContent.formula, address)
+        if (errors.length > 0) {
+          this.dependencyGraph.setParsingErrorToCell(address, new ParsingErrorVertex(errors, parsedCellContent.formula))
+        } else {
+          this.dependencyGraph.setFormulaToCell(address, ast, absolutizeDependencies(dependencies, address), hasVolatileFunction, hasStructuralChangeFunction)
+        }
+      } else if (parsedCellContent instanceof CellContent.Empty) {
+        this.setCellEmpty(address)
+      } else if (parsedCellContent instanceof CellContent.MatrixFormula) {
+        throw new Error('Cant happen')
+      } else {
+        this.setValueToCell(parsedCellContent.value, address)
+      }
+    } else {
+      throw new Error('Illegal operation')
+    }
+  }
+
+  public setValueToCell(value: ValueCellVertexValue, address: SimpleCellAddress) {
+    const oldValue = this.dependencyGraph.getCellValue(address)
+    this.dependencyGraph.setValueToCell(address, value)
+    this.columnSearch.change(oldValue, value, address)
+    this.changes.addChange(value, address)
+  }
+
+  public setCellEmpty(address: SimpleCellAddress) {
+    const oldValue = this.dependencyGraph.getCellValue(address)
+    this.columnSearch.remove(oldValue, address)
+    this.changes.addChange(EmptyValue, address)
+    this.dependencyGraph.setCellEmpty(address)
+  }
+
+  public setFormulaToCellFromCache(formulaHash: string, address: SimpleCellAddress) {
+    const {ast, hasVolatileFunction, hasStructuralChangeFunction, dependencies} = this.parser.fetchCachedResult(formulaHash)
+    this.dependencyGraph.setFormulaToCell(address, ast, absolutizeDependencies(dependencies, address), hasVolatileFunction, hasStructuralChangeFunction)
+  }
+
+  public setParsingErrorToCell(rawInput: string, errors: ParsingError[], address: SimpleCellAddress) {
+    this.dependencyGraph.setParsingErrorToCell(address, new ParsingErrorVertex(errors, rawInput))
   }
 
   /**
@@ -172,6 +545,31 @@ export class Operations {
   public rowEffectivelyNotInSheet(row: number, sheet: number): boolean {
     const height = this.dependencyGraph.addressMapping.getHeight(sheet)
     return row >= height
+  }
+
+  public getAndClearContentChanges(): ContentChanges {
+    const changes = this.changes
+    this.changes = ContentChanges.empty()
+    return changes
+  }
+
+  private get sheetMapping(): SheetMapping {
+    return this.dependencyGraph.sheetMapping
+  }
+
+  public forceApplyPostponedTransformations(): void {
+    this.dependencyGraph.forceApplyPostponedTransformations()
+  }
+
+  /**
+   * Returns true if row number is outside of given sheet.
+   *
+   * @param column - row number
+   * @param sheet - sheet id number
+   */
+  private columnEffectivelyNotInSheet(column: number, sheet: number): boolean {
+    const width = this.dependencyGraph.addressMapping.getWidth(sheet)
+    return column >= width
   }
 }
 
@@ -232,4 +630,17 @@ export function normalizeAddedIndexes(indexes: Index[]): Index[] {
   }
 
   return merged
+}
+
+function isPositiveInteger(x: number): boolean {
+  return Number.isInteger(x) && x > 0
+}
+
+function isNonnegativeInteger(x: number): boolean {
+  return Number.isInteger(x) && x >= 0
+}
+
+function isRowOrColumnRange(leftCorner: SimpleCellAddress, width: number, height: number): boolean {
+  return (leftCorner.row === 0 && isPositiveInteger(width) && height === Number.POSITIVE_INFINITY)
+    || (leftCorner.col === 0 && isPositiveInteger(height) && width === Number.POSITIVE_INFINITY)
 }

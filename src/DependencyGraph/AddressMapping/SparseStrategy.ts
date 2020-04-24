@@ -1,3 +1,8 @@
+/**
+ * @license
+ * Copyright (c) 2020 Handsoncode. All rights reserved.
+ */
+
 import {SheetCellAddress, simpleCellAddress, SimpleCellAddress} from '../../Cell'
 import {ColumnsSpan} from '../../ColumnsSpan'
 import {RowsSpan} from '../../RowsSpan'
@@ -193,6 +198,17 @@ export class SparseStrategy implements IAddressMappingStrategy {
         const rowVertex = colMapping.get(row)
         if (rowVertex) {
           yield [simpleCellAddress(rowsSpan.sheet, col, row), rowVertex]
+        }
+      }
+    }
+  }
+
+  public* entriesFromColumnsSpan(columnsSpan: ColumnsSpan): IterableIterator<[SimpleCellAddress, CellVertex]> {
+    for (const col of columnsSpan.columns()) {
+      const colMapping = this.mapping.get(col)
+      if (colMapping) {
+        for (const [row, vertex] of colMapping.entries()) {
+          yield [simpleCellAddress(columnsSpan.sheet, col, row), vertex]
         }
       }
     }

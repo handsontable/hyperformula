@@ -1,3 +1,8 @@
+/**
+ * @license
+ * Copyright (c) 2020 Handsoncode. All rights reserved.
+ */
+
 import {ErrorType} from '../Cell'
 import {MissingTranslationError} from '../errors'
 import {ErrorTranslationSet, TranslationSet, UIElement, UITranslationSet} from './index'

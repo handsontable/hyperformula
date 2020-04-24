@@ -1,3 +1,8 @@
+/**
+ * @license
+ * Copyright (c) 2020 Handsoncode. All rights reserved.
+ */
+
 import {CellError, ErrorType, InternalCellValue, SimpleCellAddress} from './Cell'
 import {ColumnSearchStrategy} from './ColumnSearch/ColumnSearchStrategy'
 import {Config} from './Config'

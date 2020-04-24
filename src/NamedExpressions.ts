@@ -1,3 +1,8 @@
+/**
+ * @license
+ * Copyright (c) 2020 Handsoncode. All rights reserved.
+ */
+
 import {absolutizeDependencies} from './absolutizeDependencies'
 import {InternalCellValue, simpleCellAddress, SimpleCellAddress} from './Cell'
 import {CellContent, CellContentParser, RawCellContent} from './CellContentParser'
@@ -116,7 +121,7 @@ export class NamedExpressions {
     this.workbookStore.add(namedExpression)
   }
 
-  private getInternalNamedExpressionAddress(expressionName: string): SimpleCellAddress | null {
+  public getInternalNamedExpressionAddress(expressionName: string): SimpleCellAddress | null {
     const namedExpression = this.workbookStore.get(expressionName)
     if (namedExpression === undefined) {
       return null
@@ -169,9 +174,9 @@ export class NamedExpressions {
       const {ast, hasVolatileFunction, hasStructuralChangeFunction, dependencies} = this.parser.parse(parsedCellContent.formula, address)
       this.dependencyGraph.setFormulaToCell(address, ast, absolutizeDependencies(dependencies, address), hasVolatileFunction, hasStructuralChangeFunction)
     } else if (parsedCellContent instanceof CellContent.Empty) {
-      this.crudOperations.setCellEmpty(address)
+      this.crudOperations.operations.setCellEmpty(address)
     } else {
-      this.crudOperations.setValueToCell(parsedCellContent.value, address)
+      this.crudOperations.operations.setValueToCell(parsedCellContent.value, address)
     }
   }
 }

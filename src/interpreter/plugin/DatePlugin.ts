@@ -1,7 +1,12 @@
+/**
+ * @license
+ * Copyright (c) 2020 Handsoncode. All rights reserved.
+ */
+
 import {CellError, ErrorType, InternalCellValue, SimpleCellAddress} from '../../Cell'
 import {endOfMonth, offsetMonth} from '../../DateTimeHelper'
 import {format} from '../../format/format'
-import {ProcedureAst} from '../../parser'
+import {AstNodeType, ProcedureAst} from '../../parser'
 import {SimpleRangeValue} from '../InterpreterValue'
 import {FunctionPlugin} from './FunctionPlugin'
 
@@ -45,6 +50,9 @@ export class DatePlugin extends FunctionPlugin {
     if (ast.args.length !== 3) {
       return new CellError(ErrorType.NA)
     }
+    if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
+      return new CellError(ErrorType.NUM)
+    }
 
     const year = this.evaluateAst(ast.args[0], formulaAddress)
     const month = this.evaluateAst(ast.args[1], formulaAddress)
@@ -71,15 +79,15 @@ export class DatePlugin extends FunctionPlugin {
     const d = Math.trunc(coercedDay)
     let m = Math.trunc(coercedMonth)
     let y = Math.trunc(coercedYear)
-    if(y<this.interpreter.dateHelper.getEpochYearZero()) {
+    if (y < this.interpreter.dateHelper.getEpochYearZero()) {
       y += this.interpreter.dateHelper.getEpochYearZero()
     }
-    const delta = Math.floor( (m - 1) / 12 )
+    const delta = Math.floor((m - 1) / 12)
     y += delta
     m -= delta * 12
 
     const date = {year: y, month: m, day: 1}
-    if ( this.interpreter.dateHelper.isValidDate(date) ) {
+    if (this.interpreter.dateHelper.isValidDate(date)) {
       const ret = this.interpreter.dateHelper.dateToNumber(date) + (d - 1)
       if (this.interpreter.dateHelper.getWithinBounds(ret)) {
         return ret
@@ -91,6 +99,9 @@ export class DatePlugin extends FunctionPlugin {
   public eomonth(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
     if (ast.args.length !== 2) {
       return new CellError(ErrorType.NA)
+    }
+    if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
+      return new CellError(ErrorType.NUM)
     }
 
     const arg = this.evaluateAst(ast.args[0], formulaAddress)
@@ -119,6 +130,9 @@ export class DatePlugin extends FunctionPlugin {
     if (ast.args.length !== 1) {
       return new CellError(ErrorType.NA)
     }
+    if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
+      return new CellError(ErrorType.NUM)
+    }
 
     const arg = this.evaluateAst(ast.args[0], formulaAddress)
     if (arg instanceof SimpleRangeValue) {
@@ -134,6 +148,9 @@ export class DatePlugin extends FunctionPlugin {
   public days(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
     if (ast.args.length !== 2) {
       return new CellError(ErrorType.NA)
+    }
+    if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
+      return new CellError(ErrorType.NUM)
     }
 
     const endDate = this.evaluateAst(ast.args[0], formulaAddress)
@@ -169,6 +186,9 @@ export class DatePlugin extends FunctionPlugin {
     if (ast.args.length !== 1) {
       return new CellError(ErrorType.NA)
     }
+    if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
+      return new CellError(ErrorType.NUM)
+    }
 
     const arg = this.evaluateAst(ast.args[0], formulaAddress)
     if (arg instanceof SimpleRangeValue) {
@@ -194,6 +214,9 @@ export class DatePlugin extends FunctionPlugin {
     if (ast.args.length !== 1) {
       return new CellError(ErrorType.NA)
     }
+    if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
+      return new CellError(ErrorType.NUM)
+    }
 
     const arg = this.evaluateAst(ast.args[0], formulaAddress)
     if (arg instanceof SimpleRangeValue) {
@@ -218,6 +241,9 @@ export class DatePlugin extends FunctionPlugin {
   public text(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
     if (ast.args.length !== 2) {
       return new CellError(ErrorType.NA)
+    }
+    if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
+      return new CellError(ErrorType.NUM)
     }
 
     const dateArg = this.evaluateAst(ast.args[0], formulaAddress)

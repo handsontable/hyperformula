@@ -1,45 +1,55 @@
+/**
+ * @license
+ * Copyright (c) 2020 Handsoncode. All rights reserved.
+ */
+
 import {AbsoluteCellRange} from './AbsoluteCellRange'
-import {absolutizeDependencies} from './absolutizeDependencies'
-import {EmptyValue, invalidSimpleCellAddress, simpleCellAddress, SimpleCellAddress} from './Cell'
-import {CellContent, CellContentParser, isMatrix, RawCellContent} from './CellContentParser'
-import {ClipboardOperations} from './ClipboardOperations'
-import {
-  AddRowsCommand,
-  normalizeAddedIndexes,
-  normalizeRemovedIndexes,
-  Operations,
-  RemoveRowsCommand,
-} from './Operations'
+import {invalidSimpleCellAddress, simpleCellAddress, SimpleCellAddress} from './Cell'
+import {CellContentParser, isMatrix, RawCellContent} from './CellContentParser'
+import {ClipboardCell, ClipboardOperations} from './ClipboardOperations'
+import {AddColumnsCommand, AddRowsCommand, Operations, RemoveColumnsCommand, RemoveRowsCommand} from './Operations'
 import {ColumnSearchStrategy} from './ColumnSearch/ColumnSearchStrategy'
 import {ColumnsSpan} from './ColumnsSpan'
 import {Config} from './Config'
 import {ContentChanges} from './ContentChanges'
+import {AddressMapping, DependencyGraph, SheetMapping} from './DependencyGraph'
 import {
-  AddressMapping,
-  DependencyGraph,
-  MatrixVertex,
-  ParsingErrorVertex,
-  SheetMapping,
-  ValueCellVertex,
-} from './DependencyGraph'
-import {ValueCellVertexValue} from './DependencyGraph/ValueCellVertex'
-import {InvalidAddressError, InvalidArgumentsError, NoSheetWithIdError, NoSheetWithNameError} from './errors'
-import {buildMatrixVertex} from './GraphBuilder'
+  InvalidAddressError,
+  InvalidArgumentsError,
+  NoOperationToRedoError,
+  NoOperationToUndoError,
+  NoSheetWithIdError,
+  NoSheetWithNameError,
+  NothingToPasteError,
+  SheetSizeLimitExceededError
+} from './errors'
 import {Index} from './HyperFormula'
 import {LazilyTransformingAstService} from './LazilyTransformingAstService'
-import {ParserWithCaching, ProcedureAst} from './parser'
+import {ParserWithCaching} from './parser'
 import {RowsSpan} from './RowsSpan'
-import {Statistics, StatType} from './statistics'
-import {UndoRedo} from './UndoRedo'
-import {AddColumnsTransformer} from './dependencyTransformers/AddColumnsTransformer'
-import {RemoveColumnsTransformer} from './dependencyTransformers/RemoveColumnsTransformer'
-import {MoveCellsTransformer} from './dependencyTransformers/MoveCellsTransformer'
-import {RemoveSheetTransformer} from './dependencyTransformers/RemoveSheetTransformer'
+import {Statistics} from './statistics'
+import {
+  AddColumnsUndoEntry,
+  AddRowsUndoEntry,
+  AddSheetUndoEntry,
+  ClearSheetUndoEntry,
+  MoveCellsUndoEntry,
+  MoveColumnsUndoEntry,
+  MoveRowsUndoEntry,
+  PasteUndoEntry,
+  RemoveColumnsUndoEntry,
+  RemoveRowsUndoEntry,
+  RemoveSheetUndoEntry,
+  SetCellContentsUndoEntry,
+  SetSheetContentUndoEntry,
+  UndoRedo
+} from './UndoRedo'
+import {findBoundaries} from './Sheet'
 
 export class CrudOperations {
 
-  private changes: ContentChanges = ContentChanges.empty()
   private readonly clipboardOperations: ClipboardOperations
+  public readonly undoRedo: UndoRedo
   public readonly operations: Operations
 
   constructor(
@@ -57,114 +67,120 @@ export class CrudOperations {
     private readonly cellContentParser: CellContentParser,
     /** Service handling postponed CRUD transformations */
     private readonly lazilyTransformingAstService: LazilyTransformingAstService,
-    private readonly undoRedo: UndoRedo,
   ) {
-    this.clipboardOperations = new ClipboardOperations(this.dependencyGraph, this, this.parser, this.lazilyTransformingAstService)
-    this.operations = new Operations(this.dependencyGraph, this.parser, this.stats, this.lazilyTransformingAstService)
+    this.operations = new Operations(this.dependencyGraph, this.columnSearch, this.cellContentParser, this.parser, this.stats, this.lazilyTransformingAstService, this.config)
+    this.clipboardOperations = new ClipboardOperations(this.dependencyGraph, this.operations, this.parser, this.lazilyTransformingAstService, this.config)
+    this.undoRedo = new UndoRedo(this.config, this.operations)
   }
 
   public addRows(sheet: number, ...indexes: Index[]): void {
     const addRowsCommand = new AddRowsCommand(sheet, indexes)
     this.ensureItIsPossibleToAddRows(sheet, ...indexes)
+    this.undoRedo.clearRedoStack()
     this.clipboardOperations.abortCut()
-    const rowsAdditions = this.operations.addRows(addRowsCommand)
-    this.undoRedo.saveOperationAddRows(addRowsCommand, rowsAdditions)
+    this.operations.addRows(addRowsCommand)
+    this.undoRedo.saveOperation(new AddRowsUndoEntry(addRowsCommand))
   }
 
   public removeRows(sheet: number, ...indexes: Index[]): void {
     const removeRowsCommand = new RemoveRowsCommand(sheet, indexes)
     this.ensureItIsPossibleToRemoveRows(sheet, ...indexes)
+    this.undoRedo.clearRedoStack()
     this.clipboardOperations.abortCut()
     const rowsRemovals = this.operations.removeRows(removeRowsCommand)
-    this.undoRedo.saveOperationRemoveRows(removeRowsCommand, rowsRemovals)
+    this.undoRedo.saveOperation(new RemoveRowsUndoEntry(removeRowsCommand, rowsRemovals))
   }
 
   public addColumns(sheet: number, ...indexes: Index[]): void {
-    const normalizedIndexes = normalizeAddedIndexes(indexes)
+    const addColumnsCommand = new AddColumnsCommand(sheet, indexes)
     this.ensureItIsPossibleToAddColumns(sheet, ...indexes)
+    this.undoRedo.clearRedoStack()
     this.clipboardOperations.abortCut()
-    for (const index of normalizedIndexes) {
-      this.doAddColumns(sheet, index[0], index[1])
-    }
+    this.operations.addColumns(addColumnsCommand)
+    this.undoRedo.saveOperation(new AddColumnsUndoEntry(addColumnsCommand))
   }
 
   public removeColumns(sheet: number, ...indexes: Index[]): void {
-    const normalizedIndexes = normalizeRemovedIndexes(indexes)
+    const removeColumnsCommand = new RemoveColumnsCommand(sheet, indexes)
     this.ensureItIsPossibleToRemoveColumns(sheet, ...indexes)
+    this.undoRedo.clearRedoStack()
     this.clipboardOperations.abortCut()
-    for (const index of normalizedIndexes) {
-      this.doRemoveColumns(sheet, index[0], index[0] + index[1] - 1)
-    }
+    const columnsRemovals = this.operations.removeColumns(removeColumnsCommand)
+    this.undoRedo.saveOperation(new RemoveColumnsUndoEntry(removeColumnsCommand, columnsRemovals))
   }
 
   public moveCells(sourceLeftCorner: SimpleCellAddress, width: number, height: number, destinationLeftCorner: SimpleCellAddress): void {
-    this.ensureItIsPossibleToMoveCells(sourceLeftCorner, width, height, destinationLeftCorner)
+    this.undoRedo.clearRedoStack()
     this.clipboardOperations.abortCut()
-
-    const sourceRange = AbsoluteCellRange.spanFrom(sourceLeftCorner, width, height)
-    const targetRange = AbsoluteCellRange.spanFrom(destinationLeftCorner, width, height)
-
-    this.dependencyGraph.breakNumericMatricesInRange(sourceRange)
-    this.dependencyGraph.breakNumericMatricesInRange(targetRange)
-
-    const toRight = destinationLeftCorner.col - sourceLeftCorner.col
-    const toBottom = destinationLeftCorner.row - sourceLeftCorner.row
-    const toSheet = destinationLeftCorner.sheet
-
-    const valuesToRemove = this.dependencyGraph.valuesFromRange(targetRange)
-    this.columnSearch.removeValues(valuesToRemove)
-    const valuesToMove = this.dependencyGraph.valuesFromRange(sourceRange)
-    this.columnSearch.moveValues(valuesToMove, toRight, toBottom, toSheet)
-
-    this.stats.measure(StatType.TRANSFORM_ASTS, () => {
-      const transformation = new MoveCellsTransformer(sourceRange, toRight, toBottom, toSheet)
-      transformation.performEagerTransformations(this.dependencyGraph, this.parser)
-      this.lazilyTransformingAstService.addTransformation(transformation)
-    })
-
-    this.dependencyGraph.moveCells(sourceRange, toRight, toBottom, toSheet)
+    const { version, overwrittenCellsData } = this.operations.moveCells(sourceLeftCorner, width, height, destinationLeftCorner)
+    this.undoRedo.saveOperation(new MoveCellsUndoEntry(sourceLeftCorner, width, height, destinationLeftCorner, overwrittenCellsData, version))
   }
 
   public moveRows(sheet: number, startRow: number, numberOfRows: number, targetRow: number): void {
     this.ensureItIsPossibleToMoveRows(sheet, startRow, numberOfRows, targetRow)
-
-    this.addRows(sheet, [targetRow, numberOfRows])
-
-    if (targetRow < startRow) {
-      startRow += numberOfRows
-    }
-
-    const startAddress = simpleCellAddress(sheet, 0, startRow)
-    const targetAddress = simpleCellAddress(sheet, 0, targetRow)
-    this.moveCells(startAddress, Number.POSITIVE_INFINITY, numberOfRows, targetAddress)
-    this.removeRows(sheet, [startRow, numberOfRows])
+    this.undoRedo.clearRedoStack()
+    this.clipboardOperations.abortCut()
+    this.operations.moveRows(sheet, startRow, numberOfRows, targetRow)
+    this.undoRedo.saveOperation(new MoveRowsUndoEntry(sheet, startRow, numberOfRows, targetRow))
   }
 
   public moveColumns(sheet: number, startColumn: number, numberOfColumns: number, targetColumn: number): void {
     this.ensureItIsPossibleToMoveColumns(sheet, startColumn, numberOfColumns, targetColumn)
-
-    this.addColumns(sheet, [targetColumn, numberOfColumns])
-
-    if (targetColumn < startColumn) {
-      startColumn += numberOfColumns
-    }
-
-    const startAddress = simpleCellAddress(sheet, startColumn, 0)
-    const targetAddress = simpleCellAddress(sheet, targetColumn, 0)
-    this.moveCells(startAddress, numberOfColumns, Number.POSITIVE_INFINITY, targetAddress)
-    this.removeColumns(sheet, [startColumn, numberOfColumns])
+    this.undoRedo.clearRedoStack()
+    this.operations.moveColumns(sheet, startColumn, numberOfColumns, targetColumn)
+    this.undoRedo.saveOperation(new MoveColumnsUndoEntry(sheet, startColumn, numberOfColumns, targetColumn))
   }
 
   public cut(sourceLeftCorner: SimpleCellAddress, width: number, height: number): void {
     this.clipboardOperations.cut(sourceLeftCorner, width, height)
   }
 
+  public ensureItIsPossibleToCopy(sourceLeftCorner: SimpleCellAddress, width: number, height: number): void {
+    if (!isPositiveInteger(width)) {
+      throw new InvalidArgumentsError('width to be positive integer')
+    }
+    if (!isPositiveInteger(height)) {
+      throw new InvalidArgumentsError('height to be positive integer')
+    }
+  }
+
   public copy(sourceLeftCorner: SimpleCellAddress, width: number, height: number): void {
+    this.ensureItIsPossibleToCopy(sourceLeftCorner, width, height)
     this.clipboardOperations.copy(sourceLeftCorner, width, height)
   }
 
   public paste(targetLeftCorner: SimpleCellAddress): void {
-    this.clipboardOperations.paste(targetLeftCorner)
+    const clipboard = this.clipboardOperations.clipboard
+    if (clipboard === undefined) {
+      throw new NothingToPasteError()
+    } else if (this.clipboardOperations.isCutClipboard()) {
+      this.undoRedo.clearRedoStack()
+      const { version, overwrittenCellsData } = this.operations.moveCells(clipboard.sourceLeftCorner, clipboard.width, clipboard.height, targetLeftCorner)
+      this.clipboardOperations.abortCut()
+      this.undoRedo.saveOperation(new MoveCellsUndoEntry(clipboard.sourceLeftCorner, clipboard.width, clipboard.height, targetLeftCorner, overwrittenCellsData, version))
+    } else if (this.clipboardOperations.isCopyClipboard()) {
+      this.clipboardOperations.ensureItIsPossibleToCopyPaste(targetLeftCorner)
+      const targetRange = AbsoluteCellRange.spanFrom(targetLeftCorner, clipboard.width, clipboard.height)
+      const oldContent = this.operations.getRangeClipboardCells(targetRange)
+      this.undoRedo.clearRedoStack()
+      this.dependencyGraph.breakNumericMatricesInRange(targetRange)
+      for (const [address, clipboardCell] of clipboard.getContent(targetLeftCorner)) {
+        this.operations.restoreCell(address, clipboardCell)
+      }
+      this.undoRedo.saveOperation(new PasteUndoEntry(targetLeftCorner, oldContent, clipboard.content!))
+    }
+  }
+
+  public beginUndoRedoBatchMode(): void {
+    this.undoRedo.beginBatchMode()
+  }
+
+  public commitUndoRedoBatchMode(): void {
+    this.undoRedo.commitBatchMode()
+  }
+
+  public isClipboardEmpty(): boolean {
+    return this.clipboardOperations.clipboard === undefined
   }
 
   public clearClipboard(): void {
@@ -175,169 +191,123 @@ export class CrudOperations {
     if (name) {
       this.ensureItIsPossibleToAddSheet(name)
     }
-    const sheetId = this.sheetMapping.addSheet(name)
-    this.addressMapping.autoAddSheet(sheetId, [])
-    return this.sheetMapping.fetchDisplayName(sheetId)
+    this.undoRedo.clearRedoStack()
+    const addedSheetName = this.operations.addSheet(name)
+    this.undoRedo.saveOperation(new AddSheetUndoEntry(addedSheetName))
+    return addedSheetName
   }
 
   public removeSheet(sheetName: string): void {
     this.ensureSheetExists(sheetName)
+    this.undoRedo.clearRedoStack()
     this.clipboardOperations.abortCut()
-
     const sheetId = this.sheetMapping.fetch(sheetName)
-
-    this.dependencyGraph.removeSheet(sheetId)
-
-    this.stats.measure(StatType.TRANSFORM_ASTS, () => {
-      const transformation = new RemoveSheetTransformer(sheetId)
-      transformation.performEagerTransformations(this.dependencyGraph, this.parser)
-      this.lazilyTransformingAstService.addTransformation(transformation)
-    })
-
-    this.sheetMapping.removeSheet(sheetId)
-    this.columnSearch.removeSheet(sheetId)
+    const originalName = this.sheetMapping.fetchDisplayName(sheetId)
+    const oldSheetContent = this.operations.getSheetClipboardCells(sheetId)
+    const version = this.operations.removeSheet(sheetName)
+    this.undoRedo.saveOperation(new RemoveSheetUndoEntry(originalName, sheetId, oldSheetContent, version))
   }
 
   public clearSheet(sheetName: string): void {
     this.ensureSheetExists(sheetName)
+    this.undoRedo.clearRedoStack()
     this.clipboardOperations.abortCut()
-
     const sheetId = this.sheetMapping.fetch(sheetName)
-
-    this.dependencyGraph.clearSheet(sheetId)
-
-    this.columnSearch.removeSheet(sheetId)
+    const oldSheetContent = this.operations.getSheetClipboardCells(sheetId)
+    this.operations.clearSheet(sheetId)
+    this.undoRedo.saveOperation(new ClearSheetUndoEntry(sheetId, oldSheetContent))
   }
 
   public setCellContents(topLeftCornerAddress: SimpleCellAddress, cellContents: RawCellContent[][] | RawCellContent): void {
     if (!(cellContents instanceof Array)) {
-      this.setCellContent(topLeftCornerAddress, cellContents)
-      return
-    }
-    for (let i = 0; i < cellContents.length; i++) {
-      if (!(cellContents[i] instanceof Array)) {
-        throw new Error('Expected an array of arrays or a raw cell value.')
-      }
-      for (let j = 0; j < cellContents[i].length; j++) {
-        if (isMatrix(cellContents[i][j])) {
-          throw new Error('Cant change matrices in batch operation')
+      cellContents = [[cellContents]]
+    } else {
+      for (let i = 0; i < cellContents.length; i++) {
+        if (!(cellContents[i] instanceof Array)) {
+          throw new InvalidArgumentsError('an array of arrays or a raw cell value')
+        }
+        for (let j = 0; j < cellContents[i].length; j++) {
+          if (isMatrix(cellContents[i][j])) {
+            throw new Error('Cant change matrices in batch operation')
+          }
         }
       }
     }
 
+    this.ensureItIsPossibleToChangeCellContents(topLeftCornerAddress, cellContents)
+
+    this.undoRedo.clearRedoStack()
+    const modifiedCellContents: { address: SimpleCellAddress, newContent: RawCellContent, oldContent: ClipboardCell }[] = []
     for (let i = 0; i < cellContents.length; i++) {
       for (let j = 0; j < cellContents[i].length; j++) {
-        this.setCellContent({
+        const address = {
           sheet: topLeftCornerAddress.sheet,
           row: topLeftCornerAddress.row + i,
           col: topLeftCornerAddress.col + j,
-        }, cellContents[i][j])
+        }
+        this.clipboardOperations.abortCut()
+        const oldContent = this.operations.getClipboardCell(address)
+        this.operations.setCellContent(address, cellContents[i][j])
+        modifiedCellContents.push({ address, newContent: cellContents[i][j], oldContent })
       }
     }
+    this.undoRedo.saveOperation(new SetCellContentsUndoEntry(modifiedCellContents))
   }
 
   public setSheetContent(sheetName: string, values: RawCellContent[][]): void {
     this.ensureSheetExists(sheetName)
     const sheetId = this.sheetMapping.fetch(sheetName)
+    this.ensureItIsPossibleToChangeSheetContents(sheetId, values)
 
-    this.clearSheet(sheetName)
+    this.undoRedo.clearRedoStack()
+    this.clipboardOperations.abortCut()
     if (!(values instanceof Array)) {
       throw new Error('Expected an array of arrays.')
     }
+    const oldSheetContent = this.operations.getSheetClipboardCells(sheetId)
+    this.operations.clearSheet(sheetId)
     for (let i = 0; i < values.length; i++) {
       if (!(values[i] instanceof Array)) {
         throw new Error('Expected an array of arrays.')
       }
       for (let j = 0; j < values[i].length; j++) {
-        this.setCellContent({
-          sheet: sheetId,
-          row: i,
-          col: j,
-        }, values[i][j])
+        const address = simpleCellAddress(sheetId, j, i)
+        this.operations.setCellContent(address, values[i][j])
       }
     }
+    this.undoRedo.saveOperation(new SetSheetContentUndoEntry(sheetId, oldSheetContent, values))
   }
 
-  public setCellContent(address: SimpleCellAddress, newCellContent: RawCellContent): void {
-    this.ensureItIsPossibleToChangeContent(address)
+  public undo() {
+    if (this.undoRedo.isUndoStackEmpty()) {
+      throw new NoOperationToUndoError()
+    }
     this.clipboardOperations.abortCut()
+    this.undoRedo.undo()
+  }
 
-    const parsedCellContent = this.cellContentParser.parse(newCellContent)
-
-    let vertex = this.dependencyGraph.getCell(address)
-
-    if (vertex instanceof MatrixVertex && !vertex.isFormula() && !(parsedCellContent instanceof CellContent.Number)) {
-      this.dependencyGraph.breakNumericMatrix(vertex)
-      vertex = this.dependencyGraph.getCell(address)
+  public redo() {
+    if (this.undoRedo.isRedoStackEmpty()) {
+      throw new NoOperationToRedoError()
     }
-
-    if (vertex instanceof MatrixVertex && !vertex.isFormula() && parsedCellContent instanceof CellContent.Number) {
-      const newValue = parsedCellContent.value
-      const oldValue = this.dependencyGraph.getCellValue(address)
-      this.dependencyGraph.graph.markNodeAsSpecialRecentlyChanged(vertex)
-      vertex.setMatrixCellValue(address, newValue)
-      this.columnSearch.change(oldValue, newValue, address)
-      this.changes.addChange(newValue, address)
-    } else if (!(vertex instanceof MatrixVertex) && parsedCellContent instanceof CellContent.MatrixFormula) {
-      const {ast, errors, dependencies} = this.parser.parse(parsedCellContent.formula, address)
-      if (errors.length > 0) {
-        this.dependencyGraph.setParsingErrorToCell(address, new ParsingErrorVertex(errors, parsedCellContent.formulaWithBraces()))
-      } else {
-        const newVertex = buildMatrixVertex(ast as ProcedureAst, address)
-        if (newVertex instanceof ValueCellVertex) {
-          throw Error('What if new matrix vertex is not properly constructed?')
-        }
-        this.dependencyGraph.addNewMatrixVertex(newVertex)
-        this.dependencyGraph.processCellDependencies(absolutizeDependencies(dependencies, address), newVertex)
-        this.dependencyGraph.graph.markNodeAsSpecialRecentlyChanged(newVertex)
-      }
-    } else if (!(vertex instanceof MatrixVertex)) {
-      if (parsedCellContent instanceof CellContent.Formula) {
-        const {ast, errors, hasVolatileFunction, hasStructuralChangeFunction, dependencies} = this.parser.parse(parsedCellContent.formula, address)
-        if (errors.length > 0) {
-          this.dependencyGraph.setParsingErrorToCell(address, new ParsingErrorVertex(errors, parsedCellContent.formula))
-        } else {
-          this.dependencyGraph.setFormulaToCell(address, ast, absolutizeDependencies(dependencies, address), hasVolatileFunction, hasStructuralChangeFunction)
-        }
-      } else if (parsedCellContent instanceof CellContent.Empty) {
-        this.setCellEmpty(address)
-      } else if (parsedCellContent instanceof CellContent.MatrixFormula) {
-        throw new Error('Cant happen')
-      } else {
-        this.setValueToCell(parsedCellContent.value, address)
-      }
-    } else {
-      throw new Error('Illegal operation')
-    }
-  }
-
-  public setValueToCell(value: ValueCellVertexValue, address: SimpleCellAddress) {
-    const oldValue = this.dependencyGraph.getCellValue(address)
-    this.dependencyGraph.setValueToCell(address, value)
-    this.columnSearch.change(oldValue, value, address)
-    this.changes.addChange(value, address)
-  }
-
-  public setCellEmpty(address: SimpleCellAddress) {
-    const oldValue = this.dependencyGraph.getCellValue(address)
-    this.columnSearch.remove(oldValue, address)
-    this.changes.addChange(EmptyValue, address)
-    this.dependencyGraph.setCellEmpty(address)
-  }
-
-  public setFormulaToCellFromCache(formulaHash: string, address: SimpleCellAddress) {
-    const {ast, hasVolatileFunction, hasStructuralChangeFunction, dependencies} = this.parser.fetchCachedResult(formulaHash)
-    this.dependencyGraph.setFormulaToCell(address, ast, absolutizeDependencies(dependencies, address), hasVolatileFunction, hasStructuralChangeFunction)
+    this.clipboardOperations.abortCut()
+    this.undoRedo.redo()
   }
 
   public ensureItIsPossibleToAddRows(sheet: number, ...indexes: Index[]): void {
+    if (!this.sheetMapping.hasSheetWithId(sheet)) {
+      throw new NoSheetWithIdError(sheet)
+    }
+
+    const sheetHeight = this.dependencyGraph.getSheetHeight(sheet)
+    const newRowsCount = indexes.map(index => index[1]).reduce((a, b) => a + b, 0)
+    if (sheetHeight + newRowsCount > this.config.maxRows) {
+      throw new SheetSizeLimitExceededError()
+    }
+
     for (const [row, numberOfRowsToAdd] of indexes) {
       if (!isNonnegativeInteger(row) || !isPositiveInteger(numberOfRowsToAdd)) {
         throw new InvalidArgumentsError()
-      }
-
-      if (!this.sheetMapping.hasSheetWithId(sheet)) {
-        throw new NoSheetWithIdError(sheet)
       }
 
       if (isPositiveInteger(row)
@@ -371,13 +341,19 @@ export class CrudOperations {
   }
 
   public ensureItIsPossibleToAddColumns(sheet: number, ...indexes: Index[]): void {
+    if (!this.sheetMapping.hasSheetWithId(sheet)) {
+      throw new NoSheetWithIdError(sheet)
+    }
+
+    const sheetWidth = this.dependencyGraph.getSheetWidth(sheet)
+    const newColumnsCount = indexes.map(index => index[1]).reduce((a, b) => a + b, 0)
+    if (sheetWidth + newColumnsCount > this.config.maxColumns) {
+      throw new SheetSizeLimitExceededError()
+    }
+
     for (const [column, numberOfColumnsToAdd] of indexes) {
       if (!isNonnegativeInteger(column) || !isPositiveInteger(numberOfColumnsToAdd)) {
         throw new InvalidArgumentsError()
-      }
-
-      if (!this.sheetMapping.hasSheetWithId(sheet)) {
-        throw new NoSheetWithIdError(sheet)
       }
 
       if (isPositiveInteger(column)
@@ -408,29 +384,6 @@ export class CrudOperations {
       if (this.dependencyGraph.matrixMapping.isFormulaMatrixInColumns(columnsToRemove)) {
         throw Error('It is not possible to remove column within matrix')
       }
-    }
-  }
-
-  public ensureItIsPossibleToMoveCells(sourceLeftCorner: SimpleCellAddress, width: number, height: number, destinationLeftCorner: SimpleCellAddress): void {
-    if (
-      invalidSimpleCellAddress(sourceLeftCorner) ||
-      !((isPositiveInteger(width) && isPositiveInteger(height)) || isRowOrColumnRange(sourceLeftCorner, width, height)) ||
-      invalidSimpleCellAddress(destinationLeftCorner) ||
-      !this.sheetMapping.hasSheetWithId(sourceLeftCorner.sheet) ||
-      !this.sheetMapping.hasSheetWithId(destinationLeftCorner.sheet)
-    ) {
-      throw new InvalidArgumentsError()
-    }
-
-    const sourceRange = AbsoluteCellRange.spanFrom(sourceLeftCorner, width, height)
-    const targetRange = AbsoluteCellRange.spanFrom(destinationLeftCorner, width, height)
-
-    if (this.dependencyGraph.matrixMapping.isFormulaMatrixInRange(sourceRange)) {
-      throw new Error('It is not possible to move matrix')
-    }
-
-    if (this.dependencyGraph.matrixMapping.isFormulaMatrixInRange(targetRange)) {
-      throw new Error('It is not possible to replace cells with matrix')
     }
   }
 
@@ -501,77 +454,43 @@ export class CrudOperations {
     }
   }
 
+  public ensureItIsPossibleToChangeCellContents(address: SimpleCellAddress, content: RawCellContent[][]) {
+    const boundaries = findBoundaries(content)
+    const targetRange = AbsoluteCellRange.spanFrom(address, boundaries.width, boundaries.height)
+    this.ensureRangeInSizeLimits(targetRange)
+    for (const address of targetRange.addresses(this.dependencyGraph)) {
+      this.ensureItIsPossibleToChangeContent(address)
+    }
+  }
+
+  public ensureItIsPossibleToChangeSheetContents(sheetId: number, content: RawCellContent[][]) {
+    const boundaries = findBoundaries(content)
+    const targetRange = AbsoluteCellRange.spanFrom(simpleCellAddress(sheetId, 0, 0), boundaries.width, boundaries.height)
+    this.ensureRangeInSizeLimits(targetRange)
+  }
+
+  public ensureRangeInSizeLimits(range: AbsoluteCellRange): void {
+    if (range.exceedsSheetSizeLimits(this.config.maxColumns, this.config.maxRows)) {
+      throw new SheetSizeLimitExceededError()
+    }
+  }
+
+  public isThereSomethingToUndo() {
+    return !this.undoRedo.isUndoStackEmpty()
+  }
+
+  public isThereSomethingToRedo() {
+    return !this.undoRedo.isRedoStackEmpty()
+  }
+
   public getAndClearContentChanges(): ContentChanges {
-    const changes = this.changes
-    this.changes = ContentChanges.empty()
-    return changes
+    return this.operations.getAndClearContentChanges()
   }
 
   public ensureSheetExists(sheetName: string): void {
     if (!this.sheetMapping.hasSheetWithName(sheetName)) {
       throw new NoSheetWithNameError(sheetName)
     }
-  }
-
-  /**
-   * Add multiple columns to sheet </br>
-   * Does nothing if columns are outside of effective sheet size
-   *
-   * @param sheet - sheet id in which columns will be added
-   * @param column - column number above which the columns will be added
-   * @param numberOfColumns - number of columns to add
-   */
-  private doAddColumns(sheet: number, column: number, numberOfColumns: number = 1): void {
-    if (this.columnEffectivelyNotInSheet(column, sheet)) {
-      return
-    }
-
-    const addedColumns = ColumnsSpan.fromNumberOfColumns(sheet, column, numberOfColumns)
-
-    this.dependencyGraph.addColumns(addedColumns)
-    this.columnSearch.addColumns(addedColumns)
-
-    this.stats.measure(StatType.TRANSFORM_ASTS, () => {
-      const transformation = new AddColumnsTransformer(addedColumns)
-      transformation.performEagerTransformations(this.dependencyGraph, this.parser)
-      this.lazilyTransformingAstService.addTransformation(transformation)
-    })
-  }
-
-  /**
-   * Removes multiple columns from sheet. </br>
-   * Does nothing if columns are outside of effective sheet size.
-   *
-   * @param sheet - sheet id from which columns will be removed
-   * @param columnStart - number of the first column to be deleted
-   * @param columnEnd - number of the last row to be deleted
-   */
-  private doRemoveColumns(sheet: number, columnStart: number, columnEnd: number = columnStart): void {
-    if (this.columnEffectivelyNotInSheet(columnStart, sheet) || columnEnd < columnStart) {
-      return
-    }
-
-    const removedColumns = ColumnsSpan.fromColumnStartAndEnd(sheet, columnStart, columnEnd)
-
-    this.dependencyGraph.removeColumns(removedColumns)
-    this.columnSearch.removeColumns(removedColumns)
-
-    this.stats.measure(StatType.TRANSFORM_ASTS, () => {
-      const transformation = new RemoveColumnsTransformer(removedColumns)
-      transformation.performEagerTransformations(this.dependencyGraph, this.parser)
-      this.lazilyTransformingAstService.addTransformation(transformation)
-    })
-  }
-
-  /**
-   * Returns true if row number is outside of given sheet.
-   *
-   * @param column - row number
-   * @param sheet - sheet id number
-   */
-  private columnEffectivelyNotInSheet(column: number, sheet: number): boolean {
-    const width = this.addressMapping.getWidth(sheet)
-    return column >= width
   }
 
   private get addressMapping(): AddressMapping {
@@ -581,11 +500,6 @@ export class CrudOperations {
   private get sheetMapping(): SheetMapping {
     return this.dependencyGraph.sheetMapping
   }
-}
-
-function isRowOrColumnRange(leftCorner: SimpleCellAddress, width: number, height: number): boolean {
-  return (leftCorner.row === 0 && isPositiveInteger(width) && height === Number.POSITIVE_INFINITY)
-    || (leftCorner.col === 0 && isPositiveInteger(height) && width === Number.POSITIVE_INFINITY)
 }
 
 function isPositiveInteger(x: number): boolean {

@@ -3,7 +3,6 @@ import {Config} from '../../src/Config'
 import {SheetMapping} from '../../src/DependencyGraph'
 import {buildTranslationPackage, enGB} from '../../src/i18n'
 import {AstNodeType, ConcatenateOpAst, ParserWithCaching, ProcedureAst} from '../../src/parser'
-import '../testConfig'
 
 describe('Parser - Concatenate operators', () => {
   it('Greater than operator', () => {
@@ -20,6 +19,6 @@ describe('Parser - Concatenate operators', () => {
 
     const ast = parser.parse('=CONCATENATE("="&A6,"foo")', simpleCellAddress(0, 0, 0)).ast as ProcedureAst
     expect(ast.type).toBe(AstNodeType.FUNCTION_CALL)
-    expect(ast.args[0].type).toBe(AstNodeType.CONCATENATE_OP)
+    expect(ast.args[0]!.type).toBe(AstNodeType.CONCATENATE_OP)
   })
 })

@@ -1,3 +1,8 @@
+/**
+ * @license
+ * Copyright (c) 2020 Handsoncode. All rights reserved.
+ */
+
 import {EmptyValue, EmptyValueType} from '../Cell'
 
 /**

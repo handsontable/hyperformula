@@ -5,7 +5,6 @@ import {SheetMapping} from '../src/DependencyGraph'
 import {buildTranslationPackage, enGB} from '../src/i18n'
 import {checkMatrixSize, MatrixSize} from '../src/Matrix'
 import {ParserWithCaching} from '../src/parser'
-import './testConfig.ts'
 import {adr} from './testUtils'
 
 describe('Matrix size check tests', () => {

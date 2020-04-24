@@ -1,3 +1,8 @@
+/**
+ * @license
+ * Copyright (c) 2020 Handsoncode. All rights reserved.
+ */
+
 import {InternalCellValue, SimpleCellAddress} from './Cell'
 import {Matrix} from './Matrix'
 

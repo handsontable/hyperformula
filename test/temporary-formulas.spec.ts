@@ -1,6 +1,5 @@
 import {HyperFormula} from '../src'
 import {ErrorType} from '../src/Cell'
-import './testConfig'
 import {detailedError} from './testUtils'
 
 describe('Temporary formulas - normalization', () => {
