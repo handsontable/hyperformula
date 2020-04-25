@@ -3,9 +3,11 @@
  * Copyright (c) 2020 Handsoncode. All rights reserved.
  */
 
+import {SimpleCellAddress} from '../Cell'
 import {CellAddress} from './'
 import {ColumnAddress} from './ColumnAddress'
 import {RowAddress} from './RowAddress'
+import {AbsoluteCellRange, AbsoluteColumnRange, AbsoluteRowRange} from '../AbsoluteCellRange'
 
 export type RangeDependency = CellRangeDependency | ColumnRangeDependency | RowRangeDependency
 export type RelativeDependency = AddressDependency | RangeDependency
@@ -15,6 +17,10 @@ export class AddressDependency {
     public readonly dependency: CellAddress
   ) {
   }
+
+  public absolutize(baseAddress: SimpleCellAddress) {
+    return this.dependency.toSimpleCellAddress(baseAddress)
+  }
 }
 
 export class CellRangeDependency {
@@ -22,6 +28,13 @@ export class CellRangeDependency {
     public readonly start: CellAddress,
     public readonly end: CellAddress,
   ) {
+  }
+
+  public absolutize(baseAddress: SimpleCellAddress) {
+    return new AbsoluteCellRange(
+      this.start.toSimpleCellAddress(baseAddress),
+      this.end.toSimpleCellAddress(baseAddress)
+    )
   }
 }
 
@@ -31,6 +44,12 @@ export class ColumnRangeDependency {
     public readonly end: ColumnAddress,
   ) {
   }
+
+  public absolutize(baseAddress: SimpleCellAddress) {
+    const start = this.start.toSimpleColumnAddress(baseAddress)
+    const end = this.end.toSimpleColumnAddress(baseAddress)
+    return new AbsoluteColumnRange(start.sheet, start.col, end.col)
+  }
 }
 
 export class RowRangeDependency {
@@ -38,5 +57,11 @@ export class RowRangeDependency {
     public readonly start: RowAddress,
     public readonly end: RowAddress,
   ) {
+  }
+
+  public absolutize(baseAddress: SimpleCellAddress) {
+    const start = this.start.toSimpleRowAddress(baseAddress)
+    const end = this.end.toSimpleRowAddress(baseAddress)
+    return new AbsoluteRowRange(start.sheet, start.row, end.row)
   }
 }

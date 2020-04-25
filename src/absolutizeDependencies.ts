@@ -15,19 +15,5 @@ import {RelativeDependency, AddressDependency, CellRangeDependency, ColumnRangeD
  * @param baseAddress - base address with regard to which make a convertion
  */
 export const absolutizeDependencies = (deps: RelativeDependency[], baseAddress: SimpleCellAddress): CellDependency[] => {
-  return deps.map((dep) => {
-    if (dep instanceof CellRangeDependency) {
-      return new AbsoluteCellRange(dep.start.toSimpleCellAddress(baseAddress), dep.end.toSimpleCellAddress(baseAddress))
-    } else if (dep instanceof ColumnRangeDependency) {
-      const start = dep.start.toSimpleColumnAddress(baseAddress)
-      const end = dep.end.toSimpleColumnAddress(baseAddress)
-      return new AbsoluteColumnRange(start.sheet, start.col, end.col)
-    } else if (dep instanceof RowRangeDependency) {
-      const start = dep.start.toSimpleRowAddress(baseAddress)
-      const end = dep.end.toSimpleRowAddress(baseAddress)
-      return new AbsoluteRowRange(start.sheet, start.row, end.row)
-    } else {
-      return dep.dependency.toSimpleCellAddress(baseAddress)
-    }
-  })
+  return deps.map((dep) => dep.absolutize(baseAddress))
 }
