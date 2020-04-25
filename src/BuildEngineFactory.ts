@@ -20,7 +20,7 @@ import {buildLexerConfig, ParserWithCaching, Unparser} from './parser'
 import {Serialization} from './Serialization'
 import {EmptyStatistics, Statistics, StatType} from './statistics'
 import {SheetSizeLimitExceededError} from './errors'
-import {findBoundaries, Sheet, Sheets} from './Sheet'
+import {findBoundaries, Sheet, Sheets, validateAsSheet} from './Sheet'
 
 export type EngineState = {
   config: Config,
@@ -51,6 +51,7 @@ export class BuildEngineFactory {
     for (const sheetName in sheets) {
       if (Object.prototype.hasOwnProperty.call(sheets, sheetName)) {
         const sheet = sheets[sheetName]
+        validateAsSheet(sheet)
         const boundaries = findBoundaries(sheet)
         if (boundaries.height > config.maxRows || boundaries.width > config.maxColumns) {
           throw new SheetSizeLimitExceededError()
