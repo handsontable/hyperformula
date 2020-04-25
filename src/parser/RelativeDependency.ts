@@ -10,29 +10,33 @@ import {RowAddress} from './RowAddress'
 export type RangeDependency = CellRangeDependency | ColumnRangeDependency | RowRangeDependency
 export type RelativeDependency = AddressDependency | RangeDependency
 
-export enum RelativeDependencyType {
-  CellAddress,
-  CellRange,
-  ColumnRange,
-  RowRange,
+export class AddressDependency {
+  constructor(
+    public readonly dependency: CellAddress
+  ) {
+  }
 }
 
-export interface AddressDependency {
-  type: RelativeDependencyType.CellAddress,
-  dependency: CellAddress,
+export class CellRangeDependency {
+  constructor(
+    public readonly start: CellAddress,
+    public readonly end: CellAddress,
+  ) {
+  }
 }
 
-export interface CellRangeDependency {
-  type: RelativeDependencyType.CellRange,
-  dependency: [CellAddress, CellAddress],
+export class ColumnRangeDependency {
+  constructor(
+    public readonly start: ColumnAddress,
+    public readonly end: ColumnAddress,
+  ) {
+  }
 }
 
-export interface ColumnRangeDependency {
-  type: RelativeDependencyType.ColumnRange,
-  dependency: [ColumnAddress, ColumnAddress],
-}
-
-export interface RowRangeDependency {
-  type: RelativeDependencyType.RowRange,
-  dependency: [RowAddress, RowAddress],
+export class RowRangeDependency {
+  constructor(
+    public readonly start: RowAddress,
+    public readonly end: RowAddress,
+  ) {
+  }
 }
