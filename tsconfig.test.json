@@ -1,7 +1,9 @@
 {
   "compilerOptions": {
-    "outDir": "./temp-lib", 
+    "module": "commonjs",
+    "outDir": "./test-jasmine",
   },
   "extends": "./tsconfig",
-  "include": ["src", "test"]
+  "include": ["src", "test"],
+  "exclude": []
 }

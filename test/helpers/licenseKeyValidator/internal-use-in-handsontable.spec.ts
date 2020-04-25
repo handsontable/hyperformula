@@ -6,7 +6,7 @@
 import {HyperFormula} from '../../../src'
 
 describe('license key', () => {
-  it('should not warn a message about invalid key when "internal-use-in-handsontable" is used', () => {
+  xit('should not warn a message about invalid key when "internal-use-in-handsontable" is used', () => {
     spyOn(console, 'warn')
 
     HyperFormula.buildEmpty({

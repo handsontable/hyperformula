@@ -1,4 +1,3 @@
-import sinon from 'sinon'
 import {EmptyValue, HyperFormula} from '../../src'
 import {normalizeAddedIndexes, normalizeRemovedIndexes} from '../../src/Operations'
 import {adr, expectArrayWithSameContent} from '../testUtils'
@@ -12,7 +11,7 @@ describe('batch cruds', () => {
       ['bar'],
     ])
 
-    const evaluatorSpy = sinon.spy(engine.evaluator, 'partialRun')
+    const evaluatorSpy = spyOn(engine.evaluator, 'partialRun')
 
     engine.batch((e) => {
       e.setCellContents(adr('B1'), [['=A1']])
@@ -20,7 +19,7 @@ describe('batch cruds', () => {
       e.removeRows(0, [0, 1])
     })
 
-    expect(evaluatorSpy.calledOnce).toBe(true)
+    expect(evaluatorSpy).toHaveBeenCalledTimes(1)
     expect(engine.getCellValue(adr('A1'))).toEqual('foo')
     expect(engine.getCellValue(adr('A2'))).toEqual(EmptyValue)
     expect(engine.getCellValue(adr('A3'))).toEqual('bar')
@@ -34,7 +33,7 @@ describe('batch cruds', () => {
       ['bar'],
     ])
 
-    const evaluatorSpy = sinon.spy(engine.evaluator, 'partialRun')
+    const evaluatorSpy = spyOn(engine.evaluator, 'partialRun')
 
     try {
       engine.batch((e) => {
@@ -48,7 +47,7 @@ describe('batch cruds', () => {
       // empty line
     }
 
-    expect(evaluatorSpy.calledOnce).toBe(true)
+    expect(evaluatorSpy).toHaveBeenCalledTimes(1)
     expect(engine.getCellValue(adr('A1'))).toEqual('foo')
     expect(engine.getCellValue(adr('A2'))).toEqual(EmptyValue)
     expect(engine.getCellValue(adr('A3'))).toEqual('bar')

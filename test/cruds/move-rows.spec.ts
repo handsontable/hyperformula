@@ -211,7 +211,7 @@ describe('Move rows', () => {
     const changes = engine.moveRows(0, 1, 1, 3)
 
     expect(changes.length).toEqual(1)
-    expect(changes).toContainEqual(new ExportedCellChange(simpleCellAddress( 0, 1, 2), 1 ))
+    expect(changes).toEqual(jasmine.objectContaining([new ExportedCellChange(simpleCellAddress( 0, 1, 2), 1 )]))
   })
 
   it('should return #CYCLE when moving formula onto referred range', () => {

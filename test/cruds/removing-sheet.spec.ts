@@ -1,4 +1,3 @@
-import sinon from 'sinon'
 import {HyperFormula, ExportedCellChange} from '../../src'
 import {AbsoluteCellRange} from '../../src/AbsoluteCellRange'
 import {ErrorType, simpleCellAddress} from '../../src/Cell'
@@ -226,7 +225,7 @@ describe('remove sheet - adjust formula dependencies', () => {
     const changes = engine.removeSheet('Sheet2')
 
     expect(changes.length).toBe(1)
-    expect(changes).toContainEqual(new ExportedCellChange(simpleCellAddress(0, 0, 0), detailedError(ErrorType.REF)))
+    expect(changes).toEqual(jasmine.objectContaining([new ExportedCellChange(simpleCellAddress(0, 0, 0), detailedError(ErrorType.REF))]))
   })
 })
 
@@ -295,11 +294,11 @@ describe('remove sheet - adjust column index', () => {
       ['1'],
     ], { useColumnIndex: true })
     const index = engine.columnSearch as ColumnIndex
-    const removeSheetSpy = sinon.spy(index, 'removeSheet')
+    const removeSheetSpy = spyOn(index, 'removeSheet')
 
     engine.removeSheet('Sheet1')
 
-    expect(removeSheetSpy.called).toBe(true)
+    expect(removeSheetSpy).toHaveBeenCalled()
     expectArrayWithSameContent([], index.getValueIndex(0, 0, 1).index)
   })
 })

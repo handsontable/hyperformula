@@ -1,4 +1,3 @@
-import sinon from 'sinon'
 import {HyperFormula, ExportedCellChange} from '../../src'
 import {AbsoluteCellRange} from '../../src/AbsoluteCellRange'
 import {ColumnIndex} from '../../src/ColumnSearch/ColumnIndex'
@@ -450,14 +449,14 @@ describe('Removing columns - reevaluation', () => {
     const a2 = engine.addressMapping.getCell(adr('A2'))
     const a3 = engine.addressMapping.getCell(adr('A3'))
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const a2setCellValueSpy = sinon.spy(a2 as any, 'setCellValue')
+    const a2setCellValueSpy = spyOn(a2 as any, 'setCellValue')
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const a3setCellValueSpy = sinon.spy(a3 as any, 'setCellValue')
+    const a3setCellValueSpy = spyOn(a3 as any, 'setCellValue')
 
     engine.removeColumns(0, [1, 1])
 
-    expect(a2setCellValueSpy.called).toBe(true)
-    expect(a3setCellValueSpy.notCalled).toBe(true)
+    expect(a2setCellValueSpy).toHaveBeenCalled()
+    expect(a3setCellValueSpy).not.toHaveBeenCalled()
   })
 
   it('reevaluates cells which are dependent on structure changes', () => {
@@ -466,11 +465,11 @@ describe('Removing columns - reevaluation', () => {
     ])
     const d1 = engine.addressMapping.getCell(adr('D1'))
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const d1setCellValueSpy = sinon.spy(d1 as any, 'setCellValue')
+    const d1setCellValueSpy = spyOn(d1 as any, 'setCellValue')
 
     engine.removeColumns(0, [1, 1])
 
-    expect(d1setCellValueSpy.called).toBe(true)
+    expect(d1setCellValueSpy).toHaveBeenCalled()
     expect(extractRange(engine, adr('C1'))).toEqual(new AbsoluteCellRange(adr('A1'), adr('B1')))
   })
 
@@ -481,11 +480,11 @@ describe('Removing columns - reevaluation', () => {
 
     const c1 = engine.addressMapping.getCell(adr('C1'))
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const c1setCellValueSpy = sinon.spy(c1 as any, 'setCellValue')
+    const c1setCellValueSpy = spyOn(c1 as any, 'setCellValue')
 
     engine.removeColumns(0, [0, 2])
 
-    expect(c1setCellValueSpy.called).toBe(true)
+    expect(c1setCellValueSpy).toHaveBeenCalled()
     expectFunctionToHaveRefError(engine, adr('A1'))
   })
 
@@ -747,11 +746,11 @@ describe('Removing columns - sheet dimensions', () => {
     ])
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const recalcSpy = sinon.spy(engine.evaluator as any, 'partialRun')
+    const recalcSpy = spyOn(engine.evaluator as any, 'partialRun')
     engine.removeColumns(0, [1, 1])
     engine.removeColumns(0, [10, 6])
 
-    expect(recalcSpy.notCalled).toBe(true)
+    expect(recalcSpy).not.toHaveBeenCalled()
     expect(engine.getSheetDimensions(0)).toEqual({
       width: 1,
       height: 1,

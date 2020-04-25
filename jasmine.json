@@ -1,0 +1,13 @@
+{
+  "spec_dir": "test-jasmine/test",
+  "spec_files": [
+    "**/*[sS]pec.js"
+  ],
+  "helpers": [
+    "helper/babel.js",
+    "_setupFiles/bootstrap.js",
+    "helper/jsdom.js"
+  ],
+  "stopSpecOnExpectationFailure": false,
+  "random": true
+}
