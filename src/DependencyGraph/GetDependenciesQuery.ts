@@ -8,7 +8,7 @@ import {absolutizeDependencies} from '../absolutizeDependencies'
 import {SimpleCellAddress} from '../Cell'
 import {CellDependency} from '../CellDependency'
 import {LazilyTransformingAstService} from '../LazilyTransformingAstService'
-import {Ast, collectDependencies} from '../parser'
+import {Ast, collectDependencies, NamedExpressionDependency} from '../parser'
 import {FormulaCellVertex, MatrixVertex, Vertex} from './'
 import {AddressMapping} from './AddressMapping/AddressMapping'
 import {IGetDependenciesQuery} from './Graph'
@@ -42,6 +42,8 @@ export class GetDependenciesQuery implements IGetDependenciesQuery<Vertex> {
     return new Set(absoluteDeps.map((dep: CellDependency) => {
       if (dep instanceof AbsoluteCellRange) {
         return this.rangeMapping.fetchRange(dep.start, dep.end)
+      } else if (dep instanceof NamedExpressionDependency) {
+        throw "Not implemented yet"
       } else {
         return this.addressMapping.fetchCell(dep)
       }

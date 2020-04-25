@@ -12,7 +12,7 @@ import {Config} from '../Config'
 import {findSmallerRange} from '../interpreter/plugin/SumprodPlugin'
 import {LazilyTransformingAstService} from '../LazilyTransformingAstService'
 import {Maybe} from '../Maybe'
-import {Ast} from '../parser'
+import {Ast, NamedExpressionDependency} from '../parser'
 import {RowsSpan} from '../RowsSpan'
 import {Statistics, StatType} from '../statistics'
 import {
@@ -178,6 +178,8 @@ export class DependencyGraph {
         if (range.isFinite()) {
           this.correctInfiniteRangesDependenciesByRangeVertex(rangeVertex)
         }
+      } else if (absStartCell instanceof NamedExpressionDependency) {
+        throw "Not implemented yet"
       } else {
         this.graph.addEdge(this.fetchCellOrCreateEmpty(absStartCell), endVertex)
       }
