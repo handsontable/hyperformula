@@ -172,7 +172,7 @@ export class ParserWithCaching {
         return imageWithWhitespace('"' + ast.value + '"', ast.leadingWhitespace)
       }
       case AstNodeType.NAMED_EXPRESSION: {
-        return imageWithWhitespace(ast.namedExpression, ast.leadingWhitespace)
+        return imageWithWhitespace(ast.expressionName, ast.leadingWhitespace)
       }
       case AstNodeType.FUNCTION_CALL: {
         const args = ast.args.map((arg) => this.computeHashOfAstNode(arg)).join(this.config.functionArgSeparator)

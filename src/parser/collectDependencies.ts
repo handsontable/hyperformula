@@ -23,7 +23,7 @@ const collectDependenciesFn = (ast: Ast, functionsWhichDoesNotNeedArgumentsToBeC
     case AstNodeType.ERROR:
       return
     case AstNodeType.NAMED_EXPRESSION: {
-      dependenciesSet.push(new NamedExpressionDependency(ast.namedExpression))
+      dependenciesSet.push(new NamedExpressionDependency(ast.expressionName))
       return
     }
     case AstNodeType.CELL_REFERENCE: {

@@ -396,12 +396,12 @@ export const buildProcedureAst = (procedureName: string, args: Ast[], leadingWhi
 
 export interface NamedExpressionAst extends AstWithInternalWhitespace {
   type: AstNodeType.NAMED_EXPRESSION,
-  namedExpression: string,
+  expressionName: string,
 }
 
-export const buildNamedExpressionAst = (namedExpression: string, leadingWhitespace?: IToken): NamedExpressionAst => ({
+export const buildNamedExpressionAst = (expressionName: string, leadingWhitespace?: IToken): NamedExpressionAst => ({
   type: AstNodeType.NAMED_EXPRESSION,
-  namedExpression,
+  expressionName,
   leadingWhitespace: leadingWhitespace?.image,
 })
 

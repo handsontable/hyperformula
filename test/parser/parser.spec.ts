@@ -272,7 +272,7 @@ describe('ParserWithCaching', () => {
     const ast = parser.parse('= true', simpleCellAddress(0, 0, 0)).ast as NamedExpressionAst
 
     expect(ast.type).toBe(AstNodeType.NAMED_EXPRESSION)
-    expect(ast.namedExpression).toBe('true')
+    expect(ast.expressionName).toBe('true')
     expect(ast.leadingWhitespace).toBe(' ')
   })
 })

@@ -189,7 +189,7 @@ export class Interpreter {
         }
       }
       case AstNodeType.NAMED_EXPRESSION: {
-        const address = this.namedExpressions.getInternalNamedExpressionAddress(ast.namedExpression)
+        const address = this.namedExpressions.getInternalNamedExpressionAddress(ast.expressionName)
         if (address) {
           return this.dependencyGraph.getCellValue(address)
         } else {

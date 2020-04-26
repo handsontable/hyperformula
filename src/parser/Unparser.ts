@@ -54,8 +54,8 @@ export class Unparser {
         return imageWithWhitespace(rightPart, ast.leadingWhitespace)
       }
       case AstNodeType.NAMED_EXPRESSION: {
-        const originalNamedExpressionName = this.namedExpressionsStore.get(ast.namedExpression)?.name
-        return imageWithWhitespace(originalNamedExpressionName || ast.namedExpression, ast.leadingWhitespace)
+        const originalNamedExpressionName = this.namedExpressionsStore.get(ast.expressionName)?.name
+        return imageWithWhitespace(originalNamedExpressionName || ast.expressionName, ast.leadingWhitespace)
       }
       case AstNodeType.CELL_REFERENCE: {
         let image
