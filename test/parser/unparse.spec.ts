@@ -187,6 +187,17 @@ describe('Unparse', () => {
     expect(unparsed).toEqual('=SomeWEIRD_name')
   })
 
+  it('#unparse nonexisting named expression returns original input', () => {
+    const namedExpressionsStore = new NamedExpressionsStore()
+    const unparser = new Unparser(config, lexerConfig, sheetMapping.fetchDisplayName, namedExpressionsStore)
+    const formula = '=someWeird_Name'
+    const ast = parser.parse(formula, simpleCellAddress(0, 0, 0)).ast
+
+    const unparsed = unparser.unparse(ast, adr('A1'))
+
+    expect(unparsed).toEqual('=someWeird_Name')
+  })
+
   it('#unparse forgets about OFFSET', () => {
     const formula = '=OFFSET(C3, 1, 1)'
     const ast = parser.parse(formula, simpleCellAddress(0, 0, 0)).ast

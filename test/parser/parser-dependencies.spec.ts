@@ -116,7 +116,7 @@ describe('Parsing collecting dependencies', () => {
     const dependencies = absolutizeDependencies(parseResult.dependencies, adr('A1'))
 
     expect(dependencies).toEqual([
-      new NamedExpressionDependency('foo'),
+      new NamedExpressionDependency('FOO'),
       new NamedExpressionDependency('bar'),
     ])
   })

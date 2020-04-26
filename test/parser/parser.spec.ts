@@ -275,15 +275,6 @@ describe('ParserWithCaching', () => {
     expect(ast.namedExpression).toBe('true')
     expect(ast.leadingWhitespace).toBe(' ')
   })
-
-  it('named expression name is normalized', () => {
-    const parser = new ParserWithCaching(new Config(), new SheetMapping(buildTranslationPackage(enGB)).get)
-
-    const ast = parser.parse('=TRuE', simpleCellAddress(0, 0, 0)).ast as NamedExpressionAst
-
-    expect(ast.type).toBe(AstNodeType.NAMED_EXPRESSION)
-    expect(ast.namedExpression).toBe('true')
-  })
 })
 
 describe('cell references and ranges', () => {

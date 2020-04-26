@@ -447,8 +447,7 @@ export class FormulaParser extends EmbeddedActionsParser {
 
   private namedExpressionExpression: AstRule = this.RULE('namedExpressionExpression', () => {
     const name = this.CONSUME(NamedExpression) as IExtendedToken
-    const normalizedName = name.image.toLowerCase()
-    return buildNamedExpressionAst(normalizedName, name.leadingWhitespace)
+    return buildNamedExpressionAst(name.image, name.leadingWhitespace)
   })
 
   /**
