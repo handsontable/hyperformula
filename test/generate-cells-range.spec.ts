@@ -5,13 +5,13 @@ import {DependencyGraph} from '../src/DependencyGraph'
 import {LazilyTransformingAstService} from '../src'
 import {Config} from '../src/Config'
 import {Statistics} from '../src/statistics/Statistics'
-import {NamedExpressions, NamedExpressionsStore} from '../src/NamedExpressions'
+import {NamedExpressions} from '../src/NamedExpressions'
 
 describe('generateCellsFromRange', () => {
   const config = new Config()
   const stats = new Statistics()
   const lazilyTransformingAstService = new LazilyTransformingAstService(stats)
-  const dependencyGraph = DependencyGraph.buildEmpty(lazilyTransformingAstService, config, stats, new NamedExpressions(new NamedExpressionsStore()))
+  const dependencyGraph = DependencyGraph.buildEmpty(lazilyTransformingAstService, config, stats, new NamedExpressions())
   const generateCellsFromRange = (range: AbsoluteCellRange): SimpleCellAddress[] => {
     return Array.from(range.addresses(dependencyGraph))
   }

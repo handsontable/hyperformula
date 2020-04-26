@@ -14,7 +14,7 @@ import {DependencyGraph} from './DependencyGraph'
 import {Evaluator} from './Evaluator'
 import {GraphBuilder} from './GraphBuilder'
 import {UIElement} from './i18n'
-import {NamedExpressions, NamedExpressionsStore} from './NamedExpressions'
+import {NamedExpressions} from './NamedExpressions'
 import {NumberLiteralHelper} from './NumberLiteralHelper'
 import {buildLexerConfig, ParserWithCaching, Unparser} from './parser'
 import {Serialization} from './Serialization'
@@ -42,8 +42,7 @@ export class BuildEngineFactory {
   private static buildEngine(config: Config, sheets: Sheets = {}, stats: Statistics = config.useStats ? new Statistics() : new EmptyStatistics()): EngineState {
     stats.start(StatType.BUILD_ENGINE_TOTAL)
 
-    const namedExpressionsStore = new NamedExpressionsStore()
-    const namedExpressions = new NamedExpressions(namedExpressionsStore)
+    const namedExpressions = new NamedExpressions()
     const lazilyTransformingAstService = new LazilyTransformingAstService(stats)
     const dependencyGraph = DependencyGraph.buildEmpty(lazilyTransformingAstService, config, stats, namedExpressions)
     const columnSearch = buildColumnSearchStrategy(dependencyGraph, config, stats)

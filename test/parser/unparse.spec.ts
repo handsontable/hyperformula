@@ -2,7 +2,7 @@ import {HyperFormula} from '../../src'
 import {simpleCellAddress} from '../../src/Cell'
 import {Config} from '../../src/Config'
 import {SheetMapping} from '../../src/DependencyGraph'
-import {NamedExpressionsStore, NamedExpressions} from '../../src/NamedExpressions'
+import {NamedExpressions} from '../../src/NamedExpressions'
 import {buildTranslationPackage, enGB, plPL} from '../../src/i18n'
 import {AstNodeType, buildLexerConfig, ParserWithCaching, Unparser} from '../../src/parser'
 import {adr, unregisterAllLanguages} from '../testUtils'
@@ -15,7 +15,7 @@ describe('Unparse', () => {
   sheetMapping.addSheet('Sheet2')
   sheetMapping.addSheet('Sheet with spaces')
   const parser = new ParserWithCaching(config, sheetMapping.get)
-  const namedExpressions = new NamedExpressions(new NamedExpressionsStore())
+  const namedExpressions = new NamedExpressions()
   const unparser = new Unparser(config, lexerConfig, sheetMapping.fetchDisplayName, namedExpressions)
 
 
@@ -176,7 +176,7 @@ describe('Unparse', () => {
   })
 
   it('#unparse named expression returns original form', () => {
-    const namedExpressions = new NamedExpressions(new NamedExpressionsStore())
+    const namedExpressions = new NamedExpressions()
     namedExpressions.addNamedExpression("SomeWEIRD_name")
     const unparser = new Unparser(config, lexerConfig, sheetMapping.fetchDisplayName, namedExpressions)
     const formula = '=someWeird_Name'
@@ -188,7 +188,7 @@ describe('Unparse', () => {
   })
 
   it('#unparse nonexisting named expression returns original input', () => {
-    const namedExpressions = new NamedExpressions(new NamedExpressionsStore())
+    const namedExpressions = new NamedExpressions()
     const unparser = new Unparser(config, lexerConfig, sheetMapping.fetchDisplayName, namedExpressions)
     const formula = '=someWeird_Name'
     const ast = parser.parse(formula, simpleCellAddress(0, 0, 0)).ast

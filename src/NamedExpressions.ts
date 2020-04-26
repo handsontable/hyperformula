@@ -15,7 +15,7 @@ export class NamedExpression {
   }
 }
 
-export class NamedExpressionsStore {
+class NamedExpressionsStore {
   private readonly mapping = new Map<string, NamedExpression>()
   private readonly rowMapping = new Map<number, NamedExpression>()
 
@@ -62,9 +62,9 @@ export class NamedExpressionsStore {
 export class NamedExpressions {
   public static SHEET_FOR_WORKBOOK_EXPRESSIONS = -1
   private nextNamedExpressionRow: number = 0
+  public readonly workbookStore: NamedExpressionsStore = new NamedExpressionsStore()
 
   constructor(
-    public readonly workbookStore: NamedExpressionsStore = new NamedExpressionsStore(),
   ) {
   }
 

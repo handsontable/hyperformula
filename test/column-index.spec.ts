@@ -4,7 +4,7 @@ import {AbsoluteCellRange} from '../src/AbsoluteCellRange'
 import {ErrorType, simpleCellAddress} from '../src/Cell'
 import {ColumnIndex} from '../src/ColumnSearch/ColumnIndex'
 import {DependencyGraph} from '../src/DependencyGraph/DependencyGraph'
-import {NamedExpressions, NamedExpressionsStore} from '../src/NamedExpressions'
+import {NamedExpressions} from '../src/NamedExpressions'
 import {ColumnsSpan} from '../src/ColumnsSpan'
 import {Config} from '../src/Config'
 import {Matrix} from '../src/Matrix'
@@ -15,8 +15,7 @@ import {AddRowsTransformer} from '../src/dependencyTransformers/AddRowsTransform
 import {RemoveRowsTransformer} from '../src/dependencyTransformers/RemoveRowsTransformer'
 
 const buildEmpty = (transformingService: LazilyTransformingAstService, config: Config, statistics: Statistics): ColumnIndex => {
-  const namedExpressionsStore = new NamedExpressionsStore()
-  const dependencyGraph = DependencyGraph.buildEmpty(transformingService, config, statistics, new NamedExpressions(namedExpressionsStore))
+  const dependencyGraph = DependencyGraph.buildEmpty(transformingService, config, statistics, new NamedExpressions())
   return new ColumnIndex(dependencyGraph, config, statistics)
 }
 
