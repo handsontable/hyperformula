@@ -262,5 +262,48 @@ describe("Named expressions - in formula usage", () => {
     const fooVertex = engine.dependencyGraph.namedExpressionVertex('FOO')!
     const a1 = engine.dependencyGraph.fetchCell(adr('A1'))
     expect(engine.graph.existsEdge(fooVertex, a1)).toBe(true)
+    expect(engine.getCellValue(adr('A1'))).toEqual(52)
+  })
+
+  it('NAME error when there is no such named expression', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=FOO']
+    ])
+
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NAME))
+  })
+
+  it('named expression dependency works if named expression was defined later', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=FOO']
+    ])
+
+    engine.addNamedExpression('FOO', '=42')
+
+    const fooVertex = engine.dependencyGraph.namedExpressionVertex('FOO')!
+    const a1 = engine.dependencyGraph.fetchCell(adr('A1'))
+    expect(engine.graph.existsEdge(fooVertex, a1)).toBe(true)
+    expect(engine.getCellValue(adr('A1'))).toEqual(42)
+  })
+
+  it('removed named expression returns NAME error', () => {
+    const engine = HyperFormula.buildFromArray([])
+    engine.addNamedExpression('FOO', '=42')
+    engine.setCellContents(adr('A1'), '=FOO+10')
+
+    engine.removeNamedExpression('FOO')
+
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NAME))
+  })
+
+  it('removing node dependent on named expression', () => {
+    const engine = HyperFormula.buildFromArray([])
+    engine.addNamedExpression('FOO', '=42')
+    engine.setCellContents(adr('A1'), '=FOO+10')
+
+    engine.setCellContents(adr('A1'), null)
+
+    const fooVertex = engine.dependencyGraph.namedExpressionVertex('FOO')!
+    expect(engine.graph.adjacentNodes(fooVertex).size).toBe(0)
   })
 })

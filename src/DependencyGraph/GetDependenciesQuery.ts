@@ -45,7 +45,8 @@ export class GetDependenciesQuery implements IGetDependenciesQuery<Vertex> {
       if (dep instanceof AbsoluteCellRange) {
         return this.rangeMapping.fetchRange(dep.start, dep.end)
       } else if (dep instanceof NamedExpressionDependency) {
-        throw "Not implemented yet"
+        const address = this.namedExpressions.getInternalMaybeNotAddedNamedExpressionAddress(dep.name)
+        return this.addressMapping.fetchCell(address)
       } else {
         return this.addressMapping.fetchCell(dep)
       }

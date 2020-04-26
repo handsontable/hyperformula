@@ -193,7 +193,7 @@ export class Interpreter {
         if (address) {
           return this.dependencyGraph.getCellValue(address)
         } else {
-          throw "Not implemented yet"
+          return new CellError(ErrorType.NAME)
         }
       }
       case AstNodeType.CELL_RANGE: {

@@ -183,24 +183,16 @@ export class DependencyGraph {
         }
       } else if (absStartCell instanceof NamedExpressionDependency) {
         const namedExpressionVertex = this.namedExpressionVertex(absStartCell.name)
-        if (namedExpressionVertex) {
-          this.graph.addEdge(namedExpressionVertex, endVertex)
-        } else {
-          throw "Not sure yet what to do"
-        }
+        this.graph.addEdge(namedExpressionVertex, endVertex)
       } else {
         this.graph.addEdge(this.fetchCellOrCreateEmpty(absStartCell), endVertex)
       }
     })
   }
 
-  public namedExpressionVertex(expressionName: string): Maybe<CellVertex> {
-    const address = this.namedExpressions.getInternalNamedExpressionAddress(expressionName)
-    if (address) {
-      return this.fetchCell(address)
-    } else {
-      return undefined
-    }
+  public namedExpressionVertex(expressionName: string): CellVertex {
+    const address = this.namedExpressions.getInternalMaybeNotAddedNamedExpressionAddress(expressionName)
+    return this.fetchCellOrCreateEmpty(address)
   }
 
   private correctInfiniteRangesDependenciesByRangeVertex(vertex: RangeVertex) {
