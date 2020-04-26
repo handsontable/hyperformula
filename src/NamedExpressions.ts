@@ -108,7 +108,7 @@ export class NamedExpressions {
     return /^[A-Za-z\u00C0-\u02AF_][A-Za-z0-9\u00C0-\u02AF\._]*$/.test(expressionName)
   }
 
-  public addNamedExpression(expressionName: string, expression: RawCellContent): void {
+  public addNamedExpression(expressionName: string, expression: RawCellContent): NamedExpression {
     if (!this.isNameValid(expressionName)) {
       throw new Error('Name of Named Expression is invalid')
     }
@@ -116,9 +116,9 @@ export class NamedExpressions {
       throw new Error('Name of Named Expression already taken')
     }
     const namedExpression = new NamedExpression(expressionName, this.nextNamedExpressionRow)
-    this.storeExpressionInCell(namedExpression, expression)
     this.nextNamedExpressionRow++
     this.workbookStore.add(namedExpression)
+    return namedExpression
   }
 
   public getInternalNamedExpressionAddress(expressionName: string): SimpleCellAddress | null {

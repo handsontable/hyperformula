@@ -4,6 +4,7 @@
  */
 
 import {AbsoluteCellRange} from './AbsoluteCellRange'
+import {absolutizeDependencies} from './absolutizeDependencies'
 import {CellType, CellValueType, getCellType, getCellValueType, NoErrorCellValue, SimpleCellAddress} from './Cell'
 import {CellContent, CellContentParser, RawCellContent} from './CellContentParser'
 import {CellValue, ExportedChange, Exporter} from './CellValue'
@@ -1428,7 +1429,9 @@ export class HyperFormula implements TypedEmitter {
     if (!this._namedExpressions.isNameAvailable(expressionName)) {
       throw new NamedExpressionNameIsAlreadyTaken(expressionName)
     }
-    this._namedExpressions.addNamedExpression(expressionName, expression)
+    const namedExpression = this._namedExpressions.addNamedExpression(expressionName, expression)
+    const address = this._namedExpressions.getInternalNamedExpressionAddress(expressionName)!
+    this.storeExpressionInCell(address, expression)
     const changes = this.recomputeIfDependencyGraphNeedsIt()
     this._emitter.emit(Events.NamedExpressionAdded, expressionName, changes)
     return changes
@@ -1679,6 +1682,20 @@ export class HyperFormula implements TypedEmitter {
       return exportedChanges
     } else {
       return []
+    }
+  }
+
+  private storeExpressionInCell(address: SimpleCellAddress, expression: RawCellContent) {
+    const parsedCellContent = this._cellContentParser.parse(expression)
+    if (parsedCellContent instanceof CellContent.MatrixFormula) {
+      throw new Error('Matrix formulas are not supported')
+    } else if (parsedCellContent instanceof CellContent.Formula) {
+      const {ast, hasVolatileFunction, hasStructuralChangeFunction, dependencies} = this._parser.parse(parsedCellContent.formula, address)
+      this._dependencyGraph.setFormulaToCell(address, ast, absolutizeDependencies(dependencies, address), hasVolatileFunction, hasStructuralChangeFunction)
+    } else if (parsedCellContent instanceof CellContent.Empty) {
+      this._crudOperations.operations.setCellEmpty(address)
+    } else {
+      this._crudOperations.operations.setValueToCell(parsedCellContent.value, address)
     }
   }
 }
