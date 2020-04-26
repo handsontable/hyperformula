@@ -12,7 +12,7 @@ import {ColumnSearchStrategy} from './ColumnSearch/ColumnSearchStrategy'
 import {ColumnsSpan} from './ColumnsSpan'
 import {Config} from './Config'
 import {ContentChanges} from './ContentChanges'
-import {AddressMapping, DependencyGraph, SheetMapping} from './DependencyGraph'
+import {AddressMapping, DependencyGraph, SheetMapping, SparseStrategy} from './DependencyGraph'
 import {
   InvalidAddressError,
   InvalidArgumentsError,
@@ -71,6 +71,8 @@ export class CrudOperations {
     this.operations = new Operations(this.dependencyGraph, this.columnSearch, this.cellContentParser, this.parser, this.stats, this.lazilyTransformingAstService, this.config)
     this.clipboardOperations = new ClipboardOperations(this.dependencyGraph, this.operations, this.parser, this.lazilyTransformingAstService, this.config)
     this.undoRedo = new UndoRedo(this.config, this.operations)
+
+    this.allocateNamedExpressionAddressSpace()
   }
 
   public addRows(sheet: number, ...indexes: Index[]): void {
@@ -499,6 +501,10 @@ export class CrudOperations {
 
   private get sheetMapping(): SheetMapping {
     return this.dependencyGraph.sheetMapping
+  }
+
+  private allocateNamedExpressionAddressSpace() {
+    this.dependencyGraph.addressMapping.addSheet(-1, new SparseStrategy(0, 0))
   }
 }
 

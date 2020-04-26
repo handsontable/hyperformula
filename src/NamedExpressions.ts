@@ -72,7 +72,6 @@ export class NamedExpressions {
     private readonly parser: ParserWithCaching,
     private readonly crudOperations: CrudOperations,
   ) {
-    dependencyGraph.addressMapping.addSheet(-1, new SparseStrategy(0, 0))
   }
 
   public doesNamedExpressionExist(expressionName: string): boolean {
