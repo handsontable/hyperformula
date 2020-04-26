@@ -251,3 +251,16 @@ describe('Named expressions', () => {
     expect(engine.getNamedExpressionFormula('myName.1')).toBeUndefined()
   })
 })
+
+describe("Named expressions - in formula usage", () => {
+  it('adds edge to dependency', () => {
+    const engine = HyperFormula.buildFromArray([])
+    engine.addNamedExpression('FOO', '=42')
+
+    engine.setCellContents(adr('A1'), '=FOO+10')
+
+    const fooVertex = engine.dependencyGraph.namedExpressionVertex('FOO')!
+    const a1 = engine.dependencyGraph.fetchCell(adr('A1'))
+    expect(engine.graph.existsEdge(fooVertex, a1)).toBe(true)
+  })
+})

@@ -15,6 +15,7 @@ import {Maybe} from '../Maybe'
 import {Ast, NamedExpressionDependency} from '../parser'
 import {RowsSpan} from '../RowsSpan'
 import {Statistics, StatType} from '../statistics'
+import {NamedExpressions} from '../NamedExpressions'
 import {
   CellVertex,
   EmptyCellVertex,
@@ -40,18 +41,19 @@ export class DependencyGraph {
    * - empty cell has associated EmptyCellVertex if and only if it is a dependency (possibly indirect, through range) to some formula
    */
 
-  public static buildEmpty(lazilyTransformingAstService: LazilyTransformingAstService, config: Config, stats: Statistics) {
+  public static buildEmpty(lazilyTransformingAstService: LazilyTransformingAstService, config: Config, stats: Statistics, namedExpressions: NamedExpressions) {
     const addressMapping = new AddressMapping(config.chooseAddressMappingPolicy)
     const rangeMapping = new RangeMapping()
     return new DependencyGraph(
       addressMapping,
       rangeMapping,
-      new Graph<Vertex>(new GetDependenciesQuery(rangeMapping, addressMapping, lazilyTransformingAstService, config.functionsWhichDoesNotNeedArgumentsToBeComputed())),
+      new Graph<Vertex>(new GetDependenciesQuery(rangeMapping, addressMapping, lazilyTransformingAstService, config.functionsWhichDoesNotNeedArgumentsToBeComputed(), namedExpressions)),
       new SheetMapping(config.translationPackage),
       new MatrixMapping(),
       stats,
       lazilyTransformingAstService,
       config.functionsWhichDoesNotNeedArgumentsToBeComputed(),
+      namedExpressions
     )
   }
 
@@ -64,6 +66,7 @@ export class DependencyGraph {
     public readonly stats: Statistics,
     public readonly lazilyTransformingAstService: LazilyTransformingAstService,
     public readonly functionsWhichDoesNotNeedArgumentsToBeComputed: Set<string>,
+    public readonly namedExpressions: NamedExpressions,
   ) {
   }
 
@@ -179,11 +182,25 @@ export class DependencyGraph {
           this.correctInfiniteRangesDependenciesByRangeVertex(rangeVertex)
         }
       } else if (absStartCell instanceof NamedExpressionDependency) {
-        throw "Not implemented yet"
+        const namedExpressionVertex = this.namedExpressionVertex(absStartCell.name)
+        if (namedExpressionVertex) {
+          this.graph.addEdge(namedExpressionVertex, endVertex)
+        } else {
+          throw "Not sure yet what to do"
+        }
       } else {
         this.graph.addEdge(this.fetchCellOrCreateEmpty(absStartCell), endVertex)
       }
     })
+  }
+
+  public namedExpressionVertex(expressionName: string): Maybe<CellVertex> {
+    const address = this.namedExpressions.getInternalNamedExpressionAddress(expressionName)
+    if (address) {
+      return this.fetchCell(address)
+    } else {
+      return undefined
+    }
   }
 
   private correctInfiniteRangesDependenciesByRangeVertex(vertex: RangeVertex) {

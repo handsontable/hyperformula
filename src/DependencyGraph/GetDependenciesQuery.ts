@@ -13,6 +13,7 @@ import {FormulaCellVertex, MatrixVertex, Vertex} from './'
 import {AddressMapping} from './AddressMapping/AddressMapping'
 import {IGetDependenciesQuery} from './Graph'
 import {RangeMapping} from './RangeMapping'
+import {NamedExpressions} from '../NamedExpressions'
 
 export class GetDependenciesQuery implements IGetDependenciesQuery<Vertex> {
   constructor(
@@ -20,6 +21,7 @@ export class GetDependenciesQuery implements IGetDependenciesQuery<Vertex> {
     private readonly addressMapping: AddressMapping,
     private readonly lazilyTransformingAstService: LazilyTransformingAstService,
     private readonly functionsWhichDoesNotNeedArgumentsToBeComputed: Set<string>,
+    private readonly namedExpressions: NamedExpressions,
   ) {
   }
 

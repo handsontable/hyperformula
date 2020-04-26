@@ -27,6 +27,7 @@ import {
 import {InterpreterValue, SimpleRangeValue} from './InterpreterValue'
 import {concatenate} from './text'
 import {NumberLiteralHelper} from '../NumberLiteralHelper'
+import {NamedExpressions} from '../NamedExpressions'
 
 export class Interpreter {
   private gpu?: GPU.GPU
@@ -40,6 +41,7 @@ export class Interpreter {
     public readonly stats: Statistics,
     public readonly dateHelper: DateTimeHelper,
     public readonly numberLiteralsHelper: NumberLiteralHelper,
+    public readonly namedExpressions: NamedExpressions,
   ) {
     this.registerPlugins(this.config.allFunctionPlugins())
     this.arithmeticHelper = new ArithmeticHelper(config, dateHelper, numberLiteralsHelper)
@@ -187,7 +189,12 @@ export class Interpreter {
         }
       }
       case AstNodeType.NAMED_EXPRESSION: {
-        throw "Not implemented yet"
+        const address = this.namedExpressions.getInternalNamedExpressionAddress(ast.namedExpression)
+        if (address) {
+          return this.dependencyGraph.getCellValue(address)
+        } else {
+          throw "Not implemented yet"
+        }
       }
       case AstNodeType.CELL_RANGE: {
         if (!this.rangeSpansOneSheet(ast)) {

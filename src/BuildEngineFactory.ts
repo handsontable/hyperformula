@@ -42,8 +42,10 @@ export class BuildEngineFactory {
   private static buildEngine(config: Config, sheets: Sheets = {}, stats: Statistics = config.useStats ? new Statistics() : new EmptyStatistics()): EngineState {
     stats.start(StatType.BUILD_ENGINE_TOTAL)
 
+    const namedExpressionsStore = new NamedExpressionsStore()
+    const namedExpressions = new NamedExpressions(namedExpressionsStore)
     const lazilyTransformingAstService = new LazilyTransformingAstService(stats)
-    const dependencyGraph = DependencyGraph.buildEmpty(lazilyTransformingAstService, config, stats)
+    const dependencyGraph = DependencyGraph.buildEmpty(lazilyTransformingAstService, config, stats, namedExpressions)
     const columnSearch = buildColumnSearchStrategy(dependencyGraph, config, stats)
     const sheetMapping = dependencyGraph.sheetMapping
     const addressMapping = dependencyGraph.addressMapping
@@ -62,8 +64,6 @@ export class BuildEngineFactory {
     }
 
     const notEmpty = sheetMapping.numberOfSheets() > 0
-    const namedExpressionsStore = new NamedExpressionsStore()
-    const namedExpressions = new NamedExpressions(namedExpressionsStore)
     const parser = new ParserWithCaching(config, notEmpty ? sheetMapping.get : sheetMapping.fetch)
     const unparser = new Unparser(config, buildLexerConfig(config), sheetMapping.fetchDisplayName, namedExpressionsStore)
     const dateHelper = new DateTimeHelper(config)
@@ -79,7 +79,7 @@ export class BuildEngineFactory {
     lazilyTransformingAstService.undoRedo = crudOperations.undoRedo
     lazilyTransformingAstService.parser = parser
 
-    const evaluator = new Evaluator(dependencyGraph, columnSearch, config, stats, dateHelper, numberLiteralHelper)
+    const evaluator = new Evaluator(dependencyGraph, columnSearch, config, stats, dateHelper, numberLiteralHelper, namedExpressions)
     evaluator.run()
 
     const exporter = new Exporter(config, namedExpressions)
