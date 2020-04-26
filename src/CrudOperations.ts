@@ -4,8 +4,9 @@
  */
 
 import {AbsoluteCellRange} from './AbsoluteCellRange'
+import {absolutizeDependencies} from './absolutizeDependencies'
 import {invalidSimpleCellAddress, simpleCellAddress, SimpleCellAddress} from './Cell'
-import {CellContentParser, isMatrix, RawCellContent} from './CellContentParser'
+import {CellContent, CellContentParser, isMatrix, RawCellContent} from './CellContentParser'
 import {ClipboardCell, ClipboardOperations} from './ClipboardOperations'
 import {AddColumnsCommand, AddRowsCommand, Operations, RemoveColumnsCommand, RemoveRowsCommand} from './Operations'
 import {ColumnSearchStrategy} from './ColumnSearch/ColumnSearchStrategy'
@@ -13,9 +14,13 @@ import {ColumnsSpan} from './ColumnsSpan'
 import {Config} from './Config'
 import {ContentChanges} from './ContentChanges'
 import {AddressMapping, DependencyGraph, SheetMapping, SparseStrategy} from './DependencyGraph'
+import {NamedExpressions} from './NamedExpressions'
 import {
   InvalidAddressError,
   InvalidArgumentsError,
+  NamedExpressionDoesNotExist,
+  NamedExpressionNameIsAlreadyTaken,
+  NamedExpressionNameIsInvalid,
   NoOperationToRedoError,
   NoOperationToUndoError,
   NoSheetWithIdError,
@@ -67,6 +72,8 @@ export class CrudOperations {
     private readonly cellContentParser: CellContentParser,
     /** Service handling postponed CRUD transformations */
     private readonly lazilyTransformingAstService: LazilyTransformingAstService,
+    /** Storage for named expressions */
+    private readonly namedExpressions: NamedExpressions,
   ) {
     this.operations = new Operations(this.dependencyGraph, this.columnSearch, this.cellContentParser, this.parser, this.stats, this.lazilyTransformingAstService, this.config)
     this.clipboardOperations = new ClipboardOperations(this.dependencyGraph, this.operations, this.parser, this.lazilyTransformingAstService, this.config)
@@ -296,6 +303,26 @@ export class CrudOperations {
     this.undoRedo.redo()
   }
 
+  public addNamedExpression(expressionName: string, expression: RawCellContent) {
+    if (!this.namedExpressions.isNameValid(expressionName)) {
+      throw new NamedExpressionNameIsInvalid(expressionName)
+    }
+    if (!this.namedExpressions.isNameAvailable(expressionName)) {
+      throw new NamedExpressionNameIsAlreadyTaken(expressionName)
+    }
+    const namedExpression = this.namedExpressions.addNamedExpression(expressionName)
+    const address = this.namedExpressions.getInternalNamedExpressionAddress(expressionName)!
+    this.storeExpressionInCell(address, expression)
+  }
+
+  public changeNamedExpressionExpression(expressionName: string, newExpression: RawCellContent) {
+    const address = this.namedExpressions.getInternalNamedExpressionAddress(expressionName)
+    if (!address) {
+      throw new NamedExpressionDoesNotExist(expressionName)
+    }
+    this.storeExpressionInCell(address, newExpression)
+  }
+
   public ensureItIsPossibleToAddRows(sheet: number, ...indexes: Index[]): void {
     if (!this.sheetMapping.hasSheetWithId(sheet)) {
       throw new NoSheetWithIdError(sheet)
@@ -505,6 +532,20 @@ export class CrudOperations {
 
   private allocateNamedExpressionAddressSpace() {
     this.dependencyGraph.addressMapping.addSheet(-1, new SparseStrategy(0, 0))
+  }
+
+  private storeExpressionInCell(address: SimpleCellAddress, expression: RawCellContent) {
+    const parsedCellContent = this.cellContentParser.parse(expression)
+    if (parsedCellContent instanceof CellContent.MatrixFormula) {
+      throw new Error('Matrix formulas are not supported')
+    } else if (parsedCellContent instanceof CellContent.Formula) {
+      const {ast, hasVolatileFunction, hasStructuralChangeFunction, dependencies} = this.parser.parse(parsedCellContent.formula, address)
+      this.dependencyGraph.setFormulaToCell(address, ast, absolutizeDependencies(dependencies, address), hasVolatileFunction, hasStructuralChangeFunction)
+    } else if (parsedCellContent instanceof CellContent.Empty) {
+      this.operations.setCellEmpty(address)
+    } else {
+      this.operations.setValueToCell(parsedCellContent.value, address)
+    }
   }
 }
 
