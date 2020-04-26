@@ -130,7 +130,7 @@ export class NamedExpressions {
     }
   }
 
-  public removeNamedExpression(expressionName: string): void {
+  public remove(expressionName: string): void {
     const namedExpression = this.workbookStore.get(expressionName)
     if (namedExpression === undefined) {
       throw "Named expression does not exist"
