@@ -1504,9 +1504,11 @@ export class HyperFormula implements TypedEmitter {
    * @category Named Expression
    */
   public removeNamedExpression(expressionName: string): ExportedChange[] {
-    const namedExpressionDisplayName = this._namedExpressions.getDisplayNameByName(expressionName)!
-    const actuallyRemoved = this._namedExpressions.removeNamedExpression(expressionName)
-    if (actuallyRemoved) {
+    const address = this._namedExpressions.getInternalNamedExpressionAddress(expressionName)
+    if (address) {
+      const namedExpressionDisplayName = this._namedExpressions.getDisplayNameByName(expressionName)!
+      this._namedExpressions.removeNamedExpression(expressionName)
+      this.dependencyGraph.setCellEmpty(address)
       const changes = this.recomputeIfDependencyGraphNeedsIt()
       this._emitter.emit(Events.NamedExpressionRemoved, namedExpressionDisplayName, changes)
       return changes

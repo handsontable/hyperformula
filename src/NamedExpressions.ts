@@ -130,14 +130,12 @@ export class NamedExpressions {
     }
   }
 
-  public removeNamedExpression(expressionName: string): boolean {
+  public removeNamedExpression(expressionName: string): void {
     const namedExpression = this.workbookStore.get(expressionName)
     if (namedExpression === undefined) {
-      return false
+      throw "Named expression does not exist"
     }
-    this.dependencyGraph.setCellEmpty(this.buildAddress(namedExpression.row))
     this.workbookStore.remove(expressionName)
-    return true
   }
 
   public changeNamedExpressionExpression(expressionName: string, newExpression: RawCellContent): void {
