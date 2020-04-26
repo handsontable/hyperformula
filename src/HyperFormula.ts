@@ -1443,11 +1443,12 @@ export class HyperFormula implements TypedEmitter {
    * @category Named Expression
    */
   public getNamedExpressionValue(expressionName: string): Maybe<CellValue> {
-    const namedExpressionValue = this._namedExpressions.getNamedExpressionValue(expressionName)
-    if (namedExpressionValue === null) {
-      return undefined
+    this.ensureEvaluationIsNotSuspended()
+    const namedExpressionAddress = this._namedExpressions.getInternalNamedExpressionAddress(expressionName)
+    if (namedExpressionAddress) {
+      return this._serialization.getCellValue(namedExpressionAddress)
     } else {
-      return this._exporter.exportValue(namedExpressionValue)
+      return undefined
     }
   }
 

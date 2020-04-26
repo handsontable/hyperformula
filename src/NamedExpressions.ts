@@ -152,15 +152,6 @@ export class NamedExpressions {
     return this.workbookStore.getAllNamedExpressions().map((ne) => ne.name)
   }
 
-  public getNamedExpressionValue(expressionName: string): InternalCellValue | null {
-    const internalNamedExpressionAddress = this.getInternalNamedExpressionAddress(expressionName)
-    if (internalNamedExpressionAddress === null) {
-      return null
-    } else {
-      return this.dependencyGraph.getCellValue(internalNamedExpressionAddress)
-    }
-  }
-
   private buildAddress(namedExpressionRow: number) {
     return simpleCellAddress(NamedExpressions.SHEET_FOR_WORKBOOK_EXPRESSIONS, 0, namedExpressionRow)
   }
