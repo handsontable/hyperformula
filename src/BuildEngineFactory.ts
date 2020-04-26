@@ -79,7 +79,7 @@ export class BuildEngineFactory {
     const evaluator = new Evaluator(dependencyGraph, columnSearch, config, stats, dateHelper, numberLiteralHelper)
     evaluator.run()
 
-    const namedExpressions = new NamedExpressions(cellContentParser, dependencyGraph, parser, crudOperations)
+    const namedExpressions = new NamedExpressions()
     const exporter = new Exporter(config, namedExpressions)
     const serialization = new Serialization(dependencyGraph, unparser, config, exporter)
 

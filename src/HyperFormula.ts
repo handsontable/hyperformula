@@ -1429,7 +1429,7 @@ export class HyperFormula implements TypedEmitter {
     if (!this._namedExpressions.isNameAvailable(expressionName)) {
       throw new NamedExpressionNameIsAlreadyTaken(expressionName)
     }
-    const namedExpression = this._namedExpressions.addNamedExpression(expressionName, expression)
+    const namedExpression = this._namedExpressions.addNamedExpression(expressionName)
     const address = this._namedExpressions.getInternalNamedExpressionAddress(expressionName)!
     this.storeExpressionInCell(address, expression)
     const changes = this.recomputeIfDependencyGraphNeedsIt()

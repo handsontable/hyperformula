@@ -4,11 +4,7 @@
  */
 
 import {simpleCellAddress, SimpleCellAddress} from './Cell'
-import {CellContentParser, RawCellContent} from './CellContentParser'
-import {DependencyGraph, SparseStrategy} from './DependencyGraph'
 import {Maybe} from './Maybe'
-import {ParserWithCaching} from './parser'
-import {CrudOperations} from './CrudOperations'
 
 class NamedExpression {
   constructor(
@@ -67,10 +63,6 @@ export class NamedExpressions {
   private workbookStore = new NamedExpressionsStore()
 
   constructor(
-    private readonly cellContentParser: CellContentParser,
-    private readonly dependencyGraph: DependencyGraph,
-    private readonly parser: ParserWithCaching,
-    private readonly crudOperations: CrudOperations,
   ) {
   }
 
@@ -106,7 +98,7 @@ export class NamedExpressions {
     return /^[A-Za-z\u00C0-\u02AF_][A-Za-z0-9\u00C0-\u02AF\._]*$/.test(expressionName)
   }
 
-  public addNamedExpression(expressionName: string, expression: RawCellContent): NamedExpression {
+  public addNamedExpression(expressionName: string): NamedExpression {
     if (!this.isNameValid(expressionName)) {
       throw new Error('Name of Named Expression is invalid')
     }
