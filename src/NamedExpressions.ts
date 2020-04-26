@@ -64,7 +64,7 @@ export class NamedExpressions {
   private nextNamedExpressionRow: number = 0
 
   constructor(
-    public readonly workbookStore: NamedExpressionsStore,
+    public readonly workbookStore: NamedExpressionsStore = new NamedExpressionsStore(),
   ) {
   }
 
