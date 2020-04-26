@@ -1487,10 +1487,11 @@ export class HyperFormula implements TypedEmitter {
    * @category Named Expression
    */
   public changeNamedExpression(expressionName: string, newExpression: RawCellContent): ExportedChange[] {
-    if (!this._namedExpressions.doesNamedExpressionExist(expressionName)) {
+    const address = this._namedExpressions.getInternalNamedExpressionAddress(expressionName)
+    if (!address) {
       throw new NamedExpressionDoesNotExist(expressionName)
     }
-    this._namedExpressions.changeNamedExpressionExpression(expressionName, newExpression)
+    this.storeExpressionInCell(address, newExpression)
     return this.recomputeIfDependencyGraphNeedsIt()
   }
 

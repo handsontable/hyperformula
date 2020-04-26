@@ -3,9 +3,8 @@
  * Copyright (c) 2020 Handsoncode. All rights reserved.
  */
 
-import {absolutizeDependencies} from './absolutizeDependencies'
-import {InternalCellValue, simpleCellAddress, SimpleCellAddress} from './Cell'
-import {CellContent, CellContentParser, RawCellContent} from './CellContentParser'
+import {simpleCellAddress, SimpleCellAddress} from './Cell'
+import {CellContentParser, RawCellContent} from './CellContentParser'
 import {DependencyGraph, SparseStrategy} from './DependencyGraph'
 import {Maybe} from './Maybe'
 import {ParserWithCaching} from './parser'
@@ -138,34 +137,11 @@ export class NamedExpressions {
     this.workbookStore.remove(expressionName)
   }
 
-  public changeNamedExpressionExpression(expressionName: string, newExpression: RawCellContent): void {
-    const namedExpression = this.workbookStore.get(expressionName)
-    if (!namedExpression) {
-      throw new Error('Requested Named Expression does not exist')
-    }
-    this.storeExpressionInCell(namedExpression, newExpression)
-  }
-
   public getAllNamedExpressionsNames(): string[] {
     return this.workbookStore.getAllNamedExpressions().map((ne) => ne.name)
   }
 
   private buildAddress(namedExpressionRow: number) {
     return simpleCellAddress(NamedExpressions.SHEET_FOR_WORKBOOK_EXPRESSIONS, 0, namedExpressionRow)
-  }
-
-  private storeExpressionInCell(namedExpression: NamedExpression, expression: RawCellContent) {
-    const parsedCellContent = this.cellContentParser.parse(expression)
-    const address = this.buildAddress(namedExpression.row)
-    if (parsedCellContent instanceof CellContent.MatrixFormula) {
-      throw new Error('Matrix formulas are not supported')
-    } else if (parsedCellContent instanceof CellContent.Formula) {
-      const {ast, hasVolatileFunction, hasStructuralChangeFunction, dependencies} = this.parser.parse(parsedCellContent.formula, address)
-      this.dependencyGraph.setFormulaToCell(address, ast, absolutizeDependencies(dependencies, address), hasVolatileFunction, hasStructuralChangeFunction)
-    } else if (parsedCellContent instanceof CellContent.Empty) {
-      this.crudOperations.operations.setCellEmpty(address)
-    } else {
-      this.crudOperations.operations.setValueToCell(parsedCellContent.value, address)
-    }
   }
 }
