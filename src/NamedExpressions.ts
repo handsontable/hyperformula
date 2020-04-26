@@ -123,7 +123,7 @@ export class NamedExpressions {
   public remove(expressionName: string): void {
     const namedExpression = this.workbookStore.get(expressionName)
     if (namedExpression === undefined) {
-      throw "Named expression does not exist"
+      throw 'Named expression does not exist'
     }
     this.workbookStore.remove(expressionName)
   }
