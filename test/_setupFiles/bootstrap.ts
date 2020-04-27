@@ -34,38 +34,5 @@ beforeEach(() => {
 beforeAll(() => {
   jasmine.addMatchers({
     ...toContainsMatcher,
-    // toContainEqual: function(util) {
-    //   return {
-    //     compare: function(actual: string|ArrayLike<unknown>, expected: unknown) {
-    //       return {
-    //         pass: util.contains(actual, expected),
-    //       }
-    //     },
-    //   }
-    // },
-    // toMatchObject: function() {
-    //   return {
-    //     compare: function(actual: any, expected: any) {
-    //       let result = false
-
-    //       Object.keys(expected).forEach((key: string) => {
-    //         result = actual[key] === expected[key]
-    //       })
-
-    //       return {
-    //         pass: result,
-    //       }
-    //     },
-    //   }
-    // },
-    // toStrictEqual: function(util) {
-    //   return {
-    //     compare: function(actual: unknown, expected: unknown) {
-    //       return {
-    //         pass: util.equals(actual, expected),
-    //       }
-    //     },
-    //   }
-    // },
   })
 })
