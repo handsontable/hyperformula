@@ -5,9 +5,9 @@ type MatchersUtil = jasmine.MatchersUtil
 
 declare global {
   namespace jasmine {
-      interface Matchers<T> {
-        toContainEqual(expected: object, expectationFailOutput?: string): boolean,
-      }
+    interface Matchers<T> {
+      toContainEqual(expected: object, expectationFailOutput?: string): boolean,
+    }
   }
 }
 
