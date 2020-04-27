@@ -34,7 +34,7 @@ export class ArithmeticHelper {
 
   public eqMatcherFunction(pattern: string): (arg: InternalCellValue) => boolean {
     const regexp = this.buildRegex(pattern)
-    return (cellValue) => (typeof cellValue === 'string' && regexp.test(this.normalizeAccents(cellValue)))
+    return (cellValue) => (typeof cellValue === 'string' && regexp.test(this.normalizeString(cellValue)))
   }
 
   public neqMatcherFunction(pattern: string): (arg: InternalCellValue) => boolean {
@@ -44,7 +44,7 @@ export class ArithmeticHelper {
       if(typeof cellValue !== 'string') {
         return true
       }
-      const na = this.normalizeAccents(cellValue)
+      const na = this.normalizeString(cellValue)
       const b = regexp.test(na)
       return !b
     }
@@ -64,19 +64,19 @@ export class ArithmeticHelper {
   }
 
   private buildRegex(pattern: string): RegExp {
-    pattern = this.normalizeAccents(pattern)
+    pattern = this.normalizeString(pattern)
     let regexpStr
     switch(this.config.regexpType) {
       case 'full': {
-        regexpStr = pattern
+        regexpStr = escapeNoCharacters(pattern, this.config.caseSensitive)
         break
       }
       case 'none': {
-        regexpStr = escapeAllCharacters(pattern)
+        regexpStr = escapeAllCharacters(pattern, this.config.caseSensitive)
         break
       }
       case 'wildcards': {
-        regexpStr = escapeNonWildcards(pattern)
+        regexpStr = escapeNonWildcards(pattern, this.config.caseSensitive)
         break
       }
     }
@@ -87,12 +87,14 @@ export class ArithmeticHelper {
     }
   }
 
-  private normalizeAccents(str: string): string {
-    if(this.config.accentSensitive) {
-      return str
-    } else {
-      return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+  private normalizeString(str: string): string {
+    if(!this.config.caseSensitive) {
+      str = str.toLowerCase()
     }
+    if(!this.config.accentSensitive) {
+      str = str.normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    }
+    return str
   }
 
   public compare(left: NoErrorCellValue, right: NoErrorCellValue): number {
@@ -544,7 +546,7 @@ function needsEscape(c: string): boolean {
   }
 }
 
-function escapeNonWildcards(pattern: string): string {
+function escapeNonWildcards(pattern: string, caseSensitive: boolean): string {
   let str = ''
   for (let i = 0; i < pattern.length; i++) {
     const c = pattern.charAt(i)
@@ -565,21 +567,40 @@ function escapeNonWildcards(pattern: string): string {
       str += '.' + c
     } else if (needsEscape(c)) {
       str += '\\' + c
-    } else {
+    } else if(caseSensitive) {
       str += c
+    } else {
+      str += c.toLowerCase()
     }
   }
   return str
 }
 
-function escapeAllCharacters(pattern: string): string {
+function escapeAllCharacters(pattern: string, caseSensitive: boolean): string {
   let str = ''
   for (let i = 0; i < pattern.length; i++) {
     const c = pattern.charAt(i)
     if(isWildcard(c) || needsEscape(c)) {
       str += '\\' + c
-    } else {
+    } else if(caseSensitive) {
       str += c
+    } else {
+      str += c.toLowerCase()
+    }
+  }
+  return str
+}
+
+function escapeNoCharacters(pattern: string, caseSensitive: boolean): string {
+  let str = ''
+  for (let i = 0; i < pattern.length; i++) {
+    const c = pattern.charAt(i)
+    if(isWildcard(c) || needsEscape(c)) {
+      str += c
+    } else if(caseSensitive) {
+      str += c
+    } else {
+      str += c.toLowerCase()
     }
   }
   return str

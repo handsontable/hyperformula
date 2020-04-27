@@ -267,7 +267,7 @@ describe('Function SUMIF(S) - calculations and optimizations', () => {
       ['=SUMIF(A1:A3, "=ąbcd", B1:B3)']
     ])
 
-    expect(engine.getCellValue(adr('A4'))).toEqual(1)
+    expect(engine.getCellValue(adr('A4'))).toEqual(3)
   })
 
   it('criterions are accent sensitive if specified', () => {
@@ -281,7 +281,7 @@ describe('Function SUMIF(S) - calculations and optimizations', () => {
     expect(engine.getCellValue(adr('A4'))).toEqual(0)
   })
 
-  it('criterions are case sensitive', () => {
+  it('criterions are not case sensitive', () => {
     const engine = HyperFormula.buildFromArray( [
       ['abcd', '1'],
       ['ABCD', '2'],
@@ -289,10 +289,10 @@ describe('Function SUMIF(S) - calculations and optimizations', () => {
       ['=SUMIF(A1:A3, "<>abcd", B1:B3)']
     ])
 
-    expect(engine.getCellValue(adr('A4'))).toEqual(6)
+    expect(engine.getCellValue(adr('A4'))).toEqual(4)
   })
 
-  it('criterions are case sensitive 2', () => {
+  it('criterions are not case sensitive 2', () => {
     const engine = HyperFormula.buildFromArray( [
       ['abcd', '1'],
       ['ABCD', '2'],
@@ -300,7 +300,18 @@ describe('Function SUMIF(S) - calculations and optimizations', () => {
       ['=SUMIF(A1:A3, "=abcd", B1:B3)']
     ])
 
-    expect(engine.getCellValue(adr('A4'))).toEqual(1)
+    expect(engine.getCellValue(adr('A4'))).toEqual(3)
+  })
+
+  it('criterions are case sensitive if specified', () => {
+    const engine = HyperFormula.buildFromArray( [
+      ['abcd', '1'],
+      ['ABCD', '2'],
+      ['abc', '4'],
+      ['=SUMIF(A1:A3, "<>abcd", B1:B3)']
+    ], {caseSensitive: true})
+
+    expect(engine.getCellValue(adr('A4'))).toEqual(6)
   })
 
   it('usage of wildcards', () => {
@@ -312,7 +323,7 @@ describe('Function SUMIF(S) - calculations and optimizations', () => {
       ['=SUMIF(A1:A4, "=a?c*", B1:B4)']
     ])
 
-    expect(engine.getCellValue(adr('A5'))).toEqual(5)
+    expect(engine.getCellValue(adr('A5'))).toEqual(7)
   })
 
   it('wildcards instead of regexps', () => {
