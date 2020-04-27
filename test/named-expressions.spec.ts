@@ -306,4 +306,15 @@ describe("Named expressions - in formula usage", () => {
     const fooVertex = engine.dependencyGraph.namedExpressionVertex('FOO')!
     expect(engine.graph.adjacentNodes(fooVertex).size).toBe(0)
   })
+
+  it('named expressions are transformed during CRUDs', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=42']
+    ])
+    engine.addNamedExpression('FOO', '=Sheet1!A1 + 10')
+
+    engine.removeSheet("Sheet1")
+
+    expect(engine.getNamedExpressionFormula("FOO")).toEqual('=#REF! + 10')
+  })
 })
