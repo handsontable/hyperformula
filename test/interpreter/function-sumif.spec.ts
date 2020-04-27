@@ -350,6 +350,18 @@ describe('Function SUMIF(S) - calculations and optimizations', () => {
     expect(engine.getCellValue(adr('A5'))).toEqual(10)
   })
 
+  it('incorrect regexps', () => {
+    const engine = HyperFormula.buildFromArray( [
+      ['abcd', '1'],
+      ['abd', '2'],
+      ['.*c.*', '4'],
+      [0, 8],
+      ['=SUMIF(A1:A4, "=)", B1:B4)']
+    ], {regexpType: 'full'})
+
+    expect(engine.getCellValue(adr('A5'))).toEqual(0)
+  })
+
   it('ignore errors', () => {
     const engine =  HyperFormula.buildFromArray([
       ['1', '3'],

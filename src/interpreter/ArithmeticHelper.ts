@@ -66,7 +66,16 @@ export class ArithmeticHelper {
   private buildRegex(pattern: string): RegExp {
     pattern = this.normalizeString(pattern)
     let regexpStr
-    switch(this.config.regexpType) {
+    let type = this.config.regexpType
+    if(type === 'full') {
+      try {
+        RegExp(pattern)
+      }
+      catch (e) {
+        type = 'none'
+      }
+    }
+    switch(type) {
       case 'full': {
         regexpStr = escapeNoCharacters(pattern, this.config.caseSensitive)
         break
