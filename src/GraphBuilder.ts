@@ -157,7 +157,7 @@ export class MatrixDetectionStrategy implements GraphBuilderStrategy {
   public run(sheets: Sheets): Dependencies {
     const dependencies: Map<Vertex, CellDependency[]> = new Map()
 
-    const matrixHeuristic = new GraphBuilderMatrixHeuristic(this.dependencyGraph, this.columnSearch, dependencies, this.threshold, this.cellContentParser)
+    const matrixHeuristic = new GraphBuilderMatrixHeuristic(this.dependencyGraph, this.columnSearch, this.threshold, this.cellContentParser)
 
     for (const sheetName in sheets) {
       const sheetId = this.dependencyGraph.getSheetId(sheetName)
