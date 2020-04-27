@@ -16,3 +16,4 @@ lib
 script
 test-jasmine
 typings
+test/_setupFiles/*.js

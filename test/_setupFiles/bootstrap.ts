@@ -18,6 +18,10 @@ Config.defaultConfig = Object.assign({}, Config.defaultConfig, {
 })
 
 beforeEach(() => {
+  // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+  // @ts-ignore
+  jasmine.setDefaultSpyStrategy((and: unknown) => and.callThrough())
+
   unregisterAllLanguages()
 
   const defaultLanguage = Config.defaultConfig.language

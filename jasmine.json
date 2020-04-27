@@ -4,9 +4,9 @@
     "**/*[sS]pec.js"
   ],
   "helpers": [
-    "helper/babel.js",
+    "_setupFiles/babel.js",
     "_setupFiles/bootstrap.js",
-    "helper/jsdom.js"
+    "_setupFiles/jsdom.js"
   ],
   "stopSpecOnExpectationFailure": false,
   "random": true
