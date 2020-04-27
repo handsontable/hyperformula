@@ -4,8 +4,7 @@
  */
 
 import {Maybe} from '../Maybe'
-import {Ast, AstNodeType, RelativeDependency} from './'
-import {RelativeDependencyType} from './RelativeDependency'
+import {Ast, AstNodeType, RelativeDependency, AddressDependency, CellRangeDependency, ColumnRangeDependency, RowRangeDependency} from './'
 
 const collectDependenciesFn = (ast: Ast, functionsWhichDoesNotNeedArgumentsToBeComputed: Set<string>, dependenciesSet: RelativeDependency[]) => {
   switch (ast.type) {
@@ -15,36 +14,24 @@ const collectDependenciesFn = (ast: Ast, functionsWhichDoesNotNeedArgumentsToBeC
     case AstNodeType.ERROR:
       return
     case AstNodeType.CELL_REFERENCE: {
-      dependenciesSet.push({
-        type: RelativeDependencyType.CellAddress,
-        dependency: ast.reference
-      })
+      dependenciesSet.push(new AddressDependency(ast.reference))
       return
     }
     case AstNodeType.CELL_RANGE: {
       if (ast.start.sheet === ast.end.sheet) {
-        dependenciesSet.push({
-          type: RelativeDependencyType.CellRange,
-          dependency: [ast.start, ast.end]
-        })
+        dependenciesSet.push(new CellRangeDependency(ast.start, ast.end))
       }
       return
     }
     case AstNodeType.COLUMN_RANGE: {
       if (ast.start.sheet === ast.end.sheet) {
-        dependenciesSet.push({
-          type: RelativeDependencyType.ColumnRange,
-          dependency: [ast.start, ast.end]
-        })
+        dependenciesSet.push(new ColumnRangeDependency(ast.start, ast.end))
       }
       return
     }
     case AstNodeType.ROW_RANGE: {
       if (ast.start.sheet === ast.end.sheet) {
-        dependenciesSet.push({
-          type: RelativeDependencyType.RowRange,
-          dependency: [ast.start, ast.end]
-        })
+        dependenciesSet.push(new RowRangeDependency(ast.start, ast.end))
       }
       return
     }

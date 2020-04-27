@@ -121,7 +121,6 @@ describe('CellContentParser', () => {
 
   it('JS Date parsing', () => {
     expect(cellContentParser.parse(new Date(1995, 11, 17))).toStrictEqual(new CellContent.Number(35050))
-    expect(cellContentParser.parse(new Date('02-02-2020'))).toStrictEqual(new CellContent.Number(43863))
   })
 
   it( 'starts with \'', () => {

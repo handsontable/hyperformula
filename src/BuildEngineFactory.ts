@@ -47,6 +47,7 @@ export class BuildEngineFactory {
     const columnSearch = buildColumnSearchStrategy(dependencyGraph, config, stats)
     const sheetMapping = dependencyGraph.sheetMapping
     const addressMapping = dependencyGraph.addressMapping
+    const namedExpressions = new NamedExpressions()
 
     for (const sheetName in sheets) {
       if (Object.prototype.hasOwnProperty.call(sheets, sheetName)) {
@@ -72,14 +73,13 @@ export class BuildEngineFactory {
       graphBuilder.buildGraph(sheets)
     })
 
-    const crudOperations = new CrudOperations(config, stats, dependencyGraph, columnSearch, parser, cellContentParser, lazilyTransformingAstService)
+    const crudOperations = new CrudOperations(config, stats, dependencyGraph, columnSearch, parser, cellContentParser, lazilyTransformingAstService, namedExpressions)
     lazilyTransformingAstService.undoRedo = crudOperations.undoRedo
     lazilyTransformingAstService.parser = parser
 
     const evaluator = new Evaluator(dependencyGraph, columnSearch, config, stats, dateHelper, numberLiteralHelper)
     evaluator.run()
 
-    const namedExpressions = new NamedExpressions(cellContentParser, dependencyGraph, parser, crudOperations)
     const exporter = new Exporter(config, namedExpressions)
     const serialization = new Serialization(dependencyGraph, unparser, config, exporter)
 

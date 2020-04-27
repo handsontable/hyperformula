@@ -138,4 +138,61 @@ describe('Config', () => {
       new Config({ thousandSeparator: ';' })
     }).toThrow('Expected one of \'\' \',\' \' \' \'.\' for config parameter: thousandSeparator')
   })
+
+  it('#undoLimit validation', () => {
+    expect(() => new Config({ undoLimit: 0 })).not.toThrow()
+    expect(() => new Config({ undoLimit: 42 })).not.toThrow()
+    expect(() => new Config({ undoLimit: Infinity })).not.toThrow()
+    expect(() => new Config({ undoLimit: -1 })).toThrow('undoLimit should be at least 0')
+  })
+
+  it('#vlookupThreshold', () => {
+    expect(() => new Config({ vlookupThreshold: 1 })).not.toThrow()
+    expect(() => new Config({ vlookupThreshold: 42 })).not.toThrow()
+    expect(() => new Config({ vlookupThreshold: Infinity })).not.toThrow()
+    expect(() => new Config({ vlookupThreshold: 0 })).toThrow('vlookupThreshold should be at least 1')
+  })
+
+  it('#matrixDetectionThreshold', () => {
+    expect(() => new Config({ matrixDetectionThreshold: 1 })).not.toThrow()
+    expect(() => new Config({ matrixDetectionThreshold: 42 })).not.toThrow()
+    expect(() => new Config({ matrixDetectionThreshold: Infinity })).not.toThrow()
+    expect(() => new Config({ matrixDetectionThreshold: 0 })).toThrow('matrixDetectionThreshold should be at least 1')
+  })
+
+  it('#precisionEpsilon', () => {
+    expect(() => new Config({ precisionEpsilon: 0 })).not.toThrow()
+    expect(() => new Config({ precisionEpsilon: 42 })).not.toThrow()
+    expect(() => new Config({ precisionEpsilon: Infinity })).not.toThrow()
+    expect(() => new Config({ precisionEpsilon: -1 })).toThrow('precisionEpsilon should be at least 0')
+  })
+
+  it('#precisionRounding', () => {
+    expect(() => new Config({ precisionRounding: 0 })).not.toThrow()
+    expect(() => new Config({ precisionRounding: 42 })).not.toThrow()
+    expect(() => new Config({ precisionRounding: Infinity })).not.toThrow()
+    expect(() => new Config({ precisionRounding: -1 })).toThrow('precisionRounding should be at least 0')
+  })
+
+  it('#maxRows', () => {
+    expect(() => new Config({ maxRows: 1 })).not.toThrow()
+    expect(() => new Config({ maxRows: 42 })).not.toThrow()
+    expect(() => new Config({ maxRows: Infinity })).not.toThrow()
+    expect(() => new Config({ maxRows: 0 })).toThrow('maxRows should be at least 1')
+  })
+
+  it('#maxColumns', () => {
+    expect(() => new Config({ maxColumns: 1 })).not.toThrow()
+    expect(() => new Config({ maxColumns: 42 })).not.toThrow()
+    expect(() => new Config({ maxColumns: Infinity })).not.toThrow()
+    expect(() => new Config({ maxColumns: 0 })).toThrow('maxColumns should be at least 1')
+  })
+
+  it('#nullYear', () => {
+    expect(() => new Config({ nullYear: -1 })).toThrow('nullYear should be at least 0')
+    expect(() => new Config({ nullYear: 0 })).not.toThrow()
+    expect(() => new Config({ nullYear: 42 })).not.toThrow()
+    expect(() => new Config({ nullYear: 100 })).not.toThrow()
+    expect(() => new Config({ nullYear: 101 })).toThrow('nullYear should be at most 100')
+  })
 })

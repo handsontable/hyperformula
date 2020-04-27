@@ -3,13 +3,8 @@
  * Copyright (c) 2020 Handsoncode. All rights reserved.
  */
 
-import {absolutizeDependencies} from './absolutizeDependencies'
-import {InternalCellValue, simpleCellAddress, SimpleCellAddress} from './Cell'
-import {CellContent, CellContentParser, RawCellContent} from './CellContentParser'
-import {DependencyGraph, SparseStrategy} from './DependencyGraph'
+import {simpleCellAddress, SimpleCellAddress} from './Cell'
 import {Maybe} from './Maybe'
-import {ParserWithCaching} from './parser'
-import {CrudOperations} from './CrudOperations'
 
 class NamedExpression {
   constructor(
@@ -68,12 +63,7 @@ export class NamedExpressions {
   private workbookStore = new NamedExpressionsStore()
 
   constructor(
-    private readonly cellContentParser: CellContentParser,
-    private readonly dependencyGraph: DependencyGraph,
-    private readonly parser: ParserWithCaching,
-    private readonly crudOperations: CrudOperations,
   ) {
-    dependencyGraph.addressMapping.addSheet(-1, new SparseStrategy(0, 0))
   }
 
   public doesNamedExpressionExist(expressionName: string): boolean {
@@ -108,7 +98,7 @@ export class NamedExpressions {
     return /^[A-Za-z\u00C0-\u02AF_][A-Za-z0-9\u00C0-\u02AF\._]*$/.test(expressionName)
   }
 
-  public addNamedExpression(expressionName: string, expression: RawCellContent): void {
+  public addNamedExpression(expressionName: string): NamedExpression {
     if (!this.isNameValid(expressionName)) {
       throw new Error('Name of Named Expression is invalid')
     }
@@ -116,9 +106,9 @@ export class NamedExpressions {
       throw new Error('Name of Named Expression already taken')
     }
     const namedExpression = new NamedExpression(expressionName, this.nextNamedExpressionRow)
-    this.storeExpressionInCell(namedExpression, expression)
     this.nextNamedExpressionRow++
     this.workbookStore.add(namedExpression)
+    return namedExpression
   }
 
   public getInternalNamedExpressionAddress(expressionName: string): SimpleCellAddress | null {
@@ -130,53 +120,19 @@ export class NamedExpressions {
     }
   }
 
-  public removeNamedExpression(expressionName: string): boolean {
+  public remove(expressionName: string): void {
     const namedExpression = this.workbookStore.get(expressionName)
     if (namedExpression === undefined) {
-      return false
+      throw 'Named expression does not exist'
     }
-    this.dependencyGraph.setCellEmpty(this.buildAddress(namedExpression.row))
     this.workbookStore.remove(expressionName)
-    return true
-  }
-
-  public changeNamedExpressionExpression(expressionName: string, newExpression: RawCellContent): void {
-    const namedExpression = this.workbookStore.get(expressionName)
-    if (!namedExpression) {
-      throw new Error('Requested Named Expression does not exist')
-    }
-    this.storeExpressionInCell(namedExpression, newExpression)
   }
 
   public getAllNamedExpressionsNames(): string[] {
     return this.workbookStore.getAllNamedExpressions().map((ne) => ne.name)
   }
 
-  public getNamedExpressionValue(expressionName: string): InternalCellValue | null {
-    const internalNamedExpressionAddress = this.getInternalNamedExpressionAddress(expressionName)
-    if (internalNamedExpressionAddress === null) {
-      return null
-    } else {
-      return this.dependencyGraph.getCellValue(internalNamedExpressionAddress)
-    }
-  }
-
   private buildAddress(namedExpressionRow: number) {
     return simpleCellAddress(NamedExpressions.SHEET_FOR_WORKBOOK_EXPRESSIONS, 0, namedExpressionRow)
-  }
-
-  private storeExpressionInCell(namedExpression: NamedExpression, expression: RawCellContent) {
-    const parsedCellContent = this.cellContentParser.parse(expression)
-    const address = this.buildAddress(namedExpression.row)
-    if (parsedCellContent instanceof CellContent.MatrixFormula) {
-      throw new Error('Matrix formulas are not supported')
-    } else if (parsedCellContent instanceof CellContent.Formula) {
-      const {ast, hasVolatileFunction, hasStructuralChangeFunction, dependencies} = this.parser.parse(parsedCellContent.formula, address)
-      this.dependencyGraph.setFormulaToCell(address, ast, absolutizeDependencies(dependencies, address), hasVolatileFunction, hasStructuralChangeFunction)
-    } else if (parsedCellContent instanceof CellContent.Empty) {
-      this.crudOperations.operations.setCellEmpty(address)
-    } else {
-      this.crudOperations.operations.setValueToCell(parsedCellContent.value, address)
-    }
   }
 }
