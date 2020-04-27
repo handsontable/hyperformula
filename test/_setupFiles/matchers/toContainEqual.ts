@@ -11,18 +11,6 @@ declare global {
   }
 }
 
-// function testArray(arr: unknown[], items: unknown[]) {
-//   const result = items.some((value) => !arr.includes(value))
-
-//   return !result
-// }
-
-// function testObject(base: never, fields: never) {
-//   const result = Object.keys(fields).some((key) => base[key] != fields[key] && typeof base[key] !== typeof fields[key])
-
-//   return !result
-// }
-
 export const toContainsMatcher: CustomMatcherFactories = {
   toContainEqual: function(util: MatchersUtil): CustomMatcher {
     return {
