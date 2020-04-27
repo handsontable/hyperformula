@@ -167,8 +167,6 @@ export class HyperFormula implements TypedEmitter {
     )
   }
 
-  
-
   /**
    * Builds the engine for a sheet from a two-dimensional array representation.
    * The engine is created with a single sheet.
@@ -325,13 +323,12 @@ export class HyperFormula implements TypedEmitter {
    *
    * @param {Partial<ConfigParams>} configInput - engine configuration
    * 
-   * 
    * @example
    * ```js
    * // build with no initial data and with optional config parameter maxColumns
    * const hfInstance = HyperFormula.buildEmpty({ maxColumns: 1000 });
    * ```
-   *
+   * 
    * @category Factory
    */
   public static buildEmpty(configInput?: Partial<ConfigParams>): HyperFormula {
@@ -745,7 +742,7 @@ export class HyperFormula implements TypedEmitter {
    * // perform CRUD operation, for example remove the second row
    * hfInstance.removeRows(0, [1, 1]);
    * 
-   * // do an undo, it should return previous values [['1'], ['2'], ['3']]
+   * // do an undo, it should return the changes
    * const changes = hfInstance.undo();
    * ```
    *
@@ -905,6 +902,7 @@ export class HyperFormula implements TypedEmitter {
    * // should return true for this example
    * const isAddable = hfInstance.isItPossibleToAddRows(0, [1, 1]);
    * ```
+   * 
    * @category Row
    */
   public isItPossibleToAddRows(sheetId: number, ...indexes: Index[]): boolean {
