@@ -196,7 +196,7 @@ describe('Move columns', () => {
     const changes = engine.moveColumns(0, 1, 1, 3)
 
     expect(changes.length).toEqual(1)
-    expect(changes).toEqual(jasmine.objectContaining([new ExportedCellChange(simpleCellAddress( 0, 2, 1), 1 )]))
+    expect(changes).toContainEqual([new ExportedCellChange(simpleCellAddress( 0, 2, 1), 1 )])
   })
 
   it('should return #CYCLE when moving formula onto referred range', () => {

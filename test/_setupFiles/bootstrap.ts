@@ -8,6 +8,8 @@ import {AlwaysSparse} from '../../src/DependencyGraph/AddressMapping/ChooseAddre
 import {languages} from '../../src/i18n'
 import {unregisterAllLanguages} from './../testUtils'
 
+import { toContainsMatcher } from './matchers'
+
 Config.defaultConfig = Object.assign({}, Config.defaultConfig, {
   chooseAddressMappingPolicy: new AlwaysSparse(),
   functionPlugins: [],
@@ -31,38 +33,39 @@ beforeEach(() => {
 
 beforeAll(() => {
   jasmine.addMatchers({
-    toContainEqual: function(util) {
-      return {
-        compare: function(actual: string|ArrayLike<unknown>, expected: unknown) {
-          return {
-            pass: util.contains(actual, expected),
-          }
-        },
-      }
-    },
-    toMatchObject: function() {
-      return {
-        compare: function(actual: any, expected: any) {
-          let result = false
+    ...toContainsMatcher,
+    // toContainEqual: function(util) {
+    //   return {
+    //     compare: function(actual: string|ArrayLike<unknown>, expected: unknown) {
+    //       return {
+    //         pass: util.contains(actual, expected),
+    //       }
+    //     },
+    //   }
+    // },
+    // toMatchObject: function() {
+    //   return {
+    //     compare: function(actual: any, expected: any) {
+    //       let result = false
 
-          Object.keys(expected).forEach((key: string) => {
-            result = actual[key] === expected[key]
-          })
+    //       Object.keys(expected).forEach((key: string) => {
+    //         result = actual[key] === expected[key]
+    //       })
 
-          return {
-            pass: result,
-          }
-        },
-      }
-    },
-    toStrictEqual: function(util) {
-      return {
-        compare: function(actual: unknown, expected: unknown) {
-          return {
-            pass: util.equals(actual, expected),
-          }
-        },
-      }
-    },
+    //       return {
+    //         pass: result,
+    //       }
+    //     },
+    //   }
+    // },
+    // toStrictEqual: function(util) {
+    //   return {
+    //     compare: function(actual: unknown, expected: unknown) {
+    //       return {
+    //         pass: util.equals(actual, expected),
+    //       }
+    //     },
+    //   }
+    // },
   })
 })

@@ -823,7 +823,7 @@ describe('Removing rows - sheet dimensions', () => {
     const changes = engine.removeRows(0, [0, 1])
 
     expect(changes.length).toBe(1)
-    expect(changes).toEqual(jasmine.objectContaining([new ExportedCellChange(simpleCellAddress(0, 0, 1), 2)]))
+    expect(changes).toContainEqual([new ExportedCellChange(simpleCellAddress(0, 0, 1), 2)])
   })
 })
 

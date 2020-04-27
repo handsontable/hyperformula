@@ -468,7 +468,7 @@ describe('changing cell content', () => {
     const changes = engine.setCellContents(adr('A1'), '2')
 
     expect(changes.length).toBe(1)
-    expect(changes).toEqual(jasmine.objectContaining([new ExportedCellChange(simpleCellAddress(0, 0, 0), 2)]))
+    expect(changes).toContainEqual([new ExportedCellChange(simpleCellAddress(0, 0, 0), 2)])
   })
 
   it('returns dependent formula value change', () => {
@@ -481,8 +481,8 @@ describe('changing cell content', () => {
     const changes = engine.setCellContents(adr('A1'), '2')
 
     expect(changes.length).toBe(2)
-    expect(changes[0]).toEqual(jasmine.objectContaining(new ExportedCellChange(simpleCellAddress(0, 0, 0), 2)))
-    expect(changes[1]).toEqual(jasmine.objectContaining(new ExportedCellChange(simpleCellAddress(0, 1, 0), 2)))
+    expect(changes[0]).toContainEqual(new ExportedCellChange(simpleCellAddress(0, 0, 0), 2))
+    expect(changes[1]).toContainEqual(new ExportedCellChange(simpleCellAddress(0, 1, 0), 2))
   })
 
   it('returns dependent matrix value changes', () => {
@@ -496,7 +496,7 @@ describe('changing cell content', () => {
     const changes = engine.setCellContents(adr('A1'), '2')
 
     expect(changes.length).toBe(5)
-    expect(changes.map((change) => change.newValue)).toEqual(jasmine.arrayContaining([2, 10, 12, 18, 22]))
+    expect(changes.map((change) => change.newValue)).toContainEqual([2, 10, 12, 18, 22])
   })
 
   it('returns change of numeric matrix', () => {
@@ -509,7 +509,7 @@ describe('changing cell content', () => {
     const changes = engine.setCellContents(adr('A1'), '7')
 
     expect(changes.length).toBe(1)
-    expect(changes).toEqual(jasmine.objectContaining([new ExportedCellChange(simpleCellAddress(0, 0, 0), 7 )]))
+    expect(changes).toContainEqual([new ExportedCellChange(simpleCellAddress(0, 0, 0), 7 )])
   })
 
   it('update empty cell to parsing error ', () => {
@@ -662,7 +662,7 @@ describe('change multiple cells contents', () => {
     const changes = engine.setCellContents(adr('A1'), [['7', '8'], ['9', '10']])
 
     expect(changes.length).toEqual(4)
-    expect(changes.map((change) => change.newValue)).toEqual(jasmine.arrayContaining([7, 8, 9, 10]))
+    expect(changes.map((change) => change.newValue)).toContainEqual([7, 8, 9, 10])
   })
 
   it('returns changes of mutliple values dependent formulas', () => {
@@ -677,7 +677,7 @@ describe('change multiple cells contents', () => {
     const changes = engine.setCellContents(adr('A1'), [['7', '8'], ['9', '10']])
 
     expect(changes.length).toEqual(6)
-    expect(changes.map((change) => change.newValue)).toEqual(jasmine.arrayContaining([7, 8, 9, 10, 15, 18]))
+    expect(changes.map((change) => change.newValue)).toContainEqual([7, 8, 9, 10, 15, 18])
   })
 
   it('should throw when trying to set cell contents outside sheet limits', () => {
@@ -699,8 +699,8 @@ describe('updating column index', () => {
 
     engine.setCellContents(adr('B2'), '8')
 
-    expect((engine.columnSearch as ColumnIndex).getValueIndex(0, 1, 4).index).toEqual(jasmine.arrayContaining([]))
-    expect((engine.columnSearch as ColumnIndex).getValueIndex(0, 1, 8).index).toEqual(jasmine.arrayContaining([1]))
+    expect((engine.columnSearch as ColumnIndex).getValueIndex(0, 1, 4).index).toContainEqual([])
+    expect((engine.columnSearch as ColumnIndex).getValueIndex(0, 1, 8).index).toContainEqual([1])
   })
 
   it('should update column index when changing value inside numeric matrix', () => {
@@ -711,8 +711,8 @@ describe('updating column index', () => {
 
     engine.setCellContents(adr('B2'), '8')
 
-    expect((engine.columnSearch as ColumnIndex).getValueIndex(0, 1, 4).index).toEqual(jasmine.arrayContaining([]))
-    expect((engine.columnSearch as ColumnIndex).getValueIndex(0, 1, 8).index).toEqual(jasmine.arrayContaining([1]))
+    expect((engine.columnSearch as ColumnIndex).getValueIndex(0, 1, 4).index).toContainEqual([])
+    expect((engine.columnSearch as ColumnIndex).getValueIndex(0, 1, 8).index).toContainEqual([1])
   })
 })
 

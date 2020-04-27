@@ -225,7 +225,7 @@ describe('remove sheet - adjust formula dependencies', () => {
     const changes = engine.removeSheet('Sheet2')
 
     expect(changes.length).toBe(1)
-    expect(changes).toEqual(jasmine.objectContaining([new ExportedCellChange(simpleCellAddress(0, 0, 0), detailedError(ErrorType.REF))]))
+    expect(changes).toContainEqual([new ExportedCellChange(simpleCellAddress(0, 0, 0), detailedError(ErrorType.REF))])
   })
 })
 
