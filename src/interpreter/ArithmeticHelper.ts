@@ -40,13 +40,7 @@ export class ArithmeticHelper {
   public neqMatcherFunction(pattern: string): (arg: InternalCellValue) => boolean {
     const regexp = this.buildRegex(pattern)
     return (cellValue) => {
-//      return (typeof cellValue !== 'string' || !regexp.test(this.normalizeAccents(cellValue)))
-      if(typeof cellValue !== 'string') {
-        return true
-      }
-      const na = this.normalizeString(cellValue)
-      const b = regexp.test(na)
-      return !b
+      return (typeof cellValue !== 'string' || !regexp.test(this.normalizeString(cellValue)))
     }
   }
 
