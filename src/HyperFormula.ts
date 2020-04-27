@@ -492,7 +492,7 @@ export class HyperFormula implements TypedEmitter {
     this._exporter = newEngine.exporter
     this._namedExpressions = newEngine.namedExpressions
     this._serialization = newEngine.serialization
-    this._formulaRegistry = newEngine.formulaRegistry
+    this._functionRegistry = newEngine.functionRegistry
   }
 
   /**
