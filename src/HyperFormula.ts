@@ -1068,11 +1068,15 @@ export class HyperFormula implements TypedEmitter {
    * ```js
    * // build from arrays, only one sheet
    * const hfInstance = HyperFormula.buildFromArray([
-   * ['1', '2'], 
+   * ['=RAND()', '42'],
    * ]);
    * 
    * // should return a list of cells which values changed after the operation, their absolute addresses and new values
-   * const changes = hfInstance.addColumns(0, [1, 1]);
+   * // for this example:
+   * // [ ExportedCellChange {
+   * //   address: { sheet: 0, col: 1, row: 0 },
+   * //   newValue: 0.92754862796338 } ]
+   * const changes = hfInstance.addColumns(0, [0, 1]);
    * ```
    *
    * @category Column
@@ -1205,10 +1209,15 @@ export class HyperFormula implements TypedEmitter {
    * ```js
    * // build from arrays, only one sheet
    * const hfInstance = HyperFormula.buildFromArray([
-   * ['1', '2'], 
+   * ['=RAND()', '42'],
    * ]);
    * 
    * // should return a list of cells which values changed after the operation, their absolute addresses and new values.
+   * // for this example:
+   * // [ ExportedCellChange {
+   * //   address: { sheet: 0, col: 0, row: 0 },
+   * //   newValue: 0.93524248002062 } ]
+   * 
    * const changes = hfInstance.moveCells({ col: 1, row: 0, sheet: 0 }, 1, 1, { col: 3, row: 0, sheet: 0 })
    * ```
    *
@@ -1339,10 +1348,17 @@ export class HyperFormula implements TypedEmitter {
    * ```js
    * // build from arrays, only one sheet
    * const hfInstance = HyperFormula.buildFromArray([
-   * ['1', '2']
+   * ['1', '2', '3', '=RAND()', '=SUM(A1:C1)']
    * ]);
    * 
    * // should return a list of cells which values changed after the operation, their absolute addresses and new values.
+   * // for this example:
+   * // [ ExportedCellChange {
+   * //  address: { sheet: 0, col: 1, row: 0 },
+   * //  newValue: 0.16210054671639 },
+   * //    ExportedCellChange {
+   * //  address: { sheet: 0, col: 4, row: 0 },
+   * //  newValue: 6.16210054671639 } ]
    * const changes = hfInstance.moveColumns(0, 1, 1, 2);
    * ```
    *
