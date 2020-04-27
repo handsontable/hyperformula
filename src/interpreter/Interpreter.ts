@@ -32,9 +32,9 @@ export class Interpreter {
     public readonly stats: Statistics,
     public readonly dateHelper: DateTimeHelper,
     public readonly numberLiteralsHelper: NumberLiteralHelper,
-    public readonly formulaRegistry: FunctionRegistry
+    public readonly functionRegistry: FunctionRegistry
   ) {
-    this.formulaRegistry.initializePlugins(this)
+    this.functionRegistry.initializePlugins(this)
     this.arithmeticHelper = new ArithmeticHelper(config, dateHelper, numberLiteralsHelper)
   }
 
@@ -171,7 +171,7 @@ export class Interpreter {
         }
       }
       case AstNodeType.FUNCTION_CALL: {
-        const pluginEntry = this.formulaRegistry.getFunction(ast.procedureName)
+        const pluginEntry = this.functionRegistry.getFunction(ast.procedureName)
         if (pluginEntry && this.config.translationPackage.isFunctionTranslated(ast.procedureName)) {
           const [pluginFunction, pluginInstance] = pluginEntry as [string, any]
           return pluginInstance[pluginFunction](ast, formulaAddress)

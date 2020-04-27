@@ -37,16 +37,16 @@ export type EngineState = {
   exporter: Exporter,
   namedExpressions: NamedExpressions,
   serialization: Serialization,
-  formulaRegistry: FunctionRegistry,
+  functionRegistry: FunctionRegistry,
 }
 
 export class BuildEngineFactory {
   private static buildEngine(config: Config, sheets: Sheets = {}, stats: Statistics = config.useStats ? new Statistics() : new EmptyStatistics()): EngineState {
     stats.start(StatType.BUILD_ENGINE_TOTAL)
 
-    const formulaRegistry = new FunctionRegistry(config)
+    const functionRegistry = new FunctionRegistry(config)
     const lazilyTransformingAstService = new LazilyTransformingAstService(stats)
-    const dependencyGraph = DependencyGraph.buildEmpty(lazilyTransformingAstService, config, formulaRegistry, stats)
+    const dependencyGraph = DependencyGraph.buildEmpty(lazilyTransformingAstService, config, functionRegistry, stats)
     const columnSearch = buildColumnSearchStrategy(dependencyGraph, config, stats)
     const sheetMapping = dependencyGraph.sheetMapping
     const addressMapping = dependencyGraph.addressMapping
@@ -64,7 +64,7 @@ export class BuildEngineFactory {
     }
 
     const notEmpty = sheetMapping.numberOfSheets() > 0
-    const parser = new ParserWithCaching(config, formulaRegistry, notEmpty ? sheetMapping.get : sheetMapping.fetch)
+    const parser = new ParserWithCaching(config, functionRegistry, notEmpty ? sheetMapping.get : sheetMapping.fetch)
     const unparser = new Unparser(config, buildLexerConfig(config), sheetMapping.fetchDisplayName)
     const dateHelper = new DateTimeHelper(config)
     const numberLiteralHelper = new NumberLiteralHelper(config)
@@ -79,7 +79,7 @@ export class BuildEngineFactory {
     lazilyTransformingAstService.undoRedo = crudOperations.undoRedo
     lazilyTransformingAstService.parser = parser
 
-    const evaluator = new Evaluator(dependencyGraph, columnSearch, config, stats, dateHelper, numberLiteralHelper, formulaRegistry)
+    const evaluator = new Evaluator(dependencyGraph, columnSearch, config, stats, dateHelper, numberLiteralHelper, functionRegistry)
     evaluator.run()
 
     const namedExpressions = new NamedExpressions(cellContentParser, dependencyGraph, parser, crudOperations)
@@ -102,7 +102,7 @@ export class BuildEngineFactory {
       exporter,
       namedExpressions,
       serialization,
-      formulaRegistry,
+      functionRegistry: functionRegistry,
     }
   }
 

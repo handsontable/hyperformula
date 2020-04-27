@@ -15,8 +15,8 @@ import {DependencyGraph} from '../src/DependencyGraph'
 import {FunctionRegistry} from '../src/interpreter/FunctionRegistry'
 
 function buildEmptyIndex(transformingService: LazilyTransformingAstService, config: Config, statistics: Statistics): ColumnIndex {
-  const formulaRegistry = new FunctionRegistry(config)
-  const dependencyGraph = DependencyGraph.buildEmpty(transformingService, config, formulaRegistry, statistics)
+  const functionRegistry = new FunctionRegistry(config)
+  const dependencyGraph = DependencyGraph.buildEmpty(transformingService, config, functionRegistry, statistics)
   return new ColumnIndex(dependencyGraph, config, statistics)
 }
 

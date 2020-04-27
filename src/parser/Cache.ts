@@ -19,13 +19,13 @@ export class Cache {
   private cache: Map<string, CacheEntry> = new Map()
 
   constructor(
-    private readonly formulaRegistry: FunctionRegistry,
+    private readonly functionRegistry: FunctionRegistry,
   ) {
   }
 
   public set(hash: string, ast: Ast): CacheEntry {
-    const astRelativeDependencies = collectDependencies(ast, this.formulaRegistry)
-    const cacheEntry = buildCacheEntry(ast, astRelativeDependencies, doesContainFunctions(ast, this.formulaRegistry.isFunctionVolatile), doesContainFunctions(ast, this.formulaRegistry.isFunctionDependentOnSheetStructureChange))
+    const astRelativeDependencies = collectDependencies(ast, this.functionRegistry)
+    const cacheEntry = buildCacheEntry(ast, astRelativeDependencies, doesContainFunctions(ast, this.functionRegistry.isFunctionVolatile), doesContainFunctions(ast, this.functionRegistry.isFunctionDependentOnSheetStructureChange))
     this.cache.set(hash, cacheEntry)
     return cacheEntry
   }

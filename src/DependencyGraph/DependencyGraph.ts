@@ -41,18 +41,18 @@ export class DependencyGraph {
    * - empty cell has associated EmptyCellVertex if and only if it is a dependency (possibly indirect, through range) to some formula
    */
 
-  public static buildEmpty(lazilyTransformingAstService: LazilyTransformingAstService, config: Config, formulaRegistry: FunctionRegistry, stats: Statistics) {
+  public static buildEmpty(lazilyTransformingAstService: LazilyTransformingAstService, config: Config, functionRegistry: FunctionRegistry, stats: Statistics) {
     const addressMapping = new AddressMapping(config.chooseAddressMappingPolicy)
     const rangeMapping = new RangeMapping()
     return new DependencyGraph(
       addressMapping,
       rangeMapping,
-      new Graph<Vertex>(new GetDependenciesQuery(rangeMapping, addressMapping, lazilyTransformingAstService, formulaRegistry)),
+      new Graph<Vertex>(new GetDependenciesQuery(rangeMapping, addressMapping, lazilyTransformingAstService, functionRegistry)),
       new SheetMapping(config.translationPackage),
       new MatrixMapping(),
       stats,
       lazilyTransformingAstService,
-      formulaRegistry,
+      functionRegistry,
     )
   }
 
@@ -64,7 +64,7 @@ export class DependencyGraph {
     public readonly matrixMapping: MatrixMapping,
     public readonly stats: Statistics,
     public readonly lazilyTransformingAstService: LazilyTransformingAstService,
-    public readonly formulaRegistry: FunctionRegistry,
+    public readonly functionRegistry: FunctionRegistry,
   ) {
   }
 
@@ -467,7 +467,7 @@ export class DependencyGraph {
     }
 
     for (const adjacentNode of adjacentNodes.values()) {
-      const nodeDependencies = collectAddressesDependentToMatrix(this.formulaRegistry, adjacentNode, matrixVertex, this.lazilyTransformingAstService, this)
+      const nodeDependencies = collectAddressesDependentToMatrix(this.functionRegistry, adjacentNode, matrixVertex, this.lazilyTransformingAstService, this)
       for (const address of nodeDependencies) {
         const vertex = this.fetchCell(address)
         this.graph.addEdge(vertex, adjacentNode)
@@ -487,7 +487,7 @@ export class DependencyGraph {
     }
 
     for (const adjacentNode of adjacentNodes.values()) {
-      const nodeDependencies = collectAddressesDependentToMatrix(this.formulaRegistry, adjacentNode, matrixVertex, this.lazilyTransformingAstService, this)
+      const nodeDependencies = collectAddressesDependentToMatrix(this.functionRegistry, adjacentNode, matrixVertex, this.lazilyTransformingAstService, this)
       for (const address of nodeDependencies) {
         const vertex = this.fetchCellOrCreateEmpty(address)
         this.graph.addEdge(vertex, adjacentNode)
