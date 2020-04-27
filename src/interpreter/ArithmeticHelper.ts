@@ -64,8 +64,7 @@ export class ArithmeticHelper {
     if(type === 'full') {
       try {
         RegExp(pattern)
-      }
-      catch (e) {
+      } catch (e) {
         type = 'none'
       }
     }
