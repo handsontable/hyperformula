@@ -149,9 +149,9 @@ export class DependencyGraph {
   }
 
   public processCellDependencies(cellDependencies: CellDependency[], endVertex: Vertex) {
-    cellDependencies.forEach((absStartCell: CellDependency) => {
-      if (absStartCell instanceof AbsoluteCellRange) {
-        const range = absStartCell
+    cellDependencies.forEach((dep: CellDependency) => {
+      if (dep instanceof AbsoluteCellRange) {
+        const range = dep
         let rangeVertex = this.rangeMapping.getRange(range.start, range.end)
         if (rangeVertex === null) {
           rangeVertex = new RangeVertex(range)
@@ -181,11 +181,11 @@ export class DependencyGraph {
         if (range.isFinite()) {
           this.correctInfiniteRangesDependenciesByRangeVertex(rangeVertex)
         }
-      } else if (absStartCell instanceof NamedExpressionDependency) {
-        const namedExpressionVertex = this.namedExpressionVertex(absStartCell.name)
+      } else if (dep instanceof NamedExpressionDependency) {
+        const namedExpressionVertex = this.namedExpressionVertex(dep.name)
         this.graph.addEdge(namedExpressionVertex, endVertex)
       } else {
-        this.graph.addEdge(this.fetchCellOrCreateEmpty(absStartCell), endVertex)
+        this.graph.addEdge(this.fetchCellOrCreateEmpty(dep), endVertex)
       }
     })
   }
