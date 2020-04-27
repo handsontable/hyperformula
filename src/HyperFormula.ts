@@ -287,14 +287,11 @@ export class HyperFormula implements TypedEmitter {
    * 
    * @example
    * ```js
-   * // have a HyperFormula instance built, for example:
-   * const hfInstance = HyperFormula.buildEmpty();
-   *  
    * // register the language for the instance
-   * hfInstance.registerLanguage('plPL', plPL)
+   * HyperFormula.registerLanguage('plPL', plPL)
    * 
    * // unregister plPL
-   * hfInstance.unregisterLanguage('plPL').
+   * HyperFormula.unregisterLanguage('plPL').
    * ```
    */
   public static unregisterLanguage(languageCode: string): void {
@@ -749,7 +746,7 @@ export class HyperFormula implements TypedEmitter {
    * hfInstance.removeRows(0, [1, 1]);
    * 
    * // do an undo, it should return previous values [['1'], ['2'], ['3']]
-   * hfInstance.undo();
+   * const changes = hfInstance.undo();
    * ```
    *
    * @category UndoRedo
@@ -780,7 +777,7 @@ export class HyperFormula implements TypedEmitter {
    * hfInstance.undo();
    *
    * // do a redo, it should return the values after removing the second row: [['1'], ['3']]
-   * hfInstance.redo();
+   * const changes = hfInstance.redo();
    * ```
    *
    * @category UndoRedo
@@ -878,7 +875,7 @@ export class HyperFormula implements TypedEmitter {
    * ['1', '2', '=A1'],
    * ]);
    * 
-   * // should set the content, returns: [ ExportedCellChange { address: { sheet: 0, col: 3, row: 0 }, newValue: 2 } ]
+   * // should set the content, returns: [{ address: { sheet: 0, col: 3, row: 0 }, newValue: 2 }]
    * hfInstance.setCellContents({ col: 3, row: 0, sheet: 0 }, [['=B1']]);
    * ```
    *
@@ -2353,8 +2350,7 @@ export class HyperFormula implements TypedEmitter {
    * // suspend the evaluation
    * hfInstance.suspendEvaluation();
    * 
-   * // Between suspendEvaluation() and resumeEvaluation() or inside batch it will return true, otherwise false. 
-   * // Can be used to intentionally trigger or pause evaluation.
+   * // Between suspendEvaluation() and resumeEvaluation() or inside batch() it will return true, otherwise false. 
    * const isEvaluationSuspended = hfInstance.isEvaluationSuspended()
    *
    * const changes = hfInstance.resumeEvaluation()
