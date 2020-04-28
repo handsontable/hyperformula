@@ -13,6 +13,10 @@ export class NamedExpression {
     public added: boolean,
   ) {
   }
+  
+  public get displayName(): string {
+    return this.name
+  }
 }
 
 class NamedExpressionsStore {
@@ -123,18 +127,6 @@ export class NamedExpressions {
     return namedExpression.name
   }
 
-  public getDisplayNameByName(expressionName: string, sheetId: number): Maybe<string> {
-    let namedExpression = this.worksheetStore(sheetId).get(expressionName)
-    if (!namedExpression) {
-      namedExpression = this.workbookStore.get(expressionName)
-    }
-    if (namedExpression) {
-      return namedExpression.name
-    } else {
-      return undefined
-    }
-  }
-
   public getDisplayNameByNameForScope(expressionName: string, sheetId: number | undefined): Maybe<string> {
     let namedExpression
     if (sheetId === undefined) {
@@ -147,6 +139,10 @@ export class NamedExpressions {
     } else {
       return undefined
     }
+  }
+
+  public nearestNamedExpression(expressionName: string, sheetId: number): Maybe<NamedExpression> {
+    return this.worksheetStore(sheetId).get(expressionName) || this.workbookStore.get(expressionName)
   }
 
   public isNameValid(expressionName: string): boolean {
