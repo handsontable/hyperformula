@@ -8,22 +8,30 @@ import {Interpreter} from './Interpreter'
 import {Maybe} from '../Maybe'
 import {Config} from '../Config'
 import {FunctionPluginValidationError} from '../errors'
+import {TranslationSet} from '../i18n'
+import {HyperFormula} from '../HyperFormula'
+
+export type FunctionTranslationsPackage = Record<string, TranslationSet>
 
 export class FunctionRegistry {
   public static plugins: Map<string, FunctionPluginDefinition> = new Map()
 
-  public static registerFunctionPlugins(...plugins: FunctionPluginDefinition[]): void {
-    for (const plugin of plugins) {
-      this.loadPluginFunctions(plugin, this.plugins)
+  public static registerFunctionPlugin(plugin: FunctionPluginDefinition, translations?: FunctionTranslationsPackage): void {
+    this.loadPluginFunctions(plugin, this.plugins)
+    if (translations !== undefined) {
+      this.loadTranslations(translations)
     }
   }
 
-  public static registerFunction(functionId: string, plugin: FunctionPluginDefinition): void {
+  public static registerFunction(functionId: string, plugin: FunctionPluginDefinition, translations?: FunctionTranslationsPackage): void {
     const entry = plugin.implementedFunctions[functionId]
     if (entry !== undefined) {
       this.loadPluginFunction(plugin, functionId, this.plugins)
     } else {
       throw FunctionPluginValidationError.functionNotDeclaredInPlugin(functionId, plugin.name)
+    }
+    if (translations !== undefined) {
+      this.loadTranslations(translations)
     }
   }
 
@@ -49,6 +57,12 @@ export class FunctionRegistry {
 
   public static getFunctionPlugin(functionId: string): Maybe<FunctionPluginDefinition> {
     return this.plugins.get(functionId)
+  }
+
+  private static loadTranslations(translations: FunctionTranslationsPackage) {
+    Object.keys(translations).forEach(language => {
+      HyperFormula.getLanguage(language).extendFunctions(translations[language])
+    })
   }
 
   private static loadPluginFunctions(plugin: FunctionPluginDefinition, registry: Map<string, FunctionPluginDefinition>): void {

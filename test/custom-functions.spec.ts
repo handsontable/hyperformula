@@ -1,11 +1,11 @@
 import {FunctionPlugin} from '../src/interpreter/plugin/FunctionPlugin'
 import {ProcedureAst} from '../src/parser'
 import {ErrorType, InternalCellValue, SimpleCellAddress} from '../src/Cell'
-import {HyperFormula} from '../src'
+import {HyperFormula, FunctionPluginValidationError} from '../src'
 import {adr, detailedError, expectArrayWithSameContent, unregisterAllFormulas} from './testUtils'
-import {FunctionPluginValidationError} from '../src/errors'
 import {SumifPlugin} from '../src/interpreter/plugin/SumifPlugin'
 import {NumericAggregationPlugin} from '../src/interpreter/plugin/NumericAggregationPlugin'
+import {enGB, plPL} from '../src/i18n'
 
 class FooPlugin extends FunctionPlugin {
   public static implementedFunctions = {
@@ -15,6 +15,13 @@ class FooPlugin extends FunctionPlugin {
     'BAR': {
       method: 'bar'
     }
+  }
+
+  public static translations = {
+    'enGB': {
+      'FOO': 'FOO',
+      'BAR': 'BAR'
+    },
   }
 
   public foo(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
@@ -54,21 +61,40 @@ class InvalidPlugin extends FunctionPlugin {
 
 
 describe('Register static custom plugin', () => {
-  beforeEach(() => {
-    HyperFormula.getLanguage('enGB').extendFunctions({FOO: 'FOO'})
-    HyperFormula.getLanguage('enGB').extendFunctions({BAR: 'BAR'})
+  it('should register plugin with translations', () => {
+    HyperFormula.registerLanguage('plPL', plPL)
+    const translations = {
+      'plPL': {
+        'FOO': 'FU',
+        'BAR': 'BAR'
+      },
+    }
+    HyperFormula.registerFunctionPlugin(FooPlugin, translations)
+
+    const pl = HyperFormula.getLanguage('plPL')
+
+    expect(pl.getFunctionTranslation('FOO')).toEqual('FU')
+  })
+
+  it('should register single function with translations', () => {
+    HyperFormula.registerFunction('FOO', FooPlugin, FooPlugin.translations)
+
+    const engine = HyperFormula.buildFromArray([['=FOO()']])
+
+    expect(engine.getCellValue(adr('A1'))).toEqual('foo')
   })
 
   it('should return registered formula ids', () => {
     unregisterAllFormulas()
-    HyperFormula.registerFunctionPlugins(SumifPlugin, FooPlugin)
+    HyperFormula.registerFunctionPlugin(SumifPlugin)
+    HyperFormula.registerFunctionPlugin(FooPlugin)
     const formulaIds = HyperFormula.getRegisteredFunctions()
 
     expectArrayWithSameContent(['FOO', 'BAR', 'SUMIF', 'COUNTIF', 'AVERAGEIF', 'SUMIFS', 'COUNTIFS'], formulaIds)
   })
 
   it('should register all formulas from plugin', () => {
-    HyperFormula.registerFunctionPlugins(FooPlugin)
+    HyperFormula.registerFunctionPlugin(FooPlugin, FooPlugin.translations)
 
     const engine = HyperFormula.buildFromArray([
       ['=foo()', '=bar()']
@@ -81,7 +107,7 @@ describe('Register static custom plugin', () => {
   })
 
   it('should register single formula from plugin', () => {
-    HyperFormula.registerFunction('BAR', FooPlugin)
+    HyperFormula.registerFunction('BAR', FooPlugin, FooPlugin.translations)
     const engine = HyperFormula.buildFromArray([
       ['=foo()', '=bar()']
     ])
@@ -104,7 +130,7 @@ describe('Register static custom plugin', () => {
 
   it('should throw plugin validation error', () => {
     expect(() => {
-      HyperFormula.registerFunctionPlugins(InvalidPlugin)
+      HyperFormula.registerFunctionPlugin(InvalidPlugin)
     }).toThrow(FunctionPluginValidationError.functionMethodNotFound('foo', 'InvalidPlugin'))
 
     expect(() => {
@@ -118,16 +144,18 @@ describe('Register static custom plugin', () => {
 
   it('should return registered plugins', () => {
     unregisterAllFormulas()
-    HyperFormula.registerFunctionPlugins(SumifPlugin)
-    HyperFormula.registerFunctionPlugins(NumericAggregationPlugin)
-    HyperFormula.registerFunctionPlugins(SumWithExtra)
+    HyperFormula.registerFunctionPlugin(SumifPlugin)
+    HyperFormula.registerFunctionPlugin(NumericAggregationPlugin)
+    HyperFormula.registerFunctionPlugin(SumWithExtra)
 
     expectArrayWithSameContent(HyperFormula.getPlugins(), [SumifPlugin, NumericAggregationPlugin, SumWithExtra])
   })
 
   it('should unregister whole plugin', () => {
     unregisterAllFormulas()
-    HyperFormula.registerFunctionPlugins(SumifPlugin, NumericAggregationPlugin)
+    HyperFormula.registerFunctionPlugin(NumericAggregationPlugin)
+    HyperFormula.registerFunctionPlugin(SumifPlugin)
+
     HyperFormula.unregisterFunctionPlugin(NumericAggregationPlugin)
 
     expectArrayWithSameContent(HyperFormula.getPlugins(), [SumifPlugin])
@@ -158,7 +186,7 @@ describe('Instance level formula registry', () => {
   })
 
   it('modifying static plugins should not affect existing engine instance registry', () => {
-    HyperFormula.registerFunctionPlugins(FooPlugin)
+    HyperFormula.registerFunctionPlugin(FooPlugin)
     const engine = HyperFormula.buildFromArray([
       ['=foo()', '=bar()']
     ])
