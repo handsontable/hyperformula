@@ -42,4 +42,11 @@ describe('Unary operator MINUS', () => {
 
     expect(engine.getCellValue(adr('B2'))).toEqual(detailedError(ErrorType.VALUE))
   })
+
+  it('double unary plus', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=--2'],
+    ])
+    expect(engine.getCellValue(adr('A1'))).toEqual(2)
+  })
 })
