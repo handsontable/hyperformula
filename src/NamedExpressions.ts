@@ -9,7 +9,7 @@ import {Maybe} from './Maybe'
 export class NamedExpression {
   constructor(
     public name: string,
-    public readonly row: number,
+    public readonly address: SimpleCellAddress,
     public added: boolean,
   ) {
   }
@@ -31,7 +31,7 @@ class NamedExpressionsStore {
 
   public add(namedExpression: NamedExpression): void {
     this.mapping.set(this.normalizeExpressionName(namedExpression.name), namedExpression)
-    this.rowMapping.set(namedExpression.row, namedExpression)
+    this.rowMapping.set(namedExpression.address.row, namedExpression)
   }
 
   public get(expressionName: string): Maybe<NamedExpression> {
@@ -110,7 +110,7 @@ export class NamedExpressions {
     if (!namedExpression) {
       for (const store of this.worksheetStores.values()) {
         for (const worksheetNamedExpression of store.mapping.values()) {
-          if (worksheetNamedExpression.row === row) {
+          if (worksheetNamedExpression.address.row === row) {
             return worksheetNamedExpression.name
           }
         }
@@ -169,7 +169,7 @@ export class NamedExpressions {
         namedExpression.added = true
         namedExpression.name = expressionName
       } else {
-        namedExpression = new NamedExpression(expressionName, this.nextNamedExpressionRow, true)
+        namedExpression = new NamedExpression(expressionName, this.buildAddress(this.nextNamedExpressionRow), true)
         this.nextNamedExpressionRow++
         this.workbookStore.add(namedExpression)
       }
@@ -179,7 +179,7 @@ export class NamedExpressions {
       // if (store.has(expressionName)) {
       //   throw new Error('Name of Named Expression already taken')
       // }
-      const namedExpression = new NamedExpression(expressionName, this.nextNamedExpressionRow, true)
+      const namedExpression = new NamedExpression(expressionName, this.buildAddress(this.nextNamedExpressionRow), true)
       this.nextNamedExpressionRow++
       store.add(namedExpression)
       return namedExpression
@@ -200,20 +200,20 @@ export class NamedExpressions {
     if (namedExpression === undefined || !namedExpression.added) {
       return null
     } else {
-      return this.buildAddress(namedExpression.row)
+      return namedExpression.address
     }
   }
 
   public getGuessedInternalNamedExpressionAddress(expressionName: string, sheetId: number): SimpleCellAddress | null {
     const namedExpression = this.worksheetStore(sheetId).get(expressionName)
     if (namedExpression) {
-      return this.buildAddress(namedExpression.row)
+      return namedExpression.address
     } else {
       const namedExpression = this.workbookStore.get(expressionName)
       if (namedExpression === undefined || !namedExpression.added) {
         return null
       } else {
-        return this.buildAddress(namedExpression.row)
+        return namedExpression.address
       }
     }
   }
@@ -229,22 +229,22 @@ export class NamedExpressions {
     if (namedExpression === undefined || !namedExpression.added) {
       return null
     } else {
-      return this.buildAddress(namedExpression.row)
+      return namedExpression.address
     }
   }
 
   public getInternalMaybeNotAddedNamedExpressionAddress(expressionName: string, sheetId: number): SimpleCellAddress {
     const namedExpression = this.worksheetStore(sheetId).get(expressionName)
     if (namedExpression) {
-      return this.buildAddress(namedExpression.row)
+      return namedExpression.address
     } else {
       let namedExpression = this.workbookStore.get(expressionName)
       if (namedExpression === undefined) {
-        namedExpression = new NamedExpression(expressionName, this.nextNamedExpressionRow, false)
+        namedExpression = new NamedExpression(expressionName, this.buildAddress(this.nextNamedExpressionRow), false)
         this.nextNamedExpressionRow++
         this.workbookStore.add(namedExpression)
       }
-      return this.buildAddress(namedExpression.row)
+      return namedExpression.address
     }
   }
 
