@@ -1491,6 +1491,7 @@ export class HyperFormula implements TypedEmitter {
    * Note that this method may trigger dependency graph recalculation.
    *
    * @param {string} expressionName - an expression name, case insensitive.
+   * @param {string | undefined} scope - sheet name or undefined for global scope
    * @param {RawCellContent} newExpression - a new expression
    *
    * @fires [[valuesUpdated]] if recalculation was triggered by this change
@@ -1499,8 +1500,8 @@ export class HyperFormula implements TypedEmitter {
    *
    * @category Named Expression
    */
-  public changeNamedExpression(expressionName: string, newExpression: RawCellContent): ExportedChange[] {
-    this._crudOperations.changeNamedExpressionExpression(expressionName, newExpression)
+  public changeNamedExpression(expressionName: string, sheetScope: string | undefined, newExpression: RawCellContent): ExportedChange[] {
+    this._crudOperations.changeNamedExpressionExpression(expressionName, sheetScope, newExpression)
     return this.recomputeIfDependencyGraphNeedsIt()
   }
 

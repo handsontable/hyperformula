@@ -142,7 +142,7 @@ describe('Named expressions', () => {
     ])
     engine.addNamedExpression('myName', '=Sheet1!A1+10')
 
-    engine.changeNamedExpression('myName', '=Sheet1!A1+11')
+    engine.changeNamedExpression('myName', undefined, '=Sheet1!A1+11')
 
     expect(engine.getNamedExpressionValue('myName')).toEqual(53)
   })
@@ -153,18 +153,32 @@ describe('Named expressions', () => {
     ])
     engine.addNamedExpression('myName', '=Sheet1!A1+10')
 
-    engine.changeNamedExpression('myName', 58)
+    engine.changeNamedExpression('myName', undefined, 58)
 
     expect(engine.getNamedExpressionValue('myName')).toEqual(58)
   })
 
-  it('when changing named expression, only formulas are accepted', () => {
+  it('is possible to change named expression formula on local level', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['42'],
+    ])
+    engine.addNamedExpression('myName', '=10')
+    engine.addNamedExpression('myName', '=100', 'Sheet1')
+
+    engine.changeNamedExpression('myName', undefined, '=20')
+    engine.changeNamedExpression('myName', 'Sheet1', '=200')
+
+    expect(engine.getNamedExpressionValue('myName', undefined)).toEqual(20)
+    expect(engine.getNamedExpressionValue('myName', 'Sheet1')).toEqual(200)
+  })
+
+  it('when changing named expression, matrices are not supported', () => {
     const engine = HyperFormula.buildEmpty()
 
     engine.addNamedExpression('myName', '=42')
 
     expect(() => {
-      engine.changeNamedExpression('myName', '{=TRANSPOSE(A1:B2)}')
+      engine.changeNamedExpression('myName', undefined, '{=TRANSPOSE(A1:B2)}')
     }).toThrowError(/not supported/)
   })
 
@@ -172,7 +186,7 @@ describe('Named expressions', () => {
     const engine = HyperFormula.buildEmpty()
 
     expect(() => {
-      engine.changeNamedExpression('myName', '=42')
+      engine.changeNamedExpression('myName', undefined, '=42')
     }).toThrowError("Named Expression 'myName' does not exist")
   })
 
@@ -196,7 +210,7 @@ describe('Named expressions', () => {
 
     expect(engine.getNamedExpressionValue('MYname')).toEqual(42)
     expect(() => {
-      engine.changeNamedExpression('MYname', '=43')
+      engine.changeNamedExpression('MYname', undefined, '=43')
     }).not.toThrowError()
     expect(() => {
       engine.removeNamedExpression('MYname')

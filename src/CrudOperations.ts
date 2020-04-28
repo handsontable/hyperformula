@@ -315,8 +315,13 @@ export class CrudOperations {
     this.storeExpressionInCell(address, expression)
   }
 
-  public changeNamedExpressionExpression(expressionName: string, newExpression: RawCellContent) {
-    const address = this.namedExpressions.getInternalNamedExpressionAddress(expressionName)
+  public changeNamedExpressionExpression(expressionName: string, sheetScope: string | undefined, newExpression: RawCellContent) {
+    let sheetId = undefined
+    if (sheetScope !== undefined) {
+      this.ensureSheetExists(sheetScope)
+      sheetId = this.sheetMapping.fetch(sheetScope)
+    }
+    const address = this.namedExpressions.getInternalNamedExpressionAddressFromScope(expressionName, sheetId)
     if (!address) {
       throw new NamedExpressionDoesNotExist(expressionName)
     }
