@@ -74,6 +74,6 @@ describe('Building engine from arrays', () => {
         null, // broken sheet
         [6, 7]
       ] as any)
-    }).toThrowError('Expected an array of arrays.')
+    }).toThrowError('Invalid arguments, expected an array of arrays.')
   })
 })
