@@ -73,6 +73,14 @@ class WorksheetStore {
   private normalizeExpressionName(expressionName: string): string {
     return expressionName.toLowerCase()
   }
+
+  public remove(expressionName: string): void {
+    const normalizedExpressionName = this.normalizeExpressionName(expressionName)
+    const namedExpression = this.mapping.get(normalizedExpressionName)
+    if (namedExpression) {
+      this.mapping.delete(normalizedExpressionName)
+    }
+  }
 }
 
 export class NamedExpressions {
@@ -115,8 +123,25 @@ export class NamedExpressions {
     return namedExpression.name
   }
 
-  public getDisplayNameByName(expressionName: string): Maybe<string> {
-    const namedExpression = this.workbookStore.get(expressionName)
+  public getDisplayNameByName(expressionName: string, sheetId: number): Maybe<string> {
+    let namedExpression = this.worksheetStore(sheetId).get(expressionName)
+    if (!namedExpression) {
+      namedExpression = this.workbookStore.get(expressionName)
+    }
+    if (namedExpression) {
+      return namedExpression.name
+    } else {
+      return undefined
+    }
+  }
+
+  public getDisplayNameByNameForScope(expressionName: string, sheetId: number | undefined): Maybe<string> {
+    let namedExpression
+    if (sheetId === undefined) {
+      namedExpression = this.workbookStore.get(expressionName)
+    } else {
+      namedExpression = this.worksheetStore(sheetId).get(expressionName)
+    }
     if (namedExpression) {
       return namedExpression.name
     } else {
@@ -223,12 +248,18 @@ export class NamedExpressions {
     }
   }
 
-  public remove(expressionName: string): void {
-    const namedExpression = this.workbookStore.get(expressionName)
+  public remove(expressionName: string, sheetId: number | undefined): void {
+    let store
+    if (sheetId === undefined) {
+      store = this.workbookStore
+    } else {
+      store = this.worksheetStore(sheetId)
+    }
+    const namedExpression = store.get(expressionName)
     if (namedExpression === undefined || !namedExpression.added) {
       throw 'Named expression does not exist'
     }
-    this.workbookStore.remove(expressionName)
+    store.remove(expressionName)
   }
 
   public getAllNamedExpressionsNames(): string[] {

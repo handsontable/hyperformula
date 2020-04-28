@@ -130,10 +130,21 @@ describe('Named expressions', () => {
     ])
     engine.addNamedExpression('myName', '=Sheet1!A1')
 
-    engine.removeNamedExpression('myName')
+    engine.removeNamedExpression('myName', undefined)
 
     expect(engine.getNamedExpressionValue('myName')).toBe(undefined)
     expect(engine.setCellContents(adr('A1'), '43').length).toBe(1)
+  })
+
+  it('removing local named expression', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['42'],
+    ])
+    engine.addNamedExpression('myName', '=Sheet1!A1', 'Sheet1')
+
+    engine.removeNamedExpression('myName', 'Sheet1')
+
+    expect(engine.getNamedExpressionValue('myName')).toBe(undefined)
   })
 
   it('is possible to change named expression formula to other', () => {
@@ -213,7 +224,7 @@ describe('Named expressions', () => {
       engine.changeNamedExpression('MYname', undefined, '=43')
     }).not.toThrowError()
     expect(() => {
-      engine.removeNamedExpression('MYname')
+      engine.removeNamedExpression('MYname', undefined)
     }).not.toThrowError()
   })
 
@@ -330,7 +341,7 @@ describe("Named expressions - in formula usage", () => {
     engine.addNamedExpression('FOO', '=42')
     engine.setCellContents(adr('A1'), '=FOO+10')
 
-    engine.removeNamedExpression('FOO')
+    engine.removeNamedExpression('FOO', undefined)
 
     expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NAME))
   })

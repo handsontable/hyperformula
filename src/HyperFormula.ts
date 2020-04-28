@@ -1511,17 +1511,23 @@ export class HyperFormula implements TypedEmitter {
    * Note that this method may trigger dependency graph recalculation.
    *
    * @param {string} expressionName - expression name, case insensitive.
+   * @param {string | undefined} scope - sheet name or undefined for global scope
    *
    * @fires [[namedExpressionRemoved]]
    * @fires [[valuesUpdated]] if recalculation was triggered by this change
    *
    * @category Named Expression
    */
-  public removeNamedExpression(expressionName: string): ExportedChange[] {
-    const address = this._namedExpressions.getInternalNamedExpressionAddress(expressionName)
+  public removeNamedExpression(expressionName: string, sheetScope: string | undefined): ExportedChange[] {
+    let sheetId = undefined
+    if (sheetScope !== undefined) {
+      this._crudOperations.ensureSheetExists(sheetScope)
+      sheetId = this.sheetMapping.fetch(sheetScope)
+    }
+    const address = this._namedExpressions.getInternalNamedExpressionAddressFromScope(expressionName, sheetId)
     if (address) {
-      const namedExpressionDisplayName = this._namedExpressions.getDisplayNameByName(expressionName)!
-      this._namedExpressions.remove(expressionName)
+      const namedExpressionDisplayName = this._namedExpressions.getDisplayNameByNameForScope(expressionName, sheetId)!
+      this._namedExpressions.remove(expressionName, sheetId)
       this.dependencyGraph.setCellEmpty(address)
       const changes = this.recomputeIfDependencyGraphNeedsIt()
       this._emitter.emit(Events.NamedExpressionRemoved, namedExpressionDisplayName, changes)

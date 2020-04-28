@@ -82,7 +82,7 @@ describe('Events', () => {
     const handler = jasmine.createSpy()
 
     engine.on(Events.NamedExpressionRemoved, handler)
-    engine.removeNamedExpression('myName')
+    engine.removeNamedExpression('myName', undefined)
 
     expect(handler).toHaveBeenCalledTimes(1)
     expect(handler).toHaveBeenCalledWith('myName', [])
@@ -93,7 +93,7 @@ describe('Events', () => {
     const handler = jasmine.createSpy()
 
     engine.on(Events.NamedExpressionRemoved, handler)
-    engine.removeNamedExpression('myName')
+    engine.removeNamedExpression('myName', undefined)
 
     expect(handler).not.toHaveBeenCalled()
   })
@@ -104,7 +104,7 @@ describe('Events', () => {
     const handler = jasmine.createSpy()
 
     engine.on(Events.NamedExpressionRemoved, handler)
-    engine.removeNamedExpression('MYNAME')
+    engine.removeNamedExpression('MYNAME', undefined)
 
     expect(handler).toHaveBeenCalledTimes(1)
     expect(handler).toHaveBeenCalledWith('myName', [])
