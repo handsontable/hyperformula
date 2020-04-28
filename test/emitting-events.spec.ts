@@ -70,7 +70,7 @@ describe('Events', () => {
     const handler = jasmine.createSpy()
 
     engine.on(Events.NamedExpressionAdded, handler)
-    engine.addNamedExpression('myName', 'foobarbaz')
+    engine.addNamedExpression('myName', 'foobarbaz', undefined)
 
     expect(handler).toHaveBeenCalledTimes(1)
     expect(handler).toHaveBeenCalledWith('myName', [new ExportedNamedExpressionChange('myName', 'foobarbaz')])
@@ -78,7 +78,7 @@ describe('Events', () => {
 
   it('namedExpressionRemoved works', () => {
     const engine = HyperFormula.buildEmpty()
-    engine.addNamedExpression('myName', 'foobarbaz')
+    engine.addNamedExpression('myName', 'foobarbaz', undefined)
     const handler = jasmine.createSpy()
 
     engine.on(Events.NamedExpressionRemoved, handler)
@@ -100,8 +100,8 @@ describe('Events', () => {
 
   it('namedExpressionRemoved contains actual named expression name', () => {
     const engine = HyperFormula.buildEmpty()
-    engine.addNamedExpression('myName', 'foobarbaz')
-    const handler = jasmine.createSpy()
+    engine.addNamedExpression('myName', 'foobarbaz', undefined)
+    const handler = jest.fn()
 
     engine.on(Events.NamedExpressionRemoved, handler)
     engine.removeNamedExpression('MYNAME', undefined)

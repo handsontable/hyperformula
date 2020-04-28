@@ -1431,7 +1431,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * @category Named Expression
    */
-  public addNamedExpression(expressionName: string, expression: RawCellContent, sheetScope: string | undefined = undefined): ExportedChange[] {
+  public addNamedExpression(expressionName: string, expression: RawCellContent, sheetScope: string | undefined): ExportedChange[] {
     this._crudOperations.addNamedExpression(expressionName, expression, sheetScope)
     const changes = this.recomputeIfDependencyGraphNeedsIt()
     this._emitter.emit(Events.NamedExpressionAdded, expressionName, changes)
