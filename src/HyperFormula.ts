@@ -1478,7 +1478,7 @@ export class HyperFormula implements TypedEmitter {
       sheetId = this.sheetMapping.fetch(sheetScope)
     }
     const namedExpressionAddress = this._namedExpressions.getInternalNamedExpressionAddressFromScope(expressionName, sheetId)
-    if (namedExpressionAddress === null) {
+    if (namedExpressionAddress === undefined) {
       return undefined
     } else {
       return this._serialization.getCellFormula(namedExpressionAddress)

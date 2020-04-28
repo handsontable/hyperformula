@@ -189,30 +189,30 @@ export class NamedExpressions {
     return store
   }
 
-  public getInternalNamedExpressionAddress(expressionName: string): SimpleCellAddress | null {
+  public getInternalNamedExpressionAddress(expressionName: string): Maybe<SimpleCellAddress> {
     const namedExpression = this.workbookStore.get(expressionName)
     if (namedExpression === undefined || !namedExpression.added) {
-      return null
+      return undefined
     } else {
       return namedExpression.address
     }
   }
 
-  public getGuessedInternalNamedExpressionAddress(expressionName: string, sheetId: number): SimpleCellAddress | null {
+  public getGuessedInternalNamedExpressionAddress(expressionName: string, sheetId: number): Maybe<SimpleCellAddress> {
     const namedExpression = this.worksheetStore(sheetId).get(expressionName)
     if (namedExpression) {
       return namedExpression.address
     } else {
       const namedExpression = this.workbookStore.get(expressionName)
       if (namedExpression === undefined || !namedExpression.added) {
-        return null
+        return undefined
       } else {
         return namedExpression.address
       }
     }
   }
 
-  public getInternalNamedExpressionAddressFromScope(expressionName: string, sheetId: number | undefined): SimpleCellAddress | null {
+  public getInternalNamedExpressionAddressFromScope(expressionName: string, sheetId: number | undefined): Maybe<SimpleCellAddress> {
     let store: NamedExpressionsStore | WorksheetStore
     if (sheetId === undefined) {
       store = this.workbookStore
@@ -221,7 +221,7 @@ export class NamedExpressions {
     }
     const namedExpression = store.get(expressionName)
     if (namedExpression === undefined || !namedExpression.added) {
-      return null
+      return undefined
     } else {
       return namedExpression.address
     }
