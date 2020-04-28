@@ -21,7 +21,6 @@ export class NamedExpression {
 
 class NamedExpressionsStore {
   private readonly mapping = new Map<string, NamedExpression>()
-  private readonly rowMapping = new Map<number, NamedExpression>()
 
   public has(expressionName: string): boolean {
     return this.mapping.has(this.normalizeExpressionName(expressionName))
@@ -35,7 +34,6 @@ class NamedExpressionsStore {
 
   public add(namedExpression: NamedExpression): void {
     this.mapping.set(this.normalizeExpressionName(namedExpression.name), namedExpression)
-    this.rowMapping.set(namedExpression.address.row, namedExpression)
   }
 
   public get(expressionName: string): Maybe<NamedExpression> {
@@ -49,10 +47,6 @@ class NamedExpressionsStore {
     } else {
       return undefined
     }
-  }
-
-  public getByRow(row: number): Maybe<NamedExpression> {
-    return this.rowMapping.get(row)
   }
 
   public remove(expressionName: string): void {
@@ -101,6 +95,7 @@ export class NamedExpressions {
   private nextNamedExpressionRow: number = 0
   public readonly workbookStore: NamedExpressionsStore = new NamedExpressionsStore()
   public readonly worksheetStores: Map<number, WorksheetStore> = new Map()
+  public readonly addressCache: Map<number, NamedExpression> = new Map()
 
   constructor(
   ) {
@@ -119,17 +114,7 @@ export class NamedExpressions {
   }
 
   public fetchNameForNamedExpressionRow(row: number): string {
-    let namedExpression = this.workbookStore.getByRow(row)
-    if (!namedExpression) {
-      for (const store of this.worksheetStores.values()) {
-        for (const worksheetNamedExpression of store.mapping.values()) {
-          if (worksheetNamedExpression.address.row === row) {
-            return worksheetNamedExpression.name
-          }
-        }
-      }
-    }
-    // maybe rowmapping should be on other level
+    const namedExpression = this.addressCache.get(row)
     if (!namedExpression) {
       throw new Error('Requested Named Expression does not exist')
     }
@@ -171,6 +156,7 @@ export class NamedExpressions {
         namedExpression = new NamedExpression(expressionName, this.nextAddress(), true)
         this.workbookStore.add(namedExpression)
       }
+      this.addressCache.set(namedExpression.address.row, namedExpression)
       return namedExpression
     } else {
       const store = this.worksheetStore(sheetId)
@@ -179,6 +165,7 @@ export class NamedExpressions {
       // }
       const namedExpression = new NamedExpression(expressionName, this.nextAddress(), true)
       store.add(namedExpression)
+      this.addressCache.set(namedExpression.address.row, namedExpression)
       return namedExpression
     }
   }
@@ -233,6 +220,7 @@ export class NamedExpressions {
       throw 'Named expression does not exist'
     }
     store.remove(expressionName)
+    this.addressCache.delete(namedExpression.address.row)
   }
 
   public getAllNamedExpressionsNames(): string[] {
