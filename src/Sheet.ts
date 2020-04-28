@@ -5,6 +5,7 @@
 
 import {RawCellContent} from './CellContentParser'
 import {EmptyValue} from './Cell'
+import {InvalidArgumentsError} from './errors'
 
 /**
  * Two-dimenstional array representation of sheet

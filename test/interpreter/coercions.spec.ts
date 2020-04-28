@@ -1,5 +1,5 @@
 import {HyperFormula} from '../../src'
-import {CellError, EmptyValue, ErrorType} from '../../src/Cell'
+import {CellError, EmptyValue, ErrorType} from '../../src'
 import {Config} from '../../src/Config'
 import {DateTimeHelper} from '../../src/DateTimeHelper'
 import {
