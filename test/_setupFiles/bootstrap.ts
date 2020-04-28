@@ -8,7 +8,10 @@ import {AlwaysSparse} from '../../src/DependencyGraph/AddressMapping/ChooseAddre
 import {languages} from '../../src/i18n'
 import {unregisterAllLanguages} from './../testUtils'
 
-import { toContainsMatcher } from './matchers'
+import {
+  toContainEqualMatcher,
+  toMatchObjectMatcher,
+} from './matchers'
 
 Config.defaultConfig = Object.assign({}, Config.defaultConfig, {
   chooseAddressMappingPolicy: new AlwaysSparse(),
@@ -33,6 +36,7 @@ beforeEach(() => {
 
 beforeAll(() => {
   jasmine.addMatchers({
-    ...toContainsMatcher,
+    ...toContainEqualMatcher,
+    ...toMatchObjectMatcher,
   })
 })

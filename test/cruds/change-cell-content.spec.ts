@@ -481,8 +481,8 @@ describe('changing cell content', () => {
     const changes = engine.setCellContents(adr('A1'), '2')
 
     expect(changes.length).toBe(2)
-    expect(changes[0]).toContainEqual(new ExportedCellChange(simpleCellAddress(0, 0, 0), 2))
-    expect(changes[1]).toContainEqual(new ExportedCellChange(simpleCellAddress(0, 1, 0), 2))
+    expect(changes[0]).toMatchObject(new ExportedCellChange(simpleCellAddress(0, 0, 0), 2))
+    expect(changes[1]).toMatchObject(new ExportedCellChange(simpleCellAddress(0, 1, 0), 2))
   })
 
   it('returns dependent matrix value changes', () => {

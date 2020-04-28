@@ -6,21 +6,21 @@ describe('findBoundaries', () => {
     expect(findBoundaries([
       ['1', '2'],
       ['1', '2', '3'],
-    ])).toContainEqual({height: 2, width: 3})
+    ])).toMatchObject({height: 2, width: 3})
   })
 
   it('find correct dimensions when empty cell at the end of row', () => {
     expect(findBoundaries([
       ['1', '2'],
       ['1', '2', null],
-    ])).toContainEqual({height: 2, width: 2})
+    ])).toMatchObject({height: 2, width: 2})
   })
 
   it('find correct dimensions when empty cell in the middle of the row', () => {
     expect(findBoundaries([
       ['1', '2'],
       ['1', '2', EmptyValue, '4'],
-    ])).toContainEqual({height: 2, width: 4})
+    ])).toMatchObject({height: 2, width: 4})
   })
 
   it('find correct dimensions when empty row', () => {
@@ -29,19 +29,19 @@ describe('findBoundaries', () => {
       ['1', '2'],
       [EmptyValue],
       [],
-    ])).toContainEqual({height: 2, width: 2})
+    ])).toMatchObject({height: 2, width: 2})
   })
 
   it('returns sane dimensions for empty cases', () => {
-    expect(findBoundaries([])).toContainEqual({height: 0, width: 0})
-    expect(findBoundaries([[]])).toContainEqual({height: 0, width: 0})
+    expect(findBoundaries([])).toMatchObject({height: 0, width: 0})
+    expect(findBoundaries([[]])).toMatchObject({height: 0, width: 0})
   })
 
   it('calculate correct fill for array with different size', () => {
     expect(findBoundaries([
       ['1', '2'],
       ['1', '2', '3'],
-    ])).toContainEqual({fill: 5 / 6})
+    ])).toMatchObject({fill: 5 / 6})
   })
 
   it('calculate correct fill for empty arrays', () => {
@@ -58,27 +58,27 @@ describe('findBoundaries', () => {
     expect(findBoundaries([
       ['1', ''],
       ['1', '2'],
-    ])).toContainEqual({fill: 1})
+    ])).toMatchObject({fill: 1})
   })
 
   it('does not count empty value', () => {
     expect(findBoundaries([
       ['1', EmptyValue],
       ['1', '2'],
-    ])).toContainEqual({fill: 3 / 4})
+    ])).toMatchObject({fill: 3 / 4})
   })
 
   it('does not count null', () => {
     expect(findBoundaries([
       ['1', null],
       ['1', '2'],
-    ])).toContainEqual({fill: 3 / 4})
+    ])).toMatchObject({fill: 3 / 4})
   })
 
   it('does not count undefined', () => {
     expect(findBoundaries([
       ['1', undefined],
       ['1', '2'],
-    ])).toContainEqual({fill: 3 / 4})
+    ])).toMatchObject({fill: 3 / 4})
   })
 })

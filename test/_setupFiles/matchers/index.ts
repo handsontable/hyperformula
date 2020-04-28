@@ -1,1 +1,2 @@
-export { toContainsMatcher } from './toContainEqual'
+export { toContainEqualMatcher } from './toContainEqual'
+export { toMatchObjectMatcher } from './toMatchObject'
