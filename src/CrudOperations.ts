@@ -298,15 +298,20 @@ export class CrudOperations {
     this.undoRedo.redo()
   }
 
-  public addNamedExpression(expressionName: string, expression: RawCellContent) {
+  public addNamedExpression(expressionName: string, expression: RawCellContent, sheetScope: string | undefined) {
     if (!this.namedExpressions.isNameValid(expressionName)) {
       throw new NamedExpressionNameIsInvalid(expressionName)
     }
-    if (!this.namedExpressions.isNameAvailable(expressionName)) {
+    let sheetId = undefined
+    if (sheetScope !== undefined) {
+      this.ensureSheetExists(sheetScope)
+      sheetId = this.sheetMapping.fetch(sheetScope)
+    }
+    if (!this.namedExpressions.isNameAvailable(expressionName, sheetId)) {
       throw new NamedExpressionNameIsAlreadyTaken(expressionName)
     }
-    const namedExpression = this.namedExpressions.addNamedExpression(expressionName)
-    const address = this.namedExpressions.getInternalNamedExpressionAddress(expressionName)!
+    const namedExpression = this.namedExpressions.addNamedExpression(expressionName, sheetId)
+    const address = this.namedExpressions.getInternalNamedExpressionAddressFromScope(expressionName, sheetId)!
     this.storeExpressionInCell(address, expression)
   }
 

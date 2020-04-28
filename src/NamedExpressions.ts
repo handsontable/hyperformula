@@ -59,10 +59,27 @@ class NamedExpressionsStore {
   }
 }
 
+class WorksheetStore {
+  public readonly mapping = new Map<string, NamedExpression>()
+
+  public add(namedExpression: NamedExpression): void {
+    this.mapping.set(this.normalizeExpressionName(namedExpression.name), namedExpression)
+  }
+
+  public get(expressionName: string): Maybe<NamedExpression> {
+    return this.mapping.get(this.normalizeExpressionName(expressionName))
+  }
+
+  private normalizeExpressionName(expressionName: string): string {
+    return expressionName.toLowerCase()
+  }
+}
+
 export class NamedExpressions {
   public static SHEET_FOR_WORKBOOK_EXPRESSIONS = -1
   private nextNamedExpressionRow: number = 0
   public readonly workbookStore: NamedExpressionsStore = new NamedExpressionsStore()
+  public readonly worksheetStores: Map<number, WorksheetStore> = new Map()
 
   constructor(
   ) {
@@ -72,12 +89,26 @@ export class NamedExpressions {
     return this.workbookStore.has(expressionName)
   }
 
-  public isNameAvailable(expressionName: string): boolean {
-    return this.workbookStore.isNameAvailable(expressionName)
+  public isNameAvailable(expressionName: string, sheetId: number | undefined): boolean {
+    if (sheetId === undefined) {
+      return this.workbookStore.isNameAvailable(expressionName)
+    } else {
+      return true
+    }
   }
 
   public fetchNameForNamedExpressionRow(row: number): string {
-    const namedExpression = this.workbookStore.getByRow(row)
+    let namedExpression = this.workbookStore.getByRow(row)
+    if (!namedExpression) {
+      for (const store of this.worksheetStores.values()) {
+        for (const worksheetNamedExpression of store.mapping.values()) {
+          if (worksheetNamedExpression.row === row) {
+            return worksheetNamedExpression.name
+          }
+        }
+      }
+    }
+    // maybe rowmapping should be on other level
     if (!namedExpression) {
       throw new Error('Requested Named Expression does not exist')
     }
@@ -100,23 +131,43 @@ export class NamedExpressions {
     return /^[A-Za-z\u00C0-\u02AF_][A-Za-z0-9\u00C0-\u02AF\._]*$/.test(expressionName)
   }
 
-  public addNamedExpression(expressionName: string): NamedExpression {
+  public addNamedExpression(expressionName: string, sheetId: number | undefined): NamedExpression {
     if (!this.isNameValid(expressionName)) {
       throw new Error('Name of Named Expression is invalid')
     }
-    if (!this.isNameAvailable(expressionName)) {
+    if (!this.isNameAvailable(expressionName, sheetId)) {
       throw new Error('Name of Named Expression already taken')
     }
-    let namedExpression = this.workbookStore.get(expressionName)
-    if (namedExpression) {
-      namedExpression.added = true
-      namedExpression.name = expressionName
+    if (sheetId === undefined) {
+      let namedExpression = this.workbookStore.get(expressionName)
+      if (namedExpression) {
+        namedExpression.added = true
+        namedExpression.name = expressionName
+      } else {
+        namedExpression = new NamedExpression(expressionName, this.nextNamedExpressionRow, true)
+        this.nextNamedExpressionRow++
+        this.workbookStore.add(namedExpression)
+      }
+      return namedExpression
     } else {
-      namedExpression = new NamedExpression(expressionName, this.nextNamedExpressionRow, true)
+      const store = this.worksheetStore(sheetId)
+      // if (store.has(expressionName)) {
+      //   throw new Error('Name of Named Expression already taken')
+      // }
+      const namedExpression = new NamedExpression(expressionName, this.nextNamedExpressionRow, true)
       this.nextNamedExpressionRow++
-      this.workbookStore.add(namedExpression)
+      store.add(namedExpression)
+      return namedExpression
     }
-    return namedExpression
+  }
+
+  private worksheetStore(sheetId: number) {
+    let store = this.worksheetStores.get(sheetId)
+    if (!store) {
+      store = new WorksheetStore()
+      this.worksheetStores.set(sheetId, store)
+    }
+    return store
   }
 
   public getInternalNamedExpressionAddress(expressionName: string): SimpleCellAddress | null {
@@ -128,14 +179,48 @@ export class NamedExpressions {
     }
   }
 
-  public getInternalMaybeNotAddedNamedExpressionAddress(expressionName: string): SimpleCellAddress {
-    let namedExpression = this.workbookStore.get(expressionName)
-    if (namedExpression === undefined) {
-      namedExpression = new NamedExpression(expressionName, this.nextNamedExpressionRow, false)
-      this.nextNamedExpressionRow++
-      this.workbookStore.add(namedExpression)
+  public getGuessedInternalNamedExpressionAddress(expressionName: string, sheetId: number): SimpleCellAddress | null {
+    const namedExpression = this.worksheetStore(sheetId).get(expressionName)
+    if (namedExpression) {
+      return this.buildAddress(namedExpression.row)
+    } else {
+      const namedExpression = this.workbookStore.get(expressionName)
+      if (namedExpression === undefined || !namedExpression.added) {
+        return null
+      } else {
+        return this.buildAddress(namedExpression.row)
+      }
     }
-    return this.buildAddress(namedExpression.row)
+  }
+
+  public getInternalNamedExpressionAddressFromScope(expressionName: string, sheetId: number | undefined): SimpleCellAddress | null {
+    let store: NamedExpressionsStore | WorksheetStore
+    if (sheetId === undefined) {
+      store = this.workbookStore
+    } else {
+      store = this.worksheetStore(sheetId)
+    }
+    const namedExpression = store.get(expressionName)
+    if (namedExpression === undefined || !namedExpression.added) {
+      return null
+    } else {
+      return this.buildAddress(namedExpression.row)
+    }
+  }
+
+  public getInternalMaybeNotAddedNamedExpressionAddress(expressionName: string, sheetId: number): SimpleCellAddress {
+    const namedExpression = this.worksheetStore(sheetId).get(expressionName)
+    if (namedExpression) {
+      return this.buildAddress(namedExpression.row)
+    } else {
+      let namedExpression = this.workbookStore.get(expressionName)
+      if (namedExpression === undefined) {
+        namedExpression = new NamedExpression(expressionName, this.nextNamedExpressionRow, false)
+        this.nextNamedExpressionRow++
+        this.workbookStore.add(namedExpression)
+      }
+      return this.buildAddress(namedExpression.row)
+    }
   }
 
   public remove(expressionName: string): void {

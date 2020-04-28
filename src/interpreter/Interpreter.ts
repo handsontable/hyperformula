@@ -189,7 +189,7 @@ export class Interpreter {
         }
       }
       case AstNodeType.NAMED_EXPRESSION: {
-        const address = this.namedExpressions.getInternalNamedExpressionAddress(ast.expressionName)
+        const address = this.namedExpressions.getGuessedInternalNamedExpressionAddress(ast.expressionName, formulaAddress.sheet)
         if (address) {
           return this.dependencyGraph.getCellValue(address)
         } else {

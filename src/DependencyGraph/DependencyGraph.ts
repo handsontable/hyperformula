@@ -182,7 +182,8 @@ export class DependencyGraph {
           this.correctInfiniteRangesDependenciesByRangeVertex(rangeVertex)
         }
       } else if (dep instanceof NamedExpressionDependency) {
-        const namedExpressionVertex = this.namedExpressionVertex(dep.name)
+        const sheetOfVertex = (endVertex as FormulaCellVertex).getAddress(this.lazilyTransformingAstService).sheet
+        const namedExpressionVertex = this.namedExpressionVertex(dep.name, sheetOfVertex)
         this.graph.addEdge(namedExpressionVertex, endVertex)
       } else {
         this.graph.addEdge(this.fetchCellOrCreateEmpty(dep), endVertex)
@@ -190,8 +191,8 @@ export class DependencyGraph {
     })
   }
 
-  public namedExpressionVertex(expressionName: string): CellVertex {
-    const address = this.namedExpressions.getInternalMaybeNotAddedNamedExpressionAddress(expressionName)
+  public namedExpressionVertex(expressionName: string, sheetId: number): CellVertex {
+    const address = this.namedExpressions.getInternalMaybeNotAddedNamedExpressionAddress(expressionName, sheetId)
     return this.fetchCellOrCreateEmpty(address)
   }
 

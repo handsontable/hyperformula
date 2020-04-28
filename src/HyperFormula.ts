@@ -1431,8 +1431,8 @@ export class HyperFormula implements TypedEmitter {
    *
    * @category Named Expression
    */
-  public addNamedExpression(expressionName: string, expression: RawCellContent): ExportedChange[] {
-    this._crudOperations.addNamedExpression(expressionName, expression)
+  public addNamedExpression(expressionName: string, expression: RawCellContent, sheetScope: string | undefined = undefined): ExportedChange[] {
+    this._crudOperations.addNamedExpression(expressionName, expression, sheetScope)
     const changes = this.recomputeIfDependencyGraphNeedsIt()
     this._emitter.emit(Events.NamedExpressionAdded, expressionName, changes)
     return changes
@@ -1443,12 +1443,18 @@ export class HyperFormula implements TypedEmitter {
    * Returns a [[CellValue]] or undefined if the given named expression does not exists
    *
    * @param {string} expressionName - expression name, case insensitive.
+   * @param {string | undefined} scope - sheet name or undefined for global scope
    *
    * @category Named Expression
    */
-  public getNamedExpressionValue(expressionName: string): Maybe<CellValue> {
+  public getNamedExpressionValue(expressionName: string, sheetScope: string | undefined = undefined): Maybe<CellValue> {
     this.ensureEvaluationIsNotSuspended()
-    const namedExpressionAddress = this._namedExpressions.getInternalNamedExpressionAddress(expressionName)
+    let sheetId = undefined
+    if (sheetScope !== undefined) {
+      this._crudOperations.ensureSheetExists(sheetScope)
+      sheetId = this.sheetMapping.fetch(sheetScope)
+    }
+    const namedExpressionAddress = this._namedExpressions.getInternalNamedExpressionAddressFromScope(expressionName, sheetId)
     if (namedExpressionAddress) {
       return this._serialization.getCellValue(namedExpressionAddress)
     } else {
@@ -1461,11 +1467,17 @@ export class HyperFormula implements TypedEmitter {
    * Unparses AST.
    *
    * @param {string} expressionName - expression name, case insensitive.
+   * @param {string | undefined} scope - sheet name or undefined for global scope
    *
    * @category Named Expression
    */
-  public getNamedExpressionFormula(expressionName: string): Maybe<string> {
-    const namedExpressionAddress = this._namedExpressions.getInternalNamedExpressionAddress(expressionName)
+  public getNamedExpressionFormula(expressionName: string, sheetScope: string | undefined = undefined): Maybe<string> {
+    let sheetId = undefined
+    if (sheetScope !== undefined) {
+      this._crudOperations.ensureSheetExists(sheetScope)
+      sheetId = this.sheetMapping.fetch(sheetScope)
+    }
+    const namedExpressionAddress = this._namedExpressions.getInternalNamedExpressionAddressFromScope(expressionName, sheetId)
     if (namedExpressionAddress === null) {
       return undefined
     } else {

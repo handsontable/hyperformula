@@ -177,7 +177,7 @@ describe('Unparse', () => {
 
   it('#unparse named expression returns original form', () => {
     const namedExpressions = new NamedExpressions()
-    namedExpressions.addNamedExpression("SomeWEIRD_name")
+    namedExpressions.addNamedExpression("SomeWEIRD_name", undefined)
     const unparser = new Unparser(config, lexerConfig, sheetMapping.fetchDisplayName, namedExpressions)
     const formula = '=someWeird_Name'
     const ast = parser.parse(formula, simpleCellAddress(0, 0, 0)).ast

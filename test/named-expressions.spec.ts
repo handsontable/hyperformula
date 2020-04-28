@@ -1,6 +1,7 @@
 import {HyperFormula, ExportedNamedExpressionChange, EmptyValue} from '../src'
 import {adr, detailedError} from './testUtils'
 import {ErrorType} from '../src/Cell'
+import {NoSheetWithNameError} from '../src/errors'
 
 describe('Named expressions', () => {
   it('basic usage', () => {
@@ -250,6 +251,30 @@ describe('Named expressions', () => {
 
     expect(engine.getNamedExpressionFormula('myName.1')).toBeUndefined()
   })
+
+  it('local level named expressions have separate storages', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['42'],
+    ])
+
+    engine.addNamedExpression('myName', '=42')
+    engine.addNamedExpression('myName', '=13', "Sheet1")
+
+    expect(engine.getNamedExpressionValue('myName')).toEqual(42)
+    expect(engine.getNamedExpressionValue('myName', "Sheet1")).toEqual(13)
+    expect(engine.getNamedExpressionFormula('myName')).toEqual('=42')
+    expect(engine.getNamedExpressionFormula('myName', "Sheet1")).toEqual('=13')
+  })
+
+  it('when trying to add named expression to nonexisting sheet', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['42'],
+    ])
+
+    expect(() => {
+      engine.addNamedExpression('myName', '=13', "NonExistingSheetName")
+    }).toThrowError(NoSheetWithNameError)
+  })
 })
 
 describe("Named expressions - in formula usage", () => {
@@ -259,7 +284,7 @@ describe("Named expressions - in formula usage", () => {
 
     engine.setCellContents(adr('A1'), '=FOO+10')
 
-    const fooVertex = engine.dependencyGraph.namedExpressionVertex('FOO')!
+    const fooVertex = engine.dependencyGraph.namedExpressionVertex('FOO', 0)!
     const a1 = engine.dependencyGraph.fetchCell(adr('A1'))
     expect(engine.graph.existsEdge(fooVertex, a1)).toBe(true)
     expect(engine.getCellValue(adr('A1'))).toEqual(52)
@@ -280,7 +305,7 @@ describe("Named expressions - in formula usage", () => {
 
     engine.addNamedExpression('FOO', '=42')
 
-    const fooVertex = engine.dependencyGraph.namedExpressionVertex('FOO')!
+    const fooVertex = engine.dependencyGraph.namedExpressionVertex('FOO', 0)!
     const a1 = engine.dependencyGraph.fetchCell(adr('A1'))
     expect(engine.graph.existsEdge(fooVertex, a1)).toBe(true)
     expect(engine.getCellValue(adr('A1'))).toEqual(42)
@@ -303,7 +328,7 @@ describe("Named expressions - in formula usage", () => {
 
     engine.setCellContents(adr('A1'), null)
 
-    const fooVertex = engine.dependencyGraph.namedExpressionVertex('FOO')!
+    const fooVertex = engine.dependencyGraph.namedExpressionVertex('FOO', 0)!
     expect(engine.graph.adjacentNodes(fooVertex).size).toBe(0)
   })
 
@@ -316,5 +341,20 @@ describe("Named expressions - in formula usage", () => {
     engine.removeSheet("Sheet1")
 
     expect(engine.getNamedExpressionFormula("FOO")).toEqual('=#REF! + 10')
+  })
+
+  it('local named expression shadows global one', () => {
+    const engine = HyperFormula.buildFromArray([])
+    engine.addNamedExpression('FOO', '=42')
+    engine.addNamedExpression('FOO', '=13', 'Sheet1')
+
+    engine.setCellContents(adr('A1'), '=FOO+10')
+
+    const localFooVertex = engine.dependencyGraph.namedExpressionVertex('FOO', 0)!
+    const globalFooVertex = engine.dependencyGraph.fetchCell(engine.dependencyGraph.namedExpressions.getInternalNamedExpressionAddressFromScope('FOO', undefined)!)
+    const a1 = engine.dependencyGraph.fetchCell(adr('A1'))
+    expect(engine.graph.existsEdge(localFooVertex, a1)).toBe(true)
+    expect(engine.graph.existsEdge(globalFooVertex, a1)).toBe(false)
+    expect(engine.getCellValue(adr('A1'))).toEqual(23)
   })
 })
