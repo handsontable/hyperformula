@@ -1166,7 +1166,6 @@ export class HyperFormula implements TypedEmitter {
    * // should return true for this example
    * const isMovable = hfInstance.isItPossibleToMoveCells({ col: 1, row: 0, sheet: 0 }, 1, 1, { col: 3, row: 0, sheet: 0 })
    * ```
-   *
    * @category Cell
    */
   public isItPossibleToMoveCells(sourceLeftCorner: SimpleCellAddress, width: number, height: number, destinationLeftCorner: SimpleCellAddress): boolean {
@@ -2299,10 +2298,11 @@ export class HyperFormula implements TypedEmitter {
    * @example
    * ```js
    * // build with no sheets
-   * hfInstance = HyperFormula.buildEmpty();
+   * const hfInstance = HyperFormula.buildEmpty();
    *
    * // Similar to batch() but operations are not within a callback,
-   * // one methods suspends the recalculation the second will resume calculations and return the changes.
+   * // one method suspends the recalculation the second will resume calculations and return the changes.
+   *
    * // Suspend the evaluation with this method
    * hfInstance.suspendEvaluation()
    *
@@ -2329,10 +2329,10 @@ export class HyperFormula implements TypedEmitter {
    * @example
    * ```js
    * // build with no sheets
-   * hfInstance = HyperFormula.buildEmpty();
+   * const hfInstance = HyperFormula.buildEmpty();
    *
    * // Similar to batch() but operations are not within a callback,
-   * // one methods suspends the recalculation the second will resume calculations and return the changes.
+   * // one method suspends the recalculation the second will resume calculations and return the changes.
    *
    * // First, suspend the evaluation
    * hfInstance.suspendEvaluation()
@@ -2358,15 +2358,15 @@ export class HyperFormula implements TypedEmitter {
    * @example
    * ```js
    * // build with no sheets
-   * hfInstance = HyperFormula.buildEmpty()
+   * const hfInstance = HyperFormula.buildEmpty();
    *
    * // suspend the evaluation
    * hfInstance.suspendEvaluation();
    *
    * // Between suspendEvaluation() and resumeEvaluation() or inside batch() it will return true, otherwise false.
-   * const isEvaluationSuspended = hfInstance.isEvaluationSuspended()
+   * const isEvaluationSuspended = hfInstance.isEvaluationSuspended();
    *
-   * const changes = hfInstance.resumeEvaluation()
+   * const changes = hfInstance.resumeEvaluation();
    * ```
    *
    * @category Batch
@@ -2427,7 +2427,7 @@ export class HyperFormula implements TypedEmitter {
    * // build from arrays, one sheet
    * const hfInstance = HyperFormula.buildFromArray([
    *  ['42'],
-   * ])
+   * ]);
    *
    * // add a named expression
    * hfInstance.addNamedExpression('prettyName', '=Sheet1!A1+100');
@@ -2458,7 +2458,7 @@ export class HyperFormula implements TypedEmitter {
    * // build from arrays, one sheet
    * const hfInstance = HyperFormula.buildFromArray([
    *  ['42'],
-   * ])
+   * ]);
    *
    * // add a named expression
    * hfInstance.addNamedExpression('prettyName', '=Sheet1!A1+100');
