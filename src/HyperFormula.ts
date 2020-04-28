@@ -239,9 +239,6 @@ export class HyperFormula implements TypedEmitter {
    *
    * @example
    * ```js
-   * // have a HyperFormula instance built, for example:
-   * const hfInstance = HyperFormula.buildEmpty();
-   *
    * // return registered language
    * const language = HyperFormula.getLanguage('enGB');
    * ```
@@ -263,11 +260,8 @@ export class HyperFormula implements TypedEmitter {
    *
    * @example
    * ```js
-   * // have a HyperFormula instance built, for example:
-   * const hfInstance = HyperFormula.buildEmpty();
-   *
    * // return registered language
-   * HyperFormula.registerLanguage('plPL', plPL);
+   * const registeredLanguage = HyperFormula.registerLanguage('plPL', plPL);
    * ```
    */
   public static registerLanguage(languageCode: string, languagePackage: RawTranslationPackage): void {
@@ -305,9 +299,6 @@ export class HyperFormula implements TypedEmitter {
    *
    * @example
    * ```js
-   * // have a HyperFormula instance built, for example:
-   * const hfInstance = HyperFormula.buildEmpty();
-   *
    * // should return all registered language codes
    * const registeredLangugaes = HyperFormula.getRegisteredLanguagesCodes();
    * ```
