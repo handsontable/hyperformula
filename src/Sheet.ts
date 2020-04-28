@@ -5,6 +5,7 @@
 
 import {RawCellContent} from './CellContentParser'
 import {EmptyValue} from './Cell'
+import {InvalidArgumentsError} from './errors'
 
 /**
  * Two-dimenstional array representation of sheet
@@ -20,6 +21,17 @@ export interface SheetBoundaries {
   width: number,
   height: number,
   fill: number,
+}
+
+export function validateAsSheet(sheet: Sheet): void {
+  if(!Array.isArray(sheet)) {
+    throw new InvalidArgumentsError('an array of arrays.')
+  }
+  for(let i=0; i<sheet.length; i++) {
+    if(!Array.isArray(sheet[i])) {
+      throw new InvalidArgumentsError('an array of arrays.')
+    }
+  }
 }
 
 /**

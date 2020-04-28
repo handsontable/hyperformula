@@ -46,12 +46,6 @@ describe( 'unsupported types should result in error', () => {
       '    \"sym\": \"Symbol()\"\n' +
       '}')
   })
-  it('should give parsing error #8', () => {
-    // eslint-disable-next-line
-    // @ts-ignore
-    expect( () => HyperFormula.buildFromArray([[Symbol(Symbol())]])
-    ).toThrow('Cannot convert a Symbol value to a string')
-  })
   it('should give parsing error #9', () => {
     // eslint-disable-next-line
     // @ts-ignore
@@ -95,11 +89,11 @@ describe( 'unsupported types should result in error', () => {
     // eslint-disable-next-line
     // @ts-ignore
     expect( () => engine.setSheetContent('Sheet1', 1)
-    ).toThrow('Expected an array of arrays.')
+    ).toThrow('Invalid arguments, expected an array of arrays.')
     // eslint-disable-next-line
     // @ts-ignore
     expect( () => engine.setSheetContent('Sheet1', [1])
-    ).toThrow('Expected an array of arrays.')
+    ).toThrow('Invalid arguments, expected an array of arrays.')
     // eslint-disable-next-line
     // @ts-ignore
     expect( () => engine.setCellContents(adr('A1'), [1])
