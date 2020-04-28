@@ -42,6 +42,15 @@ class NamedExpressionsStore {
     return this.mapping.get(this.normalizeExpressionName(expressionName))
   }
 
+  public getExisting(expressionName: string): Maybe<NamedExpression> {
+    const namedExpression = this.mapping.get(this.normalizeExpressionName(expressionName))
+    if (namedExpression && namedExpression.added) {
+      return namedExpression
+    } else {
+      return undefined
+    }
+  }
+
   public getByRow(row: number): Maybe<NamedExpression> {
     return this.rowMapping.get(row)
   }
@@ -142,7 +151,7 @@ export class NamedExpressions {
   }
 
   public nearestNamedExpression(expressionName: string, sheetId: number): Maybe<NamedExpression> {
-    return this.worksheetStore(sheetId).get(expressionName) || this.workbookStore.get(expressionName)
+    return this.worksheetStore(sheetId).get(expressionName) || this.workbookStore.getExisting(expressionName)
   }
 
   public isNameValid(expressionName: string): boolean {
@@ -187,20 +196,6 @@ export class NamedExpressions {
       this.worksheetStores.set(sheetId, store)
     }
     return store
-  }
-
-  public getGuessedInternalNamedExpressionAddress(expressionName: string, sheetId: number): Maybe<SimpleCellAddress> {
-    const namedExpression = this.worksheetStore(sheetId).get(expressionName)
-    if (namedExpression) {
-      return namedExpression.address
-    } else {
-      const namedExpression = this.workbookStore.get(expressionName)
-      if (namedExpression === undefined || !namedExpression.added) {
-        return undefined
-      } else {
-        return namedExpression.address
-      }
-    }
   }
 
   public getInternalNamedExpressionAddressFromScope(expressionName: string, sheetId: number | undefined): Maybe<SimpleCellAddress> {
