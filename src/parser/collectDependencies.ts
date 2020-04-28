@@ -3,8 +3,15 @@
  * Copyright (c) 2020 Handsoncode. All rights reserved.
  */
 
-import {Maybe} from '../Maybe'
-import {Ast, AstNodeType, RelativeDependency, AddressDependency, CellRangeDependency, ColumnRangeDependency, RowRangeDependency} from './'
+import {
+  AddressDependency,
+  Ast,
+  AstNodeType,
+  CellRangeDependency,
+  ColumnRangeDependency,
+  RelativeDependency,
+  RowRangeDependency
+} from './'
 
 const collectDependenciesFn = (ast: Ast, functionsWhichDoesNotNeedArgumentsToBeComputed: Set<string>, dependenciesSet: RelativeDependency[]) => {
   switch (ast.type) {
@@ -55,6 +62,9 @@ const collectDependenciesFn = (ast: Ast, functionsWhichDoesNotNeedArgumentsToBeC
     case AstNodeType.POWER_OP:
       collectDependenciesFn(ast.left, functionsWhichDoesNotNeedArgumentsToBeComputed, dependenciesSet)
       collectDependenciesFn(ast.right, functionsWhichDoesNotNeedArgumentsToBeComputed, dependenciesSet)
+      return
+    case AstNodeType.PARENTHESIS:
+      collectDependenciesFn(ast.expression, functionsWhichDoesNotNeedArgumentsToBeComputed, dependenciesSet)
       return
     case AstNodeType.FUNCTION_CALL:
       if (!functionsWhichDoesNotNeedArgumentsToBeComputed.has(ast.procedureName)) {
