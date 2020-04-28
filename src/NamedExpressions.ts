@@ -137,16 +137,19 @@ export class NamedExpressions {
   }
 
   public getDisplayNameByNameForScope(expressionName: string, sheetId: number | undefined): Maybe<string> {
-    let namedExpression
-    if (sheetId === undefined) {
-      namedExpression = this.workbookStore.get(expressionName)
-    } else {
-      namedExpression = this.worksheetStore(sheetId).get(expressionName)
-    }
+    const namedExpression = this.namedExpressionForScope(expressionName, sheetId)
     if (namedExpression) {
       return namedExpression.name
     } else {
       return undefined
+    }
+  }
+
+  public namedExpressionForScope(expressionName: string, sheetId: number | undefined): Maybe<NamedExpression> {
+    if (sheetId === undefined) {
+      return this.workbookStore.get(expressionName)
+    } else {
+      return this.worksheetStore(sheetId).get(expressionName)
     }
   }
 
