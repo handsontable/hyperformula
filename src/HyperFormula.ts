@@ -274,6 +274,10 @@ export class HyperFormula implements TypedEmitter {
     return FunctionRegistry.getFunctionPlugin(functionId)
   }
 
+  public static getPlugins(): FunctionPluginDefinition[] {
+    return FunctionRegistry.getPlugins()
+  }
+
   /**
    * Builds an empty engine instance.
    * Can be configured with the optional parameter that represents a [[ConfigParams]].
@@ -1590,6 +1594,10 @@ export class HyperFormula implements TypedEmitter {
 
   public getFunctionPlugin(functionId: string): Maybe<FunctionPluginDefinition> {
     return this._functionRegistry.getFunctionPlugin(functionId)
+  }
+
+  public getPlugins(): FunctionPluginDefinition[] {
+    return this._functionRegistry.getPlugins()
   }
 
   private extractTemporaryFormula(formulaString: string, sheetId: number = 1): [Ast | false, SimpleCellAddress] {

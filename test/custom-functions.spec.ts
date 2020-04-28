@@ -5,6 +5,7 @@ import {HyperFormula} from '../src'
 import {adr, detailedError, expectArrayWithSameContent, unregisterAllFormulas} from './testUtils'
 import {FunctionPluginValidationError} from '../src/errors'
 import {SumifPlugin} from '../src/interpreter/plugin/SumifPlugin'
+import {NumericAggregationPlugin} from '../src/interpreter/plugin/NumericAggregationPlugin'
 
 class FooPlugin extends FunctionPlugin {
   public static implementedFunctions = {
@@ -114,6 +115,15 @@ describe('Register static custom plugin', () => {
       HyperFormula.registerFunction('BAR', InvalidPlugin)
     }).toThrow(FunctionPluginValidationError.functionNotDeclaredInPlugin('BAR', 'InvalidPlugin'))
   })
+
+  it('should return registered plugins', () => {
+    unregisterAllFormulas()
+    HyperFormula.registerFunctionPlugins(SumifPlugin)
+    HyperFormula.registerFunctionPlugins(NumericAggregationPlugin)
+    HyperFormula.registerFunctionPlugins(SumWithExtra)
+
+    expectArrayWithSameContent(HyperFormula.getPlugins(), [SumifPlugin, NumericAggregationPlugin, SumWithExtra])
+  })
 })
 
 describe('Instance level formula registry', () => {
@@ -151,5 +161,11 @@ describe('Instance level formula registry', () => {
     expect(engine.getCellValue(adr('A1'))).toEqual('foo')
     expect(engine.getCellValue(adr('B1'))).toEqual('bar')
     expect(engine.getCellValue(adr('C1'))).toEqual('foo')
+  })
+
+  it('should return registered plugins', () => {
+    const engine = HyperFormula.buildFromArray([], { functionPlugins: [SumifPlugin, NumericAggregationPlugin, SumWithExtra]})
+
+    expectArrayWithSameContent(engine.getPlugins(), [SumifPlugin, NumericAggregationPlugin, SumWithExtra])
   })
 })

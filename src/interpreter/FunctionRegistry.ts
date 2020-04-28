@@ -35,6 +35,10 @@ export class FunctionRegistry {
     return Array.from(this.plugins.keys())
   }
 
+  public static getPlugins(): FunctionPluginDefinition[] {
+    return Array.from(new Set(this.plugins.values()).values())
+  }
+
   public static getFunctionPlugin(functionId: string): Maybe<FunctionPluginDefinition> {
     return this.plugins.get(functionId)
   }
@@ -54,7 +58,7 @@ export class FunctionRegistry {
     }
   }
 
-  private readonly plugins: Map<string, FunctionPluginDefinition>
+  private readonly instancePlugins: Map<string, FunctionPluginDefinition>
   private readonly functions: Map<string, [string, FunctionPlugin]> = new Map()
 
   private readonly volatileFunctions: Set<string> = new Set()
@@ -63,15 +67,15 @@ export class FunctionRegistry {
 
   constructor(private config: Config) {
     if (config.functionPlugins.length > 0) {
-      this.plugins = new Map()
+      this.instancePlugins = new Map()
       for (const plugin of config.functionPlugins) {
-        FunctionRegistry.loadPluginFunctions(plugin, this.plugins)
+        FunctionRegistry.loadPluginFunctions(plugin, this.instancePlugins)
       }
     } else {
-      this.plugins = new Map(FunctionRegistry.plugins)
+      this.instancePlugins = new Map(FunctionRegistry.plugins)
     }
 
-    for (const [functionId, plugin] of this.plugins.entries()) {
+    for (const [functionId, plugin] of this.instancePlugins.entries()) {
       this.categorizeFunction(functionId, plugin.implementedFunctions[functionId])
     }
   }
@@ -79,7 +83,7 @@ export class FunctionRegistry {
   public initializePlugins(interpreter: Interpreter): void {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const instances: any[] = []
-    for (const [functionId, plugin] of this.plugins.entries()) {
+    for (const [functionId, plugin] of this.instancePlugins.entries()) {
       let pluginInstance = instances.find(pluginInstance => pluginInstance instanceof plugin)
       if (pluginInstance === undefined) {
         pluginInstance = new plugin(interpreter)
@@ -91,11 +95,15 @@ export class FunctionRegistry {
   }
 
   public getFunctionPlugin(functionId: string): Maybe<FunctionPluginDefinition> {
-    return this.plugins.get(functionId)
+    return this.instancePlugins.get(functionId)
   }
 
   public getFunction(functionId: string): Maybe<[string, FunctionPlugin]> {
     return this.functions.get(functionId)
+  }
+
+  public getPlugins(): FunctionPluginDefinition[] {
+    return Array.from(new Set(this.instancePlugins.values()).values())
   }
 
   public getRegisteredFunctions(): string[] {
