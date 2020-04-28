@@ -266,6 +266,10 @@ export class HyperFormula implements TypedEmitter {
     FunctionRegistry.unregisterFunction(functionId)
   }
 
+  public static unregisterFunctionPlugin(plugin: FunctionPluginDefinition): void {
+    FunctionRegistry.unregisterFunctionPlugin(plugin)
+  }
+
   public static getRegisteredFunctions(): string[] {
     return FunctionRegistry.getRegisteredFunctions()
   }

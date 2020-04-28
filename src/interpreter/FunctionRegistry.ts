@@ -31,6 +31,14 @@ export class FunctionRegistry {
     this.plugins.delete(functionId)
   }
 
+  public static unregisterFunctionPlugin(plugin: FunctionPluginDefinition): void {
+    for (const [functionId, registeredPlugin] of this.plugins.entries()) {
+      if (registeredPlugin === plugin) {
+        this.plugins.delete(functionId)
+      }
+    }
+  }
+
   public static getRegisteredFunctions(): string[] {
     return Array.from(this.plugins.keys())
   }

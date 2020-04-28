@@ -124,6 +124,14 @@ describe('Register static custom plugin', () => {
 
     expectArrayWithSameContent(HyperFormula.getPlugins(), [SumifPlugin, NumericAggregationPlugin, SumWithExtra])
   })
+
+  it('should unregister whole plugin', () => {
+    unregisterAllFormulas()
+    HyperFormula.registerFunctionPlugins(SumifPlugin, NumericAggregationPlugin)
+    HyperFormula.unregisterFunctionPlugin(NumericAggregationPlugin)
+
+    expectArrayWithSameContent(HyperFormula.getPlugins(), [SumifPlugin])
+  })
 })
 
 describe('Instance level formula registry', () => {
