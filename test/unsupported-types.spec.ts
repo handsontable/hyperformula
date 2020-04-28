@@ -88,12 +88,12 @@ describe( 'unsupported types should result in error', () => {
     const engine = HyperFormula.buildFromArray(sheet)
     // eslint-disable-next-line
     // @ts-ignore
-    expect(() => engine.setSheetContent('Sheet1', 1))
-      .toThrowError('Expected an array of arrays.')
+    expect( () => engine.setSheetContent('Sheet1', 1)
+    ).toThrowError('Invalid arguments, expected an array of arrays.')
     // eslint-disable-next-line
     // @ts-ignore
-    expect(() => engine.setSheetContent('Sheet1', [1]))
-      .toThrowError('Expected an array of arrays.')
+    expect( () => engine.setSheetContent('Sheet1', [1])
+    ).toThrowError('Invalid arguments, expected an array of arrays.')
     // eslint-disable-next-line
     // @ts-ignore
     expect(() => engine.setCellContents(adr('A1'), [1]))
