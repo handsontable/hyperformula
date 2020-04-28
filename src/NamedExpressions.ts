@@ -169,8 +169,7 @@ export class NamedExpressions {
         namedExpression.added = true
         namedExpression.name = expressionName
       } else {
-        namedExpression = new NamedExpression(expressionName, this.buildAddress(this.nextNamedExpressionRow), true)
-        this.nextNamedExpressionRow++
+        namedExpression = new NamedExpression(expressionName, this.nextAddress(), true)
         this.workbookStore.add(namedExpression)
       }
       return namedExpression
@@ -179,8 +178,7 @@ export class NamedExpressions {
       // if (store.has(expressionName)) {
       //   throw new Error('Name of Named Expression already taken')
       // }
-      const namedExpression = new NamedExpression(expressionName, this.buildAddress(this.nextNamedExpressionRow), true)
-      this.nextNamedExpressionRow++
+      const namedExpression = new NamedExpression(expressionName, this.nextAddress(), true)
       store.add(namedExpression)
       return namedExpression
     }
@@ -240,8 +238,7 @@ export class NamedExpressions {
     } else {
       let namedExpression = this.workbookStore.get(expressionName)
       if (namedExpression === undefined) {
-        namedExpression = new NamedExpression(expressionName, this.buildAddress(this.nextNamedExpressionRow), false)
-        this.nextNamedExpressionRow++
+        namedExpression = new NamedExpression(expressionName, this.nextAddress(), false)
         this.workbookStore.add(namedExpression)
       }
       return namedExpression.address
@@ -266,7 +263,7 @@ export class NamedExpressions {
     return this.workbookStore.getAllNamedExpressions().map((ne) => ne.name)
   }
 
-  private buildAddress(namedExpressionRow: number) {
-    return simpleCellAddress(NamedExpressions.SHEET_FOR_WORKBOOK_EXPRESSIONS, 0, namedExpressionRow)
+  private nextAddress() {
+    return simpleCellAddress(NamedExpressions.SHEET_FOR_WORKBOOK_EXPRESSIONS, 0, this.nextNamedExpressionRow++)
   }
 }
