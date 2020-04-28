@@ -2137,7 +2137,7 @@ export class HyperFormula implements TypedEmitter {
    *  ],
    *  });
    *
-   * // should return true
+   * // should return false
    * const isEmpty = hfInstance.isCellEmpty({ sheet: 1, col: 0, row: 0 });
    * ```
    *
@@ -2715,7 +2715,7 @@ export class HyperFormula implements TypedEmitter {
    * // subscribe to a 'sheetAdded', pass a simple handler
    * hfInstance.once('sheetAdded', ( ) => { console.log('foo') });
    *
-   * // add a sheet to trigger an event, console should print 'foo' only once when the sheet is added in this example
+   * // call addSheet twice, console should print 'foo' only once when the sheet is added in this example
    * hfInstance.addSheet('FooBar');
    * hfInstance.addSheet('FooBar');
    * ```
@@ -2737,9 +2737,10 @@ export class HyperFormula implements TypedEmitter {
    * // build with no sheets
    * const hfInstance = HyperFormula.buildEmpty();
    *
+   * // define a simple function to be called upon emitting an event
    * const handler = ( ) => { console.log('baz') }
    *
-   * // subscribe to a 'sheetAdded', pass a simple handler
+   * // subscribe to a 'sheetAdded', pass the handler
    * hfInstance.on('sheetAdded', handler);
    *
    * // add a sheet to trigger an event, console should print 'foo' each time a sheet is added
@@ -2748,7 +2749,7 @@ export class HyperFormula implements TypedEmitter {
    * // unsubscribe from a 'sheetAdded'
    * hfInstance.off('sheetAdded', handler);
    *
-   * // add a sheet, console log should not print anything
+   * // add a sheet, the console should not print anything
    * hfInstance.addSheet('FooBaz');
    * ```
    *
