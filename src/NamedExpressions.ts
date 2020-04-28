@@ -189,15 +189,6 @@ export class NamedExpressions {
     return store
   }
 
-  public getInternalNamedExpressionAddress(expressionName: string): Maybe<SimpleCellAddress> {
-    const namedExpression = this.workbookStore.get(expressionName)
-    if (namedExpression === undefined || !namedExpression.added) {
-      return undefined
-    } else {
-      return namedExpression.address
-    }
-  }
-
   public getGuessedInternalNamedExpressionAddress(expressionName: string, sheetId: number): Maybe<SimpleCellAddress> {
     const namedExpression = this.worksheetStore(sheetId).get(expressionName)
     if (namedExpression) {
