@@ -626,7 +626,7 @@ export class HyperFormula implements TypedEmitter {
    *  ['1', '2', '=A1+10']
    * ]);
    *
-   * // should return { Sheet1: [ [ 1, 2, 11 ] ] }
+   * // should return { Sheet1: [ [ 1, 2, '=A1+10' ] ] }
    * const allSheetsSerialized = hfInstance.getAllSheetsSerialized();
    * ```
    *
@@ -2303,12 +2303,14 @@ export class HyperFormula implements TypedEmitter {
    *
    * // Similar to batch() but operations are not within a callback,
    * // one methods suspends the recalculation the second will resume calculations and return the changes.
-   * // Complementary to resumeEvaluation().
+   * // Suspend the evaluation with this method
    * hfInstance.suspendEvaluation()
    *
+   * // perform operations
    * hfInstance.addRows(0, [1, 1]);
    * hfInstance.removeColumns(0, [1, 1]);
    *
+   * // Use resumeEvaluation to resume
    * const changes = hfInstance.resumeEvaluation();
    * ```
    *
@@ -2331,12 +2333,15 @@ export class HyperFormula implements TypedEmitter {
    *
    * // Similar to batch() but operations are not within a callback,
    * // one methods suspends the recalculation the second will resume calculations and return the changes.
-   * // Complementary to suspendEvaluation().
+   *
+   * // First, suspend the evaluation
    * hfInstance.suspendEvaluation()
    *
+   * // perform operations
    * hfInstance.addRows(0, [1, 1]);
    * hfInstance.removeColumns(0, [1, 1]);
    *
+   * // resume the evaluation
    * const changes = hfInstance.resumeEvaluation();
    * ```
    *
