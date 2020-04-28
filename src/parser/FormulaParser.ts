@@ -327,7 +327,7 @@ export class FormulaParser extends EmbeddedActionsParser {
       {
         ALT: () => {
           const op = this.CONSUME(AdditionOp) as IExtendedToken
-          const value = this.SUBRULE(this.rightUnaryOpAtomicExpression)
+          const value = this.SUBRULE(this.atomicExpression)
           if (tokenMatcher(op, PlusOp)) {
             return buildPlusUnaryOpAst(value, op.leadingWhitespace)
           } else if (tokenMatcher(op, MinusOp)) {
