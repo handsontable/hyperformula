@@ -45,6 +45,16 @@ export class TranslationPackage {
     return this.functions[key] !== undefined
   }
 
+  public getFunctionTranslations(functionIds: string[]): string[] {
+    const translations: string[] = []
+    for (const functionId of functionIds) {
+      if (this.isFunctionTranslated(functionId)) {
+        translations.push(this.functions[functionId])
+      }
+    }
+    return translations
+  }
+
   public getFunctionTranslation(key: string): string {
     const val = this.functions[key]
     if(val === undefined) {
@@ -53,6 +63,7 @@ export class TranslationPackage {
       return val
     }
   }
+
   public getErrorTranslation(key: ErrorType): string {
     const val = this.errors[key]
     if(val === undefined) {
@@ -61,6 +72,7 @@ export class TranslationPackage {
       return val
     }
   }
+
   public getUITranslation(key: UIElement): string {
     const val = this.ui[key]
     if(val === undefined) {

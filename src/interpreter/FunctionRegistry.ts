@@ -47,7 +47,7 @@ export class FunctionRegistry {
     }
   }
 
-  public static getRegisteredFunctions(): string[] {
+  public static getRegisteredFunctionIds(): string[] {
     return Array.from(this.plugins.keys())
   }
 
@@ -60,8 +60,11 @@ export class FunctionRegistry {
   }
 
   private static loadTranslations(translations: FunctionTranslationsPackage) {
-    Object.keys(translations).forEach(language => {
-      HyperFormula.getLanguage(language).extendFunctions(translations[language])
+    const registeredLanguages = new Set(HyperFormula.getRegisteredLanguagesCodes())
+    Object.keys(translations).forEach(code => {
+      if (registeredLanguages.has(code)) {
+        HyperFormula.getLanguage(code).extendFunctions(translations[code])
+      }
     })
   }
 
@@ -128,7 +131,7 @@ export class FunctionRegistry {
     return Array.from(new Set(this.instancePlugins.values()).values())
   }
 
-  public getRegisteredFunctions(): string[] {
+  public getRegisteredFunctionIds(): string[] {
     return Array.from(this.functions.keys())
   }
 

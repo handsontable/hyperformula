@@ -258,6 +258,10 @@ export class HyperFormula implements TypedEmitter {
     FunctionRegistry.registerFunctionPlugin(plugin, translations)
   }
 
+  public static unregisterFunctionPlugin(plugin: FunctionPluginDefinition): void {
+    FunctionRegistry.unregisterFunctionPlugin(plugin)
+  }
+
   public static registerFunction(functionId: string, plugin: FunctionPluginDefinition, translations?: FunctionTranslationsPackage): void {
     FunctionRegistry.registerFunction(functionId, plugin, translations)
   }
@@ -266,12 +270,10 @@ export class HyperFormula implements TypedEmitter {
     FunctionRegistry.unregisterFunction(functionId)
   }
 
-  public static unregisterFunctionPlugin(plugin: FunctionPluginDefinition): void {
-    FunctionRegistry.unregisterFunctionPlugin(plugin)
-  }
-
-  public static getRegisteredFunctions(): string[] {
-    return FunctionRegistry.getRegisteredFunctions()
+  public static getRegisteredFunctionNames(code: string): string[] {
+    const functionIds = FunctionRegistry.getRegisteredFunctionIds()
+    const language = this.getLanguage(code)
+    return language.getFunctionTranslations(functionIds)
   }
 
   public static getFunctionPlugin(functionId: string): Maybe<FunctionPluginDefinition> {
@@ -1592,8 +1594,9 @@ export class HyperFormula implements TypedEmitter {
     return true
   }
 
-  public getRegisteredFunctions(): string[] {
-    return this._functionRegistry.getRegisteredFunctions()
+  public getRegisteredFunctionNames(): string[] {
+    const language = HyperFormula.getLanguage(this._config.language)
+    return language.getFunctionTranslations(this._functionRegistry.getRegisteredFunctionIds())
   }
 
   public getFunctionPlugin(functionId: string): Maybe<FunctionPluginDefinition> {

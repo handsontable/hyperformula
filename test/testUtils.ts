@@ -133,7 +133,7 @@ export function unregisterAllLanguages() {
 }
 
 export function unregisterAllFormulas() {
-  for (const formulaId of FunctionRegistry.getRegisteredFunctions()) {
+  for (const formulaId of FunctionRegistry.getRegisteredFunctionIds()) {
     HyperFormula.unregisterFunction(formulaId)
   }
 }

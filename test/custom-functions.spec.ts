@@ -22,6 +22,10 @@ class FooPlugin extends FunctionPlugin {
       'FOO': 'FOO',
       'BAR': 'BAR'
     },
+    'plPL': {
+      'FOO': 'FU',
+      'BAR': 'BAR'
+    }
   }
 
   public foo(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
@@ -63,13 +67,7 @@ class InvalidPlugin extends FunctionPlugin {
 describe('Register static custom plugin', () => {
   it('should register plugin with translations', () => {
     HyperFormula.registerLanguage('plPL', plPL)
-    const translations = {
-      'plPL': {
-        'FOO': 'FU',
-        'BAR': 'BAR'
-      },
-    }
-    HyperFormula.registerFunctionPlugin(FooPlugin, translations)
+    HyperFormula.registerFunctionPlugin(FooPlugin, FooPlugin.translations)
 
     const pl = HyperFormula.getLanguage('plPL')
 
@@ -84,13 +82,14 @@ describe('Register static custom plugin', () => {
     expect(engine.getCellValue(adr('A1'))).toEqual('foo')
   })
 
-  it('should return registered formula ids', () => {
+  it('should return registered formula translations', () => {
     unregisterAllFormulas()
+    HyperFormula.registerLanguage('plPL', plPL)
     HyperFormula.registerFunctionPlugin(SumifPlugin)
-    HyperFormula.registerFunctionPlugin(FooPlugin)
-    const formulaIds = HyperFormula.getRegisteredFunctions()
+    HyperFormula.registerFunctionPlugin(FooPlugin, FooPlugin.translations)
+    const formulaNames = HyperFormula.getRegisteredFunctionNames('plPL')
 
-    expectArrayWithSameContent(['FOO', 'BAR', 'SUMIF', 'COUNTIF', 'AVERAGEIF', 'SUMIFS', 'COUNTIFS'], formulaIds)
+    expectArrayWithSameContent(['FU', 'BAR', 'SUMA.JEŻELI', 'LICZ.JEŻELI', 'ŚREDNIA.JEŻELI', 'SUMY.JEŻELI', 'LICZ.WARUNKI'], formulaNames)
   })
 
   it('should register all formulas from plugin', () => {
@@ -100,8 +99,8 @@ describe('Register static custom plugin', () => {
       ['=foo()', '=bar()']
     ])
 
-    expect(HyperFormula.getRegisteredFunctions()).toContain('FOO')
-    expect(HyperFormula.getRegisteredFunctions()).toContain('BAR')
+    expect(HyperFormula.getRegisteredFunctionNames('enGB')).toContain('FOO')
+    expect(HyperFormula.getRegisteredFunctionNames('enGB')).toContain('BAR')
     expect(engine.getCellValue(adr('A1'))).toEqual('foo')
     expect(engine.getCellValue(adr('B1'))).toEqual('bar')
   })
@@ -112,8 +111,8 @@ describe('Register static custom plugin', () => {
       ['=foo()', '=bar()']
     ])
 
-    expect(HyperFormula.getRegisteredFunctions()).not.toContain('FOO')
-    expect(HyperFormula.getRegisteredFunctions()).toContain('BAR')
+    expect(HyperFormula.getRegisteredFunctionNames('enGB')).not.toContain('FOO')
+    expect(HyperFormula.getRegisteredFunctionNames('enGB')).toContain('BAR')
     expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NAME))
     expect(engine.getCellValue(adr('B1'))).toEqual('bar')
   })
@@ -171,7 +170,7 @@ describe('Instance level formula registry', () => {
   it('should return registered formula ids', () => {
     const engine = HyperFormula.buildFromArray([], {functionPlugins: [FooPlugin, SumWithExtra]})
 
-    expectArrayWithSameContent(engine.getRegisteredFunctions(), ['SUM', 'FOO', 'BAR'])
+    expectArrayWithSameContent(engine.getRegisteredFunctionNames(), ['SUM', 'FOO', 'BAR'])
   })
 
   it('should create engine only with plugins passed to configuration', () => {
@@ -179,7 +178,7 @@ describe('Instance level formula registry', () => {
       ['=foo()', '=bar()', '=SUM(1, 2)']
     ], {functionPlugins: [FooPlugin]})
 
-    expectArrayWithSameContent(['FOO', 'BAR'], engine.getRegisteredFunctions())
+    expectArrayWithSameContent(['FOO', 'BAR'], engine.getRegisteredFunctionNames())
     expect(engine.getCellValue(adr('A1'))).toEqual('foo')
     expect(engine.getCellValue(adr('B1'))).toEqual('bar')
     expect(engine.getCellValue(adr('C1'))).toEqual(detailedError(ErrorType.NAME))
