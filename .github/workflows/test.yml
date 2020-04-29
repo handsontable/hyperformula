@@ -3,7 +3,7 @@ name: Test
 on: [push]
 
 jobs:
-  build:
+  unit:
     strategy:
       matrix:
         node-version: [ '12' ]
@@ -25,7 +25,11 @@ jobs:
       - name: Run tests
         run: |
           npm run test:unit
-
+  browsers:
+    strategy:
+      matrix:
+        node-version: [ '12' ]
+        os: [ 'ubuntu-latest' ]
     name: BROWSERS
     runs-on: ${{ matrix.os }}
     steps:
