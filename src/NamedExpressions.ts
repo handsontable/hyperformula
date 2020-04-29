@@ -97,10 +97,6 @@ export class NamedExpressions {
   ) {
   }
 
-  public doesNamedExpressionExist(expressionName: string): boolean {
-    return this.workbookStore.has(expressionName)
-  }
-
   public isNameAvailable(expressionName: string, sheetId: number | undefined): boolean {
     if (sheetId === undefined) {
       return this.workbookStore.isNameAvailable(expressionName)
