@@ -203,4 +203,15 @@ describe('Instance level formula registry', () => {
 
     expectArrayWithSameContent(engine.getPlugins(), [SumifPlugin, NumericAggregationPlugin, SumWithExtra])
   })
+
+  it('should instantiate engine with additional plugin', () => {
+    const engine = HyperFormula.buildFromArray([], {
+      functionPlugins: [...HyperFormula.getPlugins(), FooPlugin]
+    })
+
+    const registeredPlugins = new Set(engine.getPlugins())
+
+    expect(registeredPlugins.size).toEqual(HyperFormula.getPlugins().length + 1)
+    expect(registeredPlugins.has(FooPlugin)).toBe(true)
+  })
 })
