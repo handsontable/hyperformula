@@ -1428,6 +1428,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * @throws [[NamedExpressionNameIsAlreadyTaken]] when the named expression is not available.
    * @throws [[NamedExpressionNameIsInvalid]] when the named expression is not valid
+   * @throws [[NoSheetWithNameError]] when the given sheet name does not exists
    *
    * @category Named Expression
    */
@@ -1444,6 +1445,8 @@ export class HyperFormula implements TypedEmitter {
    *
    * @param {string} expressionName - expression name, case insensitive.
    * @param {string | undefined} scope - sheet name or undefined for global scope
+   *
+   * @throws [[NoSheetWithNameError]] when the given sheet name does not exists
    *
    * @category Named Expression
    */
@@ -1468,6 +1471,8 @@ export class HyperFormula implements TypedEmitter {
    *
    * @param {string} expressionName - expression name, case insensitive.
    * @param {string | undefined} scope - sheet name or undefined for global scope
+   *
+   * @throws [[NoSheetWithNameError]] when the given sheet name does not exists
    *
    * @category Named Expression
    */
@@ -1497,6 +1502,7 @@ export class HyperFormula implements TypedEmitter {
    * @fires [[valuesUpdated]] if recalculation was triggered by this change
    *
    * @throws [[NamedExpressionDoesNotExist]] when the given expression does not exist.
+   * @throws [[NoSheetWithNameError]] when the given sheet name does not exists
    *
    * @category Named Expression
    */
