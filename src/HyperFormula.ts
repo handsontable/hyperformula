@@ -1566,11 +1566,13 @@ export class HyperFormula implements TypedEmitter {
    *
    * // build from arrays, only one sheet
    * const hfInstance = HyperFormula.buildFromArray([
-   * ['=SUM(1:2)', '2'],
-   * ['5', '6']
+   *  ['=SUM(1:2)', '2', '10'],
+   *  ['5', '6', '{=TRANSPOSE(A1:B1)}'],
+   *  ['40', '{=MMULT(A1:B3,A4:B5)}', '{=TRANSPOSE(A1:B1)}']
    * ]);
    *
-   * // returns cell formulas only: [ [ '=SUM(1:2)', undefined ], [ undefined, undefined ] ]
+   * // returns cell formulas of a given range only:
+   * // [ [ '=SUM(1:2)', undefined ], [ undefined, undefined ] ]
    * const rangeFormulas = hfInstance.getRangeFormulas(new AbsoluteCellRange({ col: 0, row: 0, sheet: 0 }, { col: 1, row: 1, sheet: 0 }));
    * ```
    *
