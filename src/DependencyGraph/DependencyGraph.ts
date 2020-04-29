@@ -192,8 +192,8 @@ export class DependencyGraph {
   }
 
   public namedExpressionVertex(expressionName: string, sheetId: number): CellVertex {
-    const address = this.namedExpressions.getInternalMaybeNotAddedNamedExpressionAddress(expressionName, sheetId)
-    return this.fetchCellOrCreateEmpty(address)
+    const namedExpression = this.namedExpressions.namedExpressionOrPlaceholder(expressionName, sheetId)
+    return this.fetchCellOrCreateEmpty(namedExpression.address)
   }
 
   private correctInfiniteRangesDependenciesByRangeVertex(vertex: RangeVertex) {

@@ -191,17 +191,17 @@ export class NamedExpressions {
     }
   }
 
-  public getInternalMaybeNotAddedNamedExpressionAddress(expressionName: string, sheetId: number): SimpleCellAddress {
+  public namedExpressionOrPlaceholder(expressionName: string, sheetId: number): NamedExpression {
     const namedExpression = this.worksheetStore(sheetId).get(expressionName)
     if (namedExpression) {
-      return namedExpression.address
+      return namedExpression
     } else {
-      let namedExpression = this.workbookStore.get(expressionName)
+      let namedExpression = this.workbookStore.getExisting(expressionName)
       if (namedExpression === undefined) {
         namedExpression = new NamedExpression(expressionName, this.nextAddress(), false)
         this.workbookStore.add(namedExpression)
       }
-      return namedExpression.address
+      return namedExpression
     }
   }
 
