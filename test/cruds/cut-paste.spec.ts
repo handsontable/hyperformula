@@ -336,7 +336,7 @@ describe('moving ranges', () => {
     expect(() => {
       engine.cut(adr('A2'), 2, 2)
       engine.paste(adr('C1'))
-    }).toThrow('It is not possible to move matrix')
+    }).toThrowError('It is not possible to move matrix')
   })
 
   it('should not be possible to move cells to area with matrix', () => {
@@ -348,7 +348,7 @@ describe('moving ranges', () => {
     expect(() => {
       engine.cut(adr('A1'), 2, 1)
       engine.paste(adr('A2'))
-    }).toThrow('It is not possible to replace cells with matrix')
+    }).toThrowError('It is not possible to replace cells with matrix')
   })
 
   it('should adjust edges when moving part of range', () => {
@@ -885,20 +885,6 @@ describe('move cells with matrices', () => {
 })
 
 describe('aborting cut paste', () => {
-  it('should do nothing when clipboard is cleared', () => {
-    const engine = HyperFormula.buildFromArray([
-      ['1'],
-      ['2']
-    ])
-
-    engine.cut(adr('A1'), 1, 2)
-    engine.clearClipboard()
-    engine.paste(adr('B2'))
-
-    expect(engine.getCellValue(adr('B1'))).toEqual(EmptyValue)
-    expect(engine.getCellValue(adr('B2'))).toEqual(EmptyValue)
-  })
-
   it('should be aborted when addRows is done before paste', () => {
     const engine = HyperFormula.buildFromArray([
       ['1'],
@@ -1019,7 +1005,7 @@ describe('aborting cut paste', () => {
 
     expect(() => {
       engine.addRows(1, [1, 1])
-    }).toThrowError(new NoSheetWithIdError(1))
+    }).toThrow(new NoSheetWithIdError(1))
 
     expect(engine.isClipboardEmpty()).toBe(false)
   })

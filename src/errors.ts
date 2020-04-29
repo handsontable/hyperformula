@@ -102,6 +102,15 @@ export class NoOperationToRedoError extends Error {
   }
 }
 
+/**
+ * Error thrown when there is nothing to paste by the [[paste]] method.
+ */
+export class NothingToPasteError extends Error {
+  constructor() {
+    super('There is nothing to paste')
+  }
+}
+
 function replacer(key: any, val: any): any {
   switch (typeof val) {
     case 'function':
@@ -148,6 +157,38 @@ export class UnableToParse extends Error {
 export class ExpectedValueOfType extends Error {
   constructor(expectedType: string, paramName: string) {
     super(`Expected value of type: ${expectedType} for config parameter: ${paramName}`)
+  }
+}
+
+/**
+ * Error thrown when supplied config parameter value is too small.
+ * This error might be thrown while setting or updating the [[ConfigParams]].
+ * The following methods accept [[ConfigParams]] as a parameter:
+ * 
+ * @see [[buildEmpty]]
+ * @see [[buildFromArray]]
+ * @see [[buildFromSheets]]
+ * @see [[updateConfig]]
+ */
+export class ConfigValueTooSmallError extends Error {
+  constructor(paramName: string, minimum: number) {
+    super(`Config parameter ${paramName} should be at least ${minimum}`)
+  }
+}
+
+/**
+ * Error thrown when supplied config parameter value is too big.
+ * This error might be thrown while setting or updating the [[ConfigParams]].
+ * The following methods accept [[ConfigParams]] as a parameter:
+ * 
+ * @see [[buildEmpty]]
+ * @see [[buildFromArray]]
+ * @see [[buildFromSheets]]
+ * @see [[updateConfig]]
+ */
+export class ConfigValueTooBigError extends Error {
+  constructor(paramName: string, maximum: number) {
+    super(`Config parameter ${paramName} should be at most ${maximum}`)
   }
 }
 

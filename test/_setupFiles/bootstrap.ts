@@ -41,6 +41,11 @@ import {CodePlugin} from '../../src/interpreter/plugin/CodePlugin'
 import {ErrorFunctionPlugin} from '../../src/interpreter/plugin/ErrorFunctionPlugin'
 import {CorrelPlugin} from '../../src/interpreter/plugin/CorrelPlugin'
 
+import {
+  toContainEqualMatcher,
+  toMatchObjectMatcher,
+} from './matchers'
+
 Config.defaultConfig = Object.assign({}, Config.defaultConfig, {
   chooseAddressMappingPolicy: new AlwaysSparse(),
   functionPlugins: [],
@@ -51,6 +56,10 @@ Config.defaultConfig = Object.assign({}, Config.defaultConfig, {
 })
 
 beforeEach(() => {
+  // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+  // @ts-ignore
+  jasmine.setDefaultSpyStrategy((and: unknown) => and.callThrough())
+
   unregisterAllLanguages()
 
   const defaultLanguage = Config.defaultConfig.language
@@ -91,4 +100,11 @@ beforeEach(() => {
   HyperFormula.registerFunctionPlugin(CodePlugin)
   HyperFormula.registerFunctionPlugin(ErrorFunctionPlugin)
   HyperFormula.registerFunctionPlugin(CorrelPlugin)
+})
+
+beforeAll(() => {
+  jasmine.addMatchers({
+    ...toContainEqualMatcher,
+    ...toMatchObjectMatcher,
+  })
 })

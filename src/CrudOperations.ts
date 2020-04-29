@@ -4,22 +4,28 @@
  */
 
 import {AbsoluteCellRange} from './AbsoluteCellRange'
+import {absolutizeDependencies} from './absolutizeDependencies'
 import {invalidSimpleCellAddress, simpleCellAddress, SimpleCellAddress} from './Cell'
-import {CellContentParser, isMatrix, RawCellContent} from './CellContentParser'
+import {CellContent, CellContentParser, isMatrix, RawCellContent} from './CellContentParser'
 import {ClipboardCell, ClipboardOperations} from './ClipboardOperations'
 import {AddColumnsCommand, AddRowsCommand, Operations, RemoveColumnsCommand, RemoveRowsCommand} from './Operations'
 import {ColumnSearchStrategy} from './ColumnSearch/ColumnSearchStrategy'
 import {ColumnsSpan} from './ColumnsSpan'
 import {Config} from './Config'
 import {ContentChanges} from './ContentChanges'
-import {AddressMapping, DependencyGraph, SheetMapping} from './DependencyGraph'
+import {AddressMapping, DependencyGraph, SheetMapping, SparseStrategy} from './DependencyGraph'
+import {NamedExpressions} from './NamedExpressions'
 import {
   InvalidAddressError,
   InvalidArgumentsError,
+  NamedExpressionDoesNotExist,
+  NamedExpressionNameIsAlreadyTaken,
+  NamedExpressionNameIsInvalid,
   NoOperationToRedoError,
   NoOperationToUndoError,
   NoSheetWithIdError,
   NoSheetWithNameError,
+  NothingToPasteError,
   SheetSizeLimitExceededError
 } from './errors'
 import {Index} from './HyperFormula'
@@ -43,7 +49,7 @@ import {
   SetSheetContentUndoEntry,
   UndoRedo
 } from './UndoRedo'
-import {findBoundaries} from './Sheet'
+import {findBoundaries, validateAsSheet} from './Sheet'
 
 export class CrudOperations {
 
@@ -66,10 +72,14 @@ export class CrudOperations {
     private readonly cellContentParser: CellContentParser,
     /** Service handling postponed CRUD transformations */
     private readonly lazilyTransformingAstService: LazilyTransformingAstService,
+    /** Storage for named expressions */
+    private readonly namedExpressions: NamedExpressions,
   ) {
     this.operations = new Operations(this.dependencyGraph, this.columnSearch, this.cellContentParser, this.parser, this.stats, this.lazilyTransformingAstService, this.config)
     this.clipboardOperations = new ClipboardOperations(this.dependencyGraph, this.operations, this.parser, this.lazilyTransformingAstService, this.config)
     this.undoRedo = new UndoRedo(this.config, this.operations)
+
+    this.allocateNamedExpressionAddressSpace()
   }
 
   public addRows(sheet: number, ...indexes: Index[]): void {
@@ -149,14 +159,15 @@ export class CrudOperations {
   }
 
   public paste(targetLeftCorner: SimpleCellAddress): void {
-    if (this.clipboardOperations.isCutClipboard()) {
-      const clipboard = this.clipboardOperations.clipboard!
+    const clipboard = this.clipboardOperations.clipboard
+    if (clipboard === undefined) {
+      throw new NothingToPasteError()
+    } else if (this.clipboardOperations.isCutClipboard()) {
       this.undoRedo.clearRedoStack()
       const { version, overwrittenCellsData } = this.operations.moveCells(clipboard.sourceLeftCorner, clipboard.width, clipboard.height, targetLeftCorner)
       this.clipboardOperations.abortCut()
       this.undoRedo.saveOperation(new MoveCellsUndoEntry(clipboard.sourceLeftCorner, clipboard.width, clipboard.height, targetLeftCorner, overwrittenCellsData, version))
     } else if (this.clipboardOperations.isCopyClipboard()) {
-      const clipboard = this.clipboardOperations.clipboard!
       this.clipboardOperations.ensureItIsPossibleToCopyPaste(targetLeftCorner)
       const targetRange = AbsoluteCellRange.spanFrom(targetLeftCorner, clipboard.width, clipboard.height)
       const oldContent = this.operations.getRangeClipboardCells(targetRange)
@@ -257,17 +268,12 @@ export class CrudOperations {
     const sheetId = this.sheetMapping.fetch(sheetName)
     this.ensureItIsPossibleToChangeSheetContents(sheetId, values)
 
+    validateAsSheet(values)
     this.undoRedo.clearRedoStack()
     this.clipboardOperations.abortCut()
-    if (!(values instanceof Array)) {
-      throw new Error('Expected an array of arrays.')
-    }
     const oldSheetContent = this.operations.getSheetClipboardCells(sheetId)
     this.operations.clearSheet(sheetId)
     for (let i = 0; i < values.length; i++) {
-      if (!(values[i] instanceof Array)) {
-        throw new Error('Expected an array of arrays.')
-      }
       for (let j = 0; j < values[i].length; j++) {
         const address = simpleCellAddress(sheetId, j, i)
         this.operations.setCellContent(address, values[i][j])
@@ -290,6 +296,26 @@ export class CrudOperations {
     }
     this.clipboardOperations.abortCut()
     this.undoRedo.redo()
+  }
+
+  public addNamedExpression(expressionName: string, expression: RawCellContent) {
+    if (!this.namedExpressions.isNameValid(expressionName)) {
+      throw new NamedExpressionNameIsInvalid(expressionName)
+    }
+    if (!this.namedExpressions.isNameAvailable(expressionName)) {
+      throw new NamedExpressionNameIsAlreadyTaken(expressionName)
+    }
+    const namedExpression = this.namedExpressions.addNamedExpression(expressionName)
+    const address = this.namedExpressions.getInternalNamedExpressionAddress(expressionName)!
+    this.storeExpressionInCell(address, expression)
+  }
+
+  public changeNamedExpressionExpression(expressionName: string, newExpression: RawCellContent) {
+    const address = this.namedExpressions.getInternalNamedExpressionAddress(expressionName)
+    if (!address) {
+      throw new NamedExpressionDoesNotExist(expressionName)
+    }
+    this.storeExpressionInCell(address, newExpression)
   }
 
   public ensureItIsPossibleToAddRows(sheet: number, ...indexes: Index[]): void {
@@ -497,6 +523,24 @@ export class CrudOperations {
 
   private get sheetMapping(): SheetMapping {
     return this.dependencyGraph.sheetMapping
+  }
+
+  private allocateNamedExpressionAddressSpace() {
+    this.dependencyGraph.addressMapping.addSheet(-1, new SparseStrategy(0, 0))
+  }
+
+  private storeExpressionInCell(address: SimpleCellAddress, expression: RawCellContent) {
+    const parsedCellContent = this.cellContentParser.parse(expression)
+    if (parsedCellContent instanceof CellContent.MatrixFormula) {
+      throw new Error('Matrix formulas are not supported')
+    } else if (parsedCellContent instanceof CellContent.Formula) {
+      const {ast, hasVolatileFunction, hasStructuralChangeFunction, dependencies} = this.parser.parse(parsedCellContent.formula, address)
+      this.dependencyGraph.setFormulaToCell(address, ast, absolutizeDependencies(dependencies, address), hasVolatileFunction, hasStructuralChangeFunction)
+    } else if (parsedCellContent instanceof CellContent.Empty) {
+      this.operations.setCellEmpty(address)
+    } else {
+      this.operations.setValueToCell(parsedCellContent.value, address)
+    }
   }
 }
 

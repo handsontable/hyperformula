@@ -21,13 +21,7 @@ import {
   SheetMapping,
   Vertex,
 } from './DependencyGraph'
-import {
-  EvaluationSuspendedError,
-  NamedExpressionDoesNotExist,
-  NamedExpressionNameIsAlreadyTaken,
-  NamedExpressionNameIsInvalid,
-  NotAFormulaError
-} from './errors'
+import {EvaluationSuspendedError, NotAFormulaError} from './errors'
 import {Evaluator} from './Evaluator'
 import {IBatchExecutor} from './IBatchExecutor'
 import {LazilyTransformingAstService} from './LazilyTransformingAstService'
@@ -80,6 +74,11 @@ export class HyperFormula implements TypedEmitter {
    * Latest build date.
    */
   public static buildDate = process.env.HT_BUILD_DATE
+
+  /**
+   * A release date.
+   */
+  public static releaseDate = process.env.HT_RELEASE_DATE
 
   /**
    * Calls the `graph` method on the dependency graph.
@@ -180,6 +179,7 @@ export class HyperFormula implements TypedEmitter {
    * @param {Partial<ConfigParams>} [configInput] - engine configuration
    *
    * @throws [[SheetSizeLimitExceededError]] when sheet size exceeds the limits
+   * @throws [[InvalidArgumentsError]] when sheet is not an array of arrays
    * @throws [[FunctionPluginValidationError]] when plugin class definition is not consistent with metadata
    *
    * @category Factory
@@ -198,6 +198,7 @@ export class HyperFormula implements TypedEmitter {
    * @param {Partial<ConfigParams>} [configInput] - engine configuration
    *
    * @throws [[SheetSizeLimitExceededError]] when sheet size exceeds the limits
+   * @throws [[InvalidArgumentsError]] when any sheet is not an array of arrays
    * @throws [[FunctionPluginValidationError]] when plugin class definition is not consistent with metadata
    *
    * @category Factory
@@ -1026,6 +1027,7 @@ export class HyperFormula implements TypedEmitter {
    * @throws an error while attempting to paste onto a matrix
    * @throws [[EvaluationSuspendedError]] when the evaluation is suspended
    * @throws [[SheetSizeLimitExceededError]] when performing this operation would result in sheet size limits exceeding
+   * @throws [[NothingToPasteError]] when clipboard is empty
    *
    * @category Clipboard
    */
@@ -1242,6 +1244,7 @@ export class HyperFormula implements TypedEmitter {
    * @param {RawCellContent[][]} values - array of new values
    *
    * @throws [[NoSheetWithNameError]] when the given sheet name does not exists
+   * @throws [[InvalidArgumentsError]] when values is not an array of arrays
    *
    * @category Sheet
    */
@@ -1286,6 +1289,16 @@ export class HyperFormula implements TypedEmitter {
    */
   public getSheetName(sheetId: number): Maybe<string> {
     return this.sheetMapping.getDisplayName(sheetId)
+  }
+
+  /**
+   * List all sheet names.
+   * Returns an array of sheet names as strings.
+   *
+   * @category Sheet
+   */
+  public getSheetNames(): string[] {
+    return this.sheetMapping.sheetNames()
   }
 
   /**
@@ -1493,13 +1506,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Named Expression
    */
   public addNamedExpression(expressionName: string, expression: RawCellContent): ExportedChange[] {
-    if (!this._namedExpressions.isNameValid(expressionName)) {
-      throw new NamedExpressionNameIsInvalid(expressionName)
-    }
-    if (!this._namedExpressions.isNameAvailable(expressionName)) {
-      throw new NamedExpressionNameIsAlreadyTaken(expressionName)
-    }
-    this._namedExpressions.addNamedExpression(expressionName, expression)
+    this._crudOperations.addNamedExpression(expressionName, expression)
     const changes = this.recomputeIfDependencyGraphNeedsIt()
     this._emitter.emit(Events.NamedExpressionAdded, expressionName, changes)
     return changes
@@ -1507,18 +1514,36 @@ export class HyperFormula implements TypedEmitter {
 
   /**
    * Gets specified named expression value.
-   * Returns a [[CellValue]] or null if the given named expression does not exists
+   * Returns a [[CellValue]] or undefined if the given named expression does not exists
    *
    * @param {string} expressionName - expression name, case insensitive.
    *
    * @category Named Expression
    */
-  public getNamedExpressionValue(expressionName: string): CellValue | null {
-    const namedExpressionValue = this._namedExpressions.getNamedExpressionValue(expressionName)
-    if (namedExpressionValue === null) {
-      return null
+  public getNamedExpressionValue(expressionName: string): Maybe<CellValue> {
+    this.ensureEvaluationIsNotSuspended()
+    const namedExpressionAddress = this._namedExpressions.getInternalNamedExpressionAddress(expressionName)
+    if (namedExpressionAddress) {
+      return this._serialization.getCellValue(namedExpressionAddress)
     } else {
-      return this._exporter.exportValue(namedExpressionValue)
+      return undefined
+    }
+  }
+
+  /**
+   * Returns a normalized formula string for given named expression or `undefined` for a named expression that does not exist or does not hold a formula.
+   * Unparses AST.
+   *
+   * @param {string} expressionName - expression name, case insensitive.
+   *
+   * @category Named Expression
+   */
+  public getNamedExpressionFormula(expressionName: string): Maybe<string> {
+    const namedExpressionAddress = this._namedExpressions.getInternalNamedExpressionAddress(expressionName)
+    if (namedExpressionAddress === null) {
+      return undefined
+    } else {
+      return this._serialization.getCellFormula(namedExpressionAddress)
     }
   }
 
@@ -1537,10 +1562,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Named Expression
    */
   public changeNamedExpression(expressionName: string, newExpression: RawCellContent): ExportedChange[] {
-    if (!this._namedExpressions.doesNamedExpressionExist(expressionName)) {
-      throw new NamedExpressionDoesNotExist(expressionName)
-    }
-    this._namedExpressions.changeNamedExpressionExpression(expressionName, newExpression)
+    this._crudOperations.changeNamedExpressionExpression(expressionName, newExpression)
     return this.recomputeIfDependencyGraphNeedsIt()
   }
 
@@ -1557,9 +1579,11 @@ export class HyperFormula implements TypedEmitter {
    * @category Named Expression
    */
   public removeNamedExpression(expressionName: string): ExportedChange[] {
-    const namedExpressionDisplayName = this._namedExpressions.getDisplayNameByName(expressionName)!
-    const actuallyRemoved = this._namedExpressions.removeNamedExpression(expressionName)
-    if (actuallyRemoved) {
+    const address = this._namedExpressions.getInternalNamedExpressionAddress(expressionName)
+    if (address) {
+      const namedExpressionDisplayName = this._namedExpressions.getDisplayNameByName(expressionName)!
+      this._namedExpressions.remove(expressionName)
+      this.dependencyGraph.setCellEmpty(address)
       const changes = this.recomputeIfDependencyGraphNeedsIt()
       this._emitter.emit(Events.NamedExpressionRemoved, namedExpressionDisplayName, changes)
       return changes

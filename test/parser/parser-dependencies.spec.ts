@@ -24,7 +24,7 @@ describe('Parsing collecting dependencies', () => {
     const dependencies = absolutizeDependencies(parseResult.dependencies, formulaAddress)
 
     expect(dependencies.length).toEqual(1)
-    expect(dependencies[0]).toMatchObject(adr('B2'))
+    expect(dependencies[0]).toEqual(adr('B2'))
   })
 
   it('works for CELL_RANGE', () => {

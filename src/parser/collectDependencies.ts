@@ -3,8 +3,15 @@
  * Copyright (c) 2020 Handsoncode. All rights reserved.
  */
 
-import {Ast, AstNodeType, RelativeDependency} from './'
-import {RelativeDependencyType} from './RelativeDependency'
+import {
+  AddressDependency,
+  Ast,
+  AstNodeType,
+  CellRangeDependency,
+  ColumnRangeDependency,
+  RelativeDependency,
+  RowRangeDependency
+} from './'
 import {FunctionRegistry} from '../interpreter/FunctionRegistry'
 
 const collectDependenciesFn = (ast: Ast, functionRegistry: FunctionRegistry, dependenciesSet: RelativeDependency[]) => {
@@ -15,36 +22,24 @@ const collectDependenciesFn = (ast: Ast, functionRegistry: FunctionRegistry, dep
     case AstNodeType.ERROR:
       return
     case AstNodeType.CELL_REFERENCE: {
-      dependenciesSet.push({
-        type: RelativeDependencyType.CellAddress,
-        dependency: ast.reference
-      })
+      dependenciesSet.push(new AddressDependency(ast.reference))
       return
     }
     case AstNodeType.CELL_RANGE: {
       if (ast.start.sheet === ast.end.sheet) {
-        dependenciesSet.push({
-          type: RelativeDependencyType.CellRange,
-          dependency: [ast.start, ast.end]
-        })
+        dependenciesSet.push(new CellRangeDependency(ast.start, ast.end))
       }
       return
     }
     case AstNodeType.COLUMN_RANGE: {
       if (ast.start.sheet === ast.end.sheet) {
-        dependenciesSet.push({
-          type: RelativeDependencyType.ColumnRange,
-          dependency: [ast.start, ast.end]
-        })
+        dependenciesSet.push(new ColumnRangeDependency(ast.start, ast.end))
       }
       return
     }
     case AstNodeType.ROW_RANGE: {
       if (ast.start.sheet === ast.end.sheet) {
-        dependenciesSet.push({
-          type: RelativeDependencyType.RowRange,
-          dependency: [ast.start, ast.end]
-        })
+        dependenciesSet.push(new RowRangeDependency(ast.start, ast.end))
       }
       return
     }

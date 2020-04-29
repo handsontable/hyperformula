@@ -449,9 +449,9 @@ describe('Removing columns - reevaluation', () => {
     const a2 = engine.addressMapping.getCell(adr('A2'))
     const a3 = engine.addressMapping.getCell(adr('A3'))
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const a2setCellValueSpy = jest.spyOn(a2 as any, 'setCellValue')
+    const a2setCellValueSpy = spyOn(a2 as any, 'setCellValue')
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const a3setCellValueSpy = jest.spyOn(a3 as any, 'setCellValue')
+    const a3setCellValueSpy = spyOn(a3 as any, 'setCellValue')
 
     engine.removeColumns(0, [1, 1])
 
@@ -465,7 +465,7 @@ describe('Removing columns - reevaluation', () => {
     ])
     const d1 = engine.addressMapping.getCell(adr('D1'))
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const d1setCellValueSpy = jest.spyOn(d1 as any, 'setCellValue')
+    const d1setCellValueSpy = spyOn(d1 as any, 'setCellValue')
 
     engine.removeColumns(0, [1, 1])
 
@@ -480,7 +480,7 @@ describe('Removing columns - reevaluation', () => {
 
     const c1 = engine.addressMapping.getCell(adr('C1'))
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const c1setCellValueSpy = jest.spyOn(c1 as any, 'setCellValue')
+    const c1setCellValueSpy = spyOn(c1 as any, 'setCellValue')
 
     engine.removeColumns(0, [0, 2])
 
@@ -746,7 +746,7 @@ describe('Removing columns - sheet dimensions', () => {
     ])
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const recalcSpy = jest.spyOn(engine.evaluator as any, 'partialRun')
+    const recalcSpy = spyOn(engine.evaluator as any, 'partialRun')
     engine.removeColumns(0, [1, 1])
     engine.removeColumns(0, [10, 6])
 

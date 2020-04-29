@@ -627,7 +627,7 @@ describe('Undo', () => {
 
     expect(() => {
       engine.undo()
-    }).toThrowError(new NoOperationToUndoError())
+    }).toThrow(new NoOperationToUndoError())
   })
 
   it('undo recomputes and return changes', () => {
@@ -1370,7 +1370,7 @@ describe('Redo', () => {
 
     expect(() => {
       engine.redo()
-    }).toThrowError(new NoOperationToRedoError())
+    }).toThrow(new NoOperationToRedoError())
   })
 
   it('redo recomputes and return changes', () => {

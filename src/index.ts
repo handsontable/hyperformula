@@ -5,6 +5,11 @@
 
 import {CellError, EmptyValue, ErrorType} from './Cell'
 import {CellValue, DetailedCellError, ExportedCellChange, ExportedNamedExpressionChange} from './CellValue'
+import {HyperFormula} from './HyperFormula'
+import {Config} from './Config'
+import {languages} from './i18n'
+import {LazilyTransformingAstService} from './LazilyTransformingAstService'
+import {Sheets} from './Sheet'
 import {
   EvaluationSuspendedError,
   InvalidAddressError,
@@ -14,14 +19,10 @@ import {
   NoSheetWithIdError,
   NoSheetWithNameError,
   NotAFormulaError,
+  NothingToPasteError,
   SheetSizeLimitExceededError,
   FunctionPluginValidationError
 } from './errors'
-import {HyperFormula} from './HyperFormula'
-import {Config} from './Config'
-import {languages} from './i18n'
-import {LazilyTransformingAstService} from './LazilyTransformingAstService'
-import {Sheets} from './Sheet'
 
 /** @internal */
 class HyperFormulaNS extends HyperFormula {
@@ -34,6 +35,7 @@ class HyperFormulaNS extends HyperFormula {
   public static DetailedCellError = DetailedCellError
   public static NoOperationToUndoError = NoOperationToUndoError
   public static NoOperationToRedoError = NoOperationToRedoError
+  public static NothingToPasteError = NothingToPasteError
   public static LazilyTransformingAstService = LazilyTransformingAstService
   public static ExportedCellChange = ExportedCellChange
   public static ExportedNamedExpressionChange = ExportedNamedExpressionChange
@@ -68,6 +70,7 @@ export {
   ExportedNamedExpressionChange,
   NoOperationToUndoError,
   NoOperationToRedoError,
+  NothingToPasteError,
   EvaluationSuspendedError,
   FunctionPluginValidationError,
   ErrorType,

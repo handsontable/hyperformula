@@ -59,4 +59,4 @@ export {
 
 export { Unparser } from './Unparser'
 
-export { RelativeDependency } from './RelativeDependency'
+export { RelativeDependency, AddressDependency, CellRangeDependency, ColumnRangeDependency, RowRangeDependency } from './RelativeDependency'

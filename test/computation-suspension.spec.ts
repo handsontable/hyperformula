@@ -33,6 +33,9 @@ describe('Evaluation suspension', () => {
     expect(() => {
       engine.getRangeValues(new AbsoluteCellRange(adr('A1'), adr('A2')))
     }).toThrow(new EvaluationSuspendedError())
+    expect(() => {
+      engine.getNamedExpressionValue('FOO')
+    }).toThrow(new EvaluationSuspendedError())
   })
 
   it('when evaluation is stopped, getting serialized cell values is forbidden', () => {
@@ -118,7 +121,7 @@ describe('Evaluation suspension', () => {
     const changes = engine.resumeEvaluation()
 
     expect(engine.getCellValue(adr('C1'))).toBe(2)
-    expect(changes).toContainEqual(new ExportedCellChange(adr('C1'), 2))
+    expect(changes).toContain(new ExportedCellChange(adr('C1'), 2))
   })
 
   it('#isEvaluationSuspended when evaluation is suspended', () => {

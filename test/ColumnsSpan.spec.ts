@@ -4,13 +4,13 @@ describe('ColumnsSpan', () => {
   it('raise error when starting column is less than 0', () => {
     expect(() => {
       new ColumnsSpan(0, -1, 0)
-    }).toThrow('Starting column cant be less than 0')
+    }).toThrowError('Starting column cant be less than 0')
   })
 
   it('raise error when column end before column start', () => {
     expect(() => {
       new ColumnsSpan(0, 1, 0)
-    }).toThrow('Column span cant end before start')
+    }).toThrowError('Column span cant end before start')
   })
 
   it('#fromNumberOfColumns', () => {
@@ -43,7 +43,7 @@ describe('ColumnsSpan', () => {
 
     expect(() => {
       span1.intersect(span2)
-    }).toThrow("Can't intersect spans from different sheets")
+    }).toThrowError("Can't intersect spans from different sheets")
   })
 
   it('#intersect with span overlapping at right', () => {
