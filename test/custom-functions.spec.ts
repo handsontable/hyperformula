@@ -166,7 +166,7 @@ describe('Instance level formula registry', () => {
     HyperFormula.getLanguage('enGB').extendFunctions({FOO: 'FOO'})
     HyperFormula.getLanguage('enGB').extendFunctions({BAR: 'BAR'})
   })
-  
+
   it('should return registered formula ids', () => {
     const engine = HyperFormula.buildFromArray([], {functionPlugins: [FooPlugin, SumWithExtra]})
 
@@ -199,7 +199,7 @@ describe('Instance level formula registry', () => {
   })
 
   it('should return registered plugins', () => {
-    const engine = HyperFormula.buildFromArray([], { functionPlugins: [SumifPlugin, NumericAggregationPlugin, SumWithExtra]})
+    const engine = HyperFormula.buildFromArray([], {functionPlugins: [SumifPlugin, NumericAggregationPlugin, SumWithExtra]})
 
     expectArrayWithSameContent(engine.getPlugins(), [SumifPlugin, NumericAggregationPlugin, SumWithExtra])
   })
@@ -213,5 +213,18 @@ describe('Instance level formula registry', () => {
 
     expect(registeredPlugins.size).toEqual(HyperFormula.getPlugins().length + 1)
     expect(registeredPlugins.has(FooPlugin)).toBe(true)
+  })
+
+  it('should rebuild engine and override plugins', () => {
+    const engine = HyperFormula.buildFromArray([])
+
+    let registeredPlugins = new Set(engine.getPlugins())
+    expect(registeredPlugins.has(SumifPlugin)).toBe(true)
+    expect(registeredPlugins.has(FooPlugin)).toBe(false)
+
+    engine.updateConfig({functionPlugins: [FooPlugin]})
+    registeredPlugins = new Set(engine.getPlugins())
+    expect(registeredPlugins.has(FooPlugin)).toBe(true)
+    expect(registeredPlugins.size).toBe(1)
   })
 })
