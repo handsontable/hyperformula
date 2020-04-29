@@ -69,6 +69,11 @@ Run tests to make sure that everything is working properly:
 npm run test
 ```
 
+If you want to debug it in a browser, run the following script:
+```
+npm run test:browser.debug
+```
+
 See other useful scripts available in [package.json](package.json).
 
 ## Demos

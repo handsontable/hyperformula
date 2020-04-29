@@ -41,8 +41,8 @@ describe('#coerceBooleanToNumber', () => {
     const dateHelper = new DateTimeHelper(config)
     const numberLiteralsHelper = new NumberLiteralHelper(config)
     const arithmeticHelper = new ArithmeticHelper(config, dateHelper, numberLiteralsHelper)
-    expect(coerceBooleanToNumber(true)).toBe(arithmeticHelper.coerceScalarToNumberOrError(true))
-    expect(coerceBooleanToNumber(false)).toBe(arithmeticHelper.coerceScalarToNumberOrError(false))
+    expect(coerceBooleanToNumber(true)).toBe(arithmeticHelper.coerceScalarToNumberOrError(true) as number)
+    expect(coerceBooleanToNumber(false)).toBe(arithmeticHelper.coerceScalarToNumberOrError(false) as number)
   })
 })
 

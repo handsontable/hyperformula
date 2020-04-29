@@ -84,7 +84,7 @@ describe('Basic Graph manipulation', () => {
 
     expect(() => {
       graph.addEdge(identifiableString(0, 'origin'), node)
-    }).toThrowError('Unknown node')
+    }).toThrowError(/Unknown node/)
   })
 
   it('#addEdge is raising an error when the target node not present', () => {
@@ -94,7 +94,7 @@ describe('Basic Graph manipulation', () => {
 
     expect(() => {
       graph.addEdge(node, identifiableString(1, 'target'))
-    }).toThrowError('Unknown node')
+    }).toThrowError(/Unknown node/)
   })
 
   it('#existsEdge works', () => {
@@ -259,73 +259,81 @@ describe('Graph#getTopologicallySortedSubgraphFrom', () => {
     graph.addNode(node0)
     graph.addNode(node1)
 
-    const fn = jest.fn(() => true)
-    const fn2 = jest.fn( () => {})
+    const fn = jasmine.createSpy().and.returnValue(true)
+    const fn2 = jasmine.createSpy()
+
     graph.getTopSortedWithSccSubgraphFrom([node0], fn, fn2)
 
     expect(fn).toHaveBeenCalledTimes(1)
-    expect(fn).toHaveBeenCalledWith(node0)
+    expect(fn.calls.argsFor(0)).toContain(node0)
   })
 
   it('case with obvious edge', () => {
     const graph = new Graph<string>(new DummyGetDependenciesQuery())
     const node0 = 'foo'
     const node1 = 'bar'
+
     graph.addNode(node0)
     graph.addNode(node1)
     graph.addEdge(node0, node1)
 
-    const fn = jest.fn(() => true)
-    const fn2 = jest.fn( () => {})
+    const fn = jasmine.createSpy().and.returnValue(true)
+    const fn2 = jasmine.createSpy()
+
     graph.getTopSortedWithSccSubgraphFrom([node0], fn, fn2)
 
     expect(fn).toHaveBeenCalledTimes(2)
-    expect(fn).toHaveBeenNthCalledWith(1, node0)
-    expect(fn).toHaveBeenNthCalledWith(2, node1)
+    expect(fn.calls.argsFor(0)).toContain(node0)
+    expect(fn.calls.argsFor(1)).toContain(node1)
   })
 
   it('it doesnt call other if didnt change', () => {
     const graph = new Graph<string>(new DummyGetDependenciesQuery())
     const node0 = 'foo'
     const node1 = 'bar'
+
     graph.addNode(node0)
     graph.addNode(node1)
     graph.addEdge(node0, node1)
 
-    const fn = jest.fn(() => false)
-    const fn2 = jest.fn( () => {})
+    const fn = jasmine.createSpy().and.returnValue(false)
+    const fn2 = jasmine.createSpy()
+
     graph.getTopSortedWithSccSubgraphFrom([node0], fn, fn2)
 
     expect(fn).toHaveBeenCalledTimes(1)
-    expect(fn).toHaveBeenNthCalledWith(1, node0)
+    expect(fn.calls.argsFor(0)).toContain(node0)
   })
 
   it('does call if some previous vertex marked as changed', () => {
     const graph = new Graph<string>(new DummyGetDependenciesQuery())
     const nodes = ['foo', 'bar', 'baz']
+
     nodes.forEach((n) => graph.addNode(n))
     graph.addEdge(nodes[0], nodes[2])
     graph.addEdge(nodes[1], nodes[2])
 
-    const fn = jest.fn((node: string) => node === nodes[0])
-    const fn2 = jest.fn( () => {})
+    const fn = jasmine.createSpy().and.callFake((node: string) => node === nodes[0])
+    const fn2 = jasmine.createSpy()
+
     graph.getTopSortedWithSccSubgraphFrom([nodes[0], nodes[1]], fn, fn2)
 
     expect(fn).toHaveBeenCalledTimes(3)
-    expect(fn).toHaveBeenLastCalledWith(nodes[2])
+    expect(fn.calls.argsFor(2)).toContain(nodes[2])
   })
 
   it('returns cycled vertices', () => {
     const graph = new Graph<string>(new DummyGetDependenciesQuery())
     const nodes = ['foo', 'c0', 'c1', 'c2']
+
     nodes.forEach((n) => graph.addNode(n))
     graph.addEdge(nodes[0], nodes[1])
     graph.addEdge(nodes[1], nodes[2])
     graph.addEdge(nodes[2], nodes[3])
     graph.addEdge(nodes[3], nodes[1])
 
-    const fn = jest.fn(() => true)
-    const fn2 = jest.fn( () => {})
+    const fn = jasmine.createSpy().and.returnValue(true)
+    const fn2 = jasmine.createSpy()
     const cycled = graph.getTopSortedWithSccSubgraphFrom([nodes[0]], fn, fn2).cycled
 
     expect(fn).toHaveBeenCalledTimes(1)
@@ -340,11 +348,11 @@ describe('Graph#getTopologicallySortedSubgraphFrom', () => {
     graph.addEdge(nodes[1], nodes[2])
     graph.addEdge(nodes[2], nodes[0])
 
-    const fn = jest.fn(() => true)
-    const fn2 = jest.fn( () => {})
+    const fn = jasmine.createSpy().and.returnValue(true)
+    const fn2 = jasmine.createSpy()
     const cycled = graph.getTopSortedWithSccSubgraphFrom([nodes[0]], fn, fn2).cycled
 
-    expect(fn).toHaveBeenCalledTimes(0)
+    expect(fn).not.toHaveBeenCalled()
     expect(cycled).toEqual(['c0', 'c1', 'c2'])
   })
 
@@ -357,8 +365,8 @@ describe('Graph#getTopologicallySortedSubgraphFrom', () => {
     graph.addEdge(nodes[2], nodes[3])
     graph.addEdge(nodes[3], nodes[1])
 
-    const fn = jest.fn(() => false)
-    const fn2 = jest.fn( () => {})
+    const fn = jasmine.createSpy().and.returnValue(true)
+    const fn2 = jasmine.createSpy()
     const cycled = graph.getTopSortedWithSccSubgraphFrom([nodes[0]], fn, fn2).cycled
 
     expect(fn).toHaveBeenCalledTimes(1)
@@ -374,7 +382,7 @@ describe('Graph cruds', () => {
     graph.addNode(node0)
     graph.addNode(node1)
 
-    expect(() => graph.removeEdge(node0, node1)).toThrowError(new Error('Edge does not exist'))
+    expect(() => graph.removeEdge(node0, node1)).toThrowError('Edge does not exist')
   })
 
   it('#removeEdge removes edge from graph', () => {
