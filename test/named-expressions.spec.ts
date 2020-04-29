@@ -440,4 +440,19 @@ describe("Named expressions - evaluation", () => {
     expect(engine.graph.existsEdge(globalFooVertex, a1)).toBe(true)
     expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NAME))
   })
+
+  it('adding local named expression binds all the edges from global one', () => {
+    const engine = HyperFormula.buildFromArray([[]])
+    engine.addNamedExpression('foo', '20', undefined)
+    engine.setCellContents(adr('A1'), [['=foo']])
+    const globalFooVertex = namedExpressionVertex(engine, 'foo', undefined)
+
+    engine.addNamedExpression('foo', '30', 'Sheet1')
+
+    const localFooVertex = namedExpressionVertex(engine, 'foo', 0)
+    const a1 = engine.dependencyGraph.fetchCell(adr('A1'))
+    expect(engine.graph.existsEdge(localFooVertex, a1)).toBe(true)
+    expect(engine.graph.existsEdge(globalFooVertex, a1)).toBe(false)
+    expect(engine.getCellValue(adr('A1'))).toEqual(30)
+  })
 })
