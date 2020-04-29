@@ -293,6 +293,19 @@ describe('Integration', () => {
     expect(engine.doesSheetExist('FOO')).toBe(true)
   })
 
+  it('#sheetNames for empty engine', () => {
+    const engine = HyperFormula.buildEmpty()
+
+    expect(engine.getSheetNames()).toEqual([])
+  })
+
+  it('#sheetNames', () => {
+    const engine = HyperFormula.buildFromArray([])
+    engine.addSheet('Foo')
+
+    expect(engine.getSheetNames()).toEqual(['Sheet1', 'Foo'])
+  })
+
   it('#getCellType empty cell', () => {
     const engine = HyperFormula.buildFromArray([[null, undefined]])
 
