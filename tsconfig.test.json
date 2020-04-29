@@ -1,0 +1,9 @@
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "outDir": "./test-jasmine",
+  },
+  "extends": "./tsconfig",
+  "include": ["src", "test"],
+  "exclude": []
+}

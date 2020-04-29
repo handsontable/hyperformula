@@ -336,7 +336,7 @@ describe('moving ranges', () => {
     expect(() => {
       engine.cut(adr('A2'), 2, 2)
       engine.paste(adr('C1'))
-    }).toThrow('It is not possible to move matrix')
+    }).toThrowError('It is not possible to move matrix')
   })
 
   it('should not be possible to move cells to area with matrix', () => {
@@ -348,7 +348,7 @@ describe('moving ranges', () => {
     expect(() => {
       engine.cut(adr('A1'), 2, 1)
       engine.paste(adr('A2'))
-    }).toThrow('It is not possible to replace cells with matrix')
+    }).toThrowError('It is not possible to replace cells with matrix')
   })
 
   it('should adjust edges when moving part of range', () => {
@@ -1005,7 +1005,7 @@ describe('aborting cut paste', () => {
 
     expect(() => {
       engine.addRows(1, [1, 1])
-    }).toThrowError(new NoSheetWithIdError(1))
+    }).toThrow(new NoSheetWithIdError(1))
 
     expect(engine.isClipboardEmpty()).toBe(false)
   })

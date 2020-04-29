@@ -84,12 +84,12 @@ describe('Move columns', () => {
       ['1', '2'],
     ])
 
-    expect(() => engine.moveColumns(0, 0, 1, -1)).toThrowError(new InvalidArgumentsError())
-    expect(() => engine.moveColumns(0, 0, 1, 1)).toThrowError(new InvalidArgumentsError())
-    expect(() => engine.moveColumns(0, 0, 1, 0)).toThrowError(new InvalidArgumentsError())
-    expect(() => engine.moveColumns(0, 0, 2, 0)).toThrowError(new InvalidArgumentsError())
-    expect(() => engine.moveColumns(0, 0, 2, 1)).toThrowError(new InvalidArgumentsError())
-    expect(() => engine.moveColumns(0, 0, 2, 2)).toThrowError(new InvalidArgumentsError())
+    expect(() => engine.moveColumns(0, 0, 1, -1)).toThrow(new InvalidArgumentsError())
+    expect(() => engine.moveColumns(0, 0, 1, 1)).toThrow(new InvalidArgumentsError())
+    expect(() => engine.moveColumns(0, 0, 1, 0)).toThrow(new InvalidArgumentsError())
+    expect(() => engine.moveColumns(0, 0, 2, 0)).toThrow(new InvalidArgumentsError())
+    expect(() => engine.moveColumns(0, 0, 2, 1)).toThrow(new InvalidArgumentsError())
+    expect(() => engine.moveColumns(0, 0, 2, 2)).toThrow(new InvalidArgumentsError())
   })
 
   it('should move one column', () => {
@@ -196,7 +196,7 @@ describe('Move columns', () => {
     const changes = engine.moveColumns(0, 1, 1, 3)
 
     expect(changes.length).toEqual(1)
-    expect(changes).toContainEqual(new ExportedCellChange(simpleCellAddress( 0, 2, 1), 1 ))
+    expect(changes).toContainEqual([new ExportedCellChange(simpleCellAddress( 0, 2, 1), 1 )])
   })
 
   it('should return #CYCLE when moving formula onto referred range', () => {

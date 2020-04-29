@@ -5,13 +5,12 @@
 
 import {SimpleCellAddress} from '../Cell'
 import {LazilyTransformingAstService} from '../LazilyTransformingAstService'
-import {Ast, CellAddress, collectDependencies} from '../parser'
+import {Ast, CellAddress, collectDependencies, AddressDependency} from '../parser'
 import {FormulaCellVertex} from './FormulaCellVertex'
 import {MatrixVertex} from './MatrixVertex'
 import {RangeVertex} from './RangeVertex'
 import {Vertex} from './Vertex'
 import {DependencyGraph} from './DependencyGraph'
-import {RelativeDependencyType} from '../parser/RelativeDependency'
 
 export const collectAddressesDependentToMatrix = (functionsWhichDoesNotNeedArgumentsToBeComputed: Set<string>, vertex: Vertex, matrix: MatrixVertex, lazilyTransformingAstService: LazilyTransformingAstService, dependencyGraph: DependencyGraph): SimpleCellAddress[] => {
   const range = matrix.getRange()
@@ -39,7 +38,7 @@ export const collectAddressesDependentToMatrix = (functionsWhichDoesNotNeedArgum
   }
 
   return collectDependencies(formula, functionsWhichDoesNotNeedArgumentsToBeComputed)
-    .filter((d) => d.type === RelativeDependencyType.CellAddress)
-    .map((d) => (d.dependency as CellAddress).toSimpleCellAddress(address))
+    .filter((d): d is AddressDependency => d instanceof AddressDependency)
+    .map((d) => d.dependency.toSimpleCellAddress(address))
     .filter((d) => range.addressInRange(d))
 }

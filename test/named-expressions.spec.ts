@@ -76,7 +76,7 @@ describe('Named expressions', () => {
     const changes = engine.setCellContents(adr('A1'), '20')
 
     expect(changes.length).toBe(2)
-    expect(changes).toContainEqual(new ExportedNamedExpressionChange('myName', 30))
+    expect(changes).toContainEqual([new ExportedNamedExpressionChange('myName', 30)])
     expect(engine.getNamedExpressionValue('myName')).toEqual(30)
   })
 
@@ -196,10 +196,10 @@ describe('Named expressions', () => {
     expect(engine.getNamedExpressionValue('MYname')).toEqual(42)
     expect(() => {
       engine.changeNamedExpression('MYname', '=43')
-    }).not.toThrow()
+    }).not.toThrowError()
     expect(() => {
       engine.removeNamedExpression('MYname')
-    }).not.toThrow()
+    }).not.toThrowError()
   })
 
   it('allow even 255 character named expressions', () => {
@@ -210,7 +210,7 @@ describe('Named expressions', () => {
     expect(longExpressionName.length).toBe(255)
     expect(() => {
       engine.addNamedExpression(longExpressionName, '=42')
-    }).not.toThrow()
+    }).not.toThrowError()
   })
 
   it('validates characters which are allowed in name', () => {
@@ -248,6 +248,6 @@ describe('Named expressions', () => {
 
     engine.addNamedExpression('myName.1', '42')
 
-    expect(engine.getNamedExpressionFormula('not.existing')).toBeUndefined()
+    expect(engine.getNamedExpressionFormula('myName.1')).toBeUndefined()
   })
 })

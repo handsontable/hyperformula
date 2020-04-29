@@ -112,7 +112,7 @@ describe('Adding row - matrix check', () => {
 
     expect(() => {
       engine.addRows(0, [3, 1])
-    }).toThrow(new Error('It is not possible to add row in row with matrix'))
+    }).toThrowError('It is not possible to add row in row with matrix')
   })
 
   it('should be possible to add row right above matrix', () => {
@@ -170,9 +170,9 @@ describe('Adding row - reevaluation', () => {
     const b1 = engine.addressMapping.getCell(adr('B1'))
     const c1 = engine.addressMapping.getCell(adr('C1'))
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const b1setCellValueSpy = jest.spyOn(b1 as any, 'setCellValue')
+    const b1setCellValueSpy = spyOn(b1 as any, 'setCellValue')
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const c1setCellValueSpy = jest.spyOn(c1 as any, 'setCellValue')
+    const c1setCellValueSpy = spyOn(c1 as any, 'setCellValue')
 
     engine.addRows(0, [1, 1])
 
@@ -187,7 +187,7 @@ describe('Adding row - reevaluation', () => {
     ])
     const c1 = engine.addressMapping.getCell(adr('C1'))
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const c1setCellValueSpy = jest.spyOn(c1 as any, 'setCellValue')
+    const c1setCellValueSpy = spyOn(c1 as any, 'setCellValue')
 
     engine.addRows(0, [0, 1])
 
@@ -204,7 +204,7 @@ describe('Adding row - reevaluation', () => {
     const changes = engine.addRows(0, [1, 1])
 
     expect(changes.length).toBe(1)
-    expect(changes).toContainEqual(new ExportedCellChange(simpleCellAddress(0, 1, 2), 1))
+    expect(changes).toContainEqual([new ExportedCellChange(simpleCellAddress(0, 1, 2), 1)])
   })
 })
 
@@ -331,7 +331,7 @@ describe('Adding row - sheet dimensions', () => {
     ])
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const recalcSpy = jest.spyOn(engine.evaluator as any, 'partialRun')
+    const recalcSpy = spyOn(engine.evaluator as any, 'partialRun')
     engine.addRows(0, [1, 1])
     engine.addRows(0, [10, 15])
 
