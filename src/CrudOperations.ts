@@ -14,7 +14,8 @@ import {ColumnsSpan} from './ColumnsSpan'
 import {Config} from './Config'
 import {ContentChanges} from './ContentChanges'
 import {AddressMapping, DependencyGraph, SheetMapping, SparseStrategy} from './DependencyGraph'
-import {NamedExpressions} from './NamedExpressions'
+import {NamedExpressions, NamedExpression} from './NamedExpressions'
+import {Maybe} from './Maybe'
 import {
   InvalidAddressError,
   InvalidArgumentsError,
@@ -325,6 +326,22 @@ export class CrudOperations {
       throw new NamedExpressionDoesNotExist(expressionName)
     }
     this.storeExpressionInCell(namedExpression.address, newExpression)
+  }
+
+  public removeNamedExpression(expressionName: string, sheetScope: string | undefined): Maybe<NamedExpression> {
+    let sheetId = undefined
+    if (sheetScope !== undefined) {
+      this.ensureSheetExists(sheetScope)
+      sheetId = this.sheetMapping.fetch(sheetScope)
+    }
+    const namedExpression = this.namedExpressions.namedExpressionForScope(expressionName, sheetId)
+    if (namedExpression) {
+      this.namedExpressions.remove(namedExpression.displayName, sheetId)
+      this.dependencyGraph.setCellEmpty(namedExpression.address)
+      return namedExpression
+    } else {
+      return undefined
+    }
   }
 
   public ensureItIsPossibleToAddRows(sheet: number, ...indexes: Index[]): void {

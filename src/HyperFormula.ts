@@ -1525,17 +1525,10 @@ export class HyperFormula implements TypedEmitter {
    * @category Named Expression
    */
   public removeNamedExpression(expressionName: string, sheetScope: string | undefined): ExportedChange[] {
-    let sheetId = undefined
-    if (sheetScope !== undefined) {
-      this._crudOperations.ensureSheetExists(sheetScope)
-      sheetId = this.sheetMapping.fetch(sheetScope)
-    }
-    const namedExpression = this._namedExpressions.namedExpressionForScope(expressionName, sheetId)
-    if (namedExpression) {
-      this._namedExpressions.remove(namedExpression.displayName, sheetId)
-      this.dependencyGraph.setCellEmpty(namedExpression.address)
+    const removedNamedExpression = this._crudOperations.removeNamedExpression(expressionName, sheetScope)
+    if (removedNamedExpression) {
       const changes = this.recomputeIfDependencyGraphNeedsIt()
-      this._emitter.emit(Events.NamedExpressionRemoved, namedExpression.displayName, changes)
+      this._emitter.emit(Events.NamedExpressionRemoved, removedNamedExpression.displayName, changes)
       return changes
     } else {
       return []
