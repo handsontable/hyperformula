@@ -335,18 +335,17 @@ export class CrudOperations {
       sheetId = this.sheetMapping.fetch(sheetScope)
     }
     const namedExpression = this.namedExpressions.namedExpressionForScope(expressionName, sheetId)
-    if (namedExpression) {
-      this.namedExpressions.remove(namedExpression.displayName, sheetId)
-      if (sheetScope !== undefined) {
-        const globalNamedExpression = this.namedExpressions.workbookNamedExpressionOrPlaceholder(expressionName)
-        this.dependencyGraph.exchangeNode(namedExpression.address, globalNamedExpression.address)
-      } else {
-        this.dependencyGraph.setCellEmpty(namedExpression.address)
-      }
-      return namedExpression
-    } else {
+    if (!namedExpression) {
       return undefined
     }
+    this.namedExpressions.remove(namedExpression.displayName, sheetId)
+    if (sheetScope !== undefined) {
+      const globalNamedExpression = this.namedExpressions.workbookNamedExpressionOrPlaceholder(expressionName)
+      this.dependencyGraph.exchangeNode(namedExpression.address, globalNamedExpression.address)
+    } else {
+      this.dependencyGraph.setCellEmpty(namedExpression.address)
+    }
+    return namedExpression
   }
 
   public ensureItIsPossibleToAddRows(sheet: number, ...indexes: Index[]): void {
