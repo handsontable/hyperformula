@@ -70,5 +70,5 @@ export {
   NoOperationToRedoError,
   EvaluationSuspendedError,
   FunctionPluginValidationError,
-  ErrorType
+  ErrorType,
 }

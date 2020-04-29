@@ -180,6 +180,7 @@ export class HyperFormula implements TypedEmitter {
    * @param {Partial<ConfigParams>} [configInput] - engine configuration
    *
    * @throws [[SheetSizeLimitExceededError]] when sheet size exceeds the limits
+   * @throws [[FunctionPluginValidationError]] when plugin class definition is not consistent with metadata
    *
    * @category Factory
    */
@@ -197,6 +198,7 @@ export class HyperFormula implements TypedEmitter {
    * @param {Partial<ConfigParams>} [configInput] - engine configuration
    *
    * @throws [[SheetSizeLimitExceededError]] when sheet size exceeds the limits
+   * @throws [[FunctionPluginValidationError]] when plugin class definition is not consistent with metadata
    *
    * @category Factory
    */
@@ -254,32 +256,72 @@ export class HyperFormula implements TypedEmitter {
     return Array.from(this.registeredLanguages.keys())
   }
 
+  /**
+   * Registers all functions in a given plugin with optional translations
+   *
+   * @param {FunctionPluginDefinition} plugin - plugin class
+   * @param {FunctionTranslationsPackage} translations - optional package of function names translations
+   *
+   * @throws [[FunctionPluginValidationError]] when plugin class definition is not consistent with metadata
+   */
   public static registerFunctionPlugin(plugin: FunctionPluginDefinition, translations?: FunctionTranslationsPackage): void {
     FunctionRegistry.registerFunctionPlugin(plugin, translations)
   }
 
+  /**
+   * Unregisters all functions defined in given plugin
+   *
+   * @param {FunctionPluginDefinition} plugin - plugin class
+   */
   public static unregisterFunctionPlugin(plugin: FunctionPluginDefinition): void {
     FunctionRegistry.unregisterFunctionPlugin(plugin)
   }
 
+  /**
+   * Registers a function with a given id if such exists in a plugin
+   *
+   * @param {string} functionId - function id, e.g. 'SUMIF'
+   * @param {FunctionPluginDefinition} plugin - plugin class
+   * @param translations
+   *
+   * @throws [[FunctionPluginValidationError]] when function with a given id does not exists in plugin or plugin class definition is not consistent with metadata
+   */
   public static registerFunction(functionId: string, plugin: FunctionPluginDefinition, translations?: FunctionTranslationsPackage): void {
     FunctionRegistry.registerFunction(functionId, plugin, translations)
   }
 
+  /**
+   * Unregisters a function with a given id
+   *
+   * @param {string} functionId - function id, e.g. 'SUMIF'
+   */
   public static unregisterFunction(functionId: string): void {
     FunctionRegistry.unregisterFunction(functionId)
   }
 
+  /**
+   * Returns translated names of all registered functions for a given language
+   *
+   * @param {string} code - language code
+   */
   public static getRegisteredFunctionNames(code: string): string[] {
     const functionIds = FunctionRegistry.getRegisteredFunctionIds()
     const language = this.getLanguage(code)
     return language.getFunctionTranslations(functionIds)
   }
 
+  /**
+   * Returns class of a plugin used by function with given id
+   *
+   * @param {string} functionId - id of a function, e.g. 'SUMIF'
+   */
   public static getFunctionPlugin(functionId: string): Maybe<FunctionPluginDefinition> {
     return FunctionRegistry.getFunctionPlugin(functionId)
   }
 
+  /**
+   * Returns classes of all plugins registered in this instance of HyperFormula
+   */
   public static getPlugins(): FunctionPluginDefinition[] {
     return FunctionRegistry.getPlugins()
   }
@@ -1539,7 +1581,7 @@ export class HyperFormula implements TypedEmitter {
   /**
    * Returns a normalized formula.
    *
-   * @param {string} formulaString - a formula, ex. =SUM(Sheet1!A1:A100)"
+   * @param {string} formulaString - a formula, e.g. =SUM(Sheet1!A1:A100)"
    *
    * @throws [[NotAFormulaError]] when the provided string is not a valid formula, i.e does not start with "="
    *
@@ -1556,7 +1598,7 @@ export class HyperFormula implements TypedEmitter {
   /**
    * Calculates fire-and-forget formula, returns the calculated value.
    *
-   * @param {string} formulaString - a formula, ex. "=SUM(Sheet1!A1:A100)"
+   * @param {string} formulaString - a formula, e.g. "=SUM(Sheet1!A1:A100)"
    * @param {string} sheetName - a name of the sheet in context of which we evaluate formula, case insensitive.
    *
    * @throws [[NotAFormulaError]] when the provided string is not a valid formula, i.e does not start with "="
@@ -1579,7 +1621,7 @@ export class HyperFormula implements TypedEmitter {
    * Validates the formula.
    * If the provided string starts with "=" and is a parsable formula the method returns `true`.
    *
-   * @param {string} formulaString - a formula, ex. "=SUM(Sheet1!A1:A100)"
+   * @param {string} formulaString - a formula, e.g. "=SUM(Sheet1!A1:A100)"
    *
    * @category Helper
    */
@@ -1594,15 +1636,27 @@ export class HyperFormula implements TypedEmitter {
     return true
   }
 
+  /**
+   * Returns translated names of all functions registered in this instance of HyperFormula
+   * according to the language set in the configuration
+   */
   public getRegisteredFunctionNames(): string[] {
     const language = HyperFormula.getLanguage(this._config.language)
     return language.getFunctionTranslations(this._functionRegistry.getRegisteredFunctionIds())
   }
 
+  /**
+   * Returns class of a plugin used by function with given id
+   *
+   * @param {string} functionId - id of a function, e.g. 'SUMIF'
+   */
   public getFunctionPlugin(functionId: string): Maybe<FunctionPluginDefinition> {
     return this._functionRegistry.getFunctionPlugin(functionId)
   }
 
+  /**
+   * Returns classes of all plugins registered in this instance of HyperFormula
+   */
   public getPlugins(): FunctionPluginDefinition[] {
     return this._functionRegistry.getPlugins()
   }

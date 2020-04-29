@@ -3,7 +3,7 @@
  * Copyright (c) 2020 Handsoncode. All rights reserved.
  */
 
-import {FunctionPlugin, FunctionPluginDefinition, IImplementedFunction} from './plugin/FunctionPlugin'
+import {FunctionPlugin, FunctionPluginDefinition, FunctionMetadata} from './plugin/FunctionPlugin'
 import {Interpreter} from './Interpreter'
 import {Maybe} from '../Maybe'
 import {Config} from '../Config'
@@ -147,7 +147,7 @@ export class FunctionRegistry {
     return this.structuralChangeFunctions.has(functionId)
   }
 
-  private categorizeFunction(functionId: string, functionMetadata: IImplementedFunction): void {
+  private categorizeFunction(functionId: string, functionMetadata: FunctionMetadata): void {
     if (functionMetadata.isVolatile) {
       this.volatileFunctions.add(functionId)
     }
