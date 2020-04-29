@@ -159,6 +159,10 @@ describe('Register static custom plugin', () => {
 
     expectArrayWithSameContent(HyperFormula.getPlugins(), [SumifPlugin])
   })
+
+  it('should return plugin for given functionId', () => {
+    expect(HyperFormula.getFunctionPlugin('SUMIF')).toBe(SumifPlugin)
+  })
 })
 
 describe('Instance level formula registry', () => {
@@ -226,5 +230,11 @@ describe('Instance level formula registry', () => {
     registeredPlugins = new Set(engine.getPlugins())
     expect(registeredPlugins.has(FooPlugin)).toBe(true)
     expect(registeredPlugins.size).toBe(1)
+  })
+
+  it('should return plugin for given functionId', () => {
+    const engine = HyperFormula.buildFromArray([])
+
+    expect(engine.getFunctionPlugin('SUMIF')).toBe(SumifPlugin)
   })
 })
