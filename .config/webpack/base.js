@@ -19,7 +19,7 @@ module.exports.create = function create(processedFile) {
       library: 'HyperFormula',
       libraryExport: 'default',
       libraryTarget: 'umd',
-      path: path.resolve(__dirname, '../dist'),
+      path: path.resolve(__dirname, '../../dist'),
       umdNamedDefine: true,
     },
     resolve: {
