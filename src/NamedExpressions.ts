@@ -8,14 +8,10 @@ import {Maybe} from './Maybe'
 
 export class NamedExpression {
   constructor(
-    public name: string,
+    public displayName: string,
     public readonly address: SimpleCellAddress,
     public added: boolean,
   ) {
-  }
-  
-  public get displayName(): string {
-    return this.name
   }
 }
 
@@ -33,7 +29,7 @@ class NamedExpressionsStore {
   }
 
   public add(namedExpression: NamedExpression): void {
-    this.mapping.set(this.normalizeExpressionName(namedExpression.name), namedExpression)
+    this.mapping.set(this.normalizeExpressionName(namedExpression.displayName), namedExpression)
   }
 
   public get(expressionName: string): Maybe<NamedExpression> {
@@ -70,7 +66,7 @@ class WorksheetStore {
   public readonly mapping = new Map<string, NamedExpression>()
 
   public add(namedExpression: NamedExpression): void {
-    this.mapping.set(this.normalizeExpressionName(namedExpression.name), namedExpression)
+    this.mapping.set(this.normalizeExpressionName(namedExpression.displayName), namedExpression)
   }
 
   public get(expressionName: string): Maybe<NamedExpression> {
@@ -152,7 +148,7 @@ export class NamedExpressions {
       let namedExpression = this.workbookStore.get(expressionName)
       if (namedExpression) {
         namedExpression.added = true
-        namedExpression.name = expressionName
+        namedExpression.displayName = expressionName
       } else {
         namedExpression = new NamedExpression(expressionName, this.nextAddress(), true)
         this.workbookStore.add(namedExpression)
@@ -225,7 +221,7 @@ export class NamedExpressions {
   }
 
   public getAllNamedExpressionsNames(): string[] {
-    return this.workbookStore.getAllNamedExpressions().map((ne) => ne.name)
+    return this.workbookStore.getAllNamedExpressions().map((ne) => ne.displayName)
   }
 
   private nextAddress() {
