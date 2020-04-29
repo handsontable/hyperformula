@@ -113,12 +113,13 @@ export class NamedExpressions {
     }
   }
 
-  public fetchNameForNamedExpressionRow(row: number): string {
+  public namedExpressionInAddress(row: number): Maybe<NamedExpression> {
     const namedExpression = this.addressCache.get(row)
-    if (!namedExpression) {
-      throw new Error('Requested Named Expression does not exist')
+    if (namedExpression && namedExpression.added) {
+      return namedExpression
+    } else {
+      return undefined
     }
-    return namedExpression.name
   }
 
   public namedExpressionForScope(expressionName: string, sheetId: number | undefined): Maybe<NamedExpression> {
