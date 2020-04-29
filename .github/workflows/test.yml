@@ -2,14 +2,16 @@ name: Test
 
 on: [push]
 
+defaults:
+  strategy:
+    matrix:
+      node-version: [ '12' ]
+      os: [ 'ubuntu-latest' ]
+  runs-on: ${{ matrix.os }}
+
 jobs:
   build:
-    strategy:
-      matrix:
-        node-version: [ '12' ]
-        os: [ 'ubuntu-latest' ]
     name: BUILD
-    runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@722adc63f1aa60a57ec37892e133b1d319cae598 # https://github.com/actions/checkout/releases/tag/v2.0.0
 
@@ -26,12 +28,7 @@ jobs:
         run: |
           npm run bundle-all
   unit:
-    strategy:
-      matrix:
-        node-version: [ '12' ]
-        os: [ 'ubuntu-latest' ]
     name: UNIT
-    runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@722adc63f1aa60a57ec37892e133b1d319cae598 # https://github.com/actions/checkout/releases/tag/v2.0.0
 
@@ -48,12 +45,7 @@ jobs:
         run: |
           npm run test:unit
   browsers:
-    strategy:
-      matrix:
-        node-version: [ '12' ]
-        os: [ 'ubuntu-latest' ]
     name: BROWSERS
-    runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@722adc63f1aa60a57ec37892e133b1d319cae598 # https://github.com/actions/checkout/releases/tag/v2.0.0
 
