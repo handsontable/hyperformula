@@ -311,8 +311,7 @@ export class CrudOperations {
       throw new NamedExpressionNameIsAlreadyTaken(expressionName)
     }
     const namedExpression = this.namedExpressions.addNamedExpression(expressionName, sheetId)
-    const address = this.namedExpressions.getInternalNamedExpressionAddressFromScope(expressionName, sheetId)!
-    this.storeExpressionInCell(address, expression)
+    this.storeExpressionInCell(namedExpression.address, expression)
   }
 
   public changeNamedExpressionExpression(expressionName: string, sheetScope: string | undefined, newExpression: RawCellContent) {
@@ -321,11 +320,11 @@ export class CrudOperations {
       this.ensureSheetExists(sheetScope)
       sheetId = this.sheetMapping.fetch(sheetScope)
     }
-    const address = this.namedExpressions.getInternalNamedExpressionAddressFromScope(expressionName, sheetId)
-    if (!address) {
+    const namedExpression = this.namedExpressions.namedExpressionForScope(expressionName, sheetId)
+    if (!namedExpression) {
       throw new NamedExpressionDoesNotExist(expressionName)
     }
-    this.storeExpressionInCell(address, newExpression)
+    this.storeExpressionInCell(namedExpression.address, newExpression)
   }
 
   public ensureItIsPossibleToAddRows(sheet: number, ...indexes: Index[]): void {

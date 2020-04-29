@@ -120,7 +120,7 @@ export class NamedExpressions {
 
   public namedExpressionForScope(expressionName: string, sheetId: number | undefined): Maybe<NamedExpression> {
     if (sheetId === undefined) {
-      return this.workbookStore.get(expressionName)
+      return this.workbookStore.getExisting(expressionName)
     } else {
       return this.worksheetStore(sheetId).get(expressionName)
     }
@@ -174,21 +174,6 @@ export class NamedExpressions {
       this.worksheetStores.set(sheetId, store)
     }
     return store
-  }
-
-  public getInternalNamedExpressionAddressFromScope(expressionName: string, sheetId: number | undefined): Maybe<SimpleCellAddress> {
-    let store: NamedExpressionsStore | WorksheetStore
-    if (sheetId === undefined) {
-      store = this.workbookStore
-    } else {
-      store = this.worksheetStore(sheetId)
-    }
-    const namedExpression = store.get(expressionName)
-    if (namedExpression === undefined || !namedExpression.added) {
-      return undefined
-    } else {
-      return namedExpression.address
-    }
   }
 
   public namedExpressionOrPlaceholder(expressionName: string, sheetId: number): NamedExpression {

@@ -392,7 +392,7 @@ describe("Named expressions - evaluation", () => {
     engine.setCellContents(adr('A1'), '=FOO+10')
 
     const localFooVertex = engine.dependencyGraph.namedExpressionVertex('FOO', 0)!
-      const globalFooVertex = engine.dependencyGraph.fetchCell(engine.dependencyGraph.namedExpressions.getInternalNamedExpressionAddressFromScope('FOO', undefined)!)
+    const globalFooVertex = engine.dependencyGraph.fetchCell(engine.dependencyGraph.namedExpressions.namedExpressionForScope('FOO', undefined)!.address)
     const a1 = engine.dependencyGraph.fetchCell(adr('A1'))
     expect(engine.graph.existsEdge(localFooVertex, a1)).toBe(true)
     expect(engine.graph.existsEdge(globalFooVertex, a1)).toBe(false)

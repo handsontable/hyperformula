@@ -1457,9 +1457,9 @@ export class HyperFormula implements TypedEmitter {
       this._crudOperations.ensureSheetExists(sheetScope)
       sheetId = this.sheetMapping.fetch(sheetScope)
     }
-    const namedExpressionAddress = this._namedExpressions.getInternalNamedExpressionAddressFromScope(expressionName, sheetId)
-    if (namedExpressionAddress) {
-      return this._serialization.getCellValue(namedExpressionAddress)
+    const namedExpression = this._namedExpressions.namedExpressionForScope(expressionName, sheetId)
+    if (namedExpression) {
+      return this._serialization.getCellValue(namedExpression.address)
     } else {
       return undefined
     }
@@ -1482,11 +1482,11 @@ export class HyperFormula implements TypedEmitter {
       this._crudOperations.ensureSheetExists(sheetScope)
       sheetId = this.sheetMapping.fetch(sheetScope)
     }
-    const namedExpressionAddress = this._namedExpressions.getInternalNamedExpressionAddressFromScope(expressionName, sheetId)
-    if (namedExpressionAddress === undefined) {
+    const namedExpression = this._namedExpressions.namedExpressionForScope(expressionName, sheetId)
+    if (namedExpression === undefined) {
       return undefined
     } else {
-      return this._serialization.getCellFormula(namedExpressionAddress)
+      return this._serialization.getCellFormula(namedExpression.address)
     }
   }
 
