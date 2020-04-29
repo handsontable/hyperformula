@@ -1218,6 +1218,16 @@ export class HyperFormula implements TypedEmitter {
   }
 
   /**
+   * List all sheet names.
+   * Returns an array of sheet names as strings.
+   *
+   * @category Sheet
+   */
+  public getSheetNames(): string[] {
+    return this.sheetMapping.sheetNames()
+  }
+
+  /**
    * Returns a unique sheet ID assigned to the sheet with a given name or `undefined` if the sheet does not exist.
    *
    * @param {string} sheetName - name of the sheet, for which we want to retrieve ID, case insensitive.
