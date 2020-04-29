@@ -70,7 +70,7 @@ module.exports = {
     {
       files: '**/src/**/*.ts',
       rules: {
-        'license-header/header': [ 'error', './.config/license-header.js' ],
+        'license-header/header': [ 'error', './.config/source-license-header.js' ],
       }
     }
   ]
