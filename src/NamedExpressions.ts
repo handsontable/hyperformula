@@ -15,7 +15,7 @@ export class NamedExpression {
   }
 }
 
-class NamedExpressionsStore {
+class WorkbookStore {
   private readonly mapping = new Map<string, NamedExpression>()
 
   public has(expressionName: string): boolean {
@@ -89,7 +89,7 @@ class WorksheetStore {
 export class NamedExpressions {
   public static SHEET_FOR_WORKBOOK_EXPRESSIONS = -1
   private nextNamedExpressionRow: number = 0
-  public readonly workbookStore: NamedExpressionsStore = new NamedExpressionsStore()
+  public readonly workbookStore: WorkbookStore = new WorkbookStore()
   public readonly worksheetStores: Map<number, WorksheetStore> = new Map()
   public readonly addressCache: Map<number, NamedExpression> = new Map()
 
