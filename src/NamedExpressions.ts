@@ -177,7 +177,7 @@ export class NamedExpressions {
     if (namedExpression) {
       return namedExpression
     } else {
-      let namedExpression = this.workbookStore.getExisting(expressionName)
+      let namedExpression = this.workbookStore.get(expressionName)
       if (namedExpression === undefined) {
         namedExpression = new NamedExpression(expressionName, this.nextAddress(), false)
         this.workbookStore.add(namedExpression)
@@ -187,7 +187,7 @@ export class NamedExpressions {
   }
 
   public workbookNamedExpressionOrPlaceholder(expressionName: string): NamedExpression {
-    let namedExpression = this.workbookStore.getExisting(expressionName)
+    let namedExpression = this.workbookStore.get(expressionName)
     if (namedExpression === undefined) {
       namedExpression = new NamedExpression(expressionName, this.nextAddress(), false)
       this.workbookStore.add(namedExpression)

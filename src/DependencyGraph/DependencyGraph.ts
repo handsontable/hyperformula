@@ -199,6 +199,7 @@ export class DependencyGraph {
   public exchangeNode(addressFrom: SimpleCellAddress, addressTo: SimpleCellAddress) {
     const vertexFrom = this.fetchCellOrCreateEmpty(addressFrom)
     const vertexTo = this.fetchCellOrCreateEmpty(addressTo)
+    this.addressMapping.removeCell(addressFrom)
     this.graph.exchangeNode(vertexFrom, vertexTo)
   }
 

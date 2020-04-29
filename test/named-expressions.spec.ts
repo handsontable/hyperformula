@@ -307,7 +307,12 @@ describe('Named expressions - store manipulation', () => {
 })
 
 const namedExpressionVertex = (engine: HyperFormula, expressionName: string, sheetId: number | undefined): Vertex => {
-  const namedExpression = engine.dependencyGraph.namedExpressions.namedExpressionForScope(expressionName, sheetId)!
+  let namedExpression
+  if (sheetId === undefined) {
+    namedExpression = engine.dependencyGraph.namedExpressions.workbookNamedExpressionOrPlaceholder(expressionName)!
+  } else {
+    namedExpression = engine.dependencyGraph.namedExpressions.namedExpressionForScope(expressionName, sheetId)!
+  }
   return engine.dependencyGraph.fetchCell(namedExpression.address)
 }
 
@@ -418,5 +423,21 @@ describe("Named expressions - evaluation", () => {
     const a1 = engine.dependencyGraph.fetchCell(adr('A1'))
     expect(engine.graph.existsEdge(localFooVertex, a1)).toBe(false)
     expect(engine.graph.existsEdge(globalFooVertex, a1)).toBe(true)
+    expect(engine.getCellValue(adr('A1'))).toEqual(10)
+  })
+
+  it('removing local named expression binds all the edges to global one even if it doesnt exist', () => {
+    const engine = HyperFormula.buildFromArray([[]])
+    engine.addNamedExpression('foo', '20', 'Sheet1')
+    engine.setCellContents(adr('A1'), [['=foo']])
+    const localFooVertex = namedExpressionVertex(engine, 'foo', 0)
+
+    engine.removeNamedExpression('foo', 'Sheet1')
+
+    const globalFooVertex = namedExpressionVertex(engine, 'foo', undefined)
+    const a1 = engine.dependencyGraph.fetchCell(adr('A1'))
+    expect(engine.graph.existsEdge(localFooVertex, a1)).toBe(false)
+    expect(engine.graph.existsEdge(globalFooVertex, a1)).toBe(true)
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NAME))
   })
 })
