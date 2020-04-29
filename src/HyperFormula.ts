@@ -566,8 +566,8 @@ export class HyperFormula implements TypedEmitter {
    *    ['1', '2', '=Sheet2!$A1'],
    *   ],
    *   Sheet2: [
-   *     ['3'],
-   *     ['4'],
+   *    ['3'],
+   *    ['4'],
    *   ],
    * })
    *
@@ -830,8 +830,8 @@ export class HyperFormula implements TypedEmitter {
    * ```js
    * // build from arrays, only one sheet
    * const hfInstance = HyperFormula.buildFromArray([
-   * ['1'],
-   * ['2'],
+   *  ['1'],
+   *  ['2'],
    * ]);
    *
    * // should return true for this example
@@ -2459,7 +2459,7 @@ export class HyperFormula implements TypedEmitter {
    * // build from arrays, one sheet
    * const hfInstance = HyperFormula.buildFromArray([
    *  ['42'],
-   * ])
+   * ]);
    *
    * // add own expression, the method should return a list of cells which values changed after the operation,
    * // their absolute addresses and new values.
