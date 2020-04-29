@@ -186,6 +186,15 @@ export class NamedExpressions {
     }
   }
 
+  public workbookNamedExpressionOrPlaceholder(expressionName: string): NamedExpression {
+    let namedExpression = this.workbookStore.getExisting(expressionName)
+    if (namedExpression === undefined) {
+      namedExpression = new NamedExpression(expressionName, this.nextAddress(), false)
+      this.workbookStore.add(namedExpression)
+    }
+    return namedExpression
+  }
+
   public remove(expressionName: string, sheetId: number | undefined): void {
     let store
     if (sheetId === undefined) {

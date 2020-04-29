@@ -2,6 +2,7 @@ import {HyperFormula, ExportedNamedExpressionChange, EmptyValue} from '../src'
 import {adr, detailedError} from './testUtils'
 import {ErrorType} from '../src/Cell'
 import {NoSheetWithNameError} from '../src/errors'
+import {Vertex} from '../src/DependencyGraph/Vertex'
 
 describe('Named expressions - store manipulation', () => {
   it('basic usage with global named expression', () => {
@@ -305,6 +306,11 @@ describe('Named expressions - store manipulation', () => {
   })
 })
 
+const namedExpressionVertex = (engine: HyperFormula, expressionName: string, sheetId: number | undefined): Vertex => {
+  const namedExpression = engine.dependencyGraph.namedExpressions.namedExpressionForScope(expressionName, sheetId)!
+  return engine.dependencyGraph.fetchCell(namedExpression.address)
+}
+
 describe("Named expressions - evaluation", () => {
   it('is recomputed', () => {
     const engine = HyperFormula.buildFromArray([
@@ -397,5 +403,20 @@ describe("Named expressions - evaluation", () => {
     expect(engine.graph.existsEdge(localFooVertex, a1)).toBe(true)
     expect(engine.graph.existsEdge(globalFooVertex, a1)).toBe(false)
     expect(engine.getCellValue(adr('A1'))).toEqual(23)
+  })
+
+  it('removing local named expression binds all the edges to global one', () => {
+    const engine = HyperFormula.buildFromArray([[]])
+    engine.addNamedExpression('foo', '10', undefined)
+    engine.addNamedExpression('foo', '20', 'Sheet1')
+    engine.setCellContents(adr('A1'), [['=foo']])
+    const localFooVertex = namedExpressionVertex(engine, 'foo', 0)
+    const globalFooVertex = namedExpressionVertex(engine, 'foo', undefined)
+
+    engine.removeNamedExpression('foo', 'Sheet1')
+
+    const a1 = engine.dependencyGraph.fetchCell(adr('A1'))
+    expect(engine.graph.existsEdge(localFooVertex, a1)).toBe(false)
+    expect(engine.graph.existsEdge(globalFooVertex, a1)).toBe(true)
   })
 })

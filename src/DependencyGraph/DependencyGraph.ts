@@ -196,6 +196,12 @@ export class DependencyGraph {
     return this.fetchCellOrCreateEmpty(namedExpression.address)
   }
 
+  public exchangeNode(addressFrom: SimpleCellAddress, addressTo: SimpleCellAddress) {
+    const vertexFrom = this.fetchCellOrCreateEmpty(addressFrom)
+    const vertexTo = this.fetchCellOrCreateEmpty(addressTo)
+    this.graph.exchangeNode(vertexFrom, vertexTo)
+  }
+
   private correctInfiniteRangesDependenciesByRangeVertex(vertex: RangeVertex) {
     for (const range of this.graph.infiniteRanges) {
       const infiniteRangeVertex = (range as RangeVertex)

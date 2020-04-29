@@ -337,7 +337,12 @@ export class CrudOperations {
     const namedExpression = this.namedExpressions.namedExpressionForScope(expressionName, sheetId)
     if (namedExpression) {
       this.namedExpressions.remove(namedExpression.displayName, sheetId)
-      this.dependencyGraph.setCellEmpty(namedExpression.address)
+      if (sheetScope !== undefined) {
+        const globalNamedExpression = this.namedExpressions.workbookNamedExpressionOrPlaceholder(expressionName)
+        this.dependencyGraph.exchangeNode(namedExpression.address, globalNamedExpression.address)
+      } else {
+        this.dependencyGraph.setCellEmpty(namedExpression.address)
+      }
       return namedExpression
     } else {
       return undefined
