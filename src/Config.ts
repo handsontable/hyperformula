@@ -585,7 +585,7 @@ export class Config implements ConfigParams, ParserConfig {
     )
   }
 
-  public getConfig(): ConfigParams { //TODO: avoid pollution
+  public getConfig(): Config { //TODO: avoid pollution
     return this
   }
 
