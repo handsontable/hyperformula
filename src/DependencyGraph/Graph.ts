@@ -200,9 +200,17 @@ export class Graph<T> {
     return this.getTopSortedWithSccSubgraphFrom(Array.from(this.nodes), (_node: T) => true, (_node: T) => {})
   }
 
-  public getTopSortedWithSccSubgraphFrom(vertices: T[], operatingFunction: (node: T) => boolean, onCycle: (node: T) => void): TopSortResult<T> {
+  /**
+   *
+   * computes topological sort order, but vertices that are on cycles are kept separate
+   *
+   * @param modifiedNodes - seed for computation. During engine init run, all of the vertices of grap. In recomputation run, changed vertices.
+   * @param operatingFunction - recomputes value of a node, and returns whether a change occured
+   * @param onCycle - action to be performed when node is on cycle
+   */
+  public getTopSortedWithSccSubgraphFrom(modifiedNodes: T[], operatingFunction: (node: T) => boolean, onCycle: (node: T) => void): TopSortResult<T> {
 
-    const disc: Map<T, number> = new Map()
+    const entranceTime: Map<T, number> = new Map()
     const low: Map<T, number> = new Map()
     const parent: Map<T, T | null> = new Map()
     const processed: Set<T> = new Set()
@@ -211,11 +219,11 @@ export class Graph<T> {
 
     let time: number = 0
 
-    vertices.reverse().forEach( (v: T) => {
+    modifiedNodes.reverse().forEach( (v: T) => {
       if (processed.has(v)) {
         return
       }
-      disc.set(v, time)
+      entranceTime.set(v, time)
       // order.push(v)
       low.set(v, time)
       parent.set(v, null)
@@ -235,13 +243,13 @@ export class Graph<T> {
           order.push(u)
         } else {
           processed.add(u)
-          disc.set(u, time)
+          entranceTime.set(u, time)
           low.set(u, time)
           this.adjacentNodes(u).forEach( (t: T) => {
-            if (disc.get(t) !== undefined) { // forward edge or backward edge
+            if (entranceTime.get(t) !== undefined) { // forward edge or backward edge
               if (onStack.has(t)) { // backward edge
                 // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-                low.set(u, Math.min(low.get(u)!, disc.get(t)!))
+                low.set(u, Math.min(low.get(u)!, entranceTime.get(t)!))
               }
             } else {
               parent.set(t, u)
@@ -255,11 +263,11 @@ export class Graph<T> {
     })
 
     const sccMap: Map<T, T> = new Map()
-    const sccInnerEdgeCnt: Map<T, number> = new Map()
-    order.reverse().forEach( (v: T) => {
-      if (disc.get(v) === low.get(v)) {
+    const sccNonSingletons: Set<T> = new Set()
+    order.reverse()
+    order.forEach( (v: T) => {
+      if (entranceTime.get(v) === low.get(v)) {
         sccMap.set(v, v)
-        sccInnerEdgeCnt.set(v, 0)
       } else {
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         sccMap.set(v, sccMap.get(parent.get(v) as T)!)
@@ -274,26 +282,24 @@ export class Graph<T> {
         const vRepr = sccMap.get(v)!
         if (uRepr === vRepr) {
           // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-          sccInnerEdgeCnt.set(uRepr, sccInnerEdgeCnt.get(uRepr)! + 1)
+          sccNonSingletons.add(uRepr)
         }
       })
     })
 
-    const shouldBeUpdatedMapping = new Set(vertices)
+    const shouldBeUpdatedMapping = new Set(modifiedNodes)
 
     const sorted: T[] = []
     const cycled: T[] = []
     order.forEach( (t: T) => {
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        const tRepr = sccMap.get(t)!
-        if (sccInnerEdgeCnt.get(tRepr) === 0) {
+        if (!sccNonSingletons.has(sccMap.get(t)!)) {
           sorted.push(t)
           if ( shouldBeUpdatedMapping.has(t) && operatingFunction(t)) {
             this.adjacentNodes(t).forEach( (s: T) => shouldBeUpdatedMapping.add(s) )
           }
         } else {
           cycled.push(t)
-          // operatingFunction(t)
           onCycle(t)
           this.adjacentNodes(t).forEach( (s: T) => shouldBeUpdatedMapping.add(s) )
         }
