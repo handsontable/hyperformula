@@ -19,7 +19,7 @@ describe('license key', () => {
         licenseKey: 'agpl-v3',
       })
 
-      expect(hf.getConfig().licenseKeyValidityState).toEqual(LicenseKeyValidityState.VALID)
+      expect(hf.licenseKeyValidityState).toEqual(LicenseKeyValidityState.VALID)
     })
 
     it('should verify "internal-use-in-handsontable" as a valid license key', () => {
@@ -27,7 +27,7 @@ describe('license key', () => {
         licenseKey: 'internal-use-in-handsontable',
       })
 
-      expect(hf.getConfig().licenseKeyValidityState).toEqual(LicenseKeyValidityState.VALID)
+      expect(hf.licenseKeyValidityState).toEqual(LicenseKeyValidityState.VALID)
     })
 
     it('should verify "non-commercial-and-evaluation" as a valid license key', () => {
@@ -35,7 +35,7 @@ describe('license key', () => {
         licenseKey: 'non-commercial-and-evaluation',
       })
 
-      expect(hf.getConfig().licenseKeyValidityState).toEqual(LicenseKeyValidityState.VALID)
+      expect(hf.licenseKeyValidityState).toEqual(LicenseKeyValidityState.VALID)
     })
   })
 
@@ -45,7 +45,7 @@ describe('license key', () => {
         licenseKey: 'agpl-v1',
       })
 
-      expect(hf.getConfig().licenseKeyValidityState).toEqual(LicenseKeyValidityState.INVALID)
+      expect(hf.licenseKeyValidityState).toEqual(LicenseKeyValidityState.INVALID)
     })
 
     it('should verify license keys correctnes', () => {
@@ -53,7 +53,7 @@ describe('license key', () => {
         licenseKey: '11111-11111-11111-11111-11111',
       })
 
-      expect(hf.getConfig().licenseKeyValidityState).toEqual(LicenseKeyValidityState.INVALID)
+      expect(hf.licenseKeyValidityState).toEqual(LicenseKeyValidityState.INVALID)
     })
   })
 
@@ -63,7 +63,7 @@ describe('license key', () => {
         licenseKey: '',
       })
 
-      expect(hf.getConfig().licenseKeyValidityState).toEqual(LicenseKeyValidityState.MISSING)
+      expect(hf.licenseKeyValidityState).toEqual(LicenseKeyValidityState.MISSING)
     })
   })
 })

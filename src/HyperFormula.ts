@@ -44,6 +44,7 @@ import {Emitter, Events, Listeners, TypedEmitter} from './Emitter'
 import {BuildEngineFactory, EngineState} from './BuildEngineFactory'
 import {Sheet, Sheets} from './Sheet'
 import {SheetDimensions} from './_types'
+import { LicenseKeyValidityState } from './helpers/licenseKeyValidator'
 
 export type Index = [number, number]
 
@@ -149,6 +150,15 @@ export class HyperFormula implements TypedEmitter {
   /** @internal */
   public get lazilyTransformingAstService(): LazilyTransformingAstService {
     return this._lazilyTransformingAstService
+  }
+
+  /**
+   * Returns state of the validity of the license key.
+   *
+   * @internal
+   */
+  public get licenseKeyValidityState(): LicenseKeyValidityState {
+    return this._config.licenseKeyValidityState
   }
 
   private static buildFromEngineState(engine: EngineState): HyperFormula {
@@ -479,7 +489,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * @category Instance
    */
-  public getConfig(): Config {
+  public getConfig(): ConfigParams {
     return this._config.getConfig()
   }
 
