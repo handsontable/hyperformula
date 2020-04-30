@@ -296,12 +296,12 @@ describe('Named expressions - store manipulation', () => {
     ])
 
     engine.addNamedExpression('myName', '=42', undefined)
-    engine.addNamedExpression('myName', '=13', "Sheet1")
+    engine.addNamedExpression('myName', '=13', 'Sheet1')
 
     expect(engine.getNamedExpressionValue('myName')).toEqual(42)
-    expect(engine.getNamedExpressionValue('myName', "Sheet1")).toEqual(13)
+    expect(engine.getNamedExpressionValue('myName', 'Sheet1')).toEqual(13)
     expect(engine.getNamedExpressionFormula('myName')).toEqual('=42')
-    expect(engine.getNamedExpressionFormula('myName', "Sheet1")).toEqual('=13')
+    expect(engine.getNamedExpressionFormula('myName', 'Sheet1')).toEqual('=13')
   })
 
   it('when trying to add named expression to nonexisting sheet', () => {
@@ -310,7 +310,7 @@ describe('Named expressions - store manipulation', () => {
     ])
 
     expect(() => {
-      engine.addNamedExpression('myName', '=13', "NonExistingSheetName")
+      engine.addNamedExpression('myName', '=13', 'NonExistingSheetName')
     }).toThrowError(NoSheetWithNameError)
   })
 })
@@ -325,7 +325,7 @@ const namedExpressionVertex = (engine: HyperFormula, expressionName: string, she
   return engine.dependencyGraph.fetchCell(namedExpression.address)
 }
 
-describe("Named expressions - evaluation", () => {
+describe('Named expressions - evaluation', () => {
   it('is recomputed', () => {
     const engine = HyperFormula.buildFromArray([
       ['42'],
@@ -399,9 +399,9 @@ describe("Named expressions - evaluation", () => {
     ])
     engine.addNamedExpression('FOO', '=Sheet1!A1 + 10', undefined)
 
-    engine.removeSheet("Sheet1")
+    engine.removeSheet('Sheet1')
 
-    expect(engine.getNamedExpressionFormula("FOO")).toEqual('=#REF! + 10')
+    expect(engine.getNamedExpressionFormula('FOO')).toEqual('=#REF! + 10')
   })
 
   it('local named expression shadows global one', () => {

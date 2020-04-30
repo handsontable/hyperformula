@@ -177,7 +177,7 @@ describe('Unparse', () => {
 
   it('#unparse named expression returns original form', () => {
     const namedExpressions = new NamedExpressions()
-    namedExpressions.addNamedExpression("SomeWEIRD_name", undefined)
+    namedExpressions.addNamedExpression('SomeWEIRD_name', undefined)
     const unparser = new Unparser(config, lexerConfig, sheetMapping.fetchDisplayName, namedExpressions)
     const formula = '=someWeird_Name'
     const ast = parser.parse(formula, simpleCellAddress(0, 0, 0)).ast
@@ -189,8 +189,8 @@ describe('Unparse', () => {
 
   it('#unparse named expression use local version if available', () => {
     const namedExpressions = new NamedExpressions()
-    namedExpressions.addNamedExpression("SomeWEIRD_name", undefined)
-    namedExpressions.addNamedExpression("SomeWEIRD_NAME", 0)
+    namedExpressions.addNamedExpression('SomeWEIRD_name', undefined)
+    namedExpressions.addNamedExpression('SomeWEIRD_NAME', 0)
     const unparser = new Unparser(config, lexerConfig, sheetMapping.fetchDisplayName, namedExpressions)
     const formula = '=someWeird_Name'
     const ast = parser.parse(formula, simpleCellAddress(0, 0, 0)).ast
@@ -213,8 +213,8 @@ describe('Unparse', () => {
 
   it('#unparse nonexisting named expression returns original input when global named expression is removed', () => {
     const namedExpressions = new NamedExpressions()
-    namedExpressions.addNamedExpression("SomeWEIRD_name", undefined)
-    namedExpressions.remove("SomeWEIRD_name", undefined)
+    namedExpressions.addNamedExpression('SomeWEIRD_name', undefined)
+    namedExpressions.remove('SomeWEIRD_name', undefined)
     const unparser = new Unparser(config, lexerConfig, sheetMapping.fetchDisplayName, namedExpressions)
     const formula = '=someWeird_Name'
     const ast = parser.parse(formula, simpleCellAddress(0, 0, 0)).ast

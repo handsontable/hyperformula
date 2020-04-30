@@ -74,7 +74,7 @@ export class Exporter {
     if (change.sheet === NamedExpressions.SHEET_FOR_WORKBOOK_EXPRESSIONS) {
       const namedExpression = this.namedExpressions.namedExpressionInAddress(change.row)
       if (!namedExpression) {
-        throw "Missing named expression"
+        throw 'Missing named expression'
       }
       return new ExportedNamedExpressionChange(
         namedExpression.displayName,
