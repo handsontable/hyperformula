@@ -87,7 +87,16 @@ describe('Named expressions - store manipulation', () => {
 
     expect(() => {
       engine.addNamedExpression('myName', '=Sheet1!A1+10', undefined)
-    }).toThrowError('Name of Named Expression \'myName\' is already present in the workbook')
+    }).toThrowError('Name of Named Expression \'myName\' is already present')
+  })
+
+  it('adding the same named expression twice on  local level is forbidden', () => {
+    const engine = HyperFormula.buildFromArray([])
+    engine.addNamedExpression('myName', '=Sheet1!A1+10', 'Sheet1')
+
+    expect(() => {
+      engine.addNamedExpression('myName', '=Sheet1!A1+10', 'Sheet1')
+    }).toThrowError('Name of Named Expression \'myName\' is already present')
   })
 
   it('named expressions is validated when added', () => {

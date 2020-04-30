@@ -77,6 +77,11 @@ class WorksheetStore {
     return expressionName.toLowerCase()
   }
 
+  public isNameAvailable(expressionName: string): boolean {
+    const normalizedExpressionName = this.normalizeExpressionName(expressionName)
+    return !this.mapping.has(normalizedExpressionName)
+  }
+
   public remove(expressionName: string): void {
     const normalizedExpressionName = this.normalizeExpressionName(expressionName)
     const namedExpression = this.mapping.get(normalizedExpressionName)
@@ -101,7 +106,7 @@ export class NamedExpressions {
     if (sheetId === undefined) {
       return this.workbookStore.isNameAvailable(expressionName)
     } else {
-      return true
+      return this.worksheetStore(sheetId).isNameAvailable(expressionName)
     }
   }
 
