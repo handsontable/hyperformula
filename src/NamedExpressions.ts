@@ -158,9 +158,6 @@ export class NamedExpressions {
       return namedExpression
     } else {
       const store = this.worksheetStore(sheetId)
-      // if (store.has(expressionName)) {
-      //   throw new Error('Name of Named Expression already taken')
-      // }
       const namedExpression = new NamedExpression(expressionName, this.nextAddress(), true)
       store.add(namedExpression)
       this.addressCache.set(namedExpression.address.row, namedExpression)
