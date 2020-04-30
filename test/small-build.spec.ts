@@ -19,7 +19,7 @@ describe('Small tests that check evaluation order', () => {
     ])
     expect(engine.getSheetValues(0)).toEqual([
       [500, 400, 320],
-      [500, 0.2, 0.1]
+      [500, 0.2, 0.2]
     ])
   })
 })
