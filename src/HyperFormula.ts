@@ -179,6 +179,7 @@ export class HyperFormula implements TypedEmitter {
    * @param {Partial<ConfigParams>} [configInput] - engine configuration
    *
    * @throws [[SheetSizeLimitExceededError]] when sheet size exceeds the limits
+   * @throws [[InvalidArgumentsError]] when sheet is not an array of arrays
    *
    * @category Factory
    */
@@ -196,6 +197,7 @@ export class HyperFormula implements TypedEmitter {
    * @param {Partial<ConfigParams>} [configInput] - engine configuration
    *
    * @throws [[SheetSizeLimitExceededError]] when sheet size exceeds the limits
+   * @throws [[InvalidArgumentsError]] when any sheet is not an array of arrays
    *
    * @category Factory
    */
@@ -1168,6 +1170,7 @@ export class HyperFormula implements TypedEmitter {
    * @param {RawCellContent[][]} values - array of new values
    *
    * @throws [[NoSheetWithNameError]] when the given sheet name does not exists
+   * @throws [[InvalidArgumentsError]] when values is not an array of arrays
    *
    * @category Sheet
    */
@@ -1212,6 +1215,16 @@ export class HyperFormula implements TypedEmitter {
    */
   public getSheetName(sheetId: number): Maybe<string> {
     return this.sheetMapping.getDisplayName(sheetId)
+  }
+
+  /**
+   * List all sheet names.
+   * Returns an array of sheet names as strings.
+   *
+   * @category Sheet
+   */
+  public getSheetNames(): string[] {
+    return this.sheetMapping.sheetNames()
   }
 
   /**

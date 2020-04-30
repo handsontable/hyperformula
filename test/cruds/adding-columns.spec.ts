@@ -110,7 +110,7 @@ describe('Adding column - matrix check', () => {
 
     expect(() => {
       engine.addColumns(0, [1, 1])
-    }).toThrow(new Error('It is not possible to add column in column with matrix'))
+    }).toThrowError('It is not possible to add column in column with matrix')
   })
 
   it('should be possible to add row right before matrix', () => {
@@ -161,9 +161,9 @@ describe('Adding column - reevaluation', () => {
     const c1 = engine.addressMapping.getCell(adr('C1'))
     const a2 = engine.addressMapping.getCell(adr('A2'))
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const c1setCellValueSpy = jest.spyOn(c1 as any, 'setCellValue')
+    const c1setCellValueSpy = spyOn(c1 as any, 'setCellValue')
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const a2setCellValueSpy = jest.spyOn(a2 as any, 'setCellValue')
+    const a2setCellValueSpy = spyOn(a2 as any, 'setCellValue')
 
     engine.addColumns(0, [1, 1])
 
@@ -177,7 +177,7 @@ describe('Adding column - reevaluation', () => {
     ])
     const c1 = engine.addressMapping.getCell(adr('C1'))
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const c1setCellValueSpy = jest.spyOn(c1 as any, 'setCellValue')
+    const c1setCellValueSpy = spyOn(c1 as any, 'setCellValue')
 
     engine.addColumns(0, [1, 1])
 
@@ -190,12 +190,13 @@ describe('Adding column - reevaluation', () => {
       /* */
       ['1', '2', '=COLUMNS(A1:B1)'],
     ])
-    const c1 = engine.addressMapping.getCell(adr('C1'))
+
+    engine.addressMapping.getCell(adr('C1'))
 
     const changes = engine.addColumns(0, [1, 1])
 
     expect(changes.length).toBe(1)
-    expect(changes).toContainEqual(new ExportedCellChange(simpleCellAddress(0, 3, 0), 3))
+    expect(changes).toContainEqual([new ExportedCellChange(simpleCellAddress(0, 3, 0), 3)])
   })
 })
 
@@ -315,7 +316,7 @@ describe('Adding column - sheet dimensions', () => {
     ])
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const recalcSpy = jest.spyOn(engine.evaluator as any, 'partialRun')
+    const recalcSpy = spyOn(engine.evaluator as any, 'partialRun')
     engine.addColumns(0, [1, 1])
     engine.addColumns(0, [10, 15])
 

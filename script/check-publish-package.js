@@ -23,7 +23,6 @@ const UNPACKED_DIR_NAME = 'package'
  */
 const FILES_CHECKLIST = [
   'CHANGELOG.md',
-  'COPYING.md',
   'README.md',
   'package.json',
   'commonjs/index.js',

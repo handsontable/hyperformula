@@ -11,7 +11,7 @@ describe('batch cruds', () => {
       ['bar'],
     ])
 
-    const evaluatorSpy = jest.spyOn(engine.evaluator, 'partialRun')
+    const evaluatorSpy = spyOn(engine.evaluator, 'partialRun')
 
     engine.batch((e) => {
       e.setCellContents(adr('B1'), [['=A1']])
@@ -19,7 +19,7 @@ describe('batch cruds', () => {
       e.removeRows(0, [0, 1])
     })
 
-    expect(evaluatorSpy).toBeCalledTimes(1)
+    expect(evaluatorSpy).toHaveBeenCalledTimes(1)
     expect(engine.getCellValue(adr('A1'))).toEqual('foo')
     expect(engine.getCellValue(adr('A2'))).toEqual(EmptyValue)
     expect(engine.getCellValue(adr('A3'))).toEqual('bar')
@@ -33,7 +33,7 @@ describe('batch cruds', () => {
       ['bar'],
     ])
 
-    const evaluatorSpy = jest.spyOn(engine.evaluator, 'partialRun')
+    const evaluatorSpy = spyOn(engine.evaluator, 'partialRun')
 
     try {
       engine.batch((e) => {
@@ -47,7 +47,7 @@ describe('batch cruds', () => {
       // empty line
     }
 
-    expect(evaluatorSpy).toBeCalledTimes(1)
+    expect(evaluatorSpy).toHaveBeenCalledTimes(1)
     expect(engine.getCellValue(adr('A1'))).toEqual('foo')
     expect(engine.getCellValue(adr('A2'))).toEqual(EmptyValue)
     expect(engine.getCellValue(adr('A3'))).toEqual('bar')

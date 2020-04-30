@@ -171,7 +171,7 @@ describe('Function MATCH', () => {
 
   it('uses binsearch', () => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const spy = jest.spyOn(ColumnBinarySearch.prototype as any, 'computeListOfValuesInRange')
+    const spy = spyOn(ColumnBinarySearch.prototype as any, 'computeListOfValuesInRange')
 
     const engine = HyperFormula.buildFromArray([
       ['=MATCH(400, A2:A5, 1)'],
@@ -188,7 +188,7 @@ describe('Function MATCH', () => {
 
   it('uses indexOf', () => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const spy = jest.spyOn(ColumnBinarySearch.prototype as any, 'computeListOfValuesInRange')
+    const spy = spyOn(ColumnBinarySearch.prototype as any, 'computeListOfValuesInRange')
 
     const engine = HyperFormula.buildFromArray([
       ['=MATCH(400, A2:A5, 0)'],

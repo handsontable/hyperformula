@@ -136,6 +136,10 @@ export class SheetMapping {
     this.mappingFromId.clear()
   }
 
+  public sheetNames(): string[] {
+    return Array.from(this.mappingFromId.values()).map((s) => s.displayName)
+  }
+
   private store(sheet: Sheet): void {
     this.mappingFromId.set(sheet.id, sheet)
     this.mappingFromCanonicalName.set(sheet.canonicalName, sheet)

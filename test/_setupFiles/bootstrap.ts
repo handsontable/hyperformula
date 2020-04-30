@@ -8,6 +8,11 @@ import {AlwaysSparse} from '../../src/DependencyGraph/AddressMapping/ChooseAddre
 import {languages} from '../../src/i18n'
 import {unregisterAllLanguages} from './../testUtils'
 
+import {
+  toContainEqualMatcher,
+  toMatchObjectMatcher,
+} from './matchers'
+
 Config.defaultConfig = Object.assign({}, Config.defaultConfig, {
   chooseAddressMappingPolicy: new AlwaysSparse(),
   functionPlugins: [],
@@ -18,9 +23,20 @@ Config.defaultConfig = Object.assign({}, Config.defaultConfig, {
 })
 
 beforeEach(() => {
+  // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+  // @ts-ignore
+  jasmine.setDefaultSpyStrategy((and: unknown) => and.callThrough())
+
   unregisterAllLanguages()
 
   const defaultLanguage = Config.defaultConfig.language
 
   HyperFormula.registerLanguage(defaultLanguage, languages[defaultLanguage])
+})
+
+beforeAll(() => {
+  jasmine.addMatchers({
+    ...toContainEqualMatcher,
+    ...toMatchObjectMatcher,
+  })
 })
