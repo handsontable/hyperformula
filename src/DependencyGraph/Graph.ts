@@ -207,8 +207,7 @@ export class Graph<T> {
     const parent: Map<T, T | null> = new Map()
     const processed: Set<T> = new Set()
     const onStack: Set<T> = new Set()
-    const flatOrder: T[] = []
-    const deepOrder: T[][] = []
+    const order: T[] = []
 
     let time: number = 0
 
@@ -216,10 +215,8 @@ export class Graph<T> {
       if (processed.has(v)) {
         return
       }
-      const shortOrder: T[] = []
       disc.set(v, time)
-      flatOrder.push(v)
-      shortOrder.push(v)
+      // order.push(v)
       low.set(v, time)
       parent.set(v, null)
       time++
@@ -235,7 +232,11 @@ export class Graph<T> {
           }
           DFSstack.pop()
           onStack.delete(u)
+          order.push(u)
         } else {
+          processed.add(u)
+          disc.set(u, time)
+          low.set(u, time)
           this.adjacentNodes(u).forEach( (t: T) => {
             if (disc.get(t) !== undefined) { // forward edge or backward edge
               if (onStack.has(t)) { // backward edge
@@ -243,25 +244,19 @@ export class Graph<T> {
                 low.set(u, Math.min(low.get(u)!, disc.get(t)!))
               }
             } else {
-              disc.set(t, time)
-              flatOrder.push(t)
-              shortOrder.push(t)
-              low.set(t, time)
               parent.set(t, u)
               DFSstack.push(t)
               onStack.add(t)
               time++
             }
           })
-          processed.add(u)
         }
       }
-      deepOrder.push(shortOrder)
     })
 
     const sccMap: Map<T, T> = new Map()
     const sccInnerEdgeCnt: Map<T, number> = new Map()
-    flatOrder.forEach( (v: T) => {
+    order.reverse().forEach( (v: T) => {
       if (disc.get(v) === low.get(v)) {
         sccMap.set(v, v)
         sccInnerEdgeCnt.set(v, 0)
@@ -288,8 +283,7 @@ export class Graph<T> {
 
     const sorted: T[] = []
     const cycled: T[] = []
-    deepOrder.reverse().forEach( (arr: T[]) =>
-      arr.forEach( (t: T) => {
+    order.forEach( (t: T) => {
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         const tRepr = sccMap.get(t)!
         if (sccInnerEdgeCnt.get(tRepr) === 0) {
@@ -303,8 +297,7 @@ export class Graph<T> {
           onCycle(t)
           this.adjacentNodes(t).forEach( (s: T) => shouldBeUpdatedMapping.add(s) )
         }
-      }),
-    )
+      })
     return { sorted, cycled }
   }
 
