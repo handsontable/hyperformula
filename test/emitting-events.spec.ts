@@ -101,7 +101,7 @@ describe('Events', () => {
   it('namedExpressionRemoved contains actual named expression name', () => {
     const engine = HyperFormula.buildEmpty()
     engine.addNamedExpression('myName', 'foobarbaz', undefined)
-    const handler = jest.fn()
+    const handler = jasmine.createSpy()
 
     engine.on(Events.NamedExpressionRemoved, handler)
     engine.removeNamedExpression('MYNAME', undefined)
