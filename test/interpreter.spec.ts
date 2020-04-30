@@ -65,7 +65,7 @@ describe('Interpreter', () => {
   })
 
   it('errors - parsing errors', () => {
-    const engine = HyperFormula.buildFromArray([['=A', '=A1C1', '=SUM(A)', '=foo', '=)(asdf']])
+    const engine = HyperFormula.buildFromArray([['=A', '=A1C1', '=SUM(A)', '=foo(', '=)(asdf']])
 
     expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.ERROR, 'Parsing error'))
     expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.ERROR, 'Parsing error'))

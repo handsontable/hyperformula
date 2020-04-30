@@ -13,8 +13,9 @@ import {ColumnSearchStrategy} from './ColumnSearch/ColumnSearchStrategy'
 import {ColumnsSpan} from './ColumnsSpan'
 import {Config} from './Config'
 import {ContentChanges} from './ContentChanges'
-import {AddressMapping, DependencyGraph, SheetMapping, SparseStrategy} from './DependencyGraph'
-import {NamedExpressions} from './NamedExpressions'
+import {AddressMapping, DependencyGraph, SheetMapping, SparseStrategy, FormulaCellVertex, MatrixVertex} from './DependencyGraph'
+import {NamedExpressions, NamedExpression} from './NamedExpressions'
+import {Maybe} from './Maybe'
 import {
   InvalidAddressError,
   InvalidArgumentsError,
@@ -30,7 +31,7 @@ import {
 } from './errors'
 import {Index} from './HyperFormula'
 import {LazilyTransformingAstService} from './LazilyTransformingAstService'
-import {ParserWithCaching} from './parser'
+import {ParserWithCaching, NamedExpressionDependency} from './parser'
 import {RowsSpan} from './RowsSpan'
 import {Statistics} from './statistics'
 import {
@@ -298,24 +299,74 @@ export class CrudOperations {
     this.undoRedo.redo()
   }
 
-  public addNamedExpression(expressionName: string, expression: RawCellContent) {
+  public addNamedExpression(expressionName: string, expression: RawCellContent, sheetScope: string | undefined) {
     if (!this.namedExpressions.isNameValid(expressionName)) {
       throw new NamedExpressionNameIsInvalid(expressionName)
     }
-    if (!this.namedExpressions.isNameAvailable(expressionName)) {
+    let sheetId = undefined
+    if (sheetScope !== undefined) {
+      this.ensureSheetExists(sheetScope)
+      sheetId = this.sheetMapping.fetch(sheetScope)
+    }
+    if (!this.namedExpressions.isNameAvailable(expressionName, sheetId)) {
       throw new NamedExpressionNameIsAlreadyTaken(expressionName)
     }
-    const namedExpression = this.namedExpressions.addNamedExpression(expressionName)
-    const address = this.namedExpressions.getInternalNamedExpressionAddress(expressionName)!
-    this.storeExpressionInCell(address, expression)
+    const namedExpression = this.namedExpressions.addNamedExpression(expressionName, sheetId)
+    this.storeExpressionInCell(namedExpression.address, expression)
+    if (sheetId !== undefined) {
+      const localVertex = this.dependencyGraph.fetchCellOrCreateEmpty(namedExpression.address)
+      const globalNamedExpression = this.namedExpressions.workbookNamedExpressionOrPlaceholder(expressionName)
+      const globalVertex = this.dependencyGraph.fetchCellOrCreateEmpty(globalNamedExpression.address)
+      for (const adjacentNode of this.dependencyGraph.graph.adjacentNodes(globalVertex)) {
+        if (adjacentNode instanceof FormulaCellVertex || adjacentNode instanceof MatrixVertex) {
+          const ast = adjacentNode.getFormula(this.lazilyTransformingAstService)
+          if (ast) {
+            const formulaAddress = adjacentNode.getAddress(this.lazilyTransformingAstService)
+            const hash = this.parser.computeHashFromAst(ast)
+            const parsingResult = this.parser.fetchCachedResult(hash)
+            for (const dependency of absolutizeDependencies(parsingResult.dependencies, formulaAddress)) {
+              if (dependency instanceof NamedExpressionDependency && dependency.name.toLowerCase() === namedExpression.displayName.toLowerCase()) {
+                this.dependencyGraph.graph.removeEdge(globalVertex, adjacentNode)
+                this.dependencyGraph.graph.addEdge(localVertex, adjacentNode)
+              }
+            }
+          }
+        }
+      }
+    }
   }
 
-  public changeNamedExpressionExpression(expressionName: string, newExpression: RawCellContent) {
-    const address = this.namedExpressions.getInternalNamedExpressionAddress(expressionName)
-    if (!address) {
+  public changeNamedExpressionExpression(expressionName: string, sheetScope: string | undefined, newExpression: RawCellContent) {
+    let sheetId = undefined
+    if (sheetScope !== undefined) {
+      this.ensureSheetExists(sheetScope)
+      sheetId = this.sheetMapping.fetch(sheetScope)
+    }
+    const namedExpression = this.namedExpressions.namedExpressionForScope(expressionName, sheetId)
+    if (!namedExpression) {
       throw new NamedExpressionDoesNotExist(expressionName)
     }
-    this.storeExpressionInCell(address, newExpression)
+    this.storeExpressionInCell(namedExpression.address, newExpression)
+  }
+
+  public removeNamedExpression(expressionName: string, sheetScope: string | undefined): Maybe<NamedExpression> {
+    let sheetId = undefined
+    if (sheetScope !== undefined) {
+      this.ensureSheetExists(sheetScope)
+      sheetId = this.sheetMapping.fetch(sheetScope)
+    }
+    const namedExpression = this.namedExpressions.namedExpressionForScope(expressionName, sheetId)
+    if (!namedExpression) {
+      return undefined
+    }
+    this.namedExpressions.remove(namedExpression.displayName, sheetId)
+    if (sheetScope !== undefined) {
+      const globalNamedExpression = this.namedExpressions.workbookNamedExpressionOrPlaceholder(expressionName)
+      this.dependencyGraph.exchangeNode(namedExpression.address, globalNamedExpression.address)
+    } else {
+      this.dependencyGraph.setCellEmpty(namedExpression.address)
+    }
+    return namedExpression
   }
 
   public ensureItIsPossibleToAddRows(sheet: number, ...indexes: Index[]): void {

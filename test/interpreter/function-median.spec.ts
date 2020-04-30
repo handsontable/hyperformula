@@ -54,7 +54,7 @@ describe('Function MEDIAN', () => {
 
   it('propagates first error from range argument', () => {
     const engine = HyperFormula.buildFromArray([
-      ['=3/0', '=FOO', '=MEDIAN(A1:B1)'],
+      ['=3/0', '=FOO(', '=MEDIAN(A1:B1)'],
     ])
 
     expect(engine.getCellValue(adr('C1'))).toEqual(detailedError(ErrorType.DIV_BY_ZERO))

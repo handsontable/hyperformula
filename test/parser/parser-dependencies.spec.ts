@@ -4,7 +4,7 @@ import {simpleCellAddress} from '../../src/Cell'
 import {Config} from '../../src/Config'
 import {SheetMapping} from '../../src/DependencyGraph'
 import {buildTranslationPackage, enGB} from '../../src/i18n'
-import {ParserWithCaching} from '../../src/parser'
+import {ParserWithCaching, NamedExpressionDependency} from '../../src/parser'
 import {adr, expectArrayWithSameContent} from '../testUtils'
 
 describe('Parsing collecting dependencies', () => {
@@ -107,5 +107,17 @@ describe('Parsing collecting dependencies', () => {
     const parseResult = parser.parse('=COLUMNS(A1:B3)', formulaAddress)
     const dependencies = absolutizeDependencies(parseResult.dependencies, formulaAddress)
     expect(dependencies).toEqual([])
+  })
+
+  it('works for named expression dependencies', () => {
+    const parser = new ParserWithCaching(new Config(), new SheetMapping(buildTranslationPackage(enGB)).get)
+    const parseResult = parser.parse('=FOO+bar', adr('A1'))
+
+    const dependencies = absolutizeDependencies(parseResult.dependencies, adr('A1'))
+
+    expect(dependencies).toEqual([
+      new NamedExpressionDependency('FOO'),
+      new NamedExpressionDependency('bar'),
+    ])
   })
 })

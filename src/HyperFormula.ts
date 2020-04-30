@@ -455,7 +455,7 @@ export class HyperFormula implements TypedEmitter {
     const newConfig = this._config.mergeConfig(newParams)
 
     const configNewLanguage = this._config.mergeConfig({language: newParams.language})
-    const serializedSheets = this._serialization.withNewConfig(configNewLanguage).getAllSheetsSerialized()
+    const serializedSheets = this._serialization.withNewConfig(configNewLanguage, this._namedExpressions).getAllSheetsSerialized()
 
     const newEngine = BuildEngineFactory.rebuildWithConfig(newConfig, serializedSheets, this._stats)
 
@@ -1428,11 +1428,12 @@ export class HyperFormula implements TypedEmitter {
    *
    * @throws [[NamedExpressionNameIsAlreadyTaken]] when the named expression is not available.
    * @throws [[NamedExpressionNameIsInvalid]] when the named expression is not valid
+   * @throws [[NoSheetWithNameError]] when the given sheet name does not exists
    *
    * @category Named Expression
    */
-  public addNamedExpression(expressionName: string, expression: RawCellContent): ExportedChange[] {
-    this._crudOperations.addNamedExpression(expressionName, expression)
+  public addNamedExpression(expressionName: string, expression: RawCellContent, sheetScope: string | undefined): ExportedChange[] {
+    this._crudOperations.addNamedExpression(expressionName, expression, sheetScope)
     const changes = this.recomputeIfDependencyGraphNeedsIt()
     this._emitter.emit(Events.NamedExpressionAdded, expressionName, changes)
     return changes
@@ -1443,14 +1444,22 @@ export class HyperFormula implements TypedEmitter {
    * Returns a [[CellValue]] or undefined if the given named expression does not exists
    *
    * @param {string} expressionName - expression name, case insensitive.
+   * @param {string | undefined} scope - sheet name or undefined for global scope
+   *
+   * @throws [[NoSheetWithNameError]] when the given sheet name does not exists
    *
    * @category Named Expression
    */
-  public getNamedExpressionValue(expressionName: string): Maybe<CellValue> {
+  public getNamedExpressionValue(expressionName: string, sheetScope: string | undefined = undefined): Maybe<CellValue> {
     this.ensureEvaluationIsNotSuspended()
-    const namedExpressionAddress = this._namedExpressions.getInternalNamedExpressionAddress(expressionName)
-    if (namedExpressionAddress) {
-      return this._serialization.getCellValue(namedExpressionAddress)
+    let sheetId = undefined
+    if (sheetScope !== undefined) {
+      this._crudOperations.ensureSheetExists(sheetScope)
+      sheetId = this.sheetMapping.fetch(sheetScope)
+    }
+    const namedExpression = this._namedExpressions.namedExpressionForScope(expressionName, sheetId)
+    if (namedExpression) {
+      return this._serialization.getCellValue(namedExpression.address)
     } else {
       return undefined
     }
@@ -1461,15 +1470,23 @@ export class HyperFormula implements TypedEmitter {
    * Unparses AST.
    *
    * @param {string} expressionName - expression name, case insensitive.
+   * @param {string | undefined} scope - sheet name or undefined for global scope
+   *
+   * @throws [[NoSheetWithNameError]] when the given sheet name does not exists
    *
    * @category Named Expression
    */
-  public getNamedExpressionFormula(expressionName: string): Maybe<string> {
-    const namedExpressionAddress = this._namedExpressions.getInternalNamedExpressionAddress(expressionName)
-    if (namedExpressionAddress === null) {
+  public getNamedExpressionFormula(expressionName: string, sheetScope: string | undefined = undefined): Maybe<string> {
+    let sheetId = undefined
+    if (sheetScope !== undefined) {
+      this._crudOperations.ensureSheetExists(sheetScope)
+      sheetId = this.sheetMapping.fetch(sheetScope)
+    }
+    const namedExpression = this._namedExpressions.namedExpressionForScope(expressionName, sheetId)
+    if (namedExpression === undefined) {
       return undefined
     } else {
-      return this._serialization.getCellFormula(namedExpressionAddress)
+      return this._serialization.getCellFormula(namedExpression.address)
     }
   }
 
@@ -1479,16 +1496,18 @@ export class HyperFormula implements TypedEmitter {
    * Note that this method may trigger dependency graph recalculation.
    *
    * @param {string} expressionName - an expression name, case insensitive.
+   * @param {string | undefined} scope - sheet name or undefined for global scope
    * @param {RawCellContent} newExpression - a new expression
    *
    * @fires [[valuesUpdated]] if recalculation was triggered by this change
    *
    * @throws [[NamedExpressionDoesNotExist]] when the given expression does not exist.
+   * @throws [[NoSheetWithNameError]] when the given sheet name does not exists
    *
    * @category Named Expression
    */
-  public changeNamedExpression(expressionName: string, newExpression: RawCellContent): ExportedChange[] {
-    this._crudOperations.changeNamedExpressionExpression(expressionName, newExpression)
+  public changeNamedExpression(expressionName: string, sheetScope: string | undefined, newExpression: RawCellContent): ExportedChange[] {
+    this._crudOperations.changeNamedExpressionExpression(expressionName, sheetScope, newExpression)
     return this.recomputeIfDependencyGraphNeedsIt()
   }
 
@@ -1498,20 +1517,18 @@ export class HyperFormula implements TypedEmitter {
    * Note that this method may trigger dependency graph recalculation.
    *
    * @param {string} expressionName - expression name, case insensitive.
+   * @param {string | undefined} scope - sheet name or undefined for global scope
    *
    * @fires [[namedExpressionRemoved]]
    * @fires [[valuesUpdated]] if recalculation was triggered by this change
    *
    * @category Named Expression
    */
-  public removeNamedExpression(expressionName: string): ExportedChange[] {
-    const address = this._namedExpressions.getInternalNamedExpressionAddress(expressionName)
-    if (address) {
-      const namedExpressionDisplayName = this._namedExpressions.getDisplayNameByName(expressionName)!
-      this._namedExpressions.remove(expressionName)
-      this.dependencyGraph.setCellEmpty(address)
+  public removeNamedExpression(expressionName: string, sheetScope: string | undefined): ExportedChange[] {
+    const removedNamedExpression = this._crudOperations.removeNamedExpression(expressionName, sheetScope)
+    if (removedNamedExpression) {
       const changes = this.recomputeIfDependencyGraphNeedsIt()
-      this._emitter.emit(Events.NamedExpressionRemoved, namedExpressionDisplayName, changes)
+      this._emitter.emit(Events.NamedExpressionRemoved, removedNamedExpression.displayName, changes)
       return changes
     } else {
       return []

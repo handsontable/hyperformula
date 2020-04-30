@@ -41,6 +41,7 @@ import {
   buildMinusOpAst,
   buildMinusUnaryOpAst,
   buildNotEqualOpAst,
+  buildNamedExpressionAst,
   buildNumberAst,
   buildParenthesisAst,
   buildParsingErrorAst,
@@ -77,6 +78,7 @@ import {
   LParen,
   MinusOp,
   MultiplicationOp,
+  NamedExpression,
   NotEqualOp,
   PercentOp,
   PlusOp,
@@ -385,6 +387,9 @@ export class FormulaParser extends EmbeddedActionsParser {
         ALT: () => this.SUBRULE(this.procedureExpression),
       },
       {
+        ALT: () => this.SUBRULE(this.namedExpressionExpression),
+      },
+      {
         ALT: () => {
           const number = this.CONSUME(this.lexerConfig.NumberLiteral) as IExtendedToken
           return buildNumberAst(this.numericStringToNumber(number.image), number.leadingWhitespace)
@@ -438,6 +443,11 @@ export class FormulaParser extends EmbeddedActionsParser {
 
     const rParenToken = this.CONSUME(RParen) as IExtendedToken
     return buildProcedureAst(canonicalProcedureName, args, procedureNameToken.leadingWhitespace, rParenToken.leadingWhitespace)
+  })
+
+  private namedExpressionExpression: AstRule = this.RULE('namedExpressionExpression', () => {
+    const name = this.CONSUME(NamedExpression) as IExtendedToken
+    return buildNamedExpressionAst(name.image, name.leadingWhitespace)
   })
 
   /**

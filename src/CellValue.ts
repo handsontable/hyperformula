@@ -72,8 +72,12 @@ export class Exporter {
 
   public exportChange(change: CellValueChange): ExportedChange {
     if (change.sheet === NamedExpressions.SHEET_FOR_WORKBOOK_EXPRESSIONS) {
+      const namedExpression = this.namedExpressions.namedExpressionInAddress(change.row)
+      if (!namedExpression) {
+        throw 'Missing named expression'
+      }
       return new ExportedNamedExpressionChange(
-        this.namedExpressions.fetchNameForNamedExpressionRow(change.row),
+        namedExpression.displayName,
         this.exportValue(change.value),
       )
     } else {

@@ -27,6 +27,7 @@ import {
 import {InterpreterValue, SimpleRangeValue} from './InterpreterValue'
 import {concatenate} from './text'
 import {NumberLiteralHelper} from '../NumberLiteralHelper'
+import {NamedExpressions} from '../NamedExpressions'
 
 export class Interpreter {
   private gpu?: GPU.GPU
@@ -40,6 +41,7 @@ export class Interpreter {
     public readonly stats: Statistics,
     public readonly dateHelper: DateTimeHelper,
     public readonly numberLiteralsHelper: NumberLiteralHelper,
+    public readonly namedExpressions: NamedExpressions,
   ) {
     this.registerPlugins(this.config.allFunctionPlugins())
     this.arithmeticHelper = new ArithmeticHelper(config, dateHelper, numberLiteralsHelper)
@@ -182,6 +184,14 @@ export class Interpreter {
         if (pluginEntry && this.config.translationPackage.isFunctionTranslated(ast.procedureName)) {
           const [pluginInstance, pluginFunction] = pluginEntry
           return pluginInstance[pluginFunction](ast, formulaAddress)
+        } else {
+          return new CellError(ErrorType.NAME)
+        }
+      }
+      case AstNodeType.NAMED_EXPRESSION: {
+        const namedExpression = this.namedExpressions.nearestNamedExpression(ast.expressionName, formulaAddress.sheet)
+        if (namedExpression) {
+          return this.dependencyGraph.getCellValue(namedExpression.address)
         } else {
           return new CellError(ErrorType.NAME)
         }
