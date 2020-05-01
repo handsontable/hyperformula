@@ -1041,8 +1041,8 @@ export class HyperFormula implements TypedEmitter {
    *  ['1', '2'],
    * ]);
    *
-   * // should return true for this example
-   * // it is possible to add one column to the second column of sheet 0
+   * // should return true for this example,
+   * // it is possible to add 1 column in sheet 0, at column 1
    * const isAddable = hfInstance.isItPossibleToAddColumns(0, [1, 1]);
    * ```
    *
@@ -1546,8 +1546,11 @@ export class HyperFormula implements TypedEmitter {
    *  ['7', '8']
    * ]);
    *
+   * // create cell range
+   * const range = new AbsoluteCellRange({ col: 0, row: 0, sheet: 0 }, { col: 1, row: 1, sheet: 0 })
+   *
    * // returns the cells content: [ [ 1, 2 ], [ 5, 6 ] ]
-   * const rangeValues = hfInstance.getRangeValues(new AbsoluteCellRange({ col: 0, row: 0, sheet: 0 }, { col: 1, row: 1, sheet: 0 }));
+   * const rangeValues = hfInstance.getRangeValues(range);
    * ```
    *
    * @category Range
@@ -1573,13 +1576,13 @@ export class HyperFormula implements TypedEmitter {
    * // build from arrays, only one sheet
    * const hfInstance = HyperFormula.buildFromArray([
    *  ['=SUM(1:2)', '2', '10'],
-   *  ['5', '6', '{=TRANSPOSE(A1:B1)}'],
-   *  ['40', '{=MMULT(A1:B3,A4:B5)}', '{=TRANSPOSE(A1:B1)}']
+   *  ['5', '6', '7'],
+   *  ['40', '30', '20']
    * ]);
    *
    * // returns cell formulas of a given range only:
    * // [ [ '=SUM(1:2)', undefined ], [ undefined, undefined ] ]
-   * const range = new AbsoluteCellRange({ col: 0, row: 0, sheet: 0 }, { col: 1, row: 1, sheet: 0 }); 
+   * const range = new AbsoluteCellRange({ col: 0, row: 0, sheet: 0 }, { col: 1, row: 1, sheet: 0 });
    * const rangeFormulas = hfInstance.getRangeFormulas(range);
    * ```
    *
@@ -1610,7 +1613,7 @@ export class HyperFormula implements TypedEmitter {
    *  ['7'], ['8'],
    * ]);
    *
-   * // should return serialized cell values for the given range: 
+   * // should return serialized cell values for the given range:
    * // [ [ '=SUM(1:2)', Symbol() ], [ 2, Symbol() ] ]
    * const rangeSerialized = hfInstance.getRangeSerialized(new AbsoluteCellRange({ col: 0, row: 0, sheet: 0 }, { col: 1, row: 1, sheet: 0 }));
    * ```
@@ -2081,19 +2084,12 @@ export class HyperFormula implements TypedEmitter {
    * @example
    * ```js
    * // build from arrays, two sheets
-   * const hfInstance = HyperFormula.buildFromSheets({
-   *  MySheet1: [
-   *   ['1'],
-   *   ['2'],
-   *  ],
-   *  MySheet2: [
-   *   ['10'],
-   *   ['20'],
-   *  ],
-   * });
+   * const hfInstance = HyperFormula.buildFromArray([
+   *  ['1', '2']
+   * ]);
    *
    * // should return 'VALUE', the cell of given coordinates is of this type
-   * const cellType = hfInstance.getCellType({ sheet: 1, col: 0, row: 1 });
+   * const cellType = hfInstance.getCellType({ sheet: 0, col: 0, row: 1 });
    * ```
    *
    * @category Cell
@@ -2112,19 +2108,12 @@ export class HyperFormula implements TypedEmitter {
    * @example
    * ```js
    * // build from arrays, two sheets
-   * const hfInstance = HyperFormula.buildFromSheets({
-   *  MySheet1: [
-   *   ['1'],
-   *   ['2'],
-   *  ],
-   *  MySheet2: [
-   *   ['10'],
-   *   ['20'],
-   *  ],
-   * });
+   * const hfInstance = HyperFormula.buildFromArray([
+   *  ['1', '2']
+   * ]);
    *
    * // should return true since the selcted cell contains a simple value
-   * const isSimpleValue = hfInstance.doesCellHaveSimpleValue({ sheet: 1, col: 0, row: 1 });
+   * const isSimpleValue = hfInstance.doesCellHaveSimpleValue({ sheet: 0, col: 0, row: 1 });
    * ```
    *
    * @category Cell
@@ -2142,19 +2131,12 @@ export class HyperFormula implements TypedEmitter {
    * @example
    * ```js
    * // build from arrays, two sheets
-   * const hfInstance = HyperFormula.buildFromSheets({
-   *  MySheet1: [
-   *   ['1'],
-   *   ['2'],
-   *  ],
-   *  MySheet2: [
-   *   ['=SUM(A2:A3)'],
-   *   ['20'],
-   *  ],
-   * });
+   * const hfInstance = HyperFormula.buildFromArray([
+   *  ['=SUM(A2:A3)', '2']
+   * ]);
    *
    * // should return true since the specified cell contains a formula
-   * const haveFormula = hfInstance.doesCellHaveFormula({ sheet: 1, col: 0, row: 0 });
+   * const haveFormula = hfInstance.doesCellHaveFormula({ sheet: 0, col: 0, row: 0 });
    * ```
    *
    * @category Cell
@@ -2506,7 +2488,7 @@ export class HyperFormula implements TypedEmitter {
    * // add a named expression
    * hfInstance.addNamedExpression('prettyName', '=Sheet1!A1+100');
    *
-   * // returns a normalized formula string corresponding to a passed name, 
+   * // returns a normalized formula string corresponding to a passed name,
    * // '=Sheet1!A1+100' for this example
    * const myFormula = hfInstance.getNamedExpressionFormula('prettyName');
    * ```
