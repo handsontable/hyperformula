@@ -46,7 +46,7 @@ export class ArithmeticHelper {
 
   public requiresRegex(pattern: string): boolean {
     if(this.config.regexpType === 'none') {
-      return true
+      return !this.config.matchWholeCell
     }
     for(let i=0;i<pattern.length;i++) {
       const c = pattern.charAt(i)

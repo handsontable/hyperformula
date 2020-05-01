@@ -92,15 +92,28 @@ const sharedExamples = (builder: (sheet: Sheet, config?: Partial<ConfigParams>) 
 
     it('works with wildcards', () => {
       const engine = builder([
-        ['"abd"', 'a'],
+        ['abd', 'a'],
         [1, 'b'],
-        ['"aaaa"', 'c'],
-        ['"ddaa"', 'd'],
-        ['"abcd"', 'e'],
-        ['=VLOOKUP("*c*", A1:B5, 2)'],
+        ['aaaa', 'c'],
+        ['ddaa', 'd'],
+        ['abcd', 'e'],
+        ['=VLOOKUP("*c*", A1:B5, 2, FALSE())'],
       ])
 
       expect(engine.getCellValue(adr('A6'))).toEqual('e')
+    })
+
+    it('on sorted data ignores wildcards', () => {
+      const engine = builder([
+        ['abd', 'a'],
+        [1, 'b'],
+        ['*c*', 'c'],
+        ['ddaa', 'd'],
+        ['abcd', 'e'],
+        ['=VLOOKUP("*c*", A1:B5, 2, TRUE())'],
+      ])
+
+      expect(engine.getCellValue(adr('A6'))).toEqual('c')
     })
 
     it('should find value in unsorted range using linearSearch', () => {

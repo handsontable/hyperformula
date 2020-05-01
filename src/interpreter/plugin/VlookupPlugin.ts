@@ -115,7 +115,7 @@ export class VlookupPlugin extends FunctionPlugin {
   }
 
   private searchInRange(key: any, range: AbsoluteCellRange, sorted: boolean): number {
-    if(typeof key === 'string' && this.interpreter.arithmeticHelper.requiresRegex(key)) {
+    if(!sorted && typeof key === 'string' && this.interpreter.arithmeticHelper.requiresRegex(key)) {
       return this.columnSearch.advancedFind(
         this.interpreter.arithmeticHelper.eqMatcherFunction(key),
         range
