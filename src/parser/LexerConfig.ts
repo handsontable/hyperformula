@@ -70,6 +70,9 @@ export const RParen = createToken({name: 'RParen', pattern: /\)/})
 /* prcoedures */
 export const ProcedureName = createToken({name: 'ProcedureName', pattern: /(\.?[0-9A-Za-z\u00C0-\u02AF]+)+\(/})
 
+/* named expressions */
+export const NamedExpression = createToken({name: 'NamedExpression', pattern: /[A-Za-z\u00C0-\u02AF_][0-9\.A-Za-z_\u00C0-\u02AF_]+/})
+
 /* string literal */
 export const StringLiteral = createToken({name: 'StringLiteral', pattern: /"([^"\\]*(\\.[^"\\]*)*)"/})
 
@@ -135,6 +138,7 @@ export const buildLexerConfig = (config: ParserConfig): ILexerConfig => {
     AdditionOp,
     MultiplicationOp,
     CellReference,
+    NamedExpression,
   ]
 
   return {

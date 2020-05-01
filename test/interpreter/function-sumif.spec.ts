@@ -522,7 +522,7 @@ describe('Function SUMIF - cache recalculation after cruds', () => {
 
     expect(engine.getCellValue(adr('A3'))).toEqual(4)
     expect(changes.length).toEqual(3)
-    expect(changes.map((change) => change.newValue)).toEqual(expect.arrayContaining([1, 3, 4]))
+    expect(changes.map((change) => change.newValue)).toContainEqual([1, 3, 4])
   })
 
   it('recalculates SUMIF if changes in tested range', () => {
@@ -537,7 +537,7 @@ describe('Function SUMIF - cache recalculation after cruds', () => {
 
     expect(engine.getCellValue(adr('B3'))).toEqual(6)
     expect(changes.length).toEqual(3)
-    expect(changes.map((change) => change.newValue)).toEqual(expect.arrayContaining([1, 3, 6]))
+    expect(changes.map((change) => change.newValue)).toContainEqual([1, 3, 6])
   })
 
   it('recalculates SUMIF if summed range same as tested range', () => {
@@ -553,7 +553,7 @@ describe('Function SUMIF - cache recalculation after cruds', () => {
 
     expect(engine.getCellValue(adr('B2'))).toEqual(3)
     expect(changes.length).toEqual(3)
-    expect(changes.map((change) => change.newValue)).toEqual(expect.arrayContaining([1, 3, 3]))
+    expect(changes.map((change) => change.newValue)).toContainEqual([1, 3, 3])
   })
 })
 
@@ -571,7 +571,7 @@ describe('Function SUMIFS - cache recalculation after cruds', () => {
 
     expect(engine.getCellValue(adr('A4'))).toEqual(4)
     expect(changes.length).toEqual(3)
-    expect(changes.map((change) => change.newValue)).toEqual(expect.arrayContaining([1, 3, 4]))
+    expect(changes.map((change) => change.newValue)).toContainEqual([1, 3, 4])
   })
 
   it('recalculates SUMIFS if changes in one of the tested range', () => {
@@ -588,6 +588,6 @@ describe('Function SUMIFS - cache recalculation after cruds', () => {
 
     expect(engine.getCellValue(adr('A4'))).toEqual(10)
     expect(changes.length).toEqual(3)
-    expect(changes.map((change) => change.newValue)).toEqual(expect.arrayContaining([1, 7, 10]))
+    expect(changes.map((change) => change.newValue)).toContainEqual([1, 7, 10])
   })
 })

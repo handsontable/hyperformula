@@ -16,6 +16,7 @@ import {
 import {binaryOpTokenMap} from './binaryOpTokenMap'
 import {additionalCharactersAllowedInQuotes, ILexerConfig} from './LexerConfig'
 import {ParserConfig} from './ParserConfig'
+import {NamedExpressions} from '../NamedExpressions'
 
 export type SheetMappingFn = (sheetId: number) => string
 
@@ -24,6 +25,7 @@ export class Unparser {
     private readonly config: ParserConfig,
     private readonly lexerConfig: ILexerConfig,
     private readonly sheetMappingFn: SheetMappingFn,
+    private readonly namedExpressions: NamedExpressions,
   ) {
   }
 
@@ -50,6 +52,10 @@ export class Unparser {
           ast.procedureName
         const rightPart = procedureName + '(' + args + imageWithWhitespace(')', ast.internalWhitespace)
         return imageWithWhitespace(rightPart, ast.leadingWhitespace)
+      }
+      case AstNodeType.NAMED_EXPRESSION: {
+        const originalNamedExpressionName = this.namedExpressions.nearestNamedExpression(ast.expressionName, address.sheet)?.displayName
+        return imageWithWhitespace(originalNamedExpressionName || ast.expressionName, ast.leadingWhitespace)
       }
       case AstNodeType.CELL_REFERENCE: {
         let image

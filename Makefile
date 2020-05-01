@@ -11,7 +11,7 @@ test: ## Run tests
 	@npm run test
 
 test-ci: ## Separate test configuration for CI environment
-	@npm run test:ci
+	@npm run test
 
 check: typecheck test ## Check whether code is working correctly (types + specs)
 

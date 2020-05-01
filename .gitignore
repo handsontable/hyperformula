@@ -11,6 +11,7 @@ docs/.vuepress/api-sidebar.json
 typedoc/
 es/
 lib/
+test-jasmine/
 node_modules/
 typings/
 

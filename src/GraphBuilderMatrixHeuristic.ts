@@ -64,7 +64,6 @@ export class GraphBuilderMatrixHeuristic {
   constructor(
     private readonly dependencyGraph: DependencyGraph,
     private readonly columnSearch: ColumnSearchStrategy,
-    private readonly dependencies: Map<Vertex, CellDependency[]>,
     private readonly threshold: number,
     private readonly cellContentParser: CellContentParser,
   ) {

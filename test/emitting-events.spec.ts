@@ -7,7 +7,7 @@ import { adr, detailedError } from './testUtils'
 describe('Events', () => {
   it('sheetAdded works', function() {
     const engine = HyperFormula.buildEmpty()
-    const handler = jest.fn()
+    const handler = jasmine.createSpy()
     
     engine.on(Events.SheetAdded, handler)
     engine.addSheet('FooBar')
@@ -21,7 +21,7 @@ describe('Events', () => {
       Sheet1: [['=Sheet2!A1']],
       Sheet2: [['42']],
     })
-    const handler = jest.fn()
+    const handler = jasmine.createSpy()
 
     engine.on(Events.SheetRemoved, handler)
     engine.removeSheet('Sheet2')
@@ -35,7 +35,7 @@ describe('Events', () => {
       Sheet1: [['=Sheet2!A1']],
       Sheet2: [['42']],
     })
-    const handler = jest.fn()
+    const handler = jasmine.createSpy()
 
     engine.on(Events.SheetRemoved, handler)
     engine.removeSheet('sheet2')
@@ -46,7 +46,7 @@ describe('Events', () => {
 
   it('sheetRenamed works', () => {
     const engine = HyperFormula.buildFromArray([[]])
-    const handler = jest.fn()
+    const handler = jasmine.createSpy()
 
     engine.on(Events.SheetRenamed, handler)
     engine.renameSheet(0, 'SomeNewName')
@@ -57,7 +57,7 @@ describe('Events', () => {
 
   it('sheetRenamed is not triggered when sheet didnt change', () => {
     const engine = HyperFormula.buildFromArray([[]])
-    const handler = jest.fn()
+    const handler = jasmine.createSpy()
 
     engine.on(Events.SheetRenamed, handler)
     engine.renameSheet(0, 'Sheet1')
@@ -67,10 +67,10 @@ describe('Events', () => {
 
   it('namedExpressionAdded works', () => {
     const engine = HyperFormula.buildEmpty()
-    const handler = jest.fn()
+    const handler = jasmine.createSpy()
 
     engine.on(Events.NamedExpressionAdded, handler)
-    engine.addNamedExpression('myName', 'foobarbaz')
+    engine.addNamedExpression('myName', 'foobarbaz', undefined)
 
     expect(handler).toHaveBeenCalledTimes(1)
     expect(handler).toHaveBeenCalledWith('myName', [new ExportedNamedExpressionChange('myName', 'foobarbaz')])
@@ -78,11 +78,11 @@ describe('Events', () => {
 
   it('namedExpressionRemoved works', () => {
     const engine = HyperFormula.buildEmpty()
-    engine.addNamedExpression('myName', 'foobarbaz')
-    const handler = jest.fn()
+    engine.addNamedExpression('myName', 'foobarbaz', undefined)
+    const handler = jasmine.createSpy()
 
     engine.on(Events.NamedExpressionRemoved, handler)
-    engine.removeNamedExpression('myName')
+    engine.removeNamedExpression('myName', undefined)
 
     expect(handler).toHaveBeenCalledTimes(1)
     expect(handler).toHaveBeenCalledWith('myName', [])
@@ -90,21 +90,21 @@ describe('Events', () => {
 
   it('namedExpressionRemoved is not triggered if there was nothing to remove', () => {
     const engine = HyperFormula.buildEmpty()
-    const handler = jest.fn()
+    const handler = jasmine.createSpy()
 
     engine.on(Events.NamedExpressionRemoved, handler)
-    engine.removeNamedExpression('myName')
+    engine.removeNamedExpression('myName', undefined)
 
-    expect(handler).toHaveBeenCalledTimes(0)
+    expect(handler).not.toHaveBeenCalled()
   })
 
   it('namedExpressionRemoved contains actual named expression name', () => {
     const engine = HyperFormula.buildEmpty()
-    engine.addNamedExpression('myName', 'foobarbaz')
-    const handler = jest.fn()
+    engine.addNamedExpression('myName', 'foobarbaz', undefined)
+    const handler = jasmine.createSpy()
 
     engine.on(Events.NamedExpressionRemoved, handler)
-    engine.removeNamedExpression('MYNAME')
+    engine.removeNamedExpression('MYNAME', undefined)
 
     expect(handler).toHaveBeenCalledTimes(1)
     expect(handler).toHaveBeenCalledWith('myName', [])
@@ -114,7 +114,7 @@ describe('Events', () => {
     const engine = HyperFormula.buildFromArray([
       ['42']
     ])
-    const handler = jest.fn()
+    const handler = jasmine.createSpy()
 
     engine.on(Events.ValuesUpdated, handler)
     engine.setCellContents(adr('A1'), [['43']])
@@ -127,7 +127,7 @@ describe('Events', () => {
     const engine = HyperFormula.buildFromArray([
       ['42']
     ])
-    const handler = jest.fn()
+    const handler = jasmine.createSpy()
 
     engine.on(Events.ValuesUpdated, handler)
     engine.setCellContents(adr('A1'), [['42']])
@@ -140,7 +140,7 @@ describe('Events', () => {
 describe('Subscribing only once', () => {
   it('works', function() {
     const engine = HyperFormula.buildEmpty()
-    const handler = jest.fn()
+    const handler = jasmine.createSpy()
 
     engine.once(Events.SheetAdded, handler)
     engine.addSheet('FooBar1')
@@ -153,7 +153,7 @@ describe('Subscribing only once', () => {
 describe('Unsubsribing', () => {
   it('works', function() {
     const engine = HyperFormula.buildEmpty()
-    const handler = jest.fn()
+    const handler = jasmine.createSpy()
     engine.on(Events.SheetAdded, handler)
     engine.addSheet('FooBar1')
 

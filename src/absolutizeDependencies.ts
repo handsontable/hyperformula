@@ -3,10 +3,9 @@
  * Copyright (c) 2020 Handsoncode. All rights reserved.
  */
 
-import {AbsoluteCellRange, AbsoluteColumnRange, AbsoluteRowRange} from './AbsoluteCellRange'
 import {SimpleCellAddress} from './Cell'
 import {CellDependency} from './CellDependency'
-import {RelativeDependency, AddressDependency, CellRangeDependency, ColumnRangeDependency, RowRangeDependency} from './parser'
+import {RelativeDependency} from './parser'
 
 /**
  * Converts dependencies from maybe relative addressing to absolute addressing.
