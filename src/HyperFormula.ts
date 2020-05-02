@@ -1580,9 +1580,11 @@ export class HyperFormula implements TypedEmitter {
    *  ['40', '30', '20']
    * ]);
    *
+   * // create cell range
+   * const range = new AbsoluteCellRange({ col: 0, row: 0, sheet: 0 }, { col: 1, row: 1, sheet: 0 });
+   *
    * // returns cell formulas of a given range only:
    * // [ [ '=SUM(1:2)', undefined ], [ undefined, undefined ] ]
-   * const range = new AbsoluteCellRange({ col: 0, row: 0, sheet: 0 }, { col: 1, row: 1, sheet: 0 });
    * const rangeFormulas = hfInstance.getRangeFormulas(range);
    * ```
    *
@@ -2089,7 +2091,7 @@ export class HyperFormula implements TypedEmitter {
    * ]);
    *
    * // should return 'VALUE', the cell of given coordinates is of this type
-   * const cellType = hfInstance.getCellType({ sheet: 0, col: 0, row: 1 });
+   * const cellType = hfInstance.getCellType({ sheet: 0, col: 1, row: 0 });
    * ```
    *
    * @category Cell
@@ -2113,7 +2115,7 @@ export class HyperFormula implements TypedEmitter {
    * ]);
    *
    * // should return true since the selcted cell contains a simple value
-   * const isSimpleValue = hfInstance.doesCellHaveSimpleValue({ sheet: 0, col: 0, row: 1 });
+   * const isSimpleValue = hfInstance.doesCellHaveSimpleValue({ sheet: 0, col: 1, row: 0 });
    * ```
    *
    * @category Cell
