@@ -1159,7 +1159,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * // should return a list of cells which values changed after the operation,
    * // their absolute addresses and new values, in this example it will return:
-   * // [{ 
+   * // [{
    * //   address: { sheet: 0, col: 1, row: 0 },
    * //   newValue: DetailedCellError { error: [CellError], value: '#REF!' }
    * //  }];
@@ -1193,13 +1193,14 @@ export class HyperFormula implements TypedEmitter {
    * ]);
    *
    * // choose the coordinates and assign them to a variable
-   * const coordinates = { col: 1, row: 0, sheet: 0 }, 1, 1, { col: 3, row: 0, sheet: 0 };
+   * const source = { col: 1, row: 0, sheet: 0 };
+   * const destination = { col: 3, row: 0, sheet: 0 };
    *
    * // should return true for this example
    * // it is possible to move a block of width 1 and height 1
    * // from the corner: column 1 and row 0 of sheet 0
    * // into destination corner: column 3, row 0 of sheet 0
-   * const isMovable = hfInstance.isItPossibleToMoveCells(coordinates);
+   * const isMovable = hfInstance.isItPossibleToMoveCells(source, 1, 1, destination);
    * ```
    * @category Cell
    */
@@ -1566,7 +1567,7 @@ export class HyperFormula implements TypedEmitter {
    * @example
    * ```js
    * // remember to import AbsoluteCellRange
-   * import {AbsoluteCellRange} from 'hyperformula';
+   * import { AbsoluteCellRange } from 'hyperformula';
    *
    * // build from arrays, only one sheet
    * const hfInstance = HyperFormula.buildFromArray([
@@ -1603,7 +1604,7 @@ export class HyperFormula implements TypedEmitter {
    * @example
    * ```js
    * // remember to import AbsoluteCellRange
-   * import {AbsoluteCellRange} from 'hyperformula';
+   * import { AbsoluteCellRange } from 'hyperformula';
    *
    * // build from arrays, only one sheet
    * const hfInstance = HyperFormula.buildFromArray([
@@ -1612,9 +1613,12 @@ export class HyperFormula implements TypedEmitter {
    *  ['7'], ['8'],
    * ]);
    *
+   * // create cell range
+   * const range = new AbsoluteCellRange({ col: 0, row: 0, sheet: 0 }, { col: 1, row: 1, sheet: 0 });
+   *
    * // should return serialized cell values for the given range:
    * // [ [ '=SUM(1:2)', Symbol() ], [ 2, Symbol() ] ]
-   * const rangeSerialized = hfInstance.getRangeSerialized(new AbsoluteCellRange({ col: 0, row: 0, sheet: 0 }, { col: 1, row: 1, sheet: 0 }));
+   * const rangeSerialized = hfInstance.getRangeSerialized(range);
    * ```
    *
    * @category Range
