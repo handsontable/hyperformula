@@ -364,8 +364,7 @@ export class HyperFormula implements TypedEmitter {
    * @example
    * ```js
    * const hfInstance = HyperFormula.buildFromArray([
-   *  ['1'],
-   *  ['2'],
+   *  ['1', '2'],
    * ]);
    *
    * // get value of the cell, should be '1'
@@ -418,8 +417,7 @@ export class HyperFormula implements TypedEmitter {
    * @example
    * ```js
    * const hfInstance = HyperFormula.buildFromArray([
-   *  ['=SUM(1,2,3)'],
-   *  ['0'],
+   *  ['=SUM(1,2,3)', '0'],
    * ]);
    *
    * // should return serialized content of the cell, '=SUM(1,2,3)' for this example
@@ -819,8 +817,7 @@ export class HyperFormula implements TypedEmitter {
    * @example
    * ```js
    * const hfInstance = HyperFormula.buildFromArray([
-   *  ['1'],
-   *  ['2'],
+   *  ['1', '2'],
    * ]);
    *
    * // choose the address and assign it to a variable
@@ -2193,7 +2190,7 @@ export class HyperFormula implements TypedEmitter {
    * ]);
    *
    * // should return 'NUMBER', cell value of provided coordinates is a number
-   * hfInstance.getCellValueType({ sheet: 0, col: 0, row: 0 });
+   * const cellValue = hfInstance.getCellValueType({ sheet: 0, col: 0, row: 0 });
    * ```
    *
    * @category Cell
