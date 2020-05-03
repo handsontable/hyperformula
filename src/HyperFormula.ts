@@ -1812,7 +1812,7 @@ export class HyperFormula implements TypedEmitter {
    * ```js
    * const hfInstance = HyperFormula.buildFromSheets({
    *  MySheet1: [
-   *   ['1'],
+   *   ['=SUM(MySheet2!A1:A2)'],
    *   ['2'],
    *  ],
    *  MySheet2: [
@@ -1983,6 +1983,24 @@ export class HyperFormula implements TypedEmitter {
   /**
    * List all sheet names.
    * Returns an array of sheet names as strings.
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromSheets({
+   *  MySheet1: [
+   *   ['1'],
+   *   ['2'],
+   *  ],
+   *  MySheet2: [
+   *   ['10'],
+   *   ['20'],
+   *  ],
+   * });
+   *
+   * // should return all sheets names
+   * // ['MySheet1', 'MySheet2'] for this example
+   * const sheetNames = hfInstance.getSheetNames();
+   * ```
    *
    * @category Sheet
    */
