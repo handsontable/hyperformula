@@ -89,7 +89,7 @@ export class Exporter {
   }
 
   public exportValue(value: InternalCellValue): CellValue {
-    if (this.config.smartRounding && typeof value == 'number' && !Number.isInteger(value)) {
+    if (this.config.smartRounding && typeof value == 'number') {
       return this.cellValueRounding(value)
     } else if (value instanceof CellError) {
       return this.detailedError(value)
@@ -103,7 +103,11 @@ export class Exporter {
   }
 
   private cellValueRounding(value: number): number {
-    const placesMultiplier = Math.pow(10, this.config.precisionRounding)
+    if(Number.isInteger(value)) {
+      return value
+    }
+    const magnitudeMultiplierExponent = Math.floor(Math.log10(Math.abs(value)))
+    const placesMultiplier = Math.pow(10, this.config.precisionRounding - magnitudeMultiplierExponent)
     if (value < 0) {
       return -Math.round(-value * placesMultiplier) / placesMultiplier
     } else {
