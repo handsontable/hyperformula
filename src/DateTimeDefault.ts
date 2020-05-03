@@ -8,11 +8,16 @@ import {Maybe} from './Maybe'
 
 export function defaultParseToDateTime(dateTimeString: string, dateFormat: string, timeFormat: string): Maybe<DateTime> {
   dateTimeString = dateTimeString.replace(/\s\s+/g, ' ').trim().toLowerCase()
-  let ampmtoken: string | undefined = dateTimeString.substring(dateTimeString.length - 2)
+  let ampmtoken: Maybe<string> = dateTimeString.substring(dateTimeString.length - 2)
   if (ampmtoken === 'am' || ampmtoken === 'pm') {
     dateTimeString = dateTimeString.substring(0, dateTimeString.length - 2).trim()
   } else {
-    ampmtoken = undefined
+    ampmtoken = dateTimeString.substring(dateTimeString.length - 1)
+    if(ampmtoken === 'a' || ampmtoken === 'p') {
+      dateTimeString = dateTimeString.substring(0, dateTimeString.length - 1).trim()
+    } else {
+      ampmtoken = undefined
+    }
   }
   const dateItems = dateTimeString.split(/[ /.-]/g)
   const timeItems = dateItems[dateItems.length - 1].split(':')
@@ -39,15 +44,19 @@ export function defaultParseToDateTime(dateTimeString: string, dateFormat: strin
 
 export function defaultParseToTime(timeItems: string[], timeFormat: string): Maybe<SimpleTime> {
   timeFormat = timeFormat.toLowerCase()
-  if (timeFormat.length >= 1 && timeFormat.endsWith('a')) {
+  if (timeFormat.endsWith('am/pm')) {
+    timeFormat = timeFormat.substring(0, timeFormat.length - 5).trim()
+  } else if (timeFormat.endsWith('a/p')) {
+    timeFormat = timeFormat.substring(0, timeFormat.length - 3).trim()
+  } else if (timeFormat.endsWith('a')) {
     timeFormat = timeFormat.substring(0, timeFormat.length - 1).trim()
   }
   const formatItems = timeFormat.split(':')
   let ampm = undefined
-  if (timeItems[timeItems.length - 1] === 'am') {
+  if (timeItems[timeItems.length - 1] === 'am' || timeItems[timeItems.length - 1] === 'a') {
     ampm = false
     timeItems.pop()
-  } else if (timeItems[timeItems.length - 1] === 'pm') {
+  } else if (timeItems[timeItems.length - 1] === 'pm' || timeItems[timeItems.length - 1] === 'p') {
     ampm = true
     timeItems.pop()
   }

@@ -52,8 +52,10 @@ describe('Date helpers', () => {
   it('#stringToDateNumber am/pm', () => {
     const dateHelper = new DateTimeHelper(new Config())
     expect(dateHelper.dateStringToDateNumber('03:00 am')).toBe(0.125)
+    expect(dateHelper.dateStringToDateNumber('03:00 a')).toBe(0.125)
     expect(dateHelper.dateStringToDateNumber('03:00 pm')).toBe(0.625)
     expect(dateHelper.dateStringToDateNumber('12:00 pm')).toBe(0.5)
+    expect(dateHelper.dateStringToDateNumber('12:00 p')).toBe(0.5)
     expect(dateHelper.dateStringToDateNumber('00:00 pm')).toBe(0.5)
     expect(dateHelper.dateStringToDateNumber('12:59 pm')).toBe(0.5409722222222222)
     expect(dateHelper.dateStringToDateNumber('12:00 am')).toBe(0.0)
