@@ -363,7 +363,6 @@ export class HyperFormula implements TypedEmitter {
    *
    * @example
    * ```js
-   * // build from arrays, only one sheet
    * const hfInstance = HyperFormula.buildFromArray([
    *  ['1'],
    *  ['2'],
@@ -394,7 +393,6 @@ export class HyperFormula implements TypedEmitter {
    *
    * @example
    * ```js
-   * // build from arrays, only one sheet
    * const hfInstance = HyperFormula.buildFromArray([
    *  ['=SUM(1,2,3)', '0'],
    * ]);
@@ -419,7 +417,6 @@ export class HyperFormula implements TypedEmitter {
    *
    * @example
    * ```js
-   * // build from arrays, only one sheet
    * const hfInstance = HyperFormula.buildFromArray([
    *  ['=SUM(1,2,3)'],
    *  ['0'],
@@ -474,7 +471,6 @@ export class HyperFormula implements TypedEmitter {
    *
    * @example
    * ```js
-   * // build from arrays, only one sheet
    * const hfInstance = HyperFormula.buildFromArray([
    *  ['0', '=SUM(1,2,3)', '=A1'],
    *  ['1', '=TEXT(A2, "0.0%")', '=C1'],
@@ -507,7 +503,6 @@ export class HyperFormula implements TypedEmitter {
    *
    * @example
    * ```js
-   * // build from arrays, only one sheet
    * const hfInstance = HyperFormula.buildFromArray([
    *  ['0', '=SUM(1,2,3)', '=A1'],
    *  ['1', '=TEXT(A2, "0.0%")', '=C1'],
@@ -537,7 +532,6 @@ export class HyperFormula implements TypedEmitter {
    *
    * @example
    * ```js
-   * // build from arrays, only one sheet
    * const hfInstance = HyperFormula.buildFromArray([
    *  ['1'],
    *  ['2'],
@@ -563,7 +557,6 @@ export class HyperFormula implements TypedEmitter {
    *
    * @example
    * ```js
-   * // build from sheets, two of them
    * const hfInstance = HyperFormula.buildFromSheets({
    *   Sheet1: [
    *    ['1', '2', '=Sheet2!$A1'],
@@ -594,7 +587,6 @@ export class HyperFormula implements TypedEmitter {
    *
    * @example
    * ```js
-   * // build from arrays, only one sheet
    * const hfInstance = HyperFormula.buildFromArray([
    *  ['1', '=A1+10', '3']
    * ]);
@@ -615,7 +607,6 @@ export class HyperFormula implements TypedEmitter {
    *
    * @example
    * ```js
-   * // build from arrays, only one sheet
    * const hfInstance = HyperFormula.buildFromArray([
    *  ['1', '2', '=A1+10']
    * ]);
@@ -636,7 +627,6 @@ export class HyperFormula implements TypedEmitter {
    *
    * @example
    * ```js
-   * // build from arrays, only one sheet
    * const hfInstance = HyperFormula.buildFromArray([
    *  ['1', '2', '=A1+10']
    * ]);
@@ -659,7 +649,6 @@ export class HyperFormula implements TypedEmitter {
    *
    * @example
    * ```js
-   * // build from arrays, only one sheet
    * const hfInstance = HyperFormula.buildFromArray([['1'], ['2'], ['3']]);
    *
    * // add a config param, for example maxColumns,
@@ -742,7 +731,6 @@ export class HyperFormula implements TypedEmitter {
    *
    * @example
    * ```js
-   * // build from arrays, only one sheet
    * const hfInstance = HyperFormula.buildFromArray([['1'], ['2'], ['3']]);
    *
    * // perform CRUD operation, for example remove the second row
@@ -770,7 +758,6 @@ export class HyperFormula implements TypedEmitter {
    *
    * @example
    * ```js
-   * // build from arrays, only one sheet
    * const hfInstance = HyperFormula.buildFromArray([['1'], ['2'], ['3']]);
    *
    * // perform CRUD operation, for example remove the second row
@@ -831,7 +818,6 @@ export class HyperFormula implements TypedEmitter {
    *
    * @example
    * ```js
-   * // build from arrays, only one sheet
    * const hfInstance = HyperFormula.buildFromArray([
    *  ['1'],
    *  ['2'],
@@ -874,13 +860,12 @@ export class HyperFormula implements TypedEmitter {
    *
    * @example
    * ```js
-   * // build from arrays, only one sheet
    * const hfInstance = HyperFormula.buildFromArray([
    *  ['1', '2', '=A1'],
    * ]);
    *
-   * // should set the content, returns: [{ 
-   * //   address: { sheet: 0, col: 3, row: 0 }, 
+   * // should set the content, returns: [{
+   * //   address: { sheet: 0, col: 3, row: 0 },
    * //   newValue: 2,
    * // }]
    * const changes = hfInstance.setCellContents({ col: 3, row: 0, sheet: 0 }, [['=B1']]);
@@ -904,7 +889,6 @@ export class HyperFormula implements TypedEmitter {
    *
    * @example
    * ```js
-   * // build from arrays, only one sheet
    * const hfInstance = HyperFormula.buildFromArray([
    *  ['1', '2', '3'],
    * ]);
@@ -943,7 +927,6 @@ export class HyperFormula implements TypedEmitter {
    *
    * @example
    * ```js
-   * // build from arrays, only one sheet
    * const hfInstance = HyperFormula.buildFromArray([
    *  ['1'],
    *  ['1'],
@@ -972,7 +955,6 @@ export class HyperFormula implements TypedEmitter {
    *
    * @example
    * ```js
-   * // build from arrays, only one sheet
    * const hfInstance = HyperFormula.buildFromArray([
    *  ['1'],
    *  ['1'],
@@ -1012,7 +994,6 @@ export class HyperFormula implements TypedEmitter {
    *
    * @example
    * ```js
-   * // build from arrays, only one sheet
    * const hfInstance = HyperFormula.buildFromArray([
    *  ['1'],
    *  ['1'],
@@ -1040,7 +1021,6 @@ export class HyperFormula implements TypedEmitter {
    *
    * @example
    * ```js
-   * // build from arrays, only one sheet
    * const hfInstance = HyperFormula.buildFromArray([
    *  ['1', '2'],
    * ]);
@@ -1080,7 +1060,6 @@ export class HyperFormula implements TypedEmitter {
    *
    * @example
    * ```js
-   * // build from arrays, only one sheet
    * const hfInstance = HyperFormula.buildFromArray([
    *  ['=RAND()', '42'],
    * ]);
@@ -1113,7 +1092,6 @@ export class HyperFormula implements TypedEmitter {
    *
    * @example
    * ```js
-   * // build from arrays, only one sheet
    * const hfInstance = HyperFormula.buildFromArray([
    *  ['1', '2'],
    * ]);
@@ -1152,7 +1130,6 @@ export class HyperFormula implements TypedEmitter {
    *
    * @example
    * ```js
-   * // build from arrays, only one sheet
    * const hfInstance = HyperFormula.buildFromArray([
    *  ['0', '=SUM(1,2,3)', '=A1'],
    * ]);
@@ -1187,7 +1164,6 @@ export class HyperFormula implements TypedEmitter {
    *
    * @example
    * ```js
-   * // build from arrays, only one sheet
    * const hfInstance = HyperFormula.buildFromArray([
    *  ['1', '2'],
    * ]);
@@ -1232,7 +1208,6 @@ export class HyperFormula implements TypedEmitter {
    *
    * @example
    * ```js
-   * // build from arrays, only one sheet
    * const hfInstance = HyperFormula.buildFromArray([
    *  ['=RAND()', '42'],
    * ]);
@@ -1268,7 +1243,6 @@ export class HyperFormula implements TypedEmitter {
    *
    * @example
    * ```js
-   * // build from arrays, only one sheet
    * const hfInstance = HyperFormula.buildFromArray([
    *  ['1'],
    *  ['2']
@@ -1307,7 +1281,6 @@ export class HyperFormula implements TypedEmitter {
    *
    * @example
    * ```js
-   * // build from arrays, only one sheet
    * const hfInstance = HyperFormula.buildFromArray([
    *  ['1'],
    *  ['2']
@@ -1338,7 +1311,6 @@ export class HyperFormula implements TypedEmitter {
    *
    * @example
    * ```js
-   * // build from arrays, only one sheet
    * const hfInstance = HyperFormula.buildFromArray([
    *  ['1', '2']
    * ]);
@@ -1376,7 +1348,6 @@ export class HyperFormula implements TypedEmitter {
    *
    * @example
    * ```js
-   * // build from arrays, only one sheet
    * const hfInstance = HyperFormula.buildFromArray([
    *  ['1', '2', '3', '=RAND()', '=SUM(A1:C1)']
    * ]);
@@ -1412,7 +1383,6 @@ export class HyperFormula implements TypedEmitter {
    *
    * @example
    * ```js
-   * // build from arrays, only one sheet
    * const hfInstance = HyperFormula.buildFromArray([
    *  ['1', '2']
    * ]);
@@ -1440,7 +1410,6 @@ export class HyperFormula implements TypedEmitter {
    *
    * @example
    * ```js
-   * // build from arrays, only one sheet
    * const hfInstance = HyperFormula.buildFromArray([
    *  ['1', '2']
    * ]);
@@ -1474,7 +1443,6 @@ export class HyperFormula implements TypedEmitter {
    *
    * @example
    * ```js
-   * // build from arrays, only one sheet
    * const hfInstance = HyperFormula.buildFromArray([
    *  ['1', '2']
    * ]);
@@ -1641,7 +1609,6 @@ export class HyperFormula implements TypedEmitter {
    *
    * @example
    * ```js
-   * // build from arrays, two sheets
    * const hfInstance = HyperFormula.buildFromSheets({
    *  MySheet1: [
    *   ['1'],
@@ -1679,7 +1646,6 @@ export class HyperFormula implements TypedEmitter {
    *
    * @example
    * ```js
-   * // build from arrays, two sheets
    * const hfInstance = HyperFormula.buildFromSheets({
    *  MySheet1: [
    *   ['1'],
@@ -1716,7 +1682,6 @@ export class HyperFormula implements TypedEmitter {
    *
    * @example
    * ```js
-   * // build from arrays, two sheets
    * const hfInstance = HyperFormula.buildFromSheets({
    *  MySheet1: [
    *   ['1'],
@@ -1757,7 +1722,6 @@ export class HyperFormula implements TypedEmitter {
    *
    * @example
    * ```js
-   * // build from arrays, two sheets
    * const hfInstance = HyperFormula.buildFromSheets({
    *  MySheet1: [
    *   ['1'],
@@ -1793,7 +1757,6 @@ export class HyperFormula implements TypedEmitter {
    *
    * @example
    * ```js
-   * // build from arrays, two sheets
    * const hfInstance = HyperFormula.buildFromSheets({
    *  MySheet1: [
    *   ['1'],
@@ -1834,7 +1797,6 @@ export class HyperFormula implements TypedEmitter {
    *
    * @example
    * ```js
-   * // build from arrays, two sheets
    * const hfInstance = HyperFormula.buildFromSheets({
    *  MySheet1: [
    *   ['1'],
@@ -1869,7 +1831,6 @@ export class HyperFormula implements TypedEmitter {
    *
    * @example
    * ```js
-   * // build from arrays, two sheets
    * const hfInstance = HyperFormula.buildFromSheets({
    *  MySheet1: [
    *   ['1'],
@@ -1911,7 +1872,6 @@ export class HyperFormula implements TypedEmitter {
    *
    * @example
    * ```js
-   * // build from arrays, two sheets
    * const hfInstance = HyperFormula.buildFromSheets({
    *  MySheet1: [
    *   ['1'],
@@ -1945,7 +1905,6 @@ export class HyperFormula implements TypedEmitter {
    *
    * @example
    * ```js
-   * // build from arrays, two sheets
    * const hfInstance = HyperFormula.buildEmpty();
    *
    * // should return { sheet: 0, col: 0, row: 0 }
@@ -1966,7 +1925,6 @@ export class HyperFormula implements TypedEmitter {
    *
    * @example
    * ```js
-   * // build from arrays, two sheets
    * const hfInstance = HyperFormula.buildEmpty();
    *
    * // should return 'B2'
@@ -1986,7 +1944,6 @@ export class HyperFormula implements TypedEmitter {
    *
    * @example
    * ```js
-   * // build from arrays, two sheets
    * const hfInstance = HyperFormula.buildFromSheets({
    *  MySheet1: [
    *   ['1'],
@@ -2025,7 +1982,6 @@ export class HyperFormula implements TypedEmitter {
    *
    * @example
    * ```js
-   * // build from arrays, two sheets
    * const hfInstance = HyperFormula.buildFromSheets({
    *  MySheet1: [
    *   ['1'],
@@ -2054,7 +2010,6 @@ export class HyperFormula implements TypedEmitter {
    *
    * @example
    * ```js
-   * // build from arrays, two sheets
    * const hfInstance = HyperFormula.buildFromSheets({
    *  MySheet1: [
    *   ['1'],
@@ -2086,7 +2041,6 @@ export class HyperFormula implements TypedEmitter {
    *
    * @example
    * ```js
-   * // build from arrays, two sheets
    * const hfInstance = HyperFormula.buildFromArray([
    *  ['1', '2']
    * ]);
@@ -2110,7 +2064,6 @@ export class HyperFormula implements TypedEmitter {
    *
    * @example
    * ```js
-   * // build from arrays, two sheets
    * const hfInstance = HyperFormula.buildFromArray([
    *  ['1', '2']
    * ]);
@@ -2133,7 +2086,6 @@ export class HyperFormula implements TypedEmitter {
    *
    * @example
    * ```js
-   * // build from arrays, two sheets
    * const hfInstance = HyperFormula.buildFromArray([
    *  ['=SUM(A2:A3)', '2']
    * ]);
@@ -2156,7 +2108,6 @@ export class HyperFormula implements TypedEmitter {
    *
    * @example
    * ```js
-   * // build from arrays, two sheets
    * const hfInstance = HyperFormula.buildFromArray([
    *   [null, '1'],
    *   [null, '2'],
@@ -2182,7 +2133,6 @@ export class HyperFormula implements TypedEmitter {
    *
    * @example
    * ```js
-   * // build from arrays, only one sheet
    * const hfInstance = HyperFormula.buildFromArray([['{=TRANSPOSE(B1:B1)}']])
    *
    * // should return true, cell of provided coordinates is a part of a matrix
@@ -2205,7 +2155,6 @@ export class HyperFormula implements TypedEmitter {
    *
    * @example
    * ```js
-   * // build from arrays, only one sheet
    * const hfInstance = HyperFormula.buildFromArray([
    *  ['1', '2']
    * ]);
@@ -2227,7 +2176,6 @@ export class HyperFormula implements TypedEmitter {
    *
    * @example
    * ```js
-   * // build from arrays, only one sheet
    * const hfInstance = HyperFormula.buildFromArray([
    *  ['1', '2']
    * ]);
@@ -2254,7 +2202,6 @@ export class HyperFormula implements TypedEmitter {
    *
    * @example
    * ```js
-   * // build from arrays, two sheets
    * const hfInstance = HyperFormula.buildFromSheets({
    *  MySheet1: [
    *   ['1'],
@@ -2289,7 +2236,6 @@ export class HyperFormula implements TypedEmitter {
    *
    * @example
    * ```js
-   * // build with no sheets
    * const hfInstance = HyperFormula.buildEmpty();
    *
    * // Multiple operations in a single callback will trigger evaluation only once
@@ -2326,7 +2272,6 @@ export class HyperFormula implements TypedEmitter {
    *
    * @example
    * ```js
-   * // build with no sheets
    * const hfInstance = HyperFormula.buildEmpty();
    *
    * // Similar to batch() but operations are not within a callback,
@@ -2358,7 +2303,6 @@ export class HyperFormula implements TypedEmitter {
    *
    * @example
    * ```js
-   * // build with no sheets
    * const hfInstance = HyperFormula.buildEmpty();
    *
    * // Similar to batch() but operations are not within a callback,
@@ -2388,7 +2332,6 @@ export class HyperFormula implements TypedEmitter {
    *
    * @example
    * ```js
-   * // build with no sheets
    * const hfInstance = HyperFormula.buildEmpty();
    *
    * // suspend the evaluation
@@ -2423,7 +2366,6 @@ export class HyperFormula implements TypedEmitter {
    *
    * @example
    * ```js
-   * // build from arrays, one sheet
    * const hfInstance = HyperFormula.buildFromArray([
    *  ['42'],
    * ]);
@@ -2451,7 +2393,6 @@ export class HyperFormula implements TypedEmitter {
    *
    * @example
    * ```js
-   * // build from arrays, one sheet
    * const hfInstance = HyperFormula.buildFromArray([
    *  ['42'],
    * ]);
@@ -2483,7 +2424,6 @@ export class HyperFormula implements TypedEmitter {
    *
    * @example
    * ```js
-   * // build from arrays, one sheet
    * const hfInstance = HyperFormula.buildFromArray([
    *  ['42'],
    * ]);
@@ -2521,7 +2461,6 @@ export class HyperFormula implements TypedEmitter {
    *
    * @example
    * ```js
-   * // build from arrays, one sheet
    * const hfInstance = HyperFormula.buildFromArray([
    *  ['42'],
    * ]);
@@ -2552,7 +2491,6 @@ export class HyperFormula implements TypedEmitter {
    *
    * @example
    * ```js
-   * // build from arrays, one sheet
    * const hfInstance = HyperFormula.buildFromArray([
    *  ['42'],
    * ])
@@ -2586,7 +2524,6 @@ export class HyperFormula implements TypedEmitter {
    *
    * @example
    * ```js
-   * // build from arrays, one sheet
    * const hfInstance = HyperFormula.buildFromArray([
    *  ['42'],
    *  ['50'],
@@ -2615,7 +2552,6 @@ export class HyperFormula implements TypedEmitter {
    *
    * @example
    * ```js
-   * // build from arrays, one sheet
    * const hfInstance = HyperFormula.buildFromArray([
    *  ['42'],
    *  ['50'],
@@ -2646,7 +2582,6 @@ export class HyperFormula implements TypedEmitter {
    *
    * @example
    * ```js
-   * // build from sheets, two of them
    * const hfInstance = HyperFormula.buildFromSheets({
    *  Sheet1: [['22']],
    *  Sheet2: [['58']],
@@ -2718,7 +2653,6 @@ export class HyperFormula implements TypedEmitter {
    *
    * @example
    * ```js
-   * // build with no sheets
    * const hfInstance = HyperFormula.buildEmpty();
    *
    * // subscribe to a 'sheetAdded', pass a simple handler
@@ -2743,7 +2677,6 @@ export class HyperFormula implements TypedEmitter {
    *
    * @example
    * ```js
-   * // build with no sheets
    * const hfInstance = HyperFormula.buildEmpty();
    *
    * // subscribe to a 'sheetAdded', pass a simple handler
@@ -2769,7 +2702,6 @@ export class HyperFormula implements TypedEmitter {
    *
    * @example
    * ```js
-   * // build with no sheets
    * const hfInstance = HyperFormula.buildEmpty();
    *
    * // define a simple function to be called upon emitting an event
