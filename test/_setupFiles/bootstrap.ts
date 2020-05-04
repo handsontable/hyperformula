@@ -23,9 +23,11 @@ Config.defaultConfig = Object.assign({}, Config.defaultConfig, {
 })
 
 beforeEach(() => {
-  // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
-  // @ts-ignore
-  jasmine.setDefaultSpyStrategy((and: unknown) => and.callThrough())
+  try {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+    // @ts-ignore
+    jasmine.setDefaultSpyStrategy((and: unknown) => and.callThrough())
+  } catch (e) {}
 
   unregisterAllLanguages()
 
@@ -35,8 +37,10 @@ beforeEach(() => {
 })
 
 beforeAll(() => {
-  jasmine.addMatchers({
-    ...toContainEqualMatcher,
-    ...toMatchObjectMatcher,
-  })
+  try {
+    jasmine.addMatchers({
+      ...toContainEqualMatcher,
+      ...toMatchObjectMatcher,
+    })
+  } catch (e) {}
 })
