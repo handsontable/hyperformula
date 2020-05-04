@@ -1,6 +1,15 @@
 import {HyperFormula} from '../src'
 import {adr} from './testUtils'
 
+function BigIntSupported(): boolean {
+  try {
+    BigInt(1)
+    return true
+  } catch (e) {
+    return false
+  }
+}
+
 describe( 'unsupported types should result in error', () => {
   it('should give parsing error #1', () => {
     // eslint-disable-next-line
@@ -61,10 +70,12 @@ describe( 'unsupported types should result in error', () => {
       ']')
   })
   it('should give parsing error #11', () => {
-    // eslint-disable-next-line
-    // @ts-ignore
-    expect( () => HyperFormula.buildFromArray([[BigInt(9007199254740991)]])
-    ).toThrowError('Unable to parse value: \"BigInt(9007199254740991)\"')
+    if(BigIntSupported()) {
+      // eslint-disable-next-line
+      // @ts-ignore
+      expect(() => HyperFormula.buildFromArray([[BigInt(9007199254740991)]])
+      ).toThrowError('Unable to parse value: \"BigInt(9007199254740991)\"')
+    }
   })
   it('should give parsing error for setCellContents', () => {
     const sheet = [
