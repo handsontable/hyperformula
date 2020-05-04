@@ -1,14 +1,14 @@
 import {HyperFormula} from '../src'
 import {adr} from './testUtils'
 
-function BigIntSupported(): boolean {
+const BigIntSupported = (function(): boolean {
   try {
-    BigInt(1)
-    return true
+    const bigint = BigInt(1)
+    return typeof bigint === 'bigint'
   } catch (e) {
     return false
   }
-}
+})()
 
 describe( 'unsupported types should result in error', () => {
   it('should give parsing error #1', () => {
