@@ -103,7 +103,7 @@ export class Exporter {
   }
 
   private cellValueRounding(value: number): number {
-    if(Number.isInteger(value)) {
+    if(value === 0) {
       return value
     }
     const magnitudeMultiplierExponent = Math.floor(Math.log10(Math.abs(value)))
