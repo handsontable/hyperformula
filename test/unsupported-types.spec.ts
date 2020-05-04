@@ -2,12 +2,7 @@ import {HyperFormula} from '../src'
 import {adr} from './testUtils'
 
 const BigIntSupported = (function(): boolean {
-  try {
-    const bigint = BigInt(1)
-    return typeof bigint === 'bigint'
-  } catch (e) {
-    return false
-  }
+  return typeof BigInt === 'function' && Object.prototype.hasOwnProperty.call(BigInt, 'asIntN') && Object.prototype.hasOwnProperty.call(BigInt, 'asUintN') && typeof BigInt(1) === 'bigint'
 })()
 
 describe( 'unsupported types should result in error', () => {
@@ -70,7 +65,7 @@ describe( 'unsupported types should result in error', () => {
       ']')
   })
   it('should give parsing error #11', () => {
-    if(BigIntSupported()) {
+    if(BigIntSupported) {
       // eslint-disable-next-line
       // @ts-ignore
       expect(() => HyperFormula.buildFromArray([[BigInt(9007199254740991)]])
