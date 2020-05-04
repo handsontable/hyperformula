@@ -44,7 +44,7 @@ import {Emitter, Events, Listeners, TypedEmitter} from './Emitter'
 import {BuildEngineFactory, EngineState} from './BuildEngineFactory'
 import {Sheet, Sheets} from './Sheet'
 import {SheetDimensions} from './_types'
-import { LicenseKeyValidityState } from './helpers/licenseKeyValidator'
+import {LicenseKeyValidityState} from './helpers/licenseKeyValidator'
 
 export type Index = [number, number]
 
