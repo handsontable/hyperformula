@@ -87,7 +87,8 @@ export function defaultStringifyDateTime(date: SimpleDateTime, formatArg: string
   let result = ''
   let minutes: boolean = false
 
-  const ampm = tokens.some( (token) => token.type === TokenType.FORMAT && (token.value === 'a' || token.value === 'A') )
+  const ampm = tokens.some( (token) => token.type === TokenType.FORMAT &&
+    (token.value === 'a' || token.value === 'A' || token.value === 'a/p' || token.value === 'A/P' || token.value === 'am/pm' || token.value === 'AM/PM') )
 
   for (const token of tokens){
     if (token.type === TokenType.FREE_TEXT) {
@@ -148,9 +149,23 @@ export function defaultStringifyDateTime(date: SimpleDateTime, formatArg: string
       }
 
       /* AM / PM */
+      case 'am/pm':
       case 'a':
-      case 'A': {
-       result += date.hour < 12 ? 'am' : 'pm'
+        {
+        result += date.hour < 12 ? 'am' : 'pm'
+        break
+      }
+      case 'a/p': {
+        result += date.hour < 12 ? 'a' : 'p'
+        break
+      }
+      case 'A/P': {
+        result += date.hour < 12 ? 'A' : 'P'
+        break
+      }
+      case 'A':
+      case 'AM/PM': {
+       result += date.hour < 12 ? 'AM' : 'PM'
        break
       }
       default:
