@@ -44,12 +44,21 @@ export function defaultParseToTime(timeItems: string[], timeFormat: string): May
   }
   const formatItems = timeFormat.split(':')
   let ampm = undefined
-  if (timeItems[timeItems.length - 1] === 'am') {
+  if (timeItems[timeItems.length - 1] === 'am' || timeItems[timeItems.length-1] === 'a') {
     ampm = false
     timeItems.pop()
-  } else if (timeItems[timeItems.length - 1] === 'pm') {
+  } else if (timeItems[timeItems.length - 1] === 'pm' || timeItems[timeItems.length-1] === 'p') {
     ampm = true
     timeItems.pop()
+  }
+  let fractionOfSecondPrecision: number = 0
+  if(formatItems.length >= 1 && formatItems[formatItems.length-1])
+  if(formatItems.length >= 2 && formatItems[formatItems.length-2]==='ss' && /^s*$/.test(formatItems[formatItems.length-1])) {
+    fractionOfSecondPrecision = formatItems[formatItems.length-1].length
+    formatItems.length--
+    if(formatItems.length+1 === timeFormat.length) {
+      timeItems = [...timeItems.slice(0,timeItems.length-2), timeItems[timeFormat.length-2] + '.' + timeItems[timeFormat.length-1]]
+    }
   }
   if (timeItems.length !== formatItems.length) {
     return undefined
@@ -80,10 +89,11 @@ export function defaultParseToTime(timeItems: string[], timeFormat: string): May
   const minute = Number(minuteString)
 
   const secondString = secondIndex !== -1 ? timeItems[secondIndex] : '0'
-  if (!/^\d+$/.test(secondString)) {
+  if (!/^\d+(\.\d+)?$/.test(secondString)) {
     return undefined
   }
-  const second = Number(secondString)
+  let second = Number(secondString)
+  second = Math.round(second * Math.pow(10, fractionOfSecondPrecision))/Math.pow(10, fractionOfSecondPrecision)
 
   return {hour, minute, second}
 }
