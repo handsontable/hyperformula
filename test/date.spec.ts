@@ -45,8 +45,16 @@ describe('Date helpers', () => {
     expect(dateHelper.dateStringToDateNumber('48:00')).toBe(2)
     expect(dateHelper.dateStringToDateNumber('00:01')).toBe(0.0006944444444444445)
     expect(dateHelper.dateStringToDateNumber('00:00:00')).toBe(0)
+    expect(dateHelper.dateStringToDateNumber('00:00:00.1')).toBe(0)
     expect(dateHelper.dateStringToDateNumber('00:00:01')).toBe(0.000011574074074074073)
     expect(dateHelper.dateStringToDateNumber('00:179:60')).toBe(0.125)
+  })
+
+  it('#stringToDateNumber - fraction of seconds', () => {
+    const dateHelper = new DateTimeHelper(new Config({timeFormats: ['hh:mm:ss.ss']}))
+    expect(dateHelper.dateStringToDateNumber('00:00:00.1')).toBeCloseTo(0.0000011574074074074074)
+    expect(dateHelper.dateStringToDateNumber('00:00:00.01')).toBeCloseTo(1.1574074074074073e-7)
+    expect(dateHelper.dateStringToDateNumber('00:00:00.001')).toBeCloseTo(0)
   })
 
   it('#stringToDateNumber am/pm', () => {

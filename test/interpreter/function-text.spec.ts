@@ -81,10 +81,20 @@ describe('Text', () => {
       [
         '8/8/2018 00:30',
         '=TEXT(A2, "hh:mm A")',
+      ],
+        [
+        '8/8/2018 00:30',
+          '=TEXT(A3, "hh:mm am/pm")',
+        ],
+      [
+        '8/8/2018 00:30',
+        '=TEXT(A4, "hh:mm a/p")',
       ]
     ])
-    expect(engine.getCellValue(adr('B1'))).toEqual('02:00 pm')
-    expect(engine.getCellValue(adr('B2'))).toEqual('12:30 am')
+    expect(engine.getCellValue(adr('B1'))).toEqual('02:00 PM')
+    expect(engine.getCellValue(adr('B2'))).toEqual('12:30 AM')
+    expect(engine.getCellValue(adr('B3'))).toEqual('12:30 am')
+    expect(engine.getCellValue(adr('B4'))).toEqual('12:30 a')
   })
 
   it('24 hours',  () => {
