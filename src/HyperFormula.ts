@@ -795,7 +795,9 @@ export class HyperFormula implements TypedEmitter {
    *
    * @example
    * ```js
-   * // when there is nothing to redo, this will return `false`
+   * hfInstance.undo(); 
+   *
+   * // when there is an action to redo, this will return `true`
    * const isSomethingToRedo = hfInstance.isThereSomethingToRedo();
    * ```
    *
@@ -1139,7 +1141,7 @@ export class HyperFormula implements TypedEmitter {
    * // their absolute addresses and new values, in this example it will return:
    * // [{
    * //   address: { sheet: 0, col: 1, row: 0 },
-   * //   newValue: DetailedCellError { error: [CellError], value: '#REF!' }
+   * //   newValue: { error: [CellError], value: '#REF!' }
    * // }]
    * const changes = hfInstance.removeColumns(0, [0, 1]);
    * ```
@@ -1217,8 +1219,7 @@ export class HyperFormula implements TypedEmitter {
    * const destination = { col: 3, row: 0, sheet: 0 };
    *
    * // should return a list of cells which values changed after the operation,
-   * // their absolute addresses and new values
-   * // for this example:
+   * // their absolute addresses and new values, for this example:
    * // [{
    * //   address: { sheet: 0, col: 0, row: 0 },
    * //   newValue: 0.93524248002062
@@ -1356,8 +1357,7 @@ export class HyperFormula implements TypedEmitter {
    * ]);
    *
    * // should return a list of cells which values changed after the operation,
-   * // their absolute addresses and new values
-   * // for this example:
+   * // their absolute addresses and new values, for this example:
    * // [{
    * //   address: { sheet: 0, col: 1, row: 0 },
    * //   newValue: 0.16210054671639
@@ -1992,8 +1992,7 @@ export class HyperFormula implements TypedEmitter {
    *  ],
    * });
    *
-   * // should return all sheets names
-   * // ['MySheet1', 'MySheet2'] for this example
+   * // should return all sheets names: ['MySheet1', 'MySheet2']
    * const sheetNames = hfInstance.getSheetNames();
    * ```
    *
@@ -2115,7 +2114,7 @@ export class HyperFormula implements TypedEmitter {
    * @example
    * ```js
    * const hfInstance = HyperFormula.buildFromArray([
-   *  ['=SUM(A2:A3)', '2']
+   *  ['=SUM(A2:A3)', '2'],
    * ]);
    *
    * // should return true since the specified cell contains a formula
@@ -2241,7 +2240,7 @@ export class HyperFormula implements TypedEmitter {
    *  ],
    * });
    *
-   * // Renames the sheet 'MySheet1'
+   * // renames the sheet 'MySheet1'
    * hfInstance.renameSheet(0, 'MySheet0');
    * ```
    *
@@ -2333,11 +2332,11 @@ export class HyperFormula implements TypedEmitter {
    * ```js
    * const hfInstance = HyperFormula.buildEmpty();
    *
-   * // Similar to batch() but operations are not within a callback,
+   * // similar to batch() but operations are not within a callback,
    * // one method suspends the recalculation
-   * // the second will resume calculations and return the changes.
+   * // the second will resume calculations and return the changes
    *
-   * // First, suspend the evaluation
+   * // first, suspend the evaluation
    * hfInstance.suspendEvaluation();
    *
    * // perform operations
@@ -2497,7 +2496,7 @@ export class HyperFormula implements TypedEmitter {
    * hfInstance.addNamedExpression('prettyName', '=Sheet1!A1+100');
    *
    * // change the named expression
-   * hfInstance.changeNamedExpression('prettyName', '=Sheet1!A1+200');
+   * const changes = hfInstance.changeNamedExpression('prettyName', '=Sheet1!A1+200');
    * ```
    *
    * @category Named Expression
@@ -2521,13 +2520,13 @@ export class HyperFormula implements TypedEmitter {
    * ```js
    * const hfInstance = HyperFormula.buildFromArray([
    *  ['42'],
-   * ])
+   * ]);
    *
    * // add a named expression
    * hfInstance.addNamedExpression('prettyName', '=Sheet1!A1+100');
    *
    * // remove the named expression
-   * hfInstance.removeNamedExpression('prettyName');
+   * const changes = hfInstance.removeNamedExpression('prettyName');
    * ```
    *
    * @category Named Expression
