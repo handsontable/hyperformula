@@ -2,7 +2,12 @@ import {HyperFormula} from '../src'
 import {adr} from './testUtils'
 
 const BigIntSupported = (function(): boolean {
-  return typeof BigInt === 'function' && Object.prototype.hasOwnProperty.call(BigInt, 'asIntN') && Object.prototype.hasOwnProperty.call(BigInt, 'asUintN') && typeof BigInt(1) === 'bigint'
+  try {
+    const bigint = BigInt(1)
+    return typeof bigint === 'bigint'
+  } catch (e) {
+    return false
+  }
 })()
 
 describe( 'unsupported types should result in error', () => {
