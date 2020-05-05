@@ -96,6 +96,13 @@ export function defaultStringifyDateTime(date: SimpleDateTime, formatArg: string
       continue
     }
 
+    if(/^ss\.s+/.test(token.value)) {
+      const fractionOfSecondPrecision = token.value.length-3
+      result += (date.second < 10 ? '0' : '') + Math.round(date.second * Math.pow(10, fractionOfSecondPrecision))/Math.pow(10, fractionOfSecondPrecision)
+      continue
+    }
+
+
     switch (token.value) {
       /* hours*/
       case 'h':
@@ -117,8 +124,7 @@ export function defaultStringifyDateTime(date: SimpleDateTime, formatArg: string
       }
 
       /* seconds */
-      case 's':
-      case 'ss': {
+      case 's': {
         result += padLeft(date.second, token.value.length)
         break
       }

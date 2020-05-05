@@ -20,7 +20,7 @@ export function defaultParseToDateTime(dateTimeString: string, dateFormat: strin
     }
   }
   const dateItems = dateTimeString.split(/[ /.-]/g)
-  if(dateItems.length >= 2 && dateItems[dateItems.length-2].indexOf(':') > -1) {
+  if(dateItems.length >= 2 && dateItems[dateItems.length-2].includes(':')) {
     dateItems[dateItems.length-2] = dateItems[dateItems.length-2] + '.' + dateItems[dateItems.length-1]
     dateItems.pop()
   }
