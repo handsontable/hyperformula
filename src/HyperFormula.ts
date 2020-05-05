@@ -1584,9 +1584,9 @@ export class HyperFormula implements TypedEmitter {
    *
    * // build from arrays, only one sheet
    * const hfInstance = HyperFormula.buildFromArray([
-   *  ['=SUM(1:2)'], ['2'],
-   *  ['5'], ['6'],
-   *  ['7'], ['8'],
+   *  ['=SUM(1:2)', '2'],
+   *  ['5', '6'],
+   *  ['7', '8'],
    * ]);
    *
    * // create cell range
@@ -1595,7 +1595,7 @@ export class HyperFormula implements TypedEmitter {
    * const range = new AbsoluteCellRange(rangeStart, rangeEnd);
    *
    * // should return serialized cell values for the given range:
-   * // [ [ '=SUM(1:2)', Symbol() ], [ 2, Symbol() ] ]
+   * // [ [ '=SUM(1:2)', 2 ], [ 5, 6 ] ]
    * const rangeSerialized = hfInstance.getRangeSerialized(range);
    * ```
    *
