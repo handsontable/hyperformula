@@ -780,7 +780,13 @@ export class HyperFormula implements TypedEmitter {
    *
    * @example
    * ```js
-   * // when there is nothing to undo, this will return `false`
+   * const hfInstance = HyperFormula.buildFromArray([['1'], ['2'], ['3']]);
+   *
+   * // perform CRUD operation, for example remove the second row
+   * hfInstance.removeRows(0, [1, 1]);
+   *
+   * // should return `true`, it is possible to undo last operation
+   * // which is removing rows in this example
    * const isSomethingToUndo = hfInstance.isThereSomethingToUndo();
    * ```
    *
@@ -795,7 +801,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * @example
    * ```js
-   * hfInstance.undo(); 
+   * hfInstance.undo();
    *
    * // when there is an action to redo, this will return `true`
    * const isSomethingToRedo = hfInstance.isThereSomethingToRedo();
@@ -867,7 +873,7 @@ export class HyperFormula implements TypedEmitter {
    *  ['1', '2', '=A1'],
    * ]);
    *
-   * // should set the content, returns: 
+   * // should set the content, returns:
    * // [{
    * //   address: { sheet: 0, col: 3, row: 0 },
    * //   newValue: 2,
@@ -1472,7 +1478,14 @@ export class HyperFormula implements TypedEmitter {
    *
    * @example
    * ```js
-   * // returns true, assuming nothing was copied or cut beforehand
+   * const hfInstance = HyperFormula.buildFromArray([
+   *  ['1', '2'],
+   * ]);
+   *
+   * // copy desired content
+   * hfInstance.copy({ col: 1, row: 0, sheet: 0 }, 1, 1);
+   *
+   * // returns false, there is content in the clipboard
    * const isClipboardEmpty = hfInstance.isClipboardEmpty();
    * ```
    *
@@ -1732,7 +1745,7 @@ export class HyperFormula implements TypedEmitter {
    * ```js
    * const hfInstance = HyperFormula.buildFromSheets({
    *  MySheet1: [
-   *   ['1'],
+   *   ['=SUM(MySheet2!A1:A2)'],
    *   ['2'],
    *  ],
    *  MySheet2: [
@@ -1741,8 +1754,12 @@ export class HyperFormula implements TypedEmitter {
    *  ],
    * });
    *
-   * // an array of cells that were changed
-   * // or affected by this CRUD operation: [['10'], ['20']]
+   * // should return a list of cells which values changed after the operation,
+   * // their absolute addresses and new values, in this example it will return:
+   * // [{
+   * //   address: { sheet: 0, col: 0, row: 0 },
+   * //   newValue: { error: [CellError], value: '#REF!' }
+   * // }]
    * const changes = hfInstance.removeSheet('MySheet2');
    * ```
    *
