@@ -5,23 +5,24 @@
 
 import {InternalCellValue} from '../Cell'
 import {Config} from '../Config'
-import {DateTimeHelper, SimpleDateTime} from '../DateTimeHelper'
+import {DateTimeHelper, SimpleDateTime, SimpleTime} from '../DateTimeHelper'
 import {Maybe} from '../Maybe'
 import {FormatToken, parseForDateTimeFormat, parseForNumberFormat, TokenType} from './parser'
 
 export function format(value: number, formatArg: string, config: Config, dateHelper: DateTimeHelper): InternalCellValue {
-  const tryString = config.stringifyDateTime(dateHelper.numberToDateTime(value), formatArg) // default points to defaultStringifyDateTime()
-  if (tryString !== undefined) {
-    return tryString
-  } else {
-    const expression = parseForNumberFormat(formatArg)
-
-    if (expression !== undefined) {
-      return numberFormat(expression.tokens, value)
-    } else {
-      return formatArg
-    }
+  const tryDateTime = config.stringifyDateTime(dateHelper.numberToDateTime(value), formatArg) // default points to defaultStringifyDateTime()
+  if (tryDateTime !== undefined) {
+    return tryDateTime
   }
+  const tryDuration = config.stringifyDuration(dateHelper.numberToTime(value), formatArg)
+  if(tryDuration !== undefined) {
+    return tryDuration
+  }
+  const expression = parseForNumberFormat(formatArg)
+  if (expression !== undefined) {
+    return numberFormat(expression.tokens, value)
+  }
+  return formatArg
 }
 
 export function padLeft(number: number | string, size: number) {
@@ -78,7 +79,64 @@ function numberFormat(tokens: FormatToken[], value: number): InternalCellValue {
   return result
 }
 
-export function defaultStringifyDateTime(date: SimpleDateTime, formatArg: string): Maybe<string> {
+export function defaultStringifyDuration(time: SimpleTime, formatArg: string): Maybe<string> {
+  const expression = parseForDateTimeFormat(formatArg)
+  if (expression === undefined) {
+    return undefined
+  }
+  const tokens = expression.tokens
+  let result = ''
+
+  for (const token of tokens) {
+    if (token.type === TokenType.FREE_TEXT) {
+      result += token.value
+      continue
+    }
+
+    if(/^ss\.s+/.test(token.value)) {
+      const fractionOfSecondPrecision = token.value.length-3
+      result += (time.second < 10 ? '0' : '') + Math.round(time.second * Math.pow(10, fractionOfSecondPrecision))/Math.pow(10, fractionOfSecondPrecision)
+      continue
+    }
+
+    switch (token.value) {
+      case 'h':
+      case 'H':
+      case 'hh':
+      case 'HH':
+      case '[hh]':
+      case '[HH]': {
+        result += padLeft( time.hour, token.value.length)
+        time.hour = 0
+        break
+      }
+
+      case 'M':
+      case 'm':
+      case 'MM':
+      case 'mm': {
+        result += padLeft(time.minute, token.value.length)
+        time.minute = 0
+        break
+      }
+
+      case '[mm]':
+      case '[MM]': {
+        result += padLeft(time.minute + 60*time.hour, token.value.length)
+        time.minute = 0
+        time.hour = 0
+        break
+      }
+
+      default: {
+        return undefined
+      }
+    }
+  }
+  return result
+}
+
+export function defaultStringifyDateTime(dateTime: SimpleDateTime, formatArg: string): Maybe<string> {
   const expression = parseForDateTimeFormat(formatArg)
   if (expression === undefined) {
     return undefined
@@ -98,7 +156,7 @@ export function defaultStringifyDateTime(date: SimpleDateTime, formatArg: string
 
     if(/^ss\.s+/.test(token.value)) {
       const fractionOfSecondPrecision = token.value.length-3
-      result += (date.second < 10 ? '0' : '') + Math.round(date.second * Math.pow(10, fractionOfSecondPrecision))/Math.pow(10, fractionOfSecondPrecision)
+      result += (dateTime.second < 10 ? '0' : '') + Math.round(dateTime.second * Math.pow(10, fractionOfSecondPrecision))/Math.pow(10, fractionOfSecondPrecision)
       continue
     }
 
@@ -110,7 +168,7 @@ export function defaultStringifyDateTime(date: SimpleDateTime, formatArg: string
       case 'hh':
       case 'HH': {
         minutes = true
-        result += padLeft( ampm? (date.hour+11)%12+1 : date.hour, token.value.length)
+        result += padLeft( ampm? (dateTime.hour+11)%12+1 : dateTime.hour, token.value.length)
         break
       }
 
@@ -119,13 +177,13 @@ export function defaultStringifyDateTime(date: SimpleDateTime, formatArg: string
       case 'D':
       case 'dd':
       case 'DD': {
-        result += padLeft(date.day, token.value.length)
+        result += padLeft(dateTime.day, token.value.length)
         break
       }
 
       /* seconds */
       case 's': {
-        result += padLeft(date.second, token.value.length)
+        result += padLeft(dateTime.second, token.value.length)
         break
       }
 
@@ -135,9 +193,9 @@ export function defaultStringifyDateTime(date: SimpleDateTime, formatArg: string
       case 'MM':
       case 'mm': {
         if (minutes) {
-          result += padLeft(date.minute, token.value.length)
+          result += padLeft(dateTime.minute, token.value.length)
         } else {
-          result += padLeft(date.month, token.value.length)
+          result += padLeft(dateTime.month, token.value.length)
         }
         break
       }
@@ -145,12 +203,12 @@ export function defaultStringifyDateTime(date: SimpleDateTime, formatArg: string
       /* years */
       case 'yy':
       case 'YY': {
-        result += padLeft(date.year % 100, token.value.length)
+        result += padLeft(dateTime.year % 100, token.value.length)
         break
       }
       case 'yyyy':
       case 'YYYY': {
-        result += date.year
+        result += dateTime.year
         break
       }
 
@@ -158,24 +216,25 @@ export function defaultStringifyDateTime(date: SimpleDateTime, formatArg: string
       case 'am/pm':
       case 'a':
         {
-        result += date.hour < 12 ? 'am' : 'pm'
+        result += dateTime.hour < 12 ? 'am' : 'pm'
         break
       }
       case 'a/p': {
-        result += date.hour < 12 ? 'a' : 'p'
+        result += dateTime.hour < 12 ? 'a' : 'p'
         break
       }
       case 'A/P': {
-        result += date.hour < 12 ? 'A' : 'P'
+        result += dateTime.hour < 12 ? 'A' : 'P'
         break
       }
       case 'A':
       case 'AM/PM': {
-       result += date.hour < 12 ? 'AM' : 'PM'
+       result += dateTime.hour < 12 ? 'AM' : 'PM'
        break
       }
-      default:
-        throw new Error('Mismatched token type')
+      default: {
+        return undefined
+      }
     }
   }
 
