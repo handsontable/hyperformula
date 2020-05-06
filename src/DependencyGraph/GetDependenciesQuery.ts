@@ -8,11 +8,12 @@ import {absolutizeDependencies} from '../absolutizeDependencies'
 import {SimpleCellAddress} from '../Cell'
 import {CellDependency} from '../CellDependency'
 import {LazilyTransformingAstService} from '../LazilyTransformingAstService'
-import {Ast, collectDependencies} from '../parser'
+import {Ast, collectDependencies, NamedExpressionDependency} from '../parser'
 import {FormulaCellVertex, MatrixVertex, Vertex} from './'
 import {AddressMapping} from './AddressMapping/AddressMapping'
 import {IGetDependenciesQuery} from './Graph'
 import {RangeMapping} from './RangeMapping'
+import {NamedExpressions} from '../NamedExpressions'
 import {FunctionRegistry} from '../interpreter/FunctionRegistry'
 
 export class GetDependenciesQuery implements IGetDependenciesQuery<Vertex> {
@@ -21,6 +22,7 @@ export class GetDependenciesQuery implements IGetDependenciesQuery<Vertex> {
     private readonly addressMapping: AddressMapping,
     private readonly lazilyTransformingAstService: LazilyTransformingAstService,
     private readonly functionRegistry: FunctionRegistry,
+    private readonly namedExpressions: NamedExpressions,
   ) {
   }
 
@@ -43,6 +45,9 @@ export class GetDependenciesQuery implements IGetDependenciesQuery<Vertex> {
     return new Set(absoluteDeps.map((dep: CellDependency) => {
       if (dep instanceof AbsoluteCellRange) {
         return this.rangeMapping.fetchRange(dep.start, dep.end)
+      } else if (dep instanceof NamedExpressionDependency) {
+        const namedExpression = this.namedExpressions.namedExpressionOrPlaceholder(dep.name, address.sheet)
+        return this.addressMapping.fetchCell(namedExpression.address)
       } else {
         return this.addressMapping.fetchCell(dep)
       }

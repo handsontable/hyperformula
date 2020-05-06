@@ -3,6 +3,7 @@ import {CellError, LazilyTransformingAstService} from '../src'
 import {AbsoluteCellRange} from '../src/AbsoluteCellRange'
 import {ErrorType, simpleCellAddress} from '../src/Cell'
 import {ColumnIndex} from '../src/ColumnSearch/ColumnIndex'
+import {NamedExpressions} from '../src/NamedExpressions'
 import {ColumnsSpan} from '../src/ColumnsSpan'
 import {Config} from '../src/Config'
 import {Matrix} from '../src/Matrix'
@@ -16,7 +17,8 @@ import {FunctionRegistry} from '../src/interpreter/FunctionRegistry'
 
 function buildEmptyIndex(transformingService: LazilyTransformingAstService, config: Config, statistics: Statistics): ColumnIndex {
   const functionRegistry = new FunctionRegistry(config)
-  const dependencyGraph = DependencyGraph.buildEmpty(transformingService, config, functionRegistry, statistics)
+  const namedExpression = new NamedExpressions()
+  const dependencyGraph = DependencyGraph.buildEmpty(transformingService, config, functionRegistry, namedExpression, statistics)
   return new ColumnIndex(dependencyGraph, config, statistics)
 }
 

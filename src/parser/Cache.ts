@@ -60,6 +60,7 @@ export const doesContainFunctions = (ast: Ast, functionCriterion: (functionId: s
     case AstNodeType.CELL_RANGE:
     case AstNodeType.COLUMN_RANGE:
     case AstNodeType.ROW_RANGE:
+    case AstNodeType.NAMED_EXPRESSION:
       return false
     case AstNodeType.PERCENT_OP:
     case AstNodeType.PLUS_UNARY_OP:

@@ -33,6 +33,7 @@ export {
   ParsingErrorType,
 
   ProcedureAst,
+  NamedExpressionAst,
   ErrorAst,
   CellReferenceAst,
   CellRangeAst,
@@ -59,4 +60,11 @@ export {
 
 export { Unparser } from './Unparser'
 
-export { RelativeDependency, AddressDependency, CellRangeDependency, ColumnRangeDependency, RowRangeDependency } from './RelativeDependency'
+export {
+  RelativeDependency,
+  AddressDependency,
+  CellRangeDependency,
+  ColumnRangeDependency,
+  RowRangeDependency,
+  NamedExpressionDependency,
+} from './RelativeDependency'

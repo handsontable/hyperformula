@@ -12,9 +12,10 @@ import {Config} from '../Config'
 import {findSmallerRange} from '../interpreter/plugin/SumprodPlugin'
 import {LazilyTransformingAstService} from '../LazilyTransformingAstService'
 import {Maybe} from '../Maybe'
-import {Ast} from '../parser'
+import {Ast, NamedExpressionDependency} from '../parser'
 import {RowsSpan} from '../RowsSpan'
 import {Statistics, StatType} from '../statistics'
+import {NamedExpressions} from '../NamedExpressions'
 import {
   CellVertex,
   EmptyCellVertex,
@@ -41,18 +42,19 @@ export class DependencyGraph {
    * - empty cell has associated EmptyCellVertex if and only if it is a dependency (possibly indirect, through range) to some formula
    */
 
-  public static buildEmpty(lazilyTransformingAstService: LazilyTransformingAstService, config: Config, functionRegistry: FunctionRegistry, stats: Statistics) {
+  public static buildEmpty(lazilyTransformingAstService: LazilyTransformingAstService, config: Config, functionRegistry: FunctionRegistry, namedExpressions: NamedExpressions, stats: Statistics) {
     const addressMapping = new AddressMapping(config.chooseAddressMappingPolicy)
     const rangeMapping = new RangeMapping()
     return new DependencyGraph(
       addressMapping,
       rangeMapping,
-      new Graph<Vertex>(new GetDependenciesQuery(rangeMapping, addressMapping, lazilyTransformingAstService, functionRegistry)),
+      new Graph<Vertex>(new GetDependenciesQuery(rangeMapping, addressMapping, lazilyTransformingAstService, functionRegistry, namedExpressions)),
       new SheetMapping(config.translationPackage),
       new MatrixMapping(),
       stats,
       lazilyTransformingAstService,
       functionRegistry,
+      namedExpressions
     )
   }
 
@@ -65,6 +67,7 @@ export class DependencyGraph {
     public readonly stats: Statistics,
     public readonly lazilyTransformingAstService: LazilyTransformingAstService,
     public readonly functionRegistry: FunctionRegistry,
+    public readonly namedExpressions: NamedExpressions,
   ) {
   }
 
@@ -147,9 +150,9 @@ export class DependencyGraph {
   }
 
   public processCellDependencies(cellDependencies: CellDependency[], endVertex: Vertex) {
-    cellDependencies.forEach((absStartCell: CellDependency) => {
-      if (absStartCell instanceof AbsoluteCellRange) {
-        const range = absStartCell
+    cellDependencies.forEach((dep: CellDependency) => {
+      if (dep instanceof AbsoluteCellRange) {
+        const range = dep
         let rangeVertex = this.rangeMapping.getRange(range.start, range.end)
         if (rangeVertex === null) {
           rangeVertex = new RangeVertex(range)
@@ -179,10 +182,26 @@ export class DependencyGraph {
         if (range.isFinite()) {
           this.correctInfiniteRangesDependenciesByRangeVertex(rangeVertex)
         }
+      } else if (dep instanceof NamedExpressionDependency) {
+        const sheetOfVertex = (endVertex as FormulaCellVertex).getAddress(this.lazilyTransformingAstService).sheet
+        const namedExpressionVertex = this.namedExpressionVertex(dep.name, sheetOfVertex)
+        this.graph.addEdge(namedExpressionVertex, endVertex)
       } else {
-        this.graph.addEdge(this.fetchCellOrCreateEmpty(absStartCell), endVertex)
+        this.graph.addEdge(this.fetchCellOrCreateEmpty(dep), endVertex)
       }
     })
+  }
+
+  public namedExpressionVertex(expressionName: string, sheetId: number): CellVertex {
+    const namedExpression = this.namedExpressions.namedExpressionOrPlaceholder(expressionName, sheetId)
+    return this.fetchCellOrCreateEmpty(namedExpression.address)
+  }
+
+  public exchangeNode(addressFrom: SimpleCellAddress, addressTo: SimpleCellAddress) {
+    const vertexFrom = this.fetchCellOrCreateEmpty(addressFrom)
+    const vertexTo = this.fetchCellOrCreateEmpty(addressTo)
+    this.addressMapping.removeCell(addressFrom)
+    this.graph.exchangeNode(vertexFrom, vertexTo)
   }
 
   private correctInfiniteRangesDependenciesByRangeVertex(vertex: RangeVertex) {

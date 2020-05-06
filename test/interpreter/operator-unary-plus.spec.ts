@@ -50,4 +50,11 @@ describe('Unary operator PLUS', () => {
     ])
     expect(engine.getCellValue(adr('A2'))).toEqual('Liz') // UNARY PLUS value
   })
+
+  it('double unary plus', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=++2'],
+    ])
+    expect(engine.getCellValue(adr('A1'))).toEqual(2)
+  })
 })

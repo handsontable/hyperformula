@@ -2,6 +2,7 @@ import {HyperFormula} from '../../src'
 import {simpleCellAddress} from '../../src/Cell'
 import {Config} from '../../src/Config'
 import {SheetMapping} from '../../src/DependencyGraph'
+import {NamedExpressions} from '../../src/NamedExpressions'
 import {buildTranslationPackage, enGB, plPL} from '../../src/i18n'
 import {AstNodeType, buildLexerConfig, Unparser} from '../../src/parser'
 import {adr, unregisterAllLanguages} from '../testUtils'
@@ -15,7 +16,8 @@ describe('Unparse', () => {
   sheetMapping.addSheet('Sheet2')
   sheetMapping.addSheet('Sheet with spaces')
   const parser = buildEmptyParserWithCaching(config, sheetMapping)
-  const unparser = new Unparser(config, lexerConfig, sheetMapping.fetchDisplayName)
+  const namedExpressions = new NamedExpressions()
+  const unparser = new Unparser(config, lexerConfig, sheetMapping.fetchDisplayName, namedExpressions)
 
 
   beforeEach(() => {
@@ -139,7 +141,7 @@ describe('Unparse', () => {
   it('#unparse with known error with translation', () => {
     const config = new Config({language: 'plPL'})
     const parser = buildEmptyParserWithCaching(config, sheetMapping)
-    const unparser = new Unparser(config, buildLexerConfig(config), sheetMapping.fetchDisplayName)
+    const unparser = new Unparser(config, buildLexerConfig(config), sheetMapping.fetchDisplayName, new NamedExpressions())
     const formula = '=#ADR!'
     const ast = parser.parse(formula, simpleCellAddress(0, 0, 0)).ast
     const unparsed = unparser.unparse(ast, adr('A1'))
@@ -157,12 +159,70 @@ describe('Unparse', () => {
   })
 
   it('#unparse should not forget about spaces', () => {
-    const formula = '= 1 + sum( 1,2,   3) +A1 / 2'
+    const formula = '= 1 + sum( 1,2,   3) +A1 / 2 + bar'
     const ast = parser.parse(formula, simpleCellAddress(0, 0, 0)).ast
 
     const unparsed = unparser.unparse(ast, adr('A1'))
 
-    expect(unparsed).toEqual('= 1 + SUM( 1,2,   3) +A1 / 2')
+    expect(unparsed).toEqual('= 1 + SUM( 1,2,   3) +A1 / 2 + bar')
+  })
+
+  it('#unparse named expression', () => {
+    const formula = '=true'
+    const ast = parser.parse(formula, simpleCellAddress(0, 0, 0)).ast
+
+    const unparsed = unparser.unparse(ast, adr('A1'))
+
+    expect(unparsed).toEqual('=true')
+  })
+
+  it('#unparse named expression returns original form', () => {
+    const namedExpressions = new NamedExpressions()
+    namedExpressions.addNamedExpression('SomeWEIRD_name', undefined)
+    const unparser = new Unparser(config, lexerConfig, sheetMapping.fetchDisplayName, namedExpressions)
+    const formula = '=someWeird_Name'
+    const ast = parser.parse(formula, simpleCellAddress(0, 0, 0)).ast
+
+    const unparsed = unparser.unparse(ast, adr('A1'))
+
+    expect(unparsed).toEqual('=SomeWEIRD_name')
+  })
+
+  it('#unparse named expression use local version if available', () => {
+    const namedExpressions = new NamedExpressions()
+    namedExpressions.addNamedExpression('SomeWEIRD_name', undefined)
+    namedExpressions.addNamedExpression('SomeWEIRD_NAME', 0)
+    const unparser = new Unparser(config, lexerConfig, sheetMapping.fetchDisplayName, namedExpressions)
+    const formula = '=someWeird_Name'
+    const ast = parser.parse(formula, simpleCellAddress(0, 0, 0)).ast
+
+    const unparsed = unparser.unparse(ast, adr('A1'))
+
+    expect(unparsed).toEqual('=SomeWEIRD_NAME')
+  })
+
+  it('#unparse nonexisting named expression returns original input', () => {
+    const namedExpressions = new NamedExpressions()
+    const unparser = new Unparser(config, lexerConfig, sheetMapping.fetchDisplayName, namedExpressions)
+    const formula = '=someWeird_Name'
+    const ast = parser.parse(formula, simpleCellAddress(0, 0, 0)).ast
+
+    const unparsed = unparser.unparse(ast, adr('A1'))
+
+    expect(unparsed).toEqual('=someWeird_Name')
+  })
+
+  it('#unparse nonexisting named expression returns original input when global named expression is removed', () => {
+    const namedExpressions = new NamedExpressions()
+    namedExpressions.addNamedExpression('SomeWEIRD_name', undefined)
+    namedExpressions.remove('SomeWEIRD_name', undefined)
+    const unparser = new Unparser(config, lexerConfig, sheetMapping.fetchDisplayName, namedExpressions)
+    const formula = '=someWeird_Name'
+    const ast = parser.parse(formula, simpleCellAddress(0, 0, 0)).ast
+
+    const unparsed = unparser.unparse(ast, adr('A1'))
+
+    expect(unparsed).toEqual('=someWeird_Name')
   })
 
   it('#unparse forgets about OFFSET', () => {
@@ -287,8 +347,8 @@ describe('Unparse', () => {
 
     const parser = buildEmptyParserWithCaching(configPL, sheetMapping)
 
-    const unparserPL = new Unparser(configPL, buildLexerConfig(configPL), sheetMapping.fetchDisplayName)
-    const unparserEN = new Unparser(configEN, buildLexerConfig(configEN), sheetMapping.fetchDisplayName)
+    const unparserPL = new Unparser(configPL, buildLexerConfig(configPL), sheetMapping.fetchDisplayName, new NamedExpressions())
+    const unparserEN = new Unparser(configEN, buildLexerConfig(configEN), sheetMapping.fetchDisplayName, new NamedExpressions())
 
     const formula = '=SUMA(1,2)'
 
@@ -347,7 +407,7 @@ describe('Unparse', () => {
     const sheetMapping = new SheetMapping(buildTranslationPackage(enGB))
     sheetMapping.addSheet('Sheet1')
     const parser = buildEmptyParserWithCaching(config, sheetMapping)
-    const unparser = new Unparser(config, lexerConfig, sheetMapping.fetchDisplayName)
+    const unparser = new Unparser(config, lexerConfig, sheetMapping.fetchDisplayName, new NamedExpressions())
     const formula = '=1+1234,567'
 
     const ast = parser.parse(formula, adr('A1')).ast
@@ -429,7 +489,7 @@ describe('whitespaces', () => {
   sheetMapping.addSheet('Sheet2')
   sheetMapping.addSheet('Sheet with spaces')
   const parser = buildEmptyParserWithCaching(config, sheetMapping)
-  const unparser = new Unparser(config, lexerConfig, sheetMapping.fetchDisplayName)
+  const unparser = new Unparser(config, lexerConfig, sheetMapping.fetchDisplayName, new NamedExpressions())
 
   it('should unparse with original whitespaces', () => {
     const formula = '= 1'

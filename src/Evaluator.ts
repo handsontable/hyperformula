@@ -16,6 +16,7 @@ import {Matrix} from './Matrix'
 import {Ast} from './parser'
 import {Statistics, StatType} from './statistics'
 import {NumberLiteralHelper} from './NumberLiteralHelper'
+import {NamedExpressions} from './NamedExpressions'
 import {FunctionRegistry} from './interpreter/FunctionRegistry'
 
 export class Evaluator {
@@ -28,9 +29,10 @@ export class Evaluator {
     private readonly stats: Statistics,
     private readonly dateHelper: DateTimeHelper,
     private readonly numberLiteralsHelper: NumberLiteralHelper,
-    private readonly functionRegistry: FunctionRegistry
+    private readonly functionRegistry: FunctionRegistry,
+    private readonly namedExpressions: NamedExpressions
   ) {
-    this.interpreter = new Interpreter(this.dependencyGraph, this.columnSearch, this.config, this.stats, this.dateHelper, this.numberLiteralsHelper, this.functionRegistry)
+    this.interpreter = new Interpreter(this.dependencyGraph, this.columnSearch, this.config, this.stats, this.dateHelper, this.numberLiteralsHelper, this.functionRegistry, this.namedExpressions)
   }
 
   public run() {

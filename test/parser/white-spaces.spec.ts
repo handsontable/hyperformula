@@ -41,6 +41,13 @@ describe('tokenizeFormula', () => {
     expectArrayWithSameContent(tokenTypes, ['EqualsOp', 'CellReference', 'RangeSeparator', 'CellReference'])
   })
 
+  it('should not skip whitespaces before named expression', () => {
+    const tokens = lexer.tokenizeFormula('= A1 + TRUE').tokens
+
+    const tokenTypes = tokens.map(token => token.tokenType.name)
+    expectArrayWithSameContent(tokenTypes, ['EqualsOp', 'WhiteSpace', 'CellReference', 'WhiteSpace', 'PlusOp', 'WhiteSpace', 'NamedExpression'])
+  })
+
   it('should skip whitespace before function args separator', () => {
     const tokens = lexer.tokenizeFormula('=SUM(A1 , A2)').tokens
     const tokenTypes = tokens.map(token => token.tokenType.name)

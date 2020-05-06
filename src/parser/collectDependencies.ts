@@ -9,10 +9,12 @@ import {
   AstNodeType,
   CellRangeDependency,
   ColumnRangeDependency,
+  NamedExpressionDependency,
   RelativeDependency,
   RowRangeDependency
 } from './'
 import {FunctionRegistry} from '../interpreter/FunctionRegistry'
+
 
 const collectDependenciesFn = (ast: Ast, functionRegistry: FunctionRegistry, dependenciesSet: RelativeDependency[]) => {
   switch (ast.type) {
@@ -21,6 +23,10 @@ const collectDependenciesFn = (ast: Ast, functionRegistry: FunctionRegistry, dep
     case AstNodeType.STRING:
     case AstNodeType.ERROR:
       return
+    case AstNodeType.NAMED_EXPRESSION: {
+      dependenciesSet.push(new NamedExpressionDependency(ast.expressionName))
+      return
+    }
     case AstNodeType.CELL_REFERENCE: {
       dependenciesSet.push(new AddressDependency(ast.reference))
       return
@@ -63,6 +69,9 @@ const collectDependenciesFn = (ast: Ast, functionRegistry: FunctionRegistry, dep
     case AstNodeType.POWER_OP:
       collectDependenciesFn(ast.left, functionRegistry, dependenciesSet)
       collectDependenciesFn(ast.right, functionRegistry, dependenciesSet)
+      return
+    case AstNodeType.PARENTHESIS:
+      collectDependenciesFn(ast.expression, functionRegistry, dependenciesSet)
       return
     case AstNodeType.FUNCTION_CALL:
       if (!functionRegistry.doesFunctionNeedArgumentToBeComputed(ast.procedureName)) {

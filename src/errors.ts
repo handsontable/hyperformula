@@ -65,7 +65,7 @@ export class InvalidArgumentsError extends Error {
  */
 export class NamedExpressionNameIsAlreadyTaken extends Error {
   constructor(expressionName: string) {
-    super(`Name of Named Expression '${expressionName}' is already present in the workbook`)
+    super(`Name of Named Expression '${expressionName}' is already present`)
   }
 }
 

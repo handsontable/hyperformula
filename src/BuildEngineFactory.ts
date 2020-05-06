@@ -44,13 +44,13 @@ export class BuildEngineFactory {
   private static buildEngine(config: Config, sheets: Sheets = {}, stats: Statistics = config.useStats ? new Statistics() : new EmptyStatistics()): EngineState {
     stats.start(StatType.BUILD_ENGINE_TOTAL)
 
+    const namedExpressions = new NamedExpressions()
     const functionRegistry = new FunctionRegistry(config)
     const lazilyTransformingAstService = new LazilyTransformingAstService(stats)
-    const dependencyGraph = DependencyGraph.buildEmpty(lazilyTransformingAstService, config, functionRegistry, stats)
+    const dependencyGraph = DependencyGraph.buildEmpty(lazilyTransformingAstService, config, functionRegistry, namedExpressions, stats)
     const columnSearch = buildColumnSearchStrategy(dependencyGraph, config, stats)
     const sheetMapping = dependencyGraph.sheetMapping
     const addressMapping = dependencyGraph.addressMapping
-    const namedExpressions = new NamedExpressions()
 
     for (const sheetName in sheets) {
       if (Object.prototype.hasOwnProperty.call(sheets, sheetName)) {
@@ -67,21 +67,21 @@ export class BuildEngineFactory {
 
     const notEmpty = sheetMapping.numberOfSheets() > 0
     const parser = new ParserWithCaching(config, functionRegistry, notEmpty ? sheetMapping.get : sheetMapping.fetch)
-    const unparser = new Unparser(config, buildLexerConfig(config), sheetMapping.fetchDisplayName)
+    const unparser = new Unparser(config, buildLexerConfig(config), sheetMapping.fetchDisplayName, namedExpressions)
     const dateHelper = new DateTimeHelper(config)
     const numberLiteralHelper = new NumberLiteralHelper(config)
     const cellContentParser = new CellContentParser(config, dateHelper, numberLiteralHelper)
 
+    const crudOperations = new CrudOperations(config, stats, dependencyGraph, columnSearch, parser, cellContentParser, lazilyTransformingAstService, namedExpressions)
     stats.measure(StatType.GRAPH_BUILD, () => {
       const graphBuilder = new GraphBuilder(dependencyGraph, columnSearch, parser, cellContentParser, config, stats)
       graphBuilder.buildGraph(sheets)
     })
 
-    const crudOperations = new CrudOperations(config, stats, dependencyGraph, columnSearch, parser, cellContentParser, lazilyTransformingAstService, namedExpressions)
     lazilyTransformingAstService.undoRedo = crudOperations.undoRedo
     lazilyTransformingAstService.parser = parser
 
-    const evaluator = new Evaluator(dependencyGraph, columnSearch, config, stats, dateHelper, numberLiteralHelper, functionRegistry)
+    const evaluator = new Evaluator(dependencyGraph, columnSearch, config, stats, dateHelper, numberLiteralHelper, functionRegistry, namedExpressions)
     evaluator.run()
 
     const exporter = new Exporter(config, namedExpressions)

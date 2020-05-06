@@ -20,6 +20,7 @@ import {InterpreterValue, SimpleRangeValue} from './InterpreterValue'
 import {concatenate} from './text'
 import {NumberLiteralHelper} from '../NumberLiteralHelper'
 import {FunctionRegistry} from './FunctionRegistry'
+import {NamedExpressions} from '../NamedExpressions'
 
 export class Interpreter {
   private gpu?: GPU.GPU
@@ -32,7 +33,8 @@ export class Interpreter {
     public readonly stats: Statistics,
     public readonly dateHelper: DateTimeHelper,
     public readonly numberLiteralsHelper: NumberLiteralHelper,
-    public readonly functionRegistry: FunctionRegistry
+    public readonly functionRegistry: FunctionRegistry,
+    public readonly namedExpressions: NamedExpressions
   ) {
     this.functionRegistry.initializePlugins(this)
     this.arithmeticHelper = new ArithmeticHelper(config, dateHelper, numberLiteralsHelper)
@@ -69,37 +71,37 @@ export class Interpreter {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
         const rightResult = this.evaluateAst(ast.right, formulaAddress)
         return this.passErrors(leftResult, rightResult) ??
-          this.arithmeticHelper.compare( leftResult as NoErrorCellValue, rightResult as NoErrorCellValue) === 0
+          this.arithmeticHelper.compare(leftResult as NoErrorCellValue, rightResult as NoErrorCellValue) === 0
       }
       case AstNodeType.NOT_EQUAL_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
         const rightResult = this.evaluateAst(ast.right, formulaAddress)
         return this.passErrors(leftResult, rightResult) ??
-          this.arithmeticHelper.compare( leftResult as NoErrorCellValue, rightResult as NoErrorCellValue) !== 0
+          this.arithmeticHelper.compare(leftResult as NoErrorCellValue, rightResult as NoErrorCellValue) !== 0
       }
       case AstNodeType.GREATER_THAN_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
         const rightResult = this.evaluateAst(ast.right, formulaAddress)
         return this.passErrors(leftResult, rightResult) ??
-          this.arithmeticHelper.compare( leftResult as NoErrorCellValue, rightResult as NoErrorCellValue) > 0
+          this.arithmeticHelper.compare(leftResult as NoErrorCellValue, rightResult as NoErrorCellValue) > 0
       }
       case AstNodeType.LESS_THAN_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
         const rightResult = this.evaluateAst(ast.right, formulaAddress)
         return this.passErrors(leftResult, rightResult) ??
-          this.arithmeticHelper.compare( leftResult as NoErrorCellValue, rightResult as NoErrorCellValue) < 0
+          this.arithmeticHelper.compare(leftResult as NoErrorCellValue, rightResult as NoErrorCellValue) < 0
       }
       case AstNodeType.GREATER_THAN_OR_EQUAL_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
         const rightResult = this.evaluateAst(ast.right, formulaAddress)
         return this.passErrors(leftResult, rightResult) ??
-          this.arithmeticHelper.compare( leftResult as NoErrorCellValue, rightResult as NoErrorCellValue) >= 0
+          this.arithmeticHelper.compare(leftResult as NoErrorCellValue, rightResult as NoErrorCellValue) >= 0
       }
       case AstNodeType.LESS_THAN_OR_EQUAL_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
         const rightResult = this.evaluateAst(ast.right, formulaAddress)
         return this.passErrors(leftResult, rightResult) ??
-          this.arithmeticHelper.compare( leftResult as NoErrorCellValue, rightResult as NoErrorCellValue) <= 0
+          this.arithmeticHelper.compare(leftResult as NoErrorCellValue, rightResult as NoErrorCellValue) <= 0
       }
       case AstNodeType.PLUS_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
@@ -179,6 +181,14 @@ export class Interpreter {
           return new CellError(ErrorType.NAME)
         }
       }
+      case AstNodeType.NAMED_EXPRESSION: {
+        const namedExpression = this.namedExpressions.nearestNamedExpression(ast.expressionName, formulaAddress.sheet)
+        if (namedExpression) {
+          return this.dependencyGraph.getCellValue(namedExpression.address)
+        } else {
+          return new CellError(ErrorType.NAME)
+        }
+      }
       case AstNodeType.CELL_RANGE: {
         if (!this.rangeSpansOneSheet(ast)) {
           return new CellError(ErrorType.REF)
@@ -227,7 +237,7 @@ export class Interpreter {
   public getGpuInstance(): GPU.GPU {
     if (!this.gpu) {
       const GPUConstructor = GPU.GPU || GPU
-      this.gpu = new GPUConstructor({mode: this.config.gpuMode })
+      this.gpu = new GPUConstructor({mode: this.config.gpuMode})
     }
     return this.gpu
   }
