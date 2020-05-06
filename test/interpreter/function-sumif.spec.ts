@@ -505,9 +505,6 @@ describe('Function SUMIFS - argument validations and combinations', () => {
   })
 })
 
-​
-
-
 describe('Function SUMIFS - calcultions on more than one criteria', () => {
   it('works for more than one criterion/range pair', () => {
     const engine =  HyperFormula.buildFromArray([
