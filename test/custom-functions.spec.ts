@@ -147,7 +147,7 @@ describe('Register static custom plugin', () => {
     HyperFormula.registerFunctionPlugin(NumericAggregationPlugin)
     HyperFormula.registerFunctionPlugin(SumWithExtra)
 
-    expectArrayWithSameContent(HyperFormula.getPlugins(), [SumifPlugin, NumericAggregationPlugin, SumWithExtra])
+    expectArrayWithSameContent(HyperFormula.getAllFunctionPlugins(), [SumifPlugin, NumericAggregationPlugin, SumWithExtra])
   })
 
   it('should unregister whole plugin', () => {
@@ -157,7 +157,7 @@ describe('Register static custom plugin', () => {
 
     HyperFormula.unregisterFunctionPlugin(NumericAggregationPlugin)
 
-    expectArrayWithSameContent(HyperFormula.getPlugins(), [SumifPlugin])
+    expectArrayWithSameContent(HyperFormula.getAllFunctionPlugins(), [SumifPlugin])
   })
 
   it('should return plugin for given functionId', () => {
@@ -205,29 +205,29 @@ describe('Instance level formula registry', () => {
   it('should return registered plugins', () => {
     const engine = HyperFormula.buildFromArray([], {functionPlugins: [SumifPlugin, NumericAggregationPlugin, SumWithExtra]})
 
-    expectArrayWithSameContent(engine.getPlugins(), [SumifPlugin, NumericAggregationPlugin, SumWithExtra])
+    expectArrayWithSameContent(engine.getAllFunctionPlugins(), [SumifPlugin, NumericAggregationPlugin, SumWithExtra])
   })
 
   it('should instantiate engine with additional plugin', () => {
     const engine = HyperFormula.buildFromArray([], {
-      functionPlugins: [...HyperFormula.getPlugins(), FooPlugin]
+      functionPlugins: [...HyperFormula.getAllFunctionPlugins(), FooPlugin]
     })
 
-    const registeredPlugins = new Set(engine.getPlugins())
+    const registeredPlugins = new Set(engine.getAllFunctionPlugins())
 
-    expect(registeredPlugins.size).toEqual(HyperFormula.getPlugins().length + 1)
+    expect(registeredPlugins.size).toEqual(HyperFormula.getAllFunctionPlugins().length + 1)
     expect(registeredPlugins.has(FooPlugin)).toBe(true)
   })
 
   it('should rebuild engine and override plugins', () => {
     const engine = HyperFormula.buildFromArray([])
 
-    let registeredPlugins = new Set(engine.getPlugins())
+    let registeredPlugins = new Set(engine.getAllFunctionPlugins())
     expect(registeredPlugins.has(SumifPlugin)).toBe(true)
     expect(registeredPlugins.has(FooPlugin)).toBe(false)
 
     engine.updateConfig({functionPlugins: [FooPlugin]})
-    registeredPlugins = new Set(engine.getPlugins())
+    registeredPlugins = new Set(engine.getAllFunctionPlugins())
     expect(registeredPlugins.has(FooPlugin)).toBe(true)
     expect(registeredPlugins.size).toBe(1)
   })

@@ -323,7 +323,7 @@ export class HyperFormula implements TypedEmitter {
   /**
    * Returns classes of all plugins registered in this instance of HyperFormula
    */
-  public static getPlugins(): FunctionPluginDefinition[] {
+  public static getAllFunctionPlugins(): FunctionPluginDefinition[] {
     return FunctionRegistry.getPlugins()
   }
 
@@ -1681,7 +1681,7 @@ export class HyperFormula implements TypedEmitter {
   /**
    * Returns classes of all plugins registered in this instance of HyperFormula
    */
-  public getPlugins(): FunctionPluginDefinition[] {
+  public getAllFunctionPlugins(): FunctionPluginDefinition[] {
     return this._functionRegistry.getPlugins()
   }
 
