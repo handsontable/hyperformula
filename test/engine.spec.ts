@@ -519,7 +519,7 @@ describe('Integration', () => {
     expectArrayWithSameContent([[1, true]], out)
   })
 
-  it('#getRangeValues should return serialized cells', () => {
+  it('#getRangeSerialized should return serialized cells', () => {
     const engine = HyperFormula.buildFromArray([
       ['=SUM(1, B1)', '2', '#VALUE!']
     ])
