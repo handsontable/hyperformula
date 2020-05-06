@@ -28,7 +28,7 @@ export class CriterionPackage {
       return undefined
     }
 
-    const criterion = parseCriterion(raw)
+    const criterion = parseCriterion(raw,arithmeticHelper)
     if (criterion === undefined) {
       return undefined
     }
@@ -44,18 +44,18 @@ export class CriterionPackage {
 
 const ANY_CRITERION_REGEX = /([<>=]+)(.*)/
 
-export const parseCriterion = (criterion: InternalCellValue): Maybe<Criterion> => {
+export const parseCriterion = (criterion: InternalCellValue, arithmeticHelper: ArithmeticHelper): Maybe<Criterion> => {
   if (typeof criterion === 'number') {
     return buildCriterion(CriterionType.EQUAL, criterion)
   } else if (typeof criterion === 'string') {
     const regexResult = ANY_CRITERION_REGEX.exec(criterion)
 
     if (regexResult) {
-      const value = Number(regexResult[2])
+      const value = arithmeticHelper.coerceToMaybeNumber(regexResult[2])
       const boolvalue = regexResult[2].toLowerCase()==='true' ? true : regexResult[2].toLowerCase() === 'false' ? false : undefined
       if (regexResult[1] === '=' && regexResult[2] === '') {
         return buildCriterion(CriterionType.EQUAL, '')
-      } else if (isNaN(value)) {
+      } else if (value === undefined) {
         switch (regexResult[1]) {
           case '=': return buildCriterion(CriterionType.EQUAL, boolvalue ?? regexResult[2])
           case '<>': return buildCriterion(CriterionType.NOT_EQUAL, boolvalue ?? regexResult[2])
@@ -83,16 +83,24 @@ export type CriterionLambda = (cellValue: InternalCellValue) => boolean
 export const buildCriterionLambda = (criterion: Criterion, arithmeticHelper: ArithmeticHelper): CriterionLambda => {
   switch (criterion.operator) {
     case CriterionType.GREATER_THAN: {
-      return (cellValue) => (typeof cellValue === 'number' && arithmeticHelper.floatCmp(cellValue, criterion.value as number) > 0)
+      return (cellValue) => {
+        return (typeof cellValue === 'number' && arithmeticHelper.floatCmp(cellValue, criterion.value as number) > 0)
+      }
     }
     case CriterionType.GREATER_THAN_OR_EQUAL: {
-      return (cellValue) => (typeof cellValue === 'number' && arithmeticHelper.floatCmp(cellValue, criterion.value as number) >= 0)
+      return (cellValue) => {
+        return (typeof cellValue === 'number' && arithmeticHelper.floatCmp(cellValue, criterion.value as number) >= 0)
+      }
     }
     case CriterionType.LESS_THAN: {
-      return (cellValue) => (typeof cellValue === 'number' && arithmeticHelper.floatCmp(cellValue, criterion.value as number) < 0)
+      return (cellValue) => {
+        return (typeof cellValue === 'number' && arithmeticHelper.floatCmp(cellValue, criterion.value as number) < 0)
+      }
     }
     case CriterionType.LESS_THAN_OR_EQUAL: {
-      return (cellValue) => (typeof cellValue === 'number' && arithmeticHelper.floatCmp(cellValue, criterion.value as number) <= 0)
+      return (cellValue) => {
+        return (typeof cellValue === 'number' && arithmeticHelper.floatCmp(cellValue, criterion.value as number) <= 0)
+      }
     }
     case CriterionType.EQUAL: {
       if(typeof criterion.value === 'number') {
