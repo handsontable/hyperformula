@@ -494,7 +494,19 @@ describe('Function SUMIFS - argument validations and combinations', () => {
     expect(engine.getCellValue(adr('A2'))).toEqual(3)
     expect(engine.getCellValue(adr('A4'))).toEqual(5)
   })
+
+  it('coerces dates as numbers', () => {
+    const engine = HyperFormula.buildFromArray([
+      ["1","9160250011660588","43469","25000"],
+      ["2","9160250011689568","43631","15000"],
+      ["=SUMIF(C2:C11,\">31/05/2019\",D2:D11)"]
+    ], {dateFormats : ['DD/MM/YYYY']})
+    expect(engine.getCellValue(adr('A3'))).toEqual(15000)
+  })
 })
+
+​
+
 
 describe('Function SUMIFS - calcultions on more than one criteria', () => {
   it('works for more than one criterion/range pair', () => {
