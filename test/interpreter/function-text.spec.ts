@@ -148,11 +148,11 @@ describe('Text', () => {
 describe('time duration', () => {
   it('works', () => {
     const engine = HyperFormula.buildFromArray( [
-      ['0.1', '=TEXT(A1, "[hh]:mm:ss")',],
-      ['1.1', '=TEXT(A2, "[hh]:mm:ss")',],
-      ['0.1', '=TEXT(A3, "[mm]:ss")',],
-      ['1.1', '=TEXT(A4, "[mm]:ss")',],
-      ['0.1111', '=TEXT(A5, "[mm]:ss.ss")',],
+      ['0.1', '=TEXT(A1, "[hh]:mm:ss")', ],
+      ['1.1', '=TEXT(A2, "[hh]:mm:ss")', ],
+      ['0.1', '=TEXT(A3, "[mm]:ss")', ],
+      ['1.1', '=TEXT(A4, "[mm]:ss")', ],
+      ['0.1111', '=TEXT(A5, "[mm]:ss.ss")', ],
     ])
     expect(engine.getCellValue(adr('B1'))).toEqual('02:24:00')
     expect(engine.getCellValue(adr('B2'))).toEqual('26:24:00')
