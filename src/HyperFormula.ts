@@ -1517,23 +1517,15 @@ export class HyperFormula implements TypedEmitter {
    *
    * @example
    * ```js
-   * // remember to import AbsoluteCellRange
-   * import { AbsoluteCellRange } from 'hyperformula';
-   *
-   * // build from arrays, only one sheet
    * const hfInstance = HyperFormula.buildFromArray([
    *  ['1', '2'],
    *  ['5', '6'],
    *  ['7', '8'],
    * ]);
    *
-   * // create cell range
-   * const rangeStart = { col: 0, row: 0, sheet: 0 };
-   * const rangeEnd = { col: 1, row: 1, sheet: 0 };
-   * const range = new AbsoluteCellRange(rangeStart, rangeEnd);
    *
    * // returns the cells content: [ [ 1, 2 ], [ 5, 6 ] ]
-   * const rangeValues = hfInstance.getRangeValues(range);
+   * const rangeValues = hfInstance.getRangeValues({ col: 0, row: 0, sheet: 0 }, 1, 1);
    * ```
    *
    * @category Range
@@ -1911,7 +1903,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * // should return a list of cells which values changed after the operation,
    * // their absolute addresses and new values
-   * const changes = hfInstance.isItPossibleToReplaceSheetContent('MySheet1', [['50'], ['60']]);
+   * const changes = hfInstance.setSheetContent('MySheet1', [['50'], ['60']]);
    * ```
    *
    * @category Sheet
@@ -1972,14 +1964,8 @@ export class HyperFormula implements TypedEmitter {
    * @example
    * ```js
    * const hfInstance = HyperFormula.buildFromSheets({
-   *  MySheet1: [
-   *   ['1'],
-   *   ['2'],
-   *  ],
-   *  MySheet2: [
-   *   ['10'],
-   *   ['20'],
-   *  ],
+   *  MySheet1: [ ['1'] ],
+   *  MySheet2: [ ['10'] ],
    * });
    *
    * // should return 'MySheet2' as this sheet is the second one
