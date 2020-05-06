@@ -103,10 +103,15 @@ export function defaultStringifyDuration(time: SimpleTime, formatArg: string): M
       case 'h':
       case 'H':
       case 'hh':
-      case 'HH':
+      case 'HH': {
+        result += padLeft( time.hour, token.value.length)
+        time.hour = 0
+        break
+      }
+
       case '[hh]':
       case '[HH]': {
-        result += padLeft( time.hour, token.value.length)
+        result += padLeft( time.hour, token.value.length-2)
         time.hour = 0
         break
       }
@@ -122,9 +127,16 @@ export function defaultStringifyDuration(time: SimpleTime, formatArg: string): M
 
       case '[mm]':
       case '[MM]': {
-        result += padLeft(time.minute + 60*time.hour, token.value.length)
+        result += padLeft(time.minute + 60*time.hour, token.value.length-2)
         time.minute = 0
         time.hour = 0
+        break
+      }
+
+      /* seconds */
+      case 's':
+      case 'ss': {
+        result += padLeft(time.second, token.value.length)
         break
       }
 
@@ -182,7 +194,8 @@ export function defaultStringifyDateTime(dateTime: SimpleDateTime, formatArg: st
       }
 
       /* seconds */
-      case 's': {
+      case 's':
+      case 'ss': {
         result += padLeft(dateTime.second, token.value.length)
         break
       }
