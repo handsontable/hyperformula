@@ -28,7 +28,7 @@ export class CriterionPackage {
       return undefined
     }
 
-    const criterion = parseCriterion(raw,arithmeticHelper)
+    const criterion = parseCriterion(raw, arithmeticHelper)
     if (criterion === undefined) {
       return undefined
     }
