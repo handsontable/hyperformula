@@ -368,7 +368,7 @@ export class HyperFormula implements TypedEmitter {
    * ]);
    *
    * // get value of the cell, should be '6'
-   * const cellValue = hfInstance.getCellValue({ col: 0, row: 0, sheet: 0 });
+   * const cellValue = hfInstance.getCellValue({ sheet: 0, col: 0, row: 0 });
    * ```
    *
    * @category Cell
@@ -397,7 +397,7 @@ export class HyperFormula implements TypedEmitter {
    * ]);
    *
    * // should return a normalized cell formula '=SUM(1,2,3)'
-   * const cellFormula = hfInstance.getCellFormula({ col: 0, row: 0, sheet: 0 });
+   * const cellFormula = hfInstance.getCellFormula({ sheet: 0, col: 0, row: 0 });
    * ```
    *
    * @category Cell
@@ -421,7 +421,7 @@ export class HyperFormula implements TypedEmitter {
    * ]);
    *
    * // should return serialized content of the cell, '=SUM(1,2,3)' for this example
-   * const cellSerialized = hfInstance.getCellSerialized({ col: 0, row: 0, sheet: 0 });
+   * const cellSerialized = hfInstance.getCellSerialized({ sheet: 0, col: 0, row: 0 });
    * ```
    *
    * @category Cell
@@ -540,7 +540,7 @@ export class HyperFormula implements TypedEmitter {
    *   ],
    * });
    *
-   * // should return the dimensions of all sheets: 
+   * // should return the dimensions of all sheets:
    * // { Sheet1: { width: 3, height: 1 }, Sheet2: { width: 1, height: 2 } }
    * const allSheetsDimensions = hfInstance.getAllSheetsDimensions();
    * ```
@@ -711,6 +711,8 @@ export class HyperFormula implements TypedEmitter {
   /**
    * Returns a snapshot of computation time statistics.
    * It returns a map with key-value pairs where keys are enums for stat type and time (number)
+   *
+   * @internal
    *
    * @category Instance
    */
@@ -1221,8 +1223,8 @@ export class HyperFormula implements TypedEmitter {
    * ]);
    *
    * // choose the coordinates and assign them to variables
-   * const source = { col: 1, row: 0, sheet: 0 };
-   * const destination = { col: 3, row: 0, sheet: 0 };
+   * const source = { sheet: 0, col: 1, row: 0 };
+   * const destination = { sheet: 0, col: 3, row: 0 };
    *
    * // should return a list of cells which values changed after the operation,
    * // their absolute addresses and new values, for this example:
@@ -1398,7 +1400,7 @@ export class HyperFormula implements TypedEmitter {
    * ]);
    *
    * // should return [ [ 2 ] ]
-   * const clipboardContent = hfInstance.copy({ col: 1, row: 0, sheet: 0 }, 1, 1);
+   * const clipboardContent = hfInstance.copy({ sheet: 0, col: 1, row: 0 }, 1, 1);
    * ```
    *
    * @category Clipboard
@@ -1425,7 +1427,7 @@ export class HyperFormula implements TypedEmitter {
    * ]);
    *
    * // should return values that were cut: [ [ 1 ] ]
-   * const clipboardContent = hfInstance.cut({ col: 0, row: 0, sheet: 0 }, 1, 1);
+   * const clipboardContent = hfInstance.cut({ sheet: 0, col: 0, row: 0 }, 1, 1);
    * ```
    *
    * @category Clipboard
@@ -1458,11 +1460,11 @@ export class HyperFormula implements TypedEmitter {
    * ]);
    *
    * // do a copy, [ [ 2 ] ] was copied
-   * hfInstance.cut({ col: 1, row: 0, sheet: 0 }, 1, 1);
+   * hfInstance.cut({ sheet: 0, col: 0, row: 0 }, 1, 1);
    *
    * // do a paste, should return a list of cells which values changed
    * // after the operation, their absolute addresses and new values
-   * const changes = hfInstance.paste({ col: 1, row: 0, sheet: 0 });
+   * const changes = hfInstance.paste({ sheet: 0, col: 1, row: 0 });
    * ```
    *
    * @category Clipboard
@@ -1483,7 +1485,7 @@ export class HyperFormula implements TypedEmitter {
    * ]);
    *
    * // copy desired content
-   * hfInstance.copy({ col: 1, row: 0, sheet: 0 }, 1, 1);
+   * hfInstance.copy({ sheet: 0, col: 1, row: 0 }, 1, 1);
    *
    * // returns false, there is content in the clipboard
    * const isClipboardEmpty = hfInstance.isClipboardEmpty();
@@ -1525,7 +1527,7 @@ export class HyperFormula implements TypedEmitter {
    *
    *
    * // returns the cells content: [ [ 1, 2 ], [ 5, 6 ] ]
-   * const rangeValues = hfInstance.getRangeValues({ col: 0, row: 0, sheet: 0 }, 1, 1);
+   * const rangeValues = hfInstance.getRangeValues({ sheet: 0, col: 0, row: 0 }, 1, 1);
    * ```
    *
    * @category Range
@@ -1545,24 +1547,15 @@ export class HyperFormula implements TypedEmitter {
    *
    * @example
    * ```js
-   * // remember to import AbsoluteCellRange
-   * import { AbsoluteCellRange } from 'hyperformula';
-   *
-   * // build from arrays, only one sheet
    * const hfInstance = HyperFormula.buildFromArray([
    *  ['=SUM(1:2)', '2', '10'],
    *  ['5', '6', '7'],
    *  ['40', '30', '20'],
    * ]);
    *
-   * // create cell range
-   * const rangeStart = { col: 0, row: 0, sheet: 0 };
-   * const rangeEnd = { col: 1, row: 1, sheet: 0 };
-   * const range = new AbsoluteCellRange(rangeStart, rangeEnd);
-   *
    * // returns cell formulas of a given range only:
    * // [ [ '=SUM(1:2)', undefined ], [ undefined, undefined ] ]
-   * const rangeFormulas = hfInstance.getRangeFormulas(range);
+   * const rangeFormulas = hfInstance.getRangeFormulas({ sheet: 0, col: 0, row: 0 }, 1, 1);
    * ```
    *
    * @category Range
@@ -1582,24 +1575,15 @@ export class HyperFormula implements TypedEmitter {
    *
    * @example
    * ```js
-   * // remember to import AbsoluteCellRange
-   * import { AbsoluteCellRange } from 'hyperformula';
-   *
-   * // build from arrays, only one sheet
    * const hfInstance = HyperFormula.buildFromArray([
    *  ['=SUM(1:2)', '2'],
    *  ['5', '6'],
    *  ['7', '8'],
    * ]);
    *
-   * // create cell range
-   * const rangeStart = { col: 0, row: 0, sheet: 0 };
-   * const rangeEnd = { col: 1, row: 1, sheet: 0 };
-   * const range = new AbsoluteCellRange(rangeStart, rangeEnd);
-   *
    * // should return serialized cell values for the given range:
    * // [ [ '=SUM(1:2)', 2 ], [ 5, 6 ] ]
-   * const rangeSerialized = hfInstance.getRangeSerialized(range);
+   * const rangeSerialized = hfInstance.getRangeSerialized(({ sheet: 0, col: 0, row: 0 }, 1, 1);
    * ```
    *
    * @category Range
@@ -1623,14 +1607,8 @@ export class HyperFormula implements TypedEmitter {
    * @example
    * ```js
    * const hfInstance = HyperFormula.buildFromSheets({
-   *  MySheet1: [
-   *   ['1'],
-   *   ['2'],
-   *  ],
-   *  MySheet2: [
-   *   ['10'],
-   *   ['20'],
-   *  ],
+   *  MySheet1: [ ['1'] ],
+   *  MySheet2: [ ['10'] ],
    * });
    *
    * // should return false because 'MySheet2' already exists
@@ -1660,14 +1638,8 @@ export class HyperFormula implements TypedEmitter {
    * @example
    * ```js
    * const hfInstance = HyperFormula.buildFromSheets({
-   *  MySheet1: [
-   *   ['1'],
-   *   ['2'],
-   *  ],
-   *  MySheet2: [
-   *   ['10'],
-   *   ['20'],
-   *  ],
+   *  MySheet1: [ ['1'] ],
+   *  MySheet2: [ ['10'] ],
    * });
    *
    * // should return 'MySheet3'
@@ -1696,14 +1668,8 @@ export class HyperFormula implements TypedEmitter {
    * @example
    * ```js
    * const hfInstance = HyperFormula.buildFromSheets({
-   *  MySheet1: [
-   *   ['1'],
-   *   ['2'],
-   *  ],
-   *  MySheet2: [
-   *   ['10'],
-   *   ['20'],
-   *  ],
+   *  MySheet1: [ ['1'] ],
+   *  MySheet2: [ ['10'] ],
    * });
    *
    * // should return true because 'MySheet2' exists and is removable
@@ -1775,14 +1741,8 @@ export class HyperFormula implements TypedEmitter {
    * @example
    * ```js
    * const hfInstance = HyperFormula.buildFromSheets({
-   *  MySheet1: [
-   *   ['1'],
-   *   ['2'],
-   *  ],
-   *  MySheet2: [
-   *   ['10'],
-   *   ['20'],
-   *  ],
+   *  MySheet1: [ ['1'] ],
+   *  MySheet2: [ ['10'] ],
    * });
    *
    * // should return true because 'MySheet2' exists and can be cleared
@@ -1849,14 +1809,8 @@ export class HyperFormula implements TypedEmitter {
    * @example
    * ```js
    * const hfInstance = HyperFormula.buildFromSheets({
-   *  MySheet1: [
-   *   ['1'],
-   *   ['2'],
-   *  ],
-   *  MySheet2: [
-   *   ['10'],
-   *   ['20'],
-   *  ],
+   *  MySheet1: [ ['1'] ],
+   *  MySheet2: [ ['10'] ],
    * });
    *
    * // should return true because 'MySheet1' exists
@@ -1891,14 +1845,8 @@ export class HyperFormula implements TypedEmitter {
    * @example
    * ```js
    * const hfInstance = HyperFormula.buildFromSheets({
-   *  MySheet1: [
-   *   ['1'],
-   *   ['2'],
-   *  ],
-   *  MySheet2: [
-   *   ['10'],
-   *   ['20'],
-   *  ],
+   *  MySheet1: [ ['1'] ],
+   *  MySheet2: [ ['10'] ],
    * });
    *
    * // should return a list of cells which values changed after the operation,
@@ -1985,14 +1933,8 @@ export class HyperFormula implements TypedEmitter {
    * @example
    * ```js
    * const hfInstance = HyperFormula.buildFromSheets({
-   *  MySheet1: [
-   *   ['1'],
-   *   ['2'],
-   *  ],
-   *  MySheet2: [
-   *   ['10'],
-   *   ['20'],
-   *  ],
+   *  MySheet1: [ ['1'] ],
+   *  MySheet2: [ ['10'] ],
    * });
    *
    * // should return all sheets names: ['MySheet1', 'MySheet2']
@@ -2013,14 +1955,8 @@ export class HyperFormula implements TypedEmitter {
    * @example
    * ```js
    * const hfInstance = HyperFormula.buildFromSheets({
-   *  MySheet1: [
-   *   ['1'],
-   *   ['2'],
-   *  ],
-   *  MySheet2: [
-   *   ['10'],
-   *   ['20'],
-   *  ],
+   *  MySheet1: [ ['1'] ],
+   *  MySheet2: [ ['10'] ],
    * });
    *
    * // should return 0 because 'MySheet1' is of ID 0
@@ -2041,14 +1977,8 @@ export class HyperFormula implements TypedEmitter {
    * @example
    * ```js
    * const hfInstance = HyperFormula.buildFromSheets({
-   *  MySheet1: [
-   *   ['1'],
-   *   ['2'],
-   *  ],
-   *  MySheet2: [
-   *   ['10'],
-   *   ['20'],
-   *  ],
+   *  MySheet1: [ ['1'] ],
+   *  MySheet2: [ ['10'] ],
    * });
    *
    * // should return true since 'MySheet1' exists
@@ -2163,7 +2093,9 @@ export class HyperFormula implements TypedEmitter {
    *
    * @example
    * ```js
-   * const hfInstance = HyperFormula.buildFromArray([['{=TRANSPOSE(B1:B1)}']])
+   * const hfInstance = HyperFormula.buildFromArray([
+   *    ['{=TRANSPOSE(B1:B1)}']
+   * ]);
    *
    * // should return true, cell of provided coordinates is a part of a matrix
    * const isPartOfMatrix = hfInstance.isCellPartOfMatrix({ sheet: 0, col: 0, row: 0 });
@@ -2233,14 +2165,8 @@ export class HyperFormula implements TypedEmitter {
    * @example
    * ```js
    * const hfInstance = HyperFormula.buildFromSheets({
-   *  MySheet1: [
-   *   ['1'],
-   *   ['2'],
-   *  ],
-   *  MySheet2: [
-   *   ['10']
-   *   ['20'],
-   *  ],
+   *  MySheet1: [ ['1'] ],
+   *  MySheet2: [ ['10'] ],
    * });
    *
    * // renames the sheet 'MySheet1'
