@@ -1607,8 +1607,8 @@ export class HyperFormula implements TypedEmitter {
    * @example
    * ```js
    * const hfInstance = HyperFormula.buildFromSheets({
-   *  MySheet1: [ ['1'] ],
-   *  MySheet2: [ ['10'] ],
+   *   MySheet1: [ ['1'] ],
+   *   MySheet2: [ ['10'] ],
    * });
    *
    * // should return 'false' because 'MySheet2' already exists
@@ -1955,11 +1955,11 @@ export class HyperFormula implements TypedEmitter {
    * @example
    * ```js
    * const hfInstance = HyperFormula.buildFromSheets({
-   *  MySheet1: [ ['1'] ],
-   *  MySheet2: [ ['10'] ],
+   *   MySheet1: [ ['1'] ],
+   *   MySheet2: [ ['10'] ],
    * });
    *
-   * // should return '0' because 'MySheet1' is of ID 0
+   * // should return '0' because 'MySheet1' is of ID '0'
    * const sheetID = hfInstance.getSheetId('MySheet1');
    * ```
    *
@@ -1977,8 +1977,8 @@ export class HyperFormula implements TypedEmitter {
    * @example
    * ```js
    * const hfInstance = HyperFormula.buildFromSheets({
-   *  MySheet1: [ ['1'] ],
-   *  MySheet2: [ ['10'] ],
+   *   MySheet1: [ ['1'] ],
+   *   MySheet2: [ ['10'] ],
    * });
    *
    * // should return 'true' since 'MySheet1' exists
@@ -2124,10 +2124,13 @@ export class HyperFormula implements TypedEmitter {
    * @example
    * ```js
    * const hfInstance = HyperFormula.buildFromArray([
-   *  ['1', '2'],
+   *  ['=SUM(1,2,3)', '2'],
    * ]);
    *
-   * // should return 'NUMBER', cell value of provided coordinates is a number
+   * // should return 'NUMBER', cell value type of provided coordinates is a number
+   * const cellValue = hfInstance.getCellValueType({ sheet: 0, col: 1, row: 0 });
+   *
+   * // should return 'NUMBER', cell value type of provided coordinates is a number
    * const cellValue = hfInstance.getCellValueType({ sheet: 0, col: 0, row: 0 });
    * ```
    *
@@ -2148,7 +2151,7 @@ export class HyperFormula implements TypedEmitter {
    *  ['1', '2'],
    * ]);
    *
-   * // should return the number of sheets which is "1"
+   * // should return the number of sheets which is '1'
    * const sheetsCount = hfInstance.countSheets();
    * ```
    *
@@ -2171,8 +2174,8 @@ export class HyperFormula implements TypedEmitter {
    * @example
    * ```js
    * const hfInstance = HyperFormula.buildFromSheets({
-   *  MySheet1: [ ['1'] ],
-   *  MySheet2: [ ['10'] ],
+   *   MySheet1: [ ['1'] ],
+   *   MySheet2: [ ['10'] ],
    * });
    *
    * // renames the sheet 'MySheet1'
@@ -2553,7 +2556,7 @@ export class HyperFormula implements TypedEmitter {
    *  Sheet2: [['58']],
    * });
    *
-   * // returns the value of calculated formula, 32 for this example
+   * // returns the value of calculated formula, '32' for this example
    * const calculatedFormula = hfInstance.calculateFormula('=A1+10', 'Sheet1'));
    * ```
    *
