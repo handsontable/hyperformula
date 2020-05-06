@@ -497,9 +497,9 @@ describe('Function SUMIFS - argument validations and combinations', () => {
 
   it('coerces dates as numbers', () => {
     const engine = HyperFormula.buildFromArray([
-      ["1","9160250011660588","43469","25000"],
-      ["2","9160250011689568","43631","15000"],
-      ["=SUMIF(C2:C11,\">31/05/2019\",D2:D11)"]
+      ['1', '9160250011660588', '43469', '25000'],
+      ['2', '9160250011689568', '43631', '15000'],
+      ['=SUMIF(C2:C11,">31/05/2019",D2:D11)']
     ], {dateFormats : ['DD/MM/YYYY']})
     expect(engine.getCellValue(adr('A3'))).toEqual(15000)
   })
