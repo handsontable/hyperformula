@@ -1,7 +1,7 @@
 import {DetailedCellError, HyperFormula} from '../src'
 import {CellType, CellValueType, EmptyValue, ErrorType} from '../src/Cell'
 import {plPL} from '../src/i18n'
-import {adr, detailedError} from './testUtils'
+import {adr, detailedError, expectArrayWithSameContent} from './testUtils'
 
 describe('Integration', () => {
   it('#loadSheet load simple sheet', () => {
@@ -497,5 +497,35 @@ describe('Integration', () => {
 
     expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.ERROR, 'Parsing error'))
     expect(engine.getCellFormula(adr('B1'))).toEqual('=A1')
+  })
+
+  it('#getRangeFormulas should return formulas', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=SUM(1, A2)', '=TRUE()']
+    ])
+
+    const out = engine.getRangeFormulas(adr('A1'), 2, 1)
+
+    expectArrayWithSameContent([['=SUM(1, A2)', '=TRUE()']], out)
+  })
+
+  it('#getRangeValues should return values', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=SUM(1, B1)', '=TRUE()']
+    ])
+
+    const out = engine.getRangeValues(adr('A1'), 2, 1)
+
+    expectArrayWithSameContent([[1, true]], out)
+  })
+
+  it('#getRangeValues should return serialized cells', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=SUM(1, B1)', '2', '#VALUE!']
+    ])
+
+    const out = engine.getRangeSerialized(adr('A1'), 3, 1)
+
+    expectArrayWithSameContent([['=SUM(1, B1)', 2, '#VALUE!']], out)
   })
 })
