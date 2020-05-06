@@ -24,11 +24,11 @@ describe('RangeVertex with cache', () => {
 
     const criterionString1 = '>=0'
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const criterion1 = buildCriterionLambda(parseCriterion(criterionString1)!, arithmeticHelper)
+    const criterion1 = buildCriterionLambda(parseCriterion(criterionString1,arithmeticHelper)!, arithmeticHelper)
 
     const criterionString2 = '=1'
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const criterion2 = buildCriterionLambda(parseCriterion(criterionString2)!, arithmeticHelper)
+    const criterion2 = buildCriterionLambda(parseCriterion(criterionString2,arithmeticHelper)!, arithmeticHelper)
 
     const criterionCache: CriterionCache = new Map()
 
