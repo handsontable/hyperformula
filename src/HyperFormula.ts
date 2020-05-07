@@ -746,7 +746,7 @@ export class HyperFormula implements TypedEmitter {
    * ```js
    * const hfInstance = HyperFormula.buildFromArray([
    *  ['1', '2'],
-   *  ['3', '']
+   *  ['3', ''],
    * ]);
    *
    * // perform CRUD operation, for example remove the second row
@@ -777,7 +777,7 @@ export class HyperFormula implements TypedEmitter {
    * const hfInstance = HyperFormula.buildFromArray([
    *  ['1'],
    *  ['2'],
-   *  ['3']
+   *  ['3'],
    * ]);
    *
    * // perform CRUD operation, for example remove the second row
@@ -805,7 +805,7 @@ export class HyperFormula implements TypedEmitter {
    * const hfInstance = HyperFormula.buildFromArray([
    *  ['1'],
    *  ['2'],
-   *  ['3']
+   *  ['3'],
    * ]);
    *
    * // perform CRUD operation, for example remove the second row
@@ -964,7 +964,7 @@ export class HyperFormula implements TypedEmitter {
    * ```js
    * const hfInstance = HyperFormula.buildFromArray([
    *  ['1'],
-   *  ['1'],
+   *  ['2'],
    * ]);
    *
    * // should return a list of cells which values changed after the operation,
@@ -992,7 +992,7 @@ export class HyperFormula implements TypedEmitter {
    * ```js
    * const hfInstance = HyperFormula.buildFromArray([
    *  ['1'],
-   *  ['1'],
+   *  ['2'],
    * ]);
    *
    * // should return 'true' for this example
@@ -1103,7 +1103,7 @@ export class HyperFormula implements TypedEmitter {
    * // their absolute addresses and new values, for this example:
    * // [{
    * //   address: { sheet: 0, col: 1, row: 0 },
-   * //   newValue: 0.92754862796338
+   * //   newValue: 0.92754862796338,
    * // }]
    * const changes = hfInstance.addColumns(0, [0, 1]);
    * ```
@@ -1172,7 +1172,7 @@ export class HyperFormula implements TypedEmitter {
    * // their absolute addresses and new values, in this example it will return:
    * // [{
    * //   address: { sheet: 0, col: 1, row: 0 },
-   * //   newValue: { error: [CellError], value: '#REF!' }
+   * //   newValue: { error: [CellError], value: '#REF!' },
    * // }]
    * const changes = hfInstance.removeColumns(0, [0, 1]);
    * ```
@@ -1253,7 +1253,7 @@ export class HyperFormula implements TypedEmitter {
    * // their absolute addresses and new values, for this example:
    * // [{
    * //   address: { sheet: 0, col: 0, row: 0 },
-   * //   newValue: 0.93524248002062
+   * //   newValue: 0.93524248002062,
    * // }]
    * const changes = hfInstance.moveCells(source, 1, 1, destination);
    * ```
@@ -1384,17 +1384,17 @@ export class HyperFormula implements TypedEmitter {
    * @example
    * ```js
    * const hfInstance = HyperFormula.buildFromArray([
-   *  ['1', '2', '3', '=RAND()', '=SUM(A1:C1)']
+   *  ['1', '2', '3', '=RAND()', '=SUM(A1:C1)'],
    * ]);
    *
    * // should return a list of cells which values changed after the operation,
    * // their absolute addresses and new values, for this example:
    * // [{
    * //   address: { sheet: 0, col: 1, row: 0 },
-   * //   newValue: 0.16210054671639
+   * //   newValue: 0.16210054671639,
    * //  }, {
    * //   address: { sheet: 0, col: 4, row: 0 },
-   * //   newValue: 6.16210054671639
+   * //   newValue: 6.16210054671639,
    * // }]
    * const changes = hfInstance.moveColumns(0, 1, 1, 2);
    * ```
@@ -1733,7 +1733,7 @@ export class HyperFormula implements TypedEmitter {
    * // their absolute addresses and new values, in this example it will return:
    * // [{
    * //   address: { sheet: 0, col: 0, row: 0 },
-   * //   newValue: { error: [CellError], value: '#REF!' }
+   * //   newValue: { error: [CellError], value: '#REF!' },
    * // }]
    * const changes = hfInstance.removeSheet('MySheet2');
    * ```
@@ -1800,7 +1800,7 @@ export class HyperFormula implements TypedEmitter {
    * // their absolute addresses and new values, in this example it will return:
    * // [{
    * //   address: { sheet: 0, col: 0, row: 0 },
-   * //   newValue: 0
+   * //   newValue: 0,
    * // }]
    * const changes = hfInstance.clearSheet('MySheet2');
    * ```
@@ -2118,7 +2118,7 @@ export class HyperFormula implements TypedEmitter {
    * @example
    * ```js
    * const hfInstance = HyperFormula.buildFromArray([
-   *    ['{=TRANSPOSE(B1:B1)}']
+   *    ['{=TRANSPOSE(B1:B1)}'],
    * ]);
    *
    * // should return 'true', cell of provided coordinates is a part of a matrix
@@ -2358,7 +2358,7 @@ export class HyperFormula implements TypedEmitter {
    * // for this example:
    * // [{
    * //   name: 'prettyName',
-   * //   newValue: 142
+   * //   newValue: 142,
    * // }]
    * const changes = hfInstance.addNamedExpression('prettyName', '=Sheet1!A1+100');
    * ```
