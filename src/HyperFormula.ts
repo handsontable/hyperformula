@@ -2047,10 +2047,10 @@ export class HyperFormula implements TypedEmitter {
    * ]);
    *
    * // should return 'false' since the selcted cell contains a simple value
-   * const isA1SimpleValue = hfInstance.doesCellHaveSimpleValue({ sheet: 0, col: 0, row: 0 });
+   * const isA1Simple = hfInstance.doesCellHaveSimpleValue({ sheet: 0, col: 0, row: 0 });
    *
    * // should return 'true' since the selcted cell does not contain a simple value
-   * const isB1SimpleValue = hfInstance.doesCellHaveSimpleValue({ sheet: 0, col: 1, row: 0 });
+   * const isB1Simple = hfInstance.doesCellHaveSimpleValue({ sheet: 0, col: 1, row: 0 });
    * ```
    *
    * @category Cell
