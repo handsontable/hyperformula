@@ -44,6 +44,7 @@ import {Emitter, Events, Listeners, TypedEmitter} from './Emitter'
 import {BuildEngineFactory, EngineState} from './BuildEngineFactory'
 import {Sheet, Sheets} from './Sheet'
 import {SheetDimensions} from './_types'
+import {LicenseKeyValidityState} from './helpers/licenseKeyValidator'
 
 export type Index = [number, number]
 
@@ -149,6 +150,15 @@ export class HyperFormula implements TypedEmitter {
   /** @internal */
   public get lazilyTransformingAstService(): LazilyTransformingAstService {
     return this._lazilyTransformingAstService
+  }
+
+  /**
+   * Returns state of the validity of the license key.
+   *
+   * @internal
+   */
+  public get licenseKeyValidityState(): LicenseKeyValidityState {
+    return this._config.licenseKeyValidityState
   }
 
   private static buildFromEngineState(engine: EngineState): HyperFormula {
@@ -673,7 +683,7 @@ export class HyperFormula implements TypedEmitter {
     const newConfig = this._config.mergeConfig(newParams)
 
     const configNewLanguage = this._config.mergeConfig({language: newParams.language})
-    const serializedSheets = this._serialization.withNewConfig(configNewLanguage).getAllSheetsSerialized()
+    const serializedSheets = this._serialization.withNewConfig(configNewLanguage, this._namedExpressions).getAllSheetsSerialized()
 
     const newEngine = BuildEngineFactory.rebuildWithConfig(newConfig, serializedSheets, this._stats)
 
@@ -1430,7 +1440,7 @@ export class HyperFormula implements TypedEmitter {
   */
   public copy(sourceLeftCorner: SimpleCellAddress, width: number, height: number): CellValue[][] {
     this._crudOperations.copy(sourceLeftCorner, width, height)
-    return this.getRangeValues(AbsoluteCellRange.spanFrom(sourceLeftCorner, width, height))
+    return this.getRangeValues(sourceLeftCorner, width, height)
   }
 
   /**
@@ -1457,7 +1467,7 @@ export class HyperFormula implements TypedEmitter {
    */
   public cut(sourceLeftCorner: SimpleCellAddress, width: number, height: number): CellValue[][] {
     this._crudOperations.cut(sourceLeftCorner, width, height)
-    return this.getRangeValues(AbsoluteCellRange.spanFrom(sourceLeftCorner, width, height))
+    return this.getRangeValues(sourceLeftCorner, width, height)
   }
 
   /**
@@ -1538,7 +1548,9 @@ export class HyperFormula implements TypedEmitter {
   /**
    * Returns the cell content of a given range in a [[CellValue]][][] format.
    *
-   * @param {AbsoluteCellRange} cellRange absolute cell range
+   * @param {SimpleCellAddress} leftCorner - address of the upper left corner of a range
+   * @param {number} width - width of a range
+   * @param {number} height - height of a range
    *
    * @example
    * ```js
@@ -1555,7 +1567,8 @@ export class HyperFormula implements TypedEmitter {
    *
    * @category Range
    */
-  public getRangeValues(cellRange: AbsoluteCellRange): CellValue[][] {
+  public getRangeValues(leftCorner: SimpleCellAddress, width: number, height: number): CellValue[][] {
+    const cellRange = AbsoluteCellRange.spanFrom(leftCorner, width, height)
     return cellRange.arrayOfAddressesInRange().map(
       (subarray) => subarray.map(
         (address) => this.getCellValue(address)
@@ -1566,7 +1579,9 @@ export class HyperFormula implements TypedEmitter {
   /**
    * Returns cell formulas in given range.
    *
-   * @param {AbsoluteCellRange} cellRange absolute cell range
+   * @param {SimpleCellAddress} leftCorner - address of the upper left corner of a range
+   * @param {number} width - width of a range
+   * @param {number} height - height of a range
    *
    * @example
    * ```js
@@ -1583,7 +1598,8 @@ export class HyperFormula implements TypedEmitter {
    *
    * @category Range
    */
-  public getRangeFormulas(cellRange: AbsoluteCellRange): Maybe<string>[][] {
+  public getRangeFormulas(leftCorner: SimpleCellAddress, width: number, height: number): Maybe<string>[][] {
+    const cellRange = AbsoluteCellRange.spanFrom(leftCorner, width, height)
     return cellRange.arrayOfAddressesInRange().map(
       (subarray) => subarray.map(
         (address) => this.getCellFormula(address)
@@ -1592,9 +1608,11 @@ export class HyperFormula implements TypedEmitter {
   }
 
   /**
-   * Returns serialized cell in given range.
+   * Returns serialized cells in given range.
    *
-   * @param {AbsoluteCellRange} cellRange absolute cell range
+   * @param {SimpleCellAddress} leftCorner - address of the upper left corner of a range
+   * @param {number} width - width of a range
+   * @param {number} height - height of a range
    *
    * @example
    * ```js
@@ -1611,7 +1629,8 @@ export class HyperFormula implements TypedEmitter {
    *
    * @category Range
    */
-  public getRangeSerialized(cellRange: AbsoluteCellRange): CellValue[][] {
+  public getRangeSerialized(leftCorner: SimpleCellAddress, width: number, height: number): CellValue[][] {
+    const cellRange = AbsoluteCellRange.spanFrom(leftCorner, width, height)
     return cellRange.arrayOfAddressesInRange().map(
       (subarray) => subarray.map(
         (address) => this.getCellSerialized(address)
@@ -2346,6 +2365,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * @throws [[NamedExpressionNameIsAlreadyTaken]] when the named expression is not available.
    * @throws [[NamedExpressionNameIsInvalid]] when the named expression is not valid
+   * @throws [[NoSheetWithNameError]] when the given sheet name does not exists
    *
    * @example
    * ```js
@@ -2365,8 +2385,8 @@ export class HyperFormula implements TypedEmitter {
    *
    * @category Named Expression
    */
-  public addNamedExpression(expressionName: string, expression: RawCellContent): ExportedChange[] {
-    this._crudOperations.addNamedExpression(expressionName, expression)
+  public addNamedExpression(expressionName: string, expression: RawCellContent, sheetScope: string | undefined): ExportedChange[] {
+    this._crudOperations.addNamedExpression(expressionName, expression, sheetScope)
     const changes = this.recomputeIfDependencyGraphNeedsIt()
     this._emitter.emit(Events.NamedExpressionAdded, expressionName, changes)
     return changes
@@ -2377,6 +2397,9 @@ export class HyperFormula implements TypedEmitter {
    * Returns a [[CellValue]] or undefined if the given named expression does not exists
    *
    * @param {string} expressionName - expression name, case insensitive.
+   * @param {string | undefined} scope - sheet name or undefined for global scope
+   *
+   * @throws [[NoSheetWithNameError]] when the given sheet name does not exists
    *
    * @example
    * ```js
@@ -2393,11 +2416,16 @@ export class HyperFormula implements TypedEmitter {
    *
    * @category Named Expression
    */
-  public getNamedExpressionValue(expressionName: string): Maybe<CellValue> {
+  public getNamedExpressionValue(expressionName: string, sheetScope: string | undefined = undefined): Maybe<CellValue> {
     this.ensureEvaluationIsNotSuspended()
-    const namedExpressionAddress = this._namedExpressions.getInternalNamedExpressionAddress(expressionName)
-    if (namedExpressionAddress) {
-      return this._serialization.getCellValue(namedExpressionAddress)
+    let sheetId = undefined
+    if (sheetScope !== undefined) {
+      this._crudOperations.ensureSheetExists(sheetScope)
+      sheetId = this.sheetMapping.fetch(sheetScope)
+    }
+    const namedExpression = this._namedExpressions.namedExpressionForScope(expressionName, sheetId)
+    if (namedExpression) {
+      return this._serialization.getCellValue(namedExpression.address)
     } else {
       return undefined
     }
@@ -2408,6 +2436,9 @@ export class HyperFormula implements TypedEmitter {
    * Unparses AST.
    *
    * @param {string} expressionName - expression name, case insensitive.
+   * @param {string | undefined} scope - sheet name or undefined for global scope
+   *
+   * @throws [[NoSheetWithNameError]] when the given sheet name does not exists
    *
    * @example
    * ```js
@@ -2425,12 +2456,17 @@ export class HyperFormula implements TypedEmitter {
    *
    * @category Named Expression
    */
-  public getNamedExpressionFormula(expressionName: string): Maybe<string> {
-    const namedExpressionAddress = this._namedExpressions.getInternalNamedExpressionAddress(expressionName)
-    if (namedExpressionAddress === null) {
+  public getNamedExpressionFormula(expressionName: string, sheetScope: string | undefined = undefined): Maybe<string> {
+    let sheetId = undefined
+    if (sheetScope !== undefined) {
+      this._crudOperations.ensureSheetExists(sheetScope)
+      sheetId = this.sheetMapping.fetch(sheetScope)
+    }
+    const namedExpression = this._namedExpressions.namedExpressionForScope(expressionName, sheetId)
+    if (namedExpression === undefined) {
       return undefined
     } else {
-      return this._serialization.getCellFormula(namedExpressionAddress)
+      return this._serialization.getCellFormula(namedExpression.address)
     }
   }
 
@@ -2440,11 +2476,13 @@ export class HyperFormula implements TypedEmitter {
    * Note that this method may trigger dependency graph recalculation.
    *
    * @param {string} expressionName - an expression name, case insensitive.
+   * @param {string | undefined} scope - sheet name or undefined for global scope
    * @param {RawCellContent} newExpression - a new expression
    *
    * @fires [[valuesUpdated]] if recalculation was triggered by this change
    *
    * @throws [[NamedExpressionDoesNotExist]] when the given expression does not exist.
+   * @throws [[NoSheetWithNameError]] when the given sheet name does not exists
    *
    * @example
    * ```js
@@ -2461,8 +2499,8 @@ export class HyperFormula implements TypedEmitter {
    *
    * @category Named Expression
    */
-  public changeNamedExpression(expressionName: string, newExpression: RawCellContent): ExportedChange[] {
-    this._crudOperations.changeNamedExpressionExpression(expressionName, newExpression)
+  public changeNamedExpression(expressionName: string, sheetScope: string | undefined, newExpression: RawCellContent): ExportedChange[] {
+    this._crudOperations.changeNamedExpressionExpression(expressionName, sheetScope, newExpression)
     return this.recomputeIfDependencyGraphNeedsIt()
   }
 
@@ -2472,6 +2510,7 @@ export class HyperFormula implements TypedEmitter {
    * Note that this method may trigger dependency graph recalculation.
    *
    * @param {string} expressionName - expression name, case insensitive.
+   * @param {string | undefined} scope - sheet name or undefined for global scope
    *
    * @fires [[namedExpressionRemoved]]
    * @fires [[valuesUpdated]] if recalculation was triggered by this change
@@ -2491,14 +2530,11 @@ export class HyperFormula implements TypedEmitter {
    *
    * @category Named Expression
    */
-  public removeNamedExpression(expressionName: string): ExportedChange[] {
-    const address = this._namedExpressions.getInternalNamedExpressionAddress(expressionName)
-    if (address) {
-      const namedExpressionDisplayName = this._namedExpressions.getDisplayNameByName(expressionName)!
-      this._namedExpressions.remove(expressionName)
-      this.dependencyGraph.setCellEmpty(address)
+  public removeNamedExpression(expressionName: string, sheetScope: string | undefined): ExportedChange[] {
+    const removedNamedExpression = this._crudOperations.removeNamedExpression(expressionName, sheetScope)
+    if (removedNamedExpression) {
       const changes = this.recomputeIfDependencyGraphNeedsIt()
-      this._emitter.emit(Events.NamedExpressionRemoved, namedExpressionDisplayName, changes)
+      this._emitter.emit(Events.NamedExpressionRemoved, removedNamedExpression.displayName, changes)
       return changes
     } else {
       return []

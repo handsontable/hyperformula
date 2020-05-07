@@ -4,8 +4,8 @@ import {simpleCellAddress} from '../../src/Cell'
 import {Config} from '../../src/Config'
 import {SheetMapping} from '../../src/DependencyGraph'
 import {buildTranslationPackage, enGB} from '../../src/i18n'
-import {ParserWithCaching} from '../../src/parser'
-import {adr} from '../testUtils'
+import {ParserWithCaching, NamedExpressionDependency} from '../../src/parser'
+import {adr, expectArrayWithSameContent} from '../testUtils'
 
 describe('Parsing collecting dependencies', () => {
   it('works for CELL_REFERENCE with relative dependency', () => {
@@ -39,6 +39,16 @@ describe('Parsing collecting dependencies', () => {
     expect(dependencies).toEqual([
       new AbsoluteCellRange(adr('B2'), adr('C4')),
     ])
+  })
+
+  it('works inside parenthesis', () => {
+    const parser = new ParserWithCaching(new Config(), new SheetMapping(buildTranslationPackage(enGB)).get)
+    const formulaAddress = simpleCellAddress(0, 0, 0)
+
+    const parseResult = parser.parse('=(A1+B2)', formulaAddress)
+    const dependencies = absolutizeDependencies(parseResult.dependencies, formulaAddress)
+
+    expectArrayWithSameContent([adr('A1'), adr('B2')], dependencies)
   })
 
   it('goes inside unary minus', () => {
@@ -97,5 +107,17 @@ describe('Parsing collecting dependencies', () => {
     const parseResult = parser.parse('=COLUMNS(A1:B3)', formulaAddress)
     const dependencies = absolutizeDependencies(parseResult.dependencies, formulaAddress)
     expect(dependencies).toEqual([])
+  })
+
+  it('works for named expression dependencies', () => {
+    const parser = new ParserWithCaching(new Config(), new SheetMapping(buildTranslationPackage(enGB)).get)
+    const parseResult = parser.parse('=FOO+bar', adr('A1'))
+
+    const dependencies = absolutizeDependencies(parseResult.dependencies, adr('A1'))
+
+    expect(dependencies).toEqual([
+      new NamedExpressionDependency('FOO'),
+      new NamedExpressionDependency('bar'),
+    ])
   })
 })

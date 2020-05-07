@@ -35,6 +35,7 @@ export type Ast =
   | DivOpAst
   | PowerOpAst
   | ProcedureAst
+  | NamedExpressionAst
   | ParenthesisAst
   | ErrorAst
   | ErrorWithRawInputAst
@@ -84,6 +85,7 @@ export enum AstNodeType {
   POWER_OP = 'POWER_OP',
 
   FUNCTION_CALL = 'FUNCTION_CALL',
+  NAMED_EXPRESSION = 'NAMED_EXPRESSION',
 
   PARENTHESIS = 'PARENTHESES',
 
@@ -390,6 +392,17 @@ export const buildProcedureAst = (procedureName: string, args: Ast[], leadingWhi
   args,
   leadingWhitespace: leadingWhitespace?.image,
   internalWhitespace: internalWhitespace?.image,
+})
+
+export interface NamedExpressionAst extends AstWithInternalWhitespace {
+  type: AstNodeType.NAMED_EXPRESSION,
+  expressionName: string,
+}
+
+export const buildNamedExpressionAst = (expressionName: string, leadingWhitespace?: IToken): NamedExpressionAst => ({
+  type: AstNodeType.NAMED_EXPRESSION,
+  expressionName,
+  leadingWhitespace: leadingWhitespace?.image,
 })
 
 export interface ParenthesisAst extends AstWithInternalWhitespace {
