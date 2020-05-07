@@ -31,7 +31,7 @@ describe('Evaluation suspension', () => {
       engine.getAllSheetsValues()
     }).toThrow(new EvaluationSuspendedError())
     expect(() => {
-      engine.getRangeValues(new AbsoluteCellRange(adr('A1'), adr('A2')))
+      engine.getRangeValues(adr('A1'), 1, 2)
     }).toThrow(new EvaluationSuspendedError())
     expect(() => {
       engine.getNamedExpressionValue('FOO')
@@ -55,7 +55,7 @@ describe('Evaluation suspension', () => {
       engine.getAllSheetsSerialized()
     }).toThrow(new EvaluationSuspendedError())
     expect(() => {
-      engine.getRangeSerialized(new AbsoluteCellRange(adr('A1'), adr('A2')))
+      engine.getRangeSerialized(adr('A1'), 1, 2)
     }).toThrow(new EvaluationSuspendedError())
   })
 
@@ -96,7 +96,7 @@ describe('Evaluation suspension', () => {
     expect(engine.getCellFormula(adr('C1'))).toEqual('=A1+78')
     expect(engine.getSheetFormulas(0)).toEqual([[undefined, undefined, '=A1+78']])
     expect(engine.getAllSheetsFormulas()).toEqual({ Sheet1: [[undefined, undefined, '=A1+78']] })
-    expect(engine.getRangeFormulas(new AbsoluteCellRange(adr('A1'), adr('C1')))).toEqual([[undefined, undefined, '=A1+78']])
+    expect(engine.getRangeFormulas(adr('A1'), 3, 1)).toEqual([[undefined, undefined, '=A1+78']])
   })
 
   it('formulas are rebuild even if evaluation is suspended', () => {
