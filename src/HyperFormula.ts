@@ -929,7 +929,7 @@ export class HyperFormula implements TypedEmitter {
   */
   public copy(sourceLeftCorner: SimpleCellAddress, width: number, height: number): CellValue[][] {
     this._crudOperations.copy(sourceLeftCorner, width, height)
-    return this.getRangeValues(AbsoluteCellRange.spanFrom(sourceLeftCorner, width, height))
+    return this.getRangeValues(sourceLeftCorner, width, height)
   }
 
   /**
@@ -946,7 +946,7 @@ export class HyperFormula implements TypedEmitter {
    */
   public cut(sourceLeftCorner: SimpleCellAddress, width: number, height: number): CellValue[][] {
     this._crudOperations.cut(sourceLeftCorner, width, height)
-    return this.getRangeValues(AbsoluteCellRange.spanFrom(sourceLeftCorner, width, height))
+    return this.getRangeValues(sourceLeftCorner, width, height)
   }
 
   /**
@@ -994,11 +994,14 @@ export class HyperFormula implements TypedEmitter {
   /**
    * Returns the cell content of a given range in a [[CellValue]][][] format.
    *
-   * @param {AbsoluteCellRange} cellRange absolute cell range
+   * @param {SimpleCellAddress} leftCorner - address of the upper left corner of a range
+   * @param {number} width - width of a range
+   * @param {number} height - height of a range
    *
    * @category Range
    */
-  public getRangeValues(cellRange: AbsoluteCellRange): CellValue[][] {
+  public getRangeValues(leftCorner: SimpleCellAddress, width: number, height: number): CellValue[][] {
+    const cellRange = AbsoluteCellRange.spanFrom(leftCorner, width, height)
     return cellRange.arrayOfAddressesInRange().map(
       (subarray) => subarray.map(
         (address) => this.getCellValue(address)
@@ -1009,11 +1012,14 @@ export class HyperFormula implements TypedEmitter {
   /**
    * Returns cell formulas in given range.
    *
-   * @param {AbsoluteCellRange} cellRange absolute cell range
+   * @param {SimpleCellAddress} leftCorner - address of the upper left corner of a range
+   * @param {number} width - width of a range
+   * @param {number} height - height of a range
    *
    * @category Range
    */
-  public getRangeFormulas(cellRange: AbsoluteCellRange): Maybe<string>[][] {
+  public getRangeFormulas(leftCorner: SimpleCellAddress, width: number, height: number): Maybe<string>[][] {
+    const cellRange = AbsoluteCellRange.spanFrom(leftCorner, width, height)
     return cellRange.arrayOfAddressesInRange().map(
       (subarray) => subarray.map(
         (address) => this.getCellFormula(address)
@@ -1022,13 +1028,16 @@ export class HyperFormula implements TypedEmitter {
   }
 
   /**
-   * Returns serialized cell in given range.
+   * Returns serialized cells in given range.
    *
-   * @param {AbsoluteCellRange} cellRange absolute cell range
+   * @param {SimpleCellAddress} leftCorner - address of the upper left corner of a range
+   * @param {number} width - width of a range
+   * @param {number} height - height of a range
    *
    * @category Range
    */
-  public getRangeSerialized(cellRange: AbsoluteCellRange): CellValue[][] {
+  public getRangeSerialized(leftCorner: SimpleCellAddress, width: number, height: number): CellValue[][] {
+    const cellRange = AbsoluteCellRange.spanFrom(leftCorner, width, height)
     return cellRange.arrayOfAddressesInRange().map(
       (subarray) => subarray.map(
         (address) => this.getCellSerialized(address)
