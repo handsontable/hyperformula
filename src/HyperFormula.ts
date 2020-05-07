@@ -833,9 +833,8 @@ export class HyperFormula implements TypedEmitter {
    * // choose the address and assign it to a variable
    * const address = { col: 0, row: 0, sheet: 0 };
    *
-   * // should return 'true' for this example
-   * // it is possible to set content of width 2,
-   * // height 1 in the first row and column of sheet 0
+   * // should return 'true' for this example, it is possible to set content of 
+   * // width 2, height 1 in the first row and column of sheet 0
    * const isSettable = hfInstance.isItPossibleToSetCellContents(address, 2, 1);
    * ```
    *
@@ -1008,7 +1007,7 @@ export class HyperFormula implements TypedEmitter {
    * ```js
    * const hfInstance = HyperFormula.buildFromArray([
    *  ['1'],
-   *  ['1'],
+   *  ['2'],
    * ]);
    *
    * // should return: [{ sheet: 0, col: 1, row: 2, value: null }] for this example
@@ -1555,7 +1554,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * // returns cell formulas of a given range only:
    * // [ [ '=SUM(1:2)', undefined ], [ undefined, undefined ] ]
-   * const rangeFormulas = hfInstance.getRangeFormulas({ sheet: 0, col: 0, row: 0 }, 1, 1);
+   * const rangeFormulas = hfInstance.getRangeFormulas({ sheet: 0, col: 0, row: 0 }, 2, 2);
    * ```
    *
    * @category Range
@@ -2081,6 +2080,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * // should return 'true', cell of provided coordinates is empty
    * const isEmpty = hfInstance.isCellEmpty({ sheet: 0, col: 0, row: 0 });
+   *
    * // should return 'false', cell of provided coordinates is not empty
    * const isNotEmpty = hfInstance.isCellEmpty({ sheet: 0, col: 1, row: 1 });
    * ```
@@ -2243,14 +2243,14 @@ export class HyperFormula implements TypedEmitter {
    * // one method suspends the recalculation
    * // the second will resume calculations and return the changes
    *
-   * // Suspend the evaluation with this method
+   * // suspend the evaluation with this method
    * hfInstance.suspendEvaluation();
    *
    * // perform operations
    * hfInstance.addRows(0, [1, 1]);
    * hfInstance.removeColumns(0, [1, 1]);
    *
-   * // Use resumeEvaluation to resume
+   * // use resumeEvaluation to resume
    * const changes = hfInstance.resumeEvaluation();
    * ```
    *
