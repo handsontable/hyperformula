@@ -186,10 +186,23 @@ export class HyperFormula implements TypedEmitter {
    * If not specified, the engine will be built with the default configuration.
    *
    * @param {Sheet} sheet - two-dimensional array representation of sheet
-   * @param {Partial<ConfigParams>} [configInput] - engine configuration
+   * @param {Partial<ConfigParams>} configInput - engine configuration
    *
    * @throws [[SheetSizeLimitExceededError]] when sheet size exceeds the limits
    * @throws [[InvalidArgumentsError]] when sheet is not an array of arrays
+   *
+   * @example
+   * ```js
+   * // data represented as an array
+   * const sheetData = [
+   *  ['0', '=SUM(1,2,3)', '52'],
+   *  ['=SUM(A1:C1)', '', '=A1'],
+   *  ['2', '=SUM(A1:C1)', '91'],
+   * ];
+   *
+   * // method with optional config parameter maxColumns
+   * const hfInstance = HyperFormula.buildFromArray(sheetData, { maxColumns: 1000 });
+   * ```
    *
    * @category Factory
    */
@@ -204,10 +217,30 @@ export class HyperFormula implements TypedEmitter {
    * If not specified the engine will be built with the default configuration.
    *
    * @param {Sheet} sheets - object with sheets definition
-   * @param {Partial<ConfigParams>} [configInput] - engine configuration
+   * @param {Partial<ConfigParams>} configInput - engine configuration
    *
    * @throws [[SheetSizeLimitExceededError]] when sheet size exceeds the limits
    * @throws [[InvalidArgumentsError]] when any sheet is not an array of arrays
+   *
+   * @example
+   * ```js
+   * // data represented as an object with sheets: Sheet1 and Sheet2
+   * const sheetData = {
+   *  'Sheet1': [
+   *    ['1', '', '=Sheet2!$A1'],
+   *    ['', '2', '=SUM(1,2,3)'],
+   *    ['=Sheet2!$A2', '2', ''],
+   *   ],
+   *  'Sheet2': [
+   *    ['', '4', '=Sheet1!$B1'],
+   *    ['', '8', '=SUM(9,3,3)'],
+   *    ['=Sheet1!$B1', '2', ''],
+   *   ],
+   * };
+   *
+   * // method with optional config parameter useColumnIndex
+   * const hfInstance = HyperFormula.buildFromSheets(sheetData, { useColumnIndex: true });
+   * ```
    *
    * @category Factory
    */
@@ -220,10 +253,16 @@ export class HyperFormula implements TypedEmitter {
   /**
    * Returns registered language from its code string.
    *
-   * @param {string} code - code string of the translation package, for example: 'enGB'
+   * @param {string} languageCode - code string of the translation package
+   *
+   * @example
+   * ```js
+   * // return registered language
+   * const language = HyperFormula.getLanguage('enGB');
+   * ```
    */
-  public static getLanguage(code: string): TranslationPackage {
-    const val = this.registeredLanguages.get(code)
+  public static getLanguage(languageCode: string): TranslationPackage {
+    const val = this.registeredLanguages.get(languageCode)
     if(val === undefined) {
       throw new Error('Language not registered.')
     } else {
@@ -234,25 +273,40 @@ export class HyperFormula implements TypedEmitter {
   /**
    * Registers language from under given code string.
    *
-   * @param {string} code - code string of the translation package, for example: 'enGB'
-   * @param {RawTranslationPackage} lang - translation package to be registered
+   * @param {string} languageCode - code string of the translation package
+   * @param {RawTranslationPackage} languagePackage - translation package to be registered
+   *
+   * @example
+   * ```js
+   * // return registered language
+   * HyperFormula.registerLanguage('plPL', plPL);
+   * ```
    */
-  public static registerLanguage(code: string, lang: RawTranslationPackage): void {
-    if(this.registeredLanguages.has(code)) {
+  public static registerLanguage(languageCode: string, languagePackage: RawTranslationPackage): void {
+    if(this.registeredLanguages.has(languageCode)) {
       throw new Error('Language already registered.')
     } else {
-      this.registeredLanguages.set(code, buildTranslationPackage(lang))
+      this.registeredLanguages.set(languageCode, buildTranslationPackage(languagePackage))
     }
   }
 
   /**
    * Unregisters language that is registered under given code string.
    *
-   * @param {string} code - code string of the translation package, for example: 'enGB'
+   * @param {string} languageCode - code string of the translation package
+   *
+   * @example
+   * ```js
+   * // register the language for the instance
+   * HyperFormula.registerLanguage('plPL', plPL);
+   *
+   * // unregister plPL
+   * HyperFormula.unregisterLanguage('plPL');
+   * ```
    */
-  public static unregisterLanguage(code: string): void {
-    if(this.registeredLanguages.has(code)) {
-      this.registeredLanguages.delete(code)
+  public static unregisterLanguage(languageCode: string): void {
+    if(this.registeredLanguages.has(languageCode)) {
+      this.registeredLanguages.delete(languageCode)
     } else {
       throw new Error('Language not registered.')
     }
@@ -260,6 +314,12 @@ export class HyperFormula implements TypedEmitter {
 
   /**
    * Returns all registered languages codes.
+   *
+   * @example
+   * ```js
+   * // should return all registered language codes: ['enGB', 'plPL']
+   * const registeredLangugaes = HyperFormula.getRegisteredLanguagesCodes();
+   * ```
    */
   public static getRegisteredLanguagesCodes(): string[] {
     return Array.from(this.registeredLanguages.keys())
@@ -270,7 +330,13 @@ export class HyperFormula implements TypedEmitter {
    * Can be configured with the optional parameter that represents a [[ConfigParams]].
    * If not specified the engine will be built with the default configuration.
    *
-   * @param {Partial<ConfigParams>} [configInput] - engine configuration
+   * @param {Partial<ConfigParams>} configInput - engine configuration
+   *
+   * @example
+   * ```js
+   * // build with no initial data and with optional config parameter maxColumns
+   * const hfInstance = HyperFormula.buildEmpty({ maxColumns: 1000 });
+   * ```
    *
    * @category Factory
    */
@@ -307,6 +373,19 @@ export class HyperFormula implements TypedEmitter {
    * @throws Throws an error if the sheet ID is unknown
    * @throws [[EvaluationSuspendedError]] when the evaluation is suspended
    *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromArray([
+   *  ['=SUM(1,2,3)', '2'],
+   * ]);
+   *
+   * // get value of A1 cell, should be '6'
+   * const A1Value = hfInstance.getCellValue({ sheet: 0, col: 0, row: 0 });
+   *
+   * // get value of B1 cell, should be '2'
+   * const B1Value = hfInstance.getCellValue({ sheet: 0, col: 1, row: 0 });
+   * ```
+   *
    * @category Cell
    */
   public getCellValue(cellAddress: SimpleCellAddress): CellValue {
@@ -326,6 +405,19 @@ export class HyperFormula implements TypedEmitter {
    *
    * @param {SimpleCellAddress} cellAddress - cell coordinates
    *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromArray([
+   *  ['=SUM(1,2,3)', '0'],
+   * ]);
+   *
+   * // should return a normalized A1 cell formula: '=SUM(1,2,3)'
+   * const A1Formula = hfInstance.getCellFormula({ sheet: 0, col: 0, row: 0 });
+   *
+   * // should return a normalized B1 cell formula: 'undefined'
+   * const B1Formula = hfInstance.getCellFormula({ sheet: 0, col: 1, row: 0 });
+   * ```
+   *
    * @category Cell
    */
   public getCellFormula(cellAddress: SimpleCellAddress): Maybe<string> {
@@ -339,6 +431,19 @@ export class HyperFormula implements TypedEmitter {
    * @param {SimpleCellAddress} cellAddress - cell coordinates
    *
    * @throws [[EvaluationSuspendedError]] when the evaluation is suspended
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromArray([
+   *  ['=SUM(1,2,3)', '0'],
+   * ]);
+   *
+   * // should return serialized content of A1 cell: '=SUM(1,2,3)'
+   * const cellA1Serialized = hfInstance.getCellSerialized({ sheet: 0, col: 0, row: 0 });
+   *
+   * // should return serialized content of B1 cell: '0'
+   * const cellB1Serialized = hfInstance.getCellSerialized({ sheet: 0, col: 1, row: 0 });
+   * ```
    *
    * @category Cell
    */
@@ -356,6 +461,18 @@ export class HyperFormula implements TypedEmitter {
    *
    * @param {number} sheetId - sheet ID number
    *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromArray([
+   *  ['0', '=SUM(1,2,3)', '=A1'],
+   *  ['1', '=TEXT(A2, "0.0%")', '=C1'],
+   *  ['2', '=SUM(A1:C1)', '=C1'],
+   * ]);
+   *
+   * // should return all values of a sheet: [[0, 6, 0], [1, '1.0%', 0], [2, 6, 0]]
+   * const sheetValues = hfInstance.getSheetValues(0);
+   * ```
+   *
    * @category Sheet
    */
   public getSheetValues(sheetId: number): CellValue[][] {
@@ -370,6 +487,23 @@ export class HyperFormula implements TypedEmitter {
    * @param {SimpleCellAddress} sheetId - sheet ID number
    *
    * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromArray([
+   *  ['0', '=SUM(1,2,3)', '=A1'],
+   *  ['1', '=TEXT(A2, "0.0%")', '=C1'],
+   *  ['2', '=SUM(A1:C1)', '=C1'],
+   * ]);
+   *
+   * // should return all formulas of a sheet:
+   * // [
+   * //  [undefined, '=SUM(1,2,3)', '=A1'],
+   * //  [undefined, '=TEXT(A2, "0.0%")', '=C1'],
+   * //  [undefined, '=SUM(A1:C1)', '=C1'],
+   * // ];
+   * const sheetFormulas = hfInstance.getSheetFormulas(0);
+   * ```
    *
    * @category Sheet
    */
@@ -386,6 +520,23 @@ export class HyperFormula implements TypedEmitter {
    * @throws [[EvaluationSuspendedError]] when the evaluation is suspended
    * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
    *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromArray([
+   *  ['0', '=SUM(1,2,3)', '=A1'],
+   *  ['1', '=TEXT(A2, "0.0%")', '=C1'],
+   *  ['2', '=SUM(A1:C1)', '=C1'],
+   * ]);
+   *
+   * // should return:
+   * // [
+   * //  ['0', '=SUM(1,2,3)', '=A1'],
+   * //  ['1', '=TEXT(A2, "0.0%")', '=C1'],
+   * //  ['2', '=SUM(A1:C1)', '=C1'],
+   * // ];
+   * const serializedContent = hfInstance.getSheetSerialized(0);
+   * ```
+   *
    * @category Sheet
    */
   public getSheetSerialized(sheetId: number): NoErrorCellValue[][] {
@@ -397,6 +548,23 @@ export class HyperFormula implements TypedEmitter {
    * Returns a map containing dimensions of all sheets for the engine instance represented as a key-value pairs where keys are sheet IDs and dimensions are returned as numbers, width and height respectively.
    *
    * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromSheets({
+   *   Sheet1: [
+   *    ['1', '2', '=Sheet2!$A1'],
+   *   ],
+   *   Sheet2: [
+   *    ['3'],
+   *    ['4'],
+   *   ],
+   * });
+   *
+   * // should return the dimensions of all sheets:
+   * // { Sheet1: { width: 3, height: 1 }, Sheet2: { width: 1, height: 2 } }
+   * const allSheetsDimensions = hfInstance.getAllSheetsDimensions();
+   * ```
    *
    * @category Sheet
    */
@@ -412,6 +580,16 @@ export class HyperFormula implements TypedEmitter {
    *
    * @param {number} sheetId - sheet ID number
    *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromArray([
+   *    ['1', '2', '=Sheet2!$A1'],
+   * ]);
+   *
+   * // should return provided sheet's dimensions: { width: 3, height: 1 }
+   * const sheetDimensions = hfInstance.getSheetDimensions(0);
+   * ```
+   *
    * @category Sheet
    */
   public getSheetDimensions(sheetId: number): SheetDimensions {
@@ -426,6 +604,16 @@ export class HyperFormula implements TypedEmitter {
    *
    * @throws [[EvaluationSuspendedError]] when the evaluation is suspended
    *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromArray([
+   *  ['1', '=A1+10', '3'],
+   * ]);
+   *
+   * // should return all sheets values: { Sheet1: [ [ 1, 11, 3 ] ] }
+   * const allSheetsValues = hfInstance.getAllSheetsValues();
+   * ```
+   *
    * @category Sheet
    */
   public getAllSheetsValues(): Record<string, CellValue[][]> {
@@ -436,6 +624,15 @@ export class HyperFormula implements TypedEmitter {
   /**
    * Returns formulas of all sheets in a form of an object which property keys are strings and values are arrays of arrays of strings or possibly `undefined`
    *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromArray([
+   *  ['1', '2', '=A1+10'],
+   * ]);
+   *
+   * // should return only formulas: { Sheet1: [ [ undefined, undefined, '=A1+10' ] ] }
+   * const allSheetsFormulas = hfInstance.getAllSheetsFormulas();
+   * ```
    * @category Sheet
    */
   public getAllSheetsFormulas(): Record<string, Maybe<string>[][]> {
@@ -446,6 +643,16 @@ export class HyperFormula implements TypedEmitter {
    * Returns formulas or values of all sheets in a form of an object which property keys are strings and values are arrays of arrays of [[CellValue]]
    *
    * @throws [[EvaluationSuspendedError]] when the evaluation is suspended
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromArray([
+   *  ['1', '2', '=A1+10'],
+   * ]);
+   *
+   * // should return all sheets serialized content: { Sheet1: [ [ 1, 2, '=A1+10' ] ] }
+   * const allSheetsSerialized = hfInstance.getAllSheetsSerialized();
+   * ```
    *
    * @category Sheet
    */
@@ -458,6 +665,17 @@ export class HyperFormula implements TypedEmitter {
    * Updates the config with given new parameters.
    *
    * @param {Partial<ConfigParams>} newParams configuration options to be updated or added
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromArray([
+   *  ['1', '2'],
+   * ]);
+   *
+   * // add a config param, for example maxColumns,
+   * // you can check the configuration with getConfig method
+   * hfInstance.updateConfig({ maxColumns: 1000 });
+   * ```
    *
    * @category Instance
    */
@@ -487,6 +705,12 @@ export class HyperFormula implements TypedEmitter {
   /**
    * Returns current configuration of the engine instance.
    *
+   * @example
+   * ```js
+   * // should return all config parameters including default and those which were added
+   * const hfConfig = hfInstance.getConfig();
+   * ```
+   *
    * @category Instance
    */
   public getConfig(): ConfigParams {
@@ -495,6 +719,11 @@ export class HyperFormula implements TypedEmitter {
 
   /**
    * Serializes and deserializes whole engine, effectively reloading it.
+   *
+   * @example
+   * ```js
+   * hfInstance.rebuildAndRecalculate();
+   * ```
    *
    * @category Instance
    */
@@ -505,6 +734,8 @@ export class HyperFormula implements TypedEmitter {
   /**
    * Returns a snapshot of computation time statistics.
    * It returns a map with key-value pairs where keys are enums for stat type and time (number)
+   *
+   * @internal
    *
    * @category Instance
    */
@@ -520,6 +751,20 @@ export class HyperFormula implements TypedEmitter {
    * @fires [[valuesUpdated]] if recalculation was triggered by this change
    *
    * @throws [[NoOperationToUndoError]] when there is no operation running that can be undone
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromArray([
+   *  ['1', '2'],
+   *  ['3', ''],
+   * ]);
+   *
+   * // perform CRUD operation, for example remove the second row
+   * hfInstance.removeRows(0, [1, 1]);
+   *
+   * // do an undo, it should return the changes
+   * const changes = hfInstance.undo();
+   * ```
    *
    * @category UndoRedo
    */
@@ -537,6 +782,24 @@ export class HyperFormula implements TypedEmitter {
    *
    * @throws [[NoOperationToRedoError]] when there is no operation running that can be re-done
    *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromArray([
+   *  ['1'],
+   *  ['2'],
+   *  ['3'],
+   * ]);
+   *
+   * // perform CRUD operation, for example remove the second row
+   * hfInstance.removeRows(0, [1, 1]);
+   *
+   * // do an undo, it should return prvious values: [['1'], ['2'], ['3']]
+   * hfInstance.undo();
+   *
+   * // do a redo, it should return the values after removing the second row: [['1'], ['3']]
+   * const changes = hfInstance.redo();
+   * ```
+   *
    * @category UndoRedo
    */
   public redo(): ExportedChange[] {
@@ -547,18 +810,42 @@ export class HyperFormula implements TypedEmitter {
   /**
    * Checks if there is at least one operation that can be undone.
    *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromArray([
+   *  ['1'],
+   *  ['2'],
+   *  ['3'],
+   * ]);
+   *
+   * // perform CRUD operation, for example remove the second row
+   * hfInstance.removeRows(0, [1, 1]);
+   *
+   * // should return 'true', it is possible to undo last operation
+   * // which is removing rows in this example
+   * const isSomethingToUndo = hfInstance.isThereSomethingToUndo();
+   * ```
+   *
    * @category UndoRedo
    */
-  public isThereSomethingToUndo() {
+  public isThereSomethingToUndo(): boolean {
     return this._crudOperations.isThereSomethingToUndo()
   }
 
   /**
    * Checks if there is at least one operation that can be re-done.
    *
+   * @example
+   * ```js
+   * hfInstance.undo();
+   *
+   * // when there is an action to redo, this will return 'true'
+   * const isSomethingToRedo = hfInstance.isThereSomethingToRedo();
+   * ```
+   *
    * @category UndoRedo
    */
-  public isThereSomethingToRedo() {
+  public isThereSomethingToRedo(): boolean {
     return this._crudOperations.isThereSomethingToRedo()
   }
 
@@ -570,6 +857,20 @@ export class HyperFormula implements TypedEmitter {
    * @param {SimpleCellAddress} topLeftCornerAddress -  top left corner of block of cells
    * @param {number} width - width of the box
    * @param {number} height - height of the box
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromArray([
+   *  ['1', '2'],
+   * ]);
+   *
+   * // choose the address and assign it to a variable
+   * const address = { col: 0, row: 0, sheet: 0 };
+   *
+   * // should return 'true' for this example, it is possible to set content of 
+   * // width 2, height 1 in the first row and column of sheet 0
+   * const isSettable = hfInstance.isItPossibleToSetCellContents(address, 2, 1);
+   * ```
    *
    * @category Cell
    */
@@ -601,6 +902,20 @@ export class HyperFormula implements TypedEmitter {
    * @throws [[SheetSizeLimitExceededError]] when performing this operation would result in sheet size limits exceeding
    * @throws an error when it is an attempt to set cells content inside matrices during batch operation
    *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromArray([
+   *  ['1', '2', '=A1'],
+   * ]);
+   *
+   * // should set the content, returns:
+   * // [{
+   * //   address: { sheet: 0, col: 3, row: 0 },
+   * //   newValue: 2,
+   * // }]
+   * const changes = hfInstance.setCellContents({ col: 3, row: 0, sheet: 0 }, [['=B1']]);
+   * ```
+   *
    * @category Cell
    */
   public setCellContents(topLeftCornerAddress: SimpleCellAddress, cellContents: RawCellContent[][] | RawCellContent): ExportedChange[] {
@@ -616,6 +931,17 @@ export class HyperFormula implements TypedEmitter {
    *
    * @param {number} sheetId - sheet ID in which rows will be added
    * @param {Index[]} indexes - non-contiguous indexes with format [row, amount], where row is a row number above which the rows will be added
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromArray([
+   *  ['1', '2', '3'],
+   * ]);
+   *
+   * // should return 'true' for this example,
+   * // it is possible to add one row in the second row of sheet 0
+   * const isAddable = hfInstance.isItPossibleToAddRows(0, [1, 1]);
+   * ```
    *
    * @category Row
    */
@@ -644,6 +970,18 @@ export class HyperFormula implements TypedEmitter {
    * @throws [[SheetSizeLimitExceededError]] when performing this operation would result in sheet size limits exceeding
    * @throws an error if the selected position has matrix inside
    *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromArray([
+   *  ['1'],
+   *  ['2'],
+   * ]);
+   *
+   * // should return a list of cells which values changed after the operation,
+   * // their absolute addresses and new values
+   * const changes = hfInstance.addRows(0, [0, 1]);
+   * ```
+   *
    * @category Row
    */
   public addRows(sheetId: number, ...indexes: Index[]): ExportedChange[] {
@@ -659,6 +997,18 @@ export class HyperFormula implements TypedEmitter {
    *
    * @param {number} sheetId - sheet ID from which rows will be removed
    * @param {Index[]} indexes - non-contiguous indexes with format: [row, amount]
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromArray([
+   *  ['1'],
+   *  ['2'],
+   * ]);
+   *
+   * // should return 'true' for this example
+   * // it is possible to remove one row from row 1 of sheet 0
+   * const isRemovable = hfInstance.isItPossibleToRemoveRows(0, [1, 1]);
+   * ```
    *
    * @category Row
    */
@@ -687,6 +1037,17 @@ export class HyperFormula implements TypedEmitter {
    * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
    * @throws an error when the selected position has matrix inside
    *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromArray([
+   *  ['1'],
+   *  ['2'],
+   * ]);
+   *
+   * // should return: [{ sheet: 0, col: 1, row: 2, value: null }] for this example
+   * const changes = hfInstance.removeRows(0, [1, 1]);
+   * ```
+   *
    * @category Row
    */
   public removeRows(sheetId: number, ...indexes: Index[]): ExportedChange[] {
@@ -702,6 +1063,17 @@ export class HyperFormula implements TypedEmitter {
    *
    * @param {number} sheetId - sheet ID in which columns will be added
    * @param {Index[]} indexes - non-contiguous indexes with format: [column, amount], where column is a column number from which new columns will be added
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromArray([
+   *  ['1', '2'],
+   * ]);
+   *
+   * // should return 'true' for this example,
+   * // it is possible to add 1 column in sheet 0, at column 1
+   * const isAddable = hfInstance.isItPossibleToAddColumns(0, [1, 1]);
+   * ```
    *
    * @category Column
    */
@@ -731,6 +1103,21 @@ export class HyperFormula implements TypedEmitter {
    * @throws [[SheetSizeLimitExceededError]] when performing this operation would result in sheet size limits exceeding
    * @throws an error when the selected position has matrix inside
    *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromArray([
+   *  ['=RAND()', '42'],
+   * ]);
+   *
+   * // should return a list of cells which values changed after the operation,
+   * // their absolute addresses and new values, for this example:
+   * // [{
+   * //   address: { sheet: 0, col: 1, row: 0 },
+   * //   newValue: 0.92754862796338,
+   * // }]
+   * const changes = hfInstance.addColumns(0, [0, 1]);
+   * ```
+   *
    * @category Column
    */
   public addColumns(sheetId: number, ...indexes: Index[]): ExportedChange[] {
@@ -746,6 +1133,17 @@ export class HyperFormula implements TypedEmitter {
    *
    * @param {number} sheetId - sheet ID from which columns will be removed
    * @param {Index[]} indexes - non-contiguous indexes with format [column, amount]
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromArray([
+   *  ['1', '2'],
+   * ]);
+   *
+   * // should return 'true' for this example
+   * // it is possible to remove one column, in place of the second column of sheet 0
+   * const isRemovable = hfInstance.isItPossibleToRemoveColumns(0, [1, 1]);
+   * ```
    *
    * @category Column
    */
@@ -774,6 +1172,21 @@ export class HyperFormula implements TypedEmitter {
    * @throws [[InvalidArgumentsError]] when the given arguments are invalid
    * @throws an error when the selected position has matrix inside
    *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromArray([
+   *  ['0', '=SUM(1,2,3)', '=A1'],
+   * ]);
+   *
+   * // should return a list of cells which values changed after the operation,
+   * // their absolute addresses and new values, in this example it will return:
+   * // [{
+   * //   address: { sheet: 0, col: 1, row: 0 },
+   * //   newValue: { error: [CellError], value: '#REF!' },
+   * // }]
+   * const changes = hfInstance.removeColumns(0, [0, 1]);
+   * ```
+   *
    * @category Column
    */
   public removeColumns(sheetId: number, ...indexes: Index[]): ExportedChange[] {
@@ -792,6 +1205,22 @@ export class HyperFormula implements TypedEmitter {
    * @param {number} height - height of the cell block that is being moved
    * @param {SimpleCellAddress} destinationLeftCorner - upper left address of the target cell block
    *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromArray([
+   *  ['1', '2'],
+   * ]);
+   *
+   * // choose the coordinates and assign them to variables
+   * const source = { sheet: 0, col: 1, row: 0 };
+   * const destination = { sheet: 0, col: 3, row: 0 };
+   *
+   * // should return 'true' for this example
+   * // it is possible to move a block of width 1 and height 1
+   * // from the corner: column 1 and row 0 of sheet 0
+   * // into destination corner: column 3, row 0 of sheet 0
+   * const isMovable = hfInstance.isItPossibleToMoveCells(source, 1, 1, destination);
+   * ```
    * @category Cell
    */
   public isItPossibleToMoveCells(sourceLeftCorner: SimpleCellAddress, width: number, height: number, destinationLeftCorner: SimpleCellAddress): boolean {
@@ -820,6 +1249,25 @@ export class HyperFormula implements TypedEmitter {
    * @throws an error when the source location has matrix inside - matrix cannot be moved
    * @throws an error when the target location has matrix inside - cells cannot be replaced by the matrix
    *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromArray([
+   *  ['=RAND()', '42'],
+   * ]);
+   *
+   * // choose the coordinates and assign them to variables
+   * const source = { sheet: 0, col: 1, row: 0 };
+   * const destination = { sheet: 0, col: 3, row: 0 };
+   *
+   * // should return a list of cells which values changed after the operation,
+   * // their absolute addresses and new values, for this example:
+   * // [{
+   * //   address: { sheet: 0, col: 0, row: 0 },
+   * //   newValue: 0.93524248002062,
+   * // }]
+   * const changes = hfInstance.moveCells(source, 1, 1, destination);
+   * ```
+   *
    * @category Cell
    */
   public moveCells(sourceLeftCorner: SimpleCellAddress, width: number, height: number, destinationLeftCorner: SimpleCellAddress): ExportedChange[] {
@@ -837,6 +1285,18 @@ export class HyperFormula implements TypedEmitter {
    * @param {number} startRow - number of the first row to move
    * @param {number} numberOfRows - number of rows to move
    * @param {number} targetRow - row number before which rows will be moved
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromArray([
+   *  ['1'],
+   *  ['2'],
+   * ]);
+   *
+   * // should return 'true' for this example
+   * // it is possible to move one row from row 0 into row 2
+   * const isMovable = hfInstance.isItPossibleToMoveRows(0, 0, 1, 2);
+   * ```
    *
    * @category Row
    */
@@ -864,6 +1324,18 @@ export class HyperFormula implements TypedEmitter {
    * @throws [[InvalidArgumentsError]] when the given arguments are invalid
    * @throws an error when the source location has matrix inside - matrix cannot be moved
    *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromArray([
+   *  ['1'],
+   *  ['2'],
+   * ]);
+   *
+   * // should return a list of cells which values changed after the operation,
+   * // their absolute addresses and new values
+   * const changes = hfInstance.moveRows(0, 0, 1, 2);
+   * ```
+   *
    * @category Row
    */
   public moveRows(sheetId: number, startRow: number, numberOfRows: number, targetRow: number): ExportedChange[] {
@@ -881,6 +1353,17 @@ export class HyperFormula implements TypedEmitter {
    * @param {number} startColumn - number of the first column to move
    * @param {number} numberOfColumns - number of columns to move
    * @param {number} targetColumn - column number before which columns will be moved
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromArray([
+   *  ['1', '2'],
+   * ]);
+   *
+   * // should return 'true' for this example
+   * // it is possible to move one column from column 1 into column 2 of sheet 0
+   * const isMovable = hfInstance.isItPossibleToMoveColumns(0, 1, 1, 2);
+   * ```
    *
    * @category Column
    */
@@ -908,6 +1391,24 @@ export class HyperFormula implements TypedEmitter {
    * @throws [[InvalidArgumentsError]] when the given arguments are invalid
    * @throws an error when the source location has matrix inside - matrix cannot be moved
    *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromArray([
+   *  ['1', '2', '3', '=RAND()', '=SUM(A1:C1)'],
+   * ]);
+   *
+   * // should return a list of cells which values changed after the operation,
+   * // their absolute addresses and new values, for this example:
+   * // [{
+   * //   address: { sheet: 0, col: 1, row: 0 },
+   * //   newValue: 0.16210054671639,
+   * //  }, {
+   * //   address: { sheet: 0, col: 4, row: 0 },
+   * //   newValue: 6.16210054671639,
+   * // }]
+   * const changes = hfInstance.moveColumns(0, 1, 1, 2);
+   * ```
+   *
    * @category Column
    */
   public moveColumns(sheetId: number, startColumn: number, numberOfColumns: number, targetColumn: number): ExportedChange[] {
@@ -925,6 +1426,16 @@ export class HyperFormula implements TypedEmitter {
    *
    * @throws an error while attempting to copy unsupported content type
    *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromArray([
+   *  ['1', '2'],
+   * ]);
+   *
+   * // should return: [ [ 2 ] ]
+   * const clipboardContent = hfInstance.copy({ sheet: 0, col: 1, row: 0 }, 1, 1);
+   * ```
+   *
    * @category Clipboard
   */
   public copy(sourceLeftCorner: SimpleCellAddress, width: number, height: number): CellValue[][] {
@@ -941,6 +1452,16 @@ export class HyperFormula implements TypedEmitter {
    * @param {SimpleCellAddress} sourceLeftCorner - address of the upper left corner of a copied block
    * @param {number} width - width of the cell block being copied
    * @param {number} height - height of the cell block being copied
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromArray([
+   *  ['1', '2'],
+   * ]);
+   *
+   * // should return values that were cut: [ [ 1 ] ]
+   * const clipboardContent = hfInstance.cut({ sheet: 0, col: 0, row: 0 }, 1, 1);
+   * ```
    *
    * @category Clipboard
    */
@@ -965,6 +1486,20 @@ export class HyperFormula implements TypedEmitter {
    * @throws [[SheetSizeLimitExceededError]] when performing this operation would result in sheet size limits exceeding
    * @throws [[NothingToPasteError]] when clipboard is empty
    *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromArray([
+   *  ['1', '2'],
+   * ]);
+   *
+   * // do a copy, [ [ 2 ] ] was copied
+   * hfInstance.copy({ sheet: 0, col: 0, row: 0 }, 1, 1);
+   *
+   * // do a paste, should return a list of cells which values changed
+   * // after the operation, their absolute addresses and new values
+   * const changes = hfInstance.paste({ sheet: 0, col: 1, row: 0 });
+   * ```
+   *
    * @category Clipboard
    */
   public paste(targetLeftCorner: SimpleCellAddress): ExportedChange[] {
@@ -976,6 +1511,19 @@ export class HyperFormula implements TypedEmitter {
   /**
    * Returns information whether there is something in the clipboard.
    *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromArray([
+   *  ['1', '2'],
+   * ]);
+   *
+   * // copy desired content
+   * hfInstance.copy({ sheet: 0, col: 1, row: 0 }, 1, 1);
+   *
+   * // returns 'false', there is content in the clipboard
+   * const isClipboardEmpty = hfInstance.isClipboardEmpty();
+   * ```
+   *
    * @category Clipboard
    */
   public isClipboardEmpty(): boolean {
@@ -984,6 +1532,12 @@ export class HyperFormula implements TypedEmitter {
 
   /**
    * Clears the clipboard content by setting the content to `undefined`.
+   *
+   * @example
+   * ```js
+   * // clears the clipboard, isClipboardEmpty() should return true if called afterwards
+   * hfInstance.clearClipboard();
+   * ```
    *
    * @category Clipboard
    */
@@ -997,6 +1551,19 @@ export class HyperFormula implements TypedEmitter {
    * @param {SimpleCellAddress} leftCorner - address of the upper left corner of a range
    * @param {number} width - width of a range
    * @param {number} height - height of a range
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromArray([
+   *  ['=SUM(1,2)', '2', '10'],
+   *  ['5', '6', '7'],
+   *  ['40', '30', '20'],
+   * ]);
+   *
+   *
+   * // returns calculated cells content: [ [ 3, 2 ], [ 5, 6 ] ]
+   * const rangeValues = hfInstance.getRangeValues({ sheet: 0, col: 0, row: 0 }, 2, 2);
+   * ```
    *
    * @category Range
    */
@@ -1016,6 +1583,19 @@ export class HyperFormula implements TypedEmitter {
    * @param {number} width - width of a range
    * @param {number} height - height of a range
    *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromArray([
+   *  ['=SUM(1,2)', '2', '10'],
+   *  ['5', '6', '7'],
+   *  ['40', '30', '20'],
+   * ]);
+   *
+   * // returns cell formulas of a given range only:
+   * // [ [ '=SUM(1,2)', undefined ], [ undefined, undefined ] ]
+   * const rangeFormulas = hfInstance.getRangeFormulas({ sheet: 0, col: 0, row: 0 }, 2, 2);
+   * ```
+   *
    * @category Range
    */
   public getRangeFormulas(leftCorner: SimpleCellAddress, width: number, height: number): Maybe<string>[][] {
@@ -1033,6 +1613,19 @@ export class HyperFormula implements TypedEmitter {
    * @param {SimpleCellAddress} leftCorner - address of the upper left corner of a range
    * @param {number} width - width of a range
    * @param {number} height - height of a range
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromArray([
+   *  ['=SUM(1,2)', '2', '10'],
+   *  ['5', '6', '7'],
+   *  ['40', '30', '20'],
+   * ]);
+   *
+   * // should return serialized cell content for the given range:
+   * // [ [ '=SUM(1,2)', 2 ], [ 5, 6 ] ]
+   * const rangeSerialized = hfInstance.getRangeSerialized({ sheet: 0, col: 0, row: 0 }, 2, 2);
+   * ```
    *
    * @category Range
    */
@@ -1052,6 +1645,17 @@ export class HyperFormula implements TypedEmitter {
    * Returns `false` if the chosen name is already used.
    *
    * @param {string} sheetName - sheet name, case insensitive
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromSheets({
+   *   MySheet1: [ ['1'] ],
+   *   MySheet2: [ ['10'] ],
+   * });
+   *
+   * // should return 'false' because 'MySheet2' already exists
+   * const isAddable = hfInstance.isItPossibleToAddSheet('MySheet2');
+   * ```
    *
    * @category Sheet
    */
@@ -1073,6 +1677,21 @@ export class HyperFormula implements TypedEmitter {
    *
    * @throws an error when sheet with a given name already exists
    *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromSheets({
+   *  MySheet1: [ ['1'] ],
+   *  MySheet2: [ ['10'] ],
+   * });
+   *
+   * // should return 'MySheet3'
+   * const nameProvided = hfInstance.addSheet('MySheet3');
+   *
+   * // should return autogenerated 'Sheet4'
+   * // because no name was provided and 3 other ones already exist
+   * const generatedName = hfInstance.addSheet();
+   * ```
+   *
    * @category Sheet
    */
   public addSheet(sheetName?: string): string {
@@ -1087,6 +1706,17 @@ export class HyperFormula implements TypedEmitter {
    * Returns `false` if there is no sheet with a given name
    *
    * @param {string} sheetName - sheet name, case insensitive
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromSheets({
+   *  MySheet1: [ ['1'] ],
+   *  MySheet2: [ ['10'] ],
+   * });
+   *
+   * // should return 'true' because 'MySheet2' exists and is removable
+   * const isRemovable = hfInstance.isItPossibleToRemoveSheet('MySheet2');
+   * ```
    *
    * @category Sheet
    */
@@ -1111,6 +1741,22 @@ export class HyperFormula implements TypedEmitter {
    *
    * @throws [[NoSheetWithNameError]] when the given sheet name does not exists
    *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromSheets({
+   *  MySheet1: [ ['=SUM(MySheet2!A1:A2)'] ],
+   *  MySheet2: [ ['10'] ],
+   * });
+   *
+   * // should return a list of cells which values changed after the operation,
+   * // their absolute addresses and new values, in this example it will return:
+   * // [{
+   * //   address: { sheet: 0, col: 0, row: 0 },
+   * //   newValue: { error: [CellError], value: '#REF!' },
+   * // }]
+   * const changes = hfInstance.removeSheet('MySheet2');
+   * ```
+   *
    * @category Sheet
    */
   public removeSheet(sheetName: string): ExportedChange[] {
@@ -1127,6 +1773,17 @@ export class HyperFormula implements TypedEmitter {
    * Returns `false` if there is no sheet with a given name
    *
    * @param {string} sheetName - sheet name, case insensitive.
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromSheets({
+   *  MySheet1: [ ['1'] ],
+   *  MySheet2: [ ['10'] ],
+   * });
+   *
+   * // should return 'true' because 'MySheet2' exists and can be cleared
+   * const isClearable = hfInstance.isItPossibleToClearSheet('MySheet2');
+   * ```
    *
    * @category Sheet
    */
@@ -1151,6 +1808,22 @@ export class HyperFormula implements TypedEmitter {
    *
    * @throws [[NoSheetWithNameError]] when the given sheet name does not exists
    *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromSheets({
+   *  MySheet1: [ ['=SUM(MySheet2!A1:A2)'] ],
+   *  MySheet2: [ ['10'] ],
+   * });
+   *
+   * // should return a list of cells which values changed after the operation,
+   * // their absolute addresses and new values, in this example it will return:
+   * // [{
+   * //   address: { sheet: 0, col: 0, row: 0 },
+   * //   newValue: 0,
+   * // }]
+   * const changes = hfInstance.clearSheet('MySheet2');
+   * ```
+   *
    * @category Sheet
    */
   public clearSheet(sheetName: string): ExportedChange[] {
@@ -1166,6 +1839,18 @@ export class HyperFormula implements TypedEmitter {
    *
    * @param {string} sheetName - sheet name, case insensitive.
    * @param {RawCellContent[][]} values - array of new values
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromSheets({
+   *  MySheet1: [ ['1'] ],
+   *  MySheet2: [ ['10'] ],
+   * });
+   *
+   * // should return 'true' because 'MySheet1' exists
+   * // and the provided content can be placed in this sheet
+   * const isReplaceable = hfInstance.isItPossibleToReplaceSheetContent('MySheet1', [['50'], ['60']]);
+   * ```
    *
    * @category Sheet
    */
@@ -1191,6 +1876,18 @@ export class HyperFormula implements TypedEmitter {
    * @throws [[NoSheetWithNameError]] when the given sheet name does not exists
    * @throws [[InvalidArgumentsError]] when values is not an array of arrays
    *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromSheets({
+   *  MySheet1: [ ['1'] ],
+   *  MySheet2: [ ['10'] ],
+   * });
+   *
+   * // should return a list of cells which values changed after the operation,
+   * // their absolute addresses and new values
+   * const changes = hfInstance.setSheetContent('MySheet1', [['50'], ['60']]);
+   * ```
+   *
    * @category Sheet
    */
   public setSheetContent(sheetName: string, values: RawCellContent[][]): ExportedChange[] {
@@ -1207,9 +1904,17 @@ export class HyperFormula implements TypedEmitter {
    * @param {string} cellAddress - string representation of cell address in A1 notation, e.g. 'C64'
    * @param {number} sheetId - override sheet index regardless of sheet mapping
    *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildEmpty();
+   *
+   * // should return { sheet: 0, col: 0, row: 0 }
+   * const simpleCellAddress = hfInstance.simpleCellAddressFromString('A1', 0);
+   * ```
+   *
    * @category Helper
    */
-  public simpleCellAddressFromString(cellAddress: string, sheetId: number) {
+  public simpleCellAddressFromString(cellAddress: string, sheetId: number): Maybe<SimpleCellAddress> {
     return simpleCellAddressFromString(this.sheetMapping.get, cellAddress, sheetId)
   }
 
@@ -1218,6 +1923,14 @@ export class HyperFormula implements TypedEmitter {
    *
    * @param {SimpleCellAddress} cellAddress - object representation of an absolute address
    * @param {number} sheetId - if is not equal with address sheet index, string representation will contain sheet name
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildEmpty();
+   *
+   * // should return 'B2'
+   * const A1Notation = hfInstance.simpleCellAddressToString({ sheet: 0, col: 1, row: 1 }, 0);
+   * ```
    *
    * @category Helper
    */
@@ -1230,6 +1943,17 @@ export class HyperFormula implements TypedEmitter {
    *
    * @param {number} sheetId - ID of the sheet, for which we want to retrieve name
    *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromSheets({
+   *  MySheet1: [ ['1'] ],
+   *  MySheet2: [ ['10'] ],
+   * });
+   *
+   * // should return 'MySheet2' as this sheet is the second one
+   * const sheetName = hfInstance.getSheetName(1);
+   * ```
+   *
    * @category Sheet
    */
   public getSheetName(sheetId: number): Maybe<string> {
@@ -1239,6 +1963,17 @@ export class HyperFormula implements TypedEmitter {
   /**
    * List all sheet names.
    * Returns an array of sheet names as strings.
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromSheets({
+   *  MySheet1: [ ['1'] ],
+   *  MySheet2: [ ['10'] ],
+   * });
+   *
+   * // should return all sheets names: ['MySheet1', 'MySheet2']
+   * const sheetNames = hfInstance.getSheetNames();
+   * ```
    *
    * @category Sheet
    */
@@ -1251,6 +1986,17 @@ export class HyperFormula implements TypedEmitter {
    *
    * @param {string} sheetName - name of the sheet, for which we want to retrieve ID, case insensitive.
    *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromSheets({
+   *   MySheet1: [ ['1'] ],
+   *   MySheet2: [ ['10'] ],
+   * });
+   *
+   * // should return '0' because 'MySheet1' is of ID '0'
+   * const sheetID = hfInstance.getSheetId('MySheet1');
+   * ```
+   *
    * @category Sheet
    */
   public getSheetId(sheetName: string): Maybe<number> {
@@ -1261,6 +2007,17 @@ export class HyperFormula implements TypedEmitter {
    * Returns `true` whether sheet with a given name exists. The methods accepts sheet name to be checked.
    *
    * @param {string} sheetName - name of the sheet, case insensitive.
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromSheets({
+   *   MySheet1: [ ['1'] ],
+   *   MySheet2: [ ['10'] ],
+   * });
+   *
+   * // should return 'true' since 'MySheet1' exists
+   * const sheetExist = hfInstance.doesSheetExist('MySheet1');
+   * ```
    *
    * @category Sheet
    */
@@ -1276,6 +2033,19 @@ export class HyperFormula implements TypedEmitter {
    *
    * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
    *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromArray([
+   *  ['=SUM(A2:A3)', '2'],
+   * ]);
+   *
+   * // should return 'FORMULA', the cell of given coordinates is of this type
+   * const cellA1Type = hfInstance.getCellType({ sheet: 0, col: 0, row: 0 });
+   *
+   * // should return 'VALUE', the cell of given coordinates is of this type
+   * const cellB1Type = hfInstance.getCellType({ sheet: 0, col: 1, row: 0 });
+   * ```
+   *
    * @category Cell
    */
   public getCellType(cellAddress: SimpleCellAddress): CellType {
@@ -1289,6 +2059,19 @@ export class HyperFormula implements TypedEmitter {
    *
    * @param {SimpleCellAddress} cellAddress - cell coordinates
    *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromArray([
+   *  ['=SUM(A2:A3)', '2'],
+   * ]);
+   *
+   * // should return 'false' since the selcted cell contains a simple value
+   * const isA1Simple = hfInstance.doesCellHaveSimpleValue({ sheet: 0, col: 0, row: 0 });
+   *
+   * // should return 'true' since the selcted cell does not contain a simple value
+   * const isB1Simple = hfInstance.doesCellHaveSimpleValue({ sheet: 0, col: 1, row: 0 });
+   * ```
+   *
    * @category Cell
    */
   public doesCellHaveSimpleValue(cellAddress: SimpleCellAddress): boolean {
@@ -1300,6 +2083,19 @@ export class HyperFormula implements TypedEmitter {
    * The methods accepts cell coordinates as object with column, row and sheet numbers.
    *
    * @param {SimpleCellAddress} cellAddress - cell coordinates
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromArray([
+   *  ['=SUM(A2:A3)', '2'],
+   * ]);
+   *
+   * // should return 'true' since the A1 cell contains a formula
+   * const A1Formula = hfInstance.doesCellHaveFormula({ sheet: 0, col: 0, row: 0 });
+   *
+   * // should return 'false' since the B1 cell does not contain a formula
+   * const B1NoFormula = hfInstance.doesCellHaveFormula({ sheet: 0, col: 1, row: 0 });
+   * ```
    *
    * @category Cell
    */
@@ -1313,6 +2109,19 @@ export class HyperFormula implements TypedEmitter {
    *
    * @param {SimpleCellAddress} cellAddress - cell coordinates
    *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromArray([
+   *   [null, '1'],
+   * ]);
+   *
+   * // should return 'true', cell of provided coordinates is empty
+   * const isEmpty = hfInstance.isCellEmpty({ sheet: 0, col: 0, row: 0 });
+   *
+   * // should return 'false', cell of provided coordinates is not empty
+   * const isNotEmpty = hfInstance.isCellEmpty({ sheet: 0, col: 1, row: 0 });
+   * ```
+   *
    * @category Cell
    */
   public isCellEmpty(cellAddress: SimpleCellAddress): boolean {
@@ -1324,6 +2133,16 @@ export class HyperFormula implements TypedEmitter {
    * The methods accepts cell coordinates as object with column, row and sheet numbers.
    *
    * @param {SimpleCellAddress} cellAddress - cell coordinates
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromArray([
+   *    ['{=TRANSPOSE(B1:B1)}'],
+   * ]);
+   *
+   * // should return 'true', cell of provided coordinates is a part of a matrix
+   * const isPartOfMatrix = hfInstance.isCellPartOfMatrix({ sheet: 0, col: 0, row: 0 });
+   * ```
    *
    * @category Cell
    */
@@ -1339,6 +2158,19 @@ export class HyperFormula implements TypedEmitter {
    *
    * @throws [[EvaluationSuspendedError]] when the evaluation is suspended
    *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromArray([
+   *  ['=SUM(1,2,3)', '2'],
+   * ]);
+   *
+   * // should return 'NUMBER', cell value type of provided coordinates is a number
+   * const cellValue = hfInstance.getCellValueType({ sheet: 0, col: 1, row: 0 });
+   *
+   * // should return 'NUMBER', cell value type of provided coordinates is a number
+   * const cellValue = hfInstance.getCellValueType({ sheet: 0, col: 0, row: 0 });
+   * ```
+   *
    * @category Cell
    */
   public getCellValueType(cellAddress: SimpleCellAddress): CellValueType {
@@ -1349,6 +2181,16 @@ export class HyperFormula implements TypedEmitter {
 
   /**
    * Returns the number of existing sheets.
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromArray([
+   *  ['1', '2'],
+   * ]);
+   *
+   * // should return the number of sheets which is '1'
+   * const sheetsCount = hfInstance.countSheets();
+   * ```
    *
    * @category Sheet
    */
@@ -1366,6 +2208,17 @@ export class HyperFormula implements TypedEmitter {
    *
    * @throws Throws an error if the provided sheet ID does not exists.
    *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromSheets({
+   *   MySheet1: [ ['1'] ],
+   *   MySheet2: [ ['10'] ],
+   * });
+   *
+   * // renames the sheet 'MySheet1'
+   * hfInstance.renameSheet(0, 'MySheet0');
+   * ```
+   *
    * @category Sheet
    */
   public renameSheet(sheetId: number, newName: string): void {
@@ -1382,6 +2235,19 @@ export class HyperFormula implements TypedEmitter {
    *
    * @param {(e: IBatchExecutor) => void} batchOperations
    * @fires [[valuesUpdated]] if recalculation was triggered by this change
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildEmpty();
+   *
+   * // multiple operations in a single callback will trigger evaluation only once
+   * // and only one set of changes is returned as a combined result of all
+   * // the operations that were triggered within the callback
+   * const changes = hfInstance.batch(() => {
+   *   hfInstance.addRows(0, [1, 1]);
+   *   hfInstance.removeColumns(0, [1, 1]);
+   * });
+   * ```
    *
    * @category Instance
    */
@@ -1406,6 +2272,25 @@ export class HyperFormula implements TypedEmitter {
    * Suspending evaluation should result in an overall faster calculation compared to recalculating after each operation separately.
    * To resume the evaluation use [[resumeEvaluation]].
    *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildEmpty();
+   *
+   * // similar to batch() but operations are not within a callback,
+   * // one method suspends the recalculation
+   * // the second will resume calculations and return the changes
+   *
+   * // suspend the evaluation with this method
+   * hfInstance.suspendEvaluation();
+   *
+   * // perform operations
+   * hfInstance.addRows(0, [1, 1]);
+   * hfInstance.removeColumns(0, [1, 1]);
+   *
+   * // use resumeEvaluation to resume
+   * const changes = hfInstance.resumeEvaluation();
+   * ```
+   *
    * @category Batch
    */
   public suspendEvaluation(): void {
@@ -1418,6 +2303,25 @@ export class HyperFormula implements TypedEmitter {
    *
    * @fires [[valuesUpdated]] if recalculation was triggered by this change
    *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildEmpty();
+   *
+   * // similar to batch() but operations are not within a callback,
+   * // one method suspends the recalculation
+   * // the second will resume calculations and return the changes
+   *
+   * // first, suspend the evaluation
+   * hfInstance.suspendEvaluation();
+   *
+   * // perform operations
+   * hfInstance.addRows(0, [1, 1]);
+   * hfInstance.removeColumns(0, [1, 1]);
+   *
+   * // resume the evaluation
+   * const changes = hfInstance.resumeEvaluation();
+   * ```
+   *
    * @category Batch
    */
   public resumeEvaluation(): ExportedChange[] {
@@ -1427,6 +2331,20 @@ export class HyperFormula implements TypedEmitter {
 
   /**
    * Checks if the dependency graph recalculation process is suspended or not.
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildEmpty();
+   *
+   * // suspend the evaluation
+   * hfInstance.suspendEvaluation();
+   *
+   * // between suspendEvaluation() and resumeEvaluation()
+   * // or inside batch() callback it will return 'true', otherwise 'false'
+   * const isEvaluationSuspended = hfInstance.isEvaluationSuspended();
+   *
+   * const changes = hfInstance.resumeEvaluation();
+   * ```
    *
    * @category Batch
    */
@@ -1449,6 +2367,22 @@ export class HyperFormula implements TypedEmitter {
    * @throws [[NamedExpressionNameIsInvalid]] when the named expression is not valid
    * @throws [[NoSheetWithNameError]] when the given sheet name does not exists
    *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromArray([
+   *  ['42'],
+   * ]);
+   *
+   * // add own expression, the method should return a list of cells which values
+   * // changed after the operation, their absolute addresses and new values
+   * // for this example:
+   * // [{
+   * //   name: 'prettyName',
+   * //   newValue: 142,
+   * // }]
+   * const changes = hfInstance.addNamedExpression('prettyName', '=Sheet1!A1+100');
+   * ```
+   *
    * @category Named Expression
    */
   public addNamedExpression(expressionName: string, expression: RawCellContent, sheetScope: string | undefined): ExportedChange[] {
@@ -1466,6 +2400,19 @@ export class HyperFormula implements TypedEmitter {
    * @param {string | undefined} scope - sheet name or undefined for global scope
    *
    * @throws [[NoSheetWithNameError]] when the given sheet name does not exists
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromArray([
+   *  ['42'],
+   * ]);
+   *
+   * // add a named expression
+   * hfInstance.addNamedExpression('prettyName', '=Sheet1!A1+100');
+   *
+   * // returns the calculated value of a passed named expression, '142' for this example
+   * const myFormula = hfInstance.getNamedExpressionValue('prettyName');
+   * ```
    *
    * @category Named Expression
    */
@@ -1492,6 +2439,20 @@ export class HyperFormula implements TypedEmitter {
    * @param {string | undefined} scope - sheet name or undefined for global scope
    *
    * @throws [[NoSheetWithNameError]] when the given sheet name does not exists
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromArray([
+   *  ['42'],
+   * ]);
+   *
+   * // add a named expression
+   * hfInstance.addNamedExpression('prettyName', '=Sheet1!A1+100');
+   *
+   * // returns a normalized formula string corresponding to a passed name,
+   * // '=Sheet1!A1+100' for this example
+   * const myFormula = hfInstance.getNamedExpressionFormula('prettyName');
+   * ```
    *
    * @category Named Expression
    */
@@ -1523,6 +2484,19 @@ export class HyperFormula implements TypedEmitter {
    * @throws [[NamedExpressionDoesNotExist]] when the given expression does not exist.
    * @throws [[NoSheetWithNameError]] when the given sheet name does not exists
    *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromArray([
+   *  ['42'],
+   * ]);
+   *
+   * // add a named expression
+   * hfInstance.addNamedExpression('prettyName', '=Sheet1!A1+100');
+   *
+   * // change the named expression
+   * const changes = hfInstance.changeNamedExpression('prettyName', '=Sheet1!A1+200');
+   * ```
+   *
    * @category Named Expression
    */
   public changeNamedExpression(expressionName: string, sheetScope: string | undefined, newExpression: RawCellContent): ExportedChange[] {
@@ -1541,6 +2515,19 @@ export class HyperFormula implements TypedEmitter {
    * @fires [[namedExpressionRemoved]]
    * @fires [[valuesUpdated]] if recalculation was triggered by this change
    *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromArray([
+   *  ['42'],
+   * ]);
+   *
+   * // add a named expression
+   * hfInstance.addNamedExpression('prettyName', '=Sheet1!A1+100');
+   *
+   * // remove the named expression
+   * const changes = hfInstance.removeNamedExpression('prettyName');
+   * ```
+   *
    * @category Named Expression
    */
   public removeNamedExpression(expressionName: string, sheetScope: string | undefined): ExportedChange[] {
@@ -1558,6 +2545,21 @@ export class HyperFormula implements TypedEmitter {
    * Lists all named expressions.
    * Returns an array of expression names as strings
    *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromArray([
+   *  ['42'],
+   *  ['50'],
+   * ]);
+   *
+   * // add two named expressions
+   * hfInstance.addNamedExpression('prettyName', '=Sheet1!A1+100');
+   * hfInstance.addNamedExpression('prettyName2', '=Sheet1!A2+100');
+   *
+   * // list the expressions, should return: ['prettyName', 'prettyName2'] for this example
+   * const listOfExpressions = hfInstance.listNamedExpressions();
+   * ```
+   *
    * @category Named Expression
    */
   public listNamedExpressions(): string[] {
@@ -1570,6 +2572,17 @@ export class HyperFormula implements TypedEmitter {
    * @param {string} formulaString - a formula, ex. =SUM(Sheet1!A1:A100)"
    *
    * @throws [[NotAFormulaError]] when the provided string is not a valid formula, i.e does not start with "="
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromArray([
+   *  ['42'],
+   *  ['50'],
+   * ]);
+   *
+   * // normalize the formula, should return '=Sheet1!A1+10' for this example
+   * const normalizedFormula = hfInstance.normalizeFormula('=SHEET1!A1+10');
+   * ```
    *
    * @category Helper
    */
@@ -1590,6 +2603,17 @@ export class HyperFormula implements TypedEmitter {
    * @throws [[NotAFormulaError]] when the provided string is not a valid formula, i.e does not start with "="
    * @throws [[NoSheetWithNameError]] when the given sheet name does not exists
    *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromSheets({
+   *  Sheet1: [['22']],
+   *  Sheet2: [['58']],
+   * });
+   *
+   * // returns the value of calculated formula, '32' for this example
+   * const calculatedFormula = hfInstance.calculateFormula('=A1+10', 'Sheet1'));
+   * ```
+   *
    * @category Helper
    */
   public calculateFormula(formulaString: string, sheetName: string): CellValue {
@@ -1608,6 +2632,12 @@ export class HyperFormula implements TypedEmitter {
    * If the provided string starts with "=" and is a parsable formula the method returns `true`.
    *
    * @param {string} formulaString - a formula, ex. "=SUM(Sheet1!A1:A100)"
+   *
+   * @example
+   * ```js
+   * // checks if the given string is a valid formula, should return 'true' for this example
+   * const isFormula = hfInstance.validateFormula('=SUM(1,2)');
+   * ```
    *
    * @category Helper
    */
@@ -1644,6 +2674,18 @@ export class HyperFormula implements TypedEmitter {
    * @param {Event} event the name of the event to subscribe to
    * @param {Listener} listener to be called when event is emitted
    *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildEmpty();
+   *
+   * // subscribe to a 'sheetAdded', pass a simple handler
+   * hfInstance.on('sheetAdded', ( ) => { console.log('foo') });
+   *
+   * // add a sheet to trigger an event,
+   * // console should print 'foo' after each time sheet is added in this example
+   * hfInstance.addSheet('FooBar');
+   * ```
+   *
    * @category Events
    */
   public on<Event extends keyof Listeners>(event: Event, listener: Listeners[Event]): void {
@@ -1655,6 +2697,19 @@ export class HyperFormula implements TypedEmitter {
    *
    * @param {Event} event the name of the event to subscribe to
    * @param {Listener} listener to be called when event is emitted
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildEmpty();
+   *
+   * // subscribe to a 'sheetAdded', pass a simple handler
+   * hfInstance.once('sheetAdded', ( ) => { console.log('foo') });
+   *
+   * // call addSheet twice,
+   * // console should print 'foo' only once when the sheet is added in this example
+   * hfInstance.addSheet('FooBar');
+   * hfInstance.addSheet('FooBaz');
+   * ```
    *
    * @category Events
    */
@@ -1668,6 +2723,27 @@ export class HyperFormula implements TypedEmitter {
    * @param {Event} event the name of the event to subscribe to
    * @param {Listener} listener to be called when event is emitted
    *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildEmpty();
+   *
+   * // define a simple function to be called upon emitting an event
+   * const handler = ( ) => { console.log('baz') }
+   *
+   * // subscribe to a 'sheetAdded', pass the handler
+   * hfInstance.on('sheetAdded', handler);
+   *
+   * // add a sheet to trigger an event,
+   * // console should print 'baz' each time a sheet is added
+   * hfInstance.addSheet('FooBar');
+   *
+   * // unsubscribe from a 'sheetAdded'
+   * hfInstance.off('sheetAdded', handler);
+   *
+   * // add a sheet, the console should not print anything
+   * hfInstance.addSheet('FooBaz');
+   * ```
+   *
    * @category Events
    */
   public off<Event extends keyof Listeners>(event: Event, listener: Listeners[Event]): void {
@@ -1677,6 +2753,12 @@ export class HyperFormula implements TypedEmitter {
   /**
    * Destroys instance of HyperFormula.
    * Dependency graph, optimization indexes, statistics and parser are removed.
+   *
+   * @example
+   * ```js
+   * // destroys the instance
+   * hfInstance.destroy();
+   * ```
    *
    * @category Instance
    */
