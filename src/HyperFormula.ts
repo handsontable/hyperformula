@@ -600,7 +600,7 @@ export class HyperFormula implements TypedEmitter {
    *  ['1', '=A1+10', '3'],
    * ]);
    *
-   * // should return all sheets values: { Sheet1: [ [ 1, undefined, 3 ] ] }
+   * // should return all sheets values: { Sheet1: [ [ 1, 11, 3 ] ] }
    * const allSheetsValues = hfInstance.getAllSheetsValues();
    * ```
    *
@@ -2072,10 +2072,10 @@ export class HyperFormula implements TypedEmitter {
    * ]);
    *
    * // should return 'true' since the A1 cell contains a formula
-   * const haveFormula = hfInstance.doesCellHaveFormula({ sheet: 0, col: 0, row: 0 });
+   * const A1Formula = hfInstance.doesCellHaveFormula({ sheet: 0, col: 0, row: 0 });
    *
    * // should return 'false' since the B1 cell does not contain a formula
-   * const haveFormula = hfInstance.doesCellHaveFormula({ sheet: 0, col: 1, row: 0 });
+   * const B1NoFormula = hfInstance.doesCellHaveFormula({ sheet: 0, col: 1, row: 0 });
    * ```
    *
    * @category Cell
@@ -2672,7 +2672,7 @@ export class HyperFormula implements TypedEmitter {
    * // call addSheet twice,
    * // console should print 'foo' only once when the sheet is added in this example
    * hfInstance.addSheet('FooBar');
-   * hfInstance.addSheet('FooBar');
+   * hfInstance.addSheet('FooBaz');
    * ```
    *
    * @category Events
