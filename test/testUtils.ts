@@ -57,7 +57,13 @@ export const expectFunctionToHaveRefError = (engine: HyperFormula, address: Simp
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const expectArrayWithSameContent = (expected: any[], actual: any[]) => {
   expect(actual.length).toBe(expected.length)
-  expect(actual).toContainEqual(expected)
+  // if(jasmine !== undefined) {
+  //   // @ts-ignore
+  //   expect(actual).toContainEqual(expected)
+  // } else {
+    // @ts-ignore
+    expect(actual).toEqual(expect.arrayContaining(expected))
+  // }
 }
 
 export const rowStart = (input: number, sheet: number = 0): SimpleCellAddress => {
