@@ -452,7 +452,7 @@ describe('Function SUMIF - cache recalculation after cruds', () => {
 
     expect(engine.getCellValue(adr('A3'))).toEqual(4)
     expect(changes.length).toEqual(3)
-    expectArrayWithSameContent(changes.map((change) => change.newValue),[1, 3, 4])
+    expectArrayWithSameContent(changes.map((change) => change.newValue), [1, 3, 4])
   })
 
   it('recalculates SUMIF if changes in tested range', () => {

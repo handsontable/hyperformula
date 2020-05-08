@@ -496,7 +496,7 @@ describe('changing cell content', () => {
     const changes = engine.setCellContents(adr('A1'), '2')
 
     expect(changes.length).toBe(5)
-    expectArrayWithSameContent(changes.map((change) => change.newValue),[2, 10, 12, 18, 22])
+    expectArrayWithSameContent(changes.map((change) => change.newValue), [2, 10, 12, 18, 22])
   })
 
   it('returns change of numeric matrix', () => {
@@ -662,7 +662,7 @@ describe('change multiple cells contents', () => {
     const changes = engine.setCellContents(adr('A1'), [['7', '8'], ['9', '10']])
 
     expect(changes.length).toEqual(4)
-    expectArrayWithSameContent(changes.map((change) => change.newValue),[7, 8, 9, 10])
+    expectArrayWithSameContent(changes.map((change) => change.newValue), [7, 8, 9, 10])
   })
 
   it('returns changes of mutliple values dependent formulas', () => {
@@ -677,7 +677,7 @@ describe('change multiple cells contents', () => {
     const changes = engine.setCellContents(adr('A1'), [['7', '8'], ['9', '10']])
 
     expect(changes.length).toEqual(6)
-    expectArrayWithSameContent(changes.map((change) => change.newValue),[7, 8, 9, 10, 15, 18])
+    expectArrayWithSameContent(changes.map((change) => change.newValue), [7, 8, 9, 10, 15, 18])
   })
 
   it('should throw when trying to set cell contents outside sheet limits', () => {
@@ -700,7 +700,7 @@ describe('updating column index', () => {
     engine.setCellContents(adr('B2'), '8')
 
     expectArrayWithSameContent((engine.columnSearch as ColumnIndex).getValueIndex(0, 1, 4).index, [])
-    expectArrayWithSameContent((engine.columnSearch as ColumnIndex).getValueIndex(0, 1, 8).index,[1])
+    expectArrayWithSameContent((engine.columnSearch as ColumnIndex).getValueIndex(0, 1, 8).index, [1])
   })
 
   it('should update column index when changing value inside numeric matrix', () => {
