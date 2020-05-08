@@ -27,7 +27,8 @@ beforeEach(() => {
     // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
     // @ts-ignore
     jasmine.setDefaultSpyStrategy((and: unknown) => and.callThrough())
-  } catch (e) {}
+  } catch (e) { //jasmine failed
+  }
 
   unregisterAllLanguages()
 
@@ -37,12 +38,9 @@ beforeEach(() => {
 })
 
 beforeAll(() => {
-  // jasmine.addMatchers({
-  //   ...toContainEqualMatcher,
-  //   ...toMatchObjectMatcher,
-  // })
   try {
     expect([{a: 0}]).toContainEqual({a:0})
+    // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
     // @ts-ignore
     spyOn = jest.spyOn
   } catch (e) {
