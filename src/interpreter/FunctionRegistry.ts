@@ -47,6 +47,10 @@ export class FunctionRegistry {
     }
   }
 
+  public static unregisterAll(): void {
+    this.plugins.clear()
+  }
+
   public static getRegisteredFunctionIds(): string[] {
     return Array.from(this.plugins.keys())
   }

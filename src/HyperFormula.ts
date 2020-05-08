@@ -311,6 +311,13 @@ export class HyperFormula implements TypedEmitter {
   }
 
   /**
+   * Clears function registry
+   */
+  public static unregisterAllFunctions(): void {
+    FunctionRegistry.unregisterAll()
+  }
+
+  /**
    * Returns translated names of all registered functions for a given language
    *
    * @param {string} code - language code

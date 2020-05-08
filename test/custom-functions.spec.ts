@@ -163,6 +163,14 @@ describe('Register static custom plugin', () => {
   it('should return plugin for given functionId', () => {
     expect(HyperFormula.getFunctionPlugin('SUMIF')).toBe(SumifPlugin)
   })
+
+  it('should clear function registry', () => {
+    expect(HyperFormula.getRegisteredFunctionNames('enGB').length).toBeGreaterThan(0)
+
+    HyperFormula.unregisterAllFunctions()
+
+    expect(HyperFormula.getRegisteredFunctionNames('enGB').length).toEqual(0)
+  })
 })
 
 describe('Instance level formula registry', () => {
