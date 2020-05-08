@@ -37,12 +37,12 @@ beforeEach(() => {
 })
 
 beforeAll(() => {
-  jasmine.addMatchers({
-    ...toContainEqualMatcher,
-    ...toMatchObjectMatcher,
-  })
-  jest.addMatchers({
-    ...toContainEqualMatcher,
-    ...toMatchObjectMatcher,
-  })
+  try {
+    expect([{a: 0}]).toContainEqual({a:0})
+  } catch (e) {
+    jasmine.addMatchers({
+      ...toContainEqualMatcher,
+      ...toMatchObjectMatcher,
+    })
+  }
 })
