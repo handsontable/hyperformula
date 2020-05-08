@@ -43,6 +43,8 @@ beforeAll(() => {
   // })
   try {
     expect([{a: 0}]).toContainEqual({a:0})
+    // @ts-ignore
+    spyOn = jest.spyOn
   } catch (e) {
     jasmine.addMatchers({
       ...toContainEqualMatcher,
