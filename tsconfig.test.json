@@ -2,6 +2,7 @@
   "compilerOptions": {
     "module": "commonjs",
     "outDir": "./test-jasmine",
+    "sourceMap": true
   },
   "extends": "./tsconfig",
   "include": ["src", "test"],
