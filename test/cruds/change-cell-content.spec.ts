@@ -2,7 +2,7 @@ import {EmptyValue, ExportedCellChange, HyperFormula, InvalidAddressError, NoShe
 import {ErrorType, simpleCellAddress} from '../../src/Cell'
 import {ColumnIndex} from '../../src/ColumnSearch/ColumnIndex'
 import {EmptyCellVertex, MatrixVertex} from '../../src/DependencyGraph'
-import {adr, colEnd, colStart, detailedError, rowEnd, rowStart} from '../testUtils'
+import {adr, colEnd, colStart, detailedError, expectArrayWithSameContent, rowEnd, rowStart} from '../testUtils'
 import {Config} from '../../src/Config'
 import {SheetSizeLimitExceededError} from '../../src/errors'
 
@@ -468,7 +468,7 @@ describe('changing cell content', () => {
     const changes = engine.setCellContents(adr('A1'), '2')
 
     expect(changes.length).toBe(1)
-    expect(changes).toContainEqual([new ExportedCellChange(simpleCellAddress(0, 0, 0), 2)])
+    expect(changes).toContainEqual(new ExportedCellChange(simpleCellAddress(0, 0, 0), 2))
   })
 
   it('returns dependent formula value change', () => {
@@ -496,7 +496,7 @@ describe('changing cell content', () => {
     const changes = engine.setCellContents(adr('A1'), '2')
 
     expect(changes.length).toBe(5)
-    expect(changes.map((change) => change.newValue)).toContainEqual([2, 10, 12, 18, 22])
+    expectArrayWithSameContent(changes.map((change) => change.newValue),[2, 10, 12, 18, 22])
   })
 
   it('returns change of numeric matrix', () => {
@@ -509,7 +509,7 @@ describe('changing cell content', () => {
     const changes = engine.setCellContents(adr('A1'), '7')
 
     expect(changes.length).toBe(1)
-    expect(changes).toContainEqual([new ExportedCellChange(simpleCellAddress(0, 0, 0), 7 )])
+    expect(changes).toContainEqual(new ExportedCellChange(simpleCellAddress(0, 0, 0), 7 ))
   })
 
   it('update empty cell to parsing error ', () => {

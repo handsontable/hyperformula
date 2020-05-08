@@ -1,6 +1,6 @@
 import {HyperFormula} from '../../src'
 import {ErrorType} from '../../src/Cell'
-import {adr, detailedError} from '../testUtils'
+import {adr, detailedError, expectArrayWithSameContent} from '../testUtils'
 import {StatType} from '../../src/statistics'
 
 describe('Function SUMIF - argument validations and combinations', () => {
@@ -452,7 +452,7 @@ describe('Function SUMIF - cache recalculation after cruds', () => {
 
     expect(engine.getCellValue(adr('A3'))).toEqual(4)
     expect(changes.length).toEqual(3)
-    expect(changes.map((change) => change.newValue)).toContainEqual([1, 3, 4])
+    expectArrayWithSameContent(changes.map((change) => change.newValue),[1, 3, 4])
   })
 
   it('recalculates SUMIF if changes in tested range', () => {
