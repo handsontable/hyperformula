@@ -23,7 +23,7 @@ import {
   SheetSizeLimitExceededError,
   FunctionPluginValidationError
 } from './errors'
-import * as plugins from '../src/interpreter/plugin'
+import * as plugins from './interpreter/plugin'
 
 /** @internal */
 class HyperFormulaNS extends HyperFormula {
@@ -51,9 +51,39 @@ class HyperFormulaNS extends HyperFormula {
 const defaultLanguage = Config.defaultConfig.language
 HyperFormula.registerLanguage(defaultLanguage, languages[defaultLanguage])
 
-for (const plugin of Object.values(plugins)) {
-  HyperFormula.registerFunctionPlugin(plugin)
-}
+HyperFormula.registerFunctionPlugin(plugins.SumifPlugin)
+HyperFormula.registerFunctionPlugin(plugins.TextPlugin)
+HyperFormula.registerFunctionPlugin(plugins.NumericAggregationPlugin)
+HyperFormula.registerFunctionPlugin(plugins.MedianPlugin)
+HyperFormula.registerFunctionPlugin(plugins.DatePlugin)
+HyperFormula.registerFunctionPlugin(plugins.BooleanPlugin)
+HyperFormula.registerFunctionPlugin(plugins.InformationPlugin)
+HyperFormula.registerFunctionPlugin(plugins.TrigonometryPlugin)
+HyperFormula.registerFunctionPlugin(plugins.CountUniquePlugin)
+HyperFormula.registerFunctionPlugin(plugins.SumprodPlugin)
+HyperFormula.registerFunctionPlugin(plugins.MatrixPlugin)
+HyperFormula.registerFunctionPlugin(plugins.ExpPlugin)
+HyperFormula.registerFunctionPlugin(plugins.AbsPlugin)
+HyperFormula.registerFunctionPlugin(plugins.DegreesPlugin)
+HyperFormula.registerFunctionPlugin(plugins.RadiansPlugin)
+HyperFormula.registerFunctionPlugin(plugins.RandomPlugin)
+HyperFormula.registerFunctionPlugin(plugins.VlookupPlugin)
+HyperFormula.registerFunctionPlugin(plugins.IsEvenPlugin)
+HyperFormula.registerFunctionPlugin(plugins.IsOddPlugin)
+HyperFormula.registerFunctionPlugin(plugins.RoundingPlugin)
+HyperFormula.registerFunctionPlugin(plugins.RadixConversionPlugin)
+HyperFormula.registerFunctionPlugin(plugins.LogarithmPlugin)
+HyperFormula.registerFunctionPlugin(plugins.BitwiseLogicOperationsPlugin)
+HyperFormula.registerFunctionPlugin(plugins.BitShiftPlugin)
+HyperFormula.registerFunctionPlugin(plugins.PowerPlugin)
+HyperFormula.registerFunctionPlugin(plugins.MathConstantsPlugin)
+HyperFormula.registerFunctionPlugin(plugins.SqrtPlugin)
+HyperFormula.registerFunctionPlugin(plugins.ModuloPlugin)
+HyperFormula.registerFunctionPlugin(plugins.DeltaPlugin)
+HyperFormula.registerFunctionPlugin(plugins.CharPlugin)
+HyperFormula.registerFunctionPlugin(plugins.CodePlugin)
+HyperFormula.registerFunctionPlugin(plugins.ErrorFunctionPlugin)
+HyperFormula.registerFunctionPlugin(plugins.CorrelPlugin)
 
 export default HyperFormulaNS
 
