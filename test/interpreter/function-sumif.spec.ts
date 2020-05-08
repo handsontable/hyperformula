@@ -467,7 +467,7 @@ describe('Function SUMIF - cache recalculation after cruds', () => {
 
     expect(engine.getCellValue(adr('B3'))).toEqual(6)
     expect(changes.length).toEqual(3)
-    expect(changes.map((change) => change.newValue)).toContainEqual([1, 3, 6])
+    expectArrayWithSameContent(changes.map((change) => change.newValue), [1, 3, 6])
   })
 
   it('recalculates SUMIF if summed range same as tested range', () => {
@@ -483,7 +483,7 @@ describe('Function SUMIF - cache recalculation after cruds', () => {
 
     expect(engine.getCellValue(adr('B2'))).toEqual(3)
     expect(changes.length).toEqual(3)
-    expect(changes.map((change) => change.newValue)).toContainEqual([1, 3, 3])
+    expectArrayWithSameContent(changes.map((change) => change.newValue), [1, 3, 3])
   })
 })
 
@@ -501,7 +501,7 @@ describe('Function SUMIFS - cache recalculation after cruds', () => {
 
     expect(engine.getCellValue(adr('A4'))).toEqual(4)
     expect(changes.length).toEqual(3)
-    expect(changes.map((change) => change.newValue)).toContainEqual([1, 3, 4])
+    expectArrayWithSameContent(changes.map((change) => change.newValue), [1, 3, 4])
   })
 
   it('recalculates SUMIFS if changes in one of the tested range', () => {
@@ -518,6 +518,6 @@ describe('Function SUMIFS - cache recalculation after cruds', () => {
 
     expect(engine.getCellValue(adr('A4'))).toEqual(10)
     expect(changes.length).toEqual(3)
-    expect(changes.map((change) => change.newValue)).toContainEqual([1, 7, 10])
+    expectArrayWithSameContent(changes.map((change) => change.newValue), [1, 7, 10])
   })
 })
