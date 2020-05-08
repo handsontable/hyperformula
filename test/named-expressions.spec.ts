@@ -1,4 +1,4 @@
-import {HyperFormula, ExportedNamedExpressionChange, EmptyValue} from '../src'
+import {HyperFormula, ExportedNamedExpressionChange, EmptyValue, ExportedCellChange} from '../src'
 import {adr, detailedError} from './testUtils'
 import {ErrorType} from '../src/Cell'
 import {NoSheetWithNameError} from '../src/errors'
@@ -337,6 +337,20 @@ describe('Named expressions - evaluation', () => {
     expect(changes.length).toBe(2)
     expect(changes).toContainEqual(new ExportedNamedExpressionChange('myName', 30))
     expect(engine.getNamedExpressionValue('myName')).toEqual(30)
+  })
+
+  it('should reevaluate volatile function in named expression', () => {
+    const engine = HyperFormula.buildFromArray([])
+
+    engine.addNamedExpression('volatileExpression', '=RAND()')
+    const valueBeforeRecomputation = engine.getNamedExpressionValue('volatileExpression')
+
+    const changes = engine.setCellContents(adr('A1'), 'foo')
+
+    const valueAfterRecomputation = engine.getNamedExpressionValue('volatileExpression')
+    expect(valueAfterRecomputation).not.toEqual(valueBeforeRecomputation)
+    expect(changes).toContainEqual(new ExportedCellChange(adr('A1'), 'foo'))
+    expect(changes).toContainEqual(new ExportedNamedExpressionChange('volatileExpression', valueAfterRecomputation!))
   })
 
   it('adds edge to dependency', () => {
