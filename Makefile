@@ -7,8 +7,17 @@ setup: ## Setup project
 compile: ## Compile to javascript
 	@npm run compile
 
-test: ## Run tests
+test: ## Run jasmine tests
 	@npm run test
+
+unit: ## Run jasmine tests
+	@npm run test:unit
+
+compile-jest: ## Compile to javascript for jest tests
+	@npm run compile:jest
+
+jest: compile-jest ## Run jest tests
+	@jest
 
 test-ci: ## Separate test configuration for CI environment
 	@npm run test
