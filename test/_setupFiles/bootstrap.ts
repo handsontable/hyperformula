@@ -23,11 +23,12 @@ Config.defaultConfig = Object.assign({}, Config.defaultConfig, {
 })
 
 beforeEach(() => {
-  try {
+  // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+  // @ts-ignore
+  if(typeof ts-jest === undefined) {
     // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
     // @ts-ignore
     jasmine.setDefaultSpyStrategy((and: unknown) => and.callThrough())
-  } catch (e) { //jasmine failed
   }
 
   unregisterAllLanguages()
@@ -38,15 +39,16 @@ beforeEach(() => {
 })
 
 beforeAll(() => {
-  try {
-    expect([{a: 0}]).toContainEqual({a:0})
-    // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
-    // @ts-ignore
-    spyOn = jest.spyOn
-  } catch (e) {
+  // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+  // @ts-ignore
+  if(typeof ts-jest === undefined) {
     jasmine.addMatchers({
       ...toContainEqualMatcher,
       ...toMatchObjectMatcher,
     })
+  } else {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+    // @ts-ignore
+    spyOn = jest.spyOn
   }
 })
