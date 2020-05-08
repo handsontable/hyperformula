@@ -11,7 +11,7 @@ declare global {
   }
 }
 
-export const toMatchObjectMatcher: CustomMatcherFactories = {
+export const toMatchObjectMatcherJasmine: CustomMatcherFactories = {
   toMatchObject: function(util: MatchersUtil): CustomMatcher {
     return {
       compare: function(actual: never, expected: never): CustomMatcherResult {

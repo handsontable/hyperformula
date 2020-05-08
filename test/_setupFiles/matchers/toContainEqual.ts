@@ -11,7 +11,7 @@ declare global {
   }
 }
 
-export const toContainEqualMatcher: CustomMatcherFactories = {
+export const toContainEqualMatcherJasmine: CustomMatcherFactories = {
   toContainEqual: function(util: MatchersUtil): CustomMatcher {
     return {
       compare: function(actual: never, expected: never): CustomMatcherResult {
