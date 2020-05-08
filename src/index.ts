@@ -23,6 +23,7 @@ import {
   SheetSizeLimitExceededError,
   FunctionPluginValidationError
 } from './errors'
+import * as plugins from '../src/interpreter/plugin'
 
 /** @internal */
 class HyperFormulaNS extends HyperFormula {
@@ -49,6 +50,10 @@ class HyperFormulaNS extends HyperFormula {
 
 const defaultLanguage = Config.defaultConfig.language
 HyperFormula.registerLanguage(defaultLanguage, languages[defaultLanguage])
+
+for (const plugin of Object.values(plugins)) {
+  HyperFormula.registerFunctionPlugin(plugin)
+}
 
 export default HyperFormulaNS
 
