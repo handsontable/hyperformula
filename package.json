@@ -63,7 +63,7 @@
     "test:browser.debug": "cross-env NODE_ENV=debug npm run test:browser",
     "jasmine:start": "cross-env NODE_ICU_DATA=node_modules/full-icu jasmine --config=jasmine.json",
     "karma:start": "karma start",
-    "typedoc:build": "typedoc --options .typedoc.js",
+    "typedoc:build": "typedoc --options .typedoc.ts",
     "typedoc:serve": "npm run typedoc:build && serve doc -p 5005",
     "lint": "eslint . --ext .js,.ts",
     "lint:fix": "eslint . --ext .js,.ts --fix",
