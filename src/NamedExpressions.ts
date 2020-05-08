@@ -102,7 +102,7 @@ export class NamedExpressions {
   ) {
   }
 
-  public isNameAvailable(expressionName: string, sheetId: number | undefined): boolean {
+  public isNameAvailable(expressionName: string, sheetId?: number): boolean {
     if (sheetId === undefined) {
       return this.workbookStore.isNameAvailable(expressionName)
     } else {
@@ -119,7 +119,7 @@ export class NamedExpressions {
     }
   }
 
-  public namedExpressionForScope(expressionName: string, sheetId: number | undefined): Maybe<NamedExpression> {
+  public namedExpressionForScope(expressionName: string, sheetId?: number): Maybe<NamedExpression> {
     if (sheetId === undefined) {
       return this.workbookStore.getExisting(expressionName)
     } else {
@@ -138,7 +138,7 @@ export class NamedExpressions {
     return /^[A-Za-z\u00C0-\u02AF_][A-Za-z0-9\u00C0-\u02AF\._]*$/.test(expressionName)
   }
 
-  public addNamedExpression(expressionName: string, sheetId: number | undefined): NamedExpression {
+  public addNamedExpression(expressionName: string, sheetId?: number): NamedExpression {
     if (!this.isNameValid(expressionName)) {
       throw new Error('Name of Named Expression is invalid')
     }
@@ -197,7 +197,7 @@ export class NamedExpressions {
     return namedExpression
   }
 
-  public remove(expressionName: string, sheetId: number | undefined): void {
+  public remove(expressionName: string, sheetId?: number): void {
     let store
     if (sheetId === undefined) {
       store = this.workbookStore
