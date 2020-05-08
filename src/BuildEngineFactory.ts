@@ -103,7 +103,7 @@ export class BuildEngineFactory {
       exporter,
       namedExpressions,
       serialization,
-      functionRegistry: functionRegistry,
+      functionRegistry,
     }
   }
 
