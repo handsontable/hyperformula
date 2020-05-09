@@ -13,7 +13,15 @@ import {ColumnSearchStrategy} from './ColumnSearch/ColumnSearchStrategy'
 import {ColumnsSpan} from './ColumnsSpan'
 import {Config} from './Config'
 import {ContentChanges} from './ContentChanges'
-import {AddressMapping, DependencyGraph, SheetMapping, SparseStrategy, FormulaCellVertex, MatrixVertex} from './DependencyGraph'
+import {
+  AddressMapping,
+  DependencyGraph,
+  SheetMapping,
+  SparseStrategy,
+  FormulaCellVertex,
+  MatrixVertex,
+  Vertex, CellVertex, EmptyCellVertex, ValueCellVertex
+} from './DependencyGraph'
 import {NamedExpressions, NamedExpression} from './NamedExpressions'
 import {Maybe} from './Maybe'
 import {
@@ -31,7 +39,7 @@ import {
 } from './errors'
 import {Index} from './HyperFormula'
 import {LazilyTransformingAstService} from './LazilyTransformingAstService'
-import {ParserWithCaching, NamedExpressionDependency} from './parser'
+import {ParserWithCaching, NamedExpressionDependency, RelativeDependency, collectDependencies, Ast} from './parser'
 import {RowsSpan} from './RowsSpan'
 import {Statistics} from './statistics'
 import {
@@ -51,6 +59,8 @@ import {
   UndoRedo
 } from './UndoRedo'
 import {findBoundaries, validateAsSheet} from './Sheet'
+import has = Reflect.has
+import {ParsingResult} from './parser/ParserWithCaching'
 
 export class CrudOperations {
 
@@ -122,9 +132,70 @@ export class CrudOperations {
   public moveCells(sourceLeftCorner: SimpleCellAddress, width: number, height: number, destinationLeftCorner: SimpleCellAddress): void {
     this.undoRedo.clearRedoStack()
     this.clipboardOperations.abortCut()
-    const { version, overwrittenCellsData } = this.operations.moveCells(sourceLeftCorner, width, height, destinationLeftCorner)
+    const {version, overwrittenCellsData} = this.operations.moveCells(sourceLeftCorner, width, height, destinationLeftCorner)
+    this.updateNamedExpressions(sourceLeftCorner, width, height, destinationLeftCorner)
     this.undoRedo.saveOperation(new MoveCellsUndoEntry(sourceLeftCorner, width, height, destinationLeftCorner, overwrittenCellsData, version))
   }
+
+  public updateNamedExpressions(sourceLeftCorner: SimpleCellAddress, width: number, height: number, destinationLeftCorner: SimpleCellAddress): void {
+    if (sourceLeftCorner.sheet === destinationLeftCorner.sheet) {
+      return
+    }
+
+    const targetRange = AbsoluteCellRange.spanFrom(destinationLeftCorner, width, height)
+
+    for (const formulaAddress of targetRange.addresses(this.dependencyGraph)) {
+      const vertex = this.addressMapping.fetchCell(formulaAddress)
+      /* TODO MatrixVertex? */
+      if (vertex instanceof FormulaCellVertex && formulaAddress.sheet !== sourceLeftCorner.sheet) {
+        const ast = vertex.getFormula(this.lazilyTransformingAstService)
+
+        const {dependencies} = this.parser.fetchCachedResultForAst(ast)
+
+        for (const namedExpressionDependency of absolutizeDependencies(dependencies, formulaAddress)) {
+          if (!(namedExpressionDependency instanceof NamedExpressionDependency)) {
+            continue
+          }
+
+          const expressionName = namedExpressionDependency.name
+          const sourceExpression = this.namedExpressions.nearestNamedExpression(expressionName, sourceLeftCorner.sheet)
+          const sourceVertex = this.dependencyGraph.fetchNamedExpressionVertex(expressionName, sourceLeftCorner.sheet)
+          const namedExpressionInTargetScope = this.namedExpressions.isExpressionInScope(expressionName, formulaAddress.sheet)
+
+          const targetScopeExpressionVertex = namedExpressionInTargetScope
+            ? this.dependencyGraph.fetchNamedExpressionVertex(expressionName, formulaAddress.sheet)
+            : this.copyOrFetchGlobalNamedExpressionVertex(expressionName, sourceVertex)
+
+          if (targetScopeExpressionVertex !== sourceVertex) {
+            this.dependencyGraph.graph.removeEdge(sourceVertex, vertex)
+            this.dependencyGraph.graph.addEdge(targetScopeExpressionVertex, vertex)
+          }
+        }
+      }
+    }
+  }
+
+  private copyOrFetchGlobalNamedExpressionVertex(expressionName: string, sourceVertex: CellVertex): CellVertex {
+    let expression = this.namedExpressions.namedExpressionForScope(expressionName)
+    if (expression === undefined) {
+      expression = this.namedExpressions.addNamedExpression(expressionName)
+      this.copyExpressionVertexContent(expression.address, sourceVertex)
+    }
+    return this.dependencyGraph.fetchCellOrCreateEmpty(expression.address)
+  }
+
+  private copyExpressionVertexContent(address: SimpleCellAddress, sourceVertex: CellVertex) {
+    if (sourceVertex instanceof FormulaCellVertex) {
+      const parsingResult = this.parser.fetchCachedResultForAst(sourceVertex.getFormula(this.lazilyTransformingAstService))
+      const {ast, hasVolatileFunction, hasStructuralChangeFunction, dependencies} = parsingResult
+      this.dependencyGraph.setFormulaToCell(address, ast, absolutizeDependencies(dependencies, address), hasVolatileFunction, hasStructuralChangeFunction)
+    } else if (sourceVertex instanceof EmptyCellVertex) {
+      this.operations.setCellEmpty(address)
+    } else if (sourceVertex instanceof ValueCellVertex) {
+      this.operations.setValueToCell(sourceVertex.getCellValue(), address)
+    }
+  }
+
 
   public moveRows(sheet: number, startRow: number, numberOfRows: number, targetRow: number): void {
     this.ensureItIsPossibleToMoveRows(sheet, startRow, numberOfRows, targetRow)
@@ -165,7 +236,7 @@ export class CrudOperations {
       throw new NothingToPasteError()
     } else if (this.clipboardOperations.isCutClipboard()) {
       this.undoRedo.clearRedoStack()
-      const { version, overwrittenCellsData } = this.operations.moveCells(clipboard.sourceLeftCorner, clipboard.width, clipboard.height, targetLeftCorner)
+      const {version, overwrittenCellsData} = this.operations.moveCells(clipboard.sourceLeftCorner, clipboard.width, clipboard.height, targetLeftCorner)
       this.clipboardOperations.abortCut()
       this.undoRedo.saveOperation(new MoveCellsUndoEntry(clipboard.sourceLeftCorner, clipboard.width, clipboard.height, targetLeftCorner, overwrittenCellsData, version))
     } else if (this.clipboardOperations.isCopyClipboard()) {
@@ -258,7 +329,7 @@ export class CrudOperations {
         this.clipboardOperations.abortCut()
         const oldContent = this.operations.getClipboardCell(address)
         this.operations.setCellContent(address, cellContents[i][j])
-        modifiedCellContents.push({ address, newContent: cellContents[i][j], oldContent })
+        modifiedCellContents.push({address, newContent: cellContents[i][j], oldContent})
       }
     }
     this.undoRedo.saveOperation(new SetCellContentsUndoEntry(modifiedCellContents))
@@ -311,6 +382,7 @@ export class CrudOperations {
     if (!this.namedExpressions.isNameAvailable(expressionName, sheetId)) {
       throw new NamedExpressionNameIsAlreadyTaken(expressionName)
     }
+
     const namedExpression = this.namedExpressions.addNamedExpression(expressionName, sheetId)
     this.storeExpressionInCell(namedExpression.address, expression)
     if (sheetId !== undefined) {
@@ -322,9 +394,8 @@ export class CrudOperations {
           const ast = adjacentNode.getFormula(this.lazilyTransformingAstService)
           if (ast) {
             const formulaAddress = adjacentNode.getAddress(this.lazilyTransformingAstService)
-            const hash = this.parser.computeHashFromAst(ast)
-            const parsingResult = this.parser.fetchCachedResult(hash)
-            for (const dependency of absolutizeDependencies(parsingResult.dependencies, formulaAddress)) {
+            const {dependencies} = this.parser.fetchCachedResultForAst(ast)
+            for (const dependency of absolutizeDependencies(dependencies, formulaAddress)) {
               if (dependency instanceof NamedExpressionDependency && dependency.name.toLowerCase() === namedExpression.displayName.toLowerCase()) {
                 this.dependencyGraph.graph.removeEdge(globalVertex, adjacentNode)
                 this.dependencyGraph.graph.addEdge(localVertex, adjacentNode)
@@ -585,7 +656,8 @@ export class CrudOperations {
     if (parsedCellContent instanceof CellContent.MatrixFormula) {
       throw new Error('Matrix formulas are not supported')
     } else if (parsedCellContent instanceof CellContent.Formula) {
-      const {ast, hasVolatileFunction, hasStructuralChangeFunction, dependencies} = this.parser.parse(parsedCellContent.formula, address)
+      const parsingResult = this.parser.parse(parsedCellContent.formula, address)
+      const {ast, hasVolatileFunction, hasStructuralChangeFunction, dependencies} = parsingResult
       this.dependencyGraph.setFormulaToCell(address, ast, absolutizeDependencies(dependencies, address), hasVolatileFunction, hasStructuralChangeFunction)
     } else if (parsedCellContent instanceof CellContent.Empty) {
       this.operations.setCellEmpty(address)

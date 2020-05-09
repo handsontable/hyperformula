@@ -74,6 +74,10 @@ class WorksheetStore {
     return this.mapping.get(this.normalizeExpressionName(expressionName))
   }
 
+  public has(expressionName: string): boolean {
+    return this.mapping.has(this.normalizeExpressionName(expressionName))
+  }
+
   private normalizeExpressionName(expressionName: string): string {
     return expressionName.toLowerCase()
   }
@@ -130,6 +134,10 @@ export class NamedExpressions {
 
   public nearestNamedExpression(expressionName: string, sheetId: number): Maybe<NamedExpression> {
     return this.worksheetStore(sheetId).get(expressionName) || this.workbookStore.getExisting(expressionName)
+  }
+
+  public isExpressionInScope(expressionName: string, sheetId: number): boolean {
+    return this.worksheetStore(sheetId).has(expressionName)
   }
 
   public isNameValid(expressionName: string): boolean {

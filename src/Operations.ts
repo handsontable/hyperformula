@@ -26,7 +26,7 @@ import {
 } from './DependencyGraph'
 import {ValueCellVertexValue} from './DependencyGraph/ValueCellVertex'
 import {InvalidArgumentsError, SheetSizeLimitExceededError} from './errors'
-import {ParserWithCaching, ProcedureAst} from './parser'
+import {NamedExpressionDependency, ParserWithCaching, ProcedureAst, RelativeDependency} from './parser'
 import {ParsingError} from './parser/Ast'
 import {AddRowsTransformer} from './dependencyTransformers/AddRowsTransformer'
 import {RemoveRowsTransformer} from './dependencyTransformers/RemoveRowsTransformer'

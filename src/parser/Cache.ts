@@ -93,3 +93,4 @@ export const doesContainFunctions = (ast: Ast, interestingFunctions: Set<string>
     }
   }
 }
+
