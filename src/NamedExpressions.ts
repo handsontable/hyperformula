@@ -5,6 +5,7 @@
 
 import {simpleCellAddress, SimpleCellAddress} from './Cell'
 import {Maybe} from './Maybe'
+import {NamedExpressionNameIsAlreadyTaken, NamedExpressionNameIsInvalid} from './errors'
 
 export class NamedExpression {
   constructor(
@@ -140,10 +141,10 @@ export class NamedExpressions {
 
   public addNamedExpression(expressionName: string, sheetId?: number): NamedExpression {
     if (!this.isNameValid(expressionName)) {
-      throw new Error('Name of Named Expression is invalid')
+      throw new NamedExpressionNameIsInvalid(expressionName)
     }
     if (!this.isNameAvailable(expressionName, sheetId)) {
-      throw new Error('Name of Named Expression already taken')
+      throw new NamedExpressionNameIsAlreadyTaken(expressionName)
     }
     if (sheetId === undefined) {
       let namedExpression = this.workbookStore.get(expressionName)
