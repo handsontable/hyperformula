@@ -43,7 +43,7 @@ export class RangeMapping {
       return null
     }
     const key = `${start.col},${start.row},${end.col},${end.row}`
-    return sheetMap.get(key) || null
+    return sheetMap.get(key) ?? null
   }
 
   public fetchRange(start: SimpleCellAddress, end: SimpleCellAddress): RangeVertex {

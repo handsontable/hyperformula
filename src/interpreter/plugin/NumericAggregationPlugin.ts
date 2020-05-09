@@ -6,6 +6,7 @@
 import assert from 'assert'
 import {AbsoluteCellRange, DIFFERENT_SHEETS_ERROR} from '../../AbsoluteCellRange'
 import {CellError, EmptyValue, ErrorType, InternalCellValue, SimpleCellAddress} from '../../Cell'
+import {RangeVertex} from '../../DependencyGraph'
 import {Maybe} from '../../Maybe'
 import {AstNodeType, CellRangeAst, ProcedureAst} from '../../parser'
 import {coerceToRange, max, maxa, min, mina} from '../ArithmeticHelper'
@@ -386,8 +387,11 @@ export class NumericAggregationPlugin extends FunctionPlugin {
     }
     const rangeStart = range.start
     const rangeEnd = range.end
-    const rangeVertex = this.dependencyGraph.getRange(rangeStart, rangeEnd)!
-    assert.ok(rangeVertex, 'Range does not exists in graph')
+    let rangeVertex = this.dependencyGraph.getRange(rangeStart, rangeEnd)
+    if (rangeVertex === null) {
+      rangeVertex = new RangeVertex(range)
+      this.dependencyGraph.rangeMapping.setRange(rangeVertex)
+    }
 
     let value = rangeVertex.getFunctionValue(functionName) as T
     if (!value) {

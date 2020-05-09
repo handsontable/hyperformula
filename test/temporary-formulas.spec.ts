@@ -72,6 +72,14 @@ describe('Temporary formulas - calculation', () => {
     }).toThrowError(/no sheet with name/)
   })
 
+  it('SUM with range args', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1', '2'],
+      ['3', '4']
+    ]);
+    expect(engine.calculateFormula('=SUM(A1:B2)', 'Sheet1')).toEqual(10);
+  })
+
   it('non-scalars doesnt work', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '2'],
