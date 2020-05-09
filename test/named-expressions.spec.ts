@@ -536,7 +536,6 @@ describe('Named expression - cross scope', () => {
     expect(engine.getCellValue(adr('B1', 1))).toEqual('foo')
   })
 
-
   /* TODO */
   xit('should add named expression to global scope when copying formula to other sheet', () => {
     const engine = HyperFormula.buildFromSheets({

@@ -318,7 +318,7 @@ export class CrudOperations {
       const globalNamedExpression = this.namedExpressions.workbookNamedExpressionOrPlaceholder(expressionName)
       const globalVertex = this.dependencyGraph.fetchCellOrCreateEmpty(globalNamedExpression.address)
       for (const adjacentNode of this.dependencyGraph.graph.adjacentNodes(globalVertex)) {
-        if (adjacentNode instanceof FormulaCellVertex || adjacentNode instanceof MatrixVertex) {
+        if ((adjacentNode instanceof FormulaCellVertex || adjacentNode instanceof MatrixVertex) && adjacentNode.cellAddress.sheet === sheetId) {
           const ast = adjacentNode.getFormula(this.lazilyTransformingAstService)
           if (ast) {
             const formulaAddress = adjacentNode.getAddress(this.lazilyTransformingAstService)
