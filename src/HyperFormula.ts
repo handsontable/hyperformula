@@ -2204,7 +2204,7 @@ export class HyperFormula implements TypedEmitter {
    * @param {number} sheetId - a sheet number
    * @param {string} newName - a name of the sheet to be given, if is the same as the old one the method does nothing
    *
-   * @fires [[sheetRenamed]]
+   * @fires [[sheetRenamed]] after the sheet was renamed
    *
    * @throws Throws an error if the provided sheet ID does not exists.
    *
