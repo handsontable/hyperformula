@@ -2569,7 +2569,7 @@ export class HyperFormula implements TypedEmitter {
   /**
    * Returns a normalized formula.
    *
-   * @param {string} formulaString - a formula in the proper format - it must start with "="
+   * @param {string} formulaString - a formula in a proper format - it must start with "="
    *
    * @throws [[NotAFormulaError]] when the provided string is not a valid formula, i.e does not start with "="
    *
@@ -2597,7 +2597,7 @@ export class HyperFormula implements TypedEmitter {
   /**
    * Calculates fire-and-forget formula, returns the calculated value.
    *
-   * @param {string} formulaString -  a formula in the proper format - it must start with "="
+   * @param {string} formulaString -  a formula in a proper format - it must start with "="
    * @param {string} sheetName - a name of the sheet in context of which we evaluate formula, case insensitive.
    *
    * @throws [[NotAFormulaError]] when the provided string is not a valid formula, i.e does not start with "="
@@ -2631,7 +2631,7 @@ export class HyperFormula implements TypedEmitter {
    * Validates the formula.
    * If the provided string starts with "=" and is a parsable formula the method returns `true`.
    *
-   * @param {string} formulaString -  a formula in the proper format - it must start with "="
+   * @param {string} formulaString -  a formula in a proper format - it must start with "="
    *
    * @example
    * ```js
