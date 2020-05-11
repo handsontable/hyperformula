@@ -608,9 +608,7 @@ export class DependencyGraph {
   }
 
   public getRangeFromAbsoluteRange(range: AbsoluteCellRange): RangeVertex {
-    const rangeStart = range.start
-    const rangeEnd = range.end
-    let rangeVertex = this.getRange(rangeStart, rangeEnd)
+    let rangeVertex = this.getRange(range.start, range.end)
     if (rangeVertex === undefined) {
       rangeVertex = new RangeVertex(range)
       this.rangeMapping.setRange(rangeVertex)
