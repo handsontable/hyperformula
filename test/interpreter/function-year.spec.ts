@@ -24,7 +24,7 @@ describe('Function YEAR', () => {
   })
 
   it('with string arguments', () => {
-    const engine = HyperFormula.buildFromArray([['=YEAR("12/31/1899")', '=YEAR("01/01/1900")', '=YEAR("12/31/2018")']])
+    const engine = HyperFormula.buildFromArray([['=YEAR("31/12/1899")', '=YEAR("01/01/1900")', '=YEAR("31/12/2018")']])
 
     expect(engine.getCellValue(adr('A1'))).toEqual(1899)
     expect(engine.getCellValue(adr('B1'))).toEqual(1900)
