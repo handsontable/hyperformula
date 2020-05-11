@@ -76,8 +76,8 @@ describe('Temporary formulas - calculation', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '2'],
       ['3', '4']
-    ]);
-    expect(engine.calculateFormula('=SUM(A1:B2)', 'Sheet1')).toEqual(10);
+    ])
+    expect(engine.calculateFormula('=SUM(A1:B2)', 'Sheet1')).toEqual(10)
   })
 
   it('non-scalars doesnt work', () => {
