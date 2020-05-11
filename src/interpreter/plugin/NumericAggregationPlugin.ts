@@ -385,13 +385,7 @@ export class NumericAggregationPlugin extends FunctionPlugin {
         throw err
       }
     }
-    const rangeStart = range.start
-    const rangeEnd = range.end
-    let rangeVertex = this.dependencyGraph.getRange(rangeStart, rangeEnd)
-    if (rangeVertex === undefined) {
-      rangeVertex = new RangeVertex(range)
-      this.dependencyGraph.rangeMapping.setRange(rangeVertex)
-    }
+    const rangeVertex = this.dependencyGraph.getRangeFromAbsoluteRange(range)
 
     let value = rangeVertex.getFunctionValue(functionName) as T
     if (!value) {
