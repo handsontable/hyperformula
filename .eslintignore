@@ -15,6 +15,5 @@ es
 lib
 script
 test-jasmine
-test-jest
 typings
 test/_setupFiles/*.js
