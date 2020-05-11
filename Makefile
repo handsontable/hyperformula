@@ -10,14 +10,8 @@ compile: ## Compile to javascript
 test: ## Run jasmine tests
 	@npm run test
 
-unit: ## Run jasmine tests
+unit: ## Run unit tests
 	@npm run test:unit
-
-compile-jest: ## Compile to javascript for jest tests
-	@npm run compile:jest
-
-jest: compile-jest ## Run jest tests
-	@jest
 
 test-ci: ## Separate test configuration for CI environment
 	@npm run test

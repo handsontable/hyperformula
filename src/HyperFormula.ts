@@ -600,7 +600,7 @@ export class HyperFormula implements TypedEmitter {
   }
 
   /**
-   * Returns values of all sheets in a form of an object which property keys are strings and values are arrays of arrays of [[CellValue]]
+   * Returns values of all sheets in a form of an object which property keys are strings and values are arrays of arrays of [[CellValue]].
    *
    * @throws [[EvaluationSuspendedError]] when the evaluation is suspended
    *
@@ -622,7 +622,7 @@ export class HyperFormula implements TypedEmitter {
   }
 
   /**
-   * Returns formulas of all sheets in a form of an object which property keys are strings and values are arrays of arrays of strings or possibly `undefined`
+   * Returns formulas of all sheets in a form of an object which property keys are strings and values are arrays of arrays of strings or possibly `undefined`.
    *
    * @example
    * ```js
@@ -640,7 +640,7 @@ export class HyperFormula implements TypedEmitter {
   }
 
   /**
-   * Returns formulas or values of all sheets in a form of an object which property keys are strings and values are arrays of arrays of [[CellValue]]
+   * Returns formulas or values of all sheets in a form of an object which property keys are strings and values are arrays of arrays of [[CellValue]].
    *
    * @throws [[EvaluationSuspendedError]] when the evaluation is suspended
    *
@@ -733,7 +733,7 @@ export class HyperFormula implements TypedEmitter {
 
   /**
    * Returns a snapshot of computation time statistics.
-   * It returns a map with key-value pairs where keys are enums for stat type and time (number)
+   * It returns a map with key-value pairs where keys are enums for stat type and time (number).
    *
    * @internal
    *
@@ -778,7 +778,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * Note that this method may trigger dependency graph recalculation.
    *
-   * @fires [[valuesUpdated]]
+   * @fires [[valuesUpdated]] if recalculation was triggered by this change
    *
    * @throws [[NoOperationToRedoError]] when there is no operation running that can be re-done
    *
@@ -852,7 +852,7 @@ export class HyperFormula implements TypedEmitter {
   /**
    * Returns information whether it is possible to change the content in a rectangular area bounded by the box.
    * If returns `true`, doing [[setCellContents]] operation won't throw any errors.
-   * Returns `false` if the operation might be disrupted and causes side-effects by the fact that there is a matrix inside selected cells, the address is invalid or the sheet does not exist
+   * Returns `false` if the operation might be disrupted and causes side-effects by the fact that there is a matrix inside selected cells, the address is invalid or the sheet does not exist.
    *
    * @param {SimpleCellAddress} topLeftCornerAddress -  top left corner of block of cells
    * @param {number} width - width of the box
@@ -867,7 +867,7 @@ export class HyperFormula implements TypedEmitter {
    * // choose the address and assign it to a variable
    * const address = { col: 0, row: 0, sheet: 0 };
    *
-   * // should return 'true' for this example, it is possible to set content of 
+   * // should return 'true' for this example, it is possible to set content of
    * // width 2, height 1 in the first row and column of sheet 0
    * const isSettable = hfInstance.isItPossibleToSetCellContents(address, 2, 1);
    * ```
@@ -1472,7 +1472,7 @@ export class HyperFormula implements TypedEmitter {
 
   /**
    * When called after [[copy]] it will paste copied values and formulas into a cell block.
-   * When called after [[paste]] it will perform [[moveCells]] operation into the cell block.
+   * When called after [[cut]] it will perform [[moveCells]] operation into the cell block.
    * Does nothing if the clipboard is empty.
    *
    * Note that this method may trigger dependency graph recalculation.
@@ -1703,7 +1703,7 @@ export class HyperFormula implements TypedEmitter {
   /**
    * Returns information whether it is possible to remove sheet for the engine.
    * Returns `true` if the provided name of a sheet exists and therefore it can be removed, doing [[removeSheet]] operation won't throw any errors.
-   * Returns `false` if there is no sheet with a given name
+   * Returns `false` if there is no sheet with a given name.
    *
    * @param {string} sheetName - sheet name, case insensitive
    *
@@ -1770,7 +1770,7 @@ export class HyperFormula implements TypedEmitter {
   /**
    * Returns information whether it is possible to clear a specified sheet.
    * If returns `true`, doing [[clearSheet]] operation won't throw any errors, provided name of a sheet exists and then its content can be cleared.
-   * Returns `false` if there is no sheet with a given name
+   * Returns `false` if there is no sheet with a given name.
    *
    * @param {string} sheetName - sheet name, case insensitive.
    *
@@ -1835,7 +1835,7 @@ export class HyperFormula implements TypedEmitter {
   /**
    * Returns information whether it is possible to replace the sheet content.
    * If returns `true`, doing [[setSheetContent]] operation won't throw any errors, the provided name of a sheet exists and then its content can be replaced.
-   * Returns `false` if there is no sheet with a given name
+   * Returns `false` if there is no sheet with a given name.
    *
    * @param {string} sheetName - sheet name, case insensitive.
    * @param {RawCellContent[][]} values - array of new values
@@ -1867,7 +1867,7 @@ export class HyperFormula implements TypedEmitter {
 
   /**
    * Replaces the sheet content with new values.
-   * The new value is to be provided as an array of arrays of [[RawCellContent]]
+   * The new value is to be provided as an array of arrays of [[RawCellContent]].
    * The method finds sheet ID based on the provided sheet name.
    *
    * @param {string} sheetName - sheet name, case insensitive.
@@ -1899,9 +1899,9 @@ export class HyperFormula implements TypedEmitter {
    * Computes simple (absolute) address of a cell address based on its string representation.
    * If sheet name is present in string representation but not present in the engine, returns `undefined`.
    * If sheet name is not present in string representation, returns the sheet number.
-   * Returns an absolute representation of address, e.g. `{ sheet: 0, col: 1, row: 1 }` for `Sheet1!B2`
+   * Returns an absolute representation of address.
    *
-   * @param {string} cellAddress - string representation of cell address in A1 notation, e.g. 'C64'
+   * @param {string} cellAddress - string representation of cell address in A1 notation
    * @param {number} sheetId - override sheet index regardless of sheet mapping
    *
    * @example
@@ -2204,7 +2204,7 @@ export class HyperFormula implements TypedEmitter {
    * @param {number} sheetId - a sheet number
    * @param {string} newName - a name of the sheet to be given, if is the same as the old one the method does nothing
    *
-   * @fires [[sheetRenamed]]
+   * @fires [[sheetRenamed]] after the sheet was renamed
    *
    * @throws Throws an error if the provided sheet ID does not exists.
    *
@@ -2394,7 +2394,7 @@ export class HyperFormula implements TypedEmitter {
 
   /**
    * Gets specified named expression value.
-   * Returns a [[CellValue]] or undefined if the given named expression does not exists
+   * Returns a [[CellValue]] or undefined if the given named expression does not exists.
    *
    * @param {string} expressionName - expression name, case insensitive.
    * @param {string | undefined} scope - sheet name or undefined for global scope
@@ -2512,7 +2512,7 @@ export class HyperFormula implements TypedEmitter {
    * @param {string} expressionName - expression name, case insensitive.
    * @param {string | undefined} scope - sheet name or undefined for global scope
    *
-   * @fires [[namedExpressionRemoved]]
+   * @fires [[namedExpressionRemoved]] after the expression was removed
    * @fires [[valuesUpdated]] if recalculation was triggered by this change
    *
    * @example
@@ -2569,7 +2569,7 @@ export class HyperFormula implements TypedEmitter {
   /**
    * Returns a normalized formula.
    *
-   * @param {string} formulaString - a formula, ex. =SUM(Sheet1!A1:A100)"
+   * @param {string} formulaString - a formula in a proper format - it must start with "="
    *
    * @throws [[NotAFormulaError]] when the provided string is not a valid formula, i.e does not start with "="
    *
@@ -2597,7 +2597,7 @@ export class HyperFormula implements TypedEmitter {
   /**
    * Calculates fire-and-forget formula, returns the calculated value.
    *
-   * @param {string} formulaString - a formula, ex. "=SUM(Sheet1!A1:A100)"
+   * @param {string} formulaString -  a formula in a proper format - it must start with "="
    * @param {string} sheetName - a name of the sheet in context of which we evaluate formula, case insensitive.
    *
    * @throws [[NotAFormulaError]] when the provided string is not a valid formula, i.e does not start with "="
@@ -2631,7 +2631,7 @@ export class HyperFormula implements TypedEmitter {
    * Validates the formula.
    * If the provided string starts with "=" and is a parsable formula the method returns `true`.
    *
-   * @param {string} formulaString - a formula, ex. "=SUM(Sheet1!A1:A100)"
+   * @param {string} formulaString -  a formula in a proper format - it must start with "="
    *
    * @example
    * ```js
