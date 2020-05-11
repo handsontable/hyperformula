@@ -7,7 +7,7 @@ setup: ## Setup project
 compile: ## Compile to javascript
 	@npm run compile
 
-test: ## Run jasmine tests
+test: ## Run tests
 	@npm run test
 
 unit: ## Run unit tests
