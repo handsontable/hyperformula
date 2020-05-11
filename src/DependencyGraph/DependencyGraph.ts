@@ -153,7 +153,7 @@ export class DependencyGraph {
       if (dep instanceof AbsoluteCellRange) {
         const range = dep
         let rangeVertex = this.rangeMapping.getRange(range.start, range.end)
-        if (rangeVertex === null) {
+        if (rangeVertex === undefined) {
           rangeVertex = new RangeVertex(range)
           this.rangeMapping.setRange(rangeVertex)
         }
@@ -611,7 +611,7 @@ export class DependencyGraph {
     this.matrixMapping.setMatrix(range, vertex)
   }
 
-  public getRange(start: SimpleCellAddress, end: SimpleCellAddress): RangeVertex | null {
+  public getRange(start: SimpleCellAddress, end: SimpleCellAddress): Maybe<RangeVertex> {
     return this.rangeMapping.getRange(start, end)
   }
 

@@ -6,6 +6,7 @@
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
 import {SimpleCellAddress} from '../Cell'
 import {ColumnsSpan} from '../ColumnsSpan'
+import {Maybe} from '../Maybe'
 import {RowsSpan} from '../RowsSpan'
 import {RangeVertex} from './'
 
@@ -37,13 +38,10 @@ export class RangeMapping {
    * @param start - top-left corner of the range
    * @param end - bottom-right corner of the range
    */
-  public getRange(start: SimpleCellAddress, end: SimpleCellAddress): RangeVertex | null {
+  public getRange(start: SimpleCellAddress, end: SimpleCellAddress): Maybe<RangeVertex> {
     const sheetMap = this.rangeMapping.get(start.sheet)
-    if (!sheetMap) {
-      return null
-    }
     const key = `${start.col},${start.row},${end.col},${end.row}`
-    return sheetMap.get(key) ?? null
+    return sheetMap?.get(key)
   }
 
   public fetchRange(start: SimpleCellAddress, end: SimpleCellAddress): RangeVertex {

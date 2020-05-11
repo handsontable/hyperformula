@@ -16,7 +16,7 @@ const findSmallerRange = (dependencyGraph: DependencyGraph, conditionRanges: Abs
   if (valuesRange.end.row > valuesRange.start.row) {
     const valuesRangeEndRowLess = simpleCellAddress(valuesRange.end.sheet, valuesRange.end.col, valuesRange.end.row - 1)
     const rowLessVertex = dependencyGraph.getRange(valuesRange.start, valuesRangeEndRowLess)
-    if (rowLessVertex) {
+    if (rowLessVertex !== undefined) {
       return {
         smallerRangeVertex: rowLessVertex,
         restValuesRange: valuesRange.withStart(simpleCellAddress(valuesRange.start.sheet, valuesRange.start.col, valuesRange.end.row)),
@@ -89,7 +89,7 @@ export class CriterionFunctionCompute<T> {
     if (maybeRange === undefined) {
       return undefined
     } else {
-      return this.dependencyGraph.getRange(maybeRange.start, maybeRange.end) || undefined
+      return this.dependencyGraph.getRange(maybeRange.start, maybeRange.end)
     }
   }
 
