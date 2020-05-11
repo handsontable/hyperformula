@@ -19,10 +19,21 @@ Config.defaultConfig = Object.assign({}, Config.defaultConfig, {
   licenseKey: 'agpl-v3',
 })
 
+const jestPresent = (() => {
+  try {
+    expect([{a: 0}]).toContainEqual({a:0})
+    return true
+  } catch (e) {
+    return false
+  }
+})()
+
 beforeEach(() => {
-  // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
-  // @ts-ignore
-  jasmine.setDefaultSpyStrategy((and: unknown) => and.callThrough())
+  if(!jestPresent) {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+    // @ts-ignore
+    jasmine.setDefaultSpyStrategy((and: unknown) => and.callThrough())
+  }
 
   unregisterAllLanguages()
 
@@ -37,8 +48,14 @@ beforeEach(() => {
 })
 
 beforeAll(() => {
-  jasmine.addMatchers({
-    ...toContainEqualMatcher,
-    ...toMatchObjectMatcher,
-  })
+  if(jestPresent) {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+    // @ts-ignore
+    spyOn = jest.spyOn
+  } else {
+    jasmine.addMatchers({
+      ...toContainEqualMatcher,
+      ...toMatchObjectMatcher,
+    })
+  }
 })

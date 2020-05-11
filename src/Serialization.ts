@@ -19,6 +19,7 @@ export class Serialization {
     public readonly exporter: Exporter
   ) {
   }
+
   public getCellFormula(address: SimpleCellAddress): Maybe<string> {
     const formulaVertex = this.dependencyGraph.getCell(address)
     if (formulaVertex instanceof FormulaCellVertex) {
@@ -37,11 +38,11 @@ export class Serialization {
 
   public getCellSerialized(address: SimpleCellAddress): NoErrorCellValue {
     const formula: Maybe<string> = this.getCellFormula(address)
-    if( formula !== undefined ) {
+    if (formula !== undefined) {
       return formula
     } else {
       const value: CellValue = this.getCellValue(address)
-      if(value instanceof DetailedCellError) {
+      if (value instanceof DetailedCellError) {
         return this.config.translationPackage.getErrorTranslation(value.error.type)
       } else {
         return value
@@ -81,7 +82,7 @@ export class Serialization {
     const result: Record<string, T> = {}
     for (const sheetName of this.dependencyGraph.sheetMapping.displayNames()) {
       const sheetId = this.dependencyGraph.sheetMapping.fetch(sheetName)
-      result[sheetName] =  sheetGetter(sheetId)
+      result[sheetName] = sheetGetter(sheetId)
     }
     return result
   }

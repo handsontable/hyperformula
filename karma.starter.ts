@@ -1,7 +1,7 @@
-import './test-jasmine/test/_setupFiles/bootstrap';
+import './test/_setupFiles/bootstrap';
 
 // require all modules ending in ".spec.js" from the
 // './temp-browser/test' directory and all subdirectories
-const testsContext = require.context('./test-jasmine', true, /.spec.js$/);
+const testsContext = require.context('./test', true, /.spec.ts$/);
 
 testsContext.keys().forEach(testsContext);

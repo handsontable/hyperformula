@@ -204,7 +204,7 @@ describe('Adding row - reevaluation', () => {
     const changes = engine.addRows(0, [1, 1])
 
     expect(changes.length).toBe(1)
-    expect(changes).toContainEqual([new ExportedCellChange(simpleCellAddress(0, 1, 2), 1)])
+    expect(changes).toContainEqual(new ExportedCellChange(simpleCellAddress(0, 1, 2), 1))
   })
 })
 
