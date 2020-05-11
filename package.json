@@ -55,7 +55,6 @@
     "clean": "rimraf coverage/ commonjs/ dist/ es/ lib/ typings/ test-jasmine/",
     "compile": "tsc",
     "compile:tests": "tsc --project tsconfig.test.json",
-    "compile:jest": "tsc --project tsconfig.jest.json",
     "coverage": "cross-env NODE_ICU_DATA=node_modules/full-icu jest --coverage",
     "test": "npm-run-all lint test:unit test:browser",
     "test:unit": "npm-run-all compile:tests jasmine:start",
