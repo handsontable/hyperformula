@@ -3,7 +3,7 @@ node_modules
 
 # Configurations
 *.config.js
-karma.*.js
+karma.*
 doc
 
 # Aut-generated directiories
