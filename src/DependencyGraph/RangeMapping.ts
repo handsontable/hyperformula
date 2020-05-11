@@ -55,15 +55,18 @@ export class RangeMapping {
   public truncateRangesByRows(rowsSpan: RowsSpan): RangeVertex[] {
     const rangesToRemove = Array<RangeVertex>()
 
-    this.updateVerticesFromSheet(rowsSpan.sheet, (key: string, vertex: RangeVertex): RangeVertex | void => {
+    this.updateVerticesFromSheet(rowsSpan.sheet, (key: string, vertex: RangeVertex): Maybe<RangeVertex> => {
       if (rowsSpan.rowStart <= vertex.range.end.row) {
         vertex.range.removeRows(rowsSpan.rowStart, rowsSpan.rowEnd)
         if (vertex.range.shouldBeRemoved()) {
           rangesToRemove.push(vertex)
           this.removeByKey(rowsSpan.sheet, key)
+          return undefined
         } else {
           return vertex
         }
+      } else {
+        return undefined
       }
     })
 
@@ -73,15 +76,18 @@ export class RangeMapping {
   public truncateRangesByColumns(columnsSpan: ColumnsSpan): RangeVertex[] {
     const rangesToRemove = Array<RangeVertex>()
 
-    this.updateVerticesFromSheet(columnsSpan.sheet, (key: string, vertex: RangeVertex): RangeVertex | void => {
+    this.updateVerticesFromSheet(columnsSpan.sheet, (key: string, vertex: RangeVertex): Maybe<RangeVertex> => {
       if (columnsSpan.columnStart <= vertex.range.end.col) {
         vertex.range.removeColumns(columnsSpan.columnStart, columnsSpan.columnEnd)
         if (vertex.range.shouldBeRemoved()) {
           rangesToRemove.push(vertex)
           this.removeByKey(columnsSpan.sheet, key)
+          return undefined
         } else {
           return vertex
         }
+      } else {
+        return undefined
       }
     })
 
@@ -89,36 +95,42 @@ export class RangeMapping {
   }
 
   public moveAllRangesInSheetAfterRowByRows(sheet: number, row: number, numberOfRows: number) {
-    this.updateVerticesFromSheet(sheet, (key: string, vertex: RangeVertex): RangeVertex | void => {
+    this.updateVerticesFromSheet(sheet, (key: string, vertex: RangeVertex): Maybe<RangeVertex> => {
       if (row <= vertex.start.row) {
         vertex.range.shiftByRows(numberOfRows)
         return vertex
       } else if (row > vertex.start.row && row <= vertex.end.row) {
         vertex.range.expandByRows(numberOfRows)
         return vertex
+      } else {
+        return undefined
       }
     })
   }
 
   public moveAllRangesInSheetAfterColumnByColumns(sheet: number, column: number, numberOfColumns: number) {
-    this.updateVerticesFromSheet(sheet, (key: string, vertex: RangeVertex): RangeVertex | void => {
+    this.updateVerticesFromSheet(sheet, (key: string, vertex: RangeVertex): Maybe<RangeVertex> => {
       if (column <= vertex.start.col) {
         vertex.range.shiftByColumns(numberOfColumns)
         return vertex
       } else if (column > vertex.start.col && column <= vertex.end.col) {
         vertex.range.expandByColumns(numberOfColumns)
         return vertex
+      } else {
+        return undefined
       }
     })
   }
 
   public moveRangesInsideSourceRange(sourceRange: AbsoluteCellRange, toRight: number, toBottom: number, toSheet: number) {
-    this.updateVerticesFromSheet(sourceRange.sheet, (key: string, vertex: RangeVertex): RangeVertex | void => {
+    this.updateVerticesFromSheet(sourceRange.sheet, (key: string, vertex: RangeVertex): Maybe<RangeVertex> => {
       if (sourceRange.containsRange(vertex.range)) {
         vertex.range.shiftByColumns(toRight)
         vertex.range.shiftByRows(toBottom)
         vertex.range.moveToSheet(toSheet)
         return vertex
+      } else {
+        return undefined
       }
     })
   }
@@ -164,12 +176,12 @@ export class RangeMapping {
     this.rangeMapping.get(sheet)!.delete(key)
   }
 
-  private updateVerticesFromSheet(sheet: number, fn: (key: string, vertex: RangeVertex) => RangeVertex | void) {
+  private updateVerticesFromSheet(sheet: number, fn: (key: string, vertex: RangeVertex) => Maybe<RangeVertex>) {
     const updated = Array<RangeVertex>()
 
     for (const [key, vertex] of this.entriesFromSheet(sheet)) {
       const result = fn(key, vertex)
-      if (result) {
+      if (result !== undefined) {
         this.removeByKey(sheet, key)
         updated.push(result)
       }
