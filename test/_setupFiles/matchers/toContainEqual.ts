@@ -14,9 +14,10 @@ declare global {
 export const toContainEqualMatcher: CustomMatcherFactories = {
   toContainEqual: function(util: MatchersUtil): CustomMatcher {
     return {
-      compare: function(actual: never, expected: never): CustomMatcherResult {
+      compare: function(actual: any[], expected: any): CustomMatcherResult {
         return {
-          pass: util.equals(actual, jasmine.arrayContaining(expected))
+          pass: util.equals(actual, jasmine.arrayContaining([expected])),
+          message: ''
         }
       },
     }

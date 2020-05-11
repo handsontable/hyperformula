@@ -335,7 +335,7 @@ describe('Named expressions - evaluation', () => {
     const changes = engine.setCellContents(adr('A1'), '20')
 
     expect(changes.length).toBe(2)
-    expect(changes).toContainEqual([new ExportedNamedExpressionChange('myName', 30)])
+    expect(changes).toContainEqual(new ExportedNamedExpressionChange('myName', 30))
     expect(engine.getNamedExpressionValue('myName')).toEqual(30)
   })
 
