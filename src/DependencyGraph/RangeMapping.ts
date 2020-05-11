@@ -17,6 +17,10 @@ export class RangeMapping {
   /** Map in which actual data is stored. */
   private rangeMapping: Map<number, Map<string, RangeVertex>> = new Map()
 
+  public getMappingSize(sheet: number): Maybe<number> {
+    return this.rangeMapping.get(sheet)?.size ?? 0
+  }
+
   /**
    * Saves range vertex
    *
