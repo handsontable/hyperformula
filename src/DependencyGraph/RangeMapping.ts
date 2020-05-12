@@ -28,12 +28,22 @@ export class RangeMapping {
    */
   public setRange(vertex: RangeVertex) {
     let sheetMap = this.rangeMapping.get(vertex.getStart().sheet)
-    if (!sheetMap) {
+    if (sheetMap === undefined) {
       sheetMap = new Map()
       this.rangeMapping.set(vertex.getStart().sheet, sheetMap)
     }
-    const key = `${vertex.getStart().col},${vertex.getStart().row},${vertex.getEnd().col},${vertex.getEnd().row}`
+    const key = keyFromAddresses(vertex.getStart(), vertex.getEnd())
     sheetMap.set(key, vertex)
+  }
+
+  public removeRange(vertex: RangeVertex) {
+    const sheet = vertex.getStart().sheet
+    const sheetMap = this.rangeMapping.get(sheet)!
+    const key = keyFromAddresses(vertex.getStart(), vertex.getEnd())
+    sheetMap.delete(key)
+    if(sheetMap.size === 0) {
+      this.rangeMapping.delete(sheet)
+    }
   }
 
   /**
@@ -44,7 +54,7 @@ export class RangeMapping {
    */
   public getRange(start: SimpleCellAddress, end: SimpleCellAddress): Maybe<RangeVertex> {
     const sheetMap = this.rangeMapping.get(start.sheet)
-    const key = `${start.col},${start.row},${end.col},${end.row}`
+    const key = keyFromAddresses(start, end)
     return sheetMap?.get(key)
   }
 
@@ -196,3 +206,8 @@ export class RangeMapping {
     })
   }
 }
+
+function keyFromAddresses(start: SimpleCellAddress, end: SimpleCellAddress) {
+  return `${start.col},${start.row},${end.col},${end.row}`
+}
+

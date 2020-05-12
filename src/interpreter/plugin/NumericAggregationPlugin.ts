@@ -385,7 +385,11 @@ export class NumericAggregationPlugin extends FunctionPlugin {
         throw err
       }
     }
-    const rangeVertex = this.dependencyGraph.getRangeFromAbsoluteRange(range)
+
+    const rangeStart = range.start
+    const rangeEnd = range.end
+    const rangeVertex = this.dependencyGraph.getRange(rangeStart, rangeEnd)!
+    assert.ok(rangeVertex, 'Range does not exists in graph')
 
     let value = rangeVertex.getFunctionValue(functionName) as T
     if (!value) {

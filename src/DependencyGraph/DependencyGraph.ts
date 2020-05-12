@@ -152,7 +152,12 @@ export class DependencyGraph {
     cellDependencies.forEach((dep: CellDependency) => {
       if (dep instanceof AbsoluteCellRange) {
         const range = dep
-        const rangeVertex = this.getRangeFromAbsoluteRange(range)
+
+        let rangeVertex = this.getRange(range.start, range.end)
+        if (rangeVertex === undefined) {
+          rangeVertex = new RangeVertex(range)
+          this.rangeMapping.setRange(rangeVertex)
+        }
 
         this.graph.addNode(rangeVertex)
         if (!range.isFinite()) {
@@ -605,15 +610,6 @@ export class DependencyGraph {
 
   public setMatrix(range: AbsoluteCellRange, vertex: MatrixVertex): void {
     this.matrixMapping.setMatrix(range, vertex)
-  }
-
-  public getRangeFromAbsoluteRange(range: AbsoluteCellRange): RangeVertex {
-    let rangeVertex = this.getRange(range.start, range.end)
-    if (rangeVertex === undefined) {
-      rangeVertex = new RangeVertex(range)
-      this.rangeMapping.setRange(rangeVertex)
-    }
-    return rangeVertex
   }
 
   public getRange(start: SimpleCellAddress, end: SimpleCellAddress): Maybe<RangeVertex> {

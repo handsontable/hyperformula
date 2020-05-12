@@ -3,6 +3,8 @@
  * Copyright (c) 2020 Handsoncode. All rights reserved.
  */
 
+import {AbsoluteCellRange} from './AbsoluteCellRange'
+import {absolutizeDependencies} from './absolutizeDependencies'
 import {CellError, ErrorType, InternalCellValue, SimpleCellAddress} from './Cell'
 import {ColumnSearchStrategy} from './ColumnSearch/ColumnSearchStrategy'
 import {Config} from './Config'
@@ -13,7 +15,7 @@ import {fixNegativeZero, isNumberOverflow} from './interpreter/ArithmeticHelper'
 import {Interpreter} from './interpreter/Interpreter'
 import {SimpleRangeValue} from './interpreter/InterpreterValue'
 import {Matrix} from './Matrix'
-import {Ast} from './parser'
+import {Ast, RelativeDependency} from './parser'
 import {Statistics, StatType} from './statistics'
 import {NumberLiteralHelper} from './NumberLiteralHelper'
 import {NamedExpressions} from './NamedExpressions'
@@ -102,8 +104,25 @@ export class Evaluator {
     this.interpreter.destroy()
   }
 
-  public runAndForget(ast: Ast, address: SimpleCellAddress) {
-    return this.evaluateAstToScalarValue(ast, address)
+  public runAndForget(ast: Ast, address: SimpleCellAddress, dependencies: RelativeDependency[]) {
+    const tmpRanges: RangeVertex[] = []
+    for(const dep of absolutizeDependencies(dependencies, address)) {
+      if(dep instanceof AbsoluteCellRange) {
+        const range = dep
+        if(this.dependencyGraph.getRange(range.start, range.end) === undefined){
+          const rangeVertex = new RangeVertex(range)
+          this.dependencyGraph.rangeMapping.setRange(rangeVertex)
+          tmpRanges.push(rangeVertex)
+        }
+      }
+    }
+    const ret = this.evaluateAstToScalarValue(ast, address)
+
+    tmpRanges.forEach((rangeVertex) => {
+      this.dependencyGraph.rangeMapping.removeRange(rangeVertex)
+    })
+
+    return ret
   }
 
   /**
