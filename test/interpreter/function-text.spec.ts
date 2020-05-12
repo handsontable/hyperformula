@@ -109,9 +109,7 @@ describe('Text', () => {
       [
         '0.0000011574074074074074', '=TEXT(A1, "hh:mm:ss.ss")',
       ],
-      [
-        '0.000001', '=TEXT(A2, "hh:mm:ss.sss")',
-      ]
+      ['0.000001', '=TEXT(A2, "hh:mm:ss.sss")']
     ])
     expect(engine.getCellValue(adr('B1'))).toEqual('00:00:00.1')
     expect(engine.getCellValue(adr('B2'))).toEqual('00:00:00.086')
