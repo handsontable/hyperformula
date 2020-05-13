@@ -9,12 +9,12 @@ import {FunctionPlugin} from './FunctionPlugin'
 
 export class ModuloPlugin extends FunctionPlugin {
   public static implementedFunctions = {
-    modulo: {
-      translationKey: 'MOD',
+    'MOD': {
+      method: 'mod',
     },
   }
 
-  public modulo(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
+  public mod(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
     const validationResult = this.validateTwoNumericArguments(ast, formulaAddress)
     if (validationResult instanceof CellError) {
       return validationResult

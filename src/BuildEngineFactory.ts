@@ -21,6 +21,7 @@ import {Serialization} from './Serialization'
 import {EmptyStatistics, Statistics, StatType} from './statistics'
 import {SheetSizeLimitExceededError} from './errors'
 import {findBoundaries, Sheet, Sheets, validateAsSheet} from './Sheet'
+import {FunctionRegistry} from './interpreter/FunctionRegistry'
 
 export type EngineState = {
   config: Config,
@@ -36,6 +37,7 @@ export type EngineState = {
   exporter: Exporter,
   namedExpressions: NamedExpressions,
   serialization: Serialization,
+  functionRegistry: FunctionRegistry,
 }
 
 export class BuildEngineFactory {
@@ -43,8 +45,9 @@ export class BuildEngineFactory {
     stats.start(StatType.BUILD_ENGINE_TOTAL)
 
     const namedExpressions = new NamedExpressions()
+    const functionRegistry = new FunctionRegistry(config)
     const lazilyTransformingAstService = new LazilyTransformingAstService(stats)
-    const dependencyGraph = DependencyGraph.buildEmpty(lazilyTransformingAstService, config, stats, namedExpressions)
+    const dependencyGraph = DependencyGraph.buildEmpty(lazilyTransformingAstService, config, functionRegistry, namedExpressions, stats)
     const columnSearch = buildColumnSearchStrategy(dependencyGraph, config, stats)
     const sheetMapping = dependencyGraph.sheetMapping
     const addressMapping = dependencyGraph.addressMapping
@@ -63,7 +66,7 @@ export class BuildEngineFactory {
     }
 
     const notEmpty = sheetMapping.numberOfSheets() > 0
-    const parser = new ParserWithCaching(config, notEmpty ? sheetMapping.get : sheetMapping.fetch)
+    const parser = new ParserWithCaching(config, functionRegistry, notEmpty ? sheetMapping.get : sheetMapping.fetch)
     const unparser = new Unparser(config, buildLexerConfig(config), sheetMapping.fetchDisplayName, namedExpressions)
     const dateHelper = new DateTimeHelper(config)
     const numberLiteralHelper = new NumberLiteralHelper(config)
@@ -78,7 +81,7 @@ export class BuildEngineFactory {
     lazilyTransformingAstService.undoRedo = crudOperations.undoRedo
     lazilyTransformingAstService.parser = parser
 
-    const evaluator = new Evaluator(dependencyGraph, columnSearch, config, stats, dateHelper, numberLiteralHelper, namedExpressions)
+    const evaluator = new Evaluator(dependencyGraph, columnSearch, config, stats, dateHelper, numberLiteralHelper, functionRegistry, namedExpressions)
     evaluator.run()
 
     const exporter = new Exporter(config, namedExpressions)
@@ -99,7 +102,8 @@ export class BuildEngineFactory {
       crudOperations,
       exporter,
       namedExpressions,
-      serialization
+      serialization,
+      functionRegistry,
     }
   }
 

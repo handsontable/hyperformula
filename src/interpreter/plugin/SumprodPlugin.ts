@@ -13,8 +13,8 @@ import {FunctionPlugin} from './FunctionPlugin'
 
 export class SumprodPlugin extends FunctionPlugin {
   public static implementedFunctions = {
-    sumprod: {
-      translationKey: 'SUMPRODUCT',
+    'SUMPRODUCT': {
+      method: 'sumprod',
     },
   }
 

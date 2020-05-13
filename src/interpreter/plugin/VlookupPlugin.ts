@@ -12,11 +12,11 @@ import {FunctionPlugin} from './FunctionPlugin'
 
 export class VlookupPlugin extends FunctionPlugin {
   public static implementedFunctions = {
-    vlookup: {
-      translationKey: 'VLOOKUP',
+    'VLOOKUP': {
+      method: 'vlookup',
     },
-    match: {
-      translationKey: 'MATCH',
+    'MATCH': {
+      method: 'match',
     },
   }
 

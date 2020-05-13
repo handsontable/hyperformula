@@ -22,29 +22,29 @@ export function findNextEvenNumber(arg: number): number {
 
 export class RoundingPlugin extends FunctionPlugin {
   public static implementedFunctions = {
-    roundup: {
-      translationKey: 'ROUNDUP',
+    'ROUNDUP': {
+      method: 'roundup',
     },
-    rounddown: {
-      translationKey: 'ROUNDDOWN',
+    'ROUNDDOWN': {
+      method: 'rounddown',
     },
-    round: {
-      translationKey: 'ROUND',
+    'ROUND': {
+      method: 'round',
     },
-    trunc: {
-      translationKey: 'TRUNC',
+    'TRUNC': {
+      method: 'trunc',
     },
-    intFunc: {
-      translationKey: 'INT',
+    'INT': {
+      method: 'intFunc',
     },
-    even: {
-      translationKey: 'EVEN',
+    'EVEN': {
+      method: 'even',
     },
-    odd: {
-      translationKey: 'ODD',
+    'ODD': {
+      method: 'odd',
     },
-    ceiling: {
-      translationKey: 'CEILING',
+    'CEILING': {
+      method: 'ceiling',
     },
   }
 

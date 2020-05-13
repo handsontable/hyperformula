@@ -1,8 +1,8 @@
 import {HyperFormula} from '../src'
-import {Config} from '../src/Config'
 import {languages, plPL, TranslationPackage} from '../src/i18n'
 import {CellAddress} from '../src/parser'
 import {adr, extractReference} from './testUtils'
+import {FunctionRegistry} from '../src/interpreter/FunctionRegistry'
 
 describe('i18n', () => {
   beforeEach(() => {
@@ -61,7 +61,7 @@ describe('i18n', () => {
   })
 
   it('all translation packages should translate all implemented functions', () => {
-    const implementedFunctions = Config.getRegisteredFunctions()
+    const implementedFunctions = new Set(Array.from(FunctionRegistry.getRegisteredFunctionIds()))
     implementedFunctions.add('OFFSET') // HARDCODED FUNCTION
 
     for (const lang in languages) {

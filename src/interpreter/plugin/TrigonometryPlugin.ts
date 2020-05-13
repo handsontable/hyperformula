@@ -14,29 +14,29 @@ import {FunctionPlugin} from './FunctionPlugin'
 export class TrigonometryPlugin extends FunctionPlugin {
 
   public static implementedFunctions = {
-    acos: {
-      translationKey: 'ACOS',
+    'ACOS': {
+      method: 'acos',
     },
-    asin: {
-      translationKey: 'ASIN',
+    'ASIN': {
+      method: 'asin',
     },
-    cos: {
-      translationKey: 'COS',
+    'COS': {
+      method: 'cos',
     },
-    sin: {
-      translationKey: 'SIN',
+    'SIN': {
+      method: 'sin',
     },
-    tan: {
-      translationKey: 'TAN',
+    'TAN': {
+      method: 'tan',
     },
-    atan: {
-      translationKey: 'ATAN',
+    'ATAN': {
+      method: 'atan',
     },
-    atan2: {
-      translationKey: 'ATAN2',
+    'ATAN2': {
+      method: 'atan2',
     },
-    ctg: {
-      translationKey: 'COT',
+    'COT': {
+      method: 'ctg',
     },
   }
 

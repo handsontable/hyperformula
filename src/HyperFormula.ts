@@ -21,10 +21,7 @@ import {
   SheetMapping,
   Vertex,
 } from './DependencyGraph'
-import {
-  EvaluationSuspendedError,
-  NotAFormulaError
-} from './errors'
+import {EvaluationSuspendedError, NotAFormulaError} from './errors'
 import {Evaluator} from './Evaluator'
 import {IBatchExecutor} from './IBatchExecutor'
 import {LazilyTransformingAstService} from './LazilyTransformingAstService'
@@ -45,6 +42,8 @@ import {BuildEngineFactory, EngineState} from './BuildEngineFactory'
 import {Sheet, Sheets} from './Sheet'
 import {SheetDimensions} from './_types'
 import {LicenseKeyValidityState} from './helpers/licenseKeyValidator'
+import {FunctionPluginDefinition} from './interpreter'
+import {FunctionRegistry, FunctionTranslationsPackage} from './interpreter/FunctionRegistry'
 
 export type Index = [number, number]
 
@@ -175,7 +174,8 @@ export class HyperFormula implements TypedEmitter {
       engine.crudOperations,
       engine.exporter,
       engine.namedExpressions,
-      engine.serialization
+      engine.serialization,
+      engine.functionRegistry,
     )
   }
 
@@ -190,6 +190,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * @throws [[SheetSizeLimitExceededError]] when sheet size exceeds the limits
    * @throws [[InvalidArgumentsError]] when sheet is not an array of arrays
+   * @throws [[FunctionPluginValidationError]] when plugin class definition is not consistent with metadata
    *
    * @example
    * ```js
@@ -221,6 +222,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * @throws [[SheetSizeLimitExceededError]] when sheet size exceeds the limits
    * @throws [[InvalidArgumentsError]] when any sheet is not an array of arrays
+   * @throws [[FunctionPluginValidationError]] when plugin class definition is not consistent with metadata
    *
    * @example
    * ```js
@@ -326,6 +328,83 @@ export class HyperFormula implements TypedEmitter {
   }
 
   /**
+   * Registers all functions in a given plugin with optional translations
+   *
+   * @param {FunctionPluginDefinition} plugin - plugin class
+   * @param {FunctionTranslationsPackage} translations - optional package of function names translations
+   *
+   * @throws [[FunctionPluginValidationError]] when plugin class definition is not consistent with metadata
+   */
+  public static registerFunctionPlugin(plugin: FunctionPluginDefinition, translations?: FunctionTranslationsPackage): void {
+    FunctionRegistry.registerFunctionPlugin(plugin, translations)
+  }
+
+  /**
+   * Unregisters all functions defined in given plugin
+   *
+   * @param {FunctionPluginDefinition} plugin - plugin class
+   */
+  public static unregisterFunctionPlugin(plugin: FunctionPluginDefinition): void {
+    FunctionRegistry.unregisterFunctionPlugin(plugin)
+  }
+
+  /**
+   * Registers a function with a given id if such exists in a plugin
+   *
+   * @param {string} functionId - function id, e.g. 'SUMIF'
+   * @param {FunctionPluginDefinition} plugin - plugin class
+   * @param translations
+   *
+   * @throws [[FunctionPluginValidationError]] when function with a given id does not exists in plugin or plugin class definition is not consistent with metadata
+   */
+  public static registerFunction(functionId: string, plugin: FunctionPluginDefinition, translations?: FunctionTranslationsPackage): void {
+    FunctionRegistry.registerFunction(functionId, plugin, translations)
+  }
+
+  /**
+   * Unregisters a function with a given id
+   *
+   * @param {string} functionId - function id, e.g. 'SUMIF'
+   */
+  public static unregisterFunction(functionId: string): void {
+    FunctionRegistry.unregisterFunction(functionId)
+  }
+
+  /**
+   * Clears function registry
+   */
+  public static unregisterAllFunctions(): void {
+    FunctionRegistry.unregisterAll()
+  }
+
+  /**
+   * Returns translated names of all registered functions for a given language
+   *
+   * @param {string} code - language code
+   */
+  public static getRegisteredFunctionNames(code: string): string[] {
+    const functionIds = FunctionRegistry.getRegisteredFunctionIds()
+    const language = this.getLanguage(code)
+    return language.getFunctionTranslations(functionIds)
+  }
+
+  /**
+   * Returns class of a plugin used by function with given id
+   *
+   * @param {string} functionId - id of a function, e.g. 'SUMIF'
+   */
+  public static getFunctionPlugin(functionId: string): Maybe<FunctionPluginDefinition> {
+    return FunctionRegistry.getFunctionPlugin(functionId)
+  }
+
+  /**
+   * Returns classes of all plugins registered in this instance of HyperFormula
+   */
+  public static getAllFunctionPlugins(): FunctionPluginDefinition[] {
+    return FunctionRegistry.getPlugins()
+  }
+
+  /**
    * Builds an empty engine instance.
    * Can be configured with the optional parameter that represents a [[ConfigParams]].
    * If not specified the engine will be built with the default configuration.
@@ -360,7 +439,8 @@ export class HyperFormula implements TypedEmitter {
     private _crudOperations: CrudOperations,
     private _exporter: Exporter,
     private _namedExpressions: NamedExpressions,
-    private _serialization: Serialization
+    private _serialization: Serialization,
+    private _functionRegistry: FunctionRegistry,
   ) {
   }
 
@@ -700,6 +780,7 @@ export class HyperFormula implements TypedEmitter {
     this._exporter = newEngine.exporter
     this._namedExpressions = newEngine.namedExpressions
     this._serialization = newEngine.serialization
+    this._functionRegistry = newEngine.functionRegistry
   }
 
   /**
@@ -2650,6 +2731,31 @@ export class HyperFormula implements TypedEmitter {
       return false
     }
     return true
+  }
+
+  /**
+   * Returns translated names of all functions registered in this instance of HyperFormula
+   * according to the language set in the configuration
+   */
+  public getRegisteredFunctionNames(): string[] {
+    const language = HyperFormula.getLanguage(this._config.language)
+    return language.getFunctionTranslations(this._functionRegistry.getRegisteredFunctionIds())
+  }
+
+  /**
+   * Returns class of a plugin used by function with given id
+   *
+   * @param {string} functionId - id of a function, e.g. 'SUMIF'
+   */
+  public getFunctionPlugin(functionId: string): Maybe<FunctionPluginDefinition> {
+    return this._functionRegistry.getFunctionPlugin(functionId)
+  }
+
+  /**
+   * Returns classes of all plugins registered in this instance of HyperFormula
+   */
+  public getAllFunctionPlugins(): FunctionPluginDefinition[] {
+    return this._functionRegistry.getPlugins()
   }
 
   private extractTemporaryFormula(formulaString: string, sheetId: number = 1): [Ast | false, SimpleCellAddress] {

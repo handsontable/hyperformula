@@ -9,11 +9,11 @@ import {FunctionPlugin} from './FunctionPlugin'
 
 export class ErrorFunctionPlugin extends FunctionPlugin {
   public static implementedFunctions = {
-    erf: {
-      translationKey: 'ERF',
+    'ERF': {
+      method: 'erf',
     },
-    erfc: {
-      translationKey: 'ERFC',
+    'ERFC': {
+      method: 'erfc',
     },
   }
 

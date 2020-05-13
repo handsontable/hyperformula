@@ -9,8 +9,8 @@ import {FunctionPlugin} from './FunctionPlugin'
 
 export class SqrtPlugin extends  FunctionPlugin {
   public static implementedFunctions = {
-    sqrt: {
-      translationKey: 'SQRT',
+    'SQRT': {
+      method: 'sqrt',
     },
   }
 

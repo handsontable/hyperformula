@@ -10,8 +10,8 @@ import {FunctionPlugin} from './FunctionPlugin'
 
 export class IsOddPlugin extends FunctionPlugin {
   public static implementedFunctions = {
-    isodd: {
-      translationKey: 'ISODD',
+    'ISODD': {
+      method: 'isodd',
     },
   }
 
