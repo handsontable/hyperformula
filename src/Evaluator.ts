@@ -37,7 +37,7 @@ export class Evaluator {
     this.interpreter = new Interpreter(this.dependencyGraph, this.columnSearch, this.config, this.stats, this.dateHelper, this.numberLiteralsHelper, this.functionRegistry, this.namedExpressions)
   }
 
-  public run() {
+  public run(): void {
     this.stats.start(StatType.TOP_SORT)
     const {sorted, cycled} = this.dependencyGraph.topSortWithScc()
     this.stats.end(StatType.TOP_SORT)
@@ -102,11 +102,11 @@ export class Evaluator {
     return changes
   }
 
-  public destroy() {
+  public destroy(): void {
     this.interpreter.destroy()
   }
 
-  public runAndForget(ast: Ast, address: SimpleCellAddress, dependencies: RelativeDependency[]) {
+  public runAndForget(ast: Ast, address: SimpleCellAddress, dependencies: RelativeDependency[]): InternalCellValue {
     const tmpRanges: RangeVertex[] = []
     for (const dep of absolutizeDependencies(dependencies, address)) {
       if (dep instanceof AbsoluteCellRange) {
@@ -130,7 +130,7 @@ export class Evaluator {
   /**
    * Recalculates formulas in the topological sort order
    */
-  private recomputeFormulas(cycled: Vertex[], sorted: Vertex[]) {
+  private recomputeFormulas(cycled: Vertex[], sorted: Vertex[]): void {
     cycled.forEach((vertex: Vertex) => {
       if (vertex instanceof FormulaCellVertex) {
         vertex.setCellValue(new CellError(ErrorType.CYCLE))
