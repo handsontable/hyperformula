@@ -578,7 +578,7 @@ export class DependencyGraph {
 
     toBeRemoved.forEach( (vertex) => {
       revEdges.get(vertex)!.forEach( (target) => {
-        this.graph.softRemoveEdge(target,vertex)
+        this.graph.softRemoveEdge(target, vertex)
       })
       this.graph.removeNode(vertex)
 
