@@ -1,7 +1,5 @@
 import {simpleCellAddress} from '../../src/Cell'
 import {Config} from '../../src/Config'
-import {SheetMapping} from '../../src/DependencyGraph'
-import {buildTranslationPackage, enGB} from '../../src/i18n'
 import {
   AstNodeType,
   EqualsOpAst,
@@ -10,7 +8,6 @@ import {
   LessThanOpAst,
   LessThanOrEqualOpAst,
   NotEqualOpAst,
-  ParserWithCaching,
 } from '../../src/parser'
 import {buildEmptyParserWithCaching} from './common'
 

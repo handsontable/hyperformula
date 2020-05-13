@@ -1,12 +1,8 @@
 import {CellError} from '../src'
 import {ErrorType, simpleCellAddress} from '../src/Cell'
 import {Config} from '../src/Config'
-import {SheetMapping} from '../src/DependencyGraph'
-import {buildTranslationPackage, enGB} from '../src/i18n'
 import {checkMatrixSize, MatrixSize} from '../src/Matrix'
-import {ParserWithCaching} from '../src/parser'
 import {adr} from './testUtils'
-import {FunctionRegistry} from '../src/interpreter/FunctionRegistry'
 import {buildEmptyParserWithCaching} from './parser/common'
 
 

@@ -3,7 +3,6 @@ import {CellError, ErrorType, SimpleCellAddress} from '../src/Cell'
 import {FunctionPlugin} from '../src/interpreter/plugin/FunctionPlugin'
 import {ProcedureAst} from '../src/parser'
 import {adr, detailedError} from './testUtils'
-import {enGB} from '../src/i18n'
 
 class SquarePlugin extends FunctionPlugin {
   public static implementedFunctions = {

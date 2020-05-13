@@ -12,7 +12,6 @@ import {
   MinusOpAst,
   MinusUnaryOpAst,
   NumberAst,
-  ParserWithCaching,
   ParsingErrorType,
   PlusOpAst,
   PowerOpAst,

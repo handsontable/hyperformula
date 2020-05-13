@@ -1,10 +1,5 @@
 import {simpleCellAddress} from '../../src/Cell'
 import {Config} from '../../src/Config'
-import {SheetMapping} from '../../src/DependencyGraph'
-import {buildTranslationPackage, enGB} from '../../src/i18n'
-import {
-  ParserWithCaching,
-} from '../../src/parser'
 import {buildEmptyParserWithCaching} from './common'
 
 describe('ParserWithCaching - volatile functions detection', () => {
