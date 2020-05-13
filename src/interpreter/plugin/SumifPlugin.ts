@@ -60,20 +60,20 @@ function countifsCacheKey(conditions: Condition[]): string {
 
 export class SumifPlugin extends FunctionPlugin {
   public static implementedFunctions = {
-    sumif: {
-      translationKey: 'SUMIF',
+    'SUMIF': {
+      method: 'sumif',
     },
-    countif: {
-      translationKey: 'COUNTIF',
+    'COUNTIF': {
+      method: 'countif',
     },
-    averageif: {
-      translationKey: 'AVERAGEIF',
+    'AVERAGEIF': {
+      method: 'averageif',
     },
-    sumifs: {
-      translationKey: 'SUMIFS',
+    'SUMIFS': {
+      method: 'sumifs',
     },
-    countifs: {
-      translationKey: 'COUNTIFS',
+    'COUNTIFS': {
+      method: 'countifs',
     },
   }
 

@@ -11,42 +11,10 @@ import {AlwaysDense, ChooseAddressMapping} from './DependencyGraph/AddressMappin
 import {defaultStringifyDateTime} from './format/format'
 import {HyperFormula} from './HyperFormula'
 import {TranslationPackage} from './i18n'
-import {AbsPlugin} from './interpreter/plugin/AbsPlugin'
-import {BitShiftPlugin} from './interpreter/plugin/BitShiftPlugin'
-import {BitwiseLogicOperationsPlugin} from './interpreter/plugin/BitwiseLogicOperationsPlugin'
-import {BooleanPlugin} from './interpreter/plugin/BooleanPlugin'
-import {CharPlugin} from './interpreter/plugin/CharPlugin'
-import {CodePlugin} from './interpreter/plugin/CodePlugin'
-import {CorrelPlugin} from './interpreter/plugin/CorrelPlugin'
-import {CountUniquePlugin} from './interpreter/plugin/CountUniquePlugin'
-import {DatePlugin} from './interpreter/plugin/DatePlugin'
-import {DegreesPlugin} from './interpreter/plugin/DegreesPlugin'
-import {DeltaPlugin} from './interpreter/plugin/DeltaPlugin'
-import {ErrorFunctionPlugin} from './interpreter/plugin/ErrorFunctionPlugin'
-import {ExpPlugin} from './interpreter/plugin/ExpPlugin'
-import {InformationPlugin} from './interpreter/plugin/InformationPlugin'
-import {IsEvenPlugin} from './interpreter/plugin/IsEvenPlugin'
-import {IsOddPlugin} from './interpreter/plugin/IsOddPlugin'
-import {LogarithmPlugin} from './interpreter/plugin/LogarithmPlugin'
-import {MathConstantsPlugin} from './interpreter/plugin/MathConstantsPlugin'
-import {MatrixPlugin} from './interpreter/plugin/MatrixPlugin'
-import {MedianPlugin} from './interpreter/plugin/MedianPlugin'
-import {ModuloPlugin} from './interpreter/plugin/ModuloPlugin'
-import {NumericAggregationPlugin} from './interpreter/plugin/NumericAggregationPlugin'
-import {PowerPlugin} from './interpreter/plugin/PowerPlugin'
-import {RadiansPlugin} from './interpreter/plugin/RadiansPlugin'
-import {RadixConversionPlugin} from './interpreter/plugin/RadixConversionPlugin'
-import {RandomPlugin} from './interpreter/plugin/RandomPlugin'
-import {RoundingPlugin} from './interpreter/plugin/RoundingPlugin'
-import {SqrtPlugin} from './interpreter/plugin/SqrtPlugin'
-import {SumifPlugin} from './interpreter/plugin/SumifPlugin'
-import {SumprodPlugin} from './interpreter/plugin/SumprodPlugin'
-import {TextPlugin} from './interpreter/plugin/TextPlugin'
-import {TrigonometryPlugin} from './interpreter/plugin/TrigonometryPlugin'
-import {VlookupPlugin} from './interpreter/plugin/VlookupPlugin'
 import {Maybe} from './Maybe'
 import {ParserConfig} from './parser/ParserConfig'
-import {LicenseKeyValidityState, checkLicenseKeyValidity} from './helpers/licenseKeyValidator'
+import {checkLicenseKeyValidity, LicenseKeyValidityState} from './helpers/licenseKeyValidator'
+import {FunctionPluginDefinition} from './interpreter/plugin/FunctionPlugin'
 
 type GPUMode = 'gpu' | 'cpu' | 'dev'
 
@@ -371,42 +339,6 @@ export class Config implements ConfigParams, ParserConfig {
     maxColumns: 18_278
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  private static defaultPlugins: any[] = [
-    SumifPlugin,
-    TextPlugin,
-    NumericAggregationPlugin,
-    MedianPlugin,
-    DatePlugin,
-    BooleanPlugin,
-    InformationPlugin,
-    TrigonometryPlugin,
-    CountUniquePlugin,
-    SumprodPlugin,
-    MatrixPlugin,
-    ExpPlugin,
-    AbsPlugin,
-    DegreesPlugin,
-    RadiansPlugin,
-    RandomPlugin,
-    VlookupPlugin,
-    IsEvenPlugin,
-    IsOddPlugin,
-    RoundingPlugin,
-    RadixConversionPlugin,
-    LogarithmPlugin,
-    BitwiseLogicOperationsPlugin,
-    BitShiftPlugin,
-    PowerPlugin,
-    MathConstantsPlugin,
-    SqrtPlugin,
-    ModuloPlugin,
-    DeltaPlugin,
-    CharPlugin,
-    CodePlugin,
-    ErrorFunctionPlugin,
-    CorrelPlugin,
-  ]
   /** @inheritDoc */
   public readonly caseSensitive: boolean
   /** @inheritDoc */
@@ -431,7 +363,7 @@ export class Config implements ConfigParams, ParserConfig {
   public readonly licenseKey: string
   /** @inheritDoc */
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  public readonly functionPlugins: any[]
+  public readonly functionPlugins: FunctionPluginDefinition[]
   /** @inheritDoc */
   public readonly gpuMode: GPUMode
   /** @inheritDoc */
@@ -593,64 +525,6 @@ export class Config implements ConfigParams, ParserConfig {
     const mergedConfig: ConfigParams = Object.assign({}, this.getConfig(), init)
 
     return new Config(mergedConfig)
-  }
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  public allFunctionPlugins(): any[] {
-    return [...Config.defaultPlugins, ...this.functionPlugins]
-  }
-
-  public volatileFunctions(): Set<string> {
-    const volatileFunctions = new Set<string>()
-
-    for (const plugin of this.allFunctionPlugins()) {
-      for (const functionKey in plugin.implementedFunctions) {
-        const pluginFunctionData = plugin.implementedFunctions[functionKey]
-        if (pluginFunctionData.isVolatile) {
-          volatileFunctions.add(this.translationPackage.getFunctionTranslation(pluginFunctionData.translationKey))
-        }
-      }
-    }
-
-    return volatileFunctions
-  }
-
-  public structuralChangeFunctions(): Set<string> {
-    const structuralChangeFunctions = new Set<string>()
-
-    for (const plugin of this.allFunctionPlugins()) {
-      for (const functionKey in plugin.implementedFunctions) {
-        const pluginFunctionData = plugin.implementedFunctions[functionKey]
-        if (pluginFunctionData.isDependentOnSheetStructureChange) {
-          structuralChangeFunctions.add(this.translationPackage.getFunctionTranslation(pluginFunctionData.translationKey))
-        }
-      }
-    }
-    return structuralChangeFunctions
-  }
-
-  public functionsWhichDoesNotNeedArgumentsToBeComputed(): Set<string> {
-    const functionsWhichDoesNotNeedArgumentsToBeComputed = new Set<string>()
-
-    for (const plugin of this.allFunctionPlugins()) {
-      for (const functionKey in plugin.implementedFunctions) {
-        const pluginFunctionData = plugin.implementedFunctions[functionKey]
-        if (pluginFunctionData.doesNotNeedArgumentsToBeComputed) {
-          functionsWhichDoesNotNeedArgumentsToBeComputed.add(this.translationPackage.getFunctionTranslation(pluginFunctionData.translationKey))
-        }
-      }
-    }
-    return functionsWhichDoesNotNeedArgumentsToBeComputed
-  }
-
-  public static getRegisteredFunctions(): Set<String> {
-    const ret = new Set<String>()
-    for (const pluginClass of Config.defaultPlugins) {
-      Object.keys(pluginClass.implementedFunctions).forEach((pluginFunction) => {
-        ret.add(pluginClass.implementedFunctions[pluginFunction].translationKey.toUpperCase())
-      })
-    }
-    return ret
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

@@ -12,11 +12,11 @@ const E = parseFloat(Math.E.toFixed(14))
 
 export class MathConstantsPlugin extends FunctionPlugin {
   public static implementedFunctions = {
-    pi: {
-      translationKey: 'PI',
+    'PI': {
+      method: 'pi',
     },
-    e: {
-      translationKey: 'E',
+    'E': {
+      method: 'e',
     },
   }
 

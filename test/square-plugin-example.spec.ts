@@ -3,12 +3,13 @@ import {CellError, ErrorType, SimpleCellAddress} from '../src/Cell'
 import {FunctionPlugin} from '../src/interpreter/plugin/FunctionPlugin'
 import {ProcedureAst} from '../src/parser'
 import {adr, detailedError} from './testUtils'
+import {enGB} from '../src/i18n'
 
 class SquarePlugin extends FunctionPlugin {
   public static implementedFunctions = {
     // Key of the mapping describes which function will be used to compute it
-    square: {
-      translationKey: 'SQUARE',
+    'SQUARE': {
+      method: 'square',
     },
   }
 
@@ -38,6 +39,10 @@ class SquarePlugin extends FunctionPlugin {
 }
 
 describe('Documentation example spec', () => {
+  beforeEach(() => {
+    HyperFormula.registerFunctionPlugin(SquarePlugin)
+  })
+
   it('works', () => {
     HyperFormula.getLanguage('enGB').extendFunctions({SQUARE: 'SQUARE'})
     const engine = HyperFormula.buildFromArray([
@@ -45,7 +50,7 @@ describe('Documentation example spec', () => {
       ['=SQUARE()'],
       ['=SQUARE(TRUE())'],
       ['=SQUARE(1/0)'],
-    ], { functionPlugins: [SquarePlugin]})
+    ])
     expect(engine.getCellValue(adr('A1'))).toEqual(4)
     expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NA))
     expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.VALUE))

@@ -9,8 +9,8 @@ import {FunctionPlugin} from './FunctionPlugin'
 
 export class DeltaPlugin extends FunctionPlugin {
   public static implementedFunctions = {
-    delta: {
-      translationKey: 'DELTA',
+    'DELTA': {
+      method: 'delta',
     },
   }
 

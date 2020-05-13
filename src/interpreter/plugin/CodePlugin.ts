@@ -9,8 +9,8 @@ import {FunctionPlugin} from './FunctionPlugin'
 
 export class CodePlugin extends FunctionPlugin {
   public static implementedFunctions = {
-    code: {
-      translationKey: 'CODE',
+    'CODE': {
+      method: 'code',
     },
   }
 

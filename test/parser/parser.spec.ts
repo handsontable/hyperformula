@@ -31,6 +31,7 @@ import {ColumnAddress} from '../../src/parser/ColumnAddress'
 import {adr, unregisterAllLanguages} from '../testUtils'
 import {RowAddress} from '../../src/parser/RowAddress'
 import {columnIndexToLabel} from '../../src/parser/addressRepresentationConverters'
+import {buildEmptyParserWithCaching} from './common'
 
 describe('ParserWithCaching', () => {
   beforeEach(() => {
@@ -40,7 +41,7 @@ describe('ParserWithCaching', () => {
   })
 
   it('integer literal', () => {
-    const parser = new ParserWithCaching(new Config(), new SheetMapping(buildTranslationPackage(enGB)).get)
+    const parser = buildEmptyParserWithCaching(new Config())
 
     const ast = parser.parse('=42', simpleCellAddress(0, 0, 0)).ast as NumberAst
     expect(ast.type).toBe(AstNodeType.NUMBER)
@@ -48,7 +49,7 @@ describe('ParserWithCaching', () => {
   })
 
   it('negative integer literal', () => {
-    const parser = new ParserWithCaching(new Config(), new SheetMapping(buildTranslationPackage(enGB)).get)
+    const parser = buildEmptyParserWithCaching(new Config())
 
     const ast = parser.parse('=-42', simpleCellAddress(0, 0, 0)).ast as MinusUnaryOpAst
     expect(ast.type).toBe(AstNodeType.MINUS_UNARY_OP)
@@ -58,7 +59,7 @@ describe('ParserWithCaching', () => {
   })
 
   it('string literal', () => {
-    const parser = new ParserWithCaching(new Config(), new SheetMapping(buildTranslationPackage(enGB)).get)
+    const parser = buildEmptyParserWithCaching(new Config())
 
     const ast = parser.parse('="foobar"', simpleCellAddress(0, 0, 0)).ast as StringAst
     expect(ast.type).toBe(AstNodeType.STRING)
@@ -66,7 +67,7 @@ describe('ParserWithCaching', () => {
   })
 
   it('plus operator on different nodes', () => {
-    const parser = new ParserWithCaching(new Config(), new SheetMapping(buildTranslationPackage(enGB)).get)
+    const parser = buildEmptyParserWithCaching(new Config())
 
     const ast = parser.parse('=1+A5', simpleCellAddress(0, 0, 0)).ast as PlusOpAst
     expect(ast.type).toBe(AstNodeType.PLUS_OP)
@@ -75,7 +76,7 @@ describe('ParserWithCaching', () => {
   })
 
   it('minus operator', () => {
-    const parser = new ParserWithCaching(new Config(), new SheetMapping(buildTranslationPackage(enGB)).get)
+    const parser = buildEmptyParserWithCaching(new Config())
 
     const ast = parser.parse('=1-3', simpleCellAddress(0, 0, 0)).ast as MinusOpAst
     expect(ast.type).toBe(AstNodeType.MINUS_OP)
@@ -84,7 +85,7 @@ describe('ParserWithCaching', () => {
   })
 
   it('power operator', () => {
-    const parser = new ParserWithCaching(new Config(), new SheetMapping(buildTranslationPackage(enGB)).get)
+    const parser = buildEmptyParserWithCaching(new Config())
 
     const ast = parser.parse('=2^3', simpleCellAddress(0, 0, 0)).ast as PowerOpAst
     expect(ast.type).toBe(AstNodeType.POWER_OP)
@@ -93,7 +94,7 @@ describe('ParserWithCaching', () => {
   })
 
   it('power operator order', () => {
-    const parser = new ParserWithCaching(new Config(), new SheetMapping(buildTranslationPackage(enGB)).get)
+    const parser = buildEmptyParserWithCaching(new Config())
 
     const ast = parser.parse('=2*2^3', simpleCellAddress(0, 0, 0)).ast as PowerOpAst
     expect(ast.type).toBe(AstNodeType.TIMES_OP)
@@ -102,7 +103,7 @@ describe('ParserWithCaching', () => {
   })
 
   it('SUM function without args', () => {
-    const parser = new ParserWithCaching(new Config(), new SheetMapping(buildTranslationPackage(enGB)).get)
+    const parser = buildEmptyParserWithCaching(new Config())
     const ast = parser.parse('=SUM()', simpleCellAddress(0, 0, 0)).ast as ProcedureAst
     expect(ast.type).toBe(AstNodeType.FUNCTION_CALL)
     expect(ast.procedureName).toBe('SUM')
@@ -110,7 +111,7 @@ describe('ParserWithCaching', () => {
   })
 
   it('function without polish characters', () => {
-    const parser = new ParserWithCaching(new Config(), new SheetMapping(buildTranslationPackage(enGB)).get)
+    const parser = buildEmptyParserWithCaching(new Config())
     const ast = parser.parse('=żółćąęźśńŻÓŁĆĄĘŹŚŃ()', simpleCellAddress(0, 0, 0)).ast as ProcedureAst
     expect(ast.type).toBe(AstNodeType.FUNCTION_CALL)
     expect(ast.procedureName).toBe('ŻÓŁĆĄĘŹŚŃŻÓŁĆĄĘŹŚŃ')
@@ -118,7 +119,7 @@ describe('ParserWithCaching', () => {
   })
 
   it('function with dot separator', () => {
-    const parser = new ParserWithCaching(new Config({ language: 'plPL' }), new SheetMapping(buildTranslationPackage(plPL)).get)
+    const parser = buildEmptyParserWithCaching(new Config({ language: 'plPL' }), new SheetMapping(buildTranslationPackage(plPL)))
     const ast = parser.parse('=NR.SER.OST.DN.MIEŚ()', simpleCellAddress(0, 0, 0)).ast as ProcedureAst
     expect(ast.type).toBe(AstNodeType.FUNCTION_CALL)
     expect(ast.procedureName).toBe('EOMONTH')
@@ -126,7 +127,7 @@ describe('ParserWithCaching', () => {
   })
 
   it('function name should be translated during parsing', () => {
-    const parser = new ParserWithCaching(new Config({ language: 'plPL' }), new SheetMapping(buildTranslationPackage(plPL)).get)
+    const parser = buildEmptyParserWithCaching(new Config({ language: 'plPL' }), new SheetMapping(buildTranslationPackage(plPL)))
     const ast = parser.parse('=SUMA()', simpleCellAddress(0, 0, 0)).ast as ProcedureAst
     expect(ast.type).toBe(AstNodeType.FUNCTION_CALL)
     expect(ast.procedureName).toBe('SUM')
@@ -134,14 +135,14 @@ describe('ParserWithCaching', () => {
   })
 
   it('function with number', () => {
-    const parser = new ParserWithCaching(new Config(), new SheetMapping(buildTranslationPackage(enGB)).get)
+    const parser = buildEmptyParserWithCaching(new Config())
     const ast = parser.parse('=DEC2BIN(4)', simpleCellAddress(0, 0, 0)).ast as ProcedureAst
     expect(ast.type).toBe(AstNodeType.FUNCTION_CALL)
     expect(ast.procedureName).toEqual('DEC2BIN')
   })
 
   it('should leave original name if procedure translation not known', () => {
-    const parser = new ParserWithCaching(new Config({ language: 'plPL' }), new SheetMapping(buildTranslationPackage(plPL)).get)
+    const parser = buildEmptyParserWithCaching(new Config({ language: 'plPL' }), new SheetMapping(buildTranslationPackage(plPL)))
     const ast = parser.parse('=FOOBAR()', simpleCellAddress(0, 0, 0)).ast as ProcedureAst
     expect(ast.type).toBe(AstNodeType.FUNCTION_CALL)
     expect(ast.procedureName).toBe('FOOBAR')
@@ -149,7 +150,7 @@ describe('ParserWithCaching', () => {
   })
 
   it('SUM function with args', () => {
-    const parser = new ParserWithCaching(new Config(), new SheetMapping(buildTranslationPackage(enGB)).get)
+    const parser = buildEmptyParserWithCaching(new Config())
     const ast = parser.parse('=SUM(1, A1)', simpleCellAddress(0, 0, 0)).ast as ProcedureAst
     expect(ast.type).toBe(AstNodeType.FUNCTION_CALL)
     expect(ast.procedureName).toBe('SUM')
@@ -158,7 +159,7 @@ describe('ParserWithCaching', () => {
   })
 
   it('SUM function with expression arg', () => {
-    const parser = new ParserWithCaching(new Config(), new SheetMapping(buildTranslationPackage(enGB)).get)
+    const parser = buildEmptyParserWithCaching(new Config())
     const ast = parser.parse('=SUM(1 / 2 + SUM(1,2))', simpleCellAddress(0, 0, 0)).ast as ProcedureAst
     expect(ast.type).toBe(AstNodeType.FUNCTION_CALL)
     expect(ast.args.length).toBe(1)
@@ -170,7 +171,7 @@ describe('ParserWithCaching', () => {
   })
 
   it('joining nodes without braces', () => {
-    const parser = new ParserWithCaching(new Config(), new SheetMapping(buildTranslationPackage(enGB)).get)
+    const parser = buildEmptyParserWithCaching(new Config())
     const ast = parser.parse('=1 + 2 + 3', simpleCellAddress(0, 0, 0)).ast as PlusOpAst
     expect(ast.type).toBe(AstNodeType.PLUS_OP)
     expect(ast.left.type).toBe(AstNodeType.PLUS_OP)
@@ -178,7 +179,7 @@ describe('ParserWithCaching', () => {
   })
 
   it('joining nodes with braces', () => {
-    const parser = new ParserWithCaching(new Config(), new SheetMapping(buildTranslationPackage(enGB)).get)
+    const parser = buildEmptyParserWithCaching(new Config())
     const ast = parser.parse('=1 + (2 + 3)', simpleCellAddress(0, 0, 0)).ast as PlusOpAst
     expect(ast.type).toBe(AstNodeType.PLUS_OP)
     expect(ast.left.type).toBe(AstNodeType.NUMBER)
@@ -189,14 +190,14 @@ describe('ParserWithCaching', () => {
   })
 
   it('float literal', () => {
-    const parser = new ParserWithCaching(new Config(), new SheetMapping(buildTranslationPackage(enGB)).get)
+    const parser = buildEmptyParserWithCaching(new Config())
     const ast = parser.parse('=3.14', simpleCellAddress(0, 0, 0)).ast as NumberAst
     expect(ast.type).toBe(AstNodeType.NUMBER)
     expect(ast.value).toBe(3.14)
   })
 
   it('float literal with different decimal separator', () => {
-    const parser = new ParserWithCaching(new Config({ decimalSeparator: ',', functionArgSeparator: ';' }), new SheetMapping(buildTranslationPackage(enGB)).get)
+    const parser = buildEmptyParserWithCaching(new Config({ decimalSeparator: ',', functionArgSeparator: ';' }), new SheetMapping(buildTranslationPackage(enGB)))
     const ast1 = parser.parse('=3,14', simpleCellAddress(0, 0, 0)).ast as NumberAst
     const ast2 = parser.parse('=03,14', simpleCellAddress(0, 0, 0)).ast as NumberAst
     const ast3 = parser.parse('=,14', simpleCellAddress(0, 0, 0)).ast as NumberAst
@@ -210,7 +211,7 @@ describe('ParserWithCaching', () => {
   })
 
   it('leading zeros of number literals', () => {
-    const parser = new ParserWithCaching(new Config(), new SheetMapping(buildTranslationPackage(enGB)).get)
+    const parser = buildEmptyParserWithCaching(new Config())
     const int = parser.parse('=01234', simpleCellAddress(0, 0, 0)).ast as NumberAst
     const float = parser.parse('=03.14', simpleCellAddress(0, 0, 0)).ast as NumberAst
     expect(int.type).toBe(AstNodeType.NUMBER)
@@ -220,15 +221,15 @@ describe('ParserWithCaching', () => {
   })
 
   it('functions should not be case sensitive', () => {
-    const parser = new ParserWithCaching(new Config(), new SheetMapping(buildTranslationPackage(enGB)).get)
+    const parser = buildEmptyParserWithCaching(new Config())
     const ast = parser.parse('=sum(1)', simpleCellAddress(0, 0, 0)).ast as ProcedureAst
     expect(ast.type).toBe(AstNodeType.FUNCTION_CALL)
     expect(ast.procedureName).toBe('SUM')
   })
 
   it('allow to accept different lexer configs', () => {
-    const parser1 = new ParserWithCaching(new Config(), new SheetMapping(buildTranslationPackage(enGB)).get)
-    const parser2 = new ParserWithCaching(new Config({ functionArgSeparator: ';' }), new SheetMapping(buildTranslationPackage(enGB)).get)
+    const parser1 = buildEmptyParserWithCaching(new Config())
+    const parser2 = buildEmptyParserWithCaching(new Config({ functionArgSeparator: ';' }), new SheetMapping(buildTranslationPackage(enGB)))
 
     const ast1 = parser1.parse('=SUM(1, 2)', simpleCellAddress(0, 0, 0)).ast as ProcedureAst
     const ast2 = parser2.parse('=SUM(1; 2)', simpleCellAddress(0, 0, 0)).ast as ProcedureAst
@@ -239,7 +240,7 @@ describe('ParserWithCaching', () => {
   })
 
   it('error literal', () => {
-    const parser = new ParserWithCaching(new Config(), new SheetMapping(buildTranslationPackage(enGB)).get)
+    const parser = buildEmptyParserWithCaching(new Config())
 
     const ast = parser.parse('=#REF!', simpleCellAddress(0, 0, 0)).ast as ErrorAst
     expect(ast.type).toBe(AstNodeType.ERROR)
@@ -247,7 +248,7 @@ describe('ParserWithCaching', () => {
   })
 
   it('error literals are case insensitive', () => {
-    const parser = new ParserWithCaching(new Config(), new SheetMapping(buildTranslationPackage(enGB)).get)
+    const parser = buildEmptyParserWithCaching(new Config())
 
     const ast = parser.parse('=#rEf!', simpleCellAddress(0, 0, 0)).ast as ErrorAst
     expect(ast.type).toBe(AstNodeType.ERROR)
@@ -257,7 +258,7 @@ describe('ParserWithCaching', () => {
   it('refernece to address in unexsiting range returns ref error with raw input ast', () => {
     const sheetMapping = new SheetMapping(buildTranslationPackage(enGB))
     sheetMapping.addSheet('Sheet1')
-    const parser = new ParserWithCaching(new Config(), sheetMapping.get)
+    const parser = buildEmptyParserWithCaching(new Config(), sheetMapping)
 
     const ast = parser.parse('=Sheet2!A1', simpleCellAddress(0, 0, 0)).ast as ErrorWithRawInputAst
 
@@ -267,7 +268,7 @@ describe('ParserWithCaching', () => {
   })
 
   it('named expression ast', () => {
-    const parser = new ParserWithCaching(new Config(), new SheetMapping(buildTranslationPackage(enGB)).get)
+    const parser = buildEmptyParserWithCaching(new Config())
 
     const ast = parser.parse('= true', simpleCellAddress(0, 0, 0)).ast as NamedExpressionAst
 
@@ -279,7 +280,7 @@ describe('ParserWithCaching', () => {
 
 describe('cell references and ranges', () => {
   it('absolute cell reference', () => {
-    const parser = new ParserWithCaching(new Config(), new SheetMapping(buildTranslationPackage(enGB)).get)
+    const parser = buildEmptyParserWithCaching(new Config())
 
     const ast = parser.parse('=$B$3', simpleCellAddress(0, 1, 1)).ast as CellReferenceAst
 
@@ -288,7 +289,7 @@ describe('cell references and ranges', () => {
   })
 
   it('relative cell reference', () => {
-    const parser = new ParserWithCaching(new Config(), new SheetMapping(buildTranslationPackage(enGB)).get)
+    const parser = buildEmptyParserWithCaching(new Config())
 
     const ast = parser.parse('=B3', simpleCellAddress(0, 1, 1)).ast as CellReferenceAst
 
@@ -297,7 +298,7 @@ describe('cell references and ranges', () => {
   })
 
   it('absolute column cell reference', () => {
-    const parser = new ParserWithCaching(new Config(), new SheetMapping(buildTranslationPackage(enGB)).get)
+    const parser = buildEmptyParserWithCaching(new Config())
 
     const ast = parser.parse('=$B3', simpleCellAddress(0, 1, 1)).ast as CellReferenceAst
 
@@ -306,7 +307,7 @@ describe('cell references and ranges', () => {
   })
 
   it('absolute row cell reference', () => {
-    const parser = new ParserWithCaching(new Config(), new SheetMapping(buildTranslationPackage(enGB)).get)
+    const parser = buildEmptyParserWithCaching(new Config())
 
     const ast = parser.parse('=B$3', simpleCellAddress(0, 1, 1)).ast as CellReferenceAst
 
@@ -315,7 +316,7 @@ describe('cell references and ranges', () => {
   })
 
   it('cell references should not be case sensitive', () => {
-    const parser = new ParserWithCaching(new Config(), new SheetMapping(buildTranslationPackage(enGB)).get)
+    const parser = buildEmptyParserWithCaching(new Config())
 
     const ast = parser.parse('=d1', simpleCellAddress(0, 0, 0)).ast as CellReferenceAst
     expect(ast.type).toBe(AstNodeType.CELL_REFERENCE)
@@ -327,7 +328,7 @@ describe('cell references and ranges', () => {
     const sheetMapping = new SheetMapping(buildTranslationPackage(enGB))
     sheetMapping.addSheet('Sheet1')
     sheetMapping.addSheet('Sheet2')
-    const parser = new ParserWithCaching(new Config(), sheetMapping.get)
+    const parser = buildEmptyParserWithCaching(new Config(), sheetMapping)
 
     const ast = parser.parse('=D1', simpleCellAddress(1, 0, 0)).ast as CellReferenceAst
 
@@ -341,7 +342,7 @@ describe('cell references and ranges', () => {
     const sheetMapping = new SheetMapping(buildTranslationPackage(enGB))
     sheetMapping.addSheet('Sheet1')
     sheetMapping.addSheet('Sheet2')
-    const parser = new ParserWithCaching(new Config(), sheetMapping.get)
+    const parser = buildEmptyParserWithCaching(new Config(), sheetMapping)
 
     const ast = parser.parse('=Sheet2!D1', simpleCellAddress(0, 0, 0)).ast as CellReferenceAst
     expect(ast.type).toBe(AstNodeType.CELL_REFERENCE)
@@ -351,7 +352,7 @@ describe('cell references and ranges', () => {
   })
 
   it('using unknown sheet gives REF', () => {
-    const parser = new ParserWithCaching(new Config(), new SheetMapping(buildTranslationPackage(enGB)).get)
+    const parser = buildEmptyParserWithCaching(new Config())
 
     const ast = parser.parse('=Sheet2!A1', simpleCellAddress(0, 0, 0)).ast as ErrorWithRawInputAst
 
@@ -364,7 +365,7 @@ describe('cell references and ranges', () => {
     const sheetMapping = new SheetMapping(buildTranslationPackage(enGB))
     sheetMapping.addSheet('Sheet1')
     sheetMapping.addSheet('Sheet_zażółć_gęślą_jaźń')
-    const parser = new ParserWithCaching(new Config(), sheetMapping.get)
+    const parser = buildEmptyParserWithCaching(new Config(), sheetMapping)
 
     const ast = parser.parse('=Sheet_zażółć_gęślą_jaźń!A1', simpleCellAddress(0, 0, 0)).ast as CellReferenceAst
     expect(ast.type).toBe(AstNodeType.CELL_REFERENCE)
@@ -375,7 +376,7 @@ describe('cell references and ranges', () => {
     const sheetMapping = new SheetMapping(buildTranslationPackage(enGB))
     sheetMapping.addSheet('Sheet1')
     sheetMapping.addSheet('Sheet2')
-    const parser = new ParserWithCaching(new Config(), sheetMapping.get)
+    const parser = buildEmptyParserWithCaching(new Config(), sheetMapping)
 
     const ast = parser.parse('=shEEt2!A1', simpleCellAddress(0, 0, 0)).ast as CellReferenceAst
     expect(ast.type).toBe(AstNodeType.CELL_REFERENCE)
@@ -386,7 +387,7 @@ describe('cell references and ranges', () => {
     const sheetMapping = new SheetMapping(buildTranslationPackage(enGB))
     sheetMapping.addSheet('Sheet1')
     sheetMapping.addSheet('Sheet with spaces')
-    const parser = new ParserWithCaching(new Config(), sheetMapping.get)
+    const parser = buildEmptyParserWithCaching(new Config(), sheetMapping)
 
     const ast = parser.parse("='Sheet with spaces'!A1", simpleCellAddress(0, 0, 0)).ast as CellReferenceAst
     expect(ast.type).toBe(AstNodeType.CELL_REFERENCE)
@@ -397,7 +398,7 @@ describe('cell references and ranges', () => {
     const sheetMapping = new SheetMapping(buildTranslationPackage(enGB))
     sheetMapping.addSheet('Sheet1')
     sheetMapping.addSheet('Sheet2')
-    const parser = new ParserWithCaching(new Config(), sheetMapping.get)
+    const parser = buildEmptyParserWithCaching(new Config(), sheetMapping)
 
     const ast = parser.parse("='Sheet2'!A1", simpleCellAddress(0, 0, 0)).ast as CellReferenceAst
     expect(ast.type).toBe(AstNodeType.CELL_REFERENCE)
@@ -408,7 +409,7 @@ describe('cell references and ranges', () => {
     const sheetMapping = new SheetMapping(buildTranslationPackage(enGB))
     sheetMapping.addSheet('Sheet1')
     sheetMapping.addSheet("Some'sheet")
-    const parser = new ParserWithCaching(new Config(), sheetMapping.get)
+    const parser = buildEmptyParserWithCaching(new Config(), sheetMapping)
 
     const ast = parser.parse("='Some''sheet'!A1", simpleCellAddress(0, 0, 0)).ast as CellReferenceAst
     expect(ast.type).toBe(AstNodeType.CELL_REFERENCE)
@@ -416,7 +417,7 @@ describe('cell references and ranges', () => {
   })
 
   it('simple cell range', () => {
-    const parser = new ParserWithCaching(new Config(), new SheetMapping(buildTranslationPackage(enGB)).get)
+    const parser = buildEmptyParserWithCaching(new Config())
 
     const ast = parser.parse('=A1:B2', simpleCellAddress(0, 0, 0)).ast as CellRangeAst
     expect(ast.type).toBe(AstNodeType.CELL_RANGE)
@@ -426,7 +427,7 @@ describe('cell references and ranges', () => {
     const sheetMapping = new SheetMapping(buildTranslationPackage(enGB))
     sheetMapping.addSheet('Sheet1')
     sheetMapping.addSheet('Sheet2')
-    const parser = new ParserWithCaching(new Config(), sheetMapping.get)
+    const parser = buildEmptyParserWithCaching(new Config(), sheetMapping)
 
     const ast = parser.parse('=Sheet2!A1:Sheet2!B2', simpleCellAddress(0, 0, 0)).ast as CellRangeAst
 
@@ -439,7 +440,7 @@ describe('cell references and ranges', () => {
     const sheetMapping = new SheetMapping(buildTranslationPackage(enGB))
     sheetMapping.addSheet('Sheet1')
     sheetMapping.addSheet('Sheet2')
-    const parser = new ParserWithCaching(new Config(), sheetMapping.get)
+    const parser = buildEmptyParserWithCaching(new Config(), sheetMapping)
 
     const ast = parser.parse('=Sheet2!A1:B2', simpleCellAddress(0, 0, 0)).ast as CellRangeAst
 
@@ -452,7 +453,7 @@ describe('cell references and ranges', () => {
     const sheetMapping = new SheetMapping(buildTranslationPackage(enGB))
     sheetMapping.addSheet('Sheet1')
     sheetMapping.addSheet('Sheet2')
-    const parser = new ParserWithCaching(new Config(), sheetMapping.get)
+    const parser = buildEmptyParserWithCaching(new Config(), sheetMapping)
 
     const { errors } = parser.parse('=A1:Sheet2!B2', simpleCellAddress(0, 0, 0))
 
@@ -464,7 +465,7 @@ describe('cell references and ranges', () => {
     sheetMapping.addSheet('Sheet1')
     sheetMapping.addSheet('Sheet2')
     sheetMapping.addSheet('Sheet3')
-    const parser = new ParserWithCaching(new Config(), sheetMapping.get)
+    const parser = buildEmptyParserWithCaching(new Config(), sheetMapping)
 
     const ast = parser.parse('=Sheet2!A1:Sheet3!B2', simpleCellAddress(0, 0, 0)).ast as CellRangeAst
 
@@ -475,7 +476,7 @@ describe('cell references and ranges', () => {
 
   it('offset has relative sheet reference', () => {
     const sheetMapping = new SheetMapping(buildTranslationPackage(enGB))
-    const parser = new ParserWithCaching(new Config(), sheetMapping.get)
+    const parser = buildEmptyParserWithCaching(new Config(), sheetMapping)
     const ast = parser.parse('=OFFSET(A1, 1, 2)', simpleCellAddress(0, 0, 0)).ast as CellReferenceAst
 
     expect(ast.reference.sheet).toBe(null)
@@ -485,7 +486,7 @@ describe('cell references and ranges', () => {
     const sheetMapping = new SheetMapping(buildTranslationPackage(enGB))
     sheetMapping.addSheet('Sheet1')
     sheetMapping.addSheet('Sheet2')
-    const parser = new ParserWithCaching(new Config(), sheetMapping.get)
+    const parser = buildEmptyParserWithCaching(new Config(), sheetMapping)
 
     const ast = parser.parse('=Sheet3!A1:Sheet2!B2', simpleCellAddress(0, 0, 0)).ast as ErrorWithRawInputAst
 
@@ -498,7 +499,7 @@ describe('cell references and ranges', () => {
     const sheetMapping = new SheetMapping(buildTranslationPackage(enGB))
     sheetMapping.addSheet('Sheet1')
     sheetMapping.addSheet('Sheet2')
-    const parser = new ParserWithCaching(new Config(), sheetMapping.get)
+    const parser = buildEmptyParserWithCaching(new Config(), sheetMapping)
 
     const ast = parser.parse('=Sheet2!A1:Sheet3!B2', simpleCellAddress(0, 0, 0)).ast as ErrorWithRawInputAst
 
@@ -510,7 +511,7 @@ describe('cell references and ranges', () => {
   it('cell reference beyond maximum row limit is #NAME', () => {
     const sheetMapping = new SheetMapping(buildTranslationPackage(enGB))
     sheetMapping.addSheet('Sheet1')
-    const parser = new ParserWithCaching(new Config(), sheetMapping.get)
+    const parser = buildEmptyParserWithCaching(new Config(), sheetMapping)
     const maxRow = Config.defaultConfig.maxRows
 
     const maxRowAst = parser.parse(`=A${maxRow}`, adr('A1')).ast as CellReferenceAst
@@ -526,7 +527,7 @@ describe('cell references and ranges', () => {
   it('cell reference beyond maximum column limit is #NAME', () => {
     const sheetMapping = new SheetMapping(buildTranslationPackage(enGB))
     sheetMapping.addSheet('Sheet1')
-    const parser = new ParserWithCaching(new Config(), sheetMapping.get)
+    const parser = buildEmptyParserWithCaching(new Config(), sheetMapping)
     const maxColumns = Config.defaultConfig.maxColumns
 
     const maxColumnAst = parser.parse(`=${columnIndexToLabel(maxColumns - 1)}1`, adr('A1')).ast as CellReferenceAst
@@ -542,7 +543,7 @@ describe('cell references and ranges', () => {
   it('cell range start beyond maximum column/row limit is #NAME', () => {
     const sheetMapping = new SheetMapping(buildTranslationPackage(enGB))
     sheetMapping.addSheet('Sheet1')
-    const parser = new ParserWithCaching(new Config(), sheetMapping.get)
+    const parser = buildEmptyParserWithCaching(new Config(), sheetMapping)
     const maxRow = Config.defaultConfig.maxRows
     const maxColumns = Config.defaultConfig.maxColumns
 
@@ -560,7 +561,7 @@ describe('cell references and ranges', () => {
   it('cell range end beyond maximum column/row limit is #NAME', () => {
     const sheetMapping = new SheetMapping(buildTranslationPackage(enGB))
     sheetMapping.addSheet('Sheet1')
-    const parser = new ParserWithCaching(new Config(), sheetMapping.get)
+    const parser = buildEmptyParserWithCaching(new Config(), sheetMapping)
     const maxRow = Config.defaultConfig.maxRows
     const maxColumns = Config.defaultConfig.maxColumns
 
@@ -580,7 +581,7 @@ describe('Column ranges', () => {
   const sheetMapping = new SheetMapping(buildTranslationPackage(enGB))
   sheetMapping.addSheet('Sheet1')
   sheetMapping.addSheet('Sheet2')
-  const parser = new ParserWithCaching(new Config(), sheetMapping.get)
+  const parser = buildEmptyParserWithCaching(new Config(), sheetMapping)
 
   it('column range', () => {
     const ast = parser.parse('=C:D', adr('A1')).ast as ColumnRangeAst
@@ -647,7 +648,7 @@ describe('Row ranges', () => {
   const sheetMapping = new SheetMapping(buildTranslationPackage(enGB))
   sheetMapping.addSheet('Sheet1')
   sheetMapping.addSheet('Sheet2')
-  const parser = new ParserWithCaching(new Config(), sheetMapping.get)
+  const parser = buildEmptyParserWithCaching(new Config(), sheetMapping)
 
   it('row range', () => {
     const ast = parser.parse('=3:4', adr('A1')).ast as RowRangeAst
@@ -697,7 +698,7 @@ describe('Row ranges', () => {
 
 describe('Parsing errors', () => {
   it('errors - lexing errors', () => {
-    const parser = new ParserWithCaching(new Config(), new SheetMapping(buildTranslationPackage(enGB)).get)
+    const parser = buildEmptyParserWithCaching(new Config())
 
     const input = ["='foo'", "=foo'bar", "=''''''", '=@']
 
@@ -709,7 +710,7 @@ describe('Parsing errors', () => {
   })
 
   it('parsing error - column name without whole range', () => {
-    const parser = new ParserWithCaching(new Config(), new SheetMapping(buildTranslationPackage(enGB)).get)
+    const parser = buildEmptyParserWithCaching(new Config())
 
     const { ast, errors } = parser.parse('=A', simpleCellAddress(0, 0, 0))
     expect(ast.type).toBe(AstNodeType.ERROR)
@@ -717,21 +718,21 @@ describe('Parsing errors', () => {
   })
 
   it('parsing error - column name in procedure without whole range', () => {
-    const parser = new ParserWithCaching(new Config(), new SheetMapping(buildTranslationPackage(enGB)).get)
+    const parser = buildEmptyParserWithCaching(new Config())
 
     const { errors } = parser.parse('=SUM(A)', simpleCellAddress(0, 0, 0))
     expect(errors[0].type).toBe(ParsingErrorType.LexingError)
   })
 
   it('parsing error - not all input parsed', () => {
-    const parser = new ParserWithCaching(new Config(), new SheetMapping(buildTranslationPackage(enGB)).get)
+    const parser = buildEmptyParserWithCaching(new Config())
 
     const { errors } = parser.parse('=A1B1', simpleCellAddress(0, 0, 0))
     expect(errors[0].type).toBe(ParsingErrorType.ParserError)
   })
 
   it('unknown error literal', () => {
-    const parser = new ParserWithCaching(new Config(), new SheetMapping(buildTranslationPackage(enGB)).get)
+    const parser = buildEmptyParserWithCaching(new Config())
 
     const { ast, errors } = parser.parse('=#FOO!', simpleCellAddress(0, 0, 0))
     expect(ast.type).toBe(AstNodeType.ERROR)
