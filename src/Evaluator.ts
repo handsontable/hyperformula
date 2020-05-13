@@ -39,7 +39,7 @@ export class Evaluator {
 
   public run() {
     this.stats.start(StatType.TOP_SORT)
-    const { sorted, cycled } = this.dependencyGraph.topSortWithScc()
+    const {sorted, cycled} = this.dependencyGraph.topSortWithScc()
     this.stats.end(StatType.TOP_SORT)
 
     this.stats.measure(StatType.EVALUATION, () => {
@@ -108,10 +108,10 @@ export class Evaluator {
 
   public runAndForget(ast: Ast, address: SimpleCellAddress, dependencies: RelativeDependency[]) {
     const tmpRanges: RangeVertex[] = []
-    for(const dep of absolutizeDependencies(dependencies, address)) {
-      if(dep instanceof AbsoluteCellRange) {
+    for (const dep of absolutizeDependencies(dependencies, address)) {
+      if (dep instanceof AbsoluteCellRange) {
         const range = dep
-        if(this.dependencyGraph.getRange(range.start, range.end) === undefined){
+        if (this.dependencyGraph.getRange(range.start, range.end) === undefined) {
           const rangeVertex = new RangeVertex(range)
           this.dependencyGraph.rangeMapping.setRange(rangeVertex)
           tmpRanges.push(rangeVertex)
@@ -132,7 +132,7 @@ export class Evaluator {
    */
   private recomputeFormulas(cycled: Vertex[], sorted: Vertex[]) {
     cycled.forEach((vertex: Vertex) => {
-      if (vertex instanceof  FormulaCellVertex) {
+      if (vertex instanceof FormulaCellVertex) {
         vertex.setCellValue(new CellError(ErrorType.CYCLE))
       }
     })
@@ -165,8 +165,8 @@ export class Evaluator {
     const interpreterValue = this.interpreter.evaluateAst(ast, formulaAddress)
     if (interpreterValue instanceof SimpleRangeValue) {
       return new CellError(ErrorType.VALUE)
-    } else if(typeof interpreterValue === 'number') {
-      if(isNumberOverflow(interpreterValue)) {
+    } else if (typeof interpreterValue === 'number') {
+      if (isNumberOverflow(interpreterValue)) {
         return new CellError(ErrorType.NUM)
       } else {
         return fixNegativeZero(interpreterValue)
