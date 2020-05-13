@@ -77,10 +77,7 @@ export class Graph<T> {
   }
 
   public softRemoveEdge(fromNode: T, toNode: T) {
-    const edges = this.edges.get(fromNode)
-    if (edges) {
-      edges.delete(toNode)
-    }
+    this.edges.get(fromNode)?.delete(toNode)
   }
 
   public removeIncomingEdges(toNode: T) {
@@ -186,11 +183,7 @@ export class Graph<T> {
    * @param toNode - node to which edge is incoming
    */
   public existsEdge(fromNode: T, toNode: T): boolean {
-    const nodeEdges = this.edges.get(fromNode)
-    if (nodeEdges) {
-      return nodeEdges.has(toNode)
-    }
-    return false
+    return this.edges.get(fromNode)?.has(toNode) ?? false
   }
 
   /*

@@ -30,7 +30,7 @@ import {NamedExpressions} from './NamedExpressions'
 import {
   Ast,
   AstNodeType,
-  ParserWithCaching,
+  ParserWithCaching, RelativeDependency,
   simpleCellAddressFromString,
   simpleCellAddressToString,
   Unparser,
@@ -265,7 +265,7 @@ export class HyperFormula implements TypedEmitter {
    */
   public static getLanguage(languageCode: string): TranslationPackage {
     const val = this.registeredLanguages.get(languageCode)
-    if(val === undefined) {
+    if (val === undefined) {
       throw new Error('Language not registered.')
     } else {
       return val
@@ -285,7 +285,7 @@ export class HyperFormula implements TypedEmitter {
    * ```
    */
   public static registerLanguage(languageCode: string, languagePackage: RawTranslationPackage): void {
-    if(this.registeredLanguages.has(languageCode)) {
+    if (this.registeredLanguages.has(languageCode)) {
       throw new Error('Language already registered.')
     } else {
       this.registeredLanguages.set(languageCode, buildTranslationPackage(languagePackage))
@@ -307,7 +307,7 @@ export class HyperFormula implements TypedEmitter {
    * ```
    */
   public static unregisterLanguage(languageCode: string): void {
-    if(this.registeredLanguages.has(languageCode)) {
+    if (this.registeredLanguages.has(languageCode)) {
       this.registeredLanguages.delete(languageCode)
     } else {
       throw new Error('Language not registered.')
@@ -960,7 +960,11 @@ export class HyperFormula implements TypedEmitter {
       this._crudOperations.ensureRangeInSizeLimits(AbsoluteCellRange.spanFrom(topLeftCornerAddress, width, height))
       for (let i = 0; i < width; i++) {
         for (let j = 0; j < height; j++) {
-          this._crudOperations.ensureItIsPossibleToChangeContent({ col: topLeftCornerAddress.col + i, row: topLeftCornerAddress.row + j, sheet: topLeftCornerAddress.sheet })
+          this._crudOperations.ensureItIsPossibleToChangeContent({
+            col: topLeftCornerAddress.col + i,
+            row: topLeftCornerAddress.row + j,
+            sheet: topLeftCornerAddress.sheet
+          })
         }
       }
     } catch (e) {
@@ -1518,7 +1522,7 @@ export class HyperFormula implements TypedEmitter {
    * ```
    *
    * @category Clipboard
-  */
+   */
   public copy(sourceLeftCorner: SimpleCellAddress, width: number, height: number): CellValue[][] {
     this._crudOperations.copy(sourceLeftCorner, width, height)
     return this.getRangeValues(sourceLeftCorner, width, height)
@@ -2669,7 +2673,7 @@ export class HyperFormula implements TypedEmitter {
    */
   public normalizeFormula(formulaString: string): string {
     const [ast, address] = this.extractTemporaryFormula(formulaString)
-    if (!ast) {
+    if (ast === undefined) {
       throw new NotAFormulaError()
     }
     return this._unparser.unparse(ast, address)
@@ -2700,11 +2704,11 @@ export class HyperFormula implements TypedEmitter {
   public calculateFormula(formulaString: string, sheetName: string): CellValue {
     this._crudOperations.ensureSheetExists(sheetName)
     const sheetId = this.sheetMapping.fetch(sheetName)
-    const [ast, address] = this.extractTemporaryFormula(formulaString, sheetId)
-    if (!ast) {
+    const [ast, address, dependencies] = this.extractTemporaryFormula(formulaString, sheetId)
+    if (ast === undefined) {
       throw new NotAFormulaError()
     }
-    const internalCellValue = this.evaluator.runAndForget(ast, address)
+    const internalCellValue = this.evaluator.runAndForget(ast, address, dependencies)
     return this._exporter.exportValue(internalCellValue)
   }
 
@@ -2724,7 +2728,7 @@ export class HyperFormula implements TypedEmitter {
    */
   public validateFormula(formulaString: string): boolean {
     const [ast] = this.extractTemporaryFormula(formulaString)
-    if (!ast) {
+    if (ast === undefined) {
       return false
     }
     if (ast.type === AstNodeType.ERROR && !ast.error) {
@@ -2758,20 +2762,20 @@ export class HyperFormula implements TypedEmitter {
     return this._functionRegistry.getPlugins()
   }
 
-  private extractTemporaryFormula(formulaString: string, sheetId: number = 1): [Ast | false, SimpleCellAddress] {
+  private extractTemporaryFormula(formulaString: string, sheetId: number = 1): [Maybe<Ast>, SimpleCellAddress, RelativeDependency[]] {
     const parsedCellContent = this._cellContentParser.parse(formulaString)
-    const exampleTemporaryFormulaAddress = { sheet: sheetId, col: 0, row: 0 }
+    const exampleTemporaryFormulaAddress = {sheet: sheetId, col: 0, row: 0}
     if (!(parsedCellContent instanceof CellContent.Formula)) {
-      return [false, exampleTemporaryFormulaAddress]
+      return [undefined, exampleTemporaryFormulaAddress, []]
     }
 
-    const { ast, errors } = this._parser.parse(parsedCellContent.formula, exampleTemporaryFormulaAddress)
+    const {ast, errors, dependencies} = this._parser.parse(parsedCellContent.formula, exampleTemporaryFormulaAddress)
 
     if (errors.length > 0) {
-      return [false, exampleTemporaryFormulaAddress]
+      return [undefined, exampleTemporaryFormulaAddress, []]
     }
 
-    return [ast, exampleTemporaryFormulaAddress]
+    return [ast, exampleTemporaryFormulaAddress, dependencies]
   }
 
   /**

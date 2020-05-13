@@ -204,7 +204,7 @@ describe('Copy - paste integration', () => {
 
     expect(engine.getCellValue(adr('B3'))).toEqual(7)
     expect(Array.from(engine.dependencyGraph.rangeMapping.rangesInSheet(0)).length).toBe(2)
-    expect(engine.dependencyGraph.getRange(adr('B1'), adr('B2'))).not.toBeNull()
+    expect(engine.dependencyGraph.getRange(adr('B1'), adr('B2'))).not.toBeUndefined()
   })
 
   it('should create new range vertex - column range', () => {
@@ -219,7 +219,7 @@ describe('Copy - paste integration', () => {
 
     expect(engine.getCellValue(adr('E1'))).toEqual(18)
     expect(Array.from(engine.dependencyGraph.rangeMapping.rangesInSheet(0)).length).toBe(2)
-    expect(engine.dependencyGraph.getRange(colStart('B'), colEnd('C'))).not.toBeNull()
+    expect(engine.dependencyGraph.getRange(colStart('B'), colEnd('C'))).not.toBeUndefined()
   })
 
   it('should create new range vertex - row range', () => {
@@ -236,7 +236,7 @@ describe('Copy - paste integration', () => {
 
     expect(engine.getCellValue(adr('A5'))).toEqual(18)
     expect(Array.from(engine.dependencyGraph.rangeMapping.rangesInSheet(0)).length).toBe(2)
-    expect(engine.dependencyGraph.getRange(rowStart(2), rowEnd(3))).not.toBeNull()
+    expect(engine.dependencyGraph.getRange(rowStart(2), rowEnd(3))).not.toBeUndefined()
   })
 
   it('should update edges between infinite range and pasted values', () => {

@@ -310,7 +310,7 @@ describe('moving ranges', () => {
     engine.cut(adr('A1'), 1, 2)
     engine.paste(adr('B1'))
 
-    expect(engine.rangeMapping.getRange(adr('B1'), adr('B2'))).not.toBe(null)
+    expect(engine.rangeMapping.getRange(adr('B1'), adr('B2'))).not.toBe(undefined)
 
     const range = extractRange(engine, adr('A3'))
     expect(range.start).toEqual(adr('B1'))
