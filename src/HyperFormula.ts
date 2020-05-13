@@ -2737,6 +2737,10 @@ export class HyperFormula implements TypedEmitter {
     return true
   }
 
+  public dependencyGarbageCollect(): void {
+    this.dependencyGraph.garbageCollection()
+  }
+
   /**
    * Returns translated names of all functions registered in this instance of HyperFormula
    * according to the language set in the configuration

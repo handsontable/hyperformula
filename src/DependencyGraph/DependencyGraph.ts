@@ -549,6 +549,43 @@ export class DependencyGraph {
     }
   }
 
+  public garbageCollection(): void {
+    const toBeRemoved: RangeVertex[] = []
+    const candidates: Set<RangeVertex> = new Set()
+    const count: Map<Vertex, number> = this.graph.getAllOutDegrees()
+    const revEdges: Map<Vertex, Set<Vertex>> = this.graph.getReversedEdges()
+
+    count.forEach((cnt, key) => {
+      if(key instanceof RangeVertex && cnt===0) {
+        candidates.add(key)
+      }
+    })
+
+    while(candidates.size > 0) {
+      const vertex: RangeVertex = candidates.values().next().value
+      candidates.delete(vertex)
+      toBeRemoved.push(vertex)
+      revEdges.get(vertex)!.forEach((target) => {
+        if(target instanceof RangeVertex) {
+          const cnt = count.get(target)! - 1
+          count.set(target, cnt)
+          if (cnt === 0) {
+            candidates.add(target)
+          }
+        }
+      })
+    }
+
+    toBeRemoved.forEach( (vertex) => {
+      revEdges.get(vertex)!.forEach( (target) => {
+        this.graph.softRemoveEdge(target,vertex)
+      })
+      this.graph.removeNode(vertex)
+
+      this.rangeMapping.removeRange(vertex)
+    })
+  }
+
   public* matrixFormulaNodes(): IterableIterator<MatrixVertex> {
     for (const vertex of this.graph.nodes) {
       if (vertex instanceof MatrixVertex && vertex.isFormula()) {
