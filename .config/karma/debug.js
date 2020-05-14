@@ -8,5 +8,6 @@ module.exports.create = function(config) {
     browsers: ['Chrome'],
     reporters: ['kjhtml'],
     singleRun: false,
+    autoWatch: true,
   }
 }
