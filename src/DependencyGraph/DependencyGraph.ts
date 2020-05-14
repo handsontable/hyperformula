@@ -566,11 +566,15 @@ export class DependencyGraph {
       candidates.delete(vertex)
       toBeRemoved.push(vertex)
       revEdges.get(vertex)!.forEach((target) => {
-        if(target instanceof RangeVertex) {
+        if(target instanceof RangeVertex || target instanceof EmptyCellVertex) {
           const cnt = count.get(target)! - 1
           count.set(target, cnt)
           if (cnt === 0) {
-            candidates.add(target)
+            if(target instanceof RangeVertex) {
+              candidates.add(target)
+            } else {
+              this.graph.removeNode(target)
+            }
           }
         }
       })
