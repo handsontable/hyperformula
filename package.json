@@ -59,7 +59,7 @@
     "test": "npm-run-all lint test:unit test:browser",
     "test:unit": "cross-env NODE_ICU_DATA=node_modules/full-icu jest",
     "test:browser": "karma start",
-    "test:browser.debug": "cross-env NODE_ENV=debug npm run test:browser",
+    "test:browser.debug": "cross-env NODE_ENV=debug karma start",
     "jasmine:start": "cross-env NODE_ICU_DATA=node_modules/full-icu jasmine --config=jasmine.json",
     "typedoc:build": "typedoc --options .typedoc.js",
     "typedoc:serve": "npm run typedoc:build && serve doc -p 5005",

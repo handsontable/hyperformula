@@ -1,7 +1,17 @@
 import './test/_setupFiles/bootstrap';
 
-// require all modules ending in ".spec.js" from the
-// './temp-browser/test' directory and all subdirectories
-const testsContext = require.context('./test', true, /.spec.ts$/);
+//@ts-ignore
+const specArg: string = __karma__.config.spec;
 
-testsContext.keys().forEach(testsContext);
+// require all modules ending in ".spec.ts" from the
+// './test' directory and all subdirectories
+const testsContext = require.context('./test', true, /.spec.ts$/);
+let files = testsContext.keys();
+
+if (specArg) {
+  const regEx = new RegExp(specArg);
+
+  files = testsContext.keys().filter(key => key.match(regEx));
+}
+
+files.forEach(testsContext);
