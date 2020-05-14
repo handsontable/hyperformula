@@ -517,8 +517,6 @@ describe('Named expression - cross scope', () => {
     expect(engine.getCellValue(adr('B1', 1))).toEqual(detailedError(ErrorType.NAME))
   })
 
-
-  /* TODO */
   it('should add named expression to global scope when moving formula to other sheet', () => {
     const engine = HyperFormula.buildFromSheets({
       'Sheet1': [['foo', '=expr']],
@@ -555,22 +553,21 @@ describe('Named expression - cross scope', () => {
     expect(engine.getCellValue(adr('B1', 1))).toEqual('bar')
   })
 
-  /* TODO */
-  xit('should use already existing named expression in other sheet when moving formula', () => {
+  it('should use already existing named expression in other sheet when moving formula', () => {
     const engine = HyperFormula.buildFromSheets({
       'Sheet1': [['foo', '=expr']],
       'Sheet2': [['bar']]
     })
 
 
-    engine.addNamedExpression('expr', '=Sheet1!A1', 'Sheet1')
-    engine.addNamedExpression('expr', '=Sheet2!A1', 'Sheet2')
+    engine.addNamedExpression('expr', '=Sheet1!$A$1', 'Sheet1')
+    engine.addNamedExpression('expr', '=Sheet2!$A$1', 'Sheet2')
 
     engine.moveCells(adr('B1'), 1, 1, adr('B1', 1))
 
     expect(engine.getNamedExpressionFormula('expr')).toEqual(undefined)
-    expect(engine.getNamedExpressionFormula('expr', 'Sheet1')).toEqual('=Sheet1!A1')
-    expect(engine.getNamedExpressionFormula('expr', 'Sheet2')).toEqual('=Sheet2!A1')
+    expect(engine.getNamedExpressionFormula('expr', 'Sheet1')).toEqual('=Sheet1!$A$1')
+    expect(engine.getNamedExpressionFormula('expr', 'Sheet2')).toEqual('=Sheet2!$A$1')
     expect(engine.getCellValue(adr('B1', 0))).toEqual(EmptyValue)
     expect(engine.getCellValue(adr('B1', 1))).toEqual('bar')
   })

@@ -158,7 +158,6 @@ export class CrudOperations {
           }
 
           const expressionName = namedExpressionDependency.name
-          const sourceExpression = this.namedExpressions.nearestNamedExpression(expressionName, sourceLeftCorner.sheet)
           const sourceVertex = this.dependencyGraph.fetchNamedExpressionVertex(expressionName, sourceLeftCorner.sheet)
           const namedExpressionInTargetScope = this.namedExpressions.isExpressionInScope(expressionName, formulaAddress.sheet)
 
