@@ -40,7 +40,7 @@ export class MoveCellsTransformer extends Transformer {
   }
 
   protected fixNodeAddress(address: SimpleCellAddress): SimpleCellAddress {
-    return simpleCellAddress(address.sheet, address.col + this.toRight, address.row + this.toBottom)
+    return simpleCellAddress(this.toSheet, address.col + this.toRight, address.row + this.toBottom)
   }
 
   protected transformCellAddress<T extends CellAddress>(dependencyAddress: T, formulaAddress: SimpleCellAddress): ErrorType.REF | false | T {

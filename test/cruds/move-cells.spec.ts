@@ -2,7 +2,7 @@ import {EmptyValue, HyperFormula} from '../../src'
 import {AbsoluteCellRange} from '../../src/AbsoluteCellRange'
 import {simpleCellAddress} from '../../src/Cell'
 import {ColumnIndex} from '../../src/ColumnSearch/ColumnIndex'
-import {EmptyCellVertex, ValueCellVertex} from '../../src/DependencyGraph'
+import {EmptyCellVertex, FormulaCellVertex, ValueCellVertex} from '../../src/DependencyGraph'
 import {CellAddress} from '../../src/parser'
 import {
   adr,
@@ -234,6 +234,23 @@ describe('Move cells', () => {
     engine.moveCells(adr('A2'), 1, 1, adr('B1', 1))
 
     expect(extractReference(engine, adr('B1', 1))).toEqual(CellAddress.relative(null, -1, 0))
+  })
+
+  it('should update address in vertex', () => {
+    const engine = HyperFormula.buildFromSheets({
+      Sheet1: [
+        ['foo'],
+        ['=A1'],
+      ],
+      Sheet2: [
+        [null /* =A1 */],
+      ],
+    })
+
+    engine.moveCells(adr('A2'), 1, 1, adr('B1', 1))
+
+    const vertex = engine.dependencyGraph.fetchCell(adr('B1', 1)) as FormulaCellVertex
+    expect(vertex.getAddress(engine.lazilyTransformingAstService)).toEqual(adr('B1', 1))
   })
 
   it('should update reference', () => {
