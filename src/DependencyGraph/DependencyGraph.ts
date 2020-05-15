@@ -47,7 +47,10 @@ export class DependencyGraph {
     return new DependencyGraph(
       addressMapping,
       rangeMapping,
-      new Graph<Vertex>(new GetDependenciesQuery(rangeMapping, addressMapping, lazilyTransformingAstService, functionRegistry, namedExpressions)),
+      new Graph<Vertex>(new GetDependenciesQuery(rangeMapping, addressMapping, lazilyTransformingAstService, functionRegistry, namedExpressions),
+        (arg) => {
+          return ((arg instanceof RangeVertex) || (arg instanceof EmptyCellVertex))
+        }),
       new SheetMapping(config.translationPackage),
       new MatrixMapping(),
       stats,

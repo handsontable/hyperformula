@@ -238,6 +238,18 @@ export class AbsoluteCellRange {
     return result
   }
 
+  public flatArrayOfAddressesInRange(): SimpleCellAddress[] {
+    const result: SimpleCellAddress[] = []
+    for (let y = 0; y < this.height(); ++y) {
+      for (let x = 0; x < this.width(); ++x) {
+        const value = simpleCellAddress(this.sheet, this.start.col + x, this.start.row + y)
+        result.push(value)
+      }
+    }
+    return result
+
+  }
+
   public withStart(newStart: SimpleCellAddress): AbsoluteCellRange {
     return new AbsoluteCellRange(newStart, this.end)
   }

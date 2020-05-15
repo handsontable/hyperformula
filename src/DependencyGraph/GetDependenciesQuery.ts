@@ -26,6 +26,7 @@ export class GetDependenciesQuery implements IGetDependenciesQuery<Vertex> {
   ) {
   }
 
+
   public call(vertex: Vertex) {
     let formula: Ast
     let address: SimpleCellAddress
@@ -41,11 +42,15 @@ export class GetDependenciesQuery implements IGetDependenciesQuery<Vertex> {
       if(smallerRangeVertex !== null) {
         const endVertex = vertex.range.end
         const startVertex = simpleCellAddress(vertex.range.start.sheet, vertex.range.start.col, endVertex.row)
-        const allDeps = new Set(this.rangeMapping.rangeVerticesContainedInRange(new AbsoluteCellRange(startVertex, endVertex)))
+        const range = new AbsoluteCellRange(startVertex, endVertex)
+        const allAdresses: Vertex[] = range.flatArrayOfAddressesInRange().map((address) => this.addressMapping.fetchCell(address))
+        const allDeps = new Set(allAdresses)
         allDeps.add(smallerRangeVertex)
         return allDeps
       } else {
-        return new Set(this.rangeMapping.rangeVerticesContainedInRange(vertex.range))
+        const range = vertex.range
+        const allAdresses: Vertex[] = range.flatArrayOfAddressesInRange().map((address) => this.addressMapping.fetchCell(address))
+        return new Set(allAdresses)
       }
     } else {
       return null

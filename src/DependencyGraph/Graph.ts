@@ -33,6 +33,7 @@ export class Graph<T> {
 
   constructor(
     private readonly getDependenciesQuery: IGetDependenciesQuery<T>,
+    private readonly removalTester: (arg: T) => boolean,
   ) {
   }
 
@@ -346,6 +347,9 @@ export class Graph<T> {
     }
     for (const dependentNode of dependentNodes) {
       this.softRemoveEdge(dependentNode, node)
+      if(this.edges.get(dependentNode)!.size === 0 && this.removalTester(dependentNode)) {
+        this.removeNode(dependentNode)
+      }
     }
   }
 }
