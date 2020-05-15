@@ -7,6 +7,7 @@ import {CellError, ErrorType, InternalCellValue, NoErrorCellValue, simpleCellAdd
 import {Config} from './Config'
 import {CellValueChange} from './ContentChanges'
 import {NamedExpressions} from './NamedExpressions'
+import {SimpleRangeValue} from './interpreter/InterpreterValue'
 
 export type CellValue = NoErrorCellValue | DetailedCellError
 
@@ -89,7 +90,9 @@ export class Exporter {
   }
 
   public exportValue(value: InternalCellValue): CellValue {
-    if (this.config.smartRounding && typeof value == 'number') {
+    if (value instanceof SimpleRangeValue) {
+      return this.detailedError(new CellError(ErrorType.VALUE))
+    } else if (this.config.smartRounding && typeof value == 'number') {
       return this.cellValueRounding(value)
     } else if (value instanceof CellError) {
       return this.detailedError(value)

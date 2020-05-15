@@ -143,7 +143,7 @@ export class Evaluator {
   private evaluateAstToScalarValue(ast: Ast, formulaAddress: SimpleCellAddress): InternalCellValue {
     const interpreterValue = this.interpreter.evaluateAst(ast, formulaAddress)
     if (interpreterValue instanceof SimpleRangeValue) {
-      return new CellError(ErrorType.VALUE)
+      return interpreterValue
     } else if(typeof interpreterValue === 'number') {
       if(isNumberOverflow(interpreterValue)) {
         return new CellError(ErrorType.NUM)
