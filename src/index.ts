@@ -21,7 +21,8 @@ import {
   NoSheetWithNameError,
   NotAFormulaError,
   NothingToPasteError,
-  SheetSizeLimitExceededError
+  SheetSizeLimitExceededError,
+  SheetAlreadyExistsError
 } from './errors'
 import * as plugins from './interpreter/plugin'
 
@@ -31,6 +32,7 @@ class HyperFormulaNS extends HyperFormula {
   public static NoSheetWithIdError = NoSheetWithIdError
   public static NoSheetWithNameError = NoSheetWithNameError
   public static SheetSizeLimitExceededError = SheetSizeLimitExceededError
+  public static SheetAlreadyExistsError = SheetAlreadyExistsError
   public static InvalidAddressError = InvalidAddressError
   public static EmptyValue = EmptyValue
   public static DetailedCellError = DetailedCellError
@@ -83,4 +85,5 @@ export {
   EvaluationSuspendedError,
   FunctionPluginValidationError,
   ErrorType,
+  SheetAlreadyExistsError,
 }

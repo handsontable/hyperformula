@@ -25,6 +25,15 @@ export class NoSheetWithNameError extends Error {
 }
 
 /**
+ * Error thrown when the sheet of a given name already exists.
+ */
+export class SheetAlreadyExistsError extends Error {
+  constructor(sheetName: string) {
+    super(`Sheet with name ${sheetName} already exists`)
+  }
+}
+
+/**
  * Error thrown when loaded sheet size exceeds configured limits.
  */
 export class SheetSizeLimitExceededError extends Error {

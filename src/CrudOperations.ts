@@ -27,7 +27,8 @@ import {
   NoSheetWithIdError,
   NoSheetWithNameError,
   NothingToPasteError,
-  SheetSizeLimitExceededError
+  SheetSizeLimitExceededError,
+  SheetAlreadyExistsError
 } from './errors'
 import {Index} from './HyperFormula'
 import {LazilyTransformingAstService} from './LazilyTransformingAstService'
@@ -512,7 +513,7 @@ export class CrudOperations {
 
   public ensureItIsPossibleToAddSheet(name: string): void {
     if (this.sheetMapping.hasSheetWithName(name)) {
-      throw Error(`Sheet with name ${name} already exists`)
+      throw new SheetAlreadyExistsError(name)
     }
   }
 

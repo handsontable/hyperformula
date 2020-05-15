@@ -60,7 +60,7 @@ export interface ConfigParams {
   /**
    * A list of date formats that are supported by date parsing functions.
    *
-   * The separator is ignored and it can be any of '-',' ','/'.
+   * The separator is ignored and it can be any of '-',' ','/' (dash, empty space, coma).
    *
    * Any order of YY, MM, DD is accepted as a date, and YY can be replaced with YYYY.
    *
@@ -72,7 +72,7 @@ export interface ConfigParams {
   /**
    * A list of time formats that are supported by time parsing functions.
    *
-   * The separator is ':'.
+   * The separator is ':' (colon).
    *
    * Any configuration of at least two of hh, mm, ss is accepted as a time, and they can be put in any order.
    *
@@ -89,7 +89,7 @@ export interface ConfigParams {
   functionArgSeparator: string,
   /**
    * A decimal separator used for parsing numeric literals.
-   * Can be either '.' or ',' and must be different from [[thousandSeparator]] and [[functionArgSeparator]].
+   * Can be either '.' (period) or ',' (coma) and must be different from [[thousandSeparator]] and [[functionArgSeparator]].
    *
    * @default '.'
    *
@@ -110,7 +110,7 @@ export interface ConfigParams {
   licenseKey: string,
   /**
    * A thousand separator used for parsing numeric literals.
-   * Can be either empty, ',' or ' ' and must be different from [[decimalSeparator]] and [[functionArgSeparator]].
+   * Can be either empty, ',' (coma) or ' ' (empty space) and must be different from [[decimalSeparator]] and [[functionArgSeparator]].
    *
    * @default ''
    *

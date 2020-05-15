@@ -450,7 +450,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * @param {SimpleCellAddress} cellAddress - cell coordinates
    *
-   * @throws Throws an error if the sheet ID is unknown
+   * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
    * @throws [[EvaluationSuspendedError]] when the evaluation is suspended
    *
    * @example
@@ -1760,7 +1760,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * @fires [[sheetAdded]] after the sheet was added
    *
-   * @throws an error when sheet with a given name already exists
+   * @throws [[SheetAlreadyExistsError]] when sheet with a given name already exists
    *
    * @example
    * ```js
@@ -2291,7 +2291,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * @fires [[sheetRenamed]] after the sheet was renamed
    *
-   * @throws Throws an error if the provided sheet ID does not exists.
+   * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
    *
    * @example
    * ```js
