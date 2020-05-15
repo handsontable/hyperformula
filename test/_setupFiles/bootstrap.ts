@@ -42,13 +42,14 @@ beforeEach(() => {
   HyperFormula.registerLanguage(defaultLanguage, languages[defaultLanguage])
 
   unregisterAllFormulas()
-for (const pluginName of Object.getOwnPropertyNames(plugins)) {
-  if (!pluginName.startsWith('_')) {
-    // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
-    // @ts-ignore
-    HyperFormula.registerFunctionPlugin(plugins[pluginName])
+
+  for (const pluginName of Object.getOwnPropertyNames(plugins)) {
+    if (!pluginName.startsWith('_')) {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+      // @ts-ignore
+      HyperFormula.registerFunctionPlugin(plugins[pluginName])
+    }
   }
-}
 })
 
 beforeAll(() => {
