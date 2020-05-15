@@ -313,6 +313,21 @@ describe('Named expressions - store manipulation', () => {
       engine.addNamedExpression('myName', '=13', 'NonExistingSheetName')
     }).toThrowError(NoSheetWithNameError)
   })
+
+  /* Inconsistency with Product 1 */
+  it('relative reference', () => {
+    const engine = HyperFormula.buildFromArray([])
+
+    engine.addNamedExpression('expr', '=Sheet1!A1', 'Sheet1')
+
+    engine.setCellContents(adr('A1'), [
+      ['1', '2'],
+      ['=expr', '=expr'],
+    ])
+
+    expect(engine.getCellValue(adr('A2'))).toEqual(1)
+    expect(engine.getCellValue(adr('B2'))).toEqual(1)
+  })
 })
 
 const namedExpressionVertex = (engine: HyperFormula, expressionName: string, sheetId: number | undefined = undefined): Vertex => {
