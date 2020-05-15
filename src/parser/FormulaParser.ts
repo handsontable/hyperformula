@@ -58,7 +58,7 @@ import {
   parsingError,
   ParsingError,
   ParsingErrorType,
-  RangeSheetReferenceType,
+  RangeSheetReferenceType, buildNamedExpressionRangeAst,
 } from './Ast'
 import {CellAddress, CellReferenceType} from './CellAddress'
 import {
@@ -78,7 +78,7 @@ import {
   LParen,
   MinusOp,
   MultiplicationOp,
-  NamedExpression,
+  NamedExpression, NamedExpressionRange,
   NotEqualOp,
   PercentOp,
   PlusOp,
@@ -378,6 +378,9 @@ export class FormulaParser extends EmbeddedActionsParser {
         ALT: () => this.SUBRULE(this.rowRangeExpression),
       },
       {
+        ALT: () => this.SUBRULE(this.namedExpressionRange),
+      },
+      {
         ALT: () => this.SUBRULE(this.offsetExpression),
       },
       {
@@ -502,6 +505,18 @@ export class FormulaParser extends EmbeddedActionsParser {
     const start = this.CONSUME(CellReference)
     this.CONSUME2(RangeSeparator)
     return this.SUBRULE(this.endOfRangeExpression, {ARGS: [start]})
+  })
+
+
+  private namedExpressionRange: AstRule = this.RULE('namedExpressionRange', () => {
+    const range = this.CONSUME(NamedExpressionRange) as IExtendedToken
+    const [start, end] = range.image.split(':')
+
+    if (start === undefined || end === undefined) {
+      return buildCellErrorAst(new CellError(ErrorType.REF))
+    }
+
+    return buildNamedExpressionRangeAst(buildNamedExpressionAst(start), buildNamedExpressionAst(end))
   })
 
   /*

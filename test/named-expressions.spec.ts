@@ -641,9 +641,9 @@ describe('Named expression - ranges', () => {
 
     engine.addNamedExpression('fooo', '=Sheet1!A:Sheet1!A')
     engine.addNamedExpression('baar', '=Sheet1!B:Sheet1!B')
-    engine.setCellContents(adr('A3'), [['=SUM(fooo:baar)']])
+    engine.setCellContents(adr('C1'), [['=SUM(fooo:baar)']])
 
 
-    expect(engine.getCellValue(adr('A3'))).toEqual(10)
+    expect(engine.getCellValue(adr('C1'))).toEqual(10)
   })
 })

@@ -26,6 +26,11 @@ const collectDependenciesFn = (ast: Ast, functionsWhichDoesNotNeedArgumentsToBeC
       dependenciesSet.push(new NamedExpressionDependency(ast.expressionName))
       return
     }
+    case AstNodeType.NAMED_EXPRESSION_RANGE: {
+      dependenciesSet.push(new NamedExpressionDependency(ast.start.expressionName))
+      dependenciesSet.push(new NamedExpressionDependency(ast.end.expressionName))
+      return
+    }
     case AstNodeType.CELL_REFERENCE: {
       dependenciesSet.push(new AddressDependency(ast.reference))
       return

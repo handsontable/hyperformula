@@ -24,7 +24,7 @@ import {Statistics} from '../statistics/Statistics'
 import {
   ArithmeticHelper, divide, multiply, percent, power, unaryminus,
 } from './ArithmeticHelper'
-import {InterpreterValue, SimpleRangeValue} from './InterpreterValue'
+import {InterpreterValue, OnlyRangeData, SimpleRangeValue} from './InterpreterValue'
 import {concatenate} from './text'
 import {NumberLiteralHelper} from '../NumberLiteralHelper'
 import {NamedExpressions} from '../NamedExpressions'
@@ -194,6 +194,18 @@ export class Interpreter {
           return this.dependencyGraph.getCellValue(namedExpression.address)
         } else {
           return new CellError(ErrorType.NAME)
+        }
+      }
+      case AstNodeType.NAMED_EXPRESSION_RANGE: {
+        const start = this.evaluateAst(ast.start, formulaAddress)
+        const end = this.evaluateAst(ast.end, formulaAddress)
+        if (start instanceof SimpleRangeValue && end instanceof SimpleRangeValue && start.data instanceof OnlyRangeData && end.data instanceof OnlyRangeData) {
+          const startAddress = start.data._range
+          const endAddress = end.data._range
+          const effectiveRange = new AbsoluteColumnRange(startAddress.sheet, startAddress.start.col, endAddress.end.col)
+          return SimpleRangeValue.onlyRange(effectiveRange, this.dependencyGraph)
+        } else {
+          throw Error('Not handled yet')
         }
       }
       case AstNodeType.CELL_RANGE: {

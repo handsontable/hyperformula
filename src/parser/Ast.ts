@@ -40,6 +40,7 @@ export type Ast =
   | ErrorAst
   | ErrorWithRawInputAst
   | EmptyArgAst
+  | NamedExpressionRangeAst
 
 export interface ParsingError {
   type: ParsingErrorType,
@@ -94,6 +95,7 @@ export enum AstNodeType {
   CELL_RANGE = 'CELL_RANGE',
   COLUMN_RANGE = 'COLUMN_RANGE',
   ROW_RANGE = 'ROW_RANGE',
+  NAMED_EXPRESSION_RANGE = 'NAMED_EXPRESSION_RANGE',
 
   ERROR = 'ERROR',
 
@@ -189,6 +191,20 @@ export const buildColumnRangeAst = (start: ColumnAddress, end: ColumnAddress, sh
     end,
     sheetReferenceType,
     leadingWhitespace: leadingWhitespace?.image,
+  }
+}
+
+export interface NamedExpressionRangeAst extends AstWithWhitespace {
+  type: AstNodeType.NAMED_EXPRESSION_RANGE,
+  start: NamedExpressionAst,
+  end: NamedExpressionAst,
+}
+
+export const buildNamedExpressionRangeAst = (start: NamedExpressionAst, end: NamedExpressionAst): NamedExpressionRangeAst => {
+  return {
+    type: AstNodeType.NAMED_EXPRESSION_RANGE,
+    start,
+    end
   }
 }
 
