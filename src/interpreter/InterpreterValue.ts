@@ -95,8 +95,8 @@ export class OnlyRangeData {
   public* valuesFromTopLeftCorner(): IterableIterator<InternalCellValue> {
     this.ensureThatComputed()
 
-    for (let i = 0; i < this.size.height; i++) {
-      for (let j = 0; j < this.size.width; j++) {
+    for (let i = 0; i < this.data!.length; i++) {
+      for (let j = 0; j < this.data![0].length; j++) {
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         yield this.data![i][j]
       }

@@ -6,6 +6,7 @@
 import {CellVertex, FormulaCellVertex, MatrixVertex, ValueCellVertex} from './DependencyGraph'
 import {CellAddress} from './parser'
 import {AddressWithSheet} from './parser/Address'
+import {SimpleRangeValue} from './interpreter/InterpreterValue'
 
 /**
  * Possible errors returned by our interpreter.
@@ -32,7 +33,7 @@ export enum ErrorType {
 
 export const EmptyValue = Symbol()
 export type EmptyValueType = typeof EmptyValue
-export type NoErrorCellValue = number | string | boolean | EmptyValueType
+export type NoErrorCellValue = number | string | boolean | EmptyValueType | SimpleRangeValue
 export type InternalCellValue = NoErrorCellValue | CellError
 
 export enum CellType {

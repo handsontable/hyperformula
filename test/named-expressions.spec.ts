@@ -607,3 +607,29 @@ describe('Named expression - cross scope', () => {
     expect(engine.getCellValue(adr('B1', 1))).toEqual('bar')
   })
 })
+
+describe('Named expression - ranges', () => {
+  it('should be possible to define simple range in named expression', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1'],
+      ['3'],
+    ])
+
+    engine.addNamedExpression('fooo', '=Sheet1!A1:Sheet1!A2')
+    engine.setCellContents(adr('B1'), [['=SUM(fooo)']])
+
+    expect(engine.getCellValue(adr('B1'))).toEqual(4)
+  })
+
+  it('should be possible to define column range in named expression', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1'],
+      ['3'],
+    ])
+
+    engine.addNamedExpression('fooo', '=Sheet1!A:Sheet1!A')
+    engine.setCellContents(adr('B1'), [['=SUM(fooo)']])
+
+    expect(engine.getCellValue(adr('B1'))).toEqual(4)
+  })
+})
