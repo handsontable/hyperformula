@@ -19,11 +19,9 @@ describe('vertex counting', () => {
     ])
     expect(engine.dependencyGraph.graph.nodesCount()).toBe(4)
     engine.setCellContents(adr('A1'), '=SUM(A2:B2)')
-    expect(engine.dependencyGarbageCollect()).toBe(0)
     expect(engine.dependencyGraph.graph.nodesCount()).toBe(5)
     engine.setCellContents(adr('A1'), 1)
     expect(engine.dependencyGraph.graph.nodesCount()).toBe(4)
-    expect(engine.dependencyGarbageCollect()).toBe(0)
   })
 })
 
@@ -58,9 +56,9 @@ function randomInteger(min: number, max: number) {
 describe('larger tests', () => {
   it('repeat the same crud', () => {
     const engine = HyperFormula.buildFromArray([])
-    for(let tmp = 0; tmp < 25; tmp++) {
-      for (let x = 0; x < 10; x++) {
-        for (let y = 0; y < 10; y++) {
+    for(let tmp = 0; tmp < 1; tmp++) {
+      for (let x = 0; x < 3; x++) {
+        for (let y = 0; y < 3; y++) {
           const col1 = randomInteger(2, 7)
           const row1 = randomInteger(2, 7)
           const col2 = col1 + randomInteger(-2, 2)
@@ -86,7 +84,6 @@ describe('larger tests', () => {
       }
     }
     console.log(engine.dependencyGraph.graph.nodesCount(), engine.dependencyGraph.rangeMapping.getMappingSize(0))
-    engine.dependencyGarbageCollect()
     expect(engine.dependencyGraph.graph.nodesCount()).toBe(0)
     expect(engine.dependencyGraph.rangeMapping.getMappingSize(0)).toBe(0)
   })

@@ -47,10 +47,7 @@ export class DependencyGraph {
     return new DependencyGraph(
       addressMapping,
       rangeMapping,
-      new Graph<Vertex>(new GetDependenciesQuery(rangeMapping, addressMapping, lazilyTransformingAstService, functionRegistry, namedExpressions),
-        (arg) => {
-          return ((arg instanceof RangeVertex) || (arg instanceof EmptyCellVertex))
-        }),
+      new Graph<Vertex>(new GetDependenciesQuery(rangeMapping, addressMapping, lazilyTransformingAstService, functionRegistry, namedExpressions)),
       new SheetMapping(config.translationPackage),
       new MatrixMapping(),
       stats,
@@ -78,7 +75,7 @@ export class DependencyGraph {
     this.ensureThatVertexIsNonMatrixCellVertex(vertex)
 
     const newVertex = new FormulaCellVertex(ast, address, this.lazilyTransformingAstService.version())
-    this.graph.exchangeOrAddNode(vertex, newVertex)
+    this.exchangeOrAddGraphNode(vertex, newVertex)
     this.addressMapping.setCell(address, newVertex)
 
     this.processCellDependencies(dependencies, newVertex)
@@ -95,7 +92,7 @@ export class DependencyGraph {
   public setParsingErrorToCell(address: SimpleCellAddress, errorVertex: ParsingErrorVertex) {
     const vertex = this.addressMapping.getCell(address)
     this.ensureThatVertexIsNonMatrixCellVertex(vertex)
-    this.graph.exchangeOrAddNode(vertex, errorVertex)
+    this.exchangeOrAddGraphNode(vertex, errorVertex)
     this.addressMapping.setCell(address, errorVertex)
     this.graph.markNodeAsSpecialRecentlyChanged(errorVertex)
     this.correctInfiniteRangesDependency(address)
@@ -113,7 +110,7 @@ export class DependencyGraph {
       }
     } else {
       const newVertex = new ValueCellVertex(newValue)
-      this.graph.exchangeOrAddNode(vertex, newVertex)
+      this.exchangeOrAddGraphNode(vertex, newVertex)
       this.addressMapping.setCell(address, newVertex)
       this.graph.markNodeAsSpecialRecentlyChanged(newVertex)
     }
@@ -130,7 +127,7 @@ export class DependencyGraph {
 
     if (this.graph.adjacentNodes(vertex).size > 0) {
       const emptyVertex = new EmptyCellVertex()
-      this.graph.exchangeNode(vertex, emptyVertex)
+      this.exchangeGraphNode(vertex, emptyVertex)
       this.graph.markNodeAsSpecialRecentlyChanged(emptyVertex)
       this.addressMapping.setCell(address, emptyVertex)
     } else {
@@ -204,7 +201,7 @@ export class DependencyGraph {
     const vertexFrom = this.fetchCellOrCreateEmpty(addressFrom)
     const vertexTo = this.fetchCellOrCreateEmpty(addressTo)
     this.addressMapping.removeCell(addressFrom)
-    this.graph.exchangeNode(vertexFrom, vertexTo)
+    this.exchangeGraphNode(vertexFrom, vertexTo)
   }
 
   private correctInfiniteRangesDependenciesByRangeVertex(vertex: RangeVertex) {
@@ -545,56 +542,12 @@ export class DependencyGraph {
 
     for (const [address, vertex] of this.entriesFromRange(range)) {
       if (vertex) {
-        this.graph.exchangeNode(vertex, matrixVertex)
+        this.exchangeGraphNode(vertex, matrixVertex)
       }
       this.setVertexAddress(address, matrixVertex)
     }
   }
 
-  public garbageCollection(): number {
-    let ret = 0
-    const toBeRemoved: RangeVertex[] = []
-    const candidates: Set<RangeVertex> = new Set()
-    const count: Map<Vertex, number> = this.graph.getAllOutDegrees()
-    const revEdges: Map<Vertex, Set<Vertex>> = this.graph.getReversedEdges()
-
-    count.forEach((cnt, key) => {
-      if(key instanceof RangeVertex && cnt===0) {
-        candidates.add(key)
-      }
-    })
-
-    while(candidates.size > 0) {
-      const vertex: RangeVertex = candidates.values().next().value
-      candidates.delete(vertex)
-      toBeRemoved.push(vertex)
-      revEdges.get(vertex)!.forEach((target) => {
-        if(target instanceof RangeVertex || target instanceof EmptyCellVertex) {
-          const cnt = count.get(target)! - 1
-          count.set(target, cnt)
-          if (cnt === 0) {
-            if(target instanceof RangeVertex) {
-              candidates.add(target)
-            } else {
-              this.graph.removeNode(target)
-              ret += 1
-            }
-          }
-        }
-      })
-    }
-
-    toBeRemoved.forEach( (vertex) => {
-      revEdges.get(vertex)!.forEach( (target) => {
-        this.graph.softRemoveEdge(target, vertex)
-      })
-      this.graph.removeNode(vertex)
-      ret += 1
-
-      this.rangeMapping.removeRange(vertex)
-    })
-    return ret
-  }
 
   public* matrixFormulaNodes(): IterableIterator<MatrixVertex> {
     for (const vertex of this.graph.nodes) {
@@ -814,6 +767,38 @@ export class DependencyGraph {
   public* entriesFromRange(range: AbsoluteCellRange): IterableIterator<[SimpleCellAddress, CellVertex | null]> {
     for (const address of range.addresses(this)) {
       yield [address, this.getCell(address)]
+    }
+  }
+
+  public exchangeGraphNode(oldNode: Vertex, newNode: Vertex) {
+    this.graph.addNode(newNode)
+    this.graph.adjacentNodes(oldNode).forEach((adjacentNode) => {
+      this.graph.addEdge(newNode, adjacentNode)
+    })
+    this.removeGraphNode(oldNode)
+  }
+
+  public exchangeOrAddGraphNode(oldNode: Vertex | null, newNode: Vertex) {
+    if (oldNode) {
+      this.exchangeGraphNode(oldNode, newNode)
+    } else {
+      this.graph.addNode(newNode)
+    }
+  }
+
+  public removeGraphNode(node: Vertex) {
+    const candidates = this.graph.removeNode(node)
+    while(candidates.size > 0) {
+      const vertex: Vertex = candidates.values().next().value
+      candidates.delete(vertex)
+      if(this.graph.adjacentNodesCount(vertex) === 0) {
+        if(vertex instanceof RangeVertex || vertex instanceof EmptyCellVertex) {
+          this.graph.removeNode(vertex).forEach((candidate) => candidates.add(candidate))
+        }
+        if(vertex instanceof RangeVertex) {
+          this.rangeMapping.removeRange(vertex)
+        }
+      }
     }
   }
 }

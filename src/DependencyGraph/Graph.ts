@@ -33,7 +33,6 @@ export class Graph<T> {
 
   constructor(
     private readonly getDependenciesQuery: IGetDependenciesQuery<T>,
-    private readonly removalTester: (arg: T) => boolean,
   ) {
   }
 
@@ -126,23 +125,7 @@ export class Graph<T> {
     return result
   }
 
-  public exchangeNode(oldNode: T, newNode: T) {
-    this.addNode(newNode)
-    this.adjacentNodes(oldNode).forEach((adjacentNode) => {
-      this.addEdge(newNode, adjacentNode)
-    })
-    this.removeNode(oldNode)
-  }
-
-  public exchangeOrAddNode(oldNode: T | null, newNode: T) {
-    if (oldNode) {
-      this.exchangeNode(oldNode, newNode)
-    } else {
-      this.addNode(newNode)
-    }
-  }
-
-  public removeNode(node: T) {
+  public removeNode(node: T): Set<T> {
     for (const adjacentNode of this.adjacentNodes(node).values()) {
       this.markNodeAsSpecialRecentlyChanged(adjacentNode)
     }
@@ -152,7 +135,7 @@ export class Graph<T> {
     this.specialNodesRecentlyChanged.delete(node)
     this.specialNodesStructuralChanges.delete(node)
     this.infiniteRanges.delete(node)
-    this.removeDependencies(node)
+    return this.removeDependencies(node)
   }
 
   public markNodeAsSpecial(node: T) {
@@ -340,16 +323,14 @@ export class Graph<T> {
     this.clearSpecialNodesRecentlyChanged()
   }
 
-  private removeDependencies(node: T) {
+  private removeDependencies(node: T): Set<T> {
     const dependentNodes = this.getDependenciesQuery.call(node)
     if (!dependentNodes) {
-      return
+      return new Set()
     }
     for (const dependentNode of dependentNodes) {
       this.softRemoveEdge(dependentNode, node)
-      if(this.edges.get(dependentNode)!.size === 0 && this.removalTester(dependentNode)) {
-        this.removeNode(dependentNode)
-      }
     }
+    return dependentNodes
   }
 }

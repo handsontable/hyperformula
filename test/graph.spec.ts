@@ -2,11 +2,10 @@ import {Graph} from '../src/DependencyGraph'
 import {DummyGetDependenciesQuery} from './DummyGetDependenciesQuery'
 
 const identifiableString = (id: number, str: string) => ({ id, str })
-const dummyTester = () => false
 
 describe('Basic Graph manipulation', () => {
   it('#addNode', () => {
-    const graph = new Graph(new DummyGetDependenciesQuery(), dummyTester)
+    const graph = new Graph(new DummyGetDependenciesQuery())
 
     const node = identifiableString(0, 'foo')
     graph.addNode(node)
@@ -15,7 +14,7 @@ describe('Basic Graph manipulation', () => {
   })
 
   it('#addNode for the second time', () => {
-    const graph = new Graph(new DummyGetDependenciesQuery(), dummyTester)
+    const graph = new Graph(new DummyGetDependenciesQuery())
 
     const node = identifiableString(0, 'foo')
     graph.addNode(node)
@@ -25,7 +24,7 @@ describe('Basic Graph manipulation', () => {
   })
 
   it('#addNode for the second time doesnt reset adjacent nodes', () => {
-    const graph = new Graph(new DummyGetDependenciesQuery(), dummyTester)
+    const graph = new Graph(new DummyGetDependenciesQuery())
 
     const node0 = identifiableString(0, 'foo')
     const node1 = identifiableString(1, 'bar')
@@ -39,7 +38,7 @@ describe('Basic Graph manipulation', () => {
   })
 
   it('#hasNode when there is node', () => {
-    const graph = new Graph(new DummyGetDependenciesQuery(), dummyTester)
+    const graph = new Graph(new DummyGetDependenciesQuery())
 
     const node = identifiableString(0, 'foo')
     graph.addNode(node)
@@ -48,13 +47,13 @@ describe('Basic Graph manipulation', () => {
   })
 
   it('#hasNode when there is no node', () => {
-    const graph = new Graph(new DummyGetDependenciesQuery(), dummyTester)
+    const graph = new Graph(new DummyGetDependenciesQuery())
 
     expect(graph.hasNode(identifiableString(0, 'foo'))).toBe(false)
   })
 
   it('#adjacentNodes', () => {
-    const graph = new Graph(new DummyGetDependenciesQuery(), dummyTester)
+    const graph = new Graph(new DummyGetDependenciesQuery())
 
     const node0 = identifiableString(0, 'foo')
     const node1 = identifiableString(1, 'bar')
@@ -66,7 +65,7 @@ describe('Basic Graph manipulation', () => {
   })
 
   it('#addEdge removes multiple edges', () => {
-    const graph = new Graph(new DummyGetDependenciesQuery(), dummyTester)
+    const graph = new Graph(new DummyGetDependenciesQuery())
 
     const node0 = identifiableString(0, 'foo')
     const node1 = identifiableString(1, 'bar')
@@ -79,7 +78,7 @@ describe('Basic Graph manipulation', () => {
   })
 
   it('#addEdge is raising an error when the origin node not present', () => {
-    const graph = new Graph(new DummyGetDependenciesQuery(), dummyTester)
+    const graph = new Graph(new DummyGetDependenciesQuery())
     const node = identifiableString(1, 'target')
     graph.addNode(node)
 
@@ -89,7 +88,7 @@ describe('Basic Graph manipulation', () => {
   })
 
   it('#addEdge is raising an error when the target node not present', () => {
-    const graph = new Graph(new DummyGetDependenciesQuery(), dummyTester)
+    const graph = new Graph(new DummyGetDependenciesQuery())
     const node = identifiableString(0, 'origin')
     graph.addNode(node)
 
@@ -99,7 +98,7 @@ describe('Basic Graph manipulation', () => {
   })
 
   it('#existsEdge works', () => {
-    const graph = new Graph(new DummyGetDependenciesQuery(), dummyTester)
+    const graph = new Graph(new DummyGetDependenciesQuery())
     const node0 = identifiableString(0, 'foo')
     const node1 = identifiableString(1, 'bar')
     graph.addNode(node0)
@@ -110,7 +109,7 @@ describe('Basic Graph manipulation', () => {
   })
 
   it('#existsEdge when there is origin node but no edge', () => {
-    const graph = new Graph(new DummyGetDependenciesQuery(), dummyTester)
+    const graph = new Graph(new DummyGetDependenciesQuery())
     const node = identifiableString(0, 'foo')
     graph.addNode(node)
 
@@ -118,19 +117,19 @@ describe('Basic Graph manipulation', () => {
   })
 
   it('#existsEdge when there is no node', () => {
-    const graph = new Graph(new DummyGetDependenciesQuery(), dummyTester)
+    const graph = new Graph(new DummyGetDependenciesQuery())
 
     expect(graph.existsEdge(identifiableString(0, 'foo'), identifiableString(1, 'bar'))).toBe(false)
   })
 
   it('#edgesCount when there is no nodes', () => {
-    const graph = new Graph(new DummyGetDependenciesQuery(), dummyTester)
+    const graph = new Graph(new DummyGetDependenciesQuery())
 
     expect(graph.edgesCount()).toBe(0)
   })
 
   it('#edgesCount counts edges from all nodes', () => {
-    const graph = new Graph(new DummyGetDependenciesQuery(), dummyTester)
+    const graph = new Graph(new DummyGetDependenciesQuery())
     const node0 = identifiableString(0, 'bar1')
     const node1 = identifiableString(1, 'bar2')
     graph.addNode(node0)
@@ -147,14 +146,14 @@ describe('Basic Graph manipulation', () => {
   })
 
   it('#topologicalSort for empty graph', () => {
-    const graph = new Graph(new DummyGetDependenciesQuery(), dummyTester)
+    const graph = new Graph(new DummyGetDependenciesQuery())
 
     expect(graph.topSortWithScc().sorted).toEqual([])
     expect(graph.topSortWithScc().cycled).toEqual([])
   })
 
   it('#topologicalSort node is included even if he is not connected to anything', () => {
-    const graph = new Graph(new DummyGetDependenciesQuery(), dummyTester)
+    const graph = new Graph(new DummyGetDependenciesQuery())
     const node = identifiableString(0, 'foo')
     graph.addNode(node)
 
@@ -163,7 +162,7 @@ describe('Basic Graph manipulation', () => {
   })
 
   it('#topologicalSort for simple graph', () => {
-    const graph = new Graph(new DummyGetDependenciesQuery(), dummyTester)
+    const graph = new Graph(new DummyGetDependenciesQuery())
     const node0 = identifiableString(0, 'foo')
     const node1 = identifiableString(1, 'bar')
     graph.addNode(node0)
@@ -175,7 +174,7 @@ describe('Basic Graph manipulation', () => {
   })
 
   it('#topologicalSort for more complex graph', () => {
-    const graph = new Graph(new DummyGetDependenciesQuery(), dummyTester)
+    const graph = new Graph(new DummyGetDependenciesQuery())
     const node0 = identifiableString(0, 'x0')
     const node1 = identifiableString(1, 'x1')
     const node2 = identifiableString(2, 'x2')
@@ -196,7 +195,7 @@ describe('Basic Graph manipulation', () => {
   })
 
   it('#topologicalSort for not connected graph', () => {
-    const graph = new Graph(new DummyGetDependenciesQuery(), dummyTester)
+    const graph = new Graph(new DummyGetDependenciesQuery())
     const node0 = identifiableString(0, 'x0')
     const node1 = identifiableString(1, 'x1')
     const node2 = identifiableString(2, 'x2')
@@ -213,7 +212,7 @@ describe('Basic Graph manipulation', () => {
   })
 
   it('#topologicalSort returns vertices on trivial cycle', () => {
-    const graph = new Graph(new DummyGetDependenciesQuery(), dummyTester)
+    const graph = new Graph(new DummyGetDependenciesQuery())
     const node0 = identifiableString(0, 'x0')
     const node1 = identifiableString(1, 'x1')
     graph.addNode(node0)
@@ -226,7 +225,7 @@ describe('Basic Graph manipulation', () => {
   })
 
   it('#topologicalSort returns vertices on cycle', () => {
-    const graph = new Graph(new DummyGetDependenciesQuery(), dummyTester)
+    const graph = new Graph(new DummyGetDependenciesQuery())
     const node0 = identifiableString(0, 'x0')
     const node1 = identifiableString(1, 'x1')
     const node2 = identifiableString(2, 'x2')
@@ -242,7 +241,7 @@ describe('Basic Graph manipulation', () => {
   })
 
   it('#topologicalSort returns one-element cycle', () => {
-    const graph = new Graph(new DummyGetDependenciesQuery(), dummyTester)
+    const graph = new Graph(new DummyGetDependenciesQuery())
     const node = identifiableString(0, 'foo')
     graph.addNode(node)
     graph.addEdge(node, node)
@@ -254,7 +253,7 @@ describe('Basic Graph manipulation', () => {
 
 describe('Graph#getTopologicallySortedSubgraphFrom', () => {
   it('case without edges', () => {
-    const graph = new Graph<string>(new DummyGetDependenciesQuery(), dummyTester)
+    const graph = new Graph<string>(new DummyGetDependenciesQuery())
     const node0 = 'foo'
     const node1 = 'bar'
     graph.addNode(node0)
@@ -270,7 +269,7 @@ describe('Graph#getTopologicallySortedSubgraphFrom', () => {
   })
 
   it('case with obvious edge', () => {
-    const graph = new Graph<string>(new DummyGetDependenciesQuery(), dummyTester)
+    const graph = new Graph<string>(new DummyGetDependenciesQuery())
     const node0 = 'foo'
     const node1 = 'bar'
 
@@ -289,7 +288,7 @@ describe('Graph#getTopologicallySortedSubgraphFrom', () => {
   })
 
   it('it doesnt call other if didnt change', () => {
-    const graph = new Graph<string>(new DummyGetDependenciesQuery(), dummyTester)
+    const graph = new Graph<string>(new DummyGetDependenciesQuery())
     const node0 = 'foo'
     const node1 = 'bar'
 
@@ -307,7 +306,7 @@ describe('Graph#getTopologicallySortedSubgraphFrom', () => {
   })
 
   it('does call if some previous vertex marked as changed', () => {
-    const graph = new Graph<string>(new DummyGetDependenciesQuery(), dummyTester)
+    const graph = new Graph<string>(new DummyGetDependenciesQuery())
     const nodes = ['foo', 'bar', 'baz']
 
     nodes.forEach((n) => graph.addNode(n))
@@ -324,7 +323,7 @@ describe('Graph#getTopologicallySortedSubgraphFrom', () => {
   })
 
   it('returns cycled vertices', () => {
-    const graph = new Graph<string>(new DummyGetDependenciesQuery(), dummyTester)
+    const graph = new Graph<string>(new DummyGetDependenciesQuery())
     const nodes = ['foo', 'c0', 'c1', 'c2']
 
     nodes.forEach((n) => graph.addNode(n))
@@ -342,7 +341,7 @@ describe('Graph#getTopologicallySortedSubgraphFrom', () => {
   })
 
   it('doesnt call first one of the given vertices if its on cycle', () => {
-    const graph = new Graph<string>(new DummyGetDependenciesQuery(), dummyTester)
+    const graph = new Graph<string>(new DummyGetDependenciesQuery())
     const nodes = ['c0', 'c1', 'c2']
     nodes.forEach((n) => graph.addNode(n))
     graph.addEdge(nodes[0], nodes[1])
@@ -358,7 +357,7 @@ describe('Graph#getTopologicallySortedSubgraphFrom', () => {
   })
 
   it('returns cycled vertices even if they were not tried to be computed', () => {
-    const graph = new Graph<string>(new DummyGetDependenciesQuery(), dummyTester)
+    const graph = new Graph<string>(new DummyGetDependenciesQuery())
     const nodes = ['foo', 'c0', 'c1', 'c2']
     nodes.forEach((n) => graph.addNode(n))
     graph.addEdge(nodes[0], nodes[1])
@@ -377,7 +376,7 @@ describe('Graph#getTopologicallySortedSubgraphFrom', () => {
 
 describe('Graph cruds', () => {
   it('#removeEdge not existing edge', () => {
-    const graph = new Graph(new DummyGetDependenciesQuery(), dummyTester)
+    const graph = new Graph(new DummyGetDependenciesQuery())
     const node0 = identifiableString(0, 'x0')
     const node1 = identifiableString(1, 'x1')
     graph.addNode(node0)
@@ -387,7 +386,7 @@ describe('Graph cruds', () => {
   })
 
   it('#removeEdge removes edge from graph', () => {
-    const graph = new Graph(new DummyGetDependenciesQuery(), dummyTester)
+    const graph = new Graph(new DummyGetDependenciesQuery())
     const node0 = identifiableString(0, 'x0')
     const node1 = identifiableString(1, 'x1')
 
@@ -404,7 +403,7 @@ describe('Graph cruds', () => {
   })
 
   it('#removeIncomingEdges removes all edges incoming to given node', () => {
-    const graph = new Graph(new DummyGetDependenciesQuery(), dummyTester)
+    const graph = new Graph(new DummyGetDependenciesQuery())
     const node0 = identifiableString(0, 'x0')
     const node1 = identifiableString(1, 'x1')
     const node2 = identifiableString(1, 'x2')
