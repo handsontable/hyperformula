@@ -5,7 +5,7 @@
 
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
 import {absolutizeDependencies} from '../absolutizeDependencies'
-import {SimpleCellAddress} from '../Cell'
+import {simpleCellAddress, SimpleCellAddress} from '../Cell'
 import {CellDependency} from '../CellDependency'
 import {LazilyTransformingAstService} from '../LazilyTransformingAstService'
 import {Ast, collectDependencies, NamedExpressionDependency} from '../parser'
@@ -36,9 +36,17 @@ export class GetDependenciesQuery implements IGetDependenciesQuery<Vertex> {
     } else if (vertex instanceof MatrixVertex && vertex.isFormula()) {
       address = vertex.getAddress()
       formula = vertex.getFormula()!
-//    } else if (vertex instanceof RangeVertex) {
-
-
+    } else if (vertex instanceof RangeVertex) {
+      const {smallerRangeVertex} = this.rangeMapping.findSmallerRange(vertex.range)
+      if(smallerRangeVertex !== null) {
+        const endVertex = vertex.range.end
+        const startVertex = simpleCellAddress(vertex.range.start.sheet, vertex.range.start.col, endVertex.row)
+        const allDeps = new Set(this.rangeMapping.rangeVerticesContainedInRange(new AbsoluteCellRange(startVertex,endVertex)))
+        allDeps.add(smallerRangeVertex)
+        return allDeps
+      } else {
+        return new Set(this.rangeMapping.rangeVerticesContainedInRange(vertex.range))
+      }
     } else {
       return null
     }
