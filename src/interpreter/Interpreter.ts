@@ -199,13 +199,10 @@ export class Interpreter {
       case AstNodeType.NAMED_EXPRESSION_RANGE: {
         const start = this.evaluateAst(ast.start, formulaAddress)
         const end = this.evaluateAst(ast.end, formulaAddress)
-        if (start instanceof SimpleRangeValue && end instanceof SimpleRangeValue && start.data instanceof OnlyRangeData && end.data instanceof OnlyRangeData) {
-          const startAddress = start.data._range
-          const endAddress = end.data._range
-          const effectiveRange = new AbsoluteColumnRange(startAddress.sheet, startAddress.start.col, endAddress.end.col)
-          return SimpleRangeValue.onlyRange(effectiveRange, this.dependencyGraph)
+        if (start instanceof SimpleRangeValue && end instanceof SimpleRangeValue) {
+          return SimpleRangeValue.maybeBiggerRange(start, end, this.dependencyGraph)
         } else {
-          throw Error('Not handled yet')
+          return new CellError(ErrorType.NAME)
         }
       }
       case AstNodeType.CELL_RANGE: {

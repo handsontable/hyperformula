@@ -3,7 +3,15 @@
  * Copyright (c) 2020 Handsoncode. All rights reserved.
  */
 
-import {CellRange, simpleCellAddress, SimpleCellAddress, SimpleColumnAddress, SimpleRowAddress} from './Cell'
+import {
+  CellError,
+  CellRange,
+  ErrorType,
+  simpleCellAddress,
+  SimpleCellAddress,
+  SimpleColumnAddress,
+  SimpleRowAddress
+} from './Cell'
 import {DependencyGraph} from './DependencyGraph'
 import {AstNodeType, CellAddress, CellRangeAst} from './parser'
 import {ColumnRangeAst, RowRangeAst} from './parser/Ast'
@@ -31,6 +39,18 @@ export class AbsoluteCellRange {
       new CellAddress(x.start.sheet, x.start.col, x.start.row, x.start.type).toSimpleCellAddress(baseAddress),
       new CellAddress(x.end.sheet, x.end.col, x.end.row, x.end.type).toSimpleCellAddress(baseAddress),
     )
+  }
+
+  public static fromRanges(start: AbsoluteCellRange, end: AbsoluteCellRange): AbsoluteCellRange | CellError {
+    if (start instanceof AbsoluteColumnRange && end instanceof AbsoluteColumnRange) {
+      return new AbsoluteColumnRange(start.sheet, start.start.col, end.end.col)
+    } else if (start instanceof AbsoluteRowRange && end instanceof AbsoluteRowRange) {
+      return new AbsoluteRowRange(start.sheet, start.start.row, end.end.row)
+    } else if (start.isFinite() && end.isFinite()) {
+      return new AbsoluteCellRange(start.start, end.end)
+    } else {
+      return new CellError(ErrorType.NAME)
+    }
   }
 
   public static spanFrom(topLeftCorner: SimpleCellAddress, width: number, height: number): AbsoluteCellRange {

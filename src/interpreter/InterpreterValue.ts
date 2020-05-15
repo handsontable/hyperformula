@@ -4,7 +4,7 @@
  */
 
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
-import {InternalCellValue} from '../Cell'
+import {CellError, ErrorType, InternalCellValue} from '../Cell'
 import {DependencyGraph} from '../DependencyGraph'
 import {MatrixSize} from '../Matrix'
 import {Maybe} from '../Maybe'
@@ -159,6 +159,18 @@ export class SimpleRangeValue {
     const hasOnlyNumbers = (typeof scalar === 'number')
     return new SimpleRangeValue(new ArrayData({ width: 1, height: 1 }, [[scalar]], hasOnlyNumbers))
   }
+
+  public static maybeBiggerRange(start: SimpleRangeValue, end: SimpleRangeValue, dependencyGraph: DependencyGraph): SimpleRangeValue | CellError {
+    if (start.data instanceof OnlyRangeData && end.data instanceof OnlyRangeData) {
+      const range = AbsoluteCellRange.fromRanges(start.data.range(), end.data.range())
+      if (range instanceof CellError) {
+        return range
+      }
+      return SimpleRangeValue.onlyRange(range, dependencyGraph)
+    }
+    return new CellError(ErrorType.NAME)
+  }
+
   constructor(
     public readonly data: RangeData,
   ) {

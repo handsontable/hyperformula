@@ -1,6 +1,5 @@
-import {HyperFormula, ExportedNamedExpressionChange, EmptyValue, ExportedCellChange} from '../src'
+import {EmptyValue, ErrorType, ExportedCellChange, ExportedNamedExpressionChange, HyperFormula} from '../src'
 import {adr, detailedError} from './testUtils'
-import {ErrorType} from '../src/Cell'
 import {NoSheetWithNameError} from '../src/errors'
 import {Vertex} from '../src/DependencyGraph/Vertex'
 
@@ -627,7 +626,7 @@ describe('Named expression - ranges', () => {
       ['3'],
     ])
 
-    engine.addNamedExpression('fooo', '=Sheet1!A:Sheet1!A')
+    engine.addNamedExpression('fooo', '=Sheet1!A:A')
     engine.setCellContents(adr('B1'), [['=SUM(fooo)']])
 
     expect(engine.getCellValue(adr('B1'))).toEqual(4)
@@ -639,11 +638,54 @@ describe('Named expression - ranges', () => {
       ['3', '4'],
     ])
 
-    engine.addNamedExpression('fooo', '=Sheet1!A:Sheet1!A')
-    engine.addNamedExpression('baar', '=Sheet1!B:Sheet1!B')
+    engine.addNamedExpression('fooo', '=Sheet1!$A:$A')
+    engine.addNamedExpression('baar', '=Sheet1!$B:$B')
     engine.setCellContents(adr('C1'), [['=SUM(fooo:baar)']])
 
+    expect(engine.getCellValue(adr('C1'))).toEqual(10)
+  })
+
+  it('should be possible to make column range from named expressions - add named expressions after formula', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1', '2'],
+      ['3', '4'],
+    ])
+
+    engine.setCellContents(adr('C1'), [['=SUM(fooo:baar)']])
+    engine.addNamedExpression('fooo', '=Sheet1!$A:$A')
+    engine.addNamedExpression('baar', '=Sheet1!$B:$B')
 
     expect(engine.getCellValue(adr('C1'))).toEqual(10)
+  })
+
+  it('should be possible to make column range from named expressions - add one of the ends later', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1', '2'],
+      ['3', '4'],
+    ])
+
+    engine.addNamedExpression('fooo', '=Sheet1!$A:$A')
+    engine.setCellContents(adr('C1'), [['=SUM(fooo:baar)']])
+    engine.addNamedExpression('baar', '=Sheet1!$B:$B')
+
+    expect(engine.getCellValue(adr('C1'))).toEqual(10)
+  })
+
+  it('named expression range - incompatibile expressions', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1', '2'],
+      ['3', '4'],
+    ])
+
+    engine.addNamedExpression('_expr1', '=Sheet1!$A$1:$A$1')
+    engine.addNamedExpression('_expr2', '=Sheet1!$A:$A')
+    engine.addNamedExpression('_expr3', '=TRUE()')
+    engine.setCellContents(adr('C1'), [['=SUM(_expr1:_expr2)']])
+    engine.setCellContents(adr('C2'), [['=SUM(_expr2:_expr3)']])
+    engine.setCellContents(adr('C3'), [['=SUM(_expr3:_expr1)']])
+
+    expect(engine.getCellValue(adr('C1'))).toEqual(detailedError(ErrorType.NAME))
+    expect(engine.getCellValue(adr('C2'))).toEqual(detailedError(ErrorType.NAME))
+    expect(engine.getCellValue(adr('C3'))).toEqual(detailedError(ErrorType.NAME))
   })
 })
