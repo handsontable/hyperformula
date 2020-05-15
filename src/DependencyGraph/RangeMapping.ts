@@ -180,7 +180,7 @@ export class RangeMapping {
    * @param rangeMapping - range mapping dependency
    * @param ranges - ranges to find smaller range in
    */
-  public findSmallerRange (range: AbsoluteCellRange): { smallerRangeVertex: RangeVertex | null, restRange: AbsoluteCellRange } {
+  public findSmallerRange(range: AbsoluteCellRange): { smallerRangeVertex: RangeVertex | null, restRange: AbsoluteCellRange } {
     if (range.height() > 1 && Number.isFinite(range.height())) {
       const valuesRangeEndRowLess = simpleCellAddress(range.end.sheet, range.end.col, range.end.row - 1)
       const rowLessVertex = this.getRange(range.start, valuesRangeEndRowLess)

@@ -41,7 +41,7 @@ export class GetDependenciesQuery implements IGetDependenciesQuery<Vertex> {
       if(smallerRangeVertex !== null) {
         const endVertex = vertex.range.end
         const startVertex = simpleCellAddress(vertex.range.start.sheet, vertex.range.start.col, endVertex.row)
-        const allDeps = new Set(this.rangeMapping.rangeVerticesContainedInRange(new AbsoluteCellRange(startVertex,endVertex)))
+        const allDeps = new Set(this.rangeMapping.rangeVerticesContainedInRange(new AbsoluteCellRange(startVertex, endVertex)))
         allDeps.add(smallerRangeVertex)
         return allDeps
       } else {
