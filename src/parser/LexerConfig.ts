@@ -52,7 +52,7 @@ export const CellReference = createToken({
 
 export const ColumnRange = createToken({
   name: 'ColumnRange',
-  pattern: new RegExp(`\(${sheetNameRegexp}\)?\\$?[A-Za-z]+:\(${sheetNameRegexp}\)?\\$?[A-Za-z]+`),
+  pattern: new RegExp(`\(${sheetNameRegexp}\)?\\$?[A-Za-z]{1,3}:\(${sheetNameRegexp}\)?\\$?[A-Za-z]{1,3}`),
 })
 
 export const RowRange = createToken({

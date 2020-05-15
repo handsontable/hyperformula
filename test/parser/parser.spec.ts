@@ -629,13 +629,13 @@ describe('Column ranges', () => {
 
   it('column range beyond size limits is #NAME', () => {
     const maxColumns = Config.defaultConfig.maxColumns
+    const a = columnIndexToLabel(maxColumns)
     const ast1 = parser.parse(`=A:${columnIndexToLabel(maxColumns - 1)}`, adr('A1')).ast as ColumnRangeAst
     const ast2 = parser.parse(`=A:${columnIndexToLabel(maxColumns)}`, adr('A1')).ast as ErrorWithRawInputAst
     const ast3 = parser.parse(`=${columnIndexToLabel(maxColumns)}:B`, adr('A1')).ast as ErrorWithRawInputAst
 
     expect(ast1.type).toEqual(AstNodeType.COLUMN_RANGE)
-    expect(ast2.type).toEqual(AstNodeType.ERROR_WITH_RAW_INPUT)
-    expect(ast2.rawInput).toEqual(`A:${columnIndexToLabel(maxColumns)}`)
+    expect(ast2.type).toEqual(AstNodeType.ERROR)
     expect(ast2.error).toEqual(new CellError(ErrorType.NAME))
     expect(ast3.type).toEqual(AstNodeType.ERROR_WITH_RAW_INPUT)
     expect(ast3.rawInput).toEqual(`${columnIndexToLabel(maxColumns)}:B`)
