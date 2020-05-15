@@ -158,12 +158,12 @@ describe('Unparse', () => {
   })
 
   it('#unparse should not forget about spaces', () => {
-    const formula = '= 1 + sum( 1,2,   3) +A1 / 2 + bar'
+    const formula = '= 1 + sum( 1,2,   3) +A1 / 2 + baar'
     const ast = parser.parse(formula, simpleCellAddress(0, 0, 0)).ast
 
     const unparsed = unparser.unparse(ast, adr('A1'))
 
-    expect(unparsed).toEqual('= 1 + SUM( 1,2,   3) +A1 / 2 + bar')
+    expect(unparsed).toEqual('= 1 + SUM( 1,2,   3) +A1 / 2 + baar')
   })
 
   it('#unparse named expression', () => {

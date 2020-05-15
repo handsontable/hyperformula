@@ -44,6 +44,7 @@ export const ConcatenateOp = createToken({name: 'ConcatenateOp', pattern: /&/})
 /* addresses */
 export const additionalCharactersAllowedInQuotes = ' ' // It's included in regexps, so escape characters which have special regexp semantics
 export const sheetNameRegexp = `([A-Za-z0-9_\u00C0-\u02AF]+|'[A-Za-z0-9${additionalCharactersAllowedInQuotes}_\u00C0-\u02AF]+')!`
+export const namedExpressionRegexp = '[A-Za-z\u00C0-\u02AF_][0-9\.A-Za-z_\u00C0-\u02AF_]{3,}' // at least 4 chars
 
 export const CellReference = createToken({
   name: 'CellReference',
@@ -55,11 +56,15 @@ export const ColumnRange = createToken({
   pattern: new RegExp(`\(${sheetNameRegexp}\)?\\$?[A-Za-z]{1,3}:\(${sheetNameRegexp}\)?\\$?[A-Za-z]{1,3}`),
 })
 
+export const NamedExpressionRange = createToken({
+  name: 'ColumnRange',
+  pattern: new RegExp(`${namedExpressionRegexp}:${namedExpressionRegexp}`),
+})
+
 export const RowRange = createToken({
   name: 'RowRange',
   pattern: new RegExp(`\(${sheetNameRegexp}\)?\\$?[0-9]+:\(${sheetNameRegexp}\)?\\$?[0-9]+`),
 })
-
 
 export const RangeSeparator = createToken({name: 'RangeSeparator', pattern: /:/})
 
@@ -71,7 +76,7 @@ export const RParen = createToken({name: 'RParen', pattern: /\)/})
 export const ProcedureName = createToken({name: 'ProcedureName', pattern: /(\.?[0-9A-Za-z\u00C0-\u02AF]+)+\(/})
 
 /* named expressions */
-export const NamedExpression = createToken({name: 'NamedExpression', pattern: /[A-Za-z\u00C0-\u02AF_][0-9\.A-Za-z_\u00C0-\u02AF_]+/})
+export const NamedExpression = createToken({name: 'NamedExpression', pattern: new RegExp(namedExpressionRegexp) }) ///[A-Za-z\u00C0-\u02AF_][0-9\.A-Za-z_\u00C0-\u02AF_]+/})
 
 /* string literal */
 export const StringLiteral = createToken({name: 'StringLiteral', pattern: /"([^"\\]*(\\.[^"\\]*)*)"/})
@@ -130,6 +135,7 @@ export const buildLexerConfig = (config: ParserConfig): ILexerConfig => {
     ArgSeparator,
     ColumnRange,
     RowRange,
+    NamedExpressionRange,
     NumberLiteral,
     StringLiteral,
     ErrorLiteral,

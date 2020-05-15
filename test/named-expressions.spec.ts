@@ -370,11 +370,11 @@ describe('Named expressions - evaluation', () => {
 
   it('adds edge to dependency', () => {
     const engine = HyperFormula.buildFromArray([])
-    engine.addNamedExpression('FOO', '=42')
+    engine.addNamedExpression('FOOO', '=42')
 
-    engine.setCellContents(adr('A1'), '=FOO+10')
+    engine.setCellContents(adr('A1'), '=FOOO+10')
 
-    const fooVertex = engine.dependencyGraph.fetchNamedExpressionVertex('FOO', 0)
+    const fooVertex = engine.dependencyGraph.fetchNamedExpressionVertex('FOOO', 0)
     const a1 = engine.dependencyGraph.fetchCell(adr('A1'))
     expect(engine.graph.existsEdge(fooVertex, a1)).toBe(true)
     expect(engine.getCellValue(adr('A1'))).toEqual(52)
@@ -382,7 +382,7 @@ describe('Named expressions - evaluation', () => {
 
   it('NAME error when there is no such named expression', () => {
     const engine = HyperFormula.buildFromArray([
-      ['=FOO']
+      ['=FOOO']
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NAME))
@@ -390,12 +390,12 @@ describe('Named expressions - evaluation', () => {
 
   it('named expression dependency works if named expression was defined later', () => {
     const engine = HyperFormula.buildFromArray([
-      ['=FOO']
+      ['=FOOO']
     ])
 
-    engine.addNamedExpression('FOO', '=42')
+    engine.addNamedExpression('FOOO', '=42')
 
-    const fooVertex = engine.dependencyGraph.fetchNamedExpressionVertex('FOO', 0)
+    const fooVertex = engine.dependencyGraph.fetchNamedExpressionVertex('FOOO', 0)
     const a1 = engine.dependencyGraph.fetchCell(adr('A1'))
     expect(engine.graph.existsEdge(fooVertex, a1)).toBe(true)
     expect(engine.getCellValue(adr('A1'))).toEqual(42)
@@ -403,10 +403,10 @@ describe('Named expressions - evaluation', () => {
 
   it('removed named expression returns NAME error', () => {
     const engine = HyperFormula.buildFromArray([])
-    engine.addNamedExpression('FOO', '=42')
-    engine.setCellContents(adr('A1'), '=FOO+10')
+    engine.addNamedExpression('FOOO', '=42')
+    engine.setCellContents(adr('A1'), '=FOOO+10')
 
-    engine.removeNamedExpression('FOO')
+    engine.removeNamedExpression('FOOO')
 
     expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NAME))
   })
@@ -435,13 +435,13 @@ describe('Named expressions - evaluation', () => {
 
   it('local named expression shadows global one', () => {
     const engine = HyperFormula.buildFromArray([])
-    engine.addNamedExpression('FOO', '=42')
-    engine.addNamedExpression('FOO', '=13', 'Sheet1')
+    engine.addNamedExpression('FOOO', '=42')
+    engine.addNamedExpression('FOOO', '=13', 'Sheet1')
 
-    engine.setCellContents(adr('A1'), '=FOO+10')
+    engine.setCellContents(adr('A1'), '=FOOO+10')
 
-    const localFooVertex = engine.dependencyGraph.fetchNamedExpressionVertex('FOO', 0)!
-    const globalFooVertex = engine.dependencyGraph.fetchCell(engine.dependencyGraph.namedExpressions.namedExpressionForScope('FOO')!.address)
+    const localFooVertex = engine.dependencyGraph.fetchNamedExpressionVertex('FOOO', 0)!
+    const globalFooVertex = engine.dependencyGraph.fetchCell(engine.dependencyGraph.namedExpressions.namedExpressionForScope('FOOO')!.address)
     const a1 = engine.dependencyGraph.fetchCell(adr('A1'))
     expect(engine.graph.existsEdge(localFooVertex, a1)).toBe(true)
     expect(engine.graph.existsEdge(globalFooVertex, a1)).toBe(false)
@@ -450,13 +450,13 @@ describe('Named expressions - evaluation', () => {
 
   it('removing local named expression binds all the edges to global one', () => {
     const engine = HyperFormula.buildFromArray([[]])
-    engine.addNamedExpression('foo', '10')
-    engine.addNamedExpression('foo', '20', 'Sheet1')
-    engine.setCellContents(adr('A1'), [['=foo']])
-    const localFooVertex = namedExpressionVertex(engine, 'foo', 0)
-    const globalFooVertex = namedExpressionVertex(engine, 'foo')
+    engine.addNamedExpression('fooo', '10')
+    engine.addNamedExpression('fooo', '20', 'Sheet1')
+    engine.setCellContents(adr('A1'), [['=fooo']])
+    const localFooVertex = namedExpressionVertex(engine, 'fooo', 0)
+    const globalFooVertex = namedExpressionVertex(engine, 'fooo')
 
-    engine.removeNamedExpression('foo', 'Sheet1')
+    engine.removeNamedExpression('fooo', 'Sheet1')
 
     const a1 = engine.dependencyGraph.fetchCell(adr('A1'))
     expect(engine.graph.existsEdge(localFooVertex, a1)).toBe(false)
@@ -466,13 +466,13 @@ describe('Named expressions - evaluation', () => {
 
   it('removing local named expression binds all the edges to global one even if it doesnt exist', () => {
     const engine = HyperFormula.buildFromArray([[]])
-    engine.addNamedExpression('foo', '20', 'Sheet1')
-    engine.setCellContents(adr('A1'), [['=foo']])
-    const localFooVertex = namedExpressionVertex(engine, 'foo', 0)
+    engine.addNamedExpression('fooo', '20', 'Sheet1')
+    engine.setCellContents(adr('A1'), [['=fooo']])
+    const localFooVertex = namedExpressionVertex(engine, 'fooo', 0)
 
-    engine.removeNamedExpression('foo', 'Sheet1')
+    engine.removeNamedExpression('fooo', 'Sheet1')
 
-    const globalFooVertex = namedExpressionVertex(engine, 'foo')
+    const globalFooVertex = namedExpressionVertex(engine, 'fooo')
     const a1 = engine.dependencyGraph.fetchCell(adr('A1'))
     expect(engine.graph.existsEdge(localFooVertex, a1)).toBe(false)
     expect(engine.graph.existsEdge(globalFooVertex, a1)).toBe(true)
@@ -481,13 +481,13 @@ describe('Named expressions - evaluation', () => {
 
   it('adding local named expression binds all the edges from global one', () => {
     const engine = HyperFormula.buildFromArray([[]])
-    engine.addNamedExpression('foo', '20')
-    engine.setCellContents(adr('A1'), [['=foo']])
-    const globalFooVertex = namedExpressionVertex(engine, 'foo')
+    engine.addNamedExpression('fooo', '20')
+    engine.setCellContents(adr('A1'), [['=fooo']])
+    const globalFooVertex = namedExpressionVertex(engine, 'fooo')
 
-    engine.addNamedExpression('foo', '30', 'Sheet1')
+    engine.addNamedExpression('fooo', '30', 'Sheet1')
 
-    const localFooVertex = namedExpressionVertex(engine, 'foo', 0)
+    const localFooVertex = namedExpressionVertex(engine, 'fooo', 0)
     const a1 = engine.dependencyGraph.fetchCell(adr('A1'))
     expect(engine.graph.existsEdge(localFooVertex, a1)).toBe(true)
     expect(engine.graph.existsEdge(globalFooVertex, a1)).toBe(false)

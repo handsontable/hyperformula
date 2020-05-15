@@ -111,13 +111,13 @@ describe('Parsing collecting dependencies', () => {
 
   it('works for named expression dependencies', () => {
     const parser = new ParserWithCaching(new Config(), new SheetMapping(buildTranslationPackage(enGB)).get)
-    const parseResult = parser.parse('=FOO+bar', adr('A1'))
+    const parseResult = parser.parse('=FOOO+baar', adr('A1'))
 
     const dependencies = absolutizeDependencies(parseResult.dependencies, adr('A1'))
 
     expect(dependencies).toEqual([
-      new NamedExpressionDependency('FOO'),
-      new NamedExpressionDependency('bar'),
+      new NamedExpressionDependency('FOOO'),
+      new NamedExpressionDependency('baar'),
     ])
   })
 })
