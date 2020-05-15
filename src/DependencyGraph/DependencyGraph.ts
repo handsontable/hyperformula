@@ -9,7 +9,6 @@ import {EmptyValue, InternalCellValue, simpleCellAddress, SimpleCellAddress} fro
 import {CellDependency} from '../CellDependency'
 import {ColumnsSpan} from '../ColumnsSpan'
 import {Config} from '../Config'
-import {findSmallerRange} from '../interpreter/plugin/SumprodPlugin'
 import {LazilyTransformingAstService} from '../LazilyTransformingAstService'
 import {Maybe} from '../Maybe'
 import {Ast, NamedExpressionDependency} from '../parser'
@@ -165,7 +164,7 @@ export class DependencyGraph {
           this.graph.markNodeAsInfiniteRange(rangeVertex)
         }
 
-        const {smallerRangeVertex, restRange} = findSmallerRange(this, range)
+        const {smallerRangeVertex, restRange} = this.rangeMapping.findSmallerRange(range)
         if (smallerRangeVertex) {
           this.graph.addEdge(smallerRangeVertex, rangeVertex)
         }
@@ -549,7 +548,8 @@ export class DependencyGraph {
     }
   }
 
-  public garbageCollection(): void {
+  public garbageCollection(): number {
+    let ret = 0
     const toBeRemoved: RangeVertex[] = []
     const candidates: Set<RangeVertex> = new Set()
     const count: Map<Vertex, number> = this.graph.getAllOutDegrees()
@@ -574,6 +574,7 @@ export class DependencyGraph {
               candidates.add(target)
             } else {
               this.graph.removeNode(target)
+              ret += 1
             }
           }
         }
@@ -585,9 +586,11 @@ export class DependencyGraph {
         this.graph.softRemoveEdge(target, vertex)
       })
       this.graph.removeNode(vertex)
+      ret += 1
 
       this.rangeMapping.removeRange(vertex)
     })
+    return ret
   }
 
   public* matrixFormulaNodes(): IterableIterator<MatrixVertex> {

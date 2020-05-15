@@ -9,7 +9,7 @@ import {SimpleCellAddress} from '../Cell'
 import {CellDependency} from '../CellDependency'
 import {LazilyTransformingAstService} from '../LazilyTransformingAstService'
 import {Ast, collectDependencies, NamedExpressionDependency} from '../parser'
-import {FormulaCellVertex, MatrixVertex, Vertex} from './'
+import {FormulaCellVertex, MatrixVertex, RangeVertex, Vertex} from './'
 import {AddressMapping} from './AddressMapping/AddressMapping'
 import {IGetDependenciesQuery} from './Graph'
 import {RangeMapping} from './RangeMapping'
@@ -36,6 +36,9 @@ export class GetDependenciesQuery implements IGetDependenciesQuery<Vertex> {
     } else if (vertex instanceof MatrixVertex && vertex.isFormula()) {
       address = vertex.getAddress()
       formula = vertex.getFormula()!
+//    } else if (vertex instanceof RangeVertex) {
+
+
     } else {
       return null
     }

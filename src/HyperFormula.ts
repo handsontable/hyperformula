@@ -2737,8 +2737,8 @@ export class HyperFormula implements TypedEmitter {
     return true
   }
 
-  public dependencyGarbageCollect(): void {
-    this.dependencyGraph.garbageCollection()
+  public dependencyGarbageCollect(): number {
+    return this.dependencyGraph.garbageCollection()
   }
 
   /**

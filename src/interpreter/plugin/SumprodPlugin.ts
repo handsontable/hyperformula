@@ -3,9 +3,7 @@
  * Copyright (c) 2020 Handsoncode. All rights reserved.
  */
 
-import {AbsoluteCellRange} from '../../AbsoluteCellRange'
-import {CellError, ErrorType, InternalCellValue, simpleCellAddress, SimpleCellAddress} from '../../Cell'
-import {DependencyGraph, RangeVertex} from '../../DependencyGraph'
+import {CellError, ErrorType, InternalCellValue, SimpleCellAddress} from '../../Cell'
 import {AstNodeType, ProcedureAst} from '../../parser'
 import {coerceToRange} from '../ArithmeticHelper'
 import {SimpleRangeValue} from '../InterpreterValue'
@@ -62,26 +60,3 @@ export class SumprodPlugin extends FunctionPlugin {
   }
 }
 
-/**
- * Finds smaller range does have own vertex.
- *
- * @param rangeMapping - range mapping dependency
- * @param ranges - ranges to find smaller range in
- */
-export const findSmallerRange = (dependencyGraph: DependencyGraph, range: AbsoluteCellRange): { smallerRangeVertex: RangeVertex | null, restRange: AbsoluteCellRange } => {
-  if (range.height() > 1 && Number.isFinite(range.height())) {
-    const valuesRangeEndRowLess = simpleCellAddress(range.end.sheet, range.end.col, range.end.row - 1)
-    const rowLessVertex = dependencyGraph.getRange(range.start, valuesRangeEndRowLess)
-    if (rowLessVertex !== undefined) {
-      const restRange = new AbsoluteCellRange(simpleCellAddress(range.start.sheet, range.start.col, range.end.row), range.end)
-      return {
-        smallerRangeVertex: rowLessVertex,
-        restRange,
-      }
-    }
-  }
-  return {
-    smallerRangeVertex: null,
-    restRange: range,
-  }
-}
