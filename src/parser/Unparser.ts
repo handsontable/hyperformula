@@ -53,6 +53,11 @@ export class Unparser {
         const rightPart = procedureName + '(' + args + imageWithWhitespace(')', ast.internalWhitespace)
         return imageWithWhitespace(rightPart, ast.leadingWhitespace)
       }
+      case AstNodeType.NAMED_EXPRESSION_RANGE: {
+        const startName = this.namedExpressions.nearestNamedExpression(ast.start.expressionName, address.sheet)?.displayName || ast.start.expressionName
+        const endName = this.namedExpressions.nearestNamedExpression(ast.end.expressionName, address.sheet)?.displayName || ast.end.expressionName
+        return imageWithWhitespace(`${startName}:${endName}`, ast.leadingWhitespace)
+      }
       case AstNodeType.NAMED_EXPRESSION: {
         const originalNamedExpressionName = this.namedExpressions.nearestNamedExpression(ast.expressionName, address.sheet)?.displayName
         return imageWithWhitespace(originalNamedExpressionName || ast.expressionName, ast.leadingWhitespace)

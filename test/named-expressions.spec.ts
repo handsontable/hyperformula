@@ -688,4 +688,40 @@ describe('Named expression - ranges', () => {
     expect(engine.getCellValue(adr('C2'))).toEqual(detailedError(ErrorType.NAME))
     expect(engine.getCellValue(adr('C3'))).toEqual(detailedError(ErrorType.NAME))
   })
+
+  it('named expression range - incompatibile expressions', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1', '2'],
+      ['3', '4'],
+    ])
+
+    engine.addNamedExpression('_expr1', '=Sheet1!$A$1:$A$1')
+    engine.addNamedExpression('_expr2', '=Sheet1!$A:$A')
+    engine.addNamedExpression('_expr3', '=TRUE()')
+    engine.setCellContents(adr('C1'), [['=SUM(_expr1:_expr2)']])
+    engine.setCellContents(adr('C2'), [['=SUM(_expr2:_expr3)']])
+    engine.setCellContents(adr('C3'), [['=SUM(_expr3:_expr1)']])
+
+    expect(engine.getCellValue(adr('C1'))).toEqual(detailedError(ErrorType.NAME))
+    expect(engine.getCellValue(adr('C2'))).toEqual(detailedError(ErrorType.NAME))
+    expect(engine.getCellValue(adr('C3'))).toEqual(detailedError(ErrorType.NAME))
+  })
+
+
+  it('should be possible to make column range from named expressions - basic crud', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1', '=D1', '3', '2'],
+      ['4', '=D2', '6', '5'],
+    ])
+
+    engine.addNamedExpression('fooo', '=Sheet1!$A:$A')
+    engine.addNamedExpression('baar', '=Sheet1!$C:$C')
+    engine.setCellContents(adr('E1'), [['=SUM(fooo:baar)']])
+
+    engine.setCellContents(adr('D1'), 5)
+
+
+    expect(engine.getCellValue(adr('E1'))).toEqual(26)
+  })
+
 })

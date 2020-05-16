@@ -5,6 +5,6 @@
 
 import {AbsoluteCellRange} from './AbsoluteCellRange'
 import {SimpleCellAddress} from './Cell'
-import {NamedExpressionDependency} from './parser/RelativeDependency'
+import {NamedExpressionDependency, NamedExpressionRangeDependency} from './parser/RelativeDependency'
 
-export type CellDependency = SimpleCellAddress | AbsoluteCellRange | NamedExpressionDependency
+export type CellDependency = SimpleCellAddress | AbsoluteCellRange | NamedExpressionDependency | NamedExpressionRangeDependency

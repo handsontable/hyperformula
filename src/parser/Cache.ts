@@ -62,6 +62,7 @@ export const doesContainFunctions = (ast: Ast, interestingFunctions: Set<string>
     case AstNodeType.COLUMN_RANGE:
     case AstNodeType.ROW_RANGE:
     case AstNodeType.NAMED_EXPRESSION:
+    case AstNodeType.NAMED_EXPRESSION_RANGE:
       return false
     case AstNodeType.PERCENT_OP:
     case AstNodeType.PLUS_UNARY_OP:

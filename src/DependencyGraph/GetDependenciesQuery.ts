@@ -14,6 +14,7 @@ import {AddressMapping} from './AddressMapping/AddressMapping'
 import {IGetDependenciesQuery} from './Graph'
 import {RangeMapping} from './RangeMapping'
 import {NamedExpressions} from '../NamedExpressions'
+import {NamedExpressionRangeDependency} from '../parser/RelativeDependency'
 
 export class GetDependenciesQuery implements IGetDependenciesQuery<Vertex> {
   constructor(
@@ -47,7 +48,11 @@ export class GetDependenciesQuery implements IGetDependenciesQuery<Vertex> {
       } else if (dep instanceof NamedExpressionDependency) {
         const namedExpression = this.namedExpressions.namedExpressionOrPlaceholder(dep.name, address.sheet)
         return this.addressMapping.fetchCell(namedExpression.address)
-      } else {
+      } else if (dep instanceof NamedExpressionRangeDependency) {
+        /* TODO */
+        const namedExpression = this.namedExpressions.namedExpressionOrPlaceholder(dep.start, address.sheet)
+        return this.addressMapping.fetchCell(namedExpression.address)
+      }else {
         return this.addressMapping.fetchCell(dep)
       }
     }))

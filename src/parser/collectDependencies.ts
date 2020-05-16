@@ -14,6 +14,7 @@ import {
   RelativeDependency,
   RowRangeDependency
 } from './'
+import {NamedExpressionRangeDependency} from './RelativeDependency'
 
 const collectDependenciesFn = (ast: Ast, functionsWhichDoesNotNeedArgumentsToBeComputed: Set<string>, dependenciesSet: RelativeDependency[]) => {
   switch (ast.type) {
@@ -27,8 +28,7 @@ const collectDependenciesFn = (ast: Ast, functionsWhichDoesNotNeedArgumentsToBeC
       return
     }
     case AstNodeType.NAMED_EXPRESSION_RANGE: {
-      dependenciesSet.push(new NamedExpressionDependency(ast.start.expressionName))
-      dependenciesSet.push(new NamedExpressionDependency(ast.end.expressionName))
+      dependenciesSet.push(new NamedExpressionRangeDependency(ast.start.expressionName, ast.end.expressionName))
       return
     }
     case AstNodeType.CELL_REFERENCE: {

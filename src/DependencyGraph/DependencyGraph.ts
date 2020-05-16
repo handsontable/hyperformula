@@ -34,6 +34,7 @@ import {MatrixMapping} from './MatrixMapping'
 import {RangeMapping} from './RangeMapping'
 import {SheetMapping} from './SheetMapping'
 import {ValueCellVertexValue} from './ValueCellVertex'
+import {NamedExpressionRangeDependency} from '../parser/RelativeDependency'
 
 export class DependencyGraph {
   /*
@@ -185,6 +186,8 @@ export class DependencyGraph {
         const sheetOfVertex = (endVertex as FormulaCellVertex).getAddress(this.lazilyTransformingAstService).sheet
         const namedExpressionVertex = this.fetchNamedExpressionVertex(dep.name, sheetOfVertex)
         this.graph.addEdge(namedExpressionVertex, endVertex)
+      } else if (dep instanceof NamedExpressionRangeDependency) {
+        console.log()
       } else {
         this.graph.addEdge(this.fetchCellOrCreateEmpty(dep), endVertex)
       }

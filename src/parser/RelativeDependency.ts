@@ -10,7 +10,7 @@ import {RowAddress} from './RowAddress'
 import {AbsoluteCellRange, AbsoluteColumnRange, AbsoluteRowRange} from '../AbsoluteCellRange'
 
 export type RangeDependency = CellRangeDependency | ColumnRangeDependency | RowRangeDependency
-export type RelativeDependency = AddressDependency | RangeDependency | NamedExpressionDependency
+export type RelativeDependency = AddressDependency | RangeDependency | NamedExpressionDependency | NamedExpressionRangeDependency
 
 export class AddressDependency {
   constructor(
@@ -76,3 +76,16 @@ export class NamedExpressionDependency {
     return this
   }
 }
+
+export class NamedExpressionRangeDependency {
+  constructor(
+    public readonly start: string,
+    public readonly end: string,
+  ) {
+  }
+
+  public absolutize(_baseAddress: SimpleCellAddress) {
+    return this
+  }
+}
+
