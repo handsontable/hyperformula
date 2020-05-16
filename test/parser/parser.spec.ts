@@ -637,9 +637,7 @@ describe('Column ranges', () => {
 
     expect(ast1.type).toEqual(AstNodeType.COLUMN_RANGE)
     expect(ast2.type).toEqual(AstNodeType.ERROR)
-    expect(ast3.type).toEqual(AstNodeType.ERROR_WITH_RAW_INPUT)
-    expect(ast3.rawInput).toEqual(`${columnIndexToLabel(maxColumns)}:B`)
-    expect(ast3.error).toEqual(new CellError(ErrorType.NAME))
+    expect(ast3.type).toEqual(AstNodeType.ERROR)
   })
 })
 

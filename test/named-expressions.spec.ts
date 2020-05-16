@@ -721,7 +721,7 @@ describe('Named expression - ranges', () => {
     engine.setCellContents(adr('D1'), 5)
 
 
-    expect(engine.getCellValue(adr('E1'))).toEqual(26)
+    expect(engine.getCellValue(adr('E1'))).toEqual(24)
   })
 
 })

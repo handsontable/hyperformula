@@ -12,7 +12,7 @@ import {Config} from '../Config'
 import {findSmallerRange} from '../interpreter/plugin/SumprodPlugin'
 import {LazilyTransformingAstService} from '../LazilyTransformingAstService'
 import {Maybe} from '../Maybe'
-import {Ast, NamedExpressionDependency} from '../parser'
+import {Ast, AstNodeType, CellRangeAst, NamedExpressionDependency} from '../parser'
 import {RowsSpan} from '../RowsSpan'
 import {Statistics, StatType} from '../statistics'
 import {NamedExpressions} from '../NamedExpressions'
@@ -35,6 +35,7 @@ import {RangeMapping} from './RangeMapping'
 import {SheetMapping} from './SheetMapping'
 import {ValueCellVertexValue} from './ValueCellVertex'
 import {NamedExpressionRangeDependency} from '../parser/RelativeDependency'
+import {ColumnRangeAst, RowRangeAst} from '../parser/Ast'
 
 export class DependencyGraph {
   /*
@@ -152,46 +153,78 @@ export class DependencyGraph {
   public processCellDependencies(cellDependencies: CellDependency[], endVertex: Vertex) {
     cellDependencies.forEach((dep: CellDependency) => {
       if (dep instanceof AbsoluteCellRange) {
-        const range = dep
-        let rangeVertex = this.rangeMapping.getRange(range.start, range.end)
-        if (rangeVertex === null) {
-          rangeVertex = new RangeVertex(range)
-          this.rangeMapping.setRange(rangeVertex)
-        }
-
-        this.graph.addNode(rangeVertex)
-        if (!range.isFinite()) {
-          this.graph.markNodeAsInfiniteRange(rangeVertex)
-        }
-
-        const {smallerRangeVertex, restRange} = findSmallerRange(this, range)
-        if (smallerRangeVertex) {
-          this.graph.addEdge(smallerRangeVertex, rangeVertex)
-        }
-
-        const matrix = this.matrixMapping.getMatrix(restRange)
-        if (matrix !== undefined) {
-          this.graph.addEdge(matrix, rangeVertex)
-        } else {
-          for (const cellFromRange of restRange.addresses(this)) {
-            this.graph.addEdge(this.fetchCellOrCreateEmpty(cellFromRange), rangeVertex)
-          }
-        }
-        this.graph.addEdge(rangeVertex, endVertex)
-
-        if (range.isFinite()) {
-          this.correctInfiniteRangesDependenciesByRangeVertex(rangeVertex)
+        this.processRangeDependency(dep, endVertex)
+      } else if (dep instanceof NamedExpressionRangeDependency) {
+        const maybeRange = this.absoluteCellRangeFromNamedRangeDependency(dep, endVertex)
+        if (maybeRange !== null) {
+          this.processRangeDependency(maybeRange, endVertex)
         }
       } else if (dep instanceof NamedExpressionDependency) {
         const sheetOfVertex = (endVertex as FormulaCellVertex).getAddress(this.lazilyTransformingAstService).sheet
         const namedExpressionVertex = this.fetchNamedExpressionVertex(dep.name, sheetOfVertex)
         this.graph.addEdge(namedExpressionVertex, endVertex)
-      } else if (dep instanceof NamedExpressionRangeDependency) {
-        console.log()
       } else {
         this.graph.addEdge(this.fetchCellOrCreateEmpty(dep), endVertex)
       }
     })
+  }
+
+  private processRangeDependency(dep: AbsoluteCellRange, endVertex: Vertex) {
+    const range = dep
+    let rangeVertex = this.rangeMapping.getRange(range.start, range.end)
+    if (rangeVertex === null) {
+      rangeVertex = new RangeVertex(range)
+      this.rangeMapping.setRange(rangeVertex)
+    }
+
+    this.graph.addNode(rangeVertex)
+    if (!range.isFinite()) {
+      this.graph.markNodeAsInfiniteRange(rangeVertex)
+    }
+
+    const {smallerRangeVertex, restRange} = findSmallerRange(this, range)
+    if (smallerRangeVertex) {
+      this.graph.addEdge(smallerRangeVertex, rangeVertex)
+    }
+
+    const matrix = this.matrixMapping.getMatrix(restRange)
+    if (matrix !== undefined) {
+      this.graph.addEdge(matrix, rangeVertex)
+    } else {
+      for (const cellFromRange of restRange.addresses(this)) {
+        this.graph.addEdge(this.fetchCellOrCreateEmpty(cellFromRange), rangeVertex)
+      }
+    }
+    this.graph.addEdge(rangeVertex, endVertex)
+
+    if (range.isFinite()) {
+      this.correctInfiniteRangesDependenciesByRangeVertex(rangeVertex)
+    }
+  }
+
+  private absoluteCellRangeFromNamedRangeDependency(dep: NamedExpressionRangeDependency, endVertex: Vertex): AbsoluteCellRange | null {
+    const address = (endVertex as FormulaCellVertex).getAddress(this.lazilyTransformingAstService)
+    const startExpressionVertex = this.fetchNamedExpressionRange(dep.start, address.sheet)
+    const endExpressionVertex = this.fetchNamedExpressionRange(dep.end, address.sheet)
+
+    if (startExpressionVertex !== null && endExpressionVertex !== null && startExpressionVertex.type === endExpressionVertex.type) {
+      const start = AbsoluteCellRange.fromAst(startExpressionVertex, address)
+      const end = AbsoluteCellRange.fromAst(endExpressionVertex, address)
+      return AbsoluteCellRange.fromRanges(start, end)
+    }
+
+    return null
+  }
+
+  private fetchNamedExpressionRange(expressionName: string, sheetId: number): CellRangeAst | ColumnRangeAst | RowRangeAst | null{
+    const vertex  = this.fetchNamedExpressionVertex(expressionName, sheetId)
+    if (vertex instanceof FormulaCellVertex) {
+      const formula = vertex.getFormula(this.lazilyTransformingAstService)
+      if (formula.type === AstNodeType.CELL_RANGE || formula.type === AstNodeType.COLUMN_RANGE || formula.type === AstNodeType.ROW_RANGE) {
+        return formula
+      }
+    }
+    return null
   }
 
   public fetchNamedExpressionVertex(expressionName: string, sheetId: number): CellVertex {

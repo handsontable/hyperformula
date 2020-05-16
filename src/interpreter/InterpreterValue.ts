@@ -163,8 +163,8 @@ export class SimpleRangeValue {
   public static maybeBiggerRange(start: SimpleRangeValue, end: SimpleRangeValue, dependencyGraph: DependencyGraph): SimpleRangeValue | CellError {
     if (start.data instanceof OnlyRangeData && end.data instanceof OnlyRangeData) {
       const range = AbsoluteCellRange.fromRanges(start.data.range(), end.data.range())
-      if (range instanceof CellError) {
-        return range
+      if (range === null) {
+        return new CellError(ErrorType.NAME)
       }
       return SimpleRangeValue.onlyRange(range, dependencyGraph)
     }

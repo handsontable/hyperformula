@@ -41,7 +41,7 @@ export class AbsoluteCellRange {
     )
   }
 
-  public static fromRanges(start: AbsoluteCellRange, end: AbsoluteCellRange): AbsoluteCellRange | CellError {
+  public static fromRanges(start: AbsoluteCellRange, end: AbsoluteCellRange): AbsoluteCellRange | null {
     if (start instanceof AbsoluteColumnRange && end instanceof AbsoluteColumnRange) {
       return new AbsoluteColumnRange(start.sheet, start.start.col, end.end.col)
     } else if (start instanceof AbsoluteRowRange && end instanceof AbsoluteRowRange) {
@@ -49,7 +49,7 @@ export class AbsoluteCellRange {
     } else if (start.isFinite() && end.isFinite()) {
       return new AbsoluteCellRange(start.start, end.end)
     } else {
-      return new CellError(ErrorType.NAME)
+      return null
     }
   }
 
