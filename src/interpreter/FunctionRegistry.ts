@@ -10,6 +10,7 @@ import {Config} from '../Config'
 import {FunctionPluginValidationError} from '../errors'
 import {TranslationSet} from '../i18n'
 import {HyperFormula} from '../HyperFormula'
+import { VersionPlugin } from './plugin/VersionPlugin'
 
 export type FunctionTranslationsPackage = Record<string, TranslationSet>
 
@@ -103,6 +104,8 @@ export class FunctionRegistry {
     } else {
       this.instancePlugins = new Map(FunctionRegistry.plugins)
     }
+
+    FunctionRegistry.loadPluginFunctions(VersionPlugin, this.instancePlugins)
 
     for (const [functionId, plugin] of this.instancePlugins.entries()) {
       this.categorizeFunction(functionId, plugin.implementedFunctions[functionId])

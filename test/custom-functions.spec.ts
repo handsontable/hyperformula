@@ -6,6 +6,7 @@ import {adr, detailedError, expectArrayWithSameContent, unregisterAllFormulas} f
 import {SumifPlugin} from '../src/interpreter/plugin/SumifPlugin'
 import {NumericAggregationPlugin} from '../src/interpreter/plugin/NumericAggregationPlugin'
 import {enGB, plPL} from '../src/i18n'
+import { VersionPlugin } from '../src/interpreter/plugin/VersionPlugin'
 
 class FooPlugin extends FunctionPlugin {
   public static implementedFunctions = {
@@ -182,7 +183,7 @@ describe('Instance level formula registry', () => {
   it('should return registered formula ids', () => {
     const engine = HyperFormula.buildFromArray([], {functionPlugins: [FooPlugin, SumWithExtra]})
 
-    expectArrayWithSameContent(engine.getRegisteredFunctionNames(), ['SUM', 'FOO', 'BAR'])
+    expectArrayWithSameContent(engine.getRegisteredFunctionNames(), ['SUM', 'FOO', 'BAR', 'VERSION'])
   })
 
   it('should create engine only with plugins passed to configuration', () => {
@@ -190,7 +191,7 @@ describe('Instance level formula registry', () => {
       ['=foo()', '=bar()', '=SUM(1, 2)']
     ], {functionPlugins: [FooPlugin]})
 
-    expectArrayWithSameContent(['FOO', 'BAR'], engine.getRegisteredFunctionNames())
+    expectArrayWithSameContent(['FOO', 'BAR', 'VERSION'], engine.getRegisteredFunctionNames())
     expect(engine.getCellValue(adr('A1'))).toEqual('foo')
     expect(engine.getCellValue(adr('B1'))).toEqual('bar')
     expect(engine.getCellValue(adr('C1'))).toEqual(detailedError(ErrorType.NAME))
@@ -213,7 +214,7 @@ describe('Instance level formula registry', () => {
   it('should return registered plugins', () => {
     const engine = HyperFormula.buildFromArray([], {functionPlugins: [SumifPlugin, NumericAggregationPlugin, SumWithExtra]})
 
-    expectArrayWithSameContent(engine.getAllFunctionPlugins(), [SumifPlugin, NumericAggregationPlugin, SumWithExtra])
+    expectArrayWithSameContent(engine.getAllFunctionPlugins(), [SumifPlugin, NumericAggregationPlugin, SumWithExtra, VersionPlugin])
   })
 
   it('should instantiate engine with additional plugin', () => {
@@ -223,7 +224,7 @@ describe('Instance level formula registry', () => {
 
     const registeredPlugins = new Set(engine.getAllFunctionPlugins())
 
-    expect(registeredPlugins.size).toEqual(HyperFormula.getAllFunctionPlugins().length + 1)
+    expect(registeredPlugins.size).toEqual(HyperFormula.getAllFunctionPlugins().length + 2)
     expect(registeredPlugins.has(FooPlugin)).toBe(true)
   })
 
@@ -237,7 +238,7 @@ describe('Instance level formula registry', () => {
     engine.updateConfig({functionPlugins: [FooPlugin]})
     registeredPlugins = new Set(engine.getAllFunctionPlugins())
     expect(registeredPlugins.has(FooPlugin)).toBe(true)
-    expect(registeredPlugins.size).toBe(1)
+    expect(registeredPlugins.size).toBe(2)
   })
 
   it('should return plugin for given functionId', () => {
