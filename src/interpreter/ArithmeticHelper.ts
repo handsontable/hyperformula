@@ -220,7 +220,9 @@ export function coerceEmptyToValue(arg: NoErrorCellValue): NoErrorCellValue {
  * @param arg
  */
 export function coerceScalarToBoolean(arg: InternalCellValue): boolean | CellError | null {
-  if (arg instanceof CellError || typeof arg === 'boolean') {
+  if (arg instanceof SimpleRangeValue) {
+    return new CellError(ErrorType.VALUE)
+  } else if (arg instanceof CellError || typeof arg === 'boolean') {
     return arg
   } else if (arg === EmptyValue) {
     return false
