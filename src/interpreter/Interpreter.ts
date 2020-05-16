@@ -197,6 +197,7 @@ export class Interpreter {
         }
       }
       case AstNodeType.NAMED_EXPRESSION_RANGE: {
+        /* TODO */
         const start = this.evaluateAst(ast.start, formulaAddress)
         const end = this.evaluateAst(ast.end, formulaAddress)
         if (start instanceof SimpleRangeValue && end instanceof SimpleRangeValue) {

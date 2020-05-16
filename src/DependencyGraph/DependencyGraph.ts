@@ -150,26 +150,34 @@ export class DependencyGraph {
     return new Set([...this.graph.specialNodesRecentlyChanged, ...this.volatileVertices()])
   }
 
-  public processCellDependencies(cellDependencies: CellDependency[], endVertex: Vertex) {
+  public processCellDependencies(cellDependencies: CellDependency[], dependentVertex: Vertex) {
     cellDependencies.forEach((dep: CellDependency) => {
       if (dep instanceof AbsoluteCellRange) {
-        this.processRangeDependency(dep, endVertex)
+        this.processRangeDependency(dep, dependentVertex)
       } else if (dep instanceof NamedExpressionRangeDependency) {
-        const maybeRange = this.absoluteCellRangeFromNamedRangeDependency(dep, endVertex)
+        const address = (dependentVertex as FormulaCellVertex).getAddress(this.lazilyTransformingAstService)
+        const startVertex = this.fetchNamedExpressionVertex(dep.start, address.sheet)
+        const endVertex = this.fetchNamedExpressionVertex(dep.end, address.sheet)
+        const maybeRange = this.absoluteCellRangeFromNamedRangeDependency(startVertex, endVertex, address)
         if (maybeRange !== null) {
           this.processRangeDependency(maybeRange, endVertex)
+        } else {
+          this.graph.markNodeAsWaitingForNamedExpression(endVertex, dep.start)
+          this.graph.markNodeAsWaitingForNamedExpression(endVertex, dep.end)
         }
+        this.graph.addEdge(startVertex, dependentVertex)
+        this.graph.addEdge(endVertex, dependentVertex)
       } else if (dep instanceof NamedExpressionDependency) {
-        const sheetOfVertex = (endVertex as FormulaCellVertex).getAddress(this.lazilyTransformingAstService).sheet
+        const sheetOfVertex = (dependentVertex as FormulaCellVertex).getAddress(this.lazilyTransformingAstService).sheet
         const namedExpressionVertex = this.fetchNamedExpressionVertex(dep.name, sheetOfVertex)
-        this.graph.addEdge(namedExpressionVertex, endVertex)
+        this.graph.addEdge(namedExpressionVertex, dependentVertex)
       } else {
-        this.graph.addEdge(this.fetchCellOrCreateEmpty(dep), endVertex)
+        this.graph.addEdge(this.fetchCellOrCreateEmpty(dep), dependentVertex)
       }
     })
   }
 
-  private processRangeDependency(dep: AbsoluteCellRange, endVertex: Vertex) {
+  private processRangeDependency(dep: AbsoluteCellRange, endVertex: Vertex): RangeVertex {
     const range = dep
     let rangeVertex = this.rangeMapping.getRange(range.start, range.end)
     if (rangeVertex === null) {
@@ -200,12 +208,13 @@ export class DependencyGraph {
     if (range.isFinite()) {
       this.correctInfiniteRangesDependenciesByRangeVertex(rangeVertex)
     }
+
+    return rangeVertex
   }
 
-  private absoluteCellRangeFromNamedRangeDependency(dep: NamedExpressionRangeDependency, endVertex: Vertex): AbsoluteCellRange | null {
-    const address = (endVertex as FormulaCellVertex).getAddress(this.lazilyTransformingAstService)
-    const startExpressionVertex = this.fetchNamedExpressionRange(dep.start, address.sheet)
-    const endExpressionVertex = this.fetchNamedExpressionRange(dep.end, address.sheet)
+  private absoluteCellRangeFromNamedRangeDependency(start: CellVertex, end: CellVertex, address: SimpleCellAddress): AbsoluteCellRange | null {
+    const startExpressionVertex = this.fetchNamedExpressionRange(start)
+    const endExpressionVertex = this.fetchNamedExpressionRange(end)
 
     if (startExpressionVertex !== null && endExpressionVertex !== null && startExpressionVertex.type === endExpressionVertex.type) {
       const start = AbsoluteCellRange.fromAst(startExpressionVertex, address)
@@ -216,8 +225,7 @@ export class DependencyGraph {
     return null
   }
 
-  private fetchNamedExpressionRange(expressionName: string, sheetId: number): CellRangeAst | ColumnRangeAst | RowRangeAst | null{
-    const vertex  = this.fetchNamedExpressionVertex(expressionName, sheetId)
+  private fetchNamedExpressionRange(vertex: CellVertex): CellRangeAst | ColumnRangeAst | RowRangeAst | null{
     if (vertex instanceof FormulaCellVertex) {
       const formula = vertex.getFormula(this.lazilyTransformingAstService)
       if (formula.type === AstNodeType.CELL_RANGE || formula.type === AstNodeType.COLUMN_RANGE || formula.type === AstNodeType.ROW_RANGE) {
