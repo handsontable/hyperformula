@@ -253,3 +253,12 @@ export class FunctionPluginValidationError extends Error {
     return new FunctionPluginValidationError(`Formula method ${functionName} not found in plugin ${pluginName}`)
   }
 }
+
+/**
+ * Error thrown when there is matrix inside.
+ */
+export class IsPartOfMatrixError extends Error {
+  constructor() {
+    super('Cannot perform this operation, there is a matrix inside.')
+  }
+}

@@ -22,7 +22,8 @@ import {
   NotAFormulaError,
   NothingToPasteError,
   SheetSizeLimitExceededError,
-  SheetAlreadyExistsError
+  SheetAlreadyExistsError,
+  IsPartOfMatrixError
 } from './errors'
 import * as plugins from './interpreter/plugin'
 
@@ -44,6 +45,7 @@ class HyperFormulaNS extends HyperFormula {
   public static ExportedNamedExpressionChange = ExportedNamedExpressionChange
   public static EvaluationSuspendedError = EvaluationSuspendedError
   public static NotAFormulaError = NotAFormulaError
+  public static IsPartOfMatrixError = IsPartOfMatrixError
   public static ErrorType = ErrorType
   public static CellError = CellError
   public static InvalidArgumentsError = InvalidArgumentsError
@@ -86,4 +88,5 @@ export {
   FunctionPluginValidationError,
   ErrorType,
   SheetAlreadyExistsError,
+  IsPartOfMatrixError
 }

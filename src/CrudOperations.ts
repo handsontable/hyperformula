@@ -28,7 +28,8 @@ import {
   NoSheetWithNameError,
   NothingToPasteError,
   SheetSizeLimitExceededError,
-  SheetAlreadyExistsError
+  SheetAlreadyExistsError,
+  IsPartOfMatrixError
 } from './errors'
 import {Index} from './HyperFormula'
 import {LazilyTransformingAstService} from './LazilyTransformingAstService'
@@ -390,7 +391,7 @@ export class CrudOperations {
         && this.dependencyGraph.matrixMapping.isFormulaMatrixInRow(sheet, row - 1)
         && this.dependencyGraph.matrixMapping.isFormulaMatrixInRow(sheet, row)
       ) {
-        throw Error('It is not possible to add row in row with matrix')
+        throw new IsPartOfMatrixError()
       }
     }
   }
@@ -411,7 +412,7 @@ export class CrudOperations {
       }
 
       if (this.dependencyGraph.matrixMapping.isFormulaMatrixInRows(rowsToRemove)) {
-        throw Error('It is not possible to remove row with matrix')
+        throw new IsPartOfMatrixError()
       }
     }
   }
@@ -436,7 +437,7 @@ export class CrudOperations {
         && this.dependencyGraph.matrixMapping.isFormulaMatrixInColumn(sheet, column - 1)
         && this.dependencyGraph.matrixMapping.isFormulaMatrixInColumn(sheet, column)
       ) {
-        throw Error('It is not possible to add column in column with matrix')
+        throw new IsPartOfMatrixError()
       }
     }
   }
@@ -458,7 +459,7 @@ export class CrudOperations {
       }
 
       if (this.dependencyGraph.matrixMapping.isFormulaMatrixInColumns(columnsToRemove)) {
-        throw Error('It is not possible to remove column within matrix')
+        throw new IsPartOfMatrixError()
       }
     }
   }
@@ -483,7 +484,7 @@ export class CrudOperations {
     const sourceRange = AbsoluteCellRange.spanFrom(sourceStart, width, numberOfRows)
 
     if (this.dependencyGraph.matrixMapping.isFormulaMatrixInRange(sourceRange)) {
-      throw new Error('It is not possible to move matrix')
+      throw new IsPartOfMatrixError()
     }
   }
 
@@ -507,7 +508,7 @@ export class CrudOperations {
     const sourceRange = AbsoluteCellRange.spanFrom(sourceStart, numberOfColumns, sheetHeight)
 
     if (this.dependencyGraph.matrixMapping.isFormulaMatrixInRange(sourceRange)) {
-      throw new Error('It is not possible to move matrix')
+      throw new IsPartOfMatrixError()
     }
   }
 
@@ -526,7 +527,7 @@ export class CrudOperations {
     }
 
     if (this.dependencyGraph.matrixMapping.isFormulaMatrixAtAddress(address)) {
-      throw Error('It is not possible to change part of a matrix')
+      throw new IsPartOfMatrixError()
     }
   }
 
