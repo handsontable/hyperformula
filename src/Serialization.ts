@@ -3,13 +3,14 @@
  * Copyright (c) 2020 Handsoncode. All rights reserved.
  */
 
-import {NoErrorCellValue, simpleCellAddress, SimpleCellAddress} from './Cell'
+import {NoErrorCellValue, NoErrorScalarValue, simpleCellAddress, SimpleCellAddress} from './Cell'
 import {CellValue, DetailedCellError, Exporter} from './CellValue'
 import {Config} from './Config'
 import {DependencyGraph, FormulaCellVertex, MatrixVertex, ParsingErrorVertex} from './DependencyGraph'
 import {Maybe} from './Maybe'
 import {buildLexerConfig, Unparser} from './parser'
 import {NamedExpressions} from './NamedExpressions'
+import {SimpleRangeValue} from './interpreter/InterpreterValue'
 
 export class Serialization {
   constructor(
@@ -36,7 +37,7 @@ export class Serialization {
     return undefined
   }
 
-  public getCellSerialized(address: SimpleCellAddress): NoErrorCellValue {
+  public getCellSerialized(address: SimpleCellAddress): NoErrorScalarValue {
     const formula: Maybe<string> = this.getCellFormula(address)
     if (formula !== undefined) {
       return formula
@@ -44,6 +45,9 @@ export class Serialization {
       const value: CellValue = this.getCellValue(address)
       if (value instanceof DetailedCellError) {
         return this.config.translationPackage.getErrorTranslation(value.error.type)
+      } else if (value instanceof SimpleRangeValue) {
+        /* TODO */
+        throw Error("Shouldn't happen")
       } else {
         return value
       }
@@ -87,7 +91,7 @@ export class Serialization {
     return result
   }
 
-  public getSheetSerialized(sheet: number): NoErrorCellValue[][] {
+  public getSheetSerialized(sheet: number): NoErrorScalarValue[][] {
     return this.genericSheetGetter(sheet, (arg) => this.getCellSerialized(arg))
   }
 
@@ -99,7 +103,7 @@ export class Serialization {
     return this.genericAllSheetsGetter((arg) => this.getSheetFormulas(arg))
   }
 
-  public getAllSheetsSerialized(): Record<string, NoErrorCellValue[][]> {
+  public getAllSheetsSerialized(): Record<string, NoErrorScalarValue[][]> {
     return this.genericAllSheetsGetter((arg) => this.getSheetSerialized(arg))
   }
 

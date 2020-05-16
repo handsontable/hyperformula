@@ -4,7 +4,15 @@
  */
 
 import {AbsoluteCellRange} from './AbsoluteCellRange'
-import {CellType, CellValueType, getCellType, getCellValueType, NoErrorCellValue, SimpleCellAddress} from './Cell'
+import {
+  CellType,
+  CellValueType,
+  getCellType,
+  getCellValueType,
+  NoErrorCellValue,
+  NoErrorScalarValue,
+  SimpleCellAddress
+} from './Cell'
 import {CellContent, CellContentParser, RawCellContent} from './CellContentParser'
 import {CellValue, ExportedChange, Exporter} from './CellValue'
 import {ColumnSearchStrategy} from './ColumnSearch/ColumnSearchStrategy'
@@ -656,7 +664,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * @category Sheet
    */
-  public getAllSheetsSerialized(): Record<string, NoErrorCellValue[][]> {
+  public getAllSheetsSerialized(): Record<string, NoErrorScalarValue[][]> {
     this.ensureEvaluationIsNotSuspended()
     return this._serialization.getAllSheetsSerialized()
   }
@@ -685,8 +693,6 @@ export class HyperFormula implements TypedEmitter {
     const configNewLanguage = this._config.mergeConfig({language: newParams.language})
     const serializedSheets = this._serialization.withNewConfig(configNewLanguage, this._namedExpressions).getAllSheetsSerialized()
 
-    /* TODO */
-    // @ts-ignore
     const newEngine = BuildEngineFactory.rebuildWithConfig(newConfig, serializedSheets, this._stats)
 
     this._config = newEngine.config
