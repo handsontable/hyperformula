@@ -10,6 +10,8 @@ import {EmptyCellVertex, FormulaCellVertex, MatrixVertex, RangeVertex, ValueCell
  */
 export type CellVertex = FormulaCellVertex | ValueCellVertex | EmptyCellVertex | MatrixVertex | ParsingErrorVertex
 
+export type VertexWithFormula = FormulaCellVertex | MatrixVertex
+
 /**
  * Represents any vertex
  */

@@ -6,6 +6,7 @@
 import {simpleCellAddress, SimpleCellAddress} from './Cell'
 import {Maybe} from './Maybe'
 import {NamedExpressionNameIsAlreadyTaken, NamedExpressionNameIsInvalid} from './errors'
+import {VertexWithFormula} from './DependencyGraph'
 
 export class NamedExpression {
   constructor(
@@ -102,6 +103,8 @@ export class NamedExpressions {
   public readonly workbookStore: WorkbookStore = new WorkbookStore()
   public readonly worksheetStores: Map<number, WorksheetStore> = new Map()
   public readonly addressCache: Map<number, NamedExpression> = new Map()
+
+  public nodesWaitingForNamedExpressions: Map<string, Set<VertexWithFormula>> = new Map()
 
   constructor(
   ) {
@@ -227,5 +230,24 @@ export class NamedExpressions {
 
   private nextAddress() {
     return simpleCellAddress(NamedExpressions.SHEET_FOR_WORKBOOK_EXPRESSIONS, 0, this.nextNamedExpressionRow++)
+  }
+
+  public markNodeAsWaitingForNamedExpression(node: VertexWithFormula, expression: string) {
+    const expressionNodes = this.nodesWaitingForNamedExpressions.get(expression) || new Set()
+    expressionNodes.add(node)
+    this.nodesWaitingForNamedExpressions.set(expression, expressionNodes)
+  }
+
+  public processNodesWaitingForNamedExpression(expression: string, process: (vertex: VertexWithFormula) => boolean) {
+    const entries = this.nodesWaitingForNamedExpressions.get(expression)
+    if (entries === undefined) {
+      return
+    }
+    for (const vertex of entries) {
+      const remove = process(vertex)
+      if (remove) {
+        entries.delete(vertex)
+      }
+    }
   }
 }

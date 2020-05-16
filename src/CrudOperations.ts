@@ -20,7 +20,7 @@ import {
   SparseStrategy,
   FormulaCellVertex,
   MatrixVertex,
-  Vertex, CellVertex, EmptyCellVertex, ValueCellVertex
+  Vertex, CellVertex, EmptyCellVertex, ValueCellVertex, VertexWithFormula
 } from './DependencyGraph'
 import {NamedExpressions, NamedExpression} from './NamedExpressions'
 import {Maybe} from './Maybe'
@@ -373,7 +373,7 @@ export class CrudOperations {
     if (!this.namedExpressions.isNameValid(expressionName)) {
       throw new NamedExpressionNameIsInvalid(expressionName)
     }
-    let sheetId = undefined
+    let sheetId: number | undefined = undefined
     if (sheetScope !== undefined) {
       this.ensureSheetExists(sheetScope)
       sheetId = this.sheetMapping.fetch(sheetScope)
@@ -383,9 +383,9 @@ export class CrudOperations {
     }
 
     const namedExpression = this.namedExpressions.addNamedExpression(expressionName, sheetId)
-    this.storeExpressionInCell(namedExpression.address, expression)
+    const namedExpressionVertex = this.storeExpressionInCell(namedExpression.address, expression)
+
     if (sheetId !== undefined) {
-      const localVertex = this.dependencyGraph.fetchCellOrCreateEmpty(namedExpression.address)
       const globalNamedExpression = this.namedExpressions.workbookNamedExpressionOrPlaceholder(expressionName)
       const globalVertex = this.dependencyGraph.fetchCellOrCreateEmpty(globalNamedExpression.address)
       for (const adjacentNode of this.dependencyGraph.graph.adjacentNodes(globalVertex)) {
@@ -397,13 +397,22 @@ export class CrudOperations {
             for (const dependency of absolutizeDependencies(dependencies, formulaAddress)) {
               if (dependency instanceof NamedExpressionDependency && dependency.name.toLowerCase() === namedExpression.displayName.toLowerCase()) {
                 this.dependencyGraph.graph.removeEdge(globalVertex, adjacentNode)
-                this.dependencyGraph.graph.addEdge(localVertex, adjacentNode)
+                this.dependencyGraph.graph.addEdge(namedExpressionVertex, adjacentNode)
               }
             }
           }
         }
       }
     }
+
+    this.namedExpressions.processNodesWaitingForNamedExpression(expressionName, (vertex: VertexWithFormula) => {
+        const vertexAddress = vertex.getAddress(this.lazilyTransformingAstService)
+        if (sheetId === undefined || vertexAddress.sheet === sheetId) {
+          this.dependencyGraph.graph.addEdge(namedExpressionVertex, vertex)
+          return true
+        }
+        return false
+    })
   }
 
   public changeNamedExpressionExpression(expressionName: string, sheetScope: string | undefined, newExpression: RawCellContent) {
@@ -650,7 +659,7 @@ export class CrudOperations {
     this.dependencyGraph.addressMapping.addSheet(-1, new SparseStrategy(0, 0))
   }
 
-  private storeExpressionInCell(address: SimpleCellAddress, expression: RawCellContent) {
+  private storeExpressionInCell(address: SimpleCellAddress, expression: RawCellContent): CellVertex {
     const parsedCellContent = this.cellContentParser.parse(expression)
     if (parsedCellContent instanceof CellContent.MatrixFormula) {
       throw new Error('Matrix formulas are not supported')
@@ -663,6 +672,7 @@ export class CrudOperations {
     } else {
       this.operations.setValueToCell(parsedCellContent.value, address)
     }
+    return this.dependencyGraph.fetchCellOrCreateEmpty(address)
   }
 }
 

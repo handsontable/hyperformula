@@ -27,7 +27,6 @@ export class Graph<T> {
   public specialNodesStructuralChanges: Set<T> = new Set()
   public specialNodesRecentlyChanged: Set<T> = new Set()
   public infiniteRanges: Set<T> = new Set()
-  public nodesWaitingForNamedExpressions: Map<string, T> = new Map()
 
   /** Nodes adjacency mapping. */
   private edges: Map<T, Set<T>> = new Map()
@@ -156,10 +155,6 @@ export class Graph<T> {
     this.specialNodesStructuralChanges.delete(node)
     this.infiniteRanges.delete(node)
     this.removeDependencies(node)
-  }
-
-  public markNodeAsWaitingForNamedExpression(node: T, expression: string) {
-    this.nodesWaitingForNamedExpressions.set(expression, node)
   }
 
   public markNodeAsSpecial(node: T) {

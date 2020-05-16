@@ -161,9 +161,9 @@ export class DependencyGraph {
         const maybeRange = this.absoluteCellRangeFromNamedRangeDependency(startVertex, endVertex, address)
         if (maybeRange !== null) {
           this.processRangeDependency(maybeRange, endVertex)
-        } else {
-          this.graph.markNodeAsWaitingForNamedExpression(endVertex, dep.start)
-          this.graph.markNodeAsWaitingForNamedExpression(endVertex, dep.end)
+        } else if (dependentVertex instanceof FormulaCellVertex || dependentVertex instanceof MatrixVertex) {
+          this.namedExpressions.markNodeAsWaitingForNamedExpression(dependentVertex, dep.start)
+          this.namedExpressions.markNodeAsWaitingForNamedExpression(dependentVertex, dep.end)
         }
         this.graph.addEdge(startVertex, dependentVertex)
         this.graph.addEdge(endVertex, dependentVertex)
