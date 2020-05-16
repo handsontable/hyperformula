@@ -126,12 +126,17 @@ export class DependencyGraph {
     this.ensureThatVertexIsNonMatrixCellVertex(vertex)
 
     if (this.graph.adjacentNodes(vertex).size > 0) {
-      const emptyVertex = new EmptyCellVertex()
+      const emptyVertex = new EmptyCellVertex(address)
       this.exchangeGraphNode(vertex, emptyVertex)
-      this.graph.markNodeAsSpecialRecentlyChanged(emptyVertex)
-      this.addressMapping.setCell(address, emptyVertex)
+      if(this.graph.adjacentNodesCount(emptyVertex)===0) {
+        this.removeGraphNode(emptyVertex)
+        this.addressMapping.removeCell(address)
+      } else {
+        this.graph.markNodeAsSpecialRecentlyChanged(emptyVertex)
+        this.addressMapping.setCell(address, emptyVertex)
+      }
     } else {
-      this.graph.removeNode(vertex)
+      this.removeGraphNode(vertex)
       this.addressMapping.removeCell(address)
     }
   }
@@ -231,7 +236,7 @@ export class DependencyGraph {
   public fetchCellOrCreateEmpty(address: SimpleCellAddress): CellVertex {
     let vertex = this.addressMapping.getCell(address)
     if (!vertex) {
-      vertex = new EmptyCellVertex()
+      vertex = new EmptyCellVertex(address)
       this.graph.addNode(vertex)
       this.addressMapping.setCell(address, vertex)
     }
@@ -772,10 +777,13 @@ export class DependencyGraph {
 
   public exchangeGraphNode(oldNode: Vertex, newNode: Vertex) {
     this.graph.addNode(newNode)
-    this.graph.adjacentNodes(oldNode).forEach((adjacentNode) => {
-      this.graph.addEdge(newNode, adjacentNode)
-    })
+    const adjNodesStored = this.graph.adjacentNodes(oldNode)
     this.removeGraphNode(oldNode)
+    adjNodesStored.forEach((adjacentNode) => {
+      if(this.graph.hasNode(adjacentNode)) {
+        this.graph.addEdge(newNode, adjacentNode)
+      }
+    })
   }
 
   public exchangeOrAddGraphNode(oldNode: Vertex | null, newNode: Vertex) {
@@ -788,15 +796,20 @@ export class DependencyGraph {
 
   public removeGraphNode(node: Vertex) {
     const candidates = this.graph.removeNode(node)
+    if(node instanceof RangeVertex) {
+      this.rangeMapping.removeRange(node)
+    }
     while(candidates.size > 0) {
       const vertex: Vertex = candidates.values().next().value
       candidates.delete(vertex)
-      if(this.graph.adjacentNodesCount(vertex) === 0) {
+      if(this.graph.hasNode(vertex) && this.graph.adjacentNodesCount(vertex) === 0) {
         if(vertex instanceof RangeVertex || vertex instanceof EmptyCellVertex) {
           this.graph.removeNode(vertex).forEach((candidate) => candidates.add(candidate))
         }
         if(vertex instanceof RangeVertex) {
           this.rangeMapping.removeRange(vertex)
+        } else if(vertex instanceof EmptyCellVertex) {
+          this.addressMapping.removeCell(vertex.address)
         }
       }
     }

@@ -9,7 +9,7 @@ import {simpleCellAddress, SimpleCellAddress} from '../Cell'
 import {CellDependency} from '../CellDependency'
 import {LazilyTransformingAstService} from '../LazilyTransformingAstService'
 import {Ast, collectDependencies, NamedExpressionDependency} from '../parser'
-import {FormulaCellVertex, MatrixVertex, RangeVertex, Vertex} from './'
+import {EmptyCellVertex, FormulaCellVertex, MatrixVertex, RangeVertex, Vertex} from './'
 import {AddressMapping} from './AddressMapping/AddressMapping'
 import {IGetDependenciesQuery} from './Graph'
 import {RangeMapping} from './RangeMapping'
@@ -43,14 +43,26 @@ export class GetDependenciesQuery implements IGetDependenciesQuery<Vertex> {
         const endVertex = vertex.range.end
         const startVertex = simpleCellAddress(vertex.range.start.sheet, vertex.range.start.col, endVertex.row)
         const range = new AbsoluteCellRange(startVertex, endVertex)
-        const allAdresses: Vertex[] = range.flatArrayOfAddressesInRange().map((address) => this.addressMapping.fetchCell(address))
-        const allDeps = new Set(allAdresses)
+        const allAddresses: Vertex[] = range.flatArrayOfAddressesInRange().map((address) => {
+          const cell = this.addressMapping.fetchCell(address)
+          if(cell instanceof EmptyCellVertex) {
+            cell.address = address
+          }
+          return cell
+        })
+        const allDeps = new Set(allAddresses)
         allDeps.add(smallerRangeVertex)
         return allDeps
       } else {
         const range = vertex.range
-        const allAdresses: Vertex[] = range.flatArrayOfAddressesInRange().map((address) => this.addressMapping.fetchCell(address))
-        return new Set(allAdresses)
+        const allAddresses: Vertex[] = range.flatArrayOfAddressesInRange().map((address) => {
+          const cell = this.addressMapping.fetchCell(address)
+          if(cell instanceof EmptyCellVertex) {
+            cell.address = address
+          }
+          return cell
+        })
+        return new Set(allAddresses)
       }
     } else {
       return null

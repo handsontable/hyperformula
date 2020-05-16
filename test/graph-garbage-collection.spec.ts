@@ -56,9 +56,9 @@ function randomInteger(min: number, max: number) {
 describe('larger tests', () => {
   it('repeat the same crud', () => {
     const engine = HyperFormula.buildFromArray([])
-    for(let tmp = 0; tmp < 1; tmp++) {
-      for (let x = 0; x < 3; x++) {
-        for (let y = 0; y < 3; y++) {
+    for(let tmp = 0; tmp < 2; tmp++) {
+      for (let x = 0; x < 10; x++) {
+        for (let y = 0; y < 10; y++) {
           const col1 = randomInteger(2, 7)
           const row1 = randomInteger(2, 7)
           const col2 = col1 + randomInteger(-2, 2)
