@@ -13,8 +13,8 @@ import {FunctionPlugin} from './FunctionPlugin'
 
 export class SumprodPlugin extends FunctionPlugin {
   public static implementedFunctions = {
-    sumprod: {
-      translationKey: 'SUMPRODUCT',
+    'SUMPRODUCT': {
+      method: 'sumprod',
     },
   }
 
@@ -72,7 +72,7 @@ export const findSmallerRange = (dependencyGraph: DependencyGraph, range: Absolu
   if (range.height() > 1 && Number.isFinite(range.height())) {
     const valuesRangeEndRowLess = simpleCellAddress(range.end.sheet, range.end.col, range.end.row - 1)
     const rowLessVertex = dependencyGraph.getRange(range.start, valuesRangeEndRowLess)
-    if (rowLessVertex) {
+    if (rowLessVertex !== undefined) {
       const restRange = new AbsoluteCellRange(simpleCellAddress(range.start.sheet, range.start.col, range.end.row), range.end)
       return {
         smallerRangeVertex: rowLessVertex,

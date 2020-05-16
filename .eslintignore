@@ -3,7 +3,7 @@ node_modules
 
 # Configurations
 *.config.js
-karma.*.js
+karma.*
 doc
 
 # Aut-generated directiories
@@ -16,6 +16,5 @@ lib
 script
 test-jasmine
 test-jest
-typedoc
 typings
 test/_setupFiles/*.js

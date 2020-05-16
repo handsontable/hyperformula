@@ -1,16 +1,17 @@
-import {HyperFormula} from '../src'
-import {ErrorType} from '../src'
-import {FunctionPlugin, PluginFunctionType} from '../src/interpreter/plugin/FunctionPlugin'
+import {ErrorType, HyperFormula} from '../src'
+import {FunctionPlugin} from '../src/interpreter/plugin/FunctionPlugin'
 import {adr, detailedError} from './testUtils'
+import {ProcedureAst} from '../src/parser'
+import {SimpleCellAddress} from '../src/Cell'
 
 class FooPlugin extends FunctionPlugin {
   public static implementedFunctions = {
-    foo: {
-      translationKey: 'FOO',
+    'FOO': {
+      method: 'foo',
     },
   }
 
-  public foo: PluginFunctionType = () => {
+  public foo(_ast: ProcedureAst, _formulaAddress: SimpleCellAddress) {
     return 42
   }
 }

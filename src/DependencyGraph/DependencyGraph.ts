@@ -36,6 +36,7 @@ import {SheetMapping} from './SheetMapping'
 import {ValueCellVertexValue} from './ValueCellVertex'
 import {NamedExpressionRangeDependency} from '../parser/RelativeDependency'
 import {ColumnRangeAst, RowRangeAst} from '../parser/Ast'
+import {FunctionRegistry} from '../interpreter/FunctionRegistry'
 
 export class DependencyGraph {
   /*
@@ -43,18 +44,18 @@ export class DependencyGraph {
    * - empty cell has associated EmptyCellVertex if and only if it is a dependency (possibly indirect, through range) to some formula
    */
 
-  public static buildEmpty(lazilyTransformingAstService: LazilyTransformingAstService, config: Config, stats: Statistics, namedExpressions: NamedExpressions) {
+  public static buildEmpty(lazilyTransformingAstService: LazilyTransformingAstService, config: Config, functionRegistry: FunctionRegistry, namedExpressions: NamedExpressions, stats: Statistics) {
     const addressMapping = new AddressMapping(config.chooseAddressMappingPolicy)
     const rangeMapping = new RangeMapping()
     return new DependencyGraph(
       addressMapping,
       rangeMapping,
-      new Graph<Vertex>(new GetDependenciesQuery(rangeMapping, addressMapping, lazilyTransformingAstService, config.functionsWhichDoesNotNeedArgumentsToBeComputed(), namedExpressions)),
+      new Graph<Vertex>(new GetDependenciesQuery(rangeMapping, addressMapping, lazilyTransformingAstService, functionRegistry, namedExpressions)),
       new SheetMapping(config.translationPackage),
       new MatrixMapping(),
       stats,
       lazilyTransformingAstService,
-      config.functionsWhichDoesNotNeedArgumentsToBeComputed(),
+      functionRegistry,
       namedExpressions
     )
   }
@@ -67,7 +68,7 @@ export class DependencyGraph {
     public readonly matrixMapping: MatrixMapping,
     public readonly stats: Statistics,
     public readonly lazilyTransformingAstService: LazilyTransformingAstService,
-    public readonly functionsWhichDoesNotNeedArgumentsToBeComputed: Set<string>,
+    public readonly functionRegistry: FunctionRegistry,
     public readonly namedExpressions: NamedExpressions,
   ) {
   }
@@ -179,8 +180,8 @@ export class DependencyGraph {
 
   private processRangeDependency(dep: AbsoluteCellRange, endVertex: Vertex): RangeVertex {
     const range = dep
-    let rangeVertex = this.rangeMapping.getRange(range.start, range.end)
-    if (rangeVertex === null) {
+    let rangeVertex = this.getRange(range.start, range.end)
+    if (rangeVertex === undefined) {
       rangeVertex = new RangeVertex(range)
       this.rangeMapping.setRange(rangeVertex)
     }
@@ -529,7 +530,7 @@ export class DependencyGraph {
     }
 
     for (const adjacentNode of adjacentNodes.values()) {
-      const nodeDependencies = collectAddressesDependentToMatrix(this.functionsWhichDoesNotNeedArgumentsToBeComputed, adjacentNode, matrixVertex, this.lazilyTransformingAstService, this)
+      const nodeDependencies = collectAddressesDependentToMatrix(this.functionRegistry, adjacentNode, matrixVertex, this.lazilyTransformingAstService, this)
       for (const address of nodeDependencies) {
         const vertex = this.fetchCell(address)
         this.graph.addEdge(vertex, adjacentNode)
@@ -549,7 +550,7 @@ export class DependencyGraph {
     }
 
     for (const adjacentNode of adjacentNodes.values()) {
-      const nodeDependencies = collectAddressesDependentToMatrix(this.functionsWhichDoesNotNeedArgumentsToBeComputed, adjacentNode, matrixVertex, this.lazilyTransformingAstService, this)
+      const nodeDependencies = collectAddressesDependentToMatrix(this.functionRegistry, adjacentNode, matrixVertex, this.lazilyTransformingAstService, this)
       for (const address of nodeDependencies) {
         const vertex = this.fetchCellOrCreateEmpty(address)
         this.graph.addEdge(vertex, adjacentNode)
@@ -655,7 +656,7 @@ export class DependencyGraph {
     this.matrixMapping.setMatrix(range, vertex)
   }
 
-  public getRange(start: SimpleCellAddress, end: SimpleCellAddress): RangeVertex | null {
+  public getRange(start: SimpleCellAddress, end: SimpleCellAddress): Maybe<RangeVertex> {
     return this.rangeMapping.getRange(start, end)
   }
 

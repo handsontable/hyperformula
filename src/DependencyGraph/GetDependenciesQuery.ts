@@ -14,6 +14,7 @@ import {AddressMapping} from './AddressMapping/AddressMapping'
 import {IGetDependenciesQuery} from './Graph'
 import {RangeMapping} from './RangeMapping'
 import {NamedExpressions} from '../NamedExpressions'
+import {FunctionRegistry} from '../interpreter/FunctionRegistry'
 import {NamedExpressionRangeDependency} from '../parser/RelativeDependency'
 
 export class GetDependenciesQuery implements IGetDependenciesQuery<Vertex> {
@@ -21,7 +22,7 @@ export class GetDependenciesQuery implements IGetDependenciesQuery<Vertex> {
     private readonly rangeMapping: RangeMapping,
     private readonly addressMapping: AddressMapping,
     private readonly lazilyTransformingAstService: LazilyTransformingAstService,
-    private readonly functionsWhichDoesNotNeedArgumentsToBeComputed: Set<string>,
+    private readonly functionRegistry: FunctionRegistry,
     private readonly namedExpressions: NamedExpressions,
   ) {
   }
@@ -40,7 +41,7 @@ export class GetDependenciesQuery implements IGetDependenciesQuery<Vertex> {
       return null
     }
 
-    const deps = collectDependencies(formula!, this.functionsWhichDoesNotNeedArgumentsToBeComputed)
+    const deps = collectDependencies(formula!, this.functionRegistry)
     const absoluteDeps = absolutizeDependencies(deps, address)
     return new Set(absoluteDeps.map((dep: CellDependency) => {
       if (dep instanceof AbsoluteCellRange) {

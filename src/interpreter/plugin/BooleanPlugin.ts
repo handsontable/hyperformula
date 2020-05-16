@@ -14,38 +14,38 @@ import {FunctionPlugin} from './FunctionPlugin'
  */
 export class BooleanPlugin extends FunctionPlugin {
   public static implementedFunctions = {
-    literalTrue: {
-      translationKey: 'TRUE',
+    'TRUE': {
+      method: 'literalTrue'
     },
-    literalFalse: {
-      translationKey: 'FALSE',
+    'FALSE': {
+      method: 'literalFalse'
     },
-    conditionalIf: {
-      translationKey: 'IF',
+    'IF': {
+      method: 'conditionalIf'
     },
-    and: {
-      translationKey: 'AND',
+    'AND': {
+      method: 'and'
     },
-    or: {
-      translationKey: 'OR',
+    'OR': {
+      method: 'or'
     },
-    xor: {
-      translationKey: 'XOR',
+    'XOR': {
+      method: 'xor'
     },
-    not: {
-      translationKey: 'NOT',
+    'NOT': {
+      method: 'not'
     },
-    switch: {
-      translationKey: 'SWITCH',
+    'SWITCH': {
+      method: 'switch'
     },
-    iferror: {
-      translationKey: 'IFERROR',
+    'IFERROR': {
+      method: 'iferror'
     },
-    ifna: {
-      translationKey: 'IFNA',
+    'IFNA': {
+      method: 'ifna'
     },
-    choose: {
-      translationKey: 'CHOOSE',
+    'CHOOSE': {
+      method: 'choose'
     },
   }
 

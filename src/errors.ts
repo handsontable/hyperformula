@@ -234,3 +234,13 @@ export class MissingTranslationError extends Error {
     super(`Translation for ${key} is missing in the translation package you're using.`)
   }
 }
+
+export class FunctionPluginValidationError extends Error {
+  public static functionNotDeclaredInPlugin(formulaId: string, pluginName: string): FunctionPluginValidationError {
+    return new FunctionPluginValidationError(`Formula with id ${formulaId} not declared in plugin ${pluginName}`)
+  }
+
+  public static functionMethodNotFound(functionName: string, pluginName: string): FunctionPluginValidationError {
+    return new FunctionPluginValidationError(`Formula method ${functionName} not found in plugin ${pluginName}`)
+  }
+}

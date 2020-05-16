@@ -13,8 +13,8 @@ import {FunctionPlugin} from './FunctionPlugin'
 export class MedianPlugin extends FunctionPlugin {
 
   public static implementedFunctions = {
-    median: {
-      translationKey: 'MEDIAN',
+    'MEDIAN': {
+      method: 'median',
     },
   }
 

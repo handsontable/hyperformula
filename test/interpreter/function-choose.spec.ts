@@ -30,7 +30,7 @@ describe('Interpreter - CHOOSE function', () => {
 
   it('Coercions', () => {
     const engine = HyperFormula.buildFromArray([
-      ['=CHOOSE(TRUE(),2,3)', '=CHOOSE("12/31/1899",2,3,4)']
+      ['=CHOOSE(TRUE(),2,3)', '=CHOOSE("31/12/1899",2,3,4)']
     ])
     expect(engine.getCellValue(adr('A1'))).toEqual(2)
     expect(engine.getCellValue(adr('B1'))).toEqual(2)

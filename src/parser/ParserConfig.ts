@@ -13,7 +13,4 @@ export interface ParserConfig {
   errorMapping: Record<string, ErrorType>,
   maxColumns: number,
   maxRows: number,
-  volatileFunctions(): Set<string>,
-  structuralChangeFunctions(): Set<string>,
-  functionsWhichDoesNotNeedArgumentsToBeComputed(): Set<string>,
 }

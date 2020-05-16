@@ -278,10 +278,10 @@ describe('Adding row, ranges', () => {
       ['3', null],
     ])
 
-    expect(engine.rangeMapping.getRange(adr('A1'), adr('A3'))).not.toBe(null)
+    expect(engine.rangeMapping.getRange(adr('A1'), adr('A3'))).not.toBe(undefined)
     engine.addRows(0, [1, 1])
-    expect(engine.rangeMapping.getRange(adr('A1'), adr('A3'))).toBe(null)
-    expect(engine.rangeMapping.getRange(adr('A1'), adr('A4'))).not.toBe(null)
+    expect(engine.rangeMapping.getRange(adr('A1'), adr('A3'))).toBe(undefined)
+    expect(engine.rangeMapping.getRange(adr('A1'), adr('A4'))).not.toBe(undefined)
 
     expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
       ['1', '=SUM(A1:A4)'],
@@ -299,10 +299,10 @@ describe('Adding row, ranges', () => {
       ['3', null],
     ])
 
-    expect(engine.rangeMapping.getRange(adr('A1'), adr('A3'))).not.toBe(null)
+    expect(engine.rangeMapping.getRange(adr('A1'), adr('A3'))).not.toBe(undefined)
     engine.addRows(0, [0, 1])
-    expect(engine.rangeMapping.getRange(adr('A1'), adr('A3'))).toBe(null)
-    expect(engine.rangeMapping.getRange(adr('A2'), adr('A4'))).not.toBe(null)
+    expect(engine.rangeMapping.getRange(adr('A1'), adr('A3'))).toBe(undefined)
+    expect(engine.rangeMapping.getRange(adr('A2'), adr('A4'))).not.toBe(undefined)
 
     expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
       [null, null],
@@ -320,9 +320,9 @@ describe('Adding row, ranges', () => {
       // new row
     ])
 
-    expect(engine.rangeMapping.getRange(adr('A1'), adr('A3'))).not.toBe(null)
+    expect(engine.rangeMapping.getRange(adr('A1'), adr('A3'))).not.toBe(undefined)
     engine.addRows(0, [3, 1])
-    expect(engine.rangeMapping.getRange(adr('A1'), adr('A3'))).not.toBe(null)
+    expect(engine.rangeMapping.getRange(adr('A1'), adr('A3'))).not.toBe(undefined)
 
     expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
       ['1', '=SUM(A1:A3)'],
@@ -554,7 +554,7 @@ describe('Adding row, column range', () => {
 
     engine.addRows(0, [1, 1])
 
-    expect(engine.rangeMapping.getRange(colStart('A'), colEnd('B'))).not.toBe(null)
+    expect(engine.rangeMapping.getRange(colStart('A'), colEnd('B'))).not.toBe(undefined)
 
     expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
       ['1', '1', '=SUM(A:B)'],
@@ -575,12 +575,12 @@ describe('Adding row, fixing row ranges', () => {
       ['=SUM(1:3)'],
     ])
 
-    expect(engine.rangeMapping.getRange(rowStart(1), rowEnd(3))).not.toBe(null)
+    expect(engine.rangeMapping.getRange(rowStart(1), rowEnd(3))).not.toBe(undefined)
 
     engine.addRows(0, [1, 1])
 
-    expect(engine.rangeMapping.getRange(rowStart(1), rowEnd(3))).toBe(null)
-    expect(engine.rangeMapping.getRange(rowStart(1), rowEnd(4))).not.toBe(null)
+    expect(engine.rangeMapping.getRange(rowStart(1), rowEnd(3))).toBe(undefined)
+    expect(engine.rangeMapping.getRange(rowStart(1), rowEnd(4))).not.toBe(undefined)
 
     expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
       ['1'],
@@ -600,10 +600,10 @@ describe('Adding row, fixing row ranges', () => {
       ['=SUM(1:3)'],
     ])
 
-    expect(engine.rangeMapping.getRange(rowStart(1), rowEnd(3))).not.toBe(null)
+    expect(engine.rangeMapping.getRange(rowStart(1), rowEnd(3))).not.toBe(undefined)
     engine.addRows(0, [0, 1])
-    expect(engine.rangeMapping.getRange(rowStart(1), rowEnd(3))).toBe(null)
-    expect(engine.rangeMapping.getRange(rowStart(2), rowEnd(4))).not.toBe(null)
+    expect(engine.rangeMapping.getRange(rowStart(1), rowEnd(3))).toBe(undefined)
+    expect(engine.rangeMapping.getRange(rowStart(2), rowEnd(4))).not.toBe(undefined)
 
     expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
       [null],
@@ -623,9 +623,9 @@ describe('Adding row, fixing row ranges', () => {
       ['=SUM(1:3)'],
     ])
 
-    expect(engine.rangeMapping.getRange(rowStart(1), rowEnd(3))).not.toBe(null)
+    expect(engine.rangeMapping.getRange(rowStart(1), rowEnd(3))).not.toBe(undefined)
     engine.addRows(0, [3, 1])
-    expect(engine.rangeMapping.getRange(rowStart(1), rowEnd(3))).not.toBe(null)
+    expect(engine.rangeMapping.getRange(rowStart(1), rowEnd(3))).not.toBe(undefined)
 
     expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
       ['1'],
