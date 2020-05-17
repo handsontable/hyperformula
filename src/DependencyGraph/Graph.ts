@@ -3,9 +3,11 @@
  * Copyright (c) 2020 Handsoncode. All rights reserved.
  */
 
-export interface IGetDependenciesQuery<T> {
-  call(node: T): Set<T> | null,
-}
+// export interface IGetDependenciesQuery<T> {
+//   call(node: T): Set<T> | null,
+// }
+
+export type DependencyQuery<T> = (vertex: T) => Set<T> | null
 
 export interface TopSortResult<T> {
   sorted: T[], cycled: T[], 
@@ -32,7 +34,8 @@ export class Graph<T> {
   private edges: Map<T, Set<T>> = new Map()
 
   constructor(
-    private readonly getDependenciesQuery: IGetDependenciesQuery<T>,
+    // private readonly getDependenciesQuery: IGetDependenciesQuery<T>,
+    private readonly dependencyQuery: DependencyQuery<T>
   ) {
   }
 
@@ -324,7 +327,7 @@ export class Graph<T> {
   }
 
   private removeDependencies(node: T): Set<T> {
-    const dependentNodes = this.getDependenciesQuery.call(node)
+    const dependentNodes = this.dependencyQuery(node)
     if (!dependentNodes) {
       return new Set()
     }

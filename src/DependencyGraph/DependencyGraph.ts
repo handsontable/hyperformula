@@ -5,13 +5,14 @@
 
 import assert from 'assert'
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
+import {absolutizeDependencies} from '../absolutizeDependencies'
 import {EmptyValue, InternalCellValue, simpleCellAddress, SimpleCellAddress} from '../Cell'
 import {CellDependency} from '../CellDependency'
 import {ColumnsSpan} from '../ColumnsSpan'
 import {Config} from '../Config'
 import {LazilyTransformingAstService} from '../LazilyTransformingAstService'
 import {Maybe} from '../Maybe'
-import {Ast, NamedExpressionDependency} from '../parser'
+import {Ast, collectDependencies, NamedExpressionDependency} from '../parser'
 import {RowsSpan} from '../RowsSpan'
 import {Statistics, StatType} from '../statistics'
 import {NamedExpressions} from '../NamedExpressions'
@@ -27,7 +28,6 @@ import {
 } from './'
 import {AddressMapping} from './AddressMapping/AddressMapping'
 import {collectAddressesDependentToMatrix} from './collectAddressesDependentToMatrix'
-import {GetDependenciesQuery} from './GetDependenciesQuery'
 import {Graph, TopSortResult} from './Graph'
 import {MatrixMapping} from './MatrixMapping'
 import {RangeMapping} from './RangeMapping'
@@ -47,7 +47,7 @@ export class DependencyGraph {
     return new DependencyGraph(
       addressMapping,
       rangeMapping,
-      new Graph<Vertex>(new GetDependenciesQuery(rangeMapping, addressMapping, lazilyTransformingAstService, functionRegistry, namedExpressions)),
+      // new Graph<Vertex>(new GetDependenciesQuery(rangeMapping, addressMapping, lazilyTransformingAstService, functionRegistry, namedExpressions)),
       new SheetMapping(config.translationPackage),
       new MatrixMapping(),
       stats,
@@ -57,10 +57,11 @@ export class DependencyGraph {
     )
   }
 
+  public readonly graph: Graph<Vertex>
+
   constructor(
     public readonly addressMapping: AddressMapping,
     public readonly rangeMapping: RangeMapping,
-    public readonly graph: Graph<Vertex>,
     public readonly sheetMapping: SheetMapping,
     public readonly matrixMapping: MatrixMapping,
     public readonly stats: Statistics,
@@ -68,6 +69,7 @@ export class DependencyGraph {
     public readonly functionRegistry: FunctionRegistry,
     public readonly namedExpressions: NamedExpressions,
   ) {
+    this.graph = new Graph<Vertex>(this.dependencyQuery)
   }
 
   public setFormulaToCell(address: SimpleCellAddress, ast: Ast, dependencies: CellDependency[], hasVolatileFunction: boolean, hasStructuralChangeFunction: boolean) {
@@ -256,7 +258,7 @@ export class DependencyGraph {
         if (vertex instanceof MatrixVertex) {
           continue
         }
-        this.graph.removeNode(vertex)
+        this.removeGraphNode(vertex)
       }
     })
 
@@ -288,7 +290,7 @@ export class DependencyGraph {
       for (const adjacentNode of this.graph.adjacentNodes(vertex)) {
         this.graph.markNodeAsSpecialRecentlyChanged(adjacentNode)
       }
-      this.graph.removeNode(vertex)
+      this.removeGraphNode(vertex)
     }
 
     this.stats.measure(StatType.ADJUSTING_MATRIX_MAPPING, () => {
@@ -304,7 +306,7 @@ export class DependencyGraph {
     this.stats.measure(StatType.ADJUSTING_RANGES, () => {
       const rangesToRemove = this.rangeMapping.removeRangesInSheet(removedSheetId)
       for (const range of rangesToRemove) {
-        this.graph.removeNode(range)
+        this.removeGraphNode(range)
       }
     })
 
@@ -341,7 +343,7 @@ export class DependencyGraph {
         if (vertex instanceof MatrixVertex) {
           continue
         }
-        this.graph.removeNode(vertex)
+        this.removeGraphNode(vertex)
       }
     })
 
@@ -446,7 +448,7 @@ export class DependencyGraph {
             this.graph.markNodeAsSpecialRecentlyChanged(sourceVertex)
           }
         }
-        this.graph.removeNode(targetVertex)
+        this.removeGraphNode(targetVertex)
       }
     }
 
@@ -498,7 +500,7 @@ export class DependencyGraph {
       }
     }
 
-    this.graph.removeNode(matrixVertex)
+    this.removeGraphNode(matrixVertex)
     this.matrixMapping.removeMatrix(matrixVertex.getRange())
   }
 
@@ -521,7 +523,7 @@ export class DependencyGraph {
       }
     }
 
-    this.graph.removeNode(matrixVertex)
+    this.removeGraphNode(matrixVertex)
     this.matrixMapping.removeMatrix(matrixVertex.getRange())
   }
 
@@ -706,28 +708,28 @@ export class DependencyGraph {
   private truncateMatricesAfterRemovingRows(removedRows: RowsSpan) {
     const verticesToRemove = this.matrixMapping.truncateMatricesByRows(removedRows)
     verticesToRemove.forEach((vertex) => {
-      this.graph.removeNode(vertex)
+      this.removeGraphNode(vertex)
     })
   }
 
   private truncateRangesAfterRemovingRows(removedRows: RowsSpan) {
     const rangesToRemove = this.rangeMapping.truncateRangesByRows(removedRows)
     rangesToRemove.forEach((vertex) => {
-      this.graph.removeNode(vertex)
+      this.removeGraphNode(vertex)
     })
   }
 
   private truncateMatricesAfterRemovingColumns(removedColumns: ColumnsSpan) {
     const verticesToRemove = this.matrixMapping.truncateMatricesByColumns(removedColumns)
     verticesToRemove.forEach((vertex) => {
-      this.graph.removeNode(vertex)
+      this.removeGraphNode(vertex)
     })
   }
 
   private truncateRangesAfterRemovingColumns(removedColumns: ColumnsSpan) {
     const rangesToRemove = this.rangeMapping.truncateRangesByColumns(removedColumns)
     rangesToRemove.forEach((vertex) => {
-      this.graph.removeNode(vertex)
+      this.removeGraphNode(vertex)
     })
   }
 
@@ -813,5 +815,63 @@ export class DependencyGraph {
         }
       }
     }
+  }
+
+  public dependencyQuery: (vertex: Vertex) => Set<Vertex> | null = (vertex: Vertex) => {
+    let formula: Ast
+    let address: SimpleCellAddress
+
+    if (vertex instanceof FormulaCellVertex) {
+      address = vertex.getAddress(this.lazilyTransformingAstService)
+      formula = vertex.getFormula(this.lazilyTransformingAstService)
+    } else if (vertex instanceof MatrixVertex && vertex.isFormula()) {
+      address = vertex.getAddress()
+      formula = vertex.getFormula()!
+    } else if (vertex instanceof RangeVertex) {
+      const allDeps: Set<Vertex> = new Set()
+      const {smallerRangeVertex} = this.rangeMapping.findSmallerRange(vertex.range) //checking whether this range was splitted by heuristic or not. But the trick is that both cases are possible
+      if(smallerRangeVertex !== null && this.graph.adjacentNodes(smallerRangeVertex).has(vertex)) {
+        const endVertex = vertex.range.end
+        const startVertex = simpleCellAddress(vertex.range.start.sheet, vertex.range.start.col, endVertex.row)
+        const range = new AbsoluteCellRange(startVertex, endVertex)
+        range.flatArrayOfAddressesInRange().forEach((address) => {
+          const cell = this.addressMapping.fetchCell(address)
+          if(cell instanceof EmptyCellVertex) {
+            cell.address = address
+          }
+          allDeps.add(cell)
+        })
+        allDeps.add(smallerRangeVertex)
+      }
+
+      const startVertex = this.addressMapping.fetchCell(vertex.range.start)
+      if(this.graph.adjacentNodes(startVertex).has(vertex)) //basically we check whether the top-left corner is there
+      {
+        const range = vertex.range
+        range.flatArrayOfAddressesInRange().forEach((address) => {
+          const cell = this.addressMapping.fetchCell(address)
+          if(cell instanceof EmptyCellVertex) {
+            cell.address = address
+          }
+          allDeps.add(cell)
+        })
+      }
+      return allDeps
+    } else {
+      return null
+    }
+
+    const deps = collectDependencies(formula!, this.functionRegistry)
+    const absoluteDeps = absolutizeDependencies(deps, address)
+    return new Set(absoluteDeps.map((dep: CellDependency) => {
+      if (dep instanceof AbsoluteCellRange) {
+        return this.rangeMapping.fetchRange(dep.start, dep.end)
+      } else if (dep instanceof NamedExpressionDependency) {
+        const namedExpression = this.namedExpressions.namedExpressionOrPlaceholder(dep.name, address.sheet)
+        return this.addressMapping.fetchCell(namedExpression.address)
+      } else {
+        return this.addressMapping.fetchCell(dep)
+      }
+    }))
   }
 }
