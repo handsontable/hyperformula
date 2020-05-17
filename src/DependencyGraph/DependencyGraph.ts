@@ -844,8 +844,8 @@ export class DependencyGraph {
         allDeps.add(smallerRangeVertex)
       }
 
-      const startVertex = this.addressMapping.fetchCell(vertex.range.start)
-      if(this.graph.adjacentNodes(startVertex).has(vertex)) //basically we check whether the top-left corner is there
+      const startVertex = this.addressMapping.getCell(vertex.range.start)
+      if(startVertex && this.graph.adjacentNodes(startVertex).has(vertex)) //basically we check whether the top-left corner is there
       {
         const range = vertex.range
         range.flatArrayOfAddressesInRange().forEach((address) => {
