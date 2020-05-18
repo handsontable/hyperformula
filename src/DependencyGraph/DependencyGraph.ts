@@ -279,7 +279,7 @@ export class DependencyGraph {
 
   public removeSheet(removedSheetId: number) {
     const matrices: Set<MatrixVertex> = new Set()
-    for (const [_, vertex] of this.addressMapping.sheetEntries(removedSheetId)) {
+    for (const [adr, vertex] of this.addressMapping.sheetEntries(removedSheetId)) {
       if (vertex instanceof MatrixVertex) {
         if (matrices.has(vertex)) {
           continue
@@ -291,6 +291,7 @@ export class DependencyGraph {
         this.graph.markNodeAsSpecialRecentlyChanged(adjacentNode)
       }
       this.removeGraphNode(vertex)
+      this.addressMapping.removeCell(adr)
     }
 
     this.stats.measure(StatType.ADJUSTING_MATRIX_MAPPING, () => {
