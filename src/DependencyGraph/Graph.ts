@@ -3,10 +3,6 @@
  * Copyright (c) 2020 Handsoncode. All rights reserved.
  */
 
-// export interface IGetDependenciesQuery<T> {
-//   call(node: T): Set<T> | null,
-// }
-
 export type DependencyQuery<T> = (vertex: T) => Set<T> | null
 
 export interface TopSortResult<T> {
@@ -161,27 +157,6 @@ export class Graph<T> {
 
   public markNodeAsInfiniteRange(node: T) {
     this.infiniteRanges.add(node)
-  }
-
-  public getAllOutDegrees(): Map<T, number> {
-    const outDegrees: Map<T, number> = new Map()
-    this.edges.forEach((edges, node)=>{
-      outDegrees.set(node, edges.size)
-    })
-    return outDegrees
-  }
-
-  public getReversedEdges(): Map<T, Set<T>> {
-    const reversedEdges: Map<T, Set<T>> = new Map()
-    this.edges.forEach((edges, node)=>{
-      edges.forEach( (target) => {
-        if(!reversedEdges.has(target)) {
-          reversedEdges.set(target, new Set())
-        }
-        reversedEdges.get(target)!.add(node)
-      })
-    })
-    return reversedEdges
   }
 
   /**

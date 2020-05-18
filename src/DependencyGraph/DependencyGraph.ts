@@ -835,18 +835,18 @@ export class DependencyGraph {
       const allDeps: Set<Vertex> = new Set()
       const {smallerRangeVertex, restRange} = this.rangeMapping.findSmallerRange(vertex.range) //checking whether this range was splitted by bruteForce or not. But the trick is that both cases are possible
       if(smallerRangeVertex !== null && this.graph.adjacentNodes(smallerRangeVertex).has(vertex)) {
-        restRange.flatArrayOfAddressesInRange().forEach((address) => {
+        for(const address of restRange.addresses(this)) {
           const cell = this.addressMapping.fetchCell(address)
           if(cell instanceof EmptyCellVertex) {
             cell.address = address
           }
           allDeps.add(cell)
-        })
+        }
         allDeps.add(smallerRangeVertex)
       }
 
       if(vertex.bruteForce) { //did we ever need to use full range
-        vertex.range.flatArrayOfAddressesInRange().forEach((address) => {
+        for(const address of vertex.range.addresses(this)) {
           const cell = this.addressMapping.getCell(address)
           if(cell instanceof EmptyCellVertex) {
             cell.address = address
@@ -854,7 +854,7 @@ export class DependencyGraph {
           if(cell !== null) {
             allDeps.add(cell)
           }
-        })
+        }
       }
       return allDeps
     } else {
