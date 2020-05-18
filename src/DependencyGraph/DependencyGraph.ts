@@ -300,15 +300,16 @@ export class DependencyGraph {
       }
     })
 
-    this.stats.measure(StatType.ADJUSTING_ADDRESS_MAPPING, () => {
-      this.addressMapping.removeSheet(removedSheetId)
-    })
 
     this.stats.measure(StatType.ADJUSTING_RANGES, () => {
       const rangesToRemove = this.rangeMapping.removeRangesInSheet(removedSheetId)
       for (const range of rangesToRemove) {
         this.removeGraphNode(range)
       }
+
+      this.stats.measure(StatType.ADJUSTING_ADDRESS_MAPPING, () => {
+        this.addressMapping.removeSheet(removedSheetId)
+      })
     })
 
     this.addStructuralNodesToChangeSet()

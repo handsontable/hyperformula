@@ -38,7 +38,10 @@ export class RangeMapping {
 
   public removeRange(vertex: RangeVertex) {
     const sheet = vertex.getStart().sheet
-    const sheetMap = this.rangeMapping.get(sheet)!
+    const sheetMap = this.rangeMapping.get(sheet)
+    if(sheetMap === undefined) {
+      return
+    }
     const key = keyFromAddresses(vertex.getStart(), vertex.getEnd())
     sheetMap.delete(key)
     if(sheetMap.size === 0) {
