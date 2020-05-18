@@ -303,13 +303,13 @@ const sharedExamples = (builder: (width: number, height: number) => AddressMappi
 
   it('should expand columns when adding cell', () => {
     const mapping = builder(2, 2)
-    mapping.setCell(adr('C1'), new EmptyCellVertex())
+    mapping.setCell(adr('C1'), new EmptyCellVertex({sheet: 0, row: 0, col: 0}))
     expect(mapping.getWidth(0)).toBe(3)
   })
 
   it('should expand rows when adding cell', () => {
     const mapping = builder(2, 2)
-    mapping.setCell(adr('A3'), new EmptyCellVertex())
+    mapping.setCell(adr('A3'), new EmptyCellVertex({sheet: 0, row: 0, col: 0}))
     expect(mapping.getHeight(0)).toBe(3)
   })
 }
