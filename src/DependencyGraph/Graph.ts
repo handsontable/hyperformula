@@ -30,7 +30,6 @@ export class Graph<T> {
   private edges: Map<T, Set<T>> = new Map()
 
   constructor(
-    // private readonly getDependenciesQuery: IGetDependenciesQuery<T>,
     private readonly dependencyQuery: DependencyQuery<T>
   ) {
   }

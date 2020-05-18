@@ -71,14 +71,9 @@ describe('larger tests', () => {
     const engine = HyperFormula.buildFromArray(arr)
     for(let x=0; x<3; x++) {
       for(let y=0; y<3; y++) {
-        // try {
         engine.setCellContents({sheet: 0, col: x, row: y}, null)
-        // } catch(e) {
-        //   const x = 1
-        // }
       }
     }
-    console.log(engine.dependencyGraph.graph.nodesCount(), engine.dependencyGraph.rangeMapping.getMappingSize(0))
     expect(engine.dependencyGraph.graph.nodesCount()).toBe(0)
     expect(engine.dependencyGraph.rangeMapping.getMappingSize(0)).toBe(0)
   })
@@ -96,7 +91,6 @@ describe('larger tests', () => {
     engine.setCellContents({sheet: 0, col: 1, row: 0}, null)
     engine.setCellContents({sheet: 0, col: 2, row: 0}, null)
     engine.setCellContents({sheet: 0, col: 3, row: 0}, null)
-    console.log(engine.dependencyGraph.graph.nodesCount(), engine.dependencyGraph.rangeMapping.getMappingSize(0))
     expect(engine.dependencyGraph.graph.nodesCount()).toBe(0)
     expect(engine.dependencyGraph.rangeMapping.getMappingSize(0)).toBe(0)
   })
@@ -111,7 +105,6 @@ describe('larger tests', () => {
 
     engine.setCellContents({sheet: 0, col: 0, row: 0}, null)
 
-    console.log(engine.dependencyGraph.graph.nodesCount(), engine.dependencyGraph.rangeMapping.getMappingSize(0))
     expect(engine.dependencyGraph.graph.nodesCount()).toBe(0)
     expect(engine.dependencyGraph.rangeMapping.getMappingSize(0)).toBe(0)
   })
@@ -129,14 +122,13 @@ describe('larger tests', () => {
     engine.setCellContents({sheet: 0, col: 3, row: 0}, null)
     engine.setCellContents({sheet: 0, col: 4, row: 0}, null)
 
-    console.log(engine.dependencyGraph.graph.nodesCount(), engine.dependencyGraph.rangeMapping.getMappingSize(0))
     expect(engine.dependencyGraph.graph.nodesCount()).toBe(0)
     expect(engine.dependencyGraph.rangeMapping.getMappingSize(0)).toBe(0)
   })
 
   it('repeat the same crud', () => {
     const engine = HyperFormula.buildFromArray([])
-    for(let tmp = 0; tmp < 1; tmp++) {
+    for(let tmp = 0; tmp < 3; tmp++) {
       for (let x = 0; x < 10; x++) {
         for (let y = 0; y < 10; y++) {
           const col1 = randomInteger(2, 7)
@@ -158,13 +150,11 @@ describe('larger tests', () => {
         }
       }
     }
-    console.log(engine.getSheetSerialized(0))
     for(let x=0; x<10; x++) {
       for(let y=0; y<10; y++) {
         engine.setCellContents({sheet: 0, col: x, row: y}, null)
       }
     }
-    console.log(engine.dependencyGraph.graph.nodesCount(), engine.dependencyGraph.rangeMapping.getMappingSize(0))
     expect(engine.dependencyGraph.graph.nodesCount()).toBe(0)
     expect(engine.dependencyGraph.rangeMapping.getMappingSize(0)).toBe(0)
   })
