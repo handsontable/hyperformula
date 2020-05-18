@@ -101,6 +101,39 @@ describe('larger tests', () => {
     expect(engine.dependencyGraph.rangeMapping.getMappingSize(0)).toBe(0)
   })
 
+  it( 'large fixed #3', () => {
+    const arr =     [
+      [
+        '=SUM(A1:B1)',
+      ],
+    ]
+    const engine = HyperFormula.buildFromArray(arr)
+
+    engine.setCellContents({sheet: 0, col: 0, row: 0}, null)
+
+    console.log(engine.dependencyGraph.graph.nodesCount(), engine.dependencyGraph.rangeMapping.getMappingSize(0))
+    expect(engine.dependencyGraph.graph.nodesCount()).toBe(0)
+    expect(engine.dependencyGraph.rangeMapping.getMappingSize(0)).toBe(0)
+  })
+
+  it( 'large fixed #4', () => {
+    const arr =     [
+      [
+        null, '=SUM(A1:A1)', '=SUM(A1:A2)', '=SUM(A1:A3)', '=SUM(A1:A4)',
+      ],
+    ]
+    const engine = HyperFormula.buildFromArray(arr)
+
+    engine.setCellContents({sheet: 0, col: 1, row: 0}, null)
+    engine.setCellContents({sheet: 0, col: 2, row: 0}, null)
+    engine.setCellContents({sheet: 0, col: 3, row: 0}, null)
+    engine.setCellContents({sheet: 0, col: 4, row: 0}, null)
+
+    console.log(engine.dependencyGraph.graph.nodesCount(), engine.dependencyGraph.rangeMapping.getMappingSize(0))
+    expect(engine.dependencyGraph.graph.nodesCount()).toBe(0)
+    expect(engine.dependencyGraph.rangeMapping.getMappingSize(0)).toBe(0)
+  })
+
   it('repeat the same crud', () => {
     const engine = HyperFormula.buildFromArray([])
     for(let tmp = 0; tmp < 1; tmp++) {
@@ -125,6 +158,7 @@ describe('larger tests', () => {
         }
       }
     }
+    console.log(engine.getSheetSerialized(0))
     for(let x=0; x<10; x++) {
       for(let y=0; y<10; y++) {
         engine.setCellContents({sheet: 0, col: x, row: y}, null)

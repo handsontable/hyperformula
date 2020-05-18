@@ -174,6 +174,7 @@ export class DependencyGraph {
         const {smallerRangeVertex, restRange} = this.rangeMapping.findSmallerRange(range)
         if (smallerRangeVertex) {
           this.graph.addEdge(smallerRangeVertex, rangeVertex)
+          rangeVertex.heuristic = true
         }
 
         const matrix = this.matrixMapping.getMatrix(restRange)
@@ -831,12 +832,9 @@ export class DependencyGraph {
       formula = vertex.getFormula()!
     } else if (vertex instanceof RangeVertex) {
       const allDeps: Set<Vertex> = new Set()
-      const {smallerRangeVertex} = this.rangeMapping.findSmallerRange(vertex.range) //checking whether this range was splitted by heuristic or not. But the trick is that both cases are possible
+      const {smallerRangeVertex, restRange} = this.rangeMapping.findSmallerRange(vertex.range) //checking whether this range was splitted by heuristic or not. But the trick is that both cases are possible
       if(smallerRangeVertex !== null && this.graph.adjacentNodes(smallerRangeVertex).has(vertex)) {
-        const endVertex = vertex.range.end
-        const startVertex = simpleCellAddress(vertex.range.start.sheet, vertex.range.start.col, endVertex.row)
-        const range = new AbsoluteCellRange(startVertex, endVertex)
-        range.flatArrayOfAddressesInRange().forEach((address) => {
+        restRange.flatArrayOfAddressesInRange().forEach((address) => {
           const cell = this.addressMapping.fetchCell(address)
           if(cell instanceof EmptyCellVertex) {
             cell.address = address
@@ -846,10 +844,8 @@ export class DependencyGraph {
         allDeps.add(smallerRangeVertex)
       }
 
-      const startVertex = this.addressMapping.getCell(vertex.range.start)
-      if(startVertex && this.graph.adjacentNodes(startVertex).has(vertex)) { //basically we check whether the top-left corner is there
-        const range = vertex.range
-        range.flatArrayOfAddressesInRange().forEach((address) => {
+      if(!vertex.heuristic) { //did we ever need to use full range
+        vertex.range.flatArrayOfAddressesInRange().forEach((address) => {
           const cell = this.addressMapping.fetchCell(address)
           if(cell instanceof EmptyCellVertex) {
             cell.address = address
