@@ -24,13 +24,13 @@ export class RangeVertex {
 
   private dependentCacheRanges: Set<RangeVertex>
 
-  public heuristic: boolean
+  public bruteForce: boolean
 
   constructor(public range: AbsoluteCellRange) {
     this.functionCache = new Map()
     this.criterionFunctionCache = new Map()
     this.dependentCacheRanges = new Set()
-    this.heuristic = false
+    this.bruteForce = false
   }
 
   public get start() {

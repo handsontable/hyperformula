@@ -174,7 +174,8 @@ export class DependencyGraph {
         const {smallerRangeVertex, restRange} = this.rangeMapping.findSmallerRange(range)
         if (smallerRangeVertex) {
           this.graph.addEdge(smallerRangeVertex, rangeVertex)
-          rangeVertex.heuristic = true
+        } else {
+          rangeVertex.bruteForce = true
         }
 
         const matrix = this.matrixMapping.getMatrix(restRange)
@@ -832,7 +833,7 @@ export class DependencyGraph {
       formula = vertex.getFormula()!
     } else if (vertex instanceof RangeVertex) {
       const allDeps: Set<Vertex> = new Set()
-      const {smallerRangeVertex, restRange} = this.rangeMapping.findSmallerRange(vertex.range) //checking whether this range was splitted by heuristic or not. But the trick is that both cases are possible
+      const {smallerRangeVertex, restRange} = this.rangeMapping.findSmallerRange(vertex.range) //checking whether this range was splitted by bruteForce or not. But the trick is that both cases are possible
       if(smallerRangeVertex !== null && this.graph.adjacentNodes(smallerRangeVertex).has(vertex)) {
         restRange.flatArrayOfAddressesInRange().forEach((address) => {
           const cell = this.addressMapping.fetchCell(address)
@@ -844,13 +845,15 @@ export class DependencyGraph {
         allDeps.add(smallerRangeVertex)
       }
 
-      if(!vertex.heuristic) { //did we ever need to use full range
+      if(vertex.bruteForce) { //did we ever need to use full range
         vertex.range.flatArrayOfAddressesInRange().forEach((address) => {
-          const cell = this.addressMapping.fetchCell(address)
+          const cell = this.addressMapping.getCell(address)
           if(cell instanceof EmptyCellVertex) {
             cell.address = address
           }
-          allDeps.add(cell)
+          if(cell !== null) {
+            allDeps.add(cell)
+          }
         })
       }
       return allDeps
