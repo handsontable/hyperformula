@@ -27,7 +27,7 @@ export class NoSheetWithNameError extends Error {
 /**
  * Error thrown when the sheet of a given name already exists.
  */
-export class SheetAlreadyExistsError extends Error {
+export class SheetNameAlreadyTaken extends Error {
   constructor(sheetName: string) {
     super(`Sheet with name ${sheetName} already exists`)
   }

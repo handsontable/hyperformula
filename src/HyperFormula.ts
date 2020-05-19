@@ -1760,7 +1760,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * @fires [[sheetAdded]] after the sheet was added
    *
-   * @throws [[SheetAlreadyExistsError]] when sheet with a given name already exists
+   * @throws [[SheetNameAlreadyTaken]] when sheet with a given name already exists
    *
    * @example
    * ```js

@@ -60,7 +60,7 @@ export interface ConfigParams {
   /**
    * A list of date formats that are supported by date parsing functions.
    *
-   * The separator is ignored and it can be any of '-',' ','/' (dash, empty space, comma).
+   * The separator is ignored and it can be any of '-' (dash), ' ' (empty space), '/' (comma).
    *
    * Any order of YY, MM, DD is accepted as a date, and YY can be replaced with YYYY.
    *

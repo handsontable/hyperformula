@@ -28,7 +28,7 @@ import {
   NoSheetWithNameError,
   NothingToPasteError,
   SheetSizeLimitExceededError,
-  SheetAlreadyExistsError,
+  SheetNameAlreadyTaken,
   IsPartOfMatrixError
 } from './errors'
 import {Index} from './HyperFormula'
@@ -514,7 +514,7 @@ export class CrudOperations {
 
   public ensureItIsPossibleToAddSheet(name: string): void {
     if (this.sheetMapping.hasSheetWithName(name)) {
-      throw new SheetAlreadyExistsError(name)
+      throw new SheetNameAlreadyTaken(name)
     }
   }
 
