@@ -5,8 +5,14 @@
 
 import {CellError, EmptyValue, ErrorType} from './Cell'
 import {CellValue, DetailedCellError, ExportedCellChange, ExportedNamedExpressionChange} from './CellValue'
+import {HyperFormula} from './HyperFormula'
+import {Config} from './Config'
+import {languages} from './i18n'
+import {LazilyTransformingAstService} from './LazilyTransformingAstService'
+import {Sheets} from './Sheet'
 import {
   EvaluationSuspendedError,
+  FunctionPluginValidationError,
   InvalidAddressError,
   InvalidArgumentsError,
   NoOperationToRedoError,
@@ -17,11 +23,7 @@ import {
   NothingToPasteError,
   SheetSizeLimitExceededError
 } from './errors'
-import {HyperFormula} from './HyperFormula'
-import {Config} from './Config'
-import {languages} from './i18n'
-import {LazilyTransformingAstService} from './LazilyTransformingAstService'
-import {Sheets} from './Sheet'
+import * as plugins from './interpreter/plugin'
 
 /** @internal */
 class HyperFormulaNS extends HyperFormula {
@@ -43,10 +45,19 @@ class HyperFormulaNS extends HyperFormula {
   public static ErrorType = ErrorType
   public static CellError = CellError
   public static InvalidArgumentsError = InvalidArgumentsError
+  public static FunctionPluginValidationError = FunctionPluginValidationError
 }
 
 const defaultLanguage = Config.defaultConfig.language
 HyperFormula.registerLanguage(defaultLanguage, languages[defaultLanguage])
+
+for (const pluginName of Object.getOwnPropertyNames(plugins)) {
+  if (!pluginName.startsWith('_')) {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+    // @ts-ignore
+    HyperFormula.registerFunctionPlugin(plugins[pluginName])
+  }
+}
 
 export default HyperFormulaNS
 
@@ -70,5 +81,6 @@ export {
   NoOperationToRedoError,
   NothingToPasteError,
   EvaluationSuspendedError,
-  ErrorType
+  FunctionPluginValidationError,
+  ErrorType,
 }

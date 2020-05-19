@@ -13,11 +13,20 @@ import {coerceScalarToString} from '../ArithmeticHelper'
 import {Interpreter} from '../Interpreter'
 import {InterpreterValue, SimpleRangeValue} from '../InterpreterValue'
 
-interface IImplementedFunctions {
-  [functionName: string]: {
-    translationKey: string,
-    isVolatile?: boolean,
-  },
+export interface ImplementedFunctions {
+  [formulaId: string]: FunctionMetadata,
+}
+
+export interface FunctionMetadata {
+  method: string,
+  isVolatile?: boolean,
+  isDependentOnSheetStructureChange?: boolean,
+  doesNotNeedArgumentsToBeComputed?: boolean,
+}
+
+export interface FunctionPluginDefinition {
+  new (interpreter: Interpreter): FunctionPlugin,
+  implementedFunctions: ImplementedFunctions,
 }
 
 export type PluginFunctionType = (ast: ProcedureAst, formulaAddress: SimpleCellAddress) => InternalCellValue
@@ -31,13 +40,13 @@ export abstract class FunctionPlugin {
   /**
    * Dictionary containing functions implemented by specific plugin, along with function name translations.
    */
-  public static implementedFunctions: IImplementedFunctions
+  public static implementedFunctions: ImplementedFunctions
   protected readonly interpreter: Interpreter
   protected readonly dependencyGraph: DependencyGraph
   protected readonly columnSearch: ColumnSearchStrategy
   protected readonly config: Config
 
-  protected constructor(interpreter: Interpreter) {
+  constructor(interpreter: Interpreter) {
     this.interpreter = interpreter
     this.dependencyGraph = interpreter.dependencyGraph
     this.columnSearch = interpreter.columnSearch

@@ -6,12 +6,14 @@ import {LazilyTransformingAstService} from '../src'
 import {Config} from '../src/Config'
 import {Statistics} from '../src/statistics/Statistics'
 import {NamedExpressions} from '../src/NamedExpressions'
+import {FunctionRegistry} from '../src/interpreter/FunctionRegistry'
 
 describe('generateCellsFromRange', () => {
   const config = new Config()
+  const functionRegistry = new FunctionRegistry(config)
   const stats = new Statistics()
   const lazilyTransformingAstService = new LazilyTransformingAstService(stats)
-  const dependencyGraph = DependencyGraph.buildEmpty(lazilyTransformingAstService, config, stats, new NamedExpressions())
+  const dependencyGraph = DependencyGraph.buildEmpty(lazilyTransformingAstService, config, functionRegistry, new NamedExpressions(), stats)
   const generateCellsFromRange = (range: AbsoluteCellRange): SimpleCellAddress[] => {
     return Array.from(range.addresses(dependencyGraph))
   }

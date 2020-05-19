@@ -3,6 +3,8 @@
  * Copyright (c) 2020 Handsoncode. All rights reserved.
  */
 
+import {AbsoluteCellRange} from './AbsoluteCellRange'
+import {absolutizeDependencies} from './absolutizeDependencies'
 import {CellError, ErrorType, InternalCellValue, SimpleCellAddress} from './Cell'
 import {ColumnSearchStrategy} from './ColumnSearch/ColumnSearchStrategy'
 import {Config} from './Config'
@@ -13,10 +15,11 @@ import {fixNegativeZero, isNumberOverflow} from './interpreter/ArithmeticHelper'
 import {Interpreter} from './interpreter/Interpreter'
 import {SimpleRangeValue} from './interpreter/InterpreterValue'
 import {Matrix} from './Matrix'
-import {Ast} from './parser'
+import {Ast, RelativeDependency} from './parser'
 import {Statistics, StatType} from './statistics'
 import {NumberLiteralHelper} from './NumberLiteralHelper'
 import {NamedExpressions} from './NamedExpressions'
+import {FunctionRegistry} from './interpreter/FunctionRegistry'
 
 export class Evaluator {
   private interpreter: Interpreter
@@ -28,14 +31,15 @@ export class Evaluator {
     private readonly stats: Statistics,
     private readonly dateHelper: DateTimeHelper,
     private readonly numberLiteralsHelper: NumberLiteralHelper,
-    private readonly namedExpressions: NamedExpressions,
+    private readonly functionRegistry: FunctionRegistry,
+    private readonly namedExpressions: NamedExpressions
   ) {
-    this.interpreter = new Interpreter(this.dependencyGraph, this.columnSearch, this.config, this.stats, this.dateHelper, this.numberLiteralsHelper, namedExpressions)
+    this.interpreter = new Interpreter(this.dependencyGraph, this.columnSearch, this.config, this.stats, this.dateHelper, this.numberLiteralsHelper, this.functionRegistry, this.namedExpressions)
   }
 
-  public run() {
+  public run(): void {
     this.stats.start(StatType.TOP_SORT)
-    const { sorted, cycled } = this.dependencyGraph.topSortWithScc()
+    const {sorted, cycled} = this.dependencyGraph.topSortWithScc()
     this.stats.end(StatType.TOP_SORT)
 
     this.stats.measure(StatType.EVALUATION, () => {
@@ -98,20 +102,37 @@ export class Evaluator {
     return changes
   }
 
-  public destroy() {
+  public destroy(): void {
     this.interpreter.destroy()
   }
 
-  public runAndForget(ast: Ast, address: SimpleCellAddress) {
-    return this.evaluateAstToScalarValue(ast, address)
+  public runAndForget(ast: Ast, address: SimpleCellAddress, dependencies: RelativeDependency[]): InternalCellValue {
+    const tmpRanges: RangeVertex[] = []
+    for (const dep of absolutizeDependencies(dependencies, address)) {
+      if (dep instanceof AbsoluteCellRange) {
+        const range = dep
+        if (this.dependencyGraph.getRange(range.start, range.end) === undefined) {
+          const rangeVertex = new RangeVertex(range)
+          this.dependencyGraph.rangeMapping.setRange(rangeVertex)
+          tmpRanges.push(rangeVertex)
+        }
+      }
+    }
+    const ret = this.evaluateAstToScalarValue(ast, address)
+
+    tmpRanges.forEach((rangeVertex) => {
+      this.dependencyGraph.rangeMapping.removeRange(rangeVertex)
+    })
+
+    return ret
   }
 
   /**
    * Recalculates formulas in the topological sort order
    */
-  private recomputeFormulas(cycled: Vertex[], sorted: Vertex[]) {
+  private recomputeFormulas(cycled: Vertex[], sorted: Vertex[]): void {
     cycled.forEach((vertex: Vertex) => {
-      if (vertex instanceof  FormulaCellVertex) {
+      if (vertex instanceof FormulaCellVertex) {
         vertex.setCellValue(new CellError(ErrorType.CYCLE))
       }
     })
@@ -144,8 +165,8 @@ export class Evaluator {
     const interpreterValue = this.interpreter.evaluateAst(ast, formulaAddress)
     if (interpreterValue instanceof SimpleRangeValue) {
       return interpreterValue
-    } else if(typeof interpreterValue === 'number') {
-      if(isNumberOverflow(interpreterValue)) {
+    } else if (typeof interpreterValue === 'number') {
+      if (isNumberOverflow(interpreterValue)) {
         return new CellError(ErrorType.NUM)
       } else {
         return fixNegativeZero(interpreterValue)

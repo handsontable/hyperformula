@@ -13,8 +13,8 @@ import {SimpleRangeValue} from '../InterpreterValue'
  */
 export class CountUniquePlugin extends FunctionPlugin {
   public static implementedFunctions = {
-    countunique: {
-      translationKey: 'COUNTUNIQUE',
+    'COUNTUNIQUE': {
+      method: 'countunique',
     },
   }
 

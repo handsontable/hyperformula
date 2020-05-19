@@ -3,13 +3,18 @@ module.exports.create = function(config) {
     // base path that will be used to resolve all patterns (eg. files, exclude)
     basePath: '',
 
+    client: {
+      clearContext: false,
+      spec: config.spec
+    },
+
     // frameworks to use
     // available frameworks: https://npmjs.org/browse/keyword/karma-adapter
     frameworks: ['jasmine'],
 
     // list of files / patterns to load in the browser
     files: [
-      'karma.starter.js',
+      'karma.starter.ts',
     ],
 
     // list of files / patterns to exclude
@@ -18,7 +23,7 @@ module.exports.create = function(config) {
     // preprocess matching files before serving them to the browser
     // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
     preprocessors: {
-      'karma.starter.js': ['webpack', 'sourcemap'],
+      'karma.starter.ts': ['webpack', 'sourcemap'],
     },
 
     // test results reporter to use
@@ -37,7 +42,7 @@ module.exports.create = function(config) {
     logLevel: config.LOG_INFO,
 
     // enable / disable watching file and executing tests whenever any file changes
-    autoWatch: true,
+    autoWatch: false,
 
     // start these browsers
     // available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
@@ -54,7 +59,22 @@ module.exports.create = function(config) {
     // Webpack's configuration for Karma
     webpack: {
       mode: 'development',
-      devtool: 'inline-source-map',
+      devtool: 'cheap-module-eval-source-map',
+      module: {
+        rules: [
+          {
+            test: /\.ts?$/,
+            loader: 'ts-loader',
+            exclude: /node_modules/,
+            options: {
+              configFile: 'tsconfig.test.json'
+            }
+          },
+        ],
+      },
+      resolve: {
+        extensions: [ '.ts', '.js' ],
+      },
     },
   };
 };

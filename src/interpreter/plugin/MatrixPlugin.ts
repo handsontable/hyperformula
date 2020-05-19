@@ -12,17 +12,17 @@ import {FunctionPlugin} from './FunctionPlugin'
 
 export class MatrixPlugin extends FunctionPlugin {
   public static implementedFunctions = {
-    mmult: {
-      translationKey: 'MMULT',
+    'MMULT': {
+      method: 'mmult',
     },
-    transpose: {
-      translationKey: 'TRANSPOSE',
+    'TRANSPOSE': {
+      method: 'transpose',
     },
-    maxpool: {
-      translationKey: 'MAXPOOL',
+    'MAXPOOL': {
+      method: 'maxpool',
     },
-    medianpool: {
-      translationKey: 'MEDIANPOOL',
+    'MEDIANPOOL': {
+      method: 'medianpool',
     },
   }
 

@@ -1,4 +1,4 @@
-import {HyperFormula, SheetSizeLimitExceededError} from '../src'
+import {HyperFormula} from '../src'
 import {plPL} from '../src/i18n'
 import {adr} from './testUtils'
 

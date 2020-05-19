@@ -5,8 +5,9 @@ module.exports.create = function(config) {
 
   return {
     ...configBase,
-    browsers: ['Chrome', 'Firefox'],
+    browsers: ['Chrome'],
     reporters: ['kjhtml'],
     singleRun: false,
+    autoWatch: true,
   }
 }

@@ -69,38 +69,38 @@ class AverageResult {
 
 export class NumericAggregationPlugin extends FunctionPlugin {
   public static implementedFunctions = {
-    sum: {
-      translationKey: 'SUM',
+    'SUM': {
+      method: 'sum',
     },
-    sumsq: {
-      translationKey: 'SUMSQ',
+    'SUMSQ': {
+      method: 'sumsq',
     },
-    max: {
-      translationKey: 'MAX',
+    'MAX': {
+      method: 'max',
     },
-    min: {
-      translationKey: 'MIN',
+    'MIN': {
+      method: 'min',
     },
-    maxa: {
-      translationKey: 'MAXA',
+    'MAXA': {
+      method: 'maxa',
     },
-    mina: {
-      translationKey: 'MINA',
+    'MINA': {
+      method: 'mina',
     },
-    countblank: {
-      translationKey: 'COUNTBLANK',
+    'COUNTBLANK': {
+      method: 'countblank',
     },
-    count: {
-      translationKey: 'COUNT',
+    'COUNT': {
+      method: 'count',
     },
-    counta: {
-      translationKey: 'COUNTA',
+    'COUNTA': {
+      method: 'counta',
     },
-    average: {
-      translationKey: 'AVERAGE',
+    'AVERAGE': {
+      method: 'average',
     },
-    averagea: {
-      translationKey: 'AVERAGEA',
+    'AVERAGEA': {
+      method: 'averagea',
     },
   }
 
@@ -384,6 +384,7 @@ export class NumericAggregationPlugin extends FunctionPlugin {
         throw err
       }
     }
+
     const rangeStart = range.start
     const rangeEnd = range.end
     const rangeVertex = this.dependencyGraph.getRange(rangeStart, rangeEnd)!

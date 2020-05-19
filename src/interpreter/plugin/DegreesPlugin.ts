@@ -9,8 +9,8 @@ import {FunctionPlugin} from './FunctionPlugin'
 
 export class DegreesPlugin extends FunctionPlugin {
   public static implementedFunctions = {
-    degrees: {
-      translationKey: 'DEGREES',
+    'DEGREES': {
+      method: 'degrees',
     },
   }
 

@@ -5,7 +5,6 @@
 
 import {IToken} from 'chevrotain'
 import {CellError} from '../Cell'
-import {Maybe} from '../Maybe'
 import {CellAddress} from './CellAddress'
 import {ColumnAddress} from './ColumnAddress'
 import {IExtendedToken} from './FormulaParser'
