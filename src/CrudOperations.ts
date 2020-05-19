@@ -29,7 +29,8 @@ import {
   NothingToPasteError,
   SheetSizeLimitExceededError,
   SheetNameAlreadyTaken,
-  IsPartOfMatrixError
+  TargetLocationHasMatrixError,
+  SourceLocationHasMatrixError
 } from './errors'
 import {Index} from './HyperFormula'
 import {LazilyTransformingAstService} from './LazilyTransformingAstService'
@@ -391,7 +392,7 @@ export class CrudOperations {
         && this.dependencyGraph.matrixMapping.isFormulaMatrixInRow(sheet, row - 1)
         && this.dependencyGraph.matrixMapping.isFormulaMatrixInRow(sheet, row)
       ) {
-        throw new IsPartOfMatrixError()
+        throw new TargetLocationHasMatrixError()
       }
     }
   }
@@ -412,7 +413,7 @@ export class CrudOperations {
       }
 
       if (this.dependencyGraph.matrixMapping.isFormulaMatrixInRows(rowsToRemove)) {
-        throw new IsPartOfMatrixError()
+        throw new SourceLocationHasMatrixError()
       }
     }
   }
@@ -437,7 +438,7 @@ export class CrudOperations {
         && this.dependencyGraph.matrixMapping.isFormulaMatrixInColumn(sheet, column - 1)
         && this.dependencyGraph.matrixMapping.isFormulaMatrixInColumn(sheet, column)
       ) {
-        throw new IsPartOfMatrixError()
+        throw new TargetLocationHasMatrixError()
       }
     }
   }
@@ -459,7 +460,7 @@ export class CrudOperations {
       }
 
       if (this.dependencyGraph.matrixMapping.isFormulaMatrixInColumns(columnsToRemove)) {
-        throw new IsPartOfMatrixError()
+        throw new SourceLocationHasMatrixError()
       }
     }
   }
@@ -484,7 +485,7 @@ export class CrudOperations {
     const sourceRange = AbsoluteCellRange.spanFrom(sourceStart, width, numberOfRows)
 
     if (this.dependencyGraph.matrixMapping.isFormulaMatrixInRange(sourceRange)) {
-      throw new IsPartOfMatrixError()
+      throw new SourceLocationHasMatrixError()
     }
   }
 
@@ -508,7 +509,7 @@ export class CrudOperations {
     const sourceRange = AbsoluteCellRange.spanFrom(sourceStart, numberOfColumns, sheetHeight)
 
     if (this.dependencyGraph.matrixMapping.isFormulaMatrixInRange(sourceRange)) {
-      throw new IsPartOfMatrixError()
+      throw new SourceLocationHasMatrixError()
     }
   }
 
@@ -527,7 +528,7 @@ export class CrudOperations {
     }
 
     if (this.dependencyGraph.matrixMapping.isFormulaMatrixAtAddress(address)) {
-      throw new IsPartOfMatrixError()
+      throw new SourceLocationHasMatrixError()
     }
   }
 

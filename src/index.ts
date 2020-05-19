@@ -23,7 +23,8 @@ import {
   NothingToPasteError,
   SheetSizeLimitExceededError,
   SheetNameAlreadyTaken,
-  IsPartOfMatrixError
+  TargetLocationHasMatrixError,
+  SourceLocationHasMatrixError
 } from './errors'
 import * as plugins from './interpreter/plugin'
 
@@ -45,7 +46,8 @@ class HyperFormulaNS extends HyperFormula {
   public static ExportedNamedExpressionChange = ExportedNamedExpressionChange
   public static EvaluationSuspendedError = EvaluationSuspendedError
   public static NotAFormulaError = NotAFormulaError
-  public static IsPartOfMatrixError = IsPartOfMatrixError
+  public static TargetLocationHasMatrixError = TargetLocationHasMatrixError
+  public static SourceLocationHasMatrixError = SourceLocationHasMatrixError
   public static ErrorType = ErrorType
   public static CellError = CellError
   public static InvalidArgumentsError = InvalidArgumentsError
@@ -88,5 +90,6 @@ export {
   FunctionPluginValidationError,
   ErrorType,
   SheetNameAlreadyTaken,
-  IsPartOfMatrixError
+  TargetLocationHasMatrixError,
+  SourceLocationHasMatrixError
 }

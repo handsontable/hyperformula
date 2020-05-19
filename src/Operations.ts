@@ -25,7 +25,7 @@ import {
   ValueCellVertex
 } from './DependencyGraph'
 import {ValueCellVertexValue} from './DependencyGraph/ValueCellVertex'
-import {InvalidArgumentsError, SheetSizeLimitExceededError, IsPartOfMatrixError} from './errors'
+import {InvalidArgumentsError, SheetSizeLimitExceededError, TargetLocationHasMatrixError, SourceLocationHasMatrixError} from './errors'
 import {ParserWithCaching, ProcedureAst} from './parser'
 import {ParsingError} from './parser/Ast'
 import {AddRowsTransformer} from './dependencyTransformers/AddRowsTransformer'
@@ -287,11 +287,11 @@ export class Operations {
     }
 
     if (this.dependencyGraph.matrixMapping.isFormulaMatrixInRange(sourceRange)) {
-      throw new IsPartOfMatrixError()
+      throw new SourceLocationHasMatrixError()
     }
 
     if (this.dependencyGraph.matrixMapping.isFormulaMatrixInRange(targetRange)) {
-      throw new IsPartOfMatrixError()
+      throw new TargetLocationHasMatrixError()
     }
   }
 

@@ -1053,7 +1053,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
    * @throws [[SheetSizeLimitExceededError]] when performing this operation would result in sheet size limits exceeding
-   * @throws [[IsPartOfMatrixError]] if the selected position has matrix inside
+   * @throws [[TargetLocationHasMatrixError]] when the selected position has matrix inside
    *
    * @example
    * ```js
@@ -1120,7 +1120,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * @throws [[InvalidArgumentsError]] when the given arguments are invalid
    * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
-   * @throws [[IsPartOfMatrixError]] when the selected position has matrix inside
+   * @throws [[SourceLocationHasMatrixError]] when the selected position has matrix inside
    *
    * @example
    * ```js
@@ -1186,7 +1186,7 @@ export class HyperFormula implements TypedEmitter {
    * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
    * @throws [[InvalidArgumentsError]] when the given arguments are invalid
    * @throws [[SheetSizeLimitExceededError]] when performing this operation would result in sheet size limits exceeding
-   * @throws [[IsPartOfMatrixError]] when the selected position has matrix inside
+   * @throws [[TargetLocationHasMatrixError]] when the selected position has matrix inside
    *
    * @example
    * ```js
@@ -1255,7 +1255,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
    * @throws [[InvalidArgumentsError]] when the given arguments are invalid
-   * @throws [[IsPartOfMatrixError]] when the selected position has matrix inside
+   * @throws [[SourceLocationHasMatrixError]] when the selected position has matrix inside
    *
    * @example
    * ```js
@@ -1331,7 +1331,8 @@ export class HyperFormula implements TypedEmitter {
    *
    * @throws [[InvalidArgumentsError]] when the given arguments are invalid
    * @throws [[SheetSizeLimitExceededError]] when performing this operation would result in sheet size limits exceeding
-   * @throws [[IsPartOfMatrixError]] when the source or target location has matrix inside - matrix cannot be moved, cells cannot be replaced by the matrix
+   * @throws [[SourceLocationHasMatrixError]] when the source location has matrix inside - matrix cannot be moved
+   * @throws [[TargetLocationHasMatrixError]] when the target location has matrix inside - cells cannot be replaced by the matrix
    *
    * @example
    * ```js
@@ -1406,7 +1407,8 @@ export class HyperFormula implements TypedEmitter {
    * @fires [[valuesUpdated]] if recalculation was triggered by this change
    *
    * @throws [[InvalidArgumentsError]] when the given arguments are invalid
-   * @throws [[IsPartOfMatrixError]] when the source location has matrix inside - matrix cannot be moved
+   * @throws [[SourceLocationHasMatrixError]] when the source location has matrix inside - matrix cannot be moved
+   * @throws [[TargetLocationHasMatrixError]] when the target location has matrix inside - cells cannot be replaced by the matrix
    *
    * @example
    * ```js
@@ -1473,7 +1475,8 @@ export class HyperFormula implements TypedEmitter {
    * @fires [[valuesUpdated]] if recalculation was triggered by this change
    *
    * @throws [[InvalidArgumentsError]] when the given arguments are invalid
-   * @throws [[IsPartOfMatrixError]] when the source location has matrix inside - matrix cannot be moved
+   * @throws [[SourceLocationHasMatrixError]] when the source location has matrix inside - matrix cannot be moved
+   * @throws [[TargetLocationHasMatrixError]] when the target location has matrix inside - cells cannot be replaced by the matrix
    *
    * @example
    * ```js
@@ -1569,7 +1572,7 @@ export class HyperFormula implements TypedEmitter {
    * @throws [[EvaluationSuspendedError]] when the evaluation is suspended
    * @throws [[SheetSizeLimitExceededError]] when performing this operation would result in sheet size limits exceeding
    * @throws [[NothingToPasteError]] when clipboard is empty
-   * @throws [[IsPartOfMatrixError]] when the selected area has matrix inside
+   * @throws [[TargetLocationHasMatrixError]] when the selected target area has matrix inside
    *
    * @example
    * ```js
