@@ -632,4 +632,17 @@ describe('Named expression - named ranges', () => {
 
     expect(engine.getCellValue(adr('B1'))).toEqual(4)
   })
+
+  it('should recalculate when named range changes definition', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1', '2'],
+      ['3', '4'],
+    ])
+
+    engine.addNamedExpression('fooo', '=Sheet1!A:Sheet1!A')
+    engine.setCellContents(adr('C1'), [['=SUM(fooo)']])
+    engine.changeNamedExpression('fooo', '=Sheet1!B:Sheet1!B')
+
+    expect(engine.getCellValue(adr('C1'))).toEqual(6)
+  })
 })
