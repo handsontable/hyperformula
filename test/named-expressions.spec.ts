@@ -608,7 +608,7 @@ describe('Named expression - cross scope', () => {
   })
 })
 
-describe('Named expression - ranges', () => {
+describe('Named expression - named ranges', () => {
   it('should be possible to define simple range in named expression', () => {
     const engine = HyperFormula.buildFromArray([
       ['1'],
