@@ -3,7 +3,15 @@
  * Copyright (c) 2020 Handsoncode. All rights reserved.
  */
 
-import {CellError, ErrorType, InternalCellValue, NoErrorCellValue, simpleCellAddress, SimpleCellAddress} from './Cell'
+import {
+  CellError,
+  ErrorType,
+  InternalCellValue,
+  InternalCellValueOrRange,
+  NoErrorCellValue,
+  simpleCellAddress,
+  SimpleCellAddress
+} from './Cell'
 import {Config} from './Config'
 import {CellValueChange} from './ContentChanges'
 import {NamedExpressions} from './NamedExpressions'
@@ -89,7 +97,7 @@ export class Exporter {
     }
   }
 
-  public exportValue(value: InternalCellValue): CellValue {
+  public exportValue(value: InternalCellValueOrRange): CellValue {
     if (value instanceof SimpleRangeValue) {
       return this.detailedError(new CellError(ErrorType.VALUE))
     } else if (this.config.smartRounding && typeof value == 'number') {

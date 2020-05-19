@@ -4,7 +4,14 @@
  */
 
 import {AbsoluteCellRange} from '../../AbsoluteCellRange'
-import {CellError, ErrorType, InternalCellValue, simpleCellAddress, SimpleCellAddress} from '../../Cell'
+import {
+  CellError,
+  ErrorType,
+  InternalCellValue,
+  InternalCellValueOrRange,
+  simpleCellAddress,
+  SimpleCellAddress
+} from '../../Cell'
 import {AstNodeType, ProcedureAst} from '../../parser'
 import {StatType} from '../../statistics'
 import {InterpreterValue} from '../InterpreterValue'
@@ -26,7 +33,7 @@ export class VlookupPlugin extends FunctionPlugin {
    * @param ast
    * @param formulaAddress
    */
-  public vlookup(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
+  public vlookup(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValueOrRange {
     if (ast.args.length < 3 || ast.args.length > 4) {
       return new CellError(ErrorType.NA)
     }
@@ -114,7 +121,7 @@ export class VlookupPlugin extends FunctionPlugin {
     }
   }
 
-  private doVlookup(key: any, range: AbsoluteCellRange, index: number, sorted: boolean): InternalCellValue {
+  private doVlookup(key: any, range: AbsoluteCellRange, index: number, sorted: boolean): InternalCellValueOrRange {
     this.dependencyGraph.stats.start(StatType.VLOOKUP)
 
     const searchedRange = AbsoluteCellRange.spanFrom(range.start, 1, range.height())

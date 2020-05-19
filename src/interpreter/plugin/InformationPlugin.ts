@@ -4,7 +4,14 @@
  */
 
 import {AbsoluteCellRange} from '../../AbsoluteCellRange'
-import {CellError, EmptyValue, ErrorType, InternalCellValue, SimpleCellAddress} from '../../Cell'
+import {
+  CellError,
+  EmptyValue,
+  ErrorType,
+  InternalCellValue,
+  InternalCellValueOrRange,
+  SimpleCellAddress
+} from '../../Cell'
 import {AstNodeType, ProcedureAst} from '../../parser'
 import {SimpleRangeValue} from '../InterpreterValue'
 import {FunctionPlugin} from './FunctionPlugin'
@@ -233,7 +240,7 @@ export class InformationPlugin extends FunctionPlugin {
     }
   }
 
-  public index(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
+  public index(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValueOrRange {
     const rangeArg = ast.args[0]
     if (ast.args.length < 1 || ast.args.length > 3) {
       return new CellError(ErrorType.NA)

@@ -419,12 +419,12 @@ export class NumericAggregationPlugin extends FunctionPlugin {
         rangeResult.push(cachedValue)
       } else {
         for (const cellFromRange of smallerRangeVertex.range.addresses(this.dependencyGraph)) {
-          rangeResult.push(mapFunction(this.dependencyGraph.getCellValue(cellFromRange)))
+          rangeResult.push(mapFunction(this.dependencyGraph.getScalarValue(cellFromRange)))
         }
       }
     }
     for (const cellFromRange of restRange.addresses(this.dependencyGraph)) {
-      rangeResult.push(mapFunction(this.dependencyGraph.getCellValue(cellFromRange)))
+      rangeResult.push(mapFunction(this.dependencyGraph.getScalarValue(cellFromRange)))
     }
 
     return rangeResult

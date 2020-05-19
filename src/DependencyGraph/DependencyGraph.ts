@@ -5,7 +5,15 @@
 
 import assert from 'assert'
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
-import {EmptyValue, InternalCellValue, simpleCellAddress, SimpleCellAddress} from '../Cell'
+import {
+  CellError,
+  EmptyValue,
+  ErrorType,
+  InternalCellValue,
+  InternalCellValueOrRange,
+  simpleCellAddress,
+  SimpleCellAddress
+} from '../Cell'
 import {CellDependency} from '../CellDependency'
 import {ColumnsSpan} from '../ColumnsSpan'
 import {Config} from '../Config'
@@ -35,6 +43,7 @@ import {RangeMapping} from './RangeMapping'
 import {SheetMapping} from './SheetMapping'
 import {ValueCellVertexValue} from './ValueCellVertex'
 import {FunctionRegistry} from '../interpreter/FunctionRegistry'
+import {SimpleRangeValue} from '../interpreter/InterpreterValue'
 
 export class DependencyGraph {
   /*
@@ -577,8 +586,16 @@ export class DependencyGraph {
     return this.addressMapping.getCell(address)
   }
 
-  public getCellValue(address: SimpleCellAddress): InternalCellValue {
+  public getCellValue(address: SimpleCellAddress): InternalCellValueOrRange {
     return this.addressMapping.getCellValue(address)
+  }
+
+  public getScalarValue(address: SimpleCellAddress): InternalCellValue {
+    const value = this.addressMapping.getCellValue(address)
+    if (value instanceof SimpleRangeValue) {
+      return new CellError(ErrorType.VALUE)
+    }
+    return value
   }
 
   public setVertexAddress(address: SimpleCellAddress, vertex: CellVertex) {
@@ -757,7 +774,7 @@ export class DependencyGraph {
 
   public* valuesFromRange(range: AbsoluteCellRange): IterableIterator<[InternalCellValue, SimpleCellAddress]> {
     for (const address of range.addresses(this)) {
-      const value = this.getCellValue(address)
+      const value = this.getScalarValue(address)
       if (value !== EmptyValue) {
         yield [value, address]
       }

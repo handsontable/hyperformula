@@ -4,7 +4,7 @@
  */
 
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
-import {InternalCellValue, SimpleCellAddress} from '../Cell'
+import {InternalCellValue, InternalCellValueOrRange, SimpleCellAddress} from '../Cell'
 import {ColumnsSpan} from '../ColumnsSpan'
 import {Config} from '../Config'
 import {DependencyGraph} from '../DependencyGraph'
@@ -14,11 +14,11 @@ import {ColumnBinarySearch} from './ColumnBinarySearch'
 import {ColumnIndex} from './ColumnIndex'
 
 export interface ColumnSearchStrategy {
-  add(value: InternalCellValue | Matrix, address: SimpleCellAddress): void,
+  add(value: InternalCellValueOrRange | Matrix, address: SimpleCellAddress): void,
 
-  remove(value: InternalCellValue | Matrix | null, address: SimpleCellAddress): void,
+  remove(value: InternalCellValueOrRange | Matrix | null, address: SimpleCellAddress): void,
 
-  change(oldValue: InternalCellValue | Matrix | null, newValue: InternalCellValue | Matrix, address: SimpleCellAddress): void,
+  change(oldValue: InternalCellValueOrRange | Matrix | null, newValue: InternalCellValueOrRange | Matrix, address: SimpleCellAddress): void,
 
   addColumns(columnsSpan: ColumnsSpan): void,
 

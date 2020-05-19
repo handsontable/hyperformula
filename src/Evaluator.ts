@@ -5,7 +5,7 @@
 
 import {AbsoluteCellRange} from './AbsoluteCellRange'
 import {absolutizeDependencies} from './absolutizeDependencies'
-import {CellError, ErrorType, InternalCellValue, SimpleCellAddress} from './Cell'
+import {CellError, ErrorType, InternalCellValue, InternalCellValueOrRange, SimpleCellAddress} from './Cell'
 import {ColumnSearchStrategy} from './ColumnSearch/ColumnSearchStrategy'
 import {Config} from './Config'
 import {ContentChanges} from './ContentChanges'
@@ -57,7 +57,7 @@ export class Evaluator {
             const address = vertex.getAddress(this.dependencyGraph.lazilyTransformingAstService)
             const formula = vertex.getFormula(this.dependencyGraph.lazilyTransformingAstService)
             const currentValue = vertex.isComputed() ? vertex.getCellValue() : null
-            const newCellValue = this.evaluateAstToScalarValue(formula, address)
+            const newCellValue = this.evaluateAstToCellValue(formula, address)
             vertex.setCellValue(newCellValue)
             if (newCellValue !== currentValue) {
               changes.addChange(newCellValue, address)
@@ -106,7 +106,7 @@ export class Evaluator {
     this.interpreter.destroy()
   }
 
-  public runAndForget(ast: Ast, address: SimpleCellAddress, dependencies: RelativeDependency[]): InternalCellValue {
+  public runAndForget(ast: Ast, address: SimpleCellAddress, dependencies: RelativeDependency[]): InternalCellValueOrRange {
     const tmpRanges: RangeVertex[] = []
     for (const dep of absolutizeDependencies(dependencies, address)) {
       if (dep instanceof AbsoluteCellRange) {
@@ -118,7 +118,7 @@ export class Evaluator {
         }
       }
     }
-    const ret = this.evaluateAstToScalarValue(ast, address)
+    const ret = this.evaluateAstToCellValue(ast, address)
 
     tmpRanges.forEach((rangeVertex) => {
       this.dependencyGraph.rangeMapping.removeRange(rangeVertex)
@@ -140,7 +140,7 @@ export class Evaluator {
       if (vertex instanceof FormulaCellVertex) {
         const address = vertex.getAddress(this.dependencyGraph.lazilyTransformingAstService)
         const formula = vertex.getFormula(this.dependencyGraph.lazilyTransformingAstService)
-        const newCellValue = this.evaluateAstToScalarValue(formula, address)
+        const newCellValue = this.evaluateAstToCellValue(formula, address)
         vertex.setCellValue(newCellValue)
         this.columnSearch.add(newCellValue, address)
       } else if (vertex instanceof MatrixVertex && vertex.isFormula()) {
@@ -161,7 +161,7 @@ export class Evaluator {
     })
   }
 
-  private evaluateAstToScalarValue(ast: Ast, formulaAddress: SimpleCellAddress): InternalCellValue {
+  private evaluateAstToCellValue(ast: Ast, formulaAddress: SimpleCellAddress): InternalCellValueOrRange {
     const interpreterValue = this.interpreter.evaluateAst(ast, formulaAddress)
     if (interpreterValue instanceof SimpleRangeValue) {
       return interpreterValue

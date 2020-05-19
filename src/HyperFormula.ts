@@ -8,9 +8,8 @@ import {
   CellType,
   CellValueType,
   getCellType,
-  getCellValueType,
+  getCellValueType, InternalCellValue,
   NoErrorCellValue,
-  NoErrorScalarValue,
   SimpleCellAddress
 } from './Cell'
 import {CellContent, CellContentParser, RawCellContent} from './CellContentParser'
@@ -774,7 +773,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * @category Sheets
    */
-  public getAllSheetsSerialized(): Record<string, NoErrorScalarValue[][]> {
+  public getAllSheetsSerialized(): Record<string, InternalCellValue[][]> {
     this.ensureEvaluationIsNotSuspended()
     return this._serialization.getAllSheetsSerialized()
   }

@@ -4,7 +4,7 @@
  */
 
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
-import {InternalCellValue} from '../Cell'
+import {CellError, ErrorType, InternalCellValue} from '../Cell'
 import {DependencyGraph} from '../DependencyGraph'
 import {MatrixSize} from '../Matrix'
 import {Maybe} from '../Maybe'
@@ -116,7 +116,9 @@ export class OnlyRangeData {
     let row = []
     for (const cellFromRange of this._range.addresses(this.dependencyGraph)) {
       const value = this.dependencyGraph.getCellValue(cellFromRange)
-      if (typeof value === 'number') {
+      if (value instanceof SimpleRangeValue) {
+        row.push(new CellError(ErrorType.VALUE))
+      } else if (typeof value === 'number') {
         row.push(value)
       } else {
         row.push(value)

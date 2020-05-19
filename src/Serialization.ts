@@ -3,7 +3,7 @@
  * Copyright (c) 2020 Handsoncode. All rights reserved.
  */
 
-import {NoErrorCellValue, NoErrorScalarValue, simpleCellAddress, SimpleCellAddress} from './Cell'
+import {InternalCellValue, NoErrorCellValue, simpleCellAddress, SimpleCellAddress} from './Cell'
 import {CellValue, DetailedCellError, Exporter} from './CellValue'
 import {Config} from './Config'
 import {DependencyGraph, FormulaCellVertex, MatrixVertex, ParsingErrorVertex} from './DependencyGraph'
@@ -37,7 +37,7 @@ export class Serialization {
     return undefined
   }
 
-  public getCellSerialized(address: SimpleCellAddress): NoErrorScalarValue {
+  public getCellSerialized(address: SimpleCellAddress): NoErrorCellValue {
     const formula: Maybe<string> = this.getCellFormula(address)
     if (formula !== undefined) {
       return formula
@@ -45,9 +45,6 @@ export class Serialization {
       const value: CellValue = this.getCellValue(address)
       if (value instanceof DetailedCellError) {
         return this.config.translationPackage.getErrorTranslation(value.error.type)
-      } else if (value instanceof SimpleRangeValue) {
-        /* TODO */
-        throw Error("Shouldn't happen")
       } else {
         return value
       }
@@ -55,7 +52,7 @@ export class Serialization {
   }
 
   public getCellValue(address: SimpleCellAddress): CellValue {
-    return this.exporter.exportValue(this.dependencyGraph.getCellValue(address))
+    return this.exporter.exportValue(this.dependencyGraph.getScalarValue(address))
   }
 
   public getSheetValues(sheet: number): CellValue[][] {
@@ -91,7 +88,7 @@ export class Serialization {
     return result
   }
 
-  public getSheetSerialized(sheet: number): NoErrorScalarValue[][] {
+  public getSheetSerialized(sheet: number): NoErrorCellValue[][] {
     return this.genericSheetGetter(sheet, (arg) => this.getCellSerialized(arg))
   }
 
@@ -103,7 +100,7 @@ export class Serialization {
     return this.genericAllSheetsGetter((arg) => this.getSheetFormulas(arg))
   }
 
-  public getAllSheetsSerialized(): Record<string, NoErrorScalarValue[][]> {
+  public getAllSheetsSerialized(): Record<string, NoErrorCellValue[][]> {
     return this.genericAllSheetsGetter((arg) => this.getSheetSerialized(arg))
   }
 

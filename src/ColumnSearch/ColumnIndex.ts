@@ -4,7 +4,13 @@
  */
 
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
-import {CellError, InternalCellValue, movedSimpleCellAddress, SimpleCellAddress} from '../Cell'
+import {
+  CellError,
+  InternalCellValue,
+  InternalCellValueOrRange,
+  movedSimpleCellAddress,
+  SimpleCellAddress
+} from '../Cell'
 import {ColumnsSpan} from '../ColumnsSpan'
 import {Config} from '../Config'
 import {DependencyGraph} from '../DependencyGraph'
@@ -18,7 +24,7 @@ import {AddRowsTransformer} from '../dependencyTransformers/AddRowsTransformer'
 import {RemoveRowsTransformer} from '../dependencyTransformers/RemoveRowsTransformer'
 import {FormulaTransformer} from '../dependencyTransformers/Transformer'
 
-type ColumnMap = Map<InternalCellValue, ValueIndex>
+type ColumnMap = Map<InternalCellValueOrRange, ValueIndex>
 
 interface ValueIndex {
   version: number,
@@ -42,7 +48,8 @@ export class ColumnIndex implements ColumnSearchStrategy {
     this.binarySearchStrategy = new ColumnBinarySearch(dependencyGraph, config)
   }
 
-  public add(value: InternalCellValue | Matrix, address: SimpleCellAddress) {
+  public add(value: InternalCellValueOrRange | Matrix, address: SimpleCellAddress) {
+    /* TODO expand SimpleRangeValue? */
     if (value instanceof Matrix) {
       for (const [matrixValue, cellAddress] of value.generateValues(address)) {
         this.addSingleCellValue(matrixValue, cellAddress)
@@ -52,7 +59,7 @@ export class ColumnIndex implements ColumnSearchStrategy {
     }
   }
 
-  public remove(value: InternalCellValue | Matrix | null, address: SimpleCellAddress) {
+  public remove(value: InternalCellValueOrRange | Matrix | null, address: SimpleCellAddress) {
     if (!value) {
       return
     }
@@ -66,7 +73,7 @@ export class ColumnIndex implements ColumnSearchStrategy {
     }
   }
 
-  public change(oldValue: InternalCellValue | Matrix | null, newValue: InternalCellValue | Matrix, address: SimpleCellAddress) {
+  public change(oldValue: InternalCellValueOrRange | Matrix | null, newValue: InternalCellValue | Matrix, address: SimpleCellAddress) {
     if (oldValue === newValue) {
       return
     }
@@ -143,7 +150,7 @@ export class ColumnIndex implements ColumnSearchStrategy {
     return columnMap
   }
 
-  public getValueIndex(sheet: number, col: number, value: InternalCellValue): ValueIndex {
+  public getValueIndex(sheet: number, col: number, value: InternalCellValueOrRange): ValueIndex {
     const columnMap = this.getColumnMap(sheet, col)
     let index = this.getColumnMap(sheet, col).get(value)
     if (!index) {
@@ -156,7 +163,7 @@ export class ColumnIndex implements ColumnSearchStrategy {
     return index
   }
 
-  public ensureRecentData(sheet: number, col: number, value: InternalCellValue) {
+  public ensureRecentData(sheet: number, col: number, value: InternalCellValueOrRange) {
     const valueIndex = this.getValueIndex(sheet, col, value)
     const actualVersion = this.transformingService.version()
     if (valueIndex.version === actualVersion) {
@@ -179,7 +186,7 @@ export class ColumnIndex implements ColumnSearchStrategy {
     this.index.clear()
   }
 
-  private addSingleCellValue(value: InternalCellValue, address: SimpleCellAddress) {
+  private addSingleCellValue(value: InternalCellValueOrRange, address: SimpleCellAddress) {
     this.stats.measure(StatType.BUILD_COLUMN_INDEX, () => {
       this.ensureRecentData(address.sheet, address.col, value)
       const valueIndex = this.getValueIndex(address.sheet, address.col, value)
@@ -187,7 +194,7 @@ export class ColumnIndex implements ColumnSearchStrategy {
     })
   }
 
-  private removeSingleValue(value: InternalCellValue, address: SimpleCellAddress) {
+  private removeSingleValue(value: InternalCellValueOrRange, address: SimpleCellAddress) {
     this.stats.measure(StatType.BUILD_COLUMN_INDEX, () => {
       this.ensureRecentData(address.sheet, address.col, value)
 
@@ -210,12 +217,12 @@ export class ColumnIndex implements ColumnSearchStrategy {
     })
   }
 
-  private addRows(col: number, rowsSpan: RowsSpan, value: InternalCellValue) {
+  private addRows(col: number, rowsSpan: RowsSpan, value: InternalCellValueOrRange) {
     const valueIndex = this.getValueIndex(rowsSpan.sheet, col, value)
     this.shiftRows(valueIndex, rowsSpan.rowStart, rowsSpan.numberOfRows)
   }
 
-  private removeRows(col: number, rowsSpan: RowsSpan, value: InternalCellValue) {
+  private removeRows(col: number, rowsSpan: RowsSpan, value: InternalCellValueOrRange) {
     const valueIndex = this.getValueIndex(rowsSpan.sheet, col, value)
     this.removeRowsFromValues(valueIndex, rowsSpan)
     this.shiftRows(valueIndex, rowsSpan.rowEnd + 1, -rowsSpan.numberOfRows)
