@@ -8,7 +8,7 @@ import {
   CellType,
   CellValueType,
   getCellType,
-  getCellValueType, InternalCellValue,
+  getCellValueType, InternalScalarValue,
   NoErrorCellValue,
   SimpleCellAddress
 } from './Cell'

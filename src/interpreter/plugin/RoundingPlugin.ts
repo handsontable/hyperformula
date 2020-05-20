@@ -3,7 +3,7 @@
  * Copyright (c) 2020 Handsoncode. All rights reserved.
  */
 
-import {CellError, ErrorType, InternalCellValue, SimpleCellAddress} from '../../Cell'
+import {CellError, ErrorType, InternalScalarValue, SimpleCellAddress} from '../../Cell'
 import {AstNodeType, ProcedureAst} from '../../parser'
 import {SimpleRangeValue} from '../InterpreterValue'
 import {FunctionPlugin} from './FunctionPlugin'
@@ -48,7 +48,7 @@ export class RoundingPlugin extends FunctionPlugin {
     },
   }
 
-  public roundup(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
+  public roundup(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.commonArgumentsHandling2(ast, formulaAddress, (numberToRound: number, places: number): number => {
       const placesMultiplier = Math.pow(10, places)
       if (numberToRound < 0) {
@@ -59,7 +59,7 @@ export class RoundingPlugin extends FunctionPlugin {
     })
   }
 
-  public rounddown(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
+  public rounddown(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.commonArgumentsHandling2(ast, formulaAddress, (numberToRound: number, places: number): number => {
       const placesMultiplier = Math.pow(10, places)
       if (numberToRound < 0) {
@@ -70,7 +70,7 @@ export class RoundingPlugin extends FunctionPlugin {
     })
   }
 
-  public round(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
+  public round(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.commonArgumentsHandling2(ast, formulaAddress, (numberToRound: number, places: number): number => {
       const placesMultiplier = Math.pow(10, places)
       if (numberToRound < 0) {
@@ -81,11 +81,11 @@ export class RoundingPlugin extends FunctionPlugin {
     })
   }
 
-  public trunc(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
+  public trunc(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.rounddown(ast, formulaAddress)
   }
 
-  public intFunc(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
+  public intFunc(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.templateWithOneCoercedToNumberArgument(ast, formulaAddress, (coercedNumberToRound) => {
       if (coercedNumberToRound < 0) {
         return -Math.floor(-coercedNumberToRound)
@@ -95,7 +95,7 @@ export class RoundingPlugin extends FunctionPlugin {
     })
   }
 
-  public even(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
+  public even(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.templateWithOneCoercedToNumberArgument(ast, formulaAddress, (coercedNumberToRound) => {
       if (coercedNumberToRound < 0) {
         return -findNextEvenNumber(-coercedNumberToRound)
@@ -105,7 +105,7 @@ export class RoundingPlugin extends FunctionPlugin {
     })
   }
 
-  public odd(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
+  public odd(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.templateWithOneCoercedToNumberArgument(ast, formulaAddress, (coercedNumberToRound) => {
       if (coercedNumberToRound < 0) {
         return -findNextOddNumber(-coercedNumberToRound)
@@ -115,7 +115,7 @@ export class RoundingPlugin extends FunctionPlugin {
     })
   }
 
-  public ceiling(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
+  public ceiling(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     if (ast.args.length < 1 || ast.args.length > 3) {
       return new CellError(ErrorType.NA)
     }
@@ -159,7 +159,7 @@ export class RoundingPlugin extends FunctionPlugin {
     return Math.ceil(value / significance) * significance
   }
 
-  private commonArgumentsHandling2(ast: ProcedureAst, formulaAddress: SimpleCellAddress, roundingFunction: RoundingFunction): InternalCellValue {
+  private commonArgumentsHandling2(ast: ProcedureAst, formulaAddress: SimpleCellAddress, roundingFunction: RoundingFunction): InternalScalarValue {
     if (ast.args.length < 1 || ast.args.length > 2) {
       return new CellError(ErrorType.NA)
     }

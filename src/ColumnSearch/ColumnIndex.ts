@@ -6,8 +6,8 @@
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
 import {
   CellError,
+  InternalScalarValue,
   InternalCellValue,
-  InternalCellValueOrRange,
   movedSimpleCellAddress,
   SimpleCellAddress
 } from '../Cell'
@@ -24,7 +24,7 @@ import {AddRowsTransformer} from '../dependencyTransformers/AddRowsTransformer'
 import {RemoveRowsTransformer} from '../dependencyTransformers/RemoveRowsTransformer'
 import {FormulaTransformer} from '../dependencyTransformers/Transformer'
 
-type ColumnMap = Map<InternalCellValueOrRange, ValueIndex>
+type ColumnMap = Map<InternalCellValue, ValueIndex>
 
 interface ValueIndex {
   version: number,
@@ -48,7 +48,7 @@ export class ColumnIndex implements ColumnSearchStrategy {
     this.binarySearchStrategy = new ColumnBinarySearch(dependencyGraph, config)
   }
 
-  public add(value: InternalCellValueOrRange | Matrix, address: SimpleCellAddress) {
+  public add(value: InternalCellValue | Matrix, address: SimpleCellAddress) {
     /* TODO expand SimpleRangeValue? */
     if (value instanceof Matrix) {
       for (const [matrixValue, cellAddress] of value.generateValues(address)) {
@@ -59,7 +59,7 @@ export class ColumnIndex implements ColumnSearchStrategy {
     }
   }
 
-  public remove(value: InternalCellValueOrRange | Matrix | null, address: SimpleCellAddress) {
+  public remove(value: InternalCellValue | Matrix | null, address: SimpleCellAddress) {
     if (!value) {
       return
     }
@@ -73,7 +73,7 @@ export class ColumnIndex implements ColumnSearchStrategy {
     }
   }
 
-  public change(oldValue: InternalCellValueOrRange | Matrix | null, newValue: InternalCellValue | Matrix, address: SimpleCellAddress) {
+  public change(oldValue: InternalCellValue | Matrix | null, newValue: InternalScalarValue | Matrix, address: SimpleCellAddress) {
     if (oldValue === newValue) {
       return
     }
@@ -81,7 +81,7 @@ export class ColumnIndex implements ColumnSearchStrategy {
     this.add(newValue, address)
   }
 
-  public moveValues(sourceRange: IterableIterator<[InternalCellValue, SimpleCellAddress]>, toRight: number, toBottom: number, toSheet: number) {
+  public moveValues(sourceRange: IterableIterator<[InternalScalarValue, SimpleCellAddress]>, toRight: number, toBottom: number, toSheet: number) {
     for (const [value, address] of sourceRange) {
       const targetAddress = movedSimpleCellAddress(address, toSheet, toRight, toBottom)
       this.remove(value, address)
@@ -89,13 +89,13 @@ export class ColumnIndex implements ColumnSearchStrategy {
     }
   }
 
-  public removeValues(range: IterableIterator<[InternalCellValue, SimpleCellAddress]>): void {
+  public removeValues(range: IterableIterator<[InternalScalarValue, SimpleCellAddress]>): void {
     for (const [value, address] of range) {
       this.remove(value, address)
     }
   }
 
-  public find(key: InternalCellValue, range: AbsoluteCellRange, sorted: boolean): number {
+  public find(key: InternalScalarValue, range: AbsoluteCellRange, sorted: boolean): number {
     this.ensureRecentData(range.sheet, range.start.col, key)
 
     const columnMap = this.getColumnMap(range.sheet, range.start.col)
@@ -150,7 +150,7 @@ export class ColumnIndex implements ColumnSearchStrategy {
     return columnMap
   }
 
-  public getValueIndex(sheet: number, col: number, value: InternalCellValueOrRange): ValueIndex {
+  public getValueIndex(sheet: number, col: number, value: InternalCellValue): ValueIndex {
     const columnMap = this.getColumnMap(sheet, col)
     let index = this.getColumnMap(sheet, col).get(value)
     if (!index) {
@@ -163,7 +163,7 @@ export class ColumnIndex implements ColumnSearchStrategy {
     return index
   }
 
-  public ensureRecentData(sheet: number, col: number, value: InternalCellValueOrRange) {
+  public ensureRecentData(sheet: number, col: number, value: InternalCellValue) {
     const valueIndex = this.getValueIndex(sheet, col, value)
     const actualVersion = this.transformingService.version()
     if (valueIndex.version === actualVersion) {
@@ -186,7 +186,7 @@ export class ColumnIndex implements ColumnSearchStrategy {
     this.index.clear()
   }
 
-  private addSingleCellValue(value: InternalCellValueOrRange, address: SimpleCellAddress) {
+  private addSingleCellValue(value: InternalCellValue, address: SimpleCellAddress) {
     this.stats.measure(StatType.BUILD_COLUMN_INDEX, () => {
       this.ensureRecentData(address.sheet, address.col, value)
       const valueIndex = this.getValueIndex(address.sheet, address.col, value)
@@ -194,7 +194,7 @@ export class ColumnIndex implements ColumnSearchStrategy {
     })
   }
 
-  private removeSingleValue(value: InternalCellValueOrRange, address: SimpleCellAddress) {
+  private removeSingleValue(value: InternalCellValue, address: SimpleCellAddress) {
     this.stats.measure(StatType.BUILD_COLUMN_INDEX, () => {
       this.ensureRecentData(address.sheet, address.col, value)
 
@@ -217,12 +217,12 @@ export class ColumnIndex implements ColumnSearchStrategy {
     })
   }
 
-  private addRows(col: number, rowsSpan: RowsSpan, value: InternalCellValueOrRange) {
+  private addRows(col: number, rowsSpan: RowsSpan, value: InternalCellValue) {
     const valueIndex = this.getValueIndex(rowsSpan.sheet, col, value)
     this.shiftRows(valueIndex, rowsSpan.rowStart, rowsSpan.numberOfRows)
   }
 
-  private removeRows(col: number, rowsSpan: RowsSpan, value: InternalCellValueOrRange) {
+  private removeRows(col: number, rowsSpan: RowsSpan, value: InternalCellValue) {
     const valueIndex = this.getValueIndex(rowsSpan.sheet, col, value)
     this.removeRowsFromValues(valueIndex, rowsSpan)
     this.shiftRows(valueIndex, rowsSpan.rowEnd + 1, -rowsSpan.numberOfRows)

@@ -3,7 +3,7 @@
  * Copyright (c) 2020 Handsoncode. All rights reserved.
  */
 
-import {CellError, ErrorType, InternalCellValue, SimpleCellAddress} from '../../Cell'
+import {CellError, ErrorType, InternalScalarValue, SimpleCellAddress} from '../../Cell'
 import {AstNodeType, ProcedureAst} from '../../parser'
 import {SimpleRangeValue} from '../InterpreterValue'
 import {FunctionPlugin} from './FunctionPlugin'
@@ -15,7 +15,7 @@ export class IsOddPlugin extends FunctionPlugin {
     },
   }
 
-  public isodd(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
+  public isodd(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     if (ast.args.length != 1) {
       return new CellError(ErrorType.NA)
     }

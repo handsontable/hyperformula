@@ -3,14 +3,14 @@
  * Copyright (c) 2020 Handsoncode. All rights reserved.
  */
 
-import {InternalCellValue, InternalCellValueOrRange, SimpleCellAddress} from './Cell'
+import {InternalScalarValue, InternalCellValue, SimpleCellAddress} from './Cell'
 import {Matrix} from './Matrix'
 
 export interface CellValueChange {
   sheet: number,
   row: number,
   col: number,
-  value: InternalCellValueOrRange,
+  value: InternalCellValue,
 }
 
 export interface ChangeExporter<T> {
@@ -37,7 +37,7 @@ export class ContentChanges {
     }
   }
 
-  public addChange(newValue: InternalCellValueOrRange, address: SimpleCellAddress): void {
+  public addChange(newValue: InternalCellValue, address: SimpleCellAddress): void {
     this.addSingleCellValue(newValue, address)
   }
 
@@ -61,7 +61,7 @@ export class ContentChanges {
     return this.changes === []
   }
 
-  private addSingleCellValue(value: InternalCellValueOrRange, address: SimpleCellAddress) {
+  private addSingleCellValue(value: InternalCellValue, address: SimpleCellAddress) {
     this.add({
       sheet: address.sheet,
       col: address.col,

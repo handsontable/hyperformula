@@ -34,8 +34,8 @@ export enum ErrorType {
 export const EmptyValue = Symbol()
 export type EmptyValueType = typeof EmptyValue
 export type NoErrorCellValue = number | string | boolean | EmptyValueType
-export type InternalCellValue = NoErrorCellValue | CellError
-export type InternalCellValueOrRange = InternalCellValue | SimpleRangeValue
+export type InternalScalarValue = NoErrorCellValue | CellError
+export type InternalCellValue = InternalScalarValue | SimpleRangeValue
 
 export enum CellType {
   FORMULA = 'FORMULA',
@@ -82,7 +82,7 @@ export const CellValueTypeOrd = (arg: CellValueType): number => {
   }
 }
 
-export const getCellValueType = (cellValue: InternalCellValueOrRange): CellValueType => {
+export const getCellValueType = (cellValue: InternalCellValue): CellValueType => {
   if (cellValue === EmptyValue) {
     return CellValueType.EMPTY
   }

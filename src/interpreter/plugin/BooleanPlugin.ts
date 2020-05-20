@@ -3,7 +3,7 @@
  * Copyright (c) 2020 Handsoncode. All rights reserved.
  */
 
-import {CellError, ErrorType, InternalCellValue, NoErrorCellValue, SimpleCellAddress} from '../../Cell'
+import {CellError, ErrorType, InternalScalarValue, NoErrorCellValue, SimpleCellAddress} from '../../Cell'
 import {AstNodeType, ProcedureAst} from '../../parser'
 import {coerceScalarToBoolean} from '../ArithmeticHelper'
 import {InterpreterValue, SimpleRangeValue} from '../InterpreterValue'
@@ -58,7 +58,7 @@ export class BooleanPlugin extends FunctionPlugin {
    * @param formulaAddress
    */
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  public literalTrue(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
+  public literalTrue(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     if (ast.args.length > 0) {
       return new CellError(ErrorType.NA)
     } else {
@@ -75,7 +75,7 @@ export class BooleanPlugin extends FunctionPlugin {
    * @param formulaAddress
    */
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  public literalFalse(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
+  public literalFalse(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     if (ast.args.length > 0) {
       return new CellError(ErrorType.NA)
     } else {
@@ -126,7 +126,7 @@ export class BooleanPlugin extends FunctionPlugin {
    * @param ast
    * @param formulaAddress
    */
-  public and(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
+  public and(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     if (ast.args.length < 1) {
       return new CellError(ErrorType.NA)
     }
@@ -134,7 +134,7 @@ export class BooleanPlugin extends FunctionPlugin {
       return new CellError(ErrorType.NUM)
     }
 
-    let result: InternalCellValue = true
+    let result: InternalScalarValue = true
     let anyReasonableValue = false
     for (const scalarValue of this.iterateOverScalarValues(ast.args, formulaAddress)) {
       const coercedValue = coerceScalarToBoolean(scalarValue)
@@ -160,7 +160,7 @@ export class BooleanPlugin extends FunctionPlugin {
    * @param ast
    * @param formulaAddress
    */
-  public or(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
+  public or(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     if (ast.args.length < 1) {
       return new CellError(ErrorType.NA)
     }
@@ -168,7 +168,7 @@ export class BooleanPlugin extends FunctionPlugin {
       return new CellError(ErrorType.NUM)
     }
 
-    let result: InternalCellValue | null = null
+    let result: InternalScalarValue | null = null
     for (const scalarValue of this.iterateOverScalarValues(ast.args, formulaAddress)) {
       const coercedValue = coerceScalarToBoolean(scalarValue)
       if (coercedValue instanceof CellError) {
@@ -184,7 +184,7 @@ export class BooleanPlugin extends FunctionPlugin {
     }
   }
 
-  public not(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
+  public not(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     if (ast.args.length !== 1) {
       return new CellError(ErrorType.NA)
     }
@@ -205,7 +205,7 @@ export class BooleanPlugin extends FunctionPlugin {
     }
   }
 
-  public xor(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
+  public xor(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     if (ast.args.length < 1) {
       return new CellError(ErrorType.NA)
     }
@@ -232,7 +232,7 @@ export class BooleanPlugin extends FunctionPlugin {
     }
   }
 
-  public switch(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
+  public switch(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     if (ast.args.length < 3) {
       return new CellError(ErrorType.NA)
     }
@@ -240,7 +240,7 @@ export class BooleanPlugin extends FunctionPlugin {
       return new CellError(ErrorType.NUM)
     }
 
-    const vals: InternalCellValue[] = []
+    const vals: InternalScalarValue[] = []
     for (const arg of ast.args) {
       const val: InterpreterValue = this.evaluateAst(arg, formulaAddress)
       if (val instanceof SimpleRangeValue) {
@@ -269,7 +269,7 @@ export class BooleanPlugin extends FunctionPlugin {
     }
   }
 
-  public iferror(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
+  public iferror(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     if (ast.args.length !== 2) {
       return new CellError(ErrorType.NA)
     }
@@ -290,7 +290,7 @@ export class BooleanPlugin extends FunctionPlugin {
     }
   }
 
-  public ifna(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
+  public ifna(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     if (ast.args.length !== 2) {
       return new CellError(ErrorType.NA)
     }
@@ -311,7 +311,7 @@ export class BooleanPlugin extends FunctionPlugin {
     }
   }
 
-  public choose(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
+  public choose(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     if (ast.args.length < 2) {
       return new CellError(ErrorType.NA)
     }
@@ -319,7 +319,7 @@ export class BooleanPlugin extends FunctionPlugin {
       return new CellError(ErrorType.NUM)
     }
 
-    const vals: InternalCellValue[] = []
+    const vals: InternalScalarValue[] = []
     for (const arg of ast.args) {
       const val: InterpreterValue = this.evaluateAst(arg, formulaAddress)
       if (val instanceof SimpleRangeValue) {

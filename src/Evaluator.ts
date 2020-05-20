@@ -5,7 +5,7 @@
 
 import {AbsoluteCellRange} from './AbsoluteCellRange'
 import {absolutizeDependencies} from './absolutizeDependencies'
-import {CellError, ErrorType, InternalCellValue, InternalCellValueOrRange, SimpleCellAddress} from './Cell'
+import {CellError, ErrorType, InternalScalarValue, InternalCellValue, SimpleCellAddress} from './Cell'
 import {ColumnSearchStrategy} from './ColumnSearch/ColumnSearchStrategy'
 import {Config} from './Config'
 import {ContentChanges} from './ContentChanges'
@@ -106,7 +106,7 @@ export class Evaluator {
     this.interpreter.destroy()
   }
 
-  public runAndForget(ast: Ast, address: SimpleCellAddress, dependencies: RelativeDependency[]): InternalCellValueOrRange {
+  public runAndForget(ast: Ast, address: SimpleCellAddress, dependencies: RelativeDependency[]): InternalCellValue {
     const tmpRanges: RangeVertex[] = []
     for (const dep of absolutizeDependencies(dependencies, address)) {
       if (dep instanceof AbsoluteCellRange) {
@@ -161,7 +161,7 @@ export class Evaluator {
     })
   }
 
-  private evaluateAstToCellValue(ast: Ast, formulaAddress: SimpleCellAddress): InternalCellValueOrRange {
+  private evaluateAstToCellValue(ast: Ast, formulaAddress: SimpleCellAddress): InternalCellValue {
     const interpreterValue = this.interpreter.evaluateAst(ast, formulaAddress)
     if (interpreterValue instanceof SimpleRangeValue) {
       return interpreterValue

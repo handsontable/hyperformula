@@ -7,8 +7,8 @@ import {AbsoluteCellRange} from '../../AbsoluteCellRange'
 import {
   CellError,
   ErrorType,
+  InternalScalarValue,
   InternalCellValue,
-  InternalCellValueOrRange,
   simpleCellAddress,
   SimpleCellAddress
 } from '../../Cell'
@@ -33,7 +33,7 @@ export class VlookupPlugin extends FunctionPlugin {
    * @param ast
    * @param formulaAddress
    */
-  public vlookup(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValueOrRange {
+  public vlookup(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
     if (ast.args.length < 3 || ast.args.length > 4) {
       return new CellError(ErrorType.NA)
     }
@@ -58,7 +58,7 @@ export class VlookupPlugin extends FunctionPlugin {
       return new CellError(ErrorType.VALUE)
     }
 
-    let sorted: InternalCellValue = true
+    let sorted: InternalScalarValue = true
     if (ast.args.length === 4) {
       const computedSorted = this.evaluateAst(ast.args[3], formulaAddress)
       if (typeof computedSorted === 'boolean') {
@@ -76,7 +76,7 @@ export class VlookupPlugin extends FunctionPlugin {
     return this.doVlookup(key, range, index - 1, sorted)
   }
 
-  public match(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
+  public match(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     if (ast.args.length < 2 || ast.args.length > 3) {
       return new CellError(ErrorType.NA)
     }
@@ -121,7 +121,7 @@ export class VlookupPlugin extends FunctionPlugin {
     }
   }
 
-  private doVlookup(key: any, range: AbsoluteCellRange, index: number, sorted: boolean): InternalCellValueOrRange {
+  private doVlookup(key: any, range: AbsoluteCellRange, index: number, sorted: boolean): InternalCellValue {
     this.dependencyGraph.stats.start(StatType.VLOOKUP)
 
     const searchedRange = AbsoluteCellRange.spanFrom(range.start, 1, range.height())

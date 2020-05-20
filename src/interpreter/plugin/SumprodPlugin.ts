@@ -4,7 +4,7 @@
  */
 
 import {AbsoluteCellRange} from '../../AbsoluteCellRange'
-import {CellError, ErrorType, InternalCellValue, simpleCellAddress, SimpleCellAddress} from '../../Cell'
+import {CellError, ErrorType, InternalScalarValue, simpleCellAddress, SimpleCellAddress} from '../../Cell'
 import {DependencyGraph, RangeVertex} from '../../DependencyGraph'
 import {AstNodeType, ProcedureAst} from '../../parser'
 import {coerceToRange} from '../ArithmeticHelper'
@@ -18,7 +18,7 @@ export class SumprodPlugin extends FunctionPlugin {
     },
   }
 
-  public sumprod(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
+  public sumprod(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     if (ast.args.length !== 2) {
       return new CellError(ErrorType.NA)
     }

@@ -9,8 +9,8 @@ import {
   CellError,
   EmptyValue,
   ErrorType,
+  InternalScalarValue,
   InternalCellValue,
-  InternalCellValueOrRange,
   simpleCellAddress,
   SimpleCellAddress
 } from '../Cell'
@@ -586,11 +586,11 @@ export class DependencyGraph {
     return this.addressMapping.getCell(address)
   }
 
-  public getCellValue(address: SimpleCellAddress): InternalCellValueOrRange {
+  public getCellValue(address: SimpleCellAddress): InternalCellValue {
     return this.addressMapping.getCellValue(address)
   }
 
-  public getScalarValue(address: SimpleCellAddress): InternalCellValue {
+  public getScalarValue(address: SimpleCellAddress): InternalScalarValue {
     const value = this.addressMapping.getCellValue(address)
     if (value instanceof SimpleRangeValue) {
       return new CellError(ErrorType.VALUE)
@@ -772,7 +772,7 @@ export class DependencyGraph {
     }
   }
 
-  public* valuesFromRange(range: AbsoluteCellRange): IterableIterator<[InternalCellValue, SimpleCellAddress]> {
+  public* valuesFromRange(range: AbsoluteCellRange): IterableIterator<[InternalScalarValue, SimpleCellAddress]> {
     for (const address of range.addresses(this)) {
       const value = this.getScalarValue(address)
       if (value !== EmptyValue) {

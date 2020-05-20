@@ -3,7 +3,7 @@
  * Copyright (c) 2020 Handsoncode. All rights reserved.
  */
 
-import {InternalCellValue, NoErrorCellValue, simpleCellAddress, SimpleCellAddress} from './Cell'
+import {InternalScalarValue, NoErrorCellValue, simpleCellAddress, SimpleCellAddress} from './Cell'
 import {CellValue, DetailedCellError, Exporter} from './CellValue'
 import {Config} from './Config'
 import {DependencyGraph, FormulaCellVertex, MatrixVertex, ParsingErrorVertex} from './DependencyGraph'

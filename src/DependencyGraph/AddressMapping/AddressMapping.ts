@@ -3,7 +3,7 @@
  * Copyright (c) 2020 Handsoncode. All rights reserved.
  */
 
-import {EmptyValue, InternalCellValue, InternalCellValueOrRange, SimpleCellAddress} from '../../Cell'
+import {EmptyValue, InternalScalarValue, InternalCellValue, SimpleCellAddress} from '../../Cell'
 import {ColumnsSpan} from '../../ColumnsSpan'
 import {RowsSpan} from '../../RowsSpan'
 import {MatrixVertex} from '../index'
@@ -65,7 +65,7 @@ export class AddressMapping {
     this.addSheet(sheetId, new strategyConstructor(width, height))
   }
 
-  public getCellValue(address: SimpleCellAddress): InternalCellValueOrRange {
+  public getCellValue(address: SimpleCellAddress): InternalCellValue {
     const vertex = this.getCell(address)
 
     if (vertex === null) {

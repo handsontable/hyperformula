@@ -6,8 +6,8 @@
 import {
   CellError,
   ErrorType,
+  InternalScalarValue,
   InternalCellValue,
-  InternalCellValueOrRange,
   NoErrorCellValue,
   simpleCellAddress,
   SimpleCellAddress
@@ -97,7 +97,7 @@ export class Exporter {
     }
   }
 
-  public exportValue(value: InternalCellValueOrRange): CellValue {
+  public exportValue(value: InternalCellValue): CellValue {
     if (value instanceof SimpleRangeValue) {
       return this.detailedError(new CellError(ErrorType.VALUE))
     } else if (this.config.smartRounding && typeof value == 'number') {
