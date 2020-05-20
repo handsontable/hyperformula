@@ -1,7 +1,7 @@
 import {HyperFormula, ExportedNamedExpressionChange, EmptyValue, ExportedCellChange} from '../src'
 import {adr, detailedError} from './testUtils'
 import {ErrorType} from '../src/Cell'
-import {NoSheetWithNameError} from '../src/errors'
+import {NoRelativeAddressesAllowedError, NoSheetWithNameError} from '../src/errors'
 import {Vertex} from '../src/DependencyGraph/Vertex'
 
 describe('Named expressions - store manipulation', () => {
@@ -10,7 +10,7 @@ describe('Named expressions - store manipulation', () => {
       ['42'],
     ])
 
-    engine.addNamedExpression('myName', '=Sheet1!A1+10')
+    engine.addNamedExpression('myName', '=Sheet1!$A$1+10')
 
     expect(engine.getNamedExpressionValue('myName')).toEqual(52)
   })
@@ -69,13 +69,67 @@ describe('Named expressions - store manipulation', () => {
     expect(engine.getNamedExpressionValue('myName')).toEqual(detailedError(ErrorType.VALUE))
   })
 
+  it('adding named expression allows only for absolute addresses', () => {
+    const engine = HyperFormula.buildFromArray([])
+
+    expect(() => {
+      engine.addNamedExpression('foo', '=A1')
+    }).toThrow(new NoRelativeAddressesAllowedError())
+    expect(() => {
+      engine.addNamedExpression('foo', '=Sheet1!A1')
+    }).toThrow(new NoRelativeAddressesAllowedError())
+    expect(() => {
+      engine.addNamedExpression('foo', '=$A$1')
+    }).toThrow(new NoRelativeAddressesAllowedError())
+    expect(() => {
+      engine.addNamedExpression('foo', '=Sheet1!$A1')
+    }).toThrow(new NoRelativeAddressesAllowedError())
+    expect(() => {
+      engine.addNamedExpression('foo', '=Sheet1!A$1')
+    }).toThrow(new NoRelativeAddressesAllowedError())
+    expect(() => {
+      engine.addNamedExpression('foo', '=Sheet1!A1:A2')
+    }).toThrow(new NoRelativeAddressesAllowedError())
+    expect(() => {
+      engine.addNamedExpression('foo', '=Sheet1!A:B')
+    }).toThrow(new NoRelativeAddressesAllowedError())
+  })
+
+  it('changing named expression allows only for absolute addresses', () => {
+    const engine = HyperFormula.buildFromArray([])
+
+    engine.addNamedExpression('foo', 'foo')
+
+    expect(() => {
+      engine.changeNamedExpression('foo', '=A1')
+    }).toThrow(new NoRelativeAddressesAllowedError())
+    expect(() => {
+      engine.changeNamedExpression('foo', '=Sheet1!A1')
+    }).toThrow(new NoRelativeAddressesAllowedError())
+    expect(() => {
+      engine.changeNamedExpression('foo', '=$A$1')
+    }).toThrow(new NoRelativeAddressesAllowedError())
+    expect(() => {
+      engine.changeNamedExpression('foo', '=Sheet1!$A1')
+    }).toThrow(new NoRelativeAddressesAllowedError())
+    expect(() => {
+      engine.changeNamedExpression('foo', '=Sheet1!A$1')
+    }).toThrow(new NoRelativeAddressesAllowedError())
+    expect(() => {
+      engine.changeNamedExpression('foo', '=Sheet1!A1:A2')
+    }).toThrow(new NoRelativeAddressesAllowedError())
+    expect(() => {
+      engine.changeNamedExpression('foo', '=Sheet1!A:B')
+    }).toThrow(new NoRelativeAddressesAllowedError())
+  })
+
   it('works for more formulas', () => {
     const engine = HyperFormula.buildFromArray([
       ['42'],
     ])
 
-    engine.addNamedExpression('myName.1', '=Sheet1!A1+10')
-    engine.addNamedExpression('myName.2', '=Sheet1!A1+11')
+    engine.addNamedExpression('myName.1', '=Sheet1!$A$1+10')
+    engine.addNamedExpression('myName.2', '=Sheet1!$A$1+11')
 
     expect(engine.getNamedExpressionValue('myName.1')).toEqual(52)
     expect(engine.getNamedExpressionValue('myName.2')).toEqual(53)
@@ -83,7 +137,7 @@ describe('Named expressions - store manipulation', () => {
 
   it('adding the same named expression twice on global level is forbidden', () => {
     const engine = HyperFormula.buildFromArray([])
-    engine.addNamedExpression('myName', '=Sheet1!A1+10')
+    engine.addNamedExpression('myName', '=Sheet1!$A$1+10')
 
     expect(() => {
       engine.addNamedExpression('myName', '=Sheet1!A1+10')
@@ -92,7 +146,7 @@ describe('Named expressions - store manipulation', () => {
 
   it('adding the same named expression twice on local level is forbidden', () => {
     const engine = HyperFormula.buildFromArray([])
-    engine.addNamedExpression('myName', '=Sheet1!A1+10', 'Sheet1')
+    engine.addNamedExpression('myName', '=Sheet1!$A$1+10', 'Sheet1')
 
     expect(() => {
       engine.addNamedExpression('myName', '=Sheet1!A1+10', 'Sheet1')
@@ -126,7 +180,7 @@ describe('Named expressions - store manipulation', () => {
     const engine = HyperFormula.buildFromArray([
       ['42'],
     ])
-    engine.addNamedExpression('myName', '=Sheet1!A1')
+    engine.addNamedExpression('myName', '=Sheet1!$A$1')
 
     engine.removeNamedExpression('myName')
 
@@ -139,7 +193,7 @@ describe('Named expressions - store manipulation', () => {
       ['42'],
     ])
     engine.addNamedExpression('myName', '13')
-    engine.addNamedExpression('myName', '=Sheet1!A1', 'Sheet1')
+    engine.addNamedExpression('myName', '=Sheet1!$A$1', 'Sheet1')
 
     engine.removeNamedExpression('myName', 'Sheet1')
 
@@ -151,9 +205,9 @@ describe('Named expressions - store manipulation', () => {
     const engine = HyperFormula.buildFromArray([
       ['42'],
     ])
-    engine.addNamedExpression('myName', '=Sheet1!A1+10')
+    engine.addNamedExpression('myName', '=Sheet1!$A$1+10')
 
-    engine.changeNamedExpression('myName', '=Sheet1!A1+11')
+    engine.changeNamedExpression('myName', '=Sheet1!$A$1+11')
 
     expect(engine.getNamedExpressionValue('myName')).toEqual(53)
   })
@@ -162,7 +216,7 @@ describe('Named expressions - store manipulation', () => {
     const engine = HyperFormula.buildFromArray([
       ['42'],
     ])
-    engine.addNamedExpression('myName', '=Sheet1!A1+10')
+    engine.addNamedExpression('myName', '=Sheet1!$A$1+10')
 
     engine.changeNamedExpression('myName', 58)
 
@@ -263,9 +317,9 @@ describe('Named expressions - store manipulation', () => {
   it('#getNamedExpressionFormula when it exists', () => {
     const engine = HyperFormula.buildFromArray([])
 
-    engine.addNamedExpression('myName.1', '=Sheet1!A1+10')
+    engine.addNamedExpression('myName.1', '=Sheet1!$A$1+10')
 
-    expect(engine.getNamedExpressionFormula('myName.1')).toEqual('=Sheet1!A1+10')
+    expect(engine.getNamedExpressionFormula('myName.1')).toEqual('=Sheet1!$A$1+10')
   })
 
   it('#getNamedExpressionFormula when there is no such named expression', () => {
@@ -313,21 +367,6 @@ describe('Named expressions - store manipulation', () => {
       engine.addNamedExpression('myName', '=13', 'NonExistingSheetName')
     }).toThrowError(NoSheetWithNameError)
   })
-
-  /* Inconsistency with Product 1 */
-  it('relative reference', () => {
-    const engine = HyperFormula.buildFromArray([])
-
-    engine.addNamedExpression('expr', '=Sheet1!A1', 'Sheet1')
-
-    engine.setCellContents(adr('A1'), [
-      ['1', '2'],
-      ['=expr', '=expr'],
-    ])
-
-    expect(engine.getCellValue(adr('A2'))).toEqual(1)
-    expect(engine.getCellValue(adr('B2'))).toEqual(1)
-  })
 })
 
 const namedExpressionVertex = (engine: HyperFormula, expressionName: string, sheetId: number | undefined = undefined): Vertex => {
@@ -345,7 +384,7 @@ describe('Named expressions - evaluation', () => {
     const engine = HyperFormula.buildFromArray([
       ['42'],
     ])
-    engine.addNamedExpression('myName', '=Sheet1!A1+10')
+    engine.addNamedExpression('myName', '=Sheet1!$A$1+10')
 
     const changes = engine.setCellContents(adr('A1'), '20')
 
@@ -426,7 +465,7 @@ describe('Named expressions - evaluation', () => {
     const engine = HyperFormula.buildFromArray([
       ['=42']
     ])
-    engine.addNamedExpression('FOO', '=Sheet1!A1 + 10')
+    engine.addNamedExpression('FOO', '=Sheet1!$A$1 + 10')
 
     engine.removeSheet('Sheet1')
 
@@ -502,7 +541,7 @@ describe('Named expression - cross scope', () => {
       'Sheet2': [['bar']]
     })
 
-    engine.addNamedExpression('expr', '=Sheet2!A1', 'Sheet1')
+    engine.addNamedExpression('expr', '=Sheet2!$A$1', 'Sheet1')
 
     expect(engine.getNamedExpressionValue('expr',  'Sheet1')).toEqual('bar')
   })
@@ -513,8 +552,8 @@ describe('Named expression - cross scope', () => {
       'Sheet2': [['bar', '=expr']]
     })
 
-    engine.addNamedExpression('expr', '=Sheet1!A1', 'Sheet1')
-    engine.addNamedExpression('expr', '=Sheet2!A1', 'Sheet2')
+    engine.addNamedExpression('expr', '=Sheet1!$A$1', 'Sheet1')
+    engine.addNamedExpression('expr', '=Sheet2!$A$1', 'Sheet2')
 
     expect(engine.getCellValue(adr('B1'))).toEqual('foo')
     expect(engine.getCellValue(adr('B1', 1))).toEqual('bar')
@@ -526,7 +565,7 @@ describe('Named expression - cross scope', () => {
       'Sheet2': [['bar', '=expr']]
     })
 
-    engine.addNamedExpression('expr', '=Sheet1!A1', 'Sheet1')
+    engine.addNamedExpression('expr', '=Sheet1!$A$1', 'Sheet1')
 
     expect(engine.getCellValue(adr('B1'))).toEqual('foo')
     expect(engine.getCellValue(adr('B1', 1))).toEqual(detailedError(ErrorType.NAME))
@@ -562,8 +601,8 @@ describe('Named expression - cross scope', () => {
     engine.copy(adr('B1'), 1, 1)
     engine.paste(adr('B1', 1))
 
-    expect(engine.getNamedExpressionFormula('expr', 'Sheet1')).toEqual('=Sheet1!A1')
-    expect(engine.getNamedExpressionFormula('expr')).toEqual('=Sheet1!A1')
+    expect(engine.getNamedExpressionFormula('expr', 'Sheet1')).toEqual('=Sheet1!$A$1')
+    expect(engine.getNamedExpressionFormula('expr')).toEqual('=Sheet1!$A$1')
     expect(engine.getCellValue(adr('B1', 0))).toEqual('foo')
     expect(engine.getCellValue(adr('B1', 1))).toEqual('bar')
   })
@@ -594,15 +633,15 @@ describe('Named expression - cross scope', () => {
       'Sheet2': [['bar']]
     })
 
-    engine.addNamedExpression('expr', '=Sheet1!A1', 'Sheet1')
-    engine.addNamedExpression('expr', '=Sheet2!A1', 'Sheet2')
+    engine.addNamedExpression('expr', '=Sheet1!$A$1', 'Sheet1')
+    engine.addNamedExpression('expr', '=Sheet2!$A$1', 'Sheet2')
 
     engine.copy(adr('B1'), 1, 1)
     engine.paste(adr('B1', 1))
 
     expect(engine.getNamedExpressionFormula('expr')).toEqual(undefined)
-    expect(engine.getNamedExpressionFormula('expr', 'Sheet1')).toEqual('=Sheet1!A1')
-    expect(engine.getNamedExpressionFormula('expr', 'Sheet2')).toEqual('=Sheet2!A1')
+    expect(engine.getNamedExpressionFormula('expr', 'Sheet1')).toEqual('=Sheet1!$A$1')
+    expect(engine.getNamedExpressionFormula('expr', 'Sheet2')).toEqual('=Sheet2!$A$1')
     expect(engine.getCellValue(adr('B1', 0))).toEqual('foo')
     expect(engine.getCellValue(adr('B1', 1))).toEqual('bar')
   })
@@ -615,7 +654,7 @@ describe('Named expression - named ranges', () => {
       ['3'],
     ])
 
-    engine.addNamedExpression('fooo', '=Sheet1!A1:Sheet1!A2')
+    engine.addNamedExpression('fooo', '=Sheet1!$A$1:Sheet1!$A$2')
     engine.setCellContents(adr('B1'), [['=SUM(fooo)']])
 
     expect(engine.getCellValue(adr('B1'))).toEqual(4)
@@ -627,7 +666,7 @@ describe('Named expression - named ranges', () => {
       ['3'],
     ])
 
-    engine.addNamedExpression('fooo', '=Sheet1!A:Sheet1!A')
+    engine.addNamedExpression('fooo', '=Sheet1!$A:Sheet1!$A')
     engine.setCellContents(adr('B1'), [['=SUM(fooo)']])
 
     expect(engine.getCellValue(adr('B1'))).toEqual(4)
@@ -639,9 +678,9 @@ describe('Named expression - named ranges', () => {
       ['3', '4'],
     ])
 
-    engine.addNamedExpression('fooo', '=Sheet1!A:Sheet1!A')
+    engine.addNamedExpression('fooo', '=Sheet1!$A:Sheet1!$A')
     engine.setCellContents(adr('C1'), [['=SUM(fooo)']])
-    engine.changeNamedExpression('fooo', '=Sheet1!B:Sheet1!B')
+    engine.changeNamedExpression('fooo', '=Sheet1!$B:Sheet1!$B')
 
     expect(engine.getCellValue(adr('C1'))).toEqual(6)
   })

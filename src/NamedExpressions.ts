@@ -6,6 +6,7 @@
 import {simpleCellAddress, SimpleCellAddress} from './Cell'
 import {Maybe} from './Maybe'
 import {NamedExpressionNameIsAlreadyTaken, NamedExpressionNameIsInvalid} from './errors'
+import {Ast, AstNodeType} from './parser'
 
 export class NamedExpression {
   constructor(
@@ -227,5 +228,60 @@ export class NamedExpressions {
 
   private nextAddress() {
     return simpleCellAddress(NamedExpressions.SHEET_FOR_WORKBOOK_EXPRESSIONS, 0, this.nextNamedExpressionRow++)
+  }
+
+  public lookupNextAddress(expressionName: string, sheetId?: number): SimpleCellAddress {
+    if (sheetId === undefined) {
+      const namedExpression = this.workbookStore.get(expressionName)
+      if (namedExpression) {
+        return namedExpression.address
+      }
+    }
+    return simpleCellAddress(NamedExpressions.SHEET_FOR_WORKBOOK_EXPRESSIONS, 0, this.nextNamedExpressionRow)
+  }
+}
+
+
+export const doesContainRelativeReferences = (ast: Ast): boolean => {
+  switch (ast.type) {
+    case AstNodeType.EMPTY:
+    case AstNodeType.NUMBER:
+    case AstNodeType.STRING:
+    case AstNodeType.ERROR:
+    case AstNodeType.ERROR_WITH_RAW_INPUT:
+      return false
+    case AstNodeType.CELL_REFERENCE:
+      return !ast.reference.isAbsolute()
+    case AstNodeType.CELL_RANGE:
+    case AstNodeType.COLUMN_RANGE:
+    case AstNodeType.ROW_RANGE:
+      return !ast.start.isAbsolute()
+    case AstNodeType.NAMED_EXPRESSION:
+      return false
+    case AstNodeType.PERCENT_OP:
+    case AstNodeType.PLUS_UNARY_OP:
+    case AstNodeType.MINUS_UNARY_OP: {
+      return doesContainRelativeReferences(ast.value)
+    }
+    case AstNodeType.CONCATENATE_OP:
+    case AstNodeType.EQUALS_OP:
+    case AstNodeType.NOT_EQUAL_OP:
+    case AstNodeType.LESS_THAN_OP:
+    case AstNodeType.GREATER_THAN_OP:
+    case AstNodeType.LESS_THAN_OR_EQUAL_OP:
+    case AstNodeType.GREATER_THAN_OR_EQUAL_OP:
+    case AstNodeType.MINUS_OP:
+    case AstNodeType.PLUS_OP:
+    case AstNodeType.TIMES_OP:
+    case AstNodeType.DIV_OP:
+    case AstNodeType.POWER_OP:
+      return doesContainRelativeReferences(ast.left) || doesContainRelativeReferences(ast.right)
+    case AstNodeType.PARENTHESIS:
+      return doesContainRelativeReferences(ast.expression)
+    case AstNodeType.FUNCTION_CALL: {
+      return ast.args.some((arg) =>
+        doesContainRelativeReferences(arg)
+      )
+    }
   }
 }

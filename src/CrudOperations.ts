@@ -22,7 +22,7 @@ import {
   MatrixVertex,
   Vertex, CellVertex, EmptyCellVertex, ValueCellVertex
 } from './DependencyGraph'
-import {NamedExpressions, NamedExpression} from './NamedExpressions'
+import {NamedExpressions, NamedExpression, doesContainRelativeReferences} from './NamedExpressions'
 import {Maybe} from './Maybe'
 import {
   InvalidAddressError,
@@ -31,7 +31,7 @@ import {
   NamedExpressionNameIsAlreadyTaken,
   NamedExpressionNameIsInvalid,
   NoOperationToRedoError,
-  NoOperationToUndoError,
+  NoOperationToUndoError, NoRelativeAddressesAllowedError,
   NoSheetWithIdError,
   NoSheetWithNameError,
   NothingToPasteError,
@@ -382,8 +382,9 @@ export class CrudOperations {
       throw new NamedExpressionNameIsAlreadyTaken(expressionName)
     }
 
+    this.storeNamedExpressionInCell(this.namedExpressions.lookupNextAddress(expressionName, sheetId), expression)
     const namedExpression = this.namedExpressions.addNamedExpression(expressionName, sheetId)
-    this.storeExpressionInCell(namedExpression.address, expression)
+
     if (sheetId !== undefined) {
       const localVertex = this.dependencyGraph.fetchCellOrCreateEmpty(namedExpression.address)
       const globalNamedExpression = this.namedExpressions.workbookNamedExpressionOrPlaceholder(expressionName)
@@ -416,7 +417,8 @@ export class CrudOperations {
     if (!namedExpression) {
       throw new NamedExpressionDoesNotExist(expressionName)
     }
-    this.storeExpressionInCell(namedExpression.address, newExpression)
+
+    this.storeNamedExpressionInCell(namedExpression.address, newExpression)
   }
 
   public removeNamedExpression(expressionName: string, sheetScope: string | undefined): Maybe<NamedExpression> {
@@ -650,18 +652,25 @@ export class CrudOperations {
     this.dependencyGraph.addressMapping.addSheet(-1, new SparseStrategy(0, 0))
   }
 
-  private storeExpressionInCell(address: SimpleCellAddress, expression: RawCellContent) {
+  private storeNamedExpressionInCell(address: SimpleCellAddress, expression: RawCellContent) {
     const parsedCellContent = this.cellContentParser.parse(expression)
+
     if (parsedCellContent instanceof CellContent.MatrixFormula) {
       throw new Error('Matrix formulas are not supported')
     } else if (parsedCellContent instanceof CellContent.Formula) {
-      const parsingResult = this.parser.parse(parsedCellContent.formula, address)
+      const parsingResult = this.parser.parse(parsedCellContent.formula, simpleCellAddress(-1, 0, 0))
+      if (doesContainRelativeReferences(parsingResult.ast)) {
+        throw new NoRelativeAddressesAllowedError()
+      }
       const {ast, hasVolatileFunction, hasStructuralChangeFunction, dependencies} = parsingResult
       this.dependencyGraph.setFormulaToCell(address, ast, absolutizeDependencies(dependencies, address), hasVolatileFunction, hasStructuralChangeFunction)
-    } else if (parsedCellContent instanceof CellContent.Empty) {
-      this.operations.setCellEmpty(address)
     } else {
-      this.operations.setValueToCell(parsedCellContent.value, address)
+
+      if (parsedCellContent instanceof CellContent.Empty) {
+        this.operations.setCellEmpty(address)
+      } else {
+        this.operations.setValueToCell(parsedCellContent.value, address)
+      }
     }
   }
 }

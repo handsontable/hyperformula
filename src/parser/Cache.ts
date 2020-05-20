@@ -92,4 +92,3 @@ export const doesContainFunctions = (ast: Ast, functionCriterion: (functionId: s
     }
   }
 }
-

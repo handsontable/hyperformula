@@ -244,3 +244,9 @@ export class FunctionPluginValidationError extends Error {
     return new FunctionPluginValidationError(`Formula method ${functionName} not found in plugin ${pluginName}`)
   }
 }
+
+export class NoRelativeAddressesAllowedError extends Error {
+  constructor() {
+    super('Relative addresses not allowed in named expressions.')
+  }
+}
