@@ -112,7 +112,7 @@ describe('Adding row - matrix check', () => {
 
     expect(() => {
       engine.addRows(0, [3, 1])
-    }).toThrowError('It is not possible to add row in row with matrix')
+    }).toThrowError('Cannot perform this operation, target location has a matrix inside.')
   })
 
   it('should be possible to add row right above matrix', () => {

@@ -480,7 +480,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * @param {SimpleCellAddress} cellAddress - cell coordinates
    *
-   * @throws Throws an error if the sheet ID is unknown
+   * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
    * @throws [[EvaluationSuspendedError]] when the evaluation is suspended
    *
    * @example
@@ -1083,7 +1083,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
    * @throws [[SheetSizeLimitExceededError]] when performing this operation would result in sheet size limits exceeding
-   * @throws an error if the selected position has matrix inside
+   * @throws [[TargetLocationHasMatrixError]] when the selected position has matrix inside
    *
    * @example
    * ```js
@@ -1150,7 +1150,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * @throws [[InvalidArgumentsError]] when the given arguments are invalid
    * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
-   * @throws an error when the selected position has matrix inside
+   * @throws [[SourceLocationHasMatrixError]] when the selected position has matrix inside
    *
    * @example
    * ```js
@@ -1216,7 +1216,7 @@ export class HyperFormula implements TypedEmitter {
    * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
    * @throws [[InvalidArgumentsError]] when the given arguments are invalid
    * @throws [[SheetSizeLimitExceededError]] when performing this operation would result in sheet size limits exceeding
-   * @throws an error when the selected position has matrix inside
+   * @throws [[TargetLocationHasMatrixError]] when the selected position has matrix inside
    *
    * @example
    * ```js
@@ -1285,7 +1285,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
    * @throws [[InvalidArgumentsError]] when the given arguments are invalid
-   * @throws an error when the selected position has matrix inside
+   * @throws [[SourceLocationHasMatrixError]] when the selected position has matrix inside
    *
    * @example
    * ```js
@@ -1361,8 +1361,8 @@ export class HyperFormula implements TypedEmitter {
    *
    * @throws [[InvalidArgumentsError]] when the given arguments are invalid
    * @throws [[SheetSizeLimitExceededError]] when performing this operation would result in sheet size limits exceeding
-   * @throws an error when the source location has matrix inside - matrix cannot be moved
-   * @throws an error when the target location has matrix inside - cells cannot be replaced by the matrix
+   * @throws [[SourceLocationHasMatrixError]] when the source location has matrix inside - matrix cannot be moved
+   * @throws [[TargetLocationHasMatrixError]] when the target location has matrix inside - cells cannot be replaced by the matrix
    *
    * @example
    * ```js
@@ -1437,7 +1437,8 @@ export class HyperFormula implements TypedEmitter {
    * @fires [[valuesUpdated]] if recalculation was triggered by this change
    *
    * @throws [[InvalidArgumentsError]] when the given arguments are invalid
-   * @throws an error when the source location has matrix inside - matrix cannot be moved
+   * @throws [[SourceLocationHasMatrixError]] when the source location has matrix inside - matrix cannot be moved
+   * @throws [[TargetLocationHasMatrixError]] when the target location has matrix inside - cells cannot be replaced by the matrix
    *
    * @example
    * ```js
@@ -1504,7 +1505,8 @@ export class HyperFormula implements TypedEmitter {
    * @fires [[valuesUpdated]] if recalculation was triggered by this change
    *
    * @throws [[InvalidArgumentsError]] when the given arguments are invalid
-   * @throws an error when the source location has matrix inside - matrix cannot be moved
+   * @throws [[SourceLocationHasMatrixError]] when the source location has matrix inside - matrix cannot be moved
+   * @throws [[TargetLocationHasMatrixError]] when the target location has matrix inside - cells cannot be replaced by the matrix
    *
    * @example
    * ```js
@@ -1600,6 +1602,7 @@ export class HyperFormula implements TypedEmitter {
    * @throws [[EvaluationSuspendedError]] when the evaluation is suspended
    * @throws [[SheetSizeLimitExceededError]] when performing this operation would result in sheet size limits exceeding
    * @throws [[NothingToPasteError]] when clipboard is empty
+   * @throws [[TargetLocationHasMatrixError]] when the selected target area has matrix inside
    *
    * @example
    * ```js
@@ -1790,7 +1793,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * @fires [[sheetAdded]] after the sheet was added
    *
-   * @throws an error when sheet with a given name already exists
+   * @throws [[SheetNameAlreadyTaken]] when sheet with a given name already exists
    *
    * @example
    * ```js
@@ -2321,7 +2324,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * @fires [[sheetRenamed]] after the sheet was renamed
    *
-   * @throws Throws an error if the provided sheet ID does not exists.
+   * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
    *
    * @example
    * ```js

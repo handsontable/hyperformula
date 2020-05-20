@@ -25,7 +25,7 @@ import {
   ValueCellVertex
 } from './DependencyGraph'
 import {ValueCellVertexValue} from './DependencyGraph/ValueCellVertex'
-import {InvalidArgumentsError, SheetSizeLimitExceededError} from './errors'
+import {InvalidArgumentsError, SheetSizeLimitExceededError, TargetLocationHasMatrixError, SourceLocationHasMatrixError} from './errors'
 import {ParserWithCaching, ProcedureAst} from './parser'
 import {ParsingError} from './parser/Ast'
 import {AddRowsTransformer} from './dependencyTransformers/AddRowsTransformer'
@@ -287,11 +287,11 @@ export class Operations {
     }
 
     if (this.dependencyGraph.matrixMapping.isFormulaMatrixInRange(sourceRange)) {
-      throw new Error('It is not possible to move matrix')
+      throw new SourceLocationHasMatrixError()
     }
 
     if (this.dependencyGraph.matrixMapping.isFormulaMatrixInRange(targetRange)) {
-      throw new Error('It is not possible to replace cells with matrix')
+      throw new TargetLocationHasMatrixError()
     }
   }
 

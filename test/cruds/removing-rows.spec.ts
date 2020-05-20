@@ -566,7 +566,7 @@ describe('Removing rows - matrices', () => {
       ['{=MMULT(A1:B2, A1:B2)}'],
     ])
 
-    expect(() => engine.removeRows(0, [2, 1])).toThrowError('It is not possible to remove row with matrix')
+    expect(() => engine.removeRows(0, [2, 1])).toThrowError('Cannot perform this operation, source location has a matrix inside.')
   })
 
   it('should remove row from numeric matrix', () => {
