@@ -55,6 +55,8 @@ export interface ConfigParams {
    * - AlwaysSparse - will use SparseStrategy for all sheets.
    *
    * @default AlwaysDense
+   *
+   * @category Engine
    */
   chooseAddressMappingPolicy: ChooseAddressMapping,
   /**
@@ -66,7 +68,7 @@ export interface ConfigParams {
    *
    * @default ['MM/DD/YYYY', 'MM/DD/YY']
    *
-   * @category DateTime
+   * @category Date and Time
    */
   dateFormats: string[],
   /**
@@ -77,6 +79,8 @@ export interface ConfigParams {
    * Any configuration of at least two of hh, mm, ss is accepted as a time, and they can be put in any order.
    *
    * @default ['hh:mm', 'hh:mm:ss']
+   *
+   * @category Date and Time
    */
   timeFormats: string[],
   /**
@@ -84,7 +88,7 @@ export interface ConfigParams {
    *
    * @default ','
    *
-   * @category Syntax
+   * @category Formula Syntax
    */
   functionArgSeparator: string,
   /**
@@ -100,12 +104,16 @@ export interface ConfigParams {
    * Code for translation package with translations of function and error names.
    *
    * @default 'enGB'
+   *
+   * @category Formula Syntax
    */
   language: string,
   /**
    * License key for commercial version of HyperFormula.
    *
-   * @default ''
+   * @default undefined
+   *
+   * @category License
    */
   licenseKey: string,
   /**
@@ -122,7 +130,7 @@ export interface ConfigParams {
    *
    * @default []
    *
-   * @category Syntax
+   * @category Formula Syntax
    */
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   functionPlugins: any[],
@@ -151,7 +159,7 @@ export interface ConfigParams {
    *
    * @default false
    *
-   * @category DateTime
+   * @category Date and Time
    */
   leapYear1900: boolean,
   /**
@@ -186,7 +194,7 @@ export interface ConfigParams {
    *
    * @default 30
    *
-   * @category DateTime
+   * @category Date and Time
    */
   nullYear: number,
   /**
@@ -194,7 +202,7 @@ export interface ConfigParams {
    *
    * @default defaultParseToDateTime
    *
-   * @category DateTime
+   * @category Date and Time
    */
   parseDateTime: (dateTimeString: string, dateFormat: string, timeFormat: string) => Maybe<DateTime>,
   /**
@@ -225,7 +233,7 @@ export interface ConfigParams {
    *
    * @default defaultStringifyDateTime
    *
-   * @category DateTime
+   * @category Date and Time
    */
   stringifyDateTime: (dateTime: SimpleDateTime, dateFormat: string) => Maybe<string>,
   /**
@@ -272,7 +280,7 @@ export interface ConfigParams {
    *
    * @default {year: 1899, month: 12, day: 30}
    *
-   * @category DateTime
+   * @category Date and Time
    */
   nullDate: SimpleDate,
   /**
@@ -280,7 +288,7 @@ export interface ConfigParams {
    *
    * @default 20
    *
-   * @category UndoRedo
+   * @category Undo and Redo
    */
   undoLimit: number,
   /**
