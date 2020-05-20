@@ -773,7 +773,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * @category Sheets
    */
-  public getAllSheetsSerialized(): Record<string, InternalCellValue[][]> {
+  public getAllSheetsSerialized(): Record<string, NoErrorCellValue[][]> {
     this.ensureEvaluationIsNotSuspended()
     return this._serialization.getAllSheetsSerialized()
   }
