@@ -2626,7 +2626,7 @@ export class HyperFormula implements TypedEmitter {
    * Note that this method may trigger dependency graph recalculation.
    *
    * @param {string} expressionName - expression name, case insensitive.
-   * @param {string | undefined} sheetScope - scope definition, sheet name for local scope or undefined for global scope
+   * @param {string | undefined} sheetScope - scope definition, `sheetName` for local scope or `undefined` for global scope
    *
    * @fires [[namedExpressionRemoved]] after the expression was removed
    * @fires [[valuesUpdated]] if recalculation was triggered by this change
