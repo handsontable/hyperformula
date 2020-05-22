@@ -113,6 +113,13 @@ export class PasteUndoEntry {
   ) { }
 }
 
+export class AddNamedExpressionUndoEntry {
+  constructor(
+    public readonly name: string,
+    public readonly scope?: number,
+  ) { }
+}
+
 export class BatchUndoEntry {
   public readonly operations: UndoStackEntry[] = []
 
@@ -142,6 +149,7 @@ type UndoStackEntry
   | SetSheetContentUndoEntry
   | PasteUndoEntry
   | BatchUndoEntry
+  | AddNamedExpressionUndoEntry
 
 export class UndoRedo {
   private readonly undoStack: UndoStackEntry[] = []
@@ -245,6 +253,8 @@ export class UndoRedo {
       this.undoPaste(operation)
     } else if (operation instanceof BatchUndoEntry) {
       this.undoBatch(operation)
+    } else if (operation instanceof AddNamedExpressionUndoEntry) {
+      this.undoAddNamedExpression(operation)
     } else {
       throw 'Unknown element'
     }
@@ -381,6 +391,10 @@ export class UndoRedo {
         this.operations.restoreCell(address, cellType)
       }
     }
+  }
+
+  private undoAddNamedExpression(operation: AddNamedExpressionUndoEntry) {
+    this.operations.removeNamedExpression(operation.name, operation.scope)
   }
 
   public redo() {
