@@ -6,25 +6,15 @@
 import {AbsoluteCellRange} from './AbsoluteCellRange'
 import {absolutizeDependencies} from './absolutizeDependencies'
 import {invalidSimpleCellAddress, simpleCellAddress, SimpleCellAddress} from './Cell'
-import {CellContent, CellContentParser, isMatrix, RawCellContent} from './CellContentParser'
-import {ClipboardCell, ClipboardCellFormula, ClipboardCellType, ClipboardOperations} from './ClipboardOperations'
+import {CellContentParser, isMatrix, RawCellContent} from './CellContentParser'
+import {ClipboardCell, ClipboardCellType, ClipboardOperations} from './ClipboardOperations'
 import {AddColumnsCommand, AddRowsCommand, Operations, RemoveColumnsCommand, RemoveRowsCommand} from './Operations'
 import {ColumnSearchStrategy} from './ColumnSearch/ColumnSearchStrategy'
 import {ColumnsSpan} from './ColumnsSpan'
 import {Config} from './Config'
 import {ContentChanges} from './ContentChanges'
-import {
-  AddressMapping,
-  CellVertex,
-  DependencyGraph,
-  EmptyCellVertex,
-  FormulaCellVertex,
-  MatrixVertex,
-  SheetMapping,
-  SparseStrategy,
-  ValueCellVertex
-} from './DependencyGraph'
-import {doesContainRelativeReferences, NamedExpression, NamedExpressions} from './NamedExpressions'
+import {AddressMapping, DependencyGraph, FormulaCellVertex, MatrixVertex, SheetMapping} from './DependencyGraph'
+import {NamedExpression, NamedExpressions} from './NamedExpressions'
 import {Maybe} from './Maybe'
 import {
   InvalidAddressError,
@@ -34,7 +24,6 @@ import {
   NamedExpressionNameIsInvalid,
   NoOperationToRedoError,
   NoOperationToUndoError,
-  NoRelativeAddressesAllowedError,
   NoSheetWithIdError,
   NoSheetWithNameError,
   NothingToPasteError,
@@ -42,7 +31,7 @@ import {
 } from './errors'
 import {Index} from './HyperFormula'
 import {LazilyTransformingAstService} from './LazilyTransformingAstService'
-import {NamedExpressionDependency, ParserWithCaching, RelativeDependency} from './parser'
+import {NamedExpressionDependency, ParserWithCaching} from './parser'
 import {RowsSpan} from './RowsSpan'
 import {Statistics} from './statistics'
 import {
@@ -62,13 +51,14 @@ import {
   UndoRedo
 } from './UndoRedo'
 import {findBoundaries, validateAsSheet} from './Sheet'
-import {ParsingResult} from './parser/ParserWithCaching'
+import {NamedExpressionsOperations} from './NamedExpressionsOperations'
 
 export class CrudOperations {
 
   private readonly clipboardOperations: ClipboardOperations
   public readonly undoRedo: UndoRedo
   public readonly operations: Operations
+  public readonly namedExpressionsOperations: NamedExpressionsOperations
 
   constructor(
     /** Engine config */
@@ -89,10 +79,9 @@ export class CrudOperations {
     private readonly namedExpressions: NamedExpressions,
   ) {
     this.operations = new Operations(this.dependencyGraph, this.columnSearch, this.cellContentParser, this.parser, this.stats, this.lazilyTransformingAstService, this.config)
+    this.namedExpressionsOperations = new NamedExpressionsOperations(this.dependencyGraph, this.cellContentParser, this.parser, this.operations, this.namedExpressions, this.lazilyTransformingAstService)
     this.clipboardOperations = new ClipboardOperations(this.dependencyGraph, this.operations, this.parser, this.lazilyTransformingAstService, this.config)
     this.undoRedo = new UndoRedo(this.config, this.operations)
-
-    this.allocateNamedExpressionAddressSpace()
   }
 
   public addRows(sheet: number, ...indexes: Index[]): void {
@@ -135,31 +124,9 @@ export class CrudOperations {
     this.undoRedo.clearRedoStack()
     this.clipboardOperations.abortCut()
     const {version, overwrittenCellsData} = this.operations.moveCells(sourceLeftCorner, width, height, destinationLeftCorner)
-    this.updateNamedExpressionsForMovedCells(sourceLeftCorner, width, height, destinationLeftCorner)
+    this.namedExpressionsOperations.updateNamedExpressionsForMovedCells(sourceLeftCorner, width, height, destinationLeftCorner)
     this.undoRedo.saveOperation(new MoveCellsUndoEntry(sourceLeftCorner, width, height, destinationLeftCorner, overwrittenCellsData, version))
   }
-
-  private copyOrFetchGlobalNamedExpressionVertex(expressionName: string, sourceVertex: CellVertex): CellVertex {
-    let expression = this.namedExpressions.namedExpressionForScope(expressionName)
-    if (expression === undefined) {
-      expression = this.namedExpressions.addNamedExpression(expressionName)
-      this.copyExpressionVertexContent(expression.address, sourceVertex)
-    }
-    return this.dependencyGraph.fetchCellOrCreateEmpty(expression.address)
-  }
-
-  private copyExpressionVertexContent(address: SimpleCellAddress, sourceVertex: CellVertex) {
-    if (sourceVertex instanceof FormulaCellVertex) {
-      const parsingResult = this.parser.fetchCachedResultForAst(sourceVertex.getFormula(this.lazilyTransformingAstService))
-      const {ast, hasVolatileFunction, hasStructuralChangeFunction, dependencies} = parsingResult
-      this.dependencyGraph.setFormulaToCell(address, ast, absolutizeDependencies(dependencies, address), hasVolatileFunction, hasStructuralChangeFunction)
-    } else if (sourceVertex instanceof EmptyCellVertex) {
-      this.operations.setCellEmpty(address)
-    } else if (sourceVertex instanceof ValueCellVertex) {
-      this.operations.setValueToCell(sourceVertex.getCellValue(), address)
-    }
-  }
-
 
   public moveRows(sheet: number, startRow: number, numberOfRows: number, targetRow: number): void {
     this.ensureItIsPossibleToMoveRows(sheet, startRow, numberOfRows, targetRow)
@@ -210,7 +177,7 @@ export class CrudOperations {
         this.operations.restoreCell(address, clipboardCell)
         if (clipboardCell.type === ClipboardCellType.FORMULA) {
           const {dependencies} = this.parser.fetchCachedResult(clipboardCell.hash)
-          this.updateNamedExpressionsForTargetAddress(clipboard.sourceLeftCorner.sheet, address, dependencies)
+          this.namedExpressionsOperations.updateNamedExpressionsForTargetAddress(clipboard.sourceLeftCorner.sheet, address, dependencies)
         }
       }
       this.undoRedo.saveOperation(new PasteUndoEntry(targetLeftCorner, oldContent, clipboard.content!))
@@ -348,7 +315,7 @@ export class CrudOperations {
       throw new NamedExpressionNameIsAlreadyTaken(expressionName)
     }
 
-    this.storeNamedExpressionInCell(this.namedExpressions.lookupNextAddress(expressionName, sheetId), expression)
+    this.namedExpressionsOperations.storeNamedExpressionInCell(this.namedExpressions.lookupNextAddress(expressionName, sheetId), expression)
     const namedExpression = this.namedExpressions.addNamedExpression(expressionName, sheetId)
 
     if (sheetId !== undefined) {
@@ -384,7 +351,7 @@ export class CrudOperations {
       throw new NamedExpressionDoesNotExist(expressionName)
     }
 
-    this.storeNamedExpressionInCell(namedExpression.address, newExpression)
+    this.namedExpressionsOperations.storeNamedExpressionInCell(namedExpression.address, newExpression)
   }
 
   public removeNamedExpression(expressionName: string, sheetScope: string | undefined): Maybe<NamedExpression> {
@@ -612,76 +579,6 @@ export class CrudOperations {
 
   private get sheetMapping(): SheetMapping {
     return this.dependencyGraph.sheetMapping
-  }
-
-  private allocateNamedExpressionAddressSpace() {
-    this.dependencyGraph.addressMapping.addSheet(-1, new SparseStrategy(0, 0))
-  }
-
-  private storeNamedExpressionInCell(address: SimpleCellAddress, expression: RawCellContent) {
-    const parsedCellContent = this.cellContentParser.parse(expression)
-
-    if (parsedCellContent instanceof CellContent.MatrixFormula) {
-      throw new Error('Matrix formulas are not supported')
-    } else if (parsedCellContent instanceof CellContent.Formula) {
-      const parsingResult = this.parser.parse(parsedCellContent.formula, simpleCellAddress(-1, 0, 0))
-      if (doesContainRelativeReferences(parsingResult.ast)) {
-        throw new NoRelativeAddressesAllowedError()
-      }
-      const {ast, hasVolatileFunction, hasStructuralChangeFunction, dependencies} = parsingResult
-      this.dependencyGraph.setFormulaToCell(address, ast, absolutizeDependencies(dependencies, address), hasVolatileFunction, hasStructuralChangeFunction)
-    } else {
-
-      if (parsedCellContent instanceof CellContent.Empty) {
-        this.operations.setCellEmpty(address)
-      } else {
-        this.operations.setValueToCell(parsedCellContent.value, address)
-      }
-    }
-  }
-
-  private updateNamedExpressionsForMovedCells(sourceLeftCorner: SimpleCellAddress, width: number, height: number, destinationLeftCorner: SimpleCellAddress): void {
-    if (sourceLeftCorner.sheet === destinationLeftCorner.sheet) {
-      return
-    }
-
-    const targetRange = AbsoluteCellRange.spanFrom(destinationLeftCorner, width, height)
-
-    for (const formulaAddress of targetRange.addresses(this.dependencyGraph)) {
-      const vertex = this.addressMapping.fetchCell(formulaAddress)
-      if (vertex instanceof FormulaCellVertex && formulaAddress.sheet !== sourceLeftCorner.sheet) {
-        const ast = vertex.getFormula(this.lazilyTransformingAstService)
-        const {dependencies} = this.parser.fetchCachedResultForAst(ast)
-        this.updateNamedExpressionsForTargetAddress(sourceLeftCorner.sheet, formulaAddress, dependencies)
-      }
-    }
-  }
-
-  private updateNamedExpressionsForTargetAddress(sourceSheet: number, targetAddress: SimpleCellAddress, dependencies: RelativeDependency[]) {
-    if (sourceSheet === targetAddress.sheet) {
-      return
-    }
-
-    const vertex = this.addressMapping.fetchCell(targetAddress)
-
-    for (const namedExpressionDependency of absolutizeDependencies(dependencies, targetAddress)) {
-      if (!(namedExpressionDependency instanceof NamedExpressionDependency)) {
-        continue
-      }
-
-      const expressionName = namedExpressionDependency.name
-      const sourceVertex = this.dependencyGraph.fetchNamedExpressionVertex(expressionName, sourceSheet)
-      const namedExpressionInTargetScope = this.namedExpressions.isExpressionInScope(expressionName, targetAddress.sheet)
-
-      const targetScopeExpressionVertex = namedExpressionInTargetScope
-        ? this.dependencyGraph.fetchNamedExpressionVertex(expressionName, targetAddress.sheet)
-        : this.copyOrFetchGlobalNamedExpressionVertex(expressionName, sourceVertex)
-
-      if (targetScopeExpressionVertex !== sourceVertex) {
-        this.dependencyGraph.graph.softRemoveEdge(sourceVertex, vertex)
-        this.dependencyGraph.graph.addEdge(targetScopeExpressionVertex, vertex)
-      }
-    }
   }
 }
 
