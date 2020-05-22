@@ -606,8 +606,7 @@ describe('Named expression - cross scope', () => {
     expect(engine.getCellValue(adr('B1', 1))).toEqual('foo')
   })
 
-  /* TODO */
-  xit('should add named expression to global scope when copying formula to other sheet', () => {
+  it('should add named expression to global scope when copying formula to other sheet', () => {
     const engine = HyperFormula.buildFromSheets({
       'Sheet1': [['foo', '=expr']],
       'Sheet2': [['bar']]
@@ -622,7 +621,26 @@ describe('Named expression - cross scope', () => {
     expect(engine.getNamedExpressionFormula('expr', 'Sheet1')).toEqual('=Sheet1!$A$1')
     expect(engine.getNamedExpressionFormula('expr')).toEqual('=Sheet1!$A$1')
     expect(engine.getCellValue(adr('B1', 0))).toEqual('foo')
-    expect(engine.getCellValue(adr('B1', 1))).toEqual('bar')
+    expect(engine.getCellValue(adr('B1', 1))).toEqual('foo')
+  })
+
+  it('should add named expression to global scope even if cell was modified before pasting', () => {
+    const engine = HyperFormula.buildFromSheets({
+      'Sheet1': [['foo', '=expr']],
+      'Sheet2': [['bar']]
+    })
+
+
+    engine.addNamedExpression('expr', '=Sheet1!$A$1', 'Sheet1')
+
+    engine.copy(adr('B1'), 1, 1)
+    engine.setCellContents(adr('B1'), [['baz']])
+    engine.paste(adr('B1', 1))
+
+    expect(engine.getNamedExpressionFormula('expr', 'Sheet1')).toEqual('=Sheet1!$A$1')
+    expect(engine.getNamedExpressionFormula('expr')).toEqual('=Sheet1!$A$1')
+    expect(engine.getCellValue(adr('B1', 0))).toEqual('baz')
+    expect(engine.getCellValue(adr('B1', 1))).toEqual('foo')
   })
 
   it('should use already existing named expression in other sheet when moving formula', () => {
@@ -630,7 +648,6 @@ describe('Named expression - cross scope', () => {
       'Sheet1': [['foo', '=expr']],
       'Sheet2': [['bar']]
     })
-
 
     engine.addNamedExpression('expr', '=Sheet1!$A$1', 'Sheet1')
     engine.addNamedExpression('expr', '=Sheet2!$A$1', 'Sheet2')
@@ -642,6 +659,12 @@ describe('Named expression - cross scope', () => {
     expect(engine.getNamedExpressionFormula('expr', 'Sheet2')).toEqual('=Sheet2!$A$1')
     expect(engine.getCellValue(adr('B1', 0))).toEqual(EmptyValue)
     expect(engine.getCellValue(adr('B1', 1))).toEqual('bar')
+    // ensure edges are correct
+    const sourceScopeNEVertex = engine.dependencyGraph.fetchNamedExpressionVertex('expr', 0)
+    const targetScopeNEVertex = engine.dependencyGraph.fetchNamedExpressionVertex('expr', 1)
+    const targetFormulaVertex = engine.dependencyGraph.getCell(adr('B1', 1))!
+    expect(engine.dependencyGraph.existsEdge(sourceScopeNEVertex, targetFormulaVertex)).toBe(false)
+    expect(engine.dependencyGraph.existsEdge(targetScopeNEVertex, targetFormulaVertex)).toBe(true)
   })
 
   it('should use already existing named expression in other sheet when cut pasting formula', () => {
@@ -662,10 +685,15 @@ describe('Named expression - cross scope', () => {
     expect(engine.getNamedExpressionFormula('expr', 'Sheet2')).toEqual('=Sheet2!$A$1')
     expect(engine.getCellValue(adr('B1', 0))).toEqual(EmptyValue)
     expect(engine.getCellValue(adr('B1', 1))).toEqual('bar')
+    // ensure edges are correct
+    const sourceScopeNEVertex = engine.dependencyGraph.fetchNamedExpressionVertex('expr', 0)
+    const targetScopeNEVertex = engine.dependencyGraph.fetchNamedExpressionVertex('expr', 1)
+    const targetFormulaVertex = engine.dependencyGraph.getCell(adr('B1', 1))!
+    expect(engine.dependencyGraph.existsEdge(sourceScopeNEVertex, targetFormulaVertex)).toBe(false)
+    expect(engine.dependencyGraph.existsEdge(targetScopeNEVertex, targetFormulaVertex)).toBe(true)
   })
 
-  /* TODO */
-  xit('should use already existing named expression in other sheet when copying formula', () => {
+  it('should use already existing named expression in other sheet when copying formula', () => {
     const engine = HyperFormula.buildFromSheets({
       'Sheet1': [['foo', '=expr']],
       'Sheet2': [['bar']]
@@ -682,6 +710,12 @@ describe('Named expression - cross scope', () => {
     expect(engine.getNamedExpressionFormula('expr', 'Sheet2')).toEqual('=Sheet2!$A$1')
     expect(engine.getCellValue(adr('B1', 0))).toEqual('foo')
     expect(engine.getCellValue(adr('B1', 1))).toEqual('bar')
+    // ensure edges are correct
+    const sourceScopeNEVertex = engine.dependencyGraph.fetchNamedExpressionVertex('expr', 0)
+    const targetScopeNEVertex = engine.dependencyGraph.fetchNamedExpressionVertex('expr', 1)
+    const targetFormulaVertex = engine.dependencyGraph.getCell(adr('B1', 1))!
+    expect(engine.dependencyGraph.existsEdge(sourceScopeNEVertex, targetFormulaVertex)).toBe(false)
+    expect(engine.dependencyGraph.existsEdge(targetScopeNEVertex, targetFormulaVertex)).toBe(true)
   })
 })
 
