@@ -159,3 +159,24 @@ describe('larger tests', () => {
     expect(engine.dependencyGraph.rangeMapping.getMappingSize(0)).toBe(0)
   })
 })
+
+
+describe('cruds', () => {
+  it('should collect empty vertices when bigger range is no longer bind to smaller range', () => {
+    const engine = HyperFormula.buildFromArray([
+      [],
+      [],
+      // add
+      [],
+      ['=SUM(A1:A2)'],
+      ['=SUM(A1:A3)'],
+    ])
+
+    engine.addRows(0, [2, 1])
+    engine.removeRows(0, [0, 2])
+    engine.removeRows(0, [2, 2])
+
+    expect(engine.dependencyGraph.graph.nodesCount()).toBe(0)
+    expect(engine.dependencyGraph.rangeMapping.getMappingSize(0)).toBe(0)
+  })
+})
