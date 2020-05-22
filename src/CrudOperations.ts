@@ -234,10 +234,7 @@ export class CrudOperations {
     if (clipboard === undefined) {
       throw new NothingToPasteError()
     } else if (this.clipboardOperations.isCutClipboard()) {
-      this.undoRedo.clearRedoStack()
-      const {version, overwrittenCellsData} = this.operations.moveCells(clipboard.sourceLeftCorner, clipboard.width, clipboard.height, targetLeftCorner)
-      this.clipboardOperations.abortCut()
-      this.undoRedo.saveOperation(new MoveCellsUndoEntry(clipboard.sourceLeftCorner, clipboard.width, clipboard.height, targetLeftCorner, overwrittenCellsData, version))
+      this.moveCells(clipboard.sourceLeftCorner, clipboard.width, clipboard.height, targetLeftCorner)
     } else if (this.clipboardOperations.isCopyClipboard()) {
       this.clipboardOperations.ensureItIsPossibleToCopyPaste(targetLeftCorner)
       const targetRange = AbsoluteCellRange.spanFrom(targetLeftCorner, clipboard.width, clipboard.height)
