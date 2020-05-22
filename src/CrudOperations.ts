@@ -573,10 +573,6 @@ export class CrudOperations {
     }
   }
 
-  private get addressMapping(): AddressMapping {
-    return this.dependencyGraph.addressMapping
-  }
-
   private get sheetMapping(): SheetMapping {
     return this.dependencyGraph.sheetMapping
   }
