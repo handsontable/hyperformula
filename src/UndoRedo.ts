@@ -520,28 +520,23 @@ export class UndoRedo {
   }
 
   private redoRemoveSheet(operation: RemoveSheetUndoEntry) {
-    const { sheetName } = operation
-    this.operations.removeSheet(sheetName)
+    this.operations.removeSheet(operation.sheetName)
   }
 
   private redoAddSheet(operation: AddSheetUndoEntry) {
-    const { sheetName } = operation
-    this.operations.addSheet(sheetName)
+    this.operations.addSheet(operation.sheetName)
   }
 
   private redoMoveRows(operation: MoveRowsUndoEntry) {
-    const { sheet } = operation
-    this.operations.moveRows(sheet, operation.startRow, operation.numberOfRows, operation.targetRow)
+    this.operations.moveRows(operation.sheet, operation.startRow, operation.numberOfRows, operation.targetRow)
   }
 
   private redoMoveColumns(operation: MoveColumnsUndoEntry) {
-    const { sheet } = operation
-    this.operations.moveColumns(sheet, operation.startColumn, operation.numberOfColumns, operation.targetColumn)
+    this.operations.moveColumns(operation.sheet, operation.startColumn, operation.numberOfColumns, operation.targetColumn)
   }
 
   private redoClearSheet(operation: ClearSheetUndoEntry) {
-    const { sheetId } = operation
-    this.operations.clearSheet(sheetId)
+    this.operations.clearSheet(operation.sheetId)
   }
 
   private redoSetSheetContent(operation: SetSheetContentUndoEntry) {
