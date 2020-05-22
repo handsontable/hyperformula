@@ -300,7 +300,7 @@ export class CrudOperations {
     }
 
     this.operations.addNamedExpression(expressionName, expression, sheetId)
-    this.undoRedo.saveOperation(new AddNamedExpressionUndoEntry(expressionName, sheetId))
+    this.undoRedo.saveOperation(new AddNamedExpressionUndoEntry(expressionName, expression, sheetId))
   }
 
   public changeNamedExpressionExpression(expressionName: string, sheetScope: string | undefined, newExpression: RawCellContent) {

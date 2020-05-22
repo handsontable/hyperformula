@@ -1373,6 +1373,56 @@ describe('Redo - setting sheet contents', () => {
   })
 })
 
+describe('Redo - add named expression', () => {
+  it('works', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=foo']
+    ])
+
+    engine.addNamedExpression('foo', 'foo')
+    engine.undo()
+
+    engine.redo()
+
+    expect(engine.listNamedExpressions().length).toEqual(1)
+    expect(engine.getCellValue(adr('A1'))).toEqual('foo')
+  })
+})
+
+describe('Redo - remove named expression', () => {
+  it('works', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=foo']
+    ])
+
+    engine.addNamedExpression('foo', 'foo')
+    engine.removeNamedExpression('foo')
+    engine.undo()
+
+    engine.redo()
+
+    expect(engine.listNamedExpressions().length).toEqual(0)
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NAME))
+  })
+})
+
+describe('Redo - change named expression', () => {
+  it('works', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=foo']
+    ])
+
+    engine.addNamedExpression('foo', 'foo')
+    engine.changeNamedExpression('foo', 'bar')
+    engine.undo()
+
+    engine.redo()
+
+    expect(engine.listNamedExpressions().length).toEqual(1)
+    expect(engine.getCellValue(adr('A1'))).toEqual('bar')
+  })
+})
+
 describe('Redo - batch mode', () => {
   it('multiple batched operations are one redo', () => {
     const engine = HyperFormula.buildFromArray([
