@@ -149,12 +149,6 @@ export class NamedExpressions {
   }
 
   public addNamedExpression(expressionName: string, sheetId?: number): NamedExpression {
-    if (!this.isNameValid(expressionName)) {
-      throw new NamedExpressionNameIsInvalid(expressionName)
-    }
-    if (!this.isNameAvailable(expressionName, sheetId)) {
-      throw new NamedExpressionNameIsAlreadyTaken(expressionName)
-    }
     if (sheetId === undefined) {
       let namedExpression = this.workbookStore.get(expressionName)
       if (namedExpression) {

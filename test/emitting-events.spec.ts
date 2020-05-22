@@ -3,6 +3,7 @@ import {Events} from '../src/Emitter'
 import {ErrorType} from '../src/Cell'
 
 import { adr, detailedError } from './testUtils'
+import {NamedExpressionDoesNotExist} from '../src/errors'
 
 describe('Events', () => {
   it('sheetAdded works', function() {
@@ -88,14 +89,14 @@ describe('Events', () => {
     expect(handler).toHaveBeenCalledWith('myName', [])
   })
 
-  it('namedExpressionRemoved is not triggered if there was nothing to remove', () => {
+  it('namedExpressionRemoved throws error when named expression not exists', () => {
     const engine = HyperFormula.buildEmpty()
     const handler = jasmine.createSpy()
 
     engine.on(Events.NamedExpressionRemoved, handler)
-    engine.removeNamedExpression('myName')
-
-    expect(handler).not.toHaveBeenCalled()
+    expect(() => {
+      engine.removeNamedExpression('myName')
+    }).toThrow(new NamedExpressionDoesNotExist('myName'))
   })
 
   it('namedExpressionRemoved contains actual named expression name', () => {

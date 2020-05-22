@@ -9,7 +9,7 @@ import {RawCellContent} from './CellContentParser'
 import {RemoveColumnsCommand, AddColumnsCommand, RowsRemoval, ColumnsRemoval, RemoveRowsCommand, AddRowsCommand} from './Operations'
 import {Operations} from './Operations'
 import {Config} from './Config'
-import {NamedExpression, NamedExpressions} from './NamedExpressions'
+import {NamedExpression} from './NamedExpressions'
 
 export class RemoveRowsUndoEntry {
   constructor(
@@ -129,6 +129,15 @@ export class RemoveNamedExpressionUndoEntry {
   ) { }
 }
 
+export class ChangeNamedExpressionUndoEntry {
+  constructor(
+    public readonly namedExpression: NamedExpression,
+    public readonly newContent: RawCellContent,
+    public readonly oldContent: ClipboardCell,
+    public readonly scope?: number
+  ) { }
+}
+
 export class BatchUndoEntry {
   public readonly operations: UndoStackEntry[] = []
 
@@ -160,6 +169,7 @@ type UndoStackEntry
   | BatchUndoEntry
   | AddNamedExpressionUndoEntry
   | RemoveNamedExpressionUndoEntry
+  | ChangeNamedExpressionUndoEntry
 
 export class UndoRedo {
   private readonly undoStack: UndoStackEntry[] = []
@@ -265,6 +275,8 @@ export class UndoRedo {
       this.undoAddNamedExpression(operation)
     } else if (operation instanceof RemoveNamedExpressionUndoEntry) {
       this.undoRemoveNamedExpression(operation)
+    } else if (operation instanceof ChangeNamedExpressionUndoEntry) {
+      this.undoChangeNamedExpression(operation)
     } else {
       throw 'Unknown element'
     }
@@ -409,6 +421,10 @@ export class UndoRedo {
 
   private undoRemoveNamedExpression(operation: RemoveNamedExpressionUndoEntry) {
     this.operations.restoreNamedExpression(operation.namedExpression, operation.content, operation.scope)
+  }
+
+  private undoChangeNamedExpression(operation: ChangeNamedExpressionUndoEntry) {
+    this.operations.restoreNamedExpression(operation.namedExpression, operation.oldContent, operation.scope)
   }
 
   public redo() {

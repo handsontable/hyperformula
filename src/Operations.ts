@@ -304,12 +304,14 @@ export class Operations {
     this.adjustNamedExpressionEdges(restoredNamedExpression, expressionName, sheetId)
   }
 
-  public changeNamedExpressionExpression(expressionName: string, newExpression: RawCellContent, sheetId?: number) {
+  public changeNamedExpressionExpression(expressionName: string, newExpression: RawCellContent, sheetId?: number): [NamedExpression, ClipboardCell]  {
     const namedExpression = this.namedExpressions.namedExpressionForScope(expressionName, sheetId)
     if (!namedExpression) {
       throw new NamedExpressionDoesNotExist(expressionName)
     }
+    const content = this.getClipboardCell(namedExpression.address)
     this.storeNamedExpressionInCell(namedExpression.address, newExpression)
+    return [namedExpression, content]
   }
 
   public removeNamedExpression(expressionName: string, sheetId?: number): [NamedExpression, ClipboardCell] {

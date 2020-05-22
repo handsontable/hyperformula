@@ -37,7 +37,7 @@ import {Statistics} from './statistics'
 import {
   AddColumnsUndoEntry, AddNamedExpressionUndoEntry,
   AddRowsUndoEntry,
-  AddSheetUndoEntry,
+  AddSheetUndoEntry, ChangeNamedExpressionUndoEntry,
   ClearSheetUndoEntry,
   MoveCellsUndoEntry,
   MoveColumnsUndoEntry,
@@ -316,8 +316,9 @@ export class CrudOperations {
       this.ensureSheetExists(sheetScope)
       sheetId = this.sheetMapping.fetch(sheetScope)
     }
-    this.operations.changeNamedExpressionExpression(expressionName, newExpression, sheetId)
-    /* TODO undoredo*/
+    const [namedExpression, content] = this.operations.changeNamedExpressionExpression(expressionName, newExpression, sheetId)
+    this.undoRedo.saveOperation(new ChangeNamedExpressionUndoEntry(namedExpression, newExpression, content, sheetId))
+    /* TODO undoredo */
   }
 
   public removeNamedExpression(expressionName: string, sheetScope: string | undefined): NamedExpression {
