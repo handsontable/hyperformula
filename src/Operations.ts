@@ -360,6 +360,16 @@ export class Operations {
     }
   }
 
+  public restoreClipboardCells(sourceSheetId: number, cells: IterableIterator<[SimpleCellAddress, ClipboardCell]>) {
+    for (const [address, clipboardCell] of cells) {
+      this.restoreCell(address, clipboardCell)
+      if (clipboardCell.type === ClipboardCellType.FORMULA) {
+        const {dependencies} = this.parser.fetchCachedResult(clipboardCell.hash)
+        this.updateNamedExpressionsForTargetAddress(sourceSheetId, address, dependencies)
+      }
+    }
+  }
+
   public restoreCell(address: SimpleCellAddress, clipboardCell: ClipboardCell) {
     switch (clipboardCell.type) {
       case ClipboardCellType.VALUE: {
@@ -705,7 +715,7 @@ export class Operations {
     }
   }
 
-  private updateNamedExpressionsForTargetAddress(sourceSheet: number, targetAddress: SimpleCellAddress, dependencies: RelativeDependency[]) {
+  public updateNamedExpressionsForTargetAddress(sourceSheet: number, targetAddress: SimpleCellAddress, dependencies: RelativeDependency[]) {
     if (sourceSheet === targetAddress.sheet) {
       return
     }

@@ -169,14 +169,7 @@ export class CrudOperations {
       const oldContent = this.operations.getRangeClipboardCells(targetRange)
       this.undoRedo.clearRedoStack()
       this.dependencyGraph.breakNumericMatricesInRange(targetRange)
-      for (const [address, clipboardCell] of clipboard.getContent(targetLeftCorner)) {
-        this.operations.restoreCell(address, clipboardCell)
-        /* TODO move to operations */
-        // if (clipboardCell.type === ClipboardCellType.FORMULA) {
-        //   const {dependencies} = this.parser.fetchCachedResult(clipboardCell.hash)
-        //   this.namedExpressionsOperations.updateNamedExpressionsForTargetAddress(clipboard.sourceLeftCorner.sheet, address, dependencies)
-        // }
-      }
+      this.operations.restoreClipboardCells(clipboard.sourceLeftCorner.sheet, clipboard.getContent(targetLeftCorner))
       this.undoRedo.saveOperation(new PasteUndoEntry(targetLeftCorner, oldContent, clipboard.content!))
     }
   }
@@ -318,7 +311,6 @@ export class CrudOperations {
     }
     const [namedExpression, content] = this.operations.changeNamedExpressionExpression(expressionName, newExpression, sheetId)
     this.undoRedo.saveOperation(new ChangeNamedExpressionUndoEntry(namedExpression, newExpression, content, sheetId))
-    /* TODO undoredo */
   }
 
   public removeNamedExpression(expressionName: string, sheetScope: string | undefined): NamedExpression {
