@@ -638,6 +638,7 @@ describe('Undo - remove named expression', () => {
     const engine = HyperFormula.buildFromArray([
       ['=foo']
     ])
+
     engine.addNamedExpression('foo', 'foo')
     engine.removeNamedExpression('foo')
 

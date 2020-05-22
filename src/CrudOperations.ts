@@ -43,7 +43,7 @@ import {
   MoveColumnsUndoEntry,
   MoveRowsUndoEntry,
   PasteUndoEntry,
-  RemoveColumnsUndoEntry,
+  RemoveColumnsUndoEntry, RemoveNamedExpressionUndoEntry,
   RemoveRowsUndoEntry,
   RemoveSheetUndoEntry,
   SetCellContentsUndoEntry,
@@ -320,14 +320,16 @@ export class CrudOperations {
     /* TODO undoredo*/
   }
 
-  public removeNamedExpression(expressionName: string, sheetScope: string | undefined): Maybe<NamedExpression> {
+  public removeNamedExpression(expressionName: string, sheetScope: string | undefined): NamedExpression {
     let sheetId = undefined
     if (sheetScope !== undefined) {
       this.ensureSheetExists(sheetScope)
       sheetId = this.sheetMapping.fetch(sheetScope)
     }
-    return this.operations.removeNamedExpression(expressionName, sheetId)
-    /* TODO undoredo*/
+    const [namedExpression, content] = this.operations.removeNamedExpression(expressionName, sheetId)
+    this.undoRedo.saveOperation(new RemoveNamedExpressionUndoEntry(namedExpression, content, sheetId))
+
+    return namedExpression
   }
 
   public ensureItIsPossibleToAddRows(sheet: number, ...indexes: Index[]): void {

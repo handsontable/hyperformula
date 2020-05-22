@@ -9,6 +9,7 @@ import {RawCellContent} from './CellContentParser'
 import {RemoveColumnsCommand, AddColumnsCommand, RowsRemoval, ColumnsRemoval, RemoveRowsCommand, AddRowsCommand} from './Operations'
 import {Operations} from './Operations'
 import {Config} from './Config'
+import {NamedExpression, NamedExpressions} from './NamedExpressions'
 
 export class RemoveRowsUndoEntry {
   constructor(
@@ -120,6 +121,14 @@ export class AddNamedExpressionUndoEntry {
   ) { }
 }
 
+export class RemoveNamedExpressionUndoEntry {
+  constructor(
+    public readonly namedExpression: NamedExpression,
+    public readonly content: ClipboardCell,
+    public readonly scope?: number
+  ) { }
+}
+
 export class BatchUndoEntry {
   public readonly operations: UndoStackEntry[] = []
 
@@ -150,6 +159,7 @@ type UndoStackEntry
   | PasteUndoEntry
   | BatchUndoEntry
   | AddNamedExpressionUndoEntry
+  | RemoveNamedExpressionUndoEntry
 
 export class UndoRedo {
   private readonly undoStack: UndoStackEntry[] = []
@@ -225,8 +235,6 @@ export class UndoRedo {
   private undoEntry(operation: UndoStackEntry) {
     if (operation instanceof RemoveRowsUndoEntry) {
       this.undoRemoveRows(operation)
-    } else if (operation instanceof RemoveRowsUndoEntry) {
-      this.undoRemoveRows(operation)
     } else if (operation instanceof AddRowsUndoEntry) {
       this.undoAddRows(operation)
     } else if (operation instanceof SetCellContentsUndoEntry) {
@@ -255,6 +263,8 @@ export class UndoRedo {
       this.undoBatch(operation)
     } else if (operation instanceof AddNamedExpressionUndoEntry) {
       this.undoAddNamedExpression(operation)
+    } else if (operation instanceof RemoveNamedExpressionUndoEntry) {
+      this.undoRemoveNamedExpression(operation)
     } else {
       throw 'Unknown element'
     }
@@ -395,6 +405,10 @@ export class UndoRedo {
 
   private undoAddNamedExpression(operation: AddNamedExpressionUndoEntry) {
     this.operations.removeNamedExpression(operation.name, operation.scope)
+  }
+
+  private undoRemoveNamedExpression(operation: RemoveNamedExpressionUndoEntry) {
+    this.operations.restoreNamedExpression(operation.namedExpression, operation.content, operation.scope)
   }
 
   public redo() {
