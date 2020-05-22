@@ -1,8 +1,5 @@
-import {HyperFormula, NoOperationToUndoError, NoOperationToRedoError} from '../src'
-import {
-  expectEngineToBeTheSameAs,
-  adr
-} from './testUtils'
+import {ErrorType, HyperFormula, NoOperationToRedoError, NoOperationToUndoError} from '../src'
+import {adr, detailedError, expectEngineToBeTheSameAs} from './testUtils'
 
 describe('Undo - removing rows', () => {
   it('works for empty row', () => {
@@ -618,6 +615,52 @@ describe('Undo - copy-paste', () => {
     engine.undo()
 
     expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray(sheet))
+  })
+})
+
+describe('Undo - add named expression', () => {
+  it('works', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=foo']
+    ])
+
+    engine.addNamedExpression('foo', 'foo')
+
+    engine.undo()
+
+    expect(engine.listNamedExpressions().length).toEqual(0)
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NAME))
+  })
+})
+
+describe('Undo - remove named expression', () => {
+  it('works', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=foo']
+    ])
+    engine.addNamedExpression('foo', 'foo')
+    engine.removeNamedExpression('foo')
+
+    engine.undo()
+
+    expect(engine.listNamedExpressions().length).toEqual(1)
+    expect(engine.getCellValue(adr('A1'))).toEqual('foo')
+  })
+})
+
+describe('Undo - change named expression', () => {
+  it('works', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=foo']
+    ])
+
+    engine.addNamedExpression('foo', 'foo')
+    engine.changeNamedExpression('foo', 'bar')
+
+    engine.undo()
+
+    expect(engine.listNamedExpressions().length).toEqual(1)
+    expect(engine.getCellValue(adr('A1'))).toEqual('foo')
   })
 })
 

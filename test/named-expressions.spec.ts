@@ -534,7 +534,7 @@ describe('Named expressions - evaluation', () => {
   })
 })
 
-describe('Named expression - cross scope', () => {
+describe('Named expressions - cross scope', () => {
   it('should be possible to refer to other sheet', () => {
     const engine = HyperFormula.buildFromSheets({
       'Sheet1': [['foo']],
@@ -719,7 +719,7 @@ describe('Named expression - cross scope', () => {
   })
 })
 
-describe('Named expression - named ranges', () => {
+describe('Named expressions - named ranges', () => {
   it('should be possible to define simple range in named expression', () => {
     const engine = HyperFormula.buildFromArray([
       ['1'],
