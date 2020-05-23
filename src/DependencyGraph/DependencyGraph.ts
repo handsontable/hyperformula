@@ -688,12 +688,14 @@ export class DependencyGraph {
   private fixRangesWhenAddingColumns(sheet: number, column: number, numberOfColumns: number): void {
     for (const rangeVertex of this.rangeMapping.rangesInSheet(sheet)) {
       if (rangeVertex.range.includesColumn(column)) {
-        const anyVertexInColumn = this.addressMapping.fetchCell(simpleCellAddress(sheet, column + numberOfColumns, rangeVertex.start.row))
-        if (this.graph.existsEdge(anyVertexInColumn, rangeVertex)) {
-          const addedSubrangeInThatRange = rangeVertex.range.rangeWithSameHeight(column, numberOfColumns)
-          for (const address of addedSubrangeInThatRange.addresses(this)) {
-            this.graph.addEdge(this.fetchCellOrCreateEmpty(address), rangeVertex)
-          }
+        let subrange
+        if(rangeVertex.bruteForce) {
+          subrange = rangeVertex.range.rangeWithSameHeight(column, numberOfColumns)
+        } else {
+          subrange = AbsoluteCellRange.spanFrom(simpleCellAddress(sheet, column, rangeVertex.range.end.row), numberOfColumns, 1)
+        }
+        for (const address of subrange.addresses(this)) {
+          this.graph.addEdge(this.fetchCellOrCreateEmpty(address), rangeVertex)
         }
       }
     }

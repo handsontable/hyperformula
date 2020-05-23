@@ -206,8 +206,8 @@ export class AbsoluteCellRange {
     return AbsoluteCellRange.spanFrom(simpleCellAddress(this.sheet, this.start.col, startRow), this.width(), numberOfRows)
   }
 
-  public rangeWithSameHeight(startColumn: number, numebrOfColumns: number): AbsoluteCellRange {
-    return AbsoluteCellRange.spanFrom(simpleCellAddress(this.sheet, startColumn, this.start.row), numebrOfColumns, this.height())
+  public rangeWithSameHeight(startColumn: number, numberOfColumns: number): AbsoluteCellRange {
+    return AbsoluteCellRange.spanFrom(simpleCellAddress(this.sheet, startColumn, this.start.row), numberOfColumns, this.height())
   }
 
   public toString(): string {

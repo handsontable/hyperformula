@@ -211,4 +211,20 @@ describe('cruds', () => {
     expect(engine.dependencyGraph.graph.nodesCount()).toBe(0)
     expect(engine.dependencyGraph.rangeMapping.getMappingSize(0)).toBe(0)
   })
+
+  it('this test fails column adding', () => {
+    const engine = HyperFormula.buildFromArray([
+      [0, 0],
+      [0, 0],
+      [0, 0],
+      ['=SUM(A1:B2)'],
+      ['=SUM(A1:B3)']
+    ])
+    engine.addColumns(0, [1,1])
+    engine.setCellContents(adr('B3'), 1)
+    expect(engine.getCellSerialized(adr('A4'))).toBe('=SUM(A1:C2)')
+    expect(engine.getCellSerialized(adr('A5'))).toBe('=SUM(A1:C3)')
+    expect(engine.getCellValue(adr('A4'))).toBe(0)
+    expect(engine.getCellValue(adr('A5'))).toBe(1)
+  })
 })
