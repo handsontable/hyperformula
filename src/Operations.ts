@@ -646,12 +646,12 @@ export class Operations {
     return changes
   }
 
-  private get sheetMapping(): SheetMapping {
-    return this.dependencyGraph.sheetMapping
-  }
-
   public forceApplyPostponedTransformations(): void {
     this.dependencyGraph.forceApplyPostponedTransformations()
+  }
+
+  private get sheetMapping(): SheetMapping {
+    return this.dependencyGraph.sheetMapping
   }
 
   /**
@@ -725,7 +725,7 @@ export class Operations {
     }
   }
 
-  public updateNamedExpressionsForTargetAddress(sourceSheet: number, targetAddress: SimpleCellAddress, dependencies: RelativeDependency[]) {
+  private updateNamedExpressionsForTargetAddress(sourceSheet: number, targetAddress: SimpleCellAddress, dependencies: RelativeDependency[]) {
     if (sourceSheet === targetAddress.sheet) {
       return
     }
