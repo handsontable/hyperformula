@@ -173,6 +173,12 @@ export class DependencyGraph {
         const {smallerRangeVertex, restRange} = this.rangeMapping.findSmallerRange(range)
         if (smallerRangeVertex) {
           this.graph.addEdge(smallerRangeVertex, rangeVertex)
+          if(rangeVertex.bruteForce) {
+            rangeVertex.bruteForce = false
+            for(const cellFromRange of range.addresses(this)) { //if we ever switch heuristic to processing by sorted sizes, this would be unnecessary
+              this.graph.removeEdge(this.fetchCell(cellFromRange), rangeVertex)
+            }
+          }
         } else {
           rangeVertex.bruteForce = true
         }
@@ -375,9 +381,9 @@ export class DependencyGraph {
     })
 
     this.stats.measure(StatType.ADJUSTING_RANGES, () => {
-      this.fixRanges(addedRows.sheet, addedRows.rowStart, addedRows.numberOfRows)
 
       this.rangeMapping.moveAllRangesInSheetAfterRowByRows(addedRows.sheet, addedRows.rowStart, addedRows.numberOfRows)
+      this.fixRanges(addedRows.sheet, addedRows.rowStart, addedRows.numberOfRows)
     })
 
     for (const vertex of this.addressMapping.verticesFromRowsSpan(addedRows)) {
@@ -667,7 +673,7 @@ export class DependencyGraph {
 
   private fixRanges(sheet: number, row: number, numberOfRows: number): void {
     for (const rangeVertex of this.rangeMapping.rangesInSheet(sheet)) {
-      if (rangeVertex.range.includesRow(row)) {
+      if (rangeVertex.range.includesRow(row+numberOfRows)) {
         const anyVertexInRow = this.addressMapping.getCell(simpleCellAddress(sheet, rangeVertex.start.col, row + numberOfRows))!
         if (this.graph.existsEdge(anyVertexInRow, rangeVertex)) {
           const addedSubrangeInThatRange = rangeVertex.range.rangeWithSameWidth(row, numberOfRows)
