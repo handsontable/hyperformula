@@ -31,8 +31,6 @@ import {ValueCellVertexValue} from './DependencyGraph/ValueCellVertex'
 import {
   InvalidArgumentsError,
   NamedExpressionDoesNotExist,
-  NamedExpressionNameIsAlreadyTaken,
-  NamedExpressionNameIsInvalid,
   NoRelativeAddressesAllowedError,
   SheetSizeLimitExceededError
 } from './errors'
@@ -48,7 +46,6 @@ import {AbsoluteCellRange} from './AbsoluteCellRange'
 import {findBoundaries, Sheet} from './Sheet'
 import {Config} from './Config'
 import {doesContainRelativeReferences, NamedExpression, NamedExpressions} from './NamedExpressions'
-import {Maybe} from './Maybe'
 
 export class RemoveRowsCommand {
   constructor(

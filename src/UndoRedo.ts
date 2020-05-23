@@ -7,14 +7,14 @@ import {simpleCellAddress, SimpleCellAddress} from './Cell'
 import {ClipboardCell} from './ClipboardOperations'
 import {RawCellContent} from './CellContentParser'
 import {
-  RemoveColumnsCommand,
   AddColumnsCommand,
-  RowsRemoval,
+  AddRowsCommand,
   ColumnsRemoval,
+  Operations,
+  RemoveColumnsCommand,
   RemoveRowsCommand,
-  AddRowsCommand
+  RowsRemoval
 } from './Operations'
-import {Operations} from './Operations'
 import {Config} from './Config'
 import {NamedExpression} from './NamedExpressions'
 

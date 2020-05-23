@@ -4,14 +4,7 @@
  */
 
 import {AbsoluteCellRange} from './AbsoluteCellRange'
-import {
-  CellType,
-  CellValueType,
-  getCellType,
-  getCellValueType, InternalScalarValue,
-  NoErrorCellValue,
-  SimpleCellAddress
-} from './Cell'
+import {CellType, CellValueType, getCellType, getCellValueType, NoErrorCellValue, SimpleCellAddress} from './Cell'
 import {CellContent, CellContentParser, RawCellContent} from './CellContentParser'
 import {CellValue, ExportedChange, Exporter} from './CellValue'
 import {ColumnSearchStrategy} from './ColumnSearch/ColumnSearchStrategy'
@@ -37,7 +30,8 @@ import {NamedExpressions} from './NamedExpressions'
 import {
   Ast,
   AstNodeType,
-  ParserWithCaching, RelativeDependency,
+  ParserWithCaching,
+  RelativeDependency,
   simpleCellAddressFromString,
   simpleCellAddressToString,
   Unparser,

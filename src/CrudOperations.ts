@@ -4,26 +4,26 @@
  */
 
 import {AbsoluteCellRange} from './AbsoluteCellRange'
-import {absolutizeDependencies} from './absolutizeDependencies'
 import {invalidSimpleCellAddress, simpleCellAddress, SimpleCellAddress} from './Cell'
 import {CellContent, CellContentParser, isMatrix, RawCellContent} from './CellContentParser'
-import {ClipboardCell, ClipboardCellType, ClipboardOperations} from './ClipboardOperations'
+import {ClipboardCell, ClipboardOperations} from './ClipboardOperations'
 import {AddColumnsCommand, AddRowsCommand, Operations, RemoveColumnsCommand, RemoveRowsCommand} from './Operations'
 import {ColumnSearchStrategy} from './ColumnSearch/ColumnSearchStrategy'
 import {ColumnsSpan} from './ColumnsSpan'
 import {Config} from './Config'
 import {ContentChanges} from './ContentChanges'
-import {AddressMapping, DependencyGraph, FormulaCellVertex, MatrixVertex, SheetMapping} from './DependencyGraph'
+import {DependencyGraph, SheetMapping} from './DependencyGraph'
 import {doesContainRelativeReferences, NamedExpression, NamedExpressions} from './NamedExpressions'
-import {Maybe} from './Maybe'
 import {
   InvalidAddressError,
-  InvalidArgumentsError, MatrixFormulasNotSupportedError,
+  InvalidArgumentsError,
+  MatrixFormulasNotSupportedError,
   NamedExpressionDoesNotExist,
   NamedExpressionNameIsAlreadyTaken,
   NamedExpressionNameIsInvalid,
   NoOperationToRedoError,
-  NoOperationToUndoError, NoRelativeAddressesAllowedError,
+  NoOperationToUndoError,
+  NoRelativeAddressesAllowedError,
   NoSheetWithIdError,
   NoSheetWithNameError,
   NothingToPasteError,
@@ -31,19 +31,22 @@ import {
 } from './errors'
 import {Index} from './HyperFormula'
 import {LazilyTransformingAstService} from './LazilyTransformingAstService'
-import {NamedExpressionDependency, ParserWithCaching} from './parser'
+import {ParserWithCaching} from './parser'
 import {RowsSpan} from './RowsSpan'
 import {Statistics} from './statistics'
 import {
-  AddColumnsUndoEntry, AddNamedExpressionUndoEntry,
+  AddColumnsUndoEntry,
+  AddNamedExpressionUndoEntry,
   AddRowsUndoEntry,
-  AddSheetUndoEntry, ChangeNamedExpressionUndoEntry,
+  AddSheetUndoEntry,
+  ChangeNamedExpressionUndoEntry,
   ClearSheetUndoEntry,
   MoveCellsUndoEntry,
   MoveColumnsUndoEntry,
   MoveRowsUndoEntry,
   PasteUndoEntry,
-  RemoveColumnsUndoEntry, RemoveNamedExpressionUndoEntry,
+  RemoveColumnsUndoEntry,
+  RemoveNamedExpressionUndoEntry,
   RemoveRowsUndoEntry,
   RemoveSheetUndoEntry,
   SetCellContentsUndoEntry,
