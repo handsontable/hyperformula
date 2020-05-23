@@ -571,13 +571,7 @@ export class UndoRedo {
 
   private redoSetSheetContent(operation: SetSheetContentUndoEntry) {
     const {sheetId, newSheetContent} = operation
-    this.operations.clearSheet(sheetId)
-    for (let row = 0; row < newSheetContent.length; row++) {
-      for (let col = 0; col < newSheetContent[row].length; col++) {
-        const address = simpleCellAddress(sheetId, col, row)
-        this.operations.setCellContent(address, newSheetContent[row][col])
-      }
-    }
+    this.operations.setSheetContent(sheetId, newSheetContent)
   }
 
   private redoAddNamedExpression(operation: AddNamedExpressionUndoEntry) {

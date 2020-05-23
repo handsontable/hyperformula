@@ -266,13 +266,7 @@ export class CrudOperations {
     this.undoRedo.clearRedoStack()
     this.clipboardOperations.abortCut()
     const oldSheetContent = this.operations.getSheetClipboardCells(sheetId)
-    this.operations.clearSheet(sheetId)
-    for (let i = 0; i < values.length; i++) {
-      for (let j = 0; j < values[i].length; j++) {
-        const address = simpleCellAddress(sheetId, j, i)
-        this.operations.setCellContent(address, values[i][j])
-      }
-    }
+    this.operations.setSheetContent(sheetId, values)
     this.undoRedo.saveOperation(new SetSheetContentUndoEntry(sheetId, oldSheetContent, values))
   }
 

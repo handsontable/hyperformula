@@ -596,6 +596,16 @@ export class Operations {
     }
   }
 
+  public setSheetContent(sheetId: number, newSheetContent: RawCellContent[][]) {
+    this.clearSheet(sheetId)
+    for (let i = 0; i < newSheetContent.length; i++) {
+      for (let j = 0; j < newSheetContent[i].length; j++) {
+        const address = simpleCellAddress(sheetId, j, i)
+        this.setCellContent(address, newSheetContent[i][j])
+      }
+    }
+  }
+
   public setValueToCell(value: ValueCellVertexValue, address: SimpleCellAddress) {
     const oldValue = this.dependencyGraph.getCellValue(address)
     this.dependencyGraph.setValueToCell(address, value)
@@ -829,10 +839,6 @@ export function normalizeAddedIndexes(indexes: Index[]): Index[] {
 
 function isPositiveInteger(x: number): boolean {
   return Number.isInteger(x) && x > 0
-}
-
-function isNonnegativeInteger(x: number): boolean {
-  return Number.isInteger(x) && x >= 0
 }
 
 function isRowOrColumnRange(leftCorner: SimpleCellAddress, width: number, height: number): boolean {
