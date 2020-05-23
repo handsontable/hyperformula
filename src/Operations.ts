@@ -285,13 +285,6 @@ export class Operations {
   }
 
   public addNamedExpression(expressionName: string, expression: RawCellContent, sheetId?: number) {
-    if (!this.namedExpressions.isNameValid(expressionName)) {
-      throw new NamedExpressionNameIsInvalid(expressionName)
-    }
-    if (!this.namedExpressions.isNameAvailable(expressionName, sheetId)) {
-      throw new NamedExpressionNameIsAlreadyTaken(expressionName)
-    }
-
     this.storeNamedExpressionInCell(this.namedExpressions.lookupNextAddress(expressionName, sheetId), expression)
     const namedExpression = this.namedExpressions.addNamedExpression(expressionName, sheetId)
     this.adjustNamedExpressionEdges(namedExpression, expressionName, sheetId)

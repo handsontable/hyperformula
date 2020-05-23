@@ -287,33 +287,34 @@ export class CrudOperations {
   }
 
   public addNamedExpression(expressionName: string, expression: RawCellContent, sheetScope: string | undefined) {
-    let sheetId = undefined
-    if (sheetScope !== undefined) {
-      this.ensureSheetExists(sheetScope)
-      sheetId = this.sheetMapping.fetch(sheetScope)
+    const sheetId = this.scopeId(sheetScope)
+
+    if (!this.namedExpressions.isNameValid(expressionName)) {
+      throw new NamedExpressionNameIsInvalid(expressionName)
+    }
+    if (!this.namedExpressions.isNameAvailable(expressionName, sheetId)) {
+      throw new NamedExpressionNameIsAlreadyTaken(expressionName)
     }
 
     this.operations.addNamedExpression(expressionName, expression, sheetId)
+    this.undoRedo.clearRedoStack()
+    this.clipboardOperations.abortCut()
     this.undoRedo.saveOperation(new AddNamedExpressionUndoEntry(expressionName, expression, sheetId))
   }
 
   public changeNamedExpressionExpression(expressionName: string, sheetScope: string | undefined, newExpression: RawCellContent) {
-    let sheetId = undefined
-    if (sheetScope !== undefined) {
-      this.ensureSheetExists(sheetScope)
-      sheetId = this.sheetMapping.fetch(sheetScope)
-    }
+    const sheetId = this.scopeId(sheetScope)
     const [namedExpression, content] = this.operations.changeNamedExpressionExpression(expressionName, newExpression, sheetId)
+    this.undoRedo.clearRedoStack()
+    this.clipboardOperations.abortCut()
     this.undoRedo.saveOperation(new ChangeNamedExpressionUndoEntry(namedExpression, newExpression, content, sheetId))
   }
 
   public removeNamedExpression(expressionName: string, sheetScope: string | undefined): NamedExpression {
-    let sheetId = undefined
-    if (sheetScope !== undefined) {
-      this.ensureSheetExists(sheetScope)
-      sheetId = this.sheetMapping.fetch(sheetScope)
-    }
+    const sheetId = this.scopeId(sheetScope)
     const [namedExpression, content] = this.operations.removeNamedExpression(expressionName, sheetId)
+    this.undoRedo.clearRedoStack()
+    this.clipboardOperations.abortCut()
     this.undoRedo.saveOperation(new RemoveNamedExpressionUndoEntry(namedExpression, content, sheetId))
 
     return namedExpression
@@ -520,6 +521,14 @@ export class CrudOperations {
 
   private get sheetMapping(): SheetMapping {
     return this.dependencyGraph.sheetMapping
+  }
+
+  private scopeId(sheetName: string | undefined): number | undefined {
+    if (sheetName !== undefined) {
+      this.ensureSheetExists(sheetName)
+      return this.sheetMapping.fetch(sheetName)
+    }
+    return undefined
   }
 }
 

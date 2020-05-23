@@ -1387,6 +1387,16 @@ describe('Redo - add named expression', () => {
     expect(engine.listNamedExpressions().length).toEqual(1)
     expect(engine.getCellValue(adr('A1'))).toEqual('foo')
   })
+
+  it('clears redo stack', () => {
+    const engine = HyperFormula.buildFromArray([])
+    engine.setCellContents(adr('A1'), 42)
+    engine.undo()
+
+    engine.addNamedExpression('foo', 'foo')
+
+    expect(engine.isThereSomethingToRedo()).toBe(false)
+  })
 })
 
 describe('Redo - remove named expression', () => {
@@ -1404,6 +1414,17 @@ describe('Redo - remove named expression', () => {
     expect(engine.listNamedExpressions().length).toEqual(0)
     expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NAME))
   })
+
+  it('clears redo stack', () => {
+    const engine = HyperFormula.buildFromArray([])
+    engine.addNamedExpression('foo', 'foo')
+    engine.setCellContents(adr('A1'), 42)
+    engine.undo()
+
+    engine.removeNamedExpression('foo')
+
+    expect(engine.isThereSomethingToRedo()).toBe(false)
+  })
 })
 
 describe('Redo - change named expression', () => {
@@ -1420,6 +1441,17 @@ describe('Redo - change named expression', () => {
 
     expect(engine.listNamedExpressions().length).toEqual(1)
     expect(engine.getCellValue(adr('A1'))).toEqual('bar')
+  })
+
+  it('clears redo stack', () => {
+    const engine = HyperFormula.buildFromArray([])
+    engine.addNamedExpression('foo', 'foo')
+    engine.setCellContents(adr('A1'), 42)
+    engine.undo()
+
+    engine.changeNamedExpression('foo', 'foo')
+
+    expect(engine.isThereSomethingToRedo()).toBe(false)
   })
 })
 
