@@ -6,7 +6,7 @@
 import {AbsoluteCellRange} from './AbsoluteCellRange'
 import {absolutizeDependencies} from './absolutizeDependencies'
 import {invalidSimpleCellAddress, simpleCellAddress, SimpleCellAddress} from './Cell'
-import {CellContentParser, isMatrix, RawCellContent} from './CellContentParser'
+import {CellContent, CellContentParser, isMatrix, RawCellContent} from './CellContentParser'
 import {ClipboardCell, ClipboardCellType, ClipboardOperations} from './ClipboardOperations'
 import {AddColumnsCommand, AddRowsCommand, Operations, RemoveColumnsCommand, RemoveRowsCommand} from './Operations'
 import {ColumnSearchStrategy} from './ColumnSearch/ColumnSearchStrategy'
@@ -14,16 +14,16 @@ import {ColumnsSpan} from './ColumnsSpan'
 import {Config} from './Config'
 import {ContentChanges} from './ContentChanges'
 import {AddressMapping, DependencyGraph, FormulaCellVertex, MatrixVertex, SheetMapping} from './DependencyGraph'
-import {NamedExpression, NamedExpressions} from './NamedExpressions'
+import {doesContainRelativeReferences, NamedExpression, NamedExpressions} from './NamedExpressions'
 import {Maybe} from './Maybe'
 import {
   InvalidAddressError,
-  InvalidArgumentsError,
+  InvalidArgumentsError, MatrixFormulasNotSupportedError,
   NamedExpressionDoesNotExist,
   NamedExpressionNameIsAlreadyTaken,
   NamedExpressionNameIsInvalid,
   NoOperationToRedoError,
-  NoOperationToUndoError,
+  NoOperationToUndoError, NoRelativeAddressesAllowedError,
   NoSheetWithIdError,
   NoSheetWithNameError,
   NothingToPasteError,
@@ -288,14 +288,7 @@ export class CrudOperations {
 
   public addNamedExpression(expressionName: string, expression: RawCellContent, sheetScope: string | undefined) {
     const sheetId = this.scopeId(sheetScope)
-
-    if (!this.namedExpressions.isNameValid(expressionName)) {
-      throw new NamedExpressionNameIsInvalid(expressionName)
-    }
-    if (!this.namedExpressions.isNameAvailable(expressionName, sheetId)) {
-      throw new NamedExpressionNameIsAlreadyTaken(expressionName)
-    }
-
+    this.ensureNamedExpressionNameIsValid(expressionName, sheetId)
     this.operations.addNamedExpression(expressionName, expression, sheetId)
     this.undoRedo.clearRedoStack()
     this.clipboardOperations.abortCut()
@@ -318,6 +311,27 @@ export class CrudOperations {
     this.undoRedo.saveOperation(new RemoveNamedExpressionUndoEntry(namedExpression, content, sheetId))
 
     return namedExpression
+  }
+
+  public ensureItIsPossibleToAddNamedExpression(expressionName: string, expression: RawCellContent, sheetScope?: string): void {
+    const scopeId = this.scopeId(sheetScope)
+    this.ensureNamedExpressionNameIsValid(expressionName, scopeId)
+    this.ensureNamedExpressionIsValid(expression)
+  }
+
+  public ensureItIsPossibleToChangeNamedExpression(expressionName: string, expression: RawCellContent, sheetScope?: string): void {
+    const scopeId = this.scopeId(sheetScope)
+    if (this.namedExpressions.namedExpressionForScope(expressionName, scopeId) === undefined) {
+      throw new NamedExpressionDoesNotExist(expressionName)
+    }
+    this.ensureNamedExpressionIsValid(expression)
+  }
+
+  public isItPossibleToRemoveNamedExpression(expressionName: string, sheetScope?: string): void {
+    const scopeId = this.scopeId(sheetScope)
+    if (this.namedExpressions.namedExpressionForScope(expressionName, scopeId) === undefined) {
+      throw new NamedExpressionDoesNotExist(expressionName)
+    }
   }
 
   public ensureItIsPossibleToAddRows(sheet: number, ...indexes: Index[]): void {
@@ -521,6 +535,27 @@ export class CrudOperations {
 
   private get sheetMapping(): SheetMapping {
     return this.dependencyGraph.sheetMapping
+  }
+
+  private ensureNamedExpressionNameIsValid(expressionName: string, sheetId?: number) {
+    if (!this.namedExpressions.isNameValid(expressionName)) {
+      throw new NamedExpressionNameIsInvalid(expressionName)
+    }
+    if (!this.namedExpressions.isNameAvailable(expressionName, sheetId)) {
+      throw new NamedExpressionNameIsAlreadyTaken(expressionName)
+    }
+  }
+
+  private ensureNamedExpressionIsValid(expression: RawCellContent): void {
+    const parsedExpression = this.cellContentParser.parse(expression)
+    if (parsedExpression instanceof CellContent.MatrixFormula) {
+      throw new MatrixFormulasNotSupportedError()
+    } else if (parsedExpression instanceof CellContent.Formula) {
+      const parsingResult = this.parser.parse(parsedExpression.formula, simpleCellAddress(-1, 0, 0))
+      if (doesContainRelativeReferences(parsingResult.ast)) {
+        throw new NoRelativeAddressesAllowedError()
+      }
+    }
   }
 
   private scopeId(sheetName: string | undefined): number | undefined {

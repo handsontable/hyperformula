@@ -4,6 +4,136 @@ import {ErrorType} from '../src/Cell'
 import {NoRelativeAddressesAllowedError, NoSheetWithNameError} from '../src/errors'
 import {Vertex} from '../src/DependencyGraph/Vertex'
 
+describe('Named expressions - checking if its possible', () => {
+  it('should be possible to add named expression', () => {
+    const engine = HyperFormula.buildFromArray([])
+    expect(engine.isItPossibleToAddNamedExpression('foo', '1')).toBe(true)
+    expect(engine.isItPossibleToAddNamedExpression('foo', 'foo')).toBe(true)
+    expect(engine.isItPossibleToAddNamedExpression('foo', null)).toBe(true)
+    expect(engine.isItPossibleToAddNamedExpression('foo', '=Sheet1!$A$1')).toBe(true)
+    expect(engine.isItPossibleToAddNamedExpression('foo', '=Sheet1!$A$1', 'Sheet1')).toBe(true)
+  })
+
+  it('no if expression name invalid', () => {
+    const engine = HyperFormula.buildFromArray([])
+    expect(engine.isItPossibleToAddNamedExpression('A1', 'foo')).toBe(false)
+  })
+
+  it('no if scope does not exists', () => {
+    const engine = HyperFormula.buildFromArray([])
+    expect(engine.isItPossibleToAddNamedExpression('foo', '=A1', 'Sheet2')).toBe(false)
+  })
+
+  it('no if trying to add formula with relative references', () => {
+    const engine = HyperFormula.buildFromArray([])
+    expect(engine.isItPossibleToAddNamedExpression('foo', '=A1')).toBe(false)
+    expect(engine.isItPossibleToAddNamedExpression('foo', '=A$1')).toBe(false)
+    expect(engine.isItPossibleToAddNamedExpression('foo', '=$A1')).toBe(false)
+    expect(engine.isItPossibleToAddNamedExpression('foo', '=Sheet1!A1:A2')).toBe(false)
+  })
+
+  it('should be possible to remove named expression', () => {
+    const engine = HyperFormula.buildFromArray([])
+    engine.addNamedExpression('foo', 'foo')
+    engine.addNamedExpression('bar', 'bar', 'Sheet1')
+    expect(engine.isItPossibleToRemoveNamedExpression('foo')).toBe(true)
+    expect(engine.isItPossibleToRemoveNamedExpression('bar', 'Sheet1')).toBe(true)
+  })
+
+  it('no if trying to remove not existing expression', () => {
+    const engine = HyperFormula.buildFromArray([])
+    expect(engine.isItPossibleToRemoveNamedExpression('foo')).toBe(false)
+  })
+
+  it('no if trying to remove named expression from not existing scope', () => {
+    const engine = HyperFormula.buildFromArray([])
+    expect(engine.isItPossibleToRemoveNamedExpression('foo', 'Sheet2')).toBe(false)
+  })
+
+  it('should be possible to change named expression', () => {
+    const engine = HyperFormula.buildFromArray([])
+    engine.addNamedExpression('foo', 'foo')
+    engine.addNamedExpression('bar', 'bar', 'Sheet1')
+    expect(engine.isItPossibleToChangeNamedExpression('foo', 'bar')).toBe(true)
+    expect(engine.isItPossibleToChangeNamedExpression('bar', 'baz', 'Sheet1')).toBe(true)
+  })
+
+  it('no if trying to change to formula with relative references', () => {
+    const engine = HyperFormula.buildFromArray([])
+    engine.addNamedExpression('foo', 'foo')
+    expect(engine.isItPossibleToChangeNamedExpression('foo', '=A1')).toBe(false)
+    expect(engine.isItPossibleToChangeNamedExpression('foo', '=A$1')).toBe(false)
+    expect(engine.isItPossibleToChangeNamedExpression('foo', '=$A1')).toBe(false)
+    expect(engine.isItPossibleToChangeNamedExpression('foo', '=Sheet1!A1:A2')).toBe(false)
+  })
+
+  it('no if trying to change named expression in not existing scope', () => {
+    const engine = HyperFormula.buildFromArray([])
+    expect(engine.isItPossibleToChangeNamedExpression('foo', '=A1', 'Sheet2')).toBe(false)
+  })
+
+  it('no if trying to change not existing expression', () => {
+    const engine = HyperFormula.buildFromArray([])
+    expect(engine.isItPossibleToChangeNamedExpression('foo', 'foo')).toBe(false)
+  })
+})
+
+describe('Named expressions - absolute references only', () => {
+  it('adding named expression allows only for absolute addresses', () => {
+    const engine = HyperFormula.buildFromArray([])
+
+    expect(() => {
+      engine.addNamedExpression('foo', '=A1')
+    }).toThrow(new NoRelativeAddressesAllowedError())
+    expect(() => {
+      engine.addNamedExpression('foo', '=Sheet1!A1')
+    }).toThrow(new NoRelativeAddressesAllowedError())
+    expect(() => {
+      engine.addNamedExpression('foo', '=$A$1')
+    }).toThrow(new NoRelativeAddressesAllowedError())
+    expect(() => {
+      engine.addNamedExpression('foo', '=Sheet1!$A1')
+    }).toThrow(new NoRelativeAddressesAllowedError())
+    expect(() => {
+      engine.addNamedExpression('foo', '=Sheet1!A$1')
+    }).toThrow(new NoRelativeAddressesAllowedError())
+    expect(() => {
+      engine.addNamedExpression('foo', '=Sheet1!A1:A2')
+    }).toThrow(new NoRelativeAddressesAllowedError())
+    expect(() => {
+      engine.addNamedExpression('foo', '=Sheet1!A:B')
+    }).toThrow(new NoRelativeAddressesAllowedError())
+  })
+
+  it('changing named expression allows only for absolute addresses', () => {
+    const engine = HyperFormula.buildFromArray([])
+
+    engine.addNamedExpression('foo', 'foo')
+
+    expect(() => {
+      engine.changeNamedExpression('foo', '=A1')
+    }).toThrow(new NoRelativeAddressesAllowedError())
+    expect(() => {
+      engine.changeNamedExpression('foo', '=Sheet1!A1')
+    }).toThrow(new NoRelativeAddressesAllowedError())
+    expect(() => {
+      engine.changeNamedExpression('foo', '=$A$1')
+    }).toThrow(new NoRelativeAddressesAllowedError())
+    expect(() => {
+      engine.changeNamedExpression('foo', '=Sheet1!$A1')
+    }).toThrow(new NoRelativeAddressesAllowedError())
+    expect(() => {
+      engine.changeNamedExpression('foo', '=Sheet1!A$1')
+    }).toThrow(new NoRelativeAddressesAllowedError())
+    expect(() => {
+      engine.changeNamedExpression('foo', '=Sheet1!A1:A2')
+    }).toThrow(new NoRelativeAddressesAllowedError())
+    expect(() => {
+      engine.changeNamedExpression('foo', '=Sheet1!A:B')
+    }).toThrow(new NoRelativeAddressesAllowedError())
+  })
+})
+
 describe('Named expressions - store manipulation', () => {
   it('basic usage with global named expression', () => {
     const engine = HyperFormula.buildFromArray([
@@ -67,60 +197,6 @@ describe('Named expressions - store manipulation', () => {
 
     expect(changes).toEqual([new ExportedNamedExpressionChange('myName', detailedError(ErrorType.VALUE))])
     expect(engine.getNamedExpressionValue('myName')).toEqual(detailedError(ErrorType.VALUE))
-  })
-
-  it('adding named expression allows only for absolute addresses', () => {
-    const engine = HyperFormula.buildFromArray([])
-
-    expect(() => {
-      engine.addNamedExpression('foo', '=A1')
-    }).toThrow(new NoRelativeAddressesAllowedError())
-    expect(() => {
-      engine.addNamedExpression('foo', '=Sheet1!A1')
-    }).toThrow(new NoRelativeAddressesAllowedError())
-    expect(() => {
-      engine.addNamedExpression('foo', '=$A$1')
-    }).toThrow(new NoRelativeAddressesAllowedError())
-    expect(() => {
-      engine.addNamedExpression('foo', '=Sheet1!$A1')
-    }).toThrow(new NoRelativeAddressesAllowedError())
-    expect(() => {
-      engine.addNamedExpression('foo', '=Sheet1!A$1')
-    }).toThrow(new NoRelativeAddressesAllowedError())
-    expect(() => {
-      engine.addNamedExpression('foo', '=Sheet1!A1:A2')
-    }).toThrow(new NoRelativeAddressesAllowedError())
-    expect(() => {
-      engine.addNamedExpression('foo', '=Sheet1!A:B')
-    }).toThrow(new NoRelativeAddressesAllowedError())
-  })
-
-  it('changing named expression allows only for absolute addresses', () => {
-    const engine = HyperFormula.buildFromArray([])
-
-    engine.addNamedExpression('foo', 'foo')
-
-    expect(() => {
-      engine.changeNamedExpression('foo', '=A1')
-    }).toThrow(new NoRelativeAddressesAllowedError())
-    expect(() => {
-      engine.changeNamedExpression('foo', '=Sheet1!A1')
-    }).toThrow(new NoRelativeAddressesAllowedError())
-    expect(() => {
-      engine.changeNamedExpression('foo', '=$A$1')
-    }).toThrow(new NoRelativeAddressesAllowedError())
-    expect(() => {
-      engine.changeNamedExpression('foo', '=Sheet1!$A1')
-    }).toThrow(new NoRelativeAddressesAllowedError())
-    expect(() => {
-      engine.changeNamedExpression('foo', '=Sheet1!A$1')
-    }).toThrow(new NoRelativeAddressesAllowedError())
-    expect(() => {
-      engine.changeNamedExpression('foo', '=Sheet1!A1:A2')
-    }).toThrow(new NoRelativeAddressesAllowedError())
-    expect(() => {
-      engine.changeNamedExpression('foo', '=Sheet1!A:B')
-    }).toThrow(new NoRelativeAddressesAllowedError())
   })
 
   it('works for more formulas', () => {
@@ -543,7 +619,7 @@ describe('Named expressions - cross scope', () => {
 
     engine.addNamedExpression('expr', '=Sheet2!$A$1', 'Sheet1')
 
-    expect(engine.getNamedExpressionValue('expr',  'Sheet1')).toEqual('bar')
+    expect(engine.getNamedExpressionValue('expr', 'Sheet1')).toEqual('bar')
   })
 
   it('should be possible to add named expressions with same name to two different scopes', () => {

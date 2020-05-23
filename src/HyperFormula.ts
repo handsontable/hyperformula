@@ -2474,6 +2474,15 @@ export class HyperFormula implements TypedEmitter {
     return this._evaluationSuspended
   }
 
+  public isItPossibleToAddNamedExpression(expressionName: string, expression: RawCellContent, scope?: string): boolean {
+    try {
+      this._crudOperations.ensureItIsPossibleToAddNamedExpression(expressionName, expression, scope)
+      return true
+    } catch (e) {
+      return false
+    }
+  }
+
   /**
    * Adds a specified named expression.
    *
@@ -2593,6 +2602,15 @@ export class HyperFormula implements TypedEmitter {
     }
   }
 
+  public isItPossibleToChangeNamedExpression(expressionName: string, newExpression: RawCellContent, scope?: string): boolean {
+    try {
+      this._crudOperations.ensureItIsPossibleToChangeNamedExpression(expressionName, newExpression, scope)
+      return true
+    } catch (e) {
+      return false
+    }
+  }
+
   /**
    * Changes a given named expression to a specified formula.
    *
@@ -2625,6 +2643,15 @@ export class HyperFormula implements TypedEmitter {
   public changeNamedExpression(expressionName: string, newExpression: RawCellContent, scope?: string): ExportedChange[] {
     this._crudOperations.changeNamedExpressionExpression(expressionName, scope, newExpression)
     return this.recomputeIfDependencyGraphNeedsIt()
+  }
+
+  public isItPossibleToRemoveNamedExpression(expressionName: string, scope?: string): boolean {
+    try {
+      this._crudOperations.isItPossibleToRemoveNamedExpression(expressionName, scope)
+      return true
+    } catch (e) {
+      return false
+    }
   }
 
   /**

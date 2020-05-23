@@ -245,6 +245,12 @@ export class FunctionPluginValidationError extends Error {
   }
 }
 
+export class MatrixFormulasNotSupportedError extends Error {
+  constructor() {
+    super('Matrix formulas are not supported.')
+  }
+}
+
 export class NoRelativeAddressesAllowedError extends Error {
   constructor() {
     super('Relative addresses not allowed in named expressions.')
