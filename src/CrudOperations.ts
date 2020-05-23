@@ -123,8 +123,8 @@ export class CrudOperations {
   public moveCells(sourceLeftCorner: SimpleCellAddress, width: number, height: number, destinationLeftCorner: SimpleCellAddress): void {
     this.undoRedo.clearRedoStack()
     this.clipboardOperations.abortCut()
-    const {version, overwrittenCellsData} = this.operations.moveCells(sourceLeftCorner, width, height, destinationLeftCorner)
-    this.undoRedo.saveOperation(new MoveCellsUndoEntry(sourceLeftCorner, width, height, destinationLeftCorner, overwrittenCellsData, version))
+    const {version, overwrittenCellsData, addedGlobalNamedExpressions} = this.operations.moveCells(sourceLeftCorner, width, height, destinationLeftCorner)
+    this.undoRedo.saveOperation(new MoveCellsUndoEntry(sourceLeftCorner, width, height, destinationLeftCorner, overwrittenCellsData, addedGlobalNamedExpressions, version))
   }
 
   public moveRows(sheet: number, startRow: number, numberOfRows: number, targetRow: number): void {
@@ -172,8 +172,8 @@ export class CrudOperations {
       const oldContent = this.operations.getRangeClipboardCells(targetRange)
       this.undoRedo.clearRedoStack()
       this.dependencyGraph.breakNumericMatricesInRange(targetRange)
-      this.operations.restoreClipboardCells(clipboard.sourceLeftCorner.sheet, clipboard.getContent(targetLeftCorner))
-      this.undoRedo.saveOperation(new PasteUndoEntry(targetLeftCorner, oldContent, clipboard.content!))
+      const addedGlobalNamedExpressions = this.operations.restoreClipboardCells(clipboard.sourceLeftCorner.sheet, clipboard.getContent(targetLeftCorner))
+      this.undoRedo.saveOperation(new PasteUndoEntry(targetLeftCorner, oldContent, clipboard.content!, addedGlobalNamedExpressions))
     }
   }
 

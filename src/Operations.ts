@@ -138,6 +138,12 @@ export interface ColumnsRemoval {
   removedCells: ChangedCell[],
 }
 
+export interface MoveCellsResult {
+  version: number,
+  overwrittenCellsData: [SimpleCellAddress, ClipboardCell][],
+  addedGlobalNamedExpressions: string[],
+}
+
 export class Operations {
   private changes: ContentChanges = ContentChanges.empty()
 
@@ -247,7 +253,7 @@ export class Operations {
     this.doRemoveColumns(columnsToRemove)
   }
 
-  public moveCells(sourceLeftCorner: SimpleCellAddress, width: number, height: number, destinationLeftCorner: SimpleCellAddress): { version: number, overwrittenCellsData: [SimpleCellAddress, ClipboardCell][] } {
+  public moveCells(sourceLeftCorner: SimpleCellAddress, width: number, height: number, destinationLeftCorner: SimpleCellAddress): MoveCellsResult {
     this.ensureItIsPossibleToMoveCells(sourceLeftCorner, width, height, destinationLeftCorner)
 
     const sourceRange = AbsoluteCellRange.spanFrom(sourceLeftCorner, width, height)
@@ -276,9 +282,9 @@ export class Operations {
 
     this.dependencyGraph.moveCells(sourceRange, toRight, toBottom, toSheet)
 
-    this.updateNamedExpressionsForMovedCells(sourceLeftCorner, width, height, destinationLeftCorner)
+    const addedGlobalNamedExpressions = this.updateNamedExpressionsForMovedCells(sourceLeftCorner, width, height, destinationLeftCorner)
 
-    return {version: version!, overwrittenCellsData: currentDataAtTarget}
+    return {version: version!, overwrittenCellsData: currentDataAtTarget, addedGlobalNamedExpressions: addedGlobalNamedExpressions}
   }
 
   public addNamedExpression(expressionName: string, expression: RawCellContent, sheetId?: number) {
@@ -350,14 +356,16 @@ export class Operations {
     }
   }
 
-  public restoreClipboardCells(sourceSheetId: number, cells: IterableIterator<[SimpleCellAddress, ClipboardCell]>) {
+  public restoreClipboardCells(sourceSheetId: number, cells: IterableIterator<[SimpleCellAddress, ClipboardCell]>): string[] {
+    const addedNamedExpressions: string[] = []
     for (const [address, clipboardCell] of cells) {
       this.restoreCell(address, clipboardCell)
       if (clipboardCell.type === ClipboardCellType.FORMULA) {
         const {dependencies} = this.parser.fetchCachedResult(clipboardCell.hash)
-        this.updateNamedExpressionsForTargetAddress(sourceSheetId, address, dependencies)
+        addedNamedExpressions.push(...this.updateNamedExpressionsForTargetAddress(sourceSheetId, address, dependencies))
       }
     }
+    return addedNamedExpressions
   }
 
   public restoreCell(address: SimpleCellAddress, clipboardCell: ClipboardCell) {
@@ -698,11 +706,12 @@ export class Operations {
     }
   }
 
-  private updateNamedExpressionsForMovedCells(sourceLeftCorner: SimpleCellAddress, width: number, height: number, destinationLeftCorner: SimpleCellAddress): void {
+  private updateNamedExpressionsForMovedCells(sourceLeftCorner: SimpleCellAddress, width: number, height: number, destinationLeftCorner: SimpleCellAddress): string[] {
     if (sourceLeftCorner.sheet === destinationLeftCorner.sheet) {
-      return
+      return []
     }
 
+    const addedGlobalNamedExpressions: string[] = []
     const targetRange = AbsoluteCellRange.spanFrom(destinationLeftCorner, width, height)
 
     for (const formulaAddress of targetRange.addresses(this.dependencyGraph)) {
@@ -710,16 +719,19 @@ export class Operations {
       if (vertex instanceof FormulaCellVertex && formulaAddress.sheet !== sourceLeftCorner.sheet) {
         const ast = vertex.getFormula(this.lazilyTransformingAstService)
         const {dependencies} = this.parser.fetchCachedResultForAst(ast)
-        this.updateNamedExpressionsForTargetAddress(sourceLeftCorner.sheet, formulaAddress, dependencies)
+        addedGlobalNamedExpressions.push(...this.updateNamedExpressionsForTargetAddress(sourceLeftCorner.sheet, formulaAddress, dependencies))
       }
     }
+
+    return addedGlobalNamedExpressions
   }
 
-  private updateNamedExpressionsForTargetAddress(sourceSheet: number, targetAddress: SimpleCellAddress, dependencies: RelativeDependency[]) {
+  private updateNamedExpressionsForTargetAddress(sourceSheet: number, targetAddress: SimpleCellAddress, dependencies: RelativeDependency[]): string[] {
     if (sourceSheet === targetAddress.sheet) {
-      return
+      return []
     }
 
+    const addedGlobalNamedExpressions: string[] = []
     const vertex = this.addressMapping.fetchCell(targetAddress)
 
     for (const namedExpressionDependency of absolutizeDependencies(dependencies, targetAddress)) {
@@ -733,23 +745,26 @@ export class Operations {
 
       const targetScopeExpressionVertex = namedExpressionInTargetScope
         ? this.dependencyGraph.fetchNamedExpressionVertex(expressionName, targetAddress.sheet)
-        : this.copyOrFetchGlobalNamedExpressionVertex(expressionName, sourceVertex)
+        : this.copyOrFetchGlobalNamedExpressionVertex(expressionName, sourceVertex, addedGlobalNamedExpressions)
 
       if (targetScopeExpressionVertex !== sourceVertex) {
         this.dependencyGraph.graph.softRemoveEdge(sourceVertex, vertex)
         this.dependencyGraph.graph.addEdge(targetScopeExpressionVertex, vertex)
       }
     }
+
+    return addedGlobalNamedExpressions
   }
 
   private allocateNamedExpressionAddressSpace() {
     this.dependencyGraph.addressMapping.addSheet(-1, new SparseStrategy(0, 0))
   }
 
-  private copyOrFetchGlobalNamedExpressionVertex(expressionName: string, sourceVertex: CellVertex): CellVertex {
+  private copyOrFetchGlobalNamedExpressionVertex(expressionName: string, sourceVertex: CellVertex, addedNamedExpressions: string[]): CellVertex {
     let expression = this.namedExpressions.namedExpressionForScope(expressionName)
     if (expression === undefined) {
       expression = this.namedExpressions.addNamedExpression(expressionName)
+      addedNamedExpressions.push(expression.normalizeExpressionName())
       if (sourceVertex instanceof FormulaCellVertex) {
         const parsingResult = this.parser.fetchCachedResultForAst(sourceVertex.getFormula(this.lazilyTransformingAstService))
         const {ast, hasVolatileFunction, hasStructuralChangeFunction, dependencies} = parsingResult

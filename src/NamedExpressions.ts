@@ -5,7 +5,6 @@
 
 import {simpleCellAddress, SimpleCellAddress} from './Cell'
 import {Maybe} from './Maybe'
-import {NamedExpressionNameIsAlreadyTaken, NamedExpressionNameIsInvalid} from './errors'
 import {Ast, AstNodeType} from './parser'
 
 export class NamedExpression {
@@ -14,6 +13,10 @@ export class NamedExpression {
     public readonly address: SimpleCellAddress,
     public added: boolean,
   ) {
+  }
+
+  public normalizeExpressionName(): string {
+    return this.displayName.toLowerCase()
   }
 }
 
@@ -31,7 +34,7 @@ class WorkbookStore {
   }
 
   public add(namedExpression: NamedExpression): void {
-    this.mapping.set(this.normalizeExpressionName(namedExpression.displayName), namedExpression)
+    this.mapping.set(namedExpression.normalizeExpressionName(), namedExpression)
   }
 
   public get(expressionName: string): Maybe<NamedExpression> {

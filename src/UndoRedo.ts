@@ -33,6 +33,7 @@ export class MoveCellsUndoEntry {
     public readonly height: number,
     public readonly destinationLeftCorner: SimpleCellAddress,
     public readonly overwrittenCellsData: [SimpleCellAddress, ClipboardCell][],
+    public readonly addedGlobalNamedExpressions: string[],
     public readonly version: number,
   ) {
   }
@@ -130,6 +131,7 @@ export class PasteUndoEntry {
     public readonly targetLeftCorner: SimpleCellAddress,
     public readonly oldContent: [SimpleCellAddress, ClipboardCell][],
     public readonly newContent: ClipboardCell[][],
+    public readonly addedGlobalNamedExpressions: string[],
   ) {
   }
 }
@@ -370,6 +372,9 @@ export class UndoRedo {
     for (const [address, clipboardCell] of operation.oldContent) {
       this.operations.restoreCell(address, clipboardCell)
     }
+    for (const namedExpression of operation.addedGlobalNamedExpressions) {
+      this.operations.removeNamedExpression(namedExpression)
+    }
   }
 
   private undoMoveRows(operation: MoveRowsUndoEntry) {
@@ -391,6 +396,9 @@ export class UndoRedo {
     }
 
     this.restoreOldDataFromVersion(operation.version - 1)
+    for (const namedExpression of operation.addedGlobalNamedExpressions) {
+      this.operations.removeNamedExpression(namedExpression)
+    }
   }
 
   private undoAddSheet(operation: AddSheetUndoEntry) {

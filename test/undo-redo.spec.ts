@@ -571,6 +571,34 @@ describe('Undo - moving cells', () => {
 
     expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray(sheet))
   })
+
+  it('removed added global named expression', () => {
+    const engine = HyperFormula.buildFromSheets({
+      'Sheet1': [],
+      'Sheet2': []
+    })
+    engine.addNamedExpression('foo', 'bar', 'Sheet1')
+    engine.setCellContents(adr('A1'), '=foo')
+    engine.moveCells(adr('A1'), 1, 1, adr('A1', 1))
+
+    engine.undo()
+
+    expect(engine.getNamedExpressionValue('foo')).toEqual(undefined)
+  })
+
+  it('remove global named expression even if it was added after formula', () => {
+    const engine = HyperFormula.buildFromSheets({
+      'Sheet1': [['=foo']],
+      'Sheet2': []
+    })
+    engine.addNamedExpression('foo', 'bar', 'Sheet1')
+    engine.moveCells(adr('A1'), 1, 1, adr('A1', 1))
+
+    engine.undo()
+
+    expect(engine.getNamedExpressionValue('foo', 'Sheet1')).toEqual('bar')
+    expect(engine.getNamedExpressionValue('foo')).toEqual(undefined)
+  })
 })
 
 describe('Undo - cut-paste', () => {
@@ -600,6 +628,22 @@ describe('Undo - cut-paste', () => {
 
     expect(engine.isClipboardEmpty()).toBe(true)
   })
+
+  it('removed added global named expression', () => {
+    const engine = HyperFormula.buildFromSheets({
+      'Sheet1': [],
+      'Sheet2': []
+    })
+    engine.addNamedExpression('foo', 'bar', 'Sheet1')
+    engine.setCellContents(adr('A1'), '=foo')
+    engine.cut(adr('A1'), 1, 1)
+    engine.paste(adr('A1', 1))
+
+    engine.undo()
+
+    expect(engine.getNamedExpressionValue('foo', 'Sheet1')).toEqual('bar')
+    expect(engine.getNamedExpressionValue('foo')).toEqual(undefined)
+  })
 })
 
 describe('Undo - copy-paste', () => {
@@ -615,6 +659,22 @@ describe('Undo - copy-paste', () => {
     engine.undo()
 
     expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray(sheet))
+  })
+
+  it('removed added global named expression', () => {
+    const engine = HyperFormula.buildFromSheets({
+      'Sheet1': [],
+      'Sheet2': []
+    })
+    engine.addNamedExpression('foo', 'bar', 'Sheet1')
+    engine.setCellContents(adr('A1'), '=foo')
+    engine.copy(adr('A1'), 1, 1)
+    engine.paste(adr('A1', 1))
+
+    engine.undo()
+
+    expect(engine.getNamedExpressionValue('foo', 'Sheet1')).toEqual('bar')
+    expect(engine.getNamedExpressionValue('foo')).toEqual(undefined)
   })
 })
 
