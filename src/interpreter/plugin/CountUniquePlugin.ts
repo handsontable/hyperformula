@@ -38,9 +38,7 @@ export class CountUniquePlugin extends FunctionPlugin {
     const errorsSet = new Set<ErrorType>()
 
     for (const scalarValue of this.iterateOverScalarValues(ast.args, formulaAddress)) {
-      if (scalarValue instanceof SimpleRangeValue) {
-        /* TODO */
-      } else if (scalarValue instanceof CellError) {
+      if (scalarValue instanceof CellError) {
         errorsSet.add(scalarValue.type)
       } else if (scalarValue !== '') {
         valuesSet.add(scalarValue)

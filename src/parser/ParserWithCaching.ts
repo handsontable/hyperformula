@@ -98,7 +98,6 @@ export class ParserWithCaching {
   }
 
   public fetchCachedResultForAst(ast: Ast): ParsingResult {
-    /* TODO we store dependencies in AST? */
     const hash = this.computeHashFromAst(ast)
     return this.fetchCachedResult(hash)
   }

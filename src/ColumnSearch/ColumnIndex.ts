@@ -23,6 +23,7 @@ import {ColumnSearchStrategy} from './ColumnSearchStrategy'
 import {AddRowsTransformer} from '../dependencyTransformers/AddRowsTransformer'
 import {RemoveRowsTransformer} from '../dependencyTransformers/RemoveRowsTransformer'
 import {FormulaTransformer} from '../dependencyTransformers/Transformer'
+import {SimpleRangeValue} from '../interpreter/InterpreterValue'
 
 type ColumnMap = Map<InternalCellValue, ValueIndex>
 
@@ -49,12 +50,11 @@ export class ColumnIndex implements ColumnSearchStrategy {
   }
 
   public add(value: InternalCellValue | Matrix, address: SimpleCellAddress) {
-    /* TODO expand SimpleRangeValue? */
     if (value instanceof Matrix) {
       for (const [matrixValue, cellAddress] of value.generateValues(address)) {
         this.addSingleCellValue(matrixValue, cellAddress)
       }
-    } else if (!(value instanceof CellError)) {
+    } else if (!(value instanceof CellError || value instanceof SimpleRangeValue)) {
       this.addSingleCellValue(value, address)
     }
   }

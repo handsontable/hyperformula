@@ -58,7 +58,6 @@ export abstract class FunctionPlugin {
   }
 
   protected* iterateOverScalarValues(asts: Ast[], formulaAddress: SimpleCellAddress): IterableIterator<InternalScalarValue> {
-    /* TODO filter SingleRangeValue */
     for (const argAst of asts) {
       const value = this.evaluateAst(argAst, formulaAddress)
       if (value instanceof SimpleRangeValue) {
