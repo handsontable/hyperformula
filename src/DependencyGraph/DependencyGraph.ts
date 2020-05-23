@@ -672,14 +672,40 @@ export class DependencyGraph {
   }
 
   private fixRanges(sheet: number, row: number, numberOfRows: number): void {
-    for (const rangeVertex of this.rangeMapping.rangesInSheet(sheet)) {
+    const originalValues: RangeVertex[] = Array.from(this.rangeMapping.rangesInSheet(sheet))
+    for(const rangeVertex of originalValues) {
       if (rangeVertex.range.includesRow(row+numberOfRows)) {
-        const anyVertexInRow = this.addressMapping.getCell(simpleCellAddress(sheet, rangeVertex.start.col, row + numberOfRows))!
-        if (this.graph.existsEdge(anyVertexInRow, rangeVertex)) {
+        if(rangeVertex.bruteForce) {
           const addedSubrangeInThatRange = rangeVertex.range.rangeWithSameWidth(row, numberOfRows)
           for (const address of addedSubrangeInThatRange.addresses(this)) {
             this.graph.addEdge(this.fetchCellOrCreateEmpty(address), rangeVertex)
           }
+        } else {
+          let currentRangeVertex = rangeVertex
+          let currentRange = rangeVertex.range
+          let find = this.rangeMapping.findSmallerRange(currentRange)
+          if(find.smallerRangeVertex !== null) {
+            break
+          }
+          while(find.smallerRangeVertex === null) {
+            const newRange = AbsoluteCellRange.spanFrom(currentRange.start, currentRange.width(), currentRange.height() - 1)
+            const newRangeVertex = new RangeVertex(newRange)
+            this.rangeMapping.setRange(newRangeVertex)
+            this.graph.addNode(newRangeVertex)
+            find = this.rangeMapping.findSmallerRange(currentRange)
+            for (const address of find.restRange.addresses(this)) {
+              this.graph.addEdge(this.fetchCellOrCreateEmpty(address), currentRangeVertex)
+            }
+            this.graph.addEdge(newRangeVertex, currentRangeVertex)
+            currentRange = newRange
+            currentRangeVertex = newRangeVertex
+            find = this.rangeMapping.findSmallerRange(currentRange)
+          }
+          this.graph.addEdge(find.smallerRangeVertex, currentRangeVertex)
+          for(const address of find.restRange.addresses(this)) {
+            this.graph.addEdge(this.fetchCellOrCreateEmpty(address), currentRangeVertex)
+          }
+          this.graph.removeEdge(find.smallerRangeVertex, rangeVertex)
         }
       }
     }
