@@ -212,7 +212,7 @@ describe('cruds', () => {
     expect(engine.dependencyGraph.rangeMapping.getMappingSize(0)).toBe(0)
   })
 
-  it('this test fails column adding', () => {
+  it('column adding', () => {
     const engine = HyperFormula.buildFromArray([
       [0, 0],
       [0, 0],
@@ -226,5 +226,26 @@ describe('cruds', () => {
     expect(engine.getCellSerialized(adr('A5'))).toBe('=SUM(A1:C3)')
     expect(engine.getCellValue(adr('A4'))).toBe(0)
     expect(engine.getCellValue(adr('A5'))).toBe(1)
+  })
+
+  it('movecell', () => {
+    const engine = HyperFormula.buildFromArray([
+    [1],
+    [2],
+    [3],
+    [4],
+    ['=SUM(A1:A3)'],
+    ['=SUM(A1:A4)'],
+    ])
+    engine.moveCells(adr('A1'), 1, 3, adr('B1'))
+    engine.setCellContents(adr('B1'), null)
+    engine.setCellContents(adr('B2'), null)
+    engine.setCellContents(adr('B3'), null)
+    engine.setCellContents(adr('A4'), null)
+    engine.setCellContents(adr('A5'), null)
+    engine.setCellContents(adr('A6'), null)
+
+    expect(engine.dependencyGraph.graph.nodesCount()).toBe(0)
+    expect(engine.dependencyGraph.rangeMapping.getMappingSize(0)).toBe(0)
   })
 })
