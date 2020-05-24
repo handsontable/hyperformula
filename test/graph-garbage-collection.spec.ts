@@ -220,7 +220,7 @@ describe('cruds', () => {
       ['=SUM(A1:B2)'],
       ['=SUM(A1:B3)']
     ])
-    engine.addColumns(0, [1,1])
+    engine.addColumns(0, [1, 1])
     engine.setCellContents(adr('B3'), 1)
     expect(engine.getCellSerialized(adr('A4'))).toBe('=SUM(A1:C2)')
     expect(engine.getCellSerialized(adr('A5'))).toBe('=SUM(A1:C3)')

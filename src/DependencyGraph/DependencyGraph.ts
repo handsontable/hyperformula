@@ -866,39 +866,21 @@ export class DependencyGraph {
       formula = vertex.getFormula()!
     } else if (vertex instanceof RangeVertex) {
       const allDeps: Set<Vertex> = new Set()
-      const {smallerRangeVertex, restRange} = this.rangeMapping.findSmallerRange(vertex.range) //checking whether this range was splitted by bruteForce or not. But the trick is that both cases are possible
+      const {smallerRangeVertex, restRange} = this.rangeMapping.findSmallerRange(vertex.range) //checking whether this range was splitted by bruteForce or not
+      let range
       if(smallerRangeVertex !== null && this.graph.adjacentNodes(smallerRangeVertex).has(vertex)) {
-        for(const address of restRange.addresses(this)) {
-          const cell = this.addressMapping.getCell(address)
-          if (cell instanceof EmptyCellVertex) {
-            cell.address = address
-          }
-          if (cell !== null) {
-            allDeps.add(cell)
-          }
-        }
+        range = restRange
         allDeps.add(smallerRangeVertex)
-      } else if(!vertex.bruteForce) {
-        for(const address of restRange.addresses(this)) {
-          const cell = this.addressMapping.getCell(address)
-          if(cell instanceof EmptyCellVertex) {
-            cell.address = address
-          }
-          if(cell !== null) {
-            allDeps.add(cell)
-          }
-        }
+      } else { //did we ever need to use full range
+        range = vertex.range
       }
-
-      if(vertex.bruteForce) { //did we ever need to use full range
-        for(const address of vertex.range.addresses(this)) {
-          const cell = this.addressMapping.getCell(address)
-          if(cell instanceof EmptyCellVertex) {
-            cell.address = address
-          }
-          if(cell !== null) {
-            allDeps.add(cell)
-          }
+      for(const address of range.addresses(this)) {
+        const cell = this.addressMapping.getCell(address)
+        if(cell instanceof EmptyCellVertex) {
+          cell.address = address
+        }
+        if(cell !== null) {
+          allDeps.add(cell)
         }
       }
       return allDeps
