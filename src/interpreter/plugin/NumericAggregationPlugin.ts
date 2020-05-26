@@ -423,8 +423,7 @@ export class NumericAggregationPlugin extends FunctionPlugin {
         }
       }
       actualRange = restRange
-    }
-    else {
+    } else {
       actualRange = range
     }
     for (const cellFromRange of actualRange.addresses(this.dependencyGraph)) {
