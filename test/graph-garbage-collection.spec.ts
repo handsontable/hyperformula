@@ -212,6 +212,51 @@ describe('cruds', () => {
     expect(engine.dependencyGraph.rangeMapping.getMappingSize(0)).toBe(0)
   })
 
+  xit('should collect empty vertices when bigger range is no longer bind to smaller range #4', () => {
+    const engine = HyperFormula.buildFromArray([
+      [],
+      [],
+      [],
+      ['=SUM(A1:A3)'],
+      ['=SUM(A1:A2)'],
+    ])
+    engine.addRows(0, [1, 1])
+
+    engine.setCellContents(adr('A1'), [[1],[2],[3],[4]])
+    const x = engine.getSheetSerialized(0)
+
+    expect(engine.getCellValue(adr('A5'))).toBe(10)
+    expect(engine.getCellValue(adr('A6'))).toBe(6)
+
+    engine.removeRows(0, [0, 6])
+
+    expect(engine.dependencyGraph.graph.nodesCount()).toBe(0)
+    expect(engine.dependencyGraph.rangeMapping.getMappingSize(0)).toBe(0)
+  })
+
+  xit('should collect empty vertices when bigger range is no longer bind to smaller range #5', () => {
+    const engine = HyperFormula.buildFromArray([
+      [],
+      [],
+      [],
+      ['=SUM(A1:A2)', '=SUM(B1:B3)'],
+      ['=SUM(A1:A3)', '=SUM(B1:B2)'],
+    ])
+    engine.addRows(0, [1, 1])
+
+    engine.setCellContents(adr('A1'), [[1,1],[2,2],[3,3],[4,4]])
+
+    expect(engine.getCellValue(adr('A5'))).toBe(6)
+    expect(engine.getCellValue(adr('B5'))).toBe(10)
+    expect(engine.getCellValue(adr('A6'))).toBe(10)
+    expect(engine.getCellValue(adr('B6'))).toBe(6)
+
+    engine.removeRows(0, [0, 6])
+
+    expect(engine.dependencyGraph.graph.nodesCount()).toBe(0)
+    expect(engine.dependencyGraph.rangeMapping.getMappingSize(0)).toBe(0)
+  })
+
   it('column adding', () => {
     const engine = HyperFormula.buildFromArray([
       [0, 0],
