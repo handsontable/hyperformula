@@ -222,7 +222,7 @@ describe('cruds', () => {
     ])
     engine.addRows(0, [1, 1])
 
-    engine.setCellContents(adr('A1'), [[1],[2],[3],[4]])
+    engine.setCellContents(adr('A1'), [[1], [2], [3], [4]])
     const x = engine.getSheetSerialized(0)
 
     expect(engine.getCellValue(adr('A5'))).toBe(10)
@@ -244,7 +244,7 @@ describe('cruds', () => {
     ])
     engine.addRows(0, [1, 1])
 
-    engine.setCellContents(adr('A1'), [[1,1],[2,2],[3,3],[4,4]])
+    engine.setCellContents(adr('A1'), [[1, 1], [2, 2], [3, 3], [4, 4]])
 
     expect(engine.getCellValue(adr('A5'))).toBe(6)
     expect(engine.getCellValue(adr('B5'))).toBe(10)
