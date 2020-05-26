@@ -212,7 +212,7 @@ describe('cruds', () => {
     expect(engine.dependencyGraph.rangeMapping.getMappingSize(0)).toBe(0)
   })
 
-  xit('should collect empty vertices when bigger range is no longer bind to smaller range #4', () => {
+  it('should collect empty vertices when bigger range is no longer bind to smaller range #4', () => {
     const engine = HyperFormula.buildFromArray([
       [],
       [],
@@ -223,7 +223,6 @@ describe('cruds', () => {
     engine.addRows(0, [1, 1])
 
     engine.setCellContents(adr('A1'), [[1], [2], [3], [4]])
-    const x = engine.getSheetSerialized(0)
 
     expect(engine.getCellValue(adr('A5'))).toBe(10)
     expect(engine.getCellValue(adr('A6'))).toBe(6)
@@ -234,7 +233,47 @@ describe('cruds', () => {
     expect(engine.dependencyGraph.rangeMapping.getMappingSize(0)).toBe(0)
   })
 
-  xit('should collect empty vertices when bigger range is no longer bind to smaller range #5', () => {
+  it('should collect empty vertices when bigger range is no longer bind to smaller range #5', () => {
+    const engine = HyperFormula.buildFromArray([
+      [],
+      [],
+      [],
+      [],
+      ['=SUM(A1:A4)'],
+      ['=SUM(A1:A3)'],
+    ])
+
+    engine.setCellContents(adr('A1'), [[1], [2], [3], [4]])
+
+    expect(engine.getCellValue(adr('A5'))).toBe(10)
+    expect(engine.getCellValue(adr('A6'))).toBe(6)
+
+    engine.removeRows(0, [0, 6])
+
+    expect(engine.dependencyGraph.graph.nodesCount()).toBe(0)
+    expect(engine.dependencyGraph.rangeMapping.getMappingSize(0)).toBe(0)
+  })
+
+  it('should collect empty vertices when bigger range is no longer bind to smaller range #6', () => {
+    const engine = HyperFormula.buildFromArray([
+      [1],
+      [2],
+      [3],
+      [4],
+      ['=SUM(A1:A4)'],
+      ['=SUM(A1:A3)'],
+    ])
+
+    expect(engine.getCellValue(adr('A5'))).toBe(10)
+    expect(engine.getCellValue(adr('A6'))).toBe(6)
+
+    engine.removeRows(0, [0, 6])
+
+    expect(engine.dependencyGraph.graph.nodesCount()).toBe(0)
+    expect(engine.dependencyGraph.rangeMapping.getMappingSize(0)).toBe(0)
+  })
+
+  it('should collect empty vertices when bigger range is no longer bind to smaller range #7', () => {
     const engine = HyperFormula.buildFromArray([
       [],
       [],
