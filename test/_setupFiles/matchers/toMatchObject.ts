@@ -16,7 +16,8 @@ export const toMatchObjectMatcher: CustomMatcherFactories = {
     return {
       compare: function(actual: never, expected: never): CustomMatcherResult {
         return {
-          pass: util.equals(actual, jasmine.objectContaining(expected))
+          pass: util.equals(actual, jasmine.objectContaining(expected)),
+          message: ''
         }
       },
     }

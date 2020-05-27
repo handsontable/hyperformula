@@ -17,7 +17,7 @@ describe('Function DAYS', () => {
     const engine = HyperFormula.buildFromArray([
       ['=DAYS("foo", 1)'],
       ['=DAYS(2, "bar")'],
-      ['=DAYS(2, "30/12/2018")'],
+      ['=DAYS(2, "12/30/2018")'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE))
@@ -27,10 +27,10 @@ describe('Function DAYS', () => {
 
   it('should work for strings', () => {
     const engine = HyperFormula.buildFromArray([
-      ['=DAYS("12/30/2018", "12/30/2018")'],
-      ['=DAYS("12/31/2018", "12/30/2018")'],
-      ['=DAYS("12/30/2018", "12/31/2018")'],
-      ['=DAYS("02/28/2017", "02/28/2016")'],
+      ['=DAYS("30/12/2018", "30/12/2018")'],
+      ['=DAYS("31/12/2018", "30/12/2018")'],
+      ['=DAYS("30/12/2018", "31/12/2018")'],
+      ['=DAYS("28/02/2017", "28/02/2016")'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqual(0)
@@ -42,7 +42,7 @@ describe('Function DAYS', () => {
   it('should work for numbers', () => {
     const engine = HyperFormula.buildFromArray([
       ['=DAYS(20, 10)'],
-      ['=DAYS(12346, "02/28/2016")'],
+      ['=DAYS(12346, "28/02/2016")'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqual(10)

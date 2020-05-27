@@ -9,8 +9,8 @@ import {FunctionPlugin} from './FunctionPlugin'
 
 export class RadiansPlugin extends FunctionPlugin {
   public static implementedFunctions = {
-    radians: {
-      translationKey: 'RADIANS',
+    'RADIANS': {
+      method: 'radians',
     },
   }
 

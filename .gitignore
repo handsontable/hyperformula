@@ -12,6 +12,7 @@ typedoc/
 es/
 lib/
 test-jasmine/
+test-jest/
 node_modules/
 typings/
 

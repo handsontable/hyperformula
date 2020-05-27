@@ -15,6 +15,7 @@ import {
 } from '../src/parser'
 import {EngineComparator} from './graphComparator'
 import {ColumnRangeAst, RowRangeAst} from '../src/parser/Ast'
+import {FunctionRegistry} from '../src/interpreter/FunctionRegistry'
 
 export const extractReference = (engine: HyperFormula, address: SimpleCellAddress): CellAddress => {
   return ((engine.addressMapping.fetchCell(address) as FormulaCellVertex).getFormula(engine.lazilyTransformingAstService) as CellReferenceAst).reference
@@ -57,7 +58,11 @@ export const expectFunctionToHaveRefError = (engine: HyperFormula, address: Simp
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const expectArrayWithSameContent = (expected: any[], actual: any[]) => {
   expect(actual.length).toBe(expected.length)
-  expect(actual).toContainEqual(expected)
+  for(const iter of expected) {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+    // @ts-ignore
+    expect(actual).toContainEqual(iter)
+  }
 }
 
 export const rowStart = (input: number, sheet: number = 0): SimpleCellAddress => {
@@ -128,5 +133,11 @@ export function expectCloseTo(actual: InternalCellValue, expected: number, preci
 export function unregisterAllLanguages() {
   for (const langCode of HyperFormula.getRegisteredLanguagesCodes()) {
     HyperFormula.unregisterLanguage(langCode)
+  }
+}
+
+export function unregisterAllFormulas() {
+  for (const formulaId of FunctionRegistry.getRegisteredFunctionIds()) {
+    HyperFormula.unregisterFunction(formulaId)
   }
 }

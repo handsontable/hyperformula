@@ -1,13 +1,12 @@
 import {CellError} from '../../src'
 import {ErrorType, simpleCellAddress} from '../../src/Cell'
 import {Config} from '../../src/Config'
-import {SheetMapping} from '../../src/DependencyGraph'
-import {buildTranslationPackage, enGB} from '../../src/i18n'
-import {AstNodeType, CellAddress, CellRangeAst, CellReferenceAst, ErrorAst, ParserWithCaching} from '../../src/parser'
+import {AstNodeType, CellAddress, CellRangeAst, CellReferenceAst, ErrorAst} from '../../src/parser'
+import {buildEmptyParserWithCaching} from './common'
 
 describe('Parser - OFFSET to reference translation', () => {
   it('OFFSET parsing into cell reference', () => {
-    const parser = new ParserWithCaching(new Config(), new SheetMapping(buildTranslationPackage(enGB)).get)
+    const parser = buildEmptyParserWithCaching(new Config())
 
     const ast = parser.parse('=OFFSET(F16, 0, 0)', simpleCellAddress(0, 1, 2)).ast as CellReferenceAst
     expect(ast.type).toBe(AstNodeType.CELL_REFERENCE)
@@ -15,7 +14,7 @@ describe('Parser - OFFSET to reference translation', () => {
   })
 
   it('OFFSET parsing into cell reference with row shift', () => {
-    const parser = new ParserWithCaching(new Config(), new SheetMapping(buildTranslationPackage(enGB)).get)
+    const parser = buildEmptyParserWithCaching(new Config())
 
     const ast = parser.parse('=OFFSET(F16, 1, 0)', simpleCellAddress(0, 1, 2)).ast as CellReferenceAst
     expect(ast.type).toBe(AstNodeType.CELL_REFERENCE)
@@ -23,7 +22,7 @@ describe('Parser - OFFSET to reference translation', () => {
   })
 
   it('OFFSET parsing into cell reference with negative row shift', () => {
-    const parser = new ParserWithCaching(new Config(), new SheetMapping(buildTranslationPackage(enGB)).get)
+    const parser = buildEmptyParserWithCaching(new Config())
 
     const ast = parser.parse('=OFFSET(C3, -1, 0)', simpleCellAddress(0, 1, 1)).ast as CellReferenceAst
     expect(ast.type).toBe(AstNodeType.CELL_REFERENCE)
@@ -31,7 +30,7 @@ describe('Parser - OFFSET to reference translation', () => {
   })
 
   it('OFFSET parsing into cell reference with column shift', () => {
-    const parser = new ParserWithCaching(new Config(), new SheetMapping(buildTranslationPackage(enGB)).get)
+    const parser = buildEmptyParserWithCaching(new Config())
 
     const ast = parser.parse('=OFFSET(F16, 0, 1)', simpleCellAddress(0, 1, 2)).ast as CellReferenceAst
     expect(ast.type).toBe(AstNodeType.CELL_REFERENCE)
@@ -39,7 +38,7 @@ describe('Parser - OFFSET to reference translation', () => {
   })
 
   it('OFFSET parsing into cell reference with negative column shift', () => {
-    const parser = new ParserWithCaching(new Config(), new SheetMapping(buildTranslationPackage(enGB)).get)
+    const parser = buildEmptyParserWithCaching(new Config())
 
     const ast = parser.parse('=OFFSET(C3, 0, -1)', simpleCellAddress(0, 1, 1)).ast as CellReferenceAst
     expect(ast.type).toBe(AstNodeType.CELL_REFERENCE)
@@ -47,7 +46,7 @@ describe('Parser - OFFSET to reference translation', () => {
   })
 
   it('OFFSET parsing into cell reference with some height', () => {
-    const parser = new ParserWithCaching(new Config(), new SheetMapping(buildTranslationPackage(enGB)).get)
+    const parser = buildEmptyParserWithCaching(new Config())
 
     const ast = parser.parse('=OFFSET(F16, 2, 0, 3)', simpleCellAddress(0, 1, 2)).ast as CellRangeAst
     expect(ast.type).toBe(AstNodeType.CELL_RANGE)
@@ -56,7 +55,7 @@ describe('Parser - OFFSET to reference translation', () => {
   })
 
   it('OFFSET parsing into cell reference with some width', () => {
-    const parser = new ParserWithCaching(new Config(), new SheetMapping(buildTranslationPackage(enGB)).get)
+    const parser = buildEmptyParserWithCaching(new Config())
 
     const ast = parser.parse('=OFFSET(F16, 0, 2, 1, 3)', simpleCellAddress(0, 1, 2)).ast as CellRangeAst
     expect(ast.type).toBe(AstNodeType.CELL_RANGE)
@@ -65,7 +64,7 @@ describe('Parser - OFFSET to reference translation', () => {
   })
 
   it('OFFSET first argument need to be reference', () => {
-    const parser = new ParserWithCaching(new Config(), new SheetMapping(buildTranslationPackage(enGB)).get)
+    const parser = buildEmptyParserWithCaching(new Config())
 
     const {errors} = parser.parse('=OFFSET(42, 0, 0)', simpleCellAddress(0, 0, 0))
     expect(errors[0].type).toBe('StaticOffsetError')
@@ -73,7 +72,7 @@ describe('Parser - OFFSET to reference translation', () => {
   })
 
   it('OFFSET second argument need to be static number', () => {
-    const parser = new ParserWithCaching(new Config(), new SheetMapping(buildTranslationPackage(enGB)).get)
+    const parser = buildEmptyParserWithCaching(new Config())
 
     const {errors} = parser.parse('=OFFSET(A1, C3, 0)', simpleCellAddress(0, 0, 0))
     expect(errors[0].type).toBe('StaticOffsetError')
@@ -81,7 +80,7 @@ describe('Parser - OFFSET to reference translation', () => {
   })
 
   it('OFFSET second argument need to be integer', () => {
-    const parser = new ParserWithCaching(new Config(), new SheetMapping(buildTranslationPackage(enGB)).get)
+    const parser = buildEmptyParserWithCaching(new Config())
 
     const {errors} = parser.parse('=OFFSET(A1, 1.3, 0)', simpleCellAddress(0, 0, 0))
     expect(errors[0].type).toBe('StaticOffsetError')
@@ -89,7 +88,7 @@ describe('Parser - OFFSET to reference translation', () => {
   })
 
   it('OFFSET third argument need to be static number', () => {
-    const parser = new ParserWithCaching(new Config(), new SheetMapping(buildTranslationPackage(enGB)).get)
+    const parser = buildEmptyParserWithCaching(new Config())
 
     const {errors} = parser.parse('=OFFSET(A1, 0, C3)', simpleCellAddress(0, 0, 0))
     expect(errors[0].type).toBe('StaticOffsetError')
@@ -97,7 +96,7 @@ describe('Parser - OFFSET to reference translation', () => {
   })
 
   it('OFFSET third argument need to be integer', () => {
-    const parser = new ParserWithCaching(new Config(), new SheetMapping(buildTranslationPackage(enGB)).get)
+    const parser = buildEmptyParserWithCaching(new Config())
 
     const {errors} = parser.parse('=OFFSET(A1, 0, 1.3)', simpleCellAddress(0, 0, 0))
     expect(errors[0].type).toBe('StaticOffsetError')
@@ -105,7 +104,7 @@ describe('Parser - OFFSET to reference translation', () => {
   })
 
   it('OFFSET fourth argument need to be static number', () => {
-    const parser = new ParserWithCaching(new Config(), new SheetMapping(buildTranslationPackage(enGB)).get)
+    const parser = buildEmptyParserWithCaching(new Config())
 
     const {errors} = parser.parse('=OFFSET(A1, 0, 0, B3)', simpleCellAddress(0, 0, 0))
     expect(errors[0].type).toBe('StaticOffsetError')
@@ -113,7 +112,7 @@ describe('Parser - OFFSET to reference translation', () => {
   })
 
   it('OFFSET fourth argument need to be static number bigger than 0', () => {
-    const parser = new ParserWithCaching(new Config(), new SheetMapping(buildTranslationPackage(enGB)).get)
+    const parser = buildEmptyParserWithCaching(new Config())
 
     const {errors} = parser.parse('=OFFSET(A1, 0, 0, 0)', simpleCellAddress(0, 0, 0))
     expect(errors[0].type).toBe('StaticOffsetError')
@@ -121,7 +120,7 @@ describe('Parser - OFFSET to reference translation', () => {
   })
 
   it('OFFSET fourth argument need to be integer', () => {
-    const parser = new ParserWithCaching(new Config(), new SheetMapping(buildTranslationPackage(enGB)).get)
+    const parser = buildEmptyParserWithCaching(new Config())
 
     const {errors} = parser.parse('=OFFSET(A1, 0, 0, 1.3)', simpleCellAddress(0, 0, 0))
     expect(errors[0].type).toBe('StaticOffsetError')
@@ -129,7 +128,7 @@ describe('Parser - OFFSET to reference translation', () => {
   })
 
   it('OFFSET fifth argument need to be static number', () => {
-    const parser = new ParserWithCaching(new Config(), new SheetMapping(buildTranslationPackage(enGB)).get)
+    const parser = buildEmptyParserWithCaching(new Config())
 
     const {errors} = parser.parse('=OFFSET(A1, 0, 0, 1, B3)', simpleCellAddress(0, 0, 0))
     expect(errors[0].type).toBe('StaticOffsetError')
@@ -137,7 +136,7 @@ describe('Parser - OFFSET to reference translation', () => {
   })
 
   it('OFFSET fifth argument need to be static number bigger than 0', () => {
-    const parser = new ParserWithCaching(new Config(), new SheetMapping(buildTranslationPackage(enGB)).get)
+    const parser = buildEmptyParserWithCaching(new Config())
 
     const {errors} = parser.parse('=OFFSET(A1, 0, 0, 1, 0)', simpleCellAddress(0, 0, 0))
     expect(errors[0].type).toBe('StaticOffsetError')
@@ -145,7 +144,7 @@ describe('Parser - OFFSET to reference translation', () => {
   })
 
   it('OFFSET fifth argument need to be integer', () => {
-    const parser = new ParserWithCaching(new Config(), new SheetMapping(buildTranslationPackage(enGB)).get)
+    const parser = buildEmptyParserWithCaching(new Config())
 
     const {errors} = parser.parse('=OFFSET(A1, 0, 0, 1, 1.3)', simpleCellAddress(0, 0, 0))
     expect(errors[0].type).toBe('StaticOffsetError')
@@ -153,7 +152,7 @@ describe('Parser - OFFSET to reference translation', () => {
   })
 
   it('OFFSET resulting reference out of the sheet in top left row', () => {
-    const parser = new ParserWithCaching(new Config(), new SheetMapping(buildTranslationPackage(enGB)).get)
+    const parser = buildEmptyParserWithCaching(new Config())
 
     const {ast, errors} = parser.parse('=OFFSET(A1, -1, 0)', simpleCellAddress(0, 0, 0))
     expect(errors.length).toBe(0)
@@ -161,7 +160,7 @@ describe('Parser - OFFSET to reference translation', () => {
   })
 
   it('OFFSET resulting reference out of the sheet in top left column', () => {
-    const parser = new ParserWithCaching(new Config(), new SheetMapping(buildTranslationPackage(enGB)).get)
+    const parser = buildEmptyParserWithCaching(new Config())
 
     const {ast, errors} = parser.parse('=OFFSET(A1, 0, -1)', simpleCellAddress(0, 0, 0))
     expect(errors.length).toBe(0)
@@ -169,7 +168,7 @@ describe('Parser - OFFSET to reference translation', () => {
   })
 
   it('OFFSET case insensitive', () => {
-    const parser = new ParserWithCaching(new Config(), new SheetMapping(buildTranslationPackage(enGB)).get)
+    const parser = buildEmptyParserWithCaching(new Config())
 
     const ast = parser.parse('=oFfSeT(F16, 0, 0)', simpleCellAddress(0, 1, 2)).ast as CellReferenceAst
     expect(ast.type).toBe(AstNodeType.CELL_REFERENCE)

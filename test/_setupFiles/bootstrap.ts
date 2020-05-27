@@ -6,12 +6,9 @@ import {HyperFormula} from '../../src'
 import {Config} from '../../src/Config'
 import {AlwaysSparse} from '../../src/DependencyGraph/AddressMapping/ChooseAddressMappingPolicy'
 import {languages} from '../../src/i18n'
-import {unregisterAllLanguages} from './../testUtils'
-
-import {
-  toContainEqualMatcher,
-  toMatchObjectMatcher,
-} from './matchers'
+import {unregisterAllFormulas, unregisterAllLanguages} from './../testUtils'
+import {toContainEqualMatcher, toMatchObjectMatcher} from './matchers'
+import * as plugins from '../../src/interpreter/plugin'
 
 Config.defaultConfig = Object.assign({}, Config.defaultConfig, {
   chooseAddressMappingPolicy: new AlwaysSparse(),
@@ -22,21 +19,47 @@ Config.defaultConfig = Object.assign({}, Config.defaultConfig, {
   licenseKey: 'agpl-v3',
 })
 
+const jestPresent = (() => {
+  try {
+    expect([{a: 0}]).toContainEqual({a:0})
+    return true
+  } catch (e) {
+    return false
+  }
+})()
+
 beforeEach(() => {
-  // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
-  // @ts-ignore
-  jasmine.setDefaultSpyStrategy((and: unknown) => and.callThrough())
+  if(!jestPresent) {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+    // @ts-ignore
+    jasmine.setDefaultSpyStrategy((and: unknown) => and.callThrough())
+  }
 
   unregisterAllLanguages()
 
   const defaultLanguage = Config.defaultConfig.language
 
   HyperFormula.registerLanguage(defaultLanguage, languages[defaultLanguage])
+
+  unregisterAllFormulas()
+for (const pluginName of Object.getOwnPropertyNames(plugins)) {
+  if (!pluginName.startsWith('_')) {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+    // @ts-ignore
+    HyperFormula.registerFunctionPlugin(plugins[pluginName])
+  }
+}
 })
 
 beforeAll(() => {
-  jasmine.addMatchers({
-    ...toContainEqualMatcher,
-    ...toMatchObjectMatcher,
-  })
+  if(jestPresent) {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+    // @ts-ignore
+    spyOn = jest.spyOn
+  } else {
+    jasmine.addMatchers({
+      ...toContainEqualMatcher,
+      ...toMatchObjectMatcher,
+    })
+  }
 })

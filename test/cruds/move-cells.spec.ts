@@ -2,7 +2,7 @@ import {EmptyValue, HyperFormula} from '../../src'
 import {AbsoluteCellRange} from '../../src/AbsoluteCellRange'
 import {simpleCellAddress} from '../../src/Cell'
 import {ColumnIndex} from '../../src/ColumnSearch/ColumnIndex'
-import {EmptyCellVertex, ValueCellVertex} from '../../src/DependencyGraph'
+import {EmptyCellVertex, FormulaCellVertex, ValueCellVertex} from '../../src/DependencyGraph'
 import {CellAddress} from '../../src/parser'
 import {
   adr,
@@ -236,6 +236,23 @@ describe('Move cells', () => {
     expect(extractReference(engine, adr('B1', 1))).toEqual(CellAddress.relative(null, -1, 0))
   })
 
+  it('should update address in vertex', () => {
+    const engine = HyperFormula.buildFromSheets({
+      Sheet1: [
+        ['foo'],
+        ['=A1'],
+      ],
+      Sheet2: [
+        [null /* =A1 */],
+      ],
+    })
+
+    engine.moveCells(adr('A2'), 1, 1, adr('B1', 1))
+
+    const vertex = engine.dependencyGraph.fetchCell(adr('B1', 1)) as FormulaCellVertex
+    expect(vertex.getAddress(engine.lazilyTransformingAstService)).toEqual(adr('B1', 1))
+  })
+
   it('should update reference', () => {
     const engine = HyperFormula.buildFromArray([
       ['foo' /* foo */],
@@ -409,7 +426,7 @@ describe('moving ranges', () => {
 
     engine.moveCells(adr('A1'), 1, 2, adr('B1'))
 
-    expect(engine.rangeMapping.getRange(adr('B1'), adr('B2'))).not.toBe(null)
+    expect(engine.rangeMapping.getRange(adr('B1'), adr('B2'))).not.toBe(undefined)
 
     const range = extractRange(engine, adr('A3'))
     expect(range.start).toEqual(adr('B1'))
@@ -434,7 +451,7 @@ describe('moving ranges', () => {
 
     expect(() => {
       engine.moveCells(adr('A2'), 2, 2, adr('C1'))
-    }).toThrowError('It is not possible to move matrix')
+    }).toThrowError('Cannot perform this operation, source location has a matrix inside.')
   })
 
   it('should not be possible to move cells to area with matrix', () => {
@@ -445,7 +462,7 @@ describe('moving ranges', () => {
 
     expect(() => {
       engine.moveCells(adr('A1'), 2, 1, adr('A2'))
-    }).toThrowError('It is not possible to replace cells with matrix')
+    }).toThrowError('Cannot perform this operation, target location has a matrix inside.')
   })
 
   it('should adjust edges when moving part of range', () => {
@@ -462,7 +479,7 @@ describe('moving ranges', () => {
     const target = engine.addressMapping.fetchCell(adr('A2'))
     const range = engine.rangeMapping.fetchRange(adr('A1'), adr('A2'))
 
-    expect(source).toEqual(new EmptyCellVertex())
+    expect(source).toBeInstanceOf(EmptyCellVertex)
     expect(source.getCellValue()).toBe(EmptyValue)
     expect(engine.graph.nodesCount()).toBe(
       +2 // formulas
@@ -909,7 +926,7 @@ describe('move cells with matrices', () => {
 
     expect(() => {
       engine.moveCells(adr('A2'), 1, 1, adr('A3'))
-    }).toThrowError('It is not possible to move matrix')
+    }).toThrowError('Cannot perform this operation, source location has a matrix inside.')
   })
 
   it('should not be possible to move formula matrix at all', function() {
@@ -920,7 +937,7 @@ describe('move cells with matrices', () => {
 
     expect(() => {
       engine.moveCells(adr('A2'), 2, 1, adr('A3'))
-    }).toThrowError('It is not possible to move matrix')
+    }).toThrowError('Cannot perform this operation, source location has a matrix inside.')
   })
 
   it('should be possible to move whole numeric matrix', () => {

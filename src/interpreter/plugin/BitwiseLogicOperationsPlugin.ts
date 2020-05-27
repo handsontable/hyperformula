@@ -9,14 +9,14 @@ import {FunctionPlugin} from './FunctionPlugin'
 
 export class BitwiseLogicOperationsPlugin extends FunctionPlugin {
   public static implementedFunctions = {
-    bitand: {
-      translationKey: 'BITAND',
+    'BITAND': {
+      method: 'bitand',
     },
-    bitor: {
-      translationKey: 'BITOR',
+    'BITOR': {
+      method: 'bitor',
     },
-    bitxor: {
-      translationKey: 'BITXOR',
+    'BITXOR': {
+      method: 'bitxor',
     },
   }
 

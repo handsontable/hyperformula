@@ -28,6 +28,7 @@ interface ValueIndex {
 type SheetIndex = ColumnMap[]
 
 export class ColumnIndex implements ColumnSearchStrategy {
+
   private readonly index: Map<number, SheetIndex> = new Map()
   private readonly transformingService: LazilyTransformingAstService
   private readonly binarySearchStrategy: ColumnBinarySearch

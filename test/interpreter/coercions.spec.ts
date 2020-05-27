@@ -81,7 +81,7 @@ describe('#coerceScalarToNumberOrError', () => {
 
     expect(arithmeticHelper.coerceScalarToNumberOrError(new CellError(ErrorType.DIV_BY_ZERO))).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
 
-    expect(arithmeticHelper.coerceScalarToNumberOrError('12/31/1899')).toEqual(1)
+    expect(arithmeticHelper.coerceScalarToNumberOrError('31/12/1899')).toEqual(1)
     expect(arithmeticHelper.coerceScalarToNumberOrError('00:00:00')).toEqual(0)
     expect(arithmeticHelper.coerceScalarToNumberOrError(true)).toEqual(1)
 

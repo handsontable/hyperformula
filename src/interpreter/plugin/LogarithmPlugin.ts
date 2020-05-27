@@ -11,14 +11,14 @@ import {FunctionPlugin} from './FunctionPlugin'
 export class LogarithmPlugin extends FunctionPlugin {
 
   public static implementedFunctions = {
-    log10: {
-      translationKey: 'LOG10',
+    'LOG10': {
+      method: 'log10',
     },
-    log: {
-      translationKey: 'LOG',
+    'LOG': {
+      method: 'log',
     },
-    ln: {
-      translationKey: 'LN',
+    'LN': {
+      method: 'ln',
     },
   }
 

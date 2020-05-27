@@ -507,7 +507,7 @@ describe('Removing columns - matrices', () => {
       ['3', '4'],
     ])
 
-    expect(() => engine.removeColumns(0, [2, 1])).toThrowError('It is not possible to remove column within matrix')
+    expect(() => engine.removeColumns(0, [2, 1])).toThrowError('Cannot perform this operation, source location has a matrix inside.')
   })
 
   it('should remove column from numeric matrix', () => {

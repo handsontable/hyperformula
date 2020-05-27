@@ -12,11 +12,11 @@ import {CriterionLambda, CriterionPackage} from './Criterion'
 import {Interpreter} from './Interpreter'
 import {SimpleRangeValue} from './InterpreterValue'
 
-const findSmallerRange = (dependencyGraph: DependencyGraph, conditionRanges: AbsoluteCellRange[], valuesRange: AbsoluteCellRange): {smallerRangeVertex: RangeVertex | null, restConditionRanges: AbsoluteCellRange[], restValuesRange: AbsoluteCellRange} => {
+const findSmallerRangeForMany = (dependencyGraph: DependencyGraph, conditionRanges: AbsoluteCellRange[], valuesRange: AbsoluteCellRange): {smallerRangeVertex: RangeVertex | null, restConditionRanges: AbsoluteCellRange[], restValuesRange: AbsoluteCellRange} => {
   if (valuesRange.end.row > valuesRange.start.row) {
     const valuesRangeEndRowLess = simpleCellAddress(valuesRange.end.sheet, valuesRange.end.col, valuesRange.end.row - 1)
     const rowLessVertex = dependencyGraph.getRange(valuesRange.start, valuesRangeEndRowLess)
-    if (rowLessVertex) {
+    if (rowLessVertex !== undefined) {
       return {
         smallerRangeVertex: rowLessVertex,
         restValuesRange: valuesRange.withStart(simpleCellAddress(valuesRange.start.sheet, valuesRange.start.col, valuesRange.end.row)),
@@ -89,7 +89,7 @@ export class CriterionFunctionCompute<T> {
     if (maybeRange === undefined) {
       return undefined
     } else {
-      return this.dependencyGraph.getRange(maybeRange.start, maybeRange.end) || undefined
+      return this.dependencyGraph.getRange(maybeRange.start, maybeRange.end)
     }
   }
 
@@ -115,7 +115,7 @@ export class CriterionFunctionCompute<T> {
 
   private buildNewCriterionCache(cacheKey: string, simpleConditionRanges: AbsoluteCellRange[], simpleValuesRange: AbsoluteCellRange): CriterionCache {
     const currentRangeVertex = this.dependencyGraph.getRange(simpleValuesRange.start, simpleValuesRange.end)!
-    const {smallerRangeVertex, restConditionRanges, restValuesRange} = findSmallerRange(this.dependencyGraph, simpleConditionRanges, simpleValuesRange)
+    const {smallerRangeVertex, restConditionRanges, restValuesRange} = findSmallerRangeForMany(this.dependencyGraph, simpleConditionRanges, simpleValuesRange)
 
     let smallerCache
     if (smallerRangeVertex && this.dependencyGraph.existsEdge(smallerRangeVertex, currentRangeVertex)) {

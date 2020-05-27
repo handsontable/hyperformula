@@ -110,7 +110,7 @@ describe('Adding column - matrix check', () => {
 
     expect(() => {
       engine.addColumns(0, [1, 1])
-    }).toThrowError('It is not possible to add column in column with matrix')
+    }).toThrowError('Cannot perform this operation, target location has a matrix inside.')
   })
 
   it('should be possible to add row right before matrix', () => {
@@ -196,7 +196,7 @@ describe('Adding column - reevaluation', () => {
     const changes = engine.addColumns(0, [1, 1])
 
     expect(changes.length).toBe(1)
-    expect(changes).toContainEqual([new ExportedCellChange(simpleCellAddress(0, 3, 0), 3)])
+    expect(changes).toContainEqual(new ExportedCellChange(simpleCellAddress(0, 3, 0), 3))
   })
 })
 

@@ -10,6 +10,9 @@ compile: ## Compile to javascript
 test: ## Run tests
 	@npm run test
 
+unit: ## Run unit tests
+	@npm run test:unit
+
 test-ci: ## Separate test configuration for CI environment
 	@npm run test
 
