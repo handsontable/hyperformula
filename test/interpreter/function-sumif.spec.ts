@@ -154,9 +154,9 @@ describe('Function SUMIF(S) - calculations and optimizations', () => {
 
   it('empty coercions', () => {
     const engine = HyperFormula.buildFromArray([
-      [1,null],
-      [2,8],
-      [3,9],
+      [1, null],
+      [2, 8],
+      [3, 9],
       ['=SUMIF(B1:B3,"=",A1:A3)'],
       ['=SUMIF(B1:B3,">=",A1:A3)'],
       ['=SUMIF(B1:B3,"<=",A1:A3)'],
