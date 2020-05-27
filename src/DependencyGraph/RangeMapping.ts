@@ -4,7 +4,7 @@
  */
 
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
-import {SimpleCellAddress} from '../Cell'
+import {simpleCellAddress, SimpleCellAddress} from '../Cell'
 import {ColumnsSpan} from '../ColumnsSpan'
 import {Maybe} from '../Maybe'
 import {RowsSpan} from '../RowsSpan'
@@ -38,7 +38,10 @@ export class RangeMapping {
 
   public removeRange(vertex: RangeVertex) {
     const sheet = vertex.getStart().sheet
-    const sheetMap = this.rangeMapping.get(sheet)!
+    const sheetMap = this.rangeMapping.get(sheet)
+    if(sheetMap === undefined) {
+      return
+    }
     const key = keyFromAddresses(vertex.getStart(), vertex.getEnd())
     sheetMap.delete(key)
     if(sheetMap.size === 0) {
@@ -171,6 +174,30 @@ export class RangeMapping {
       if (sourceRange.containsRange(rangeVertex.range)) {
         yield rangeVertex
       }
+    }
+  }
+
+  /**
+   * Finds smaller range does have own vertex.
+   *
+   * @param rangeMapping - range mapping dependency
+   * @param ranges - ranges to find smaller range in
+   */
+  public findSmallerRange(range: AbsoluteCellRange): { smallerRangeVertex: RangeVertex | null, restRange: AbsoluteCellRange } {
+    if (range.height() > 1 && Number.isFinite(range.height())) {
+      const valuesRangeEndRowLess = simpleCellAddress(range.end.sheet, range.end.col, range.end.row - 1)
+      const rowLessVertex = this.getRange(range.start, valuesRangeEndRowLess)
+      if (rowLessVertex !== undefined) {
+        const restRange = new AbsoluteCellRange(simpleCellAddress(range.start.sheet, range.start.col, range.end.row), range.end)
+        return {
+          smallerRangeVertex: rowLessVertex,
+          restRange,
+        }
+      }
+    }
+    return {
+      smallerRangeVertex: null,
+      restRange: range,
     }
   }
 

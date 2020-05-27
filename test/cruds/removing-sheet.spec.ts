@@ -212,6 +212,21 @@ describe('remove sheet - adjust formula dependencies', () => {
     expectReferenceToHaveRefError(engine, adr('A4'))
   })
 
+  it('should be #REF after removing sheet #2', () => {
+    const engine = HyperFormula.buildFromSheets({
+      Sheet1: [
+        ['=Sheet2!A:B'],
+      ],
+      Sheet2: [
+        ['1'],
+      ],
+    })
+
+    engine.removeSheet('Sheet2')
+
+    expectReferenceToHaveRefError(engine, adr('A1'))
+  })
+
   it('should return changed values', () => {
     const engine = HyperFormula.buildFromSheets({
       Sheet1: [

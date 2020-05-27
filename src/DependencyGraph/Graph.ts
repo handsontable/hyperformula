@@ -3,9 +3,7 @@
  * Copyright (c) 2020 Handsoncode. All rights reserved.
  */
 
-export interface IGetDependenciesQuery<T> {
-  call(node: T): Set<T> | null,
-}
+export type DependencyQuery<T> = (vertex: T) => Set<T> | null
 
 export interface TopSortResult<T> {
   sorted: T[], cycled: T[], 
@@ -32,7 +30,7 @@ export class Graph<T> {
   private edges: Map<T, Set<T>> = new Map()
 
   constructor(
-    private readonly getDependenciesQuery: IGetDependenciesQuery<T>,
+    private readonly dependencyQuery: DependencyQuery<T>
   ) {
   }
 
@@ -125,23 +123,7 @@ export class Graph<T> {
     return result
   }
 
-  public exchangeNode(oldNode: T, newNode: T) {
-    this.addNode(newNode)
-    this.adjacentNodes(oldNode).forEach((adjacentNode) => {
-      this.addEdge(newNode, adjacentNode)
-    })
-    this.removeNode(oldNode)
-  }
-
-  public exchangeOrAddNode(oldNode: T | null, newNode: T) {
-    if (oldNode) {
-      this.exchangeNode(oldNode, newNode)
-    } else {
-      this.addNode(newNode)
-    }
-  }
-
-  public removeNode(node: T) {
+  public removeNode(node: T): Set<T> {
     for (const adjacentNode of this.adjacentNodes(node).values()) {
       this.markNodeAsSpecialRecentlyChanged(adjacentNode)
     }
@@ -151,7 +133,7 @@ export class Graph<T> {
     this.specialNodesRecentlyChanged.delete(node)
     this.specialNodesStructuralChanges.delete(node)
     this.infiniteRanges.delete(node)
-    this.removeDependencies(node)
+    return this.removeDependencies(node)
   }
 
   public markNodeAsSpecial(node: T) {
@@ -318,13 +300,14 @@ export class Graph<T> {
     this.clearSpecialNodesRecentlyChanged()
   }
 
-  private removeDependencies(node: T) {
-    const dependentNodes = this.getDependenciesQuery.call(node)
+  private removeDependencies(node: T): Set<T> {
+    const dependentNodes = this.dependencyQuery(node)
     if (!dependentNodes) {
-      return
+      return new Set()
     }
     for (const dependentNode of dependentNodes) {
       this.softRemoveEdge(dependentNode, node)
     }
+    return dependentNodes
   }
 }

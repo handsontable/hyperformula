@@ -479,7 +479,7 @@ describe('moving ranges', () => {
     const target = engine.addressMapping.fetchCell(adr('A2'))
     const range = engine.rangeMapping.fetchRange(adr('A1'), adr('A2'))
 
-    expect(source).toEqual(new EmptyCellVertex())
+    expect(source).toBeInstanceOf(EmptyCellVertex)
     expect(source.getCellValue()).toBe(EmptyValue)
     expect(engine.graph.nodesCount()).toBe(
       +2 // formulas

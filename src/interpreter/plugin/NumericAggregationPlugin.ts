@@ -11,7 +11,6 @@ import {AstNodeType, CellRangeAst, ProcedureAst} from '../../parser'
 import {coerceToRange, max, maxa, min, mina} from '../ArithmeticHelper'
 import {SimpleRangeValue} from '../InterpreterValue'
 import {FunctionPlugin} from './FunctionPlugin'
-import {findSmallerRange} from './SumprodPlugin'
 import {ColumnRangeAst, RowRangeAst} from '../../parser/Ast'
 
 export type BinaryOperation<T> = (left: T, right: T) => T
@@ -411,8 +410,9 @@ export class NumericAggregationPlugin extends FunctionPlugin {
    */
   private getRangeValues<T>(functionName: string, range: AbsoluteCellRange, mapFunction: MapOperation<T>): T[] {
     const rangeResult: T[] = []
-    const {smallerRangeVertex, restRange} = findSmallerRange(this.dependencyGraph, range)
+    const {smallerRangeVertex, restRange} = this.dependencyGraph.rangeMapping.findSmallerRange(range)
     const currentRangeVertex = this.dependencyGraph.getRange(range.start, range.end)!
+    let actualRange: AbsoluteCellRange
     if (smallerRangeVertex && this.dependencyGraph.existsEdge(smallerRangeVertex, currentRangeVertex)) {
       const cachedValue: T = smallerRangeVertex.getFunctionValue(functionName) as T
       if (cachedValue) {
@@ -422,8 +422,11 @@ export class NumericAggregationPlugin extends FunctionPlugin {
           rangeResult.push(mapFunction(this.dependencyGraph.getCellValue(cellFromRange)))
         }
       }
+      actualRange = restRange
+    } else {
+      actualRange = range
     }
-    for (const cellFromRange of restRange.addresses(this.dependencyGraph)) {
+    for (const cellFromRange of actualRange.addresses(this.dependencyGraph)) {
       rangeResult.push(mapFunction(this.dependencyGraph.getCellValue(cellFromRange)))
     }
 
