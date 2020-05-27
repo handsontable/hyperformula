@@ -361,7 +361,7 @@ describe('Function SUMIF(S) - calculations and optimizations', () => {
       ['.*c.*', '4'],
       [0, 8],
       ['=SUMIF(A1:A4, "<>.*c.*", B1:B4)']
-    ], {regexpType: 'full'})
+    ], {useRegularExpresssions: true})
 
     expect(engine.getCellValue(adr('A5'))).toEqual(10)
   })
@@ -373,7 +373,7 @@ describe('Function SUMIF(S) - calculations and optimizations', () => {
       ['.*c.*', '4'],
       [0, 8],
       ['=SUMIF(A1:A4, "=)", B1:B4)']
-    ], {regexpType: 'full'})
+    ], {useRegularExpresssions: true})
 
     expect(engine.getCellValue(adr('A5'))).toEqual(0)
   })

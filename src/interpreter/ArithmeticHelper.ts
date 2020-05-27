@@ -45,12 +45,12 @@ export class ArithmeticHelper {
   }
 
   public requiresRegex(pattern: string): boolean {
-    if(this.config.regexpType === 'none') {
+    if(!this.config.useRegularExpresssions && !this.config.useWildcards) {
       return !this.config.matchWholeCell
     }
     for(let i=0;i<pattern.length;i++) {
       const c = pattern.charAt(i)
-      if(isWildcard(c) || (this.config.regexpType === 'full' && needsEscape(c))) {
+      if(isWildcard(c) || (this.config.useRegularExpresssions && needsEscape(c))) {
         return true
       }
     }
@@ -60,27 +60,22 @@ export class ArithmeticHelper {
   private buildRegex(pattern: string): RegExp {
     pattern = this.normalizeString(pattern)
     let regexpStr
-    let type = this.config.regexpType
-    if(type === 'full') {
+    let useWildcards = this.config.useWildcards
+    let useRegularExpresssions = this.config.useRegularExpresssions
+    if(useRegularExpresssions) {
       try {
         RegExp(pattern)
       } catch (e) {
-        type = 'none'
+        useRegularExpresssions = false
+        useWildcards = false
       }
     }
-    switch(type) {
-      case 'full': {
-        regexpStr = escapeNoCharacters(pattern, this.config.caseSensitive)
-        break
-      }
-      case 'none': {
-        regexpStr = escapeAllCharacters(pattern, this.config.caseSensitive)
-        break
-      }
-      case 'wildcards': {
-        regexpStr = escapeNonWildcards(pattern, this.config.caseSensitive)
-        break
-      }
+    if(useRegularExpresssions) {
+      regexpStr = escapeNoCharacters(pattern, this.config.caseSensitive)
+    } else if(useWildcards) {
+      regexpStr = escapeNonWildcards(pattern, this.config.caseSensitive)
+    } else {
+      regexpStr = escapeAllCharacters(pattern, this.config.caseSensitive)
     }
     if(this.config.matchWholeCell) {
       return RegExp('^('+ regexpStr + ')$')

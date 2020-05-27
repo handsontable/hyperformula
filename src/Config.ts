@@ -292,7 +292,8 @@ export interface ConfigParams {
    */
   undoLimit: number,
 
-  regexpType: 'none' | 'wildcards' | 'full',
+  useRegularExpresssions: boolean,
+  useWildcards: boolean,
 
   matchWholeCell: boolean,
   /**
@@ -347,7 +348,8 @@ export class Config implements ConfigParams, ParserConfig {
     vlookupThreshold: 20,
     nullDate: {year: 1899, month: 12, day: 30},
     undoLimit: 20,
-    regexpType: 'wildcards',
+    useRegularExpresssions: false,
+    useWildcards: true,
     matchWholeCell: true,
     maxRows: 40_000,
     maxColumns: 18_278
@@ -428,7 +430,8 @@ export class Config implements ConfigParams, ParserConfig {
    * @internal
    */
   public readonly translationPackage: TranslationPackage
-  public readonly regexpType: 'none' | 'wildcards' | 'full'
+  public readonly useRegularExpresssions: boolean
+  public readonly useWildcards: boolean
   public readonly matchWholeCell: boolean
   /**
    * Set automatically based on licenseKey checking result.
@@ -477,7 +480,8 @@ export class Config implements ConfigParams, ParserConfig {
       nullDate,
       useStats,
       undoLimit,
-      regexpType,
+      useRegularExpresssions,
+      useWildcards,
       matchWholeCell,
       maxRows,
       maxColumns
@@ -521,7 +525,8 @@ export class Config implements ConfigParams, ParserConfig {
     this.nullDate = this.valueFromParamCheck(nullDate, instanceOfSimpleDate, 'IDate', 'nullDate')
     this.leapYear1900 = this.valueFromParam(leapYear1900, 'boolean', 'leapYear1900')
     this.undoLimit = this.valueFromParam(undoLimit, 'number', 'undoLimit')
-    this.regexpType = this.valueFromParam(regexpType, ['none', 'wildcards', 'full'], 'regexpType')
+    this.useRegularExpresssions = this.valueFromParam(useRegularExpresssions, 'boolean', 'useRegularExpresssions')
+    this.useWildcards = this.valueFromParam(useWildcards, 'boolean', 'useWildcards')
     this.matchWholeCell = this.valueFromParam(matchWholeCell, 'boolean', 'matchWholeCell')
     this.validateNumberToBeAtLeast(this.undoLimit, 'undoLimit', 0)
     this.maxRows = this.valueFromParam(maxRows, 'number', 'maxRows')

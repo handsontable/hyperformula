@@ -125,7 +125,7 @@ describe( 'big test', () => {
       ["=COUNTA(A1:A49)", "=SUM(B1:B50)", , , "codes counted  >  ", "=SUM(F1:F20)", "=SUM(G1:G21)"],
     ]
 
-    const engine = HyperFormula.buildFromArray(formulas, {regexpType: 'full', precisionRounding: 13})
+    const engine = HyperFormula.buildFromArray(formulas, {useRegularExpresssions: true, precisionRounding: 13})
 
     expect(engine.getCellValue(adr('B51'))).toEqual(304.5)
     expect(engine.getCellValue(adr('G51'))).toEqual(304.5)
