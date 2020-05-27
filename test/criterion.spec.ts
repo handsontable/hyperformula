@@ -52,7 +52,7 @@ describe('Criterion', () => {
   })
 
   it('works with empty string', () => {
-    expect(parseCriterion('=', arithmeticHelper)).toEqual(buildCriterion(CriterionType.EQUAL, ''))
+    expect(parseCriterion('=', arithmeticHelper)).toEqual(buildCriterion(CriterionType.EQUAL, null))
   })
 
   it('null when unknown operator', () => {

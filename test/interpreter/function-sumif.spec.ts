@@ -152,6 +152,22 @@ describe('Function SUMIF(S) - calculations and optimizations', () => {
     expect(engine.getCellValue(adr('A2'))).toEqual(0)
   })
 
+  it('empty coercions', () => {
+    const engine = HyperFormula.buildFromArray([
+      [1,null],
+      [2,8],
+      [3,9],
+      ['=SUMIF(B1:B3,"=",A1:A3)'],
+      ['=SUMIF(B1:B3,">=",A1:A3)'],
+      ['=SUMIF(B1:B3,"<=",A1:A3)'],
+      ['=SUMIF(B1:B3,"<>",A1:A3)'],
+    ])
+    expect(engine.getCellValue(adr('A4'))).toEqual(1)
+    expect(engine.getCellValue(adr('A5'))).toEqual(0)
+    expect(engine.getCellValue(adr('A6'))).toEqual(0)
+    expect(engine.getCellValue(adr('A7'))).toEqual(5)
+  })
+
   it('works for subranges with different conditions',  () => {
     const engine =  HyperFormula.buildFromArray([
       ['1', '1', '=SUMIF(A1:A1,"="&A1,B1:B1)'],
