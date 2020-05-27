@@ -6,9 +6,8 @@
 import {AbsoluteCellRange} from './AbsoluteCellRange'
 import {simpleCellAddress, SimpleCellAddress} from './Cell'
 import {CellContent, CellContentParser, RawCellContent} from './CellContentParser'
-import {CellDependency} from './CellDependency'
 import {ColumnSearchStrategy} from './ColumnSearch/ColumnSearchStrategy'
-import {DependencyGraph, MatrixVertex, Vertex} from './DependencyGraph'
+import {DependencyGraph, MatrixVertex} from './DependencyGraph'
 import {Matrix, MatrixSize} from './Matrix'
 import {Sheets} from './Sheet'
 

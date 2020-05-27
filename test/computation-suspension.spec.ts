@@ -1,5 +1,4 @@
 import {HyperFormula, EvaluationSuspendedError, ExportedCellChange} from '../src'
-import { AbsoluteCellRange } from '../src/AbsoluteCellRange'
 import { CellType } from '../src/Cell'
 import {adr} from './testUtils'
 
