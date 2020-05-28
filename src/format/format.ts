@@ -237,17 +237,11 @@ export function defaultStringifyDateTime(dateTime: SimpleDateTime, formatArg: st
         result += dateTime.hour < 12 ? 'am' : 'pm'
         break
       }
-      case 'a/p': {
-        result += dateTime.hour < 12 ? 'a' : 'p'
-        break
-      }
-      case 'A/P': {
-        result += dateTime.hour < 12 ? 'A' : 'P'
-        break
-      }
-      case 'A':
-      case 'AM/PM': {
-       result += dateTime.hour < 12 ? 'AM' : 'PM'
+      case 'a/p':
+      case 'A/P':
+      case 'AM/PM':
+       const [am, pm] = token.value.split('/')
+       result += dateTime.hour < 12 ? am : pm
        break
       }
       default: {
