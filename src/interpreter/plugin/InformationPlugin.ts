@@ -14,36 +14,36 @@ import {FunctionPlugin} from './FunctionPlugin'
  */
 export class InformationPlugin extends FunctionPlugin {
   public static implementedFunctions = {
-    iserror: {
-      translationKey: 'ISERROR',
+    'ISERROR': {
+      method: 'iserror',
     },
-    isblank: {
-      translationKey: 'ISBLANK',
+    'ISBLANK': {
+      method: 'isblank',
     },
-    isnumber: {
-      translationKey: 'ISNUMBER',
+    'ISNUMBER': {
+      method: 'isnumber',
     },
-    islogical: {
-      translationKey: 'ISLOGICAL',
+    'ISLOGICAL': {
+      method: 'islogical',
     },
-    istext: {
-      translationKey: 'ISTEXT',
+    'ISTEXT': {
+      method: 'istext',
     },
-    isnontext: {
-      translationKey: 'ISNONTEXT',
+    'ISNONTEXT': {
+      method: 'isnontext',
     },
-    columns: {
-      translationKey: 'COLUMNS',
+    'COLUMNS': {
+      method: 'columns',
       isDependentOnSheetStructureChange: true,
       doesNotNeedArgumentsToBeComputed: true,
     },
-    rows: {
-      translationKey: 'ROWS',
+    'ROWS': {
+      method: 'rows',
       isDependentOnSheetStructureChange: true,
       doesNotNeedArgumentsToBeComputed: true,
     },
-    index: {
-      translationKey: 'INDEX',
+    'INDEX': {
+      method: 'index',
     },
   }
 

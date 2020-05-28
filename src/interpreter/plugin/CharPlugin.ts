@@ -9,8 +9,8 @@ import {FunctionPlugin} from './FunctionPlugin'
 
 export class CharPlugin extends FunctionPlugin {
   public static implementedFunctions = {
-    char: {
-      translationKey: 'CHAR',
+    'CHAR': {
+      method: 'char',
     },
   }
 

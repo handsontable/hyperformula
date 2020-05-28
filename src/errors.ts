@@ -25,6 +25,15 @@ export class NoSheetWithNameError extends Error {
 }
 
 /**
+ * Error thrown when the sheet of a given name already exists.
+ */
+export class SheetNameAlreadyTaken extends Error {
+  constructor(sheetName: string) {
+    super(`Sheet with name ${sheetName} already exists`)
+  }
+}
+
+/**
  * Error thrown when loaded sheet size exceeds configured limits.
  */
 export class SheetSizeLimitExceededError extends Error {
@@ -43,7 +52,7 @@ export class NotAFormulaError extends Error {
 }
 
 /**
- * Error thrown when the given address is invalid. 
+ * Error thrown when the given address is invalid.
  */
 export class InvalidAddressError extends Error {
   constructor(address: SimpleCellAddress) {
@@ -130,9 +139,9 @@ function replacer(key: any, val: any): any {
 
 /**
  * Error thrown when the given value cannot be parsed.
- * 
+ *
  * Checks against the validity in:
- * 
+ *
  * @see [[buildFromArray]]
  * @see [[buildFromSheets]]
  * @see [[setCellsContents]]
@@ -148,7 +157,7 @@ export class UnableToParse extends Error {
  * It also displays the expected type.
  * This error might be thrown while setting or updating the [[ConfigParams]].
  * The following methods accept [[ConfigParams]] as a parameter:
- * 
+ *
  * @see [[buildEmpty]]
  * @see [[buildFromArray]]
  * @see [[buildFromSheets]]
@@ -164,7 +173,7 @@ export class ExpectedValueOfType extends Error {
  * Error thrown when supplied config parameter value is too small.
  * This error might be thrown while setting or updating the [[ConfigParams]].
  * The following methods accept [[ConfigParams]] as a parameter:
- * 
+ *
  * @see [[buildEmpty]]
  * @see [[buildFromArray]]
  * @see [[buildFromSheets]]
@@ -180,7 +189,7 @@ export class ConfigValueTooSmallError extends Error {
  * Error thrown when supplied config parameter value is too big.
  * This error might be thrown while setting or updating the [[ConfigParams]].
  * The following methods accept [[ConfigParams]] as a parameter:
- * 
+ *
  * @see [[buildEmpty]]
  * @see [[buildFromArray]]
  * @see [[buildFromSheets]]
@@ -197,7 +206,7 @@ export class ConfigValueTooBigError extends Error {
  * It also displays the expected value.
  * This error might be thrown while setting or updating the [[ConfigParams]].
  * The following methods accept [[ConfigParams]] as a parameter:
- * 
+ *
  * @see [[buildEmpty]]
  * @see [[buildFromArray]]
  * @see [[buildFromSheets]]
@@ -213,7 +222,7 @@ export class ExpectedOneOfValues extends Error {
  * Error thrown when computations become suspended.
  * To perform any other action wait for the batch to complete or resume the evaluation.
  * Relates to:
- * 
+ *
  * @see [[batch]]
  * @see [[suspendEvaluation]]
  * @see [[resumeEvaluation]]
@@ -232,5 +241,33 @@ export class EvaluationSuspendedError extends Error {
 export class MissingTranslationError extends Error {
   constructor(key: string) {
     super(`Translation for ${key} is missing in the translation package you're using.`)
+  }
+}
+
+export class FunctionPluginValidationError extends Error {
+  public static functionNotDeclaredInPlugin(formulaId: string, pluginName: string): FunctionPluginValidationError {
+    return new FunctionPluginValidationError(`Formula with id ${formulaId} not declared in plugin ${pluginName}`)
+  }
+
+  public static functionMethodNotFound(functionName: string, pluginName: string): FunctionPluginValidationError {
+    return new FunctionPluginValidationError(`Formula method ${functionName} not found in plugin ${pluginName}`)
+  }
+}
+
+/**
+ * Error thrown when selected source location has a matrix.
+ */
+export class SourceLocationHasMatrixError extends Error {
+  constructor() {
+    super('Cannot perform this operation, source location has a matrix inside.')
+  }
+}
+
+/**
+ * Error thrown when selected target location has a matrix.
+ */
+export class TargetLocationHasMatrixError extends Error {
+  constructor() {
+    super('Cannot perform this operation, target location has a matrix inside.')
   }
 }

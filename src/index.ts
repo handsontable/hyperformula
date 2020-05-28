@@ -5,8 +5,14 @@
 
 import {CellError, EmptyValue, ErrorType} from './Cell'
 import {CellValue, DetailedCellError, ExportedCellChange, ExportedNamedExpressionChange} from './CellValue'
+import {HyperFormula} from './HyperFormula'
+import {Config} from './Config'
+import {languages} from './i18n'
+import {LazilyTransformingAstService} from './LazilyTransformingAstService'
+import {Sheets} from './Sheet'
 import {
   EvaluationSuspendedError,
+  FunctionPluginValidationError,
   InvalidAddressError,
   InvalidArgumentsError,
   NoOperationToRedoError,
@@ -15,13 +21,12 @@ import {
   NoSheetWithNameError,
   NotAFormulaError,
   NothingToPasteError,
-  SheetSizeLimitExceededError
+  SheetSizeLimitExceededError,
+  SheetNameAlreadyTaken,
+  TargetLocationHasMatrixError,
+  SourceLocationHasMatrixError
 } from './errors'
-import {HyperFormula} from './HyperFormula'
-import {Config} from './Config'
-import {languages} from './i18n'
-import {LazilyTransformingAstService} from './LazilyTransformingAstService'
-import {Sheets} from './Sheet'
+import * as plugins from './interpreter/plugin'
 
 /** @internal */
 class HyperFormulaNS extends HyperFormula {
@@ -29,6 +34,7 @@ class HyperFormulaNS extends HyperFormula {
   public static NoSheetWithIdError = NoSheetWithIdError
   public static NoSheetWithNameError = NoSheetWithNameError
   public static SheetSizeLimitExceededError = SheetSizeLimitExceededError
+  public static SheetNameAlreadyTaken = SheetNameAlreadyTaken
   public static InvalidAddressError = InvalidAddressError
   public static EmptyValue = EmptyValue
   public static DetailedCellError = DetailedCellError
@@ -40,13 +46,24 @@ class HyperFormulaNS extends HyperFormula {
   public static ExportedNamedExpressionChange = ExportedNamedExpressionChange
   public static EvaluationSuspendedError = EvaluationSuspendedError
   public static NotAFormulaError = NotAFormulaError
+  public static TargetLocationHasMatrixError = TargetLocationHasMatrixError
+  public static SourceLocationHasMatrixError = SourceLocationHasMatrixError
   public static ErrorType = ErrorType
   public static CellError = CellError
   public static InvalidArgumentsError = InvalidArgumentsError
+  public static FunctionPluginValidationError = FunctionPluginValidationError
 }
 
 const defaultLanguage = Config.defaultConfig.language
 HyperFormula.registerLanguage(defaultLanguage, languages[defaultLanguage])
+
+for (const pluginName of Object.getOwnPropertyNames(plugins)) {
+  if (!pluginName.startsWith('_')) {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+    // @ts-ignore
+    HyperFormula.registerFunctionPlugin(plugins[pluginName])
+  }
+}
 
 export default HyperFormulaNS
 
@@ -70,5 +87,9 @@ export {
   NoOperationToRedoError,
   NothingToPasteError,
   EvaluationSuspendedError,
-  ErrorType
+  FunctionPluginValidationError,
+  ErrorType,
+  SheetNameAlreadyTaken,
+  TargetLocationHasMatrixError,
+  SourceLocationHasMatrixError
 }

@@ -2,6 +2,8 @@
   "compilerOptions": {
     "module": "commonjs",
     "outDir": "./test-jasmine",
+    "types": ["jasmine", "node", "webpack-env"],
+    "sourceMap": true
   },
   "extends": "./tsconfig",
   "include": ["src", "test"],

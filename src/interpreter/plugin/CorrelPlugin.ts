@@ -11,8 +11,8 @@ import {FunctionPlugin} from './FunctionPlugin'
 
 export class CorrelPlugin extends FunctionPlugin {
   public static implementedFunctions = {
-    correl: {
-      translationKey: 'CORREL',
+    'CORREL': {
+      method: 'correl',
     },
   }
 

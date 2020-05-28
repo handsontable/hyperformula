@@ -12,8 +12,8 @@ describe('Function DATE', () => {
     expect(engine.getCellValue(adr('A1'))).toEqual(2)
     expect(dateNumberToString(engine.getCellValue(adr('A1')), config)).toEqual('01/01/1900')
     expect(engine.getCellValue(adr('B1'))).toEqual(3)
-    expect(dateNumberToString(engine.getCellValue(adr('B1')), config)).toEqual('01/02/1900')
-    expect(dateNumberToString(engine.getCellValue(adr('C1')), config)).toEqual('10/24/1915')
+    expect(dateNumberToString(engine.getCellValue(adr('B1')), config)).toEqual('02/01/1900')
+    expect(dateNumberToString(engine.getCellValue(adr('C1')), config)).toEqual('24/10/1915')
   })
 
   it('truncation', () => {
@@ -24,8 +24,8 @@ describe('Function DATE', () => {
     expect(engine.getCellValue(adr('A1'))).toEqual(2)
     expect(dateNumberToString(engine.getCellValue(adr('A1')), config)).toEqual('01/01/1900')
     expect(engine.getCellValue(adr('B1'))).toEqual(3)
-    expect(dateNumberToString(engine.getCellValue(adr('B1')), config)).toEqual('01/02/1900')
-    expect(dateNumberToString(engine.getCellValue(adr('C1')), config)).toEqual('10/24/1915')
+    expect(dateNumberToString(engine.getCellValue(adr('B1')), config)).toEqual('02/01/1900')
+    expect(dateNumberToString(engine.getCellValue(adr('C1')), config)).toEqual('24/10/1915')
   })
 
   it('negative', () => {
@@ -34,9 +34,9 @@ describe('Function DATE', () => {
       ['=DATE(-1900, 1, 1)', '=DATE(1901, -1, 2)', '=DATE(2000,-13,2)', '=DATE(1915, 10, -24)', '=DATE(1900, 1, -100000)', '=DATE(1900, 1, -200000)', '=DATE(-1,1,1)'],
     ], config)
     expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE))
-    expect(dateNumberToString(engine.getCellValue(adr('B1')), config)).toEqual('11/02/1900')
-    expect(dateNumberToString(engine.getCellValue(adr('C1')), config)).toEqual('11/02/1998')
-    expect(dateNumberToString(engine.getCellValue(adr('D1')), config)).toEqual('09/06/1915')
+    expect(dateNumberToString(engine.getCellValue(adr('B1')), config)).toEqual('02/11/1900')
+    expect(dateNumberToString(engine.getCellValue(adr('C1')), config)).toEqual('02/11/1998')
+    expect(dateNumberToString(engine.getCellValue(adr('D1')), config)).toEqual('06/09/1915')
     expect(engine.getCellValue(adr('E1'))).toEqual(detailedError(ErrorType.VALUE))
     expect(engine.getCellValue(adr('F1'))).toEqual(detailedError(ErrorType.VALUE))
     expect(engine.getCellValue(adr('G1'))).toEqual(detailedError(ErrorType.VALUE))
@@ -47,9 +47,9 @@ describe('Function DATE', () => {
     const engine = HyperFormula.buildFromArray([
       ['=DATE(1900, 14, 28)', '=DATE(1900, 14, 29)', '=DATE(1915, 100, 1000)'],
     ], config)
-    expect(dateNumberToString(engine.getCellValue(adr('A1')), config)).toEqual('02/28/1901')
-    expect(dateNumberToString(engine.getCellValue(adr('B1')), config)).toEqual('03/01/1901')
-    expect(dateNumberToString(engine.getCellValue(adr('C1')), config)).toEqual('12/25/1925')
+    expect(dateNumberToString(engine.getCellValue(adr('A1')), config)).toEqual('28/02/1901')
+    expect(dateNumberToString(engine.getCellValue(adr('B1')), config)).toEqual('01/03/1901')
+    expect(dateNumberToString(engine.getCellValue(adr('C1')), config)).toEqual('25/12/1925')
   })
 
   it('number of arguments', () => {
@@ -119,7 +119,7 @@ describe( 'Function DATE + leap years', () =>{
     const engine = HyperFormula.buildFromArray([
       ['=DATE(2001,02,29)'],
     ], config)
-    expect(dateNumberToString(engine.getCellValue(adr('A1')), config)).toEqual('03/01/2001')
+    expect(dateNumberToString(engine.getCellValue(adr('A1')), config)).toEqual('01/03/2001')
   })
 
   it('should support leap year 2016', () => {
@@ -127,7 +127,7 @@ describe( 'Function DATE + leap years', () =>{
     const engine = HyperFormula.buildFromArray([
       ['=DATE(2016,02,29)'],
     ], config)
-    expect(dateNumberToString(engine.getCellValue(adr('A1')), config)).toEqual('02/29/2016')
+    expect(dateNumberToString(engine.getCellValue(adr('A1')), config)).toEqual('29/02/2016')
   })
 
   it('should support leap year 1920', () => {
@@ -135,7 +135,7 @@ describe( 'Function DATE + leap years', () =>{
     const engine = HyperFormula.buildFromArray([
       ['=DATE(1920,02,29)'],
     ], config)
-    expect(dateNumberToString(engine.getCellValue(adr('A1')), config)).toEqual('02/29/1920')
+    expect(dateNumberToString(engine.getCellValue(adr('A1')), config)).toEqual('29/02/1920')
   })
 
   it('should support nonleap year 1900', () => {
@@ -143,7 +143,7 @@ describe( 'Function DATE + leap years', () =>{
     const engine = HyperFormula.buildFromArray([
       ['=DATE(1900,02,29)'],
     ], config)
-    expect(dateNumberToString(engine.getCellValue(adr('A1')), config)).toEqual('03/01/1900')
+    expect(dateNumberToString(engine.getCellValue(adr('A1')), config)).toEqual('01/03/1900')
   })
 
   it('should support nonleap year 1900 with excel compatibility', () => {
@@ -151,7 +151,7 @@ describe( 'Function DATE + leap years', () =>{
     const engine = HyperFormula.buildFromArray([
       ['=DATE(1900,02,29)'],
     ], config)
-    expect(dateNumberToString(engine.getCellValue(adr('A1')), config)).toEqual('02/29/1900')
+    expect(dateNumberToString(engine.getCellValue(adr('A1')), config)).toEqual('29/02/1900')
   })
 
   it('should support leap year 2400', () => {
@@ -159,7 +159,7 @@ describe( 'Function DATE + leap years', () =>{
     const engine = HyperFormula.buildFromArray([
       ['=DATE(2400,02,29)'],
     ], config)
-    expect(dateNumberToString(engine.getCellValue(adr('A1')), config)).toEqual('02/29/2400')
+    expect(dateNumberToString(engine.getCellValue(adr('A1')), config)).toEqual('29/02/2400')
   })
 
   it('small year values', () => {
@@ -168,8 +168,8 @@ describe( 'Function DATE + leap years', () =>{
       ['=DATE(0,02,29)'],
       ['=DATE(1800,02,28)'],
     ], config)
-    expect(dateNumberToString(engine.getCellValue(adr('A1')), config)).toEqual('03/01/1900')
-    expect(dateNumberToString(engine.getCellValue(adr('A2')), config)).toEqual('02/28/3700')
+    expect(dateNumberToString(engine.getCellValue(adr('A1')), config)).toEqual('01/03/1900')
+    expect(dateNumberToString(engine.getCellValue(adr('A2')), config)).toEqual('28/02/3700')
   })
 
   it('different nullDate', () => {
@@ -178,8 +178,8 @@ describe( 'Function DATE + leap years', () =>{
       ['=DATE(0,02,28)'],
       ['=DATE(1800,02,28)'],
     ], config)
-    expect(dateNumberToString(engine.getCellValue(adr('A1')), config)).toEqual('02/28/1900')
-    expect(dateNumberToString(engine.getCellValue(adr('A2')), config)).toEqual('02/28/3700')
+    expect(dateNumberToString(engine.getCellValue(adr('A1')), config)).toEqual('28/02/1900')
+    expect(dateNumberToString(engine.getCellValue(adr('A2')), config)).toEqual('28/02/3700')
   })
 
   it('should be leap1900 sensitive', () => {
@@ -189,7 +189,7 @@ describe( 'Function DATE + leap years', () =>{
       ['=DATE(1800,02,28)'],
     ], config)
     expect(dateNumberToString(engine.getCellValue(adr('A1')), config)).toEqual('03/03/1909')
-    expect(dateNumberToString(engine.getCellValue(adr('A2')), config)).toEqual('02/28/3699')
+    expect(dateNumberToString(engine.getCellValue(adr('A2')), config)).toEqual('28/02/3699')
   })
 
   it('different nullDate, leap1900 sensitive', () => {
@@ -199,9 +199,9 @@ describe( 'Function DATE + leap years', () =>{
       ['=DATE(0,02,29)'],
       ['=DATE(1800,02,28)'],
     ], config)
-    expect(dateNumberToString(engine.getCellValue(adr('A1')), config)).toEqual('02/28/1900')
-    expect(dateNumberToString(engine.getCellValue(adr('A2')), config)).toEqual('02/29/1900')
-    expect(dateNumberToString(engine.getCellValue(adr('A3')), config)).toEqual('02/28/3700')
+    expect(dateNumberToString(engine.getCellValue(adr('A1')), config)).toEqual('28/02/1900')
+    expect(dateNumberToString(engine.getCellValue(adr('A2')), config)).toEqual('29/02/1900')
+    expect(dateNumberToString(engine.getCellValue(adr('A3')), config)).toEqual('28/02/3700')
   })
 
   it('should throw a error in the absence of arguments', () => {
@@ -224,10 +224,10 @@ describe( 'Function DATE + leap years', () =>{
       ['=DATE(E1, 2, 3)'],
     ], config)
 
-    expect(dateNumberToString(engine.getCellValue(adr('A2')), config)).toEqual('02/03/1900')
-    expect(dateNumberToString(engine.getCellValue(adr('A3')), config)).toEqual('02/03/1900')
+    expect(dateNumberToString(engine.getCellValue(adr('A2')), config)).toEqual('03/02/1900')
+    expect(dateNumberToString(engine.getCellValue(adr('A3')), config)).toEqual('03/02/1900')
     expect(engine.getCellValue(adr('A4'))).toEqual(detailedError(ErrorType.VALUE))
-    expect(dateNumberToString(engine.getCellValue(adr('A5')), config)).toEqual('02/03/1900')
-    expect(dateNumberToString(engine.getCellValue(adr('A6')), config)).toEqual('02/03/1900')
+    expect(dateNumberToString(engine.getCellValue(adr('A5')), config)).toEqual('03/02/1900')
+    expect(dateNumberToString(engine.getCellValue(adr('A6')), config)).toEqual('03/02/1900')
   })
 })

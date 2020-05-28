@@ -13,11 +13,11 @@ import {FunctionPlugin} from './FunctionPlugin'
  */
 export class TextPlugin extends FunctionPlugin {
   public static implementedFunctions = {
-    concatenate: {
-      translationKey: 'CONCATENATE',
+    'CONCATENATE': {
+      method: 'concatenate',
     },
-    split: {
-      translationKey: 'SPLIT',
+    'SPLIT': {
+      method: 'split',
     },
   }
 

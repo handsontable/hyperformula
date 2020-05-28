@@ -9,8 +9,8 @@ import {FunctionPlugin} from './FunctionPlugin'
 
 export class AbsPlugin extends FunctionPlugin {
   public static implementedFunctions = {
-    abs: {
-      translationKey: 'ABS',
+    'ABS': {
+      method: 'abs',
     },
   }
 

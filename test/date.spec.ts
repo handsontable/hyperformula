@@ -28,13 +28,13 @@ describe('Date helpers', () => {
 
   it('#stringToDateNumber - tests expected to return not null, dates', () => {
     const dateHelper = new DateTimeHelper(new Config())
-    expect(dateHelper.dateStringToDateNumber('08/16/1985')).toBe(31275)
-    expect(dateHelper.dateStringToDateNumber('01/15/2020')).toBe(43845)
-    expect(dateHelper.dateStringToDateNumber('02/29/2000')).toBe(36585)
-    expect(dateHelper.dateStringToDateNumber('12/31/2999')).toBe(401768)
-    expect(dateHelper.dateStringToDateNumber('12 31 2999')).toBe(401768)
-    expect(dateHelper.dateStringToDateNumber(' 12 31 2999 ')).toBe(401768)
-    expect(dateHelper.dateStringToDateNumber('12  31 2999')).toBe(401768)
+    expect(dateHelper.dateStringToDateNumber('16/08/1985')).toBe(31275)
+    expect(dateHelper.dateStringToDateNumber('15/01/2020')).toBe(43845)
+    expect(dateHelper.dateStringToDateNumber('29/02/2000')).toBe(36585)
+    expect(dateHelper.dateStringToDateNumber('31/12/2999')).toBe(401768)
+    expect(dateHelper.dateStringToDateNumber('31 12 2999')).toBe(401768)
+    expect(dateHelper.dateStringToDateNumber(' 31 12 2999 ')).toBe(401768)
+    expect(dateHelper.dateStringToDateNumber('31  12 2999')).toBe(401768)
   })
 
   it('#stringToDateNumber - tests expected to return not null, times', () => {
@@ -79,27 +79,27 @@ describe('Date helpers', () => {
 
   it('#stringToDateNumber - tests expected to return not null, dates + times', () => {
     const dateHelper = new DateTimeHelper(new Config())
-    expect(dateHelper.dateStringToDateNumber('08/16/1985 03:40')).toBe(31275.152777777777)
-    expect(dateHelper.dateStringToDateNumber(' 12 31 2999 00:00:00 ')).toBe(401768)
+    expect(dateHelper.dateStringToDateNumber('16/08/1985 03:40')).toBe(31275.152777777777)
+    expect(dateHelper.dateStringToDateNumber(' 31 12 2999 00:00:00 ')).toBe(401768)
   })
 
   it('#stringToDateNumber - excel compatibility', () => {
     const dateHelper = new DateTimeHelper(new Config())
-    expect(dateHelper.dateStringToDateNumber('02/29/1900')).toBe(undefined)
+    expect(dateHelper.dateStringToDateNumber('29/02/1900')).toBe(undefined)
     const dateHelper2 = new DateTimeHelper(new Config({leapYear1900: true}))
-    expect(dateHelper2.dateStringToDateNumber('02/29/1900')).toBe(61)
+    expect(dateHelper2.dateStringToDateNumber('29/02/1900')).toBe(61)
   })
 
   it('stringToDateNumber - 00 year parsing', () => {
     const dateHelper = new DateTimeHelper(new Config())
-    expect(dateHelper.dateStringToDateNumber('08/16/85')).toBe(31275)
-    expect(dateHelper.dateStringToDateNumber('01/15/20')).toBe(43845)
-    expect(dateHelper.dateStringToDateNumber('02/29/00')).toBe(36585)
-    expect(dateHelper.dateStringToDateNumber('12/31/99')).toBe(36525)
+    expect(dateHelper.dateStringToDateNumber('16/08/85')).toBe(31275)
+    expect(dateHelper.dateStringToDateNumber('15/01/20')).toBe(43845)
+    expect(dateHelper.dateStringToDateNumber('29/02/00')).toBe(36585)
+    expect(dateHelper.dateStringToDateNumber('31/12/99')).toBe(36525)
     const dateHelper1 = new DateTimeHelper(new Config({nullYear: 0}))
-    expect(dateHelper1.dateStringToDateNumber('01/15/20')).toBe(7320)
+    expect(dateHelper1.dateStringToDateNumber('15/01/20')).toBe(7320)
     const dateHelper2 = new DateTimeHelper(new Config({nullYear: 100}))
-    expect(dateHelper2.dateStringToDateNumber('12/31/99')).toBe(73050)
+    expect(dateHelper2.dateStringToDateNumber('31/12/99')).toBe(73050)
   })
 
   it('stringToDateNumber - other date formats', () => {
@@ -158,10 +158,10 @@ describe('Date helpers, other zero date', () => {
 
   it('#stringToDateNumber - tests expected to return not null, different zero date', () => {
     const dateHelper = new DateTimeHelper(new Config({nullDate: {year: 1950, month: 6, day: 15}}))
-    expect(dateHelper.dateStringToDateNumber('08/16/1985')).toBe(12846)
-    expect(dateHelper.dateStringToDateNumber('01/15/2020')).toBe(25416)
-    expect(dateHelper.dateStringToDateNumber('02/29/2000')).toBe(18156)
-    expect(dateHelper.dateStringToDateNumber('12/31/2999')).toBe(383339)
+    expect(dateHelper.dateStringToDateNumber('16/08/1985')).toBe(12846)
+    expect(dateHelper.dateStringToDateNumber('15/01/2020')).toBe(25416)
+    expect(dateHelper.dateStringToDateNumber('29/02/2000')).toBe(18156)
+    expect(dateHelper.dateStringToDateNumber('31/12/2999')).toBe(383339)
   })
 })
 

@@ -13,11 +13,11 @@ const SHIFT_MAX_POSITIONS = 53
 
 export class BitShiftPlugin extends FunctionPlugin {
   public static implementedFunctions = {
-    bitlshift: {
-      translationKey: 'BITLSHIFT',
+    'BITLSHIFT': {
+      method: 'bitlshift',
     },
-    bitrshift: {
-      translationKey: 'BITRSHIFT',
+    'BITRSHIFT': {
+      method: 'bitrshift',
     },
   }
 

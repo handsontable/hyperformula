@@ -15,26 +15,26 @@ import {FunctionPlugin} from './FunctionPlugin'
  */
 export class DatePlugin extends FunctionPlugin {
   public static implementedFunctions = {
-    date: {
-      translationKey: 'DATE',
+    'DATE': {
+      method: 'date'
     },
-    month: {
-      translationKey: 'MONTH',
+    'MONTH': {
+      method: 'month'
     },
-    year: {
-      translationKey: 'YEAR',
+    'YEAR': {
+      method: 'year'
     },
-    text: {
-      translationKey: 'TEXT',
+    'TEXT': {
+      method: 'text'
     },
-    eomonth: {
-      translationKey: 'EOMONTH',
+    'EOMONTH': {
+      method: 'eomonth'
     },
-    day: {
-      translationKey: 'DAY',
+    'DAY': {
+      method: 'day'
     },
-    days: {
-      translationKey: 'DAYS',
+    'DAYS': {
+      method: 'days'
     },
   }
 

@@ -9,8 +9,8 @@ import {FunctionPlugin} from './FunctionPlugin'
 
 export class ExpPlugin extends FunctionPlugin {
   public static implementedFunctions = {
-    exp: {
-      translationKey: 'EXP',
+    'EXP': {
+      method: 'exp',
     },
   }
 

@@ -5,13 +5,7 @@
 
 import GPU from 'gpu.js'
 import {AbsoluteCellRange, AbsoluteColumnRange, AbsoluteRowRange} from '../AbsoluteCellRange'
-import {
-  CellError,
-  ErrorType,
-  invalidSimpleCellAddress,
-  NoErrorCellValue,
-  SimpleCellAddress,
-} from '../Cell'
+import {CellError, ErrorType, invalidSimpleCellAddress, NoErrorCellValue, SimpleCellAddress, } from '../Cell'
 import {ColumnSearchStrategy} from '../ColumnSearch/ColumnSearchStrategy'
 import {Config} from '../Config'
 import {DateTimeHelper} from '../DateTimeHelper'
@@ -21,17 +15,15 @@ import {Maybe} from '../Maybe'
 // noinspection TypeScriptPreferShortImport
 import {Ast, AstNodeType, CellRangeAst, ColumnRangeAst, RowRangeAst} from '../parser/Ast'
 import {Statistics} from '../statistics/Statistics'
-import {
-  ArithmeticHelper, divide, multiply, percent, power, unaryminus,
-} from './ArithmeticHelper'
+import {ArithmeticHelper, divide, multiply, percent, power, unaryminus, } from './ArithmeticHelper'
 import {InterpreterValue, SimpleRangeValue} from './InterpreterValue'
 import {concatenate} from './text'
 import {NumberLiteralHelper} from '../NumberLiteralHelper'
+import {FunctionRegistry} from './FunctionRegistry'
 import {NamedExpressions} from '../NamedExpressions'
 
 export class Interpreter {
   private gpu?: GPU.GPU
-  private readonly pluginCache: Map<string, [any, string]> = new Map()
   public readonly arithmeticHelper: ArithmeticHelper
 
   constructor(
@@ -41,9 +33,10 @@ export class Interpreter {
     public readonly stats: Statistics,
     public readonly dateHelper: DateTimeHelper,
     public readonly numberLiteralsHelper: NumberLiteralHelper,
-    public readonly namedExpressions: NamedExpressions,
+    public readonly functionRegistry: FunctionRegistry,
+    public readonly namedExpressions: NamedExpressions
   ) {
-    this.registerPlugins(this.config.allFunctionPlugins())
+    this.functionRegistry.initializePlugins(this)
     this.arithmeticHelper = new ArithmeticHelper(config, dateHelper, numberLiteralsHelper)
   }
 
@@ -78,37 +71,37 @@ export class Interpreter {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
         const rightResult = this.evaluateAst(ast.right, formulaAddress)
         return this.passErrors(leftResult, rightResult) ??
-          this.arithmeticHelper.compare( leftResult as NoErrorCellValue, rightResult as NoErrorCellValue) === 0
+          this.arithmeticHelper.compare(leftResult as NoErrorCellValue, rightResult as NoErrorCellValue) === 0
       }
       case AstNodeType.NOT_EQUAL_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
         const rightResult = this.evaluateAst(ast.right, formulaAddress)
         return this.passErrors(leftResult, rightResult) ??
-          this.arithmeticHelper.compare( leftResult as NoErrorCellValue, rightResult as NoErrorCellValue) !== 0
+          this.arithmeticHelper.compare(leftResult as NoErrorCellValue, rightResult as NoErrorCellValue) !== 0
       }
       case AstNodeType.GREATER_THAN_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
         const rightResult = this.evaluateAst(ast.right, formulaAddress)
         return this.passErrors(leftResult, rightResult) ??
-          this.arithmeticHelper.compare( leftResult as NoErrorCellValue, rightResult as NoErrorCellValue) > 0
+          this.arithmeticHelper.compare(leftResult as NoErrorCellValue, rightResult as NoErrorCellValue) > 0
       }
       case AstNodeType.LESS_THAN_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
         const rightResult = this.evaluateAst(ast.right, formulaAddress)
         return this.passErrors(leftResult, rightResult) ??
-          this.arithmeticHelper.compare( leftResult as NoErrorCellValue, rightResult as NoErrorCellValue) < 0
+          this.arithmeticHelper.compare(leftResult as NoErrorCellValue, rightResult as NoErrorCellValue) < 0
       }
       case AstNodeType.GREATER_THAN_OR_EQUAL_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
         const rightResult = this.evaluateAst(ast.right, formulaAddress)
         return this.passErrors(leftResult, rightResult) ??
-          this.arithmeticHelper.compare( leftResult as NoErrorCellValue, rightResult as NoErrorCellValue) >= 0
+          this.arithmeticHelper.compare(leftResult as NoErrorCellValue, rightResult as NoErrorCellValue) >= 0
       }
       case AstNodeType.LESS_THAN_OR_EQUAL_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
         const rightResult = this.evaluateAst(ast.right, formulaAddress)
         return this.passErrors(leftResult, rightResult) ??
-          this.arithmeticHelper.compare( leftResult as NoErrorCellValue, rightResult as NoErrorCellValue) <= 0
+          this.arithmeticHelper.compare(leftResult as NoErrorCellValue, rightResult as NoErrorCellValue) <= 0
       }
       case AstNodeType.PLUS_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
@@ -180,9 +173,9 @@ export class Interpreter {
         }
       }
       case AstNodeType.FUNCTION_CALL: {
-        const pluginEntry = this.pluginCache.get(ast.procedureName)
+        const pluginEntry = this.functionRegistry.getFunction(ast.procedureName)
         if (pluginEntry && this.config.translationPackage.isFunctionTranslated(ast.procedureName)) {
-          const [pluginInstance, pluginFunction] = pluginEntry
+          const [pluginFunction, pluginInstance] = pluginEntry as [string, any]
           return pluginInstance[pluginFunction](ast, formulaAddress)
         } else {
           return new CellError(ErrorType.NAME)
@@ -244,31 +237,14 @@ export class Interpreter {
   public getGpuInstance(): GPU.GPU {
     if (!this.gpu) {
       const GPUConstructor = GPU.GPU || GPU
-      this.gpu = new GPUConstructor({mode: this.config.gpuMode })
+      this.gpu = new GPUConstructor({mode: this.config.gpuMode})
     }
     return this.gpu
   }
 
   public destroy() {
-    this.pluginCache.clear()
     if (this.gpu) {
       this.gpu.destroy()
-    }
-  }
-
-  /**
-   * Registers plugins with functions to use
-   *
-   * @param plugins - list of plugin modules
-   */
-  private registerPlugins(plugins: any[]) {
-    for (const pluginClass of plugins) {
-      const pluginInstance = new pluginClass(this)
-      Object.keys(pluginClass.implementedFunctions).forEach((pluginFunction) => {
-        const pluginFunctionData = pluginClass.implementedFunctions[pluginFunction]
-        const functionName = pluginFunctionData.translationKey.toUpperCase()
-        this.pluginCache.set(functionName, [pluginInstance, pluginFunction])
-      })
     }
   }
 
