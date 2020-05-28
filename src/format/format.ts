@@ -99,7 +99,7 @@ export function defaultStringifyDuration(time: SimpleTime, formatArg: string): M
       continue
     }
 
-    switch (token.value) {
+    switch (token.value.toLowerCase()) {
       case 'h':
       case 'H':
       case 'hh':
