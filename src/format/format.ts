@@ -174,7 +174,7 @@ export function defaultStringifyDateTime(dateTime: SimpleDateTime, formatArg: st
     }
 
 
-    switch (token.value) {
+    switch (token.value.toLowerCase()) {
       /* hours*/
       case 'h':
       case 'H':
@@ -258,4 +258,3 @@ export function defaultStringifyDateTime(dateTime: SimpleDateTime, formatArg: st
 
   return result
 }
-
