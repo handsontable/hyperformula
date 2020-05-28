@@ -104,6 +104,16 @@ describe('Text', () => {
     expect(engine.getCellValue(adr('B1'))).toEqual('13:59')
   })
 
+  it('padding', () => {
+    const engine =  HyperFormula.buildFromArray([
+      [
+        '8/8/2018 01:01:01',
+        '=TEXT(A1, "H:m:s")',
+      ]
+    ])
+    expect(engine.getCellValue(adr('B1'))).toEqual('1:1:1')
+  })
+
   it('fractions of seconds', () => {
     const engine =  HyperFormula.buildFromArray([
       [
