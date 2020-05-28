@@ -57,8 +57,8 @@ describe('Text', () => {
       '=TEXT(A1, "mm MM")',
     ]])
 
-    expect(engine.getCellValue(adr('B1'))).toEqual('8 8')
-    expect(engine.getCellValue(adr('C1'))).toEqual('08 08')
+    expect(engine.getCellValue(adr('B1'))).toEqual('8 0') //heuristic - repeated month is minutes
+    expect(engine.getCellValue(adr('C1'))).toEqual('08 00') //heuristic - repeated month is minutes
   })
 
   it('year formats',  () => {
@@ -196,5 +196,12 @@ describe( 'Custom date printing', () => {
 
     expect(engine.getCellValue(adr('B1'))).toEqual('12.45')
     expect(engine.getCellValue(adr('C1'))).toEqual('012.450')
+  })
+
+  it('date printing, month and minutes', () => {
+    const enigne = HyperFormula.buildFromArray([['1.1', '=TEXT(A1, "mm-dd mm:ss.sssss")' ],
+      ['1.222', '=TEXT(A2, "mm-dd mm:ss.sssss")' ]])
+    expect(enigne.getCellValue(adr('B1'))).toEqual('12-31 24:00')
+    expect(enigne.getCellValue(adr('B2'))).toEqual('12-31 19:40.8')
   })
 })

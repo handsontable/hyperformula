@@ -1,7 +1,9 @@
+import {HyperFormula} from '../src'
 import {Config} from '../src/Config'
 import {DateTimeHelper, SimpleDate} from '../src/DateTimeHelper'
 import moment from 'moment'
 import {Maybe} from '../src/Maybe'
+import {adr} from './testUtils'
 
 describe('Date helpers', () => {
   it('#dateToNumber should return number representation of a date', () => {
@@ -136,7 +138,6 @@ describe('Date helpers', () => {
     expect(dateHelper.dateStringToDateNumber(' ')).toBe(undefined)
     expect(dateHelper.dateStringToDateNumber('')).toBe(undefined)
   })
-
 })
 
 describe('Date helpers, other zero date', () => {
@@ -164,8 +165,6 @@ describe('Date helpers, other zero date', () => {
     expect(dateHelper.dateStringToDateNumber('31/12/2999')).toBe(383339)
   })
 })
-
-
 
 describe('Custom date parsing', () => {
 

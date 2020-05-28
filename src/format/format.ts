@@ -160,7 +160,8 @@ export function defaultStringifyDateTime(dateTime: SimpleDateTime, formatArg: st
   const ampm = tokens.some( (token) => token.type === TokenType.FORMAT &&
     (token.value === 'a/p' || token.value === 'A/P' || token.value === 'am/pm' || token.value === 'AM/PM') )
 
-  for (const token of tokens){
+  for (let i=0; i<tokens.length; i++){
+    const token = tokens[i]
     if (token.type === TokenType.FREE_TEXT) {
       result += token.value
       continue
@@ -205,11 +206,15 @@ export function defaultStringifyDateTime(dateTime: SimpleDateTime, formatArg: st
       case 'm':
       case 'MM':
       case 'mm': {
+        if(i+1 < tokens.length && tokens[i+1].value.startsWith(':')) {
+          minutes = true
+        }
         if (minutes) {
           result += padLeft(dateTime.minute, token.value.length)
         } else {
           result += padLeft(dateTime.month, token.value.length)
         }
+        minutes = true
         break
       }
 
