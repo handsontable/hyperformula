@@ -101,32 +101,26 @@ export function defaultStringifyDuration(time: SimpleTime, formatArg: string): M
 
     switch (token.value.toLowerCase()) {
       case 'h':
-      case 'H':
-      case 'hh':
-      case 'HH': {
+      case 'hh': {
         result += padLeft( time.hour, token.value.length)
         time.hour = 0
         break
       }
 
-      case '[hh]':
-      case '[HH]': {
+      case '[hh]': {
         result += padLeft( time.hour, token.value.length-2)
         time.hour = 0
         break
       }
 
-      case 'M':
       case 'm':
-      case 'MM':
       case 'mm': {
         result += padLeft(time.minute, token.value.length)
         time.minute = 0
         break
       }
 
-      case '[mm]':
-      case '[MM]': {
+      case '[mm]': {
         result += padLeft(time.minute + 60*time.hour, token.value.length-2)
         time.minute = 0
         time.hour = 0
@@ -177,9 +171,7 @@ export function defaultStringifyDateTime(dateTime: SimpleDateTime, formatArg: st
     switch (token.value.toLowerCase()) {
       /* hours*/
       case 'h':
-      case 'H':
-      case 'hh':
-      case 'HH': {
+      case 'hh': {
         minutes = true
         result += padLeft( ampm? (dateTime.hour+11)%12+1 : dateTime.hour, token.value.length)
         break
@@ -187,9 +179,7 @@ export function defaultStringifyDateTime(dateTime: SimpleDateTime, formatArg: st
 
       /* days */
       case 'd':
-      case 'D':
-      case 'dd':
-      case 'DD': {
+      case 'dd': {
         result += padLeft(dateTime.day, token.value.length)
         break
       }
@@ -202,9 +192,7 @@ export function defaultStringifyDateTime(dateTime: SimpleDateTime, formatArg: st
       }
 
       /* minutes / months */
-      case 'M':
       case 'm':
-      case 'MM':
       case 'mm': {
         if(i+1 < tokens.length && tokens[i+1].value.startsWith(':')) {
           minutes = true
@@ -219,27 +207,18 @@ export function defaultStringifyDateTime(dateTime: SimpleDateTime, formatArg: st
       }
 
       /* years */
-      case 'yy':
-      case 'YY': {
+      case 'yy': {
         result += padLeft(dateTime.year % 100, token.value.length)
         break
       }
-      case 'yyyy':
-      case 'YYYY': {
+      case 'yyyy': {
         result += dateTime.year
         break
       }
 
       /* AM / PM */
       case 'am/pm':
-      case 'a':
-        {
-        result += dateTime.hour < 12 ? 'am' : 'pm'
-        break
-      }
-      case 'a/p':
-      case 'A/P':
-      case 'AM/PM':
+      case 'a/p': {
        const [am, pm] = token.value.split('/')
        result += dateTime.hour < 12 ? am : pm
        break
