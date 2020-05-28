@@ -93,7 +93,7 @@ export function defaultStringifyDuration(time: SimpleTime, formatArg: string): M
       continue
     }
 
-    if(/^ss\.s+/.test(token.value)) {
+    if(/^ss\.s+/.test(token.value) || /^ss\.0+/.test(token.value)) {
       const fractionOfSecondPrecision = token.value.length-3
       result += (time.second < 10 ? '0' : '') + Math.round(time.second * Math.pow(10, fractionOfSecondPrecision))/Math.pow(10, fractionOfSecondPrecision)
       continue
@@ -158,7 +158,7 @@ export function defaultStringifyDateTime(dateTime: SimpleDateTime, formatArg: st
   let minutes: boolean = false
 
   const ampm = tokens.some( (token) => token.type === TokenType.FORMAT &&
-    (token.value === 'a' || token.value === 'A' || token.value === 'a/p' || token.value === 'A/P' || token.value === 'am/pm' || token.value === 'AM/PM') )
+    (token.value === 'a/p' || token.value === 'A/P' || token.value === 'am/pm' || token.value === 'AM/PM') )
 
   for (const token of tokens){
     if (token.type === TokenType.FREE_TEXT) {

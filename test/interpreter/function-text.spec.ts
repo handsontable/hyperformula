@@ -76,11 +76,11 @@ describe('Text', () => {
     const engine =  HyperFormula.buildFromArray([
       [
         '8/8/2018 14:00',
-        '=TEXT(A1, "hh:mm A")',
+        '=TEXT(A1, "hh:mm A/P")',
       ],
       [
         '8/8/2018 00:30',
-        '=TEXT(A2, "hh:mm A")',
+        '=TEXT(A2, "hh:mm AM/PM")',
       ],
       ['8/8/2018 00:30', '=TEXT(A3, "hh:mm am/pm")'],
       [
@@ -88,7 +88,7 @@ describe('Text', () => {
         '=TEXT(A4, "hh:mm a/p")',
       ]
     ])
-    expect(engine.getCellValue(adr('B1'))).toEqual('02:00 PM')
+    expect(engine.getCellValue(adr('B1'))).toEqual('02:00 P')
     expect(engine.getCellValue(adr('B2'))).toEqual('12:30 AM')
     expect(engine.getCellValue(adr('B3'))).toEqual('12:30 am')
     expect(engine.getCellValue(adr('B4'))).toEqual('12:30 a')
@@ -148,12 +148,14 @@ describe('time duration', () => {
       ['0.1', '=TEXT(A3, "[mm]:ss")', ],
       ['1.1', '=TEXT(A4, "[mm]:ss")', ],
       ['0.1111', '=TEXT(A5, "[mm]:ss.ss")', ],
+      ['0.1111', '=TEXT(A6, "[mm]:ss.00")', ],
     ])
     expect(engine.getCellValue(adr('B1'))).toEqual('02:24:00')
     expect(engine.getCellValue(adr('B2'))).toEqual('26:24:00')
     expect(engine.getCellValue(adr('B3'))).toEqual('144:00')
     expect(engine.getCellValue(adr('B4'))).toEqual('1584:00')
     expect(engine.getCellValue(adr('B5'))).toEqual('159:59.04')
+    expect(engine.getCellValue(adr('B6'))).toEqual('159:59.04')
   })
 })
 

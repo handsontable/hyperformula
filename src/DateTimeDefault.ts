@@ -52,8 +52,6 @@ export function defaultParseToTime(timeItems: string[], timeFormat: string): May
     timeFormat = timeFormat.substring(0, timeFormat.length - 5).trim()
   } else if (timeFormat.endsWith('a/p')) {
     timeFormat = timeFormat.substring(0, timeFormat.length - 3).trim()
-  } else if (timeFormat.endsWith('a')) {
-    timeFormat = timeFormat.substring(0, timeFormat.length - 1).trim()
   }
   const formatItems = timeFormat.split(':')
   let ampm = undefined
@@ -65,7 +63,7 @@ export function defaultParseToTime(timeItems: string[], timeFormat: string): May
     timeItems.pop()
   }
   let fractionOfSecondPrecision: number = 0
-  if(formatItems.length >= 1 && /^ss\.s+/.test(formatItems[formatItems.length-1])) {
+  if(formatItems.length >= 1 && /^ss\.(s+|0+)/.test(formatItems[formatItems.length-1])) {
     fractionOfSecondPrecision = formatItems[formatItems.length-1].length-3
     formatItems[formatItems.length-1] = 'ss'
   }
