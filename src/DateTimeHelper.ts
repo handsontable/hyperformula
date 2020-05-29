@@ -158,7 +158,7 @@ export class DateTimeHelper {
   }
 
   public numberToTime(arg: number): SimpleTime {
-    let second = Math.round(arg*60*60*24)
+    let second = Math.round(arg*60*60*24 * 1000000000) / 1000000000
     let minute = Math.floor(second / 60)
     second = second % 60
     const hour = Math.floor(minute / 60)

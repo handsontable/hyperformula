@@ -57,8 +57,8 @@ describe('Text', () => {
       '=TEXT(A1, "mm MM")',
     ]])
 
-    expect(engine.getCellValue(adr('B1'))).toEqual('8 8')
-    expect(engine.getCellValue(adr('C1'))).toEqual('08 08')
+    expect(engine.getCellValue(adr('B1'))).toEqual('8 0') //heuristic - repeated month is minutes
+    expect(engine.getCellValue(adr('C1'))).toEqual('08 00') //heuristic - repeated month is minutes
   })
 
   it('year formats',  () => {
@@ -76,15 +76,22 @@ describe('Text', () => {
     const engine =  HyperFormula.buildFromArray([
       [
         '8/8/2018 14:00',
-        '=TEXT(A1, "hh:mm A")',
+        '=TEXT(A1, "hh:mm A/P")',
       ],
       [
         '8/8/2018 00:30',
-        '=TEXT(A2, "hh:mm A")',
+        '=TEXT(A2, "hh:mm AM/PM")',
+      ],
+      ['8/8/2018 00:30', '=TEXT(A3, "hh:mm am/pm")'],
+      [
+        '8/8/2018 00:30',
+        '=TEXT(A4, "hh:mm a/p")',
       ]
     ])
-    expect(engine.getCellValue(adr('B1'))).toEqual('02:00 pm')
-    expect(engine.getCellValue(adr('B2'))).toEqual('12:30 am')
+    expect(engine.getCellValue(adr('B1'))).toEqual('02:00 P')
+    expect(engine.getCellValue(adr('B2'))).toEqual('12:30 AM')
+    expect(engine.getCellValue(adr('B3'))).toEqual('12:30 am')
+    expect(engine.getCellValue(adr('B4'))).toEqual('12:30 a')
   })
 
   it('24 hours',  () => {
@@ -95,6 +102,30 @@ describe('Text', () => {
       ]
     ])
     expect(engine.getCellValue(adr('B1'))).toEqual('13:59')
+  })
+
+  it('padding', () => {
+    const engine =  HyperFormula.buildFromArray([
+      [
+        '8/8/2018 01:01:01',  '=TEXT(A1, "H:m:s")',
+      ],
+      [
+        '8/8/2018 01:11:11',  '=TEXT(A2, "H:m:s")',
+      ]
+    ])
+    expect(engine.getCellValue(adr('B1'))).toEqual('1:1:1')
+    expect(engine.getCellValue(adr('B2'))).toEqual('1:11:11')
+  })
+
+  it('fractions of seconds', () => {
+    const engine =  HyperFormula.buildFromArray([
+      [
+        '0.0000011574074074074074', '=TEXT(A1, "hh:mm:ss.ss")',
+      ],
+      ['0.000001', '=TEXT(A2, "hh:mm:ss.sss")']
+    ])
+    expect(engine.getCellValue(adr('B1'))).toEqual('00:00:00.1')
+    expect(engine.getCellValue(adr('B2'))).toEqual('00:00:00.086')
   })
 
   it('distinguishes between months and minutes - not supported',  () => {
@@ -120,6 +151,25 @@ describe('Text', () => {
     expect(engine.getCellValue(adr('C1'))).toEqual('012.450')
   })
 
+})
+
+describe('time duration', () => {
+  it('works', () => {
+    const engine = HyperFormula.buildFromArray( [
+      ['0.1', '=TEXT(A1, "[hh]:mm:ss")'],
+      ['1.1', '=TEXT(A2, "[hh]:mm:ss")', ],
+      ['0.1', '=TEXT(A3, "[mm]:ss")', ],
+      ['1.1', '=TEXT(A4, "[mm]:ss")', ],
+      ['0.1111', '=TEXT(A5, "[mm]:ss.ss")', ],
+      ['0.1111', '=TEXT(A6, "[mm]:ss.00")', ],
+    ])
+    expect(engine.getCellValue(adr('B1'))).toEqual('02:24:00')
+    expect(engine.getCellValue(adr('B2'))).toEqual('26:24:00')
+    expect(engine.getCellValue(adr('B3'))).toEqual('144:00')
+    expect(engine.getCellValue(adr('B4'))).toEqual('1584:00')
+    expect(engine.getCellValue(adr('B5'))).toEqual('159:59.04')
+    expect(engine.getCellValue(adr('B6'))).toEqual('159:59.04')
+  })
 })
 
 describe( 'Custom date printing', () => {
@@ -149,5 +199,12 @@ describe( 'Custom date printing', () => {
 
     expect(engine.getCellValue(adr('B1'))).toEqual('12.45')
     expect(engine.getCellValue(adr('C1'))).toEqual('012.450')
+  })
+
+  it('date printing, month and minutes', () => {
+    const enigne = HyperFormula.buildFromArray([['1.1', '=TEXT(A1, "mm-dd mm:ss.sssss")' ],
+      ['1.222', '=TEXT(A2, "mm-dd mm:ss.sssss")' ]])
+    expect(enigne.getCellValue(adr('B1'))).toEqual('12-31 24:00')
+    expect(enigne.getCellValue(adr('B2'))).toEqual('12-31 19:40.8')
   })
 })
