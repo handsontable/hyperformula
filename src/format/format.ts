@@ -10,7 +10,7 @@ import {DateTimeHelper, SimpleDateTime, SimpleTime} from '../DateTimeHelper'
 import {Maybe} from '../Maybe'
 import {FormatToken, parseForDateTimeFormat, parseForNumberFormat, TokenType} from './parser'
 
-export function format(value: number, formatArg: string, config: Config, dateHelper: DateTimeHelper): InternalCellValue {
+export function format(value: number, formatArg: string, config: Config, dateHelper: DateTimeHelper): InternalScalarValue {
   const tryDateTime = config.stringifyDateTime(dateHelper.numberToDateTime(value), formatArg) // default points to defaultStringifyDateTime()
   if (tryDateTime !== undefined) {
     return tryDateTime
