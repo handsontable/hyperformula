@@ -45,29 +45,34 @@ export class CriterionPackage {
 const ANY_CRITERION_REGEX = /([<>=]+)(.*)/
 
 export const parseCriterion = (criterion: InternalScalarValue, arithmeticHelper: ArithmeticHelper): Maybe<Criterion> => {
-  if (typeof criterion === 'number') {
+  if (typeof criterion === 'number' || typeof criterion === 'boolean') {
     return buildCriterion(CriterionType.EQUAL, criterion)
   } else if (typeof criterion === 'string') {
     const regexResult = ANY_CRITERION_REGEX.exec(criterion)
 
+    let criterionValue
+    let criterionType
+
     if (regexResult) {
-      const value = arithmeticHelper.coerceToMaybeNumber(regexResult[2])
-      const boolvalue = regexResult[2].toLowerCase()==='true' ? true : regexResult[2].toLowerCase() === 'false' ? false : undefined
-      const criterionType = StrToCriterionType(regexResult[1])
-      if(criterionType === undefined) {
-        return undefined
-      }
-      if (regexResult[2] === '') {
-        return buildCriterion(criterionType, null)
-      } else if (value === undefined) {
-        if(criterionType === CriterionType.EQUAL || criterionType === CriterionType.NOT_EQUAL) {
-          return buildCriterion(criterionType, boolvalue ?? regexResult[2])
-        }
-      } else {
-        return buildCriterion(criterionType, value)
+      criterionType = StrToCriterionType(regexResult[1])
+      criterionValue = regexResult[2]
+    } else {
+      criterionType = CriterionType.EQUAL
+      criterionValue = criterion
+    }
+    const value = arithmeticHelper.coerceToMaybeNumber(criterionValue)
+    const boolvalue = criterionValue.toLowerCase()==='true' ? true : criterionValue.toLowerCase() === 'false' ? false : undefined
+    if(criterionType === undefined) {
+      return undefined
+    }
+    if (criterionValue === '') {
+      return buildCriterion(criterionType, null)
+    } else if (value === undefined) {
+      if(criterionType === CriterionType.EQUAL || criterionType === CriterionType.NOT_EQUAL) {
+        return buildCriterion(criterionType, boolvalue ?? criterionValue)
       }
     } else {
-      return buildCriterion(CriterionType.EQUAL, criterion)
+      return buildCriterion(criterionType, value)
     }
   }
   return undefined
