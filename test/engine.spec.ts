@@ -456,7 +456,7 @@ describe('Integration', () => {
 
   it('should correctly parse all JS types', () => {
     const engine = HyperFormula.buildFromArray([
-      [1, true, EmptyValue],
+      [1, true, null],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toBe(1)

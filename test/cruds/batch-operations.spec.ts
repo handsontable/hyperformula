@@ -1,4 +1,4 @@
-import {EmptyValue, HyperFormula} from '../../src'
+import {HyperFormula} from '../../src'
 import {normalizeAddedIndexes, normalizeRemovedIndexes} from '../../src/Operations'
 import {adr, expectArrayWithSameContent} from '../testUtils'
 

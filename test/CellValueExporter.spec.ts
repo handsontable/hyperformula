@@ -1,5 +1,5 @@
-import {CellError, DetailedCellError, EmptyValue, HyperFormula} from '../src'
-import {ErrorType} from '../src/Cell'
+import {CellError, DetailedCellError, HyperFormula} from '../src'
+import {EmptyValue, ErrorType} from '../src/Cell'
 import {Exporter} from '../src/CellValue'
 import {Config} from '../src/Config'
 import {plPL} from '../src/i18n'

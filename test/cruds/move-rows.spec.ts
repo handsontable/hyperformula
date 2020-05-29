@@ -1,4 +1,4 @@
-import {EmptyValue, ExportedCellChange, HyperFormula, InvalidArgumentsError} from '../../src'
+import {ExportedCellChange, HyperFormula, InvalidArgumentsError} from '../../src'
 import {ErrorType, simpleCellAddress} from '../../src/Cell'
 import {CellAddress} from '../../src/parser'
 import {

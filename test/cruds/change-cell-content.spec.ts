@@ -1,4 +1,4 @@
-import {EmptyValue, ExportedCellChange, HyperFormula, InvalidAddressError, NoSheetWithIdError} from '../../src'
+import {ExportedCellChange, HyperFormula, InvalidAddressError, NoSheetWithIdError} from '../../src'
 import {ErrorType, simpleCellAddress} from '../../src/Cell'
 import {ColumnIndex} from '../../src/ColumnSearch/ColumnIndex'
 import {EmptyCellVertex, MatrixVertex} from '../../src/DependencyGraph'
@@ -137,7 +137,6 @@ describe('changing cell content', () => {
 
     expect(engine.graph.existsEdge(a1, b1)).toBe(true)
     expect(engine.getCellValue(adr('B1'))).toBe(1)
-
     engine.setCellContents(adr('B1'), [[null]])
     expect(engine.getCellValue(adr('B1'))).toBe(null)
     expect(engine.graph.nodes).not.toContain(b1)
@@ -585,8 +584,8 @@ describe('changing cell content', () => {
     const cellInLastColumn = simpleCellAddress(0, Config.defaultConfig.maxColumns, 0)
     const cellInLastRow = simpleCellAddress(0, 0, Config.defaultConfig.maxRows)
 
-    expect(() => engine.setCellContents(cellInLastColumn, EmptyValue)).not.toThrow()
-    expect(() => engine.setCellContents(cellInLastRow, EmptyValue)).not.toThrow()
+    expect(() => engine.setCellContents(cellInLastColumn, null)).not.toThrow()
+    expect(() => engine.setCellContents(cellInLastRow, null)).not.toThrow()
   })
 })
 

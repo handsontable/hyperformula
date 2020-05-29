@@ -1,4 +1,4 @@
-import {EmptyValue, HyperFormula, ExportedCellChange, NothingToPasteError} from '../../src'
+import {HyperFormula, ExportedCellChange, NothingToPasteError} from '../../src'
 import {ErrorType, simpleCellAddress} from '../../src/Cell'
 import {CellAddress} from '../../src/parser'
 import {

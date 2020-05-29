@@ -1,4 +1,4 @@
-import {EmptyValue, ExportedCellChange, HyperFormula, SheetSizeLimitExceededError} from '../../src'
+import {ExportedCellChange, HyperFormula, SheetSizeLimitExceededError} from '../../src'
 import {AbsoluteCellRange} from '../../src/AbsoluteCellRange'
 import {simpleCellAddress} from '../../src/Cell'
 import {ColumnIndex} from '../../src/ColumnSearch/ColumnIndex'
