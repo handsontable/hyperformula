@@ -108,6 +108,8 @@ describe('Text', () => {
     const engine =  HyperFormula.buildFromArray([
       [
         '8/8/2018 01:01:01',  '=TEXT(A1, "H:m:s")',
+      ],
+      [
         '8/8/2018 01:11:11',  '=TEXT(A2, "H:m:s")',
       ]
     ])
