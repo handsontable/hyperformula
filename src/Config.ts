@@ -291,10 +291,26 @@ export interface ConfigParams {
    * @category Undo and Redo
    */
   undoLimit: number,
-
+  /**
+   * If set true, then criterions in functions (SUMIF, COUNTIF, ...) can use regular expressions.
+   *
+   * @default false
+   * @category String
+   */
   useRegularExpresssions: boolean,
+  /**
+   * If set true, then criterions in functions (SUMIF, COUNTIF, ...) can use wildcards '*' and '?'.
+   *
+   * @default true
+   * @category String
+   */
   useWildcards: boolean,
-
+  /**
+   * Whether criterions in functions require whole cell to match the pattern, or just a subword.
+   *
+   * @default true
+   * @category String
+   */
   matchWholeCell: boolean,
   /**
    * Maximum number of rows
