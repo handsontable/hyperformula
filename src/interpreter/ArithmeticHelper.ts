@@ -508,31 +508,10 @@ function isWildcard(c: string): boolean {
   return ['*', '?'].includes(c)
 }
 
+const escapedCharacters = ['{', '}', '[', ']', '(', ')', '<', '>', '=', '.', '+', '-', ',', '\\', '$', '^', '!']
+
 function needsEscape(c: string): boolean {
-  switch(c) {
-    case '{':
-    case '}':
-    case '[':
-    case ']':
-    case '(':
-    case ')':
-    case '<':
-    case '>':
-    case '=':
-    case '.':
-    case '+':
-    case '-':
-    case ',':
-    case '\\':
-    case '$':
-    case '^':
-    case '!': {
-      return true
-    }
-    default: {
-      return false
-    }
-  }
+  return escapedCharacters.includes(c)
 }
 
 function escapeNonWildcards(pattern: string, caseSensitive: boolean): string {
