@@ -13,7 +13,6 @@ import {ContentChanges} from './ContentChanges'
 import {ColumnSearchStrategy} from './ColumnSearch/ColumnSearchStrategy'
 import {absolutizeDependencies} from './absolutizeDependencies'
 import {LazilyTransformingAstService} from './LazilyTransformingAstService'
-import {Index} from './HyperFormula'
 import {buildMatrixVertex} from './GraphBuilder'
 import {
   AddressMapping,
@@ -30,7 +29,7 @@ import {
 import {ValueCellVertexValue} from './DependencyGraph/ValueCellVertex'
 import {
   InvalidArgumentsError,
-  NamedExpressionDoesNotExist,
+  NamedExpressionDoesNotExistError,
   NoRelativeAddressesAllowedError,
   SheetSizeLimitExceededError,
   SourceLocationHasMatrixError,
@@ -48,15 +47,16 @@ import {AbsoluteCellRange} from './AbsoluteCellRange'
 import {findBoundaries, Sheet} from './Sheet'
 import {Config} from './Config'
 import {doesContainRelativeReferences, NamedExpression, NamedExpressions} from './NamedExpressions'
+import {ColumnRowIndex} from './CrudOperations'
 
 export class RemoveRowsCommand {
   constructor(
     public readonly sheet: number,
-    public readonly indexes: Index[]
+    public readonly indexes: ColumnRowIndex[]
   ) {
   }
 
-  public normalizedIndexes(): Index[] {
+  public normalizedIndexes(): ColumnRowIndex[] {
     return normalizeRemovedIndexes(this.indexes)
   }
 
@@ -70,11 +70,11 @@ export class RemoveRowsCommand {
 export class AddRowsCommand {
   constructor(
     public readonly sheet: number,
-    public readonly indexes: Index[]
+    public readonly indexes: ColumnRowIndex[]
   ) {
   }
 
-  public normalizedIndexes(): Index[] {
+  public normalizedIndexes(): ColumnRowIndex[] {
     return normalizeAddedIndexes(this.indexes)
   }
 
@@ -88,11 +88,11 @@ export class AddRowsCommand {
 export class AddColumnsCommand {
   constructor(
     public readonly sheet: number,
-    public readonly indexes: Index[]
+    public readonly indexes: ColumnRowIndex[]
   ) {
   }
 
-  public normalizedIndexes(): Index[] {
+  public normalizedIndexes(): ColumnRowIndex[] {
     return normalizeAddedIndexes(this.indexes)
   }
 
@@ -106,11 +106,11 @@ export class AddColumnsCommand {
 export class RemoveColumnsCommand {
   constructor(
     public readonly sheet: number,
-    public readonly indexes: Index[]
+    public readonly indexes: ColumnRowIndex[]
   ) {
   }
 
-  public normalizedIndexes(): Index[] {
+  public normalizedIndexes(): ColumnRowIndex[] {
     return normalizeRemovedIndexes(this.indexes)
   }
 
@@ -305,7 +305,7 @@ export class Operations {
   public changeNamedExpressionExpression(expressionName: string, newExpression: RawCellContent, sheetId?: number): [NamedExpression, ClipboardCell]  {
     const namedExpression = this.namedExpressions.namedExpressionForScope(expressionName, sheetId)
     if (!namedExpression) {
-      throw new NamedExpressionDoesNotExist(expressionName)
+      throw new NamedExpressionDoesNotExistError(expressionName)
     }
     const content = this.getClipboardCell(namedExpression.address)
     this.storeNamedExpressionInCell(namedExpression.address, newExpression)
@@ -315,7 +315,7 @@ export class Operations {
   public removeNamedExpression(expressionName: string, sheetId?: number): [NamedExpression, ClipboardCell] {
     const namedExpression = this.namedExpressions.namedExpressionForScope(expressionName, sheetId)
     if (!namedExpression) {
-      throw new NamedExpressionDoesNotExist(expressionName)
+      throw new NamedExpressionDoesNotExistError(expressionName)
     }
     this.namedExpressions.remove(namedExpression.displayName, sheetId)
     const content = this.getClipboardCell(namedExpression.address)
@@ -785,7 +785,7 @@ export class Operations {
   }
 }
 
-export function normalizeRemovedIndexes(indexes: Index[]): Index[] {
+export function normalizeRemovedIndexes(indexes: ColumnRowIndex[]): ColumnRowIndex[] {
   if (indexes.length <= 1) {
     return indexes
   }
@@ -793,7 +793,7 @@ export function normalizeRemovedIndexes(indexes: Index[]): Index[] {
   const sorted = indexes.sort(([a], [b]) => (a < b) ? -1 : (a > b) ? 1 : 0)
 
   /* merge overlapping and adjacent indexes */
-  const merged = sorted.reduce((acc: Index[], [startIndex, amount]: Index) => {
+  const merged = sorted.reduce((acc: ColumnRowIndex[], [startIndex, amount]: ColumnRowIndex) => {
     const previous = acc[acc.length - 1]
     const lastIndex = previous[0] + previous[1]
 
@@ -816,7 +816,7 @@ export function normalizeRemovedIndexes(indexes: Index[]): Index[] {
   return merged
 }
 
-export function normalizeAddedIndexes(indexes: Index[]): Index[] {
+export function normalizeAddedIndexes(indexes: ColumnRowIndex[]): ColumnRowIndex[] {
   if (indexes.length <= 1) {
     return indexes
   }
@@ -824,7 +824,7 @@ export function normalizeAddedIndexes(indexes: Index[]): Index[] {
   const sorted = indexes.sort(([a], [b]) => (a < b) ? -1 : (a > b) ? 1 : 0)
 
   /* merge indexes with same start */
-  const merged = sorted.reduce((acc: Index[], [startIndex, amount]: Index) => {
+  const merged = sorted.reduce((acc: ColumnRowIndex[], [startIndex, amount]: ColumnRowIndex) => {
     const previous = acc[acc.length - 1]
     if (startIndex === previous[0]) {
       previous[1] = Math.max(previous[1], amount)

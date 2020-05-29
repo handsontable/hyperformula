@@ -18,21 +18,20 @@ import {
   InvalidAddressError,
   InvalidArgumentsError,
   MatrixFormulasNotSupportedError,
-  NamedExpressionDoesNotExist,
-  NamedExpressionNameIsAlreadyTaken,
-  NamedExpressionNameIsInvalid,
+  NamedExpressionDoesNotExistError,
+  NamedExpressionNameIsAlreadyTakenError,
+  NamedExpressionNameIsInvalidError,
   NoOperationToRedoError,
   NoOperationToUndoError,
   NoRelativeAddressesAllowedError,
   NoSheetWithIdError,
   NoSheetWithNameError,
   NothingToPasteError,
-  SheetNameAlreadyTaken,
+  SheetNameAlreadyTakenError,
   SheetSizeLimitExceededError,
   SourceLocationHasMatrixError,
   TargetLocationHasMatrixError
 } from './errors'
-import {Index} from './HyperFormula'
 import {LazilyTransformingAstService} from './LazilyTransformingAstService'
 import {ParserWithCaching} from './parser'
 import {RowsSpan} from './RowsSpan'
@@ -57,6 +56,8 @@ import {
   UndoRedo
 } from './UndoRedo'
 import {findBoundaries, validateAsSheet} from './Sheet'
+
+export type ColumnRowIndex = [number, number]
 
 export class CrudOperations {
 
@@ -87,7 +88,7 @@ export class CrudOperations {
     this.undoRedo = new UndoRedo(this.config, this.operations)
   }
 
-  public addRows(sheet: number, ...indexes: Index[]): void {
+  public addRows(sheet: number, ...indexes: ColumnRowIndex[]): void {
     const addRowsCommand = new AddRowsCommand(sheet, indexes)
     this.ensureItIsPossibleToAddRows(sheet, ...indexes)
     this.undoRedo.clearRedoStack()
@@ -96,7 +97,7 @@ export class CrudOperations {
     this.undoRedo.saveOperation(new AddRowsUndoEntry(addRowsCommand))
   }
 
-  public removeRows(sheet: number, ...indexes: Index[]): void {
+  public removeRows(sheet: number, ...indexes: ColumnRowIndex[]): void {
     const removeRowsCommand = new RemoveRowsCommand(sheet, indexes)
     this.ensureItIsPossibleToRemoveRows(sheet, ...indexes)
     this.undoRedo.clearRedoStack()
@@ -105,7 +106,7 @@ export class CrudOperations {
     this.undoRedo.saveOperation(new RemoveRowsUndoEntry(removeRowsCommand, rowsRemovals))
   }
 
-  public addColumns(sheet: number, ...indexes: Index[]): void {
+  public addColumns(sheet: number, ...indexes: ColumnRowIndex[]): void {
     const addColumnsCommand = new AddColumnsCommand(sheet, indexes)
     this.ensureItIsPossibleToAddColumns(sheet, ...indexes)
     this.undoRedo.clearRedoStack()
@@ -114,7 +115,7 @@ export class CrudOperations {
     this.undoRedo.saveOperation(new AddColumnsUndoEntry(addColumnsCommand))
   }
 
-  public removeColumns(sheet: number, ...indexes: Index[]): void {
+  public removeColumns(sheet: number, ...indexes: ColumnRowIndex[]): void {
     const removeColumnsCommand = new RemoveColumnsCommand(sheet, indexes)
     this.ensureItIsPossibleToRemoveColumns(sheet, ...indexes)
     this.undoRedo.clearRedoStack()
@@ -328,7 +329,7 @@ export class CrudOperations {
   public ensureItIsPossibleToChangeNamedExpression(expressionName: string, expression: RawCellContent, sheetScope?: string): void {
     const scopeId = this.scopeId(sheetScope)
     if (this.namedExpressions.namedExpressionForScope(expressionName, scopeId) === undefined) {
-      throw new NamedExpressionDoesNotExist(expressionName)
+      throw new NamedExpressionDoesNotExistError(expressionName)
     }
     this.ensureNamedExpressionIsValid(expression)
   }
@@ -336,11 +337,11 @@ export class CrudOperations {
   public isItPossibleToRemoveNamedExpression(expressionName: string, sheetScope?: string): void {
     const scopeId = this.scopeId(sheetScope)
     if (this.namedExpressions.namedExpressionForScope(expressionName, scopeId) === undefined) {
-      throw new NamedExpressionDoesNotExist(expressionName)
+      throw new NamedExpressionDoesNotExistError(expressionName)
     }
   }
 
-  public ensureItIsPossibleToAddRows(sheet: number, ...indexes: Index[]): void {
+  public ensureItIsPossibleToAddRows(sheet: number, ...indexes: ColumnRowIndex[]): void {
     if (!this.sheetMapping.hasSheetWithId(sheet)) {
       throw new NoSheetWithIdError(sheet)
     }
@@ -365,7 +366,7 @@ export class CrudOperations {
     }
   }
 
-  public ensureItIsPossibleToRemoveRows(sheet: number, ...indexes: Index[]): void {
+  public ensureItIsPossibleToRemoveRows(sheet: number, ...indexes: ColumnRowIndex[]): void {
     for (const [rowStart, numberOfRows] of indexes) {
       const rowEnd = rowStart + numberOfRows - 1
       if (!isNonnegativeInteger(rowStart) || !isNonnegativeInteger(rowEnd)) {
@@ -386,7 +387,7 @@ export class CrudOperations {
     }
   }
 
-  public ensureItIsPossibleToAddColumns(sheet: number, ...indexes: Index[]): void {
+  public ensureItIsPossibleToAddColumns(sheet: number, ...indexes: ColumnRowIndex[]): void {
     if (!this.sheetMapping.hasSheetWithId(sheet)) {
       throw new NoSheetWithIdError(sheet)
     }
@@ -411,7 +412,7 @@ export class CrudOperations {
     }
   }
 
-  public ensureItIsPossibleToRemoveColumns(sheet: number, ...indexes: Index[]): void {
+  public ensureItIsPossibleToRemoveColumns(sheet: number, ...indexes: ColumnRowIndex[]): void {
     for (const [columnStart, numberOfColumns] of indexes) {
       const columnEnd = columnStart + numberOfColumns - 1
 
@@ -483,7 +484,7 @@ export class CrudOperations {
 
   public ensureItIsPossibleToAddSheet(name: string): void {
     if (this.sheetMapping.hasSheetWithName(name)) {
-      throw new SheetNameAlreadyTaken(name)
+      throw new SheetNameAlreadyTakenError(name)
     }
   }
 
@@ -545,10 +546,10 @@ export class CrudOperations {
 
   private ensureNamedExpressionNameIsValid(expressionName: string, sheetId?: number) {
     if (!this.namedExpressions.isNameValid(expressionName)) {
-      throw new NamedExpressionNameIsInvalid(expressionName)
+      throw new NamedExpressionNameIsInvalidError(expressionName)
     }
     if (!this.namedExpressions.isNameAvailable(expressionName, sheetId)) {
-      throw new NamedExpressionNameIsAlreadyTaken(expressionName)
+      throw new NamedExpressionNameIsAlreadyTakenError(expressionName)
     }
   }
 

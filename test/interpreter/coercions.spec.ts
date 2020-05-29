@@ -1,5 +1,5 @@
 import {HyperFormula} from '../../src'
-import {CellError, ErrorType} from '../../src'
+import {ErrorType} from '../../src'
 import {Config} from '../../src/Config'
 import {DateTimeHelper} from '../../src/DateTimeHelper'
 import {
@@ -10,7 +10,7 @@ import {
 } from '../../src/interpreter/ArithmeticHelper'
 import {adr, detailedError} from '../testUtils'
 import {NumberLiteralHelper} from '../../src/NumberLiteralHelper'
-import {EmptyValue} from '../../src/Cell'
+import {CellError, EmptyValue} from '../../src/Cell'
 
 describe('#coerceNonDateScalarToMaybeNumber', () => {
   const config = new Config()

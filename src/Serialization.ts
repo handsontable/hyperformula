@@ -43,7 +43,7 @@ export class Serialization {
     } else {
       const value: CellValue = this.getCellValue(address)
       if (value instanceof DetailedCellError) {
-        return this.config.translationPackage.getErrorTranslation(value.error.type)
+        return this.config.translationPackage.getErrorTranslation(value.type)
       } else {
         return value
       }
