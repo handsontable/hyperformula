@@ -31,7 +31,7 @@ export enum ErrorType {
   ERROR = 'ERROR'
 }
 
-export const EmptyValue = Symbol()
+export const EmptyValue = Symbol('Empty value')
 export type EmptyValueType = typeof EmptyValue
 export type NoErrorCellValue = number | string | boolean | EmptyValueType
 export type InternalScalarValue = NoErrorCellValue | CellError
