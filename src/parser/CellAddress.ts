@@ -107,6 +107,10 @@ export class CellAddress implements AddressWithColumn, AddressWithRow {
     return (this.type === CellReferenceType.CELL_REFERENCE_RELATIVE || this.type === CellReferenceType.CELL_REFERENCE_ABSOLUTE_COL)
   }
 
+  public isAbsolute(): boolean {
+    return (this.type === CellReferenceType.CELL_REFERENCE_ABSOLUTE && this.sheet !== null)
+  }
+
   public shiftedByRows(numberOfRows: number): CellAddress {
     return new CellAddress(this.sheet, this.col, this.row + numberOfRows, this.type)
   }

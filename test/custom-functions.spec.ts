@@ -1,6 +1,6 @@
 import {FunctionPlugin} from '../src/interpreter/plugin/FunctionPlugin'
 import {ProcedureAst} from '../src/parser'
-import {ErrorType, InternalCellValue, SimpleCellAddress} from '../src/Cell'
+import {ErrorType, InternalScalarValue, SimpleCellAddress} from '../src/Cell'
 import {HyperFormula, FunctionPluginValidationError} from '../src'
 import {adr, detailedError, expectArrayWithSameContent, unregisterAllFormulas} from './testUtils'
 import {SumifPlugin} from '../src/interpreter/plugin/SumifPlugin'
@@ -28,11 +28,11 @@ class FooPlugin extends FunctionPlugin {
     }
   }
 
-  public foo(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
+  public foo(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return 'foo'
   }
 
-  public bar(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
+  public bar(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return 'bar'
   }
 }
@@ -44,7 +44,7 @@ class SumWithExtra extends FunctionPlugin {
     }
   }
 
-  public sum(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
+  public sum(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     const left = this.evaluateAst(ast.args[0], formulaAddress) as number
     const right = this.evaluateAst(ast.args[1], formulaAddress) as number
     return 42 + left + right
@@ -58,7 +58,7 @@ class InvalidPlugin extends FunctionPlugin {
     }
   }
 
-  public bar(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
+  public bar(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return 'bar'
   }
 }

@@ -10,6 +10,14 @@ describe('Temporary formulas - normalization', () => {
 
     expect(normalizedFormula).toEqual('=Sheet1!A1+10')
   })
+
+  it('wont normalize sheet names of not existing sheets', () => {
+    const engine = HyperFormula.buildEmpty()
+
+    const formula = '=ShEeT1!A1+10'
+
+    expect(engine.normalizeFormula(formula)).toBe('=ShEeT1!A1+10')
+  })
 })
 
 describe('Temporary formulas - validation', () => {
@@ -38,6 +46,14 @@ describe('Temporary formulas - validation', () => {
     const engine = HyperFormula.buildFromArray([])
 
     expect(engine.validateFormula('=#N/A')).toBe(true)
+  })
+
+  it('validateFormula fails with an empty engine', () => {
+    const engine = HyperFormula.buildEmpty()
+
+    const formula = '=Sheet1!A1+10'
+
+    expect(engine.validateFormula(formula)).toBe(true)
   })
 })
 

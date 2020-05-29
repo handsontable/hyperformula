@@ -1,4 +1,4 @@
-import {EmptyValue, HyperFormula} from '../../src'
+import {HyperFormula} from '../../src'
 import {normalizeAddedIndexes, normalizeRemovedIndexes} from '../../src/Operations'
 import {adr, expectArrayWithSameContent} from '../testUtils'
 
@@ -13,15 +13,15 @@ describe('batch cruds', () => {
 
     const evaluatorSpy = spyOn(engine.evaluator, 'partialRun')
 
-    engine.batch((e) => {
-      e.setCellContents(adr('B1'), [['=A1']])
-      e.addRows(0, [0, 1], [1, 1])
-      e.removeRows(0, [0, 1])
+    engine.batch(() => {
+      engine.setCellContents(adr('B1'), [['=A1']])
+      engine.addRows(0, [0, 1], [1, 1])
+      engine.removeRows(0, [0, 1])
     })
 
     expect(evaluatorSpy).toHaveBeenCalledTimes(1)
     expect(engine.getCellValue(adr('A1'))).toEqual('foo')
-    expect(engine.getCellValue(adr('A2'))).toEqual(EmptyValue)
+    expect(engine.getCellValue(adr('A2'))).toBe(null)
     expect(engine.getCellValue(adr('A3'))).toEqual('bar')
   })
 
@@ -36,12 +36,12 @@ describe('batch cruds', () => {
     const evaluatorSpy = spyOn(engine.evaluator, 'partialRun')
 
     try {
-      engine.batch((e) => {
-        e.setCellContents(adr('B1'), [['=A1']])
-        e.addRows(0, [0, 1], [1, 1])
-        e.removeRows(0, [0, 1])
-        e.addRows(1, [0, 1]) // fail
-        e.addRows(0, [0, 1])
+      engine.batch(() => {
+        engine.setCellContents(adr('B1'), [['=A1']])
+        engine.addRows(0, [0, 1], [1, 1])
+        engine.removeRows(0, [0, 1])
+        engine.addRows(1, [0, 1]) // fail
+        engine.addRows(0, [0, 1])
       })
     } catch(e) {
       // empty line
@@ -49,7 +49,7 @@ describe('batch cruds', () => {
 
     expect(evaluatorSpy).toHaveBeenCalledTimes(1)
     expect(engine.getCellValue(adr('A1'))).toEqual('foo')
-    expect(engine.getCellValue(adr('A2'))).toEqual(EmptyValue)
+    expect(engine.getCellValue(adr('A2'))).toBe(null)
     expect(engine.getCellValue(adr('A3'))).toEqual('bar')
   })
 })

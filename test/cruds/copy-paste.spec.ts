@@ -1,4 +1,4 @@
-import {EmptyValue, HyperFormula, ExportedCellChange, NothingToPasteError} from '../../src'
+import {HyperFormula, ExportedCellChange, NothingToPasteError} from '../../src'
 import {ErrorType, simpleCellAddress} from '../../src/Cell'
 import {CellAddress} from '../../src/parser'
 import {
@@ -80,7 +80,7 @@ describe('Copy - paste integration', () => {
     engine.copy(adr('A1'), 1, 1)
     const changes = engine.paste(adr('A2'))
 
-    expectArrayWithSameContent([new ExportedCellChange(simpleCellAddress(0, 0, 1), EmptyValue)], changes)
+    expectArrayWithSameContent([new ExportedCellChange(simpleCellAddress(0, 0, 1), null)], changes)
   })
 
   it('should work for single number', () => {

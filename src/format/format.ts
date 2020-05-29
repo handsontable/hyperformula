@@ -3,7 +3,7 @@
  * Copyright (c) 2020 Handsoncode. All rights reserved.
  */
 
-import {InternalCellValue} from '../Cell'
+import {InternalCellValue, InternalScalarValue} from '../Cell'
 import {Config} from '../Config'
 import {secondsExtendedRegexp} from '../DateTimeDefault'
 import {DateTimeHelper, SimpleDateTime, SimpleTime} from '../DateTimeHelper'
@@ -46,7 +46,7 @@ function countChars(text: string, char: string) {
   return text.split(char).length - 1
 }
 
-function numberFormat(tokens: FormatToken[], value: number): InternalCellValue {
+function numberFormat(tokens: FormatToken[], value: number): InternalScalarValue {
   let result = ''
 
   for (let i = 0; i < tokens.length; ++i) {

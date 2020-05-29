@@ -1,12 +1,11 @@
 import {deepStrictEqual} from 'assert'
-import {CellError, LazilyTransformingAstService} from '../src'
 import {AbsoluteCellRange} from '../src/AbsoluteCellRange'
-import {ErrorType, simpleCellAddress} from '../src/Cell'
+import {CellError, ErrorType, simpleCellAddress} from '../src/Cell'
 import {ColumnIndex} from '../src/ColumnSearch/ColumnIndex'
 import {NamedExpressions} from '../src/NamedExpressions'
 import {ColumnsSpan} from '../src/ColumnsSpan'
 import {Config} from '../src/Config'
-import {Matrix} from '../src/Matrix'
+import {Matrix, MatrixSize} from '../src/Matrix'
 import {RowsSpan} from '../src/RowsSpan'
 import {Statistics} from '../src/statistics'
 import {adr} from './testUtils'
@@ -14,6 +13,8 @@ import {AddRowsTransformer} from '../src/dependencyTransformers/AddRowsTransform
 import {RemoveRowsTransformer} from '../src/dependencyTransformers/RemoveRowsTransformer'
 import {DependencyGraph} from '../src/DependencyGraph'
 import {FunctionRegistry} from '../src/interpreter/FunctionRegistry'
+import {SimpleRangeValue} from '../src/interpreter/InterpreterValue'
+import {LazilyTransformingAstService} from '../src/LazilyTransformingAstService'
 
 function buildEmptyIndex(transformingService: LazilyTransformingAstService, config: Config, statistics: Statistics): ColumnIndex {
   const functionRegistry = new FunctionRegistry(config)
@@ -74,6 +75,16 @@ describe('ColumnIndex#add', () => {
     const columnMap = index.getColumnMap(0, 0)
     expect(columnMap.size).toBe(0)
     expect(columnMap.keys()).not.toContain(error)
+  })
+
+  it('should ignore SimpleRangeValue', () => {
+    const index = buildEmptyIndex(transformingService, new Config(), statistics)
+    const simpleRangeValue = SimpleRangeValue.onlyNumbersDataWithoutRange([[1]], new MatrixSize(1, 1))
+
+    index.add(simpleRangeValue, adr('A1'))
+
+    const columnMap = index.getColumnMap(0, 0)
+    expect(columnMap.size).toBe(0)
   })
 })
 

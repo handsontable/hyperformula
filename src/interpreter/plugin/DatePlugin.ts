@@ -3,7 +3,7 @@
  * Copyright (c) 2020 Handsoncode. All rights reserved.
  */
 
-import {CellError, ErrorType, InternalCellValue, SimpleCellAddress} from '../../Cell'
+import {CellError, ErrorType, InternalScalarValue, SimpleCellAddress} from '../../Cell'
 import {endOfMonth, offsetMonth} from '../../DateTimeHelper'
 import {format} from '../../format/format'
 import {AstNodeType, ProcedureAst} from '../../parser'
@@ -46,7 +46,7 @@ export class DatePlugin extends FunctionPlugin {
    * @param ast
    * @param formulaAddress
    */
-  public date(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
+  public date(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     if (ast.args.length !== 3) {
       return new CellError(ErrorType.NA)
     }
@@ -96,7 +96,7 @@ export class DatePlugin extends FunctionPlugin {
     return new CellError(ErrorType.VALUE)
   }
 
-  public eomonth(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
+  public eomonth(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     if (ast.args.length !== 2) {
       return new CellError(ErrorType.NA)
     }
@@ -126,7 +126,7 @@ export class DatePlugin extends FunctionPlugin {
     return this.interpreter.dateHelper.dateToNumber(endOfMonth(offsetMonth(date, numberOfMonthsToShift)))
   }
 
-  public day(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
+  public day(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     if (ast.args.length !== 1) {
       return new CellError(ErrorType.NA)
     }
@@ -145,7 +145,7 @@ export class DatePlugin extends FunctionPlugin {
     return this.interpreter.dateHelper.numberToDate(dateNumber).day
   }
 
-  public days(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
+  public days(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     if (ast.args.length !== 2) {
       return new CellError(ErrorType.NA)
     }
@@ -182,7 +182,7 @@ export class DatePlugin extends FunctionPlugin {
    * @param ast
    * @param formulaAddress
    */
-  public month(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
+  public month(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     if (ast.args.length !== 1) {
       return new CellError(ErrorType.NA)
     }
@@ -210,7 +210,7 @@ export class DatePlugin extends FunctionPlugin {
    * @param ast
    * @param formulaAddress
    */
-  public year(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
+  public year(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     if (ast.args.length !== 1) {
       return new CellError(ErrorType.NA)
     }
@@ -238,7 +238,7 @@ export class DatePlugin extends FunctionPlugin {
    * @param ast
    * @param formulaAddress
    */
-  public text(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
+  public text(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     if (ast.args.length !== 2) {
       return new CellError(ErrorType.NA)
     }

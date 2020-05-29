@@ -1,4 +1,3 @@
-import {EmptyValue} from '../src'
 import {ErrorType} from '../src/Cell'
 import {CellContent, CellContentParser} from '../src/CellContentParser'
 import {Config} from '../src/Config'
@@ -81,7 +80,8 @@ describe('CellContentParser', () => {
   it( 'non-string', () => {
     expect(cellContentParser.parse(42)).toEqual(new CellContent.Number(42))
     expect(cellContentParser.parse(true)).toEqual(new CellContent.Boolean(true))
-    expect(cellContentParser.parse(EmptyValue)).toEqual(new CellContent.Empty())
+    expect(cellContentParser.parse(null)).toEqual(new CellContent.Empty())
+    expect(cellContentParser.parse(undefined)).toEqual(new CellContent.Empty())
     expect(cellContentParser.parse(-0)).toEqual(new CellContent.Number(0))
     expect(cellContentParser.parse(Infinity)).toEqual(new CellContent.Error(ErrorType.NUM))
     expect(cellContentParser.parse(-Infinity)).toEqual(new CellContent.Error(ErrorType.NUM))

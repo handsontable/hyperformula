@@ -1,4 +1,4 @@
-import {EmptyValue, ExportedCellChange, HyperFormula, SheetSizeLimitExceededError} from '../../src'
+import {ExportedCellChange, HyperFormula, SheetSizeLimitExceededError} from '../../src'
 import {AbsoluteCellRange} from '../../src/AbsoluteCellRange'
 import {simpleCellAddress} from '../../src/Cell'
 import {ColumnIndex} from '../../src/ColumnSearch/ColumnIndex'
@@ -125,7 +125,7 @@ describe('Adding row - matrix check', () => {
 
     engine.addRows(0, [0, 1])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(EmptyValue)
+    expect(engine.getCellValue(adr('A1'))).toBe(null)
     expect(engine.getCellValue(adr('A2'))).toEqual(1)
     expect(engine.getCellValue(adr('B2'))).toEqual(3)
     expect(engine.getCellValue(adr('A4'))).toEqual(1)
@@ -143,7 +143,7 @@ describe('Adding row - matrix check', () => {
 
     expect(engine.getCellValue(adr('A1'))).toEqual(1)
     expect(engine.getCellValue(adr('B1'))).toEqual(3)
-    expect(engine.getCellValue(adr('A3'))).toEqual(EmptyValue)
+    expect(engine.getCellValue(adr('A3'))).toBe(null)
     expect(engine.getCellValue(adr('A4'))).toEqual(1)
   })
 })

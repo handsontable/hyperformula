@@ -3,8 +3,8 @@
  * Copyright (c) 2020 Handsoncode. All rights reserved.
  */
 
-import {NoErrorCellValue, simpleCellAddress, SimpleCellAddress} from './Cell'
-import {CellValue, DetailedCellError, Exporter} from './CellValue'
+import {simpleCellAddress, SimpleCellAddress} from './Cell'
+import {CellValue, DetailedCellError, Exporter, NoErrorCellValue} from './CellValue'
 import {Config} from './Config'
 import {DependencyGraph, FormulaCellVertex, MatrixVertex, ParsingErrorVertex} from './DependencyGraph'
 import {Maybe} from './Maybe'
@@ -43,7 +43,7 @@ export class Serialization {
     } else {
       const value: CellValue = this.getCellValue(address)
       if (value instanceof DetailedCellError) {
-        return this.config.translationPackage.getErrorTranslation(value.error.type)
+        return this.config.translationPackage.getErrorTranslation(value.type)
       } else {
         return value
       }
@@ -51,7 +51,7 @@ export class Serialization {
   }
 
   public getCellValue(address: SimpleCellAddress): CellValue {
-    return this.exporter.exportValue(this.dependencyGraph.getCellValue(address))
+    return this.exporter.exportValue(this.dependencyGraph.getScalarValue(address))
   }
 
   public getSheetValues(sheet: number): CellValue[][] {

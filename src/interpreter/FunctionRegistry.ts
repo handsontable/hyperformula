@@ -3,7 +3,7 @@
  * Copyright (c) 2020 Handsoncode. All rights reserved.
  */
 
-import {FunctionPlugin, FunctionPluginDefinition, FunctionMetadata} from './plugin/FunctionPlugin'
+import {FunctionMetadata, FunctionPlugin, FunctionPluginDefinition} from './plugin/FunctionPlugin'
 import {Interpreter} from './Interpreter'
 import {Maybe} from '../Maybe'
 import {Config} from '../Config'

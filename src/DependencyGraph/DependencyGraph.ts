@@ -6,7 +6,15 @@
 import assert from 'assert'
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
 import {absolutizeDependencies} from '../absolutizeDependencies'
-import {EmptyValue, InternalCellValue, simpleCellAddress, SimpleCellAddress} from '../Cell'
+import {
+  CellError,
+  EmptyValue,
+  ErrorType,
+  InternalCellValue,
+  InternalScalarValue,
+  simpleCellAddress,
+  SimpleCellAddress
+} from '../Cell'
 import {CellDependency} from '../CellDependency'
 import {ColumnsSpan} from '../ColumnsSpan'
 import {Config} from '../Config'
@@ -34,6 +42,7 @@ import {RangeMapping} from './RangeMapping'
 import {SheetMapping} from './SheetMapping'
 import {ValueCellVertexValue} from './ValueCellVertex'
 import {FunctionRegistry} from '../interpreter/FunctionRegistry'
+import {SimpleRangeValue} from '../interpreter/InterpreterValue'
 
 export class DependencyGraph {
   /*
@@ -198,7 +207,7 @@ export class DependencyGraph {
         }
       } else if (dep instanceof NamedExpressionDependency) {
         const sheetOfVertex = (endVertex as FormulaCellVertex).getAddress(this.lazilyTransformingAstService).sheet
-        const namedExpressionVertex = this.namedExpressionVertex(dep.name, sheetOfVertex)
+        const namedExpressionVertex = this.fetchNamedExpressionVertex(dep.name, sheetOfVertex)
         this.graph.addEdge(namedExpressionVertex, endVertex)
       } else {
         this.graph.addEdge(this.fetchCellOrCreateEmpty(dep), endVertex)
@@ -206,7 +215,7 @@ export class DependencyGraph {
     })
   }
 
-  public namedExpressionVertex(expressionName: string, sheetId: number): CellVertex {
+  public fetchNamedExpressionVertex(expressionName: string, sheetId: number): CellVertex {
     const namedExpression = this.namedExpressions.namedExpressionOrPlaceholder(expressionName, sheetId)
     return this.fetchCellOrCreateEmpty(namedExpression.address)
   }
@@ -597,6 +606,14 @@ export class DependencyGraph {
     return this.addressMapping.getCellValue(address)
   }
 
+  public getScalarValue(address: SimpleCellAddress): InternalScalarValue {
+    const value = this.addressMapping.getCellValue(address)
+    if (value instanceof SimpleRangeValue) {
+      return new CellError(ErrorType.VALUE)
+    }
+    return value
+  }
+
   public setVertexAddress(address: SimpleCellAddress, vertex: CellVertex) {
     this.addressMapping.setCell(address, vertex)
   }
@@ -798,9 +815,9 @@ export class DependencyGraph {
     }
   }
 
-  public* valuesFromRange(range: AbsoluteCellRange): IterableIterator<[InternalCellValue, SimpleCellAddress]> {
+  public* valuesFromRange(range: AbsoluteCellRange): IterableIterator<[InternalScalarValue, SimpleCellAddress]> {
     for (const address of range.addresses(this)) {
-      const value = this.getCellValue(address)
+      const value = this.getScalarValue(address)
       if (value !== EmptyValue) {
         yield [value, address]
       }

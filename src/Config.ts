@@ -6,7 +6,12 @@
 import {ErrorType} from './Cell'
 import {defaultParseToDateTime} from './DateTimeDefault'
 import {DateTime, instanceOfSimpleDate, SimpleDate, SimpleDateTime, SimpleTime} from './DateTimeHelper'
-import {ExpectedOneOfValues, ExpectedValueOfType, ConfigValueTooSmallError, ConfigValueTooBigError} from './errors'
+import {
+  ConfigValueTooSmallError,
+  ConfigValueTooBigError,
+  ExpectedValueOfTypeError,
+  ExpectedOneOfValuesError
+} from './errors'
 import {AlwaysDense, ChooseAddressMapping} from './DependencyGraph/AddressMapping/ChooseAddressMappingPolicy'
 import {defaultStringifyDateTime, defaultStringifyDuration} from './format/format'
 import {HyperFormula} from './HyperFormula'
@@ -556,13 +561,13 @@ export class Config implements ConfigParams, ParserConfig {
       if (typeof inputValue === expectedType) {
         return inputValue
       } else {
-        throw new ExpectedValueOfType(expectedType, paramName)
+        throw new ExpectedValueOfTypeError(expectedType, paramName)
       }
     } else {
       if (expectedType.includes(inputValue)) {
         return inputValue
       } else {
-        throw new ExpectedOneOfValues(expectedType.map((val: string) => '\'' + val + '\'').join(' '), paramName)
+        throw new ExpectedOneOfValuesError(expectedType.map((val: string) => '\'' + val + '\'').join(' '), paramName)
       }
     }
   }
@@ -574,7 +579,7 @@ export class Config implements ConfigParams, ParserConfig {
     } else if (typeof inputValue === 'undefined') {
       return Config.defaultConfig[paramName]
     } else {
-      throw new ExpectedValueOfType(expectedType, paramName)
+      throw new ExpectedValueOfTypeError(expectedType, paramName)
     }
   }
 

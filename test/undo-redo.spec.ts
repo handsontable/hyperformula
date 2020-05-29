@@ -1,8 +1,5 @@
-import {HyperFormula, NoOperationToUndoError, NoOperationToRedoError} from '../src'
-import {
-  expectEngineToBeTheSameAs,
-  adr
-} from './testUtils'
+import {ErrorType, HyperFormula, NoOperationToRedoError, NoOperationToUndoError} from '../src'
+import {adr, detailedError, expectEngineToBeTheSameAs} from './testUtils'
 
 describe('Undo - removing rows', () => {
   it('works for empty row', () => {
@@ -574,6 +571,34 @@ describe('Undo - moving cells', () => {
 
     expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray(sheet))
   })
+
+  it('removed added global named expression', () => {
+    const engine = HyperFormula.buildFromSheets({
+      'Sheet1': [],
+      'Sheet2': []
+    })
+    engine.addNamedExpression('foo', 'bar', 'Sheet1')
+    engine.setCellContents(adr('A1'), '=foo')
+    engine.moveCells(adr('A1'), 1, 1, adr('A1', 1))
+
+    engine.undo()
+
+    expect(engine.getNamedExpressionValue('foo')).toEqual(undefined)
+  })
+
+  it('remove global named expression even if it was added after formula', () => {
+    const engine = HyperFormula.buildFromSheets({
+      'Sheet1': [['=foo']],
+      'Sheet2': []
+    })
+    engine.addNamedExpression('foo', 'bar', 'Sheet1')
+    engine.moveCells(adr('A1'), 1, 1, adr('A1', 1))
+
+    engine.undo()
+
+    expect(engine.getNamedExpressionValue('foo', 'Sheet1')).toEqual('bar')
+    expect(engine.getNamedExpressionValue('foo')).toEqual(undefined)
+  })
 })
 
 describe('Undo - cut-paste', () => {
@@ -603,6 +628,22 @@ describe('Undo - cut-paste', () => {
 
     expect(engine.isClipboardEmpty()).toBe(true)
   })
+
+  it('removed added global named expression', () => {
+    const engine = HyperFormula.buildFromSheets({
+      'Sheet1': [],
+      'Sheet2': []
+    })
+    engine.addNamedExpression('foo', 'bar', 'Sheet1')
+    engine.setCellContents(adr('A1'), '=foo')
+    engine.cut(adr('A1'), 1, 1)
+    engine.paste(adr('A1', 1))
+
+    engine.undo()
+
+    expect(engine.getNamedExpressionValue('foo', 'Sheet1')).toEqual('bar')
+    expect(engine.getNamedExpressionValue('foo')).toEqual(undefined)
+  })
 })
 
 describe('Undo - copy-paste', () => {
@@ -618,6 +659,69 @@ describe('Undo - copy-paste', () => {
     engine.undo()
 
     expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray(sheet))
+  })
+
+  it('removed added global named expression', () => {
+    const engine = HyperFormula.buildFromSheets({
+      'Sheet1': [],
+      'Sheet2': []
+    })
+    engine.addNamedExpression('foo', 'bar', 'Sheet1')
+    engine.setCellContents(adr('A1'), '=foo')
+    engine.copy(adr('A1'), 1, 1)
+    engine.paste(adr('A1', 1))
+
+    engine.undo()
+
+    expect(engine.getNamedExpressionValue('foo', 'Sheet1')).toEqual('bar')
+    expect(engine.getNamedExpressionValue('foo')).toEqual(undefined)
+  })
+})
+
+describe('Undo - add named expression', () => {
+  it('works', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=foo']
+    ])
+
+    engine.addNamedExpression('foo', 'foo')
+
+    engine.undo()
+
+    expect(engine.listNamedExpressions().length).toEqual(0)
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NAME))
+  })
+})
+
+describe('Undo - remove named expression', () => {
+  it('works', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=foo']
+    ])
+
+    engine.addNamedExpression('foo', 'foo')
+    engine.removeNamedExpression('foo')
+
+    engine.undo()
+
+    expect(engine.listNamedExpressions().length).toEqual(1)
+    expect(engine.getCellValue(adr('A1'))).toEqual('foo')
+  })
+})
+
+describe('Undo - change named expression', () => {
+  it('works', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=foo']
+    ])
+
+    engine.addNamedExpression('foo', 'foo')
+    engine.changeNamedExpression('foo', 'bar')
+
+    engine.undo()
+
+    expect(engine.listNamedExpressions().length).toEqual(1)
+    expect(engine.getCellValue(adr('A1'))).toEqual('foo')
   })
 })
 
@@ -1324,6 +1428,88 @@ describe('Redo - setting sheet contents', () => {
     engine.undo()
 
     engine.setSheetContent('Sheet1', [['42']])
+
+    expect(engine.isThereSomethingToRedo()).toBe(false)
+  })
+})
+
+describe('Redo - add named expression', () => {
+  it('works', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=foo']
+    ])
+
+    engine.addNamedExpression('foo', 'foo')
+    engine.undo()
+
+    engine.redo()
+
+    expect(engine.listNamedExpressions().length).toEqual(1)
+    expect(engine.getCellValue(adr('A1'))).toEqual('foo')
+  })
+
+  it('clears redo stack', () => {
+    const engine = HyperFormula.buildFromArray([])
+    engine.setCellContents(adr('A1'), 42)
+    engine.undo()
+
+    engine.addNamedExpression('foo', 'foo')
+
+    expect(engine.isThereSomethingToRedo()).toBe(false)
+  })
+})
+
+describe('Redo - remove named expression', () => {
+  it('works', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=foo']
+    ])
+
+    engine.addNamedExpression('foo', 'foo')
+    engine.removeNamedExpression('foo')
+    engine.undo()
+
+    engine.redo()
+
+    expect(engine.listNamedExpressions().length).toEqual(0)
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NAME))
+  })
+
+  it('clears redo stack', () => {
+    const engine = HyperFormula.buildFromArray([])
+    engine.addNamedExpression('foo', 'foo')
+    engine.setCellContents(adr('A1'), 42)
+    engine.undo()
+
+    engine.removeNamedExpression('foo')
+
+    expect(engine.isThereSomethingToRedo()).toBe(false)
+  })
+})
+
+describe('Redo - change named expression', () => {
+  it('works', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=foo']
+    ])
+
+    engine.addNamedExpression('foo', 'foo')
+    engine.changeNamedExpression('foo', 'bar')
+    engine.undo()
+
+    engine.redo()
+
+    expect(engine.listNamedExpressions().length).toEqual(1)
+    expect(engine.getCellValue(adr('A1'))).toEqual('bar')
+  })
+
+  it('clears redo stack', () => {
+    const engine = HyperFormula.buildFromArray([])
+    engine.addNamedExpression('foo', 'foo')
+    engine.setCellContents(adr('A1'), 42)
+    engine.undo()
+
+    engine.changeNamedExpression('foo', 'foo')
 
     expect(engine.isThereSomethingToRedo()).toBe(false)
   })
