@@ -157,7 +157,7 @@ function* ifFilter<T>(criterionLambdas: CriterionLambda[], conditionalIterables:
       return
     }
     const conditionalFirsts = conditionalSplits.map((cs) => (cs.value as InternalScalarValue))
-    if (zip(conditionalFirsts, criterionLambdas).every(([conditionalFirst, criterionLambda]) => criterionLambda(conditionalFirst) as boolean)) {
+    if (zip(conditionalFirsts, criterionLambdas).every(([conditionalFirst, criterionLambda]) => criterionLambda(conditionalFirst))) {
       yield computable
     }
     conditionalIterables = conditionalSplits.map((cs) => cs.rest)
