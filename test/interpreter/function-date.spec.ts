@@ -1,4 +1,4 @@
-import {EmptyValue, HyperFormula} from '../../src'
+import {HyperFormula} from '../../src'
 import {ErrorType} from '../../src/Cell'
 import {Config} from '../../src/Config'
 import {adr, dateNumberToString, detailedError} from '../testUtils'
@@ -216,7 +216,7 @@ describe( 'Function DATE + leap years', () =>{
   it('with blanks', () => {
     const config = new Config()
     const engine = HyperFormula.buildFromArray([
-      [null, '', 'string', EmptyValue, '\''],
+      [null, '', 'string', null, '\''],
       ['=DATE(A1, 2, 3)'],
       ['=DATE(B1, 2, 3)'],
       ['=DATE(C1, 2, 3)'],

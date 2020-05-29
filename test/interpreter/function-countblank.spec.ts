@@ -1,4 +1,4 @@
-import {EmptyValue, HyperFormula} from '../../src'
+import {HyperFormula} from '../../src'
 import {ErrorType} from '../../src/Cell'
 import {adr, detailedError} from '../testUtils'
 
@@ -45,7 +45,7 @@ describe('COUNTBLANK', () => {
     const engine = HyperFormula.buildFromArray([
       ['1'],
       ['=COUNTBLANK(A1:A3)'],
-      [EmptyValue],
+      [null],
       ['=COUNTBLANK(A1:A3)']
     ])
 

@@ -3,7 +3,7 @@
  * Copyright (c) 2020 Handsoncode. All rights reserved.
  */
 
-import {CellError, ErrorType, InternalCellValue, SimpleCellAddress} from '../../Cell'
+import {CellError, ErrorType, InternalScalarValue, SimpleCellAddress} from '../../Cell'
 import {AstNodeType, ProcedureAst} from '../../parser'
 import {SimpleRangeValue} from '../InterpreterValue'
 import {FunctionPlugin} from './FunctionPlugin'
@@ -22,7 +22,7 @@ export class LogarithmPlugin extends FunctionPlugin {
     },
   }
 
-  public log10(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
+  public log10(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.templateWithOneCoercedToNumberArgument(ast, formulaAddress, (arg) => {
       if (arg > 0) {
         return Math.log10(arg)
@@ -32,7 +32,7 @@ export class LogarithmPlugin extends FunctionPlugin {
     })
   }
 
-  public log(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
+  public log(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     if (ast.args.length < 1 || ast.args.length > 2) {
       return new CellError(ErrorType.NA)
     }
@@ -70,7 +70,7 @@ export class LogarithmPlugin extends FunctionPlugin {
     }
   }
 
-  public ln(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
+  public ln(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.templateWithOneCoercedToNumberArgument(ast, formulaAddress, (arg) => {
       if (arg > 0) {
         return Math.log(arg)

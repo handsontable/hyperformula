@@ -4,7 +4,7 @@
  */
 
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
-import {CellError, ErrorType, InternalCellValue, simpleCellAddress} from '../Cell'
+import {CellError, ErrorType, InternalScalarValue, simpleCellAddress} from '../Cell'
 import {CriterionCache, DependencyGraph, RangeVertex} from '../DependencyGraph'
 import {split} from '../generatorUtils'
 import {Maybe} from '../Maybe'
@@ -39,7 +39,7 @@ export class CriterionFunctionCompute<T> {
     private readonly cacheKey: (conditions: Condition[]) => string,
     private readonly reduceInitialValue: T,
     private readonly composeFunction: (left: T, right: T) => T,
-    private readonly mapFunction: (arg: InternalCellValue) => T,
+    private readonly mapFunction: (arg: InternalScalarValue) => T,
   ) {
     this.dependencyGraph = this.interpreter.dependencyGraph
   }
@@ -144,20 +144,20 @@ export class Condition {
   }
 }
 
-function * getRangeValues(dependencyGraph: DependencyGraph, cellRange: AbsoluteCellRange): IterableIterator<InternalCellValue> {
+function * getRangeValues(dependencyGraph: DependencyGraph, cellRange: AbsoluteCellRange): IterableIterator<InternalScalarValue> {
   for (const cellFromRange of cellRange.addresses(dependencyGraph)) {
-    yield dependencyGraph.getCellValue(cellFromRange)
+    yield dependencyGraph.getScalarValue(cellFromRange)
   }
 }
 
-function* ifFilter<T>(criterionLambdas: CriterionLambda[], conditionalIterables: IterableIterator<InternalCellValue>[], computableIterable: IterableIterator<T>): IterableIterator<T> {
+function* ifFilter<T>(criterionLambdas: CriterionLambda[], conditionalIterables: IterableIterator<InternalScalarValue>[], computableIterable: IterableIterator<T>): IterableIterator<T> {
   for (const computable of computableIterable) {
     const conditionalSplits = conditionalIterables.map((conditionalIterable) => split(conditionalIterable))
     if (!conditionalSplits.every((cs) => Object.prototype.hasOwnProperty.call(cs, 'value'))) {
       return
     }
-    const conditionalFirsts = conditionalSplits.map((cs) => (cs.value as InternalCellValue))
-    if (zip(conditionalFirsts, criterionLambdas).every(([conditionalFirst, criterionLambda]) => criterionLambda(conditionalFirst))) {
+    const conditionalFirsts = conditionalSplits.map((cs) => (cs.value as InternalScalarValue))
+    if (zip(conditionalFirsts, criterionLambdas).every(([conditionalFirst, criterionLambda]) => criterionLambda(conditionalFirst) as boolean)) {
       yield computable
     }
     conditionalIterables = conditionalSplits.map((cs) => cs.rest)

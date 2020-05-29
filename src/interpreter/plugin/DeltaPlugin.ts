@@ -3,7 +3,7 @@
  * Copyright (c) 2020 Handsoncode. All rights reserved.
  */
 
-import {CellError, ErrorType, InternalCellValue, SimpleCellAddress} from '../../Cell'
+import {CellError, ErrorType, InternalScalarValue, SimpleCellAddress} from '../../Cell'
 import {AstNodeType, ProcedureAst} from '../../parser'
 import {FunctionPlugin} from './FunctionPlugin'
 
@@ -14,7 +14,7 @@ export class DeltaPlugin extends FunctionPlugin {
     },
   }
 
-  public delta(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
+  public delta(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     if (ast.args.length < 1 || ast.args.length > 2) {
       return new CellError(ErrorType.NA)
     }

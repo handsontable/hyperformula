@@ -3,7 +3,7 @@
  * Copyright (c) 2020 Handsoncode. All rights reserved.
  */
 
-import { ExportedChange } from './CellValue'
+import {ExportedChange} from './CellValue'
 import {TinyEmitter} from 'tiny-emitter'
 
 export enum Events {

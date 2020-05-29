@@ -8,9 +8,9 @@ import {
   CellValueTypeOrd,
   EmptyValue,
   ErrorType,
-  getCellValueType,
-  InternalCellValue,
-  NoErrorCellValue
+  getCellValueType, InternalCellValue,
+  InternalNoErrorCellValue,
+  InternalScalarValue
 } from '../Cell'
 import {Config} from '../Config'
 import {DateTimeHelper} from '../DateTimeHelper'
@@ -94,7 +94,7 @@ export class ArithmeticHelper {
     return str
   }
 
-  public compare(left: NoErrorCellValue, right: NoErrorCellValue): number {
+  public compare(left: InternalNoErrorCellValue, right: InternalNoErrorCellValue): number {
     if (typeof left === 'string' || typeof right === 'string') {
       const leftTmp = typeof left === 'string' ? this.dateTimeHelper.dateStringToDateNumber(left) : left
       const rightTmp = typeof right === 'string' ? this.dateTimeHelper.dateStringToDateNumber(right) : right
@@ -168,7 +168,7 @@ export class ArithmeticHelper {
    * @param left - left operand of addition
    * @param right - right operand of addition
    */
-  public nonstrictadd = (left: InternalCellValue, right: InternalCellValue): number | CellError => {
+  public nonstrictadd = (left: InternalScalarValue, right: InternalScalarValue): number | CellError => {
     if (left instanceof CellError) {
       return left
     } else if (right instanceof CellError) {
@@ -212,20 +212,20 @@ export class ArithmeticHelper {
     }
   }
 
-  public coerceScalarToNumberOrError(arg: InternalCellValue): number | CellError {
+  public coerceScalarToNumberOrError(arg: InternalScalarValue): number | CellError {
     if (arg instanceof CellError) {
       return arg
     }
     return this.coerceToMaybeNumber(arg) ?? new CellError(ErrorType.VALUE)
   }
 
-  public coerceToMaybeNumber(arg: NoErrorCellValue): Maybe<number> {
+  public coerceToMaybeNumber(arg: InternalNoErrorCellValue): Maybe<number> {
     return this.coerceNonDateScalarToMaybeNumber(arg) ?? (
       typeof arg === 'string' ? this.dateTimeHelper.dateStringToDateNumber(arg) : undefined
     )
   }
 
-  public coerceNonDateScalarToMaybeNumber(arg: NoErrorCellValue): Maybe<number> {
+  public coerceNonDateScalarToMaybeNumber(arg: InternalNoErrorCellValue): Maybe<number> {
     if (arg === EmptyValue) {
       return 0
     }
@@ -264,7 +264,7 @@ export function coerceBooleanToNumber(arg: boolean): number {
   return Number(arg)
 }
 
-export function coerceEmptyToValue(arg: NoErrorCellValue): NoErrorCellValue {
+export function coerceEmptyToValue(arg: InternalNoErrorCellValue): InternalNoErrorCellValue {
   if (typeof arg === 'string') {
     return ''
   } else if (typeof arg === 'number') {
@@ -281,8 +281,10 @@ export function coerceEmptyToValue(arg: NoErrorCellValue): NoErrorCellValue {
  *
  * @param arg
  */
-export function coerceScalarToBoolean(arg: InternalCellValue): boolean | CellError | null {
-  if (arg instanceof CellError || typeof arg === 'boolean') {
+export function coerceScalarToBoolean(arg: InternalScalarValue): boolean | CellError | null {
+  if (arg instanceof SimpleRangeValue) {
+    return new CellError(ErrorType.VALUE)
+  } else if (arg instanceof CellError || typeof arg === 'boolean') {
     return arg
   } else if (arg === EmptyValue) {
     return false
@@ -300,7 +302,7 @@ export function coerceScalarToBoolean(arg: InternalCellValue): boolean | CellErr
   }
 }
 
-export function coerceScalarToString(arg: InternalCellValue): string | CellError {
+export function coerceScalarToString(arg: InternalScalarValue): string | CellError {
   if (arg instanceof CellError || typeof arg === 'string') {
     return arg
   } else if (arg === EmptyValue) {
@@ -380,7 +382,7 @@ export function percent(value: number | CellError): number | CellError {
  * @param left - left operand of addition
  * @param right - right operand of addition
  */
-export function max(left: InternalCellValue, right: InternalCellValue): InternalCellValue {
+export function max(left: InternalScalarValue, right: InternalScalarValue): InternalScalarValue {
   if (left instanceof CellError) {
     return left
   }
@@ -400,7 +402,7 @@ export function max(left: InternalCellValue, right: InternalCellValue): Internal
   }
 }
 
-export function maxa(left: InternalCellValue, right: InternalCellValue): InternalCellValue {
+export function maxa(left: InternalScalarValue, right: InternalScalarValue): InternalScalarValue {
   if (left instanceof CellError) {
     return left
   }
@@ -436,7 +438,7 @@ export function maxa(left: InternalCellValue, right: InternalCellValue): Interna
  * @param left - left operand of addition
  * @param right - right operand of addition
  */
-export function min(left: InternalCellValue, right: InternalCellValue): InternalCellValue {
+export function min(left: InternalScalarValue, right: InternalScalarValue): InternalScalarValue {
   if (left instanceof CellError) {
     return left
   }
@@ -456,7 +458,7 @@ export function min(left: InternalCellValue, right: InternalCellValue): Internal
   }
 }
 
-export function mina(left: InternalCellValue, right: InternalCellValue): InternalCellValue {
+export function mina(left: InternalScalarValue, right: InternalScalarValue): InternalScalarValue {
   if (left instanceof CellError) {
     return left
   }

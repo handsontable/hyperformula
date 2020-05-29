@@ -57,7 +57,7 @@ describe('ColumnsSpan', () => {
     const span1 = new ColumnsSpan(0, 42, 45)
     const span2 = new ColumnsSpan(0, 46, 49)
 
-    expect(span1.intersect(span2)).toEqual(null)
+    expect(span1.intersect(span2)).toBe(null)
   })
 
   it('#intersect with span overlapping at left', () => {
@@ -71,7 +71,7 @@ describe('ColumnsSpan', () => {
     const span1 = new ColumnsSpan(0, 42, 45)
     const span2 = new ColumnsSpan(0, 39, 41)
 
-    expect(span1.intersect(span2)).toEqual(null)
+    expect(span1.intersect(span2)).toBe(null)
   })
 
   it('#intersect with span included', () => {

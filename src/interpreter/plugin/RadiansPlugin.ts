@@ -3,7 +3,7 @@
  * Copyright (c) 2020 Handsoncode. All rights reserved.
  */
 
-import { InternalCellValue, SimpleCellAddress} from '../../Cell'
+import {InternalScalarValue, SimpleCellAddress} from '../../Cell'
 import {ProcedureAst} from '../../parser'
 import {FunctionPlugin} from './FunctionPlugin'
 
@@ -14,7 +14,7 @@ export class RadiansPlugin extends FunctionPlugin {
     },
   }
 
-  public radians(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
+  public radians(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.templateWithOneCoercedToNumberArgument(ast, formulaAddress, (arg) => {
       return arg * (Math.PI / 180)
     })

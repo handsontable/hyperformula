@@ -3,13 +3,13 @@
  * Copyright (c) 2020 Handsoncode. All rights reserved.
  */
 
-import {InternalCellValue} from '../Cell'
+import {InternalScalarValue} from '../Cell'
 import {Config} from '../Config'
 import {DateTimeHelper, SimpleDateTime} from '../DateTimeHelper'
 import {Maybe} from '../Maybe'
 import {FormatToken, parseForDateTimeFormat, parseForNumberFormat, TokenType} from './parser'
 
-export function format(value: number, formatArg: string, config: Config, dateHelper: DateTimeHelper): InternalCellValue {
+export function format(value: number, formatArg: string, config: Config, dateHelper: DateTimeHelper): InternalScalarValue {
   const tryString = config.stringifyDateTime(dateHelper.numberToDateTime(value), formatArg) // default points to defaultStringifyDateTime()
   if (tryString !== undefined) {
     return tryString
@@ -44,7 +44,7 @@ function countChars(text: string, char: string) {
   return text.split(char).length - 1
 }
 
-function numberFormat(tokens: FormatToken[], value: number): InternalCellValue {
+function numberFormat(tokens: FormatToken[], value: number): InternalScalarValue {
   let result = ''
 
   for (let i = 0; i < tokens.length; ++i) {

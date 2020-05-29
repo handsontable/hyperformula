@@ -27,7 +27,7 @@ export class NoSheetWithNameError extends Error {
 /**
  * Error thrown when the sheet of a given name already exists.
  */
-export class SheetNameAlreadyTaken extends Error {
+export class SheetNameAlreadyTakenError extends Error {
   constructor(sheetName: string) {
     super(`Sheet with name ${sheetName} already exists`)
   }
@@ -72,7 +72,7 @@ export class InvalidArgumentsError extends Error {
 /**
  * Error thrown when the given named expression already exists in the workbook and therefore it cannot be added.
  */
-export class NamedExpressionNameIsAlreadyTaken extends Error {
+export class NamedExpressionNameIsAlreadyTakenError extends Error {
   constructor(expressionName: string) {
     super(`Name of Named Expression '${expressionName}' is already present`)
   }
@@ -81,7 +81,7 @@ export class NamedExpressionNameIsAlreadyTaken extends Error {
 /**
  * Error thrown when the name given for the named expression is invalid.
  */
-export class NamedExpressionNameIsInvalid extends Error {
+export class NamedExpressionNameIsInvalidError extends Error {
   constructor(expressionName: string) {
     super(`Name of Named Expression '${expressionName}' is invalid`)
   }
@@ -90,7 +90,7 @@ export class NamedExpressionNameIsInvalid extends Error {
 /**
  * Error thrown when the given named expression does not exist.
  */
-export class NamedExpressionDoesNotExist extends Error {
+export class NamedExpressionDoesNotExistError extends Error {
   constructor(expressionName: string) {
     super(`Named Expression '${expressionName}' does not exist`)
   }
@@ -105,6 +105,9 @@ export class NoOperationToUndoError extends Error {
   }
 }
 
+/**
+ * Error thrown when there are no operations to redo by the [[redo]] method.
+ */
 export class NoOperationToRedoError extends Error {
   constructor() {
     super('There is no operation to redo')
@@ -146,7 +149,7 @@ function replacer(key: any, val: any): any {
  * @see [[buildFromSheets]]
  * @see [[setCellsContents]]
  */
-export class UnableToParse extends Error {
+export class UnableToParseError extends Error {
   constructor(value: any) {
     super(`Unable to parse value: ${JSON.stringify(value, replacer, 4)}`)
   }
@@ -163,7 +166,7 @@ export class UnableToParse extends Error {
  * @see [[buildFromSheets]]
  * @see [[updateConfig]]
  */
-export class ExpectedValueOfType extends Error {
+export class ExpectedValueOfTypeError extends Error {
   constructor(expectedType: string, paramName: string) {
     super(`Expected value of type: ${expectedType} for config parameter: ${paramName}`)
   }
@@ -212,7 +215,7 @@ export class ConfigValueTooBigError extends Error {
  * @see [[buildFromSheets]]
  * @see [[updateConfig]]
  */
-export class ExpectedOneOfValues extends Error {
+export class ExpectedOneOfValuesError extends Error {
   constructor(values: string, paramName: string) {
     super(`Expected one of ${values} for config parameter: ${paramName}`)
   }
@@ -244,6 +247,14 @@ export class MissingTranslationError extends Error {
   }
 }
 
+/**
+ * Error thrown when function plugin is invalid.
+ *
+ * @see [[registerFunction]]
+ * @see [[registerFunctionPlugin]]
+ * @see [[buildFromArray]]
+ * @see [[buildFromSheets]]
+ * */
 export class FunctionPluginValidationError extends Error {
   public static functionNotDeclaredInPlugin(formulaId: string, pluginName: string): FunctionPluginValidationError {
     return new FunctionPluginValidationError(`Formula with id ${formulaId} not declared in plugin ${pluginName}`)
@@ -265,9 +276,40 @@ export class SourceLocationHasMatrixError extends Error {
 
 /**
  * Error thrown when selected target location has a matrix.
+ *
+ * @see [[addRows]]
+ * @see [[addColumns]]
+ * @see [[moveCells]]
+ * @see [[moveRows]]
+ * @see [[moveColumns]]
+ * @see [[paste]]
  */
 export class TargetLocationHasMatrixError extends Error {
   constructor() {
     super('Cannot perform this operation, target location has a matrix inside.')
+  }
+}
+
+/**
+ * Error thrown when trying to use matrix expression as named expression.
+ *
+ * @see [[addNamedExpression]]
+ * @see [[changeNamedExpression]]
+ */
+export class MatrixFormulasNotSupportedError extends Error {
+  constructor() {
+    super('Matrix formulas are not supported in named expressions.')
+  }
+}
+
+/**
+ * Error thrown when named expression contains relative addresses.
+ *
+ * @see [[addNamedExpression]]
+ * @see [[changeNamedExpression]]
+ * */
+export class NoRelativeAddressesAllowedError extends Error {
+  constructor() {
+    super('Relative addresses not allowed in named expressions.')
   }
 }

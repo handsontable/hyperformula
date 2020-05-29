@@ -4,7 +4,7 @@
  */
 
 import {AbsoluteCellRange} from '../../AbsoluteCellRange'
-import {CellError, EmptyValue, ErrorType, InternalCellValue, SimpleCellAddress} from '../../Cell'
+import {CellError, EmptyValue, ErrorType, InternalCellValue, InternalScalarValue, SimpleCellAddress} from '../../Cell'
 import {AstNodeType, ProcedureAst} from '../../parser'
 import {SimpleRangeValue} from '../InterpreterValue'
 import {FunctionPlugin} from './FunctionPlugin'
@@ -55,7 +55,7 @@ export class InformationPlugin extends FunctionPlugin {
    * @param ast
    * @param formulaAddress
    */
-  public iserror(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
+  public iserror(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     if (ast.args.length != 1) {
       return new CellError(ErrorType.NA)
     }
@@ -78,7 +78,7 @@ export class InformationPlugin extends FunctionPlugin {
    * @param ast
    * @param formulaAddress
    */
-  public isblank(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
+  public isblank(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     if (ast.args.length != 1) {
       return new CellError(ErrorType.NA)
     }
@@ -101,7 +101,7 @@ export class InformationPlugin extends FunctionPlugin {
    * @param ast
    * @param formulaAddress
    */
-  public isnumber(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
+  public isnumber(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     if (ast.args.length != 1) {
       return new CellError(ErrorType.NA)
     }
@@ -124,7 +124,7 @@ export class InformationPlugin extends FunctionPlugin {
    * @param ast
    * @param formulaAddress
    */
-  public islogical(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
+  public islogical(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     if (ast.args.length != 1) {
       return new CellError(ErrorType.NA)
     }
@@ -147,7 +147,7 @@ export class InformationPlugin extends FunctionPlugin {
    * @param ast
    * @param formulaAddress
    */
-  public istext(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
+  public istext(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     if (ast.args.length != 1) {
       return new CellError(ErrorType.NA)
     }
@@ -170,7 +170,7 @@ export class InformationPlugin extends FunctionPlugin {
    * @param ast
    * @param formulaAddress
    */
-  public isnontext(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
+  public isnontext(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     if (ast.args.length != 1) {
       return new CellError(ErrorType.NA)
     }
@@ -194,7 +194,7 @@ export class InformationPlugin extends FunctionPlugin {
    * @param formulaAddress
    */
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  public columns(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
+  public columns(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     if (ast.args.length !== 1) {
       return new CellError(ErrorType.NA)
     }
@@ -218,7 +218,7 @@ export class InformationPlugin extends FunctionPlugin {
    * @param formulaAddress
    */
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  public rows(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
+  public rows(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     if (ast.args.length !== 1) {
       return new CellError(ErrorType.NA)
     }
