@@ -2348,7 +2348,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * Note that this method may trigger dependency graph recalculation.
    *
-   * @param {(e: HyperFormula) => void} batchOperations
+   * @param {() => void} batchOperations
    * @fires [[valuesUpdated]] if recalculation was triggered by this change
    *
    * @example
@@ -2366,11 +2366,11 @@ export class HyperFormula implements TypedEmitter {
    *
    * @category Batch
    */
-  public batch(batchOperations: (e: HyperFormula) => void): ExportedChange[] {
+  public batch(batchOperations: () => void): ExportedChange[] {
     this.suspendEvaluation()
     this._crudOperations.beginUndoRedoBatchMode()
     try {
-      batchOperations(this)
+      batchOperations()
     } catch (e) {
       this._crudOperations.commitUndoRedoBatchMode()
       this.resumeEvaluation()

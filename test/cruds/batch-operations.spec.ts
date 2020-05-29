@@ -13,10 +13,10 @@ describe('batch cruds', () => {
 
     const evaluatorSpy = spyOn(engine.evaluator, 'partialRun')
 
-    engine.batch((e) => {
-      e.setCellContents(adr('B1'), [['=A1']])
-      e.addRows(0, [0, 1], [1, 1])
-      e.removeRows(0, [0, 1])
+    engine.batch(() => {
+      engine.setCellContents(adr('B1'), [['=A1']])
+      engine.addRows(0, [0, 1], [1, 1])
+      engine.removeRows(0, [0, 1])
     })
 
     expect(evaluatorSpy).toHaveBeenCalledTimes(1)
@@ -36,12 +36,12 @@ describe('batch cruds', () => {
     const evaluatorSpy = spyOn(engine.evaluator, 'partialRun')
 
     try {
-      engine.batch((e) => {
-        e.setCellContents(adr('B1'), [['=A1']])
-        e.addRows(0, [0, 1], [1, 1])
-        e.removeRows(0, [0, 1])
-        e.addRows(1, [0, 1]) // fail
-        e.addRows(0, [0, 1])
+      engine.batch(() => {
+        engine.setCellContents(adr('B1'), [['=A1']])
+        engine.addRows(0, [0, 1], [1, 1])
+        engine.removeRows(0, [0, 1])
+        engine.addRows(1, [0, 1]) // fail
+        engine.addRows(0, [0, 1])
       })
     } catch(e) {
       // empty line
