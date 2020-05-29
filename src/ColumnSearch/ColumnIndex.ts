@@ -4,13 +4,7 @@
  */
 
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
-import {
-  CellError,
-  InternalScalarValue,
-  InternalCellValue,
-  movedSimpleCellAddress,
-  SimpleCellAddress
-} from '../Cell'
+import {CellError, InternalCellValue, InternalScalarValue, movedSimpleCellAddress, SimpleCellAddress} from '../Cell'
 import {ColumnsSpan} from '../ColumnsSpan'
 import {Config} from '../Config'
 import {DependencyGraph} from '../DependencyGraph'

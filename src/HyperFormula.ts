@@ -4,7 +4,7 @@
  */
 
 import {AbsoluteCellRange} from './AbsoluteCellRange'
-import {CellType, CellValueType, getCellType, getCellValueType, InternalNoErrorCellValue, SimpleCellAddress} from './Cell'
+import {CellType, CellValueType, getCellType, getCellValueType, SimpleCellAddress} from './Cell'
 import {CellContent, CellContentParser, RawCellContent} from './CellContentParser'
 import {CellValue, ExportedChange, Exporter, NoErrorCellValue} from './CellValue'
 import {ColumnSearchStrategy} from './ColumnSearch/ColumnSearchStrategy'

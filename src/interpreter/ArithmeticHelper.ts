@@ -9,8 +9,8 @@ import {
   EmptyValue,
   ErrorType,
   getCellValueType,
-  InternalScalarValue,
-  InternalNoErrorCellValue
+  InternalNoErrorCellValue,
+  InternalScalarValue
 } from '../Cell'
 import {Config} from '../Config'
 import {DateTimeHelper} from '../DateTimeHelper'

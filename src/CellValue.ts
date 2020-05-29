@@ -3,15 +3,7 @@
  * Copyright (c) 2020 Handsoncode. All rights reserved.
  */
 
-import {
-  CellError,
-  EmptyValue,
-  EmptyValueType,
-  ErrorType,
-  InternalCellValue,
-  simpleCellAddress,
-  SimpleCellAddress
-} from './Cell'
+import {CellError, EmptyValue, ErrorType, InternalCellValue, simpleCellAddress, SimpleCellAddress} from './Cell'
 import {Config} from './Config'
 import {CellValueChange} from './ContentChanges'
 import {NamedExpressions} from './NamedExpressions'

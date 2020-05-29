@@ -6,7 +6,6 @@
 import {CellError, EmptyValueType, ErrorType, InternalScalarValue, SimpleCellAddress} from '../../Cell'
 import {AstNodeType, ProcedureAst} from '../../parser'
 import {FunctionPlugin} from './FunctionPlugin'
-import {SimpleRangeValue} from '../InterpreterValue'
 
 /**
  * Interpreter plugin containing COUNTUNIQUE function

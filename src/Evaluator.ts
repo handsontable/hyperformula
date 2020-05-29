@@ -5,7 +5,7 @@
 
 import {AbsoluteCellRange} from './AbsoluteCellRange'
 import {absolutizeDependencies} from './absolutizeDependencies'
-import {CellError, ErrorType, InternalScalarValue, InternalCellValue, SimpleCellAddress} from './Cell'
+import {CellError, ErrorType, InternalCellValue, SimpleCellAddress} from './Cell'
 import {ColumnSearchStrategy} from './ColumnSearch/ColumnSearchStrategy'
 import {Config} from './Config'
 import {ContentChanges} from './ContentChanges'

@@ -10,8 +10,8 @@ import {
   CellError,
   EmptyValue,
   ErrorType,
-  InternalScalarValue,
   InternalCellValue,
+  InternalScalarValue,
   simpleCellAddress,
   SimpleCellAddress
 } from '../Cell'

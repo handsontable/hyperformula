@@ -3,7 +3,7 @@
  * Copyright (c) 2020 Handsoncode. All rights reserved.
  */
 
-import {CellError, EmptyValue, ErrorType} from './Cell'
+import {CellError, ErrorType} from './Cell'
 import {Config} from './Config'
 import {DateTimeHelper} from './DateTimeHelper'
 import {UnableToParse} from './errors'

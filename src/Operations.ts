@@ -32,8 +32,10 @@ import {
   InvalidArgumentsError,
   NamedExpressionDoesNotExist,
   NoRelativeAddressesAllowedError,
-  SheetSizeLimitExceededError
-, TargetLocationHasMatrixError, SourceLocationHasMatrixError} from './errors'
+  SheetSizeLimitExceededError,
+  SourceLocationHasMatrixError,
+  TargetLocationHasMatrixError
+} from './errors'
 import {NamedExpressionDependency, ParserWithCaching, ProcedureAst, RelativeDependency} from './parser'
 import {ParsingError} from './parser/Ast'
 import {AddRowsTransformer} from './dependencyTransformers/AddRowsTransformer'

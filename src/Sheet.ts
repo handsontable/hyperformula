@@ -4,7 +4,6 @@
  */
 
 import {RawCellContent} from './CellContentParser'
-import {EmptyValue} from './Cell'
 import {InvalidArgumentsError} from './errors'
 
 /**

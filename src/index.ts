@@ -4,7 +4,13 @@
  */
 
 import {CellError, ErrorType} from './Cell'
-import {CellValue, NoErrorCellValue, DetailedCellError, ExportedCellChange, ExportedNamedExpressionChange} from './CellValue'
+import {
+  CellValue,
+  DetailedCellError,
+  ExportedCellChange,
+  ExportedNamedExpressionChange,
+  NoErrorCellValue
+} from './CellValue'
 import {HyperFormula} from './HyperFormula'
 import {Config} from './Config'
 import {languages} from './i18n'
@@ -15,21 +21,21 @@ import {
   FunctionPluginValidationError,
   InvalidAddressError,
   InvalidArgumentsError,
+  MatrixFormulasNotSupportedError,
+  NamedExpressionDoesNotExist,
+  NamedExpressionNameIsAlreadyTaken,
+  NamedExpressionNameIsInvalid,
   NoOperationToRedoError,
   NoOperationToUndoError,
+  NoRelativeAddressesAllowedError,
   NoSheetWithIdError,
   NoSheetWithNameError,
   NotAFormulaError,
   NothingToPasteError,
-  SheetSizeLimitExceededError,
   SheetNameAlreadyTaken,
-  TargetLocationHasMatrixError,
+  SheetSizeLimitExceededError,
   SourceLocationHasMatrixError,
-  NoRelativeAddressesAllowedError,
-  MatrixFormulasNotSupportedError,
-  NamedExpressionDoesNotExist,
-  NamedExpressionNameIsAlreadyTaken,
-  NamedExpressionNameIsInvalid
+  TargetLocationHasMatrixError
 } from './errors'
 import * as plugins from './interpreter/plugin'
 

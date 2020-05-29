@@ -3,7 +3,7 @@
  * Copyright (c) 2020 Handsoncode. All rights reserved.
  */
 
-import {EmptyCellVertex, FormulaCellVertex, MatrixVertex, RangeVertex, ValueCellVertex, ParsingErrorVertex} from './'
+import {EmptyCellVertex, FormulaCellVertex, MatrixVertex, ParsingErrorVertex, RangeVertex, ValueCellVertex} from './'
 
 /**
  * Represents vertex which keeps values of one or more cells

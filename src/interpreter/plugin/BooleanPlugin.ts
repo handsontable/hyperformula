@@ -3,7 +3,7 @@
  * Copyright (c) 2020 Handsoncode. All rights reserved.
  */
 
-import {CellError, ErrorType, InternalScalarValue, InternalNoErrorCellValue, SimpleCellAddress} from '../../Cell'
+import {CellError, ErrorType, InternalNoErrorCellValue, InternalScalarValue, SimpleCellAddress} from '../../Cell'
 import {AstNodeType, ProcedureAst} from '../../parser'
 import {coerceScalarToBoolean} from '../ArithmeticHelper'
 import {InterpreterValue, SimpleRangeValue} from '../InterpreterValue'
