@@ -6,7 +6,7 @@
 import {CellError, ErrorType} from './Cell'
 import {Config} from './Config'
 import {DateTimeHelper} from './DateTimeHelper'
-import {UnableToParse} from './errors'
+import {UnableToParseError} from './errors'
 import {fixNegativeZero, isNumberOverflow} from './interpreter/ArithmeticHelper'
 import {NumberLiteralHelper} from './NumberLiteralHelper'
 
@@ -141,7 +141,7 @@ export class CellContentParser {
         }
       }
     } else {
-      throw new UnableToParse(content)
+      throw new UnableToParseError(content)
     }
   }
 }

@@ -18,16 +18,16 @@ import {
   InvalidAddressError,
   InvalidArgumentsError,
   MatrixFormulasNotSupportedError,
-  NamedExpressionDoesNotExist,
-  NamedExpressionNameIsAlreadyTaken,
-  NamedExpressionNameIsInvalid,
+  NamedExpressionDoesNotExistError,
+  NamedExpressionNameIsAlreadyTakenError,
+  NamedExpressionNameIsInvalidError,
   NoOperationToRedoError,
   NoOperationToUndoError,
   NoRelativeAddressesAllowedError,
   NoSheetWithIdError,
   NoSheetWithNameError,
   NothingToPasteError,
-  SheetNameAlreadyTaken,
+  SheetNameAlreadyTakenError,
   SheetSizeLimitExceededError,
   SourceLocationHasMatrixError,
   TargetLocationHasMatrixError
@@ -328,7 +328,7 @@ export class CrudOperations {
   public ensureItIsPossibleToChangeNamedExpression(expressionName: string, expression: RawCellContent, sheetScope?: string): void {
     const scopeId = this.scopeId(sheetScope)
     if (this.namedExpressions.namedExpressionForScope(expressionName, scopeId) === undefined) {
-      throw new NamedExpressionDoesNotExist(expressionName)
+      throw new NamedExpressionDoesNotExistError(expressionName)
     }
     this.ensureNamedExpressionIsValid(expression)
   }
@@ -336,7 +336,7 @@ export class CrudOperations {
   public isItPossibleToRemoveNamedExpression(expressionName: string, sheetScope?: string): void {
     const scopeId = this.scopeId(sheetScope)
     if (this.namedExpressions.namedExpressionForScope(expressionName, scopeId) === undefined) {
-      throw new NamedExpressionDoesNotExist(expressionName)
+      throw new NamedExpressionDoesNotExistError(expressionName)
     }
   }
 
@@ -483,7 +483,7 @@ export class CrudOperations {
 
   public ensureItIsPossibleToAddSheet(name: string): void {
     if (this.sheetMapping.hasSheetWithName(name)) {
-      throw new SheetNameAlreadyTaken(name)
+      throw new SheetNameAlreadyTakenError(name)
     }
   }
 
@@ -545,10 +545,10 @@ export class CrudOperations {
 
   private ensureNamedExpressionNameIsValid(expressionName: string, sheetId?: number) {
     if (!this.namedExpressions.isNameValid(expressionName)) {
-      throw new NamedExpressionNameIsInvalid(expressionName)
+      throw new NamedExpressionNameIsInvalidError(expressionName)
     }
     if (!this.namedExpressions.isNameAvailable(expressionName, sheetId)) {
-      throw new NamedExpressionNameIsAlreadyTaken(expressionName)
+      throw new NamedExpressionNameIsAlreadyTakenError(expressionName)
     }
   }
 

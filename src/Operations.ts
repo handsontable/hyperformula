@@ -30,7 +30,7 @@ import {
 import {ValueCellVertexValue} from './DependencyGraph/ValueCellVertex'
 import {
   InvalidArgumentsError,
-  NamedExpressionDoesNotExist,
+  NamedExpressionDoesNotExistError,
   NoRelativeAddressesAllowedError,
   SheetSizeLimitExceededError,
   SourceLocationHasMatrixError,
@@ -305,7 +305,7 @@ export class Operations {
   public changeNamedExpressionExpression(expressionName: string, newExpression: RawCellContent, sheetId?: number): [NamedExpression, ClipboardCell]  {
     const namedExpression = this.namedExpressions.namedExpressionForScope(expressionName, sheetId)
     if (!namedExpression) {
-      throw new NamedExpressionDoesNotExist(expressionName)
+      throw new NamedExpressionDoesNotExistError(expressionName)
     }
     const content = this.getClipboardCell(namedExpression.address)
     this.storeNamedExpressionInCell(namedExpression.address, newExpression)
@@ -315,7 +315,7 @@ export class Operations {
   public removeNamedExpression(expressionName: string, sheetId?: number): [NamedExpression, ClipboardCell] {
     const namedExpression = this.namedExpressions.namedExpressionForScope(expressionName, sheetId)
     if (!namedExpression) {
-      throw new NamedExpressionDoesNotExist(expressionName)
+      throw new NamedExpressionDoesNotExistError(expressionName)
     }
     this.namedExpressions.remove(namedExpression.displayName, sheetId)
     const content = this.getClipboardCell(namedExpression.address)

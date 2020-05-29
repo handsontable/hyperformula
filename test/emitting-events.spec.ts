@@ -3,7 +3,7 @@ import {Events} from '../src/Emitter'
 import {ErrorType} from '../src/Cell'
 
 import { adr, detailedError } from './testUtils'
-import {NamedExpressionDoesNotExist} from '../src/errors'
+import {NamedExpressionDoesNotExistError} from '../src/errors'
 
 describe('Events', () => {
   it('sheetAdded works', function() {
@@ -96,7 +96,7 @@ describe('Events', () => {
     engine.on(Events.NamedExpressionRemoved, handler)
     expect(() => {
       engine.removeNamedExpression('myName')
-    }).toThrow(new NamedExpressionDoesNotExist('myName'))
+    }).toThrow(new NamedExpressionDoesNotExistError('myName'))
   })
 
   it('namedExpressionRemoved contains actual named expression name', () => {

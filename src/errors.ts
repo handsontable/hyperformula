@@ -27,7 +27,7 @@ export class NoSheetWithNameError extends Error {
 /**
  * Error thrown when the sheet of a given name already exists.
  */
-export class SheetNameAlreadyTaken extends Error {
+export class SheetNameAlreadyTakenError extends Error {
   constructor(sheetName: string) {
     super(`Sheet with name ${sheetName} already exists`)
   }
@@ -72,7 +72,7 @@ export class InvalidArgumentsError extends Error {
 /**
  * Error thrown when the given named expression already exists in the workbook and therefore it cannot be added.
  */
-export class NamedExpressionNameIsAlreadyTaken extends Error {
+export class NamedExpressionNameIsAlreadyTakenError extends Error {
   constructor(expressionName: string) {
     super(`Name of Named Expression '${expressionName}' is already present`)
   }
@@ -81,7 +81,7 @@ export class NamedExpressionNameIsAlreadyTaken extends Error {
 /**
  * Error thrown when the name given for the named expression is invalid.
  */
-export class NamedExpressionNameIsInvalid extends Error {
+export class NamedExpressionNameIsInvalidError extends Error {
   constructor(expressionName: string) {
     super(`Name of Named Expression '${expressionName}' is invalid`)
   }
@@ -90,7 +90,7 @@ export class NamedExpressionNameIsInvalid extends Error {
 /**
  * Error thrown when the given named expression does not exist.
  */
-export class NamedExpressionDoesNotExist extends Error {
+export class NamedExpressionDoesNotExistError extends Error {
   constructor(expressionName: string) {
     super(`Named Expression '${expressionName}' does not exist`)
   }
@@ -146,7 +146,7 @@ function replacer(key: any, val: any): any {
  * @see [[buildFromSheets]]
  * @see [[setCellsContents]]
  */
-export class UnableToParse extends Error {
+export class UnableToParseError extends Error {
   constructor(value: any) {
     super(`Unable to parse value: ${JSON.stringify(value, replacer, 4)}`)
   }
@@ -163,7 +163,7 @@ export class UnableToParse extends Error {
  * @see [[buildFromSheets]]
  * @see [[updateConfig]]
  */
-export class ExpectedValueOfType extends Error {
+export class ExpectedValueOfTypeError extends Error {
   constructor(expectedType: string, paramName: string) {
     super(`Expected value of type: ${expectedType} for config parameter: ${paramName}`)
   }
@@ -212,7 +212,7 @@ export class ConfigValueTooBigError extends Error {
  * @see [[buildFromSheets]]
  * @see [[updateConfig]]
  */
-export class ExpectedOneOfValues extends Error {
+export class ExpectedOneOfValuesError extends Error {
   constructor(values: string, paramName: string) {
     super(`Expected one of ${values} for config parameter: ${paramName}`)
   }
