@@ -46,6 +46,8 @@ export function defaultParseToDateTime(dateTimeString: string, dateFormat: strin
   }
 }
 
+export const secondsExtendedRegexp = /^ss\.(s+|0+)$/
+
 export function defaultParseToTime(timeItems: string[], timeFormat: string): Maybe<SimpleTime> {
   timeFormat = timeFormat.toLowerCase()
   if (timeFormat.endsWith('am/pm')) {
@@ -63,7 +65,7 @@ export function defaultParseToTime(timeItems: string[], timeFormat: string): May
     timeItems.pop()
   }
   let fractionOfSecondPrecision: number = 0
-  if(formatItems.length >= 1 && /^ss\.(s+|0+)/.test(formatItems[formatItems.length-1])) {
+  if(formatItems.length >= 1 && secondsExtendedRegexp.test(formatItems[formatItems.length-1])) {
     fractionOfSecondPrecision = formatItems[formatItems.length-1].length-3
     formatItems[formatItems.length-1] = 'ss'
   }

@@ -5,6 +5,7 @@
 
 import {InternalCellValue} from '../Cell'
 import {Config} from '../Config'
+import {secondsExtendedRegexp} from '../DateTimeDefault'
 import {DateTimeHelper, SimpleDateTime, SimpleTime} from '../DateTimeHelper'
 import {Maybe} from '../Maybe'
 import {FormatToken, parseForDateTimeFormat, parseForNumberFormat, TokenType} from './parser'
@@ -93,7 +94,7 @@ export function defaultStringifyDuration(time: SimpleTime, formatArg: string): M
       continue
     }
 
-    if(/^ss\.s+/.test(token.value) || /^ss\.0+/.test(token.value)) {
+    if(secondsExtendedRegexp.test(token.value)) {
       const fractionOfSecondPrecision = token.value.length-3
       result += (time.second < 10 ? '0' : '') + Math.round(time.second * Math.pow(10, fractionOfSecondPrecision))/Math.pow(10, fractionOfSecondPrecision)
       continue
@@ -161,7 +162,7 @@ export function defaultStringifyDateTime(dateTime: SimpleDateTime, formatArg: st
       continue
     }
 
-    if(/^ss\.(s+|0+)/.test(token.value)) {
+    if(secondsExtendedRegexp.test(token.value)) {
       const fractionOfSecondPrecision = token.value.length-3
       result += (dateTime.second < 10 ? '0' : '') + Math.round(dateTime.second * Math.pow(10, fractionOfSecondPrecision))/Math.pow(10, fractionOfSecondPrecision)
       continue
