@@ -97,6 +97,11 @@ export class ParserWithCaching {
     return {ast, errors: [], hasVolatileFunction, hasStructuralChangeFunction, dependencies: relativeDependencies}
   }
 
+  public fetchCachedResultForAst(ast: Ast): ParsingResult {
+    const hash = this.computeHashFromAst(ast)
+    return this.fetchCachedResult(hash)
+  }
+
   public fetchCachedResult(hash: string): ParsingResult {
     const cacheResult = this.cache.get(hash)
     if (cacheResult === null) {

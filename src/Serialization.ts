@@ -3,13 +3,14 @@
  * Copyright (c) 2020 Handsoncode. All rights reserved.
  */
 
-import {NoErrorCellValue, simpleCellAddress, SimpleCellAddress} from './Cell'
+import {InternalScalarValue, NoErrorCellValue, simpleCellAddress, SimpleCellAddress} from './Cell'
 import {CellValue, DetailedCellError, Exporter} from './CellValue'
 import {Config} from './Config'
 import {DependencyGraph, FormulaCellVertex, MatrixVertex, ParsingErrorVertex} from './DependencyGraph'
 import {Maybe} from './Maybe'
 import {buildLexerConfig, Unparser} from './parser'
 import {NamedExpressions} from './NamedExpressions'
+import {SimpleRangeValue} from './interpreter/InterpreterValue'
 
 export class Serialization {
   constructor(
@@ -51,7 +52,7 @@ export class Serialization {
   }
 
   public getCellValue(address: SimpleCellAddress): CellValue {
-    return this.exporter.exportValue(this.dependencyGraph.getCellValue(address))
+    return this.exporter.exportValue(this.dependencyGraph.getScalarValue(address))
   }
 
   public getSheetValues(sheet: number): CellValue[][] {

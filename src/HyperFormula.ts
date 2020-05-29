@@ -30,7 +30,8 @@ import {NamedExpressions} from './NamedExpressions'
 import {
   Ast,
   AstNodeType,
-  ParserWithCaching, RelativeDependency,
+  ParserWithCaching,
+  RelativeDependency,
   simpleCellAddressFromString,
   simpleCellAddressToString,
   Unparser,
@@ -2471,19 +2472,53 @@ export class HyperFormula implements TypedEmitter {
   }
 
   /**
+   * Returns information whether it is possible to add named expression into a specific scope.
+   * Checks against particular rules to ascertain that addNamedExpression can be called.
+   * If returns `true`, doing [[addNamedExpression]] operation won't throw any errors.
+   * Returns `false` if the operation might be disrupted.
+   *
+   * @param {string} expressionName - a name of the expression to be added
+   * @param {RawCellContent} expression - the expression
+   * @param {string?} scope - sheet name or undefined for global scope
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromArray([
+   *  ['42'],
+   * ]);
+   *
+   * // should return 'true' for this example,
+   * // it is possible to add named expression to global scope
+   * const isAddable = hfInstance.isItPossibleToAddNamedExpression('prettyName', '=Sheet1!$A$1+100');
+   * ```
+   *
+   * @category Named Expressions
+   */
+  public isItPossibleToAddNamedExpression(expressionName: string, expression: RawCellContent, scope?: string): boolean {
+    try {
+      this._crudOperations.ensureItIsPossibleToAddNamedExpression(expressionName, expression, scope)
+      return true
+    } catch (e) {
+      return false
+    }
+  }
+
+  /**
    * Adds a specified named expression.
    *
    * Note that this method may trigger dependency graph recalculation.
    *
    * @param {string} expressionName - a name of the expression to be added
    * @param {RawCellContent} expression - the expression
-   * @param {string | undefined} sheetScope - scope definition, `sheetName` for local scope or `undefined` for global scope
+   * @param {string?} scope - scope definition, `sheetName` for local scope or `undefined` for global scope
    *
    * @fires [[namedExpressionAdded]] always, unless [[batch]] mode is used
    * @fires [[valuesUpdated]] if recalculation was triggered by this change
    *
-   * @throws [[NamedExpressionNameIsAlreadyTaken]] when the named expression is not available.
-   * @throws [[NamedExpressionNameIsInvalid]] when the named expression is not valid
+   * @throws [[NamedExpressionNameIsAlreadyTaken]] when the named expression name is not available.
+   * @throws [[NamedExpressionNameIsInvalid]] when the named expression name is not valid
+   * @throws [[MatrixFormulasNotSupportedError]] when the named expression formula is a Matrix formula
+   * @throws [[NoRelativeAddressesAllowedError]] when the named expression formula contains relative references
    * @throws [[NoSheetWithNameError]] when the given sheet name does not exists
    *
    * @example
@@ -2499,13 +2534,13 @@ export class HyperFormula implements TypedEmitter {
    * //   name: 'prettyName',
    * //   newValue: 142,
    * // }]
-   * const changes = hfInstance.addNamedExpression('prettyName', '=Sheet1!A1+100', 'Sheet1');
+   * const changes = hfInstance.addNamedExpression('prettyName', '=Sheet1!$A$1+100', 'Sheet1');
    * ```
    *
    * @category Named Expressions
    */
-  public addNamedExpression(expressionName: string, expression: RawCellContent, sheetScope: string | undefined): ExportedChange[] {
-    this._crudOperations.addNamedExpression(expressionName, expression, sheetScope)
+  public addNamedExpression(expressionName: string, expression: RawCellContent, scope?: string): ExportedChange[] {
+    this._crudOperations.addNamedExpression(expressionName, expression, scope)
     const changes = this.recomputeIfDependencyGraphNeedsIt()
     this._emitter.emit(Events.NamedExpressionAdded, expressionName, changes)
     return changes
@@ -2516,7 +2551,7 @@ export class HyperFormula implements TypedEmitter {
    * Returns a [[CellValue]] or undefined if the given named expression does not exists.
    *
    * @param {string} expressionName - expression name, case insensitive.
-   * @param {string | undefined} sheetScope - scope definition, `sheetName` for local scope or `undefined` for global scope
+   * @param {string?} sheetScope - scope definition, `sheetName` for local scope or `undefined` for global scope
    *
    * @throws [[NoSheetWithNameError]] when the given sheet name does not exists
    *
@@ -2535,12 +2570,12 @@ export class HyperFormula implements TypedEmitter {
    *
    * @category Named Expressions
    */
-  public getNamedExpressionValue(expressionName: string, sheetScope: string | undefined = undefined): Maybe<CellValue> {
+  public getNamedExpressionValue(expressionName: string, scope?: string): Maybe<CellValue> {
     this.ensureEvaluationIsNotSuspended()
     let sheetId = undefined
-    if (sheetScope !== undefined) {
-      this._crudOperations.ensureSheetExists(sheetScope)
-      sheetId = this.sheetMapping.fetch(sheetScope)
+    if (scope !== undefined) {
+      this._crudOperations.ensureSheetExists(scope)
+      sheetId = this.sheetMapping.fetch(scope)
     }
     const namedExpression = this._namedExpressions.namedExpressionForScope(expressionName, sheetId)
     if (namedExpression) {
@@ -2555,7 +2590,7 @@ export class HyperFormula implements TypedEmitter {
    * Unparses AST.
    *
    * @param {string} expressionName - expression name, case insensitive.
-   * @param {string | undefined} sheetScope - scope definition, `sheetName` for local scope or `undefined` for global scope
+   * @param {string?} sheetScope - scope definition, `sheetName` for local scope or `undefined` for global scope
    *
    * @throws [[NoSheetWithNameError]] when the given sheet name does not exists
    *
@@ -2575,11 +2610,11 @@ export class HyperFormula implements TypedEmitter {
    *
    * @category Named Expressions
    */
-  public getNamedExpressionFormula(expressionName: string, sheetScope: string | undefined = undefined): Maybe<string> {
+  public getNamedExpressionFormula(expressionName: string, scope?: string): Maybe<string> {
     let sheetId = undefined
-    if (sheetScope !== undefined) {
-      this._crudOperations.ensureSheetExists(sheetScope)
-      sheetId = this.sheetMapping.fetch(sheetScope)
+    if (scope !== undefined) {
+      this._crudOperations.ensureSheetExists(scope)
+      sheetId = this.sheetMapping.fetch(scope)
     }
     const namedExpression = this._namedExpressions.namedExpressionForScope(expressionName, sheetId)
     if (namedExpression === undefined) {
@@ -2590,14 +2625,119 @@ export class HyperFormula implements TypedEmitter {
   }
 
   /**
+   * Returns information whether it is possible to change named expression in a specific scope.
+   * Checks against particular rules to ascertain that changeNamedExpression can be called.
+   * If returns `true`, doing [[changeNamedExpression]] operation won't throw any errors.
+   * Returns `false` if the operation might be disrupted.
+   *
+   * @param {string} expressionName - an expression name, case insensitive.
+   * @param {RawCellContent} newExpression - a new expression
+   * @param {string?} scope - sheet name or undefined for global scope
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromArray([
+   *  ['42'],
+   * ]);
+   *
+   * // add a named expression
+   * hfInstance.addNamedExpression('prettyName', '=Sheet1!$A$1+100');
+   *
+   * // should return 'true' for this example,
+   * // it is possible to change named expression
+   * const isAddable = hfInstance.isItPossibleToChangeNamedExpression('prettyName', '=Sheet1!$A$1+100');
+   * ```
+   *
+   * @category Named Expressions
+   */
+  public isItPossibleToChangeNamedExpression(expressionName: string, newExpression: RawCellContent, scope?: string): boolean {
+    try {
+      this._crudOperations.ensureItIsPossibleToChangeNamedExpression(expressionName, newExpression, scope)
+      return true
+    } catch (e) {
+      return false
+    }
+  }
+
+  /**
    * Changes a given named expression to a specified formula.
    *
    * Note that this method may trigger dependency graph recalculation.
    *
    * @param {string} expressionName - an expression name, case insensitive.
-   * @param {string | undefined} sheetScope - scope definition, `sheetName` for local scope or `undefined` for global scope
    * @param {RawCellContent} newExpression - a new expression
+   * @param {string?} scope - scope definition, `sheetName` for local scope or `undefined` for global scope
    *
+   * @fires [[valuesUpdated]] if recalculation was triggered by this change
+   *
+   * @throws [[NamedExpressionDoesNotExist]] when the given expression does not exist.
+   * @throws [[NoSheetWithNameError]] when the given sheet name does not exists
+   * @throws [[MatrixFormulasNotSupportedError]] when the named expression formula is a Matrix formula
+   * @throws [[NoRelativeAddressesAllowedError]] when the named expression formula contains relative references
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromArray([
+   *  ['42'],
+   * ]);
+   *
+   * // add a named expression, scope limited to 'Sheet1'
+   * hfInstance.addNamedExpression('prettyName', 'Sheet1', '=Sheet1!$A$1+100');
+   *
+   * // change the named expression
+   * const changes = hfInstance.changeNamedExpression('prettyName', '=Sheet1!$A$1+200');
+   * ```
+   *
+   * @category Named Expressions
+   */
+  public changeNamedExpression(expressionName: string, newExpression: RawCellContent, scope?: string): ExportedChange[] {
+    this._crudOperations.changeNamedExpressionExpression(expressionName, scope, newExpression)
+    return this.recomputeIfDependencyGraphNeedsIt()
+  }
+
+  /**
+   * Returns information whether it is possible to remove named expression from a specific scope.
+   * Checks against particular rules to ascertain that removeNamedExpression can be called.
+   * If returns `true`, doing [[removeNamedExpression]] operation won't throw any errors.
+   * Returns `false` if the operation might be disrupted.
+   *
+   * @param {string} expressionName - an expression name, case insensitive.
+   * @param {string?} scope - sheet name or undefined for global scope
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromArray([
+   *  ['42'],
+   * ]);
+   *
+   * // add a named expression
+   * hfInstance.addNamedExpression('prettyName', '=Sheet1!$A$1+100');
+   *
+   * // should return 'true' for this example,
+   * // it is possible to change named expression
+   * const isAddable = hfInstance.isItPossibleToRemoveNamedExpression('prettyName');
+   * ```
+   *
+   * @category Named Expressions
+   */
+  public isItPossibleToRemoveNamedExpression(expressionName: string, scope?: string): boolean {
+    try {
+      this._crudOperations.isItPossibleToRemoveNamedExpression(expressionName, scope)
+      return true
+    } catch (e) {
+      return false
+    }
+  }
+
+  /**
+   * Removes a named expression.
+   *
+   * Note that this method may trigger dependency graph recalculation.
+   *
+   * @param {string} expressionName - expression name, case insensitive.
+   * @param {string?} sheetScope - scope definition, `sheetName` for local scope or `undefined` for global scope
+   *
+   * @fires [[namedExpressionRemoved]] after the expression was removed
    * @fires [[valuesUpdated]] if recalculation was triggered by this change
    *
    * @throws [[NamedExpressionDoesNotExist]] when the given expression does not exist.
@@ -2609,39 +2749,8 @@ export class HyperFormula implements TypedEmitter {
    *  ['42'],
    * ]);
    *
-   * // add a named expression, scope limited to 'Sheet1'
-   * hfInstance.addNamedExpression('prettyName', 'Sheet1', '=Sheet1!A1+100');
-   *
-   * // change the named expression
-   * const changes = hfInstance.changeNamedExpression('prettyName', '=Sheet1!A1+200');
-   * ```
-   *
-   * @category Named Expressions
-   */
-  public changeNamedExpression(expressionName: string, sheetScope: string | undefined, newExpression: RawCellContent): ExportedChange[] {
-    this._crudOperations.changeNamedExpressionExpression(expressionName, sheetScope, newExpression)
-    return this.recomputeIfDependencyGraphNeedsIt()
-  }
-
-  /**
-   * Removes a named expression.
-   *
-   * Note that this method may trigger dependency graph recalculation.
-   *
-   * @param {string} expressionName - expression name, case insensitive.
-   * @param {string | undefined} sheetScope - scope definition, `sheetName` for local scope or `undefined` for global scope
-   *
-   * @fires [[namedExpressionRemoved]] after the expression was removed
-   * @fires [[valuesUpdated]] if recalculation was triggered by this change
-   *
-   * @example
-   * ```js
-   * const hfInstance = HyperFormula.buildFromArray([
-   *  ['42'],
-   * ]);
-   *
    * // add a named expression
-   * hfInstance.addNamedExpression('prettyName', '=Sheet1!A1+100', 'Sheet1');
+   * hfInstance.addNamedExpression('prettyName', '=Sheet1!$A$1+100', 'Sheet1');
    *
    * // remove the named expression
    * const changes = hfInstance.removeNamedExpression('prettyName', 'Sheet1');
@@ -2649,8 +2758,8 @@ export class HyperFormula implements TypedEmitter {
    *
    * @category Named Expressions
    */
-  public removeNamedExpression(expressionName: string, sheetScope: string | undefined): ExportedChange[] {
-    const removedNamedExpression = this._crudOperations.removeNamedExpression(expressionName, sheetScope)
+  public removeNamedExpression(expressionName: string, scope?: string): ExportedChange[] {
+    const removedNamedExpression = this._crudOperations.removeNamedExpression(expressionName, scope)
     if (removedNamedExpression) {
       const changes = this.recomputeIfDependencyGraphNeedsIt()
       this._emitter.emit(Events.NamedExpressionRemoved, removedNamedExpression.displayName, changes)

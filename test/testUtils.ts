@@ -1,6 +1,6 @@
 import {CellValue, DetailedCellError, HyperFormula} from '../src'
 import {AbsoluteCellRange, AbsoluteColumnRange, AbsoluteRowRange} from '../src/AbsoluteCellRange'
-import {CellError, ErrorType, InternalCellValue, SimpleCellAddress, simpleCellAddress} from '../src/Cell'
+import {CellError, ErrorType, InternalScalarValue, SimpleCellAddress, simpleCellAddress} from '../src/Cell'
 import {Config} from '../src/Config'
 import {DateTimeHelper} from '../src/DateTimeHelper'
 import {FormulaCellVertex, MatrixVertex} from '../src/DependencyGraph'
@@ -122,7 +122,7 @@ export function dateNumberToString(dateNumber: CellValue, config: Config): strin
   return dateString ? dateString : ''
 }
 
-export function expectCloseTo(actual: InternalCellValue, expected: number, precision: number = 0.000001) {
+export function expectCloseTo(actual: InternalScalarValue, expected: number, precision: number = 0.000001) {
   if (typeof actual !== 'number') {
     expect(true).toBe(false)
   } else {

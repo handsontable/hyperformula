@@ -5,6 +5,7 @@ import {Config} from '../src/Config'
 import {plPL} from '../src/i18n'
 import {detailedError} from './testUtils'
 import {NamedExpressions} from '../src/NamedExpressions'
+import {OnlyRangeData, SimpleRangeValue} from '../src/interpreter/InterpreterValue'
 
 const namedExpressionsMock = {} as NamedExpressions
 

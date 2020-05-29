@@ -24,7 +24,12 @@ import {
   SheetSizeLimitExceededError,
   SheetNameAlreadyTaken,
   TargetLocationHasMatrixError,
-  SourceLocationHasMatrixError
+  SourceLocationHasMatrixError,
+  NoRelativeAddressesAllowedError,
+  MatrixFormulasNotSupportedError,
+  NamedExpressionDoesNotExist,
+  NamedExpressionNameIsAlreadyTaken,
+  NamedExpressionNameIsInvalid
 } from './errors'
 import * as plugins from './interpreter/plugin'
 
@@ -52,6 +57,11 @@ class HyperFormulaNS extends HyperFormula {
   public static CellError = CellError
   public static InvalidArgumentsError = InvalidArgumentsError
   public static FunctionPluginValidationError = FunctionPluginValidationError
+  public static NoRelativeAddressesAllowedError = NoRelativeAddressesAllowedError
+  public static MatrixFormulasNotSupportedError = MatrixFormulasNotSupportedError
+  public static NamedExpressionDoesNotExist = NamedExpressionDoesNotExist
+  public static NamedExpressionNameIsAlreadyTaken = NamedExpressionNameIsAlreadyTaken
+  public static NamedExpressionNameIsInvalid = NamedExpressionNameIsInvalid
 }
 
 const defaultLanguage = Config.defaultConfig.language
@@ -88,6 +98,11 @@ export {
   NothingToPasteError,
   EvaluationSuspendedError,
   FunctionPluginValidationError,
+  NoRelativeAddressesAllowedError,
+  MatrixFormulasNotSupportedError,
+  NamedExpressionDoesNotExist,
+  NamedExpressionNameIsAlreadyTaken,
+  NamedExpressionNameIsInvalid,
   ErrorType,
   SheetNameAlreadyTaken,
   TargetLocationHasMatrixError,

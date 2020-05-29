@@ -427,6 +427,12 @@ describe('Integration', () => {
     expect(engine.getCellValueType(adr('C1'))).toBe(CellValueType.ERROR)
   })
 
+  it('#getCellValueType formula evaluating to range', () => {
+    const engine = HyperFormula.buildFromArray([['=B1:B2', '=C:D']])
+    expect(engine.getCellValueType(adr('A1'))).toBe(CellValueType.ERROR)
+    expect(engine.getCellValueType(adr('B1'))).toBe(CellValueType.ERROR)
+  })
+
   it('exporting translated errors', () => {
     const engine = HyperFormula.buildFromArray([
       ['=#VALUE!'],

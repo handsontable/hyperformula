@@ -244,6 +244,9 @@ export class MissingTranslationError extends Error {
   }
 }
 
+/**
+ * Error thrown when function plugin is invalid.
+ * */
 export class FunctionPluginValidationError extends Error {
   public static functionNotDeclaredInPlugin(formulaId: string, pluginName: string): FunctionPluginValidationError {
     return new FunctionPluginValidationError(`Formula with id ${formulaId} not declared in plugin ${pluginName}`)
@@ -269,5 +272,23 @@ export class SourceLocationHasMatrixError extends Error {
 export class TargetLocationHasMatrixError extends Error {
   constructor() {
     super('Cannot perform this operation, target location has a matrix inside.')
+  }
+}
+
+/**
+ * Error thrown when trying to use matrix expression as named expression.
+ */
+export class MatrixFormulasNotSupportedError extends Error {
+  constructor() {
+    super('Matrix formulas are not supported in named expressions.')
+  }
+}
+
+/**
+ * Error thrown when named expression contains relative addresses.
+ * */
+export class NoRelativeAddressesAllowedError extends Error {
+  constructor() {
+    super('Relative addresses not allowed in named expressions.')
   }
 }

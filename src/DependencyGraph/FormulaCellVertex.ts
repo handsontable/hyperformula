@@ -3,7 +3,7 @@
  * Copyright (c) 2020 Handsoncode. All rights reserved.
  */
 
-import {InternalCellValue, SimpleCellAddress} from '../Cell'
+import {InternalScalarValue, InternalCellValue, SimpleCellAddress} from '../Cell'
 import {LazilyTransformingAstService} from '../LazilyTransformingAstService'
 import {Ast} from '../parser'
 

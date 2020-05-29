@@ -3,7 +3,7 @@
  * Copyright (c) 2020 Handsoncode. All rights reserved.
  */
 
-import {InternalCellValue} from '../Cell'
+import {InternalScalarValue} from '../Cell'
 import {Maybe} from '../Maybe'
 import {ArithmeticHelper} from './ArithmeticHelper'
 
@@ -23,7 +23,7 @@ export const buildCriterion = (operator: CriterionType, value: number | string) 
 
 export class CriterionPackage {
 
-  public static fromCellValue(raw: InternalCellValue, arithmeticHelper: ArithmeticHelper): Maybe<CriterionPackage> {
+  public static fromCellValue(raw: InternalScalarValue, arithmeticHelper: ArithmeticHelper): Maybe<CriterionPackage> {
     if (typeof raw !== 'string') {
       return undefined
     }
@@ -44,7 +44,7 @@ export class CriterionPackage {
 
 const ANY_CRITERION_REGEX = /([<>=]+)(.*)/
 
-export const parseCriterion = (criterion: InternalCellValue): Maybe<Criterion> => {
+export const parseCriterion = (criterion: InternalScalarValue): Maybe<Criterion> => {
   if (typeof criterion === 'number') {
     return buildCriterion(CriterionType.EQUAL, criterion)
   } else if (typeof criterion === 'string') {
@@ -78,7 +78,7 @@ export const parseCriterion = (criterion: InternalCellValue): Maybe<Criterion> =
   return undefined
 }
 
-export type CriterionLambda = (cellValue: InternalCellValue) => boolean | null
+export type CriterionLambda = (cellValue: InternalScalarValue) => boolean | null
 export const buildCriterionLambda = (criterion: Criterion, arithmeticHelper: ArithmeticHelper): CriterionLambda => {
   switch (criterion.operator) {
     case CriterionType.GREATER_THAN: {

@@ -3,7 +3,7 @@
  * Copyright (c) 2020 Handsoncode. All rights reserved.
  */
 
-import {CellError, ErrorType, InternalCellValue, SimpleCellAddress} from '../../Cell'
+import {CellError, ErrorType, InternalScalarValue, SimpleCellAddress} from '../../Cell'
 import {AstNodeType, ProcedureAst} from '../../parser'
 import {FunctionPlugin} from './FunctionPlugin'
 
@@ -21,7 +21,7 @@ export class MathConstantsPlugin extends FunctionPlugin {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  public pi(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
+  public pi(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     if (ast.args.length > 0) {
       return new CellError(ErrorType.NA)
     }
@@ -32,7 +32,7 @@ export class MathConstantsPlugin extends FunctionPlugin {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  public e(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
+  public e(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     if (ast.args.length > 0) {
       return new CellError(ErrorType.NA)
     }
