@@ -122,7 +122,7 @@ export function dateNumberToString(dateNumber: CellValue, config: Config): strin
   return dateString ? dateString : ''
 }
 
-export function expectCloseTo(actual: InternalScalarValue, expected: number, precision: number = 0.000001) {
+export function expectCloseTo(actual: CellValue, expected: number, precision: number = 0.000001) {
   if (typeof actual !== 'number') {
     expect(true).toBe(false)
   } else {

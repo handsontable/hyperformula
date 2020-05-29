@@ -39,8 +39,8 @@ describe('Replace sheet content', () => {
 
     expect(engine.getCellValue(adr('A1'))).toEqual(3)
     expect(engine.getCellValue(adr('B1'))).toEqual(4)
-    expect(engine.getCellValue(adr('A2'))).toEqual(EmptyValue)
-    expect(engine.getCellValue(adr('B2'))).toEqual(EmptyValue)
+    expect(engine.getCellValue(adr('A2'))).toBe(null)
+    expect(engine.getCellValue(adr('B2'))).toBe(null)
   })
 
   /* for now return only new values */
@@ -72,8 +72,8 @@ describe('Replace sheet content', () => {
     expectArrayWithSameContent(changes, [
       new ExportedCellChange(simpleCellAddress(0, 0, 0), 3),
       new ExportedCellChange(simpleCellAddress(0, 1, 0), 4),
-      new ExportedCellChange(simpleCellAddress(0, 0, 1), EmptyValue),
-      new ExportedCellChange(simpleCellAddress(0, 1, 1), EmptyValue),
+      new ExportedCellChange(simpleCellAddress(0, 0, 1), null),
+      new ExportedCellChange(simpleCellAddress(0, 1, 1), null),
     ])
   })
 
@@ -91,7 +91,7 @@ describe('Replace sheet content', () => {
     engine.setSheetContent('Sheet1', [['3']])
 
     expect(engine.getCellValue(adr('A1', 1))).toEqual(3)
-    expect(engine.getCellValue(adr('A2', 1))).toEqual(EmptyValue)
+    expect(engine.getCellValue(adr('A2', 1))).toBe(null)
   })
 
   it('should replace content of a sheet with formula matrix', () => {
@@ -112,7 +112,7 @@ describe('Replace sheet content', () => {
     ])
 
     expect(engine.getCellValue(adr('A1', 1))).toEqual('foo')
-    expect(engine.getCellValue(adr('A2', 1))).toEqual(EmptyValue)
+    expect(engine.getCellValue(adr('A2', 1))).toBe(null)
   })
 
   it('should replace content of a sheet with formula matrix and recalculate range formula', () => {

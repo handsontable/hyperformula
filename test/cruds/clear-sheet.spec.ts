@@ -32,8 +32,8 @@ describe('Clear sheet content', () => {
 
     engine.clearSheet('Sheet1')
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(EmptyValue)
-    expect(engine.getCellValue(adr('B1'))).toEqual(EmptyValue)
+    expect(engine.getCellValue(adr('A1'))).toBe(null)
+    expect(engine.getCellValue(adr('B1'))).toBe(null)
   })
 
   it('should recalculate and return changes', () => {
@@ -49,7 +49,7 @@ describe('Clear sheet content', () => {
 
     const changes = engine.clearSheet('Sheet1')
 
-    expect(engine.getCellValue(adr('A1', 1))).toEqual(EmptyValue)
+    expect(engine.getCellValue(adr('A1', 1))).toBe(null)
     expect(engine.getCellValue(adr('A2', 1))).toEqual(1)
 
     expect(changes.length).toEqual(2)
@@ -68,8 +68,8 @@ describe('Clear sheet content', () => {
 
     const changes = engine.clearSheet('Sheet1')
 
-    expect(engine.getCellValue(adr('A1', 1))).toEqual(EmptyValue)
-    expect(engine.getCellValue(adr('A2', 1))).toEqual(EmptyValue)
+    expect(engine.getCellValue(adr('A1', 1))).toBe(null)
+    expect(engine.getCellValue(adr('A2', 1))).toBe(null)
 
     expect(changes.length).toEqual(2)
   })
@@ -88,8 +88,8 @@ describe('Clear sheet content', () => {
 
     const changes = engine.clearSheet('Sheet1')
 
-    expect(engine.getCellValue(adr('A1', 1))).toEqual(EmptyValue)
-    expect(engine.getCellValue(adr('A2', 1))).toEqual(EmptyValue)
+    expect(engine.getCellValue(adr('A1', 1))).toBe(null)
+    expect(engine.getCellValue(adr('A2', 1))).toBe(null)
 
     expect(changes.length).toEqual(2)
   })

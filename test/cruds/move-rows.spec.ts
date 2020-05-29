@@ -158,8 +158,8 @@ describe('Move rows', () => {
     engine.moveRows(0, 1, 2, 5)
 
     expect(engine.getCellValue(adr('A1'))).toEqual(1)
-    expect(engine.getCellValue(adr('A2'))).toEqual(EmptyValue)
-    expect(engine.getCellValue(adr('A3'))).toEqual(EmptyValue)
+    expect(engine.getCellValue(adr('A2'))).toBe(null)
+    expect(engine.getCellValue(adr('A3'))).toBe(null)
     expect(engine.getCellValue(adr('A4'))).toEqual(2)
     expect(engine.getCellValue(adr('A5'))).toEqual(3)
   })

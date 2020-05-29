@@ -121,7 +121,7 @@ describe('Adding column - matrix check', () => {
 
     engine.addColumns(0, [0, 1])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(EmptyValue)
+    expect(engine.getCellValue(adr('A1'))).toBe(null)
     expect(engine.getCellValue(adr('B1'))).toEqual(1)
     expect(engine.getCellValue(adr('C1'))).toEqual(3)
     expect(engine.getCellValue(adr('D1'))).toEqual(1)
@@ -137,7 +137,7 @@ describe('Adding column - matrix check', () => {
 
     expect(engine.getCellValue(adr('A1'))).toEqual(1)
     expect(engine.getCellValue(adr('B1'))).toEqual(3)
-    expect(engine.getCellValue(adr('C1'))).toEqual(EmptyValue)
+    expect(engine.getCellValue(adr('C1'))).toBe(null)
     expect(engine.getCellValue(adr('D1'))).toEqual(1)
   })
 })

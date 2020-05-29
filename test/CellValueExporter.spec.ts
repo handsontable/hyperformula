@@ -5,7 +5,6 @@ import {Config} from '../src/Config'
 import {plPL} from '../src/i18n'
 import {detailedError} from './testUtils'
 import {NamedExpressions} from '../src/NamedExpressions'
-import {OnlyRangeData, SimpleRangeValue} from '../src/interpreter/InterpreterValue'
 
 const namedExpressionsMock = {} as NamedExpressions
 
@@ -20,7 +19,7 @@ describe( 'rounding', () => {
     expect(cellValueExporter.exportValue(true)).toBe(true)
     expect(cellValueExporter.exportValue(false)).toBe(false)
     expect(cellValueExporter.exportValue(1)).toBe(1)
-    expect(cellValueExporter.exportValue(EmptyValue)).toBe(EmptyValue)
+    expect(cellValueExporter.exportValue(EmptyValue)).toBe(null)
     expect(cellValueExporter.exportValue('abcd')).toBe('abcd')
   })
 
@@ -36,7 +35,7 @@ describe( 'rounding', () => {
     expect(cellValueExporter.exportValue(true)).toBe(true)
     expect(cellValueExporter.exportValue(false)).toBe(false)
     expect(cellValueExporter.exportValue(1)).toBe(1)
-    expect(cellValueExporter.exportValue(EmptyValue)).toBe(EmptyValue)
+    expect(cellValueExporter.exportValue(EmptyValue)).toBe(null)
     expect(cellValueExporter.exportValue('abcd')).toBe('abcd')
   })
 })

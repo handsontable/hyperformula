@@ -124,7 +124,7 @@ describe('changing cell content', () => {
     const a2 = engine.addressMapping.fetchCell(adr('B1'))
     expect(a1).toBeInstanceOf(EmptyCellVertex)
     expect(engine.graph.existsEdge(a1, a2)).toBe(true)
-    expect(engine.getCellValue(adr('A1'))).toBe(EmptyValue)
+    expect(engine.getCellValue(adr('A1'))).toBe(null)
   })
 
   it('update formula to empty cell', () => {
@@ -139,7 +139,7 @@ describe('changing cell content', () => {
     expect(engine.getCellValue(adr('B1'))).toBe(1)
 
     engine.setCellContents(adr('B1'), [[null]])
-    expect(engine.getCellValue(adr('B1'))).toBe(EmptyValue)
+    expect(engine.getCellValue(adr('B1'))).toBe(null)
     expect(engine.graph.nodes).not.toContain(b1)
     expect(engine.graph.existsEdge(a1, b1)).toBe(false)
   })
@@ -199,7 +199,7 @@ describe('changing cell content', () => {
     expect(engine.getCellValue(adr('B1'))).toBe(2)
     engine.setCellContents(adr('B1'), null)
     expect(engine.addressMapping.getCell(adr('B1'))).toBe(null)
-    expect(engine.getCellValue(adr('B1'))).toBe(EmptyValue)
+    expect(engine.getCellValue(adr('B1'))).toBe(null)
   })
 
   it('update value cell to error literal', () => {
@@ -296,7 +296,7 @@ describe('changing cell content', () => {
     engine.setCellContents(adr('A1'), null)
     const a1 = engine.addressMapping.getCell(adr('A1'))
     expect(a1).toBe(null)
-    expect(engine.getCellValue(adr('A1'))).toBe(EmptyValue)
+    expect(engine.getCellValue(adr('A1'))).toBe(null)
   })
 
   it('set number for the first time', () => {

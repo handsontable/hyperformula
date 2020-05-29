@@ -21,7 +21,7 @@ describe('batch cruds', () => {
 
     expect(evaluatorSpy).toHaveBeenCalledTimes(1)
     expect(engine.getCellValue(adr('A1'))).toEqual('foo')
-    expect(engine.getCellValue(adr('A2'))).toEqual(EmptyValue)
+    expect(engine.getCellValue(adr('A2'))).toBe(null)
     expect(engine.getCellValue(adr('A3'))).toEqual('bar')
   })
 
@@ -49,7 +49,7 @@ describe('batch cruds', () => {
 
     expect(evaluatorSpy).toHaveBeenCalledTimes(1)
     expect(engine.getCellValue(adr('A1'))).toEqual('foo')
-    expect(engine.getCellValue(adr('A2'))).toEqual(EmptyValue)
+    expect(engine.getCellValue(adr('A2'))).toBe(null)
     expect(engine.getCellValue(adr('A3'))).toEqual('bar')
   })
 })

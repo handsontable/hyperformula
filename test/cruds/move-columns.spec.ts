@@ -139,8 +139,8 @@ describe('Move columns', () => {
     engine.moveColumns(0, 1, 2, 5)
 
     expect(engine.getCellValue(adr('A1'))).toEqual(1)
-    expect(engine.getCellValue(adr('B1'))).toEqual(EmptyValue)
-    expect(engine.getCellValue(adr('C1'))).toEqual(EmptyValue)
+    expect(engine.getCellValue(adr('B1'))).toBe(null)
+    expect(engine.getCellValue(adr('C1'))).toBe(null)
     expect(engine.getCellValue(adr('D1'))).toEqual(2)
     expect(engine.getCellValue(adr('E1'))).toEqual(3)
   })
