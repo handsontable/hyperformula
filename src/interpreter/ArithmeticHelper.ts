@@ -505,15 +505,7 @@ export function fixNegativeZero(arg: number): number {
 }
 
 function isWildcard(c: string): boolean {
-  switch(c) {
-    case '*':
-    case '?': {
-      return true
-    }
-    default: {
-      return false
-    }
-  }
+  return ['*', '?'].includes(c)
 }
 
 function needsEscape(c: string): boolean {
