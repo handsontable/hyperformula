@@ -105,6 +105,9 @@ export class NoOperationToUndoError extends Error {
   }
 }
 
+/**
+ * Error thrown when there are no operations to redo by the [[redo]] method.
+ */
 export class NoOperationToRedoError extends Error {
   constructor() {
     super('There is no operation to redo')
@@ -246,6 +249,11 @@ export class MissingTranslationError extends Error {
 
 /**
  * Error thrown when function plugin is invalid.
+ *
+ * @see [[registerFunction]]
+ * @see [[registerFunctionPlugin]]
+ * @see [[buildFromArray]]
+ * @see [[buildFromSheets]]
  * */
 export class FunctionPluginValidationError extends Error {
   public static functionNotDeclaredInPlugin(formulaId: string, pluginName: string): FunctionPluginValidationError {
@@ -268,6 +276,13 @@ export class SourceLocationHasMatrixError extends Error {
 
 /**
  * Error thrown when selected target location has a matrix.
+ *
+ * @see [[addRows]]
+ * @see [[addColumns]]
+ * @see [[moveCells]]
+ * @see [[moveRows]]
+ * @see [[moveColumns]]
+ * @see [[paste]]
  */
 export class TargetLocationHasMatrixError extends Error {
   constructor() {
@@ -277,6 +292,9 @@ export class TargetLocationHasMatrixError extends Error {
 
 /**
  * Error thrown when trying to use matrix expression as named expression.
+ *
+ * @see [[addNamedExpression]]
+ * @see [[changeNamedExpression]]
  */
 export class MatrixFormulasNotSupportedError extends Error {
   constructor() {
@@ -286,6 +304,9 @@ export class MatrixFormulasNotSupportedError extends Error {
 
 /**
  * Error thrown when named expression contains relative addresses.
+ *
+ * @see [[addNamedExpression]]
+ * @see [[changeNamedExpression]]
  * */
 export class NoRelativeAddressesAllowedError extends Error {
   constructor() {
