@@ -51,7 +51,6 @@ class HyperFormulaNS extends HyperFormula {
   public static ErrorType = ErrorType
   public static CellError = CellError
   public static DetailedCellError = DetailedCellError
-  public static LazilyTransformingAstService = LazilyTransformingAstService
   public static ExportedCellChange = ExportedCellChange
   public static ExportedNamedExpressionChange = ExportedNamedExpressionChange
   public static ConfigValueTooBigError = ConfigValueTooBigError
@@ -99,9 +98,9 @@ export {
   HyperFormula,
   CellValue,
   NoErrorCellValue,
+  ErrorType,
   CellError,
   DetailedCellError,
-  LazilyTransformingAstService,
   ExportedCellChange,
   ExportedNamedExpressionChange,
   ConfigValueTooBigError,
