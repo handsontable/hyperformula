@@ -10,7 +10,7 @@ import {
   ErrorType,
   getCellValueType,
   InternalScalarValue,
-  NoErrorCellValue
+  InternalNoErrorCellValue
 } from '../Cell'
 import {Config} from '../Config'
 import {DateTimeHelper} from '../DateTimeHelper'
@@ -32,7 +32,7 @@ export class ArithmeticHelper {
     this.actualEps = config.smartRounding ? config.precisionEpsilon : 0
   }
 
-  public compare(left: NoErrorCellValue, right: NoErrorCellValue): number {
+  public compare(left: InternalNoErrorCellValue, right: InternalNoErrorCellValue): number {
     if (typeof left === 'string' || typeof right === 'string') {
       const leftTmp = typeof left === 'string' ? this.dateTimeHelper.dateStringToDateNumber(left) : left
       const rightTmp = typeof right === 'string' ? this.dateTimeHelper.dateStringToDateNumber(right) : right
@@ -157,13 +157,13 @@ export class ArithmeticHelper {
     return this.coerceToMaybeNumber(arg) ?? new CellError(ErrorType.VALUE)
   }
 
-  public coerceToMaybeNumber(arg: NoErrorCellValue): Maybe<number> {
+  public coerceToMaybeNumber(arg: InternalNoErrorCellValue): Maybe<number> {
     return this.coerceNonDateScalarToMaybeNumber(arg) ?? (
       typeof arg === 'string' ? this.dateTimeHelper.dateStringToDateNumber(arg) : undefined
     )
   }
 
-  public coerceNonDateScalarToMaybeNumber(arg: NoErrorCellValue): Maybe<number> {
+  public coerceNonDateScalarToMaybeNumber(arg: InternalNoErrorCellValue): Maybe<number> {
     if (arg === EmptyValue) {
       return 0
     }
@@ -202,7 +202,7 @@ export function coerceBooleanToNumber(arg: boolean): number {
   return Number(arg)
 }
 
-export function coerceEmptyToValue(arg: NoErrorCellValue): NoErrorCellValue {
+export function coerceEmptyToValue(arg: InternalNoErrorCellValue): InternalNoErrorCellValue {
   if (typeof arg === 'string') {
     return ''
   } else if (typeof arg === 'number') {

@@ -33,8 +33,8 @@ export enum ErrorType {
 
 export const EmptyValue = Symbol('Empty value')
 export type EmptyValueType = typeof EmptyValue
-export type NoErrorCellValue = number | string | boolean | EmptyValueType
-export type InternalScalarValue = NoErrorCellValue | CellError
+export type InternalNoErrorCellValue = number | string | boolean | EmptyValueType
+export type InternalScalarValue = InternalNoErrorCellValue | CellError
 export type InternalCellValue = InternalScalarValue | SimpleRangeValue
 
 export enum CellType {
