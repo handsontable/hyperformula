@@ -5,10 +5,15 @@
 
 import {ErrorType} from './Cell'
 import {defaultParseToDateTime} from './DateTimeDefault'
-import {DateTime, instanceOfSimpleDate, SimpleDate, SimpleDateTime} from './DateTimeHelper'
-import {ConfigValueTooBigError, ConfigValueTooSmallError, ExpectedOneOfValuesError, ExpectedValueOfTypeError} from './errors'
+import {DateTime, instanceOfSimpleDate, SimpleDate, SimpleDateTime, SimpleTime} from './DateTimeHelper'
+import {
+  ConfigValueTooSmallError,
+  ConfigValueTooBigError,
+  ExpectedValueOfTypeError,
+  ExpectedOneOfValuesError
+} from './errors'
 import {AlwaysDense, ChooseAddressMapping} from './DependencyGraph/AddressMapping/ChooseAddressMappingPolicy'
-import {defaultStringifyDateTime} from './format/format'
+import {defaultStringifyDateTime, defaultStringifyDuration} from './format/format'
 import {HyperFormula} from './HyperFormula'
 import {TranslationPackage} from './i18n'
 import {Maybe} from './Maybe'
@@ -235,7 +240,15 @@ export interface ConfigParams {
    *
    * @category Date and Time
    */
-  stringifyDateTime: (dateTime: SimpleDateTime, dateFormat: string) => Maybe<string>,
+  stringifyDateTime: (dateTime: SimpleDateTime, dateTimeFormat: string) => Maybe<string>,
+  /**
+   * Allows to provide a function that takes time duration prints it into string.
+   *
+   * @default defaultStringifyDuration
+   *
+   * @category DateTime
+   */
+  stringifyDuration: (time: SimpleTime, timeFormat: string) => Maybe<string>,
   /**
    * Sets the rounding.
    * If `false`, no rounding happens, and numbers are equal if and only if they are truly identical value (see: [[precisionEpsilon]]).
@@ -320,7 +333,7 @@ export class Config implements ConfigParams, ParserConfig {
     ignorePunctuation: false,
     chooseAddressMappingPolicy: new AlwaysDense(),
     dateFormats: ['DD/MM/YYYY', 'DD/MM/YY'],
-    timeFormats: ['hh:mm', 'hh:mm:ss'],
+    timeFormats: ['hh:mm', 'hh:mm:ss.sss'],
     functionArgSeparator: ',',
     decimalSeparator: '.',
     thousandSeparator: '',
@@ -336,6 +349,7 @@ export class Config implements ConfigParams, ParserConfig {
     nullYear: 30,
     parseDateTime: defaultParseToDateTime,
     stringifyDateTime: defaultStringifyDateTime,
+    stringifyDuration: defaultStringifyDuration,
     precisionEpsilon: 1e-13,
     precisionRounding: 14,
     useColumnIndex: false,
@@ -390,6 +404,8 @@ export class Config implements ConfigParams, ParserConfig {
   public readonly parseDateTime: (dateString: string, dateFormats: string) => Maybe<SimpleDateTime>
   /** @inheritDoc */
   public readonly stringifyDateTime: (date: SimpleDateTime, formatArg: string) => Maybe<string>
+  /** @inheritDoc */
+  public readonly stringifyDuration: (time: SimpleTime, formatArg: string) => Maybe<string>
   /** @inheritDoc */
   public readonly precisionEpsilon: number
   /** @inheritDoc */
@@ -462,6 +478,7 @@ export class Config implements ConfigParams, ParserConfig {
       nullYear,
       parseDateTime,
       stringifyDateTime,
+      stringifyDuration,
       precisionEpsilon,
       precisionRounding,
       useColumnIndex,
@@ -506,6 +523,7 @@ export class Config implements ConfigParams, ParserConfig {
     this.validateNumberToBeAtLeast(this.vlookupThreshold, 'vlookupThreshold', 1)
     this.parseDateTime = this.valueFromParam(parseDateTime, 'function', 'parseDateTime')
     this.stringifyDateTime = this.valueFromParam(stringifyDateTime, 'function', 'stringifyDateTime')
+    this.stringifyDuration = this.valueFromParam(stringifyDuration, 'function', 'stringifyDuration')
     this.translationPackage = HyperFormula.getLanguage(this.language)
     this.errorMapping = this.translationPackage.buildErrorMapping()
     this.nullDate = this.valueFromParamCheck(nullDate, instanceOfSimpleDate, 'IDate', 'nullDate')
