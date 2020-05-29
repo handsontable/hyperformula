@@ -24,14 +24,14 @@ describe('Integration', () => {
   it('#loadSheet evaluate empty vertex', () => {
     const engine = HyperFormula.buildFromArray([['=A5']])
 
-    expect(engine.getCellValue(adr('A5'))).toBe(EmptyValue)
-    expect(engine.getCellValue(adr('A1'))).toBe(EmptyValue)
+    expect(engine.getCellValue(adr('A5'))).toBe(null)
+    expect(engine.getCellValue(adr('A1'))).toBe(null)
   })
 
   it('#loadSheet evaluate empty vertex', () => {
     const engine = HyperFormula.buildFromArray([[null, '=A1']])
 
-    expect(engine.getCellValue(adr('B1'))).toBe(EmptyValue)
+    expect(engine.getCellValue(adr('B1'))).toBe(null)
   })
 
   it('getAllValues', () => {
@@ -74,8 +74,8 @@ describe('Integration', () => {
     const engine = HyperFormula.buildFromArray([['', null, undefined]])
 
     expect(engine.getCellValue(adr('A1'))).toEqual('')
-    expect(engine.getCellValue(adr('B1'))).toBe(EmptyValue)
-    expect(engine.getCellValue(adr('C1'))).toBe(EmptyValue)
+    expect(engine.getCellValue(adr('B1'))).toBe(null)
+    expect(engine.getCellValue(adr('C1'))).toBe(null)
   })
 
   it('loadSheet with a loop', () => {
@@ -456,12 +456,12 @@ describe('Integration', () => {
 
   it('should correctly parse all JS types', () => {
     const engine = HyperFormula.buildFromArray([
-      [1, true, EmptyValue],
+      [1, true, null],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toBe(1)
     expect(engine.getCellValue(adr('B1'))).toBe(true)
-    expect(engine.getCellValue(adr('C1'))).toBe(EmptyValue)
+    expect(engine.getCellValue(adr('C1'))).toBe(null)
   })
 
   it('should work with other numerals', () => {

@@ -4,14 +4,7 @@
  */
 
 import {AbsoluteCellRange} from '../../AbsoluteCellRange'
-import {
-  CellError,
-  EmptyValue,
-  ErrorType,
-  InternalScalarValue,
-  InternalCellValue,
-  SimpleCellAddress
-} from '../../Cell'
+import {CellError, EmptyValue, ErrorType, InternalCellValue, InternalScalarValue, SimpleCellAddress} from '../../Cell'
 import {AstNodeType, ProcedureAst} from '../../parser'
 import {SimpleRangeValue} from '../InterpreterValue'
 import {FunctionPlugin} from './FunctionPlugin'

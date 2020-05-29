@@ -3,7 +3,7 @@
  * Copyright (c) 2020 Handsoncode. All rights reserved.
  */
 
-import {EmptyValue, InternalScalarValue, InternalCellValue, SimpleCellAddress} from '../../Cell'
+import {EmptyValue, InternalCellValue, SimpleCellAddress} from '../../Cell'
 import {ColumnsSpan} from '../../ColumnsSpan'
 import {RowsSpan} from '../../RowsSpan'
 import {MatrixVertex} from '../index'

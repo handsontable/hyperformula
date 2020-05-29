@@ -1,4 +1,4 @@
-import {HyperFormula, ExportedNamedExpressionChange, EmptyValue, ExportedCellChange} from '../src'
+import {HyperFormula, ExportedNamedExpressionChange, ExportedCellChange} from '../src'
 import {adr, detailedError} from './testUtils'
 import {ErrorType} from '../src/Cell'
 import {NoRelativeAddressesAllowedError, NoSheetWithNameError} from '../src/errors'
@@ -168,8 +168,8 @@ describe('Named expressions - store manipulation', () => {
 
     const changes = engine.addNamedExpression('myName', null)
 
-    expect(changes).toEqual([new ExportedNamedExpressionChange('myName', EmptyValue)])
-    expect(engine.getNamedExpressionValue('myName')).toEqual(EmptyValue)
+    expect(changes).toEqual([new ExportedNamedExpressionChange('myName', null)])
+    expect(engine.getNamedExpressionValue('myName')).toBe(null)
   })
 
   it('using native number as expression', () => {
@@ -660,7 +660,7 @@ describe('Named expressions - cross scope', () => {
 
     expect(engine.getNamedExpressionFormula('expr', 'Sheet1')).toEqual('=Sheet1!$A$1')
     expect(engine.getNamedExpressionFormula('expr')).toEqual('=Sheet1!$A$1')
-    expect(engine.getCellValue(adr('B1', 0))).toEqual(EmptyValue)
+    expect(engine.getCellValue(adr('B1', 0))).toBe(null)
     expect(engine.getCellValue(adr('B1', 1))).toEqual('foo')
   })
 
@@ -678,7 +678,7 @@ describe('Named expressions - cross scope', () => {
 
     expect(engine.getNamedExpressionFormula('expr', 'Sheet1')).toEqual('=Sheet1!$A$1')
     expect(engine.getNamedExpressionFormula('expr')).toEqual('=Sheet1!$A$1')
-    expect(engine.getCellValue(adr('B1', 0))).toEqual(EmptyValue)
+    expect(engine.getCellValue(adr('B1', 0))).toBe(null)
     expect(engine.getCellValue(adr('B1', 1))).toEqual('foo')
   })
 
@@ -733,7 +733,7 @@ describe('Named expressions - cross scope', () => {
     expect(engine.getNamedExpressionFormula('expr')).toEqual(undefined)
     expect(engine.getNamedExpressionFormula('expr', 'Sheet1')).toEqual('=Sheet1!$A$1')
     expect(engine.getNamedExpressionFormula('expr', 'Sheet2')).toEqual('=Sheet2!$A$1')
-    expect(engine.getCellValue(adr('B1', 0))).toEqual(EmptyValue)
+    expect(engine.getCellValue(adr('B1', 0))).toBe(null)
     expect(engine.getCellValue(adr('B1', 1))).toEqual('bar')
     // ensure edges are correct
     const sourceScopeNEVertex = engine.dependencyGraph.fetchNamedExpressionVertex('expr', 0)
@@ -759,7 +759,7 @@ describe('Named expressions - cross scope', () => {
     expect(engine.getNamedExpressionFormula('expr')).toEqual(undefined)
     expect(engine.getNamedExpressionFormula('expr', 'Sheet1')).toEqual('=Sheet1!$A$1')
     expect(engine.getNamedExpressionFormula('expr', 'Sheet2')).toEqual('=Sheet2!$A$1')
-    expect(engine.getCellValue(adr('B1', 0))).toEqual(EmptyValue)
+    expect(engine.getCellValue(adr('B1', 0))).toBe(null)
     expect(engine.getCellValue(adr('B1', 1))).toEqual('bar')
     // ensure edges are correct
     const sourceScopeNEVertex = engine.dependencyGraph.fetchNamedExpressionVertex('expr', 0)

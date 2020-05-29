@@ -7,8 +7,8 @@ import {AbsoluteCellRange} from '../../AbsoluteCellRange'
 import {
   CellError,
   ErrorType,
-  InternalScalarValue,
   InternalCellValue,
+  InternalScalarValue,
   simpleCellAddress,
   SimpleCellAddress
 } from '../../Cell'

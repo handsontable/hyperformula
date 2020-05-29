@@ -4,7 +4,6 @@
  */
 
 import {RawCellContent} from './CellContentParser'
-import {EmptyValue} from './Cell'
 import {InvalidArgumentsError} from './errors'
 
 /**
@@ -48,7 +47,7 @@ export function findBoundaries(sheet: Sheet): SheetBoundaries {
     let currentRowWidth = 0
     for (let currentCol = 0; currentCol < sheet[currentRow].length; currentCol++) {
       const currentValue = sheet[currentRow][currentCol]
-      if (currentValue === undefined || currentValue === null || currentValue === EmptyValue) {
+      if (currentValue === undefined || currentValue === null) {
         continue
       }
       currentRowWidth = currentCol + 1

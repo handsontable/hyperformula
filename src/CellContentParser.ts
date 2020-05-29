@@ -3,14 +3,14 @@
  * Copyright (c) 2020 Handsoncode. All rights reserved.
  */
 
-import {CellError, EmptyValue, EmptyValueType, ErrorType} from './Cell'
+import {CellError, ErrorType} from './Cell'
 import {Config} from './Config'
 import {DateTimeHelper} from './DateTimeHelper'
 import {UnableToParse} from './errors'
 import {fixNegativeZero, isNumberOverflow} from './interpreter/ArithmeticHelper'
 import {NumberLiteralHelper} from './NumberLiteralHelper'
 
-export type RawCellContent = Date | string | number | boolean | EmptyValueType | null | undefined
+export type RawCellContent = Date | string | number | boolean | null | undefined
 
 export namespace CellContent {
   export class Number {
@@ -101,7 +101,7 @@ export class CellContentParser {
   }
 
   public parse(content: RawCellContent): CellContent.Type {
-    if (content === undefined || content === null || content === EmptyValue) {
+    if (content === undefined || content === null) {
       return CellContent.Empty.getSingletonInstance()
     } else if (typeof content === 'number') {
       if (isNumberOverflow(content)) {

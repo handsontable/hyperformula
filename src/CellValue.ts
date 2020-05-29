@@ -3,27 +3,20 @@
  * Copyright (c) 2020 Handsoncode. All rights reserved.
  */
 
-import {
-  CellError,
-  ErrorType,
-  InternalScalarValue,
-  InternalCellValue,
-  NoErrorCellValue,
-  simpleCellAddress,
-  SimpleCellAddress
-} from './Cell'
+import {CellError, EmptyValue, ErrorType, InternalCellValue, simpleCellAddress, SimpleCellAddress} from './Cell'
 import {Config} from './Config'
 import {CellValueChange} from './ContentChanges'
 import {NamedExpressions} from './NamedExpressions'
 import {SimpleRangeValue} from './interpreter/InterpreterValue'
 
+export type NoErrorCellValue = number | string | boolean | null
 export type CellValue = NoErrorCellValue | DetailedCellError
 
 export type ExportedChange = ExportedCellChange | ExportedNamedExpressionChange
 
-  /**
-   * A list of cells which values changed after the operation, their absolute addresses and new values.
-   */
+/**
+ * A list of cells which values changed after the operation, their absolute addresses and new values.
+ */
 export class ExportedCellChange {
   constructor(
     public readonly address: SimpleCellAddress,
@@ -104,6 +97,8 @@ export class Exporter {
       return this.cellValueRounding(value)
     } else if (value instanceof CellError) {
       return this.detailedError(value)
+    } else if (value === EmptyValue) {
+      return null
     } else {
       return value
     }
@@ -114,7 +109,7 @@ export class Exporter {
   }
 
   private cellValueRounding(value: number): number {
-    if(value === 0) {
+    if (value === 0) {
       return value
     }
     const magnitudeMultiplierExponent = Math.floor(Math.log10(Math.abs(value)))

@@ -1,4 +1,4 @@
-import {EmptyValue, HyperFormula} from '../../src'
+import {HyperFormula} from '../../src'
 import {ErrorType} from '../../src/Cell'
 import {MatrixPlugin} from '../../src/interpreter/plugin/MatrixPlugin'
 import {adr, detailedError} from '../testUtils'
@@ -38,7 +38,7 @@ describe('Matrix plugin', () => {
     ])
 
     expect(engine.getCellValue(adr('A7'))).toEqual(detailedError(ErrorType.VALUE))
-    expect(engine.getCellValue(adr('B7'))).toEqual(EmptyValue)
+    expect(engine.getCellValue(adr('B7'))).toBe(null)
   })
 
   it('matrix multiplication with string in data', () => {
@@ -264,7 +264,7 @@ describe('Function TRANSPOSE', () => {
     ])
 
     expect(engine.getCellValue(adr('A4'))).toEqual(detailedError(ErrorType.VALUE))
-    expect(engine.getCellValue(adr('A5'))).toEqual(EmptyValue)
-    expect(engine.getCellValue(adr('B4'))).toEqual(EmptyValue)
+    expect(engine.getCellValue(adr('A5'))).toBe(null)
+    expect(engine.getCellValue(adr('B4'))).toBe(null)
   })
 })

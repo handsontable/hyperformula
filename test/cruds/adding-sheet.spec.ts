@@ -1,4 +1,4 @@
-import {EmptyValue, HyperFormula} from '../../src'
+import {HyperFormula} from '../../src'
 import {plPL} from '../../src/i18n'
 import {adr} from '../testUtils'
 
@@ -46,7 +46,7 @@ describe('add sheet to engine', () => {
 
     engine.addSheet()
 
-    expect(engine.getCellValue(adr('A1', 0))).toBe(EmptyValue)
+    expect(engine.getCellValue(adr('A1', 0))).toBe(null)
   })
 
   it('should add sheet with translated sheet name', function() {

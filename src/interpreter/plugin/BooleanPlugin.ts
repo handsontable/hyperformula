@@ -3,7 +3,7 @@
  * Copyright (c) 2020 Handsoncode. All rights reserved.
  */
 
-import {CellError, ErrorType, InternalScalarValue, NoErrorCellValue, SimpleCellAddress} from '../../Cell'
+import {CellError, ErrorType, InternalNoErrorCellValue, InternalScalarValue, SimpleCellAddress} from '../../Cell'
 import {AstNodeType, ProcedureAst} from '../../parser'
 import {coerceScalarToBoolean} from '../ArithmeticHelper'
 import {InterpreterValue, SimpleRangeValue} from '../InterpreterValue'
@@ -258,7 +258,7 @@ export class BooleanPlugin extends FunctionPlugin {
       if (vals[i] instanceof CellError) {
         continue
       }
-      if (this.interpreter.arithmeticHelper.compare(vals[0], vals[i] as NoErrorCellValue) === 0) {
+      if (this.interpreter.arithmeticHelper.compare(vals[0], vals[i] as InternalNoErrorCellValue) === 0) {
         return vals[i + 1]
       }
     }

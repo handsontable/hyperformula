@@ -3,14 +3,13 @@
  * Copyright (c) 2020 Handsoncode. All rights reserved.
  */
 
-import {InternalScalarValue, NoErrorCellValue, simpleCellAddress, SimpleCellAddress} from './Cell'
-import {CellValue, DetailedCellError, Exporter} from './CellValue'
+import {simpleCellAddress, SimpleCellAddress} from './Cell'
+import {CellValue, DetailedCellError, Exporter, NoErrorCellValue} from './CellValue'
 import {Config} from './Config'
 import {DependencyGraph, FormulaCellVertex, MatrixVertex, ParsingErrorVertex} from './DependencyGraph'
 import {Maybe} from './Maybe'
 import {buildLexerConfig, Unparser} from './parser'
 import {NamedExpressions} from './NamedExpressions'
-import {SimpleRangeValue} from './interpreter/InterpreterValue'
 
 export class Serialization {
   constructor(

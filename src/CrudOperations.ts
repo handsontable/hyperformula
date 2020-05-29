@@ -27,10 +27,10 @@ import {
   NoSheetWithIdError,
   NoSheetWithNameError,
   NothingToPasteError,
-  SheetSizeLimitExceededError,
   SheetNameAlreadyTaken,
-  TargetLocationHasMatrixError,
-  SourceLocationHasMatrixError
+  SheetSizeLimitExceededError,
+  SourceLocationHasMatrixError,
+  TargetLocationHasMatrixError
 } from './errors'
 import {Index} from './HyperFormula'
 import {LazilyTransformingAstService} from './LazilyTransformingAstService'

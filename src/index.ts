@@ -3,8 +3,14 @@
  * Copyright (c) 2020 Handsoncode. All rights reserved.
  */
 
-import {CellError, EmptyValue, ErrorType} from './Cell'
-import {CellValue, DetailedCellError, ExportedCellChange, ExportedNamedExpressionChange} from './CellValue'
+import {CellError, ErrorType} from './Cell'
+import {
+  CellValue,
+  DetailedCellError,
+  ExportedCellChange,
+  ExportedNamedExpressionChange,
+  NoErrorCellValue
+} from './CellValue'
 import {HyperFormula} from './HyperFormula'
 import {Config} from './Config'
 import {languages} from './i18n'
@@ -15,21 +21,21 @@ import {
   FunctionPluginValidationError,
   InvalidAddressError,
   InvalidArgumentsError,
+  MatrixFormulasNotSupportedError,
+  NamedExpressionDoesNotExist,
+  NamedExpressionNameIsAlreadyTaken,
+  NamedExpressionNameIsInvalid,
   NoOperationToRedoError,
   NoOperationToUndoError,
+  NoRelativeAddressesAllowedError,
   NoSheetWithIdError,
   NoSheetWithNameError,
   NotAFormulaError,
   NothingToPasteError,
-  SheetSizeLimitExceededError,
   SheetNameAlreadyTaken,
-  TargetLocationHasMatrixError,
+  SheetSizeLimitExceededError,
   SourceLocationHasMatrixError,
-  NoRelativeAddressesAllowedError,
-  MatrixFormulasNotSupportedError,
-  NamedExpressionDoesNotExist,
-  NamedExpressionNameIsAlreadyTaken,
-  NamedExpressionNameIsInvalid
+  TargetLocationHasMatrixError
 } from './errors'
 import * as plugins from './interpreter/plugin'
 
@@ -41,7 +47,6 @@ class HyperFormulaNS extends HyperFormula {
   public static SheetSizeLimitExceededError = SheetSizeLimitExceededError
   public static SheetNameAlreadyTaken = SheetNameAlreadyTaken
   public static InvalidAddressError = InvalidAddressError
-  public static EmptyValue = EmptyValue
   public static DetailedCellError = DetailedCellError
   public static NoOperationToUndoError = NoOperationToUndoError
   public static NoOperationToRedoError = NoOperationToRedoError
@@ -87,7 +92,7 @@ export {
   InvalidArgumentsError,
   NotAFormulaError,
   CellValue,
-  EmptyValue,
+  NoErrorCellValue,
   CellError,
   DetailedCellError,
   LazilyTransformingAstService,

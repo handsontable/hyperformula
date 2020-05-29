@@ -6,7 +6,7 @@
 import {ErrorType} from './Cell'
 import {defaultParseToDateTime} from './DateTimeDefault'
 import {DateTime, instanceOfSimpleDate, SimpleDate, SimpleDateTime} from './DateTimeHelper'
-import {ExpectedOneOfValues, ExpectedValueOfType, ConfigValueTooSmallError, ConfigValueTooBigError} from './errors'
+import {ConfigValueTooBigError, ConfigValueTooSmallError, ExpectedOneOfValues, ExpectedValueOfType} from './errors'
 import {AlwaysDense, ChooseAddressMapping} from './DependencyGraph/AddressMapping/ChooseAddressMappingPolicy'
 import {defaultStringifyDateTime} from './format/format'
 import {HyperFormula} from './HyperFormula'
