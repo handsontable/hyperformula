@@ -103,8 +103,6 @@ export class VlookupPlugin extends FunctionPlugin {
 
       return rowIndex - searchedRange.start.row + 1
     } else {
-      //const valuesInRange = this.computeListOfValuesInRange(searchedRange)
-      //const columnIndex = valuesInRange.indexOf(key)
       const columnIndex = this.searchInRange(key, searchedRange, false)
       if (columnIndex === -1) {
         return new CellError(ErrorType.NA)
