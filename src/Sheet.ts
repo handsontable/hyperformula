@@ -14,6 +14,14 @@ export type Sheet = RawCellContent[][]
 export type Sheets = Record<string, Sheet>
 
 /**
+ * Represents size of a sheet
+ */
+export type SheetDimensions = {
+  width: number,
+  height: number,
+}
+
+/**
  * Represents size and fill ratio of a sheet
 */
 export interface SheetBoundaries {

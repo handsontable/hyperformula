@@ -9,7 +9,7 @@ import {CellContent, CellContentParser, RawCellContent} from './CellContentParse
 import {CellValue, ExportedChange, Exporter, NoErrorCellValue} from './CellValue'
 import {ColumnSearchStrategy} from './ColumnSearch/ColumnSearchStrategy'
 import {Config, ConfigParams} from './Config'
-import {CrudOperations} from './CrudOperations'
+import {CrudOperations, ColumnRowIndex} from './CrudOperations'
 import {buildTranslationPackage, RawTranslationPackage, TranslationPackage} from './i18n'
 import {normalizeAddedIndexes, normalizeRemovedIndexes} from './Operations'
 import {
@@ -40,13 +40,10 @@ import {Serialization} from './Serialization'
 import {Statistics, StatType} from './statistics'
 import {Emitter, Events, Listeners, TypedEmitter} from './Emitter'
 import {BuildEngineFactory, EngineState} from './BuildEngineFactory'
-import {Sheet, Sheets} from './Sheet'
-import {SheetDimensions} from './_types'
+import {Sheet, SheetDimensions, Sheets} from './Sheet'
 import {LicenseKeyValidityState} from './helpers/licenseKeyValidator'
 import {FunctionPluginDefinition} from './interpreter'
 import {FunctionRegistry, FunctionTranslationsPackage} from './interpreter/FunctionRegistry'
-
-export type Index = [number, number]
 
 /**
  * This is a class for creating HyperFormula instance, all the following public methods
@@ -1046,7 +1043,7 @@ export class HyperFormula implements TypedEmitter {
    * Returns `false` if the operation might be disrupted and causes side-effects by the fact that there is a matrix inside the selected rows.
    *
    * @param {number} sheetId - sheet ID in which rows will be added
-   * @param {Index[]} indexes - non-contiguous indexes with format [row, amount], where row is a row number above which the rows will be added
+   * @param {ColumnRowIndex[]} indexes - non-contiguous indexes with format [row, amount], where row is a row number above which the rows will be added
    *
    * @example
    * ```js
@@ -1061,7 +1058,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * @category Rows
    */
-  public isItPossibleToAddRows(sheetId: number, ...indexes: Index[]): boolean {
+  public isItPossibleToAddRows(sheetId: number, ...indexes: ColumnRowIndex[]): boolean {
     const normalizedIndexes = normalizeAddedIndexes(indexes)
     try {
       this._crudOperations.ensureItIsPossibleToAddRows(sheetId, ...normalizedIndexes)
@@ -1078,7 +1075,7 @@ export class HyperFormula implements TypedEmitter {
    * Note that this method may trigger dependency graph recalculation.
    *
    * @param {number} sheetId - sheet ID in which rows will be added
-   * @param {Index[]} indexes - non-contiguous indexes with format [row, amount], where row is a row number above which the rows will be added
+   * @param {ColumnRowIndex[]} indexes - non-contiguous indexes with format [row, amount], where row is a row number above which the rows will be added
    *
    * @fires [[valuesUpdated]] if recalculation was triggered by this change
    *
@@ -1100,7 +1097,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * @category Rows
    */
-  public addRows(sheetId: number, ...indexes: Index[]): ExportedChange[] {
+  public addRows(sheetId: number, ...indexes: ColumnRowIndex[]): ExportedChange[] {
     this._crudOperations.addRows(sheetId, ...indexes)
     return this.recomputeIfDependencyGraphNeedsIt()
   }
@@ -1112,7 +1109,7 @@ export class HyperFormula implements TypedEmitter {
    * Returns `false` if the operation might be disrupted and causes side-effects by the fact that there is a matrix inside the selected rows.
    *
    * @param {number} sheetId - sheet ID from which rows will be removed
-   * @param {Index[]} indexes - non-contiguous indexes with format: [row, amount]
+   * @param {ColumnRowIndex[]} indexes - non-contiguous indexes with format: [row, amount]
    *
    * @example
    * ```js
@@ -1128,7 +1125,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * @category Rows
    */
-  public isItPossibleToRemoveRows(sheetId: number, ...indexes: Index[]): boolean {
+  public isItPossibleToRemoveRows(sheetId: number, ...indexes: ColumnRowIndex[]): boolean {
     const normalizedIndexes = normalizeRemovedIndexes(indexes)
     try {
       this._crudOperations.ensureItIsPossibleToRemoveRows(sheetId, ...normalizedIndexes)
@@ -1145,7 +1142,7 @@ export class HyperFormula implements TypedEmitter {
    * Note that this method may trigger dependency graph recalculation.
    *
    * @param {number} sheetId - sheet ID from which rows will be removed
-   * @param {Index[]} indexes - non-contiguous indexes with format: [row, amount]
+   * @param {ColumnRowIndex[]} indexes - non-contiguous indexes with format: [row, amount]
    *
    * @fires [[valuesUpdated]] if recalculation was triggered by this change
    *
@@ -1166,7 +1163,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * @category Rows
    */
-  public removeRows(sheetId: number, ...indexes: Index[]): ExportedChange[] {
+  public removeRows(sheetId: number, ...indexes: ColumnRowIndex[]): ExportedChange[] {
     this._crudOperations.removeRows(sheetId, ...indexes)
     return this.recomputeIfDependencyGraphNeedsIt()
   }
@@ -1178,7 +1175,7 @@ export class HyperFormula implements TypedEmitter {
    * Returns `false` if the operation might be disrupted and causes side-effects by the fact that there is a matrix inside the selected columns.
    *
    * @param {number} sheetId - sheet ID in which columns will be added
-   * @param {Index[]} indexes - non-contiguous indexes with format: [column, amount], where column is a column number from which new columns will be added
+   * @param {ColumnRowIndex[]} indexes - non-contiguous indexes with format: [column, amount], where column is a column number from which new columns will be added
    *
    * @example
    * ```js
@@ -1193,7 +1190,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * @category Columns
    */
-  public isItPossibleToAddColumns(sheetId: number, ...indexes: Index[]): boolean {
+  public isItPossibleToAddColumns(sheetId: number, ...indexes: ColumnRowIndex[]): boolean {
     const normalizedIndexes = normalizeAddedIndexes(indexes)
     try {
       this._crudOperations.ensureItIsPossibleToAddColumns(sheetId, ...normalizedIndexes)
@@ -1210,7 +1207,7 @@ export class HyperFormula implements TypedEmitter {
    * Note that this method may trigger dependency graph recalculation.
    *
    * @param {number} sheetId - sheet ID in which columns will be added
-   * @param {Index[]} indexes - non-contiguous indexes with format: [column, amount], where column is a column number from which new columns will be added
+   * @param {ColumnRowIndex[]} indexes - non-contiguous indexes with format: [column, amount], where column is a column number from which new columns will be added
    *
    * @fires [[valuesUpdated]] if recalculation was triggered by this change
    *
@@ -1236,7 +1233,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * @category Columns
    */
-  public addColumns(sheetId: number, ...indexes: Index[]): ExportedChange[] {
+  public addColumns(sheetId: number, ...indexes: ColumnRowIndex[]): ExportedChange[] {
     this._crudOperations.addColumns(sheetId, ...indexes)
     return this.recomputeIfDependencyGraphNeedsIt()
   }
@@ -1248,7 +1245,7 @@ export class HyperFormula implements TypedEmitter {
    * Returns `false` if the operation might be disrupted and causes side-effects by the fact that there is a matrix inside the selected columns.
    *
    * @param {number} sheetId - sheet ID from which columns will be removed
-   * @param {Index[]} indexes - non-contiguous indexes with format [column, amount]
+   * @param {ColumnRowIndex[]} indexes - non-contiguous indexes with format [column, amount]
    *
    * @example
    * ```js
@@ -1263,7 +1260,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * @category Columns
    */
-  public isItPossibleToRemoveColumns(sheetId: number, ...indexes: Index[]): boolean {
+  public isItPossibleToRemoveColumns(sheetId: number, ...indexes: ColumnRowIndex[]): boolean {
     const normalizedIndexes = normalizeRemovedIndexes(indexes)
     try {
       this._crudOperations.ensureItIsPossibleToRemoveColumns(sheetId, ...normalizedIndexes)
@@ -1280,7 +1277,7 @@ export class HyperFormula implements TypedEmitter {
    * Note that this method may trigger dependency graph recalculation.
    *
    * @param {number} sheetId - sheet ID from which columns will be removed
-   * @param {Index[]} indexes - non-contiguous indexes with format: [column, amount]
+   * @param {ColumnRowIndex[]} indexes - non-contiguous indexes with format: [column, amount]
    *
    * @fires [[valuesUpdated]] if recalculation was triggered by this change
    *
@@ -1305,7 +1302,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * @category Columns
    */
-  public removeColumns(sheetId: number, ...indexes: Index[]): ExportedChange[] {
+  public removeColumns(sheetId: number, ...indexes: ColumnRowIndex[]): ExportedChange[] {
     this._crudOperations.removeColumns(sheetId, ...indexes)
     return this.recomputeIfDependencyGraphNeedsIt()
   }

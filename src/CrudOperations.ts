@@ -32,7 +32,6 @@ import {
   SourceLocationHasMatrixError,
   TargetLocationHasMatrixError
 } from './errors'
-import {Index} from './HyperFormula'
 import {LazilyTransformingAstService} from './LazilyTransformingAstService'
 import {ParserWithCaching} from './parser'
 import {RowsSpan} from './RowsSpan'
@@ -57,6 +56,8 @@ import {
   UndoRedo
 } from './UndoRedo'
 import {findBoundaries, validateAsSheet} from './Sheet'
+
+export type ColumnRowIndex = [number, number]
 
 export class CrudOperations {
 
@@ -87,7 +88,7 @@ export class CrudOperations {
     this.undoRedo = new UndoRedo(this.config, this.operations)
   }
 
-  public addRows(sheet: number, ...indexes: Index[]): void {
+  public addRows(sheet: number, ...indexes: ColumnRowIndex[]): void {
     const addRowsCommand = new AddRowsCommand(sheet, indexes)
     this.ensureItIsPossibleToAddRows(sheet, ...indexes)
     this.undoRedo.clearRedoStack()
@@ -96,7 +97,7 @@ export class CrudOperations {
     this.undoRedo.saveOperation(new AddRowsUndoEntry(addRowsCommand))
   }
 
-  public removeRows(sheet: number, ...indexes: Index[]): void {
+  public removeRows(sheet: number, ...indexes: ColumnRowIndex[]): void {
     const removeRowsCommand = new RemoveRowsCommand(sheet, indexes)
     this.ensureItIsPossibleToRemoveRows(sheet, ...indexes)
     this.undoRedo.clearRedoStack()
@@ -105,7 +106,7 @@ export class CrudOperations {
     this.undoRedo.saveOperation(new RemoveRowsUndoEntry(removeRowsCommand, rowsRemovals))
   }
 
-  public addColumns(sheet: number, ...indexes: Index[]): void {
+  public addColumns(sheet: number, ...indexes: ColumnRowIndex[]): void {
     const addColumnsCommand = new AddColumnsCommand(sheet, indexes)
     this.ensureItIsPossibleToAddColumns(sheet, ...indexes)
     this.undoRedo.clearRedoStack()
@@ -114,7 +115,7 @@ export class CrudOperations {
     this.undoRedo.saveOperation(new AddColumnsUndoEntry(addColumnsCommand))
   }
 
-  public removeColumns(sheet: number, ...indexes: Index[]): void {
+  public removeColumns(sheet: number, ...indexes: ColumnRowIndex[]): void {
     const removeColumnsCommand = new RemoveColumnsCommand(sheet, indexes)
     this.ensureItIsPossibleToRemoveColumns(sheet, ...indexes)
     this.undoRedo.clearRedoStack()
@@ -340,7 +341,7 @@ export class CrudOperations {
     }
   }
 
-  public ensureItIsPossibleToAddRows(sheet: number, ...indexes: Index[]): void {
+  public ensureItIsPossibleToAddRows(sheet: number, ...indexes: ColumnRowIndex[]): void {
     if (!this.sheetMapping.hasSheetWithId(sheet)) {
       throw new NoSheetWithIdError(sheet)
     }
@@ -365,7 +366,7 @@ export class CrudOperations {
     }
   }
 
-  public ensureItIsPossibleToRemoveRows(sheet: number, ...indexes: Index[]): void {
+  public ensureItIsPossibleToRemoveRows(sheet: number, ...indexes: ColumnRowIndex[]): void {
     for (const [rowStart, numberOfRows] of indexes) {
       const rowEnd = rowStart + numberOfRows - 1
       if (!isNonnegativeInteger(rowStart) || !isNonnegativeInteger(rowEnd)) {
@@ -386,7 +387,7 @@ export class CrudOperations {
     }
   }
 
-  public ensureItIsPossibleToAddColumns(sheet: number, ...indexes: Index[]): void {
+  public ensureItIsPossibleToAddColumns(sheet: number, ...indexes: ColumnRowIndex[]): void {
     if (!this.sheetMapping.hasSheetWithId(sheet)) {
       throw new NoSheetWithIdError(sheet)
     }
@@ -411,7 +412,7 @@ export class CrudOperations {
     }
   }
 
-  public ensureItIsPossibleToRemoveColumns(sheet: number, ...indexes: Index[]): void {
+  public ensureItIsPossibleToRemoveColumns(sheet: number, ...indexes: ColumnRowIndex[]): void {
     for (const [columnStart, numberOfColumns] of indexes) {
       const columnEnd = columnStart + numberOfColumns - 1
 

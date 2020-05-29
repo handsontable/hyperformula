@@ -3,18 +3,20 @@
  * Copyright (c) 2020 Handsoncode. All rights reserved.
  */
 
-import {ErrorType} from './Cell'
+import {CellType, CellValueType, ErrorType, SimpleCellAddress} from './Cell'
 import {
   CellValue,
   DetailedCellError,
   ExportedCellChange,
+  ExportedChange,
   ExportedNamedExpressionChange,
   NoErrorCellValue
 } from './CellValue'
 import {HyperFormula} from './HyperFormula'
-import {Config} from './Config'
-import {languages} from './i18n'
-import {Sheets} from './Sheet'
+import {Config, ConfigParams} from './Config'
+import {languages, RawTranslationPackage} from './i18n'
+import {Sheet, SheetDimensions, Sheets} from './Sheet'
+import {RawCellContent} from './CellContentParser'
 import {
   ConfigValueTooBigError,
   ConfigValueTooSmallError,
@@ -43,11 +45,15 @@ import {
   UnableToParseError,
 } from './errors'
 import * as plugins from './interpreter/plugin'
+import {FunctionPluginDefinition} from './interpreter'
+import {ColumnRowIndex} from './CrudOperations'
 
 /** @internal */
 class HyperFormulaNS extends HyperFormula {
   public static HyperFormula = HyperFormula
   public static ErrorType = ErrorType
+  public static CellType = CellType
+  public static CellValueType = CellValueType
   public static DetailedCellError = DetailedCellError
   public static ExportedCellChange = ExportedCellChange
   public static ExportedNamedExpressionChange = ExportedNamedExpressionChange
@@ -92,14 +98,25 @@ for (const pluginName of Object.getOwnPropertyNames(plugins)) {
 export default HyperFormulaNS
 
 export {
-  Sheets,
-  HyperFormula,
   CellValue,
   NoErrorCellValue,
+  ConfigParams,
+  ExportedChange,
+  RawCellContent,
+  Sheet,
+  Sheets,
+  SheetDimensions,
+  SimpleCellAddress,
+  ColumnRowIndex,
+  RawTranslationPackage,
+  FunctionPluginDefinition,
+  HyperFormula,
+  CellType,
+  CellValueType,
   ErrorType,
-  DetailedCellError,
   ExportedCellChange,
   ExportedNamedExpressionChange,
+  DetailedCellError,
   ConfigValueTooBigError,
   ConfigValueTooSmallError,
   EvaluationSuspendedError,
