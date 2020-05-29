@@ -451,7 +451,7 @@ describe('moving ranges', () => {
 
     expect(() => {
       engine.moveCells(adr('A2'), 2, 2, adr('C1'))
-    }).toThrowError('It is not possible to move matrix')
+    }).toThrowError('Cannot perform this operation, source location has a matrix inside.')
   })
 
   it('should not be possible to move cells to area with matrix', () => {
@@ -462,7 +462,7 @@ describe('moving ranges', () => {
 
     expect(() => {
       engine.moveCells(adr('A1'), 2, 1, adr('A2'))
-    }).toThrowError('It is not possible to replace cells with matrix')
+    }).toThrowError('Cannot perform this operation, target location has a matrix inside.')
   })
 
   it('should adjust edges when moving part of range', () => {
@@ -479,7 +479,7 @@ describe('moving ranges', () => {
     const target = engine.addressMapping.fetchCell(adr('A2'))
     const range = engine.rangeMapping.fetchRange(adr('A1'), adr('A2'))
 
-    expect(source).toEqual(new EmptyCellVertex())
+    expect(source).toBeInstanceOf(EmptyCellVertex)
     expect(source.getCellValue()).toBe(EmptyValue)
     expect(engine.graph.nodesCount()).toBe(
       +2 // formulas
@@ -926,7 +926,7 @@ describe('move cells with matrices', () => {
 
     expect(() => {
       engine.moveCells(adr('A2'), 1, 1, adr('A3'))
-    }).toThrowError('It is not possible to move matrix')
+    }).toThrowError('Cannot perform this operation, source location has a matrix inside.')
   })
 
   it('should not be possible to move formula matrix at all', function() {
@@ -937,7 +937,7 @@ describe('move cells with matrices', () => {
 
     expect(() => {
       engine.moveCells(adr('A2'), 2, 1, adr('A3'))
-    }).toThrowError('It is not possible to move matrix')
+    }).toThrowError('Cannot perform this operation, source location has a matrix inside.')
   })
 
   it('should be possible to move whole numeric matrix', () => {

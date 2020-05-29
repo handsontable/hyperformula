@@ -481,7 +481,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * @param {SimpleCellAddress} cellAddress - cell coordinates
    *
-   * @throws Throws an error if the sheet ID is unknown
+   * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
    * @throws [[EvaluationSuspendedError]] when the evaluation is suspended
    *
    * @example
@@ -1084,7 +1084,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
    * @throws [[SheetSizeLimitExceededError]] when performing this operation would result in sheet size limits exceeding
-   * @throws an error if the selected position has matrix inside
+   * @throws [[TargetLocationHasMatrixError]] when the selected position has matrix inside
    *
    * @example
    * ```js
@@ -1151,7 +1151,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * @throws [[InvalidArgumentsError]] when the given arguments are invalid
    * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
-   * @throws an error when the selected position has matrix inside
+   * @throws [[SourceLocationHasMatrixError]] when the selected position has matrix inside
    *
    * @example
    * ```js
@@ -1217,7 +1217,7 @@ export class HyperFormula implements TypedEmitter {
    * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
    * @throws [[InvalidArgumentsError]] when the given arguments are invalid
    * @throws [[SheetSizeLimitExceededError]] when performing this operation would result in sheet size limits exceeding
-   * @throws an error when the selected position has matrix inside
+   * @throws [[TargetLocationHasMatrixError]] when the selected position has matrix inside
    *
    * @example
    * ```js
@@ -1286,7 +1286,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
    * @throws [[InvalidArgumentsError]] when the given arguments are invalid
-   * @throws an error when the selected position has matrix inside
+   * @throws [[SourceLocationHasMatrixError]] when the selected position has matrix inside
    *
    * @example
    * ```js
@@ -1362,8 +1362,8 @@ export class HyperFormula implements TypedEmitter {
    *
    * @throws [[InvalidArgumentsError]] when the given arguments are invalid
    * @throws [[SheetSizeLimitExceededError]] when performing this operation would result in sheet size limits exceeding
-   * @throws an error when the source location has matrix inside - matrix cannot be moved
-   * @throws an error when the target location has matrix inside - cells cannot be replaced by the matrix
+   * @throws [[SourceLocationHasMatrixError]] when the source location has matrix inside - matrix cannot be moved
+   * @throws [[TargetLocationHasMatrixError]] when the target location has matrix inside - cells cannot be replaced by the matrix
    *
    * @example
    * ```js
@@ -1438,7 +1438,8 @@ export class HyperFormula implements TypedEmitter {
    * @fires [[valuesUpdated]] if recalculation was triggered by this change
    *
    * @throws [[InvalidArgumentsError]] when the given arguments are invalid
-   * @throws an error when the source location has matrix inside - matrix cannot be moved
+   * @throws [[SourceLocationHasMatrixError]] when the source location has matrix inside - matrix cannot be moved
+   * @throws [[TargetLocationHasMatrixError]] when the target location has matrix inside - cells cannot be replaced by the matrix
    *
    * @example
    * ```js
@@ -1505,7 +1506,8 @@ export class HyperFormula implements TypedEmitter {
    * @fires [[valuesUpdated]] if recalculation was triggered by this change
    *
    * @throws [[InvalidArgumentsError]] when the given arguments are invalid
-   * @throws an error when the source location has matrix inside - matrix cannot be moved
+   * @throws [[SourceLocationHasMatrixError]] when the source location has matrix inside - matrix cannot be moved
+   * @throws [[TargetLocationHasMatrixError]] when the target location has matrix inside - cells cannot be replaced by the matrix
    *
    * @example
    * ```js
@@ -1601,6 +1603,7 @@ export class HyperFormula implements TypedEmitter {
    * @throws [[EvaluationSuspendedError]] when the evaluation is suspended
    * @throws [[SheetSizeLimitExceededError]] when performing this operation would result in sheet size limits exceeding
    * @throws [[NothingToPasteError]] when clipboard is empty
+   * @throws [[TargetLocationHasMatrixError]] when the selected target area has matrix inside
    *
    * @example
    * ```js
@@ -1791,7 +1794,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * @fires [[sheetAdded]] after the sheet was added
    *
-   * @throws an error when sheet with a given name already exists
+   * @throws [[SheetNameAlreadyTaken]] when sheet with a given name already exists
    *
    * @example
    * ```js
@@ -2322,7 +2325,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * @fires [[sheetRenamed]] after the sheet was renamed
    *
-   * @throws Throws an error if the provided sheet ID does not exists.
+   * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
    *
    * @example
    * ```js
@@ -2507,7 +2510,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * @param {string} expressionName - a name of the expression to be added
    * @param {RawCellContent} expression - the expression
-   * @param {string?} scope - sheet name or undefined for global scope
+   * @param {string?} scope - scope definition, `sheetName` for local scope or `undefined` for global scope
    *
    * @fires [[namedExpressionAdded]] always, unless [[batch]] mode is used
    * @fires [[valuesUpdated]] if recalculation was triggered by this change
@@ -2524,14 +2527,14 @@ export class HyperFormula implements TypedEmitter {
    *  ['42'],
    * ]);
    *
-   * // add own expression, the method should return a list of cells which values
+   * // add own expression, scope limited to 'Sheet1', the method should return a list of cells which values
    * // changed after the operation, their absolute addresses and new values
    * // for this example:
    * // [{
    * //   name: 'prettyName',
    * //   newValue: 142,
    * // }]
-   * const changes = hfInstance.addNamedExpression('prettyName', '=Sheet1!$A$1+100');
+   * const changes = hfInstance.addNamedExpression('prettyName', '=Sheet1!$A$1+100', 'Sheet1');
    * ```
    *
    * @category Named Expressions
@@ -2548,7 +2551,7 @@ export class HyperFormula implements TypedEmitter {
    * Returns a [[CellValue]] or undefined if the given named expression does not exists.
    *
    * @param {string} expressionName - expression name, case insensitive.
-   * @param {string?} scope - sheet name or undefined for global scope
+   * @param {string?} sheetScope - scope definition, `sheetName` for local scope or `undefined` for global scope
    *
    * @throws [[NoSheetWithNameError]] when the given sheet name does not exists
    *
@@ -2558,11 +2561,11 @@ export class HyperFormula implements TypedEmitter {
    *  ['42'],
    * ]);
    *
-   * // add a named expression
-   * hfInstance.addNamedExpression('prettyName', '=Sheet1!A1+100');
+   * // add a named expression, only 'Sheet1' considered as it is the scope
+   * hfInstance.addNamedExpression('prettyName', '=Sheet1!A1+100', 'Sheet1');
    *
    * // returns the calculated value of a passed named expression, '142' for this example
-   * const myFormula = hfInstance.getNamedExpressionValue('prettyName');
+   * const myFormula = hfInstance.getNamedExpressionValue('prettyName', 'Sheet1');
    * ```
    *
    * @category Named Expressions
@@ -2587,7 +2590,7 @@ export class HyperFormula implements TypedEmitter {
    * Unparses AST.
    *
    * @param {string} expressionName - expression name, case insensitive.
-   * @param {string?} scope - sheet name or undefined for global scope
+   * @param {string?} sheetScope - scope definition, `sheetName` for local scope or `undefined` for global scope
    *
    * @throws [[NoSheetWithNameError]] when the given sheet name does not exists
    *
@@ -2597,12 +2600,12 @@ export class HyperFormula implements TypedEmitter {
    *  ['42'],
    * ]);
    *
-   * // add a named expression
-   * hfInstance.addNamedExpression('prettyName', '=Sheet1!A1+100');
+   * // add a named expression in 'Sheet1'
+   * hfInstance.addNamedExpression('prettyName', '=Sheet1!A1+100', 'Sheet1');
    *
-   * // returns a normalized formula string corresponding to a passed name,
+   * // returns a normalized formula string corresponding to a passed name from 'Sheet1',
    * // '=Sheet1!A1+100' for this example
-   * const myFormula = hfInstance.getNamedExpressionFormula('prettyName');
+   * const myFormula = hfInstance.getNamedExpressionFormula('prettyName', 'Sheet1');
    * ```
    *
    * @category Named Expressions
@@ -2663,7 +2666,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * @param {string} expressionName - an expression name, case insensitive.
    * @param {RawCellContent} newExpression - a new expression
-   * @param {string?} scope - sheet name or undefined for global scope
+   * @param {string?} scope - scope definition, `sheetName` for local scope or `undefined` for global scope
    *
    * @fires [[valuesUpdated]] if recalculation was triggered by this change
    *
@@ -2678,8 +2681,8 @@ export class HyperFormula implements TypedEmitter {
    *  ['42'],
    * ]);
    *
-   * // add a named expression
-   * hfInstance.addNamedExpression('prettyName', '=Sheet1!$A$1+100');
+   * // add a named expression, scope limited to 'Sheet1'
+   * hfInstance.addNamedExpression('prettyName', 'Sheet1', '=Sheet1!$A$1+100');
    *
    * // change the named expression
    * const changes = hfInstance.changeNamedExpression('prettyName', '=Sheet1!$A$1+200');
@@ -2732,7 +2735,7 @@ export class HyperFormula implements TypedEmitter {
    * Note that this method may trigger dependency graph recalculation.
    *
    * @param {string} expressionName - expression name, case insensitive.
-   * @param {string?} scope - sheet name or undefined for global scope
+   * @param {string?} sheetScope - scope definition, `sheetName` for local scope or `undefined` for global scope
    *
    * @fires [[namedExpressionRemoved]] after the expression was removed
    * @fires [[valuesUpdated]] if recalculation was triggered by this change
@@ -2747,10 +2750,10 @@ export class HyperFormula implements TypedEmitter {
    * ]);
    *
    * // add a named expression
-   * hfInstance.addNamedExpression('prettyName', '=Sheet1!$A$1+100');
+   * hfInstance.addNamedExpression('prettyName', '=Sheet1!$A$1+100', 'Sheet1');
    *
    * // remove the named expression
-   * const changes = hfInstance.removeNamedExpression('prettyName');
+   * const changes = hfInstance.removeNamedExpression('prettyName', 'Sheet1');
    * ```
    *
    * @category Named Expressions

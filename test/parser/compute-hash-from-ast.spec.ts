@@ -2,7 +2,7 @@ import {HyperFormula} from '../../src'
 import {Config} from '../../src/Config'
 import {SheetMapping} from '../../src/DependencyGraph'
 import {buildTranslationPackage, enGB, plPL} from '../../src/i18n'
-import {buildLexerConfig, FormulaLexer, ParserWithCaching} from '../../src/parser'
+import {buildLexerConfig, FormulaLexer} from '../../src/parser'
 import {adr, unregisterAllLanguages} from '../testUtils'
 import {buildEmptyParserWithCaching} from './common'
 

@@ -122,7 +122,7 @@ describe('changing cell content', () => {
 
     const a1 = engine.addressMapping.fetchCell(adr('A1'))
     const a2 = engine.addressMapping.fetchCell(adr('B1'))
-    expect(a1).toEqual(new EmptyCellVertex())
+    expect(a1).toBeInstanceOf(EmptyCellVertex)
     expect(engine.graph.existsEdge(a1, a2)).toBe(true)
     expect(engine.getCellValue(adr('A1'))).toBe(EmptyValue)
   })
