@@ -126,6 +126,9 @@ export const buildCriterionLambda = (criterion: Criterion, arithmeticHelper: Ari
           if(typeof cellValue === 'number') {
             return arithmeticHelper.floatCmp(cellValue, criterion.value as number) === 0
           } else if(typeof cellValue === 'string') {
+            if(cellValue==='') {
+              return false
+            }
             const val = arithmeticHelper.coerceToMaybeNumber(cellValue)
             if(val === undefined) {
               return false
@@ -149,6 +152,9 @@ export const buildCriterionLambda = (criterion: Criterion, arithmeticHelper: Ari
           if(typeof cellValue === 'number') {
             return arithmeticHelper.floatCmp(cellValue, criterion.value as number) !== 0
           } else if(typeof cellValue === 'string') {
+            if(cellValue === '') {
+              return true
+            }
             const val = arithmeticHelper.coerceToMaybeNumber(cellValue)
             if(val === undefined) {
               return true

@@ -228,10 +228,12 @@ export class ArithmeticHelper {
   public coerceNonDateScalarToMaybeNumber(arg: InternalNoErrorCellValue): Maybe<number> {
     if (arg === EmptyValue) {
       return 0
-    }
-    if (typeof arg === 'string' && this.numberLiteralsHelper.isNumber(arg)) {
+    } else if (typeof arg === 'string' && this.numberLiteralsHelper.isNumber(arg)) {
       return this.numberLiteralsHelper.numericStringToNumber(arg)
     } else {
+      if(typeof arg === 'string' && arg.length>0 && arg.trim() === '') {
+        return undefined
+      }
       const coercedNumber = Number(arg)
       if (isNaN(coercedNumber)) {
         return undefined

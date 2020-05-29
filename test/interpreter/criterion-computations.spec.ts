@@ -67,6 +67,50 @@ describe('Criterions - operators computations', () => {
 
     expect(engine.getCellValue(adr('A4'))).toEqual(10)
   })
+
+  it('empty values #1',  () => {
+    const engine =  HyperFormula.buildFromArray([
+      ['1', ''],
+      ['2', '8'],
+      ['3', '9'],
+      ['=SUMIF(B1:B3, "=", A1:A3)'],
+    ])
+
+    expect(engine.getCellValue(adr('A4'))).toEqual(0)
+  })
+
+  it('empty values #2',  () => {
+    const engine =  HyperFormula.buildFromArray([
+      ['1', ''],
+      ['2', '8'],
+      ['3', '9'],
+      ['=SUMIF(B1:B3, "<>", A1:A3)'],
+    ])
+
+    expect(engine.getCellValue(adr('A4'))).toEqual(6)
+  })
+
+  it('empty values #3',  () => {
+    const engine =  HyperFormula.buildFromArray([
+      ['1', ' '],
+      ['2', '1'],
+      ['3', 'TRUE'],
+      ['=SUMIF(B1:B3, "=0", A1:A3)'],
+    ])
+
+    expect(engine.getCellValue(adr('A4'))).toEqual(0)
+  })
+
+  it('empty values #4',  () => {
+    const engine =  HyperFormula.buildFromArray([
+      [''],
+      ['8'],
+      ['9'],
+      ['=COUNTIF(A1:A3, "=")'],
+    ])
+
+    expect(engine.getCellValue(adr('A4'))).toEqual(0)
+  })
 })
 
 describe( 'big test', () => {
