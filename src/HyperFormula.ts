@@ -23,7 +23,6 @@ import {
 } from './DependencyGraph'
 import {EvaluationSuspendedError, NotAFormulaError} from './errors'
 import {Evaluator} from './Evaluator'
-import {IBatchExecutor} from './IBatchExecutor'
 import {LazilyTransformingAstService} from './LazilyTransformingAstService'
 import {Maybe} from './Maybe'
 import {NamedExpressions} from './NamedExpressions'
@@ -2349,7 +2348,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * Note that this method may trigger dependency graph recalculation.
    *
-   * @param {(e: IBatchExecutor) => void} batchOperations
+   * @param {(e: HyperFormula) => void} batchOperations
    * @fires [[valuesUpdated]] if recalculation was triggered by this change
    *
    * @example
@@ -2367,7 +2366,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * @category Batch
    */
-  public batch(batchOperations: (e: IBatchExecutor) => void): ExportedChange[] {
+  public batch(batchOperations: (e: HyperFormula) => void): ExportedChange[] {
     this.suspendEvaluation()
     this._crudOperations.beginUndoRedoBatchMode()
     try {
