@@ -328,7 +328,7 @@ export class Config implements ConfigParams, ParserConfig {
     ignorePunctuation: false,
     chooseAddressMappingPolicy: new AlwaysDense(),
     dateFormats: ['DD/MM/YYYY', 'DD/MM/YY'],
-    timeFormats: ['hh:mm', 'hh:mm:ss'],
+    timeFormats: ['hh:mm', 'hh:mm:ss.sss'],
     functionArgSeparator: ',',
     decimalSeparator: '.',
     thousandSeparator: '',
