@@ -3,7 +3,7 @@
  * Copyright (c) 2020 Handsoncode. All rights reserved.
  */
 
-import {CellError, ErrorType} from './Cell'
+import {ErrorType} from './Cell'
 import {
   CellValue,
   DetailedCellError,
@@ -14,7 +14,6 @@ import {
 import {HyperFormula} from './HyperFormula'
 import {Config} from './Config'
 import {languages} from './i18n'
-import {LazilyTransformingAstService} from './LazilyTransformingAstService'
 import {Sheets} from './Sheet'
 import {
   ConfigValueTooBigError,
@@ -49,7 +48,6 @@ import * as plugins from './interpreter/plugin'
 class HyperFormulaNS extends HyperFormula {
   public static HyperFormula = HyperFormula
   public static ErrorType = ErrorType
-  public static CellError = CellError
   public static DetailedCellError = DetailedCellError
   public static ExportedCellChange = ExportedCellChange
   public static ExportedNamedExpressionChange = ExportedNamedExpressionChange
@@ -99,7 +97,6 @@ export {
   CellValue,
   NoErrorCellValue,
   ErrorType,
-  CellError,
   DetailedCellError,
   ExportedCellChange,
   ExportedNamedExpressionChange,

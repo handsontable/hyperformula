@@ -1,5 +1,5 @@
-import {CellError, ErrorType, HyperFormula} from '../src'
-import {SimpleCellAddress} from '../src/Cell'
+import {ErrorType, HyperFormula} from '../src'
+import {CellError, SimpleCellAddress} from '../src/Cell'
 import {coerceScalarToString} from '../src/interpreter/ArithmeticHelper'
 import {SimpleRangeValue} from '../src/interpreter/InterpreterValue'
 import {FunctionPlugin} from '../src/interpreter/plugin/FunctionPlugin'

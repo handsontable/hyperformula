@@ -50,18 +50,15 @@ export class ExportedNamedExpressionChange {
 }
 
 export class DetailedCellError {
+  public readonly type: ErrorType
+  public readonly message: string
+
   constructor(
-    public readonly error: CellError,
+    error: CellError,
     public readonly value: string,
   ) {
-  }
-
-  public get type(): ErrorType {
-    return this.error.type
-  }
-
-  public get message(): string {
-    return this.error.message || ''
+    this.type = error.type
+    this.message = error.message || ''
   }
 }
 

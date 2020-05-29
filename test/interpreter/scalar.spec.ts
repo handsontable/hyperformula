@@ -1,8 +1,9 @@
-import {CellError, ErrorType} from '../../src'
+import {ErrorType} from '../../src'
 import {Config} from '../../src/Config'
 import {DateTimeHelper} from '../../src/DateTimeHelper'
 import {ArithmeticHelper, max, min} from '../../src/interpreter/ArithmeticHelper'
 import {NumberLiteralHelper} from '../../src/NumberLiteralHelper'
+import {CellError} from '../../src/Cell'
 
 describe('nonstrictadd', () => {
   const config = new Config()

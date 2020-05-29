@@ -1,7 +1,6 @@
 import {deepStrictEqual} from 'assert'
-import {CellError} from '../src'
 import {AbsoluteCellRange} from '../src/AbsoluteCellRange'
-import {ErrorType, simpleCellAddress} from '../src/Cell'
+import {CellError, ErrorType, simpleCellAddress} from '../src/Cell'
 import {ColumnIndex} from '../src/ColumnSearch/ColumnIndex'
 import {NamedExpressions} from '../src/NamedExpressions'
 import {ColumnsSpan} from '../src/ColumnsSpan'
