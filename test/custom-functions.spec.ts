@@ -2,11 +2,12 @@ import {FunctionPlugin} from '../src/interpreter/plugin/FunctionPlugin'
 import {ProcedureAst} from '../src/parser'
 import {ErrorType, InternalCellValue, SimpleCellAddress} from '../src/Cell'
 import {HyperFormula, FunctionPluginValidationError} from '../src'
-import {adr, detailedError, expectArrayWithSameContent, unregisterAllFormulas} from './testUtils'
+import {adr, detailedError, expectArrayWithSameContent} from './testUtils'
 import {SumifPlugin} from '../src/interpreter/plugin/SumifPlugin'
 import {NumericAggregationPlugin} from '../src/interpreter/plugin/NumericAggregationPlugin'
 import {enGB, plPL} from '../src/i18n'
 import { VersionPlugin } from '../src/interpreter/plugin/VersionPlugin'
+import {ProtectedFunctionError} from '../src/errors'
 
 class FooPlugin extends FunctionPlugin {
   public static implementedFunctions = {
@@ -64,6 +65,18 @@ class InvalidPlugin extends FunctionPlugin {
   }
 }
 
+class ReservedNamePlugin extends FunctionPlugin {
+  public static implementedFunctions = {
+    'VERSION': {
+      method: 'version',
+    }
+  }
+
+  public version(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
+    return 'foo'
+  }
+}
+
 
 describe('Register static custom plugin', () => {
   it('should register plugin with translations', () => {
@@ -84,13 +97,13 @@ describe('Register static custom plugin', () => {
   })
 
   it('should return registered formula translations', () => {
-    unregisterAllFormulas()
+    HyperFormula.unregisterAllFunctions()
     HyperFormula.registerLanguage('plPL', plPL)
     HyperFormula.registerFunctionPlugin(SumifPlugin)
     HyperFormula.registerFunctionPlugin(FooPlugin, FooPlugin.translations)
     const formulaNames = HyperFormula.getRegisteredFunctionNames('plPL')
 
-    expectArrayWithSameContent(['FU', 'BAR', 'SUMA.JEŻELI', 'LICZ.JEŻELI', 'ŚREDNIA.JEŻELI', 'SUMY.JEŻELI', 'LICZ.WARUNKI'], formulaNames)
+    expectArrayWithSameContent(['FU', 'BAR', 'SUMA.JEŻELI', 'LICZ.JEŻELI', 'ŚREDNIA.JEŻELI', 'SUMY.JEŻELI', 'LICZ.WARUNKI', 'WERSJA', 'PRZESUNIĘCIE'], formulaNames)
   })
 
   it('should register all formulas from plugin', () => {
@@ -143,7 +156,7 @@ describe('Register static custom plugin', () => {
   })
 
   it('should return registered plugins', () => {
-    unregisterAllFormulas()
+    HyperFormula.unregisterAllFunctions()
     HyperFormula.registerFunctionPlugin(SumifPlugin)
     HyperFormula.registerFunctionPlugin(NumericAggregationPlugin)
     HyperFormula.registerFunctionPlugin(SumWithExtra)
@@ -152,7 +165,7 @@ describe('Register static custom plugin', () => {
   })
 
   it('should unregister whole plugin', () => {
-    unregisterAllFormulas()
+    HyperFormula.unregisterAllFunctions()
     HyperFormula.registerFunctionPlugin(NumericAggregationPlugin)
     HyperFormula.registerFunctionPlugin(SumifPlugin)
 
@@ -170,7 +183,7 @@ describe('Register static custom plugin', () => {
 
     HyperFormula.unregisterAllFunctions()
 
-    expect(HyperFormula.getRegisteredFunctionNames('enGB').length).toEqual(0)
+    expect(HyperFormula.getRegisteredFunctionNames('enGB').length).toEqual(2) // protected functions counts
   })
 })
 
@@ -245,5 +258,33 @@ describe('Instance level formula registry', () => {
     const engine = HyperFormula.buildFromArray([])
 
     expect(engine.getFunctionPlugin('SUMIF')).toBe(SumifPlugin)
+  })
+})
+
+describe('Reserved functions', () => {
+  it('should not be possible to remove reserved function', () => {
+    expect(() => {
+      HyperFormula.unregisterFunction('VERSION')
+    }).toThrow(ProtectedFunctionError.cannotUnregisterFunctionWithId('VERSION'))
+  })
+
+  it('should not be possible to unregister reserved plugin', () => {
+    expect(() => {
+      HyperFormula.unregisterFunctionPlugin(VersionPlugin)
+    }).toThrow(ProtectedFunctionError.cannotUnregisterProtectedPlugin())
+  })
+
+  it('should not be possible to override reserved function', () => {
+    expect(() => {
+      HyperFormula.registerFunction('VERSION', ReservedNamePlugin)
+    }).toThrow(ProtectedFunctionError.cannotRegisterFunctionWithId('VERSION'))
+
+    expect(() => {
+      HyperFormula.registerFunctionPlugin(ReservedNamePlugin)
+    }).toThrow(ProtectedFunctionError.cannotRegisterFunctionWithId('VERSION'))
+  })
+
+  it('should return undefined when trying to retrieve protected function plugin', () => {
+    expect(HyperFormula.getFunctionPlugin('VERSION')).toBe(undefined)
   })
 })

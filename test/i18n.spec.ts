@@ -62,8 +62,6 @@ describe('i18n', () => {
 
   it('all translation packages should translate all implemented functions', () => {
     const implementedFunctions = new Set(Array.from(FunctionRegistry.getRegisteredFunctionIds()))
-    implementedFunctions.add('OFFSET') // HARDCODED FUNCTION
-    implementedFunctions.add('VERSION') // HARDCODED FUNCTION
 
     for (const lang in languages) {
       const translatedFunctionsInLang = new Set(Object.keys(languages[lang].functions))

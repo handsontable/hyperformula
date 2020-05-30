@@ -6,7 +6,7 @@ import {HyperFormula} from '../../src'
 import {Config} from '../../src/Config'
 import {AlwaysSparse} from '../../src/DependencyGraph/AddressMapping/ChooseAddressMappingPolicy'
 import {languages} from '../../src/i18n'
-import {unregisterAllFormulas, unregisterAllLanguages} from './../testUtils'
+import {unregisterAllLanguages} from './../testUtils'
 import {toContainEqualMatcher, toMatchObjectMatcher} from './matchers'
 import * as plugins from '../../src/interpreter/plugin'
 
@@ -41,7 +41,7 @@ beforeEach(() => {
 
   HyperFormula.registerLanguage(defaultLanguage, languages[defaultLanguage])
 
-  unregisterAllFormulas()
+  HyperFormula.unregisterAllFunctions()
 
   for (const pluginName of Object.getOwnPropertyNames(plugins)) {
     if (!pluginName.startsWith('_')) {

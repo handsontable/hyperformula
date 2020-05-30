@@ -2,6 +2,7 @@ import { FunctionPlugin } from '../../src/interpreter/plugin/FunctionPlugin'
 import { InternalCellValue } from '../../src/Cell'
 import { HyperFormula } from '../../src'
 import { adr } from '../testUtils'
+import {ProtectedFunctionError} from '../../src/errors'
 
 describe('Function VERSION', () => {
   describe('getting version', () => {
@@ -80,18 +81,20 @@ describe('Function VERSION', () => {
     }
 
     it('should not allow registering VERSION formula', () => {
-      const engine = HyperFormula.buildFromArray([
-        ['=VERSION()'],
-      ], {
-        licenseKey: 'agpl-v3',
-        functionPlugins: [VersionExtra]
-      })
-
-      expect(engine.getCellValue(adr('A1'))).toEqual(`HyperFormula v${HyperFormula.version}, 1`)
+      expect(() => {
+        HyperFormula.buildFromArray([
+          ['=VERSION()'],
+        ], {
+          licenseKey: 'agpl-v3',
+          functionPlugins: [VersionExtra]
+        })
+      }).toThrow(ProtectedFunctionError.cannotRegisterFunctionWithId('VERSION'))
     })
 
     it('should be available even if anyone unregistered ', () => {
-      HyperFormula.unregisterFunction('VERSION')
+      expect(() => {
+        HyperFormula.unregisterFunction('VERSION')
+      }).toThrow(ProtectedFunctionError.cannotUnregisterFunctionWithId('VERSION'))
 
       const engine = HyperFormula.buildFromArray([
         ['=VERSION()'],
