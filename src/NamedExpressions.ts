@@ -7,21 +7,35 @@ import {simpleCellAddress, SimpleCellAddress} from './Cell'
 import {Maybe} from './Maybe'
 import {Ast, AstNodeType} from './parser'
 
-export class NamedExpression {
+export interface NamedExpression {
+  name: string,
+  scope?: string,
+  expression?: string,
+  options?: NamedExpressionOptions,
+}
+
+export type NamedExpressionOptions = Record<string, string | number | boolean>
+
+export class InternalNamedExpression {
   constructor(
     public displayName: string,
     public readonly address: SimpleCellAddress,
     public added: boolean,
+    public options?: NamedExpressionOptions
   ) {
   }
 
   public normalizeExpressionName(): string {
     return this.displayName.toLowerCase()
   }
+
+  public copy(): InternalNamedExpression {
+    return new InternalNamedExpression(this.displayName, this.address, this.added, this.options)
+  }
 }
 
 class WorkbookStore {
-  private readonly mapping = new Map<string, NamedExpression>()
+  private readonly mapping = new Map<string, InternalNamedExpression>()
 
   public has(expressionName: string): boolean {
     return this.mapping.has(this.normalizeExpressionName(expressionName))
@@ -33,15 +47,15 @@ class WorkbookStore {
     return !(namedExpression && namedExpression.added)
   }
 
-  public add(namedExpression: NamedExpression): void {
+  public add(namedExpression: InternalNamedExpression): void {
     this.mapping.set(namedExpression.normalizeExpressionName(), namedExpression)
   }
 
-  public get(expressionName: string): Maybe<NamedExpression> {
+  public get(expressionName: string): Maybe<InternalNamedExpression> {
     return this.mapping.get(this.normalizeExpressionName(expressionName))
   }
 
-  public getExisting(expressionName: string): Maybe<NamedExpression> {
+  public getExisting(expressionName: string): Maybe<InternalNamedExpression> {
     const namedExpression = this.mapping.get(this.normalizeExpressionName(expressionName))
     if (namedExpression && namedExpression.added) {
       return namedExpression
@@ -58,8 +72,8 @@ class WorkbookStore {
     }
   }
 
-  public getAllNamedExpressions(): NamedExpression[] {
-    return Array.from(this.mapping.values()).filter((ne: NamedExpression) => ne.added)
+  public getAllNamedExpressions(): InternalNamedExpression[] {
+    return Array.from(this.mapping.values()).filter((ne: InternalNamedExpression) => ne.added)
   }
 
   private normalizeExpressionName(expressionName: string): string {
@@ -68,13 +82,13 @@ class WorkbookStore {
 }
 
 class WorksheetStore {
-  public readonly mapping = new Map<string, NamedExpression>()
+  public readonly mapping = new Map<string, InternalNamedExpression>()
 
-  public add(namedExpression: NamedExpression): void {
+  public add(namedExpression: InternalNamedExpression): void {
     this.mapping.set(this.normalizeExpressionName(namedExpression.displayName), namedExpression)
   }
 
-  public get(expressionName: string): Maybe<NamedExpression> {
+  public get(expressionName: string): Maybe<InternalNamedExpression> {
     return this.mapping.get(this.normalizeExpressionName(expressionName))
   }
 
@@ -105,7 +119,7 @@ export class NamedExpressions {
   private nextNamedExpressionRow: number = 0
   public readonly workbookStore: WorkbookStore = new WorkbookStore()
   public readonly worksheetStores: Map<number, WorksheetStore> = new Map()
-  public readonly addressCache: Map<number, NamedExpression> = new Map()
+  public readonly addressCache: Map<number, InternalNamedExpression> = new Map()
 
   constructor(
   ) {
@@ -119,7 +133,7 @@ export class NamedExpressions {
     }
   }
 
-  public namedExpressionInAddress(row: number): Maybe<NamedExpression> {
+  public namedExpressionInAddress(row: number): Maybe<InternalNamedExpression> {
     const namedExpression = this.addressCache.get(row)
     if (namedExpression && namedExpression.added) {
       return namedExpression
@@ -128,7 +142,7 @@ export class NamedExpressions {
     }
   }
 
-  public namedExpressionForScope(expressionName: string, sheetId?: number): Maybe<NamedExpression> {
+  public namedExpressionForScope(expressionName: string, sheetId?: number): Maybe<InternalNamedExpression> {
     if (sheetId === undefined) {
       return this.workbookStore.getExisting(expressionName)
     } else {
@@ -136,7 +150,7 @@ export class NamedExpressions {
     }
   }
 
-  public nearestNamedExpression(expressionName: string, sheetId: number): Maybe<NamedExpression> {
+  public nearestNamedExpression(expressionName: string, sheetId: number): Maybe<InternalNamedExpression> {
     return this.worksheetStore(sheetId).get(expressionName) || this.workbookStore.getExisting(expressionName)
   }
 
@@ -151,21 +165,22 @@ export class NamedExpressions {
     return /^[A-Za-z\u00C0-\u02AF_][A-Za-z0-9\u00C0-\u02AF\._]*$/.test(expressionName)
   }
 
-  public addNamedExpression(expressionName: string, sheetId?: number): NamedExpression {
+  public addNamedExpression(expressionName: string, sheetId?: number, options?: NamedExpressionOptions): InternalNamedExpression {
     if (sheetId === undefined) {
       let namedExpression = this.workbookStore.get(expressionName)
       if (namedExpression) {
         namedExpression.added = true
         namedExpression.displayName = expressionName
+        namedExpression.options = options
       } else {
-        namedExpression = new NamedExpression(expressionName, this.nextAddress(), true)
+        namedExpression = new InternalNamedExpression(expressionName, this.nextAddress(), true, options)
         this.workbookStore.add(namedExpression)
       }
       this.addressCache.set(namedExpression.address.row, namedExpression)
       return namedExpression
     } else {
       const store = this.worksheetStore(sheetId)
-      const namedExpression = new NamedExpression(expressionName, this.nextAddress(), true)
+      const namedExpression = new InternalNamedExpression(expressionName, this.nextAddress(), true, options)
       store.add(namedExpression)
       this.addressCache.set(namedExpression.address.row, namedExpression)
       return namedExpression
@@ -181,24 +196,24 @@ export class NamedExpressions {
     return store
   }
 
-  public namedExpressionOrPlaceholder(expressionName: string, sheetId: number): NamedExpression {
+  public namedExpressionOrPlaceholder(expressionName: string, sheetId: number): InternalNamedExpression {
     const namedExpression = this.worksheetStore(sheetId).get(expressionName)
     if (namedExpression) {
       return namedExpression
     } else {
       let namedExpression = this.workbookStore.get(expressionName)
       if (namedExpression === undefined) {
-        namedExpression = new NamedExpression(expressionName, this.nextAddress(), false)
+        namedExpression = new InternalNamedExpression(expressionName, this.nextAddress(), false)
         this.workbookStore.add(namedExpression)
       }
       return namedExpression
     }
   }
 
-  public workbookNamedExpressionOrPlaceholder(expressionName: string): NamedExpression {
+  public workbookNamedExpressionOrPlaceholder(expressionName: string): InternalNamedExpression {
     let namedExpression = this.workbookStore.get(expressionName)
     if (namedExpression === undefined) {
-      namedExpression = new NamedExpression(expressionName, this.nextAddress(), false)
+      namedExpression = new InternalNamedExpression(expressionName, this.nextAddress(), false)
       this.workbookStore.add(namedExpression)
     }
     return namedExpression

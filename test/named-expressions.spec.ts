@@ -833,3 +833,129 @@ describe('Named expressions - named ranges', () => {
     expect(engine.getCellValue(adr('C1'))).toEqual(6)
   })
 })
+
+describe('Named expressions - options', () => {
+  it('should return named expression with empty options', () => {
+    const engine = HyperFormula.buildEmpty()
+
+    engine.addNamedExpression('foo', '=foo')
+
+    expect(engine.getNamedExpression('foo')).toEqual({
+      name: 'foo',
+      expression: '=foo',
+      scope: undefined,
+      options: undefined
+    })
+  })
+
+  it('should return named expression with options', () => {
+    const engine = HyperFormula.buildEmpty()
+
+    engine.addNamedExpression('foo', '=foo', undefined, { visible: false, comment: 'bar' })
+
+    expect(engine.getNamedExpression('foo')).toEqual({
+      name: 'foo',
+      expression: '=foo',
+      scope: undefined,
+      options: {
+        visible: false,
+        comment: 'bar'
+      }
+    })
+  })
+
+  it('should preserve options after undo-redo', () => {
+    const engine = HyperFormula.buildEmpty()
+
+    engine.addNamedExpression('foo', '=foo', undefined, { visible: false, comment: 'bar' })
+
+    engine.undo()
+    engine.redo()
+
+    expect(engine.getNamedExpression('foo')).toEqual({
+      name: 'foo',
+      expression: '=foo',
+      scope: undefined,
+      options: {
+        visible: false,
+        comment: 'bar'
+      }
+    })
+  })
+
+  it('should change options of named expression', () => {
+    const engine = HyperFormula.buildEmpty()
+
+    engine.addNamedExpression('foo', '=foo', undefined, { visible: false, comment: 'foo' })
+
+    engine.changeNamedExpression('foo', '=bar', undefined, { visible: true, comment: 'bar' })
+
+    expect(engine.getNamedExpression('foo')).toEqual({
+      name: 'foo',
+      expression: '=bar',
+      scope: undefined,
+      options: {
+        visible: true,
+        comment: 'bar'
+      }
+    })
+  })
+
+  it('should undo changing options of named expression', () => {
+    const engine = HyperFormula.buildEmpty()
+
+    engine.addNamedExpression('foo', '=foo', undefined, { visible: false, comment: 'foo' })
+    engine.changeNamedExpression('foo', '=bar', undefined, { visible: true, comment: 'bar' })
+
+    engine.undo()
+
+    expect(engine.getNamedExpression('foo')).toEqual({
+      name: 'foo',
+      expression: '=foo',
+      scope: undefined,
+      options: {
+        visible: false,
+        comment: 'foo'
+      }
+    })
+  })
+
+  it('should undo-redo changing options of named expression', () => {
+    const engine = HyperFormula.buildEmpty()
+
+    engine.addNamedExpression('foo', '=foo', undefined, { visible: false, comment: 'foo' })
+    engine.changeNamedExpression('foo', '=bar', undefined, { visible: true, comment: 'bar' })
+
+    engine.undo()
+    engine.redo()
+
+    expect(engine.getNamedExpression('foo')).toEqual({
+      name: 'foo',
+      expression: '=bar',
+      scope: undefined,
+      options: {
+        visible: true,
+        comment: 'bar'
+      }
+    })
+  })
+
+  it('should restore named expression with options', () => {
+    const engine = HyperFormula.buildEmpty()
+
+    engine.addNamedExpression('foo', '=foo', undefined, { visible: false, comment: 'foo' })
+    engine.removeNamedExpression('foo')
+
+    engine.undo()
+
+    expect(engine.getNamedExpression('foo')).toEqual({
+      name: 'foo',
+      expression: '=foo',
+      scope: undefined,
+      options: {
+        visible: false,
+        comment: 'foo'
+      }
+    })
+  })
+})
