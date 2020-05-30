@@ -188,7 +188,13 @@ export class FunctionRegistry {
   }
 
   public getPlugins(): FunctionPluginDefinition[] {
-    return Array.from(new Set(this.instancePlugins.values()).values())
+    const plugins: Set<FunctionPluginDefinition> = new Set()
+    for (const [functionId, plugin] of this.instancePlugins) {
+      if (!FunctionRegistry.functionIsProtected(functionId)) {
+        plugins.add(plugin)
+      }
+    }
+    return Array.from(plugins)
   }
 
   public getRegisteredFunctionIds(): string[] {

@@ -227,7 +227,7 @@ describe('Instance level formula registry', () => {
   it('should return registered plugins', () => {
     const engine = HyperFormula.buildFromArray([], {functionPlugins: [SumifPlugin, NumericAggregationPlugin, SumWithExtra]})
 
-    expectArrayWithSameContent(engine.getAllFunctionPlugins(), [SumifPlugin, NumericAggregationPlugin, SumWithExtra, VersionPlugin])
+    expectArrayWithSameContent(engine.getAllFunctionPlugins(), [SumifPlugin, NumericAggregationPlugin, SumWithExtra])
   })
 
   it('should instantiate engine with additional plugin', () => {
@@ -237,7 +237,7 @@ describe('Instance level formula registry', () => {
 
     const registeredPlugins = new Set(engine.getAllFunctionPlugins())
 
-    expect(registeredPlugins.size).toEqual(HyperFormula.getAllFunctionPlugins().length + 2)
+    expect(registeredPlugins.size).toEqual(HyperFormula.getAllFunctionPlugins().length + 1)
     expect(registeredPlugins.has(FooPlugin)).toBe(true)
   })
 
@@ -251,7 +251,7 @@ describe('Instance level formula registry', () => {
     engine.updateConfig({functionPlugins: [FooPlugin]})
     registeredPlugins = new Set(engine.getAllFunctionPlugins())
     expect(registeredPlugins.has(FooPlugin)).toBe(true)
-    expect(registeredPlugins.size).toBe(2)
+    expect(registeredPlugins.size).toBe(1)
   })
 
   it('should return plugin for given functionId', () => {
