@@ -16,7 +16,7 @@ import {
   RowsRemoval
 } from './Operations'
 import {Config} from './Config'
-import {NamedExpression} from './NamedExpressions'
+import {InternalNamedExpression, NamedExpressionOptions} from './NamedExpressions'
 
 export class RemoveRowsUndoEntry {
   constructor(
@@ -141,25 +141,27 @@ export class AddNamedExpressionUndoEntry {
     public readonly name: string,
     public readonly newContent: RawCellContent,
     public readonly scope?: number,
+    public readonly options?: NamedExpressionOptions
   ) {
   }
 }
 
 export class RemoveNamedExpressionUndoEntry {
   constructor(
-    public readonly namedExpression: NamedExpression,
+    public readonly namedExpression: InternalNamedExpression,
     public readonly content: ClipboardCell,
-    public readonly scope?: number
+    public readonly scope?: number,
   ) {
   }
 }
 
 export class ChangeNamedExpressionUndoEntry {
   constructor(
-    public readonly namedExpression: NamedExpression,
+    public readonly namedExpression: InternalNamedExpression,
     public readonly newContent: RawCellContent,
     public readonly oldContent: ClipboardCell,
-    public readonly scope?: number
+    public readonly scope?: number,
+    public readonly options?: NamedExpressionOptions
   ) {
   }
 }
@@ -583,7 +585,7 @@ export class UndoRedo {
   }
 
   private redoAddNamedExpression(operation: AddNamedExpressionUndoEntry) {
-    this.operations.addNamedExpression(operation.name, operation.newContent, operation.scope)
+    this.operations.addNamedExpression(operation.name, operation.newContent, operation.scope, operation.options)
   }
 
   private redoRemoveNamedExpression(operation: RemoveNamedExpressionUndoEntry) {
@@ -591,7 +593,7 @@ export class UndoRedo {
   }
 
   private redoChangeNamedExpression(operation: ChangeNamedExpressionUndoEntry) {
-    this.operations.changeNamedExpressionExpression(operation.namedExpression.displayName, operation.newContent, operation.scope)
+    this.operations.changeNamedExpressionExpression(operation.namedExpression.displayName, operation.newContent, operation.scope, operation.options)
   }
 
   private restoreOldDataFromVersion(version: number) {

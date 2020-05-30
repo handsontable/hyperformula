@@ -17,6 +17,7 @@ import {Config, ConfigParams} from './Config'
 import {languages, RawTranslationPackage} from './i18n'
 import {Sheet, SheetDimensions, Sheets} from './Sheet'
 import {RawCellContent} from './CellContentParser'
+import {NamedExpression, NamedExpressionOptions} from './NamedExpressions'
 import {
   ConfigValueTooBigError,
   ConfigValueTooSmallError,
@@ -110,6 +111,8 @@ export {
   ColumnRowIndex,
   RawTranslationPackage,
   FunctionPluginDefinition,
+  NamedExpression,
+  NamedExpressionOptions,
   HyperFormula,
   CellType,
   CellValueType,

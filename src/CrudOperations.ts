@@ -13,7 +13,12 @@ import {ColumnsSpan} from './ColumnsSpan'
 import {Config} from './Config'
 import {ContentChanges} from './ContentChanges'
 import {DependencyGraph, SheetMapping} from './DependencyGraph'
-import {doesContainRelativeReferences, NamedExpression, NamedExpressions} from './NamedExpressions'
+import {
+  doesContainRelativeReferences,
+  InternalNamedExpression,
+  NamedExpressionOptions,
+  NamedExpressions
+} from './NamedExpressions'
 import {
   InvalidAddressError,
   InvalidArgumentsError,
@@ -293,24 +298,24 @@ export class CrudOperations {
     this.undoRedo.redo()
   }
 
-  public addNamedExpression(expressionName: string, expression: RawCellContent, sheetScope: string | undefined) {
+  public addNamedExpression(expressionName: string, expression: RawCellContent, sheetScope?: string, options?: NamedExpressionOptions) {
     const sheetId = this.scopeId(sheetScope)
     this.ensureNamedExpressionNameIsValid(expressionName, sheetId)
-    this.operations.addNamedExpression(expressionName, expression, sheetId)
+    this.operations.addNamedExpression(expressionName, expression, sheetId, options)
     this.undoRedo.clearRedoStack()
     this.clipboardOperations.abortCut()
-    this.undoRedo.saveOperation(new AddNamedExpressionUndoEntry(expressionName, expression, sheetId))
+    this.undoRedo.saveOperation(new AddNamedExpressionUndoEntry(expressionName, expression, sheetId, options))
   }
 
-  public changeNamedExpressionExpression(expressionName: string, sheetScope: string | undefined, newExpression: RawCellContent) {
+  public changeNamedExpressionExpression(expressionName: string, sheetScope: string | undefined, newExpression: RawCellContent, options?: NamedExpressionOptions) {
     const sheetId = this.scopeId(sheetScope)
-    const [namedExpression, content] = this.operations.changeNamedExpressionExpression(expressionName, newExpression, sheetId)
+    const [oldNamedExpression, content] = this.operations.changeNamedExpressionExpression(expressionName, newExpression, sheetId, options)
     this.undoRedo.clearRedoStack()
     this.clipboardOperations.abortCut()
-    this.undoRedo.saveOperation(new ChangeNamedExpressionUndoEntry(namedExpression, newExpression, content, sheetId))
+    this.undoRedo.saveOperation(new ChangeNamedExpressionUndoEntry(oldNamedExpression, newExpression, content, sheetId, options))
   }
 
-  public removeNamedExpression(expressionName: string, sheetScope: string | undefined): NamedExpression {
+  public removeNamedExpression(expressionName: string, sheetScope: string | undefined): InternalNamedExpression {
     const sheetId = this.scopeId(sheetScope)
     const [namedExpression, content] = this.operations.removeNamedExpression(expressionName, sheetId)
     this.undoRedo.clearRedoStack()
@@ -540,6 +545,14 @@ export class CrudOperations {
     }
   }
 
+  public scopeId(sheetName: string | undefined): number | undefined {
+    if (sheetName !== undefined) {
+      this.ensureSheetExists(sheetName)
+      return this.sheetMapping.fetch(sheetName)
+    }
+    return undefined
+  }
+
   private get sheetMapping(): SheetMapping {
     return this.dependencyGraph.sheetMapping
   }
@@ -563,14 +576,6 @@ export class CrudOperations {
         throw new NoRelativeAddressesAllowedError()
       }
     }
-  }
-
-  private scopeId(sheetName: string | undefined): number | undefined {
-    if (sheetName !== undefined) {
-      this.ensureSheetExists(sheetName)
-      return this.sheetMapping.fetch(sheetName)
-    }
-    return undefined
   }
 }
 

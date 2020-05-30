@@ -46,7 +46,12 @@ import {RemoveColumnsTransformer} from './dependencyTransformers/RemoveColumnsTr
 import {AbsoluteCellRange} from './AbsoluteCellRange'
 import {findBoundaries, Sheet} from './Sheet'
 import {Config} from './Config'
-import {doesContainRelativeReferences, NamedExpression, NamedExpressions} from './NamedExpressions'
+import {
+  doesContainRelativeReferences,
+  InternalNamedExpression,
+  NamedExpressionOptions,
+  NamedExpressions
+} from './NamedExpressions'
 import {ColumnRowIndex} from './CrudOperations'
 
 export class RemoveRowsCommand {
@@ -289,30 +294,35 @@ export class Operations {
     return {version: version!, overwrittenCellsData: currentDataAtTarget, addedGlobalNamedExpressions: addedGlobalNamedExpressions}
   }
 
-  public addNamedExpression(expressionName: string, expression: RawCellContent, sheetId?: number) {
+  public addNamedExpression(expressionName: string, expression: RawCellContent, sheetId?: number, options?: NamedExpressionOptions) {
     this.storeNamedExpressionInCell(this.namedExpressions.lookupNextAddress(expressionName, sheetId), expression)
-    const namedExpression = this.namedExpressions.addNamedExpression(expressionName, sheetId)
+    const namedExpression = this.namedExpressions.addNamedExpression(expressionName, sheetId, options)
     this.adjustNamedExpressionEdges(namedExpression, expressionName, sheetId)
   }
 
-  public restoreNamedExpression(namedExpression: NamedExpression, content: ClipboardCell, sheetId?: number) {
+  public restoreNamedExpression(namedExpression: InternalNamedExpression, content: ClipboardCell, sheetId?: number) {
     const expressionName = namedExpression.displayName
+    const options = namedExpression.options
     this.restoreCell(namedExpression.address, content)
-    const restoredNamedExpression = this.namedExpressions.addNamedExpression(expressionName, sheetId)
+    const restoredNamedExpression = this.namedExpressions.addNamedExpression(expressionName, sheetId, options)
     this.adjustNamedExpressionEdges(restoredNamedExpression, expressionName, sheetId)
   }
 
-  public changeNamedExpressionExpression(expressionName: string, newExpression: RawCellContent, sheetId?: number): [NamedExpression, ClipboardCell]  {
+  public changeNamedExpressionExpression(expressionName: string, newExpression: RawCellContent, sheetId?: number, options?: NamedExpressionOptions): [InternalNamedExpression, ClipboardCell]  {
     const namedExpression = this.namedExpressions.namedExpressionForScope(expressionName, sheetId)
     if (!namedExpression) {
       throw new NamedExpressionDoesNotExistError(expressionName)
     }
+
+    const oldNamedExpression = namedExpression.copy()
+
+    namedExpression.options = options
     const content = this.getClipboardCell(namedExpression.address)
     this.storeNamedExpressionInCell(namedExpression.address, newExpression)
-    return [namedExpression, content]
+    return [oldNamedExpression, content]
   }
 
-  public removeNamedExpression(expressionName: string, sheetId?: number): [NamedExpression, ClipboardCell] {
+  public removeNamedExpression(expressionName: string, sheetId?: number): [InternalNamedExpression, ClipboardCell] {
     const namedExpression = this.namedExpressions.namedExpressionForScope(expressionName, sheetId)
     if (!namedExpression) {
       throw new NamedExpressionDoesNotExistError(expressionName)
@@ -665,7 +675,7 @@ export class Operations {
     return column >= width
   }
 
-  private adjustNamedExpressionEdges(namedExpression: NamedExpression, expressionName: string, sheetId?: number) {
+  private adjustNamedExpressionEdges(namedExpression: InternalNamedExpression, expressionName: string, sheetId?: number) {
     if (sheetId !== undefined) {
       const localVertex = this.dependencyGraph.fetchCellOrCreateEmpty(namedExpression.address)
       const globalNamedExpression = this.namedExpressions.workbookNamedExpressionOrPlaceholder(expressionName)
