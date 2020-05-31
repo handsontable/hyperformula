@@ -4,7 +4,7 @@
  */
 
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
-import {InternalScalarValue, SimpleCellAddress} from '../Cell'
+import {InternalNoErrorCellValue, InternalScalarValue, SimpleCellAddress} from '../Cell'
 import {ColumnsSpan} from '../ColumnsSpan'
 import {Config} from '../Config'
 import {DependencyGraph} from '../DependencyGraph'
@@ -36,7 +36,7 @@ export class ColumnBinarySearch implements ColumnSearchStrategy {
 
   public destroy(): void {}
 
-  public find(key: InternalScalarValue, range: AbsoluteCellRange, sorted: boolean): number {
+  public find(key: InternalNoErrorCellValue, range: AbsoluteCellRange, sorted: boolean): number {
     if (range.height() < this.config.vlookupThreshold || !sorted) {
       const values = this.computeListOfValuesInRange(range)
       const index =  values.indexOf(key)
@@ -46,13 +46,22 @@ export class ColumnBinarySearch implements ColumnSearchStrategy {
     }
   }
 
+  public advancedFind(keyMatcher: (arg: InternalScalarValue) => boolean, range: AbsoluteCellRange): number {
+    const values = this.computeListOfValuesInRange(range)
+    for(let i=0; i<values.length; i++) {
+      if(keyMatcher(values[i])) {
+        return i + range.start.row
+      }
+    }
+    return -1
+  }
+
   private computeListOfValuesInRange(range: AbsoluteCellRange): InternalScalarValue[] {
     const values: InternalScalarValue[] = []
     for (const cellFromRange of range.addresses(this.dependencyGraph)) {
       const value = this.dependencyGraph.getScalarValue(cellFromRange)
       values.push(value)
     }
-
     return values
   }
 }

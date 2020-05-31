@@ -25,6 +25,17 @@ describe('Function COUNTIF', () => {
     expect(engine.getCellValue(adr('A4'))).toEqual(2)
   })
 
+  it('works with mixed types',  () => {
+    const engine =  HyperFormula.buildFromArray([
+      ['0'],
+      ['"1"'],
+      ['2'],
+      ['=COUNTIF(A1:A3, "=1")'],
+    ])
+
+    expect(engine.getCellValue(adr('A4'))).toEqual(0)
+  })
+
   it('use partial cache',  () => {
     const engine =  HyperFormula.buildFromArray([
       ['0'],

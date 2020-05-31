@@ -305,6 +305,27 @@ export interface ConfigParams {
    */
   undoLimit: number,
   /**
+   * If set true, then criterions in functions (SUMIF, COUNTIF, ...) can use regular expressions.
+   *
+   * @default false
+   * @category String
+   */
+  useRegularExpresssions: boolean,
+  /**
+   * If set true, then criterions in functions (SUMIF, COUNTIF, ...) can use wildcards '*' and '?'.
+   *
+   * @default true
+   * @category String
+   */
+  useWildcards: boolean,
+  /**
+   * Whether criterions in functions require whole cell to match the pattern, or just a subword.
+   *
+   * @default true
+   * @category String
+   */
+  matchWholeCell: boolean,
+  /**
    * Maximum number of rows
    *
    * @default 40,000
@@ -357,6 +378,9 @@ export class Config implements ConfigParams, ParserConfig {
     vlookupThreshold: 20,
     nullDate: {year: 1899, month: 12, day: 30},
     undoLimit: 20,
+    useRegularExpresssions: false,
+    useWildcards: true,
+    matchWholeCell: true,
     maxRows: 40_000,
     maxColumns: 18_278
   }
@@ -438,6 +462,9 @@ export class Config implements ConfigParams, ParserConfig {
    * @internal
    */
   public readonly translationPackage: TranslationPackage
+  public readonly useRegularExpresssions: boolean
+  public readonly useWildcards: boolean
+  public readonly matchWholeCell: boolean
   /**
    * Set automatically based on licenseKey checking result.
    *
@@ -486,6 +513,9 @@ export class Config implements ConfigParams, ParserConfig {
       nullDate,
       useStats,
       undoLimit,
+      useRegularExpresssions,
+      useWildcards,
+      matchWholeCell,
       maxRows,
       maxColumns
     }: Partial<ConfigParams> = {},
@@ -529,6 +559,9 @@ export class Config implements ConfigParams, ParserConfig {
     this.nullDate = this.valueFromParamCheck(nullDate, instanceOfSimpleDate, 'IDate', 'nullDate')
     this.leapYear1900 = this.valueFromParam(leapYear1900, 'boolean', 'leapYear1900')
     this.undoLimit = this.valueFromParam(undoLimit, 'number', 'undoLimit')
+    this.useRegularExpresssions = this.valueFromParam(useRegularExpresssions, 'boolean', 'useRegularExpresssions')
+    this.useWildcards = this.valueFromParam(useWildcards, 'boolean', 'useWildcards')
+    this.matchWholeCell = this.valueFromParam(matchWholeCell, 'boolean', 'matchWholeCell')
     this.validateNumberToBeAtLeast(this.undoLimit, 'undoLimit', 0)
     this.maxRows = this.valueFromParam(maxRows, 'number', 'maxRows')
     this.validateNumberToBeAtLeast(this.maxRows, 'maxRows', 1)

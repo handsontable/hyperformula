@@ -4,7 +4,14 @@
  */
 
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
-import {CellError, InternalCellValue, InternalScalarValue, movedSimpleCellAddress, SimpleCellAddress} from '../Cell'
+import {
+  CellError,
+  InternalCellValue,
+  InternalNoErrorCellValue,
+  InternalScalarValue,
+  movedSimpleCellAddress,
+  SimpleCellAddress
+} from '../Cell'
 import {ColumnsSpan} from '../ColumnsSpan'
 import {Config} from '../Config'
 import {DependencyGraph} from '../DependencyGraph'
@@ -89,7 +96,7 @@ export class ColumnIndex implements ColumnSearchStrategy {
     }
   }
 
-  public find(key: InternalScalarValue, range: AbsoluteCellRange, sorted: boolean): number {
+  public find(key: InternalNoErrorCellValue, range: AbsoluteCellRange, sorted: boolean): number {
     this.ensureRecentData(range.sheet, range.start.col, key)
 
     const columnMap = this.getColumnMap(range.sheet, range.start.col)
@@ -105,6 +112,10 @@ export class ColumnIndex implements ColumnSearchStrategy {
     const index = upperBound(valueIndex.index, range.start.row)
     const rowNumber = valueIndex.index[index]
     return rowNumber <= range.end.row ? rowNumber : this.binarySearchStrategy.find(key, range, sorted)
+  }
+
+  public advancedFind(keyMatcher: (arg: InternalCellValue) => boolean, range: AbsoluteCellRange): number {
+    return this.binarySearchStrategy.advancedFind(keyMatcher, range)
   }
 
   public addColumns(columnsSpan: ColumnsSpan) {
