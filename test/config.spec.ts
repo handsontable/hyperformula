@@ -1,6 +1,6 @@
 import {HyperFormula} from '../src'
 import {Config} from '../src/Config'
-import {enGB, plPL} from '../src/i18n'
+import {enGB, plPL} from '../src/i18n/languages'
 import {unregisterAllLanguages} from './testUtils'
 import {EmptyValue} from '../src/Cell'
 

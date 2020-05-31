@@ -5,7 +5,7 @@ import {HyperFormula, FunctionPluginValidationError} from '../src'
 import {adr, detailedError, expectArrayWithSameContent, unregisterAllFormulas} from './testUtils'
 import {SumifPlugin} from '../src/interpreter/plugin/SumifPlugin'
 import {NumericAggregationPlugin} from '../src/interpreter/plugin/NumericAggregationPlugin'
-import {plPL} from '../src/i18n'
+import {plPL} from '../src/i18n/languages'
 
 class FooPlugin extends FunctionPlugin {
   public static implementedFunctions = {

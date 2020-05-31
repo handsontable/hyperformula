@@ -3,7 +3,7 @@
  * Copyright (c) 2020 Handsoncode. All rights reserved.
  */
 
-import {RawTranslationPackage} from './'
+import {RawTranslationPackage} from '..'
 
 export const enGB: RawTranslationPackage = {
   functions: {

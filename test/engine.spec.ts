@@ -1,6 +1,6 @@
 import {DetailedCellError, HyperFormula} from '../src'
 import {CellType, CellValueType, EmptyValue, ErrorType} from '../src/Cell'
-import {plPL} from '../src/i18n'
+import {plPL} from '../src/i18n/languages'
 import {adr, detailedError, expectArrayWithSameContent} from './testUtils'
 
 describe('Integration', () => {

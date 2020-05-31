@@ -1,10 +1,16 @@
 import {HyperFormula} from '../src'
-import {languages, plPL, TranslationPackage} from '../src/i18n'
+import {TranslationPackage, RawTranslationPackage} from '../src/i18n'
+import {enGB, plPL} from '../src/i18n/languages'
 import {CellAddress} from '../src/parser'
 import {adr, extractReference} from './testUtils'
 import {FunctionRegistry} from '../src/interpreter/FunctionRegistry'
 
 describe('i18n', () => {
+  const languages: Record<string, RawTranslationPackage> = {
+    enGB,
+    plPL,
+  }
+
   beforeEach(() => {
     HyperFormula.registerLanguage('plPL', plPL)
   })
@@ -52,7 +58,7 @@ describe('i18n', () => {
   })
 
   it('all function translation keys has to be upper cased', () => {
-      for (const lang in languages) {
+    for (const lang in languages) {
       const translationPackage = languages[lang]
       for (const translationKey in translationPackage.functions) {
         expect(translationPackage.functions[translationKey]).toEqual(translationPackage.functions[translationKey].toUpperCase())
