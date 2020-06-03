@@ -6,6 +6,7 @@
 import {CellVertex, FormulaCellVertex, MatrixVertex, ValueCellVertex} from './DependencyGraph'
 import {CellAddress} from './parser'
 import {AddressWithSheet} from './parser/Address'
+import {SimpleRangeValue} from './interpreter/InterpreterValue'
 
 /**
  * Possible errors returned by our interpreter.
@@ -30,10 +31,11 @@ export enum ErrorType {
   ERROR = 'ERROR'
 }
 
-export const EmptyValue = Symbol()
+export const EmptyValue = Symbol('Empty value')
 export type EmptyValueType = typeof EmptyValue
-export type NoErrorCellValue = number | string | boolean | EmptyValueType
-export type InternalCellValue = NoErrorCellValue | CellError
+export type InternalNoErrorCellValue = number | string | boolean | EmptyValueType
+export type InternalScalarValue = InternalNoErrorCellValue | CellError
+export type InternalCellValue = InternalScalarValue | SimpleRangeValue
 
 export enum CellType {
   FORMULA = 'FORMULA',
@@ -85,7 +87,7 @@ export const getCellValueType = (cellValue: InternalCellValue): CellValueType =>
     return CellValueType.EMPTY
   }
 
-  if (cellValue instanceof CellError) {
+  if (cellValue instanceof CellError || cellValue instanceof SimpleRangeValue) {
     return CellValueType.ERROR
   }
 

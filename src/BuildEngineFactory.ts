@@ -65,8 +65,7 @@ export class BuildEngineFactory {
       }
     }
 
-    const notEmpty = sheetMapping.numberOfSheets() > 0
-    const parser = new ParserWithCaching(config, functionRegistry, notEmpty ? sheetMapping.get : sheetMapping.fetch)
+    const parser = new ParserWithCaching(config, functionRegistry, sheetMapping.get)
     const unparser = new Unparser(config, buildLexerConfig(config), sheetMapping.fetchDisplayName, namedExpressions)
     const dateHelper = new DateTimeHelper(config)
     const numberLiteralHelper = new NumberLiteralHelper(config)

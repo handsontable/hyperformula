@@ -4,7 +4,7 @@
  */
 
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
-import {InternalCellValue} from '../Cell'
+import {CellError, ErrorType, InternalScalarValue} from '../Cell'
 import {DependencyGraph} from '../DependencyGraph'
 import {MatrixSize} from '../Matrix'
 import {Maybe} from '../Maybe'
@@ -12,7 +12,7 @@ import {Maybe} from '../Maybe'
 export class ArrayData {
   constructor(
     public readonly size: MatrixSize,
-    public readonly data: InternalCellValue[][],
+    public readonly data: InternalScalarValue[][],
     public _hasOnlyNumbers: boolean,
   ) {
   }
@@ -25,7 +25,7 @@ export class ArrayData {
     return this._hasOnlyNumbers
   }
 
-  public* valuesFromTopLeftCorner(): IterableIterator<InternalCellValue> {
+  public* valuesFromTopLeftCorner(): IterableIterator<InternalScalarValue> {
     for (let i = 0; i < this.size.height; i++) {
       for (let j = 0; j < this.size.width; j++) {
         yield this.data[i][j]
@@ -33,7 +33,7 @@ export class ArrayData {
     }
   }
 
-  public raw(): InternalCellValue[][] {
+  public raw(): InternalScalarValue[][] {
     return this.data
   }
 
@@ -47,7 +47,7 @@ export class ArrayData {
 }
 
 export class OnlyRangeData {
-  public data: Maybe<InternalCellValue[][]>
+  public data: Maybe<InternalScalarValue[][]>
   public _hasOnlyNumbers?: boolean
 
   constructor(
@@ -57,7 +57,7 @@ export class OnlyRangeData {
   ) {
   }
 
-  public raw(): InternalCellValue[][] {
+  public raw(): InternalScalarValue[][] {
     this.ensureThatComputed()
 
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -92,11 +92,11 @@ export class OnlyRangeData {
     return this._range
   }
 
-  public* valuesFromTopLeftCorner(): IterableIterator<InternalCellValue> {
+  public* valuesFromTopLeftCorner(): IterableIterator<InternalScalarValue> {
     this.ensureThatComputed()
 
-    for (let i = 0; i < this.size.height; i++) {
-      for (let j = 0; j < this.size.width; j++) {
+    for (let i = 0; i < this.data!.length; i++) {
+      for (let j = 0; j < this.data![0].length; j++) {
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         yield this.data![i][j]
       }
@@ -109,14 +109,16 @@ export class OnlyRangeData {
     }
   }
 
-  private computeDataFromDependencyGraph(): InternalCellValue[][] {
-    const result: InternalCellValue[][] = []
+  private computeDataFromDependencyGraph(): InternalScalarValue[][] {
+    const result: InternalScalarValue[][] = []
 
     let i = 0
     let row = []
     for (const cellFromRange of this._range.addresses(this.dependencyGraph)) {
       const value = this.dependencyGraph.getCellValue(cellFromRange)
-      if (typeof value === 'number') {
+      if (value instanceof SimpleRangeValue) {
+        row.push(new CellError(ErrorType.VALUE))
+      } else if (typeof value === 'number') {
         row.push(value)
       } else {
         row.push(value)
@@ -155,7 +157,7 @@ export class SimpleRangeValue {
     return new SimpleRangeValue(new OnlyRangeData({ width: range.width(), height: range.height() }, range, dependencyGraph))
   }
 
-  public static fromScalar(scalar: InternalCellValue): SimpleRangeValue {
+  public static fromScalar(scalar: InternalScalarValue): SimpleRangeValue {
     const hasOnlyNumbers = (typeof scalar === 'number')
     return new SimpleRangeValue(new ArrayData({ width: 1, height: 1 }, [[scalar]], hasOnlyNumbers))
   }
@@ -172,11 +174,11 @@ export class SimpleRangeValue {
     return this.data.size.height
   }
 
-  public raw(): InternalCellValue[][] {
+  public raw(): InternalScalarValue[][] {
     return this.data.raw()
   }
 
-  public* valuesFromTopLeftCorner(): IterableIterator<InternalCellValue> {
+  public* valuesFromTopLeftCorner(): IterableIterator<InternalScalarValue> {
     yield *this.data.valuesFromTopLeftCorner()
   }
 
@@ -201,4 +203,4 @@ export class SimpleRangeValue {
   }
 }
 
-export type InterpreterValue = InternalCellValue | SimpleRangeValue
+export type InterpreterValue = InternalScalarValue | SimpleRangeValue

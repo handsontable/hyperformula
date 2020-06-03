@@ -26,6 +26,8 @@ module.exports = {
         $page.version = HyperFormula.version
         // inject current HF buildDate as {{ $page.buildDate }} variable
         $page.buildDate = HyperFormula.buildDate
+        // inject current HF releaseDate as {{ $page.releaseDate }} variable
+        $page.releaseDate = HyperFormula.releaseDate
       },
       chainMarkdown (config) {
         // inject custom markdown highlight with our aliases to formula syntax
@@ -40,13 +42,18 @@ module.exports = {
     extendMarkdown: md => {
       md.use(regexPlugin, {
         name: 'Replace HT_BUILD_DATE',
-        regex: /\(process\.env\.HT_BUILD_DATE/,
+        regex: /(process\.env\.HT_BUILD_DATE as string)/,
         replace: () => `'${HyperFormula.buildDate}'`
       })
       md.use(regexPlugin, {
         name: 'Replace HT_VERSION',
-        regex: /\(process\.env\.HT_VERSION/,
+        regex: /(process\.env\.HT_VERSION as string)/,
         replace: () => `'${HyperFormula.version}'`
+      })
+      md.use(regexPlugin, {
+        name: 'Replace HT_RELEASE_DATE',
+        regex: /(process\.env\.HT_RELEASE_DATE as string)/,
+        replace: () => `'${HyperFormula.releaseDate}'`
       })
     }
   },
@@ -139,34 +146,22 @@ module.exports = {
           collapsable: true,
         },
         {
-          title: 'Events',
+          title: 'Event Types',
           path: '/api/interfaces/listeners',
+          alias: '/api/events',
           collapsable: true,
         },
         {
-          title: 'Options',
+          title: 'Configuration Options',
           path: '/api/interfaces/configparams',
           collapsable: true,
         },
         {
-          title: 'Errors',
+          title: 'Error Types',
           collapsable: true,
           children: fs.readdirSync(path.join(__dirname, '../api/classes'))
             .filter((n) => n.match(/.*error\.md$/))
             .map(f => `/api/classes/${f}`)
-        },
-        {
-          title: 'Enumerations',
-          collapsable: true,
-          children: fs.readdirSync(path.join(__dirname, '../api/enums'))
-            .map(f => `/api/enums/${f}`)
-        },
-        {
-          title: 'Interfaces',
-          collapsable: true,
-          children: fs.readdirSync(path.join(__dirname, '../api/interfaces'))
-            .filter((n) => !n.match(/.*configparams.*/))
-            .map(f => `/api/interfaces/${f}`)
         },
         {
           title: 'Globals',

@@ -5,7 +5,7 @@
 
 import GPU from 'gpu.js'
 import {AbsoluteCellRange, AbsoluteColumnRange, AbsoluteRowRange} from '../AbsoluteCellRange'
-import {CellError, ErrorType, invalidSimpleCellAddress, NoErrorCellValue, SimpleCellAddress, } from '../Cell'
+import {CellError, ErrorType, InternalNoErrorCellValue, invalidSimpleCellAddress, SimpleCellAddress} from '../Cell'
 import {ColumnSearchStrategy} from '../ColumnSearch/ColumnSearchStrategy'
 import {Config} from '../Config'
 import {DateTimeHelper} from '../DateTimeHelper'
@@ -15,7 +15,7 @@ import {Maybe} from '../Maybe'
 // noinspection TypeScriptPreferShortImport
 import {Ast, AstNodeType, CellRangeAst, ColumnRangeAst, RowRangeAst} from '../parser/Ast'
 import {Statistics} from '../statistics/Statistics'
-import {ArithmeticHelper, divide, multiply, percent, power, unaryminus, } from './ArithmeticHelper'
+import {ArithmeticHelper, divide, multiply, percent, power, unaryminus} from './ArithmeticHelper'
 import {InterpreterValue, SimpleRangeValue} from './InterpreterValue'
 import {concatenate} from './text'
 import {NumberLiteralHelper} from '../NumberLiteralHelper'
@@ -71,45 +71,45 @@ export class Interpreter {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
         const rightResult = this.evaluateAst(ast.right, formulaAddress)
         return this.passErrors(leftResult, rightResult) ??
-          this.arithmeticHelper.compare(leftResult as NoErrorCellValue, rightResult as NoErrorCellValue) === 0
+          this.arithmeticHelper.compare(leftResult as InternalNoErrorCellValue, rightResult as InternalNoErrorCellValue) === 0
       }
       case AstNodeType.NOT_EQUAL_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
         const rightResult = this.evaluateAst(ast.right, formulaAddress)
         return this.passErrors(leftResult, rightResult) ??
-          this.arithmeticHelper.compare(leftResult as NoErrorCellValue, rightResult as NoErrorCellValue) !== 0
+          this.arithmeticHelper.compare(leftResult as InternalNoErrorCellValue, rightResult as InternalNoErrorCellValue) !== 0
       }
       case AstNodeType.GREATER_THAN_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
         const rightResult = this.evaluateAst(ast.right, formulaAddress)
         return this.passErrors(leftResult, rightResult) ??
-          this.arithmeticHelper.compare(leftResult as NoErrorCellValue, rightResult as NoErrorCellValue) > 0
+          this.arithmeticHelper.compare(leftResult as InternalNoErrorCellValue, rightResult as InternalNoErrorCellValue) > 0
       }
       case AstNodeType.LESS_THAN_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
         const rightResult = this.evaluateAst(ast.right, formulaAddress)
         return this.passErrors(leftResult, rightResult) ??
-          this.arithmeticHelper.compare(leftResult as NoErrorCellValue, rightResult as NoErrorCellValue) < 0
+          this.arithmeticHelper.compare(leftResult as InternalNoErrorCellValue, rightResult as InternalNoErrorCellValue) < 0
       }
       case AstNodeType.GREATER_THAN_OR_EQUAL_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
         const rightResult = this.evaluateAst(ast.right, formulaAddress)
         return this.passErrors(leftResult, rightResult) ??
-          this.arithmeticHelper.compare(leftResult as NoErrorCellValue, rightResult as NoErrorCellValue) >= 0
+          this.arithmeticHelper.compare(leftResult as InternalNoErrorCellValue, rightResult as InternalNoErrorCellValue) >= 0
       }
       case AstNodeType.LESS_THAN_OR_EQUAL_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
         const rightResult = this.evaluateAst(ast.right, formulaAddress)
         return this.passErrors(leftResult, rightResult) ??
-          this.arithmeticHelper.compare(leftResult as NoErrorCellValue, rightResult as NoErrorCellValue) <= 0
+          this.arithmeticHelper.compare(leftResult as InternalNoErrorCellValue, rightResult as InternalNoErrorCellValue) <= 0
       }
       case AstNodeType.PLUS_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
         const rightResult = this.evaluateAst(ast.right, formulaAddress)
         return this.passErrors(leftResult, rightResult) ??
           this.arithmeticHelper.add(
-            this.arithmeticHelper.coerceScalarToNumberOrError(leftResult as NoErrorCellValue),
-            this.arithmeticHelper.coerceScalarToNumberOrError(rightResult as NoErrorCellValue)
+            this.arithmeticHelper.coerceScalarToNumberOrError(leftResult as InternalNoErrorCellValue),
+            this.arithmeticHelper.coerceScalarToNumberOrError(rightResult as InternalNoErrorCellValue)
           )
       }
       case AstNodeType.MINUS_OP: {
@@ -117,8 +117,8 @@ export class Interpreter {
         const rightResult = this.evaluateAst(ast.right, formulaAddress)
         return this.passErrors(leftResult, rightResult) ??
           this.arithmeticHelper.subtract(
-            this.arithmeticHelper.coerceScalarToNumberOrError(leftResult as NoErrorCellValue),
-            this.arithmeticHelper.coerceScalarToNumberOrError(rightResult as NoErrorCellValue)
+            this.arithmeticHelper.coerceScalarToNumberOrError(leftResult as InternalNoErrorCellValue),
+            this.arithmeticHelper.coerceScalarToNumberOrError(rightResult as InternalNoErrorCellValue)
           )
       }
       case AstNodeType.TIMES_OP: {
@@ -126,8 +126,8 @@ export class Interpreter {
         const rightResult = this.evaluateAst(ast.right, formulaAddress)
         return this.passErrors(leftResult, rightResult) ??
           multiply(
-            this.arithmeticHelper.coerceScalarToNumberOrError(leftResult as NoErrorCellValue),
-            this.arithmeticHelper.coerceScalarToNumberOrError(rightResult as NoErrorCellValue)
+            this.arithmeticHelper.coerceScalarToNumberOrError(leftResult as InternalNoErrorCellValue),
+            this.arithmeticHelper.coerceScalarToNumberOrError(rightResult as InternalNoErrorCellValue)
           )
       }
       case AstNodeType.POWER_OP: {
@@ -135,8 +135,8 @@ export class Interpreter {
         const rightResult = this.evaluateAst(ast.right, formulaAddress)
         return this.passErrors(leftResult, rightResult) ??
           power(
-            this.arithmeticHelper.coerceScalarToNumberOrError(leftResult as NoErrorCellValue),
-            this.arithmeticHelper.coerceScalarToNumberOrError(rightResult as NoErrorCellValue)
+            this.arithmeticHelper.coerceScalarToNumberOrError(leftResult as InternalNoErrorCellValue),
+            this.arithmeticHelper.coerceScalarToNumberOrError(rightResult as InternalNoErrorCellValue)
           )
       }
       case AstNodeType.DIV_OP: {
@@ -144,8 +144,8 @@ export class Interpreter {
         const rightResult = this.evaluateAst(ast.right, formulaAddress)
         return this.passErrors(leftResult, rightResult) ??
           divide(
-            this.arithmeticHelper.coerceScalarToNumberOrError(leftResult as NoErrorCellValue),
-            this.arithmeticHelper.coerceScalarToNumberOrError(rightResult as NoErrorCellValue)
+            this.arithmeticHelper.coerceScalarToNumberOrError(leftResult as InternalNoErrorCellValue),
+            this.arithmeticHelper.coerceScalarToNumberOrError(rightResult as InternalNoErrorCellValue)
           )
       }
       case AstNodeType.PLUS_UNARY_OP: {

@@ -332,7 +332,7 @@ describe('Adding row, ranges', () => {
     ]))
   })
 
-  it('it should insert new cell with edge to only one range below', () => {
+  it('it should insert new cell with edge to all ranges below', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '=SUM(A1:A1)'],
       ['2', '=SUM(A1:A2)'],
@@ -343,11 +343,19 @@ describe('Adding row, ranges', () => {
 
     engine.addRows(0, [2, 1])
 
+    const a4 = engine.addressMapping.fetchCell(adr('A4'))
     const a3 = engine.addressMapping.fetchCell(adr('A3'))
+    const a2 = engine.addressMapping.fetchCell(adr('A2'))
     const a1a4 = engine.rangeMapping.fetchRange(adr('A1'), adr('A4')) // A1:A4
+    const a1a3 = engine.rangeMapping.fetchRange(adr('A1'), adr('A3')) // A1:A4
+    const a1a2 = engine.rangeMapping.fetchRange(adr('A1'), adr('A2')) // A1:A4
 
-    expect(engine.graph.existsEdge(a3, a1a4)).toBe(true)
+    expect(engine.graph.existsEdge(a4, a1a4)).toBe(true)
+    expect(engine.graph.existsEdge(a3, a1a3)).toBe(true)
+    expect(engine.graph.existsEdge(a2, a1a2)).toBe(true)
+    expect(engine.graph.adjacentNodesCount(a4)).toBe(1)
     expect(engine.graph.adjacentNodesCount(a3)).toBe(1)
+    expect(engine.graph.adjacentNodesCount(a2)).toBe(1)
   })
 
   it('it should insert new cell with edge to only one range below, shifted by 1', () => {

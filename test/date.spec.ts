@@ -1,7 +1,9 @@
+import {HyperFormula} from '../src'
 import {Config} from '../src/Config'
 import {DateTimeHelper, SimpleDate} from '../src/DateTimeHelper'
 import moment from 'moment'
 import {Maybe} from '../src/Maybe'
+import {adr} from './testUtils'
 
 describe('Date helpers', () => {
   it('#dateToNumber should return number representation of a date', () => {
@@ -45,15 +47,26 @@ describe('Date helpers', () => {
     expect(dateHelper.dateStringToDateNumber('48:00')).toBe(2)
     expect(dateHelper.dateStringToDateNumber('00:01')).toBe(0.0006944444444444445)
     expect(dateHelper.dateStringToDateNumber('00:00:00')).toBe(0)
+    expect(dateHelper.dateStringToDateNumber('00:00:00.001')).toBe(1.1574074074074076e-8)
+    expect(dateHelper.dateStringToDateNumber('00:00:00.0001')).toBe(0)
     expect(dateHelper.dateStringToDateNumber('00:00:01')).toBe(0.000011574074074074073)
     expect(dateHelper.dateStringToDateNumber('00:179:60')).toBe(0.125)
+  })
+
+  it('#stringToDateNumber - fraction of seconds', () => {
+    const dateHelper = new DateTimeHelper(new Config({timeFormats: ['hh:mm:ss.ss']}))
+    expect(dateHelper.dateStringToDateNumber('00:00:00.1')).toBeCloseTo(0.0000011574074074074074)
+    expect(dateHelper.dateStringToDateNumber('00:00:00.01')).toBeCloseTo(1.1574074074074073e-7)
+    expect(dateHelper.dateStringToDateNumber('00:00:00.001')).toBeCloseTo(0)
   })
 
   it('#stringToDateNumber am/pm', () => {
     const dateHelper = new DateTimeHelper(new Config())
     expect(dateHelper.dateStringToDateNumber('03:00 am')).toBe(0.125)
+    expect(dateHelper.dateStringToDateNumber('03:00 a')).toBe(0.125)
     expect(dateHelper.dateStringToDateNumber('03:00 pm')).toBe(0.625)
     expect(dateHelper.dateStringToDateNumber('12:00 pm')).toBe(0.5)
+    expect(dateHelper.dateStringToDateNumber('12:00 p')).toBe(0.5)
     expect(dateHelper.dateStringToDateNumber('00:00 pm')).toBe(0.5)
     expect(dateHelper.dateStringToDateNumber('12:59 pm')).toBe(0.5409722222222222)
     expect(dateHelper.dateStringToDateNumber('12:00 am')).toBe(0.0)
@@ -126,7 +139,6 @@ describe('Date helpers', () => {
     expect(dateHelper.dateStringToDateNumber(' ')).toBe(undefined)
     expect(dateHelper.dateStringToDateNumber('')).toBe(undefined)
   })
-
 })
 
 describe('Date helpers, other zero date', () => {
@@ -154,8 +166,6 @@ describe('Date helpers, other zero date', () => {
     expect(dateHelper.dateStringToDateNumber('31/12/2999')).toBe(383339)
   })
 })
-
-
 
 describe('Custom date parsing', () => {
 

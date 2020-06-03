@@ -8,13 +8,22 @@ import {Maybe} from './Maybe'
 
 export function defaultParseToDateTime(dateTimeString: string, dateFormat: string, timeFormat: string): Maybe<DateTime> {
   dateTimeString = dateTimeString.replace(/\s\s+/g, ' ').trim().toLowerCase()
-  let ampmtoken: string | undefined = dateTimeString.substring(dateTimeString.length - 2)
+  let ampmtoken: Maybe<string> = dateTimeString.substring(dateTimeString.length - 2)
   if (ampmtoken === 'am' || ampmtoken === 'pm') {
     dateTimeString = dateTimeString.substring(0, dateTimeString.length - 2).trim()
   } else {
-    ampmtoken = undefined
+    ampmtoken = dateTimeString.substring(dateTimeString.length - 1)
+    if(ampmtoken === 'a' || ampmtoken === 'p') {
+      dateTimeString = dateTimeString.substring(0, dateTimeString.length - 1).trim()
+    } else {
+      ampmtoken = undefined
+    }
   }
   const dateItems = dateTimeString.split(/[ /.-]/g)
+  if(dateItems.length >= 2 && dateItems[dateItems.length-2].includes(':')) {
+    dateItems[dateItems.length-2] = dateItems[dateItems.length-2] + '.' + dateItems[dateItems.length-1]
+    dateItems.pop()
+  }
   const timeItems = dateItems[dateItems.length - 1].split(':')
   if (ampmtoken !== undefined) {
     timeItems.push(ampmtoken)
@@ -37,19 +46,28 @@ export function defaultParseToDateTime(dateTimeString: string, dateFormat: strin
   }
 }
 
+export const secondsExtendedRegexp = /^ss\.(s+|0+)$/
+
 export function defaultParseToTime(timeItems: string[], timeFormat: string): Maybe<SimpleTime> {
   timeFormat = timeFormat.toLowerCase()
-  if (timeFormat.length >= 1 && timeFormat.endsWith('a')) {
-    timeFormat = timeFormat.substring(0, timeFormat.length - 1).trim()
+  if (timeFormat.endsWith('am/pm')) {
+    timeFormat = timeFormat.substring(0, timeFormat.length - 5).trim()
+  } else if (timeFormat.endsWith('a/p')) {
+    timeFormat = timeFormat.substring(0, timeFormat.length - 3).trim()
   }
   const formatItems = timeFormat.split(':')
   let ampm = undefined
-  if (timeItems[timeItems.length - 1] === 'am') {
+  if (timeItems[timeItems.length - 1] === 'am' || timeItems[timeItems.length - 1] === 'a') {
     ampm = false
     timeItems.pop()
-  } else if (timeItems[timeItems.length - 1] === 'pm') {
+  } else if (timeItems[timeItems.length - 1] === 'pm' || timeItems[timeItems.length - 1] === 'p') {
     ampm = true
     timeItems.pop()
+  }
+  let fractionOfSecondPrecision: number = 0
+  if(formatItems.length >= 1 && secondsExtendedRegexp.test(formatItems[formatItems.length-1])) {
+    fractionOfSecondPrecision = formatItems[formatItems.length-1].length-3
+    formatItems[formatItems.length-1] = 'ss'
   }
   if (timeItems.length !== formatItems.length) {
     return undefined
@@ -80,10 +98,11 @@ export function defaultParseToTime(timeItems: string[], timeFormat: string): May
   const minute = Number(minuteString)
 
   const secondString = secondIndex !== -1 ? timeItems[secondIndex] : '0'
-  if (!/^\d+$/.test(secondString)) {
+  if (!/^\d+(\.\d+)?$/.test(secondString)) {
     return undefined
   }
-  const second = Number(secondString)
+  let second = Number(secondString)
+  second = Math.round(second * Math.pow(10, fractionOfSecondPrecision))/Math.pow(10, fractionOfSecondPrecision)
 
   return {hour, minute, second}
 }

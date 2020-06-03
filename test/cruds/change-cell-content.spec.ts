@@ -1,4 +1,4 @@
-import {EmptyValue, ExportedCellChange, HyperFormula, InvalidAddressError, NoSheetWithIdError} from '../../src'
+import {ExportedCellChange, HyperFormula, InvalidAddressError, NoSheetWithIdError} from '../../src'
 import {ErrorType, simpleCellAddress} from '../../src/Cell'
 import {ColumnIndex} from '../../src/ColumnSearch/ColumnIndex'
 import {EmptyCellVertex, MatrixVertex} from '../../src/DependencyGraph'
@@ -122,9 +122,9 @@ describe('changing cell content', () => {
 
     const a1 = engine.addressMapping.fetchCell(adr('A1'))
     const a2 = engine.addressMapping.fetchCell(adr('B1'))
-    expect(a1).toEqual(new EmptyCellVertex())
+    expect(a1).toBeInstanceOf(EmptyCellVertex)
     expect(engine.graph.existsEdge(a1, a2)).toBe(true)
-    expect(engine.getCellValue(adr('A1'))).toBe(EmptyValue)
+    expect(engine.getCellValue(adr('A1'))).toBe(null)
   })
 
   it('update formula to empty cell', () => {
@@ -137,9 +137,8 @@ describe('changing cell content', () => {
 
     expect(engine.graph.existsEdge(a1, b1)).toBe(true)
     expect(engine.getCellValue(adr('B1'))).toBe(1)
-
     engine.setCellContents(adr('B1'), [[null]])
-    expect(engine.getCellValue(adr('B1'))).toBe(EmptyValue)
+    expect(engine.getCellValue(adr('B1'))).toBe(null)
     expect(engine.graph.nodes).not.toContain(b1)
     expect(engine.graph.existsEdge(a1, b1)).toBe(false)
   })
@@ -199,7 +198,7 @@ describe('changing cell content', () => {
     expect(engine.getCellValue(adr('B1'))).toBe(2)
     engine.setCellContents(adr('B1'), null)
     expect(engine.addressMapping.getCell(adr('B1'))).toBe(null)
-    expect(engine.getCellValue(adr('B1'))).toBe(EmptyValue)
+    expect(engine.getCellValue(adr('B1'))).toBe(null)
   })
 
   it('update value cell to error literal', () => {
@@ -296,7 +295,7 @@ describe('changing cell content', () => {
     engine.setCellContents(adr('A1'), null)
     const a1 = engine.addressMapping.getCell(adr('A1'))
     expect(a1).toBe(null)
-    expect(engine.getCellValue(adr('A1'))).toBe(EmptyValue)
+    expect(engine.getCellValue(adr('A1'))).toBe(null)
   })
 
   it('set number for the first time', () => {
@@ -585,8 +584,8 @@ describe('changing cell content', () => {
     const cellInLastColumn = simpleCellAddress(0, Config.defaultConfig.maxColumns, 0)
     const cellInLastRow = simpleCellAddress(0, 0, Config.defaultConfig.maxRows)
 
-    expect(() => engine.setCellContents(cellInLastColumn, EmptyValue)).not.toThrow()
-    expect(() => engine.setCellContents(cellInLastRow, EmptyValue)).not.toThrow()
+    expect(() => engine.setCellContents(cellInLastColumn, null)).not.toThrow()
+    expect(() => engine.setCellContents(cellInLastRow, null)).not.toThrow()
   })
 })
 

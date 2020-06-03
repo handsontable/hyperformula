@@ -3,6 +3,7 @@ import {Events} from '../src/Emitter'
 import {ErrorType} from '../src/Cell'
 
 import { adr, detailedError } from './testUtils'
+import {NamedExpressionDoesNotExistError} from '../src/errors'
 
 describe('Events', () => {
   it('sheetAdded works', function() {
@@ -70,7 +71,7 @@ describe('Events', () => {
     const handler = jasmine.createSpy()
 
     engine.on(Events.NamedExpressionAdded, handler)
-    engine.addNamedExpression('myName', 'foobarbaz', undefined)
+    engine.addNamedExpression('myName', 'foobarbaz')
 
     expect(handler).toHaveBeenCalledTimes(1)
     expect(handler).toHaveBeenCalledWith('myName', [new ExportedNamedExpressionChange('myName', 'foobarbaz')])
@@ -78,33 +79,33 @@ describe('Events', () => {
 
   it('namedExpressionRemoved works', () => {
     const engine = HyperFormula.buildEmpty()
-    engine.addNamedExpression('myName', 'foobarbaz', undefined)
+    engine.addNamedExpression('myName', 'foobarbaz')
     const handler = jasmine.createSpy()
 
     engine.on(Events.NamedExpressionRemoved, handler)
-    engine.removeNamedExpression('myName', undefined)
+    engine.removeNamedExpression('myName')
 
     expect(handler).toHaveBeenCalledTimes(1)
     expect(handler).toHaveBeenCalledWith('myName', [])
   })
 
-  it('namedExpressionRemoved is not triggered if there was nothing to remove', () => {
+  it('namedExpressionRemoved throws error when named expression not exists', () => {
     const engine = HyperFormula.buildEmpty()
     const handler = jasmine.createSpy()
 
     engine.on(Events.NamedExpressionRemoved, handler)
-    engine.removeNamedExpression('myName', undefined)
-
-    expect(handler).not.toHaveBeenCalled()
+    expect(() => {
+      engine.removeNamedExpression('myName')
+    }).toThrow(new NamedExpressionDoesNotExistError('myName'))
   })
 
   it('namedExpressionRemoved contains actual named expression name', () => {
     const engine = HyperFormula.buildEmpty()
-    engine.addNamedExpression('myName', 'foobarbaz', undefined)
+    engine.addNamedExpression('myName', 'foobarbaz')
     const handler = jasmine.createSpy()
 
     engine.on(Events.NamedExpressionRemoved, handler)
-    engine.removeNamedExpression('MYNAME', undefined)
+    engine.removeNamedExpression('MYNAME')
 
     expect(handler).toHaveBeenCalledTimes(1)
     expect(handler).toHaveBeenCalledWith('myName', [])

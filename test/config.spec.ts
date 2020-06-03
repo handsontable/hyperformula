@@ -1,7 +1,8 @@
-import {EmptyValue, HyperFormula} from '../src'
+import {HyperFormula} from '../src'
 import {Config} from '../src/Config'
 import {enGB, plPL} from '../src/i18n'
 import {unregisterAllLanguages} from './testUtils'
+import {EmptyValue} from '../src/Cell'
 
 describe('Config', () => {
   beforeEach(() => {

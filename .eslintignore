@@ -16,5 +16,6 @@ lib
 script
 test-jasmine
 test-jest
+typedoc
 typings
 test/_setupFiles/*.js

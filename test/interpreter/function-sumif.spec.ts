@@ -152,6 +152,22 @@ describe('Function SUMIF(S) - calculations and optimizations', () => {
     expect(engine.getCellValue(adr('A2'))).toEqual(0)
   })
 
+  it('empty coercions', () => {
+    const engine = HyperFormula.buildFromArray([
+      [1, null],
+      [2, 8],
+      [3, 9],
+      ['=SUMIF(B1:B3,"=",A1:A3)'],
+      ['=SUMIF(B1:B3,">=",A1:A3)'],
+      ['=SUMIF(B1:B3,"<=",A1:A3)'],
+      ['=SUMIF(B1:B3,"<>",A1:A3)'],
+    ])
+    expect(engine.getCellValue(adr('A4'))).toEqual(1)
+    expect(engine.getCellValue(adr('A5'))).toEqual(0)
+    expect(engine.getCellValue(adr('A6'))).toEqual(0)
+    expect(engine.getCellValue(adr('A7'))).toEqual(5)
+  })
+
   it('works for subranges with different conditions',  () => {
     const engine =  HyperFormula.buildFromArray([
       ['1', '1', '=SUMIF(A1:A1,"="&A1,B1:B1)'],
@@ -259,7 +275,29 @@ describe('Function SUMIF(S) - calculations and optimizations', () => {
     expect(engine.getCellValue(adr('A4'))).toEqual(6)
   })
 
-  it('case insensitive inequality', () => {
+  it('criterions are not accent sensitive', () => {
+    const engine = HyperFormula.buildFromArray( [
+      ['abcd', '1'],
+      ['ABCD', '2'],
+      ['abc', '4'],
+      ['=SUMIF(A1:A3, "=ąbcd", B1:B3)']
+    ])
+
+    expect(engine.getCellValue(adr('A4'))).toEqual(3)
+  })
+
+  it('criterions are accent sensitive if specified', () => {
+    const engine = HyperFormula.buildFromArray( [
+      ['abcd', '1'],
+      ['ABCD', '2'],
+      ['abc', '4'],
+      ['=SUMIF(A1:A3, "=ąbcd", B1:B3)']
+    ], {accentSensitive: true})
+
+    expect(engine.getCellValue(adr('A4'))).toEqual(0)
+  })
+
+  it('criterions are not case sensitive', () => {
     const engine = HyperFormula.buildFromArray( [
       ['abcd', '1'],
       ['ABCD', '2'],
@@ -270,7 +308,7 @@ describe('Function SUMIF(S) - calculations and optimizations', () => {
     expect(engine.getCellValue(adr('A4'))).toEqual(4)
   })
 
-  it('works when case insensitive', () => {
+  it('criterions are not case sensitive 2', () => {
     const engine = HyperFormula.buildFromArray( [
       ['abcd', '1'],
       ['ABCD', '2'],
@@ -281,15 +319,63 @@ describe('Function SUMIF(S) - calculations and optimizations', () => {
     expect(engine.getCellValue(adr('A4'))).toEqual(3)
   })
 
-  it('works when case sensitive', () => {
+  it('criterions are case sensitive if specified', () => {
     const engine = HyperFormula.buildFromArray( [
       ['abcd', '1'],
       ['ABCD', '2'],
       ['abc', '4'],
-      ['=SUMIF(A1:A3, "=abcd", B1:B3)']
+      ['=SUMIF(A1:A3, "<>abcd", B1:B3)']
     ], {caseSensitive: true})
 
-    expect(engine.getCellValue(adr('A4'))).toEqual(1)
+    expect(engine.getCellValue(adr('A4'))).toEqual(6)
+  })
+
+  it('usage of wildcards', () => {
+    const engine = HyperFormula.buildFromArray( [
+      ['abcd', '1'],
+      ['ABCD', '2'],
+      ['abc', '4'],
+      [0, 8],
+      ['=SUMIF(A1:A4, "=a?c*", B1:B4)']
+    ])
+
+    expect(engine.getCellValue(adr('A5'))).toEqual(7)
+  })
+
+  it('wildcards instead of regexps', () => {
+    const engine = HyperFormula.buildFromArray( [
+      ['a+?*', '1'],
+      ['a?*', '2'],
+      ['aa~?~*', '4'],
+      [0, 8],
+      ['=SUMIF(A1:A4, "=a+~?~*", B1:B4)']
+    ])
+
+    expect(engine.getCellValue(adr('A5'))).toEqual(1)
+  })
+
+  it('regexps', () => {
+    const engine = HyperFormula.buildFromArray( [
+      ['abcd', '1'],
+      ['abd', '2'],
+      ['.*c.*', '4'],
+      [0, 8],
+      ['=SUMIF(A1:A4, "<>.*c.*", B1:B4)']
+    ], {useRegularExpresssions: true})
+
+    expect(engine.getCellValue(adr('A5'))).toEqual(10)
+  })
+
+  it('incorrect regexps', () => {
+    const engine = HyperFormula.buildFromArray( [
+      ['abcd', '1'],
+      ['abd', '2'],
+      ['.*c.*', '4'],
+      [0, 8],
+      ['=SUMIF(A1:A4, "=)", B1:B4)']
+    ], {useRegularExpresssions: true})
+
+    expect(engine.getCellValue(adr('A5'))).toEqual(0)
   })
 
   it('ignore errors', () => {
@@ -423,6 +509,15 @@ describe('Function SUMIFS - argument validations and combinations', () => {
 
     expect(engine.getCellValue(adr('A2'))).toEqual(3)
     expect(engine.getCellValue(adr('A4'))).toEqual(5)
+  })
+
+  it('coerces dates as numbers', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1', '9160250011660588', '43469', '25000'],
+      ['2', '9160250011689568', '43631', '15000'],
+      ['=SUMIF(C2:C11,">31/05/2019",D2:D11)']
+    ], {dateFormats : ['DD/MM/YYYY']})
+    expect(engine.getCellValue(adr('A3'))).toEqual(15000)
   })
 })
 

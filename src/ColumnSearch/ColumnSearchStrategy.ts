@@ -4,7 +4,7 @@
  */
 
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
-import {InternalCellValue, SimpleCellAddress} from '../Cell'
+import {InternalCellValue, InternalNoErrorCellValue, InternalScalarValue, SimpleCellAddress} from '../Cell'
 import {ColumnsSpan} from '../ColumnsSpan'
 import {Config} from '../Config'
 import {DependencyGraph} from '../DependencyGraph'
@@ -26,11 +26,13 @@ export interface ColumnSearchStrategy {
 
   removeSheet(sheetId: number): void,
 
-  moveValues(range: IterableIterator<[InternalCellValue, SimpleCellAddress]>, toRight: number, toBottom: number, toSheet: number): void,
+  moveValues(range: IterableIterator<[InternalScalarValue, SimpleCellAddress]>, toRight: number, toBottom: number, toSheet: number): void,
 
-  removeValues(range: IterableIterator<[InternalCellValue, SimpleCellAddress]>): void,
+  removeValues(range: IterableIterator<[InternalScalarValue, SimpleCellAddress]>): void,
 
-  find(key: InternalCellValue, range: AbsoluteCellRange, sorted: boolean): number,
+  find(key: InternalNoErrorCellValue, range: AbsoluteCellRange, sorted: boolean): number,
+
+  advancedFind(keyMatcher: (arg: InternalCellValue) => boolean, range: AbsoluteCellRange): number,
 
   destroy(): void,
 }

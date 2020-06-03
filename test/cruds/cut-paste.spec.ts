@@ -1,6 +1,6 @@
-import {EmptyValue, HyperFormula, NoSheetWithIdError} from '../../src'
+import {HyperFormula, NoSheetWithIdError} from '../../src'
 import {AbsoluteCellRange} from '../../src/AbsoluteCellRange'
-import {simpleCellAddress} from '../../src/Cell'
+import {EmptyValue, simpleCellAddress} from '../../src/Cell'
 import {ColumnIndex} from '../../src/ColumnSearch/ColumnIndex'
 import {EmptyCellVertex, ValueCellVertex} from '../../src/DependencyGraph'
 import {CellAddress} from '../../src/parser'
@@ -198,7 +198,7 @@ describe('Move cells', () => {
 
     expect(engine.graph.edgesCount()).toBe(0)
     expect(engine.graph.nodesCount()).toBe(1)
-    expect(engine.getCellValue(adr('A1'))).toBe(EmptyValue)
+    expect(engine.getCellValue(adr('A1'))).toBe(null)
     expect(engine.getCellValue(adr('A2'))).toBe(1)
   })
 
@@ -336,7 +336,7 @@ describe('moving ranges', () => {
     expect(() => {
       engine.cut(adr('A2'), 2, 2)
       engine.paste(adr('C1'))
-    }).toThrowError('It is not possible to move matrix')
+    }).toThrowError('Cannot perform this operation, source location has a matrix inside.')
   })
 
   it('should not be possible to move cells to area with matrix', () => {
@@ -348,7 +348,7 @@ describe('moving ranges', () => {
     expect(() => {
       engine.cut(adr('A1'), 2, 1)
       engine.paste(adr('A2'))
-    }).toThrowError('It is not possible to replace cells with matrix')
+    }).toThrowError('Cannot perform this operation, target location has a matrix inside.')
   })
 
   it('should adjust edges when moving part of range', () => {
@@ -366,7 +366,7 @@ describe('moving ranges', () => {
     const target = engine.addressMapping.fetchCell(adr('A2'))
     const range = engine.rangeMapping.fetchRange(adr('A1'), adr('A2'))
 
-    expect(source).toEqual(new EmptyCellVertex())
+    expect(source).toBeInstanceOf(EmptyCellVertex)
     expect(source.getCellValue()).toBe(EmptyValue)
     expect(engine.graph.nodesCount()).toBe(
       +2 // formulas
@@ -820,7 +820,7 @@ describe('move cells with matrices', () => {
     expect(() => {
       engine.cut(adr('A2'), 1, 1)
       engine.paste(adr('A3'))
-    }).toThrowError('It is not possible to move matrix')
+    }).toThrowError('Cannot perform this operation, source location has a matrix inside.')
   })
 
   it('should not be possible to move formula matrix at all', function() {
@@ -832,7 +832,7 @@ describe('move cells with matrices', () => {
     expect(() => {
       engine.cut(adr('A2'), 2, 1)
       engine.paste(adr('A3'))
-    }).toThrowError('It is not possible to move matrix')
+    }).toThrowError('Cannot perform this operation, source location has a matrix inside.')
   })
 
   it('should be possible to move whole numeric matrix', () => {
@@ -843,8 +843,8 @@ describe('move cells with matrices', () => {
     engine.cut(adr('A1'), 2, 1)
     engine.paste(adr('A2'))
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(EmptyValue)
-    expect(engine.getCellValue(adr('B1'))).toEqual(EmptyValue)
+    expect(engine.getCellValue(adr('A1'))).toBe(null)
+    expect(engine.getCellValue(adr('B1'))).toBe(null)
     expect(engine.getCellValue(adr('A2'))).toEqual(1)
     expect(engine.getCellValue(adr('B2'))).toEqual(2)
   })
@@ -860,7 +860,7 @@ describe('move cells with matrices', () => {
     expect(engine.addressMapping.getCell(adr('A1'))).toBeInstanceOf(ValueCellVertex)
     expect(engine.addressMapping.getCell(adr('B2'))).toBeInstanceOf(ValueCellVertex)
     expect(engine.getCellValue(adr('A1'))).toEqual(1)
-    expect(engine.getCellValue(adr('B1'))).toEqual(EmptyValue)
+    expect(engine.getCellValue(adr('B1'))).toBe(null)
     expect(engine.getCellValue(adr('B2'))).toEqual(2)
     expect(engine.matrixMapping.matrixMapping.size).toEqual(0)
   })
@@ -877,8 +877,8 @@ describe('move cells with matrices', () => {
 
     expect(engine.addressMapping.getCell(adr('A3'))).toBeInstanceOf(ValueCellVertex)
     expect(engine.addressMapping.getCell(adr('B3'))).toBeInstanceOf(ValueCellVertex)
-    expect(engine.getCellValue(adr('A1'))).toEqual(EmptyValue)
-    expect(engine.getCellValue(adr('B1'))).toEqual(EmptyValue)
+    expect(engine.getCellValue(adr('A1'))).toBe(null)
+    expect(engine.getCellValue(adr('B1'))).toBe(null)
     expect(engine.getCellValue(adr('A3'))).toEqual(1)
     expect(engine.getCellValue(adr('B3'))).toEqual(2)
   })

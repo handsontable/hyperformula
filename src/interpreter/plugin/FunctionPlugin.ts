@@ -4,7 +4,7 @@
  */
 
 import {AbsoluteCellRange} from '../../AbsoluteCellRange'
-import {CellError, ErrorType, InternalCellValue, SimpleCellAddress} from '../../Cell'
+import {CellError, ErrorType, InternalScalarValue, SimpleCellAddress} from '../../Cell'
 import {ColumnSearchStrategy} from '../../ColumnSearch/ColumnSearchStrategy'
 import {Config} from '../../Config'
 import {DependencyGraph} from '../../DependencyGraph'
@@ -29,7 +29,7 @@ export interface FunctionPluginDefinition {
   implementedFunctions: ImplementedFunctions,
 }
 
-export type PluginFunctionType = (ast: ProcedureAst, formulaAddress: SimpleCellAddress) => InternalCellValue
+export type PluginFunctionType = (ast: ProcedureAst, formulaAddress: SimpleCellAddress) => InternalScalarValue
 
 /**
  * Abstract class representing interpreter function plugin.
@@ -57,7 +57,7 @@ export abstract class FunctionPlugin {
     return this.interpreter.evaluateAst(ast, formulaAddress)
   }
 
-  protected* iterateOverScalarValues(asts: Ast[], formulaAddress: SimpleCellAddress): IterableIterator<InternalCellValue> {
+  protected* iterateOverScalarValues(asts: Ast[], formulaAddress: SimpleCellAddress): IterableIterator<InternalScalarValue> {
     for (const argAst of asts) {
       const value = this.evaluateAst(argAst, formulaAddress)
       if (value instanceof SimpleRangeValue) {
@@ -70,21 +70,21 @@ export abstract class FunctionPlugin {
     }
   }
 
-  protected computeListOfValuesInRange(range: AbsoluteCellRange): InternalCellValue[] {
-    const values: InternalCellValue[] = []
+  protected computeListOfValuesInRange(range: AbsoluteCellRange): InternalScalarValue[] {
+    const values: InternalScalarValue[] = []
     for (const cellFromRange of range.addresses(this.dependencyGraph)) {
-      const value = this.dependencyGraph.getCellValue(cellFromRange)
+      const value = this.dependencyGraph.getScalarValue(cellFromRange)
       values.push(value)
     }
 
     return values
   }
 
-  protected templateWithOneCoercedToNumberArgument(ast: ProcedureAst, formulaAddress: SimpleCellAddress, fn: (arg: number) => InternalCellValue): InternalCellValue {
-    return this.templateWithOneArgumentCoercion(ast, formulaAddress, (arg: InternalCellValue) => this.coerceScalarToNumberOrError(arg), fn)
+  protected templateWithOneCoercedToNumberArgument(ast: ProcedureAst, formulaAddress: SimpleCellAddress, fn: (arg: number) => InternalScalarValue): InternalScalarValue {
+    return this.templateWithOneArgumentCoercion(ast, formulaAddress, (arg: InternalScalarValue) => this.coerceScalarToNumberOrError(arg), fn)
   }
 
-  protected templateWithOneCoercedToStringArgument(ast: ProcedureAst, formulaAddress: SimpleCellAddress, fn: (arg: string) => InternalCellValue): InternalCellValue {
+  protected templateWithOneCoercedToStringArgument(ast: ProcedureAst, formulaAddress: SimpleCellAddress, fn: (arg: string) => InternalScalarValue): InternalScalarValue {
     return this.templateWithOneArgumentCoercion(ast, formulaAddress, coerceScalarToString, fn)
   }
 
@@ -138,15 +138,15 @@ export abstract class FunctionPlugin {
     return value
   }
 
-  protected coerceScalarToNumberOrError(arg: InternalCellValue): number | CellError {
+  protected coerceScalarToNumberOrError(arg: InternalScalarValue): number | CellError {
     return this.interpreter.arithmeticHelper.coerceScalarToNumberOrError(arg)
   }
 
   private templateWithOneArgumentCoercion(
     ast: ProcedureAst,
     formulaAddress: SimpleCellAddress,
-    coerceFunction: (arg: InternalCellValue) => InternalCellValue,
-    fn: (arg: any) => InternalCellValue,
+    coerceFunction: (arg: InternalScalarValue) => InternalScalarValue,
+    fn: (arg: any) => InternalScalarValue,
   ) {
     if (ast.args.length !== 1) {
       return new CellError(ErrorType.NA)

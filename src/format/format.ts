@@ -3,25 +3,27 @@
  * Copyright (c) 2020 Handsoncode. All rights reserved.
  */
 
-import {InternalCellValue} from '../Cell'
+import {InternalCellValue, InternalScalarValue} from '../Cell'
 import {Config} from '../Config'
-import {DateTimeHelper, SimpleDateTime} from '../DateTimeHelper'
+import {secondsExtendedRegexp} from '../DateTimeDefault'
+import {DateTimeHelper, SimpleDateTime, SimpleTime} from '../DateTimeHelper'
 import {Maybe} from '../Maybe'
 import {FormatToken, parseForDateTimeFormat, parseForNumberFormat, TokenType} from './parser'
 
-export function format(value: number, formatArg: string, config: Config, dateHelper: DateTimeHelper): InternalCellValue {
-  const tryString = config.stringifyDateTime(dateHelper.numberToDateTime(value), formatArg) // default points to defaultStringifyDateTime()
-  if (tryString !== undefined) {
-    return tryString
-  } else {
-    const expression = parseForNumberFormat(formatArg)
-
-    if (expression !== undefined) {
-      return numberFormat(expression.tokens, value)
-    } else {
-      return formatArg
-    }
+export function format(value: number, formatArg: string, config: Config, dateHelper: DateTimeHelper): InternalScalarValue {
+  const tryDateTime = config.stringifyDateTime(dateHelper.numberToDateTime(value), formatArg) // default points to defaultStringifyDateTime()
+  if (tryDateTime !== undefined) {
+    return tryDateTime
   }
+  const tryDuration = config.stringifyDuration(dateHelper.numberToTime(value), formatArg)
+  if(tryDuration !== undefined) {
+    return tryDuration
+  }
+  const expression = parseForNumberFormat(formatArg)
+  if (expression !== undefined) {
+    return numberFormat(expression.tokens, value)
+  }
+  return formatArg
 }
 
 export function padLeft(number: number | string, size: number) {
@@ -44,7 +46,7 @@ function countChars(text: string, char: string) {
   return text.split(char).length - 1
 }
 
-function numberFormat(tokens: FormatToken[], value: number): InternalCellValue {
+function numberFormat(tokens: FormatToken[], value: number): InternalScalarValue {
   let result = ''
 
   for (let i = 0; i < tokens.length; ++i) {
@@ -78,7 +80,70 @@ function numberFormat(tokens: FormatToken[], value: number): InternalCellValue {
   return result
 }
 
-export function defaultStringifyDateTime(date: SimpleDateTime, formatArg: string): Maybe<string> {
+export function defaultStringifyDuration(time: SimpleTime, formatArg: string): Maybe<string> {
+  const expression = parseForDateTimeFormat(formatArg)
+  if (expression === undefined) {
+    return undefined
+  }
+  const tokens = expression.tokens
+  let result = ''
+
+  for (const token of tokens) {
+    if (token.type === TokenType.FREE_TEXT) {
+      result += token.value
+      continue
+    }
+
+    if(secondsExtendedRegexp.test(token.value)) {
+      const fractionOfSecondPrecision = token.value.length-3
+      result += (time.second < 10 ? '0' : '') + Math.round(time.second * Math.pow(10, fractionOfSecondPrecision))/Math.pow(10, fractionOfSecondPrecision)
+      continue
+    }
+
+    switch (token.value.toLowerCase()) {
+      case 'h':
+      case 'hh': {
+        result += padLeft( time.hour, token.value.length)
+        time.hour = 0
+        break
+      }
+
+      case '[hh]': {
+        result += padLeft( time.hour, token.value.length-2)
+        time.hour = 0
+        break
+      }
+
+      case 'm':
+      case 'mm': {
+        result += padLeft(time.minute, token.value.length)
+        time.minute = 0
+        break
+      }
+
+      case '[mm]': {
+        result += padLeft(time.minute + 60*time.hour, token.value.length-2)
+        time.minute = 0
+        time.hour = 0
+        break
+      }
+
+      /* seconds */
+      case 's':
+      case 'ss': {
+        result += padLeft(time.second, token.value.length)
+        break
+      }
+
+      default: {
+        return undefined
+      }
+    }
+  }
+  return result
+}
+
+export function defaultStringifyDateTime(dateTime: SimpleDateTime, formatArg: string): Maybe<string> {
   const expression = parseForDateTimeFormat(formatArg)
   if (expression === undefined) {
     return undefined
@@ -87,77 +152,83 @@ export function defaultStringifyDateTime(date: SimpleDateTime, formatArg: string
   let result = ''
   let minutes: boolean = false
 
-  const ampm = tokens.some( (token) => token.type === TokenType.FORMAT && (token.value === 'a' || token.value === 'A') )
+  const ampm = tokens.some( (token) => token.type === TokenType.FORMAT &&
+    (token.value === 'a/p' || token.value === 'A/P' || token.value === 'am/pm' || token.value === 'AM/PM') )
 
-  for (const token of tokens){
+  for (let i=0; i<tokens.length; i++){
+    const token = tokens[i]
     if (token.type === TokenType.FREE_TEXT) {
       result += token.value
       continue
     }
 
-    switch (token.value) {
+    if(secondsExtendedRegexp.test(token.value)) {
+      const fractionOfSecondPrecision = token.value.length-3
+      result += (dateTime.second < 10 ? '0' : '') + Math.round(dateTime.second * Math.pow(10, fractionOfSecondPrecision))/Math.pow(10, fractionOfSecondPrecision)
+      continue
+    }
+
+
+    switch (token.value.toLowerCase()) {
       /* hours*/
       case 'h':
-      case 'H':
-      case 'hh':
-      case 'HH': {
+      case 'hh': {
         minutes = true
-        result += padLeft( ampm? (date.hour+11)%12+1 : date.hour, token.value.length)
+        result += padLeft( ampm? (dateTime.hour+11)%12+1 : dateTime.hour, token.value.length)
         break
       }
 
       /* days */
       case 'd':
-      case 'D':
-      case 'dd':
-      case 'DD': {
-        result += padLeft(date.day, token.value.length)
+      case 'dd': {
+        result += padLeft(dateTime.day, token.value.length)
         break
       }
 
       /* seconds */
       case 's':
       case 'ss': {
-        result += padLeft(date.second, token.value.length)
+        result += padLeft(Math.round(dateTime.second), token.value.length)
         break
       }
 
       /* minutes / months */
-      case 'M':
       case 'm':
-      case 'MM':
       case 'mm': {
-        if (minutes) {
-          result += padLeft(date.minute, token.value.length)
-        } else {
-          result += padLeft(date.month, token.value.length)
+        if(i+1 < tokens.length && tokens[i+1].value.startsWith(':')) {
+          minutes = true
         }
+        if (minutes) {
+          result += padLeft(dateTime.minute, token.value.length)
+        } else {
+          result += padLeft(dateTime.month, token.value.length)
+        }
+        minutes = true
         break
       }
 
       /* years */
-      case 'yy':
-      case 'YY': {
-        result += padLeft(date.year % 100, token.value.length)
+      case 'yy': {
+        result += padLeft(dateTime.year % 100, token.value.length)
         break
       }
-      case 'yyyy':
-      case 'YYYY': {
-        result += date.year
+      case 'yyyy': {
+        result += dateTime.year
         break
       }
 
       /* AM / PM */
-      case 'a':
-      case 'A': {
-       result += date.hour < 12 ? 'am' : 'pm'
+      case 'am/pm':
+      case 'a/p': {
+       const [am, pm] = token.value.split('/')
+       result += dateTime.hour < 12 ? am : pm
        break
       }
-      default:
-        throw new Error('Mismatched token type')
+      default: {
+        return undefined
+      }
     }
   }
 
   return result
 }
-

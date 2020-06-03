@@ -5,24 +5,23 @@
 
 import assert from 'assert'
 import {AbsoluteCellRange, DIFFERENT_SHEETS_ERROR} from '../../AbsoluteCellRange'
-import {CellError, EmptyValue, ErrorType, InternalCellValue, SimpleCellAddress} from '../../Cell'
+import {CellError, EmptyValue, ErrorType, InternalScalarValue, SimpleCellAddress} from '../../Cell'
 import {Maybe} from '../../Maybe'
 import {AstNodeType, CellRangeAst, ProcedureAst} from '../../parser'
 import {coerceToRange, max, maxa, min, mina} from '../ArithmeticHelper'
 import {SimpleRangeValue} from '../InterpreterValue'
 import {FunctionPlugin} from './FunctionPlugin'
-import {findSmallerRange} from './SumprodPlugin'
 import {ColumnRangeAst, RowRangeAst} from '../../parser/Ast'
 
 export type BinaryOperation<T> = (left: T, right: T) => T
 
-export type MapOperation<T> = (arg: InternalCellValue) => T
+export type MapOperation<T> = (arg: InternalScalarValue) => T
 
-function idMap(arg: InternalCellValue): InternalCellValue {
+function idMap(arg: InternalScalarValue): InternalScalarValue {
   return arg
 }
 
-function square(arg: InternalCellValue): InternalCellValue {
+function square(arg: InternalScalarValue): InternalScalarValue {
   if (arg instanceof CellError) {
     return arg
   } else if (typeof arg === 'number') {
@@ -32,7 +31,7 @@ function square(arg: InternalCellValue): InternalCellValue {
   }
 }
 
-function zeroForInfinite(value: InternalCellValue) {
+function zeroForInfinite(value: InternalScalarValue) {
   if (typeof value === 'number' && !Number.isFinite(value)) {
     return 0
   } else {
@@ -112,14 +111,14 @@ export class NumericAggregationPlugin extends FunctionPlugin {
    * @param ast
    * @param formulaAddress
    */
-  public sum(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
+  public sum(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
       return new CellError(ErrorType.NUM)
     }
     return this.reduce(ast, formulaAddress, 0, 'SUM', this.interpreter.arithmeticHelper.nonstrictadd, idMap, (arg) => this.coerceScalarToNumberOrError(arg))
   }
 
-  public sumsq(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
+  public sumsq(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     if (ast.args.length < 1) {
       return new CellError(ErrorType.NA)
     }
@@ -129,7 +128,7 @@ export class NumericAggregationPlugin extends FunctionPlugin {
     return this.reduce(ast, formulaAddress, 0, 'SUMSQ', this.interpreter.arithmeticHelper.nonstrictadd, square, (arg) => this.coerceScalarToNumberOrError(arg))
   }
 
-  public countblank(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
+  public countblank(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     if (ast.args.length < 1) {
       return new CellError(ErrorType.NA)
     }
@@ -156,7 +155,7 @@ export class NumericAggregationPlugin extends FunctionPlugin {
    * @param ast
    * @param formulaAddress
    */
-  public max(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
+  public max(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     if (ast.args.length < 1) {
       return new CellError(ErrorType.NA)
     }
@@ -168,7 +167,7 @@ export class NumericAggregationPlugin extends FunctionPlugin {
     return zeroForInfinite(value)
   }
 
-  public maxa(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
+  public maxa(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     if (ast.args.length < 1) {
       return new CellError(ErrorType.NA)
     }
@@ -188,7 +187,7 @@ export class NumericAggregationPlugin extends FunctionPlugin {
    * @param ast
    * @param formulaAddress
    */
-  public min(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
+  public min(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     if (ast.args.length < 1) {
       return new CellError(ErrorType.NA)
     }
@@ -200,7 +199,7 @@ export class NumericAggregationPlugin extends FunctionPlugin {
     return zeroForInfinite(value)
   }
 
-  public mina(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
+  public mina(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     if (ast.args.length < 1) {
       return new CellError(ErrorType.NA)
     }
@@ -212,7 +211,7 @@ export class NumericAggregationPlugin extends FunctionPlugin {
     return zeroForInfinite(value)
   }
 
-  public count(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
+  public count(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     if (ast.args.length < 1) {
       return new CellError(ErrorType.NA)
     }
@@ -228,7 +227,7 @@ export class NumericAggregationPlugin extends FunctionPlugin {
     return value
   }
 
-  public counta(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
+  public counta(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     if (ast.args.length < 1) {
       return new CellError(ErrorType.NA)
     }
@@ -244,7 +243,7 @@ export class NumericAggregationPlugin extends FunctionPlugin {
     return value
   }
 
-  public average(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
+  public average(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     if (ast.args.length < 1) {
       return new CellError(ErrorType.NA)
     }
@@ -277,7 +276,7 @@ export class NumericAggregationPlugin extends FunctionPlugin {
     }
   }
 
-  public averagea(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
+  public averagea(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     if (ast.args.length < 1) {
       return new CellError(ErrorType.NA)
     }
@@ -326,7 +325,7 @@ export class NumericAggregationPlugin extends FunctionPlugin {
    * @param mapFunction
    * @param coerceFunction
    * */
-  private reduce<T>(ast: ProcedureAst, formulaAddress: SimpleCellAddress, initialAccValue: T, functionName: string, reducingFunction: BinaryOperation<T>, mapFunction: MapOperation<T>, coerceFunction: (arg: InternalCellValue) => InternalCellValue): T {
+  private reduce<T>(ast: ProcedureAst, formulaAddress: SimpleCellAddress, initialAccValue: T, functionName: string, reducingFunction: BinaryOperation<T>, mapFunction: MapOperation<T>, coerceFunction: (arg: InternalScalarValue) => InternalScalarValue): T {
     return ast.args.reduce((acc: T, arg) => {
       let value
       if (arg.type === AstNodeType.CELL_RANGE || arg.type === AstNodeType.COLUMN_RANGE || arg.type === AstNodeType.ROW_RANGE) {
@@ -411,20 +410,24 @@ export class NumericAggregationPlugin extends FunctionPlugin {
    */
   private getRangeValues<T>(functionName: string, range: AbsoluteCellRange, mapFunction: MapOperation<T>): T[] {
     const rangeResult: T[] = []
-    const {smallerRangeVertex, restRange} = findSmallerRange(this.dependencyGraph, range)
+    const {smallerRangeVertex, restRange} = this.dependencyGraph.rangeMapping.findSmallerRange(range)
     const currentRangeVertex = this.dependencyGraph.getRange(range.start, range.end)!
+    let actualRange: AbsoluteCellRange
     if (smallerRangeVertex && this.dependencyGraph.existsEdge(smallerRangeVertex, currentRangeVertex)) {
       const cachedValue: T = smallerRangeVertex.getFunctionValue(functionName) as T
       if (cachedValue) {
         rangeResult.push(cachedValue)
       } else {
         for (const cellFromRange of smallerRangeVertex.range.addresses(this.dependencyGraph)) {
-          rangeResult.push(mapFunction(this.dependencyGraph.getCellValue(cellFromRange)))
+          rangeResult.push(mapFunction(this.dependencyGraph.getScalarValue(cellFromRange)))
         }
       }
+      actualRange = restRange
+    } else {
+      actualRange = range
     }
-    for (const cellFromRange of restRange.addresses(this.dependencyGraph)) {
-      rangeResult.push(mapFunction(this.dependencyGraph.getCellValue(cellFromRange)))
+    for (const cellFromRange of actualRange.addresses(this.dependencyGraph)) {
+      rangeResult.push(mapFunction(this.dependencyGraph.getScalarValue(cellFromRange)))
     }
 
     return rangeResult

@@ -5,10 +5,15 @@
 
 import {ErrorType} from './Cell'
 import {defaultParseToDateTime} from './DateTimeDefault'
-import {DateTime, instanceOfSimpleDate, SimpleDate, SimpleDateTime} from './DateTimeHelper'
-import {ExpectedOneOfValues, ExpectedValueOfType, ConfigValueTooSmallError, ConfigValueTooBigError} from './errors'
+import {DateTime, instanceOfSimpleDate, SimpleDate, SimpleDateTime, SimpleTime} from './DateTimeHelper'
+import {
+  ConfigValueTooSmallError,
+  ConfigValueTooBigError,
+  ExpectedValueOfTypeError,
+  ExpectedOneOfValuesError
+} from './errors'
 import {AlwaysDense, ChooseAddressMapping} from './DependencyGraph/AddressMapping/ChooseAddressMappingPolicy'
-import {defaultStringifyDateTime} from './format/format'
+import {defaultStringifyDateTime, defaultStringifyDuration} from './format/format'
 import {HyperFormula} from './HyperFormula'
 import {TranslationPackage} from './i18n'
 import {Maybe} from './Maybe'
@@ -55,28 +60,32 @@ export interface ConfigParams {
    * - AlwaysSparse - will use SparseStrategy for all sheets.
    *
    * @default AlwaysDense
+   *
+   * @category Engine
    */
   chooseAddressMappingPolicy: ChooseAddressMapping,
   /**
    * A list of date formats that are supported by date parsing functions.
    *
-   * The separator is ignored and it can be any of '-',' ','/'.
+   * The separator is ignored and it can be any of '-' (dash), ' ' (empty space), '/' (slash).
    *
    * Any order of YY, MM, DD is accepted as a date, and YY can be replaced with YYYY.
    *
    * @default ['MM/DD/YYYY', 'MM/DD/YY']
    *
-   * @category DateTime
+   * @category Date and Time
    */
   dateFormats: string[],
   /**
    * A list of time formats that are supported by time parsing functions.
    *
-   * The separator is ':'.
+   * The separator is ':' (colon).
    *
    * Any configuration of at least two of hh, mm, ss is accepted as a time, and they can be put in any order.
    *
    * @default ['hh:mm', 'hh:mm:ss']
+   *
+   * @category Date and Time
    */
   timeFormats: string[],
   /**
@@ -84,12 +93,12 @@ export interface ConfigParams {
    *
    * @default ','
    *
-   * @category Syntax
+   * @category Formula Syntax
    */
   functionArgSeparator: string,
   /**
    * A decimal separator used for parsing numeric literals.
-   * Can be either '.' or ',' and must be different from [[thousandSeparator]] and [[functionArgSeparator]].
+   * Can be either '.' (period) or ',' (comma) and must be different from [[thousandSeparator]] and [[functionArgSeparator]].
    *
    * @default '.'
    *
@@ -100,17 +109,21 @@ export interface ConfigParams {
    * Code for translation package with translations of function and error names.
    *
    * @default 'enGB'
+   *
+   * @category Formula Syntax
    */
   language: string,
   /**
    * License key for commercial version of HyperFormula.
    *
-   * @default ''
+   * @default undefined
+   *
+   * @category License
    */
   licenseKey: string,
   /**
    * A thousand separator used for parsing numeric literals.
-   * Can be either empty, ',' or ' ' and must be different from [[decimalSeparator]] and [[functionArgSeparator]].
+   * Can be either empty, ',' (comma) or ' ' (empty space) and must be different from [[decimalSeparator]] and [[functionArgSeparator]].
    *
    * @default ''
    *
@@ -122,7 +135,7 @@ export interface ConfigParams {
    *
    * @default []
    *
-   * @category Syntax
+   * @category Formula Syntax
    */
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   functionPlugins: any[],
@@ -151,7 +164,7 @@ export interface ConfigParams {
    *
    * @default false
    *
-   * @category DateTime
+   * @category Date and Time
    */
   leapYear1900: boolean,
   /**
@@ -186,7 +199,7 @@ export interface ConfigParams {
    *
    * @default 30
    *
-   * @category DateTime
+   * @category Date and Time
    */
   nullYear: number,
   /**
@@ -194,7 +207,7 @@ export interface ConfigParams {
    *
    * @default defaultParseToDateTime
    *
-   * @category DateTime
+   * @category Date and Time
    */
   parseDateTime: (dateTimeString: string, dateFormat: string, timeFormat: string) => Maybe<DateTime>,
   /**
@@ -225,9 +238,17 @@ export interface ConfigParams {
    *
    * @default defaultStringifyDateTime
    *
+   * @category Date and Time
+   */
+  stringifyDateTime: (dateTime: SimpleDateTime, dateTimeFormat: string) => Maybe<string>,
+  /**
+   * Allows to provide a function that takes time duration prints it into string.
+   *
+   * @default defaultStringifyDuration
+   *
    * @category DateTime
    */
-  stringifyDateTime: (dateTime: SimpleDateTime, dateFormat: string) => Maybe<string>,
+  stringifyDuration: (time: SimpleTime, timeFormat: string) => Maybe<string>,
   /**
    * Sets the rounding.
    * If `false`, no rounding happens, and numbers are equal if and only if they are truly identical value (see: [[precisionEpsilon]]).
@@ -272,7 +293,7 @@ export interface ConfigParams {
    *
    * @default {year: 1899, month: 12, day: 30}
    *
-   * @category DateTime
+   * @category Date and Time
    */
   nullDate: SimpleDate,
   /**
@@ -280,9 +301,30 @@ export interface ConfigParams {
    *
    * @default 20
    *
-   * @category UndoRedo
+   * @category Undo and Redo
    */
   undoLimit: number,
+  /**
+   * If set true, then criterions in functions (SUMIF, COUNTIF, ...) can use regular expressions.
+   *
+   * @default false
+   * @category String
+   */
+  useRegularExpresssions: boolean,
+  /**
+   * If set true, then criterions in functions (SUMIF, COUNTIF, ...) can use wildcards '*' and '?'.
+   *
+   * @default true
+   * @category String
+   */
+  useWildcards: boolean,
+  /**
+   * Whether criterions in functions require whole cell to match the pattern, or just a subword.
+   *
+   * @default true
+   * @category String
+   */
+  matchWholeCell: boolean,
   /**
    * Maximum number of rows
    *
@@ -312,7 +354,7 @@ export class Config implements ConfigParams, ParserConfig {
     ignorePunctuation: false,
     chooseAddressMappingPolicy: new AlwaysDense(),
     dateFormats: ['DD/MM/YYYY', 'DD/MM/YY'],
-    timeFormats: ['hh:mm', 'hh:mm:ss'],
+    timeFormats: ['hh:mm', 'hh:mm:ss.sss'],
     functionArgSeparator: ',',
     decimalSeparator: '.',
     thousandSeparator: '',
@@ -328,6 +370,7 @@ export class Config implements ConfigParams, ParserConfig {
     nullYear: 30,
     parseDateTime: defaultParseToDateTime,
     stringifyDateTime: defaultStringifyDateTime,
+    stringifyDuration: defaultStringifyDuration,
     precisionEpsilon: 1e-13,
     precisionRounding: 14,
     useColumnIndex: false,
@@ -335,6 +378,9 @@ export class Config implements ConfigParams, ParserConfig {
     vlookupThreshold: 20,
     nullDate: {year: 1899, month: 12, day: 30},
     undoLimit: 20,
+    useRegularExpresssions: false,
+    useWildcards: true,
+    matchWholeCell: true,
     maxRows: 40_000,
     maxColumns: 18_278
   }
@@ -383,6 +429,8 @@ export class Config implements ConfigParams, ParserConfig {
   /** @inheritDoc */
   public readonly stringifyDateTime: (date: SimpleDateTime, formatArg: string) => Maybe<string>
   /** @inheritDoc */
+  public readonly stringifyDuration: (time: SimpleTime, formatArg: string) => Maybe<string>
+  /** @inheritDoc */
   public readonly precisionEpsilon: number
   /** @inheritDoc */
   public readonly precisionRounding: number
@@ -414,6 +462,9 @@ export class Config implements ConfigParams, ParserConfig {
    * @internal
    */
   public readonly translationPackage: TranslationPackage
+  public readonly useRegularExpresssions: boolean
+  public readonly useWildcards: boolean
+  public readonly matchWholeCell: boolean
   /**
    * Set automatically based on licenseKey checking result.
    *
@@ -454,6 +505,7 @@ export class Config implements ConfigParams, ParserConfig {
       nullYear,
       parseDateTime,
       stringifyDateTime,
+      stringifyDuration,
       precisionEpsilon,
       precisionRounding,
       useColumnIndex,
@@ -461,6 +513,9 @@ export class Config implements ConfigParams, ParserConfig {
       nullDate,
       useStats,
       undoLimit,
+      useRegularExpresssions,
+      useWildcards,
+      matchWholeCell,
       maxRows,
       maxColumns
     }: Partial<ConfigParams> = {},
@@ -498,11 +553,15 @@ export class Config implements ConfigParams, ParserConfig {
     this.validateNumberToBeAtLeast(this.vlookupThreshold, 'vlookupThreshold', 1)
     this.parseDateTime = this.valueFromParam(parseDateTime, 'function', 'parseDateTime')
     this.stringifyDateTime = this.valueFromParam(stringifyDateTime, 'function', 'stringifyDateTime')
+    this.stringifyDuration = this.valueFromParam(stringifyDuration, 'function', 'stringifyDuration')
     this.translationPackage = HyperFormula.getLanguage(this.language)
     this.errorMapping = this.translationPackage.buildErrorMapping()
     this.nullDate = this.valueFromParamCheck(nullDate, instanceOfSimpleDate, 'IDate', 'nullDate')
     this.leapYear1900 = this.valueFromParam(leapYear1900, 'boolean', 'leapYear1900')
     this.undoLimit = this.valueFromParam(undoLimit, 'number', 'undoLimit')
+    this.useRegularExpresssions = this.valueFromParam(useRegularExpresssions, 'boolean', 'useRegularExpresssions')
+    this.useWildcards = this.valueFromParam(useWildcards, 'boolean', 'useWildcards')
+    this.matchWholeCell = this.valueFromParam(matchWholeCell, 'boolean', 'matchWholeCell')
     this.validateNumberToBeAtLeast(this.undoLimit, 'undoLimit', 0)
     this.maxRows = this.valueFromParam(maxRows, 'number', 'maxRows')
     this.validateNumberToBeAtLeast(this.maxRows, 'maxRows', 1)
@@ -535,13 +594,13 @@ export class Config implements ConfigParams, ParserConfig {
       if (typeof inputValue === expectedType) {
         return inputValue
       } else {
-        throw new ExpectedValueOfType(expectedType, paramName)
+        throw new ExpectedValueOfTypeError(expectedType, paramName)
       }
     } else {
       if (expectedType.includes(inputValue)) {
         return inputValue
       } else {
-        throw new ExpectedOneOfValues(expectedType.map((val: string) => '\'' + val + '\'').join(' '), paramName)
+        throw new ExpectedOneOfValuesError(expectedType.map((val: string) => '\'' + val + '\'').join(' '), paramName)
       }
     }
   }
@@ -553,7 +612,7 @@ export class Config implements ConfigParams, ParserConfig {
     } else if (typeof inputValue === 'undefined') {
       return Config.defaultConfig[paramName]
     } else {
-      throw new ExpectedValueOfType(expectedType, paramName)
+      throw new ExpectedValueOfTypeError(expectedType, paramName)
     }
   }
 

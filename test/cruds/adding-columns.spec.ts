@@ -1,4 +1,4 @@
-import {EmptyValue, HyperFormula, ExportedCellChange} from '../../src'
+import {HyperFormula, ExportedCellChange} from '../../src'
 import {AbsoluteCellRange} from '../../src/AbsoluteCellRange'
 import { simpleCellAddress} from '../../src/Cell'
 import {ColumnIndex} from '../../src/ColumnSearch/ColumnIndex'
@@ -110,7 +110,7 @@ describe('Adding column - matrix check', () => {
 
     expect(() => {
       engine.addColumns(0, [1, 1])
-    }).toThrowError('It is not possible to add column in column with matrix')
+    }).toThrowError('Cannot perform this operation, target location has a matrix inside.')
   })
 
   it('should be possible to add row right before matrix', () => {
@@ -121,7 +121,7 @@ describe('Adding column - matrix check', () => {
 
     engine.addColumns(0, [0, 1])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(EmptyValue)
+    expect(engine.getCellValue(adr('A1'))).toBe(null)
     expect(engine.getCellValue(adr('B1'))).toEqual(1)
     expect(engine.getCellValue(adr('C1'))).toEqual(3)
     expect(engine.getCellValue(adr('D1'))).toEqual(1)
@@ -137,7 +137,7 @@ describe('Adding column - matrix check', () => {
 
     expect(engine.getCellValue(adr('A1'))).toEqual(1)
     expect(engine.getCellValue(adr('B1'))).toEqual(3)
-    expect(engine.getCellValue(adr('C1'))).toEqual(EmptyValue)
+    expect(engine.getCellValue(adr('C1'))).toBe(null)
     expect(engine.getCellValue(adr('D1'))).toEqual(1)
   })
 })

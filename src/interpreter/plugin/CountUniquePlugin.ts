@@ -3,7 +3,7 @@
  * Copyright (c) 2020 Handsoncode. All rights reserved.
  */
 
-import {CellError, EmptyValueType, ErrorType, InternalCellValue, SimpleCellAddress} from '../../Cell'
+import {CellError, EmptyValueType, ErrorType, InternalScalarValue, SimpleCellAddress} from '../../Cell'
 import {AstNodeType, ProcedureAst} from '../../parser'
 import {FunctionPlugin} from './FunctionPlugin'
 
@@ -25,7 +25,7 @@ export class CountUniquePlugin extends FunctionPlugin {
    * @param ast
    * @param formulaAddress
    */
-  public countunique(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
+  public countunique(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     if (ast.args.length === 0) {
       return new CellError(ErrorType.NA)
     }
