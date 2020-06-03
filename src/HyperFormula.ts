@@ -21,7 +21,12 @@ import {
   SheetMapping,
   Vertex,
 } from './DependencyGraph'
-import {EvaluationSuspendedError, NotAFormulaError} from './errors'
+import {
+  EvaluationSuspendedError,
+  LanguageAlreadyRegisteredError,
+  LanguageNotRegisteredError,
+  NotAFormulaError
+} from './errors'
 import {Evaluator} from './Evaluator'
 import {LazilyTransformingAstService} from './LazilyTransformingAstService'
 import {Maybe} from './Maybe'
@@ -290,7 +295,7 @@ export class HyperFormula implements TypedEmitter {
   public static getLanguage(languageCode: string): TranslationPackage {
     const val = this.registeredLanguages.get(languageCode)
     if (val === undefined) {
-      throw new Error('Language not registered.')
+      throw new LanguageNotRegisteredError()
     } else {
       return val
     }
@@ -303,6 +308,7 @@ export class HyperFormula implements TypedEmitter {
    * @param {RawTranslationPackage} languagePackage - translation package to be registered
    *
    * @throws [[ProtectedFunctionTranslationError]] when trying to register translation for protected function
+   * @throws [[LanguageAlreadyRegisteredError]] when given language is already registered
    *
    * @example
    * ```js
@@ -314,7 +320,7 @@ export class HyperFormula implements TypedEmitter {
    */
   public static registerLanguage(languageCode: string, languagePackage: RawTranslationPackage): void {
     if (this.registeredLanguages.has(languageCode)) {
-      throw new Error('Language already registered.')
+      throw new LanguageAlreadyRegisteredError()
     } else {
       this.registeredLanguages.set(languageCode, buildTranslationPackage(languagePackage))
     }
@@ -324,6 +330,8 @@ export class HyperFormula implements TypedEmitter {
    * Unregisters language that is registered under given code string.
    *
    * @param {string} languageCode - code string of the translation package
+   *
+   * @throws [[LanguageNotRegisteredError]] when given language is not registered
    *
    * @example
    * ```js
@@ -340,7 +348,7 @@ export class HyperFormula implements TypedEmitter {
     if (this.registeredLanguages.has(languageCode)) {
       this.registeredLanguages.delete(languageCode)
     } else {
-      throw new Error('Language not registered.')
+      throw new LanguageNotRegisteredError()
     }
   }
 

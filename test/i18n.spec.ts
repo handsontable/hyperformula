@@ -1,4 +1,4 @@
-import {HyperFormula} from '../src'
+import {HyperFormula, LanguageAlreadyRegisteredError, LanguageNotRegisteredError} from '../src'
 import {languages, plPL, RawTranslationPackage, TranslationPackage} from '../src/i18n'
 import {CellAddress} from '../src/parser'
 import {adr, extractReference} from './testUtils'
@@ -106,5 +106,23 @@ describe('i18n', () => {
     expect(() =>
       HyperFormula.registerLanguage('foo', rawTranslationPackage)
     ).toThrow(new ProtectedFunctionTranslationError('VERSION'))
+  })
+
+  it('should throw error when trying to register same language twice', () => {
+    expect(() =>
+      HyperFormula.registerLanguage('plPL', plPL)
+    ).toThrow(new LanguageAlreadyRegisteredError())
+  })
+
+  it('should throw error when trying to unregister not registered language', () => {
+    expect(() =>
+      HyperFormula.unregisterLanguage('foo')
+    ).toThrow(new LanguageNotRegisteredError())
+  })
+
+  it('should throw error when trying to retrieve not registered language', () => {
+    expect(() =>
+      HyperFormula.getLanguage('foo')
+    ).toThrow(new LanguageNotRegisteredError())
   })
 })

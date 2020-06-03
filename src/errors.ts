@@ -261,6 +261,29 @@ export class ProtectedFunctionTranslationError extends Error {
 }
 
 /**
+ * Error thrown when trying to retrieve not registered language
+ *
+ * @see [[getLanguage]]
+ * @see [[unregisterLanguage]]
+ */
+export class LanguageNotRegisteredError extends Error {
+  constructor() {
+    super('Language not registered.')
+  }
+}
+
+/**
+ * Error thrown when trying to register already registered language
+ *
+ * @see [[registerLanguage]]
+ */
+export class LanguageAlreadyRegisteredError extends Error {
+  constructor() {
+    super('Language already registered.')
+  }
+}
+
+/**
  * Error thrown when function plugin is invalid.
  *
  * @see [[registerFunction]]
