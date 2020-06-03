@@ -1,8 +1,9 @@
 import {HyperFormula} from '../src'
-import {languages, plPL, TranslationPackage} from '../src/i18n'
+import {languages, plPL, RawTranslationPackage, TranslationPackage} from '../src/i18n'
 import {CellAddress} from '../src/parser'
 import {adr, extractReference} from './testUtils'
 import {FunctionRegistry} from '../src/interpreter/FunctionRegistry'
+import {ProtectedFunctionTranslationError} from '../src/errors'
 
 describe('i18n', () => {
   beforeEach(() => {
@@ -52,11 +53,18 @@ describe('i18n', () => {
   })
 
   it('all function translation keys has to be upper cased', () => {
-      for (const lang in languages) {
+    for (const lang in languages) {
       const translationPackage = languages[lang]
       for (const translationKey in translationPackage.functions) {
         expect(translationPackage.functions[translationKey]).toEqual(translationPackage.functions[translationKey].toUpperCase())
       }
+    }
+  })
+
+  it('all translation packages should not include protected function definition', () => {
+    for (const lang in languages) {
+      const translatedFunctionsInLang = new Set(Object.keys(languages[lang].functions))
+      expect(translatedFunctionsInLang.has('VERSION')).toEqual(false)
     }
   })
 
@@ -65,6 +73,7 @@ describe('i18n', () => {
 
     for (const lang in languages) {
       const translatedFunctionsInLang = new Set(Object.keys(languages[lang].functions))
+      translatedFunctionsInLang.add('VERSION') /* missing protected function */
       expect(translatedFunctionsInLang).toEqual(implementedFunctions)
     }
   })
@@ -73,5 +82,29 @@ describe('i18n', () => {
     // eslint-disable-next-line
     // @ts-ignore
     expect(() => new TranslationPackage({}, {}, {})).toThrowError()
+  })
+
+  it('should not be possible to construct TranslationPackage with protected translation', () => {
+    expect(() =>
+      new TranslationPackage({'VERSION': 'FOO'}, plPL.errors, plPL.ui)
+    ).toThrow(new ProtectedFunctionTranslationError('VERSION'))
+  })
+
+  it('should not be possible to extend TranslationPackage with protected translation', () => {
+    const translationPackage = HyperFormula.getLanguage('plPL')
+    expect(() =>
+      translationPackage.extendFunctions({'VERSION': 'FOO'})
+    ).toThrow(new ProtectedFunctionTranslationError('VERSION'))
+  })
+
+  it('should not be possible to register language with protected translation', () => {
+    const rawTranslationPackage: RawTranslationPackage = {
+      ...plPL,
+      functions: {'VERSION': 'FOO'}
+    }
+
+    expect(() =>
+      HyperFormula.registerLanguage('foo', rawTranslationPackage)
+    ).toThrow(new ProtectedFunctionTranslationError('VERSION'))
   })
 })

@@ -7,7 +7,7 @@ import {SumifPlugin} from '../src/interpreter/plugin/SumifPlugin'
 import {NumericAggregationPlugin} from '../src/interpreter/plugin/NumericAggregationPlugin'
 import {enGB, plPL} from '../src/i18n'
 import { VersionPlugin } from '../src/interpreter/plugin/VersionPlugin'
-import {ProtectedFunctionError} from '../src/errors'
+import {ProtectedFunctionError, ProtectedFunctionTranslationError} from '../src/errors'
 
 class FooPlugin extends FunctionPlugin {
   public static implementedFunctions = {
@@ -103,7 +103,7 @@ describe('Register static custom plugin', () => {
     HyperFormula.registerFunctionPlugin(FooPlugin, FooPlugin.translations)
     const formulaNames = HyperFormula.getRegisteredFunctionNames('plPL')
 
-    expectArrayWithSameContent(['FU', 'BAR', 'SUMA.JEŻELI', 'LICZ.JEŻELI', 'ŚREDNIA.JEŻELI', 'SUMY.JEŻELI', 'LICZ.WARUNKI', 'WERSJA', 'PRZESUNIĘCIE'], formulaNames)
+    expectArrayWithSameContent(['FU', 'BAR', 'SUMA.JEŻELI', 'LICZ.JEŻELI', 'ŚREDNIA.JEŻELI', 'SUMY.JEŻELI', 'LICZ.WARUNKI', 'VERSION', 'PRZESUNIĘCIE'], formulaNames)
   })
 
   it('should register all formulas from plugin', () => {
@@ -286,5 +286,15 @@ describe('Reserved functions', () => {
 
   it('should return undefined when trying to retrieve protected function plugin', () => {
     expect(HyperFormula.getFunctionPlugin('VERSION')).toBe(undefined)
+  })
+
+  it('should not be possible to override protected function translation when registering plugin', () => {
+    expect(() => {
+      HyperFormula.registerFunction('FOO', FooPlugin, { 'enGB': { 'VERSION': 'FOOBAR' } })
+    }).toThrow(new ProtectedFunctionTranslationError('VERSION'))
+
+    expect(() => {
+      HyperFormula.registerFunctionPlugin(FooPlugin, { 'enGB': { 'VERSION': 'FOOBAR' } })
+    }).toThrow(new ProtectedFunctionTranslationError('VERSION'))
   })
 })

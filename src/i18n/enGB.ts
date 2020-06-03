@@ -112,7 +112,6 @@ export const enGB: RawTranslationPackage = {
     ISLOGICAL: 'ISLOGICAL',
     ISTEXT: 'ISTEXT',
     ISNONTEXT: 'ISNONTEXT',
-    VERSION: 'VERSION',
   },
   errors: {
     DIV_BY_ZERO: '#DIV/0!',

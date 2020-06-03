@@ -278,6 +278,8 @@ export class HyperFormula implements TypedEmitter {
    * @param {string} languageCode - code string of the translation package
    * @param {RawTranslationPackage} languagePackage - translation package to be registered
    *
+   * @throws [[ProtectedFunctionTranslationError]] when trying to register translation for protected function
+   *
    * @example
    * ```js
    * // return registered language
@@ -334,6 +336,7 @@ export class HyperFormula implements TypedEmitter {
    * @param {FunctionTranslationsPackage} translations - optional package of function names translations
    *
    * @throws [[FunctionPluginValidationError]] when plugin class definition is not consistent with metadata
+   * @throws [[ProtectedFunctionTranslationError]] when trying to register translation for protected function
    */
   public static registerFunctionPlugin(plugin: FunctionPluginDefinition, translations?: FunctionTranslationsPackage): void {
     FunctionRegistry.registerFunctionPlugin(plugin, translations)
@@ -356,6 +359,7 @@ export class HyperFormula implements TypedEmitter {
    * @param translations
    *
    * @throws [[FunctionPluginValidationError]] when function with a given id does not exists in plugin or plugin class definition is not consistent with metadata
+   * @throws [[ProtectedFunctionTranslationError]] when trying to register translation for protected function
    */
   public static registerFunction(functionId: string, plugin: FunctionPluginDefinition, translations?: FunctionTranslationsPackage): void {
     FunctionRegistry.registerFunction(functionId, plugin, translations)

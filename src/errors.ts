@@ -235,6 +235,21 @@ export class MissingTranslationError extends Error {
   }
 }
 
+
+/**
+ * Error thrown when trying to override protected translation.
+ *
+ * @see [[registerLanguage]]
+ * @see [[registerFunction]]
+ * @see [[registerFunctionPlugin]]
+ */
+export class ProtectedFunctionTranslationError extends Error {
+  constructor(key: string) {
+    super(`Cannot register translation for function with id: ${key}`)
+  }
+}
+
+
 export class FunctionPluginValidationError extends Error {
   public static functionNotDeclaredInPlugin(functionId: string, pluginName: string): FunctionPluginValidationError {
     return new FunctionPluginValidationError(`Function with id ${functionId} not declared in plugin ${pluginName}`)

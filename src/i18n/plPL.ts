@@ -112,7 +112,6 @@ export const plPL: RawTranslationPackage = {
     ISLOGICAL: 'CZY.LOGICZNA',
     ISTEXT: 'CZY.TEKST',
     ISNONTEXT: 'CZY.NIE.TEKST',
-    VERSION: 'WERSJA',
   },
   errors: {
     DIV_BY_ZERO: '#DZIEL/0!',
