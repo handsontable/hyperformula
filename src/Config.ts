@@ -114,7 +114,7 @@ export interface ConfigParams {
    */
   language: string,
   /**
-   * License key for commercial version of HyperFormula.
+   * A license key of HyperFormula: commercial or "non-commercial-and-evaluation" or "agpl-v3" type .
    *
    * @default undefined
    *
