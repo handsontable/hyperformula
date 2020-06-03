@@ -3,7 +3,7 @@
  * Copyright (c) 2020 Handsoncode. All rights reserved.
  */
 
-import {EmptyValue, InternalScalarValue} from '../Cell'
+import {CellError, EmptyValue, InternalScalarValue} from '../Cell'
 import {Config} from '../Config'
 import {TranslationPackage} from '../i18n'
 import {Maybe} from '../Maybe'
@@ -27,12 +27,12 @@ export class CriterionBuilder {
   private trueString: string
   private falseString: string
   constructor(config: Config) {
-    this.trueString = config.translationPackage.getMaybeFunctionTranslation('TRUE') ?? 'TRUE'
-    this.falseString = config.translationPackage.getMaybeFunctionTranslation('FALSE') ?? 'FALSE'
+    this.trueString = config.translationPackage.getMaybeFunctionTranslation('TRUE')?.toLowerCase() ?? 'true'
+    this.falseString = config.translationPackage.getMaybeFunctionTranslation('FALSE')?.toLowerCase() ?? 'false'
   }
 
   public fromCellValue(raw: InternalScalarValue, arithmeticHelper: ArithmeticHelper): Maybe<CriterionPackage> {
-    if (typeof raw !== 'string') {
+    if (typeof raw !== 'string' && typeof raw !== 'boolean' && typeof raw !== 'number') {
       return undefined
     }
 
@@ -61,7 +61,7 @@ export class CriterionBuilder {
         criterionValue = criterion
       }
       const value = arithmeticHelper.coerceToMaybeNumber(criterionValue)
-      const boolvalue = criterionValue.toLowerCase()==='true' ? true : criterionValue.toLowerCase() === 'false' ? false : undefined
+      const boolvalue = criterionValue.toLowerCase()===this.trueString ? true : criterionValue.toLowerCase() === this.falseString ? false : undefined
       if(criterionType === undefined) {
         return undefined
       }
@@ -79,7 +79,7 @@ export class CriterionBuilder {
   }
 }
 
-export type CriterionPackage = {raw: string, lambda: CriterionLambda}
+export type CriterionPackage = {raw: string | number | boolean, lambda: CriterionLambda}
 
 const ANY_CRITERION_REGEX = /([<>=]+)(.*)/
 
