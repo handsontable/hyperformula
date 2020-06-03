@@ -5,6 +5,7 @@
 
 import {ErrorType} from '../Cell'
 import {MissingTranslationError} from '../errors'
+import {Maybe} from '../Maybe'
 import {ErrorTranslationSet, TranslationSet, UIElement, UITranslationSet} from './index'
 
 export interface RawTranslationPackage {
@@ -62,6 +63,10 @@ export class TranslationPackage {
     } else {
       return val
     }
+  }
+
+  public getMaybeFunctionTranslation(key: string): Maybe<string> {
+    return this.functions[key]
   }
 
   public getErrorTranslation(key: ErrorType): string {

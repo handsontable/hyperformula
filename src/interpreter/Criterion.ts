@@ -4,6 +4,7 @@
  */
 
 import {EmptyValue, InternalScalarValue} from '../Cell'
+import {TranslationPackage} from '../i18n'
 import {Maybe} from '../Maybe'
 import {ArithmeticHelper} from './ArithmeticHelper'
 
@@ -21,9 +22,15 @@ export interface Criterion {
 }
 export const buildCriterion = (operator: CriterionType, value: number | string | boolean | null ) => ({ operator, value })
 
-export class CriterionPackage {
+export class CriterionBuilder {
+  private trueString: string
+  private falseString: string
+  constructor(translationPackage: TranslationPackage) {
+    this.trueString = translationPackage.getMaybeFunctionTranslation('TRUE') ?? 'TRUE'
+    this.falseString = translationPackage.getMaybeFunctionTranslation('FALSE') ?? 'FALSE'
+  }
 
-  public static fromCellValue(raw: InternalScalarValue, arithmeticHelper: ArithmeticHelper): Maybe<CriterionPackage> {
+  public fromCellValue(raw: InternalScalarValue, arithmeticHelper: ArithmeticHelper): Maybe<CriterionPackage> {
     if (typeof raw !== 'string') {
       return undefined
     }
@@ -33,14 +40,11 @@ export class CriterionPackage {
       return undefined
     }
 
-    return new CriterionPackage(raw, buildCriterionLambda(criterion, arithmeticHelper))
-  }
-  constructor(
-    public readonly raw: string,
-    public readonly lambda: CriterionLambda,
-  ) {
+    return {raw, lambda: buildCriterionLambda(criterion, arithmeticHelper)}
   }
 }
+
+export type CriterionPackage = {raw: string, lambda: CriterionLambda}
 
 const ANY_CRITERION_REGEX = /([<>=]+)(.*)/
 
