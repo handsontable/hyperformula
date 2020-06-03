@@ -4,6 +4,7 @@
  */
 
 import {EmptyValue, InternalScalarValue} from '../Cell'
+import {Config} from '../Config'
 import {TranslationPackage} from '../i18n'
 import {Maybe} from '../Maybe'
 import {ArithmeticHelper} from './ArithmeticHelper'
@@ -25,9 +26,9 @@ export const buildCriterion = (operator: CriterionType, value: number | string |
 export class CriterionBuilder {
   private trueString: string
   private falseString: string
-  constructor(translationPackage: TranslationPackage) {
-    this.trueString = translationPackage.getMaybeFunctionTranslation('TRUE') ?? 'TRUE'
-    this.falseString = translationPackage.getMaybeFunctionTranslation('FALSE') ?? 'FALSE'
+  constructor(config: Config) {
+    this.trueString = config.translationPackage.getMaybeFunctionTranslation('TRUE') ?? 'TRUE'
+    this.falseString = config.translationPackage.getMaybeFunctionTranslation('FALSE') ?? 'FALSE'
   }
 
   public fromCellValue(raw: InternalScalarValue, arithmeticHelper: ArithmeticHelper): Maybe<CriterionPackage> {
@@ -35,12 +36,46 @@ export class CriterionBuilder {
       return undefined
     }
 
-    const criterion = parseCriterion(raw, arithmeticHelper)
+    const criterion = this.parseCriterion(raw, arithmeticHelper)
     if (criterion === undefined) {
       return undefined
     }
 
     return {raw, lambda: buildCriterionLambda(criterion, arithmeticHelper)}
+  }
+
+  public parseCriterion(criterion: InternalScalarValue, arithmeticHelper: ArithmeticHelper): Maybe<Criterion> {
+    if (typeof criterion === 'number' || typeof criterion === 'boolean') {
+      return buildCriterion(CriterionType.EQUAL, criterion)
+    } else if (typeof criterion === 'string') {
+      const regexResult = ANY_CRITERION_REGEX.exec(criterion)
+
+      let criterionValue
+      let criterionType
+
+      if (regexResult) {
+        criterionType = StrToCriterionType(regexResult[1])
+        criterionValue = regexResult[2]
+      } else {
+        criterionType = CriterionType.EQUAL
+        criterionValue = criterion
+      }
+      const value = arithmeticHelper.coerceToMaybeNumber(criterionValue)
+      const boolvalue = criterionValue.toLowerCase()==='true' ? true : criterionValue.toLowerCase() === 'false' ? false : undefined
+      if(criterionType === undefined) {
+        return undefined
+      }
+      if (criterionValue === '') {
+        return buildCriterion(criterionType, null)
+      } else if (value === undefined) {
+        if(criterionType === CriterionType.EQUAL || criterionType === CriterionType.NOT_EQUAL) {
+          return buildCriterion(criterionType, boolvalue ?? criterionValue)
+        }
+      } else {
+        return buildCriterion(criterionType, value)
+      }
+    }
+    return undefined
   }
 }
 
@@ -48,39 +83,6 @@ export type CriterionPackage = {raw: string, lambda: CriterionLambda}
 
 const ANY_CRITERION_REGEX = /([<>=]+)(.*)/
 
-export const parseCriterion = (criterion: InternalScalarValue, arithmeticHelper: ArithmeticHelper): Maybe<Criterion> => {
-  if (typeof criterion === 'number' || typeof criterion === 'boolean') {
-    return buildCriterion(CriterionType.EQUAL, criterion)
-  } else if (typeof criterion === 'string') {
-    const regexResult = ANY_CRITERION_REGEX.exec(criterion)
-
-    let criterionValue
-    let criterionType
-
-    if (regexResult) {
-      criterionType = StrToCriterionType(regexResult[1])
-      criterionValue = regexResult[2]
-    } else {
-      criterionType = CriterionType.EQUAL
-      criterionValue = criterion
-    }
-    const value = arithmeticHelper.coerceToMaybeNumber(criterionValue)
-    const boolvalue = criterionValue.toLowerCase()==='true' ? true : criterionValue.toLowerCase() === 'false' ? false : undefined
-    if(criterionType === undefined) {
-      return undefined
-    }
-    if (criterionValue === '') {
-      return buildCriterion(criterionType, null)
-    } else if (value === undefined) {
-      if(criterionType === CriterionType.EQUAL || criterionType === CriterionType.NOT_EQUAL) {
-        return buildCriterion(criterionType, boolvalue ?? criterionValue)
-      }
-    } else {
-      return buildCriterion(criterionType, value)
-    }
-  }
-  return undefined
-}
 
 function StrToCriterionType(str: string): Maybe<CriterionType> {
   switch (str) {

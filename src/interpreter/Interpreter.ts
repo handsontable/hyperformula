@@ -40,7 +40,7 @@ export class Interpreter {
   ) {
     this.functionRegistry.initializePlugins(this)
     this.arithmeticHelper = new ArithmeticHelper(config, dateHelper, numberLiteralsHelper)
-    this.criterionBuilder = new CriterionBuilder(config.translationPackage)
+    this.criterionBuilder = new CriterionBuilder(config)
   }
 
   /**
