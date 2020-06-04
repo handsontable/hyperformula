@@ -5,7 +5,7 @@ import {adr, detailedError} from './testUtils'
 describe( 'Wrong licence', () => {
   it('eval', () => {
     const engine = HyperFormula.buildFromArray([['=TRUE()']], {licenseKey: ''})
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.LIC))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.LIC, 'license missing'))
   })
 
   it('serialization', () => {

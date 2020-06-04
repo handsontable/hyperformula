@@ -42,7 +42,7 @@ export class Serialization {
 
   public getCellSerialized(address: SimpleCellAddress): NoErrorCellValue {
     if(this.config.licenseKeyValidityState !== LicenseKeyValidityState.VALID) {
-      return this.config.translationPackage.getErrorTranslation(ErrorType.LIC)
+      return '#LIC!'
     }
     const formula: Maybe<string> = this.getCellFormula(address)
     if (formula !== undefined) {

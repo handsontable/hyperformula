@@ -4,6 +4,7 @@
  */
 
 import GPU from 'gpu.js'
+import {detailedError} from '../../test/testUtils'
 import {AbsoluteCellRange, AbsoluteColumnRange, AbsoluteRowRange} from '../AbsoluteCellRange'
 import {CellError, ErrorType, InternalNoErrorCellValue, invalidSimpleCellAddress, SimpleCellAddress} from '../Cell'
 import {ColumnSearchStrategy} from '../ColumnSearch/ColumnSearchStrategy'
@@ -49,7 +50,7 @@ export class Interpreter {
    */
   public evaluateAst(ast: Ast, formulaAddress: SimpleCellAddress): InterpreterValue {
     if(this.config.licenseKeyValidityState !== LicenseKeyValidityState.VALID) {
-      return new CellError(ErrorType.LIC)
+      return detailedError(ErrorType.LIC, `license ${this.config.licenseKeyValidityState}`)
     }
     switch (ast.type) {
       case AstNodeType.EMPTY: {
