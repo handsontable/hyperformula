@@ -14,6 +14,13 @@ describe('Parsing error literals', () => {
     expect(ast.error.type).toEqual(ErrorType.VALUE)
   })
 
+  it('should not parse #LIC! as license error', () => {
+    const parser = buildEmptyParserWithCaching(new Config())
+    const ast = parser.parse('=#LIC!', simpleCellAddress(0, 0, 0)).ast as ErrorAst
+    expect(ast.type).toBe(AstNodeType.ERROR)
+    expect(ast.error.type).toEqual(ErrorType.ERROR)
+  })
+
   it('should parse error literals with ?', () => {
     const parser = buildEmptyParserWithCaching(new Config())
     const ast = parser.parse('=#NAME?', simpleCellAddress(0, 0, 0)).ast as ErrorAst
