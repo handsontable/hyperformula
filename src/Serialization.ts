@@ -3,10 +3,11 @@
  * Copyright (c) 2020 Handsoncode. All rights reserved.
  */
 
-import {simpleCellAddress, SimpleCellAddress} from './Cell'
+import {CellError, ErrorType, simpleCellAddress, SimpleCellAddress} from './Cell'
 import {CellValue, DetailedCellError, Exporter, NoErrorCellValue} from './CellValue'
 import {Config} from './Config'
 import {DependencyGraph, FormulaCellVertex, MatrixVertex, ParsingErrorVertex} from './DependencyGraph'
+import {LicenseKeyValidityState} from './helpers/licenseKeyValidator'
 import {Maybe} from './Maybe'
 import {buildLexerConfig, Unparser} from './parser'
 import {NamedExpressions} from './NamedExpressions'
@@ -21,6 +22,9 @@ export class Serialization {
   }
 
   public getCellFormula(address: SimpleCellAddress): Maybe<string> {
+    if(this.config.licenseKeyValidityState !== LicenseKeyValidityState.VALID) {
+      return undefined
+    }
     const formulaVertex = this.dependencyGraph.getCell(address)
     if (formulaVertex instanceof FormulaCellVertex) {
       const formula = formulaVertex.getFormula(this.dependencyGraph.lazilyTransformingAstService)
@@ -37,6 +41,9 @@ export class Serialization {
   }
 
   public getCellSerialized(address: SimpleCellAddress): NoErrorCellValue {
+    if(this.config.licenseKeyValidityState !== LicenseKeyValidityState.VALID) {
+      return this.config.translationPackage.getErrorTranslation(ErrorType.LIC)
+    }
     const formula: Maybe<string> = this.getCellFormula(address)
     if (formula !== undefined) {
       return formula
