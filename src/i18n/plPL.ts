@@ -122,6 +122,7 @@ export const plPL: RawTranslationPackage = {
     CYCLE: '#CYKL!',
     REF: '#ADR!',
     ERROR: '#BŁĄD!',
+    LIC: '#LIC!',
   },
   ui: {
     NEW_SHEET_PREFIX: 'Arkusz',

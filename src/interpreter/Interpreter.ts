@@ -10,17 +10,18 @@ import {ColumnSearchStrategy} from '../ColumnSearch/ColumnSearchStrategy'
 import {Config} from '../Config'
 import {DateTimeHelper} from '../DateTimeHelper'
 import {DependencyGraph} from '../DependencyGraph'
+import {LicenseKeyValidityState} from '../helpers/licenseKeyValidator'
 import {Matrix, NotComputedMatrix} from '../Matrix'
 import {Maybe} from '../Maybe'
+import {NamedExpressions} from '../NamedExpressions'
+import {NumberLiteralHelper} from '../NumberLiteralHelper'
 // noinspection TypeScriptPreferShortImport
 import {Ast, AstNodeType, CellRangeAst, ColumnRangeAst, RowRangeAst} from '../parser/Ast'
 import {Statistics} from '../statistics/Statistics'
 import {ArithmeticHelper, divide, multiply, percent, power, unaryminus} from './ArithmeticHelper'
+import {FunctionRegistry} from './FunctionRegistry'
 import {InterpreterValue, SimpleRangeValue} from './InterpreterValue'
 import {concatenate} from './text'
-import {NumberLiteralHelper} from '../NumberLiteralHelper'
-import {FunctionRegistry} from './FunctionRegistry'
-import {NamedExpressions} from '../NamedExpressions'
 
 export class Interpreter {
   private gpu?: GPU.GPU
@@ -47,6 +48,9 @@ export class Interpreter {
    * @param formulaAddress - address of the cell in which formula is located
    */
   public evaluateAst(ast: Ast, formulaAddress: SimpleCellAddress): InterpreterValue {
+    if(this.config.licenseKeyValidityState !== LicenseKeyValidityState.VALID) {
+      return new CellError(ErrorType.LIC)
+    }
     switch (ast.type) {
       case AstNodeType.EMPTY: {
         throw new Error('Empty argument should not be evaluated.')

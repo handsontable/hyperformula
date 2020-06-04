@@ -121,7 +121,8 @@ export const enGB: RawTranslationPackage = {
     NA: '#N/A',
     CYCLE: '#CYCLE!',
     REF: '#REF!',
-    ERROR: '#ERROR!'
+    ERROR: '#ERROR!',
+    LIC: '#LIC!',
   },
   ui: {
     NEW_SHEET_PREFIX: 'Sheet',
