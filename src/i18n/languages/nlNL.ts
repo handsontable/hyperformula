@@ -6,6 +6,8 @@
 import {RawTranslationPackage} from '..'
 
 export const nlNL: RawTranslationPackage = {
+  // eslint-disable-next-line
+  // @ts-ignore
   errors: {
     CYCLE: '#CYCLE!',
     DIV_BY_ZERO: '#DELING.DOOR.0!',

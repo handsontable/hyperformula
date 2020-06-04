@@ -6,6 +6,8 @@
 import {RawTranslationPackage} from '..'
 
 export const esES: RawTranslationPackage = {
+  // eslint-disable-next-line
+  // @ts-ignore
   errors: {
     CYCLE: '#CYCLE!',
     DIV_BY_ZERO: '#¡DIV/0!',

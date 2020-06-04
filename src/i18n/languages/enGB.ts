@@ -6,11 +6,12 @@
 import {RawTranslationPackage} from '..'
 
 export const enGB: RawTranslationPackage = {
+  // eslint-disable-next-line
+  // @ts-ignore
   errors: {
     CYCLE: '#CYCLE!',
     DIV_BY_ZERO: '#DIV/0!',
     ERROR: '#ERROR!',
-    LIC: '#LIC!',
     NA: '#N/A',
     NAME: '#NAME?',
     NUM: '#NUM!',

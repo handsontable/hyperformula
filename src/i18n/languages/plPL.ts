@@ -6,11 +6,12 @@
 import {RawTranslationPackage} from '..'
 
 export const plPL: RawTranslationPackage = {
+  // eslint-disable-next-line
+  // @ts-ignore
   errors: {
     CYCLE: '#CYKL!',
     DIV_BY_ZERO: '#DZIEL/0!',
     ERROR: '#BŁĄD!',
-    LIC: '#LIC!',
     NA: '#N/A',
     NAME: '#NAZWA?',
     NUM: '#LICZBA!',

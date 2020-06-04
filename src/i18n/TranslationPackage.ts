@@ -91,7 +91,7 @@ export class TranslationPackage {
   }
   private checkErrors(): void {
     for(const key of Object.values(ErrorType)){
-      if(! (key in this.errors)){
+      if(! (key in this.errors) && (key !== 'LIC')){
         throw new MissingTranslationError(`errors.${key}`)
       }
     }
