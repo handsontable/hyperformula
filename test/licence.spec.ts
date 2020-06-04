@@ -9,7 +9,7 @@ describe( 'Wrong licence', () => {
   })
 
   it('serialization', () => {
-    const engine = HyperFormula.buildFromArray([['=TRUE()', null, 1]], {licenseKey: ''})
-    expect(engine.getSheetSerialized(0)).toEqual([['#LIC!', '#LIC!', '#LIC!']])
+    const engine = HyperFormula.buildFromArray([['=TRUE()', null, 1, '=A(']], {licenseKey: ''})
+    expect(engine.getSheetSerialized(0)).toEqual([['#LIC!', '#LIC!', '#LIC!', '#LIC!']])
   })
 })
