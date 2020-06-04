@@ -10,12 +10,12 @@ export const plPL: RawTranslationPackage = {
     CYCLE: '#CYKL!',
     DIV_BY_ZERO: '#DZIEL/0!',
     ERROR: '#BŁĄD!',
+    LIC: '#LIC!',
     NA: '#N/A',
     NAME: '#NAZWA?',
     NUM: '#LICZBA!',
     REF: '#ADR!',
     VALUE: '#ARG!',
-    LIC: '#LIC!',
   },
   functions: {
     ABS: 'WART.BEZWGL',

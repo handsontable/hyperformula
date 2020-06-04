@@ -10,12 +10,12 @@ export const enGB: RawTranslationPackage = {
     CYCLE: '#CYCLE!',
     DIV_BY_ZERO: '#DIV/0!',
     ERROR: '#ERROR!',
+    LIC: '#LIC!',
     NA: '#N/A',
     NAME: '#NAME?',
     NUM: '#NUM!',
     REF: '#REF!',
     VALUE: '#VALUE!',
-    LIC: '#LIC!',
   },
   functions: {
     ABS: 'ABS',
