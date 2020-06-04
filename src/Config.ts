@@ -114,7 +114,11 @@ export interface ConfigParams {
    */
   language: string,
   /**
-   * A license key of HyperFormula: commercial or "non-commercial-and-evaluation" or "agpl-v3" type .
+   * A license key of HyperFormula:
+   * "agpl-v3" string if you want to use the software on AGPL v3 license terms,
+   * "non-commercial" string if you want to use our limited versions,
+   * a valid license key string, if you bought the commercial license.
+   * For more details visit [this guide](https://handsontable.github.io/hyperformula/guide/license-key.html)
    *
    * @default undefined
    *
