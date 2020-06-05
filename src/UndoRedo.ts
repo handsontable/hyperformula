@@ -295,7 +295,7 @@ export class UndoRedo {
       this.undoRemoveSheet(operation)
     } else if (operation instanceof RenameSheetUndoEntry) {
       this.undoRenameSheet(operation)
-    }else if (operation instanceof ClearSheetUndoEntry) {
+    } else if (operation instanceof ClearSheetUndoEntry) {
       this.undoClearSheet(operation)
     } else if (operation instanceof AddColumnsUndoEntry) {
       this.undoAddColumns(operation)

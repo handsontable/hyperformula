@@ -55,7 +55,8 @@ import {
   RemoveColumnsUndoEntry,
   RemoveNamedExpressionUndoEntry,
   RemoveRowsUndoEntry,
-  RemoveSheetUndoEntry, RenameSheetUndoEntry,
+  RemoveSheetUndoEntry,
+  RenameSheetUndoEntry,
   SetCellContentsUndoEntry,
   SetSheetContentUndoEntry,
   UndoRedo
