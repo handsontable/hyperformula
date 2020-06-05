@@ -2314,6 +2314,37 @@ export class HyperFormula implements TypedEmitter {
   }
 
   /**
+   * Returns information whether it is possible to rename sheet.
+   * Returns `true` if the sheet with provided id exists and new name is available
+   * Returns `false` if sheet cannot be renamed
+   *
+   * @param {number} sheetId - a sheet number
+   * @param {string} newName - a name of the sheet to be given
+   *
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromSheets({
+   *   MySheet1: [ ['1'] ],
+   *   MySheet2: [ ['10'] ],
+   * });
+   *
+   * // returns true
+   * hfInstance.isItPossibleToRenameSheet(0, 'MySheet0');
+   * ```
+   *
+   * @category Sheets
+   */
+  public isItPossibleToRenameSheet(sheetId: number, newName: string): boolean {
+    try {
+      this._crudOperations.ensureItIsPossibleToRenameSheet(sheetId, newName)
+      return true
+    } catch (e) {
+      return false
+    }
+  }
+
+  /**
    * Renames a specified sheet.
    *
    * @param {number} sheetId - a sheet number
@@ -2337,7 +2368,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Sheets
    */
   public renameSheet(sheetId: number, newName: string): void {
-    const oldName = this.sheetMapping.renameSheet(sheetId, newName)
+    const oldName = this._crudOperations.renameSheet(sheetId, newName)
     if (oldName !== undefined) {
       this._emitter.emit(Events.SheetRenamed, oldName, newName)
     }
