@@ -5,6 +5,7 @@
 
 import {TranslationPackage, UIElement} from '../i18n'
 import {Maybe} from '../Maybe'
+import {NoSheetWithIdError, NoSheetWithNameError, SheetNameAlreadyTakenError} from '../errors'
 
 function canonicalize(sheetDisplayName: string): string {
   return sheetDisplayName.toLowerCase()
@@ -35,7 +36,7 @@ export class SheetMapping {
   public addSheet(newSheetDisplayName: string = `${this.sheetNamePrefix}${this.lastSheetId + 2}`): number {
     const newSheetCanonicalName = canonicalize(newSheetDisplayName)
     if (this.mappingFromCanonicalName.has(newSheetCanonicalName)) {
-      throw new Error(`Sheet ${newSheetDisplayName} already exists`)
+      throw new SheetNameAlreadyTakenError(newSheetDisplayName)
     }
 
     this.lastSheetId++
@@ -56,7 +57,7 @@ export class SheetMapping {
   public fetch = (sheetName: string): number => {
     const sheet = this.mappingFromCanonicalName.get(canonicalize(sheetName))
     if (sheet === undefined) {
-      throw new Error(`Sheet ${sheetName} doesn't exist`)
+      throw new NoSheetWithNameError(sheetName)
     }
     return sheet.id
   }
@@ -120,7 +121,7 @@ export class SheetMapping {
 
     const sheetWithThisCanonicalName = this.mappingFromCanonicalName.get(canonicalize(newDisplayName))
     if (sheetWithThisCanonicalName && sheetWithThisCanonicalName.id !== sheet.id) {
-      throw new Error(`Sheet '${newDisplayName}' already exists`)
+      throw new SheetNameAlreadyTakenError(newDisplayName)
     }
 
     const currentCanonicalName = sheet.canonicalName
@@ -148,7 +149,7 @@ export class SheetMapping {
   private fetchSheetById(sheetId: number): Sheet {
     const sheet = this.mappingFromId.get(sheetId)
     if (sheet === undefined) {
-      throw new Error(`Sheet with id ${sheetId} doesn't exist`)
+      throw new NoSheetWithIdError(sheetId)
     }
     return sheet
   }
