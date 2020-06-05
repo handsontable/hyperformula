@@ -1,4 +1,4 @@
-import {DetailedCellError, HyperFormula} from '../src'
+import {DetailedCellError, HyperFormula, NoSheetWithIdError, SheetNameAlreadyTakenError} from '../src'
 import {CellType, CellValueType, ErrorType} from '../src/Cell'
 import {plPL} from '../src/i18n'
 import {adr, detailedError, expectArrayWithSameContent} from './testUtils'
@@ -356,7 +356,7 @@ describe('#renameSheet', () => {
 
     expect(() => {
       engine.renameSheet(0, 'bar')
-    }).toThrowError('Sheet with id 0 doesn\'t exist')
+    }).toThrowError(new NoSheetWithIdError(0))
   })
 
   it('error when new sheet name is already taken', () => {
@@ -366,7 +366,7 @@ describe('#renameSheet', () => {
 
     expect(() => {
       engine.renameSheet(0, 'bar')
-    }).toThrowError('Sheet \'bar\' already exists')
+    }).toThrowError(new SheetNameAlreadyTakenError('bar'))
   })
 
   it('change for the same name', () => {
