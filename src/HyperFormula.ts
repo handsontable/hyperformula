@@ -2613,7 +2613,6 @@ export class HyperFormula implements TypedEmitter {
     }
   }
 
-
   /**
    * Returns named expression a normalized formula string for given named expression or `undefined` for a named expression that does not exist or does not hold a formula.
    * Unparses AST.

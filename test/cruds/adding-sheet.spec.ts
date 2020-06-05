@@ -102,6 +102,6 @@ describe('add sheet to engine', () => {
 
     expect(() => {
       engine.addSheet('bar')
-    }).toThrowError(new SheetNameAlreadyTakenError('bar'))
+    }).toThrow(new SheetNameAlreadyTakenError('bar'))
   })
 })

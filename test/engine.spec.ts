@@ -1,7 +1,8 @@
-import {DetailedCellError, HyperFormula, NoSheetWithIdError, SheetNameAlreadyTakenError} from '../src'
-import {CellType, CellValueType, ErrorType} from '../src/Cell'
+import {DetailedCellError, ErrorType, HyperFormula, NoSheetWithIdError, SheetNameAlreadyTakenError} from '../src'
+import {CellType, CellValueType} from '../src/Cell'
 import {plPL} from '../src/i18n'
 import {adr, detailedError, expectArrayWithSameContent} from './testUtils'
+import {Config} from '../src/Config'
 
 describe('#buildFromArray', () => {
   it('load single value', () => {
@@ -174,9 +175,18 @@ describe('#getCellFormula', () => {
     expect(engine.getCellFormula(adr('B2'))).toEqual(undefined)
   })
 
+  it('returns invalid formula literal', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=SUM(']
+    ])
+
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.ERROR, 'Parsing error'))
+    expect(engine.getCellFormula(adr('A1'))).toEqual('=SUM(')
+  })
+
   it('returns invalid matrix formula literal', () => {
     const engine = HyperFormula.buildFromArray([
-      [ '{=TRANSPOSE(}' ]
+      ['{=TRANSPOSE(}']
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.ERROR, 'Parsing error'))
@@ -198,16 +208,92 @@ describe('#getAllFormulas', () => {
 describe('#getRangeFormulas', () => {
   it('should return formulas', () => {
     const engine = HyperFormula.buildFromArray([
-      ['=SUM(1, A2)', '=TRUE()']
+      ['=SUM(1, A2)', '=TRUE()'],
+      ['=SUM(', null, 1]
     ])
 
-    const out = engine.getRangeFormulas(adr('A1'), 2, 1)
+    const out = engine.getRangeFormulas(adr('A1'), 3, 2)
 
-    expectArrayWithSameContent([['=SUM(1, A2)', '=TRUE()']], out)
+    expectArrayWithSameContent([['=SUM(1, A2)', '=TRUE()', undefined], ['=SUM(', undefined, undefined]], out)
+  })
+})
+
+describe('#getSheetFormulas', () => {
+  it('should return formulas from sheet', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=SUM(1, A2)', '=TRUE()'],
+      ['=SUM(', null, 1]
+    ])
+
+    const out = engine.getSheetFormulas(0)
+
+    expectArrayWithSameContent([['=SUM(1, A2)', '=TRUE()', undefined], ['=SUM(', undefined, undefined]], out)
   })
 })
 
 describe('#getCellValue', () => {
+  it('should return simple value', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['', 1, '1', 'foo', true, -1.000000000000001]
+    ])
+
+    expect(engine.getCellValue(adr('A1'))).toEqual('')
+    expect(engine.getCellValue(adr('B1'))).toEqual(1)
+    expect(engine.getCellValue(adr('C1'))).toEqual(1)
+    expect(engine.getCellValue(adr('D1'))).toEqual('foo')
+    expect(engine.getCellValue(adr('E1'))).toEqual(true)
+    expect(engine.getCellValue(adr('F1'))).toEqual(-1)
+  })
+
+  it('should return null for empty cells', () => {
+    const engine = HyperFormula.buildFromArray([
+      [null, undefined]
+    ])
+
+    expect(engine.getCellValue(adr('A1'))).toEqual(null)
+    expect(engine.getCellValue(adr('B1'))).toEqual(null)
+    expect(engine.getCellValue(adr('C1'))).toEqual(null)
+  })
+
+  it('should return value of a formula', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=1', '=SUM(1, A1)', '=TRUE()', '=1/0']
+    ])
+
+    expect(engine.getCellValue(adr('A1'))).toEqual(1)
+    expect(engine.getCellValue(adr('B1'))).toEqual(2)
+    expect(engine.getCellValue(adr('C1'))).toEqual(true)
+    expect(engine.getCellValue(adr('D1'))).toEqual(detailedError(ErrorType.DIV_BY_ZERO))
+  })
+
+  it('should return parsing error value', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=SUM(']
+    ])
+
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.ERROR, 'Parsing error'))
+  })
+
+  it('should return value of a cell in a formula matrix', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1', '2'],
+      ['{=TRANSPOSE(A1:B1)}'],
+      ['{=TRANSPOSE(A1:B1)}'],
+    ])
+
+    expect(engine.getCellValue(adr('A2'))).toEqual(1)
+    expect(engine.getCellValue(adr('A3'))).toEqual(2)
+  })
+
+  it('should return value of a cell in numeric matrix', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1', '2'],
+    ], {matrixDetection: true, matrixDetectionThreshold: 1})
+
+    expect(engine.getCellValue(adr('A1'))).toEqual(1)
+    expect(engine.getCellValue(adr('B1'))).toEqual(2)
+  })
+
   it('should return translated error', () => {
     HyperFormula.registerLanguage('plPL', plPL)
     const engine = HyperFormula.buildFromArray([
@@ -215,20 +301,67 @@ describe('#getCellValue', () => {
     ], {language: 'plPL'})
 
     const error = engine.getCellValue(adr('A1')) as DetailedCellError
-    expect(error.type).toEqual(ErrorType.VALUE)
+    expect(error).toEqual(detailedError(ErrorType.VALUE, '', new Config({language: 'plPL'})))
     expect(error.value).toEqual('#ARG!')
+  })
+})
+
+describe('#getSheetDimensions', () => {
+  it('should work for empty sheet', () => {
+    const engine = HyperFormula.buildFromArray([])
+
+    expect(engine.getSheetDimensions(0)).toEqual({ height: 0, width: 0})
+  })
+
+  it('should return sheet dimensions', () => {
+    const engine = HyperFormula.buildFromArray([
+      [1, 1],
+      [1, null, 1],
+    ])
+
+    expect(engine.getSheetDimensions(0)).toEqual({ height: 2, width: 3})
+  })
+})
+
+describe('#getAllSheetsDimensions', () => {
+  it('should return dimension of all sheets', () => {
+    const engine = HyperFormula.buildFromSheets({
+      'Sheet1': [],
+      'Sheet2': [[1]],
+      'Foo': [[null]],
+      'Bar': [[null], [null, 'foo']]
+    })
+
+    expect(engine.getAllSheetsDimensions()).toEqual({
+      'Sheet1': { width: 0, height: 0},
+      'Sheet2': { width: 1, height: 1},
+      'Foo': { width: 0, height: 0},
+      'Bar': { width: 2, height: 2},
+    })
   })
 })
 
 describe('#getRangeValues', () => {
   it('should return values from range', () => {
     const engine = HyperFormula.buildFromArray([
-      ['=SUM(1, B1)', '=TRUE()']
+      ['=SUM(1, B1)', '=TRUE()', null]
     ])
 
-    const out = engine.getRangeValues(adr('A1'), 2, 1)
+    const out = engine.getRangeValues(adr('A1'), 3, 1)
 
-    expectArrayWithSameContent([[1, true]], out)
+    expectArrayWithSameContent([[1, true, null]], out)
+  })
+})
+
+describe('#getSheetValues', () => {
+  it('should return values from sheet', () => {
+    const engine = HyperFormula.buildFromArray([
+      [1, 'foo', '=SUM(1, A1)', null, '=TRUE()', null]
+    ])
+
+    const out = engine.getSheetValues(0)
+
+    expectArrayWithSameContent([[1, 'foo', 2, null, true]], out)
   })
 })
 
@@ -243,7 +376,75 @@ describe('#getAllValues', () => {
   })
 })
 
-describe('#getAllSheetSerialized', () => {
+describe('#getCellSerialized', () => {
+  it('should return formula for formula vertex', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=SUM(1, A2)']
+    ])
+
+    expect(engine.getCellSerialized(adr('A1'))).toEqual('=SUM(1, A2)')
+  })
+
+  it('should return formula for parsing error', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=SUM(']
+    ])
+
+    expect(engine.getCellSerialized(adr('A1'))).toEqual('=SUM(')
+  })
+
+  it('should return simple value', () => {
+    const engine = HyperFormula.buildFromArray([
+      [1, '2', 'foo', true]
+    ])
+
+    expect(engine.getCellSerialized(adr('A1'))).toEqual(1)
+    expect(engine.getCellSerialized(adr('B1'))).toEqual(2)
+    expect(engine.getCellSerialized(adr('C1'))).toEqual('foo')
+    expect(engine.getCellSerialized(adr('D1'))).toEqual(true)
+  })
+
+  it('should return empty value', () => {
+    const engine = HyperFormula.buildFromArray([
+      [null, undefined]
+    ])
+
+    expect(engine.getCellSerialized(adr('A1'))).toEqual(null)
+    expect(engine.getCellSerialized(adr('B1'))).toEqual(null)
+    expect(engine.getCellSerialized(adr('C1'))).toEqual(null)
+  })
+
+  it('should return formula of a formula matrix', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1', '2'],
+      ['{=TRANSPOSE(A1:B1)}'],
+      ['{=TRANSPOSE(A1:B1)}'],
+    ])
+
+    expect(engine.getCellSerialized(adr('A2'))).toEqual('{=TRANSPOSE(A1:B1)}')
+    expect(engine.getCellSerialized(adr('A3'))).toEqual('{=TRANSPOSE(A1:B1)}')
+  })
+
+  it('should return value of a cell in numeric matrix', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1', '2'],
+    ], {matrixDetection: true, matrixDetectionThreshold: 1})
+
+    expect(engine.getCellSerialized(adr('A1'))).toEqual(1)
+    expect(engine.getCellSerialized(adr('B1'))).toEqual(2)
+  })
+
+  it('should return translated error', () => {
+    HyperFormula.registerLanguage('plPL', plPL)
+    const engine = HyperFormula.buildFromArray([
+      ['=#ARG!'],
+    ], {language: 'plPL'})
+
+    expect(engine.getCellSerialized(adr('A1'))).toEqual('=#ARG!')
+  })
+})
+
+describe('#getAllSheetsSerialized', () => {
   it('should serialize all sheets', () => {
     const engine = HyperFormula.buildFromSheets({
       Sheet1: [['=A()']],
@@ -264,18 +465,24 @@ describe('#getAllSheetSerialized', () => {
 })
 
 describe('#getRangeSerialized', () => {
+  it('should return empty values', () => {
+    const engine = HyperFormula.buildFromArray([])
+
+    expectArrayWithSameContent([[null, null]], engine.getRangeSerialized(adr('A1'), 2, 1))
+  })
+
   it('should return serialized cells from range', () => {
     const engine = HyperFormula.buildFromArray([
-      ['=SUM(1, B1)', '2', '#VALUE!']
+      ['=SUM(1, B1)', '2', '#VALUE!', null, '=#DIV/0!', '{=TRANSPOSE(A1:B1)}']
     ])
 
-    const out = engine.getRangeSerialized(adr('A1'), 3, 1)
+    const out = engine.getRangeSerialized(adr('A1'), 6, 1)
 
-    expectArrayWithSameContent([['=SUM(1, B1)', 2, '#VALUE!']], out)
+    expectArrayWithSameContent([['=SUM(1, B1)', 2, '#VALUE!', null, '=#DIV/0!', '{=TRANSPOSE(A1:B1)}']], out)
   })
 })
 
-describe('#sheetName', () =>{
+describe('#sheetName', () => {
   it('returns sheet name if sheet exists', () => {
     const engine = HyperFormula.buildEmpty()
 
@@ -356,7 +563,7 @@ describe('#renameSheet', () => {
 
     expect(() => {
       engine.renameSheet(0, 'bar')
-    }).toThrowError(new NoSheetWithIdError(0))
+    }).toThrow(new NoSheetWithIdError(0))
   })
 
   it('error when new sheet name is already taken', () => {
@@ -366,7 +573,7 @@ describe('#renameSheet', () => {
 
     expect(() => {
       engine.renameSheet(0, 'bar')
-    }).toThrowError(new SheetNameAlreadyTakenError('bar'))
+    }).toThrow(new SheetNameAlreadyTakenError('bar'))
   })
 
   it('change for the same name', () => {
@@ -441,6 +648,12 @@ describe('#getCellType', () => {
 
     expect(engine.getCellType(adr('A1'))).toBe(CellType.MATRIX)
     expect(engine.getCellType(adr('B1'))).toBe(CellType.MATRIX)
+  })
+
+  it('parsing error is a formula cell', () => {
+    const engine = HyperFormula.buildFromArray([['=SUM(']])
+
+    expect(engine.getCellType(adr('A1'))).toBe(CellType.FORMULA)
   })
 })
 
