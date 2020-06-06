@@ -12,6 +12,9 @@ export const DIFFERENT_SHEETS_ERROR = 'AbsoluteCellRange: Start and end are in d
 export const WRONG_RANGE_SIZE = 'AbsoluteCellRange: Wrong range size'
 
 export class AbsoluteCellRange {
+  public readonly start: SimpleCellAddress
+  public readonly end: SimpleCellAddress
+
   public get sheet() {
     return this.start.sheet
   }
@@ -57,12 +60,14 @@ export class AbsoluteCellRange {
   }
 
   constructor(
-    public readonly start: SimpleCellAddress,
-    public readonly end: SimpleCellAddress,
+    start: SimpleCellAddress,
+    end: SimpleCellAddress,
   ) {
     if (start.sheet !== end.sheet) {
       throw new Error(DIFFERENT_SHEETS_ERROR)
     }
+    this.start = simpleCellAddress(start.sheet, start.col, start.row)
+    this.end = simpleCellAddress(end.sheet, end.col, end.row)
   }
 
   public isFinite(): boolean {
