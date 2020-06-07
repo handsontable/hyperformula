@@ -138,7 +138,7 @@ export class DependencyGraph {
     if (this.graph.adjacentNodes(vertex).size > 0) {
       const emptyVertex = new EmptyCellVertex(address)
       this.exchangeGraphNode(vertex, emptyVertex)
-      if(this.graph.adjacentNodesCount(emptyVertex)===0) {
+      if (this.graph.adjacentNodesCount(emptyVertex) === 0) {
         this.removeGraphNode(emptyVertex)
         this.addressMapping.removeCell(address)
       } else {
@@ -182,9 +182,9 @@ export class DependencyGraph {
         const {smallerRangeVertex, restRange} = this.rangeMapping.findSmallerRange(range)
         if (smallerRangeVertex) {
           this.graph.addEdge(smallerRangeVertex, rangeVertex)
-          if(rangeVertex.bruteForce) {
+          if (rangeVertex.bruteForce) {
             rangeVertex.bruteForce = false
-            for(const cellFromRange of range.addresses(this)) { //if we ever switch heuristic to processing by sorted sizes, this would be unnecessary
+            for (const cellFromRange of range.addresses(this)) { //if we ever switch heuristic to processing by sorted sizes, this would be unnecessary
               this.graph.removeEdge(this.fetchCell(cellFromRange), rangeVertex)
             }
           }
@@ -390,9 +390,8 @@ export class DependencyGraph {
     })
 
     this.stats.measure(StatType.ADJUSTING_RANGES, () => {
-
       this.rangeMapping.moveAllRangesInSheetAfterRowByRows(addedRows.sheet, addedRows.rowStart, addedRows.numberOfRows)
-      this.fixRanges(addedRows.sheet, addedRows.rowStart, addedRows.numberOfRows)
+      this.fixRangesWhenAddingRows(addedRows.sheet, addedRows.rowStart, addedRows.numberOfRows)
     })
 
     for (const vertex of this.addressMapping.verticesFromRowsSpan(addedRows)) {
@@ -412,9 +411,8 @@ export class DependencyGraph {
     })
 
     this.stats.measure(StatType.ADJUSTING_RANGES, () => {
-      this.fixRangesWhenAddingColumns(addedColumns.sheet, addedColumns.columnStart, addedColumns.numberOfColumns)
-
       this.rangeMapping.moveAllRangesInSheetAfterColumnByColumns(addedColumns.sheet, addedColumns.columnStart, addedColumns.numberOfColumns)
+      this.fixRangesWhenAddingColumns(addedColumns.sheet, addedColumns.columnStart, addedColumns.numberOfColumns)
     })
 
     for (const vertex of this.addressMapping.verticesFromColumnsSpan(addedColumns)) {
@@ -688,11 +686,11 @@ export class DependencyGraph {
     }
   }
 
-  private fixRanges(sheet: number, row: number, numberOfRows: number): void {
+  private fixRangesWhenAddingRows(sheet: number, row: number, numberOfRows: number): void {
     const originalValues: RangeVertex[] = Array.from(this.rangeMapping.rangesInSheet(sheet))
-    for(const rangeVertex of originalValues) {
-      if (rangeVertex.range.includesRow(row+numberOfRows)) {
-        if(rangeVertex.bruteForce) {
+    for (const rangeVertex of originalValues) {
+      if (rangeVertex.range.includesRow(row + numberOfRows)) {
+        if (rangeVertex.bruteForce) {
           const addedSubrangeInThatRange = rangeVertex.range.rangeWithSameWidth(row, numberOfRows)
           for (const address of addedSubrangeInThatRange.addresses(this)) {
             this.graph.addEdge(this.fetchCellOrCreateEmpty(address), rangeVertex)
@@ -700,10 +698,10 @@ export class DependencyGraph {
         } else {
           let currentRangeVertex = rangeVertex
           let find = this.rangeMapping.findSmallerRange(currentRangeVertex.range)
-          if(find.smallerRangeVertex !== null) {
+          if (find.smallerRangeVertex !== null) {
             continue
           }
-          while(find.smallerRangeVertex === null) {
+          while (find.smallerRangeVertex === null) {
             const newRangeVertex = new RangeVertex(AbsoluteCellRange.spanFrom(currentRangeVertex.range.start, currentRangeVertex.range.width(), currentRangeVertex.range.height() - 1))
             this.rangeMapping.setRange(newRangeVertex)
             this.graph.addNode(newRangeVertex)
@@ -722,16 +720,16 @@ export class DependencyGraph {
   }
 
   private addAllFromRange(range: AbsoluteCellRange, vertex: RangeVertex) {
-    for(const address of range.addresses(this)) {
+    for (const address of range.addresses(this)) {
       this.graph.addEdge(this.fetchCellOrCreateEmpty(address), vertex)
     }
   }
 
   private fixRangesWhenAddingColumns(sheet: number, column: number, numberOfColumns: number): void {
     for (const rangeVertex of this.rangeMapping.rangesInSheet(sheet)) {
-      if (rangeVertex.range.includesColumn(column)) {
+      if (rangeVertex.range.includesColumn(column + numberOfColumns)) {
         let subrange
-        if(rangeVertex.bruteForce) {
+        if (rangeVertex.bruteForce) {
           subrange = rangeVertex.range.rangeWithSameHeight(column, numberOfColumns)
         } else {
           subrange = AbsoluteCellRange.spanFrom(simpleCellAddress(sheet, column, rangeVertex.range.end.row), numberOfColumns, 1)
@@ -835,7 +833,7 @@ export class DependencyGraph {
     const adjNodesStored = this.graph.adjacentNodes(oldNode)
     this.removeGraphNode(oldNode)
     adjNodesStored.forEach((adjacentNode) => {
-      if(this.graph.hasNode(adjacentNode)) {
+      if (this.graph.hasNode(adjacentNode)) {
         this.graph.addEdge(newNode, adjacentNode)
       }
     })
@@ -851,19 +849,19 @@ export class DependencyGraph {
 
   public removeGraphNode(node: Vertex) {
     const candidates = this.graph.removeNode(node)
-    if(node instanceof RangeVertex) {
+    if (node instanceof RangeVertex) {
       this.rangeMapping.removeRange(node)
     }
-    while(candidates.size > 0) {
+    while (candidates.size > 0) {
       const vertex: Vertex = candidates.values().next().value
       candidates.delete(vertex)
-      if(this.graph.hasNode(vertex) && this.graph.adjacentNodesCount(vertex) === 0) {
-        if(vertex instanceof RangeVertex || vertex instanceof EmptyCellVertex) {
+      if (this.graph.hasNode(vertex) && this.graph.adjacentNodesCount(vertex) === 0) {
+        if (vertex instanceof RangeVertex || vertex instanceof EmptyCellVertex) {
           this.graph.removeNode(vertex).forEach((candidate) => candidates.add(candidate))
         }
-        if(vertex instanceof RangeVertex) {
+        if (vertex instanceof RangeVertex) {
           this.rangeMapping.removeRange(vertex)
-        } else if(vertex instanceof EmptyCellVertex) {
+        } else if (vertex instanceof EmptyCellVertex) {
           this.addressMapping.removeCell(vertex.address)
         }
       }
@@ -884,18 +882,18 @@ export class DependencyGraph {
       const allDeps: Set<Vertex> = new Set()
       const {smallerRangeVertex, restRange} = this.rangeMapping.findSmallerRange(vertex.range) //checking whether this range was splitted by bruteForce or not
       let range
-      if(smallerRangeVertex !== null && this.graph.adjacentNodes(smallerRangeVertex).has(vertex)) {
+      if (smallerRangeVertex !== null && this.graph.adjacentNodes(smallerRangeVertex).has(vertex)) {
         range = restRange
         allDeps.add(smallerRangeVertex)
       } else { //did we ever need to use full range
         range = vertex.range
       }
-      for(const address of range.addresses(this)) {
+      for (const address of range.addresses(this)) {
         const cell = this.addressMapping.getCell(address)
-        if(cell instanceof EmptyCellVertex) {
+        if (cell instanceof EmptyCellVertex) {
           cell.address = address
         }
-        if(cell !== null) {
+        if (cell !== null) {
           allDeps.add(cell)
         }
       }

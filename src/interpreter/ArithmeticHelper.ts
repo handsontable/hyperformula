@@ -8,7 +8,7 @@ import {
   CellValueTypeOrd,
   EmptyValue,
   ErrorType,
-  getCellValueType,
+  getCellValueType, InternalCellValue,
   InternalNoErrorCellValue,
   InternalScalarValue
 } from '../Cell'
@@ -30,6 +30,68 @@ export class ArithmeticHelper {
   ) {
     this.collator = collatorFromConfig(config)
     this.actualEps = config.smartRounding ? config.precisionEpsilon : 0
+  }
+
+  public eqMatcherFunction(pattern: string): (arg: InternalCellValue) => boolean {
+    const regexp = this.buildRegex(pattern)
+    return (cellValue) => (typeof cellValue === 'string' && regexp.test(this.normalizeString(cellValue)))
+  }
+
+  public neqMatcherFunction(pattern: string): (arg: InternalCellValue) => boolean {
+    const regexp = this.buildRegex(pattern)
+    return (cellValue) => {
+      return (typeof cellValue !== 'string' || !regexp.test(this.normalizeString(cellValue)))
+    }
+  }
+
+  public requiresRegex(pattern: string): boolean {
+    if(!this.config.useRegularExpresssions && !this.config.useWildcards) {
+      return !this.config.matchWholeCell
+    }
+    for(let i=0;i<pattern.length;i++) {
+      const c = pattern.charAt(i)
+      if(isWildcard(c) || (this.config.useRegularExpresssions && needsEscape(c))) {
+        return true
+      }
+    }
+    return false
+  }
+
+  private buildRegex(pattern: string): RegExp {
+    pattern = this.normalizeString(pattern)
+    let regexpStr
+    let useWildcards = this.config.useWildcards
+    let useRegularExpresssions = this.config.useRegularExpresssions
+    if(useRegularExpresssions) {
+      try {
+        RegExp(pattern)
+      } catch (e) {
+        useRegularExpresssions = false
+        useWildcards = false
+      }
+    }
+    if(useRegularExpresssions) {
+      regexpStr = escapeNoCharacters(pattern, this.config.caseSensitive)
+    } else if(useWildcards) {
+      regexpStr = escapeNonWildcards(pattern, this.config.caseSensitive)
+    } else {
+      regexpStr = escapeAllCharacters(pattern, this.config.caseSensitive)
+    }
+    if(this.config.matchWholeCell) {
+      return RegExp('^('+ regexpStr + ')$')
+    } else {
+      return RegExp(regexpStr)
+    }
+  }
+
+  private normalizeString(str: string): string {
+    if(!this.config.caseSensitive) {
+      str = str.toLowerCase()
+    }
+    if(!this.config.accentSensitive) {
+      str = str.normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    }
+    return str
   }
 
   public compare(left: InternalNoErrorCellValue, right: InternalNoErrorCellValue): number {
@@ -166,10 +228,12 @@ export class ArithmeticHelper {
   public coerceNonDateScalarToMaybeNumber(arg: InternalNoErrorCellValue): Maybe<number> {
     if (arg === EmptyValue) {
       return 0
-    }
-    if (typeof arg === 'string' && this.numberLiteralsHelper.isNumber(arg)) {
+    } else if (typeof arg === 'string' && this.numberLiteralsHelper.isNumber(arg)) {
       return this.numberLiteralsHelper.numericStringToNumber(arg)
     } else {
+      if(typeof arg === 'string' && arg.length>0 && arg.trim() === '') {
+        return undefined
+      }
       const coercedNumber = Number(arg)
       if (isNaN(coercedNumber)) {
         return undefined
@@ -442,4 +506,74 @@ export function fixNegativeZero(arg: number): number {
   } else {
     return arg
   }
+}
+
+function isWildcard(c: string): boolean {
+  return ['*', '?'].includes(c)
+}
+
+const escapedCharacters = ['{', '}', '[', ']', '(', ')', '<', '>', '=', '.', '+', '-', ',', '\\', '$', '^', '!']
+
+function needsEscape(c: string): boolean {
+  return escapedCharacters.includes(c)
+}
+
+function escapeNonWildcards(pattern: string, caseSensitive: boolean): string {
+  let str = ''
+  for (let i = 0; i < pattern.length; i++) {
+    const c = pattern.charAt(i)
+    if (c === '~') {
+      if (i == pattern.length - 1) {
+        str += '~'
+        continue
+      }
+      const d = pattern.charAt(i + 1)
+      if (isWildcard(d) || needsEscape(d)) {
+        str += '\\' + d
+        i++
+      } else {
+        str += d
+        i++
+      }
+    } else if (isWildcard(c)) {
+      str += '.' + c
+    } else if (needsEscape(c)) {
+      str += '\\' + c
+    } else if(caseSensitive) {
+      str += c
+    } else {
+      str += c.toLowerCase()
+    }
+  }
+  return str
+}
+
+function escapeAllCharacters(pattern: string, caseSensitive: boolean): string {
+  let str = ''
+  for (let i = 0; i < pattern.length; i++) {
+    const c = pattern.charAt(i)
+    if(isWildcard(c) || needsEscape(c)) {
+      str += '\\' + c
+    } else if(caseSensitive) {
+      str += c
+    } else {
+      str += c.toLowerCase()
+    }
+  }
+  return str
+}
+
+function escapeNoCharacters(pattern: string, caseSensitive: boolean): string {
+  let str = ''
+  for (let i = 0; i < pattern.length; i++) {
+    const c = pattern.charAt(i)
+    if(isWildcard(c) || needsEscape(c)) {
+      str += c
+    } else if(caseSensitive) {
+      str += c
+    } else {
+      str += c.toLowerCase()
+    }
+  }
+  return str
 }

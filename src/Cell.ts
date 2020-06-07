@@ -3,7 +3,7 @@
  * Copyright (c) 2020 Handsoncode. All rights reserved.
  */
 
-import {CellVertex, FormulaCellVertex, MatrixVertex, ValueCellVertex} from './DependencyGraph'
+import {CellVertex, FormulaCellVertex, MatrixVertex, ParsingErrorVertex, ValueCellVertex} from './DependencyGraph'
 import {CellAddress} from './parser'
 import {AddressWithSheet} from './parser/Address'
 import {SimpleRangeValue} from './interpreter/InterpreterValue'
@@ -45,7 +45,7 @@ export enum CellType {
 }
 
 export const getCellType = (vertex: CellVertex | null): CellType => {
-  if (vertex instanceof FormulaCellVertex) {
+  if (vertex instanceof FormulaCellVertex || vertex instanceof ParsingErrorVertex) {
     return CellType.FORMULA
   }
   if (vertex instanceof ValueCellVertex

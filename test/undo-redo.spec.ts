@@ -397,6 +397,28 @@ describe('Undo - removing sheet', () => {
   })
 })
 
+describe('Undo - renaming sheet', () => {
+  it('undo previous operation if name not changes', () => {
+    const engine = HyperFormula.buildFromSheets({ 'Sheet1': [[1]] })
+    engine.setCellContents(adr('A1'), [[2]])
+    engine.renameSheet(0, 'Sheet1')
+
+    engine.undo()
+
+    expect(engine.getCellValue(adr('A1'))).toEqual(1)
+    expect(engine.getSheetName(0)).toEqual('Sheet1')
+  })
+
+  it('undo rename sheet', () => {
+    const engine = HyperFormula.buildFromSheets({ 'Sheet1': [[1]] })
+    engine.renameSheet(0, 'Foo')
+
+    engine.undo()
+
+    expect(engine.getSheetName(0)).toEqual('Sheet1')
+  })
+})
+
 describe('Undo - setting cell content', () => {
   it('works for simple values', () => {
     const sheet = [
@@ -1181,6 +1203,29 @@ describe('Redo - adding sheet', () => {
     expect(engine.isThereSomethingToRedo()).toBe(false)
   })
 })
+
+describe('Redo - renaming sheet', () => {
+  it('redo rename sheet', () => {
+    const engine = HyperFormula.buildFromSheets({ 'Sheet1': [[1]] })
+    engine.renameSheet(0, 'Foo')
+    engine.undo()
+
+    engine.redo()
+
+    expect(engine.getSheetName(0)).toEqual('Foo')
+  })
+
+  it('clears redo stack', () => {
+    const engine = HyperFormula.buildFromArray([])
+    engine.setCellContents(adr('A1'), 42)
+    engine.undo()
+
+    engine.renameSheet(0, 'Foo')
+
+    expect(engine.isThereSomethingToRedo()).toBe(false)
+  })
+})
+
 
 describe('Redo - clearing sheet', () => {
   it('works', () => {
