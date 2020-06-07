@@ -58,6 +58,9 @@ export class Serialization {
   }
 
   public getCellValue(address: SimpleCellAddress): CellValue {
+    if(this.config.licenseKeyValidityState !== LicenseKeyValidityState.VALID) {
+      return new DetailedCellError(new CellError(ErrorType.LIC, `License key is ${this.config.licenseKeyValidityState}.`), `#${ErrorType.LIC}!`)
+    }
     return this.exporter.exportValue(this.dependencyGraph.getScalarValue(address))
   }
 
