@@ -3,7 +3,7 @@
  * Copyright (c) 2020 Handsoncode. All rights reserved.
  */
 
-import {ErrorType} from './Cell'
+import {ErrorType, TranslatableErrorType} from './Cell'
 import {defaultParseToDateTime} from './DateTimeDefault'
 import {DateTime, instanceOfSimpleDate, SimpleDate, SimpleDateTime, SimpleTime} from './DateTimeHelper'
 import {
@@ -451,7 +451,7 @@ export class Config implements ConfigParams, ParserConfig {
    *
    * @internal
    */
-  public readonly errorMapping: Record<string, ErrorType>
+  public readonly errorMapping: Record<string, TranslatableErrorType>
   /** @inheritDoc */
   public readonly maxRows: number
   /** @inheritDoc */

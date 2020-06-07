@@ -3,7 +3,7 @@
  * Copyright (c) 2020 Handsoncode. All rights reserved.
  */
 
-import {ErrorType} from '../Cell'
+import {ErrorType, TranslatableErrorType} from '../Cell'
 import {MissingTranslationError} from '../errors'
 import {ErrorTranslationSet, TranslationSet, UIElement, UITranslationSet} from './index'
 
@@ -34,11 +34,11 @@ export class TranslationPackage {
     }, {} as Record<string, string>)
   }
 
-  public buildErrorMapping(): Record<string, ErrorType> {
+  public buildErrorMapping(): Record<string, TranslatableErrorType> {
     return Object.keys(this.errors).reduce((ret, key) => {
-      ret[this.errors[key as ErrorType]] = key as ErrorType
+      ret[this.errors[key as TranslatableErrorType]] = key as TranslatableErrorType
       return ret
-    }, {} as Record<string, ErrorType>)
+    }, {} as Record<string, TranslatableErrorType>)
   }
 
   public isFunctionTranslated(key: string): boolean {
