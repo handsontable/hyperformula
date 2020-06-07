@@ -66,7 +66,7 @@ export class TranslationPackage {
 
   public getErrorTranslation(key: ErrorType): string {
     if(key === ErrorType.LIC) {
-      return '#LIC!'
+      return `#${ErrorType.LIC}!`
     }
     const val = this.errors[key]
     if(val === undefined) {
