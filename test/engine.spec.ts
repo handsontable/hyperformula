@@ -546,57 +546,6 @@ describe('#numberOfSheets', () => {
   })
 })
 
-describe('#renameSheet', () => {
-  it('works', () => {
-    const engine = HyperFormula.buildEmpty()
-    engine.addSheet('foo')
-
-    engine.renameSheet(0, 'bar')
-
-    expect(engine.getSheetName(0)).toBe('bar')
-    expect(engine.doesSheetExist('foo')).toBe(false)
-    expect(engine.doesSheetExist('bar')).toBe(true)
-  })
-
-  it('error when there is no sheet with given ID', () => {
-    const engine = HyperFormula.buildEmpty()
-
-    expect(() => {
-      engine.renameSheet(0, 'bar')
-    }).toThrow(new NoSheetWithIdError(0))
-  })
-
-  it('error when new sheet name is already taken', () => {
-    const engine = HyperFormula.buildEmpty()
-    engine.addSheet()
-    engine.addSheet('bar')
-
-    expect(() => {
-      engine.renameSheet(0, 'bar')
-    }).toThrow(new SheetNameAlreadyTakenError('bar'))
-  })
-
-  it('change for the same name', () => {
-    const engine = HyperFormula.buildEmpty()
-    engine.addSheet('foo')
-
-    engine.renameSheet(0, 'foo')
-
-    expect(engine.getSheetName(0)).toBe('foo')
-    expect(engine.doesSheetExist('foo')).toBe(true)
-  })
-
-  it('change for the same canonical name', () => {
-    const engine = HyperFormula.buildEmpty()
-    engine.addSheet('Foo')
-
-    engine.renameSheet(0, 'FOO')
-
-    expect(engine.getSheetName(0)).toBe('FOO')
-    expect(engine.doesSheetExist('FOO')).toBe(true)
-  })
-})
-
 describe('#sheetNames', () => {
   it('empty engine', () => {
     const engine = HyperFormula.buildEmpty()
