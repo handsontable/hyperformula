@@ -6,8 +6,6 @@
 import {RawTranslationPackage} from '..'
 
 export const huHU: RawTranslationPackage = {
-  // eslint-disable-next-line
-  // @ts-ignore
   errors: {
     CYCLE: '#CYCLE!',
     DIV_BY_ZERO: '#ZÉRÓOSZTÓ!',
