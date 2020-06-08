@@ -73,14 +73,6 @@ describe('Function COUNTIFS', () => {
     expect(engine.getCellValue(adr('B2'))).toEqual(0)
   })
 
-  it('error when 2nd arg is not a string',  () => {
-    const engine =  HyperFormula.buildFromArray([
-      ['=COUNTIFS(C1:C2, 78)'],
-    ])
-
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE))
-  })
-
   it('error when criterion unparsable',  () => {
     const engine =  HyperFormula.buildFromArray([
       ['=COUNTIFS(B1:B2, "><foo")'],
