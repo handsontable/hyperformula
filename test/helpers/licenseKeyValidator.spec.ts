@@ -66,4 +66,14 @@ describe('license key', () => {
       expect(hf.licenseKeyValidityState).toEqual(LicenseKeyValidityState.MISSING)
     })
   })
+
+  describe('expired key', () => {
+    it('should verify an empty string as an invalid license key', () => {
+      const hf = HyperFormula.buildEmpty({
+        licenseKey: '80584-cc272-2e7c4-06f16-4db00',
+      })
+
+      expect(hf.licenseKeyValidityState).toEqual(LicenseKeyValidityState.EXPIRED)
+    })
+  })
 })
