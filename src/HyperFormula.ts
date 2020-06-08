@@ -284,6 +284,8 @@ export class HyperFormula implements TypedEmitter {
    *
    * @param {string} languageCode - code string of the translation package
    *
+   * @throws [[LanguageNotRegisteredError]] when trying to retrieve not registered language
+   *
    * @example
    * ```js
    * // return registered language
