@@ -46,11 +46,11 @@ describe('Function VERSION', () => {
       expect(engine.getCellValue(adr('A1'))).toEqual(`HyperFormula v${HyperFormula.version}, 4`)
     })
   
-    xit('expired license key', () => {
+    it('expired license key', () => {
       const engine = HyperFormula.buildFromArray([
         ['=VERSION()'],
       ], {
-        licenseKey: '???',
+        licenseKey: '80584-cc272-2e7c4-06f16-4db00',
       })
   
       expect(engine.getCellValue(adr('A1'))).toEqual(`HyperFormula v${HyperFormula.version}, 5`)
