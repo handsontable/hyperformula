@@ -2,17 +2,6 @@ import { HyperFormula } from '../../src'
 import { LicenseKeyValidityState } from '../../src/helpers/licenseKeyValidator'
 
 describe('license key', () => {
-  let consoleSpy: jasmine.Spy
-
-  beforeAll(() => {
-    consoleSpy = spyOn(console, 'warn')
-  })
-
-  afterAll(() => {
-    expect(consoleSpy).toHaveBeenCalledTimes(1)
-    expect(consoleSpy.calls.argsFor(0)[0]).toMatch(/The license key for HyperFormula is/)
-  })
-
   describe('valid key', () => {
     it('should verify "agpl-v3" as a valid license key', () => {
       const hf = HyperFormula.buildEmpty({
