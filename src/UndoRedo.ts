@@ -107,6 +107,15 @@ export class RemoveSheetUndoEntry {
   }
 }
 
+export class RenameSheetUndoEntry {
+  constructor(
+    public readonly sheetId: number,
+    public readonly oldName: string,
+    public readonly newName: string,
+  ) {
+  }
+}
+
 export class ClearSheetUndoEntry {
   constructor(
     public readonly sheetId: number,
@@ -190,6 +199,7 @@ type UndoStackEntry
   | SetCellContentsUndoEntry
   | AddSheetUndoEntry
   | RemoveSheetUndoEntry
+  | RenameSheetUndoEntry
   | ClearSheetUndoEntry
   | MoveCellsUndoEntry
   | SetSheetContentUndoEntry
@@ -283,6 +293,8 @@ export class UndoRedo {
       this.undoAddSheet(operation)
     } else if (operation instanceof RemoveSheetUndoEntry) {
       this.undoRemoveSheet(operation)
+    } else if (operation instanceof RenameSheetUndoEntry) {
+      this.undoRenameSheet(operation)
     } else if (operation instanceof ClearSheetUndoEntry) {
       this.undoClearSheet(operation)
     } else if (operation instanceof AddColumnsUndoEntry) {
@@ -424,6 +436,10 @@ export class UndoRedo {
     this.restoreOldDataFromVersion(operation.version - 1)
   }
 
+  public undoRenameSheet(operation: RenameSheetUndoEntry) {
+    this.operations.renameSheet(operation.sheetId, operation.oldName)
+  }
+
   private undoClearSheet(operation: ClearSheetUndoEntry) {
     const {oldSheetContent, sheetId} = operation
     for (let rowIndex = 0; rowIndex < oldSheetContent.length; rowIndex++) {
@@ -488,6 +504,8 @@ export class UndoRedo {
       this.redoAddSheet(operation)
     } else if (operation instanceof RemoveSheetUndoEntry) {
       this.redoRemoveSheet(operation)
+    } else if (operation instanceof RenameSheetUndoEntry) {
+      this.redoRenameSheet(operation)
     } else if (operation instanceof ClearSheetUndoEntry) {
       this.redoClearSheet(operation)
     } else if (operation instanceof AddColumnsUndoEntry) {
@@ -565,6 +583,10 @@ export class UndoRedo {
 
   private redoAddSheet(operation: AddSheetUndoEntry) {
     this.operations.addSheet(operation.sheetName)
+  }
+
+  private redoRenameSheet(operation: RenameSheetUndoEntry) {
+    this.operations.renameSheet(operation.sheetId, operation.newName)
   }
 
   private redoMoveRows(operation: MoveRowsUndoEntry) {

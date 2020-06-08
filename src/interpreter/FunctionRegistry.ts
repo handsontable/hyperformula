@@ -7,14 +7,20 @@ import {FunctionMetadata, FunctionPlugin, FunctionPluginDefinition} from './plug
 import {Interpreter} from './Interpreter'
 import {Maybe} from '../Maybe'
 import {Config} from '../Config'
-import {FunctionPluginValidationError} from '../errors'
+import {FunctionPluginValidationError, ProtectedFunctionError} from '../errors'
 import {TranslationSet} from '../i18n'
 import {HyperFormula} from '../HyperFormula'
+import {VersionPlugin} from './plugin/VersionPlugin'
 
 export type FunctionTranslationsPackage = Record<string, TranslationSet>
 
 export class FunctionRegistry {
   public static plugins: Map<string, FunctionPluginDefinition> = new Map()
+
+  private static readonly _protectedPlugins: Map<string, FunctionPluginDefinition | undefined> = new Map([
+    ['VERSION', VersionPlugin],
+    ['OFFSET', undefined],
+  ])
 
   public static registerFunctionPlugin(plugin: FunctionPluginDefinition, translations?: FunctionTranslationsPackage): void {
     this.loadPluginFunctions(plugin, this.plugins)
@@ -36,10 +42,18 @@ export class FunctionRegistry {
   }
 
   public static unregisterFunction(functionId: string): void {
+    if (this.functionIsProtected(functionId)) {
+      throw ProtectedFunctionError.cannotUnregisterFunctionWithId(functionId)
+    }
     this.plugins.delete(functionId)
   }
 
   public static unregisterFunctionPlugin(plugin: FunctionPluginDefinition): void {
+    for (const protectedPlugin of this.protectedPlugins()) {
+      if (protectedPlugin === plugin) {
+        throw ProtectedFunctionError.cannotUnregisterProtectedPlugin()
+      }
+    }
     for (const [functionId, registeredPlugin] of this.plugins.entries()) {
       if (registeredPlugin === plugin) {
         this.plugins.delete(functionId)
@@ -52,7 +66,10 @@ export class FunctionRegistry {
   }
 
   public static getRegisteredFunctionIds(): string[] {
-    return Array.from(this.plugins.keys())
+    return [
+      ...Array.from(this.plugins.keys()),
+      ...Array.from(this._protectedPlugins.keys())
+    ]
   }
 
   public static getPlugins(): FunctionPluginDefinition[] {
@@ -60,7 +77,11 @@ export class FunctionRegistry {
   }
 
   public static getFunctionPlugin(functionId: string): Maybe<FunctionPluginDefinition> {
-    return this.plugins.get(functionId)
+    if (this.functionIsProtected(functionId)) {
+      return undefined
+    } else {
+      return this.plugins.get(functionId)
+    }
   }
 
   private static loadTranslations(translations: FunctionTranslationsPackage) {
@@ -79,11 +100,39 @@ export class FunctionRegistry {
   }
 
   private static loadPluginFunction(plugin: FunctionPluginDefinition, functionId: string, registry: Map<string, FunctionPluginDefinition>): void {
+    if (this.functionIsProtected(functionId)) {
+      throw ProtectedFunctionError.cannotRegisterFunctionWithId(functionId)
+    } else {
+      this.loadFunctionUnprotected(plugin, functionId, registry)
+    }
+  }
+
+  private static loadFunctionUnprotected(plugin: FunctionPluginDefinition, functionId: string, registry: Map<string, FunctionPluginDefinition>): void {
     const methodName = plugin.implementedFunctions[functionId].method
     if (Object.prototype.hasOwnProperty.call(plugin.prototype, methodName)) {
       registry.set(functionId, plugin)
     } else {
       throw FunctionPluginValidationError.functionMethodNotFound(methodName, plugin.name)
+    }
+  }
+
+  private static functionIsProtected(functionId: string) {
+    return this._protectedPlugins.has(functionId)
+  }
+
+  private static* protectedFunctions(): IterableIterator<[string, FunctionPluginDefinition]> {
+    for (const [functionId, plugin] of this._protectedPlugins) {
+      if (plugin !== undefined) {
+        yield [functionId, plugin]
+      }
+    }
+  }
+
+  private static* protectedPlugins(): IterableIterator<FunctionPluginDefinition> {
+    for (const [, plugin] of this._protectedPlugins) {
+      if (plugin !== undefined) {
+        yield plugin
+      }
     }
   }
 
@@ -102,6 +151,10 @@ export class FunctionRegistry {
       }
     } else {
       this.instancePlugins = new Map(FunctionRegistry.plugins)
+    }
+
+    for (const [functionId, plugin] of FunctionRegistry.protectedFunctions()) {
+      FunctionRegistry.loadFunctionUnprotected(plugin, functionId, this.instancePlugins)
     }
 
     for (const [functionId, plugin] of this.instancePlugins.entries()) {
@@ -124,6 +177,9 @@ export class FunctionRegistry {
   }
 
   public getFunctionPlugin(functionId: string): Maybe<FunctionPluginDefinition> {
+    if (FunctionRegistry.functionIsProtected(functionId)) {
+      return undefined
+    }
     return this.instancePlugins.get(functionId)
   }
 
@@ -132,7 +188,13 @@ export class FunctionRegistry {
   }
 
   public getPlugins(): FunctionPluginDefinition[] {
-    return Array.from(new Set(this.instancePlugins.values()).values())
+    const plugins: Set<FunctionPluginDefinition> = new Set()
+    for (const [functionId, plugin] of this.instancePlugins) {
+      if (!FunctionRegistry.functionIsProtected(functionId)) {
+        plugins.add(plugin)
+      }
+    }
+    return Array.from(plugins)
   }
 
   public getRegisteredFunctionIds(): string[] {
@@ -155,10 +217,10 @@ export class FunctionRegistry {
     if (functionMetadata.isVolatile) {
       this.volatileFunctions.add(functionId)
     }
-    if(functionMetadata.doesNotNeedArgumentsToBeComputed) {
+    if (functionMetadata.doesNotNeedArgumentsToBeComputed) {
       this.functionsWhichDoesNotNeedArgumentsToBeComputed.add(functionId)
     }
-    if(functionMetadata.isDependentOnSheetStructureChange) {
+    if (functionMetadata.isDependentOnSheetStructureChange) {
       this.structuralChangeFunctions.add(functionId)
     }
   }

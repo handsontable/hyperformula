@@ -221,6 +221,15 @@ describe('changing cell content', () => {
     expect(engine.getCellValue(adr('A1'))).toEqual('#FOO!')
   })
 
+  it('update value cell to invalid formula', () => {
+    const engine = HyperFormula.buildFromArray([[1]])
+
+    engine.setCellContents(adr('A1'), '=SUM(')
+
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.ERROR, 'Parsing error'))
+    expect(engine.getCellFormula(adr('A1'))).toEqual('=SUM(')
+  })
+
   it('rewrite part of sheet with matrix', () => {
     const sheet = [
       ['1', '2'],

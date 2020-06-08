@@ -135,9 +135,3 @@ export function unregisterAllLanguages() {
     HyperFormula.unregisterLanguage(langCode)
   }
 }
-
-export function unregisterAllFormulas() {
-  for (const formulaId of FunctionRegistry.getRegisteredFunctionIds()) {
-    HyperFormula.unregisterFunction(formulaId)
-  }
-}

@@ -9,7 +9,7 @@ import {CellContent, CellContentParser, RawCellContent} from './CellContentParse
 import {CellValue, ExportedChange, Exporter, NoErrorCellValue} from './CellValue'
 import {ColumnSearchStrategy} from './ColumnSearch/ColumnSearchStrategy'
 import {Config, ConfigParams} from './Config'
-import {CrudOperations, ColumnRowIndex} from './CrudOperations'
+import {ColumnRowIndex, CrudOperations} from './CrudOperations'
 import {buildTranslationPackage, RawTranslationPackage, TranslationPackage} from './i18n'
 import {normalizeAddedIndexes, normalizeRemovedIndexes} from './Operations'
 import {
@@ -21,7 +21,12 @@ import {
   SheetMapping,
   Vertex,
 } from './DependencyGraph'
-import {EvaluationSuspendedError, NotAFormulaError} from './errors'
+import {
+  EvaluationSuspendedError,
+  LanguageAlreadyRegisteredError,
+  LanguageNotRegisteredError,
+  NotAFormulaError
+} from './errors'
 import {Evaluator} from './Evaluator'
 import {LazilyTransformingAstService} from './LazilyTransformingAstService'
 import {Maybe} from './Maybe'
@@ -279,6 +284,8 @@ export class HyperFormula implements TypedEmitter {
    *
    * @param {string} languageCode - code string of the translation package
    *
+   * @throws [[LanguageNotRegisteredError]] when trying to retrieve not registered language
+   *
    * @example
    * ```js
    * // return registered language
@@ -290,7 +297,7 @@ export class HyperFormula implements TypedEmitter {
   public static getLanguage(languageCode: string): TranslationPackage {
     const val = this.registeredLanguages.get(languageCode)
     if (val === undefined) {
-      throw new Error('Language not registered.')
+      throw new LanguageNotRegisteredError()
     } else {
       return val
     }
@@ -302,6 +309,9 @@ export class HyperFormula implements TypedEmitter {
    * @param {string} languageCode - code string of the translation package
    * @param {RawTranslationPackage} languagePackage - translation package to be registered
    *
+   * @throws [[ProtectedFunctionTranslationError]] when trying to register translation for protected function
+   * @throws [[LanguageAlreadyRegisteredError]] when given language is already registered
+   *
    * @example
    * ```js
    * // return registered language
@@ -312,7 +322,7 @@ export class HyperFormula implements TypedEmitter {
    */
   public static registerLanguage(languageCode: string, languagePackage: RawTranslationPackage): void {
     if (this.registeredLanguages.has(languageCode)) {
-      throw new Error('Language already registered.')
+      throw new LanguageAlreadyRegisteredError()
     } else {
       this.registeredLanguages.set(languageCode, buildTranslationPackage(languagePackage))
     }
@@ -322,6 +332,8 @@ export class HyperFormula implements TypedEmitter {
    * Unregisters language that is registered under given code string.
    *
    * @param {string} languageCode - code string of the translation package
+   *
+   * @throws [[LanguageNotRegisteredError]] when given language is not registered
    *
    * @example
    * ```js
@@ -338,7 +350,7 @@ export class HyperFormula implements TypedEmitter {
     if (this.registeredLanguages.has(languageCode)) {
       this.registeredLanguages.delete(languageCode)
     } else {
-      throw new Error('Language not registered.')
+      throw new LanguageNotRegisteredError()
     }
   }
 
@@ -364,6 +376,7 @@ export class HyperFormula implements TypedEmitter {
    * @param {FunctionTranslationsPackage} translations - optional package of function names translations
    *
    * @throws [[FunctionPluginValidationError]] when plugin class definition is not consistent with metadata
+   * @throws [[ProtectedFunctionTranslationError]] when trying to register translation for protected function
    *
    * @category Static Methods
    */
@@ -390,6 +403,7 @@ export class HyperFormula implements TypedEmitter {
    * @param translations
    *
    * @throws [[FunctionPluginValidationError]] when function with a given id does not exists in plugin or plugin class definition is not consistent with metadata
+   * @throws [[ProtectedFunctionTranslationError]] when trying to register translation for protected function
    *
    * @category Static Methods
    */
@@ -2314,6 +2328,37 @@ export class HyperFormula implements TypedEmitter {
   }
 
   /**
+   * Returns information whether it is possible to rename sheet.
+   * Returns `true` if the sheet with provided id exists and new name is available
+   * Returns `false` if sheet cannot be renamed
+   *
+   * @param {number} sheetId - a sheet number
+   * @param {string} newName - a name of the sheet to be given
+   *
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromSheets({
+   *   MySheet1: [ ['1'] ],
+   *   MySheet2: [ ['10'] ],
+   * });
+   *
+   * // returns true
+   * hfInstance.isItPossibleToRenameSheet(0, 'MySheet0');
+   * ```
+   *
+   * @category Sheets
+   */
+  public isItPossibleToRenameSheet(sheetId: number, newName: string): boolean {
+    try {
+      this._crudOperations.ensureItIsPossibleToRenameSheet(sheetId, newName)
+      return true
+    } catch (e) {
+      return false
+    }
+  }
+
+  /**
    * Renames a specified sheet.
    *
    * @param {number} sheetId - a sheet number
@@ -2337,7 +2382,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Sheets
    */
   public renameSheet(sheetId: number, newName: string): void {
-    const oldName = this.sheetMapping.renameSheet(sheetId, newName)
+    const oldName = this._crudOperations.renameSheet(sheetId, newName)
     if (oldName !== undefined) {
       this._emitter.emit(Events.SheetRenamed, oldName, newName)
     }
@@ -2612,7 +2657,6 @@ export class HyperFormula implements TypedEmitter {
       return this._serialization.getCellFormula(namedExpression.address)
     }
   }
-
 
   /**
    * Returns named expression a normalized formula string for given named expression or `undefined` for a named expression that does not exist or does not hold a formula.

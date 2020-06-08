@@ -4,15 +4,15 @@
  */
 
 import {ErrorType} from '../Cell'
-import {enGB} from './enGB'
-import {plPL} from './plPL'
+import {enGB} from './languages/enGB'
+import {plPL} from './languages/plPL'
 import {buildTranslationPackage, RawTranslationPackage, TranslationPackage} from './TranslationPackage'
 
 export type TranslationSet = Record<string, string>
 export type UITranslationSet = Record<UIElement, string>
 export type ErrorTranslationSet = Record<ErrorType, string>
-export {plPL} from './plPL'
-export {enGB} from './enGB'
+export {plPL} from './languages/plPL'
+export {enGB} from './languages/enGB'
 export {RawTranslationPackage, TranslationPackage, buildTranslationPackage}
 
 export enum UIElement {
