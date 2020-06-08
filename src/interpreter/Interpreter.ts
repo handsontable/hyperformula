@@ -20,12 +20,14 @@ import {Ast, AstNodeType, CellRangeAst, ColumnRangeAst, RowRangeAst} from '../pa
 import {Statistics} from '../statistics/Statistics'
 import {ArithmeticHelper, divide, multiply, percent, power, unaryminus} from './ArithmeticHelper'
 import {FunctionRegistry} from './FunctionRegistry'
+import {CriterionBuilder} from './Criterion'
 import {InterpreterValue, SimpleRangeValue} from './InterpreterValue'
 import {concatenate} from './text'
 
 export class Interpreter {
   private gpu?: GPU.GPU
   public readonly arithmeticHelper: ArithmeticHelper
+  public readonly criterionBuilder: CriterionBuilder
 
   constructor(
     public readonly dependencyGraph: DependencyGraph,
@@ -35,10 +37,11 @@ export class Interpreter {
     public readonly dateHelper: DateTimeHelper,
     public readonly numberLiteralsHelper: NumberLiteralHelper,
     public readonly functionRegistry: FunctionRegistry,
-    public readonly namedExpressions: NamedExpressions
+    public readonly namedExpressions: NamedExpressions,
   ) {
     this.functionRegistry.initializePlugins(this)
     this.arithmeticHelper = new ArithmeticHelper(config, dateHelper, numberLiteralsHelper)
+    this.criterionBuilder = new CriterionBuilder(config)
   }
 
   /**
