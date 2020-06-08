@@ -4,7 +4,7 @@
  */
 
 import {ErrorType, TranslatableErrorType} from '../Cell'
-import {MissingTranslationError} from '../errors'
+import {MissingTranslationError, ProtectedFunctionTranslationError} from '../errors'
 import {ErrorTranslationSet, TranslationSet, UIElement, UITranslationSet} from './index'
 
 export interface RawTranslationPackage {
@@ -14,6 +14,10 @@ export interface RawTranslationPackage {
 }
 
 export class TranslationPackage {
+  private readonly _protectedTranslations: TranslationSet = {
+    'VERSION': 'VERSION'
+  }
+
   constructor(
     private functions: TranslationSet,
     private errors: ErrorTranslationSet,
@@ -21,9 +25,12 @@ export class TranslationPackage {
   ) {
     this.checkUI()
     this.checkErrors()
+    this.checkFunctionTranslations(this.functions)
+    Object.assign(this.functions, this._protectedTranslations)
   }
 
   public extendFunctions(additionalFunctionTranslations: TranslationSet): void {
+    this.checkFunctionTranslations(additionalFunctionTranslations)
     Object.assign(this.functions, additionalFunctionTranslations)
   }
 
@@ -57,7 +64,7 @@ export class TranslationPackage {
 
   public getFunctionTranslation(key: string): string {
     const val = this.functions[key]
-    if(val === undefined) {
+    if (val === undefined) {
       throw new MissingTranslationError(`functions.${key}`)
     } else {
       return val
@@ -69,7 +76,7 @@ export class TranslationPackage {
       return `#${ErrorType.LIC}!`
     }
     const val = this.errors[key]
-    if(val === undefined) {
+    if (val === undefined) {
       throw new MissingTranslationError(`errors.${key}`)
     } else {
       return val
@@ -78,7 +85,7 @@ export class TranslationPackage {
 
   public getUITranslation(key: UIElement): string {
     const val = this.ui[key]
-    if(val === undefined) {
+    if (val === undefined) {
       throw new MissingTranslationError(`ui.${key}`)
     } else {
       return val
@@ -86,16 +93,26 @@ export class TranslationPackage {
   }
 
   private checkUI(): void {
-    for(const key of Object.values(UIElement)){
-      if(! (key in this.ui)){
+    for (const key of Object.values(UIElement)) {
+      if (!(key in this.ui)) {
         throw new MissingTranslationError(`ui.${key}`)
       }
     }
   }
+
   private checkErrors(): void {
     for(const key of Object.values(ErrorType)){
       if(! (key in this.errors) && (key !== ErrorType.LIC)){
         throw new MissingTranslationError(`errors.${key}`)
+      }
+    }
+  }
+
+  private checkFunctionTranslations(functions: TranslationSet) {
+    const functionNames = new Set(Object.getOwnPropertyNames(functions))
+    for (const protectedTranslation of Object.getOwnPropertyNames(this._protectedTranslations)) {
+      if (functionNames.has(protectedTranslation)) {
+        throw new ProtectedFunctionTranslationError(protectedTranslation)
       }
     }
   }

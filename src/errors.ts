@@ -248,6 +248,42 @@ export class MissingTranslationError extends Error {
 }
 
 /**
+ * Error thrown when trying to override protected translation.
+ *
+ * @see [[registerLanguage]]
+ * @see [[registerFunction]]
+ * @see [[registerFunctionPlugin]]
+ */
+export class ProtectedFunctionTranslationError extends Error {
+  constructor(key: string) {
+    super(`Cannot register translation for function with id: ${key}`)
+  }
+}
+
+/**
+ * Error thrown when trying to retrieve not registered language
+ *
+ * @see [[getLanguage]]
+ * @see [[unregisterLanguage]]
+ */
+export class LanguageNotRegisteredError extends Error {
+  constructor() {
+    super('Language not registered.')
+  }
+}
+
+/**
+ * Error thrown when trying to register already registered language
+ *
+ * @see [[registerLanguage]]
+ */
+export class LanguageAlreadyRegisteredError extends Error {
+  constructor() {
+    super('Language already registered.')
+  }
+}
+
+/**
  * Error thrown when function plugin is invalid.
  *
  * @see [[registerFunction]]
@@ -256,14 +292,36 @@ export class MissingTranslationError extends Error {
  * @see [[buildFromSheets]]
  * */
 export class FunctionPluginValidationError extends Error {
-  public static functionNotDeclaredInPlugin(formulaId: string, pluginName: string): FunctionPluginValidationError {
-    return new FunctionPluginValidationError(`Formula with id ${formulaId} not declared in plugin ${pluginName}`)
+  public static functionNotDeclaredInPlugin(functionId: string, pluginName: string): FunctionPluginValidationError {
+    return new FunctionPluginValidationError(`Function with id ${functionId} not declared in plugin ${pluginName}`)
   }
 
   public static functionMethodNotFound(functionName: string, pluginName: string): FunctionPluginValidationError {
-    return new FunctionPluginValidationError(`Formula method ${functionName} not found in plugin ${pluginName}`)
+    return new FunctionPluginValidationError(`Function method ${functionName} not found in plugin ${pluginName}`)
   }
 }
+
+/**
+ * Error thrown when trying to register, override or remove function with reserved id.
+ *
+ * @see [[registerFunctionPlugin]]
+ * @see [[registerFunction]]
+ * @see [[unregisterFunction]]
+ * */
+export class ProtectedFunctionError extends Error {
+  public static cannotRegisterFunctionWithId(functionId: string): ProtectedFunctionError {
+    return new ProtectedFunctionError(`Cannot register function with id ${functionId}`)
+  }
+
+  public static cannotUnregisterFunctionWithId(functionId: string): ProtectedFunctionError {
+    return new ProtectedFunctionError(`Cannot unregister function with id ${functionId}`)
+  }
+
+  public static cannotUnregisterProtectedPlugin(): ProtectedFunctionError {
+    return new ProtectedFunctionError('Cannot unregister protected plugin')
+  }
+}
+
 
 /**
  * Error thrown when selected source location has a matrix.

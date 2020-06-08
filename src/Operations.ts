@@ -230,6 +230,10 @@ export class Operations {
     return this.sheetMapping.fetchDisplayName(sheetId)
   }
 
+  public renameSheet(sheetId: number, newName: string) {
+    return this.sheetMapping.renameSheet(sheetId, newName)
+  }
+
   public moveRows(sheet: number, startRow: number, numberOfRows: number, targetRow: number): void {
     const rowsToAdd = RowsSpan.fromNumberOfRows(sheet, targetRow, numberOfRows)
     this.doAddRows(rowsToAdd)
