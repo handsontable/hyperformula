@@ -4,6 +4,7 @@
  */
 
 import {RawTranslationPackage} from '..'
+/* import */
 
 export const csCZ: RawTranslationPackage = {
   errors: {
@@ -127,3 +128,5 @@ export const csCZ: RawTranslationPackage = {
     NEW_SHEET_PREFIX: 'Sheet',
   },
 }
+
+/* export */
