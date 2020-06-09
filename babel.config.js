@@ -17,7 +17,7 @@ module.exports = {
     ['transform-inline-environment-variables']
   ],
   env: {
-    // Environment for transpiling files to be compatible with UMD..
+    // Environment for transpiling files to be compatible with UMD.
     commonjs: {
       plugins: [
         ['@babel/plugin-transform-runtime', {
