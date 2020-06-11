@@ -55,76 +55,6 @@ function randomInteger(min: number, max: number) {
 
 describe('larger tests', () => {
 
-  it( 'large fixed', () => {
-    const arr = [
-      [
-        '=SUM(B2:C4)',
-      ],
-      [
-        null,
-        '=SUM(A3:B3)',
-      ],
-      [
-        '=SUM(B2:C3)',
-      ],
-    ]
-    const engine = HyperFormula.buildFromArray(arr)
-    for(let x=0; x<3; x++) {
-      for(let y=0; y<3; y++) {
-        engine.setCellContents({sheet: 0, col: x, row: y}, null)
-      }
-    }
-    expect(engine.dependencyGraph.graph.nodesCount()).toBe(0)
-    expect(engine.dependencyGraph.rangeMapping.getMappingSize(0)).toBe(0)
-  })
-
-  it('large fixed #2', () => {
-    const arr = [
-      [
-        null,
-        '=SUM(A1:A2)',
-        '=SUM(A1:A1)',
-        '=SUM(A1:A2)',
-      ],
-    ]
-    const engine = HyperFormula.buildFromArray(arr)
-    engine.setCellContents({sheet: 0, col: 1, row: 0}, null)
-    engine.setCellContents({sheet: 0, col: 2, row: 0}, null)
-    engine.setCellContents({sheet: 0, col: 3, row: 0}, null)
-    expect(engine.dependencyGraph.graph.nodesCount()).toBe(0)
-    expect(engine.dependencyGraph.rangeMapping.getMappingSize(0)).toBe(0)
-  })
-
-  it( 'large fixed #3', () => {
-    const arr =     [
-      [
-        '=SUM(A1:B1)',
-      ],
-    ]
-    const engine = HyperFormula.buildFromArray(arr)
-
-    engine.setCellContents({sheet: 0, col: 0, row: 0}, null)
-
-    expect(engine.dependencyGraph.graph.nodesCount()).toBe(0)
-    expect(engine.dependencyGraph.rangeMapping.getMappingSize(0)).toBe(0)
-  })
-
-  it( 'large fixed #4', () => {
-    const arr =     [
-      [
-        null, '=SUM(A1:A1)', '=SUM(A1:A2)', '=SUM(A1:A3)', '=SUM(A1:A4)',
-      ],
-    ]
-    const engine = HyperFormula.buildFromArray(arr)
-
-    engine.setCellContents({sheet: 0, col: 1, row: 0}, null)
-    engine.setCellContents({sheet: 0, col: 2, row: 0}, null)
-    engine.setCellContents({sheet: 0, col: 3, row: 0}, null)
-    engine.setCellContents({sheet: 0, col: 4, row: 0}, null)
-
-    expect(engine.dependencyGraph.graph.nodesCount()).toBe(0)
-    expect(engine.dependencyGraph.rangeMapping.getMappingSize(0)).toBe(0)
-  })
 
   it('repeat the same crud', () => {
     const engine = HyperFormula.buildFromArray([])
@@ -161,6 +91,76 @@ describe('larger tests', () => {
 })
 
 describe('cruds', () => {
+  it( 'simple #1', () => {
+    const arr = [
+      [
+        '=SUM(B2:C4)',
+      ],
+      [
+        null,
+        '=SUM(A3:B3)',
+      ],
+      [
+        '=SUM(B2:C3)',
+      ],
+    ]
+    const engine = HyperFormula.buildFromArray(arr)
+    for(let x=0; x<3; x++) {
+      for(let y=0; y<3; y++) {
+        engine.setCellContents({sheet: 0, col: x, row: y}, null)
+      }
+    }
+    expect(engine.dependencyGraph.graph.nodesCount()).toBe(0)
+    expect(engine.dependencyGraph.rangeMapping.getMappingSize(0)).toBe(0)
+  })
+
+  it('simple #2', () => {
+    const arr = [
+      [
+        null,
+        '=SUM(A1:A2)',
+        '=SUM(A1:A1)',
+        '=SUM(A1:A2)',
+      ],
+    ]
+    const engine = HyperFormula.buildFromArray(arr)
+    engine.setCellContents({sheet: 0, col: 1, row: 0}, null)
+    engine.setCellContents({sheet: 0, col: 2, row: 0}, null)
+    engine.setCellContents({sheet: 0, col: 3, row: 0}, null)
+    expect(engine.dependencyGraph.graph.nodesCount()).toBe(0)
+    expect(engine.dependencyGraph.rangeMapping.getMappingSize(0)).toBe(0)
+  })
+
+  it( 'simple #3', () => {
+    const arr =     [
+      [
+        '=SUM(A1:B1)',
+      ],
+    ]
+    const engine = HyperFormula.buildFromArray(arr)
+
+    engine.setCellContents({sheet: 0, col: 0, row: 0}, null)
+
+    expect(engine.dependencyGraph.graph.nodesCount()).toBe(0)
+    expect(engine.dependencyGraph.rangeMapping.getMappingSize(0)).toBe(0)
+  })
+
+  it( 'simple #4', () => {
+    const arr =     [
+      [
+        null, '=SUM(A1:A1)', '=SUM(A1:A2)', '=SUM(A1:A3)', '=SUM(A1:A4)',
+      ],
+    ]
+    const engine = HyperFormula.buildFromArray(arr)
+
+    engine.setCellContents({sheet: 0, col: 1, row: 0}, null)
+    engine.setCellContents({sheet: 0, col: 2, row: 0}, null)
+    engine.setCellContents({sheet: 0, col: 3, row: 0}, null)
+    engine.setCellContents({sheet: 0, col: 4, row: 0}, null)
+
+    expect(engine.dependencyGraph.graph.nodesCount()).toBe(0)
+    expect(engine.dependencyGraph.rangeMapping.getMappingSize(0)).toBe(0)
+  })
   it('should collect empty vertices when bigger range is no longer bind to smaller range #1', () => {
     const engine = HyperFormula.buildFromArray([
       [],
