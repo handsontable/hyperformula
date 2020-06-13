@@ -16,13 +16,13 @@ function randomRange(engine: HyperFormula, rect: Rectangle): string {
   const y2 = randomInteger(rect.topleft.y, rect.bottomright.y)
   const startAddress = engine.simpleCellAddressToString({
     sheet: 0,
-    row: Math.min(x1, x2),
-    col: Math.min(y1, y2)
+    col: Math.min(x1, x2),
+    row: Math.min(y1, y2),
   }, 0)
   const endAddress = engine.simpleCellAddressToString({
     sheet: 0,
-    row: Math.max(x1, x2),
-    col: Math.max(y1, y2)
+    col: Math.max(x1, x2),
+    row: Math.max(y1, y2)
   }, 0)
   return '=SUM(' + startAddress + ':' + endAddress + ')'
 }
@@ -38,10 +38,6 @@ function randomVals(engine: HyperFormula, rectValues: Rectangle) {
   allPts(rectValues).forEach((pts) =>{
     engine.setCellContents({sheet:0, col: pts.x, row: pts.y}, randomInteger(-10,10))
   })
-}
-
-function squareFromCorner(pts: Pts, side: number): Rectangle {
-  return {topleft: pts, bottomright: {x: pts.x+side, y: pts.y+side}}
 }
 
 function rectangleFromCorner(pts: Pts, sideX: number, sideY: number): Rectangle {
@@ -79,21 +75,29 @@ function verifyValues(engine: HyperFormula) {
 }
 
 describe('larger tests', () => {
-  it('large rectangular', () => {
+  it('large rectangular + addRows', () => {
     const engine = HyperFormula.buildFromArray([])
-    const side = 5
-    const n = 5
-    for(let rep=0; rep<5; rep++) {
-      randomVals(engine, squareFromCorner({x: 0, y: 0}, side))
+    const sideX = 4
+    const n = 2
+    let sideY = 1
+    while(sideY<5) {
+      randomVals(engine, rectangleFromCorner({x: 0, y: 0}, sideX, sideY))
+      verifyValues(engine)
       for (let i = 0; i < n; i++) {
-        randomSums(engine, squareFromCorner({x: side * (i + 1), y: 0}, side), squareFromCorner({
-          x: side * i,
-          y: 0
-        }, side))
+        randomSums(engine,
+          rectangleFromCorner({x: sideX * (i + 1), y: 0}, sideX, sideY),
+          rectangleFromCorner({x: sideX * i, y: 0}, sideX, sideY)
+        )
+        verifyValues(engine)
       }
+      engine.addRows(0, [randomInteger(0, sideY+1),2])
+      sideY += 2
+      verifyValues(engine)
+      engine.removeRows(0, [randomInteger(0,sideY), 1])
+      sideY -= 1
       verifyValues(engine)
     }
-    randomCleanup(engine, rectangleFromCorner({x:0, y:0}, (n+1)*side, side))
+    randomCleanup(engine, rectangleFromCorner({x:0, y:0}, (n+1)*sideX, sideY))
     expect(engine.dependencyGraph.graph.nodesCount()).toBe(0)
     expect(engine.dependencyGraph.rangeMapping.getMappingSize(0)).toBe(0)
   })
