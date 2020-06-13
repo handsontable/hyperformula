@@ -30,13 +30,16 @@ function randomRange(engine: HyperFormula, rect: Rectangle): string {
 function randomSums(engine: HyperFormula, rectFormulas: Rectangle, rectValues: Rectangle) {
   allPts(rectFormulas).forEach((pts) =>{
     const formula = randomRange(engine, rectValues)
+    console.log(`engine.setCellContents({sheet: 0, col:${pts.x}, row:${pts.y}}, '${formula}')`)
     engine.setCellContents({sheet: 0, col: pts.x, row: pts.y}, formula)
   })
 }
 
 function randomVals(engine: HyperFormula, rectValues: Rectangle) {
   allPts(rectValues).forEach((pts) =>{
-    engine.setCellContents({sheet:0, col: pts.x, row: pts.y}, randomInteger(-10,10))
+    const val = randomInteger(-10,10)
+    console.log(`engine.setCellContents({sheet: 0, col:${pts.x}, row:${pts.y}}, ${val})`)
+    engine.setCellContents({sheet:0, col: pts.x, row: pts.y}, val)
   })
 }
 
@@ -63,8 +66,10 @@ function shuffleArray<T>(array: T[]): T[] {
 }
 
 function randomCleanup(engine: HyperFormula, rect: Rectangle) {
-  shuffleArray(allPts(rect)).forEach( (pts) =>
-    engine.setCellContents({sheet: 0, col: pts.x, row: pts.y}, null)
+  shuffleArray(allPts(rect)).forEach( (pts) => {
+      engine.setCellContents({sheet: 0, col: pts.x, row: pts.y}, null)
+      console.log(`engine.setCellContents({sheet: 0, col:${pts.x}, row:${pts.y}}, null})`)
+    }
   )
 }
 
@@ -77,8 +82,8 @@ function verifyValues(engine: HyperFormula) {
 describe('larger tests', () => {
   it('large rectangular + addRows', () => {
     const engine = HyperFormula.buildFromArray([])
-    const sideX = 4
-    const n = 1
+    const sideX = 3
+    const n = 2
     let sideY = 1
     while(sideY<5) {
       randomVals(engine, rectangleFromCorner({x: 0, y: 0}, sideX, sideY))
@@ -90,14 +95,104 @@ describe('larger tests', () => {
         )
         verifyValues(engine)
       }
-      engine.addRows(0, [randomInteger(0, sideY+1),2])
+      const positionToAdd = randomInteger(0, sideY+1)
+      console.log(`engine.addRows(0, [${positionToAdd},2])`)
+      engine.addRows(0, [positionToAdd,2])
       sideY += 2
       verifyValues(engine)
-      engine.removeRows(0, [randomInteger(0,sideY), 1])
+      const positionToRemove = randomInteger(0,sideY)
+      console.log(`engine.removeRows(0, [${positionToRemove},1])`)
+      engine.removeRows(0, [positionToRemove, 1])
       sideY -= 1
       verifyValues(engine)
     }
     randomCleanup(engine, rectangleFromCorner({x:0, y:0}, (n+1)*sideX, sideY))
+    expect(engine.dependencyGraph.graph.nodesCount()).toBe(0)
+    expect(engine.dependencyGraph.rangeMapping.getMappingSize(0)).toBe(0)
+  })
+})
+
+describe('standalone tests', () => {
+  it('runtime error - Cannot read property \'forEach\' of undefined', () => {
+    const engine = HyperFormula.buildFromArray([])
+    engine.setCellContents({sheet: 0, col:4, row:0}, '=SUM(A1:C1)')
+    engine.addRows(0, [1,2])
+    engine.removeRows(0, [2,1])
+    engine.setCellContents({sheet: 0, col:3, row:1}, '=SUM(A1:C2)')
+    engine.setCellContents({sheet: 0, col:4, row:0}, '=SUM(A1:C2)')
+    engine.addRows(0, [1,2])
+    engine.removeRows(0, [3,1])
+    engine.setCellContents({sheet: 0, col:4, row:0}, '=SUM(B2:B3)')
+    engine.addRows(0, [1,2])
+  })
+
+  it('runtime -  Range does not exist', () => {
+    const engine = HyperFormula.buildFromArray([])
+    engine.setCellContents({sheet: 0, col:3, row:0}, '=SUM(A1:C2)')
+    engine.setCellContents({sheet: 0, col:4, row:0}, '=SUM(A1:C1)')
+    engine.addRows(0, [0,2])
+    engine.removeRows(0, [3,1])
+    engine.setCellContents({sheet: 0, col:3, row:2}, '=SUM(A2:B3)')
+    engine.setCellContents({sheet: 0, col:4, row:2}, '=SUM(A2:B3)')
+  })
+
+  it('wrong value', () => {
+    const engine = HyperFormula.buildFromArray([])
+    engine.setCellContents({sheet: 0, col:1, row:0}, -2)
+    engine.addRows(0, [1,2])
+    engine.removeRows(0, [1,1])
+    engine.addRows(0, [2,2])
+    engine.removeRows(0, [0,1])
+    engine.setCellContents({sheet: 0, col:2, row:1}, 7)
+    engine.setCellContents({sheet: 0, col:3, row:0}, '=SUM(B2:C3)')
+    engine.setCellContents({sheet: 0, col:6, row:0}, '=SUM(D1:F2)')
+    engine.setCellContents({sheet: 0, col:6, row:2}, '=SUM(D1:F1)')
+    engine.addRows(0, [0,2])
+    engine.removeRows(0, [3,1])
+    verifyValues(engine)
+  })
+
+  it('not properly deallocated', () => {
+    const engine = HyperFormula.buildFromArray([])
+    engine.setCellContents({sheet: 0, col:3, row:2}, '=SUM(B2:C2)')
+    engine.setCellContents({sheet: 0, col:5, row:3}, '=SUM(B2:C3)')
+    engine.addRows(0, [2,2])
+    engine.removeRows(0, [4,1])
+    engine.setCellContents({sheet: 0, col:1, row:4}, null)
+    engine.setCellContents({sheet: 0, col:2, row:4}, null)
+    engine.setCellContents({sheet: 0, col:3, row:2}, null)
+    engine.setCellContents({sheet: 0, col:3, row:1}, null)
+    engine.setCellContents({sheet: 0, col:2, row:2}, null)
+    engine.setCellContents({sheet: 0, col:4, row:2}, null)
+    engine.setCellContents({sheet: 0, col:6, row:2}, null)
+    engine.setCellContents({sheet: 0, col:1, row:1}, null)
+    engine.setCellContents({sheet: 0, col:2, row:3}, null)
+    engine.setCellContents({sheet: 0, col:6, row:0}, null)
+    engine.setCellContents({sheet: 0, col:2, row:1}, null)
+    engine.setCellContents({sheet: 0, col:4, row:0}, null)
+    engine.setCellContents({sheet: 0, col:0, row:4}, null)
+    engine.setCellContents({sheet: 0, col:3, row:0}, null)
+    engine.setCellContents({sheet: 0, col:5, row:3}, null)
+    engine.setCellContents({sheet: 0, col:0, row:0}, null)
+    engine.setCellContents({sheet: 0, col:5, row:0}, null)
+    engine.setCellContents({sheet: 0, col:5, row:1}, null)
+    engine.setCellContents({sheet: 0, col:4, row:1}, null)
+    engine.setCellContents({sheet: 0, col:4, row:4}, null)
+    engine.setCellContents({sheet: 0, col:0, row:1}, null)
+    engine.setCellContents({sheet: 0, col:2, row:0}, null)
+    engine.setCellContents({sheet: 0, col:3, row:3}, null)
+    engine.setCellContents({sheet: 0, col:1, row:3}, null)
+    engine.setCellContents({sheet: 0, col:3, row:4}, null)
+    engine.setCellContents({sheet: 0, col:5, row:2}, null)
+    engine.setCellContents({sheet: 0, col:4, row:3}, null)
+    engine.setCellContents({sheet: 0, col:1, row:0}, null)
+    engine.setCellContents({sheet: 0, col:0, row:3}, null)
+    engine.setCellContents({sheet: 0, col:0, row:2}, null)
+    engine.setCellContents({sheet: 0, col:6, row:3}, null)
+    engine.setCellContents({sheet: 0, col:1, row:2}, null)
+    engine.setCellContents({sheet: 0, col:6, row:1}, null)
+    engine.setCellContents({sheet: 0, col:6, row:4}, null)
+    engine.setCellContents({sheet: 0, col:5, row:4}, null)
     expect(engine.dependencyGraph.graph.nodesCount()).toBe(0)
     expect(engine.dependencyGraph.rangeMapping.getMappingSize(0)).toBe(0)
   })
