@@ -78,7 +78,7 @@ describe('larger tests', () => {
   it('large rectangular + addRows', () => {
     const engine = HyperFormula.buildFromArray([])
     const sideX = 4
-    const n = 2
+    const n = 1
     let sideY = 1
     while(sideY<5) {
       randomVals(engine, rectangleFromCorner({x: 0, y: 0}, sideX, sideY))
