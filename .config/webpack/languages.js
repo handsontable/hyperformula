@@ -11,6 +11,8 @@ const WebpackOnBuildPlugin = require('on-build-webpack');
 const fs  = require('fs');
 const fsExtra  = require('fs-extra');
 
+const PACKAGE_FILENAME = process.env.HOT_FILENAME;
+
 function getEntryJsFiles() {
   const entryObject = {};
   const filesInLanguagesDirectory = fs.readdirSync(SOURCE_LANGUAGES_DIRECTORY);
@@ -37,17 +39,17 @@ const ruleForSnippetsInjection = {
   loader: StringReplacePlugin.replace({
     replacements: [
       {
-        pattern: /\/\*.import.\*\//,
+        pattern: /\/\/.import/,
         replacement: function() {
-          const snippet1 = `import { HyperFormula } from '../..';`;
+          const snippet1 = `import Hyperformula from '../..';`;
 
           return `${snippet1}${NEW_LINE_CHAR.repeat(2)}`;
         }
       },
       {
-        pattern: /\/\*.export.\*\//,
+        pattern: /\/\/.export/,
         replacement: function(matchingPhrase) {
-          const snippet = `Hyperformula.languages.registerLanguageDictionary(dictionary);`;
+          const snippet = `Hyperformula.registerLanguage(codeLang, dictionary);`;
 
           return `${snippet}${NEW_LINE_CHAR.repeat(2)}${matchingPhrase}`;
         }
@@ -68,13 +70,14 @@ module.exports.create = function create() {
       libraryTarget: 'umd',
       path: path.resolve(__dirname, '../../' + OUTPUT_LANGUAGES_DIRECTORY),
       umdNamedDefine: true,
+      
     },
     externals: {
-      [`../..`]: {
+      ['../..']: {
         root: 'Hyperformula',
-        commonjs2: `../..`,
-        commonjs: `../..`,
-        amd: `../..`,
+        commonjs2: '../..',
+        commonjs: '../..',
+        amd: '../..',
       },
     },
     module: {

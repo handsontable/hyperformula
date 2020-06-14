@@ -4,8 +4,10 @@
  */
 
 import {RawTranslationPackage} from '..'
+// import
 
-export const huHU: RawTranslationPackage = {
+export const codeLang = 'huHU'
+export const dictionary: RawTranslationPackage = {
   errors: {
     CYCLE: '#CYCLE!',
     DIV_BY_ZERO: '#ZÉRÓOSZTÓ!',
@@ -127,3 +129,4 @@ export const huHU: RawTranslationPackage = {
     NEW_SHEET_PREFIX: 'Sheet',
   },
 }
+// export
