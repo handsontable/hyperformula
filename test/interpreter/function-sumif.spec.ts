@@ -1,6 +1,6 @@
 import {HyperFormula} from '../../src'
 import {ErrorType} from '../../src/Cell'
-import {plPL} from '../../src/i18n'
+import {plPL} from '../../src/i18n/languages'
 import {adr, detailedError, expectArrayWithSameContent} from '../testUtils'
 import {StatType} from '../../src/statistics'
 

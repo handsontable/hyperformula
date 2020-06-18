@@ -11,6 +11,7 @@ import {ErrorTranslationSet, TranslationSet, UIElement, UITranslationSet} from '
 export interface RawTranslationPackage {
   functions: TranslationSet,
   errors: ErrorTranslationSet,
+  langCode: string,
   ui: UITranslationSet,
 }
 

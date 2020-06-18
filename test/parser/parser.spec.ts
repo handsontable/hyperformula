@@ -3,7 +3,7 @@ import {CellError, simpleCellAddress} from '../../src/Cell'
 import {Config} from '../../src/Config'
 import {SheetMapping} from '../../src/DependencyGraph'
 import {buildTranslationPackage} from '../../src/i18n'
-import {enGB, enGBCode, plPL, plPLCode} from '../../src/i18n/languages'
+import {enGB, plPL} from '../../src/i18n/languages'
 import {
   AstNodeType,
   CellAddress,
@@ -36,8 +36,8 @@ import {buildEmptyParserWithCaching} from './common'
 describe('ParserWithCaching', () => {
   beforeEach(() => {
     unregisterAllLanguages()
-    HyperFormula.registerLanguage(plPLCode, plPL)
-    HyperFormula.registerLanguage(enGBCode, enGB)
+    HyperFormula.registerLanguage(plPL.langCode, plPL)
+    HyperFormula.registerLanguage(enGB.langCode, enGB)
   })
 
   it('integer literal', () => {

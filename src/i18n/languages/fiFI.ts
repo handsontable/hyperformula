@@ -6,8 +6,7 @@
 import {RawTranslationPackage} from '..'
 // import
 
-export const codeLang = 'fiFI'
-export const dictionary: RawTranslationPackage = {
+const dictionary: RawTranslationPackage = {
   errors: {
     CYCLE: '#CYCLE!',
     DIV_BY_ZERO: '#JAKO/0!',
@@ -125,8 +124,10 @@ export const dictionary: RawTranslationPackage = {
     XOR: 'EHDOTON.TAI',
     YEAR: 'VUOSI',
   },
+  langCode: 'fiFI',
   ui: {
     NEW_SHEET_PREFIX: 'Sheet',
   },
 }
-// export
+
+export default dictionary

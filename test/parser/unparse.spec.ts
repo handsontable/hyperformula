@@ -4,7 +4,7 @@ import {Config} from '../../src/Config'
 import {SheetMapping} from '../../src/DependencyGraph'
 import {NamedExpressions} from '../../src/NamedExpressions'
 import {buildTranslationPackage} from '../../src/i18n'
-import {enGB, enGBCode, plPL, plPLCode} from '../../src/i18n/languages'
+import {enGB, plPL} from '../../src/i18n/languages'
 import {AstNodeType, buildLexerConfig, Unparser} from '../../src/parser'
 import {adr, unregisterAllLanguages} from '../testUtils'
 import {buildEmptyParserWithCaching} from './common'
@@ -23,8 +23,8 @@ describe('Unparse', () => {
 
   beforeEach(() => {
     unregisterAllLanguages()
-    HyperFormula.registerLanguage(plPLCode, plPL)
-    HyperFormula.registerLanguage(enGBCode, enGB)
+    HyperFormula.registerLanguage(plPL.langCode, plPL)
+    HyperFormula.registerLanguage(enGB.langCode, enGB)
   })
 
   it('#unparse', () => {
@@ -343,8 +343,8 @@ describe('Unparse', () => {
   })
 
   it('#unparse use language configuration', () => {
-    const configEN = new Config({language: enGBCode})
-    const configPL = new Config({language: plPLCode})
+    const configEN = new Config({language: enGB.langCode})
+    const configPL = new Config({language: plPL.langCode})
 
     const parser = buildEmptyParserWithCaching(configPL, sheetMapping)
 

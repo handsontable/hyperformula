@@ -1,14 +1,14 @@
 import {HyperFormula} from '../src'
 import {Config} from '../src/Config'
-import {enGB, plPL, enGBCode, plPLCode} from '../src/i18n/languages'
+import {enGB, plPL} from '../src/i18n/languages'
 import {unregisterAllLanguages} from './testUtils'
 import {EmptyValue} from '../src/Cell'
 
 describe('Config', () => {
   beforeEach(() => {
     unregisterAllLanguages()
-    HyperFormula.registerLanguage(plPLCode, plPL)
-    HyperFormula.registerLanguage(enGBCode, enGB)
+    HyperFormula.registerLanguage(plPL.langCode, plPL)
+    HyperFormula.registerLanguage(enGB.langCode, enGB)
   })
 
   it('works', () => {

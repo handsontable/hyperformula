@@ -41,15 +41,20 @@ const ruleForSnippetsInjection = {
       {
         pattern: /\/\/.import/,
         replacement: function() {
-          const snippet1 = `import Hyperformula from '../..';`;
+          const snippet1 = `import HyperFormula from '../..';`;
 
           return `${snippet1}${NEW_LINE_CHAR.repeat(2)}`;
         }
       },
       {
-        pattern: /\/\/.export/,
+        pattern: /export default dictionary/,
         replacement: function(matchingPhrase) {
-          const snippet = `Hyperformula.registerLanguage(codeLang, dictionary);`;
+          const snippet = `
+            if (!HyperFormula.languages) {
+              HyperFormula.languages = {};
+            }
+            HyperFormula.languages[dictionary.langCode] = dictionary;
+          `;
 
           return `${snippet}${NEW_LINE_CHAR.repeat(2)}${matchingPhrase}`;
         }
@@ -74,7 +79,7 @@ module.exports.create = function create() {
     },
     externals: {
       ['../..']: {
-        root: 'Hyperformula',
+        root: 'HyperFormula',
         commonjs2: '../..',
         commonjs: '../..',
         amd: '../..',

@@ -20,7 +20,6 @@ import {Maybe} from './Maybe'
 import {ParserConfig} from './parser/ParserConfig'
 import {checkLicenseKeyValidity, LicenseKeyValidityState} from './helpers/licenseKeyValidator'
 import {FunctionPluginDefinition} from './interpreter/plugin/FunctionPlugin'
-import { enGBCode } from './i18n/languages'
 
 type GPUMode = 'gpu' | 'cpu' | 'dev'
 
@@ -359,7 +358,7 @@ export class Config implements ConfigParams, ParserConfig {
     functionArgSeparator: ',',
     decimalSeparator: '.',
     thousandSeparator: '',
-    language: enGBCode,
+    language: 'enGB',
     licenseKey: '',
     functionPlugins: [],
     gpuMode: 'gpu',

@@ -6,7 +6,6 @@
 import {RawTranslationPackage} from '..'
 // import
 
-export const codeLang = 'esES'
 export const dictionary: RawTranslationPackage = {
   errors: {
     CYCLE: '#CYCLE!',
@@ -125,8 +124,10 @@ export const dictionary: RawTranslationPackage = {
     XOR: 'XOR',
     YEAR: 'AÑO',
   },
+  langCode: 'esES',
   ui: {
     NEW_SHEET_PREFIX: 'Sheet',
   },
 }
-// export
+
+export default dictionary

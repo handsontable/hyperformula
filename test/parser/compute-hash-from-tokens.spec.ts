@@ -2,7 +2,7 @@ import {HyperFormula} from '../../src'
 import {simpleCellAddress, SimpleCellAddress} from '../../src/Cell'
 import {Config} from '../../src/Config'
 import {SheetMapping} from '../../src/DependencyGraph'
-import {enGB, enGBCode, plPL, plPLCode} from '../../src/i18n/languages'
+import {enGB, plPL} from '../../src/i18n/languages'
 import {buildLexerConfig, FormulaLexer} from '../../src/parser'
 import {unregisterAllLanguages} from '../testUtils'
 import {buildEmptyParserWithCaching} from './common'
@@ -19,8 +19,8 @@ describe('computeHashFromTokens', () => {
   }
   beforeEach(() => {
     unregisterAllLanguages()
-    HyperFormula.registerLanguage(plPLCode, plPL)
-    HyperFormula.registerLanguage(enGBCode, enGB)
+    HyperFormula.registerLanguage(plPL.langCode, plPL)
+    HyperFormula.registerLanguage(enGB.langCode, enGB)
   })
 
   it('simple case', () => {
