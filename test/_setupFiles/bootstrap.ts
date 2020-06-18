@@ -6,7 +6,7 @@ import {HyperFormula} from '../../src'
 import {Config} from '../../src/Config'
 import {AlwaysSparse} from '../../src/DependencyGraph/AddressMapping/ChooseAddressMappingPolicy'
 import {enGB} from '../../src/i18n/languages'
-import {unregisterAllFormulas, unregisterAllLanguages} from './../testUtils'
+import {unregisterAllLanguages} from './../testUtils'
 import {toContainEqualMatcher, toMatchObjectMatcher} from './matchers'
 import * as plugins from '../../src/interpreter/plugin'
 
@@ -41,14 +41,15 @@ beforeEach(() => {
 
   HyperFormula.registerLanguage(defaultLanguage, enGB)
 
-  unregisterAllFormulas()
-for (const pluginName of Object.getOwnPropertyNames(plugins)) {
-  if (!pluginName.startsWith('_')) {
-    // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
-    // @ts-ignore
-    HyperFormula.registerFunctionPlugin(plugins[pluginName])
+  HyperFormula.unregisterAllFunctions()
+
+  for (const pluginName of Object.getOwnPropertyNames(plugins)) {
+    if (!pluginName.startsWith('_')) {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+      // @ts-ignore
+      HyperFormula.registerFunctionPlugin(plugins[pluginName])
+    }
   }
-}
 })
 
 beforeAll(() => {

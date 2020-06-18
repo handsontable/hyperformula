@@ -28,6 +28,8 @@ import {
   FunctionPluginValidationError,
   InvalidAddressError,
   InvalidArgumentsError,
+  LanguageAlreadyRegisteredError,
+  LanguageNotRegisteredError,
   MatrixFormulasNotSupportedError,
   MissingTranslationError,
   NamedExpressionDoesNotExistError,
@@ -40,11 +42,12 @@ import {
   NoSheetWithNameError,
   NotAFormulaError,
   NothingToPasteError,
+  ProtectedFunctionTranslationError,
   SheetNameAlreadyTakenError,
   SheetSizeLimitExceededError,
   SourceLocationHasMatrixError,
   TargetLocationHasMatrixError,
-  UnableToParseError,
+  UnableToParseError
 } from './errors'
 import * as plugins from './interpreter/plugin'
 import {FunctionPluginDefinition} from './interpreter'
@@ -67,6 +70,8 @@ class HyperFormulaNS extends HyperFormula {
   public static FunctionPluginValidationError = FunctionPluginValidationError
   public static InvalidAddressError = InvalidAddressError
   public static InvalidArgumentsError = InvalidArgumentsError
+  public static LanguageNotRegisteredError = LanguageNotRegisteredError
+  public static LanguageAlreadyRegisteredError = LanguageAlreadyRegisteredError
   public static MatrixFormulasNotSupportedError = MatrixFormulasNotSupportedError
   public static MissingTranslationError = MissingTranslationError
   public static NamedExpressionDoesNotExistError = NamedExpressionDoesNotExistError
@@ -79,6 +84,7 @@ class HyperFormulaNS extends HyperFormula {
   public static NoSheetWithNameError = NoSheetWithNameError
   public static NotAFormulaError = NotAFormulaError
   public static NothingToPasteError = NothingToPasteError
+  public static ProtectedFunctionTranslationError = ProtectedFunctionTranslationError
   public static SheetNameAlreadyTakenError = SheetNameAlreadyTakenError
   public static SheetSizeLimitExceededError = SheetSizeLimitExceededError
   public static SourceLocationHasMatrixError = SourceLocationHasMatrixError
@@ -130,6 +136,8 @@ export {
   FunctionPluginValidationError,
   InvalidAddressError,
   InvalidArgumentsError,
+  LanguageAlreadyRegisteredError,
+  LanguageNotRegisteredError,
   MatrixFormulasNotSupportedError,
   MissingTranslationError,
   NamedExpressionDoesNotExistError,
@@ -142,6 +150,7 @@ export {
   NoSheetWithNameError,
   NotAFormulaError,
   NothingToPasteError,
+  ProtectedFunctionTranslationError,
   SheetNameAlreadyTakenError,
   SheetSizeLimitExceededError,
   SourceLocationHasMatrixError,

@@ -16,9 +16,10 @@ class FooPlugin extends FunctionPlugin {
   }
 }
 
+
 describe('Plugins', () => {
-  it('Extending with a plugin',  () => {
-    HyperFormula.getLanguage('enGB').extendFunctions({FOO: 'FOO'})
+  it('Extending with a plugin', () => {
+    HyperFormula.getLanguage('enGB').extendFunctions({'FOO': 'FOO'})
     const engine = HyperFormula.buildFromArray([
       ['=foo()'],
     ], {functionPlugins: [FooPlugin]})
@@ -26,7 +27,7 @@ describe('Plugins', () => {
     expect(engine.getCellValue(adr('A1'))).toBe(42)
   })
 
-  it('cleanup',  () => {
+  it('cleanup', () => {
     const engine = HyperFormula.buildFromArray([
       ['=foo()'],
     ], {functionPlugins: [FooPlugin]})
