@@ -810,7 +810,7 @@ describe('Removing rows - sheet dimensions', () => {
       ['2'],
     ])
 
-    expect(() => engine.removeRows(0, [1, 0])).toThrow(new InvalidArgumentsError())
+    expect(() => engine.removeRows(0, [1, 0])).toThrow(new InvalidArgumentsError('starting row to be smaller than the ending row.'))
   })
 
   it('returns changed values', () => {

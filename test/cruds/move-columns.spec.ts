@@ -84,12 +84,12 @@ describe('Move columns', () => {
       ['1', '2'],
     ])
 
-    expect(() => engine.moveColumns(0, 0, 1, -1)).toThrow(new InvalidArgumentsError())
-    expect(() => engine.moveColumns(0, 0, 1, 1)).toThrow(new InvalidArgumentsError())
-    expect(() => engine.moveColumns(0, 0, 1, 0)).toThrow(new InvalidArgumentsError())
-    expect(() => engine.moveColumns(0, 0, 2, 0)).toThrow(new InvalidArgumentsError())
-    expect(() => engine.moveColumns(0, 0, 2, 1)).toThrow(new InvalidArgumentsError())
-    expect(() => engine.moveColumns(0, 0, 2, 2)).toThrow(new InvalidArgumentsError())
+    expect(() => engine.moveColumns(0, 0, 1, -1)).toThrow(new InvalidArgumentsError('column number to be nonnegative and number of columns to add to be positive.'))
+    expect(() => engine.moveColumns(0, 0, 1, 1)).toThrow(new InvalidArgumentsError('a valid range of columns to move.'))
+    expect(() => engine.moveColumns(0, 0, 1, 0)).toThrow(new InvalidArgumentsError('a valid range of columns to move.'))
+    expect(() => engine.moveColumns(0, 0, 2, 0)).toThrow(new InvalidArgumentsError('a valid range of columns to move.'))
+    expect(() => engine.moveColumns(0, 0, 2, 1)).toThrow(new InvalidArgumentsError('a valid range of columns to move.'))
+    expect(() => engine.moveColumns(0, 0, 2, 2)).toThrow(new InvalidArgumentsError('a valid range of columns to move.'))
   })
 
   it('should move one column', () => {

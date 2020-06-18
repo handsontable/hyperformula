@@ -92,12 +92,12 @@ describe('Move rows', () => {
       ['2']
     ])
 
-    expect(() => engine.moveRows(0, 0, 1, -1)).toThrow(new InvalidArgumentsError())
-    expect(() => engine.moveRows(0, 0, 1, 1)).toThrow(new InvalidArgumentsError())
-    expect(() => engine.moveRows(0, 0, 1, 0)).toThrow(new InvalidArgumentsError())
-    expect(() => engine.moveRows(0, 0, 2, 0)).toThrow(new InvalidArgumentsError())
-    expect(() => engine.moveRows(0, 0, 2, 1)).toThrow(new InvalidArgumentsError())
-    expect(() => engine.moveRows(0, 0, 2, 2)).toThrow(new InvalidArgumentsError())
+    expect(() => engine.moveRows(0, 0, 1, -1)).toThrow(new InvalidArgumentsError('row number to be nonnegative and number of rows to add to be positive.'))
+    expect(() => engine.moveRows(0, 0, 1, 1)).toThrow(new InvalidArgumentsError('a valid range of rows to move.'))
+    expect(() => engine.moveRows(0, 0, 1, 0)).toThrow(new InvalidArgumentsError('a valid range of rows to move.'))
+    expect(() => engine.moveRows(0, 0, 2, 0)).toThrow(new InvalidArgumentsError('a valid range of rows to move.'))
+    expect(() => engine.moveRows(0, 0, 2, 1)).toThrow(new InvalidArgumentsError('a valid range of rows to move.'))
+    expect(() => engine.moveRows(0, 0, 2, 2)).toThrow(new InvalidArgumentsError('a valid range of rows to move.'))
   })
 
   it('should move one row', () => {

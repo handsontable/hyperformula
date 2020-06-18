@@ -159,10 +159,10 @@ export class CrudOperations {
 
   public ensureItIsPossibleToCopy(sourceLeftCorner: SimpleCellAddress, width: number, height: number): void {
     if (!isPositiveInteger(width)) {
-      throw new InvalidArgumentsError('width to be positive integer')
+      throw new InvalidArgumentsError('width to be positive integer.')
     }
     if (!isPositiveInteger(height)) {
-      throw new InvalidArgumentsError('height to be positive integer')
+      throw new InvalidArgumentsError('height to be positive integer.')
     }
   }
 
@@ -251,7 +251,7 @@ export class CrudOperations {
     } else {
       for (let i = 0; i < cellContents.length; i++) {
         if (!(cellContents[i] instanceof Array)) {
-          throw new InvalidArgumentsError('an array of arrays or a raw cell value')
+          throw new InvalidArgumentsError('an array of arrays or a raw cell value.')
         }
         for (let j = 0; j < cellContents[i].length; j++) {
           if (isMatrix(cellContents[i][j])) {
@@ -371,7 +371,7 @@ export class CrudOperations {
 
     for (const [row, numberOfRowsToAdd] of indexes) {
       if (!isNonnegativeInteger(row) || !isPositiveInteger(numberOfRowsToAdd)) {
-        throw new InvalidArgumentsError()
+        throw new InvalidArgumentsError('row number to be nonnegative and number of rows to add to be positive.')
       }
 
       if (isPositiveInteger(row)
@@ -387,10 +387,10 @@ export class CrudOperations {
     for (const [rowStart, numberOfRows] of indexes) {
       const rowEnd = rowStart + numberOfRows - 1
       if (!isNonnegativeInteger(rowStart) || !isNonnegativeInteger(rowEnd)) {
-        throw new InvalidArgumentsError()
+        throw new InvalidArgumentsError('starting and ending row to be nonnegative.')
       }
       if (rowEnd < rowStart) {
-        throw new InvalidArgumentsError()
+        throw new InvalidArgumentsError('starting row to be smaller than the ending row.')
       }
       const rowsToRemove = RowsSpan.fromRowStartAndEnd(sheet, rowStart, rowEnd)
 
@@ -417,7 +417,7 @@ export class CrudOperations {
 
     for (const [column, numberOfColumnsToAdd] of indexes) {
       if (!isNonnegativeInteger(column) || !isPositiveInteger(numberOfColumnsToAdd)) {
-        throw new InvalidArgumentsError()
+        throw new InvalidArgumentsError('column number to be nonnegative and number of columns to add to be positive.')
       }
 
       if (isPositiveInteger(column)
@@ -434,10 +434,10 @@ export class CrudOperations {
       const columnEnd = columnStart + numberOfColumns - 1
 
       if (!isNonnegativeInteger(columnStart) || !isNonnegativeInteger(columnEnd)) {
-        throw new InvalidArgumentsError()
+        throw new InvalidArgumentsError('starting and ending column to be nonnegative.')
       }
       if (columnEnd < columnStart) {
-        throw new InvalidArgumentsError()
+        throw new InvalidArgumentsError('starting column to be smaller than the ending column.')
       }
       const columnsToRemove = ColumnsSpan.fromColumnStartAndEnd(sheet, columnStart, columnEnd)
 
@@ -464,7 +464,7 @@ export class CrudOperations {
       || !isPositiveInteger(numberOfRows)
       || (targetRow <= startRow + numberOfRows && targetRow >= startRow)
     ) {
-      throw new InvalidArgumentsError()
+      throw new InvalidArgumentsError('a valid range of rows to move.')
     }
 
     const width = this.dependencyGraph.getSheetWidth(sheet)
@@ -488,7 +488,7 @@ export class CrudOperations {
       || !isPositiveInteger(numberOfColumns)
       || (targetColumn <= startColumn + numberOfColumns && targetColumn >= startColumn)
     ) {
-      throw new InvalidArgumentsError()
+      throw new InvalidArgumentsError('a valid range of columns to move.')
     }
 
     const sheetHeight = this.dependencyGraph.getSheetHeight(sheet)

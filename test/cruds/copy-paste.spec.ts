@@ -366,7 +366,7 @@ describe('Copy - paste integration', () => {
 
     expect(() => {
       engine.paste(adr('A1', 1))
-    }).toThrowError('Invalid arguments, expected undefined')
+    }).toThrowError('Invalid arguments, expected a valid target address.')
   })
 
   it('should copy references with absolute sheet id', () => {
