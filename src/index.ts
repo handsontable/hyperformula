@@ -49,7 +49,7 @@ import {
   UnableToParseError
 } from './errors'
 import * as plugins from './interpreter/plugin'
-import {FunctionPluginDefinition} from './interpreter'
+import {FunctionPluginDefinition, FunctionPlugin} from './interpreter'
 import {ColumnRowIndex} from './CrudOperations'
 
 /** @internal */
@@ -131,6 +131,7 @@ export {
   EvaluationSuspendedError,
   ExpectedOneOfValuesError,
   ExpectedValueOfTypeError,
+  FunctionPlugin,
   FunctionPluginValidationError,
   InvalidAddressError,
   InvalidArgumentsError,
