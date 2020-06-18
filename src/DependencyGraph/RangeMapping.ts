@@ -9,6 +9,7 @@ import {ColumnsSpan} from '../ColumnsSpan'
 import {Maybe} from '../Maybe'
 import {RowsSpan} from '../RowsSpan'
 import {RangeVertex} from './'
+import {sheetNameRegexp} from '../parser/LexerConfig'
 
 /**
  * Mapping from address ranges to range vertices
@@ -69,25 +70,43 @@ export class RangeMapping {
     return maybeRange
   }
 
-  public truncateRangesByRows(rowsSpan: RowsSpan): RangeVertex[] {
+
+  public truncateRangesByRows(rowsSpan: RowsSpan): [RangeVertex[], [RangeVertex, RangeVertex][]] {
     const rangesToRemove = Array<RangeVertex>()
+    const updated = Array<[string, RangeVertex]>()
 
-    this.updateVerticesFromSheet(rowsSpan.sheet, (key: string, vertex: RangeVertex): Maybe<RangeVertex> => {
+    const sheet = rowsSpan.sheet
+    for (const [key, vertex] of this.entriesFromSheet(rowsSpan.sheet)) {
+      const range = vertex.range
       if (rowsSpan.rowStart <= vertex.range.end.row) {
-        vertex.range.removeRows(rowsSpan.rowStart, rowsSpan.rowEnd)
-        if (vertex.range.shouldBeRemoved()) {
+        range.removeRows(rowsSpan.rowStart, rowsSpan.rowEnd)
+        if (range.shouldBeRemoved()) {
+          this.removeByKey(sheet, key)
           rangesToRemove.push(vertex)
-          this.removeByKey(rowsSpan.sheet, key)
-          return undefined
         } else {
-          return vertex
+          updated.push([key, vertex])
         }
-      } else {
-        return undefined
       }
-    })
+    }
 
-    return rangesToRemove
+    const rangesToMerge:  [RangeVertex, RangeVertex][] = []
+
+    for (const [oldKey, vertex] of updated) {
+      const newKey = keyFromRange(vertex.range)
+      if (newKey === oldKey) {
+        continue
+      }
+
+      const existingVertex = this.getByKey(sheet, newKey)
+      this.removeByKey(sheet, oldKey)
+      if (existingVertex !== undefined && vertex != existingVertex) {
+        rangesToMerge.push([existingVertex, vertex])
+      } else {
+        this.setRange(vertex)
+      }
+    }
+
+    return [rangesToRemove, rangesToMerge]
   }
 
   public truncateRangesByColumns(columnsSpan: ColumnsSpan): RangeVertex[] {
@@ -217,6 +236,10 @@ export class RangeMapping {
     this.rangeMapping.get(sheet)!.delete(key)
   }
 
+  private getByKey(sheet: number, key: string): RangeVertex | undefined {
+    return this.rangeMapping.get(sheet)?.get(key)
+  }
+
   private updateVerticesFromSheet(sheet: number, fn: (key: string, vertex: RangeVertex) => Maybe<RangeVertex>) {
     const updated = Array<RangeVertex>()
 
@@ -232,9 +255,60 @@ export class RangeMapping {
       this.setRange(range)
     })
   }
+  //
+  // public truncateRangesByColumns(columnsSpan: ColumnsSpan): RangeVertex[] {
+  //   const rangesToRemove = Array<RangeVertex>()
+  //   const rangesToMerge = Array<RangeVertex>()
+  //   const updated = Array<RangeVertex>()
+  //   const sheet = columnsSpan.sheet
+  //
+  //   for (const [key, vertex] of this.entriesFromSheet(columnsSpan.sheet)) {
+  //     const range = vertex.range
+  //     if (columnsSpan.columnStart <= vertex.range.end.col) {
+  //       range.removeColumns(columnsSpan.columnStart, columnsSpan.columnEnd)
+  //       if (range.shouldBeRemoved()) {
+  //         rangesToRemove.push(vertex)
+  //         this.removeByKey(sheet, key)
+  //       } else {
+  //         const newKey = keyFromRange(range)
+  //         const existingVertex = this.getByKey(sheet, newKey)
+  //         if (existingVertex !== undefined && vertex != existingVertex) {
+  //           rangesToMerge.push(vertex)
+  //         } else {
+  //           updated.push(vertex)
+  //         }
+  //       }
+  //     }
+  //   }
+  //
+  //   updated.forEach((range) => {
+  //     this.setRange(range)
+  //   })
+  //
+  //   // this.updateVerticesFromSheet(columnsSpan.sheet, (key: string, vertex: RangeVertex): Maybe<RangeVertex> => {
+  //   //   if (columnsSpan.columnStart <= vertex.range.end.col) {
+  //   //     vertex.range.removeColumns(columnsSpan.columnStart, columnsSpan.columnEnd)
+  //   //     if (vertex.range.shouldBeRemoved()) {
+  //   //       rangesToRemove.push(vertex)
+  //   //       this.removeByKey(columnsSpan.sheet, key)
+  //   //       return undefined
+  //   //     } else {
+  //   //       return vertex
+  //   //     }
+  //   //   } else {
+  //   //     return undefined
+  //   //   }
+  //   // })
+  //   //
+  //   return rangesToRemove
+  // }
 }
 
-function keyFromAddresses(start: SimpleCellAddress, end: SimpleCellAddress) {
+function keyFromAddresses(start: SimpleCellAddress, end: SimpleCellAddress): string {
   return `${start.col},${start.row},${end.col},${end.row}`
+}
+
+function keyFromRange(range: AbsoluteCellRange): string {
+  return keyFromAddresses(range.start, range.end)
 }
 

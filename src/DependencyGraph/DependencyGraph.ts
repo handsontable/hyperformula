@@ -764,10 +764,13 @@ export class DependencyGraph {
   }
 
   private truncateRangesAfterRemovingRows(removedRows: RowsSpan) {
-    const rangesToRemove = this.rangeMapping.truncateRangesByRows(removedRows)
-    rangesToRemove.forEach((vertex) => {
-      this.removeGraphNode(vertex)
-    })
+    const [rangesToRemove, rangesToMerge] = this.rangeMapping.truncateRangesByRows(removedRows)
+    for (const [existingVertex, mergedVertex] of rangesToMerge) {
+      this.mergeRangeVertices(existingVertex, mergedVertex)
+    }
+    for (const range of rangesToRemove) {
+      this.removeGraphNode(range)
+    }
   }
 
   private truncateMatricesAfterRemovingColumns(removedColumns: ColumnsSpan) {
@@ -839,6 +842,18 @@ export class DependencyGraph {
     })
   }
 
+  public mergeRangeVertices(masterVertex: RangeVertex, mergedVertex: RangeVertex) {
+    const adjNodesStored = this.graph.adjacentNodes(mergedVertex)
+
+    this.graph.removeNode(mergedVertex)
+    this.graph.softRemoveEdge(masterVertex, mergedVertex)
+    adjNodesStored.forEach((adjacentNode) => {
+      if (this.graph.hasNode(adjacentNode)) {
+        this.graph.addEdge(masterVertex, adjacentNode)
+      }
+    })
+  }
+
   public exchangeOrAddGraphNode(oldNode: Vertex | null, newNode: Vertex) {
     if (oldNode) {
       this.exchangeGraphNode(oldNode, newNode)
@@ -848,7 +863,7 @@ export class DependencyGraph {
   }
 
   public removeGraphNode(node: Vertex) {
-    const candidates = this.graph.removeNode(node)
+    const candidates = this.graph.removeNode(node) //
     if (node instanceof RangeVertex) {
       this.rangeMapping.removeRange(node)
     }
