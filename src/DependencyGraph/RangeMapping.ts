@@ -6,7 +6,7 @@
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
 import {simpleCellAddress, SimpleCellAddress} from '../Cell'
 import {Maybe} from '../Maybe'
-import {ColumnsSpan, RowsSpan, Span} from '../Span'
+import {Span} from '../Span'
 import {RangeVertex} from './'
 
 /**
