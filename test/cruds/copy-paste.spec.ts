@@ -19,27 +19,27 @@ describe('Copy - paste integration', () => {
 
     expect(() => {
       engine.copy(adr('A1'), 0, 42)
-    }).toThrowError('Invalid arguments, expected width to be positive integer')
+    }).toThrowError('Invalid arguments, expected width to be positive integer.')
 
     expect(() => {
       engine.copy(adr('A1'), -1, 42)
-    }).toThrowError('Invalid arguments, expected width to be positive integer')
+    }).toThrowError('Invalid arguments, expected width to be positive integer.')
 
     expect(() => {
       engine.copy(adr('A1'), 3.14, 42)
-    }).toThrowError('Invalid arguments, expected width to be positive integer')
+    }).toThrowError('Invalid arguments, expected width to be positive integer.')
 
     expect(() => {
       engine.copy(adr('A1'), 42, 0)
-    }).toThrowError('Invalid arguments, expected height to be positive integer')
+    }).toThrowError('Invalid arguments, expected height to be positive integer.')
 
     expect(() => {
       engine.copy(adr('A1'), 42, -1)
-    }).toThrowError('Invalid arguments, expected height to be positive integer')
+    }).toThrowError('Invalid arguments, expected height to be positive integer.')
 
     expect(() => {
       engine.copy(adr('A1'), 42, 3.14)
-    }).toThrowError('Invalid arguments, expected height to be positive integer')
+    }).toThrowError('Invalid arguments, expected height to be positive integer.')
   })
 
   it('paste raise error when there is nothing in clipboard', () => {
