@@ -89,6 +89,12 @@ export const expectArrayWithSameContent = (expected: any[], actual: any[]) => {
   }
 }
 
+export const verifyValues = (engine: HyperFormula) => {
+  const serialization = engine.getAllSheetsSerialized()
+  const engine2 = HyperFormula.buildFromSheets(serialization)
+  expect(engine.getAllSheetsValues()).toEqual(engine2.getAllSheetsValues())
+}
+
 export const rowStart = (input: number, sheet: number = 0): SimpleCellAddress => {
   return simpleCellAddress(sheet, 0, input - 1)
 }
