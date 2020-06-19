@@ -9,7 +9,6 @@ import {ColumnsSpan} from '../ColumnsSpan'
 import {Maybe} from '../Maybe'
 import {RowsSpan} from '../RowsSpan'
 import {RangeVertex} from './'
-import {sheetNameRegexp} from '../parser/LexerConfig'
 
 /**
  * Mapping from address ranges to range vertices
@@ -70,14 +69,6 @@ export class RangeMapping {
     return maybeRange
   }
 
-  private sort = (left: RangeVertex, right: RangeVertex) => {
-    if (left.range.start.row === right.range.start.row) {
-      return left.range.end.row - right.range.end.row
-    } else {
-      return left.range.start.row - right.range.start.row
-    }
-  }
-
   public truncateRangesByRows(rowsSpan: RowsSpan): [RangeVertex[], [RangeVertex, RangeVertex][]] {
     const rangesToRemove = Array<RangeVertex>()
     const updated = Array<[string, RangeVertex]>()
@@ -98,7 +89,7 @@ export class RangeMapping {
 
     const rangesToMerge: [RangeVertex, RangeVertex][] = []
 
-    for (const [oldKey, vertex] of updated.sort((a, b) => this.sort(a[1], b[1]))) {
+    for (const [oldKey, vertex] of updated.sort((left, right) => compareByRows(left[1], right[1]))) {
       const newKey = keyFromRange(vertex.range)
       if (newKey === oldKey) {
         continue
@@ -272,3 +263,10 @@ function keyFromRange(range: AbsoluteCellRange): string {
   return keyFromAddresses(range.start, range.end)
 }
 
+const compareByRows = (left: RangeVertex, right: RangeVertex) => {
+  if (left.range.start.row === right.range.start.row) {
+    return left.range.end.row - right.range.end.row
+  } else {
+    return left.range.start.row - right.range.start.row
+  }
+}
