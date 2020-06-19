@@ -769,7 +769,7 @@ export class DependencyGraph {
       this.mergeRangeVertices(existingVertex, mergedVertex)
     }
     for (const range of rangesToRemove) {
-      this.removeGraphNode(range)
+      this.removeRange(range)
     }
   }
 
@@ -845,7 +845,7 @@ export class DependencyGraph {
   public mergeRangeVertices(masterVertex: RangeVertex, mergedVertex: RangeVertex) {
     const adjNodesStored = this.graph.adjacentNodes(mergedVertex)
 
-    this.graph.removeNode(mergedVertex)
+    this.removeRange(mergedVertex)
     this.graph.softRemoveEdge(masterVertex, mergedVertex)
     adjNodesStored.forEach((adjacentNode) => {
       if (this.graph.hasNode(adjacentNode)) {
@@ -867,6 +867,24 @@ export class DependencyGraph {
     if (node instanceof RangeVertex) {
       this.rangeMapping.removeRange(node)
     }
+    while (candidates.size > 0) {
+      const vertex: Vertex = candidates.values().next().value
+      candidates.delete(vertex)
+      if (this.graph.hasNode(vertex) && this.graph.adjacentNodesCount(vertex) === 0) {
+        if (vertex instanceof RangeVertex || vertex instanceof EmptyCellVertex) {
+          this.graph.removeNode(vertex).forEach((candidate) => candidates.add(candidate))
+        }
+        if (vertex instanceof RangeVertex) {
+          this.rangeMapping.removeRange(vertex)
+        } else if (vertex instanceof EmptyCellVertex) {
+          this.addressMapping.removeCell(vertex.address)
+        }
+      }
+    }
+  }
+
+  public removeRange(node: RangeVertex) {
+    const candidates = this.graph.removeNode(node)
     while (candidates.size > 0) {
       const vertex: Vertex = candidates.values().next().value
       candidates.delete(vertex)
