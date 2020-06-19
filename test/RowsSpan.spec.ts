@@ -1,4 +1,4 @@
-import {RowsSpan} from '../src/RowsSpan'
+import {RowsSpan} from '../src/Span'
 
 describe('RowsSpan', () => {
   it('raise error when starting row is less than 0', () => {

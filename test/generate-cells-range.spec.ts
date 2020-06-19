@@ -7,6 +7,7 @@ import {Statistics} from '../src/statistics/Statistics'
 import {NamedExpressions} from '../src/NamedExpressions'
 import {FunctionRegistry} from '../src/interpreter/FunctionRegistry'
 import {LazilyTransformingAstService} from '../src/LazilyTransformingAstService'
+import {RowsSpan} from '../src/Span'
 
 describe('generateCellsFromRange', () => {
   const config = new Config()
@@ -126,45 +127,45 @@ describe('AbsoluteCellRange#height', () => {
   })
 })
 
-describe('AbsoluteCellRange#removeRows', () => {
+describe('AbsoluteCellRange#removeSpan', () => {
   it('rows below', () => {
     const range = new AbsoluteCellRange(adr('A1'), adr('A4'))
-    range.removeRows(4, 5)
+    range.removeSpan(new RowsSpan(0, 4, 5))
     expect(range.start.row).toBe(0)
     expect(range.end.row).toBe(3)
   })
 
   it('rows above', () => {
     const range = new AbsoluteCellRange(adr('A3'), adr('A5'))
-    range.removeRows(0, 1)
+    range.removeSpan(new RowsSpan(0, 0, 1))
     expect(range.start.row).toBe(0)
     expect(range.end.row).toBe(2)
   })
 
   it('middle of the range', () => {
     const range = new AbsoluteCellRange(adr('A1'), adr('A5'))
-    range.removeRows(1, 2)
+    range.removeSpan(new RowsSpan(0, 1, 2))
     expect(range.start.row).toBe(0)
     expect(range.end.row).toBe(2)
   })
 
   it('start above range', () => {
     const range = new AbsoluteCellRange(adr('A3'), adr('A5'))
-    range.removeRows(0, 3)
+    range.removeSpan(new RowsSpan(0, 0, 3))
     expect(range.start.row).toBe(0)
     expect(range.end.row).toBe(0)
   })
 
   it('end below range', () => {
     const range = new AbsoluteCellRange(adr('A1'), adr('A5'))
-    range.removeRows(2, 5)
+    range.removeSpan(new RowsSpan(0, 2, 5))
     expect(range.start.row).toBe(0)
     expect(range.end.row).toBe(1)
   })
 
   it('whole range', () => {
     const range = new AbsoluteCellRange(adr('A3'), adr('A5'))
-    range.removeRows(0, 5)
+    range.removeSpan(new RowsSpan(0, 0, 5))
     expect(range.start.row).toBe(0)
     expect(range.end.row).toBe(-1)
     expect(range.height()).toBe(0)

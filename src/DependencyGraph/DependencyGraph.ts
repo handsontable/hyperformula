@@ -16,12 +16,11 @@ import {
   SimpleCellAddress
 } from '../Cell'
 import {CellDependency} from '../CellDependency'
-import {ColumnsSpan} from '../ColumnsSpan'
 import {Config} from '../Config'
 import {LazilyTransformingAstService} from '../LazilyTransformingAstService'
 import {Maybe} from '../Maybe'
 import {Ast, collectDependencies, NamedExpressionDependency} from '../parser'
-import {RowsSpan} from '../RowsSpan'
+import {ColumnsSpan, RowsSpan, Span} from '../Span'
 import {Statistics, StatType} from '../statistics'
 import {NamedExpressions} from '../NamedExpressions'
 import {
@@ -287,7 +286,7 @@ export class DependencyGraph {
     })
 
     this.stats.measure(StatType.ADJUSTING_RANGES, () => {
-      this.truncateRangesAfterRemovingRows(removedRows)
+      this.truncateRanges(removedRows, address => address.row)
     })
 
     this.addStructuralNodesToChangeSet()
@@ -374,7 +373,7 @@ export class DependencyGraph {
     })
 
     this.stats.measure(StatType.ADJUSTING_RANGES, () => {
-      this.truncateRangesAfterRemovingColumns(removedColumns)
+      this.truncateRanges(removedColumns, address => address.col)
     })
 
     this.addStructuralNodesToChangeSet()
@@ -571,7 +570,6 @@ export class DependencyGraph {
     }
   }
 
-
   public* matrixFormulaNodes(): IterableIterator<MatrixVertex> {
     for (const vertex of this.graph.nodes) {
       if (vertex instanceof MatrixVertex && vertex.isFormula()) {
@@ -763,12 +761,12 @@ export class DependencyGraph {
     })
   }
 
-  private truncateRangesAfterRemovingRows(removedRows: RowsSpan) {
-    const [rangesToRemove, rangesToMerge] = this.rangeMapping.truncateRangesByRows(removedRows)
-    for (const [existingVertex, mergedVertex] of rangesToMerge) {
+  private truncateRanges(span: Span, coordinate: (address: SimpleCellAddress) => number) {
+    const { verticesToRemove, verticesToMerge } = this.rangeMapping.truncateRanges(span, coordinate)
+    for (const [existingVertex, mergedVertex] of verticesToMerge) {
       this.mergeRangeVertices(existingVertex, mergedVertex)
     }
-    for (const range of rangesToRemove) {
+    for (const range of verticesToRemove) {
       this.removeRange(range)
     }
   }
@@ -778,16 +776,6 @@ export class DependencyGraph {
     verticesToRemove.forEach((vertex) => {
       this.removeGraphNode(vertex)
     })
-  }
-
-  private truncateRangesAfterRemovingColumns(removedColumns: ColumnsSpan) {
-    const [rangesToRemove, rangesToMerge] = this.rangeMapping.truncateRangesByColumns(removedColumns)
-    for (const [existingVertex, mergedVertex] of rangesToMerge) {
-      this.mergeRangeVertices(existingVertex, mergedVertex)
-    }
-    for (const range of rangesToRemove) {
-      this.removeRange(range)
-    }
   }
 
   private expandMatricesAfterAddingRows(sheet: number, rowStart: number, numberOfRows: number) {

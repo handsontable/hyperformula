@@ -5,9 +5,8 @@
 
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
 import {simpleCellAddress, SimpleCellAddress} from '../Cell'
-import {ColumnsSpan} from '../ColumnsSpan'
 import {Maybe} from '../Maybe'
-import {RowsSpan} from '../RowsSpan'
+import {ColumnsSpan, RowsSpan, Span} from '../Span'
 import {RangeVertex} from './'
 
 /**
@@ -69,27 +68,26 @@ export class RangeMapping {
     return maybeRange
   }
 
-  public truncateRangesByRows(rowsSpan: RowsSpan): [RangeVertex[], [RangeVertex, RangeVertex][]] {
-    const rangesToRemove = Array<RangeVertex>()
+  public truncateRanges(span: Span, coordinate: (address: SimpleCellAddress) => number): TruncateRangesResult {
+    const verticesToRemove = Array<RangeVertex>()
     const updated = Array<[string, RangeVertex]>()
 
-    const sheet = rowsSpan.sheet
-    for (const [key, vertex] of this.entriesFromSheet(rowsSpan.sheet)) {
+    const sheet = span.sheet
+    for (const [key, vertex] of this.entriesFromSheet(span.sheet)) {
       const range = vertex.range
-      if (rowsSpan.rowStart <= vertex.range.end.row) {
-        range.removeRows(rowsSpan.rowStart, rowsSpan.rowEnd)
+      if (span.start <= coordinate(vertex.range.end)) {
+        range.removeSpan(span)
         if (range.shouldBeRemoved()) {
           this.removeByKey(sheet, key)
-          rangesToRemove.push(vertex)
+          verticesToRemove.push(vertex)
         } else {
           updated.push([key, vertex])
         }
       }
     }
 
-    const rangesToMerge: [RangeVertex, RangeVertex][] = []
-
-    for (const [oldKey, vertex] of updated.sort((left, right) => compareByRows(left[1], right[1]))) {
+    const verticesToMerge: [RangeVertex, RangeVertex][] = []
+    for (const [oldKey, vertex] of updated.sort((left, right) => compareBy(left[1], right[1], coordinate))) {
       const newKey = keyFromRange(vertex.range)
       if (newKey === oldKey) {
         continue
@@ -98,51 +96,16 @@ export class RangeMapping {
       const existingVertex = this.getByKey(sheet, newKey)
       this.removeByKey(sheet, oldKey)
       if (existingVertex !== undefined && vertex != existingVertex) {
-        rangesToMerge.push([existingVertex, vertex])
+        verticesToMerge.push([existingVertex, vertex])
       } else {
         this.setRange(vertex)
       }
     }
 
-    return [rangesToRemove, rangesToMerge]
-  }
-
-  public truncateRangesByColumns(columnsSpan: ColumnsSpan): [RangeVertex[], [RangeVertex, RangeVertex][]] {
-    const rangesToRemove = Array<RangeVertex>()
-    const updated = Array<[string, RangeVertex]>()
-
-    const sheet = columnsSpan.sheet
-    for (const [key, vertex] of this.entriesFromSheet(columnsSpan.sheet)) {
-      const range = vertex.range
-      if (columnsSpan.columnStart <= vertex.range.end.col) {
-        range.removeColumns(columnsSpan.columnStart, columnsSpan.columnEnd)
-        if (range.shouldBeRemoved()) {
-          this.removeByKey(sheet, key)
-          rangesToRemove.push(vertex)
-        } else {
-          updated.push([key, vertex])
-        }
-      }
+    return {
+      verticesToRemove,
+      verticesToMerge
     }
-
-    const rangesToMerge: [RangeVertex, RangeVertex][] = []
-
-    for (const [oldKey, vertex] of updated.sort((left, right) => compareByColumns(left[1], right[1]))) {
-      const newKey = keyFromRange(vertex.range)
-      if (newKey === oldKey) {
-        continue
-      }
-
-      const existingVertex = this.getByKey(sheet, newKey)
-      this.removeByKey(sheet, oldKey)
-      if (existingVertex !== undefined && vertex != existingVertex) {
-        rangesToMerge.push([existingVertex, vertex])
-      } else {
-        this.setRange(vertex)
-      }
-    }
-
-    return [rangesToRemove, rangesToMerge]
   }
 
   public moveAllRangesInSheetAfterRowByRows(sheet: number, row: number, numberOfRows: number) {
@@ -272,6 +235,11 @@ export class RangeMapping {
   }
 }
 
+export interface TruncateRangesResult {
+  verticesToRemove: RangeVertex[],
+  verticesToMerge: [RangeVertex, RangeVertex][],
+}
+
 function keyFromAddresses(start: SimpleCellAddress, end: SimpleCellAddress): string {
   return `${start.col},${start.row},${end.col},${end.row}`
 }
@@ -280,18 +248,14 @@ function keyFromRange(range: AbsoluteCellRange): string {
   return keyFromAddresses(range.start, range.end)
 }
 
-const compareByRows = (left: RangeVertex, right: RangeVertex) => {
-  if (left.range.start.row === right.range.start.row) {
-    return left.range.end.row - right.range.end.row
+const compareBy = (left: RangeVertex, right: RangeVertex, coordinate: (address: SimpleCellAddress) => number) => {
+  const leftStart = coordinate(left.range.start)
+  const rightStart = coordinate(left.range.start)
+  if (leftStart === rightStart) {
+    const leftEnd = coordinate(left.range.end)
+    const rightEnd = coordinate(right.range.end)
+    return leftEnd - rightEnd
   } else {
-    return left.range.start.row - right.range.start.row
-  }
-}
-
-const compareByColumns = (left: RangeVertex, right: RangeVertex) => {
-  if (left.range.start.col === right.range.start.col) {
-    return left.range.end.col - right.range.end.col
-  } else {
-    return left.range.start.col - right.range.start.col
+    return leftStart - rightStart
   }
 }
