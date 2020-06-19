@@ -990,6 +990,25 @@ describe('Removing rows - merge ranges', () => {
 
   it('should merge ranges in proper order', () => {
     const engine = HyperFormula.buildFromArray([])
+    engine.setCellContents({sheet: 0, col: 0, row: 0}, '=SUM(A4:A6)')
+    engine.setCellContents({sheet: 0, col: 0, row: 1}, '=SUM(A4:A5)')
+    engine.setCellContents({sheet: 0, col: 0, row: 2}, '=SUM(A4:A4)')
+
+    engine.removeRows(0, [4, 1])
+
+    verifyRangesInSheet(engine, 0, ['A4:A5', 'A4:A4'])
+    verifyValues(engine)
+
+    engine.setCellContents(adr('A1'), null)
+    engine.setCellContents(adr('A2'), null)
+    engine.setCellContents(adr('A3'), null)
+
+    verifyRangesInSheet(engine, 0, [])
+    verifyValues(engine)
+  })
+
+  it('should merge ranges with subranges in proper order', () => {
+    const engine = HyperFormula.buildFromArray([])
     engine.setCellContents({sheet: 0, col: 0, row: 1}, '=SUM(E1:E1)')
     engine.setCellContents({sheet: 0, col: 0, row: 0}, '=SUM(E1:E2)')
 
@@ -1054,9 +1073,6 @@ describe('Removing rows - merge ranges', () => {
     engine.setCellContents({sheet: 0, col: 3, row: 0}, '=SUM(B2:C3)')
     engine.setCellContents({sheet: 0, col: 6, row: 0}, '=SUM(D1:F2)')
     engine.setCellContents({sheet: 0, col: 6, row: 2}, '=SUM(D1:F1)')
-    engine.setCellContents({sheet: 0, col: 100, row: 100}, '=SUM(1,2)')
-
-    console.log(engine.getSheetSerialized(0))
 
     engine.addRows(0, [0, 2])
     engine.removeRows(0, [3, 1])

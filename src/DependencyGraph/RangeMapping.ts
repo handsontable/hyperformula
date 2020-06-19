@@ -107,25 +107,42 @@ export class RangeMapping {
     return [rangesToRemove, rangesToMerge]
   }
 
-  public truncateRangesByColumns(columnsSpan: ColumnsSpan): RangeVertex[] {
+  public truncateRangesByColumns(columnsSpan: ColumnsSpan): [RangeVertex[], [RangeVertex, RangeVertex][]] {
     const rangesToRemove = Array<RangeVertex>()
+    const updated = Array<[string, RangeVertex]>()
 
-    this.updateVerticesFromSheet(columnsSpan.sheet, (key: string, vertex: RangeVertex): Maybe<RangeVertex> => {
+    const sheet = columnsSpan.sheet
+    for (const [key, vertex] of this.entriesFromSheet(columnsSpan.sheet)) {
+      const range = vertex.range
       if (columnsSpan.columnStart <= vertex.range.end.col) {
-        vertex.range.removeColumns(columnsSpan.columnStart, columnsSpan.columnEnd)
-        if (vertex.range.shouldBeRemoved()) {
+        range.removeColumns(columnsSpan.columnStart, columnsSpan.columnEnd)
+        if (range.shouldBeRemoved()) {
+          this.removeByKey(sheet, key)
           rangesToRemove.push(vertex)
-          this.removeByKey(columnsSpan.sheet, key)
-          return undefined
         } else {
-          return vertex
+          updated.push([key, vertex])
         }
-      } else {
-        return undefined
       }
-    })
+    }
 
-    return rangesToRemove
+    const rangesToMerge: [RangeVertex, RangeVertex][] = []
+
+    for (const [oldKey, vertex] of updated.sort((left, right) => compareByColumns(left[1], right[1]))) {
+      const newKey = keyFromRange(vertex.range)
+      if (newKey === oldKey) {
+        continue
+      }
+
+      const existingVertex = this.getByKey(sheet, newKey)
+      this.removeByKey(sheet, oldKey)
+      if (existingVertex !== undefined && vertex != existingVertex) {
+        rangesToMerge.push([existingVertex, vertex])
+      } else {
+        this.setRange(vertex)
+      }
+    }
+
+    return [rangesToRemove, rangesToMerge]
   }
 
   public moveAllRangesInSheetAfterRowByRows(sheet: number, row: number, numberOfRows: number) {
@@ -268,5 +285,13 @@ const compareByRows = (left: RangeVertex, right: RangeVertex) => {
     return left.range.end.row - right.range.end.row
   } else {
     return left.range.start.row - right.range.start.row
+  }
+}
+
+const compareByColumns = (left: RangeVertex, right: RangeVertex) => {
+  if (left.range.start.col === right.range.start.col) {
+    return left.range.end.col - right.range.end.col
+  } else {
+    return left.range.start.col - right.range.start.col
   }
 }

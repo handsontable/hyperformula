@@ -781,10 +781,13 @@ export class DependencyGraph {
   }
 
   private truncateRangesAfterRemovingColumns(removedColumns: ColumnsSpan) {
-    const rangesToRemove = this.rangeMapping.truncateRangesByColumns(removedColumns)
-    rangesToRemove.forEach((vertex) => {
-      this.removeGraphNode(vertex)
-    })
+    const [rangesToRemove, rangesToMerge] = this.rangeMapping.truncateRangesByColumns(removedColumns)
+    for (const [existingVertex, mergedVertex] of rangesToMerge) {
+      this.mergeRangeVertices(existingVertex, mergedVertex)
+    }
+    for (const range of rangesToRemove) {
+      this.removeRange(range)
+    }
   }
 
   private expandMatricesAfterAddingRows(sheet: number, rowStart: number, numberOfRows: number) {
