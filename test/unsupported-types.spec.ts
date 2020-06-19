@@ -108,6 +108,6 @@ describe( 'unsupported types should result in error', () => {
     // eslint-disable-next-line
     // @ts-ignore
     expect(() => engine.setCellContents(adr('A1'), [1]))
-      .toThrowError('Invalid arguments, expected an array of arrays or a raw cell value')
+      .toThrowError('Invalid arguments, expected an array of arrays or a raw cell value.')
   })
 })
