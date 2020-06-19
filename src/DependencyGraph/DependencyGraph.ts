@@ -863,7 +863,7 @@ export class DependencyGraph {
   }
 
   public removeGraphNode(node: Vertex) {
-    const candidates = this.graph.removeNode(node) //
+    const candidates = this.graph.removeNode(node)
     if (node instanceof RangeVertex) {
       this.rangeMapping.removeRange(node)
     }
