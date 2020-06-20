@@ -11,11 +11,11 @@ import {Maybe} from '../Maybe'
 import {FormatToken, parseForDateTimeFormat, parseForNumberFormat, TokenType} from './parser'
 
 export function format(value: number, formatArg: string, config: Config, dateHelper: DateTimeHelper): InternalScalarValue {
-  const tryDateTime = config.stringifyDateTime(dateHelper.numberToDateTime(value), formatArg) // default points to defaultStringifyDateTime()
+  const tryDateTime = config.stringifyDateTime(dateHelper.numberToSimpleDateTime(value), formatArg) // default points to defaultStringifyDateTime()
   if (tryDateTime !== undefined) {
     return tryDateTime
   }
-  const tryDuration = config.stringifyDuration(dateHelper.numberToTime(value), formatArg)
+  const tryDuration = config.stringifyDuration(dateHelper.numberToSimpleTime(value), formatArg)
   if(tryDuration !== undefined) {
     return tryDuration
   }

@@ -10,6 +10,7 @@ import {CellValue, ExportedChange, Exporter, NoErrorCellValue} from './CellValue
 import {ColumnSearchStrategy} from './ColumnSearch/ColumnSearchStrategy'
 import {Config, ConfigParams} from './Config'
 import {ColumnRowIndex, CrudOperations} from './CrudOperations'
+import {DateTime} from './DateTimeHelper'
 import {buildTranslationPackage, RawTranslationPackage, TranslationPackage} from './i18n'
 import {normalizeAddedIndexes, normalizeRemovedIndexes} from './Operations'
 import {
@@ -2989,6 +2990,60 @@ export class HyperFormula implements TypedEmitter {
     return this._functionRegistry.getPlugins()
   }
 
+  /**
+   * Interprets number as a date + time.
+   *
+   * @param {number} val - number of days since dateZero, should be nonnegative, fractions are interpreted as hours/minutes/seconds.
+   *
+   * @example
+   * ```js
+   * HyperFormula.buildEmpty().numberToDateTime(43845.1);
+   *
+   * // returns {year: 2020, month: 1, day: 15, hours: 2, minutes: 24}
+   * ```
+   *
+   * @category Helper
+   */
+  public numberToDateTime(val: number): DateTime {
+    return this._evaluator.dateHelper.numberToSimpleDateTime(val)
+  }
+
+  /**
+   * Interprets number as a date.
+   *
+   * @param {number} val - number of days since dateZero, should be nonnegative, fractions are ignored.
+
+   * @example
+   * ```js
+   * HyperFormula.buildEmpty().numberToDate(43845);
+   *
+   * // returns {year: 2020, month: 1, day: 15}
+   * ```
+   *
+   * @category Helper
+   */
+  public numberToDate(val: number): DateTime {
+    return this._evaluator.dateHelper.numberToSimpleDate(val)
+  }
+
+  /**
+   * Interprets number as a time (hours/minutes/second).
+   *
+   * @param {number} val - time in 24h units.
+   *
+   * @example
+   * ```js
+   * HyperFormula.buildEmpty().numberToTime(1.1);
+   *
+   * // returns {hours: 26, minutes: 24}
+   * ```
+   *
+   * @category Helper
+   */
+  public numberToTime(val: number): DateTime {
+    return this._evaluator.dateHelper.numberToSimpleTime(val)
+  }
+
   private extractTemporaryFormula(formulaString: string, sheetId: number = 1): [Maybe<Ast>, SimpleCellAddress, RelativeDependency[]] {
     const parsedCellContent = this._cellContentParser.parse(formulaString)
     const exampleTemporaryFormulaAddress = {sheet: sheetId, col: 0, row: 0}
@@ -3137,4 +3192,6 @@ export class HyperFormula implements TypedEmitter {
       return []
     }
   }
+
+
 }

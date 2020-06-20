@@ -122,7 +122,7 @@ export class DatePlugin extends FunctionPlugin {
       return numberOfMonthsToShift
     }
 
-    const date = this.interpreter.dateHelper.numberToDate(dateNumber)
+    const date = this.interpreter.dateHelper.numberToSimpleDate(dateNumber)
     return this.interpreter.dateHelper.dateToNumber(endOfMonth(offsetMonth(date, numberOfMonthsToShift)))
   }
 
@@ -142,7 +142,7 @@ export class DatePlugin extends FunctionPlugin {
     if (dateNumber instanceof CellError) {
       return dateNumber
     }
-    return this.interpreter.dateHelper.numberToDate(dateNumber).day
+    return this.interpreter.dateHelper.numberToSimpleDate(dateNumber).day
   }
 
   public days(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
@@ -199,7 +199,7 @@ export class DatePlugin extends FunctionPlugin {
       return dateNumber
     }
 
-    return this.interpreter.dateHelper.numberToDate(dateNumber).month
+    return this.interpreter.dateHelper.numberToSimpleDate(dateNumber).month
   }
 
   /**
@@ -227,7 +227,7 @@ export class DatePlugin extends FunctionPlugin {
       return dateNumber
     }
 
-    return this.interpreter.dateHelper.numberToDate(dateNumber).year
+    return this.interpreter.dateHelper.numberToSimpleDate(dateNumber).year
   }
 
   /**

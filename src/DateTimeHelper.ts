@@ -57,9 +57,9 @@ export class DateTimeHelper {
     // add two days (this is the config default)
     // otherwise only one day
     if(!config.leapYear1900 && 0 <= this.dateToNumber({year: 1900, month: 2, day: 28})) {
-      this.epochYearZero = this.numberToDate(2).year
+      this.epochYearZero = this.numberToSimpleDate(2).year
     } else {
-      this.epochYearZero = this.numberToDate(1).year
+      this.epochYearZero = this.numberToSimpleDate(1).year
     }
     this.parseDateTime = config.parseDateTime
   }
@@ -140,7 +140,7 @@ export class DateTimeHelper {
     return ((time.second/60+time.minute)/60+time.hour)/24
   }
 
-  public numberToDate(arg: number): SimpleDate {
+  public numberToSimpleDate(arg: number): SimpleDate {
     const dateNumber = arg + this.minDateAboluteValue
     let year = Math.floor(dateNumber / 365.2425)
     if (this.dateToNumberFromZero({year: year + 1, month: 1, day: 1}) <= dateNumber) {
@@ -157,7 +157,7 @@ export class DateTimeHelper {
     return {year, month: month + 1, day: day + 1}
   }
 
-  public numberToTime(arg: number): SimpleTime {
+  public numberToSimpleTime(arg: number): SimpleTime {
     let second = Math.round(arg*60*60*24 * 1000000000) / 1000000000
     let minute = Math.floor(second / 60)
     second = second % 60
@@ -166,8 +166,8 @@ export class DateTimeHelper {
     return {hour, minute, second}
   }
 
-  public numberToDateTime(arg: number): SimpleDateTime {
-    return {...this.numberToDate(Math.floor(arg)), ...this.numberToTime(arg%1)}
+  public numberToSimpleDateTime(arg: number): SimpleDateTime {
+    return {...this.numberToSimpleDate(Math.floor(arg)), ...this.numberToSimpleTime(arg%1)}
   }
 
   private leapYearsCount(year: number): number {
