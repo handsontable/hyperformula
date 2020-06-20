@@ -1,4 +1,4 @@
-import {DetailedCellError, ErrorType, HyperFormula, NoSheetWithIdError, SheetNameAlreadyTakenError} from '../src'
+import {DetailedCellError, ErrorType, HyperFormula} from '../src'
 import {CellType, CellValueType} from '../src/Cell'
 import {plPL} from '../src/i18n'
 import {adr, detailedError, expectArrayWithSameContent} from './testUtils'

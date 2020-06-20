@@ -1,4 +1,4 @@
-import {HyperFormula, NoSheetWithIdError, SheetNameAlreadyTakenError} from '../../src'
+import {HyperFormula, SheetNameAlreadyTakenError} from '../../src'
 import {plPL} from '../../src/i18n'
 import {adr} from '../testUtils'
 
