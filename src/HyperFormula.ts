@@ -1676,6 +1676,34 @@ export class HyperFormula implements TypedEmitter {
   }
 
   /**
+   * Clears the redo stack in undoRedo history.
+   *
+   * @example
+   * ```js
+   * hfInstance.clearRedo();
+   * ```
+   *
+   * @category Undo and Redo
+   */
+  public clearRedo(): void {
+    this._crudOperations.undoRedo.clearRedoStack()
+  }
+
+  /**
+   * Clears the undo stack in undoRedo history.
+   *
+   * @example
+   * ```js
+   * hfInstance.clearUndo();
+   * ```
+   *
+   * @category Undo and Redo
+   */
+  public clearUndo(): void {
+    this._crudOperations.undoRedo.clearUndoStack()
+  }
+
+  /**
    * Returns the cell content of a given range in a [[CellValue]][][] format.
    *
    * @param {SimpleCellAddress} leftCorner - address of the upper left corner of a range
