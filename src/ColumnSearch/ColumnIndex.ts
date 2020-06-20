@@ -12,12 +12,11 @@ import {
   movedSimpleCellAddress,
   SimpleCellAddress
 } from '../Cell'
-import {ColumnsSpan} from '../ColumnsSpan'
 import {Config} from '../Config'
 import {DependencyGraph} from '../DependencyGraph'
 import {LazilyTransformingAstService} from '../LazilyTransformingAstService'
 import {Matrix} from '../Matrix'
-import {RowsSpan} from '../RowsSpan'
+import {ColumnsSpan, RowsSpan} from '../Span'
 import {Statistics, StatType} from '../statistics'
 import {ColumnBinarySearch} from './ColumnBinarySearch'
 import {ColumnSearchStrategy} from './ColumnSearchStrategy'

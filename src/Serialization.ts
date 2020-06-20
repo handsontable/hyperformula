@@ -74,6 +74,21 @@ export class Serialization {
         const address = simpleCellAddress(sheet, j, i)
         arr[i][j] = getter(address)
       }
+      for(let j=sheetWidth-1; j>=0; j--) {
+        if(arr[i][j]===null || arr[i][j]===undefined) {
+          arr[i].pop()
+        } else {
+          break
+        }
+      }
+    }
+
+    for(let i=sheetHeight-1; i>=0; i--) {
+      if(arr[i].length===0) {
+        arr.pop()
+      } else {
+        break
+      }
     }
     return arr
   }
