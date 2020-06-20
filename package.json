@@ -74,7 +74,9 @@
     "verify:umd:full.min": "node script/check-file.js dist/hyperformula.full.min.js",
     "verify:cjs": "node script/check-file.js commonjs",
     "verify:publish-package": "npm pack | node script/check-publish-package.js",
-    "check:licenses": "license-checker --production --excludePackages=\"hyperformula@0.0.1\" --onlyAllow=\"MIT; Apache-2.0; BSD-3-Clause; BSD-2-Clause; ISC; BSD; Unlicense\""
+    "check:licenses": "license-checker --production --excludePackages=\"hyperformula@0.0.1\" --onlyAllow=\"MIT; Apache-2.0; BSD-3-Clause; BSD-2-Clause; ISC; BSD; Unlicense\"",
+    "tsnode": "ts-node -O '{\"module\":\"commonjs\"}'",
+    "benchmark:stage-1": "npm run tsnode benchmark/stage-1.ts"
   },
   "devDependencies": {
     "@babel/cli": "^7.8.4",
