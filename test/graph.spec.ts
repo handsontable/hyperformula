@@ -14,7 +14,7 @@ describe('Basic Graph manipulation', () => {
     expect(graph.nodesCount()).toBe(1)
   })
 
-  it('#addNode for the second time', () => {
+  it('#addNode for the seconds time', () => {
     const graph = new Graph(dummyGetDependenciesQuery)
 
     const node = identifiableString(0, 'foo')
@@ -24,7 +24,7 @@ describe('Basic Graph manipulation', () => {
     expect(graph.nodesCount()).toBe(1)
   })
 
-  it('#addNode for the second time doesnt reset adjacent nodes', () => {
+  it('#addNode for the seconds time doesnt reset adjacent nodes', () => {
     const graph = new Graph(dummyGetDependenciesQuery)
 
     const node0 = identifiableString(0, 'foo')

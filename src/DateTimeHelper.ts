@@ -16,9 +16,9 @@ export interface SimpleDate {
 }
 
 export interface SimpleTime {
-  hour: number,
-  minute: number,
-  second: number,
+  hours: number,
+  minutes: number,
+  seconds: number,
 }
 
 export type SimpleDateTime = SimpleDate & SimpleTime
@@ -35,7 +35,7 @@ export function instanceOfSimpleDate(obj: any): obj is SimpleDate {
 
 export function instanceOfSimpleTime(obj: any): obj is SimpleTime {
   if( obj && (typeof obj === 'object' || typeof obj === 'function')) {
-    return 'hour' in obj && typeof obj.hour === 'number' && 'minute' in obj && typeof obj.minute === 'number' && 'second' in obj && typeof obj.second === 'number'
+    return 'hours' in obj && typeof obj.hours === 'number' && 'minutes' in obj && typeof obj.minutes === 'number' && 'seconds' in obj && typeof obj.seconds === 'number'
   } else {
     return false
   }
@@ -137,7 +137,7 @@ export class DateTimeHelper {
   }
 
   public timeToNumber(time: SimpleTime): number {
-    return ((time.second/60+time.minute)/60+time.hour)/24
+    return ((time.seconds/60+time.minutes)/60+time.hours)/24
   }
 
   public numberToSimpleDate(arg: number): SimpleDate {
@@ -158,12 +158,16 @@ export class DateTimeHelper {
   }
 
   public numberToSimpleTime(arg: number): SimpleTime {
-    let second = Math.round(arg*60*60*24 * 1000000000) / 1000000000
-    let minute = Math.floor(second / 60)
-    second = second % 60
-    const hour = Math.floor(minute / 60)
-    minute = minute % 60
-    return {hour, minute, second}
+    arg = Math.round(arg*24*60*60*100000) / (24*60*60*100000)
+    arg *= 24
+    const hours = Math.floor(arg)
+    arg -= hours
+    arg *= 60
+    const minutes = Math.floor(arg)
+    arg -= minutes
+    arg *= 60
+    let seconds = Math.round(arg*100000) / 100000
+    return {hours, minutes, seconds}
   }
 
   public numberToSimpleDateTime(arg: number): SimpleDateTime {

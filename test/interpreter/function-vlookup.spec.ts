@@ -30,7 +30,7 @@ const sharedExamples = (builder: (sheet: Sheet, config?: Partial<ConfigParams>) 
       expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE))
     })
 
-    it('wrong type of second argument', () => {
+    it('wrong type of seconds argument', () => {
       const engine = builder([
         ['=VLOOKUP(1, "foo", 2, TRUE())'],
       ])

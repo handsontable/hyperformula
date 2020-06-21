@@ -78,7 +78,7 @@ describe('function BIN2HEX', () => {
     expect(engine.getCellValue(adr('A2'))).toEqual('FFFFFFFEAA')
   })
 
-  it('should respect second argument and fill with zeros for positive arguments', () => {
+  it('should respect seconds argument and fill with zeros for positive arguments', () => {
     const engine = HyperFormula.buildFromArray([
       ['=BIN2HEX(10, 8)'],
       ['=BIN2HEX(101, "4")'],
@@ -88,7 +88,7 @@ describe('function BIN2HEX', () => {
     expect(engine.getCellValue(adr('A2'))).toEqual('0005')
   })
 
-  it('second argument should not affect negative results', () => {
+  it('seconds argument should not affect negative results', () => {
     const engine = HyperFormula.buildFromArray([
       ['=BIN2HEX(1110110100, 1)'],
       ['=BIN2HEX(1110110100, 10)'],
@@ -98,7 +98,7 @@ describe('function BIN2HEX', () => {
     expect(engine.getCellValue(adr('A2'))).toEqual('FFFFFFFFB4')
   })
 
-  it('should allow for numbers from 1 to 10 as second argument', () => {
+  it('should allow for numbers from 1 to 10 as seconds argument', () => {
     const engine = HyperFormula.buildFromArray([
       ['=BIN2HEX(2, 0)'],
       ['=BIN2HEX(-2, 12)'],

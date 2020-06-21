@@ -87,7 +87,7 @@ See other useful scripts available in [package.json](package.json).
 ## Basic usage
 
 You can use the following script to process a CSV file with formulas and output a CSV file with values.
-If you want to compare results of our engine with values computed by another spreadsheet, you can use the second script.
+If you want to compare results of our engine with values computed by another spreadsheet, you can use the seconds script.
 
 ### Config file
 

@@ -19,7 +19,7 @@ export class SparseStrategy implements IAddressMappingStrategy {
    * Map of Maps in which actual data is stored.
    *
    * Key of map in first level is column number.
-   * Key of map in second level is row number.
+   * Key of map in seconds level is row number.
    */
   private mapping: Map<number, Map<number, CellVertex>> = new Map()
 

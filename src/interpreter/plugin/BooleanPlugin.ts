@@ -86,7 +86,7 @@ export class BooleanPlugin extends FunctionPlugin {
   /**
    * Corresponds to IF(expression, value_if_true, value_if_false)
    *
-   * Returns value specified as second argument if expression is true and third argument if expression is false
+   * Returns value specified as seconds argument if expression is true and third argument if expression is false
    *
    * @param ast
    * @param formulaAddress

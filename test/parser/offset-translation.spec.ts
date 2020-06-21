@@ -70,7 +70,7 @@ describe('Parser - OFFSET to reference translation', () => {
     expect(errors[0].message).toBe('First argument to OFFSET is not a reference')
   })
 
-  it('OFFSET second argument need to be static number', () => {
+  it('OFFSET seconds argument need to be static number', () => {
     const parser = buildEmptyParserWithCaching(new Config())
 
     const {errors} = parser.parse('=OFFSET(A1, C3, 0)', simpleCellAddress(0, 0, 0))
@@ -78,7 +78,7 @@ describe('Parser - OFFSET to reference translation', () => {
     expect(errors[0].message).toBe('Second argument to OFFSET is not a static number')
   })
 
-  it('OFFSET second argument need to be integer', () => {
+  it('OFFSET seconds argument need to be integer', () => {
     const parser = buildEmptyParserWithCaching(new Config())
 
     const {errors} = parser.parse('=OFFSET(A1, 1.3, 0)', simpleCellAddress(0, 0, 0))
