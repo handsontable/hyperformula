@@ -60,6 +60,7 @@
     "test:unit": "cross-env NODE_ICU_DATA=node_modules/full-icu jest",
     "test:browser": "karma start",
     "test:browser.debug": "cross-env NODE_ENV=debug karma start",
+    "test:performance": "npm run benchmark:basic && npm run benchmark:cruds",
     "jasmine:start": "cross-env NODE_ICU_DATA=node_modules/full-icu jasmine --config=jasmine.json",
     "typedoc:build": "typedoc --options .typedoc.ts",
     "typedoc:serve": "npm run typedoc:build && serve doc -p 5005",
@@ -76,7 +77,9 @@
     "verify:publish-package": "npm pack | node script/check-publish-package.js",
     "check:licenses": "license-checker --production --excludePackages=\"hyperformula@0.0.1\" --onlyAllow=\"MIT; Apache-2.0; BSD-3-Clause; BSD-2-Clause; ISC; BSD; Unlicense\"",
     "tsnode": "ts-node -O '{\"module\":\"commonjs\"}'",
-    "benchmark:stage-1": "npm run tsnode benchmark/stage-1.ts"
+    "benchmark:basic": "npm run tsnode test/performance/1-basic.ts",
+    "benchmark:test": "npm run tsnode test/performance/test.ts",
+    "benchmark:cruds": "npm run tsnode test/performance/2-cruds.ts"
   },
   "devDependencies": {
     "@babel/cli": "^7.8.4",
