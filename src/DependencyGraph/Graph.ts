@@ -301,13 +301,13 @@ export class Graph<T> {
   }
 
   private removeDependencies(node: T): Set<T> {
-    const dependentNodes = this.dependencyQuery(node)
-    if (!dependentNodes) {
+    const dependencies = this.dependencyQuery(node)
+    if (!dependencies) {
       return new Set()
     }
-    for (const dependentNode of dependentNodes) {
-      this.softRemoveEdge(dependentNode, node)
+    for (const dependency of dependencies) {
+      this.softRemoveEdge(dependency, node)
     }
-    return dependentNodes
+    return dependencies
   }
 }

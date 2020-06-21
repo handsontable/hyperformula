@@ -7,11 +7,15 @@ import {CellRange, simpleCellAddress, SimpleCellAddress, SimpleColumnAddress, Si
 import {DependencyGraph} from './DependencyGraph'
 import {AstNodeType, CellAddress, CellRangeAst} from './parser'
 import {ColumnRangeAst, RowRangeAst} from './parser/Ast'
+import {RowsSpan, Span} from './Span'
 
 export const DIFFERENT_SHEETS_ERROR = 'AbsoluteCellRange: Start and end are in different sheets'
 export const WRONG_RANGE_SIZE = 'AbsoluteCellRange: Wrong range size'
 
 export class AbsoluteCellRange {
+  public readonly start: SimpleCellAddress
+  public readonly end: SimpleCellAddress
+
   public get sheet() {
     return this.start.sheet
   }
@@ -57,12 +61,14 @@ export class AbsoluteCellRange {
   }
 
   constructor(
-    public readonly start: SimpleCellAddress,
-    public readonly end: SimpleCellAddress,
+    start: SimpleCellAddress,
+    end: SimpleCellAddress,
   ) {
     if (start.sheet !== end.sheet) {
       throw new Error(DIFFERENT_SHEETS_ERROR)
     }
+    this.start = simpleCellAddress(start.sheet, start.col, start.row)
+    this.end = simpleCellAddress(end.sheet, end.col, end.row)
   }
 
   public isFinite(): boolean {
@@ -166,14 +172,24 @@ export class AbsoluteCellRange {
     this.end.sheet = toSheet
   }
 
-  public removeRows(rowStart: number, rowEnd: number) {
+  public removeSpan(span: Span) {
+    if (span instanceof RowsSpan) {
+      this.removeRows(span.start, span.end)
+    } else {
+      this.removeColumns(span.start, span.end)
+    }
+  }
+
+  protected removeRows(rowStart: number, rowEnd: number) {
     if (rowStart > this.end.row) {
       return
     }
 
     if (rowEnd < this.start.row) {
-      return this.shiftByRows(-(rowEnd - rowStart + 1))
+      const numberOfRows = rowEnd - rowStart + 1
+      return this.shiftByRows(-numberOfRows)
     }
+
     if (rowStart <= this.start.row) {
       this.start.row = rowStart
     }
@@ -181,16 +197,16 @@ export class AbsoluteCellRange {
     this.end.row -= Math.min(rowEnd, this.end.row) - rowStart + 1
   }
 
-  public removeColumns(columnStart: number, columnEnd: number) {
-    const numberOfColumns = columnEnd - columnStart + 1
+  protected removeColumns(columnStart: number, columnEnd: number) {
     if (columnStart > this.end.col) {
       return
     }
 
     if (columnEnd < this.start.col) {
-      this.shiftByColumns(-numberOfColumns)
-      return
+      const numberOfColumns = columnEnd - columnStart + 1
+      return this.shiftByColumns(-numberOfColumns)
     }
+
     if (columnStart <= this.start.col) {
       this.start.col = columnStart
     }
@@ -360,7 +376,7 @@ export class AbsoluteColumnRange extends AbsoluteCellRange {
     return new AbsoluteColumnRange(this.sheet, this.start.col + byCols, this.end.col + byCols)
   }
 
-  public removeRows(_rowStart: number, _rowEnd: number) {
+  protected removeRows(_rowStart: number, _rowEnd: number) {
     return
   }
 
@@ -410,7 +426,7 @@ export class AbsoluteRowRange extends AbsoluteCellRange {
     return new AbsoluteRowRange(this.sheet, this.start.row + byRows, this.end.row + byRows)
   }
 
-  public removeColumns(_columnStart: number, _columnEnd: number) {
+  protected removeColumns(_columnStart: number, _columnEnd: number) {
     return
   }
 

@@ -5,13 +5,13 @@
 
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
 import {InternalCellValue, InternalNoErrorCellValue, InternalScalarValue, SimpleCellAddress} from '../Cell'
-import {ColumnsSpan} from '../ColumnsSpan'
 import {Config} from '../Config'
 import {DependencyGraph} from '../DependencyGraph'
 import {Matrix} from '../Matrix'
 import {Statistics} from '../statistics/Statistics'
 import {ColumnBinarySearch} from './ColumnBinarySearch'
 import {ColumnIndex} from './ColumnIndex'
+import {ColumnsSpan} from '../Span'
 
 export interface ColumnSearchStrategy {
   add(value: InternalCellValue | Matrix, address: SimpleCellAddress): void,

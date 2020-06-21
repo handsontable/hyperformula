@@ -9,7 +9,6 @@ import {CellContent, CellContentParser, isMatrix, RawCellContent} from './CellCo
 import {ClipboardCell, ClipboardOperations} from './ClipboardOperations'
 import {AddColumnsCommand, AddRowsCommand, Operations, RemoveColumnsCommand, RemoveRowsCommand} from './Operations'
 import {ColumnSearchStrategy} from './ColumnSearch/ColumnSearchStrategy'
-import {ColumnsSpan} from './ColumnsSpan'
 import {Config} from './Config'
 import {ContentChanges} from './ContentChanges'
 import {DependencyGraph, SheetMapping} from './DependencyGraph'
@@ -39,7 +38,7 @@ import {
 } from './errors'
 import {LazilyTransformingAstService} from './LazilyTransformingAstService'
 import {ParserWithCaching} from './parser'
-import {RowsSpan} from './RowsSpan'
+import {ColumnsSpan, RowsSpan} from './Span'
 import {Statistics} from './statistics'
 import {
   AddColumnsUndoEntry,
@@ -56,11 +55,13 @@ import {
   RemoveNamedExpressionUndoEntry,
   RemoveRowsUndoEntry,
   RemoveSheetUndoEntry,
+  RenameSheetUndoEntry,
   SetCellContentsUndoEntry,
   SetSheetContentUndoEntry,
   UndoRedo
 } from './UndoRedo'
 import {findBoundaries, validateAsSheet} from './Sheet'
+import {Maybe} from './Maybe'
 
 export type ColumnRowIndex = [number, number]
 
@@ -221,6 +222,16 @@ export class CrudOperations {
     const oldSheetContent = this.operations.getSheetClipboardCells(sheetId)
     const version = this.operations.removeSheet(sheetName)
     this.undoRedo.saveOperation(new RemoveSheetUndoEntry(originalName, sheetId, oldSheetContent, version))
+  }
+
+  public renameSheet(sheetId: number, newName: string): Maybe<string> {
+    this.ensureItIsPossibleToRenameSheet(sheetId, newName)
+    const oldName = this.operations.renameSheet(sheetId, newName)
+    if (oldName !== undefined) {
+      this.undoRedo.clearRedoStack()
+      this.undoRedo.saveOperation(new RenameSheetUndoEntry(sheetId, oldName, newName))
+    }
+    return oldName
   }
 
   public clearSheet(sheetName: string): void {
@@ -489,6 +500,17 @@ export class CrudOperations {
 
   public ensureItIsPossibleToAddSheet(name: string): void {
     if (this.sheetMapping.hasSheetWithName(name)) {
+      throw new SheetNameAlreadyTakenError(name)
+    }
+  }
+
+  public ensureItIsPossibleToRenameSheet(sheetId: number, name: string): void {
+    if (!this.sheetMapping.hasSheetWithId(sheetId)) {
+      throw new NoSheetWithIdError(sheetId)
+    }
+
+    const existingSheetId = this.sheetMapping.get(name)
+    if (existingSheetId !== undefined && existingSheetId !== sheetId) {
       throw new SheetNameAlreadyTakenError(name)
     }
   }

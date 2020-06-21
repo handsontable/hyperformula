@@ -7,7 +7,6 @@ import {CellError, ErrorType, InternalScalarValue, SimpleCellAddress} from '../.
 import {Maybe} from '../../Maybe'
 import {AstNodeType, ProcedureAst} from '../../parser'
 import {coerceToRange} from '../ArithmeticHelper'
-import {CriterionPackage} from '../Criterion'
 import {Condition, CriterionFunctionCompute} from '../CriterionFunctionCompute'
 import {SimpleRangeValue} from '../InterpreterValue'
 import {FunctionPlugin} from './FunctionPlugin'
@@ -106,7 +105,7 @@ export class SumifPlugin extends FunctionPlugin {
     } else if (criterionValue instanceof CellError) {
       return criterionValue
     }
-    const criterion = CriterionPackage.fromCellValue(criterionValue, this.interpreter.arithmeticHelper)
+    const criterion = this.interpreter.criterionBuilder.fromCellValue(criterionValue, this.interpreter.arithmeticHelper)
     if (criterion === undefined) {
       return new CellError(ErrorType.VALUE)
     }
@@ -159,7 +158,7 @@ export class SumifPlugin extends FunctionPlugin {
       } else if (criterionValue instanceof CellError) {
         return criterionValue
       }
-      const criterionPackage = CriterionPackage.fromCellValue(criterionValue, this.interpreter.arithmeticHelper)
+      const criterionPackage = this.interpreter.criterionBuilder.fromCellValue(criterionValue, this.interpreter.arithmeticHelper)
       if (criterionPackage === undefined) {
         return new CellError(ErrorType.VALUE)
       }
@@ -196,7 +195,7 @@ export class SumifPlugin extends FunctionPlugin {
     } else if (criterionValue instanceof CellError) {
       return criterionValue
     }
-    const criterionPackage = CriterionPackage.fromCellValue(criterionValue, this.interpreter.arithmeticHelper)
+    const criterionPackage = this.interpreter.criterionBuilder.fromCellValue(criterionValue, this.interpreter.arithmeticHelper)
     if (criterionPackage === undefined) {
       return new CellError(ErrorType.VALUE)
     }
@@ -263,7 +262,7 @@ export class SumifPlugin extends FunctionPlugin {
     } else if (criterionValue instanceof CellError) {
       return criterionValue
     }
-    const criterionPackage = CriterionPackage.fromCellValue(criterionValue, this.interpreter.arithmeticHelper)
+    const criterionPackage = this.interpreter.criterionBuilder.fromCellValue(criterionValue, this.interpreter.arithmeticHelper)
     if (criterionPackage === undefined) {
       return new CellError(ErrorType.VALUE)
     }
@@ -300,7 +299,7 @@ export class SumifPlugin extends FunctionPlugin {
       } else if (criterionValue instanceof CellError) {
         return criterionValue
       }
-      const criterionPackage = CriterionPackage.fromCellValue(criterionValue, this.interpreter.arithmeticHelper)
+      const criterionPackage = this.interpreter.criterionBuilder.fromCellValue(criterionValue, this.interpreter.arithmeticHelper)
       if (criterionPackage === undefined) {
         return new CellError(ErrorType.VALUE)
       }

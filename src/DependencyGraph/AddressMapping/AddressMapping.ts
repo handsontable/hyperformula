@@ -4,8 +4,7 @@
  */
 
 import {EmptyValue, InternalCellValue, SimpleCellAddress} from '../../Cell'
-import {ColumnsSpan} from '../../ColumnsSpan'
-import {RowsSpan} from '../../RowsSpan'
+import {ColumnsSpan, RowsSpan} from '../../Span'
 import {MatrixVertex} from '../index'
 import {CellVertex} from '../Vertex'
 import {ChooseAddressMapping} from './ChooseAddressMappingPolicy'

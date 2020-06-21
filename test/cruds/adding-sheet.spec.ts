@@ -1,4 +1,4 @@
-import {HyperFormula} from '../../src'
+import {HyperFormula, SheetNameAlreadyTakenError} from '../../src'
 import {plPL} from '../../src/i18n'
 import {adr} from '../testUtils'
 
@@ -94,5 +94,14 @@ describe('add sheet to engine', () => {
     const sheetName = engine.addSheet()
 
     expect(sheetName).toEqual('Sheet1')
+  })
+
+  it('should throw error when sheet name is already taken', () => {
+    const engine = HyperFormula.buildEmpty()
+    engine.addSheet('bar')
+
+    expect(() => {
+      engine.addSheet('bar')
+    }).toThrow(new SheetNameAlreadyTakenError('bar'))
   })
 })

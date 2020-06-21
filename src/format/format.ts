@@ -3,7 +3,7 @@
  * Copyright (c) 2020 Handsoncode. All rights reserved.
  */
 
-import {InternalCellValue, InternalScalarValue} from '../Cell'
+import {InternalScalarValue} from '../Cell'
 import {Config} from '../Config'
 import {secondsExtendedRegexp} from '../DateTimeDefault'
 import {DateTimeHelper, SimpleDateTime, SimpleTime} from '../DateTimeHelper'
