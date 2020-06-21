@@ -81,25 +81,25 @@ describe('AbsoluteCellRange#doesOverlap', () => {
     expect(range1.doesOverlap(range2)).toBe(false)
   })
 
-  it('seconds on the right side of the first', () => {
+  it('second on the right side of the first', () => {
     const range1 = new AbsoluteCellRange(adr('B1'), adr('C4'))
     const range2 = new AbsoluteCellRange(adr('D1'), adr('E4'))
     expect(range1.doesOverlap(range2)).toBe(false)
   })
 
-  it('seconds on the left side of the first', () => {
+  it('second on the left side of the first', () => {
     const range1 = new AbsoluteCellRange(adr('B1'), adr('C4'))
     const range2 = new AbsoluteCellRange(adr('A1'), adr('A4'))
     expect(range1.doesOverlap(range2)).toBe(false)
   })
 
-  it('seconds on the top of the first', () => {
+  it('second on the top of the first', () => {
     const range1 = new AbsoluteCellRange(adr('B3'), adr('C4'))
     const range2 = new AbsoluteCellRange(adr('B1'), adr('C2'))
     expect(range1.doesOverlap(range2)).toBe(false)
   })
 
-  it('seconds on the bottom of the first', () => {
+  it('second on the bottom of the first', () => {
     const range1 = new AbsoluteCellRange(adr('B3'), adr('C4'))
     const range2 = new AbsoluteCellRange(adr('B5'), adr('C6'))
     expect(range1.doesOverlap(range2)).toBe(false)
