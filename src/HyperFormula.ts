@@ -191,7 +191,7 @@ export class HyperFormula implements TypedEmitter {
   /**
    * Builds the engine for a sheet from a two-dimensional array representation.
    * The engine is created with a single sheet.
-   * Can be configured with the optional seconds parameter that represents a [[ConfigParams]].
+   * Can be configured with the optional second parameter that represents a [[ConfigParams]].
    * If not specified, the engine will be built with the default configuration.
    *
    * @param {Sheet} sheet - two-dimensional array representation of sheet
@@ -223,7 +223,7 @@ export class HyperFormula implements TypedEmitter {
   /**
    * Builds the engine from an object containing multiple sheets with names.
    * The engine is created with one or more sheets.
-   * Can be configured with the optional seconds parameter that represents a [[ConfigParams]].
+   * Can be configured with the optional second parameter that represents a [[ConfigParams]].
    * If not specified the engine will be built with the default configuration.
    *
    * @param {Sheet} sheets - object with sheets definition
@@ -882,7 +882,7 @@ export class HyperFormula implements TypedEmitter {
    *  ['3', ''],
    * ]);
    *
-   * // perform CRUD operation, for example remove the seconds row
+   * // perform CRUD operation, for example remove the second row
    * hfInstance.removeRows(0, [1, 1]);
    *
    * // do an undo, it should return the changes
@@ -913,13 +913,13 @@ export class HyperFormula implements TypedEmitter {
    *  ['3'],
    * ]);
    *
-   * // perform CRUD operation, for example remove the seconds row
+   * // perform CRUD operation, for example remove the second row
    * hfInstance.removeRows(0, [1, 1]);
    *
    * // do an undo, it should return prvious values: [['1'], ['2'], ['3']]
    * hfInstance.undo();
    *
-   * // do a redo, it should return the values after removing the seconds row: [['1'], ['3']]
+   * // do a redo, it should return the values after removing the second row: [['1'], ['3']]
    * const changes = hfInstance.redo();
    * ```
    *
@@ -941,7 +941,7 @@ export class HyperFormula implements TypedEmitter {
    *  ['3'],
    * ]);
    *
-   * // perform CRUD operation, for example remove the seconds row
+   * // perform CRUD operation, for example remove the second row
    * hfInstance.removeRows(0, [1, 1]);
    *
    * // should return 'true', it is possible to undo last operation
@@ -1066,7 +1066,7 @@ export class HyperFormula implements TypedEmitter {
    * ]);
    *
    * // should return 'true' for this example,
-   * // it is possible to add one row in the seconds row of sheet 0
+   * // it is possible to add one row in the second row of sheet 0
    * const isAddable = hfInstance.isItPossibleToAddRows(0, [1, 1]);
    * ```
    *
@@ -1268,7 +1268,7 @@ export class HyperFormula implements TypedEmitter {
    * ]);
    *
    * // should return 'true' for this example
-   * // it is possible to remove one column, in place of the seconds column of sheet 0
+   * // it is possible to remove one column, in place of the second column of sheet 0
    * const isRemovable = hfInstance.isItPossibleToRemoveColumns(0, [1, 1]);
    * ```
    *
@@ -2108,7 +2108,7 @@ export class HyperFormula implements TypedEmitter {
    *  MySheet2: [ ['10'] ],
    * });
    *
-   * // should return 'MySheet2' as this sheet is the seconds one
+   * // should return 'MySheet2' as this sheet is the second one
    * const sheetName = hfInstance.getSheetName(1);
    * ```
    *
@@ -2467,7 +2467,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * // similar to batch() but operations are not within a callback,
    * // one method suspends the recalculation
-   * // the seconds will resume calculations and return the changes
+   * // the second will resume calculations and return the changes
    *
    * // suspend the evaluation with this method
    * hfInstance.suspendEvaluation();
@@ -2498,7 +2498,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * // similar to batch() but operations are not within a callback,
    * // one method suspends the recalculation
-   * // the seconds will resume calculations and return the changes
+   * // the second will resume calculations and return the changes
    *
    * // first, suspend the evaluation
    * hfInstance.suspendEvaluation();
