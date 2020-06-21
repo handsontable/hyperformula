@@ -1,4 +1,4 @@
-import {DetailedCellError, ErrorType, HyperFormula, NoSheetWithIdError, SheetNameAlreadyTakenError} from '../src'
+import {DetailedCellError, ErrorType, HyperFormula} from '../src'
 import {CellType, CellValueType} from '../src/Cell'
 import {plPL} from '../src/i18n'
 import {adr, detailedError, expectArrayWithSameContent} from './testUtils'
@@ -227,7 +227,7 @@ describe('#getSheetFormulas', () => {
 
     const out = engine.getSheetFormulas(0)
 
-    expectArrayWithSameContent([['=SUM(1, A2)', '=TRUE()', undefined], ['=SUM(', undefined, undefined]], out)
+    expectArrayWithSameContent([['=SUM(1, A2)', '=TRUE()'], ['=SUM(']], out)
   })
 })
 

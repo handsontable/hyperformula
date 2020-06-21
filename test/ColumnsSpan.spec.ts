@@ -1,4 +1,4 @@
-import {ColumnsSpan} from '../src/ColumnsSpan'
+import {ColumnsSpan} from '../src/Span'
 
 describe('ColumnsSpan', () => {
   it('raise error when starting column is less than 0', () => {
