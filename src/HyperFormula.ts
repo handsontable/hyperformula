@@ -3025,7 +3025,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * @example
    * ```js
-   * const engine HyperFormula.buildEmpty();
+   * const engine = HyperFormula.buildEmpty();
    *
    * const dateTimeFromNumber = engine.numberToDateTime(43845.1);
    *
@@ -3045,7 +3045,9 @@ export class HyperFormula implements TypedEmitter {
 
    * @example
    * ```js
-   * HyperFormula.buildEmpty().numberToDate(43845);
+   * const engine = HyperFormula.buildEmpty();
+   *
+   * const dateFromNumber = engine.numberToDate(43845);
    *
    * // returns {year: 2020, month: 1, day: 15}
    * ```
@@ -3063,7 +3065,8 @@ export class HyperFormula implements TypedEmitter {
    *
    * @example
    * ```js
-   * HyperFormula.buildEmpty().numberToTime(1.1);
+   * const engine = HyperFormula.buildEmpty();
+   * const timeFromNumber = engine.numberToTime(1.1);
    *
    * // returns {hours: 26, minutes: 24}
    * ```
@@ -3222,6 +3225,4 @@ export class HyperFormula implements TypedEmitter {
       return []
     }
   }
-
-
 }
