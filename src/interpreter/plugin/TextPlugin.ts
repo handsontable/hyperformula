@@ -52,7 +52,7 @@ export class TextPlugin extends FunctionPlugin {
   /**
    * Corresponds to SPLIT(string, index)
    *
-   * Splits provided string using space separator and returns chunk at zero-based position specified by seconds argument
+   * Splits provided string using space separator and returns chunk at zero-based position specified by second argument
    *
    * @param ast
    * @param formulaAddress
