@@ -84,55 +84,108 @@ module.exports = {
     sidebarDepth: 3,
     sidebar: {
       '/guide/': [
+        // {
+        //   title: 'Introduction',
+        //   path: '/guide/',
+        // },
         {
-          title: 'Introduction',
-          path: '/guide/',
+          title: 'Overview',
+          collapsable: false,
+          children: [
+            ['/guide/overview/supported-browsers', 'Supported browsers'],
+            ['/guide/overview/dependencies', 'Dependencies'],
+            ['/guide/overview/licensing', 'Licensing'],
+            ['/guide/overview/changelog', 'Changelog'],
+            ['/guide/overview/roadmap', 'Roadmap'],
+            ['/guide/overview/support', 'Support'],
+          ]
         },
         {
           title: 'Getting started',
           collapsable: false,
           children: [
-            ['/guide/requirements', 'Requirements'],
-            ['/guide/compatibility', 'Browser Compatibility'],
-            ['/guide/basic-usage', 'Basic Usage'],
-            ['/guide/data-operations', 'Data Operations'],
-            ['/guide/crud-operations', 'CRUD Operations Explained'],
-            ['/guide/config-options', 'Config Options Explained'],
-            ['/guide/helpers', 'Helpers'],
-            ['/guide/working-with-events', 'Working with Events'],
-            ['/guide/handling-errors', 'Handling Errors'],
-            ['/guide/license-key', 'License Key'],
-            ['https://github.com/handsontable/hyperformula/releases', 'Release Notes'],
-            ['/guide/support', 'Support'],
+            ['/guide/getting-started/client-side', 'Client-side installation'],
+            ['/guide/getting-started/basic-usage', 'Basic usage'],
+            ['/guide/getting-started/advanced-usage', 'Advanced usage'],
+            ['/guide/getting-started/configuration-options', 'Configuration options'],
+            ['/guide/getting-started/license-key', 'License key'],
+            ['/guide/getting-started/known-limitations', 'Known limitations'],
           ]
         },
         {
-          title: 'Going deeper',
+          title: 'Framework integration',
           collapsable: false,
           children: [
-            ['/guide/custom-language', 'Custom Language'],
-            ['/guide/custom-function', 'Custom Function'],
-            ['/guide/multiple-sheets', 'Working with multiple sheets'],
-            ['/guide/named-expressions', 'Named Expressions'],
-            ['/guide/structured-references', 'Structured References'],
-            ['/guide/clipboard', 'Clipboard'],
-            ['/guide/batch-operations', 'Batch Operations'],
-            ['/guide/data-types', 'Supported Data Types'],
-            ['/guide/gpu-support', 'GPU Support'],
-            ['/guide/integrations', 'Integrations'],
-            ['/guide/testing-hyperformula', 'Testing HF'],
-          ],
+            ['/guide/framework-integration/integration-with-react', 'Integration with React'],
+            ['/guide/framework-integration/integration-with-vue', 'Integration with Vue'],
+            ['/guide/framework-integration/integration-with-angular', 'Integration with Angular'],
+          ]
         },
         {
-          title: 'Contributtor guide',
+          title: 'Data Operations',
           collapsable: false,
           children: [
-            ['/guide/graph', 'Graph'],
-            ['/guide/working-with-documentation', 'Working with the documentation'],
-            ['/guide/writing-tests', 'Writing testst for HF'],
-            ['https://github.com/handsontable/hyperformula/blob/develop/CONTRIBUTING.md', 'CONTRIBUTING.md'],
-            ['https://github.com/handsontable/hyperformula/blob/develop/CODE_OF_CONDUCT.md', 'CODE_OF_CONDUCT.md'],
-          ],
+            ['/guide/data-operations/crud-operations', 'Basic operations'],
+            ['/guide/data-operations/batch-operations', 'Batch operations'],
+            ['/guide/data-operations/clipboard-operations', 'Clipboard operations'],
+            ['/guide/data-operations/undo-redo', 'Undo-redo'],
+            ['/guide/data-operations/sorting-data', 'Sorting data'],
+          ]
+        },
+        {
+          title: 'Formula Reference',
+          collapsable: false,
+          children: [
+            ['/guide/formula-reference/specifications-and-limits', 'Specifications and limits'],
+            ['/guide/formula-reference/cell-references', 'Cell references'],
+            ['/guide/formula-reference/types-of-data', 'Types of values'],
+            ['/guide/formula-reference/types-of-errors', 'Types of errors'],
+            ['/guide/formula-reference/types-of-operators', 'Types of operators'],
+            ['/guide/formula-reference/order-of-precendece', 'Order of precedence'],
+            ['/guide/formula-reference/built-in-functions', 'Built-in functions'],
+            ['/guide/formula-reference/volatile-functions', 'Volatile functions'],
+            ['/guide/formula-reference/named-ranges', 'Named ranges'],
+          ]
+        },
+        {
+          title: 'Internationalization',
+          collapsable: false,
+          children: [
+            ['/guide/internationalization/culture-definition', 'Localizing functions'],
+            ['/guide/internationalization/date-and-time-handling', 'Date and time handling'],
+          ]
+        },
+        {
+          title: 'Advanced topics',
+          collapsable: false,
+          children: [
+            ['/guide/advanced-topics/key-concepts', 'Key concepts'],
+            ['/guide/advanced-topics/building', 'Building'],
+            ['/guide/advanced-topics/testing', 'Testing'],
+            ['/guide/advanced-topics/creating-custom-functions', 'Custom functions'],
+            ['/guide/advanced-topics/performance', 'Performance'],
+          ]
+        },
+        {
+          title: 'Contributing',
+          path: '/guide/other/contributing',
+        },
+
+        {
+          title: 'Code of conduct',
+          path: '/guide/other/code-of-conduct.md',
+        },
+        {
+          title: 'Branding',
+          path: '/guide/other/branding',
+        },
+        {
+          title: 'Acknowledgments',
+          path: '/guide/other/acknowledgements',
+        },
+        {
+          title: 'Contact',
+          path: '/guide/other/contact',
         },
       ],
       '/api/': [

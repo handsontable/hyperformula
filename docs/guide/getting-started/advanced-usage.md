@@ -1,0 +1,110 @@
+# Advanced usage
+
+The following example shows how to use formulas to find out which of the two Teams \(A or B\) is the winning one. You will do that by comparing the average scores of players in each team.
+
+The initial steps are the same as in the [basic example](basic-usage.md). First, import HyperFormula and choose the configuration options:
+
+```javascript
+import { HyperFormula } from 'hyperformula';
+
+const options = {
+    precisionRounding: 10,
+    licenseKey: 'agpl-v3'
+};
+```
+
+This time you will use the `buildFromEmpty` static method to initialize the engine:
+
+```javascript
+// initiate the engine with no data
+const hfInstance = HyperFormula.buildEmpty(options);
+```
+
+Now, let's prepare some data. The first column will be players' IDs and the second column will be their scores. Then, you will define the formulas responsible for calculating the average scores.
+
+```javascript
+// first column represents players' IDs
+// second column represents players' scores
+const playersA = [
+    ['1', '2'],
+    ['2', '3'],
+    ['3', '5'],
+    ['4', '7'],
+    ['5', '13'],
+    ['6', '17']
+];
+
+const playersB = [
+    ['7', '19'],
+    ['8', '31'],
+    ['9', '61'],
+    ['10', '89'],
+    ['11', '107'],
+    ['12', '127']
+];
+
+// in a cell A1 a formula checks which team is a winning one
+// in cells A2 and A3 formulas calculate the average score of players
+const formulas = [
+    ['=IF(Formulas!A2>Formulas!A3,"TeamA","TeamB")'],
+    ['=AVERAGE(TeamA!B1:B6)'],
+    ['=AVERAGE(TeamB!B1:B6)']
+];
+```
+
+Now prepare sheets and insert the data into them:
+
+```javascript
+// add 'TeamA' sheet
+hfInstance.addSheet('TeamA');
+// insert playersA content into targeted 'TeamA' sheet
+hfInstance.setSheetContent('TeamA', playersA);
+
+// add 'TeamB' sheet
+hfInstance.addSheet('TeamB');
+// insert playersB content into targeted 'TeamB' sheet
+hfInstance.setSheetContent('TeamB', playersB);
+
+// optionally, check the content in the console output
+console.log(hfInstance.getAllSheetsValues());
+```
+
+After setting everything up, you can add formulas:
+
+```javascript
+// add a sheet named 'Formulas'
+hfInstance.addSheet('Formulas');
+// add formulas to that sheet
+hfInstance.setSheetContent('Formulas', formulas);
+```
+
+Almost done! Now, you can use the `getSheetValues` method to get all values including the calculated ones. Alternatively, you can use `getCellValue`to get the value from a specific cell.
+
+{% hint style="success" %}
+You can work with A1 notation comfortably and use the helper function `simpleCellAddressFromString` to retrieve the `SimpleCellAddress` which is required as a parameter in some methods. This is one of several handy helper methods the HyperFormula API offers.
+{% endhint %}
+
+```javascript
+// get sheet values from the Sheet of ID 2
+const sheetValues = hfInstance.getSheetValues(2);
+
+// get a simple cell address of 'A1' from that sheet
+const simpleCellAddress = hfInstance.simpleCellAddressFromString('A1', 2);
+
+// check the winning team 🎉
+const winningTeam = hfInstance.getCellValue(simpleCellAddress);
+
+// print the result to the console
+console.log(winningTeam)
+```
+
+### Demo
+
+This demo presents an advanced usage example integrated with a sample UI.
+
+{% embed url="https://githubbox.com/handsontable/hyperformula-demos/tree/develop/advanced-usage" %}
+
+
+
+
+
