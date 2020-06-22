@@ -378,6 +378,12 @@ export class HyperFormula implements TypedEmitter {
    * @throws [[FunctionPluginValidationError]] when plugin class definition is not consistent with metadata
    * @throws [[ProtectedFunctionTranslationError]] when trying to register translation for protected function
    *
+   * @example
+   * ```js
+   * // register a plugin
+   * HyperFormula.registerFunctionPlugin(MyExamplePlugin);
+   * ```
+   *
    * @category Static Methods
    */
   public static registerFunctionPlugin(plugin: FunctionPluginDefinition, translations?: FunctionTranslationsPackage): void {
@@ -413,6 +419,11 @@ export class HyperFormula implements TypedEmitter {
    *
    * @throws [[FunctionPluginValidationError]] when function with a given id does not exists in plugin or plugin class definition is not consistent with metadata
    * @throws [[ProtectedFunctionTranslationError]] when trying to register translation for protected function
+   * @example
+   * ```js
+   * // register a function
+   * HyperFormula.registerFunction('EXAMPLE', myFunction);
+   * ```
    *
    * @category Static Methods
    */
