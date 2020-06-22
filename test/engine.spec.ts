@@ -227,7 +227,7 @@ describe('#getSheetFormulas', () => {
 
     const out = engine.getSheetFormulas(0)
 
-    expectArrayWithSameContent([['=SUM(1, A2)', '=TRUE()', undefined], ['=SUM(', undefined, undefined]], out)
+    expectArrayWithSameContent([['=SUM(1, A2)', '=TRUE()'], ['=SUM(']], out)
   })
 })
 

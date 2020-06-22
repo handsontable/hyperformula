@@ -1,9 +1,9 @@
 import {CellValue, DetailedCellError, HyperFormula} from '../src'
 import {AbsoluteCellRange, AbsoluteColumnRange, AbsoluteRowRange} from '../src/AbsoluteCellRange'
-import {CellError, ErrorType, InternalScalarValue, SimpleCellAddress, simpleCellAddress} from '../src/Cell'
+import {CellError, ErrorType, SimpleCellAddress, simpleCellAddress} from '../src/Cell'
 import {Config} from '../src/Config'
 import {DateTimeHelper} from '../src/DateTimeHelper'
-import {FormulaCellVertex, MatrixVertex} from '../src/DependencyGraph'
+import {FormulaCellVertex, MatrixVertex, RangeVertex} from '../src/DependencyGraph'
 import {defaultStringifyDateTime} from '../src/format/format'
 import {
   AstNodeType,
@@ -11,11 +11,10 @@ import {
   CellAddress,
   CellRangeAst,
   CellReferenceAst,
-  ProcedureAst,
+  ProcedureAst, simpleCellAddressToString,
 } from '../src/parser'
 import {EngineComparator} from './graphComparator'
 import {ColumnRangeAst, RowRangeAst} from '../src/parser/Ast'
-import {FunctionRegistry} from '../src/interpreter/FunctionRegistry'
 
 export const extractReference = (engine: HyperFormula, address: SimpleCellAddress): CellAddress => {
   return ((engine.addressMapping.fetchCell(address) as FormulaCellVertex).getFormula(engine.lazilyTransformingAstService) as CellReferenceAst).reference
@@ -55,6 +54,30 @@ export const expectFunctionToHaveRefError = (engine: HyperFormula, address: Simp
   expect(formula.args.find((arg) => arg!==undefined && arg.type === AstNodeType.ERROR)).toEqual(buildCellErrorAst(new CellError(ErrorType.REF)))
 }
 
+export const rangeAddr = (range: AbsoluteCellRange) => {
+  const start = simpleCellAddressToString(() => '', range.start, 0)
+  const end = simpleCellAddressToString(() => '', range.end, 0)
+  return `${start}:${end}`
+}
+
+export const verifyRangesInSheet = (engine: HyperFormula, sheet: number,  ranges: string[]) => {
+  const rangeVerticesInMapping = Array.from(engine.rangeMapping.rangesInSheet(sheet))
+    .map((vertex) => rangeAddr(vertex.range))
+
+  const rangeVerticesInGraph = Array.from(engine.graph.nodes.values()).filter(vertex => vertex instanceof RangeVertex)
+    .map(vertex => rangeAddr((vertex as RangeVertex).range))
+
+  expectNoDuplicates(rangeVerticesInGraph)
+  expectNoDuplicates(rangeVerticesInMapping)
+  expectArrayWithSameContent(rangeVerticesInGraph, ranges)
+  expectArrayWithSameContent(rangeVerticesInMapping, ranges)
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const expectNoDuplicates = (array: any[]) => {
+  expect(new Set(array).size === array.length).toBe(true)
+}
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const expectArrayWithSameContent = (expected: any[], actual: any[]) => {
   expect(actual.length).toBe(expected.length)
@@ -63,6 +86,12 @@ export const expectArrayWithSameContent = (expected: any[], actual: any[]) => {
     // @ts-ignore
     expect(actual).toContainEqual(iter)
   }
+}
+
+export const verifyValues = (engine: HyperFormula) => {
+  const serialization = engine.getAllSheetsSerialized()
+  const engine2 = HyperFormula.buildFromSheets(serialization)
+  expect(engine.getAllSheetsValues()).toEqual(engine2.getAllSheetsValues())
 }
 
 export const rowStart = (input: number, sheet: number = 0): SimpleCellAddress => {

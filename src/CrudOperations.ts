@@ -9,7 +9,6 @@ import {CellContent, CellContentParser, isMatrix, RawCellContent} from './CellCo
 import {ClipboardCell, ClipboardOperations} from './ClipboardOperations'
 import {AddColumnsCommand, AddRowsCommand, Operations, RemoveColumnsCommand, RemoveRowsCommand} from './Operations'
 import {ColumnSearchStrategy} from './ColumnSearch/ColumnSearchStrategy'
-import {ColumnsSpan} from './ColumnsSpan'
 import {Config} from './Config'
 import {ContentChanges} from './ContentChanges'
 import {DependencyGraph, SheetMapping} from './DependencyGraph'
@@ -39,7 +38,7 @@ import {
 } from './errors'
 import {LazilyTransformingAstService} from './LazilyTransformingAstService'
 import {ParserWithCaching} from './parser'
-import {RowsSpan} from './RowsSpan'
+import {ColumnsSpan, RowsSpan} from './Span'
 import {Statistics} from './statistics'
 import {
   AddColumnsUndoEntry,

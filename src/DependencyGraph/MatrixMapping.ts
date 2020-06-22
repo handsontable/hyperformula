@@ -5,9 +5,8 @@
 
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
 import {SimpleCellAddress} from '../Cell'
-import {ColumnsSpan} from '../ColumnsSpan'
 import {Maybe} from '../Maybe'
-import {RowsSpan} from '../RowsSpan'
+import {ColumnsSpan, RowsSpan} from '../Span'
 import {MatrixVertex} from './'
 
 export class MatrixMapping {
