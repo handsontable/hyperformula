@@ -2,7 +2,7 @@
 
 ### High-level design diagram
 
-![](../.gitbook/assets/hf-high-lvl-diagram.svg)
+![](/assets/hf-high-lvl-diagram.svg)
 
 The data processing consists of three phases.
 
@@ -10,7 +10,7 @@ The data processing consists of three phases.
 
 Formulas need to be parsed and represented as a so-called [Abstract Syntax Tree](https://en.wikipedia.org/wiki/Abstract_syntax_tree) \(AST\). For example, the AST for `7*3-SIN(A5)` looks will look similar to this graph:
 
-![](../.gitbook/assets/ast.png)
+![](/assets/ast.png)
 
 ### \*\*\*\*
 
@@ -20,7 +20,7 @@ HyperFormula needs to understand the relationship between cells and find the rig
 
 There can be many such orders, like so:
 
-![](../.gitbook/assets/topsort.png)
+![](/assets/topsort.png)
 
 ### \*\*\*\*
 
@@ -28,7 +28,7 @@ There can be many such orders, like so:
 
 It is crucial to evaluate cells efficiently. For simple expressions**,** there is not much room for maneuver, but spreadsheet-like data sets definitely need more attention.
 
-![](../.gitbook/assets/sample-sheet.png)
+![](/assets/sample-sheet.png)
 
 ### Grammar
 
@@ -89,7 +89,7 @@ Whereas this example is too specialized to provide a useful rule for optimizatio
 
 In the adopted implementation, every time the engine encounters a range, say `B5:D20`, it checks if it has already considered the range which is one row shorter. In this example, it would be `B5:D19`. If so, then it represents `B5:D20` as the composition of a range `B5:D19` and three cells in the last row: `B20`,`C20` and `D20`.
 
-![](../.gitbook/assets/ranges.png)
+![](/assets/ranges.png)
 
 More generally, the result of any associative operation is obtained as the result of operations for these small rows. There are many examples of such associative functions: `SUM`, `MAX`, `COUNT`, etc. As one range can be used in different formulas, we can reuse its node and avoid duplicating the work during computation.  
 

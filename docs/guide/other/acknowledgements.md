@@ -10,5 +10,5 @@ We wouldn't have made this project without co-financing from the European Region
 * Amount of grant: PLN 774 742.00
 * Duration: 2018-2019
 
-![](.gitbook/assets/eu-logos.png)
+![](/assets/eu-logos.png)
 

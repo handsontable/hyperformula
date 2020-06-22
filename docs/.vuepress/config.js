@@ -84,10 +84,6 @@ module.exports = {
     sidebarDepth: 3,
     sidebar: {
       '/guide/': [
-        // {
-        //   title: 'Introduction',
-        //   path: '/guide/',
-        // },
         {
           title: 'Overview',
           collapsable: false,
