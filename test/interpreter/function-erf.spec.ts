@@ -39,7 +39,7 @@ describe('Function ERF', () => {
     expectCloseTo(engine.getCellValue(adr('A4')), -0.999705836979508, precision)
   })
 
-  it('should work with seconds argument', () => {
+  it('should work with second argument', () => {
     const engine = HyperFormula.buildFromArray([
       ['=ERF(-2.3, -0.7)'],
       ['=ERF(-2.3, 2)'],

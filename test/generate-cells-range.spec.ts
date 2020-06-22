@@ -7,6 +7,7 @@ import {Statistics} from '../src/statistics/Statistics'
 import {NamedExpressions} from '../src/NamedExpressions'
 import {FunctionRegistry} from '../src/interpreter/FunctionRegistry'
 import {LazilyTransformingAstService} from '../src/LazilyTransformingAstService'
+import {RowsSpan} from '../src/Span'
 
 describe('generateCellsFromRange', () => {
   const config = new Config()
@@ -81,25 +82,25 @@ describe('AbsoluteCellRange#doesOverlap', () => {
     expect(range1.doesOverlap(range2)).toBe(false)
   })
 
-  it('seconds on the right side of the first', () => {
+  it('second on the right side of the first', () => {
     const range1 = new AbsoluteCellRange(adr('B1'), adr('C4'))
     const range2 = new AbsoluteCellRange(adr('D1'), adr('E4'))
     expect(range1.doesOverlap(range2)).toBe(false)
   })
 
-  it('seconds on the left side of the first', () => {
+  it('second on the left side of the first', () => {
     const range1 = new AbsoluteCellRange(adr('B1'), adr('C4'))
     const range2 = new AbsoluteCellRange(adr('A1'), adr('A4'))
     expect(range1.doesOverlap(range2)).toBe(false)
   })
 
-  it('seconds on the top of the first', () => {
+  it('second on the top of the first', () => {
     const range1 = new AbsoluteCellRange(adr('B3'), adr('C4'))
     const range2 = new AbsoluteCellRange(adr('B1'), adr('C2'))
     expect(range1.doesOverlap(range2)).toBe(false)
   })
 
-  it('seconds on the bottom of the first', () => {
+  it('second on the bottom of the first', () => {
     const range1 = new AbsoluteCellRange(adr('B3'), adr('C4'))
     const range2 = new AbsoluteCellRange(adr('B5'), adr('C6'))
     expect(range1.doesOverlap(range2)).toBe(false)
@@ -126,45 +127,45 @@ describe('AbsoluteCellRange#height', () => {
   })
 })
 
-describe('AbsoluteCellRange#removeRows', () => {
+describe('AbsoluteCellRange#removeSpan', () => {
   it('rows below', () => {
     const range = new AbsoluteCellRange(adr('A1'), adr('A4'))
-    range.removeRows(4, 5)
+    range.removeSpan(new RowsSpan(0, 4, 5))
     expect(range.start.row).toBe(0)
     expect(range.end.row).toBe(3)
   })
 
   it('rows above', () => {
     const range = new AbsoluteCellRange(adr('A3'), adr('A5'))
-    range.removeRows(0, 1)
+    range.removeSpan(new RowsSpan(0, 0, 1))
     expect(range.start.row).toBe(0)
     expect(range.end.row).toBe(2)
   })
 
   it('middle of the range', () => {
     const range = new AbsoluteCellRange(adr('A1'), adr('A5'))
-    range.removeRows(1, 2)
+    range.removeSpan(new RowsSpan(0, 1, 2))
     expect(range.start.row).toBe(0)
     expect(range.end.row).toBe(2)
   })
 
   it('start above range', () => {
     const range = new AbsoluteCellRange(adr('A3'), adr('A5'))
-    range.removeRows(0, 3)
+    range.removeSpan(new RowsSpan(0, 0, 3))
     expect(range.start.row).toBe(0)
     expect(range.end.row).toBe(0)
   })
 
   it('end below range', () => {
     const range = new AbsoluteCellRange(adr('A1'), adr('A5'))
-    range.removeRows(2, 5)
+    range.removeSpan(new RowsSpan(0, 2, 5))
     expect(range.start.row).toBe(0)
     expect(range.end.row).toBe(1)
   })
 
   it('whole range', () => {
     const range = new AbsoluteCellRange(adr('A3'), adr('A5'))
-    range.removeRows(0, 5)
+    range.removeSpan(new RowsSpan(0, 0, 5))
     expect(range.start.row).toBe(0)
     expect(range.end.row).toBe(-1)
     expect(range.height()).toBe(0)

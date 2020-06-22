@@ -74,7 +74,7 @@ describe('function DEC2OCT', () => {
     expect(engine.getCellValue(adr('A4'))).toEqual(detailedError(ErrorType.NUM))
   })
 
-  it('should respect seconds argument and fill with zeros for positive arguments', () => {
+  it('should respect second argument and fill with zeros for positive arguments', () => {
     const engine = HyperFormula.buildFromArray([
       ['=DEC2OCT(2, 8)'],
       ['=DEC2OCT(5, "4")'],
@@ -84,7 +84,7 @@ describe('function DEC2OCT', () => {
     expect(engine.getCellValue(adr('A2'))).toEqual('0005')
   })
 
-  it('should ignore seconds argument for negative numbers', () => {
+  it('should ignore second argument for negative numbers', () => {
     const engine = HyperFormula.buildFromArray([
       ['=DEC2OCT(-2, 1)'],
       ['=DEC2OCT(-2, 10)'],
@@ -94,7 +94,7 @@ describe('function DEC2OCT', () => {
     expect(engine.getCellValue(adr('A2'))).toEqual('7777777776')
   })
 
-  it('should allow for numbers from 1 to 10 as seconds argument', () => {
+  it('should allow for numbers from 1 to 10 as second argument', () => {
     const engine = HyperFormula.buildFromArray([
       ['=DEC2OCT(2, 0)'],
       ['=DEC2OCT(-2, 12)'],
