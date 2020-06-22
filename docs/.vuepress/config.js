@@ -164,24 +164,24 @@ module.exports = {
         },
         {
           title: 'Contributing',
-          path: '/guide/other/contributing',
+          path: '/guide/contributing',
         },
 
         {
           title: 'Code of conduct',
-          path: '/guide/other/code-of-conduct.md',
+          path: '/guide/code-of-conduct.md',
         },
         {
           title: 'Branding',
-          path: '/guide/other/branding',
+          path: '/guide/branding',
         },
         {
           title: 'Acknowledgments',
-          path: '/guide/other/acknowledgements',
+          path: '/guide/acknowledgements',
         },
         {
           title: 'Contact',
-          path: '/guide/other/contact',
+          path: '/guide/contact',
         },
       ],
       '/api/': [
