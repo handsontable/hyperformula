@@ -439,7 +439,7 @@ export class HyperFormula implements TypedEmitter {
    * @example
    * ```js
    * // register a function
-   * HyperFormula.registerFunction('EXAMPLE', MyExamplePlugin);
+   * HyperFormula.registerFunction('EXAMPLE', MyExampleFunction);
    *
    * // unregister a function
    * HyperFormula.unregisterFunction('EXAMPLE');
@@ -491,11 +491,11 @@ export class HyperFormula implements TypedEmitter {
    *
    * @example
    * ```js
-   * // register a function
-   * HyperFormula.registerFunction('EXAMPLE', MyExamplePlugin);
+   * // register a plugin
+   * HyperFormula.registerFunctionPlugin(MyExamplePlugin);
    *
    * // return the class of a given plugin
-   * const myFunction = HyperFormula.getAllFunctionPlugins('EXAMPLE');
+   * const myFunction = HyperFormula.getFunctionPlugin('EXAMPLE');
    * ```
    *
    * @category Static Methods
@@ -3019,6 +3019,12 @@ export class HyperFormula implements TypedEmitter {
    * Returns translated names of all functions registered in this instance of HyperFormula
    * according to the language set in the configuration
    *
+   * @example
+   * ```js
+   * // return translated names of all functions, assign to a variable
+   * const allNames = HyperFormula.getRegisteredFunctionNames();
+   * ```
+   *
    * @category Custom Functions
    */
   public getRegisteredFunctionNames(): string[] {
@@ -3031,6 +3037,15 @@ export class HyperFormula implements TypedEmitter {
    *
    * @param {string} functionId - id of a function, e.g. 'SUMIF'
    *
+   * @example
+   * ```js
+   * // register a plugin
+   * HyperFormula.registerFunctionPlugin(MyExamplePlugin);
+   *
+   * // get the plugin
+   * const myPlugin = HyperFormula.getFunctionPlugin('EXAMPLE');
+   * ```
+   *
    * @category Custom Functions
    */
   public getFunctionPlugin(functionId: string): Maybe<FunctionPluginDefinition> {
@@ -3039,6 +3054,12 @@ export class HyperFormula implements TypedEmitter {
 
   /**
    * Returns classes of all plugins registered in this instance of HyperFormula
+   *
+   * @example
+   * ```js
+   * // return classes of all plugins registered, assign to a variable
+   * const allNames = HyperFormula.getAllFunctionPlugins();
+   * ```
    *
    * @category Custom Functions
    */
