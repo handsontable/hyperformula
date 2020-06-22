@@ -1680,12 +1680,12 @@ export class HyperFormula implements TypedEmitter {
    *
    * @example
    * ```js
-   * hfInstance.clearRedo();
+   * hfInstance.clearRedoStack();
    * ```
    *
    * @category Undo and Redo
    */
-  public clearRedo(): void {
+  public clearRedoStack(): void {
     this._crudOperations.undoRedo.clearRedoStack()
   }
 
@@ -1694,12 +1694,12 @@ export class HyperFormula implements TypedEmitter {
    *
    * @example
    * ```js
-   * hfInstance.clearUndo();
+   * hfInstance.clearUndoStack();
    * ```
    *
    * @category Undo and Redo
    */
-  public clearUndo(): void {
+  public clearUndoStack(): void {
     this._crudOperations.undoRedo.clearUndoStack()
   }
 
