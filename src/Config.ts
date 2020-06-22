@@ -83,7 +83,7 @@ export interface ConfigParams {
    *
    * Any configuration of at least two of hh, mm, ss is accepted as a time, and they can be put in any order.
    *
-   * @default ['hh:mm', 'hh:mm:ss']
+   * @default ['hh:mm', 'hh:mm:ss.sss']
    *
    * @category Date and Time
    */

@@ -2194,10 +2194,10 @@ export class HyperFormula implements TypedEmitter {
    *  ['=SUM(A2:A3)', '2'],
    * ]);
    *
-   * // should return 'false' since the selcted cell contains a simple value
+   * // should return 'true' since the selected cell contains a simple value
    * const isA1Simple = hfInstance.doesCellHaveSimpleValue({ sheet: 0, col: 0, row: 0 });
    *
-   * // should return 'true' since the selcted cell does not contain a simple value
+   * // should return 'false' since the selected cell does not contain a simple value
    * const isB1Simple = hfInstance.doesCellHaveSimpleValue({ sheet: 0, col: 1, row: 0 });
    * ```
    *
@@ -2367,6 +2367,8 @@ export class HyperFormula implements TypedEmitter {
    * @fires [[sheetRenamed]] after the sheet was renamed
    *
    * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
+   *
+   * @throws [[SheetNameAlreadyTakenError]] when the provided sheet name already exists
    *
    * @example
    * ```js
