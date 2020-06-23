@@ -10,9 +10,9 @@ The logo comprises of the word "HyperFormula" combined with a symbol of integral
 
 ### Resources
 
-{% file src="/assets/hyperformula\_logo.zip" caption="Download resources" %}
+[Download resources](/hyperformula\_logo.zip)
 
-{% file src="/assets/hyperformula\_brand\_book.pdf" caption="Download brand book" %}
+[Download brand book](/hyperformula\_brand\_book.pdf)
 
 ### Terms of use
 

@@ -15,7 +15,7 @@ Write to us at [sales@handsontable.com](mailto:sales@handsontable.com) or submit
 
 ### Looking for technical support?
 
-{% page-ref page="overview/support.md" %}
+[Support](overview/support.html)
 
 
 
