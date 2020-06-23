@@ -2655,7 +2655,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * @param {string} expressionName - a name of the expression to be added
    * @param {RawCellContent} expression - the expression
-   * @param {string?} scope - sheet name or undefined for global scope
+   * @param {string?} scope - scope definition, `sheetName` for local scope or `undefined` for global scope
    *
    * @example
    * ```js
@@ -2842,7 +2842,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * @param {string} expressionName - an expression name, case insensitive.
    * @param {RawCellContent} newExpression - a new expression
-   * @param {string?} scope - sheet name or undefined for global scope
+   * @param {string?} scope - scope definition, `sheetName` for local scope or `undefined` for global scope
    *
    * @example
    * ```js
@@ -2913,7 +2913,7 @@ export class HyperFormula implements TypedEmitter {
    * Returns `false` if the operation might be disrupted.
    *
    * @param {string} expressionName - an expression name, case insensitive.
-   * @param {string?} scope - sheet name or undefined for global scope
+   * @param {string?} scope - scope definition, `sheetName` for local scope or `undefined` for global scope
    *
    * @example
    * ```js
