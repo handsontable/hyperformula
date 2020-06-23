@@ -74,7 +74,7 @@ module.exports = {
     //   indexName: '<INDEX_NAME>'
     // },
     nav: [
-      { text: 'Guide', link: '/guide/' },
+      { text: 'Guide', link: '/guide/welcome.md' },
       { text: 'API Reference', link: '/api/' },
     ],
     displayAllHeaders: false, // collapse other pages
