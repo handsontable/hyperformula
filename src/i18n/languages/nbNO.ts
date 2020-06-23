@@ -4,8 +4,9 @@
  */
 
 import {RawTranslationPackage} from '..'
+// import
 
-export const nbNO: RawTranslationPackage = {
+const dictionary: RawTranslationPackage = {
   errors: {
     CYCLE: '#CYCLE!',
     DIV_BY_ZERO: '#DIV/0!',
@@ -123,7 +124,10 @@ export const nbNO: RawTranslationPackage = {
     XOR: 'EKSKLUSIVELLER',
     YEAR: 'ÅR',
   },
+  langCode: 'nbNO',
   ui: {
     NEW_SHEET_PREFIX: 'Sheet',
   },
 }
+
+export default dictionary

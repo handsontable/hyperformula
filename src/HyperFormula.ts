@@ -90,6 +90,13 @@ export class HyperFormula implements TypedEmitter {
   public static releaseDate = process.env.HT_RELEASE_DATE as string
 
   /**
+   * Contains all available languages to use in registerLanguage.
+   * 
+   * @category Static Properies
+   */
+  public static languages: Record<string, RawTranslationPackage> = {}
+
+  /**
    * Calls the `graph` method on the dependency graph.
    * Allows to execute `graph` directly without a need to refer to `dependencyGraph`.
    *

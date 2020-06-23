@@ -4,8 +4,9 @@
  */
 
 import {RawTranslationPackage} from '..'
+// import
 
-export const ruRU: RawTranslationPackage = {
+const dictionary: RawTranslationPackage = {
   errors: {
     CYCLE: '#CYCLE!',
     DIV_BY_ZERO: '#ДЕЛ/0!',
@@ -123,7 +124,10 @@ export const ruRU: RawTranslationPackage = {
     XOR: 'ИСКЛИЛИ',
     YEAR: 'ГОД',
   },
+  langCode: 'ruRU',
   ui: {
     NEW_SHEET_PREFIX: 'Sheet',
   },
 }
+
+export default dictionary

@@ -4,8 +4,9 @@
  */
 
 import {RawTranslationPackage} from '..'
+// import
 
-export const esES: RawTranslationPackage = {
+export const dictionary: RawTranslationPackage = {
   errors: {
     CYCLE: '#CYCLE!',
     DIV_BY_ZERO: '#¡DIV/0!',
@@ -123,7 +124,10 @@ export const esES: RawTranslationPackage = {
     XOR: 'XOR',
     YEAR: 'AÑO',
   },
+  langCode: 'esES',
   ui: {
     NEW_SHEET_PREFIX: 'Sheet',
   },
 }
+
+export default dictionary

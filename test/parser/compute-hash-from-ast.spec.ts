@@ -1,7 +1,8 @@
 import {HyperFormula} from '../../src'
 import {Config} from '../../src/Config'
 import {SheetMapping} from '../../src/DependencyGraph'
-import {buildTranslationPackage, enGB, plPL} from '../../src/i18n'
+import {buildTranslationPackage} from '../../src/i18n'
+import {enGB, plPL} from '../../src/i18n/languages'
 import {buildLexerConfig, FormulaLexer} from '../../src/parser'
 import {adr, unregisterAllLanguages} from '../testUtils'
 import {buildEmptyParserWithCaching} from './common'
@@ -9,8 +10,8 @@ import {buildEmptyParserWithCaching} from './common'
 describe('Compute hash from ast', () => {
   beforeEach(() => {
     unregisterAllLanguages()
-    HyperFormula.registerLanguage('plPL', plPL)
-    HyperFormula.registerLanguage('enGB', enGB)
+    HyperFormula.registerLanguage(plPL.langCode, plPL)
+    HyperFormula.registerLanguage(enGB.langCode, enGB)
   })
 
   const config = new Config()

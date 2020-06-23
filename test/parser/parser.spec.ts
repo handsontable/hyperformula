@@ -2,7 +2,8 @@ import {ErrorType, HyperFormula} from '../../src'
 import {CellError, simpleCellAddress} from '../../src/Cell'
 import {Config} from '../../src/Config'
 import {SheetMapping} from '../../src/DependencyGraph'
-import {buildTranslationPackage, enGB, plPL} from '../../src/i18n'
+import {buildTranslationPackage} from '../../src/i18n'
+import {enGB, plPL} from '../../src/i18n/languages'
 import {
   AstNodeType,
   CellAddress,
@@ -35,8 +36,8 @@ import {buildEmptyParserWithCaching} from './common'
 describe('ParserWithCaching', () => {
   beforeEach(() => {
     unregisterAllLanguages()
-    HyperFormula.registerLanguage('plPL', plPL)
-    HyperFormula.registerLanguage('enGB', enGB)
+    HyperFormula.registerLanguage(plPL.langCode, plPL)
+    HyperFormula.registerLanguage(enGB.langCode, enGB)
   })
 
   it('integer literal', () => {

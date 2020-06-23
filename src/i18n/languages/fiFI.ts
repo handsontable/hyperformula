@@ -4,8 +4,9 @@
  */
 
 import {RawTranslationPackage} from '..'
+// import
 
-export const fiFI: RawTranslationPackage = {
+const dictionary: RawTranslationPackage = {
   errors: {
     CYCLE: '#CYCLE!',
     DIV_BY_ZERO: '#JAKO/0!',
@@ -123,7 +124,10 @@ export const fiFI: RawTranslationPackage = {
     XOR: 'EHDOTON.TAI',
     YEAR: 'VUOSI',
   },
+  langCode: 'fiFI',
   ui: {
     NEW_SHEET_PREFIX: 'Sheet',
   },
 }
+
+export default dictionary

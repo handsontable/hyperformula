@@ -14,7 +14,8 @@ import {
 } from './CellValue'
 import {HyperFormula} from './HyperFormula'
 import {Config, ConfigParams} from './Config'
-import {languages, RawTranslationPackage} from './i18n'
+import {RawTranslationPackage} from './i18n'
+import enGB from './i18n/languages/enGB'
 import {Sheet, SheetDimensions, Sheets} from './Sheet'
 import {RawCellContent} from './CellContentParser'
 import {NamedExpression, NamedExpressionOptions} from './NamedExpressions'
@@ -92,7 +93,9 @@ class HyperFormulaNS extends HyperFormula {
 }
 
 const defaultLanguage = Config.defaultConfig.language
-HyperFormula.registerLanguage(defaultLanguage, languages[defaultLanguage])
+
+HyperFormula.registerLanguage(defaultLanguage, enGB)
+HyperFormula.languages[enGB.langCode] = enGB
 
 for (const pluginName of Object.getOwnPropertyNames(plugins)) {
   if (!pluginName.startsWith('_')) {

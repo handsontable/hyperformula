@@ -4,8 +4,9 @@
  */
 
 import {RawTranslationPackage} from '..'
+// import
 
-export const plPL: RawTranslationPackage = {
+const dictionary: RawTranslationPackage = {
   errors: {
     CYCLE: '#CYKL!',
     DIV_BY_ZERO: '#DZIEL/0!',
@@ -123,7 +124,10 @@ export const plPL: RawTranslationPackage = {
     XOR: 'XOR',
     YEAR: 'ROK',
   },
+  langCode: 'plPL',
   ui: {
     NEW_SHEET_PREFIX: 'Arkusz',
   },
 }
+
+export default dictionary

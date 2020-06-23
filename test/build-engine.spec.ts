@@ -1,5 +1,5 @@
 import {HyperFormula} from '../src'
-import {plPL} from '../src/i18n'
+import {plPL} from '../src/i18n/languages'
 import {adr} from './testUtils'
 
 describe('Building empty engine', () => {

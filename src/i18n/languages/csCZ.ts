@@ -4,8 +4,9 @@
  */
 
 import {RawTranslationPackage} from '..'
+// import
 
-export const csCZ: RawTranslationPackage = {
+const dictionary: RawTranslationPackage = {
   errors: {
     CYCLE: '#CYCLE!',
     DIV_BY_ZERO: '#DĚLENÍ_NULOU!',
@@ -123,7 +124,10 @@ export const csCZ: RawTranslationPackage = {
     XOR: 'XOR',
     YEAR: 'ROK',
   },
+  langCode: 'csCZ',
   ui: {
     NEW_SHEET_PREFIX: 'Sheet',
   },
 }
+
+export default dictionary
