@@ -50,7 +50,7 @@ import {
   UnableToParseError
 } from './errors'
 import * as plugins from './interpreter/plugin'
-import {FunctionPluginDefinition} from './interpreter'
+import {FunctionPluginDefinition, FunctionPlugin} from './interpreter'
 import {ColumnRowIndex} from './CrudOperations'
 
 /** @internal */
@@ -67,6 +67,7 @@ class HyperFormulaNS extends HyperFormula {
   public static EvaluationSuspendedError = EvaluationSuspendedError
   public static ExpectedOneOfValuesError = ExpectedOneOfValuesError
   public static ExpectedValueOfTypeError = ExpectedValueOfTypeError
+  public static FunctionPlugin = FunctionPlugin
   public static FunctionPluginValidationError = FunctionPluginValidationError
   public static InvalidAddressError = InvalidAddressError
   public static InvalidArgumentsError = InvalidArgumentsError
@@ -134,6 +135,7 @@ export {
   EvaluationSuspendedError,
   ExpectedOneOfValuesError,
   ExpectedValueOfTypeError,
+  FunctionPlugin,
   FunctionPluginValidationError,
   InvalidAddressError,
   InvalidArgumentsError,

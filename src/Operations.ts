@@ -352,7 +352,7 @@ export class Operations {
       !this.sheetMapping.hasSheetWithId(sourceLeftCorner.sheet) ||
       !this.sheetMapping.hasSheetWithId(destinationLeftCorner.sheet)
     ) {
-      throw new InvalidArgumentsError()
+      throw new InvalidArgumentsError('a valid range of cells to move.')
     }
 
     const sourceRange = AbsoluteCellRange.spanFrom(sourceLeftCorner, width, height)

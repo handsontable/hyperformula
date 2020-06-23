@@ -210,7 +210,7 @@ type UndoStackEntry
   | ChangeNamedExpressionUndoEntry
 
 export class UndoRedo {
-  private readonly undoStack: UndoStackEntry[] = []
+  private undoStack: UndoStackEntry[] = []
   private redoStack: UndoStackEntry[] = []
   private readonly undoLimit: number
   private batchUndoEntry?: BatchUndoEntry
@@ -259,6 +259,10 @@ export class UndoRedo {
 
   public clearRedoStack() {
     this.redoStack = []
+  }
+
+  public clearUndoStack() {
+    this.undoStack = []
   }
 
   public isUndoStackEmpty(): boolean {

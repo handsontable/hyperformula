@@ -16,9 +16,9 @@ export interface SimpleDate {
 }
 
 export interface SimpleTime {
-  hour: number,
-  minute: number,
-  second: number,
+  hours: number,
+  minutes: number,
+  seconds: number,
 }
 
 export type SimpleDateTime = SimpleDate & SimpleTime
@@ -35,7 +35,7 @@ export function instanceOfSimpleDate(obj: any): obj is SimpleDate {
 
 export function instanceOfSimpleTime(obj: any): obj is SimpleTime {
   if( obj && (typeof obj === 'object' || typeof obj === 'function')) {
-    return 'hour' in obj && typeof obj.hour === 'number' && 'minute' in obj && typeof obj.minute === 'number' && 'second' in obj && typeof obj.second === 'number'
+    return 'hours' in obj && typeof obj.hours === 'number' && 'minutes' in obj && typeof obj.minutes === 'number' && 'seconds' in obj && typeof obj.seconds === 'number'
   } else {
     return false
   }
@@ -57,9 +57,9 @@ export class DateTimeHelper {
     // add two days (this is the config default)
     // otherwise only one day
     if(!config.leapYear1900 && 0 <= this.dateToNumber({year: 1900, month: 2, day: 28})) {
-      this.epochYearZero = this.numberToDate(2).year
+      this.epochYearZero = this.numberToSimpleDate(2).year
     } else {
-      this.epochYearZero = this.numberToDate(1).year
+      this.epochYearZero = this.numberToSimpleDate(1).year
     }
     this.parseDateTime = config.parseDateTime
   }
@@ -137,10 +137,10 @@ export class DateTimeHelper {
   }
 
   public timeToNumber(time: SimpleTime): number {
-    return ((time.second/60+time.minute)/60+time.hour)/24
+    return ((time.seconds/60+time.minutes)/60+time.hours)/24
   }
 
-  public numberToDate(arg: number): SimpleDate {
+  public numberToSimpleDate(arg: number): SimpleDate {
     const dateNumber = arg + this.minDateAboluteValue
     let year = Math.floor(dateNumber / 365.2425)
     if (this.dateToNumberFromZero({year: year + 1, month: 1, day: 1}) <= dateNumber) {
@@ -157,17 +157,21 @@ export class DateTimeHelper {
     return {year, month: month + 1, day: day + 1}
   }
 
-  public numberToTime(arg: number): SimpleTime {
-    let second = Math.round(arg*60*60*24 * 1000000000) / 1000000000
-    let minute = Math.floor(second / 60)
-    second = second % 60
-    const hour = Math.floor(minute / 60)
-    minute = minute % 60
-    return {hour, minute, second}
+  public numberToSimpleTime(arg: number): SimpleTime {
+    arg = Math.round(arg*24*60*60*100000) / (24*60*60*100000)
+    arg *= 24
+    const hours = Math.floor(arg)
+    arg -= hours
+    arg *= 60
+    const minutes = Math.floor(arg)
+    arg -= minutes
+    arg *= 60
+    const seconds = Math.round(arg*100000) / 100000
+    return {hours, minutes, seconds}
   }
 
-  public numberToDateTime(arg: number): SimpleDateTime {
-    return {...this.numberToDate(Math.floor(arg)), ...this.numberToTime(arg%1)}
+  public numberToSimpleDateTime(arg: number): SimpleDateTime {
+    return {...this.numberToSimpleDate(Math.floor(arg)), ...this.numberToSimpleTime(arg%1)}
   }
 
   private leapYearsCount(year: number): number {
