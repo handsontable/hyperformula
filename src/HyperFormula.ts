@@ -3021,7 +3021,7 @@ export class HyperFormula implements TypedEmitter {
   /**
    * Interprets number as a date + time.
    *
-   * @param {number} val - number of days since dateZero, should be nonnegative, fractions are interpreted as hours/minutes/seconds.
+   * @param {number} val - number of days since nullDate, should be nonnegative, fractions are interpreted as hours/minutes/seconds.
    *
    * @example
    * ```js
@@ -3041,7 +3041,7 @@ export class HyperFormula implements TypedEmitter {
   /**
    * Interprets number as a date.
    *
-   * @param {number} val - number of days since dateZero, should be nonnegative, fractions are ignored.
+   * @param {number} val - number of days since nullDate, should be nonnegative, fractions are ignored.
 
    * @example
    * ```js
