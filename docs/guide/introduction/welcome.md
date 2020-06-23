@@ -4,7 +4,17 @@ description: HyperFormula® - Complex Calculations Made Easy
 
 # Welcome
 
-{% embed url="https://www.youtube.com/watch?v=JJXUmACTDdk" %}
+<iframe 
+    width="560" 
+    height="315" 
+    src="https://www.youtube.com/watch?v=JJXUmACTDdk?controls=0" 
+    frameborder="0" 
+    allow="accelerometer; 
+    encrypted-media; 
+    gyroscope; 
+    picture-in-picture" 
+    allowfullscreen>
+</iframe>
 
 ### What is HyperFormula?
 
