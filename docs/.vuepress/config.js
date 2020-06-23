@@ -74,9 +74,7 @@ module.exports = {
     //   indexName: '<INDEX_NAME>'
     // },
     nav: [
-      { text: 'Home', link: '/' },
       { text: 'Guide', link: '/guide/' },
-      // { text: 'Functions', link: '/functions/' },
       { text: 'API Reference', link: '/api/' },
     ],
     displayAllHeaders: false, // collapse other pages
@@ -84,6 +82,14 @@ module.exports = {
     sidebarDepth: 3,
     sidebar: {
       '/guide/': [
+        {
+          title: 'Introduction',
+          collapsable: false,
+          children: [
+            ['/guide/introduction/welcome', 'Welcome'],
+            ['/guide/introduction/demo', 'Demo'],
+          ]
+        },
         {
           title: 'Overview',
           collapsable: false,
@@ -164,26 +170,16 @@ module.exports = {
           ]
         },
         {
-          title: 'Contributing',
-          path: '/guide/contributing',
-        },
-
-        {
-          title: 'Code of conduct',
-          path: '/guide/code-of-conduct.md',
-        },
-        {
-          title: 'Branding',
-          path: '/guide/branding',
-        },
-        {
-          title: 'Acknowledgments',
-          path: '/guide/acknowledgements',
-        },
-        {
-          title: 'Contact',
-          path: '/guide/contact',
-        },
+          title: 'Miscellaneous',
+          collapsable: false,
+          children: [
+            ['/guide/miscellaneous/contributing', 'Contributing'],
+            ['/guide/miscellaneous/code-of-conduct.md', 'Code of conduct'],
+            ['/guide/miscellaneous/branding', 'Branding'],
+            ['/guide/miscellaneous/acknowledgements', 'Acknowledgments'],
+            ['/guide/miscellaneous/contact', 'Contact'],
+          ]
+        }
       ],
       '/api/': [
         {

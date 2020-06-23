@@ -17,7 +17,7 @@ You are welcome to contribute to HyperFormula development. Your help is much app
 
 Adding a new function will be a huge help for the library growth and should not be too problematic for the first issue. Extending the library of translations is also a good task to start with.
 
-Visit [building](advanced-topics/building.md) and [testing](advanced-topics/testing.md) sections to get more info about these topics and check the list of commands you can run in this project. If you feel a bit lost check the `/i18n` folder in the project - all translations are kept just right there. For the functions see the `interpreter/plugin` folder. Both of them are a good starting point.
+Visit [building](../advanced-topics/building.md) and [testing](../advanced-topics/testing.md) sections to get more info about these topics and check the list of commands you can run in this project. If you feel a bit lost check the `/i18n` folder in the project - all translations are kept just right there. For the functions see the `interpreter/plugin` folder. Both of them are a good starting point.
 
 ### How to get started
 

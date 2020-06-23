@@ -49,5 +49,5 @@ If your license key is missing, invalid, or expired, you will see the correspond
 
 ### Getting help
 
-If you stumble across any issues while passing the license key, [contact](../contact.md) our team.
+If you stumble across any issues while passing the license key, [contact](../miscellaneous/contact.md) our team.
 

@@ -10,7 +10,7 @@ If you have an issue or a question, you can use GitHub to ask the community for 
 
 We provide support to companies using HyperFormula to enrich their mission-critical applications. We can help you at every stage of your development. Our experts have been supporting enterprises since 2012 and know exactly how to respond to individual needs.
 
-[Contact sales](../contact.md)
+[Contact sales](../miscellaneous/contact.md)
 
 ### Consulting services
 
@@ -23,7 +23,7 @@ If you need an instant turn-key solution, then consulting services are the quick
 * Provide a tailored training program
 * Provide technical leadership
 
-[Contact sales](../contact.md)
+[Contact sales](../miscellaneous/contact.md)
 
 ### Technical partners
 
