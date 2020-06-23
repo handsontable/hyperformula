@@ -29,14 +29,18 @@ module.exports.create = function create(processedFile) {
     module: {
       rules: [
         {
-          test: /\.js$/,
-          loader: 'babel-loader',
+          test: /\.(js|ts)$/,
           exclude: [
             /node_modules/,
           ],
-          options: {
-            cacheDirectory: false, // Disable cache. Necessary for injected variables into source code via ht.config.js
-          },
+          use: [
+            {
+              loader: 'babel-loader',
+              options: {
+                cacheDirectory: false, // Disable cache. Necessary for injected variables into source code via ht.config.js
+              },
+            }
+          ]
         },
       ]
     },

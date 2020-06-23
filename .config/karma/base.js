@@ -1,3 +1,5 @@
+const webpackConfigFactory = require('../../webpack.config');
+
 module.exports.create = function(config) {
   return {
     // base path that will be used to resolve all patterns (eg. files, exclude)
@@ -57,24 +59,19 @@ module.exports.create = function(config) {
     concurrency: Infinity,
 
     // Webpack's configuration for Karma
-    webpack: {
-      mode: 'development',
-      devtool: 'cheap-module-eval-source-map',
-      module: {
-        rules: [
-          {
-            test: /\.ts?$/,
-            loader: 'ts-loader',
-            exclude: /node_modules/,
-            options: {
-              configFile: 'tsconfig.test.json'
-            }
-          },
-        ],
-      },
-      resolve: {
-        extensions: [ '.ts', '.js' ],
-      },
-    },
+    webpack: (function() {
+      // Take the second config from an array - full HF build.
+      const config = webpackConfigFactory('development')[1];
+
+      // Loaders are executed from bottom to top. Push ts-loader as a first loader.
+      config.module.rules[0].use.push({
+        loader: 'ts-loader',
+        options: {
+          configFile: 'tsconfig.test.json'
+        }
+      });
+
+      return config;
+    }()),
   };
 };
