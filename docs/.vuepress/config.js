@@ -101,6 +101,7 @@ module.exports = {
           collapsable: false,
           children: [
             ['/guide/getting-started/client-side', 'Client-side installation'],
+            ['/guide/getting-started/server-side', 'Server-side installation'],
             ['/guide/getting-started/basic-usage', 'Basic usage'],
             ['/guide/getting-started/advanced-usage', 'Advanced usage'],
             ['/guide/getting-started/configuration-options', 'Configuration options'],
