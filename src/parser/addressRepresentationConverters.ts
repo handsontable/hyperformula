@@ -88,7 +88,7 @@ export const rowAddressFromString = (sheetMapping: SheetMappingFn, stringAddress
 }
 
 /**
- * Computes simple (absolute) address of a cell address based on it's string representation.
+ * Computes simple (absolute) address of a cell address based on its string representation.
  * If sheet name present in string representation but is not present in sheet mapping, returns undefined.
  * If sheet name is not present in string representation, returns {@param sheetContext} as sheet number
  *
