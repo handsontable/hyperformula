@@ -36,7 +36,7 @@ Alternatively, you can load HyperFormula from [jsDelivr](https://www.jsdelivr.co
 
 ### Clone from GitHub
 
-If you choose to clone the project or download it from GitHub you will need to build it prior to usage. Check the [building section](../advanced-topics/building.md) for a full list of commands and their descriptions.
+If you choose to clone the project or download it from GitHub you will need to build it prior to usage. Check the [building section](building.md) for a full list of commands and their descriptions.
 
 #### Clone with HTTPS
 

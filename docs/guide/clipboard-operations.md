@@ -4,13 +4,13 @@ HyperFormula supports clipboard operations such as **copy, cut, and paste**. The
 
 HyperFormula supports clipboard operations such as **copy, cut, and paste**. These methods allow you to integrate the functionality of interacting with the clipboard.
 
-{% hint style="success" %}
+::: tip
 The methods below store copied or cut data in a reference inside the memory, not directly in the system clipboard.
-{% endhint %}
+:::
 
-{% hint style="success" %}
+::: tip
 Below methods store cut or copied data in a reference inside the memory, not directly in system clipboard.
-{% endhint %}
+:::
 
 The clipboard enables spreadsheet-like updates of references inside formulas. 
 
@@ -135,7 +135,7 @@ Here is a short example on how copy and paste works. You can try it yourself:
    style="width:100%; height:500px; border:0; border-radius: 4px; overflow:hidden;"
    title="handsontable/hyperformula-demos: basic-usage"
    allow="accelerometer; ambient-light-sensor; camera; encrypted-media; geolocation; gyroscope; hid; microphone; midi; payment; usb; vr; xr-spatial-tracking"
-   sandbox="allow-autoplay allow-forms allow-modals allow-popups allow-presentation allow-same-origin allow-scripts"
+   sandbox="allow-forms allow-modals allow-popups allow-presentation allow-same-origin allow-scripts"
 />
 
 

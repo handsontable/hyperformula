@@ -80,9 +80,9 @@ hfInstance.setSheetContent('Formulas', formulas);
 
 Almost done! Now, you can use the `getSheetValues` method to get all values including the calculated ones. Alternatively, you can use `getCellValue`to get the value from a specific cell.
 
-{% hint style="success" %}
+::: tip
 You can work with A1 notation comfortably and use the helper function `simpleCellAddressFromString` to retrieve the `SimpleCellAddress` which is required as a parameter in some methods. This is one of several handy helper methods the HyperFormula API offers.
-{% endhint %}
+:::
 
 ```javascript
 // get sheet values from the Sheet of ID 2
@@ -107,7 +107,7 @@ This demo presents an advanced usage example integrated with a sample UI.
    style="width:100%; height:500px; border:0; border-radius: 4px; overflow:hidden;"
    title="handsontable/hyperformula-demos: basic-usage"
    allow="accelerometer; ambient-light-sensor; camera; encrypted-media; geolocation; gyroscope; hid; microphone; midi; payment; usb; vr; xr-spatial-tracking"
-   sandbox="allow-autoplay allow-forms allow-modals allow-popups allow-presentation allow-same-origin allow-scripts"
+   sandbox="allow-forms allow-modals allow-popups allow-presentation allow-same-origin allow-scripts"
 />
 
 

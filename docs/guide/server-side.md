@@ -1,10 +1,10 @@
 # Server-side installation
 
-{% hint style="warning" %}
+::: warning
 For full compatibility, the minimum required version of **Node is 13**. It is related to the support for ICU.
 
 There is a possibility to use lower versions of Node but you need to install an additional package as the dependency: [`full-icu`](https://github.com/unicode-org/full-icu-npm)
-{% endhint %}
+:::
 
 The basic steps are very similar to the ones in the [client-side installation](client-side.md) process.
 

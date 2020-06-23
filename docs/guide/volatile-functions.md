@@ -54,7 +54,7 @@ These actions trigger the recalculation process of volatile functions:
 
 ### Tweaking performance
 
-The extensive use of volatile functions may cause a performance drop. To reduce the negative effect you can try [batching these operations](../data-operations/batch-operations.md).
+The extensive use of volatile functions may cause a performance drop. To reduce the negative effect you can try [batching these operations](batch-operations.md).
 
 ### Volatile custom functions
 
@@ -69,5 +69,5 @@ There is a way to define a custom function that you consider volatile. To do so,
     },
 ```
 
-You can find more information about creating custom functions [in this section](../advanced-topics/creating-custom-functions.md).
+You can find more information about creating custom functions [in this section](creating-custom-functions.md).
 

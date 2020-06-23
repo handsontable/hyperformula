@@ -71,7 +71,7 @@ _Referring to named ranges is HyperFormula is more limited than typical spreadsh
 
 ### Relative references
 
-Relative and absolute references play a huge role in[ copy and paste](../data-operations/clipboard-operations.md), autofill, and CRUD operations like moving cells or columns.
+Relative and absolute references play a huge role in[ copy and paste](clipboard-operations.md), autofill, and CRUD operations like moving cells or columns.
 
 By default, all references are relative which means that when you copy them to other cells, the references are updated based on the new coordinates. There are two main exceptions though: move operation which uses absolute references, and named expressions that do not support relative references. HyperFormula provides `copy` , `cut` and `paste` methods that allow handling the clipboard operations. 
 

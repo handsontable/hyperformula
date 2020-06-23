@@ -1,6 +1,6 @@
 # Localizing functions
 
-You can [localize a function's](../formula-reference/built-in-functions.md) ID and error messages. Currently, the library supports 16 languages with English as the default.
+You can [localize a function's](built-in-functions.md) ID and error messages. Currently, the library supports 16 languages with English as the default.
 
 To change the default language all you need to do is to import and register the language like so:
 
@@ -12,7 +12,7 @@ import { frFR } from 'hyperformula';
 HyperFormula.registerLanguage('frFR', frFR);
 ```
 
-Then set it inside it the [configuration options](../getting-started/configuration-options.md):
+Then set it inside it the [configuration options](configuration-options.md):
 
 ```javascript
 // configure the instance
@@ -36,7 +36,7 @@ Here are some example functions and their translations in French:
  },
 ```
 
-Same goes for the [errors](../formula-reference/types-of-errors.md) displayed inside cells when something goes wrong:
+Same goes for the [errors](types-of-errors.md) displayed inside cells when something goes wrong:
 
 ```javascript
 // localized errors
@@ -54,7 +54,7 @@ Same goes for the [errors](../formula-reference/types-of-errors.md) displayed in
 
 ### Localizing custom functions
 
-You can translate your own [custom functions](../advanced-topics/creating-custom-functions.md) into different languages, too. You need to define them and register while registering a plugin:
+You can translate your own [custom functions](creating-custom-functions.md) into different languages, too. You need to define them and register while registering a plugin:
 
 ```javascript
 const translations = {
@@ -74,7 +74,7 @@ const translations = {
    style="width:100%; height:500px; border:0; border-radius: 4px; overflow:hidden;"
    title="handsontable/hyperformula-demos: basic-usage"
    allow="accelerometer; ambient-light-sensor; camera; encrypted-media; geolocation; gyroscope; hid; microphone; midi; payment; usb; vr; xr-spatial-tracking"
-   sandbox="allow-autoplay allow-forms allow-modals allow-popups allow-presentation allow-same-origin allow-scripts"
+   sandbox="allow-forms allow-modals allow-popups allow-presentation allow-same-origin allow-scripts"
 />
 
 
