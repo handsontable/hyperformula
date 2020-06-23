@@ -1,8 +1,8 @@
 # License key
 
-{% hint style="info" %}
+::: tip
 HyperFormula doesn't use an internet connection to validate the license key.
-{% endhint %}
+:::
 
 As this library is available under multiple licenses, we require you to specify which terms exactly apply to your case. You can do that by passing a license key in the `options` object alongside other settings you want to apply.
 

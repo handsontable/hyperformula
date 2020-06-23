@@ -161,11 +161,11 @@ const changes = hfInstance.moveColumns(0, 0, 1, 2);
 
 ### Cells
 
-{% hint style="success" %}
+::: tip
 By default, cells are identified using a `SimpleCellAddress` which consists of a sheet ID, column ID, and row ID, like this: `{ sheet: 0, col: 0, row: 0 }`
 
 Alternatively, you can work with the **A1 notation** known from spreadsheets like Excel or Google Sheets. The API provides the helper function `simpleCellAddressFromString` which you can use to retrieve the `SimpleCellAddress` .
-{% endhint %}
+:::
 
 #### Moving cells
 
@@ -289,7 +289,7 @@ This demo presents several basic operations integrated with a sample UI.
    style="width:100%; height:500px; border:0; border-radius: 4px; overflow:hidden;"
    title="handsontable/hyperformula-demos: basic-usage"
    allow="accelerometer; ambient-light-sensor; camera; encrypted-media; geolocation; gyroscope; hid; microphone; midi; payment; usb; vr; xr-spatial-tracking"
-   sandbox="allow-autoplay allow-forms allow-modals allow-popups allow-presentation allow-same-origin allow-scripts"
+   sandbox="allow-forms allow-modals allow-popups allow-presentation allow-same-origin allow-scripts"
 />
 
 
