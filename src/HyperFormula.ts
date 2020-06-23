@@ -422,7 +422,7 @@ export class HyperFormula implements TypedEmitter {
    * @example
    * ```js
    * // register a function
-   * HyperFormula.registerFunction('EXAMPLE', myFunction);
+   * HyperFormula.registerFunction('EXAMPLE', MyExamplePlugin);
    * ```
    *
    * @category Static Methods
@@ -439,7 +439,7 @@ export class HyperFormula implements TypedEmitter {
    * @example
    * ```js
    * // register a function
-   * HyperFormula.registerFunction('EXAMPLE', MyExampleFunction);
+   * HyperFormula.registerFunction('EXAMPLE', MyExamplePlugin);
    *
    * // unregister a function
    * HyperFormula.unregisterFunction('EXAMPLE');
@@ -495,7 +495,7 @@ export class HyperFormula implements TypedEmitter {
    * HyperFormula.registerFunctionPlugin(MyExamplePlugin);
    *
    * // return the class of a given plugin
-   * const myFunction = HyperFormula.getFunctionPlugin('EXAMPLE');
+   * const myFunctionClass = HyperFormula.getFunctionPlugin('EXAMPLE');
    * ```
    *
    * @category Static Methods
