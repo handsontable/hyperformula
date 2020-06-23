@@ -6,7 +6,7 @@ Release date: June 23, 2020 🎉
 
 * Core functionality of the engine; 
 * Support for data types: String, Error, Number, Date, Time, DateTime, Duration, Distinct Logical; 
-* Support for logical operators: =, &lt;&gt;, &gt;, &lt;, &gt;=, &lt;=; 
+* Support for logical operators: =, <>, >, <, >=, <=; 
 * Support for arithmetic operators: +, -, \*, /, %; 
 * Support for text operator: &; 
 * CRUD operations: - modifying the value of a single cell,  - adding/deleting row/column,  - reading the value or formula from the selected cell,  - moving a cell or a block of cells,  - deleting a subset of rows or columns,  - recalculating and refreshing of a worksheet;  - batching CRUD operations,  - support for wildcards and regex inside criterion functions like SUMIF, COUNTIF,  - named expressions support,  - support for cut, copy, paste,  - undo/redo support;
