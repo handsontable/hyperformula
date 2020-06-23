@@ -709,8 +709,8 @@ describe('#isCellPartOfMatrix', () => {
 describe('dateTime', () => {
   it('dateTime', () => {
     const engine = HyperFormula.buildEmpty()
-    expect(engine.numberToDateTime(43845.1)).toEqual({"day": 15, "hours": 2, "minutes": 24, "month": 1, "seconds": 0, "year": 2020})
-    expect(engine.numberToDate(43845)).toEqual({"day": 15, "month": 1, "year": 2020})
-    expect(engine.numberToTime(1.1)).toEqual({"hours": 26, "minutes": 24, "seconds": 0})
+    expect(engine.numberToDateTime(43845.1)).toEqual({'day': 15, 'hours': 2, 'minutes': 24, 'month': 1, 'seconds': 0, 'year': 2020})
+    expect(engine.numberToDate(43845)).toEqual({'day': 15, 'month': 1, 'year': 2020})
+    expect(engine.numberToTime(1.1)).toEqual({'hours': 26, 'minutes': 24, 'seconds': 0})
   })
 })

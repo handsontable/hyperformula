@@ -166,7 +166,7 @@ export class DateTimeHelper {
     const minutes = Math.floor(arg)
     arg -= minutes
     arg *= 60
-    let seconds = Math.round(arg*100000) / 100000
+    const seconds = Math.round(arg*100000) / 100000
     return {hours, minutes, seconds}
   }
 
