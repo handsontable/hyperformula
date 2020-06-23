@@ -3065,10 +3065,11 @@ export class HyperFormula implements TypedEmitter {
    *
    * @example
    * ```js
-   * const engine = HyperFormula.buildEmpty();
-   * const timeFromNumber = engine.numberToTime(1.1);
-   *
-   * // returns {hours: 26, minutes: 24}
+   * const hfInstance = HyperFormula.buildEmpty();
+   * 
+   * // pass a number to be interpreted as a time
+   * // should return {hours: 26, minutes: 24} for this example
+   * const timeFromNumber = hfInstance.numberToTime(1.1);
    * ```
    *
    * @category Helper
