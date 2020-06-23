@@ -1735,7 +1735,7 @@ export class HyperFormula implements TypedEmitter {
   }
 
   /**
-   * Clears the clipboard content by setting the content to `undefined`.
+   * Clears the clipboard content.
    *
    * @example
    * ```js
@@ -3321,7 +3321,6 @@ export class HyperFormula implements TypedEmitter {
 
   /**
    * Destroys instance of HyperFormula.
-   * Dependency graph, optimization indexes, statistics and parser are removed.
    *
    * @example
    * ```js
