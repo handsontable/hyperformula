@@ -1,7 +1,5 @@
 # Demo
 
-In this demo, you can see how HyperFormula handles basic operations by using the API methods, such as:
-
 <iframe
    src="https://codesandbox.io/embed/github/handsontable/hyperformula-demos/tree/develop/vanillajs-demo?autoresize=1&fontsize=14&hidenavigation=1&theme=dark&view=preview"
    style="width:100%; height:500px; border:0; border-radius: 4px; overflow:hidden;"
