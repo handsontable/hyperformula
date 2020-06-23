@@ -57,10 +57,10 @@ The features that HyperFormula offers make it a flexible and easy to use tool fo
 
 ### Useful resources
 
-* [Basic usage](getting-started/basic-usage.md)
-* [Configuration options](getting-started/configuration-options.md)
-* [Built-in functions](formula-reference/built-in-functions.md)
-* [Custom functions](advanced-topics/creating-custom-functions.md)
-* [Key concepts](advanced-topics/key-concepts.md)
-* [Performance](advanced-topics/performance.md)
+* [Basic usage](basic-usage.md)
+* [Configuration options](configuration-options.md)
+* [Built-in functions](built-in-functions.md)
+* [Custom functions](creating-custom-functions.md)
+* [Key concepts](key-concepts.md)
+* [Performance](performance.md)
 
