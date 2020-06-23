@@ -83,7 +83,7 @@ export interface ConfigParams {
    *
    * Any configuration of at least two of hh, mm, ss is accepted as a time, and they can be put in any order.
    *
-   * @default ['hh:mm', 'hh:mm:ss']
+   * @default ['hh:mm', 'hh:mm:ss.sss']
    *
    * @category Date and Time
    */
@@ -114,7 +114,12 @@ export interface ConfigParams {
    */
   language: string,
   /**
-   * License key for commercial version of HyperFormula.
+   * A license key of HyperFormula accepts the following values:
+   * * `agpl-v3` string if you want to use the software on AGPL v3 license terms,
+   * * `non-commercial-and-evaluation` string if you want to use our limited versions,
+   * * a valid license key string, if you bought the commercial license.
+   *
+   * For more details visit [this guide](/guide/getting-started/license-key.html)
    *
    * @default undefined
    *

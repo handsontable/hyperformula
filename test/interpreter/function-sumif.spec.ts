@@ -1,5 +1,6 @@
 import {HyperFormula} from '../../src'
 import {ErrorType} from '../../src/Cell'
+import {plPL} from '../../src/i18n'
 import {adr, detailedError, expectArrayWithSameContent} from '../testUtils'
 import {StatType} from '../../src/statistics'
 
@@ -14,12 +15,41 @@ describe('Function SUMIF - argument validations and combinations', () => {
     expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NA))
   })
 
-  it('error when 2nd arg is not a string',  () => {
+  it('works when 2nd arg is an integer',  () => {
     const engine =  HyperFormula.buildFromArray([
-      ['=SUMIF(C1:C2, 78, B1:B2)'],
+      ['=SUMIF(C1:C2, 1, B1:B2)', 2, 1],
+      [null, 3, true],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A1'))).toEqual(2)
+  })
+
+  it('works when 2nd arg is a boolean',  () => {
+    const engine =  HyperFormula.buildFromArray([
+      ['=SUMIF(C1:C2, TRUE(), B1:B2)', 2, 1],
+      [null, 3, true],
+    ])
+
+    expect(engine.getCellValue(adr('A1'))).toEqual(3)
+  })
+
+  it('works when 2nd arg is a string "true"',  () => {
+    const engine =  HyperFormula.buildFromArray([
+      ['=SUMIF(C1:C2, "=TRUE", B1:B2)', 2, 1],
+      [null, 3, true],
+    ])
+
+    expect(engine.getCellValue(adr('A1'))).toEqual(3)
+  })
+
+  it('works when 2nd arg is a string "true" in different language',  () => {
+    HyperFormula.registerLanguage('plPL', plPL)
+    const engine =  HyperFormula.buildFromArray([
+      ['=SUMIF(C1:C2, "=PRAWDA", B1:B2)', 2, 1],
+      [null, 3, true],
+    ], {language: 'plPL'})
+
+    expect(engine.getCellValue(adr('A1'))).toEqual(3)
   })
 
   it('error when criterion unparsable',  () => {
@@ -400,16 +430,6 @@ describe('Function SUMIFS - argument validations and combinations', () => {
 
     expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA))
     expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA))
-  })
-
-  it('error when criterion arg is not a string or number',  () => {
-    const engine =  HyperFormula.buildFromArray([
-      ['=SUMIFS(C1:C2, B1:B2, 42)'],
-      ['=SUMIFS(C1:C2, B1:B2, "=1", B1:B2, 42)'],
-    ])
-
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE))
-    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.VALUE))
   })
 
   it('error when criterion unparsable',  () => {

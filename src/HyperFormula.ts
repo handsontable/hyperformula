@@ -2194,10 +2194,10 @@ export class HyperFormula implements TypedEmitter {
    *  ['=SUM(A2:A3)', '2'],
    * ]);
    *
-   * // should return 'false' since the selcted cell contains a simple value
+   * // should return 'true' since the selected cell contains a simple value
    * const isA1Simple = hfInstance.doesCellHaveSimpleValue({ sheet: 0, col: 0, row: 0 });
    *
-   * // should return 'true' since the selcted cell does not contain a simple value
+   * // should return 'false' since the selected cell does not contain a simple value
    * const isB1Simple = hfInstance.doesCellHaveSimpleValue({ sheet: 0, col: 1, row: 0 });
    * ```
    *
@@ -2368,6 +2368,8 @@ export class HyperFormula implements TypedEmitter {
    *
    * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
    *
+   * @throws [[SheetNameAlreadyTakenError]] when the provided sheet name already exists
+   *
    * @example
    * ```js
    * const hfInstance = HyperFormula.buildFromSheets({
@@ -2398,14 +2400,17 @@ export class HyperFormula implements TypedEmitter {
    *
    * @example
    * ```js
-   * const hfInstance = HyperFormula.buildEmpty();
+   * const hfInstance = HyperFormula.buildFromSheets({
+   *  MySheet1: [ ['1'] ],
+   *  MySheet2: [ ['10'] ],
+   * });
    *
    * // multiple operations in a single callback will trigger evaluation only once
    * // and only one set of changes is returned as a combined result of all
    * // the operations that were triggered within the callback
    * const changes = hfInstance.batch(() => {
-   *   hfInstance.addRows(0, [1, 1]);
-   *   hfInstance.removeColumns(0, [1, 1]);
+   *  hfInstance.setCellContents({ col: 3, row: 0, sheet: 0 }, [['=B1']]);
+   *  hfInstance.setCellContents({ col: 4, row: 0, sheet: 0 }, [['=A1']]);
    * });
    * ```
    *
@@ -2434,7 +2439,10 @@ export class HyperFormula implements TypedEmitter {
    *
    * @example
    * ```js
-   * const hfInstance = HyperFormula.buildEmpty();
+   * const hfInstance = HyperFormula.buildFromSheets({
+   *  MySheet1: [ ['1'] ],
+   *  MySheet2: [ ['10'] ],
+   * });
    *
    * // similar to batch() but operations are not within a callback,
    * // one method suspends the recalculation
@@ -2444,8 +2452,8 @@ export class HyperFormula implements TypedEmitter {
    * hfInstance.suspendEvaluation();
    *
    * // perform operations
-   * hfInstance.addRows(0, [1, 1]);
-   * hfInstance.removeColumns(0, [1, 1]);
+   * hfInstance.setCellContents({ col: 3, row: 0, sheet: 0 }, [['=B1']]);
+   * hfInstance.setSheetContent('MySheet2', [['50'], ['60']]);
    *
    * // use resumeEvaluation to resume
    * const changes = hfInstance.resumeEvaluation();
@@ -2465,7 +2473,10 @@ export class HyperFormula implements TypedEmitter {
    *
    * @example
    * ```js
-   * const hfInstance = HyperFormula.buildEmpty();
+   * const hfInstance = HyperFormula.buildFromSheets({
+   *  MySheet1: [ ['1'] ],
+   *  MySheet2: [ ['10'] ],
+   * });
    *
    * // similar to batch() but operations are not within a callback,
    * // one method suspends the recalculation
@@ -2475,8 +2486,8 @@ export class HyperFormula implements TypedEmitter {
    * hfInstance.suspendEvaluation();
    *
    * // perform operations
-   * hfInstance.addRows(0, [1, 1]);
-   * hfInstance.removeColumns(0, [1, 1]);
+   * hfInstance.setCellContents({ col: 3, row: 0, sheet: 0 }, [['=B1']]);
+   * hfInstance.setSheetContent('MySheet2', [['50'], ['60']]);
    *
    * // resume the evaluation
    * const changes = hfInstance.resumeEvaluation();

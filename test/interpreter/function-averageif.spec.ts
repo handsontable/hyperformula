@@ -13,14 +13,6 @@ describe('Function AVERAGEIF - argument validations and combinations', () => {
     expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NA))
   })
 
-  it('error when 2nd arg is not a string',  () => {
-    const engine =  HyperFormula.buildFromArray([
-      ['=AVERAGEIF(C1:C2, 78, B1:B2)'],
-    ])
-
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE))
-  })
-
   it('error when criterion unparsable',  () => {
     const engine =  HyperFormula.buildFromArray([
       ['=AVERAGEIF(B1:B2, "><foo", C1:C2)'],

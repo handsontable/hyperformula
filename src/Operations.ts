@@ -7,8 +7,7 @@ import {Statistics, StatType} from './statistics'
 import {ClipboardCell, ClipboardCellType} from './ClipboardOperations'
 import {EmptyValue, invalidSimpleCellAddress, simpleCellAddress, SimpleCellAddress} from './Cell'
 import {CellContent, CellContentParser, RawCellContent} from './CellContentParser'
-import {RowsSpan} from './RowsSpan'
-import {ColumnsSpan} from './ColumnsSpan'
+import {ColumnsSpan, RowsSpan} from './Span'
 import {ContentChanges} from './ContentChanges'
 import {ColumnSearchStrategy} from './ColumnSearch/ColumnSearchStrategy'
 import {absolutizeDependencies} from './absolutizeDependencies'
@@ -520,7 +519,6 @@ export class Operations {
     if (vertex === null || vertex instanceof EmptyCellVertex) {
       return {type: ClipboardCellType.EMPTY}
     } else if (vertex instanceof ValueCellVertex) {
-      /* TODO should we copy errors? */
       return {type: ClipboardCellType.VALUE, value: vertex.getCellValue()}
     } else if (vertex instanceof MatrixVertex) {
       return {type: ClipboardCellType.VALUE, value: vertex.getMatrixCellValue(address)}
