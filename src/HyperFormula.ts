@@ -3047,11 +3047,12 @@ export class HyperFormula implements TypedEmitter {
 
    * @example
    * ```js
-   * const engine = HyperFormula.buildEmpty();
+   * const hfInstance = HyperFormula.buildEmpty();
    *
-   * const dateFromNumber = engine.numberToDate(43845);
-   *
-   * // returns {year: 2020, month: 1, day: 15}
+   * // pass the number of days since nullDate
+   * // the method should return formatted date, for this example:
+   * // {year: 2020, month: 1, day: 15}
+   * const dateFromNumber = hfInstance.numberToDate(43845);
    * ```
    *
    * @category Helper
