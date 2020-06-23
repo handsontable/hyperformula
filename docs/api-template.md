@@ -1,4 +1,5 @@
 Welcome to HyperFormula `v{{ $page.version }}` API!
+The API reference documentation provides detailed information for methods available in HyperFormula
 
 Current build: {{ $page.buildDate }}
 
