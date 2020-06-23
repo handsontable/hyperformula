@@ -39,7 +39,7 @@ hfInstance.addNamedExpression('MyPotato', '=SUM(100+10)');
 hfInstance.addNamedExpression('MyPotato', '=Sheet2!$A$1+100', 'Sheet2');
 ```
 
-* The name starts with a letter or an underscore. The minimum required length of a name is based on the `maxColumns`value inside [configuration object](../getting-started/configuration-options.md).
+* The name starts with a letter or an underscore. The minimum required length of a name is based on the `maxColumns`value inside [configuration object](configuration-options.md).
 * The name must not equal to a cell reference, eg. A1, $A$1, R1C1, separate 1 or A are also not valid
 * The name is case-insensitive. 
 * A space character is not allowed.
@@ -64,7 +64,7 @@ These are the basic methods that can be used to add and manipulate named express
 
 * Adding a named expression
 
-You can add a named expression by using the `addNamedExpression` method. It accepts the name for expression, the expression as a raw cell content, and optionally the scope. If you do not define the scope it will be set to the global one, meaning the expression will be per workbook. If you want to add many of them, it is advised to do so in a [batch](../data-operations/batch-operations.md). This method returns a list of cells which values were affected by this operation their absolute addresses and new values. See the "changes" section of [basic operations](../data-operations/crud-operations.md) for more info.
+You can add a named expression by using the `addNamedExpression` method. It accepts the name for expression, the expression as a raw cell content, and optionally the scope. If you do not define the scope it will be set to the global one, meaning the expression will be per workbook. If you want to add many of them, it is advised to do so in a [batch](batch-operations.md). This method returns a list of cells which values were affected by this operation their absolute addresses and new values. See the "changes" section of [basic operations](crud-operations.md) for more info.
 
 ```javascript
 // add 'prettyName' expression to the local scope of 'Sheet1'
@@ -73,7 +73,7 @@ const changes = hfInstance.addNamedExpression('prettyName', '=Sheet1!$A$1+100', 
 
 * Changing a named expression
 
-You can change a named expression by using the `changeNamedExpression` method. Select the name of an expression to change and pass it as the first parameter,  then define the new expression as raw cell content and optionally add the scope. If you do not define the scope it will be set to the global one, meaning the expression will be per workbook. If you want to change many of them, it is advised to do so in a [batch](../data-operations/batch-operations.md). This method returns a list of cells which values were affected by this operation their absolute addresses and new values. See the "changes" section of [basic operations](../data-operations/crud-operations.md) for more info.
+You can change a named expression by using the `changeNamedExpression` method. Select the name of an expression to change and pass it as the first parameter,  then define the new expression as raw cell content and optionally add the scope. If you do not define the scope it will be set to the global one, meaning the expression will be per workbook. If you want to change many of them, it is advised to do so in a [batch](batch-operations.md). This method returns a list of cells which values were affected by this operation their absolute addresses and new values. See the "changes" section of [basic operations](crud-operations.md) for more info.
 
 ```javascript
 // change the named expression
@@ -82,7 +82,7 @@ const changes = hfInstance.changeNamedExpression('prettyName', '=Sheet1!$A$1+200
 
 * Removing a named expression
 
-You can remove a named expression by using the `removeNamedExpression` method. Select the name of an expression to change and pass it as the first parameter and optionally define the scope. If you do not define the scope it will be understood as a global, meaning, the whole workbook. This method returns a list of cells which values were affected by this operation their absolute addresses and new values. See the changes section of [basic operations](../data-operations/crud-operations.md) for more info.
+You can remove a named expression by using the `removeNamedExpression` method. Select the name of an expression to change and pass it as the first parameter and optionally define the scope. If you do not define the scope it will be understood as a global, meaning, the whole workbook. This method returns a list of cells which values were affected by this operation their absolute addresses and new values. See the changes section of [basic operations](crud-operations.md) for more info.
 
 ```javascript
 // remove 'prettyName' expression from 'Sheet1'
@@ -100,7 +100,7 @@ const listOfExpressions = hfInstance.listNamedExpressions();
 
 ### Handling errors
 
-Operations on named expressions throw errors when something goes wrong. These errors can be handled to achieve good user experience in the application. Be sure to check the[ basic operations](../data-operations/crud-operations.md) section to read about error handling. There is also a possibility to check the availability of operations with `isItPossibleTo*` methods, they are also described [there](../data-operations/crud-operations.md#isitpossibleto-methods). 
+Operations on named expressions throw errors when something goes wrong. These errors can be handled to achieve good user experience in the application. Be sure to check the[ basic operations](crud-operations.md) section to read about error handling. There is also a possibility to check the availability of operations with `isItPossibleTo*` methods, they are also described [there](crud-operations.md#isitpossibleto-methods). 
 
 ### Demo
 

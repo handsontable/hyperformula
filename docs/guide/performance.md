@@ -28,11 +28,11 @@ It is worth mentioning that some of the CRUD operations, like inserting non-nume
 
 By default, HyperFormula recalculates formulas after every change. However, due to the fact that we store the graph of dependencies between cells in the sheet, we recalculate only the cells affected by the update.
 
-Sometimes, a simple change can cause recalculation of a large part of the sheet, e.g. when the modified cell is at the very beginning of the dependency chain or when there are many [volatile functions](../formula-reference/volatile-functions.md) in the worksheet. In such a case you may want to postpone the recalculation.
+Sometimes, a simple change can cause recalculation of a large part of the sheet, e.g. when the modified cell is at the very beginning of the dependency chain or when there are many [volatile functions](volatile-functions.md) in the worksheet. In such a case you may want to postpone the recalculation.
 
 The first option is to call `suspendEvaluation` before making changes and `resumeEvaluation` at a convenient moment. 
 
-The second option is to pass the callback function with multiple operations to [batch function](../data-operations/batch-operations.md). Recalculation will be suspended before performing operations and resumed after them.  
+The second option is to pass the callback function with multiple operations to [batch function](batch-operations.md). Recalculation will be suspended before performing operations and resumed after them.  
 In cases when you perform operations which may not cause a recalculation but only change the shape of the worksheet, like `addRows`, `removeRows`, `moveColumns` , we do not recommend suspending recalculation, as this may have a slightly negative impact on performance.
 
 ### GPU acceleration

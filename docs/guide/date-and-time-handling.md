@@ -1,6 +1,6 @@
 # Date and time handling
 
-Date and time formats can be set in the [configuration options](../getting-started/configuration-options.md).
+Date and time formats can be set in the [configuration options](configuration-options.md).
 
 `dateFormats` is a list of formats supported by the parser inside HyperFormula. The default format is `['MM/DD/YYYY', 'MM/DD/YY']`. The separator is ignored and it can be any of the following:  '-' \(dash\), ' ' \(empty space\), '/' \(slash\).
 
@@ -63,7 +63,7 @@ export const customParseDate = (dateString, dateFormat) => {
 };
 ```
 
-Then, use it inside the [configuration options](../getting-started/configuration-options.md) like so:
+Then, use it inside the [configuration options](configuration-options.md) like so:
 
 ```javascript
 const options = {

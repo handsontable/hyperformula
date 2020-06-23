@@ -86,98 +86,98 @@ module.exports = {
           title: 'Introduction',
           collapsable: false,
           children: [
-            ['/guide/introduction/welcome', 'Welcome'],
-            ['/guide/introduction/demo', 'Demo'],
+            ['/guide/welcome', 'Welcome'],
+            ['/guide/demo', 'Demo'],
           ]
         },
         {
           title: 'Overview',
           collapsable: false,
           children: [
-            ['/guide/overview/supported-browsers', 'Supported browsers'],
-            ['/guide/overview/dependencies', 'Dependencies'],
-            ['/guide/overview/licensing', 'Licensing'],
-            ['/guide/overview/changelog', 'Changelog'],
-            ['/guide/overview/roadmap', 'Roadmap'],
-            ['/guide/overview/support', 'Support'],
+            ['/guide/supported-browsers', 'Supported browsers'],
+            ['/guide/dependencies', 'Dependencies'],
+            ['/guide/licensing', 'Licensing'],
+            ['/guide/changelog', 'Changelog'],
+            ['/guide/roadmap', 'Roadmap'],
+            ['/guide/support', 'Support'],
           ]
         },
         {
           title: 'Getting started',
           collapsable: false,
           children: [
-            ['/guide/getting-started/client-side', 'Client-side installation'],
-            ['/guide/getting-started/server-side', 'Server-side installation'],
-            ['/guide/getting-started/basic-usage', 'Basic usage'],
-            ['/guide/getting-started/advanced-usage', 'Advanced usage'],
-            ['/guide/getting-started/configuration-options', 'Configuration options'],
-            ['/guide/getting-started/license-key', 'License key'],
-            ['/guide/getting-started/known-limitations', 'Known limitations'],
+            ['/guide/client-side', 'Client-side installation'],
+            ['/guide/server-side', 'Server-side installation'],
+            ['/guide/basic-usage', 'Basic usage'],
+            ['/guide/advanced-usage', 'Advanced usage'],
+            ['/guide/configuration-options', 'Configuration options'],
+            ['/guide/license-key', 'License key'],
+            ['/guide/known-limitations', 'Known limitations'],
           ]
         },
         {
           title: 'Framework integration',
           collapsable: false,
           children: [
-            ['/guide/framework-integration/integration-with-react', 'Integration with React'],
-            ['/guide/framework-integration/integration-with-vue', 'Integration with Vue'],
-            ['/guide/framework-integration/integration-with-angular', 'Integration with Angular'],
+            ['/guide/integration-with-react', 'Integration with React'],
+            ['/guide/integration-with-vue', 'Integration with Vue'],
+            ['/guide/integration-with-angular', 'Integration with Angular'],
           ]
         },
         {
           title: 'Data Operations',
           collapsable: false,
           children: [
-            ['/guide/data-operations/crud-operations', 'Basic operations'],
-            ['/guide/data-operations/batch-operations', 'Batch operations'],
-            ['/guide/data-operations/clipboard-operations', 'Clipboard operations'],
-            ['/guide/data-operations/undo-redo', 'Undo-redo'],
-            ['/guide/data-operations/sorting-data', 'Sorting data'],
+            ['/guide/crud-operations', 'Basic operations'],
+            ['/guide/batch-operations', 'Batch operations'],
+            ['/guide/clipboard-operations', 'Clipboard operations'],
+            ['/guide/undo-redo', 'Undo-redo'],
+            ['/guide/sorting-data', 'Sorting data'],
           ]
         },
         {
           title: 'Formula Reference',
           collapsable: false,
           children: [
-            ['/guide/formula-reference/specifications-and-limits', 'Specifications and limits'],
-            ['/guide/formula-reference/cell-references', 'Cell references'],
-            ['/guide/formula-reference/types-of-data', 'Types of values'],
-            ['/guide/formula-reference/types-of-errors', 'Types of errors'],
-            ['/guide/formula-reference/types-of-operators', 'Types of operators'],
-            ['/guide/formula-reference/order-of-precendece', 'Order of precedence'],
-            ['/guide/formula-reference/built-in-functions', 'Built-in functions'],
-            ['/guide/formula-reference/volatile-functions', 'Volatile functions'],
-            ['/guide/formula-reference/named-ranges', 'Named ranges'],
+            ['/guide/specifications-and-limits', 'Specifications and limits'],
+            ['/guide/cell-references', 'Cell references'],
+            ['/guide/types-of-data', 'Types of values'],
+            ['/guide/types-of-errors', 'Types of errors'],
+            ['/guide/types-of-operators', 'Types of operators'],
+            ['/guide/order-of-precendece', 'Order of precedence'],
+            ['/guide/built-in-functions', 'Built-in functions'],
+            ['/guide/volatile-functions', 'Volatile functions'],
+            ['/guide/named-ranges', 'Named ranges'],
           ]
         },
         {
           title: 'Internationalization',
           collapsable: false,
           children: [
-            ['/guide/internationalization/culture-definition', 'Localizing functions'],
-            ['/guide/internationalization/date-and-time-handling', 'Date and time handling'],
+            ['/guide/culture-definition', 'Localizing functions'],
+            ['/guide/date-and-time-handling', 'Date and time handling'],
           ]
         },
         {
           title: 'Advanced topics',
           collapsable: false,
           children: [
-            ['/guide/advanced-topics/key-concepts', 'Key concepts'],
-            ['/guide/advanced-topics/building', 'Building'],
-            ['/guide/advanced-topics/testing', 'Testing'],
-            ['/guide/advanced-topics/creating-custom-functions', 'Custom functions'],
-            ['/guide/advanced-topics/performance', 'Performance'],
+            ['/guide/key-concepts', 'Key concepts'],
+            ['/guide/building', 'Building'],
+            ['/guide/testing', 'Testing'],
+            ['/guide/creating-custom-functions', 'Custom functions'],
+            ['/guide/performance', 'Performance'],
           ]
         },
         {
           title: 'Miscellaneous',
           collapsable: false,
           children: [
-            ['/guide/miscellaneous/contributing', 'Contributing'],
-            ['/guide/miscellaneous/code-of-conduct.md', 'Code of conduct'],
-            ['/guide/miscellaneous/branding', 'Branding'],
-            ['/guide/miscellaneous/acknowledgements', 'Acknowledgments'],
-            ['/guide/miscellaneous/contact', 'Contact'],
+            ['/guide/contributing', 'Contributing'],
+            ['/guide/code-of-conduct.md', 'Code of conduct'],
+            ['/guide/branding', 'Branding'],
+            ['/guide/acknowledgements', 'Acknowledgments'],
+            ['/guide/contact', 'Contact'],
           ]
         }
       ],

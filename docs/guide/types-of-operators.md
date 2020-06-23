@@ -213,7 +213,7 @@ HyperFormula does type coercion and it can have an impact on comparing, adding, 
 
 ### Comparing strings
 
-By default, HyperFormula is case and accent insensitive. It means it will ignore upper and lower-case letters and accents during the comparison. For example, if you compare 'AsTrOnAuT' with \`aStroNaut\` they will be understood as identical, the same goes for 'Préservation' and 'Preservation'. It applies to comparison operators only. It can be configured with `accentSensitive` and `caseSensitive` options in the [configuration](../getting-started/configuration-options.md).
+By default, HyperFormula is case and accent insensitive. It means it will ignore upper and lower-case letters and accents during the comparison. For example, if you compare 'AsTrOnAuT' with \`aStroNaut\` they will be understood as identical, the same goes for 'Préservation' and 'Preservation'. It applies to comparison operators only. It can be configured with `accentSensitive` and `caseSensitive` options in the [configuration](configuration-options.md).
 
 Apart from accents and case sensitivity, you can also configure `caseFirst.` This option defines if the upper case or lower case should sort first. `ignorePunctuation`  specifies whether punctuation should be ignored in string comparison. By default `caseFirst` is set to 'lower' and `ignorePunctuation` is set to `false`. For more details see the official API reference of HyperFormula.
 
