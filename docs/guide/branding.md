@@ -6,13 +6,13 @@ The logo comprises of the word "HyperFormula" combined with a symbol of integral
 
 ### Logotype
 
-![](/hf_logo_black-3x%20%281%29.png)
+![](/assets/img/hf_logo_black-3x%20%281%29.png)
 
 ### Resources
 
-[Download resources](/hyperformula\_logo.zip)
+[Download resources](/assets/hyperformula\_logo.zip)
 
-[Download brand book](/hyperformula\_brand\_book.pdf)
+[Download brand book](/assets/hyperformula\_brand\_book.pdf)
 
 ### Terms of use
 
