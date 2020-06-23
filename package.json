@@ -78,7 +78,6 @@
     "check:licenses": "license-checker --production --excludePackages=\"hyperformula@0.0.1\" --onlyAllow=\"MIT; Apache-2.0; BSD-3-Clause; BSD-2-Clause; ISC; BSD; Unlicense\"",
     "tsnode": "ts-node -O '{\"module\":\"commonjs\"}'",
     "benchmark:basic": "npm run tsnode test/performance/1-basic.ts",
-    "benchmark:test": "npm run tsnode test/performance/test.ts",
     "benchmark:cruds": "npm run tsnode test/performance/2-cruds.ts"
   },
   "devDependencies": {

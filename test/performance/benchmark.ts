@@ -5,10 +5,10 @@ import {
   enrichStatistics,
   ExtStatType,
   measureCruds,
-  reduceStats, statsTreePrint,
+  reduceStats,
+  statsTreePrint,
   statsTreePrintCruds
 } from './utils/stats'
-import {numberOfRows} from './utils/utils'
 
 export interface Config {
   expectedTime?: number,
@@ -28,6 +28,30 @@ export interface ExpectedValue {
 export function benchmark(name: string, sheet: Sheet, expectedValues: ExpectedValue[], config: Partial<Config> = defaultConfig): HyperFormula {
   const runEngine = (engineConfig?: Partial<ConfigParams>) => HyperFormula.buildFromArray(sheet, engineConfig)
   return benchmarkBuild(name, runEngine, expectedValues, config)
+}
+
+export function benchmarkCruds(name: string, sheet: Sheet, cruds: (engine: HyperFormula) => void, expectedValues: ExpectedValue[], userConfig: Partial<Config> = defaultConfig): HyperFormula {
+  console.info(`=== Benchmark - ${name} === `)
+
+  const config = Object.assign({}, defaultConfig, userConfig)
+  const engineConfig = Object.assign({}, config.engineConfig, { useStats: true})
+
+  const engine = HyperFormula.buildFromArray(sheet, engineConfig)
+
+  const statistics = measureCruds(engine, name, cruds)
+
+  if (!validate(engine, expectedValues)) {
+    console.error('Sheet validation error')
+    if (process.exit) {
+      process.exit(1)
+    }
+    return engine
+  }
+
+  statsTreePrintCruds(statistics)
+  checkExpectedTime('CRUDS total time', statistics.get(ExtStatType.CRUDS_TOTAL) || 0, config.expectedTime)
+
+  return engine
 }
 
 function benchmarkBuild(name: string, runEngine: (engineConfig?: Partial<ConfigParams>) => HyperFormula, expectedValues: ExpectedValue[], userConfig: Partial<Config> = defaultConfig): HyperFormula {
@@ -58,34 +82,8 @@ function benchmarkBuild(name: string, runEngine: (engineConfig?: Partial<ConfigP
 
   const averages = reduceStats(statistics, average)
   statsTreePrint(averages)
-  const time = Number(((averages.get(EnrichedStatType.BUILD_ENGINE_TOTAL) || 0) / (numberOfRows(engine) / 1000)).toFixed(3))
-  checkExpectedTime('Average total time per 1000 rows', time, config.expectedTime)
-
-  return engine
-}
-
-export function benchmarkCruds(name: string, sheet: Sheet, cruds: (engine: HyperFormula) => void, expectedValues: ExpectedValue[], userConfig: Partial<Config> = defaultConfig): HyperFormula {
-  console.info(`=== Benchmark - ${name} === `)
-
-  const config = Object.assign({}, defaultConfig, userConfig)
-  const engineConfig = Object.assign({}, config.engineConfig, { useStats: true})
-
-  const engine = HyperFormula.buildFromArray(sheet, engineConfig)
-
-  const statistics = measureCruds(engine, name, cruds)
-
-  if (!validate(engine, expectedValues)) {
-    console.error('Sheet validation error')
-    if (process.exit) {
-      process.exit(1)
-    }
-    return engine
-  }
-
-  statsTreePrintCruds(statistics)
-  checkExpectedTime('CRUDS total time', statistics.get(ExtStatType.CRUDS_TOTAL) || 0, config.expectedTime)
-
-  console.info('\n')
+  const time = averages.get(EnrichedStatType.BUILD_ENGINE_TOTAL) || 0
+  checkExpectedTime('Average build time', time, config.expectedTime)
 
   return engine
 }
@@ -115,9 +113,9 @@ function validate(engine: HyperFormula, expectedValues: ExpectedValue[]) {
 }
 
 function checkExpectedTime(name: string, totalTime: number, limit: number | undefined) {
-  console.info(`${name}: ${totalTime}. Expected: ${limit}`)
+  console.info(`${name}: ${totalTime}. Expected: ${limit}\n`)
   if (limit !== undefined && totalTime > limit) {
-    console.error('Time exceeded')
+    console.error('Time exceeded\n')
     if (process.exit) {
       process.exit(1)
     }

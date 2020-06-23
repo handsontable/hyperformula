@@ -38,16 +38,6 @@ export function measureCruds(engine: HyperFormula, name: string, func: (engine: 
   return actualStats
 }
 
-export function statsToObject(stats: Stats, name?: string): any {
-  const result =  Object.assign({}, ...[...stats.entries()].map(([k, v]) => ({[k]: v})))
-  result['NAME'] = name
-  return result
-}
-
-export function logStats(stats: any[]): void {
-  console.table(stats, ['NAME', 'TOTAL CRUD', ...Object.keys(EnrichedStatType)])
-}
-
 export function statsTreePrint(stats: Stats): void {
   const str =
     `________________________________________________
