@@ -79,7 +79,7 @@ module.exports = {
     ],
     displayAllHeaders: false, // collapse other pages
     activeHeaderLinks: true,
-    sidebarDepth: 3,
+    sidebarDepth: 1,
     sidebar: {
       '/guide/': [
         {
