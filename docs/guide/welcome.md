@@ -18,11 +18,11 @@ description: HyperFormula® - Complex Calculations Made Easy
 
 ### What is HyperFormula?
 
-HyperFormula is an open-source **calculation engine** that allows you to perform Excel-like calculations in your business applications. HyperFormula is written mostly in TypeScript and supports all major JavaScript frameworks like [Vue](framework-integration/integration-with-vue.md) and [React](framework-integration/integration-with-react.md) \(Angular is coming soon\). You can use it in a browser or as a service with Node.js as your back-end technology.
+HyperFormula is an open-source **calculation engine** that allows you to perform Excel-like calculations in your business applications. HyperFormula is written mostly in TypeScript and supports all major JavaScript frameworks like [Vue](integration-with-vue.md) and [React](integration-with-react.md) \(Angular is coming soon\). You can use it in a browser or as a service with Node.js as your back-end technology.
 
-It comes with a built-in [library of functions](formula-reference/built-in-functions.md) grouped into different categories, such as Math and trigonometry, Engineering, Statistical, Financial, and Logical. The functions use A1 notation and are compatible with popular spreadsheet software like Excel or Google Sheets, which means that you can easily transfer the data and formulas between them.
+It comes with a built-in [library of functions](built-in-functions.md) grouped into different categories, such as Math and trigonometry, Engineering, Statistical, Financial, and Logical. The functions use A1 notation and are compatible with popular spreadsheet software like Excel or Google Sheets, which means that you can easily transfer the data and formulas between them.
 
-HyperFormula covers most user-triggered actions such as [CRUD operations](data-operations/crud-operations.md), [undo/redo](data-operations/undo-redo.md), and [clipboard operations](data-operations/clipboard-operations.md). It also supports the use of cross-sheet references, [named expressions](formula-reference/named-ranges.md), [different data types](formula-reference/types-of-data.md), and [custom functions](advanced-topics/creating-custom-functions.md).
+HyperFormula covers most user-triggered actions such as [CRUD operations](crud-operations.md), [undo/redo](undo-redo.md), and [clipboard operations](clipboard-operations.md). It also supports the use of cross-sheet references, [named expressions](named-ranges.md), [different data types](types-of-data.md), and [custom functions](creating-custom-functions.md).
 
 ### What can it be used for?
 
@@ -48,7 +48,7 @@ The features that HyperFormula offers make it a flexible and easy to use tool fo
 * Support for undo/redo
 * Support for copy/cut/paste
 * Support for wildcard characters
-* Works with frameworks such as [React](framework-integration/integration-with-react.md) and [Vue](framework-integration/integration-with-vue.md)
+* Works with frameworks such as [React](integration-with-react.md) and [Vue](integration-with-vue.md)
 * Written in TypeScript and extensively tested
 * Uses GPU acceleration for better performance
 * Function syntax compatible with Excel and Google Sheets
