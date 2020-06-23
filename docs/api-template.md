@@ -1,15 +1,10 @@
 
-Welcome to HyperFormula `v{{ $page.version }}` APIs :tada:
+Welcome to HyperFormula `v{{ $page.version }}` API!
 
 Current build: {{ $page.buildDate }}
 
-### Global Exports
+### API reference index
 
-- [HyperFormula](/api/classes/_hyperformula_.hyperformula)
-- [Events](/api/interfaces/_emitter_.listeners)
-- [Options](/api/interfaces/_config_.configparams)
-
-
-## Use version for assets
-
-{{ $page.version }}
+- [HyperFormula](/api/classes/hyperformula)
+- [Event Types](/api/interfaces/_emitter_.listeners)
+- [Configuration Options](/api/interfaces/configparams)
