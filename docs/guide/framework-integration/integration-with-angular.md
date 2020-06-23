@@ -4,5 +4,5 @@ The installation process for applications written in Angular is the same as in t
 
 ### Demo of HyperFormula for Angular
 
-\[demo\]
+Coming soon.
 
