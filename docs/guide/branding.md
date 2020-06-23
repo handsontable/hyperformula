@@ -6,7 +6,7 @@ The logo comprises of the word "HyperFormula" combined with a symbol of integral
 
 ### Logotype
 
-![](/assets/hf_logo_black-3x%20%281%29.png)
+![](/hf_logo_black-3x%20%281%29.png)
 
 ### Resources
 
