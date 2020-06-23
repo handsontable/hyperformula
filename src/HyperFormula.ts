@@ -380,7 +380,10 @@ export class HyperFormula implements TypedEmitter {
    *
    * @example
    * ```js
-   * // register a plugin
+   * // import your own plugin
+   * import { MyExamplePlugin } from './file_with_your_plugin';
+   *
+   * // register the plugin
    * HyperFormula.registerFunctionPlugin(MyExamplePlugin);
    * ```
    *
@@ -397,11 +400,11 @@ export class HyperFormula implements TypedEmitter {
    *
    * @example
    * ```js
-   * // register a plugin
-   * HyperFormula.registerFunctionPlugin(MyExamplePlugin);
+   * // get the class of a plugin
+   * const registeredPluginClass = HyperFormula.getFunctionPlugin('EXAMPLE');
    *
-   * // unregister all functions defined in MyExamplePlugin
-   * HyperFormula.unregisterFunctionPlugin(MyExamplePlugin);
+   * // unregister all functions defined in a plugin of ID 'EXAMPLE'
+   * HyperFormula.unregisterFunctionPlugin(registeredPluginClass);
    * ```
    *
    * @category Static Methods
@@ -421,6 +424,9 @@ export class HyperFormula implements TypedEmitter {
    * @throws [[ProtectedFunctionTranslationError]] when trying to register translation for protected function
    * @example
    * ```js
+   * // import your own plugin
+   * import { MyExamplePlugin } from './file_with_your_plugin';
+   *
    * // register a function
    * HyperFormula.registerFunction('EXAMPLE', MyExamplePlugin);
    * ```
@@ -438,6 +444,9 @@ export class HyperFormula implements TypedEmitter {
    *
    * @example
    * ```js
+   * // import your own plugin
+   * import { MyExamplePlugin } from './file_with_your_plugin';
+   *
    * // register a function
    * HyperFormula.registerFunction('EXAMPLE', MyExamplePlugin);
    *
@@ -491,6 +500,9 @@ export class HyperFormula implements TypedEmitter {
    *
    * @example
    * ```js
+   * // import your own plugin
+   * import { MyExamplePlugin } from './file_with_your_plugin';
+   *
    * // register a plugin
    * HyperFormula.registerFunctionPlugin(MyExamplePlugin);
    *
@@ -3021,8 +3033,10 @@ export class HyperFormula implements TypedEmitter {
    *
    * @example
    * ```js
+   * const hfInstance = HyperFormula.buildEmpty();
+   *
    * // return translated names of all functions, assign to a variable
-   * const allNames = HyperFormula.getRegisteredFunctionNames();
+   * const allNames = hfInstance.getRegisteredFunctionNames();
    * ```
    *
    * @category Custom Functions
@@ -3039,11 +3053,16 @@ export class HyperFormula implements TypedEmitter {
    *
    * @example
    * ```js
+   * // import your own plugin
+   * import { MyExamplePlugin } from './file_with_your_plugin';
+   *
+   * const hfInstance = HyperFormula.buildEmpty();
+   *
    * // register a plugin
    * HyperFormula.registerFunctionPlugin(MyExamplePlugin);
    *
    * // get the plugin
-   * const myPlugin = HyperFormula.getFunctionPlugin('EXAMPLE');
+   * const myPlugin = hfInstance.getFunctionPlugin('EXAMPLE');
    * ```
    *
    * @category Custom Functions
@@ -3057,8 +3076,10 @@ export class HyperFormula implements TypedEmitter {
    *
    * @example
    * ```js
+   * const hfInstance = HyperFormula.buildEmpty();
+   *
    * // return classes of all plugins registered, assign to a variable
-   * const allNames = HyperFormula.getAllFunctionPlugins();
+   * const allNames = hfInstance.getAllFunctionPlugins();
    * ```
    *
    * @category Custom Functions
