@@ -58,7 +58,7 @@ module.exports = {
     }
   },
   themeConfig: {
-    logo: '/logo.png',
+    logo: '/assets/img/logo.png',
     nextLinks: true,
     prevLinks: true,
     repo: 'handsontable/hyperformula',
