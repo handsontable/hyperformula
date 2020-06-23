@@ -385,6 +385,15 @@ export class HyperFormula implements TypedEmitter {
    * @throws [[FunctionPluginValidationError]] when plugin class definition is not consistent with metadata
    * @throws [[ProtectedFunctionTranslationError]] when trying to register translation for protected function
    *
+   * @example
+   * ```js
+   * // import your own plugin
+   * import { MyExamplePlugin } from './file_with_your_plugin';
+   *
+   * // register the plugin
+   * HyperFormula.registerFunctionPlugin(MyExamplePlugin);
+   * ```
+   *
    * @category Static Methods
    */
   public static registerFunctionPlugin(plugin: FunctionPluginDefinition, translations?: FunctionTranslationsPackage): void {
@@ -395,6 +404,15 @@ export class HyperFormula implements TypedEmitter {
    * Unregisters all functions defined in given plugin
    *
    * @param {FunctionPluginDefinition} plugin - plugin class
+   *
+   * @example
+   * ```js
+   * // get the class of a plugin
+   * const registeredPluginClass = HyperFormula.getFunctionPlugin('EXAMPLE');
+   *
+   * // unregister all functions defined in a plugin of ID 'EXAMPLE'
+   * HyperFormula.unregisterFunctionPlugin(registeredPluginClass);
+   * ```
    *
    * @category Static Methods
    */
@@ -411,6 +429,14 @@ export class HyperFormula implements TypedEmitter {
    *
    * @throws [[FunctionPluginValidationError]] when function with a given id does not exists in plugin or plugin class definition is not consistent with metadata
    * @throws [[ProtectedFunctionTranslationError]] when trying to register translation for protected function
+   * @example
+   * ```js
+   * // import your own plugin
+   * import { MyExamplePlugin } from './file_with_your_plugin';
+   *
+   * // register a function
+   * HyperFormula.registerFunction('EXAMPLE', MyExamplePlugin);
+   * ```
    *
    * @category Static Methods
    */
@@ -423,6 +449,18 @@ export class HyperFormula implements TypedEmitter {
    *
    * @param {string} functionId - function id, e.g. 'SUMIF'
    *
+   * @example
+   * ```js
+   * // import your own plugin
+   * import { MyExamplePlugin } from './file_with_your_plugin';
+   *
+   * // register a function
+   * HyperFormula.registerFunction('EXAMPLE', MyExamplePlugin);
+   *
+   * // unregister a function
+   * HyperFormula.unregisterFunction('EXAMPLE');
+   * ```
+   *
    * @category Static Methods
    */
   public static unregisterFunction(functionId: string): void {
@@ -431,6 +469,11 @@ export class HyperFormula implements TypedEmitter {
 
   /**
    * Clears function registry
+   *
+   * @example
+   * ```js
+   * HyperFormula.unregisterAllFunctions();
+   * ```
    *
    * @category Static Methods
    */
@@ -442,6 +485,12 @@ export class HyperFormula implements TypedEmitter {
    * Returns translated names of all registered functions for a given language
    *
    * @param {string} code - language code
+   *
+   * @example
+   * ```js
+   * // return a list of function names registered for enGB
+   * const allNames = HyperFormula.getRegisteredFunctionNames('enGB');
+   * ```
    *
    * @category Static Methods
    */
@@ -456,6 +505,18 @@ export class HyperFormula implements TypedEmitter {
    *
    * @param {string} functionId - id of a function, e.g. 'SUMIF'
    *
+   * @example
+   * ```js
+   * // import your own plugin
+   * import { MyExamplePlugin } from './file_with_your_plugin';
+   *
+   * // register a plugin
+   * HyperFormula.registerFunctionPlugin(MyExamplePlugin);
+   *
+   * // return the class of a given plugin
+   * const myFunctionClass = HyperFormula.getFunctionPlugin('EXAMPLE');
+   * ```
+   *
    * @category Static Methods
    */
   public static getFunctionPlugin(functionId: string): Maybe<FunctionPluginDefinition> {
@@ -464,6 +525,12 @@ export class HyperFormula implements TypedEmitter {
 
   /**
    * Returns classes of all plugins registered in this instance of HyperFormula
+   *
+   * @example
+   * ```js
+   * // return classes of all plugins
+   * const allClasses = HyperFormula.getAllFunctionPlugins();
+   * ```
    *
    * @category Static Methods
    */
@@ -2980,6 +3047,14 @@ export class HyperFormula implements TypedEmitter {
    * Returns translated names of all functions registered in this instance of HyperFormula
    * according to the language set in the configuration
    *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildEmpty();
+   *
+   * // return translated names of all functions, assign to a variable
+   * const allNames = hfInstance.getRegisteredFunctionNames();
+   * ```
+   *
    * @category Custom Functions
    */
   public getRegisteredFunctionNames(): string[] {
@@ -2992,6 +3067,20 @@ export class HyperFormula implements TypedEmitter {
    *
    * @param {string} functionId - id of a function, e.g. 'SUMIF'
    *
+   * @example
+   * ```js
+   * // import your own plugin
+   * import { MyExamplePlugin } from './file_with_your_plugin';
+   *
+   * const hfInstance = HyperFormula.buildEmpty();
+   *
+   * // register a plugin
+   * HyperFormula.registerFunctionPlugin(MyExamplePlugin);
+   *
+   * // get the plugin
+   * const myPlugin = hfInstance.getFunctionPlugin('EXAMPLE');
+   * ```
+   *
    * @category Custom Functions
    */
   public getFunctionPlugin(functionId: string): Maybe<FunctionPluginDefinition> {
@@ -3000,6 +3089,14 @@ export class HyperFormula implements TypedEmitter {
 
   /**
    * Returns classes of all plugins registered in this instance of HyperFormula
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildEmpty();
+   *
+   * // return classes of all plugins registered, assign to a variable
+   * const allNames = hfInstance.getAllFunctionPlugins();
+   * ```
    *
    * @category Custom Functions
    */
