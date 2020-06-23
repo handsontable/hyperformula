@@ -1694,6 +1694,17 @@ export class HyperFormula implements TypedEmitter {
    *
    * @example
    * ```js
+   * const hfInstance = HyperFormula.buildFromArray([
+   *   ['1', '2', '3'],
+   * ]);
+   *
+   * // do an operation, for example remove columns
+   * hfInstance.removeColumns(0, [0, 1]);
+   * 
+   * // undo the operation
+   * hfInstance.undo();
+   *
+   * // clear the undo stack
    * hfInstance.clearUndoStack();
    * ```
    *
