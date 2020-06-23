@@ -1,4 +1,3 @@
-
 Welcome to HyperFormula `v{{ $page.version }}` API!
 
 Current build: {{ $page.buildDate }}
