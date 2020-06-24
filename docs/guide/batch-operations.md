@@ -140,7 +140,7 @@ These operations have an impact on calculation results and may affect the perfor
 
 Batching can be useful when there is a need for multiple memory-consuming operations. In this case, you should consider using them to achieve better performance in the application you develop; it will result in faster calculation across the whole HyperFormula instance.
 
-Batching can also be useful when you decide to use HyperFormula on the server-side. Several operations might be sent as a single one.
+Batching can also be useful when you decide to use HyperFormula on the [server-side](server-side-installation). Several operations might be sent as a single one.
 
 ### Demo
 

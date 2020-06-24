@@ -22,7 +22,7 @@ HyperFormula is an open-source **calculation engine** that allows you to perform
 
 It comes with a built-in [library of functions](built-in-functions.md) grouped into different categories, such as Math and trigonometry, Engineering, Statistical, Financial, and Logical. The functions use A1 notation and are compatible with popular spreadsheet software like Excel or Google Sheets, which means that you can easily transfer the data and formulas between them.
 
-HyperFormula covers most user-triggered actions such as [CRUD operations](crud-operations.md), [undo/redo](undo-redo.md), and [clipboard operations](clipboard-operations.md). It also supports the use of cross-sheet references, [named expressions](named-ranges.md), [different data types](types-of-data.md), and [custom functions](creating-custom-functions.md).
+HyperFormula covers most user-triggered actions such as [CRUD operations](basic-operations), [undo/redo](undo-redo.md), and [clipboard operations](clipboard-operations.md). It also supports the use of cross-sheet references, [named expressions](named-ranges.md), [different data types](types-of-values.md), and [custom functions](custom-functions).
 
 ### What can it be used for?
 
@@ -60,7 +60,7 @@ The features that HyperFormula offers make it a flexible and easy to use tool fo
 * [Basic usage](basic-usage.md)
 * [Configuration options](configuration-options.md)
 * [Built-in functions](built-in-functions.md)
-* [Custom functions](creating-custom-functions.md)
+* [Custom functions](custom-functions)
 * [Key concepts](key-concepts.md)
 * [Performance](performance.md)
 

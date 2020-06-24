@@ -69,5 +69,5 @@ There is a way to define a custom function that you consider volatile. To do so,
     },
 ```
 
-You can find more information about creating custom functions [in this section](creating-custom-functions.md).
+You can find more information about creating custom functions [in this section](custom-functions).
 

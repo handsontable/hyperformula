@@ -6,7 +6,7 @@ For full compatibility, the minimum required version of **Node is 13**. It is re
 There is a possibility to use lower versions of Node but you need to install an additional package as the dependency: [`full-icu`](https://github.com/unicode-org/full-icu-npm)
 :::
 
-The basic steps are very similar to the ones in the [client-side installation](client-side.md) process.
+The basic steps are very similar to the ones in the [client-side installation](client-side-installation.md) process.
 
 ### Install with npm or Yarn
 
