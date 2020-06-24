@@ -87,19 +87,52 @@ module.exports = {
     //   indexName: '<INDEX_NAME>'
     // },
     nav: [
-      { text: 'Guide', link: '/guide/welcome.md' },
+      { text: 'Guide', link: '/' },
       { text: 'API Reference', link: '/api/' },
     ],
     displayAllHeaders: false, // collapse other pages
     activeHeaderLinks: true,
     sidebarDepth: 1,
     sidebar: {
-      '/guide/': [
+      '/api/': [
+        {
+          title: 'Introduction',
+          path: '/api/',
+        },
+        {
+          title: 'HyperFormula',
+          path: '/api/classes/hyperformula',
+          collapsable: true,
+        },
+        {
+          title: 'Event Types',
+          path: '/api/interfaces/listeners',
+          alias: '/api/events',
+          collapsable: true,
+        },
+        {
+          title: 'Configuration Options',
+          path: '/api/interfaces/configparams',
+          collapsable: true,
+        },
+        {
+          title: 'Error Types',
+          collapsable: true,
+          children: fs.readdirSync(path.join(__dirname, '../api/classes'))
+            .filter((n) => n.match(/.*error\.md$/))
+            .map(f => `/api/classes/${f}`)
+        },
+        {
+          title: 'Globals',
+          path: '/api/globals',
+        },
+      ],
+      '/': [
         {
           title: 'Introduction',
           collapsable: false,
           children: [
-            ['/guide/welcome', 'Welcome'],
+            ['/', 'Welcome'],
             ['/guide/demo', 'Demo'],
           ]
         },
@@ -193,39 +226,6 @@ module.exports = {
             ['/guide/contact', 'Contact'],
           ]
         }
-      ],
-      '/api/': [
-        {
-          title: 'Introduction',
-          path: '/api/',
-        },
-        {
-          title: 'HyperFormula',
-          path: '/api/classes/hyperformula',
-          collapsable: true,
-        },
-        {
-          title: 'Event Types',
-          path: '/api/interfaces/listeners',
-          alias: '/api/events',
-          collapsable: true,
-        },
-        {
-          title: 'Configuration Options',
-          path: '/api/interfaces/configparams',
-          collapsable: true,
-        },
-        {
-          title: 'Error Types',
-          collapsable: true,
-          children: fs.readdirSync(path.join(__dirname, '../api/classes'))
-            .filter((n) => n.match(/.*error\.md$/))
-            .map(f => `/api/classes/${f}`)
-        },
-        {
-          title: 'Globals',
-          path: '/api/globals',
-        },
       ],
     },
   }
