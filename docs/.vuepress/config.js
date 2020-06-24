@@ -8,7 +8,7 @@ module.exports = {
   title: 'HyperFormula (v' + HyperFormula.version + ')',
   description: 'HyperFormula is an open-source, high-performance calculation engine for spreadsheets and web applications.',
   head: [
-    // Google Tag Manager.
+    // Google Tag Manager, an extra element within the `ssr.html` file.
     ['script', {}, `
       (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
       new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
