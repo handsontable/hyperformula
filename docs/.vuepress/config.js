@@ -66,6 +66,10 @@ module.exports = {
       })
     }
   },
+  // TODO: It doesn't work. It's seems that this option is bugged. Documentation says that this option is configurable,
+  // but I can't do it. Resolving priority described here: https://github.com/vuejs/vuepress/issues/882#issuecomment-425323104
+  // seems not working properlt. I've uploaded `ssr.html` file to `.vuepress/template` dictionary.
+  // ssrTemplate: 'index.ssr.html',
   themeConfig: {
     logo: '/logo.png',
     nextLinks: true,
