@@ -21,11 +21,11 @@ _Some categories such as compatibility, cube, database, and financial are yet to
 
 HypeFormula provides translation packs for 16 languages thus making it easier to create localized applications. The supported languages are: English \(default\), Czech, Danish, Dutch, Finnish, French, German, Hungarian, Italian, Norwegian, Polish, Portuguese, Russian, Spanish, Swedish, and Turkish.
 
-The package includes localization of function names and error values \(such as \#REF! or \#NAME!\). To support more languages or properties create your own [custom language pack](culture-definition.md).
+The package includes localization of function names and error values \(such as \#REF! or \#NAME!\). To support more languages or properties create your own [custom language pack](localizing-functions).
 
 ### Custom functions
 
-One of the most valuable features of HyperFormula is its extensibility. All functions are implemented within the plugin architecture which means it is easy to remove or replace them. This means you are not limited by the current functionality of the engine. HyperFormula lets you design your own [custom functions](creating-custom-functions.md).
+One of the most valuable features of HyperFormula is its extensibility. All functions are implemented within the plugin architecture which means it is easy to remove or replace them. This means you are not limited by the current functionality of the engine. HyperFormula lets you design your own [custom functions](custom-functions).
 
 ### List of available functions
 

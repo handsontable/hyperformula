@@ -54,7 +54,7 @@ Same goes for the [errors](types-of-errors.md) displayed inside cells when somet
 
 ### Localizing custom functions
 
-You can translate your own [custom functions](creating-custom-functions.md) into different languages, too. You need to define them and register while registering a plugin:
+You can translate your own [custom functions](custom-functions) into different languages, too. You need to define them and register while registering a plugin:
 
 ```javascript
 const translations = {
