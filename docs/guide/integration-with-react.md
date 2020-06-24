@@ -1,6 +1,6 @@
 # Integration with React
 
-The installation process for applications written in React is the same as in the case of VanillaJS. You can check the [client-side installation](client-side.md) section for more details.
+The installation process for applications written in React is the same as in the case of VanillaJS. You can check the [client-side installation](client-side-installation.md) section for more details.
 
 ### Demo of HyperFormula for React
 

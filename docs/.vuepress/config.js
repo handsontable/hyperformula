@@ -115,8 +115,8 @@ module.exports = {
           title: 'Getting started',
           collapsable: false,
           children: [
-            ['/guide/client-side', 'Client-side installation'],
-            ['/guide/server-side', 'Server-side installation'],
+            ['/guide/client-side-installation', 'Client-side installation'],
+            ['/guide/server-side-installation', 'Server-side installation'],
             ['/guide/basic-usage', 'Basic usage'],
             ['/guide/advanced-usage', 'Advanced usage'],
             ['/guide/configuration-options', 'Configuration options'],
@@ -137,7 +137,7 @@ module.exports = {
           title: 'Data Operations',
           collapsable: false,
           children: [
-            ['/guide/crud-operations', 'Basic operations'],
+            ['/guide/basic-operations', 'Basic operations'],
             ['/guide/batch-operations', 'Batch operations'],
             ['/guide/clipboard-operations', 'Clipboard operations'],
             ['/guide/undo-redo', 'Undo-redo'],
@@ -150,7 +150,7 @@ module.exports = {
           children: [
             ['/guide/specifications-and-limits', 'Specifications and limits'],
             ['/guide/cell-references', 'Cell references'],
-            ['/guide/types-of-data', 'Types of values'],
+            ['/guide/types-of-values', 'Types of values'],
             ['/guide/types-of-errors', 'Types of errors'],
             ['/guide/types-of-operators', 'Types of operators'],
             ['/guide/order-of-precendece', 'Order of precedence'],
@@ -163,7 +163,7 @@ module.exports = {
           title: 'Internationalization',
           collapsable: false,
           children: [
-            ['/guide/culture-definition', 'Localizing functions'],
+            ['/guide/localizing-functions', 'Localizing functions'],
             ['/guide/date-and-time-handling', 'Date and time handling'],
           ]
         },
@@ -174,7 +174,7 @@ module.exports = {
             ['/guide/key-concepts', 'Key concepts'],
             ['/guide/building', 'Building'],
             ['/guide/testing', 'Testing'],
-            ['/guide/creating-custom-functions', 'Custom functions'],
+            ['/guide/custom-functions', 'Custom functions'],
             ['/guide/performance', 'Performance'],
           ]
         },
