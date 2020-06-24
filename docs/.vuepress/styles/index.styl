@@ -2,6 +2,22 @@ body div {
     user-select: initial;
 }
 
+.iframe-container {
+    overflow: hidden;
+    // aspect ration of the video (for 16:9 it is 9/16= 0.5625)
+    padding-top: 56.25%;
+    position: relative;
+}
+
+.iframe-container iframe {
+    border: 0;
+    height: 100%;
+    left: 0;
+    position: absolute;
+    top: 0;
+    width: 100%;
+}
+
 /*
     TODO: It's workaround, and it should be removed. It seems that there is no option to disable title for a custom
     containers: https://v1.vuepress.vuejs.org/guide/markdown.html#custom-containers
