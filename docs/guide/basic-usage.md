@@ -1,5 +1,9 @@
 # Basic usage
 
+::: tip
+The instance can be created with three static methods: `buildFromArray`, `buildFromSheets` or `buildEmpty`. You can check all of their descriptions in our API reference.
+:::
+
 If you've already installed the library, it's time to start writing the first simple application.
 
 First, if you used NPM or Yarn to install the package, make sure you have properly imported HyperFormula as shown below:
@@ -14,7 +18,7 @@ Now you can use the [available options](configuration-options.md) to configure t
 
 ```javascript
 const options = {
-    precisionRounding: 10,
+    precisionRounding: 4,
     licenseKey: 'agpl-v3'
 };
 ```
@@ -23,27 +27,23 @@ Then, prepare some data to be used by your app. In this case, the data set will 
 
 ```javascript
 // define the data
-const data = [['10', '20', '=SUM(A1,B1)']];
+const data = [['10', '20', '3.14159265359', '=SUM(A1:C1)']];
 
 // build an instance with defined options and data 
 const hfInstance = HyperFormula.buildFromArray(data, options);
 ```
 
-::: tip
-The instance can be created with three static methods:`buildFromArray`,`buildFromSheets` or `buildEmpty.` You can check all of their descriptions in our API reference. 
-:::
-
 Alright, now it's time to do some calculations. Let's use the `getCellValue` method to retrieve the results of a formula included in the `data` .
 
 ```javascript
 // call getCellValue to get the calculation results
-const mySum = hfInstance.getCellValue({ col: 2, row: 0, sheet: 0 });
+const mySum = hfInstance.getCellValue({ col: 3, row: 0, sheet: 0 });
 ```
 
 You can check the output in the console:
 
 ```javascript
-// this outputs 30 in the console
+// this outputs the result in the browser's console
 console.log(mySum);
 ```
 

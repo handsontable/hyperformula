@@ -8,8 +8,8 @@ You are required to specify the license under which you use the software. This c
 
 | Name | Type |
 | :--- | :--- |
-| [AGPL v3](https://github.com/handsontable/hyperformula/blob/master/agpl-v3.pdf) | Open-source |
-| [HyperFormula Non-Commercial License](https://github.com/handsontable/hyperformula/blob/master/hyperformula-non-commercial-license.pdf) | Proprietary |
+| [AGPL v3](https://github.com/handsontable/hyperformula/blob/master/agpl-3.0.txt) | Open-source |
+| [Non-Commercial License](https://github.com/handsontable/hyperformula/blob/master/non-commercial-license.pdf) | Proprietary |
 | Commercial License Agreement | Proprietary |
 
 ### Open source and non-commercial use

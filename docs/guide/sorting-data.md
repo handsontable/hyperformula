@@ -1,8 +1,15 @@
 # Sorting data
 
-**HyperFormula does not support sorting natively.** 
+::: tip
+HyperFormula does not support sorting natively.
+:::
 
-However, a similar result can be achieved by batching **move** operations for columns. It works in a similar way to spreadsheet software like Excel or Google Sheets. That means HyperFormula first sorts the formulas by their results \(values\). Then, when the sorting is done, the formulas are re-calculated with regard to their new position.
+However, a similar result can be achieved by doing multiple **move**
+operations for columns. It works in a similar way to spreadsheet
+software like Excel or Google Sheets. That means HyperFormula first
+sorts the formulas by their results \(values\). Then, when the sorting
+is done, the formulas are re-calculated with regard to their new
+position.
 
 ### Demo
 

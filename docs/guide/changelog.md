@@ -14,7 +14,7 @@ Release date: June 23, 2020 🎉
 * Support for volatile functions;
 * Cultures supports - can be configured according to the application need;
 * Custom functions support;
-* Set [http://docs.oasis-open.org/office/v1.2/OpenDocument-v1.2-part2.html](http://docs.oasis-open.org/office/v1.2/OpenDocument-v1.2-part2.html) as a standard to follow;
+* Set [OpenDocument v1.2](http://docs.oasis-open.org/office/v1.2/OpenDocument-v1.2-part2.html) as a standard to follow;
 *  Error handling:  - Division by zero: \#DIV/0!  - Unknown function name: \#NAME?,  - Wrong type of argument in a function or wrong type of operator: \#VALUE!,  - Invalid numeric values: \#NUM!,  - No value available: \#N/A,  - Cyclic dependency: \#CYCLE!,  - Wrong address reference: \#REF; 
 * Built-in function translations support for 16 languages: csCZ, daDK, deDE, enGB, esES, fiFI, frFR, huHU, itIT, nbNO, nlNL, plPL, ptPT, ruRU, svSE and trTR.
 

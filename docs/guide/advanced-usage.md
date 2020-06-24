@@ -1,5 +1,11 @@
 # Advanced usage
 
+::: tip
+By default, cells are identified using a `SimpleCellAddress` which consists of a sheet ID, column ID, and row ID, like this: `{ sheet: 0, col: 0, row: 0 }`
+
+Alternatively, you can work with the **A1 notation** known from spreadsheets like Excel or Google Sheets. The API provides the helper function `simpleCellAddressFromString` which you can use to retrieve the `SimpleCellAddress` .
+:::
+
 The following example shows how to use formulas to find out which of the two Teams \(A or B\) is the winning one. You will do that by comparing the average scores of players in each team.
 
 The initial steps are the same as in the [basic example](basic-usage.md). First, import HyperFormula and choose the configuration options:
@@ -8,7 +14,6 @@ The initial steps are the same as in the [basic example](basic-usage.md). First,
 import { HyperFormula } from 'hyperformula';
 
 const options = {
-    precisionRounding: 10,
     licenseKey: 'agpl-v3'
 };
 ```
@@ -79,10 +84,6 @@ hfInstance.setSheetContent('Formulas', formulas);
 ```
 
 Almost done! Now, you can use the `getSheetValues` method to get all values including the calculated ones. Alternatively, you can use `getCellValue`to get the value from a specific cell.
-
-::: tip
-You can work with A1 notation comfortably and use the helper function `simpleCellAddressFromString` to retrieve the `SimpleCellAddress` which is required as a parameter in some methods. This is one of several handy helper methods the HyperFormula API offers.
-:::
 
 ```javascript
 // get sheet values from the Sheet of ID 2

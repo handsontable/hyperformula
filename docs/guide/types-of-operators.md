@@ -51,12 +51,9 @@ The binary relational operators, when used in a formula, return the boolean or l
 
 HyperFormula does type coercion and it can have an impact on comparing, adding, or any other operation between **values of a different type**. The table represents some operations between different types and their results.
 
-// poniższe tabelki powinny być we vuepress zwijane/ukrywane  
-// to cenne informacje dla developera, taki cheatsheet
-
 ### **Boolean to int** coercion, basic arithmetic operations
-
-#### a\) true and null
+<details>
+ <summary>#### a\) true and null</summary>
 
 | Operation | Result |
 | :--- | :--- |
@@ -68,6 +65,7 @@ HyperFormula does type coercion and it can have an impact on comparing, adding, 
 | +true \(unary plus true\) | true |
 | -true \(unary minus true\) | -1 |
 | true% | 0.01 |
+</details>
 
 #### b\) null and true
 

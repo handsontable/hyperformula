@@ -1,6 +1,10 @@
 # Specifications and limits
 
-The following table presents the limits of features. Many of them are bounded only by the system resources - "Limited by system resources \(JavaScript\)" which means the actual limit is flexible and changes based on several factors, for example,  specifications of the device HyperFormula is running on.
+The following table presents the limits of features. Many of them
+are bounded only by the system resources. It means that the actual
+limit depends on several factors, for example,
+resources (such as available memory) of the device HyperFormula
+is running on.
 
 ### Sheet and cell limits
 
@@ -89,4 +93,3 @@ The following table presents the limits of features. Many of them are bounded on
 | Arguments in function | Limited by system resources \(JavaScript\) |
 | Number of cross-sheet dependencies | Limited by system resources \(JavaScript\) |
 | Number of dependencies on a single cell | Limited by system resources \(JavaScript\) |
-
