@@ -597,7 +597,6 @@ export class HyperFormula implements TypedEmitter {
 
   /**
    * Returns a normalized formula string from the cell of a given address or `undefined` for an address that does not exist and empty values.
-   * Unparses AST.
    *
    * @param {SimpleCellAddress} cellAddress - cell coordinates
    *
@@ -622,7 +621,6 @@ export class HyperFormula implements TypedEmitter {
 
   /**
    * Returns [[CellValue]] which a serialized content of the cell of a given address either a cell formula, an explicit value, or an error.
-   * Unparses AST and applies post-processing.
    *
    * @param {SimpleCellAddress} cellAddress - cell coordinates
    *
@@ -678,7 +676,6 @@ export class HyperFormula implements TypedEmitter {
 
   /**
    * Returns an array with normalized formula strings from [[Sheet]] or `undefined` for a cells that have no value.
-   * Unparses AST.
    *
    * @param {SimpleCellAddress} sheetId - sheet ID number
    *
@@ -709,7 +706,6 @@ export class HyperFormula implements TypedEmitter {
 
   /**
    * Returns an array of arrays of [[NoErrorCellValue]] with serialized content of cells from [[Sheet]], either a cell formula or an explicit value.
-   * Unparses AST. Applies post-processing.
    *
    * @param {SimpleCellAddress} sheetId - sheet ID number
    *
@@ -818,7 +814,7 @@ export class HyperFormula implements TypedEmitter {
   }
 
   /**
-   * Returns formulas of all sheets in a form of an object which property keys are strings and values are arrays of arrays of strings or possibly `undefined`.
+   * Returns formulas of all sheets in a form of an object which property keys are strings and values are arrays of arrays of strings or possibly `undefined` when the call does not contain a formula.
    *
    * @example
    * ```js
@@ -1735,7 +1731,7 @@ export class HyperFormula implements TypedEmitter {
   }
 
   /**
-   * Clears the clipboard content by setting the content to `undefined`.
+   * Clears the clipboard content.
    *
    * @example
    * ```js
@@ -1932,7 +1928,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * @fires [[sheetAdded]] after the sheet was added
    *
-   * @throws [[SheetNameAlreadyTaken]] when sheet with a given name already exists
+   * @throws [[SheetNameAlreadyTakenError]] when sheet with a given name already exists
    *
    * @example
    * ```js
@@ -2659,7 +2655,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * @param {string} expressionName - a name of the expression to be added
    * @param {RawCellContent} expression - the expression
-   * @param {string?} scope - sheet name or undefined for global scope
+   * @param {string?} scope - scope definition, `sheetName` for local scope or `undefined` for global scope
    *
    * @example
    * ```js
@@ -2764,7 +2760,6 @@ export class HyperFormula implements TypedEmitter {
 
   /**
    * Returns a normalized formula string for given named expression or `undefined` for a named expression that does not exist or does not hold a formula.
-   * Unparses AST.
    *
    * @param {string} expressionName - expression name, case insensitive.
    * @param {string?} scope - scope definition, `sheetName` for local scope or `undefined` for global scope
@@ -2799,7 +2794,6 @@ export class HyperFormula implements TypedEmitter {
 
   /**
    * Returns named expression a normalized formula string for given named expression or `undefined` for a named expression that does not exist or does not hold a formula.
-   * Unparses AST.
    *
    * @param {string} expressionName - expression name, case insensitive.
    * @param {string?} scope - scope definition, `sheetName` for local scope or `undefined` for global scope
@@ -2848,7 +2842,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * @param {string} expressionName - an expression name, case insensitive.
    * @param {RawCellContent} newExpression - a new expression
-   * @param {string?} scope - sheet name or undefined for global scope
+   * @param {string?} scope - scope definition, `sheetName` for local scope or `undefined` for global scope
    *
    * @example
    * ```js
@@ -2919,7 +2913,7 @@ export class HyperFormula implements TypedEmitter {
    * Returns `false` if the operation might be disrupted.
    *
    * @param {string} expressionName - an expression name, case insensitive.
-   * @param {string?} scope - sheet name or undefined for global scope
+   * @param {string?} scope - scope definition, `sheetName` for local scope or `undefined` for global scope
    *
    * @example
    * ```js
@@ -3321,7 +3315,6 @@ export class HyperFormula implements TypedEmitter {
 
   /**
    * Destroys instance of HyperFormula.
-   * Dependency graph, optimization indexes, statistics and parser are removed.
    *
    * @example
    * ```js
