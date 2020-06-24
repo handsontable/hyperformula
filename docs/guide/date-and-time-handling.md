@@ -1,12 +1,19 @@
 # Date and time handling
 
-Date and time formats can be set in the [configuration options](configuration-options.md).
+Date and time formats can be set in the 
+[configuration options](configuration-options.md).
 
-`dateFormats` is a list of formats supported by the parser inside HyperFormula. The default format is `['MM/DD/YYYY', 'MM/DD/YY']`. The separator is ignored and it can be any of the following:  '-' \(dash\), ' ' \(empty space\), '/' \(slash\).
+`dateFormats` is a list of formats supported by the parser 
+inside HyperFormula. The default format is 
+`['MM/DD/YYYY', 'MM/DD/YY']`. The separator is ignored and it can 
+be any of the following:  '-' (dash), ' ' (empty space), 
+'/' (slash).
 
-Similarly to `dateFormats`, `timeFormats` is a list of time formats supported by the parser. The default format is`['hh:mm', 'hh:mm:ss.sss']`. The only accepted separator is ':' \(colon\).
+Similarly to `dateFormats`, `timeFormats` is a list of time formats
+supported by the parser. The default format is
+`['hh:mm', 'hh:mm:ss.sss']`. The only accepted separator is ':' (colon).
 
-### Example with Chinese
+## Example with Chinese
 
 ```javascript
 const options = {
@@ -17,15 +24,25 @@ const options = {
 };
 ```
 
-### Integration and customization
+## Integration and customization
 
-HyperFormula offers a possibility to extend the number of supported date/time formats and the behavior of this functionality by exposing three options:
+HyperFormula offers a possibility to extend the number of supported
+date/time formats and the behavior of this functionality by exposing
+three options:
 
-* `parseDateTime` which allows for providing a function that accepts a string representing date-time and parting it into an actual date-time format
-* `stringifyDateTime`which allows for providing a function that takes the date and prints it as a string
-* `stringifyDuration` which allows for providing a function that takes time duration and prints it as a string
+* `parseDateTime` which allows for providing a function that accepts
+a string representing date-time and parting it into an actual
+date-time format
+* `stringifyDateTime`which allows for providing a function that
+takes the date and prints it as a string
+* `stringifyDuration` which allows for providing a function that
+takes time duration and prints it as a string
 
-To extend the numbers of possible date formats you will need to configure `parseDateTime` . This functionality is based on callbacks and you can customize the formats by integrating a third-party library like [Moment.js](https://momentjs.com/), or by writing your own custom function, like this:
+To extend the numbers of possible date formats you will need to
+configure `parseDateTime` . This functionality is based on callbacks
+and you can customize the formats by integrating a third-party
+library like [Moment.js](https://momentjs.com/), or by writing your
+own custom function, like this:
 
 ```javascript
  {
@@ -35,13 +52,22 @@ To extend the numbers of possible date formats you will need to configure `parse
  }
 ```
 
-The configuration of date formats and stringify options may have an impact on how the functions: TEXT, VALUE, and criterions i.e. SUMIF, AVERAGEIF will behave. For instance,  VALUE accepts a string and returns a number - which means, it uses `parseDatetime`. TEXT works the other way round - it accepts a number and returns a string so it will use `stringifyDateTime`. Any change here might give you different results. Criterions do comparisons so they also need to work on strings, dates, etc.
+The configuration of date formats and stringify options may have
+an impact on how the functions: TEXT, VALUE, and criterions i.e.
+SUMIF, AVERAGEIF will behave. For instance,  VALUE accepts a string
+and returns a number - which means, it uses `parseDatetime`. TEXT
+works the other way round - it accepts a number and returns a string
+so it will use `stringifyDateTime`. Any change here might give you
+different results. Criterions do comparisons so they also need to
+work on strings, dates, etc.
 
-### Moment.js integration
+## Moment.js integration
 
-In this example, you will add the possibility to parse dates in `"Do MMM YY"` custom format.
+In this example, you will add the possibility to parse dates in
+`"Do MMM YY"` custom format.
 
-To do so, first, you need to write a function using [Moment.js API](https://momentjs.com/docs/):
+To do so, first, you need to write a function using
+[Moment.js API](https://momentjs.com/docs/):
 
 ```javascript
 import moment from "moment";
@@ -63,7 +89,8 @@ export const customParseDate = (dateString, dateFormat) => {
 };
 ```
 
-Then, use it inside the [configuration options](configuration-options.md) like so:
+Then, use it inside the
+[configuration options](configuration-options.md) like so:
 
 ```javascript
 const options = {
@@ -73,31 +100,32 @@ const options = {
 };
 ```
 
-After that, you should be able to add a dataset with dates with your custom format:
+After that, you should be able to add a dataset with dates with
+your custom format:
 
 ```javascript
 const data = [["31st Jan 00", "2nd Jun 01", "=B1-A1"]];
 ```
 
-And now the operations on dates are possible since HyperFormula recognizes them as proper dates:
+And now the operations on dates are possible since HyperFormula
+recognizes them as proper dates:
 
-### **Demo**
+## Demo
 
 <iframe
-   src="https://codesandbox.io/embed/github/handsontable/hyperformula-demos/tree/develop/date-time?autoresize=1&fontsize=14&hidenavigation=1&theme=dark&view=preview"
-   style="width:100%; height:500px; border:0; border-radius: 4px; overflow:hidden;"
-   title="handsontable/hyperformula-demos: basic-usage"
-   allow="accelerometer; ambient-light-sensor; camera; encrypted-media; geolocation; gyroscope; hid; microphone; midi; payment; usb; vr; xr-spatial-tracking"
-   sandbox="allow-forms allow-modals allow-popups allow-presentation allow-same-origin allow-scripts"
-/>
+     src="https://codesandbox.io/embed/github/handsontable/hyperformula-demos/tree/develop/localizing-functions?autoresize=1&fontsize=11&hidenavigation=1&theme=light&view=preview"
+     style="width:100%; height:500px; border:0; border-radius: 4px; overflow:hidden;"
+     title="handsontable/hyperformula-demos: localizing-functions"
+     allow="accelerometer; ambient-light-sensor; camera; encrypted-media; geolocation; gyroscope; hid; microphone; midi; payment; usb; vr; xr-spatial-tracking"
+     sandbox="allow-autoplay allow-forms allow-modals allow-popups allow-presentation allow-same-origin allow-scripts"
+   ></iframe>
 
+<br><br>
 
+## Cheat sheet
 
-### Cheatsheet
-
-// tutaj też proponuję zwijaną listę
-
-Below is the cheat sheet with the most popular date formats in different countries.
+Below is the cheat sheet with the most popular date formats in
+different countries.
 
 | Country | Language | Format |
 | :--- | :--- | :--- |
@@ -210,4 +238,3 @@ Below is the cheat sheet with the most popular date formats in different countri
 | Vietnam | Vietnamese | dd/MM/yyyy |
 | Yemen | Arabic | dd/MM/yyyy |
 | South Africa | English | yyyy/MM/dd |
-

@@ -4,21 +4,23 @@ description: HyperFormula® - Complex Calculations Made Easy
 
 # Welcome
 
-<iframe 
-    width="740"
-    height="416"
-    src="https://www.youtube.com/embed/JJXUmACTDdk?controls=0" 
-    frameborder="0" 
-    allow="accelerometer; 
-    encrypted-media; 
-    gyroscope; 
-    picture-in-picture" 
+<div class="iframe-container">
+  <iframe
+    width="560"
+    height="315"
+    src="https://www.youtube.com/embed/JJXUmACTDdk?controls=0"
+    frameborder="0"
+    allow="accelerometer;
+    encrypted-media;
+    gyroscope;
+    picture-in-picture"
     allowfullscreen>
-</iframe>
+  </iframe>
+</div>
 
-### What is HyperFormula?
+## What is HyperFormula?
 
-HyperFormula is an open-source **calculation engine** that allows you
+HyperFormula is an open-source calculation engine that allows you
 to perform Excel-like calculations in your business applications.
 HyperFormula is written in TypeScript and works with major
 JavaScript frameworks like [Vue](integration-with-vue),
@@ -39,9 +41,9 @@ the use of cross-sheet references, [named expressions](named-ranges.md),
 [different data types](types-of-values.md),
 and [custom functions](custom-functions).
 
-### What can it be used for?
+## What can it be used for?
 
-HyperFormula doesn't assume any existing user interface \(UI\),
+HyperFormula doesn't assume any existing user interface (UI),
 which makes it a great general-purpose library that can be used in
 various business applications. Here are some ideas on what you can
 build with HyperFormula:
@@ -56,7 +58,7 @@ build with HyperFormula:
 * Online calculators
 * Low connectivity apps
 
-### Core features
+## Core features
 
 The features that HyperFormula offers make it a flexible and easy
 to use tool for many types of software.
@@ -76,7 +78,7 @@ and [Vue](integration-with-vue.md)
 * Actively maintained and supported by the
 [Handsontable](https://handsontable.com/) team
 
-### Useful resources
+## Useful resources
 
 * [Basic usage](basic-usage.md)
 * [Configuration options](configuration-options.md)
@@ -85,3 +87,7 @@ and [Vue](integration-with-vue.md)
 * [Key concepts](key-concepts.md)
 * [Performance](performance.md)
 
+<br>
+
+This documentation is licensed under 
+[CC BY 4.0](https://creativecommons.org/licenses/by/4.0/).

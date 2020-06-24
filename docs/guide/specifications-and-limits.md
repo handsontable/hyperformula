@@ -6,7 +6,7 @@ limit depends on several factors, for example,
 resources (such as available memory) of the device HyperFormula
 is running on.
 
-### Sheet and cell limits
+## Sheet and cell limits
 
 <table>
   <thead>
@@ -79,17 +79,17 @@ is running on.
   </tbody>
 </table>
 
-### Calculation limits
+## Calculation limits
 
 | Feature | Maximum limit |
 | :--- | :--- |
-| Default number precision | 15 digits \(inherited from JavaScript\) |
-| Smallest magnitude allowed negative number | -5E-324 \(inherited from JavaScript\) |
-| Smallest magnitude allowed positive number | 5E-324 \(inherited from JavaScript\) |
-| Largest magnitude allowed positive number | 1.79E+308 \(inherited from JavaScript\) |
-| Largest magnitude allowed negative number | -1.79E+308 \(inherited from JavaScript\) |
-| Length of a single formula contents | Limited by system resources \(JavaScript\) |
+| Default number precision | 15 digits (inherited from JavaScript) |
+| Smallest magnitude allowed negative number | -5E-324 (inherited from JavaScript) |
+| Smallest magnitude allowed positive number | 5E-324 (inherited from JavaScript) |
+| Largest magnitude allowed positive number | 1.79E+308 (inherited from JavaScript) |
+| Largest magnitude allowed negative number | -1.79E+308 (inherited from JavaScript) |
+| Length of a single formula contents | Limited by system resources (JavaScript) |
 | Number of iterations | Not supported |
-| Arguments in function | Limited by system resources \(JavaScript\) |
-| Number of cross-sheet dependencies | Limited by system resources \(JavaScript\) |
-| Number of dependencies on a single cell | Limited by system resources \(JavaScript\) |
+| Arguments in function | Limited by system resources (JavaScript) |
+| Number of cross-sheet dependencies | Limited by system resources (JavaScript) |
+| Number of dependencies on a single cell | Limited by system resources (JavaScript) |

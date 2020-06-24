@@ -23,4 +23,3 @@ const options = {
 // call the static method to build a new instance
 const hfInstance = HyperFormula.buildEmpty(options);
 ```
-
