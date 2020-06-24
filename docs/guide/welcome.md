@@ -7,7 +7,7 @@ description: HyperFormula® - Complex Calculations Made Easy
 <iframe 
     width="560" 
     height="315" 
-    src="https://www.youtube.com/embed/JJXUmACTDdk" 
+    src="https://www.youtube.com/embed/JJXUmACTDdk?controls=0" 
     frameborder="0" 
     allow="accelerometer; 
     encrypted-media; 
