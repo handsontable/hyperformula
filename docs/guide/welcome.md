@@ -4,9 +4,8 @@ description: HyperFormula® - Complex Calculations Made Easy
 
 # Welcome
 
-<iframe 
-    width="560" 
-    height="315" 
+<div class="iframe-container">
+  <iframe 
     src="https://www.youtube.com/embed/JJXUmACTDdk" 
     frameborder="0" 
     allow="accelerometer; 
@@ -14,7 +13,8 @@ description: HyperFormula® - Complex Calculations Made Easy
     gyroscope; 
     picture-in-picture" 
     allowfullscreen>
-</iframe>
+  </iframe>
+</div>
 
 ### What is HyperFormula?
 
