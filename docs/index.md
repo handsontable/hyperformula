@@ -4,9 +4,8 @@ description: HyperFormula® - Complex Calculations Made Easy
 
 # Welcome
 
-<iframe 
-    width="560" 
-    height="315" 
+<div class="iframe-container">
+  <iframe 
     src="https://www.youtube.com/embed/JJXUmACTDdk?controls=0" 
     frameborder="0" 
     allow="accelerometer; 
@@ -14,7 +13,8 @@ description: HyperFormula® - Complex Calculations Made Easy
     gyroscope; 
     picture-in-picture" 
     allowfullscreen>
-</iframe>
+  </iframe>
+</div>
 
 ### What is HyperFormula?
 
@@ -63,4 +63,3 @@ The features that HyperFormula offers make it a flexible and easy to use tool fo
 * [Custom functions](custom-functions)
 * [Key concepts](key-concepts.md)
 * [Performance](performance.md)
-
