@@ -10,7 +10,7 @@
     "url": "https://github.com/handsontable/hyperformula/issues"
   },
   "author": "Handsoncode <hello@handsontable.com>",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "keywords": [
     "formula",
     "spreadsheet",
@@ -34,13 +34,13 @@
     "open formula",
     "openformula"
   ],
+  "license": "SEE LICENSE IN LICENSE.txt",
   "module": "es/index.js",
   "main": "commonjs/index.js",
   "jsnext:main": "es/index.js",
   "jsdelivr": "dist/hyperformula.min.js",
   "unpkg": "dist/hyperformula.min.js",
   "typings": "./typings/index.d.ts",
-  "private": true,
   "scripts": {
     "docs": "npm run bundle-all && npm run docs:api && npm run docs:build",
     "docs:api": "typedoc --options .typedoc.md.ts",

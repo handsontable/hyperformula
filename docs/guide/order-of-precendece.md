@@ -1,10 +1,15 @@
 # Order of precedence
 
-HyperFormula supports multiple [operators](types-of-operators.md) that can be used to perform mathematical operations in a formula. These operators are calculated in a specific order. If the formula contains the operators of equal precedence, like addition and subtraction, then they are evaluated from left to right.
+HyperFormula supports multiple [operators](types-of-operators.md) that
+can be used to perform mathematical operations in a formula. These
+operators are calculated in a specific order. If the formula contains
+the operators of equal precedence, like addition and subtraction, then
+they are evaluated from left to right.
 
-### Table of precedence
+## Table of precedence
 
-In the table below you can find the order in which HyperFormula performs operations \(from highest to lowest priority\).
+In the table below you can find the order in which HyperFormula
+performs operations (from highest to lowest priority).
 
 <table>
   <thead>
@@ -72,9 +77,15 @@ In the table below you can find the order in which HyperFormula performs operati
   </tbody>
 </table>
 
-### Using parentheses
+## Using parentheses
 
-HyperFormula calculates the formulas in parentheses first so by using them you can override the default order of evaluation. For instance, consider this formula: =7\*8+2. After the equal sign, there are operands \(7, 8, 2\) that are separated by operators \(\* and +\). Following the order of calculations, HyperFormula computes 7\*8 first and then adds 2. The correct answer to this equation is 58.
+HyperFormula calculates the formulas in parentheses first so by using
+them you can override the default order of evaluation. For instance,
+consider this formula: =7*8+2. After the equal sign, there are
+operands (7, 8, 2) that are separated by operators (* and +).
+Following the order of calculations, HyperFormula computes 7*8 first
+and then adds 2. The correct answer to this equation is 58.
 
-By placing \(8+2\) in parenthesis will change the result as HyperFormula will first calculate 8 + 2 = 10, and only then multiply it by 7. Now the result is 70, not 58 as in the first example.
-
+By placing (8+2) in parenthesis will change the result as
+HyperFormula will first calculate 8 + 2 = 10, and only then multiply
+it by 7. Now the result is 70, not 58 as in the first example.

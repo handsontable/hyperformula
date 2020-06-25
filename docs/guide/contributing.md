@@ -1,6 +1,7 @@
 # Contributing
 
-You are welcome to contribute to HyperFormula development. Your help is much appreciated in any of the following topics:
+You are welcome to contribute to HyperFormula development. Your help
+is much appreciated in any of the following topics:
 
 * Making pull requests
   * Adding new functions
@@ -13,22 +14,33 @@ You are welcome to contribute to HyperFormula development. Your help is much app
 * Suggesting new features
 * Adding new integrations with external tools, libraries, and services
 
-### Good first issue
+## Good first issue
 
-Adding a new function will be a huge help for the library growth and should not be too problematic for the first issue. Extending the library of translations is also a good task to start with.
+Adding a new function will be a huge help for the library growth and
+should not be too problematic for the first issue. Extending the
+library of translations is also a good task to start with.
 
-Visit [building](building.md) and [testing](testing.md) sections to get more info about these topics and check the list of commands you can run in this project. If you feel a bit lost check the `/i18n` folder in the project - all translations are kept just right there. For the functions see the `interpreter/plugin` folder. Both of them are a good starting point.
+Visit [building](building.md) and [testing](testing.md) sections to
+get more info about these topics and check the list of commands you
+can run in this project. If you feel a bit lost check the `/i18n`
+folder in the project - all translations are kept just right there.
+For the functions see the `interpreter/plugin` folder. Both of them
+are a good starting point.
 
-### How to get started
+## How to get started
 
-1. First, sign this [Contributor License Agreement](https://goo.gl/forms/yuutGuN0RjsikVpM2) to allow us to use and publish your changes.
-2. Always make your changes on a separate branch. This will speed up the merging process.
-3. Always make the target of your pull request the `develop` branch, not `master`.
+1. First, sign this
+Contributor License Agreement](https://goo.gl/forms/yuutGuN0RjsikVpM2)
+to allow us to use and publish your changes.
+2. Always make your changes on a separate branch. This will speed up
+the merging process.
+3. Always make the target of your pull request the `develop` branch,
+not `master`.
 4. For any change you make, add test specs in the `test` folder.
 5. Please lint the code. See the section about using linter.
 6. Add a comprehensive description of all the changes.
 
-### Code of conduct
+## Code of conduct
 
-By participating in this project, you are expected to uphold our [Code of Conduct](code-of-conduct.md).
-
+By participating in this project, you are expected to uphold our
+[Code of Conduct](code-of-conduct.md).
