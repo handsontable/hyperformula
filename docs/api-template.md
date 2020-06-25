@@ -12,7 +12,7 @@ The following sections explain shortly what can be found in the left sidebar nav
 This section contains information about the class for creating HyperFormula instance. It enlists all available public methods alongside their descriptions, parameter types, and examples.
 
 The snippet shows an example how to use `buildFromArray` which is one of [three static methods](/api/classes/hyperformula.html#factories) for creating an instance of HyperFormula:
-```
+```javascript
 const sheetData = [
  ['0', '=SUM(1,2,3)', '52'],
  ['=SUM(A1:C1)', '', '=A1'],
@@ -26,7 +26,7 @@ const hfInstance = HyperFormula.buildFromArray(sheetData, options);
 This section contains information about options that allow you to configure the instance of HyperFormula.
 
 An example set of options:
-```
+```javascript
 const options = {
     licenseKey: 'agpl-v3',
     precisionRounding: 10,
@@ -40,7 +40,7 @@ In this section you can find information about all events you can subscribe to.
 
 For example, subscribing to `sheetAdded` event:
 
-```
+```javascript
 const hfInstance = HyperFormula.buildFromSheets({
  MySheet1: [ ['1'] ],
  MySheet2: [ ['10'] ],
@@ -57,7 +57,7 @@ const nameProvided = hfInstance.addSheet('MySheet3');
 This page is a list of errors thrown by the HyperFormula instance that may be thrown depending on the method used.
 
 An example of how you can handle an error: adding a sheet which name is already taken:
-```
+```javascript
 // variable used to carry the message for the user
 let messageUsedInUI;
 
