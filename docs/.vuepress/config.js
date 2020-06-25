@@ -8,7 +8,7 @@ module.exports = {
   title: 'HyperFormula (v' + HyperFormula.version + ')',
   description: 'HyperFormula is an open-source, high-performance calculation engine for spreadsheets and web applications.',
   head: [
-    // Google Tag Manager.
+    // Google Tag Manager, an extra element within the `ssr.html` file.
     ['script', {}, `
       (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
       new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
@@ -66,6 +66,10 @@ module.exports = {
       })
     }
   },
+  // TODO: It doesn't work. It's seems that this option is bugged. Documentation says that this option is configurable,
+  // but I can't do it. Resolving priority described here: https://github.com/vuejs/vuepress/issues/882#issuecomment-425323104
+  // seems not working properlt. I've uploaded `ssr.html` file to `.vuepress/template` dictionary.
+  // ssrTemplate: 'index.ssr.html',
   themeConfig: {
     logo: '/logo.png',
     nextLinks: true,
@@ -83,19 +87,52 @@ module.exports = {
     //   indexName: '<INDEX_NAME>'
     // },
     nav: [
-      { text: 'Guide', link: '/guide/welcome.md' },
+      { text: 'Guide', link: '/' },
       { text: 'API Reference', link: '/api/' },
     ],
     displayAllHeaders: false, // collapse other pages
     activeHeaderLinks: true,
     sidebarDepth: 1,
     sidebar: {
-      '/guide/': [
+      '/api/': [
+        {
+          title: 'Introduction',
+          path: '/api/',
+        },
+        {
+          title: 'HyperFormula',
+          path: '/api/classes/hyperformula',
+          collapsable: true,
+        },
+        {
+          title: 'Event Types',
+          path: '/api/interfaces/listeners',
+          alias: '/api/events',
+          collapsable: true,
+        },
+        {
+          title: 'Configuration Options',
+          path: '/api/interfaces/configparams',
+          collapsable: true,
+        },
+        {
+          title: 'Error Types',
+          collapsable: true,
+          children: fs.readdirSync(path.join(__dirname, '../api/classes'))
+            .filter((n) => n.match(/.*error\.md$/))
+            .map(f => `/api/classes/${f}`)
+        },
+        {
+          title: 'Globals',
+          path: '/api/globals',
+        },
+      ],
+      '/': [
         {
           title: 'Introduction',
           collapsable: false,
           children: [
-            ['/guide/welcome', 'Welcome'],
+            ['/', 'Welcome'],
             ['/guide/demo', 'Demo'],
           ]
         },
@@ -189,39 +226,6 @@ module.exports = {
             ['/guide/contact', 'Contact'],
           ]
         }
-      ],
-      '/api/': [
-        {
-          title: 'Introduction',
-          path: '/api/',
-        },
-        {
-          title: 'HyperFormula',
-          path: '/api/classes/hyperformula',
-          collapsable: true,
-        },
-        {
-          title: 'Event Types',
-          path: '/api/interfaces/listeners',
-          alias: '/api/events',
-          collapsable: true,
-        },
-        {
-          title: 'Configuration Options',
-          path: '/api/interfaces/configparams',
-          collapsable: true,
-        },
-        {
-          title: 'Error Types',
-          collapsable: true,
-          children: fs.readdirSync(path.join(__dirname, '../api/classes'))
-            .filter((n) => n.match(/.*error\.md$/))
-            .map(f => `/api/classes/${f}`)
-        },
-        {
-          title: 'Globals',
-          path: '/api/globals',
-        },
       ],
     },
   }

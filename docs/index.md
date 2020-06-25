@@ -5,15 +5,13 @@ description: HyperFormula® - Complex Calculations Made Easy
 # Welcome
 
 <div class="iframe-container">
-  <iframe
-    width="560"
-    height="315"
-    src="https://www.youtube.com/embed/JJXUmACTDdk?controls=0"
-    frameborder="0"
-    allow="accelerometer;
-    encrypted-media;
-    gyroscope;
-    picture-in-picture"
+  <iframe 
+    src="https://www.youtube.com/embed/JJXUmACTDdk?controls=0" 
+    frameborder="0" 
+    allow="accelerometer; 
+    encrypted-media; 
+    gyroscope; 
+    picture-in-picture" 
     allowfullscreen>
   </iframe>
 </div>
@@ -86,8 +84,3 @@ and [Vue](integration-with-vue.md)
 * [Custom functions](custom-functions)
 * [Key concepts](key-concepts.md)
 * [Performance](performance.md)
-
-<br>
-
-This documentation is licensed under 
-[CC BY 4.0](https://creativecommons.org/licenses/by/4.0/).
