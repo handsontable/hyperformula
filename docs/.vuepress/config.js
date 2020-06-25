@@ -8,7 +8,7 @@ module.exports = {
   title: 'HyperFormula (v' + HyperFormula.version + ')',
   description: 'HyperFormula is an open-source, high-performance calculation engine for spreadsheets and web applications.',
   head: [
-    // Google Tag Manager.
+    // Google Tag Manager, an extra element within the `ssr.html` file.
     ['script', {}, `
       (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
       new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
@@ -66,6 +66,10 @@ module.exports = {
       })
     }
   },
+  // TODO: It doesn't work. It's seems that this option is bugged. Documentation says that this option is configurable,
+  // but I can't do it. Resolving priority described here: https://github.com/vuejs/vuepress/issues/882#issuecomment-425323104
+  // seems not working properlt. I've uploaded `ssr.html` file to `.vuepress/template` dictionary.
+  // ssrTemplate: 'index.ssr.html',
   themeConfig: {
     logo: '/logo.png',
     nextLinks: true,
@@ -74,7 +78,8 @@ module.exports = {
     docsRepo: 'handsontable/hyperformula',
     docsDir: 'docs',
     docsBranch: 'develop',
-    editLinks: false,
+    editLinks: true,
+    editLinkText: 'Help us improve this page',
     lastUpdated: false,
     smoothScroll: false,
     searchPlaceholder: 'Search...',
@@ -83,19 +88,48 @@ module.exports = {
     //   indexName: '<INDEX_NAME>'
     // },
     nav: [
-      { text: 'Guide', link: '/guide/welcome.md' },
+      { text: 'Guide', link: '/' },
       { text: 'API Reference', link: '/api/' },
     ],
     displayAllHeaders: false, // collapse other pages
     activeHeaderLinks: true,
     sidebarDepth: 1,
     sidebar: {
-      '/guide/': [
+      '/api/': [
+        {
+          title: 'Introduction',
+          path: '/api/',
+        },
+        {
+          title: 'HyperFormula',
+          path: '/api/classes/hyperformula',
+          collapsable: true,
+        },
+        {
+          title: 'Configuration Options',
+          path: '/api/interfaces/configparams',
+          collapsable: true,
+        },
+        {
+          title: 'Event Types',
+          path: '/api/interfaces/listeners',
+          alias: '/api/events',
+          collapsable: true,
+        },
+        {
+          title: 'Error Types',
+          collapsable: true,
+          children: fs.readdirSync(path.join(__dirname, '../api/classes'))
+            .filter((n) => n.match(/.*error\.md$/))
+            .map(f => `/api/classes/${f}`)
+        },
+      ],
+      '/': [
         {
           title: 'Introduction',
           collapsable: false,
           children: [
-            ['/guide/welcome', 'Welcome'],
+            ['/', 'Welcome'],
             ['/guide/demo', 'Demo'],
           ]
         },
@@ -115,8 +149,8 @@ module.exports = {
           title: 'Getting started',
           collapsable: false,
           children: [
-            ['/guide/client-side', 'Client-side installation'],
-            ['/guide/server-side', 'Server-side installation'],
+            ['/guide/client-side-installation', 'Client-side installation'],
+            ['/guide/server-side-installation', 'Server-side installation'],
             ['/guide/basic-usage', 'Basic usage'],
             ['/guide/advanced-usage', 'Advanced usage'],
             ['/guide/configuration-options', 'Configuration options'],
@@ -137,7 +171,7 @@ module.exports = {
           title: 'Data Operations',
           collapsable: false,
           children: [
-            ['/guide/crud-operations', 'Basic operations'],
+            ['/guide/basic-operations', 'Basic operations'],
             ['/guide/batch-operations', 'Batch operations'],
             ['/guide/clipboard-operations', 'Clipboard operations'],
             ['/guide/undo-redo', 'Undo-redo'],
@@ -150,7 +184,7 @@ module.exports = {
           children: [
             ['/guide/specifications-and-limits', 'Specifications and limits'],
             ['/guide/cell-references', 'Cell references'],
-            ['/guide/types-of-data', 'Types of values'],
+            ['/guide/types-of-values', 'Types of values'],
             ['/guide/types-of-errors', 'Types of errors'],
             ['/guide/types-of-operators', 'Types of operators'],
             ['/guide/order-of-precendece', 'Order of precedence'],
@@ -163,7 +197,7 @@ module.exports = {
           title: 'Internationalization',
           collapsable: false,
           children: [
-            ['/guide/culture-definition', 'Localizing functions'],
+            ['/guide/localizing-functions', 'Localizing functions'],
             ['/guide/date-and-time-handling', 'Date and time handling'],
           ]
         },
@@ -174,7 +208,7 @@ module.exports = {
             ['/guide/key-concepts', 'Key concepts'],
             ['/guide/building', 'Building'],
             ['/guide/testing', 'Testing'],
-            ['/guide/creating-custom-functions', 'Custom functions'],
+            ['/guide/custom-functions', 'Custom functions'],
             ['/guide/performance', 'Performance'],
           ]
         },
@@ -189,39 +223,6 @@ module.exports = {
             ['/guide/contact', 'Contact'],
           ]
         }
-      ],
-      '/api/': [
-        {
-          title: 'Introduction',
-          path: '/api/',
-        },
-        {
-          title: 'HyperFormula',
-          path: '/api/classes/hyperformula',
-          collapsable: true,
-        },
-        {
-          title: 'Event Types',
-          path: '/api/interfaces/listeners',
-          alias: '/api/events',
-          collapsable: true,
-        },
-        {
-          title: 'Configuration Options',
-          path: '/api/interfaces/configparams',
-          collapsable: true,
-        },
-        {
-          title: 'Error Types',
-          collapsable: true,
-          children: fs.readdirSync(path.join(__dirname, '../api/classes'))
-            .filter((n) => n.match(/.*error\.md$/))
-            .map(f => `/api/classes/${f}`)
-        },
-        {
-          title: 'Globals',
-          path: '/api/globals',
-        },
       ],
     },
   }

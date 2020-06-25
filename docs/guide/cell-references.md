@@ -1,8 +1,12 @@
 # Cell references
 
-A formula can refer to one or more cells and automatically update its contents whenever any of the referenced cells change. The values from other cells can be obtained using an A1 notation which is a flexible way of pointing at different sources of data for the formulas. 
+A formula can refer to one or more cells and automatically update its
+contents whenever any of the referenced cells change. The values from
+other cells can be obtained using an A1 notation which is a flexible
+way of pointing at different sources of data for the formulas.
 
-The table below summarizes the most popular methods of referring to different cells in the workbook.
+The table below summarizes the most popular methods of referring to
+different cells in the workbook.
 
 <table>
   <thead>
@@ -51,9 +55,10 @@ The table below summarizes the most popular methods of referring to different ce
   </tbody>
 </table>
 
-#### Referring to named expressions
+### Referring to named expressions
 
-It is a special case in HyperFormula. Upon creation you define the scope of the expression:
+It is a special case in HyperFormula. Upon creation you define the
+scope of the expression:
 
 ```javascript
 // define for a global scope
@@ -65,19 +70,34 @@ hfInstance.addNamedExpression('MyGlobal', '=SUM(100+10)');
 hfInstance.addNamedExpression('MyLocal', '=Sheet2!$A$1+100', 'Sheet2');
 ```
 
-And you just use 'MyGlobal' and 'MyLocal' names.
+And now you can use 'MyGlobal' and 'MyLocal' names.
 
-_Referring to named ranges is HyperFormula is more limited than typical spreadsheet software. For more information about how HyperFormula handles the named ranges, see_ [_this section_](named-ranges.md)_._
+HyperFormula is more limited than
+typical spreadsheet software when it comes to referring to named ranges.
+For more information about how
+HyperFormula handles the named ranges,
+see [this section](named-ranges.md).
 
-### Relative references
+## Relative references
 
-Relative and absolute references play a huge role in[ copy and paste](clipboard-operations.md), autofill, and CRUD operations like moving cells or columns.
+Relative and absolute references play a huge role in
+[copy and paste](clipboard-operations.md), autofill, and CRUD
+operations like moving cells or columns.
 
-By default, all references are relative which means that when you copy them to other cells, the references are updated based on the new coordinates. There are two main exceptions though: move operation which uses absolute references, and named expressions that do not support relative references. HyperFormula provides `copy` , `cut` and `paste` methods that allow handling the clipboard operations. 
+By default, all references are relative which means that when you
+copy them to other cells, the references are updated based on the
+new coordinates. There are two main exceptions though: move
+operation which uses absolute references, and named expressions
+that do not support relative references. HyperFormula provides
+`copy` , `cut` and `paste` methods that allow handling the
+clipboard operations.
 
-**Cut and paste** will behave similarly to the move operation so if in the cell B1 there is a formula '=A1' it will stay '=A1' after being placed into B2. 
+**Cut and paste** will behave similarly to the move operation so
+if in the cell B1 there is a formula '=A1' it will stay '=A1'
+after being placed into B2.
 
-**Copy and paste** will behave a bit different in a relative mean - if '=A1' will be copied from B1 into B2 cell it will be '=A2'. 
+**Copy and paste** will behave a bit different in a relative mean
+- if '=A1' will be copied from B1 into B2 cell it will be '=A2'.
 
 <table>
   <thead>
@@ -118,9 +138,11 @@ const changes = hfInstance.moveCells(source, 1, 1, destination);
 console.log(changes);
 ```
 
-### Absolute reference
+## Absolute reference
 
-A reference to a column \(a letter\) or a row \(a number\) may be preceded with a dollar sign `$` to remain intact when the cell is copied between different places.
+A reference to a column (a letter) or a row (a number) may be
+preceded with a dollar sign `$` to remain intact when the cell is
+copied between different places.
 
 <table>
   <thead>
@@ -143,25 +165,37 @@ A reference to a column \(a letter\) or a row \(a number\) may be preceded with 
   </tbody>
 </table>
 
-### Circular reference
+## Circular reference
 
-Since HyperFormula does not embed any UI it will allow to input circular reference into a cell. Compared to popular spreadsheets, HyperFormula does not impose any specific interaction with the user \(i.e. displaying a warning \) when circular reference happens.
+Since HyperFormula does not embed any UI it will allow to input
+circular reference into a cell. Compared to popular spreadsheets,
+HyperFormula does not impose any specific interaction with the user
+(i.e. displaying a warning ) when circular reference happens.
 
-When circular reference happens, HyperFormula returns \#CYCLE as the value of the cell where circular reference occurred. After some CRUD operation, the error might disappear when is no longer a cyclic dependency. No matter what the outcome, other cells are calculated normally and the dependency graph is updated. It is **non-blocking**.
+When circular reference happens, HyperFormula returns #CYCLE as
+the value of the cell where circular reference occurred. After
+some CRUD operation, the error might disappear when is no longer
+a cyclic dependency. No matter what the outcome, other cells are
+calculated normally and the dependency graph is updated. It
+is **non-blocking**.
 
-### The \#REF! error
+## The #REF! error
 
-By deleting the cell that is referenced in a formula you make the entire formula no longer valid. As a result, you will get the \#REF! error which indicates that there is an invalid address used in a cell.
+By deleting the cell that is referenced in a formula you make the
+entire formula no longer valid. As a result, you will get the
+#REF! error which indicates that there is an invalid address
+used in a cell.
 
 Consider the following example:
 
 | Formula in C1 | Action | Result in B1 |
 | :--- | :--- | :--- |
-| =A1+B1+20 | Delete column A | \#REF! |
+| =A1+B1+20 | Delete column A | #REF! |
 
-The \#REF! error may also occur in other specific situations:
+The #REF! error may also occur in other specific situations:
 
-* When you copy and paste formulas containing relative references, for example:
+* When you copy and paste formulas containing relative references,
+or example:
 
 <table>
   <thead>
@@ -183,6 +217,7 @@ The \#REF! error may also occur in other specific situations:
   </tbody>
 </table>
 
-* When the VLOOKUP is told to look up for values in a column which index is out of the scope.
-* When the INDEX function is told to return values from rows or columns that are out of the scope.
-
+* When the VLOOKUP is told to look up for values in a column which
+index is out of the scope.
+* When the INDEX function is told to return values from rows or
+columns that are out of the scope.

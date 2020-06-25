@@ -22,6 +22,7 @@ const UNPACKED_DIR_NAME = 'package'
  * @type {string[]}
  */
 const FILES_CHECKLIST = [
+  'LICENSE.txt',
   'CHANGELOG.md',
   'README.md',
   'package.json',

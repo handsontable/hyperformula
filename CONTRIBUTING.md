@@ -1,20 +1,45 @@
-# Contributing to HyperFormula
+# Contributing
 
-Your contributions to this project are very welcome. If you want to fix a bug or propose a new feature, you can open a new Pull Request but first make sure it follows these general rules:
+You are welcome to contribute to HyperFormula development. Your help
+is much appreciated in any of the following topics:
 
-1. Sign this [Contributor License Agreement](https://goo.gl/forms/yuutGuN0RjsikVpM2) to allow us to publish your changes to the code.
-2. Make your changes on a separate branch. This will speed up the merging process.
-3. Always make the target of your pull request the `develop` branch, not `master`.
-4. **Important: For any change you make, please add test specs** in `test` folder.
-5. Please lint the code. We recommend following provided eslint configuration - to run a linter call `npm run lint` command.
-6. Add a thorough description of all the changes.
+* Making pull requests
+  * Adding new functions
+  * Adding new features
+  * Improving the quality of the existing code
+  * Improving performance
+  * Improving documentation and public API
+* Reporting bugs
+* Suggesting improvements
+* Suggesting new features
 
-Thank you for your commitment!
+## Good first issue
 
-## Team rules
+Adding a new function will be a huge help for the library growth and
+should not be too problematic for the first issue. Extending the
+library of translations is also a good task to start with.
 
-The Handsontable team utilizes Git-Flow. Read more - [Git-flow cheatsheet](https://danielkummer.github.io/git-flow-cheatsheet/)
+Visit [building](building.md) and [testing](testing.md) sections to
+get more info about these topics and check the list of commands you
+can run in this project. Check the `/i18n`
+folder in the project - all translations are kept just right there.
+For the functions see the `interpreter/plugin` folder. Both of them
+are a good starting point.
+
+## How to get started
+
+1. First, sign this
+[Contributor License Agreement](https://goo.gl/forms/yuutGuN0RjsikVpM2)
+to allow us to use and publish your changes.
+2. Always make your changes on a separate branch. This will speed up
+the merging process.
+3. Always make the target of your pull request the `develop` branch,
+not `master`.
+4. For any change you make, add test specs in the `test` folder.
+5. Please lint the code. See the section about using linter.
+6. Add a comprehensive description of all the changes.
 
 ## Code of conduct
 
-By participating, you are expected to uphold our [Code of conduct file](https://github.com/handsontable/hyperformula/blob/master/CODE_OF_CONDUCT.md)
+By participating in this project, you are expected to uphold our
+[Code of Conduct](code-of-conduct.md).
