@@ -84,3 +84,8 @@ and [Vue](integration-with-vue.md)
 * [Custom functions](custom-functions)
 * [Key concepts](key-concepts.md)
 * [Performance](performance.md)
+
+<br>
+
+This documentation is licensed under 
+[CC BY 4.0](https://creativecommons.org/licenses/by/4.0/).
