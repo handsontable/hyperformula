@@ -1,6 +1,6 @@
 # Localizing functions
 
-You can [localize a function's](built-in-functions.md) ID and error
+You can localize a function's ID and error
 messages. Currently, the library supports 16 languages with English
 as the default.
 
