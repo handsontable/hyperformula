@@ -3,13 +3,15 @@
 HyperFormula can be customized through easy-to-setup `options`.
 
 The only mandatory option is `licenseKey`. It has a
-[dedicated section](license-key.md) in which all possible types of
-keys are described.
+[dedicated section](license-key.md) in which you can find all allowed
+types of key values.
 
 Below you can see the example of a configuration object and the
 static method called to initiate a new instance of HyperFormula.
 
-[See the full list of available options &#8594;]()
+[See the full list of available options &#8594;](../api/interfaces/configparams.html)
+
+## Example
 
 ```javascript
 // define options 

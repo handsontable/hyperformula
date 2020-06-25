@@ -1,9 +1,10 @@
 # Basic usage
 
 ::: tip
-The instance can be created with three static methods: `buildFromArray`,
+The instance can be created with three static methods:
+[`buildFromArray`](../api/classes/hyperformula.html#buildfromarray),
 `buildFromSheets` or `buildEmpty`. You can check all of their
-descriptions in our API reference.
+descriptions in our [API reference](../api).
 :::
 
 If you've already installed the library, it's time to start writing the
