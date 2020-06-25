@@ -2,7 +2,7 @@ const path = require('path');
 const fs = require('fs');
 const { BannerPlugin } = require('webpack');
 
-let licenseBody = fs.readFileSync(path.resolve(__dirname, '../dist-license-header.txt'), 'utf8');
+let licenseBody = fs.readFileSync(path.resolve(__dirname, '../../LICENSE.txt'), 'utf8');
 
 licenseBody += '\nVersion: ' + process.env.HT_VERSION;
 licenseBody += '\nRelease date: ' + process.env.HT_RELEASE_DATE + ' (built at ' + process.env.HT_BUILD_DATE + ')';
