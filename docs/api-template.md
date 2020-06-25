@@ -53,7 +53,7 @@ hfInstance.on('sheetAdded', handler);
 const nameProvided = hfInstance.addSheet('MySheet3');
 ```
 
-#### Error types
+#### Error Types
 This page is a list of errors thrown by the HyperFormula instance that may be thrown depending on the method used.
 
 An example of how you can handle an error: adding a sheet which name is already taken:
@@ -70,7 +70,7 @@ try {
 
   // notify the user that a sheet with an ID of 5 does not exist
   if (e instanceof SheetNameAlreadyTakenError) {
-      messageUsedInUI = 'Sheet name already taken'
+     messageUsedInUI = 'Sheet name already taken'
   }
   // a generic error message, just in case
   else {
