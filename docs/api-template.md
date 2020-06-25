@@ -9,7 +9,7 @@ Current build: {{ $page.buildDate }}
 #### HyperFormula
 This section contains information about the class for creating HyperFormula instance. It enlists all available public methods alongside their descriptions, parameter types, and examples.
 
-The snippet shows an example of a static method: the `buildFromArray` along with sample data and configuration:
+The snippet shows an example how to use `buildFromArray` which is one of three static methods for creating an instance of HyperFormula:
 ```
 const sheetData = [
  ['0', '=SUM(1,2,3)', '52'],
@@ -20,23 +20,26 @@ const sheetData = [
 const hfInstance = HyperFormula.buildFromArray(sheetData, options);
 ```
 
-<h2>Event Types</h2>
-In this section you can find information about listeting to events.
+#### Event Types
+In this section you can find information about all events you can subscribe to.
 
-For example:
+For example, subscripbing to `sheetAdded` event:
 
 ```
 const hfInstance = HyperFormula.buildFromSheets({
  MySheet1: [ ['1'] ],
  MySheet2: [ ['10'] ],
 });
-const nameProvided = hfInstance.addSheet('MySheet3');
-const generatedName = hfInstance.addSheet();
-```
-will trigger `sheetAdded` event.
 
-<h2>Configuration Options</h2>
-This section contains information about options which allow to configure the instance of HyperFormula.
+const handler = ( ) => { console.log('baz') }
+
+hfInstance.on('sheetAdded', handler);
+
+const nameProvided = hfInstance.addSheet('MySheet3');
+```
+
+#### Configuration Options
+This section contains information about options that allow you to configure the instance of HyperFormula.
 
 An example set of options:
 ```
@@ -48,10 +51,27 @@ const options = {
 };
 ```
 
-<h2>Error types</h2>
-This page is a list of errors thrown by HyperFormula instance.
+#### Error types
+This page is a list of errors thrown by the HyperFormula instance hat may be thrown depending on the method used.
 
-Example error:
+An example of how you can handle an error: adding a sheet which name is already taken:
 ```
-InvalidArgumentsError
+// variable used to carry the message for the user
+let messageUsedInUI;
+
+// attempt to add a sheet
+try {
+    hfInstance.addSheet('MySheet1');
+
+// whoops! there is already a sheet named 'MySheet1'
+} catch (e) {
+
+// notify the user that a sheet with an ID of 5 does not exist
+    if (e instanceof SheetNameAlreadyTakenError)
+        messageUsedInUI = 'Sheet name already taken'
+
+// a generic error message, just in case
+    else
+       messageUsedInUI = 'Something went wrong'
+};
 ```
