@@ -119,7 +119,7 @@ export interface ConfigParams {
    * * `non-commercial-and-evaluation` string if you want to use our limited versions,
    * * a valid license key string, if you bought the commercial license.
    *
-   * For more details visit [this guide](/guide/getting-started/license-key.html)
+   * For more details visit [this guide](/guide/license-key.html)
    *
    * @default undefined
    *
