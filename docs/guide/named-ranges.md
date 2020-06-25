@@ -79,7 +79,7 @@ R1C1, separate 1 or A are also not valid
 These are the basic methods that can be used to add and manipulate
 named expressions, including the creation and handling of
 named ranges. The full list of methods is available in the
-API reference.
+[API reference](../api).
 
 ### Adding a named expression
 

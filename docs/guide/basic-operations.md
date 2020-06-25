@@ -7,7 +7,7 @@ You can apply these operations to various workbook elements, such as:
 * Rows / Columns
 * Sheets
 
-**Check the API** for a full reference of methods available for CRUD
+**Check the [API](../api)** for a full reference of methods available for CRUD
 operations.
 
 HyperFormula automatically updates all references, both relative and
