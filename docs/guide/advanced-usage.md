@@ -1,26 +1,43 @@
 # Advanced usage
 
-The following example shows how to use formulas to find out which of the two Teams \(A or B\) is the winning one. You will do that by comparing the average scores of players in each team.
+::: tip
+By default, cells are identified using a `SimpleCellAddress` which
+consists of a sheet ID, column ID, and row ID, like
+this: `{ sheet: 0, col: 0, row: 0 }`
 
-The initial steps are the same as in the [basic example](basic-usage.md). First, import HyperFormula and choose the configuration options:
+Alternatively, you can work with the **A1 notation** known from
+spreadsheets like Excel or Google Sheets. The API provides the helper
+function `simpleCellAddressFromString` which you can use to
+retrieve the `SimpleCellAddress` .
+:::
+
+The following example shows how to use formulas to find out which of
+the two Teams (A or B) is the winning one. You will do that by
+comparing the average scores of players in each team.
+
+The initial steps are the same as in the
+[basic example](basic-usage.md). First, import HyperFormula and choose
+the configuration options:
 
 ```javascript
 import { HyperFormula } from 'hyperformula';
 
 const options = {
-    precisionRounding: 10,
     licenseKey: 'agpl-v3'
 };
 ```
 
-This time you will use the `buildFromEmpty` static method to initialize the engine:
+This time you will use the `buildFromEmpty` static method to
+initialize the engine:
 
 ```javascript
 // initiate the engine with no data
 const hfInstance = HyperFormula.buildEmpty(options);
 ```
 
-Now, let's prepare some data. The first column will be players' IDs and the second column will be their scores. Then, you will define the formulas responsible for calculating the average scores.
+Now, let's prepare some data. The first column will be players'
+IDs and the second column will be their scores. Then, you will
+define the formulas responsible for calculating the average scores.
 
 ```javascript
 // first column represents players' IDs
@@ -78,11 +95,9 @@ hfInstance.addSheet('Formulas');
 hfInstance.setSheetContent('Formulas', formulas);
 ```
 
-Almost done! Now, you can use the `getSheetValues` method to get all values including the calculated ones. Alternatively, you can use `getCellValue`to get the value from a specific cell.
-
-::: tip
-You can work with A1 notation comfortably and use the helper function `simpleCellAddressFromString` to retrieve the `SimpleCellAddress` which is required as a parameter in some methods. This is one of several handy helper methods the HyperFormula API offers.
-:::
+Almost done! Now, you can use the `getSheetValues` method to get all
+values including the calculated ones. Alternatively, you can use
+`getCellValue`to get the value from a specific cell.
 
 ```javascript
 // get sheet values from the Sheet of ID 2
@@ -98,19 +113,12 @@ const winningTeam = hfInstance.getCellValue(simpleCellAddress);
 console.log(winningTeam)
 ```
 
-### Demo
-
-This demo presents an advanced usage example integrated with a sample UI.
+## Demo
 
 <iframe
-   src="https://codesandbox.io/embed/github/handsontable/hyperformula-demos/tree/develop/advanced-usage?autoresize=1&fontsize=14&hidenavigation=1&theme=dark&view=preview"
-   style="width:100%; height:500px; border:0; border-radius: 4px; overflow:hidden;"
-   title="handsontable/hyperformula-demos: basic-usage"
-   allow="accelerometer; ambient-light-sensor; camera; encrypted-media; geolocation; gyroscope; hid; microphone; midi; payment; usb; vr; xr-spatial-tracking"
-   sandbox="allow-forms allow-modals allow-popups allow-presentation allow-same-origin allow-scripts"
-/>
-
-
-
-
-
+     src="https://codesandbox.io/embed/github/handsontable/hyperformula-demos/tree/develop/advanced-usage?autoresize=1&fontsize=11&hidenavigation=1&theme=light&view=preview"
+     style="width:100%; height:500px; border:0; border-radius: 4px; overflow:hidden;"
+     title="handsontable/hyperformula-demos: advanced-usage"
+     allow="accelerometer; ambient-light-sensor; camera; encrypted-media; geolocation; gyroscope; hid; microphone; midi; payment; usb; vr; xr-spatial-tracking"
+     sandbox="allow-autoplay allow-forms allow-modals allow-popups allow-presentation allow-same-origin allow-scripts"
+   ></iframe>

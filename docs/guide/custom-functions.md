@@ -1,14 +1,21 @@
 # Custom functions
 
-HyperFormula enables you to create custom functions you may want to use your application.
+HyperFormula enables you to create custom functions you may want to
+use your application.
 
-This guide explains step-by-step how to create a custom function that returns the number of letters in the word 'HyperFormula'. It will be later on invoked by typing `"=HYPER()"` or `"=HAJPER()"` \(localized to Polish\).
+This guide explains step-by-step how to create a custom function that
+returns the number of letters in the word 'HyperFormula'. It will be
+later on invoked by typing `"=HYPER()"` or `"=HAJPER()"`
+(localized to Polish).
 
-HyperFormula doesn't enforce a naming convention of the function. However, all names will be normalized to the upper-case, so they are not case-sensitive.
+HyperFormula doesn't enforce a naming convention of the function.
+However, all names will be normalized to the upper-case, so they
+are not case-sensitive.
 
-### Custom class definition
+## Custom class definition
 
-First, you need to import `FunctionPlugin` and extend it with your own class. Here is how you can do that:
+First, you need to import `FunctionPlugin` and extend it with your
+own class. Here is how you can do that:
 
 ```javascript
 // import the FunctionPlugin
@@ -20,13 +27,18 @@ class CountHF extends FunctionPlugin {
 }
 ```
 
-### implementedFunction property
+## implementedFunction property
 
-Your newly created class should have a static `implementedFunctions` property that defines functions this plugin contains. This will keep a set of functions names that call corresponding methods.
+Your newly created class should have a static `implementedFunctions`
+property that defines functions this plugin contains. This will keep
+a set of functions names that call corresponding methods.
 
-The keys are canonical function IDs which are also used to find corresponding translations in translation packages. Inside of them, there is also an object which contains the corresponding method. 
+The keys are canonical function IDs which are also used to find
+corresponding translations in translation packages. Inside of them,
+there is also an object which contains the corresponding method.
 
-Optionally, you can precise if your function is volatile or not \(false as a default means that it is not defined\).
+Optionally, you can precise if your function is volatile or not
+(false as a default means that it is not defined).
 
 ```javascript
 // import the FunctionPlugin
@@ -47,11 +59,12 @@ class CountHF extends FunctionPlugin {
 }
 ```
 
-### Translations
+## Translations
 
 There are **two ways** of adding a translation of the custom function. 
 
-In the **first one**, you can define translations in your function plugin as a static.
+In the **first one**, you can define translations in your function
+plugin as a static.
 
 ```javascript
  public static translations = {
@@ -64,7 +77,9 @@ In the **first one**, you can define translations in your function plugin as a s
   }
 ```
 
-In the **second one**, you can keep your translation in any file you want as a const and import it upon registering the plugin \(or with a whole translation package\).
+In the **second one**, you can keep your translation in any file you
+want as a const and import it upon registering the plugin
+(or with a whole translation package).
 
 ```javascript
 // inside your file with translation
@@ -78,9 +93,13 @@ export const myTranslations = {
   }
 ```
 
-### Implementing the function
+## Implementing the function
 
-For the simplicity of a basic example, you will not pass any arguments. However, this method imposes a particular structure to be used - there are two optional arguments: `ast` and `formulaAddress`, and the function must return the results of the calculations.
+For the simplicity of a basic example, you will not pass any
+arguments. However, this method imposes a particular structure to
+be used - there are two optional arguments: `ast` and
+`formulaAddress`, and the function must return the results of
+the calculations.
 
 ```javascript
 // here arguments are displayed just to show the structure
@@ -90,7 +109,7 @@ public hyper(ast, formulaAddress) {
 };
 ```
 
-### A complete example of the class definition
+## A complete example of the class definition
 
 To sum up, here is a complete example of a custom `CountHF` class:
 
@@ -113,9 +132,11 @@ export class CountHF extends FunctionPlugin {
 }
 ```
 
-### Registering a custom function
+## Registering a custom function
 
-After having this set up you can finally use the newly created function. You need to register it first by using `registerFunctionPlugin` like so:
+After having this set up you can finally use the newly created
+function. You need to register it first by using
+`registerFunctionPlugin` like so:
 
 ```javascript
  import { myTranslations } from '/myTranslationFile';
@@ -123,9 +144,10 @@ After having this set up you can finally use the newly created function. You nee
  HyperFormula.registerFunctionPlugin(CountHF, myTranslations);
 ```
 
-### Using custom function
+## Using a custom function
 
-This is a short snippet that sums up how to use the custom function along with translations.
+This is a short snippet that sums up how to use the custom function
+along with translations.
 
 ```javascript
 import Hyperformula, { plPL } from 'hyperformula';
@@ -144,11 +166,16 @@ const hfInstance = HyperFormula.buildFromArray([['=HAJPER()']]);
 // read the value of A1 cell
 const A1Value = hfInstance.getCellValue({ sheet: 0, col: 0, row: 0 });
 
-// use the console to see the results!
+// open the browser's console to see the results
 console.log(A1Value);
 ```
 
-### Demo
+## Demo
 
-\[ DEMO \]
-
+<iframe
+     src="https://codesandbox.io/embed/github/handsontable/hyperformula-demos/tree/develop/custom-functions?autoresize=1&fontsize=11&hidenavigation=1&theme=light&view=preview"
+     style="width:100%; height:500px; border:0; border-radius: 4px; overflow:hidden;"
+     title="handsontable/hyperformula-demos: custom-functions"
+     allow="accelerometer; ambient-light-sensor; camera; encrypted-media; geolocation; gyroscope; hid; microphone; midi; payment; usb; vr; xr-spatial-tracking"
+     sandbox="allow-autoplay allow-forms allow-modals allow-popups allow-presentation allow-same-origin allow-scripts"
+   ></iframe>

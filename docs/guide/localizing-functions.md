@@ -1,8 +1,11 @@
 # Localizing functions
 
-You can [localize a function's](built-in-functions.md) ID and error messages. Currently, the library supports 16 languages with English as the default.
+You can [localize a function's](built-in-functions.md) ID and error
+messages. Currently, the library supports 16 languages with English
+as the default.
 
-To change the default language all you need to do is to import and register the language like so:
+To change the default language all you need to do is to import and
+register the language like so:
 
 ```javascript
 // import the French language pack
@@ -21,9 +24,13 @@ const options = {
 };
 ```
 
-Language packs names should be passed as a string. They follow a naming convention that incorporates two standards: ISO-639 and ISO-3166-1. The pattern looks like this: `languageCOUNTRY` for example: `nbNO`, `frFR`, `enGB` etc.
+Language packs names should be passed as a string. They follow a
+naming convention that incorporates two standards: ISO-639 and
+ISO-3166-1. The pattern looks like this: `languageCOUNTRY` for
+example: `nbNO`, `frFR`, `enGB` etc.
 
-You can freely use the localized names: `SUM` can be written as `SOMME` and the functionality of the function will remain the same. 
+You can freely use the localized names: `SUM` can be written as
+`SOMME` and the functionality of the function will remain the same.
 
 Here are some example functions and their translations in French:
 
@@ -36,7 +43,8 @@ Here are some example functions and their translations in French:
  },
 ```
 
-Same goes for the [errors](types-of-errors.md) displayed inside cells when something goes wrong:
+Same goes for the [errors](types-of-errors.md) displayed inside
+cells when something goes wrong:
 
 ```javascript
 // localized errors
@@ -52,9 +60,11 @@ Same goes for the [errors](types-of-errors.md) displayed inside cells when somet
   },
 ```
 
-### Localizing custom functions
+## Localizing custom functions
 
-You can translate your own [custom functions](custom-functions) into different languages, too. You need to define them and register while registering a plugin:
+You can translate your own [custom functions](custom-functions) into
+different languages, too. You need to define them and register while
+registering a plugin:
 
 ```javascript
 const translations = {
@@ -67,15 +77,12 @@ const translations = {
   }
 ```
 
-### Demo
+## Demo
 
 <iframe
-   src="https://codesandbox.io/embed/github/handsontable/hyperformula-demos/tree/develop/localizing-functions?autoresize=1&fontsize=14&hidenavigation=1&theme=dark&view=preview"
-   style="width:100%; height:500px; border:0; border-radius: 4px; overflow:hidden;"
-   title="handsontable/hyperformula-demos: basic-usage"
-   allow="accelerometer; ambient-light-sensor; camera; encrypted-media; geolocation; gyroscope; hid; microphone; midi; payment; usb; vr; xr-spatial-tracking"
-   sandbox="allow-forms allow-modals allow-popups allow-presentation allow-same-origin allow-scripts"
-/>
-
-
-
+     src="https://codesandbox.io/embed/github/handsontable/hyperformula-demos/tree/develop/localizing-functions?autoresize=1&fontsize=11&hidenavigation=1&theme=light&view=preview"
+     style="width:100%; height:500px; border:0; border-radius: 4px; overflow:hidden;"
+     title="handsontable/hyperformula-demos: localizing-functions"
+     allow="accelerometer; ambient-light-sensor; camera; encrypted-media; geolocation; gyroscope; hid; microphone; midi; payment; usb; vr; xr-spatial-tracking"
+     sandbox="allow-autoplay allow-forms allow-modals allow-popups allow-presentation allow-same-origin allow-scripts"
+   ></iframe>
