@@ -16,8 +16,8 @@ describe('Function IPMT', () => {
       ['=IPMT(1%, 1, 360, 100000)', '=IPMT(1%, 1, 360, 100000, 30000)', '=IPMT(1%, 1, 360, 100000, 30000, 1)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toBe(-1000)
-    expect(engine.getCellValue(adr('B1'))).toBe(-1000)
-    expect(engine.getCellValue(adr('C1'))).toBe(0)
+    expect(engine.getCellValue(adr('A1'))).toBeCloseTo(-1000)
+    expect(engine.getCellValue(adr('B1'))).toBeCloseTo(-1000)
+    expect(engine.getCellValue(adr('C1'))).toBeCloseTo(0)
   })
 })

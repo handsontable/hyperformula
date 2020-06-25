@@ -16,8 +16,8 @@ describe('Function FV', () => {
       ['=FV(2%, 12, 100)', '=FV(2%, 12, 100, 400)', '=FV(2%, 12, 100, 400, 1)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toBe(-1341.20897281273)
-    expect(engine.getCellValue(adr('B1'))).toBe(-1848.50569063775)
-    expect(engine.getCellValue(adr('C1'))).toBe(-1875.329870094)
+    expect(engine.getCellValue(adr('A1'))).toBeCloseTo(-1341.20897281273)
+    expect(engine.getCellValue(adr('B1'))).toBeCloseTo(-1848.50569063775)
+    expect(engine.getCellValue(adr('C1'))).toBeCloseTo(-1875.329870094)
   })
 })

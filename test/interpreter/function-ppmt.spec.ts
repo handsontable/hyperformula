@@ -16,8 +16,8 @@ describe('Function PPMT', () => {
       ['=PPMT(1%, 1, 360, 100000)', '=PPMT(1%, 1, 360, 100000, 30000)', '=PPMT(1%, 1, 360, 100000, 30000, 1)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toBe(-28.6125969255043)
-    expect(engine.getCellValue(adr('B1'))).toBe(-37.1963760031556)
-    expect(engine.getCellValue(adr('C1'))).toBe(-1026.92710495362)
+    expect(engine.getCellValue(adr('A1'))).toBeCloseTo(-28.6125969255043)
+    expect(engine.getCellValue(adr('B1'))).toBeCloseTo(-37.1963760031556)
+    expect(engine.getCellValue(adr('C1'))).toBeCloseTo(-1026.92710495362)
   })
 })
