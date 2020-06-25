@@ -1,11 +1,12 @@
 Welcome to HyperFormula `v{{ $page.version }}` API!
+
 The API reference documentation provides detailed information for methods available in HyperFormula.
 
 Current build: {{ $page.buildDate }}
 
 ### API reference index
 
-<h2>HyperFormula</h2>
+#### HyperFormula
 This section contains information about the class for creating HyperFormula instance. It enlists all available public methods alongside their descriptions, parameter types, and examples.
 
 The snippet shows an example of a static method: the `buildFromArray` along with sample data and configuration:
@@ -16,7 +17,7 @@ const sheetData = [
  ['2', '=SUM(A1:C1)', '91'],
 ];
 
-const hfInstance = HyperFormula.buildFromArray(sheetData, { maxColumns: 1000 });
+const hfInstance = HyperFormula.buildFromArray(sheetData, options);
 ```
 
 <h2>Event Types</h2>
