@@ -39,5 +39,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - No value available: #N/A,
   - Cyclic dependency: #CYCLE!,
   - Wrong address reference: #REF;
-- Built-in function translations support for 16 languages: csCZ, daDK, deDE, enGB, esES, fiFI, frFR, huHU, itIT, nbNO, nlNL, plPL, ptPT, ruRU, svSE and trTR.
+- Built-in function translations support for 16 languages: English, Czech, Danish, Dutch, Finnish, French, German, Hungarian, Italian, Norwegian, Polish, Portuguese, Russian, Spanish, Swedish, Turkish.
 
