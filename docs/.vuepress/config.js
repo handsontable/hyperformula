@@ -122,10 +122,6 @@ module.exports = {
             .filter((n) => n.match(/.*error\.md$/))
             .map(f => `/api/classes/${f}`)
         },
-        {
-          title: 'Globals',
-          path: '/api/globals',
-        },
       ],
       '/': [
         {
