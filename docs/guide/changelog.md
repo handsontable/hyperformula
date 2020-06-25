@@ -50,4 +50,4 @@ as a standard to follow
    - Wrong address reference: #REF
 * Built-in function translations support for 16 languages: English, Czech,
 Danish, Dutch, Finnish, French, German, Hungarian, Italian, Norwegian,
-Polish, Portuguese, Russian	Spanish, Swedish, Turkish.
+Polish, Portuguese, Russian, Spanish, Swedish, Turkish.

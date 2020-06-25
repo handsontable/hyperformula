@@ -77,6 +77,26 @@ const translations = {
   }
 ```
 
+### List of supported languages
+| Language name | Language code |
+| :--- | :--- |
+| English | enGB |
+| Czech | csCZ |
+| Danish | daDK |
+| Dutch | nlNL |
+| Finnish | fiFI |
+| French | frFR |
+| German | deDE |
+| Hungarian | huHU |
+| Italian | itIT |
+| Norwegian | nbNO |
+| Polish | plPL |
+| Portuguese | ptPT |
+| Russian | ruRU |
+| Spanish | esES |
+| Swedish | svSE |
+| Turkish | trTR |
+
 ## Demo
 
 <iframe
