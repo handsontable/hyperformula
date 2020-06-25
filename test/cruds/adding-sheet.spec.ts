@@ -1,7 +1,6 @@
-import {Config, EmptyValue, HyperFormula} from '../../src'
-import {plPL} from '../../src/i18n'
-import '../testConfig'
-import {adr, detailedError} from '../testUtils'
+import {HyperFormula, SheetNameAlreadyTakenError} from '../../src'
+import {plPL} from '../../src/i18n/languages'
+import {adr} from '../testUtils'
 
 describe('Adding sheet - checking if its possible', () => {
   it('yes', () => {
@@ -47,11 +46,12 @@ describe('add sheet to engine', () => {
 
     engine.addSheet()
 
-    expect(engine.getCellValue(adr('A1', 0))).toBe(EmptyValue)
+    expect(engine.getCellValue(adr('A1', 0))).toBe(null)
   })
 
   it('should add sheet with translated sheet name', function() {
-    const engine = HyperFormula.buildEmpty(new Config({ language: plPL }))
+    HyperFormula.registerLanguage('plPL', plPL)
+    const engine = HyperFormula.buildEmpty({ language: 'plPL' })
 
     engine.addSheet()
 
@@ -74,7 +74,7 @@ describe('add sheet to engine', () => {
 
     expect(() => {
       engine.addSheet('FOO')
-    }).toThrow(/already exists/)
+    }).toThrowError(/already exists/)
     expect(engine.sheetMapping.numberOfSheets()).toEqual(1)
     expect(Array.from(engine.sheetMapping.displayNames())).toEqual(['foo'])
   })
@@ -94,5 +94,14 @@ describe('add sheet to engine', () => {
     const sheetName = engine.addSheet()
 
     expect(sheetName).toEqual('Sheet1')
+  })
+
+  it('should throw error when sheet name is already taken', () => {
+    const engine = HyperFormula.buildEmpty()
+    engine.addSheet('bar')
+
+    expect(() => {
+      engine.addSheet('bar')
+    }).toThrow(new SheetNameAlreadyTakenError('bar'))
   })
 })

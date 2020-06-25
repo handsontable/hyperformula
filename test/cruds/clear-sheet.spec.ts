@@ -1,6 +1,6 @@
-import {Config, EmptyValue, HyperFormula} from '../../src'
+import {HyperFormula} from '../../src'
 import {NoSheetWithNameError} from '../../src'
-import {adr, detailedError} from '../testUtils'
+import {adr} from '../testUtils'
 
 describe('Clear sheet - checking if its possible', () => {
   it('no if theres no such sheet', () => {
@@ -32,8 +32,8 @@ describe('Clear sheet content', () => {
 
     engine.clearSheet('Sheet1')
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(EmptyValue)
-    expect(engine.getCellValue(adr('B1'))).toEqual(EmptyValue)
+    expect(engine.getCellValue(adr('A1'))).toBe(null)
+    expect(engine.getCellValue(adr('B1'))).toBe(null)
   })
 
   it('should recalculate and return changes', () => {
@@ -49,7 +49,7 @@ describe('Clear sheet content', () => {
 
     const changes = engine.clearSheet('Sheet1')
 
-    expect(engine.getCellValue(adr('A1', 1))).toEqual(EmptyValue)
+    expect(engine.getCellValue(adr('A1', 1))).toBe(null)
     expect(engine.getCellValue(adr('A2', 1))).toEqual(1)
 
     expect(changes.length).toEqual(2)
@@ -64,12 +64,12 @@ describe('Clear sheet content', () => {
         ['=Sheet1!A1'],
         ['=Sheet1!B1'],
       ],
-    }, new Config({ matrixDetection: true, matrixDetectionThreshold: 1 }))
+    }, { matrixDetection: true, matrixDetectionThreshold: 1 })
 
     const changes = engine.clearSheet('Sheet1')
 
-    expect(engine.getCellValue(adr('A1', 1))).toEqual(EmptyValue)
-    expect(engine.getCellValue(adr('A2', 1))).toEqual(EmptyValue)
+    expect(engine.getCellValue(adr('A1', 1))).toBe(null)
+    expect(engine.getCellValue(adr('A2', 1))).toBe(null)
 
     expect(changes.length).toEqual(2)
   })
@@ -88,8 +88,8 @@ describe('Clear sheet content', () => {
 
     const changes = engine.clearSheet('Sheet1')
 
-    expect(engine.getCellValue(adr('A1', 1))).toEqual(EmptyValue)
-    expect(engine.getCellValue(adr('A2', 1))).toEqual(EmptyValue)
+    expect(engine.getCellValue(adr('A1', 1))).toBe(null)
+    expect(engine.getCellValue(adr('A2', 1))).toBe(null)
 
     expect(changes.length).toEqual(2)
   })
@@ -120,6 +120,7 @@ describe('Clear sheet content', () => {
       ],
     })
 
+    // eslint-disable-next-line
     const changes = engine.clearSheet('Sheet1')
 
     engine.setCellContents(adr('A1'), '2')

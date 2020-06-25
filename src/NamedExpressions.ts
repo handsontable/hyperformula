@@ -1,42 +1,79 @@
-import {absolutizeDependencies} from './absolutizeDependencies'
-import {SimpleCellAddress, simpleCellAddress} from './Cell'
-import {CellContent, CellContentParser} from './CellContentParser'
-import {DependencyGraph} from './DependencyGraph'
-import { ParserWithCaching} from './parser'
+/**
+ * @license
+ * Copyright (c) 2020 Handsoncode. All rights reserved.
+ */
 
-class NamedExpression {
+import {simpleCellAddress, SimpleCellAddress} from './Cell'
+import {Maybe} from './Maybe'
+import {Ast, AstNodeType} from './parser'
+
+export interface NamedExpression {
+  name: string,
+  scope?: string,
+  expression?: string,
+  options?: NamedExpressionOptions,
+}
+
+export type NamedExpressionOptions = Record<string, string | number | boolean>
+
+export class InternalNamedExpression {
   constructor(
-    public readonly name: string,
-    public readonly row: number,
+    public displayName: string,
+    public readonly address: SimpleCellAddress,
+    public added: boolean,
+    public options?: NamedExpressionOptions
   ) {
+  }
+
+  public normalizeExpressionName(): string {
+    return this.displayName.toLowerCase()
+  }
+
+  public copy(): InternalNamedExpression {
+    return new InternalNamedExpression(this.displayName, this.address, this.added, this.options)
   }
 }
 
-class NamedExpressionsStore {
-  private readonly mapping = new Map<string, NamedExpression>()
+class WorkbookStore {
+  private readonly mapping = new Map<string, InternalNamedExpression>()
 
   public has(expressionName: string): boolean {
     return this.mapping.has(this.normalizeExpressionName(expressionName))
   }
 
   public isNameAvailable(expressionName: string): boolean {
-    return !(this.mapping.has(this.normalizeExpressionName(expressionName)))
+    const normalizedExpressionName = this.normalizeExpressionName(expressionName)
+    const namedExpression = this.mapping.get(normalizedExpressionName)
+    return !(namedExpression && namedExpression.added)
   }
 
-  public add(namedExpression: NamedExpression): void {
-    this.mapping.set(this.normalizeExpressionName(namedExpression.name), namedExpression)
+  public add(namedExpression: InternalNamedExpression): void {
+    this.mapping.set(namedExpression.normalizeExpressionName(), namedExpression)
   }
 
-  public get(expressionName: string): NamedExpression | undefined {
+  public get(expressionName: string): Maybe<InternalNamedExpression> {
     return this.mapping.get(this.normalizeExpressionName(expressionName))
   }
 
-  public remove(expressionName: string): void {
-    this.mapping.delete(this.normalizeExpressionName(expressionName))
+  public getExisting(expressionName: string): Maybe<InternalNamedExpression> {
+    const namedExpression = this.mapping.get(this.normalizeExpressionName(expressionName))
+    if (namedExpression && namedExpression.added) {
+      return namedExpression
+    } else {
+      return undefined
+    }
   }
 
-  public getAllNamedExpressions(): NamedExpression[] {
-    return Array.from(this.mapping.values())
+  public remove(expressionName: string): void {
+    const normalizedExpressionName = this.normalizeExpressionName(expressionName)
+    const namedExpression = this.mapping.get(normalizedExpressionName)
+    if (namedExpression) {
+      namedExpression.added = false
+    }
+  }
+
+  public getAllNamedExpressions(): InternalNamedExpression[] {
+    return Array.from(this.mapping.values()).filter((ne: InternalNamedExpression) => ne.added)
   }
 
   private normalizeExpressionName(expressionName: string): string {
@@ -44,84 +81,219 @@ class NamedExpressionsStore {
   }
 }
 
-export class NamedExpressions {
-  public static SHEET_FOR_WORKBOOK_EXPRESSIONS = -1
-  private nextNamedExpressionRow: number = 0
-  private workbookStore = new NamedExpressionsStore()
+class WorksheetStore {
+  public readonly mapping = new Map<string, InternalNamedExpression>()
 
-  constructor(
-    private readonly cellContentParser: CellContentParser,
-    private readonly dependencyGraph: DependencyGraph,
-    private readonly parser: ParserWithCaching,
-  ) {
+  public add(namedExpression: InternalNamedExpression): void {
+    this.mapping.set(this.normalizeExpressionName(namedExpression.displayName), namedExpression)
   }
 
-  public doesNamedExpressionExist(expressionName: string): boolean {
-    return this.workbookStore.has(expressionName)
+  public get(expressionName: string): Maybe<InternalNamedExpression> {
+    return this.mapping.get(this.normalizeExpressionName(expressionName))
+  }
+
+  public has(expressionName: string): boolean {
+    return this.mapping.has(this.normalizeExpressionName(expressionName))
+  }
+
+  private normalizeExpressionName(expressionName: string): string {
+    return expressionName.toLowerCase()
   }
 
   public isNameAvailable(expressionName: string): boolean {
-    return this.workbookStore.isNameAvailable(expressionName)
+    const normalizedExpressionName = this.normalizeExpressionName(expressionName)
+    return !this.mapping.has(normalizedExpressionName)
+  }
+
+  public remove(expressionName: string): void {
+    const normalizedExpressionName = this.normalizeExpressionName(expressionName)
+    const namedExpression = this.mapping.get(normalizedExpressionName)
+    if (namedExpression) {
+      this.mapping.delete(normalizedExpressionName)
+    }
+  }
+}
+
+export class NamedExpressions {
+  public static SHEET_FOR_WORKBOOK_EXPRESSIONS = -1
+  private nextNamedExpressionRow: number = 0
+  public readonly workbookStore: WorkbookStore = new WorkbookStore()
+  public readonly worksheetStores: Map<number, WorksheetStore> = new Map()
+  public readonly addressCache: Map<number, InternalNamedExpression> = new Map()
+
+  constructor(
+  ) {
+  }
+
+  public isNameAvailable(expressionName: string, sheetId?: number): boolean {
+    if (sheetId === undefined) {
+      return this.workbookStore.isNameAvailable(expressionName)
+    } else {
+      return this.worksheetStore(sheetId).isNameAvailable(expressionName)
+    }
+  }
+
+  public namedExpressionInAddress(row: number): Maybe<InternalNamedExpression> {
+    const namedExpression = this.addressCache.get(row)
+    if (namedExpression && namedExpression.added) {
+      return namedExpression
+    } else {
+      return undefined
+    }
+  }
+
+  public namedExpressionForScope(expressionName: string, sheetId?: number): Maybe<InternalNamedExpression> {
+    if (sheetId === undefined) {
+      return this.workbookStore.getExisting(expressionName)
+    } else {
+      return this.worksheetStore(sheetId).get(expressionName)
+    }
+  }
+
+  public nearestNamedExpression(expressionName: string, sheetId: number): Maybe<InternalNamedExpression> {
+    return this.worksheetStore(sheetId).get(expressionName) || this.workbookStore.getExisting(expressionName)
+  }
+
+  public isExpressionInScope(expressionName: string, sheetId: number): boolean {
+    return this.worksheetStore(sheetId).has(expressionName)
   }
 
   public isNameValid(expressionName: string): boolean {
-    return !expressionName.match(/^\d/)
+    if (/^[A-Za-z]+[0-9]+$/.test(expressionName)) {
+      return false
+    }
+    return /^[A-Za-z\u00C0-\u02AF_][A-Za-z0-9\u00C0-\u02AF\._]*$/.test(expressionName)
   }
 
-  public addNamedExpression(expressionName: string, formulaString: string): void {
-    if (!this.isNameValid(expressionName)) {
-      throw new Error('Name of Named Expression is invalid')
-    }
-    if (!this.isNameAvailable(expressionName)) {
-      throw new Error('Name of Named Expression already taken')
-    }
-    const namedExpression = new NamedExpression(expressionName, this.nextNamedExpressionRow)
-    this.storeFormulaInCell(namedExpression, formulaString)
-    this.nextNamedExpressionRow++
-    this.workbookStore.add(namedExpression)
-  }
-
-  public getInternalNamedExpressionAddress(expressionName: string): SimpleCellAddress | null {
-    const namedExpression = this.workbookStore.get(expressionName)
-    if (namedExpression === undefined) {
-      return null
+  public addNamedExpression(expressionName: string, sheetId?: number, options?: NamedExpressionOptions): InternalNamedExpression {
+    if (sheetId === undefined) {
+      let namedExpression = this.workbookStore.get(expressionName)
+      if (namedExpression) {
+        namedExpression.added = true
+        namedExpression.displayName = expressionName
+        namedExpression.options = options
+      } else {
+        namedExpression = new InternalNamedExpression(expressionName, this.nextAddress(), true, options)
+        this.workbookStore.add(namedExpression)
+      }
+      this.addressCache.set(namedExpression.address.row, namedExpression)
+      return namedExpression
     } else {
-      return this.buildAddress(namedExpression.row)
+      const store = this.worksheetStore(sheetId)
+      const namedExpression = new InternalNamedExpression(expressionName, this.nextAddress(), true, options)
+      store.add(namedExpression)
+      this.addressCache.set(namedExpression.address.row, namedExpression)
+      return namedExpression
     }
   }
 
-  public removeNamedExpression(expressionName: string): void {
-    const namedExpression = this.workbookStore.get(expressionName)
+  private worksheetStore(sheetId: number) {
+    let store = this.worksheetStores.get(sheetId)
+    if (!store) {
+      store = new WorksheetStore()
+      this.worksheetStores.set(sheetId, store)
+    }
+    return store
+  }
+
+  public namedExpressionOrPlaceholder(expressionName: string, sheetId: number): InternalNamedExpression {
+    const namedExpression = this.worksheetStore(sheetId).get(expressionName)
+    if (namedExpression) {
+      return namedExpression
+    } else {
+      let namedExpression = this.workbookStore.get(expressionName)
+      if (namedExpression === undefined) {
+        namedExpression = new InternalNamedExpression(expressionName, this.nextAddress(), false)
+        this.workbookStore.add(namedExpression)
+      }
+      return namedExpression
+    }
+  }
+
+  public workbookNamedExpressionOrPlaceholder(expressionName: string): InternalNamedExpression {
+    let namedExpression = this.workbookStore.get(expressionName)
     if (namedExpression === undefined) {
-      return
+      namedExpression = new InternalNamedExpression(expressionName, this.nextAddress(), false)
+      this.workbookStore.add(namedExpression)
     }
-    this.dependencyGraph.setCellEmpty(this.buildAddress(namedExpression.row))
-    this.workbookStore.remove(expressionName)
+    return namedExpression
   }
 
-  public changeNamedExpressionFormula(expressionName: string, newFormulaString: string): void {
-    const namedExpression = this.workbookStore.get(expressionName)
-    if (!namedExpression) {
-      throw new Error('Requested Named Expression does not exist')
+  public remove(expressionName: string, sheetId?: number): void {
+    let store
+    if (sheetId === undefined) {
+      store = this.workbookStore
+    } else {
+      store = this.worksheetStore(sheetId)
     }
-    this.storeFormulaInCell(namedExpression, newFormulaString)
+    const namedExpression = store.get(expressionName)
+    if (namedExpression === undefined || !namedExpression.added) {
+      throw 'Named expression does not exist'
+    }
+    store.remove(expressionName)
+    this.addressCache.delete(namedExpression.address.row)
   }
 
   public getAllNamedExpressionsNames(): string[] {
-    return this.workbookStore.getAllNamedExpressions().map((ne) => ne.name)
+    return this.workbookStore.getAllNamedExpressions().map((ne) => ne.displayName)
   }
 
-  private buildAddress(namedExpressionRow: number) {
-    return simpleCellAddress(NamedExpressions.SHEET_FOR_WORKBOOK_EXPRESSIONS, 0, namedExpressionRow)
+  private nextAddress() {
+    return simpleCellAddress(NamedExpressions.SHEET_FOR_WORKBOOK_EXPRESSIONS, 0, this.nextNamedExpressionRow++)
   }
 
-  private storeFormulaInCell(namedExpression: NamedExpression, formula: string) {
-    const parsedCellContent = this.cellContentParser.parse(formula)
-    if (!(parsedCellContent instanceof CellContent.Formula)) {
-      throw new Error('This is not a formula')
+  public lookupNextAddress(expressionName: string, sheetId?: number): SimpleCellAddress {
+    if (sheetId === undefined) {
+      const namedExpression = this.workbookStore.get(expressionName)
+      if (namedExpression) {
+        return namedExpression.address
+      }
     }
-    const address = this.buildAddress(namedExpression.row)
-    const {ast, hash, hasVolatileFunction, hasStructuralChangeFunction, dependencies} = this.parser.parse(parsedCellContent.formula, address)
-    this.dependencyGraph.setFormulaToCell(address, ast, absolutizeDependencies(dependencies, address), hasVolatileFunction, hasStructuralChangeFunction)
+    return simpleCellAddress(NamedExpressions.SHEET_FOR_WORKBOOK_EXPRESSIONS, 0, this.nextNamedExpressionRow)
+  }
+}
+
+
+export const doesContainRelativeReferences = (ast: Ast): boolean => {
+  switch (ast.type) {
+    case AstNodeType.EMPTY:
+    case AstNodeType.NUMBER:
+    case AstNodeType.STRING:
+    case AstNodeType.ERROR:
+    case AstNodeType.ERROR_WITH_RAW_INPUT:
+      return false
+    case AstNodeType.CELL_REFERENCE:
+      return !ast.reference.isAbsolute()
+    case AstNodeType.CELL_RANGE:
+    case AstNodeType.COLUMN_RANGE:
+    case AstNodeType.ROW_RANGE:
+      return !ast.start.isAbsolute()
+    case AstNodeType.NAMED_EXPRESSION:
+      return false
+    case AstNodeType.PERCENT_OP:
+    case AstNodeType.PLUS_UNARY_OP:
+    case AstNodeType.MINUS_UNARY_OP: {
+      return doesContainRelativeReferences(ast.value)
+    }
+    case AstNodeType.CONCATENATE_OP:
+    case AstNodeType.EQUALS_OP:
+    case AstNodeType.NOT_EQUAL_OP:
+    case AstNodeType.LESS_THAN_OP:
+    case AstNodeType.GREATER_THAN_OP:
+    case AstNodeType.LESS_THAN_OR_EQUAL_OP:
+    case AstNodeType.GREATER_THAN_OR_EQUAL_OP:
+    case AstNodeType.MINUS_OP:
+    case AstNodeType.PLUS_OP:
+    case AstNodeType.TIMES_OP:
+    case AstNodeType.DIV_OP:
+    case AstNodeType.POWER_OP:
+      return doesContainRelativeReferences(ast.left) || doesContainRelativeReferences(ast.right)
+    case AstNodeType.PARENTHESIS:
+      return doesContainRelativeReferences(ast.expression)
+    case AstNodeType.FUNCTION_CALL: {
+      return ast.args.some((arg) =>
+        doesContainRelativeReferences(arg)
+      )
+    }
   }
 }

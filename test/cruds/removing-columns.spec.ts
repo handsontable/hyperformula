@@ -1,17 +1,20 @@
-import { Config, HyperFormula} from '../../src'
+import {ExportedCellChange, HyperFormula} from '../../src'
 import {AbsoluteCellRange} from '../../src/AbsoluteCellRange'
 import {ColumnIndex} from '../../src/ColumnSearch/ColumnIndex'
 import {MatrixVertex, RangeVertex} from '../../src/DependencyGraph'
 import {CellAddress} from '../../src/parser'
-import '../testConfig'
+import {simpleCellAddress} from '../../src/Cell'
 import {
   adr,
-  expect_array_with_same_content,
-  expect_function_to_have_ref_error,
-  expect_reference_to_have_ref_error,
+  expectArrayWithSameContent,
+  expectEngineToBeTheSameAs,
+  expectFunctionToHaveRefError,
+  expectReferenceToHaveRefError,
   extractMatrixRange,
   extractRange,
   extractReference,
+  verifyRangesInSheet,
+  verifyValues,
 } from '../testUtils'
 
 describe('Removing columns - checking if its possible', () => {
@@ -70,11 +73,10 @@ describe('Removing columns - checking if its possible', () => {
   })
 
   it('yes if theres a numeric matrix in place where we add', () => {
-    const config = new Config({matrixDetection: true, matrixDetectionThreshold: 1})
     const engine = HyperFormula.buildFromArray([
       ['1', '2'],
       ['3', '4'],
-    ], config)
+    ], {matrixDetection: true, matrixDetectionThreshold: 1})
     expect(engine.matrixMapping.matrixMapping.size).toEqual(1)
 
     expect(engine.isItPossibleToRemoveColumns(0, [0, 1])).toEqual(true)
@@ -93,12 +95,12 @@ describe('Removing columns - checking if its possible', () => {
 describe('Address dependencies, Case 1: same sheet', () => {
   it('case Aa: absolute dependency before removed column should not be affected', () => {
     const engine = HyperFormula.buildFromArray([
-        ['', '1', '', '=$B1'],
+      ['', '1', '', '=$B1'],
     ])
 
     engine.removeColumns(0, [2, 1])
 
-    expect(extractReference(engine, adr('C1'))).toEqual(CellAddress.absoluteCol(0, 1, 0))
+    expect(extractReference(engine, adr('C1'))).toEqual(CellAddress.absoluteCol(null, 1, 0))
   })
 
   it('case Ab: absolute dependency after removed column should be shifted', () => {
@@ -108,7 +110,7 @@ describe('Address dependencies, Case 1: same sheet', () => {
 
     engine.removeColumns(0, [1, 1])
 
-    expect(extractReference(engine, adr('A1'))).toEqual(CellAddress.absoluteCol(0, 1, 0))
+    expect(extractReference(engine, adr('A1'))).toEqual(CellAddress.absoluteCol(null, 1, 0))
   })
 
   it('case Ac: absolute dependency in removed column range should be replaced by #REF', () => {
@@ -118,7 +120,7 @@ describe('Address dependencies, Case 1: same sheet', () => {
 
     engine.removeColumns(0, [1, 1])
 
-    expect_reference_to_have_ref_error(engine, adr('A1'))
+    expectReferenceToHaveRefError(engine, adr('A1'))
   })
 
   it('case Raa: relative dependency and formula before removed columns should not be affected', () => {
@@ -128,7 +130,7 @@ describe('Address dependencies, Case 1: same sheet', () => {
 
     engine.removeColumns(0, [2, 1])
 
-    expect(extractReference(engine, adr('B1'))).toEqual(CellAddress.relative(0, -1, 0))
+    expect(extractReference(engine, adr('B1'))).toEqual(CellAddress.relative(null, -1, 0))
   })
 
   it('case Rab: relative address should be shifted when only formula is moving', () => {
@@ -138,7 +140,7 @@ describe('Address dependencies, Case 1: same sheet', () => {
 
     engine.removeColumns(0, [1, 2])
 
-    expect(extractReference(engine, adr('B1'))).toEqual(CellAddress.relative(0, -1, 0))
+    expect(extractReference(engine, adr('B1'))).toEqual(CellAddress.relative(null, -1, 0))
   })
 
   it('case Rba: relative address should be shifted when only dependency is moving', () => {
@@ -148,7 +150,7 @@ describe('Address dependencies, Case 1: same sheet', () => {
 
     engine.removeColumns(0, [1, 2])
 
-    expect(extractReference(engine, adr('A1'))).toEqual(CellAddress.relative(0, 1, 0))
+    expect(extractReference(engine, adr('A1'))).toEqual(CellAddress.relative(null, 1, 0))
   })
 
   it('case Rbb: relative address should not be affected when dependency and formula is moving', () => {
@@ -158,7 +160,7 @@ describe('Address dependencies, Case 1: same sheet', () => {
 
     engine.removeColumns(0, [0, 2])
 
-    expect(extractReference(engine, adr('A1'))).toEqual(CellAddress.relative(0, 1, 0))
+    expect(extractReference(engine, adr('A1'))).toEqual(CellAddress.relative(null, 1, 0))
   })
 
   it('case Rca: relative dependency in deleted column range should be replaced by #REF', () => {
@@ -168,7 +170,7 @@ describe('Address dependencies, Case 1: same sheet', () => {
 
     engine.removeColumns(0, [1, 2])
 
-    expect_reference_to_have_ref_error(engine, adr('A1'))
+    expectReferenceToHaveRefError(engine, adr('A1'))
   })
 
   it('case Rcb: relative dependency in deleted column range should be replaced by #REF', () => {
@@ -178,17 +180,17 @@ describe('Address dependencies, Case 1: same sheet', () => {
 
     engine.removeColumns(0, [0, 2])
 
-    expect_reference_to_have_ref_error(engine, adr('B1'))
+    expectReferenceToHaveRefError(engine, adr('B1'))
   })
 
   it('case Rca, range', () => {
     const engine = HyperFormula.buildFromArray([
-      ['=SUM(B1:C1)', '1' , '2'],
+      ['=SUM(B1:C1)', '1', '2'],
     ])
 
     engine.removeColumns(0, [1, 2])
 
-    expect_function_to_have_ref_error(engine, adr('A1'))
+    expectFunctionToHaveRefError(engine, adr('A1'))
   })
 
   it('truncates range by one column from left if first column removed', () => {
@@ -372,8 +374,8 @@ describe('Address dependencies, Case 3: formula in different sheet', () => {
 
     engine.removeColumns(1, [0, 1])
 
-    expect_reference_to_have_ref_error(engine, adr('A1'))
-    expect_reference_to_have_ref_error(engine, adr('B1'))
+    expectReferenceToHaveRefError(engine, adr('A1'))
+    expectReferenceToHaveRefError(engine, adr('B1'))
   })
 
   it('does not truncate any ranges if columns are removed from different sheet', () => {
@@ -406,7 +408,7 @@ describe('Address dependencies, Case 4: remove columns in sheet different than f
 
     engine.removeColumns(0, [0, 1])
 
-    expect(extractReference(engine, adr('B1', 1))).toEqual(CellAddress.relative(1, -1, 0))
+    expect(extractReference(engine, adr('B1', 1))).toEqual(CellAddress.relative(null, -1, 0))
   })
 
   it('should not affect dependency when removing columns in not relevant sheet, more sheets', function() {
@@ -448,8 +450,10 @@ describe('Removing columns - reevaluation', () => {
     ])
     const a2 = engine.addressMapping.getCell(adr('A2'))
     const a3 = engine.addressMapping.getCell(adr('A3'))
-    const a2setCellValueSpy = jest.spyOn(a2 as any, 'setCellValue')
-    const a3setCellValueSpy = jest.spyOn(a3 as any, 'setCellValue')
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const a2setCellValueSpy = spyOn(a2 as any, 'setCellValue')
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const a3setCellValueSpy = spyOn(a3 as any, 'setCellValue')
 
     engine.removeColumns(0, [1, 1])
 
@@ -462,7 +466,8 @@ describe('Removing columns - reevaluation', () => {
       ['1', '2', '3', '=COLUMNS(A1:C1)'],
     ])
     const d1 = engine.addressMapping.getCell(adr('D1'))
-    const d1setCellValueSpy = jest.spyOn(d1 as any, 'setCellValue')
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const d1setCellValueSpy = spyOn(d1 as any, 'setCellValue')
 
     engine.removeColumns(0, [1, 1])
 
@@ -476,12 +481,13 @@ describe('Removing columns - reevaluation', () => {
     ])
 
     const c1 = engine.addressMapping.getCell(adr('C1'))
-    const c1setCellValueSpy = jest.spyOn(c1 as any, 'setCellValue')
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const c1setCellValueSpy = spyOn(c1 as any, 'setCellValue')
 
     engine.removeColumns(0, [0, 2])
 
     expect(c1setCellValueSpy).toHaveBeenCalled()
-    expect_function_to_have_ref_error(engine, adr('A1'))
+    expectFunctionToHaveRefError(engine, adr('A1'))
   })
 
   it('returns changed values', () => {
@@ -492,7 +498,7 @@ describe('Removing columns - reevaluation', () => {
     const changes = engine.removeColumns(0, [0, 1])
 
     expect(changes.length).toBe(1)
-    expect(changes).toContainEqual({ sheet: 0, row: 0, col: 1, value: 2})
+    expect(changes).toEqual([new ExportedCellChange(simpleCellAddress(0, 1, 0), 2)])
   })
 })
 
@@ -503,15 +509,14 @@ describe('Removing columns - matrices', () => {
       ['3', '4'],
     ])
 
-    expect(() => engine.removeColumns(0, [2, 1])).toThrowError('It is not possible to remove column within matrix')
+    expect(() => engine.removeColumns(0, [2, 1])).toThrowError('Cannot perform this operation, source location has a matrix inside.')
   })
 
   it('should remove column from numeric matrix', () => {
-    const config = new Config({matrixDetection: true, matrixDetectionThreshold: 1})
     const engine = HyperFormula.buildFromArray([
       ['1', '2', '3'],
       ['1', '2', '3'],
-    ], config)
+    ], {matrixDetection: true, matrixDetectionThreshold: 1})
 
     engine.removeColumns(0, [1, 1])
 
@@ -521,11 +526,10 @@ describe('Removing columns - matrices', () => {
   })
 
   it('should remove columns when partial overlap', () => {
-    const config = new Config({matrixDetection: true, matrixDetectionThreshold: 1})
     const engine = HyperFormula.buildFromArray([
       ['1', '2'],
       ['3', '4'],
-    ], config)
+    ], {matrixDetection: true, matrixDetectionThreshold: 1})
 
     engine.removeColumns(0, [1, 3])
     const matrix = engine.addressMapping.fetchCell(adr('A1')) as MatrixVertex
@@ -534,11 +538,10 @@ describe('Removing columns - matrices', () => {
   })
 
   it('should remove MatrixVertex completely from graph', () => {
-    const config = new Config({matrixDetection: true, matrixDetectionThreshold: 1})
     const engine = HyperFormula.buildFromArray([
       ['1', '2'],
       ['3', '4'],
-    ], config)
+    ], {matrixDetection: true, matrixDetectionThreshold: 1})
 
     expect(Array.from(engine.matrixMapping.numericMatrices()).length).toBe(1)
     engine.removeColumns(0, [0, 2])
@@ -547,12 +550,11 @@ describe('Removing columns - matrices', () => {
   })
 
   it('should remove MatrixVertex completely from graph, more cols', () => {
-    const config = new Config({matrixDetection: true, matrixDetectionThreshold: 1})
     const engine = HyperFormula.buildFromArray([
       ['1', '2'],
       ['3', '4'],
       ['foo', 'bar'],
-    ], config)
+    ], {matrixDetection: true, matrixDetectionThreshold: 1})
 
     expect(Array.from(engine.matrixMapping.numericMatrices()).length).toBe(1)
     engine.removeColumns(0, [0, 3])
@@ -561,23 +563,21 @@ describe('Removing columns - matrices', () => {
   })
 
   it('does not remove matrix vertices from graph', function() {
-    const config = new Config({matrixDetection: true, matrixDetectionThreshold: 1})
     const engine = HyperFormula.buildFromArray([
       ['1', '2', '3'],
       ['1', '2', '3'],
-    ], config)
+    ], {matrixDetection: true, matrixDetectionThreshold: 1})
     expect(engine.graph.nodes.size).toBe(1)
     engine.removeColumns(0, [1, 1])
     expect(engine.graph.nodes.size).toBe(1)
   })
 
   it('reevaluates cells dependent on matrix vertex', () => {
-    const config = new Config({matrixDetection: true, matrixDetectionThreshold: 1})
     const engine = HyperFormula.buildFromArray([
       ['1', '1', '1'],
       ['2', '2', '2'],
       ['=SUM(A1:C2)'],
-    ], config)
+    ], {matrixDetection: true, matrixDetectionThreshold: 1})
 
     expect(engine.getCellValue(adr('A3'))).toEqual(9)
 
@@ -701,7 +701,7 @@ describe('Removing columns - ranges', function() {
     const engine = HyperFormula.buildFromArray([
       ['1', '2', '3'],
       ['=SUM(A1:C1)', '', ''],
-                     /*   */
+      /*   */
     ])
 
     engine.removeColumns(0, [1, 2])
@@ -724,21 +724,21 @@ describe('Removing columns - ranges', function() {
     expect(ranges.length).toBe(0)
     expect(engine.graph.hasNode(range)).toBe(false)
   })
-})
 
-it('does not truncate any ranges if columns are removed from different sheet', () => {
-  const engine = HyperFormula.buildFromSheets({
-    Sheet1: [
-      ['1', '2', '=SUM(A1:B1)'],
-    ],
-    Sheet2: [
-      ['1'],
-    ],
+  it('does not truncate any ranges if columns are removed from different sheet', () => {
+    const engine = HyperFormula.buildFromSheets({
+      Sheet1: [
+        ['1', '2', '=SUM(A1:B1)'],
+      ],
+      Sheet2: [
+        ['1'],
+      ],
+    })
+
+    engine.removeColumns(1, [0, 1])
+
+    expect(extractRange(engine, adr('C1'))).toEqual(new AbsoluteCellRange(adr('A1'), adr('B1')))
   })
-
-  engine.removeColumns(1, [0, 1])
-
-  expect(extractRange(engine, adr('C1'))).toEqual(new AbsoluteCellRange(adr('A1'), adr('B1')))
 })
 
 describe('Removing columns - sheet dimensions', () => {
@@ -747,7 +747,8 @@ describe('Removing columns - sheet dimensions', () => {
       ['1'],
     ])
 
-    const recalcSpy = jest.spyOn(engine.evaluator as any, 'partialRun')
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const recalcSpy = spyOn(engine.evaluator as any, 'partialRun')
     engine.removeColumns(0, [1, 1])
     engine.removeColumns(0, [10, 6])
 
@@ -771,11 +772,167 @@ describe('Removing columns - column index', () => {
   it('should update column index when adding row', () => {
     const engine = HyperFormula.buildFromArray([
       ['', '1', '=VLOOKUP(2, A1:A10, 1, TRUE())'],
-    ], new Config({ useColumnIndex: true }))
+    ], { useColumnIndex: true })
 
     engine.removeColumns(0, [0, 1])
 
     const index = (engine.columnSearch as ColumnIndex)
-    expect_array_with_same_content([0], index.getValueIndex(0, 0, 1).index)
+    expectArrayWithSameContent([0], index.getValueIndex(0, 0, 1).index)
+  })
+})
+
+describe('Removing columns - column range', () => {
+  it('removing column in the middle of column range', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1', '2', '3', '=SUM(A:C)']
+    ])
+
+    engine.removeColumns(0, [1, 1])
+
+    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
+      ['1', '3', '=SUM(A:B)']
+    ]))
+  })
+
+  it('removing column in at the start of column range', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1', '2', '3', '=SUM(A:C)']
+    ])
+
+    engine.removeColumns(0, [0, 1])
+
+    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
+      ['2', '3', '=SUM(A:B)']
+    ]))
+  })
+
+  it('removing column in at the end of column range', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1', '2', '3', '=SUM(A:C)']
+    ])
+
+    engine.removeColumns(0, [2, 1])
+
+    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
+      ['1', '2', '=SUM(A:B)']
+    ]))
+  })
+})
+
+describe('Removing columns - row range', () => {
+  it('should not affect row range', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1', '1', '1'],
+      ['2', '2', '2'],
+      [null, null, '=SUM(1:2)']
+    ])
+
+    engine.removeColumns(0, [0, 1])
+
+    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
+      ['1', '1'],
+      ['2', '2'],
+      [null, '=SUM(1:2)']
+    ]))
+  })
+})
+
+describe('Removing columns - merge ranges', () => {
+  it('should merge ranges', () => {
+    const engine = HyperFormula.buildFromArray([])
+    engine.setCellContents({sheet: 0, col: 1, row: 2}, 7)
+    engine.setCellContents({sheet: 0, col: 0, row: 3}, '=SUM(B2:C3)')
+    engine.setCellContents({sheet: 0, col: 0, row: 6}, '=SUM(A4:B6)')
+    engine.setCellContents({sheet: 0, col: 2, row: 6}, '=SUM(A4:A6)')
+
+    verifyRangesInSheet(engine, 0, ['A4:A6', 'A4:B6', 'B2:C3'])
+    verifyValues(engine)
+
+    engine.addColumns(0, [0, 2])
+
+    verifyRangesInSheet(engine, 0, ['C4:C6', 'C4:D6', 'D2:E3'])
+    verifyValues(engine)
+
+    engine.removeColumns(0, [3, 1])
+
+    verifyRangesInSheet(engine, 0, ['C4:C6', 'D2:D3'])
+    verifyValues(engine)
+  })
+
+  it('Should properly deallocate all nodes', () => {
+    const engine = HyperFormula.buildFromArray([])
+    engine.setCellContents({sheet: 0, col: 2, row: 3}, '=SUM(B2:C2)')
+    engine.setCellContents({sheet: 0, col: 3, row: 5}, '=SUM(B2:C3)')
+
+    engine.addColumns(0, [2, 2])
+    engine.removeColumns(0, [4, 1])
+
+    verifyRangesInSheet(engine, 0, ['B2:D2', 'B2:D3'])
+    verifyValues(engine)
+
+    engine.setCellContents({sheet: 0, col: 4, row: 5}, null)
+
+    verifyRangesInSheet(engine, 0, [])
+    verifyValues(engine)
+    expect(engine.dependencyGraph.graph.nodesCount()).toBe(0)
+    expect(engine.dependencyGraph.rangeMapping.getMappingSize(0)).toBe(0)
+  })
+
+  it('should merge ranges in proper order', () => {
+    const engine = HyperFormula.buildFromArray([])
+    engine.setCellContents({sheet: 0, col: 0, row: 0}, '=SUM(D5:F5)')
+    engine.setCellContents({sheet: 0, col: 1, row: 0}, '=SUM(D5:E5)')
+    engine.setCellContents({sheet: 0, col: 2, row: 0}, '=SUM(D5:D5)')
+
+    engine.removeColumns(0, [4, 1])
+
+    verifyRangesInSheet(engine, 0, ['D5:E5', 'D5:D5'])
+    verifyValues(engine)
+
+    engine.setCellContents(adr('A1'), null)
+    engine.setCellContents(adr('B1'), null)
+    engine.setCellContents(adr('C1'), null)
+
+    verifyRangesInSheet(engine, 0, [])
+    verifyValues(engine)
+  })
+
+  it('should merge ranges when removing multiple columns', () => {
+    const engine = HyperFormula.buildFromArray([])
+    engine.setCellContents({sheet: 0, col: 3, row: 0}, '=SUM(A5:A5)')
+    engine.setCellContents({sheet: 0, col: 0, row: 0}, '=SUM(A5:C5)')
+
+    verifyRangesInSheet(engine, 0, ['A5:A5', 'A5:C5'])
+
+    engine.removeColumns(0, [1, 2])
+
+    verifyRangesInSheet(engine, 0, ['A5:A5'])
+    verifyValues(engine)
+
+    engine.setCellContents(adr('A1'), null)
+    engine.setCellContents(adr('B1'), null)
+
+    verifyRangesInSheet(engine, 0, [])
+    verifyValues(engine)
+  })
+
+  it('should undo merge ranges', () => {
+    const engine = HyperFormula.buildFromArray([])
+    engine.setCellContents({sheet: 0, col: 2, row: 1}, 7)
+    engine.setCellContents({sheet: 0, col: 3, row: 0}, '=SUM(B2:C3)')
+    engine.setCellContents({sheet: 0, col: 6, row: 0}, '=SUM(A4:B6)')
+    engine.setCellContents({sheet: 0, col: 6, row: 2}, '=SUM(A4:A6)')
+
+    engine.addColumns(0, [0, 2])
+    engine.removeColumns(0, [3, 1])
+
+    verifyRangesInSheet(engine, 0, ['C4:C6', 'D2:D3'])
+    verifyValues(engine)
+
+    engine.undo()
+
+    verifyRangesInSheet(engine, 0, ['C4:C6', 'C4:D6', 'D2:E3'])
+
+    verifyValues(engine)
   })
 })

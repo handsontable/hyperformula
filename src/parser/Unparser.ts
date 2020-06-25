@@ -1,10 +1,22 @@
+/**
+ * @license
+ * Copyright (c) 2020 Handsoncode. All rights reserved.
+ */
 
-import {SimpleCellAddress} from '../Cell'
-import {cellAddressToString} from './addressRepresentationConverters'
-import {Ast, AstNodeType} from './Ast'
+import {ErrorType, SimpleCellAddress} from '../Cell'
+import {
+  Ast,
+  AstNodeType,
+  CellRangeAst,
+  ColumnRangeAst,
+  imageWithWhitespace,
+  RangeSheetReferenceType,
+  RowRangeAst,
+} from './Ast'
 import {binaryOpTokenMap} from './binaryOpTokenMap'
 import {additionalCharactersAllowedInQuotes, ILexerConfig} from './LexerConfig'
 import {ParserConfig} from './ParserConfig'
+import {NamedExpressions} from '../NamedExpressions'
 
 export type SheetMappingFn = (sheetId: number) => string
 
@@ -13,6 +25,7 @@ export class Unparser {
     private readonly config: ParserConfig,
     private readonly lexerConfig: ILexerConfig,
     private readonly sheetMappingFn: SheetMappingFn,
+    private readonly namedExpressions: NamedExpressions,
   ) {
   }
 
@@ -22,67 +35,101 @@ export class Unparser {
 
   private unparseAst(ast: Ast, address: SimpleCellAddress): string {
     switch (ast.type) {
+      case AstNodeType.EMPTY: {
+        return imageWithWhitespace('', ast.leadingWhitespace)
+      }
       case AstNodeType.NUMBER: {
-        return ast.value.toString()
+        return imageWithWhitespace(formatNumber(ast.value, this.config.decimalSeparator), ast.leadingWhitespace)
       }
       case AstNodeType.STRING: {
-        return '"' + ast.value + '"'
+        return imageWithWhitespace('"' + ast.value + '"', ast.leadingWhitespace)
       }
       case AstNodeType.FUNCTION_CALL: {
-        const args = ast.args.map((arg) => this.unparseAst(arg, address)).join(this.config.functionArgSeparator)
-        const procedureName = this.config.getFunctionTranslationFor(ast.procedureName)
-        return (procedureName || ast.procedureName) + '(' + args + ')'
+        const args = ast.args.map((arg) => arg!==undefined?this.unparseAst(arg, address):''
+        ).join(this.config.functionArgSeparator)
+        const procedureName = this.config.translationPackage.isFunctionTranslated(ast.procedureName) ?
+          this.config.translationPackage.getFunctionTranslation(ast.procedureName) :
+          ast.procedureName
+        const rightPart = procedureName + '(' + args + imageWithWhitespace(')', ast.internalWhitespace)
+        return imageWithWhitespace(rightPart, ast.leadingWhitespace)
+      }
+      case AstNodeType.NAMED_EXPRESSION: {
+        const originalNamedExpressionName = this.namedExpressions.nearestNamedExpression(ast.expressionName, address.sheet)?.displayName
+        return imageWithWhitespace(originalNamedExpressionName || ast.expressionName, ast.leadingWhitespace)
       }
       case AstNodeType.CELL_REFERENCE: {
-        if (ast.reference.sheet === address.sheet) {
-          return cellAddressToString(ast.reference, address)
+        let image
+        if (ast.reference.sheet !== null) {
+          image = this.unparseSheetName(ast.reference.sheet) + '!' + ast.reference.unparse(address)
         } else {
-          return this.unparseSheetName(ast.reference.sheet) + '!' + cellAddressToString(ast.reference, address)
+          image = ast.reference.unparse(address)
         }
+        return imageWithWhitespace(image, ast.leadingWhitespace)
       }
+      case AstNodeType.COLUMN_RANGE:
+      case AstNodeType.ROW_RANGE:
       case AstNodeType.CELL_RANGE: {
-        if (ast.start.sheet === address.sheet) {
-          return cellAddressToString(ast.start, address) + ':' + cellAddressToString(ast.end, address)
-        } else {
-          return this.unparseSheetName(ast.start.sheet) + '!' + cellAddressToString(ast.start, address) + ':' + cellAddressToString(ast.end, address)
-        }
+        return imageWithWhitespace(this.formatRange(ast, address), ast.leadingWhitespace)
       }
       case AstNodeType.PLUS_UNARY_OP: {
         const unparsedExpr = this.unparseAst(ast.value, address)
-        return '+' + unparsedExpr
+        return imageWithWhitespace('+', ast.leadingWhitespace) + unparsedExpr
       }
       case AstNodeType.MINUS_UNARY_OP: {
         const unparsedExpr = this.unparseAst(ast.value, address)
-        return '-' + unparsedExpr
+        return imageWithWhitespace('-', ast.leadingWhitespace) + unparsedExpr
       }
       case AstNodeType.PERCENT_OP: {
-        return this.unparseAst(ast.value, address) + '%'
+        return this.unparseAst(ast.value, address) + imageWithWhitespace('%', ast.leadingWhitespace)
       }
       case AstNodeType.ERROR: {
-        if (ast.error) {
-          return this.config.getErrorTranslationFor(ast.error.type)
-        } else {
-          return '#ERR!'
-        }
+        const image = this.config.translationPackage.getErrorTranslation(
+          ast.error ? ast.error.type : ErrorType.ERROR
+        )
+        return imageWithWhitespace(image, ast.leadingWhitespace)
+      }
+      case AstNodeType.ERROR_WITH_RAW_INPUT: {
+        return imageWithWhitespace(ast.rawInput, ast.leadingWhitespace)
       }
       case AstNodeType.PARENTHESIS: {
         const expression = this.unparseAst(ast.expression, address)
-        return '(' + expression + ')'
+        const rightPart = '(' + expression + imageWithWhitespace(')', ast.internalWhitespace)
+        return imageWithWhitespace(rightPart, ast.leadingWhitespace)
       }
       default: {
         const left = this.unparseAst(ast.left, address)
         const right = this.unparseAst(ast.right, address)
-        return left + binaryOpTokenMap[ast.type] + right
+        return left + imageWithWhitespace(binaryOpTokenMap[ast.type], ast.leadingWhitespace) + right
       }
     }
   }
 
   private unparseSheetName(sheetId: number): string {
     const sheet = this.sheetMappingFn(sheetId)
-    if (sheet.match(new RegExp(additionalCharactersAllowedInQuotes))) {
+    if (new RegExp(additionalCharactersAllowedInQuotes).exec(sheet)) {
       return `'${sheet}'`
     } else {
       return sheet
     }
   }
+
+  private formatRange(ast: CellRangeAst | ColumnRangeAst | RowRangeAst, baseAddress: SimpleCellAddress): string {
+    let startSheeet = ''
+    let endSheet = ''
+
+    if (ast.start.sheet !== null && (ast.sheetReferenceType !== RangeSheetReferenceType.RELATIVE)) {
+      startSheeet = this.unparseSheetName(ast.start.sheet) + '!'
+    }
+
+    if (ast.end.sheet !== null && ast.sheetReferenceType === RangeSheetReferenceType.BOTH_ABSOLUTE) {
+      endSheet = this.unparseSheetName(ast.end.sheet) + '!'
+    }
+
+    return `${startSheeet}${ast.start.unparse(baseAddress)}:${endSheet}${ast.end.unparse(baseAddress)}`
+  }
+}
+
+export function formatNumber(number: number, decimalSeparator: string): string {
+  const numericString = number.toString()
+  return numericString.replace('.', decimalSeparator)
 }

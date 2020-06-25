@@ -1,10 +1,10 @@
-import {Config, EmptyValue, HyperFormula} from '../../src'
+import {ExportedCellChange, HyperFormula, SheetSizeLimitExceededError} from '../../src'
 import {AbsoluteCellRange} from '../../src/AbsoluteCellRange'
 import {simpleCellAddress} from '../../src/Cell'
 import {ColumnIndex} from '../../src/ColumnSearch/ColumnIndex'
-import { FormulaCellVertex, MatrixVertex} from '../../src/DependencyGraph'
-import '../testConfig'
-import {adr, expect_array_with_same_content, extractMatrixRange} from '../testUtils'
+import {FormulaCellVertex, MatrixVertex} from '../../src/DependencyGraph'
+import {adr, expectArrayWithSameContent, extractMatrixRange} from '../testUtils'
+import {Config} from '../../src/Config'
 
 describe('Adding row - checking if its possible', () => {
   it('no if starting row is negative', () => {
@@ -73,12 +73,20 @@ describe('Adding row - checking if its possible', () => {
     expect(engine.isItPossibleToAddRows(0, [4, 1])).toEqual(true)
   })
 
+  it('no if adding row would exceed sheet size limit', () => {
+    const engine = HyperFormula.buildFromArray(
+      Array(Config.defaultConfig.maxRows - 1).fill([''])
+    )
+
+    expect(engine.isItPossibleToAddRows(0, [0, 2])).toEqual(false)
+    expect(engine.isItPossibleToAddRows(0, [0, 1], [5, 1])).toEqual(false)
+  })
+
   it('yes if theres a numeric matrix in place where we add', () => {
-    const config = new Config({matrixDetection: true, matrixDetectionThreshold: 1})
     const engine = HyperFormula.buildFromArray([
       ['1', '2'],
       ['3', '4'],
-    ], config)
+    ], {matrixDetection: true, matrixDetectionThreshold: 1})
     expect(engine.matrixMapping.matrixMapping.size).toEqual(1)
 
     expect(engine.isItPossibleToAddRows(0, [0, 1])).toEqual(true)
@@ -104,7 +112,7 @@ describe('Adding row - matrix check', () => {
 
     expect(() => {
       engine.addRows(0, [3, 1])
-    }).toThrow(new Error('It is not possible to add row in row with matrix'))
+    }).toThrowError('Cannot perform this operation, target location has a matrix inside.')
   })
 
   it('should be possible to add row right above matrix', () => {
@@ -117,7 +125,7 @@ describe('Adding row - matrix check', () => {
 
     engine.addRows(0, [0, 1])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(EmptyValue)
+    expect(engine.getCellValue(adr('A1'))).toBe(null)
     expect(engine.getCellValue(adr('A2'))).toEqual(1)
     expect(engine.getCellValue(adr('B2'))).toEqual(3)
     expect(engine.getCellValue(adr('A4'))).toEqual(1)
@@ -135,7 +143,7 @@ describe('Adding row - matrix check', () => {
 
     expect(engine.getCellValue(adr('A1'))).toEqual(1)
     expect(engine.getCellValue(adr('B1'))).toEqual(3)
-    expect(engine.getCellValue(adr('A3'))).toEqual(EmptyValue)
+    expect(engine.getCellValue(adr('A3'))).toBe(null)
     expect(engine.getCellValue(adr('A4'))).toEqual(1)
   })
 })
@@ -161,8 +169,10 @@ describe('Adding row - reevaluation', () => {
     ])
     const b1 = engine.addressMapping.getCell(adr('B1'))
     const c1 = engine.addressMapping.getCell(adr('C1'))
-    const b1setCellValueSpy = jest.spyOn(b1 as any, 'setCellValue')
-    const c1setCellValueSpy = jest.spyOn(c1 as any, 'setCellValue')
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const b1setCellValueSpy = spyOn(b1 as any, 'setCellValue')
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const c1setCellValueSpy = spyOn(c1 as any, 'setCellValue')
 
     engine.addRows(0, [1, 1])
 
@@ -176,7 +186,8 @@ describe('Adding row - reevaluation', () => {
       ['1', '2', '=COLUMNS(A1:B1)'],
     ])
     const c1 = engine.addressMapping.getCell(adr('C1'))
-    const c1setCellValueSpy = jest.spyOn(c1 as any, 'setCellValue')
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const c1setCellValueSpy = spyOn(c1 as any, 'setCellValue')
 
     engine.addRows(0, [0, 1])
 
@@ -193,7 +204,7 @@ describe('Adding row - reevaluation', () => {
     const changes = engine.addRows(0, [1, 1])
 
     expect(changes.length).toBe(1)
-    expect(changes).toContainEqual({ sheet: 0, col: 1, row: 2, value: 1 })
+    expect(changes).toContainEqual(new ExportedCellChange(simpleCellAddress(0, 1, 2), 1))
   })
 })
 
@@ -280,11 +291,10 @@ describe('Adding row - FormulaCellVertex#address update', () => {
 
 describe('Adding row - matrices adjustments', () => {
   it('add row inside numeric matrix, expand matrix', () => {
-    const config = new Config({matrixDetection: true, matrixDetectionThreshold: 1})
     const engine = HyperFormula.buildFromArray([
       ['1', '2'],
       ['3', '4'],
-    ], config)
+    ], {matrixDetection: true, matrixDetectionThreshold: 1})
 
     expect(engine.getCellValue(adr('A2'))).toEqual(3)
 
@@ -320,7 +330,8 @@ describe('Adding row - sheet dimensions', () => {
       // new row
     ])
 
-    const recalcSpy = jest.spyOn(engine.evaluator as any, 'partialRun')
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const recalcSpy = spyOn(engine.evaluator as any, 'partialRun')
     engine.addRows(0, [1, 1])
     engine.addRows(0, [10, 15])
 
@@ -330,19 +341,31 @@ describe('Adding row - sheet dimensions', () => {
       height: 1,
     })
   })
+
+  it('should throw error when trying to expand sheet beyond limits', () => {
+    const engine = HyperFormula.buildFromArray(Array(Config.defaultConfig.maxRows - 1).fill(['']))
+
+    expect(() => {
+      engine.addRows(0, [0, 2])
+    }).toThrow(new SheetSizeLimitExceededError())
+
+    expect(() => {
+      engine.addRows(0, [0, 1], [5, 1])
+    }).toThrow(new SheetSizeLimitExceededError())
+  })
 })
 
 describe('Adding row - column index', () => {
   it('should update column index when adding row', () => {
     const engine = HyperFormula.buildFromArray([
-        ['1', '=VLOOKUP(2, A1:A10, 1, TRUE())'],
-        ['2'],
-    ], new Config({ useColumnIndex: true }))
+      ['1', '=VLOOKUP(2, A1:A10, 1, TRUE())'],
+      ['2'],
+    ], {useColumnIndex: true})
 
     engine.addRows(0, [1, 1])
 
     const index = (engine.columnSearch as ColumnIndex)
-    expect_array_with_same_content([0], index.getValueIndex(0, 0, 1).index)
-    expect_array_with_same_content([2], index.getValueIndex(0, 0, 2).index)
+    expectArrayWithSameContent([0], index.getValueIndex(0, 0, 1).index)
+    expectArrayWithSameContent([2], index.getValueIndex(0, 0, 2).index)
   })
 })

@@ -1,5 +1,12 @@
-import {CellVertex, FormulaCellVertex, MatrixVertex, ValueCellVertex} from './DependencyGraph'
+/**
+ * @license
+ * Copyright (c) 2020 Handsoncode. All rights reserved.
+ */
+
+import {CellVertex, FormulaCellVertex, MatrixVertex, ParsingErrorVertex, ValueCellVertex} from './DependencyGraph'
 import {CellAddress} from './parser'
+import {AddressWithSheet} from './parser/Address'
+import {SimpleRangeValue} from './interpreter/InterpreterValue'
 
 /**
  * Possible errors returned by our interpreter.
@@ -19,12 +26,16 @@ export enum ErrorType {
 
   /* Wrong address reference. */
   REF = 'REF',
+
+  /* Generic error */
+  ERROR = 'ERROR'
 }
 
-export const EmptyValue = Symbol()
+export const EmptyValue = Symbol('Empty value')
 export type EmptyValueType = typeof EmptyValue
-export type NoErrorCellValue = number | string | boolean | EmptyValueType
-export type InternalCellValue = NoErrorCellValue | CellError
+export type InternalNoErrorCellValue = number | string | boolean | EmptyValueType
+export type InternalScalarValue = InternalNoErrorCellValue | CellError
+export type InternalCellValue = InternalScalarValue | SimpleRangeValue
 
 export enum CellType {
   FORMULA = 'FORMULA',
@@ -34,7 +45,7 @@ export enum CellType {
 }
 
 export const getCellType = (vertex: CellVertex | null): CellType => {
-  if (vertex instanceof FormulaCellVertex) {
+  if (vertex instanceof FormulaCellVertex || vertex instanceof ParsingErrorVertex) {
     return CellType.FORMULA
   }
   if (vertex instanceof ValueCellVertex
@@ -76,7 +87,7 @@ export const getCellValueType = (cellValue: InternalCellValue): CellValueType =>
     return CellValueType.EMPTY
   }
 
-  if (cellValue instanceof CellError) {
+  if (cellValue instanceof CellError || cellValue instanceof SimpleRangeValue) {
     return CellValueType.ERROR
   }
 
@@ -98,7 +109,25 @@ export class CellError {
     public readonly message?: string,
   ) {
   }
+
+  public static parsingError() {
+    return new CellError(ErrorType.ERROR, 'Parsing error')
+  }
 }
+
+export interface SimpleRowAddress {
+  row: number,
+  sheet: number,
+}
+
+export const simpleRowAddress = (sheet: number, row: number): SimpleRowAddress => ({sheet, row})
+
+export interface SimpleColumnAddress {
+  col: number,
+  sheet: number,
+}
+
+export const simpleColumnAddress = (sheet: number, col: number): SimpleColumnAddress => ({sheet, col})
 
 export interface SimpleCellAddress {
   col: number,
@@ -112,16 +141,16 @@ export const movedSimpleCellAddress = (address: SimpleCellAddress, toSheet: numb
   return simpleCellAddress(toSheet, address.col + toRight, address.row + toBottom)
 }
 
+export const absoluteSheetReference = (address: AddressWithSheet, baseAddress: SimpleCellAddress): number => {
+  return address.sheet === null ? baseAddress.sheet : address.sheet
+}
+
 export interface SheetCellAddress {
   col: number,
   row: number,
 }
 
-export const sheetCellAddress = (col: number, row: number): SheetCellAddress => ({col, row})
-
 export interface CellRange {
   start: CellAddress,
   end: CellAddress,
 }
-
-export const buildCellRange = (start: CellAddress, end: CellAddress): CellRange => ({start, end})

@@ -1,39 +1,44 @@
-import {CellError, ErrorType, InternalCellValue, SimpleCellAddress} from '../../Cell'
+/**
+ * @license
+ * Copyright (c) 2020 Handsoncode. All rights reserved.
+ */
+
+import {CellError, ErrorType, InternalScalarValue, SimpleCellAddress} from '../../Cell'
 import {ProcedureAst} from '../../parser'
 import {FunctionPlugin} from './FunctionPlugin'
 
 export class BitwiseLogicOperationsPlugin extends FunctionPlugin {
   public static implementedFunctions = {
-    bitand: {
-      translationKey: 'BITAND',
+    'BITAND': {
+      method: 'bitand',
     },
-    bitor: {
-      translationKey: 'BITOR',
+    'BITOR': {
+      method: 'bitor',
     },
-    bitxor: {
-      translationKey: 'BITXOR',
+    'BITXOR': {
+      method: 'bitxor',
     },
   }
 
-  public bitand(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
+  public bitand(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.templateWithTwoPositiveIntegerArguments(ast, formulaAddress, (left: number, right: number) => {
       return left & right
     })
   }
 
-  public bitor(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
+  public bitor(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.templateWithTwoPositiveIntegerArguments(ast, formulaAddress, (left: number, right: number) => {
       return left | right
     })
   }
 
-  public bitxor(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
+  public bitxor(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.templateWithTwoPositiveIntegerArguments(ast, formulaAddress, (left: number, right: number) => {
       return left ^ right
     })
   }
 
-  private templateWithTwoPositiveIntegerArguments(ast: ProcedureAst, formulaAddress: SimpleCellAddress, fn: (left: number, right: number) => InternalCellValue): InternalCellValue {
+  private templateWithTwoPositiveIntegerArguments(ast: ProcedureAst, formulaAddress: SimpleCellAddress, fn: (left: number, right: number) => InternalScalarValue): InternalScalarValue {
     const validationResult = this.validateTwoNumericArguments(ast, formulaAddress)
 
     if (validationResult instanceof CellError) {

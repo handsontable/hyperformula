@@ -1,12 +1,16 @@
+/**
+ * @license
+ * Copyright (c) 2020 Handsoncode. All rights reserved.
+ */
+
 import {ErrorType} from '../Cell'
 import {TranslationPackage} from '../i18n'
 
 export interface ParserConfig {
   functionArgSeparator: string,
-  language: TranslationPackage,
+  decimalSeparator: '.' | ',',
+  translationPackage: TranslationPackage,
   errorMapping: Record<string, ErrorType>,
-  volatileFunctions(): Set<string>,
-  structuralChangeFunctions(): Set<string>,
-  getErrorTranslationFor(errorType: ErrorType): string
-  getFunctionTranslationFor(functionName: string): string
+  maxColumns: number,
+  maxRows: number,
 }

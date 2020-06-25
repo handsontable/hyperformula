@@ -1,5 +1,5 @@
-const configFactory = require(`./.config/${process.env.NODE_ENV}`);
+module.exports = function(env = process.env.NODE_ENV) {
+  const configFactory = require(`./.config/webpack/${env}`);
 
-module.exports = function() {
   return configFactory.create();
 };

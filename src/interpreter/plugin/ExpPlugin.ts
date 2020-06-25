@@ -1,11 +1,16 @@
-import { InternalCellValue, SimpleCellAddress} from '../../Cell'
+/**
+ * @license
+ * Copyright (c) 2020 Handsoncode. All rights reserved.
+ */
+
+import {InternalScalarValue, SimpleCellAddress} from '../../Cell'
 import {ProcedureAst} from '../../parser'
 import {FunctionPlugin} from './FunctionPlugin'
 
 export class ExpPlugin extends FunctionPlugin {
   public static implementedFunctions = {
-    exp: {
-      translationKey: 'EXP',
+    'EXP': {
+      method: 'exp',
     },
   }
 
@@ -17,7 +22,7 @@ export class ExpPlugin extends FunctionPlugin {
    * @param ast
    * @param formulaAddress
    */
-  public exp(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
+  public exp(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.templateWithOneCoercedToNumberArgument(ast, formulaAddress, (arg) => {
       return Math.exp(arg)
     })

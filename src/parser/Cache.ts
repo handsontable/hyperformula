@@ -1,5 +1,11 @@
-import {collectDependencies, RelativeDependency} from './'
-import {Ast, AstNodeType} from './Ast'
+/**
+ * @license
+ * Copyright (c) 2020 Handsoncode. All rights reserved.
+ */
+
+import {AstNodeType, collectDependencies, RelativeDependency} from './'
+import {Ast} from './Ast'
+import {FunctionRegistry} from '../interpreter/FunctionRegistry'
 
 export interface CacheEntry {
   ast: Ast,
@@ -13,14 +19,13 @@ export class Cache {
   private cache: Map<string, CacheEntry> = new Map()
 
   constructor(
-    private readonly volatileFunctions: Set<string>,
-    private readonly structuralChangeFunctions: Set<string>,
+    private readonly functionRegistry: FunctionRegistry,
   ) {
   }
 
   public set(hash: string, ast: Ast): CacheEntry {
-    const astRelativeDependencies = collectDependencies(ast)
-    const cacheEntry = buildCacheEntry(ast, astRelativeDependencies, doesContainFunctions(ast, this.volatileFunctions), doesContainFunctions(ast, this.structuralChangeFunctions))
+    const astRelativeDependencies = collectDependencies(ast, this.functionRegistry)
+    const cacheEntry = buildCacheEntry(ast, astRelativeDependencies, doesContainFunctions(ast, this.functionRegistry.isFunctionVolatile), doesContainFunctions(ast, this.functionRegistry.isFunctionDependentOnSheetStructureChange))
     this.cache.set(hash, cacheEntry)
     return cacheEntry
   }
@@ -44,18 +49,23 @@ export class Cache {
   }
 }
 
-export const doesContainFunctions = (ast: Ast, interestingFunctions: Set<string>): boolean => {
+export const doesContainFunctions = (ast: Ast, functionCriterion: (functionId: string) => boolean): boolean => {
   switch (ast.type) {
+    case AstNodeType.EMPTY:
     case AstNodeType.NUMBER:
     case AstNodeType.STRING:
     case AstNodeType.ERROR:
+    case AstNodeType.ERROR_WITH_RAW_INPUT:
     case AstNodeType.CELL_REFERENCE:
     case AstNodeType.CELL_RANGE:
+    case AstNodeType.COLUMN_RANGE:
+    case AstNodeType.ROW_RANGE:
+    case AstNodeType.NAMED_EXPRESSION:
       return false
     case AstNodeType.PERCENT_OP:
     case AstNodeType.PLUS_UNARY_OP:
     case AstNodeType.MINUS_UNARY_OP: {
-      return doesContainFunctions(ast.value, interestingFunctions)
+      return doesContainFunctions(ast.value, functionCriterion)
     }
     case AstNodeType.CONCATENATE_OP:
     case AstNodeType.EQUALS_OP:
@@ -69,14 +79,16 @@ export const doesContainFunctions = (ast: Ast, interestingFunctions: Set<string>
     case AstNodeType.TIMES_OP:
     case AstNodeType.DIV_OP:
     case AstNodeType.POWER_OP:
-      return doesContainFunctions(ast.left, interestingFunctions) || doesContainFunctions(ast.right, interestingFunctions)
+      return doesContainFunctions(ast.left, functionCriterion) || doesContainFunctions(ast.right, functionCriterion)
     case AstNodeType.PARENTHESIS:
-      return doesContainFunctions(ast.expression, interestingFunctions)
+      return doesContainFunctions(ast.expression, functionCriterion)
     case AstNodeType.FUNCTION_CALL: {
-      if (interestingFunctions.has(ast.procedureName)) {
+      if (functionCriterion(ast.procedureName)) {
         return true
       }
-      return ast.args.some((arg) => doesContainFunctions(arg, interestingFunctions))
+      return ast.args.some((arg) =>
+        doesContainFunctions(arg, functionCriterion)
+      )
     }
   }
 }

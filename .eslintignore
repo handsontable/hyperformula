@@ -1,0 +1,22 @@
+# Common files
+node_modules
+
+# Configurations
+*.config.js
+karma.*
+doc
+
+# Aut-generated directiories
+commonjs
+coverage
+dist
+doc
+es
+languages
+lib
+script
+test-jasmine
+test-jest
+typedoc
+typings
+test/_setupFiles/*.js

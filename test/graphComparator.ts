@@ -1,4 +1,4 @@
-import {deepStrictEqual} from 'assert'
+import {equal, deepStrictEqual} from 'assert'
 import {HyperFormula} from '../src'
 import {AbsoluteCellRange} from '../src/AbsoluteCellRange'
 import {SimpleCellAddress, simpleCellAddress} from '../src/Cell'
@@ -15,7 +15,7 @@ import {simpleCellAddressToString} from '../src/parser'
 export class EngineComparator {
 
   constructor(private expected: HyperFormula,
-              private actual: HyperFormula) {
+    private actual: HyperFormula) {
   }
 
   public compare() {
@@ -26,44 +26,41 @@ export class EngineComparator {
       throw Error(`Expected number of sheets ${expectedNumberOfSheets}, actual: ${numberOfSheets}`)
     }
 
-    this.expected.forceApplyPostponedTransformations()
-    this.actual.forceApplyPostponedTransformations()
+    this.expected.dependencyGraph.forceApplyPostponedTransformations()
+    this.actual.dependencyGraph.forceApplyPostponedTransformations()
 
     for (let sheet = 0; sheet < numberOfSheets; ++sheet) {
-      this.compareSheets(sheet)
+      this.compareSheet(sheet)
     }
   }
 
-  private compareSheets(sheet: number = 0) {
+  private compareSheet(sheet: number) {
     const expectedGraph = this.expected.graph
     const actualGraph = this.actual.graph
 
-    const expectedWidth = this.expected.addressMapping!.getWidth(sheet)
-    const expectedHeight = this.expected.addressMapping!.getHeight(sheet)
-    const actualWidth = this.actual.addressMapping!.getWidth(sheet)
-    const actualHeight = this.actual.addressMapping!.getHeight(sheet)
+    const expectedSheetName = this.expected.getSheetName(sheet)
+    const actualSheetName = this.actual.getSheetName(sheet)
+    equal(expectedSheetName, actualSheetName, `Expected sheet name '${expectedSheetName}', actual '${actualSheetName}'`)
 
-    if (expectedHeight !== actualHeight) {
-      console.warn(`Expected sheet of height ${expectedHeight}, actual: ${actualHeight}`)
-    }
-    if (expectedWidth !== actualWidth) {
-      console.warn(`Expected sheet of width ${expectedWidth}, actual: ${actualWidth}`)
-    }
+    const expectedWidth = this.expected.addressMapping.getWidth(sheet)
+    const expectedHeight = this.expected.addressMapping.getHeight(sheet)
+    const actualWidth = this.actual.addressMapping.getWidth(sheet)
+    const actualHeight = this.actual.addressMapping.getHeight(sheet)
 
     for (let x = 0; x < Math.max(expectedWidth, actualWidth); ++x) {
       for (let y = 0; y < Math.max(expectedHeight, actualHeight); ++y) {
         const address = simpleCellAddress(sheet, x, y)
-        const expectedVertex = this.expected.addressMapping!.getCell(address)
-        const actualVertex = this.actual.addressMapping!.getCell(address)
+        const expectedVertex = this.expected.addressMapping.getCell(address)
+        const actualVertex = this.actual.addressMapping.getCell(address)
 
         if (expectedVertex === null && actualVertex === null) {
           continue
         } else if (expectedVertex instanceof FormulaCellVertex && actualVertex instanceof FormulaCellVertex) {
-          deepStrictEqual(expectedVertex.address, actualVertex.address, `Different addresses in formulas. expected: ${expectedVertex.address}, actual: ${actualVertex.address}`)
-          deepStrictEqual(expectedVertex.getFormula(this.expected.lazilyTransformingAstService), actualVertex.getFormula(this.actual.lazilyTransformingAstService), 'Different AST in formulas')
-          deepStrictEqual(expectedVertex.getCellValue(), actualVertex.getCellValue(), `Different values of formulas. expected: ${expectedVertex.getCellValue().toString()}, actual: ${actualVertex.getCellValue().toString()}`)
+          deepStrictEqual(actualVertex.address, expectedVertex.address, `Different addresses in formulas. expected: ${expectedVertex.address}, actual: ${actualVertex.address}`)
+          deepStrictEqual(actualVertex.getFormula(this.actual.lazilyTransformingAstService), expectedVertex.getFormula(this.expected.lazilyTransformingAstService), 'Different AST in formulas')
+          deepStrictEqual(actualVertex.getCellValue(), expectedVertex.getCellValue(), `Different values of formulas. expected: ${expectedVertex.getCellValue().toString()}, actual: ${actualVertex.getCellValue().toString()}`)
         } else if (expectedVertex instanceof ValueCellVertex && actualVertex instanceof ValueCellVertex) {
-          deepStrictEqual(expectedVertex.getCellValue(), actualVertex.getCellValue(), `Different values. expected: ${expectedVertex.getCellValue().toString()}, actual: ${actualVertex.getCellValue().toString()}`)
+          deepStrictEqual(actualVertex.getCellValue(), expectedVertex.getCellValue(), `Different values. expected: ${expectedVertex.getCellValue().toString()}, actual: ${actualVertex.getCellValue().toString()}`)
         } else if (expectedVertex instanceof EmptyCellVertex && actualVertex instanceof EmptyCellVertex) {
           continue
         } else if (expectedVertex instanceof MatrixVertex && actualVertex instanceof MatrixVertex) {
@@ -76,18 +73,18 @@ export class EngineComparator {
         const actualAdjacentAddresses = new Set<SimpleCellAddress | AbsoluteCellRange>()
 
         for (const adjacentNode of expectedGraph.adjacentNodes(expectedVertex)) {
-          expectedAdjacentAddresses.add(this.getAddressOfVertex(this.expected, adjacentNode, sheet))
+          expectedAdjacentAddresses.add(this.getAddressOfVertex(this.expected, adjacentNode))
         }
         for (const adjacentNode of actualGraph.adjacentNodes(actualVertex)) {
-          actualAdjacentAddresses.add(this.getAddressOfVertex(this.actual, adjacentNode, sheet))
+          actualAdjacentAddresses.add(this.getAddressOfVertex(this.actual, adjacentNode))
         }
         const sheetMapping = this.expected.sheetMapping
-        deepStrictEqual(expectedAdjacentAddresses, actualAdjacentAddresses, `Dependent vertices of ${simpleCellAddressToString(sheetMapping.fetchDisplayName, address, 0)} (Sheet '${sheetMapping.fetchDisplayName(address.sheet)}') are not same`)
+        deepStrictEqual(actualAdjacentAddresses, expectedAdjacentAddresses, `Dependent vertices of ${simpleCellAddressToString(sheetMapping.fetchDisplayName, address, 0)} (Sheet '${sheetMapping.fetchDisplayName(address.sheet)}') are not same`)
       }
     }
   }
 
-  private getAddressOfVertex(engine: HyperFormula, vertex: Vertex, sheet: number): SimpleCellAddress | AbsoluteCellRange {
+  private getAddressOfVertex(engine: HyperFormula, vertex: Vertex): SimpleCellAddress | AbsoluteCellRange {
     if (vertex instanceof RangeVertex) {
       return vertex.range
     }

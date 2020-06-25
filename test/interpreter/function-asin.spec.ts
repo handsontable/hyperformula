@@ -1,6 +1,5 @@
-import {Config, HyperFormula} from '../../src'
+import {HyperFormula} from '../../src'
 import {ErrorType} from '../../src/Cell'
-import '../testConfig'
 import {adr, detailedError} from '../testUtils'
 
 describe('Function ASIN', () => {
@@ -17,13 +16,13 @@ describe('Function ASIN', () => {
   })
 
   it('for 1 (edge)', () => {
-    const engine = HyperFormula.buildFromArray([['=ASIN(1)']], new Config({ smartRounding : false}))
+    const engine = HyperFormula.buildFromArray([['=ASIN(1)']], { smartRounding : false})
 
     expect(engine.getCellValue(adr('A1'))).toBe(Math.PI / 2)
   })
 
   it('for -1 (edge)', () => {
-    const engine = HyperFormula.buildFromArray([['=ASIN(-1)']], new Config({ smartRounding : false}))
+    const engine = HyperFormula.buildFromArray([['=ASIN(-1)']], { smartRounding : false})
 
     expect(engine.getCellValue(adr('A1'))).toEqual(-Math.PI / 2)
   })

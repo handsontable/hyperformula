@@ -1,6 +1,10 @@
+/**
+ * @license
+ * Copyright (c) 2020 Handsoncode. All rights reserved.
+ */
+
 import {SheetCellAddress, simpleCellAddress, SimpleCellAddress} from '../../Cell'
-import {ColumnsSpan} from '../../ColumnsSpan'
-import {RowsSpan} from '../../RowsSpan'
+import {ColumnsSpan, RowsSpan} from '../../Span'
 import {CellVertex} from '../Vertex'
 import {IAddressMappingStrategy} from './IAddressMappingStrategy'
 
@@ -148,6 +152,28 @@ export class DenseStrategy implements IAddressMappingStrategy {
         const vertex = this.getCellVertex(x, y)
         if (vertex) {
           yield vertex
+        }
+      }
+    }
+  }
+
+  public* entriesFromRowsSpan(rowsSpan: RowsSpan): IterableIterator<[SimpleCellAddress, CellVertex]> {
+    for (let x = 0; x < this.width; ++x) {
+      for (let y = rowsSpan.rowStart; y <= rowsSpan.rowEnd; ++y) {
+        const vertex = this.getCellVertex(x, y)
+        if (vertex) {
+          yield [simpleCellAddress(rowsSpan.sheet, x, y), vertex]
+        }
+      }
+    }
+  }
+
+  public* entriesFromColumnsSpan(columnsSpan: ColumnsSpan): IterableIterator<[SimpleCellAddress, CellVertex]> {
+    for (let y = 0; y < this.height; ++y) {
+      for (let x = columnsSpan.columnStart; x <= columnsSpan.columnEnd; ++x) {
+        const vertex = this.getCellVertex(x, y)
+        if (vertex) {
+          yield [simpleCellAddress(columnsSpan.sheet, x, y), vertex]
         }
       }
     }

@@ -1,27 +1,16 @@
+/**
+ * @license
+ * Copyright (c) 2020 Handsoncode. All rights reserved.
+ */
+
 import {ErrorType} from '../Cell'
+import {buildTranslationPackage, RawTranslationPackage, TranslationPackage} from './TranslationPackage'
 
 export type TranslationSet = Record<string, string>
+export type UITranslationSet = Record<UIElement, string>
 export type ErrorTranslationSet = Record<ErrorType, string>
-export {plPL} from './plPL'
-export {enGB} from './enGB'
-import {enGB} from './enGB'
-import {plPL} from './plPL'
+export {RawTranslationPackage, TranslationPackage, buildTranslationPackage}
 
-export interface TranslationPackage {
-  functions: TranslationSet,
-  errors: ErrorTranslationSet,
-  interface: TranslationSet
-}
-
-export const extendFunctions = (pkg: TranslationPackage, additionalFunctionTranslations: TranslationSet): TranslationPackage => {
-  return {
-    functions: Object.assign({}, pkg.functions, additionalFunctionTranslations),
-    errors: pkg.errors,
-    interface: pkg.interface,
-  }
-}
-
-export const languages: Record<string, TranslationPackage> = {
-  plPL,
-  enGB,
+export enum UIElement {
+  NEW_SHEET_PREFIX = 'NEW_SHEET_PREFIX'
 }

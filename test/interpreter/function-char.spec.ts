@@ -1,6 +1,6 @@
-import {HyperFormula} from "../../src"
-import {ErrorType} from "../../src/Cell"
-import {adr, detailedError} from "../testUtils"
+import {HyperFormula} from '../../src'
+import {ErrorType} from '../../src/Cell'
+import {adr, detailedError} from '../testUtils'
 
 describe('Function CHAR', () => {
   it('should not work for wrong number of arguments', () => {

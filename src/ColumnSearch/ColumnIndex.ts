@@ -1,38 +1,49 @@
+/**
+ * @license
+ * Copyright (c) 2020 Handsoncode. All rights reserved.
+ */
+
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
-import {CellError, InternalCellValue, movedSimpleCellAddress, SimpleCellAddress} from '../Cell'
-import {ColumnsSpan} from '../ColumnsSpan'
+import {
+  CellError,
+  InternalCellValue,
+  InternalNoErrorCellValue,
+  InternalScalarValue,
+  movedSimpleCellAddress,
+  SimpleCellAddress
+} from '../Cell'
 import {Config} from '../Config'
 import {DependencyGraph} from '../DependencyGraph'
-import {LazilyTransformingAstService, Transformation, TransformationType} from '../LazilyTransformingAstService'
+import {LazilyTransformingAstService} from '../LazilyTransformingAstService'
 import {Matrix} from '../Matrix'
-import {RowsSpan} from '../RowsSpan'
-import {Statistics, StatType} from '../statistics/Statistics'
+import {ColumnsSpan, RowsSpan} from '../Span'
+import {Statistics, StatType} from '../statistics'
 import {ColumnBinarySearch} from './ColumnBinarySearch'
-import {IColumnSearchStrategy} from './ColumnSearchStrategy'
+import {ColumnSearchStrategy} from './ColumnSearchStrategy'
+import {AddRowsTransformer} from '../dependencyTransformers/AddRowsTransformer'
+import {RemoveRowsTransformer} from '../dependencyTransformers/RemoveRowsTransformer'
+import {FormulaTransformer} from '../dependencyTransformers/Transformer'
+import {SimpleRangeValue} from '../interpreter/InterpreterValue'
 
 type ColumnMap = Map<InternalCellValue, ValueIndex>
 
 interface ValueIndex {
-  version: number
-  index: number[]
+  version: number,
+  index: number[],
 }
 
 type SheetIndex = ColumnMap[]
 
-export class ColumnIndex implements IColumnSearchStrategy {
+export class ColumnIndex implements ColumnSearchStrategy {
 
-  public static buildEmpty(transformingService: LazilyTransformingAstService, config: Config, statistics: Statistics) {
-    const dependencyGraph = DependencyGraph.buildEmpty(transformingService, config, statistics)
-    return new ColumnIndex(dependencyGraph, config, statistics)
-  }
   private readonly index: Map<number, SheetIndex> = new Map()
   private readonly transformingService: LazilyTransformingAstService
   private readonly binarySearchStrategy: ColumnBinarySearch
 
   constructor(
-      private readonly dependencyGraph: DependencyGraph,
-      private readonly config: Config,
-      private readonly stats: Statistics,
+    private readonly dependencyGraph: DependencyGraph,
+    private readonly config: Config,
+    private readonly stats: Statistics,
   ) {
     this.transformingService = this.dependencyGraph.lazilyTransformingAstService
     this.binarySearchStrategy = new ColumnBinarySearch(dependencyGraph, config)
@@ -43,7 +54,7 @@ export class ColumnIndex implements IColumnSearchStrategy {
       for (const [matrixValue, cellAddress] of value.generateValues(address)) {
         this.addSingleCellValue(matrixValue, cellAddress)
       }
-    } else if (!(value instanceof CellError)) {
+    } else if (!(value instanceof CellError || value instanceof SimpleRangeValue)) {
       this.addSingleCellValue(value, address)
     }
   }
@@ -62,7 +73,7 @@ export class ColumnIndex implements IColumnSearchStrategy {
     }
   }
 
-  public change(oldValue: InternalCellValue | Matrix | null, newValue: InternalCellValue | Matrix, address: SimpleCellAddress) {
+  public change(oldValue: InternalCellValue | Matrix | null, newValue: InternalScalarValue | Matrix, address: SimpleCellAddress) {
     if (oldValue === newValue) {
       return
     }
@@ -70,7 +81,7 @@ export class ColumnIndex implements IColumnSearchStrategy {
     this.add(newValue, address)
   }
 
-  public moveValues(sourceRange: IterableIterator<[InternalCellValue, SimpleCellAddress]>, toRight: number, toBottom: number, toSheet: number) {
+  public moveValues(sourceRange: IterableIterator<[InternalScalarValue, SimpleCellAddress]>, toRight: number, toBottom: number, toSheet: number) {
     for (const [value, address] of sourceRange) {
       const targetAddress = movedSimpleCellAddress(address, toSheet, toRight, toBottom)
       this.remove(value, address)
@@ -78,13 +89,13 @@ export class ColumnIndex implements IColumnSearchStrategy {
     }
   }
 
-  public removeValues(range: IterableIterator<[InternalCellValue, SimpleCellAddress]>): void {
+  public removeValues(range: IterableIterator<[InternalScalarValue, SimpleCellAddress]>): void {
     for (const [value, address] of range) {
       this.remove(value, address)
     }
   }
 
-  public find(key: any, range: AbsoluteCellRange, sorted: boolean): number {
+  public find(key: InternalNoErrorCellValue, range: AbsoluteCellRange, sorted: boolean): number {
     this.ensureRecentData(range.sheet, range.start.col, key)
 
     const columnMap = this.getColumnMap(range.sheet, range.start.col)
@@ -100,6 +111,10 @@ export class ColumnIndex implements IColumnSearchStrategy {
     const index = upperBound(valueIndex.index, range.start.row)
     const rowNumber = valueIndex.index[index]
     return rowNumber <= range.end.row ? rowNumber : this.binarySearchStrategy.find(key, range, sorted)
+  }
+
+  public advancedFind(keyMatcher: (arg: InternalCellValue) => boolean, range: AbsoluteCellRange): number {
+    return this.binarySearchStrategy.advancedFind(keyMatcher, range)
   }
 
   public addColumns(columnsSpan: ColumnsSpan) {
@@ -128,8 +143,8 @@ export class ColumnIndex implements IColumnSearchStrategy {
     if (!this.index.has(sheet)) {
       this.index.set(sheet, [])
     }
-    const sheetMap = this.index.get(sheet)!
-    let columnMap = sheetMap![col]
+    const sheetMap = this.index.get(sheet)! // eslint-disable-line @typescript-eslint/no-non-null-assertion
+    let columnMap = sheetMap[col]
 
     if (!columnMap) {
       columnMap = new Map()
@@ -158,16 +173,14 @@ export class ColumnIndex implements IColumnSearchStrategy {
     if (valueIndex.version === actualVersion) {
       return
     }
-    const relevantTransformations = this.transformingService.getTransformationsFrom(valueIndex.version, (transformation: Transformation) => {
-      return transformation.sheet === sheet && (transformation.type === TransformationType.ADD_ROWS || transformation.type === TransformationType.REMOVE_ROWS)
+    const relevantTransformations = this.transformingService.getTransformationsFrom(valueIndex.version, (transformation: FormulaTransformer) => {
+      return transformation.sheet === sheet && (transformation instanceof AddRowsTransformer || transformation instanceof  RemoveRowsTransformer)
     })
     for (const transformation of relevantTransformations) {
-      switch (transformation.type) {
-        case TransformationType.ADD_ROWS:
-          this.addRows(col, transformation.addedRows, value)
-          break
-        case TransformationType.REMOVE_ROWS:
-          this.removeRows(col, transformation.removedRows, value)
+      if (transformation instanceof AddRowsTransformer) {
+        this.addRows(col, transformation.rowsSpan, value)
+      } else if (transformation instanceof RemoveRowsTransformer) {
+        this.removeRows(col, transformation.rowsSpan, value)
       }
     }
     valueIndex.version = actualVersion
@@ -203,7 +216,7 @@ export class ColumnIndex implements IColumnSearchStrategy {
       }
 
       if (columnMap.size === 0) {
-        delete this.index.get(address.sheet)![address.col]
+        delete this.index.get(address.sheet)![address.col] // eslint-disable-line @typescript-eslint/no-non-null-assertion
       }
     })
   }

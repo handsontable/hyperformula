@@ -1,5 +1,10 @@
+/**
+ * @license
+ * Copyright (c) 2020 Handsoncode. All rights reserved.
+ */
+
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
-import {InternalCellValue, simpleCellAddress} from '../Cell'
+import {InternalScalarValue, simpleCellAddress} from '../Cell'
 import {DependencyGraph} from '../DependencyGraph'
 
 /*
@@ -7,7 +12,7 @@ import {DependencyGraph} from '../DependencyGraph'
 * Otherwise returns first index of greatest element smaller than key
 * assuming sorted values in range
 * */
-export function rangeLowerBound(range: AbsoluteCellRange, key: any, dependencyGraph: DependencyGraph): number {
+export function rangeLowerBound(range: AbsoluteCellRange, key: InternalScalarValue, dependencyGraph: DependencyGraph): number {
   let start = range.start.row
   let end = range.end.row
 
@@ -33,7 +38,7 @@ export function rangeLowerBound(range: AbsoluteCellRange, key: any, dependencyGr
 * Otherwise returns first index of greatest element smaller than key
 * assuming sorted array
 * */
-export function lowerBound(values: InternalCellValue[], key: any): number {
+export function lowerBound(values: InternalScalarValue[], key: any): number {
   let start = 0
   let end = values.length - 1
 

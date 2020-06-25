@@ -1,7 +1,12 @@
-import {CellError, ErrorType, InternalCellValue, SimpleCellAddress} from '../../Cell'
+/**
+ * @license
+ * Copyright (c) 2020 Handsoncode. All rights reserved.
+ */
+
+import {CellError, ErrorType, InternalScalarValue, SimpleCellAddress} from '../../Cell'
 import {padLeft} from '../../format/format'
-import {ProcedureAst} from '../../parser'
-import { coerceScalarToString} from '../coerce'
+import {AstNodeType, ProcedureAst} from '../../parser'
+import {coerceScalarToString} from '../ArithmeticHelper'
 import {SimpleRangeValue} from '../InterpreterValue'
 import {FunctionPlugin} from './FunctionPlugin'
 
@@ -13,45 +18,45 @@ const ALPHABET = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'
 
 export class RadixConversionPlugin extends FunctionPlugin {
   public static implementedFunctions = {
-    dec2bin: {
-      translationKey: 'DEC2BIN',
+    'DEC2BIN': {
+      method: 'dec2bin',
     },
-    dec2oct: {
-      translationKey: 'DEC2OCT',
+    'DEC2OCT': {
+      method: 'dec2oct',
     },
-    dec2hex: {
-      translationKey: 'DEC2HEX',
+    'DEC2HEX': {
+      method: 'dec2hex',
     },
-    bin2dec: {
-      translationKey: 'BIN2DEC',
+    'BIN2DEC': {
+      method: 'bin2dec',
     },
-    bin2oct: {
-      translationKey: 'BIN2OCT',
+    'BIN2OCT': {
+      method: 'bin2oct',
     },
-    bin2hex: {
-      translationKey: 'BIN2HEX',
+    'BIN2HEX': {
+      method: 'bin2hex',
     },
-    decimal: {
-      translationKey: 'DECIMAL',
+    'DECIMAL': {
+      method: 'decimal',
     },
-    base: {
-      translationKey: 'BASE',
+    'BASE': {
+      method: 'base',
     },
   }
 
-  public dec2bin(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
+  public dec2bin(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.dec2base(ast, formulaAddress, 2)
   }
 
-  public dec2oct(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
+  public dec2oct(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.dec2base(ast, formulaAddress, 8)
   }
 
-  public dec2hex(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
+  public dec2hex(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.dec2base(ast, formulaAddress, 16)
   }
 
-  public bin2dec(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
+  public bin2dec(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     if (ast.args.length !== 1) {
       return new CellError(ErrorType.NA)
     }
@@ -64,17 +69,20 @@ export class RadixConversionPlugin extends FunctionPlugin {
     return twoComplementToDecimal(binaryWithSign)
   }
 
-  public bin2oct(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
+  public bin2oct(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.bin2base(ast, formulaAddress, 8)
   }
 
-  public bin2hex(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
+  public bin2hex(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.bin2base(ast, formulaAddress, 16)
   }
 
-  public base(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
+  public base(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     if (ast.args.length < 2 || ast.args.length > 3) {
       return new CellError(ErrorType.NA)
+    }
+    if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
+      return new CellError(ErrorType.NUM)
     }
 
     const value = this.getNumericArgument(ast, formulaAddress, 0)
@@ -102,9 +110,12 @@ export class RadixConversionPlugin extends FunctionPlugin {
     return decimalToBaseWithMinimumPadding(value, base, padding)
   }
 
-  public decimal(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
+  public decimal(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     if (ast.args.length !== 2) {
       return new CellError(ErrorType.NA)
+    }
+    if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
+      return new CellError(ErrorType.NUM)
     }
 
     const base = this.getNumericArgument(ast, formulaAddress, 1, MIN_BASE, MAX_BASE)
@@ -120,9 +131,12 @@ export class RadixConversionPlugin extends FunctionPlugin {
     return parseInt(input, base)
   }
 
-  private bin2base(ast: ProcedureAst, formulaAddress: SimpleCellAddress, base: number): InternalCellValue {
+  private bin2base(ast: ProcedureAst, formulaAddress: SimpleCellAddress, base: number): InternalScalarValue {
     if (ast.args.length < 1 || ast.args.length > 2) {
       return new CellError(ErrorType.NA)
+    }
+    if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
+      return new CellError(ErrorType.NUM)
     }
 
     const binaryWithSign = this.getFirstArgumentAsNumberInBase(ast, formulaAddress, 2, NUMBER_OF_BITS)
@@ -142,9 +156,12 @@ export class RadixConversionPlugin extends FunctionPlugin {
     return decimalToBaseWithExactPadding(decimal, base, places)
   }
 
-  private dec2base(ast: ProcedureAst, formulaAddress: SimpleCellAddress, base: number): InternalCellValue {
+  private dec2base(ast: ProcedureAst, formulaAddress: SimpleCellAddress, base: number): InternalScalarValue {
     if (ast.args.length < 1 || ast.args.length > 2) {
       return new CellError(ErrorType.NA)
+    }
+    if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
+      return new CellError(ErrorType.NUM)
     }
 
     let places

@@ -1,3 +1,10 @@
+/**
+ * @license
+ * Copyright (c) 2020 Handsoncode. All rights reserved.
+ */
+
+import {Maybe} from './Maybe'
+
 export function * empty<T>(): IterableIterator<T> { }
 
 export function split<T>(iterable: IterableIterator<T>): { value?: T, rest: IterableIterator<T> } {
@@ -11,7 +18,7 @@ export function split<T>(iterable: IterableIterator<T>): { value?: T, rest: Iter
   }
 }
 
-export function first<T>(iterable: IterableIterator<T>): T | undefined {
+export function first<T>(iterable: IterableIterator<T>): Maybe<T> {
   const iterator: Iterator<T> = iterable[Symbol.iterator]()
   const { done, value } = iterator.next()
 

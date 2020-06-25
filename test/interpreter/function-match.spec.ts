@@ -1,7 +1,6 @@
-import {Config, HyperFormula} from '../../src'
+import {HyperFormula} from '../../src'
 import {ErrorType} from '../../src/Cell'
 import {ColumnBinarySearch} from '../../src/ColumnSearch/ColumnBinarySearch'
-import '../testConfig.ts'
 import {adr, detailedError} from '../testUtils'
 
 describe('Function MATCH', () => {
@@ -171,7 +170,8 @@ describe('Function MATCH', () => {
   })
 
   it('uses binsearch', () => {
-    const spy = jest.spyOn(ColumnBinarySearch.prototype as any, 'computeListOfValuesInRange')
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const spy = spyOn(ColumnBinarySearch.prototype as any, 'computeListOfValuesInRange')
 
     const engine = HyperFormula.buildFromArray([
       ['=MATCH(400, A2:A5, 1)'],
@@ -180,14 +180,15 @@ describe('Function MATCH', () => {
       ['300'],
       ['400'],
       ['500'],
-    ], new Config({ vlookupThreshold: 1 }))
+    ], { vlookupThreshold: 1 })
 
     expect(spy).not.toHaveBeenCalled()
     expect(engine.getCellValue(adr('A1'))).toEqual(4)
   })
 
   it('uses indexOf', () => {
-    const spy = jest.spyOn(ColumnBinarySearch.prototype as any, 'computeListOfValuesInRange')
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const spy = spyOn(ColumnBinarySearch.prototype as any, 'computeListOfValuesInRange')
 
     const engine = HyperFormula.buildFromArray([
       ['=MATCH(400, A2:A5, 0)'],
@@ -196,7 +197,7 @@ describe('Function MATCH', () => {
       ['300'],
       ['400'],
       ['500'],
-    ], new Config({ vlookupThreshold: 1 }))
+    ], { vlookupThreshold: 1 })
 
     expect(spy).toHaveBeenCalled()
     expect(engine.getCellValue(adr('A1'))).toEqual(4)
@@ -210,7 +211,7 @@ describe('Function MATCH', () => {
       ['300'],
       ['400'],
       ['500'],
-    ], new Config({ vlookupThreshold: 1 }))
+    ], { vlookupThreshold: 1 })
 
     expect(engine.getCellValue(adr('A1'))).toEqual(2)
   })

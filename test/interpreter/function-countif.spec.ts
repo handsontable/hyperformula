@@ -1,7 +1,7 @@
-import {Config, HyperFormula} from '../../src'
+import {HyperFormula} from '../../src'
 import {ErrorType} from '../../src/Cell'
-import '../testConfig'
 import {adr, detailedError} from '../testUtils'
+import {StatType} from '../../src/statistics'
 
 describe('Function COUNTIF', () => {
   it('requires 2 arguments', () => {
@@ -25,6 +25,17 @@ describe('Function COUNTIF', () => {
     expect(engine.getCellValue(adr('A4'))).toEqual(2)
   })
 
+  it('works with mixed types',  () => {
+    const engine =  HyperFormula.buildFromArray([
+      ['0'],
+      ['"1"'],
+      ['2'],
+      ['=COUNTIF(A1:A3, "=1")'],
+    ])
+
+    expect(engine.getCellValue(adr('A4'))).toEqual(0)
+  })
+
   it('use partial cache',  () => {
     const engine =  HyperFormula.buildFromArray([
       ['0'],
@@ -35,7 +46,7 @@ describe('Function COUNTIF', () => {
 
     expect(engine.getCellValue(adr('B3'))).toEqual(2)
     expect(engine.getCellValue(adr('B4'))).toEqual(3)
-    expect(engine.stats.criterionFunctionPartialCacheUsed).toEqual(1)
+    expect(engine.getStats().get(StatType.CRITERION_FUNCTION_PARTIAL_CACHE_USED)).toEqual(1)
   })
 
   it('use full cache',  () => {
@@ -47,7 +58,7 @@ describe('Function COUNTIF', () => {
 
     expect(engine.getCellValue(adr('B1'))).toEqual(2)
     expect(engine.getCellValue(adr('B2'))).toEqual(2)
-    expect(engine.stats.criterionFunctionFullCacheUsed).toEqual(1)
+    expect(engine.getStats().get(StatType.CRITERION_FUNCTION_FULL_CACHE_USED)).toEqual(1)
   })
 
   it('works for only one cell',  () => {
@@ -58,14 +69,6 @@ describe('Function COUNTIF', () => {
 
     expect(engine.getCellValue(adr('B1'))).toEqual(1)
     expect(engine.getCellValue(adr('B2'))).toEqual(0)
-  })
-
-  it('error when 2nd arg is not a string',  () => {
-    const engine =  HyperFormula.buildFromArray([
-      ['=COUNTIF(C1:C2, 78)'],
-    ])
-
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE))
   })
 
   it('error when criterion unparsable',  () => {
@@ -115,7 +118,7 @@ describe('Function COUNTIF', () => {
       ['1'],
       ['2'],
       ['=COUNTIF(A1:A2, ">0")'],
-    ], new Config({ matrixDetection: true, matrixDetectionThreshold: 1 }))
+    ], { matrixDetection: true, matrixDetectionThreshold: 1 })
 
     expect(engine.getCellValue(adr('A3'))).toEqual(2)
   })

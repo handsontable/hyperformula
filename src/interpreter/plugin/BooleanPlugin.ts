@@ -1,6 +1,11 @@
-import {CellError, ErrorType, InternalCellValue, SimpleCellAddress} from '../../Cell'
-import {ProcedureAst} from '../../parser'
-import {coerceScalarToBoolean} from '../coerce'
+/**
+ * @license
+ * Copyright (c) 2020 Handsoncode. All rights reserved.
+ */
+
+import {CellError, ErrorType, InternalNoErrorCellValue, InternalScalarValue, SimpleCellAddress} from '../../Cell'
+import {AstNodeType, ProcedureAst} from '../../parser'
+import {coerceScalarToBoolean} from '../ArithmeticHelper'
 import {InterpreterValue, SimpleRangeValue} from '../InterpreterValue'
 import {FunctionPlugin} from './FunctionPlugin'
 
@@ -9,26 +14,38 @@ import {FunctionPlugin} from './FunctionPlugin'
  */
 export class BooleanPlugin extends FunctionPlugin {
   public static implementedFunctions = {
-    literal_true: {
-      translationKey: 'TRUE',
+    'TRUE': {
+      method: 'literalTrue'
     },
-    literal_false: {
-      translationKey: 'FALSE',
+    'FALSE': {
+      method: 'literalFalse'
     },
-    conditional_if: {
-      translationKey: 'IF',
+    'IF': {
+      method: 'conditionalIf'
     },
-    and: {
-      translationKey: 'AND',
+    'AND': {
+      method: 'and'
     },
-    or: {
-      translationKey: 'OR',
+    'OR': {
+      method: 'or'
     },
-    xor: {
-      translationKey: 'XOR',
+    'XOR': {
+      method: 'xor'
     },
-    not: {
-      translationKey: 'NOT',
+    'NOT': {
+      method: 'not'
+    },
+    'SWITCH': {
+      method: 'switch'
+    },
+    'IFERROR': {
+      method: 'iferror'
+    },
+    'IFNA': {
+      method: 'ifna'
+    },
+    'CHOOSE': {
+      method: 'choose'
     },
   }
 
@@ -40,7 +57,8 @@ export class BooleanPlugin extends FunctionPlugin {
    * @param ast
    * @param formulaAddress
    */
-  public literal_true(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  public literalTrue(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     if (ast.args.length > 0) {
       return new CellError(ErrorType.NA)
     } else {
@@ -56,7 +74,8 @@ export class BooleanPlugin extends FunctionPlugin {
    * @param ast
    * @param formulaAddress
    */
-  public literal_false(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  public literalFalse(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     if (ast.args.length > 0) {
       return new CellError(ErrorType.NA)
     } else {
@@ -72,7 +91,13 @@ export class BooleanPlugin extends FunctionPlugin {
    * @param ast
    * @param formulaAddress
    */
-  public conditional_if(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InterpreterValue {
+  public conditionalIf(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InterpreterValue {
+    if (ast.args.length > 3 || ast.args.length < 2) {
+      return new CellError(ErrorType.NA)
+    }
+    if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
+      return new CellError(ErrorType.NUM)
+    }
     const conditionValue = this.evaluateAst(ast.args[0], formulaAddress)
     if (conditionValue instanceof SimpleRangeValue) {
       return new CellError(ErrorType.VALUE)
@@ -81,7 +106,7 @@ export class BooleanPlugin extends FunctionPlugin {
     if (condition === true) {
       return this.evaluateAst(ast.args[1], formulaAddress)
     } else if (condition === false) {
-      if (ast.args[2]) {
+      if (ast.args[2] !== undefined) {
         return this.evaluateAst(ast.args[2], formulaAddress)
       } else {
         return false
@@ -101,12 +126,15 @@ export class BooleanPlugin extends FunctionPlugin {
    * @param ast
    * @param formulaAddress
    */
-  public and(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
+  public and(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     if (ast.args.length < 1) {
       return new CellError(ErrorType.NA)
     }
+    if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
+      return new CellError(ErrorType.NUM)
+    }
 
-    let result: InternalCellValue = true
+    let result: InternalScalarValue = true
     let anyReasonableValue = false
     for (const scalarValue of this.iterateOverScalarValues(ast.args, formulaAddress)) {
       const coercedValue = coerceScalarToBoolean(scalarValue)
@@ -132,12 +160,15 @@ export class BooleanPlugin extends FunctionPlugin {
    * @param ast
    * @param formulaAddress
    */
-  public or(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
+  public or(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     if (ast.args.length < 1) {
       return new CellError(ErrorType.NA)
     }
+    if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
+      return new CellError(ErrorType.NUM)
+    }
 
-    let result: InternalCellValue | null = null
+    let result: InternalScalarValue | null = null
     for (const scalarValue of this.iterateOverScalarValues(ast.args, formulaAddress)) {
       const coercedValue = coerceScalarToBoolean(scalarValue)
       if (coercedValue instanceof CellError) {
@@ -153,9 +184,12 @@ export class BooleanPlugin extends FunctionPlugin {
     }
   }
 
-  public not(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
+  public not(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     if (ast.args.length !== 1) {
       return new CellError(ErrorType.NA)
+    }
+    if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
+      return new CellError(ErrorType.NUM)
     }
 
     const argValue = this.evaluateAst(ast.args[0], formulaAddress)
@@ -171,9 +205,12 @@ export class BooleanPlugin extends FunctionPlugin {
     }
   }
 
-  public xor(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
+  public xor(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     if (ast.args.length < 1) {
       return new CellError(ErrorType.NA)
+    }
+    if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
+      return new CellError(ErrorType.NUM)
     }
 
     let truesCount = 0
@@ -193,5 +230,115 @@ export class BooleanPlugin extends FunctionPlugin {
     } else {
       return new CellError(ErrorType.VALUE)
     }
+  }
+
+  public switch(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    if (ast.args.length < 3) {
+      return new CellError(ErrorType.NA)
+    }
+    if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
+      return new CellError(ErrorType.NUM)
+    }
+
+    const vals: InternalScalarValue[] = []
+    for (const arg of ast.args) {
+      const val: InterpreterValue = this.evaluateAst(arg, formulaAddress)
+      if (val instanceof SimpleRangeValue) {
+        return new CellError(ErrorType.VALUE)
+      }
+      vals.push(val)
+    }
+    const n = vals.length
+    if (vals[0] instanceof CellError) {
+      return vals[0]
+    }
+
+    let i = 1
+    for (; i + 1 < n; i += 2) {
+      if (vals[i] instanceof CellError) {
+        continue
+      }
+      if (this.interpreter.arithmeticHelper.compare(vals[0], vals[i] as InternalNoErrorCellValue) === 0) {
+        return vals[i + 1]
+      }
+    }
+    if (i < n) {
+      return vals[i]
+    } else {
+      return new CellError(ErrorType.NA)
+    }
+  }
+
+  public iferror(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    if (ast.args.length !== 2) {
+      return new CellError(ErrorType.NA)
+    }
+    if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
+      return new CellError(ErrorType.NUM)
+    }
+    const left: InterpreterValue = this.evaluateAst(ast.args[0], formulaAddress)
+    const right: InterpreterValue = this.evaluateAst(ast.args[1], formulaAddress)
+
+    if (left instanceof SimpleRangeValue || right instanceof SimpleRangeValue) {
+      return new CellError(ErrorType.VALUE)
+    }
+
+    if (left instanceof CellError) {
+      return right
+    } else {
+      return left
+    }
+  }
+
+  public ifna(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    if (ast.args.length !== 2) {
+      return new CellError(ErrorType.NA)
+    }
+    if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
+      return new CellError(ErrorType.NUM)
+    }
+    const left: InterpreterValue = this.evaluateAst(ast.args[0], formulaAddress)
+    const right: InterpreterValue = this.evaluateAst(ast.args[1], formulaAddress)
+
+    if (left instanceof SimpleRangeValue || right instanceof SimpleRangeValue) {
+      return new CellError(ErrorType.VALUE)
+    }
+
+    if (left instanceof CellError && left.type === ErrorType.NA) {
+      return right
+    } else {
+      return left
+    }
+  }
+
+  public choose(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    if (ast.args.length < 2) {
+      return new CellError(ErrorType.NA)
+    }
+    if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
+      return new CellError(ErrorType.NUM)
+    }
+
+    const vals: InternalScalarValue[] = []
+    for (const arg of ast.args) {
+      const val: InterpreterValue = this.evaluateAst(arg, formulaAddress)
+      if (val instanceof SimpleRangeValue) {
+        return new CellError(ErrorType.VALUE)
+      }
+      vals.push(val)
+    }
+
+    const n = vals.length
+
+    if (vals[0] instanceof CellError) {
+      return vals[0]
+    }
+
+    const selector = this.interpreter.arithmeticHelper.coerceToMaybeNumber(vals[0])
+
+    if (selector === undefined || selector != Math.round(selector) || selector < 1 || selector >= n) {
+      return new CellError(ErrorType.NUM)
+    }
+    return vals[selector]
   }
 }

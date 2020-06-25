@@ -1,6 +1,10 @@
+/**
+ * @license
+ * Copyright (c) 2020 Handsoncode. All rights reserved.
+ */
+
 import {SheetCellAddress, simpleCellAddress, SimpleCellAddress} from '../../Cell'
-import {ColumnsSpan} from '../../ColumnsSpan'
-import {RowsSpan} from '../../RowsSpan'
+import {ColumnsSpan, RowsSpan} from '../../Span'
 import {CellVertex} from '../Vertex'
 import {IAddressMappingStrategy} from './IAddressMappingStrategy'
 
@@ -70,7 +74,7 @@ export class SparseStrategy implements IAddressMappingStrategy {
   }
 
   public addRows(row: number, numberOfRows: number): void {
-    this.mapping.forEach((rowMapping: Map<number, CellVertex>, colNumber: number) => {
+    this.mapping.forEach((rowMapping: Map<number, CellVertex>) => {
       const tmpMapping = new Map()
       rowMapping.forEach((vertex: CellVertex, rowNumber: number) => {
         if (rowNumber >= row) {
@@ -100,7 +104,7 @@ export class SparseStrategy implements IAddressMappingStrategy {
   }
 
   public removeRows(removedRows: RowsSpan): void {
-    this.mapping.forEach((rowMapping: Map<number, CellVertex>, colNumber: number) => {
+    this.mapping.forEach((rowMapping: Map<number, CellVertex>) => {
       const tmpMapping = new Map()
       rowMapping.forEach((vertex: CellVertex, rowNumber: number) => {
         if (rowNumber >= removedRows.rowStart) {
@@ -182,6 +186,28 @@ export class SparseStrategy implements IAddressMappingStrategy {
         const rowVertex = colMapping.get(row)
         if (rowVertex) {
           yield rowVertex
+        }
+      }
+    }
+  }
+
+  public* entriesFromRowsSpan(rowsSpan: RowsSpan): IterableIterator<[SimpleCellAddress, CellVertex]> {
+    for (const [col, colMapping] of this.mapping.entries()) {
+      for (const row of rowsSpan.rows()) {
+        const rowVertex = colMapping.get(row)
+        if (rowVertex) {
+          yield [simpleCellAddress(rowsSpan.sheet, col, row), rowVertex]
+        }
+      }
+    }
+  }
+
+  public* entriesFromColumnsSpan(columnsSpan: ColumnsSpan): IterableIterator<[SimpleCellAddress, CellVertex]> {
+    for (const col of columnsSpan.columns()) {
+      const colMapping = this.mapping.get(col)
+      if (colMapping) {
+        for (const [row, vertex] of colMapping.entries()) {
+          yield [simpleCellAddress(columnsSpan.sheet, col, row), vertex]
         }
       }
     }

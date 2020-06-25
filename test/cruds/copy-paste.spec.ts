@@ -1,11 +1,55 @@
-import {CellError, Config, EmptyValue, HyperFormula} from '../../src'
-import {ErrorType} from '../../src/Cell'
+import {HyperFormula, ExportedCellChange, NothingToPasteError} from '../../src'
+import {ErrorType, simpleCellAddress} from '../../src/Cell'
 import {CellAddress} from '../../src/parser'
-import {CellReferenceType} from '../../src/parser/CellAddress'
-import '../testConfig'
-import {adr, detailedError, expect_array_with_same_content, extractReference} from '../testUtils'
+import {
+  adr,
+  colEnd,
+  colStart,
+  detailedError,
+  expectArrayWithSameContent,
+  extractReference, rowEnd,
+  rowStart,
+} from '../testUtils'
+import {Config} from '../../src/Config'
+import {SheetSizeLimitExceededError} from '../../src/errors'
 
 describe('Copy - paste integration', () => {
+  it('copy should validate arguments', () => {
+    const engine = HyperFormula.buildFromArray([])
+
+    expect(() => {
+      engine.copy(adr('A1'), 0, 42)
+    }).toThrowError('Invalid arguments, expected width to be positive integer.')
+
+    expect(() => {
+      engine.copy(adr('A1'), -1, 42)
+    }).toThrowError('Invalid arguments, expected width to be positive integer.')
+
+    expect(() => {
+      engine.copy(adr('A1'), 3.14, 42)
+    }).toThrowError('Invalid arguments, expected width to be positive integer.')
+
+    expect(() => {
+      engine.copy(adr('A1'), 42, 0)
+    }).toThrowError('Invalid arguments, expected height to be positive integer.')
+
+    expect(() => {
+      engine.copy(adr('A1'), 42, -1)
+    }).toThrowError('Invalid arguments, expected height to be positive integer.')
+
+    expect(() => {
+      engine.copy(adr('A1'), 42, 3.14)
+    }).toThrowError('Invalid arguments, expected height to be positive integer.')
+  })
+
+  it('paste raise error when there is nothing in clipboard', () => {
+    const engine = HyperFormula.buildFromArray([])
+
+    expect(() => {
+      engine.paste(adr('A2'))
+    }).toThrow(new NothingToPasteError())
+  })
+
   it('copy should return values', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '2'],
@@ -14,8 +58,8 @@ describe('Copy - paste integration', () => {
 
     const values = engine.copy(adr('A1'), 2, 2)
 
-    expect_array_with_same_content([1, 2], values[0])
-    expect_array_with_same_content(['foo', 1], values[1])
+    expectArrayWithSameContent([1, 2], values[0])
+    expectArrayWithSameContent(['foo', 1], values[1])
   })
 
   it('copy should round return values', () => {
@@ -25,7 +69,7 @@ describe('Copy - paste integration', () => {
 
     const values = engine.copy(adr('A1'), 2, 1)
 
-    expect_array_with_same_content([1.0000000001, 1], values[0])
+    expectArrayWithSameContent([1.0000000001, 1], values[0])
   })
 
   it('should copy empty cell vertex', () => {
@@ -36,7 +80,7 @@ describe('Copy - paste integration', () => {
     engine.copy(adr('A1'), 1, 1)
     const changes = engine.paste(adr('A2'))
 
-    expect_array_with_same_content([{ sheet:0, col: 0, row: 1, value: EmptyValue}], changes)
+    expectArrayWithSameContent([new ExportedCellChange(simpleCellAddress(0, 0, 1), null)], changes)
   })
 
   it('should work for single number', () => {
@@ -48,6 +92,18 @@ describe('Copy - paste integration', () => {
     engine.paste(adr('B1'))
 
     expect(engine.getCellValue(adr('B1'))).toEqual(1)
+  })
+
+  it('should work for parsing error', () => {
+    const sheet = [
+      ['=SUM('],
+    ]
+    const engine = HyperFormula.buildFromArray(sheet)
+
+    engine.copy(adr('A1'), 1, 1)
+    engine.paste(adr('B1'))
+
+    expect(engine.getCellFormula(adr('B1'))).toEqual('=SUM(')
   })
 
   it('should work for area', () => {
@@ -135,7 +191,7 @@ describe('Copy - paste integration', () => {
     expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.REF))
   })
 
-  it('should create new range vertix', () => {
+  it('should create new range vertex - cell range', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '3'],
       ['2', '4'],
@@ -148,9 +204,58 @@ describe('Copy - paste integration', () => {
 
     expect(engine.getCellValue(adr('B3'))).toEqual(7)
     expect(Array.from(engine.dependencyGraph.rangeMapping.rangesInSheet(0)).length).toBe(2)
-    expect(engine.dependencyGraph.getRange(adr('B1'), adr('B2'))).not.toBeNull()
+    expect(engine.dependencyGraph.getRange(adr('B1'), adr('B2'))).not.toBeUndefined()
   })
 
+  it('should create new range vertex - column range', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1', '3', '5', '=SUM(A:B)'],
+      ['2', '4', '6', null],
+    ])
+    expect(Array.from(engine.dependencyGraph.rangeMapping.rangesInSheet(0)).length).toBe(1)
+
+    engine.copy(adr('D1'), 1, 1)
+    engine.paste(adr('E1'))
+
+    expect(engine.getCellValue(adr('E1'))).toEqual(18)
+    expect(Array.from(engine.dependencyGraph.rangeMapping.rangesInSheet(0)).length).toBe(2)
+    expect(engine.dependencyGraph.getRange(colStart('B'), colEnd('C'))).not.toBeUndefined()
+  })
+
+  it('should create new range vertex - row range', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1', '2'],
+      ['3', '4'],
+      ['5', '6'],
+      ['=SUM(1:2)']
+    ])
+    expect(Array.from(engine.dependencyGraph.rangeMapping.rangesInSheet(0)).length).toBe(1)
+
+    engine.copy(adr('A4'), 1, 1)
+    engine.paste(adr('A5'))
+
+    expect(engine.getCellValue(adr('A5'))).toEqual(18)
+    expect(Array.from(engine.dependencyGraph.rangeMapping.rangesInSheet(0)).length).toBe(2)
+    expect(engine.dependencyGraph.getRange(rowStart(2), rowEnd(3))).not.toBeUndefined()
+  })
+
+  it('should update edges between infinite range and pasted values', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=SUM(2:3)', '1', '=SUM(1,2)']
+    ])
+
+    engine.copy(adr('B1'), 1, 1)
+    engine.paste(adr('A2'))
+    engine.copy(adr('C1'), 1, 1)
+    engine.paste(adr('A3'))
+
+    const range = engine.rangeMapping.fetchRange(rowStart(2), rowEnd(3))
+    const a2 = engine.addressMapping.fetchCell(adr('A2'))
+    const a3 = engine.addressMapping.fetchCell(adr('A3'))
+    expect(engine.graph.existsEdge(a2, range))
+    expect(engine.graph.existsEdge(a3, range))
+    expect(engine.getCellValue(adr('A1'))).toEqual(4)
+  })
 
   it('paste should return newly pasted values', () => {
     const engine = HyperFormula.buildFromArray([
@@ -160,9 +265,9 @@ describe('Copy - paste integration', () => {
     engine.copy(adr('A1'), 2, 1)
     const changes = engine.paste(adr('A2'))
 
-    expect_array_with_same_content([
-      { sheet:0, col: 0, row: 1, value: 1},
-      { sheet:0, col: 1, row: 1, value: 1},
+    expectArrayWithSameContent([
+      new ExportedCellChange(simpleCellAddress(0, 0, 1), 1),
+      new ExportedCellChange(simpleCellAddress(0, 1, 1), 1),
     ], changes)
   })
 
@@ -170,7 +275,7 @@ describe('Copy - paste integration', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '2'],
       ['3', '4'],
-    ], new Config({ matrixDetection: true, matrixDetectionThreshold: 1}))
+    ], { matrixDetection: true, matrixDetectionThreshold: 1})
     expect(engine.matrixMapping.matrixMapping.size).toEqual(1)
 
     engine.copy(adr('A1'), 2, 2)
@@ -187,7 +292,7 @@ describe('Copy - paste integration', () => {
     const engine = HyperFormula.buildFromArray([
       ['foo'],
       ['3', '4'],
-    ], new Config({ matrixDetection: true, matrixDetectionThreshold: 1}))
+    ], { matrixDetection: true, matrixDetectionThreshold: 1})
     expect(engine.matrixMapping.matrixMapping.size).toEqual(1)
 
     engine.copy(adr('A1'), 1, 1)
@@ -202,7 +307,7 @@ describe('Copy - paste integration', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '2'],
       ['3', '4'],
-    ], new Config({ matrixDetection: true, matrixDetectionThreshold: 1}))
+    ], { matrixDetection: true, matrixDetectionThreshold: 1})
     expect(engine.matrixMapping.matrixMapping.size).toEqual(1)
 
     engine.copy(adr('A1'), 2, 2)
@@ -252,16 +357,6 @@ describe('Copy - paste integration', () => {
     }).toThrowError('It is not possible to paste onto matrix')
   })
 
-  it('should do nothing when empty clipboard', () => {
-    const engine = HyperFormula.buildFromArray([
-      ['1']
-    ])
-
-    engine.paste(adr('A1'))
-
-    expect(engine.getCellValue(adr('A1'))).toEqual(1)
-  })
-
   it('should not be possible to paste to not existing sheet', () => {
     const engine = HyperFormula.buildFromSheets({
       'Sheet1': [['=Sheet1!A2', '=Sheet2!A2']],
@@ -271,7 +366,7 @@ describe('Copy - paste integration', () => {
 
     expect(() => {
       engine.paste(adr('A1', 1))
-    }).toThrowError('Invalid arguments')
+    }).toThrowError('Invalid arguments, expected a valid target address.')
   })
 
   it('should copy references with absolute sheet id', () => {
@@ -283,13 +378,11 @@ describe('Copy - paste integration', () => {
     engine.copy(adr('A1'), 2, 1)
     engine.paste(adr('A1', 1))
 
-    expect(extractReference(engine, adr('A1', 1))).toEqual(new CellAddress(0, 0, 1, CellReferenceType.CELL_REFERENCE_RELATIVE))
-    expect(extractReference(engine, adr('B1', 1))).toEqual(new CellAddress(1, -1, 1, CellReferenceType.CELL_REFERENCE_RELATIVE))
+    expect(extractReference(engine, adr('A1', 1))).toEqual(CellAddress.relative(0, 0, 1))
+    expect(extractReference(engine, adr('B1', 1))).toEqual(CellAddress.relative(1, -1, 1))
   })
 
-  /* Inconsistency with Product 1
-   * We should think about distinction of relative and absolute sheet addresses */
-  it('sheet id should not be adjusted when copying "relative" sheet reference to other sheet', () => {
+  it('sheet reference should stay "relative" to other sheet', () => {
     const engine = HyperFormula.buildFromSheets({
       'Sheet1': [['=A2']],
       'Sheet2': []
@@ -298,19 +391,76 @@ describe('Copy - paste integration', () => {
     engine.copy(adr('A1'), 1, 1)
     engine.paste(adr('A1', 1))
 
-    expect(extractReference(engine, adr('A1', 1))).toEqual(new CellAddress(0, 0, 1, CellReferenceType.CELL_REFERENCE_RELATIVE))
+    expect(extractReference(engine, adr('A1', 1))).toEqual(CellAddress.relative(null, 0, 1))
   })
 
-  it('should do nothing when clipboard is cleard after copy', () => {
+  it('should throw error when trying to paste beyond sheet size limit', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1', '2'],
+      ['3', '4'],
+    ])
+
+    engine.copy(adr('A1'), 2, 2)
+
+    expect(() => engine.paste(simpleCellAddress(0, Config.defaultConfig.maxColumns, 0))).toThrow(new SheetSizeLimitExceededError())
+    expect(() => engine.paste(simpleCellAddress(0, 0, Config.defaultConfig.maxRows))).toThrow(new SheetSizeLimitExceededError())
+  })
+})
+
+describe('isClipboardEmpty', () => {
+  it('when just engine initialized', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1'],
+    ])
+
+    expect(engine.isClipboardEmpty()).toBe(true)
+  })
+
+  it('after copy', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1'],
+    ])
+    engine.copy(adr('A1'), 1, 1)
+
+    expect(engine.isClipboardEmpty()).toBe(false)
+  })
+
+  it('after copy-paste', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1'],
+    ])
+    engine.copy(adr('A1'), 1, 1)
+    engine.paste(adr('A2'))
+
+    expect(engine.isClipboardEmpty()).toBe(false)
+  })
+
+  it('after cut', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1'],
+    ])
+    engine.cut(adr('A1'), 1, 1)
+
+    expect(engine.isClipboardEmpty()).toBe(false)
+  })
+
+  it('after cut-paste', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1'],
+    ])
+    engine.cut(adr('A1'), 1, 1)
+    engine.paste(adr('A2'))
+
+    expect(engine.isClipboardEmpty()).toBe(true)
+  })
+
+  it('after clearClipboard', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '=A1'],
     ])
-
     engine.copy(adr('A1'), 2, 1)
     engine.clearClipboard()
-    engine.paste(adr('A2'))
 
-    expect(engine.getCellValue(adr('A2'))).toEqual(EmptyValue)
-    expect(engine.getCellValue(adr('B2'))).toEqual(EmptyValue)
+    expect(engine.isClipboardEmpty()).toBe(true)
   })
 })

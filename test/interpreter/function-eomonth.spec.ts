@@ -1,10 +1,10 @@
 import {HyperFormula} from '../../src'
 import {ErrorType, SimpleCellAddress} from '../../src/Cell'
-import '../testConfig'
+import {Config} from '../../src/Config'
 import {adr, dateNumberToString, detailedError} from '../testUtils'
 
 const expectToHaveDate = (engine: HyperFormula, address: SimpleCellAddress, dateString: string) => {
-  expect(dateNumberToString(engine.getCellValue(address))).toEqual(dateString)
+  expect(dateNumberToString(engine.getCellValue(address), new Config())).toEqual(dateString)
 }
 
 describe('Function EOMONTH', () => {
@@ -29,7 +29,7 @@ describe('Function EOMONTH', () => {
       ['=EOMONTH(A1, 0)'],
     ])
 
-    expectToHaveDate(engine, adr('A2'), '03/31/2019')
+    expectToHaveDate(engine, adr('A2'), '31/03/2019')
   })
 
   it('works for exact end of month', () => {
@@ -38,7 +38,7 @@ describe('Function EOMONTH', () => {
       ['=EOMONTH(A1, 0)'],
     ])
 
-    expectToHaveDate(engine, adr('A2'), '03/31/2019')
+    expectToHaveDate(engine, adr('A2'), '31/03/2019')
   })
 
   it('works for positive numbers', () => {
@@ -47,7 +47,7 @@ describe('Function EOMONTH', () => {
       ['=EOMONTH(A1, 1)'],
     ])
 
-    expectToHaveDate(engine, adr('A2'), '08/31/2019')
+    expectToHaveDate(engine, adr('A2'), '31/08/2019')
   })
 
   it('works for negative numbers', () => {
@@ -56,7 +56,7 @@ describe('Function EOMONTH', () => {
       ['=EOMONTH(A1, -1)'],
     ])
 
-    expectToHaveDate(engine, adr('A2'), '07/31/2019')
+    expectToHaveDate(engine, adr('A2'), '31/07/2019')
   })
 
   it('works when next date will have more days', () => {
@@ -65,7 +65,7 @@ describe('Function EOMONTH', () => {
       ['=EOMONTH(A1, 1)'],
     ])
 
-    expectToHaveDate(engine, adr('A2'), '07/31/2019')
+    expectToHaveDate(engine, adr('A2'), '31/07/2019')
   })
 
   it('works when next date will have less days', () => {
@@ -74,7 +74,7 @@ describe('Function EOMONTH', () => {
       ['=EOMONTH(A1, 1)'],
     ])
 
-    expectToHaveDate(engine, adr('A2'), '02/28/2019')
+    expectToHaveDate(engine, adr('A2'), '28/02/2019')
   })
 
   it('works when previous date will have more days', () => {
@@ -83,7 +83,7 @@ describe('Function EOMONTH', () => {
       ['=EOMONTH(A1, -1)'],
     ])
 
-    expectToHaveDate(engine, adr('A2'), '01/31/2019')
+    expectToHaveDate(engine, adr('A2'), '31/01/2019')
   })
 
   it('works when previous date will have less days', () => {
@@ -92,7 +92,7 @@ describe('Function EOMONTH', () => {
       ['=EOMONTH(A1, -1)'],
     ])
 
-    expectToHaveDate(engine, adr('A2'), '02/28/2019')
+    expectToHaveDate(engine, adr('A2'), '28/02/2019')
   })
 
   it('use number coercion for 1st argument', () => {
@@ -101,8 +101,8 @@ describe('Function EOMONTH', () => {
       ['=EOMONTH(1, 1)'],
     ])
 
-    expectToHaveDate(engine, adr('A1'), '01/31/1900')
-    expectToHaveDate(engine, adr('A2'), '01/31/1900')
+    expectToHaveDate(engine, adr('A1'), '31/01/1900')
+    expectToHaveDate(engine, adr('A2'), '31/01/1900')
   })
 
   it('use number coercion for 2nd argument', () => {
@@ -112,8 +112,8 @@ describe('Function EOMONTH', () => {
       ['=TRUE()', '=EOMONTH(A1, A3)'],
     ])
 
-    expectToHaveDate(engine, adr('B2'), '04/30/2019')
-    expectToHaveDate(engine, adr('B3'), '04/30/2019')
+    expectToHaveDate(engine, adr('B2'), '30/04/2019')
+    expectToHaveDate(engine, adr('B3'), '30/04/2019')
   })
 
   it('propagate errors', () => {

@@ -1,11 +1,10 @@
 import {HyperFormula} from '../../src'
 import {ErrorType} from '../../src/Cell'
-import '../testConfig'
 import {adr, detailedError} from '../testUtils'
 
 describe('Function DAY', () => {
   it('with wrong arguments', () => {
-    const engine = HyperFormula.buildFromArray([['=DAY("foo")', '=DAY("30/12/2018")', '=DAY(1, 2)', '=DAY()']])
+    const engine = HyperFormula.buildFromArray([['=DAY("foo")', '=DAY("12/30/2018")', '=DAY(1, 2)', '=DAY()']])
 
     expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE))
     expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.VALUE))
@@ -22,7 +21,7 @@ describe('Function DAY', () => {
   })
 
   it('with string arguments', () => {
-    const engine = HyperFormula.buildFromArray([['=DAY("12/31/1899")', '=DAY("01/01/1900")', '=DAY("12/31/2018")']])
+    const engine = HyperFormula.buildFromArray([['=DAY("31/12/1899")', '=DAY("01/01/1900")', '=DAY("31/12/2018")']])
 
     expect(engine.getCellValue(adr('A1'))).toEqual(31)
     expect(engine.getCellValue(adr('B1'))).toEqual(1)

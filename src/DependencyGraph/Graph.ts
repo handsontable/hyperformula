@@ -1,9 +1,13 @@
+/**
+ * @license
+ * Copyright (c) 2020 Handsoncode. All rights reserved.
+ */
 
-export interface IGetDependenciesQuery<T> {
-  call(node: T): Set<T> | null
+export type DependencyQuery<T> = (vertex: T) => Set<T> | null
+
+export interface TopSortResult<T> {
+  sorted: T[], cycled: T[], 
 }
-
-export interface TopSortResult<T> { sorted: T[], cycled: T[] }
 
 /**
  * Provides graph directed structure
@@ -20,12 +24,13 @@ export class Graph<T> {
   public specialNodes: Set<T> = new Set()
   public specialNodesStructuralChanges: Set<T> = new Set()
   public specialNodesRecentlyChanged: Set<T> = new Set()
+  public infiniteRanges: Set<T> = new Set()
 
   /** Nodes adjacency mapping. */
   private edges: Map<T, Set<T>> = new Map()
 
   constructor(
-    private readonly getDependenciesQuery: IGetDependenciesQuery<T>,
+    private readonly dependencyQuery: DependencyQuery<T>
   ) {
   }
 
@@ -56,11 +61,13 @@ export class Graph<T> {
     if (!this.nodes.has(toNode)) {
       throw new Error(`Unknown node ${toNode}`)
     }
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     this.edges.get(fromNode)!.add(toNode)
   }
 
   public removeEdge(fromNode: T, toNode: T) {
     if (this.existsEdge(fromNode, toNode)) {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       this.edges.get(fromNode)!.delete(toNode)
     } else {
       throw new Error('Edge does not exist')
@@ -68,10 +75,7 @@ export class Graph<T> {
   }
 
   public softRemoveEdge(fromNode: T, toNode: T) {
-    const edges = this.edges.get(fromNode)
-    if (edges) {
-      edges.delete(toNode)
-    }
+    this.edges.get(fromNode)?.delete(toNode)
   }
 
   public removeIncomingEdges(toNode: T) {
@@ -86,6 +90,7 @@ export class Graph<T> {
    * @param node - node to which adjacent nodes we want to retrieve
    */
   public adjacentNodes(node: T): Set<T> {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     return this.edges.get(node)!
   }
 
@@ -118,23 +123,7 @@ export class Graph<T> {
     return result
   }
 
-  public exchangeNode(oldNode: T, newNode: T) {
-    this.addNode(newNode)
-    this.adjacentNodes(oldNode).forEach((adjacentNode) => {
-      this.addEdge(newNode, adjacentNode)
-    })
-    this.removeNode(oldNode)
-  }
-
-  public exchangeOrAddNode(oldNode: T | null, newNode: T) {
-    if (oldNode) {
-      this.exchangeNode(oldNode, newNode)
-    } else {
-      this.addNode(newNode)
-    }
-  }
-
-  public removeNode(node: T) {
+  public removeNode(node: T): Set<T> {
     for (const adjacentNode of this.adjacentNodes(node).values()) {
       this.markNodeAsSpecialRecentlyChanged(adjacentNode)
     }
@@ -143,7 +132,8 @@ export class Graph<T> {
     this.specialNodes.delete(node)
     this.specialNodesRecentlyChanged.delete(node)
     this.specialNodesStructuralChanges.delete(node)
-    this.removeDependencies(node)
+    this.infiniteRanges.delete(node)
+    return this.removeDependencies(node)
   }
 
   public markNodeAsSpecial(node: T) {
@@ -164,6 +154,10 @@ export class Graph<T> {
     this.specialNodesRecentlyChanged.clear()
   }
 
+  public markNodeAsInfiniteRange(node: T) {
+    this.infiniteRanges.add(node)
+  }
+
   /**
    * Checks whether exists edge between nodes
    *
@@ -171,70 +165,121 @@ export class Graph<T> {
    * @param toNode - node to which edge is incoming
    */
   public existsEdge(fromNode: T, toNode: T): boolean {
-    const nodeEdges = this.edges.get(fromNode)
-    if (nodeEdges) {
-      return nodeEdges.has(toNode)
-    }
-    return false
+    return this.edges.get(fromNode)?.has(toNode) ?? false
+  }
+
+  /*
+   * return a topological sort order, but separates vertices that exist in some cycle
+   */
+  public topSortWithScc(): TopSortResult<T> {
+    return this.getTopSortedWithSccSubgraphFrom(Array.from(this.nodes), (_node: T) => true, (_node: T) => {})
   }
 
   /**
-   * Returns topological order of nodes.
    *
+   * computes topological sort order, but vertices that are on cycles are kept separate
+   *
+   * @param modifiedNodes - seed for computation. During engine init run, all of the vertices of grap. In recomputation run, changed vertices.
+   * @param operatingFunction - recomputes value of a node, and returns whether a change occured
+   * @param onCycle - action to be performed when node is on cycle
    */
-  public topologicalSort(): TopSortResult<T> {
-    const incomingEdges = this.incomingEdges()
-    const nodesWithNoIncomingEdge = this.nodesWithNoIncomingEdge(incomingEdges)
+  public getTopSortedWithSccSubgraphFrom(modifiedNodes: T[], operatingFunction: (node: T) => boolean, onCycle: (node: T) => void): TopSortResult<T> {
 
-    let currentNodeIndex = 0
-    const topologicalOrdering: T[] = []
-    while (currentNodeIndex < nodesWithNoIncomingEdge.length) {
-      const currentNode = nodesWithNoIncomingEdge[currentNodeIndex] as T
-      topologicalOrdering.push(currentNode)
-      this.edges.get(currentNode)!.forEach((targetNode) => {
-        incomingEdges.set(targetNode, incomingEdges.get(targetNode)! - 1)
-        if (incomingEdges.get(targetNode) === 0) {
-          nodesWithNoIncomingEdge.push(targetNode)
-        }
-      })
-      ++currentNodeIndex
-    }
+    const entranceTime: Map<T, number> = new Map()
+    const low: Map<T, number> = new Map()
+    const parent: Map<T, T | null> = new Map()
+    const processed: Set<T> = new Set()
+    const onStack: Set<T> = new Set()
+    const order: T[] = []
 
-    const cycled = this.findCycles(this.nodes, nodesWithNoIncomingEdge, incomingEdges)
-    return { sorted: topologicalOrdering, cycled }
-  }
+    let time: number = 0
 
-  public getTopologicallySortedSubgraphFrom(vertices: T[], operatingFunction: (node: T) => boolean): T[] {
-    const subgraphNodes = this.computeSubgraphNodes(vertices)
-    const incomingEdges = this.incomingEdgesForSubgraph(subgraphNodes)
-    const shouldBeUpdatedMapping = new Set(vertices)
-    const nodesWithNoIncomingEdge = this.nodesWithNoIncomingEdge(incomingEdges)
-
-    let currentNodeIndex = 0
-    while (currentNodeIndex < nodesWithNoIncomingEdge.length) {
-      const currentNode = nodesWithNoIncomingEdge[currentNodeIndex]!
-      let result: boolean
-      if (shouldBeUpdatedMapping.has(currentNode)) {
-        result = operatingFunction(currentNode)
-      } else {
-        result = false
+    modifiedNodes.reverse().forEach( (v: T) => {
+      if (processed.has(v)) {
+        return
       }
-      this.edges.get(currentNode)!.forEach((targetNode) => {
-        if (subgraphNodes.has(targetNode)) {
-          if (result) {
-            shouldBeUpdatedMapping.add(targetNode)
+      entranceTime.set(v, time)
+      // order.push(v)
+      low.set(v, time)
+      parent.set(v, null)
+      time++
+      const DFSstack: T[] = [v]
+      onStack.add(v)
+      while ( DFSstack.length > 0 ) {
+        const u = DFSstack[ DFSstack.length - 1 ]
+        if ( processed.has(u) ) { // leaving this DFS subtree
+          const pu = parent.get(u)
+          if ( pu !==  null ) {
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+            low.set(pu!, Math.min(low.get(pu!)!, low.get(u)!))
           }
-          incomingEdges.set(targetNode, incomingEdges.get(targetNode)! - 1)
-          if (incomingEdges.get(targetNode) === 0) {
-            nodesWithNoIncomingEdge.push(targetNode)
-          }
+          DFSstack.pop()
+          onStack.delete(u)
+          order.push(u)
+        } else {
+          processed.add(u)
+          entranceTime.set(u, time)
+          low.set(u, time)
+          this.adjacentNodes(u).forEach( (t: T) => {
+            if (entranceTime.get(t) !== undefined) { // forward edge or backward edge
+              if (onStack.has(t)) { // backward edge
+                // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                low.set(u, Math.min(low.get(u)!, entranceTime.get(t)!))
+              }
+            } else {
+              parent.set(t, u)
+              DFSstack.push(t)
+              onStack.add(t)
+              time++
+            }
+          })
+        }
+      }
+    })
+
+    const sccMap: Map<T, T> = new Map()
+    const sccNonSingletons: Set<T> = new Set()
+    order.reverse()
+    order.forEach( (v: T) => {
+      if (entranceTime.get(v) === low.get(v)) {
+        sccMap.set(v, v)
+      } else {
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        sccMap.set(v, sccMap.get(parent.get(v) as T)!)
+      }
+    })
+
+    this.edges.forEach( (targets: Set<T>, v: T) => {
+      targets.forEach( (u: T) => {
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        const uRepr = sccMap.get(u)!
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        const vRepr = sccMap.get(v)!
+        if (uRepr === vRepr) {
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+          sccNonSingletons.add(uRepr)
         }
       })
-      ++currentNodeIndex
-    }
+    })
 
-    const cycled = this.findCycles(subgraphNodes, nodesWithNoIncomingEdge, incomingEdges)
-    return cycled
+    const shouldBeUpdatedMapping = new Set(modifiedNodes)
+
+    const sorted: T[] = []
+    const cycled: T[] = []
+    order.forEach( (t: T) => {
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        if (!sccNonSingletons.has(sccMap.get(t)!)) {
+          sorted.push(t)
+          if ( shouldBeUpdatedMapping.has(t) && operatingFunction(t)) {
+            this.adjacentNodes(t).forEach( (s: T) => shouldBeUpdatedMapping.add(s) )
+          }
+        } else {
+          cycled.push(t)
+          onCycle(t)
+          this.adjacentNodes(t).forEach( (s: T) => shouldBeUpdatedMapping.add(s) )
+        }
+      })
+    return { sorted, cycled }
   }
 
   public getDependencies(vertex: T): T[] {
@@ -255,82 +300,14 @@ export class Graph<T> {
     this.clearSpecialNodesRecentlyChanged()
   }
 
-  private removeDependencies(node: T) {
-    const dependentNodes = this.getDependenciesQuery.call(node)
-    if (!dependentNodes) {
-      return
+  private removeDependencies(node: T): Set<T> {
+    const dependencies = this.dependencyQuery(node)
+    if (!dependencies) {
+      return new Set()
     }
-    for (const dependentNode of dependentNodes) {
-      this.softRemoveEdge(dependentNode, node)
+    for (const dependency of dependencies) {
+      this.softRemoveEdge(dependency, node)
     }
-  }
-
-  private findCycles(nodes: Set<T>, nodesWithNoIncomingEdge: T[], incomingEdges: Map<T, number>): T[] {
-    if (nodesWithNoIncomingEdge.length !== nodes.size) {
-      const nodesOnCycle: T[] = []
-      for (const [node, incomingEdgesCount] of incomingEdges) {
-        if (incomingEdgesCount !== 0) {
-          nodesOnCycle.push(node)
-        }
-      }
-      return nodesOnCycle
-    } else {
-      return []
-    }
-  }
-
-  private nodesWithNoIncomingEdge(incomingEdges: Map<T, number>): T[] {
-    const result: T[] = []
-    incomingEdges.forEach((currentCount, targetNode) => {
-      if (currentCount === 0) {
-        result.push(targetNode)
-      }
-    })
-    return result
-  }
-
-  private computeSubgraphNodes(vertices: T[]): Set<T> {
-    const result = new Set(vertices)
-    const queue = Array.from(vertices)
-    let currentNodeIndex = 0
-    while (currentNodeIndex < queue.length) {
-      const vertex = queue[currentNodeIndex]
-      for (const adjacentNode of this.adjacentNodes(vertex)) {
-        if (!result.has(adjacentNode)) {
-          result.add(adjacentNode)
-          queue.push(adjacentNode)
-        }
-      }
-      currentNodeIndex++
-    }
-    return result
-  }
-
-  /**
-   * Builds a mapping from nodes to the count of their incoming edges.
-   */
-  private incomingEdges(): Map<T, number> {
-    const incomingEdges: Map<T, number> = new Map()
-    this.nodes.forEach((node, id) => (incomingEdges.set(node, 0)))
-    this.edges.forEach((adjacentNodes, sourceNode) => {
-      adjacentNodes.forEach((targetNode) => {
-        incomingEdges.set(targetNode, incomingEdges.get(targetNode)! + 1)
-      })
-    })
-    return incomingEdges
-  }
-
-  private incomingEdgesForSubgraph(subgraphNodes: Set<T>): Map<T, number> {
-    const incomingEdges: Map<T, number> = new Map()
-    subgraphNodes.forEach((node) => (incomingEdges.set(node, 0)))
-    subgraphNodes.forEach((sourceNode) => {
-      const adjacentNodes = this.edges.get(sourceNode)!
-      adjacentNodes.forEach((targetNode) => {
-        if (subgraphNodes.has(targetNode) && subgraphNodes.has(sourceNode)) {
-          incomingEdges.set(targetNode, incomingEdges.get(targetNode)! + 1)
-        }
-      })
-    })
-    return incomingEdges
+    return dependencies
   }
 }

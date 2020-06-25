@@ -1,4 +1,8 @@
-import {AbsoluteCellRange} from './AbsoluteCellRange'
+/**
+ * @license
+ * Copyright (c) 2020 Handsoncode. All rights reserved.
+ */
+
 import {SimpleCellAddress} from './Cell'
 import {CellDependency} from './CellDependency'
 import {RelativeDependency} from './parser'
@@ -10,11 +14,5 @@ import {RelativeDependency} from './parser'
  * @param baseAddress - base address with regard to which make a convertion
  */
 export const absolutizeDependencies = (deps: RelativeDependency[], baseAddress: SimpleCellAddress): CellDependency[] => {
-  return deps.map((dep) => {
-    if (Array.isArray(dep)) {
-      return new AbsoluteCellRange(dep[0].toSimpleCellAddress(baseAddress), dep[1].toSimpleCellAddress(baseAddress))
-    } else {
-      return dep.toSimpleCellAddress(baseAddress)
-    }
-  })
+  return deps.map((dep) => dep.absolutize(baseAddress))
 }

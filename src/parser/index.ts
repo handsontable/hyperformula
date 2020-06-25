@@ -1,3 +1,8 @@
+/**
+ * @license
+ * Copyright (c) 2020 Handsoncode. All rights reserved.
+ */
+
 export {
   cellAddressFromString,
   simpleCellAddressFromString,
@@ -28,6 +33,7 @@ export {
   ParsingErrorType,
 
   ProcedureAst,
+  NamedExpressionAst,
   ErrorAst,
   CellReferenceAst,
   CellRangeAst,
@@ -48,10 +54,17 @@ export {
 
   buildProcedureAst,
   buildCellRangeAst,
-  buildErrorAst,
+  buildParsingErrorAst,
   buildCellErrorAst,
 } from './Ast'
 
 export { Unparser } from './Unparser'
 
-export { RelativeDependency } from './RelativeDependency'
+export {
+  RelativeDependency,
+  AddressDependency,
+  CellRangeDependency,
+  ColumnRangeDependency,
+  RowRangeDependency,
+  NamedExpressionDependency,
+} from './RelativeDependency'

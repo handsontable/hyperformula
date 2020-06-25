@@ -1,12 +1,8 @@
 import {HyperFormula} from '../src'
-import {Config} from '../src'
-import {
-  EmptyCellVertex,
-  MatrixVertex,
-  ValueCellVertex,
-} from '../src/DependencyGraph'
-import './testConfig.ts'
-import {adr, detailedError} from './testUtils'
+import {EmptyCellVertex, MatrixVertex, ValueCellVertex} from '../src/DependencyGraph'
+import {adr, colEnd, colStart} from './testUtils'
+import {Config} from '../src/Config'
+import {SheetSizeLimitExceededError} from '../src/errors'
 
 describe('GraphBuilder', () => {
   it('build sheet with simple number cell', () => {
@@ -51,6 +47,20 @@ describe('GraphBuilder', () => {
     expect(engine.graph.adjacentNodes(a1)).toContain(a1b2)
     expect(engine.graph.adjacentNodes(b1)).toContain(a1b2)
     expect(engine.graph.adjacentNodes(a1b2)).toContain(a2)
+  })
+
+  it('#buildGraph works with column ranges', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1', '2', '=A:B'],
+    ])
+
+    const a1 = engine.addressMapping.fetchCell(adr('A1'))
+    const b1 = engine.addressMapping.fetchCell(adr('B1'))
+    const ab = engine.rangeMapping.fetchRange(colStart('A'), colEnd('B'))
+    const c1 = engine.addressMapping.fetchCell(adr('C1'))
+    expect(engine.graph.adjacentNodes(a1)).toContain(ab)
+    expect(engine.graph.adjacentNodes(b1)).toContain(ab)
+    expect(engine.graph.adjacentNodes(ab)).toContain(c1)
   })
 
   it('#loadSheet - it should build graph with only one RangeVertex', () => {
@@ -139,7 +149,7 @@ describe('GraphBuilder with matrix detection', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '2'],
       ['3', '4'],
-    ], new Config({ matrixDetection: true, matrixDetectionThreshold: 1 }))
+    ], { matrixDetection: true, matrixDetectionThreshold: 1 })
 
     const a1 = engine.addressMapping.fetchCell(adr('A1'))
     expect(engine.addressMapping.fetchCell(adr('A2'))).toBe(a1)
@@ -154,7 +164,7 @@ describe('GraphBuilder with matrix detection', () => {
   it('matrix detection strategy and regular values', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', 'foobar'],
-    ], new Config({ matrixDetection: true, matrixDetectionThreshold: 2 }))
+    ], { matrixDetection: true, matrixDetectionThreshold: 2 })
 
     expect(engine.addressMapping.fetchCell(adr('A1'))).toBeInstanceOf(ValueCellVertex)
     expect(engine.addressMapping.fetchCell(adr('B1'))).toBeInstanceOf(ValueCellVertex)
@@ -168,10 +178,30 @@ describe('GraphBuilder with matrix detection', () => {
       ['1', '2'],
       ['3', '4'],
       ['5', '6'],
-    ], new Config({ matrixDetection: true, matrixDetectionThreshold: 6 }))
+    ], { matrixDetection: true, matrixDetectionThreshold: 6 })
 
     expect(engine.addressMapping.fetchCell(adr('A1'))).toBeInstanceOf(ValueCellVertex)
     expect(engine.addressMapping.fetchCell(adr('B2'))).toBeInstanceOf(ValueCellVertex)
     expect(engine.addressMapping.fetchCell(adr('A4'))).toBeInstanceOf(MatrixVertex)
+  })
+})
+
+describe('Sheet size limits', () => {
+  it('should throw error when trying to build engine with too many columns', () => {
+    const maxColumns = Config.defaultConfig.maxColumns
+    const sheet = [new Array(maxColumns + 1).fill('')]
+
+    expect(() => {
+      HyperFormula.buildFromArray(sheet)
+    }).toThrow(new SheetSizeLimitExceededError())
+  })
+
+  it('should throw error when trying to build engine with too many rows', () => {
+    const maxRows = Config.defaultConfig.maxRows
+    const sheet = new Array(maxRows + 1).fill([''])
+
+    expect(() => {
+      HyperFormula.buildFromArray(sheet)
+    }).toThrow(new SheetSizeLimitExceededError())
   })
 })

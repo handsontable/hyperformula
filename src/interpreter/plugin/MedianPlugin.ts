@@ -1,5 +1,10 @@
-import {CellError, ErrorType, InternalCellValue, SimpleCellAddress} from '../../Cell'
-import { ProcedureAst} from '../../parser'
+/**
+ * @license
+ * Copyright (c) 2020 Handsoncode. All rights reserved.
+ */
+
+import {CellError, ErrorType, InternalScalarValue, SimpleCellAddress} from '../../Cell'
+import {AstNodeType, ProcedureAst} from '../../parser'
 import {FunctionPlugin} from './FunctionPlugin'
 
 /**
@@ -8,8 +13,8 @@ import {FunctionPlugin} from './FunctionPlugin'
 export class MedianPlugin extends FunctionPlugin {
 
   public static implementedFunctions = {
-    median: {
-      translationKey: 'MEDIAN',
+    'MEDIAN': {
+      method: 'median',
     },
   }
 
@@ -21,9 +26,12 @@ export class MedianPlugin extends FunctionPlugin {
    * @param ast
    * @param formulaAddress
    */
-  public median(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
+  public median(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     if (ast.args.length === 0) {
       return new CellError(ErrorType.NA)
+    }
+    if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
+      return new CellError(ErrorType.NUM)
     }
 
     const values: number[] = []

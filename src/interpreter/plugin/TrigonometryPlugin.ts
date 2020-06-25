@@ -1,6 +1,10 @@
-import {CellError, ErrorType, InternalCellValue, SimpleCellAddress} from '../../Cell'
-import {ProcedureAst} from '../../parser'
-import {coerceScalarToNumberOrError} from '../coerce'
+/**
+ * @license
+ * Copyright (c) 2020 Handsoncode. All rights reserved.
+ */
+
+import {CellError, ErrorType, InternalScalarValue, SimpleCellAddress} from '../../Cell'
+import {AstNodeType, ProcedureAst} from '../../parser'
 import {SimpleRangeValue} from '../InterpreterValue'
 import {FunctionPlugin} from './FunctionPlugin'
 
@@ -10,29 +14,29 @@ import {FunctionPlugin} from './FunctionPlugin'
 export class TrigonometryPlugin extends FunctionPlugin {
 
   public static implementedFunctions = {
-    acos: {
-      translationKey: 'ACOS',
+    'ACOS': {
+      method: 'acos',
     },
-    asin: {
-      translationKey: 'ASIN',
+    'ASIN': {
+      method: 'asin',
     },
-    cos: {
-      translationKey: 'COS',
+    'COS': {
+      method: 'cos',
     },
-    sin: {
-      translationKey: 'SIN',
+    'SIN': {
+      method: 'sin',
     },
-    tan: {
-      translationKey: 'TAN',
+    'TAN': {
+      method: 'tan',
     },
-    atan: {
-      translationKey: 'ATAN',
+    'ATAN': {
+      method: 'atan',
     },
-    atan2: {
-      translationKey: 'ATAN2',
+    'ATAN2': {
+      method: 'atan2',
     },
-    ctg: {
-      translationKey: 'COT',
+    'COT': {
+      method: 'ctg',
     },
   }
 
@@ -44,7 +48,7 @@ export class TrigonometryPlugin extends FunctionPlugin {
    * @param ast
    * @param formulaAddress
    */
-  public acos(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
+  public acos(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.templateWithOneCoercedToNumberArgument(ast, formulaAddress, (coercedArg) => {
       if (-1 <= coercedArg && coercedArg <= 1) {
         return Math.acos(coercedArg)
@@ -54,7 +58,7 @@ export class TrigonometryPlugin extends FunctionPlugin {
     })
   }
 
-  public asin(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
+  public asin(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.templateWithOneCoercedToNumberArgument(ast, formulaAddress, (coercedArg) => {
       if (-1 <= coercedArg && coercedArg <= 1) {
         return Math.asin(coercedArg)
@@ -64,33 +68,36 @@ export class TrigonometryPlugin extends FunctionPlugin {
     })
   }
 
-  public cos(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
+  public cos(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.templateWithOneCoercedToNumberArgument(ast, formulaAddress, (coercedArg) => {
       return Math.cos(coercedArg)
     })
   }
 
-  public sin(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
+  public sin(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.templateWithOneCoercedToNumberArgument(ast, formulaAddress, (coercedArg) => {
       return Math.sin(coercedArg)
     })
   }
 
-  public tan(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
+  public tan(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.templateWithOneCoercedToNumberArgument(ast, formulaAddress, (coercedArg) => {
       return Math.tan(coercedArg)
     })
   }
 
-  public atan(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
+  public atan(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.templateWithOneCoercedToNumberArgument(ast, formulaAddress, (coercedArg) => {
       return Math.atan(coercedArg)
     })
   }
 
-  public atan2(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
+  public atan2(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     if (ast.args.length !== 2) {
       return new CellError(ErrorType.NA)
+    }
+    if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
+      return new CellError(ErrorType.NUM)
     }
 
     const arg1 = this.evaluateAst(ast.args[0], formulaAddress)
@@ -101,18 +108,18 @@ export class TrigonometryPlugin extends FunctionPlugin {
     if (arg2 instanceof SimpleRangeValue) {
       return new CellError(ErrorType.VALUE)
     }
-    const coercedArg1 = coerceScalarToNumberOrError(arg1, this.interpreter.dateHelper)
-    if (coercedArg1 instanceof CellError)  {
+    const coercedArg1 = this.coerceScalarToNumberOrError(arg1)
+    if (coercedArg1 instanceof CellError) {
       return coercedArg1
     }
-    const coercedArg2 = coerceScalarToNumberOrError(arg2, this.interpreter.dateHelper)
+    const coercedArg2 = this.coerceScalarToNumberOrError(arg2)
     if (coercedArg2 instanceof CellError) {
       return coercedArg2
     }
     return Math.atan2(coercedArg1, coercedArg2)
   }
 
-  public ctg(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
+  public ctg(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.templateWithOneCoercedToNumberArgument(ast, formulaAddress, (coercedArg) => {
       if (coercedArg === 0) {
         return new CellError(ErrorType.DIV_BY_ZERO)

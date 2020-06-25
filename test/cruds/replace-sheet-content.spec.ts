@@ -1,17 +1,18 @@
-import {Config, EmptyValue, HyperFormula} from '../../src'
-import {adr, expect_array_with_same_content} from '../testUtils'
+import {HyperFormula, ExportedCellChange} from '../../src'
+import {simpleCellAddress} from '../../src/Cell'
+import {adr, expectArrayWithSameContent} from '../testUtils'
 
 describe('Replace sheet content - checking if its possible', () => {
   it('no if theres no such sheet', () => {
     const engine = HyperFormula.buildFromArray([[]])
 
-    expect(engine.isItPossibleToReplaceSheetContent('foo')).toEqual(false)
+    expect(engine.isItPossibleToReplaceSheetContent('foo', [])).toEqual(false)
   })
 
   it('yes otherwise', () => {
     const engine = HyperFormula.buildFromArray([[]])
 
-    expect(engine.isItPossibleToReplaceSheetContent('Sheet1')).toEqual(true)
+    expect(engine.isItPossibleToReplaceSheetContent('Sheet1', [])).toEqual(true)
   })
 })
 
@@ -30,16 +31,16 @@ describe('Replace sheet content', () => {
 
   it('should replace sheet content with new values', () => {
     const engine = HyperFormula.buildFromArray([
-        ['1', '2'],
-        ['3', 'foo'],
+      ['1', '2'],
+      ['3', 'foo'],
     ])
 
     engine.setSheetContent('Sheet1', [['3', '4']])
 
     expect(engine.getCellValue(adr('A1'))).toEqual(3)
     expect(engine.getCellValue(adr('B1'))).toEqual(4)
-    expect(engine.getCellValue(adr('A2'))).toEqual(EmptyValue)
-    expect(engine.getCellValue(adr('B2'))).toEqual(EmptyValue)
+    expect(engine.getCellValue(adr('A2'))).toBe(null)
+    expect(engine.getCellValue(adr('B2'))).toBe(null)
   })
 
   /* for now return only new values */
@@ -51,9 +52,9 @@ describe('Replace sheet content', () => {
 
     const changes = engine.setSheetContent('Sheet1', [['3', '4']])
 
-    expect_array_with_same_content(changes, [
-      { sheet: 0, col: 0, row: 0, value: 3 },
-      { sheet: 0, col: 1, row: 0, value: 4 },
+    expectArrayWithSameContent(changes, [
+      new ExportedCellChange(simpleCellAddress(0, 0, 0), 3),
+      new ExportedCellChange(simpleCellAddress(0, 1, 0), 4),
     ])
   })
 
@@ -68,11 +69,11 @@ describe('Replace sheet content', () => {
 
     expect(changes.length).toEqual(4)
 
-    expect_array_with_same_content(changes, [
-      { sheet: 0, col: 0, row: 0, value: 3 },
-      { sheet: 0, col: 1, row: 0, value: 4 },
-      { sheet: 0, col: 0, row: 1, value: EmptyValue },
-      { sheet: 0, col: 1, row: 1, value: EmptyValue },
+    expectArrayWithSameContent(changes, [
+      new ExportedCellChange(simpleCellAddress(0, 0, 0), 3),
+      new ExportedCellChange(simpleCellAddress(0, 1, 0), 4),
+      new ExportedCellChange(simpleCellAddress(0, 0, 1), null),
+      new ExportedCellChange(simpleCellAddress(0, 1, 1), null),
     ])
   })
 
@@ -85,12 +86,12 @@ describe('Replace sheet content', () => {
         ['=Sheet1!A1'],
         ['=Sheet1!B1'],
       ],
-    }, new Config({ matrixDetection: true, matrixDetectionThreshold: 1 }))
+    }, { matrixDetection: true, matrixDetectionThreshold: 1 })
 
     engine.setSheetContent('Sheet1', [['3']])
 
     expect(engine.getCellValue(adr('A1', 1))).toEqual(3)
-    expect(engine.getCellValue(adr('A2', 1))).toEqual(EmptyValue)
+    expect(engine.getCellValue(adr('A2', 1))).toBe(null)
   })
 
   it('should replace content of a sheet with formula matrix', () => {
@@ -106,12 +107,12 @@ describe('Replace sheet content', () => {
     })
 
     engine.setSheetContent('Sheet1', [
-        ['3', '4'],
-        ['foo', '5'],
+      ['3', '4'],
+      ['foo', '5'],
     ])
 
     expect(engine.getCellValue(adr('A1', 1))).toEqual('foo')
-    expect(engine.getCellValue(adr('A2', 1))).toEqual(EmptyValue)
+    expect(engine.getCellValue(adr('A2', 1))).toBe(null)
   })
 
   it('should replace content of a sheet with formula matrix and recalculate range formula', () => {

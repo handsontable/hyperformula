@@ -1,6 +1,5 @@
 import {HyperFormula} from '../../src'
 import {ErrorType} from '../../src/Cell'
-import '../testConfig'
 import {adr, detailedError} from '../testUtils'
 
 describe('Function COLUMNS', () => {
@@ -55,6 +54,6 @@ describe('Function COLUMNS', () => {
 
     engine.addColumns(0, [1, 1])
 
-    console.log(engine.getCellValue(adr('A2')))
+    expect(engine.getCellValue(adr('A2'))).toEqual(3)
   })
 })

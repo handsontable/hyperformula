@@ -1,4 +1,11 @@
-import {TranslationPackage} from '../i18n'
+/**
+ * @license
+ * Copyright (c) 2020 Handsoncode. All rights reserved.
+ */
+
+import {TranslationPackage, UIElement} from '../i18n'
+import {Maybe} from '../Maybe'
+import {NoSheetWithIdError, NoSheetWithNameError, SheetNameAlreadyTakenError} from '../errors'
 
 function canonicalize(sheetDisplayName: string): string {
   return sheetDisplayName.toLowerCase()
@@ -19,17 +26,17 @@ class Sheet {
 export class SheetMapping {
   private readonly mappingFromCanonicalName: Map<string, Sheet> = new Map()
   private readonly mappingFromId: Map<number, Sheet> = new Map()
-  private readonly sheetNamePrefix: string = 'Sheet'
+  private readonly sheetNamePrefix: string
   private lastSheetId = -1
 
   constructor(private languages: TranslationPackage) {
-    this.sheetNamePrefix = languages.interface.NEW_SHEET_PREFIX || this.sheetNamePrefix
+    this.sheetNamePrefix = languages.getUITranslation(UIElement.NEW_SHEET_PREFIX)
   }
 
   public addSheet(newSheetDisplayName: string = `${this.sheetNamePrefix}${this.lastSheetId + 2}`): number {
     const newSheetCanonicalName = canonicalize(newSheetDisplayName)
     if (this.mappingFromCanonicalName.has(newSheetCanonicalName)) {
-      throw new Error(`Sheet ${newSheetDisplayName} already exists`)
+      throw new SheetNameAlreadyTakenError(newSheetDisplayName)
     }
 
     this.lastSheetId++
@@ -50,12 +57,12 @@ export class SheetMapping {
   public fetch = (sheetName: string): number => {
     const sheet = this.mappingFromCanonicalName.get(canonicalize(sheetName))
     if (sheet === undefined) {
-      throw new Error(`Sheet ${sheetName} doesn't exist`)
+      throw new NoSheetWithNameError(sheetName)
     }
     return sheet.id
   }
 
-  public get = (sheetName: string): number | undefined => {
+  public get = (sheetName: string): Maybe<number> => {
     const sheet = this.mappingFromCanonicalName.get(canonicalize(sheetName))
     if (sheet) {
       return sheet.id
@@ -68,8 +75,17 @@ export class SheetMapping {
     return this.fetchSheetById(sheetId).displayName
   }
 
-  public getDisplayName(sheetId: number): string | undefined {
+  public getDisplayName(sheetId: number): Maybe<string> {
     const sheet = this.mappingFromId.get(sheetId)
+    if (sheet) {
+      return sheet.displayName
+    } else {
+      return undefined
+    }
+  }
+
+  public getDisplayNameByName(sheetName: string): Maybe<string> {
+    const sheet = this.mappingFromCanonicalName.get(canonicalize(sheetName))
     if (sheet) {
       return sheet.displayName
     } else {
@@ -95,17 +111,17 @@ export class SheetMapping {
     return this.mappingFromCanonicalName.has(canonicalize(sheetName))
   }
 
-  public renameSheet(sheetId: number, newDisplayName: string): void {
+  public renameSheet(sheetId: number, newDisplayName: string): Maybe<string> {
     const sheet = this.fetchSheetById(sheetId)
 
     const currentDisplayName = sheet.displayName
     if (currentDisplayName === newDisplayName) {
-      return
+      return undefined
     }
 
     const sheetWithThisCanonicalName = this.mappingFromCanonicalName.get(canonicalize(newDisplayName))
     if (sheetWithThisCanonicalName && sheetWithThisCanonicalName.id !== sheet.id) {
-      throw new Error(`Sheet '${newDisplayName}' already exists`)
+      throw new SheetNameAlreadyTakenError(newDisplayName)
     }
 
     const currentCanonicalName = sheet.canonicalName
@@ -113,11 +129,16 @@ export class SheetMapping {
 
     sheet.displayName = newDisplayName
     this.store(sheet)
+    return currentDisplayName
   }
 
   public destroy(): void {
     this.mappingFromCanonicalName.clear()
     this.mappingFromId.clear()
+  }
+
+  public sheetNames(): string[] {
+    return Array.from(this.mappingFromId.values()).map((s) => s.displayName)
   }
 
   private store(sheet: Sheet): void {
@@ -128,7 +149,7 @@ export class SheetMapping {
   private fetchSheetById(sheetId: number): Sheet {
     const sheet = this.mappingFromId.get(sheetId)
     if (sheet === undefined) {
-      throw new Error(`Sheet with id ${sheetId} doesn't exist`)
+      throw new NoSheetWithIdError(sheetId)
     }
     return sheet
   }

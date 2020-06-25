@@ -1,17 +1,14 @@
 import {HyperFormula} from '../src'
-import {Config} from '../src'
 import {CellError, ErrorType, SimpleCellAddress} from '../src/Cell'
-import {enGB, extendFunctions} from '../src/i18n'
 import {FunctionPlugin} from '../src/interpreter/plugin/FunctionPlugin'
 import {ProcedureAst} from '../src/parser'
-import './testConfig.ts'
 import {adr, detailedError} from './testUtils'
 
 class SquarePlugin extends FunctionPlugin {
   public static implementedFunctions = {
     // Key of the mapping describes which function will be used to compute it
-    square: {
-      translationKey: 'SQUARE',
+    'SQUARE': {
+      method: 'square',
     },
   }
 
@@ -41,17 +38,18 @@ class SquarePlugin extends FunctionPlugin {
 }
 
 describe('Documentation example spec', () => {
+  beforeEach(() => {
+    HyperFormula.registerFunctionPlugin(SquarePlugin)
+  })
+
   it('works', () => {
-    const enGBextended = extendFunctions(enGB, {
-      SQUARE: 'SQUARE',
-    })
-    const config = new Config({ functionPlugins: [SquarePlugin], language: enGBextended })
+    HyperFormula.getLanguage('enGB').extendFunctions({SQUARE: 'SQUARE'})
     const engine = HyperFormula.buildFromArray([
       ['=SQUARE(2)'],
       ['=SQUARE()'],
       ['=SQUARE(TRUE())'],
       ['=SQUARE(1/0)'],
-    ], config)
+    ])
     expect(engine.getCellValue(adr('A1'))).toEqual(4)
     expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NA))
     expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.VALUE))

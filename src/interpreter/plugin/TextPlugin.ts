@@ -1,6 +1,11 @@
-import {CellError, ErrorType, InternalCellValue, SimpleCellAddress} from '../../Cell'
-import {ProcedureAst} from '../../parser'
-import {coerceScalarToString} from '../coerce'
+/**
+ * @license
+ * Copyright (c) 2020 Handsoncode. All rights reserved.
+ */
+
+import {CellError, ErrorType, InternalScalarValue, SimpleCellAddress} from '../../Cell'
+import {AstNodeType, ProcedureAst} from '../../parser'
+import {coerceScalarToString} from '../ArithmeticHelper'
 import {FunctionPlugin} from './FunctionPlugin'
 
 /**
@@ -8,11 +13,11 @@ import {FunctionPlugin} from './FunctionPlugin'
  */
 export class TextPlugin extends FunctionPlugin {
   public static implementedFunctions = {
-    concatenate: {
-      translationKey: 'CONCATENATE',
+    'CONCATENATE': {
+      method: 'concatenate',
     },
-    split: {
-      translationKey: 'SPLIT',
+    'SPLIT': {
+      method: 'split',
     },
   }
 
@@ -24,9 +29,12 @@ export class TextPlugin extends FunctionPlugin {
    * @param args
    * @param formulaAddress
    */
-  public concatenate(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
+  public concatenate(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     if (ast.args.length == 0) {
       return new CellError(ErrorType.NA)
+    }
+    if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
+      return new CellError(ErrorType.NUM)
     }
 
     let result = ''
@@ -49,7 +57,13 @@ export class TextPlugin extends FunctionPlugin {
    * @param ast
    * @param formulaAddress
    */
-  public split(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
+  public split(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    if (ast.args.length !== 2) {
+      return new CellError(ErrorType.NA)
+    }
+    if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
+      return new CellError(ErrorType.NUM)
+    }
     const stringArg = ast.args[0]
     const indexArg = ast.args[1]
 

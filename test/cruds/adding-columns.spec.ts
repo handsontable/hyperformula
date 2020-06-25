@@ -1,10 +1,11 @@
-import {Config, EmptyValue, HyperFormula} from '../../src'
+import {HyperFormula, ExportedCellChange} from '../../src'
 import {AbsoluteCellRange} from '../../src/AbsoluteCellRange'
 import { simpleCellAddress} from '../../src/Cell'
 import {ColumnIndex} from '../../src/ColumnSearch/ColumnIndex'
 import { FormulaCellVertex, MatrixVertex} from '../../src/DependencyGraph'
-import '../testConfig'
-import {adr, expect_array_with_same_content, extractMatrixRange, extractRange} from '../testUtils'
+import {adr, expectArrayWithSameContent, extractMatrixRange, extractRange} from '../testUtils'
+import {Config} from '../../src/Config'
+import {SheetSizeLimitExceededError} from '../../src/errors'
 
 describe('Adding column - checking if its possible', () => {
   it('no if starting column is negative', () => {
@@ -70,12 +71,20 @@ describe('Adding column - checking if its possible', () => {
     expect(engine.isItPossibleToAddColumns(0, [4, 1])).toEqual(true)
   })
 
+  it('no if adding column would exceed sheet size limit', () => {
+    const engine = HyperFormula.buildFromArray([
+      Array(Config.defaultConfig.maxColumns - 1).fill('')
+    ])
+
+    expect(engine.isItPossibleToAddColumns(0, [0, 2])).toEqual(false)
+    expect(engine.isItPossibleToAddColumns(0, [0, 1], [5, 1])).toEqual(false)
+  })
+
   it('yes if theres a numeric matrix in place where we add', () => {
-    const config = new Config({matrixDetection: true, matrixDetectionThreshold: 1})
     const engine = HyperFormula.buildFromArray([
       ['1', '2'],
       ['3', '4'],
-    ], config)
+    ], {matrixDetection: true, matrixDetectionThreshold: 1})
     expect(engine.matrixMapping.matrixMapping.size).toEqual(1)
 
     expect(engine.isItPossibleToAddColumns(0, [0, 1])).toEqual(true)
@@ -101,7 +110,7 @@ describe('Adding column - matrix check', () => {
 
     expect(() => {
       engine.addColumns(0, [1, 1])
-    }).toThrow(new Error('It is not possible to add column in column with matrix'))
+    }).toThrowError('Cannot perform this operation, target location has a matrix inside.')
   })
 
   it('should be possible to add row right before matrix', () => {
@@ -112,7 +121,7 @@ describe('Adding column - matrix check', () => {
 
     engine.addColumns(0, [0, 1])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(EmptyValue)
+    expect(engine.getCellValue(adr('A1'))).toBe(null)
     expect(engine.getCellValue(adr('B1'))).toEqual(1)
     expect(engine.getCellValue(adr('C1'))).toEqual(3)
     expect(engine.getCellValue(adr('D1'))).toEqual(1)
@@ -128,7 +137,7 @@ describe('Adding column - matrix check', () => {
 
     expect(engine.getCellValue(adr('A1'))).toEqual(1)
     expect(engine.getCellValue(adr('B1'))).toEqual(3)
-    expect(engine.getCellValue(adr('C1'))).toEqual(EmptyValue)
+    expect(engine.getCellValue(adr('C1'))).toBe(null)
     expect(engine.getCellValue(adr('D1'))).toEqual(1)
   })
 })
@@ -151,8 +160,10 @@ describe('Adding column - reevaluation', () => {
     ])
     const c1 = engine.addressMapping.getCell(adr('C1'))
     const a2 = engine.addressMapping.getCell(adr('A2'))
-    const c1setCellValueSpy = jest.spyOn(c1 as any, 'setCellValue')
-    const a2setCellValueSpy = jest.spyOn(a2 as any, 'setCellValue')
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const c1setCellValueSpy = spyOn(c1 as any, 'setCellValue')
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const a2setCellValueSpy = spyOn(a2 as any, 'setCellValue')
 
     engine.addColumns(0, [1, 1])
 
@@ -165,7 +176,8 @@ describe('Adding column - reevaluation', () => {
       ['1', /* */ '2', '=COLUMNS(A1:B1)'],
     ])
     const c1 = engine.addressMapping.getCell(adr('C1'))
-    const c1setCellValueSpy = jest.spyOn(c1 as any, 'setCellValue')
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const c1setCellValueSpy = spyOn(c1 as any, 'setCellValue')
 
     engine.addColumns(0, [1, 1])
 
@@ -178,12 +190,13 @@ describe('Adding column - reevaluation', () => {
       /* */
       ['1', '2', '=COLUMNS(A1:B1)'],
     ])
-    const c1 = engine.addressMapping.getCell(adr('C1'))
+
+    engine.addressMapping.getCell(adr('C1'))
 
     const changes = engine.addColumns(0, [1, 1])
 
     expect(changes.length).toBe(1)
-    expect(changes).toContainEqual({ sheet: 0, col: 3, row: 0, value: 3 })
+    expect(changes).toContainEqual(new ExportedCellChange(simpleCellAddress(0, 3, 0), 3))
   })
 })
 
@@ -201,7 +214,7 @@ describe('Adding column - FormulaCellVertex#address update', () => {
   })
 })
 
-describe('Adding column', () => {
+describe('Adding column - MatrixVertex', () => {
   it('MatrixVertex#formula should be updated', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '2', '{=TRANSPOSE(A1:B2)}', '{=TRANSPOSE(A1:B2)}'],
@@ -243,13 +256,12 @@ describe('Adding column', () => {
   })
 })
 
-describe('Adding column', () => {
+describe('Adding column - numeric matrix', () => {
   it('add column inside numeric matrix, expand matrix', () => {
-    const config = new Config({ matrixDetection: true, matrixDetectionThreshold: 1})
     const engine = HyperFormula.buildFromArray([
       ['1', '2'],
       ['3', '4'],
-    ], config)
+    ], { matrixDetection: true, matrixDetectionThreshold: 1})
 
     expect(engine.getCellValue(adr('B1'))).toEqual(2)
 
@@ -303,7 +315,8 @@ describe('Adding column - sheet dimensions', () => {
       ['1'],
     ])
 
-    const recalcSpy = jest.spyOn(engine.evaluator as any, 'partialRun')
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const recalcSpy = spyOn(engine.evaluator as any, 'partialRun')
     engine.addColumns(0, [1, 1])
     engine.addColumns(0, [10, 15])
 
@@ -313,20 +326,34 @@ describe('Adding column - sheet dimensions', () => {
       height: 1,
     })
   })
+
+  it('should throw error when trying to expand sheet beyond limits', () => {
+    const engine = HyperFormula.buildFromArray([
+      Array(Config.defaultConfig.maxColumns - 1).fill('')
+    ])
+
+    expect(() => {
+      engine.addColumns(0, [0, 2])
+    }).toThrow(new SheetSizeLimitExceededError())
+
+    expect(() => {
+      engine.addColumns(0, [0, 1], [5, 1])
+    }).toThrow(new SheetSizeLimitExceededError())
+  })
 })
 
 describe('Adding column - column index', () => {
   it('should update column index when adding row', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '=VLOOKUP(1, A1:A1, 1, TRUE())'],
-    ], new Config({ useColumnIndex: true }))
+    ], { useColumnIndex: true })
     const index = (engine.columnSearch as ColumnIndex)
 
-    expect_array_with_same_content([0], index.getValueIndex(0, 0, 1).index)
+    expectArrayWithSameContent([0], index.getValueIndex(0, 0, 1).index)
 
     engine.addColumns(0, [0, 1])
 
-    expect_array_with_same_content([], index.getValueIndex(0, 0, 1).index)
-    expect_array_with_same_content([0], index.getValueIndex(0, 1, 1).index)
+    expectArrayWithSameContent([], index.getValueIndex(0, 0, 1).index)
+    expectArrayWithSameContent([0], index.getValueIndex(0, 1, 1).index)
   })
 })

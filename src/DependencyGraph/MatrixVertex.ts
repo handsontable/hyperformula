@@ -1,9 +1,13 @@
+/**
+ * @license
+ * Copyright (c) 2020 Handsoncode. All rights reserved.
+ */
+
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
 import {CellError, SimpleCellAddress} from '../Cell'
-import {ColumnsSpan} from '../ColumnsSpan'
 import {ErroredMatrix, IMatrix, Matrix, MatrixSize, NotComputedMatrix} from '../Matrix'
 import {Ast} from '../parser'
-import {RowsSpan} from '../RowsSpan'
+import {ColumnsSpan, RowsSpan} from '../Span'
 
 export class MatrixVertex {
   get width(): number {

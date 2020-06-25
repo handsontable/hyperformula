@@ -1,13 +1,12 @@
-import {Config, HyperFormula} from '../../src'
+import {HyperFormula} from '../../src'
 import {ErrorType} from '../../src/Cell'
 import {ConfigParams} from '../../src/Config'
-import {Sheet} from '../../src/GraphBuilder'
-import '../testConfig.ts'
 import {adr, detailedError} from '../testUtils'
+import {Sheet} from '../../src/Sheet'
 
 const sharedExamples = (builder: (sheet: Sheet, config?: Partial<ConfigParams>) => HyperFormula) => {
   describe('VLOOKUP - args validation', () => {
-    it('not enough parameters', function() {
+    it('not enough parameters', () => {
       const engine = builder([
         ['=VLOOKUP(1, A2:B3)'],
       ])
@@ -15,7 +14,7 @@ const sharedExamples = (builder: (sheet: Sheet, config?: Partial<ConfigParams>) 
       expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA))
     })
 
-    it('to many parameters', function() {
+    it('too many parameters', () => {
       const engine = builder([
         ['=VLOOKUP(1, A2:B3, 2, TRUE(), "foo")'],
       ])
@@ -23,7 +22,7 @@ const sharedExamples = (builder: (sheet: Sheet, config?: Partial<ConfigParams>) 
       expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA))
     })
 
-    it('wrong type of first argument', function() {
+    it('wrong type of first argument', () => {
       const engine = builder([
         ['=VLOOKUP(D1:D2, A2:B3, 2, TRUE())'],
       ])
@@ -31,7 +30,7 @@ const sharedExamples = (builder: (sheet: Sheet, config?: Partial<ConfigParams>) 
       expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE))
     })
 
-    it('wrong type of second argument', function() {
+    it('wrong type of second argument', () => {
       const engine = builder([
         ['=VLOOKUP(1, "foo", 2, TRUE())'],
       ])
@@ -39,7 +38,7 @@ const sharedExamples = (builder: (sheet: Sheet, config?: Partial<ConfigParams>) 
       expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE))
     })
 
-    it('wrong type of third argument', function() {
+    it('wrong type of third argument', () => {
       const engine = builder([
         ['=VLOOKUP(1, A2:B3, "foo", TRUE())'],
       ])
@@ -47,7 +46,7 @@ const sharedExamples = (builder: (sheet: Sheet, config?: Partial<ConfigParams>) 
       expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE))
     })
 
-    it('wrong type of fourth argument', function() {
+    it('wrong type of fourth argument', () => {
       const engine = builder([
         ['=VLOOKUP(1, A2:B3, 2, "bar")'],
       ])
@@ -89,6 +88,32 @@ const sharedExamples = (builder: (sheet: Sheet, config?: Partial<ConfigParams>) 
       ])
 
       expect(engine.getCellValue(adr('A6'))).toEqual('b')
+    })
+
+    it('works with wildcards', () => {
+      const engine = builder([
+        ['abd', 'a'],
+        [1, 'b'],
+        ['aaaa', 'c'],
+        ['ddaa', 'd'],
+        ['abcd', 'e'],
+        ['=VLOOKUP("*c*", A1:B5, 2, FALSE())'],
+      ])
+
+      expect(engine.getCellValue(adr('A6'))).toEqual('e')
+    })
+
+    it('on sorted data ignores wildcards', () => {
+      const engine = builder([
+        ['abd', 'a'],
+        [1, 'b'],
+        ['*c*', 'c'],
+        ['ddaa', 'd'],
+        ['abcd', 'e'],
+        ['=VLOOKUP("*c*", A1:B5, 2, TRUE())'],
+      ])
+
+      expect(engine.getCellValue(adr('A6'))).toEqual('c')
     })
 
     it('should find value in unsorted range using linearSearch', () => {
@@ -189,11 +214,11 @@ const sharedExamples = (builder: (sheet: Sheet, config?: Partial<ConfigParams>) 
 
     it('should properly calculate absolute row index', () => {
       const engine = builder([
-          ['=VLOOKUP(3, A3:A5, 1, TRUE())'],
-          ['foo'],
-          ['1'],
-          ['2'],
-          ['3'],
+        ['=VLOOKUP(3, A3:A5, 1, TRUE())'],
+        ['foo'],
+        ['1'],
+        ['2'],
+        ['3'],
       ])
 
       expect(engine.getCellValue(adr('A1'))).toEqual(3)
@@ -239,34 +264,36 @@ const sharedExamples = (builder: (sheet: Sheet, config?: Partial<ConfigParams>) 
 }
 
 describe('ColumnIndex strategy', () => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   sharedExamples((sheet: Sheet, config: any = {}) => {
-    return HyperFormula.buildFromArray(sheet, new Config({
+    return HyperFormula.buildFromArray(sheet, {
       useColumnIndex: true,
       ...config,
-    }))
+    })
   })
 })
 
 describe('BinarySearchStrategy', () => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   sharedExamples((sheet: Sheet, config: any = {}) => {
-    return HyperFormula.buildFromArray(sheet, new Config({
+    return HyperFormula.buildFromArray(sheet, {
       useColumnIndex: false,
       ...config,
-    }))
+    })
   })
 
   it('should calculate indexes properly when using binary search', () => {
     const engine = HyperFormula.buildFromArray([
-        ['=VLOOKUP(4, A5:A10, 1, TRUE())'],
-        [],
-        [],
-        [],
-        ['1'],
-        ['2'],
-        ['3'],
-        ['4'],
-        ['5'],
-    ], new Config({ useColumnIndex: false, vlookupThreshold: 1}))
+      ['=VLOOKUP(4, A5:A10, 1, TRUE())'],
+      [],
+      [],
+      [],
+      ['1'],
+      ['2'],
+      ['3'],
+      ['4'],
+      ['5'],
+    ], {useColumnIndex: false, vlookupThreshold: 1})
 
     expect(engine.getCellValue(adr('A1'))).toEqual(4)
   })
@@ -282,7 +309,7 @@ describe('BinarySearchStrategy', () => {
       ['3'],
       ['4'],
       ['5'],
-    ], new Config({ useColumnIndex: false }))
+    ], {useColumnIndex: false})
 
     expect(engine.getCellValue(adr('A1'))).toEqual(4)
   })

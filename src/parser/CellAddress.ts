@@ -1,4 +1,19 @@
-import {simpleCellAddress, SimpleCellAddress} from '../Cell'
+/**
+ * @license
+ * Copyright (c) 2020 Handsoncode. All rights reserved.
+ */
+
+import {
+  absoluteSheetReference,
+  simpleCellAddress,
+  SimpleCellAddress,
+  simpleColumnAddress,
+  SimpleColumnAddress,
+  simpleRowAddress,
+  SimpleRowAddress,
+} from '../Cell'
+import {columnIndexToLabel} from './addressRepresentationConverters'
+import {AddressWithColumn, AddressWithRow} from './Address'
 
 /** Possible kinds of cell references */
 export enum CellReferenceType {
@@ -15,25 +30,25 @@ export enum CellReferenceType {
   CELL_REFERENCE_ABSOLUTE_ROW = 'CELL_REFERENCE_ABSOLUTE_ROW',
 }
 
-export class CellAddress {
+export class CellAddress implements AddressWithColumn, AddressWithRow {
 
-  public static relative(sheet: number, col: number, row: number) {
+  public static relative(sheet: number | null, col: number, row: number) {
     return new CellAddress(sheet, col, row, CellReferenceType.CELL_REFERENCE_RELATIVE)
   }
 
-  public static absolute(sheet: number, col: number, row: number) {
+  public static absolute(sheet: number | null, col: number, row: number) {
     return new CellAddress(sheet, col, row, CellReferenceType.CELL_REFERENCE_ABSOLUTE)
   }
 
-  public static absoluteCol(sheet: number, col: number, row: number) {
+  public static absoluteCol(sheet: number | null, col: number, row: number) {
     return new CellAddress(sheet, col, row, CellReferenceType.CELL_REFERENCE_ABSOLUTE_COL)
   }
 
-  public static absoluteRow(sheet: number, col: number, row: number) {
+  public static absoluteRow(sheet: number | null, col: number, row: number) {
     return new CellAddress(sheet, col, row, CellReferenceType.CELL_REFERENCE_ABSOLUTE_ROW)
   }
   constructor(
-    public readonly sheet: number,
+    public readonly sheet: number | null,
     public readonly col: number,
     public readonly row: number,
     public readonly type: CellReferenceType,
@@ -46,15 +61,34 @@ export class CellAddress {
    * @param baseAddress - base address for R0C0 shifts
    */
   public toSimpleCellAddress(baseAddress: SimpleCellAddress): SimpleCellAddress {
+    const sheet = absoluteSheetReference(this, baseAddress)
     if (this.type === CellReferenceType.CELL_REFERENCE_ABSOLUTE) {
-      return simpleCellAddress(this.sheet, this.col, this.row)
+      return simpleCellAddress(sheet, this.col, this.row)
     } else if (this.type === CellReferenceType.CELL_REFERENCE_ABSOLUTE_ROW) {
-      return simpleCellAddress(this.sheet, baseAddress.col + this.col, this.row)
+      return simpleCellAddress(sheet, baseAddress.col + this.col, this.row)
     } else if (this.type === CellReferenceType.CELL_REFERENCE_ABSOLUTE_COL) {
-      return simpleCellAddress(this.sheet, this.col, baseAddress.row + this.row)
+      return simpleCellAddress(sheet, this.col, baseAddress.row + this.row)
     } else {
-      return simpleCellAddress(this.sheet, baseAddress.col + this.col, baseAddress.row + this.row)
+      return simpleCellAddress(sheet, baseAddress.col + this.col, baseAddress.row + this.row)
     }
+  }
+
+  public toSimpleColumnAddress(baseAddress: SimpleCellAddress): SimpleColumnAddress {
+    const sheet = absoluteSheetReference(this, baseAddress)
+    let column = this.col
+    if (this.isColumnRelative()) {
+      column += baseAddress.col
+    }
+    return simpleColumnAddress(sheet, column)
+  }
+
+  public toSimpleRowAddress(baseAddress: SimpleCellAddress): SimpleRowAddress {
+    const sheet = absoluteSheetReference(this, baseAddress)
+    let row = this.row
+    if (this.isRowRelative()) {
+      row += baseAddress.row
+    }
+    return simpleRowAddress(sheet, row)
   }
 
   public isRowAbsolute(): boolean {
@@ -73,6 +107,10 @@ export class CellAddress {
     return (this.type === CellReferenceType.CELL_REFERENCE_RELATIVE || this.type === CellReferenceType.CELL_REFERENCE_ABSOLUTE_COL)
   }
 
+  public isAbsolute(): boolean {
+    return (this.type === CellReferenceType.CELL_REFERENCE_ABSOLUTE && this.sheet !== null)
+  }
+
   public shiftedByRows(numberOfRows: number): CellAddress {
     return new CellAddress(this.sheet, this.col, this.row + numberOfRows, this.type)
   }
@@ -82,7 +120,12 @@ export class CellAddress {
   }
 
   public moved(toSheet: number, toRight: number, toBottom: number): CellAddress {
-    return new CellAddress(toSheet, this.col + toRight, this.row + toBottom, this.type)
+    const newSheet = this.sheet === null ? null : toSheet
+    return new CellAddress(newSheet, this.col + toRight, this.row + toBottom, this.type)
+  }
+
+  public withAbsoluteSheet(sheet: number): CellAddress {
+    return new CellAddress(sheet, this.col, this.row, this.type)
   }
 
   public shiftRelativeDimensions(toRight: number, toBottom: number): CellAddress {
@@ -95,5 +138,35 @@ export class CellAddress {
     const col = this.isColumnRelative() ? this.col : this.col + toRight
     const row = this.isRowRelative() ? this.row : this.row + toBottom
     return new CellAddress(this.sheet, col, row, this.type)
+  }
+
+  public hash(withSheet: boolean): string {
+    const sheetPart = withSheet && this.sheet !== null ? `#${this.sheet}` : ''
+    switch (this.type) {
+      case CellReferenceType.CELL_REFERENCE_RELATIVE: {
+        return `${sheetPart}#${this.row}R${this.col}`
+      }
+      case CellReferenceType.CELL_REFERENCE_ABSOLUTE: {
+        return `${sheetPart}#${this.row}A${this.col}`
+      }
+      case CellReferenceType.CELL_REFERENCE_ABSOLUTE_COL: {
+        return `${sheetPart}#${this.row}AC${this.col}`
+      }
+      case CellReferenceType.CELL_REFERENCE_ABSOLUTE_ROW: {
+        return `${sheetPart}#${this.row}AR${this.col}`
+      }
+    }
+  }
+
+  public unparse(baseAddress: SimpleCellAddress): string {
+    const simpleAddress = this.toSimpleCellAddress(baseAddress)
+    const column = columnIndexToLabel(simpleAddress.col)
+    const rowDollar = this.type === CellReferenceType.CELL_REFERENCE_ABSOLUTE || this.type === CellReferenceType.CELL_REFERENCE_ABSOLUTE_ROW ? '$' : ''
+    const colDollar = this.type === CellReferenceType.CELL_REFERENCE_ABSOLUTE || this.type === CellReferenceType.CELL_REFERENCE_ABSOLUTE_COL ? '$' : ''
+    return `${colDollar}${column}${rowDollar}${simpleAddress.row + 1}`
+  }
+
+  public exceedsSheetSizeLimits(maxColumns: number, maxRows: number): boolean {
+    return this.row >= maxRows || this.col >= maxColumns
   }
 }

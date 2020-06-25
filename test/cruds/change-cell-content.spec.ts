@@ -1,21 +1,22 @@
-import {CellError, Config, EmptyValue, HyperFormula, InvalidAddressError, NoSheetWithIdError} from '../../src'
+import {ExportedCellChange, HyperFormula, InvalidAddressError, NoSheetWithIdError} from '../../src'
 import {ErrorType, simpleCellAddress} from '../../src/Cell'
 import {ColumnIndex} from '../../src/ColumnSearch/ColumnIndex'
 import {EmptyCellVertex, MatrixVertex} from '../../src/DependencyGraph'
-import '../testConfig'
-import {adr, detailedError} from '../testUtils'
+import {adr, colEnd, colStart, detailedError, expectArrayWithSameContent, rowEnd, rowStart} from '../testUtils'
+import {Config} from '../../src/Config'
+import {SheetSizeLimitExceededError} from '../../src/errors'
 
 describe('Changing cell content - checking if its possible', () => {
   it('address should have valid coordinates', () => {
     const engine = HyperFormula.buildFromArray([[]])
 
-    expect(engine.isItPossibleToChangeContent(simpleCellAddress(0, -1, 0))).toEqual(false)
+    expect(engine.isItPossibleToSetCellContents(simpleCellAddress(0, -1, 0))).toEqual(false)
   })
 
   it('address should be in existing sheet', () => {
     const engine = HyperFormula.buildFromArray([[]])
 
-    expect(engine.isItPossibleToChangeContent(adr('A1', 1))).toEqual(false)
+    expect(engine.isItPossibleToSetCellContents(adr('A1', 1))).toEqual(false)
   })
 
   it('no if in formula matrix', () => {
@@ -27,24 +28,36 @@ describe('Changing cell content - checking if its possible', () => {
       ['13'],
     ])
 
-    expect(engine.isItPossibleToChangeContent(adr('A3'))).toBe(false)
+    expect(engine.isItPossibleToSetCellContents(adr('A3'))).toBe(false)
+    expect(engine.isItPossibleToSetCellContents(adr('A3'), 1, 1)).toBe(false)
+    expect(engine.isItPossibleToSetCellContents(adr('A1'), 2, 2)).toBe(true)
+    expect(engine.isItPossibleToSetCellContents(adr('A2'), 2, 2)).toBe(false)
+  })
+
+  it('no if content exceeds sheet size limits', () => {
+    const engine = HyperFormula.buildFromArray([])
+    const cellInLastColumn = simpleCellAddress(0, Config.defaultConfig.maxColumns - 1, 0)
+    const cellInLastRow = simpleCellAddress(0, 0, Config.defaultConfig.maxRows - 1)
+    expect(engine.isItPossibleToSetCellContents(cellInLastColumn, 1, 1)).toEqual(true)
+    expect(engine.isItPossibleToSetCellContents(cellInLastColumn, 2, 1)).toEqual(false)
+    expect(engine.isItPossibleToSetCellContents(cellInLastRow, 1, 1)).toEqual(true)
+    expect(engine.isItPossibleToSetCellContents(cellInLastRow, 1, 2)).toEqual(false)
   })
 
   it('yes if numeric matrix', () => {
-    const config = new Config({matrixDetection: true, matrixDetectionThreshold: 1})
     const engine = HyperFormula.buildFromArray([
       ['1', '2'],
       ['3', '4'],
-    ], config)
+    ], {matrixDetection: true, matrixDetectionThreshold: 1})
     expect(engine.matrixMapping.matrixMapping.size).toEqual(1)
 
-    expect(engine.isItPossibleToChangeContent(adr('A2'))).toBe(true)
+    expect(engine.isItPossibleToSetCellContents(adr('A2'))).toBe(true)
   })
 
   it('yes otherwise', () => {
     const engine = HyperFormula.buildFromArray([[]])
 
-    expect(engine.isItPossibleToChangeContent(adr('A1'))).toEqual(true)
+    expect(engine.isItPossibleToSetCellContents(adr('A1'))).toEqual(true)
   })
 })
 
@@ -109,9 +122,9 @@ describe('changing cell content', () => {
 
     const a1 = engine.addressMapping.fetchCell(adr('A1'))
     const a2 = engine.addressMapping.fetchCell(adr('B1'))
-    expect(a1).toEqual(new EmptyCellVertex())
+    expect(a1).toBeInstanceOf(EmptyCellVertex)
     expect(engine.graph.existsEdge(a1, a2)).toBe(true)
-    expect(engine.getCellValue(adr('A1'))).toBe(EmptyValue)
+    expect(engine.getCellValue(adr('A1'))).toBe(null)
   })
 
   it('update formula to empty cell', () => {
@@ -124,9 +137,8 @@ describe('changing cell content', () => {
 
     expect(engine.graph.existsEdge(a1, b1)).toBe(true)
     expect(engine.getCellValue(adr('B1'))).toBe(1)
-
     engine.setCellContents(adr('B1'), [[null]])
-    expect(engine.getCellValue(adr('B1'))).toBe(EmptyValue)
+    expect(engine.getCellValue(adr('B1'))).toBe(null)
     expect(engine.graph.nodes).not.toContain(b1)
     expect(engine.graph.existsEdge(a1, b1)).toBe(false)
   })
@@ -165,9 +177,11 @@ describe('changing cell content', () => {
     ]
     const engine = HyperFormula.buildFromArray(sheet)
     const b1 = engine.addressMapping.getCell(adr('B1'))
-    const b1setCellValueSpy = jest.spyOn(b1 as any, 'setCellValue')
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const b1setCellValueSpy = spyOn(b1 as any, 'setCellValue')
     const c1 = engine.addressMapping.getCell(adr('C1'))
-    const c1setCellValueSpy = jest.spyOn(c1 as any, 'setCellValue')
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const c1setCellValueSpy = spyOn(c1 as any, 'setCellValue')
 
     engine.setCellContents(adr('B1'), [['2']])
 
@@ -184,7 +198,7 @@ describe('changing cell content', () => {
     expect(engine.getCellValue(adr('B1'))).toBe(2)
     engine.setCellContents(adr('B1'), null)
     expect(engine.addressMapping.getCell(adr('B1'))).toBe(null)
-    expect(engine.getCellValue(adr('B1'))).toBe(EmptyValue)
+    expect(engine.getCellValue(adr('B1'))).toBe(null)
   })
 
   it('update value cell to error literal', () => {
@@ -207,6 +221,15 @@ describe('changing cell content', () => {
     expect(engine.getCellValue(adr('A1'))).toEqual('#FOO!')
   })
 
+  it('update value cell to invalid formula', () => {
+    const engine = HyperFormula.buildFromArray([[1]])
+
+    engine.setCellContents(adr('A1'), '=SUM(')
+
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.ERROR, 'Parsing error'))
+    expect(engine.getCellFormula(adr('A1'))).toEqual('=SUM(')
+  })
+
   it('rewrite part of sheet with matrix', () => {
     const sheet = [
       ['1', '2'],
@@ -222,7 +245,7 @@ describe('changing cell content', () => {
     expect(engine.getCellValue(adr('A3'))).toBe(7)
   })
 
-  it('#loadSheet - changing value inside range', () => {
+  it('changing value inside range', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '0'],
       ['2', '0'],
@@ -232,6 +255,30 @@ describe('changing cell content', () => {
 
     engine.setCellContents({sheet: 0, col: 0, row: 0}, '3')
     expect(engine.getCellValue(adr('B3'))).toEqual(8)
+  })
+
+  it('changing value inside column range', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1', '0'],
+      ['2', '0'],
+      ['3', '0', '=SUM(A:B)'],
+    ])
+    expect(engine.getCellValue(adr('C3'))).toEqual(6)
+
+    engine.setCellContents({sheet: 0, col: 1, row: 0}, '3')
+    expect(engine.getCellValue(adr('C3'))).toEqual(9)
+  })
+
+  it('changing value inside row range', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1', '0'],
+      ['2', '0'],
+      ['=SUM(1:2)'],
+    ])
+    expect(engine.getCellValue(adr('A3'))).toEqual(3)
+
+    engine.setCellContents({sheet: 0, col: 1, row: 0}, '3')
+    expect(engine.getCellValue(adr('A3'))).toEqual(6)
   })
 
   it('set formula for the first time', () => {
@@ -257,7 +304,7 @@ describe('changing cell content', () => {
     engine.setCellContents(adr('A1'), null)
     const a1 = engine.addressMapping.getCell(adr('A1'))
     expect(a1).toBe(null)
-    expect(engine.getCellValue(adr('A1'))).toBe(EmptyValue)
+    expect(engine.getCellValue(adr('A1'))).toBe(null)
   })
 
   it('set number for the first time', () => {
@@ -342,11 +389,10 @@ describe('changing cell content', () => {
   })
 
   it('change numeric value inside matrix to another number', () => {
-    const config = new Config({matrixDetection: true, matrixDetectionThreshold: 1})
     const engine = HyperFormula.buildFromArray([
       ['1', '2'],
       ['3', '4'],
-    ], config)
+    ], {matrixDetection: true, matrixDetectionThreshold: 1})
 
     expect(engine.getCellValue(adr('A1'))).toBe(1)
     engine.setCellContents(adr('A1'), '5')
@@ -361,8 +407,10 @@ describe('changing cell content', () => {
     const engine = HyperFormula.buildFromArray(sheet)
     const a2 = engine.addressMapping.getCell(adr('A2'))
     const b2 = engine.addressMapping.getCell(adr('B2'))
-    const a2setCellValueSpy = jest.spyOn(a2 as any, 'setCellValue')
-    const b2setCellValueSpy = jest.spyOn(b2 as any, 'setCellValue')
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const a2setCellValueSpy = spyOn(a2 as any, 'setCellValue')
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const b2setCellValueSpy = spyOn(b2 as any, 'setCellValue')
 
     engine.setCellContents(adr('A1'), '3')
     expect(a2setCellValueSpy).toHaveBeenCalled()
@@ -377,7 +425,7 @@ describe('changing cell content', () => {
 
     expect(() => {
       engine.setCellContents(adr('A2'), '{=TRANSPOSE(C1:C2)}')
-    }).toThrow('You cannot modify only part of an array')
+    }).toThrowError('You cannot modify only part of an array')
   })
 
   it('is not possible to set cell content in sheet which does not exist', () => {
@@ -411,7 +459,8 @@ describe('changing cell content', () => {
 
     engine.setCellContents(adr('C1'), '=COLUMNS(A1:B1)')
     const c1 = engine.addressMapping.getCell(adr('C1'))
-    const c1setCellValueSpy = jest.spyOn(c1 as any, 'setCellValue')
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const c1setCellValueSpy = spyOn(c1 as any, 'setCellValue')
     engine.removeRows(0, [1, 1])
 
     expect(c1setCellValueSpy).toHaveBeenCalled()
@@ -427,12 +476,7 @@ describe('changing cell content', () => {
     const changes = engine.setCellContents(adr('A1'), '2')
 
     expect(changes.length).toBe(1)
-    expect(changes).toContainEqual({
-      sheet: 0,
-      col: 0,
-      row: 0,
-      value: 2,
-    })
+    expect(changes).toContainEqual(new ExportedCellChange(simpleCellAddress(0, 0, 0), 2))
   })
 
   it('returns dependent formula value change', () => {
@@ -445,18 +489,8 @@ describe('changing cell content', () => {
     const changes = engine.setCellContents(adr('A1'), '2')
 
     expect(changes.length).toBe(2)
-    expect(changes).toContainEqual({
-      sheet: 0,
-      col: 0,
-      row: 0,
-      value: 2,
-    })
-    expect(changes).toContainEqual({
-      sheet: 0,
-      col: 1,
-      row: 0,
-      value: 2,
-    })
+    expect(changes[0]).toMatchObject(new ExportedCellChange(simpleCellAddress(0, 0, 0), 2))
+    expect(changes[1]).toMatchObject(new ExportedCellChange(simpleCellAddress(0, 1, 0), 2))
   })
 
   it('returns dependent matrix value changes', () => {
@@ -470,7 +504,7 @@ describe('changing cell content', () => {
     const changes = engine.setCellContents(adr('A1'), '2')
 
     expect(changes.length).toBe(5)
-    expect(changes.map((change) => change.value)).toEqual(expect.arrayContaining([2, 10, 12, 18, 22]))
+    expectArrayWithSameContent(changes.map((change) => change.newValue), [2, 10, 12, 18, 22])
   })
 
   it('returns change of numeric matrix', () => {
@@ -478,18 +512,89 @@ describe('changing cell content', () => {
       ['1', '2'],
       ['3', '4'],
     ]
-    const engine = HyperFormula.buildFromArray(sheet, new Config({matrixDetection: true, matrixDetectionThreshold: 1}))
+    const engine = HyperFormula.buildFromArray(sheet, {matrixDetection: true, matrixDetectionThreshold: 1})
 
     const changes = engine.setCellContents(adr('A1'), '7')
 
     expect(changes.length).toBe(1)
-    expect(changes).toContainEqual({
-      sheet: 0,
-      row: 0,
-      col: 0,
-      value: 7,
-    })
+    expect(changes).toContainEqual(new ExportedCellChange(simpleCellAddress(0, 0, 0), 7 ))
+  })
 
+  it('update empty cell to parsing error ', () => {
+    const engine = HyperFormula.buildFromArray([])
+
+    engine.setCellContents(adr('A1'), '=SUM(')
+
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.ERROR, 'Parsing error'))
+  })
+
+  it('update dependecy value cell to parsing error ', () => {
+    const sheet = [
+      ['1', '=SUM(A1)'],
+    ]
+    const engine = HyperFormula.buildFromArray(sheet)
+
+    engine.setCellContents(adr('A1'), '=SUM(')
+
+    const a1 = engine.addressMapping.fetchCell(adr('A1'))
+    const b1 = engine.addressMapping.fetchCell(adr('B1'))
+    expect(engine.graph.existsEdge(a1, b1)).toBe(true)
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.ERROR, 'Parsing error'))
+    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.ERROR, 'Parsing error'))
+  })
+
+  it('update formula cell to parsing error ', () => {
+    const sheet = [
+      ['1', '=SUM(A1)'],
+    ]
+    const engine = HyperFormula.buildFromArray(sheet)
+
+    engine.setCellContents(adr('B1'), '=SUM(')
+
+    const a1 = engine.addressMapping.fetchCell(adr('A1'))
+    const b1 = engine.addressMapping.fetchCell(adr('B1'))
+    expect(engine.graph.existsEdge(a1, b1)).toBe(false)
+
+    expect(engine.getCellValue(adr('A1'))).toEqual(1)
+    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.ERROR, 'Parsing error'))
+  })
+
+  it('update parsing error to formula', () => {
+    const sheet = [
+      ['1', '=SUM('],
+    ]
+    const engine = HyperFormula.buildFromArray(sheet)
+
+    engine.setCellContents(adr('B1'), '=SUM(A1)')
+
+    expect(engine.getCellValue(adr('B1'))).toEqual(1)
+  })
+
+  it('update empty cell to unparsable matrix formula', () => {
+    const engine = HyperFormula.buildFromArray([])
+
+    engine.setCellContents(adr('A1'), '{=TRANSPOSE(}')
+
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.ERROR, 'Parsing error'))
+    expect(engine.getCellFormula(adr('A1'))).toEqual('{=TRANSPOSE(}')
+  })
+
+  it('should throw when trying to set cell content outside sheet limits', () => {
+    const engine = HyperFormula.buildFromArray([])
+    const cellInLastColumn = simpleCellAddress(0, Config.defaultConfig.maxColumns, 0)
+    const cellInLastRow = simpleCellAddress(0, 0, Config.defaultConfig.maxRows)
+
+    expect(() => engine.setCellContents(cellInLastColumn, '1')).toThrow(new SheetSizeLimitExceededError())
+    expect(() => engine.setCellContents(cellInLastRow, '1')).toThrow(new SheetSizeLimitExceededError())
+  })
+
+  it('setting empty cells outside sheet limits does not produce error', () => {
+    const engine = HyperFormula.buildFromArray([])
+    const cellInLastColumn = simpleCellAddress(0, Config.defaultConfig.maxColumns, 0)
+    const cellInLastRow = simpleCellAddress(0, 0, Config.defaultConfig.maxRows)
+
+    expect(() => engine.setCellContents(cellInLastColumn, null)).not.toThrow()
+    expect(() => engine.setCellContents(cellInLastRow, null)).not.toThrow()
   })
 })
 
@@ -530,7 +635,8 @@ describe('change multiple cells contents', () => {
       ['4', '5', '6'],
     ]
     const engine = HyperFormula.buildFromArray(sheet)
-    const evaluatorCallSpy = jest.spyOn(engine.evaluator as any, 'partialRun')
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const evaluatorCallSpy = spyOn(engine.evaluator as any, 'partialRun')
 
     engine.setCellContents(adr('B1'), [
       ['12', '13'],
@@ -549,7 +655,7 @@ describe('change multiple cells contents', () => {
 
     expect(() => {
       engine.setCellContents(adr('A1'), [['42', '{=MMULT(A1:B2,A1:B2)}']])
-    }).toThrow('Cant change matrices in batch operation')
+    }).toThrowError('Cant change matrices in batch operation')
     expect(engine.getCellValue(adr('A1'))).toBe(1)
   })
 
@@ -564,7 +670,7 @@ describe('change multiple cells contents', () => {
     const changes = engine.setCellContents(adr('A1'), [['7', '8'], ['9', '10']])
 
     expect(changes.length).toEqual(4)
-    expect(changes.map((change) => change.value)).toEqual(expect.arrayContaining([7, 8, 9, 10]))
+    expectArrayWithSameContent(changes.map((change) => change.newValue), [7, 8, 9, 10])
   })
 
   it('returns changes of mutliple values dependent formulas', () => {
@@ -579,7 +685,16 @@ describe('change multiple cells contents', () => {
     const changes = engine.setCellContents(adr('A1'), [['7', '8'], ['9', '10']])
 
     expect(changes.length).toEqual(6)
-    expect(changes.map((change) => change.value)).toEqual(expect.arrayContaining([7, 8, 9, 10, 15, 18]))
+    expectArrayWithSameContent(changes.map((change) => change.newValue), [7, 8, 9, 10, 15, 18])
+  })
+
+  it('should throw when trying to set cell contents outside sheet limits', () => {
+    const engine = HyperFormula.buildFromArray([])
+    const cellInLastColumn = simpleCellAddress(0, Config.defaultConfig.maxColumns - 1, 0)
+    const cellInLastRow = simpleCellAddress(0, 0, Config.defaultConfig.maxRows - 1)
+
+    expect(() => engine.setCellContents(cellInLastColumn, [['1', '2']])).toThrow(new SheetSizeLimitExceededError())
+    expect(() => engine.setCellContents(cellInLastRow, [['1'], ['2']])).toThrow(new SheetSizeLimitExceededError())
   })
 })
 
@@ -588,24 +703,24 @@ describe('updating column index', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '2'],
       ['3', '15'],
-    ], new Config({matrixDetection: false, vlookupThreshold: 1, useColumnIndex: true}))
+    ], {matrixDetection: false, vlookupThreshold: 1, useColumnIndex: true})
 
     engine.setCellContents(adr('B2'), '8')
 
-    expect((engine.columnSearch as ColumnIndex).getValueIndex(0, 1, 4).index).toEqual(expect.arrayContaining([]))
-    expect((engine.columnSearch as ColumnIndex).getValueIndex(0, 1, 8).index).toEqual(expect.arrayContaining([1]))
+    expectArrayWithSameContent((engine.columnSearch as ColumnIndex).getValueIndex(0, 1, 4).index, [])
+    expectArrayWithSameContent((engine.columnSearch as ColumnIndex).getValueIndex(0, 1, 8).index, [1])
   })
 
   it('should update column index when changing value inside numeric matrix', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '2'],
       ['3', '15'],
-    ], new Config({matrixDetection: true, matrixDetectionThreshold: 1, vlookupThreshold: 1, useColumnIndex: true}))
+    ], {matrixDetection: true, matrixDetectionThreshold: 1, vlookupThreshold: 1, useColumnIndex: true})
 
     engine.setCellContents(adr('B2'), '8')
 
-    expect((engine.columnSearch as ColumnIndex).getValueIndex(0, 1, 4).index).toEqual(expect.arrayContaining([]))
-    expect((engine.columnSearch as ColumnIndex).getValueIndex(0, 1, 8).index).toEqual(expect.arrayContaining([1]))
+    expectArrayWithSameContent((engine.columnSearch as ColumnIndex).getValueIndex(0, 1, 4).index, [])
+    expectArrayWithSameContent((engine.columnSearch as ColumnIndex).getValueIndex(0, 1, 8).index, [1])
   })
 })
 
@@ -614,7 +729,7 @@ describe('numeric matrices', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '2'],
       ['3', '4'],
-    ], new Config({matrixDetection: true, matrixDetectionThreshold: 1}))
+    ], {matrixDetection: true, matrixDetectionThreshold: 1})
 
     engine.setCellContents(adr('A1'), '7')
 
@@ -627,7 +742,7 @@ describe('numeric matrices', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '2'],
       ['3', '4'],
-    ], new Config({matrixDetection: true, matrixDetectionThreshold: 1}))
+    ], {matrixDetection: true, matrixDetectionThreshold: 1})
 
     engine.setCellContents(adr('A1'), 'foo')
 
@@ -643,12 +758,98 @@ describe('numeric matrices', () => {
       [null],
       ['5', '6'],
       ['7', '8'],
-    ], new Config({matrixDetection: true, matrixDetectionThreshold: 1}))
+    ], {matrixDetection: true, matrixDetectionThreshold: 1})
 
     engine.setCellContents(adr('A1'), 'foo')
 
     expect(engine.graph.nodesCount()).toBe(5)
     expect(Array.from(engine.matrixMapping.numericMatrices()).length).toBe(1)
     expect(engine.getCellValue(adr('A1'))).toBe('foo')
+  })
+})
+
+describe('column ranges', () => {
+  it('works', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1', '2', '=SUM(A:B)']
+    ])
+
+    engine.setCellContents(adr('A1'), '3')
+
+    expect(engine.getCellValue(adr('C1'))).toEqual(5)
+  })
+
+  it('works when new content is added beyond previous sheet size', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1', '2', '=SUM(A:B)']
+    ])
+
+    engine.setCellContents(adr('A2'), '3')
+
+    const range = engine.rangeMapping.fetchRange(colStart('A'), colEnd('B'))
+    const a2 = engine.addressMapping.fetchCell(adr('A2'))
+    expect(engine.graph.existsEdge(a2, range)).toEqual(true)
+    expect(engine.getCellValue(adr('C1'))).toEqual(6)
+  })
+
+  it('works when adding matrix', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=SUM(B:C)'],
+      ['1'],
+      ['2'],
+    ])
+
+    engine.setCellContents(adr('B1'), '{=TRANSPOSE(A2:A3)}')
+
+    const range = engine.rangeMapping.fetchRange(colStart('B'), colEnd('C'))
+    const b1 = engine.addressMapping.fetchCell(adr('B1'))
+    const c1 = engine.addressMapping.fetchCell(adr('C1'))
+    expect(engine.graph.existsEdge(b1, range)).toEqual(true)
+    expect(engine.graph.existsEdge(c1, range)).toEqual(true)
+    expect(engine.getCellValue(adr('A1'))).toEqual(3)
+  })
+})
+
+describe('row ranges', () => {
+  it('works', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1'],
+      ['2'],
+      ['=SUM(1:2)']
+    ])
+
+    engine.setCellContents(adr('A1'), '3')
+
+    expect(engine.getCellValue(adr('A3'))).toEqual(5)
+  })
+
+  it('works when new content is added beyond previous sheet size', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1'],
+      ['2'],
+      ['=SUM(1:2)']
+    ])
+
+    engine.setCellContents(adr('B1'), '3')
+
+    const range = engine.rangeMapping.fetchRange(rowStart(1), rowEnd(2))
+    const b1 = engine.addressMapping.fetchCell(adr('B1'))
+    expect(engine.graph.existsEdge(b1, range)).toEqual(true)
+    expect(engine.getCellValue(adr('A3'))).toEqual(6)
+  })
+
+  it('works when adding matrix', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=SUM(2:3)', '1', '2'],
+    ])
+
+    engine.setCellContents(adr('A2'), '{=TRANSPOSE(B1:C1)}')
+
+    const range = engine.rangeMapping.fetchRange(rowStart(2), rowEnd(3))
+    const a2 = engine.addressMapping.fetchCell(adr('A2'))
+    const a3 = engine.addressMapping.fetchCell(adr('A3'))
+    expect(engine.graph.existsEdge(a2, range)).toEqual(true)
+    expect(engine.graph.existsEdge(a3, range)).toEqual(true)
+    expect(engine.getCellValue(adr('A1'))).toEqual(3)
   })
 })

@@ -1,19 +1,27 @@
-import {CellError, ErrorType, InternalCellValue, SimpleCellAddress} from '../../Cell'
-import {ProcedureAst} from '../../parser'
-import {coerceToRange} from '../coerce'
+/**
+ * @license
+ * Copyright (c) 2020 Handsoncode. All rights reserved.
+ */
+
+import {CellError, ErrorType, InternalScalarValue, SimpleCellAddress} from '../../Cell'
+import {AstNodeType, ProcedureAst} from '../../parser'
+import {coerceToRange} from '../ArithmeticHelper'
 import {SimpleRangeValue} from '../InterpreterValue'
 import {FunctionPlugin} from './FunctionPlugin'
 
 export class CorrelPlugin extends FunctionPlugin {
   public static implementedFunctions = {
-    correl: {
-      translationKey: 'CORREL',
+    'CORREL': {
+      method: 'correl',
     },
   }
 
-  public correl(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
+  public correl(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     if (ast.args.length != 2) {
       return new CellError(ErrorType.NA)
+    }
+    if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
+      return new CellError(ErrorType.NUM)
     }
 
     const dataX = coerceToRange(this.evaluateAst(ast.args[0], formulaAddress))

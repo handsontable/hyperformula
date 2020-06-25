@@ -1,21 +1,22 @@
-import {EmptyValue, HyperFormula} from '../../src'
+import {HyperFormula} from '../../src'
 import {AbsoluteCellRange} from '../../src/AbsoluteCellRange'
-import {adr, detailedError} from '../testUtils'
+import {adr} from '../testUtils'
 
 describe('Set matrix empty', () => {
   it('should set matrix empty', () => {
     const engine = HyperFormula.buildFromArray([
-        ['1', '2'],
-        ['{=TRANSPOSE(A1:B1)}'],
-        ['{=TRANSPOSE(A1:B1)}'],
+      ['1', '2'],
+      ['{=TRANSPOSE(A1:B1)}'],
+      ['{=TRANSPOSE(A1:B1)}'],
     ])
     const dependencyGraph = engine.dependencyGraph
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const matrixVertex = dependencyGraph.matrixMapping.getMatrix(AbsoluteCellRange.spanFrom(adr('A2'), 1, 2))!
 
     dependencyGraph.setMatrixEmpty(matrixVertex)
 
-    expect(engine.getCellValue(adr('A2'))).toEqual(EmptyValue)
-    expect(engine.getCellValue(adr('A3'))).toEqual(EmptyValue)
+    expect(engine.getCellValue(adr('A2'))).toBe(null)
+    expect(engine.getCellValue(adr('A3'))).toBe(null)
     expect(dependencyGraph.matrixMapping.matrixMapping.size).toEqual(0)
   })
 
@@ -26,12 +27,13 @@ describe('Set matrix empty', () => {
       ['{=TRANSPOSE(A1:B1)}'],
     ])
     const dependencyGraph = engine.dependencyGraph
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const matrixVertex = dependencyGraph.matrixMapping.getMatrix(AbsoluteCellRange.spanFrom(adr('A2'), 1, 2))!
 
     dependencyGraph.setMatrixEmpty(matrixVertex)
 
-    expect(engine.getCellValue(adr('A2'))).toEqual(EmptyValue)
-    expect(engine.getCellValue(adr('A3'))).toEqual(EmptyValue)
+    expect(engine.getCellValue(adr('A2'))).toBe(null)
+    expect(engine.getCellValue(adr('A3'))).toBe(null)
     expect(dependencyGraph.matrixMapping.matrixMapping.size).toEqual(0)
 
     const formula = dependencyGraph.fetchCell(adr('C1'))
@@ -51,12 +53,13 @@ describe('Set matrix empty', () => {
       ['{=TRANSPOSE(A1:B1)}'],
     ])
     const dependencyGraph = engine.dependencyGraph
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const matrixVertex = dependencyGraph.matrixMapping.getMatrix(AbsoluteCellRange.spanFrom(adr('A2'), 1, 2))!
 
     dependencyGraph.setMatrixEmpty(matrixVertex)
 
-    expect(engine.getCellValue(adr('A2'))).toEqual(EmptyValue)
-    expect(engine.getCellValue(adr('A3'))).toEqual(EmptyValue)
+    expect(engine.getCellValue(adr('A2'))).toBe(null)
+    expect(engine.getCellValue(adr('A3'))).toBe(null)
     expect(dependencyGraph.matrixMapping.matrixMapping.size).toEqual(1)
 
     const formulaMatrix = dependencyGraph.fetchCell(adr('C1'))
@@ -72,7 +75,9 @@ describe('Set matrix empty', () => {
       ['{=TRANSPOSE(A1:B1)}'],
     ])
     const dependencyGraph = engine.dependencyGraph
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const matrixVertex = dependencyGraph.matrixMapping.getMatrix(AbsoluteCellRange.spanFrom(adr('A2'), 1, 2))!
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const rangeVertex  = dependencyGraph.rangeMapping.getRange(adr('A2'), adr('A3'))!
     expect(dependencyGraph.existsEdge(matrixVertex, rangeVertex)).toBe(true)
 
@@ -97,7 +102,9 @@ describe('Set matrix empty', () => {
       ['{=TRANSPOSE(A1:B1)}'],
     ])
     const dependencyGraph = engine.dependencyGraph
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const matrixVertex = dependencyGraph.matrixMapping.getMatrix(AbsoluteCellRange.spanFrom(adr('A2'), 1, 2))!
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const rangeVertex  = dependencyGraph.rangeMapping.getRange(adr('A1'), adr('A2'))!
     expect(dependencyGraph.existsEdge(matrixVertex, rangeVertex)).toBe(true)
 

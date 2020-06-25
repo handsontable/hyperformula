@@ -1,47 +1,22 @@
-import {AbsoluteCellRange} from '../../AbsoluteCellRange'
-import {EmptyValue, InternalCellValue, SimpleCellAddress, simpleCellAddress} from '../../Cell'
-import {ColumnsSpan} from '../../ColumnsSpan'
-import {Sheet} from '../../GraphBuilder'
-import {RowsSpan} from '../../RowsSpan'
+/**
+ * @license
+ * Copyright (c) 2020 Handsoncode. All rights reserved.
+ */
+
+import {EmptyValue, InternalCellValue, SimpleCellAddress} from '../../Cell'
+import {ColumnsSpan, RowsSpan} from '../../Span'
 import {MatrixVertex} from '../index'
 import {CellVertex} from '../Vertex'
-import {IChooseAddressMapping} from './ChooseAddressMappingPolicy'
+import {ChooseAddressMapping} from './ChooseAddressMappingPolicy'
 import {IAddressMappingStrategy} from './IAddressMappingStrategy'
-
-/**
- * Returns actual width, height and fill ratio of a sheet
- *
- * @param sheet - two-dimmensional array sheet representation
- */
-export function findBoundaries(sheet: Sheet): ({ width: number, height: number, fill: number }) {
-  let maxWidth = 0
-  let cellsCount = 0
-  for (let currentRow = 0; currentRow < sheet.length; currentRow++) {
-    const currentRowWidth = sheet[currentRow].length
-    if (maxWidth === undefined || maxWidth < currentRowWidth) {
-      maxWidth = currentRowWidth
-    }
-    for (let currentCol = 0; currentCol < currentRowWidth; currentCol++) {
-      const currentValue = sheet[currentRow][currentCol]
-      if (currentValue !== '') {
-        cellsCount++
-      }
-    }
-  }
-  const sheetSize = sheet.length * maxWidth
-
-  return {
-    height: sheet.length,
-    width: maxWidth,
-    fill: sheetSize === 0 ? 0 : cellsCount / sheetSize,
-  }
-}
+import {NoSheetWithIdError} from '../../errors'
+import {Sheet, SheetBoundaries} from '../../Sheet'
 
 export class AddressMapping {
   private mapping: Map<number, IAddressMappingStrategy> = new Map()
 
   constructor(
-    private readonly policy: IChooseAddressMapping,
+    private readonly policy: ChooseAddressMapping
   ) {
   }
 
@@ -49,7 +24,7 @@ export class AddressMapping {
   public getCell(address: SimpleCellAddress): CellVertex | null {
     const sheetMapping = this.mapping.get(address.sheet)
     if (!sheetMapping) {
-      throw Error('Unknown sheet id')
+      throw new NoSheetWithIdError(address.sheet)
     }
     return sheetMapping.getCell(address)
   }
@@ -57,7 +32,7 @@ export class AddressMapping {
   public fetchCell(address: SimpleCellAddress): CellVertex {
     const sheetMapping = this.mapping.get(address.sheet)
     if (!sheetMapping) {
-      throw Error('Unknown sheet id')
+      throw  new NoSheetWithIdError(address.sheet)
     }
     const vertex = sheetMapping.getCell(address)
     if (!vertex) {
@@ -69,7 +44,7 @@ export class AddressMapping {
   public strategyFor(sheetId: number): IAddressMappingStrategy {
     const strategy = this.mapping.get(sheetId)
     if (!strategy) {
-      throw Error('Unknown sheet id')
+      throw new NoSheetWithIdError(sheetId)
     }
 
     return strategy
@@ -83,8 +58,8 @@ export class AddressMapping {
     this.mapping.set(sheetId, strategy)
   }
 
-  public autoAddSheet(sheetId: number, sheet: Sheet) {
-    const {height, width, fill} = findBoundaries(sheet)
+  public autoAddSheet(sheetId: number, sheet: Sheet, sheetBoundaries: SheetBoundaries) {
+    const {height, width, fill} = sheetBoundaries
     const strategyConstructor = this.policy.call(fill)
     this.addSheet(sheetId, new strategyConstructor(width, height))
   }
@@ -131,7 +106,7 @@ export class AddressMapping {
   public getHeight(sheetId: number): number {
     const sheetMapping = this.mapping.get(sheetId)
     if (!sheetMapping) {
-      throw Error('Sheet does not exist')
+      throw new NoSheetWithIdError(sheetId)
     }
     return sheetMapping.getHeight()
   }
@@ -140,7 +115,7 @@ export class AddressMapping {
   public getWidth(sheetId: number): number {
     const sheetMapping = this.mapping.get(sheetId)
     if (!sheetMapping) {
-      throw Error('Sheet does not exist')
+      throw new NoSheetWithIdError(sheetId)
     }
     return sheetMapping.getWidth()
   }
@@ -181,43 +156,20 @@ export class AddressMapping {
     sheetMapping.removeColumns(removedColumns)
   }
 
-  public* verticesFromRange(range: AbsoluteCellRange): IterableIterator<CellVertex> {
-    for (const address of range.addresses()) {
-      const vertex = this.getCell(address)
-      if (vertex) {
-        yield vertex
-      }
-    }
+  public* verticesFromRowsSpan(rowsSpan: RowsSpan): IterableIterator<CellVertex> {
+    yield* this.mapping.get(rowsSpan.sheet)!.verticesFromRowsSpan(rowsSpan) // eslint-disable-line @typescript-eslint/no-non-null-assertion
   }
 
   public* verticesFromColumnsSpan(columnsSpan: ColumnsSpan): IterableIterator<CellVertex> {
-    yield* this.mapping.get(columnsSpan.sheet)!.verticesFromColumnsSpan(columnsSpan)
+    yield* this.mapping.get(columnsSpan.sheet)!.verticesFromColumnsSpan(columnsSpan) // eslint-disable-line @typescript-eslint/no-non-null-assertion
   }
 
-  public* verticesFromRowsSpan(rowsSpan: RowsSpan): IterableIterator<CellVertex> {
-    yield* this.mapping.get(rowsSpan.sheet)!.verticesFromRowsSpan(rowsSpan)
+  public* entriesFromRowsSpan(rowsSpan: RowsSpan): IterableIterator<[SimpleCellAddress, CellVertex]> {
+    yield* this.mapping.get(rowsSpan.sheet)!.entriesFromRowsSpan(rowsSpan)
   }
 
-  public* valuesFromSheet(sheet: number): IterableIterator<[InternalCellValue, SimpleCellAddress]> {
-    const sheetMapping = this.mapping.get(sheet)
-    if (sheetMapping) {
-      yield* this.valuesFromRange(AbsoluteCellRange.spanFrom(simpleCellAddress(sheet, 0, 0), sheetMapping.getWidth(), sheetMapping.getHeight()))
-    }
-  }
-
-  public* valuesFromRange(range: AbsoluteCellRange): IterableIterator<[InternalCellValue, SimpleCellAddress]> {
-    for (const address of range.addresses()) {
-      const value = this.getCellValue(address)
-      if (value !== EmptyValue) {
-        yield [value, address]
-      }
-    }
-  }
-
-  public* entriesFromRange(range: AbsoluteCellRange): IterableIterator<[SimpleCellAddress, CellVertex | null]> {
-    for (const address of range.addresses()) {
-      yield [address, this.getCell(address)]
-    }
+  public* entriesFromColumnsSpan(columnsSpan: ColumnsSpan): IterableIterator<[SimpleCellAddress, CellVertex]> {
+    yield* this.mapping.get(columnsSpan.sheet)!.entriesFromColumnsSpan(columnsSpan)
   }
 
   public* entries(): IterableIterator<[SimpleCellAddress, CellVertex | null]> {
@@ -233,14 +185,6 @@ export class AddressMapping {
     } else {
       throw new Error('Sheet does not exists')
     }
-  }
-
-  public* verticesFromColumn(sheet: number, column: number): IterableIterator<CellVertex> {
-    yield* this.mapping.get(sheet)!.verticesFromColumn(column)
-  }
-
-  public* verticesFromRow(sheet: number, row: number): IterableIterator<CellVertex> {
-    yield* this.mapping.get(sheet)!.verticesFromRow(row)
   }
 
   public destroy(): void {

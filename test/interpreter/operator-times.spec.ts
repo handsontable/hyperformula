@@ -1,6 +1,5 @@
 import {HyperFormula} from '../../src'
 import {ErrorType} from '../../src/Cell'
-import '../testConfig'
 import {adr, detailedError} from '../testUtils'
 
 describe('Operator TIMES', () => {
@@ -10,6 +9,14 @@ describe('Operator TIMES', () => {
     ])
 
     expect(engine.getCellValue(adr('A1'))).toBe(24)
+  })
+
+  it('no -0', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=(-12)*0'],
+    ])
+
+    expect(engine.getCellValue(adr('A1'))).toBe(0)
   })
 
   it('use number coerce', () => {
@@ -63,7 +70,7 @@ describe('Operator TIMES', () => {
 
   it('Times propagates errors correctly', () => {
     const engine = HyperFormula.buildFromArray([
-      ['1','2','=(1/0)*2','=2*(1/0)', '=(A1:B1)*(1/0)', '=(1/0)*(A1:B1)'],
+      ['1', '2', '=(1/0)*2', '=2*(1/0)', '=(A1:B1)*(1/0)', '=(1/0)*(A1:B1)'],
     ])
 
     expect(engine.getCellValue(adr('C1'))).toEqual(detailedError(ErrorType.DIV_BY_ZERO))

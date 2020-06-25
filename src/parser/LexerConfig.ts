@@ -1,6 +1,10 @@
+/**
+ * @license
+ * Copyright (c) 2020 Handsoncode. All rights reserved.
+ */
+
 import {createToken, Lexer, TokenType} from 'chevrotain'
 import {ErrorType} from '../Cell'
-import {TranslationPackage} from '../i18n'
 import {ParserConfig} from './ParserConfig'
 
 /* arithmetic */
@@ -38,49 +42,25 @@ export const LessThanOrEqualOp = createToken({name: 'LessThanOrEqualOp', pattern
 export const ConcatenateOp = createToken({name: 'ConcatenateOp', pattern: /&/})
 
 /* addresses */
-export const CellReference = createToken({name: 'CellReference', pattern: Lexer.NA})
 export const additionalCharactersAllowedInQuotes = ' ' // It's included in regexps, so escape characters which have special regexp semantics
 export const sheetNameRegexp = `([A-Za-z0-9_\u00C0-\u02AF]+|'[A-Za-z0-9${additionalCharactersAllowedInQuotes}_\u00C0-\u02AF]+')!`
-export const RelativeCell = createToken({
-  name: 'RelativeCell',
-  pattern: /[A-Za-z]+[0-9]+/,
-  categories: CellReference,
+
+export const CellReference = createToken({
+  name: 'CellReference',
+  pattern: new RegExp(`\(${sheetNameRegexp}\)?\\$?[A-Za-z]+\\$?[0-9]+`),
 })
-export const AbsoluteColCell = createToken({
-  name: 'AbsoluteColCell',
-  pattern: /\$[A-Za-z]+[0-9]+/,
-  categories: CellReference,
+
+export const ColumnRange = createToken({
+  name: 'ColumnRange',
+  pattern: new RegExp(`\(${sheetNameRegexp}\)?\\$?[A-Za-z]+:\(${sheetNameRegexp}\)?\\$?[A-Za-z]+`),
 })
-export const AbsoluteRowCell = createToken({
-  name: 'AbsoluteRowCell',
-  pattern: /[A-Za-z]+\$[0-9]+/,
-  categories: CellReference,
+
+export const RowRange = createToken({
+  name: 'RowRange',
+  pattern: new RegExp(`\(${sheetNameRegexp}\)?\\$?[0-9]+:\(${sheetNameRegexp}\)?\\$?[0-9]+`),
 })
-export const AbsoluteCell = createToken({
-  name: 'AbsoluteCell',
-  pattern: /\$[A-Za-z]+\$[0-9]+/,
-  categories: CellReference,
-})
-export const SheetRelativeCell = createToken({
-  name: 'SheetRelativeCell',
-  pattern: new RegExp(`${sheetNameRegexp}[A-Za-z]+[0-9]+`),
-  categories: CellReference,
-})
-export const SheetAbsoluteColCell = createToken({
-  name: 'SheetAbsoluteColCell',
-  pattern: new RegExp(`${sheetNameRegexp}\\$[A-Za-z]+[0-9]+`),
-  categories: CellReference,
-})
-export const SheetAbsoluteRowCell = createToken({
-  name: 'SheetAbsoluteRowCell',
-  pattern: new RegExp(`${sheetNameRegexp}[A-Za-z]+\\$[0-9]+`),
-  categories: CellReference,
-})
-export const SheetAbsoluteCell = createToken({
-  name: 'SheetAbsoluteCell',
-  pattern: new RegExp(`${sheetNameRegexp}\\$[A-Za-z]+\\$[0-9]+`),
-  categories: CellReference,
-})
+
+
 export const RangeSeparator = createToken({name: 'RangeSeparator', pattern: /:/})
 
 /* parenthesis */
@@ -90,8 +70,8 @@ export const RParen = createToken({name: 'RParen', pattern: /\)/})
 /* prcoedures */
 export const ProcedureName = createToken({name: 'ProcedureName', pattern: /(\.?[0-9A-Za-z\u00C0-\u02AF]+)+\(/})
 
-/* terminals */
-export const NumberLiteral = createToken({name: 'NumberLiteral', pattern: /[\d]*[.]?[\d]+/  })
+/* named expressions */
+export const NamedExpression = createToken({name: 'NamedExpression', pattern: /[A-Za-z\u00C0-\u02AF_][0-9\.A-Za-z_\u00C0-\u02AF_]+/})
 
 /* string literal */
 export const StringLiteral = createToken({name: 'StringLiteral', pattern: /"([^"\\]*(\\.[^"\\]*)*)"/})
@@ -103,27 +83,29 @@ export const ErrorLiteral = createToken({name: 'ErrorLiteral', pattern: /#[A-Za-
 export const WhiteSpace = createToken({
   name: 'WhiteSpace',
   pattern: /[ \t\n\r]+/,
-  group: Lexer.SKIPPED,
 })
 
 export interface ILexerConfig {
   ArgSeparator: TokenType,
-  OffsetProcedureName: TokenType
+  NumberLiteral: TokenType,
+  OffsetProcedureName: TokenType,
   allTokens: TokenType[],
   errorMapping: Record<string, ErrorType>,
-  functionMapping: Record<string, string>
+  functionMapping: Record<string, string>,
+  decimalSeparator: '.' | ',',
+  maxColumns: number,
+  maxRows: number,
 }
 
 export const buildLexerConfig = (config: ParserConfig): ILexerConfig => {
-  /* separator */
-  const ArgSeparator = createToken({name: 'ArgSeparator', pattern: config.functionArgSeparator})
-  const offsetProcedureNameLiteral = config.language.functions.OFFSET || 'OFFSET'
-  const OffsetProcedureName = createToken({
-    name: 'OffsetProcedureName',
-    pattern: new RegExp(offsetProcedureNameLiteral, 'i'),
-  })
+  const offsetProcedureNameLiteral = config.translationPackage.getFunctionTranslation('OFFSET')
   const errorMapping = config.errorMapping
-  const functionMapping = buildFunctionMapping(config.language)
+  const functionMapping = config.translationPackage.buildFunctionMapping()
+
+  /* configurable tokens */
+  const ArgSeparator = createToken({name: 'ArgSeparator', pattern: config.functionArgSeparator})
+  const NumberLiteral = createToken({name: 'NumberLiteral', pattern: new RegExp(`[\\d]*[${config.decimalSeparator}]?[\\d]+`)})
+  const OffsetProcedureName = createToken({name: 'OffsetProcedureName', pattern: new RegExp(offsetProcedureNameLiteral, 'i')})
 
   /* order is important, first pattern is used */
   const allTokens = [
@@ -145,15 +127,9 @@ export const buildLexerConfig = (config: ParserConfig): ILexerConfig => {
     OffsetProcedureName,
     ProcedureName,
     RangeSeparator,
-    SheetAbsoluteCell,
-    SheetAbsoluteColCell,
-    SheetAbsoluteRowCell,
-    SheetRelativeCell,
-    AbsoluteCell,
-    AbsoluteColCell,
-    AbsoluteRowCell,
-    RelativeCell,
     ArgSeparator,
+    ColumnRange,
+    RowRange,
     NumberLiteral,
     StringLiteral,
     ErrorLiteral,
@@ -162,19 +138,19 @@ export const buildLexerConfig = (config: ParserConfig): ILexerConfig => {
     AdditionOp,
     MultiplicationOp,
     CellReference,
+    NamedExpression,
   ]
+
   return {
     ArgSeparator,
+    NumberLiteral,
     OffsetProcedureName,
     allTokens,
     errorMapping,
     functionMapping,
+    decimalSeparator: config.decimalSeparator,
+    maxColumns: config.maxColumns,
+    maxRows: config.maxRows
   }
 }
 
-const buildFunctionMapping = (language: TranslationPackage): Record<string, string> => {
-  return Object.keys(language.functions).reduce((ret, key) => {
-    ret[language.functions[key]] = key
-    return ret
-  }, {} as Record<string, string>)
-}

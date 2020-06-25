@@ -1,28 +1,38 @@
+/**
+ * @license
+ * Copyright (c) 2020 Handsoncode. All rights reserved.
+ */
 
 import {CellError, ErrorType, SimpleCellAddress} from '../../Cell'
-import { matrixSizeForMultiplication, matrixSizeForPoolFunction, matrixSizeForTranspose} from '../../Matrix'
+import {matrixSizeForMultiplication, matrixSizeForPoolFunction, matrixSizeForTranspose} from '../../Matrix'
 import {Ast, AstNodeType, NumberAst, ProcedureAst} from '../../parser'
-import {coerceToRangeNumbersOrError} from '../coerce'
-import { SimpleRangeValue} from '../InterpreterValue'
+import {coerceToRangeNumbersOrError} from '../ArithmeticHelper'
+import {SimpleRangeValue} from '../InterpreterValue'
 import {FunctionPlugin} from './FunctionPlugin'
 
 export class MatrixPlugin extends FunctionPlugin {
   public static implementedFunctions = {
-    mmult: {
-      translationKey: 'MMULT',
+    'MMULT': {
+      method: 'mmult',
     },
-    transpose: {
-      translationKey: 'TRANSPOSE',
+    'TRANSPOSE': {
+      method: 'transpose',
     },
-    maxpool: {
-      translationKey: 'MAXPOOL',
+    'MAXPOOL': {
+      method: 'maxpool',
     },
-    medianpool: {
-      translationKey: 'MEDIANPOOL',
+    'MEDIANPOOL': {
+      method: 'medianpool',
     },
   }
 
   public mmult(ast: ProcedureAst, formulaAddress: SimpleCellAddress): SimpleRangeValue | CellError {
+    if (ast.args.length !== 2) {
+      return new CellError(ErrorType.NA)
+    }
+    if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
+      return new CellError(ErrorType.NUM)
+    }
     const [left, right] = ast.args
 
     const leftMatrix = coerceToRangeNumbersOrError(this.evaluateAst(left, formulaAddress))
@@ -42,7 +52,7 @@ export class MatrixPlugin extends FunctionPlugin {
     const kernel = gpu.createKernel(function(a: number[][], b: number[][], width: number) {
       let sum = 0
       for (let i = 0; i < width; ++i) {
-        sum += a[this.thread.y as number][i] * b[i][this.thread.x as number]
+        sum += a[this.thread.y as number][i] * b[i][this.thread.x]
       }
       return sum
     }).setPrecision('unsigned')
@@ -61,6 +71,9 @@ export class MatrixPlugin extends FunctionPlugin {
     const windowSize = sizeArg.value
     let stride = windowSize
 
+    if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
+      return new CellError(ErrorType.NUM)
+    }
     if (ast.args.length === 3) {
       const strideArg = ast.args[2]
       if (strideArg.type === AstNodeType.NUMBER) {
@@ -81,7 +94,7 @@ export class MatrixPlugin extends FunctionPlugin {
     /* istanbul ignore next: gpu.js */
     const gpu = this.interpreter.getGpuInstance()
     const kernel = gpu.createKernel(function(a: number[][], windowSize: number, stride: number) {
-      const leftCornerX = this.thread.x as number * stride
+      const leftCornerX = this.thread.x * stride
       const leftCornerY = this.thread.y as number * stride
       let currentMax = a[leftCornerY][leftCornerX]
       for (let i = 0; i < windowSize; i++) {
@@ -102,6 +115,9 @@ export class MatrixPlugin extends FunctionPlugin {
   public medianpool(ast: ProcedureAst, formulaAddress: SimpleCellAddress): SimpleRangeValue | CellError {
     const [rangeArg, sizeArg] = ast.args as [Ast, NumberAst]
 
+    if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
+      return new CellError(ErrorType.NUM)
+    }
     const rangeMatrix = coerceToRangeNumbersOrError(this.evaluateAst(rangeArg, formulaAddress))
     const windowSize = sizeArg.value
     let stride = windowSize
@@ -126,7 +142,7 @@ export class MatrixPlugin extends FunctionPlugin {
     /* istanbul ignore next: gpu.js */
     const gpu = this.interpreter.getGpuInstance()
     const kernel = gpu.createKernel(function(a: number[][], windowSize: number, stride: number) {
-      const leftCornerX = this.thread.x as number * stride
+      const leftCornerX = this.thread.x * stride
       const leftCornerY = this.thread.y as number * stride
       let currentMax = a[leftCornerY][leftCornerX]
       for (let i = 0; i < windowSize; i++) {
@@ -187,6 +203,12 @@ export class MatrixPlugin extends FunctionPlugin {
   }
 
   public transpose(ast: ProcedureAst, formulaAddress: SimpleCellAddress): SimpleRangeValue | CellError {
+    if (ast.args.length !== 1) {
+      return new CellError(ErrorType.NA)
+    }
+    if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
+      return new CellError(ErrorType.NUM)
+    }
     const value = coerceToRangeNumbersOrError(this.evaluateAst(ast.args[0], formulaAddress))
 
     if (value instanceof CellError) {

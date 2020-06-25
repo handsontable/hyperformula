@@ -1,9 +1,13 @@
+/**
+ * @license
+ * Copyright (c) 2020 Handsoncode. All rights reserved.
+ */
+
 import {SheetCellAddress, SimpleCellAddress} from '../../Cell'
-import {ColumnsSpan} from '../../ColumnsSpan'
-import {RowsSpan} from '../../RowsSpan'
+import {ColumnsSpan, RowsSpan} from '../../Span'
 import {CellVertex} from '../Vertex'
 
-export type IAddressMappingStrategyConstructor = new (width: number, height: number) => IAddressMappingStrategy
+export type AddressMappingStrategyConstructor = new (width: number, height: number) => IAddressMappingStrategy
 /**
  * Interface for mapping from sheet addresses to vertices.
  */
@@ -23,7 +27,7 @@ export interface IAddressMappingStrategy {
    */
   setCell(address: SheetCellAddress, newVertex: CellVertex): void,
 
-  removeCell(address: SimpleCellAddress): void
+  removeCell(address: SimpleCellAddress): void,
 
   /**
    * Returns whether the address is present or not
@@ -60,5 +64,9 @@ export interface IAddressMappingStrategy {
 
   verticesFromRowsSpan(rowsSpan: RowsSpan): IterableIterator<CellVertex>,
 
-  vertices(): IterableIterator<CellVertex>
+  entriesFromRowsSpan(rowsSpan: RowsSpan): IterableIterator<[SimpleCellAddress, CellVertex]>,
+  
+  entriesFromColumnsSpan(columnsSpan: ColumnsSpan): IterableIterator<[SimpleCellAddress, CellVertex]>,
+
+  vertices(): IterableIterator<CellVertex>,
 }

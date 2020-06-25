@@ -1,18 +1,28 @@
+/**
+ * @license
+ * Copyright (c) 2020 Handsoncode. All rights reserved.
+ */
 
 import {SimpleCellAddress} from '../Cell'
 import {LazilyTransformingAstService} from '../LazilyTransformingAstService'
-import {Ast, CellAddress, collectDependencies} from '../parser'
+import {AddressDependency, Ast, collectDependencies} from '../parser'
 import {FormulaCellVertex} from './FormulaCellVertex'
 import {MatrixVertex} from './MatrixVertex'
 import {RangeVertex} from './RangeVertex'
 import {Vertex} from './Vertex'
+import {DependencyGraph} from './DependencyGraph'
+import {FunctionRegistry} from '../interpreter/FunctionRegistry'
 
-export const collectAddressesDependentToMatrix = (vertex: Vertex, matrix: MatrixVertex, lazilyTransformingAstService: LazilyTransformingAstService): SimpleCellAddress[] => {
+export const collectAddressesDependentToMatrix = (funcitonRegistry: FunctionRegistry, vertex: Vertex, matrix: MatrixVertex, lazilyTransformingAstService: LazilyTransformingAstService, dependencyGraph: DependencyGraph): SimpleCellAddress[] => {
   const range = matrix.getRange()
 
   if (vertex instanceof RangeVertex) {
-    /* TODO range intersection */
-    return [...vertex.range.addresses()].filter((d) => range.addressInRange(d))
+    const intersection = vertex.range.intersectionWith(range)
+    if (intersection !== null) {
+      return Array.from(intersection.addresses(dependencyGraph))
+    } else {
+      return []
+    }
   }
 
   let formula: Ast
@@ -28,8 +38,8 @@ export const collectAddressesDependentToMatrix = (vertex: Vertex, matrix: Matrix
     return []
   }
 
-  return collectDependencies(formula)
-      .filter((d) => !Array.isArray(d))
-      .map((d) => (d as CellAddress).toSimpleCellAddress(address))
-      .filter((d) => range.addressInRange(d))
+  return collectDependencies(formula, funcitonRegistry)
+    .filter((d): d is AddressDependency => d instanceof AddressDependency)
+    .map((d) => d.dependency.toSimpleCellAddress(address))
+    .filter((d) => range.addressInRange(d))
 }

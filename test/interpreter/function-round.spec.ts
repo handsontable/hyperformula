@@ -1,6 +1,5 @@
 import {HyperFormula} from '../../src'
 import {ErrorType} from '../../src/Cell'
-import '../testConfig'
 import {adr, detailedError} from '../testUtils'
 
 describe('Function ROUND', () => {
@@ -30,6 +29,16 @@ describe('Function ROUND', () => {
     expect(engine.getCellValue(adr('A1'))).toBe(-1)
     expect(engine.getCellValue(adr('B1'))).toBe(-2)
   })
+
+  it('no -0', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=ROUND(-0.001)', '=ROUND(0.001)'],
+    ])
+
+    expect(engine.getCellValue(adr('A1'))).toBe(0)
+    expect(engine.getCellValue(adr('B1'))).toBe(0)
+  })
+
 
   it('works with positive rounding argument', () => {
     const engine = HyperFormula.buildFromArray([

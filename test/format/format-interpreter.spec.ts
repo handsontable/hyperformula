@@ -1,11 +1,10 @@
-import {Config} from '../../src'
-import {DateHelper} from '../../src/DateHelper'
+import {Config} from '../../src/Config'
+import {DateTimeHelper} from '../../src/DateTimeHelper'
 import {format} from '../../src/format/format'
-import {FormatExpression, FormatExpressionType, formatToken, TokenType} from '../../src/format/parser'
 
 describe('FormatInterpreter', () => {
   const config = new Config()
-  const dateHelper = new DateHelper(config)
+  const dateHelper = new DateTimeHelper(config)
   it('works for expression without significant tokens', () => {
     expect(format(2, 'Foo', config, dateHelper)).toEqual('Foo')
   })
@@ -38,13 +37,6 @@ describe('FormatInterpreter', () => {
   })
 
   it('works with 0 number format', () => {
-    const exp: FormatExpression = {
-      type: FormatExpressionType.NUMBER,
-      tokens: [
-        formatToken(TokenType.FORMAT, '00.00'),
-      ],
-    }
-
     expect(format(1, '00.00', config, dateHelper)).toEqual('01.00')
     expect(format(12, '00.00', config, dateHelper)).toEqual('12.00')
     expect(format(12.3, '00.00', config, dateHelper)).toEqual('12.30')

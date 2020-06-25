@@ -1,19 +1,28 @@
-import {AbsoluteCellRange} from '../../AbsoluteCellRange'
-import {CellError, ErrorType, InternalCellValue, simpleCellAddress, SimpleCellAddress} from '../../Cell'
-import {DependencyGraph, RangeVertex} from '../../DependencyGraph'
-import { ProcedureAst} from '../../parser'
-import {coerceScalarToNumberOrError, coerceToRange} from '../coerce'
-import { SimpleRangeValue} from '../InterpreterValue'
+/**
+ * @license
+ * Copyright (c) 2020 Handsoncode. All rights reserved.
+ */
+
+import {CellError, ErrorType, InternalScalarValue, SimpleCellAddress} from '../../Cell'
+import {AstNodeType, ProcedureAst} from '../../parser'
+import {coerceToRange} from '../ArithmeticHelper'
+import {SimpleRangeValue} from '../InterpreterValue'
 import {FunctionPlugin} from './FunctionPlugin'
 
 export class SumprodPlugin extends FunctionPlugin {
   public static implementedFunctions = {
-    sumprod: {
-      translationKey: 'SUMPRODUCT',
+    'SUMPRODUCT': {
+      method: 'sumprod',
     },
   }
 
-  public sumprod(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
+  public sumprod(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    if (ast.args.length !== 2) {
+      return new CellError(ErrorType.NA)
+    }
+    if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
+      return new CellError(ErrorType.NUM)
+    }
     const [left, right] = ast.args
 
     const leftArgValue = coerceToRange(this.evaluateAst(left, formulaAddress))
@@ -39,8 +48,8 @@ export class SumprodPlugin extends FunctionPlugin {
       } else if (r.value instanceof CellError) {
         return r.value
       } else {
-        const lval = coerceScalarToNumberOrError(l.value, this.interpreter.dateHelper)
-        const rval = coerceScalarToNumberOrError(r.value, this.interpreter.dateHelper)
+        const lval = this.coerceScalarToNumberOrError(l.value)
+        const rval = this.coerceScalarToNumberOrError(r.value)
         if (typeof lval === 'number' && typeof rval === 'number') {
           result += lval * rval
         }
@@ -51,29 +60,3 @@ export class SumprodPlugin extends FunctionPlugin {
   }
 }
 
-/**
- * Finds smaller range does have own vertex.
- *
- * @param rangeMapping - range mapping dependency
- * @param ranges - ranges to find smaller range in
- */
-export const findSmallerRange = (dependencyGraph: DependencyGraph, ranges: AbsoluteCellRange[]): { smallerRangeVertex: RangeVertex | null, restRanges: AbsoluteCellRange[] } => {
-  if (ranges[0].height() > 1) {
-    const valuesRangeEndRowLess = simpleCellAddress(ranges[0].end.sheet, ranges[0].end.col, ranges[0].end.row - 1)
-    const rowLessVertex = dependencyGraph.getRange(ranges[0].start, valuesRangeEndRowLess)
-    if (rowLessVertex) {
-      const restRanges = ranges.map((range) => {
-        return new AbsoluteCellRange(simpleCellAddress(range.start.sheet, range.start.col, range.end.row), range.end)
-      })
-
-      return {
-        smallerRangeVertex: rowLessVertex,
-        restRanges,
-      }
-    }
-  }
-  return {
-    smallerRangeVertex: null,
-    restRanges: ranges,
-  }
-}

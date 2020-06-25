@@ -1,6 +1,10 @@
-import {CellError, ErrorType, InternalCellValue, SimpleCellAddress} from '../../Cell'
-import {ProcedureAst} from '../../parser'
-import {coerceScalarToNumberOrError} from '../coerce'
+/**
+ * @license
+ * Copyright (c) 2020 Handsoncode. All rights reserved.
+ */
+
+import {CellError, ErrorType, InternalScalarValue, SimpleCellAddress} from '../../Cell'
+import {AstNodeType, ProcedureAst} from '../../parser'
 import {SimpleRangeValue} from '../InterpreterValue'
 import {FunctionPlugin} from './FunctionPlugin'
 
@@ -18,33 +22,33 @@ export function findNextEvenNumber(arg: number): number {
 
 export class RoundingPlugin extends FunctionPlugin {
   public static implementedFunctions = {
-    roundup: {
-      translationKey: 'ROUNDUP',
+    'ROUNDUP': {
+      method: 'roundup',
     },
-    rounddown: {
-      translationKey: 'ROUNDDOWN',
+    'ROUNDDOWN': {
+      method: 'rounddown',
     },
-    round: {
-      translationKey: 'ROUND',
+    'ROUND': {
+      method: 'round',
     },
-    trunc: {
-      translationKey: 'TRUNC',
+    'TRUNC': {
+      method: 'trunc',
     },
-    int_func: {
-      translationKey: 'INT',
+    'INT': {
+      method: 'intFunc',
     },
-    even: {
-      translationKey: 'EVEN',
+    'EVEN': {
+      method: 'even',
     },
-    odd: {
-      translationKey: 'ODD',
+    'ODD': {
+      method: 'odd',
     },
-    ceiling: {
-      translationKey: 'CEILING',
+    'CEILING': {
+      method: 'ceiling',
     },
   }
 
-  public roundup(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
+  public roundup(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.commonArgumentsHandling2(ast, formulaAddress, (numberToRound: number, places: number): number => {
       const placesMultiplier = Math.pow(10, places)
       if (numberToRound < 0) {
@@ -55,7 +59,7 @@ export class RoundingPlugin extends FunctionPlugin {
     })
   }
 
-  public rounddown(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
+  public rounddown(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.commonArgumentsHandling2(ast, formulaAddress, (numberToRound: number, places: number): number => {
       const placesMultiplier = Math.pow(10, places)
       if (numberToRound < 0) {
@@ -66,7 +70,7 @@ export class RoundingPlugin extends FunctionPlugin {
     })
   }
 
-  public round(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
+  public round(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.commonArgumentsHandling2(ast, formulaAddress, (numberToRound: number, places: number): number => {
       const placesMultiplier = Math.pow(10, places)
       if (numberToRound < 0) {
@@ -77,11 +81,11 @@ export class RoundingPlugin extends FunctionPlugin {
     })
   }
 
-  public trunc(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
+  public trunc(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.rounddown(ast, formulaAddress)
   }
 
-  public int_func(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
+  public intFunc(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.templateWithOneCoercedToNumberArgument(ast, formulaAddress, (coercedNumberToRound) => {
       if (coercedNumberToRound < 0) {
         return -Math.floor(-coercedNumberToRound)
@@ -91,7 +95,7 @@ export class RoundingPlugin extends FunctionPlugin {
     })
   }
 
-  public even(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
+  public even(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.templateWithOneCoercedToNumberArgument(ast, formulaAddress, (coercedNumberToRound) => {
       if (coercedNumberToRound < 0) {
         return -findNextEvenNumber(-coercedNumberToRound)
@@ -101,7 +105,7 @@ export class RoundingPlugin extends FunctionPlugin {
     })
   }
 
-  public odd(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
+  public odd(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.templateWithOneCoercedToNumberArgument(ast, formulaAddress, (coercedNumberToRound) => {
       if (coercedNumberToRound < 0) {
         return -findNextOddNumber(-coercedNumberToRound)
@@ -111,9 +115,12 @@ export class RoundingPlugin extends FunctionPlugin {
     })
   }
 
-  public ceiling(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
+  public ceiling(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     if (ast.args.length < 1 || ast.args.length > 3) {
       return new CellError(ErrorType.NA)
+    }
+    if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
+      return new CellError(ErrorType.NUM)
     }
 
     const value = this.getNumericArgument(ast, formulaAddress, 0)
@@ -152,34 +159,36 @@ export class RoundingPlugin extends FunctionPlugin {
     return Math.ceil(value / significance) * significance
   }
 
-  private commonArgumentsHandling2(ast: ProcedureAst, formulaAddress: SimpleCellAddress, roundingFunction: RoundingFunction): InternalCellValue {
+  private commonArgumentsHandling2(ast: ProcedureAst, formulaAddress: SimpleCellAddress, roundingFunction: RoundingFunction): InternalScalarValue {
     if (ast.args.length < 1 || ast.args.length > 2) {
       return new CellError(ErrorType.NA)
-    } else {
-      const numberToRound = this.evaluateAst(ast.args[0], formulaAddress)
-      if (numberToRound instanceof SimpleRangeValue) {
+    }
+    if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
+      return new CellError(ErrorType.NUM)
+    }
+    const numberToRound = this.evaluateAst(ast.args[0], formulaAddress)
+    if (numberToRound instanceof SimpleRangeValue) {
+      return new CellError(ErrorType.VALUE)
+    }
+
+    let coercedPlaces
+    if (ast.args[1]) {
+      const places = this.evaluateAst(ast.args[1], formulaAddress)
+      if (places instanceof SimpleRangeValue) {
         return new CellError(ErrorType.VALUE)
       }
+      coercedPlaces = this.coerceScalarToNumberOrError(places)
+    } else {
+      coercedPlaces = 0
+    }
 
-      let coercedPlaces
-      if (ast.args[1]) {
-        const places = this.evaluateAst(ast.args[1], formulaAddress)
-        if (places instanceof SimpleRangeValue) {
-          return new CellError(ErrorType.VALUE)
-        }
-        coercedPlaces = coerceScalarToNumberOrError(places, this.interpreter.dateHelper)
-      } else {
-        coercedPlaces = 0
-      }
-
-      const coercedNumberToRound = coerceScalarToNumberOrError(numberToRound, this.interpreter.dateHelper)
-      if (coercedNumberToRound instanceof CellError) {
-        return coercedNumberToRound
-      } else if (coercedPlaces instanceof CellError) {
-        return coercedPlaces
-      } else {
-        return roundingFunction(coercedNumberToRound, coercedPlaces)
-      }
+    const coercedNumberToRound = this.coerceScalarToNumberOrError(numberToRound)
+    if (coercedNumberToRound instanceof CellError) {
+      return coercedNumberToRound
+    } else if (coercedPlaces instanceof CellError) {
+      return coercedPlaces
+    } else {
+      return roundingFunction(coercedNumberToRound, coercedPlaces)
     }
   }
 }

@@ -1,20 +1,28 @@
-import {CellError, ErrorType, InternalCellValue, SimpleCellAddress} from '../../Cell'
-import {ProcedureAst} from '../../parser'
+/**
+ * @license
+ * Copyright (c) 2020 Handsoncode. All rights reserved.
+ */
+
+import {CellError, ErrorType, InternalScalarValue, SimpleCellAddress} from '../../Cell'
+import {AstNodeType, ProcedureAst} from '../../parser'
 import {FunctionPlugin} from './FunctionPlugin'
 
 export class ErrorFunctionPlugin extends FunctionPlugin {
   public static implementedFunctions = {
-    erf: {
-      translationKey: 'ERF',
+    'ERF': {
+      method: 'erf',
     },
-    erfc: {
-      translationKey: 'ERFC',
+    'ERFC': {
+      method: 'erfc',
     },
   }
 
-  public erf(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
+  public erf(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     if (ast.args.length < 1 || ast.args.length > 2) {
       return new CellError(ErrorType.NA)
+    }
+    if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
+      return new CellError(ErrorType.NUM)
     }
 
     const lowerBound = this.getNumericArgument(ast, formulaAddress, 0)
@@ -33,7 +41,7 @@ export class ErrorFunctionPlugin extends FunctionPlugin {
     return erf(lowerBound)
   }
 
-  public erfc(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
+  public erfc(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.templateWithOneCoercedToNumberArgument(ast, formulaAddress, (arg: number) => {
       return erfc(arg)
     })

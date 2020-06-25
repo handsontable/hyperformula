@@ -1,16 +1,16 @@
-import {ColumnsSpan} from '../src/ColumnsSpan'
+import {ColumnsSpan} from '../src/Span'
 
 describe('ColumnsSpan', () => {
   it('raise error when starting column is less than 0', () => {
     expect(() => {
-      const span = new ColumnsSpan(0, -1, 0)
-    }).toThrow('Starting column cant be less than 0')
+      new ColumnsSpan(0, -1, 0)
+    }).toThrowError('Starting column cant be less than 0')
   })
 
   it('raise error when column end before column start', () => {
     expect(() => {
-      const span = new ColumnsSpan(0, 1, 0)
-    }).toThrow('Column span cant end before start')
+      new ColumnsSpan(0, 1, 0)
+    }).toThrowError('Column span cant end before start')
   })
 
   it('#fromNumberOfColumns', () => {
@@ -43,7 +43,7 @@ describe('ColumnsSpan', () => {
 
     expect(() => {
       span1.intersect(span2)
-    }).toThrow("Can't intersect spans from different sheets")
+    }).toThrowError("Can't intersect spans from different sheets")
   })
 
   it('#intersect with span overlapping at right', () => {
@@ -57,7 +57,7 @@ describe('ColumnsSpan', () => {
     const span1 = new ColumnsSpan(0, 42, 45)
     const span2 = new ColumnsSpan(0, 46, 49)
 
-    expect(span1.intersect(span2)).toEqual(null)
+    expect(span1.intersect(span2)).toBe(null)
   })
 
   it('#intersect with span overlapping at left', () => {
@@ -71,7 +71,7 @@ describe('ColumnsSpan', () => {
     const span1 = new ColumnsSpan(0, 42, 45)
     const span2 = new ColumnsSpan(0, 39, 41)
 
-    expect(span1.intersect(span2)).toEqual(null)
+    expect(span1.intersect(span2)).toBe(null)
   })
 
   it('#intersect with span included', () => {

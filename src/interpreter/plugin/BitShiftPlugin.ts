@@ -1,4 +1,9 @@
-import {CellError, ErrorType, InternalCellValue, SimpleCellAddress} from '../../Cell'
+/**
+ * @license
+ * Copyright (c) 2020 Handsoncode. All rights reserved.
+ */
+
+import {CellError, ErrorType, InternalScalarValue, SimpleCellAddress} from '../../Cell'
 import {ProcedureAst} from '../../parser'
 import {FunctionPlugin} from './FunctionPlugin'
 
@@ -8,23 +13,23 @@ const SHIFT_MAX_POSITIONS = 53
 
 export class BitShiftPlugin extends FunctionPlugin {
   public static implementedFunctions = {
-    bitlshift: {
-      translationKey: 'BITLSHIFT',
+    'BITLSHIFT': {
+      method: 'bitlshift',
     },
-    bitrshift: {
-      translationKey: 'BITRSHIFT',
+    'BITRSHIFT': {
+      method: 'bitrshift',
     },
   }
 
-  public bitlshift(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
+  public bitlshift(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.bitshiftTemplate(ast, formulaAddress, shiftLeft)
   }
 
-  public bitrshift(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
+  public bitrshift(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.bitshiftTemplate(ast, formulaAddress, shiftRight)
   }
 
-  private bitshiftTemplate(ast: ProcedureAst, formulaAddress: SimpleCellAddress, fn: (value: number, positions: number) => number): InternalCellValue {
+  private bitshiftTemplate(ast: ProcedureAst, formulaAddress: SimpleCellAddress, fn: (value: number, positions: number) => number): InternalScalarValue {
     const validationResult = this.validateTwoNumericArguments(ast, formulaAddress)
 
     if (validationResult instanceof CellError) {

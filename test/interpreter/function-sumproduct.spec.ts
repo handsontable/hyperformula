@@ -1,9 +1,20 @@
 import {HyperFormula} from '../../src'
 import {ErrorType} from '../../src/Cell'
-import '../testConfig'
 import {adr, detailedError} from '../testUtils'
 
 describe('Function SUMPRODUCT', () => {
+  it('wrong number of arguments', () => {
+    const engine =  HyperFormula.buildFromArray([
+      ['1', '1'],
+      ['2', '2'],
+      ['3', '3'],
+      ['=SUMPRODUCT(A1:A3)', '=SUMPRODUCT(A1:A3,B1:B3,A1:A2)'],
+    ])
+
+    expect(engine.getCellValue(adr('A4'))).toEqual(detailedError(ErrorType.NA))
+    expect(engine.getCellValue(adr('B4'))).toEqual(detailedError(ErrorType.NA))
+  })
+
   it('works',  () => {
     const engine =  HyperFormula.buildFromArray([
       ['1', '1'],
@@ -146,9 +157,9 @@ describe('Function SUMPRODUCT', () => {
 
   it('works with matrices',  () => {
     const engine =  HyperFormula.buildFromArray([
-        ['1', '2'],
-        ['3'],
-        ['=SUMPRODUCT(A1:B1, TRANSPOSE(A1:A2))'],
+      ['1', '2'],
+      ['3'],
+      ['=SUMPRODUCT(A1:B1, TRANSPOSE(A1:A2))'],
     ])
     expect(engine.getCellValue(adr('A3'))).toEqual(7)
   })

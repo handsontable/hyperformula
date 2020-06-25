@@ -1,15 +1,20 @@
-import {CellError, ErrorType, InternalCellValue, SimpleCellAddress} from '../../Cell'
+/**
+ * @license
+ * Copyright (c) 2020 Handsoncode. All rights reserved.
+ */
+
+import {CellError, ErrorType, InternalScalarValue, SimpleCellAddress} from '../../Cell'
 import {ProcedureAst} from '../../parser'
 import {FunctionPlugin} from './FunctionPlugin'
 
 export class PowerPlugin extends FunctionPlugin {
   public static implementedFunctions = {
-    power: {
-      translationKey: 'POWER',
+    'POWER': {
+      method: 'power',
     },
   }
 
-  public power(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
+  public power(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     const validationResult = this.validateTwoNumericArguments(ast, formulaAddress)
 
     if (validationResult instanceof CellError) {

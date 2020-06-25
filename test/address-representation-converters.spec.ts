@@ -1,8 +1,9 @@
 import {simpleCellAddress} from '../src/Cell'
+import {Maybe} from '../src/Maybe'
 import {simpleCellAddressFromString, simpleCellAddressToString} from '../src/parser'
 
 describe('simpleCellAddressFromString', () => {
-  const sheetMappingFunction = (name: string): number | undefined => {
+  const sheetMappingFunction = (name: string): Maybe<number> => {
     const index = ['Sheet1', 'Sheet2', 'Sheet3'].indexOf(name)
     return index > 0 ? index : undefined
   }
@@ -30,7 +31,7 @@ describe('simpleCellAddressFromString', () => {
 })
 
 describe('simpleCellAddressToString', () => {
-  const sheetIndexMappingFunction = (index: number): string | undefined => {
+  const sheetIndexMappingFunction = (index: number): Maybe<string> => {
     const name = ['Sheet1', 'Sheet2', 'Sheet3'][index]
     return name
   }

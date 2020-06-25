@@ -1,6 +1,5 @@
-import {Config, HyperFormula} from '../../src'
+import {HyperFormula} from '../../src'
 import {ErrorType} from '../../src/Cell'
-import '../testConfig'
 import {adr, detailedError} from '../testUtils'
 
 describe('Function AVERAGEIF - argument validations and combinations', () => {
@@ -12,14 +11,6 @@ describe('Function AVERAGEIF - argument validations and combinations', () => {
 
     expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA))
     expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NA))
-  })
-
-  it('error when 2nd arg is not a string',  () => {
-    const engine =  HyperFormula.buildFromArray([
-      ['=AVERAGEIF(C1:C2, 78, B1:B2)'],
-    ])
-
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE))
   })
 
   it('error when criterion unparsable',  () => {
@@ -147,7 +138,7 @@ describe('Function AVERAGEIF - argument validations and combinations', () => {
       ['1'],
       ['2'],
       ['=AVERAGEIF(A1:A2, ">0", A1:A2)'],
-    ], new Config({ matrixDetection: true, matrixDetectionThreshold: 1 }))
+    ], { matrixDetection: true, matrixDetectionThreshold: 1 })
 
     expect(engine.getCellValue(adr('A3'))).toEqual(1.5)
   })

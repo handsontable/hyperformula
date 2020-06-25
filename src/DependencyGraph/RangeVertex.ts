@@ -1,5 +1,10 @@
+/**
+ * @license
+ * Copyright (c) 2020 Handsoncode. All rights reserved.
+ */
+
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
-import { SimpleCellAddress} from '../Cell'
+import {SimpleCellAddress} from '../Cell'
 import {CriterionLambda} from '../interpreter/Criterion'
 
 /**
@@ -15,11 +20,17 @@ export class RangeVertex {
   private functionCache: Map<string, any>
 
   /** Cache for criterion-based functions. */
-  private criterionFuncitonCache: Map<string, CriterionCache>
+  private criterionFunctionCache: Map<string, CriterionCache>
+
+  private dependentCacheRanges: Set<RangeVertex>
+
+  public bruteForce: boolean
 
   constructor(public range: AbsoluteCellRange) {
     this.functionCache = new Map()
-    this.criterionFuncitonCache = new Map()
+    this.criterionFunctionCache = new Map()
+    this.dependentCacheRanges = new Set()
+    this.bruteForce = false
   }
 
   public get start() {
@@ -71,7 +82,7 @@ export class RangeVertex {
    * @param cacheKey - key to retrieve from the cache
    */
   public getCriterionFunctionValues(cacheKey: string): Map<string, [any, CriterionLambda[]]> {
-    return this.criterionFuncitonCache.get(cacheKey) || new Map()
+    return this.criterionFunctionCache.get(cacheKey) || new Map()
   }
 
   /**
@@ -81,7 +92,13 @@ export class RangeVertex {
    * @param values - map with values
    */
   public setCriterionFunctionValues(cacheKey: string, values: CriterionCache) {
-    this.criterionFuncitonCache.set(cacheKey, values)
+    this.criterionFunctionCache.set(cacheKey, values)
+  }
+
+  public addDependentCacheRange(dependentRange: RangeVertex) {
+    if (dependentRange !== this) {
+      this.dependentCacheRanges.add(dependentRange)
+    }
   }
 
   /**
@@ -89,7 +106,9 @@ export class RangeVertex {
    */
   public clearCache() {
     this.functionCache.clear()
-    this.criterionFuncitonCache.clear()
+    this.criterionFunctionCache.clear()
+    this.dependentCacheRanges.forEach(range => range.criterionFunctionCache.clear())
+    this.dependentCacheRanges.clear()
   }
 
   /**

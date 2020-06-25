@@ -1,17 +1,29 @@
+/**
+ * @license
+ * Copyright (c) 2020 Handsoncode. All rights reserved.
+ */
+
 import {AbsoluteCellRange} from '../../AbsoluteCellRange'
-import {CellError, ErrorType, InternalCellValue, simpleCellAddress, SimpleCellAddress} from '../../Cell'
+import {
+  CellError,
+  ErrorType,
+  InternalCellValue,
+  InternalScalarValue,
+  simpleCellAddress,
+  SimpleCellAddress
+} from '../../Cell'
 import {AstNodeType, ProcedureAst} from '../../parser'
-import {StatType} from '../../statistics/Statistics'
+import {StatType} from '../../statistics'
 import {InterpreterValue} from '../InterpreterValue'
 import {FunctionPlugin} from './FunctionPlugin'
 
 export class VlookupPlugin extends FunctionPlugin {
   public static implementedFunctions = {
-    vlookup: {
-      translationKey: 'VLOOKUP',
+    'VLOOKUP': {
+      method: 'vlookup',
     },
-    match: {
-      translationKey: 'MATCH',
+    'MATCH': {
+      method: 'match',
     },
   }
 
@@ -24,6 +36,10 @@ export class VlookupPlugin extends FunctionPlugin {
   public vlookup(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
     if (ast.args.length < 3 || ast.args.length > 4) {
       return new CellError(ErrorType.NA)
+    }
+
+    if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
+      return new CellError(ErrorType.NUM)
     }
 
     const key = this.evaluateAst(ast.args[0], formulaAddress)
@@ -42,7 +58,7 @@ export class VlookupPlugin extends FunctionPlugin {
       return new CellError(ErrorType.VALUE)
     }
 
-    let sorted: InternalCellValue = true
+    let sorted: InternalScalarValue = true
     if (ast.args.length === 4) {
       const computedSorted = this.evaluateAst(ast.args[3], formulaAddress)
       if (typeof computedSorted === 'boolean') {
@@ -60,7 +76,7 @@ export class VlookupPlugin extends FunctionPlugin {
     return this.doVlookup(key, range, index - 1, sorted)
   }
 
-  public match(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
+  public match(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     if (ast.args.length < 2 || ast.args.length > 3) {
       return new CellError(ErrorType.NA)
     }
@@ -94,14 +110,23 @@ export class VlookupPlugin extends FunctionPlugin {
 
       return rowIndex - searchedRange.start.row + 1
     } else {
-      const valuesInRange = this.computeListOfValuesInRange(searchedRange)
-      const columnIndex = valuesInRange.indexOf(key)
-
+      const columnIndex = this.searchInRange(key, searchedRange, false)
       if (columnIndex === -1) {
         return new CellError(ErrorType.NA)
       }
 
-      return columnIndex + 1
+      return (columnIndex-searchedRange.start.row) + 1
+    }
+  }
+
+  private searchInRange(key: any, range: AbsoluteCellRange, sorted: boolean): number {
+    if(!sorted && typeof key === 'string' && this.interpreter.arithmeticHelper.requiresRegex(key)) {
+      return this.columnSearch.advancedFind(
+        this.interpreter.arithmeticHelper.eqMatcherFunction(key),
+        range
+      )
+    } else {
+      return this.columnSearch.find(key, range, sorted)
     }
   }
 
@@ -109,7 +134,7 @@ export class VlookupPlugin extends FunctionPlugin {
     this.dependencyGraph.stats.start(StatType.VLOOKUP)
 
     const searchedRange = AbsoluteCellRange.spanFrom(range.start, 1, range.height())
-    const rowIndex = this.columnSearch.find(key, searchedRange, sorted)
+    const rowIndex = this.searchInRange(key, searchedRange, sorted)
 
     this.dependencyGraph.stats.end(StatType.VLOOKUP)
 

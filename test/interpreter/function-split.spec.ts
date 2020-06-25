@@ -1,9 +1,14 @@
 import {HyperFormula} from '../../src'
 import {ErrorType} from '../../src/Cell'
-import '../testConfig'
 import {adr, detailedError} from '../testUtils'
 
 describe('Function SPLIT', () => {
+  it('wrong number of arguments', () => {
+    const engine = HyperFormula.buildFromArray([['=SPLIT(1)', '=SPLIT("a","b","c")']])
+
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA))
+    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.NA))
+  })
   it('happy path', () => {
     const engine = HyperFormula.buildFromArray([['some words', '=SPLIT(A1, 0)']])
 

@@ -1,5 +1,9 @@
+/**
+ * @license
+ * Copyright (c) 2020 Handsoncode. All rights reserved.
+ */
+
 import {InternalCellValue, SimpleCellAddress} from './Cell'
-import {CellValueExporter} from './CellValue'
 import {Matrix} from './Matrix'
 
 export interface CellValueChange {
@@ -9,6 +13,9 @@ export interface CellValueChange {
   value: InternalCellValue,
 }
 
+export interface ChangeExporter<T> {
+  exportChange: (arg: CellValueChange) => T,
+}
 export type ChangeList = CellValueChange[]
 
 export class ContentChanges {
@@ -38,21 +45,20 @@ export class ContentChanges {
     this.changes.push(...change)
   }
 
-  public exportChanges(exporter: CellValueExporter): ChangeList {
-    const ret: ChangeList = []
-    for (const i in this.changes) {
-      ret[i] = {
-        sheet: this.changes[i].sheet,
-        col: this.changes[i].col,
-        row: this.changes[i].row,
-        value: exporter.export(this.changes[i].value),
-      }
-    }
+  public exportChanges<T>(exporter: ChangeExporter<T>): T[] {
+    const ret: T[] = []
+    this.changes.forEach((e, i) => {
+      ret[i] = exporter.exportChange(this.changes[i])
+    })
     return ret
   }
 
   public getChanges(): ChangeList {
     return this.changes
+  }
+
+  public isEmpty(): boolean {
+    return this.changes === []
   }
 
   private addSingleCellValue(value: InternalCellValue, address: SimpleCellAddress) {
