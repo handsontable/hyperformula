@@ -204,7 +204,7 @@ function pmtCore(rate: number, periods: number, present: number, future: number,
   if (rate === 0) {
     result = (present + future) / periods
   } else {
-    let term = Math.pow(1 + rate, periods)
+    const term = Math.pow(1 + rate, periods)
     if (type !== 0) {
       result = (future * rate / (term - 1) + present * rate / (1 - 1 / term)) / (1 + rate)
     } else {
@@ -238,7 +238,7 @@ function fvCore(rate: number, periods: number, payment: number, value: number, t
   if (rate === 0) {
     result = value + payment * periods
   } else {
-    var term = Math.pow(1 + rate, periods)
+    const term = Math.pow(1 + rate, periods)
     if (type === 1) {
       result = value * term + payment * (1 + rate) * (term - 1) / rate
     } else {
