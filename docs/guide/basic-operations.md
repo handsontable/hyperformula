@@ -291,19 +291,20 @@ of this fact.
 let messageUsedInUI;
 
 // attempt to rename a sheet
-try {	
-    hfInstance.renameSheet(5, 'Payroll');
+try {
+  hfInstance.renameSheet(5, "Payroll");
 
-// whoops! there is no sheet with an ID of 5
+  // whoops! there is no sheet with an ID of 5
 } catch (e) {
-
-// notify the user that a sheet with an ID of 5 does not exist
-    if (e instanceof Error)	
-        messageUsedInUI = 'Sheet with provided ID does not exist'
-// a generic error message, just in case	
-    else	
-       messageUsedInUI = 'Something went wrong'	
-};
+  // notify the user that a sheet with an ID of 5 does not exist
+  if (e instanceof NoSheetWithIdError) {
+    messageUsedInUI = "Sheet with provided ID does not exist";
+  }
+    // a generic error message, just in case
+   else {
+    messageUsedInUI = "Something went wrong";
+   }
+}
 ```
 
 ## isItPossibleTo* methods

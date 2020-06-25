@@ -106,14 +106,14 @@ module.exports = {
           collapsable: true,
         },
         {
-          title: 'Event Types',
-          path: '/api/interfaces/listeners',
-          alias: '/api/events',
+          title: 'Configuration Options',
+          path: '/api/interfaces/configparams',
           collapsable: true,
         },
         {
-          title: 'Configuration Options',
-          path: '/api/interfaces/configparams',
+          title: 'Event Types',
+          path: '/api/interfaces/listeners',
+          alias: '/api/events',
           collapsable: true,
         },
         {
@@ -122,10 +122,6 @@ module.exports = {
           children: fs.readdirSync(path.join(__dirname, '../api/classes'))
             .filter((n) => n.match(/.*error\.md$/))
             .map(f => `/api/classes/${f}`)
-        },
-        {
-          title: 'Globals',
-          path: '/api/globals',
         },
       ],
       '/': [
