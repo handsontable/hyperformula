@@ -105,14 +105,14 @@ module.exports = {
           collapsable: true,
         },
         {
-          title: 'Event Types',
-          path: '/api/interfaces/listeners',
-          alias: '/api/events',
+          title: 'Configuration Options',
+          path: '/api/interfaces/configparams',
           collapsable: true,
         },
         {
-          title: 'Configuration Options',
-          path: '/api/interfaces/configparams',
+          title: 'Event Types',
+          path: '/api/interfaces/listeners',
+          alias: '/api/events',
           collapsable: true,
         },
         {
