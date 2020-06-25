@@ -9,7 +9,7 @@ Current build: {{ $page.buildDate }}
 #### HyperFormula
 This section contains information about the class for creating HyperFormula instance. It enlists all available public methods alongside their descriptions, parameter types, and examples.
 
-The snippet shows an example how to use `buildFromArray` which is one of three static methods for creating an instance of HyperFormula:
+The snippet shows an example how to use `buildFromArray` which is one of [three static methods](/api/classes/hyperformula.html#factories) for creating an instance of HyperFormula:
 ```
 const sheetData = [
  ['0', '=SUM(1,2,3)', '52'],
