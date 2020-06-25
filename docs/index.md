@@ -33,11 +33,11 @@ Excel or Google Sheets, which means that you can easily transfer
 the data and formulas between them.
 
 HyperFormula covers most user-triggered actions such as
-[CRUD operations](/guide/basic-operations), [undo/redo](/guide/undo-redo.md),
+[CRUD operations](/guide/basic-operations.md), [undo/redo](/guide/undo-redo.md),
 and [clipboard operations](/guide/clipboard-operations.md). It also supports
 the use of cross-sheet references, [named expressions](/guide/named-ranges.md),
 [different data types](/guide/types-of-values.md),
-and [custom functions](/guide/custom-functions).
+and [custom functions](/guide/custom-functions.md).
 
 ## What can it be used for?
 

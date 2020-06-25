@@ -45,7 +45,7 @@ out to be more efficient than popular [Jison](https://zaa.ch/jison/).
 The language of acceptable formulas is described with a LL(k) grammar
 using Chevrotain Domain Specific Language. See details of the grammar
 in the
-[FormulaParser](https://github.com/handsontable/hyperformula/blob/develop/src/parser/FormulaParser.ts)
+[FormulaParser](https://github.com/handsontable/hyperformula/blob/master/src/parser/FormulaParser.ts)
 file.
 
 ## Repetitive ASTs

@@ -238,7 +238,7 @@ Apart from accents and case sensitivity, you can also configure
 should sort first. `ignorePunctuation`  specifies whether punctuation
 should be ignored in string comparison. By default `caseFirst` is set
 to 'lower' and `ignorePunctuation` is set to `false`. For more details
-see the official API reference of HyperFormula.
+see the official [API reference](../api) of HyperFormula.
 
 Here is an example configuration that overwrites default settings:
 
