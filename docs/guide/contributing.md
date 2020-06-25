@@ -8,11 +8,10 @@ is much appreciated in any of the following topics:
   * Adding new features
   * Improving the quality of the existing code
   * Improving performance
-* Improving documentation and public API
+  * Improving documentation and public API
 * Reporting bugs
 * Suggesting improvements
 * Suggesting new features
-* Adding new integrations with external tools, libraries, and services
 
 ## Good first issue
 
@@ -22,7 +21,7 @@ library of translations is also a good task to start with.
 
 Visit [building](building.md) and [testing](testing.md) sections to
 get more info about these topics and check the list of commands you
-can run in this project. If you feel a bit lost check the `/i18n`
+can run in this project. Check the `/i18n`
 folder in the project - all translations are kept just right there.
 For the functions see the `interpreter/plugin` folder. Both of them
 are a good starting point.
@@ -30,7 +29,7 @@ are a good starting point.
 ## How to get started
 
 1. First, sign this
-Contributor License Agreement](https://goo.gl/forms/yuutGuN0RjsikVpM2)
+[Contributor License Agreement](https://goo.gl/forms/yuutGuN0RjsikVpM2)
 to allow us to use and publish your changes.
 2. Always make your changes on a separate branch. This will speed up
 the merging process.
