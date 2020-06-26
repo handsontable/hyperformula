@@ -65,4 +65,12 @@ describe('Function FORMULATEXT', () => {
 
     expect(engine.getCellValue(adr('B1'))).toEqual('=SUM(1,')
   })
+
+  it('should return itself', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=FORMULATEXT(A1)']
+    ])
+
+    expect(engine.getCellValue(adr('A1'))).toEqual('=FORMULATEXT(A1)')
+  })
 })
