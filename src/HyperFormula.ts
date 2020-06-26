@@ -55,7 +55,7 @@ import {FunctionRegistry, FunctionTranslationsPackage} from './interpreter/Funct
  * ale related to this class.
  *
  * The instance can be created only by calling one of the static methods
- * `buildFromArray`, `buildFromSheets` or `buildEmpty` and should be disposed of with
+ * `buildFromArray`, `buildFromSheets` or `buildEmpty` and should be disposed of with the
  * `destroy` method when it's no longer needed to free the resources.
  *
  * The instance can be seen as a workbook where worksheets can be created and
