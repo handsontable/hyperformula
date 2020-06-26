@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- Add the `languages` directory to the `.npmignore` whitelist to allow using the language packs, which were previously 
+missing from the npm package.
+
 ## [0.1.0] - 2020-06-25
 
 ### Added
