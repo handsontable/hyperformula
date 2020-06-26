@@ -11,7 +11,8 @@ export class FormulaTextPlugin extends FunctionPlugin {
   public static implementedFunctions = {
     'FORMULATEXT': {
       method: 'formulatext',
-      doesNotNeedArgumentsToBeComputed: true
+      doesNotNeedArgumentsToBeComputed: true,
+      isDependentOnSheetStructureChange: true
     },
   }
 

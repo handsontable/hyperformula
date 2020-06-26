@@ -73,4 +73,16 @@ describe('Function FORMULATEXT', () => {
 
     expect(engine.getCellValue(adr('A1'))).toEqual('=FORMULATEXT(A1)')
   })
+
+  it('should be dependent on sheet structure changes', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=SUM(A2)', '=FORMULATEXT(A1)'],
+      [1]
+    ])
+
+    engine.addRows(0, [1, 1])
+
+    expect(engine.getCellFormula(adr('A1'))).toEqual('=SUM(A3)')
+    expect(engine.getCellValue(adr('B1'))).toEqual('=SUM(A3)')
+  })
 })
