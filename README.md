@@ -31,7 +31,7 @@ and [custom functions](https://handsontable.github.io/hyperformula/guide/custom-
   - [React](https://handsontable.github.io/hyperformula/guide/integration-with-react.html)
   - [Vue.js](https://handsontable.github.io/hyperformula/guide/integration-with-vue.html)
   - Angular (coming soon)
-- [Installation](https://handsontable.github.io/hyperformula/guide/client-side.html)
+- [Installation](https://handsontable.github.io/hyperformula/guide/client-side-installation.html)
 - [Basic usage](https://handsontable.github.io/hyperformula/guide/basic-usage.html)
 - [API Reference](https://handsontable.github.io/hyperformula/api/)
 - [Configuration options](https://handsontable.github.io/hyperformula/guide/configuration-options.html)
@@ -55,7 +55,6 @@ import { HyperFormula } from 'hyperformula';
 // define the options
 const options = {
   licenseKey: 'agpl-v3',
-  precisionRounding: 10
 };
 
 // define the data
@@ -92,7 +91,7 @@ applications. Here are some examples:
 ## Contributing
 
 Help us to build the fastest and most flexible calculation engine for
-business web apps. Please read the [Contributing Guide]() before
+business web apps. Please read the [Contributing Guide](https://handsontable.github.io/hyperformula/guide/contributing.html) before
 making a pull request.
 
 Your help is much appreciated in any of the following topics:
