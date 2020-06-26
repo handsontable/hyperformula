@@ -119,6 +119,7 @@ const dictionary: RawTranslationPackage = {
     TAN: 'TAN',
     TEXT: 'SZÖVEG',
     TRANSPOSE: 'TRANSZPONÁLÁS',
+    TRIM: 'KIMETSZ',
     TRUE: 'IGAZ',
     TRUNC: 'CSONK',
     VLOOKUP: 'FKERES',

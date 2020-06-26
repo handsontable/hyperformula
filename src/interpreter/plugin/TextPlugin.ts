@@ -21,6 +21,9 @@ export class TextPlugin extends FunctionPlugin {
     },
     'LEN': {
       method: 'len'
+    },
+    'TRIM': {
+      method: 'trim'
     }
   }
 
@@ -91,6 +94,12 @@ export class TextPlugin extends FunctionPlugin {
   public len(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.templateWithOneCoercedToStringArgument(ast, formulaAddress, (arg: string) => {
       return arg.length
+    })
+  }
+
+  public trim(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.templateWithOneCoercedToStringArgument(ast, formulaAddress, (arg: string) => {
+      return arg.replace(/^ +| +$/g, '').replace(/ +/g, ' ')
     })
   }
 }

@@ -119,6 +119,7 @@ const dictionary: RawTranslationPackage = {
     TAN: 'TAN',
     TEXT: 'TEKST',
     TRANSPOSE: 'TRANSPONER',
+    TRIM: 'FJERN.OVERFLØDIGE.BLANKE',
     TRUE: 'TRUE',
     TRUNC: 'AFKORT',
     VLOOKUP: 'LOPSLAG',

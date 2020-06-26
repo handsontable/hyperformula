@@ -119,6 +119,7 @@ const dictionary: RawTranslationPackage = {
     TAN: 'TG',
     TEXT: 'HODNOTA.NA.TEXT',
     TRANSPOSE: 'TRANSPOZICE',
+    TRIM: 'PROČISTIT',
     TRUE: 'PRAVDA',
     TRUNC: 'USEKNOUT',
     VLOOKUP: 'SVYHLEDAT',

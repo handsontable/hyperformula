@@ -119,6 +119,7 @@ const dictionary: RawTranslationPackage = {
     TAN: 'TAN',
     TEXT: 'METNEÇEVİR',
     TRANSPOSE: 'DEVRİK_DÖNÜŞÜM',
+    TRIM: 'KIRP',
     TRUE: 'DOĞRU',
     TRUNC: 'NSAT',
     VLOOKUP: 'DÜŞEYARA',

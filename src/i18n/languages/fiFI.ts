@@ -119,6 +119,7 @@ const dictionary: RawTranslationPackage = {
     TAN: 'TAN',
     TEXT: 'TEKSTI',
     TRANSPOSE: 'TRANSPONOI',
+    TRIM: 'POISTA.VÄLIT',
     TRUE: 'TOSI',
     TRUNC: 'KATKAISE',
     VLOOKUP: 'PHAKU',
