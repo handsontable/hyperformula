@@ -24,6 +24,9 @@ export class TextPlugin extends FunctionPlugin {
     },
     'TRIM': {
       method: 'trim'
+    },
+    'PROPER': {
+      method: 'proper'
     }
   }
 
@@ -100,6 +103,12 @@ export class TextPlugin extends FunctionPlugin {
   public trim(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.templateWithOneCoercedToStringArgument(ast, formulaAddress, (arg: string) => {
       return arg.replace(/^ +| +$/g, '').replace(/ +/g, ' ')
+    })
+  }
+
+  public proper(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.templateWithOneCoercedToStringArgument(ast, formulaAddress, (arg: string) => {
+      return arg.replace(/\w\S*/g, word => word.charAt(0).toUpperCase() + word.substr(1).toLowerCase())
     })
   }
 }

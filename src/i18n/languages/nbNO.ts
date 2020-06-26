@@ -101,6 +101,7 @@ const dictionary: RawTranslationPackage = {
     OR: 'ELLER',
     PI: 'PI',
     POWER: 'OPPHØYD.I',
+    PROPER: 'STOR.FORBOKSTAV',
     RADIANS: 'RADIANER',
     RAND: 'TILFELDIG',
     ROUND: 'AVRUND',

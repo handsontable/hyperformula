@@ -101,6 +101,7 @@ const dictionary: RawTranslationPackage = {
     OR: 'OU',
     PI: 'PI',
     POWER: 'POTÊNCIA',
+    PROPER: 'PRI.MAIÚSCULA',
     RADIANS: 'RADIANOS',
     RAND: 'ALEATÓRIO',
     ROUND: 'ARRED',

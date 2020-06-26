@@ -101,6 +101,7 @@ const dictionary: RawTranslationPackage = {
     OR: 'VAGY',
     PI: 'PI',
     POWER: 'HATVÁNY',
+    PROPER: 'TNÉV',
     RADIANS: 'RADIÁN',
     RAND: 'VÉL',
     ROUND: 'KEREKÍTÉS',

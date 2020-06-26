@@ -101,6 +101,7 @@ const dictionary: RawTranslationPackage = {
     OR: 'ODER',
     PI: 'PI',
     POWER: 'POTENZ',
+    PROPER: 'GROSS2',
     RADIANS: 'BOGENMASS',
     RAND: 'ZUFALLSZAHL',
     ROUND: 'RUNDEN',

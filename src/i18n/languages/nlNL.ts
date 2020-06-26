@@ -101,6 +101,7 @@ const dictionary: RawTranslationPackage = {
     OR: 'OF',
     PI: 'PI',
     POWER: 'MACHT',
+    PROPER: 'BEGINLETTERS',
     RADIANS: 'RADIALEN',
     RAND: 'ASELECT',
     ROUND: 'AFRONDEN',

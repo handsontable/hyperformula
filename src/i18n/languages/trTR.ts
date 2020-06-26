@@ -101,6 +101,7 @@ const dictionary: RawTranslationPackage = {
     OR: 'VEYA',
     PI: 'Pİ',
     POWER: 'KUVVET',
+    PROPER: 'YAZIM.DÜZENİ',
     RADIANS: 'RADYAN',
     RAND: 'S_SAYI_ÜRET',
     ROUND: 'YUVARLA',

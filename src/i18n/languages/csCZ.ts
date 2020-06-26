@@ -101,6 +101,7 @@ const dictionary: RawTranslationPackage = {
     OR: 'NEBO',
     PI: 'PI',
     POWER: 'POWER',
+    PROPER: 'VELKÁ2',
     RADIANS: 'RADIANS',
     RAND: 'NÁHČÍSLO',
     ROUND: 'ZAOKROUHLIT',

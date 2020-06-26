@@ -101,6 +101,7 @@ const dictionary: RawTranslationPackage = {
     OR: 'TAI',
     PI: 'PII',
     POWER: 'POTENSSI',
+    PROPER: 'ERISNIMI',
     RADIANS: 'RADIAANIT',
     RAND: 'SATUNNAISLUKU',
     ROUND: 'PYÖRISTÄ',
