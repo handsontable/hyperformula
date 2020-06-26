@@ -91,7 +91,7 @@ applications. Here are some examples:
 ## Contributing
 
 Help us to build the fastest and most flexible calculation engine for
-business web apps. Please read the [Contributing Guide]() before
+business web apps. Please read the [Contributing Guide](https://handsontable.github.io/hyperformula/guide/contributing.html) before
 making a pull request.
 
 Your help is much appreciated in any of the following topics:
