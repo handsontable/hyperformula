@@ -19,6 +19,9 @@ export class TextPlugin extends FunctionPlugin {
     'SPLIT': {
       method: 'split',
     },
+    'LEN': {
+      method: 'len'
+    }
   }
 
   /**
@@ -83,5 +86,11 @@ export class TextPlugin extends FunctionPlugin {
     }
 
     return splittedString[indexToUse]
+  }
+
+  public len(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.templateWithOneCoercedToStringArgument(ast, formulaAddress, (arg: string) => {
+      return arg.length
+    })
   }
 }

@@ -80,6 +80,7 @@ const dictionary: RawTranslationPackage = {
     ISNUMBER: 'ESTNUM',
     ISODD: 'EST.IMPAIR',
     ISTEXT: 'ESTTEXTE',
+    LEN: 'NBCAR',
     LN: 'LN',
     LOG: 'LOG',
     LOG10: 'LOG10',

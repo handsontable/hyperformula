@@ -80,6 +80,7 @@ const dictionary: RawTranslationPackage = {
     ISNUMBER: 'ÄRTAL',
     ISODD: 'ÄRUDDA',
     ISTEXT: 'ÄRTEXT',
+    LEN: 'LÄNGD',
     LN: 'LN',
     LOG: 'LOG',
     LOG10: 'LOG10',
