@@ -6,6 +6,8 @@
 import {AstNodeType, ProcedureAst} from '../../parser'
 import {CellError, ErrorType, InternalScalarValue, SimpleCellAddress} from '../../Cell'
 import {FunctionPlugin} from '../index'
+import {AbsoluteCellRange} from '../../AbsoluteCellRange'
+import {Maybe} from '../../Maybe'
 
 export class FormulaTextPlugin extends FunctionPlugin {
   public static implementedFunctions = {
@@ -23,7 +25,19 @@ export class FormulaTextPlugin extends FunctionPlugin {
 
     const arg = ast.args[0]
 
-    if (arg.type !== AstNodeType.CELL_REFERENCE) {
+    let cellReference: Maybe<SimpleCellAddress>
+
+    if (arg.type === AstNodeType.CELL_REFERENCE) {
+      cellReference = arg.reference.toSimpleCellAddress(formulaAddress)
+    } else if (arg.type === AstNodeType.CELL_RANGE || arg.type === AstNodeType.COLUMN_RANGE || arg.type === AstNodeType.ROW_RANGE) {
+      try {
+        cellReference = AbsoluteCellRange.fromAst(arg, formulaAddress).start
+      } catch (e) {
+        return new CellError(ErrorType.REF)
+      }
+    }
+
+    if (cellReference === undefined) {
       const value = this.evaluateAst(arg, formulaAddress)
       if (value instanceof CellError) {
         return value
@@ -31,9 +45,7 @@ export class FormulaTextPlugin extends FunctionPlugin {
       return new CellError(ErrorType.NA)
     }
 
-    const cellReference = arg.reference.toSimpleCellAddress(formulaAddress)
     const formula = this.serialization.getCellFormula(cellReference)
-
     return formula || new CellError(ErrorType.NA)
   }
 }

@@ -16,14 +16,12 @@ describe('Function FORMULATEXT', () => {
     const engine = HyperFormula.buildFromArray([
       ['=FORMULATEXT(1)'],
       ['=FORMULATEXT("foo")'],
-      ['=FORMULATEXT(A1:A2)'],
       ['=FORMULATEXT(SUM(1))'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA))
     expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NA))
     expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.NA))
-    expect(engine.getCellValue(adr('A4'))).toEqual(detailedError(ErrorType.NA))
   })
 
   it('should propagate expression error', () => {
@@ -48,6 +46,24 @@ describe('Function FORMULATEXT', () => {
     ])
 
     expect(engine.getCellValue(adr('B1'))).toEqual('=SUM(1, 2)')
+  })
+
+  it('should return formula of a left corner cell', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=SUM(1, 2)', '=FORMULATEXT(A1:A2)']
+    ])
+
+    expect(engine.getCellValue(adr('B1'))).toEqual('=SUM(1, 2)')
+  })
+
+  it('should return REF when ', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=SUM(1, 2)']
+    ])
+    engine.addSheet('Sheet2')
+    engine.setCellContents(adr('B1'), '=FORMULATEXT(Sheet1!A1:Sheet2!A2)')
+
+    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.REF))
   })
 
   it('should work for matrix formula', () => {
