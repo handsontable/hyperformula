@@ -67,6 +67,7 @@ const dictionary: RawTranslationPackage = {
     EVEN: 'LIGE',
     EXP: 'EKSP',
     FALSE: 'FALSE',
+    FORMULATEXT: 'FORMELTEKST',
     IF: 'HVIS',
     IFERROR: 'HVIS.FEJL',
     IFNA: 'HVISIT',

@@ -67,6 +67,7 @@ const dictionary: RawTranslationPackage = {
     EVEN: 'ÇİFT',
     EXP: 'ÜS',
     FALSE: 'YANLIŞ',
+    FORMULATEXT: 'FORMÜLMETNİ',
     IF: 'EĞER',
     IFERROR: 'EĞERHATA',
     IFNA: 'EĞERYOKSA',

@@ -67,6 +67,7 @@ const dictionary: RawTranslationPackage = {
     EVEN: 'PÁROS',
     EXP: 'KITEVŐ',
     FALSE: 'HAMIS',
+    FORMULATEXT: 'KÉPLETSZÖVEG',
     IF: 'HA',
     IFERROR: 'HAHIBA',
     IFNA: 'HAHIÁNYZIK',

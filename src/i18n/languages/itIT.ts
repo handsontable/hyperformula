@@ -67,6 +67,7 @@ const dictionary: RawTranslationPackage = {
     EVEN: 'PARI',
     EXP: 'EXP',
     FALSE: 'FALSO',
+    FORMULATEXT: 'TESTO.FORMULA',
     IF: 'SE',
     IFERROR: 'SE.ERRORE',
     IFNA: 'SE.NON.DISP.',
