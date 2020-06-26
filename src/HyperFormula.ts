@@ -3050,7 +3050,7 @@ export class HyperFormula implements TypedEmitter {
    * });
    *
    * // returns the value of calculated formula, '32' for this example
-   * const calculatedFormula = hfInstance.calculateFormula('=A1+10', 'Sheet1'));
+   * const calculatedFormula = hfInstance.calculateFormula('=A1+10', 'Sheet1');
    * ```
    *
    * @category Helpers
