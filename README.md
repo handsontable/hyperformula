@@ -55,7 +55,6 @@ import { HyperFormula } from 'hyperformula';
 // define the options
 const options = {
   licenseKey: 'agpl-v3',
-  precisionRounding: 10
 };
 
 // define the data
