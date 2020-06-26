@@ -93,7 +93,7 @@ export class HyperFormula implements TypedEmitter {
   /**
    * Contains all available languages to use in registerLanguage.
    * 
-   * @category Static Properies
+   * @category Static Properties
    */
   public static languages: Record<string, RawTranslationPackage> = {}
 
