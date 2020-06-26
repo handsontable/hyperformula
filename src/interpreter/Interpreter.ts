@@ -22,6 +22,7 @@ import {concatenate} from './text'
 import {NumberLiteralHelper} from '../NumberLiteralHelper'
 import {FunctionRegistry} from './FunctionRegistry'
 import {NamedExpressions} from '../NamedExpressions'
+import {Serialization} from '../Serialization'
 
 export class Interpreter {
   private gpu?: GPU.GPU
@@ -37,6 +38,7 @@ export class Interpreter {
     public readonly numberLiteralsHelper: NumberLiteralHelper,
     public readonly functionRegistry: FunctionRegistry,
     public readonly namedExpressions: NamedExpressions,
+    public readonly serialization: Serialization
   ) {
     this.functionRegistry.initializePlugins(this)
     this.arithmeticHelper = new ArithmeticHelper(config, dateHelper, numberLiteralsHelper)

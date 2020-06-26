@@ -20,6 +20,7 @@ import {Statistics, StatType} from './statistics'
 import {NumberLiteralHelper} from './NumberLiteralHelper'
 import {NamedExpressions} from './NamedExpressions'
 import {FunctionRegistry} from './interpreter/FunctionRegistry'
+import {Serialization} from './Serialization'
 
 export class Evaluator {
   private interpreter: Interpreter
@@ -32,9 +33,10 @@ export class Evaluator {
     public readonly dateHelper: DateTimeHelper,
     private readonly numberLiteralsHelper: NumberLiteralHelper,
     private readonly functionRegistry: FunctionRegistry,
-    private readonly namedExpressions: NamedExpressions
+    private readonly namedExpressions: NamedExpressions,
+    private readonly serialization: Serialization
   ) {
-    this.interpreter = new Interpreter(this.dependencyGraph, this.columnSearch, this.config, this.stats, this.dateHelper, this.numberLiteralsHelper, this.functionRegistry, this.namedExpressions)
+    this.interpreter = new Interpreter(this.dependencyGraph, this.columnSearch, this.config, this.stats, this.dateHelper, this.numberLiteralsHelper, this.functionRegistry, this.namedExpressions, this.serialization)
   }
 
   public run(): void {
