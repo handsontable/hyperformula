@@ -5,10 +5,11 @@ import {
   enrichStatistics,
   ExtStatType,
   measureCruds,
-  reduceStats,
+  reduceStats, Stats,
   statsTreePrint,
   statsTreePrintCruds
 } from './utils/stats'
+import {Maybe} from '../../src/Maybe'
 
 export interface Config {
   expectedTime?: number,
@@ -25,12 +26,20 @@ export interface ExpectedValue {
   value: CellValue,
 }
 
-export function benchmark(name: string, sheet: Sheet, expectedValues: ExpectedValue[], config: Partial<Config> = defaultConfig): HyperFormula {
+export interface BenchmarkResult {
+  name: string,
+  engine: HyperFormula,
+  totalTime: number,
+  statistics: Stats,
+}
+
+export function benchmark(name: string, sheet: Sheet, expectedValues: ExpectedValue[], config: Partial<Config> = defaultConfig): Maybe<BenchmarkResult> {
   const runEngine = (engineConfig?: Partial<ConfigParams>) => HyperFormula.buildFromArray(sheet, engineConfig)
   return benchmarkBuild(name, runEngine, expectedValues, config)
 }
 
-export function benchmarkCruds(name: string, sheet: Sheet, cruds: (engine: HyperFormula) => void, expectedValues: ExpectedValue[], userConfig: Partial<Config> = defaultConfig): HyperFormula {
+export function benchmarkCruds(name: string, sheet: Sheet, cruds: (engine: HyperFormula) => void,
+                               expectedValues: ExpectedValue[], userConfig: Partial<Config> = defaultConfig): Maybe<BenchmarkResult> {
   console.info(`=== Benchmark - ${name} === `)
 
   const config = Object.assign({}, defaultConfig, userConfig)
@@ -45,16 +54,31 @@ export function benchmarkCruds(name: string, sheet: Sheet, cruds: (engine: Hyper
     if (process.exit) {
       process.exit(1)
     }
-    return engine
+    return
   }
 
+  const totalTime = statistics.get(ExtStatType.CRUDS_TOTAL) || 0
   statsTreePrintCruds(statistics)
-  checkExpectedTime('CRUDS total time', statistics.get(ExtStatType.CRUDS_TOTAL) || 0, config.expectedTime)
 
-  return engine
+  return {
+    name: name,
+    engine: engine,
+    totalTime: totalTime,
+    statistics: statistics,
+  }
 }
 
-function benchmarkBuild(name: string, runEngine: (engineConfig?: Partial<ConfigParams>) => HyperFormula, expectedValues: ExpectedValue[], userConfig: Partial<Config> = defaultConfig): HyperFormula {
+export function batch(stats: BenchmarkResult[], ...benchmarks: (() => Maybe<BenchmarkResult>)[]): void {
+  for (const benchmark of benchmarks) {
+    const result = benchmark()
+    if (result !== undefined) {
+      stats.push(result)
+    }
+  }
+}
+
+function benchmarkBuild(name: string, runEngine: (engineConfig?: Partial<ConfigParams>) => HyperFormula,
+                        expectedValues: ExpectedValue[], userConfig: Partial<Config> = defaultConfig): Maybe<BenchmarkResult> {
   console.info(`=== Benchmark - ${name} === `)
 
   const config = Object.assign({}, defaultConfig, userConfig)
@@ -76,16 +100,20 @@ function benchmarkBuild(name: string, runEngine: (engineConfig?: Partial<ConfigP
       if (process.exit) {
         process.exit(1)
       }
-      return engine
+      return
     }
   } while (currentRun < config.numberOfRuns)
 
   const averages = reduceStats(statistics, average)
   statsTreePrint(averages)
-  const time = averages.get(EnrichedStatType.BUILD_ENGINE_TOTAL) || 0
-  checkExpectedTime('Average build time', time, config.expectedTime)
+  const totalTime = averages.get(EnrichedStatType.BUILD_ENGINE_TOTAL) || 0
 
-  return engine
+  return {
+    name: name,
+    engine: engine,
+    statistics: averages,
+    totalTime: totalTime
+  }
 }
 
 function validate(engine: HyperFormula, expectedValues: ExpectedValue[]) {
@@ -110,14 +138,4 @@ function validate(engine: HyperFormula, expectedValues: ExpectedValue[]) {
   }
 
   return valid
-}
-
-function checkExpectedTime(name: string, totalTime: number, limit: number | undefined) {
-  console.info(`${name}: ${totalTime}. Expected: ${limit}\n`)
-  if (limit !== undefined && totalTime > limit) {
-    console.error('Time exceeded\n')
-    if (process.exit) {
-      process.exit(1)
-    }
-  }
 }
