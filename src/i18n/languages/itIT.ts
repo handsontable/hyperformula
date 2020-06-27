@@ -39,6 +39,7 @@ const dictionary: RawTranslationPackage = {
     CEILING: 'ARROTONDA.ECCESSO',
     CHAR: 'CODICE.CARATT',
     CHOOSE: 'SCEGLI',
+    CLEAN: 'LIBERA',
     CODE: 'CODICE',
     COLUMNS: 'COLONNE',
     CONCATENATE: 'CONCATENA',

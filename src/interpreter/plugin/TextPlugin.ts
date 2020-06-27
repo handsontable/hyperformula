@@ -27,6 +27,9 @@ export class TextPlugin extends FunctionPlugin {
     },
     'PROPER': {
       method: 'proper'
+    },
+    'CLEAN': {
+      method: 'clean'
     }
   }
 
@@ -109,6 +112,13 @@ export class TextPlugin extends FunctionPlugin {
   public proper(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.templateWithOneCoercedToStringArgument(ast, formulaAddress, (arg: string) => {
       return arg.replace(/\w\S*/g, word => word.charAt(0).toUpperCase() + word.substr(1).toLowerCase())
+    })
+  }
+
+  public clean(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.templateWithOneCoercedToStringArgument(ast, formulaAddress, (arg: string) => {
+      // eslint-disable-next-line no-control-regex
+      return arg.replace(/[\u0000-\u001F]/g, '')
     })
   }
 }

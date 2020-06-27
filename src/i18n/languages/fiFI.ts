@@ -39,6 +39,7 @@ const dictionary: RawTranslationPackage = {
     CEILING: 'PYÖRISTÄ.KERR.YLÖS',
     CHAR: 'MERKKI',
     CHOOSE: 'VALITSE.INDEKSI',
+    CLEAN: 'SIIVOA',
     CODE: 'KOODI',
     COLUMNS: 'SARAKKEET',
     CONCATENATE: 'KETJUTA',

@@ -39,6 +39,7 @@ const dictionary: RawTranslationPackage = {
     CEILING: 'PLAFON',
     CHAR: 'KARAKTER',
     CHOOSE: 'VÁLASZT',
+    CLEAN: 'TISZTÍT',
     CODE: 'KÓD',
     COLUMNS: 'OSZLOPOK',
     CONCATENATE: 'ÖSSZEFŰZ',

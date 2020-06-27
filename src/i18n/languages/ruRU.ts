@@ -39,6 +39,7 @@ const dictionary: RawTranslationPackage = {
     CEILING: 'ОКРВВЕРХ',
     CHAR: 'СИМВОЛ',
     CHOOSE: 'ВЫБОР',
+    CLEAN: 'ПЕЧСИМВ',
     CODE: 'КОДСИМВ',
     COLUMNS: 'ЧИСЛСТОЛБ',
     CONCATENATE: 'СЦЕПИТЬ',

@@ -39,6 +39,7 @@ const dictionary: RawTranslationPackage = {
     CEILING: 'TAVANAYUVARLA',
     CHAR: 'DAMGA',
     CHOOSE: 'ELEMAN',
+    CLEAN: 'TEMİZ',
     CODE: 'KOD',
     COLUMNS: 'SÜTUNSAY',
     CONCATENATE: 'BİRLEŞTİR',

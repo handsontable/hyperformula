@@ -39,6 +39,7 @@ const dictionary: RawTranslationPackage = {
     CEILING: 'AFRONDEN.BOVEN',
     CHAR: 'TEKEN',
     CHOOSE: 'KIEZEN',
+    CLEAN: 'WISSEN.CONTROL',
     CODE: 'CODE',
     COLUMNS: 'KOLOMMEN',
     CONCATENATE: 'TEKST.SAMENVOEGEN',

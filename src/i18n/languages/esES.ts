@@ -39,6 +39,7 @@ export const dictionary: RawTranslationPackage = {
     CEILING: 'MULTIPLO.SUPERIOR',
     CHAR: 'CARACTER',
     CHOOSE: 'ELEGIR',
+    CLEAN: 'LIMPIAR',
     CODE: 'CODIGO',
     COLUMNS: 'COLUMNAS',
     CONCATENATE: 'CONCATENAR',

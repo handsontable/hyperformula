@@ -39,6 +39,7 @@ const dictionary: RawTranslationPackage = {
     CEILING: 'RUNDA.UPP',
     CHAR: 'TECKENKOD',
     CHOOSE: 'VÄLJ',
+    CLEAN: 'STÄDA',
     CODE: 'KOD',
     COLUMNS: 'KOLUMNER',
     CONCATENATE: 'SAMMANFOGA',

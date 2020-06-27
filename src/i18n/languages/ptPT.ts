@@ -39,6 +39,7 @@ const dictionary: RawTranslationPackage = {
     CEILING: 'TETO',
     CHAR: 'CARACT',
     CHOOSE: 'ESCOLHER',
+    CLEAN: 'TIRAR',
     CODE: 'CÓDIGO',
     COLUMNS: 'COLS',
     CONCATENATE: 'CONCATENAR',

@@ -39,6 +39,7 @@ const dictionary: RawTranslationPackage = {
     CEILING: 'PLAFOND',
     CHAR: 'CAR',
     CHOOSE: 'CHOISIR',
+    CLEAN: 'EPURAGE',
     CODE: 'CODE',
     COLUMNS: 'COLONNES',
     CONCATENATE: 'CONCATENER',

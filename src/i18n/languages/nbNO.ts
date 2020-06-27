@@ -39,6 +39,7 @@ const dictionary: RawTranslationPackage = {
     CEILING: 'AVRUND.GJELDENDE.MULTIPLUM',
     CHAR: 'TEGNKODE',
     CHOOSE: 'VELG',
+    CLEAN: 'RENSK',
     CODE: 'KODE',
     COLUMNS: 'KOLONNER',
     CONCATENATE: 'KJEDE.SAMMEN',

@@ -39,6 +39,7 @@ const dictionary: RawTranslationPackage = {
     CEILING: 'CEILING',
     CHAR: 'CHAR',
     CHOOSE: 'CHOOSE',
+    CLEAN: 'CLEAN',
     CODE: 'CODE',
     COLUMNS: 'COLUMNS',
     CONCATENATE: 'CONCATENATE',

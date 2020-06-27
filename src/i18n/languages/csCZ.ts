@@ -39,6 +39,7 @@ const dictionary: RawTranslationPackage = {
     CEILING: 'ZAOKR.NAHORU',
     CHAR: 'ZNAK',
     CHOOSE: 'ZVOLIT',
+    CLEAN: 'VYČISTIT',
     CODE: 'KÓD',
     COLUMNS: 'SLOUPCE',
     CONCATENATE: 'CONCATENATE',
