@@ -30,6 +30,9 @@ export class TextPlugin extends FunctionPlugin {
     },
     'CLEAN': {
       method: 'clean'
+    },
+    'REPT': {
+      method: 'rept'
     }
   }
 
@@ -119,6 +122,18 @@ export class TextPlugin extends FunctionPlugin {
     return this.templateWithOneCoercedToStringArgument(ast, formulaAddress, (arg: string) => {
       // eslint-disable-next-line no-control-regex
       return arg.replace(/[\u0000-\u001F]/g, '')
+    })
+  }
+
+  public rept(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.coerceArguments(ast, formulaAddress, [
+      coerceScalarToString,
+      this.coerceScalarToNumberOrError
+    ], (text: string, count: number) => {
+      if (count < 0) {
+        return new CellError(ErrorType.VALUE)
+      }
+      return text.repeat(count)
     })
   }
 }

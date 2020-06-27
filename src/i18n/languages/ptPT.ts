@@ -105,6 +105,7 @@ const dictionary: RawTranslationPackage = {
     PROPER: 'PRI.MAIÚSCULA',
     RADIANS: 'RADIANOS',
     RAND: 'ALEATÓRIO',
+    REPT: 'REPT',
     ROUND: 'ARRED',
     ROUNDDOWN: 'ARREDONDAR.PARA.BAIXO',
     ROUNDUP: 'ARREDONDAR.PARA.CIMA',

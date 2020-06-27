@@ -105,6 +105,7 @@ const dictionary: RawTranslationPackage = {
     PROPER: 'BEGINLETTERS',
     RADIANS: 'RADIALEN',
     RAND: 'ASELECT',
+    REPT: 'HERHALING',
     ROUND: 'AFRONDEN',
     ROUNDDOWN: 'AFRONDEN.NAAR.BENEDEN',
     ROUNDUP: 'AFRONDEN.NAAR.BOVEN',

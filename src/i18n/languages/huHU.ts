@@ -105,6 +105,7 @@ const dictionary: RawTranslationPackage = {
     PROPER: 'TNÉV',
     RADIANS: 'RADIÁN',
     RAND: 'VÉL',
+    REPT: 'SOKSZOR',
     ROUND: 'KEREKÍTÉS',
     ROUNDDOWN: 'KEREK.LE',
     ROUNDUP: 'KEREK.FEL',

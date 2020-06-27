@@ -105,6 +105,7 @@ const dictionary: RawTranslationPackage = {
     PROPER: 'Z.WIELKIEJ.LITERY',
     RADIANS: 'RADIANY',
     RAND: 'LOSUJ',
+    REPT: 'POWT',
     ROUND: 'ZAOKR',
     ROUNDDOWN: 'ZAOKR.DÓŁ',
     ROUNDUP: 'ZAOKR.GÓRA',

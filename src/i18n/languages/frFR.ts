@@ -105,6 +105,7 @@ const dictionary: RawTranslationPackage = {
     PROPER: 'NOMPROPRE',
     RADIANS: 'RADIANS',
     RAND: 'ALEA',
+    REPT: 'REPT',
     ROUND: 'ARRONDI',
     ROUNDDOWN: 'ARRONDI.INF',
     ROUNDUP: 'ARRONDI.SUP',

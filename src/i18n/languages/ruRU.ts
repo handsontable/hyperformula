@@ -105,6 +105,7 @@ const dictionary: RawTranslationPackage = {
     PROPER: 'ПРОПНАЧ',
     RADIANS: 'РАДИАНЫ',
     RAND: 'СЛЧИС',
+    REPT: 'ПОВТОР',
     ROUND: 'ОКРУГЛ',
     ROUNDDOWN: 'ОКРУГЛВНИЗ',
     ROUNDUP: 'ОКРУГЛВВЕРХ',

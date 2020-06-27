@@ -105,6 +105,7 @@ const dictionary: RawTranslationPackage = {
     PROPER: 'STORT.FORBOGSTAV',
     RADIANS: 'RADIANER',
     RAND: 'SLUMP',
+    REPT: 'GENTAG',
     ROUND: 'AFRUND',
     ROUNDDOWN: 'RUND.NED',
     ROUNDUP: 'RUND.OP',

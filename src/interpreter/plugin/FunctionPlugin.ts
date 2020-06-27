@@ -25,7 +25,8 @@ export interface FunctionMetadata {
 }
 
 export interface FunctionPluginDefinition {
-  new (interpreter: Interpreter): FunctionPlugin,
+  new(interpreter: Interpreter): FunctionPlugin,
+
   implementedFunctions: ImplementedFunctions,
 }
 
@@ -81,11 +82,11 @@ export abstract class FunctionPlugin {
   }
 
   protected templateWithOneCoercedToNumberArgument(ast: ProcedureAst, formulaAddress: SimpleCellAddress, fn: (arg: number) => InternalScalarValue): InternalScalarValue {
-    return this.templateWithOneArgumentCoercion(ast, formulaAddress, (arg: InternalScalarValue) => this.coerceScalarToNumberOrError(arg), fn)
+    return this.coerceArguments(ast, formulaAddress, [this.coerceScalarToNumberOrError], fn)
   }
 
   protected templateWithOneCoercedToStringArgument(ast: ProcedureAst, formulaAddress: SimpleCellAddress, fn: (arg: string) => InternalScalarValue): InternalScalarValue {
-    return this.templateWithOneArgumentCoercion(ast, formulaAddress, coerceScalarToString, fn)
+    return this.coerceArguments(ast, formulaAddress, [coerceScalarToString], fn)
   }
 
   protected validateTwoNumericArguments(ast: ProcedureAst, formulaAddress: SimpleCellAddress): [number, number] | CellError {
@@ -138,32 +139,36 @@ export abstract class FunctionPlugin {
     return value
   }
 
-  protected coerceScalarToNumberOrError(arg: InternalScalarValue): number | CellError {
-    return this.interpreter.arithmeticHelper.coerceScalarToNumberOrError(arg)
-  }
+  protected coerceScalarToNumberOrError = (arg: InternalScalarValue): number | CellError => this.interpreter.arithmeticHelper.coerceScalarToNumberOrError(arg)
 
-  private templateWithOneArgumentCoercion(
+  protected coerceArguments = (
     ast: ProcedureAst,
     formulaAddress: SimpleCellAddress,
-    coerceFunction: (arg: InternalScalarValue) => InternalScalarValue,
-    fn: (arg: any) => InternalScalarValue,
-  ) {
-    if (ast.args.length !== 1) {
+    coerceFunctions: ((arg: InternalScalarValue) => InternalScalarValue)[],
+    fn: (...arg: any) => InternalScalarValue,
+  ) => {
+    const numberOfArguments = coerceFunctions.length
+
+    if (ast.args.length !== numberOfArguments) {
       return new CellError(ErrorType.NA)
     }
     if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
       return new CellError(ErrorType.NUM)
     }
 
-    const arg = this.evaluateAst(ast.args[0], formulaAddress)
-    if (arg instanceof SimpleRangeValue) {
-      return new CellError(ErrorType.VALUE)
+    const coercedArguments: InternalScalarValue[] = []
+    for (let i = 0; i < ast.args.length; ++i) {
+      const arg = this.evaluateAst(ast.args[i], formulaAddress)
+      if (arg instanceof SimpleRangeValue) {
+        return new CellError(ErrorType.VALUE)
+      }
+      const coercedArg = coerceFunctions[i](arg)
+      if (coercedArg instanceof CellError) {
+        return coercedArg
+      }
+      coercedArguments.push(coercedArg)
     }
-    const coercedArg = coerceFunction(arg)
-    if (coercedArg instanceof CellError) {
-      return coercedArg
-    } else {
-      return fn(coercedArg)
-    }
+
+    return fn(...coercedArguments)
   }
 }
