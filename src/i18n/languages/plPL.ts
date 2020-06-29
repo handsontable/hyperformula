@@ -81,6 +81,7 @@ const dictionary: RawTranslationPackage = {
     ISNUMBER: 'CZY.LICZBA',
     ISODD: 'CZY.NIEPARZYSTE',
     ISTEXT: 'CZY.TEKST',
+    LEFT: 'LEWY',
     LEN: 'DŁ',
     LN: 'LN',
     LOG: 'LOG',

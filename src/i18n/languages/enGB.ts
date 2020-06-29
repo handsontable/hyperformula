@@ -81,6 +81,7 @@ const dictionary: RawTranslationPackage = {
     ISNUMBER: 'ISNUMBER',
     ISODD: 'ISODD',
     ISTEXT: 'ISTEXT',
+    LEFT: 'LEFT',
     LEN: 'LEN',
     LN: 'LN',
     LOG: 'LOG',

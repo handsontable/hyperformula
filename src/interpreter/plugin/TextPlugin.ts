@@ -36,6 +36,9 @@ export class TextPlugin extends FunctionPlugin {
     },
     'RIGHT': {
       method: 'right'
+    },
+    'LEFT': {
+      method: 'left'
     }
   }
 
@@ -154,6 +157,21 @@ export class TextPlugin extends FunctionPlugin {
         return ''
       }
       return text.slice(-lenght)
+    })
+  }
+
+  public left(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.coerceArgumentsWithDefaults(ast.args, formulaAddress, [
+      coerceScalarToString,
+      this.coerceScalarToNumberOrError
+    ], [
+      undefined,
+      1
+    ], (text: string, lenght: number) => {
+      if (lenght < 0) {
+        return new CellError(ErrorType.VALUE)
+      }
+      return text.slice(0, lenght)
     })
   }
 }
