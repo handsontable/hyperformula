@@ -35,13 +35,15 @@ describe('Function REPT', () => {
       ['=REPT("foo", 0)'],
       ['=REPT("foo", 3)'],
       ['=REPT(1, 5)'],
+      ['=REPT(, 5)'],
       ['=REPT("Na", 7)&" Batman!"'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqual('')
     expect(engine.getCellValue(adr('A2'))).toEqual('foofoofoo')
     expect(engine.getCellValue(adr('A3'))).toEqual('11111')
-    expect(engine.getCellValue(adr('A4'))).toEqual('NaNaNaNaNaNaNa Batman!')
+    expect(engine.getCellValue(adr('A4'))).toEqual('')
+    expect(engine.getCellValue(adr('A5'))).toEqual('NaNaNaNaNaNaNa Batman!')
   })
 
   it('should coerce other types to string', () => {

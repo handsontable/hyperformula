@@ -12,6 +12,7 @@ import {Ast, AstNodeType, ProcedureAst} from '../../parser'
 import {coerceScalarToString} from '../ArithmeticHelper'
 import {Interpreter} from '../Interpreter'
 import {InterpreterValue, SimpleRangeValue} from '../InterpreterValue'
+import {Maybe} from '../../Maybe'
 
 export interface ImplementedFunctions {
   [formulaId: string]: FunctionMetadata,
@@ -147,18 +148,23 @@ export abstract class FunctionPlugin {
     coerceFunctions: ((arg: InternalScalarValue) => InternalScalarValue)[],
     fn: (...arg: any) => InternalScalarValue,
   ) => {
-    const numberOfArguments = coerceFunctions.length
+    return this.coerceArgumentsWithDefaults(ast.args, formulaAddress, coerceFunctions, [], fn)
+  }
 
-    if (ast.args.length !== numberOfArguments) {
+  protected coerceArgumentsWithDefaults = (
+    args: Ast[],
+    formulaAddress: SimpleCellAddress,
+    coerceFunctions: ((arg: InternalScalarValue) => InternalScalarValue)[],
+    defaults: Maybe<InternalScalarValue>[],
+    fn: (...arg: any) => InternalScalarValue
+  ) => {
+    if (args.length > coerceFunctions.length) {
       return new CellError(ErrorType.NA)
-    }
-    if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
-      return new CellError(ErrorType.NUM)
     }
 
     const coercedArguments: InternalScalarValue[] = []
-    for (let i = 0; i < ast.args.length; ++i) {
-      const arg = this.evaluateAst(ast.args[i], formulaAddress)
+    for (let i = 0; i < coerceFunctions.length; ++i) {
+      const arg = this.evaluateArgOrDefault(formulaAddress, args[i], defaults[i])
       if (arg instanceof SimpleRangeValue) {
         return new CellError(ErrorType.VALUE)
       }
@@ -170,5 +176,12 @@ export abstract class FunctionPlugin {
     }
 
     return fn(...coercedArguments)
+  }
+
+  protected evaluateArgOrDefault = (formulaAddress: SimpleCellAddress, argAst?: Ast, defaultValue?: InternalScalarValue): InterpreterValue => {
+    if (argAst !== undefined) {
+      return this.evaluateAst(argAst, formulaAddress)
+    }
+    return defaultValue || new CellError(ErrorType.NA)
   }
 }
