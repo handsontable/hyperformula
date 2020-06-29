@@ -5,6 +5,8 @@
 ### HyperFormula is an open source, spreadsheet-like calculation engine ⚡
 
 ## Description
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fhandsontable%2Fhyperformula.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Fhandsontable%2Fhyperformula?ref=badge_shield)
+
 
 HyperFormula allows you to perform spreadsheet-like calculations in your
 web applications. It is written in TypeScript and supports all major
@@ -72,6 +74,9 @@ console.log(mySum);
 ```
 
 [View this code online](https://codesandbox.io/s/github/handsontable/hyperformula-demos/tree/develop/basic-usage)
+
+
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fhandsontable%2Fhyperformula.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2Fhandsontable%2Fhyperformula?ref=badge_large)
 
 ## What can it be used for?
 
