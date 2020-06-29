@@ -106,6 +106,7 @@ const dictionary: RawTranslationPackage = {
     RADIANS: 'BOGENMASS',
     RAND: 'ZUFALLSZAHL',
     REPT: 'WIEDERHOLEN',
+    RIGHT: 'RECHTS',
     ROUND: 'RUNDEN',
     ROUNDDOWN: 'ABRUNDEN',
     ROUNDUP: 'AUFRUNDEN',

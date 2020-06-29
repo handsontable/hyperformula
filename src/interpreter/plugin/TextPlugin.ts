@@ -33,6 +33,9 @@ export class TextPlugin extends FunctionPlugin {
     },
     'REPT': {
       method: 'rept'
+    },
+    'RIGHT': {
+      method: 'right'
     }
   }
 
@@ -134,6 +137,23 @@ export class TextPlugin extends FunctionPlugin {
         return new CellError(ErrorType.VALUE)
       }
       return text.repeat(count)
+    })
+  }
+
+  public right(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.coerceArgumentsWithDefaults(ast.args, formulaAddress, [
+      coerceScalarToString,
+      this.coerceScalarToNumberOrError
+    ], [
+      undefined,
+      1
+    ], (text: string, lenght: number) => {
+      if (lenght < 0) {
+        return new CellError(ErrorType.VALUE)
+      } else if (lenght === 0) {
+        return ''
+      }
+      return text.slice(-lenght)
     })
   }
 }

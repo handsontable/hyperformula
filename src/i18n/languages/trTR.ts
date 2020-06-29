@@ -106,6 +106,7 @@ const dictionary: RawTranslationPackage = {
     RADIANS: 'RADYAN',
     RAND: 'S_SAYI_ÜRET',
     REPT: 'YİNELE',
+    RIGHT: 'SAĞ',
     ROUND: 'YUVARLA',
     ROUNDDOWN: 'AŞAĞIYUVARLA',
     ROUNDUP: 'YUKARIYUVARLA',

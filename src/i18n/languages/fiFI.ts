@@ -106,6 +106,7 @@ const dictionary: RawTranslationPackage = {
     RADIANS: 'RADIAANIT',
     RAND: 'SATUNNAISLUKU',
     REPT: 'TOISTA',
+    RIGHT: 'OIKEA',
     ROUND: 'PYÖRISTÄ',
     ROUNDDOWN: 'PYÖRISTÄ.DES.ALAS',
     ROUNDUP: 'PYÖRISTÄ.DES.YLÖS',

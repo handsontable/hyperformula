@@ -106,6 +106,7 @@ const dictionary: RawTranslationPackage = {
     RADIANS: 'RADIANER',
     RAND: 'SLUMP',
     REPT: 'REP',
+    RIGHT: 'HÖGER',
     ROUND: 'AVRUNDA',
     ROUNDDOWN: 'AVRUNDA.NEDÅT',
     ROUNDUP: 'AVRUNDA.UPPÅT',
