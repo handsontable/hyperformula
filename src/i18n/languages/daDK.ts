@@ -68,6 +68,7 @@ const dictionary: RawTranslationPackage = {
     EVEN: 'LIGE',
     EXP: 'EKSP',
     FALSE: 'FALSE',
+    FIND: 'FIND',
     IF: 'HVIS',
     IFERROR: 'HVIS.FEJL',
     IFNA: 'HVISIT',

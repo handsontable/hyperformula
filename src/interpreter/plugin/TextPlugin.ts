@@ -42,6 +42,9 @@ export class TextPlugin extends FunctionPlugin {
     },
     'SEARCH': {
       method: 'search'
+    },
+    'FIND': {
+      method: 'find'
     }
   }
 
@@ -202,6 +205,27 @@ export class TextPlugin extends FunctionPlugin {
       }
 
       index = index + startIndex
+      return index > 0 ? index : new CellError(ErrorType.VALUE)
+    })
+  }
+
+  public find(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.coerceArgumentsWithDefaults(ast.args, formulaAddress, [
+      coerceScalarToString,
+      coerceScalarToString,
+      this.coerceScalarToNumberOrError
+    ], [
+      undefined,
+      undefined,
+      1
+    ], (pattern, text: string, startIndex: number) => {
+      if (startIndex < 1 || startIndex > text.length) {
+        return new CellError(ErrorType.VALUE)
+      }
+
+      const shiftedText = text.substr(startIndex - 1)
+      const index = shiftedText.indexOf(pattern) + startIndex
+
       return index > 0 ? index : new CellError(ErrorType.VALUE)
     })
   }

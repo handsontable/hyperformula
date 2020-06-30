@@ -68,6 +68,7 @@ const dictionary: RawTranslationPackage = {
     EVEN: 'ZAOKROUHLIT.NA.SUDÉ',
     EXP: 'EXP',
     FALSE: 'NEPRAVDA',
+    FIND: 'NAJÍT',
     IF: 'KDYŽ',
     IFERROR: 'IFERROR',
     IFNA: 'IFNA',

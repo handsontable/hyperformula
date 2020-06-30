@@ -68,6 +68,7 @@ export const dictionary: RawTranslationPackage = {
     EVEN: 'REDONDEA.PAR',
     EXP: 'EXP',
     FALSE: 'FALSO',
+    FIND: 'ENCONTRAR',
     IF: 'SI',
     IFERROR: 'SI.ERROR',
     IFNA: 'IFNA',
