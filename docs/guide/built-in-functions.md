@@ -88,11 +88,11 @@ lets you design your own [custom functions](custom-functions).
 | ISNONTEXT | Information | Returns TRUE if the value is not text. | ISNONTEXT(value) |
 | ISNUMBER | Information | Returns TRUE if the value is a number. | ISNUMBER(value) |
 | ISODD | Information | Returns TRUE if the value is odd, or FALSE if the number is even. | ISODD(Value) |
-| ISTEXT | Information | Returns TRUE if the value is text. | ISTEXT(value) |
+| ISTEXT | Information | Returns TRUE if the value is text. | ISTEXT(Value) |
 | AND | Logical | Returns TRUE if all arguments are TRUE. | AND(Logicalvalue1; Logicalvalue2 ...Logicalvalue30) |
 | FALSE | Logical | Returns the logical value FALSE. | FALSE() |
 | IF | Logical | Specifies a logical test to be performed. | IF(Test; Then value; Otherwisevalue) |
-| IFNA | Logical | Returns the value you specify if the expression resolves to #N/A, otherwise returns the result of the expression | IFNA(value, value_if_na) |
+| IFNA | Logical | Returns the value you specify if the expression resolves to #N/A, otherwise returns the result of the expression | IFNA(Value, Value_if_NA) |
 | IFERROR | Logical | Returns a value you specify if a formula evaluates to an error; otherwise, returns the result of the formula. | IFERROR(A2/B2, "Error in calculation") |
 | NOT | Logical | Complements (inverts) a logical value. | NOT(Logicalvalue) |
 | SWITCH | Logical | Evaluates an expression against a list of values and returns the result corresponding to the first matching value. | SWITCH(Value1 Value2, Value3, Value4) |
