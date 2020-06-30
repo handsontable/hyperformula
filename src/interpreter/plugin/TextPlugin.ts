@@ -138,9 +138,9 @@ export class TextPlugin extends FunctionPlugin {
   }
 
   public rept(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.coerceArguments(ast, formulaAddress, [
-      coerceScalarToString,
-      this.coerceScalarToNumberOrError
+    return this.coerceArgumentsWithDefaults(ast.args, formulaAddress, [
+      { typeCoercionFunction: coerceScalarToString },
+      { typeCoercionFunction: this.coerceScalarToNumberOrError },
     ], (text: string, count: number) => {
       if (count < 0) {
         return new CellError(ErrorType.VALUE)
@@ -151,11 +151,8 @@ export class TextPlugin extends FunctionPlugin {
 
   public right(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.coerceArgumentsWithDefaults(ast.args, formulaAddress, [
-      coerceScalarToString,
-      this.coerceScalarToNumberOrError
-    ], [
-      undefined,
-      1
+      { typeCoercionFunction: coerceScalarToString },
+      { typeCoercionFunction: this.coerceScalarToNumberOrError, defaultValue: 1 },
     ], (text: string, length: number) => {
       if (length < 0) {
         return new CellError(ErrorType.VALUE)
@@ -168,11 +165,8 @@ export class TextPlugin extends FunctionPlugin {
 
   public left(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.coerceArgumentsWithDefaults(ast.args, formulaAddress, [
-      coerceScalarToString,
-      this.coerceScalarToNumberOrError
-    ], [
-      undefined,
-      1
+      { typeCoercionFunction: coerceScalarToString },
+      { typeCoercionFunction: this.coerceScalarToNumberOrError, defaultValue: 1 },
     ], (text: string, length: number) => {
       if (length < 0) {
         return new CellError(ErrorType.VALUE)
@@ -183,13 +177,9 @@ export class TextPlugin extends FunctionPlugin {
 
   public search(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.coerceArgumentsWithDefaults(ast.args, formulaAddress, [
-      coerceScalarToString,
-      coerceScalarToString,
-      this.coerceScalarToNumberOrError
-    ], [
-      undefined,
-      undefined,
-      1
+      { typeCoercionFunction: coerceScalarToString },
+      { typeCoercionFunction: coerceScalarToString },
+      { typeCoercionFunction: this.coerceScalarToNumberOrError, defaultValue: 1 },
     ], (pattern, text: string, startIndex: number) => {
       if (startIndex < 1 || startIndex > text.length) {
         return new CellError(ErrorType.VALUE)
@@ -211,13 +201,9 @@ export class TextPlugin extends FunctionPlugin {
 
   public find(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.coerceArgumentsWithDefaults(ast.args, formulaAddress, [
-      coerceScalarToString,
-      coerceScalarToString,
-      this.coerceScalarToNumberOrError
-    ], [
-      undefined,
-      undefined,
-      1
+      { typeCoercionFunction: coerceScalarToString },
+      { typeCoercionFunction: coerceScalarToString },
+      { typeCoercionFunction: this.coerceScalarToNumberOrError, defaultValue: 1 },
     ], (pattern, text: string, startIndex: number) => {
       if (startIndex < 1 || startIndex > text.length) {
         return new CellError(ErrorType.VALUE)
