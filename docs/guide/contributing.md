@@ -18,6 +18,8 @@ is much appreciated in any of the following topics:
 Adding a new function will be a huge help for the library growth and
 should not be too problematic for the first issue. Extending the
 library of translations is also a good task to start with.
+[Here](https://docs.google.com/spreadsheets/d/1UUskn4ZDDjLGSpO6kg73DOvabNoeqLbkJYyVfLyYlYw)
+you can find a list of functions' translations.
 
 Visit [building](building.md) and [testing](testing.md) sections to
 get more info about these topics and check the list of commands you

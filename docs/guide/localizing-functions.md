@@ -8,8 +8,11 @@ To change the default language all you need to do is to import and
 register the language like so:
 
 ```javascript
-// import the French language pack
-import { frFR } from 'hyperformula';
+// import the French language pack, for ES6
+import frFR from 'hyperformula/es/i18n/languages/frFR'
+
+// or for commonjs:
+import frFR from 'hyperformula/cjs/i18n/languages/frFR'
 
 // register the language
 HyperFormula.registerLanguage('frFR', frFR);
