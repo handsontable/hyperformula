@@ -22,6 +22,17 @@ It also supports the use of cross-sheet references,
 different [data types](https://handsontable.github.io/hyperformula/guide/types-of-values.html),
 and [custom functions](https://handsontable.github.io/hyperformula/guide/custom-functions.html).
 
+<br>
+<div align="center">
+  
+[![GitHub Workflow Status](https://img.shields.io/github/workflow/status/handsontable/hyperformula/Test)](https://github.com/handsontable/hyperformula/actions?query=workflow%3ATest+branch%3Amaster)
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fhandsontable%2Fhyperformula.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fhandsontable%2Fhyperformula?ref=badge_shield)
+[![Known Vulnerabilities](https://snyk.io/test/github/handsontable/hyperformula/badge.svg?targetFile=package.json)](https://snyk.io/test/github/handsontable/hyperformula?targetFile=package.json)
+[![GitHub contributors](https://img.shields.io/github/contributors/handsontable/hyperformula)](https://github.com/handsontable/hyperformula/graphs/contributors)
+
+</div>
+
+
 ## Documentation
 
 - [Explainer video](https://www.youtube.com/watch?v=JJXUmACTDdk) /
