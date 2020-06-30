@@ -79,7 +79,6 @@ lets you design your own [custom functions](custom-functions).
 | DEC2HEX | Engineering | Returns the hexadecimal number for the decimal number entered. | DEC2HEX(Number; Places) |
 | DEC2OCT | Engineering | Returns the octal number for the decimal number entered. | DEC2OCT(Number; Places) |
 | DELTA | Engineering | Returns TRUE (1) if both numbers are equal, otherwise returns FALSE (0). | DELTA(Number_1; Number_2) |
-| *E | Engineering | Returns values of the Gaussian error integral. | ERF(Lower_Limit; Upper_Limit) |
 | ERF | Engineering | Returns values of the Gaussian error integral. | ERF(Lower_Limit; Upper_Limit) |
 | ERFC | Engineering | Returns complementary values of the Gaussian error integral between x and infinity. | ERFC(Lower_Limit) |
 | ISBLANK | Information | Returns TRUE if the reference to a cell is blank. | ISBLANK(Value) |
