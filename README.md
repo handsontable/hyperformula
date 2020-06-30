@@ -96,7 +96,7 @@ applications. Here are some examples:
 
 ## Contributing
 
-Help us to build the fastest and most flexible calculation engine for
+Help us build the fastest and most flexible calculation engine for
 business web apps. Please read the [Contributing Guide](https://handsontable.github.io/hyperformula/guide/contributing.html) before
 making a pull request.
 
