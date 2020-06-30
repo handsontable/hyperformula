@@ -74,7 +74,7 @@ lets you design your own [custom functions](custom-functions).
 | BITOR | Engineering | Returns a bitwise logical "or" of the parameters. | BITOR(Number1; Number2) |
 | BITRSHIFT | Engineering | Shifts a number right by n bits. | BITRSHIFT(Number; Shift) |
 | BITXOR | Engineering | Returns a bitwise logical "exclusive or" of the parameters. | BITXOR(Number1; Number2) |
-| CHOOSE | Lookup and reference | Chooses a value from a list of values | CHOOSE(2,A2,A3,A4,A5) |
+| CHOOSE | Lookup and reference | Uses an index to return a value from a list of up to 30 values.| CHOOSE(Index; Value1; ...; Value30) |
 | DEC2BIN | Engineering | Returns the binary number for the decimal number entered between –512 and 511. | DEC2BIN(Number; Places) |
 | DEC2HEX | Engineering | Returns the hexadecimal number for the decimal number entered. | DEC2HEX(Number; Places) |
 | DEC2OCT | Engineering | Returns the octal number for the decimal number entered. | DEC2OCT(Number; Places) |
@@ -84,23 +84,23 @@ lets you design your own [custom functions](custom-functions).
 | ISBLANK | Information | Returns TRUE if the reference to a cell is blank. | ISBLANK(Value) |
 | ISERROR | Information | The ISERROR tests if the cells contain general error values. | ISERROR(Value) |
 | ISEVEN | Information | Returns TRUE if the value is an even integer, or FALSE if the value is odd. | ISEVEN(Value) |
-| ISLOGICAL | Information | Returns TRUE if the value is a logical value. | ISLOGICAL(value) |
-| ISNONTEXT | Information | Returns TRUE if the value is not text. | ISNONTEXT(value) |
-| ISNUMBER | Information | Returns TRUE if the value is a number. | ISNUMBER(value) |
+| ISLOGICAL | Information | Tests for a logical value (TRUE or FALSE). | ISLOGICAL(Value) |
+| ISNONTEXT | Information | Tests if the cell contents are text or numbers, and returns FALSE if the contents are text. | ISNONTEXT(Value) |
+| ISNUMBER | Information | Returns TRUE if the value refers to a number. | ISNUMBER(Value) |
 | ISODD | Information | Returns TRUE if the value is odd, or FALSE if the number is even. | ISODD(Value) |
-| ISTEXT | Information | Returns TRUE if the value is text. | ISTEXT(Value) |
+| ISTEXT | Information | Returns TRUE if the cell contents refer to text.| ISTEXT(Value) |
 | AND | Logical | Returns TRUE if all arguments are TRUE. | AND(Logicalvalue1; Logicalvalue2 ...Logicalvalue30) |
 | FALSE | Logical | Returns the logical value FALSE. | FALSE() |
 | IF | Logical | Specifies a logical test to be performed. | IF(Test; Then value; Otherwisevalue) |
-| IFNA | Logical | Returns the value you specify if the expression resolves to #N/A, otherwise returns the result of the expression | IFNA(Value, Value_if_NA) |
-| IFERROR | Logical | Returns a value you specify if a formula evaluates to an error; otherwise, returns the result of the formula. | IFERROR(A2/B2, "Error in calculation") |
+| IFNA | Logical | Returns the value if the cell does not contains the #N/A (value not available) error value, or the alternative value if it does. | IFNA(Value; Alternate_value) |
+| IFERROR | Logical | Returns the value if the cell does not contains an error value, or the alternative value if it does. | IFERROR(Value; Alternate_value) |
 | NOT | Logical | Complements (inverts) a logical value. | NOT(Logicalvalue) |
-| SWITCH | Logical | Evaluates an expression against a list of values and returns the result corresponding to the first matching value. | SWITCH(Value1 Value2, Value3, Value4) |
+| SWITCH | Logical | Evaluates a list of arguments, consisting of an expression followed by a value. | SWITCH(Expression1, Value1[, Expression2, Value2[..., Expression_n, Value_n]]) |
 | OR | Logical | Returns TRUE if at least one argument is TRUE. | OR(Logicalvalue1; Logicalvalue2 ...Logicalvalue30) |
 | TRUE | Logical | The logical value is set to TRUE. | TRUE() |
 | XOR | Logical | Returns true if an odd number of arguments evaluates to TRUE. | XOR(Logicalvalue1; Logicalvalue2 ...Logicalvalue30) |
 | COLUMNS | Lookup and reference | Returns the number of columns in the given reference. | COLUMNS(Array) |
-| OFFSET | Lookup and reference | Returns a reference offset from a given reference. | OFFSET(Reference, Rows, Cols, [Height], [Width]) |
+| OFFSET | Lookup and reference | Returns the value of a cell offset by a certain number of rows and columns from a given reference point. | OFFSET(Reference; Rows; Columns; Height; Width) |
 | ROWS | Lookup and reference | Returns the number of rows in the given reference. | ROWS(Array) |
 | INDEX | Lookup and reference | Returns the content of a cell, specified by row and column number, or an optional range name. | INDEX(Reference; Row; Column; Range) |
 | MATCH | Lookup and reference | Returns the relative position of an item in an array that matches a specified value. | MATCH(Searchcriterion; Lookuparray; Type) |
@@ -125,7 +125,7 @@ lets you design your own [custom functions](custom-functions).
 | LN | Math and trigonometry | Returns the natural logarithm based on the constant e of a number. | LN(Number) |
 | LOG | Math and trigonometry | Returns the logarithm of a number to the specified base. | LOG(Number; Base) |
 | LOG10 | Math and trigonometry | Returns the base-10 logarithm of a number. | LOG10(Number) |
-| MMULT | Math and trigonometry | Returns the matrix product of two arrays. | MMULT(Array1, Array2) |
+| MMULT | Math and trigonometry | Calculates the array product of two arrays. | MMULT(Array; Array) |
 | MEDIANPOOL | Math and trigonometry | ? | MEDIANPOOL(Value1, Value2) |
 | MAXPOOL | Math and trigonometry | ? | MAXPOOL(Value1, Value2) |
 | MOD | Math and trigonometry | Returns the remainder when one integer is divided by another. | MOD(Dividend; Divisor) |
@@ -163,5 +163,5 @@ lets you design your own [custom functions](custom-functions).
 | CHAR | Text | Converts a number into a character according to the current code table. | CHAR(Number) |
 | CODE | Text | Returns a numeric code for the first character in a text string. | CODE("Text") |
 | CONCATENATE | Text | Combines several text strings into one string. | CONCATENATE("Text1"; ...; "Text30") |
-| SPLIT | Text | Converts a number into text according to a given format. | TEXT(Number; Format) |
-| TEXT | Text | Divides text around a specified character or string, and puts each fragment into a separate cell in the row. | SPLIT(Text, Delimiter, [Split_by_each], [Remove_empty_text]) |
+| SPLIT | Text | Divides text around a specified character or string, and puts each fragment into a separate cell in the row. | SPLIT(Text, Delimiter, [Split_by_each], [Remove_empty_text]) |
+| TEXT | Text | Converts a number into text according to a given format. | TEXT(Number; Format) |
