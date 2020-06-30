@@ -150,13 +150,13 @@ export class TextPlugin extends FunctionPlugin {
     ], [
       undefined,
       1
-    ], (text: string, lenght: number) => {
-      if (lenght < 0) {
+    ], (text: string, length: number) => {
+      if (length < 0) {
         return new CellError(ErrorType.VALUE)
-      } else if (lenght === 0) {
+      } else if (length === 0) {
         return ''
       }
-      return text.slice(-lenght)
+      return text.slice(-length)
     })
   }
 
@@ -167,11 +167,11 @@ export class TextPlugin extends FunctionPlugin {
     ], [
       undefined,
       1
-    ], (text: string, lenght: number) => {
-      if (lenght < 0) {
+    ], (text: string, length: number) => {
+      if (length < 0) {
         return new CellError(ErrorType.VALUE)
       }
-      return text.slice(0, lenght)
+      return text.slice(0, length)
     })
   }
 }
