@@ -39,6 +39,9 @@ export class TextPlugin extends FunctionPlugin {
     },
     'LEFT': {
       method: 'left'
+    },
+    'SEARCH': {
+      method: 'search'
     }
   }
 
@@ -172,6 +175,34 @@ export class TextPlugin extends FunctionPlugin {
         return new CellError(ErrorType.VALUE)
       }
       return text.slice(0, length)
+    })
+  }
+
+  public search(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.coerceArgumentsWithDefaults(ast.args, formulaAddress, [
+      coerceScalarToString,
+      coerceScalarToString,
+      this.coerceScalarToNumberOrError
+    ], [
+      undefined,
+      undefined,
+      1
+    ], (pattern, text: string, startIndex: number) => {
+      if (startIndex < 1 || startIndex > text.length) {
+        return new CellError(ErrorType.VALUE)
+      }
+
+      const normalizedText = text.substr(startIndex - 1).toLowerCase()
+
+      let index: number
+      if (this.interpreter.arithmeticHelper.requiresRegex(pattern)) {
+        index = this.interpreter.arithmeticHelper.searchString(pattern, normalizedText)
+      } else {
+        index = normalizedText.indexOf(pattern.toLowerCase())
+      }
+
+      index = index + startIndex
+      return index > 0 ? index : new CellError(ErrorType.VALUE)
     })
   }
 }

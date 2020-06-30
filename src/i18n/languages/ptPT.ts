@@ -112,6 +112,7 @@ const dictionary: RawTranslationPackage = {
     ROUNDDOWN: 'ARREDONDAR.PARA.BAIXO',
     ROUNDUP: 'ARREDONDAR.PARA.CIMA',
     ROWS: 'LINS',
+    SEARCH: 'LOCALIZAR',
     SIN: 'SEN',
     SPLIT: 'SPLIT',
     SQRT: 'RAIZ',

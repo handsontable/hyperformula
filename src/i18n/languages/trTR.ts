@@ -112,6 +112,7 @@ const dictionary: RawTranslationPackage = {
     ROUNDDOWN: 'AŞAĞIYUVARLA',
     ROUNDUP: 'YUKARIYUVARLA',
     ROWS: 'SATIRSAY',
+    SEARCH: 'MBUL',
     SIN: 'SİN',
     SPLIT: 'SPLIT',
     SQRT: 'KAREKÖK',

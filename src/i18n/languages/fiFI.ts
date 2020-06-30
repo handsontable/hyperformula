@@ -112,6 +112,7 @@ const dictionary: RawTranslationPackage = {
     ROUNDDOWN: 'PYÖRISTÄ.DES.ALAS',
     ROUNDUP: 'PYÖRISTÄ.DES.YLÖS',
     ROWS: 'RIVIT',
+    SEARCH: 'KÄY.LÄPI',
     SIN: 'SIN',
     SPLIT: 'SPLIT',
     SQRT: 'NELIÖJUURI',

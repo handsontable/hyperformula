@@ -112,6 +112,7 @@ const dictionary: RawTranslationPackage = {
     ROUNDDOWN: 'ZAOKR.DÓŁ',
     ROUNDUP: 'ZAOKR.GÓRA',
     ROWS: 'ILE.WIERSZY',
+    SEARCH: 'SZUKAJ.TEKST',
     SIN: 'SIN',
     SPLIT: 'PODZIEL.TEKST',
     SQRT: 'PIERWIASTEK',

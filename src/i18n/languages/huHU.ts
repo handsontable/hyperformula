@@ -112,6 +112,7 @@ const dictionary: RawTranslationPackage = {
     ROUNDDOWN: 'KEREK.LE',
     ROUNDUP: 'KEREK.FEL',
     ROWS: 'SOROK',
+    SEARCH: 'SZÖVEG.KERES',
     SIN: 'SIN',
     SPLIT: 'SPLIT',
     SQRT: 'GYÖK',

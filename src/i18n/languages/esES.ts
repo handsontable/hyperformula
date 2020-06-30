@@ -112,6 +112,7 @@ export const dictionary: RawTranslationPackage = {
     ROUNDDOWN: 'REDONDEAR.MENOS',
     ROUNDUP: 'REDONDEAR.MAS',
     ROWS: 'FILAS',
+    SEARCH: 'HALLAR',
     SIN: 'SENO',
     SPLIT: 'SPLIT',
     SQRT: 'RAIZ',

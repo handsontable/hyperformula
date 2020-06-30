@@ -112,6 +112,7 @@ const dictionary: RawTranslationPackage = {
     ROUNDDOWN: 'ARRONDI.INF',
     ROUNDUP: 'ARRONDI.SUP',
     ROWS: 'LIGNES',
+    SEARCH: 'CHERCHE',
     SIN: 'SIN',
     SPLIT: 'SPLIT',
     SQRT: 'RACINE',

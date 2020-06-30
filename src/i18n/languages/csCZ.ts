@@ -112,6 +112,7 @@ const dictionary: RawTranslationPackage = {
     ROUNDDOWN: 'ROUNDDOWN',
     ROUNDUP: 'ROUNDUP',
     ROWS: 'ŘÁDKY',
+    SEARCH: 'HLEDAT',
     SIN: 'SIN',
     SPLIT: 'SPLIT',
     SQRT: 'ODMOCNINA',

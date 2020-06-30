@@ -112,6 +112,7 @@ const dictionary: RawTranslationPackage = {
     ROUNDDOWN: 'ARROTONDA.PER.DIF',
     ROUNDUP: 'ARROTONDA.PER.ECC',
     ROWS: 'RIGHE',
+    SEARCH: 'RICERCA',
     SIN: 'SEN',
     SPLIT: 'SPLIT',
     SQRT: 'RADQ',
