@@ -33,6 +33,9 @@ const FILES_CHECKLIST = [
   'es/HyperFormula.js',
   'typings/index.d.ts',
   'typings/HyperFormula.d.ts',
+  'dist/languages/plPL.js',
+  'es/i18n/languages/plPL.js',
+  'commonjs/i18n/languages/plPL.js',
 ]
 
 process.stdin.resume()
