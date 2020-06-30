@@ -74,24 +74,34 @@ lets you design your own [custom functions](custom-functions).
 | BITOR | Engineering | Returns a bitwise logical "or" of the parameters. | BITOR(Number1; Number2) |
 | BITRSHIFT | Engineering | Shifts a number right by n bits. | BITRSHIFT(Number; Shift) |
 | BITXOR | Engineering | Returns a bitwise logical "exclusive or" of the parameters. | BITXOR(Number1; Number2) |
+| CHOOSE | Lookup and reference | Chooses a value from a list of values | CHOOSE(2,A2,A3,A4,A5) |
 | DEC2BIN | Engineering | Returns the binary number for the decimal number entered between –512 and 511. | DEC2BIN(Number; Places) |
 | DEC2HEX | Engineering | Returns the hexadecimal number for the decimal number entered. | DEC2HEX(Number; Places) |
 | DEC2OCT | Engineering | Returns the octal number for the decimal number entered. | DEC2OCT(Number; Places) |
 | DELTA | Engineering | Returns TRUE (1) if both numbers are equal, otherwise returns FALSE (0). | DELTA(Number_1; Number_2) |
+| *E | Engineering | Returns values of the Gaussian error integral. | ERF(Lower_Limit; Upper_Limit) |
 | ERF | Engineering | Returns values of the Gaussian error integral. | ERF(Lower_Limit; Upper_Limit) |
 | ERFC | Engineering | Returns complementary values of the Gaussian error integral between x and infinity. | ERFC(Lower_Limit) |
 | ISBLANK | Information | Returns TRUE if the reference to a cell is blank. | ISBLANK(Value) |
 | ISERROR | Information | The ISERROR tests if the cells contain general error values. | ISERROR(Value) |
 | ISEVEN | Information | Returns TRUE if the value is an even integer, or FALSE if the value is odd. | ISEVEN(Value) |
+| ISLOGICAL | Information | Returns TRUE if the value is a logical value. | ISLOGICAL(value) |
+| ISNONTEXT | Information | Returns TRUE if the value is not text. | ISNONTEXT(value) |
+| ISNUMBER | Information | Returns TRUE if the value is a number. | ISNUMBER(value) |
 | ISODD | Information | Returns TRUE if the value is odd, or FALSE if the number is even. | ISODD(Value) |
+| ISTEXT | Information | Returns TRUE if the value is text. | ISTEXT(value) |
 | AND | Logical | Returns TRUE if all arguments are TRUE. | AND(Logicalvalue1; Logicalvalue2 ...Logicalvalue30) |
 | FALSE | Logical | Returns the logical value FALSE. | FALSE() |
 | IF | Logical | Specifies a logical test to be performed. | IF(Test; Then value; Otherwisevalue) |
+| IFNA | Logical | Returns the value you specify if the expression resolves to #N/A, otherwise returns the result of the expression | IFNA(value, value_if_na) |
+| IFERROR | Logical | Returns a value you specify if a formula evaluates to an error; otherwise, returns the result of the formula. | IFERROR(A2/B2, "Error in calculation") |
 | NOT | Logical | Complements (inverts) a logical value. | NOT(Logicalvalue) |
+| SWITCH | Logical | Evaluates an expression against a list of values and returns the result corresponding to the first matching value. | SWITCH(Value1 Value2, Value3, Value4) |
 | OR | Logical | Returns TRUE if at least one argument is TRUE. | OR(Logicalvalue1; Logicalvalue2 ...Logicalvalue30) |
 | TRUE | Logical | The logical value is set to TRUE. | TRUE() |
 | XOR | Logical | Returns true if an odd number of arguments evaluates to TRUE. | XOR(Logicalvalue1; Logicalvalue2 ...Logicalvalue30) |
 | COLUMNS | Lookup and reference | Returns the number of columns in the given reference. | COLUMNS(Array) |
+| OFFSET | Lookup and reference | Returns a reference offset from a given reference. | OFFSET(Reference, Rows, Cols, [Height], [Width]) |
 | ROWS | Lookup and reference | Returns the number of rows in the given reference. | ROWS(Array) |
 | INDEX | Lookup and reference | Returns the content of a cell, specified by row and column number, or an optional range name. | INDEX(Reference; Row; Column; Range) |
 | MATCH | Lookup and reference | Returns the relative position of an item in an array that matches a specified value. | MATCH(Searchcriterion; Lookuparray; Type) |
@@ -106,14 +116,19 @@ lets you design your own [custom functions](custom-functions).
 | CEILING | Math and trigonometry | Rounds a number up to the nearest multiple of Significance. | CEILING(Number; Significance; Mode) |
 | COS | Math and trigonometry | Returns the cosine of the given angle (in radians). | COS(Number) |
 | COT | Math and trigonometry | Returns the cotangent of the given angle (in radians). | COT(Number) |
+| COUNTUNIQUE | Math and trigonometry | Counts the number of unique values in a list of specified values and ranges. | COUNTUNIQUE(Value1, [Value2, ...]) |
 | DECIMAL | Math and trigonometry | Converts text with characters from a number system to a positive integer in the base radix given. | DECIMAL("Text"; Radix) |
 | DEGREES | Math and trigonometry | Converts radians into degrees. | DEGREES(Number) |
+| E | Math and trigonometry | ? | E(Value1, Value2) |
 | EVEN | Math and trigonometry | Rounds a positive number up to the next even integer and a negative number down to the next even integer. | EVEN(Number) |
 | EXP | Math and trigonometry | Returns e raised to the power of a number. | EXP(Number) |
 | INT | Math and trigonometry | Rounds a number down to the nearest integer. | INT(Number) |
 | LN | Math and trigonometry | Returns the natural logarithm based on the constant e of a number. | LN(Number) |
 | LOG | Math and trigonometry | Returns the logarithm of a number to the specified base. | LOG(Number; Base) |
 | LOG10 | Math and trigonometry | Returns the base-10 logarithm of a number. | LOG10(Number) |
+| MMULT | Math and trigonometry | Returns the matrix product of two arrays. | MMULT(Array1, Array2) |
+| MEDIANPOOL | Math and trigonometry | ? | MEDIANPOOL(Value1, Value2) |
+| MAXPOOL | Math and trigonometry | ? | MAXPOOL(Value1, Value2) |
 | MOD | Math and trigonometry | Returns the remainder when one integer is divided by another. | MOD(Dividend; Divisor) |
 | ODD | Math and trigonometry | Rounds a positive number up to the nearest odd integer and a negative number down to the nearest odd integer. | ODD(Number) |
 | PI | Math and trigonometry | Returns 3.14159265358979, the value of the mathematical constant PI to 14 decimal places. | PI() |
@@ -149,4 +164,5 @@ lets you design your own [custom functions](custom-functions).
 | CHAR | Text | Converts a number into a character according to the current code table. | CHAR(Number) |
 | CODE | Text | Returns a numeric code for the first character in a text string. | CODE("Text") |
 | CONCATENATE | Text | Combines several text strings into one string. | CONCATENATE("Text1"; ...; "Text30") |
-| TEXT | Text | Converts a number into text according to a given format. | TEXT(Number; Format) |
+| SPLIT | Text | Converts a number into text according to a given format. | TEXT(Number; Format) |
+| TEXT | Text | Divides text around a specified character or string, and puts each fragment into a separate cell in the row. | SPLIT(Text, Delimiter, [Split_by_each], [Remove_empty_text]) |
