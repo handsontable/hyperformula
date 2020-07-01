@@ -104,7 +104,7 @@ lets you design your own [custom functions](custom-functions).
 | ROWS | Lookup and reference | Returns the number of rows in the given reference. | ROWS(Array) |
 | INDEX | Lookup and reference | Returns the content of a cell, specified by row and column number, or an optional range name. | INDEX(Reference; Row; Column; Range) |
 | MATCH | Lookup and reference | Returns the relative position of an item in an array that matches a specified value. | MATCH(Searchcriterion; Lookuparray; Type) |
-| TRANSPOSE | Lookup and reference | Transposes the rows and columns of an array. | TRANSPOSE(Array) |
+| TRANSPOSE | Matrix functions | Transposes the rows and columns of an array. | TRANSPOSE(Array) |
 | VLOOKUP | Lookup and reference | Searches vertically with reference to adjacent cells to the right. | VLOOKUP(Search_Criterion; Array; Index; Sort_Order) |
 | ABS | Math and trigonometry | Returns the absolute value of a number. | ABS(Number) |
 | ACOS | Math and trigonometry | Returns the inverse trigonometric cosine of a number. | ACOS(Number) |
@@ -118,16 +118,16 @@ lets you design your own [custom functions](custom-functions).
 | COUNTUNIQUE | Math and trigonometry | Counts the number of unique values in a list of specified values and ranges. | COUNTUNIQUE(Value1, [Value2, ...]) |
 | DECIMAL | Math and trigonometry | Converts text with characters from a number system to a positive integer in the base radix given. | DECIMAL("Text"; Radix) |
 | DEGREES | Math and trigonometry | Converts radians into degrees. | DEGREES(Number) |
-| E | Math and trigonometry | ? | E(Value1, Value2) |
+| E | Math and trigonometry | Returns 2.718281828459..., the value of the mathematical constant E to as many decimal places as set in configuration | E() |
 | EVEN | Math and trigonometry | Rounds a positive number up to the next even integer and a negative number down to the next even integer. | EVEN(Number) |
 | EXP | Math and trigonometry | Returns e raised to the power of a number. | EXP(Number) |
 | INT | Math and trigonometry | Rounds a number down to the nearest integer. | INT(Number) |
 | LN | Math and trigonometry | Returns the natural logarithm based on the constant e of a number. | LN(Number) |
 | LOG | Math and trigonometry | Returns the logarithm of a number to the specified base. | LOG(Number; Base) |
 | LOG10 | Math and trigonometry | Returns the base-10 logarithm of a number. | LOG10(Number) |
-| MMULT | Math and trigonometry | Calculates the array product of two arrays. | MMULT(Array; Array) |
-| MEDIANPOOL | Math and trigonometry | ? | MEDIANPOOL(Value1, Value2) |
-| MAXPOOL | Math and trigonometry | ? | MAXPOOL(Value1, Value2) |
+| MMULT | Matrix functions | Calculates the array product of two arrays. | MMULT(Array; Array) |
+| MEDIANPOOL | Matrix functions | Calculates a smaller range which is a median of a Window_size, in a given Range, for every Stride element. | MEDIANPOOL(Range, Window_size, Stride) |
+| MAXPOOL | Matrix functions | Calculates a smaller range which is a maximum of a Window_size, in a given Range, for every Stride element. | MAXPOOL(Range, Window_size, Stride) |
 | MOD | Math and trigonometry | Returns the remainder when one integer is divided by another. | MOD(Dividend; Divisor) |
 | ODD | Math and trigonometry | Rounds a positive number up to the nearest odd integer and a negative number down to the nearest odd integer. | ODD(Number) |
 | PI | Math and trigonometry | Returns 3.14159265358979, the value of the mathematical constant PI to 14 decimal places. | PI() |
