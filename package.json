@@ -10,7 +10,7 @@
     "url": "https://github.com/handsontable/hyperformula/issues"
   },
   "author": "Handsoncode <hello@handsontable.com>",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "keywords": [
     "formula",
     "spreadsheet",
@@ -46,7 +46,7 @@
     "docs:api": "typedoc --options .typedoc.md.ts",
     "docs:dev": "vuepress dev docs --silent --no-clear-screen --no-cache",
     "docs:build": "vuepress build docs",
-    "bundle-all": "cross-env HF_COMPILE=1 npm-run-all compile bundle:** typings:generate verify-bundles",
+    "bundle-all": "cross-env HF_COMPILE=1 npm-run-all clean compile bundle:** typings:generate verify-bundles",
     "bundle:es": "node script/if-ne-env.js HF_COMPILE=1 || npm run compile && cross-env-shell BABEL_ENV=es env-cmd -f ht.config.js babel lib --out-dir es",
     "bundle:cjs": "node script/if-ne-env.js HF_COMPILE=1 || npm run compile && cross-env-shell BABEL_ENV=commonjs env-cmd -f ht.config.js babel lib --out-dir commonjs",
     "bundle:development": "node script/if-ne-env.js HF_COMPILE=1 || npm run compile && cross-env-shell BABEL_ENV=commonjs NODE_ENV=development env-cmd -f ht.config.js webpack ./lib/index.js",
