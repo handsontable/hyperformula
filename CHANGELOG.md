@@ -31,7 +31,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - named expressions support,
   - support for cut, copy, paste,
   - undo/redo support;
-- Following formulas: DATE(), DAYS(), ASIN(), COS(), E(), ERFC(), LOG(), PI(), SIN(), TAN(), AND(), AVERAGEA(), BASE(), BIN2HEX(), BITAND(), BITOR(), BITXOR(), CHAR(), CONCATENATE(), COUNTBLANK(), COUNTIFS(), COUNTIF(), DEC2BIN(), DEC2OCT(), DEGREES(), EVEN(), INT(), ISODD(), MAXA(), MIN(), MOD(), ODD(), ROUND(), ROUNDUP(), SUM(), SUMIFS(), SUMSQ(), XOR(), FALSE(), DAY(), ACOS(), ATAN(), COT(), ERF(), LN(), LOG10(), POWER(), SQRT(), ABS(), AVERAGE(), AVERAGEIF(), BIN2DEC(), BIN2OCT(), BITLSHIFT(), BITRSHIFT(), CEILING(), CODE(), CORREL(), COUNTA(), COUNTUNIQUE(), DEC2HEX(), DECIMAL(), DELTA(), IF(), ISEVEN(), MAX(), MEDIAN(), MINA(), NOT(), OR(), ROUNDDOWN(), SPLIT(), SUMIF(), SUMPRODUCT(), TRUNC(), TRUE();
+- Following functions: ABS(), ACOS(), AND(), ASIN(), ATAN(), ATAN2(), AVERAGE(), AVERAGEA(), AVERAGEIF(), BASE(), BIN2DEC(), BIN2HEX()BIN2OCT(), BITAND(), BITLSHIFT(), BITOR(), BITRSHIFT(), BITXOR(), CEILING(), CHAR(), CHOOSE(), CODE(), COLUMNS(), CONCATENATE(), CORREL(),
+COS(), COT(), COUNT(), COUNTA(), COUNTBLANK(), COUNTIF(), COUNTIFS(), COUNTUNIQUE(), DATE(), DAY(), DAYS(), DEC2BIN(), DEC2HEX(), DEC2OCT(), DECIMAL(), DEGREES(), DELTA(), E(), EOMONTH(), ERF(), ERFC(), EVEN(), EXP(), FALSE(), IF(), IFERROR(), IFNA(), INDEX(), INT(), ISBLANK(), ISERROR(), ISEVEN(), ISLOGICAL(), ISNONTEXT(), ISNUMBER(), ISODD(), ISTEXT(), LN(), LOG(), LOG10(), MATCH(), MAX(), MAXA(), MAXPOOL(), MEDIAN(), MEDIANPOOL(), MIN(), MINA(), MMULT(), MOD(), MONTH(), NOT(), ODD(), OFFSET(), OR(), PI(), POWER(), RADIANS(), RAND(), ROUND(), ROUNDDOWN(), ROUNDUP(), ROWS(), SIN(), SPLIT(), SQRT(), SUM(), SUMIF(), SUMIFS(), SUMPRODUCT(), SUMSQ(), SWITCH(), TAN(), TEXT(), TRANSPOSE(), TRUE(), TRUNC(), VLOOKUP(), XOR(), YEAR();
 - Support for volatile functions;
 - Cultures supports - can be configured according to the application need;
 - Custom functions support;
@@ -45,4 +46,3 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Cyclic dependency: #CYCLE!,
   - Wrong address reference: #REF;
 - Built-in function translations support for 16 languages: English, Czech, Danish, Dutch, Finnish, French, German, Hungarian, Italian, Norwegian, Polish, Portuguese, Russian, Spanish, Swedish, Turkish.
-
