@@ -6,6 +6,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1] - 2020-07-01
+
+### Fixed
+- Fixed a typo in a config option from `useRegularExpresssions` to `useRegularExpressions`. (#437)
+
 ## [0.1.0] - 2020-06-25
 
 ### Added
