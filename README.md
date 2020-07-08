@@ -31,7 +31,7 @@ and [custom functions](https://handsontable.github.io/hyperformula/guide/custom-
 ## Documentation
 
 - [Explainer video](https://www.youtube.com/watch?v=JJXUmACTDdk) /
-[Blog post](https://handsontable.com/blog/articles/2020/7/introducing-hyperformula-fast-javascript-calculation-engine)
+[Blog post](https://handsontable.com/blog/articles/2020/6/introducing-hyperformula-fast-javascript-calculation-engine)
 - Demos
   - [JavaScript](https://handsontable.github.io/hyperformula/guide/demo.html)
   - [React](https://handsontable.github.io/hyperformula/guide/integration-with-react.html)
