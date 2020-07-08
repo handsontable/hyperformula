@@ -64,7 +64,7 @@ const options = {
 };
 
 // define the data
-const data = [['10', '20', '30' '=SUM(A1:C1)']];
+const data = [['10', '20', '30', '=SUM(A1:C1)']];
 
 // build an instance with defined options and data 
 const hfInstance = HyperFormula.buildFromArray(data, options);
