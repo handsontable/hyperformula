@@ -195,8 +195,8 @@ export class Graph<T> {
     const low: Map<T, number> = new Map()
     const parent: Map<T, T | null> = new Map()
 
-    //nodes cycle their status:
-    //undefined -> ON_STACK -> PROCESSED -> POPPED
+    // node status life cycle:
+    // undefined -> ON_STACK -> PROCESSED -> POPPED
     const nodeStatus: Map<T, NodeVisitStatus> = new Map()
     const order: T[] = []
 
@@ -206,7 +206,6 @@ export class Graph<T> {
       if (nodeStatus.get(v) !== undefined) {
         return
       }
-      entranceTime.set(v, time)
       time++
       const DFSstack: T[] = [v]
       nodeStatus.set(v, NodeVisitStatus.ON_STACK)
@@ -228,7 +227,8 @@ export class Graph<T> {
                   break
                 }
                 case undefined: // not visited
-                case NodeVisitStatus.ON_STACK: { // or visited but not processed (both cases have the same processing)
+                  // process as in the case of ON_STACK
+                case NodeVisitStatus.ON_STACK: { // or visited but not processed
                   parent.set(t, u)
                   DFSstack.push(t)
                   nodeStatus.set(t, NodeVisitStatus.ON_STACK)
@@ -250,7 +250,7 @@ export class Graph<T> {
             DFSstack.pop()
             break
           }
-          case NodeVisitStatus.POPPED: { //its a 'shadow' copy, we already processed this vertex and can ignore it
+          case NodeVisitStatus.POPPED: { // it's a 'shadow' copy, we already processed this vertex and can ignore it
             DFSstack.pop()
             break
           }
