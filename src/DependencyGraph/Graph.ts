@@ -194,6 +194,9 @@ export class Graph<T> {
     const entranceTime: Map<T, number> = new Map()
     const low: Map<T, number> = new Map()
     const parent: Map<T, T | null> = new Map()
+
+    //nodes cycle their status:
+    //undefined -> ON_STACK -> PROCESSED -> POPPED
     const nodeStatus: Map<T, NodeVisitStatus> = new Map()
     const order: T[] = []
 
@@ -209,7 +212,33 @@ export class Graph<T> {
       nodeStatus.set(v, NodeVisitStatus.ON_STACK)
       while ( DFSstack.length > 0 ) {
         const u = DFSstack[ DFSstack.length - 1 ]
-        switch(nodeStatus.get(u)) {
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        switch(nodeStatus.get(u)!) {
+          case NodeVisitStatus.ON_STACK: {
+            nodeStatus.set(u, NodeVisitStatus.PROCESSED)
+            entranceTime.set(u, time)
+            low.set(u, time)
+            this.adjacentNodes(u).forEach( (t: T) => {
+              switch(nodeStatus.get(t)){
+                case NodeVisitStatus.POPPED:
+                  break
+                case NodeVisitStatus.PROCESSED: { //backward edge
+                  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                  low.set(u, Math.min(low.get(u)!, entranceTime.get(t)!))
+                  break
+                }
+                case undefined: // not visited
+                case NodeVisitStatus.ON_STACK: { // or visited but not processed (both cases have the same processing)
+                  parent.set(t, u)
+                  DFSstack.push(t)
+                  nodeStatus.set(t, NodeVisitStatus.ON_STACK)
+                  time++
+                  break
+                }
+              }
+            })
+            break
+          }
           case NodeVisitStatus.PROCESSED: { // leaving this DFS subtree
             const pu = parent.get(u)
             if ( pu !==  null ) {
@@ -224,29 +253,6 @@ export class Graph<T> {
           case NodeVisitStatus.POPPED: { //its a 'shadow' copy, we already processed this vertex and can ignore it
             DFSstack.pop()
             break
-          }
-          case NodeVisitStatus.ON_STACK: {
-            nodeStatus.set(u, NodeVisitStatus.PROCESSED)
-            entranceTime.set(u, time)
-            low.set(u, time)
-            this.adjacentNodes(u).forEach( (t: T) => {
-              switch(nodeStatus.get(t)){
-                case NodeVisitStatus.POPPED:
-                  break
-                case NodeVisitStatus.PROCESSED: { //backward edge
-                  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-                  low.set(u, Math.min(low.get(u)!, entranceTime.get(t)!))
-                  break
-                }
-                case undefined:
-                case NodeVisitStatus.ON_STACK: { //not visited, or visited but not processed
-                  parent.set(t, u)
-                  DFSstack.push(t)
-                  nodeStatus.set(t, NodeVisitStatus.ON_STACK)
-                  time++
-                }
-              }
-            })
           }
         }
       }
