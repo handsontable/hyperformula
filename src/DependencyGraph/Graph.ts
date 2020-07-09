@@ -211,9 +211,8 @@ export class Graph<T> {
       nodeStatus.set(v, NodeVisitStatus.ON_STACK)
       while ( DFSstack.length > 0 ) {
         const u = DFSstack[ DFSstack.length - 1 ]
-        if ( nodeStatus.get(u) === NodeVisitStatus.PROCESSED || nodeStatus.get(u) === NodeVisitStatus.POPPED ) { // leaving this DFS subtree
-          DFSstack.pop()
-          if(nodeStatus.get(u) === NodeVisitStatus.PROCESSED) { //otherwise its a 'shadow' copy, we already processed this vertex and can ignore
+        switch(nodeStatus.get(u)) {
+          case NodeVisitStatus.PROCESSED: { // leaving this DFS subtree
             const pu = parent.get(u)
             if ( pu !==  null ) {
               // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -221,24 +220,32 @@ export class Graph<T> {
             }
             nodeStatus.set(u, NodeVisitStatus.POPPED)
             order.push(u)
+            DFSstack.pop()
+            break
           }
-        } else {
-          nodeStatus.set(u, NodeVisitStatus.PROCESSED)
-          entranceTime.set(u, time)
-          low.set(u, time)
-          this.adjacentNodes(u).forEach( (t: T) => {
-            if (entranceTime.get(t) !== undefined) { // forward edge or backward edge
-              if (nodeStatus.get(t) === NodeVisitStatus.ON_STACK || nodeStatus.get(t) === NodeVisitStatus.PROCESSED) { // backward edge
-                // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-                low.set(u, Math.min(low.get(u)!, entranceTime.get(t)!))
+          case NodeVisitStatus.POPPED: { //its a 'shadow' copy, we already processed this vertex and can ignore it
+            DFSstack.pop()
+            break
+          }
+          case NodeVisitStatus.ON_STACK: {
+            nodeStatus.set(u, NodeVisitStatus.PROCESSED)
+            entranceTime.set(u, time)
+            low.set(u, time)
+            this.adjacentNodes(u).forEach( (t: T) => {
+              if (entranceTime.get(t) !== undefined) { // forward edge or backward edge
+                if (nodeStatus.get(t) === NodeVisitStatus.ON_STACK || nodeStatus.get(t) === NodeVisitStatus.PROCESSED) { // backward edge
+                  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                  low.set(u, Math.min(low.get(u)!, entranceTime.get(t)!))
+                }
+              } else {
+                parent.set(t, u)
+                DFSstack.push(t)
+                nodeStatus.set(t, NodeVisitStatus.ON_STACK)
+                time++
               }
-            } else {
-              parent.set(t, u)
-              DFSstack.push(t)
-              nodeStatus.set(t, NodeVisitStatus.ON_STACK)
-              time++
-            }
-          })
+            })
+            break
+          }
         }
       }
     })
