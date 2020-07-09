@@ -214,8 +214,10 @@ export class Graph<T> {
             low.set(pu!, Math.min(low.get(pu!)!, low.get(u)!))
           }
           DFSstack.pop()
-          onStack.delete(u)
-          order.push(u)
+          if(onStack.has(u)) { //otherwise its a 'shadow' copy, we already processed this vertex and can ignore
+            onStack.delete(u)
+            order.push(u)
+          }
         } else {
           processed.add(u)
           entranceTime.set(u, time)
