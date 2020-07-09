@@ -228,6 +228,7 @@ export class Graph<T> {
                 }
                 case undefined: // not visited
                   // process as in the case of ON_STACK
+                  // eslint-disable-next-line no-fallthrough
                 case NodeVisitStatus.ON_STACK: { // or visited but not processed
                   parent.set(t, u)
                   DFSstack.push(t)
