@@ -230,19 +230,23 @@ export class Graph<T> {
             entranceTime.set(u, time)
             low.set(u, time)
             this.adjacentNodes(u).forEach( (t: T) => {
-              if (entranceTime.get(t) !== undefined) { // forward edge or backward edge
-                if (nodeStatus.get(t) === NodeVisitStatus.PROCESSED) { // backward edge
+              switch(nodeStatus.get(t)){
+                case NodeVisitStatus.POPPED:
+                  break
+                case NodeVisitStatus.PROCESSED: { //backward edge
                   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
                   low.set(u, Math.min(low.get(u)!, entranceTime.get(t)!))
+                  break
                 }
-              } else {
-                parent.set(t, u)
-                DFSstack.push(t)
-                nodeStatus.set(t, NodeVisitStatus.ON_STACK)
-                time++
+                case undefined:
+                case NodeVisitStatus.ON_STACK: { //not visited, or visited but not processed
+                  parent.set(t, u)
+                  DFSstack.push(t)
+                  nodeStatus.set(t, NodeVisitStatus.ON_STACK)
+                  time++
+                }
               }
             })
-            break
           }
         }
       }
