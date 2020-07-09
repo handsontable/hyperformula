@@ -9,6 +9,12 @@ export interface TopSortResult<T> {
   sorted: T[], cycled: T[], 
 }
 
+enum NodeVisitStatus {
+  ON_STACK,
+  PROCESSED,
+  POPPED,
+}
+
 /**
  * Provides graph directed structure
  *
@@ -188,14 +194,13 @@ export class Graph<T> {
     const entranceTime: Map<T, number> = new Map()
     const low: Map<T, number> = new Map()
     const parent: Map<T, T | null> = new Map()
-    const processed: Set<T> = new Set()
-    const onStack: Set<T> = new Set()
+    const nodeStatus: Map<T, NodeVisitStatus> = new Map()
     const order: T[] = []
 
     let time: number = 0
 
     modifiedNodes.reverse().forEach( (v: T) => {
-      if (processed.has(v)) {
+      if (nodeStatus.get(v) === NodeVisitStatus.PROCESSED || nodeStatus.get(v) === NodeVisitStatus.POPPED) {
         return
       }
       entranceTime.set(v, time)
@@ -204,34 +209,34 @@ export class Graph<T> {
       parent.set(v, null)
       time++
       const DFSstack: T[] = [v]
-      onStack.add(v)
+      nodeStatus.set(v, NodeVisitStatus.ON_STACK)
       while ( DFSstack.length > 0 ) {
         const u = DFSstack[ DFSstack.length - 1 ]
-        if ( processed.has(u) ) { // leaving this DFS subtree
+        if ( nodeStatus.get(u) === NodeVisitStatus.PROCESSED || nodeStatus.get(u) === NodeVisitStatus.POPPED ) { // leaving this DFS subtree
           DFSstack.pop()
-          if(onStack.has(u)) { //otherwise its a 'shadow' copy, we already processed this vertex and can ignore
+          if(nodeStatus.get(u) === NodeVisitStatus.PROCESSED) { //otherwise its a 'shadow' copy, we already processed this vertex and can ignore
             const pu = parent.get(u)
             if ( pu !==  null ) {
               // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
               low.set(pu!, Math.min(low.get(pu!)!, low.get(u)!))
             }
-            onStack.delete(u)
+            nodeStatus.set(u, NodeVisitStatus.POPPED)
             order.push(u)
           }
         } else {
-          processed.add(u)
+          nodeStatus.set(u, NodeVisitStatus.PROCESSED)
           entranceTime.set(u, time)
           low.set(u, time)
           this.adjacentNodes(u).forEach( (t: T) => {
             if (entranceTime.get(t) !== undefined) { // forward edge or backward edge
-              if (onStack.has(t)) { // backward edge
+              if (nodeStatus.get(t) === NodeVisitStatus.ON_STACK || nodeStatus.get(t) === NodeVisitStatus.PROCESSED) { // backward edge
                 // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
                 low.set(u, Math.min(low.get(u)!, entranceTime.get(t)!))
               }
             } else {
               parent.set(t, u)
               DFSstack.push(t)
-              onStack.add(t)
+              nodeStatus.set(t, NodeVisitStatus.ON_STACK)
               time++
             }
           })
