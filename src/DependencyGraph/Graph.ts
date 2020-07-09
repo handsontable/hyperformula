@@ -231,7 +231,7 @@ export class Graph<T> {
             low.set(u, time)
             this.adjacentNodes(u).forEach( (t: T) => {
               if (entranceTime.get(t) !== undefined) { // forward edge or backward edge
-                if (nodeStatus.get(t) === NodeVisitStatus.ON_STACK || nodeStatus.get(t) === NodeVisitStatus.PROCESSED) { // backward edge
+                if (nodeStatus.get(t) === NodeVisitStatus.PROCESSED) { // backward edge
                   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
                   low.set(u, Math.min(low.get(u)!, entranceTime.get(t)!))
                 }
