@@ -200,11 +200,10 @@ export class Graph<T> {
     let time: number = 0
 
     modifiedNodes.reverse().forEach( (v: T) => {
-      if (nodeStatus.get(v) === NodeVisitStatus.PROCESSED || nodeStatus.get(v) === NodeVisitStatus.POPPED) {
+      if (nodeStatus.get(v) !== undefined) {
         return
       }
       entranceTime.set(v, time)
-      // order.push(v)
       low.set(v, time)
       parent.set(v, null)
       time++
