@@ -714,3 +714,29 @@ describe('dateTime', () => {
     expect(engine.numberToTime(1.1)).toEqual({'hours': 26, 'minutes': 24, 'seconds': 0})
   })
 })
+
+describe('engine should build correctly', () => {
+  it('should build correctly #1', () => {
+    expect(() => HyperFormula.buildFromArray([
+      ['=A3+A2'],
+      ['=A3'],
+    ])).not.toThrowError()
+  })
+
+  it('should build correctly #2', () => {
+    expect(() => HyperFormula.buildFromArray([
+      ['=A4+A3+A2'],
+      ['=A4+A3'],
+      ['=A4'],
+    ])).not.toThrowError()
+  })
+
+  it('should build correctly #3', () => {
+    expect(() => HyperFormula.buildFromArray([
+      ['=A5+A4+A3+A2'],
+      ['=A5+A4+A3'],
+      ['=A5+A4'],
+      ['=A5'],
+    ])).not.toThrowError()
+  })
+})
