@@ -208,13 +208,13 @@ export class Graph<T> {
       while ( DFSstack.length > 0 ) {
         const u = DFSstack[ DFSstack.length - 1 ]
         if ( processed.has(u) ) { // leaving this DFS subtree
-          const pu = parent.get(u)
-          if ( pu !==  null ) {
-            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-            low.set(pu!, Math.min(low.get(pu!)!, low.get(u)!))
-          }
           DFSstack.pop()
           if(onStack.has(u)) { //otherwise its a 'shadow' copy, we already processed this vertex and can ignore
+            const pu = parent.get(u)
+            if ( pu !==  null ) {
+              // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+              low.set(pu!, Math.min(low.get(pu!)!, low.get(u)!))
+            }
             onStack.delete(u)
             order.push(u)
           }
