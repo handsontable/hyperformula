@@ -204,8 +204,6 @@ export class Graph<T> {
         return
       }
       entranceTime.set(v, time)
-      low.set(v, time)
-      parent.set(v, null)
       time++
       const DFSstack: T[] = [v]
       nodeStatus.set(v, NodeVisitStatus.ON_STACK)
