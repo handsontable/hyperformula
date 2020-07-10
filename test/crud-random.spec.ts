@@ -1,8 +1,25 @@
 import {HyperFormula} from '../src'
 import {verifyValues} from './testUtils'
 
+let state = 1
+
+function getInt(): number {
+  state ^= state << 13
+  state ^= state >> 17
+  state ^= state << 5
+  state &= 0x7FFFFFFF
+  return state
+}
+
+function getFloat(): number {
+  return getInt()/0x80000000
+}
+
+const outputLog = false
+
+
 function randomInteger(min: number, max: number) {
-  return Math.floor(Math.random() * (max - min)) + min
+  return Math.floor(getFloat() * (max - min)) + min
 }
 
 type Pts = { x: number, y: number }
@@ -38,7 +55,9 @@ function randomSums(engine: HyperFormula, rectFormulas: Rectangle, rectValues: R
 function randomVals(engine: HyperFormula, rectValues: Rectangle) {
   allPts(rectValues).forEach((pts) => {
     const val = randomInteger(-10, 10)
-    console.log(`engine.setCellContents({sheet: 0, col:${pts.x}, row:${pts.y}}, ${val})`)
+    if(outputLog) {
+      console.log(`engine.setCellContents({sheet: 0, col:${pts.x}, row:${pts.y}}, ${val})`)
+    }
     engine.setCellContents({sheet: 0, col: pts.x, row: pts.y}, val)
   })
 }
@@ -68,7 +87,9 @@ function shuffleArray<T>(array: T[]): T[] {
 function randomCleanup(engine: HyperFormula, rect: Rectangle) {
   shuffleArray(allPts(rect)).forEach((pts) => {
       engine.setCellContents({sheet: 0, col: pts.x, row: pts.y}, null)
-      console.log(`engine.setCellContents({sheet: 0, col:${pts.x}, row:${pts.y}}, null})`)
+      if(outputLog) {
+        console.log(`engine.setCellContents({sheet: 0, col:${pts.x}, row:${pts.y}}, null})`)
+      }
     }
   )
 }
@@ -90,12 +111,16 @@ describe('larger tests', () => {
         verifyValues(engine)
       }
       const positionToAdd = randomInteger(0, sideY + 1)
-      console.log(`engine.addRows(0, [${positionToAdd},2])`)
+      if(outputLog) {
+        console.log(`engine.addRows(0, [${positionToAdd},2])`)
+      }
       engine.addRows(0, [positionToAdd, 2])
       sideY += 2
       verifyValues(engine)
       const positionToRemove = randomInteger(0, sideY)
-      console.log(`engine.removeRows(0, [${positionToRemove},1])`)
+      if(outputLog) {
+        console.log(`engine.removeRows(0, [${positionToRemove},1])`)
+      }
       engine.removeRows(0, [positionToRemove, 1])
       sideY -= 1
       verifyValues(engine)
