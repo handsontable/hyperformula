@@ -22,6 +22,7 @@ const UNPACKED_DIR_NAME = 'package'
  * @type {string[]}
  */
 const FILES_CHECKLIST = [
+  'LICENSE.txt',
   'CHANGELOG.md',
   'README.md',
   'package.json',
@@ -32,6 +33,9 @@ const FILES_CHECKLIST = [
   'es/HyperFormula.js',
   'typings/index.d.ts',
   'typings/HyperFormula.d.ts',
+  'dist/languages/plPL.js',
+  'es/i18n/languages/plPL.js',
+  'commonjs/i18n/languages/plPL.js',
 ]
 
 process.stdin.resume()
@@ -77,7 +81,7 @@ process.stdout.on('error', (err) => {
 
 async function checkDirectoryTreeStructure() {
   for (let i = 0; i < FILES_CHECKLIST.length; i++) {
-    const stats = await stat(FILES_CHECKLIST[i])
+    const stats = await stat(`${UNPACKED_DIR_NAME}/${FILES_CHECKLIST[i]}`)
 
     if (!stats || !stats.isFile()) {
       throw new Error(`No such file (${file}) in the checklist or it is not described as a regular file`);

@@ -1,6 +1,6 @@
 import {CellValue, DetailedCellError, HyperFormula} from '../src'
 import {AbsoluteCellRange, AbsoluteColumnRange, AbsoluteRowRange} from '../src/AbsoluteCellRange'
-import {CellError, ErrorType, InternalScalarValue, SimpleCellAddress, simpleCellAddress} from '../src/Cell'
+import {CellError, ErrorType, SimpleCellAddress, simpleCellAddress} from '../src/Cell'
 import {Config} from '../src/Config'
 import {DateTimeHelper} from '../src/DateTimeHelper'
 import {FormulaCellVertex, MatrixVertex, RangeVertex} from '../src/DependencyGraph'
@@ -15,7 +15,6 @@ import {
 } from '../src/parser'
 import {EngineComparator} from './graphComparator'
 import {ColumnRangeAst, RowRangeAst} from '../src/parser/Ast'
-import {FunctionRegistry} from '../src/interpreter/FunctionRegistry'
 
 export const extractReference = (engine: HyperFormula, address: SimpleCellAddress): CellAddress => {
   return ((engine.addressMapping.fetchCell(address) as FormulaCellVertex).getFormula(engine.lazilyTransformingAstService) as CellReferenceAst).reference
@@ -148,7 +147,7 @@ export function dateNumberToString(dateNumber: CellValue, config: Config): strin
     return dateNumber
   }
   const dateHelper = new DateTimeHelper(config)
-  const dateString = defaultStringifyDateTime(dateHelper.numberToDateTime(dateNumber as number), config.dateFormats[0])
+  const dateString = defaultStringifyDateTime(dateHelper.numberToSimpleDateTime(dateNumber as number), config.dateFormats[0])
   return dateString ? dateString : ''
 }
 

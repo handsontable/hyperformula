@@ -3,9 +3,8 @@
  * Copyright (c) 2020 Handsoncode. All rights reserved.
  */
 
-import {CellError, EmptyValue, InternalScalarValue} from '../Cell'
+import {EmptyValue, InternalScalarValue} from '../Cell'
 import {Config} from '../Config'
-import {TranslationPackage} from '../i18n'
 import {Maybe} from '../Maybe'
 import {ArithmeticHelper} from './ArithmeticHelper'
 

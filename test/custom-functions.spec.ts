@@ -5,7 +5,7 @@ import {FunctionPluginValidationError, HyperFormula} from '../src'
 import {adr, detailedError, expectArrayWithSameContent} from './testUtils'
 import {SumifPlugin} from '../src/interpreter/plugin/SumifPlugin'
 import {NumericAggregationPlugin} from '../src/interpreter/plugin/NumericAggregationPlugin'
-import {plPL} from '../src/i18n'
+import {plPL} from '../src/i18n/languages'
 import {VersionPlugin} from '../src/interpreter/plugin/VersionPlugin'
 import {ProtectedFunctionError, ProtectedFunctionTranslationError} from '../src/errors'
 

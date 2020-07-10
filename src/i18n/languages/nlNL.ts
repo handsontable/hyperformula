@@ -4,8 +4,9 @@
  */
 
 import {RawTranslationPackage} from '..'
+// import
 
-export const nlNL: RawTranslationPackage = {
+const dictionary: RawTranslationPackage = {
   errors: {
     CYCLE: '#CYCLE!',
     DIV_BY_ZERO: '#DELING.DOOR.0!',
@@ -123,7 +124,10 @@ export const nlNL: RawTranslationPackage = {
     XOR: 'EX.OF',
     YEAR: 'JAAR',
   },
+  langCode: 'nlNL',
   ui: {
     NEW_SHEET_PREFIX: 'Sheet',
   },
 }
+
+export default dictionary

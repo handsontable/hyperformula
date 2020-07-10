@@ -10,6 +10,7 @@ import {CellValue, ExportedChange, Exporter, NoErrorCellValue} from './CellValue
 import {ColumnSearchStrategy} from './ColumnSearch/ColumnSearchStrategy'
 import {Config, ConfigParams} from './Config'
 import {ColumnRowIndex, CrudOperations} from './CrudOperations'
+import {DateTime} from './DateTimeHelper'
 import {buildTranslationPackage, RawTranslationPackage, TranslationPackage} from './i18n'
 import {normalizeAddedIndexes, normalizeRemovedIndexes} from './Operations'
 import {
@@ -54,7 +55,7 @@ import {FunctionRegistry, FunctionTranslationsPackage} from './interpreter/Funct
  * ale related to this class.
  *
  * The instance can be created only by calling one of the static methods
- * `buildFromArray`, `buildFromSheets` or `buildEmpty` and should be disposed of with
+ * `buildFromArray`, `buildFromSheets` or `buildEmpty` and should be disposed of with the
  * `destroy` method when it's no longer needed to free the resources.
  *
  * The instance can be seen as a workbook where worksheets can be created and
@@ -88,6 +89,13 @@ export class HyperFormula implements TypedEmitter {
    * @category Static Properties
    */
   public static releaseDate = process.env.HT_RELEASE_DATE as string
+
+  /**
+   * Contains all available languages to use in registerLanguage.
+   * 
+   * @category Static Properties
+   */
+  public static languages: Record<string, RawTranslationPackage> = {}
 
   /**
    * Calls the `graph` method on the dependency graph.
@@ -378,6 +386,15 @@ export class HyperFormula implements TypedEmitter {
    * @throws [[FunctionPluginValidationError]] when plugin class definition is not consistent with metadata
    * @throws [[ProtectedFunctionTranslationError]] when trying to register translation for protected function
    *
+   * @example
+   * ```js
+   * // import your own plugin
+   * import { MyExamplePlugin } from './file_with_your_plugin';
+   *
+   * // register the plugin
+   * HyperFormula.registerFunctionPlugin(MyExamplePlugin);
+   * ```
+   *
    * @category Static Methods
    */
   public static registerFunctionPlugin(plugin: FunctionPluginDefinition, translations?: FunctionTranslationsPackage): void {
@@ -388,6 +405,15 @@ export class HyperFormula implements TypedEmitter {
    * Unregisters all functions defined in given plugin
    *
    * @param {FunctionPluginDefinition} plugin - plugin class
+   *
+   * @example
+   * ```js
+   * // get the class of a plugin
+   * const registeredPluginClass = HyperFormula.getFunctionPlugin('EXAMPLE');
+   *
+   * // unregister all functions defined in a plugin of ID 'EXAMPLE'
+   * HyperFormula.unregisterFunctionPlugin(registeredPluginClass);
+   * ```
    *
    * @category Static Methods
    */
@@ -404,6 +430,14 @@ export class HyperFormula implements TypedEmitter {
    *
    * @throws [[FunctionPluginValidationError]] when function with a given id does not exists in plugin or plugin class definition is not consistent with metadata
    * @throws [[ProtectedFunctionTranslationError]] when trying to register translation for protected function
+   * @example
+   * ```js
+   * // import your own plugin
+   * import { MyExamplePlugin } from './file_with_your_plugin';
+   *
+   * // register a function
+   * HyperFormula.registerFunction('EXAMPLE', MyExamplePlugin);
+   * ```
    *
    * @category Static Methods
    */
@@ -416,6 +450,18 @@ export class HyperFormula implements TypedEmitter {
    *
    * @param {string} functionId - function id, e.g. 'SUMIF'
    *
+   * @example
+   * ```js
+   * // import your own plugin
+   * import { MyExamplePlugin } from './file_with_your_plugin';
+   *
+   * // register a function
+   * HyperFormula.registerFunction('EXAMPLE', MyExamplePlugin);
+   *
+   * // unregister a function
+   * HyperFormula.unregisterFunction('EXAMPLE');
+   * ```
+   *
    * @category Static Methods
    */
   public static unregisterFunction(functionId: string): void {
@@ -424,6 +470,11 @@ export class HyperFormula implements TypedEmitter {
 
   /**
    * Clears function registry
+   *
+   * @example
+   * ```js
+   * HyperFormula.unregisterAllFunctions();
+   * ```
    *
    * @category Static Methods
    */
@@ -435,6 +486,12 @@ export class HyperFormula implements TypedEmitter {
    * Returns translated names of all registered functions for a given language
    *
    * @param {string} code - language code
+   *
+   * @example
+   * ```js
+   * // return a list of function names registered for enGB
+   * const allNames = HyperFormula.getRegisteredFunctionNames('enGB');
+   * ```
    *
    * @category Static Methods
    */
@@ -449,6 +506,18 @@ export class HyperFormula implements TypedEmitter {
    *
    * @param {string} functionId - id of a function, e.g. 'SUMIF'
    *
+   * @example
+   * ```js
+   * // import your own plugin
+   * import { MyExamplePlugin } from './file_with_your_plugin';
+   *
+   * // register a plugin
+   * HyperFormula.registerFunctionPlugin(MyExamplePlugin);
+   *
+   * // return the class of a given plugin
+   * const myFunctionClass = HyperFormula.getFunctionPlugin('EXAMPLE');
+   * ```
+   *
    * @category Static Methods
    */
   public static getFunctionPlugin(functionId: string): Maybe<FunctionPluginDefinition> {
@@ -457,6 +526,12 @@ export class HyperFormula implements TypedEmitter {
 
   /**
    * Returns classes of all plugins registered in this instance of HyperFormula
+   *
+   * @example
+   * ```js
+   * // return classes of all plugins
+   * const allClasses = HyperFormula.getAllFunctionPlugins();
+   * ```
    *
    * @category Static Methods
    */
@@ -522,7 +597,6 @@ export class HyperFormula implements TypedEmitter {
 
   /**
    * Returns a normalized formula string from the cell of a given address or `undefined` for an address that does not exist and empty values.
-   * Unparses AST.
    *
    * @param {SimpleCellAddress} cellAddress - cell coordinates
    *
@@ -547,7 +621,6 @@ export class HyperFormula implements TypedEmitter {
 
   /**
    * Returns [[CellValue]] which a serialized content of the cell of a given address either a cell formula, an explicit value, or an error.
-   * Unparses AST and applies post-processing.
    *
    * @param {SimpleCellAddress} cellAddress - cell coordinates
    *
@@ -603,7 +676,6 @@ export class HyperFormula implements TypedEmitter {
 
   /**
    * Returns an array with normalized formula strings from [[Sheet]] or `undefined` for a cells that have no value.
-   * Unparses AST.
    *
    * @param {SimpleCellAddress} sheetId - sheet ID number
    *
@@ -634,7 +706,6 @@ export class HyperFormula implements TypedEmitter {
 
   /**
    * Returns an array of arrays of [[NoErrorCellValue]] with serialized content of cells from [[Sheet]], either a cell formula or an explicit value.
-   * Unparses AST. Applies post-processing.
    *
    * @param {SimpleCellAddress} sheetId - sheet ID number
    *
@@ -743,7 +814,7 @@ export class HyperFormula implements TypedEmitter {
   }
 
   /**
-   * Returns formulas of all sheets in a form of an object which property keys are strings and values are arrays of arrays of strings or possibly `undefined`.
+   * Returns formulas of all sheets in a form of an object which property keys are strings and values are arrays of arrays of strings or possibly `undefined` when the call does not contain a formula.
    *
    * @example
    * ```js
@@ -1660,7 +1731,7 @@ export class HyperFormula implements TypedEmitter {
   }
 
   /**
-   * Clears the clipboard content by setting the content to `undefined`.
+   * Clears the clipboard content.
    *
    * @example
    * ```js
@@ -1672,6 +1743,59 @@ export class HyperFormula implements TypedEmitter {
    */
   public clearClipboard(): void {
     this._crudOperations.clearClipboard()
+  }
+
+  /**
+   * Clears the redo stack in undoRedo history.
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromArray([
+   *   ['1', '2', '3'],
+   * ]);
+   *
+   * // do an operation, for example remove columns
+   * hfInstance.removeColumns(0, [0, 1]);
+   * 
+   * // undo the operation
+   * hfInstance.undo();
+   *
+   * // redo the operation
+   * hfInstance.redo();
+   *
+   * // clear the redo stack
+   * hfInstance.clearRedoStack();
+   * ```
+   *
+   * @category Undo and Redo
+   */
+  public clearRedoStack(): void {
+    this._crudOperations.undoRedo.clearRedoStack()
+  }
+
+  /**
+   * Clears the undo stack in undoRedo history.
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromArray([
+   *   ['1', '2', '3'],
+   * ]);
+   *
+   * // do an operation, for example remove columns
+   * hfInstance.removeColumns(0, [0, 1]);
+   * 
+   * // undo the operation
+   * hfInstance.undo();
+   *
+   * // clear the undo stack
+   * hfInstance.clearUndoStack();
+   * ```
+   *
+   * @category Undo and Redo
+   */
+  public clearUndoStack(): void {
+    this._crudOperations.undoRedo.clearUndoStack()
   }
 
   /**
@@ -1804,7 +1928,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * @fires [[sheetAdded]] after the sheet was added
    *
-   * @throws [[SheetNameAlreadyTaken]] when sheet with a given name already exists
+   * @throws [[SheetNameAlreadyTakenError]] when sheet with a given name already exists
    *
    * @example
    * ```js
@@ -2194,10 +2318,10 @@ export class HyperFormula implements TypedEmitter {
    *  ['=SUM(A2:A3)', '2'],
    * ]);
    *
-   * // should return 'false' since the selcted cell contains a simple value
+   * // should return 'true' since the selected cell contains a simple value
    * const isA1Simple = hfInstance.doesCellHaveSimpleValue({ sheet: 0, col: 0, row: 0 });
    *
-   * // should return 'true' since the selcted cell does not contain a simple value
+   * // should return 'false' since the selected cell does not contain a simple value
    * const isB1Simple = hfInstance.doesCellHaveSimpleValue({ sheet: 0, col: 1, row: 0 });
    * ```
    *
@@ -2368,6 +2492,8 @@ export class HyperFormula implements TypedEmitter {
    *
    * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
    *
+   * @throws [[SheetNameAlreadyTakenError]] when the provided sheet name already exists
+   *
    * @example
    * ```js
    * const hfInstance = HyperFormula.buildFromSheets({
@@ -2398,14 +2524,17 @@ export class HyperFormula implements TypedEmitter {
    *
    * @example
    * ```js
-   * const hfInstance = HyperFormula.buildEmpty();
+   * const hfInstance = HyperFormula.buildFromSheets({
+   *  MySheet1: [ ['1'] ],
+   *  MySheet2: [ ['10'] ],
+   * });
    *
    * // multiple operations in a single callback will trigger evaluation only once
    * // and only one set of changes is returned as a combined result of all
    * // the operations that were triggered within the callback
    * const changes = hfInstance.batch(() => {
-   *   hfInstance.addRows(0, [1, 1]);
-   *   hfInstance.removeColumns(0, [1, 1]);
+   *  hfInstance.setCellContents({ col: 3, row: 0, sheet: 0 }, [['=B1']]);
+   *  hfInstance.setCellContents({ col: 4, row: 0, sheet: 0 }, [['=A1']]);
    * });
    * ```
    *
@@ -2434,7 +2563,10 @@ export class HyperFormula implements TypedEmitter {
    *
    * @example
    * ```js
-   * const hfInstance = HyperFormula.buildEmpty();
+   * const hfInstance = HyperFormula.buildFromSheets({
+   *  MySheet1: [ ['1'] ],
+   *  MySheet2: [ ['10'] ],
+   * });
    *
    * // similar to batch() but operations are not within a callback,
    * // one method suspends the recalculation
@@ -2444,8 +2576,8 @@ export class HyperFormula implements TypedEmitter {
    * hfInstance.suspendEvaluation();
    *
    * // perform operations
-   * hfInstance.addRows(0, [1, 1]);
-   * hfInstance.removeColumns(0, [1, 1]);
+   * hfInstance.setCellContents({ col: 3, row: 0, sheet: 0 }, [['=B1']]);
+   * hfInstance.setSheetContent('MySheet2', [['50'], ['60']]);
    *
    * // use resumeEvaluation to resume
    * const changes = hfInstance.resumeEvaluation();
@@ -2465,7 +2597,10 @@ export class HyperFormula implements TypedEmitter {
    *
    * @example
    * ```js
-   * const hfInstance = HyperFormula.buildEmpty();
+   * const hfInstance = HyperFormula.buildFromSheets({
+   *  MySheet1: [ ['1'] ],
+   *  MySheet2: [ ['10'] ],
+   * });
    *
    * // similar to batch() but operations are not within a callback,
    * // one method suspends the recalculation
@@ -2475,8 +2610,8 @@ export class HyperFormula implements TypedEmitter {
    * hfInstance.suspendEvaluation();
    *
    * // perform operations
-   * hfInstance.addRows(0, [1, 1]);
-   * hfInstance.removeColumns(0, [1, 1]);
+   * hfInstance.setCellContents({ col: 3, row: 0, sheet: 0 }, [['=B1']]);
+   * hfInstance.setSheetContent('MySheet2', [['50'], ['60']]);
    *
    * // resume the evaluation
    * const changes = hfInstance.resumeEvaluation();
@@ -2520,7 +2655,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * @param {string} expressionName - a name of the expression to be added
    * @param {RawCellContent} expression - the expression
-   * @param {string?} scope - sheet name or undefined for global scope
+   * @param {string?} scope - scope definition, `sheetName` for local scope or `undefined` for global scope
    *
    * @example
    * ```js
@@ -2625,7 +2760,6 @@ export class HyperFormula implements TypedEmitter {
 
   /**
    * Returns a normalized formula string for given named expression or `undefined` for a named expression that does not exist or does not hold a formula.
-   * Unparses AST.
    *
    * @param {string} expressionName - expression name, case insensitive.
    * @param {string?} scope - scope definition, `sheetName` for local scope or `undefined` for global scope
@@ -2660,7 +2794,6 @@ export class HyperFormula implements TypedEmitter {
 
   /**
    * Returns named expression a normalized formula string for given named expression or `undefined` for a named expression that does not exist or does not hold a formula.
-   * Unparses AST.
    *
    * @param {string} expressionName - expression name, case insensitive.
    * @param {string?} scope - scope definition, `sheetName` for local scope or `undefined` for global scope
@@ -2709,7 +2842,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * @param {string} expressionName - an expression name, case insensitive.
    * @param {RawCellContent} newExpression - a new expression
-   * @param {string?} scope - sheet name or undefined for global scope
+   * @param {string?} scope - scope definition, `sheetName` for local scope or `undefined` for global scope
    *
    * @example
    * ```js
@@ -2780,7 +2913,7 @@ export class HyperFormula implements TypedEmitter {
    * Returns `false` if the operation might be disrupted.
    *
    * @param {string} expressionName - an expression name, case insensitive.
-   * @param {string?} scope - sheet name or undefined for global scope
+   * @param {string?} scope - scope definition, `sheetName` for local scope or `undefined` for global scope
    *
    * @example
    * ```js
@@ -2917,7 +3050,7 @@ export class HyperFormula implements TypedEmitter {
    * });
    *
    * // returns the value of calculated formula, '32' for this example
-   * const calculatedFormula = hfInstance.calculateFormula('=A1+10', 'Sheet1'));
+   * const calculatedFormula = hfInstance.calculateFormula('=A1+10', 'Sheet1');
    * ```
    *
    * @category Helpers
@@ -2962,6 +3095,14 @@ export class HyperFormula implements TypedEmitter {
    * Returns translated names of all functions registered in this instance of HyperFormula
    * according to the language set in the configuration
    *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildEmpty();
+   *
+   * // return translated names of all functions, assign to a variable
+   * const allNames = hfInstance.getRegisteredFunctionNames();
+   * ```
+   *
    * @category Custom Functions
    */
   public getRegisteredFunctionNames(): string[] {
@@ -2974,6 +3115,20 @@ export class HyperFormula implements TypedEmitter {
    *
    * @param {string} functionId - id of a function, e.g. 'SUMIF'
    *
+   * @example
+   * ```js
+   * // import your own plugin
+   * import { MyExamplePlugin } from './file_with_your_plugin';
+   *
+   * const hfInstance = HyperFormula.buildEmpty();
+   *
+   * // register a plugin
+   * HyperFormula.registerFunctionPlugin(MyExamplePlugin);
+   *
+   * // get the plugin
+   * const myPlugin = hfInstance.getFunctionPlugin('EXAMPLE');
+   * ```
+   *
    * @category Custom Functions
    */
   public getFunctionPlugin(functionId: string): Maybe<FunctionPluginDefinition> {
@@ -2983,10 +3138,81 @@ export class HyperFormula implements TypedEmitter {
   /**
    * Returns classes of all plugins registered in this instance of HyperFormula
    *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildEmpty();
+   *
+   * // return classes of all plugins registered, assign to a variable
+   * const allNames = hfInstance.getAllFunctionPlugins();
+   * ```
+   *
    * @category Custom Functions
    */
   public getAllFunctionPlugins(): FunctionPluginDefinition[] {
     return this._functionRegistry.getPlugins()
+  }
+
+  /**
+   * Interprets number as a date + time.
+   *
+   * @param {number} val - number of days since nullDate, should be nonnegative, fractions are interpreted as hours/minutes/seconds.
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildEmpty();
+   *
+   * // pass the number of days since nullDate
+   * // the method should return formatted date and time, for this example:
+   * // {year: 2020, month: 1, day: 15, hours: 2, minutes: 24, seconds: 0}
+   * const dateTimeFromNumber = hfInstance.numberToDateTime(43845.1);
+   *
+   * ```
+   *
+   * @category Helper
+   */
+  public numberToDateTime(val: number): DateTime {
+    return this._evaluator.dateHelper.numberToSimpleDateTime(val)
+  }
+
+  /**
+   * Interprets number as a date.
+   *
+   * @param {number} val - number of days since nullDate, should be nonnegative, fractions are ignored.
+
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildEmpty();
+   *
+   * // pass the number of days since nullDate
+   * // the method should return formatted date, for this example:
+   * // {year: 2020, month: 1, day: 15}
+   * const dateFromNumber = hfInstance.numberToDate(43845);
+   * ```
+   *
+   * @category Helper
+   */
+  public numberToDate(val: number): DateTime {
+    return this._evaluator.dateHelper.numberToSimpleDate(val)
+  }
+
+  /**
+   * Interprets number as a time (hours/minutes/seconds).
+   *
+   * @param {number} val - time in 24h units.
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildEmpty();
+   * 
+   * // pass a number to be interpreted as a time
+   * // should return {hours: 26, minutes: 24} for this example
+   * const timeFromNumber = hfInstance.numberToTime(1.1);
+   * ```
+   *
+   * @category Helper
+   */
+  public numberToTime(val: number): DateTime {
+    return this._evaluator.dateHelper.numberToSimpleTime(val)
   }
 
   private extractTemporaryFormula(formulaString: string, sheetId: number = 1): [Maybe<Ast>, SimpleCellAddress, RelativeDependency[]] {
@@ -3089,7 +3315,6 @@ export class HyperFormula implements TypedEmitter {
 
   /**
    * Destroys instance of HyperFormula.
-   * Dependency graph, optimization indexes, statistics and parser are removed.
    *
    * @example
    * ```js

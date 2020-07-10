@@ -1,11 +1,18 @@
+
 import {HyperFormula, LanguageAlreadyRegisteredError, LanguageNotRegisteredError} from '../src'
-import {languages, plPL, RawTranslationPackage, TranslationPackage} from '../src/i18n'
+import {RawTranslationPackage, TranslationPackage} from '../src/i18n'
+import {enGB, plPL} from '../src/i18n/languages'
 import {CellAddress} from '../src/parser'
 import {adr, extractReference} from './testUtils'
 import {FunctionRegistry} from '../src/interpreter/FunctionRegistry'
 import {ProtectedFunctionTranslationError} from '../src/errors'
 
 describe('i18n', () => {
+  const languages: Record<string, RawTranslationPackage> = {
+    enGB,
+    plPL,
+  }
+
   beforeEach(() => {
     HyperFormula.registerLanguage('plPL', plPL)
   })

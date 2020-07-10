@@ -3,7 +3,8 @@ import {simpleCellAddress} from '../../src/Cell'
 import {Config} from '../../src/Config'
 import {SheetMapping} from '../../src/DependencyGraph'
 import {NamedExpressions} from '../../src/NamedExpressions'
-import {buildTranslationPackage, enGB, plPL} from '../../src/i18n'
+import {buildTranslationPackage} from '../../src/i18n'
+import {enGB, plPL} from '../../src/i18n/languages'
 import {AstNodeType, buildLexerConfig, Unparser} from '../../src/parser'
 import {adr, unregisterAllLanguages} from '../testUtils'
 import {buildEmptyParserWithCaching} from './common'
@@ -22,8 +23,8 @@ describe('Unparse', () => {
 
   beforeEach(() => {
     unregisterAllLanguages()
-    HyperFormula.registerLanguage('plPL', plPL)
-    HyperFormula.registerLanguage('enGB', enGB)
+    HyperFormula.registerLanguage(plPL.langCode, plPL)
+    HyperFormula.registerLanguage(enGB.langCode, enGB)
   })
 
   it('#unparse', () => {
@@ -342,8 +343,8 @@ describe('Unparse', () => {
   })
 
   it('#unparse use language configuration', () => {
-    const configEN = new Config({language: 'enGB'})
-    const configPL = new Config({language: 'plPL'})
+    const configEN = new Config({language: enGB.langCode})
+    const configPL = new Config({language: plPL.langCode})
 
     const parser = buildEmptyParserWithCaching(configPL, sheetMapping)
 

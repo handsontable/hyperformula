@@ -4,8 +4,9 @@
  */
 
 import {RawTranslationPackage} from '..'
+// import
 
-export const ptPT: RawTranslationPackage = {
+const dictionary: RawTranslationPackage = {
   errors: {
     CYCLE: '#CYCLE!',
     DIV_BY_ZERO: '#DIV/0!',
@@ -123,7 +124,10 @@ export const ptPT: RawTranslationPackage = {
     XOR: 'OUEXCL',
     YEAR: 'ANO',
   },
+  langCode: 'ptPT',
   ui: {
     NEW_SHEET_PREFIX: 'Sheet',
   },
 }
+
+export default dictionary
