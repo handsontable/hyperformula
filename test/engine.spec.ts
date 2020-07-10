@@ -715,8 +715,8 @@ describe('dateTime', () => {
   })
 })
 
-describe('engine should build correctly', () => {
-  it('should build correctly #1', () => {
+describe('Graph dependency order module blah blah', () => {
+  it('should build correctly when rows are dependant on cells that are not yet processed', () => {
     expect(() => HyperFormula.buildFromArray([
       ['=A3+A2'],
       ['=A3'],
