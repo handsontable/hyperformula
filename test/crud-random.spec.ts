@@ -97,10 +97,10 @@ function randomCleanup(engine: HyperFormula, rect: Rectangle) {
 describe('larger tests', () => {
   it('large rectangular + addRows', () => {
     const engine = HyperFormula.buildFromArray([])
-    const sideX = 3
-    const n = 2
-    let sideY = 1
-    while (sideY < 5) {
+    let sideX = 3
+    const n = 4
+    let sideY = 3
+    for(let rep=0;rep<5;rep++) {
       randomVals(engine, rectangleFromCorner({x: 0, y: 0}, sideX, sideY))
       verifyValues(engine)
       for (let i = 0; i < n; i++) {
@@ -110,18 +110,40 @@ describe('larger tests', () => {
         )
         verifyValues(engine)
       }
-      const positionToAdd = randomInteger(0, sideY + 1)
-      if(outputLog) {
-        console.log(`engine.addRows(0, [${positionToAdd},2])`)
+      for (let i = 0; i < n; i++) {
+        randomSums(engine,
+          rectangleFromCorner({x: sideX * (i + 1), y: 0}, sideX, sideY),
+          rectangleFromCorner({x: 0, y: 0}, sideX * (i+1), sideY)
+        )
+        verifyValues(engine)
       }
-      engine.addRows(0, [positionToAdd, 2])
+      for (let i=0; i<n; i++) {
+        const columnPositionToAdd = randomInteger(0, sideX*(n+1)+1)
+        engine.addColumns(0, [columnPositionToAdd, 2])
+        if(outputLog) {
+          console.log(`engine.addColumns(0, [${columnPositionToAdd},2])`)
+        }
+        verifyValues(engine)
+        const columnPositionToRemove = randomInteger(0, sideX*(n+1))
+        engine.removeColumns(0, [columnPositionToRemove, 1])
+        if(outputLog) {
+          console.log(`engine.removeColumns(0, [${columnPositionToRemove},1])`)
+        }
+      }
+      sideX += 1
+
+      const rowPositionToAdd = randomInteger(0, sideY + 1)
+      if(outputLog) {
+        console.log(`engine.addRows(0, [${rowPositionToAdd},2])`)
+      }
+      engine.addRows(0, [rowPositionToAdd, 2])
       sideY += 2
       verifyValues(engine)
-      const positionToRemove = randomInteger(0, sideY)
+      const rowPositionToRemove = randomInteger(0, sideY)
       if(outputLog) {
-        console.log(`engine.removeRows(0, [${positionToRemove},1])`)
+        console.log(`engine.removeRows(0, [${rowPositionToRemove},1])`)
       }
-      engine.removeRows(0, [positionToRemove, 1])
+      engine.removeRows(0, [rowPositionToRemove, 1])
       sideY -= 1
       verifyValues(engine)
     }
