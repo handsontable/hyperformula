@@ -715,15 +715,15 @@ describe('dateTime', () => {
   })
 })
 
-describe('Graph dependency order module blah blah', () => {
-  it('should build correctly when rows are dependant on cells that are not yet processed', () => {
+describe('Graph dependency topological ordering module', () => {
+  it('should build correctly when rows are dependant on cells that are not yet processed #1', () => {
     expect(() => HyperFormula.buildFromArray([
       ['=A3+A2'],
       ['=A3'],
     ])).not.toThrowError()
   })
 
-  it('should build correctly #2', () => {
+  it('should build correctly when rows are dependant on cells that are not yet processed #2', () => {
     expect(() => HyperFormula.buildFromArray([
       ['=A4+A3+A2'],
       ['=A4+A3'],
@@ -731,7 +731,7 @@ describe('Graph dependency order module blah blah', () => {
     ])).not.toThrowError()
   })
 
-  it('should build correctly #3', () => {
+  it('should build correctly when rows are dependant on cells that are not yet processed #3', () => {
     expect(() => HyperFormula.buildFromArray([
       ['=A5+A4+A3+A2'],
       ['=A5+A4+A3'],
