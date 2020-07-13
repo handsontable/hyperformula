@@ -1,7 +1,7 @@
 # Dependencies
 
 HyperFormula depends on a few external libraries, as listed below.
-hese dependencies are used to support some of the library's core
+These dependencies are used to support some of the library's core
 features.
 
 | Name | License | Author |
