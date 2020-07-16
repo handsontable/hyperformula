@@ -3,6 +3,9 @@ import {verifyValues} from './testUtils'
 
 let state = 1
 
+/**
+ * random int from global variable 'state'
+ */
 function getInt(): number {
   state ^= state << 13
   state ^= state >> 17
@@ -11,13 +14,24 @@ function getInt(): number {
   return state
 }
 
+/**
+ * random float from global variable 'state'
+ */
 function getFloat(): number {
   return getInt()/0x80000000
 }
 
+/**
+ * boolean flag for outputing crud operations
+ */
 const outputLog = false
 
-
+/**
+ * random int in range between min and max
+ *
+ * @param min
+ * @param max
+ */
 function randomInteger(min: number, max: number) {
   return Math.floor(getFloat() * (max - min)) + min
 }
@@ -26,7 +40,12 @@ type Pts = { x: number, y: number }
 
 type Rectangle = { topleft: Pts, bottomright: Pts }
 
-
+/**
+ * picks a random range as a subset of rectangle
+ * and builds a formula =SUM(range)
+ * @param engine
+ * @param rect
+ */
 function randomRange(engine: HyperFormula, rect: Rectangle): string {
   const x1 = randomInteger(rect.topleft.x, rect.bottomright.x)
   const x2 = randomInteger(rect.topleft.x, rect.bottomright.x)
@@ -45,6 +64,12 @@ function randomRange(engine: HyperFormula, rect: Rectangle): string {
   return '=SUM(' + startAddress + ':' + endAddress + ')'
 }
 
+/**
+ * Fills a rectangle of cells with random formula sums with a random ranges from another rectangle.
+ * @param engine
+ * @param rectFormulas
+ * @param rectValues
+ */
 function randomSums(engine: HyperFormula, rectFormulas: Rectangle, rectValues: Rectangle) {
   allPts(rectFormulas).forEach((pts) => {
     const formula = randomRange(engine, rectValues)
@@ -52,6 +77,11 @@ function randomSums(engine: HyperFormula, rectFormulas: Rectangle, rectValues: R
   })
 }
 
+/**
+ * Fills a rectangle of cells with random values.
+ * @param engine
+ * @param rectValues
+ */
 function randomVals(engine: HyperFormula, rectValues: Rectangle) {
   allPts(rectValues).forEach((pts) => {
     const val = randomInteger(-10, 10)
@@ -62,10 +92,21 @@ function randomVals(engine: HyperFormula, rectValues: Rectangle) {
   })
 }
 
+/**
+ * builds a rectangle from corner + X side length + Y side length
+ * @param pts
+ * @param sideX
+ * @param sideY
+ */
 function rectangleFromCorner(pts: Pts, sideX: number, sideY: number): Rectangle {
   return {topleft: pts, bottomright: {x: pts.x + sideX, y: pts.y + sideY}}
 }
 
+/**
+ * all adresses from a rectangle
+ *
+ * @param rect
+ */
 function allPts(rect: Rectangle): Pts[] {
   const ret: Pts[] = []
   for (let x = rect.topleft.x; x < rect.bottomright.x; x++) {
@@ -76,6 +117,11 @@ function allPts(rect: Rectangle): Pts[] {
   return ret
 }
 
+/**
+ * random shuffle of an array
+ *
+ * @param array
+ */
 function shuffleArray<T>(array: T[]): T[] {
   for (let i = array.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
@@ -84,6 +130,15 @@ function shuffleArray<T>(array: T[]): T[] {
   return array
 }
 
+/**
+ * Empties the engine using .setCellContents()
+ * operates only on sheet: 0
+ *
+ * @param engine - engine to be emptied
+ * @param rect - rectangle of adresses we expect nonempty cell to be in
+ *
+ * The outcome should be that there are no cells in the engine.
+ */
 function randomCleanup(engine: HyperFormula, rect: Rectangle) {
   shuffleArray(allPts(rect)).forEach((pts) => {
       engine.setCellContents({sheet: 0, col: pts.x, row: pts.y}, null)
@@ -94,8 +149,8 @@ function randomCleanup(engine: HyperFormula, rect: Rectangle) {
   )
 }
 
-describe('larger tests', () => {
-  it('large rectangular + addRows', () => {
+describe('large random tests', () => {
+  it('growing rectangle + addRows + addColumns', () => {
     const engine = HyperFormula.buildFromArray([])
     let sideX = 3
     const n = 4
