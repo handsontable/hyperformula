@@ -1,4 +1,5 @@
 import {HyperFormula} from '../src'
+import {simpleCellAddress} from '../src/Cell'
 import {verifyValues} from './testUtils'
 
 let state = 1
@@ -24,7 +25,7 @@ function getFloat(): number {
 /**
  * boolean flag for outputing crud operations
  */
-const outputLog = false
+const outputLog = true
 
 /**
  * random int in range between min and max
@@ -73,6 +74,9 @@ function randomRange(engine: HyperFormula, rect: Rectangle): string {
 function randomSums(engine: HyperFormula, rectFormulas: Rectangle, rectValues: Rectangle) {
   allPts(rectFormulas).forEach((pts) => {
     const formula = randomRange(engine, rectValues)
+    if(outputLog) {
+      console.log(`engine.setCellContents({sheet: 0, col: ${pts.x}, row: ${pts.y}}, '${formula}')`)
+    }
     engine.setCellContents({sheet: 0, col: pts.x, row: pts.y}, formula)
   })
 }
@@ -131,6 +135,29 @@ function shuffleArray<T>(array: T[]): T[] {
 }
 
 /**
+ * swaps two rectangles in-place
+ * @param engine
+ * @param corner1
+ * @param corner2
+ * @param sideX
+ * @param sideY
+ */
+function swapTwoRectangles(engine: HyperFormula, pts1: Pts, pts2: Pts, sideX: number, sideY: number) {
+  if(outputLog) {
+    console.log(`engine.moveCells( {sheet: 0, col: ${pts1.x}, row: ${pts1.y}}, ${sideX}, ${sideY}, {sheet: 0, col: 1000, row: 1000})`)
+  }
+  engine.moveCells( {sheet: 0, col: pts1.x, row: pts1.y}, sideX, sideY, {sheet: 0, col: 1000, row: 1000})
+  if(outputLog) {
+    console.log(`engine.moveCells( {sheet: 0, col: ${pts2.x}, row: ${pts2.y}}, ${sideX}, ${sideY}, {sheet: 0, col: ${pts1.x}, row: ${pts1.y}})`)
+  }
+  engine.moveCells( {sheet: 0, col: pts2.x, row: pts2.y}, sideX, sideY, {sheet: 0, col: pts1.x, row: pts1.y})
+  if(outputLog) {
+    console.log(`engine.moveCells( {sheet: 0, col: 1000, row: 1000}, ${sideX}, ${sideY}, {sheet: 0, col: ${pts2.x}, row: ${pts2.y}})`)
+  }
+  engine.moveCells( {sheet: 0, col: 1000, row: 1000}, sideX, sideY, {sheet: 0, col: pts2.x, row: pts2.y})
+}
+
+/**
  * Empties the engine using .setCellContents()
  * operates only on sheet: 0
  *
@@ -149,8 +176,8 @@ function randomCleanup(engine: HyperFormula, rect: Rectangle) {
   )
 }
 
-describe('large random tests', () => {
-  it('growing rectangle + addRows + addColumns', () => {
+describe('large random integration test', () => {
+  it('growing rectangle + addRows + addColumns + removeRows + removeColumns', () => {
     const engine = HyperFormula.buildFromArray([])
     let sideX = 3
     const n = 4
@@ -200,6 +227,12 @@ describe('large random tests', () => {
       }
       engine.removeRows(0, [rowPositionToRemove, 1])
       sideY -= 1
+      verifyValues(engine)
+      const x1 = randomInteger(0, n*sideX)
+      const x2 = randomInteger(0, n*sideX)
+      const y1 = randomInteger(0, sideY)
+      const y2 = randomInteger(0, sideY)
+      swapTwoRectangles(engine, {x: x1, y: y1}, {x: x2, y: y2}, sideX, sideY)
       verifyValues(engine)
     }
     randomCleanup(engine, rectangleFromCorner({x: 0, y: 0}, (n + 1) * sideX, sideY))
