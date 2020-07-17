@@ -1,4 +1,4 @@
-import {HyperFormula} from '../../src'
+import {ErrorType, HyperFormula} from '../../src'
 import {AbsoluteCellRange} from '../../src/AbsoluteCellRange'
 import {EmptyValue, simpleCellAddress} from '../../src/Cell'
 import {ColumnIndex} from '../../src/ColumnSearch/ColumnIndex'
@@ -6,18 +6,18 @@ import {EmptyCellVertex, FormulaCellVertex, ValueCellVertex} from '../../src/Dep
 import {CellAddress} from '../../src/parser'
 import {
   adr,
+  colEnd,
+  colStart,
+  detailedError,
   expectArrayWithSameContent,
-  expectReferenceToHaveRefError,
   expectEngineToBeTheSameAs,
+  extractColumnRange,
   extractMatrixRange,
   extractRange,
   extractReference,
-  extractColumnRange,
-  colStart,
-  colEnd,
-  rowStart,
-  rowEnd,
   extractRowRange,
+  rowEnd,
+  rowStart,
 } from '../testUtils'
 import {Config} from '../../src/Config'
 import {SheetSizeLimitExceededError} from '../../src/errors'
@@ -136,7 +136,7 @@ describe('Address dependencies, moved formulas', () => {
     expect(extractReference(engine, adr('B4'))).toEqual(CellAddress.absolute(null, 0, 0))
   })
 
-  it('should return #REF when overriding referred dependency to external cell', () => {
+  it('should return #CYCLE when overriding referred dependency to external cell', () => {
     const engine = HyperFormula.buildFromArray([
       ['=B1', '1'],
       ['=$B2', '2'],
@@ -146,13 +146,17 @@ describe('Address dependencies, moved formulas', () => {
 
     engine.moveCells(adr('A1'), 1, 4, adr('B1'))
 
-    expectReferenceToHaveRefError(engine, adr('B1'))
-    expectReferenceToHaveRefError(engine, adr('B2'))
-    expectReferenceToHaveRefError(engine, adr('B3'))
-    expectReferenceToHaveRefError(engine, adr('B4'))
+    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.CYCLE))
+    expect(engine.getCellValue(adr('B2'))).toEqual(detailedError(ErrorType.CYCLE))
+    expect(engine.getCellValue(adr('B3'))).toEqual(detailedError(ErrorType.CYCLE))
+    expect(engine.getCellValue(adr('B4'))).toEqual(detailedError(ErrorType.CYCLE))
+    expect(engine.getCellFormula(adr('B1'))).toEqual('=B1')
+    expect(engine.getCellFormula(adr('B2'))).toEqual('=$B2')
+    expect(engine.getCellFormula(adr('B3'))).toEqual('=B$3')
+    expect(engine.getCellFormula(adr('B4'))).toEqual('=$B$4')
   })
 
-  it('should return #REF when any of moved cells overrides external dependency', () => {
+  it('should work when overriding moved dependency', () => {
     const engine = HyperFormula.buildFromArray([
       ['=B2', '1'],
       ['3', '2'],
@@ -160,7 +164,8 @@ describe('Address dependencies, moved formulas', () => {
 
     engine.moveCells(adr('A1'), 1, 2, adr('B1'))
 
-    expectReferenceToHaveRefError(engine, adr('B1'))
+    expect(engine.getCellValue(adr('B1'))).toEqual(3)
+    expect(engine.getCellValue(adr('B2'))).toEqual(3)
   })
 
   it('should update internal dependency when overriding dependent cell', () => {
@@ -842,9 +847,25 @@ describe('overlapping areas', () => {
 
     engine.moveCells(adr('A1'), 1, 1, adr('A2'))
 
+    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.CYCLE))
     expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
       [null],
-      ['=#REF!']
+      ['=A2']
+    ]))
+  })
+
+  it('overlapped formula with range', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=A2:B2'],
+      ['42']
+    ])
+
+    engine.moveCells(adr('A1'), 1, 1, adr('A2'))
+
+    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.CYCLE))
+    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
+      [null],
+      ['=A2:B2']
     ]))
   })
 })
@@ -865,7 +886,7 @@ describe('column index', () => {
 
   it('should update column index when moving cell - REFs', () => {
     const engine = HyperFormula.buildFromArray([
-      ['=B2', '1'],
+      ['=B1', '1'],
       ['3', '2'],
     ], { useColumnIndex: true })
 
@@ -875,6 +896,7 @@ describe('column index', () => {
     expectArrayWithSameContent([], index.getValueIndex(0, 0, 2).index)
     expectArrayWithSameContent([], index.getValueIndex(0, 0, 3).index)
     expectArrayWithSameContent([], index.getValueIndex(0, 1, 1).index)
+    expectArrayWithSameContent([], index.getValueIndex(0, 1, 2).index)
     expectArrayWithSameContent([1], index.getValueIndex(0, 1, 3).index)
   })
 
@@ -986,6 +1008,38 @@ describe('move cells with matrices', () => {
   })
 })
 
+describe('cell ranges', () => {
+  it('should transform relative references', () => {
+    const engine = HyperFormula.buildFromArray([[1, 2, '=SUM(A1:B1)', '=SUM($A1:B$1)', '=SUM(A$1:$B$1)']])
+
+    engine.moveCells(adr('C1'), 3, 1, adr('D2'))
+
+    expect(engine.getCellFormula(adr('D2'))).toEqual('=SUM(A1:B1)')
+    expect(engine.getCellFormula(adr('E2'))).toEqual('=SUM($A1:B$1)')
+    expect(engine.getCellFormula(adr('F2'))).toEqual('=SUM(A$1:$B$1)')
+  })
+
+  it('move formula and one end of a range', () => {
+    const engine = HyperFormula.buildFromArray([
+      [1, 2],
+      [null, '=SUM(A1:B1)']
+    ])
+
+    engine.moveCells(adr('B1'), 1, 2, adr('C1'))
+
+    expect(engine.getCellFormula(adr('C2'))).toEqual('=SUM(A1:B1)')
+  })
+
+  it('should be #CYCLE! if one of ends is in target range', () => {
+    const engine = HyperFormula.buildFromArray([[1, 2, '=SUM(A1:B1)']])
+
+    engine.moveCells(adr('C1'), 1, 1, adr('B1'))
+
+    expect(engine.getCellFormula(adr('B1'))).toEqual('=SUM(A1:B1)')
+    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.CYCLE))
+  })
+})
+
 describe('column ranges', () => {
   it('should not update range when only part of it is moved', () => {
     const engine = HyperFormula.buildFromArray([
@@ -1018,6 +1072,15 @@ describe('column ranges', () => {
     expect(engine.getCellValue(adr('B2'))).toEqual(3)
     expect(range.start).toEqual(colStart('C'))
     expect(range.end).toEqual(colEnd('D'))
+  })
+
+  it('should be #CYCLE! if one of ends is in target range', () => {
+    const engine = HyperFormula.buildFromArray([[1, 2, '=SUM(A:B)']])
+
+    engine.moveCells(adr('C1'), 1, 1, adr('B1'))
+
+    expect(engine.getCellFormula(adr('B1'))).toEqual('=SUM(A:B)')
+    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.CYCLE))
   })
 })
 
@@ -1058,5 +1121,18 @@ describe('row ranges', () => {
     expect(engine.getCellValue(adr('B2'))).toEqual(3)
     expect(range.start).toEqual(rowStart(3))
     expect(range.end).toEqual(rowEnd(4))
+  })
+
+  it('should be #CYCLE! if one of ends is in target range', () => {
+    const engine = HyperFormula.buildFromArray([
+      [1],
+      [2],
+      ['=SUM(1:2)'],
+    ])
+
+    engine.moveCells(adr('A3'), 1, 1, adr('A2'))
+
+    expect(engine.getCellFormula(adr('A2'))).toEqual('=SUM(1:2)')
+    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.CYCLE))
   })
 })

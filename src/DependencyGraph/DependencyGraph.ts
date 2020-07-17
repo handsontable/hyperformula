@@ -457,11 +457,9 @@ export class DependencyGraph {
           this.addressMapping.removeCell(targetAddress)
         }
         for (const adjacentNode of this.graph.adjacentNodes(targetVertex)) {
-          if (adjacentNode !== sourceVertex) {
-            sourceVertex = sourceVertex || this.fetchCellOrCreateEmpty(targetAddress)
-            this.graph.addEdge(sourceVertex, adjacentNode)
-            this.graph.markNodeAsSpecialRecentlyChanged(sourceVertex)
-          }
+          sourceVertex = sourceVertex || this.fetchCellOrCreateEmpty(targetAddress)
+          this.graph.addEdge(sourceVertex, adjacentNode)
+          this.graph.markNodeAsSpecialRecentlyChanged(sourceVertex)
         }
         this.removeVertex(targetVertex)
       }
@@ -853,7 +851,7 @@ export class DependencyGraph {
   }
 
   private truncateRanges(span: Span, coordinate: (address: SimpleCellAddress) => number) {
-    const { verticesToRemove, verticesToMerge } = this.rangeMapping.truncateRanges(span, coordinate)
+    const {verticesToRemove, verticesToMerge} = this.rangeMapping.truncateRanges(span, coordinate)
     for (const [existingVertex, mergedVertex] of verticesToMerge) {
       this.mergeRangeVertices(existingVertex, mergedVertex)
     }
