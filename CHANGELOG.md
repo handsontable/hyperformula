@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - Fixed a bug in topological ordering module. (#442)
+- Fixed a bug in coercion of empty string to boolean value. (#453)
 
 ## [0.1.1] - 2020-07-01
 
