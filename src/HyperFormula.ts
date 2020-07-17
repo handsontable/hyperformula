@@ -2191,6 +2191,17 @@ export class HyperFormula implements TypedEmitter {
     return simpleCellAddressToString(this.sheetMapping.fetchDisplayName, cellAddress, sheetId)
   }
 
+  public getCellDependencies(cellAddress: SimpleCellAddress) {
+    const tmp = this._dependencyGraph.addressMapping.getCell(cellAddress)
+    if(tmp===null) {
+      return null
+    }
+    const deps = this._dependencyGraph.graph.getDependencies(tmp)
+    deps.map((vertex) => {
+      vertex.
+    })
+  }
+
   /**
    * Returns a unique sheet name assigned to the sheet of a given ID or `undefined` if the there is no sheet with a given ID.
    *
