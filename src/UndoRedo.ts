@@ -61,6 +61,7 @@ export class MoveRowsUndoEntry {
     public readonly startRow: number,
     public readonly numberOfRows: number,
     public readonly targetRow: number,
+    public readonly version: number,
   ) {
   }
 }
@@ -71,6 +72,7 @@ export class MoveColumnsUndoEntry {
     public readonly startColumn: number,
     public readonly numberOfColumns: number,
     public readonly targetColumn: number,
+    public readonly version: number,
   ) {
   }
 }
@@ -398,11 +400,13 @@ export class UndoRedo {
   private undoMoveRows(operation: MoveRowsUndoEntry) {
     const {sheet} = operation
     this.operations.moveRows(sheet, operation.targetRow - operation.numberOfRows, operation.numberOfRows, operation.startRow)
+    this.restoreOldDataFromVersion(operation.version - 1)
   }
 
   private undoMoveColumns(operation: MoveColumnsUndoEntry) {
     const {sheet} = operation
     this.operations.moveColumns(sheet, operation.targetColumn - operation.numberOfColumns, operation.numberOfColumns, operation.startColumn)
+    this.restoreOldDataFromVersion(operation.version - 1)
   }
 
   public undoMoveCells(operation: MoveCellsUndoEntry): void {

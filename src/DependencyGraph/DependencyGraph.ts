@@ -755,6 +755,7 @@ export class DependencyGraph {
 
     const deps = collectDependencies(formula!, this.functionRegistry)
     const absoluteDeps = absolutizeDependencies(deps, address)
+
     return new Set(absoluteDeps.map((dep: CellDependency) => {
       if (dep instanceof AbsoluteCellRange) {
         return this.rangeMapping.fetchRange(dep.start, dep.end)

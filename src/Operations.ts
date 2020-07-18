@@ -233,7 +233,7 @@ export class Operations {
     return this.sheetMapping.renameSheet(sheetId, newName)
   }
 
-  public moveRows(sheet: number, startRow: number, numberOfRows: number, targetRow: number): void {
+  public moveRows(sheet: number, startRow: number, numberOfRows: number, targetRow: number): number {
     const rowsToAdd = RowsSpan.fromNumberOfRows(sheet, targetRow, numberOfRows)
     this.doAddRows(rowsToAdd)
 
@@ -243,12 +243,13 @@ export class Operations {
 
     const startAddress = simpleCellAddress(sheet, 0, startRow)
     const targetAddress = simpleCellAddress(sheet, 0, targetRow)
-    this.moveCells(startAddress, Number.POSITIVE_INFINITY, numberOfRows, targetAddress)
+    const { version } = this.moveCells(startAddress, Number.POSITIVE_INFINITY, numberOfRows, targetAddress)
     const rowsToRemove = RowsSpan.fromNumberOfRows(sheet, startRow, numberOfRows)
     this.doRemoveRows(rowsToRemove)
+    return version
   }
 
-  public moveColumns(sheet: number, startColumn: number, numberOfColumns: number, targetColumn: number): void {
+  public moveColumns(sheet: number, startColumn: number, numberOfColumns: number, targetColumn: number): number {
     const columnsToAdd = ColumnsSpan.fromNumberOfColumns(sheet, targetColumn, numberOfColumns)
     this.doAddColumns(columnsToAdd)
 
@@ -258,9 +259,10 @@ export class Operations {
 
     const startAddress = simpleCellAddress(sheet, startColumn, 0)
     const targetAddress = simpleCellAddress(sheet, targetColumn, 0)
-    this.moveCells(startAddress, numberOfColumns, Number.POSITIVE_INFINITY, targetAddress)
+    const { version } = this.moveCells(startAddress, numberOfColumns, Number.POSITIVE_INFINITY, targetAddress)
     const columnsToRemove = ColumnsSpan.fromNumberOfColumns(sheet, startColumn, numberOfColumns)
     this.doRemoveColumns(columnsToRemove)
+    return version
   }
 
   public moveCells(sourceLeftCorner: SimpleCellAddress, width: number, height: number, destinationLeftCorner: SimpleCellAddress): MoveCellsResult {

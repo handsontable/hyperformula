@@ -171,6 +171,18 @@ describe('Undo - moving rows', () => {
 
     expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray(sheet))
   })
+
+  it('should restore range', () => {
+    const engine = HyperFormula.buildFromArray([
+      [1, null],
+      [2, '=SUM(A1:A2)'],
+    ])
+    engine.moveRows(0, 1, 1, 3)
+
+    engine.undo()
+
+    expect(engine.getCellFormula(adr('B2'))).toEqual('=SUM(A1:A2)')
+  })
 })
 
 describe('Undo - moving columns', () => {
@@ -184,6 +196,18 @@ describe('Undo - moving columns', () => {
     engine.undo()
 
     expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray(sheet))
+  })
+
+  it('should restore range', () => {
+    const engine = HyperFormula.buildFromArray([
+      [1, 2],
+      [null, '=SUM(A1:B1)'],
+    ])
+    engine.moveColumns(0, 1, 1, 3)
+
+    engine.undo()
+
+    expect(engine.getCellFormula(adr('B2'))).toEqual('=SUM(A1:B1)')
   })
 })
 
