@@ -77,7 +77,7 @@ export class DependencyGraph {
     public readonly functionRegistry: FunctionRegistry,
     public readonly namedExpressions: NamedExpressions,
   ) {
-    this.graph = new Graph<Vertex>(this.dependencyQuery)
+    this.graph = new Graph<Vertex>(this.dependencyQueryVertices)
   }
 
   public setFormulaToCell(address: SimpleCellAddress, ast: Ast, dependencies: CellDependency[], hasVolatileFunction: boolean, hasStructuralChangeFunction: boolean) {
@@ -722,7 +722,29 @@ export class DependencyGraph {
     }
   }
 
-  public dependencyQuery: (vertex: Vertex) => Maybe<Vertex[]> = (vertex: Vertex) => {
+  public dependencyQueryAddresses: (vertex: Vertex) => Maybe<(SimpleCellAddress | AbsoluteCellRange)[]> = (vertex: Vertex) => {
+    if (vertex instanceof RangeVertex) {
+      const allDeps: (SimpleCellAddress | AbsoluteCellRange)[] = []
+      const {smallerRangeVertex, restRange} = this.rangeMapping.findSmallerRange(vertex.range) //checking whether this range was splitted by bruteForce or not
+      let range
+      if (smallerRangeVertex !== null && this.graph.adjacentNodes(smallerRangeVertex).has(vertex)) {
+        range = restRange
+        allDeps.push(new AbsoluteCellRange(smallerRangeVertex.start, smallerRangeVertex.end))
+      } else { //did we ever need to use full range
+        range = vertex.range
+      }
+      for (const address of range.addresses(this)) {
+        const cell = this.addressMapping.getCell(address)
+        if (cell instanceof EmptyCellVertex) {
+          cell.address = address
+        }
+        if (cell !== null) {
+          allDeps.push(address)
+        }
+      }
+      return allDeps
+    }
+
     let formula: Ast
     let address: SimpleCellAddress
 
@@ -732,7 +754,23 @@ export class DependencyGraph {
     } else if (vertex instanceof MatrixVertex && vertex.isFormula()) {
       address = vertex.getAddress()
       formula = vertex.getFormula()!
-    } else if (vertex instanceof RangeVertex) {
+    } else {
+      return undefined
+    }
+
+    const deps = collectDependencies(formula!, this.functionRegistry)
+    return absolutizeDependencies(deps, address).map((dependency) => {
+      if(dependency instanceof NamedExpressionDependency) {
+        const namedExpression = this.namedExpressions.namedExpressionOrPlaceholder(dependency.name, address.sheet)
+        return namedExpression.address
+      } else {
+        return dependency
+      }
+    })
+  }
+
+  public dependencyQueryVertices: (vertex: Vertex) => Maybe<Vertex[]> = (vertex: Vertex) => {
+    if (vertex instanceof RangeVertex) {
       const allDeps: Vertex[] = []
       const {smallerRangeVertex, restRange} = this.rangeMapping.findSmallerRange(vertex.range) //checking whether this range was splitted by bruteForce or not
       let range
@@ -752,15 +790,23 @@ export class DependencyGraph {
         }
       }
       return allDeps
+    }
+
+    let formula: Ast
+    let address: SimpleCellAddress
+
+    if (vertex instanceof FormulaCellVertex) {
+      address = vertex.getAddress(this.lazilyTransformingAstService)
+      formula = vertex.getFormula(this.lazilyTransformingAstService)
+    } else if (vertex instanceof MatrixVertex && vertex.isFormula()) {
+      address = vertex.getAddress()
+      formula = vertex.getFormula()!
     } else {
       return undefined
     }
 
     const deps = collectDependencies(formula!, this.functionRegistry)
     const absoluteDeps = absolutizeDependencies(deps, address)
-    if(absoluteDeps === undefined) {
-      return undefined
-    }
     return absoluteDeps.map((dep: CellDependency) => {
       if (dep instanceof AbsoluteCellRange) {
         return this.rangeMapping.fetchRange(dep.start, dep.end)
@@ -930,7 +976,7 @@ export class DependencyGraph {
     }
   }
 
-  public getEdgeAddresses(vertex: Vertex): (AbsoluteCellRange | SimpleCellAddress)[] {
+  public getAdjacentNodesAddresses(vertex: Vertex): (AbsoluteCellRange | SimpleCellAddress)[] {
     const deps = this.graph.adjacentNodes(vertex)
     const ret: (AbsoluteCellRange | SimpleCellAddress)[] = []
     deps.forEach((vertex: Vertex) => {

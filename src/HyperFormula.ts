@@ -34,7 +34,7 @@ import {Maybe} from './Maybe'
 import {NamedExpression, NamedExpressionOptions, NamedExpressions} from './NamedExpressions'
 import {
   Ast,
-  AstNodeType,
+  AstNodeType, NamedExpressionDependency,
   ParserWithCaching,
   RelativeDependency,
   simpleCellAddressFromString,
@@ -2215,12 +2215,24 @@ export class HyperFormula implements TypedEmitter {
         return []
       }
     }
-    return this._dependencyGraph.getEdgeAddresses(vertex)
+    return this._dependencyGraph.getAdjacentNodesAddresses(vertex)
   }
 
-  // public getCellDependencies(address: SimpleCellAddress | AbsoluteCellRange): (AbsoluteCellRange | SimpleCellAddress)[] {
-  //
-  // }
+  public getCellDependencies(address: SimpleCellAddress | AbsoluteCellRange): (AbsoluteCellRange | SimpleCellAddress)[] {
+    let vertex
+    if(address instanceof AbsoluteCellRange) {
+      vertex = this._dependencyGraph.rangeMapping.getRange(address.start, address.end)
+      if(vertex===undefined) {
+        return []
+      }
+    } else {
+      vertex = this._dependencyGraph.addressMapping.getCell(address)
+      if(vertex===null) {
+        return []
+      }
+    }
+    return this._dependencyGraph.dependencyQueryAddresses(vertex) ?? []
+  }
 
   /**
    * Returns a unique sheet name assigned to the sheet of a given ID or `undefined` if the there is no sheet with a given ID.
