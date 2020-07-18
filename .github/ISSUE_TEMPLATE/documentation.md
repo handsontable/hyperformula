@@ -7,7 +7,7 @@ assignees: ''
 
 ---
 ### Description
-<!--- [mandatory] Describe the need, add pictures, code snippets, if applies-->
+<!--- [mandatory] Describe the need, add pictures and code snippets, if applies-->
 
 ### Type of issue
 <!--- [mandatory] You can choose several options here e.g. a tutorial with a demo-->
