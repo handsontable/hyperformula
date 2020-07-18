@@ -5,7 +5,7 @@ import {adr} from './testUtils'
 describe('address queries', () => {
   it('should work', () => {
     const engine = HyperFormula.buildFromArray([
-      [1,2,3],
+      [1, 2, 3],
       ['=SUM(A1:B1)', '=SUMSQ(A1:B1)'],
       ['=A2+B2'],
     ])

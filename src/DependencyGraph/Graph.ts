@@ -2,6 +2,7 @@
  * @license
  * Copyright (c) 2020 Handsoncode. All rights reserved.
  */
+
 import {Maybe} from '../Maybe'
 
 export type DependencyQuery<T> = (vertex: T) => Maybe<T[]>
