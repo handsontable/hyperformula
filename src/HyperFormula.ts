@@ -15,10 +15,10 @@ import {buildTranslationPackage, RawTranslationPackage, TranslationPackage} from
 import {normalizeAddedIndexes, normalizeRemovedIndexes} from './Operations'
 import {
   AddressMapping,
-  DependencyGraph,
+  DependencyGraph, FormulaCellVertex,
   Graph,
-  MatrixMapping,
-  RangeMapping,
+  MatrixMapping, MatrixVertex,
+  RangeMapping, RangeVertex,
   SheetMapping,
   Vertex,
 } from './DependencyGraph'
@@ -2191,16 +2191,36 @@ export class HyperFormula implements TypedEmitter {
     return simpleCellAddressToString(this.sheetMapping.fetchDisplayName, cellAddress, sheetId)
   }
 
-  public getCellDependencies(cellAddress: SimpleCellAddress) {
-    const tmp = this._dependencyGraph.addressMapping.getCell(cellAddress)
-    if(tmp===null) {
-      return null
+  /**
+   * Returns all addresses and ranges whose computation depends on input address or range provided.
+   *
+   * @param {SimpleCellAddress | AbsoluteCellRange} address - object representation of an absolute address or range of addresses
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromArray( [ ['1', '=A1', '=A1+B1'] ] );
+   * hfInstance.getCellReverseDependencies({ sheet: 0, col: 0, row: 0});
+   * // should return [{ sheet: 0, col: 1, row: 0}, { sheet: 0, col: 2, row: 0}]
+   */
+  public getCellReverseDependencies(address: SimpleCellAddress | AbsoluteCellRange): (AbsoluteCellRange | SimpleCellAddress)[] {
+    let vertex
+    if(address instanceof AbsoluteCellRange) {
+      vertex = this._dependencyGraph.rangeMapping.getRange(address.start, address.end)
+      if(vertex===undefined) {
+        return []
+      }
+    } else {
+      vertex = this._dependencyGraph.addressMapping.getCell(address)
+      if(vertex===null) {
+        return []
+      }
     }
-    const deps = this._dependencyGraph.graph.getDependencies(tmp)
-    deps.map((vertex) => {
-      vertex.
-    })
+    return this._dependencyGraph.getEdgeAddresses(vertex)
   }
+
+  // public getCellDependencies(address: SimpleCellAddress | AbsoluteCellRange): (AbsoluteCellRange | SimpleCellAddress)[] {
+  //
+  // }
 
   /**
    * Returns a unique sheet name assigned to the sheet of a given ID or `undefined` if the there is no sheet with a given ID.

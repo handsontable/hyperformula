@@ -2,8 +2,9 @@
  * @license
  * Copyright (c) 2020 Handsoncode. All rights reserved.
  */
+import {Maybe} from '../Maybe'
 
-export type DependencyQuery<T> = (vertex: T) => Set<T> | null
+export type DependencyQuery<T> = (vertex: T) => Maybe<T[]>
 
 export interface TopSortResult<T> {
   sorted: T[], cycled: T[], 
@@ -129,7 +130,7 @@ export class Graph<T> {
     return result
   }
 
-  public removeNode(node: T): Set<T> {
+  public removeNode(node: T): T[] {
     for (const adjacentNode of this.adjacentNodes(node).values()) {
       this.markNodeAsSpecialRecentlyChanged(adjacentNode)
     }
@@ -322,10 +323,10 @@ export class Graph<T> {
     this.clearSpecialNodesRecentlyChanged()
   }
 
-  private removeDependencies(node: T): Set<T> {
+  private removeDependencies(node: T): T[] {
     const dependencies = this.dependencyQuery(node)
     if (!dependencies) {
-      return new Set()
+      return []
     }
     for (const dependency of dependencies) {
       this.softRemoveEdge(dependency, node)
