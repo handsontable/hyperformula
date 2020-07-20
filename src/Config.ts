@@ -251,7 +251,7 @@ export interface ConfigParams {
    *
    * @default defaultStringifyDuration
    *
-   * @category DateTime
+   * @category Date and Time
    */
   stringifyDuration: (time: SimpleTime, timeFormat: string) => Maybe<string>,
   /**

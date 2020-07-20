@@ -3168,7 +3168,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * ```
    *
-   * @category Helper
+   * @category Helpers
    */
   public numberToDateTime(val: number): DateTime {
     return this._evaluator.dateHelper.numberToSimpleDateTime(val)
@@ -3189,7 +3189,7 @@ export class HyperFormula implements TypedEmitter {
    * const dateFromNumber = hfInstance.numberToDate(43845);
    * ```
    *
-   * @category Helper
+   * @category Helpers
    */
   public numberToDate(val: number): DateTime {
     return this._evaluator.dateHelper.numberToSimpleDate(val)
@@ -3209,7 +3209,7 @@ export class HyperFormula implements TypedEmitter {
    * const timeFromNumber = hfInstance.numberToTime(1.1);
    * ```
    *
-   * @category Helper
+   * @category Helpers
    */
   public numberToTime(val: number): DateTime {
     return this._evaluator.dateHelper.numberToSimpleTime(val)
