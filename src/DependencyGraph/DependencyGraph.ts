@@ -722,101 +722,77 @@ export class DependencyGraph {
     }
   }
 
+  public rangeDependencyQuery = (vertex: RangeVertex) => {
+    const allDeps: [(SimpleCellAddress | AbsoluteCellRange), Vertex][] = []
+    const {smallerRangeVertex, restRange} = this.rangeMapping.findSmallerRange(vertex.range) //checking whether this range was splitted by bruteForce or not
+    let range
+    if (smallerRangeVertex !== null && this.graph.adjacentNodes(smallerRangeVertex).has(vertex)) {
+      range = restRange
+      allDeps.push([new AbsoluteCellRange(smallerRangeVertex.start, smallerRangeVertex.end), smallerRangeVertex])
+    } else { //did we ever need to use full range
+      range = vertex.range
+    }
+    for (const address of range.addresses(this)) {
+      const cell = this.addressMapping.getCell(address)
+      if (cell instanceof EmptyCellVertex) {
+        cell.address = address
+      }
+      if (cell !== null) {
+        allDeps.push([address, cell])
+      }
+    }
+    return allDeps
+  }
+  public formulaDependencyQuery: (vertex: Vertex) => Maybe<[SimpleCellAddress, (SimpleCellAddress | AbsoluteCellRange)[]]> = (vertex: Vertex) => {
+    let formula: Ast
+    let address: SimpleCellAddress
+    if (vertex instanceof FormulaCellVertex) {
+      address = vertex.getAddress(this.lazilyTransformingAstService)
+      formula = vertex.getFormula(this.lazilyTransformingAstService)
+    } else if (vertex instanceof MatrixVertex && vertex.isFormula()) {
+      address = vertex.getAddress()
+      formula = vertex.getFormula()!
+    } else {
+      return undefined
+    }
+    const deps = collectDependencies(formula!, this.functionRegistry)
+    return [address, absolutizeDependencies(deps, address).map((dependency) => {
+          if(dependency instanceof NamedExpressionDependency) {
+            const namedExpression = this.namedExpressions.namedExpressionOrPlaceholder(dependency.name, address.sheet)
+            return namedExpression.address
+          } else {
+            return dependency
+          }
+        })]
+  }
   public dependencyQueryAddresses: (vertex: Vertex) => Maybe<(SimpleCellAddress | AbsoluteCellRange)[]> = (vertex: Vertex) => {
     if (vertex instanceof RangeVertex) {
-      const allDeps: (SimpleCellAddress | AbsoluteCellRange)[] = []
-      const {smallerRangeVertex, restRange} = this.rangeMapping.findSmallerRange(vertex.range) //checking whether this range was splitted by bruteForce or not
-      let range
-      if (smallerRangeVertex !== null && this.graph.adjacentNodes(smallerRangeVertex).has(vertex)) {
-        range = restRange
-        allDeps.push(new AbsoluteCellRange(smallerRangeVertex.start, smallerRangeVertex.end))
-      } else { //did we ever need to use full range
-        range = vertex.range
-      }
-      for (const address of range.addresses(this)) {
-        const cell = this.addressMapping.getCell(address)
-        if (cell instanceof EmptyCellVertex) {
-          cell.address = address
-        }
-        if (cell !== null) {
-          allDeps.push(address)
-        }
-      }
-      return allDeps
-    }
-
-    let formula: Ast
-    let address: SimpleCellAddress
-
-    if (vertex instanceof FormulaCellVertex) {
-      address = vertex.getAddress(this.lazilyTransformingAstService)
-      formula = vertex.getFormula(this.lazilyTransformingAstService)
-    } else if (vertex instanceof MatrixVertex && vertex.isFormula()) {
-      address = vertex.getAddress()
-      formula = vertex.getFormula()!
+      return this.rangeDependencyQuery(vertex).map(([address, _]) => address)
     } else {
-      return undefined
+      return this.formulaDependencyQuery(vertex)?.[1]
     }
-
-    const deps = collectDependencies(formula!, this.functionRegistry)
-    return absolutizeDependencies(deps, address).map((dependency) => {
-      if(dependency instanceof NamedExpressionDependency) {
-        const namedExpression = this.namedExpressions.namedExpressionOrPlaceholder(dependency.name, address.sheet)
-        return namedExpression.address
-      } else {
-        return dependency
-      }
-    })
   }
-
   public dependencyQueryVertices: (vertex: Vertex) => Maybe<Vertex[]> = (vertex: Vertex) => {
     if (vertex instanceof RangeVertex) {
-      const allDeps: Vertex[] = []
-      const {smallerRangeVertex, restRange} = this.rangeMapping.findSmallerRange(vertex.range) //checking whether this range was splitted by bruteForce or not
-      let range
-      if (smallerRangeVertex !== null && this.graph.adjacentNodes(smallerRangeVertex).has(vertex)) {
-        range = restRange
-        allDeps.push(smallerRangeVertex)
-      } else { //did we ever need to use full range
-        range = vertex.range
-      }
-      for (const address of range.addresses(this)) {
-        const cell = this.addressMapping.getCell(address)
-        if (cell instanceof EmptyCellVertex) {
-          cell.address = address
-        }
-        if (cell !== null) {
-          allDeps.push(cell)
-        }
-      }
-      return allDeps
-    }
-
-    let formula: Ast
-    let address: SimpleCellAddress
-
-    if (vertex instanceof FormulaCellVertex) {
-      address = vertex.getAddress(this.lazilyTransformingAstService)
-      formula = vertex.getFormula(this.lazilyTransformingAstService)
-    } else if (vertex instanceof MatrixVertex && vertex.isFormula()) {
-      address = vertex.getAddress()
-      formula = vertex.getFormula()!
+      return this.rangeDependencyQuery(vertex).map(([_, vertex]) => vertex)
     } else {
-      return undefined
-    }
-
-    const deps = collectDependencies(formula!, this.functionRegistry)
-    const absoluteDeps = absolutizeDependencies(deps, address)
-    return absoluteDeps.map((dep: CellDependency) => {
-      if (dep instanceof AbsoluteCellRange) {
-        return this.rangeMapping.fetchRange(dep.start, dep.end)
-      } else if (dep instanceof NamedExpressionDependency) {
-        const namedExpression = this.namedExpressions.namedExpressionOrPlaceholder(dep.name, address.sheet)
-        return this.addressMapping.fetchCell(namedExpression.address)
+      const dependenciesResult = this.formulaDependencyQuery(vertex)
+      if (dependenciesResult !== undefined) {
+        const [address, dependencies] = dependenciesResult
+        return dependencies.map((dependency: CellDependency) => {
+          if (dependency instanceof AbsoluteCellRange) {
+            return this.rangeMapping.fetchRange(dependency.start, dependency.end)
+          } else if (dependency instanceof NamedExpressionDependency) {
+            const namedExpression = this.namedExpressions.namedExpressionOrPlaceholder(dependency.name, address.sheet)
+            return this.addressMapping.fetchCell(namedExpression.address)
+          } else {
+            return this.addressMapping.fetchCell(dependency)
+          }
+        })
       } else {
-        return this.addressMapping.fetchCell(dep)
+        return undefined
       }
-    })
+    }
   }
 
   private addStructuralNodesToChangeSet() {
