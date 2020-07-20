@@ -2203,6 +2203,8 @@ export class HyperFormula implements TypedEmitter {
    * hfInstance.getCellDependents({ sheet: 0, col: 0, row: 0});
    * // should return [{ sheet: 0, col: 1, row: 0}, { sheet: 0, col: 2, row: 0}]
    * ```
+   *
+   * @category Helpers
    */
   public getCellDependents(address: SimpleCellAddress | AbsoluteCellRange): (AbsoluteCellRange | SimpleCellAddress)[] {
     let vertex
@@ -2232,6 +2234,8 @@ export class HyperFormula implements TypedEmitter {
    * hfInstance.getCellDependencies({ sheet: 0, col: 2, row: 0});
    * // should return [{ sheet: 0, col: 0, row: 0}, { sheet: 0, col: 1, row: 0}]
    * ```
+   *
+   * @category Helpers
    */
   public getCellDependencies(address: SimpleCellAddress | AbsoluteCellRange): (AbsoluteCellRange | SimpleCellAddress)[] {
     let vertex
