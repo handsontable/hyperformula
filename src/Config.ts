@@ -251,7 +251,7 @@ export interface ConfigParams {
    *
    * @default defaultStringifyDuration
    *
-   * @category DateTime
+   * @category Date and Time
    */
   stringifyDuration: (time: SimpleTime, timeFormat: string) => Maybe<string>,
   /**
@@ -315,7 +315,7 @@ export interface ConfigParams {
    * @default false
    * @category String
    */
-  useRegularExpresssions: boolean,
+  useRegularExpressions: boolean,
   /**
    * If set true, then criterions in functions (SUMIF, COUNTIF, ...) can use wildcards '*' and '?'.
    *
@@ -383,7 +383,7 @@ export class Config implements ConfigParams, ParserConfig {
     vlookupThreshold: 20,
     nullDate: {year: 1899, month: 12, day: 30},
     undoLimit: 20,
-    useRegularExpresssions: false,
+    useRegularExpressions: false,
     useWildcards: true,
     matchWholeCell: true,
     maxRows: 40_000,
@@ -467,7 +467,7 @@ export class Config implements ConfigParams, ParserConfig {
    * @internal
    */
   public readonly translationPackage: TranslationPackage
-  public readonly useRegularExpresssions: boolean
+  public readonly useRegularExpressions: boolean
   public readonly useWildcards: boolean
   public readonly matchWholeCell: boolean
   /**
@@ -518,7 +518,7 @@ export class Config implements ConfigParams, ParserConfig {
       nullDate,
       useStats,
       undoLimit,
-      useRegularExpresssions,
+      useRegularExpressions,
       useWildcards,
       matchWholeCell,
       maxRows,
@@ -564,7 +564,7 @@ export class Config implements ConfigParams, ParserConfig {
     this.nullDate = this.valueFromParamCheck(nullDate, instanceOfSimpleDate, 'IDate', 'nullDate')
     this.leapYear1900 = this.valueFromParam(leapYear1900, 'boolean', 'leapYear1900')
     this.undoLimit = this.valueFromParam(undoLimit, 'number', 'undoLimit')
-    this.useRegularExpresssions = this.valueFromParam(useRegularExpresssions, 'boolean', 'useRegularExpresssions')
+    this.useRegularExpressions = this.valueFromParam(useRegularExpressions, 'boolean', 'useRegularExpressions')
     this.useWildcards = this.valueFromParam(useWildcards, 'boolean', 'useWildcards')
     this.matchWholeCell = this.valueFromParam(matchWholeCell, 'boolean', 'matchWholeCell')
     this.validateNumberToBeAtLeast(this.undoLimit, 'undoLimit', 0)

@@ -9,11 +9,20 @@ register the language like so:
 
 ```javascript
 // import the French language pack
-import { frFR } from 'hyperformula';
+import frFR from 'hyperformula/es/i18n/languages/frFR';
 
 // register the language
 HyperFormula.registerLanguage('frFR', frFR);
 ```
+
+::: tip
+To import the language packs, use the module-system-specific dedicated bundles at:
+* **ES**: `hyperformula/es/i18n/languages/`
+* **CommonJS**: `hyperformula/commonjs/i18n/languages/`
+* **UMD**: `hyperformula/dist/languages/`
+
+For the UMD build, the languages are accessible through `HyperFormula.languages`, e.g. `HyperFormula.languages.frFR`.
+:::
 
 Then set it inside it the [configuration options](configuration-options.md):
 
@@ -100,7 +109,7 @@ const translations = {
 ## Demo
 
 <iframe
-     src="https://codesandbox.io/embed/github/handsontable/hyperformula-demos/tree/0.1.0/localizing-functions?autoresize=1&fontsize=11&hidenavigation=1&theme=light&view=preview"
+     src="https://codesandbox.io/embed/github/handsontable/hyperformula-demos/tree/0.1.x/localizing-functions?autoresize=1&fontsize=11&hidenavigation=1&theme=light&view=preview"
      style="width:100%; height:500px; border:0; border-radius: 4px; overflow:hidden;"
      title="handsontable/hyperformula-demos: localizing-functions"
      allow="accelerometer; ambient-light-sensor; camera; encrypted-media; geolocation; gyroscope; hid; microphone; midi; payment; usb; vr; xr-spatial-tracking"

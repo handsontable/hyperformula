@@ -47,7 +47,7 @@ lets you design your own [custom functions](custom-functions).
 ## Demo
 
 <iframe
-     src="https://codesandbox.io/embed/github/handsontable/hyperformula-demos/tree/0.1.0/built-in-functions?autoresize=1&fontsize=11&hidenavigation=1&theme=light&view=preview"
+     src="https://codesandbox.io/embed/github/handsontable/hyperformula-demos/tree/0.1.x/built-in-functions?autoresize=1&fontsize=11&hidenavigation=1&theme=light&view=preview"
      style="width:100%; height:500px; border:0; border-radius: 4px; overflow:hidden;"
      title="handsontable/hyperformula-demos: built-in-functions"
      allow="accelerometer; ambient-light-sensor; camera; encrypted-media; geolocation; gyroscope; hid; microphone; midi; payment; usb; vr; xr-spatial-tracking"
@@ -74,6 +74,7 @@ lets you design your own [custom functions](custom-functions).
 | BITOR | Engineering | Returns a bitwise logical "or" of the parameters. | BITOR(Number1; Number2) |
 | BITRSHIFT | Engineering | Shifts a number right by n bits. | BITRSHIFT(Number; Shift) |
 | BITXOR | Engineering | Returns a bitwise logical "exclusive or" of the parameters. | BITXOR(Number1; Number2) |
+| CHOOSE | Lookup and reference | Uses an index to return a value from a list of up to 30 values.| CHOOSE(Index; Value1; ...; Value30) |
 | DEC2BIN | Engineering | Returns the binary number for the decimal number entered between –512 and 511. | DEC2BIN(Number; Places) |
 | DEC2HEX | Engineering | Returns the hexadecimal number for the decimal number entered. | DEC2HEX(Number; Places) |
 | DEC2OCT | Engineering | Returns the octal number for the decimal number entered. | DEC2OCT(Number; Places) |
@@ -83,19 +84,27 @@ lets you design your own [custom functions](custom-functions).
 | ISBLANK | Information | Returns TRUE if the reference to a cell is blank. | ISBLANK(Value) |
 | ISERROR | Information | The ISERROR tests if the cells contain general error values. | ISERROR(Value) |
 | ISEVEN | Information | Returns TRUE if the value is an even integer, or FALSE if the value is odd. | ISEVEN(Value) |
+| ISLOGICAL | Information | Tests for a logical value (TRUE or FALSE). | ISLOGICAL(Value) |
+| ISNONTEXT | Information | Tests if the cell contents are text or numbers, and returns FALSE if the contents are text. | ISNONTEXT(Value) |
+| ISNUMBER | Information | Returns TRUE if the value refers to a number. | ISNUMBER(Value) |
 | ISODD | Information | Returns TRUE if the value is odd, or FALSE if the number is even. | ISODD(Value) |
+| ISTEXT | Information | Returns TRUE if the cell contents refer to text.| ISTEXT(Value) |
 | AND | Logical | Returns TRUE if all arguments are TRUE. | AND(Logicalvalue1; Logicalvalue2 ...Logicalvalue30) |
 | FALSE | Logical | Returns the logical value FALSE. | FALSE() |
 | IF | Logical | Specifies a logical test to be performed. | IF(Test; Then value; Otherwisevalue) |
+| IFNA | Logical | Returns the value if the cell does not contains the #N/A (value not available) error value, or the alternative value if it does. | IFNA(Value; Alternate_value) |
+| IFERROR | Logical | Returns the value if the cell does not contains an error value, or the alternative value if it does. | IFERROR(Value; Alternate_value) |
 | NOT | Logical | Complements (inverts) a logical value. | NOT(Logicalvalue) |
+| SWITCH | Logical | Evaluates a list of arguments, consisting of an expression followed by a value. | SWITCH(Expression1, Value1[, Expression2, Value2[..., Expression_n, Value_n]]) |
 | OR | Logical | Returns TRUE if at least one argument is TRUE. | OR(Logicalvalue1; Logicalvalue2 ...Logicalvalue30) |
 | TRUE | Logical | The logical value is set to TRUE. | TRUE() |
 | XOR | Logical | Returns true if an odd number of arguments evaluates to TRUE. | XOR(Logicalvalue1; Logicalvalue2 ...Logicalvalue30) |
 | COLUMNS | Lookup and reference | Returns the number of columns in the given reference. | COLUMNS(Array) |
+| OFFSET | Lookup and reference | Returns the value of a cell offset by a certain number of rows and columns from a given reference point. | OFFSET(Reference; Rows; Columns; Height; Width) |
 | ROWS | Lookup and reference | Returns the number of rows in the given reference. | ROWS(Array) |
 | INDEX | Lookup and reference | Returns the content of a cell, specified by row and column number, or an optional range name. | INDEX(Reference; Row; Column; Range) |
 | MATCH | Lookup and reference | Returns the relative position of an item in an array that matches a specified value. | MATCH(Searchcriterion; Lookuparray; Type) |
-| TRANSPOSE | Lookup and reference | Transposes the rows and columns of an array. | TRANSPOSE(Array) |
+| TRANSPOSE | Matrix functions | Transposes the rows and columns of an array. | TRANSPOSE(Array) |
 | VLOOKUP | Lookup and reference | Searches vertically with reference to adjacent cells to the right. | VLOOKUP(Search_Criterion; Array; Index; Sort_Order) |
 | ABS | Math and trigonometry | Returns the absolute value of a number. | ABS(Number) |
 | ACOS | Math and trigonometry | Returns the inverse trigonometric cosine of a number. | ACOS(Number) |
@@ -106,14 +115,19 @@ lets you design your own [custom functions](custom-functions).
 | CEILING | Math and trigonometry | Rounds a number up to the nearest multiple of Significance. | CEILING(Number; Significance; Mode) |
 | COS | Math and trigonometry | Returns the cosine of the given angle (in radians). | COS(Number) |
 | COT | Math and trigonometry | Returns the cotangent of the given angle (in radians). | COT(Number) |
+| COUNTUNIQUE | Math and trigonometry | Counts the number of unique values in a list of specified values and ranges. | COUNTUNIQUE(Value1, [Value2, ...]) |
 | DECIMAL | Math and trigonometry | Converts text with characters from a number system to a positive integer in the base radix given. | DECIMAL("Text"; Radix) |
 | DEGREES | Math and trigonometry | Converts radians into degrees. | DEGREES(Number) |
+| E | Math and trigonometry | Returns 2.718281828459..., the value of the mathematical constant E to as many decimal places as set in configuration | E() |
 | EVEN | Math and trigonometry | Rounds a positive number up to the next even integer and a negative number down to the next even integer. | EVEN(Number) |
 | EXP | Math and trigonometry | Returns e raised to the power of a number. | EXP(Number) |
 | INT | Math and trigonometry | Rounds a number down to the nearest integer. | INT(Number) |
 | LN | Math and trigonometry | Returns the natural logarithm based on the constant e of a number. | LN(Number) |
 | LOG | Math and trigonometry | Returns the logarithm of a number to the specified base. | LOG(Number; Base) |
 | LOG10 | Math and trigonometry | Returns the base-10 logarithm of a number. | LOG10(Number) |
+| MMULT | Matrix functions | Calculates the array product of two arrays. | MMULT(Array; Array) |
+| MEDIANPOOL | Matrix functions | Calculates a smaller range which is a median of a Window_size, in a given Range, for every Stride element. | MEDIANPOOL(Range, Window_size, Stride) |
+| MAXPOOL | Matrix functions | Calculates a smaller range which is a maximum of a Window_size, in a given Range, for every Stride element. | MAXPOOL(Range, Window_size, Stride) |
 | MOD | Math and trigonometry | Returns the remainder when one integer is divided by another. | MOD(Dividend; Divisor) |
 | ODD | Math and trigonometry | Rounds a positive number up to the nearest odd integer and a negative number down to the nearest odd integer. | ODD(Number) |
 | PI | Math and trigonometry | Returns 3.14159265358979, the value of the mathematical constant PI to 14 decimal places. | PI() |
@@ -149,4 +163,5 @@ lets you design your own [custom functions](custom-functions).
 | CHAR | Text | Converts a number into a character according to the current code table. | CHAR(Number) |
 | CODE | Text | Returns a numeric code for the first character in a text string. | CODE("Text") |
 | CONCATENATE | Text | Combines several text strings into one string. | CONCATENATE("Text1"; ...; "Text30") |
+| SPLIT | Text | Divides text around a specified character or string, and puts each fragment into a separate cell in the row. | SPLIT(Text, Delimiter, [Split_by_each], [Remove_empty_text]) |
 | TEXT | Text | Converts a number into text according to a given format. | TEXT(Number; Format) |

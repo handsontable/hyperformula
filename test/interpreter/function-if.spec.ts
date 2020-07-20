@@ -21,6 +21,11 @@ describe('Function IF', () => {
     expect(engine.getCellValue(adr('A1'))).toEqual('no')
   })
 
+  it('coercing empty string', () => {
+    const engine = HyperFormula.buildFromArray([['', '=IF(A1, "yes", "no")']])
+    expect(engine.getCellValue(adr('B1'))).toEqual('no')
+  })
+
   it('when condition is weird type', () => {
     const engine = HyperFormula.buildFromArray([['=IF("foo", "yes", "no")']])
 

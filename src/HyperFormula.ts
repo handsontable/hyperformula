@@ -55,7 +55,7 @@ import {FunctionRegistry, FunctionTranslationsPackage} from './interpreter/Funct
  * ale related to this class.
  *
  * The instance can be created only by calling one of the static methods
- * `buildFromArray`, `buildFromSheets` or `buildEmpty` and should be disposed of with
+ * `buildFromArray`, `buildFromSheets` or `buildEmpty` and should be disposed of with the
  * `destroy` method when it's no longer needed to free the resources.
  *
  * The instance can be seen as a workbook where worksheets can be created and
@@ -93,7 +93,7 @@ export class HyperFormula implements TypedEmitter {
   /**
    * Contains all available languages to use in registerLanguage.
    * 
-   * @category Static Properies
+   * @category Static Properties
    */
   public static languages: Record<string, RawTranslationPackage> = {}
 
@@ -3050,7 +3050,7 @@ export class HyperFormula implements TypedEmitter {
    * });
    *
    * // returns the value of calculated formula, '32' for this example
-   * const calculatedFormula = hfInstance.calculateFormula('=A1+10', 'Sheet1'));
+   * const calculatedFormula = hfInstance.calculateFormula('=A1+10', 'Sheet1');
    * ```
    *
    * @category Helpers
@@ -3168,7 +3168,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * ```
    *
-   * @category Helper
+   * @category Helpers
    */
   public numberToDateTime(val: number): DateTime {
     return this._evaluator.dateHelper.numberToSimpleDateTime(val)
@@ -3189,7 +3189,7 @@ export class HyperFormula implements TypedEmitter {
    * const dateFromNumber = hfInstance.numberToDate(43845);
    * ```
    *
-   * @category Helper
+   * @category Helpers
    */
   public numberToDate(val: number): DateTime {
     return this._evaluator.dateHelper.numberToSimpleDate(val)
@@ -3209,7 +3209,7 @@ export class HyperFormula implements TypedEmitter {
    * const timeFromNumber = hfInstance.numberToTime(1.1);
    * ```
    *
-   * @category Helper
+   * @category Helpers
    */
   public numberToTime(val: number): DateTime {
     return this._evaluator.dateHelper.numberToSimpleTime(val)
