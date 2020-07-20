@@ -2,7 +2,7 @@ import {ErrorType, HyperFormula} from '../../src'
 import {adr, detailedError} from '../testUtils'
 
 describe('Function FV', () => {
-  it('number of arguments', () => {
+  it('should return #NA! error with the wrong number of arguments', () => {
     const engine = HyperFormula.buildFromArray([
       ['=FV(1,1)', '=FV(1, 1, 1, 1, 1, 1)'],
     ])
@@ -11,7 +11,7 @@ describe('Function FV', () => {
     expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.NA))
   })
 
-  it('works', () => {
+  it('should calculate the correct value with correct arguments and defaults', () => {
     const engine = HyperFormula.buildFromArray([
       ['=FV(2%, 24, 100)', '=FV(2%, 24, 100, 400)', '=FV(2%, 24, 100, 400, 1)'],
     ])
