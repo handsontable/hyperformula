@@ -32,19 +32,41 @@ export class TextPlugin extends FunctionPlugin {
       method: 'clean'
     },
     'REPT': {
-      method: 'rept'
+      method: 'rept',
+      parameters: [
+        { argumentType: "string" },
+        { argumentType: "number" },
+      ],
     },
     'RIGHT': {
-      method: 'right'
+      method: 'right',
+      parameters: [
+        { argumentType: "string" },
+        { argumentType: "number", defaultValue: 1 },
+      ],
     },
     'LEFT': {
-      method: 'left'
+      method: 'left',
+      parameters: [
+        { argumentType: "string" },
+        { argumentType: "number", defaultValue: 1 },
+      ],
     },
     'SEARCH': {
-      method: 'search'
+      method: 'search',
+      parameters: [
+        { argumentType: "string" },
+        { argumentType: "string" },
+        { argumentType: "number", defaultValue: 1 },
+      ],
     },
     'FIND': {
-      method: 'find'
+      method: 'find',
+      parameters: [
+        { argumentType: "string" },
+        { argumentType: "string" },
+        { argumentType: "number", defaultValue: 1 },
+      ],
     }
   }
 
@@ -138,10 +160,7 @@ export class TextPlugin extends FunctionPlugin {
   }
 
   public rept(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.coerceArgumentsWithDefaults(ast.args, formulaAddress, [
-      { typeCoercionFunction: coerceScalarToString },
-      { typeCoercionFunction: this.coerceScalarToNumberOrError },
-    ], (text: string, count: number) => {
+    return this.coerceArgumentsWithDefaults(ast.args, formulaAddress, TextPlugin.implementedFunctions.REPT.parameters, (text: string, count: number) => {
       if (count < 0) {
         return new CellError(ErrorType.VALUE)
       }
@@ -150,10 +169,7 @@ export class TextPlugin extends FunctionPlugin {
   }
 
   public right(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.coerceArgumentsWithDefaults(ast.args, formulaAddress, [
-      { typeCoercionFunction: coerceScalarToString },
-      { typeCoercionFunction: this.coerceScalarToNumberOrError, defaultValue: 1 },
-    ], (text: string, length: number) => {
+    return this.coerceArgumentsWithDefaults(ast.args, formulaAddress, TextPlugin.implementedFunctions.RIGHT.parameters, (text: string, length: number) => {
       if (length < 0) {
         return new CellError(ErrorType.VALUE)
       } else if (length === 0) {
@@ -164,10 +180,7 @@ export class TextPlugin extends FunctionPlugin {
   }
 
   public left(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.coerceArgumentsWithDefaults(ast.args, formulaAddress, [
-      { typeCoercionFunction: coerceScalarToString },
-      { typeCoercionFunction: this.coerceScalarToNumberOrError, defaultValue: 1 },
-    ], (text: string, length: number) => {
+    return this.coerceArgumentsWithDefaults(ast.args, formulaAddress, TextPlugin.implementedFunctions.LEFT.parameters, (text: string, length: number) => {
       if (length < 0) {
         return new CellError(ErrorType.VALUE)
       }
@@ -176,11 +189,7 @@ export class TextPlugin extends FunctionPlugin {
   }
 
   public search(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.coerceArgumentsWithDefaults(ast.args, formulaAddress, [
-      { typeCoercionFunction: coerceScalarToString },
-      { typeCoercionFunction: coerceScalarToString },
-      { typeCoercionFunction: this.coerceScalarToNumberOrError, defaultValue: 1 },
-    ], (pattern, text: string, startIndex: number) => {
+    return this.coerceArgumentsWithDefaults(ast.args, formulaAddress, TextPlugin.implementedFunctions.SEARCH.parameters, (pattern, text: string, startIndex: number) => {
       if (startIndex < 1 || startIndex > text.length) {
         return new CellError(ErrorType.VALUE)
       }
@@ -200,11 +209,7 @@ export class TextPlugin extends FunctionPlugin {
   }
 
   public find(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.coerceArgumentsWithDefaults(ast.args, formulaAddress, [
-      { typeCoercionFunction: coerceScalarToString },
-      { typeCoercionFunction: coerceScalarToString },
-      { typeCoercionFunction: this.coerceScalarToNumberOrError, defaultValue: 1 },
-    ], (pattern, text: string, startIndex: number) => {
+    return this.coerceArgumentsWithDefaults(ast.args, formulaAddress, TextPlugin.implementedFunctions.FIND.parameters, (pattern, text: string, startIndex: number) => {
       if (startIndex < 1 || startIndex > text.length) {
         return new CellError(ErrorType.VALUE)
       }

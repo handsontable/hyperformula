@@ -31,8 +31,10 @@ export interface FunctionPluginDefinition {
   implementedFunctions: ImplementedFunctions,
 }
 
+export type ArgumentTypes = "string" | "number"
+
 export interface FunctionArgumentDefinition {
-  typeCoercionFunction: (arg: InternalScalarValue) => InternalScalarValue,
+  argumentType: string,
   defaultValue?: InternalScalarValue,
 }
 
@@ -88,11 +90,11 @@ export abstract class FunctionPlugin {
   }
 
   protected templateWithOneCoercedToNumberArgument(ast: ProcedureAst, formulaAddress: SimpleCellAddress, fn: (arg: number) => InternalScalarValue): InternalScalarValue {
-    return this.coerceArgumentsWithDefaults(ast.args, formulaAddress, [{ typeCoercionFunction: this.coerceScalarToNumberOrError }], fn)
+    return this.coerceArgumentsWithDefaults(ast.args, formulaAddress, [{ argumentType: "number"}], fn)
   }
 
   protected templateWithOneCoercedToStringArgument(ast: ProcedureAst, formulaAddress: SimpleCellAddress, fn: (arg: string) => InternalScalarValue): InternalScalarValue {
-    return this.coerceArgumentsWithDefaults(ast.args, formulaAddress, [{ typeCoercionFunction: coerceScalarToString }], fn)
+    return this.coerceArgumentsWithDefaults(ast.args, formulaAddress, [{ argumentType: "string" }], fn)
   }
 
   protected validateTwoNumericArguments(ast: ProcedureAst, formulaAddress: SimpleCellAddress): [number, number] | CellError {
@@ -145,8 +147,16 @@ export abstract class FunctionPlugin {
     return value
   }
 
-  protected coerceScalarToNumberOrError = (arg: InternalScalarValue): number | CellError => this.interpreter.arithmeticHelper.coerceScalarToNumberOrError(arg)
+  public coerceScalarToNumberOrError = (arg: InternalScalarValue): number | CellError => this.interpreter.arithmeticHelper.coerceScalarToNumberOrError(arg)
 
+  public coerceToType(arg: InternalScalarValue, coercedType: ArgumentTypes): InternalScalarValue {
+    switch(coercedType) {
+      case 'number':
+        return this.coerceScalarToNumberOrError(arg)
+      case 'string':
+        return coerceScalarToString(arg)
+    }
+  }
   protected coerceArgumentsWithDefaults = (
     args: Ast[],
     formulaAddress: SimpleCellAddress,
@@ -163,7 +173,7 @@ export abstract class FunctionPlugin {
       if (arg instanceof SimpleRangeValue) {
         return new CellError(ErrorType.VALUE)
       }
-      const coercedArg = argumentDefinitions[i].typeCoercionFunction(arg)
+      const coercedArg = this.coerceToType(arg, argumentDefinitions[i].argumentType as ArgumentTypes)
       if (coercedArg instanceof CellError) {
         return coercedArg
       }
