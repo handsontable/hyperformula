@@ -34,38 +34,38 @@ export class TextPlugin extends FunctionPlugin {
     'REPT': {
       method: 'rept',
       parameters: [
-        { argumentType: "string" },
-        { argumentType: "number" },
+        { argumentType: 'string' },
+        { argumentType: 'number' },
       ],
     },
     'RIGHT': {
       method: 'right',
       parameters: [
-        { argumentType: "string" },
-        { argumentType: "number", defaultValue: 1 },
+        { argumentType: 'string' },
+        { argumentType: 'number', defaultValue: 1 },
       ],
     },
     'LEFT': {
       method: 'left',
       parameters: [
-        { argumentType: "string" },
-        { argumentType: "number", defaultValue: 1 },
+        { argumentType: 'string' },
+        { argumentType: 'number', defaultValue: 1 },
       ],
     },
     'SEARCH': {
       method: 'search',
       parameters: [
-        { argumentType: "string" },
-        { argumentType: "string" },
-        { argumentType: "number", defaultValue: 1 },
+        { argumentType: 'string' },
+        { argumentType: 'string' },
+        { argumentType: 'number', defaultValue: 1 },
       ],
     },
     'FIND': {
       method: 'find',
       parameters: [
-        { argumentType: "string" },
-        { argumentType: "string" },
-        { argumentType: "number", defaultValue: 1 },
+        { argumentType: 'string' },
+        { argumentType: 'string' },
+        { argumentType: 'number', defaultValue: 1 },
       ],
     }
   }

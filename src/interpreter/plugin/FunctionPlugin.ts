@@ -31,7 +31,7 @@ export interface FunctionPluginDefinition {
   implementedFunctions: ImplementedFunctions,
 }
 
-export type ArgumentTypes = "string" | "number"
+export type ArgumentTypes = 'string' | 'number'
 
 export interface FunctionArgumentDefinition {
   argumentType: string,
@@ -90,11 +90,11 @@ export abstract class FunctionPlugin {
   }
 
   protected templateWithOneCoercedToNumberArgument(ast: ProcedureAst, formulaAddress: SimpleCellAddress, fn: (arg: number) => InternalScalarValue): InternalScalarValue {
-    return this.coerceArgumentsWithDefaults(ast.args, formulaAddress, [{ argumentType: "number"}], fn)
+    return this.coerceArgumentsWithDefaults(ast.args, formulaAddress, [{ argumentType: 'number'}], fn)
   }
 
   protected templateWithOneCoercedToStringArgument(ast: ProcedureAst, formulaAddress: SimpleCellAddress, fn: (arg: string) => InternalScalarValue): InternalScalarValue {
-    return this.coerceArgumentsWithDefaults(ast.args, formulaAddress, [{ argumentType: "string" }], fn)
+    return this.coerceArgumentsWithDefaults(ast.args, formulaAddress, [{ argumentType: 'string' }], fn)
   }
 
   protected validateTwoNumericArguments(ast: ProcedureAst, formulaAddress: SimpleCellAddress): [number, number] | CellError {
