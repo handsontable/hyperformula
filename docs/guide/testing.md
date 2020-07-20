@@ -9,7 +9,8 @@ to be sure that both environments are fine.
 * **`npm run test:browser`** - runs tests in **karma** once and closes all open browsers
 * **`npm run test:browser.debug`** - runs test in **karma** only in Chrome until you exit the process. It watches changes in `src` and `test` directories and rebuilds them automatically.
 
-An additional flag for **karma** tests: `-spec`. For example: `npm run test:browser.debug -- --spec=matrix.spec.ts`
+If you want to run a specific `spec` file or a test suite you can add a `-spec` flag. For example:
+* **`npm run test:browser.debug -- --spec=matrix.spec.ts`** - runs `matrix.spec.ts` only
 
 ## Linting
 
