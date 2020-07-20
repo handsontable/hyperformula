@@ -2,7 +2,7 @@ import {ErrorType, HyperFormula} from '../../src'
 import {adr, detailedError} from '../testUtils'
 
 describe('Function PPMT', () => {
-  it('number of arguments', () => {
+  it('should return #NA! error with the wrong number of arguments', () => {
     const engine = HyperFormula.buildFromArray([
       ['=PPMT(1,1)', '=PPMT(1, 1, 1, 1, 1, 1, 1)'],
     ])
