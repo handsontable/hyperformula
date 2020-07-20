@@ -4,8 +4,6 @@
  */
 
 import {RawTranslationPackage} from '../TranslationPackage'
-
-
 import { default as csCZ } from './csCZ'
 import { default as daDK } from './daDK'
 import { default as deDE } from './deDE'
