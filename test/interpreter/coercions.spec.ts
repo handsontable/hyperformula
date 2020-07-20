@@ -65,6 +65,7 @@ describe('#coerceScalarToBoolean', () => {
     expect(coerceScalarToBoolean(' true')).toBe(null)
     expect(coerceScalarToBoolean('true ')).toBe(null)
     expect(coerceScalarToBoolean('prawda')).toBe(null)
+    expect(coerceScalarToBoolean('')).toBe(false)
 
     expect(coerceScalarToBoolean(EmptyValue)).toBe(false)
 

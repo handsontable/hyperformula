@@ -18,8 +18,10 @@ is much appreciated in any of the following topics:
 Adding a new function will be a huge help for the library growth and
 should not be too problematic for the first issue. Extending the
 library of translations is also a good task to start with.
+[Here](https://docs.google.com/spreadsheets/d/1UUskn4ZDDjLGSpO6kg73DOvabNoeqLbkJYyVfLyYlYw)
+you can find a list of functions' translations.
 
-Visit [building](building.md) and [testing](testing.md) sections to
+Visit [building]( https://handsontable.com/docs/hyperformula/guide/building.html) and [testing]( https://handsontable.com/docs/hyperformula/guide/testing.html) sections to
 get more info about these topics and check the list of commands you
 can run in this project. Check the `/i18n`
 folder in the project - all translations are kept just right there.
@@ -42,4 +44,4 @@ not `master`.
 ## Code of conduct
 
 By participating in this project, you are expected to uphold our
-[Code of Conduct](code-of-conduct.md).
+[Code of Conduct](https://github.com/handsontable/hyperformula/blob/master/CODE_OF_CONDUCT.md).
