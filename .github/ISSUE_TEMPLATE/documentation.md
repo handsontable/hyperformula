@@ -3,7 +3,7 @@ name: Documentation
 about: A general template for documentation requests and suggestions
 title: ''
 labels: Documentation
-assignees: 'scarletfog'
+assignees: scarletfog
 
 ---
 ### Description
