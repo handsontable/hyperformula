@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - 4 financial functions FV, PMT, PPMT, IPMT.
 
+## [0.1.3] - 2020-07-21
+
 ### Fixed
 - Fixed a bug in coercion of empty string to boolean value. (#453)
 
