@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- Added helper functions for keeping track of cell/range dependencies: getCellPrecedents and getCellDependents. (#441)
+- 4 financial functions FV, PMT, PPMT, IPMT.
+
 ### Fixed
 - Fixed hardcoding of languages in i18n tests. (#471)
 
