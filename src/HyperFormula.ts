@@ -15,10 +15,10 @@ import {buildTranslationPackage, RawTranslationPackage, TranslationPackage} from
 import {normalizeAddedIndexes, normalizeRemovedIndexes} from './Operations'
 import {
   AddressMapping,
-  DependencyGraph,
+  DependencyGraph, FormulaCellVertex,
   Graph,
-  MatrixMapping,
-  RangeMapping,
+  MatrixMapping, MatrixVertex,
+  RangeMapping, RangeVertex,
   SheetMapping,
   Vertex,
 } from './DependencyGraph'
@@ -34,7 +34,7 @@ import {Maybe} from './Maybe'
 import {NamedExpression, NamedExpressionOptions, NamedExpressions} from './NamedExpressions'
 import {
   Ast,
-  AstNodeType,
+  AstNodeType, NamedExpressionDependency,
   ParserWithCaching,
   RelativeDependency,
   simpleCellAddressFromString,
@@ -2189,6 +2189,68 @@ export class HyperFormula implements TypedEmitter {
    */
   public simpleCellAddressToString(cellAddress: SimpleCellAddress, sheetId: number): Maybe<string> {
     return simpleCellAddressToString(this.sheetMapping.fetchDisplayName, cellAddress, sheetId)
+  }
+
+  /**
+   * Returns all addresses and ranges whose computation depends on input address or range provided.
+   *
+   * @param {SimpleCellAddress | AbsoluteCellRange} address - object representation of an absolute address or range of addresses
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromArray( [ ['1', '=A1', '=A1+B1'] ] );
+   *
+   * hfInstance.getCellDependents({ sheet: 0, col: 0, row: 0});
+   * // should return [{ sheet: 0, col: 1, row: 0}, { sheet: 0, col: 2, row: 0}]
+   * ```
+   *
+   * @category Helpers
+   */
+  public getCellDependents(address: SimpleCellAddress | AbsoluteCellRange): (AbsoluteCellRange | SimpleCellAddress)[] {
+    let vertex
+    if(address instanceof AbsoluteCellRange) {
+      vertex = this._dependencyGraph.rangeMapping.getRange(address.start, address.end)
+      if(vertex===undefined) {
+        return []
+      }
+    } else {
+      vertex = this._dependencyGraph.addressMapping.getCell(address)
+      if(vertex===null) {
+        return []
+      }
+    }
+    return this._dependencyGraph.getAdjacentNodesAddresses(vertex)
+  }
+
+  /**
+   * Returns all addresses and ranges necessary for computation of a given address or range.
+   *
+   * @param {SimpleCellAddress | AbsoluteCellRange} address - object representation of an absolute address or range of addresses
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromArray( [ ['1', '=A1', '=A1+B1'] ] );
+   *
+   * hfInstance.getCellPrecedents({ sheet: 0, col: 2, row: 0});
+   * // should return [{ sheet: 0, col: 0, row: 0}, { sheet: 0, col: 1, row: 0}]
+   * ```
+   *
+   * @category Helpers
+   */
+  public getCellPrecedents(address: SimpleCellAddress | AbsoluteCellRange): (AbsoluteCellRange | SimpleCellAddress)[] {
+    let vertex
+    if(address instanceof AbsoluteCellRange) {
+      vertex = this._dependencyGraph.rangeMapping.getRange(address.start, address.end)
+      if(vertex===undefined) {
+        return []
+      }
+    } else {
+      vertex = this._dependencyGraph.addressMapping.getCell(address)
+      if(vertex===null) {
+        return []
+      }
+    }
+    return this._dependencyGraph.dependencyQueryAddresses(vertex) ?? []
   }
 
   /**
