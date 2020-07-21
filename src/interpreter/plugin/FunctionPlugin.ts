@@ -157,6 +157,7 @@ export abstract class FunctionPlugin {
         return coerceScalarToString(arg)
     }
   }
+
   protected coerceArgumentsWithDefaults = (
     args: Ast[],
     formulaAddress: SimpleCellAddress,
@@ -168,6 +169,31 @@ export abstract class FunctionPlugin {
     }
 
     const coercedArguments: InternalScalarValue[] = []
+
+    for (let i = 0; i < argumentDefinitions.length; ++i) {
+      const arg = this.evaluateArgOrDefault(formulaAddress, args[i], argumentDefinitions[i].defaultValue)
+      if (arg instanceof SimpleRangeValue) {
+        return new CellError(ErrorType.VALUE)
+      }
+      const coercedArg = this.coerceToType(arg, argumentDefinitions[i].argumentType as ArgumentTypes)
+      if (coercedArg instanceof CellError) {
+        return coercedArg
+      }
+      coercedArguments.push(coercedArg)
+    }
+
+    return fn(...coercedArguments)
+  }
+
+
+  protected coerceRepeatedArgumentsWithDefaults = (
+    args: Ast[],
+    formulaAddress: SimpleCellAddress,
+    argumentDefinitions: FunctionArgumentDefinition[],
+    fn: (...arg: any) => InternalScalarValue
+  ) => {
+    const coercedArguments: InternalScalarValue[] = []
+
     for (let i = 0; i < argumentDefinitions.length; ++i) {
       const arg = this.evaluateArgOrDefault(formulaAddress, args[i], argumentDefinitions[i].defaultValue)
       if (arg instanceof SimpleRangeValue) {
@@ -187,6 +213,6 @@ export abstract class FunctionPlugin {
     if (argAst !== undefined) {
       return this.evaluateAst(argAst, formulaAddress)
     }
-    return defaultValue || new CellError(ErrorType.NA)
+    return defaultValue ?? new CellError(ErrorType.NA)
   }
 }
