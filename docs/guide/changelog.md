@@ -1,7 +1,7 @@
 # Changelog
 
 ## 0.1.3
-**Release date: July 20, 2020**
+**Release date: July 21, 2020**
 
 ### Fixed
 - Fixed a bug in coercion of empty string to boolean value. [#453](https://github.com/handsontable/hyperformula/issues/453)
