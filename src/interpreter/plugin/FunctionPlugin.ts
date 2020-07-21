@@ -194,7 +194,7 @@ export abstract class FunctionPlugin {
   ) => {
     const coercedArguments: InternalScalarValue[] = []
 
-    for (let i = 0; i < argumentDefinitions.length; ++i) {
+    for (let i = 0; i < Math.max(argumentDefinitions.length, args.length); ++i) {
       const arg = this.evaluateArgOrDefault(formulaAddress, args[i], argumentDefinitions[i].defaultValue)
       if (arg instanceof SimpleRangeValue) {
         return new CellError(ErrorType.VALUE)
