@@ -14,6 +14,7 @@ All implemented functions are grouped into 8 different categories:
 
 * Date and time
 * Engineering
+* Financial
 * Information
 * Logical
 * Lookup and reference
@@ -21,7 +22,7 @@ All implemented functions are grouped into 8 different categories:
 * Statistical
 * Text
 
-_Some categories such as compatibility, cube, database, and financial
+_Some categories such as compatibility, cube, and database
 are yet to be supported._
 
 ## Language packs
@@ -89,6 +90,10 @@ lets you design your own [custom functions](custom-functions).
 | ISNUMBER | Information | Returns TRUE if the value refers to a number. | ISNUMBER(Value) |
 | ISODD | Information | Returns TRUE if the value is odd, or FALSE if the number is even. | ISODD(Value) |
 | ISTEXT | Information | Returns TRUE if the cell contents refer to text.| ISTEXT(Value) |
+| FV | Financial | Returns the future value of an investment. | FV(Rate; Nper; Pmt[; Pv;[ Type]]) |
+| IPMT | Financial | Calculates the interest portion of a given loan payment in a given payment period. | IPMT(Rate; Per; Nper; Pv[; Fv[; Type]]) |
+| PMT | Financial | Returns the periodic payment for a loan. | PMT(Rate; Nper; Pv[; Fv[; Type]]) |
+| PPMT | Financial | Calculates the principal portion of a given loan payment. | PPMT(Rate; Per; Nper; Pv[; Fv[; Type]]) |
 | AND | Logical | Returns TRUE if all arguments are TRUE. | AND(Logicalvalue1; Logicalvalue2 ...Logicalvalue30) |
 | FALSE | Logical | Returns the logical value FALSE. | FALSE() |
 | IF | Logical | Specifies a logical test to be performed. | IF(Test; Then value; Otherwisevalue) |
