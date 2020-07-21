@@ -3,26 +3,19 @@
  * Copyright (c) 2020 Handsoncode. All rights reserved.
  */
 
-import {RawTranslationPackage} from '../TranslationPackage'
-import { default as csCZ } from './csCZ'
-import { default as daDK } from './daDK'
-import { default as deDE } from './deDE'
-import { default as enGB} from './enGB'
-import { default as esES } from './esES'
-import { default as fiFI } from './fiFI'
-import { default as frFR } from './frFR'
-import { default as huHU } from './huHU'
-import { default as itIT } from './itIT'
-import { default as nbNO } from './nbNO'
-import { default as nlNL } from './nlNL'
-import { default as plPL } from './plPL'
-import { default as ptPT } from './ptPT'
-import { default as ruRU } from './ruRU'
-import { default as svSE } from './svSE'
-import { default as trTR } from './trTR'
-
-export {csCZ, daDK, deDE, esES, enGB, fiFI, frFR, huHU, itIT, nbNO, nlNL, plPL, ptPT, ruRU, svSE, trTR, languages}
-
-const languages: Record<string, RawTranslationPackage> = {
-  csCZ, daDK, deDE, esES, enGB, fiFI, frFR, huHU, itIT, nbNO, nlNL, plPL, ptPT, ruRU, svSE, trTR,
-}
+export { default as csCZ } from './csCZ'
+export { default as daDK } from './daDK'
+export { default as deDE } from './deDE'
+export { default as enGB} from './enGB'
+export { default as esES } from './esES'
+export { default as fiFI } from './fiFI'
+export { default as frFR } from './frFR'
+export { default as huHU } from './huHU'
+export { default as itIT } from './itIT'
+export { default as nbNO } from './nbNO'
+export { default as nlNL } from './nlNL'
+export { default as plPL } from './plPL'
+export { default as ptPT } from './ptPT'
+export { default as ruRU } from './ruRU'
+export { default as svSE } from './svSE'
+export { default as trTR } from './trTR'
