@@ -6,11 +6,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- Fixed hardcoding of languages in i18n tests. (#471)
+
 ## [0.1.3] - 2020-07-21
 
 ### Fixed
 - Fixed a bug in coercion of empty string to boolean value. (#453)
-- Fixed hardcoding of languages in i18n tests. (#471)
 
 ## [0.1.2] - 2020-07-13
 
