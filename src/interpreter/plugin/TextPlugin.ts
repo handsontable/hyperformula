@@ -18,6 +18,10 @@ export class TextPlugin extends FunctionPlugin {
     },
     'SPLIT': {
       method: 'split',
+      parameters: [
+        { argumentType: 'string' },
+        { argumentType: 'number' },
+      ],
     },
     'LEN': {
       method: 'len'
@@ -107,31 +111,15 @@ export class TextPlugin extends FunctionPlugin {
    * @param formulaAddress
    */
   public split(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    if (ast.args.length !== 2) {
-      return new CellError(ErrorType.NA)
-    }
-    if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
-      return new CellError(ErrorType.NUM)
-    }
-    const stringArg = ast.args[0]
-    const indexArg = ast.args[1]
+    return this.coerceArgumentsWithDefaults(ast.args, formulaAddress, TextPlugin.implementedFunctions.SPLIT.parameters, (stringToSplit: string, indexToUse: number) => {
+      const splittedString = stringToSplit.split(' ')
 
-    const stringToSplit = this.evaluateAst(stringArg, formulaAddress)
-    if (typeof stringToSplit !== 'string') {
-      return new CellError(ErrorType.VALUE)
-    }
-    const indexToUse = this.evaluateAst(indexArg, formulaAddress)
-    if (typeof indexToUse !== 'number') {
-      return new CellError(ErrorType.VALUE)
-    }
+      if (indexToUse >= splittedString.length || indexToUse < 0) {
+        return new CellError(ErrorType.VALUE)
+      }
 
-    const splittedString = stringToSplit.split(' ')
-
-    if (indexToUse > splittedString.length || indexToUse < 0) {
-      return new CellError(ErrorType.VALUE)
-    }
-
-    return splittedString[indexToUse]
+      return splittedString[indexToUse]
+    })
   }
 
   public len(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
