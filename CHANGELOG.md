@@ -6,6 +6,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.3] - 2020-07-21
+
+### Fixed
+- Fixed a bug in coercion of empty string to boolean value. (#453)
+
 ## [0.1.2] - 2020-07-13
 
 ### Fixed
