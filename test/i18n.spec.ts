@@ -1,17 +1,16 @@
-
 import {HyperFormula, LanguageAlreadyRegisteredError, LanguageNotRegisteredError} from '../src'
 import {RawTranslationPackage, TranslationPackage} from '../src/i18n'
-import {enGB, plPL} from '../src/i18n/languages'
+import {plPL} from '../src/i18n/languages'
+import * as languages from '../src/i18n/languages'
 import {CellAddress} from '../src/parser'
 import {adr, extractReference} from './testUtils'
 import {FunctionRegistry} from '../src/interpreter/FunctionRegistry'
 import {ProtectedFunctionTranslationError} from '../src/errors'
 
 describe('i18n', () => {
-  const languages: Record<string, RawTranslationPackage> = {
-    enGB,
-    plPL,
-  }
+  // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+  // @ts-ignore
+  const allLanguages: RawTranslationPackage[] = Object.getOwnPropertyNames(languages).filter(lang => !lang.startsWith('_')).map(lang => languages[lang])
 
   beforeEach(() => {
     HyperFormula.registerLanguage('plPL', plPL)
@@ -60,29 +59,33 @@ describe('i18n', () => {
   })
 
   it('all function translation keys has to be upper cased', () => {
-    for (const lang in languages) {
-      const translationPackage = languages[lang]
-      for (const translationKey in translationPackage.functions) {
-        expect(translationPackage.functions[translationKey]).toEqual(translationPackage.functions[translationKey].toUpperCase())
+    for (const lang of Object.getOwnPropertyNames(languages)) {
+      if (!lang.startsWith('_')) {
+        // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+        // @ts-ignore
+        const translationPackage = languages[lang]
+        for (const translationKey in translationPackage.functions) {
+          expect(translationPackage.functions[translationKey]).toEqual(translationPackage.functions[translationKey].toUpperCase())
+        }
       }
     }
   })
 
   it('all translation packages should not include protected function definition', () => {
-    for (const lang in languages) {
-      const translatedFunctionsInLang = new Set(Object.keys(languages[lang].functions))
+    allLanguages.forEach(lang => {
+      const translatedFunctionsInLang = new Set(Object.keys(lang.functions))
       expect(translatedFunctionsInLang.has('VERSION')).toEqual(false)
-    }
+    })
   })
 
   it('all translation packages should translate all implemented functions', () => {
     const implementedFunctions = new Set(Array.from(FunctionRegistry.getRegisteredFunctionIds()))
 
-    for (const lang in languages) {
-      const translatedFunctionsInLang = new Set(Object.keys(languages[lang].functions))
+    allLanguages.forEach(lang => {
+      const translatedFunctionsInLang = new Set(Object.keys(lang.functions))
       translatedFunctionsInLang.add('VERSION') /* missing protected function */
       expect(translatedFunctionsInLang).toEqual(implementedFunctions)
-    }
+    })
   })
 
   it('translation package sanitization', () => {
