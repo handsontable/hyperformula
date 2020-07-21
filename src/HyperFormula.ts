@@ -2231,13 +2231,13 @@ export class HyperFormula implements TypedEmitter {
    * ```js
    * const hfInstance = HyperFormula.buildFromArray( [ ['1', '=A1', '=A1+B1'] ] );
    *
-   * hfInstance.getCellDependencies({ sheet: 0, col: 2, row: 0});
+   * hfInstance.getCellPrecedents({ sheet: 0, col: 2, row: 0});
    * // should return [{ sheet: 0, col: 0, row: 0}, { sheet: 0, col: 1, row: 0}]
    * ```
    *
    * @category Helpers
    */
-  public getCellDependencies(address: SimpleCellAddress | AbsoluteCellRange): (AbsoluteCellRange | SimpleCellAddress)[] {
+  public getCellPrecedents(address: SimpleCellAddress | AbsoluteCellRange): (AbsoluteCellRange | SimpleCellAddress)[] {
     let vertex
     if(address instanceof AbsoluteCellRange) {
       vertex = this._dependencyGraph.rangeMapping.getRange(address.start, address.end)

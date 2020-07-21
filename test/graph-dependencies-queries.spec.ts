@@ -25,13 +25,13 @@ describe('address queries', () => {
       ['=SUM(A1:B1)', '=SUMSQ(A1:B1)'],
       ['=A2+B2'],
     ])
-    expect(engine.getCellDependencies(adr('A1'))).toEqual([])
-    expect(engine.getCellDependencies(adr('D1'))).toEqual([])
-    expect(engine.getCellDependencies(adr('A2'))).toEqual([new AbsoluteCellRange(adr('A1'), adr('B1'))])
-    expect(engine.getCellDependencies(adr('B2'))).toEqual([new AbsoluteCellRange(adr('A1'), adr('B1'))])
-    expect(engine.getCellDependencies(adr('A3'))).toEqual([adr('A2'), adr('B2')])
+    expect(engine.getCellPrecedents(adr('A1'))).toEqual([])
+    expect(engine.getCellPrecedents(adr('D1'))).toEqual([])
+    expect(engine.getCellPrecedents(adr('A2'))).toEqual([new AbsoluteCellRange(adr('A1'), adr('B1'))])
+    expect(engine.getCellPrecedents(adr('B2'))).toEqual([new AbsoluteCellRange(adr('A1'), adr('B1'))])
+    expect(engine.getCellPrecedents(adr('A3'))).toEqual([adr('A2'), adr('B2')])
 
-    expect(engine.getCellDependencies(new AbsoluteCellRange(adr('A1'), adr('B1')))).toEqual([adr('A1'), adr('B1')])
-    expect(engine.getCellDependencies(new AbsoluteCellRange(adr('A3'), adr('B3')))).toEqual([])
+    expect(engine.getCellPrecedents(new AbsoluteCellRange(adr('A1'), adr('B1')))).toEqual([adr('A1'), adr('B1')])
+    expect(engine.getCellPrecedents(new AbsoluteCellRange(adr('A3'), adr('B3')))).toEqual([])
   })
 })
