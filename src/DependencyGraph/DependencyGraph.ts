@@ -722,56 +722,27 @@ export class DependencyGraph {
     }
   }
 
-  public rangeDependencyQuery = (vertex: RangeVertex) => {
-    const allDeps: [(SimpleCellAddress | AbsoluteCellRange), Vertex][] = []
-    const {smallerRangeVertex, restRange} = this.rangeMapping.findSmallerRange(vertex.range) //checking whether this range was splitted by bruteForce or not
-    let range
-    if (smallerRangeVertex !== null && this.graph.adjacentNodes(smallerRangeVertex).has(vertex)) {
-      range = restRange
-      allDeps.push([new AbsoluteCellRange(smallerRangeVertex.start, smallerRangeVertex.end), smallerRangeVertex])
-    } else { //did we ever need to use full range
-      range = vertex.range
-    }
-    for (const address of range.addresses(this)) {
-      const cell = this.addressMapping.getCell(address)
-      if (cell instanceof EmptyCellVertex) {
-        cell.address = address
-      }
-      if (cell !== null) {
-        allDeps.push([address, cell])
-      }
-    }
-    return allDeps
-  }
-  public formulaDependencyQuery: (vertex: Vertex) => Maybe<[SimpleCellAddress, (SimpleCellAddress | AbsoluteCellRange)[]]> = (vertex: Vertex) => {
-    let formula: Ast
-    let address: SimpleCellAddress
-    if (vertex instanceof FormulaCellVertex) {
-      address = vertex.getAddress(this.lazilyTransformingAstService)
-      formula = vertex.getFormula(this.lazilyTransformingAstService)
-    } else if (vertex instanceof MatrixVertex && vertex.isFormula()) {
-      address = vertex.getAddress()
-      formula = vertex.getFormula()!
+  public dependencyQueryAddresses: (vertex: Vertex) => Maybe<(SimpleCellAddress | AbsoluteCellRange)[]> = (vertex: Vertex) => {
+    if (vertex instanceof RangeVertex) {
+      return this.rangeDependencyQuery(vertex).map(([address, _]) => address)
     } else {
-      return undefined
-    }
-    const deps = collectDependencies(formula!, this.functionRegistry)
-    return [address, absolutizeDependencies(deps, address).map((dependency) => {
-          if(dependency instanceof NamedExpressionDependency) {
+      const dependenciesResult = this.formulaDependencyQuery(vertex)
+      if (dependenciesResult !== undefined) {
+        const [address, dependencies] = dependenciesResult
+        return dependencies.map((dependency: CellDependency) => {
+          if (dependency instanceof NamedExpressionDependency) {
             const namedExpression = this.namedExpressions.namedExpressionOrPlaceholder(dependency.name, address.sheet)
             return namedExpression.address
           } else {
             return dependency
           }
-        })]
-  }
-  public dependencyQueryAddresses: (vertex: Vertex) => Maybe<(SimpleCellAddress | AbsoluteCellRange)[]> = (vertex: Vertex) => {
-    if (vertex instanceof RangeVertex) {
-      return this.rangeDependencyQuery(vertex).map(([address, _]) => address)
-    } else {
-      return this.formulaDependencyQuery(vertex)?.[1]
+        })
+      } else {
+        return undefined
+      }
     }
   }
+
   public dependencyQueryVertices: (vertex: Vertex) => Maybe<Vertex[]> = (vertex: Vertex) => {
     if (vertex instanceof RangeVertex) {
       return this.rangeDependencyQuery(vertex).map(([_, vertex]) => vertex)
@@ -793,6 +764,44 @@ export class DependencyGraph {
         return undefined
       }
     }
+  }
+
+  private rangeDependencyQuery = (vertex: RangeVertex) => {
+    const allDeps: [(SimpleCellAddress | AbsoluteCellRange), Vertex][] = []
+    const {smallerRangeVertex, restRange} = this.rangeMapping.findSmallerRange(vertex.range) //checking whether this range was splitted by bruteForce or not
+    let range
+    if (smallerRangeVertex !== null && this.graph.adjacentNodes(smallerRangeVertex).has(vertex)) {
+      range = restRange
+      allDeps.push([new AbsoluteCellRange(smallerRangeVertex.start, smallerRangeVertex.end), smallerRangeVertex])
+    } else { //did we ever need to use full range
+      range = vertex.range
+    }
+    for (const address of range.addresses(this)) {
+      const cell = this.addressMapping.getCell(address)
+      if (cell instanceof EmptyCellVertex) {
+        cell.address = address
+      }
+      if (cell !== null) {
+        allDeps.push([address, cell])
+      }
+    }
+    return allDeps
+  }
+
+  private formulaDependencyQuery: (vertex: Vertex) => Maybe<[SimpleCellAddress, CellDependency[]]> = (vertex: Vertex) => {
+    let formula: Ast
+    let address: SimpleCellAddress
+    if (vertex instanceof FormulaCellVertex) {
+      address = vertex.getAddress(this.lazilyTransformingAstService)
+      formula = vertex.getFormula(this.lazilyTransformingAstService)
+    } else if (vertex instanceof MatrixVertex && vertex.isFormula()) {
+      address = vertex.getAddress()
+      formula = vertex.getFormula()!
+    } else {
+      return undefined
+    }
+    const deps = collectDependencies(formula!, this.functionRegistry)
+    return [address, absolutizeDependencies(deps, address)]
   }
 
   private addStructuralNodesToChangeSet() {
@@ -879,7 +888,7 @@ export class DependencyGraph {
   }
 
   private truncateRanges(span: Span, coordinate: (address: SimpleCellAddress) => number) {
-    const { verticesToRemove, verticesToMerge } = this.rangeMapping.truncateRanges(span, coordinate)
+    const {verticesToRemove, verticesToMerge} = this.rangeMapping.truncateRanges(span, coordinate)
     for (const [existingVertex, mergedVertex] of verticesToMerge) {
       this.mergeRangeVertices(existingVertex, mergedVertex)
     }
@@ -957,9 +966,9 @@ export class DependencyGraph {
     const ret: (AbsoluteCellRange | SimpleCellAddress)[] = []
     deps.forEach((vertex: Vertex) => {
       const castVertex = vertex as RangeVertex | FormulaCellVertex | MatrixVertex
-      if(castVertex instanceof RangeVertex) {
+      if (castVertex instanceof RangeVertex) {
         ret.push(new AbsoluteCellRange(castVertex.start, castVertex.end))
-      } else if(castVertex instanceof FormulaCellVertex){
+      } else if (castVertex instanceof FormulaCellVertex) {
         ret.push(castVertex.getAddress(this.lazilyTransformingAstService))
       } else {
         ret.push(castVertex.getAddress())
