@@ -64,7 +64,7 @@ const options = {
 };
 
 // define the data
-const data = [['10', '20', '30' '=SUM(A1:C1)']];
+const data = [['10', '20', '30', '=SUM(A1:C1)']];
 
 // build an instance with defined options and data 
 const hfInstance = HyperFormula.buildFromArray(data, options);
@@ -96,7 +96,7 @@ applications. Here are some examples:
 
 ## Contributing
 
-Help us to build the fastest and most flexible calculation engine for
+Help us build the fastest and most flexible calculation engine for
 business web apps. Please read the [Contributing Guide](https://handsontable.github.io/hyperformula/guide/contributing.html) before
 making a pull request.
 
