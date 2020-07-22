@@ -34,6 +34,10 @@ export class TrigonometryPlugin extends FunctionPlugin {
     },
     'ATAN2': {
       method: 'atan2',
+      parameters: [
+        { argumentType: 'number' },
+        { argumentType: 'number' },
+      ],
     },
     'COT': {
       method: 'ctg',
@@ -69,54 +73,23 @@ export class TrigonometryPlugin extends FunctionPlugin {
   }
 
   public cos(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.templateWithOneCoercedToNumberArgument(ast, formulaAddress, (coercedArg) => {
-      return Math.cos(coercedArg)
-    })
+    return this.templateWithOneCoercedToNumberArgument(ast, formulaAddress, Math.cos)
   }
 
   public sin(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.templateWithOneCoercedToNumberArgument(ast, formulaAddress, (coercedArg) => {
-      return Math.sin(coercedArg)
-    })
+    return this.templateWithOneCoercedToNumberArgument(ast, formulaAddress, Math.sin)
   }
 
   public tan(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.templateWithOneCoercedToNumberArgument(ast, formulaAddress, (coercedArg) => {
-      return Math.tan(coercedArg)
-    })
+    return this.templateWithOneCoercedToNumberArgument(ast, formulaAddress, Math.tan)
   }
 
   public atan(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.templateWithOneCoercedToNumberArgument(ast, formulaAddress, (coercedArg) => {
-      return Math.atan(coercedArg)
-    })
+    return this.templateWithOneCoercedToNumberArgument(ast, formulaAddress, Math.atan)
   }
 
   public atan2(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    if (ast.args.length !== 2) {
-      return new CellError(ErrorType.NA)
-    }
-    if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
-      return new CellError(ErrorType.NUM)
-    }
-
-    const arg1 = this.evaluateAst(ast.args[0], formulaAddress)
-    if (arg1 instanceof SimpleRangeValue) {
-      return new CellError(ErrorType.VALUE)
-    }
-    const arg2 = this.evaluateAst(ast.args[1], formulaAddress)
-    if (arg2 instanceof SimpleRangeValue) {
-      return new CellError(ErrorType.VALUE)
-    }
-    const coercedArg1 = this.coerceScalarToNumberOrError(arg1)
-    if (coercedArg1 instanceof CellError) {
-      return coercedArg1
-    }
-    const coercedArg2 = this.coerceScalarToNumberOrError(arg2)
-    if (coercedArg2 instanceof CellError) {
-      return coercedArg2
-    }
-    return Math.atan2(coercedArg1, coercedArg2)
+    return this.runFunctionWithDefaults(ast.args, formulaAddress, TrigonometryPlugin.implementedFunctions.ATAN2.parameters, Math.atan2)
   }
 
   public ctg(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
