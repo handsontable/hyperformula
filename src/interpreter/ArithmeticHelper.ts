@@ -44,6 +44,12 @@ export class ArithmeticHelper {
     }
   }
 
+  public searchString(pattern: string, text: string): number {
+    const regexp = this.buildRegex(pattern, false)
+    const result = regexp.exec(text)
+    return result?.index ?? -1
+  }
+
   public requiresRegex(pattern: string): boolean {
     if(!this.config.useRegularExpressions && !this.config.useWildcards) {
       return !this.config.matchWholeCell
@@ -57,7 +63,7 @@ export class ArithmeticHelper {
     return false
   }
 
-  private buildRegex(pattern: string): RegExp {
+  private buildRegex(pattern: string, matchWholeCell: boolean = true): RegExp {
     pattern = this.normalizeString(pattern)
     let regexpStr
     let useWildcards = this.config.useWildcards
@@ -77,7 +83,7 @@ export class ArithmeticHelper {
     } else {
       regexpStr = escapeAllCharacters(pattern, this.config.caseSensitive)
     }
-    if(this.config.matchWholeCell) {
+    if(this.config.matchWholeCell && matchWholeCell) {
       return RegExp('^('+ regexpStr + ')$')
     } else {
       return RegExp(regexpStr)
