@@ -90,11 +90,11 @@ export abstract class FunctionPlugin {
   }
 
   protected templateWithOneCoercedToNumberArgument(ast: ProcedureAst, formulaAddress: SimpleCellAddress, fn: (arg: number) => InternalScalarValue): InternalScalarValue {
-    return this.coerceArgumentsWithDefaults(ast.args, formulaAddress, [{ argumentType: 'number'}], fn)
+    return this.runFunctionWithDefaults(ast.args, formulaAddress, [{ argumentType: 'number'}], fn)
   }
 
   protected templateWithOneCoercedToStringArgument(ast: ProcedureAst, formulaAddress: SimpleCellAddress, fn: (arg: string) => InternalScalarValue): InternalScalarValue {
-    return this.coerceArgumentsWithDefaults(ast.args, formulaAddress, [{ argumentType: 'string' }], fn)
+    return this.runFunctionWithDefaults(ast.args, formulaAddress, [{ argumentType: 'string' }], fn)
   }
 
   protected validateTwoNumericArguments(ast: ProcedureAst, formulaAddress: SimpleCellAddress): [number, number] | CellError {
@@ -158,7 +158,7 @@ export abstract class FunctionPlugin {
     }
   }
 
-  protected coerceArgumentsWithDefaults = (
+  protected runFunctionWithDefaults = (
     args: Ast[],
     formulaAddress: SimpleCellAddress,
     argumentDefinitions: FunctionArgumentDefinition[],
@@ -186,7 +186,7 @@ export abstract class FunctionPlugin {
   }
 
 
-  protected coerceRepeatedArgumentsWithDefaults = (
+  protected runFunctionWithRepeatedArg = (
     args: Ast[],
     formulaAddress: SimpleCellAddress,
     argumentDefinitions: FunctionArgumentDefinition[],

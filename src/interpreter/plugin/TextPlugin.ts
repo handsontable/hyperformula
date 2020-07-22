@@ -111,7 +111,7 @@ export class TextPlugin extends FunctionPlugin {
    * @param formulaAddress
    */
   public split(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.coerceArgumentsWithDefaults(ast.args, formulaAddress, TextPlugin.implementedFunctions.SPLIT.parameters, (stringToSplit: string, indexToUse: number) => {
+    return this.runFunctionWithDefaults(ast.args, formulaAddress, TextPlugin.implementedFunctions.SPLIT.parameters, (stringToSplit: string, indexToUse: number) => {
       const splittedString = stringToSplit.split(' ')
 
       if (indexToUse >= splittedString.length || indexToUse < 0) {
@@ -148,7 +148,7 @@ export class TextPlugin extends FunctionPlugin {
   }
 
   public rept(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.coerceArgumentsWithDefaults(ast.args, formulaAddress, TextPlugin.implementedFunctions.REPT.parameters, (text: string, count: number) => {
+    return this.runFunctionWithDefaults(ast.args, formulaAddress, TextPlugin.implementedFunctions.REPT.parameters, (text: string, count: number) => {
       if (count < 0) {
         return new CellError(ErrorType.VALUE)
       }
@@ -157,7 +157,7 @@ export class TextPlugin extends FunctionPlugin {
   }
 
   public right(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.coerceArgumentsWithDefaults(ast.args, formulaAddress, TextPlugin.implementedFunctions.RIGHT.parameters, (text: string, length: number) => {
+    return this.runFunctionWithDefaults(ast.args, formulaAddress, TextPlugin.implementedFunctions.RIGHT.parameters, (text: string, length: number) => {
       if (length < 0) {
         return new CellError(ErrorType.VALUE)
       } else if (length === 0) {
@@ -168,7 +168,7 @@ export class TextPlugin extends FunctionPlugin {
   }
 
   public left(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.coerceArgumentsWithDefaults(ast.args, formulaAddress, TextPlugin.implementedFunctions.LEFT.parameters, (text: string, length: number) => {
+    return this.runFunctionWithDefaults(ast.args, formulaAddress, TextPlugin.implementedFunctions.LEFT.parameters, (text: string, length: number) => {
       if (length < 0) {
         return new CellError(ErrorType.VALUE)
       }
@@ -177,7 +177,7 @@ export class TextPlugin extends FunctionPlugin {
   }
 
   public search(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.coerceArgumentsWithDefaults(ast.args, formulaAddress, TextPlugin.implementedFunctions.SEARCH.parameters, (pattern, text: string, startIndex: number) => {
+    return this.runFunctionWithDefaults(ast.args, formulaAddress, TextPlugin.implementedFunctions.SEARCH.parameters, (pattern, text: string, startIndex: number) => {
       if (startIndex < 1 || startIndex > text.length) {
         return new CellError(ErrorType.VALUE)
       }
@@ -197,7 +197,7 @@ export class TextPlugin extends FunctionPlugin {
   }
 
   public find(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.coerceArgumentsWithDefaults(ast.args, formulaAddress, TextPlugin.implementedFunctions.FIND.parameters, (pattern, text: string, startIndex: number) => {
+    return this.runFunctionWithDefaults(ast.args, formulaAddress, TextPlugin.implementedFunctions.FIND.parameters, (pattern, text: string, startIndex: number) => {
       if (startIndex < 1 || startIndex > text.length) {
         return new CellError(ErrorType.VALUE)
       }
