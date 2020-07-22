@@ -289,7 +289,7 @@ export function coerceEmptyToValue(arg: InternalNoErrorCellValue): InternalNoErr
  *
  * @param arg
  */
-export function coerceScalarToBoolean(arg: InternalScalarValue): boolean | CellError | null {
+export function coerceScalarToBoolean(arg: InternalScalarValue): boolean | CellError | undefined {
   if (arg instanceof SimpleRangeValue) {
     return new CellError(ErrorType.VALUE)
   } else if (arg instanceof CellError || typeof arg === 'boolean') {
@@ -307,7 +307,7 @@ export function coerceScalarToBoolean(arg: InternalScalarValue): boolean | CellE
     } else if (argUppered === '') {
       return false
     } else {
-      return null
+      return undefined
     }
   }
 }

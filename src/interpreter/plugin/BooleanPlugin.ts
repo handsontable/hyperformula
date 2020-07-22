@@ -4,6 +4,7 @@
  */
 
 import {CellError, ErrorType, InternalNoErrorCellValue, InternalScalarValue, SimpleCellAddress} from '../../Cell'
+import {Maybe} from '../../Maybe'
 import {AstNodeType, ProcedureAst} from '../../parser'
 import {coerceScalarToBoolean} from '../ArithmeticHelper'
 import {InterpreterValue, SimpleRangeValue} from '../InterpreterValue'
@@ -15,7 +16,8 @@ import {FunctionPlugin} from './FunctionPlugin'
 export class BooleanPlugin extends FunctionPlugin {
   public static implementedFunctions = {
     'TRUE': {
-      method: 'literalTrue'
+      method: 'literalTrue',
+      parameters: [],
     },
     'FALSE': {
       method: 'literalFalse'
@@ -24,10 +26,16 @@ export class BooleanPlugin extends FunctionPlugin {
       method: 'conditionalIf'
     },
     'AND': {
-      method: 'and'
+      method: 'and',
+      parameters: [
+        { argumentType: 'boolean' },
+      ],
     },
     'OR': {
-      method: 'or'
+      method: 'or',
+      parameters: [
+        { argumentType: 'boolean' },
+      ],
     },
     'XOR': {
       method: 'xor'
@@ -57,13 +65,8 @@ export class BooleanPlugin extends FunctionPlugin {
    * @param ast
    * @param formulaAddress
    */
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public literalTrue(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    if (ast.args.length > 0) {
-      return new CellError(ErrorType.NA)
-    } else {
-      return true
-    }
+    return this.runFunctionWithDefaults(ast.args, formulaAddress, BooleanPlugin.implementedFunctions.TRUE.parameters, () => true)
   }
 
   /**
@@ -127,29 +130,15 @@ export class BooleanPlugin extends FunctionPlugin {
    * @param formulaAddress
    */
   public and(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    if (ast.args.length < 1) {
-      return new CellError(ErrorType.NA)
-    }
-    if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
-      return new CellError(ErrorType.NUM)
-    }
-
-    let result: InternalScalarValue = true
-    let anyReasonableValue = false
-    for (const scalarValue of this.iterateOverScalarValues(ast.args, formulaAddress)) {
-      const coercedValue = coerceScalarToBoolean(scalarValue)
-      if (coercedValue instanceof CellError) {
-        return coercedValue
-      } else if (coercedValue !== null) {
-        result = result && coercedValue
-        anyReasonableValue = true
+    return this.runFunctionWithRepeatedArg(ast.args, formulaAddress, BooleanPlugin.implementedFunctions.AND.parameters, 1, (...args) => {
+      if(args.some((arg:Maybe<InternalScalarValue>) => arg===false)) {
+        return false
+      } else if(args.some((arg:Maybe<InternalScalarValue>) => arg!==undefined)) {
+        return true
+      } else {
+        return new CellError(ErrorType.VALUE)
       }
-    }
-    if (anyReasonableValue) {
-      return result
-    } else {
-      return new CellError(ErrorType.VALUE)
-    }
+    })
   }
 
   /**
@@ -161,27 +150,15 @@ export class BooleanPlugin extends FunctionPlugin {
    * @param formulaAddress
    */
   public or(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    if (ast.args.length < 1) {
-      return new CellError(ErrorType.NA)
-    }
-    if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
-      return new CellError(ErrorType.NUM)
-    }
-
-    let result: InternalScalarValue | null = null
-    for (const scalarValue of this.iterateOverScalarValues(ast.args, formulaAddress)) {
-      const coercedValue = coerceScalarToBoolean(scalarValue)
-      if (coercedValue instanceof CellError) {
-        return coercedValue
-      } else if (coercedValue !== null) {
-        result = result || coercedValue
+    return this.runFunctionWithRepeatedArg(ast.args, formulaAddress, BooleanPlugin.implementedFunctions.OR.parameters, 1, (...args) => {
+      if(args.some((arg:Maybe<InternalScalarValue>) => arg===true)) {
+        return true
+      } else if(args.some((arg:Maybe<InternalScalarValue>) => arg!==undefined)) {
+        return false
+      } else {
+        return new CellError(ErrorType.VALUE)
       }
-    }
-    if (result === null) {
-      return new CellError(ErrorType.VALUE)
-    } else {
-      return result
-    }
+    })
   }
 
   public not(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {

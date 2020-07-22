@@ -149,7 +149,7 @@ export abstract class FunctionPlugin {
 
   public coerceScalarToNumberOrError = (arg: InternalScalarValue): number | CellError => this.interpreter.arithmeticHelper.coerceScalarToNumberOrError(arg)
 
-  public coerceToType(arg: InternalScalarValue, coercedType: ArgumentTypes): InternalScalarValue {
+  public coerceToType(arg: InternalScalarValue, coercedType: ArgumentTypes): Maybe<InternalScalarValue> {
     switch(coercedType) {
       case 'number':
         return this.coerceScalarToNumberOrError(arg)
@@ -170,7 +170,7 @@ export abstract class FunctionPlugin {
       return new CellError(ErrorType.NA)
     }
 
-    const coercedArguments: InternalScalarValue[] = []
+    const coercedArguments: Maybe<InternalScalarValue>[] = []
 
     for (let i = 0; i < argumentDefinitions.length; ++i) {
       const arg = this.evaluateArgOrDefault(formulaAddress, args[i], argumentDefinitions[i].defaultValue)
@@ -195,7 +195,7 @@ export abstract class FunctionPlugin {
     fn: (...arg: any) => InternalScalarValue
   ) => {
     const scalarValues: InternalScalarValue[] = [...this.iterateOverScalarValues(args, formulaAddress)]
-    const coercedArguments: InternalScalarValue[] = []
+    const coercedArguments: Maybe<InternalScalarValue>[] = []
 
     let j = 0
     let i = 0
