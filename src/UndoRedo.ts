@@ -56,6 +56,9 @@ export class SetSheetContentUndoEntry {
 }
 
 export class MoveRowsUndoEntry {
+  public readonly undoStart: number
+  public readonly undoEnd: number
+
   constructor(
     public readonly sheet: number,
     public readonly startRow: number,
@@ -63,10 +66,15 @@ export class MoveRowsUndoEntry {
     public readonly targetRow: number,
     public readonly version: number,
   ) {
+    this.undoStart = this.startRow < this.targetRow ? this.targetRow - this.numberOfRows : this.targetRow
+    this.undoEnd = this.startRow > this.targetRow ? this.startRow + this.numberOfRows : this.startRow
   }
 }
 
 export class MoveColumnsUndoEntry {
+  public readonly undoStart: number
+  public readonly undoEnd: number
+
   constructor(
     public readonly sheet: number,
     public readonly startColumn: number,
@@ -74,6 +82,8 @@ export class MoveColumnsUndoEntry {
     public readonly targetColumn: number,
     public readonly version: number,
   ) {
+    this.undoStart = this.startColumn < this.targetColumn ? this.targetColumn - this.numberOfColumns : this.targetColumn
+    this.undoEnd = this.startColumn > this.targetColumn ? this.startColumn + this.numberOfColumns : this.startColumn
   }
 }
 
@@ -399,13 +409,13 @@ export class UndoRedo {
 
   private undoMoveRows(operation: MoveRowsUndoEntry) {
     const {sheet} = operation
-    this.operations.moveRows(sheet, operation.targetRow - operation.numberOfRows, operation.numberOfRows, operation.startRow)
+    this.operations.moveRows(sheet, operation.undoStart, operation.numberOfRows, operation.undoEnd)
     this.restoreOldDataFromVersion(operation.version - 1)
   }
 
   private undoMoveColumns(operation: MoveColumnsUndoEntry) {
     const {sheet} = operation
-    this.operations.moveColumns(sheet, operation.targetColumn - operation.numberOfColumns, operation.numberOfColumns, operation.startColumn)
+    this.operations.moveColumns(sheet, operation.undoStart, operation.numberOfColumns, operation.undoEnd)
     this.restoreOldDataFromVersion(operation.version - 1)
   }
 

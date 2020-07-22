@@ -229,6 +229,16 @@ describe('Move columns', () => {
     expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.CYCLE))
     expect(engine.getCellFormula(adr('B1'))).toEqual('=SUM(A1:C1)')
   })
+
+  it('should produce only one history entry', () => {
+    const engine = HyperFormula.buildFromArray([[0, 1, 2, 3]])
+
+    const version = engine.lazilyTransformingAstService.version()
+
+    engine.moveColumns(0, 1, 1, 3)
+
+    expect(engine.lazilyTransformingAstService.version()).toEqual(version + 1)
+  })
 })
 
 describe('Move columns - column ranges', () => {

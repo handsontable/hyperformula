@@ -227,6 +227,16 @@ describe('Move rows', () => {
     expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.CYCLE))
     expect(engine.getCellValue(adr('A5'))).toEqual(detailedError(ErrorType.CYCLE))
   })
+
+  it('should produce only one history entry', () => {
+    const engine = HyperFormula.buildFromArray([[0], [1], [2], [3]])
+
+    const version = engine.lazilyTransformingAstService.version()
+
+    engine.moveRows(0, 1, 1, 3)
+
+    expect(engine.lazilyTransformingAstService.version()).toEqual(version + 1)
+  })
 })
 
 describe('Move rows - row ranges', () => {

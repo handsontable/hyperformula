@@ -160,13 +160,21 @@ describe('Undo - adding rows', () => {
 describe('Undo - moving rows', () => {
   it('works', () => {
     const sheet = [
-      ['1'],
-      ['2'],
-      ['3'], // move first row before this one
+      [0], [1], [2], [3], [4], [5], [6], [7],
     ]
     const engine = HyperFormula.buildFromArray(sheet)
-    engine.moveRows(0, 0, 1, 2)
+    engine.moveRows(0, 1, 3, 7)
+    engine.undo()
 
+    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray(sheet))
+  })
+
+  it('works in both directions', () => {
+    const sheet = [
+      [0], [1], [2], [3], [4], [5], [6], [7],
+    ]
+    const engine = HyperFormula.buildFromArray(sheet)
+    engine.moveRows(0, 4, 3, 2)
     engine.undo()
 
     expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray(sheet))
@@ -178,7 +186,18 @@ describe('Undo - moving rows', () => {
       [2, '=SUM(A1:A2)'],
     ])
     engine.moveRows(0, 1, 1, 3)
+    engine.undo()
 
+    expect(engine.getCellFormula(adr('B2'))).toEqual('=SUM(A1:A2)')
+  })
+
+  it('should restore range when moving other way', () => {
+    const engine = HyperFormula.buildFromArray([
+      [1, null],
+      [2, '=SUM(A1:A2)'],
+    ])
+
+    engine.moveRows(0, 2, 1, 1)
     engine.undo()
 
     expect(engine.getCellFormula(adr('B2'))).toEqual('=SUM(A1:A2)')
@@ -188,11 +207,21 @@ describe('Undo - moving rows', () => {
 describe('Undo - moving columns', () => {
   it('works', () => {
     const sheet = [
-      ['1', '2', '3'],
+      [0, 1, 2, 3, 4, 5, 6, 7],
     ]
     const engine = HyperFormula.buildFromArray(sheet)
-    engine.moveColumns(0, 0, 1, 2)
+    engine.moveColumns(0, 1, 3, 7)
+    engine.undo()
 
+    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray(sheet))
+  })
+
+  it('works in both directions', () => {
+    const sheet = [
+      [0, 1, 2, 3, 4, 5, 6, 7],
+    ]
+    const engine = HyperFormula.buildFromArray(sheet)
+    engine.moveColumns(0, 4, 3, 2)
     engine.undo()
 
     expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray(sheet))
@@ -204,7 +233,18 @@ describe('Undo - moving columns', () => {
       [null, '=SUM(A1:B1)'],
     ])
     engine.moveColumns(0, 1, 1, 3)
+    engine.undo()
 
+    expect(engine.getCellFormula(adr('B2'))).toEqual('=SUM(A1:B1)')
+  })
+
+  it('should restore range when moving to left', () => {
+    const engine = HyperFormula.buildFromArray([
+      [1, 2],
+      [null, '=SUM(A1:B1)'],
+    ])
+
+    engine.moveColumns(0, 2, 1, 1)
     engine.undo()
 
     expect(engine.getCellFormula(adr('B2'))).toEqual('=SUM(A1:B1)')
