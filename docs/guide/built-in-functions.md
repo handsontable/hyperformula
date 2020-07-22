@@ -170,3 +170,12 @@ lets you design your own [custom functions](custom-functions).
 | CONCATENATE | Text | Combines several text strings into one string. | CONCATENATE("Text1"; ...; "Text30") |
 | SPLIT | Text | Divides text around a specified character or string, and puts each fragment into a separate cell in the row. | SPLIT(Text, Delimiter, [Split_by_each], [Remove_empty_text]) |
 | TEXT | Text | Converts a number into text according to a given format. | TEXT(Number; Format) |
+| LEN | Text | Returns length of a given text. | LEN("Text") | 
+| TRIM | Text | Strips extra spaces from text. | TRIM("Text") |
+| PROPER | Text | Capitalizes words given text string. | PROPER("Text") |
+| CLEAN | Text | Returns text that has been "cleaned" of line breaks and other non-printable characters. | CLEAN("Text") |
+| REPT | Text | Repeats text a given number of times. | REPT("Text"; Number) |
+| RIGHT | Text | Extracts a given number of characters from the right side of a text string. | RIGHT("Text"; Number) |
+| LEFT | Text | Extracts a given number of characters from the left side of a text string. | LEFT("Text"; Number) |
+| SEARCH | Text | Returns the location of one text string inside another. (Allows the use of wildcards.) | SEARCH( "Text1"; "Text2"[; Number]) |
+| FIND | Text | Returns the location of one text string inside another. | FIND( "Text1"; "Text2"[; Number]) |
