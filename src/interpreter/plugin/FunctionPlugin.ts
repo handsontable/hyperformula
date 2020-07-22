@@ -185,25 +185,33 @@ export abstract class FunctionPlugin {
     return fn(...coercedArguments)
   }
 
-
   protected runFunctionWithRepeatedArg = (
     args: Ast[],
     formulaAddress: SimpleCellAddress,
     argumentDefinitions: FunctionArgumentDefinition[],
+    repeatedArgs: number,
     fn: (...arg: any) => InternalScalarValue
   ) => {
+    const scalarValues: InternalScalarValue[] = [...this.iterateOverScalarValues(args, formulaAddress)]
     const coercedArguments: InternalScalarValue[] = []
 
-    for (let i = 0; i < Math.max(argumentDefinitions.length, args.length); ++i) {
-      const arg = this.evaluateArgOrDefault(formulaAddress, args[i], argumentDefinitions[i].defaultValue)
-      if (arg instanceof SimpleRangeValue) {
-        return new CellError(ErrorType.VALUE)
-      }
-      const coercedArg = this.coerceToType(arg, argumentDefinitions[i].argumentType as ArgumentTypes)
+    let j = 0
+    let i = 0
+    while(true) {
+      const arg = scalarValues[i] ?? argumentDefinitions[j].defaultValue ?? new CellError(ErrorType.NA)
+      const coercedArg = this.coerceToType(arg, argumentDefinitions[j].argumentType as ArgumentTypes)
       if (coercedArg instanceof CellError) {
         return coercedArg
       }
       coercedArguments.push(coercedArg)
+      j++
+      i++
+      if(i >= scalarValues.length && j === argumentDefinitions.length) {
+        break
+      }
+      if(j===argumentDefinitions.length) {
+        j -= repeatedArgs
+      }
     }
 
     return fn(...coercedArguments)

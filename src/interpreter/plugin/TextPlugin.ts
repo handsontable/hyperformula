@@ -15,6 +15,9 @@ export class TextPlugin extends FunctionPlugin {
   public static implementedFunctions = {
     'CONCATENATE': {
       method: 'concatenate',
+      parameters: [
+        { argumentType: 'string'}
+      ]
     },
     'SPLIT': {
       method: 'split',
@@ -83,23 +86,9 @@ export class TextPlugin extends FunctionPlugin {
    * @param formulaAddress
    */
   public concatenate(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    if (ast.args.length == 0) {
-      return new CellError(ErrorType.NA)
-    }
-    if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
-      return new CellError(ErrorType.NUM)
-    }
-
-    let result = ''
-    for (const value of this.iterateOverScalarValues(ast.args, formulaAddress)) {
-      const coercedValue = coerceScalarToString(value)
-      if (coercedValue instanceof CellError) {
-        return value
-      } else {
-        result = result.concat(coercedValue)
-      }
-    }
-    return result
+    return this.runFunctionWithRepeatedArg(ast.args, formulaAddress, TextPlugin.implementedFunctions.CONCATENATE.parameters, 1, (...args) => {
+      return ''.concat(...args)
+    })
   }
 
   /**
