@@ -9,7 +9,7 @@ import {ColumnSearchStrategy} from '../../ColumnSearch/ColumnSearchStrategy'
 import {Config} from '../../Config'
 import {DependencyGraph} from '../../DependencyGraph'
 import {Ast, AstNodeType, ProcedureAst} from '../../parser'
-import {coerceScalarToString} from '../ArithmeticHelper'
+import {coerceScalarToBoolean, coerceScalarToString} from '../ArithmeticHelper'
 import {Interpreter} from '../Interpreter'
 import {InterpreterValue, SimpleRangeValue} from '../InterpreterValue'
 import {Maybe} from '../../Maybe'
@@ -31,7 +31,7 @@ export interface FunctionPluginDefinition {
   implementedFunctions: ImplementedFunctions,
 }
 
-export type ArgumentTypes = 'string' | 'number'
+export type ArgumentTypes = 'string' | 'number' | 'boolean'
 
 export interface FunctionArgumentDefinition {
   argumentType: string,
@@ -155,6 +155,8 @@ export abstract class FunctionPlugin {
         return this.coerceScalarToNumberOrError(arg)
       case 'string':
         return coerceScalarToString(arg)
+      case 'boolean':
+        return coerceScalarToBoolean(arg)
     }
   }
 
