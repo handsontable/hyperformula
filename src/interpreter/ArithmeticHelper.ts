@@ -304,6 +304,8 @@ export function coerceScalarToBoolean(arg: InternalScalarValue): boolean | CellE
       return true
     } else if (argUppered === 'FALSE') {
       return false
+    } else if (argUppered === '') {
+      return false
     } else {
       return null
     }
