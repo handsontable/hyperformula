@@ -6,13 +6,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- Added 9 text functions LEN, TRIM, PROPER, CLEAN, REPT, RIGHT, LEFT, SEARCH, FIND. (#221)
+- Added helper methods for keeping track of cell/range dependencies: getCellPrecedents and getCellDependents. (#441)
+- 4 financial functions FV, PMT, PPMT, IPMT.
+
 ### Changed
 - Operation `moveCells` creating cyclic dependencies does not cause losing original formula
 
 ### Fixed
+- Fixed hardcoding of languages in i18n tests. (#471)
 - Fixed `moveCells` behaviour when moving part of a range
-- Fixed `moveCells`/`moveRows` inconsistent behaviour
-- Fixed undo of `moveCells`/`moveRows` operations
+- Fixed `moveColumns`/`moveRows` inconsistent behaviour
+- Fixed undo of `moveColumns`/`moveRows` operations
+
+## [0.1.3] - 2020-07-21
+
+### Fixed
+- Fixed a bug in coercion of empty string to boolean value. (#453)
 
 ## [0.1.2] - 2020-07-13
 

@@ -14,6 +14,7 @@ All implemented functions are grouped into 8 different categories:
 
 * Date and time
 * Engineering
+* Financial
 * Information
 * Logical
 * Lookup and reference
@@ -21,7 +22,7 @@ All implemented functions are grouped into 8 different categories:
 * Statistical
 * Text
 
-_Some categories such as compatibility, cube, database, and financial
+_Some categories such as compatibility, cube, and database
 are yet to be supported._
 
 ## Language packs
@@ -74,7 +75,6 @@ lets you design your own [custom functions](custom-functions).
 | BITOR | Engineering | Returns a bitwise logical "or" of the parameters. | BITOR(Number1; Number2) |
 | BITRSHIFT | Engineering | Shifts a number right by n bits. | BITRSHIFT(Number; Shift) |
 | BITXOR | Engineering | Returns a bitwise logical "exclusive or" of the parameters. | BITXOR(Number1; Number2) |
-| CHOOSE | Lookup and reference | Uses an index to return a value from a list of up to 30 values.| CHOOSE(Index; Value1; ...; Value30) |
 | DEC2BIN | Engineering | Returns the binary number for the decimal number entered between –512 and 511. | DEC2BIN(Number; Places) |
 | DEC2HEX | Engineering | Returns the hexadecimal number for the decimal number entered. | DEC2HEX(Number; Places) |
 | DEC2OCT | Engineering | Returns the octal number for the decimal number entered. | DEC2OCT(Number; Places) |
@@ -89,6 +89,10 @@ lets you design your own [custom functions](custom-functions).
 | ISNUMBER | Information | Returns TRUE if the value refers to a number. | ISNUMBER(Value) |
 | ISODD | Information | Returns TRUE if the value is odd, or FALSE if the number is even. | ISODD(Value) |
 | ISTEXT | Information | Returns TRUE if the cell contents refer to text.| ISTEXT(Value) |
+| FV | Financial | Returns the future value of an investment. | FV(Rate; Nper; Pmt[; Pv;[ Type]]) |
+| IPMT | Financial | Calculates the interest portion of a given loan payment in a given payment period. | IPMT(Rate; Per; Nper; Pv[; Fv[; Type]]) |
+| PMT | Financial | Returns the periodic payment for a loan. | PMT(Rate; Nper; Pv[; Fv[; Type]]) |
+| PPMT | Financial | Calculates the principal portion of a given loan payment. | PPMT(Rate; Per; Nper; Pv[; Fv[; Type]]) |
 | AND | Logical | Returns TRUE if all arguments are TRUE. | AND(Logicalvalue1; Logicalvalue2 ...Logicalvalue30) |
 | FALSE | Logical | Returns the logical value FALSE. | FALSE() |
 | IF | Logical | Specifies a logical test to be performed. | IF(Test; Then value; Otherwisevalue) |
@@ -99,12 +103,12 @@ lets you design your own [custom functions](custom-functions).
 | OR | Logical | Returns TRUE if at least one argument is TRUE. | OR(Logicalvalue1; Logicalvalue2 ...Logicalvalue30) |
 | TRUE | Logical | The logical value is set to TRUE. | TRUE() |
 | XOR | Logical | Returns true if an odd number of arguments evaluates to TRUE. | XOR(Logicalvalue1; Logicalvalue2 ...Logicalvalue30) |
+| CHOOSE | Lookup and reference | Uses an index to return a value from a list of up to 30 values.| CHOOSE(Index; Value1; ...; Value30) |
 | COLUMNS | Lookup and reference | Returns the number of columns in the given reference. | COLUMNS(Array) |
 | OFFSET | Lookup and reference | Returns the value of a cell offset by a certain number of rows and columns from a given reference point. | OFFSET(Reference; Rows; Columns; Height; Width) |
 | ROWS | Lookup and reference | Returns the number of rows in the given reference. | ROWS(Array) |
 | INDEX | Lookup and reference | Returns the content of a cell, specified by row and column number, or an optional range name. | INDEX(Reference; Row; Column; Range) |
 | MATCH | Lookup and reference | Returns the relative position of an item in an array that matches a specified value. | MATCH(Searchcriterion; Lookuparray; Type) |
-| TRANSPOSE | Matrix functions | Transposes the rows and columns of an array. | TRANSPOSE(Array) |
 | VLOOKUP | Lookup and reference | Searches vertically with reference to adjacent cells to the right. | VLOOKUP(Search_Criterion; Array; Index; Sort_Order) |
 | ABS | Math and trigonometry | Returns the absolute value of a number. | ABS(Number) |
 | ACOS | Math and trigonometry | Returns the inverse trigonometric cosine of a number. | ACOS(Number) |
@@ -125,9 +129,6 @@ lets you design your own [custom functions](custom-functions).
 | LN | Math and trigonometry | Returns the natural logarithm based on the constant e of a number. | LN(Number) |
 | LOG | Math and trigonometry | Returns the logarithm of a number to the specified base. | LOG(Number; Base) |
 | LOG10 | Math and trigonometry | Returns the base-10 logarithm of a number. | LOG10(Number) |
-| MMULT | Matrix functions | Calculates the array product of two arrays. | MMULT(Array; Array) |
-| MEDIANPOOL | Matrix functions | Calculates a smaller range which is a median of a Window_size, in a given Range, for every Stride element. | MEDIANPOOL(Range, Window_size, Stride) |
-| MAXPOOL | Matrix functions | Calculates a smaller range which is a maximum of a Window_size, in a given Range, for every Stride element. | MAXPOOL(Range, Window_size, Stride) |
 | MOD | Math and trigonometry | Returns the remainder when one integer is divided by another. | MOD(Dividend; Divisor) |
 | ODD | Math and trigonometry | Rounds a positive number up to the nearest odd integer and a negative number down to the nearest odd integer. | ODD(Number) |
 | PI | Math and trigonometry | Returns 3.14159265358979, the value of the mathematical constant PI to 14 decimal places. | PI() |
@@ -146,6 +147,10 @@ lets you design your own [custom functions](custom-functions).
 | SUMSQ | Math and trigonometry | Returns the sum of the squares of the arguments | SUMSQ(Number1; Number2; ...; Number30) |
 | TAN | Math and trigonometry | Returns the tangent of the given angle (in radians). | TAN(Number) |
 | TRUNC | Math and trigonometry | Truncates a number by removing decimal places. | TRUNC(Number; Count) |
+| MMULT | Matrix functions | Calculates the array product of two arrays. | MMULT(Array; Array) |
+| MEDIANPOOL | Matrix functions | Calculates a smaller range which is a median of a Window_size, in a given Range, for every Stride element. | MEDIANPOOL(Range, Window_size, Stride) |
+| MAXPOOL | Matrix functions | Calculates a smaller range which is a maximum of a Window_size, in a given Range, for every Stride element. | MAXPOOL(Range, Window_size, Stride) |
+| TRANSPOSE | Matrix functions | Transposes the rows and columns of an array. | TRANSPOSE(Array) |
 | AVERAGE | Statistical | Returns the average of the arguments. | AVERAGE(Number1; Number2; ...Number30) |
 | AVERAGEA | Statistical | Returns the average of the arguments. | AVERAGEA(Value1; Value2; ... Value30) |
 | AVERAGEIF | Statistical | Returns the arithmetic mean of all cells in a range that satisfy a given condition. | AVERAGEIF(Range; Criterion [; Average_Range ]) |
@@ -165,3 +170,12 @@ lets you design your own [custom functions](custom-functions).
 | CONCATENATE | Text | Combines several text strings into one string. | CONCATENATE("Text1"; ...; "Text30") |
 | SPLIT | Text | Divides text around a specified character or string, and puts each fragment into a separate cell in the row. | SPLIT(Text, Delimiter, [Split_by_each], [Remove_empty_text]) |
 | TEXT | Text | Converts a number into text according to a given format. | TEXT(Number; Format) |
+| LEN | Text | Returns length of a given text. | LEN("Text") | 
+| TRIM | Text | Strips extra spaces from text. | TRIM("Text") |
+| PROPER | Text | Capitalizes words given text string. | PROPER("Text") |
+| CLEAN | Text | Returns text that has been "cleaned" of line breaks and other non-printable characters. | CLEAN("Text") |
+| REPT | Text | Repeats text a given number of times. | REPT("Text"; Number) |
+| RIGHT | Text | Extracts a given number of characters from the right side of a text string. | RIGHT("Text"; Number) |
+| LEFT | Text | Extracts a given number of characters from the left side of a text string. | LEFT("Text"; Number) |
+| SEARCH | Text | Returns the location of one text string inside another. (Allows the use of wildcards.) | SEARCH( "Text1"; "Text2"[; Number]) |
+| FIND | Text | Returns the location of one text string inside another. | FIND( "Text1"; "Text2"[; Number]) |

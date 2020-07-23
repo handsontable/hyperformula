@@ -2,7 +2,7 @@ import {Graph} from '../src/DependencyGraph'
 
 const identifiableString = (id: number, str: string) => ({ id, str })
 
-const dummyGetDependenciesQuery = () => null
+const dummyGetDependenciesQuery = () => undefined
 
 describe('Basic Graph manipulation', () => {
   it('#addNode', () => {

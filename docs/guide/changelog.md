@@ -1,16 +1,22 @@
 # Changelog
 
+## 0.1.3
+**Release date: July 21, 2020**
+
+### Fixed
+- Fixed a bug in coercion of empty string to boolean value. [#453](https://github.com/handsontable/hyperformula/issues/453)
+
 ## 0.1.2
 **Release date: July 13, 2020**
 
 ### Fixed
-- Fixed a bug in topological ordering module. (#442)
+- Fixed a bug in topological ordering module. [#442](https://github.com/handsontable/hyperformula/issues/442)
 
 ## 0.1.1
 **Release date: July 1, 2020**
 
 ### Fixed
-- Fixed a typo in a config option from `useRegularExpresssions` to `useRegularExpressions`. (#437)
+- Fixed a typo in a config option from `useRegularExpresssions` to `useRegularExpressions`. [#437](https://github.com/handsontable/hyperformula/issues/437)
 
 ## 0.1.0
 

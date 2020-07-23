@@ -5,7 +5,14 @@
 
 import GPU from 'gpu.js'
 import {AbsoluteCellRange, AbsoluteColumnRange, AbsoluteRowRange} from '../AbsoluteCellRange'
-import {CellError, ErrorType, InternalNoErrorCellValue, invalidSimpleCellAddress, SimpleCellAddress} from '../Cell'
+import {
+  CellError,
+  EmptyValue,
+  ErrorType,
+  InternalNoErrorCellValue,
+  invalidSimpleCellAddress,
+  SimpleCellAddress
+} from '../Cell'
 import {ColumnSearchStrategy} from '../ColumnSearch/ColumnSearchStrategy'
 import {Config} from '../Config'
 import {DateTimeHelper} from '../DateTimeHelper'
@@ -52,7 +59,7 @@ export class Interpreter {
   public evaluateAst(ast: Ast, formulaAddress: SimpleCellAddress): InterpreterValue {
     switch (ast.type) {
       case AstNodeType.EMPTY: {
-        throw new Error('Empty argument should not be evaluated.')
+        return EmptyValue
       }
       case AstNodeType.CELL_REFERENCE: {
         const address = ast.reference.toSimpleCellAddress(formulaAddress)

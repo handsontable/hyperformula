@@ -19,6 +19,33 @@ export class TextPlugin extends FunctionPlugin {
     'SPLIT': {
       method: 'split',
     },
+    'LEN': {
+      method: 'len'
+    },
+    'TRIM': {
+      method: 'trim'
+    },
+    'PROPER': {
+      method: 'proper'
+    },
+    'CLEAN': {
+      method: 'clean'
+    },
+    'REPT': {
+      method: 'rept'
+    },
+    'RIGHT': {
+      method: 'right'
+    },
+    'LEFT': {
+      method: 'left'
+    },
+    'SEARCH': {
+      method: 'search'
+    },
+    'FIND': {
+      method: 'find'
+    }
   }
 
   /**
@@ -83,5 +110,109 @@ export class TextPlugin extends FunctionPlugin {
     }
 
     return splittedString[indexToUse]
+  }
+
+  public len(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.templateWithOneCoercedToStringArgument(ast, formulaAddress, (arg: string) => {
+      return arg.length
+    })
+  }
+
+  public trim(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.templateWithOneCoercedToStringArgument(ast, formulaAddress, (arg: string) => {
+      return arg.replace(/^ +| +$/g, '').replace(/ +/g, ' ')
+    })
+  }
+
+  public proper(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.templateWithOneCoercedToStringArgument(ast, formulaAddress, (arg: string) => {
+      return arg.replace(/\w\S*/g, word => word.charAt(0).toUpperCase() + word.substr(1).toLowerCase())
+    })
+  }
+
+  public clean(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.templateWithOneCoercedToStringArgument(ast, formulaAddress, (arg: string) => {
+      // eslint-disable-next-line no-control-regex
+      return arg.replace(/[\u0000-\u001F]/g, '')
+    })
+  }
+
+  public rept(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.coerceArgumentsWithDefaults(ast.args, formulaAddress, [
+      { typeCoercionFunction: coerceScalarToString },
+      { typeCoercionFunction: this.coerceScalarToNumberOrError },
+    ], (text: string, count: number) => {
+      if (count < 0) {
+        return new CellError(ErrorType.VALUE)
+      }
+      return text.repeat(count)
+    })
+  }
+
+  public right(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.coerceArgumentsWithDefaults(ast.args, formulaAddress, [
+      { typeCoercionFunction: coerceScalarToString },
+      { typeCoercionFunction: this.coerceScalarToNumberOrError, defaultValue: 1 },
+    ], (text: string, length: number) => {
+      if (length < 0) {
+        return new CellError(ErrorType.VALUE)
+      } else if (length === 0) {
+        return ''
+      }
+      return text.slice(-length)
+    })
+  }
+
+  public left(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.coerceArgumentsWithDefaults(ast.args, formulaAddress, [
+      { typeCoercionFunction: coerceScalarToString },
+      { typeCoercionFunction: this.coerceScalarToNumberOrError, defaultValue: 1 },
+    ], (text: string, length: number) => {
+      if (length < 0) {
+        return new CellError(ErrorType.VALUE)
+      }
+      return text.slice(0, length)
+    })
+  }
+
+  public search(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.coerceArgumentsWithDefaults(ast.args, formulaAddress, [
+      { typeCoercionFunction: coerceScalarToString },
+      { typeCoercionFunction: coerceScalarToString },
+      { typeCoercionFunction: this.coerceScalarToNumberOrError, defaultValue: 1 },
+    ], (pattern, text: string, startIndex: number) => {
+      if (startIndex < 1 || startIndex > text.length) {
+        return new CellError(ErrorType.VALUE)
+      }
+
+      const normalizedText = text.substr(startIndex - 1).toLowerCase()
+
+      let index: number
+      if (this.interpreter.arithmeticHelper.requiresRegex(pattern)) {
+        index = this.interpreter.arithmeticHelper.searchString(pattern, normalizedText)
+      } else {
+        index = normalizedText.indexOf(pattern.toLowerCase())
+      }
+
+      index = index + startIndex
+      return index > 0 ? index : new CellError(ErrorType.VALUE)
+    })
+  }
+
+  public find(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.coerceArgumentsWithDefaults(ast.args, formulaAddress, [
+      { typeCoercionFunction: coerceScalarToString },
+      { typeCoercionFunction: coerceScalarToString },
+      { typeCoercionFunction: this.coerceScalarToNumberOrError, defaultValue: 1 },
+    ], (pattern, text: string, startIndex: number) => {
+      if (startIndex < 1 || startIndex > text.length) {
+        return new CellError(ErrorType.VALUE)
+      }
+
+      const shiftedText = text.substr(startIndex - 1)
+      const index = shiftedText.indexOf(pattern) + startIndex
+
+      return index > 0 ? index : new CellError(ErrorType.VALUE)
+    })
   }
 }
