@@ -6,6 +6,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- Operation `moveCells` creating cyclic dependencies does not cause losing original formula
+
+### Fixed
+- Fixed `moveCells` behaviour when moving part of a range
+- Fixed `moveCells`/`moveRows` inconsistent behaviour
+- Fixed undo of `moveCells`/`moveRows` operations
+
 ## [0.1.2] - 2020-07-13
 
 ### Fixed
