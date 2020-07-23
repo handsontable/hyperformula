@@ -273,9 +273,9 @@ export class BooleanPlugin extends FunctionPlugin {
       return vals[0]
     }
 
-    const selector = this.interpreter.arithmeticHelper.coerceToMaybeNumber(vals[0])
+    const selector = this.interpreter.arithmeticHelper.coerceScalarToNumberOrError(vals[0])
 
-    if (selector === undefined || selector != Math.round(selector) || selector < 1 || selector >= n) {
+    if (selector instanceof CellError || selector != Math.round(selector) || selector < 1 || selector >= n) {
       return new CellError(ErrorType.NUM)
     }
     return vals[selector]

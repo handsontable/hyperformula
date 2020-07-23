@@ -206,7 +206,10 @@ export abstract class FunctionPlugin {
     let i = 0
     //eslint-disable-next-line no-constant-condition
     while(true) {
-      const arg = scalarValues[i] ?? argumentDefinitions[j].defaultValue ?? new CellError(ErrorType.NA)
+      const arg = scalarValues[i] ?? argumentDefinitions[j].defaultValue
+      if(arg === undefined) {
+        return new CellError(ErrorType.NA)
+      }
       const coercedArg = this.coerceToType(arg, argumentDefinitions[j].argumentType as ArgumentTypes)
       if (coercedArg instanceof CellError) {
         return coercedArg
