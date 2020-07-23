@@ -44,7 +44,10 @@ export class BooleanPlugin extends FunctionPlugin {
       ],
     },
     'XOR': {
-      method: 'xor'
+      method: 'xor',
+      parameters: [
+        { argumentType: 'boolean' },
+      ],
     },
     'NOT': {
       method: 'not',
@@ -53,7 +56,12 @@ export class BooleanPlugin extends FunctionPlugin {
       ],
     },
     'SWITCH': {
-      method: 'switch'
+      method: 'switch',
+      parameters: [
+        { argumentType: 'noerror' },
+        { argumentType: 'scalar' },
+        { argumentType: 'scalar' },
+      ],
     },
     'IFERROR': {
       method: 'iferror',
@@ -70,7 +78,11 @@ export class BooleanPlugin extends FunctionPlugin {
       ],
     },
     'CHOOSE': {
-      method: 'choose'
+      method: 'choose',
+      parameters: [
+        { argumentType: 'number' },
+        { argumentType: 'scalar' },
+      ],
     },
   }
 
@@ -167,67 +179,36 @@ export class BooleanPlugin extends FunctionPlugin {
   }
 
   public xor(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    if (ast.args.length < 1) {
-      return new CellError(ErrorType.NA)
-    }
-    if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
-      return new CellError(ErrorType.NUM)
-    }
-
-    let truesCount = 0
-    let anyFalseValue = false
-    for (const scalarValue of this.iterateOverScalarValues(ast.args, formulaAddress)) {
-      const coercedValue = coerceScalarToBoolean(scalarValue)
-      if (coercedValue instanceof CellError) {
-        return coercedValue
-      } else if (coercedValue === true) {
-        truesCount++
-      } else if (coercedValue === false) {
-        anyFalseValue = true
+    return this.runFunctionWithRepeatedArg(ast.args, formulaAddress, BooleanPlugin.implementedFunctions.XOR.parameters, 1, (...args) => {
+      if(args.some((arg: Maybe<InternalScalarValue>) => arg!==undefined)) {
+        let cnt = 0
+        args.forEach((arg: Maybe<InternalScalarValue>) => {if(arg===true){cnt++}})
+        // @ts-ignore
+        return (cnt%2) === 1
+      } else {
+        return new CellError(ErrorType.VALUE)
       }
-    }
-    if (anyFalseValue || truesCount > 0) {
-      return (truesCount % 2 === 1)
-    } else {
-      return new CellError(ErrorType.VALUE)
-    }
+    })
   }
 
   public switch(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    if (ast.args.length < 3) {
-      return new CellError(ErrorType.NA)
-    }
-    if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
-      return new CellError(ErrorType.NUM)
-    }
-
-    const vals: InternalScalarValue[] = []
-    for (const arg of ast.args) {
-      const val: InterpreterValue = this.evaluateAst(arg, formulaAddress)
-      if (val instanceof SimpleRangeValue) {
-        return new CellError(ErrorType.VALUE)
+    return this.runFunctionWithRepeatedArgNoRanges(ast.args, formulaAddress, BooleanPlugin.implementedFunctions.SWITCH.parameters, 1, (selector, ...args) => {
+      const n = args.length
+      let i  = 0
+      for (; i + 1 < n; i += 2) {
+        if (args[i] instanceof CellError) {
+          continue
+        }
+        if (this.interpreter.arithmeticHelper.compare(selector, args[i] as InternalNoErrorCellValue) === 0) {
+          return args[i+1]
+        }
       }
-      vals.push(val)
-    }
-    const n = vals.length
-    if (vals[0] instanceof CellError) {
-      return vals[0]
-    }
-
-    let i = 1
-    for (; i + 1 < n; i += 2) {
-      if (vals[i] instanceof CellError) {
-        continue
+      if (i < n) {
+        return args[i]
+      } else {
+        return new CellError(ErrorType.NA)
       }
-      if (this.interpreter.arithmeticHelper.compare(vals[0], vals[i] as InternalNoErrorCellValue) === 0) {
-        return vals[i + 1]
-      }
-    }
-    if (i < n) {
-      return vals[i]
-    } else {
-      return new CellError(ErrorType.NA)
-    }
+    })
   }
 
   public iferror(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
@@ -251,33 +232,11 @@ export class BooleanPlugin extends FunctionPlugin {
   }
 
   public choose(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    if (ast.args.length < 2) {
-      return new CellError(ErrorType.NA)
-    }
-    if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
-      return new CellError(ErrorType.NUM)
-    }
-
-    const vals: InternalScalarValue[] = []
-    for (const arg of ast.args) {
-      const val: InterpreterValue = this.evaluateAst(arg, formulaAddress)
-      if (val instanceof SimpleRangeValue) {
-        return new CellError(ErrorType.VALUE)
+    return this.runFunctionWithRepeatedArgNoRanges(ast.args, formulaAddress, BooleanPlugin.implementedFunctions.CHOOSE.parameters, 1,(selector, ...args) => {
+      if(selector !== Math.round(selector) || selector<1 || selector > args.length) {
+        return new CellError(ErrorType.NUM)
       }
-      vals.push(val)
-    }
-
-    const n = vals.length
-
-    if (vals[0] instanceof CellError) {
-      return vals[0]
-    }
-
-    const selector = this.interpreter.arithmeticHelper.coerceScalarToNumberOrError(vals[0])
-
-    if (selector instanceof CellError || selector != Math.round(selector) || selector < 1 || selector >= n) {
-      return new CellError(ErrorType.NUM)
-    }
-    return vals[selector]
+      return args[selector-1]
+    })
   }
 }

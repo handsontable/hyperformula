@@ -31,7 +31,7 @@ export interface FunctionPluginDefinition {
   implementedFunctions: ImplementedFunctions,
 }
 
-export type ArgumentTypes = 'string' | 'number' | 'boolean' | 'scalar'
+export type ArgumentTypes = 'string' | 'number' | 'boolean' | 'scalar' | 'noerror'
 
 export interface FunctionArgumentDefinition {
   argumentType: string,
@@ -159,6 +159,8 @@ export abstract class FunctionPlugin {
         return coerceScalarToBoolean(arg)
       case 'scalar':
         return arg
+      case 'noerror':
+        return arg
     }
   }
 
@@ -211,13 +213,50 @@ export abstract class FunctionPlugin {
         return new CellError(ErrorType.NA)
       }
       const coercedArg = this.coerceToType(arg, argumentDefinitions[j].argumentType as ArgumentTypes)
-      if (coercedArg instanceof CellError) {
+      if (coercedArg instanceof CellError && argumentDefinitions[j].argumentType !== 'scalar') {
         return coercedArg
       }
       coercedArguments.push(coercedArg)
       j++
       i++
       if(i >= scalarValues.length && j === argumentDefinitions.length) {
+        break
+      }
+      if(j===argumentDefinitions.length) {
+        j -= repeatedArgs
+      }
+    }
+
+    return fn(...coercedArguments)
+  }
+
+  protected runFunctionWithRepeatedArgNoRanges = (
+    args: Ast[],
+    formulaAddress: SimpleCellAddress,
+    argumentDefinitions: FunctionArgumentDefinition[],
+    repeatedArgs: number,
+    fn: (...arg: any) => InternalScalarValue
+  ) => {
+    const coercedArguments: Maybe<InternalScalarValue>[] = []
+    let j = 0
+    let i = 0
+    //eslint-disable-next-line no-constant-condition
+    while(true) {
+      if(args[i] === undefined && argumentDefinitions[j].defaultValue === undefined) {
+        return new CellError(ErrorType.NA)
+      }
+      const arg = this.evaluateArgOrDefault(formulaAddress, args[i], argumentDefinitions[j].defaultValue)
+      if (arg instanceof SimpleRangeValue) {
+        return new CellError(ErrorType.VALUE)
+      }
+      const coercedArg = this.coerceToType(arg, argumentDefinitions[j].argumentType as ArgumentTypes)
+      if (coercedArg instanceof CellError && argumentDefinitions[j].argumentType !== 'scalar') {
+        return coercedArg
+      }
+      coercedArguments.push(coercedArg)
+      j++
+      i++
+      if(i >= args.length && j === argumentDefinitions.length) {
         break
       }
       if(j===argumentDefinitions.length) {
