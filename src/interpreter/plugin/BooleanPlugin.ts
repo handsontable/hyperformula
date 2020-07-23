@@ -5,9 +5,8 @@
 
 import {CellError, ErrorType, InternalNoErrorCellValue, InternalScalarValue, SimpleCellAddress} from '../../Cell'
 import {Maybe} from '../../Maybe'
-import {AstNodeType, ProcedureAst} from '../../parser'
-import {coerceScalarToBoolean} from '../ArithmeticHelper'
-import {InterpreterValue, SimpleRangeValue} from '../InterpreterValue'
+import {ProcedureAst} from '../../parser'
+import {InterpreterValue} from '../InterpreterValue'
 import {FunctionPlugin} from './FunctionPlugin'
 
 /**
