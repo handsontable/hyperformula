@@ -234,7 +234,7 @@ export class BooleanPlugin extends FunctionPlugin {
   }
 
   public choose(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunctionWithRepeatedArgNoRanges(ast.args, formulaAddress, BooleanPlugin.implementedFunctions.CHOOSE.parameters, 1,(selector, ...args) => {
+    return this.runFunctionWithRepeatedArgNoRanges(ast.args, formulaAddress, BooleanPlugin.implementedFunctions.CHOOSE.parameters, 1, (selector, ...args) => {
       if(selector !== Math.round(selector) || selector<1 || selector > args.length) {
         return new CellError(ErrorType.NUM)
       }

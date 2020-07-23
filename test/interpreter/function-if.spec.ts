@@ -53,7 +53,7 @@ describe('Function IF', () => {
   it('passes correct value when other arg is an error', () => {
     const engine = HyperFormula.buildFromArray([['=IF(FALSE(), 4/0, "no")']])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual("no")
+    expect(engine.getCellValue(adr('A1'))).toEqual('no')
   })
 
   it('when condition is number', () => {
