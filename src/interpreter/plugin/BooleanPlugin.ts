@@ -182,8 +182,11 @@ export class BooleanPlugin extends FunctionPlugin {
     return this.runFunctionWithRepeatedArg(ast.args, formulaAddress, BooleanPlugin.implementedFunctions.XOR.parameters, 1, (...args) => {
       if(args.some((arg: Maybe<InternalScalarValue>) => arg!==undefined)) {
         let cnt = 0
-        args.forEach((arg: Maybe<InternalScalarValue>) => {if(arg===true){cnt++}})
-        // @ts-ignore
+        args.forEach((arg: Maybe<InternalScalarValue>) => {
+          if( arg===true ) {
+            cnt++
+          }
+        })
         return (cnt%2) === 1
       } else {
         return new CellError(ErrorType.VALUE)
