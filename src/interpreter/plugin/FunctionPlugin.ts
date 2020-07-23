@@ -31,7 +31,7 @@ export interface FunctionPluginDefinition {
   implementedFunctions: ImplementedFunctions,
 }
 
-export type ArgumentTypes = 'string' | 'number' | 'boolean' | 'scalar' | 'noerror'
+export type ArgumentTypes = 'string' | 'number' | 'boolean' | 'scalar' | 'noerror' | 'range'
 
 export interface FunctionArgumentDefinition {
   argumentType: string,
@@ -149,18 +149,28 @@ export abstract class FunctionPlugin {
 
   public coerceScalarToNumberOrError = (arg: InternalScalarValue): number | CellError => this.interpreter.arithmeticHelper.coerceScalarToNumberOrError(arg)
 
-  public coerceToType(arg: InternalScalarValue, coercedType: ArgumentTypes): Maybe<InternalScalarValue> {
-    switch(coercedType) {
-      case 'number':
-        return this.coerceScalarToNumberOrError(arg)
-      case 'string':
-        return coerceScalarToString(arg)
-      case 'boolean':
-        return coerceScalarToBoolean(arg)
-      case 'scalar':
+  public coerceToType(arg: InterpreterValue, coercedType: ArgumentTypes): Maybe<InterpreterValue> {
+    if(arg instanceof SimpleRangeValue) {
+      if(coercedType === 'range') {
         return arg
-      case 'noerror':
-        return arg
+      } else {
+        return new CellError(ErrorType.VALUE)
+      }
+    } else {
+      switch (coercedType) {
+        case 'number':
+          return this.coerceScalarToNumberOrError(arg)
+        case 'string':
+          return coerceScalarToString(arg)
+        case 'boolean':
+          return coerceScalarToBoolean(arg)
+        case 'scalar':
+          return arg
+        case 'noerror':
+          return arg
+        case 'range':
+          return new CellError(ErrorType.VALUE)
+      }
     }
   }
 
@@ -174,16 +184,13 @@ export abstract class FunctionPlugin {
       return new CellError(ErrorType.NA)
     }
 
-    const coercedArguments: Maybe<InternalScalarValue>[] = []
+    const coercedArguments: Maybe<InterpreterValue>[] = []
 
     for (let i = 0; i < argumentDefinitions.length; ++i) {
       if(args[i] === undefined && argumentDefinitions[i].defaultValue === undefined) {
         return new CellError(ErrorType.NA)
       }
       const arg = this.evaluateArgOrDefault(formulaAddress, args[i], argumentDefinitions[i].defaultValue)
-      if (arg instanceof SimpleRangeValue) {
-        return new CellError(ErrorType.VALUE)
-      }
       const coercedArg = this.coerceToType(arg, argumentDefinitions[i].argumentType as ArgumentTypes)
       if (coercedArg instanceof CellError && argumentDefinitions[i].argumentType !== 'scalar') {
         return coercedArg
@@ -202,7 +209,7 @@ export abstract class FunctionPlugin {
     fn: (...arg: any) => InternalScalarValue
   ) => {
     const scalarValues: InternalScalarValue[] = [...this.iterateOverScalarValues(args, formulaAddress)]
-    const coercedArguments: Maybe<InternalScalarValue>[] = []
+    const coercedArguments: Maybe<InterpreterValue>[] = []
 
     let j = 0
     let i = 0
@@ -237,7 +244,7 @@ export abstract class FunctionPlugin {
     repeatedArgs: number,
     fn: (...arg: any) => InternalScalarValue
   ) => {
-    const coercedArguments: Maybe<InternalScalarValue>[] = []
+    const coercedArguments: Maybe<InterpreterValue>[] = []
     let j = 0
     let i = 0
     //eslint-disable-next-line no-constant-condition
@@ -246,9 +253,6 @@ export abstract class FunctionPlugin {
         return new CellError(ErrorType.NA)
       }
       const arg = this.evaluateArgOrDefault(formulaAddress, args[i], argumentDefinitions[j].defaultValue)
-      if (arg instanceof SimpleRangeValue) {
-        return new CellError(ErrorType.VALUE)
-      }
       const coercedArg = this.coerceToType(arg, argumentDefinitions[j].argumentType as ArgumentTypes)
       if (coercedArg instanceof CellError && argumentDefinitions[j].argumentType !== 'scalar') {
         return coercedArg
