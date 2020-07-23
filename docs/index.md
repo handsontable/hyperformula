@@ -22,7 +22,7 @@ HyperFormula is an open-source calculation engine that allows you
 to perform Excel-like calculations in your business applications.
 HyperFormula is written in TypeScript and works with major
 JavaScript frameworks like [Vue](/guide/integration-with-vue.md),
-[React](/guide/integration-with-react.md), and Angular. You can use it in a
+[React](/guide/integration-with-react.md), and [Angular](/guide/integration-with-angular.md). You can use it in a
 browser or as a service with Node.js as your back-end technology.
 
 It comes with a built-in [library of functions](/guide/built-in-functions.md)
