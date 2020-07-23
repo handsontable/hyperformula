@@ -7,9 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
-- 9 text functions LEN, TRIM, PROPER, CLEAN, REPT, RIGHT, LEFT, SEARCH, FIND.
-- helper methods for keeping track of cell/range dependencies: getCellPrecedents and getCellDependents. (#441)
-- 4 financial functions FV, PMT, PPMT, IPMT.
+- Added 9 text functions LEN, TRIM, PROPER, CLEAN, REPT, RIGHT, LEFT, SEARCH, FIND. (#221)
+- Added helper methods for keeping track of cell/range dependencies: getCellPrecedents and getCellDependents. (#441)
+- Added 4 financial functions FV, PMT, PPMT, IPMT.
 
 ### Fixed
 - Fixed hardcoding of languages in i18n tests. (#471)
