@@ -16,21 +16,39 @@ export class InformationPlugin extends FunctionPlugin {
   public static implementedFunctions = {
     'ISERROR': {
       method: 'iserror',
+      parameters: [
+        { argumentType: 'scalar'}
+      ]
     },
     'ISBLANK': {
       method: 'isblank',
+      parameters: [
+        { argumentType: 'scalar'}
+      ]
     },
     'ISNUMBER': {
       method: 'isnumber',
+      parameters: [
+        { argumentType: 'scalar'}
+      ]
     },
     'ISLOGICAL': {
       method: 'islogical',
+      parameters: [
+        { argumentType: 'scalar'}
+      ]
     },
     'ISTEXT': {
       method: 'istext',
+      parameters: [
+        { argumentType: 'scalar'}
+      ]
     },
     'ISNONTEXT': {
       method: 'isnontext',
+      parameters: [
+        { argumentType: 'scalar'}
+      ]
     },
     'COLUMNS': {
       method: 'columns',
@@ -56,18 +74,9 @@ export class InformationPlugin extends FunctionPlugin {
    * @param formulaAddress
    */
   public iserror(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    if (ast.args.length != 1) {
-      return new CellError(ErrorType.NA)
-    }
-    if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
-      return new CellError(ErrorType.NUM)
-    }
-    const arg = this.evaluateAst(ast.args[0], formulaAddress)
-    if (arg instanceof SimpleRangeValue) {
-      return new CellError(ErrorType.VALUE)
-    }
-    return (arg instanceof CellError)
-
+    return this.runFunctionWithDefaults(ast.args, formulaAddress, InformationPlugin.implementedFunctions.ISERROR.parameters, (arg: InternalScalarValue) =>
+      (arg instanceof CellError)
+    )
   }
 
   /**
@@ -79,18 +88,9 @@ export class InformationPlugin extends FunctionPlugin {
    * @param formulaAddress
    */
   public isblank(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    if (ast.args.length != 1) {
-      return new CellError(ErrorType.NA)
-    }
-    if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
-      return new CellError(ErrorType.NUM)
-    }
-    const arg = ast.args[0]
-    const value = this.evaluateAst(arg, formulaAddress)
-    if (value instanceof SimpleRangeValue) {
-      return new CellError(ErrorType.VALUE)
-    }
-    return (value === EmptyValue)
+    return this.runFunctionWithDefaults(ast.args, formulaAddress, InformationPlugin.implementedFunctions.ISBLANK.parameters, (arg: InternalScalarValue) =>
+      (arg === EmptyValue)
+    )
   }
 
   /**
@@ -102,18 +102,9 @@ export class InformationPlugin extends FunctionPlugin {
    * @param formulaAddress
    */
   public isnumber(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    if (ast.args.length != 1) {
-      return new CellError(ErrorType.NA)
-    }
-    if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
-      return new CellError(ErrorType.NUM)
-    }
-    const arg = ast.args[0]
-    const value = this.evaluateAst(arg, formulaAddress)
-    if (value instanceof SimpleRangeValue) {
-      return new CellError(ErrorType.VALUE)
-    }
-    return (typeof value === 'number')
+    return this.runFunctionWithDefaults(ast.args, formulaAddress, InformationPlugin.implementedFunctions.ISNUMBER.parameters, (arg: InternalScalarValue) =>
+      (typeof arg === 'number')
+    )
   }
 
   /**
@@ -125,18 +116,9 @@ export class InformationPlugin extends FunctionPlugin {
    * @param formulaAddress
    */
   public islogical(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    if (ast.args.length != 1) {
-      return new CellError(ErrorType.NA)
-    }
-    if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
-      return new CellError(ErrorType.NUM)
-    }
-    const arg = ast.args[0]
-    const value = this.evaluateAst(arg, formulaAddress)
-    if (value instanceof SimpleRangeValue) {
-      return new CellError(ErrorType.VALUE)
-    }
-    return (typeof value === 'boolean')
+    return this.runFunctionWithDefaults(ast.args, formulaAddress, InformationPlugin.implementedFunctions.ISLOGICAL.parameters, (arg: InternalScalarValue) =>
+      (typeof arg === 'boolean')
+    )
   }
 
   /**
@@ -148,18 +130,9 @@ export class InformationPlugin extends FunctionPlugin {
    * @param formulaAddress
    */
   public istext(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    if (ast.args.length != 1) {
-      return new CellError(ErrorType.NA)
-    }
-    if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
-      return new CellError(ErrorType.NUM)
-    }
-    const arg = ast.args[0]
-    const value = this.evaluateAst(arg, formulaAddress)
-    if (value instanceof SimpleRangeValue) {
-      return new CellError(ErrorType.VALUE)
-    }
-    return (typeof value === 'string')
+    return this.runFunctionWithDefaults(ast.args, formulaAddress, InformationPlugin.implementedFunctions.ISTEXT.parameters, (arg: InternalScalarValue) =>
+      (typeof arg === 'string')
+    )
   }
 
   /**
@@ -171,18 +144,9 @@ export class InformationPlugin extends FunctionPlugin {
    * @param formulaAddress
    */
   public isnontext(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    if (ast.args.length != 1) {
-      return new CellError(ErrorType.NA)
-    }
-    if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
-      return new CellError(ErrorType.NUM)
-    }
-    const arg = ast.args[0]
-    const value = this.evaluateAst(arg, formulaAddress)
-    if (value instanceof SimpleRangeValue) {
-      return new CellError(ErrorType.VALUE)
-    }
-    return (typeof value !== 'string')
+    return this.runFunctionWithDefaults(ast.args, formulaAddress, InformationPlugin.implementedFunctions.ISNONTEXT.parameters, (arg: InternalScalarValue) =>
+      (typeof arg !== 'string')
+    )
   }
 
   /**
