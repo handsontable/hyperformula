@@ -15,6 +15,9 @@ export class MedianPlugin extends FunctionPlugin {
   public static implementedFunctions = {
     'MEDIAN': {
       method: 'median',
+      parameters: [
+        { argumentType: 'noerror' },
+      ],
     },
   }
 
@@ -27,32 +30,17 @@ export class MedianPlugin extends FunctionPlugin {
    * @param formulaAddress
    */
   public median(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    if (ast.args.length === 0) {
-      return new CellError(ErrorType.NA)
-    }
-    if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
-      return new CellError(ErrorType.NUM)
-    }
-
-    const values: number[] = []
-    for (const scalarValue of this.iterateOverScalarValues(ast.args, formulaAddress)) {
-      if (scalarValue instanceof CellError) {
-        return scalarValue
-      } else if (typeof scalarValue === 'number') {
-        values.push(scalarValue)
+    return this.runFunctionWithRepeatedArg(ast.args, formulaAddress, MedianPlugin.implementedFunctions.MEDIAN.parameters, 1, (...args) => {
+      const values: number[] = args.filter((val: InternalScalarValue) => (typeof val === 'number'))
+      if (values.length === 0) {
+        return new CellError(ErrorType.NUM)
       }
-    }
-
-    if (values.length === 0) {
-      return new CellError(ErrorType.NUM)
-    }
-
-    values.sort((a, b) => (a - b))
-
-    if (values.length % 2 === 0) {
-      return (values[(values.length / 2) - 1] + values[values.length / 2]) / 2
-    } else {
-      return values[Math.floor(values.length / 2)]
-    }
+      values.sort((a, b) => (a - b))
+      if (values.length % 2 === 0) {
+        return (values[(values.length / 2) - 1] + values[values.length / 2]) / 2
+      } else {
+        return values[Math.floor(values.length / 2)]
+      }
+    })
   }
 }
