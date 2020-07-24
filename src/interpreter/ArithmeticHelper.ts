@@ -44,40 +44,46 @@ export class ArithmeticHelper {
     }
   }
 
+  public searchString(pattern: string, text: string): number {
+    const regexp = this.buildRegex(pattern, false)
+    const result = regexp.exec(text)
+    return result?.index ?? -1
+  }
+
   public requiresRegex(pattern: string): boolean {
-    if(!this.config.useRegularExpresssions && !this.config.useWildcards) {
+    if(!this.config.useRegularExpressions && !this.config.useWildcards) {
       return !this.config.matchWholeCell
     }
     for(let i=0;i<pattern.length;i++) {
       const c = pattern.charAt(i)
-      if(isWildcard(c) || (this.config.useRegularExpresssions && needsEscape(c))) {
+      if(isWildcard(c) || (this.config.useRegularExpressions && needsEscape(c))) {
         return true
       }
     }
     return false
   }
 
-  private buildRegex(pattern: string): RegExp {
+  private buildRegex(pattern: string, matchWholeCell: boolean = true): RegExp {
     pattern = this.normalizeString(pattern)
     let regexpStr
     let useWildcards = this.config.useWildcards
-    let useRegularExpresssions = this.config.useRegularExpresssions
-    if(useRegularExpresssions) {
+    let useRegularExpressions = this.config.useRegularExpressions
+    if(useRegularExpressions) {
       try {
         RegExp(pattern)
       } catch (e) {
-        useRegularExpresssions = false
+        useRegularExpressions = false
         useWildcards = false
       }
     }
-    if(useRegularExpresssions) {
+    if(useRegularExpressions) {
       regexpStr = escapeNoCharacters(pattern, this.config.caseSensitive)
     } else if(useWildcards) {
       regexpStr = escapeNonWildcards(pattern, this.config.caseSensitive)
     } else {
       regexpStr = escapeAllCharacters(pattern, this.config.caseSensitive)
     }
-    if(this.config.matchWholeCell) {
+    if(this.config.matchWholeCell && matchWholeCell) {
       return RegExp('^('+ regexpStr + ')$')
     } else {
       return RegExp(regexpStr)
@@ -297,6 +303,8 @@ export function coerceScalarToBoolean(arg: InternalScalarValue): boolean | CellE
     if (argUppered === 'TRUE') {
       return true
     } else if (argUppered === 'FALSE') {
+      return false
+    } else if (argUppered === '') {
       return false
     } else {
       return null

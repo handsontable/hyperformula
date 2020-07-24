@@ -80,9 +80,9 @@ module.exports.create = function create() {
     externals: {
       ['../..']: {
         root: 'HyperFormula',
-        commonjs2: '../..',
-        commonjs: '../..',
-        amd: '../..',
+        commonjs2: 'hyperformula',
+        commonjs: 'hyperformula',
+        amd: 'hyperformula',
       },
     },
     module: {

@@ -1,7 +1,7 @@
 # Dependencies
 
 HyperFormula depends on a few external libraries, as listed below.
-hese dependencies are used to support some of the library's core
+These dependencies are used to support some of the library's core
 features.
 
 | Name | License | Author |
@@ -10,6 +10,7 @@ features.
 | [GPU.js](https://github.com/gpujs/gpu.js/) | The MIT License | gpu.js Team |
 | [core-js](https://github.com/zloirock/core-js) | The MIT License | Denis Pushkarev |
 | [tiny-emitter](https://github.com/scottcorgan/tiny-emitter) | The MIT License | Scott Corgan |
+| [regenerator-runtime](https://github.com/facebook/regenerator/tree/master/packages/regenerator-runtime) | The MIT License | Facebook, Inc. |
 
 <br>
 

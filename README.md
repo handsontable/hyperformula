@@ -4,6 +4,12 @@
 
 ### HyperFormula is an open source, spreadsheet-like calculation engine ⚡
 
+[![GitHub Workflow Status](https://img.shields.io/github/workflow/status/handsontable/hyperformula/Test)](https://github.com/handsontable/hyperformula/actions?query=workflow%3ATest+branch%3Amaster)
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fhandsontable%2Fhyperformula.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fhandsontable%2Fhyperformula?ref=badge_shield)
+[![Known Vulnerabilities](https://snyk.io/test/github/handsontable/hyperformula/badge.svg?targetFile=package.json)](https://snyk.io/test/github/handsontable/hyperformula?targetFile=package.json)
+[![GitHub contributors](https://img.shields.io/github/contributors/handsontable/hyperformula)](https://github.com/handsontable/hyperformula/graphs/contributors)
+
+
 ## Description
 
 HyperFormula allows you to perform spreadsheet-like calculations in your
@@ -30,8 +36,8 @@ and [custom functions](https://handsontable.github.io/hyperformula/guide/custom-
   - [JavaScript](https://handsontable.github.io/hyperformula/guide/demo.html)
   - [React](https://handsontable.github.io/hyperformula/guide/integration-with-react.html)
   - [Vue.js](https://handsontable.github.io/hyperformula/guide/integration-with-vue.html)
-  - Angular (coming soon)
-- [Installation](https://handsontable.github.io/hyperformula/guide/client-side.html)
+  - [Angular.js](https://handsontable.github.io/hyperformula/guide/integration-with-angular.html)
+- [Installation](https://handsontable.github.io/hyperformula/guide/client-side-installation.html)
 - [Basic usage](https://handsontable.github.io/hyperformula/guide/basic-usage.html)
 - [API Reference](https://handsontable.github.io/hyperformula/api/)
 - [Configuration options](https://handsontable.github.io/hyperformula/guide/configuration-options.html)
@@ -55,11 +61,10 @@ import { HyperFormula } from 'hyperformula';
 // define the options
 const options = {
   licenseKey: 'agpl-v3',
-  precisionRounding: 10
 };
 
 // define the data
-const data = [['10', '20', '30' '=SUM(A1:C1)']];
+const data = [['10', '20', '30', '=SUM(A1:C1)']];
 
 // build an instance with defined options and data 
 const hfInstance = HyperFormula.buildFromArray(data, options);
@@ -91,8 +96,8 @@ applications. Here are some examples:
 
 ## Contributing
 
-Help us to build the fastest and most flexible calculation engine for
-business web apps. Please read the [Contributing Guide]() before
+Help us build the fastest and most flexible calculation engine for
+business web apps. Please read the [Contributing Guide](https://handsontable.github.io/hyperformula/guide/contributing.html) before
 making a pull request.
 
 Your help is much appreciated in any of the following topics:

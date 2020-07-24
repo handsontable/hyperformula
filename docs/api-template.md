@@ -36,7 +36,7 @@ const options = {
 ```
 
 #### Event Types
-In this section you can find information about all events you can subscribe to.
+In this section, you can find information about all events you can subscribe to.
 
 For example, subscribing to `sheetAdded` event:
 

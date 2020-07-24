@@ -15,10 +15,10 @@ import {buildTranslationPackage, RawTranslationPackage, TranslationPackage} from
 import {normalizeAddedIndexes, normalizeRemovedIndexes} from './Operations'
 import {
   AddressMapping,
-  DependencyGraph,
+  DependencyGraph, FormulaCellVertex,
   Graph,
-  MatrixMapping,
-  RangeMapping,
+  MatrixMapping, MatrixVertex,
+  RangeMapping, RangeVertex,
   SheetMapping,
   Vertex,
 } from './DependencyGraph'
@@ -34,7 +34,7 @@ import {Maybe} from './Maybe'
 import {NamedExpression, NamedExpressionOptions, NamedExpressions} from './NamedExpressions'
 import {
   Ast,
-  AstNodeType,
+  AstNodeType, NamedExpressionDependency,
   ParserWithCaching,
   RelativeDependency,
   simpleCellAddressFromString,
@@ -55,7 +55,7 @@ import {FunctionRegistry, FunctionTranslationsPackage} from './interpreter/Funct
  * ale related to this class.
  *
  * The instance can be created only by calling one of the static methods
- * `buildFromArray`, `buildFromSheets` or `buildEmpty` and should be disposed of with
+ * `buildFromArray`, `buildFromSheets` or `buildEmpty` and should be disposed of with the
  * `destroy` method when it's no longer needed to free the resources.
  *
  * The instance can be seen as a workbook where worksheets can be created and
@@ -93,7 +93,7 @@ export class HyperFormula implements TypedEmitter {
   /**
    * Contains all available languages to use in registerLanguage.
    * 
-   * @category Static Properies
+   * @category Static Properties
    */
   public static languages: Record<string, RawTranslationPackage> = {}
 
@@ -2192,6 +2192,68 @@ export class HyperFormula implements TypedEmitter {
   }
 
   /**
+   * Returns all addresses and ranges whose computation depends on input address or range provided.
+   *
+   * @param {SimpleCellAddress | AbsoluteCellRange} address - object representation of an absolute address or range of addresses
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromArray( [ ['1', '=A1', '=A1+B1'] ] );
+   *
+   * hfInstance.getCellDependents({ sheet: 0, col: 0, row: 0});
+   * // should return [{ sheet: 0, col: 1, row: 0}, { sheet: 0, col: 2, row: 0}]
+   * ```
+   *
+   * @category Helpers
+   */
+  public getCellDependents(address: SimpleCellAddress | AbsoluteCellRange): (AbsoluteCellRange | SimpleCellAddress)[] {
+    let vertex
+    if(address instanceof AbsoluteCellRange) {
+      vertex = this._dependencyGraph.rangeMapping.getRange(address.start, address.end)
+      if(vertex===undefined) {
+        return []
+      }
+    } else {
+      vertex = this._dependencyGraph.addressMapping.getCell(address)
+      if(vertex===null) {
+        return []
+      }
+    }
+    return this._dependencyGraph.getAdjacentNodesAddresses(vertex)
+  }
+
+  /**
+   * Returns all addresses and ranges necessary for computation of a given address or range.
+   *
+   * @param {SimpleCellAddress | AbsoluteCellRange} address - object representation of an absolute address or range of addresses
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromArray( [ ['1', '=A1', '=A1+B1'] ] );
+   *
+   * hfInstance.getCellPrecedents({ sheet: 0, col: 2, row: 0});
+   * // should return [{ sheet: 0, col: 0, row: 0}, { sheet: 0, col: 1, row: 0}]
+   * ```
+   *
+   * @category Helpers
+   */
+  public getCellPrecedents(address: SimpleCellAddress | AbsoluteCellRange): (AbsoluteCellRange | SimpleCellAddress)[] {
+    let vertex
+    if(address instanceof AbsoluteCellRange) {
+      vertex = this._dependencyGraph.rangeMapping.getRange(address.start, address.end)
+      if(vertex===undefined) {
+        return []
+      }
+    } else {
+      vertex = this._dependencyGraph.addressMapping.getCell(address)
+      if(vertex===null) {
+        return []
+      }
+    }
+    return this._dependencyGraph.dependencyQueryAddresses(vertex) ?? []
+  }
+
+  /**
    * Returns a unique sheet name assigned to the sheet of a given ID or `undefined` if the there is no sheet with a given ID.
    *
    * @param {number} sheetId - ID of the sheet, for which we want to retrieve name
@@ -3050,7 +3112,7 @@ export class HyperFormula implements TypedEmitter {
    * });
    *
    * // returns the value of calculated formula, '32' for this example
-   * const calculatedFormula = hfInstance.calculateFormula('=A1+10', 'Sheet1'));
+   * const calculatedFormula = hfInstance.calculateFormula('=A1+10', 'Sheet1');
    * ```
    *
    * @category Helpers
@@ -3168,7 +3230,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * ```
    *
-   * @category Helper
+   * @category Helpers
    */
   public numberToDateTime(val: number): DateTime {
     return this._evaluator.dateHelper.numberToSimpleDateTime(val)
@@ -3189,7 +3251,7 @@ export class HyperFormula implements TypedEmitter {
    * const dateFromNumber = hfInstance.numberToDate(43845);
    * ```
    *
-   * @category Helper
+   * @category Helpers
    */
   public numberToDate(val: number): DateTime {
     return this._evaluator.dateHelper.numberToSimpleDate(val)
@@ -3209,7 +3271,7 @@ export class HyperFormula implements TypedEmitter {
    * const timeFromNumber = hfInstance.numberToTime(1.1);
    * ```
    *
-   * @category Helper
+   * @category Helpers
    */
   public numberToTime(val: number): DateTime {
     return this._evaluator.dateHelper.numberToSimpleTime(val)
