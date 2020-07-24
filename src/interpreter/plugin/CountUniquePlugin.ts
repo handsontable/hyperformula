@@ -29,7 +29,7 @@ export class CountUniquePlugin extends FunctionPlugin {
    * @param formulaAddress
    */
   public countunique(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunctionWithRepeatedArg(ast.args, formulaAddress, CountUniquePlugin.implementedFunctions.COUNTUNIQUE.parameters, 1, (...args: InternalScalarValue[]) => {
+    return this.runFunctionWithRepeatedArg(ast.args, formulaAddress, CountUniquePlugin.implementedFunctions.COUNTUNIQUE.parameters, (...args: InternalScalarValue[]) => {
       const valuesSet = new Set<number | string | boolean | EmptyValueType>()
       const errorsSet = new Set<ErrorType>()
 

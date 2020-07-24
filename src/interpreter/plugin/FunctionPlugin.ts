@@ -208,7 +208,6 @@ export abstract class FunctionPlugin {
     args: Ast[],
     formulaAddress: SimpleCellAddress,
     argumentDefinitions: FunctionArgumentDefinition[],
-    repeatedArgs: number,
     fn: (...arg: any) => InternalScalarValue
   ) => {
     const scalarValues: InternalScalarValue[] = [...this.iterateOverScalarValues(args, formulaAddress)]
@@ -232,11 +231,11 @@ export abstract class FunctionPlugin {
       coercedArguments.push(coercedArg)
       j++
       i++
-      if(i >= scalarValues.length && j === argumentDefinitions.length) {
-        break
-      }
       if(j===argumentDefinitions.length) {
-        j -= repeatedArgs
+        if (i >= scalarValues.length) {
+          break
+        }
+        j--
       }
     }
 
@@ -247,7 +246,6 @@ export abstract class FunctionPlugin {
     args: Ast[],
     formulaAddress: SimpleCellAddress,
     argumentDefinitions: FunctionArgumentDefinition[],
-    repeatedArgs: number,
     fn: (...arg: any) => InternalScalarValue
   ) => {
     const coercedArguments: Maybe<InterpreterValue>[] = []
@@ -269,11 +267,11 @@ export abstract class FunctionPlugin {
       coercedArguments.push(coercedArg)
       j++
       i++
-      if(i >= args.length && j === argumentDefinitions.length) {
-        break
-      }
       if(j===argumentDefinitions.length) {
-        j -= repeatedArgs
+        if (i >= args.length) {
+          break
+        }
+        j--
       }
     }
 

@@ -136,7 +136,7 @@ export class BooleanPlugin extends FunctionPlugin {
    * @param formulaAddress
    */
   public and(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunctionWithRepeatedArg(ast.args, formulaAddress, BooleanPlugin.implementedFunctions.AND.parameters, 1, (...args) => {
+    return this.runFunctionWithRepeatedArg(ast.args, formulaAddress, BooleanPlugin.implementedFunctions.AND.parameters, (...args) => {
       if(args.some((arg: Maybe<InternalScalarValue>) => arg===false)) {
         return false
       } else if(args.some((arg: Maybe<InternalScalarValue>) => arg!==undefined)) {
@@ -156,7 +156,7 @@ export class BooleanPlugin extends FunctionPlugin {
    * @param formulaAddress
    */
   public or(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunctionWithRepeatedArg(ast.args, formulaAddress, BooleanPlugin.implementedFunctions.OR.parameters, 1, (...args) => {
+    return this.runFunctionWithRepeatedArg(ast.args, formulaAddress, BooleanPlugin.implementedFunctions.OR.parameters, (...args) => {
       if(args.some((arg: Maybe<InternalScalarValue>) => arg===true)) {
         return true
       } else if(args.some((arg: Maybe<InternalScalarValue>) => arg!==undefined)) {
@@ -178,7 +178,7 @@ export class BooleanPlugin extends FunctionPlugin {
   }
 
   public xor(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunctionWithRepeatedArg(ast.args, formulaAddress, BooleanPlugin.implementedFunctions.XOR.parameters, 1, (...args) => {
+    return this.runFunctionWithRepeatedArg(ast.args, formulaAddress, BooleanPlugin.implementedFunctions.XOR.parameters, (...args) => {
       if(args.some((arg: Maybe<InternalScalarValue>) => arg!==undefined)) {
         let cnt = 0
         args.forEach((arg: Maybe<InternalScalarValue>) => {
@@ -194,7 +194,7 @@ export class BooleanPlugin extends FunctionPlugin {
   }
 
   public switch(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunctionWithRepeatedArgNoRanges(ast.args, formulaAddress, BooleanPlugin.implementedFunctions.SWITCH.parameters, 1, (selector, ...args) => {
+    return this.runFunctionWithRepeatedArgNoRanges(ast.args, formulaAddress, BooleanPlugin.implementedFunctions.SWITCH.parameters, (selector, ...args) => {
       const n = args.length
       let i  = 0
       for (; i + 1 < n; i += 2) {
@@ -234,7 +234,7 @@ export class BooleanPlugin extends FunctionPlugin {
   }
 
   public choose(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunctionWithRepeatedArgNoRanges(ast.args, formulaAddress, BooleanPlugin.implementedFunctions.CHOOSE.parameters, 1, (selector, ...args) => {
+    return this.runFunctionWithRepeatedArgNoRanges(ast.args, formulaAddress, BooleanPlugin.implementedFunctions.CHOOSE.parameters, (selector, ...args) => {
       if(selector !== Math.round(selector) || selector<1 || selector > args.length) {
         return new CellError(ErrorType.NUM)
       }

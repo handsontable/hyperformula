@@ -86,7 +86,7 @@ export class TextPlugin extends FunctionPlugin {
    * @param formulaAddress
    */
   public concatenate(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunctionWithRepeatedArg(ast.args, formulaAddress, TextPlugin.implementedFunctions.CONCATENATE.parameters, 1, (...args) => {
+    return this.runFunctionWithRepeatedArg(ast.args, formulaAddress, TextPlugin.implementedFunctions.CONCATENATE.parameters, (...args) => {
       return ''.concat(...args)
     })
   }

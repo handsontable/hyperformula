@@ -30,7 +30,7 @@ export class MedianPlugin extends FunctionPlugin {
    * @param formulaAddress
    */
   public median(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunctionWithRepeatedArg(ast.args, formulaAddress, MedianPlugin.implementedFunctions.MEDIAN.parameters, 1, (...args) => {
+    return this.runFunctionWithRepeatedArg(ast.args, formulaAddress, MedianPlugin.implementedFunctions.MEDIAN.parameters, (...args) => {
       const values: number[] = args.filter((val: InternalScalarValue) => (typeof val === 'number'))
       if (values.length === 0) {
         return new CellError(ErrorType.NUM)
