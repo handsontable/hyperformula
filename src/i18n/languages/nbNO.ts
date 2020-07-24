@@ -82,6 +82,7 @@ const dictionary: RawTranslationPackage = {
     ISERROR: 'ERFEIL',
     ISEVEN: 'ERPARTALL',
     ISLOGICAL: 'ERLOGISK',
+    ISNA: 'ERIT',
     ISNONTEXT: 'ERIKKETEKST',
     ISNUMBER: 'ERTALL',
     ISODD: 'ERODDE',

@@ -82,6 +82,7 @@ const dictionary: RawTranslationPackage = {
     ISERROR: 'HIBÁS',
     ISEVEN: 'PÁROSE',
     ISLOGICAL: 'LOGIKAI',
+    ISNA: 'NINCS',
     ISNONTEXT: 'NEM.SZÖVEG',
     ISNUMBER: 'SZÁM',
     ISODD: 'PÁRATLANE',

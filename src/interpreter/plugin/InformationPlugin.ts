@@ -38,6 +38,12 @@ export class InformationPlugin extends FunctionPlugin {
         ]
       }
     },
+    'ISNA': {
+      method: 'isna',
+      parameters: [
+        { argumentType: 'scalar'}
+      ]
+    },
     'ISNUMBER': {
       method: 'isnumber',
       parameters: {
@@ -124,6 +130,20 @@ export class InformationPlugin extends FunctionPlugin {
   public isblank(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.runFunction(ast.args, formulaAddress, this.parameters('ISBLANK'), (arg: InternalScalarValue) =>
       (arg === EmptyValue)
+    )
+  }
+
+  /**
+   * Corresponds to ISNA(value)
+   *
+   * Returns true if provided value is #N/A! error
+   *
+   * @param ast
+   * @param formulaAddress
+   */
+  public isna(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunctionWithDefaults(ast.args, formulaAddress, InformationPlugin.implementedFunctions.ISNA.parameters, (arg: InternalScalarValue) =>
+      (arg instanceof CellError && arg.type == ErrorType.NA)
     )
   }
 

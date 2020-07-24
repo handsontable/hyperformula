@@ -82,6 +82,7 @@ const dictionary: RawTranslationPackage = {
     ISERROR: 'EHATALIYSA',
     ISEVEN: 'ÇİFTMİ',
     ISLOGICAL: 'EMANTIKSALSA',
+    ISNA: 'EYOKSA',
     ISNONTEXT: 'EMETİNDEĞİLSE',
     ISNUMBER: 'ESAYIYSA',
     ISODD: 'TEKMİ',

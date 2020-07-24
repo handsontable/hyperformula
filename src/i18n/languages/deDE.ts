@@ -82,6 +82,7 @@ const dictionary: RawTranslationPackage = {
     ISERROR: 'ISTFEHLER',
     ISEVEN: 'ISTGERADE',
     ISLOGICAL: 'ISTLOG',
+    ISNA: 'ISTNV',
     ISNONTEXT: 'ISTKTEXT',
     ISNUMBER: 'ISTZAHL',
     ISODD: 'ISTUNGERADE',

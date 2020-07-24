@@ -82,6 +82,7 @@ const dictionary: RawTranslationPackage = {
     ISERROR: 'ONVIRHE',
     ISEVEN: 'ONPARILLINEN',
     ISLOGICAL: 'ONTOTUUS',
+    ISNA: 'ONPUUTTUU',
     ISNONTEXT: 'ONEI_TEKSTI',
     ISNUMBER: 'ONLUKU',
     ISODD: 'ONPARITON',
