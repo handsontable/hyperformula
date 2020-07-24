@@ -123,6 +123,7 @@ const dictionary: RawTranslationPackage = {
     ROUNDUP: 'AFRONDEN.NAAR.BOVEN',
     ROWS: 'RIJEN',
     SEARCH: 'VIND.SPEC',
+    SHEET: 'BLAD',
     SIN: 'SIN',
     SPLIT: 'SPLIT',
     SQRT: 'WORTEL',

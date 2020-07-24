@@ -123,6 +123,7 @@ const dictionary: RawTranslationPackage = {
     ROUNDUP: 'ZAOKR.GÓRA',
     ROWS: 'ILE.WIERSZY',
     SEARCH: 'SZUKAJ.TEKST',
+    SHEET: 'ARKUSZ',
     SIN: 'SIN',
     SPLIT: 'PODZIEL.TEKST',
     SQRT: 'PIERWIASTEK',

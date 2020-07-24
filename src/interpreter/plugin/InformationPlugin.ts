@@ -8,12 +8,26 @@ import {CellError, EmptyValue, ErrorType, InternalScalarValue, SimpleCellAddress
 import {AstNodeType, ProcedureAst} from '../../parser'
 import {InterpreterValue} from '../InterpreterValue'
 import {FunctionPlugin} from './FunctionPlugin'
+import {Maybe} from '../../Maybe'
 
 /**
  * Interpreter plugin containing information functions
  */
 export class InformationPlugin extends FunctionPlugin {
   public static implementedFunctions = {
+    'COLUMNS': {
+      method: 'columns',
+      isDependentOnSheetStructureChange: true,
+      doesNotNeedArgumentsToBeComputed: true,
+    },
+    'ISBLANK': {
+      method: 'isblank',
+      parameters: {
+        list: [
+          {argumentType: 'scalar'}
+        ]
+      }
+    },
     'ISERR': {
       method: 'iserr',
       parameters: {
@@ -24,14 +38,6 @@ export class InformationPlugin extends FunctionPlugin {
     },
     'ISERROR': {
       method: 'iserror',
-      parameters: {
-        list: [
-          {argumentType: 'scalar'}
-        ]
-      }
-    },
-    'ISBLANK': {
-      method: 'isblank',
       parameters: {
         list: [
           {argumentType: 'scalar'}
@@ -86,21 +92,25 @@ export class InformationPlugin extends FunctionPlugin {
         ]
       }
     },
-    'COLUMNS': {
-      method: 'columns',
-      isDependentOnSheetStructureChange: true,
-      doesNotNeedArgumentsToBeComputed: true,
+    'INDEX': {
+      method: 'index',
+    },
+    'NA': {
+      method: 'na'
     },
     'ROWS': {
       method: 'rows',
       isDependentOnSheetStructureChange: true,
       doesNotNeedArgumentsToBeComputed: true,
     },
-    'INDEX': {
-      method: 'index',
-    },
-    'NA': {
-      method: 'na'
+    'SHEET': {
+      method: 'sheet',
+      parameters: {
+        list: [
+          {argumentType: 'noerror'}
+        ]
+      },
+      doesNotNeedArgumentsToBeComputed: true
     }
   }
 
@@ -329,5 +339,48 @@ export class InformationPlugin extends FunctionPlugin {
    */
   public na(_ast: ProcedureAst, _formulaAddress: SimpleCellAddress): CellError {
     return new CellError(ErrorType.NA)
+  }
+
+  /**
+   * Corresponds to SHEET(value)
+   *
+   * Returns sheet number of a given value or a formula sheet number if no argument is provided
+   *
+   * @param ast
+   * @param formulaAddress
+   * */
+  public sheet(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    if (ast.args.length > 1) {
+      return new CellError(ErrorType.NA)
+    } else if (ast.args.length == 0) {
+      return formulaAddress.sheet + 1
+    }
+    const arg = ast.args[0]
+
+    let cellReference: Maybe<SimpleCellAddress>
+
+    if (arg.type === AstNodeType.CELL_REFERENCE) {
+      cellReference = arg.reference.toSimpleCellAddress(formulaAddress)
+    } else if (arg.type === AstNodeType.CELL_RANGE || arg.type === AstNodeType.COLUMN_RANGE || arg.type === AstNodeType.ROW_RANGE) {
+      try {
+        cellReference = AbsoluteCellRange.fromAst(arg, formulaAddress).start
+      } catch (e) {
+        return new CellError(ErrorType.REF)
+      }
+    }
+
+    if (cellReference !== undefined) {
+      return cellReference.sheet + 1
+    }
+
+    /* Not using static parameters definition as we expect only values coerced to string from now on. */
+    return this.runFunction(ast.args, formulaAddress, { list: [{ argumentType: 'string' }]}, (value: string) => {
+      const sheetNumber = this.dependencyGraph.sheetMapping.get(value)
+      if (sheetNumber !== undefined) {
+        return sheetNumber + 1
+      } else {
+        return new CellError(ErrorType.NA)
+      }
+    })
   }
 }

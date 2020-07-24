@@ -123,6 +123,7 @@ const dictionary: RawTranslationPackage = {
     ROUNDUP: 'PYÖRISTÄ.DES.YLÖS',
     ROWS: 'RIVIT',
     SEARCH: 'KÄY.LÄPI',
+    SHEET: 'TAULUKKO',
     SIN: 'SIN',
     SPLIT: 'SPLIT',
     SQRT: 'NELIÖJUURI',

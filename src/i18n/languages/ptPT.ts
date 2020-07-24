@@ -123,6 +123,7 @@ const dictionary: RawTranslationPackage = {
     ROUNDUP: 'ARREDONDAR.PARA.CIMA',
     ROWS: 'LINS',
     SEARCH: 'LOCALIZAR',
+    SHEET: 'PLANILHA',
     SIN: 'SEN',
     SPLIT: 'SPLIT',
     SQRT: 'RAIZ',

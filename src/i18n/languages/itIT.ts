@@ -123,6 +123,7 @@ const dictionary: RawTranslationPackage = {
     ROUNDUP: 'ARROTONDA.PER.ECC',
     ROWS: 'RIGHE',
     SEARCH: 'RICERCA',
+    SHEET: 'FOGLIO',
     SIN: 'SEN',
     SPLIT: 'SPLIT',
     SQRT: 'RADQ',
