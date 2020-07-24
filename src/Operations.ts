@@ -233,8 +233,10 @@ export class Operations {
     return this.sheetMapping.renameSheet(sheetId, newName)
   }
 
-  public moveRows(sheet: number, startRow: number, numberOfRows: number, targetRow: number): void {
+  public moveRows(sheet: number, startRow: number, numberOfRows: number, targetRow: number): number {
     const rowsToAdd = RowsSpan.fromNumberOfRows(sheet, targetRow, numberOfRows)
+    this.lazilyTransformingAstService.beginCombinedMode(sheet)
+
     this.doAddRows(rowsToAdd)
 
     if (targetRow < startRow) {
@@ -246,10 +248,14 @@ export class Operations {
     this.moveCells(startAddress, Number.POSITIVE_INFINITY, numberOfRows, targetAddress)
     const rowsToRemove = RowsSpan.fromNumberOfRows(sheet, startRow, numberOfRows)
     this.doRemoveRows(rowsToRemove)
+
+    return this.lazilyTransformingAstService.commitCombinedMode()
   }
 
-  public moveColumns(sheet: number, startColumn: number, numberOfColumns: number, targetColumn: number): void {
+  public moveColumns(sheet: number, startColumn: number, numberOfColumns: number, targetColumn: number): number {
     const columnsToAdd = ColumnsSpan.fromNumberOfColumns(sheet, targetColumn, numberOfColumns)
+    this.lazilyTransformingAstService.beginCombinedMode(sheet)
+
     this.doAddColumns(columnsToAdd)
 
     if (targetColumn < startColumn) {
@@ -261,6 +267,8 @@ export class Operations {
     this.moveCells(startAddress, numberOfColumns, Number.POSITIVE_INFINITY, targetAddress)
     const columnsToRemove = ColumnsSpan.fromNumberOfColumns(sheet, startColumn, numberOfColumns)
     this.doRemoveColumns(columnsToRemove)
+
+    return this.lazilyTransformingAstService.commitCombinedMode()
   }
 
   public moveCells(sourceLeftCorner: SimpleCellAddress, width: number, height: number, destinationLeftCorner: SimpleCellAddress): MoveCellsResult {
