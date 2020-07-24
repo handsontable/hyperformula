@@ -5,8 +5,7 @@
 
 import {AbsoluteCellRange} from '../../AbsoluteCellRange'
 import {CellError, EmptyValue, ErrorType, InternalCellValue, InternalScalarValue, SimpleCellAddress} from '../../Cell'
-import {AstNodeType, CellRangeAst, ProcedureAst} from '../../parser'
-import {SimpleRangeValue} from '../InterpreterValue'
+import {AstNodeType, ProcedureAst} from '../../parser'
 import {FunctionPlugin} from './FunctionPlugin'
 
 /**
@@ -54,17 +53,11 @@ export class InformationPlugin extends FunctionPlugin {
       method: 'columns',
       isDependentOnSheetStructureChange: true,
       doesNotNeedArgumentsToBeComputed: true,
-      parameters: [
-        { argumentType: 'range'}
-      ],
     },
     'ROWS': {
       method: 'rows',
       isDependentOnSheetStructureChange: true,
       doesNotNeedArgumentsToBeComputed: true,
-      parameters: [
-        { argumentType: 'range'}
-      ],
     },
     'INDEX': {
       method: 'index',
@@ -154,7 +147,6 @@ export class InformationPlugin extends FunctionPlugin {
       (typeof arg !== 'string')
     )
   }
-
   /**
    * Corresponds to COLUMNS(range)
    *
@@ -163,11 +155,20 @@ export class InformationPlugin extends FunctionPlugin {
    * @param ast
    * @param formulaAddress
    */
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public columns(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunctionWithDefaults(ast.args, formulaAddress, InformationPlugin.implementedFunctions.COLUMNS.parameters, () => {
-      const rangeAst = ast.args[0] as CellRangeAst
-      return rangeAst.end.col - rangeAst.start.col + 1
-    })
+    if (ast.args.length !== 1) {
+      return new CellError(ErrorType.NA)
+    }
+    if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
+      return new CellError(ErrorType.NUM)
+    }
+    const rangeAst = ast.args[0]
+    if (rangeAst.type === AstNodeType.CELL_RANGE) {
+      return (rangeAst.end.col - rangeAst.start.col + 1)
+    } else {
+      return new CellError(ErrorType.VALUE)
+    }
   }
 
   /**
@@ -178,11 +179,20 @@ export class InformationPlugin extends FunctionPlugin {
    * @param ast
    * @param formulaAddress
    */
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public rows(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunctionWithDefaults(ast.args, formulaAddress, InformationPlugin.implementedFunctions.ROWS.parameters, () => {
-      const rangeAst = ast.args[0] as CellRangeAst
-      return rangeAst.end.row - rangeAst.start.row + 1
-    })
+    if (ast.args.length !== 1) {
+      return new CellError(ErrorType.NA)
+    }
+    if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
+      return new CellError(ErrorType.NUM)
+    }
+    const rangeAst = ast.args[0]
+    if (rangeAst.type === AstNodeType.CELL_RANGE) {
+      return (rangeAst.end.row - rangeAst.start.row + 1)
+    } else {
+      return new CellError(ErrorType.VALUE)
+    }
   }
 
   public index(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
