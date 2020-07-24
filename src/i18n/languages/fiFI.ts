@@ -69,6 +69,7 @@ const dictionary: RawTranslationPackage = {
     EXP: 'EKSPONENTTI',
     FALSE: 'EPÄTOSI',
     FIND: 'ETSI',
+    FORMULATEXT: 'KAAVA.TEKSTI',
     FV: 'TULEVA.ARVO',
     IF: 'JOS',
     IFERROR: 'JOSVIRHE',
