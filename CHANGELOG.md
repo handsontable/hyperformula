@@ -16,9 +16,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - Fixed hardcoding of languages in i18n tests. (#471)
-- Fixed `moveCells` behaviour when moving part of a range
-- Fixed `moveColumns`/`moveRows` inconsistent behaviour
-- Fixed undo of `moveColumns`/`moveRows` operations
+- Fixed `moveCells` behaviour when moving part of a range. (#479)
+- Fixed `moveColumns`/`moveRows` inconsistent behaviour. (#479)
+- Fixed undo of `moveColumns`/`moveRows` operations. (#479)
 
 ## [0.1.3] - 2020-07-21
 
