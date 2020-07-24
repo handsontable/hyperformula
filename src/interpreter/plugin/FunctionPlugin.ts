@@ -223,7 +223,7 @@ export abstract class FunctionPlugin {
       }
       const coercedArg = this.coerceToType(arg, argumentDefinitions[j].argumentType as ArgumentTypes)
       if(coercedArg === undefined) {
-        new CellError(ErrorType.VALUE)
+        return new CellError(ErrorType.VALUE)
       }
       if (coercedArg instanceof CellError && argumentDefinitions[j].argumentType !== 'scalar') {
         return coercedArg
@@ -259,7 +259,7 @@ export abstract class FunctionPlugin {
       const arg = this.evaluateArgOrDefault(formulaAddress, args[i], argumentDefinitions[j].defaultValue)
       const coercedArg = this.coerceToType(arg, argumentDefinitions[j].argumentType as ArgumentTypes)
       if(coercedArg === undefined) {
-        new CellError(ErrorType.VALUE)
+        return new CellError(ErrorType.VALUE)
       }
       if (coercedArg instanceof CellError && argumentDefinitions[j].argumentType !== 'scalar') {
         return coercedArg
