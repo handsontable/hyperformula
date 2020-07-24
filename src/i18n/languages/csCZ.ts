@@ -104,6 +104,7 @@ const dictionary: RawTranslationPackage = {
     MMULT: 'SOUČIN.MATIC',
     MOD: 'MOD',
     MONTH: 'MĚSÍC',
+    NA: 'NEDEF',
     NOT: 'NE',
     ODD: 'ZAOKROUHLIT.NA.LICHÉ',
     OFFSET: 'POSUN',

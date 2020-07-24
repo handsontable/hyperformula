@@ -104,6 +104,7 @@ const dictionary: RawTranslationPackage = {
     MMULT: 'MMULT',
     MOD: 'REST',
     MONTH: 'MONAT',
+    NA: 'NV',
     NOT: 'NICHT',
     ODD: 'UNGERADE',
     OFFSET: 'BEREICH.VERSCHIEBEN',

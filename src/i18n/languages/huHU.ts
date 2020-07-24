@@ -104,6 +104,7 @@ const dictionary: RawTranslationPackage = {
     MMULT: 'MSZORZAT',
     MOD: 'MARADÉK',
     MONTH: 'HÓNAP',
+    NA: 'HIÁNYZIK',
     NOT: 'NEM',
     ODD: 'PÁRATLAN',
     OFFSET: 'ELTOLÁS',

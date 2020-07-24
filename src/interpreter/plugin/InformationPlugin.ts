@@ -94,6 +94,9 @@ export class InformationPlugin extends FunctionPlugin {
     },
     'INDEX': {
       method: 'index',
+    },
+    'NA': {
+      method: 'na'
     }
   }
 
@@ -310,5 +313,17 @@ export class InformationPlugin extends FunctionPlugin {
 
     const address = range.getAddress(columnValue - 1, rowValue - 1)
     return this.dependencyGraph.getCellValue(address)
+  }
+
+  /**
+   * Corresponds to NA()
+   *
+   * Returns #N/A!
+   *
+   * @param _ast
+   * @param _formulaAddress
+   */
+  public na(_ast: ProcedureAst, _formulaAddress: SimpleCellAddress): InternalCellValue {
+    return new CellError(ErrorType.NA)
   }
 }

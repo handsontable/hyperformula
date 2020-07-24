@@ -104,6 +104,7 @@ const dictionary: RawTranslationPackage = {
     MMULT: 'МУМНОЖ',
     MOD: 'ОСТАТ',
     MONTH: 'МЕСЯЦ',
+    NA: 'НД',
     NOT: 'НЕ',
     ODD: 'НЕЧЁТ',
     OFFSET: 'СМЕЩ',

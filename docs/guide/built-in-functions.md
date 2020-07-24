@@ -92,6 +92,7 @@ lets you design your own [custom functions](custom-functions).
 | ISODD | Information | Returns TRUE if the value is odd, or FALSE if the number is even. | ISODD(Value) |
 | ISREF | Information | Returns TRUE if provided value is #REF! error.| ISREF(Value) |
 | ISTEXT | Information | Returns TRUE if the cell contents refer to text.| ISTEXT(Value) |
+| NA | Information | Returns #N/A! error value.| NA(Value) |
 | FV | Financial | Returns the future value of an investment. | FV(Rate; Nper; Pmt[; Pv;[ Type]]) |
 | IPMT | Financial | Calculates the interest portion of a given loan payment in a given payment period. | IPMT(Rate; Per; Nper; Pv[; Fv[; Type]]) |
 | PMT | Financial | Returns the periodic payment for a loan. | PMT(Rate; Nper; Pv[; Fv[; Type]]) |

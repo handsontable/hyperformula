@@ -104,6 +104,7 @@ const dictionary: RawTranslationPackage = {
     MMULT: 'DÇARP',
     MOD: 'MOD',
     MONTH: 'AY',
+    NA: 'YOKSAY',
     NOT: 'DEĞİL',
     ODD: 'TEK',
     OFFSET: 'KAYDIR',
