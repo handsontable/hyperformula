@@ -111,6 +111,15 @@ export class InformationPlugin extends FunctionPlugin {
         ]
       },
       doesNotNeedArgumentsToBeComputed: true
+    },
+    'SHEETS': {
+      method: 'sheets',
+      parameters: {
+        list: [
+          {argumentType: 'noerror'}
+        ]
+      },
+      doesNotNeedArgumentsToBeComputed: true
     }
   }
 
@@ -374,13 +383,44 @@ export class InformationPlugin extends FunctionPlugin {
     }
 
     /* Not using static parameters definition as we expect only values coerced to string from now on. */
-    return this.runFunction(ast.args, formulaAddress, { list: [{ argumentType: 'string' }]}, (value: string) => {
+    return this.runFunction(ast.args, formulaAddress, {list: [{argumentType: 'string'}]}, (value: string) => {
       const sheetNumber = this.dependencyGraph.sheetMapping.get(value)
       if (sheetNumber !== undefined) {
         return sheetNumber + 1
       } else {
         return new CellError(ErrorType.NA)
       }
+    })
+  }
+
+  /**
+   * Corresponds to SHEETS(value)
+   *
+   * Returns number of sheet of a given reference or number of all sheets in workbook when no argument is provided.
+   * It returns always 1 for a valid reference as 3D references are not supported.
+   *
+   * @param ast
+   * @param formulaAddress
+   * */
+  public sheets(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    if (ast.args.length > 1) {
+      return new CellError(ErrorType.NA)
+    } else if (ast.args.length == 0) {
+      return this.dependencyGraph.sheetMapping.numberOfSheets()
+    }
+
+    const arg = ast.args[0]
+    if (
+      arg.type === AstNodeType.CELL_REFERENCE ||
+      arg.type === AstNodeType.CELL_RANGE ||
+      arg.type === AstNodeType.COLUMN_RANGE ||
+      arg.type === AstNodeType.ROW_RANGE
+    ) {
+      return 1
+    }
+
+    return this.runFunction(ast.args, formulaAddress, this.parameters('SHEETS'), () => {
+      return new CellError(ErrorType.VALUE)
     })
   }
 }

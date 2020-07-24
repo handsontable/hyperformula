@@ -123,6 +123,7 @@ const dictionary: RawTranslationPackage = {
     ROUNDUP: 'ОКРУГЛВВЕРХ',
     ROWS: 'ЧСТРОК',
     SEARCH: 'ПОИСК',
+    SHEETS: 'ЛИСТЫ',
     SHEET: 'ЛИСТ',
     SIN: 'SIN',
     SPLIT: 'SPLIT',

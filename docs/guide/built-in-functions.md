@@ -93,6 +93,7 @@ lets you design your own [custom functions](custom-functions).
 | ISREF | Information | Returns TRUE if provided value is #REF! error. | ISREF(Value) |
 | ISTEXT | Information | Returns TRUE if the cell contents refer to text. | ISTEXT(Value) |
 | SHEET | Information | Returns sheet number of a given value or a formula sheet number if no argument is provided. | SHEET([Value]) |
+| SHEETS | Information | Returns number of sheet of a given reference or number of all sheets in workbook when no argument is provided. | SHEETS([Value]) |
 | NA | Information | Returns #N/A! error value.| NA(Value) |
 | FV | Financial | Returns the future value of an investment. | FV(Rate; Nper; Pmt[; Pv;[ Type]]) |
 | IPMT | Financial | Calculates the interest portion of a given loan payment in a given payment period. | IPMT(Rate; Per; Nper; Pv[; Fv[; Type]]) |
