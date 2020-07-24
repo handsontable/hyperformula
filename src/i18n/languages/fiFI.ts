@@ -78,6 +78,7 @@ const dictionary: RawTranslationPackage = {
     INT: 'KOKONAISLUKU',
     IPMT: 'IPMT',
     ISBLANK: 'ONTYHJÄ',
+    ISERR: 'ONVIRH',
     ISERROR: 'ONVIRHE',
     ISEVEN: 'ONPARILLINEN',
     ISLOGICAL: 'ONTOTUUS',

@@ -82,7 +82,8 @@ lets you design your own [custom functions](custom-functions).
 | ERF | Engineering | Returns values of the Gaussian error integral. | ERF(Lower_Limit; Upper_Limit) |
 | ERFC | Engineering | Returns complementary values of the Gaussian error integral between x and infinity. | ERFC(Lower_Limit) |
 | ISBLANK | Information | Returns TRUE if the reference to a cell is blank. | ISBLANK(Value) |
-| ISERROR | Information | The ISERROR tests if the cells contain general error values. | ISERROR(Value) |
+| ISERR | Information | Returns TRUE if the value is error value except #N/A!. | ISERR(Value) |
+| ISERROR | Information | Returns TRUE if the value is general error value. | ISERROR(Value) |
 | ISEVEN | Information | Returns TRUE if the value is an even integer, or FALSE if the value is odd. | ISEVEN(Value) |
 | ISLOGICAL | Information | Tests for a logical value (TRUE or FALSE). | ISLOGICAL(Value) |
 | ISNONTEXT | Information | Tests if the cell contents are text or numbers, and returns FALSE if the contents are text. | ISNONTEXT(Value) |

@@ -78,6 +78,7 @@ export const dictionary: RawTranslationPackage = {
     INT: 'ENTERO',
     IPMT: 'PAGOINT',
     ISBLANK: 'ESBLANCO',
+    ISERR: 'ESERR',
     ISERROR: 'ESERROR',
     ISEVEN: 'ES.PAR',
     ISLOGICAL: 'ESLOGICO',

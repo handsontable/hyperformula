@@ -78,6 +78,7 @@ const dictionary: RawTranslationPackage = {
     INT: 'TAMSAYI',
     IPMT: 'FAİZTUTARI',
     ISBLANK: 'EBOŞSA',
+    ISERR: 'EHATA',
     ISERROR: 'EHATALIYSA',
     ISEVEN: 'ÇİFTMİ',
     ISLOGICAL: 'EMANTIKSALSA',

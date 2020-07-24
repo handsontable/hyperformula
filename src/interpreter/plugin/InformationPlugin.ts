@@ -14,41 +14,61 @@ import {FunctionPlugin} from './FunctionPlugin'
  */
 export class InformationPlugin extends FunctionPlugin {
   public static implementedFunctions = {
+    'ISERR': {
+      method: 'iserr',
+      parameters: {
+        list: [
+          {argumentType: 'scalar'}
+        ]
+      }
+    },
     'ISERROR': {
       method: 'iserror',
-      parameters: { list: [
-        { argumentType: 'scalar'}
-      ]}
+      parameters: {
+        list: [
+          {argumentType: 'scalar'}
+        ]
+      }
     },
     'ISBLANK': {
       method: 'isblank',
-      parameters: { list: [
-        { argumentType: 'scalar'}
-      ]}
+      parameters: {
+        list: [
+          {argumentType: 'scalar'}
+        ]
+      }
     },
     'ISNUMBER': {
       method: 'isnumber',
-      parameters: { list: [
-        { argumentType: 'scalar'}
-      ]}
+      parameters: {
+        list: [
+          {argumentType: 'scalar'}
+        ]
+      }
     },
     'ISLOGICAL': {
       method: 'islogical',
-      parameters: { list: [
-        { argumentType: 'scalar'}
-      ]}
+      parameters: {
+        list: [
+          {argumentType: 'scalar'}
+        ]
+      }
     },
     'ISTEXT': {
       method: 'istext',
-      parameters: { list: [
-        { argumentType: 'scalar'}
-      ]}
+      parameters: {
+        list: [
+          {argumentType: 'scalar'}
+        ]
+      }
     },
     'ISNONTEXT': {
       method: 'isnontext',
-      parameters: { list: [
-        { argumentType: 'scalar'}
-      ]}
+      parameters: {
+        list: [
+          {argumentType: 'scalar'}
+        ]
+      }
     },
     'COLUMNS': {
       method: 'columns',
@@ -62,7 +82,21 @@ export class InformationPlugin extends FunctionPlugin {
     },
     'INDEX': {
       method: 'index',
-    },
+    }
+  }
+
+  /**
+   * Corresponds to ISERR(value)
+   *
+   * Returns true if provided value is an error except #N/A!
+   *
+   * @param ast
+   * @param formulaAddress
+   */
+  public iserr(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.parameters('ISERR'), (arg: InternalScalarValue) =>
+      (arg instanceof CellError && arg.type !== ErrorType.NA)
+    )
   }
 
   /**
@@ -148,6 +182,7 @@ export class InformationPlugin extends FunctionPlugin {
       (typeof arg !== 'string')
     )
   }
+
   /**
    * Corresponds to COLUMNS(range)
    *

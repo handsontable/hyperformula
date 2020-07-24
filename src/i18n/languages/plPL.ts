@@ -78,6 +78,7 @@ const dictionary: RawTranslationPackage = {
     INT: 'ZAOKR.DO.CAŁK',
     IPMT: 'IPMT',
     ISBLANK: 'CZY.PUSTA',
+    ISERR: 'CZY.BŁ',
     ISERROR: 'CZY.BŁĄD',
     ISEVEN: 'CZY.PARZYSTE',
     ISLOGICAL: 'CZY.LOGICZNA',
