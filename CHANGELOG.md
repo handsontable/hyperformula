@@ -12,7 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - 4 financial functions FV, PMT, PPMT, IPMT.
 
 ### Changed
-- Operation `moveCells` creating cyclic dependencies does not cause losing original formula
+- Operation `moveCells` creating cyclic dependencies does not cause losing original formula. (#479)
 
 ### Fixed
 - Fixed hardcoding of languages in i18n tests. (#471)
