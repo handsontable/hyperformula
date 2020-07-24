@@ -69,6 +69,7 @@ const dictionary: RawTranslationPackage = {
     EXP: 'EXP',
     FALSE: 'FALSCH',
     FIND: 'FINDEN',
+    FORMULATEXT: 'FORMELTEKST',
     FV: 'ZW',
     IF: 'WENN',
     IFERROR: 'WENNFEHLER',

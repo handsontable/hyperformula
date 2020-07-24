@@ -69,6 +69,7 @@ const dictionary: RawTranslationPackage = {
     EXP: 'KITEVŐ',
     FALSE: 'HAMIS',
     FIND: 'SZÖVEG.TALÁL',
+    FORMULATEXT: 'KÉPLETSZÖVEG',
     FV: 'JBÉ',
     IF: 'HA',
     IFERROR: 'HAHIBA',

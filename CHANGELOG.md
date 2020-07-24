@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added 9 text functions LEN, TRIM, PROPER, CLEAN, REPT, RIGHT, LEFT, SEARCH, FIND. (#221)
 - Added helper methods for keeping track of cell/range dependencies: getCellPrecedents and getCellDependents. (#441)
 - 4 financial functions FV, PMT, PPMT, IPMT.
+- Added FORMULATEXT function.
 
 ### Changed
 - Operation `moveCells` creating cyclic dependencies does not cause losing original formula. (#479)

@@ -61,6 +61,7 @@
     "test:unit": "cross-env NODE_ICU_DATA=node_modules/full-icu jest",
     "test:browser": "cross-env-shell BABEL_ENV=commonjs env-cmd -f ht.config.js karma start",
     "test:browser.debug": "cross-env-shell BABEL_ENV=commonjs NODE_ENV=debug env-cmd -f ht.config.js karma start",
+    "test:performance": "npm run benchmark:basic && npm run benchmark:cruds",
     "jasmine:start": "cross-env NODE_ICU_DATA=node_modules/full-icu jasmine --config=jasmine.json",
     "typedoc:build": "typedoc --options .typedoc.ts",
     "typedoc:serve": "npm run typedoc:build && serve doc -p 5005",
@@ -75,7 +76,10 @@
     "verify:umd:full.min": "node script/check-file.js dist/hyperformula.full.min.js",
     "verify:cjs": "node script/check-file.js commonjs",
     "verify:publish-package": "npm pack | node script/check-publish-package.js",
-    "check:licenses": "license-checker --production --excludePackages=\"hyperformula@0.0.1\" --onlyAllow=\"MIT; Apache-2.0; BSD-3-Clause; BSD-2-Clause; ISC; BSD; Unlicense\""
+    "check:licenses": "license-checker --production --excludePackages=\"hyperformula@0.0.1\" --onlyAllow=\"MIT; Apache-2.0; BSD-3-Clause; BSD-2-Clause; ISC; BSD; Unlicense\"",
+    "tsnode": "ts-node -O '{\"module\":\"commonjs\"}'",
+    "benchmark:basic": "npm run tsnode test/performance/1-basic.ts",
+    "benchmark:cruds": "npm run tsnode test/performance/2-cruds.ts"
   },
   "devDependencies": {
     "@babel/cli": "^7.8.4",
