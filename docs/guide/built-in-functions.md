@@ -90,6 +90,7 @@ lets you design your own [custom functions](custom-functions).
 | ISNONTEXT | Information | Tests if the cell contents are text or numbers, and returns FALSE if the contents are text. | ISNONTEXT(Value) |
 | ISNUMBER | Information | Returns TRUE if the value refers to a number. | ISNUMBER(Value) |
 | ISODD | Information | Returns TRUE if the value is odd, or FALSE if the number is even. | ISODD(Value) |
+| ISREF | Information | Returns TRUE if provided value is #REF! error.| ISREF(Value) |
 | ISTEXT | Information | Returns TRUE if the cell contents refer to text.| ISTEXT(Value) |
 | FV | Financial | Returns the future value of an investment. | FV(Rate; Nper; Pmt[; Pv;[ Type]]) |
 | IPMT | Financial | Calculates the interest portion of a given loan payment in a given payment period. | IPMT(Rate; Per; Nper; Pv[; Fv[; Type]]) |

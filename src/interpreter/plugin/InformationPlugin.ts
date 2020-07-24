@@ -60,6 +60,12 @@ export class InformationPlugin extends FunctionPlugin {
         ]
       }
     },
+    'ISREF': {
+      method: 'isref',
+      parameters: [
+        { argumentType: 'scalar'}
+      ]
+    },
     'ISTEXT': {
       method: 'istext',
       parameters: {
@@ -174,6 +180,21 @@ export class InformationPlugin extends FunctionPlugin {
       (typeof arg === 'boolean')
     )
   }
+
+  /**
+   * Corresponds to ISREF(value)
+   *
+   * Returns true if provided value is #REF! error
+   *
+   * @param ast
+   * @param formulaAddress
+   */
+  public isref(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunctionWithDefaults(ast.args, formulaAddress, InformationPlugin.implementedFunctions.ISREF.parameters, (arg: InternalScalarValue) =>
+      (arg instanceof CellError && (arg.type == ErrorType.REF || arg.type == ErrorType.CYCLE))
+    )
+  }
+
 
   /**
    * Corresponds to ISTEXT(value)
