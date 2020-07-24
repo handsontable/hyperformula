@@ -154,7 +154,7 @@ export abstract class FunctionPlugin {
       if(coercedType === 'range') {
         return arg
       } else {
-        return new CellError(ErrorType.VALUE)
+        return undefined
       }
     } else {
       switch (coercedType) {
@@ -169,7 +169,7 @@ export abstract class FunctionPlugin {
         case 'noerror':
           return arg
         case 'range':
-          return new CellError(ErrorType.VALUE)
+          return undefined
       }
     }
   }
@@ -192,6 +192,9 @@ export abstract class FunctionPlugin {
       }
       const arg = this.evaluateArgOrDefault(formulaAddress, args[i], argumentDefinitions[i].defaultValue)
       const coercedArg = this.coerceToType(arg, argumentDefinitions[i].argumentType as ArgumentTypes)
+      if(coercedArg === undefined) {
+        return new CellError(ErrorType.VALUE)
+      }
       if (coercedArg instanceof CellError && argumentDefinitions[i].argumentType !== 'scalar') {
         return coercedArg
       }
@@ -220,6 +223,9 @@ export abstract class FunctionPlugin {
         return new CellError(ErrorType.NA)
       }
       const coercedArg = this.coerceToType(arg, argumentDefinitions[j].argumentType as ArgumentTypes)
+      if(coercedArg === undefined) {
+        new CellError(ErrorType.VALUE)
+      }
       if (coercedArg instanceof CellError && argumentDefinitions[j].argumentType !== 'scalar') {
         return coercedArg
       }
@@ -254,6 +260,9 @@ export abstract class FunctionPlugin {
       }
       const arg = this.evaluateArgOrDefault(formulaAddress, args[i], argumentDefinitions[j].defaultValue)
       const coercedArg = this.coerceToType(arg, argumentDefinitions[j].argumentType as ArgumentTypes)
+      if(coercedArg === undefined) {
+        new CellError(ErrorType.VALUE)
+      }
       if (coercedArg instanceof CellError && argumentDefinitions[j].argumentType !== 'scalar') {
         return coercedArg
       }
