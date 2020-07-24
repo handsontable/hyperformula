@@ -40,9 +40,11 @@ export class InformationPlugin extends FunctionPlugin {
     },
     'ISNA': {
       method: 'isna',
-      parameters: [
-        { argumentType: 'scalar'}
-      ]
+      parameters: {
+        list: [
+          {argumentType: 'scalar'}
+        ]
+      }
     },
     'ISNUMBER': {
       method: 'isnumber',
@@ -62,9 +64,11 @@ export class InformationPlugin extends FunctionPlugin {
     },
     'ISREF': {
       method: 'isref',
-      parameters: [
-        { argumentType: 'scalar'}
-      ]
+      parameters: {
+        list: [
+          {argumentType: 'scalar'}
+        ]
+      }
     },
     'ISTEXT': {
       method: 'istext',
@@ -151,7 +155,7 @@ export class InformationPlugin extends FunctionPlugin {
    * @param formulaAddress
    */
   public isna(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunctionWithDefaults(ast.args, formulaAddress, InformationPlugin.implementedFunctions.ISNA.parameters, (arg: InternalScalarValue) =>
+    return this.runFunction(ast.args, formulaAddress, this.parameters('ISNA'), (arg: InternalScalarValue) =>
       (arg instanceof CellError && arg.type == ErrorType.NA)
     )
   }
@@ -193,7 +197,7 @@ export class InformationPlugin extends FunctionPlugin {
    * @param formulaAddress
    */
   public isref(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunctionWithDefaults(ast.args, formulaAddress, InformationPlugin.implementedFunctions.ISREF.parameters, (arg: InternalScalarValue) =>
+    return this.runFunction(ast.args, formulaAddress, this.parameters('ISREF'), (arg: InternalScalarValue) =>
       (arg instanceof CellError && (arg.type == ErrorType.REF || arg.type == ErrorType.CYCLE))
     )
   }
@@ -323,7 +327,7 @@ export class InformationPlugin extends FunctionPlugin {
    * @param _ast
    * @param _formulaAddress
    */
-  public na(_ast: ProcedureAst, _formulaAddress: SimpleCellAddress): InternalCellValue {
+  public na(_ast: ProcedureAst, _formulaAddress: SimpleCellAddress): CellError {
     return new CellError(ErrorType.NA)
   }
 }
