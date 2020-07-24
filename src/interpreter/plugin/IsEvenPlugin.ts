@@ -11,9 +11,11 @@ export class IsEvenPlugin extends FunctionPlugin {
   public static implementedFunctions = {
     'ISEVEN': {
       method: 'iseven',
-      parameters: { list: [
-        { argumentType: 'number'}
-      ]}
+      parameters: {
+        list: [
+          {argumentType: 'number'}
+        ]
+      }
     },
   }
 
