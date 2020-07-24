@@ -1,6 +1,7 @@
 import {Config} from '../../src/Config'
 import {SheetMapping} from '../../src/DependencyGraph'
-import {buildTranslationPackage, enGB} from '../../src/i18n'
+import {buildTranslationPackage} from '../../src/i18n'
+import {enGB} from '../../src/i18n/languages'
 import {buildLexerConfig, FormulaLexer} from '../../src/parser'
 import {CellReference, EqualsOp, ProcedureName, RangeSeparator, RParen, WhiteSpace} from '../../src/parser/LexerConfig'
 import {bindWhitespacesToTokens} from '../../src/parser/ParserWithCaching'

@@ -4,8 +4,9 @@
  */
 
 import {RawTranslationPackage} from '..'
+// import
 
-export const ruRU: RawTranslationPackage = {
+const dictionary: RawTranslationPackage = {
   errors: {
     CYCLE: '#CYCLE!',
     DIV_BY_ZERO: '#ДЕЛ/0!',
@@ -38,6 +39,7 @@ export const ruRU: RawTranslationPackage = {
     CEILING: 'ОКРВВЕРХ',
     CHAR: 'СИМВОЛ',
     CHOOSE: 'ВЫБОР',
+    CLEAN: 'ПЕЧСИМВ',
     CODE: 'КОДСИМВ',
     COLUMNS: 'ЧИСЛСТОЛБ',
     CONCATENATE: 'СЦЕПИТЬ',
@@ -66,11 +68,14 @@ export const ruRU: RawTranslationPackage = {
     EVEN: 'ЧЁТН',
     EXP: 'EXP',
     FALSE: 'ЛОЖЬ',
+    FIND: 'НАЙТИ',
+    FV: 'БС',
     IF: 'ЕСЛИ',
     IFERROR: 'ЕСЛИОШИБКА',
     IFNA: 'ЕСНД',
     INDEX: 'ИНДЕКС',
     INT: 'ЦЕЛОЕ',
+    IPMT: 'ПРПЛТ',
     ISBLANK: 'ЕПУСТО',
     ISERROR: 'ЕОШИБКА',
     ISEVEN: 'ЕЧЁТН',
@@ -79,6 +84,8 @@ export const ruRU: RawTranslationPackage = {
     ISNUMBER: 'ЕЧИСЛО',
     ISODD: 'ЕНЕЧЁТ',
     ISTEXT: 'ЕТЕКСТ',
+    LEFT: 'ЛЕВСИМВ',
+    LEN: 'ДЛСТР',
     LN: 'LN',
     LOG: 'LOG',
     LOG10: 'LOG10',
@@ -98,13 +105,19 @@ export const ruRU: RawTranslationPackage = {
     OFFSET: 'СМЕЩ',
     OR: 'ИЛИ',
     PI: 'ПИ',
+    PMT: 'ПЛТ',
     POWER: 'СТЕПЕНЬ',
+    PPMT: 'ОСПЛТ',
+    PROPER: 'ПРОПНАЧ',
     RADIANS: 'РАДИАНЫ',
     RAND: 'СЛЧИС',
+    REPT: 'ПОВТОР',
+    RIGHT: 'ПРАВСИМВ',
     ROUND: 'ОКРУГЛ',
     ROUNDDOWN: 'ОКРУГЛВНИЗ',
     ROUNDUP: 'ОКРУГЛВВЕРХ',
     ROWS: 'ЧСТРОК',
+    SEARCH: 'ПОИСК',
     SIN: 'SIN',
     SPLIT: 'SPLIT',
     SQRT: 'КОРЕНЬ',
@@ -117,13 +130,17 @@ export const ruRU: RawTranslationPackage = {
     TAN: 'TAN',
     TEXT: 'ТЕКСТ',
     TRANSPOSE: 'ТРАНСП',
+    TRIM: 'СЖПРОБЕЛЫ',
     TRUE: 'ИСТИНА',
     TRUNC: 'ОТБР',
     VLOOKUP: 'ВПР',
     XOR: 'ИСКЛИЛИ',
     YEAR: 'ГОД',
   },
+  langCode: 'ruRU',
   ui: {
     NEW_SHEET_PREFIX: 'Sheet',
   },
 }
+
+export default dictionary

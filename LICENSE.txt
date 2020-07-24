@@ -1,0 +1,29 @@
+Copyright (c) HANDSONCODE sp. z o. o.
+
+HYPERFORMULA is software distributed by HANDSONCODE sp. z o. o.,
+a Polish corporation, based in Gdynia, Poland, at 96/98 Aleja Zwycięstwa,
+registered with the National Court Register under number 538651,
+EU tax ID number: PL5862294002, share capital: PLN 62,800.00.
+
+This software is protected by applicable copyright laws, including
+international treaties, and triple-licensed.
+
+First, if your use involves only such purposes as education, research, study,
+and personal use, testing and demonstration, you agree to be bound by
+the terms included in the “non-commercial-license.pdf” file, available
+in the main directory of this software repository.
+
+Second, commercial purposes dictate more individual approach
+and the terms of such use are subject to negotiations.
+
+Third, at your option, your use of this Software – either commercial, non-commercial, or both –
+may be subject to the GNU Affero General Public License
+in such version as included in the “agpl-3.0.txt” file,
+available in the main directory of this software repository.
+
+HANDSONCODE PROVIDES THIS SOFTWARE ON AN “AS IS” BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND. IN NO EVENT
+AND UNDER NO LEGAL THEORY, SHALL HANDSONCODE BE LIABLE
+TO YOU FOR DAMAGES, INCLUDING ANY DIRECT, INDIRECT, SPECIAL,
+INCIDENTAL, OR CONSEQUENTIAL DAMAGES OF ANY CHARACTER ARISING
+FROM USE OR INABILITY TO USE THIS SOFTWARE.

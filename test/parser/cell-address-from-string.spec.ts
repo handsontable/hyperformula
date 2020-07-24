@@ -1,6 +1,7 @@
 import {simpleCellAddress} from '../../src/Cell'
 import {SheetMapping} from '../../src/DependencyGraph'
-import {buildTranslationPackage, enGB} from '../../src/i18n'
+import {buildTranslationPackage} from '../../src/i18n'
+import {enGB} from '../../src/i18n/languages'
 import {cellAddressFromString} from '../../src/parser'
 import {CellAddress} from '../../src/parser'
 

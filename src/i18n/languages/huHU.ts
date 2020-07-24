@@ -4,8 +4,9 @@
  */
 
 import {RawTranslationPackage} from '..'
+// import
 
-export const huHU: RawTranslationPackage = {
+const dictionary: RawTranslationPackage = {
   errors: {
     CYCLE: '#CYCLE!',
     DIV_BY_ZERO: '#ZÉRÓOSZTÓ!',
@@ -38,6 +39,7 @@ export const huHU: RawTranslationPackage = {
     CEILING: 'PLAFON',
     CHAR: 'KARAKTER',
     CHOOSE: 'VÁLASZT',
+    CLEAN: 'TISZTÍT',
     CODE: 'KÓD',
     COLUMNS: 'OSZLOPOK',
     CONCATENATE: 'ÖSSZEFŰZ',
@@ -66,11 +68,14 @@ export const huHU: RawTranslationPackage = {
     EVEN: 'PÁROS',
     EXP: 'KITEVŐ',
     FALSE: 'HAMIS',
+    FIND: 'SZÖVEG.TALÁL',
+    FV: 'JBÉ',
     IF: 'HA',
     IFERROR: 'HAHIBA',
     IFNA: 'HAHIÁNYZIK',
     INDEX: 'INDEX',
     INT: 'INT',
+    IPMT: 'RRÉSZLET',
     ISBLANK: 'ÜRES',
     ISERROR: 'HIBÁS',
     ISEVEN: 'PÁROSE',
@@ -79,6 +84,8 @@ export const huHU: RawTranslationPackage = {
     ISNUMBER: 'SZÁM',
     ISODD: 'PÁRATLANE',
     ISTEXT: 'SZÖVEG.E',
+    LEFT: 'BAL',
+    LEN: 'HOSSZ',
     LN: 'LN',
     LOG: 'LOG',
     LOG10: 'LOG10',
@@ -98,13 +105,19 @@ export const huHU: RawTranslationPackage = {
     OFFSET: 'ELTOLÁS',
     OR: 'VAGY',
     PI: 'PI',
+    PMT: 'RÉSZLET',
     POWER: 'HATVÁNY',
+    PPMT: 'PRÉSZLET',
+    PROPER: 'TNÉV',
     RADIANS: 'RADIÁN',
     RAND: 'VÉL',
+    REPT: 'SOKSZOR',
+    RIGHT: 'JOBB',
     ROUND: 'KEREKÍTÉS',
     ROUNDDOWN: 'KEREK.LE',
     ROUNDUP: 'KEREK.FEL',
     ROWS: 'SOROK',
+    SEARCH: 'SZÖVEG.KERES',
     SIN: 'SIN',
     SPLIT: 'SPLIT',
     SQRT: 'GYÖK',
@@ -117,13 +130,17 @@ export const huHU: RawTranslationPackage = {
     TAN: 'TAN',
     TEXT: 'SZÖVEG',
     TRANSPOSE: 'TRANSZPONÁLÁS',
+    TRIM: 'KIMETSZ',
     TRUE: 'IGAZ',
     TRUNC: 'CSONK',
     VLOOKUP: 'FKERES',
     XOR: 'XVAGY',
     YEAR: 'ÉV',
   },
+  langCode: 'huHU',
   ui: {
     NEW_SHEET_PREFIX: 'Sheet',
   },
 }
+
+export default dictionary

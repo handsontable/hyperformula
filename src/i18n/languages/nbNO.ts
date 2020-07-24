@@ -4,8 +4,9 @@
  */
 
 import {RawTranslationPackage} from '..'
+// import
 
-export const nbNO: RawTranslationPackage = {
+const dictionary: RawTranslationPackage = {
   errors: {
     CYCLE: '#CYCLE!',
     DIV_BY_ZERO: '#DIV/0!',
@@ -38,6 +39,7 @@ export const nbNO: RawTranslationPackage = {
     CEILING: 'AVRUND.GJELDENDE.MULTIPLUM',
     CHAR: 'TEGNKODE',
     CHOOSE: 'VELG',
+    CLEAN: 'RENSK',
     CODE: 'KODE',
     COLUMNS: 'KOLONNER',
     CONCATENATE: 'KJEDE.SAMMEN',
@@ -66,11 +68,14 @@ export const nbNO: RawTranslationPackage = {
     EVEN: 'AVRUND.TIL.PARTALL',
     EXP: 'EKSP',
     FALSE: 'USANN',
+    FIND: 'FINN',
+    FV: 'SLUTTVERDI',
     IF: 'HVIS',
     IFERROR: 'HVISFEIL',
     IFNA: 'HVIS.IT',
     INDEX: 'INDEKS',
     INT: 'HELTALL',
+    IPMT: 'RAVDRAG',
     ISBLANK: 'ERTOM',
     ISERROR: 'ERFEIL',
     ISEVEN: 'ERPARTALL',
@@ -79,6 +84,8 @@ export const nbNO: RawTranslationPackage = {
     ISNUMBER: 'ERTALL',
     ISODD: 'ERODDE',
     ISTEXT: 'ERTEKST',
+    LEFT: 'VENSTRE',
+    LEN: 'LENGDE',
     LN: 'LN',
     LOG: 'LOG',
     LOG10: 'LOG10',
@@ -98,13 +105,19 @@ export const nbNO: RawTranslationPackage = {
     OFFSET: 'FORSKYVNING',
     OR: 'ELLER',
     PI: 'PI',
+    PMT: 'AVDRAG',
     POWER: 'OPPHØYD.I',
+    PPMT: 'AMORT',
+    PROPER: 'STOR.FORBOKSTAV',
     RADIANS: 'RADIANER',
     RAND: 'TILFELDIG',
+    REPT: 'GJENTA',
+    RIGHT: 'HØYRE',
     ROUND: 'AVRUND',
     ROUNDDOWN: 'AVRUND.NED',
     ROUNDUP: 'AVRUND.OPP',
     ROWS: 'RADER',
+    SEARCH: 'SØK',
     SIN: 'SIN',
     SPLIT: 'SPLIT',
     SQRT: 'ROT',
@@ -117,13 +130,17 @@ export const nbNO: RawTranslationPackage = {
     TAN: 'TAN',
     TEXT: 'TEKST',
     TRANSPOSE: 'TRANSPONER',
+    TRIM: 'TRIMME',
     TRUE: 'SANN',
     TRUNC: 'AVKORT',
     VLOOKUP: 'FINN.RAD',
     XOR: 'EKSKLUSIVELLER',
     YEAR: 'ÅR',
   },
+  langCode: 'nbNO',
   ui: {
     NEW_SHEET_PREFIX: 'Sheet',
   },
 }
+
+export default dictionary

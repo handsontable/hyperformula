@@ -4,8 +4,9 @@
  */
 
 import {RawTranslationPackage} from '..'
+// import
 
-export const plPL: RawTranslationPackage = {
+const dictionary: RawTranslationPackage = {
   errors: {
     CYCLE: '#CYKL!',
     DIV_BY_ZERO: '#DZIEL/0!',
@@ -38,6 +39,7 @@ export const plPL: RawTranslationPackage = {
     CEILING: 'ZAOKR.W.GÓRĘ',
     CHAR: 'ZNAK',
     CHOOSE: 'WYBIERZ',
+    CLEAN: 'OCZYŚĆ',
     CODE: 'KOD',
     COLUMNS: 'LICZBA.KOLUMN',
     CONCATENATE: 'ZŁĄCZ.TEKST',
@@ -66,11 +68,14 @@ export const plPL: RawTranslationPackage = {
     EVEN: 'ZAOKR.DO.PARZ',
     EXP: 'EXP',
     FALSE: 'FAŁSZ',
+    FIND: 'ZNAJDŹ',
+    FV: 'FV',
     IF: 'JEŻELI',
     IFERROR: 'JEŻELI.BŁĄD',
     IFNA: 'JEŻELI.ND',
     INDEX: 'INDEKS',
     INT: 'ZAOKR.DO.CAŁK',
+    IPMT: 'IPMT',
     ISBLANK: 'CZY.PUSTA',
     ISERROR: 'CZY.BŁĄD',
     ISEVEN: 'CZY.PARZYSTE',
@@ -79,6 +84,8 @@ export const plPL: RawTranslationPackage = {
     ISNUMBER: 'CZY.LICZBA',
     ISODD: 'CZY.NIEPARZYSTE',
     ISTEXT: 'CZY.TEKST',
+    LEFT: 'LEWY',
+    LEN: 'DŁ',
     LN: 'LN',
     LOG: 'LOG',
     LOG10: 'LOG10',
@@ -98,13 +105,19 @@ export const plPL: RawTranslationPackage = {
     OFFSET: 'PRZESUNIĘCIE',
     OR: 'LUB',
     PI: 'PI',
+    PMT: 'PMT',
     POWER: 'POTĘGA',
+    PPMT: 'PPMT',
+    PROPER: 'Z.WIELKIEJ.LITERY',
     RADIANS: 'RADIANY',
     RAND: 'LOSUJ',
+    REPT: 'POWT',
+    RIGHT: 'PRAWY',
     ROUND: 'ZAOKR',
     ROUNDDOWN: 'ZAOKR.DÓŁ',
     ROUNDUP: 'ZAOKR.GÓRA',
     ROWS: 'ILE.WIERSZY',
+    SEARCH: 'SZUKAJ.TEKST',
     SIN: 'SIN',
     SPLIT: 'PODZIEL.TEKST',
     SQRT: 'PIERWIASTEK',
@@ -117,13 +130,17 @@ export const plPL: RawTranslationPackage = {
     TAN: 'TAN',
     TEXT: 'TEKST',
     TRANSPOSE: 'TRANSPONUJ',
+    TRIM: 'USUŃ.ZBĘDNE.ODSTĘPY',
     TRUE: 'PRAWDA',
     TRUNC: 'LICZBA.CAŁK',
     VLOOKUP: 'WYSZUKAJ.PIONOWO',
     XOR: 'XOR',
     YEAR: 'ROK',
   },
+  langCode: 'plPL',
   ui: {
     NEW_SHEET_PREFIX: 'Arkusz',
   },
 }
+
+export default dictionary

@@ -4,8 +4,9 @@
  */
 
 import {RawTranslationPackage} from '..'
+// import
 
-export const trTR: RawTranslationPackage = {
+const dictionary: RawTranslationPackage = {
   errors: {
     CYCLE: '#CYCLE!',
     DIV_BY_ZERO: '#SAYI/0!',
@@ -38,6 +39,7 @@ export const trTR: RawTranslationPackage = {
     CEILING: 'TAVANAYUVARLA',
     CHAR: 'DAMGA',
     CHOOSE: 'ELEMAN',
+    CLEAN: 'TEMİZ',
     CODE: 'KOD',
     COLUMNS: 'SÜTUNSAY',
     CONCATENATE: 'BİRLEŞTİR',
@@ -66,11 +68,14 @@ export const trTR: RawTranslationPackage = {
     EVEN: 'ÇİFT',
     EXP: 'ÜS',
     FALSE: 'YANLIŞ',
+    FIND: 'BUL',
+    FV: 'GD',
     IF: 'EĞER',
     IFERROR: 'EĞERHATA',
     IFNA: 'EĞERYOKSA',
     INDEX: 'İNDİS',
     INT: 'TAMSAYI',
+    IPMT: 'FAİZTUTARI',
     ISBLANK: 'EBOŞSA',
     ISERROR: 'EHATALIYSA',
     ISEVEN: 'ÇİFTMİ',
@@ -79,6 +84,8 @@ export const trTR: RawTranslationPackage = {
     ISNUMBER: 'ESAYIYSA',
     ISODD: 'TEKMİ',
     ISTEXT: 'EMETİNSE',
+    LEFT: 'SOL',
+    LEN: 'UZUNLUK',
     LN: 'LN',
     LOG: 'LOG',
     LOG10: 'LOG10',
@@ -98,13 +105,19 @@ export const trTR: RawTranslationPackage = {
     OFFSET: 'KAYDIR',
     OR: 'VEYA',
     PI: 'Pİ',
+    PMT: 'DEVRESEL_ÖDEME',
     POWER: 'KUVVET',
+    PPMT: 'ANA_PARA_ÖDEMESİ',
+    PROPER: 'YAZIM.DÜZENİ',
     RADIANS: 'RADYAN',
     RAND: 'S_SAYI_ÜRET',
+    REPT: 'YİNELE',
+    RIGHT: 'SAĞ',
     ROUND: 'YUVARLA',
     ROUNDDOWN: 'AŞAĞIYUVARLA',
     ROUNDUP: 'YUKARIYUVARLA',
     ROWS: 'SATIRSAY',
+    SEARCH: 'MBUL',
     SIN: 'SİN',
     SPLIT: 'SPLIT',
     SQRT: 'KAREKÖK',
@@ -117,13 +130,17 @@ export const trTR: RawTranslationPackage = {
     TAN: 'TAN',
     TEXT: 'METNEÇEVİR',
     TRANSPOSE: 'DEVRİK_DÖNÜŞÜM',
+    TRIM: 'KIRP',
     TRUE: 'DOĞRU',
     TRUNC: 'NSAT',
     VLOOKUP: 'DÜŞEYARA',
     XOR: 'ÖZELVEYA',
     YEAR: 'YIL',
   },
+  langCode: 'trTR',
   ui: {
     NEW_SHEET_PREFIX: 'Sheet',
   },
 }
+
+export default dictionary

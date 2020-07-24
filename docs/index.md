@@ -1,67 +1,90 @@
 ---
-title: Introduction
-lang: en-US
+description: HyperFormula® - Complex Calculations Made Easy
 ---
 
+# Welcome
 
-First of all... we can use Emoji! :tada:
+<div class="iframe-container">
+  <iframe 
+    src="https://www.youtube.com/embed/JJXUmACTDdk?controls=0" 
+    frameborder="0" 
+    allow="accelerometer; 
+    encrypted-media; 
+    gyroscope; 
+    picture-in-picture" 
+    allowfullscreen>
+  </iframe>
+</div>
 
-### Blocks
+## What is HyperFormula?
 
-::: tip
-This is a tip
-:::
+HyperFormula is an open-source calculation engine that allows you
+to perform Excel-like calculations in your business applications.
+HyperFormula is written in TypeScript and works with major
+JavaScript frameworks like [Vue](/guide/integration-with-vue.md),
+[React](/guide/integration-with-react.md), and [Angular](/guide/integration-with-angular.md). You can use it in a
+browser or as a service with Node.js as your back-end technology.
 
-::: warning
-This is a warning
-:::
+It comes with a built-in [library of functions](/guide/built-in-functions.md)
+grouped into different categories, such as Math and trigonometry,
+Engineering, Statistical, Financial, and Logical. The functions use
+A1 notation and are compatible with popular spreadsheet software like
+Excel or Google Sheets, which means that you can easily transfer
+the data and formulas between them.
 
-::: danger
-This is a dangerous warning
-:::
+HyperFormula covers most user-triggered actions such as
+[CRUD operations](/guide/basic-operations.md), [undo/redo](/guide/undo-redo.md),
+and [clipboard operations](/guide/clipboard-operations.md). It also supports
+the use of cross-sheet references, [named expressions](/guide/named-ranges.md),
+[different data types](/guide/types-of-values.md),
+and [custom functions](/guide/custom-functions.md).
 
-::: details
-This is a details block, which does not work in IE / Edge
-:::
+## What can it be used for?
 
-### Code syntax
+HyperFormula doesn't assume any existing user interface \(UI\),
+which makes it a great general-purpose library that can be used in
+various business applications. Here are some ideas on what you can
+build with HyperFormula:
 
-We can use `html`, `js`, `ts` and others supported by Prism.js
+* Smart documents
+* Educational apps
+* Computation notebooks
+* Data grid components
+* Business logic builders
+* Forms and form builders
+* Spreadsheets
+* Online calculators
+* Low connectivity apps
 
-```ts
-import { HyperFormula } from 'hyperformula'
+## Core features
 
-const engine = HyperFormula.buildFromArray([[ ... ]]);
+The features that HyperFormula offers make it a flexible and easy
+to use tool for many types of software.
 
-engine.getCellValue('A1')
-```
+* High-speed formula calculations
+* A library of built-in functions available in 16 languages
+* Support for cross-sheet references
+* Support for undo/redo
+* Support for copy/cut/paste
+* Support for wildcard characters
+* Works with popular JavaScript frameworks
+* Written in TypeScript and extensively tested
+* Uses GPU acceleration for better performance
+* Function syntax compatible with Excel and Google Sheets
+* Triple-licensed: AGPL/Non-commercial/Commercial
+* Actively maintained and supported by the
+[Handsontable](https://handsontable.com/) team
 
-### Formulas syntax
-Formula Syntax is supported with `formula` and `hf` syntax.
-```formula
-=COUNTIFS($C$7:$C$350;"<>S";$F$7:$F$350;2;S$7:S$350;"*C")+COUNTIFS($C$7:$C$350;"<>S";$F$7:$F$350;3;S$7:S$350;"*C")
-```
+## Useful resources
 
-```hf
-=COUNTIFS($C$7:$C$350;"<>S";$F$7:$F$350;2;S$7:S$350;"*C")+COUNTIFS($C$7:$C$350;"<>S";$F$7:$F$350;3;S$7:S$350;"*C")
-```
+* [Basic usage](/guide/basic-usage.md)
+* [Configuration options](/guide/configuration-options.md)
+* [Built-in functions](/guide/built-in-functions.md)
+* [Custom functions](/guide/custom-functions.md)
+* [Key concepts](/guide/key-concepts.md)
+* [Performance](/guide/performance.md)
 
-```hyperformula
-=COUNTIFS($C$7:$C$350;"<>S";$F$7:$F$350;2;S$7:S$350;"*C")+COUNTIFS($C$7:$C$350;"<>S";$F$7:$F$350;3;S$7:S$350;"*C")
-```
+<br>
 
-### Github style tables
-
-| Tables        | Are           | Cool  |
-| ------------- |:-------------:| -----:|
-| col 3 is      | right-aligned | $1600 |
-| col 2 is      | centered      |   $12 |
-| zebra stripes | are neat      |    $1 |
-
-### Links
-
-[GPU Support](gpu-support.md)
-
-### Frontmatter
-
-The beginning of the file with meta data
+This documentation is licensed under 
+[CC BY 4.0](https://creativecommons.org/licenses/by/4.0/).

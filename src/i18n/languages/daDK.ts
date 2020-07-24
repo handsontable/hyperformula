@@ -4,8 +4,9 @@
  */
 
 import {RawTranslationPackage} from '..'
+// import
 
-export const daDK: RawTranslationPackage = {
+const dictionary: RawTranslationPackage = {
   errors: {
     CYCLE: '#CYCLE!',
     DIV_BY_ZERO: '#DIVISION/0!',
@@ -38,6 +39,7 @@ export const daDK: RawTranslationPackage = {
     CEILING: 'AFRUND.LOFT',
     CHAR: 'CHAR',
     CHOOSE: 'VÆLG',
+    CLEAN: 'RENS',
     CODE: 'KODE',
     COLUMNS: 'KOLONNER',
     CONCATENATE: 'SAMMENKÆDNING',
@@ -66,11 +68,14 @@ export const daDK: RawTranslationPackage = {
     EVEN: 'LIGE',
     EXP: 'EKSP',
     FALSE: 'FALSE',
+    FIND: 'FIND',
+    FV: 'FV',
     IF: 'HVIS',
     IFERROR: 'HVIS.FEJL',
     IFNA: 'HVISIT',
     INDEX: 'INDEKS',
     INT: 'HELTAL',
+    IPMT: 'R.YDELSE',
     ISBLANK: 'ER.TOM',
     ISERROR: 'ER.FEJL',
     ISEVEN: 'ER.LIGE',
@@ -79,6 +84,8 @@ export const daDK: RawTranslationPackage = {
     ISNUMBER: 'ER.TAL',
     ISODD: 'ER.ULIGE',
     ISTEXT: 'ER.TEKST',
+    LEFT: 'VENSTRE',
+    LEN: 'LÆNGDE',
     LN: 'LN',
     LOG: 'LOG',
     LOG10: 'LOG10',
@@ -98,13 +105,19 @@ export const daDK: RawTranslationPackage = {
     OFFSET: 'FORSKYDNING',
     OR: 'ELLER',
     PI: 'PI',
+    PMT: 'YDELSE',
     POWER: 'POTENS',
+    PPMT: 'H.YDELSE',
+    PROPER: 'STORT.FORBOGSTAV',
     RADIANS: 'RADIANER',
     RAND: 'SLUMP',
+    REPT: 'GENTAG',
+    RIGHT: 'HØJRE',
     ROUND: 'AFRUND',
     ROUNDDOWN: 'RUND.NED',
     ROUNDUP: 'RUND.OP',
     ROWS: 'RÆKKER',
+    SEARCH: 'SØG',
     SIN: 'SIN',
     SPLIT: 'SPLIT',
     SQRT: 'KVROD',
@@ -117,13 +130,17 @@ export const daDK: RawTranslationPackage = {
     TAN: 'TAN',
     TEXT: 'TEKST',
     TRANSPOSE: 'TRANSPONER',
+    TRIM: 'FJERN.OVERFLØDIGE.BLANKE',
     TRUE: 'TRUE',
     TRUNC: 'AFKORT',
     VLOOKUP: 'LOPSLAG',
     XOR: 'XELLER',
     YEAR: 'ÅR',
   },
+  langCode: 'daDK',
   ui: {
     NEW_SHEET_PREFIX: 'Sheet',
   },
 }
+
+export default dictionary

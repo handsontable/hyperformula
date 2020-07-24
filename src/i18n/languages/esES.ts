@@ -4,8 +4,9 @@
  */
 
 import {RawTranslationPackage} from '..'
+// import
 
-export const esES: RawTranslationPackage = {
+export const dictionary: RawTranslationPackage = {
   errors: {
     CYCLE: '#CYCLE!',
     DIV_BY_ZERO: '#¡DIV/0!',
@@ -38,6 +39,7 @@ export const esES: RawTranslationPackage = {
     CEILING: 'MULTIPLO.SUPERIOR',
     CHAR: 'CARACTER',
     CHOOSE: 'ELEGIR',
+    CLEAN: 'LIMPIAR',
     CODE: 'CODIGO',
     COLUMNS: 'COLUMNAS',
     CONCATENATE: 'CONCATENAR',
@@ -66,11 +68,14 @@ export const esES: RawTranslationPackage = {
     EVEN: 'REDONDEA.PAR',
     EXP: 'EXP',
     FALSE: 'FALSO',
+    FIND: 'ENCONTRAR',
+    FV: 'VF',
     IF: 'SI',
     IFERROR: 'SI.ERROR',
     IFNA: 'IFNA',
     INDEX: 'INDICE',
     INT: 'ENTERO',
+    IPMT: 'PAGOINT',
     ISBLANK: 'ESBLANCO',
     ISERROR: 'ESERROR',
     ISEVEN: 'ES.PAR',
@@ -79,6 +84,8 @@ export const esES: RawTranslationPackage = {
     ISNUMBER: 'ESNUMERO',
     ISODD: 'ES.IMPAR',
     ISTEXT: 'ESTEXTO',
+    LEFT: 'IZQUIERDA',
+    LEN: 'LARGO',
     LN: 'LN',
     LOG: 'LOG',
     LOG10: 'LOG10',
@@ -98,13 +105,19 @@ export const esES: RawTranslationPackage = {
     OFFSET: 'DESREF',
     OR: 'O',
     PI: 'PI',
+    PMT: 'PAGO',
     POWER: 'POTENCIA',
+    PPMT: 'PAGOPRIN',
+    PROPER: 'NOMPROPIO',
     RADIANS: 'RADIANES',
     RAND: 'ALEATORIO',
+    REPT: 'REPETIR',
+    RIGHT: 'DERECHA',
     ROUND: 'REDONDEAR',
     ROUNDDOWN: 'REDONDEAR.MENOS',
     ROUNDUP: 'REDONDEAR.MAS',
     ROWS: 'FILAS',
+    SEARCH: 'HALLAR',
     SIN: 'SENO',
     SPLIT: 'SPLIT',
     SQRT: 'RAIZ',
@@ -117,13 +130,17 @@ export const esES: RawTranslationPackage = {
     TAN: 'TAN',
     TEXT: 'TEXTO',
     TRANSPOSE: 'TRANSPONER',
+    TRIM: 'ESPACIOS',
     TRUE: 'VERDADERO',
     TRUNC: 'TRUNCAR',
     VLOOKUP: 'BUSCARV',
     XOR: 'XOR',
     YEAR: 'AÑO',
   },
+  langCode: 'esES',
   ui: {
     NEW_SHEET_PREFIX: 'Sheet',
   },
 }
+
+export default dictionary

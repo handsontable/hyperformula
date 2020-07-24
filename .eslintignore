@@ -12,6 +12,7 @@ coverage
 dist
 doc
 es
+languages
 lib
 script
 test-jasmine

@@ -21,9 +21,9 @@ describe('Date helpers', () => {
 
   it('#dateNumberToMonthNumber should return proper month number', () => {
     const dateHelper = new DateTimeHelper(new Config())
-    expect(dateHelper.numberToDate(0).month).toEqual(12)
-    expect(dateHelper.numberToDate(2).month).toEqual(1)
-    expect(dateHelper.numberToDate(43465).month).toEqual(12)
+    expect(dateHelper.numberToSimpleDate(0).month).toEqual(12)
+    expect(dateHelper.numberToSimpleDate(2).month).toEqual(1)
+    expect(dateHelper.numberToSimpleDate(43465).month).toEqual(12)
   })
 
   it('#stringToDateNumber - tests expected to return not null, dates', () => {
@@ -151,9 +151,9 @@ describe('Date helpers, other zero date', () => {
   it('#dateNumberToMonthNumber should return proper month number, different zero date', () => {
     const config = new Config({nullDate: {year: 1950, month: 6, day: 15}})
     const dateHelper = new DateTimeHelper(config)
-    expect(dateHelper.numberToDate(0).month).toEqual(6)
-    expect(dateHelper.numberToDate(2).month).toEqual(6)
-    expect(dateHelper.numberToDate(43465).month).toEqual(6)
+    expect(dateHelper.numberToSimpleDate(0).month).toEqual(6)
+    expect(dateHelper.numberToSimpleDate(2).month).toEqual(6)
+    expect(dateHelper.numberToSimpleDate(43465).month).toEqual(6)
   })
 
   it('#stringToDateNumber - tests expected to return not null, different zero date', () => {

@@ -4,8 +4,9 @@
  */
 
 import {RawTranslationPackage} from '..'
+// import
 
-export const itIT: RawTranslationPackage = {
+const dictionary: RawTranslationPackage = {
   errors: {
     CYCLE: '#CYCLE!',
     DIV_BY_ZERO: '#DIV/0!',
@@ -38,6 +39,7 @@ export const itIT: RawTranslationPackage = {
     CEILING: 'ARROTONDA.ECCESSO',
     CHAR: 'CODICE.CARATT',
     CHOOSE: 'SCEGLI',
+    CLEAN: 'LIBERA',
     CODE: 'CODICE',
     COLUMNS: 'COLONNE',
     CONCATENATE: 'CONCATENA',
@@ -66,11 +68,14 @@ export const itIT: RawTranslationPackage = {
     EVEN: 'PARI',
     EXP: 'EXP',
     FALSE: 'FALSO',
+    FIND: 'TROVA',
+    FV: 'VAL.FUT',
     IF: 'SE',
     IFERROR: 'SE.ERRORE',
     IFNA: 'SE.NON.DISP.',
     INDEX: 'INDICE',
     INT: 'INT',
+    IPMT: 'INTERESSI',
     ISBLANK: 'VAL.VUOTO',
     ISERROR: 'VAL.ERRORE',
     ISEVEN: 'VAL.PARI',
@@ -79,6 +84,8 @@ export const itIT: RawTranslationPackage = {
     ISNUMBER: 'VAL.NUMERO',
     ISODD: 'VAL.DISPARI',
     ISTEXT: 'VAL.TESTO',
+    LEFT: 'SINISTRA',
+    LEN: 'LUNGHEZZA',
     LN: 'LN',
     LOG: 'LOG',
     LOG10: 'LOG10',
@@ -98,13 +105,19 @@ export const itIT: RawTranslationPackage = {
     OFFSET: 'SCARTO',
     OR: 'O',
     PI: 'PI.GRECO',
+    PMT: 'RATA',
     POWER: 'POTENZA',
+    PPMT: 'P.RATA',
+    PROPER: 'MAIUSC.INIZ',
     RADIANS: 'RADIANTI',
     RAND: 'CASUALE',
+    REPT: 'RIPETI',
+    RIGHT: 'DESTRA',
     ROUND: 'ARROTONDA',
     ROUNDDOWN: 'ARROTONDA.PER.DIF',
     ROUNDUP: 'ARROTONDA.PER.ECC',
     ROWS: 'RIGHE',
+    SEARCH: 'RICERCA',
     SIN: 'SEN',
     SPLIT: 'SPLIT',
     SQRT: 'RADQ',
@@ -117,13 +130,17 @@ export const itIT: RawTranslationPackage = {
     TAN: 'TAN',
     TEXT: 'TESTO',
     TRANSPOSE: 'MATR.TRASPOSTA',
+    TRIM: 'ANNULLA.SPAZI',
     TRUE: 'VERO',
     TRUNC: 'TRONCA',
     VLOOKUP: 'CERCA.VERT',
     XOR: 'XOR',
     YEAR: 'ANNO',
   },
+  langCode: 'itIT',
   ui: {
     NEW_SHEET_PREFIX: 'Sheet',
   },
 }
+
+export default dictionary

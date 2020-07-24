@@ -4,8 +4,9 @@
  */
 
 import {RawTranslationPackage} from '..'
+// import
 
-export const enGB: RawTranslationPackage = {
+const dictionary: RawTranslationPackage = {
   errors: {
     CYCLE: '#CYCLE!',
     DIV_BY_ZERO: '#DIV/0!',
@@ -38,6 +39,7 @@ export const enGB: RawTranslationPackage = {
     CEILING: 'CEILING',
     CHAR: 'CHAR',
     CHOOSE: 'CHOOSE',
+    CLEAN: 'CLEAN',
     CODE: 'CODE',
     COLUMNS: 'COLUMNS',
     CONCATENATE: 'CONCATENATE',
@@ -66,11 +68,14 @@ export const enGB: RawTranslationPackage = {
     EVEN: 'EVEN',
     EXP: 'EXP',
     FALSE: 'FALSE',
+    FIND: 'FIND',
+    FV: 'FV',
     IF: 'IF',
     IFERROR: 'IFERROR',
     IFNA: 'IFNA',
     INDEX: 'INDEX',
     INT: 'INT',
+    IPMT: 'IPMT',
     ISBLANK: 'ISBLANK',
     ISERROR: 'ISERROR',
     ISEVEN: 'ISEVEN',
@@ -79,6 +84,8 @@ export const enGB: RawTranslationPackage = {
     ISNUMBER: 'ISNUMBER',
     ISODD: 'ISODD',
     ISTEXT: 'ISTEXT',
+    LEFT: 'LEFT',
+    LEN: 'LEN',
     LN: 'LN',
     LOG: 'LOG',
     LOG10: 'LOG10',
@@ -98,13 +105,19 @@ export const enGB: RawTranslationPackage = {
     OFFSET: 'OFFSET',
     OR: 'OR',
     PI: 'PI',
+    PMT: 'PMT',
+    PPMT: 'PPMT',
     POWER: 'POWER',
+    PROPER: 'PROPER',
     RADIANS: 'RADIANS',
     RAND: 'RAND',
+    REPT: 'REPT',
+    RIGHT: 'RIGHT',
     ROUND: 'ROUND',
     ROUNDDOWN: 'ROUNDDOWN',
     ROUNDUP: 'ROUNDUP',
     ROWS: 'ROWS',
+    SEARCH: 'SEARCH',
     SIN: 'SIN',
     SPLIT: 'SPLIT',
     SQRT: 'SQRT',
@@ -117,13 +130,17 @@ export const enGB: RawTranslationPackage = {
     TAN: 'TAN',
     TEXT: 'TEXT',
     TRANSPOSE: 'TRANSPOSE',
+    TRIM: 'TRIM',
     TRUE: 'TRUE',
     TRUNC: 'TRUNC',
     VLOOKUP: 'VLOOKUP',
     XOR: 'XOR',
     YEAR: 'YEAR',
   },
+  langCode: 'enGB',
   ui: {
     NEW_SHEET_PREFIX: 'Sheet',
   },
 }
+
+export default dictionary

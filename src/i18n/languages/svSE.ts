@@ -4,8 +4,9 @@
  */
 
 import {RawTranslationPackage} from '..'
+// import
 
-export const svSE: RawTranslationPackage = {
+const dictionary: RawTranslationPackage = {
   errors: {
     CYCLE: '#CYCLE!',
     DIV_BY_ZERO: '#DIVISION/0!',
@@ -38,6 +39,7 @@ export const svSE: RawTranslationPackage = {
     CEILING: 'RUNDA.UPP',
     CHAR: 'TECKENKOD',
     CHOOSE: 'VÄLJ',
+    CLEAN: 'STÄDA',
     CODE: 'KOD',
     COLUMNS: 'KOLUMNER',
     CONCATENATE: 'SAMMANFOGA',
@@ -66,11 +68,14 @@ export const svSE: RawTranslationPackage = {
     EVEN: 'JÄMN',
     EXP: 'EXP',
     FALSE: 'FALSKT',
+    FIND: 'HITTA',
+    FV: 'SLUTVÄRDE',
     IF: 'OM',
     IFERROR: 'OMFEL',
     IFNA: 'IFNA',
     INDEX: 'INDEX',
     INT: 'HELTAL',
+    IPMT: 'RBETALNING',
     ISBLANK: 'ÄRTOM',
     ISERROR: 'ÄRFEL',
     ISEVEN: 'ÄRJÄMN',
@@ -79,6 +84,8 @@ export const svSE: RawTranslationPackage = {
     ISNUMBER: 'ÄRTAL',
     ISODD: 'ÄRUDDA',
     ISTEXT: 'ÄRTEXT',
+    LEFT: 'VÄNSTER',
+    LEN: 'LÄNGD',
     LN: 'LN',
     LOG: 'LOG',
     LOG10: 'LOG10',
@@ -98,13 +105,19 @@ export const svSE: RawTranslationPackage = {
     OFFSET: 'FÖRSKJUTNING',
     OR: 'ELLER',
     PI: 'PI',
+    PMT: 'BETALNING',
     POWER: 'UPPHÖJT.TILL',
+    PPMT: 'AMORT',
+    PROPER: 'INITIAL',
     RADIANS: 'RADIANER',
     RAND: 'SLUMP',
+    REPT: 'REP',
+    RIGHT: 'HÖGER',
     ROUND: 'AVRUNDA',
     ROUNDDOWN: 'AVRUNDA.NEDÅT',
     ROUNDUP: 'AVRUNDA.UPPÅT',
     ROWS: 'RADER',
+    SEARCH: 'SÖK',
     SIN: 'SIN',
     SPLIT: 'SPLIT',
     SQRT: 'ROT',
@@ -117,13 +130,17 @@ export const svSE: RawTranslationPackage = {
     TAN: 'TAN',
     TEXT: 'TEXT',
     TRANSPOSE: 'TRANSPONERA',
+    TRIM: 'RENSA',
     TRUE: 'SANT',
     TRUNC: 'AVKORTA',
     VLOOKUP: 'LETARAD',
     XOR: 'XOR',
     YEAR: 'ÅR',
   },
+  langCode: 'svSE',
   ui: {
     NEW_SHEET_PREFIX: 'Sheet',
   },
 }
+
+export default dictionary

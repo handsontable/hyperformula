@@ -4,8 +4,9 @@
  */
 
 import {RawTranslationPackage} from '..'
+// import
 
-export const frFR: RawTranslationPackage = {
+const dictionary: RawTranslationPackage = {
   errors: {
     CYCLE: '#CYCLE!',
     DIV_BY_ZERO: '#DIV/0!',
@@ -38,6 +39,7 @@ export const frFR: RawTranslationPackage = {
     CEILING: 'PLAFOND',
     CHAR: 'CAR',
     CHOOSE: 'CHOISIR',
+    CLEAN: 'EPURAGE',
     CODE: 'CODE',
     COLUMNS: 'COLONNES',
     CONCATENATE: 'CONCATENER',
@@ -66,11 +68,14 @@ export const frFR: RawTranslationPackage = {
     EVEN: 'PAIR',
     EXP: 'EXP',
     FALSE: 'FAUX',
+    FIND: 'TROUVE',
+    FV: 'VC',
     IF: 'SI',
     IFERROR: 'SIERREUR',
     IFNA: 'SI.NON.DISP',
     INDEX: 'INDEX',
     INT: 'ENT',
+    IPMT: 'INTPER',
     ISBLANK: 'ESTVIDE',
     ISERROR: 'ESTERREUR',
     ISEVEN: 'EST.PAIR',
@@ -79,6 +84,8 @@ export const frFR: RawTranslationPackage = {
     ISNUMBER: 'ESTNUM',
     ISODD: 'EST.IMPAIR',
     ISTEXT: 'ESTTEXTE',
+    LEFT: 'GAUCHE',
+    LEN: 'NBCAR',
     LN: 'LN',
     LOG: 'LOG',
     LOG10: 'LOG10',
@@ -98,13 +105,19 @@ export const frFR: RawTranslationPackage = {
     OFFSET: 'DECALER',
     OR: 'OU',
     PI: 'PI',
+    PMT: 'VPM',
     POWER: 'PUISSANCE',
+    PPMT: 'PRINCPER',
+    PROPER: 'NOMPROPRE',
     RADIANS: 'RADIANS',
     RAND: 'ALEA',
+    REPT: 'REPT',
+    RIGHT: 'DROITE',
     ROUND: 'ARRONDI',
     ROUNDDOWN: 'ARRONDI.INF',
     ROUNDUP: 'ARRONDI.SUP',
     ROWS: 'LIGNES',
+    SEARCH: 'CHERCHE',
     SIN: 'SIN',
     SPLIT: 'SPLIT',
     SQRT: 'RACINE',
@@ -117,13 +130,17 @@ export const frFR: RawTranslationPackage = {
     TAN: 'TAN',
     TEXT: 'TEXTE',
     TRANSPOSE: 'TRANSPOSE',
+    TRIM: 'SUPPRESPACE',
     TRUE: 'VRAI',
     TRUNC: 'TRONQUE',
     VLOOKUP: 'RECHERCHEV',
     XOR: 'OUX',
     YEAR: 'ANNEE',
   },
+  langCode: 'frFR',
   ui: {
     NEW_SHEET_PREFIX: 'Sheet',
   },
 }
+
+export default dictionary

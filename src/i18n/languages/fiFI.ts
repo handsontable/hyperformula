@@ -4,8 +4,9 @@
  */
 
 import {RawTranslationPackage} from '..'
+// import
 
-export const fiFI: RawTranslationPackage = {
+const dictionary: RawTranslationPackage = {
   errors: {
     CYCLE: '#CYCLE!',
     DIV_BY_ZERO: '#JAKO/0!',
@@ -38,6 +39,7 @@ export const fiFI: RawTranslationPackage = {
     CEILING: 'PYÖRISTÄ.KERR.YLÖS',
     CHAR: 'MERKKI',
     CHOOSE: 'VALITSE.INDEKSI',
+    CLEAN: 'SIIVOA',
     CODE: 'KOODI',
     COLUMNS: 'SARAKKEET',
     CONCATENATE: 'KETJUTA',
@@ -66,11 +68,14 @@ export const fiFI: RawTranslationPackage = {
     EVEN: 'PARILLINEN',
     EXP: 'EKSPONENTTI',
     FALSE: 'EPÄTOSI',
+    FIND: 'ETSI',
+    FV: 'TULEVA.ARVO',
     IF: 'JOS',
     IFERROR: 'JOSVIRHE',
     IFNA: 'JOSPUUTTUU',
     INDEX: 'INDEKSI',
     INT: 'KOKONAISLUKU',
+    IPMT: 'IPMT',
     ISBLANK: 'ONTYHJÄ',
     ISERROR: 'ONVIRHE',
     ISEVEN: 'ONPARILLINEN',
@@ -79,6 +84,8 @@ export const fiFI: RawTranslationPackage = {
     ISNUMBER: 'ONLUKU',
     ISODD: 'ONPARITON',
     ISTEXT: 'ONTEKSTI',
+    LEFT: 'VASEN',
+    LEN: 'PITUUS',
     LN: 'LUONNLOG',
     LOG: 'LOG',
     LOG10: 'LOG10',
@@ -98,13 +105,19 @@ export const fiFI: RawTranslationPackage = {
     OFFSET: 'SIIRTYMÄ',
     OR: 'TAI',
     PI: 'PII',
+    PMT: 'MAKSU',
     POWER: 'POTENSSI',
+    PPMT: 'PPMT',
+    PROPER: 'ERISNIMI',
     RADIANS: 'RADIAANIT',
     RAND: 'SATUNNAISLUKU',
+    REPT: 'TOISTA',
+    RIGHT: 'OIKEA',
     ROUND: 'PYÖRISTÄ',
     ROUNDDOWN: 'PYÖRISTÄ.DES.ALAS',
     ROUNDUP: 'PYÖRISTÄ.DES.YLÖS',
     ROWS: 'RIVIT',
+    SEARCH: 'KÄY.LÄPI',
     SIN: 'SIN',
     SPLIT: 'SPLIT',
     SQRT: 'NELIÖJUURI',
@@ -117,13 +130,17 @@ export const fiFI: RawTranslationPackage = {
     TAN: 'TAN',
     TEXT: 'TEKSTI',
     TRANSPOSE: 'TRANSPONOI',
+    TRIM: 'POISTA.VÄLIT',
     TRUE: 'TOSI',
     TRUNC: 'KATKAISE',
     VLOOKUP: 'PHAKU',
     XOR: 'EHDOTON.TAI',
     YEAR: 'VUOSI',
   },
+  langCode: 'fiFI',
   ui: {
     NEW_SHEET_PREFIX: 'Sheet',
   },
 }
+
+export default dictionary

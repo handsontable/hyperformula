@@ -4,8 +4,9 @@
  */
 
 import {RawTranslationPackage} from '..'
+// import
 
-export const csCZ: RawTranslationPackage = {
+const dictionary: RawTranslationPackage = {
   errors: {
     CYCLE: '#CYCLE!',
     DIV_BY_ZERO: '#DĚLENÍ_NULOU!',
@@ -38,6 +39,7 @@ export const csCZ: RawTranslationPackage = {
     CEILING: 'ZAOKR.NAHORU',
     CHAR: 'ZNAK',
     CHOOSE: 'ZVOLIT',
+    CLEAN: 'VYČISTIT',
     CODE: 'KÓD',
     COLUMNS: 'SLOUPCE',
     CONCATENATE: 'CONCATENATE',
@@ -66,11 +68,14 @@ export const csCZ: RawTranslationPackage = {
     EVEN: 'ZAOKROUHLIT.NA.SUDÉ',
     EXP: 'EXP',
     FALSE: 'NEPRAVDA',
+    FIND: 'NAJÍT',
+    FV: 'BUDHODNOTA',
     IF: 'KDYŽ',
     IFERROR: 'IFERROR',
     IFNA: 'IFNA',
     INDEX: 'INDEX',
     INT: 'CELÁ.ČÁST',
+    IPMT: 'PLATBA.ÚROK',
     ISBLANK: 'JE.PRÁZDNÉ',
     ISERROR: 'JE.CHYBHODN',
     ISEVEN: 'ISEVEN',
@@ -79,6 +84,8 @@ export const csCZ: RawTranslationPackage = {
     ISNUMBER: 'JE.ČISLO',
     ISODD: 'ISODD',
     ISTEXT: 'JE.TEXT',
+    LEFT: 'ZLEVA',
+    LEN: 'DÉLKA',
     LN: 'LN',
     LOG: 'LOGZ',
     LOG10: 'LOG',
@@ -98,13 +105,19 @@ export const csCZ: RawTranslationPackage = {
     OFFSET: 'POSUN',
     OR: 'NEBO',
     PI: 'PI',
+    PMT: 'PLATBA',
     POWER: 'POWER',
+    PPMT: 'PLATBA.ZÁKLAD',
+    PROPER: 'VELKÁ2',
     RADIANS: 'RADIANS',
     RAND: 'NÁHČÍSLO',
+    REPT: 'OPAKOVAT',
+    RIGHT: 'ZPRAVA',
     ROUND: 'ZAOKROUHLIT',
     ROUNDDOWN: 'ROUNDDOWN',
     ROUNDUP: 'ROUNDUP',
     ROWS: 'ŘÁDKY',
+    SEARCH: 'HLEDAT',
     SIN: 'SIN',
     SPLIT: 'SPLIT',
     SQRT: 'ODMOCNINA',
@@ -117,13 +130,17 @@ export const csCZ: RawTranslationPackage = {
     TAN: 'TG',
     TEXT: 'HODNOTA.NA.TEXT',
     TRANSPOSE: 'TRANSPOZICE',
+    TRIM: 'PROČISTIT',
     TRUE: 'PRAVDA',
     TRUNC: 'USEKNOUT',
     VLOOKUP: 'SVYHLEDAT',
     XOR: 'XOR',
     YEAR: 'ROK',
   },
+  langCode: 'csCZ',
   ui: {
     NEW_SHEET_PREFIX: 'Sheet',
   },
 }
+
+export default dictionary

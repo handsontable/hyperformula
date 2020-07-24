@@ -4,8 +4,9 @@
  */
 
 import {RawTranslationPackage} from '..'
+// import
 
-export const ptPT: RawTranslationPackage = {
+const dictionary: RawTranslationPackage = {
   errors: {
     CYCLE: '#CYCLE!',
     DIV_BY_ZERO: '#DIV/0!',
@@ -38,6 +39,7 @@ export const ptPT: RawTranslationPackage = {
     CEILING: 'TETO',
     CHAR: 'CARACT',
     CHOOSE: 'ESCOLHER',
+    CLEAN: 'TIRAR',
     CODE: 'CÓDIGO',
     COLUMNS: 'COLS',
     CONCATENATE: 'CONCATENAR',
@@ -66,11 +68,14 @@ export const ptPT: RawTranslationPackage = {
     EVEN: 'PAR',
     EXP: 'EXP',
     FALSE: 'FALSO',
+    FIND: 'PROCURAR',
+    FV: 'VF',
     IF: 'SE',
     IFERROR: 'SEERRO',
     IFNA: 'SENA',
     INDEX: 'ÍNDICE',
     INT: 'INT',
+    IPMT: 'IPGTO',
     ISBLANK: 'ÉCÉL.VAZIA',
     ISERROR: 'ÉERROS',
     ISEVEN: 'ÉPAR',
@@ -79,6 +84,8 @@ export const ptPT: RawTranslationPackage = {
     ISNUMBER: 'ÉNÚM',
     ISODD: 'ÉIMPAR',
     ISTEXT: 'ÉTEXTO',
+    LEFT: 'ESQUERDA',
+    LEN: 'NÚM.CARACT',
     LN: 'LN',
     LOG: 'LOG',
     LOG10: 'LOG10',
@@ -98,13 +105,19 @@ export const ptPT: RawTranslationPackage = {
     OFFSET: 'DESLOC',
     OR: 'OU',
     PI: 'PI',
+    PMT: 'PGTO',
     POWER: 'POTÊNCIA',
+    PPMT: 'PPGTO',
+    PROPER: 'PRI.MAIÚSCULA',
     RADIANS: 'RADIANOS',
     RAND: 'ALEATÓRIO',
+    REPT: 'REPT',
+    RIGHT: 'DIREITA',
     ROUND: 'ARRED',
     ROUNDDOWN: 'ARREDONDAR.PARA.BAIXO',
     ROUNDUP: 'ARREDONDAR.PARA.CIMA',
     ROWS: 'LINS',
+    SEARCH: 'LOCALIZAR',
     SIN: 'SEN',
     SPLIT: 'SPLIT',
     SQRT: 'RAIZ',
@@ -117,13 +130,17 @@ export const ptPT: RawTranslationPackage = {
     TAN: 'TAN',
     TEXT: 'TEXTO',
     TRANSPOSE: 'TRANSPOR',
+    TRIM: 'ARRUMAR',
     TRUE: 'VERDADEIRO',
     TRUNC: 'TRUNCAR',
     VLOOKUP: 'PROCV',
     XOR: 'OUEXCL',
     YEAR: 'ANO',
   },
+  langCode: 'ptPT',
   ui: {
     NEW_SHEET_PREFIX: 'Sheet',
   },
 }
+
+export default dictionary

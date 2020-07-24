@@ -4,8 +4,9 @@
  */
 
 import {RawTranslationPackage} from '..'
+// import
 
-export const nlNL: RawTranslationPackage = {
+const dictionary: RawTranslationPackage = {
   errors: {
     CYCLE: '#CYCLE!',
     DIV_BY_ZERO: '#DELING.DOOR.0!',
@@ -38,6 +39,7 @@ export const nlNL: RawTranslationPackage = {
     CEILING: 'AFRONDEN.BOVEN',
     CHAR: 'TEKEN',
     CHOOSE: 'KIEZEN',
+    CLEAN: 'WISSEN.CONTROL',
     CODE: 'CODE',
     COLUMNS: 'KOLOMMEN',
     CONCATENATE: 'TEKST.SAMENVOEGEN',
@@ -66,11 +68,14 @@ export const nlNL: RawTranslationPackage = {
     EVEN: 'EVEN',
     EXP: 'EXP',
     FALSE: 'ONWAAR',
+    FIND: 'VIND.ALLES',
+    FV: 'TW',
     IF: 'ALS',
     IFERROR: 'ALS.FOUT',
     IFNA: 'ALS.NB',
     INDEX: 'INDEX',
     INT: 'INTEGER',
+    IPMT: 'IBET',
     ISBLANK: 'ISLEEG',
     ISERROR: 'ISFOUT',
     ISEVEN: 'IS.EVEN',
@@ -79,6 +84,8 @@ export const nlNL: RawTranslationPackage = {
     ISNUMBER: 'ISGETAL',
     ISODD: 'IS.ONEVEN',
     ISTEXT: 'ISTEKST',
+    LEFT: 'LINKS',
+    LEN: 'PITUUS',
     LN: 'LN',
     LOG: 'LOG',
     LOG10: 'LOG10',
@@ -98,13 +105,19 @@ export const nlNL: RawTranslationPackage = {
     OFFSET: 'VERSCHUIVING',
     OR: 'OF',
     PI: 'PI',
+    PMT: 'BET',
     POWER: 'MACHT',
+    PPMT: 'PBET',
+    PROPER: 'BEGINLETTERS',
     RADIANS: 'RADIALEN',
     RAND: 'ASELECT',
+    REPT: 'HERHALING',
+    RIGHT: 'RECHTS',
     ROUND: 'AFRONDEN',
     ROUNDDOWN: 'AFRONDEN.NAAR.BENEDEN',
     ROUNDUP: 'AFRONDEN.NAAR.BOVEN',
     ROWS: 'RIJEN',
+    SEARCH: 'VIND.SPEC',
     SIN: 'SIN',
     SPLIT: 'SPLIT',
     SQRT: 'WORTEL',
@@ -117,13 +130,17 @@ export const nlNL: RawTranslationPackage = {
     TAN: 'TAN',
     TEXT: 'TEKST',
     TRANSPOSE: 'TRANSPONEREN',
+    TRIM: 'SPATIES.WISSEN',
     TRUE: 'WAAR',
     TRUNC: 'GEHEEL',
     VLOOKUP: 'VERT.ZOEKEN',
     XOR: 'EX.OF',
     YEAR: 'JAAR',
   },
+  langCode: 'nlNL',
   ui: {
     NEW_SHEET_PREFIX: 'Sheet',
   },
 }
+
+export default dictionary

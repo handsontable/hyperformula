@@ -4,8 +4,9 @@
  */
 
 import {RawTranslationPackage} from '..'
+// import
 
-export const deDE: RawTranslationPackage = {
+const dictionary: RawTranslationPackage = {
   errors: {
     CYCLE: '#CYCLE!',
     DIV_BY_ZERO: '#DIV/0!',
@@ -38,6 +39,7 @@ export const deDE: RawTranslationPackage = {
     CEILING: 'OBERGRENZE',
     CHAR: 'ZEICHEN',
     CHOOSE: 'WAHL',
+    CLEAN: 'SÄUBERN',
     CODE: 'CODE',
     COLUMNS: 'SPALTEN',
     CONCATENATE: 'VERKETTEN',
@@ -66,11 +68,14 @@ export const deDE: RawTranslationPackage = {
     EVEN: 'GERADE',
     EXP: 'EXP',
     FALSE: 'FALSCH',
+    FIND: 'FINDEN',
+    FV: 'ZW',
     IF: 'WENN',
     IFERROR: 'WENNFEHLER',
     IFNA: 'WENNNV',
     INDEX: 'INDEX',
     INT: 'GANZZAHL',
+    IPMT: 'ZINSZ',
     ISBLANK: 'ISTLEER',
     ISERROR: 'ISTFEHLER',
     ISEVEN: 'ISTGERADE',
@@ -79,6 +84,8 @@ export const deDE: RawTranslationPackage = {
     ISNUMBER: 'ISTZAHL',
     ISODD: 'ISTUNGERADE',
     ISTEXT: 'ISTTEXT',
+    LEFT: 'LINKS',
+    LEN: 'LÄNGE',
     LN: 'LN',
     LOG: 'LOG',
     LOG10: 'LOG10',
@@ -98,13 +105,19 @@ export const deDE: RawTranslationPackage = {
     OFFSET: 'BEREICH.VERSCHIEBEN',
     OR: 'ODER',
     PI: 'PI',
+    PMT: 'RMZ',
     POWER: 'POTENZ',
+    PPMT: 'KAPZ',
+    PROPER: 'GROSS2',
     RADIANS: 'BOGENMASS',
     RAND: 'ZUFALLSZAHL',
+    REPT: 'WIEDERHOLEN',
+    RIGHT: 'RECHTS',
     ROUND: 'RUNDEN',
     ROUNDDOWN: 'ABRUNDEN',
     ROUNDUP: 'AUFRUNDEN',
     ROWS: 'ZEILEN',
+    SEARCH: 'SUCHEN',
     SIN: 'SIN',
     SPLIT: 'SPLIT',
     SQRT: 'WURZEL',
@@ -117,13 +130,17 @@ export const deDE: RawTranslationPackage = {
     TAN: 'TAN',
     TEXT: 'TEXT',
     TRANSPOSE: 'MTRANS',
+    TRIM: 'GLÄTTEN',
     TRUE: 'WAHR',
     TRUNC: 'KÜRZEN',
     VLOOKUP: 'SVERWEIS',
     XOR: 'XODER',
     YEAR: 'JAHR',
   },
+  langCode: 'deDE',
   ui: {
     NEW_SHEET_PREFIX: 'Sheet',
   },
 }
+
+export default dictionary
