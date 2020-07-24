@@ -25,7 +25,7 @@ function getFloat(): number {
 /**
  * boolean flag for outputing crud operations
  */
-const outputLog = true
+const outputLog = false
 
 /**
  * random int in range between min and max
@@ -170,7 +170,7 @@ function randomCleanup(engine: HyperFormula, rect: Rectangle) {
   shuffleArray(allPts(rect)).forEach((pts) => {
       engine.setCellContents({sheet: 0, col: pts.x, row: pts.y}, null)
       if(outputLog) {
-        console.log(`engine.setCellContents({sheet: 0, col:${pts.x}, row:${pts.y}}, null})`)
+        console.log(`engine.setCellContents({sheet: 0, col:${pts.x}, row:${pts.y}}, null)`)
       }
     }
   )
@@ -235,9 +235,14 @@ describe('large random integration test', () => {
       swapTwoRectangles(engine, {x: x1, y: y1}, {x: x2, y: y2}, sideX, sideY)
       verifyValues(engine)
     }
-    randomCleanup(engine, rectangleFromCorner({x: 0, y: 0}, (n + 1) * sideX, sideY))
+    randomCleanup(engine, rectangleFromCorner({x: 0, y: 0}, 2 * (n + 1) * sideX, 2 * sideY))
     expect(engine.dependencyGraph.graph.nodesCount()).toBe(0)
     expect(engine.dependencyGraph.rangeMapping.getMappingSize(0)).toBe(0)
+  })
+  
+  it('dupa', () => {
+    const engine = HyperFormula.buildFromArray([])
+    expect(engine.dependencyGraph.graph.nodesCount()).toBe(0)
   })
 })
 
