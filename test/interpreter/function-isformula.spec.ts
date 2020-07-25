@@ -46,4 +46,12 @@ describe('Function ISFORMULA', () => {
     expect(engine.getCellValue(adr('C1'))).toEqual(detailedError(ErrorType.NA))
     expect(engine.getCellValue(adr('D1'))).toEqual(detailedError(ErrorType.NA))
   })
+
+  it('should work for itself', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=ISFORMULA(A1)']
+    ])
+
+    expect(engine.getCellValue(adr('A1'))).toEqual(true)
+  })
 })

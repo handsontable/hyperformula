@@ -59,7 +59,8 @@ export class InformationPlugin extends FunctionPlugin {
         list: [
           {argumentType: 'noerror'}
         ]
-      }
+      },
+      doesNotNeedArgumentsToBeComputed: true
     },
     'ISNA': {
       method: 'isna',
