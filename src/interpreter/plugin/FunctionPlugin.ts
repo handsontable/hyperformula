@@ -158,6 +158,7 @@ export abstract class FunctionPlugin {
     } else {
       switch (coercedType.argumentType as ArgumentTypes) {
         case 'number':
+          // eslint-disable-next-line no-case-declarations
           const value = this.coerceScalarToNumberOrError(arg)
           if (typeof value === 'number' && coercedType.maxValue !== undefined && coercedType.minValue !== undefined && (value < coercedType.minValue || value > coercedType.maxValue)) {
             return new CellError(ErrorType.NUM)

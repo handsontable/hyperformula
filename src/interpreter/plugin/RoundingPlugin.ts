@@ -146,7 +146,7 @@ export class RoundingPlugin extends FunctionPlugin {
   }
 
   public ceiling(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, RoundingPlugin.implementedFunctions.CEILING,(value: number, significance: number, mode: number) => {
+    return this.runFunction(ast.args, formulaAddress, RoundingPlugin.implementedFunctions.CEILING, (value: number, significance: number, mode: number) => {
       if (significance === 0 || value === 0) {
         return 0
       }
