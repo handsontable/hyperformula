@@ -105,7 +105,7 @@ export class RoundingPlugin extends FunctionPlugin {
   }
 
   public even(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, RoundingPlugin.implementedFunctions.EVEN,(coercedNumberToRound) => {
+    return this.runFunction(ast.args, formulaAddress, RoundingPlugin.implementedFunctions.EVEN, (coercedNumberToRound) => {
       if (coercedNumberToRound < 0) {
         return -findNextEvenNumber(-coercedNumberToRound)
       } else {
@@ -115,7 +115,7 @@ export class RoundingPlugin extends FunctionPlugin {
   }
 
   public odd(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, RoundingPlugin.implementedFunctions.ODD,(coercedNumberToRound) => {
+    return this.runFunction(ast.args, formulaAddress, RoundingPlugin.implementedFunctions.ODD, (coercedNumberToRound) => {
       if (coercedNumberToRound < 0) {
         return -findNextOddNumber(-coercedNumberToRound)
       } else {

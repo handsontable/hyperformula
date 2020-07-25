@@ -45,7 +45,7 @@ export class ErrorFunctionPlugin extends FunctionPlugin {
   }
 
   public erfc(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, ErrorFunctionPlugin.implementedFunctions.ERFC,erfc)
+    return this.runFunction(ast.args, formulaAddress, ErrorFunctionPlugin.implementedFunctions.ERFC, erfc)
   }
 }
 

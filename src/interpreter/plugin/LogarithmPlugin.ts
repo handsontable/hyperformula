@@ -47,6 +47,6 @@ export class LogarithmPlugin extends FunctionPlugin {
   }
 
   public ln(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, LogarithmPlugin.implementedFunctions.LN,Math.log)
+    return this.runFunction(ast.args, formulaAddress, LogarithmPlugin.implementedFunctions.LN, Math.log)
   }
 }

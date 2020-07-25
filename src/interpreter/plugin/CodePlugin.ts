@@ -18,7 +18,7 @@ export class CodePlugin extends FunctionPlugin {
   }
 
   public code(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, CodePlugin.implementedFunctions.CODE,(value: string) => {
+    return this.runFunction(ast.args, formulaAddress, CodePlugin.implementedFunctions.CODE, (value: string) => {
       if (value.length === 0) {
         return new CellError(ErrorType.VALUE)
       }
