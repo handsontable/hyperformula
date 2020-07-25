@@ -9,11 +9,11 @@ import {CellError, ErrorType, InternalScalarValue, SimpleCellAddress} from '../.
 import {ColumnSearchStrategy} from '../../ColumnSearch/ColumnSearchStrategy'
 import {Config} from '../../Config'
 import {DependencyGraph} from '../../DependencyGraph'
+import {Maybe} from '../../Maybe'
 import {Ast, AstNodeType, ProcedureAst} from '../../parser'
 import {coerceScalarToBoolean, coerceScalarToString} from '../ArithmeticHelper'
 import {Interpreter} from '../Interpreter'
 import {InterpreterValue, SimpleRangeValue} from '../InterpreterValue'
-import {Maybe} from '../../Maybe'
 
 export interface ImplementedFunctions {
   [formulaId: string]: FunctionMetadata,

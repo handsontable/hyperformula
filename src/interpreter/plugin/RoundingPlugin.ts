@@ -24,15 +24,31 @@ export class RoundingPlugin extends FunctionPlugin {
   public static implementedFunctions = {
     'ROUNDUP': {
       method: 'roundup',
+      parameters: [
+        { argumentType: 'number' },
+        { argumentType: 'number', defaultValue: 0},
+      ],
     },
     'ROUNDDOWN': {
       method: 'rounddown',
+      parameters: [
+        { argumentType: 'number' },
+        { argumentType: 'number', defaultValue: 0},
+      ],
     },
     'ROUND': {
       method: 'round',
+      parameters: [
+        { argumentType: 'number' },
+        { argumentType: 'number', defaultValue: 0},
+      ],
     },
     'TRUNC': {
       method: 'trunc',
+      parameters: [
+        { argumentType: 'number' },
+        { argumentType: 'number', defaultValue: 0},
+      ],
     },
     'INT': {
       method: 'intFunc',
@@ -54,11 +70,16 @@ export class RoundingPlugin extends FunctionPlugin {
     },
     'CEILING': {
       method: 'ceiling',
+      parameters: [
+        { argumentType: 'number' },
+        { argumentType: 'number', defaultValue: 1 },
+        { argumentType: 'number', defaultValue: 0 },
+      ],
     },
   }
 
   public roundup(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.commonArgumentsHandling2(ast, formulaAddress, (numberToRound: number, places: number): number => {
+    return this.runFunction(ast.args, formulaAddress, RoundingPlugin.implementedFunctions.ROUNDDOWN, (numberToRound: number, places: number): number => {
       const placesMultiplier = Math.pow(10, places)
       if (numberToRound < 0) {
         return -Math.ceil(-numberToRound * placesMultiplier) / placesMultiplier
@@ -69,7 +90,7 @@ export class RoundingPlugin extends FunctionPlugin {
   }
 
   public rounddown(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.commonArgumentsHandling2(ast, formulaAddress, (numberToRound: number, places: number): number => {
+    return this.runFunction(ast.args, formulaAddress, RoundingPlugin.implementedFunctions.ROUNDDOWN, (numberToRound: number, places: number): number => {
       const placesMultiplier = Math.pow(10, places)
       if (numberToRound < 0) {
         return -Math.floor(-numberToRound * placesMultiplier) / placesMultiplier
@@ -80,7 +101,7 @@ export class RoundingPlugin extends FunctionPlugin {
   }
 
   public round(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.commonArgumentsHandling2(ast, formulaAddress, (numberToRound: number, places: number): number => {
+    return this.runFunction(ast.args, formulaAddress, RoundingPlugin.implementedFunctions.ROUND, (numberToRound: number, places: number): number => {
       const placesMultiplier = Math.pow(10, places)
       if (numberToRound < 0) {
         return -Math.round(-numberToRound * placesMultiplier) / placesMultiplier
@@ -125,79 +146,20 @@ export class RoundingPlugin extends FunctionPlugin {
   }
 
   public ceiling(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    if (ast.args.length < 1 || ast.args.length > 3) {
-      return new CellError(ErrorType.NA)
-    }
-    if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
-      return new CellError(ErrorType.NUM)
-    }
-
-    const value = this.getNumericArgument(ast, formulaAddress, 0)
-    if (value instanceof CellError) {
-      return value
-    }
-
-    let significance: number | CellError = 1
-    if (ast.args.length >= 2) {
-      significance = this.getNumericArgument(ast, formulaAddress, 1)
-      if (significance instanceof CellError) {
-        return significance
+    return this.runFunction(ast.args, formulaAddress, RoundingPlugin.implementedFunctions.CEILING,(value: number, significance: number, mode: number) => {
+      if (significance === 0 || value === 0) {
+        return 0
       }
-    }
 
-    let mode: number | CellError = 0
-    if (ast.args.length === 3) {
-      mode = this.getNumericArgument(ast, formulaAddress, 2)
-      if (mode instanceof CellError) {
-        return mode
+      if ((value > 0) !== (significance > 0) && ast.args.length > 1) {
+        return new CellError(ErrorType.NUM)
       }
-    }
 
-    if (significance === 0 || value === 0) {
-      return 0
-    }
-
-    if ((value > 0) != (significance > 0) && ast.args.length > 1) {
-      return new CellError(ErrorType.NUM)
-    }
-
-    if (mode === 0) {
-      significance = Math.abs(significance)
-    }
-
-    return Math.ceil(value / significance) * significance
-  }
-
-  private commonArgumentsHandling2(ast: ProcedureAst, formulaAddress: SimpleCellAddress, roundingFunction: RoundingFunction): InternalScalarValue {
-    if (ast.args.length < 1 || ast.args.length > 2) {
-      return new CellError(ErrorType.NA)
-    }
-    if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
-      return new CellError(ErrorType.NUM)
-    }
-    const numberToRound = this.evaluateAst(ast.args[0], formulaAddress)
-    if (numberToRound instanceof SimpleRangeValue) {
-      return new CellError(ErrorType.VALUE)
-    }
-
-    let coercedPlaces
-    if (ast.args[1]) {
-      const places = this.evaluateAst(ast.args[1], formulaAddress)
-      if (places instanceof SimpleRangeValue) {
-        return new CellError(ErrorType.VALUE)
+      if (mode === 0) {
+        significance = Math.abs(significance)
       }
-      coercedPlaces = this.coerceScalarToNumberOrError(places)
-    } else {
-      coercedPlaces = 0
-    }
 
-    const coercedNumberToRound = this.coerceScalarToNumberOrError(numberToRound)
-    if (coercedNumberToRound instanceof CellError) {
-      return coercedNumberToRound
-    } else if (coercedPlaces instanceof CellError) {
-      return coercedPlaces
-    } else {
-      return roundingFunction(coercedNumberToRound, coercedPlaces)
-    }
+      return Math.ceil(value / significance) * significance
+    })
   }
 }
