@@ -9,6 +9,7 @@ import {Ast, AstNodeType, ProcedureAst} from '../../parser'
 import {InterpreterValue} from '../InterpreterValue'
 import {FunctionArgumentsDefinition, FunctionPlugin} from './FunctionPlugin'
 import {Maybe} from '../../Maybe'
+import {FormulaCellVertex, MatrixVertex} from '../../DependencyGraph'
 
 /**
  * Interpreter plugin containing information functions
@@ -49,6 +50,14 @@ export class InformationPlugin extends FunctionPlugin {
       parameters: {
         list: [
           {argumentType: 'scalar'}
+        ]
+      }
+    },
+    'ISFORMULA': {
+      method: 'isformula',
+      parameters: {
+        list: [
+          {argumentType: 'noerror'}
         ]
       }
     },
@@ -170,6 +179,25 @@ export class InformationPlugin extends FunctionPlugin {
   public iserror(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.runFunction(ast.args, formulaAddress, this.parameters('ISERROR'), (arg: InternalScalarValue) =>
       (arg instanceof CellError)
+    )
+  }
+
+  /**
+   * Corresponds to ISFORMULA(value)
+   *
+   * Checks whether referenced cell is a formula
+   *
+   * @param ast
+   * @param formulaAddress
+   */
+  public isformula(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunctionWithReferenceArgument(ast.args, formulaAddress, this.parameters('ISFORMULA'),
+      () => new CellError(ErrorType.NA),
+      (reference: SimpleCellAddress) => {
+        const vertex = this.dependencyGraph.addressMapping.getCell(reference)
+        return vertex instanceof FormulaCellVertex || (vertex instanceof MatrixVertex && vertex.isFormula())
+      },
+      () => new CellError(ErrorType.NA)
     )
   }
 
@@ -381,7 +409,7 @@ export class InformationPlugin extends FunctionPlugin {
    * @param formulaAddress
    * */
   public sheet(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunctionWithReferenceArgument(ast.args, formulaAddress, { list: [{argumentType: 'string'}] },
+    return this.runFunctionWithReferenceArgument(ast.args, formulaAddress, {list: [{argumentType: 'string'}]},
       () => formulaAddress.sheet + 1,
       (reference: SimpleCellAddress) => reference.sheet + 1,
       (value: string) => {
@@ -405,7 +433,7 @@ export class InformationPlugin extends FunctionPlugin {
    * @param formulaAddress
    * */
   public sheets(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunctionWithReferenceArgument(ast.args, formulaAddress, { list: [{argumentType: 'string'}] },
+    return this.runFunctionWithReferenceArgument(ast.args, formulaAddress, {list: [{argumentType: 'string'}]},
       () => this.dependencyGraph.sheetMapping.numberOfSheets(), // return number of sheets if no argument
       () => 1, // return 1 for valid reference
       () => new CellError(ErrorType.VALUE) // error otherwise

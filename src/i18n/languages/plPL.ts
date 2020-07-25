@@ -82,6 +82,7 @@ const dictionary: RawTranslationPackage = {
     ISERR: 'CZY.BŁ',
     ISERROR: 'CZY.BŁĄD',
     ISEVEN: 'CZY.PARZYSTE',
+    ISFORMULA: 'CZY.FORMUŁA',
     ISLOGICAL: 'CZY.LOGICZNA',
     ISNA: 'CZY.BRAK',
     ISNONTEXT: 'CZY.NIE.TEKST',

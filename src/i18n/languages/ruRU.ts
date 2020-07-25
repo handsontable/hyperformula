@@ -82,6 +82,7 @@ const dictionary: RawTranslationPackage = {
     ISERR: 'ЕОШ',
     ISERROR: 'ЕОШИБКА',
     ISEVEN: 'ЕЧЁТН',
+    ISFORMULA: 'ЕФОРМУЛА',
     ISLOGICAL: 'ЕЛОГИЧ',
     ISNA: 'ЕНД',
     ISNONTEXT: 'ЕНЕТЕКСТ',

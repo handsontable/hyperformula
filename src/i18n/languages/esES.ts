@@ -82,6 +82,7 @@ export const dictionary: RawTranslationPackage = {
     ISERR: 'ESERR',
     ISERROR: 'ESERROR',
     ISEVEN: 'ES.PAR',
+    ISFORMULA: 'ISFORMULA',
     ISLOGICAL: 'ESLOGICO',
     ISNA: 'ESNOD',
     ISNONTEXT: 'ESNOTEXTO',

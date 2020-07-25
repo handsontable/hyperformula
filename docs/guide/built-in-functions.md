@@ -86,6 +86,7 @@ lets you design your own [custom functions](custom-functions).
 | ISERR | Information | Returns TRUE if the value is error value except #N/A!. | ISERR(Value) |
 | ISERROR | Information | Returns TRUE if the value is general error value. | ISERROR(Value) |
 | ISEVEN | Information | Returns TRUE if the value is an even integer, or FALSE if the value is odd. | ISEVEN(Value) |
+| ISFORMULA | Information | Checks whether referenced cell is a formula. | ISFORMULA(Value) |
 | ISLOGICAL | Information | Tests for a logical value (TRUE or FALSE). | ISLOGICAL(Value) |
 | ISNA | Information | Returns TRUE if the value is #N/A! error. | ISNA(Value) |
 | ISNONTEXT | Information | Tests if the cell contents are text or numbers, and returns FALSE if the contents are text. | ISNONTEXT(Value) |
