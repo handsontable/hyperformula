@@ -14,6 +14,9 @@ export class ErrorFunctionPlugin extends FunctionPlugin {
     },
     'ERFC': {
       method: 'erfc',
+      parameters: [
+        { argumentType: 'number' }
+      ],
     },
   }
 
@@ -42,9 +45,7 @@ export class ErrorFunctionPlugin extends FunctionPlugin {
   }
 
   public erfc(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.templateWithOneCoercedToNumberArgument(ast, formulaAddress, (arg: number) => {
-      return erfc(arg)
-    })
+    return this.runFunction(ast.args, formulaAddress, ErrorFunctionPlugin.implementedFunctions.ERFC,erfc)
   }
 }
 

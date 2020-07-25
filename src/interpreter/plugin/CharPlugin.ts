@@ -11,11 +11,14 @@ export class CharPlugin extends FunctionPlugin {
   public static implementedFunctions = {
     'CHAR': {
       method: 'char',
+      parameters: [
+        { argumentType: 'number' }
+      ],
     },
   }
 
   public char(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.templateWithOneCoercedToNumberArgument(ast, formulaAddress, (value: number) => {
+    return this.runFunction(ast.args, formulaAddress, CharPlugin.implementedFunctions.CHAR,(value: number) => {
       if (value < 1 || value > 255) {
         return new CellError(ErrorType.NUM)
       }

@@ -94,14 +94,6 @@ export abstract class FunctionPlugin {
     return values
   }
 
-  protected templateWithOneCoercedToNumberArgument(ast: ProcedureAst, formulaAddress: SimpleCellAddress, fn: (arg: number) => InternalScalarValue): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, {parameters: [{ argumentType: 'number'}]} as FunctionMetadata, fn)
-  }
-
-  protected templateWithOneCoercedToStringArgument(ast: ProcedureAst, formulaAddress: SimpleCellAddress, fn: (arg: string) => InternalScalarValue): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, {parameters: [{ argumentType: 'string' }]} as FunctionMetadata, fn)
-  }
-
   protected validateTwoNumericArguments(ast: ProcedureAst, formulaAddress: SimpleCellAddress): [number, number] | CellError {
     if (ast.args.length !== 2) {
       return new CellError(ErrorType.NA)
@@ -198,12 +190,8 @@ export abstract class FunctionPlugin {
     let argCoerceFailure: Maybe<CellError> = undefined
     let j = 0
     let i = 0
-    //eslint-disable-next-line no-constant-condition
-    while(true) {
+    while(i<scalarValues.length || j<argumentDefinitions.length) {
       if(j===argumentDefinitions.length) {
-        if (i >= scalarValues.length) {
-          break
-        }
         if(functionDefinition.repeatedArg) {
           j--
         } else {

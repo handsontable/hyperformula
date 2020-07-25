@@ -11,16 +11,13 @@ export class SqrtPlugin extends  FunctionPlugin {
   public static implementedFunctions = {
     'SQRT': {
       method: 'sqrt',
+      parameters: [
+        { argumentType: 'number' }
+      ],
     },
   }
 
   public sqrt(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.templateWithOneCoercedToNumberArgument(ast, formulaAddress, (input: number) => {
-      if (input < 0) {
-        return new CellError(ErrorType.NUM)
-      } else {
-        return Math.sqrt(input)
-      }
-    })
+    return this.runFunction(ast.args, formulaAddress, SqrtPlugin.implementedFunctions.SQRT, Math.sqrt)
   }
 }

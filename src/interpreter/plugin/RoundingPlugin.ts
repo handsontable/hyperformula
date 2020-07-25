@@ -36,12 +36,21 @@ export class RoundingPlugin extends FunctionPlugin {
     },
     'INT': {
       method: 'intFunc',
+      parameters: [
+        { argumentType: 'number' }
+      ],
     },
     'EVEN': {
       method: 'even',
+      parameters: [
+        { argumentType: 'number' }
+      ],
     },
     'ODD': {
       method: 'odd',
+      parameters: [
+        { argumentType: 'number' }
+      ],
     },
     'CEILING': {
       method: 'ceiling',
@@ -86,7 +95,7 @@ export class RoundingPlugin extends FunctionPlugin {
   }
 
   public intFunc(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.templateWithOneCoercedToNumberArgument(ast, formulaAddress, (coercedNumberToRound) => {
+    return this.runFunction(ast.args, formulaAddress, RoundingPlugin.implementedFunctions.INT, (coercedNumberToRound) => {
       if (coercedNumberToRound < 0) {
         return -Math.floor(-coercedNumberToRound)
       } else {
@@ -96,7 +105,7 @@ export class RoundingPlugin extends FunctionPlugin {
   }
 
   public even(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.templateWithOneCoercedToNumberArgument(ast, formulaAddress, (coercedNumberToRound) => {
+    return this.runFunction(ast.args, formulaAddress, RoundingPlugin.implementedFunctions.EVEN,(coercedNumberToRound) => {
       if (coercedNumberToRound < 0) {
         return -findNextEvenNumber(-coercedNumberToRound)
       } else {
@@ -106,7 +115,7 @@ export class RoundingPlugin extends FunctionPlugin {
   }
 
   public odd(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.templateWithOneCoercedToNumberArgument(ast, formulaAddress, (coercedNumberToRound) => {
+    return this.runFunction(ast.args, formulaAddress, RoundingPlugin.implementedFunctions.ODD,(coercedNumberToRound) => {
       if (coercedNumberToRound < 0) {
         return -findNextOddNumber(-coercedNumberToRound)
       } else {

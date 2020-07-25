@@ -29,16 +29,28 @@ export class TextPlugin extends FunctionPlugin {
       ],
     },
     'LEN': {
-      method: 'len'
+      method: 'len',
+      parameters: [
+        { argumentType: 'string'}
+      ],
     },
     'TRIM': {
-      method: 'trim'
+      method: 'trim',
+      parameters: [
+        { argumentType: 'string'}
+      ],
     },
     'PROPER': {
-      method: 'proper'
+      method: 'proper',
+      parameters: [
+        { argumentType: 'string'}
+      ],
     },
     'CLEAN': {
-      method: 'clean'
+      method: 'clean',
+      parameters: [
+        { argumentType: 'string'}
+      ],
     },
     'REPT': {
       method: 'rept',
@@ -114,25 +126,25 @@ export class TextPlugin extends FunctionPlugin {
   }
 
   public len(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.templateWithOneCoercedToStringArgument(ast, formulaAddress, (arg: string) => {
+    return this.runFunction(ast.args, formulaAddress, TextPlugin.implementedFunctions.LEN, (arg: string) => {
       return arg.length
     })
   }
 
   public trim(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.templateWithOneCoercedToStringArgument(ast, formulaAddress, (arg: string) => {
+    return this.runFunction(ast.args, formulaAddress, TextPlugin.implementedFunctions.TRIM, (arg: string) => {
       return arg.replace(/^ +| +$/g, '').replace(/ +/g, ' ')
     })
   }
 
   public proper(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.templateWithOneCoercedToStringArgument(ast, formulaAddress, (arg: string) => {
+    return this.runFunction(ast.args, formulaAddress, TextPlugin.implementedFunctions.PROPER, (arg: string) => {
       return arg.replace(/\w\S*/g, word => word.charAt(0).toUpperCase() + word.substr(1).toLowerCase())
     })
   }
 
   public clean(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.templateWithOneCoercedToStringArgument(ast, formulaAddress, (arg: string) => {
+    return this.runFunction(ast.args, formulaAddress, TextPlugin.implementedFunctions.CLEAN, (arg: string) => {
       // eslint-disable-next-line no-control-regex
       return arg.replace(/[\u0000-\u001F]/g, '')
     })
