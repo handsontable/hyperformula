@@ -88,7 +88,7 @@ export class TrigonometryPlugin extends FunctionPlugin {
   }
 
   public atan2(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunctionWithDefaults(ast.args, formulaAddress, TrigonometryPlugin.implementedFunctions.ATAN2.parameters, Math.atan2)
+    return this.runFunction(ast.args, formulaAddress, TrigonometryPlugin.implementedFunctions.ATAN2, Math.atan2)
   }
 
   public ctg(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {

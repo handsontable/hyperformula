@@ -36,6 +36,7 @@ export type ArgumentTypes = 'string' | 'number' | 'boolean' | 'scalar' | 'noerro
 export interface FunctionArgumentDefinition {
   argumentType: string,
   defaultValue?: InternalScalarValue,
+  softCoerce?: boolean
 }
 
 export type PluginFunctionType = (ast: ProcedureAst, formulaAddress: SimpleCellAddress) => InternalScalarValue
@@ -90,11 +91,11 @@ export abstract class FunctionPlugin {
   }
 
   protected templateWithOneCoercedToNumberArgument(ast: ProcedureAst, formulaAddress: SimpleCellAddress, fn: (arg: number) => InternalScalarValue): InternalScalarValue {
-    return this.runFunctionWithDefaults(ast.args, formulaAddress, [{ argumentType: 'number'}], fn)
+    return this.runFunction(ast.args, formulaAddress, {parameters: [{ argumentType: 'number'}]}, fn)
   }
 
   protected templateWithOneCoercedToStringArgument(ast: ProcedureAst, formulaAddress: SimpleCellAddress, fn: (arg: string) => InternalScalarValue): InternalScalarValue {
-    return this.runFunctionWithDefaults(ast.args, formulaAddress, [{ argumentType: 'string' }], fn)
+    return this.runFunction(ast.args, formulaAddress, {parameters: [{ argumentType: 'string' }]}, fn)
   }
 
   protected validateTwoNumericArguments(ast: ProcedureAst, formulaAddress: SimpleCellAddress): [number, number] | CellError {
@@ -174,108 +175,53 @@ export abstract class FunctionPlugin {
     }
   }
 
-  protected runFunctionWithDefaults = (
+  protected runFunction = (
     args: Ast[],
     formulaAddress: SimpleCellAddress,
-    argumentDefinitions: FunctionArgumentDefinition[],
+    functionDefinition: any,
     fn: (...arg: any) => InternalScalarValue
   ) => {
-    if (args.length > argumentDefinitions.length) {
-      return new CellError(ErrorType.NA)
+    const argumentDefinitions: FunctionArgumentDefinition[] = functionDefinition.parameters
+    let scalarValues: InterpreterValue[]
+    if(functionDefinition.expandRanges) {
+      scalarValues = [...this.iterateOverScalarValues(args, formulaAddress)]
+    } else {
+      scalarValues = args.map((ast) => this.evaluateAst(ast, formulaAddress))
     }
-
     const coercedArguments: Maybe<InterpreterValue>[] = []
 
-    for (let i = 0; i < argumentDefinitions.length; ++i) {
-      if(args[i] === undefined && argumentDefinitions[i].defaultValue === undefined) {
-        return new CellError(ErrorType.NA)
-      }
-      const arg = this.evaluateArgOrDefault(formulaAddress, args[i], argumentDefinitions[i].defaultValue)
-      const coercedArg = this.coerceToType(arg, argumentDefinitions[i].argumentType as ArgumentTypes)
-      if(coercedArg === undefined) {
-        return new CellError(ErrorType.VALUE)
-      }
-      if (coercedArg instanceof CellError && argumentDefinitions[i].argumentType !== 'scalar') {
-        return coercedArg
-      }
-      coercedArguments.push(coercedArg)
-    }
-
-    return fn(...coercedArguments)
-  }
-
-  protected runFunctionWithRepeatedArg = (
-    args: Ast[],
-    formulaAddress: SimpleCellAddress,
-    argumentDefinitions: FunctionArgumentDefinition[],
-    fn: (...arg: any) => InternalScalarValue
-  ) => {
-    const scalarValues: InternalScalarValue[] = [...this.iterateOverScalarValues(args, formulaAddress)]
-    const coercedArguments: Maybe<InterpreterValue>[] = []
-
+    let argCoerceFailure: Maybe<CellError> = undefined
     let j = 0
     let i = 0
     //eslint-disable-next-line no-constant-condition
     while(true) {
-      const arg = scalarValues[i] ?? argumentDefinitions[j].defaultValue
-      if(arg === undefined) {
-        return new CellError(ErrorType.NA)
-      }
-      const coercedArg = this.coerceToType(arg, argumentDefinitions[j].argumentType as ArgumentTypes)
-      if(coercedArg === undefined) {
-        return new CellError(ErrorType.VALUE)
-      }
-      if (coercedArg instanceof CellError && argumentDefinitions[j].argumentType !== 'scalar') {
-        return coercedArg
-      }
-      coercedArguments.push(coercedArg)
-      j++
-      i++
       if(j===argumentDefinitions.length) {
         if (i >= scalarValues.length) {
           break
         }
-        j--
+        if(functionDefinition.repeatedArg) {
+          j--
+        } else {
+          return new CellError(ErrorType.NA)
+        }
       }
-    }
-
-    return fn(...coercedArguments)
-  }
-
-  protected runFunctionWithRepeatedArgNoRanges = (
-    args: Ast[],
-    formulaAddress: SimpleCellAddress,
-    argumentDefinitions: FunctionArgumentDefinition[],
-    fn: (...arg: any) => InternalScalarValue
-  ) => {
-    const coercedArguments: Maybe<InterpreterValue>[] = []
-    let j = 0
-    let i = 0
-    //eslint-disable-next-line no-constant-condition
-    while(true) {
-      if(args[i] === undefined && argumentDefinitions[j].defaultValue === undefined) {
+      const arg = scalarValues[i] ?? argumentDefinitions[j]?.defaultValue
+      if(arg === undefined) {
         return new CellError(ErrorType.NA)
       }
-      const arg = this.evaluateArgOrDefault(formulaAddress, args[i], argumentDefinitions[j].defaultValue)
       const coercedArg = this.coerceToType(arg, argumentDefinitions[j].argumentType as ArgumentTypes)
-      if(coercedArg === undefined) {
-        return new CellError(ErrorType.VALUE)
+      if(coercedArg === undefined && !argumentDefinitions[j].softCoerce) {
+        argCoerceFailure = argCoerceFailure ?? (new CellError(ErrorType.VALUE))
       }
       if (coercedArg instanceof CellError && argumentDefinitions[j].argumentType !== 'scalar') {
-        return coercedArg
+        argCoerceFailure = argCoerceFailure ?? coercedArg
       }
       coercedArguments.push(coercedArg)
       j++
       i++
-      if(j===argumentDefinitions.length) {
-        if (i >= args.length) {
-          break
-        }
-        j--
-      }
     }
 
-    return fn(...coercedArguments)
+    return argCoerceFailure ?? fn(...coercedArguments)
   }
 
   protected evaluateArgOrDefault = (formulaAddress: SimpleCellAddress, argAst?: Ast, defaultValue?: InternalScalarValue): InterpreterValue => {

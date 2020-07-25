@@ -225,13 +225,13 @@ export class ArithmeticHelper {
     return this.coerceToMaybeNumber(arg) ?? new CellError(ErrorType.VALUE)
   }
 
-  public coerceToMaybeNumber(arg: InternalNoErrorCellValue): Maybe<number> {
+  public coerceToMaybeNumber(arg: InternalScalarValue): Maybe<number> {
     return this.coerceNonDateScalarToMaybeNumber(arg) ?? (
       typeof arg === 'string' ? this.dateTimeHelper.dateStringToDateNumber(arg) : undefined
     )
   }
 
-  public coerceNonDateScalarToMaybeNumber(arg: InternalNoErrorCellValue): Maybe<number> {
+  public coerceNonDateScalarToMaybeNumber(arg: InternalScalarValue): Maybe<number> {
     if (arg === EmptyValue) {
       return 0
     } else if (typeof arg === 'string' && this.numberLiteralsHelper.isNumber(arg)) {
@@ -290,9 +290,7 @@ export function coerceEmptyToValue(arg: InternalNoErrorCellValue): InternalNoErr
  * @param arg
  */
 export function coerceScalarToBoolean(arg: InternalScalarValue): boolean | CellError | undefined {
-  if (arg instanceof SimpleRangeValue) {
-    return new CellError(ErrorType.VALUE)
-  } else if (arg instanceof CellError || typeof arg === 'boolean') {
+  if (arg instanceof CellError || typeof arg === 'boolean') {
     return arg
   } else if (arg === EmptyValue) {
     return false
