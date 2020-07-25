@@ -41,6 +41,8 @@ export interface FunctionArgumentDefinition {
   argumentType: string,
   defaultValue?: InternalScalarValue,
   softCoerce?: boolean,
+  minValue?: number,
+  maxValue?: number,
 }
 
 export type PluginFunctionType = (ast: ProcedureAst, formulaAddress: SimpleCellAddress) => InternalScalarValue
@@ -146,17 +148,21 @@ export abstract class FunctionPlugin {
 
   public coerceScalarToNumberOrError = (arg: InternalScalarValue): number | CellError => this.interpreter.arithmeticHelper.coerceScalarToNumberOrError(arg)
 
-  public coerceToType(arg: InterpreterValue, coercedType: ArgumentTypes): Maybe<InterpreterValue> {
+  public coerceToType(arg: InterpreterValue, coercedType: FunctionArgumentDefinition): Maybe<InterpreterValue> {
     if(arg instanceof SimpleRangeValue) {
-      if(coercedType === 'range') {
+      if(coercedType.argumentType === 'range') {
         return arg
       } else {
         return undefined
       }
     } else {
-      switch (coercedType) {
+      switch (coercedType.argumentType as ArgumentTypes) {
         case 'number':
-          return this.coerceScalarToNumberOrError(arg)
+          const value = this.coerceScalarToNumberOrError(arg)
+          if (typeof value === 'number' && coercedType.maxValue !== undefined && coercedType.minValue !== undefined && (value < coercedType.minValue || value > coercedType.maxValue)) {
+            return new CellError(ErrorType.NUM)
+          }
+          return value
         case 'string':
           return coerceScalarToString(arg)
         case 'boolean':
@@ -202,7 +208,7 @@ export abstract class FunctionPlugin {
       if(arg === undefined) {
         return new CellError(ErrorType.NA)
       }
-      const coercedArg = this.coerceToType(arg, argumentDefinitions[j].argumentType as ArgumentTypes)
+      const coercedArg = this.coerceToType(arg, argumentDefinitions[j])
       if(coercedArg === undefined && !argumentDefinitions[j].softCoerce) {
         argCoerceFailure = argCoerceFailure ?? (new CellError(ErrorType.VALUE))
       }
