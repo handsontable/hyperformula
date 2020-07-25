@@ -3,6 +3,7 @@
  * Copyright (c) 2020 Handsoncode. All rights reserved.
  */
 
+import assert from 'assert'
 import {AbsoluteCellRange} from '../../AbsoluteCellRange'
 import {CellError, ErrorType, InternalScalarValue, SimpleCellAddress} from '../../Cell'
 import {ColumnSearchStrategy} from '../../ColumnSearch/ColumnSearchStrategy'
@@ -20,6 +21,9 @@ export interface ImplementedFunctions {
 
 export interface FunctionMetadata {
   method: string,
+  parameters?: FunctionArgumentDefinition[],
+  repeatedArg?: boolean,
+  expandRanges?: boolean,
   isVolatile?: boolean,
   isDependentOnSheetStructureChange?: boolean,
   doesNotNeedArgumentsToBeComputed?: boolean,
@@ -36,7 +40,7 @@ export type ArgumentTypes = 'string' | 'number' | 'boolean' | 'scalar' | 'noerro
 export interface FunctionArgumentDefinition {
   argumentType: string,
   defaultValue?: InternalScalarValue,
-  softCoerce?: boolean
+  softCoerce?: boolean,
 }
 
 export type PluginFunctionType = (ast: ProcedureAst, formulaAddress: SimpleCellAddress) => InternalScalarValue
@@ -91,11 +95,11 @@ export abstract class FunctionPlugin {
   }
 
   protected templateWithOneCoercedToNumberArgument(ast: ProcedureAst, formulaAddress: SimpleCellAddress, fn: (arg: number) => InternalScalarValue): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, {parameters: [{ argumentType: 'number'}]}, fn)
+    return this.runFunction(ast.args, formulaAddress, {parameters: [{ argumentType: 'number'}]} as FunctionMetadata, fn)
   }
 
   protected templateWithOneCoercedToStringArgument(ast: ProcedureAst, formulaAddress: SimpleCellAddress, fn: (arg: string) => InternalScalarValue): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, {parameters: [{ argumentType: 'string' }]}, fn)
+    return this.runFunction(ast.args, formulaAddress, {parameters: [{ argumentType: 'string' }]} as FunctionMetadata, fn)
   }
 
   protected validateTwoNumericArguments(ast: ProcedureAst, formulaAddress: SimpleCellAddress): [number, number] | CellError {
@@ -178,10 +182,11 @@ export abstract class FunctionPlugin {
   protected runFunction = (
     args: Ast[],
     formulaAddress: SimpleCellAddress,
-    functionDefinition: any,
+    functionDefinition: FunctionMetadata,
     fn: (...arg: any) => InternalScalarValue
   ) => {
-    const argumentDefinitions: FunctionArgumentDefinition[] = functionDefinition.parameters
+    const argumentDefinitions: FunctionArgumentDefinition[] = functionDefinition.parameters!
+    assert(argumentDefinitions !== undefined)
     let scalarValues: InterpreterValue[]
     if(functionDefinition.expandRanges) {
       scalarValues = [...this.iterateOverScalarValues(args, formulaAddress)]
