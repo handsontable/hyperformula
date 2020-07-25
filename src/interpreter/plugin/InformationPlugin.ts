@@ -5,9 +5,9 @@
 
 import {AbsoluteCellRange} from '../../AbsoluteCellRange'
 import {CellError, EmptyValue, ErrorType, InternalScalarValue, SimpleCellAddress} from '../../Cell'
-import {AstNodeType, ProcedureAst} from '../../parser'
+import {Ast, AstNodeType, ProcedureAst} from '../../parser'
 import {InterpreterValue} from '../InterpreterValue'
-import {FunctionPlugin} from './FunctionPlugin'
+import {FunctionArgumentsDefinition, FunctionPlugin} from './FunctionPlugin'
 import {Maybe} from '../../Maybe'
 
 /**
@@ -22,9 +22,11 @@ export class InformationPlugin extends FunctionPlugin {
     },
     'ISBINARY': {
       method: 'isbinary',
-      parameters: [
-        {argumentType: 'string'}
-      ]
+      parameters: {
+        list: [
+          {argumentType: 'string'}
+        ]
+      }
     },
     'ISBLANK': {
       method: 'isblank',
@@ -138,7 +140,7 @@ export class InformationPlugin extends FunctionPlugin {
    * @param formulaAddress
    */
   public isbinary(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunctionWithDefaults(ast.args, formulaAddress, InformationPlugin.implementedFunctions.ISBINARY.parameters, (arg: string) =>
+    return this.runFunction(ast.args, formulaAddress, this.parameters('ISBINARY'), (arg: string) =>
       /^[01]{1,10}$/.test(arg)
     )
   }
@@ -379,12 +381,51 @@ export class InformationPlugin extends FunctionPlugin {
    * @param formulaAddress
    * */
   public sheet(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    if (ast.args.length > 1) {
+    return this.runFunctionWithReferenceArgument(ast.args, formulaAddress, { list: [{argumentType: 'string'}] },
+      () => formulaAddress.sheet + 1,
+      (reference: SimpleCellAddress) => reference.sheet + 1,
+      (value: string) => {
+        const sheetNumber = this.dependencyGraph.sheetMapping.get(value)
+        if (sheetNumber !== undefined) {
+          return sheetNumber + 1
+        } else {
+          return new CellError(ErrorType.NA)
+        }
+      }
+    )
+  }
+
+  /**
+   * Corresponds to SHEETS(value)
+   *
+   * Returns number of sheet of a given reference or number of all sheets in workbook when no argument is provided.
+   * It returns always 1 for a valid reference as 3D references are not supported.
+   *
+   * @param ast
+   * @param formulaAddress
+   * */
+  public sheets(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunctionWithReferenceArgument(ast.args, formulaAddress, { list: [{argumentType: 'string'}] },
+      () => this.dependencyGraph.sheetMapping.numberOfSheets(), // return number of sheets if no argument
+      () => 1, // return 1 for valid reference
+      () => new CellError(ErrorType.VALUE) // error otherwise
+    )
+  }
+
+  protected runFunctionWithReferenceArgument = (
+    args: Ast[],
+    formulaAddress: SimpleCellAddress,
+    argumentDefinitions: FunctionArgumentsDefinition,
+    noArgCallback: () => InternalScalarValue,
+    referenceCallback: (reference: SimpleCellAddress) => InternalScalarValue,
+    nonReferenceCallback: (...arg: any) => InternalScalarValue
+  ) => {
+    if (args.length === 0) {
+      return noArgCallback()
+    } else if (args.length > 1) {
       return new CellError(ErrorType.NA)
-    } else if (ast.args.length == 0) {
-      return formulaAddress.sheet + 1
     }
-    const arg = ast.args[0]
+    const arg = args[0]
 
     let cellReference: Maybe<SimpleCellAddress>
 
@@ -399,48 +440,9 @@ export class InformationPlugin extends FunctionPlugin {
     }
 
     if (cellReference !== undefined) {
-      return cellReference.sheet + 1
+      return referenceCallback(cellReference)
     }
 
-    /* Not using static parameters definition as we expect only values coerced to string from now on. */
-    return this.runFunction(ast.args, formulaAddress, {list: [{argumentType: 'string'}]}, (value: string) => {
-      const sheetNumber = this.dependencyGraph.sheetMapping.get(value)
-      if (sheetNumber !== undefined) {
-        return sheetNumber + 1
-      } else {
-        return new CellError(ErrorType.NA)
-      }
-    })
-  }
-
-  /**
-   * Corresponds to SHEETS(value)
-   *
-   * Returns number of sheet of a given reference or number of all sheets in workbook when no argument is provided.
-   * It returns always 1 for a valid reference as 3D references are not supported.
-   *
-   * @param ast
-   * @param formulaAddress
-   * */
-  public sheets(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    if (ast.args.length > 1) {
-      return new CellError(ErrorType.NA)
-    } else if (ast.args.length == 0) {
-      return this.dependencyGraph.sheetMapping.numberOfSheets()
-    }
-
-    const arg = ast.args[0]
-    if (
-      arg.type === AstNodeType.CELL_REFERENCE ||
-      arg.type === AstNodeType.CELL_RANGE ||
-      arg.type === AstNodeType.COLUMN_RANGE ||
-      arg.type === AstNodeType.ROW_RANGE
-    ) {
-      return 1
-    }
-
-    return this.runFunction(ast.args, formulaAddress, this.parameters('SHEETS'), () => {
-      return new CellError(ErrorType.VALUE)
-    })
+    return this.runFunction(args, formulaAddress, argumentDefinitions, nonReferenceCallback)
   }
 }
