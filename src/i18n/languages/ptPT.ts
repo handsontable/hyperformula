@@ -77,6 +77,7 @@ const dictionary: RawTranslationPackage = {
     INDEX: 'ÍNDICE',
     INT: 'INT',
     IPMT: 'IPGTO',
+    ISBINARY: 'ISBINARY',
     ISBLANK: 'ÉCÉL.VAZIA',
     ISERR: 'ÉERRO',
     ISERROR: 'ÉERROS',

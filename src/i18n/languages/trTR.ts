@@ -77,6 +77,7 @@ const dictionary: RawTranslationPackage = {
     INDEX: 'İNDİS',
     INT: 'TAMSAYI',
     IPMT: 'FAİZTUTARI',
+    ISBINARY: 'ISBINARY',
     ISBLANK: 'EBOŞSA',
     ISERR: 'EHATA',
     ISERROR: 'EHATALIYSA',

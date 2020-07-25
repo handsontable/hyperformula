@@ -20,6 +20,12 @@ export class InformationPlugin extends FunctionPlugin {
       isDependentOnSheetStructureChange: true,
       doesNotNeedArgumentsToBeComputed: true,
     },
+    'ISBINARY': {
+      method: 'isbinary',
+      parameters: [
+        {argumentType: 'string'}
+      ]
+    },
     'ISBLANK': {
       method: 'isblank',
       parameters: {
@@ -121,6 +127,20 @@ export class InformationPlugin extends FunctionPlugin {
       },
       doesNotNeedArgumentsToBeComputed: true
     }
+  }
+
+  /**
+   * Corresponds to ISBINARY(value)
+   *
+   * Returns true if provided value is a valid binary number
+   *
+   * @param ast
+   * @param formulaAddress
+   */
+  public isbinary(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunctionWithDefaults(ast.args, formulaAddress, InformationPlugin.implementedFunctions.ISBINARY.parameters, (arg: string) =>
+      /^[01]{1,10}$/.test(arg)
+    )
   }
 
   /**

@@ -77,6 +77,7 @@ const dictionary: RawTranslationPackage = {
     INDEX: 'INDEKSI',
     INT: 'KOKONAISLUKU',
     IPMT: 'IPMT',
+    ISBINARY: 'ISBINARY',
     ISBLANK: 'ONTYHJÄ',
     ISERR: 'ONVIRH',
     ISERROR: 'ONVIRHE',
