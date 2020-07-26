@@ -35,7 +35,7 @@ export interface FunctionPluginDefinition {
   implementedFunctions: ImplementedFunctions,
 }
 
-export type ArgumentTypes = 'string' | 'number' | 'boolean' | 'scalar' | 'noerror' | 'range'
+export type ArgumentTypes = 'string' | 'number' | 'boolean' | 'scalar' | 'noerror' | 'range' | 'integer'
 
 export interface FunctionArgumentDefinition {
   argumentType: string,
@@ -157,10 +157,20 @@ export abstract class FunctionPlugin {
       }
     } else {
       switch (coercedType.argumentType as ArgumentTypes) {
+        case 'integer':
         case 'number':
           // eslint-disable-next-line no-case-declarations
           const value = this.coerceScalarToNumberOrError(arg)
-          if (typeof value === 'number' && coercedType.maxValue !== undefined && coercedType.minValue !== undefined && (value < coercedType.minValue || value > coercedType.maxValue)) {
+          if(typeof value !== 'number') {
+            return value
+          }
+          if(coercedType.maxValue !== undefined && value > coercedType.maxValue) {
+            return new CellError(ErrorType.NUM)
+          }
+          if (coercedType.minValue !== undefined && value < coercedType.minValue) {
+            return new CellError(ErrorType.NUM)
+          }
+          if(coercedType.argumentType === 'integer' && !Number.isInteger(value)) {
             return new CellError(ErrorType.NUM)
           }
           return value
@@ -209,7 +219,7 @@ export abstract class FunctionPlugin {
       if(arg === undefined) {
         return new CellError(ErrorType.NA)
       }
-      const coercedArg = this.coerceToType(arg, argumentDefinitions[j])
+      const coercedArg = scalarValues[i] !== undefined ? this.coerceToType(arg, argumentDefinitions[j]) : arg
       if(coercedArg === undefined && !argumentDefinitions[j].softCoerce) {
         argCoerceFailure = argCoerceFailure ?? (new CellError(ErrorType.VALUE))
       }
