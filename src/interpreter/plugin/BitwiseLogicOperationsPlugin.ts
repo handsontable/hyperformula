@@ -33,20 +33,20 @@ export class BitwiseLogicOperationsPlugin extends FunctionPlugin {
   }
 
   public bitand(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, BitwiseLogicOperationsPlugin.implementedFunctions.BITAND, (left: number, right: number) => {
-      return left & right
-    })
+    return this.runFunction(ast.args, formulaAddress, BitwiseLogicOperationsPlugin.implementedFunctions.BITAND,
+      (left: number, right: number) => left & right
+    )
   }
 
   public bitor(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, BitwiseLogicOperationsPlugin.implementedFunctions.BITOR, (left: number, right: number) => {
-      return left | right
-    })
+    return this.runFunction(ast.args, formulaAddress, BitwiseLogicOperationsPlugin.implementedFunctions.BITOR,
+      (left: number, right: number) => left | right
+    )
   }
 
   public bitxor(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, BitwiseLogicOperationsPlugin.implementedFunctions.BITXOR, (left: number, right: number) => {
-      return left ^ right
-    })
+    return this.runFunction(ast.args, formulaAddress, BitwiseLogicOperationsPlugin.implementedFunctions.BITXOR,
+      (left: number, right: number) => left ^ right
+    )
   }
 }

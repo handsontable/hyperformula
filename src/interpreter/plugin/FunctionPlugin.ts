@@ -40,7 +40,8 @@ export type ArgumentTypes = 'string' | 'number' | 'boolean' | 'scalar' | 'noerro
 export interface FunctionArgumentDefinition {
   argumentType: string,
   defaultValue?: InternalScalarValue,
-  softCoerce?: boolean,
+  softCoerce?: boolean, //failed coerce makes function ignore the arg instead of producing error
+  optionalArg?: boolean, //
   minValue?: number,
   maxValue?: number,
 }
@@ -94,35 +95,6 @@ export abstract class FunctionPlugin {
     }
 
     return values
-  }
-
-  protected validateTwoNumericArguments(ast: ProcedureAst, formulaAddress: SimpleCellAddress): [number, number] | CellError {
-    if (ast.args.length !== 2) {
-      return new CellError(ErrorType.NA)
-    }
-    if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
-      return new CellError(ErrorType.NUM)
-    }
-    const left = this.evaluateAst(ast.args[0], formulaAddress)
-    if (left instanceof SimpleRangeValue) {
-      return new CellError(ErrorType.VALUE)
-    }
-    const coercedLeft = this.coerceScalarToNumberOrError(left)
-    if (coercedLeft instanceof CellError) {
-      return coercedLeft
-    }
-
-    const right = this.evaluateAst(ast.args[1], formulaAddress)
-    if (right instanceof SimpleRangeValue) {
-      return new CellError(ErrorType.VALUE)
-    }
-
-    const coercedRight = this.coerceScalarToNumberOrError(right)
-    if (coercedRight instanceof CellError) {
-      return coercedRight
-    }
-
-    return [coercedLeft, coercedRight]
   }
 
   protected getNumericArgument(ast: ProcedureAst, formulaAddress: SimpleCellAddress, position: number, min?: number, max?: number): number | CellError {
@@ -217,7 +189,14 @@ export abstract class FunctionPlugin {
       }
       const arg = scalarValues[i] ?? argumentDefinitions[j]?.defaultValue
       if(arg === undefined) {
-        return new CellError(ErrorType.NA)
+        if(argumentDefinitions[j]?.optionalArg) {
+          i++
+          j++
+          coercedArguments.push(undefined)
+          continue
+        } else {
+          return new CellError(ErrorType.NA)
+        }
       }
       const coercedArg = scalarValues[i] !== undefined ? this.coerceToType(arg, argumentDefinitions[j]) : arg
       if(coercedArg === undefined && !argumentDefinitions[j].softCoerce) {

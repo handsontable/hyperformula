@@ -15,59 +15,49 @@ export class BitShiftPlugin extends FunctionPlugin {
   public static implementedFunctions = {
     'BITLSHIFT': {
       method: 'bitlshift',
+      parameters: [
+        { argumentType: 'integer', minValue: 0 },
+        { argumentType: 'integer', minValue: SHIFT_MIN_POSITIONS, maxValue: SHIFT_MAX_POSITIONS },
+      ]
     },
     'BITRSHIFT': {
       method: 'bitrshift',
+      parameters: [
+        { argumentType: 'integer', minValue: 0 },
+        { argumentType: 'integer', minValue: SHIFT_MIN_POSITIONS, maxValue: SHIFT_MAX_POSITIONS },
+      ]
     },
   }
 
   public bitlshift(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.bitshiftTemplate(ast, formulaAddress, shiftLeft)
+    return this.runFunction(ast.args, formulaAddress, BitShiftPlugin.implementedFunctions.BITLSHIFT, shiftLeft)
   }
 
   public bitrshift(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.bitshiftTemplate(ast, formulaAddress, shiftRight)
-  }
-
-  private bitshiftTemplate(ast: ProcedureAst, formulaAddress: SimpleCellAddress, fn: (value: number, positions: number) => number): InternalScalarValue {
-    const validationResult = this.validateTwoNumericArguments(ast, formulaAddress)
-
-    if (validationResult instanceof CellError) {
-      return validationResult
-    }
-
-    const [coercedValue, coercedPositions] = validationResult
-
-    if (coercedValue < 0 || !Number.isInteger(coercedValue) || !Number.isInteger(coercedPositions)) {
-      return new CellError(ErrorType.NUM)
-    }
-
-    if (coercedPositions < SHIFT_MIN_POSITIONS || coercedPositions > SHIFT_MAX_POSITIONS) {
-      return new CellError(ErrorType.NUM)
-    }
-
-    const result = fn(coercedValue, coercedPositions)
-
-    if (result > MAX_48BIT_INTEGER) {
-      return new CellError(ErrorType.NUM)
-    } else {
-      return result
-    }
+    return this.runFunction(ast.args, formulaAddress, BitShiftPlugin.implementedFunctions.BITRSHIFT, shiftRight)
   }
 }
 
-function shiftLeft(value: number, positions: number): number {
+function shiftLeft(value: number, positions: number): number | CellError {
   if (positions < 0) {
     return shiftRight(value, -positions)
   } else {
-    return value * Math.pow(2, positions)
+    return validate(value * Math.pow(2, positions))
   }
 }
 
-function shiftRight(value: number, positions: number): number {
+function shiftRight(value: number, positions: number): number | CellError {
   if (positions < 0) {
     return shiftLeft(value, -positions)
   } else {
-    return Math.floor(value / Math.pow(2, positions))
+    return validate(Math.floor(value / Math.pow(2, positions)))
+  }
+}
+
+function validate(result: number): number | CellError {
+  if (result > MAX_48BIT_INTEGER) {
+    return new CellError(ErrorType.NUM)
+  } else {
+    return result
   }
 }

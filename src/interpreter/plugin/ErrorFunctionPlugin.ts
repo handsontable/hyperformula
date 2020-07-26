@@ -14,7 +14,7 @@ export class ErrorFunctionPlugin extends FunctionPlugin {
       method: 'erf',
       parameters: [
         { argumentType: 'number' },
-        { argumentType: 'number', defaultValue: EmptyValue as InternalScalarValue}, //hacking around since ERF can take 1 or 2 args
+        { argumentType: 'number', optionalArg: true},
       ],
     },
     'ERFC': {
@@ -27,10 +27,11 @@ export class ErrorFunctionPlugin extends FunctionPlugin {
 
   public erf(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.runFunction(ast.args, formulaAddress, ErrorFunctionPlugin.implementedFunctions.ERF, (lowerBound, upperBound) => {
-      if(ast.args.length === 1) {
+      if(upperBound===undefined) {
         return erf(lowerBound)
+      } else {
+        return erf(upperBound) - erf(lowerBound)
       }
-      return erf2(lowerBound, upperBound)
     })
   }
 
@@ -63,10 +64,6 @@ function erfApprox(x: number): number {
   }, 1)
 
   return 1 - (1 / Math.pow(poly, polyExponent))
-}
-
-function erf2(lowerBound: number, upperBound: number): number {
-  return erf(upperBound) - erf(lowerBound)
 }
 
 function erfc(x: number): number {
