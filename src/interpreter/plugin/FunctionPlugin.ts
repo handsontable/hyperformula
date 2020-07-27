@@ -13,10 +13,7 @@ import {Ast, ProcedureAst} from '../../parser'
 import {coerceScalarToBoolean, coerceScalarToString} from '../ArithmeticHelper'
 import {Interpreter} from '../Interpreter'
 import {InterpreterValue, SimpleRangeValue} from '../InterpreterValue'
-<<<<<<< HEAD
-=======
 import {Serialization} from '../../Serialization'
->>>>>>> develop
 
 export interface ImplementedFunctions {
   [formulaId: string]: FunctionMetadata,
