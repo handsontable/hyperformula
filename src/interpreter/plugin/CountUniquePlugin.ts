@@ -4,7 +4,7 @@
  */
 
 import {CellError, EmptyValueType, ErrorType, InternalScalarValue, SimpleCellAddress} from '../../Cell'
-import {AstNodeType, ProcedureAst} from '../../parser'
+import {ProcedureAst} from '../../parser'
 import {FunctionPlugin} from './FunctionPlugin'
 
 /**

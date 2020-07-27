@@ -18,8 +18,8 @@ export class DegreesPlugin extends FunctionPlugin {
   }
 
   public degrees(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, DegreesPlugin.implementedFunctions.DEGREES, (arg) => {
-      return arg * (180 / Math.PI)
-    })
+    return this.runFunction(ast.args, formulaAddress, DegreesPlugin.implementedFunctions.DEGREES,
+      (arg) => arg * (180 / Math.PI)
+    )
   }
 }

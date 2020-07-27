@@ -3,8 +3,8 @@
  * Copyright (c) 2020 Handsoncode. All rights reserved.
  */
 
-import {CellError, ErrorType, InternalScalarValue, SimpleCellAddress} from '../../Cell'
-import {AstNodeType, ProcedureAst} from '../../parser'
+import {InternalScalarValue, SimpleCellAddress} from '../../Cell'
+import {ProcedureAst} from '../../parser'
 import {FunctionPlugin} from './FunctionPlugin'
 
 export class DeltaPlugin extends FunctionPlugin {
@@ -19,8 +19,8 @@ export class DeltaPlugin extends FunctionPlugin {
   }
 
   public delta(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, DeltaPlugin.implementedFunctions.DELTA, (left: number, right: number) => {
-      return left === right ? 1 : 0
-    })
+    return this.runFunction(ast.args, formulaAddress, DeltaPlugin.implementedFunctions.DELTA,
+      (left: number, right: number) => (left === right ? 1 : 0)
+    )
   }
 }

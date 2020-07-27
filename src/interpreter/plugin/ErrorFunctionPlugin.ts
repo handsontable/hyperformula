@@ -3,9 +3,8 @@
  * Copyright (c) 2020 Handsoncode. All rights reserved.
  */
 
-import {CellError, EmptyValue, ErrorType, InternalScalarValue, SimpleCellAddress} from '../../Cell'
-import {upperBound} from '../../ColumnSearch/ColumnIndex'
-import {AstNodeType, ProcedureAst} from '../../parser'
+import {InternalScalarValue, SimpleCellAddress} from '../../Cell'
+import {ProcedureAst} from '../../parser'
 import {FunctionPlugin} from './FunctionPlugin'
 
 export class ErrorFunctionPlugin extends FunctionPlugin {

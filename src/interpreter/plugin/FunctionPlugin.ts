@@ -10,7 +10,7 @@ import {ColumnSearchStrategy} from '../../ColumnSearch/ColumnSearchStrategy'
 import {Config} from '../../Config'
 import {DependencyGraph} from '../../DependencyGraph'
 import {Maybe} from '../../Maybe'
-import {Ast, AstNodeType, ProcedureAst} from '../../parser'
+import {Ast, ProcedureAst} from '../../parser'
 import {coerceScalarToBoolean, coerceScalarToString} from '../ArithmeticHelper'
 import {Interpreter} from '../Interpreter'
 import {InterpreterValue, SimpleRangeValue} from '../InterpreterValue'
@@ -44,6 +44,8 @@ export interface FunctionArgumentDefinition {
   optionalArg?: boolean, //
   minValue?: number,
   maxValue?: number,
+  lessThan?: number,
+  greaterThan?: number,
 }
 
 export type PluginFunctionType = (ast: ProcedureAst, formulaAddress: SimpleCellAddress) => InternalScalarValue
@@ -97,27 +99,6 @@ export abstract class FunctionPlugin {
     return values
   }
 
-  protected getNumericArgument(ast: ProcedureAst, formulaAddress: SimpleCellAddress, position: number, min?: number, max?: number): number | CellError {
-    if (position > ast.args.length - 1) {
-      return new CellError(ErrorType.NA)
-    }
-    if (ast.args[position].type === AstNodeType.EMPTY) {
-      return new CellError(ErrorType.NUM)
-    }
-    const arg = this.evaluateAst(ast.args[position]!, formulaAddress)
-
-    if (arg instanceof SimpleRangeValue) {
-      return new CellError(ErrorType.VALUE)
-    }
-
-    const value = this.coerceScalarToNumberOrError(arg)
-    if (typeof value === 'number' && min !== undefined && max !== undefined && (value < min || value > max)) {
-      return new CellError(ErrorType.NUM)
-    }
-
-    return value
-  }
-
   public coerceScalarToNumberOrError = (arg: InternalScalarValue): number | CellError => this.interpreter.arithmeticHelper.coerceScalarToNumberOrError(arg)
 
   public coerceToType(arg: InterpreterValue, coercedType: FunctionArgumentDefinition): Maybe<InterpreterValue> {
@@ -140,6 +121,12 @@ export abstract class FunctionPlugin {
             return new CellError(ErrorType.NUM)
           }
           if (coercedType.minValue !== undefined && value < coercedType.minValue) {
+            return new CellError(ErrorType.NUM)
+          }
+          if(coercedType.lessThan !== undefined && value >= coercedType.lessThan) {
+            return new CellError(ErrorType.NUM)
+          }
+          if (coercedType.greaterThan !== undefined && value <= coercedType.greaterThan) {
             return new CellError(ErrorType.NUM)
           }
           if(coercedType.argumentType === 'integer' && !Number.isInteger(value)) {

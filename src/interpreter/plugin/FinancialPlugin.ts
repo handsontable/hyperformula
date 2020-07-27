@@ -3,9 +3,8 @@
  * Copyright (c) 2020 Handsoncode. All rights reserved.
  */
 
-import {CellError, ErrorType, InternalScalarValue, SimpleCellAddress} from '../../Cell'
-import {AstNodeType, ProcedureAst} from '../../parser'
-import {SimpleRangeValue} from '../InterpreterValue'
+import {InternalScalarValue, SimpleCellAddress} from '../../Cell'
+import {ProcedureAst} from '../../parser'
 import {FunctionPlugin} from './FunctionPlugin'
 
 export class FinancialPlugin extends FunctionPlugin {

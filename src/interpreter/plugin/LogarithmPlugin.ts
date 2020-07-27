@@ -3,9 +3,8 @@
  * Copyright (c) 2020 Handsoncode. All rights reserved.
  */
 
-import {CellError, ErrorType, InternalScalarValue, SimpleCellAddress} from '../../Cell'
-import {AstNodeType, ProcedureAst} from '../../parser'
-import {SimpleRangeValue} from '../InterpreterValue'
+import {InternalScalarValue, SimpleCellAddress} from '../../Cell'
+import {ProcedureAst} from '../../parser'
 import {FunctionPlugin} from './FunctionPlugin'
 
 export class LogarithmPlugin extends FunctionPlugin {
@@ -20,8 +19,8 @@ export class LogarithmPlugin extends FunctionPlugin {
     'LOG': {
       method: 'log',
       parameters: [
-        { argumentType: 'number' },
-        { argumentType: 'number', defaultValue: 10 },
+        { argumentType: 'number', greaterThan: 0 },
+        { argumentType: 'number', defaultValue: 10, greaterThan: 0 },
       ],
     },
     'LN': {
@@ -37,13 +36,9 @@ export class LogarithmPlugin extends FunctionPlugin {
   }
 
   public log(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, LogarithmPlugin.implementedFunctions.LOG, (arg: number, base: number) => {
-        if(arg > 0 && base > 0) {
-          return Math.log(arg) / Math.log(base)
-        } else {
-          return new CellError(ErrorType.NUM)
-        }
-      })
+    return this.runFunction(ast.args, formulaAddress, LogarithmPlugin.implementedFunctions.LOG,
+      (arg: number, base: number) => Math.log(arg) / Math.log(base)
+    )
   }
 
   public ln(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
