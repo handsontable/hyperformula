@@ -33,7 +33,7 @@ export class BooleanPlugin extends FunctionPlugin {
     'AND': {
       method: 'and',
       parameters: [
-        { argumentType: 'boolean', softCoerce: true },
+        { argumentType: 'boolean' },
       ],
       repeatedArg: true,
       expandRanges: true,
@@ -41,7 +41,7 @@ export class BooleanPlugin extends FunctionPlugin {
     'OR': {
       method: 'or',
       parameters: [
-        { argumentType: 'boolean', softCoerce: true },
+        { argumentType: 'boolean' },
       ],
       repeatedArg: true,
       expandRanges: true,
@@ -49,7 +49,7 @@ export class BooleanPlugin extends FunctionPlugin {
     'XOR': {
       method: 'xor',
       parameters: [
-        { argumentType: 'boolean', softCoerce: true },
+        { argumentType: 'boolean' },
       ],
       repeatedArg: true,
       expandRanges: true,
@@ -127,11 +127,7 @@ export class BooleanPlugin extends FunctionPlugin {
    */
   public conditionalIf(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InterpreterValue {
     return this.runFunction(ast.args, formulaAddress, BooleanPlugin.implementedFunctions.IF, (condition, arg2, arg3) => {
-      if(condition===undefined) {
-        return new CellError(ErrorType.VALUE)
-      } else {
         return condition ? arg2 : arg3
-      }
     })
   }
 
@@ -144,15 +140,9 @@ export class BooleanPlugin extends FunctionPlugin {
    * @param formulaAddress
    */
   public and(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, BooleanPlugin.implementedFunctions.AND, (...args) => {
-      if(args.some((arg: Maybe<InternalScalarValue>) => arg===false)) {
-        return false
-      } else if(args.some((arg: Maybe<InternalScalarValue>) => arg!==undefined)) {
-        return true
-      } else {
-        return new CellError(ErrorType.VALUE)
-      }
-    })
+    return this.runFunction(ast.args, formulaAddress, BooleanPlugin.implementedFunctions.AND,
+      (...args) => !args.some( (arg:boolean) => !arg)
+    )
   }
 
   /**
@@ -164,40 +154,24 @@ export class BooleanPlugin extends FunctionPlugin {
    * @param formulaAddress
    */
   public or(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, BooleanPlugin.implementedFunctions.OR, (...args) => {
-      if(args.some((arg: Maybe<InternalScalarValue>) => arg===true)) {
-        return true
-      } else if(args.some((arg: Maybe<InternalScalarValue>) => arg!==undefined)) {
-        return false
-      } else {
-        return new CellError(ErrorType.VALUE)
-      }
-    })
+    return this.runFunction(ast.args, formulaAddress, BooleanPlugin.implementedFunctions.OR,
+      (...args) => args.some( (arg:boolean) => arg)
+    )
   }
 
   public not(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, BooleanPlugin.implementedFunctions.NOT, (arg) => {
-      if(arg===undefined) {
-        return new CellError(ErrorType.VALUE)
-      } else {
-        return !arg
-      }
-    })
+    return this.runFunction(ast.args, formulaAddress, BooleanPlugin.implementedFunctions.NOT, (arg) => !arg)
   }
 
   public xor(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.runFunction(ast.args, formulaAddress, BooleanPlugin.implementedFunctions.XOR, (...args) => {
-      if(args.some((arg: Maybe<InternalScalarValue>) => arg!==undefined)) {
-        let cnt = 0
-        args.forEach((arg: Maybe<InternalScalarValue>) => {
-          if( arg===true ) {
-            cnt++
-          }
-        })
-        return (cnt%2) === 1
-      } else {
-        return new CellError(ErrorType.VALUE)
-      }
+      let cnt = 0
+      args.forEach((arg: boolean) => {
+        if( arg ) {
+          cnt++
+        }
+      })
+      return (cnt%2) === 1
     })
   }
 

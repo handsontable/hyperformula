@@ -76,15 +76,15 @@ export abstract class FunctionPlugin {
     return this.interpreter.evaluateAst(ast, formulaAddress)
   }
 
-  protected* iterateOverScalarValues(asts: Ast[], formulaAddress: SimpleCellAddress): IterableIterator<InternalScalarValue> {
+  protected* iterateOverScalarValues(asts: Ast[], formulaAddress: SimpleCellAddress): IterableIterator<[InternalScalarValue,boolean]> {
     for (const argAst of asts) {
       const value = this.evaluateAst(argAst, formulaAddress)
       if (value instanceof SimpleRangeValue) {
         for (const scalarValue of value.valuesFromTopLeftCorner()) {
-          yield scalarValue
+          yield [scalarValue, true]
         }
       } else {
-        yield value
+        yield [value, false]
       }
     }
   }
@@ -155,11 +155,11 @@ export abstract class FunctionPlugin {
   ) => {
     const argumentDefinitions: FunctionArgumentDefinition[] = functionDefinition.parameters!
     assert(argumentDefinitions !== undefined)
-    let scalarValues: InterpreterValue[]
+    let scalarValues: [InterpreterValue, boolean][]
     if(functionDefinition.expandRanges) {
       scalarValues = [...this.iterateOverScalarValues(args, formulaAddress)]
     } else {
-      scalarValues = args.map((ast) => this.evaluateAst(ast, formulaAddress))
+      scalarValues = args.map((ast) => [this.evaluateAst(ast, formulaAddress), false])
     }
     const coercedArguments: Maybe<InterpreterValue>[] = []
 
@@ -174,7 +174,8 @@ export abstract class FunctionPlugin {
           return new CellError(ErrorType.NA)
         }
       }
-      const arg = scalarValues[i] ?? argumentDefinitions[j]?.defaultValue
+      const [val,ignorable] = scalarValues[i] ?? [undefined, undefined]
+      const arg = val ?? argumentDefinitions[j]?.defaultValue
       if(arg === undefined) {
         if(argumentDefinitions[j]?.optionalArg) {
           i++
@@ -185,9 +186,14 @@ export abstract class FunctionPlugin {
           return new CellError(ErrorType.NA)
         }
       }
-      const coercedArg = scalarValues[i] !== undefined ? this.coerceToType(arg, argumentDefinitions[j]) : arg
-      if(coercedArg === undefined && !argumentDefinitions[j].softCoerce) {
-        argCoerceFailure = argCoerceFailure ?? (new CellError(ErrorType.VALUE))
+      const coercedArg = val !== undefined ? this.coerceToType(arg, argumentDefinitions[j]) : arg
+      if(coercedArg === undefined) {
+        if(!ignorable) {
+          argCoerceFailure = argCoerceFailure ?? (new CellError(ErrorType.VALUE))
+        }
+        i++
+        j++
+        continue
       }
       if (coercedArg instanceof CellError && argumentDefinitions[j].argumentType !== 'scalar') {
         argCoerceFailure = argCoerceFailure ?? coercedArg
