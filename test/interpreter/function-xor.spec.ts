@@ -52,7 +52,7 @@ describe('Function XOR', () => {
       ['=XOR(A4:B4)'],
       ['=XOR(C4:D4)'],
       ['=XOR(C4:D4, "foo")'],
-      ["TRUE", 1, "foo", "=TRUE()"],
+      ['TRUE', 1, 'foo', '=TRUE()'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toBe(false)

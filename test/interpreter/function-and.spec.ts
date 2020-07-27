@@ -36,7 +36,7 @@ describe('Function AND', () => {
       ['=AND(A4:B4)'],
       ['=AND(C4:D4)'],
       ['=AND(C4:D4, "foo")'],
-      ["TRUE", 1, "foo", "=TRUE()"],
+      ['TRUE', 1, 'foo', '=TRUE()'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toBe(true)

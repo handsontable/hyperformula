@@ -76,7 +76,7 @@ export abstract class FunctionPlugin {
     return this.interpreter.evaluateAst(ast, formulaAddress)
   }
 
-  protected* iterateOverScalarValues(asts: Ast[], formulaAddress: SimpleCellAddress): IterableIterator<[InternalScalarValue,boolean]> {
+  protected* iterateOverScalarValues(asts: Ast[], formulaAddress: SimpleCellAddress): IterableIterator<[InternalScalarValue, boolean]> {
     for (const argAst of asts) {
       const value = this.evaluateAst(argAst, formulaAddress)
       if (value instanceof SimpleRangeValue) {
@@ -174,7 +174,7 @@ export abstract class FunctionPlugin {
           return new CellError(ErrorType.NA)
         }
       }
-      const [val,ignorable] = scalarValues[i] ?? [undefined, undefined]
+      const [val, ignorable] = scalarValues[i] ?? [undefined, undefined]
       const arg = val ?? argumentDefinitions[j]?.defaultValue
       if(arg === undefined) {
         if(argumentDefinitions[j]?.optionalArg) {

@@ -141,7 +141,7 @@ export class BooleanPlugin extends FunctionPlugin {
    */
   public and(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.runFunction(ast.args, formulaAddress, BooleanPlugin.implementedFunctions.AND,
-      (...args) => !args.some( (arg:boolean) => !arg)
+      (...args) => !args.some( (arg: boolean) => !arg)
     )
   }
 
@@ -155,7 +155,7 @@ export class BooleanPlugin extends FunctionPlugin {
    */
   public or(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.runFunction(ast.args, formulaAddress, BooleanPlugin.implementedFunctions.OR,
-      (...args) => args.some( (arg:boolean) => arg)
+      (...args) => args.some( (arg: boolean) => arg)
     )
   }
 
