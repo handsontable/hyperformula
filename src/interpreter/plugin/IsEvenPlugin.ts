@@ -11,14 +11,14 @@ export class IsEvenPlugin extends FunctionPlugin {
   public static implementedFunctions = {
     'ISEVEN': {
       method: 'iseven',
-      parameters: [
+      parameters: { list: [
         { argumentType: 'number'}
-      ]
+      ]}
     },
   }
 
   public iseven(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, IsEvenPlugin.implementedFunctions.ISEVEN,
+    return this.runFunction(ast.args, formulaAddress, this.parameters('ISEVEN'),
       (val) => (val % 2 === 0)
     )
   }

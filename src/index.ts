@@ -50,7 +50,7 @@ import {
   UnableToParseError
 } from './errors'
 import * as plugins from './interpreter/plugin'
-import {FunctionArgumentDefinition, FunctionPlugin, FunctionPluginDefinition} from './interpreter'
+import {FunctionArgument, FunctionPlugin, FunctionPluginDefinition} from './interpreter'
 import {ColumnRowIndex} from './CrudOperations'
 
 /** @internal */
@@ -121,7 +121,7 @@ export {
   ColumnRowIndex,
   RawTranslationPackage,
   FunctionPluginDefinition,
-  FunctionArgumentDefinition,
+  FunctionArgument,
   NamedExpression,
   NamedExpressionOptions,
   HyperFormula,

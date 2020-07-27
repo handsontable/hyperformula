@@ -15,52 +15,52 @@ export class TrigonometryPlugin extends FunctionPlugin {
   public static implementedFunctions = {
     'ACOS': {
       method: 'acos',
-      parameters: [
+      parameters: { list: [
         { argumentType: 'number' }
-      ],
+      ]}
     },
     'ASIN': {
       method: 'asin',
-      parameters: [
+      parameters: { list: [
         { argumentType: 'number' }
-      ],
+      ]}
     },
     'COS': {
       method: 'cos',
-      parameters: [
+      parameters: { list: [
         { argumentType: 'number' }
-      ],
+      ]}
     },
     'SIN': {
       method: 'sin',
-      parameters: [
+      parameters: { list: [
         { argumentType: 'number' }
-      ],
+      ]}
     },
     'TAN': {
       method: 'tan',
-      parameters: [
+      parameters: { list: [
         { argumentType: 'number' }
-      ],
+      ]}
     },
     'ATAN': {
       method: 'atan',
-      parameters: [
+      parameters: { list: [
         { argumentType: 'number' }
-      ],
+      ]}
     },
     'ATAN2': {
       method: 'atan2',
-      parameters: [
+      parameters: { list: [
         { argumentType: 'number' },
         { argumentType: 'number' },
-      ],
+      ]}
     },
     'COT': {
       method: 'ctg',
-      parameters: [
+      parameters: { list: [
         { argumentType: 'number' }
-      ],
+      ]}
     },
   }
 
@@ -73,35 +73,35 @@ export class TrigonometryPlugin extends FunctionPlugin {
    * @param formulaAddress
    */
   public acos(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, TrigonometryPlugin.implementedFunctions.ACOS, Math.acos)
+    return this.runFunction(ast.args, formulaAddress, this.parameters('ACOS'), Math.acos)
   }
 
   public asin(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, TrigonometryPlugin.implementedFunctions.ASIN, Math.asin)
+    return this.runFunction(ast.args, formulaAddress, this.parameters('ASIN'), Math.asin)
   }
 
   public cos(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, TrigonometryPlugin.implementedFunctions.COS, Math.cos)
+    return this.runFunction(ast.args, formulaAddress, this.parameters('COS'), Math.cos)
   }
 
   public sin(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, TrigonometryPlugin.implementedFunctions.SIN, Math.sin)
+    return this.runFunction(ast.args, formulaAddress, this.parameters('SIN'), Math.sin)
   }
 
   public tan(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, TrigonometryPlugin.implementedFunctions.TAN, Math.tan)
+    return this.runFunction(ast.args, formulaAddress, this.parameters('TAN'), Math.tan)
   }
 
   public atan(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, TrigonometryPlugin.implementedFunctions.ATAN, Math.atan)
+    return this.runFunction(ast.args, formulaAddress, this.parameters('ATAN'), Math.atan)
   }
 
   public atan2(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, TrigonometryPlugin.implementedFunctions.ATAN2, Math.atan2)
+    return this.runFunction(ast.args, formulaAddress, this.parameters('ATAN2'), Math.atan2)
   }
 
   public ctg(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, TrigonometryPlugin.implementedFunctions.COT, (coercedArg) => {
+    return this.runFunction(ast.args, formulaAddress, this.parameters('COT'), (coercedArg) => {
       if (coercedArg === 0) {
         return new CellError(ErrorType.DIV_BY_ZERO)
       } else {

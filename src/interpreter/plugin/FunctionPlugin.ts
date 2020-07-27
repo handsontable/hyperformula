@@ -3,7 +3,6 @@
  * Copyright (c) 2020 Handsoncode. All rights reserved.
  */
 
-import assert from 'assert'
 import {AbsoluteCellRange} from '../../AbsoluteCellRange'
 import {CellError, ErrorType, InternalScalarValue, SimpleCellAddress} from '../../Cell'
 import {ColumnSearchStrategy} from '../../ColumnSearch/ColumnSearchStrategy'
@@ -21,9 +20,7 @@ export interface ImplementedFunctions {
 
 export interface FunctionMetadata {
   method: string,
-  parameters?: FunctionArgumentDefinition[],
-  repeatedArg?: boolean,
-  expandRanges?: boolean,
+  parameters?: FunctionArgumentsDefinition,
   isVolatile?: boolean,
   isDependentOnSheetStructureChange?: boolean,
   doesNotNeedArgumentsToBeComputed?: boolean,
@@ -37,11 +34,16 @@ export interface FunctionPluginDefinition {
 
 export type ArgumentTypes = 'string' | 'number' | 'boolean' | 'scalar' | 'noerror' | 'range' | 'integer'
 
-export interface FunctionArgumentDefinition {
+export interface FunctionArgumentsDefinition {
+  list: FunctionArgument[],
+  repeatedArg?: boolean,
+  expandRanges?: boolean,
+}
+
+export interface FunctionArgument {
   argumentType: string,
   defaultValue?: InternalScalarValue,
-  softCoerce?: boolean, //failed coerce makes function ignore the arg instead of producing error
-  optionalArg?: boolean, //
+  optionalArg?: boolean,
   minValue?: number,
   maxValue?: number,
   lessThan?: number,
@@ -101,7 +103,7 @@ export abstract class FunctionPlugin {
 
   public coerceScalarToNumberOrError = (arg: InternalScalarValue): number | CellError => this.interpreter.arithmeticHelper.coerceScalarToNumberOrError(arg)
 
-  public coerceToType(arg: InterpreterValue, coercedType: FunctionArgumentDefinition): Maybe<InterpreterValue> {
+  public coerceToType(arg: InterpreterValue, coercedType: FunctionArgument): Maybe<InterpreterValue> {
     if(arg instanceof SimpleRangeValue) {
       if(coercedType.argumentType === 'range') {
         return arg
@@ -150,17 +152,18 @@ export abstract class FunctionPlugin {
   protected runFunction = (
     args: Ast[],
     formulaAddress: SimpleCellAddress,
-    functionDefinition: FunctionMetadata,
+    functionDefinition: FunctionArgumentsDefinition,
     fn: (...arg: any) => InternalScalarValue
   ) => {
-    const argumentDefinitions: FunctionArgumentDefinition[] = functionDefinition.parameters!
-    assert(argumentDefinitions !== undefined)
+    const argumentDefinitions: FunctionArgument[] = functionDefinition.list
     let scalarValues: [InterpreterValue, boolean][]
+
     if(functionDefinition.expandRanges) {
       scalarValues = [...this.iterateOverScalarValues(args, formulaAddress)]
     } else {
       scalarValues = args.map((ast) => [this.evaluateAst(ast, formulaAddress), false])
     }
+
     const coercedArguments: Maybe<InterpreterValue>[] = []
 
     let argCoerceFailure: Maybe<CellError> = undefined
@@ -206,10 +209,11 @@ export abstract class FunctionPlugin {
     return argCoerceFailure ?? fn(...coercedArguments)
   }
 
-  protected evaluateArgOrDefault = (formulaAddress: SimpleCellAddress, argAst?: Ast, defaultValue?: InternalScalarValue): InterpreterValue => {
-    if (argAst !== undefined) {
-      return this.evaluateAst(argAst, formulaAddress)
+  protected parameters(name: string): FunctionArgumentsDefinition {
+    const params = (this.constructor as FunctionPluginDefinition).implementedFunctions[name]?.parameters
+    if (params !== undefined) {
+      return params
     }
-    return defaultValue ?? new CellError(ErrorType.NA)
+    throw new Error('FIXME Should not be undefined')
   }
 }

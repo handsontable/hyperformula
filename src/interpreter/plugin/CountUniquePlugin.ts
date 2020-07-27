@@ -14,11 +14,13 @@ export class CountUniquePlugin extends FunctionPlugin {
   public static implementedFunctions = {
     'COUNTUNIQUE': {
       method: 'countunique',
-      parameters: [
-        { argumentType: 'scalar' },
-      ],
-      repeatedArg: true,
-      expandRanges: true,
+      parameters: {
+        list: [
+          {argumentType: 'scalar'},
+        ],
+        repeatedArg: true,
+        expandRanges: true,
+      },
     },
   }
 
@@ -31,11 +33,11 @@ export class CountUniquePlugin extends FunctionPlugin {
    * @param formulaAddress
    */
   public countunique(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, CountUniquePlugin.implementedFunctions.COUNTUNIQUE, (...args: InternalScalarValue[]) => {
+    return this.runFunction(ast.args, formulaAddress, this.parameters('COUNTUNIQUE'), (...args: InternalScalarValue[]) => {
       const valuesSet = new Set<number | string | boolean | EmptyValueType>()
       const errorsSet = new Set<ErrorType>()
 
-      for (const scalarValue  of args) {
+      for (const scalarValue of args) {
         if (scalarValue instanceof CellError) {
           errorsSet.add(scalarValue.type)
         } else if (scalarValue !== '') {

@@ -11,15 +11,15 @@ export class ModuloPlugin extends FunctionPlugin {
   public static implementedFunctions = {
     'MOD': {
       method: 'mod',
-      parameters: [
+      parameters: { list: [
         { argumentType: 'number' },
         { argumentType: 'number' },
-      ],
+      ]},
     },
   }
 
   public mod(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, ModuloPlugin.implementedFunctions.MOD, (dividend: number, divisor: number) => {
+    return this.runFunction(ast.args, formulaAddress, this.parameters('MOD'), (dividend: number, divisor: number) => {
       if (divisor === 0) {
         return new CellError(ErrorType.DIV_BY_ZERO)
       } else {

@@ -19,82 +19,82 @@ export class RadixConversionPlugin extends FunctionPlugin {
   public static implementedFunctions = {
     'DEC2BIN': {
       method: 'dec2bin',
-      parameters: [
+      parameters: { list: [
         { argumentType: 'number', minValue: minValFromBase(2), maxValue: maxValFromBase(2) },
         { argumentType: 'number', optionalArg: true, minValue: 1, maxValue: 10 },
-      ],
+      ]},
     },
     'DEC2OCT': {
       method: 'dec2oct',
-      parameters: [
+      parameters: { list: [
         { argumentType: 'number', minValue: minValFromBase(8), maxValue: maxValFromBase(8) },
         { argumentType: 'number', optionalArg: true, minValue: 1, maxValue: 10 },
-      ],
+      ]},
     },
     'DEC2HEX': {
       method: 'dec2hex',
-      parameters: [
+      parameters: { list: [
         { argumentType: 'number', minValue: minValFromBase(16), maxValue: maxValFromBase(16) },
         { argumentType: 'number', optionalArg: true, minValue: 1, maxValue: 10 },
-      ],
+      ]},
     },
     'BIN2DEC': {
       method: 'bin2dec',
-      parameters: [
+      parameters: { list: [
         { argumentType: 'string' }
-      ],
+      ]},
     },
     'BIN2OCT': {
       method: 'bin2oct',
-      parameters: [
+      parameters: { list: [
         { argumentType: 'string' },
         { argumentType: 'number', optionalArg: true, minValue: 0, maxValue: DECIMAL_NUMBER_OF_BITS},
-      ],
+      ]},
     },
     'BIN2HEX': {
       method: 'bin2hex',
-      parameters: [
+      parameters: { list: [
         { argumentType: 'string' },
         { argumentType: 'number', optionalArg: true, minValue: 0, maxValue: DECIMAL_NUMBER_OF_BITS},
-      ],
+      ]},
     },
     'DECIMAL': {
       method: 'decimal',
-      parameters: [
+      parameters: { list: [
         { argumentType: 'string' },
         { argumentType: 'number', minValue: MIN_BASE, maxValue: MAX_BASE },
-      ],
+      ]},
     },
     'BASE': {
       method: 'base',
-      parameters: [
+      parameters: { list: [
         { argumentType: 'number', minValue: 0 },
         { argumentType: 'number', minValue: MIN_BASE, maxValue: MAX_BASE },
         { argumentType: 'number', optionalArg: true, minValue: 0, maxValue: DECIMAL_NUMBER_OF_BITS},
-      ],
+      ]},
     },
   }
 
   public dec2bin(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, RadixConversionPlugin.implementedFunctions.DEC2BIN,
+    return this.runFunction(ast.args, formulaAddress, this.parameters('DEC2BIN'),
       (value, places) => decimalToBaseWithExactPadding(value, 2, places)
     )
   }
 
   public dec2oct(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, RadixConversionPlugin.implementedFunctions.DEC2OCT,
+    return this.runFunction(ast.args, formulaAddress, this.parameters('DEC2OCT'),
       (value, places) => decimalToBaseWithExactPadding(value, 8, places)
     )
   }
 
   public dec2hex(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, RadixConversionPlugin.implementedFunctions.DEC2HEX,
+    return this.runFunction(ast.args, formulaAddress, this.parameters('DEC2HEX'),
       (value, places) => decimalToBaseWithExactPadding(value, 16, places)
     )
   }
 
   public bin2dec(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, RadixConversionPlugin.implementedFunctions.BIN2DEC, (binary) => {
+    return this.runFunction(ast.args, formulaAddress, this.parameters('BIN2DEC'), (binary) => {
         const binaryWithSign = coerceStringToBase(binary, 2, NUMBER_OF_BITS)
         if(binaryWithSign === undefined) {
           return new CellError(ErrorType.NUM)
@@ -104,7 +104,7 @@ export class RadixConversionPlugin extends FunctionPlugin {
   }
 
   public bin2oct(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, RadixConversionPlugin.implementedFunctions.BIN2OCT, (binary, places) => {
+    return this.runFunction(ast.args, formulaAddress, this.parameters('BIN2OCT'), (binary, places) => {
       const binaryWithSign = coerceStringToBase(binary, 2, NUMBER_OF_BITS)
       if(binaryWithSign === undefined) {
         return new CellError(ErrorType.NUM)
@@ -114,7 +114,7 @@ export class RadixConversionPlugin extends FunctionPlugin {
   }
 
   public bin2hex(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, RadixConversionPlugin.implementedFunctions.BIN2HEX, (binary, places) => {
+    return this.runFunction(ast.args, formulaAddress, this.parameters('BIN2HEX'), (binary, places) => {
       const binaryWithSign = coerceStringToBase(binary, 2, NUMBER_OF_BITS)
       if(binaryWithSign === undefined) {
         return new CellError(ErrorType.NUM)
@@ -124,11 +124,11 @@ export class RadixConversionPlugin extends FunctionPlugin {
   }
 
   public base(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, RadixConversionPlugin.implementedFunctions.BASE, decimalToBaseWithMinimumPadding)
+    return this.runFunction(ast.args, formulaAddress, this.parameters('BASE'), decimalToBaseWithMinimumPadding)
   }
 
   public decimal(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, RadixConversionPlugin.implementedFunctions.DECIMAL, (arg, base) => {
+    return this.runFunction(ast.args, formulaAddress, this.parameters('DECIMAL'), (arg, base) => {
       const input = coerceStringToBase(arg, base, DECIMAL_NUMBER_OF_BITS)
       if(input === undefined) {
         return new CellError(ErrorType.NUM)

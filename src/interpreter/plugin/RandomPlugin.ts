@@ -3,15 +3,15 @@
  * Copyright (c) 2020 Handsoncode. All rights reserved.
  */
 
-import {CellError, ErrorType, InternalScalarValue, SimpleCellAddress} from '../../Cell'
-import {AstNodeType, ProcedureAst} from '../../parser'
+import {InternalScalarValue, SimpleCellAddress} from '../../Cell'
+import {ProcedureAst} from '../../parser'
 import {FunctionPlugin} from './FunctionPlugin'
 
 export class RandomPlugin extends FunctionPlugin {
   public static implementedFunctions = {
     'RAND': {
       method: 'rand',
-      parameters: [],
+      parameters: { list: [] },
       isVolatile: true,
     },
   }
@@ -26,6 +26,6 @@ export class RandomPlugin extends FunctionPlugin {
    * @param formulaAddress
    */
   public rand(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, RandomPlugin.implementedFunctions.RAND, Math.random)
+    return this.runFunction(ast.args, formulaAddress, this.parameters('RAND'), Math.random)
   }
 }

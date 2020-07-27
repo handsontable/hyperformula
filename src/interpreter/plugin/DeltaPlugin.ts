@@ -11,15 +11,17 @@ export class DeltaPlugin extends FunctionPlugin {
   public static implementedFunctions = {
     'DELTA': {
       method: 'delta',
-      parameters: [
-        { argumentType: 'number' },
-        { argumentType: 'number', defaultValue: 0 },
-      ],
+      parameters: {
+        list: [
+          {argumentType: 'number'},
+          {argumentType: 'number', defaultValue: 0},
+        ]
+      },
     },
   }
 
   public delta(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, DeltaPlugin.implementedFunctions.DELTA,
+    return this.runFunction(ast.args, formulaAddress, this.parameters('DELTA'),
       (left: number, right: number) => (left === right ? 1 : 0)
     )
   }

@@ -11,22 +11,26 @@ export class ErrorFunctionPlugin extends FunctionPlugin {
   public static implementedFunctions = {
     'ERF': {
       method: 'erf',
-      parameters: [
-        { argumentType: 'number' },
-        { argumentType: 'number', optionalArg: true},
-      ],
+      parameters: {
+        list: [
+          {argumentType: 'number'},
+          {argumentType: 'number', optionalArg: true},
+        ]
+      },
     },
     'ERFC': {
       method: 'erfc',
-      parameters: [
-        { argumentType: 'number' }
-      ],
+      parameters: {
+        list: [
+          {argumentType: 'number'}
+        ]
+      },
     },
   }
 
   public erf(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, ErrorFunctionPlugin.implementedFunctions.ERF, (lowerBound, upperBound) => {
-      if(upperBound===undefined) {
+    return this.runFunction(ast.args, formulaAddress, this.parameters('ERF'), (lowerBound, upperBound) => {
+      if (upperBound === undefined) {
         return erf(lowerBound)
       } else {
         return erf(upperBound) - erf(lowerBound)
@@ -35,7 +39,7 @@ export class ErrorFunctionPlugin extends FunctionPlugin {
   }
 
   public erfc(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, ErrorFunctionPlugin.implementedFunctions.ERFC, erfc)
+    return this.runFunction(ast.args, formulaAddress, this.parameters('ERFC'), erfc)
   }
 }
 

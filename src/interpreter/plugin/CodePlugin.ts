@@ -11,14 +11,16 @@ export class CodePlugin extends FunctionPlugin {
   public static implementedFunctions = {
     'CODE': {
       method: 'code',
-      parameters: [
-        { argumentType: 'string' }
-        ],
+      parameters: {
+        list: [
+          {argumentType: 'string'}
+        ]
+      },
     },
   }
 
   public code(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, CodePlugin.implementedFunctions.CODE, (value: string) => {
+    return this.runFunction(ast.args, formulaAddress, this.parameters('CODE'), (value: string) => {
       if (value.length === 0) {
         return new CellError(ErrorType.VALUE)
       }

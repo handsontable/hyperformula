@@ -11,71 +11,79 @@ export class FinancialPlugin extends FunctionPlugin {
   public static implementedFunctions = {
     'PMT': {
       method: 'pmt',
-      parameters: [
-        { argumentType: 'number' },
-        { argumentType: 'number' },
-        { argumentType: 'number' },
-        { argumentType: 'number', defaultValue: 0 },
-        { argumentType: 'number', defaultValue: 0 },
-      ],
+      parameters: {
+        list: [
+          {argumentType: 'number'},
+          {argumentType: 'number'},
+          {argumentType: 'number'},
+          {argumentType: 'number', defaultValue: 0},
+          {argumentType: 'number', defaultValue: 0},
+        ]
+      },
     },
     'IPMT': {
       method: 'ipmt',
-      parameters: [
-        { argumentType: 'number' },
-        { argumentType: 'number' },
-        { argumentType: 'number' },
-        { argumentType: 'number' },
-        { argumentType: 'number', defaultValue: 0 },
-        { argumentType: 'number', defaultValue: 0 },
-      ],
+      parameters: {
+        list: [
+          {argumentType: 'number'},
+          {argumentType: 'number'},
+          {argumentType: 'number'},
+          {argumentType: 'number'},
+          {argumentType: 'number', defaultValue: 0},
+          {argumentType: 'number', defaultValue: 0},
+        ]
+      },
     },
     'PPMT': {
       method: 'ppmt',
-      parameters: [
-        { argumentType: 'number' },
-        { argumentType: 'number' },
-        { argumentType: 'number' },
-        { argumentType: 'number' },
-        { argumentType: 'number', defaultValue: 0 },
-        { argumentType: 'number', defaultValue: 0 },
-      ],
+      parameters: {
+        list: [
+          {argumentType: 'number'},
+          {argumentType: 'number'},
+          {argumentType: 'number'},
+          {argumentType: 'number'},
+          {argumentType: 'number', defaultValue: 0},
+          {argumentType: 'number', defaultValue: 0},
+        ]
+      },
     },
     'FV': {
       method: 'fv',
-      parameters: [
-        { argumentType: 'number' },
-        { argumentType: 'number' },
-        { argumentType: 'number' },
-        { argumentType: 'number', defaultValue: 0 },
-        { argumentType: 'number', defaultValue: 0 },
-      ],
+      parameters: {
+        list: [
+          {argumentType: 'number'},
+          {argumentType: 'number'},
+          {argumentType: 'number'},
+          {argumentType: 'number', defaultValue: 0},
+          {argumentType: 'number', defaultValue: 0},
+        ]
+      },
     },
   }
 
   public pmt(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, FinancialPlugin.implementedFunctions.PMT, pmtCore)
+    return this.runFunction(ast.args, formulaAddress, this.parameters('PMT'), pmtCore)
   }
 
   public ipmt(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, FinancialPlugin.implementedFunctions.IPMT, ipmtCore)
+    return this.runFunction(ast.args, formulaAddress, this.parameters('IPMT'), ipmtCore)
   }
 
   public ppmt(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, FinancialPlugin.implementedFunctions.PPMT, ppmtCore)
+    return this.runFunction(ast.args, formulaAddress, this.parameters('PPMT'), ppmtCore)
   }
 
   public fv(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, FinancialPlugin.implementedFunctions.FV, fvCore)
+    return this.runFunction(ast.args, formulaAddress, this.parameters('FV'), fvCore)
   }
 }
 
 function pmtCore(rate: number, periods: number, present: number, future: number, type: number): number {
   if (rate === 0) {
-    return (- present - future) / periods
+    return (-present - future) / periods
   } else {
     const term = Math.pow(1 + rate, periods)
-    return (future * rate + present * rate * term) * (type !== 0 ? 1 / (1 + rate) : 1) / (1-term)
+    return (future * rate + present * rate * term) * (type !== 0 ? 1 / (1 + rate) : 1) / (1 - term)
   }
 }
 
@@ -90,10 +98,10 @@ function ipmtCore(rate: number, period: number, periods: number, present: number
 
 function fvCore(rate: number, periods: number, payment: number, value: number, type: number): number {
   if (rate === 0) {
-    return - value - payment * periods
+    return -value - payment * periods
   } else {
     const term = Math.pow(1 + rate, periods)
-    return payment * (type !== 0 ? (1 + rate) : 1) * (1 - term) / rate  - value * term
+    return payment * (type !== 0 ? (1 + rate) : 1) * (1 - term) / rate - value * term
   }
 }
 

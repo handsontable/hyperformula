@@ -15,11 +15,13 @@ export class MedianPlugin extends FunctionPlugin {
   public static implementedFunctions = {
     'MEDIAN': {
       method: 'median',
-      parameters: [
-        { argumentType: 'noerror' },
-      ],
-      repeatedArg: true,
-      expandRanges: true,
+      parameters: {
+        list: [
+          {argumentType: 'noerror'},
+        ],
+        repeatedArg: true,
+        expandRanges: true,
+      },
     },
   }
 
@@ -32,7 +34,7 @@ export class MedianPlugin extends FunctionPlugin {
    * @param formulaAddress
    */
   public median(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, MedianPlugin.implementedFunctions.MEDIAN, (...args) => {
+    return this.runFunction(ast.args, formulaAddress, this.parameters('MEDIAN'), (...args) => {
       const values: number[] = args.filter((val: InternalScalarValue) => (typeof val === 'number'))
       if (values.length === 0) {
         return new CellError(ErrorType.NUM)

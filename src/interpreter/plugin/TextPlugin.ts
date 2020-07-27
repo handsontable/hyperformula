@@ -14,79 +14,101 @@ export class TextPlugin extends FunctionPlugin {
   public static implementedFunctions = {
     'CONCATENATE': {
       method: 'concatenate',
-      parameters: [
-        { argumentType: 'string'}
-      ],
-      repeatedArg: true,
-      expandRanges: true,
+      parameters: {
+        list: [
+          {argumentType: 'string'}
+        ],
+        repeatedArg: true,
+        expandRanges: true,
+      },
     },
     'SPLIT': {
       method: 'split',
-      parameters: [
-        { argumentType: 'string' },
-        { argumentType: 'number' },
-      ],
+      parameters: {
+        list: [
+          {argumentType: 'string'},
+          {argumentType: 'number'},
+        ]
+      },
     },
     'LEN': {
       method: 'len',
-      parameters: [
-        { argumentType: 'string'}
-      ],
+      parameters: {
+        list: [
+          {argumentType: 'string'}
+        ]
+      },
     },
     'TRIM': {
       method: 'trim',
-      parameters: [
-        { argumentType: 'string'}
-      ],
+      parameters: {
+        list: [
+          {argumentType: 'string'}
+        ]
+      },
     },
     'PROPER': {
       method: 'proper',
-      parameters: [
-        { argumentType: 'string'}
-      ],
+      parameters: {
+        list: [
+          {argumentType: 'string'}
+        ]
+      },
     },
     'CLEAN': {
       method: 'clean',
-      parameters: [
-        { argumentType: 'string'}
-      ],
+      parameters: {
+        list: [
+          {argumentType: 'string'}
+        ]
+      },
     },
     'REPT': {
       method: 'rept',
-      parameters: [
-        { argumentType: 'string' },
-        { argumentType: 'number' },
-      ],
+      parameters: {
+        list: [
+          {argumentType: 'string'},
+          {argumentType: 'number'},
+        ]
+      },
     },
     'RIGHT': {
       method: 'right',
-      parameters: [
-        { argumentType: 'string' },
-        { argumentType: 'number', defaultValue: 1 },
-      ],
+      parameters: {
+        list: [
+          {argumentType: 'string'},
+          {argumentType: 'number', defaultValue: 1},
+        ]
+      },
     },
     'LEFT': {
       method: 'left',
-      parameters: [
-        { argumentType: 'string' },
-        { argumentType: 'number', defaultValue: 1 },
-      ],
+      parameters: {
+        list: [
+          {argumentType: 'string'},
+          {argumentType: 'number', defaultValue: 1},
+        ]
+      },
     },
     'SEARCH': {
       method: 'search',
-      parameters: [
-        { argumentType: 'string' },
-        { argumentType: 'string' },
-        { argumentType: 'number', defaultValue: 1 },
-      ],
+      parameters: {
+        list: [
+          {argumentType: 'string'},
+          {argumentType: 'string'},
+          {argumentType: 'number', defaultValue: 1},
+        ]
+      },
     },
     'FIND': {
       method: 'find',
-      parameters: [
-        { argumentType: 'string' },
-        { argumentType: 'string' },
-        { argumentType: 'number', defaultValue: 1 },
-      ],
+      parameters: {
+        list: [
+          {argumentType: 'string'},
+          {argumentType: 'string'},
+          {argumentType: 'number', defaultValue: 1},
+        ]
+      },
     }
   }
 
@@ -99,7 +121,7 @@ export class TextPlugin extends FunctionPlugin {
    * @param formulaAddress
    */
   public concatenate(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, TextPlugin.implementedFunctions.CONCATENATE, (...args) => {
+    return this.runFunction(ast.args, formulaAddress, this.parameters('CONCATENATE'), (...args) => {
       return ''.concat(...args)
     })
   }
@@ -113,7 +135,7 @@ export class TextPlugin extends FunctionPlugin {
    * @param formulaAddress
    */
   public split(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, TextPlugin.implementedFunctions.SPLIT, (stringToSplit: string, indexToUse: number) => {
+    return this.runFunction(ast.args, formulaAddress, this.parameters('SPLIT'), (stringToSplit: string, indexToUse: number) => {
       const splittedString = stringToSplit.split(' ')
 
       if (indexToUse >= splittedString.length || indexToUse < 0) {
@@ -125,32 +147,32 @@ export class TextPlugin extends FunctionPlugin {
   }
 
   public len(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, TextPlugin.implementedFunctions.LEN, (arg: string) => {
+    return this.runFunction(ast.args, formulaAddress, this.parameters('LEN'), (arg: string) => {
       return arg.length
     })
   }
 
   public trim(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, TextPlugin.implementedFunctions.TRIM, (arg: string) => {
+    return this.runFunction(ast.args, formulaAddress, this.parameters('TRIM'), (arg: string) => {
       return arg.replace(/^ +| +$/g, '').replace(/ +/g, ' ')
     })
   }
 
   public proper(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, TextPlugin.implementedFunctions.PROPER, (arg: string) => {
+    return this.runFunction(ast.args, formulaAddress, this.parameters('PROPER'), (arg: string) => {
       return arg.replace(/\w\S*/g, word => word.charAt(0).toUpperCase() + word.substr(1).toLowerCase())
     })
   }
 
   public clean(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, TextPlugin.implementedFunctions.CLEAN, (arg: string) => {
+    return this.runFunction(ast.args, formulaAddress, this.parameters('CLEAN'), (arg: string) => {
       // eslint-disable-next-line no-control-regex
       return arg.replace(/[\u0000-\u001F]/g, '')
     })
   }
 
   public rept(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, TextPlugin.implementedFunctions.REPT, (text: string, count: number) => {
+    return this.runFunction(ast.args, formulaAddress, this.parameters('REPT'), (text: string, count: number) => {
       if (count < 0) {
         return new CellError(ErrorType.VALUE)
       }
@@ -159,7 +181,7 @@ export class TextPlugin extends FunctionPlugin {
   }
 
   public right(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, TextPlugin.implementedFunctions.RIGHT, (text: string, length: number) => {
+    return this.runFunction(ast.args, formulaAddress, this.parameters('RIGHT'), (text: string, length: number) => {
       if (length < 0) {
         return new CellError(ErrorType.VALUE)
       } else if (length === 0) {
@@ -170,7 +192,7 @@ export class TextPlugin extends FunctionPlugin {
   }
 
   public left(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, TextPlugin.implementedFunctions.LEFT, (text: string, length: number) => {
+    return this.runFunction(ast.args, formulaAddress, this.parameters('LEFT'), (text: string, length: number) => {
       if (length < 0) {
         return new CellError(ErrorType.VALUE)
       }
@@ -179,7 +201,7 @@ export class TextPlugin extends FunctionPlugin {
   }
 
   public search(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, TextPlugin.implementedFunctions.SEARCH, (pattern, text: string, startIndex: number) => {
+    return this.runFunction(ast.args, formulaAddress, this.parameters('SEARCH'), (pattern, text: string, startIndex: number) => {
       if (startIndex < 1 || startIndex > text.length) {
         return new CellError(ErrorType.VALUE)
       }
@@ -199,7 +221,7 @@ export class TextPlugin extends FunctionPlugin {
   }
 
   public find(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, TextPlugin.implementedFunctions.FIND, (pattern, text: string, startIndex: number) => {
+    return this.runFunction(ast.args, formulaAddress, this.parameters('FIND'), (pattern, text: string, startIndex: number) => {
       if (startIndex < 1 || startIndex > text.length) {
         return new CellError(ErrorType.VALUE)
       }

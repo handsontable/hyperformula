@@ -11,14 +11,14 @@ export class RadiansPlugin extends FunctionPlugin {
   public static implementedFunctions = {
     'RADIANS': {
       method: 'radians',
-      parameters: [
+      parameters: { list: [
         { argumentType: 'number' }
-      ],
+      ]},
     },
   }
 
   public radians(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, RadiansPlugin.implementedFunctions.RADIANS,
+    return this.runFunction(ast.args, formulaAddress, this.parameters('RADIANS'),
       (arg) => arg * (Math.PI / 180)
     )
   }

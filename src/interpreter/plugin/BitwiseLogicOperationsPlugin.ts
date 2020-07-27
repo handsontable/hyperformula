@@ -11,41 +11,41 @@ export class BitwiseLogicOperationsPlugin extends FunctionPlugin {
   public static implementedFunctions = {
     'BITAND': {
       method: 'bitand',
-      parameters: [
+      parameters: { list: [
         { argumentType: 'integer', minValue: 0 },
         { argumentType: 'integer', minValue: 0 },
-      ]
+      ]}
     },
     'BITOR': {
       method: 'bitor',
-      parameters: [
+      parameters: { list: [
         { argumentType: 'integer', minValue: 0 },
         { argumentType: 'integer', minValue: 0 },
-      ]
+      ]}
     },
     'BITXOR': {
       method: 'bitxor',
-      parameters: [
+      parameters: { list: [
         { argumentType: 'integer', minValue: 0 },
         { argumentType: 'integer', minValue: 0 },
-      ]
+      ]}
     },
   }
 
   public bitand(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, BitwiseLogicOperationsPlugin.implementedFunctions.BITAND,
+    return this.runFunction(ast.args, formulaAddress, this.parameters('BITAND'),
       (left: number, right: number) => left & right
     )
   }
 
   public bitor(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, BitwiseLogicOperationsPlugin.implementedFunctions.BITOR,
+    return this.runFunction(ast.args, formulaAddress, this.parameters('BITOR'),
       (left: number, right: number) => left | right
     )
   }
 
   public bitxor(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, BitwiseLogicOperationsPlugin.implementedFunctions.BITXOR,
+    return this.runFunction(ast.args, formulaAddress, this.parameters('BITXOR'),
       (left: number, right: number) => left ^ right
     )
   }

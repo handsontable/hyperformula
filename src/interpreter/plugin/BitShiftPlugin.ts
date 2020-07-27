@@ -15,26 +15,26 @@ export class BitShiftPlugin extends FunctionPlugin {
   public static implementedFunctions = {
     'BITLSHIFT': {
       method: 'bitlshift',
-      parameters: [
+      parameters: { list: [
         { argumentType: 'integer', minValue: 0 },
         { argumentType: 'integer', minValue: SHIFT_MIN_POSITIONS, maxValue: SHIFT_MAX_POSITIONS },
-      ]
+      ]}
     },
     'BITRSHIFT': {
       method: 'bitrshift',
-      parameters: [
+      parameters: { list: [
         { argumentType: 'integer', minValue: 0 },
         { argumentType: 'integer', minValue: SHIFT_MIN_POSITIONS, maxValue: SHIFT_MAX_POSITIONS },
-      ]
+      ]}
     },
   }
 
   public bitlshift(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, BitShiftPlugin.implementedFunctions.BITLSHIFT, shiftLeft)
+    return this.runFunction(ast.args, formulaAddress, this.parameters('BITLSHIFT'), shiftLeft)
   }
 
   public bitrshift(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, BitShiftPlugin.implementedFunctions.BITRSHIFT, shiftRight)
+    return this.runFunction(ast.args, formulaAddress, this.parameters('BITRSHIFT'), shiftRight)
   }
 }
 

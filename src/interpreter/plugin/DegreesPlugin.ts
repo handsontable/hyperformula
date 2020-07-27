@@ -11,14 +11,16 @@ export class DegreesPlugin extends FunctionPlugin {
   public static implementedFunctions = {
     'DEGREES': {
       method: 'degrees',
-      parameters: [
-        { argumentType: 'number' }
-      ],
+      parameters: {
+        list: [
+          {argumentType: 'number'}
+        ]
+      },
     },
   }
 
   public degrees(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, DegreesPlugin.implementedFunctions.DEGREES,
+    return this.runFunction(ast.args, formulaAddress, this.parameters('DEGREES'),
       (arg) => arg * (180 / Math.PI)
     )
   }
