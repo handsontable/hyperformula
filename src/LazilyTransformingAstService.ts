@@ -9,12 +9,15 @@ import {Statistics} from './statistics/Statistics'
 import {UndoRedo} from './UndoRedo'
 import {FormulaTransformer} from './dependencyTransformers/Transformer'
 import {StatType} from './statistics'
+import {CombinedTransformer} from './dependencyTransformers/CombinedTransformer'
 
 export class LazilyTransformingAstService {
 
   public parser?: ParserWithCaching
   public undoRedo?: UndoRedo
+
   private transformations: FormulaTransformer[] = []
+  private combinedTransformer?: CombinedTransformer
 
   constructor(
     private readonly stats: Statistics,
@@ -26,7 +29,24 @@ export class LazilyTransformingAstService {
   }
 
   public addTransformation(transformation: FormulaTransformer): number {
-    this.transformations.push(transformation)
+    if (this.combinedTransformer !== undefined) {
+      this.combinedTransformer.add(transformation)
+    } else {
+      this.transformations.push(transformation)
+    }
+    return this.version()
+  }
+
+  public beginCombinedMode(sheet: number) {
+    this.combinedTransformer = new CombinedTransformer(sheet)
+  }
+
+  public commitCombinedMode(): number {
+    if (this.combinedTransformer === undefined) {
+      throw 'Combined mode wasn\'t started'
+    }
+    this.transformations.push(this.combinedTransformer)
+    this.combinedTransformer = undefined
     return this.version()
   }
 

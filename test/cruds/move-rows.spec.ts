@@ -2,10 +2,11 @@ import {ExportedCellChange, HyperFormula, InvalidArgumentsError} from '../../src
 import {ErrorType, simpleCellAddress} from '../../src/Cell'
 import {CellAddress} from '../../src/parser'
 import {
-  adr, colEnd,
+  adr,
+  colEnd,
   colStart,
-  detailedError, extractColumnRange,
-  extractRange,
+  detailedError,
+  extractColumnRange,
   extractReference,
   extractRowRange,
   rowEnd,
@@ -195,23 +196,21 @@ describe('Move rows', () => {
     ])
 
     engine.moveRows(0, 1, 1, 3)
-    const range = extractRange(engine, adr('B3'))
 
-    expect(range.start.row).toEqual(0)
-    expect(range.end.row).toEqual(2)
-    expect(engine.getCellValue(adr('B3'))).toEqual(1)
+    expect(engine.getCellFormula(adr('B3'))).toEqual('=COUNTBLANK(A1:A1)')
+    expect(engine.getCellValue(adr('B3'))).toEqual(0)
   })
 
   it('should return changes', () => {
     const engine = HyperFormula.buildFromArray([
       ['1'],
-      ['2', '=COUNTBLANK(A1:A2)'],
+      [null, '=COUNTBLANK(A1:A2)'],
     ])
 
     const changes = engine.moveRows(0, 1, 1, 3)
 
     expect(changes.length).toEqual(1)
-    expect(changes).toContainEqual(new ExportedCellChange(simpleCellAddress( 0, 1, 2), 1 ))
+    expect(changes).toContainEqual(new ExportedCellChange(simpleCellAddress(0, 1, 2), 0))
   })
 
   it('should return #CYCLE when moving formula onto referred range', () => {
@@ -227,6 +226,16 @@ describe('Move rows', () => {
 
     expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.CYCLE))
     expect(engine.getCellValue(adr('A5'))).toEqual(detailedError(ErrorType.CYCLE))
+  })
+
+  it('should produce only one history entry', () => {
+    const engine = HyperFormula.buildFromArray([[0], [1], [2], [3]])
+
+    const version = engine.lazilyTransformingAstService.version()
+
+    engine.moveRows(0, 1, 1, 3)
+
+    expect(engine.lazilyTransformingAstService.version()).toEqual(version + 1)
   })
 })
 

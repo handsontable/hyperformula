@@ -13,6 +13,10 @@ import {Ast, ProcedureAst} from '../../parser'
 import {coerceScalarToBoolean, coerceScalarToString} from '../ArithmeticHelper'
 import {Interpreter} from '../Interpreter'
 import {InterpreterValue, SimpleRangeValue} from '../InterpreterValue'
+<<<<<<< HEAD
+=======
+import {Serialization} from '../../Serialization'
+>>>>>>> develop
 
 export interface ImplementedFunctions {
   [formulaId: string]: FunctionMetadata,
@@ -66,12 +70,14 @@ export abstract class FunctionPlugin {
   protected readonly dependencyGraph: DependencyGraph
   protected readonly columnSearch: ColumnSearchStrategy
   protected readonly config: Config
+  protected readonly serialization: Serialization
 
   constructor(interpreter: Interpreter) {
     this.interpreter = interpreter
     this.dependencyGraph = interpreter.dependencyGraph
     this.columnSearch = interpreter.columnSearch
     this.config = interpreter.config
+    this.serialization = interpreter.serialization
   }
 
   protected evaluateAst(ast: Ast, formulaAddress: SimpleCellAddress): InterpreterValue {

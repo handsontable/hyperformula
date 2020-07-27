@@ -458,11 +458,9 @@ export class DependencyGraph {
           this.addressMapping.removeCell(targetAddress)
         }
         for (const adjacentNode of this.graph.adjacentNodes(targetVertex)) {
-          if (adjacentNode !== sourceVertex) {
-            sourceVertex = sourceVertex || this.fetchCellOrCreateEmpty(targetAddress)
-            this.graph.addEdge(sourceVertex, adjacentNode)
-            this.graph.markNodeAsSpecialRecentlyChanged(sourceVertex)
-          }
+          sourceVertex = sourceVertex ?? this.fetchCellOrCreateEmpty(targetAddress)
+          this.graph.addEdge(sourceVertex, adjacentNode)
+          this.graph.markNodeAsSpecialRecentlyChanged(sourceVertex)
         }
         this.removeVertex(targetVertex)
       }

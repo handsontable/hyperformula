@@ -75,6 +75,10 @@ export class FormulaCellVertex {
     }
   }
 
+  public valueOrNull(): InternalCellValue | null {
+    return this.cachedCellValue
+  }
+
   public isComputed() {
     return (this.cachedCellValue !== null)
   }
