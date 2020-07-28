@@ -85,13 +85,28 @@ export abstract class FunctionPlugin {
     for (const argAst of asts) {
       const value = this.evaluateAst(argAst, formulaAddress)
       if (value instanceof SimpleRangeValue) {
-        for (const scalarValue of value.valuesFromTopLeftCorner()) {
+        for (const scalarValue of value.iterateValuesFromTopLeftCorner()) {
           yield [scalarValue, true]
         }
       } else {
         yield [value, false]
       }
     }
+  }
+
+  protected listOfScalarValues(asts: Ast[], formulaAddress: SimpleCellAddress): [InternalScalarValue, boolean][] {
+    const ret: [InternalScalarValue, boolean][] = []
+    for (const argAst of asts) {
+      const value = this.evaluateAst(argAst, formulaAddress)
+      if (value instanceof SimpleRangeValue) {
+        for (const scalarValue of value.valuesFromTopLeftCorner()) {
+          ret.push([scalarValue, true])
+        }
+      } else {
+        ret.push([value,false])
+      }
+    }
+    return ret
   }
 
   protected computeListOfValuesInRange(range: AbsoluteCellRange): InternalScalarValue[] {
@@ -162,7 +177,7 @@ export abstract class FunctionPlugin {
     let scalarValues: [InterpreterValue, boolean][]
 
     if(functionDefinition.expandRanges) {
-      scalarValues = [...this.iterateOverScalarValues(args, formulaAddress)]
+      scalarValues = this.listOfScalarValues(args, formulaAddress)
     } else {
       scalarValues = args.map((ast) => [this.evaluateAst(ast, formulaAddress), false])
     }
