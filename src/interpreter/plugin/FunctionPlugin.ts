@@ -172,43 +172,31 @@ export abstract class FunctionPlugin {
     const coercedArguments: Maybe<InterpreterValue>[] = []
 
     let argCoerceFailure: Maybe<CellError> = undefined
-    let j = 0
     let i = 0
-    while(i<scalarValues.length || j<argumentDefinitions.length) {
-      if(j===argumentDefinitions.length) {
-        if(functionDefinition.repeatedArg) {
-          j--
-        } else {
-          return new CellError(ErrorType.NA)
-        }
-      }
+    if(!functionDefinition.repeatedArg && argumentDefinitions.length < scalarValues.length) {
+      return new CellError(ErrorType.NA)
+    }
+    for(let i=0; i<Math.max(scalarValues.length, argumentDefinitions.length); i++) {
+      const j = Math.min(i, argumentDefinitions.length-1)
       const [val, ignorable] = scalarValues[i] ?? [undefined, undefined]
       const arg = val ?? argumentDefinitions[j]?.defaultValue
       if(arg === undefined) {
         if(argumentDefinitions[j]?.optionalArg) {
-          i++
-          j++
           coercedArguments.push(undefined)
-          continue
         } else {
           return new CellError(ErrorType.NA)
         }
-      }
-      const coercedArg = val !== undefined ? this.coerceToType(arg, argumentDefinitions[j]) : arg
-      if(coercedArg === undefined) {
-        if(!ignorable) {
+      } else {
+        const coercedArg = val !== undefined ? this.coerceToType(arg, argumentDefinitions[j]) : arg
+        if(coercedArg !== undefined) {
+          if (coercedArg instanceof CellError && argumentDefinitions[j].argumentType !== 'scalar') {
+            argCoerceFailure = argCoerceFailure ?? coercedArg
+          }
+          coercedArguments.push(coercedArg)
+        } else if (!ignorable) {
           argCoerceFailure = argCoerceFailure ?? (new CellError(ErrorType.VALUE))
         }
-        i++
-        j++
-        continue
       }
-      if (coercedArg instanceof CellError && argumentDefinitions[j].argumentType !== 'scalar') {
-        argCoerceFailure = argCoerceFailure ?? coercedArg
-      }
-      coercedArguments.push(coercedArg)
-      j++
-      i++
     }
 
     return argCoerceFailure ?? fn(...coercedArguments)

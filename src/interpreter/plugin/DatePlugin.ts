@@ -16,25 +16,65 @@ import {FunctionPlugin} from './FunctionPlugin'
 export class DatePlugin extends FunctionPlugin {
   public static implementedFunctions = {
     'DATE': {
-      method: 'date'
+      method: 'date',
+      parameters: {
+        list: [
+          {argumentType: 'number'},
+          {argumentType: 'number'},
+          {argumentType: 'number'},
+        ]
+      },
     },
     'MONTH': {
-      method: 'month'
+      method: 'month',
+      parameters: {
+        list: [
+          {argumentType: 'number'},
+        ]
+      },
     },
     'YEAR': {
-      method: 'year'
+      method: 'year',
+      parameters: {
+        list: [
+          {argumentType: 'number'},
+        ]
+      },
     },
     'TEXT': {
-      method: 'text'
+      method: 'text',
+      parameters: {
+        list: [
+          {argumentType: 'number'},
+          {argumentType: 'string'},
+        ]
+      },
     },
     'EOMONTH': {
-      method: 'eomonth'
+      method: 'eomonth',
+      parameters: {
+        list: [
+          {argumentType: 'number'},
+          {argumentType: 'number'},
+        ]
+      },
     },
     'DAY': {
-      method: 'day'
+      method: 'day',
+      parameters: {
+        list: [
+          {argumentType: 'number'},
+        ]
+      },
     },
     'DAYS': {
-      method: 'days'
+      method: 'days',
+      parameters: {
+        list: [
+          {argumentType: 'number'},
+          {argumentType: 'number'},
+        ]
+      },
     },
   }
 
@@ -47,131 +87,43 @@ export class DatePlugin extends FunctionPlugin {
    * @param formulaAddress
    */
   public date(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    if (ast.args.length !== 3) {
-      return new CellError(ErrorType.NA)
-    }
-    if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
-      return new CellError(ErrorType.NUM)
-    }
-
-    const year = this.evaluateAst(ast.args[0], formulaAddress)
-    const month = this.evaluateAst(ast.args[1], formulaAddress)
-    const day = this.evaluateAst(ast.args[2], formulaAddress)
-    if (year instanceof SimpleRangeValue || month instanceof SimpleRangeValue || day instanceof SimpleRangeValue) {
-      return new CellError(ErrorType.VALUE)
-    }
-
-    const coercedYear = this.coerceScalarToNumberOrError(year)
-    const coercedMonth = this.coerceScalarToNumberOrError(month)
-    const coercedDay = this.coerceScalarToNumberOrError(day)
-
-    if (coercedYear instanceof CellError) {
-      return coercedYear
-    }
-
-    if (coercedMonth instanceof CellError) {
-      return coercedMonth
-    }
-
-    if (coercedDay instanceof CellError) {
-      return coercedDay
-    }
-    const d = Math.trunc(coercedDay)
-    let m = Math.trunc(coercedMonth)
-    let y = Math.trunc(coercedYear)
-    if (y < this.interpreter.dateHelper.getEpochYearZero()) {
-      y += this.interpreter.dateHelper.getEpochYearZero()
-    }
-    const delta = Math.floor((m - 1) / 12)
-    y += delta
-    m -= delta * 12
-
-    const date = {year: y, month: m, day: 1}
-    if (this.interpreter.dateHelper.isValidDate(date)) {
-      const ret = this.interpreter.dateHelper.dateToNumber(date) + (d - 1)
-      if (this.interpreter.dateHelper.getWithinBounds(ret)) {
-        return ret
+    return this.runFunction(ast.args, formulaAddress, this.parameters('DATE'), (year, month, day) => {
+      const d = Math.trunc(day)
+      let m = Math.trunc(month)
+      let y = Math.trunc(year)
+      if (y < this.interpreter.dateHelper.getEpochYearZero()) {
+        y += this.interpreter.dateHelper.getEpochYearZero()
       }
-    }
-    return new CellError(ErrorType.VALUE)
+      const delta = Math.floor((m - 1) / 12)
+      y += delta
+      m -= delta * 12
+
+      const date = {year: y, month: m, day: 1}
+      if (this.interpreter.dateHelper.isValidDate(date)) {
+        const ret = this.interpreter.dateHelper.dateToNumber(date) + (d - 1)
+        if (this.interpreter.dateHelper.getWithinBounds(ret)) {
+          return ret
+        }
+      }
+      return new CellError(ErrorType.VALUE)
+    })
   }
 
   public eomonth(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    if (ast.args.length !== 2) {
-      return new CellError(ErrorType.NA)
-    }
-    if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
-      return new CellError(ErrorType.NUM)
-    }
-
-    const arg = this.evaluateAst(ast.args[0], formulaAddress)
-    if (arg instanceof SimpleRangeValue) {
-      return new CellError(ErrorType.VALUE)
-    }
-    const dateNumber = this.coerceScalarToNumberOrError(arg)
-    if (dateNumber instanceof CellError) {
-      return dateNumber
-    }
-
-    const numberOfMonthsToShiftValue = this.evaluateAst(ast.args[1], formulaAddress)
-    if (numberOfMonthsToShiftValue instanceof SimpleRangeValue) {
-      return new CellError(ErrorType.VALUE)
-    }
-    const numberOfMonthsToShift = this.coerceScalarToNumberOrError(numberOfMonthsToShiftValue)
-    if (numberOfMonthsToShift instanceof CellError) {
-      return numberOfMonthsToShift
-    }
-
-    const date = this.interpreter.dateHelper.numberToSimpleDate(dateNumber)
-    return this.interpreter.dateHelper.dateToNumber(endOfMonth(offsetMonth(date, numberOfMonthsToShift)))
+    return this.runFunction(ast.args, formulaAddress, this.parameters('EOMONTH'), (dateNumber, numberOfMonthsToShift) => {
+      const date = this.interpreter.dateHelper.numberToSimpleDate(dateNumber)
+      return this.interpreter.dateHelper.dateToNumber(endOfMonth(offsetMonth(date, numberOfMonthsToShift)))
+    })
   }
 
   public day(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    if (ast.args.length !== 1) {
-      return new CellError(ErrorType.NA)
-    }
-    if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
-      return new CellError(ErrorType.NUM)
-    }
-
-    const arg = this.evaluateAst(ast.args[0], formulaAddress)
-    if (arg instanceof SimpleRangeValue) {
-      return new CellError(ErrorType.VALUE)
-    }
-    const dateNumber = this.coerceScalarToNumberOrError(arg)
-    if (dateNumber instanceof CellError) {
-      return dateNumber
-    }
-    return this.interpreter.dateHelper.numberToSimpleDate(dateNumber).day
+    return this.runFunction(ast.args, formulaAddress, this.parameters('DAY'),
+      (dateNumber) => this.interpreter.dateHelper.numberToSimpleDate(dateNumber).day
+    )
   }
 
   public days(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    if (ast.args.length !== 2) {
-      return new CellError(ErrorType.NA)
-    }
-    if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
-      return new CellError(ErrorType.NUM)
-    }
-
-    const endDate = this.evaluateAst(ast.args[0], formulaAddress)
-    if (endDate instanceof SimpleRangeValue) {
-      return new CellError(ErrorType.VALUE)
-    }
-    const endDateNumber = this.coerceScalarToNumberOrError(endDate)
-    if (endDateNumber instanceof CellError) {
-      return endDateNumber
-    }
-
-    const startDate = this.evaluateAst(ast.args[1], formulaAddress)
-    if (startDate instanceof SimpleRangeValue) {
-      return new CellError(ErrorType.VALUE)
-    }
-    const startDateNumber = this.coerceScalarToNumberOrError(startDate)
-    if (startDateNumber instanceof CellError) {
-      return startDateNumber
-    }
-
-    return endDateNumber - startDateNumber
+    return this.runFunction(ast.args, formulaAddress, this.parameters('DAYS'), (endDate, startDate) => endDate - startDate)
   }
 
   /**
@@ -183,23 +135,9 @@ export class DatePlugin extends FunctionPlugin {
    * @param formulaAddress
    */
   public month(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    if (ast.args.length !== 1) {
-      return new CellError(ErrorType.NA)
-    }
-    if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
-      return new CellError(ErrorType.NUM)
-    }
-
-    const arg = this.evaluateAst(ast.args[0], formulaAddress)
-    if (arg instanceof SimpleRangeValue) {
-      return new CellError(ErrorType.VALUE)
-    }
-    const dateNumber = this.coerceScalarToNumberOrError(arg)
-    if (dateNumber instanceof CellError) {
-      return dateNumber
-    }
-
-    return this.interpreter.dateHelper.numberToSimpleDate(dateNumber).month
+    return this.runFunction(ast.args, formulaAddress, this.parameters('MONTH'),
+      (dateNumber) => this.interpreter.dateHelper.numberToSimpleDate(dateNumber).month
+    )
   }
 
   /**
@@ -211,23 +149,9 @@ export class DatePlugin extends FunctionPlugin {
    * @param formulaAddress
    */
   public year(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    if (ast.args.length !== 1) {
-      return new CellError(ErrorType.NA)
-    }
-    if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
-      return new CellError(ErrorType.NUM)
-    }
-
-    const arg = this.evaluateAst(ast.args[0], formulaAddress)
-    if (arg instanceof SimpleRangeValue) {
-      return new CellError(ErrorType.VALUE)
-    }
-    const dateNumber = this.coerceScalarToNumberOrError(arg)
-    if (dateNumber instanceof CellError) {
-      return dateNumber
-    }
-
-    return this.interpreter.dateHelper.numberToSimpleDate(dateNumber).year
+    return this.runFunction(ast.args, formulaAddress, this.parameters('YEAR'),
+      (dateNumber) => this.interpreter.dateHelper.numberToSimpleDate(dateNumber).year
+    )
   }
 
   /**
