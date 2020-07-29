@@ -29,8 +29,8 @@ describe('Text', () => {
       ['=TEXT(2, 0)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual("42")
-    expect(engine.getCellValue(adr('A2'))).toEqual("2")
+    expect(engine.getCellValue(adr('A1'))).toEqual('42')
+    expect(engine.getCellValue(adr('A2'))).toEqual('2')
   })
 
   it('wrong date argument',  () => {
