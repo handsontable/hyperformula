@@ -26,9 +26,11 @@ describe('Text', () => {
   it('wrong format argument',  () => {
     const engine =  HyperFormula.buildFromArray([
       ['=TEXT(2, 42)'],
+      ['=TEXT(2, 0)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A1'))).toEqual("42")
+    expect(engine.getCellValue(adr('A2'))).toEqual("2")
   })
 
   it('wrong date argument',  () => {

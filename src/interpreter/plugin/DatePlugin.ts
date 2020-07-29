@@ -163,28 +163,8 @@ export class DatePlugin extends FunctionPlugin {
    * @param formulaAddress
    */
   public text(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    if (ast.args.length !== 2) {
-      return new CellError(ErrorType.NA)
-    }
-    if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
-      return new CellError(ErrorType.NUM)
-    }
-
-    const dateArg = this.evaluateAst(ast.args[0], formulaAddress)
-    const formatArg = this.evaluateAst(ast.args[1], formulaAddress)
-    if (dateArg instanceof SimpleRangeValue) {
-      return new CellError(ErrorType.VALUE)
-    }
-
-    const numberRepresentation = this.coerceScalarToNumberOrError(dateArg)
-    if (numberRepresentation instanceof CellError) {
-      return numberRepresentation
-    }
-
-    if (typeof formatArg !== 'string') {
-      return new CellError(ErrorType.VALUE)
-    }
-
-    return format(numberRepresentation, formatArg, this.config, this.interpreter.dateHelper)
+    return this.runFunction(ast.args, formulaAddress, this.parameters('TEXT'),
+      (numberRepresentation, formatArg) =>format(numberRepresentation, formatArg, this.config, this.interpreter.dateHelper)
+    )
   }
 }
