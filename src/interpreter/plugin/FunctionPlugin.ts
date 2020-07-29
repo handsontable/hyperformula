@@ -177,6 +177,8 @@ export abstract class FunctionPlugin {
       return new CellError(ErrorType.NA)
     }
     for(let i=0; i<Math.max(scalarValues.length, argumentDefinitions.length); i++) {
+      // i points to where are we in the scalarValues list,
+      // j points to where are we in the argumentDefinitions list
       const j = Math.min(i, argumentDefinitions.length-1)
       const [val, ignorable] = scalarValues[i] ?? [undefined, undefined]
       const arg = val ?? argumentDefinitions[j]?.defaultValue
@@ -184,16 +186,20 @@ export abstract class FunctionPlugin {
         if(argumentDefinitions[j]?.optionalArg) {
           coercedArguments.push(undefined)
         } else {
+          //not enough values passed as arguments, and there was no default value and argument was not optional
           return new CellError(ErrorType.NA)
         }
       } else {
+        //we apply coerce only to non-default values
         const coercedArg = val !== undefined ? this.coerceToType(arg, argumentDefinitions[j]) : arg
         if(coercedArg !== undefined) {
           if (coercedArg instanceof CellError && argumentDefinitions[j].argumentType !== 'scalar') {
+            //if this is first error encountered, store it
             argCoerceFailure = argCoerceFailure ?? coercedArg
           }
           coercedArguments.push(coercedArg)
         } else if (!ignorable) {
+          //if this is first error encountered, store it
           argCoerceFailure = argCoerceFailure ?? (new CellError(ErrorType.VALUE))
         }
       }
