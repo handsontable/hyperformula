@@ -172,7 +172,6 @@ export abstract class FunctionPlugin {
     const coercedArguments: Maybe<InterpreterValue>[] = []
 
     let argCoerceFailure: Maybe<CellError> = undefined
-    let i = 0
     if(!functionDefinition.repeatedArg && argumentDefinitions.length < scalarValues.length) {
       return new CellError(ErrorType.NA)
     }
