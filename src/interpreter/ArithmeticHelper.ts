@@ -8,7 +8,7 @@ import {
   CellValueTypeOrd,
   EmptyValue,
   ErrorType,
-  getCellValueType, InternalCellValue,
+  getCellValueType,
   InternalNoErrorCellValue,
   InternalScalarValue
 } from '../Cell'
@@ -32,12 +32,12 @@ export class ArithmeticHelper {
     this.actualEps = config.smartRounding ? config.precisionEpsilon : 0
   }
 
-  public eqMatcherFunction(pattern: string): (arg: InternalCellValue) => boolean {
+  public eqMatcherFunction(pattern: string): (arg: InterpreterValue) => boolean {
     const regexp = this.buildRegex(pattern)
     return (cellValue) => (typeof cellValue === 'string' && regexp.test(this.normalizeString(cellValue)))
   }
 
-  public neqMatcherFunction(pattern: string): (arg: InternalCellValue) => boolean {
+  public neqMatcherFunction(pattern: string): (arg: InterpreterValue) => boolean {
     const regexp = this.buildRegex(pattern)
     return (cellValue) => {
       return (typeof cellValue !== 'string' || !regexp.test(this.normalizeString(cellValue)))

@@ -10,7 +10,6 @@ import {
   CellError,
   EmptyValue,
   ErrorType,
-  InternalCellValue,
   InternalScalarValue,
   simpleCellAddress,
   SimpleCellAddress
@@ -42,7 +41,7 @@ import {RangeMapping} from './RangeMapping'
 import {SheetMapping} from './SheetMapping'
 import {ValueCellVertexValue} from './ValueCellVertex'
 import {FunctionRegistry} from '../interpreter/FunctionRegistry'
-import {SimpleRangeValue} from '../interpreter/InterpreterValue'
+import {InterpreterValue, SimpleRangeValue} from '../interpreter/InterpreterValue'
 
 export class DependencyGraph {
   /*
@@ -597,7 +596,7 @@ export class DependencyGraph {
     return this.addressMapping.getCell(address)
   }
 
-  public getCellValue(address: SimpleCellAddress): InternalCellValue {
+  public getCellValue(address: SimpleCellAddress): InterpreterValue {
     return this.addressMapping.getCellValue(address)
   }
 
