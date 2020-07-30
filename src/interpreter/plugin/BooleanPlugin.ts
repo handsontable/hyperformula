@@ -37,7 +37,7 @@ export class BooleanPlugin extends FunctionPlugin {
         list: [
           {argumentType: ArgumentTypes.BOOLEAN},
         ],
-        repeatedArg: true,
+        repeatLastArg: true,
         expandRanges: true,
       },
     },
@@ -47,7 +47,7 @@ export class BooleanPlugin extends FunctionPlugin {
         list: [
           {argumentType: ArgumentTypes.BOOLEAN},
         ],
-        repeatedArg: true,
+        repeatLastArg: true,
         expandRanges: true,
       },
     },
@@ -57,7 +57,7 @@ export class BooleanPlugin extends FunctionPlugin {
         list: [
           {argumentType: ArgumentTypes.BOOLEAN},
         ],
-        repeatedArg: true,
+        repeatLastArg: true,
         expandRanges: true,
       },
     },
@@ -77,7 +77,7 @@ export class BooleanPlugin extends FunctionPlugin {
           {argumentType: ArgumentTypes.SCALAR},
           {argumentType: ArgumentTypes.SCALAR},
         ],
-        repeatedArg: true,
+        repeatLastArg: true,
       },
     },
     'IFERROR': {
@@ -105,7 +105,7 @@ export class BooleanPlugin extends FunctionPlugin {
           {argumentType: ArgumentTypes.NUMBER},
           {argumentType: ArgumentTypes.SCALAR},
         ],
-        repeatedArg: true,
+        repeatLastArg: true,
       },
     },
   }

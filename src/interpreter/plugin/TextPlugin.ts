@@ -18,7 +18,7 @@ export class TextPlugin extends FunctionPlugin {
         list: [
           {argumentType: ArgumentTypes.STRING}
         ],
-        repeatedArg: true,
+        repeatLastArg: true,
         expandRanges: true,
       },
     },

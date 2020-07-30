@@ -34,28 +34,89 @@ export interface FunctionPluginDefinition {
 }
 
 export enum ArgumentTypes {
+
+  /**
+   * String type.
+   */
   STRING = 'STRING',
+
+  /**
+   * Floating point type.
+   */
   NUMBER = 'NUMBER',
+
+  /**
+   * Boolean type.
+   */
   BOOLEAN = 'BOOLEAN',
-  SCALAR = 'scalar',
-  NOERROR = 'noerror',
-  RANGE = 'range',
-  INTEGER = 'integer',
+
+  /**
+   * Any non-range value.
+   */
+  SCALAR = 'SCALAR',
+
+  /**
+   * Any non-range, no-error type.
+   */
+  NOERROR = 'NOERROR',
+
+  /**
+   * Range type.
+   */
+  RANGE = 'RANGE',
+
+  /**
+   * Integer type.
+   */
+  INTEGER = 'INTEGER',
 }
 
 export interface FunctionArgumentsDefinition {
   list: FunctionArgument[],
-  repeatedArg?: boolean,
+
+  /**
+   * Used for functions with variable number of arguments -- last defined argument is repeated indefinitely.
+   */
+  repeatLastArg?: boolean,
+
+  /**
+   * Ranges in arguments are inlined to (possibly multiple) scalar arguments.
+   */
   expandRanges?: boolean,
 }
 
 export interface FunctionArgument {
   argumentType: ArgumentTypes,
+
+  /**
+   * If argument is missing, its value defaults to this.
+   */
   defaultValue?: InternalScalarValue,
+
+  /**
+   * If argument is missing, and no defaultValue provided, undefined is supplied as a value, instead of throwing an error.
+   * Logically equivalent to setting defaultValue = undefined.
+   */
   optionalArg?: boolean,
+
+  /**
+   * Numeric argument needs to be greater-equal than this.
+   */
   minValue?: number,
+
+  /**
+   * Numeric argument needs to be less-equal than this.
+   */
   maxValue?: number,
+
+  /**
+   * Numeric argument needs to be less than this.
+   */
   lessThan?: number,
+
+  /**
+   * Numeric argument needs to be greater than this.
+   */
   greaterThan?: number,
 }
 
@@ -180,7 +241,7 @@ export abstract class FunctionPlugin {
     const coercedArguments: Maybe<InterpreterValue>[] = []
 
     let argCoerceFailure: Maybe<CellError> = undefined
-    if(!functionDefinition.repeatedArg && argumentDefinitions.length < scalarValues.length) {
+    if(!functionDefinition.repeatLastArg && argumentDefinitions.length < scalarValues.length) {
       return new CellError(ErrorType.NA)
     }
     for(let i=0; i<Math.max(scalarValues.length, argumentDefinitions.length); i++) {
