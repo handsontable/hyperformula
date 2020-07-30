@@ -5,7 +5,7 @@
 
 import {InternalScalarValue, SimpleCellAddress} from '../../Cell'
 import {ProcedureAst} from '../../parser'
-import {FunctionPlugin} from './FunctionPlugin'
+import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
 
 export class ErrorFunctionPlugin extends FunctionPlugin {
   public static implementedFunctions = {
@@ -13,8 +13,8 @@ export class ErrorFunctionPlugin extends FunctionPlugin {
       method: 'erf',
       parameters: {
         list: [
-          {argumentType: 'number'},
-          {argumentType: 'number', optionalArg: true},
+          {argumentType: ArgumentTypes.NUMBER},
+          {argumentType: ArgumentTypes.NUMBER, optionalArg: true},
         ]
       },
     },
@@ -22,7 +22,7 @@ export class ErrorFunctionPlugin extends FunctionPlugin {
       method: 'erfc',
       parameters: {
         list: [
-          {argumentType: 'number'}
+          {argumentType: ArgumentTypes.NUMBER}
         ]
       },
     },

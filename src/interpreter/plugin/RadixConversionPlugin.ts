@@ -7,7 +7,7 @@ import {CellError, ErrorType, InternalScalarValue, SimpleCellAddress} from '../.
 import {padLeft} from '../../format/format'
 import {Maybe} from '../../Maybe'
 import {ProcedureAst} from '../../parser'
-import {FunctionPlugin} from './FunctionPlugin'
+import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
 
 const NUMBER_OF_BITS = 10
 const DECIMAL_NUMBER_OF_BITS = 255
@@ -20,57 +20,57 @@ export class RadixConversionPlugin extends FunctionPlugin {
     'DEC2BIN': {
       method: 'dec2bin',
       parameters: { list: [
-        { argumentType: 'number', minValue: minValFromBase(2), maxValue: maxValFromBase(2) },
-        { argumentType: 'number', optionalArg: true, minValue: 1, maxValue: 10 },
+        { argumentType: ArgumentTypes.NUMBER, minValue: minValFromBase(2), maxValue: maxValFromBase(2) },
+        { argumentType: ArgumentTypes.NUMBER, optionalArg: true, minValue: 1, maxValue: 10 },
       ]},
     },
     'DEC2OCT': {
       method: 'dec2oct',
       parameters: { list: [
-        { argumentType: 'number', minValue: minValFromBase(8), maxValue: maxValFromBase(8) },
-        { argumentType: 'number', optionalArg: true, minValue: 1, maxValue: 10 },
+        { argumentType: ArgumentTypes.NUMBER, minValue: minValFromBase(8), maxValue: maxValFromBase(8) },
+        { argumentType: ArgumentTypes.NUMBER, optionalArg: true, minValue: 1, maxValue: 10 },
       ]},
     },
     'DEC2HEX': {
       method: 'dec2hex',
       parameters: { list: [
-        { argumentType: 'number', minValue: minValFromBase(16), maxValue: maxValFromBase(16) },
-        { argumentType: 'number', optionalArg: true, minValue: 1, maxValue: 10 },
+        { argumentType: ArgumentTypes.NUMBER, minValue: minValFromBase(16), maxValue: maxValFromBase(16) },
+        { argumentType: ArgumentTypes.NUMBER, optionalArg: true, minValue: 1, maxValue: 10 },
       ]},
     },
     'BIN2DEC': {
       method: 'bin2dec',
       parameters: { list: [
-        { argumentType: 'string' }
+        { argumentType: ArgumentTypes.STRING }
       ]},
     },
     'BIN2OCT': {
       method: 'bin2oct',
       parameters: { list: [
-        { argumentType: 'string' },
-        { argumentType: 'number', optionalArg: true, minValue: 0, maxValue: DECIMAL_NUMBER_OF_BITS},
+        { argumentType: ArgumentTypes.STRING },
+        { argumentType: ArgumentTypes.NUMBER, optionalArg: true, minValue: 0, maxValue: DECIMAL_NUMBER_OF_BITS},
       ]},
     },
     'BIN2HEX': {
       method: 'bin2hex',
       parameters: { list: [
-        { argumentType: 'string' },
-        { argumentType: 'number', optionalArg: true, minValue: 0, maxValue: DECIMAL_NUMBER_OF_BITS},
+        { argumentType: ArgumentTypes.STRING },
+        { argumentType: ArgumentTypes.NUMBER, optionalArg: true, minValue: 0, maxValue: DECIMAL_NUMBER_OF_BITS},
       ]},
     },
     'DECIMAL': {
       method: 'decimal',
       parameters: { list: [
-        { argumentType: 'string' },
-        { argumentType: 'number', minValue: MIN_BASE, maxValue: MAX_BASE },
+        { argumentType: ArgumentTypes.STRING },
+        { argumentType: ArgumentTypes.NUMBER, minValue: MIN_BASE, maxValue: MAX_BASE },
       ]},
     },
     'BASE': {
       method: 'base',
       parameters: { list: [
-        { argumentType: 'number', minValue: 0 },
-        { argumentType: 'number', minValue: MIN_BASE, maxValue: MAX_BASE },
-        { argumentType: 'number', optionalArg: true, minValue: 0, maxValue: DECIMAL_NUMBER_OF_BITS},
+        { argumentType: ArgumentTypes.NUMBER, minValue: 0 },
+        { argumentType: ArgumentTypes.NUMBER, minValue: MIN_BASE, maxValue: MAX_BASE },
+        { argumentType: ArgumentTypes.NUMBER, optionalArg: true, minValue: 0, maxValue: DECIMAL_NUMBER_OF_BITS},
       ]},
     },
   }

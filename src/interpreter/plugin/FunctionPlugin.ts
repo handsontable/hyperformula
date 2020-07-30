@@ -33,7 +33,15 @@ export interface FunctionPluginDefinition {
   implementedFunctions: ImplementedFunctions,
 }
 
-export type ArgumentTypes = 'string' | 'number' | 'boolean' | 'scalar' | 'noerror' | 'range' | 'integer'
+export enum ArgumentTypes {
+  STRING = 'STRING',
+  NUMBER = 'NUMBER',
+  BOOLEAN = 'BOOLEAN',
+  SCALAR = 'scalar',
+  NOERROR = 'noerror',
+  RANGE = 'range',
+  INTEGER = 'integer',
+}
 
 export interface FunctionArgumentsDefinition {
   list: FunctionArgument[],
@@ -42,7 +50,7 @@ export interface FunctionArgumentsDefinition {
 }
 
 export interface FunctionArgument {
-  argumentType: string,
+  argumentType: ArgumentTypes,
   defaultValue?: InternalScalarValue,
   optionalArg?: boolean,
   minValue?: number,
@@ -110,15 +118,15 @@ export abstract class FunctionPlugin {
 
   public coerceToType(arg: InterpreterValue, coercedType: FunctionArgument): Maybe<InterpreterValue> {
     if(arg instanceof SimpleRangeValue) {
-      if(coercedType.argumentType === 'range') {
+      if(coercedType.argumentType === ArgumentTypes.RANGE) {
         return arg
       } else {
         return undefined
       }
     } else {
-      switch (coercedType.argumentType as ArgumentTypes) {
-        case 'integer':
-        case 'number':
+      switch (coercedType.argumentType) {
+        case ArgumentTypes.INTEGER:
+        case ArgumentTypes.NUMBER:
           // eslint-disable-next-line no-case-declarations
           const value = this.coerceScalarToNumberOrError(arg)
           if(typeof value !== 'number') {
@@ -136,19 +144,19 @@ export abstract class FunctionPlugin {
           if (coercedType.greaterThan !== undefined && value <= coercedType.greaterThan) {
             return new CellError(ErrorType.NUM)
           }
-          if(coercedType.argumentType === 'integer' && !Number.isInteger(value)) {
+          if(coercedType.argumentType === ArgumentTypes.INTEGER && !Number.isInteger(value)) {
             return new CellError(ErrorType.NUM)
           }
           return value
-        case 'string':
+        case ArgumentTypes.STRING:
           return coerceScalarToString(arg)
-        case 'boolean':
+        case ArgumentTypes.BOOLEAN:
           return coerceScalarToBoolean(arg)
-        case 'scalar':
+        case ArgumentTypes.SCALAR:
           return arg
-        case 'noerror':
+        case ArgumentTypes.NOERROR:
           return arg
-        case 'range':
+        case ArgumentTypes.RANGE:
           return undefined
       }
     }
@@ -192,7 +200,7 @@ export abstract class FunctionPlugin {
         //we apply coerce only to non-default values
         const coercedArg = val !== undefined ? this.coerceToType(arg, argumentDefinitions[j]) : arg
         if(coercedArg !== undefined) {
-          if (coercedArg instanceof CellError && argumentDefinitions[j].argumentType !== 'scalar') {
+          if (coercedArg instanceof CellError && argumentDefinitions[j].argumentType !== ArgumentTypes.SCALAR) {
             //if this is first error encountered, store it
             argCoerceFailure = argCoerceFailure ?? coercedArg
           }

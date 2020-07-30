@@ -5,29 +5,29 @@
 
 import {InternalScalarValue, SimpleCellAddress} from '../../Cell'
 import {ProcedureAst} from '../../parser'
-import {FunctionPlugin} from './FunctionPlugin'
+import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
 
 export class BitwiseLogicOperationsPlugin extends FunctionPlugin {
   public static implementedFunctions = {
     'BITAND': {
       method: 'bitand',
       parameters: { list: [
-        { argumentType: 'integer', minValue: 0 },
-        { argumentType: 'integer', minValue: 0 },
+        { argumentType: ArgumentTypes.INTEGER, minValue: 0 },
+        { argumentType: ArgumentTypes.INTEGER, minValue: 0 },
       ]}
     },
     'BITOR': {
       method: 'bitor',
       parameters: { list: [
-        { argumentType: 'integer', minValue: 0 },
-        { argumentType: 'integer', minValue: 0 },
+        { argumentType: ArgumentTypes.INTEGER, minValue: 0 },
+        { argumentType: ArgumentTypes.INTEGER, minValue: 0 },
       ]}
     },
     'BITXOR': {
       method: 'bitxor',
       parameters: { list: [
-        { argumentType: 'integer', minValue: 0 },
-        { argumentType: 'integer', minValue: 0 },
+        { argumentType: ArgumentTypes.INTEGER, minValue: 0 },
+        { argumentType: ArgumentTypes.INTEGER, minValue: 0 },
       ]}
     },
   }

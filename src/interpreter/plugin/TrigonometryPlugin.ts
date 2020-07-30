@@ -5,7 +5,7 @@
 
 import {CellError, ErrorType, InternalScalarValue, SimpleCellAddress} from '../../Cell'
 import {ProcedureAst} from '../../parser'
-import {FunctionPlugin} from './FunctionPlugin'
+import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
 
 /**
  * Interpreter plugin containing trigonometric functions
@@ -16,50 +16,50 @@ export class TrigonometryPlugin extends FunctionPlugin {
     'ACOS': {
       method: 'acos',
       parameters: { list: [
-        { argumentType: 'number' }
+        { argumentType: ArgumentTypes.NUMBER }
       ]}
     },
     'ASIN': {
       method: 'asin',
       parameters: { list: [
-        { argumentType: 'number' }
+        { argumentType: ArgumentTypes.NUMBER }
       ]}
     },
     'COS': {
       method: 'cos',
       parameters: { list: [
-        { argumentType: 'number' }
+        { argumentType: ArgumentTypes.NUMBER }
       ]}
     },
     'SIN': {
       method: 'sin',
       parameters: { list: [
-        { argumentType: 'number' }
+        { argumentType: ArgumentTypes.NUMBER }
       ]}
     },
     'TAN': {
       method: 'tan',
       parameters: { list: [
-        { argumentType: 'number' }
+        { argumentType: ArgumentTypes.NUMBER }
       ]}
     },
     'ATAN': {
       method: 'atan',
       parameters: { list: [
-        { argumentType: 'number' }
+        { argumentType: ArgumentTypes.NUMBER }
       ]}
     },
     'ATAN2': {
       method: 'atan2',
       parameters: { list: [
-        { argumentType: 'number' },
-        { argumentType: 'number' },
+        { argumentType: ArgumentTypes.NUMBER },
+        { argumentType: ArgumentTypes.NUMBER },
       ]}
     },
     'COT': {
       method: 'ctg',
       parameters: { list: [
-        { argumentType: 'number' }
+        { argumentType: ArgumentTypes.NUMBER }
       ]}
     },
   }

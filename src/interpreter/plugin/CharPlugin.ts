@@ -5,7 +5,7 @@
 
 import {CellError, ErrorType, InternalScalarValue, SimpleCellAddress} from '../../Cell'
 import {ProcedureAst} from '../../parser'
-import {FunctionPlugin} from './FunctionPlugin'
+import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
 
 export class CharPlugin extends FunctionPlugin {
   public static implementedFunctions = {
@@ -13,7 +13,7 @@ export class CharPlugin extends FunctionPlugin {
       method: 'char',
       parameters: {
         list: [
-          {argumentType: 'number'}
+          {argumentType: ArgumentTypes.NUMBER}
         ],
       }
     },

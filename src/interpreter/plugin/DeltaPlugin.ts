@@ -5,7 +5,7 @@
 
 import {InternalScalarValue, SimpleCellAddress} from '../../Cell'
 import {ProcedureAst} from '../../parser'
-import {FunctionPlugin} from './FunctionPlugin'
+import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
 
 export class DeltaPlugin extends FunctionPlugin {
   public static implementedFunctions = {
@@ -13,8 +13,8 @@ export class DeltaPlugin extends FunctionPlugin {
       method: 'delta',
       parameters: {
         list: [
-          {argumentType: 'number'},
-          {argumentType: 'number', defaultValue: 0},
+          {argumentType: ArgumentTypes.NUMBER},
+          {argumentType: ArgumentTypes.NUMBER, defaultValue: 0},
         ]
       },
     },

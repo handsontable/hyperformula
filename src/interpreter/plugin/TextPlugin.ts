@@ -5,7 +5,7 @@
 
 import {CellError, ErrorType, InternalScalarValue, SimpleCellAddress} from '../../Cell'
 import {ProcedureAst} from '../../parser'
-import {FunctionPlugin} from './FunctionPlugin'
+import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
 
 /**
  * Interpreter plugin containing text-specific functions
@@ -16,7 +16,7 @@ export class TextPlugin extends FunctionPlugin {
       method: 'concatenate',
       parameters: {
         list: [
-          {argumentType: 'string'}
+          {argumentType: ArgumentTypes.STRING}
         ],
         repeatedArg: true,
         expandRanges: true,
@@ -26,8 +26,8 @@ export class TextPlugin extends FunctionPlugin {
       method: 'split',
       parameters: {
         list: [
-          {argumentType: 'string'},
-          {argumentType: 'number'},
+          {argumentType: ArgumentTypes.STRING},
+          {argumentType: ArgumentTypes.NUMBER},
         ]
       },
     },
@@ -35,7 +35,7 @@ export class TextPlugin extends FunctionPlugin {
       method: 'len',
       parameters: {
         list: [
-          {argumentType: 'string'}
+          {argumentType: ArgumentTypes.STRING}
         ]
       },
     },
@@ -43,7 +43,7 @@ export class TextPlugin extends FunctionPlugin {
       method: 'trim',
       parameters: {
         list: [
-          {argumentType: 'string'}
+          {argumentType: ArgumentTypes.STRING}
         ]
       },
     },
@@ -51,7 +51,7 @@ export class TextPlugin extends FunctionPlugin {
       method: 'proper',
       parameters: {
         list: [
-          {argumentType: 'string'}
+          {argumentType: ArgumentTypes.STRING}
         ]
       },
     },
@@ -59,7 +59,7 @@ export class TextPlugin extends FunctionPlugin {
       method: 'clean',
       parameters: {
         list: [
-          {argumentType: 'string'}
+          {argumentType: ArgumentTypes.STRING}
         ]
       },
     },
@@ -67,8 +67,8 @@ export class TextPlugin extends FunctionPlugin {
       method: 'rept',
       parameters: {
         list: [
-          {argumentType: 'string'},
-          {argumentType: 'number'},
+          {argumentType: ArgumentTypes.STRING},
+          {argumentType: ArgumentTypes.NUMBER},
         ]
       },
     },
@@ -76,8 +76,8 @@ export class TextPlugin extends FunctionPlugin {
       method: 'right',
       parameters: {
         list: [
-          {argumentType: 'string'},
-          {argumentType: 'number', defaultValue: 1},
+          {argumentType: ArgumentTypes.STRING},
+          {argumentType: ArgumentTypes.NUMBER, defaultValue: 1},
         ]
       },
     },
@@ -85,8 +85,8 @@ export class TextPlugin extends FunctionPlugin {
       method: 'left',
       parameters: {
         list: [
-          {argumentType: 'string'},
-          {argumentType: 'number', defaultValue: 1},
+          {argumentType: ArgumentTypes.STRING},
+          {argumentType: ArgumentTypes.NUMBER, defaultValue: 1},
         ]
       },
     },
@@ -94,9 +94,9 @@ export class TextPlugin extends FunctionPlugin {
       method: 'search',
       parameters: {
         list: [
-          {argumentType: 'string'},
-          {argumentType: 'string'},
-          {argumentType: 'number', defaultValue: 1},
+          {argumentType: ArgumentTypes.STRING},
+          {argumentType: ArgumentTypes.STRING},
+          {argumentType: ArgumentTypes.NUMBER, defaultValue: 1},
         ]
       },
     },
@@ -104,9 +104,9 @@ export class TextPlugin extends FunctionPlugin {
       method: 'find',
       parameters: {
         list: [
-          {argumentType: 'string'},
-          {argumentType: 'string'},
-          {argumentType: 'number', defaultValue: 1},
+          {argumentType: ArgumentTypes.STRING},
+          {argumentType: ArgumentTypes.STRING},
+          {argumentType: ArgumentTypes.NUMBER, defaultValue: 1},
         ]
       },
     }

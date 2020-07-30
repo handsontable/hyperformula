@@ -8,7 +8,7 @@ import {endOfMonth, offsetMonth} from '../../DateTimeHelper'
 import {format} from '../../format/format'
 import {AstNodeType, ProcedureAst} from '../../parser'
 import {SimpleRangeValue} from '../InterpreterValue'
-import {FunctionPlugin} from './FunctionPlugin'
+import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
 
 /**
  * Interpreter plugin containing date-specific functions
@@ -19,9 +19,9 @@ export class DatePlugin extends FunctionPlugin {
       method: 'date',
       parameters: {
         list: [
-          {argumentType: 'number'},
-          {argumentType: 'number'},
-          {argumentType: 'number'},
+          {argumentType: ArgumentTypes.NUMBER},
+          {argumentType: ArgumentTypes.NUMBER},
+          {argumentType: ArgumentTypes.NUMBER},
         ]
       },
     },
@@ -29,7 +29,7 @@ export class DatePlugin extends FunctionPlugin {
       method: 'month',
       parameters: {
         list: [
-          {argumentType: 'number'},
+          {argumentType: ArgumentTypes.NUMBER},
         ]
       },
     },
@@ -37,7 +37,7 @@ export class DatePlugin extends FunctionPlugin {
       method: 'year',
       parameters: {
         list: [
-          {argumentType: 'number'},
+          {argumentType: ArgumentTypes.NUMBER},
         ]
       },
     },
@@ -45,8 +45,8 @@ export class DatePlugin extends FunctionPlugin {
       method: 'text',
       parameters: {
         list: [
-          {argumentType: 'number'},
-          {argumentType: 'string'},
+          {argumentType: ArgumentTypes.NUMBER},
+          {argumentType: ArgumentTypes.STRING},
         ]
       },
     },
@@ -54,8 +54,8 @@ export class DatePlugin extends FunctionPlugin {
       method: 'eomonth',
       parameters: {
         list: [
-          {argumentType: 'number'},
-          {argumentType: 'number'},
+          {argumentType: ArgumentTypes.NUMBER},
+          {argumentType: ArgumentTypes.NUMBER},
         ]
       },
     },
@@ -63,7 +63,7 @@ export class DatePlugin extends FunctionPlugin {
       method: 'day',
       parameters: {
         list: [
-          {argumentType: 'number'},
+          {argumentType: ArgumentTypes.NUMBER},
         ]
       },
     },
@@ -71,8 +71,8 @@ export class DatePlugin extends FunctionPlugin {
       method: 'days',
       parameters: {
         list: [
-          {argumentType: 'number'},
-          {argumentType: 'number'},
+          {argumentType: ArgumentTypes.NUMBER},
+          {argumentType: ArgumentTypes.NUMBER},
         ]
       },
     },

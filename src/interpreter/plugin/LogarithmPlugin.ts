@@ -5,7 +5,7 @@
 
 import {InternalScalarValue, SimpleCellAddress} from '../../Cell'
 import {ProcedureAst} from '../../parser'
-import {FunctionPlugin} from './FunctionPlugin'
+import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
 
 export class LogarithmPlugin extends FunctionPlugin {
 
@@ -14,7 +14,7 @@ export class LogarithmPlugin extends FunctionPlugin {
       method: 'log10',
       parameters: {
         list: [
-          {argumentType: 'number'}
+          {argumentType: ArgumentTypes.NUMBER}
         ]
       },
     },
@@ -22,8 +22,8 @@ export class LogarithmPlugin extends FunctionPlugin {
       method: 'log',
       parameters: {
         list: [
-          {argumentType: 'number', greaterThan: 0},
-          {argumentType: 'number', defaultValue: 10, greaterThan: 0},
+          {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
+          {argumentType: ArgumentTypes.NUMBER, defaultValue: 10, greaterThan: 0},
         ]
       },
     },
@@ -31,7 +31,7 @@ export class LogarithmPlugin extends FunctionPlugin {
       method: 'ln',
       parameters: {
         list: [
-          {argumentType: 'number'}
+          {argumentType: ArgumentTypes.NUMBER}
         ]
       },
     },

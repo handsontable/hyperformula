@@ -5,15 +5,15 @@
 
 import {CellError, ErrorType, InternalScalarValue, SimpleCellAddress} from '../../Cell'
 import {ProcedureAst} from '../../parser'
-import {FunctionPlugin} from './FunctionPlugin'
+import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
 
 export class PowerPlugin extends FunctionPlugin {
   public static implementedFunctions = {
     'POWER': {
       method: 'power',
       parameters: { list: [
-        { argumentType: 'number' },
-        { argumentType: 'number' },
+        { argumentType: ArgumentTypes.NUMBER },
+        { argumentType: ArgumentTypes.NUMBER },
       ]},
     },
   }

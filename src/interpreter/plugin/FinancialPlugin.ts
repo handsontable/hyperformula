@@ -5,7 +5,7 @@
 
 import {InternalScalarValue, SimpleCellAddress} from '../../Cell'
 import {ProcedureAst} from '../../parser'
-import {FunctionPlugin} from './FunctionPlugin'
+import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
 
 export class FinancialPlugin extends FunctionPlugin {
   public static implementedFunctions = {
@@ -13,11 +13,11 @@ export class FinancialPlugin extends FunctionPlugin {
       method: 'pmt',
       parameters: {
         list: [
-          {argumentType: 'number'},
-          {argumentType: 'number'},
-          {argumentType: 'number'},
-          {argumentType: 'number', defaultValue: 0},
-          {argumentType: 'number', defaultValue: 0},
+          {argumentType: ArgumentTypes.NUMBER},
+          {argumentType: ArgumentTypes.NUMBER},
+          {argumentType: ArgumentTypes.NUMBER},
+          {argumentType: ArgumentTypes.NUMBER, defaultValue: 0},
+          {argumentType: ArgumentTypes.NUMBER, defaultValue: 0},
         ]
       },
     },
@@ -25,12 +25,12 @@ export class FinancialPlugin extends FunctionPlugin {
       method: 'ipmt',
       parameters: {
         list: [
-          {argumentType: 'number'},
-          {argumentType: 'number'},
-          {argumentType: 'number'},
-          {argumentType: 'number'},
-          {argumentType: 'number', defaultValue: 0},
-          {argumentType: 'number', defaultValue: 0},
+          {argumentType: ArgumentTypes.NUMBER},
+          {argumentType: ArgumentTypes.NUMBER},
+          {argumentType: ArgumentTypes.NUMBER},
+          {argumentType: ArgumentTypes.NUMBER},
+          {argumentType: ArgumentTypes.NUMBER, defaultValue: 0},
+          {argumentType: ArgumentTypes.NUMBER, defaultValue: 0},
         ]
       },
     },
@@ -38,12 +38,12 @@ export class FinancialPlugin extends FunctionPlugin {
       method: 'ppmt',
       parameters: {
         list: [
-          {argumentType: 'number'},
-          {argumentType: 'number'},
-          {argumentType: 'number'},
-          {argumentType: 'number'},
-          {argumentType: 'number', defaultValue: 0},
-          {argumentType: 'number', defaultValue: 0},
+          {argumentType: ArgumentTypes.NUMBER},
+          {argumentType: ArgumentTypes.NUMBER},
+          {argumentType: ArgumentTypes.NUMBER},
+          {argumentType: ArgumentTypes.NUMBER},
+          {argumentType: ArgumentTypes.NUMBER, defaultValue: 0},
+          {argumentType: ArgumentTypes.NUMBER, defaultValue: 0},
         ]
       },
     },
@@ -51,11 +51,11 @@ export class FinancialPlugin extends FunctionPlugin {
       method: 'fv',
       parameters: {
         list: [
-          {argumentType: 'number'},
-          {argumentType: 'number'},
-          {argumentType: 'number'},
-          {argumentType: 'number', defaultValue: 0},
-          {argumentType: 'number', defaultValue: 0},
+          {argumentType: ArgumentTypes.NUMBER},
+          {argumentType: ArgumentTypes.NUMBER},
+          {argumentType: ArgumentTypes.NUMBER},
+          {argumentType: ArgumentTypes.NUMBER, defaultValue: 0},
+          {argumentType: ArgumentTypes.NUMBER, defaultValue: 0},
         ]
       },
     },

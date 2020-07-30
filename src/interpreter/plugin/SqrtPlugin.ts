@@ -5,14 +5,14 @@
 
 import {InternalScalarValue, SimpleCellAddress} from '../../Cell'
 import {ProcedureAst} from '../../parser'
-import {FunctionPlugin} from './FunctionPlugin'
+import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
 
 export class SqrtPlugin extends  FunctionPlugin {
   public static implementedFunctions = {
     'SQRT': {
       method: 'sqrt',
       parameters: { list: [
-        { argumentType: 'number' }
+        { argumentType: ArgumentTypes.NUMBER }
       ]},
     },
   }

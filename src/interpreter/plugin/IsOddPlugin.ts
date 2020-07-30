@@ -5,7 +5,7 @@
 
 import {InternalScalarValue, SimpleCellAddress} from '../../Cell'
 import {ProcedureAst} from '../../parser'
-import {FunctionPlugin} from './FunctionPlugin'
+import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
 
 export class IsOddPlugin extends FunctionPlugin {
   public static implementedFunctions = {
@@ -13,7 +13,7 @@ export class IsOddPlugin extends FunctionPlugin {
       method: 'isodd',
       parameters: {
         list: [
-          {argumentType: 'number'}
+          {argumentType: ArgumentTypes.NUMBER}
         ]
       }
     },

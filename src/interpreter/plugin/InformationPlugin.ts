@@ -7,7 +7,7 @@ import {AbsoluteCellRange} from '../../AbsoluteCellRange'
 import {CellError, EmptyValue, ErrorType, InternalScalarValue, SimpleCellAddress} from '../../Cell'
 import {AstNodeType, ProcedureAst} from '../../parser'
 import {InterpreterValue} from '../InterpreterValue'
-import {FunctionPlugin} from './FunctionPlugin'
+import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
 
 /**
  * Interpreter plugin containing information functions
@@ -17,37 +17,37 @@ export class InformationPlugin extends FunctionPlugin {
     'ISERROR': {
       method: 'iserror',
       parameters: { list: [
-        { argumentType: 'scalar'}
+        { argumentType: ArgumentTypes.SCALAR}
       ]}
     },
     'ISBLANK': {
       method: 'isblank',
       parameters: { list: [
-        { argumentType: 'scalar'}
+        { argumentType: ArgumentTypes.SCALAR}
       ]}
     },
     'ISNUMBER': {
       method: 'isnumber',
       parameters: { list: [
-        { argumentType: 'scalar'}
+        { argumentType: ArgumentTypes.SCALAR}
       ]}
     },
     'ISLOGICAL': {
       method: 'islogical',
       parameters: { list: [
-        { argumentType: 'scalar'}
+        { argumentType: ArgumentTypes.SCALAR}
       ]}
     },
     'ISTEXT': {
       method: 'istext',
       parameters: { list: [
-        { argumentType: 'scalar'}
+        { argumentType: ArgumentTypes.SCALAR}
       ]}
     },
     'ISNONTEXT': {
       method: 'isnontext',
       parameters: { list: [
-        { argumentType: 'scalar'}
+        { argumentType: ArgumentTypes.SCALAR}
       ]}
     },
     'COLUMNS': {

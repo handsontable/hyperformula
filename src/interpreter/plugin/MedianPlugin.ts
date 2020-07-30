@@ -5,7 +5,7 @@
 
 import {CellError, ErrorType, InternalScalarValue, SimpleCellAddress} from '../../Cell'
 import {ProcedureAst} from '../../parser'
-import {FunctionPlugin} from './FunctionPlugin'
+import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
 
 /**
  * Interpreter plugin containing MEDIAN function
@@ -17,7 +17,7 @@ export class MedianPlugin extends FunctionPlugin {
       method: 'median',
       parameters: {
         list: [
-          {argumentType: 'noerror'},
+          {argumentType: ArgumentTypes.NOERROR},
         ],
         repeatedArg: true,
         expandRanges: true,

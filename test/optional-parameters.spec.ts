@@ -1,9 +1,7 @@
 import {ErrorType, HyperFormula} from '../src'
-import {CellError, SimpleCellAddress} from '../src/Cell'
-import {coerceScalarToString} from '../src/interpreter/ArithmeticHelper'
-import {SimpleRangeValue} from '../src/interpreter/InterpreterValue'
-import {FunctionPlugin} from '../src/interpreter/plugin/FunctionPlugin'
-import {AstNodeType, ProcedureAst} from '../src/parser'
+import {SimpleCellAddress} from '../src/Cell'
+import {ArgumentTypes, FunctionPlugin} from '../src/interpreter/plugin/FunctionPlugin'
+import {ProcedureAst} from '../src/parser'
 import {adr, detailedError} from './testUtils'
 
 class FooPlugin extends FunctionPlugin {
@@ -12,8 +10,8 @@ class FooPlugin extends FunctionPlugin {
       method: 'foo',
       parameters: {
         list: [
-          { argumentType: 'string', defaultValue: 'default1'},
-          { argumentType: 'string', defaultValue: 'default2'},
+          { argumentType: ArgumentTypes.STRING, defaultValue: 'default1'},
+          { argumentType: ArgumentTypes.STRING, defaultValue: 'default2'},
         ],
       },
     },

@@ -5,7 +5,7 @@
 
 import {CellError, ErrorType, InternalScalarValue, SimpleCellAddress} from '../../Cell'
 import {ProcedureAst} from '../../parser'
-import {FunctionPlugin} from './FunctionPlugin'
+import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
 
 export function findNextOddNumber(arg: number): number {
   const ceiled = Math.ceil(arg)
@@ -22,55 +22,55 @@ export class RoundingPlugin extends FunctionPlugin {
     'ROUNDUP': {
       method: 'roundup',
       parameters: { list: [
-        { argumentType: 'number' },
-        { argumentType: 'number', defaultValue: 0},
+        { argumentType: ArgumentTypes.NUMBER },
+        { argumentType: ArgumentTypes.NUMBER, defaultValue: 0},
       ]},
     },
     'ROUNDDOWN': {
       method: 'rounddown',
       parameters: { list: [
-        { argumentType: 'number' },
-        { argumentType: 'number', defaultValue: 0},
+        { argumentType: ArgumentTypes.NUMBER },
+        { argumentType: ArgumentTypes.NUMBER, defaultValue: 0},
       ]},
     },
     'ROUND': {
       method: 'round',
       parameters: { list: [
-        { argumentType: 'number' },
-        { argumentType: 'number', defaultValue: 0},
+        { argumentType: ArgumentTypes.NUMBER },
+        { argumentType: ArgumentTypes.NUMBER, defaultValue: 0},
       ]},
     },
     'TRUNC': {
       method: 'trunc',
       parameters: { list: [
-        { argumentType: 'number' },
-        { argumentType: 'number', defaultValue: 0},
+        { argumentType: ArgumentTypes.NUMBER },
+        { argumentType: ArgumentTypes.NUMBER, defaultValue: 0},
       ]},
     },
     'INT': {
       method: 'intFunc',
       parameters: { list: [
-        { argumentType: 'number' }
+        { argumentType: ArgumentTypes.NUMBER }
       ]},
     },
     'EVEN': {
       method: 'even',
       parameters: { list: [
-        { argumentType: 'number' }
+        { argumentType: ArgumentTypes.NUMBER }
       ]},
     },
     'ODD': {
       method: 'odd',
       parameters: { list: [
-        { argumentType: 'number' }
+        { argumentType: ArgumentTypes.NUMBER }
       ]},
     },
     'CEILING': {
       method: 'ceiling',
       parameters: { list: [
-        { argumentType: 'number' },
-        { argumentType: 'number', defaultValue: 1 },
-        { argumentType: 'number', defaultValue: 0 },
+        { argumentType: ArgumentTypes.NUMBER },
+        { argumentType: ArgumentTypes.NUMBER, defaultValue: 1 },
+        { argumentType: ArgumentTypes.NUMBER, defaultValue: 0 },
       ]},
     },
   }

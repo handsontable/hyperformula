@@ -5,7 +5,7 @@
 
 import {CellError, ErrorType, InternalScalarValue, SimpleCellAddress} from '../../Cell'
 import {ProcedureAst} from '../../parser'
-import {FunctionPlugin} from './FunctionPlugin'
+import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
 
 const MAX_48BIT_INTEGER = 281474976710655
 const SHIFT_MIN_POSITIONS = -53
@@ -16,15 +16,15 @@ export class BitShiftPlugin extends FunctionPlugin {
     'BITLSHIFT': {
       method: 'bitlshift',
       parameters: { list: [
-        { argumentType: 'integer', minValue: 0 },
-        { argumentType: 'integer', minValue: SHIFT_MIN_POSITIONS, maxValue: SHIFT_MAX_POSITIONS },
+        { argumentType: ArgumentTypes.INTEGER, minValue: 0 },
+        { argumentType: ArgumentTypes.INTEGER, minValue: SHIFT_MIN_POSITIONS, maxValue: SHIFT_MAX_POSITIONS },
       ]}
     },
     'BITRSHIFT': {
       method: 'bitrshift',
       parameters: { list: [
-        { argumentType: 'integer', minValue: 0 },
-        { argumentType: 'integer', minValue: SHIFT_MIN_POSITIONS, maxValue: SHIFT_MAX_POSITIONS },
+        { argumentType: ArgumentTypes.INTEGER, minValue: 0 },
+        { argumentType: ArgumentTypes.INTEGER, minValue: SHIFT_MIN_POSITIONS, maxValue: SHIFT_MAX_POSITIONS },
       ]}
     },
   }

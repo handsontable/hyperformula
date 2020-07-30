@@ -6,7 +6,7 @@
 import {CellError, ErrorType, InternalNoErrorCellValue, InternalScalarValue, SimpleCellAddress} from '../../Cell'
 import {ProcedureAst} from '../../parser'
 import {InterpreterValue} from '../InterpreterValue'
-import {FunctionPlugin} from './FunctionPlugin'
+import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
 
 /**
  * Interpreter plugin containing boolean functions
@@ -25,9 +25,9 @@ export class BooleanPlugin extends FunctionPlugin {
       method: 'conditionalIf',
       parameters: {
         list: [
-          {argumentType: 'boolean'},
-          {argumentType: 'scalar'},
-          {argumentType: 'scalar', defaultValue: false},
+          {argumentType: ArgumentTypes.BOOLEAN},
+          {argumentType: ArgumentTypes.SCALAR},
+          {argumentType: ArgumentTypes.SCALAR, defaultValue: false},
         ]
       },
     },
@@ -35,7 +35,7 @@ export class BooleanPlugin extends FunctionPlugin {
       method: 'and',
       parameters: {
         list: [
-          {argumentType: 'boolean'},
+          {argumentType: ArgumentTypes.BOOLEAN},
         ],
         repeatedArg: true,
         expandRanges: true,
@@ -45,7 +45,7 @@ export class BooleanPlugin extends FunctionPlugin {
       method: 'or',
       parameters: {
         list: [
-          {argumentType: 'boolean'},
+          {argumentType: ArgumentTypes.BOOLEAN},
         ],
         repeatedArg: true,
         expandRanges: true,
@@ -55,7 +55,7 @@ export class BooleanPlugin extends FunctionPlugin {
       method: 'xor',
       parameters: {
         list: [
-          {argumentType: 'boolean'},
+          {argumentType: ArgumentTypes.BOOLEAN},
         ],
         repeatedArg: true,
         expandRanges: true,
@@ -65,7 +65,7 @@ export class BooleanPlugin extends FunctionPlugin {
       method: 'not',
       parameters: {
         list: [
-          {argumentType: 'boolean'},
+          {argumentType: ArgumentTypes.BOOLEAN},
         ]
       },
     },
@@ -73,9 +73,9 @@ export class BooleanPlugin extends FunctionPlugin {
       method: 'switch',
       parameters: {
         list: [
-          {argumentType: 'noerror'},
-          {argumentType: 'scalar'},
-          {argumentType: 'scalar'},
+          {argumentType: ArgumentTypes.NOERROR},
+          {argumentType: ArgumentTypes.SCALAR},
+          {argumentType: ArgumentTypes.SCALAR},
         ],
         repeatedArg: true,
       },
@@ -84,8 +84,8 @@ export class BooleanPlugin extends FunctionPlugin {
       method: 'iferror',
       parameters: {
         list: [
-          {argumentType: 'scalar'},
-          {argumentType: 'scalar'},
+          {argumentType: ArgumentTypes.SCALAR},
+          {argumentType: ArgumentTypes.SCALAR},
         ]
       },
     },
@@ -93,8 +93,8 @@ export class BooleanPlugin extends FunctionPlugin {
       method: 'ifna',
       parameters: {
         list: [
-          {argumentType: 'scalar'},
-          {argumentType: 'scalar'},
+          {argumentType: ArgumentTypes.SCALAR},
+          {argumentType: ArgumentTypes.SCALAR},
         ]
       },
     },
@@ -102,8 +102,8 @@ export class BooleanPlugin extends FunctionPlugin {
       method: 'choose',
       parameters: {
         list: [
-          {argumentType: 'number'},
-          {argumentType: 'scalar'},
+          {argumentType: ArgumentTypes.NUMBER},
+          {argumentType: ArgumentTypes.SCALAR},
         ],
         repeatedArg: true,
       },
