@@ -440,38 +440,4 @@ export class InformationPlugin extends FunctionPlugin {
       () => new CellError(ErrorType.VALUE) // error otherwise
     )
   }
-
-  protected runFunctionWithReferenceArgument = (
-    args: Ast[],
-    formulaAddress: SimpleCellAddress,
-    argumentDefinitions: FunctionArgumentsDefinition,
-    noArgCallback: () => InternalScalarValue,
-    referenceCallback: (reference: SimpleCellAddress) => InternalScalarValue,
-    nonReferenceCallback: (...arg: any) => InternalScalarValue
-  ) => {
-    if (args.length === 0) {
-      return noArgCallback()
-    } else if (args.length > 1) {
-      return new CellError(ErrorType.NA)
-    }
-    const arg = args[0]
-
-    let cellReference: Maybe<SimpleCellAddress>
-
-    if (arg.type === AstNodeType.CELL_REFERENCE) {
-      cellReference = arg.reference.toSimpleCellAddress(formulaAddress)
-    } else if (arg.type === AstNodeType.CELL_RANGE || arg.type === AstNodeType.COLUMN_RANGE || arg.type === AstNodeType.ROW_RANGE) {
-      try {
-        cellReference = AbsoluteCellRange.fromAst(arg, formulaAddress).start
-      } catch (e) {
-        return new CellError(ErrorType.REF)
-      }
-    }
-
-    if (cellReference !== undefined) {
-      return referenceCallback(cellReference)
-    }
-
-    return this.runFunction(args, formulaAddress, argumentDefinitions, nonReferenceCallback)
-  }
 }
