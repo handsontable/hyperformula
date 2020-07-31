@@ -225,3 +225,8 @@ export function offsetMonth(date: SimpleDate, offset: number): SimpleDate {
   const totalM = 12 * date.year + date.month - 1 + offset
   return {year: Math.floor(totalM / 12), month: totalM % 12 + 1, day: date.day}
 }
+
+export function roundToNearestSecond(arg: number): number {
+  return Math.round(arg*3600*24)/(3600*24)
+}
+

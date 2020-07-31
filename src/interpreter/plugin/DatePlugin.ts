@@ -4,7 +4,7 @@
  */
 
 import {CellError, ErrorType, InternalScalarValue, SimpleCellAddress} from '../../Cell'
-import {endOfMonth, offsetMonth} from '../../DateTimeHelper'
+import {endOfMonth, offsetMonth, roundToNearestSecond} from '../../DateTimeHelper'
 import {format} from '../../format/format'
 import {ProcedureAst} from '../../parser'
 import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
@@ -34,6 +34,30 @@ export class DatePlugin extends FunctionPlugin {
     },
     'YEAR': {
       method: 'year',
+      parameters: {
+        list: [
+          {argumentType: ArgumentTypes.NUMBER},
+        ]
+      },
+    },
+    'HOUR': {
+      method: 'hour',
+      parameters: {
+        list: [
+          {argumentType: ArgumentTypes.NUMBER},
+        ]
+      },
+    },
+    'MINUTE': {
+      method: 'minute',
+      parameters: {
+        list: [
+          {argumentType: ArgumentTypes.NUMBER},
+        ]
+      },
+    },
+    'SECOND': {
+      method: 'second',
       parameters: {
         list: [
           {argumentType: ArgumentTypes.NUMBER},
@@ -167,6 +191,24 @@ export class DatePlugin extends FunctionPlugin {
   public year(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.runFunction(ast.args, formulaAddress, this.parameters('YEAR'),
       (dateNumber) => this.interpreter.dateHelper.numberToSimpleDate(dateNumber).year
+    )
+  }
+
+  public hour(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.parameters('HOUR'),
+      (timeNumber) => this.interpreter.dateHelper.numberToSimpleTime(roundToNearestSecond(timeNumber)%1).hours
+    )
+  }
+
+  public minute(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.parameters('MINUTE'),
+      (timeNumber) => this.interpreter.dateHelper.numberToSimpleTime(roundToNearestSecond(timeNumber)%1).minutes
+    )
+  }
+
+  public second(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.parameters('SECOND'),
+      (timeNumber) => this.interpreter.dateHelper.numberToSimpleTime(roundToNearestSecond(timeNumber)%1).seconds
     )
   }
 
