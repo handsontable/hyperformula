@@ -134,6 +134,7 @@ const dictionary: RawTranslationPackage = {
     SWITCH: '',
     TAN: 'TAN',
     TEXT: 'TEXTE',
+    TIME: 'TEMPS',
     TRANSPOSE: 'TRANSPOSE',
     TRIM: 'SUPPRESPACE',
     TRUE: 'VRAI',

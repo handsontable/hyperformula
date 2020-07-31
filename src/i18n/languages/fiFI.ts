@@ -134,6 +134,7 @@ const dictionary: RawTranslationPackage = {
     SWITCH: '',
     TAN: 'TAN',
     TEXT: 'TEKSTI',
+    TIME: 'AIKA',
     TRANSPOSE: 'TRANSPONOI',
     TRIM: 'POISTA.VÄLIT',
     TRUE: 'TOSI',

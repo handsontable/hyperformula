@@ -164,7 +164,7 @@ export class DateTimeHelper {
   }
 
   public numberToSimpleDateTime(arg: number): SimpleDateTime {
-    return {...this.numberToSimpleDate(Math.floor(arg)), ...this.numberToSimpleTime(arg%1)}
+    return {...this.numberToSimpleDate(Math.floor(arg)), ...numberToSimpleTime(arg%1)}
   }
 
   private leapYearsCount(year: number): number {

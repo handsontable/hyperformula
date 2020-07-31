@@ -134,6 +134,7 @@ const dictionary: RawTranslationPackage = {
     SWITCH: '',
     TAN: 'TAN',
     TEXT: 'SZÖVEG',
+    TIME: 'IDŐ',
     TRANSPOSE: 'TRANSZPONÁLÁS',
     TRIM: 'KIMETSZ',
     TRUE: 'IGAZ',

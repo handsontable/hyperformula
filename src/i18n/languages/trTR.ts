@@ -134,6 +134,7 @@ const dictionary: RawTranslationPackage = {
     SWITCH: '',
     TAN: 'TAN',
     TEXT: 'METNEÇEVİR',
+    TIME: 'ZAMAN',
     TRANSPOSE: 'DEVRİK_DÖNÜŞÜM',
     TRIM: 'KIRP',
     TRUE: 'DOĞRU',
