@@ -38,6 +38,19 @@ describe('Function DAYS', () => {
     expect(engine.getCellValue(adr('A3'))).toEqual(-1)
     expect(engine.getCellValue(adr('A4'))).toEqual(366)
   })
+  it('ignores time', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=DAYS("30/12/2018 1:00am", "30/12/2018 11:00pm")'],
+      ['=DAYS("31/12/2018 1:00am", "30/12/2018 11:00pm")'],
+      ['=DAYS("30/12/2018 11:00pm", "31/12/2018 1:00am")'],
+      ['=DAYS("28/02/2017 11:00pm", "28/02/2016 1:00am")'],
+    ])
+
+    expect(engine.getCellValue(adr('A1'))).toEqual(0)
+    expect(engine.getCellValue(adr('A2'))).toEqual(1)
+    expect(engine.getCellValue(adr('A3'))).toEqual(-1)
+    expect(engine.getCellValue(adr('A4'))).toEqual(366)
+  })
 
   it('should work for numbers', () => {
     const engine = HyperFormula.buildFromArray([

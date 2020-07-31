@@ -139,7 +139,7 @@ export class DatePlugin extends FunctionPlugin {
   }
 
   public days(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.parameters('DAYS'), (endDate, startDate) => endDate - startDate)
+    return this.runFunction(ast.args, formulaAddress, this.parameters('DAYS'), (endDate, startDate) => Math.trunc(endDate) - Math.trunc(startDate))
   }
 
   /**
