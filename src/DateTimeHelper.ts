@@ -163,19 +163,6 @@ export class DateTimeHelper {
     return {year, month: month + 1, day: day + 1}
   }
 
-  public numberToSimpleTime(arg: number): SimpleTime {
-    arg = Math.round(arg*24*60*60*100000) / (24*60*60*100000)
-    arg *= 24
-    const hours = Math.floor(arg)
-    arg -= hours
-    arg *= 60
-    const minutes = Math.floor(arg)
-    arg -= minutes
-    arg *= 60
-    const seconds = Math.round(arg*100000) / 100000
-    return {hours, minutes, seconds}
-  }
-
   public numberToSimpleDateTime(arg: number): SimpleDateTime {
     return {...this.numberToSimpleDate(Math.floor(arg)), ...this.numberToSimpleTime(arg%1)}
   }
@@ -229,4 +216,18 @@ export function offsetMonth(date: SimpleDate, offset: number): SimpleDate {
 export function roundToNearestSecond(arg: number): number {
   return Math.round(arg*3600*24)/(3600*24)
 }
+
+export function numberToSimpleTime(arg: number): SimpleTime {
+  arg = Math.round(arg*24*60*60*100000) / (24*60*60*100000)
+  arg *= 24
+  const hours = Math.floor(arg)
+  arg -= hours
+  arg *= 60
+  const minutes = Math.floor(arg)
+  arg -= minutes
+  arg *= 60
+  const seconds = Math.round(arg*100000) / 100000
+  return {hours, minutes, seconds}
+}
+
 

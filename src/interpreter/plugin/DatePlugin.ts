@@ -4,7 +4,7 @@
  */
 
 import {CellError, ErrorType, InternalScalarValue, SimpleCellAddress} from '../../Cell'
-import {endOfMonth, offsetMonth, roundToNearestSecond} from '../../DateTimeHelper'
+import {endOfMonth, numberToSimpleTime, offsetMonth, roundToNearestSecond} from '../../DateTimeHelper'
 import {format} from '../../format/format'
 import {ProcedureAst} from '../../parser'
 import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
@@ -212,19 +212,19 @@ export class DatePlugin extends FunctionPlugin {
 
   public hour(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.runFunction(ast.args, formulaAddress, this.parameters('HOUR'),
-      (timeNumber) => this.interpreter.dateHelper.numberToSimpleTime(roundToNearestSecond(timeNumber)%1).hours
+      (timeNumber) => numberToSimpleTime(roundToNearestSecond(timeNumber)%1).hours
     )
   }
 
   public minute(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.runFunction(ast.args, formulaAddress, this.parameters('MINUTE'),
-      (timeNumber) => this.interpreter.dateHelper.numberToSimpleTime(roundToNearestSecond(timeNumber)%1).minutes
+      (timeNumber) => numberToSimpleTime(roundToNearestSecond(timeNumber)%1).minutes
     )
   }
 
   public second(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.runFunction(ast.args, formulaAddress, this.parameters('SECOND'),
-      (timeNumber) => this.interpreter.dateHelper.numberToSimpleTime(roundToNearestSecond(timeNumber)%1).seconds
+      (timeNumber) => numberToSimpleTime(roundToNearestSecond(timeNumber)%1).seconds
     )
   }
 
