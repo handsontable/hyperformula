@@ -24,6 +24,16 @@ export class DatePlugin extends FunctionPlugin {
         ]
       },
     },
+    'TIME': {
+      method: 'time',
+      parameters: {
+        list: [
+          {argumentType: ArgumentTypes.NUMBER, minValue: 0},
+          {argumentType: ArgumentTypes.NUMBER, minValue: 0},
+          {argumentType: ArgumentTypes.NUMBER, minValue: 0},
+        ]
+      },
+    },
     'MONTH': {
       method: 'month',
       parameters: {
@@ -147,6 +157,12 @@ export class DatePlugin extends FunctionPlugin {
       }
       return new CellError(ErrorType.VALUE)
     })
+  }
+
+  public time(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.parameters('TIME'),
+      (h, m, s) => this.interpreter.dateHelper.timeToNumber({hours: Math.trunc(h), minutes: Math.trunc(m), seconds: Math.trunc(s)})%1
+    )
   }
 
   public eomonth(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
