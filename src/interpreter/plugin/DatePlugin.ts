@@ -6,8 +6,7 @@
 import {CellError, ErrorType, InternalScalarValue, SimpleCellAddress} from '../../Cell'
 import {endOfMonth, offsetMonth} from '../../DateTimeHelper'
 import {format} from '../../format/format'
-import {AstNodeType, ProcedureAst} from '../../parser'
-import {SimpleRangeValue} from '../InterpreterValue'
+import {ProcedureAst} from '../../parser'
 import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
 
 /**
@@ -73,6 +72,15 @@ export class DatePlugin extends FunctionPlugin {
         list: [
           {argumentType: ArgumentTypes.NUMBER},
           {argumentType: ArgumentTypes.NUMBER},
+        ]
+      },
+    },
+    'WEEKDAY': {
+      method: 'weekday',
+      parameters: {
+        list: [
+          {argumentType: ArgumentTypes.NUMBER, minValue: 0},
+          {argumentType: ArgumentTypes.NUMBER, defaultValue: 1},
         ]
       },
     },
@@ -167,4 +175,19 @@ export class DatePlugin extends FunctionPlugin {
       (numberRepresentation, formatArg) =>format(numberRepresentation, formatArg, this.config, this.interpreter.dateHelper)
     )
   }
+
+  public weekday(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.parameters('WEEKDAY'),
+      (day: number, type: number) => {
+      const absoluteDay = this.interpreter.dateHelper.relativeNumberToAbsoluteNumber(day)
+        if(type===3) {
+          return (Math.trunc(absoluteDay)+6)%7
+        }
+        const offset = weekdayOffsets.get(type)
+        return offset===undefined ? new CellError(ErrorType.NUM) : (Math.trunc(absoluteDay)+offset)%7+1
+      }
+    )
+  }
 }
+
+const weekdayOffsets = new Map([[1,0],[2,6],[11,6],[12,5],[13,4],[14,3],[15,2],[16,1],[17,0]])

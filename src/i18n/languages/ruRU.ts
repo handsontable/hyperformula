@@ -135,6 +135,7 @@ const dictionary: RawTranslationPackage = {
     TRUE: 'ИСТИНА',
     TRUNC: 'ОТБР',
     VLOOKUP: 'ВПР',
+    WEEKDAY: 'ДЕНЬНЕД',
     XOR: 'ИСКЛИЛИ',
     YEAR: 'ГОД',
   },

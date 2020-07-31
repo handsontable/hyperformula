@@ -135,6 +135,7 @@ const dictionary: RawTranslationPackage = {
     TRUE: 'TOSI',
     TRUNC: 'KATKAISE',
     VLOOKUP: 'PHAKU',
+    WEEKDAY: 'VIIKONPÄIVÄ',
     XOR: 'EHDOTON.TAI',
     YEAR: 'VUOSI',
   },

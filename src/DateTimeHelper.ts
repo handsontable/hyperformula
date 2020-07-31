@@ -48,15 +48,17 @@ export class DateTimeHelper {
   private readonly maxDateValue: number
   private readonly epochYearZero: number
   private readonly parseDateTime: (dateString: string, dateFormat: string, timeFormat: string) => Maybe<DateTime>
+  private readonly leapYear1900: boolean
   constructor(private readonly config: Config) {
     this.minDateAboluteValue = this.dateToNumberFromZero(config.nullDate)
     this.maxDateValue = this.dateToNumber(maxDate)
+    this.leapYear1900 = config.leapYear1900
 
     // code below fixes epochYearStart while being leapYear1900 sensitive
     // if nullDate is earlier than fateful 28 Feb 1900 and 1900 is not supposed to be leap year, then we should
     // add two days (this is the config default)
     // otherwise only one day
-    if(!config.leapYear1900 && 0 <= this.dateToNumber({year: 1900, month: 2, day: 28})) {
+    if(!this.leapYear1900 && 0 <= this.dateToNumber({year: 1900, month: 2, day: 28})) {
       this.epochYearZero = this.numberToSimpleDate(2).year
     } else {
       this.epochYearZero = this.numberToSimpleDate(1).year
@@ -138,6 +140,10 @@ export class DateTimeHelper {
 
   public timeToNumber(time: SimpleTime): number {
     return ((time.seconds/60+time.minutes)/60+time.hours)/24
+  }
+
+  public relativeNumberToAbsoluteNumber(arg: number): number {
+    return arg + this.minDateAboluteValue - (this.leapYear1900?1:0)
   }
 
   public numberToSimpleDate(arg: number): SimpleDate {
