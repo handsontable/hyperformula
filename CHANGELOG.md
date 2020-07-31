@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added helper methods for keeping track of cell/range dependencies: getCellPrecedents and getCellDependents. (#441)
 - Added 4 financial functions FV, PMT, PPMT, IPMT.
 - Added FORMULATEXT function.
+- Added 1 date function WEEKDAY.
 
 ### Changed
 - Operation `moveCells` creating cyclic dependencies does not cause losing original formula. (#479)
