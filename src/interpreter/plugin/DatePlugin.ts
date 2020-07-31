@@ -190,4 +190,4 @@ export class DatePlugin extends FunctionPlugin {
   }
 }
 
-const weekdayOffsets = new Map([[1,0],[2,6],[11,6],[12,5],[13,4],[14,3],[15,2],[16,1],[17,0]])
+const weekdayOffsets = new Map([[1, 0], [2, 6], [11, 6], [12, 5], [13, 4], [14, 3], [15, 2], [16, 1], [17, 0]])
