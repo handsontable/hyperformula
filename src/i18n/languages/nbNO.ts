@@ -53,6 +53,7 @@ const dictionary: RawTranslationPackage = {
     COUNTIFS: 'ANTALL.HVIS.SETT',
     COUNTUNIQUE: 'COUNTUNIQUE',
     DATE: 'DATO',
+    DATEVALUE: 'DATOVERDI',
     DAY: 'DAG',
     DAYS: 'DAGER',
     DEC2BIN: 'DESTILBIN',

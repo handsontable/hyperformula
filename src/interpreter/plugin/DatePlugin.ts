@@ -84,6 +84,14 @@ export class DatePlugin extends FunctionPlugin {
         ]
       },
     },
+    'DATEVALUE': {
+      method: 'datevalue',
+      parameters: {
+        list: [
+          {argumentType: ArgumentTypes.STRING},
+        ]
+      },
+    },
   }
 
   /**
@@ -185,6 +193,18 @@ export class DatePlugin extends FunctionPlugin {
         }
         const offset = weekdayOffsets.get(type)
         return offset===undefined ? new CellError(ErrorType.NUM) : (Math.trunc(absoluteDay)+offset)%7+1
+      }
+    )
+  }
+
+  public datevalue(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.parameters('DATEVALUE'),
+      (date: string) => {
+        const dateNumber = this.interpreter.dateHelper.dateStringToDateNumber(date)
+        if(dateNumber===undefined){
+          return new CellError(ErrorType.VALUE)
+        }
+        return Math.trunc(dateNumber)
       }
     )
   }
