@@ -9,7 +9,7 @@ import {
   instanceOfSimpleTime,
   numberToSimpleTime,
   offsetMonth,
-  roundToNearestSecond
+  roundToNearestSecond, timeToNumber
 } from '../../DateTimeHelper'
 import {format} from '../../format/format'
 import {ProcedureAst} from '../../parser'
@@ -140,6 +140,13 @@ export class DatePlugin extends FunctionPlugin {
         ]
       },
     },
+    'NOW': {
+      method: 'now',
+      parameters: {
+        list: [],
+      },
+      isVolatile: true,
+    }
   }
 
   /**
@@ -175,7 +182,7 @@ export class DatePlugin extends FunctionPlugin {
 
   public time(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.runFunction(ast.args, formulaAddress, this.parameters('TIME'),
-      (h, m, s) => this.interpreter.dateHelper.timeToNumber({hours: Math.trunc(h), minutes: Math.trunc(m), seconds: Math.trunc(s)})%1
+      (h, m, s) => timeToNumber({hours: Math.trunc(h), minutes: Math.trunc(m), seconds: Math.trunc(s)})%1
     )
   }
 
@@ -279,7 +286,7 @@ export class DatePlugin extends FunctionPlugin {
         if(!instanceOfSimpleDate(dateTime)) {
           return 0
         }
-        return (instanceOfSimpleTime(dateTime) ? Math.trunc(this.interpreter.dateHelper.timeToNumber(dateTime)) : 0) +
+        return (instanceOfSimpleTime(dateTime) ? Math.trunc(timeToNumber(dateTime)) : 0) +
           this.interpreter.dateHelper.dateToNumber(dateTime)
       }
     )
@@ -293,6 +300,16 @@ export class DatePlugin extends FunctionPlugin {
           return new CellError(ErrorType.VALUE)
         }
         return dateNumber%1
+      }
+    )
+  }
+
+  public now(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.parameters('NOW'),
+      () => {
+        const now = new Date()
+        return timeToNumber({hours: now.getHours(), minutes: now.getMinutes(), seconds: now.getSeconds()})+
+          this.interpreter.dateHelper.dateToNumber({year: now.getFullYear(), month: now.getMonth()+1, day: now.getDay()})
       }
     )
   }

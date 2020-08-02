@@ -75,7 +75,7 @@ export class DateTimeHelper {
     if(dateTime === undefined) {
       return undefined
     }
-    return (instanceOfSimpleTime(dateTime) ? this.timeToNumber(dateTime) : 0) +
+    return (instanceOfSimpleTime(dateTime) ? timeToNumber(dateTime) : 0) +
       (instanceOfSimpleDate(dateTime) ? this.dateToNumber(dateTime) : 0)
   }
 
@@ -139,10 +139,6 @@ export class DateTimeHelper {
 
   public dateToNumber(date: SimpleDate): number {
     return this.dateToNumberFromZero(date) - this.minDateAboluteValue
-  }
-
-  public timeToNumber(time: SimpleTime): number {
-    return ((time.seconds/60+time.minutes)/60+time.hours)/24
   }
 
   public relativeNumberToAbsoluteNumber(arg: number): number {
@@ -233,4 +229,7 @@ export function numberToSimpleTime(arg: number): SimpleTime {
   return {hours, minutes, seconds}
 }
 
+export function timeToNumber(time: SimpleTime): number {
+  return ((time.seconds/60+time.minutes)/60+time.hours)/24
+}
 

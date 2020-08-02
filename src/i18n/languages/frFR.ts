@@ -104,6 +104,7 @@ const dictionary: RawTranslationPackage = {
     MMULT: 'PRODUITMAT',
     MOD: 'MOD',
     MONTH: 'MOIS',
+    NOW: 'MAINTENANT',
     NOT: 'NON',
     ODD: 'IMPAIR',
     OFFSET: 'DECALER',

@@ -104,6 +104,7 @@ const dictionary: RawTranslationPackage = {
     MMULT: 'MATRIZ.MULT',
     MOD: 'MOD',
     MONTH: 'MÊS',
+    NOW: 'AGORA',
     NOT: 'NÃO',
     ODD: 'ÍMPAR',
     OFFSET: 'DESLOC',

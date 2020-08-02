@@ -104,6 +104,7 @@ export const dictionary: RawTranslationPackage = {
     MMULT: 'MMULT',
     MOD: 'RESIDUO',
     MONTH: 'MES',
+    NOW: 'AHORA',
     NOT: 'NO',
     ODD: 'REDONDEA.IMPAR',
     OFFSET: 'DESREF',

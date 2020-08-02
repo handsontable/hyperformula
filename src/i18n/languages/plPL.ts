@@ -104,6 +104,7 @@ const dictionary: RawTranslationPackage = {
     MMULT: 'MACIERZ.ILOCZYN',
     MOD: 'MOD',
     MONTH: 'MIESIĄC',
+    NOW: 'TERAZ',
     NOT: 'NIE',
     ODD: 'ZAOKR.DO.NPARZ',
     OFFSET: 'PRZESUNIĘCIE',
