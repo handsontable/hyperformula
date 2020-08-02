@@ -137,6 +137,7 @@ const dictionary: RawTranslationPackage = {
     TEXT: 'SZÖVEG',
     TIME: 'IDŐ',
     TIMEVALUE: 'IDŐÉRTÉK',
+    TODAY: 'MA',
     TRANSPOSE: 'TRANSZPONÁLÁS',
     TRIM: 'KIMETSZ',
     TRUE: 'IGAZ',

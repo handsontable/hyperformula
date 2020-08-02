@@ -137,6 +137,7 @@ const dictionary: RawTranslationPackage = {
     TEXT: 'TEKSTI',
     TIME: 'AIKA',
     TIMEVALUE: 'AIKA_ARVO',
+    TODAY: 'TÄMÄ.PÄIVÄ',
     TRANSPOSE: 'TRANSPONOI',
     TRIM: 'POISTA.VÄLIT',
     TRUE: 'TOSI',

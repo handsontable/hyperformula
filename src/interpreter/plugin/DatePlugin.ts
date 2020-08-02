@@ -146,7 +146,14 @@ export class DatePlugin extends FunctionPlugin {
         list: [],
       },
       isVolatile: true,
-    }
+    },
+    'TODAY': {
+      method: 'today',
+      parameters: {
+        list: [],
+      },
+      isVolatile: true,
+    },
   }
 
   /**
@@ -310,6 +317,15 @@ export class DatePlugin extends FunctionPlugin {
         const now = new Date()
         return timeToNumber({hours: now.getHours(), minutes: now.getMinutes(), seconds: now.getSeconds()})+
           this.interpreter.dateHelper.dateToNumber({year: now.getFullYear(), month: now.getMonth()+1, day: now.getDay()})
+      }
+    )
+  }
+
+  public today(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.parameters('TODAY'),
+      () => {
+        const now = new Date()
+        return this.interpreter.dateHelper.dateToNumber({year: now.getFullYear(), month: now.getMonth()+1, day: now.getDay()})
       }
     )
   }

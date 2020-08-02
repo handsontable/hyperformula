@@ -137,6 +137,7 @@ const dictionary: RawTranslationPackage = {
     TEXT: 'TEKST',
     TIME: 'TIJD',
     TIMEVALUE: 'TIJDWAARDE',
+    TODAY: 'VANDAAG',
     TRANSPOSE: 'TRANSPONEREN',
     TRIM: 'SPATIES.WISSEN',
     TRUE: 'WAAR',

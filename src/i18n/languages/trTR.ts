@@ -137,6 +137,7 @@ const dictionary: RawTranslationPackage = {
     TEXT: 'METNEÇEVİR',
     TIME: 'ZAMAN',
     TIMEVALUE: 'ZAMANSAYISI',
+    TODAY: 'BUGÜN',
     TRANSPOSE: 'DEVRİK_DÖNÜŞÜM',
     TRIM: 'KIRP',
     TRUE: 'DOĞRU',

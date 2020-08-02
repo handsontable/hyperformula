@@ -137,6 +137,7 @@ const dictionary: RawTranslationPackage = {
     TEXT: 'TEXTO',
     TIME: 'TEMPO',
     TIMEVALUE: 'VALOR.TEMPO',
+    TODAY: 'HOJE',
     TRANSPOSE: 'TRANSPOR',
     TRIM: 'ARRUMAR',
     TRUE: 'VERDADEIRO',

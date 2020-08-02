@@ -137,6 +137,7 @@ const dictionary: RawTranslationPackage = {
     TEXT: 'HODNOTA.NA.TEXT',
     TIME: 'ČAS',
     TIMEVALUE: 'ČASHODN',
+    TODAY: 'DNES',
     TRANSPOSE: 'TRANSPOZICE',
     TRIM: 'PROČISTIT',
     TRUE: 'PRAVDA',
