@@ -3,7 +3,7 @@ import {ErrorType} from '../../src/Cell'
 import {adr, detailedError} from '../testUtils'
 
 function sleepFor( sleepDuration: number ){
-  let now = new Date().getTime()
+  const now = new Date().getTime()
   while(new Date().getTime() < now + sleepDuration){ /* do nothing */ }
 }
 
