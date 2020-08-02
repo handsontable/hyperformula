@@ -135,7 +135,7 @@ export const dictionary: RawTranslationPackage = {
     TAN: 'TAN',
     TEXT: 'TEXTO',
     TIME: 'NSHORA',
-    TIMEVALUE: 'HORANUMERO'
+    TIMEVALUE: 'HORANUMERO',
     TRANSPOSE: 'TRANSPONER',
     TRIM: 'ESPACIOS',
     TRUE: 'VERDADERO',
