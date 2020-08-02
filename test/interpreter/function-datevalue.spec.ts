@@ -27,6 +27,15 @@ describe('Function DATEVALUE', () => {
     expect(engine.getCellValue(adr('B1'))).toEqual(43465)
   })
 
+  it('border case', () => {
+    const engine = HyperFormula.buildFromArray([['=DATEVALUE("25:00")', '=DATEVALUE("31/12/2018 25:00")']])
+
+    expect(engine.getCellValue(adr('A1'))).toEqual(0)
+    expect(engine.getCellValue(adr('B1'))).toEqual(43466)
+  })
+
+
+
   it('propagate errors', () => {
     const engine =  HyperFormula.buildFromArray([
       ['=DATEVALUE(4/0)'],

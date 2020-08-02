@@ -135,6 +135,7 @@ const dictionary: RawTranslationPackage = {
     TAN: 'TAN',
     TEXT: 'TEKSTI',
     TIME: 'AIKA',
+    TIMEVALUE: 'AIKA_ARVO',
     TRANSPOSE: 'TRANSPONOI',
     TRIM: 'POISTA.VÄLIT',
     TRUE: 'TOSI',

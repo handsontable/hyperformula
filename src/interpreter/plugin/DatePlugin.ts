@@ -4,7 +4,13 @@
  */
 
 import {CellError, ErrorType, InternalScalarValue, SimpleCellAddress} from '../../Cell'
-import {endOfMonth, numberToSimpleTime, offsetMonth, roundToNearestSecond} from '../../DateTimeHelper'
+import {
+  endOfMonth, instanceOfSimpleDate,
+  instanceOfSimpleTime,
+  numberToSimpleTime,
+  offsetMonth,
+  roundToNearestSecond
+} from '../../DateTimeHelper'
 import {format} from '../../format/format'
 import {ProcedureAst} from '../../parser'
 import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
@@ -120,6 +126,14 @@ export class DatePlugin extends FunctionPlugin {
     },
     'DATEVALUE': {
       method: 'datevalue',
+      parameters: {
+        list: [
+          {argumentType: ArgumentTypes.STRING},
+        ]
+      },
+    },
+    'TIMEVALUE': {
+      method: 'timevalue',
       parameters: {
         list: [
           {argumentType: ArgumentTypes.STRING},
@@ -258,11 +272,27 @@ export class DatePlugin extends FunctionPlugin {
   public datevalue(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.runFunction(ast.args, formulaAddress, this.parameters('DATEVALUE'),
       (date: string) => {
+        const dateTime = this.interpreter.dateHelper.parseDateTimeFromConfigFormats(date)
+        if(dateTime === undefined) {
+          return new CellError(ErrorType.VALUE)
+        }
+        if(!instanceOfSimpleDate(dateTime)) {
+          return 0
+        }
+        return (instanceOfSimpleTime(dateTime) ? Math.trunc(this.interpreter.dateHelper.timeToNumber(dateTime)) : 0) +
+          this.interpreter.dateHelper.dateToNumber(dateTime)
+      }
+    )
+  }
+
+  public timevalue(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.parameters('TIMEVALUE'),
+      (date: string) => {
         const dateNumber = this.interpreter.dateHelper.dateStringToDateNumber(date)
         if(dateNumber===undefined){
           return new CellError(ErrorType.VALUE)
         }
-        return Math.trunc(dateNumber)
+        return dateNumber%1
       }
     )
   }

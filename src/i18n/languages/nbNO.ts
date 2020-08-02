@@ -135,6 +135,7 @@ const dictionary: RawTranslationPackage = {
     TAN: 'TAN',
     TEXT: 'TEKST',
     TIME: 'TID',
+    TIMEVALUE: 'TIDSVERDI',
     TRANSPOSE: 'TRANSPONER',
     TRIM: 'TRIMME',
     TRUE: 'SANN',

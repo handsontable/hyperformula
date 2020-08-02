@@ -135,6 +135,7 @@ const dictionary: RawTranslationPackage = {
     TAN: 'TAN',
     TEXT: 'SZÖVEG',
     TIME: 'IDŐ',
+    TIMEVALUE: 'IDŐÉRTÉK',
     TRANSPOSE: 'TRANSZPONÁLÁS',
     TRIM: 'KIMETSZ',
     TRUE: 'IGAZ',

@@ -135,6 +135,7 @@ const dictionary: RawTranslationPackage = {
     TAN: 'TG',
     TEXT: 'HODNOTA.NA.TEXT',
     TIME: 'ČAS',
+    TIMEVALUE: 'ČASHODN',
     TRANSPOSE: 'TRANSPOZICE',
     TRIM: 'PROČISTIT',
     TRUE: 'PRAVDA',

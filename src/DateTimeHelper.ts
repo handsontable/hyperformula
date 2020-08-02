@@ -71,7 +71,7 @@ export class DateTimeHelper {
   }
 
   public dateStringToDateNumber(dateTimeString: string): Maybe<number> {
-    const dateTime = this.parseDateTimeFromFormats(dateTimeString, this.config.dateFormats, this.config.timeFormats)
+    const dateTime = this.parseDateTimeFromConfigFormats(dateTimeString)
     if(dateTime === undefined) {
       return undefined
     }
@@ -96,10 +96,13 @@ export class DateTimeHelper {
     return dateTime
   }
 
-  private parseDateTimeFromFormats(dateString: string, dateFormats: string[], timeFormats: string[]): Maybe<DateTime> {
+  public parseDateTimeFromConfigFormats(dateTimeString: string): Maybe<DateTime> {
+    return this.parseDateTimeFromFormats(dateTimeString, this.config.dateFormats, this.config.timeFormats)
+  }
+  private parseDateTimeFromFormats(dateTimeString: string, dateFormats: string[], timeFormats: string[]): Maybe<DateTime> {
     for (const dateFormat of dateFormats) {
       for (const timeFormat of timeFormats) {
-        const dateTime = this.parseSingleFormat(dateString, dateFormat, timeFormat)
+        const dateTime = this.parseSingleFormat(dateTimeString, dateFormat, timeFormat)
         if (dateTime !== undefined) {
           return dateTime
         }
