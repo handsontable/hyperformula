@@ -62,10 +62,20 @@ lets you design your own [custom functions](custom-functions).
 | Function ID | Category | Description | Syntax |
 | :--- | :--- | :--- | :--- |
 | DATE | Date and time | This function calculates a date specified by year, month, day, and displays it in the cell's formatting. | DATE(Year; Month; Day) |
+| DATEVALUE | Date and time | Interprets string as date. | DATEVALUE(Datestring) |
 | DAY | Date and time | Returns the day of the given date value. | DAY(Number) |
 | DAYS | Date and time | Calculates the difference between two date values. | DAYS(Date2; Date1) |
+| EDATE | Date and time | Shifts the given startdate by given number of months. | EDATE(Startdate; Months) |
 | EOMONTH | Date and time | Returns the date of the last day of a month which falls months away from the start date. | EOMONTH(Startdate; Months) |
+| HOUR | Date and time | Returns hour component of given time. | HOUR(Time) |
+| MINUTE | Date and time | Returns minute component of given time. | MINUTE(Time) |
 | MONTH | Date and time | Returns the month for the given date value. | MONTH(Number) |
+| NOW | Date and time | Returns current date + time. | NOW() |
+| SECOND | Date and time | Returns second component of given time. | SECOND(Time) |
+| TIME | Date and time | Calculates time from given hour, minute and second. | TIME(Hour; Minute; Second) |
+| TIMEVALUE | Date and time | Interprets string as time. | TIMEVALUE(Timestring) |
+| TODAY | Date and time | Returns current date. | TODAY() |
+| WEEKDAY | Date and time |  Computes a number between 1-7 representing the day of week. | WEEKDAY(Date; Type) |
 | YEAR | Date and time | Returns the year as a number according to the internal calculation rules. | YEAR(Number) |
 | BIN2DEC | Engineering | The result is the decimal number for the binary number entered. | BIN2DEC(Number) |
 | BIN2HEX | Engineering | The result is the hexadecimal number for the binary number entered. | BIN2HEX(Number; Places) |
