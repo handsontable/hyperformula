@@ -5,11 +5,13 @@
 
 import {CellError, ErrorType, InternalScalarValue, SimpleCellAddress} from '../../Cell'
 import {
-  endOfMonth, instanceOfSimpleDate,
+  endOfMonth,
+  instanceOfSimpleDate,
   instanceOfSimpleTime,
   numberToSimpleTime,
   offsetMonth,
-  roundToNearestSecond, timeToNumber
+  roundToNearestSecond,
+  timeToNumber, truncateDayInMonth
 } from '../../DateTimeHelper'
 import {format} from '../../format/format'
 import {ProcedureAst} from '../../parser'
@@ -44,7 +46,7 @@ export class DatePlugin extends FunctionPlugin {
       method: 'month',
       parameters: {
         list: [
-          {argumentType: ArgumentTypes.NUMBER},
+          {argumentType: ArgumentTypes.NUMBER, minValue: 0},
         ]
       },
     },
@@ -52,7 +54,7 @@ export class DatePlugin extends FunctionPlugin {
       method: 'year',
       parameters: {
         list: [
-          {argumentType: ArgumentTypes.NUMBER},
+          {argumentType: ArgumentTypes.NUMBER, minValue: 0},
         ]
       },
     },
@@ -60,7 +62,7 @@ export class DatePlugin extends FunctionPlugin {
       method: 'hour',
       parameters: {
         list: [
-          {argumentType: ArgumentTypes.NUMBER},
+          {argumentType: ArgumentTypes.NUMBER, minValue: 0},
         ]
       },
     },
@@ -68,7 +70,7 @@ export class DatePlugin extends FunctionPlugin {
       method: 'minute',
       parameters: {
         list: [
-          {argumentType: ArgumentTypes.NUMBER},
+          {argumentType: ArgumentTypes.NUMBER, minValue: 0},
         ]
       },
     },
@@ -76,7 +78,7 @@ export class DatePlugin extends FunctionPlugin {
       method: 'second',
       parameters: {
         list: [
-          {argumentType: ArgumentTypes.NUMBER},
+          {argumentType: ArgumentTypes.NUMBER, minValue: 0},
         ]
       },
     },
@@ -93,7 +95,7 @@ export class DatePlugin extends FunctionPlugin {
       method: 'eomonth',
       parameters: {
         list: [
-          {argumentType: ArgumentTypes.NUMBER},
+          {argumentType: ArgumentTypes.NUMBER, minValue: 0},
           {argumentType: ArgumentTypes.NUMBER},
         ]
       },
@@ -102,7 +104,7 @@ export class DatePlugin extends FunctionPlugin {
       method: 'day',
       parameters: {
         list: [
-          {argumentType: ArgumentTypes.NUMBER},
+          {argumentType: ArgumentTypes.NUMBER, minValue: 0},
         ]
       },
     },
@@ -110,8 +112,8 @@ export class DatePlugin extends FunctionPlugin {
       method: 'days',
       parameters: {
         list: [
-          {argumentType: ArgumentTypes.NUMBER},
-          {argumentType: ArgumentTypes.NUMBER},
+          {argumentType: ArgumentTypes.NUMBER, minValue: 0},
+          {argumentType: ArgumentTypes.NUMBER, minValue: 0},
         ]
       },
     },
@@ -154,6 +156,15 @@ export class DatePlugin extends FunctionPlugin {
       },
       isVolatile: true,
     },
+    'EDATE': {
+      method: 'edate',
+      parameters: {
+        list: [
+          {argumentType: ArgumentTypes.NUMBER},
+          {argumentType: ArgumentTypes.NUMBER},
+        ],
+      },
+    },
   }
 
   /**
@@ -179,9 +190,7 @@ export class DatePlugin extends FunctionPlugin {
       const date = {year: y, month: m, day: 1}
       if (this.interpreter.dateHelper.isValidDate(date)) {
         const ret = this.interpreter.dateHelper.dateToNumber(date) + (d - 1)
-        if (this.interpreter.dateHelper.getWithinBounds(ret)) {
-          return ret
-        }
+        return this.interpreter.dateHelper.getWithinBounds(ret) ?? new CellError(ErrorType.NUM)
       }
       return new CellError(ErrorType.VALUE)
     })
@@ -196,7 +205,8 @@ export class DatePlugin extends FunctionPlugin {
   public eomonth(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.runFunction(ast.args, formulaAddress, this.parameters('EOMONTH'), (dateNumber, numberOfMonthsToShift) => {
       const date = this.interpreter.dateHelper.numberToSimpleDate(dateNumber)
-      return this.interpreter.dateHelper.dateToNumber(endOfMonth(offsetMonth(date, numberOfMonthsToShift)))
+      const ret = this.interpreter.dateHelper.dateToNumber(endOfMonth(offsetMonth(date, numberOfMonthsToShift)))
+      return this.interpreter.dateHelper.getWithinBounds(ret) ?? new CellError(ErrorType.NUM)
     })
   }
 
@@ -326,6 +336,17 @@ export class DatePlugin extends FunctionPlugin {
       () => {
         const now = new Date()
         return this.interpreter.dateHelper.dateToNumber({year: now.getFullYear(), month: now.getMonth()+1, day: now.getDay()})
+      }
+    )
+  }
+
+  public edate(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.parameters('EDATE'),
+      (dateNumber: number, delta: number) => {
+        const date = this.interpreter.dateHelper.numberToSimpleDate(dateNumber)
+        const newDate = truncateDayInMonth(offsetMonth(date, delta))
+        const ret = this.interpreter.dateHelper.dateToNumber(newDate)
+        return this.interpreter.dateHelper.getWithinBounds(ret) ?? new CellError(ErrorType.NUM)
       }
     )
   }

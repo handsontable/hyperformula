@@ -63,6 +63,7 @@ const dictionary: RawTranslationPackage = {
     DEGREES: 'GRADEN',
     DELTA: 'DELTA',
     E: 'E',
+    EDATE: 'ZELFDE.DAG',
     EOMONTH: 'LAATSTE.DAG',
     ERF: 'FOUTFUNCTIE',
     ERFC: 'FOUT.COMPLEMENT',

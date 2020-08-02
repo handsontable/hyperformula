@@ -66,8 +66,8 @@ export class DateTimeHelper {
     this.parseDateTime = config.parseDateTime
   }
 
-  public getWithinBounds(dayNumber: number) {
-    return (dayNumber <= this.maxDateValue) && (dayNumber >= 0)
+  public getWithinBounds(dayNumber: number): Maybe<number> {
+    return (dayNumber <= this.maxDateValue) && (dayNumber >= 0) ? dayNumber : undefined
   }
 
   public dateStringToDateNumber(dateTimeString: string): Maybe<number> {
@@ -146,7 +146,7 @@ export class DateTimeHelper {
   }
 
   public numberToSimpleDate(arg: number): SimpleDate {
-    const dateNumber = arg + this.minDateAboluteValue
+    const dateNumber = Math.floor(arg) + this.minDateAboluteValue
     let year = Math.floor(dateNumber / 365.2425)
     if (this.dateToNumberFromZero({year: year + 1, month: 1, day: 1}) <= dateNumber) {
       year++
@@ -210,6 +210,10 @@ export function endOfMonth(date: SimpleDate): SimpleDate {
 export function offsetMonth(date: SimpleDate, offset: number): SimpleDate {
   const totalM = 12 * date.year + date.month - 1 + offset
   return {year: Math.floor(totalM / 12), month: totalM % 12 + 1, day: date.day}
+}
+
+export function truncateDayInMonth(date: SimpleDate): SimpleDate {
+  return {year: date.year, month: date.month, day: Math.min(date.day, numDays[date.month-1])}
 }
 
 export function roundToNearestSecond(arg: number): number {

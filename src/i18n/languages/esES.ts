@@ -63,6 +63,7 @@ export const dictionary: RawTranslationPackage = {
     DEGREES: 'GRADOS',
     DELTA: 'DELTA',
     E: 'E',
+    EDATE: 'FECHA.MES',
     EOMONTH: 'FIN.MES',
     ERF: 'FUN.ERROR',
     ERFC: 'FUN.ERROR.COMPL',

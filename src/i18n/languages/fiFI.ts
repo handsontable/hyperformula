@@ -63,6 +63,7 @@ const dictionary: RawTranslationPackage = {
     DEGREES: 'ASTEET',
     DELTA: 'SAMA.ARVO',
     E: 'E',
+    EDATE: 'PÄIVÄ.KUUKAUSI',
     EOMONTH: 'KUUKAUSI.LOPPU',
     ERF: 'VIRHEFUNKTIO',
     ERFC: 'VIRHEFUNKTIO.KOMPLEMENTTI',

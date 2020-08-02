@@ -63,6 +63,7 @@ const dictionary: RawTranslationPackage = {
     DEGREES: 'FOK',
     DELTA: 'DELTA',
     E: 'E',
+    EDATE: 'KALK.DÁTUM',
     EOMONTH: 'HÓNAP.UTOLSÓ.NAP',
     ERF: 'HIBAF',
     ERFC: 'HIBAF.KOMPLEMENTER',
