@@ -170,7 +170,7 @@ export class DateTimeHelper {
     return Math.floor(year / 4) - Math.floor(year / 100) + Math.floor(year / 400) + (this.config.leapYear1900 && year >= 1900 ? 1 : 0)
   }
 
-  private dateToNumberFromZero(date: SimpleDate): number {
+  public dateToNumberFromZero(date: SimpleDate): number {
     return 365 * date.year + prefSumDays[date.month - 1] + date.day - 1 + (date.month <= 2 ? this.leapYearsCount(date.year - 1) : this.leapYearsCount(date.year))
   }
 

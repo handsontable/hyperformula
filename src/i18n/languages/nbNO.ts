@@ -145,6 +145,7 @@ const dictionary: RawTranslationPackage = {
     TRUNC: 'AVKORT',
     VLOOKUP: 'FINN.RAD',
     WEEKDAY: 'UKEDAG',
+    WEEKNUM: 'UKENR',
     XOR: 'EKSKLUSIVELLER',
     YEAR: 'ÅR',
   },

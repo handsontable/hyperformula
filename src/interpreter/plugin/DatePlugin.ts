@@ -11,7 +11,8 @@ import {
   numberToSimpleTime,
   offsetMonth,
   roundToNearestSecond,
-  timeToNumber, truncateDayInMonth
+  timeToNumber,
+  truncateDayInMonth
 } from '../../DateTimeHelper'
 import {format} from '../../format/format'
 import {ProcedureAst} from '../../parser'
@@ -119,6 +120,15 @@ export class DatePlugin extends FunctionPlugin {
     },
     'WEEKDAY': {
       method: 'weekday',
+      parameters: {
+        list: [
+          {argumentType: ArgumentTypes.NUMBER, minValue: 0},
+          {argumentType: ArgumentTypes.NUMBER, defaultValue: 1},
+        ]
+      },
+    },
+    'WEEKNUM': {
+      method: 'weeknum',
       parameters: {
         list: [
           {argumentType: ArgumentTypes.NUMBER, minValue: 0},
@@ -283,12 +293,35 @@ export class DatePlugin extends FunctionPlugin {
   public weekday(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.runFunction(ast.args, formulaAddress, this.parameters('WEEKDAY'),
       (day: number, type: number) => {
-      const absoluteDay = this.interpreter.dateHelper.relativeNumberToAbsoluteNumber(day)
+        const absoluteDay = Math.floor(this.interpreter.dateHelper.relativeNumberToAbsoluteNumber(day))
         if(type===3) {
-          return (Math.trunc(absoluteDay)+6)%7
+          return (absoluteDay-1)%7
         }
         const offset = weekdayOffsets.get(type)
-        return offset===undefined ? new CellError(ErrorType.NUM) : (Math.trunc(absoluteDay)+offset)%7+1
+        if(offset===undefined) {
+          return new CellError(ErrorType.NUM)
+        }
+        return (absoluteDay-offset)%7+1
+      }
+    )
+  }
+
+  public weeknum(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.parameters('WEEKNUM'),
+      (day: number, type: number) => {
+        const absoluteDay = Math.floor(this.interpreter.dateHelper.relativeNumberToAbsoluteNumber(day))
+        const date = this.interpreter.dateHelper.numberToSimpleDate(day)
+        const yearStart = this.interpreter.dateHelper.dateToNumber({year: date.year, month: 1, day: 1})
+        const yearStartAbsolute = this.interpreter.dateHelper.relativeNumberToAbsoluteNumber(yearStart)
+        if(type === 21) {
+          const firstThursdayAbs = yearStartAbsolute + ((4-yearStartAbsolute)%7+7)%7
+          return Math.floor((absoluteDay-1)/7) - Math.floor((firstThursdayAbs-1)/7)+1
+        }
+        const offset = weekdayOffsets.get(type)
+        if(offset===undefined) {
+          return new CellError(ErrorType.NUM)
+        }
+        return Math.floor((absoluteDay-offset)/7) - Math.floor((yearStartAbsolute-offset)/7)+1
       }
     )
   }
@@ -352,4 +385,4 @@ export class DatePlugin extends FunctionPlugin {
   }
 }
 
-const weekdayOffsets = new Map([[1, 0], [2, 6], [11, 6], [12, 5], [13, 4], [14, 3], [15, 2], [16, 1], [17, 0]])
+const weekdayOffsets = new Map([[1, 0], [2, 1], [11, 1], [12, 2], [13, 3], [14, 4], [15, 5], [16, 6], [17, 0]])

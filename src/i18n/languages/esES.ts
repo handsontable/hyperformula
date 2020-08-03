@@ -145,6 +145,7 @@ export const dictionary: RawTranslationPackage = {
     TRUNC: 'TRUNCAR',
     VLOOKUP: 'BUSCARV',
     WEEKDAY: 'DIASEM',
+    WEEKNUM: 'NUM.DE.SEMANA',
     XOR: 'XOR',
     YEAR: 'AÑO',
   },
