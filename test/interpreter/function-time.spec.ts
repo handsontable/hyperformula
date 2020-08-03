@@ -46,11 +46,21 @@ describe('Function TIME', () => {
   it('negative', () => {
     const config = new Config()
     const engine = HyperFormula.buildFromArray([
-      ['=TIME(24, -0.5, 0)', '=TIME(-19, 120, 54)', '=TIME(0, 189, -84)'],
+      ['=TIME(-1, 59, 0)', '=TIME(0, -1, 59)', '=TIME(0, 1, -61)'],
     ], config)
     expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM))
     expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.NUM))
     expect(engine.getCellValue(adr('C1'))).toEqual(detailedError(ErrorType.NUM))
+  })
+
+  it('fractions', () => {
+    const config = new Config()
+    const engine = HyperFormula.buildFromArray([
+      ['=TIME(0, 0.9, 0)', '=TIME(0, 0, -0.9)', '=TIME(0.9, 0, 0)'],
+    ], config)
+    expect(engine.getCellValue(adr('A1'))).toEqual(0)
+    expect(engine.getCellValue(adr('B1'))).toEqual(0)
+    expect(engine.getCellValue(adr('C1'))).toEqual(0)
   })
 
   it('number of arguments', () => {

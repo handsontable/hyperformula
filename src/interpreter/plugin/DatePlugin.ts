@@ -37,9 +37,9 @@ export class DatePlugin extends FunctionPlugin {
       method: 'time',
       parameters: {
         list: [
-          {argumentType: ArgumentTypes.NUMBER, minValue: 0},
-          {argumentType: ArgumentTypes.NUMBER, minValue: 0},
-          {argumentType: ArgumentTypes.NUMBER, minValue: 0},
+          {argumentType: ArgumentTypes.NUMBER},
+          {argumentType: ArgumentTypes.NUMBER},
+          {argumentType: ArgumentTypes.NUMBER},
         ]
       },
     },
@@ -216,7 +216,13 @@ export class DatePlugin extends FunctionPlugin {
 
   public time(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.runFunction(ast.args, formulaAddress, this.parameters('TIME'),
-      (h, m, s) => timeToNumber({hours: Math.trunc(h), minutes: Math.trunc(m), seconds: Math.trunc(s)})%1
+      (h, m, s) => {
+        const ret = timeToNumber({hours: Math.trunc(h), minutes: Math.trunc(m), seconds: Math.trunc(s)})
+        if(ret<0) {
+          return new CellError(ErrorType.NUM)
+        }
+        return ret%1
+      }
     )
   }
 
