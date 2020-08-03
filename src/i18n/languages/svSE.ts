@@ -87,6 +87,7 @@ const dictionary: RawTranslationPackage = {
     ISNONTEXT: 'ÄREJTEXT',
     ISNUMBER: 'ÄRTAL',
     ISODD: 'ÄRUDDA',
+    ISOWEEKNUM: 'ISOWEEKNUM',
     ISTEXT: 'ÄRTEXT',
     LEFT: 'VÄNSTER',
     LEN: 'LÄNGD',

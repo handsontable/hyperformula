@@ -136,6 +136,14 @@ export class DatePlugin extends FunctionPlugin {
         ]
       },
     },
+    'ISOWEEKNUM': {
+      method: 'isoweeknum',
+      parameters: {
+        list: [
+          {argumentType: ArgumentTypes.NUMBER, minValue: 0},
+        ]
+      },
+    },
     'DATEVALUE': {
       method: 'datevalue',
       parameters: {
@@ -314,8 +322,7 @@ export class DatePlugin extends FunctionPlugin {
         const yearStart = this.interpreter.dateHelper.dateToNumber({year: date.year, month: 1, day: 1})
         const yearStartAbsolute = this.interpreter.dateHelper.relativeNumberToAbsoluteNumber(yearStart)
         if(type === 21) {
-          const firstThursdayAbs = yearStartAbsolute + ((4-yearStartAbsolute)%7+7)%7
-          return Math.floor((absoluteDay-1)/7) - Math.floor((firstThursdayAbs-1)/7)+1
+          return this.isoweeknumCore(day)
         }
         const offset = weekdayOffsets.get(type)
         if(offset===undefined) {
@@ -324,6 +331,23 @@ export class DatePlugin extends FunctionPlugin {
         return Math.floor((absoluteDay-offset)/7) - Math.floor((yearStartAbsolute-offset)/7)+1
       }
     )
+  }
+
+  public isoweeknum(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.parameters('ISOWEEKNUM'), this.isoweeknumCore)
+  }
+
+  private isoweeknumCore = (day: number): number => {
+    const absoluteDay = Math.floor(this.interpreter.dateHelper.relativeNumberToAbsoluteNumber(day))
+    const date = this.interpreter.dateHelper.numberToSimpleDate(day)
+    const yearStart = this.interpreter.dateHelper.dateToNumber({year: date.year, month: 1, day: 1})
+    const yearStartAbsolute = this.interpreter.dateHelper.relativeNumberToAbsoluteNumber(yearStart)
+    const firstThursdayAbs = yearStartAbsolute + ((4-yearStartAbsolute)%7+7)%7
+    const ret = Math.floor((absoluteDay-1)/7) - Math.floor((firstThursdayAbs-1)/7)+1
+    if(ret===0) {
+      return this.isoweeknumCore(day-7)+1
+    }
+    return ret
   }
 
   public datevalue(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {

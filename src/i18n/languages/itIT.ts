@@ -87,6 +87,7 @@ const dictionary: RawTranslationPackage = {
     ISNONTEXT: 'VAL.NON.TESTO',
     ISNUMBER: 'VAL.NUMERO',
     ISODD: 'VAL.DISPARI',
+    ISOWEEKNUM: 'NUM.SETTIMANA.ISO',
     ISTEXT: 'VAL.TESTO',
     LEFT: 'SINISTRA',
     LEN: 'LUNGHEZZA',

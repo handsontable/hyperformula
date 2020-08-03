@@ -87,6 +87,7 @@ export const dictionary: RawTranslationPackage = {
     ISNONTEXT: 'ESNOTEXTO',
     ISNUMBER: 'ESNUMERO',
     ISODD: 'ES.IMPAR',
+    ISOWEEKNUM: 'ISOWEEKNUM',
     ISTEXT: 'ESTEXTO',
     LEFT: 'IZQUIERDA',
     LEN: 'LARGO',
