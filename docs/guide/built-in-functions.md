@@ -76,6 +76,7 @@ lets you design your own [custom functions](custom-functions).
 | TIMEVALUE | Date and time | Interprets string as time. | TIMEVALUE(Timestring) |
 | TODAY | Date and time | Returns current date. | TODAY() |
 | WEEKDAY | Date and time |  Computes a number between 1-7 representing the day of week. | WEEKDAY(Date; Type) |
+| WEEKNUM | Date and time |   Returns a week number that corresponds to the week of year. | WEEKNUM(Date; Type) |
 | YEAR | Date and time | Returns the year as a number according to the internal calculation rules. | YEAR(Number) |
 | BIN2DEC | Engineering | The result is the decimal number for the binary number entered. | BIN2DEC(Number) |
 | BIN2HEX | Engineering | The result is the hexadecimal number for the binary number entered. | BIN2HEX(Number; Places) |
