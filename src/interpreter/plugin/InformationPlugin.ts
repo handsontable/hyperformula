@@ -273,7 +273,6 @@ export class InformationPlugin extends FunctionPlugin {
       (typeof arg !== 'string')
     )
   }
-
   /**
    * Corresponds to COLUMNS(range)
    *

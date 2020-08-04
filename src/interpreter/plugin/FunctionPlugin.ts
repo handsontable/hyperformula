@@ -34,9 +34,20 @@ export interface FunctionArguments {
 
 export interface FunctionMetadata extends FunctionArguments{
   method: string,
+  parameters?: FunctionArgument[],
   isVolatile?: boolean,
   isDependentOnSheetStructureChange?: boolean,
   doesNotNeedArgumentsToBeComputed?: boolean,
+
+  /**
+   * Used for functions with variable number of arguments -- last defined argument is repeated indefinitely.
+   */
+  repeatLastArg?: boolean,
+
+  /**
+   * Ranges in arguments are inlined to (possibly multiple) scalar arguments.
+   */
+  expandRanges?: boolean,
 }
 
 export interface FunctionPluginDefinition {
