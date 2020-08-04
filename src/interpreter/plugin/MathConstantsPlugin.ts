@@ -14,22 +14,22 @@ export class MathConstantsPlugin extends FunctionPlugin {
   public static implementedFunctions = {
     'PI': {
       method: 'pi',
-      parameters: {list: []},
+      parameters: [],
     },
     'E': {
       method: 'e',
-      parameters: {list: []},
+      parameters: [],
     },
   }
 
   public pi(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.parameters('PI'),
+    return this.runFunction(ast.args, formulaAddress, this.metadata('PI'),
       () => PI
     )
   }
 
   public e(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.parameters('E'),
+    return this.runFunction(ast.args, formulaAddress, this.metadata('E'),
       () => E
     )
   }

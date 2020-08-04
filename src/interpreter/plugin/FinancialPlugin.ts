@@ -11,20 +11,17 @@ export class FinancialPlugin extends FunctionPlugin {
   public static implementedFunctions = {
     'PMT': {
       method: 'pmt',
-      parameters: {
-        list: [
+      parameters: [
           {argumentType: ArgumentTypes.NUMBER},
           {argumentType: ArgumentTypes.NUMBER},
           {argumentType: ArgumentTypes.NUMBER},
           {argumentType: ArgumentTypes.NUMBER, defaultValue: 0},
           {argumentType: ArgumentTypes.NUMBER, defaultValue: 0},
         ]
-      },
     },
     'IPMT': {
       method: 'ipmt',
-      parameters: {
-        list: [
+      parameters: [
           {argumentType: ArgumentTypes.NUMBER},
           {argumentType: ArgumentTypes.NUMBER},
           {argumentType: ArgumentTypes.NUMBER},
@@ -32,12 +29,10 @@ export class FinancialPlugin extends FunctionPlugin {
           {argumentType: ArgumentTypes.NUMBER, defaultValue: 0},
           {argumentType: ArgumentTypes.NUMBER, defaultValue: 0},
         ]
-      },
     },
     'PPMT': {
       method: 'ppmt',
-      parameters: {
-        list: [
+      parameters: [
           {argumentType: ArgumentTypes.NUMBER},
           {argumentType: ArgumentTypes.NUMBER},
           {argumentType: ArgumentTypes.NUMBER},
@@ -45,36 +40,33 @@ export class FinancialPlugin extends FunctionPlugin {
           {argumentType: ArgumentTypes.NUMBER, defaultValue: 0},
           {argumentType: ArgumentTypes.NUMBER, defaultValue: 0},
         ]
-      },
     },
     'FV': {
       method: 'fv',
-      parameters: {
-        list: [
+      parameters: [
           {argumentType: ArgumentTypes.NUMBER},
           {argumentType: ArgumentTypes.NUMBER},
           {argumentType: ArgumentTypes.NUMBER},
           {argumentType: ArgumentTypes.NUMBER, defaultValue: 0},
           {argumentType: ArgumentTypes.NUMBER, defaultValue: 0},
         ]
-      },
     },
   }
 
   public pmt(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.parameters('PMT'), pmtCore)
+    return this.runFunction(ast.args, formulaAddress, this.metadata('PMT'), pmtCore)
   }
 
   public ipmt(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.parameters('IPMT'), ipmtCore)
+    return this.runFunction(ast.args, formulaAddress, this.metadata('IPMT'), ipmtCore)
   }
 
   public ppmt(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.parameters('PPMT'), ppmtCore)
+    return this.runFunction(ast.args, formulaAddress, this.metadata('PPMT'), ppmtCore)
   }
 
   public fv(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.parameters('FV'), fvCore)
+    return this.runFunction(ast.args, formulaAddress, this.metadata('FV'), fvCore)
   }
 }
 

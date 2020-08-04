@@ -11,7 +11,7 @@ export class RandomPlugin extends FunctionPlugin {
   public static implementedFunctions = {
     'RAND': {
       method: 'rand',
-      parameters: { list: [] },
+      parameters: [],
       isVolatile: true,
     },
   }
@@ -26,6 +26,6 @@ export class RandomPlugin extends FunctionPlugin {
    * @param formulaAddress
    */
   public rand(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.parameters('RAND'), Math.random)
+    return this.runFunction(ast.args, formulaAddress, this.metadata('RAND'), Math.random)
   }
 }

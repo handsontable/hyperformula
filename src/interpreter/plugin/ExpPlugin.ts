@@ -11,9 +11,9 @@ export class ExpPlugin extends FunctionPlugin {
   public static implementedFunctions = {
     'EXP': {
       method: 'exp',
-      parameters: { list: [
+      parameters:[
         { argumentType: ArgumentTypes.NUMBER }
-      ]},
+      ],
     },
   }
 
@@ -26,6 +26,6 @@ export class ExpPlugin extends FunctionPlugin {
    * @param formulaAddress
    */
   public exp(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.parameters('EXP'), Math.exp)
+    return this.runFunction(ast.args, formulaAddress, this.metadata('EXP'), Math.exp)
   }
 }

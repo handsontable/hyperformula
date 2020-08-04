@@ -6,7 +6,7 @@ import {Sheet} from '../../src/Sheet'
 
 const sharedExamples = (builder: (sheet: Sheet, config?: Partial<ConfigParams>) => HyperFormula) => {
   describe('VLOOKUP - args validation', () => {
-    it('not enough parameters', () => {
+    it('not enough metadata', () => {
       const engine = builder([
         ['=VLOOKUP(1, A2:B3)'],
       ])
@@ -14,7 +14,7 @@ const sharedExamples = (builder: (sheet: Sheet, config?: Partial<ConfigParams>) 
       expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA))
     })
 
-    it('too many parameters', () => {
+    it('too many metadata', () => {
       const engine = builder([
         ['=VLOOKUP(1, A2:B3, 2, TRUE(), "foo")'],
       ])

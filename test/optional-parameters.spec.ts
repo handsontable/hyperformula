@@ -8,23 +8,21 @@ class FooPlugin extends FunctionPlugin {
   public static implementedFunctions = {
     'FOO': {
       method: 'foo',
-      parameters: {
-        list: [
+      parameters: [
           { argumentType: ArgumentTypes.STRING, defaultValue: 'default1'},
           { argumentType: ArgumentTypes.STRING, defaultValue: 'default2'},
         ],
-      },
     },
   }
 
   public foo(ast: ProcedureAst, formulaAddress: SimpleCellAddress) {
-    return this.runFunction(ast.args, formulaAddress, this.parameters('FOO'),
+    return this.runFunction(ast.args, formulaAddress, this.metadata('FOO'),
       (arg1, arg2) => arg1+'+'+arg2
     )
   }
 }
 
-describe('Nonexistent parameters', () => {
+describe('Nonexistent metadata', () => {
   it('should work for function', () => {
     HyperFormula.getLanguage('enGB').extendFunctions({FOO: 'FOO'})
     const engine = HyperFormula.buildFromArray([
