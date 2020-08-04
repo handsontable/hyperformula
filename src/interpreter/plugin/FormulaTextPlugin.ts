@@ -13,8 +13,8 @@ export class FormulaTextPlugin extends FunctionPlugin {
     'FORMULATEXT': {
       method: 'formulatext',
       parameters: [
-          {argumentType: ArgumentTypes.NOERROR}
-        ],
+        {argumentType: ArgumentTypes.NOERROR}
+      ],
       doesNotNeedArgumentsToBeComputed: true,
       isDependentOnSheetStructureChange: true
     },
