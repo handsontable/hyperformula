@@ -108,8 +108,8 @@ export class InformationPlugin extends FunctionPlugin {
     'SHEETS': {
       method: 'sheets',
       parameters: [
-          {argumentType: ArgumentTypes.NOERROR}
-        ],
+        {argumentType: ArgumentTypes.NOERROR}
+      ],
       doesNotNeedArgumentsToBeComputed: true
     }
   }
