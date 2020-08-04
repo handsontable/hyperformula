@@ -8,28 +8,15 @@ class FooPlugin extends FunctionPlugin {
   public static implementedFunctions = {
     'FOO': {
       method: 'foo',
-<<<<<<< HEAD
-      parameters: {
-        list: [
-          { argumentType: ArgumentTypes.STRING, defaultValue: 'default1'},
-          { argumentType: ArgumentTypes.STRING, defaultValue: 'default2'},
-        ],
-      },
-=======
       parameters: [
           { argumentType: ArgumentTypes.STRING, defaultValue: 'default1'},
           { argumentType: ArgumentTypes.STRING, defaultValue: 'default2'},
         ],
->>>>>>> develop
     },
   }
 
   public foo(ast: ProcedureAst, formulaAddress: SimpleCellAddress) {
-<<<<<<< HEAD
-    return this.runFunction(ast.args, formulaAddress, this.parameters('FOO'),
-=======
     return this.runFunction(ast.args, formulaAddress, this.metadata('FOO'),
->>>>>>> develop
       (arg1, arg2) => arg1+'+'+arg2
     )
   }
