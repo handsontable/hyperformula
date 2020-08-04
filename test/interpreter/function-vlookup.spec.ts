@@ -14,7 +14,7 @@ const sharedExamples = (builder: (sheet: Sheet, config?: Partial<ConfigParams>) 
       expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA))
     })
 
-    it('too many metadata', () => {
+    it('too many parameters', () => {
       const engine = builder([
         ['=VLOOKUP(1, A2:B3, 2, TRUE(), "foo")'],
       ])
