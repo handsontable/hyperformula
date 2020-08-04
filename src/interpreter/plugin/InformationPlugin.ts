@@ -23,33 +23,33 @@ export class InformationPlugin extends FunctionPlugin {
     'ISBINARY': {
       method: 'isbinary',
       parameters: [
-          {argumentType: ArgumentTypes.STRING}
-        ]
+        {argumentType: ArgumentTypes.STRING}
+      ]
     },
     'ISERR': {
       method: 'iserr',
       parameters:  [
-          {argumentType: ArgumentTypes.SCALAR}
-        ]
+        {argumentType: ArgumentTypes.SCALAR}
+      ]
     },
     'ISFORMULA': {
       method: 'isformula',
       parameters:  [
-          {argumentType: ArgumentTypes.NOERROR}
-        ],
+        {argumentType: ArgumentTypes.NOERROR}
+      ],
       doesNotNeedArgumentsToBeComputed: true
     },
     'ISNA': {
       method: 'isna',
       parameters: [
-          {argumentType: ArgumentTypes.SCALAR}
-        ]
+        {argumentType: ArgumentTypes.SCALAR}
+      ]
     },
     'ISREF': {
       method: 'isref',
       parameters:[
-          {argumentType: ArgumentTypes.SCALAR}
-        ]
+        {argumentType: ArgumentTypes.SCALAR}
+      ]
     },
     'ISERROR': {
       method: 'iserror',
