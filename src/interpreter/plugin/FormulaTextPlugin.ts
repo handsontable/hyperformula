@@ -27,7 +27,7 @@ export class FormulaTextPlugin extends FunctionPlugin {
    *
    * @param ast
    * @param formulaAddress
-   * */
+   */
   public formulatext(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.runFunctionWithReferenceArgument(ast.args, formulaAddress, this.metadata('FORMULATEXT'),
       () => new CellError(ErrorType.NA),
