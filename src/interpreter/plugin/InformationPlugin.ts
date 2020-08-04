@@ -5,11 +5,10 @@
 
 import {AbsoluteCellRange} from '../../AbsoluteCellRange'
 import {CellError, EmptyValue, ErrorType, InternalScalarValue, SimpleCellAddress} from '../../Cell'
-import {Ast, AstNodeType, ProcedureAst} from '../../parser'
-import {InterpreterValue} from '../InterpreterValue'
-import {FunctionArgumentsDefinition, FunctionPlugin} from './FunctionPlugin'
-import {Maybe} from '../../Maybe'
 import {FormulaCellVertex, MatrixVertex} from '../../DependencyGraph'
+import {AstNodeType, ProcedureAst} from '../../parser'
+import {InterpreterValue} from '../InterpreterValue'
+import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
 
 /**
  * Interpreter plugin containing information functions
@@ -23,92 +22,70 @@ export class InformationPlugin extends FunctionPlugin {
     },
     'ISBINARY': {
       method: 'isbinary',
-      parameters: {
-        list: [
-          {argumentType: 'string'}
+      parameters: [
+          {argumentType: ArgumentTypes.STRING}
         ]
-      }
-    },
-    'ISBLANK': {
-      method: 'isblank',
-      parameters: {
-        list: [
-          {argumentType: 'scalar'}
-        ]
-      }
     },
     'ISERR': {
       method: 'iserr',
-      parameters: {
-        list: [
-          {argumentType: 'scalar'}
+      parameters:  [
+          {argumentType: ArgumentTypes.SCALAR}
         ]
-      }
-    },
-    'ISERROR': {
-      method: 'iserror',
-      parameters: {
-        list: [
-          {argumentType: 'scalar'}
-        ]
-      }
     },
     'ISFORMULA': {
       method: 'isformula',
-      parameters: {
-        list: [
-          {argumentType: 'noerror'}
-        ]
-      },
+      parameters:  [
+          {argumentType: ArgumentTypes.NOERROR}
+        ],
       doesNotNeedArgumentsToBeComputed: true
     },
     'ISNA': {
       method: 'isna',
-      parameters: {
-        list: [
-          {argumentType: 'scalar'}
+      parameters: [
+          {argumentType: ArgumentTypes.SCALAR}
         ]
-      }
-    },
-    'ISNUMBER': {
-      method: 'isnumber',
-      parameters: {
-        list: [
-          {argumentType: 'scalar'}
-        ]
-      }
-    },
-    'ISLOGICAL': {
-      method: 'islogical',
-      parameters: {
-        list: [
-          {argumentType: 'scalar'}
-        ]
-      }
     },
     'ISREF': {
       method: 'isref',
-      parameters: {
-        list: [
-          {argumentType: 'scalar'}
+      parameters:[
+          {argumentType: ArgumentTypes.SCALAR}
         ]
-      }
+    },
+    'ISERROR': {
+      method: 'iserror',
+      parameters: [
+        { argumentType: ArgumentTypes.SCALAR}
+      ]
+    },
+    'ISBLANK': {
+      method: 'isblank',
+      parameters: [
+        { argumentType: ArgumentTypes.SCALAR}
+      ]
+    },
+    'ISNUMBER': {
+      method: 'isnumber',
+      parameters: [
+        { argumentType: ArgumentTypes.SCALAR}
+      ]
+    },
+    'ISLOGICAL': {
+      method: 'islogical',
+      parameters: [
+        { argumentType: ArgumentTypes.SCALAR}
+      ]
     },
     'ISTEXT': {
       method: 'istext',
-      parameters: {
-        list: [
-          {argumentType: 'scalar'}
-        ]
-      }
+      parameters: [
+        { argumentType: ArgumentTypes.SCALAR}
+      ]
     },
     'ISNONTEXT': {
       method: 'isnontext',
-      parameters: {
-        list: [
-          {argumentType: 'scalar'}
-        ]
-      }
+      parameters: [
+        { argumentType: ArgumentTypes.SCALAR}
+      ]
     },
     'INDEX': {
       method: 'index',
@@ -150,7 +127,7 @@ export class InformationPlugin extends FunctionPlugin {
    * @param formulaAddress
    */
   public isbinary(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.parameters('ISBINARY'), (arg: string) =>
+    return this.runFunction(ast.args, formulaAddress, this.metadata('ISBINARY'), (arg: string) =>
       /^[01]{1,10}$/.test(arg)
     )
   }
@@ -164,7 +141,7 @@ export class InformationPlugin extends FunctionPlugin {
    * @param formulaAddress
    */
   public iserr(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.parameters('ISERR'), (arg: InternalScalarValue) =>
+    return this.runFunction(ast.args, formulaAddress, this.metadata('ISERR'), (arg: InternalScalarValue) =>
       (arg instanceof CellError && arg.type !== ErrorType.NA)
     )
   }
@@ -178,7 +155,7 @@ export class InformationPlugin extends FunctionPlugin {
    * @param formulaAddress
    */
   public iserror(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.parameters('ISERROR'), (arg: InternalScalarValue) =>
+    return this.runFunction(ast.args, formulaAddress, this.metadata('ISERROR'), (arg: InternalScalarValue) =>
       (arg instanceof CellError)
     )
   }
@@ -192,7 +169,7 @@ export class InformationPlugin extends FunctionPlugin {
    * @param formulaAddress
    */
   public isformula(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunctionWithReferenceArgument(ast.args, formulaAddress, this.parameters('ISFORMULA'),
+    return this.runFunctionWithReferenceArgument(ast.args, formulaAddress, this.metadata('ISFORMULA'),
       () => new CellError(ErrorType.NA),
       (reference: SimpleCellAddress) => {
         const vertex = this.dependencyGraph.addressMapping.getCell(reference)
@@ -211,7 +188,7 @@ export class InformationPlugin extends FunctionPlugin {
    * @param formulaAddress
    */
   public isblank(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.parameters('ISBLANK'), (arg: InternalScalarValue) =>
+    return this.runFunction(ast.args, formulaAddress, this.metadata('ISBLANK'), (arg: InternalScalarValue) =>
       (arg === EmptyValue)
     )
   }
@@ -225,7 +202,7 @@ export class InformationPlugin extends FunctionPlugin {
    * @param formulaAddress
    */
   public isna(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.parameters('ISNA'), (arg: InternalScalarValue) =>
+    return this.runFunction(ast.args, formulaAddress, this.metadata('ISNA'), (arg: InternalScalarValue) =>
       (arg instanceof CellError && arg.type == ErrorType.NA)
     )
   }
@@ -239,7 +216,7 @@ export class InformationPlugin extends FunctionPlugin {
    * @param formulaAddress
    */
   public isnumber(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.parameters('ISNUMBER'), (arg: InternalScalarValue) =>
+    return this.runFunction(ast.args, formulaAddress, this.metadata('ISNUMBER'), (arg: InternalScalarValue) =>
       (typeof arg === 'number')
     )
   }
@@ -253,7 +230,7 @@ export class InformationPlugin extends FunctionPlugin {
    * @param formulaAddress
    */
   public islogical(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.parameters('ISLOGICAL'), (arg: InternalScalarValue) =>
+    return this.runFunction(ast.args, formulaAddress, this.metadata('ISLOGICAL'), (arg: InternalScalarValue) =>
       (typeof arg === 'boolean')
     )
   }
@@ -267,7 +244,7 @@ export class InformationPlugin extends FunctionPlugin {
    * @param formulaAddress
    */
   public isref(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.parameters('ISREF'), (arg: InternalScalarValue) =>
+    return this.runFunction(ast.args, formulaAddress, this.metadata('ISREF'), (arg: InternalScalarValue) =>
       (arg instanceof CellError && (arg.type == ErrorType.REF || arg.type == ErrorType.CYCLE))
     )
   }
@@ -282,7 +259,7 @@ export class InformationPlugin extends FunctionPlugin {
    * @param formulaAddress
    */
   public istext(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.parameters('ISTEXT'), (arg: InternalScalarValue) =>
+    return this.runFunction(ast.args, formulaAddress, this.metadata('ISTEXT'), (arg: InternalScalarValue) =>
       (typeof arg === 'string')
     )
   }
@@ -296,7 +273,7 @@ export class InformationPlugin extends FunctionPlugin {
    * @param formulaAddress
    */
   public isnontext(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.parameters('ISNONTEXT'), (arg: InternalScalarValue) =>
+    return this.runFunction(ast.args, formulaAddress, this.metadata('ISNONTEXT'), (arg: InternalScalarValue) =>
       (typeof arg !== 'string')
     )
   }
@@ -410,7 +387,7 @@ export class InformationPlugin extends FunctionPlugin {
    * @param formulaAddress
    * */
   public sheet(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunctionWithReferenceArgument(ast.args, formulaAddress, {list: [{argumentType: 'string'}]},
+    return this.runFunctionWithReferenceArgument(ast.args, formulaAddress, {parameters: [{argumentType: ArgumentTypes.STRING}]},
       () => formulaAddress.sheet + 1,
       (reference: SimpleCellAddress) => reference.sheet + 1,
       (value: string) => {
@@ -434,7 +411,7 @@ export class InformationPlugin extends FunctionPlugin {
    * @param formulaAddress
    * */
   public sheets(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunctionWithReferenceArgument(ast.args, formulaAddress, {list: [{argumentType: 'string'}]},
+    return this.runFunctionWithReferenceArgument(ast.args, formulaAddress, {parameters: [{argumentType: ArgumentTypes.STRING}]},
       () => this.dependencyGraph.sheetMapping.numberOfSheets(), // return number of sheets if no argument
       () => 1, // return 1 for valid reference
       () => new CellError(ErrorType.VALUE) // error otherwise

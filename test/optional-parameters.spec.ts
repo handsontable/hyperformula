@@ -1,32 +1,28 @@
 import {ErrorType, HyperFormula} from '../src'
-import {CellError, SimpleCellAddress} from '../src/Cell'
-import {coerceScalarToString} from '../src/interpreter/ArithmeticHelper'
-import {SimpleRangeValue} from '../src/interpreter/InterpreterValue'
-import {FunctionPlugin} from '../src/interpreter/plugin/FunctionPlugin'
-import {AstNodeType, ProcedureAst} from '../src/parser'
+import {SimpleCellAddress} from '../src/Cell'
+import {ArgumentTypes, FunctionPlugin} from '../src/interpreter/plugin/FunctionPlugin'
+import {ProcedureAst} from '../src/parser'
 import {adr, detailedError} from './testUtils'
 
 class FooPlugin extends FunctionPlugin {
   public static implementedFunctions = {
     'FOO': {
       method: 'foo',
-      parameters: {
-        list: [
-          { argumentType: 'string', defaultValue: 'default1'},
-          { argumentType: 'string', defaultValue: 'default2'},
+      parameters: [
+          { argumentType: ArgumentTypes.STRING, defaultValue: 'default1'},
+          { argumentType: ArgumentTypes.STRING, defaultValue: 'default2'},
         ],
-      },
     },
   }
 
   public foo(ast: ProcedureAst, formulaAddress: SimpleCellAddress) {
-    return this.runFunction(ast.args, formulaAddress, this.parameters('FOO'),
+    return this.runFunction(ast.args, formulaAddress, this.metadata('FOO'),
       (arg1, arg2) => arg1+'+'+arg2
     )
   }
 }
 
-describe('Nonexistent parameters', () => {
+describe('Nonexistent metadata', () => {
   it('should work for function', () => {
     HyperFormula.getLanguage('enGB').extendFunctions({FOO: 'FOO'})
     const engine = HyperFormula.buildFromArray([

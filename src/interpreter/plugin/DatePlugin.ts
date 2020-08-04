@@ -8,7 +8,7 @@ import {endOfMonth, offsetMonth} from '../../DateTimeHelper'
 import {format} from '../../format/format'
 import {AstNodeType, ProcedureAst} from '../../parser'
 import {SimpleRangeValue} from '../InterpreterValue'
-import {FunctionPlugin} from './FunctionPlugin'
+import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
 
 /**
  * Interpreter plugin containing date-specific functions
@@ -17,64 +17,50 @@ export class DatePlugin extends FunctionPlugin {
   public static implementedFunctions = {
     'DATE': {
       method: 'date',
-      parameters: {
-        list: [
-          {argumentType: 'number'},
-          {argumentType: 'number'},
-          {argumentType: 'number'},
+      parameters:  [
+          {argumentType: ArgumentTypes.NUMBER},
+          {argumentType: ArgumentTypes.NUMBER},
+          {argumentType: ArgumentTypes.NUMBER},
         ]
-      },
     },
     'MONTH': {
       method: 'month',
-      parameters: {
-        list: [
-          {argumentType: 'number'},
+      parameters: [
+          {argumentType: ArgumentTypes.NUMBER},
         ]
-      },
     },
     'YEAR': {
       method: 'year',
-      parameters: {
-        list: [
-          {argumentType: 'number'},
+      parameters: [
+          {argumentType: ArgumentTypes.NUMBER},
         ]
-      },
     },
     'TEXT': {
       method: 'text',
-      parameters: {
-        list: [
-          {argumentType: 'number'},
-          {argumentType: 'string'},
+      parameters: [
+          {argumentType: ArgumentTypes.NUMBER},
+          {argumentType: ArgumentTypes.STRING},
         ]
-      },
     },
     'EOMONTH': {
       method: 'eomonth',
-      parameters: {
-        list: [
-          {argumentType: 'number'},
-          {argumentType: 'number'},
+      parameters: [
+          {argumentType: ArgumentTypes.NUMBER},
+          {argumentType: ArgumentTypes.NUMBER},
         ]
-      },
     },
     'DAY': {
       method: 'day',
-      parameters: {
-        list: [
-          {argumentType: 'number'},
+      parameters: [
+          {argumentType: ArgumentTypes.NUMBER},
         ]
-      },
     },
     'DAYS': {
       method: 'days',
-      parameters: {
-        list: [
-          {argumentType: 'number'},
-          {argumentType: 'number'},
+      parameters:[
+          {argumentType: ArgumentTypes.NUMBER},
+          {argumentType: ArgumentTypes.NUMBER},
         ]
-      },
     },
   }
 
@@ -87,7 +73,7 @@ export class DatePlugin extends FunctionPlugin {
    * @param formulaAddress
    */
   public date(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.parameters('DATE'), (year, month, day) => {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('DATE'), (year, month, day) => {
       const d = Math.trunc(day)
       let m = Math.trunc(month)
       let y = Math.trunc(year)
@@ -110,20 +96,20 @@ export class DatePlugin extends FunctionPlugin {
   }
 
   public eomonth(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.parameters('EOMONTH'), (dateNumber, numberOfMonthsToShift) => {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('EOMONTH'), (dateNumber, numberOfMonthsToShift) => {
       const date = this.interpreter.dateHelper.numberToSimpleDate(dateNumber)
       return this.interpreter.dateHelper.dateToNumber(endOfMonth(offsetMonth(date, numberOfMonthsToShift)))
     })
   }
 
   public day(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.parameters('DAY'),
+    return this.runFunction(ast.args, formulaAddress, this.metadata('DAY'),
       (dateNumber) => this.interpreter.dateHelper.numberToSimpleDate(dateNumber).day
     )
   }
 
   public days(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.parameters('DAYS'), (endDate, startDate) => endDate - startDate)
+    return this.runFunction(ast.args, formulaAddress, this.metadata('DAYS'), (endDate, startDate) => endDate - startDate)
   }
 
   /**
@@ -135,7 +121,7 @@ export class DatePlugin extends FunctionPlugin {
    * @param formulaAddress
    */
   public month(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.parameters('MONTH'),
+    return this.runFunction(ast.args, formulaAddress, this.metadata('MONTH'),
       (dateNumber) => this.interpreter.dateHelper.numberToSimpleDate(dateNumber).month
     )
   }
@@ -149,7 +135,7 @@ export class DatePlugin extends FunctionPlugin {
    * @param formulaAddress
    */
   public year(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.parameters('YEAR'),
+    return this.runFunction(ast.args, formulaAddress, this.metadata('YEAR'),
       (dateNumber) => this.interpreter.dateHelper.numberToSimpleDate(dateNumber).year
     )
   }
@@ -163,7 +149,7 @@ export class DatePlugin extends FunctionPlugin {
    * @param formulaAddress
    */
   public text(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.parameters('TEXT'),
+    return this.runFunction(ast.args, formulaAddress, this.metadata('TEXT'),
       (numberRepresentation, formatArg) =>format(numberRepresentation, formatArg, this.config, this.interpreter.dateHelper)
     )
   }

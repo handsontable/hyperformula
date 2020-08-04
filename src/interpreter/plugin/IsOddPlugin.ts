@@ -5,22 +5,20 @@
 
 import {InternalScalarValue, SimpleCellAddress} from '../../Cell'
 import {ProcedureAst} from '../../parser'
-import {FunctionPlugin} from './FunctionPlugin'
+import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
 
 export class IsOddPlugin extends FunctionPlugin {
   public static implementedFunctions = {
     'ISODD': {
       method: 'isodd',
-      parameters: {
-        list: [
-          {argumentType: 'number'}
+      parameters: [
+          {argumentType: ArgumentTypes.NUMBER}
         ]
-      }
     },
   }
 
   public isodd(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.parameters('ISODD'),
+    return this.runFunction(ast.args, formulaAddress, this.metadata('ISODD'),
       (val) => (val % 2 === 1)
     )
   }

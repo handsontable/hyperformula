@@ -21,10 +21,20 @@ export interface ImplementedFunctions {
 
 export interface FunctionMetadata {
   method: string,
-  parameters?: FunctionArgumentsDefinition,
+  parameters?: FunctionArgument[],
   isVolatile?: boolean,
   isDependentOnSheetStructureChange?: boolean,
   doesNotNeedArgumentsToBeComputed?: boolean,
+
+  /**
+   * Used for functions with variable number of arguments -- last defined argument is repeated indefinitely.
+   */
+  repeatLastArg?: boolean,
+
+  /**
+   * Ranges in arguments are inlined to (possibly multiple) scalar arguments.
+   */
+  expandRanges?: boolean,
 }
 
 export interface FunctionPluginDefinition {
@@ -33,21 +43,76 @@ export interface FunctionPluginDefinition {
   implementedFunctions: ImplementedFunctions,
 }
 
-export type ArgumentTypes = 'string' | 'number' | 'boolean' | 'scalar' | 'noerror' | 'range' | 'integer'
+export enum ArgumentTypes {
 
-export interface FunctionArgumentsDefinition {
-  list: FunctionArgument[],
-  repeatedArg?: boolean,
-  expandRanges?: boolean,
+  /**
+   * String type.
+   */
+  STRING = 'STRING',
+
+  /**
+   * Floating point type.
+   */
+  NUMBER = 'NUMBER',
+
+  /**
+   * Boolean type.
+   */
+  BOOLEAN = 'BOOLEAN',
+
+  /**
+   * Any non-range value.
+   */
+  SCALAR = 'SCALAR',
+
+  /**
+   * Any non-range, no-error type.
+   */
+  NOERROR = 'NOERROR',
+
+  /**
+   * Range type.
+   */
+  RANGE = 'RANGE',
+
+  /**
+   * Integer type.
+   */
+  INTEGER = 'INTEGER',
 }
 
 export interface FunctionArgument {
-  argumentType: string,
+  argumentType: ArgumentTypes,
+
+  /**
+   * If argument is missing, its value defaults to this.
+   */
   defaultValue?: InternalScalarValue,
+
+  /**
+   * If argument is missing, and no defaultValue provided, undefined is supplied as a value, instead of throwing an error.
+   * Logically equivalent to setting defaultValue = undefined.
+   */
   optionalArg?: boolean,
+
+  /**
+   * Numeric argument needs to be greater-equal than this.
+   */
   minValue?: number,
+
+  /**
+   * Numeric argument needs to be less-equal than this.
+   */
   maxValue?: number,
+
+  /**
+   * Numeric argument needs to be less than this.
+   */
   lessThan?: number,
+
+  /**
+   * Numeric argument needs to be greater than this.
+   */
   greaterThan?: number,
 }
 
@@ -110,15 +175,15 @@ export abstract class FunctionPlugin {
 
   public coerceToType(arg: InterpreterValue, coercedType: FunctionArgument): Maybe<InterpreterValue> {
     if(arg instanceof SimpleRangeValue) {
-      if(coercedType.argumentType === 'range') {
+      if(coercedType.argumentType === ArgumentTypes.RANGE) {
         return arg
       } else {
         return undefined
       }
     } else {
-      switch (coercedType.argumentType as ArgumentTypes) {
-        case 'integer':
-        case 'number':
+      switch (coercedType.argumentType) {
+        case ArgumentTypes.INTEGER:
+        case ArgumentTypes.NUMBER:
           // eslint-disable-next-line no-case-declarations
           const value = this.coerceScalarToNumberOrError(arg)
           if(typeof value !== 'number') {
@@ -136,19 +201,19 @@ export abstract class FunctionPlugin {
           if (coercedType.greaterThan !== undefined && value <= coercedType.greaterThan) {
             return new CellError(ErrorType.NUM)
           }
-          if(coercedType.argumentType === 'integer' && !Number.isInteger(value)) {
+          if(coercedType.argumentType === ArgumentTypes.INTEGER && !Number.isInteger(value)) {
             return new CellError(ErrorType.NUM)
           }
           return value
-        case 'string':
+        case ArgumentTypes.STRING:
           return coerceScalarToString(arg)
-        case 'boolean':
+        case ArgumentTypes.BOOLEAN:
           return coerceScalarToBoolean(arg)
-        case 'scalar':
+        case ArgumentTypes.SCALAR:
           return arg
-        case 'noerror':
+        case ArgumentTypes.NOERROR:
           return arg
-        case 'range':
+        case ArgumentTypes.RANGE:
           return undefined
       }
     }
@@ -157,10 +222,10 @@ export abstract class FunctionPlugin {
   protected runFunction = (
     args: Ast[],
     formulaAddress: SimpleCellAddress,
-    functionDefinition: FunctionArgumentsDefinition,
+    functionDefinition: FunctionMetadata,
     fn: (...arg: any) => InternalScalarValue
   ) => {
-    const argumentDefinitions: FunctionArgument[] = functionDefinition.list
+    const argumentDefinitions: FunctionArgument[] = functionDefinition.parameters!
     let scalarValues: [InterpreterValue, boolean][]
 
     if(functionDefinition.expandRanges) {
@@ -172,7 +237,7 @@ export abstract class FunctionPlugin {
     const coercedArguments: Maybe<InterpreterValue>[] = []
 
     let argCoerceFailure: Maybe<CellError> = undefined
-    if(!functionDefinition.repeatedArg && argumentDefinitions.length < scalarValues.length) {
+    if(!functionDefinition.repeatLastArg && argumentDefinitions.length < scalarValues.length) {
       return new CellError(ErrorType.NA)
     }
     for(let i=0; i<Math.max(scalarValues.length, argumentDefinitions.length); i++) {
@@ -192,7 +257,7 @@ export abstract class FunctionPlugin {
         //we apply coerce only to non-default values
         const coercedArg = val !== undefined ? this.coerceToType(arg, argumentDefinitions[j]) : arg
         if(coercedArg !== undefined) {
-          if (coercedArg instanceof CellError && argumentDefinitions[j].argumentType !== 'scalar') {
+          if (coercedArg instanceof CellError && argumentDefinitions[j].argumentType !== ArgumentTypes.SCALAR) {
             //if this is first error encountered, store it
             argCoerceFailure = argCoerceFailure ?? coercedArg
           }
@@ -210,7 +275,7 @@ export abstract class FunctionPlugin {
   protected runFunctionWithReferenceArgument = (
     args: Ast[],
     formulaAddress: SimpleCellAddress,
-    argumentDefinitions: FunctionArgumentsDefinition,
+    argumentDefinitions: FunctionMetadata,
     noArgCallback: () => InternalScalarValue,
     referenceCallback: (reference: SimpleCellAddress) => InternalScalarValue,
     nonReferenceCallback: (...arg: any) => InternalScalarValue
@@ -241,8 +306,8 @@ export abstract class FunctionPlugin {
     return this.runFunction(args, formulaAddress, argumentDefinitions, nonReferenceCallback)
   }
 
-  protected parameters(name: string): FunctionArgumentsDefinition {
-    const params = (this.constructor as FunctionPluginDefinition).implementedFunctions[name]?.parameters
+  protected metadata(name: string): FunctionMetadata {
+    const params = (this.constructor as FunctionPluginDefinition).implementedFunctions[name]
     if (params !== undefined) {
       return params
     }

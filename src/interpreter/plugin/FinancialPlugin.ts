@@ -5,76 +5,68 @@
 
 import {InternalScalarValue, SimpleCellAddress} from '../../Cell'
 import {ProcedureAst} from '../../parser'
-import {FunctionPlugin} from './FunctionPlugin'
+import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
 
 export class FinancialPlugin extends FunctionPlugin {
   public static implementedFunctions = {
     'PMT': {
       method: 'pmt',
-      parameters: {
-        list: [
-          {argumentType: 'number'},
-          {argumentType: 'number'},
-          {argumentType: 'number'},
-          {argumentType: 'number', defaultValue: 0},
-          {argumentType: 'number', defaultValue: 0},
+      parameters: [
+          {argumentType: ArgumentTypes.NUMBER},
+          {argumentType: ArgumentTypes.NUMBER},
+          {argumentType: ArgumentTypes.NUMBER},
+          {argumentType: ArgumentTypes.NUMBER, defaultValue: 0},
+          {argumentType: ArgumentTypes.NUMBER, defaultValue: 0},
         ]
-      },
     },
     'IPMT': {
       method: 'ipmt',
-      parameters: {
-        list: [
-          {argumentType: 'number'},
-          {argumentType: 'number'},
-          {argumentType: 'number'},
-          {argumentType: 'number'},
-          {argumentType: 'number', defaultValue: 0},
-          {argumentType: 'number', defaultValue: 0},
+      parameters: [
+          {argumentType: ArgumentTypes.NUMBER},
+          {argumentType: ArgumentTypes.NUMBER},
+          {argumentType: ArgumentTypes.NUMBER},
+          {argumentType: ArgumentTypes.NUMBER},
+          {argumentType: ArgumentTypes.NUMBER, defaultValue: 0},
+          {argumentType: ArgumentTypes.NUMBER, defaultValue: 0},
         ]
-      },
     },
     'PPMT': {
       method: 'ppmt',
-      parameters: {
-        list: [
-          {argumentType: 'number'},
-          {argumentType: 'number'},
-          {argumentType: 'number'},
-          {argumentType: 'number'},
-          {argumentType: 'number', defaultValue: 0},
-          {argumentType: 'number', defaultValue: 0},
+      parameters: [
+          {argumentType: ArgumentTypes.NUMBER},
+          {argumentType: ArgumentTypes.NUMBER},
+          {argumentType: ArgumentTypes.NUMBER},
+          {argumentType: ArgumentTypes.NUMBER},
+          {argumentType: ArgumentTypes.NUMBER, defaultValue: 0},
+          {argumentType: ArgumentTypes.NUMBER, defaultValue: 0},
         ]
-      },
     },
     'FV': {
       method: 'fv',
-      parameters: {
-        list: [
-          {argumentType: 'number'},
-          {argumentType: 'number'},
-          {argumentType: 'number'},
-          {argumentType: 'number', defaultValue: 0},
-          {argumentType: 'number', defaultValue: 0},
+      parameters: [
+          {argumentType: ArgumentTypes.NUMBER},
+          {argumentType: ArgumentTypes.NUMBER},
+          {argumentType: ArgumentTypes.NUMBER},
+          {argumentType: ArgumentTypes.NUMBER, defaultValue: 0},
+          {argumentType: ArgumentTypes.NUMBER, defaultValue: 0},
         ]
-      },
     },
   }
 
   public pmt(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.parameters('PMT'), pmtCore)
+    return this.runFunction(ast.args, formulaAddress, this.metadata('PMT'), pmtCore)
   }
 
   public ipmt(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.parameters('IPMT'), ipmtCore)
+    return this.runFunction(ast.args, formulaAddress, this.metadata('IPMT'), ipmtCore)
   }
 
   public ppmt(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.parameters('PPMT'), ppmtCore)
+    return this.runFunction(ast.args, formulaAddress, this.metadata('PPMT'), ppmtCore)
   }
 
   public fv(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.parameters('FV'), fvCore)
+    return this.runFunction(ast.args, formulaAddress, this.metadata('FV'), fvCore)
   }
 }
 

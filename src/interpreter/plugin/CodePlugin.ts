@@ -5,22 +5,20 @@
 
 import {CellError, ErrorType, InternalScalarValue, SimpleCellAddress} from '../../Cell'
 import {ProcedureAst} from '../../parser'
-import {FunctionPlugin} from './FunctionPlugin'
+import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
 
 export class CodePlugin extends FunctionPlugin {
   public static implementedFunctions = {
     'CODE': {
       method: 'code',
-      parameters: {
-        list: [
-          {argumentType: 'string'}
+      parameters: [
+          {argumentType: ArgumentTypes.STRING}
         ]
-      },
     },
   }
 
   public code(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.parameters('CODE'), (value: string) => {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('CODE'), (value: string) => {
       if (value.length === 0) {
         return new CellError(ErrorType.VALUE)
       }
