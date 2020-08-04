@@ -14,14 +14,27 @@ describe('Function OR', () => {
     expect(engine.getCellValue(adr('D1'))).toEqual(detailedError(ErrorType.VALUE))
   })
 
-  it('use coercion', () => {
+  it('use coercion #1', () => {
     const engine = HyperFormula.buildFromArray([
       ['=OR("TRUE", 0)'],
       ['=OR("foo", 0)'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toBe(true)
-    expect(engine.getCellValue(adr('A2'))).toBe(false)
+    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.VALUE))
+  })
+
+  it('use coercion #2', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=OR(A4:B4)'],
+      ['=OR(C4:D4)'],
+      ['=OR(C4:D4, "foo")'],
+      ['TRUE', 1, 'foo', '=TRUE()'],
+    ])
+
+    expect(engine.getCellValue(adr('A1'))).toBe(true)
+    expect(engine.getCellValue(adr('A2'))).toBe(true)
+    expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.VALUE))
   })
 
   it('function OR with numerical arguments', () => {

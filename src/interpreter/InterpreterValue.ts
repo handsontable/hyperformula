@@ -25,7 +25,17 @@ export class ArrayData {
     return this._hasOnlyNumbers
   }
 
-  public* valuesFromTopLeftCorner(): IterableIterator<InternalScalarValue> {
+  public valuesFromTopLeftCorner(): InternalScalarValue[] {
+    const ret = []
+    for (let i = 0; i < this.size.height; i++) {
+      for (let j = 0; j < this.size.width; j++) {
+        ret.push(this.data[i][j])
+      }
+    }
+    return ret
+  }
+
+  public* iterateValuesFromTopLeftCorner(): IterableIterator<InternalScalarValue> {
     for (let i = 0; i < this.size.height; i++) {
       for (let j = 0; j < this.size.width; j++) {
         yield this.data[i][j]
@@ -76,7 +86,7 @@ export class OnlyRangeData {
     this.ensureThatComputed()
 
     if (this._hasOnlyNumbers === undefined) {
-      for (const v of this.valuesFromTopLeftCorner()) {
+      for (const v of this.iterateValuesFromTopLeftCorner()) {
         if (typeof v !== 'number') {
           this._hasOnlyNumbers = false
           break
@@ -92,7 +102,20 @@ export class OnlyRangeData {
     return this._range
   }
 
-  public* valuesFromTopLeftCorner(): IterableIterator<InternalScalarValue> {
+  public valuesFromTopLeftCorner(): InternalScalarValue[] {
+    this.ensureThatComputed()
+
+    const ret = []
+    for (let i = 0; i < this.data!.length; i++) {
+      for (let j = 0; j < this.data![0].length; j++) {
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        ret.push(this.data![i][j])
+      }
+    }
+    return ret
+  }
+
+  public* iterateValuesFromTopLeftCorner(): IterableIterator<InternalScalarValue> {
     this.ensureThatComputed()
 
     for (let i = 0; i < this.data!.length; i++) {
@@ -178,8 +201,12 @@ export class SimpleRangeValue {
     return this.data.raw()
   }
 
-  public* valuesFromTopLeftCorner(): IterableIterator<InternalScalarValue> {
-    yield *this.data.valuesFromTopLeftCorner()
+  public valuesFromTopLeftCorner(): InternalScalarValue[] {
+    return this.data.valuesFromTopLeftCorner()
+  }
+
+  public* iterateValuesFromTopLeftCorner(): IterableIterator<InternalScalarValue> {
+    yield *this.data.iterateValuesFromTopLeftCorner()
   }
 
   public numberOfElements(): number {

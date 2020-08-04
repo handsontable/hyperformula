@@ -38,8 +38,8 @@ export class SumprodPlugin extends FunctionPlugin {
   private reduceSumprod(left: SimpleRangeValue, right: SimpleRangeValue): number | CellError {
     let result = 0
 
-    const lit = left.valuesFromTopLeftCorner()
-    const rit = right.valuesFromTopLeftCorner()
+    const lit = left.iterateValuesFromTopLeftCorner()
+    const rit = right.iterateValuesFromTopLeftCorner()
     let l, r
 
     while (l = lit.next(), r = rit.next(), !l.done && !r.done) {

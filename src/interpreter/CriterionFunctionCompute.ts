@@ -108,7 +108,7 @@ export class CriterionFunctionCompute<T> {
   private evaluateRangeValue(simpleValuesRange: SimpleRangeValue, conditions: Condition[]) {
     const criterionLambdas = conditions.map((condition) => condition.criterionPackage.lambda)
     const values = Array.from(simpleValuesRange.valuesFromTopLeftCorner()).map(this.mapFunction)[Symbol.iterator]()
-    const conditionsIterators = conditions.map((condition) => condition.conditionRange.valuesFromTopLeftCorner())
+    const conditionsIterators = conditions.map((condition) => condition.conditionRange.iterateValuesFromTopLeftCorner())
     const filteredValues = ifFilter(criterionLambdas, conditionsIterators, values)
     return this.reduceFunction(filteredValues)
   }

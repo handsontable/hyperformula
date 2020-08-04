@@ -4,7 +4,7 @@
  */
 
 import {
-  FunctionArgumentDefinition,
+  FunctionArgument,
   FunctionMetadata,
   FunctionPlugin,
   FunctionPluginDefinition,
@@ -14,7 +14,7 @@ import {FunctionTranslationsPackage} from './FunctionRegistry'
 
 export { 
   FunctionPluginDefinition,
-  FunctionArgumentDefinition,
+  FunctionArgument,
   FunctionPlugin,
   ImplementedFunctions,
   FunctionMetadata,
