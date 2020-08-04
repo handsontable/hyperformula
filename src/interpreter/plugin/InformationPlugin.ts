@@ -5,6 +5,7 @@
 
 import {AbsoluteCellRange} from '../../AbsoluteCellRange'
 import {CellError, EmptyValue, ErrorType, InternalScalarValue, SimpleCellAddress} from '../../Cell'
+import {FormulaCellVertex, MatrixVertex} from '../../DependencyGraph'
 import {AstNodeType, ProcedureAst} from '../../parser'
 import {InterpreterValue} from '../InterpreterValue'
 import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
@@ -14,6 +15,42 @@ import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
  */
 export class InformationPlugin extends FunctionPlugin {
   public static implementedFunctions = {
+    'COLUMNS': {
+      method: 'columns',
+      isDependentOnSheetStructureChange: true,
+      doesNotNeedArgumentsToBeComputed: true,
+    },
+    'ISBINARY': {
+      method: 'isbinary',
+      parameters: [
+        {argumentType: ArgumentTypes.STRING}
+      ]
+    },
+    'ISERR': {
+      method: 'iserr',
+      parameters:  [
+        {argumentType: ArgumentTypes.SCALAR}
+      ]
+    },
+    'ISFORMULA': {
+      method: 'isformula',
+      parameters:  [
+        {argumentType: ArgumentTypes.NOERROR}
+      ],
+      doesNotNeedArgumentsToBeComputed: true
+    },
+    'ISNA': {
+      method: 'isna',
+      parameters: [
+        {argumentType: ArgumentTypes.SCALAR}
+      ]
+    },
+    'ISREF': {
+      method: 'isref',
+      parameters:[
+        {argumentType: ArgumentTypes.SCALAR}
+      ]
+    },
     'ISERROR': {
       method: 'iserror',
       parameters: [
@@ -50,19 +87,59 @@ export class InformationPlugin extends FunctionPlugin {
         { argumentType: ArgumentTypes.SCALAR}
       ]
     },
-    'COLUMNS': {
-      method: 'columns',
-      isDependentOnSheetStructureChange: true,
-      doesNotNeedArgumentsToBeComputed: true,
+    'INDEX': {
+      method: 'index',
+    },
+    'NA': {
+      method: 'na'
     },
     'ROWS': {
       method: 'rows',
       isDependentOnSheetStructureChange: true,
       doesNotNeedArgumentsToBeComputed: true,
     },
-    'INDEX': {
-      method: 'index',
+    'SHEET': {
+      method: 'sheet',
+      parameters:  [
+        {argumentType: ArgumentTypes.NOERROR}
+      ],
+      doesNotNeedArgumentsToBeComputed: true
     },
+    'SHEETS': {
+      method: 'sheets',
+      parameters: [
+        {argumentType: ArgumentTypes.NOERROR}
+      ],
+      doesNotNeedArgumentsToBeComputed: true
+    }
+  }
+
+  /**
+   * Corresponds to ISBINARY(value)
+   *
+   * Returns true if provided value is a valid binary number
+   *
+   * @param ast
+   * @param formulaAddress
+   */
+  public isbinary(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('ISBINARY'), (arg: string) =>
+      /^[01]{1,10}$/.test(arg)
+    )
+  }
+
+  /**
+   * Corresponds to ISERR(value)
+   *
+   * Returns true if provided value is an error except #N/A!
+   *
+   * @param ast
+   * @param formulaAddress
+   */
+  public iserr(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('ISERR'), (arg: InternalScalarValue) =>
+      (arg instanceof CellError && arg.type !== ErrorType.NA)
+    )
   }
 
   /**
@@ -80,6 +157,25 @@ export class InformationPlugin extends FunctionPlugin {
   }
 
   /**
+   * Corresponds to ISFORMULA(value)
+   *
+   * Checks whether referenced cell is a formula
+   *
+   * @param ast
+   * @param formulaAddress
+   */
+  public isformula(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunctionWithReferenceArgument(ast.args, formulaAddress, this.metadata('ISFORMULA'),
+      () => new CellError(ErrorType.NA),
+      (reference: SimpleCellAddress) => {
+        const vertex = this.dependencyGraph.addressMapping.getCell(reference)
+        return vertex instanceof FormulaCellVertex || (vertex instanceof MatrixVertex && vertex.isFormula())
+      },
+      () => new CellError(ErrorType.NA)
+    )
+  }
+
+  /**
    * Corresponds to ISBLANK(value)
    *
    * Checks whether provided cell reference is empty
@@ -90,6 +186,20 @@ export class InformationPlugin extends FunctionPlugin {
   public isblank(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.runFunction(ast.args, formulaAddress, this.metadata('ISBLANK'), (arg: InternalScalarValue) =>
       (arg === EmptyValue)
+    )
+  }
+
+  /**
+   * Corresponds to ISNA(value)
+   *
+   * Returns true if provided value is #N/A! error
+   *
+   * @param ast
+   * @param formulaAddress
+   */
+  public isna(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('ISNA'), (arg: InternalScalarValue) =>
+      (arg instanceof CellError && arg.type == ErrorType.NA)
     )
   }
 
@@ -120,6 +230,21 @@ export class InformationPlugin extends FunctionPlugin {
       (typeof arg === 'boolean')
     )
   }
+
+  /**
+   * Corresponds to ISREF(value)
+   *
+   * Returns true if provided value is #REF! error
+   *
+   * @param ast
+   * @param formulaAddress
+   */
+  public isref(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('ISREF'), (arg: InternalScalarValue) =>
+      (arg instanceof CellError && (arg.type == ErrorType.REF || arg.type == ErrorType.CYCLE))
+    )
+  }
+
 
   /**
    * Corresponds to ISTEXT(value)
@@ -234,5 +359,57 @@ export class InformationPlugin extends FunctionPlugin {
 
     const address = range.getAddress(columnValue - 1, rowValue - 1)
     return this.dependencyGraph.getCellValue(address)
+  }
+
+  /**
+   * Corresponds to NA()
+   *
+   * Returns #N/A!
+   *
+   * @param _ast
+   * @param _formulaAddress
+   */
+  public na(_ast: ProcedureAst, _formulaAddress: SimpleCellAddress): CellError {
+    return new CellError(ErrorType.NA)
+  }
+
+  /**
+   * Corresponds to SHEET(value)
+   *
+   * Returns sheet number of a given value or a formula sheet number if no argument is provided
+   *
+   * @param ast
+   * @param formulaAddress
+   * */
+  public sheet(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunctionWithReferenceArgument(ast.args, formulaAddress, {parameters: [{argumentType: ArgumentTypes.STRING}]},
+      () => formulaAddress.sheet + 1,
+      (reference: SimpleCellAddress) => reference.sheet + 1,
+      (value: string) => {
+        const sheetNumber = this.dependencyGraph.sheetMapping.get(value)
+        if (sheetNumber !== undefined) {
+          return sheetNumber + 1
+        } else {
+          return new CellError(ErrorType.NA)
+        }
+      }
+    )
+  }
+
+  /**
+   * Corresponds to SHEETS(value)
+   *
+   * Returns number of sheet of a given reference or number of all sheets in workbook when no argument is provided.
+   * It returns always 1 for a valid reference as 3D references are not supported.
+   *
+   * @param ast
+   * @param formulaAddress
+   * */
+  public sheets(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunctionWithReferenceArgument(ast.args, formulaAddress, {parameters: [{argumentType: ArgumentTypes.STRING}]},
+      () => this.dependencyGraph.sheetMapping.numberOfSheets(), // return number of sheets if no argument
+      () => 1, // return 1 for valid reference
+      () => new CellError(ErrorType.VALUE) // error otherwise
+    )
   }
 }
