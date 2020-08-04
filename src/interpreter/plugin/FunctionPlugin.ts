@@ -19,13 +19,8 @@ export interface ImplementedFunctions {
   [formulaId: string]: FunctionMetadata,
 }
 
-export interface FunctionMetadata {
-  method: string,
+export interface FunctionArguments {
   parameters?: FunctionArgument[],
-  isVolatile?: boolean,
-  isDependentOnSheetStructureChange?: boolean,
-  doesNotNeedArgumentsToBeComputed?: boolean,
-
   /**
    * Used for functions with variable number of arguments -- last defined argument is repeated indefinitely.
    */
@@ -35,6 +30,13 @@ export interface FunctionMetadata {
    * Ranges in arguments are inlined to (possibly multiple) scalar arguments.
    */
   expandRanges?: boolean,
+}
+
+export interface FunctionMetadata extends FunctionArguments{
+  method: string,
+  isVolatile?: boolean,
+  isDependentOnSheetStructureChange?: boolean,
+  doesNotNeedArgumentsToBeComputed?: boolean,
 }
 
 export interface FunctionPluginDefinition {
@@ -222,7 +224,7 @@ export abstract class FunctionPlugin {
   protected runFunction = (
     args: Ast[],
     formulaAddress: SimpleCellAddress,
-    functionDefinition: FunctionMetadata,
+    functionDefinition: FunctionArguments,
     fn: (...arg: any) => InternalScalarValue
   ) => {
     const argumentDefinitions: FunctionArgument[] = functionDefinition.parameters!
@@ -275,7 +277,7 @@ export abstract class FunctionPlugin {
   protected runFunctionWithReferenceArgument = (
     args: Ast[],
     formulaAddress: SimpleCellAddress,
-    argumentDefinitions: FunctionMetadata,
+    argumentDefinitions: FunctionArguments,
     noArgCallback: () => InternalScalarValue,
     referenceCallback: (reference: SimpleCellAddress) => InternalScalarValue,
     nonReferenceCallback: (...arg: any) => InternalScalarValue
