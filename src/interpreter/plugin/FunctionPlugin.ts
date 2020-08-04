@@ -9,7 +9,7 @@ import {ColumnSearchStrategy} from '../../ColumnSearch/ColumnSearchStrategy'
 import {Config} from '../../Config'
 import {DependencyGraph} from '../../DependencyGraph'
 import {Maybe} from '../../Maybe'
-import {Ast, ProcedureAst} from '../../parser'
+import {Ast, AstNodeType, ProcedureAst} from '../../parser'
 import {coerceScalarToBoolean, coerceScalarToString} from '../ArithmeticHelper'
 import {Interpreter} from '../Interpreter'
 import {InterpreterValue, SimpleRangeValue} from '../InterpreterValue'
@@ -19,7 +19,20 @@ export interface ImplementedFunctions {
   [formulaId: string]: FunctionMetadata,
 }
 
-export interface FunctionMetadata {
+export interface FunctionArguments {
+  parameters?: FunctionArgument[],
+  /**
+   * Used for functions with variable number of arguments -- last defined argument is repeated indefinitely.
+   */
+  repeatLastArg?: boolean,
+
+  /**
+   * Ranges in arguments are inlined to (possibly multiple) scalar arguments.
+   */
+  expandRanges?: boolean,
+}
+
+export interface FunctionMetadata extends FunctionArguments{
   method: string,
   parameters?: FunctionArgument[],
   isVolatile?: boolean,
@@ -222,7 +235,7 @@ export abstract class FunctionPlugin {
   protected runFunction = (
     args: Ast[],
     formulaAddress: SimpleCellAddress,
-    functionDefinition: FunctionMetadata,
+    functionDefinition: FunctionArguments,
     fn: (...arg: any) => InternalScalarValue
   ) => {
     const argumentDefinitions: FunctionArgument[] = functionDefinition.parameters!
@@ -270,6 +283,40 @@ export abstract class FunctionPlugin {
     }
 
     return argCoerceFailure ?? fn(...coercedArguments)
+  }
+
+  protected runFunctionWithReferenceArgument = (
+    args: Ast[],
+    formulaAddress: SimpleCellAddress,
+    argumentDefinitions: FunctionArguments,
+    noArgCallback: () => InternalScalarValue,
+    referenceCallback: (reference: SimpleCellAddress) => InternalScalarValue,
+    nonReferenceCallback: (...arg: any) => InternalScalarValue
+  ) => {
+    if (args.length === 0) {
+      return noArgCallback()
+    } else if (args.length > 1) {
+      return new CellError(ErrorType.NA)
+    }
+    const arg = args[0]
+
+    let cellReference: Maybe<SimpleCellAddress>
+
+    if (arg.type === AstNodeType.CELL_REFERENCE) {
+      cellReference = arg.reference.toSimpleCellAddress(formulaAddress)
+    } else if (arg.type === AstNodeType.CELL_RANGE || arg.type === AstNodeType.COLUMN_RANGE || arg.type === AstNodeType.ROW_RANGE) {
+      try {
+        cellReference = AbsoluteCellRange.fromAst(arg, formulaAddress).start
+      } catch (e) {
+        return new CellError(ErrorType.REF)
+      }
+    }
+
+    if (cellReference !== undefined) {
+      return referenceCallback(cellReference)
+    }
+
+    return this.runFunction(args, formulaAddress, argumentDefinitions, nonReferenceCallback)
   }
 
   protected metadata(name: string): FunctionMetadata {

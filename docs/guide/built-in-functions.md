@@ -81,14 +81,22 @@ lets you design your own [custom functions](custom-functions).
 | DELTA | Engineering | Returns TRUE (1) if both numbers are equal, otherwise returns FALSE (0). | DELTA(Number_1; Number_2) |
 | ERF | Engineering | Returns values of the Gaussian error integral. | ERF(Lower_Limit; Upper_Limit) |
 | ERFC | Engineering | Returns complementary values of the Gaussian error integral between x and infinity. | ERFC(Lower_Limit) |
+| ISBINARY | Information | Returns TRUE if provided value is a valid binary number. | ISBINARY(Value) |
 | ISBLANK | Information | Returns TRUE if the reference to a cell is blank. | ISBLANK(Value) |
-| ISERROR | Information | The ISERROR tests if the cells contain general error values. | ISERROR(Value) |
+| ISERR | Information | Returns TRUE if the value is error value except #N/A!. | ISERR(Value) |
+| ISERROR | Information | Returns TRUE if the value is general error value. | ISERROR(Value) |
 | ISEVEN | Information | Returns TRUE if the value is an even integer, or FALSE if the value is odd. | ISEVEN(Value) |
+| ISFORMULA | Information | Checks whether referenced cell is a formula. | ISFORMULA(Value) |
 | ISLOGICAL | Information | Tests for a logical value (TRUE or FALSE). | ISLOGICAL(Value) |
+| ISNA | Information | Returns TRUE if the value is #N/A! error. | ISNA(Value) |
 | ISNONTEXT | Information | Tests if the cell contents are text or numbers, and returns FALSE if the contents are text. | ISNONTEXT(Value) |
 | ISNUMBER | Information | Returns TRUE if the value refers to a number. | ISNUMBER(Value) |
 | ISODD | Information | Returns TRUE if the value is odd, or FALSE if the number is even. | ISODD(Value) |
-| ISTEXT | Information | Returns TRUE if the cell contents refer to text.| ISTEXT(Value) |
+| ISREF | Information | Returns TRUE if provided value is #REF! error. | ISREF(Value) |
+| ISTEXT | Information | Returns TRUE if the cell contents refer to text. | ISTEXT(Value) |
+| SHEET | Information | Returns sheet number of a given value or a formula sheet number if no argument is provided. | SHEET([Value]) |
+| SHEETS | Information | Returns number of sheet of a given reference or number of all sheets in workbook when no argument is provided. | SHEETS([Value]) |
+| NA | Information | Returns #N/A! error value.| NA(Value) |
 | FV | Financial | Returns the future value of an investment. | FV(Rate; Nper; Pmt[; Pv;[ Type]]) |
 | IPMT | Financial | Calculates the interest portion of a given loan payment in a given payment period. | IPMT(Rate; Per; Nper; Pv[; Fv[; Type]]) |
 | PMT | Financial | Returns the periodic payment for a loan. | PMT(Rate; Nper; Pv[; Fv[; Type]]) |
