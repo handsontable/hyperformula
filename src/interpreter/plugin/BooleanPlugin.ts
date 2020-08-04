@@ -15,98 +15,80 @@ export class BooleanPlugin extends FunctionPlugin {
   public static implementedFunctions = {
     'TRUE': {
       method: 'literalTrue',
-      parameters: {list: []},
+      parameters: [],
     },
     'FALSE': {
       method: 'literalFalse',
-      parameters: {list: []},
+      parameters: [],
     },
     'IF': {
       method: 'conditionalIf',
-      parameters: {
-        list: [
+      parameters: [
           {argumentType: ArgumentTypes.BOOLEAN},
           {argumentType: ArgumentTypes.SCALAR},
           {argumentType: ArgumentTypes.SCALAR, defaultValue: false},
-        ]
-      },
+        ],
     },
     'AND': {
       method: 'and',
-      parameters: {
-        list: [
+      parameters: [
           {argumentType: ArgumentTypes.BOOLEAN},
         ],
         repeatLastArg: true,
         expandRanges: true,
-      },
     },
     'OR': {
       method: 'or',
-      parameters: {
-        list: [
+      parameters: [
           {argumentType: ArgumentTypes.BOOLEAN},
         ],
         repeatLastArg: true,
         expandRanges: true,
-      },
     },
     'XOR': {
       method: 'xor',
-      parameters: {
-        list: [
+      parameters: [
           {argumentType: ArgumentTypes.BOOLEAN},
         ],
         repeatLastArg: true,
         expandRanges: true,
-      },
     },
     'NOT': {
       method: 'not',
-      parameters: {
-        list: [
+      parameters:  [
           {argumentType: ArgumentTypes.BOOLEAN},
         ]
-      },
     },
     'SWITCH': {
       method: 'switch',
-      parameters: {
-        list: [
+      parameters: [
           {argumentType: ArgumentTypes.NOERROR},
           {argumentType: ArgumentTypes.SCALAR},
           {argumentType: ArgumentTypes.SCALAR},
         ],
         repeatLastArg: true,
-      },
     },
     'IFERROR': {
       method: 'iferror',
-      parameters: {
-        list: [
+      parameters:  [
           {argumentType: ArgumentTypes.SCALAR},
           {argumentType: ArgumentTypes.SCALAR},
         ]
-      },
     },
     'IFNA': {
       method: 'ifna',
-      parameters: {
-        list: [
+      parameters: [
           {argumentType: ArgumentTypes.SCALAR},
           {argumentType: ArgumentTypes.SCALAR},
         ]
-      },
     },
     'CHOOSE': {
       method: 'choose',
-      parameters: {
-        list: [
+      parameters:  [
           {argumentType: ArgumentTypes.NUMBER},
           {argumentType: ArgumentTypes.SCALAR},
         ],
         repeatLastArg: true,
-      },
     },
   }
 
@@ -119,7 +101,7 @@ export class BooleanPlugin extends FunctionPlugin {
    * @param formulaAddress
    */
   public literalTrue(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.parameters('TRUE'), () => true)
+    return this.runFunction(ast.args, formulaAddress, this.metadata('TRUE'), () => true)
   }
 
   /**
@@ -131,7 +113,7 @@ export class BooleanPlugin extends FunctionPlugin {
    * @param formulaAddress
    */
   public literalFalse(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.parameters('FALSE'), () => false)
+    return this.runFunction(ast.args, formulaAddress, this.metadata('FALSE'), () => false)
   }
 
   /**
@@ -143,7 +125,7 @@ export class BooleanPlugin extends FunctionPlugin {
    * @param formulaAddress
    */
   public conditionalIf(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InterpreterValue {
-    return this.runFunction(ast.args, formulaAddress, this.parameters('IF'), (condition, arg2, arg3) => {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('IF'), (condition, arg2, arg3) => {
       return condition ? arg2 : arg3
     })
   }
@@ -157,7 +139,7 @@ export class BooleanPlugin extends FunctionPlugin {
    * @param formulaAddress
    */
   public and(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.parameters('AND'),
+    return this.runFunction(ast.args, formulaAddress, this.metadata('AND'),
       (...args) => !args.some((arg: boolean) => !arg)
     )
   }
@@ -171,17 +153,17 @@ export class BooleanPlugin extends FunctionPlugin {
    * @param formulaAddress
    */
   public or(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.parameters('OR'),
+    return this.runFunction(ast.args, formulaAddress, this.metadata('OR'),
       (...args) => args.some((arg: boolean) => arg)
     )
   }
 
   public not(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.parameters('NOT'), (arg) => !arg)
+    return this.runFunction(ast.args, formulaAddress, this.metadata('NOT'), (arg) => !arg)
   }
 
   public xor(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.parameters('XOR'), (...args) => {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('XOR'), (...args) => {
       let cnt = 0
       args.forEach((arg: boolean) => {
         if (arg) {
@@ -193,7 +175,7 @@ export class BooleanPlugin extends FunctionPlugin {
   }
 
   public switch(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.parameters('SWITCH'), (selector, ...args) => {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('SWITCH'), (selector, ...args) => {
       const n = args.length
       let i = 0
       for (; i + 1 < n; i += 2) {
@@ -213,7 +195,7 @@ export class BooleanPlugin extends FunctionPlugin {
   }
 
   public iferror(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.parameters('IFERROR'), (arg1: InternalScalarValue, arg2: InternalScalarValue) => {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('IFERROR'), (arg1: InternalScalarValue, arg2: InternalScalarValue) => {
       if (arg1 instanceof CellError) {
         return arg2
       } else {
@@ -223,7 +205,7 @@ export class BooleanPlugin extends FunctionPlugin {
   }
 
   public ifna(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.parameters('IFNA'), (arg1: InternalScalarValue, arg2: InternalScalarValue) => {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('IFNA'), (arg1: InternalScalarValue, arg2: InternalScalarValue) => {
       if (arg1 instanceof CellError && arg1.type === ErrorType.NA) {
         return arg2
       } else {
@@ -233,7 +215,7 @@ export class BooleanPlugin extends FunctionPlugin {
   }
 
   public choose(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.parameters('CHOOSE'), (selector, ...args) => {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('CHOOSE'), (selector, ...args) => {
       if (selector !== Math.round(selector) || selector < 1 || selector > args.length) {
         return new CellError(ErrorType.NUM)
       }

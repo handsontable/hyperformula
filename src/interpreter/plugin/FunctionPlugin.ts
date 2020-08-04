@@ -21,10 +21,20 @@ export interface ImplementedFunctions {
 
 export interface FunctionMetadata {
   method: string,
-  parameters?: FunctionArgumentsDefinition,
+  parameters?: FunctionArgument[],
   isVolatile?: boolean,
   isDependentOnSheetStructureChange?: boolean,
   doesNotNeedArgumentsToBeComputed?: boolean,
+
+  /**
+   * Used for functions with variable number of arguments -- last defined argument is repeated indefinitely.
+   */
+  repeatLastArg?: boolean,
+
+  /**
+   * Ranges in arguments are inlined to (possibly multiple) scalar arguments.
+   */
+  expandRanges?: boolean,
 }
 
 export interface FunctionPluginDefinition {
@@ -69,20 +79,6 @@ export enum ArgumentTypes {
    * Integer type.
    */
   INTEGER = 'INTEGER',
-}
-
-export interface FunctionArgumentsDefinition {
-  list: FunctionArgument[],
-
-  /**
-   * Used for functions with variable number of arguments -- last defined argument is repeated indefinitely.
-   */
-  repeatLastArg?: boolean,
-
-  /**
-   * Ranges in arguments are inlined to (possibly multiple) scalar arguments.
-   */
-  expandRanges?: boolean,
 }
 
 export interface FunctionArgument {
@@ -226,10 +222,10 @@ export abstract class FunctionPlugin {
   protected runFunction = (
     args: Ast[],
     formulaAddress: SimpleCellAddress,
-    functionDefinition: FunctionArgumentsDefinition,
+    functionDefinition: FunctionMetadata,
     fn: (...arg: any) => InternalScalarValue
   ) => {
-    const argumentDefinitions: FunctionArgument[] = functionDefinition.list
+    const argumentDefinitions: FunctionArgument[] = functionDefinition.parameters!
     let scalarValues: [InterpreterValue, boolean][]
 
     if(functionDefinition.expandRanges) {
@@ -276,8 +272,8 @@ export abstract class FunctionPlugin {
     return argCoerceFailure ?? fn(...coercedArguments)
   }
 
-  protected parameters(name: string): FunctionArgumentsDefinition {
-    const params = (this.constructor as FunctionPluginDefinition).implementedFunctions[name]?.parameters
+  protected metadata(name: string): FunctionMetadata {
+    const params = (this.constructor as FunctionPluginDefinition).implementedFunctions[name]
     if (params !== undefined) {
       return params
     }

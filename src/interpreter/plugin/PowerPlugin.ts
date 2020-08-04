@@ -11,14 +11,14 @@ export class PowerPlugin extends FunctionPlugin {
   public static implementedFunctions = {
     'POWER': {
       method: 'power',
-      parameters: { list: [
+      parameters: [
         { argumentType: ArgumentTypes.NUMBER },
         { argumentType: ArgumentTypes.NUMBER },
-      ]},
+      ],
     },
   }
 
   public power(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.parameters('POWER'), Math.pow)
+    return this.runFunction(ast.args, formulaAddress, this.metadata('POWER'), Math.pow)
   }
 }

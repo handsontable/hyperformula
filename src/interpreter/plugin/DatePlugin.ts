@@ -25,163 +25,125 @@ export class DatePlugin extends FunctionPlugin {
   public static implementedFunctions = {
     'DATE': {
       method: 'date',
-      parameters: {
-        list: [
+      parameters:  [
           {argumentType: ArgumentTypes.NUMBER},
           {argumentType: ArgumentTypes.NUMBER},
           {argumentType: ArgumentTypes.NUMBER},
         ]
       },
-    },
     'TIME': {
       method: 'time',
-      parameters: {
-        list: [
+      parameters: [
           {argumentType: ArgumentTypes.NUMBER},
           {argumentType: ArgumentTypes.NUMBER},
           {argumentType: ArgumentTypes.NUMBER},
         ]
-      },
     },
     'MONTH': {
       method: 'month',
-      parameters: {
-        list: [
+      parameters: [
           {argumentType: ArgumentTypes.NUMBER, minValue: 0},
         ]
-      },
     },
     'YEAR': {
       method: 'year',
-      parameters: {
-        list: [
+      parameters:[
           {argumentType: ArgumentTypes.NUMBER, minValue: 0},
         ]
-      },
     },
     'HOUR': {
       method: 'hour',
-      parameters: {
-        list: [
+      parameters: [
           {argumentType: ArgumentTypes.NUMBER, minValue: 0},
         ]
-      },
     },
     'MINUTE': {
       method: 'minute',
-      parameters: {
-        list: [
+      parameters: [
           {argumentType: ArgumentTypes.NUMBER, minValue: 0},
         ]
-      },
     },
     'SECOND': {
       method: 'second',
-      parameters: {
-        list: [
+      parameters: [
           {argumentType: ArgumentTypes.NUMBER, minValue: 0},
         ]
-      },
     },
     'TEXT': {
       method: 'text',
-      parameters: {
-        list: [
+      parameters: [
           {argumentType: ArgumentTypes.NUMBER},
           {argumentType: ArgumentTypes.STRING},
         ]
-      },
     },
     'EOMONTH': {
       method: 'eomonth',
-      parameters: {
-        list: [
+      parameters: [
           {argumentType: ArgumentTypes.NUMBER, minValue: 0},
           {argumentType: ArgumentTypes.NUMBER},
         ]
-      },
     },
     'DAY': {
       method: 'day',
-      parameters: {
-        list: [
+      parameters:  [
           {argumentType: ArgumentTypes.NUMBER, minValue: 0},
         ]
-      },
     },
     'DAYS': {
       method: 'days',
-      parameters: {
-        list: [
+      parameters: [
           {argumentType: ArgumentTypes.NUMBER, minValue: 0},
           {argumentType: ArgumentTypes.NUMBER, minValue: 0},
         ]
-      },
     },
     'WEEKDAY': {
       method: 'weekday',
-      parameters: {
-        list: [
+      parameters: [
           {argumentType: ArgumentTypes.NUMBER, minValue: 0},
           {argumentType: ArgumentTypes.NUMBER, defaultValue: 1},
         ]
-      },
     },
     'WEEKNUM': {
       method: 'weeknum',
-      parameters: {
-        list: [
+      parameters: [
           {argumentType: ArgumentTypes.NUMBER, minValue: 0},
           {argumentType: ArgumentTypes.NUMBER, defaultValue: 1},
         ]
-      },
     },
     'ISOWEEKNUM': {
       method: 'isoweeknum',
-      parameters: {
-        list: [
+      parameters: [
           {argumentType: ArgumentTypes.NUMBER, minValue: 0},
         ]
-      },
     },
     'DATEVALUE': {
       method: 'datevalue',
-      parameters: {
-        list: [
+      parameters: [
           {argumentType: ArgumentTypes.STRING},
         ]
-      },
     },
     'TIMEVALUE': {
       method: 'timevalue',
-      parameters: {
-        list: [
+      parameters: [
           {argumentType: ArgumentTypes.STRING},
         ]
-      },
     },
     'NOW': {
       method: 'now',
-      parameters: {
-        list: [],
-      },
+      parameters: [],
       isVolatile: true,
     },
     'TODAY': {
       method: 'today',
-      parameters: {
-        list: [],
-      },
+      parameters: [],
       isVolatile: true,
     },
     'EDATE': {
       method: 'edate',
-      parameters: {
-        list: [
+      parameters: [
           {argumentType: ArgumentTypes.NUMBER},
           {argumentType: ArgumentTypes.NUMBER},
         ],
-      },
     },
   }
 
@@ -194,7 +156,7 @@ export class DatePlugin extends FunctionPlugin {
    * @param formulaAddress
    */
   public date(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.parameters('DATE'), (year, month, day) => {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('DATE'), (year, month, day) => {
       const d = Math.trunc(day)
       let m = Math.trunc(month)
       let y = Math.trunc(year)
@@ -215,7 +177,7 @@ export class DatePlugin extends FunctionPlugin {
   }
 
   public time(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.parameters('TIME'),
+    return this.runFunction(ast.args, formulaAddress, this.metadata('TIME'),
       (h, m, s) => {
         const ret = timeToNumber({hours: Math.trunc(h), minutes: Math.trunc(m), seconds: Math.trunc(s)})
         if(ret<0) {
@@ -227,7 +189,7 @@ export class DatePlugin extends FunctionPlugin {
   }
 
   public eomonth(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.parameters('EOMONTH'), (dateNumber, numberOfMonthsToShift) => {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('EOMONTH'), (dateNumber, numberOfMonthsToShift) => {
       const date = this.interpreter.dateHelper.numberToSimpleDate(dateNumber)
       const ret = this.interpreter.dateHelper.dateToNumber(endOfMonth(offsetMonth(date, numberOfMonthsToShift)))
       return this.interpreter.dateHelper.getWithinBounds(ret) ?? new CellError(ErrorType.NUM)
@@ -235,13 +197,13 @@ export class DatePlugin extends FunctionPlugin {
   }
 
   public day(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.parameters('DAY'),
+    return this.runFunction(ast.args, formulaAddress, this.metadata('DAY'),
       (dateNumber) => this.interpreter.dateHelper.numberToSimpleDate(dateNumber).day
     )
   }
 
   public days(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.parameters('DAYS'), (endDate, startDate) => Math.trunc(endDate) - Math.trunc(startDate))
+    return this.runFunction(ast.args, formulaAddress, this.metadata('DAYS'), (endDate, startDate) => Math.trunc(endDate) - Math.trunc(startDate))
   }
 
   /**
@@ -253,7 +215,7 @@ export class DatePlugin extends FunctionPlugin {
    * @param formulaAddress
    */
   public month(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.parameters('MONTH'),
+    return this.runFunction(ast.args, formulaAddress, this.metadata('MONTH'),
       (dateNumber) => this.interpreter.dateHelper.numberToSimpleDate(dateNumber).month
     )
   }
@@ -267,25 +229,25 @@ export class DatePlugin extends FunctionPlugin {
    * @param formulaAddress
    */
   public year(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.parameters('YEAR'),
+    return this.runFunction(ast.args, formulaAddress, this.metadata('YEAR'),
       (dateNumber) => this.interpreter.dateHelper.numberToSimpleDate(dateNumber).year
     )
   }
 
   public hour(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.parameters('HOUR'),
+    return this.runFunction(ast.args, formulaAddress, this.metadata('HOUR'),
       (timeNumber) => numberToSimpleTime(roundToNearestSecond(timeNumber)%1).hours
     )
   }
 
   public minute(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.parameters('MINUTE'),
+    return this.runFunction(ast.args, formulaAddress, this.metadata('MINUTE'),
       (timeNumber) => numberToSimpleTime(roundToNearestSecond(timeNumber)%1).minutes
     )
   }
 
   public second(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.parameters('SECOND'),
+    return this.runFunction(ast.args, formulaAddress, this.metadata('SECOND'),
       (timeNumber) => numberToSimpleTime(roundToNearestSecond(timeNumber)%1).seconds
     )
   }
@@ -299,13 +261,13 @@ export class DatePlugin extends FunctionPlugin {
    * @param formulaAddress
    */
   public text(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.parameters('TEXT'),
+    return this.runFunction(ast.args, formulaAddress, this.metadata('TEXT'),
       (numberRepresentation, formatArg) =>format(numberRepresentation, formatArg, this.config, this.interpreter.dateHelper)
     )
   }
 
   public weekday(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.parameters('WEEKDAY'),
+    return this.runFunction(ast.args, formulaAddress, this.metadata('WEEKDAY'),
       (day: number, type: number) => {
         const absoluteDay = Math.floor(this.interpreter.dateHelper.relativeNumberToAbsoluteNumber(day))
         if(type===3) {
@@ -321,7 +283,7 @@ export class DatePlugin extends FunctionPlugin {
   }
 
   public weeknum(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.parameters('WEEKNUM'),
+    return this.runFunction(ast.args, formulaAddress, this.metadata('WEEKNUM'),
       (day: number, type: number) => {
         const absoluteDay = Math.floor(this.interpreter.dateHelper.relativeNumberToAbsoluteNumber(day))
         const date = this.interpreter.dateHelper.numberToSimpleDate(day)
@@ -340,7 +302,7 @@ export class DatePlugin extends FunctionPlugin {
   }
 
   public isoweeknum(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.parameters('ISOWEEKNUM'), this.isoweeknumCore)
+    return this.runFunction(ast.args, formulaAddress, this.metadata('ISOWEEKNUM'), this.isoweeknumCore)
   }
 
   private isoweeknumCore = (day: number): number => {
@@ -357,7 +319,7 @@ export class DatePlugin extends FunctionPlugin {
   }
 
   public datevalue(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.parameters('DATEVALUE'),
+    return this.runFunction(ast.args, formulaAddress, this.metadata('DATEVALUE'),
       (date: string) => {
         const dateTime = this.interpreter.dateHelper.parseDateTimeFromConfigFormats(date)
         if(dateTime === undefined) {
@@ -373,7 +335,7 @@ export class DatePlugin extends FunctionPlugin {
   }
 
   public timevalue(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.parameters('TIMEVALUE'),
+    return this.runFunction(ast.args, formulaAddress, this.metadata('TIMEVALUE'),
       (date: string) => {
         const dateNumber = this.interpreter.dateHelper.dateStringToDateNumber(date)
         if(dateNumber===undefined){
@@ -385,7 +347,7 @@ export class DatePlugin extends FunctionPlugin {
   }
 
   public now(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.parameters('NOW'),
+    return this.runFunction(ast.args, formulaAddress, this.metadata('NOW'),
       () => {
         const now = new Date()
         return timeToNumber({hours: now.getHours(), minutes: now.getMinutes(), seconds: now.getSeconds()})+
@@ -395,7 +357,7 @@ export class DatePlugin extends FunctionPlugin {
   }
 
   public today(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.parameters('TODAY'),
+    return this.runFunction(ast.args, formulaAddress, this.metadata('TODAY'),
       () => {
         const now = new Date()
         return this.interpreter.dateHelper.dateToNumber({year: now.getFullYear(), month: now.getMonth()+1, day: now.getDay()})
@@ -404,7 +366,7 @@ export class DatePlugin extends FunctionPlugin {
   }
 
   public edate(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.parameters('EDATE'),
+    return this.runFunction(ast.args, formulaAddress, this.metadata('EDATE'),
       (dateNumber: number, delta: number) => {
         const date = this.interpreter.dateHelper.numberToSimpleDate(dateNumber)
         const newDate = truncateDayInMonth(offsetMonth(date, delta))

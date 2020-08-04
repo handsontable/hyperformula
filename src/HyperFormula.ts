@@ -854,7 +854,7 @@ export class HyperFormula implements TypedEmitter {
   }
 
   /**
-   * Updates the config with given new parameters.
+   * Updates the config with given new metadata.
    *
    * @param {Partial<ConfigParams>} newParams configuration options to be updated or added
    *
@@ -900,7 +900,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * @example
    * ```js
-   * // should return all config parameters including default and those which were added
+   * // should return all config metadata including default and those which were added
    * const hfConfig = hfInstance.getConfig();
    * ```
    *

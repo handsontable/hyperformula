@@ -12,42 +12,36 @@ export class LogarithmPlugin extends FunctionPlugin {
   public static implementedFunctions = {
     'LOG10': {
       method: 'log10',
-      parameters: {
-        list: [
+      parameters: [
           {argumentType: ArgumentTypes.NUMBER}
         ]
-      },
     },
     'LOG': {
       method: 'log',
-      parameters: {
-        list: [
+      parameters: [
           {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
           {argumentType: ArgumentTypes.NUMBER, defaultValue: 10, greaterThan: 0},
         ]
-      },
     },
     'LN': {
       method: 'ln',
-      parameters: {
-        list: [
+      parameters: [
           {argumentType: ArgumentTypes.NUMBER}
         ]
-      },
     },
   }
 
   public log10(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.parameters('LOG10'), Math.log10)
+    return this.runFunction(ast.args, formulaAddress, this.metadata('LOG10'), Math.log10)
   }
 
   public log(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.parameters('LOG'),
+    return this.runFunction(ast.args, formulaAddress, this.metadata('LOG'),
       (arg: number, base: number) => Math.log(arg) / Math.log(base)
     )
   }
 
   public ln(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.parameters('LN'), Math.log)
+    return this.runFunction(ast.args, formulaAddress, this.metadata('LN'), Math.log)
   }
 }

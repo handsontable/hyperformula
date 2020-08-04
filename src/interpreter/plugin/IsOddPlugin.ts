@@ -11,16 +11,14 @@ export class IsOddPlugin extends FunctionPlugin {
   public static implementedFunctions = {
     'ISODD': {
       method: 'isodd',
-      parameters: {
-        list: [
+      parameters: [
           {argumentType: ArgumentTypes.NUMBER}
         ]
-      }
     },
   }
 
   public isodd(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.parameters('ISODD'),
+    return this.runFunction(ast.args, formulaAddress, this.metadata('ISODD'),
       (val) => (val % 2 === 1)
     )
   }

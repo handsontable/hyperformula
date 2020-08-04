@@ -11,13 +11,13 @@ export class AbsPlugin extends FunctionPlugin {
   public static implementedFunctions = {
     'ABS': {
       method: 'abs',
-      parameters: { list: [
+      parameters: [
         { argumentType: ArgumentTypes.NUMBER }
-      ]}
+      ]
     },
   }
 
   public abs(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.parameters('ABS'), Math.abs)
+    return this.runFunction(ast.args, formulaAddress, this.metadata('ABS'), Math.abs)
   }
 }
