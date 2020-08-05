@@ -15,8 +15,8 @@ describe('Function DATEDIF', () => {
 
   it('should not work for wrong type of arguments', () => {
     const engine = HyperFormula.buildFromArray([
-      ['=DATEDIF("foo", 1, "y")'],
-      ['=DATEDIF(2, "bar", "y")'],
+      ['=DATEDIF("foo", 1, "Y")'],
+      ['=DATEDIF(2, "bar", "Y")'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE))
@@ -26,8 +26,8 @@ describe('Function DATEDIF', () => {
   it('numerical errors', () => {
     const engine = HyperFormula.buildFromArray([
       ['=DATEDIF(1, 2, "abcd")'],
-      ['=DATEDIF(2, 1, "y")'],
-      ['=DATEDIF(1.9, 1.8, "y")'],
+      ['=DATEDIF(2, 1, "Y")'],
+      ['=DATEDIF(1.9, 1.8, "Y")'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM))
@@ -35,11 +35,11 @@ describe('Function DATEDIF', () => {
     expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.NUM))
   })
 
-  it('"d" mode', () => {
+  it('"D" mode', () => {
     const engine = HyperFormula.buildFromArray([
-      ['=DATEDIF("30/12/2018", "30/12/2018", "d")'],
-      ['=DATEDIF("28/02/2019", "01/03/2019", "d")'],
-      ['=DATEDIF("28/02/2020", "01/03/2020", "d")'],
+      ['=DATEDIF("30/12/2018", "30/12/2018", "D")'],
+      ['=DATEDIF("28/02/2019", "01/03/2019", "D")'],
+      ['=DATEDIF("28/02/2020", "01/03/2020", "D")'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqual(0)
@@ -49,9 +49,9 @@ describe('Function DATEDIF', () => {
 
   it('ignores time', () => {
     const engine = HyperFormula.buildFromArray([
-      ['=DATEDIF("22:00", "36:00", "d")'],
-      ['=DATEDIF("28/02/2019", "01/03/2019 1:00am", "d")'],
-      ['=DATEDIF("28/02/2020 2:00pm", "01/03/2020", "d")'],
+      ['=DATEDIF("22:00", "36:00", "D")'],
+      ['=DATEDIF("28/02/2019", "01/03/2019 1:00am", "D")'],
+      ['=DATEDIF("28/02/2020 2:00pm", "01/03/2020", "D")'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqual(1)
@@ -59,11 +59,11 @@ describe('Function DATEDIF', () => {
     expect(engine.getCellValue(adr('A3'))).toEqual(2)
   })
 
-  it('"m" mode', () => {
+  it('"M" mode', () => {
     const engine = HyperFormula.buildFromArray([
-      ['=DATEDIF("30/12/2018", "30/12/2019", "m")'],
-      ['=DATEDIF("28/02/2019", "29/03/2019", "m")'],
-      ['=DATEDIF("29/02/2020", "28/03/2020", "m")'],
+      ['=DATEDIF("30/12/2018", "30/12/2019", "M")'],
+      ['=DATEDIF("28/02/2019", "29/03/2019", "M")'],
+      ['=DATEDIF("29/02/2020", "28/03/2020", "M")'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqual(12)
@@ -71,11 +71,11 @@ describe('Function DATEDIF', () => {
     expect(engine.getCellValue(adr('A3'))).toEqual(0)
   })
 
-  it('"ym" mode', () => {
+  it('"YM" mode', () => {
     const engine = HyperFormula.buildFromArray([
-      ['=DATEDIF("30/12/2018", "30/12/2019", "ym")'],
-      ['=DATEDIF("28/02/2019", "29/03/2019", "ym")'],
-      ['=DATEDIF("29/02/2020", "28/03/2020", "ym")'],
+      ['=DATEDIF("30/12/2018", "30/12/2019", "YM")'],
+      ['=DATEDIF("28/02/2019", "29/03/2019", "YM")'],
+      ['=DATEDIF("29/02/2020", "28/03/2020", "YM")'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqual(0)
@@ -83,16 +83,16 @@ describe('Function DATEDIF', () => {
     expect(engine.getCellValue(adr('A3'))).toEqual(0)
   })
 
-  it('"y" mode', () => {
+  it('"Y" mode', () => {
     const engine = HyperFormula.buildFromArray([
-      ['=DATEDIF("01/03/2019", "29/02/2020", "y")'],
-      ['=DATEDIF("01/03/2019", "28/02/2020", "y")'],
-      ['=DATEDIF("28/02/2019", "29/02/2020", "y")'],
-      ['=DATEDIF("28/02/2019", "28/02/2020", "y")'],
-      ['=DATEDIF("29/02/2020", "28/02/2021", "y")'],
-      ['=DATEDIF("29/02/2020", "01/03/2021", "y")'],
-      ['=DATEDIF("28/02/2020", "28/02/2021", "y")'],
-      ['=DATEDIF("28/02/2020", "01/03/2021", "y")'],
+      ['=DATEDIF("01/03/2019", "29/02/2020", "Y")'],
+      ['=DATEDIF("01/03/2019", "28/02/2020", "Y")'],
+      ['=DATEDIF("28/02/2019", "29/02/2020", "Y")'],
+      ['=DATEDIF("28/02/2019", "28/02/2020", "Y")'],
+      ['=DATEDIF("29/02/2020", "28/02/2021", "Y")'],
+      ['=DATEDIF("29/02/2020", "01/03/2021", "Y")'],
+      ['=DATEDIF("28/02/2020", "28/02/2021", "Y")'],
+      ['=DATEDIF("28/02/2020", "01/03/2021", "Y")'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqual(0)
@@ -105,22 +105,22 @@ describe('Function DATEDIF', () => {
     expect(engine.getCellValue(adr('A8'))).toEqual(1)
   })
 
-  it('"md" mode #1', () => {
+  it('"MD" mode #1', () => {
     const engine = HyperFormula.buildFromArray([
-      ['=DATEDIF("28/03/2019", "29/02/2020", "md")'],
-      ['=DATEDIF("28/03/2019", "28/02/2020", "md")'],
+      ['=DATEDIF("28/03/2019", "29/02/2020", "MD")'],
+      ['=DATEDIF("28/03/2019", "28/02/2020", "MD")'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqual(1)
     expect(engine.getCellValue(adr('A2'))).toEqual(0)
   })
 
-  it('"md" mode #2', () => {
+  it('"MD" mode #2', () => {
     const engine = HyperFormula.buildFromArray([
-      ['=DATEDIF("28/03/2016", "01/05/2020", "md")'],
-      ['=DATEDIF("28/02/2016", "01/05/2020", "md")'],
-      ['=DATEDIF("28/02/2015", "01/05/2020", "md")'],
-      ['=DATEDIF("28/01/2016", "01/05/2020", "md")'],
+      ['=DATEDIF("28/03/2016", "01/05/2020", "MD")'],
+      ['=DATEDIF("28/02/2016", "01/05/2020", "MD")'],
+      ['=DATEDIF("28/02/2015", "01/05/2020", "MD")'],
+      ['=DATEDIF("28/01/2016", "01/05/2020", "MD")'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqual(3)
@@ -129,12 +129,12 @@ describe('Function DATEDIF', () => {
     expect(engine.getCellValue(adr('A4'))).toEqual(3)
   })
 
-  it('"md" mode #3', () => {
+  it('"MD" mode #3', () => {
     const engine = HyperFormula.buildFromArray([
-      ['=DATEDIF("28/03/2016", "01/03/2020", "md")'],
-      ['=DATEDIF("28/02/2016", "01/03/2020", "md")'],
-      ['=DATEDIF("28/02/2015", "01/03/2020", "md")'],
-      ['=DATEDIF("28/01/2016", "01/03/2020", "md")'],
+      ['=DATEDIF("28/03/2016", "01/03/2020", "MD")'],
+      ['=DATEDIF("28/02/2016", "01/03/2020", "MD")'],
+      ['=DATEDIF("28/02/2015", "01/03/2020", "MD")'],
+      ['=DATEDIF("28/01/2016", "01/03/2020", "MD")'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqual(2)
@@ -143,12 +143,12 @@ describe('Function DATEDIF', () => {
     expect(engine.getCellValue(adr('A4'))).toEqual(2)
   })
 
-  it('"md" mode #4', () => {
+  it('"MD" mode #4', () => {
     const engine = HyperFormula.buildFromArray([
-      ['=DATEDIF("28/03/2016", "01/03/2021", "md")'],
-      ['=DATEDIF("28/02/2016", "01/03/2021", "md")'],
-      ['=DATEDIF("28/02/2015", "01/03/2021", "md")'],
-      ['=DATEDIF("28/01/2016", "01/03/2021", "md")'],
+      ['=DATEDIF("28/03/2016", "01/03/2021", "MD")'],
+      ['=DATEDIF("28/02/2016", "01/03/2021", "MD")'],
+      ['=DATEDIF("28/02/2015", "01/03/2021", "MD")'],
+      ['=DATEDIF("28/01/2016", "01/03/2021", "MD")'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqual(1)
@@ -157,12 +157,12 @@ describe('Function DATEDIF', () => {
     expect(engine.getCellValue(adr('A4'))).toEqual(1)
   })
 
-  it('"md" mode #5', () => {
+  it('"MD" mode #5', () => {
     const engine = HyperFormula.buildFromArray([
-      ['=DATEDIF("28/03/2016", "01/02/2020", "md")'],
-      ['=DATEDIF("28/02/2016", "01/02/2020", "md")'],
-      ['=DATEDIF("28/02/2015", "01/02/2020", "md")'],
-      ['=DATEDIF("28/01/2016", "01/02/2020", "md")'],
+      ['=DATEDIF("28/03/2016", "01/02/2020", "MD")'],
+      ['=DATEDIF("28/02/2016", "01/02/2020", "MD")'],
+      ['=DATEDIF("28/02/2015", "01/02/2020", "MD")'],
+      ['=DATEDIF("28/01/2016", "01/02/2020", "MD")'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqual(4)
@@ -171,12 +171,12 @@ describe('Function DATEDIF', () => {
     expect(engine.getCellValue(adr('A4'))).toEqual(4)
   })
 
-  it('"md" mode #6', () => {
+  it('"MD" mode #6', () => {
     const engine = HyperFormula.buildFromArray([
-      ['=DATEDIF("28/03/2016", "01/01/2020", "md")'],
-      ['=DATEDIF("28/02/2016", "01/01/2020", "md")'],
-      ['=DATEDIF("28/02/2015", "01/01/2020", "md")'],
-      ['=DATEDIF("28/01/2016", "01/01/2020", "md")'],
+      ['=DATEDIF("28/03/2016", "01/01/2020", "MD")'],
+      ['=DATEDIF("28/02/2016", "01/01/2020", "MD")'],
+      ['=DATEDIF("28/02/2015", "01/01/2020", "MD")'],
+      ['=DATEDIF("28/01/2016", "01/01/2020", "MD")'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqual(4)
@@ -185,15 +185,15 @@ describe('Function DATEDIF', () => {
     expect(engine.getCellValue(adr('A4'))).toEqual(4)
   })
 
-  it('"yd" mode #1', () => {
+  it('"YD" mode #1', () => {
     const engine = HyperFormula.buildFromArray([
-      ['=DATEDIF("27/02/2016", "27/02/2020", "yd")'],
-      ['=DATEDIF("27/02/2016", "28/02/2020", "yd")'],
-      ['=DATEDIF("27/02/2016", "29/02/2020", "yd")'],
-      ['=DATEDIF("27/02/2016", "01/03/2020", "yd")'],
-      ['=DATEDIF("27/02/2016", "27/02/2021", "yd")'],
-      ['=DATEDIF("27/02/2016", "28/02/2021", "yd")'],
-      ['=DATEDIF("27/02/2016", "01/03/2021", "yd")'],
+      ['=DATEDIF("27/02/2016", "27/02/2020", "YD")'],
+      ['=DATEDIF("27/02/2016", "28/02/2020", "YD")'],
+      ['=DATEDIF("27/02/2016", "29/02/2020", "YD")'],
+      ['=DATEDIF("27/02/2016", "01/03/2020", "YD")'],
+      ['=DATEDIF("27/02/2016", "27/02/2021", "YD")'],
+      ['=DATEDIF("27/02/2016", "28/02/2021", "YD")'],
+      ['=DATEDIF("27/02/2016", "01/03/2021", "YD")'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqual(0)
@@ -205,15 +205,15 @@ describe('Function DATEDIF', () => {
     expect(engine.getCellValue(adr('A7'))).toEqual(2)
   })
 
-  it('"yd" mode #2', () => {
+  it('"YD" mode #2', () => {
     const engine = HyperFormula.buildFromArray([
-      ['=DATEDIF("28/02/2016", "27/02/2020", "yd")'],
-      ['=DATEDIF("28/02/2016", "28/02/2020", "yd")'],
-      ['=DATEDIF("28/02/2016", "29/02/2020", "yd")'],
-      ['=DATEDIF("28/02/2016", "01/03/2020", "yd")'],
-      ['=DATEDIF("28/02/2016", "27/02/2021", "yd")'],
-      ['=DATEDIF("28/02/2016", "28/02/2021", "yd")'],
-      ['=DATEDIF("28/02/2016", "01/03/2021", "yd")'],
+      ['=DATEDIF("28/02/2016", "27/02/2020", "YD")'],
+      ['=DATEDIF("28/02/2016", "28/02/2020", "YD")'],
+      ['=DATEDIF("28/02/2016", "29/02/2020", "YD")'],
+      ['=DATEDIF("28/02/2016", "01/03/2020", "YD")'],
+      ['=DATEDIF("28/02/2016", "27/02/2021", "YD")'],
+      ['=DATEDIF("28/02/2016", "28/02/2021", "YD")'],
+      ['=DATEDIF("28/02/2016", "01/03/2021", "YD")'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqual(365)
@@ -225,15 +225,15 @@ describe('Function DATEDIF', () => {
     expect(engine.getCellValue(adr('A7'))).toEqual(1)
   })
 
-  it('"yd" mode #3', () => {
+  it('"YD" mode #3', () => {
     const engine = HyperFormula.buildFromArray([
-      ['=DATEDIF("29/02/2016", "27/02/2020", "yd")'],
-      ['=DATEDIF("29/02/2016", "28/02/2020", "yd")'],
-      ['=DATEDIF("29/02/2016", "29/02/2020", "yd")'],
-      ['=DATEDIF("29/02/2016", "01/03/2020", "yd")'],
-      ['=DATEDIF("29/02/2016", "27/02/2021", "yd")'],
-      ['=DATEDIF("29/02/2016", "28/02/2021", "yd")'],
-      ['=DATEDIF("29/02/2016", "01/03/2021", "yd")'],
+      ['=DATEDIF("29/02/2016", "27/02/2020", "YD")'],
+      ['=DATEDIF("29/02/2016", "28/02/2020", "YD")'],
+      ['=DATEDIF("29/02/2016", "29/02/2020", "YD")'],
+      ['=DATEDIF("29/02/2016", "01/03/2020", "YD")'],
+      ['=DATEDIF("29/02/2016", "27/02/2021", "YD")'],
+      ['=DATEDIF("29/02/2016", "28/02/2021", "YD")'],
+      ['=DATEDIF("29/02/2016", "01/03/2021", "YD")'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqual(364)
@@ -245,15 +245,15 @@ describe('Function DATEDIF', () => {
     expect(engine.getCellValue(adr('A7'))).toEqual(0)
   })
 
-  it('"yd" mode #4', () => {
+  it('"YD" mode #4', () => {
     const engine = HyperFormula.buildFromArray([
-      ['=DATEDIF("01/03/2016", "27/02/2020", "yd")'],
-      ['=DATEDIF("01/03/2016", "28/02/2020", "yd")'],
-      ['=DATEDIF("01/03/2016", "29/02/2020", "yd")'],
-      ['=DATEDIF("01/03/2016", "01/03/2020", "yd")'],
-      ['=DATEDIF("01/03/2016", "27/02/2021", "yd")'],
-      ['=DATEDIF("01/03/2016", "28/02/2021", "yd")'],
-      ['=DATEDIF("01/03/2016", "01/03/2021", "yd")'],
+      ['=DATEDIF("01/03/2016", "27/02/2020", "YD")'],
+      ['=DATEDIF("01/03/2016", "28/02/2020", "YD")'],
+      ['=DATEDIF("01/03/2016", "29/02/2020", "YD")'],
+      ['=DATEDIF("01/03/2016", "01/03/2020", "YD")'],
+      ['=DATEDIF("01/03/2016", "27/02/2021", "YD")'],
+      ['=DATEDIF("01/03/2016", "28/02/2021", "YD")'],
+      ['=DATEDIF("01/03/2016", "01/03/2021", "YD")'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqual(363)
@@ -265,15 +265,15 @@ describe('Function DATEDIF', () => {
     expect(engine.getCellValue(adr('A7'))).toEqual(0)
   })
 
-  it('"yd" mode #5', () => {
+  it('"YD" mode #5', () => {
     const engine = HyperFormula.buildFromArray([
-      ['=DATEDIF("27/02/2015", "27/02/2020", "yd")'],
-      ['=DATEDIF("27/02/2015", "28/02/2020", "yd")'],
-      ['=DATEDIF("27/02/2015", "29/02/2020", "yd")'],
-      ['=DATEDIF("27/02/2015", "01/03/2020", "yd")'],
-      ['=DATEDIF("27/02/2015", "27/02/2021", "yd")'],
-      ['=DATEDIF("27/02/2015", "28/02/2021", "yd")'],
-      ['=DATEDIF("27/02/2015", "01/03/2021", "yd")'],
+      ['=DATEDIF("27/02/2015", "27/02/2020", "YD")'],
+      ['=DATEDIF("27/02/2015", "28/02/2020", "YD")'],
+      ['=DATEDIF("27/02/2015", "29/02/2020", "YD")'],
+      ['=DATEDIF("27/02/2015", "01/03/2020", "YD")'],
+      ['=DATEDIF("27/02/2015", "27/02/2021", "YD")'],
+      ['=DATEDIF("27/02/2015", "28/02/2021", "YD")'],
+      ['=DATEDIF("27/02/2015", "01/03/2021", "YD")'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqual(0)
@@ -285,15 +285,15 @@ describe('Function DATEDIF', () => {
     expect(engine.getCellValue(adr('A7'))).toEqual(2)
   })
 
-  it('"yd" mode #6', () => {
+  it('"YD" mode #6', () => {
     const engine = HyperFormula.buildFromArray([
-      ['=DATEDIF("28/02/2015", "27/02/2020", "yd")'],
-      ['=DATEDIF("28/02/2015", "28/02/2020", "yd")'],
-      ['=DATEDIF("28/02/2015", "29/02/2020", "yd")'],
-      ['=DATEDIF("28/02/2015", "01/03/2020", "yd")'],
-      ['=DATEDIF("28/02/2015", "27/02/2021", "yd")'],
-      ['=DATEDIF("28/02/2015", "28/02/2021", "yd")'],
-      ['=DATEDIF("28/02/2015", "01/03/2021", "yd")'],
+      ['=DATEDIF("28/02/2015", "27/02/2020", "YD")'],
+      ['=DATEDIF("28/02/2015", "28/02/2020", "YD")'],
+      ['=DATEDIF("28/02/2015", "29/02/2020", "YD")'],
+      ['=DATEDIF("28/02/2015", "01/03/2020", "YD")'],
+      ['=DATEDIF("28/02/2015", "27/02/2021", "YD")'],
+      ['=DATEDIF("28/02/2015", "28/02/2021", "YD")'],
+      ['=DATEDIF("28/02/2015", "01/03/2021", "YD")'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqual(364)
@@ -305,15 +305,15 @@ describe('Function DATEDIF', () => {
     expect(engine.getCellValue(adr('A7'))).toEqual(1)
   })
 
-  it('"yd" mode #7', () => {
+  it('"YD" mode #7', () => {
     const engine = HyperFormula.buildFromArray([
-      ['=DATEDIF("01/03/2015", "27/02/2020", "yd")'],
-      ['=DATEDIF("01/03/2015", "28/02/2020", "yd")'],
-      ['=DATEDIF("01/03/2015", "29/02/2020", "yd")'],
-      ['=DATEDIF("01/03/2015", "01/03/2020", "yd")'],
-      ['=DATEDIF("01/03/2015", "27/02/2021", "yd")'],
-      ['=DATEDIF("01/03/2015", "28/02/2021", "yd")'],
-      ['=DATEDIF("01/03/2015", "01/03/2021", "yd")'],
+      ['=DATEDIF("01/03/2015", "27/02/2020", "YD")'],
+      ['=DATEDIF("01/03/2015", "28/02/2020", "YD")'],
+      ['=DATEDIF("01/03/2015", "29/02/2020", "YD")'],
+      ['=DATEDIF("01/03/2015", "01/03/2020", "YD")'],
+      ['=DATEDIF("01/03/2015", "27/02/2021", "YD")'],
+      ['=DATEDIF("01/03/2015", "28/02/2021", "YD")'],
+      ['=DATEDIF("01/03/2015", "01/03/2021", "YD")'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqual(363)

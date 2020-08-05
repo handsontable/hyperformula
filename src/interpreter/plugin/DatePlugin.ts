@@ -389,23 +389,23 @@ export class DatePlugin extends FunctionPlugin {
         if(startDate > endDate) {
           return new CellError(ErrorType.NUM)
         }
-        if(unit === 'd') {
+        if(unit === 'D') {
           return Math.floor(endDate) - Math.floor(startDate)
         }
         const start = this.interpreter.dateHelper.numberToSimpleDate(startDate)
         const end = this.interpreter.dateHelper.numberToSimpleDate(endDate)
         switch(unit) {
-          case 'm':
+          case 'M':
             return (end.year - start.year)*12 + (end.month-start.month) - (end.day < start.day?1:0)
-          case 'ym':
+          case 'YM':
             return (12+(end.month-start.month) - (end.day < start.day?1:0))%12
-          case 'y':
+          case 'Y':
             if((end.month > start.month) || (end.month === start.month && end.day >= start.day)) {
               return end.year - start.year
             } else {
               return end.year - start.year - 1
             }
-          case 'md':
+          case 'MD':
             if(end.day >= start.day) {
               return end.day - start.day
             } else {
@@ -413,7 +413,7 @@ export class DatePlugin extends FunctionPlugin {
               const y = end.month === 1 ? end.year-1 : end.year
               return this.interpreter.dateHelper.daysInMonth(y, m)+end.day-start.day
             }
-          case 'yd':
+          case 'YD':
             if(end.month > start.month || (end.month === start.month && end.day >= start.day)) {
               return Math.floor(endDate) - this.interpreter.dateHelper.dateToNumber({year: end.year, month: start.month, day: start.day})
             } else {
