@@ -185,6 +185,16 @@ describe('Function DATEDIF', () => {
     expect(engine.getCellValue(adr('A4'))).toEqual(4)
   })
 
+  it('"MD" mode negative result', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=DATEDIF("31/01/2020", "01/03/2020", "MD")'],
+      ['=DATEDIF("31/01/2021", "01/03/2021", "MD")'],
+    ])
+
+    expect(engine.getCellValue(adr('A1'))).toEqual(-1)
+    expect(engine.getCellValue(adr('A2'))).toEqual(-2)
+  })
+
   it('"YD" mode #1', () => {
     const engine = HyperFormula.buildFromArray([
       ['=DATEDIF("27/02/2016", "27/02/2020", "YD")'],
