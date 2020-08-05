@@ -164,16 +164,12 @@ export class DateTimeHelper {
     return {...this.numberToSimpleDate(Math.floor(arg)), ...numberToSimpleTime(arg%1)}
   }
 
-  private leapYearsCount(year: number): number {
+  public leapYearsCount(year: number): number {
     return Math.floor(year / 4) - Math.floor(year / 100) + Math.floor(year / 400) + (this.config.leapYear1900 && year >= 1900 ? 1 : 0)
   }
 
   private dateToNumberFromZero(date: SimpleDate): number {
-    const a = 365 * date.year
-    const b = prefSumDays[date.month - 1]
-    const c = date.day - 1
-    const d = (date.month <= 2 ? this.leapYearsCount(date.year - 1) : this.leapYearsCount(date.year))
-    return a+b+c+d
+    return 365 * date.year + prefSumDays[date.month - 1] + date.day - 1 + (date.month <= 2 ? this.leapYearsCount(date.year - 1) : this.leapYearsCount(date.year))
   }
 
   private isLeapYear(year: number): boolean {

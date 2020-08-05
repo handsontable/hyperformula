@@ -417,9 +417,11 @@ export class DatePlugin extends FunctionPlugin {
             if(end.month > start.month || (end.month === start.month && end.day >= start.day)) {
               return Math.floor(endDate) - this.interpreter.dateHelper.dateToNumber({year: end.year, month: start.month, day: start.day})
             } else {
-              //TODO: implement dayNumberInYear
-              return 1 + Math.floor(endDate) - this.interpreter.dateHelper.dateToNumber({year: end.year, month: 1, day: 1}) +
-                this.interpreter.dateHelper.dateToNumber({year: start.year, month: 12, day: 31}) - Math.floor(startDate)
+              return Math.floor(endDate)
+                - Math.floor(startDate)
+                - 365*(end.year-start.year-1)
+                - this.interpreter.dateHelper.leapYearsCount(end.year-1)
+                + this.interpreter.dateHelper.leapYearsCount(start.year)
             }
           default:
             return new CellError(ErrorType.NUM)
