@@ -411,7 +411,7 @@ export class DatePlugin extends FunctionPlugin {
             } else {
               const m = end.month === 1 ? 12 : end.month-1
               const y = end.month === 1 ? end.year-1 : end.year
-              return this.interpreter.dateHelper.daysInMonth(y,m)+end.day-start.day
+              return this.interpreter.dateHelper.daysInMonth(y, m)+end.day-start.day
             }
           case 'yd':
             if(end.month > start.month || (end.month === start.month && end.day >= start.day)) {
