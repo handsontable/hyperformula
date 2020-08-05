@@ -396,9 +396,9 @@ export class DatePlugin extends FunctionPlugin {
         const end = this.interpreter.dateHelper.numberToSimpleDate(endDate)
         switch(unit) {
           case 'm':
-            return (end.year - start.year)*12 + (end.month-start.month) - (end.day >= start.day?0:1)
+            return (end.year - start.year)*12 + (end.month-start.month) - (end.day < start.day?1:0)
           case 'ym':
-            return (12+(end.month-start.month) - (end.day >= start.day?0:1))%12
+            return (12+(end.month-start.month) - (end.day < start.day?1:0))%12
           case 'y':
             if((end.month > start.month) || (end.month === start.month && end.day >= start.day)) {
               return end.year - start.year
@@ -424,7 +424,6 @@ export class DatePlugin extends FunctionPlugin {
           default:
             return new CellError(ErrorType.NUM)
         }
-
       }
       )
   }

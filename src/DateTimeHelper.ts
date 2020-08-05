@@ -155,10 +155,8 @@ export class DateTimeHelper {
     }
 
     const dayOfYear = dateNumber - this.dateToNumberFromZero( {year, month: 1, day: 1})
-    const month = dayToMonth(
-      (this.isLeapYear(year) && dayOfYear >= 59) ? dayOfYear - 1 : dayOfYear,
-    )
-    const day = dayOfYear - prefSumDays[month]
+    const month = dayToMonth(dayOfYear - (this.isLeapYear(year) && dayOfYear >= 59 ? 1 : 0))
+    const day = dayOfYear - prefSumDays[month] - (this.isLeapYear(year) && month>1?1:0)
     return {year, month: month + 1, day: day + 1}
   }
 
@@ -171,7 +169,11 @@ export class DateTimeHelper {
   }
 
   private dateToNumberFromZero(date: SimpleDate): number {
-    return 365 * date.year + prefSumDays[date.month - 1] + date.day - 1 + (date.month <= 2 ? this.leapYearsCount(date.year - 1) : this.leapYearsCount(date.year))
+    const a = 365 * date.year
+    const b = prefSumDays[date.month - 1]
+    const c = date.day - 1
+    const d = (date.month <= 2 ? this.leapYearsCount(date.year - 1) : this.leapYearsCount(date.year))
+    return a+b+c+d
   }
 
   private isLeapYear(year: number): boolean {

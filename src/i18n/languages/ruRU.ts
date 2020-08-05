@@ -53,6 +53,7 @@ const dictionary: RawTranslationPackage = {
     COUNTIFS: 'СЧЁТЕСЛИМН',
     COUNTUNIQUE: 'COUNTUNIQUE',
     DATE: 'ДАТА',
+    DATEDIF: 'DATEDIF', //FIXME
     DATEVALUE: 'ДАТАЗНАЧ',
     DAY: 'ДЕНЬ',
     DAYS: 'ДНИ',
