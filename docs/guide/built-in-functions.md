@@ -61,7 +61,8 @@ lets you design your own [custom functions](custom-functions).
 
 | Function ID | Category | Description | Syntax |
 | :--- | :--- | :--- | :--- |
-| DATE | Date and time | This function calculates a date specified by year, month, day, and displays it in the cell's formatting. | DATE(Year; Month; Day) |
+| DATE | Date and time | Calculates a date specified by year, month, day, and displays it in the cell's formatting. | DATE(Year; Month; Day) |
+| DATEDIF | Date and time | Calculates distance between two dates, in provided unit parameter. | DATEDIF(Date1; Date2; Units) |
 | DATEVALUE | Date and time | Interprets string as date. | DATEVALUE(Datestring) |
 | DAY | Date and time | Returns the day of the given date value. | DAY(Number) |
 | DAYS | Date and time | Calculates the difference between two date values. | DAYS(Date2; Date1) |
