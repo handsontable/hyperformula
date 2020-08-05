@@ -5,7 +5,6 @@
 
 import {CellError, ErrorType, InternalScalarValue, SimpleCellAddress} from '../../Cell'
 import {
-  endOfMonth,
   instanceOfSimpleDate,
   instanceOfSimpleTime,
   numberToSimpleTime,
@@ -141,9 +140,17 @@ export class DatePlugin extends FunctionPlugin {
     'EDATE': {
       method: 'edate',
       parameters: [
-          {argumentType: ArgumentTypes.NUMBER},
+          {argumentType: ArgumentTypes.NUMBER, minValue: 0},
           {argumentType: ArgumentTypes.NUMBER},
         ],
+    },
+    'DATEDIF': {
+      method: 'datedif',
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER, minValue: 0},
+        {argumentType: ArgumentTypes.NUMBER, minValue: 0},
+        {argumentType: ArgumentTypes.STRING},
+      ],
     },
   }
 
@@ -191,7 +198,7 @@ export class DatePlugin extends FunctionPlugin {
   public eomonth(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.runFunction(ast.args, formulaAddress, this.metadata('EOMONTH'), (dateNumber, numberOfMonthsToShift) => {
       const date = this.interpreter.dateHelper.numberToSimpleDate(dateNumber)
-      const ret = this.interpreter.dateHelper.dateToNumber(endOfMonth(offsetMonth(date, numberOfMonthsToShift)))
+      const ret = this.interpreter.dateHelper.dateToNumber(this.interpreter.dateHelper.endOfMonth(offsetMonth(date, numberOfMonthsToShift)))
       return this.interpreter.dateHelper.getWithinBounds(ret) ?? new CellError(ErrorType.NUM)
     })
   }
@@ -374,6 +381,52 @@ export class DatePlugin extends FunctionPlugin {
         return this.interpreter.dateHelper.getWithinBounds(ret) ?? new CellError(ErrorType.NUM)
       }
     )
+  }
+
+  public datedif(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('DATEDIF'),
+      (startDate: number, endDate: number, unit: string) => {
+        if(startDate > endDate) {
+          return new CellError(ErrorType.NUM)
+        }
+        if(unit === 'd') {
+          return Math.floor(endDate) - Math.floor(startDate)
+        }
+        const start = this.interpreter.dateHelper.numberToSimpleDate(startDate)
+        const end = this.interpreter.dateHelper.numberToSimpleDate(endDate)
+        switch(unit) {
+          case 'm':
+            return (end.year - start.year)*12 + (end.month-start.month) - (end.day >= start.day?0:1)
+          case 'ym':
+            return (12+(end.month-start.month) - (end.day >= start.day?0:1))%12
+          case 'y':
+            if((end.month > start.month) || (end.month === start.month && end.day >= start.day)) {
+              return end.year - start.year
+            } else {
+              return end.year - start.year - 1
+            }
+          case 'md':
+            if(end.day >= start.day) {
+              return end.day - start.day
+            } else {
+              const m = end.month === 1 ? 12 : end.month-1
+              const y = end.month === 1 ? end.year-1 : end.year
+              return this.interpreter.dateHelper.daysInMonth(y,m)+end.day-start.day
+            }
+          case 'yd':
+            if(end.month > start.month || (end.month === start.month && end.day >= start.day)) {
+              return Math.floor(endDate) - this.interpreter.dateHelper.dateToNumber({year: end.year, month: start.month, day: start.day})
+            } else {
+              //TODO: implement dayNumberInYear
+              return 1 + Math.floor(endDate) - this.interpreter.dateHelper.dateToNumber({year: end.year, month: 1, day: 1}) +
+                this.interpreter.dateHelper.dateToNumber({year: start.year, month: 12, day: 31}) - Math.floor(startDate)
+            }
+          default:
+            return new CellError(ErrorType.NUM)
+        }
+
+      }
+      )
   }
 }
 

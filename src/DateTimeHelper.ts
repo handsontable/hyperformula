@@ -170,7 +170,7 @@ export class DateTimeHelper {
     return Math.floor(year / 4) - Math.floor(year / 100) + Math.floor(year / 400) + (this.config.leapYear1900 && year >= 1900 ? 1 : 0)
   }
 
-  public dateToNumberFromZero(date: SimpleDate): number {
+  private dateToNumberFromZero(date: SimpleDate): number {
     return 365 * date.year + prefSumDays[date.month - 1] + date.day - 1 + (date.month <= 2 ? this.leapYearsCount(date.year - 1) : this.leapYearsCount(date.year))
   }
 
@@ -184,6 +184,18 @@ export class DateTimeHelper {
     } else {
       return true
     }
+  }
+
+  public daysInMonth(year: number, month: number): number {
+    if(this.isLeapYear(year) && month === 2) {
+      return 29
+    } else {
+      return numDays[month-1]
+    }
+  }
+
+  public endOfMonth(date: SimpleDate): SimpleDate {
+    return {year: date.year, month: date.month, day: this.daysInMonth(date.year, date.month)}
   }
 }
 
@@ -201,10 +213,6 @@ function dayToMonth(dayOfYear: number): number {
     month += 1
   }
   return month
-}
-
-export function endOfMonth(date: SimpleDate): SimpleDate {
-  return {year: date.year, month: date.month, day: numDays[date.month - 1]}
 }
 
 export function offsetMonth(date: SimpleDate, offset: number): SimpleDate {
