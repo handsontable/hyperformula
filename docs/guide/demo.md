@@ -8,7 +8,7 @@
      sandbox="allow-autoplay allow-forms allow-modals allow-popups allow-presentation allow-same-origin allow-scripts"
    ></iframe>
 
-In this demo, you can see how HyperFormula handles basic operations by using the API methods, such as:
+In this demo, you can see how HyperFormula handles basic operations by using API methods, such as:
 
 * `buildEmpty` static method to initialize the instance
 * `addSheet` method to add a new sheet

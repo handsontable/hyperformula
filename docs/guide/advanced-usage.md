@@ -60,7 +60,7 @@ const playersB = [
     ['12', '127']
 ];
 
-// in a cell A1 a formula checks which team is a winning one
+// in cell A1 a formula checks which team is the winning one
 // in cells A2 and A3 formulas calculate the average score of players
 const formulas = [
     ['=IF(Formulas!A2>Formulas!A3,"TeamA","TeamB")'],
@@ -82,7 +82,7 @@ hfInstance.addSheet('TeamB');
 // insert playersB content into targeted 'TeamB' sheet
 hfInstance.setSheetContent('TeamB', playersB);
 
-// optionally, check the content in the console output
+// check the content in the console output
 console.log(hfInstance.getAllSheetsValues());
 ```
 
@@ -100,10 +100,10 @@ values including the calculated ones. Alternatively, you can use
 `getCellValue`to get the value from a specific cell.
 
 ```javascript
-// get sheet values from the Sheet of ID 2
+// get sheet values from the Sheet with an ID of 2
 const sheetValues = hfInstance.getSheetValues(2);
 
-// get a simple cell address of 'A1' from that sheet
+// get the simple cell address of 'A1' from that sheet
 const simpleCellAddress = hfInstance.simpleCellAddressFromString('A1', 2);
 
 // check the winning team 🎉

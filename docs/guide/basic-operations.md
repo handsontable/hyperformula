@@ -53,7 +53,7 @@ removed. This method returns a list of cells whose values were affected
 by this operation together with their absolute addresses and new values.
 
 ```javascript
-// track the changes triggered by removing a sheet named 'SheetName'
+// track the changes triggered by removing the sheet named 'SheetName'
 const changes = hfInstance.removeSheet('SheetName');
 ```
 
@@ -87,7 +87,7 @@ operation together with their absolute addresses and new values.
 const changes = hfInstance.clearSheet('MySheet2');
 ```
 
-### Replace sheet content
+### Replacing sheet content
 
 Instead of removing and adding the content of a sheet you can replace
 it right away. To do so use `setSheetContent`, in which you can pass
