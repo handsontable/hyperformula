@@ -57,6 +57,7 @@ const dictionary: RawTranslationPackage = {
     DATEVALUE: 'DATA.WARTOŚĆ',
     DAY: 'DZIEŃ',
     DAYS: 'DNI',
+    DAYS360: 'DNI.360',
     DEC2BIN: 'DZIES.NA.DWÓJK',
     DEC2HEX: 'DZIES.NA.SZESN',
     DEC2OCT: 'DZIES.NA.ÓSM',

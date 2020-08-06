@@ -57,6 +57,7 @@ export const dictionary: RawTranslationPackage = {
     DATEVALUE: 'FECHANUMERO',
     DAY: 'DIA',
     DAYS: 'DÍAS',
+    DAYS360: 'DIAS360',
     DEC2BIN: 'DEC.A.BIN',
     DEC2HEX: 'DEC.A.HEX',
     DEC2OCT: 'DEC.A.OCT',

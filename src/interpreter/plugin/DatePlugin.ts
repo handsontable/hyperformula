@@ -152,6 +152,14 @@ export class DatePlugin extends FunctionPlugin {
         {argumentType: ArgumentTypes.STRING},
       ],
     },
+    'DAYS360': {
+      method: 'days360',
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER, minValue: 0},
+        {argumentType: ArgumentTypes.NUMBER, minValue: 0},
+        {argumentType: ArgumentTypes.BOOLEAN, defaultValue: false},
+      ],
+    },
   }
 
   /**
@@ -427,7 +435,39 @@ export class DatePlugin extends FunctionPlugin {
             return new CellError(ErrorType.NUM)
         }
       }
-      )
+    )
+  }
+
+  public days360(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('DAYS360'),
+      (startDate: number, endDate: number, mode: boolean) => {
+        const start = this.interpreter.dateHelper.numberToSimpleDate(startDate)
+        const end = this.interpreter.dateHelper.numberToSimpleDate(endDate)
+        const endY = end.year
+        const startY = start.year
+        let endM = end.month
+        const startM = start.month
+        let endD = end.day
+        let startD = start.day
+        if(mode) {
+          endD = Math.min(endD, 30)
+          startD = Math.min(startD, 30)
+        } else {
+          if(start.day === this.interpreter.dateHelper.daysInMonth(start.year, start.month) ) {
+            startD = 30
+          }
+          if(end.day === this.interpreter.dateHelper.daysInMonth(end.year, end.month) ) {
+            if(startD < 30) {
+              endD = 1
+              endM += 1
+            } else {
+              endD = 30
+            }
+          }
+        }
+        return 360 * (endY - startY) + 30*(endM-startM) + endD-startD
+      }
+    )
   }
 }
 
