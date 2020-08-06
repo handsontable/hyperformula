@@ -95,8 +95,8 @@ const changes = hfInstance.paste({ sheet: 0, col: 1, row: 0 });
 **Cut and paste** behaves similarly to the `move` operation, so if the formula
  '=A1' is in cell B1 it will stay '=A1' after being placed into B2.
 
-**Copy and paste** behave a bit differently. If '=A1' will be copied
-from B1 into B2 cell it will become '=A2'.
+**Copy and paste** behaves a bit differently. If '=A1' is copied from
+cell B1 into B2 it will become '=A2'.
 
 ## Clear the clipboard
 

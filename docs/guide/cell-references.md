@@ -2,7 +2,7 @@
 
 A formula can refer to one or more cells and automatically update its
 contents whenever any of the referenced cells change. The values from
-other cells can be obtained using an A1 notation which is a flexible
+other cells can be obtained using A1 notation which is a flexible
 way of pointing at different sources of data for the formulas.
 
 The table below summarizes the most popular methods of referring to

@@ -1,9 +1,9 @@
 # Specifications and limits
 
 The following table presents the limits of features. Many of them
-are bounded only by the system resources. It means that the actual
+are bounded only by system resources. This means the actual
 limit depends on several factors, for example,
-resources (such as available memory) of the device HyperFormula
+the resources (such as available memory) of the device HyperFormula
 is running on.
 
 ## Sheet and cell limits
@@ -88,8 +88,8 @@ is running on.
 | Smallest magnitude allowed positive number | 5E-324 (inherited from JavaScript) |
 | Largest magnitude allowed positive number | 1.79E+308 (inherited from JavaScript) |
 | Largest magnitude allowed negative number | -1.79E+308 (inherited from JavaScript) |
-| Length of a single formula contents | Limited by system resources (JavaScript) |
+| Length of a single formula's contents | Limited by system resources (JavaScript) |
 | Number of iterations | Not supported |
 | Arguments in function | Limited by system resources (JavaScript) |
 | Number of cross-sheet dependencies | Limited by system resources (JavaScript) |
-| Number of dependencies on a single cell | Limited by system resources (JavaScript) |
+| Number of dependencies in a single cell | Limited by system resources (JavaScript) |
