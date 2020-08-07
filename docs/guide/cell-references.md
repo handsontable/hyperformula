@@ -57,12 +57,12 @@ different cells in the workbook.
 
 ### Referring to named expressions
 
-It is a special case in HyperFormula. Upon creation you define the
+This is a special case in HyperFormula. Upon creation you define the
 scope of the expression:
 
 ```javascript
 // define for a global scope
-// sheet name not passed passed
+// sheet name not passed
 hfInstance.addNamedExpression('MyGlobal', '=SUM(100+10)');
 
 // define for a local scope
@@ -75,7 +75,7 @@ And now you can use 'MyGlobal' and 'MyLocal' names.
 HyperFormula is more limited than
 typical spreadsheet software when it comes to referring to named ranges.
 For more information about how
-HyperFormula handles the named ranges,
+HyperFormula handles named ranges,
 see [this section](named-ranges.md).
 
 ## Relative references
@@ -86,15 +86,10 @@ operations like moving cells or columns.
 
 By default, all references are relative which means that when you
 copy them to other cells, the references are updated based on the
-new coordinates. There are two main exceptions though: move
-operation which uses absolute references, and named expressions
-that do not support relative references. HyperFormula provides
-`copy` , `cut` and `paste` methods that allow handling the
-clipboard operations.
+new coordinates. There are two main exceptions though: the move operation and named expressions, both of which use absolute references. HyperFormula provides
+`copy` , `cut` and `paste` methods that allow for handling clipboard operations.
 
-**Cut and paste** will behave similarly to the move operation so
-if in the cell B1 there is a formula '=A1' it will stay '=A1'
-after being placed into B2.
+**Cut and paste** behaves a bit differently. If '=A1' is copied from cell B1 into B2 it will stay after being placed into B2.
 
 **Copy and paste** will behave a bit different in a relative mean
 - if '=A1' will be copied from B1 into B2 cell it will be '=A2'.
@@ -167,15 +162,14 @@ copied between different places.
 
 ## Circular reference
 
-Since HyperFormula does not embed any UI it will allow to input
-circular reference into a cell. Compared to popular spreadsheets,
-HyperFormula does not impose any specific interaction with the user
+Since HyperFormula does not embed any UI, it allows for the input of a circular reference into a cell. Compared to popular spreadsheets,
+HyperFormula does not force any specific interaction with the user
 (i.e. displaying a warning ) when circular reference happens.
 
 When circular reference happens, HyperFormula returns #CYCLE as
-the value of the cell where circular reference occurred. After
-some CRUD operation, the error might disappear when is no longer
-a cyclic dependency. No matter what the outcome, other cells are
+the value of the cell where the circular reference occurred. After
+some CRUD operation is performed, the error might disappear when it is no longer
+a cyclic dependency. No matter the outcome, other cells are
 calculated normally and the dependency graph is updated. It
 is **non-blocking**.
 
@@ -217,7 +211,7 @@ or example:
   </tbody>
 </table>
 
-* When the VLOOKUP is told to look up for values in a column which
+* When the VLOOKUP is told to look up values in a column whose
 index is out of the scope.
 * When the INDEX function is told to return values from rows or
 columns that are out of the scope.
