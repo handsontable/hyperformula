@@ -33,10 +33,10 @@ const options = {
 };
 ```
 
-Language packs names should be passed as a string. They follow a
+Language pack names should be passed as a string. They follow a
 naming convention that incorporates two standards: ISO-639 and
-ISO-3166-1. The pattern looks like this: `languageCOUNTRY` for
-example: `nbNO`, `frFR`, `enGB` etc.
+ISO-3166-1. The pattern is `languageCOUNTRY`, for
+example `nbNO`, `frFR`, `enGB` etc.
 
 You can freely use the localized names: `SUM` can be written as
 `SOMME` and the functionality of the function will remain the same.
@@ -72,8 +72,7 @@ cells when something goes wrong:
 ## Localizing custom functions
 
 You can translate your own [custom functions](custom-functions) into
-different languages, too. You need to define them and register while
-registering a plugin:
+different languages too. You need to define the translations and register the corresponding language pack after registering a plugin:
 
 ```javascript
 const translations = {

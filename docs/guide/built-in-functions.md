@@ -5,10 +5,10 @@
 HyperFormula comes with an extensive library of pre-built functions.
 You can use them to create complex formulas for any business application.
 Formula syntax and logic of function are similar to what is
-considered a standard in modern spreadsheet software. That is
+considered the standard in modern spreadsheet software. That is
 because a spreadsheet is probably the most universal software
 ever created. We wanted the same flexibility for HyperFormula
-but without the constrains of the spreadsheet UI.
+but without the constraints of the spreadsheet UI.
 
 All implemented functions are grouped into 8 different categories:
 
@@ -27,7 +27,7 @@ are yet to be supported._
 
 ## Language packs
 
-HypeFormula provides translation packs for 16 languages thus making
+HyperFormula provides translation packs for 16 languages thus making
 it easier to create localized applications. The supported languages
 are: English (default), Czech, Danish, Dutch, Finnish, French,
 German, Hungarian, Italian, Norwegian, Polish, Portuguese, Russian,
@@ -64,7 +64,7 @@ lets you design your own [custom functions](custom-functions).
 | DATE | Date and time | This function calculates a date specified by year, month, day, and displays it in the cell's formatting. | DATE(Year; Month; Day) |
 | DAY | Date and time | Returns the day of the given date value. | DAY(Number) |
 | DAYS | Date and time | Calculates the difference between two date values. | DAYS(Date2; Date1) |
-| EOMONTH | Date and time | Returns the date of the last day of a month which falls months away from the start date. | EOMONTH(Startdate; Months) |
+| EOMONTH | Date and time | Returns the date of the last day of a month which falls Months away from the start date. | EOMONTH(Startdate; Months) |
 | MONTH | Date and time | Returns the month for the given date value. | MONTH(Number) |
 | YEAR | Date and time | Returns the year as a number according to the internal calculation rules. | YEAR(Number) |
 | BIN2DEC | Engineering | The result is the decimal number for the binary number entered. | BIN2DEC(Number) |
@@ -91,7 +91,7 @@ lets you design your own [custom functions](custom-functions).
 | ISNA | Information | Returns TRUE if the value is #N/A! error. | ISNA(Value) |
 | ISNONTEXT | Information | Tests if the cell contents are text or numbers, and returns FALSE if the contents are text. | ISNONTEXT(Value) |
 | ISNUMBER | Information | Returns TRUE if the value refers to a number. | ISNUMBER(Value) |
-| ISODD | Information | Returns TRUE if the value is odd, or FALSE if the number is even. | ISODD(Value) |
+| ISODD | Information | Returns TRUE if the value is odd, or FALSE if the value is even. | ISODD(Value) |
 | ISREF | Information | Returns TRUE if provided value is #REF! error. | ISREF(Value) |
 | ISTEXT | Information | Returns TRUE if the cell contents refer to text. | ISTEXT(Value) |
 | SHEET | Information | Returns sheet number of a given value or a formula sheet number if no argument is provided. | SHEET([Value]) |
@@ -125,7 +125,7 @@ lets you design your own [custom functions](custom-functions).
 | ATAN | Math and trigonometry | Returns the inverse trigonometric tangent of a number. | ATAN(Number) |
 | ATAN2 | Math and trigonometry | Returns the inverse trigonometric tangent of the specified x and y coordinates. | ATAN2(Numberx; Numbery) |
 | BASE | Math and trigonometry | Converts a positive integer to a specified base into a text from the numbering system. | BASE(Number; Radix; [Minimumlength]) |
-| CEILING | Math and trigonometry | Rounds a number up to the nearest multiple of Significance. | CEILING(Number; Significance; Mode) |
+| CEILING | Math and trigonometry | Rounds a number up to the nearest multiple of significance. | CEILING(Number; Significance; Mode) |
 | COS | Math and trigonometry | Returns the cosine of the given angle (in radians). | COS(Number) |
 | COT | Math and trigonometry | Returns the cotangent of the given angle (in radians). | COT(Number) |
 | COUNTUNIQUE | Math and trigonometry | Counts the number of unique values in a list of specified values and ranges. | COUNTUNIQUE(Value1, [Value2, ...]) |
