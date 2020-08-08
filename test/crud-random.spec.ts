@@ -1,19 +1,21 @@
 import {HyperFormula} from '../src'
-import {simpleCellAddress} from '../src/Cell'
 import {verifyValues} from './testUtils'
 
-let state = 1
 
 /**
  * random int from global variable 'state'
  */
-function getInt(): number {
-  state ^= state << 13
-  state ^= state >> 17
-  state ^= state << 5
-  state &= 0x7FFFFFFF
-  return state
-}
+
+const getInt = (function () {
+  let state = 1
+  return function () {
+    state ^= state << 13
+    state ^= state >> 17
+    state ^= state << 5
+    state &= 0x7FFFFFFF
+    return state
+  }
+})()
 
 /**
  * random float from global variable 'state'
@@ -25,7 +27,7 @@ function getFloat(): number {
 /**
  * boolean flag for outputing crud operations
  */
-const outputLog = false
+const outputLog = true
 
 /**
  * random int in range between min and max
@@ -65,6 +67,17 @@ function randomRange(engine: HyperFormula, rect: Rectangle): string {
   return '=SUM(' + startAddress + ':' + endAddress + ')'
 }
 
+function undoRedo(engine: HyperFormula) {
+  if(outputLog) {
+    console.log(`engine.undo()`)
+  }
+  engine.undo()
+  if(outputLog) {
+    console.log(`engine.redo()`)
+  }
+  engine.redo()
+}
+
 /**
  * Fills a rectangle of cells with random formula sums with a random ranges from another rectangle.
  * @param engine
@@ -78,6 +91,7 @@ function randomSums(engine: HyperFormula, rectFormulas: Rectangle, rectValues: R
       console.log(`engine.setCellContents({sheet: 0, col: ${pts.x}, row: ${pts.y}}, '${formula}')`)
     }
     engine.setCellContents({sheet: 0, col: pts.x, row: pts.y}, formula)
+    undoRedo(engine)
   })
 }
 
@@ -93,6 +107,7 @@ function randomVals(engine: HyperFormula, rectValues: Rectangle) {
       console.log(`engine.setCellContents({sheet: 0, col:${pts.x}, row:${pts.y}}, ${val})`)
     }
     engine.setCellContents({sheet: 0, col: pts.x, row: pts.y}, val)
+    undoRedo(engine)
   })
 }
 
@@ -147,14 +162,17 @@ function swapTwoRectangles(engine: HyperFormula, pts1: Pts, pts2: Pts, sideX: nu
     console.log(`engine.moveCells( {sheet: 0, col: ${pts1.x}, row: ${pts1.y}}, ${sideX}, ${sideY}, {sheet: 0, col: 1000, row: 1000})`)
   }
   engine.moveCells( {sheet: 0, col: pts1.x, row: pts1.y}, sideX, sideY, {sheet: 0, col: 1000, row: 1000})
+  undoRedo(engine)
   if(outputLog) {
     console.log(`engine.moveCells( {sheet: 0, col: ${pts2.x}, row: ${pts2.y}}, ${sideX}, ${sideY}, {sheet: 0, col: ${pts1.x}, row: ${pts1.y}})`)
   }
   engine.moveCells( {sheet: 0, col: pts2.x, row: pts2.y}, sideX, sideY, {sheet: 0, col: pts1.x, row: pts1.y})
+  undoRedo(engine)
   if(outputLog) {
     console.log(`engine.moveCells( {sheet: 0, col: 1000, row: 1000}, ${sideX}, ${sideY}, {sheet: 0, col: ${pts2.x}, row: ${pts2.y}})`)
   }
   engine.moveCells( {sheet: 0, col: 1000, row: 1000}, sideX, sideY, {sheet: 0, col: pts2.x, row: pts2.y})
+  undoRedo(engine)
 }
 
 /**
@@ -168,10 +186,11 @@ function swapTwoRectangles(engine: HyperFormula, pts1: Pts, pts2: Pts, sideX: nu
  */
 function randomCleanup(engine: HyperFormula, rect: Rectangle) {
   shuffleArray(allPts(rect)).forEach((pts) => {
-      engine.setCellContents({sheet: 0, col: pts.x, row: pts.y}, null)
       if(outputLog) {
         console.log(`engine.setCellContents({sheet: 0, col:${pts.x}, row:${pts.y}}, null)`)
       }
+      engine.setCellContents({sheet: 0, col: pts.x, row: pts.y}, null)
+      undoRedo(engine)
     }
   )
 }
@@ -201,16 +220,18 @@ describe('large random integration test', () => {
       }
       for (let i=0; i<n; i++) {
         const columnPositionToAdd = randomInteger(0, sideX*(n+1)+1)
-        engine.addColumns(0, [columnPositionToAdd, 2])
         if(outputLog) {
           console.log(`engine.addColumns(0, [${columnPositionToAdd},2])`)
         }
+        engine.addColumns(0, [columnPositionToAdd, 2])
+        undoRedo(engine)
         verifyValues(engine)
         const columnPositionToRemove = randomInteger(0, sideX*(n+1))
-        engine.removeColumns(0, [columnPositionToRemove, 1])
         if(outputLog) {
           console.log(`engine.removeColumns(0, [${columnPositionToRemove},1])`)
         }
+        engine.removeColumns(0, [columnPositionToRemove, 1])
+        undoRedo(engine)
       }
       sideX += 1
 
@@ -219,6 +240,7 @@ describe('large random integration test', () => {
         console.log(`engine.addRows(0, [${rowPositionToAdd},2])`)
       }
       engine.addRows(0, [rowPositionToAdd, 2])
+      undoRedo(engine)
       sideY += 2
       verifyValues(engine)
       const rowPositionToRemove = randomInteger(0, sideY)
@@ -226,6 +248,7 @@ describe('large random integration test', () => {
         console.log(`engine.removeRows(0, [${rowPositionToRemove},1])`)
       }
       engine.removeRows(0, [rowPositionToRemove, 1])
+      undoRedo(engine)
       sideY -= 1
       verifyValues(engine)
       const x1 = randomInteger(0, n*sideX)
@@ -239,10 +262,13 @@ describe('large random integration test', () => {
     expect(engine.dependencyGraph.graph.nodesCount()).toBe(0)
     expect(engine.dependencyGraph.rangeMapping.getMappingSize(0)).toBe(0)
   })
-  
-  it('dupa', () => {
+
+  it('fails', () => {
     const engine = HyperFormula.buildFromArray([])
-    expect(engine.dependencyGraph.graph.nodesCount()).toBe(0)
+    engine.setCellContents({sheet: 0, col: 13, row: 2}, '=SUM(A2:H3)')
+    engine.addColumns(0, [10,2])
+    engine.removeColumns(0, [0,1])
+    engine.undo()
   })
 })
 
