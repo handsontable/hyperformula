@@ -132,6 +132,7 @@ lets you design your own [custom functions](custom-functions).
 | COTH | Math and trigonometry | Returns the hyperbolic cotangent of the given value. | COTH(Number) |
 | COUNTUNIQUE | Math and trigonometry | Counts the number of unique values in a list of specified values and ranges. | COUNTUNIQUE(Value1, [Value2, ...]) |
 | CSC | Math and trigonometry | Returns the cosecans of the given angle (in radians). | CSC(Number) |
+| CSCH | Math and trigonometry | Returns the hyperbolic cosecans of the given value. | CSCH(Number) |
 | DECIMAL | Math and trigonometry | Converts text with characters from a number system to a positive integer in the base radix given. | DECIMAL("Text"; Radix) |
 | DEGREES | Math and trigonometry | Converts radians into degrees. | DEGREES(Number) |
 | E | Math and trigonometry | Returns 2.718281828459..., the value of the mathematical constant E to as many decimal places as set in configuration | E() |
@@ -151,6 +152,7 @@ lets you design your own [custom functions](custom-functions).
 | ROUNDDOWN | Math and trigonometry | Rounds a number down, toward zero, to a certain precision. | ROUNDDOWN(Number; Count) |
 | ROUNDUP | Math and trigonometry | Rounds a number up, away from zero, to a certain precision. | ROUNDUP(Number; Count) |
 | SEC | Math and trigonometry | Returns the secans of the given angle (in radians). | SEC(Number) |
+| SECH | Math and trigonometry | Returns the hyperbolic secans of the given value. | SEC(Number) |
 | SIN | Math and trigonometry | Returns the sine of the given angle (in radians). | SIN(Number) |
 | SINH | Math and trigonometry | Returns the hyperbolic sine of the given value. | SINH(Number) |
 | SQRT | Math and trigonometry | Returns the positive square root of a number. | SQRT(Number) |

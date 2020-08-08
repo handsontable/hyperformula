@@ -12,7 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added 4 financial functions FV, PMT, PPMT, IPMT.
 - Added FORMULATEXT function.
 - Added 8 information functions ISERR, ISNA, ISREF, NA, SHEET, SHEETS, ISBINARY, ISFORMULA (#481)
-- Added 6 trigonometry functions: SEC, CSC, SINH, COSH, TANH, COTH.
+- Added 8 trigonometry functions: SEC, CSC, SINH, COSH, TANH, COTH, SECH, CSCH.
 
 ### Changed
 - Operation `moveCells` creating cyclic dependencies does not cause losing original formula. (#479)
