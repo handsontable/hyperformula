@@ -55,6 +55,7 @@ const dictionary: RawTranslationPackage = {
     COUNTIFS: 'TÆL.HVISER',
     COUNTUNIQUE: 'COUNTUNIQUE',
     CSC: 'CSC',
+    CSCH: 'CSCH',
     DATE: 'DATO',
     DAY: 'DAG',
     DAYS: 'DAGE',

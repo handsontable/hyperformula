@@ -55,6 +55,7 @@ const dictionary: RawTranslationPackage = {
     COUNTIFS: 'ANTAL.OMF',
     COUNTUNIQUE: 'COUNTUNIQUE',
     CSC: 'CSC',
+    CSCH: 'CSCH',
     DATE: 'DATUM',
     DAY: 'DAG',
     DAYS: 'DAYS',

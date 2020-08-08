@@ -55,6 +55,7 @@ export const dictionary: RawTranslationPackage = {
     COUNTIFS: 'CONTAR.SI.CONJUNTO',
     COUNTUNIQUE: 'COUNTUNIQUE',
     CSC: 'CSC',
+    CSCH: 'CSCH',
     DATE: 'FECHA',
     DAY: 'DIA',
     DAYS: 'DÍAS',

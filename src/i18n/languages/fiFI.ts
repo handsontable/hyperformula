@@ -55,6 +55,7 @@ const dictionary: RawTranslationPackage = {
     COUNTIFS: 'LASKE.JOS.JOUKKO',
     COUNTUNIQUE: 'COUNTUNIQUE',
     CSC: 'KOSEK',
+    CSCH: 'KOSEKH',
     DATE: 'PÄIVÄYS',
     DAY: 'PÄIVÄ',
     DAYS: 'PV',
