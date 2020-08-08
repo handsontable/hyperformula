@@ -52,6 +52,7 @@ const dictionary: RawTranslationPackage = {
     COUNTIF: 'СЧЁТЕСЛИ',
     COUNTIFS: 'СЧЁТЕСЛИМН',
     COUNTUNIQUE: 'COUNTUNIQUE',
+    CSC: 'CSC',
     DATE: 'ДАТА',
     DAY: 'ДЕНЬ',
     DAYS: 'ДНИ',

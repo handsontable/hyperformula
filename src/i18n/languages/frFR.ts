@@ -52,6 +52,7 @@ const dictionary: RawTranslationPackage = {
     COUNTIF: 'NB.SI',
     COUNTIFS: 'NB.SI.ENS',
     COUNTUNIQUE: 'COUNTUNIQUE',
+    CSC: 'CSC',
     DATE: 'DATE',
     DAY: 'JOUR',
     DAYS: 'JOURS',

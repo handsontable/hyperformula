@@ -68,6 +68,12 @@ export class TrigonometryPlugin extends FunctionPlugin {
         { argumentType: ArgumentTypes.NUMBER }
       ]
     },
+    'CSC': {
+      method: 'cosec',
+      parameters: [
+        { argumentType: ArgumentTypes.NUMBER }
+      ]
+    },
   }
 
   /**
@@ -107,18 +113,20 @@ export class TrigonometryPlugin extends FunctionPlugin {
   }
 
   public ctg(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('COT'), (coercedArg) => {
-      if (coercedArg === 0) {
-        return new CellError(ErrorType.DIV_BY_ZERO)
-      } else {
-        return (1 / Math.tan(coercedArg))
-      }
-    })
+    return this.runFunction(ast.args, formulaAddress, this.metadata('COT'),
+      (arg) => (arg === 0) ? new CellError(ErrorType.DIV_BY_ZERO) : (1 / Math.tan(arg))
+    )
   }
 
   public sec(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.runFunction(ast.args, formulaAddress, this.metadata('SEC'),
       (arg: number) => 1 / Math.cos(arg)
+    )
+  }
+  
+  public cosec(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('CSC'),
+      (arg) => (arg === 0) ? new CellError(ErrorType.DIV_BY_ZERO) : (1 / Math.sin(arg))
     )
   }
 }
