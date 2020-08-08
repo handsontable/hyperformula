@@ -57,7 +57,7 @@ export class TrigonometryPlugin extends FunctionPlugin {
       ]
     },
     'COT': {
-      method: 'ctg',
+      method: 'cot',
       parameters: [
         { argumentType: ArgumentTypes.NUMBER }
       ]
@@ -82,6 +82,18 @@ export class TrigonometryPlugin extends FunctionPlugin {
     },
     'COSH': {
       method: 'cosh',
+      parameters: [
+        { argumentType: ArgumentTypes.NUMBER }
+      ]
+    },
+    'TANH': {
+      method: 'tanh',
+      parameters: [
+        { argumentType: ArgumentTypes.NUMBER }
+      ]
+    },
+    'COTH': {
+      method: 'coth',
       parameters: [
         { argumentType: ArgumentTypes.NUMBER }
       ]
@@ -124,7 +136,7 @@ export class TrigonometryPlugin extends FunctionPlugin {
     return this.runFunction(ast.args, formulaAddress, this.metadata('ATAN2'), Math.atan2)
   }
 
-  public ctg(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+  public cot(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.runFunction(ast.args, formulaAddress, this.metadata('COT'),
       (arg) => (arg === 0) ? new CellError(ErrorType.DIV_BY_ZERO) : (1 / Math.tan(arg))
     )
@@ -148,5 +160,15 @@ export class TrigonometryPlugin extends FunctionPlugin {
 
   public cosh(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.runFunction(ast.args, formulaAddress, this.metadata('COSH'), Math.cosh)
+  }
+
+  public tanh(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('TANH'), Math.tanh)
+  }
+
+  public coth(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('COTH'),
+      (arg) => (arg === 0) ? new CellError(ErrorType.DIV_BY_ZERO) : (1 / Math.tanh(arg))
+    )
   }
 }
