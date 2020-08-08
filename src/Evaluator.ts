@@ -5,7 +5,7 @@
 
 import {AbsoluteCellRange} from './AbsoluteCellRange'
 import {absolutizeDependencies} from './absolutizeDependencies'
-import {CellError, ErrorType, InternalCellValue, SimpleCellAddress} from './Cell'
+import {CellError, ErrorType, SimpleCellAddress} from './Cell'
 import {ColumnSearchStrategy} from './ColumnSearch/ColumnSearchStrategy'
 import {Config} from './Config'
 import {ContentChanges} from './ContentChanges'
@@ -13,7 +13,7 @@ import {DateTimeHelper} from './DateTimeHelper'
 import {DependencyGraph, FormulaCellVertex, MatrixVertex, RangeVertex, Vertex} from './DependencyGraph'
 import {fixNegativeZero, isNumberOverflow} from './interpreter/ArithmeticHelper'
 import {Interpreter} from './interpreter/Interpreter'
-import {SimpleRangeValue} from './interpreter/InterpreterValue'
+import {InterpreterValue, SimpleRangeValue} from './interpreter/InterpreterValue'
 import {Matrix} from './Matrix'
 import {Ast, RelativeDependency} from './parser'
 import {Statistics, StatType} from './statistics'
@@ -110,7 +110,7 @@ export class Evaluator {
     this.interpreter.destroy()
   }
 
-  public runAndForget(ast: Ast, address: SimpleCellAddress, dependencies: RelativeDependency[]): InternalCellValue {
+  public runAndForget(ast: Ast, address: SimpleCellAddress, dependencies: RelativeDependency[]): InterpreterValue {
     const tmpRanges: RangeVertex[] = []
     for (const dep of absolutizeDependencies(dependencies, address)) {
       if (dep instanceof AbsoluteCellRange) {
@@ -165,7 +165,7 @@ export class Evaluator {
     })
   }
 
-  private evaluateAstToCellValue(ast: Ast, formulaAddress: SimpleCellAddress): InternalCellValue {
+  private evaluateAstToCellValue(ast: Ast, formulaAddress: SimpleCellAddress): InterpreterValue {
     const interpreterValue = this.interpreter.evaluateAst(ast, formulaAddress)
     if (interpreterValue instanceof SimpleRangeValue) {
       return interpreterValue

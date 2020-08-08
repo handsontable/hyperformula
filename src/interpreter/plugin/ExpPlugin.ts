@@ -5,12 +5,15 @@
 
 import {InternalScalarValue, SimpleCellAddress} from '../../Cell'
 import {ProcedureAst} from '../../parser'
-import {FunctionPlugin} from './FunctionPlugin'
+import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
 
 export class ExpPlugin extends FunctionPlugin {
   public static implementedFunctions = {
     'EXP': {
       method: 'exp',
+      parameters:[
+        { argumentType: ArgumentTypes.NUMBER }
+      ],
     },
   }
 
@@ -23,8 +26,6 @@ export class ExpPlugin extends FunctionPlugin {
    * @param formulaAddress
    */
   public exp(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.templateWithOneCoercedToNumberArgument(ast, formulaAddress, (arg) => {
-      return Math.exp(arg)
-    })
+    return this.runFunction(ast.args, formulaAddress, this.metadata('EXP'), Math.exp)
   }
 }

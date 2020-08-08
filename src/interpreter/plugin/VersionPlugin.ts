@@ -3,7 +3,7 @@
  * Copyright (c) 2020 Handsoncode. All rights reserved.
  */
 
-import { InternalCellValue } from '../../Cell'
+import {InterpreterValue} from '../InterpreterValue'
 import { FunctionPlugin } from './FunctionPlugin'
 import { HyperFormula } from '../../HyperFormula'
 import { LicenseKeyValidityState } from '../../helpers/licenseKeyValidator'
@@ -23,7 +23,7 @@ export class VersionPlugin extends FunctionPlugin {
     },
   }
 
-  public version(): InternalCellValue {
+  public version(): InterpreterValue {
     const {
       licenseKeyValidityState: validityState,
       licenseKey,

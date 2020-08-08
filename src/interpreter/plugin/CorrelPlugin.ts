@@ -39,8 +39,8 @@ export class CorrelPlugin extends FunctionPlugin {
   }
 
   private computePearson(dataX: SimpleRangeValue, dataY: SimpleRangeValue): number | CellError {
-    const xit = dataX.valuesFromTopLeftCorner()
-    const yit = dataY.valuesFromTopLeftCorner()
+    const xit = dataX.iterateValuesFromTopLeftCorner()
+    const yit = dataY.iterateValuesFromTopLeftCorner()
     let x, y
 
     let count = 0

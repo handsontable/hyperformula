@@ -1,5 +1,4 @@
-import {HyperFormula} from '../../src'
-import {ErrorType} from '../../src/Cell'
+import {ErrorType, HyperFormula} from '../../src'
 import {adr, detailedError} from '../testUtils'
 
 describe('Function AND', () => {
@@ -22,14 +21,27 @@ describe('Function AND', () => {
     expect(engine.getCellValue(adr('C1'))).toBe(true)
   })
 
-  it('use coercion', () => {
+  it('use coercion #1', () => {
     const engine = HyperFormula.buildFromArray([
       ['=AND("TRUE", 1)'],
       ['=AND("foo", TRUE())'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toBe(true)
+    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.VALUE))
+  })
+
+  it('use coercion #2', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=AND(A4:B4)'],
+      ['=AND(C4:D4)'],
+      ['=AND(C4:D4, "foo")'],
+      ['TRUE', 1, 'foo', '=TRUE()'],
+    ])
+
+    expect(engine.getCellValue(adr('A1'))).toBe(true)
     expect(engine.getCellValue(adr('A2'))).toBe(true)
+    expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.VALUE))
   })
 
   it('if error in range found, returns first one in row-by-row order', () => {

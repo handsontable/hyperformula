@@ -44,6 +44,18 @@ describe('Function IF', () => {
     expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.DIV_BY_ZERO))
   })
 
+  it('passes errors', () => {
+    const engine = HyperFormula.buildFromArray([['=IF(TRUE(), 4/0, "no")']])
+
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.DIV_BY_ZERO))
+  })
+
+  it('passes correct value when other arg is an error', () => {
+    const engine = HyperFormula.buildFromArray([['=IF(FALSE(), 4/0, "no")']])
+
+    expect(engine.getCellValue(adr('A1'))).toEqual('no')
+  })
+
   it('when condition is number', () => {
     const engine = HyperFormula.buildFromArray([['=IF(1, "yes", "no")']])
 

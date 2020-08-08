@@ -3,48 +3,39 @@
  * Copyright (c) 2020 Handsoncode. All rights reserved.
  */
 
-import {CellError, ErrorType, InternalScalarValue, SimpleCellAddress} from '../../Cell'
-import {AstNodeType, ProcedureAst} from '../../parser'
-import {FunctionPlugin} from './FunctionPlugin'
+import {InternalScalarValue, SimpleCellAddress} from '../../Cell'
+import {ProcedureAst} from '../../parser'
+import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
 
 export class ErrorFunctionPlugin extends FunctionPlugin {
   public static implementedFunctions = {
     'ERF': {
       method: 'erf',
+      parameters: [
+          {argumentType: ArgumentTypes.NUMBER},
+          {argumentType: ArgumentTypes.NUMBER, optionalArg: true},
+        ]
     },
     'ERFC': {
       method: 'erfc',
+      parameters: [
+          {argumentType: ArgumentTypes.NUMBER}
+        ]
     },
   }
 
   public erf(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    if (ast.args.length < 1 || ast.args.length > 2) {
-      return new CellError(ErrorType.NA)
-    }
-    if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
-      return new CellError(ErrorType.NUM)
-    }
-
-    const lowerBound = this.getNumericArgument(ast, formulaAddress, 0)
-    if (lowerBound instanceof CellError) {
-      return lowerBound
-    }
-
-    if (ast.args.length === 2) {
-      const upperBound = this.getNumericArgument(ast, formulaAddress, 1)
-      if (upperBound instanceof CellError) {
-        return upperBound
+    return this.runFunction(ast.args, formulaAddress, this.metadata('ERF'), (lowerBound, upperBound) => {
+      if (upperBound === undefined) {
+        return erf(lowerBound)
+      } else {
+        return erf(upperBound) - erf(lowerBound)
       }
-      return erf2(lowerBound, upperBound)
-    }
-
-    return erf(lowerBound)
+    })
   }
 
   public erfc(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.templateWithOneCoercedToNumberArgument(ast, formulaAddress, (arg: number) => {
-      return erfc(arg)
-    })
+    return this.runFunction(ast.args, formulaAddress, this.metadata('ERFC'), erfc)
   }
 }
 
@@ -72,10 +63,6 @@ function erfApprox(x: number): number {
   }, 1)
 
   return 1 - (1 / Math.pow(poly, polyExponent))
-}
-
-function erf2(lowerBound: number, upperBound: number): number {
-  return erf(upperBound) - erf(lowerBound)
 }
 
 function erfc(x: number): number {

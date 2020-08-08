@@ -8,7 +8,7 @@ import {
   CellValueTypeOrd,
   EmptyValue,
   ErrorType,
-  getCellValueType, InternalCellValue,
+  getCellValueType,
   InternalNoErrorCellValue,
   InternalScalarValue
 } from '../Cell'
@@ -32,12 +32,12 @@ export class ArithmeticHelper {
     this.actualEps = config.smartRounding ? config.precisionEpsilon : 0
   }
 
-  public eqMatcherFunction(pattern: string): (arg: InternalCellValue) => boolean {
+  public eqMatcherFunction(pattern: string): (arg: InterpreterValue) => boolean {
     const regexp = this.buildRegex(pattern)
     return (cellValue) => (typeof cellValue === 'string' && regexp.test(this.normalizeString(cellValue)))
   }
 
-  public neqMatcherFunction(pattern: string): (arg: InternalCellValue) => boolean {
+  public neqMatcherFunction(pattern: string): (arg: InterpreterValue) => boolean {
     const regexp = this.buildRegex(pattern)
     return (cellValue) => {
       return (typeof cellValue !== 'string' || !regexp.test(this.normalizeString(cellValue)))
@@ -225,13 +225,13 @@ export class ArithmeticHelper {
     return this.coerceToMaybeNumber(arg) ?? new CellError(ErrorType.VALUE)
   }
 
-  public coerceToMaybeNumber(arg: InternalNoErrorCellValue): Maybe<number> {
+  public coerceToMaybeNumber(arg: InternalScalarValue): Maybe<number> {
     return this.coerceNonDateScalarToMaybeNumber(arg) ?? (
       typeof arg === 'string' ? this.dateTimeHelper.dateStringToDateNumber(arg) : undefined
     )
   }
 
-  public coerceNonDateScalarToMaybeNumber(arg: InternalNoErrorCellValue): Maybe<number> {
+  public coerceNonDateScalarToMaybeNumber(arg: InternalScalarValue): Maybe<number> {
     if (arg === EmptyValue) {
       return 0
     } else if (typeof arg === 'string' && this.numberLiteralsHelper.isNumber(arg)) {
@@ -289,10 +289,8 @@ export function coerceEmptyToValue(arg: InternalNoErrorCellValue): InternalNoErr
  *
  * @param arg
  */
-export function coerceScalarToBoolean(arg: InternalScalarValue): boolean | CellError | null {
-  if (arg instanceof SimpleRangeValue) {
-    return new CellError(ErrorType.VALUE)
-  } else if (arg instanceof CellError || typeof arg === 'boolean') {
+export function coerceScalarToBoolean(arg: InternalScalarValue): boolean | CellError | undefined {
+  if (arg instanceof CellError || typeof arg === 'boolean') {
     return arg
   } else if (arg === EmptyValue) {
     return false
@@ -307,7 +305,7 @@ export function coerceScalarToBoolean(arg: InternalScalarValue): boolean | CellE
     } else if (argUppered === '') {
       return false
     } else {
-      return null
+      return undefined
     }
   }
 }

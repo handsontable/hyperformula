@@ -1,5 +1,5 @@
+import {InterpreterValue} from '../../src/interpreter/InterpreterValue'
 import { FunctionPlugin } from '../../src/interpreter/plugin/FunctionPlugin'
-import { InternalCellValue } from '../../src/Cell'
 import { HyperFormula } from '../../src'
 import { adr } from '../testUtils'
 import {ProtectedFunctionError} from '../../src/errors'
@@ -75,7 +75,7 @@ describe('Function VERSION', () => {
         }
       }
     
-      public version(): InternalCellValue {
+      public version(): InterpreterValue {
         return 'version'
       }
     }

@@ -5,10 +5,9 @@
 
 import {CellError, ErrorType, InternalScalarValue, SimpleCellAddress} from '../../Cell'
 import {padLeft} from '../../format/format'
-import {AstNodeType, ProcedureAst} from '../../parser'
-import {coerceScalarToString} from '../ArithmeticHelper'
-import {SimpleRangeValue} from '../InterpreterValue'
-import {FunctionPlugin} from './FunctionPlugin'
+import {Maybe} from '../../Maybe'
+import {ProcedureAst} from '../../parser'
+import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
 
 const NUMBER_OF_BITS = 10
 const DECIMAL_NUMBER_OF_BITS = 255
@@ -20,187 +19,132 @@ export class RadixConversionPlugin extends FunctionPlugin {
   public static implementedFunctions = {
     'DEC2BIN': {
       method: 'dec2bin',
+      parameters:  [
+        { argumentType: ArgumentTypes.NUMBER, minValue: minValFromBase(2), maxValue: maxValFromBase(2) },
+        { argumentType: ArgumentTypes.NUMBER, optionalArg: true, minValue: 1, maxValue: 10 },
+      ],
     },
     'DEC2OCT': {
       method: 'dec2oct',
+      parameters: [
+        { argumentType: ArgumentTypes.NUMBER, minValue: minValFromBase(8), maxValue: maxValFromBase(8) },
+        { argumentType: ArgumentTypes.NUMBER, optionalArg: true, minValue: 1, maxValue: 10 },
+      ],
     },
     'DEC2HEX': {
       method: 'dec2hex',
+      parameters: [
+        { argumentType: ArgumentTypes.NUMBER, minValue: minValFromBase(16), maxValue: maxValFromBase(16) },
+        { argumentType: ArgumentTypes.NUMBER, optionalArg: true, minValue: 1, maxValue: 10 },
+      ],
     },
     'BIN2DEC': {
       method: 'bin2dec',
+      parameters: [
+        { argumentType: ArgumentTypes.STRING }
+      ],
     },
     'BIN2OCT': {
       method: 'bin2oct',
+      parameters: [
+        { argumentType: ArgumentTypes.STRING },
+        { argumentType: ArgumentTypes.NUMBER, optionalArg: true, minValue: 0, maxValue: DECIMAL_NUMBER_OF_BITS},
+      ],
     },
     'BIN2HEX': {
       method: 'bin2hex',
+      parameters: [
+        { argumentType: ArgumentTypes.STRING },
+        { argumentType: ArgumentTypes.NUMBER, optionalArg: true, minValue: 0, maxValue: DECIMAL_NUMBER_OF_BITS},
+      ],
     },
     'DECIMAL': {
       method: 'decimal',
+      parameters: [
+        { argumentType: ArgumentTypes.STRING },
+        { argumentType: ArgumentTypes.NUMBER, minValue: MIN_BASE, maxValue: MAX_BASE },
+      ],
     },
     'BASE': {
       method: 'base',
+      parameters: [
+        { argumentType: ArgumentTypes.NUMBER, minValue: 0 },
+        { argumentType: ArgumentTypes.NUMBER, minValue: MIN_BASE, maxValue: MAX_BASE },
+        { argumentType: ArgumentTypes.NUMBER, optionalArg: true, minValue: 0, maxValue: DECIMAL_NUMBER_OF_BITS},
+      ],
     },
   }
 
   public dec2bin(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.dec2base(ast, formulaAddress, 2)
+    return this.runFunction(ast.args, formulaAddress, this.metadata('DEC2BIN'),
+      (value, places) => decimalToBaseWithExactPadding(value, 2, places)
+    )
   }
 
   public dec2oct(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.dec2base(ast, formulaAddress, 8)
+    return this.runFunction(ast.args, formulaAddress, this.metadata('DEC2OCT'),
+      (value, places) => decimalToBaseWithExactPadding(value, 8, places)
+    )
   }
 
   public dec2hex(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.dec2base(ast, formulaAddress, 16)
+    return this.runFunction(ast.args, formulaAddress, this.metadata('DEC2HEX'),
+      (value, places) => decimalToBaseWithExactPadding(value, 16, places)
+    )
   }
 
   public bin2dec(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    if (ast.args.length !== 1) {
-      return new CellError(ErrorType.NA)
-    }
-
-    const binaryWithSign = this.getFirstArgumentAsNumberInBase(ast, formulaAddress, 2, NUMBER_OF_BITS)
-    if (binaryWithSign instanceof CellError) {
-      return binaryWithSign
-    }
-
-    return twoComplementToDecimal(binaryWithSign)
+    return this.runFunction(ast.args, formulaAddress, this.metadata('BIN2DEC'), (binary) => {
+        const binaryWithSign = coerceStringToBase(binary, 2, NUMBER_OF_BITS)
+        if(binaryWithSign === undefined) {
+          return new CellError(ErrorType.NUM)
+        }
+        return twoComplementToDecimal(binaryWithSign)
+      })
   }
 
   public bin2oct(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.bin2base(ast, formulaAddress, 8)
+    return this.runFunction(ast.args, formulaAddress, this.metadata('BIN2OCT'), (binary, places) => {
+      const binaryWithSign = coerceStringToBase(binary, 2, NUMBER_OF_BITS)
+      if(binaryWithSign === undefined) {
+        return new CellError(ErrorType.NUM)
+      }
+      return decimalToBaseWithExactPadding(twoComplementToDecimal(binaryWithSign), 8, places)
+    })
   }
 
   public bin2hex(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.bin2base(ast, formulaAddress, 16)
+    return this.runFunction(ast.args, formulaAddress, this.metadata('BIN2HEX'), (binary, places) => {
+      const binaryWithSign = coerceStringToBase(binary, 2, NUMBER_OF_BITS)
+      if(binaryWithSign === undefined) {
+        return new CellError(ErrorType.NUM)
+      }
+      return decimalToBaseWithExactPadding(twoComplementToDecimal(binaryWithSign), 16, places)
+    })
   }
 
   public base(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    if (ast.args.length < 2 || ast.args.length > 3) {
-      return new CellError(ErrorType.NA)
-    }
-    if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
-      return new CellError(ErrorType.NUM)
-    }
-
-    const value = this.getNumericArgument(ast, formulaAddress, 0)
-    if (value instanceof CellError) {
-      return value
-    }
-
-    const base = this.getNumericArgument(ast, formulaAddress, 1, MIN_BASE, MAX_BASE)
-    if (base instanceof CellError) {
-      return base
-    }
-
-    let padding
-    if (ast.args.length === 3) {
-      padding = this.getNumericArgument(ast, formulaAddress, 2, 0, DECIMAL_NUMBER_OF_BITS)
-      if (padding instanceof CellError) {
-        return padding
-      }
-    }
-
-    if (value < 0) {
-      return new CellError(ErrorType.NUM)
-    }
-
-    return decimalToBaseWithMinimumPadding(value, base, padding)
+    return this.runFunction(ast.args, formulaAddress, this.metadata('BASE'), decimalToBaseWithMinimumPadding)
   }
 
   public decimal(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    if (ast.args.length !== 2) {
-      return new CellError(ErrorType.NA)
-    }
-    if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
-      return new CellError(ErrorType.NUM)
-    }
-
-    const base = this.getNumericArgument(ast, formulaAddress, 1, MIN_BASE, MAX_BASE)
-    if (base instanceof CellError) {
-      return base
-    }
-
-    const input = this.getFirstArgumentAsNumberInBase(ast, formulaAddress, base, DECIMAL_NUMBER_OF_BITS)
-    if (input instanceof CellError) {
-      return input
-    }
-
-    return parseInt(input, base)
-  }
-
-  private bin2base(ast: ProcedureAst, formulaAddress: SimpleCellAddress, base: number): InternalScalarValue {
-    if (ast.args.length < 1 || ast.args.length > 2) {
-      return new CellError(ErrorType.NA)
-    }
-    if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
-      return new CellError(ErrorType.NUM)
-    }
-
-    const binaryWithSign = this.getFirstArgumentAsNumberInBase(ast, formulaAddress, 2, NUMBER_OF_BITS)
-    if (binaryWithSign instanceof CellError) {
-      return binaryWithSign
-    }
-
-    let places
-    if (ast.args.length === 2) {
-      places = this.getNumericArgument(ast, formulaAddress, 1, 1, 10)
-      if (places instanceof CellError) {
-        return places
-      }
-    }
-
-    const decimal = twoComplementToDecimal(binaryWithSign)
-    return decimalToBaseWithExactPadding(decimal, base, places)
-  }
-
-  private dec2base(ast: ProcedureAst, formulaAddress: SimpleCellAddress, base: number): InternalScalarValue {
-    if (ast.args.length < 1 || ast.args.length > 2) {
-      return new CellError(ErrorType.NA)
-    }
-    if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
-      return new CellError(ErrorType.NUM)
-    }
-
-    let places
-    if (ast.args.length === 2) {
-      places = this.getNumericArgument(ast, formulaAddress, 1, 1, 10)
-      if (places instanceof CellError) {
-        return places
-      }
-    }
-
-    const min = -Math.pow(base, NUMBER_OF_BITS) / 2
-    const max = -min - 1
-
-    const value = this.getNumericArgument(ast, formulaAddress, 0, min, max)
-    if (value instanceof CellError) {
-      return value
-    }
-
-    return decimalToBaseWithExactPadding(value, base, places)
-  }
-
-  private getFirstArgumentAsNumberInBase(ast: ProcedureAst, formulaAddress: SimpleCellAddress, base: number, maxLength: number): string | CellError {
-    const arg = this.evaluateAst(ast.args[0], formulaAddress)
-
-    if (arg instanceof SimpleRangeValue) {
-      return new CellError(ErrorType.VALUE)
-    }
-
-    const value = coerceScalarToString(arg)
-    if (typeof value === 'string') {
-      const baseAlphabet = ALPHABET.substr(0, base)
-      const regex = new RegExp(`^[${baseAlphabet}]+$`)
-      if (value.length > maxLength || !regex.test(value)) {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('DECIMAL'), (arg, base) => {
+      const input = coerceStringToBase(arg, base, DECIMAL_NUMBER_OF_BITS)
+      if(input === undefined) {
         return new CellError(ErrorType.NUM)
       }
-    }
-
-    return value
+      return parseInt(input, base)
+    })
   }
+}
+
+function coerceStringToBase(value: string, base: number, maxLength: number): Maybe<string> {
+  const baseAlphabet = ALPHABET.substr(0, base)
+  const regex = new RegExp(`^[${baseAlphabet}]+$`)
+  if (value.length > maxLength || !regex.test(value)) {
+    return undefined
+  }
+  return value
 }
 
 function decimalToBaseWithExactPadding(value: number, base: number, places?: number): string | CellError {
@@ -212,6 +156,14 @@ function decimalToBaseWithExactPadding(value: number, base: number, places?: num
   } else {
     return padLeft(result, places)
   }
+}
+
+function minValFromBase(base: number) {
+  return -Math.pow(base, NUMBER_OF_BITS) / 2
+}
+
+function maxValFromBase(base: number) {
+  return -minValFromBase(base) - 1
 }
 
 function decimalToBaseWithMinimumPadding(value: number, base: number, places?: number): string {
