@@ -20,6 +20,7 @@ const dictionary: RawTranslationPackage = {
   functions: {
     ABS: 'ITSEISARVO',
     ACOS: 'ACOS',
+    ACOT: 'ACOT',
     AND: 'JA',
     ASIN: 'ASIN',
     ATAN: 'ATAN',

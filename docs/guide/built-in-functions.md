@@ -121,6 +121,7 @@ lets you design your own [custom functions](custom-functions).
 | VLOOKUP | Lookup and reference | Searches vertically with reference to adjacent cells to the right. | VLOOKUP(Search_Criterion; Array; Index; Sort_Order) |
 | ABS | Math and trigonometry | Returns the absolute value of a number. | ABS(Number) |
 | ACOS | Math and trigonometry | Returns the inverse trigonometric cosine of a number. | ACOS(Number) |
+| ACOT | Math and trigonometry | Returns the inverse trigonometric cotangent of a number. | ACOT(Number) |
 | ASIN | Math and trigonometry | Returns the inverse trigonometric sine of a number. | ASIN(Number) |
 | ATAN | Math and trigonometry | Returns the inverse trigonometric tangent of a number. | ATAN(Number) |
 | ATAN2 | Math and trigonometry | Returns the inverse trigonometric tangent of the specified x and y coordinates. | ATAN2(Numberx; Numbery) |

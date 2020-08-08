@@ -6,6 +6,7 @@
 import {CellError, ErrorType, InternalScalarValue, SimpleCellAddress} from '../../Cell'
 import {ProcedureAst} from '../../parser'
 import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
+import {PI} from './MathConstantsPlugin'
 
 /**
  * Interpreter plugin containing trigonometric functions
@@ -110,6 +111,12 @@ export class TrigonometryPlugin extends FunctionPlugin {
         { argumentType: ArgumentTypes.NUMBER }
       ]
     },
+    'ACOT': {
+      method: 'acot',
+      parameters: [
+        { argumentType: ArgumentTypes.NUMBER }
+      ]
+    },
   }
 
   /**
@@ -151,6 +158,12 @@ export class TrigonometryPlugin extends FunctionPlugin {
   public cot(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.runFunction(ast.args, formulaAddress, this.metadata('COT'),
       (arg) => (arg === 0) ? new CellError(ErrorType.DIV_BY_ZERO) : (1 / Math.tan(arg))
+    )
+  }
+
+  public acot(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('ACOT'),
+      (arg) => (arg === 0) ? PI/2 : Math.atan(1/arg)
     )
   }
 
