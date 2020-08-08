@@ -74,6 +74,18 @@ export class TrigonometryPlugin extends FunctionPlugin {
         { argumentType: ArgumentTypes.NUMBER }
       ]
     },
+    'SINH': {
+      method: 'sinh',
+      parameters: [
+        { argumentType: ArgumentTypes.NUMBER }
+      ]
+    },
+    'COSH': {
+      method: 'cosh',
+      parameters: [
+        { argumentType: ArgumentTypes.NUMBER }
+      ]
+    },
   }
 
   /**
@@ -123,10 +135,18 @@ export class TrigonometryPlugin extends FunctionPlugin {
       (arg: number) => 1 / Math.cos(arg)
     )
   }
-  
+
   public cosec(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.runFunction(ast.args, formulaAddress, this.metadata('CSC'),
       (arg) => (arg === 0) ? new CellError(ErrorType.DIV_BY_ZERO) : (1 / Math.sin(arg))
     )
+  }
+
+  public sinh(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('SINH'), Math.sinh)
+  }
+
+  public cosh(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('COSH'), Math.cosh)
   }
 }
