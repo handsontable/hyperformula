@@ -131,7 +131,6 @@ lets you design your own [custom functions](custom-functions).
 | COUNTUNIQUE | Math and trigonometry | Counts the number of unique values in a list of specified values and ranges. | COUNTUNIQUE(Value1, [Value2, ...]) |
 | DECIMAL | Math and trigonometry | Converts text with characters from a number system to a positive integer in the base radix given. | DECIMAL("Text"; Radix) |
 | DEGREES | Math and trigonometry | Converts radians into degrees. | DEGREES(Number) |
-| E | Math and trigonometry | Returns 2.718281828459..., the value of the mathematical constant E to as many decimal places as set in configuration | E() |
 | EVEN | Math and trigonometry | Rounds a positive number up to the next even integer and a negative number down to the next even integer. | EVEN(Number) |
 | EXP | Math and trigonometry | Returns e raised to the power of a number. | EXP(Number) |
 | INT | Math and trigonometry | Rounds a number down to the nearest integer. | INT(Number) |

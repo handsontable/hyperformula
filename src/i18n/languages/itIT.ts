@@ -61,7 +61,6 @@ const dictionary: RawTranslationPackage = {
     DECIMAL: 'DECIMALE',
     DEGREES: 'GRADI',
     DELTA: 'DELTA',
-    E: 'E',
     EOMONTH: 'FINE.MESE',
     ERF: 'FUNZ.ERRORE',
     ERFC: 'FUNZ.ERRORE.COMP',
