@@ -127,8 +127,11 @@ lets you design your own [custom functions](custom-functions).
 | BASE | Math and trigonometry | Converts a positive integer to a specified base into a text from the numbering system. | BASE(Number; Radix; [Minimumlength]) |
 | CEILING | Math and trigonometry | Rounds a number up to the nearest multiple of Significance. | CEILING(Number; Significance; Mode) |
 | COS | Math and trigonometry | Returns the cosine of the given angle (in radians). | COS(Number) |
+| COSH | Math and trigonometry | Returns the hyperbolic cosine of the given value. | COSH(Number) |
 | COT | Math and trigonometry | Returns the cotangent of the given angle (in radians). | COT(Number) |
+| COTH | Math and trigonometry | Returns the hyperbolic cotangent of the given value. | COTH(Number) |
 | COUNTUNIQUE | Math and trigonometry | Counts the number of unique values in a list of specified values and ranges. | COUNTUNIQUE(Value1, [Value2, ...]) |
+| CSC | Math and trigonometry | Returns the cosecans of the given angle (in radians). | CSC(Number) |
 | DECIMAL | Math and trigonometry | Converts text with characters from a number system to a positive integer in the base radix given. | DECIMAL("Text"; Radix) |
 | DEGREES | Math and trigonometry | Converts radians into degrees. | DEGREES(Number) |
 | E | Math and trigonometry | Returns 2.718281828459..., the value of the mathematical constant E to as many decimal places as set in configuration | E() |
@@ -147,7 +150,9 @@ lets you design your own [custom functions](custom-functions).
 | ROUND | Math and trigonometry | Rounds a number to a certain number of decimal places. | ROUND(Number; Count) |
 | ROUNDDOWN | Math and trigonometry | Rounds a number down, toward zero, to a certain precision. | ROUNDDOWN(Number; Count) |
 | ROUNDUP | Math and trigonometry | Rounds a number up, away from zero, to a certain precision. | ROUNDUP(Number; Count) |
+| SEC | Math and trigonometry | Returns the secans of the given angle (in radians). | SEC(Number) |
 | SIN | Math and trigonometry | Returns the sine of the given angle (in radians). | SIN(Number) |
+| SINH | Math and trigonometry | Returns the hyperbolic sine of the given value. | SINH(Number) |
 | SQRT | Math and trigonometry | Returns the positive square root of a number. | SQRT(Number) |
 | SUM | Math and trigonometry | Adds all the numbers in a range of cells. | SUM(Number1; Number2; ...; Number30) |
 | SUMIF | Math and trigonometry | Adds the cells specified by given criteria. | SUMIF(Range; Criteria; Sumrange) |
@@ -155,6 +160,7 @@ lets you design your own [custom functions](custom-functions).
 | SUMPRODUCT | Math and trigonometry | Multiplies corresponding elements in the given arrays, and returns the sum of those products. | SUMPRODUCT(Array1; Array2...Array30) |
 | SUMSQ | Math and trigonometry | Returns the sum of the squares of the arguments | SUMSQ(Number1; Number2; ...; Number30) |
 | TAN | Math and trigonometry | Returns the tangent of the given angle (in radians). | TAN(Number) |
+| TANH | Math and trigonometry | Returns the hyperbolic tangent of the given value. | TANH(Number) |
 | TRUNC | Math and trigonometry | Truncates a number by removing decimal places. | TRUNC(Number; Count) |
 | MMULT | Matrix functions | Calculates the array product of two arrays. | MMULT(Array; Array) |
 | MEDIANPOOL | Matrix functions | Calculates a smaller range which is a median of a Window_size, in a given Range, for every Stride element. | MEDIANPOOL(Range, Window_size, Stride) |
