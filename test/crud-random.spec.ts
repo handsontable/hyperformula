@@ -6,9 +6,9 @@ import {verifyValues} from './testUtils'
  * random int from global variable 'state'
  */
 
-const getInt = (function () {
+const getInt = (function() {
   let state = 1
-  return function () {
+  return function() {
     state ^= state << 13
     state ^= state >> 17
     state ^= state << 5
@@ -69,11 +69,11 @@ function randomRange(engine: HyperFormula, rect: Rectangle): string {
 
 function undoRedo(engine: HyperFormula) {
   if(outputLog) {
-    console.log(`engine.undo()`)
+    console.log('engine.undo()')
   }
   engine.undo()
   if(outputLog) {
-    console.log(`engine.redo()`)
+    console.log('engine.redo()')
   }
   engine.redo()
 }
@@ -266,8 +266,8 @@ describe('large random integration test', () => {
   it('fails', () => {
     const engine = HyperFormula.buildFromArray([])
     engine.setCellContents({sheet: 0, col: 13, row: 2}, '=SUM(A2:H3)')
-    engine.addColumns(0, [10,2])
-    engine.removeColumns(0, [0,1])
+    engine.addColumns(0, [10, 2])
+    engine.removeColumns(0, [0, 1])
     engine.undo()
   })
 })
