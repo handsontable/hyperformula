@@ -98,6 +98,18 @@ export class TrigonometryPlugin extends FunctionPlugin {
         { argumentType: ArgumentTypes.NUMBER }
       ]
     },
+    'SECH': {
+      method: 'sech',
+      parameters: [
+        { argumentType: ArgumentTypes.NUMBER }
+      ]
+    },
+    'CSCH': {
+      method: 'cosech',
+      parameters: [
+        { argumentType: ArgumentTypes.NUMBER }
+      ]
+    },
   }
 
   /**
@@ -169,6 +181,18 @@ export class TrigonometryPlugin extends FunctionPlugin {
   public coth(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.runFunction(ast.args, formulaAddress, this.metadata('COTH'),
       (arg) => (arg === 0) ? new CellError(ErrorType.DIV_BY_ZERO) : (1 / Math.tanh(arg))
+    )
+  }
+
+  public sech(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('SECH'),
+      (arg: number) => 1 / Math.cosh(arg)
+    )
+  }
+
+  public cosech(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('CSCH'),
+      (arg) => (arg === 0) ? new CellError(ErrorType.DIV_BY_ZERO) : (1 / Math.sinh(arg))
     )
   }
 }
