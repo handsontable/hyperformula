@@ -121,10 +121,14 @@ lets you design your own [custom functions](custom-functions).
 | VLOOKUP | Lookup and reference | Searches vertically with reference to adjacent cells to the right. | VLOOKUP(Search_Criterion; Array; Index; Sort_Order) |
 | ABS | Math and trigonometry | Returns the absolute value of a number. | ABS(Number) |
 | ACOS | Math and trigonometry | Returns the inverse trigonometric cosine of a number. | ACOS(Number) |
+| ACOSH | Math and trigonometry | Returns the inverse harmonic cosine of a number. | ACOSH(Number) |
 | ACOT | Math and trigonometry | Returns the inverse trigonometric cotangent of a number. | ACOT(Number) |
+| ACOTH | Math and trigonometry | Returns the inverse harmonic cotangent of a number. | ACOTH(Number) |
 | ASIN | Math and trigonometry | Returns the inverse trigonometric sine of a number. | ASIN(Number) |
+| ASINH | Math and trigonometry | Returns the inverse harmonic sine of a number. | ASINH(Number) |
 | ATAN | Math and trigonometry | Returns the inverse trigonometric tangent of a number. | ATAN(Number) |
 | ATAN2 | Math and trigonometry | Returns the inverse trigonometric tangent of the specified x and y coordinates. | ATAN2(Numberx; Numbery) |
+| ATANH | Math and trigonometry | Returns the inverse harmonic tangent of a number. | ATANH(Number) |
 | BASE | Math and trigonometry | Converts a positive integer to a specified base into a text from the numbering system. | BASE(Number; Radix; [Minimumlength]) |
 | CEILING | Math and trigonometry | Rounds a number up to the nearest multiple of Significance. | CEILING(Number; Significance; Mode) |
 | COS | Math and trigonometry | Returns the cosine of the given angle (in radians). | COS(Number) |
