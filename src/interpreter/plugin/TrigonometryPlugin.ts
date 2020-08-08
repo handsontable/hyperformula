@@ -117,6 +117,30 @@ export class TrigonometryPlugin extends FunctionPlugin {
         { argumentType: ArgumentTypes.NUMBER }
       ]
     },
+    'ASINH': {
+      method: 'asinh',
+      parameters: [
+        { argumentType: ArgumentTypes.NUMBER }
+      ]
+    },
+    'ACOSH': {
+      method: 'acosh',
+      parameters: [
+        { argumentType: ArgumentTypes.NUMBER }
+      ]
+    },
+    'ATANH': {
+      method: 'atanh',
+      parameters: [
+        { argumentType: ArgumentTypes.NUMBER }
+      ]
+    },
+    'ACOTH': {
+      method: 'acoth',
+      parameters: [
+        { argumentType: ArgumentTypes.NUMBER }
+      ]
+    },
   }
 
   /**
@@ -183,17 +207,35 @@ export class TrigonometryPlugin extends FunctionPlugin {
     return this.runFunction(ast.args, formulaAddress, this.metadata('SINH'), Math.sinh)
   }
 
+  public asinh(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('ASINH'), Math.asinh)
+  }
+
   public cosh(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.runFunction(ast.args, formulaAddress, this.metadata('COSH'), Math.cosh)
+  }
+
+  public acosh(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('ACOSH'), Math.acosh)
   }
 
   public tanh(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.runFunction(ast.args, formulaAddress, this.metadata('TANH'), Math.tanh)
   }
 
+  public atanh(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('ATANH'), Math.atanh)
+  }
+
   public coth(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.runFunction(ast.args, formulaAddress, this.metadata('COTH'),
       (arg) => (arg === 0) ? new CellError(ErrorType.DIV_BY_ZERO) : (1 / Math.tanh(arg))
+    )
+  }
+
+  public acoth(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('ACOTH'),
+      (arg) => (arg === 0) ? new CellError(ErrorType.NUM) : Math.atanh(1/arg)
     )
   }
 
