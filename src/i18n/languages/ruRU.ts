@@ -129,6 +129,7 @@ const dictionary: RawTranslationPackage = {
     ROWS: 'ЧСТРОК',
     SEARCH: 'ПОИСК',
     SEC: 'SEC',
+    SECH: 'SECH',
     SHEETS: 'ЛИСТЫ',
     SHEET: 'ЛИСТ',
     SIN: 'SIN',
