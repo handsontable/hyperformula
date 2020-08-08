@@ -125,6 +125,7 @@ const dictionary: RawTranslationPackage = {
     ROUNDUP: 'ARREDONDAR.PARA.CIMA',
     ROWS: 'LINS',
     SEARCH: 'LOCALIZAR',
+    SEC: 'SEC',
     SHEETS: 'PLANILHAS',
     SHEET: 'PLANILHA',
     SIN: 'SEN',

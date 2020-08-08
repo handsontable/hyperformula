@@ -125,6 +125,7 @@ const dictionary: RawTranslationPackage = {
     ROUNDUP: 'AVRUNDA.UPPÅT',
     ROWS: 'RADER',
     SEARCH: 'SÖK',
+    SEC: 'SEC',
     SHEETS: 'SHEETS',
     SHEET: 'SHEET',
     SIN: 'SIN',

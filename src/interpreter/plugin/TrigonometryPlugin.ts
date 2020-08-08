@@ -62,6 +62,12 @@ export class TrigonometryPlugin extends FunctionPlugin {
         { argumentType: ArgumentTypes.NUMBER }
       ]
     },
+    'SEC': {
+      method: 'sec',
+      parameters: [
+        { argumentType: ArgumentTypes.NUMBER }
+      ]
+    },
   }
 
   /**
@@ -108,5 +114,11 @@ export class TrigonometryPlugin extends FunctionPlugin {
         return (1 / Math.tan(coercedArg))
       }
     })
+  }
+
+  public sec(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('SEC'),
+      (arg: number) => 1 / Math.cos(arg)
+    )
   }
 }

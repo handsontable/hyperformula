@@ -125,6 +125,7 @@ export const dictionary: RawTranslationPackage = {
     ROUNDUP: 'REDONDEAR.MAS',
     ROWS: 'FILAS',
     SEARCH: 'HALLAR',
+    SEC: 'SEC',
     SHEETS: 'HOJAS',
     SHEET: 'HOJA',
     SIN: 'SENO',

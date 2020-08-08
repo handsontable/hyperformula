@@ -125,6 +125,7 @@ const dictionary: RawTranslationPackage = {
     ROUNDUP: 'ARROTONDA.PER.ECC',
     ROWS: 'RIGHE',
     SEARCH: 'RICERCA',
+    SEC: 'SEC',
     SHEETS: 'FOGLI',
     SHEET: 'FOGLIO',
     SIN: 'SEN',

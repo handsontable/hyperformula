@@ -125,6 +125,7 @@ const dictionary: RawTranslationPackage = {
     ROUNDUP: 'KEREK.FEL',
     ROWS: 'SOROK',
     SEARCH: 'SZÖVEG.KERES',
+    SEC: 'SEC',
     SHEETS: 'LAPOK',
     SHEET: 'LAP',
     SIN: 'SIN',
