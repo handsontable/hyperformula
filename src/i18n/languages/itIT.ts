@@ -57,6 +57,7 @@ const dictionary: RawTranslationPackage = {
     DATE: 'DATA',
     DAY: 'GIORNO',
     DAYS: 'GIORNI',
+    DB: 'AMMORT.FISSO',
     DEC2BIN: 'DECIMALE.BINARIO',
     DEC2HEX: 'DECIMALE.HEX',
     DEC2OCT: 'DECIMALE.OCT',

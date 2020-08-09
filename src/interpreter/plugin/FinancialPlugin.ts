@@ -72,7 +72,17 @@ export class FinancialPlugin extends FunctionPlugin {
         {argumentType: ArgumentTypes.INTEGER, minValue: 1},
         {argumentType: ArgumentTypes.INTEGER, minValue: 0, maxValue: 1},
       ]
-    }
+    },
+    'DB': {
+      method: 'db',
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER, minValue: 0},
+        {argumentType: ArgumentTypes.NUMBER, minValue: 0},
+        {argumentType: ArgumentTypes.NUMBER, minValue: 0},
+        {argumentType: ArgumentTypes.NUMBER, minValue: 0},
+        {argumentType: ArgumentTypes.INTEGER, minValue: 1, maxValue: 12, defaultValue: 12},
+      ]
+    },
   }
 
   public pmt(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
@@ -92,11 +102,15 @@ export class FinancialPlugin extends FunctionPlugin {
   }
 
   public cumipmt(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('CUMIPMT'), cumimptCore)
+    return this.runFunction(ast.args, formulaAddress, this.metadata('CUMIPMT'), cumipmtCore)
   }
 
   public cumprinc(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.runFunction(ast.args, formulaAddress, this.metadata('CUMPRINC'), cumprincCore)
+  }
+
+  public db(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('DB'), dbCore)
   }
 }
 
@@ -131,7 +145,7 @@ function ppmtCore(rate: number, period: number, periods: number, present: number
   return pmtCore(rate, periods, present, future, type) - ipmtCore(rate, period, periods, present, future, type)
 }
 
-function cumimptCore(rate: number, periods: number, value: number, start: number, end: number, type: number): number | CellError {
+function cumipmtCore(rate: number, periods: number, value: number, start: number, end: number, type: number): number | CellError {
   if (start > end) {
     return new CellError(ErrorType.NUM)
   }
@@ -168,4 +182,29 @@ function cumprincCore(rate: number, periods: number, value: number, start: numbe
   }
 
   return acc
+}
+
+function dbCore(cost: number, salvage: number, life: number, period: number, month: number) {
+  if (period > life) {
+    return new CellError(ErrorType.NUM)
+  }
+
+  if (salvage >= cost) {
+    return 0
+  }
+
+  let rate = Math.round((1 - Math.pow(salvage / cost, 1 / life))*1000)/1000
+
+  const initial = cost * rate * month / 12
+
+  if(period===1) {
+    return initial
+  }
+
+  let total = initial
+
+  for (let i = 0; i < period - 2; i++) {
+    total += (cost - total) * rate
+  }
+  return (cost - total) * rate
 }
