@@ -324,6 +324,6 @@ export abstract class FunctionPlugin {
     if (params !== undefined) {
       return params
     }
-    throw new Error('FIXME Should not be undefined')
+    throw new Error('Should not be undefined')
   }
 }

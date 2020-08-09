@@ -3,7 +3,7 @@
  * Copyright (c) 2020 Handsoncode. All rights reserved.
  */
 
-import {InternalScalarValue, SimpleCellAddress} from '../../Cell'
+import {CellError, ErrorType, InternalScalarValue, SimpleCellAddress} from '../../Cell'
 import {ProcedureAst} from '../../parser'
 import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
 
@@ -16,7 +16,7 @@ export class FinancialPlugin extends FunctionPlugin {
           {argumentType: ArgumentTypes.NUMBER},
           {argumentType: ArgumentTypes.NUMBER},
           {argumentType: ArgumentTypes.NUMBER, defaultValue: 0},
-          {argumentType: ArgumentTypes.NUMBER, defaultValue: 0},
+          {argumentType: ArgumentTypes.INTEGER, minValue: 0, maxValue: 1, defaultValue: 0},
         ]
     },
     'IPMT': {
@@ -27,7 +27,7 @@ export class FinancialPlugin extends FunctionPlugin {
           {argumentType: ArgumentTypes.NUMBER},
           {argumentType: ArgumentTypes.NUMBER},
           {argumentType: ArgumentTypes.NUMBER, defaultValue: 0},
-          {argumentType: ArgumentTypes.NUMBER, defaultValue: 0},
+          {argumentType: ArgumentTypes.INTEGER, minValue: 0, maxValue: 1, defaultValue: 0},
         ]
     },
     'PPMT': {
@@ -38,7 +38,7 @@ export class FinancialPlugin extends FunctionPlugin {
           {argumentType: ArgumentTypes.NUMBER},
           {argumentType: ArgumentTypes.NUMBER},
           {argumentType: ArgumentTypes.NUMBER, defaultValue: 0},
-          {argumentType: ArgumentTypes.NUMBER, defaultValue: 0},
+          {argumentType: ArgumentTypes.INTEGER, minValue: 0, maxValue: 1, defaultValue: 0},
         ]
     },
     'FV': {
@@ -48,9 +48,20 @@ export class FinancialPlugin extends FunctionPlugin {
           {argumentType: ArgumentTypes.NUMBER},
           {argumentType: ArgumentTypes.NUMBER},
           {argumentType: ArgumentTypes.NUMBER, defaultValue: 0},
-          {argumentType: ArgumentTypes.NUMBER, defaultValue: 0},
+          {argumentType: ArgumentTypes.INTEGER, minValue: 0, maxValue: 1, defaultValue: 0},
         ]
     },
+    'CUMIPMT': {
+      method: 'cumipmt',
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
+        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
+        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
+        {argumentType: ArgumentTypes.INTEGER, minValue: 1},
+        {argumentType: ArgumentTypes.INTEGER, minValue: 1},
+        {argumentType: ArgumentTypes.INTEGER, minValue: 0, maxValue: 1},
+      ]
+    }
   }
 
   public pmt(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
@@ -68,6 +79,10 @@ export class FinancialPlugin extends FunctionPlugin {
   public fv(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.runFunction(ast.args, formulaAddress, this.metadata('FV'), fvCore)
   }
+
+  public cumipmt(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('CUMIPMT'), cumimptCore)
+  }
 }
 
 function pmtCore(rate: number, periods: number, present: number, future: number, type: number): number {
@@ -82,9 +97,9 @@ function pmtCore(rate: number, periods: number, present: number, future: number,
 function ipmtCore(rate: number, period: number, periods: number, present: number, future: number, type: number): number {
   const payment = pmtCore(rate, periods, present, future, type)
   if (period === 1) {
-    return rate * (type !== 0 ? 0 : -present)
+    return rate * (type ? 0 : -present)
   } else {
-    return rate * (type !== 0 ? fvCore(rate, period - 2, payment, present, type) - payment : fvCore(rate, period - 1, payment, present, type))
+    return rate * (type ? fvCore(rate, period - 2, payment, present, type) - payment : fvCore(rate, period - 1, payment, present, type))
   }
 }
 
@@ -93,10 +108,31 @@ function fvCore(rate: number, periods: number, payment: number, value: number, t
     return -value - payment * periods
   } else {
     const term = Math.pow(1 + rate, periods)
-    return payment * (type !== 0 ? (1 + rate) : 1) * (1 - term) / rate - value * term
+    return payment * (type ? (1 + rate) : 1) * (1 - term) / rate - value * term
   }
 }
 
 function ppmtCore(rate: number, period: number, periods: number, present: number, future: number, type: number): number {
   return pmtCore(rate, periods, present, future, type) - ipmtCore(rate, period, periods, present, future, type)
+}
+
+function cumimptCore(rate: number, periods: number, value: number, start: number, end: number, type: number): number | CellError {
+  if (start > end) {
+    return new CellError(ErrorType.NUM)
+  }
+
+  const payment = pmtCore(rate, periods, value, 0, type)
+  let interest = 0
+
+  if (start === 1) {
+    if (type === 0) {
+      interest = -value
+    }
+    start = 2
+  }
+
+  for (let i = start; i <= end; i++) {
+    interest += type ? fvCore(rate, i - 2, payment, value, type) - payment : fvCore(rate, i - 1, payment, value, type)
+  }
+  return interest * rate
 }
