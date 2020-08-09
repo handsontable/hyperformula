@@ -53,6 +53,7 @@ const dictionary: RawTranslationPackage = {
     COUNTIFS: 'ÇOKEĞERSAY',
     COUNTUNIQUE: 'COUNTUNIQUE',
     CUMIPMT: 'TOPÖDENENFAİZ',
+    CUMPRINC: 'TOPANAPARA',
     DATE: 'TARİH',
     DAY: 'GÜN',
     DAYS: 'GÜNSAY',

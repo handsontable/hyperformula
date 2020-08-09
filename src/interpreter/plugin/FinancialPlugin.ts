@@ -61,6 +61,17 @@ export class FinancialPlugin extends FunctionPlugin {
         {argumentType: ArgumentTypes.INTEGER, minValue: 1},
         {argumentType: ArgumentTypes.INTEGER, minValue: 0, maxValue: 1},
       ]
+    },
+    'CUMPRINC': {
+      method: 'cumprinc',
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
+        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
+        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
+        {argumentType: ArgumentTypes.INTEGER, minValue: 1},
+        {argumentType: ArgumentTypes.INTEGER, minValue: 1},
+        {argumentType: ArgumentTypes.INTEGER, minValue: 0, maxValue: 1},
+      ]
     }
   }
 
@@ -82,6 +93,10 @@ export class FinancialPlugin extends FunctionPlugin {
 
   public cumipmt(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.runFunction(ast.args, formulaAddress, this.metadata('CUMIPMT'), cumimptCore)
+  }
+
+  public cumprinc(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('CUMPRINC'), cumprincCore)
   }
 }
 
@@ -135,4 +150,30 @@ function cumimptCore(rate: number, periods: number, value: number, start: number
     interest += type ? fvCore(rate, i - 2, payment, value, type) - payment : fvCore(rate, i - 1, payment, value, type)
   }
   return interest * rate
+}
+
+function cumprincCore(rate: number, periods: number, value: number, start: number, end: number, type: number): number | CellError {
+  if (start > end) {
+    return new CellError(ErrorType.NUM)
+  }
+
+  let payment = pmtCore(rate, periods, value, 0, type)
+  let principal = 0
+  if (start === 1) {
+    if (type === 0) {
+      principal = payment + value * rate
+    } else {
+      principal = payment
+    }
+    start = 2
+  }
+  for (let i = start; i <= end; i++) {
+    if (type > 0) {
+      principal += payment - (fvCore(rate, i - 2, payment, value, 1) - payment) * rate
+    } else {
+      principal += payment - fvCore(rate, i - 1, payment, value, 0) * rate
+    }
+  }
+
+  return principal
 }

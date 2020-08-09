@@ -53,6 +53,7 @@ export const dictionary: RawTranslationPackage = {
     COUNTIFS: 'CONTAR.SI.CONJUNTO',
     COUNTUNIQUE: 'COUNTUNIQUE',
     CUMIPMT: 'PAGO.INT.ENTRE',
+    CUMPRINC: 'PAGO.PRINC.ENTRE',
     DATE: 'FECHA',
     DAY: 'DIA',
     DAYS: 'DÍAS',

@@ -53,6 +53,7 @@ const dictionary: RawTranslationPackage = {
     COUNTIFS: 'AANTALLEN.ALS',
     COUNTUNIQUE: 'COUNTUNIQUE',
     CUMIPMT: 'CUM.RENTE',
+    CUMPRINC: 'CUM.HOOFDSOM',
     DATE: 'DATUM',
     DAY: 'DAG',
     DAYS: 'DAGEN',
