@@ -137,19 +137,19 @@ function cumimptCore(rate: number, periods: number, value: number, start: number
   }
 
   const payment = pmtCore(rate, periods, value, 0, type)
-  let interest = 0
+  let acc = 0
 
   if (start === 1) {
     if (type === 0) {
-      interest = -value
+      acc = -value
     }
     start = 2
   }
 
   for (let i = start; i <= end; i++) {
-    interest += type ? fvCore(rate, i - 2, payment, value, type) - payment : fvCore(rate, i - 1, payment, value, type)
+    acc += type ? fvCore(rate, i - 2, payment, value, type) - payment : fvCore(rate, i - 1, payment, value, type)
   }
-  return interest * rate
+  return acc * rate
 }
 
 function cumprincCore(rate: number, periods: number, value: number, start: number, end: number, type: number): number | CellError {
@@ -157,23 +157,15 @@ function cumprincCore(rate: number, periods: number, value: number, start: numbe
     return new CellError(ErrorType.NUM)
   }
 
-  let payment = pmtCore(rate, periods, value, 0, type)
-  let principal = 0
+  const payment = pmtCore(rate, periods, value, 0, type)
+  let acc = 0
   if (start === 1) {
-    if (type === 0) {
-      principal = payment + value * rate
-    } else {
-      principal = payment
-    }
+    acc = type ? payment : payment + value*rate
     start = 2
   }
   for (let i = start; i <= end; i++) {
-    if (type > 0) {
-      principal += payment - (fvCore(rate, i - 2, payment, value, 1) - payment) * rate
-    } else {
-      principal += payment - fvCore(rate, i - 1, payment, value, 0) * rate
-    }
+    acc += payment - rate * (type?  (fvCore(rate, i - 2, payment, value, 1) - payment) : fvCore(rate, i - 1, payment, value, 0))
   }
 
-  return principal
+  return acc
 }
