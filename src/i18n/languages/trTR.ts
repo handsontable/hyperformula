@@ -61,7 +61,6 @@ const dictionary: RawTranslationPackage = {
     DECIMAL: 'ONDALIK',
     DEGREES: 'DERECE',
     DELTA: 'DELTA',
-    E: 'E',
     EOMONTH: 'SERİAY',
     ERF: 'HATAİŞLEV',
     ERFC: 'TÜMHATAİŞLEV',

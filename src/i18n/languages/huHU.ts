@@ -61,7 +61,6 @@ const dictionary: RawTranslationPackage = {
     DECIMAL: 'TIZEDES',
     DEGREES: 'FOK',
     DELTA: 'DELTA',
-    E: 'E',
     EOMONTH: 'HÓNAP.UTOLSÓ.NAP',
     ERF: 'HIBAF',
     ERFC: 'HIBAF.KOMPLEMENTER',
