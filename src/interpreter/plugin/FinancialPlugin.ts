@@ -207,7 +207,7 @@ function dbCore(cost: number, salvage: number, life: number, period: number, mon
     return 0
   }
 
-  let rate = Math.round((1 - Math.pow(salvage / cost, 1 / life))*1000)/1000
+  const rate = Math.round((1 - Math.pow(salvage / cost, 1 / life))*1000)/1000
 
   const initial = cost * rate * month / 12
 
@@ -234,7 +234,7 @@ function ddbCore(cost: number, salvage: number, life: number, period: number, fa
     return 0
   }
 
-  let total = 0;
+  let total = 0
   for (let i = 0; i < period-1; i++) {
     total += Math.min((cost - total) * (factor / life), (cost - salvage - total))
   }

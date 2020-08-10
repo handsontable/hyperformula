@@ -35,7 +35,7 @@ describe('Function DB', () => {
     const engine = HyperFormula.buildFromArray([
       ['=DB(1000000,100000,6,7,7)',
         '=DB(1000000,100000,6,8,7)',
-        '=DB(1000000,100000,6,7)',],
+        '=DB(1000000,100000,6,7)', ],
     ])
     expect(engine.getCellValue(adr('A1'))).toBeCloseTo(15845.10)
     expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.NUM))
