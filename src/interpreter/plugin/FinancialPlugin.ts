@@ -90,7 +90,7 @@ export class FinancialPlugin extends FunctionPlugin {
         {argumentType: ArgumentTypes.NUMBER, minValue: 0},
         {argumentType: ArgumentTypes.INTEGER, minValue: 0},
         {argumentType: ArgumentTypes.INTEGER, minValue: 0},
-        {argumentType: ArgumentTypes.INTEGER, greaterThan: 0, defaultValue: 2},
+        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0, defaultValue: 2},
       ]
     },
   }
