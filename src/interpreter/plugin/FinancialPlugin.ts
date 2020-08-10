@@ -78,9 +78,19 @@ export class FinancialPlugin extends FunctionPlugin {
       parameters: [
         {argumentType: ArgumentTypes.NUMBER, minValue: 0},
         {argumentType: ArgumentTypes.NUMBER, minValue: 0},
-        {argumentType: ArgumentTypes.NUMBER, minValue: 0},
-        {argumentType: ArgumentTypes.NUMBER, minValue: 0},
+        {argumentType: ArgumentTypes.INTEGER, minValue: 0},
+        {argumentType: ArgumentTypes.INTEGER, minValue: 0},
         {argumentType: ArgumentTypes.INTEGER, minValue: 1, maxValue: 12, defaultValue: 12},
+      ]
+    },
+    'DDB': {
+      method: 'ddb',
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER, minValue: 0},
+        {argumentType: ArgumentTypes.NUMBER, minValue: 0},
+        {argumentType: ArgumentTypes.INTEGER, minValue: 0},
+        {argumentType: ArgumentTypes.INTEGER, minValue: 0},
+        {argumentType: ArgumentTypes.INTEGER, greaterThan: 0, defaultValue: 2},
       ]
     },
   }
@@ -111,6 +121,10 @@ export class FinancialPlugin extends FunctionPlugin {
 
   public db(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.runFunction(ast.args, formulaAddress, this.metadata('DB'), dbCore)
+  }
+
+  public ddb(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('DDB'), ddbCore)
   }
 }
 
@@ -184,8 +198,8 @@ function cumprincCore(rate: number, periods: number, value: number, start: numbe
   return acc
 }
 
-function dbCore(cost: number, salvage: number, life: number, period: number, month: number) {
-  if (period > life) {
+function dbCore(cost: number, salvage: number, life: number, period: number, month: number): number | CellError {
+  if ((month===12 && period > life) || (period > life+1)) {
     return new CellError(ErrorType.NUM)
   }
 
@@ -206,5 +220,24 @@ function dbCore(cost: number, salvage: number, life: number, period: number, mon
   for (let i = 0; i < period - 2; i++) {
     total += (cost - total) * rate
   }
+  if(period === life+1) {
+    return (cost - total) * rate * (12-month)/12
+  }
   return (cost - total) * rate
+}
+
+function ddbCore(cost: number, salvage: number, life: number, period: number, factor: number): number | CellError {
+  if (period > life) {
+    return new CellError(ErrorType.NUM)
+  }
+  if (salvage >= cost) {
+    return 0
+  }
+
+  let total = 0;
+  for (let i = 0; i < period-1; i++) {
+    total += Math.min((cost - total) * (factor / life), (cost - salvage - total))
+  }
+
+  return Math.min((cost - total) * (factor / life), (cost - salvage - total))
 }

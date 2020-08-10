@@ -30,4 +30,16 @@ describe('Function DB', () => {
     expect(engine.getCellValue(adr('A3'))).toBeCloseTo(35.07)
     expect(engine.getCellValue(adr('B3'))).toBeCloseTo(45.26)
   })
+
+  it('compatability', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=DB(1000000,100000,6,7,7)',
+        '=DB(1000000,100000,6,8,7)',
+        '=DB(1000000,100000,6,7)',],
+    ])
+    expect(engine.getCellValue(adr('A1'))).toBeCloseTo(15845.10)
+    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.NUM))
+    expect(engine.getCellValue(adr('C1'))).toEqual(detailedError(ErrorType.NUM))
+
+  })
 })
