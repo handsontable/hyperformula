@@ -97,6 +97,10 @@ lets you design your own [custom functions](custom-functions).
 | SHEET | Information | Returns sheet number of a given value or a formula sheet number if no argument is provided. | SHEET([Value]) |
 | SHEETS | Information | Returns number of sheet of a given reference or number of all sheets in workbook when no argument is provided. | SHEETS([Value]) |
 | NA | Information | Returns #N/A! error value.| NA(Value) |
+| CUMIPMT | Financial |  Returns the cumulative interest paid on a loan between a start period and an end period. | CUMIPMT(Rate; Nper; Pv; Start, End; type) |
+| CUMPRINC | Financial | Returns the cumulative principal paid on a loan between a start period and an end period. | CUMPRINC(Rate; Nper; Pv; Start; End; Type) |
+| DB | Financial | Returns the depreciation of an asset for a specified period using the fixed-declining balance method. | DB(Cost; Salvage; Life; Period[; Month]) |
+| DDB | Financial | Returns the depreciation of an asset for a specified period using the double-declining balance method. | DDB(Cost, Salvage; Life; Period[; Factor]) |
 | FV | Financial | Returns the future value of an investment. | FV(Rate; Nper; Pmt[; Pv;[ Type]]) |
 | IPMT | Financial | Calculates the interest portion of a given loan payment in a given payment period. | IPMT(Rate; Per; Nper; Pv[; Fv[; Type]]) |
 | PMT | Financial | Returns the periodic payment for a loan. | PMT(Rate; Nper; Pv[; Fv[; Type]]) |
