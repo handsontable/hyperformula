@@ -58,6 +58,7 @@ const dictionary: RawTranslationPackage = {
     DAY: 'NAP',
     DAYS: 'NAPOK',
     DB: 'DB',
+    DDB: 'KCSA',
     DEC2BIN: 'DEC.BIN',
     DEC2HEX: 'DEC.HEX',
     DEC2OCT: 'DEC.OKT',

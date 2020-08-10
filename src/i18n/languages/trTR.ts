@@ -58,6 +58,7 @@ const dictionary: RawTranslationPackage = {
     DAY: 'GÜN',
     DAYS: 'GÜNSAY',
     DB: 'AZALANBAKİYE',
+    DDB: 'ÇİFTAZALANBAKİYE',
     DEC2BIN: 'DEC2BIN',
     DEC2HEX: 'DEC2HEX',
     DEC2OCT: 'DEC2OCT',
