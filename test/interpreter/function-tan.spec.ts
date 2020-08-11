@@ -4,9 +4,10 @@ import {adr, detailedError} from '../testUtils'
 
 describe('Function TAN', () => {
   it('happy path', () => {
-    const engine = HyperFormula.buildFromArray([['=TAN(0)']])
+    const engine = HyperFormula.buildFromArray([['=TAN(0)', '=TAN(0.5)']])
 
     expect(engine.getCellValue(adr('A1'))).toBe(0)
+    expect(engine.getCellValue(adr('B1'))).toBeCloseTo(0.546302489843791)
   })
 
   it('when value not numeric', () => {

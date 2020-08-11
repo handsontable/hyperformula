@@ -7,7 +7,7 @@ import {InternalScalarValue, SimpleCellAddress} from '../../Cell'
 import {ProcedureAst} from '../../parser'
 import {FunctionPlugin} from './FunctionPlugin'
 
-const PI = parseFloat(Math.PI.toFixed(14))
+export const PI = parseFloat(Math.PI.toFixed(14))
 
 export class MathConstantsPlugin extends FunctionPlugin {
   public static implementedFunctions = {
