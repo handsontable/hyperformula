@@ -65,6 +65,7 @@ const dictionary: RawTranslationPackage = {
     DECIMAL: 'DESIMAL',
     DEGREES: 'GRADER',
     DELTA: 'DELTA',
+    DOLLARDE: 'DOLLARDE',
     E: 'E',
     EOMONTH: 'MÅNEDSSLUTT',
     ERF: 'FEILF',

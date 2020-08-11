@@ -93,6 +93,13 @@ export class FinancialPlugin extends FunctionPlugin {
         {argumentType: ArgumentTypes.NUMBER, greaterThan: 0, defaultValue: 2},
       ]
     },
+    'DOLLARDE': {
+      method: 'dollarde',
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER},
+        {argumentType: ArgumentTypes.NUMBER, minValue: 0},
+      ]
+    },
   }
 
   public pmt(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
@@ -112,19 +119,118 @@ export class FinancialPlugin extends FunctionPlugin {
   }
 
   public cumipmt(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('CUMIPMT'), cumipmtCore)
+    return this.runFunction(ast.args, formulaAddress, this.metadata('CUMIPMT'),
+      (rate: number, periods: number, value: number, start: number, end: number, type: number) => {
+        if (start > end) {
+          return new CellError(ErrorType.NUM)
+        }
+
+        const payment = pmtCore(rate, periods, value, 0, type)
+        let acc = 0
+
+        if (start === 1) {
+          if (type === 0) {
+            acc = -value
+          }
+          start = 2
+        }
+
+        for (let i = start; i <= end; i++) {
+          acc += type ? fvCore(rate, i - 2, payment, value, type) - payment : fvCore(rate, i - 1, payment, value, type)
+        }
+        return acc * rate
+      }
+    )
   }
 
   public cumprinc(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('CUMPRINC'), cumprincCore)
+    return this.runFunction(ast.args, formulaAddress, this.metadata('CUMPRINC'),
+      (rate: number, periods: number, value: number, start: number, end: number, type: number) => {
+        if (start > end) {
+          return new CellError(ErrorType.NUM)
+        }
+
+        const payment = pmtCore(rate, periods, value, 0, type)
+        let acc = 0
+        if (start === 1) {
+          acc = type ? payment : payment + value*rate
+          start = 2
+        }
+        for (let i = start; i <= end; i++) {
+          acc += payment - rate * (type?  (fvCore(rate, i - 2, payment, value, 1) - payment) : fvCore(rate, i - 1, payment, value, 0))
+        }
+
+        return acc
+      }
+    )
   }
 
   public db(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('DB'), dbCore)
+    return this.runFunction(ast.args, formulaAddress, this.metadata('DB'),
+      (cost: number, salvage: number, life: number, period: number, month: number) => {
+        if ((month===12 && period > life) || (period > life+1)) {
+          return new CellError(ErrorType.NUM)
+        }
+
+        if (salvage >= cost) {
+          return 0
+        }
+
+        const rate = Math.round((1 - Math.pow(salvage / cost, 1 / life))*1000)/1000
+
+        const initial = cost * rate * month / 12
+
+        if(period===1) {
+          return initial
+        }
+
+        let total = initial
+
+        for (let i = 0; i < period - 2; i++) {
+          total += (cost - total) * rate
+        }
+        if(period === life+1) {
+          return (cost - total) * rate * (12-month)/12
+        }
+        return (cost - total) * rate
+      }
+    )
   }
 
   public ddb(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('DDB'), ddbCore)
+    return this.runFunction(ast.args, formulaAddress, this.metadata('DDB'),
+      (cost: number, salvage: number, life: number, period: number, factor: number) => {
+        if (period > life) {
+          return new CellError(ErrorType.NUM)
+        }
+        if (salvage >= cost) {
+          return 0
+        }
+
+        let total = 0
+        for (let i = 0; i < period-1; i++) {
+          total += Math.min((cost - total) * (factor / life), (cost - salvage - total))
+        }
+
+        return Math.min((cost - total) * (factor / life), (cost - salvage - total))
+      }
+    )
+  }
+
+  public dollarde(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('DOLLARDE'),
+      (dollar, fraction) => {
+        if (fraction < 1) {
+          return new CellError(ErrorType.DIV_BY_ZERO)
+        }
+        fraction = Math.trunc(fraction)
+
+        while(fraction>10) {
+          fraction /= 10
+        }
+        return Math.trunc(dollar) + (dollar-Math.trunc(dollar))*10/fraction
+      }
+    )
   }
 }
 
@@ -159,85 +265,3 @@ function ppmtCore(rate: number, period: number, periods: number, present: number
   return pmtCore(rate, periods, present, future, type) - ipmtCore(rate, period, periods, present, future, type)
 }
 
-function cumipmtCore(rate: number, periods: number, value: number, start: number, end: number, type: number): number | CellError {
-  if (start > end) {
-    return new CellError(ErrorType.NUM)
-  }
-
-  const payment = pmtCore(rate, periods, value, 0, type)
-  let acc = 0
-
-  if (start === 1) {
-    if (type === 0) {
-      acc = -value
-    }
-    start = 2
-  }
-
-  for (let i = start; i <= end; i++) {
-    acc += type ? fvCore(rate, i - 2, payment, value, type) - payment : fvCore(rate, i - 1, payment, value, type)
-  }
-  return acc * rate
-}
-
-function cumprincCore(rate: number, periods: number, value: number, start: number, end: number, type: number): number | CellError {
-  if (start > end) {
-    return new CellError(ErrorType.NUM)
-  }
-
-  const payment = pmtCore(rate, periods, value, 0, type)
-  let acc = 0
-  if (start === 1) {
-    acc = type ? payment : payment + value*rate
-    start = 2
-  }
-  for (let i = start; i <= end; i++) {
-    acc += payment - rate * (type?  (fvCore(rate, i - 2, payment, value, 1) - payment) : fvCore(rate, i - 1, payment, value, 0))
-  }
-
-  return acc
-}
-
-function dbCore(cost: number, salvage: number, life: number, period: number, month: number): number | CellError {
-  if ((month===12 && period > life) || (period > life+1)) {
-    return new CellError(ErrorType.NUM)
-  }
-
-  if (salvage >= cost) {
-    return 0
-  }
-
-  const rate = Math.round((1 - Math.pow(salvage / cost, 1 / life))*1000)/1000
-
-  const initial = cost * rate * month / 12
-
-  if(period===1) {
-    return initial
-  }
-
-  let total = initial
-
-  for (let i = 0; i < period - 2; i++) {
-    total += (cost - total) * rate
-  }
-  if(period === life+1) {
-    return (cost - total) * rate * (12-month)/12
-  }
-  return (cost - total) * rate
-}
-
-function ddbCore(cost: number, salvage: number, life: number, period: number, factor: number): number | CellError {
-  if (period > life) {
-    return new CellError(ErrorType.NUM)
-  }
-  if (salvage >= cost) {
-    return 0
-  }
-
-  let total = 0
-  for (let i = 0; i < period-1; i++) {
-    total += Math.min((cost - total) * (factor / life), (cost - salvage - total))
-  }
-
-  return Math.min((cost - total) * (factor / life), (cost - salvage - total))
-}

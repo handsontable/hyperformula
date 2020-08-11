@@ -65,6 +65,7 @@ const dictionary: RawTranslationPackage = {
     DECIMAL: 'TIZEDES',
     DEGREES: 'FOK',
     DELTA: 'DELTA',
+    DOLLARDE: 'FORINT.DEC',
     E: 'E',
     EOMONTH: 'HÓNAP.UTOLSÓ.NAP',
     ERF: 'HIBAF',
