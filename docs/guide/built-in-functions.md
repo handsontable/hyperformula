@@ -101,7 +101,8 @@ lets you design your own [custom functions](custom-functions).
 | CUMPRINC | Financial | Returns the cumulative principal paid on a loan between a start period and an end period. | CUMPRINC(Rate; Nper; Pv; Start; End; Type) |
 | DB | Financial | Returns the depreciation of an asset for a specified period using the fixed-declining balance method. | DB(Cost; Salvage; Life; Period[; Month]) |
 | DDB | Financial | Returns the depreciation of an asset for a specified period using the double-declining balance method. | DDB(Cost, Salvage; Life; Period[; Factor]) |
-| DOLLARDE | Financial | Converts a dollar price entered with a special notation to a dollar price displayed as a decimal number. | DOLLARDE(dollar, fraction) |
+| DOLLARDE | Financial | Converts a price entered with a special notation to a price displayed as a decimal number. | DOLLARDE(Price, Fraction) |
+| DOLLARFR | Financial | Converts a price displayed as a decimal number to a price entered with a special notation. | DOLLARFR(Price, Fraction) |
 | FV | Financial | Returns the future value of an investment. | FV(Rate; Nper; Pmt[; Pv;[ Type]]) |
 | IPMT | Financial | Calculates the interest portion of a given loan payment in a given payment period. | IPMT(Rate; Per; Nper; Pv[; Fv[; Type]]) |
 | PMT | Financial | Returns the periodic payment for a loan. | PMT(Rate; Nper; Pv[; Fv[; Type]]) |
