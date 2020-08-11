@@ -9,8 +9,8 @@ import {
   instanceOfSimpleTime,
   numberToSimpleTime,
   offsetMonth,
-  roundToNearestSecond,
-  timeToNumber,
+  roundToNearestSecond, SimpleDate,
+  timeToNumber, toBasisUS,
   truncateDayInMonth
 } from '../../DateTimeHelper'
 import {format} from '../../format/format'
@@ -443,29 +443,14 @@ export class DatePlugin extends FunctionPlugin {
       (startDate: number, endDate: number, mode: boolean) => {
         const start = this.interpreter.dateHelper.numberToSimpleDate(startDate)
         const end = this.interpreter.dateHelper.numberToSimpleDate(endDate)
-        const endY = end.year
-        const startY = start.year
-        let endM = end.month
-        const startM = start.month
-        let endD = end.day
-        let startD = start.day
+        let nStart, nEnd: SimpleDate
         if(mode) {
-          endD = Math.min(endD, 30)
-          startD = Math.min(startD, 30)
+          nStart = toBasisUS(start)
+          nEnd = toBasisUS(end)
         } else {
-          if(start.day === this.interpreter.dateHelper.daysInMonth(start.year, start.month) ) {
-            startD = 30
-          }
-          if(end.day === this.interpreter.dateHelper.daysInMonth(end.year, end.month) ) {
-            if(startD < 30) {
-              endD = 1
-              endM += 1
-            } else {
-              endD = 30
-            }
-          }
+          [nStart, nEnd] = this.interpreter.dateHelper.toBasisEU(start, end)
         }
-        return 360 * (endY - startY) + 30*(endM-startM) + endD-startD
+        return 360 * (nEnd.year - nStart.year) + 30*(nEnd.month-nStart.month) + nEnd.day-nStart.day
       }
     )
   }

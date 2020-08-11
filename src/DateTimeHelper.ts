@@ -195,6 +195,32 @@ export class DateTimeHelper {
   public endOfMonth(date: SimpleDate): SimpleDate {
     return {year: date.year, month: date.month, day: this.daysInMonth(date.year, date.month)}
   }
+
+  public toBasisEU(start: SimpleDate, end: SimpleDate): [SimpleDate, SimpleDate] {
+    let endY = end.year
+    const startY = start.year
+    let endM = end.month
+    const startM = start.month
+    let endD = end.day
+    let startD = start.day
+    if(start.day === this.daysInMonth(start.year, start.month) ) {
+      startD = 30
+    }
+    if(end.day === this.daysInMonth(end.year, end.month) ) {
+      if(startD < 30) {
+        endD = 1
+        endM += 1
+        if(endM === 13) {
+          endM = 1
+          endY += 1
+        }
+      } else {
+        endD = 30
+      }
+    }
+    return [{year: startY, month: startM, day: startD}, {year: endY, month: endM, day: endD}]
+  }
+
 }
 
 function dayToMonth(dayOfYear: number): number {
@@ -241,5 +267,9 @@ export function numberToSimpleTime(arg: number): SimpleTime {
 
 export function timeToNumber(time: SimpleTime): number {
   return ((time.seconds/60+time.minutes)/60+time.hours)/24
+}
+
+export function toBasisUS(date: SimpleDate): SimpleDate {
+  return {year: date.year, month: date.month, day: Math.min(30, date.day)}
 }
 
