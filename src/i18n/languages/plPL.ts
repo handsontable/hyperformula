@@ -70,7 +70,6 @@ const dictionary: RawTranslationPackage = {
     DECIMAL: 'DZIESIĘTNA',
     DEGREES: 'STOPNIE',
     DELTA: 'DELTA',
-    E: 'E',
     EOMONTH: 'NR.SER.OST.DN.MIEŚ',
     ERF: 'FUNKCJA.BŁ',
     ERFC: 'KOMP.FUNKCJA.BŁ',

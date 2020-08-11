@@ -8,7 +8,6 @@ import {ProcedureAst} from '../../parser'
 import {FunctionPlugin} from './FunctionPlugin'
 
 export const PI = parseFloat(Math.PI.toFixed(14))
-const E = parseFloat(Math.E.toFixed(14))
 
 export class MathConstantsPlugin extends FunctionPlugin {
   public static implementedFunctions = {
@@ -16,21 +15,11 @@ export class MathConstantsPlugin extends FunctionPlugin {
       method: 'pi',
       parameters: [],
     },
-    'E': {
-      method: 'e',
-      parameters: [],
-    },
   }
 
   public pi(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.runFunction(ast.args, formulaAddress, this.metadata('PI'),
       () => PI
-    )
-  }
-
-  public e(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('E'),
-      () => E
     )
   }
 }

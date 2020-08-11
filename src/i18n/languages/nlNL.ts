@@ -70,7 +70,6 @@ const dictionary: RawTranslationPackage = {
     DECIMAL: 'DECIMAAL',
     DEGREES: 'GRADEN',
     DELTA: 'DELTA',
-    E: 'E',
     EOMONTH: 'LAATSTE.DAG',
     ERF: 'FOUTFUNCTIE',
     ERFC: 'FOUT.COMPLEMENT',
