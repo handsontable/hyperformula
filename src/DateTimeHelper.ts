@@ -201,7 +201,7 @@ export class DateTimeHelper {
   }
 
   public toBasisUS(start: SimpleDate, end: SimpleDate): [SimpleDate, SimpleDate] {
-    let endY = end.year
+    const endY = end.year
     const startY = start.year
     let endM = end.month
     const startM = start.month

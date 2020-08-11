@@ -450,7 +450,7 @@ export class DatePlugin extends FunctionPlugin {
     return this.runFunction(ast.args, formulaAddress, this.metadata('DAYS360'), this.days360Core)
   }
 
-  private days360Core(startDate: number, endDate: number, mode: boolean): number {
+  private days360Core = (startDate: number, endDate: number, mode: boolean): number => {
     const start = this.interpreter.dateHelper.numberToSimpleDate(startDate)
     const end = this.interpreter.dateHelper.numberToSimpleDate(endDate)
     let nStart, nEnd: SimpleDate
