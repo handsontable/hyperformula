@@ -3,9 +3,10 @@ import {adr, detailedError} from '../testUtils'
 
 describe('Function CSC', () => {
   it('happy path', () => {
-    const engine = HyperFormula.buildFromArray([['=CSC(PI()/2)']])
+    const engine = HyperFormula.buildFromArray([['=CSC(PI()/2)', '=CSC(1)']])
 
     expect(engine.getCellValue(adr('A1'))).toBe(1)
+    expect(engine.getCellValue(adr('B1'))).toBeCloseTo(1.18839510577812)
   })
 
   it('when value not numeric', () => {

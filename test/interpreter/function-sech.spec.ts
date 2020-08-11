@@ -4,9 +4,10 @@ import {adr, detailedError} from '../testUtils'
 
 describe('Function SECH', () => {
   it('happy path', () => {
-    const engine = HyperFormula.buildFromArray([['=SECH(0)']])
+    const engine = HyperFormula.buildFromArray([['=SECH(0)', '=SECH(0.5)']])
 
     expect(engine.getCellValue(adr('A1'))).toBe(1)
+    expect(engine.getCellValue(adr('B1'))).toBeCloseTo(0.886818883970074)
   })
 
   it('when value not numeric', () => {

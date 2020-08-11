@@ -4,9 +4,10 @@ import {adr, detailedError} from '../testUtils'
 
 describe('Function COSH', () => {
   it('happy path', () => {
-    const engine = HyperFormula.buildFromArray([['=COSH(0)']])
+    const engine = HyperFormula.buildFromArray([['=COSH(0)', '=COSH(1)']])
 
     expect(engine.getCellValue(adr('A1'))).toBe(1)
+    expect(engine.getCellValue(adr('B1'))).toBeCloseTo(1.54308063481524)
   })
 
   it('when value not numeric', () => {

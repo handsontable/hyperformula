@@ -4,9 +4,10 @@ import {adr, detailedError} from '../testUtils'
 
 describe('Function ACOT', () => {
   it('happy path', () => {
-    const engine = HyperFormula.buildFromArray([['=ACOT(0)']])
+    const engine = HyperFormula.buildFromArray([['=ACOT(0)', '=ACOT(1)']])
 
     expect(engine.getCellValue(adr('A1'))).toBeCloseTo(1.5707963267949)
+    expect(engine.getCellValue(adr('B1'))).toBeCloseTo(0.785398163397448)
   })
 
   it('when value not numeric', () => {

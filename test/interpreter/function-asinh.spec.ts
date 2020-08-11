@@ -4,9 +4,10 @@ import {adr, detailedError} from '../testUtils'
 
 describe('Function ASINH', () => {
   it('happy path', () => {
-    const engine = HyperFormula.buildFromArray([['=ASINH(0)']])
+    const engine = HyperFormula.buildFromArray([['=ASINH(0)', '=ASINH(0.5)']])
 
     expect(engine.getCellValue(adr('A1'))).toBe(0)
+    expect(engine.getCellValue(adr('B1'))).toBeCloseTo(0.481211825059604)
   })
 
   it('when value not numeric', () => {

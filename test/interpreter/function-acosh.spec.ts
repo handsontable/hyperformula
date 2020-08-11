@@ -3,9 +3,10 @@ import {adr, detailedError} from '../testUtils'
 
 describe('Function ACOSH', () => {
   it('happy path', () => {
-    const engine = HyperFormula.buildFromArray([['=ACOSH(1)']])
+    const engine = HyperFormula.buildFromArray([['=ACOSH(1)', '=ACOSH(2)']])
 
     expect(engine.getCellValue(adr('A1'))).toBe(0)
+    expect(engine.getCellValue(adr('B1'))).toBeCloseTo(1.31695789692482)
   })
 
   it('when value not numeric', () => {

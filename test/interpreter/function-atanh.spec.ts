@@ -3,9 +3,10 @@ import {adr, detailedError} from '../testUtils'
 
 describe('Function ATANH', () => {
   it('happy path', () => {
-    const engine = HyperFormula.buildFromArray([['=ATANH(0)']], { smartRounding : false})
+    const engine = HyperFormula.buildFromArray([['=ATANH(0)', '=ATANH(0.5)']], { smartRounding : false})
 
     expect(engine.getCellValue(adr('A1'))).toEqual(0)
+    expect(engine.getCellValue(adr('B1'))).toBeCloseTo(0.5493061443340548)
   })
 
   it('error for 1', () => {
