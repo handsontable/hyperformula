@@ -100,6 +100,13 @@ export class FinancialPlugin extends FunctionPlugin {
         {argumentType: ArgumentTypes.NUMBER, minValue: 0},
       ]
     },
+    'DOLLARFR': {
+      method: 'dollarfr',
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER},
+        {argumentType: ArgumentTypes.NUMBER, minValue: 0},
+      ]
+    },
   }
 
   public pmt(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
@@ -229,6 +236,22 @@ export class FinancialPlugin extends FunctionPlugin {
           fraction /= 10
         }
         return Math.trunc(dollar) + (dollar-Math.trunc(dollar))*10/fraction
+      }
+    )
+  }
+
+  public dollarfr(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('DOLLARFR'),
+      (dollar, fraction) => {
+        if (fraction < 1) {
+          return new CellError(ErrorType.DIV_BY_ZERO)
+        }
+        fraction = Math.trunc(fraction)
+
+        while(fraction>10) {
+          fraction /= 10
+        }
+        return Math.trunc(dollar) + (dollar-Math.trunc(dollar))*fraction/10
       }
     )
   }
