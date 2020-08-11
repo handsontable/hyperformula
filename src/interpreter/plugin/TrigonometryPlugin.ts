@@ -70,7 +70,7 @@ export class TrigonometryPlugin extends FunctionPlugin {
       ]
     },
     'CSC': {
-      method: 'cosec',
+      method: 'csc',
       parameters: [
         { argumentType: ArgumentTypes.NUMBER }
       ]
@@ -106,7 +106,7 @@ export class TrigonometryPlugin extends FunctionPlugin {
       ]
     },
     'CSCH': {
-      method: 'cosech',
+      method: 'csch',
       parameters: [
         { argumentType: ArgumentTypes.NUMBER }
       ]
@@ -197,7 +197,7 @@ export class TrigonometryPlugin extends FunctionPlugin {
     )
   }
 
-  public cosec(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+  public csc(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.runFunction(ast.args, formulaAddress, this.metadata('CSC'),
       (arg) => (arg === 0) ? new CellError(ErrorType.DIV_BY_ZERO) : (1 / Math.sin(arg))
     )
@@ -245,7 +245,7 @@ export class TrigonometryPlugin extends FunctionPlugin {
     )
   }
 
-  public cosech(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+  public csch(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.runFunction(ast.args, formulaAddress, this.metadata('CSCH'),
       (arg) => (arg === 0) ? new CellError(ErrorType.DIV_BY_ZERO) : (1 / Math.sinh(arg))
     )
