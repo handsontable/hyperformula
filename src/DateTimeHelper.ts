@@ -168,6 +168,10 @@ export class DateTimeHelper {
     return Math.floor(year / 4) - Math.floor(year / 100) + Math.floor(year / 400) + (this.config.leapYear1900 && year >= 1900 ? 1 : 0)
   }
 
+  private countLeapDays(date: SimpleDate): number {
+    return this.leapYearsCount(date.year) + ((date.month > 2 || (date.month === 2 && date.day === 29)) ? 1 : 0)
+  }
+
   private dateToNumberFromZero(date: SimpleDate): number {
     return 365 * date.year + prefSumDays[date.month - 1] + date.day - 1 + (date.month <= 2 ? this.leapYearsCount(date.year - 1) : this.leapYearsCount(date.year))
   }
@@ -196,7 +200,7 @@ export class DateTimeHelper {
     return {year: date.year, month: date.month, day: this.daysInMonth(date.year, date.month)}
   }
 
-  public toBasisEU(start: SimpleDate, end: SimpleDate): [SimpleDate, SimpleDate] {
+  public toBasisUS(start: SimpleDate, end: SimpleDate): [SimpleDate, SimpleDate] {
     let endY = end.year
     const startY = start.year
     let endM = end.month
@@ -210,10 +214,6 @@ export class DateTimeHelper {
       if(startD < 30) {
         endD = 1
         endM += 1
-        if(endM === 13) {
-          endM = 1
-          endY += 1
-        }
       } else {
         endD = 30
       }
@@ -221,6 +221,24 @@ export class DateTimeHelper {
     return [{year: startY, month: startM, day: startD}, {year: endY, month: endM, day: endD}]
   }
 
+  public yearLengthForBasis(start: SimpleDate, end: SimpleDate): number {
+    if(start.year !== end.year) {
+      if ((start.year + 1 !== end.year) || (start.month < end.month) || (start.month === end.month && start.day < end.day)) {
+        // this is true IFF at least one year of gap between dates
+        return (this.leapYearsCount(end.year) - this.leapYearsCount(start.year-1))/(end.year-start.year+1) + 365
+      }
+      if(this.countLeapDays(end) !== this.countLeapDays({year: start.year, month: start.month, day: start.day-1})) {
+        return 366
+      } else {
+        return 365
+      }
+    }
+    if (this.isLeapYear(start.year)) {
+      return 366
+    } else {
+      return 365
+    }
+  }
 }
 
 function dayToMonth(dayOfYear: number): number {
@@ -269,7 +287,7 @@ export function timeToNumber(time: SimpleTime): number {
   return ((time.seconds/60+time.minutes)/60+time.hours)/24
 }
 
-export function toBasisUS(date: SimpleDate): SimpleDate {
+export function toBasisEU(date: SimpleDate): SimpleDate {
   return {year: date.year, month: date.month, day: Math.min(30, date.day)}
 }
 

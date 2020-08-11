@@ -10,7 +10,7 @@ import {
   numberToSimpleTime,
   offsetMonth,
   roundToNearestSecond, SimpleDate,
-  timeToNumber, toBasisUS,
+  timeToNumber, toBasisEU,
   truncateDayInMonth
 } from '../../DateTimeHelper'
 import {format} from '../../format/format'
@@ -158,6 +158,14 @@ export class DatePlugin extends FunctionPlugin {
         {argumentType: ArgumentTypes.NUMBER, minValue: 0},
         {argumentType: ArgumentTypes.NUMBER, minValue: 0},
         {argumentType: ArgumentTypes.BOOLEAN, defaultValue: false},
+      ],
+    },
+    'YEARFRAC': {
+      method: 'yearfrac',
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER, minValue: 0},
+        {argumentType: ArgumentTypes.NUMBER, minValue: 0},
+        {argumentType: ArgumentTypes.INTEGER, defaultValue: 0, minValue: 0, maxValue: 4},
       ],
     },
   }
@@ -439,18 +447,46 @@ export class DatePlugin extends FunctionPlugin {
   }
 
   public days360(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('DAYS360'),
-      (startDate: number, endDate: number, mode: boolean) => {
-        const start = this.interpreter.dateHelper.numberToSimpleDate(startDate)
-        const end = this.interpreter.dateHelper.numberToSimpleDate(endDate)
-        let nStart, nEnd: SimpleDate
-        if(mode) {
-          nStart = toBasisUS(start)
-          nEnd = toBasisUS(end)
-        } else {
-          [nStart, nEnd] = this.interpreter.dateHelper.toBasisEU(start, end)
+    return this.runFunction(ast.args, formulaAddress, this.metadata('DAYS360'), this.days360Core)
+  }
+
+  private days360Core(startDate: number, endDate: number, mode: boolean): number {
+    const start = this.interpreter.dateHelper.numberToSimpleDate(startDate)
+    const end = this.interpreter.dateHelper.numberToSimpleDate(endDate)
+    let nStart, nEnd: SimpleDate
+    if(mode) {
+      nStart = toBasisEU(start)
+      nEnd = toBasisEU(end)
+    } else {
+      [nStart, nEnd] = this.interpreter.dateHelper.toBasisUS(start, end)
+    }
+    return 360 * (nEnd.year - nStart.year) + 30*(nEnd.month-nStart.month) + nEnd.day-nStart.day
+  }
+
+  public yearfrac(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('YEARFRAC'),
+      (startDate: number, endDate: number, mode: number) => {
+        startDate = Math.trunc(startDate)
+        endDate = Math.trunc(endDate)
+        if(startDate > endDate) {
+          [startDate, endDate] = [endDate, startDate]
         }
-        return 360 * (nEnd.year - nStart.year) + 30*(nEnd.month-nStart.month) + nEnd.day-nStart.day
+        switch (mode) {
+          case 0:
+            return this.days360Core(startDate, endDate, false) / 360
+          case 1:
+            return (endDate-startDate) / this.interpreter.dateHelper.yearLengthForBasis(
+              this.interpreter.dateHelper.numberToSimpleDate(startDate),
+              this.interpreter.dateHelper.numberToSimpleDate(endDate)
+            )
+          case 2:
+            return (endDate-startDate)/360
+          case 3:
+            return (endDate-startDate)/365
+          case 4:
+            return this.days360Core(startDate, endDate, true) / 360
+        }
+        throw new Error('Should not be reachable.')
       }
     )
   }
