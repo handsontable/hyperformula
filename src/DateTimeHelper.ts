@@ -169,7 +169,11 @@ export class DateTimeHelper {
   }
 
   private countLeapDays(date: SimpleDate): number {
-    return this.leapYearsCount(date.year) + ((date.month > 2 || (date.month === 2 && date.day === 29)) ? 1 : 0)
+    if(date.month>2 || (date.month === 2 && date.day >= 29)) {
+      return this.leapYearsCount(date.year)
+    } else {
+      return this.leapYearsCount(date.year-1)
+    }
   }
 
   private dateToNumberFromZero(date: SimpleDate): number {
