@@ -4,9 +4,9 @@ import {adr, detailedError} from '../testUtils'
 
 describe('Function ACOS', () => {
   it('happy path', () => {
-    const engine = HyperFormula.buildFromArray([['=ACOS(1)']])
+    const engine = HyperFormula.buildFromArray([['=ACOS(0.5)']])
 
-    expect(engine.getCellValue(adr('A1'))).toBe(0)
+    expect(engine.getCellValue(adr('A1'))).toBeCloseTo(1.0471975511966)
   })
 
   it('when value not numeric', () => {
