@@ -117,7 +117,7 @@ const dictionary: RawTranslationPackage = {
     MEDIANPOOL: 'MEDIANPOOL',
     MIN: 'MIN',
     MINA: 'MINA',
-    MINUTE: 'MPERC',
+    MINUTE: 'PERCEK',
     MMULT: 'MSZORZAT',
     MOD: 'MARADÉK',
     MONTH: 'HÓNAP',
