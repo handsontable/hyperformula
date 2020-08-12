@@ -159,6 +159,7 @@ const dictionary: RawTranslationPackage = {
     WEEKNUM: 'WEEKNUMMER',
     XOR: 'EX.OF',
     YEAR: 'JAAR',
+    YEARFRAC: 'JAAR.DEEL',
   },
   langCode: 'nlNL',
   ui: {

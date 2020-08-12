@@ -159,6 +159,7 @@ const dictionary: RawTranslationPackage = {
     WEEKNUM: 'NUM.SETTIMANA',
     XOR: 'XOR',
     YEAR: 'ANNO',
+    YEARFRAC: 'FRAZIONE.ANNO',
   },
   langCode: 'itIT',
   ui: {

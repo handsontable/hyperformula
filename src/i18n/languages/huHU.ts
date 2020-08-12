@@ -159,6 +159,7 @@ const dictionary: RawTranslationPackage = {
     WEEKNUM: 'HÉT.SZÁMA',
     XOR: 'XVAGY',
     YEAR: 'ÉV',
+    YEARFRAC: 'TÖRTÉV',
   },
   langCode: 'huHU',
   ui: {

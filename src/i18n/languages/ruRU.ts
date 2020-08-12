@@ -159,6 +159,7 @@ const dictionary: RawTranslationPackage = {
     WEEKNUM: 'НОМНЕДЕЛИ',
     XOR: 'ИСКЛИЛИ',
     YEAR: 'ГОД',
+    YEARFRAC: 'ДОЛЯГОДА',
   },
   langCode: 'ruRU',
   ui: {

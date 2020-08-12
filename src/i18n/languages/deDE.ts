@@ -159,6 +159,7 @@ const dictionary: RawTranslationPackage = {
     WEEKNUM: 'KALENDERWOCHE',
     XOR: 'XODER',
     YEAR: 'JAHR',
+    YEARFRAC: 'BRTEILJAHRE',
   },
   langCode: 'deDE',
   ui: {

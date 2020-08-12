@@ -159,6 +159,7 @@ const dictionary: RawTranslationPackage = {
     WEEKNUM: 'HAFTASAY',
     XOR: 'ÖZELVEYA',
     YEAR: 'YIL',
+    YEARFRAC: 'YILORAN',
   },
   langCode: 'trTR',
   ui: {

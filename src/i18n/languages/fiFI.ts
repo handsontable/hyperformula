@@ -159,6 +159,7 @@ const dictionary: RawTranslationPackage = {
     WEEKNUM: 'VIIKKO.NRO',
     XOR: 'EHDOTON.TAI',
     YEAR: 'VUOSI',
+    YEARFRAC: 'VUOSI.OSA',
   },
   langCode: 'fiFI',
   ui: {

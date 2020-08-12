@@ -159,6 +159,7 @@ const dictionary: RawTranslationPackage = {
     WEEKNUM: 'VECKONR',
     XOR: 'XOR',
     YEAR: 'ÅR',
+    YEARFRAC: 'ÅRDEL',
   },
   langCode: 'svSE',
   ui: {
