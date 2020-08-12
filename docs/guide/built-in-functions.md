@@ -66,7 +66,7 @@ lets you design your own [custom functions](custom-functions).
 | DATEVALUE | Date and time | Interprets string as date. | DATEVALUE(Datestring) |
 | DAY | Date and time | Returns the day of the given date value. | DAY(Number) |
 | DAYS | Date and time | Calculates the difference between two date values. | DAYS(Date2; Date1) |
-| DAYS | Date and time | Calculates the difference between two date values in days, in 360-day basis. | DAYS(Date2; Date1[; Format]) |
+| DAYS360 | Date and time | Calculates the difference between two date values in days, in 360-day basis. | DAYS360(Date2; Date1[; Format]) |
 | EDATE | Date and time | Shifts the given startdate by given number of months. | EDATE(Startdate; Months) |
 | EOMONTH | Date and time | Returns the date of the last day of a month which falls months away from the start date. | EOMONTH(Startdate; Months) |
 | HOUR | Date and time | Returns hour component of given time. | HOUR(Time) |
@@ -81,6 +81,7 @@ lets you design your own [custom functions](custom-functions).
 | WEEKDAY | Date and time |  Computes a number between 1-7 representing the day of week. | WEEKDAY(Date; Type) |
 | WEEKNUM | Date and time |   Returns a week number that corresponds to the week of year. | WEEKNUM(Date; Type) |
 | YEAR | Date and time | Returns the year as a number according to the internal calculation rules. | YEAR(Number) |
+| YEARFRAC | Date and time | Computes the difference between two date values, in fraction of years. |  YEARFRAC(Date2; Date1[; Format]) |
 | BIN2DEC | Engineering | The result is the decimal number for the binary number entered. | BIN2DEC(Number) |
 | BIN2HEX | Engineering | The result is the hexadecimal number for the binary number entered. | BIN2HEX(Number; Places) |
 | BIN2OCT | Engineering | The result is the octal number for the binary number entered. | BIN2OCT(Number; Places) |
