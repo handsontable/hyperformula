@@ -83,7 +83,7 @@ const dictionary: RawTranslationPackage = {
     FIND: 'BUL',
     FORMULATEXT: 'FORMÜLMETNİ',
     FV: 'GD',
-    HOUR: 'DAKİKA',
+    HOUR: 'SAAT',
     IF: 'EĞER',
     IFERROR: 'EĞERHATA',
     IFNA: 'EĞERYOKSA',
