@@ -107,6 +107,7 @@ lets you design your own [custom functions](custom-functions).
 | FV | Financial | Returns the future value of an investment. | FV(Rate; Nper; Pmt[; Pv;[ Type]]) |
 | IPMT | Financial | Calculates the interest portion of a given loan payment in a given payment period. | IPMT(Rate; Per; Nper; Pv[; Fv[; Type]]) |
 | ISPMT | Financial | Calculates the interest paid during a given period of an investment where principal payments are equal. | ISPMT(Rate; Per; Nper; Value) |
+| NOMINAL | Financial | Returns the nominal interest rate, given an effective annual interest rate and the number of compounding periods per year. | NOMINAL(Effect_rate; Npery) |
 | PMT | Financial | Returns the periodic payment for a loan. | PMT(Rate; Nper; Pv[; Fv[; Type]]) |
 | PPMT | Financial | Calculates the principal portion of a given loan payment. | PPMT(Rate; Per; Nper; Pv[; Fv[; Type]]) |
 | AND | Logical | Returns TRUE if all arguments are TRUE. | AND(Logicalvalue1; Logicalvalue2 ...Logicalvalue30) |
