@@ -2,22 +2,22 @@ import {HyperFormula} from '../../src'
 import {ErrorType} from '../../src/Cell'
 import {adr, detailedError} from '../testUtils'
 
-describe('Function COS', () => {
+describe('Function TANH', () => {
   it('happy path', () => {
-    const engine = HyperFormula.buildFromArray([['=COS(0)', '=COS(7)']])
+    const engine = HyperFormula.buildFromArray([['=TANH(0)', '=TANH(0.5)']])
 
-    expect(engine.getCellValue(adr('A1'))).toBe(1)
-    expect(engine.getCellValue(adr('B1'))).toBeCloseTo(0.753902254343305)
+    expect(engine.getCellValue(adr('A1'))).toBe(0)
+    expect(engine.getCellValue(adr('B1'))).toBeCloseTo(0.46211715726001)
   })
 
   it('when value not numeric', () => {
-    const engine = HyperFormula.buildFromArray([['=COS("foo")']])
+    const engine = HyperFormula.buildFromArray([['=TANH("foo")']])
 
     expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE))
   })
 
   it('wrong number of arguments', () => {
-    const engine = HyperFormula.buildFromArray([['=COS()', '=COS(1,-1)']])
+    const engine = HyperFormula.buildFromArray([['=TANH()', '=TANH(1,-1)']])
 
     expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA))
     expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.NA))
@@ -25,15 +25,15 @@ describe('Function COS', () => {
 
   it('use number coercion',  () => {
     const engine =  HyperFormula.buildFromArray([
-      ['="-1"', '=COS(A1)'],
+      ['="-1"', '=TANH(A1)'],
     ])
 
-    expect(engine.getCellValue(adr('B1'))).toBeCloseTo(0.54030230586814)
+    expect(engine.getCellValue(adr('B1'))).toBeCloseTo(-0.761594155955765)
   })
 
   it('errors propagation', () => {
     const engine =  HyperFormula.buildFromArray([
-      ['=COS(4/0)'],
+      ['=TANH(4/0)'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.DIV_BY_ZERO))
@@ -43,7 +43,7 @@ describe('Function COS', () => {
   it('range value results in VALUE error', () => {
     const engine = HyperFormula.buildFromArray([
       ['0'],
-      ['1', '=COS(A1:A3)'],
+      ['1', '=TANH(A1:A3)'],
       ['-1'],
     ])
 

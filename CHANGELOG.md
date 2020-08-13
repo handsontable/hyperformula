@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added 10 financial functions FV, PMT, PPMT, IPMT, CUMIPMT, CUMPRINC, DB, DDB, DOLLARDE, DOLLARFR.
 - Added FORMULATEXT function.
 - Added 8 information functions ISERR, ISNA, ISREF, NA, SHEET, SHEETS, ISBINARY, ISFORMULA (#481)
+- Added 13 trigonometry functions: SEC, CSC, SINH, COSH, TANH, COTH, SECH, CSCH, ACOT, ASINH, ACOSH, ATANH, ACOTH.
 
 ### Changed
 - Operation `moveCells` creating cyclic dependencies does not cause losing original formula. (#479)
@@ -22,6 +23,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed `moveCells` behaviour when moving part of a range. (#479)
 - Fixed `moveColumns`/`moveRows` inconsistent behaviour. (#479)
 - Fixed undo of `moveColumns`/`moveRows` operations. (#479)
+- Fixed name-collision issue in translations.
 
 ## [0.1.3] - 2020-07-21
 
