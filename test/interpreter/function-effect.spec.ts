@@ -16,8 +16,8 @@ describe('Function EFFECT', () => {
       ['=EFFECT(2%, 1)', '=EFFECT(2%, 2)', '=EFFECT(2%, 2.9)', '=EFFECT(2%, 24)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toBeCloseTo(0.02,9)
-    expect(engine.getCellValue(adr('B1'))).toBeCloseTo(0.0201,9)
+    expect(engine.getCellValue(adr('A1'))).toBeCloseTo(0.02, 9)
+    expect(engine.getCellValue(adr('B1'))).toBeCloseTo(0.0201, 9)
     expect(engine.getCellValue(adr('C1'))).toBeCloseTo(0.0201, 9)
     expect(engine.getCellValue(adr('D1'))).toBeCloseTo(0.0201928431045086, 9)
   })
