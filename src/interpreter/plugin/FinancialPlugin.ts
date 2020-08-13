@@ -16,7 +16,7 @@ export class FinancialPlugin extends FunctionPlugin {
           {argumentType: ArgumentTypes.NUMBER},
           {argumentType: ArgumentTypes.NUMBER},
           {argumentType: ArgumentTypes.NUMBER, defaultValue: 0},
-          {argumentType: ArgumentTypes.INTEGER, minValue: 0, maxValue: 1, defaultValue: 0},
+          {argumentType: ArgumentTypes.NUMBER, defaultValue: 0},
         ]
     },
     'IPMT': {
@@ -27,7 +27,7 @@ export class FinancialPlugin extends FunctionPlugin {
           {argumentType: ArgumentTypes.NUMBER},
           {argumentType: ArgumentTypes.NUMBER},
           {argumentType: ArgumentTypes.NUMBER, defaultValue: 0},
-          {argumentType: ArgumentTypes.INTEGER, minValue: 0, maxValue: 1, defaultValue: 0},
+          {argumentType: ArgumentTypes.NUMBER, defaultValue: 0},
         ]
     },
     'PPMT': {
@@ -38,7 +38,7 @@ export class FinancialPlugin extends FunctionPlugin {
           {argumentType: ArgumentTypes.NUMBER},
           {argumentType: ArgumentTypes.NUMBER},
           {argumentType: ArgumentTypes.NUMBER, defaultValue: 0},
-          {argumentType: ArgumentTypes.INTEGER, minValue: 0, maxValue: 1, defaultValue: 0},
+          {argumentType: ArgumentTypes.NUMBER, defaultValue: 0},
         ]
     },
     'FV': {
@@ -48,7 +48,7 @@ export class FinancialPlugin extends FunctionPlugin {
           {argumentType: ArgumentTypes.NUMBER},
           {argumentType: ArgumentTypes.NUMBER},
           {argumentType: ArgumentTypes.NUMBER, defaultValue: 0},
-          {argumentType: ArgumentTypes.INTEGER, minValue: 0, maxValue: 1, defaultValue: 0},
+          {argumentType: ArgumentTypes.NUMBER, defaultValue: 0},
         ]
     },
     'CUMIPMT': {
@@ -130,6 +130,16 @@ export class FinancialPlugin extends FunctionPlugin {
         {argumentType: ArgumentTypes.NUMBER, minValue: 1},
       ]
     },
+    'NPER': {
+      method: 'nper',
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER},
+        {argumentType: ArgumentTypes.NUMBER},
+        {argumentType: ArgumentTypes.NUMBER},
+        {argumentType: ArgumentTypes.NUMBER, defaultValue: 0},
+        {argumentType: ArgumentTypes.NUMBER, defaultValue: 0},
+      ]
+    },
   }
 
   public pmt(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
@@ -187,7 +197,7 @@ export class FinancialPlugin extends FunctionPlugin {
           start = 2
         }
         for (let i = start; i <= end; i++) {
-          acc += payment - rate * (type?  (fvCore(rate, i - 2, payment, value, 1) - payment) : fvCore(rate, i - 1, payment, value, 0))
+          acc += payment - rate * (type ? (fvCore(rate, i - 2, payment, value, 1) - payment) : fvCore(rate, i - 1, payment, value, 0))
         }
 
         return acc
@@ -307,6 +317,23 @@ export class FinancialPlugin extends FunctionPlugin {
       }
     )
   }
+
+  public nper(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('NPER'),
+      (rate, payment, present, future, type) => {
+        if(rate === 0) {
+          if(payment === 0) {
+            return new CellError(ErrorType.DIV_BY_ZERO)
+          }
+          return (-present - future)/payment
+        }
+        const cType = type ? 1 : 0
+        const num = payment * (1 + rate * cType) - future * rate
+        const den = (present * rate + payment * (1 + rate * cType))
+        return Math.log(num / den) / Math.log(1 + rate)
+      }
+    )
+  }
 }
 
 function pmtCore(rate: number, periods: number, present: number, future: number, type: number): number {
@@ -314,7 +341,7 @@ function pmtCore(rate: number, periods: number, present: number, future: number,
     return (-present - future) / periods
   } else {
     const term = Math.pow(1 + rate, periods)
-    return (future * rate + present * rate * term) * (type !== 0 ? 1 / (1 + rate) : 1) / (1 - term)
+    return (future * rate + present * rate * term) * (type ? 1 / (1 + rate) : 1) / (1 - term)
   }
 }
 
