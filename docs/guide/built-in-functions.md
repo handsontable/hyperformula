@@ -103,6 +103,7 @@ lets you design your own [custom functions](custom-functions).
 | DDB | Financial | Returns the depreciation of an asset for a specified period using the double-declining balance method. | DDB(Cost, Salvage; Life; Period[; Factor]) |
 | DOLLARDE | Financial | Converts a price entered with a special notation to a price displayed as a decimal number. | DOLLARDE(Price, Fraction) |
 | DOLLARFR | Financial | Converts a price displayed as a decimal number to a price entered with a special notation. | DOLLARFR(Price, Fraction) |
+| EFFECT | Financial | Calculates the effective annual interest rate, given a nominal interest rate and the number of compounding periods per year. | EFFECT (Nominal_rate; Npery) |
 | FV | Financial | Returns the future value of an investment. | FV(Rate; Nper; Pmt[; Pv;[ Type]]) |
 | IPMT | Financial | Calculates the interest portion of a given loan payment in a given payment period. | IPMT(Rate; Per; Nper; Pv[; Fv[; Type]]) |
 | PMT | Financial | Returns the periodic payment for a loan. | PMT(Rate; Nper; Pv[; Fv[; Type]]) |
