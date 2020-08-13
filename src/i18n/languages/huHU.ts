@@ -125,6 +125,7 @@ const dictionary: RawTranslationPackage = {
     NA: 'HIÁNYZIK',
     NOMINAL: 'NÉVLEGES',
     NOT: 'NEM',
+    NPER: 'PER.SZÁM',
     ODD: 'PÁRATLAN',
     OFFSET: 'ELTOLÁS',
     OR: 'VAGY',

@@ -125,6 +125,7 @@ const dictionary: RawTranslationPackage = {
     NA: 'NB',
     NOMINAL: 'NOMINALE.RENTE',
     NOT: 'NIET',
+    NPER: 'NPER',
     ODD: 'ONEVEN',
     OFFSET: 'VERSCHUIVING',
     OR: 'OF',

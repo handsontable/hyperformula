@@ -125,6 +125,7 @@ const dictionary: RawTranslationPackage = {
     NA: 'PUUTTUU',
     NOMINAL: 'KORKO.VUOSI',
     NOT: 'EI',
+    NPER: 'NJAKSO',
     ODD: 'PARITON',
     OFFSET: 'SIIRTYMÄ',
     OR: 'TAI',

@@ -125,6 +125,7 @@ export const dictionary: RawTranslationPackage = {
     NA: 'NOD',
     NOMINAL: 'TASA.NOMINAL',
     NOT: 'NO',
+    NPER: 'NPER',
     ODD: 'REDONDEA.IMPAR',
     OFFSET: 'DESREF',
     OR: 'O',

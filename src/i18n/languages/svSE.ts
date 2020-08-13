@@ -125,6 +125,7 @@ const dictionary: RawTranslationPackage = {
     NA: 'SAKNAS',
     NOMINAL: 'NOMRÄNTA',
     NOT: 'ICKE',
+    NPER: 'PERIODER',
     ODD: 'UDDA',
     OFFSET: 'FÖRSKJUTNING',
     OR: 'ELLER',

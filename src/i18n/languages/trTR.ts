@@ -125,6 +125,7 @@ const dictionary: RawTranslationPackage = {
     NA: 'YOKSAY',
     NOMINAL: 'NOMİNAL',
     NOT: 'DEĞİL',
+    NPER: 'TAKSİT_SAYISI',
     ODD: 'TEK',
     OFFSET: 'KAYDIR',
     OR: 'VEYA',

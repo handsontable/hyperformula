@@ -125,6 +125,7 @@ const dictionary: RawTranslationPackage = {
     NA: 'NEDEF',
     NOMINAL: 'NOMINAL',
     NOT: 'NE',
+    NPER: 'POČET.OBDOBÍ',
     ODD: 'ZAOKROUHLIT.NA.LICHÉ',
     OFFSET: 'POSUN',
     OR: 'NEBO',
