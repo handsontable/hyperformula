@@ -76,6 +76,7 @@ const dictionary: RawTranslationPackage = {
     DELTA: 'DELTA',
     DOLLARDE: 'FORINT.DEC',
     DOLLARFR: 'FORINT.TÖRT',
+    EFFECT: "TÉNYLEGES",
     EOMONTH: 'HÓNAP.UTOLSÓ.NAP',
     ERF: 'HIBAF',
     ERFC: 'HIBAF.KOMPLEMENTER',

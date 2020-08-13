@@ -76,6 +76,7 @@ const dictionary: RawTranslationPackage = {
     DELTA: 'DELTA',
     DOLLARDE: 'VALUTA.DEC',
     DOLLARFR: 'VALUTA.FRAZ',
+    EFFECT: "EFFETTIVO",
     EOMONTH: 'FINE.MESE',
     ERF: 'FUNZ.ERRORE',
     ERFC: 'FUNZ.ERRORE.COMP',
