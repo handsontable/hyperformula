@@ -114,6 +114,15 @@ export class FinancialPlugin extends FunctionPlugin {
         {argumentType: ArgumentTypes.NUMBER, minValue: 1},
       ]
     },
+    'ISPMT': {
+      method: 'ispmt',
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER},
+        {argumentType: ArgumentTypes.NUMBER},
+        {argumentType: ArgumentTypes.NUMBER},
+        {argumentType: ArgumentTypes.NUMBER},
+      ]
+    },
   }
 
   public pmt(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
@@ -268,6 +277,17 @@ export class FinancialPlugin extends FunctionPlugin {
       (rate: number, periods: number) => {
         periods = Math.trunc(periods)
         return Math.pow(1 + rate / periods, periods) - 1
+      }
+    )
+  }
+
+  public ispmt(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('ISPMT'),
+      (rate, period, periods, value) => {
+        if(periods===0) {
+          return new CellError(ErrorType.DIV_BY_ZERO)
+        }
+        return value * rate * (period / periods - 1)
       }
     )
   }

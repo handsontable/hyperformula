@@ -103,6 +103,7 @@ const dictionary: RawTranslationPackage = {
     ISNONTEXT: 'ЕНЕТЕКСТ',
     ISNUMBER: 'ЕЧИСЛО',
     ISODD: 'ЕНЕЧЁТ',
+    ISPMT: 'ПРОЦПЛАТ',
     ISREF: 'ЕССЫЛКА',
     ISTEXT: 'ЕТЕКСТ',
     LEFT: 'ЛЕВСИМВ',

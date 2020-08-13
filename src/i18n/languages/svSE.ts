@@ -103,6 +103,7 @@ const dictionary: RawTranslationPackage = {
     ISNONTEXT: 'ÄREJTEXT',
     ISNUMBER: 'ÄRTAL',
     ISODD: 'ÄRUDDA',
+    ISPMT: 'RALÅN',
     ISREF: 'ÄRREF',
     ISTEXT: 'ÄRTEXT',
     LEFT: 'VÄNSTER',

@@ -103,6 +103,7 @@ const dictionary: RawTranslationPackage = {
     ISNONTEXT: 'JE.NETEXT',
     ISNUMBER: 'JE.ČISLO',
     ISODD: 'ISODD',
+    ISPMT: 'ISPMT',
     ISREF: 'JE.ODKAZ',
     ISTEXT: 'JE.TEXT',
     LEFT: 'ZLEVA',

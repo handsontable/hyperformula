@@ -103,6 +103,7 @@ const dictionary: RawTranslationPackage = {
     ISNONTEXT: 'ER.IKKE.TEKST',
     ISNUMBER: 'ER.TAL',
     ISODD: 'ER.ULIGE',
+    ISPMT: 'ISPMT',
     ISREF: 'ER.REFERENCE',
     ISTEXT: 'ER.TEKST',
     LEFT: 'VENSTRE',

@@ -103,6 +103,7 @@ const dictionary: RawTranslationPackage = {
     ISNONTEXT: 'VAL.NON.TESTO',
     ISNUMBER: 'VAL.NUMERO',
     ISODD: 'VAL.DISPARI',
+    ISPMT: 'INTERESSE.RATA',
     ISREF: 'VAL.RIF',
     ISTEXT: 'VAL.TESTO',
     LEFT: 'SINISTRA',

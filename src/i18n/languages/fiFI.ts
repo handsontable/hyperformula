@@ -103,6 +103,7 @@ const dictionary: RawTranslationPackage = {
     ISNONTEXT: 'ONEI_TEKSTI',
     ISNUMBER: 'ONLUKU',
     ISODD: 'ONPARITON',
+    ISPMT: 'ISPMT',
     ISREF: 'ONVIITT',
     ISTEXT: 'ONTEKSTI',
     LEFT: 'VASEN',
