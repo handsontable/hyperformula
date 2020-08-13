@@ -107,6 +107,13 @@ export class FinancialPlugin extends FunctionPlugin {
         {argumentType: ArgumentTypes.NUMBER, minValue: 0},
       ]
     },
+    'EFFECT': {
+      method: 'effect',
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER, minValue: 0},
+        {argumentType: ArgumentTypes.NUMBER, minValue: 1},
+      ]
+    },
   }
 
   public pmt(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
@@ -252,6 +259,15 @@ export class FinancialPlugin extends FunctionPlugin {
           fraction /= 10
         }
         return Math.trunc(dollar) + (dollar-Math.trunc(dollar))*fraction/10
+      }
+    )
+  }
+
+  public effect(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('EFFECT'),
+      (rate: number, periods: number) => {
+        periods = Math.trunc(periods)
+        return Math.pow(1 + rate / periods, periods) - 1
       }
     )
   }
