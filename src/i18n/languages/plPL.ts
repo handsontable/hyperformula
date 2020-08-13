@@ -123,6 +123,7 @@ const dictionary: RawTranslationPackage = {
     MOD: 'MOD',
     MONTH: 'MIESIĄC',
     NA: 'BRAK',
+    NOMINAL: 'NOMINALNA',
     NOT: 'NIE',
     ODD: 'ZAOKR.DO.NPARZ',
     OFFSET: 'PRZESUNIĘCIE',

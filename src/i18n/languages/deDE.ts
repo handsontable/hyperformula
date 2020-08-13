@@ -123,6 +123,7 @@ const dictionary: RawTranslationPackage = {
     MOD: 'REST',
     MONTH: 'MONAT',
     NA: 'NV',
+    NOMINAL: 'NOMINAL',
     NOT: 'NICHT',
     ODD: 'UNGERADE',
     OFFSET: 'BEREICH.VERSCHIEBEN',

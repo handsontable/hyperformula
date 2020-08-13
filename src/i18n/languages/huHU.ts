@@ -123,6 +123,7 @@ const dictionary: RawTranslationPackage = {
     MOD: 'MARADÉK',
     MONTH: 'HÓNAP',
     NA: 'HIÁNYZIK',
+    NOMINAL: 'NÉVLEGES',
     NOT: 'NEM',
     ODD: 'PÁRATLAN',
     OFFSET: 'ELTOLÁS',

@@ -123,6 +123,13 @@ export class FinancialPlugin extends FunctionPlugin {
         {argumentType: ArgumentTypes.NUMBER},
       ]
     },
+    'NOMINAL': {
+      method: 'nominal',
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER, minValue: 0},
+        {argumentType: ArgumentTypes.NUMBER, minValue: 1},
+      ]
+    },
   }
 
   public pmt(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
@@ -288,6 +295,15 @@ export class FinancialPlugin extends FunctionPlugin {
           return new CellError(ErrorType.DIV_BY_ZERO)
         }
         return value * rate * (period / periods - 1)
+      }
+    )
+  }
+
+  public nominal(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('NOMINAL'),
+      (rate: number, periods: number) => {
+        periods = Math.trunc(periods)
+        return (Math.pow(rate + 1, 1 / periods) - 1) * periods
       }
     )
   }

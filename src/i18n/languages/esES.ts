@@ -123,6 +123,7 @@ export const dictionary: RawTranslationPackage = {
     MOD: 'RESIDUO',
     MONTH: 'MES',
     NA: 'NOD',
+    NOMINAL: 'TASA.NOMINAL',
     NOT: 'NO',
     ODD: 'REDONDEA.IMPAR',
     OFFSET: 'DESREF',

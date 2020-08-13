@@ -123,6 +123,7 @@ const dictionary: RawTranslationPackage = {
     MOD: 'JAKOJ',
     MONTH: 'KUUKAUSI',
     NA: 'PUUTTUU',
+    NOMINAL: 'KORKO.VUOSI',
     NOT: 'EI',
     ODD: 'PARITON',
     OFFSET: 'SIIRTYMÄ',
