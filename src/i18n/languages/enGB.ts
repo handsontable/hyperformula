@@ -136,6 +136,7 @@ const dictionary: RawTranslationPackage = {
     PROPER: 'PROPER',
     RADIANS: 'RADIANS',
     RAND: 'RAND',
+    RATE: 'RATE',
     REPT: 'REPT',
     RIGHT: 'RIGHT',
     ROUND: 'ROUND',
