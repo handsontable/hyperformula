@@ -88,6 +88,7 @@ describe('Function WEEKDAY', () => {
     expect(engine.getCellValue(adr('A3'))).toEqual(5)
     expect(engine.getCellValue(adr('A4'))).toEqual(4)
   })
+
   it('should work for strings with compatibility mode and different nullDate', () => {
     const engine = HyperFormula.buildFromArray([
       ['=WEEKDAY("31/07/2020")'],
@@ -100,5 +101,30 @@ describe('Function WEEKDAY', () => {
     expect(engine.getCellValue(adr('A2'))).toEqual(6)
     expect(engine.getCellValue(adr('A3'))).toEqual(5)
     expect(engine.getCellValue(adr('A4'))).toEqual(4)
+  })
+
+  it('big test', () => {
+    const args = [1,2,3,11,12,13,14,15,16,17]
+    const dates = ["13/08/2020", "14/08/2020", "15/08/2020", "16/08/2020", "17/08/2020", "18/08/2020", "19/08/2020"]
+    const arrs = []
+    for(let arg of args) {
+      const arr = []
+      for(let date of dates) {
+        arr.push(`=WEEKDAY("${date}", ${arg})`)
+      }
+      arrs.push(arr)
+    }
+    const engine = HyperFormula.buildFromArray(arrs)
+    expect(engine.getSheetValues(0)).toEqual(
+      [[5, 6, 7, 1, 2, 3, 4],
+        [4, 5, 6, 7, 1, 2, 3],
+        [3, 4, 5, 6, 0, 1, 2],
+        [4, 5, 6, 7, 1, 2, 3],
+        [3, 4, 5, 6, 7, 1, 2],
+        [2, 3, 4, 5, 6, 7, 1],
+        [1, 2, 3, 4, 5, 6, 7],
+        [7, 1, 2, 3, 4, 5, 6],
+        [6, 7, 1, 2, 3, 4, 5],
+        [5, 6, 7, 1, 2, 3, 4]])
   })
 })

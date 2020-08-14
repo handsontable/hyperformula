@@ -204,17 +204,6 @@ export class DateTimeHelper {
     return {year: date.year, month: date.month, day: this.daysInMonth(date.year, date.month)}
   }
 
-  /**
-   *
-   4.If day(date1)==31 then subtract 1 day from date1
-
-   5.If day(date1)==30 and day(date2)==31 then subtract 1 day from date2
-
-   6.If both date1 and date2 are the last day of February, change date2 to the 30th of the month.
-
-   7.If date1 is the last day of February, change it to the 30th of the month.
-   *
-   */
   public toBasisUS(start: SimpleDate, end: SimpleDate): [SimpleDate, SimpleDate] {
     if(start.day === 31 ) {
       start.day = 30
