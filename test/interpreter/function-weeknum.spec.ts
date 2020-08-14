@@ -115,4 +115,30 @@ describe('Function WEEKNUM', () => {
     expect(engine.getCellValue(adr('A5'))).toEqual(32)
     expect(engine.getCellValue(adr('A6'))).toEqual(31)
   })
+
+  it('big test', () => {
+    const args = [1,2,11,12,13,14,15,16,17,21]
+    const dates = ["13/08/2020", "14/08/2020", "15/08/2020", "16/08/2020", "17/08/2020", "18/08/2020", "19/08/2020"]
+    const arrs = []
+    for(let arg of args) {
+      const arr = []
+      for(let date of dates) {
+        arr.push(`=WEEKNUM("${date}", ${arg})`)
+      }
+      arrs.push(arr)
+    }
+    const engine = HyperFormula.buildFromArray(arrs)
+    expect(engine.getSheetValues(0)).toEqual(
+      [[33, 33, 33, 34, 34, 34, 34],
+        [ 33, 33, 33, 33, 34, 34, 34],
+        [ 33, 33, 33, 33, 34, 34, 34],
+        [ 33, 33, 33, 33, 33, 34, 34],
+        [ 33, 33, 33, 33, 33, 33, 34],
+        [ 34, 34, 34, 34, 34, 34, 34],
+        [ 33, 34, 34, 34, 34, 34, 34],
+        [ 33, 33, 34, 34, 34, 34, 34],
+        [ 33, 33, 33, 34, 34, 34, 34],
+        [ 33, 33, 33, 33, 34, 34, 34],
+      ])
+  })
 })
