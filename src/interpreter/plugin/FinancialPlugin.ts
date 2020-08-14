@@ -357,8 +357,7 @@ export class FinancialPlugin extends FunctionPlugin {
         const iterMax = 20
 
         let rate = guess
-        let i = 0
-        while(true) {
+        for(let i=0; i<iterMax; i++) {
           if(rate<=-1) {
             return new CellError(ErrorType.NUM)
           }
@@ -372,9 +371,6 @@ export class FinancialPlugin extends FunctionPlugin {
           if(Math.abs(y) < epsMax) {
             return rate
           }
-          if(i===iterMax) {
-            return new CellError(ErrorType.NUM)
-          }
           let dy
           if (Math.abs(rate) < epsMax) {
             dy = present * periods + payment * type * periods
@@ -384,8 +380,8 @@ export class FinancialPlugin extends FunctionPlugin {
             dy = present *  df + payment * (1/rate + type) * df + payment * (-1/(rate*rate)) * (f-1)
           }
           rate -= y/dy
-          i++
         }
+        return new CellError(ErrorType.NUM)
       }
     )
   }
