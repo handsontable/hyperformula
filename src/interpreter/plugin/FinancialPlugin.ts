@@ -327,10 +327,10 @@ export class FinancialPlugin extends FunctionPlugin {
           }
           return (-present - future)/payment
         }
-        const cType = type ? 1 : 0
-        const num = payment * (1 + rate * cType) - future * rate
-        const den = (present * rate + payment * (1 + rate * cType))
-        return Math.log(num / den) / Math.log(1 + rate)
+        if(type) {
+          payment *= 1 + rate
+        }
+        return Math.log( (payment  - future * rate) / (present * rate + payment)) / Math.log(1 + rate)
       }
     )
   }
