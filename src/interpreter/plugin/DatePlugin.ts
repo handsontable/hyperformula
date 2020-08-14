@@ -144,20 +144,20 @@ export class DatePlugin extends FunctionPlugin {
           {argumentType: ArgumentTypes.NUMBER},
         ],
     },
-    'DATEDIF': {
-      method: 'datedif',
-      parameters: [
-        {argumentType: ArgumentTypes.NUMBER, minValue: 0},
-        {argumentType: ArgumentTypes.NUMBER, minValue: 0},
-        {argumentType: ArgumentTypes.STRING},
-      ],
-    },
     'DAYS360': {
       method: 'days360',
       parameters: [
         {argumentType: ArgumentTypes.NUMBER, minValue: 0},
         {argumentType: ArgumentTypes.NUMBER, minValue: 0},
         {argumentType: ArgumentTypes.BOOLEAN, defaultValue: false},
+      ],
+    },
+    'DATEDIF': {
+      method: 'datedif',
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER, minValue: 0},
+        {argumentType: ArgumentTypes.NUMBER, minValue: 0},
+        {argumentType: ArgumentTypes.STRING},
       ],
     },
     'YEARFRAC': {
