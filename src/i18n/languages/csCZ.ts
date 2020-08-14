@@ -136,6 +136,7 @@ const dictionary: RawTranslationPackage = {
     PROPER: 'VELKÁ2',
     RADIANS: 'RADIANS',
     RAND: 'NÁHČÍSLO',
+    RATE: 'ÚROKOVÁ.MÍRA',
     REPT: 'OPAKOVAT',
     RIGHT: 'ZPRAVA',
     ROUND: 'ZAOKROUHLIT',

@@ -136,6 +136,7 @@ const dictionary: RawTranslationPackage = {
     PROPER: 'GROSS2',
     RADIANS: 'BOGENMASS',
     RAND: 'ZUFALLSZAHL',
+    RATE: 'ZINS',
     REPT: 'WIEDERHOLEN',
     RIGHT: 'RECHTS',
     ROUND: 'RUNDEN',

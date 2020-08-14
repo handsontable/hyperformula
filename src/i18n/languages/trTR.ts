@@ -136,6 +136,7 @@ const dictionary: RawTranslationPackage = {
     PROPER: 'YAZIM.DÜZENİ',
     RADIANS: 'RADYAN',
     RAND: 'S_SAYI_ÜRET',
+    RATE: 'FAİZ_ORANI',
     REPT: 'YİNELE',
     RIGHT: 'SAĞ',
     ROUND: 'YUVARLA',

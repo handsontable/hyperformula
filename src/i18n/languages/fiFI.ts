@@ -136,6 +136,7 @@ const dictionary: RawTranslationPackage = {
     PROPER: 'ERISNIMI',
     RADIANS: 'RADIAANIT',
     RAND: 'SATUNNAISLUKU',
+    RATE: 'KORKO',
     REPT: 'TOISTA',
     RIGHT: 'OIKEA',
     ROUND: 'PYÖRISTÄ',

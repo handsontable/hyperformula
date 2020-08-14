@@ -136,6 +136,7 @@ const dictionary: RawTranslationPackage = {
     PROPER: 'STOR.FORBOKSTAV',
     RADIANS: 'RADIANER',
     RAND: 'TILFELDIG',
+    RATE: 'RENTE',
     REPT: 'GJENTA',
     RIGHT: 'HØYRE',
     ROUND: 'AVRUND',

@@ -136,6 +136,7 @@ const dictionary: RawTranslationPackage = {
     PROPER: 'PRI.MAIÚSCULA',
     RADIANS: 'RADIANOS',
     RAND: 'ALEATÓRIO',
+    RATE: 'TAXA',
     REPT: 'REPT',
     RIGHT: 'DIREITA',
     ROUND: 'ARRED',

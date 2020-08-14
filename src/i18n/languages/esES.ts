@@ -136,6 +136,7 @@ export const dictionary: RawTranslationPackage = {
     PROPER: 'NOMPROPIO',
     RADIANS: 'RADIANES',
     RAND: 'ALEATORIO',
+    RATE: 'TASA',
     REPT: 'REPETIR',
     RIGHT: 'DERECHA',
     ROUND: 'REDONDEAR',
