@@ -91,7 +91,7 @@ export class DatePlugin extends FunctionPlugin {
     'DAYS': {
       method: 'days',
       parameters: [
-          //Inconsistency between product 1 and 2, for less strict typing remove both 'minValue: 0'
+          //'minValue: 0' for cmpatibility with product 2
           {argumentType: ArgumentTypes.NUMBER, minValue: 0},
           {argumentType: ArgumentTypes.NUMBER, minValue: 0},
         ]
@@ -148,7 +148,7 @@ export class DatePlugin extends FunctionPlugin {
     'DATEDIF': {
       method: 'datedif',
       parameters: [
-        //Inconsistency between product 1 and 2, for less strict typing remove both 'minValue: 0'
+        //'minValue: 0' for cmpatibility with product 2
         {argumentType: ArgumentTypes.NUMBER, minValue: 0},
         {argumentType: ArgumentTypes.NUMBER, minValue: 0},
         {argumentType: ArgumentTypes.STRING},
