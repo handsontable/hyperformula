@@ -1,5 +1,4 @@
-import {HyperFormula} from '../../src'
-import {ErrorType} from '../../src/Cell'
+import {ErrorType, HyperFormula} from '../../src'
 import {adr, detailedError} from '../testUtils'
 
 describe('Function DAYS', () => {
@@ -60,5 +59,16 @@ describe('Function DAYS', () => {
 
     expect(engine.getCellValue(adr('A1'))).toEqual(10)
     expect(engine.getCellValue(adr('A2'))).toEqual(-30082)
+  })
+
+  //inconsistency with product 1
+  it('fails for negative values', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=DAYS(-1, 0)'],
+      ['=DAYS(0, -1)'],
+    ])
+
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM))
+    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NUM))
   })
 })

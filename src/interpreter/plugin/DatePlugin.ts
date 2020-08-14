@@ -91,7 +91,6 @@ export class DatePlugin extends FunctionPlugin {
     'DAYS': {
       method: 'days',
       parameters: [
-          //'minValue: 0' for cmpatibility with product 2
           {argumentType: ArgumentTypes.NUMBER, minValue: 0},
           {argumentType: ArgumentTypes.NUMBER, minValue: 0},
         ]
@@ -148,7 +147,6 @@ export class DatePlugin extends FunctionPlugin {
     'DATEDIF': {
       method: 'datedif',
       parameters: [
-        //'minValue: 0' for cmpatibility with product 2
         {argumentType: ArgumentTypes.NUMBER, minValue: 0},
         {argumentType: ArgumentTypes.NUMBER, minValue: 0},
         {argumentType: ArgumentTypes.STRING},

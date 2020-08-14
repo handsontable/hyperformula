@@ -334,4 +334,15 @@ describe('Function DATEDIF', () => {
     expect(engine.getCellValue(adr('A6'))).toEqual(364)
     expect(engine.getCellValue(adr('A7'))).toEqual(0)
   })
+
+  //inconsistency with product 1
+  it('fails for negative values', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=DATEDIF(-1, 0, "Y")'],
+      ['=DATEDIF(0, -1, "M")'],
+    ])
+
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM))
+    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NUM))
+  })
 })
