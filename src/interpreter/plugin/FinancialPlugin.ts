@@ -151,7 +151,10 @@ export class FinancialPlugin extends FunctionPlugin {
   }
 
   public ppmt(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('PPMT'), ppmtCore)
+    return this.runFunction(ast.args, formulaAddress, this.metadata('PPMT'),
+      (rate: number, period: number, periods: number, present: number, future: number, type: number) =>
+      (pmtCore(rate, periods, present, future, type) - ipmtCore(rate, period, periods, present, future, type))
+    )
   }
 
   public fv(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
@@ -362,8 +365,3 @@ function fvCore(rate: number, periods: number, payment: number, value: number, t
     return payment * (type ? (1 + rate) : 1) * (1 - term) / rate - value * term
   }
 }
-
-function ppmtCore(rate: number, period: number, periods: number, present: number, future: number, type: number): number {
-  return pmtCore(rate, periods, present, future, type) - ipmtCore(rate, period, periods, present, future, type)
-}
-
