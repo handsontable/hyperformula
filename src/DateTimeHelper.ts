@@ -204,25 +204,31 @@ export class DateTimeHelper {
     return {year: date.year, month: date.month, day: this.daysInMonth(date.year, date.month)}
   }
 
+  /**
+   *
+   4.If day(date1)==31 then subtract 1 day from date1
+
+   5.If day(date1)==30 and day(date2)==31 then subtract 1 day from date2
+
+   6.If both date1 and date2 are the last day of February, change date2 to the 30th of the month.
+
+   7.If date1 is the last day of February, change it to the 30th of the month.
+   *
+   */
   public toBasisUS(start: SimpleDate, end: SimpleDate): [SimpleDate, SimpleDate] {
-    const endY = end.year
-    const startY = start.year
-    let endM = end.month
-    const startM = start.month
-    let endD = end.day
-    let startD = start.day
-    if(start.day === this.daysInMonth(start.year, start.month) ) {
-      startD = 30
+    if(start.day === 31 ) {
+      start.day = 30
     }
-    if(end.day === this.daysInMonth(end.year, end.month) ) {
-      if(startD < 30) {
-        endD = 1
-        endM += 1
-      } else {
-        endD = 30
+    if(start.day === 30 && end.day === 31) {
+      end.day = 30
+    }
+    if(start.month===2 && start.day === this.daysInMonth(start.year, start.month)) {
+      start.day = 30
+      if(end.month===2 && end.day === this.daysInMonth(end.year, end.month)) {
+        end.day = 30
       }
     }
-    return [{year: startY, month: startM, day: startD}, {year: endY, month: endM, day: endD}]
+    return [start, end]
   }
 
   public yearLengthForBasis(start: SimpleDate, end: SimpleDate): number {

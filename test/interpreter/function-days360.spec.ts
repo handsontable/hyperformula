@@ -37,13 +37,13 @@ describe('Function DAYS360', () => {
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqual(0)
-    expect(engine.getCellValue(adr('A2'))).toEqual(3)
+    expect(engine.getCellValue(adr('A2'))).toEqual(1)
     expect(engine.getCellValue(adr('A3'))).toEqual(1)
     expect(engine.getCellValue(adr('A4'))).toEqual(1)
     expect(engine.getCellValue(adr('A5'))).toEqual(0)
     expect(engine.getCellValue(adr('A6'))).toEqual(-2)
-    expect(engine.getCellValue(adr('A7'))).toEqual(0)
-    expect(engine.getCellValue(adr('A8'))).toEqual(0)
+    expect(engine.getCellValue(adr('A7'))).toEqual(-2)
+    expect(engine.getCellValue(adr('A8'))).toEqual(-3)
   })
 
   it('EU mode', () => {

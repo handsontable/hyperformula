@@ -37,11 +37,11 @@ describe('Function YEARFRAC', () => {
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqual(0)
-    expect(engine.getCellValue(adr('A2'))).toBeCloseTo(3/360, 9)
+    expect(engine.getCellValue(adr('A2'))).toBeCloseTo(1/360, 9)
     expect(engine.getCellValue(adr('A3'))).toBeCloseTo(1/360, 9)
     expect(engine.getCellValue(adr('A4'))).toBeCloseTo(1/360, 9)
     expect(engine.getCellValue(adr('A5'))).toEqual(0)
-    expect(engine.getCellValue(adr('A6'))).toBeCloseTo(3/360, 9)
+    expect(engine.getCellValue(adr('A6'))).toBeCloseTo(1/360, 9)
     expect(engine.getCellValue(adr('A7'))).toBeCloseTo(1/360, 9)
     expect(engine.getCellValue(adr('A8'))).toBeCloseTo(1/360, 9)
   })
@@ -68,6 +68,7 @@ describe('Function YEARFRAC', () => {
     expect(engine.getCellValue(adr('A6'))).toBeCloseTo(60/366, 9)
     expect(engine.getCellValue(adr('A7'))).toBeCloseTo(59/365, 9)
     expect(engine.getCellValue(adr('A8'))).toBeCloseTo(1, 9)
+    expect(engine.getCellValue(adr('A9'))).toBeCloseTo(367/365.5, 9)
     expect(engine.getCellValue(adr('A10'))).toBeCloseTo((366+365+365+365)/((366+365+365+365+366)/5), 9)
   })
 
