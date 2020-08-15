@@ -6,7 +6,7 @@
 import {InternalScalarValue} from '../Cell'
 import {Config} from '../Config'
 import {secondsExtendedRegexp} from '../DateTimeDefault'
-import {DateTimeHelper, SimpleDateTime, SimpleTime} from '../DateTimeHelper'
+import {DateTimeHelper, numberToSimpleTime, SimpleDateTime, SimpleTime} from '../DateTimeHelper'
 import {Maybe} from '../Maybe'
 import {FormatToken, parseForDateTimeFormat, parseForNumberFormat, TokenType} from './parser'
 
@@ -15,7 +15,7 @@ export function format(value: number, formatArg: string, config: Config, dateHel
   if (tryDateTime !== undefined) {
     return tryDateTime
   }
-  const tryDuration = config.stringifyDuration(dateHelper.numberToSimpleTime(value), formatArg)
+  const tryDuration = config.stringifyDuration(numberToSimpleTime(value), formatArg)
   if(tryDuration !== undefined) {
     return tryDuration
   }

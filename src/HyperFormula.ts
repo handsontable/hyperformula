@@ -10,7 +10,7 @@ import {CellValue, ExportedChange, Exporter, NoErrorCellValue} from './CellValue
 import {ColumnSearchStrategy} from './ColumnSearch/ColumnSearchStrategy'
 import {Config, ConfigParams} from './Config'
 import {ColumnRowIndex, CrudOperations} from './CrudOperations'
-import {DateTime} from './DateTimeHelper'
+import {DateTime, numberToSimpleTime} from './DateTimeHelper'
 import {buildTranslationPackage, RawTranslationPackage, TranslationPackage} from './i18n'
 import {normalizeAddedIndexes, normalizeRemovedIndexes} from './Operations'
 import {
@@ -3274,7 +3274,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Helpers
    */
   public numberToTime(val: number): DateTime {
-    return this._evaluator.dateHelper.numberToSimpleTime(val)
+    return numberToSimpleTime(val)
   }
 
   private extractTemporaryFormula(formulaString: string, sheetId: number = 1): [Maybe<Ast>, SimpleCellAddress, RelativeDependency[]] {
