@@ -13,7 +13,7 @@ describe('Function SYD', () => {
 
   it('should calculate the correct value with correct arguments and defaults', () => {
     const engine = HyperFormula.buildFromArray([
-      ['=SYD(100, 1, 2.1, 2)', '=SYD(100, 1, 2.1, 2.1)', '=SYD(100, 1, 2, 2.1)', '=SYD(100, 1, 2, 2)',],
+      ['=SYD(100, 1, 2.1, 2)', '=SYD(100, 1, 2.1, 2.1)', '=SYD(100, 1, 2, 2.1)', '=SYD(100, 1, 2, 2)', ],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toBeCloseTo(33.4562211981567)
