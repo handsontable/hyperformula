@@ -169,6 +169,14 @@ export class FinancialPlugin extends FunctionPlugin {
         {argumentType: ArgumentTypes.NUMBER},
       ]
     },
+    'SLN': {
+      method: 'sln',
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER},
+        {argumentType: ArgumentTypes.NUMBER},
+        {argumentType: ArgumentTypes.NUMBER},
+      ]
+    },
   }
 
   public pmt(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
@@ -433,6 +441,17 @@ export class FinancialPlugin extends FunctionPlugin {
         }
 
         return Math.pow(future / present, 1 / periods) - 1
+      }
+    )
+  }
+
+  public sln(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('SLN'),
+      (cost, salvage, life) => {
+        if (life === 0) {
+          return new CellError(ErrorType.DIV_BY_ZERO)
+        }
+        return (cost - salvage) / life
       }
     )
   }
