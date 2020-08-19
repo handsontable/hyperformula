@@ -183,6 +183,7 @@ const dictionary: RawTranslationPackage = {
     XOR: 'XELLER',
     YEAR: 'ÅR',
     YEARFRAC: 'ÅR.BRØK',
+    PV: 'NV',
   },
   langCode: 'daDK',
   ui: {

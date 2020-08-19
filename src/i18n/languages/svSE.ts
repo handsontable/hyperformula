@@ -183,6 +183,7 @@ const dictionary: RawTranslationPackage = {
     XOR: 'XOR',
     YEAR: 'ÅR',
     YEARFRAC: 'ÅRDEL',
+    PV: 'NUVÄRDE',
   },
   langCode: 'svSE',
   ui: {

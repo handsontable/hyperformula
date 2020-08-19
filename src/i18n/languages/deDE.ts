@@ -183,6 +183,7 @@ const dictionary: RawTranslationPackage = {
     XOR: 'XODER',
     YEAR: 'JAHR',
     YEARFRAC: 'BRTEILJAHRE',
+    PV: 'BW',
   },
   langCode: 'deDE',
   ui: {

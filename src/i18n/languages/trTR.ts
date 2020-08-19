@@ -183,6 +183,7 @@ const dictionary: RawTranslationPackage = {
     XOR: 'ÖZELVEYA',
     YEAR: 'YIL',
     YEARFRAC: 'YILORAN',
+    PV: 'BD',
   },
   langCode: 'trTR',
   ui: {

@@ -140,6 +140,16 @@ export class FinancialPlugin extends FunctionPlugin {
         {argumentType: ArgumentTypes.NUMBER, defaultValue: 0},
       ]
     },
+    'PV': {
+      method: 'pv',
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER},
+        {argumentType: ArgumentTypes.NUMBER},
+        {argumentType: ArgumentTypes.NUMBER},
+        {argumentType: ArgumentTypes.NUMBER, defaultValue: 0},
+        {argumentType: ArgumentTypes.NUMBER, defaultValue: 0},
+      ]
+    },
     'RATE': {
       method: 'rate',
       parameters: [
@@ -357,6 +367,7 @@ export class FinancialPlugin extends FunctionPlugin {
         const iterMax = 20
 
         let rate = guess
+        type = type ? 1 : 0
         for(let i=0; i<iterMax; i++) {
           if(rate<=-1) {
             return new CellError(ErrorType.NUM)
@@ -382,6 +393,26 @@ export class FinancialPlugin extends FunctionPlugin {
           rate -= y/dy
         }
         return new CellError(ErrorType.NUM)
+      }
+    )
+  }
+
+  public pv(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('PV'),
+      (rate, periods, payment, future, type) => {
+        type = type ? 1 : 0
+        if(rate === -1) {
+          if(periods === 0) {
+            return new CellError(ErrorType.NUM)
+          } else {
+            return new CellError(ErrorType.DIV_BY_ZERO)
+          }
+        }
+        if (rate === 0) {
+          return -payment * periods - future
+        } else {
+          return (((1 - Math.pow(1 + rate, periods)) / rate) * payment * (1 + rate * type) - future) / Math.pow(1 + rate, periods)
+        }
       }
     )
   }

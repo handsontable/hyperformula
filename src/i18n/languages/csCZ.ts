@@ -183,6 +183,7 @@ const dictionary: RawTranslationPackage = {
     XOR: 'XOR',
     YEAR: 'ROK',
     YEARFRAC: 'YEARFRAC',
+    PV: 'SOUČHODNOTA',
   },
   langCode: 'csCZ',
   ui: {

@@ -183,6 +183,7 @@ const dictionary: RawTranslationPackage = {
     XOR: 'XVAGY',
     YEAR: 'ÉV',
     YEARFRAC: 'TÖRTÉV',
+    PV: 'MÉ',
   },
   langCode: 'huHU',
   ui: {

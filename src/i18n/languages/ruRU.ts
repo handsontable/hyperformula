@@ -183,6 +183,7 @@ const dictionary: RawTranslationPackage = {
     XOR: 'ИСКЛИЛИ',
     YEAR: 'ГОД',
     YEARFRAC: 'ДОЛЯГОДА',
+    PV: 'ПС',
   },
   langCode: 'ruRU',
   ui: {

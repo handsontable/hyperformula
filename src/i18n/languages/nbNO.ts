@@ -183,6 +183,7 @@ const dictionary: RawTranslationPackage = {
     XOR: 'EKSKLUSIVELLER',
     YEAR: 'ÅR',
     YEARFRAC: 'ÅRDEL',
+    PV: 'NÅVERDI',
   },
   langCode: 'nbNO',
   ui: {

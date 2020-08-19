@@ -183,6 +183,7 @@ const dictionary: RawTranslationPackage = {
     XOR: 'EHDOTON.TAI',
     YEAR: 'VUOSI',
     YEARFRAC: 'VUOSI.OSA',
+    PV: 'NA',
   },
   langCode: 'fiFI',
   ui: {

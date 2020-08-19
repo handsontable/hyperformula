@@ -183,6 +183,7 @@ export const dictionary: RawTranslationPackage = {
     XOR: 'XOR',
     YEAR: 'AÑO',
     YEARFRAC: 'FRAC.AÑO',
+    PV: 'VA',
   },
   langCode: 'esES',
   ui: {

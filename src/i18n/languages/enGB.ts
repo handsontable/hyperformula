@@ -183,6 +183,7 @@ const dictionary: RawTranslationPackage = {
     XOR: 'XOR',
     YEAR: 'YEAR',
     YEARFRAC: 'YEARFRAC',
+    PV: 'PV',
   },
   langCode: 'enGB',
   ui: {
