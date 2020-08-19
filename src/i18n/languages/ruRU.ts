@@ -184,6 +184,7 @@ const dictionary: RawTranslationPackage = {
     YEAR: 'ГОД',
     YEARFRAC: 'ДОЛЯГОДА',
     PV: 'ПС',
+    RRI: 'ЭКВ.СТАВКА',
   },
   langCode: 'ruRU',
   ui: {

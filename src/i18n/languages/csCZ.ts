@@ -184,6 +184,7 @@ const dictionary: RawTranslationPackage = {
     YEAR: 'ROK',
     YEARFRAC: 'YEARFRAC',
     PV: 'SOUČHODNOTA',
+    RRI: 'RRI',
   },
   langCode: 'csCZ',
   ui: {

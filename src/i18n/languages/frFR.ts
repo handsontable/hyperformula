@@ -184,6 +184,7 @@ const dictionary: RawTranslationPackage = {
     YEAR: 'ANNEE',
     YEARFRAC: 'FRACTION.ANNEE',
     PV: 'VA',
+    RRI: 'TAUX.INT.EQUIV',
   },
   langCode: 'frFR',
   ui: {

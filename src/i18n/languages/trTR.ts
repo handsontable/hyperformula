@@ -184,6 +184,7 @@ const dictionary: RawTranslationPackage = {
     YEAR: 'YIL',
     YEARFRAC: 'YILORAN',
     PV: 'BD',
+    RRI: 'GERÇEKLEŞENYATIRIMGETİRİSİ',
   },
   langCode: 'trTR',
   ui: {

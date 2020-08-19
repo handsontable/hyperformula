@@ -184,6 +184,7 @@ const dictionary: RawTranslationPackage = {
     YEAR: 'ÅR',
     YEARFRAC: 'ÅRDEL',
     PV: 'NUVÄRDE',
+    RRI: 'RRI',
   },
   langCode: 'svSE',
   ui: {

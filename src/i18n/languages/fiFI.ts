@@ -184,6 +184,7 @@ const dictionary: RawTranslationPackage = {
     YEAR: 'VUOSI',
     YEARFRAC: 'VUOSI.OSA',
     PV: 'NA',
+    RRI: 'TOT.ROI',
   },
   langCode: 'fiFI',
   ui: {

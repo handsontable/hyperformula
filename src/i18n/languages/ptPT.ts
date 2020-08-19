@@ -184,6 +184,7 @@ const dictionary: RawTranslationPackage = {
     YEAR: 'ANO',
     YEARFRAC: 'FRAÇÃOANO',
     PV: 'VP',
+    RRI: 'RRI',
   },
   langCode: 'ptPT',
   ui: {

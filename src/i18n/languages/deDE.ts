@@ -184,6 +184,7 @@ const dictionary: RawTranslationPackage = {
     YEAR: 'JAHR',
     YEARFRAC: 'BRTEILJAHRE',
     PV: 'BW',
+    RRI: 'ZSATZINVEST',
   },
   langCode: 'deDE',
   ui: {

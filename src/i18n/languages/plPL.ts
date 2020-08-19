@@ -184,6 +184,7 @@ const dictionary: RawTranslationPackage = {
     YEAR: 'ROK',
     YEARFRAC: 'CZĘŚĆ.ROKU',
     PV: 'PV',
+    RRI: 'RÓWNOW.STOPA.PROC',
   },
   langCode: 'plPL',
   ui: {

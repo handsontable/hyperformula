@@ -161,6 +161,14 @@ export class FinancialPlugin extends FunctionPlugin {
         {argumentType: ArgumentTypes.NUMBER, defaultValue: 0.1, greaterThan: -1},
       ]
     },
+    'RRI': {
+      method: 'rri',
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
+        {argumentType: ArgumentTypes.NUMBER},
+        {argumentType: ArgumentTypes.NUMBER},
+      ]
+    },
   }
 
   public pmt(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
@@ -413,6 +421,18 @@ export class FinancialPlugin extends FunctionPlugin {
         } else {
           return (((1 - Math.pow(1 + rate, periods)) / rate) * payment * (1 + rate * type) - future) / Math.pow(1 + rate, periods)
         }
+      }
+    )
+  }
+
+  public rri(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('RRI'),
+      (periods, present, future) => {
+        if (present === 0 || (future < 0 && present > 0) || (future > 0 && present < 0)) {
+          return new CellError(ErrorType.NUM)
+        }
+
+        return Math.pow(future / present, 1 / periods) - 1
       }
     )
   }
