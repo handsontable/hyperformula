@@ -1,5 +1,4 @@
-import {HyperFormula} from '../../src'
-import {ErrorType} from '../../src/Cell'
+import {ErrorType, HyperFormula} from '../../src'
 import {adr, detailedError} from '../testUtils'
 
 describe('Function DAYS', () => {
@@ -38,6 +37,19 @@ describe('Function DAYS', () => {
     expect(engine.getCellValue(adr('A3'))).toEqual(-1)
     expect(engine.getCellValue(adr('A4'))).toEqual(366)
   })
+  it('ignores time', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=DAYS("30/12/2018 1:00am", "30/12/2018 11:00pm")'],
+      ['=DAYS("31/12/2018 1:00am", "30/12/2018 11:00pm")'],
+      ['=DAYS("30/12/2018 11:00pm", "31/12/2018 1:00am")'],
+      ['=DAYS("28/02/2017 11:00pm", "28/02/2016 1:00am")'],
+    ])
+
+    expect(engine.getCellValue(adr('A1'))).toEqual(0)
+    expect(engine.getCellValue(adr('A2'))).toEqual(1)
+    expect(engine.getCellValue(adr('A3'))).toEqual(-1)
+    expect(engine.getCellValue(adr('A4'))).toEqual(366)
+  })
 
   it('should work for numbers', () => {
     const engine = HyperFormula.buildFromArray([
@@ -47,5 +59,16 @@ describe('Function DAYS', () => {
 
     expect(engine.getCellValue(adr('A1'))).toEqual(10)
     expect(engine.getCellValue(adr('A2'))).toEqual(-30082)
+  })
+
+  //inconsistency with product 1
+  it('fails for negative values', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=DAYS(-1, 0)'],
+      ['=DAYS(0, -1)'],
+    ])
+
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM))
+    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NUM))
   })
 })
