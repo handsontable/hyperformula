@@ -186,6 +186,7 @@ const dictionary: RawTranslationPackage = {
     PV: 'NV',
     RRI: 'RRI',
     SLN: 'LA',
+    SYD: 'ÅRSAFSKRIVNING',
   },
   langCode: 'daDK',
   ui: {

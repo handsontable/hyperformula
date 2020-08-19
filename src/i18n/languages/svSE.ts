@@ -186,6 +186,7 @@ const dictionary: RawTranslationPackage = {
     PV: 'NUVÄRDE',
     RRI: 'RRI',
     SLN: 'LINAVSKR',
+    SYD: 'ÅRSAVSKR',
   },
   langCode: 'svSE',
   ui: {

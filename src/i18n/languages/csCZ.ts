@@ -186,6 +186,7 @@ const dictionary: RawTranslationPackage = {
     PV: 'SOUČHODNOTA',
     RRI: 'RRI',
     SLN: 'ODPIS.LIN',
+    SYD: 'ODPIS.NELIN',
   },
   langCode: 'csCZ',
   ui: {

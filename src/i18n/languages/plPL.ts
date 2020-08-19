@@ -186,6 +186,7 @@ const dictionary: RawTranslationPackage = {
     PV: 'PV',
     RRI: 'RÓWNOW.STOPA.PROC',
     SLN: 'SLN',
+    SYD: 'SYD',
   },
   langCode: 'plPL',
   ui: {

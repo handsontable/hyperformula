@@ -186,6 +186,7 @@ export const dictionary: RawTranslationPackage = {
     PV: 'VA',
     RRI: 'RRI',
     SLN: 'SLN',
+    SYD: 'SYD',
   },
   langCode: 'esES',
   ui: {

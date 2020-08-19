@@ -177,6 +177,15 @@ export class FinancialPlugin extends FunctionPlugin {
         {argumentType: ArgumentTypes.NUMBER},
       ]
     },
+    'SYD': {
+      method: 'syd',
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER},
+        {argumentType: ArgumentTypes.NUMBER},
+        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
+        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
+      ]
+    },
   }
 
   public pmt(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
@@ -452,6 +461,17 @@ export class FinancialPlugin extends FunctionPlugin {
           return new CellError(ErrorType.DIV_BY_ZERO)
         }
         return (cost - salvage) / life
+      }
+    )
+  }
+
+  public syd(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('SYD'),
+      (cost, salvage, life, period) => {
+        if (period > life) {
+          return new CellError(ErrorType.NUM)
+        }
+        return ((cost - salvage) * (life - period + 1) * 2) / (life * (life + 1))
       }
     )
   }

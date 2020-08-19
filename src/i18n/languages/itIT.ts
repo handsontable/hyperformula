@@ -186,6 +186,7 @@ const dictionary: RawTranslationPackage = {
     PV: 'VA',
     RRI: 'RIT.INVEST.EFFETT',
     SLN: 'AMMORT.COST',
+    SYD: 'AMMORT.ANNUO',
   },
   langCode: 'itIT',
   ui: {

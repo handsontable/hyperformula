@@ -186,6 +186,7 @@ const dictionary: RawTranslationPackage = {
     PV: 'NA',
     RRI: 'TOT.ROI',
     SLN: 'STP',
+    SYD: 'VUOSIPOISTO',
   },
   langCode: 'fiFI',
   ui: {

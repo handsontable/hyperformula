@@ -186,6 +186,7 @@ const dictionary: RawTranslationPackage = {
     PV: 'BW',
     RRI: 'ZSATZINVEST',
     SLN: 'LIA',
+    SYD: 'DIA',
   },
   langCode: 'deDE',
   ui: {

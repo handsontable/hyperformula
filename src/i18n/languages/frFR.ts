@@ -186,6 +186,7 @@ const dictionary: RawTranslationPackage = {
     PV: 'VA',
     RRI: 'TAUX.INT.EQUIV',
     SLN: 'AMORLIN',
+    SYD: 'SYD',
   },
   langCode: 'frFR',
   ui: {

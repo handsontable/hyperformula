@@ -186,6 +186,7 @@ const dictionary: RawTranslationPackage = {
     PV: 'MÉ',
     RRI: 'MR',
     SLN: 'LCSA',
+    SYD: 'ÉSZÖ',
   },
   langCode: 'huHU',
   ui: {
