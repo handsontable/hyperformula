@@ -185,6 +185,7 @@ const dictionary: RawTranslationPackage = {
     YEARFRAC: 'FRAZIONE.ANNO',
     PV: 'VA',
     RRI: 'RIT.INVEST.EFFETT',
+    SLN: 'AMMORT.COST',
   },
   langCode: 'itIT',
   ui: {

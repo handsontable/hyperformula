@@ -129,6 +129,7 @@ lets you design your own [custom functions](custom-functions).
 | PV | Financial | Returns the present value of an investment. | PV(Rate; Nper; Pmt[; Fv[; Type]]) |
 | RATE | Financial |  Returns the interest rate per period of an annuity. | RATE(Nper; Pmt; Pv[; Fv[; Type[; guess]]]) |
 | RRI | Financial | Returns an equivalent interest rate for the growth of an investment. | RRI(Nper; Pv; Fv) |
+| SLN | Financial | Returns the depreciation of an asset for one period, calculated with a straight-line method. | SLN(Cost; Salvage; Life) |
 | AND | Logical | Returns TRUE if all arguments are TRUE. | AND(Logicalvalue1; Logicalvalue2 ...Logicalvalue30) |
 | FALSE | Logical | Returns the logical value FALSE. | FALSE() |
 | IF | Logical | Specifies a logical test to be performed. | IF(Test; Then value; Otherwisevalue) |

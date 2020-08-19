@@ -185,6 +185,7 @@ const dictionary: RawTranslationPackage = {
     YEARFRAC: 'ÅRDEL',
     PV: 'NÅVERDI',
     RRI: 'REALISERT.AVKASTNING',
+    SLN: 'LINAVS',
   },
   langCode: 'nbNO',
   ui: {
