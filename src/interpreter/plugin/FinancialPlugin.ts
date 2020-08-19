@@ -419,7 +419,7 @@ export class FinancialPlugin extends FunctionPlugin {
         if (rate === 0) {
           return -payment * periods - future
         } else {
-          return (((1 - Math.pow(1 + rate, periods)) / rate) * payment * (1 + rate * type) - future) / Math.pow(1 + rate, periods)
+          return ((1 - Math.pow(1 + rate, periods)) * payment * (1 + rate * type) / rate - future) / Math.pow(1 + rate, periods)
         }
       }
     )
