@@ -189,6 +189,7 @@ const dictionary: RawTranslationPackage = {
     SYD: 'ODPIS.NELIN',
     TBILLEQ: 'TBILLEQ',
     TBILLPRICE: 'TBILLPRICE',
+    TBILLYIELD: 'TBILLYIELD',
   },
   langCode: 'csCZ',
   ui: {

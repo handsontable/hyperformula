@@ -189,6 +189,7 @@ export const dictionary: RawTranslationPackage = {
     SYD: 'SYD',
     TBILLEQ: 'LETRA.DE.TEST.EQV.A.BONO',
     TBILLPRICE: 'LETRA.DE.TES.PRECIO',
+    TBILLYIELD: 'LETRA.DE.TES.RENDTO',
   },
   langCode: 'esES',
   ui: {

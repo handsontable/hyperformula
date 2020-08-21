@@ -189,6 +189,7 @@ const dictionary: RawTranslationPackage = {
     SYD: 'SYD',
     TBILLEQ: 'TAUX.ESCOMPTE.R',
     TBILLPRICE: 'PRIX.BON.TRESOR',
+    TBILLYIELD: 'RENDEMENT.BON.TRESOR',
   },
   langCode: 'frFR',
   ui: {

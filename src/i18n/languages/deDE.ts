@@ -189,6 +189,7 @@ const dictionary: RawTranslationPackage = {
     SYD: 'DIA',
     TBILLEQ: 'TBILLÄQUIV',
     TBILLPRICE: 'TBILLKURS',
+    TBILLYIELD: 'TBILLRENDITE',
   },
   langCode: 'deDE',
   ui: {

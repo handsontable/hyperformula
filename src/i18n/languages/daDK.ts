@@ -189,6 +189,7 @@ const dictionary: RawTranslationPackage = {
     SYD: 'ÅRSAFSKRIVNING',
     TBILLEQ: 'STATSOBLIGATION',
     TBILLPRICE: 'STATSOBLIGATION.KURS',
+    TBILLYIELD: 'STATSOBLIGATION.AFKAST',
   },
   langCode: 'daDK',
   ui: {

@@ -189,6 +189,7 @@ const dictionary: RawTranslationPackage = {
     SYD: 'VUOSIPOISTO',
     TBILLEQ: 'OBLIG.TUOTTOPROS',
     TBILLPRICE: 'OBLIG.HINTA',
+    TBILLYIELD: 'OBLIG.TUOTTO',
   },
   langCode: 'fiFI',
   ui: {

@@ -189,6 +189,7 @@ const dictionary: RawTranslationPackage = {
     SYD: 'AMMORT.ANNUO',
     TBILLEQ: 'BOT.EQUIV',
     TBILLPRICE: 'BOT.PREZZO',
+    TBILLYIELD: 'BOT.REND',
   },
   langCode: 'itIT',
   ui: {

@@ -189,6 +189,7 @@ const dictionary: RawTranslationPackage = {
     SYD: 'YAT',
     TBILLEQ: 'HTAHEŞ',
     TBILLPRICE: 'HTAHDEĞER',
+    TBILLYIELD: 'HTAHÖDEME',
   },
   langCode: 'trTR',
   ui: {

@@ -189,6 +189,7 @@ const dictionary: RawTranslationPackage = {
     SYD: 'ÉSZÖ',
     TBILLEQ: 'KJEGY.EGYENÉRT',
     TBILLPRICE: 'KJEGY.ÁR',
+    TBILLYIELD: 'KJEGY.HOZAM',
   },
   langCode: 'huHU',
   ui: {
