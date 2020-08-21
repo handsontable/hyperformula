@@ -188,6 +188,7 @@ const dictionary: RawTranslationPackage = {
     SLN: 'ODPIS.LIN',
     SYD: 'ODPIS.NELIN',
     TBILLEQ: 'TBILLEQ',
+    TBILLPRICE: 'TBILLPRICE',
   },
   langCode: 'csCZ',
   ui: {

@@ -188,6 +188,7 @@ const dictionary: RawTranslationPackage = {
     SLN: 'DPD',
     SYD: 'SDA',
     TBILLEQ: 'OTN',
+    TBILLPRICE: 'OTNVALOR',
   },
   langCode: 'ptPT',
   ui: {

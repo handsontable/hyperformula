@@ -188,6 +188,7 @@ const dictionary: RawTranslationPackage = {
     SLN: 'LA',
     SYD: 'ÅRSAFSKRIVNING',
     TBILLEQ: 'STATSOBLIGATION',
+    TBILLPRICE: 'STATSOBLIGATION.KURS',
   },
   langCode: 'daDK',
   ui: {

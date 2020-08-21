@@ -188,6 +188,7 @@ const dictionary: RawTranslationPackage = {
     SLN: 'AMORLIN',
     SYD: 'SYD',
     TBILLEQ: 'TAUX.ESCOMPTE.R',
+    TBILLPRICE: 'PRIX.BON.TRESOR',
   },
   langCode: 'frFR',
   ui: {

@@ -195,6 +195,14 @@ export class FinancialPlugin extends FunctionPlugin {
         {argumentType: ArgumentTypes.NUMBER, minValue: 0},
         {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
       ]
+    },
+    'TBILLPRICE': {
+      method: 'tbillprice',
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER, minValue: 0},
+        {argumentType: ArgumentTypes.NUMBER, minValue: 0},
+        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
+      ]
     }
   }
 
@@ -508,6 +516,32 @@ export class FinancialPlugin extends FunctionPlugin {
           return new CellError(ErrorType.NUM)
         }
         return 365 * discount/denom
+      }
+    )
+  }
+
+  public tbillprice(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('TBILLPRICE'),
+      (settlement, maturity, discount) => {
+        settlement = Math.round(settlement)
+        maturity = Math.round(maturity)
+        if (settlement >= maturity) {
+          return new CellError(ErrorType.NUM)
+        }
+
+        const startDate = this.interpreter.dateHelper.numberToSimpleDate(settlement)
+        const endDate = this.interpreter.dateHelper.numberToSimpleDate(maturity)
+        if(endDate.year > startDate.year+1 || (endDate.year === startDate.year+1 && (endDate.month > startDate.month || (endDate.month === startDate.month && endDate.day > startDate.day)))) {
+          return new CellError(ErrorType.NUM)
+        }
+        const denom = 360 - discount * (maturity - settlement)
+        if(denom === 0) {
+          return 0
+        }
+        if(denom < 0) {
+          return new CellError(ErrorType.NUM)
+        }
+        return 100 * (1 - discount * (maturity - settlement) / 360)
       }
     )
   }

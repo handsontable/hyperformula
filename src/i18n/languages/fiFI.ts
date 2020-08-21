@@ -188,6 +188,7 @@ const dictionary: RawTranslationPackage = {
     SLN: 'STP',
     SYD: 'VUOSIPOISTO',
     TBILLEQ: 'OBLIG.TUOTTOPROS',
+    TBILLPRICE: 'OBLIG.HINTA',
   },
   langCode: 'fiFI',
   ui: {

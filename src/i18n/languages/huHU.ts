@@ -188,6 +188,7 @@ const dictionary: RawTranslationPackage = {
     SLN: 'LCSA',
     SYD: 'ÉSZÖ',
     TBILLEQ: 'KJEGY.EGYENÉRT',
+    TBILLPRICE: 'KJEGY.ÁR',
   },
   langCode: 'huHU',
   ui: {

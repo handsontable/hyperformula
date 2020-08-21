@@ -188,6 +188,7 @@ const dictionary: RawTranslationPackage = {
     SLN: 'АПЛ',
     SYD: 'АСЧ',
     TBILLEQ: 'РАВНОКЧЕК',
+    TBILLPRICE: 'ЦЕНАКЧЕК',
   },
   langCode: 'ruRU',
   ui: {

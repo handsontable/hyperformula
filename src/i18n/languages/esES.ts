@@ -188,6 +188,7 @@ export const dictionary: RawTranslationPackage = {
     SLN: 'SLN',
     SYD: 'SYD',
     TBILLEQ: 'LETRA.DE.TEST.EQV.A.BONO',
+    TBILLPRICE: 'LETRA.DE.TES.PRECIO',
   },
   langCode: 'esES',
   ui: {
