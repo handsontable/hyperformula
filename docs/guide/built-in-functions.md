@@ -132,7 +132,8 @@ lets you design your own [custom functions](custom-functions).
 | SLN | Financial | Returns the depreciation of an asset for one period, calculated with a straight-line method. | SLN(Cost; Salvage; Life) |
 | SYD | Financial | Returns the "sum-of-years" depreciation for an asset in a given period. | SYD(Cost; Salvage; Life; Period) |
 | TBILLEQ | Financial | Returns the bond-equivalent yield for a Treasury bill. | TBILLEQ(Settlement; Maturity; Discount) |
-| TBILLPRICE | Financial | Returns the price per $100 face value for a Treasury bill. | TBILLEQ(Settlement; Maturity; Discount) |
+| TBILLPRICE | Financial | Returns the price per $100 face value for a Treasury bill. | TBILLPRICE(Settlement; Maturity; Discount) |
+| TBILLYIELD | Financial | Return the yield for a Treasury bill. | TBILLYIELD(Settlement; Maturity; Price) |
 | AND | Logical | Returns TRUE if all arguments are TRUE. | AND(Logicalvalue1; Logicalvalue2 ...Logicalvalue30) |
 | FALSE | Logical | Returns the logical value FALSE. | FALSE() |
 | IF | Logical | Specifies a logical test to be performed. | IF(Test; Then value; Otherwisevalue) |
