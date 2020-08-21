@@ -187,6 +187,7 @@ const dictionary: RawTranslationPackage = {
     RRI: 'RIT.INVEST.EFFETT',
     SLN: 'AMMORT.COST',
     SYD: 'AMMORT.ANNUO',
+    TBILLEQ: 'BOT.EQUIV',
   },
   langCode: 'itIT',
   ui: {

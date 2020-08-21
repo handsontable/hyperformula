@@ -187,6 +187,7 @@ const dictionary: RawTranslationPackage = {
     RRI: 'RÓWNOW.STOPA.PROC',
     SLN: 'SLN',
     SYD: 'SYD',
+    TBILLEQ: 'RENT.EKW.BS',
   },
   langCode: 'plPL',
   ui: {

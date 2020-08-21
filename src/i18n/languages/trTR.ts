@@ -187,6 +187,7 @@ const dictionary: RawTranslationPackage = {
     RRI: 'GERÇEKLEŞENYATIRIMGETİRİSİ',
     SLN: 'DA',
     SYD: 'YAT',
+    TBILLEQ: 'HTAHEŞ',
   },
   langCode: 'trTR',
   ui: {

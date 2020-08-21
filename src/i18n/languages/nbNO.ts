@@ -187,6 +187,7 @@ const dictionary: RawTranslationPackage = {
     RRI: 'REALISERT.AVKASTNING',
     SLN: 'LINAVS',
     SYD: 'ÅRSAVS',
+    TBILLEQ: 'TBILLEKV',
   },
   langCode: 'nbNO',
   ui: {

@@ -187,6 +187,7 @@ const dictionary: RawTranslationPackage = {
     RRI: 'RRI',
     SLN: 'DPD',
     SYD: 'SDA',
+    TBILLEQ: 'OTN',
   },
   langCode: 'ptPT',
   ui: {

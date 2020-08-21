@@ -187,6 +187,7 @@ const dictionary: RawTranslationPackage = {
     RRI: 'RRI',
     SLN: 'LA',
     SYD: 'ÅRSAFSKRIVNING',
+    TBILLEQ: 'STATSOBLIGATION',
   },
   langCode: 'daDK',
   ui: {

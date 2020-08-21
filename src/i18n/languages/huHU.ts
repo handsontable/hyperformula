@@ -187,6 +187,7 @@ const dictionary: RawTranslationPackage = {
     RRI: 'MR',
     SLN: 'LCSA',
     SYD: 'ÉSZÖ',
+    TBILLEQ: 'KJEGY.EGYENÉRT',
   },
   langCode: 'huHU',
   ui: {
