@@ -322,12 +322,11 @@ export class FinancialPlugin extends FunctionPlugin {
           return 0
         }
 
-        let total = 0
         for (let i = 0; i < period-1; i++) {
-          total += Math.min((cost - total) * (factor / life), (cost - salvage - total))
+          cost = Math.max(cost * (1 - factor / life), salvage)
         }
 
-        return Math.min((cost - total) * (factor / life), (cost - salvage - total))
+        return Math.min(cost * (factor / life), (cost - salvage))
       }
     )
   }
