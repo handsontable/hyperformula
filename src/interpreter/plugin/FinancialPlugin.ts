@@ -89,7 +89,7 @@ export class FinancialPlugin extends FunctionPlugin {
         {argumentType: ArgumentTypes.NUMBER, minValue: 0},
         {argumentType: ArgumentTypes.NUMBER, minValue: 0},
         {argumentType: ArgumentTypes.INTEGER, minValue: 0},
-        {argumentType: ArgumentTypes.INTEGER, minValue: 0},
+        {argumentType: ArgumentTypes.NUMBER, minValue: 0},
         {argumentType: ArgumentTypes.NUMBER, greaterThan: 0, defaultValue: 2},
       ]
     },
@@ -296,15 +296,20 @@ export class FinancialPlugin extends FunctionPlugin {
         if (period > life) {
           return new CellError(ErrorType.NUM)
         }
-        if (salvage >= cost) {
-          return 0
+        let rate = factor / life
+        let oldValue
+        if(rate >= 1) {
+          rate = 1
+          if(period === 1) {
+            oldValue = cost
+          } else {
+            oldValue = 0
+          }
+        } else {
+          oldValue = cost * Math.pow(1 - rate, period - 1)
         }
-
-        for (let i = 0; i < period-1; i++) {
-          cost = Math.max(cost * (1 - factor / life), salvage)
-        }
-
-        return Math.min(cost * (factor / life), (cost - salvage))
+        const newValue = cost * Math.pow(1-rate, period)
+        return Math.max(oldValue - Math.max(salvage, newValue), 0)
       }
     )
   }
