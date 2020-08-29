@@ -4,9 +4,7 @@
  */
 
 import {CellError, ErrorType, InternalScalarValue, SimpleCellAddress} from '../../Cell'
-import {SimpleDate, toBasisEU} from '../../DateTimeHelper'
 import {ProcedureAst} from '../../parser'
-import {DatePlugin} from './DatePlugin'
 import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
 
 export class FinancialPlugin extends FunctionPlugin {
@@ -223,10 +221,7 @@ export class FinancialPlugin extends FunctionPlugin {
   }
 
   public ppmt(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('PPMT'),
-      (rate: number, period: number, periods: number, present: number, future: number, type: number) =>
-      (pmtCore(rate, periods, present, future, type) - ipmtCore(rate, period, periods, present, future, type))
-    )
+    return this.runFunction(ast.args, formulaAddress, this.metadata('PPMT'), ppmtCore)
   }
 
   public fv(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
@@ -239,21 +234,11 @@ export class FinancialPlugin extends FunctionPlugin {
         if (start > end) {
           return new CellError(ErrorType.NUM)
         }
-
-        const payment = pmtCore(rate, periods, value, 0, type)
         let acc = 0
-
-        if (start === 1) {
-          if (type === 0) {
-            acc = -value
-          }
-          start = 2
+        for(let i = start; i <= end; i++) {
+          acc += ipmtCore(rate, i, periods, value, 0, type)
         }
-
-        for (let i = start; i <= end; i++) {
-          acc += type ? fvCore(rate, i - 2, payment, value, type) - payment : fvCore(rate, i - 1, payment, value, type)
-        }
-        return acc * rate
+        return acc
       }
     )
   }
@@ -264,17 +249,10 @@ export class FinancialPlugin extends FunctionPlugin {
         if (start > end) {
           return new CellError(ErrorType.NUM)
         }
-
-        const payment = pmtCore(rate, periods, value, 0, type)
         let acc = 0
-        if (start === 1) {
-          acc = type ? payment : payment + value*rate
-          start = 2
+        for(let i = start; i <= end; i++) {
+          acc += ppmtCore(rate, i, periods, value, 0, type)
         }
-        for (let i = start; i <= end; i++) {
-          acc += payment - rate * (type ? (fvCore(rate, i - 2, payment, value, 1) - payment) : fvCore(rate, i - 1, payment, value, 0))
-        }
-
         return acc
       }
     )
@@ -598,4 +576,8 @@ function fvCore(rate: number, periods: number, payment: number, value: number, t
     const term = Math.pow(1 + rate, periods)
     return payment * (type ? (1 + rate) : 1) * (1 - term) / rate - value * term
   }
+}
+
+function ppmtCore(rate: number, period: number, periods: number, present: number, future: number, type: number): number {
+  return pmtCore(rate, periods, present, future, type) - ipmtCore(rate, period, periods, present, future, type)
 }
