@@ -23,11 +23,17 @@ describe('Function RATE', () => {
     ])
 
     expect(engine.getCellValue(adr('A1'))).toBeCloseTo(0.228933070977096)
+    //GS returns different value
     expect(engine.getCellValue(adr('A2'))).toBeCloseTo(-0.499692679085513)
+    //GS returns different value
     expect(engine.getCellValue(adr('A3'))).toBeCloseTo(-0.99009900990099)
+    //GS returns value
     expect(engine.getCellValue(adr('A4'))).toEqual(detailedError(ErrorType.NUM))
+    //GS returns value
     expect(engine.getCellValue(adr('A5'))).toEqual(detailedError(ErrorType.NUM))
+    //GS and XL returns VALUE
     expect(engine.getCellValue(adr('A6'))).toEqual(detailedError(ErrorType.NUM))
+    //GS returns NUM
     expect(engine.getCellValue(adr('A7'))).toBeCloseTo(-0.8)
   })
 })
