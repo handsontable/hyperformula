@@ -78,6 +78,26 @@ export class RadixConversionPlugin extends FunctionPlugin {
         { argumentType: ArgumentTypes.NUMBER, optionalArg: true, minValue: 0, maxValue: MAX_LENGTH},
       ],
     },
+    'HEX2DEC': {
+      method: 'hex2dec',
+      parameters: [
+        { argumentType: ArgumentTypes.STRING }
+      ],
+    },
+    'HEX2BIN': {
+      method: 'hex2bin',
+      parameters: [
+        { argumentType: ArgumentTypes.STRING },
+        { argumentType: ArgumentTypes.NUMBER, optionalArg: true, minValue: 0, maxValue: MAX_LENGTH},
+      ],
+    },
+    'HEX2OCT': {
+      method: 'hex2oct',
+      parameters: [
+        { argumentType: ArgumentTypes.STRING },
+        { argumentType: ArgumentTypes.NUMBER, optionalArg: true, minValue: 0, maxValue: MAX_LENGTH},
+      ],
+    },
     'DECIMAL': {
       method: 'decimal',
       parameters: [
@@ -170,6 +190,36 @@ export class RadixConversionPlugin extends FunctionPlugin {
         return new CellError(ErrorType.NUM)
       }
       return decimalToBaseWithExactPadding(twoComplementToDecimal(octalWithSign, 8), 16, places)
+    })
+  }
+
+ public hex2dec(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('HEX2DEC'), (hexadecimal) => {
+        const hexadecimalWithSign = coerceStringToBase(hexadecimal, 16, MAX_LENGTH)
+        if(hexadecimalWithSign === undefined) {
+          return new CellError(ErrorType.NUM)
+        }
+        return twoComplementToDecimal(hexadecimalWithSign, 16)
+      })
+  }
+
+  public hex2bin(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('HEX2BIN'), (hexadecimal, places) => {
+      const hexadecimalWithSign = coerceStringToBase(hexadecimal, 16, MAX_LENGTH)
+      if(hexadecimalWithSign === undefined) {
+        return new CellError(ErrorType.NUM)
+      }
+      return decimalToBaseWithExactPadding(twoComplementToDecimal(hexadecimalWithSign, 16), 2, places)
+    })
+  }
+
+  public hex2oct(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('HEX2OCT'), (hexadecimal, places) => {
+      const hexadecimalWithSign = coerceStringToBase(hexadecimal, 16, MAX_LENGTH)
+      if(hexadecimalWithSign === undefined) {
+        return new CellError(ErrorType.NUM)
+      }
+      return decimalToBaseWithExactPadding(twoComplementToDecimal(hexadecimalWithSign, 16), 8, places)
     })
   }
 
