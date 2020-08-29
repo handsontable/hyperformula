@@ -64,7 +64,7 @@ describe('function OCT2DEC', () => {
     expect(engine.getCellValue(adr('A2'))).toEqual(83)
   })
 
-  it('should return integer', () => {
+  it('should return a number', () => {
     const engine = HyperFormula.buildFromArray([
       ['=OCT2DEC(11)'],
     ])

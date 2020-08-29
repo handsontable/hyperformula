@@ -51,9 +51,9 @@ describe('function HEX2OCT', () => {
     expect(engine.getCellValue(adr('A11'))).toEqual('4000000000')
   })
 
-  it('should work for strings', () => {
+  it('should work for numbers', () => {
     const engine = HyperFormula.buildFromArray([
-      ['=HEX2OCT("456")'],
+      ['=HEX2OCT(456)'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqual('2126')

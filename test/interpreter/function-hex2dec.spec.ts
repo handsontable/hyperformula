@@ -68,7 +68,7 @@ describe('function HEX2DEC', () => {
     expect(engine.getCellValue(adr('A2'))).toEqual(419)
   })
 
-  it('should return integer', () => {
+  it('should return a number', () => {
     const engine = HyperFormula.buildFromArray([
       ['=HEX2DEC("11")'],
     ])

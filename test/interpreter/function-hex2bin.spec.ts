@@ -43,9 +43,9 @@ describe('function HEX2BIN', () => {
     expect(engine.getCellValue(adr('A7'))).toEqual('1000000000')
   })
 
-  it('should work for strings', () => {
+  it('should work for numbers', () => {
     const engine = HyperFormula.buildFromArray([
-      ['=HEX2BIN("156")'],
+      ['=HEX2BIN(156)'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqual('101010110')

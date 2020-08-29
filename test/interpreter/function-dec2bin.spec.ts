@@ -84,6 +84,16 @@ describe('function DEC2BIN', () => {
     expect(engine.getCellValue(adr('A2'))).toEqual('0101')
   })
 
+  it('should fail if the result is longer than the desired number of digits', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=DEC2BIN(50, 1)'],
+      ['=DEC2BIN(777, "4")'],
+    ])
+
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM))
+    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NUM))
+  })
+
   it('should ignore second argument for negative numbers', () => {
     const engine = HyperFormula.buildFromArray([
       ['=DEC2BIN(-2, 1)'],
