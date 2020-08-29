@@ -20,6 +20,7 @@ describe('Function RRI', () => {
     expect(engine.getCellValue(adr('A1'))).toBeCloseTo(-0.5)
     expect(engine.getCellValue(adr('B1'))).toBeCloseTo(0.414213562373095)
     expect(engine.getCellValue(adr('C1'))).toBeCloseTo(-0.9990234375)
+    //GS returns NUM
     expect(engine.getCellValue(adr('A2'))).toBeCloseTo(0)
     expect(engine.getCellValue(adr('B2'))).toEqual(detailedError(ErrorType.NUM))
     expect(engine.getCellValue(adr('C2'))).toEqual(detailedError(ErrorType.NUM))
