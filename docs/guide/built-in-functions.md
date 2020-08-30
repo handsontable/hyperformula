@@ -96,6 +96,12 @@ lets you design your own [custom functions](custom-functions).
 | DELTA | Engineering | Returns TRUE (1) if both numbers are equal, otherwise returns FALSE (0). | DELTA(Number_1; Number_2) |
 | ERF | Engineering | Returns values of the Gaussian error integral. | ERF(Lower_Limit; Upper_Limit) |
 | ERFC | Engineering | Returns complementary values of the Gaussian error integral between x and infinity. | ERFC(Lower_Limit) |
+| HEX2BIN | Engineering | The result is the binary number for the hexadecimal number entered. | HEX2BIN(Number; Places) |
+| HEX2DEC | Engineering | The result is the decimal number for the hexadecimal number entered. | HEX2DEC(Number) |
+| HEX2OCT | Engineering | The result is the octal number for the hexadecimal number entered. | HEX2OCT(Number; Places) |
+| OCT2BIN | Engineering | The result is the binary number for the octal number entered. | OCT2BIN(Number; Places) |
+| OCT2DEC | Engineering | The result is the decimal number for the octal number entered. | OCT2DEC(Number) |
+| OCT2HEX | Engineering | The result is the hexadecimal number for the octal number entered. | OCT2HEX(Number; Places) |
 | ISBINARY | Information | Returns TRUE if provided value is a valid binary number. | ISBINARY(Value) |
 | ISBLANK | Information | Returns TRUE if the reference to a cell is blank. | ISBLANK(Value) |
 | ISERR | Information | Returns TRUE if the value is error value except #N/A!. | ISERR(Value) |
