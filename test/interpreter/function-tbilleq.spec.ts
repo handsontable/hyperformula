@@ -22,16 +22,18 @@ describe('Function TBILLEQ', () => {
     ])
 
     expect(engine.getCellValue(adr('A1'))).toBeCloseTo(0.104285714285714, 6)
-    //inconsistency with products 1 & 2
+    //inconsistency with products #1 & #2
     expect(engine.getCellValue(adr('A2'))).toBeCloseTo(0.112654320987654, 6)
-    //inconsistency with products 1 & 2
+    //inconsistency with products #1 & #2
     expect(engine.getCellValue(adr('B2'))).toBeCloseTo(0.106818846941762, 6)
+    //inconsistency with product #1 (returns #NUM!)
     expect(engine.getCellValue(adr('A3'))).toBeCloseTo(38.5277777777778, 6)
+    //inconsistency with product #1 (returns #NUM!)
     expect(engine.getCellValue(adr('B3'))).toEqual(0)
     expect(engine.getCellValue(adr('C3'))).toEqual(detailedError(ErrorType.NUM))
-    //inconsistency with products 1 & 2
+    //inconsistency with products #1 & #2
     expect(engine.getCellValue(adr('A4'))).toBeCloseTo(0.112828438948995, 6)
-    //inconsistency with products 1 & 2
+    //inconsistency with products #1 & #2
     expect(engine.getCellValue(adr('B4'))).toBeCloseTo(0.112828438948995, 6)
     expect(engine.getCellValue(adr('A5'))).toEqual(detailedError(ErrorType.NUM))
     expect(engine.getCellValue(adr('A6'))).toEqual(detailedError(ErrorType.NUM))

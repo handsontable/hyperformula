@@ -37,7 +37,7 @@ describe('Function DB', () => {
         '=DB(1000000,100000,6,8,7)',
         '=DB(1000000,100000,6,7)', ],
     ])
-    //some products are not following ODFF specification, returning NUM instead of actual value
+    //product #1 returns #NUM! instead of an actual value
     expect(engine.getCellValue(adr('A1'))).toBeCloseTo(15845.10)
     expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.NUM))
     expect(engine.getCellValue(adr('C1'))).toEqual(detailedError(ErrorType.NUM))
