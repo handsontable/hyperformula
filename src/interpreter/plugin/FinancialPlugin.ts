@@ -158,7 +158,7 @@ export class FinancialPlugin extends FunctionPlugin {
         {argumentType: ArgumentTypes.NUMBER},
         {argumentType: ArgumentTypes.NUMBER, defaultValue: 0},
         {argumentType: ArgumentTypes.NUMBER, defaultValue: 0},
-        {argumentType: ArgumentTypes.NUMBER, defaultValue: 0.1, greaterThan: -1},
+        {argumentType: ArgumentTypes.NUMBER, defaultValue: 0.1},
       ]
     },
     'RRI': {
@@ -395,6 +395,10 @@ export class FinancialPlugin extends FunctionPlugin {
   public rate(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.runFunction(ast.args, formulaAddress, this.metadata('RATE'),
       (periods, payment, present, future, type, guess) => {
+        if(guess<=-1) {
+          return new CellError(ErrorType.VALUE)
+        }
+
         const epsMax = 1e-10
 
         const iterMax = 20
