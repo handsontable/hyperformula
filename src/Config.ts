@@ -200,8 +200,7 @@ export interface ConfigParams {
   matrixDetectionThreshold: number,
   /**
    * Sets the compatibility mode for behaviour of null value.
-   * If set, formula evaluating to null evaluates to 0 instead,
-   * as in product #2.
+   * If set, formula evaluating to null evaluates to 0 instead.
    *
    * @default false
    *
