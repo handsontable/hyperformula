@@ -2,31 +2,31 @@ import {HyperFormula} from '../src'
 import {adr} from './testUtils'
 
 describe('null compatibility', () => {
-  it('reference - default behaviour', () => {
+  it('should evaluate empty reference to null', () => {
     const engine = HyperFormula.buildFromArray([['=A2']], {nullCompatibility: false})
     expect(engine.getCellValue(adr('A1'))).toBeNull()
     expect(engine.getCellValue(adr('A2'))).toBeNull()
   })
 
-  it('reference - compatibility', () => {
+  it('should evaluate empty reference to 0', () => {
     const engine = HyperFormula.buildFromArray([['=A2']], {nullCompatibility: true})
     expect(engine.getCellValue(adr('A1'))).toEqual(0)
     expect(engine.getCellValue(adr('A2'))).toBeNull()
   })
 
-  it('if - default behaviour', () => {
+  it('should evaluate if to null', () => {
     const engine = HyperFormula.buildFromArray([['=IF(TRUE(),A2)']], {nullCompatibility: false})
     expect(engine.getCellValue(adr('A1'))).toBeNull()
     expect(engine.getCellValue(adr('A2'))).toBeNull()
   })
 
-  it('if - compatibility', () => {
+  it('should evaluate if to 0', () => {
     const engine = HyperFormula.buildFromArray([['=IF(TRUE(),A2)']], {nullCompatibility: true})
     expect(engine.getCellValue(adr('A1'))).toEqual(0)
     expect(engine.getCellValue(adr('A2'))).toBeNull()
   })
 
-  it('isblank - default behaviour', () => {
+  it('should evaluate isblank with null', () => {
     const engine = HyperFormula.buildFromArray([
       ['=A2', '=ISBLANK(A1)'],
       [null, '=ISBLANK(A2)']
@@ -35,7 +35,7 @@ describe('null compatibility', () => {
     expect(engine.getCellValue(adr('B2'))).toEqual(true)
   })
 
-  it('isblank - compatibility', () => {
+  it('should evaluate isblank with 0', () => {
     const engine = HyperFormula.buildFromArray([
       ['=A2', '=ISBLANK(A1)'],
       [null, '=ISBLANK(A2)']
