@@ -175,7 +175,7 @@ export class Evaluator {
       } else {
         return fixNegativeZero(interpreterValue)
       }
-    } else if (interpreterValue === EmptyValue && this.config.nullCompatibility) {
+    } else if (interpreterValue === EmptyValue && this.config.evaluateNullToZero) {
       return 0
     } else {
       return interpreterValue
