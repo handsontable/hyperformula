@@ -199,6 +199,15 @@ export interface ConfigParams {
    */
   matrixDetectionThreshold: number,
   /**
+   * Sets the compatibility mode for behaviour of null value.
+   * If set, formula evaluating to null evaluates to 0 instead.
+   *
+   * @default false
+   *
+   * @category Engine
+   */
+  evaluateNullToZero: boolean,
+  /**
    * Two-digit values when interpreted as a year can be either 19xx or 20xx.
    * If `xx <= nullYear` its latter, otherwise its former.
    *
@@ -372,6 +381,7 @@ export class Config implements ConfigParams, ParserConfig {
     localeLang: 'en',
     matrixDetection: true,
     matrixDetectionThreshold: 100,
+    evaluateNullToZero: false,
     nullYear: 30,
     parseDateTime: defaultParseToDateTime,
     stringifyDateTime: defaultStringifyDateTime,
@@ -427,6 +437,8 @@ export class Config implements ConfigParams, ParserConfig {
   public readonly localeLang: string
   /** @inheritDoc */
   public readonly matrixDetectionThreshold: number
+  /** @inheritDoc */
+  public readonly evaluateNullToZero: boolean
   /** @inheritDoc */
   public readonly nullYear: number
   /** @inheritDoc */
@@ -507,6 +519,7 @@ export class Config implements ConfigParams, ParserConfig {
       smartRounding,
       matrixDetection,
       matrixDetectionThreshold,
+      evaluateNullToZero,
       nullYear,
       parseDateTime,
       stringifyDateTime,
@@ -545,6 +558,7 @@ export class Config implements ConfigParams, ParserConfig {
     this.matrixDetection = this.valueFromParam(matrixDetection, 'boolean', 'matrixDetection')
     this.matrixDetectionThreshold = this.valueFromParam(matrixDetectionThreshold, 'number', 'matrixDetectionThreshold')
     this.validateNumberToBeAtLeast(this.matrixDetectionThreshold, 'matrixDetectionThreshold', 1)
+    this.evaluateNullToZero = this.valueFromParam(evaluateNullToZero, 'boolean', 'evaluateNullToZero')
     this.nullYear = this.valueFromParam(nullYear, 'number', 'nullYear')
     this.validateNumberToBeAtLeast(this.nullYear, 'nullYear', 0)
     this.validateNumberToBeAtMost(this.nullYear, 'nullYear', 100)
