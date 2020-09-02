@@ -1,7 +1,7 @@
 import {HyperFormula} from '../../src'
 import {ErrorType} from '../../src/Cell'
 import {Config} from '../../src/Config'
-import {adr, dateNumberToString, detailedError, timeNumberToString} from '../testUtils'
+import {adr, detailedError, timeNumberToString} from '../testUtils'
 
 describe('Function TIME', () => {
   it('with 3 numerical arguments', () => {

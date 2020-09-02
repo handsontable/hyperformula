@@ -145,17 +145,7 @@ export class ArithmeticHelper {
     return this.collator.compare(left, right)
   }
 
-  public add(left: number | CellError, right: number | CellError): number | CellError {
-    if (left instanceof CellError) {
-      return left
-    } else if (right instanceof CellError) {
-      return right
-    } else {
-      return this.addWithEpsilon(left, right)
-    }
-  }
-
-  private addWithEpsilon(left: number, right: number): number {
+  public addWithEpsilon = (left: number, right: number) => {
     const ret = left + right
     if (Math.abs(ret) < this.actualEps * Math.abs(left)) {
       return 0
@@ -168,8 +158,6 @@ export class ArithmeticHelper {
    * Adds two numbers
    *
    * Implementation of adding which is used in interpreter.
-   *
-   * Errors are propagated, non-numerical values are ignored.
    *
    * @param left - left operand of addition
    * @param right - right operand of addition
@@ -197,24 +185,16 @@ export class ArithmeticHelper {
    *
    * Implementation of subtracting which is used in interpreter.
    *
-   * Errors are propagated.
-   *
    * @param left - left operand of subtraction
    * @param right - right operand of subtraction
    * @param eps - precision of comparison
    */
-  public subtract(left: number | CellError, right: number | CellError): number | CellError {
-    if (left instanceof CellError) {
-      return left
-    } else if (right instanceof CellError) {
-      return right
+  public subtract = (left: number, right: number) => {
+    const ret = left - right
+    if (Math.abs(ret) < this.actualEps * Math.abs(left)) {
+      return 0
     } else {
-      const ret = left - right
-      if (Math.abs(ret) < this.actualEps * Math.abs(left)) {
-        return 0
-      } else {
-        return ret
-      }
+      return ret
     }
   }
 
@@ -322,61 +302,11 @@ export function coerceScalarToString(arg: InternalScalarValue): string | CellErr
   }
 }
 
-/**
- * Multiplies two numbers
- *
- * Implementation of multiplication which is used in interpreter.
- *
- * Errors are propagated.
- *
- * @param left - left operand of multiplication
- * @param right - right operand of multiplication
- */
-export function multiply(left: number | CellError, right: number | CellError): number | CellError {
-  if (left instanceof CellError) {
-    return left
-  } else if (right instanceof CellError) {
-    return right
-  } else {
-    return left * right
-  }
-}
-
-export function power(left: number | CellError, right: number | CellError): number | CellError {
-  if (left instanceof CellError) {
-    return left
-  } else if (right instanceof CellError) {
-    return right
-  } else {
-    return Math.pow(left, right)
-  }
-}
-
-export function divide(left: number | CellError, right: number | CellError): number | CellError {
-  if (left instanceof CellError) {
-    return left
-  } else if (right instanceof CellError) {
-    return right
-  } else if (right === 0) {
+export function divide(left: number, right: number): number | CellError {
+  if (right === 0) {
     return new CellError(ErrorType.DIV_BY_ZERO)
   } else {
     return (left / right)
-  }
-}
-
-export function unaryminus(value: number | CellError): number | CellError {
-  if (value instanceof CellError) {
-    return value
-  } else {
-    return -value
-  }
-}
-
-export function percent(value: number | CellError): number | CellError {
-  if (value instanceof CellError) {
-    return value
-  } else {
-    return value / 100
   }
 }
 

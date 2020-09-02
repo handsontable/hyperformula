@@ -15,10 +15,10 @@ import {buildTranslationPackage, RawTranslationPackage, TranslationPackage} from
 import {normalizeAddedIndexes, normalizeRemovedIndexes} from './Operations'
 import {
   AddressMapping,
-  DependencyGraph, FormulaCellVertex,
+  DependencyGraph,
   Graph,
-  MatrixMapping, MatrixVertex,
-  RangeMapping, RangeVertex,
+  MatrixMapping,
+  RangeMapping,
   SheetMapping,
   Vertex,
 } from './DependencyGraph'
@@ -34,7 +34,7 @@ import {Maybe} from './Maybe'
 import {NamedExpression, NamedExpressionOptions, NamedExpressions} from './NamedExpressions'
 import {
   Ast,
-  AstNodeType, NamedExpressionDependency,
+  AstNodeType,
   ParserWithCaching,
   RelativeDependency,
   simpleCellAddressFromString,
