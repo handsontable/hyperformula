@@ -10,7 +10,7 @@ import {Config} from '../../Config'
 import {DependencyGraph} from '../../DependencyGraph'
 import {Maybe} from '../../Maybe'
 import {Ast, AstNodeType, ProcedureAst} from '../../parser'
-import {coerceScalarToBoolean, coerceScalarToString} from '../ArithmeticHelper'
+import {coerceScalarToBoolean, coerceScalarToString, coerceToRange} from '../ArithmeticHelper'
 import {Interpreter} from '../Interpreter'
 import {InterpreterValue, SimpleRangeValue} from '../InterpreterValue'
 import {Serialization} from '../../Serialization'
@@ -227,7 +227,7 @@ export abstract class FunctionPlugin {
         case ArgumentTypes.NOERROR:
           return arg
         case ArgumentTypes.RANGE:
-          return undefined
+          return coerceToRange(arg)
       }
     }
   }
