@@ -260,7 +260,7 @@ export abstract class FunctionPlugin {
       (scalarValues.length-argumentDefinitions.length)%functionDefinition.repeatLastArgs !== 0) {
       return new CellError(ErrorType.NA)
     }
-    for(let i=0, j=0; i<Math.max(scalarValues.length, argumentDefinitions.length); i++,j++) {
+    for(let i=0, j=0; i<Math.max(scalarValues.length, argumentDefinitions.length); i++, j++) {
       // i points to where are we in the scalarValues list,
       // j points to where are we in the argumentDefinitions list
       if(j===argumentDefinitions.length) {
