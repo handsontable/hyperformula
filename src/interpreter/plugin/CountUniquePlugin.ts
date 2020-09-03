@@ -17,7 +17,7 @@ export class CountUniquePlugin extends FunctionPlugin {
       parameters: [
           {argumentType: ArgumentTypes.SCALAR},
         ],
-        repeatLastArg: true,
+        repeatLastArgs: 1,
         expandRanges: true,
     },
   }

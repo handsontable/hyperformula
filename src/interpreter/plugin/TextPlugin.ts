@@ -17,7 +17,7 @@ export class TextPlugin extends FunctionPlugin {
       parameters: [
           {argumentType: ArgumentTypes.STRING}
         ],
-        repeatLastArg: true,
+        repeatLastArgs: 1,
         expandRanges: true,
     },
     'SPLIT': {

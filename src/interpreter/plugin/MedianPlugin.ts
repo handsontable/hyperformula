@@ -18,7 +18,7 @@ export class MedianPlugin extends FunctionPlugin {
       parameters: [
           {argumentType: ArgumentTypes.NOERROR},
         ],
-        repeatLastArg: true,
+        repeatLastArgs: 1,
         expandRanges: true,
     },
   }
