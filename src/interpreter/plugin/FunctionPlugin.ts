@@ -227,6 +227,9 @@ export abstract class FunctionPlugin {
         case ArgumentTypes.NOERROR:
           return arg
         case ArgumentTypes.RANGE:
+          if(arg instanceof CellError) {
+            return arg
+          }
           return coerceToRange(arg)
       }
     }
