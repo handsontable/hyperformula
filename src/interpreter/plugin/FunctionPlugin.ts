@@ -22,7 +22,7 @@ export interface ImplementedFunctions {
 export interface FunctionArguments {
   parameters?: FunctionArgument[],
   /**
-   * Used for functions with variable number of arguments -- last defined argument is repeated indefinitely.
+   * Used for functions with variable number of arguments -- tells how many last arguments can be repeated indefinitely.
    */
   repeatLastArgs?: number,
 
