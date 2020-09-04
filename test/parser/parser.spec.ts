@@ -194,6 +194,12 @@ describe('ParserWithCaching', () => {
 })
 
 describe('Functions', () => {
+  beforeEach(() => {
+    unregisterAllLanguages()
+    HyperFormula.registerLanguage(plPL.langCode, plPL)
+    HyperFormula.registerLanguage(enGB.langCode, enGB)
+  })
+
   it('SUM function without args', () => {
     const parser = buildEmptyParserWithCaching(new Config())
     const ast = parser.parse('=SUM()', simpleCellAddress(0, 0, 0)).ast as ProcedureAst
