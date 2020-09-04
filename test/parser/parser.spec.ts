@@ -266,16 +266,6 @@ describe('ParserWithCaching', () => {
     expect(ast.rawInput).toBe('Sheet2!A1')
     expect(ast.error.type).toBe(ErrorType.REF)
   })
-
-  it('named expression ast', () => {
-    const parser = buildEmptyParserWithCaching(new Config())
-
-    const ast = parser.parse('= true', simpleCellAddress(0, 0, 0)).ast as NamedExpressionAst
-
-    expect(ast.type).toBe(AstNodeType.NAMED_EXPRESSION)
-    expect(ast.expressionName).toBe('true')
-    expect(ast.leadingWhitespace).toBe(' ')
-  })
 })
 
 describe('cell references and ranges', () => {
@@ -696,6 +686,30 @@ describe('Row ranges', () => {
   })
 })
 
+describe('Named expressions', () => {
+  it('should be a valid name for named expression', () => {
+    const parser = buildEmptyParserWithCaching(new Config())
+
+    expect((parser.parse('=_A', adr('A1')).ast as NamedExpressionAst).expressionName).toEqual('_A')
+    expect((parser.parse('=A', adr('A1')).ast as NamedExpressionAst).expressionName).toEqual('A')
+    expect((parser.parse('=Aa', adr('A1')).ast as NamedExpressionAst).expressionName).toEqual('Aa')
+    expect((parser.parse('=B.', adr('A1')).ast as NamedExpressionAst).expressionName).toEqual('B.')
+    expect((parser.parse('=foo_bar', adr('A1')).ast as NamedExpressionAst).expressionName).toEqual('foo_bar')
+    expect((parser.parse('=A...', adr('A1')).ast as NamedExpressionAst).expressionName).toEqual('A...')
+    expect((parser.parse('=B___', adr('A1')).ast as NamedExpressionAst).expressionName).toEqual('B___')
+  })
+
+  it('named expression ast with leading whitespace', () => {
+    const parser = buildEmptyParserWithCaching(new Config())
+
+    const ast = parser.parse('= true', adr('A1')).ast as NamedExpressionAst
+
+    expect(ast.type).toBe(AstNodeType.NAMED_EXPRESSION)
+    expect(ast.expressionName).toBe('true')
+    expect(ast.leadingWhitespace).toBe(' ')
+  })
+})
+
 describe('Parsing errors', () => {
   it('errors - lexing errors', () => {
     const parser = buildEmptyParserWithCaching(new Config())
@@ -707,21 +721,6 @@ describe('Parsing errors', () => {
       expect(ast.type).toBe(AstNodeType.ERROR)
       expect(errors[0].type).toBe(ParsingErrorType.LexingError)
     })
-  })
-
-  it('parsing error - column name without whole range', () => {
-    const parser = buildEmptyParserWithCaching(new Config())
-
-    const { ast, errors } = parser.parse('=A', simpleCellAddress(0, 0, 0))
-    expect(ast.type).toBe(AstNodeType.ERROR)
-    expect(errors[0].type).toBe(ParsingErrorType.LexingError)
-  })
-
-  it('parsing error - column name in procedure without whole range', () => {
-    const parser = buildEmptyParserWithCaching(new Config())
-
-    const { errors } = parser.parse('=SUM(A)', simpleCellAddress(0, 0, 0))
-    expect(errors[0].type).toBe(ParsingErrorType.LexingError)
   })
 
   it('parsing error - not all input parsed', () => {
