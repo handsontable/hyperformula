@@ -34,7 +34,7 @@ export class BooleanPlugin extends FunctionPlugin {
       parameters: [
           {argumentType: ArgumentTypes.BOOLEAN},
         ],
-        repeatLastArg: true,
+        repeatLastArgs: 1,
         expandRanges: true,
     },
     'OR': {
@@ -42,7 +42,7 @@ export class BooleanPlugin extends FunctionPlugin {
       parameters: [
           {argumentType: ArgumentTypes.BOOLEAN},
         ],
-        repeatLastArg: true,
+        repeatLastArgs: 1,
         expandRanges: true,
     },
     'XOR': {
@@ -50,7 +50,7 @@ export class BooleanPlugin extends FunctionPlugin {
       parameters: [
           {argumentType: ArgumentTypes.BOOLEAN},
         ],
-        repeatLastArg: true,
+        repeatLastArgs: 1,
         expandRanges: true,
     },
     'NOT': {
@@ -66,7 +66,7 @@ export class BooleanPlugin extends FunctionPlugin {
           {argumentType: ArgumentTypes.SCALAR},
           {argumentType: ArgumentTypes.SCALAR},
         ],
-        repeatLastArg: true,
+        repeatLastArgs: 1,
     },
     'IFERROR': {
       method: 'iferror',
@@ -88,7 +88,7 @@ export class BooleanPlugin extends FunctionPlugin {
           {argumentType: ArgumentTypes.NUMBER},
           {argumentType: ArgumentTypes.SCALAR},
         ],
-        repeatLastArg: true,
+        repeatLastArgs: 1,
     },
   }
 

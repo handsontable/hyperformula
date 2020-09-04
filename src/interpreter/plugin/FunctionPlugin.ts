@@ -10,7 +10,7 @@ import {Config} from '../../Config'
 import {DependencyGraph} from '../../DependencyGraph'
 import {Maybe} from '../../Maybe'
 import {Ast, AstNodeType, ProcedureAst} from '../../parser'
-import {coerceScalarToBoolean, coerceScalarToString} from '../ArithmeticHelper'
+import {coerceScalarToBoolean, coerceScalarToString, coerceToRange} from '../ArithmeticHelper'
 import {Interpreter} from '../Interpreter'
 import {InterpreterValue, SimpleRangeValue} from '../InterpreterValue'
 import {Serialization} from '../../Serialization'
@@ -22,9 +22,9 @@ export interface ImplementedFunctions {
 export interface FunctionArguments {
   parameters?: FunctionArgument[],
   /**
-   * Used for functions with variable number of arguments -- last defined argument is repeated indefinitely.
+   * Used for functions with variable number of arguments -- tells how many last arguments can be repeated indefinitely.
    */
-  repeatLastArg?: boolean,
+  repeatLastArgs?: number,
 
   /**
    * Ranges in arguments are inlined to (possibly multiple) scalar arguments.
@@ -34,20 +34,9 @@ export interface FunctionArguments {
 
 export interface FunctionMetadata extends FunctionArguments{
   method: string,
-  parameters?: FunctionArgument[],
   isVolatile?: boolean,
   isDependentOnSheetStructureChange?: boolean,
   doesNotNeedArgumentsToBeComputed?: boolean,
-
-  /**
-   * Used for functions with variable number of arguments -- last defined argument is repeated indefinitely.
-   */
-  repeatLastArg?: boolean,
-
-  /**
-   * Ranges in arguments are inlined to (possibly multiple) scalar arguments.
-   */
-  expandRanges?: boolean,
 }
 
 export interface FunctionPluginDefinition {
@@ -227,7 +216,10 @@ export abstract class FunctionPlugin {
         case ArgumentTypes.NOERROR:
           return arg
         case ArgumentTypes.RANGE:
-          return undefined
+          if(arg instanceof CellError) {
+            return arg
+          }
+          return coerceToRange(arg)
       }
     }
   }
@@ -250,13 +242,19 @@ export abstract class FunctionPlugin {
     const coercedArguments: Maybe<InterpreterValue>[] = []
 
     let argCoerceFailure: Maybe<CellError> = undefined
-    if(!functionDefinition.repeatLastArg && argumentDefinitions.length < scalarValues.length) {
+    if(functionDefinition.repeatLastArgs === undefined && argumentDefinitions.length < scalarValues.length) {
       return new CellError(ErrorType.NA)
     }
-    for(let i=0; i<Math.max(scalarValues.length, argumentDefinitions.length); i++) {
+    if(functionDefinition.repeatLastArgs !== undefined && scalarValues.length > argumentDefinitions.length &&
+      (scalarValues.length-argumentDefinitions.length)%functionDefinition.repeatLastArgs !== 0) {
+      return new CellError(ErrorType.NA)
+    }
+    for(let i=0, j=0; i<Math.max(scalarValues.length, argumentDefinitions.length); i++, j++) {
       // i points to where are we in the scalarValues list,
       // j points to where are we in the argumentDefinitions list
-      const j = Math.min(i, argumentDefinitions.length-1)
+      if(j===argumentDefinitions.length) {
+        j -= functionDefinition.repeatLastArgs!
+      }
       const [val, ignorable] = scalarValues[i] ?? [undefined, undefined]
       const arg = val ?? argumentDefinitions[j]?.defaultValue
       if(arg === undefined) {
