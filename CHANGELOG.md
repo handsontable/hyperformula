@@ -31,6 +31,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed undo of `moveColumns`/`moveRows` operations. (#479)
 - Fixed name-collision issue in translations.
 - Fixed bug in concatenation + nullValue. (#495)
+- Fixed bug when undoing irreversible operation (#502)
 
 ## [0.1.3] - 2020-07-21
 
