@@ -37,9 +37,9 @@ describe('Function DATE', () => {
     expect(dateNumberToString(engine.getCellValue(adr('B1')), config)).toEqual('02/11/1900')
     expect(dateNumberToString(engine.getCellValue(adr('C1')), config)).toEqual('02/11/1998')
     expect(dateNumberToString(engine.getCellValue(adr('D1')), config)).toEqual('06/09/1915')
-    expect(engine.getCellValue(adr('E1'))).toEqual(detailedError(ErrorType.VALUE))
-    expect(engine.getCellValue(adr('F1'))).toEqual(detailedError(ErrorType.VALUE))
-    expect(engine.getCellValue(adr('G1'))).toEqual(detailedError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('E1'))).toEqual(detailedError(ErrorType.NUM))
+    expect(engine.getCellValue(adr('F1'))).toEqual(detailedError(ErrorType.NUM))
+    expect(engine.getCellValue(adr('G1'))).toEqual(detailedError(ErrorType.NUM))
   })
 
   it('rollover', () => {

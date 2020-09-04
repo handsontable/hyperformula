@@ -5,22 +5,22 @@
 
 import {AbsoluteCellRange} from './AbsoluteCellRange'
 import {absolutizeDependencies} from './absolutizeDependencies'
-import {CellError, ErrorType, SimpleCellAddress} from './Cell'
+import {CellError, EmptyValue, ErrorType, SimpleCellAddress} from './Cell'
 import {ColumnSearchStrategy} from './ColumnSearch/ColumnSearchStrategy'
 import {Config} from './Config'
 import {ContentChanges} from './ContentChanges'
 import {DateTimeHelper} from './DateTimeHelper'
 import {DependencyGraph, FormulaCellVertex, MatrixVertex, RangeVertex, Vertex} from './DependencyGraph'
 import {fixNegativeZero, isNumberOverflow} from './interpreter/ArithmeticHelper'
+import {FunctionRegistry} from './interpreter/FunctionRegistry'
 import {Interpreter} from './interpreter/Interpreter'
 import {InterpreterValue, SimpleRangeValue} from './interpreter/InterpreterValue'
 import {Matrix} from './Matrix'
-import {Ast, RelativeDependency} from './parser'
-import {Statistics, StatType} from './statistics'
-import {NumberLiteralHelper} from './NumberLiteralHelper'
 import {NamedExpressions} from './NamedExpressions'
-import {FunctionRegistry} from './interpreter/FunctionRegistry'
+import {NumberLiteralHelper} from './NumberLiteralHelper'
+import {Ast, RelativeDependency} from './parser'
 import {Serialization} from './Serialization'
+import {Statistics, StatType} from './statistics'
 
 export class Evaluator {
   private interpreter: Interpreter
@@ -175,6 +175,8 @@ export class Evaluator {
       } else {
         return fixNegativeZero(interpreterValue)
       }
+    } else if (interpreterValue === EmptyValue && this.config.evaluateNullToZero) {
+      return 0
     } else {
       return interpreterValue
     }

@@ -95,6 +95,24 @@ describe('Function EOMONTH', () => {
     expectToHaveDate(engine, adr('A2'), '28/02/2019')
   })
 
+  it('works for leap years', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=DATE(2020, 2, 28)'],
+      ['=EOMONTH(A1, 0)'],
+    ])
+
+    expectToHaveDate(engine, adr('A2'), '29/02/2020')
+  })
+
+  it('works for non-leap years', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=DATE(2019, 2, 28)'],
+      ['=EOMONTH(A1, 0)'],
+    ])
+
+    expectToHaveDate(engine, adr('A2'), '28/02/2019')
+  })
+
   it('use number coercion for 1st argument', () => {
     const engine =  HyperFormula.buildFromArray([
       ['=EOMONTH(TRUE(), 1)'],

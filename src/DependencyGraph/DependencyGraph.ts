@@ -16,7 +16,6 @@ import {
 } from '../Cell'
 import {CellDependency} from '../CellDependency'
 import {Config} from '../Config'
-import {Dependencies} from '../GraphBuilder'
 import {LazilyTransformingAstService} from '../LazilyTransformingAstService'
 import {Maybe} from '../Maybe'
 import {Ast, collectDependencies, NamedExpressionDependency} from '../parser'

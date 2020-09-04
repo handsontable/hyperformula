@@ -19,17 +19,16 @@ import {DateTimeHelper} from '../DateTimeHelper'
 import {DependencyGraph} from '../DependencyGraph'
 import {Matrix, NotComputedMatrix} from '../Matrix'
 import {Maybe} from '../Maybe'
+import {NamedExpressions} from '../NamedExpressions'
+import {NumberLiteralHelper} from '../NumberLiteralHelper'
 // noinspection TypeScriptPreferShortImport
 import {Ast, AstNodeType, CellRangeAst, ColumnRangeAst, RowRangeAst} from '../parser/Ast'
-import {Statistics} from '../statistics/Statistics'
-import {ArithmeticHelper, divide, multiply, percent, power, unaryminus} from './ArithmeticHelper'
-import {CriterionBuilder} from './Criterion'
-import {InterpreterValue, SimpleRangeValue} from './InterpreterValue'
-import {concatenate} from './text'
-import {NumberLiteralHelper} from '../NumberLiteralHelper'
-import {FunctionRegistry} from './FunctionRegistry'
-import {NamedExpressions} from '../NamedExpressions'
 import {Serialization} from '../Serialization'
+import {Statistics} from '../statistics/Statistics'
+import {ArithmeticHelper, coerceScalarToString, divide} from './ArithmeticHelper'
+import {CriterionBuilder} from './Criterion'
+import {FunctionRegistry} from './FunctionRegistry'
+import {InterpreterValue, SimpleRangeValue} from './InterpreterValue'
 
 export class Interpreter {
   private gpu?: GPU.GPU
@@ -75,51 +74,55 @@ export class Interpreter {
         return ast.value
       }
       case AstNodeType.CONCATENATE_OP: {
-        const left = this.evaluateAst(ast.left, formulaAddress)
-        const right = this.evaluateAst(ast.right, formulaAddress)
-        return concatenate([left, right])
+        const leftResult = this.evaluateAst(ast.left, formulaAddress)
+        const rightResult = this.evaluateAst(ast.right, formulaAddress)
+        return passErrors(leftResult, rightResult) ??
+          wrapperBinary((a, b) => a.concat(b),
+            coerceScalarToString(leftResult as InternalNoErrorCellValue),
+            coerceScalarToString(rightResult as InternalNoErrorCellValue)
+          )
       }
       case AstNodeType.EQUALS_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
         const rightResult = this.evaluateAst(ast.right, formulaAddress)
-        return this.passErrors(leftResult, rightResult) ??
+        return passErrors(leftResult, rightResult) ??
           this.arithmeticHelper.compare(leftResult as InternalNoErrorCellValue, rightResult as InternalNoErrorCellValue) === 0
       }
       case AstNodeType.NOT_EQUAL_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
         const rightResult = this.evaluateAst(ast.right, formulaAddress)
-        return this.passErrors(leftResult, rightResult) ??
+        return passErrors(leftResult, rightResult) ??
           this.arithmeticHelper.compare(leftResult as InternalNoErrorCellValue, rightResult as InternalNoErrorCellValue) !== 0
       }
       case AstNodeType.GREATER_THAN_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
         const rightResult = this.evaluateAst(ast.right, formulaAddress)
-        return this.passErrors(leftResult, rightResult) ??
+        return passErrors(leftResult, rightResult) ??
           this.arithmeticHelper.compare(leftResult as InternalNoErrorCellValue, rightResult as InternalNoErrorCellValue) > 0
       }
       case AstNodeType.LESS_THAN_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
         const rightResult = this.evaluateAst(ast.right, formulaAddress)
-        return this.passErrors(leftResult, rightResult) ??
+        return passErrors(leftResult, rightResult) ??
           this.arithmeticHelper.compare(leftResult as InternalNoErrorCellValue, rightResult as InternalNoErrorCellValue) < 0
       }
       case AstNodeType.GREATER_THAN_OR_EQUAL_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
         const rightResult = this.evaluateAst(ast.right, formulaAddress)
-        return this.passErrors(leftResult, rightResult) ??
+        return passErrors(leftResult, rightResult) ??
           this.arithmeticHelper.compare(leftResult as InternalNoErrorCellValue, rightResult as InternalNoErrorCellValue) >= 0
       }
       case AstNodeType.LESS_THAN_OR_EQUAL_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
         const rightResult = this.evaluateAst(ast.right, formulaAddress)
-        return this.passErrors(leftResult, rightResult) ??
+        return passErrors(leftResult, rightResult) ??
           this.arithmeticHelper.compare(leftResult as InternalNoErrorCellValue, rightResult as InternalNoErrorCellValue) <= 0
       }
       case AstNodeType.PLUS_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
         const rightResult = this.evaluateAst(ast.right, formulaAddress)
-        return this.passErrors(leftResult, rightResult) ??
-          this.arithmeticHelper.add(
+        return passErrors(leftResult, rightResult) ??
+          wrapperBinary(this.arithmeticHelper.addWithEpsilon,
             this.arithmeticHelper.coerceScalarToNumberOrError(leftResult as InternalNoErrorCellValue),
             this.arithmeticHelper.coerceScalarToNumberOrError(rightResult as InternalNoErrorCellValue)
           )
@@ -127,8 +130,8 @@ export class Interpreter {
       case AstNodeType.MINUS_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
         const rightResult = this.evaluateAst(ast.right, formulaAddress)
-        return this.passErrors(leftResult, rightResult) ??
-          this.arithmeticHelper.subtract(
+        return passErrors(leftResult, rightResult) ??
+          wrapperBinary(this.arithmeticHelper.subtract,
             this.arithmeticHelper.coerceScalarToNumberOrError(leftResult as InternalNoErrorCellValue),
             this.arithmeticHelper.coerceScalarToNumberOrError(rightResult as InternalNoErrorCellValue)
           )
@@ -136,8 +139,9 @@ export class Interpreter {
       case AstNodeType.TIMES_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
         const rightResult = this.evaluateAst(ast.right, formulaAddress)
-        return this.passErrors(leftResult, rightResult) ??
-          multiply(
+        return passErrors(leftResult, rightResult) ??
+          wrapperBinary(
+            (a, b) => a*b,
             this.arithmeticHelper.coerceScalarToNumberOrError(leftResult as InternalNoErrorCellValue),
             this.arithmeticHelper.coerceScalarToNumberOrError(rightResult as InternalNoErrorCellValue)
           )
@@ -145,8 +149,9 @@ export class Interpreter {
       case AstNodeType.POWER_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
         const rightResult = this.evaluateAst(ast.right, formulaAddress)
-        return this.passErrors(leftResult, rightResult) ??
-          power(
+        return passErrors(leftResult, rightResult) ??
+          wrapperBinary(
+            Math.pow,
             this.arithmeticHelper.coerceScalarToNumberOrError(leftResult as InternalNoErrorCellValue),
             this.arithmeticHelper.coerceScalarToNumberOrError(rightResult as InternalNoErrorCellValue)
           )
@@ -154,8 +159,9 @@ export class Interpreter {
       case AstNodeType.DIV_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
         const rightResult = this.evaluateAst(ast.right, formulaAddress)
-        return this.passErrors(leftResult, rightResult) ??
-          divide(
+        return passErrors(leftResult, rightResult) ??
+          wrapperBinary(
+            divide,
             this.arithmeticHelper.coerceScalarToNumberOrError(leftResult as InternalNoErrorCellValue),
             this.arithmeticHelper.coerceScalarToNumberOrError(rightResult as InternalNoErrorCellValue)
           )
@@ -173,7 +179,8 @@ export class Interpreter {
         if (result instanceof SimpleRangeValue) {
           return new CellError(ErrorType.VALUE)
         } else {
-          return unaryminus(this.arithmeticHelper.coerceScalarToNumberOrError(result))
+          return wrapperUnary((a) => -a,
+            this.arithmeticHelper.coerceScalarToNumberOrError(result))
         }
       }
       case AstNodeType.PERCENT_OP: {
@@ -181,7 +188,8 @@ export class Interpreter {
         if (result instanceof SimpleRangeValue) {
           return new CellError(ErrorType.VALUE)
         } else {
-          return percent(this.arithmeticHelper.coerceScalarToNumberOrError(result))
+          return wrapperUnary((a) => a/100,
+            this.arithmeticHelper.coerceScalarToNumberOrError(result))
         }
       }
       case AstNodeType.FUNCTION_CALL: {
@@ -263,18 +271,36 @@ export class Interpreter {
   private rangeSpansOneSheet(ast: CellRangeAst | ColumnRangeAst | RowRangeAst): boolean {
     return ast.start.sheet === ast.end.sheet
   }
+}
 
-  private passErrors(left: InterpreterValue, right: InterpreterValue): Maybe<CellError> {
-    if (left instanceof CellError) {
-      return left
-    } else if (left instanceof SimpleRangeValue) {
-      return new CellError(ErrorType.VALUE)
-    } else if (right instanceof CellError) {
-      return right
-    } else if (right instanceof SimpleRangeValue) {
-      return new CellError(ErrorType.VALUE)
-    } else {
-      return undefined
-    }
+function passErrors(left: InterpreterValue, right: InterpreterValue): Maybe<CellError> {
+  if (left instanceof CellError) {
+    return left
+  } else if (left instanceof SimpleRangeValue) {
+    return new CellError(ErrorType.VALUE)
+  } else if (right instanceof CellError) {
+    return right
+  } else if (right instanceof SimpleRangeValue) {
+    return new CellError(ErrorType.VALUE)
+  } else {
+    return undefined
+  }
+}
+
+function wrapperUnary<T extends InterpreterValue>(op: (a: T) => InterpreterValue, a: T | CellError): InterpreterValue {
+  if(a instanceof CellError) {
+    return a
+  } else {
+    return op(a)
+  }
+}
+
+function wrapperBinary<T extends InterpreterValue>(op: (a: T, b: T) => InterpreterValue, a: T | CellError, b: T | CellError): InterpreterValue {
+  if(a instanceof CellError) {
+    return a
+  } else if(b instanceof CellError) {
+    return b
+  } else {
+    return op(a, b)
   }
 }

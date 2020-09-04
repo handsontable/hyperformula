@@ -4,9 +4,10 @@ import {adr, detailedError} from '../testUtils'
 
 describe('Function COS', () => {
   it('happy path', () => {
-    const engine = HyperFormula.buildFromArray([['=COS(0)']])
+    const engine = HyperFormula.buildFromArray([['=COS(0)', '=COS(7)']])
 
     expect(engine.getCellValue(adr('A1'))).toBe(1)
+    expect(engine.getCellValue(adr('B1'))).toBeCloseTo(0.753902254343305)
   })
 
   it('when value not numeric', () => {

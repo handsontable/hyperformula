@@ -146,9 +146,18 @@ export function dateNumberToString(dateNumber: CellValue, config: Config): strin
   if(dateNumber instanceof DetailedCellError) {
     return dateNumber
   }
-  const dateHelper = new DateTimeHelper(config)
-  const dateString = defaultStringifyDateTime(dateHelper.numberToSimpleDateTime(dateNumber as number), config.dateFormats[0])
-  return dateString ? dateString : ''
+  const dateTimeHelper = new DateTimeHelper(config)
+  const dateString = defaultStringifyDateTime(dateTimeHelper.numberToSimpleDateTime(dateNumber as number), config.dateFormats[0])
+  return dateString ?? ''
+}
+
+export function timeNumberToString(timeNumber: CellValue, config: Config): string | DetailedCellError {
+  if(timeNumber instanceof DetailedCellError) {
+    return timeNumber
+  }
+  const dateTimeHelper = new DateTimeHelper(config)
+  const timeString = defaultStringifyDateTime(dateTimeHelper.numberToSimpleDateTime(timeNumber as number), 'hh:mm:ss.sss')
+  return timeString ?? ''
 }
 
 export function expectCloseTo(actual: CellValue, expected: number, precision: number = 0.000001) {

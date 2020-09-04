@@ -9,7 +9,7 @@ import {Maybe} from '../../Maybe'
 import {ProcedureAst} from '../../parser'
 import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
 
-const NUMBER_OF_BITS = 10
+const MAX_LENGTH = 10
 const DECIMAL_NUMBER_OF_BITS = 255
 const MIN_BASE = 2
 const MAX_BASE = 36
@@ -20,21 +20,21 @@ export class RadixConversionPlugin extends FunctionPlugin {
     'DEC2BIN': {
       method: 'dec2bin',
       parameters:  [
-        { argumentType: ArgumentTypes.NUMBER, minValue: minValFromBase(2), maxValue: maxValFromBase(2) },
+        { argumentType: ArgumentTypes.NUMBER },
         { argumentType: ArgumentTypes.NUMBER, optionalArg: true, minValue: 1, maxValue: 10 },
       ],
     },
     'DEC2OCT': {
       method: 'dec2oct',
       parameters: [
-        { argumentType: ArgumentTypes.NUMBER, minValue: minValFromBase(8), maxValue: maxValFromBase(8) },
+        { argumentType: ArgumentTypes.NUMBER },
         { argumentType: ArgumentTypes.NUMBER, optionalArg: true, minValue: 1, maxValue: 10 },
       ],
     },
     'DEC2HEX': {
       method: 'dec2hex',
       parameters: [
-        { argumentType: ArgumentTypes.NUMBER, minValue: minValFromBase(16), maxValue: maxValFromBase(16) },
+        { argumentType: ArgumentTypes.NUMBER },
         { argumentType: ArgumentTypes.NUMBER, optionalArg: true, minValue: 1, maxValue: 10 },
       ],
     },
@@ -48,14 +48,54 @@ export class RadixConversionPlugin extends FunctionPlugin {
       method: 'bin2oct',
       parameters: [
         { argumentType: ArgumentTypes.STRING },
-        { argumentType: ArgumentTypes.NUMBER, optionalArg: true, minValue: 0, maxValue: DECIMAL_NUMBER_OF_BITS},
+        { argumentType: ArgumentTypes.NUMBER, optionalArg: true, minValue: 0, maxValue: MAX_LENGTH},
       ],
     },
     'BIN2HEX': {
       method: 'bin2hex',
       parameters: [
         { argumentType: ArgumentTypes.STRING },
-        { argumentType: ArgumentTypes.NUMBER, optionalArg: true, minValue: 0, maxValue: DECIMAL_NUMBER_OF_BITS},
+        { argumentType: ArgumentTypes.NUMBER, optionalArg: true, minValue: 0, maxValue: MAX_LENGTH},
+      ],
+    },
+    'OCT2DEC': {
+      method: 'oct2dec',
+      parameters: [
+        { argumentType: ArgumentTypes.STRING }
+      ],
+    },
+    'OCT2BIN': {
+      method: 'oct2bin',
+      parameters: [
+        { argumentType: ArgumentTypes.STRING },
+        { argumentType: ArgumentTypes.NUMBER, optionalArg: true, minValue: 0, maxValue: MAX_LENGTH},
+      ],
+    },
+    'OCT2HEX': {
+      method: 'oct2hex',
+      parameters: [
+        { argumentType: ArgumentTypes.STRING },
+        { argumentType: ArgumentTypes.NUMBER, optionalArg: true, minValue: 0, maxValue: MAX_LENGTH},
+      ],
+    },
+    'HEX2DEC': {
+      method: 'hex2dec',
+      parameters: [
+        { argumentType: ArgumentTypes.STRING }
+      ],
+    },
+    'HEX2BIN': {
+      method: 'hex2bin',
+      parameters: [
+        { argumentType: ArgumentTypes.STRING },
+        { argumentType: ArgumentTypes.NUMBER, optionalArg: true, minValue: 0, maxValue: MAX_LENGTH},
+      ],
+    },
+    'HEX2OCT': {
+      method: 'hex2oct',
+      parameters: [
+        { argumentType: ArgumentTypes.STRING },
+        { argumentType: ArgumentTypes.NUMBER, optionalArg: true, minValue: 0, maxValue: MAX_LENGTH},
       ],
     },
     'DECIMAL': {
@@ -95,31 +135,91 @@ export class RadixConversionPlugin extends FunctionPlugin {
 
   public bin2dec(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.runFunction(ast.args, formulaAddress, this.metadata('BIN2DEC'), (binary) => {
-        const binaryWithSign = coerceStringToBase(binary, 2, NUMBER_OF_BITS)
+        const binaryWithSign = coerceStringToBase(binary, 2, MAX_LENGTH)
         if(binaryWithSign === undefined) {
           return new CellError(ErrorType.NUM)
         }
-        return twoComplementToDecimal(binaryWithSign)
+        return twoComplementToDecimal(binaryWithSign, 2)
       })
   }
 
   public bin2oct(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.runFunction(ast.args, formulaAddress, this.metadata('BIN2OCT'), (binary, places) => {
-      const binaryWithSign = coerceStringToBase(binary, 2, NUMBER_OF_BITS)
+      const binaryWithSign = coerceStringToBase(binary, 2, MAX_LENGTH)
       if(binaryWithSign === undefined) {
         return new CellError(ErrorType.NUM)
       }
-      return decimalToBaseWithExactPadding(twoComplementToDecimal(binaryWithSign), 8, places)
+      return decimalToBaseWithExactPadding(twoComplementToDecimal(binaryWithSign, 2), 8, places)
     })
   }
 
   public bin2hex(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.runFunction(ast.args, formulaAddress, this.metadata('BIN2HEX'), (binary, places) => {
-      const binaryWithSign = coerceStringToBase(binary, 2, NUMBER_OF_BITS)
+      const binaryWithSign = coerceStringToBase(binary, 2, MAX_LENGTH)
       if(binaryWithSign === undefined) {
         return new CellError(ErrorType.NUM)
       }
-      return decimalToBaseWithExactPadding(twoComplementToDecimal(binaryWithSign), 16, places)
+      return decimalToBaseWithExactPadding(twoComplementToDecimal(binaryWithSign, 2), 16, places)
+    })
+  }
+
+  public oct2dec(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('OCT2DEC'), (octal) => {
+        const octalWithSign = coerceStringToBase(octal, 8, MAX_LENGTH)
+        if(octalWithSign === undefined) {
+          return new CellError(ErrorType.NUM)
+        }
+        return twoComplementToDecimal(octalWithSign, 8)
+      })
+  }
+
+  public oct2bin(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('OCT2BIN'), (octal, places) => {
+      const octalWithSign = coerceStringToBase(octal, 8, MAX_LENGTH)
+      if(octalWithSign === undefined) {
+        return new CellError(ErrorType.NUM)
+      }
+      return decimalToBaseWithExactPadding(twoComplementToDecimal(octalWithSign, 8), 2, places)
+    })
+  }
+
+  public oct2hex(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('OCT2HEX'), (octal, places) => {
+      const octalWithSign = coerceStringToBase(octal, 8, MAX_LENGTH)
+      if(octalWithSign === undefined) {
+        return new CellError(ErrorType.NUM)
+      }
+      return decimalToBaseWithExactPadding(twoComplementToDecimal(octalWithSign, 8), 16, places)
+    })
+  }
+
+ public hex2dec(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('HEX2DEC'), (hexadecimal) => {
+        const hexadecimalWithSign = coerceStringToBase(hexadecimal, 16, MAX_LENGTH)
+        if(hexadecimalWithSign === undefined) {
+          return new CellError(ErrorType.NUM)
+        }
+        return twoComplementToDecimal(hexadecimalWithSign, 16)
+      })
+  }
+
+  public hex2bin(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('HEX2BIN'), (hexadecimal, places) => {
+      const hexadecimalWithSign = coerceStringToBase(hexadecimal, 16, MAX_LENGTH)
+      if(hexadecimalWithSign === undefined) {
+        return new CellError(ErrorType.NUM)
+      }
+      return decimalToBaseWithExactPadding(twoComplementToDecimal(hexadecimalWithSign, 16), 2, places)
+    })
+  }
+
+  public hex2oct(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('HEX2OCT'), (hexadecimal, places) => {
+      const hexadecimalWithSign = coerceStringToBase(hexadecimal, 16, MAX_LENGTH)
+      if(hexadecimalWithSign === undefined) {
+        return new CellError(ErrorType.NUM)
+      }
+      return decimalToBaseWithExactPadding(twoComplementToDecimal(hexadecimalWithSign, 16), 8, places)
     })
   }
 
@@ -148,6 +248,9 @@ function coerceStringToBase(value: string, base: number, maxLength: number): May
 }
 
 function decimalToBaseWithExactPadding(value: number, base: number, places?: number): string | CellError {
+  if (value > maxValFromBase(base) || value < minValFromBase(base) ) {
+    return new CellError(ErrorType.NUM)
+  }
   const result = decimalToRadixComplement(value, base)
   if (places === undefined || value < 0) {
     return result
@@ -159,7 +262,7 @@ function decimalToBaseWithExactPadding(value: number, base: number, places?: num
 }
 
 function minValFromBase(base: number) {
-  return -Math.pow(base, NUMBER_OF_BITS) / 2
+  return -Math.pow(base, MAX_LENGTH) / 2
 }
 
 function maxValFromBase(base: number) {
@@ -176,11 +279,12 @@ function decimalToBaseWithMinimumPadding(value: number, base: number, places?: n
 }
 
 function decimalToRadixComplement(value: number, base: number): string {
-  const offset = value < 0 ? Math.pow(base, NUMBER_OF_BITS) : 0
+  const offset = value < 0 ? Math.pow(base, MAX_LENGTH) : 0
   return (value + offset).toString(base).toUpperCase()
 }
 
-function twoComplementToDecimal(value: string): number {
-  const offset = (value.length == NUMBER_OF_BITS && value.startsWith('1')) ? Math.pow(2, NUMBER_OF_BITS) : 0
-  return parseInt(value, 2) - offset
+function twoComplementToDecimal(value: string, base: number): number {
+  const parsed = parseInt(value, base)
+  const offset = Math.pow(base, MAX_LENGTH)
+  return (parsed >= offset/2) ? parsed - offset : parsed
 }
