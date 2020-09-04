@@ -47,17 +47,17 @@ export const sheetNameRegexp = `([A-Za-z0-9_\u00C0-\u02AF]+|'[A-Za-z0-9${additio
 
 export const CellReference = createToken({
   name: 'CellReference',
-  pattern: new RegExp(`\(${sheetNameRegexp}\)?\\$?[A-Za-z]+\\$?[0-9]+`),
+  pattern: new RegExp(`(${sheetNameRegexp})?\\$?[A-Za-z]+\\$?[0-9]+`),
 })
 
 export const ColumnRange = createToken({
   name: 'ColumnRange',
-  pattern: new RegExp(`\(${sheetNameRegexp}\)?\\$?[A-Za-z]+:\(${sheetNameRegexp}\)?\\$?[A-Za-z]+`),
+  pattern: new RegExp(`(${sheetNameRegexp})?\\$?[A-Za-z]+:\(${sheetNameRegexp}\)?\\$?[A-Za-z]+`),
 })
 
 export const RowRange = createToken({
   name: 'RowRange',
-  pattern: new RegExp(`\(${sheetNameRegexp}\)?\\$?[0-9]+:\(${sheetNameRegexp}\)?\\$?[0-9]+`),
+  pattern: new RegExp(`(${sheetNameRegexp})?\\$?[0-9]+:\(${sheetNameRegexp}\)?\\$?[0-9]+`),
 })
 
 
