@@ -57,6 +57,7 @@ export class LazilyTransformingAstService {
       const transformation = this.transformations[v]
       if (transformation.isIrreversible()) {
         this.undoRedo!.storeDataForVersion(v, address, this.parser!.computeHashFromAst(ast))
+        this.parser!.rememberNewAst(ast)
       }
 
       const [newAst, newAddress] = transformation.transformSingleAst(ast, address)
