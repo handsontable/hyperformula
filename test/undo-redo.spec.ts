@@ -889,6 +889,16 @@ describe('Undo', () => {
 
     expect(engine.isThereSomethingToUndo()).toBe(true)
   })
+
+  it('restore AST after irreversible operation', () => {
+    const engine = HyperFormula.buildFromArray([])
+    engine.setCellContents(adr('E1'), '=SUM(A1:C1)')
+    engine.addColumns(0, [3, 1])
+    engine.removeColumns(0, [0, 1])
+
+    expect(() => engine.undo()).not.toThrowError()
+    expect(engine.getCellFormula(adr('F1'))).toEqual('=SUM(A1:C1)')
+  })
 })
 
 describe('UndoRedo', () => {
@@ -1289,7 +1299,6 @@ describe('Redo - renaming sheet', () => {
     expect(engine.isThereSomethingToRedo()).toBe(false)
   })
 })
-
 
 describe('Redo - clearing sheet', () => {
   it('works', () => {
