@@ -134,7 +134,6 @@ export class SumifPlugin extends FunctionPlugin {
 
   public sumifs(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.runFunction(ast.args, formulaAddress, this.metadata('SUMIFS'), (values: SimpleRangeValue, ...args) => {
-
       const conditions: Condition[] = []
       for (let i = 0; i < args.length; i += 2) {
         const conditionArg = args[i] as SimpleRangeValue
