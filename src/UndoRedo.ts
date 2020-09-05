@@ -471,7 +471,7 @@ export class UndoRedo {
   }
 
   private undoSetSheetContent(operation: SetSheetContentUndoEntry) {
-    const {oldSheetContent, newSheetContent, sheetId} = operation
+    const {oldSheetContent, sheetId} = operation
     this.operations.clearSheet(sheetId)
     for (let rowIndex = 0; rowIndex < oldSheetContent.length; rowIndex++) {
       const row = oldSheetContent[rowIndex]
@@ -509,8 +509,6 @@ export class UndoRedo {
 
   private redoEntry(operation: UndoStackEntry) {
     if (operation instanceof RemoveRowsUndoEntry) {
-      this.redoRemoveRows(operation)
-    } else if (operation instanceof RemoveRowsUndoEntry) {
       this.redoRemoveRows(operation)
     } else if (operation instanceof AddRowsUndoEntry) {
       this.redoAddRows(operation)
