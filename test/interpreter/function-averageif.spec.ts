@@ -9,8 +9,8 @@ describe('Function AVERAGEIF - argument validations and combinations', () => {
       ['=AVERAGEIF(C1, ">0", C1, C1)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA))
-    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NA))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA, 'Wrong number of arguments.'))
+    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NA, 'Wrong number of arguments.'))
   })
 
   it('error when criterion unparsable',  () => {

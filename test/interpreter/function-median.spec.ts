@@ -65,7 +65,7 @@ describe('Function MEDIAN', () => {
       ['=MEDIAN()'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA, 'Wrong number of arguments.'))
   })
 
   it('doesnt do coercions of nonnumeric arguments', () => {

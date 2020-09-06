@@ -7,8 +7,8 @@ describe('Interpreter - SWITCH function', () => {
     const engine = HyperFormula.buildFromArray([
       ['=SWITCH(1)', '=SWITCH(2,3)']
     ])
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA))
-    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.NA))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA, 'Wrong number of arguments.'))
+    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.NA, 'Wrong number of arguments.'))
   })
 
   it('Should work with more arguments', () => {

@@ -96,7 +96,7 @@ export class Evaluator {
           } else if (vertex instanceof FormulaCellVertex) {
             const address = vertex.getAddress(this.dependencyGraph.lazilyTransformingAstService)
             this.columnSearch.remove(vertex.valueOrNull(), address)
-            const error = new CellError(ErrorType.CYCLE, `Cyclical dependency in ${vertex.address}.`)
+            const error = new CellError(ErrorType.CYCLE)
             vertex.setCellValue(error)
             changes.addChange(error, vertex.address)
           }
@@ -137,7 +137,7 @@ export class Evaluator {
   private recomputeFormulas(cycled: Vertex[], sorted: Vertex[]): void {
     cycled.forEach((vertex: Vertex) => {
       if (vertex instanceof FormulaCellVertex) {
-        vertex.setCellValue(new CellError(ErrorType.CYCLE,`Cyclical dependency in ${vertex.address}.`))
+        vertex.setCellValue(new CellError(ErrorType.CYCLE))
       }
     })
     sorted.forEach((vertex: Vertex) => {
