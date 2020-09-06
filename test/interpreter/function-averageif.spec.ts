@@ -18,7 +18,7 @@ describe('Function AVERAGEIF - argument validations and combinations', () => {
       ['=AVERAGEIF(B1:B2, "><foo", C1:C2)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE, 'Incorrect criterion.'))
   })
 
   it('error when different width dimension of arguments',  () => {

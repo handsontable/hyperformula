@@ -65,7 +65,7 @@ export class Interpreter {
       case AstNodeType.CELL_REFERENCE: {
         const address = ast.reference.toSimpleCellAddress(formulaAddress)
         if (invalidSimpleCellAddress(address)) {
-          return new CellError(ErrorType.REF, `Address ${address} is not correct.`)
+          return new CellError(ErrorType.REF, `Address is not correct.`)
         }
         return this.dependencyGraph.getCellValue(address)
       }

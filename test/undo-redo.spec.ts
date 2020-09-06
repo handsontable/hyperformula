@@ -775,7 +775,7 @@ describe('Undo - add named expression', () => {
     engine.undo()
 
     expect(engine.listNamedExpressions().length).toEqual(0)
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NAME))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NAME, 'Named expression foo not recognized.'))
   })
 })
 
@@ -1590,7 +1590,7 @@ describe('Redo - remove named expression', () => {
     engine.redo()
 
     expect(engine.listNamedExpressions().length).toEqual(0)
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NAME))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NAME, 'Named expression foo not recognized.'))
   })
 
   it('clears redo stack', () => {

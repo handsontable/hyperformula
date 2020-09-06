@@ -12,13 +12,13 @@ describe('Function ATANH', () => {
   it('error for 1', () => {
     const engine = HyperFormula.buildFromArray([['=ATANH(1)']])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM, 'Infinite value.'))
   })
 
   it('error for -1', () => {
     const engine = HyperFormula.buildFromArray([['=ATANH(-1)']])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM, 'Infinite value.'))
   })
 
   it('when value not numeric', () => {

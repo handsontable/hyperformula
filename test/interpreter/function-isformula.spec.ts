@@ -41,10 +41,10 @@ describe('Function ISFORMULA', () => {
       ['=ISFORMULA()', '=ISFORMULA(A1, A2)', '=ISFORMULA("foo")', '=ISFORMULA(42)']
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA))
-    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.NA))
-    expect(engine.getCellValue(adr('C1'))).toEqual(detailedError(ErrorType.NA))
-    expect(engine.getCellValue(adr('D1'))).toEqual(detailedError(ErrorType.NA))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA, 'At least one argument required.'))
+    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.NA, 'At least one argument required.'))
+    expect(engine.getCellValue(adr('C1'))).toEqual(detailedError(ErrorType.NA, 'At least one argument required.'))
+    expect(engine.getCellValue(adr('D1'))).toEqual(detailedError(ErrorType.NA, 'At least one argument required.'))
   })
 
   it('should work for itself', () => {

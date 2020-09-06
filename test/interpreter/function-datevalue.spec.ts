@@ -6,10 +6,10 @@ describe('Function DATEVALUE', () => {
   it('with wrong arguments', () => {
     const engine = HyperFormula.buildFromArray([['=DATEVALUE("foo")', '=DATEVALUE(1)', '=DATEVALUE(1, 2)', '=DATEVALUE()']])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE))
-    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.VALUE))
-    expect(engine.getCellValue(adr('C1'))).toEqual(detailedError(ErrorType.NA))
-    expect(engine.getCellValue(adr('D1'))).toEqual(detailedError(ErrorType.NA))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE, 'String does not represent correct DateTime.'))
+    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.VALUE, 'String does not represent correct DateTime.'))
+    expect(engine.getCellValue(adr('C1'))).toEqual(detailedError(ErrorType.NA, 'Wrong number of arguments.'))
+    expect(engine.getCellValue(adr('D1'))).toEqual(detailedError(ErrorType.NA, 'Wrong number of arguments.'))
   })
 
   it('with string arguments', () => {

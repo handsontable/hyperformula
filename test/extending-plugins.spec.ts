@@ -32,6 +32,6 @@ describe('Plugins', () => {
       ['=foo()'],
     ], {functionPlugins: [FooPlugin]})
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NAME))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NAME, 'Function name FOO not recognized.'))
   })
 })

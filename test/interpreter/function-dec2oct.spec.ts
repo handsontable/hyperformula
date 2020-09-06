@@ -100,8 +100,8 @@ describe('function DEC2OCT', () => {
       ['=DEC2OCT(-2, 12)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM))
-    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NUM))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM, 'Value too small.'))
+    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NUM, 'Value too small.'))
   })
 
   // Inconsistency with Product 1

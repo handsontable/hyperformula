@@ -127,7 +127,7 @@ describe('Register static custom plugin', () => {
 
     expect(HyperFormula.getRegisteredFunctionNames('enGB')).not.toContain('FOO')
     expect(HyperFormula.getRegisteredFunctionNames('enGB')).toContain('BAR')
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NAME))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NAME, 'Function name FOO not recognized.'))
     expect(engine.getCellValue(adr('B1'))).toEqual('bar')
   })
 
@@ -207,7 +207,7 @@ describe('Instance level formula registry', () => {
     expectArrayWithSameContent(['FOO', 'BAR', 'VERSION'], engine.getRegisteredFunctionNames())
     expect(engine.getCellValue(adr('A1'))).toEqual('foo')
     expect(engine.getCellValue(adr('B1'))).toEqual('bar')
-    expect(engine.getCellValue(adr('C1'))).toEqual(detailedError(ErrorType.NAME))
+    expect(engine.getCellValue(adr('C1'))).toEqual(detailedError(ErrorType.NAME, 'Function name SUM not recognized.'))
   })
 
   it('modifying static plugins should not affect existing engine instance registry', () => {

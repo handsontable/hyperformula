@@ -61,7 +61,7 @@ describe('Interpreter', () => {
   it('procedures - not known procedure', () => {
     const engine = HyperFormula.buildFromArray([['=FOO()']])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NAME))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NAME, 'Function name FOO not recognized.'))
   })
 
   it('errors - parsing errors', () => {
@@ -172,11 +172,11 @@ describe('Interpreter', () => {
       ]
     })
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.REF))
-    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.REF))
-    expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.REF))
-    expect(engine.getCellValue(adr('A4'))).toEqual(detailedError(ErrorType.REF))
-    expect(engine.getCellValue(adr('A5'))).toEqual(detailedError(ErrorType.REF))
-    expect(engine.getCellValue(adr('A6'))).toEqual(detailedError(ErrorType.REF))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.REF,'Range spans more than one sheet.'))
+    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.REF, 'Range spans more than one sheet.'))
+    expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.REF, 'Range spans more than one sheet.'))
+    expect(engine.getCellValue(adr('A4'))).toEqual(detailedError(ErrorType.REF, 'Range spans more than one sheet.'))
+    expect(engine.getCellValue(adr('A5'))).toEqual(detailedError(ErrorType.REF, 'Range spans more than one sheet.'))
+    expect(engine.getCellValue(adr('A6'))).toEqual(detailedError(ErrorType.REF, 'Range spans more than one sheet.'))
   })
 })

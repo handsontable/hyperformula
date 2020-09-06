@@ -63,7 +63,7 @@ describe('Function DECIMAL', () => {
       ['=DECIMAL("XYZ", 37)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM, 'Value too small.'))
     expect(engine.getCellValue(adr('A2'))).toEqual(2)
     expect(engine.getCellValue(adr('A3'))).toEqual(44027)
     expect(engine.getCellValue(adr('A4'))).toEqual(detailedError(ErrorType.NUM))

@@ -126,7 +126,7 @@ describe('function OCT2BIN', () => {
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM))
-    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NUM))
+    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NUM, 'Value too large.'))
   })
 
   // Inconsistency with Product 1
