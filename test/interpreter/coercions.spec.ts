@@ -87,7 +87,7 @@ describe('#coerceScalarToNumberOrError', () => {
     expect(arithmeticHelper.coerceScalarToNumberOrError('00:00:00')).toEqual(0)
     expect(arithmeticHelper.coerceScalarToNumberOrError(true)).toEqual(1)
 
-    expect(arithmeticHelper.coerceScalarToNumberOrError('foo42')).toEqual(new CellError(ErrorType.VALUE))
+    expect(arithmeticHelper.coerceScalarToNumberOrError('foo42')).toEqual(new CellError(ErrorType.VALUE, 'Value cannot be coerced to number.'))
 
     expect(arithmeticHelper.coerceScalarToNumberOrError('1')).toEqual(1)
   })

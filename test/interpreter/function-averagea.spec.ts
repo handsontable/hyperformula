@@ -6,7 +6,7 @@ describe('AVERAGEA', () => {
   it('AVERAGEA with empty args', () => {
     const engine = HyperFormula.buildFromArray([['=AVERAGEA()']])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA, 'Wrong number of arguments.'))
   })
 
   it('AVERAGEA with args', () => {

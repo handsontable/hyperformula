@@ -5,7 +5,7 @@ import {adr, detailedError} from '../testUtils'
 describe('MAX', () => {
   it('MAX with empty args',  () => {
     const engine =  HyperFormula.buildFromArray([['=MAX()']])
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA, 'Wrong number of arguments.'))
   })
 
   it('MAX with args',  () => {

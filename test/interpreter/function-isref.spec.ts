@@ -33,8 +33,8 @@ describe('Function ISREF', () => {
     const engine = HyperFormula.buildFromArray([
       ['=ISREF(1, 2)', '=ISREF()'],
     ])
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA))
-    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.NA))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA, 'Wrong number of arguments.'))
+    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.NA, 'Wrong number of arguments.'))
   })
 
   // Inconsistency with Product 1

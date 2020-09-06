@@ -8,7 +8,7 @@ describe('function HEX2OCT', () => {
       ['=HEX2OCT("foo", 2, 3)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA, 'Wrong number of arguments.'))
   })
 
   it('should not work for non-hex arguments', () => {

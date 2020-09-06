@@ -6,7 +6,7 @@ describe('MINA', () => {
   it('MINA with empty args', () => {
     const engine = HyperFormula.buildFromArray([['=MINA()']])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA, 'Wrong number of arguments.'))
   })
 
   it('MINA with args', () => {

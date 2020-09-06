@@ -7,8 +7,8 @@ describe('Function IFNA', () => {
     const engine = HyperFormula.buildFromArray([
       ['=IFNA(1)', '=IFNA(2,3,4)']
     ])
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA))
-    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.NA))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA, 'Wrong number of arguments.'))
+    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.NA, 'Wrong number of arguments.'))
   })
   it('when no error', () => {
     const engine = HyperFormula.buildFromArray([['=IFNA("abcd", "no")']])

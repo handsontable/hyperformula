@@ -37,7 +37,7 @@ describe('Matrix plugin', () => {
       ['{=mmult(A1:B3,A4:C6)}'],
     ])
 
-    expect(engine.getCellValue(adr('A7'))).toEqual(detailedError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A7'))).toEqual(detailedError(ErrorType.VALUE, 'Matrix dimensions are not compatible.'))
     expect(engine.getCellValue(adr('B7'))).toBe(null)
   })
 
@@ -49,7 +49,7 @@ describe('Matrix plugin', () => {
       ['3', '4'],
     ])
 
-    expect(engine.getCellValue(adr('C1'))).toEqual(detailedError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('C1'))).toEqual(detailedError(ErrorType.VALUE, 'Number-only range expected.'))
     expect(engine.getCellValue(adr('D1'))).toEqual(detailedError(ErrorType.VALUE))
     expect(engine.getCellValue(adr('C2'))).toEqual(detailedError(ErrorType.VALUE))
     expect(engine.getCellValue(adr('D2'))).toEqual(detailedError(ErrorType.VALUE))
@@ -98,8 +98,8 @@ describe('Matrix plugin', () => {
       ['{=MMULT(A1:A2)}', '{=MMULT(A1:A2, B1:B2, C1:C2)}'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA))
-    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.NA))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA, 'Wrong number of arguments.'))
+    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.NA, 'Wrong number of arguments.'))
   })
 
   it('matrix multiplication by sumproduct', () => {
@@ -158,8 +158,8 @@ describe('Matrix plugin', () => {
       ['{=MAXPOOL(A1:A2)}', '{=MAXPOOL(A1:A2, 0,0,0)}'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA))
-    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.NA))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA, 'Wrong number of arguments.'))
+    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.NA, 'Wrong number of arguments.'))
   })
 
   it('matrix medianpool on even square', () => {
@@ -179,8 +179,8 @@ describe('Matrix plugin', () => {
       ['{=MEDIANPOOL(A1:A2)}', '{=MEDIANPOOL(A1:A2, 0,0,0)}'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA))
-    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.NA))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA, 'Wrong number of arguments.'))
+    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.NA, 'Wrong number of arguments.'))
   })
 
   it('matrix medianpool on odd square', () => {
@@ -244,8 +244,8 @@ describe('Function TRANSPOSE', () => {
       ['{=TRANSPOSE()}', '{=TRANSPOSE(A1:A2, B1:B2)}'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA))
-    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.NA))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA, 'Wrong number of arguments.'))
+    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.NA, 'Wrong number of arguments.'))
   })
   it('transpose returns VALUE when wrong type', () => {
     const engine = HyperFormula.buildFromArray([

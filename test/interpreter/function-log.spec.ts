@@ -58,8 +58,8 @@ describe('Function LOG', () => {
   it('wrong number of arguments', () => {
     const engine = HyperFormula.buildFromArray([['=LOG()', '=LOG(42, 42, 42)']])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA))
-    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.NA))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA, 'Wrong number of arguments.'))
+    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.NA, 'Wrong number of arguments.'))
   })
 
   it('use number coercion',  () => {
