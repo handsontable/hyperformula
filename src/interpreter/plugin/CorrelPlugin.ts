@@ -23,11 +23,11 @@ export class CorrelPlugin extends FunctionPlugin {
   public correl(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.runFunction(ast.args, formulaAddress, this.metadata('CORREL'), (dataX: SimpleRangeValue, dataY: SimpleRangeValue) => {
       if (dataX.numberOfElements() !== dataY.numberOfElements()) {
-        return new CellError(ErrorType.NA)
+        return new CellError(ErrorType.NA, 'Ranges need to be of equal length.')
       }
 
       if (dataX.numberOfElements() <= 1) {
-        return new CellError(ErrorType.DIV_BY_ZERO)
+        return new CellError(ErrorType.DIV_BY_ZERO, 'Range needs to contain at least two elements.')
       }
 
       return this.computePearson(dataX, dataY)

@@ -189,7 +189,7 @@ export class BooleanPlugin extends FunctionPlugin {
       if (i < n) {
         return args[i]
       } else {
-        return new CellError(ErrorType.NA)
+        return new CellError(ErrorType.NA, 'No default option.')
       }
     })
   }
@@ -216,8 +216,12 @@ export class BooleanPlugin extends FunctionPlugin {
 
   public choose(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.runFunction(ast.args, formulaAddress, this.metadata('CHOOSE'), (selector, ...args) => {
-      if (selector !== Math.round(selector) || selector < 1 || selector > args.length) {
-        return new CellError(ErrorType.NUM)
+      if (selector !== Math.round(selector)) {
+        return new CellError(ErrorType.NUM, 'Selector needs to be integer.')
+      } else if( selector < 1 ) {
+        return new CellError(ErrorType.NUM, 'Selector needs to be at least 1.')
+      } else if (selector > args.length) {
+        return new CellError(ErrorType.NUM, 'Selector cannot exceed number of arguments.')
       }
       return args[selector - 1]
     })

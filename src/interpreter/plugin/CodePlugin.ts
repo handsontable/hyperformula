@@ -20,7 +20,7 @@ export class CodePlugin extends FunctionPlugin {
   public code(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.runFunction(ast.args, formulaAddress, this.metadata('CODE'), (value: string) => {
       if (value.length === 0) {
-        return new CellError(ErrorType.VALUE)
+        return new CellError(ErrorType.VALUE, 'Empty-string argument not allowed.')
       }
       return value.charCodeAt(0)
     })

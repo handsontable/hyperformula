@@ -166,12 +166,12 @@ export class InformationPlugin extends FunctionPlugin {
    */
   public isformula(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.runFunctionWithReferenceArgument(ast.args, formulaAddress, this.metadata('ISFORMULA'),
-      () => new CellError(ErrorType.NA),
+      () => new CellError(ErrorType.NA, 'At least one argument required.'),
       (reference: SimpleCellAddress) => {
         const vertex = this.dependencyGraph.addressMapping.getCell(reference)
         return vertex instanceof FormulaCellVertex || (vertex instanceof MatrixVertex && vertex.isFormula())
       },
-      () => new CellError(ErrorType.NA)
+      () => new CellError(ErrorType.NA, 'Cell reference required.')
     )
   }
 
@@ -284,16 +284,16 @@ export class InformationPlugin extends FunctionPlugin {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public columns(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     if (ast.args.length !== 1) {
-      return new CellError(ErrorType.NA)
+      return new CellError(ErrorType.NA, 'Wrong number of arguments.')
     }
     if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
-      return new CellError(ErrorType.NUM)
+      return new CellError(ErrorType.NUM, 'Empty function argument.')
     }
     const rangeAst = ast.args[0]
     if (rangeAst.type === AstNodeType.CELL_RANGE) {
       return (rangeAst.end.col - rangeAst.start.col + 1)
     } else {
-      return new CellError(ErrorType.VALUE)
+      return new CellError(ErrorType.VALUE, 'Cell range expected.')
     }
   }
 

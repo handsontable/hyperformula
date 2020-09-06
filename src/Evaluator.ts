@@ -96,7 +96,7 @@ export class Evaluator {
           } else if (vertex instanceof FormulaCellVertex) {
             const address = vertex.getAddress(this.dependencyGraph.lazilyTransformingAstService)
             this.columnSearch.remove(vertex.valueOrNull(), address)
-            const error = new CellError(ErrorType.CYCLE)
+            const error = new CellError(ErrorType.CYCLE, `Cyclical dependency in ${vertex.address}.`)
             vertex.setCellValue(error)
             changes.addChange(error, vertex.address)
           }
@@ -137,7 +137,7 @@ export class Evaluator {
   private recomputeFormulas(cycled: Vertex[], sorted: Vertex[]): void {
     cycled.forEach((vertex: Vertex) => {
       if (vertex instanceof FormulaCellVertex) {
-        vertex.setCellValue(new CellError(ErrorType.CYCLE))
+        vertex.setCellValue(new CellError(ErrorType.CYCLE,`Cyclical dependency in ${vertex.address}.`))
       }
     })
     sorted.forEach((vertex: Vertex) => {
@@ -171,7 +171,7 @@ export class Evaluator {
       return interpreterValue
     } else if (typeof interpreterValue === 'number') {
       if (isNumberOverflow(interpreterValue)) {
-        return new CellError(ErrorType.NUM)
+        return new CellError(ErrorType.NUM, 'Infinite value.')
       } else {
         return fixNegativeZero(interpreterValue)
       }
@@ -189,7 +189,7 @@ export class Evaluator {
     } else if (interpreterValue instanceof SimpleRangeValue && interpreterValue.hasOnlyNumbers()) {
       return interpreterValue
     } else {
-      return new CellError(ErrorType.VALUE)
+      return new CellError(ErrorType.VALUE, 'Range value expected.')
     }
   }
 }

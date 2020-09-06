@@ -56,7 +56,7 @@ function shiftRight(value: number, positions: number): number | CellError {
 
 function validate(result: number): number | CellError {
   if (result > MAX_48BIT_INTEGER) {
-    return new CellError(ErrorType.NUM)
+    return new CellError(ErrorType.NUM, 'Result of bitshift is too long.')
   } else {
     return result
   }

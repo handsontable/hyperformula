@@ -232,7 +232,7 @@ export class FinancialPlugin extends FunctionPlugin {
     return this.runFunction(ast.args, formulaAddress, this.metadata('CUMIPMT'),
       (rate: number, periods: number, value: number, start: number, end: number, type: number) => {
         if (start > end) {
-          return new CellError(ErrorType.NUM)
+          return new CellError(ErrorType.NUM, 'End period needs to be at least start period.')
         }
         let acc = 0
         for(let i = start; i <= end; i++) {
@@ -247,7 +247,7 @@ export class FinancialPlugin extends FunctionPlugin {
     return this.runFunction(ast.args, formulaAddress, this.metadata('CUMPRINC'),
       (rate: number, periods: number, value: number, start: number, end: number, type: number) => {
         if (start > end) {
-          return new CellError(ErrorType.NUM)
+          return new CellError(ErrorType.NUM, 'End period needs to be at least start period.')
         }
         let acc = 0
         for(let i = start; i <= end; i++) {
@@ -262,7 +262,7 @@ export class FinancialPlugin extends FunctionPlugin {
     return this.runFunction(ast.args, formulaAddress, this.metadata('DB'),
       (cost: number, salvage: number, life: number, period: number, month: number) => {
         if ((month===12 && period > life) || (period > life+1)) {
-          return new CellError(ErrorType.NUM)
+          return new CellError(ErrorType.NUM, 'Period number cannot exceed life length.')
         }
 
         if (salvage >= cost) {

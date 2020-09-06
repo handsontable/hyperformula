@@ -193,9 +193,9 @@ export class DatePlugin extends FunctionPlugin {
       const date = {year: y, month: m, day: 1}
       if (this.interpreter.dateHelper.isValidDate(date)) {
         const ret = this.interpreter.dateHelper.dateToNumber(date) + (d - 1)
-        return this.interpreter.dateHelper.getWithinBounds(ret) ?? new CellError(ErrorType.NUM)
+        return this.interpreter.dateHelper.getWithinBounds(ret) ?? new CellError(ErrorType.NUM, 'Date outside of bounds.')
       }
-      return new CellError(ErrorType.VALUE)
+      return new CellError(ErrorType.VALUE, 'Invalid date.')
     })
   }
 
@@ -204,7 +204,7 @@ export class DatePlugin extends FunctionPlugin {
       (h, m, s) => {
         const ret = timeToNumber({hours: Math.trunc(h), minutes: Math.trunc(m), seconds: Math.trunc(s)})
         if(ret<0) {
-          return new CellError(ErrorType.NUM)
+          return new CellError(ErrorType.NUM, 'Time cannot be negative.')
         }
         return ret%1
       }
@@ -215,7 +215,7 @@ export class DatePlugin extends FunctionPlugin {
     return this.runFunction(ast.args, formulaAddress, this.metadata('EOMONTH'), (dateNumber, numberOfMonthsToShift) => {
       const date = this.interpreter.dateHelper.numberToSimpleDate(dateNumber)
       const ret = this.interpreter.dateHelper.dateToNumber(this.interpreter.dateHelper.endOfMonth(offsetMonth(date, numberOfMonthsToShift)))
-      return this.interpreter.dateHelper.getWithinBounds(ret) ?? new CellError(ErrorType.NUM)
+      return this.interpreter.dateHelper.getWithinBounds(ret) ?? new CellError(ErrorType.NUM, 'Date outside of bounds.')
     })
   }
 
@@ -298,7 +298,7 @@ export class DatePlugin extends FunctionPlugin {
         }
         const offset = weekdayOffsets.get(type)
         if(offset===undefined) {
-          return new CellError(ErrorType.NUM)
+          return new CellError(ErrorType.NUM, 'Weekday standard not recognized.')
         }
         return (absoluteDay-offset)%7+1
       }
@@ -317,7 +317,7 @@ export class DatePlugin extends FunctionPlugin {
         }
         const offset = weekdayOffsets.get(type)
         if(offset===undefined) {
-          return new CellError(ErrorType.NUM)
+          return new CellError(ErrorType.NUM, 'Weekday standard not recognized.')
         }
         return Math.floor((absoluteDay-offset)/7) - Math.floor((yearStartAbsolute-offset)/7)+1
       }
@@ -346,7 +346,7 @@ export class DatePlugin extends FunctionPlugin {
       (date: string) => {
         const dateTime = this.interpreter.dateHelper.parseDateTimeFromConfigFormats(date)
         if(dateTime === undefined) {
-          return new CellError(ErrorType.VALUE)
+          return new CellError(ErrorType.VALUE, 'String does not represent correct DateTime.')
         }
         if(!instanceOfSimpleDate(dateTime)) {
           return 0
@@ -362,7 +362,7 @@ export class DatePlugin extends FunctionPlugin {
       (date: string) => {
         const dateNumber = this.interpreter.dateHelper.dateStringToDateNumber(date)
         if(dateNumber===undefined){
-          return new CellError(ErrorType.VALUE)
+          return new CellError(ErrorType.VALUE, 'String does not represent correct Date.')
         }
         return dateNumber%1
       }

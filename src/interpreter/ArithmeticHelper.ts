@@ -202,7 +202,7 @@ export class ArithmeticHelper {
     if (arg instanceof CellError) {
       return arg
     }
-    return this.coerceToMaybeNumber(arg) ?? new CellError(ErrorType.VALUE)
+    return this.coerceToMaybeNumber(arg) ?? new CellError(ErrorType.VALUE, 'Value cannot be coerced to number.')
   }
 
   public coerceToMaybeNumber(arg: InternalScalarValue): Maybe<number> {

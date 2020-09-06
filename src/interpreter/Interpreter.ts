@@ -65,7 +65,7 @@ export class Interpreter {
       case AstNodeType.CELL_REFERENCE: {
         const address = ast.reference.toSimpleCellAddress(formulaAddress)
         if (invalidSimpleCellAddress(address)) {
-          return new CellError(ErrorType.REF)
+          return new CellError(ErrorType.REF, `Address ${address} is not correct.`)
         }
         return this.dependencyGraph.getCellValue(address)
       }
@@ -169,7 +169,7 @@ export class Interpreter {
       case AstNodeType.PLUS_UNARY_OP: {
         const result = this.evaluateAst(ast.value, formulaAddress)
         if (result instanceof SimpleRangeValue) {
-          return new CellError(ErrorType.VALUE)
+          return new CellError(ErrorType.VALUE, 'Non-range value expected.')
         } else {
           return result
         }
@@ -177,7 +177,7 @@ export class Interpreter {
       case AstNodeType.MINUS_UNARY_OP: {
         const result = this.evaluateAst(ast.value, formulaAddress)
         if (result instanceof SimpleRangeValue) {
-          return new CellError(ErrorType.VALUE)
+          return new CellError(ErrorType.VALUE, 'Non-range value expected.')
         } else {
           return wrapperUnary((a) => -a,
             this.arithmeticHelper.coerceScalarToNumberOrError(result))
@@ -186,7 +186,7 @@ export class Interpreter {
       case AstNodeType.PERCENT_OP: {
         const result = this.evaluateAst(ast.value, formulaAddress)
         if (result instanceof SimpleRangeValue) {
-          return new CellError(ErrorType.VALUE)
+          return new CellError(ErrorType.VALUE, 'Non-range value expected.')
         } else {
           return wrapperUnary((a) => a/100,
             this.arithmeticHelper.coerceScalarToNumberOrError(result))
@@ -198,7 +198,7 @@ export class Interpreter {
           const [pluginFunction, pluginInstance] = pluginEntry as [string, any]
           return pluginInstance[pluginFunction](ast, formulaAddress)
         } else {
-          return new CellError(ErrorType.NAME)
+          return new CellError(ErrorType.NAME, `Function name ${ast.procedureName} not recognized.`)
         }
       }
       case AstNodeType.NAMED_EXPRESSION: {
@@ -206,12 +206,12 @@ export class Interpreter {
         if (namedExpression) {
           return this.dependencyGraph.getCellValue(namedExpression.address)
         } else {
-          return new CellError(ErrorType.NAME)
+          return new CellError(ErrorType.NAME, `Named expression ${ast.expressionName} not recognized.`)
         }
       }
       case AstNodeType.CELL_RANGE: {
         if (!this.rangeSpansOneSheet(ast)) {
-          return new CellError(ErrorType.REF)
+          return new CellError(ErrorType.REF, 'Range spans more than one sheet.')
         }
         const range = AbsoluteCellRange.fromCellRange(ast, formulaAddress)
         const matrixVertex = this.dependencyGraph.getMatrix(range)
@@ -232,14 +232,14 @@ export class Interpreter {
       }
       case AstNodeType.COLUMN_RANGE: {
         if (!this.rangeSpansOneSheet(ast)) {
-          return new CellError(ErrorType.REF)
+          return new CellError(ErrorType.REF, 'Range spans more than one sheet.')
         }
         const range = AbsoluteColumnRange.fromColumnRange(ast, formulaAddress)
         return SimpleRangeValue.onlyRange(range, this.dependencyGraph)
       }
       case AstNodeType.ROW_RANGE: {
         if (!this.rangeSpansOneSheet(ast)) {
-          return new CellError(ErrorType.REF)
+          return new CellError(ErrorType.REF, 'Range spans more than one sheet.')
         }
         const range = AbsoluteRowRange.fromRowRange(ast, formulaAddress)
         return SimpleRangeValue.onlyRange(range, this.dependencyGraph)
@@ -277,11 +277,11 @@ function passErrors(left: InterpreterValue, right: InterpreterValue): Maybe<Cell
   if (left instanceof CellError) {
     return left
   } else if (left instanceof SimpleRangeValue) {
-    return new CellError(ErrorType.VALUE)
+    return new CellError(ErrorType.VALUE, 'Non-range value expected.')
   } else if (right instanceof CellError) {
     return right
   } else if (right instanceof SimpleRangeValue) {
-    return new CellError(ErrorType.VALUE)
+    return new CellError(ErrorType.VALUE, 'Non-range value expected.')
   } else {
     return undefined
   }
