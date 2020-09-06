@@ -6,8 +6,8 @@ describe('Function MONTH', () => {
   it('with wrong arguments', () => {
     const engine = HyperFormula.buildFromArray([['=MONTH("foo")', '=MONTH("12/30/2018")', '=MONTH(1, 2)', '=MONTH()']])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE))
-    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE, 'Value cannot be coerced to number.'))
+    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.VALUE, 'Value cannot be coerced to number.'))
     expect(engine.getCellValue(adr('C1'))).toEqual(detailedError(ErrorType.NA))
     expect(engine.getCellValue(adr('D1'))).toEqual(detailedError(ErrorType.NA))
   })

@@ -37,7 +37,7 @@ describe('Function SPLIT', () => {
   it('when 2nd arg not a number', () => {
     const engine = HyperFormula.buildFromArray([['some words', '=SPLIT(A1, "foo")']])
 
-    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.VALUE, 'Value cannot be coerced to number.'))
   })
 
   it('when index arg is not value within bounds', () => {

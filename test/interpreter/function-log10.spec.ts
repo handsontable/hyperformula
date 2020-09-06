@@ -12,7 +12,7 @@ describe('Function LOG10', () => {
   it('when value not numeric', () => {
     const engine = HyperFormula.buildFromArray([['=LOG10("foo")']])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE, 'Value cannot be coerced to number.'))
   })
 
   it('for zero', () => {

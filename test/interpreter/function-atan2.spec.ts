@@ -12,7 +12,7 @@ describe('Function ATAN2', () => {
   it('when value not numeric', () => {
     const engine = HyperFormula.buildFromArray([['=ATAN2(1,"foo")']])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE, 'Value cannot be coerced to number.'))
   })
 
   it('wrong number of arguments', () => {

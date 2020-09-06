@@ -19,7 +19,7 @@ describe('Function REPT', () => {
       ['=REPT("foo", "bar")'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE, 'Value cannot be coerced to number.'))
   })
 
   it('should return VALUE when second parameter is less than 0', () => {

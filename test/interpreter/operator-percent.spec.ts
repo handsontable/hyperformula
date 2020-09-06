@@ -19,7 +19,7 @@ describe('Percent operator', () => {
     ])
 
     expect(engine.getCellValue(adr('A1'))).toBe(0.03)
-    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.VALUE, 'Value cannot be coerced to number.'))
     expect(engine.getCellValue(adr('A3'))).toEqual(0.01)
   })
 

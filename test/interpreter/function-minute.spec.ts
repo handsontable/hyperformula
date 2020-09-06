@@ -6,8 +6,8 @@ describe('Function MINUTE', () => {
   it('with wrong arguments', () => {
     const engine = HyperFormula.buildFromArray([['=MINUTE("foo")', '=MINUTE("12/30/2018")', '=MINUTE(1, 2)', '=MINUTE()']])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE))
-    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE, 'Value cannot be coerced to number.'))
+    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.VALUE, 'Value cannot be coerced to number.'))
     expect(engine.getCellValue(adr('C1'))).toEqual(detailedError(ErrorType.NA))
     expect(engine.getCellValue(adr('D1'))).toEqual(detailedError(ErrorType.NA))
   })

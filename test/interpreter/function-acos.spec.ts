@@ -12,7 +12,7 @@ describe('Function ACOS', () => {
   it('when value not numeric', () => {
     const engine = HyperFormula.buildFromArray([['=ACOS("foo")']])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE, 'Value cannot be coerced to number.'))
   })
 
   it('for 1 (edge)', () => {

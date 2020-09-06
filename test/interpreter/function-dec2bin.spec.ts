@@ -8,7 +8,7 @@ describe('function DEC2BIN', () => {
       ['=DEC2BIN("foo")'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE, 'Value cannot be coerced to number.'))
   })
 
   it('should return error when wrong number of argument', () => {

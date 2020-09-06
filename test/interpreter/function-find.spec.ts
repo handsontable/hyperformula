@@ -19,7 +19,7 @@ describe('Function FIND', () => {
       ['=FIND("foo", "bar", "baz")'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE, 'Value cannot be coerced to number.'))
   })
 
   it('should return VALUE if third parameter is not between 1 and text length', () => {

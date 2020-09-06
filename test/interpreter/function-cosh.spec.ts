@@ -13,7 +13,7 @@ describe('Function COSH', () => {
   it('when value not numeric', () => {
     const engine = HyperFormula.buildFromArray([['=COSH("foo")']])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE, 'Value cannot be coerced to number.'))
   })
 
   it('wrong number of arguments', () => {

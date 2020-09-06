@@ -26,7 +26,7 @@ describe('Operator DIVISION', () => {
     ])
 
     expect(engine.getCellValue(adr('A1'))).toBe(3)
-    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.VALUE, 'Value cannot be coerced to number.'))
   })
 
   it('pass error from left operand', () => {
