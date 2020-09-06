@@ -28,10 +28,10 @@ export class MatrixPlugin extends FunctionPlugin {
 
   public mmult(ast: ProcedureAst, formulaAddress: SimpleCellAddress): SimpleRangeValue | CellError {
     if (ast.args.length !== 2) {
-      return new CellError(ErrorType.NA)
+      return new CellError(ErrorType.NA, 'Wrong number of arguments.')
     }
     if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
-      return new CellError(ErrorType.NUM)
+      return new CellError(ErrorType.NUM, 'Empty function argument.')
     }
     const [left, right] = ast.args
 
@@ -43,7 +43,7 @@ export class MatrixPlugin extends FunctionPlugin {
     } else if (rightMatrix instanceof CellError) {
       return rightMatrix
     } else if (leftMatrix === null || rightMatrix === null) {
-      return new CellError(ErrorType.VALUE)
+      return new CellError(ErrorType.VALUE, 'Number-only range expected.')
     }
 
     const outputSize = matrixSizeForMultiplication(leftMatrix.size, rightMatrix.size)
@@ -72,21 +72,21 @@ export class MatrixPlugin extends FunctionPlugin {
     let stride = windowSize
 
     if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
-      return new CellError(ErrorType.NUM)
+      return new CellError(ErrorType.NUM, 'Empty function argument.')
     }
     if (ast.args.length === 3) {
       const strideArg = ast.args[2]
       if (strideArg.type === AstNodeType.NUMBER) {
         stride = strideArg.value
       } else {
-        return new CellError(ErrorType.VALUE)
+        return new CellError(ErrorType.VALUE, 'Number expected.')
       }
     }
 
     if (rangeMatrix instanceof CellError) {
       return rangeMatrix
     } else if (rangeMatrix === null) {
-      return new CellError(ErrorType.VALUE)
+      return new CellError(ErrorType.VALUE, 'Number-only range expected.')
     }
 
     const outputSize = matrixSizeForPoolFunction(rangeMatrix.size, windowSize, stride)
@@ -116,7 +116,7 @@ export class MatrixPlugin extends FunctionPlugin {
     const [rangeArg, sizeArg] = ast.args as [Ast, NumberAst]
 
     if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
-      return new CellError(ErrorType.NUM)
+      return new CellError(ErrorType.NUM, 'Empty function argument.')
     }
     const rangeMatrix = coerceToRangeNumbersOrError(this.evaluateAst(rangeArg, formulaAddress))
     const windowSize = sizeArg.value
@@ -127,14 +127,14 @@ export class MatrixPlugin extends FunctionPlugin {
       if (strideArg.type === AstNodeType.NUMBER) {
         stride = strideArg.value
       } else {
-        return new CellError(ErrorType.VALUE)
+        return new CellError(ErrorType.VALUE, 'Number expected.')
       }
     }
 
     if (rangeMatrix instanceof CellError) {
       return rangeMatrix
     } else if (rangeMatrix === null) {
-      return new CellError(ErrorType.VALUE)
+      return new CellError(ErrorType.VALUE, 'Number-only range expected.')
     }
 
     const outputSize = matrixSizeForPoolFunction(rangeMatrix.size, windowSize, stride)
@@ -204,17 +204,17 @@ export class MatrixPlugin extends FunctionPlugin {
 
   public transpose(ast: ProcedureAst, formulaAddress: SimpleCellAddress): SimpleRangeValue | CellError {
     if (ast.args.length !== 1) {
-      return new CellError(ErrorType.NA)
+      return new CellError(ErrorType.NA, 'Wrong number of arguments.')
     }
     if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
-      return new CellError(ErrorType.NUM)
+      return new CellError(ErrorType.NUM, 'Empty function argument.')
     }
     const value = coerceToRangeNumbersOrError(this.evaluateAst(ast.args[0], formulaAddress))
 
     if (value instanceof CellError) {
       return value
     } else if (value === null) {
-      return new CellError(ErrorType.VALUE)
+      return new CellError(ErrorType.VALUE, 'Number-only range expected.')
     }
 
     const input = value.rawNumbers()

@@ -113,27 +113,27 @@ export class NumericAggregationPlugin extends FunctionPlugin {
    */
   public sum(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
-      return new CellError(ErrorType.NUM)
+      return new CellError(ErrorType.NUM, 'Empty function argument.')
     }
     return this.reduce(ast, formulaAddress, 0, 'SUM', this.interpreter.arithmeticHelper.nonstrictadd, idMap, (arg) => this.coerceScalarToNumberOrError(arg))
   }
 
   public sumsq(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     if (ast.args.length < 1) {
-      return new CellError(ErrorType.NA)
+      return new CellError(ErrorType.NA, 'Wrong number of arguments.')
     }
     if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
-      return new CellError(ErrorType.NUM)
+      return new CellError(ErrorType.NUM, 'Empty function argument.')
     }
     return this.reduce(ast, formulaAddress, 0, 'SUMSQ', this.interpreter.arithmeticHelper.nonstrictadd, square, (arg) => this.coerceScalarToNumberOrError(arg))
   }
 
   public countblank(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     if (ast.args.length < 1) {
-      return new CellError(ErrorType.NA)
+      return new CellError(ErrorType.NA, 'Wrong number of arguments.')
     }
     if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
-      return new CellError(ErrorType.NUM)
+      return new CellError(ErrorType.NUM, 'Empty function argument.')
     }
     let counter = 0
     for (const arg of ast.args) {
@@ -157,10 +157,10 @@ export class NumericAggregationPlugin extends FunctionPlugin {
    */
   public max(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     if (ast.args.length < 1) {
-      return new CellError(ErrorType.NA)
+      return new CellError(ErrorType.NA, 'Wrong number of arguments.')
     }
     if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
-      return new CellError(ErrorType.NUM)
+      return new CellError(ErrorType.NUM, 'Empty function argument.')
     }
     const value = this.reduce(ast, formulaAddress, Number.NEGATIVE_INFINITY, 'MAX', max, idMap, (arg) => this.coerceScalarToNumberOrError(arg))
 
@@ -169,10 +169,10 @@ export class NumericAggregationPlugin extends FunctionPlugin {
 
   public maxa(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     if (ast.args.length < 1) {
-      return new CellError(ErrorType.NA)
+      return new CellError(ErrorType.NA, 'Wrong number of arguments.')
     }
     if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
-      return new CellError(ErrorType.NUM)
+      return new CellError(ErrorType.NUM, 'Empty function argument.')
     }
     const value = this.reduce(ast, formulaAddress, Number.NEGATIVE_INFINITY, 'MAXA', maxa, idMap, (arg) => this.coerceScalarToNumberOrError(arg))
 
@@ -189,10 +189,10 @@ export class NumericAggregationPlugin extends FunctionPlugin {
    */
   public min(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     if (ast.args.length < 1) {
-      return new CellError(ErrorType.NA)
+      return new CellError(ErrorType.NA, 'Wrong number of arguments.')
     }
     if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
-      return new CellError(ErrorType.NUM)
+      return new CellError(ErrorType.NUM, 'Empty function argument.')
     }
     const value = this.reduce(ast, formulaAddress, Number.POSITIVE_INFINITY, 'MIN', min, idMap, (arg) => this.coerceScalarToNumberOrError(arg))
 
@@ -201,10 +201,10 @@ export class NumericAggregationPlugin extends FunctionPlugin {
 
   public mina(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     if (ast.args.length < 1) {
-      return new CellError(ErrorType.NA)
+      return new CellError(ErrorType.NA, 'Wrong number of arguments.')
     }
     if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
-      return new CellError(ErrorType.NUM)
+      return new CellError(ErrorType.NUM, 'Empty function argument.')
     }
     const value = this.reduce(ast, formulaAddress, Number.POSITIVE_INFINITY, 'MINA', mina, idMap, (arg) => this.coerceScalarToNumberOrError(arg))
 
@@ -213,10 +213,10 @@ export class NumericAggregationPlugin extends FunctionPlugin {
 
   public count(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     if (ast.args.length < 1) {
-      return new CellError(ErrorType.NA)
+      return new CellError(ErrorType.NA, 'Wrong number of arguments.')
     }
     if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
-      return new CellError(ErrorType.NUM)
+      return new CellError(ErrorType.NUM, 'Empty function argument.')
     }
     const value = this.reduce(ast, formulaAddress, 0, 'COUNT', (left, right) => {
       return left + right
@@ -229,10 +229,10 @@ export class NumericAggregationPlugin extends FunctionPlugin {
 
   public counta(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     if (ast.args.length < 1) {
-      return new CellError(ErrorType.NA)
+      return new CellError(ErrorType.NA, 'Wrong number of arguments.')
     }
     if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
-      return new CellError(ErrorType.NUM)
+      return new CellError(ErrorType.NUM, 'Empty function argument.')
     }
     const value = this.reduce(ast, formulaAddress, 0, 'COUNTA', (left, right) => {
       return left + right
@@ -245,10 +245,10 @@ export class NumericAggregationPlugin extends FunctionPlugin {
 
   public average(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     if (ast.args.length < 1) {
-      return new CellError(ErrorType.NA)
+      return new CellError(ErrorType.NA, 'Wrong number of arguments.')
     }
     if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
-      return new CellError(ErrorType.NUM)
+      return new CellError(ErrorType.NUM, 'Empty function argument.')
     }
 
     const result = this.reduce<AverageResult | CellError>(ast, formulaAddress, AverageResult.empty, 'AVERAGE', (left, right) => {
@@ -278,10 +278,10 @@ export class NumericAggregationPlugin extends FunctionPlugin {
 
   public averagea(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     if (ast.args.length < 1) {
-      return new CellError(ErrorType.NA)
+      return new CellError(ErrorType.NA, 'Wrong number of arguments.')
     }
     if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
-      return new CellError(ErrorType.NUM)
+      return new CellError(ErrorType.NUM, 'Empty function argument.')
     }
 
     const result = this.reduce<AverageResult | CellError>(ast, formulaAddress, AverageResult.empty, 'AVERAGE', (left, right) => {
@@ -310,7 +310,7 @@ export class NumericAggregationPlugin extends FunctionPlugin {
     if (result instanceof CellError) {
       return result
     } else {
-      return result.averageValue() || new CellError(ErrorType.DIV_BY_ZERO)
+      return result.averageValue() ?? new CellError(ErrorType.DIV_BY_ZERO)
     }
   }
 

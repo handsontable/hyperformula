@@ -308,26 +308,26 @@ export class InformationPlugin extends FunctionPlugin {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public rows(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     if (ast.args.length !== 1) {
-      return new CellError(ErrorType.NA)
+      return new CellError(ErrorType.NA, 'Wrong number of arguments.')
     }
     if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
-      return new CellError(ErrorType.NUM)
+      return new CellError(ErrorType.NUM, 'Empty function argument.')
     }
     const rangeAst = ast.args[0]
     if (rangeAst.type === AstNodeType.CELL_RANGE) {
       return (rangeAst.end.row - rangeAst.start.row + 1)
     } else {
-      return new CellError(ErrorType.VALUE)
+      return new CellError(ErrorType.VALUE, 'Cell range expected.')
     }
   }
 
   public index(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InterpreterValue {
     const rangeArg = ast.args[0]
     if (ast.args.length < 1 || ast.args.length > 3) {
-      return new CellError(ErrorType.NA)
+      return new CellError(ErrorType.NA, 'Wrong number of arguments.')
     }
     if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
-      return new CellError(ErrorType.NUM)
+      return new CellError(ErrorType.NUM, 'Empty function argument.')
     }
 
     let width, height
@@ -343,14 +343,22 @@ export class InformationPlugin extends FunctionPlugin {
 
     const rowArg = ast.args[1]
     const rowValue = this.evaluateAst(rowArg, formulaAddress)
-    if (typeof rowValue !== 'number' || rowValue < 0 || rowValue > height) {
-      return new CellError(ErrorType.NUM)
+    if (typeof rowValue !== 'number') {
+      return new CellError(ErrorType.NUM, 'Wrong type of argument.') //TODO: argument could be coerced
+    } else if (rowValue < 0) {
+      return new CellError(ErrorType.NUM, 'Value cannot be negative.')
+    } else if (rowValue > height) {
+      return new CellError(ErrorType.NUM, 'Value too large.')
     }
 
     const columnArg = ast.args[2]
     const columnValue = this.evaluateAst(columnArg, formulaAddress)
-    if (typeof columnValue !== 'number' || columnValue < 0 || columnValue > width) {
-      return new CellError(ErrorType.NUM)
+    if (typeof columnValue !== 'number') {
+      return new CellError(ErrorType.NUM, 'Wrong type of argument.') //TODO: argument could be coerced
+    } else if (columnValue < 0) {
+      return new CellError(ErrorType.NUM, 'Value cannot be negative.')
+    } else if (columnValue > height) {
+      return new CellError(ErrorType.NUM, 'Value too large.')
     }
 
     if (columnValue === 0 || rowValue === 0 || range === undefined) {
@@ -390,7 +398,7 @@ export class InformationPlugin extends FunctionPlugin {
         if (sheetNumber !== undefined) {
           return sheetNumber + 1
         } else {
-          return new CellError(ErrorType.NA)
+          return new CellError(ErrorType.NA, 'Sheet does not exist.')
         }
       }
     )

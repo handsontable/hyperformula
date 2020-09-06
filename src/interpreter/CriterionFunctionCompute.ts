@@ -47,7 +47,7 @@ export class CriterionFunctionCompute<T> {
   public compute(simpleValuesRange: SimpleRangeValue, conditions: Condition[]): T | CellError {
     for (const condition of conditions) {
       if (!condition.conditionRange.sameDimensionsAs(simpleValuesRange)) {
-        return new CellError(ErrorType.VALUE)
+        return new CellError(ErrorType.VALUE, 'Dimensions do not match.')
       }
     }
 

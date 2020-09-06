@@ -394,7 +394,7 @@ export class DatePlugin extends FunctionPlugin {
         const date = this.interpreter.dateHelper.numberToSimpleDate(dateNumber)
         const newDate = truncateDayInMonth(offsetMonth(date, delta))
         const ret = this.interpreter.dateHelper.dateToNumber(newDate)
-        return this.interpreter.dateHelper.getWithinBounds(ret) ?? new CellError(ErrorType.NUM)
+        return this.interpreter.dateHelper.getWithinBounds(ret) ?? new CellError(ErrorType.NUM, 'Date outside of bounds.')
       }
     )
   }
@@ -403,7 +403,7 @@ export class DatePlugin extends FunctionPlugin {
     return this.runFunction(ast.args, formulaAddress, this.metadata('DATEDIF'),
       (startDate: number, endDate: number, unit: string) => {
         if(startDate > endDate) {
-          return new CellError(ErrorType.NUM)
+          return new CellError(ErrorType.NUM, 'Start date needs to be earlier than end date.')
         }
         if(unit === 'D') {
           return Math.floor(endDate) - Math.floor(startDate)

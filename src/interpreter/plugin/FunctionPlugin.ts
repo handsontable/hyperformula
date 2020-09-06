@@ -192,19 +192,19 @@ export abstract class FunctionPlugin {
             return value
           }
           if(coercedType.maxValue !== undefined && value > coercedType.maxValue) {
-            return new CellError(ErrorType.NUM)
+            return new CellError(ErrorType.NUM, 'Value too large.')
           }
           if (coercedType.minValue !== undefined && value < coercedType.minValue) {
-            return new CellError(ErrorType.NUM)
+            return new CellError(ErrorType.NUM, 'Value too small.')
           }
           if(coercedType.lessThan !== undefined && value >= coercedType.lessThan) {
-            return new CellError(ErrorType.NUM)
+            return new CellError(ErrorType.NUM, 'Value too large.')
           }
           if (coercedType.greaterThan !== undefined && value <= coercedType.greaterThan) {
-            return new CellError(ErrorType.NUM)
+            return new CellError(ErrorType.NUM, 'Value too small.')
           }
           if(coercedType.argumentType === ArgumentTypes.INTEGER && !Number.isInteger(value)) {
-            return new CellError(ErrorType.NUM)
+            return new CellError(ErrorType.NUM, 'Value needs to be integer.')
           }
           return value
         case ArgumentTypes.STRING:
@@ -243,11 +243,11 @@ export abstract class FunctionPlugin {
 
     let argCoerceFailure: Maybe<CellError> = undefined
     if(functionDefinition.repeatLastArgs === undefined && argumentDefinitions.length < scalarValues.length) {
-      return new CellError(ErrorType.NA)
+      return new CellError(ErrorType.NA, 'Wrong number of arguments.')
     }
     if(functionDefinition.repeatLastArgs !== undefined && scalarValues.length > argumentDefinitions.length &&
       (scalarValues.length-argumentDefinitions.length)%functionDefinition.repeatLastArgs !== 0) {
-      return new CellError(ErrorType.NA)
+      return new CellError(ErrorType.NA, 'Wrong number of arguments.')
     }
     for(let i=0, j=0; i<Math.max(scalarValues.length, argumentDefinitions.length); i++, j++) {
       // i points to where are we in the scalarValues list,
@@ -262,7 +262,7 @@ export abstract class FunctionPlugin {
           coercedArguments.push(undefined)
         } else {
           //not enough values passed as arguments, and there was no default value and argument was not optional
-          return new CellError(ErrorType.NA)
+          return new CellError(ErrorType.NA, 'Wrong number of arguments.')
         }
       } else {
         //we apply coerce only to non-default values
@@ -294,7 +294,7 @@ export abstract class FunctionPlugin {
     if (args.length === 0) {
       return noArgCallback()
     } else if (args.length > 1) {
-      return new CellError(ErrorType.NA)
+      return new CellError(ErrorType.NA, 'Wrong number of arguments.')
     }
     const arg = args[0]
 
@@ -306,7 +306,7 @@ export abstract class FunctionPlugin {
       try {
         cellReference = AbsoluteCellRange.fromAst(arg, formulaAddress).start
       } catch (e) {
-        return new CellError(ErrorType.REF)
+        return new CellError(ErrorType.REF, 'Cell reference expected.')
       }
     }
 

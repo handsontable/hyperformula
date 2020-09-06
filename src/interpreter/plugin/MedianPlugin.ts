@@ -35,7 +35,7 @@ export class MedianPlugin extends FunctionPlugin {
     return this.runFunction(ast.args, formulaAddress, this.metadata('MEDIAN'), (...args) => {
       const values: number[] = args.filter((val: InternalScalarValue) => (typeof val === 'number'))
       if (values.length === 0) {
-        return new CellError(ErrorType.NUM)
+        return new CellError(ErrorType.NUM, 'Needs at least one value.')
       }
       values.sort((a, b) => (a - b))
       if (values.length % 2 === 0) {
