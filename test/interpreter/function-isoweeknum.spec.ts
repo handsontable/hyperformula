@@ -26,7 +26,7 @@ describe('Function ISOWEEKNUM', () => {
       ['=ISOWEEKNUM(-1)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM, 'Value too small.'))
   })
 
   it('should work for strings', () => {

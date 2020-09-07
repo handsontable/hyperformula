@@ -63,7 +63,7 @@ describe('Function FORMULATEXT', () => {
     engine.addSheet('Sheet2')
     engine.setCellContents(adr('B1'), '=FORMULATEXT(Sheet1!A1:Sheet2!A2)')
 
-    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.REF, 'Cell reference required.'))
+    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.REF, 'Cell reference expected.'))
   })
 
   it('should work for matrix formula', () => {

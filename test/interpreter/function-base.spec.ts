@@ -82,7 +82,7 @@ describe('function BASE', () => {
       ['=BASE(-2, 5)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM, 'Value too small.'))
   })
 
   it('should allow base from 2 to 36', () => {
@@ -93,9 +93,9 @@ describe('function BASE', () => {
       ['=BASE(2, 37)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM, 'Value too small.'))
     expect(engine.getCellValue(adr('A2'))).toEqual('10')
     expect(engine.getCellValue(adr('A3'))).toEqual('2')
-    expect(engine.getCellValue(adr('A4'))).toEqual(detailedError(ErrorType.NUM))
+    expect(engine.getCellValue(adr('A4'))).toEqual(detailedError(ErrorType.NUM, 'Value too large.'))
   })
 })

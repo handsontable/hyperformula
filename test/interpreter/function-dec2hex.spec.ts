@@ -68,10 +68,10 @@ describe('function DEC2HEX', () => {
       ['=DEC2HEX(549755813888)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM, 'Value in base too small.'))
     expect(engine.getCellValue(adr('A2'))).toEqual('8000000000')
     expect(engine.getCellValue(adr('A3'))).toEqual('7FFFFFFFFF')
-    expect(engine.getCellValue(adr('A4'))).toEqual(detailedError(ErrorType.NUM))
+    expect(engine.getCellValue(adr('A4'))).toEqual(detailedError(ErrorType.NUM, 'Value in base too large.'))
   })
 
   it('should respect second argument and fill with zeros for positive arguments', () => {
@@ -100,8 +100,8 @@ describe('function DEC2HEX', () => {
       ['=DEC2HEX(-2, 12)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM))
-    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NUM))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM, 'Value too small.'))
+    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NUM, 'Value too small.'))
   })
 
   // Inconsistency with Product 1
