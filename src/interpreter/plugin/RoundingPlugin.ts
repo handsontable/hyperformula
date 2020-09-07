@@ -149,7 +149,7 @@ export class RoundingPlugin extends FunctionPlugin {
       }
 
       if ((value > 0) !== (significance > 0) && ast.args.length > 1) {
-        return new CellError(ErrorType.NUM)
+        return new CellError(ErrorType.NUM, 'Distinct signs.')
       }
 
       if (mode === 0) {
