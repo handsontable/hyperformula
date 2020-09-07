@@ -34,27 +34,27 @@ export class VlookupPlugin extends FunctionPlugin {
    */
   public vlookup(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InterpreterValue {
     if (ast.args.length < 3 || ast.args.length > 4) {
-      return new CellError(ErrorType.NA)
+      return new CellError(ErrorType.NA, 'Wrong number of arguments.')
     }
 
     if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
-      return new CellError(ErrorType.NUM)
+      return new CellError(ErrorType.NUM, 'Empty function argument.')
     }
 
     const key = this.evaluateAst(ast.args[0], formulaAddress)
     if (typeof key !== 'string' && typeof key !== 'number' && typeof key !== 'boolean') {
-      return new CellError(ErrorType.VALUE)
+      return new CellError(ErrorType.VALUE, 'Wrong type of argument.')
     }
 
     const rangeArg = ast.args[1]
     if (rangeArg.type !== AstNodeType.CELL_RANGE) {
       /* gsheet returns REF */
-      return new CellError(ErrorType.VALUE)
+      return new CellError(ErrorType.VALUE, 'Wrong type of argument.')
     }
 
     const index = this.evaluateAst(ast.args[2], formulaAddress)
     if (typeof index !== 'number') {
-      return new CellError(ErrorType.VALUE)
+      return new CellError(ErrorType.VALUE, 'Wrong type of argument.')
     }
 
     let sorted: InternalScalarValue = true
@@ -63,7 +63,7 @@ export class VlookupPlugin extends FunctionPlugin {
       if (typeof computedSorted === 'boolean') {
         sorted = computedSorted
       } else {
-        return new CellError(ErrorType.VALUE)
+        return new CellError(ErrorType.VALUE, 'Wrong type of argument.')
       }
     }
 
@@ -77,24 +77,24 @@ export class VlookupPlugin extends FunctionPlugin {
 
   public match(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     if (ast.args.length < 2 || ast.args.length > 3) {
-      return new CellError(ErrorType.NA)
+      return new CellError(ErrorType.NA, 'Wrong number of arguments.')
     }
 
     const key = this.evaluateAst(ast.args[0], formulaAddress)
     if (typeof key !== 'string' && typeof key !== 'number' && typeof key !== 'boolean') {
-      return new CellError(ErrorType.VALUE)
+      return new CellError(ErrorType.VALUE, 'Wrong type of argument.')
     }
 
     const rangeArg = ast.args[1]
     if (rangeArg.type !== AstNodeType.CELL_RANGE) {
-      return new CellError(ErrorType.VALUE)
+      return new CellError(ErrorType.VALUE, 'Wrong type of argument.')
     }
 
     let sorted: InterpreterValue = 1
     if (ast.args.length === 3) {
       sorted = this.evaluateAst(ast.args[2], formulaAddress)
       if (typeof sorted !== 'number') {
-        return new CellError(ErrorType.VALUE)
+        return new CellError(ErrorType.VALUE, 'Wrong type of argument.')
       }
     }
 

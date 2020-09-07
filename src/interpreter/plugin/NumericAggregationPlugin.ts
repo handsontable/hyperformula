@@ -378,7 +378,7 @@ export class NumericAggregationPlugin extends FunctionPlugin {
       range = AbsoluteCellRange.fromAst(ast, formulaAddress)
     } catch (err) {
       if (err.message === DIFFERENT_SHEETS_ERROR) {
-        return mapFunction(new CellError(ErrorType.REF))
+        return mapFunction(new CellError(ErrorType.REF, 'Range spans more than one sheet.'))
       } else {
         throw err
       }
