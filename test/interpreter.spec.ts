@@ -172,7 +172,7 @@ describe('Interpreter', () => {
       ]
     })
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.REF,'Range spans more than one sheet.'))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.REF, 'Range spans more than one sheet.'))
     expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.REF, 'Range spans more than one sheet.'))
     expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.REF, 'Range spans more than one sheet.'))
     expect(engine.getCellValue(adr('A4'))).toEqual(detailedError(ErrorType.REF, 'Range spans more than one sheet.'))
