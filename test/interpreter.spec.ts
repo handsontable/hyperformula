@@ -65,13 +65,11 @@ describe('Interpreter', () => {
   })
 
   it('errors - parsing errors', () => {
-    const engine = HyperFormula.buildFromArray([['=A', '=A1C1', '=SUM(A)', '=foo(', '=)(asdf']])
+    const engine = HyperFormula.buildFromArray([['=A1C1', '=foo(', '=)(asdf']])
 
     expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.ERROR, 'Parsing error'))
     expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.ERROR, 'Parsing error'))
     expect(engine.getCellValue(adr('C1'))).toEqual(detailedError(ErrorType.ERROR, 'Parsing error'))
-    expect(engine.getCellValue(adr('D1'))).toEqual(detailedError(ErrorType.ERROR, 'Parsing error'))
-    expect(engine.getCellValue(adr('E1'))).toEqual(detailedError(ErrorType.ERROR, 'Parsing error'))
   })
 
   it('function OFFSET basic use', () => {

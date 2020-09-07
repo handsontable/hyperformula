@@ -1,8 +1,11 @@
 import {HyperFormula, ExportedNamedExpressionChange, ExportedCellChange} from '../src'
 import {adr, detailedError} from './testUtils'
-import {ErrorType} from '../src/Cell'
+import {ErrorType, simpleCellAddress} from '../src/Cell'
 import {NoRelativeAddressesAllowedError, NoSheetWithNameError} from '../src/errors'
 import {Vertex} from '../src/DependencyGraph/Vertex'
+import {buildEmptyParserWithCaching} from './parser/common'
+import {Config} from '../src/Config'
+import {AstNodeType, NamedExpressionAst} from '../src/parser'
 
 describe('Named expressions - checking if its possible', () => {
   it('should be possible to add named expression', () => {
@@ -12,6 +15,13 @@ describe('Named expressions - checking if its possible', () => {
     expect(engine.isItPossibleToAddNamedExpression('foo', null)).toBe(true)
     expect(engine.isItPossibleToAddNamedExpression('foo', '=Sheet1!$A$1')).toBe(true)
     expect(engine.isItPossibleToAddNamedExpression('foo', '=Sheet1!$A$1', 'Sheet1')).toBe(true)
+    expect(engine.isItPossibleToAddNamedExpression('_A', 1)).toBe(true)
+    expect(engine.isItPossibleToAddNamedExpression('A', 1)).toBe(true)
+    expect(engine.isItPossibleToAddNamedExpression('Aa', 1)).toBe(true)
+    expect(engine.isItPossibleToAddNamedExpression('B.', 1)).toBe(true)
+    expect(engine.isItPossibleToAddNamedExpression('foo_bar', 1)).toBe(true)
+    expect(engine.isItPossibleToAddNamedExpression('A...', 1)).toBe(true)
+    expect(engine.isItPossibleToAddNamedExpression('B___', 1)).toBe(true)
   })
 
   it('no if expression name invalid', () => {
