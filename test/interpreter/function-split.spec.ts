@@ -31,7 +31,7 @@ describe('Function SPLIT', () => {
   it('coerce first argument to string', () => {
     const engine = HyperFormula.buildFromArray([['42', '=SPLIT(A1, 1)']])
 
-    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.VALUE, 'Index out of bounds.'))
   })
 
   it('when 2nd arg not a number', () => {
@@ -43,7 +43,7 @@ describe('Function SPLIT', () => {
   it('when index arg is not value within bounds', () => {
     const engine = HyperFormula.buildFromArray([['some words', '=SPLIT(A1, 17)', '=SPLIT(A1, -1)']])
 
-    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.VALUE))
-    expect(engine.getCellValue(adr('C1'))).toEqual(detailedError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.VALUE, 'Index out of bounds.'))
+    expect(engine.getCellValue(adr('C1'))).toEqual(detailedError(ErrorType.VALUE, 'Index out of bounds.'))
   })
 })

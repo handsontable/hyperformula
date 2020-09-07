@@ -69,7 +69,7 @@ export class VlookupPlugin extends FunctionPlugin {
 
     const range = AbsoluteCellRange.fromCellRange(rangeArg, formulaAddress)
     if (index > range.width()) {
-      return new CellError(ErrorType.REF)
+      return new CellError(ErrorType.REF, 'Index too large.')
     }
 
     return this.doVlookup(key, range, index - 1, sorted)
@@ -104,14 +104,14 @@ export class VlookupPlugin extends FunctionPlugin {
       const rowIndex = this.columnSearch.find(key, searchedRange, sorted !== 0)
 
       if (rowIndex === -1) {
-        return new CellError(ErrorType.NA)
+        return new CellError(ErrorType.NA, 'Value not found.')
       }
 
       return rowIndex - searchedRange.start.row + 1
     } else {
       const columnIndex = this.searchInRange(key, searchedRange, false)
       if (columnIndex === -1) {
-        return new CellError(ErrorType.NA)
+        return new CellError(ErrorType.NA, 'Value not found.')
       }
 
       return (columnIndex-searchedRange.start.row) + 1
@@ -138,7 +138,7 @@ export class VlookupPlugin extends FunctionPlugin {
     this.dependencyGraph.stats.end(StatType.VLOOKUP)
 
     if (rowIndex === -1) {
-      return new CellError(ErrorType.NA)
+      return new CellError(ErrorType.NA, 'Value not found.')
     }
 
     const address = simpleCellAddress(range.sheet, range.start.col + index, rowIndex)

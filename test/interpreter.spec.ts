@@ -147,7 +147,7 @@ describe('Interpreter', () => {
         [''],
       ],
     })
-    expect(engine.getCellValue(adr('A1', 1))).toEqual(detailedError(ErrorType.REF))
+    expect(engine.getCellValue(adr('A1', 1))).toEqual(detailedError(ErrorType.REF, 'Range spans more than one sheet.'))
   })
 
   it('expression with parenthesis', () => {

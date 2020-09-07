@@ -27,7 +27,7 @@ describe('Function REPT', () => {
       ['=REPT("foo", -1)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE, 'Count cannot be negative.'))
   })
 
   it('should work', () => {

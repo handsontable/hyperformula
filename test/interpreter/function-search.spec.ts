@@ -29,9 +29,9 @@ describe('Function SEARCH', () => {
       ['=SEARCH("foo", "bar", 4)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE))
-    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.VALUE))
-    expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE, 'Length out of bounds.'))
+    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.VALUE, 'Length out of bounds.'))
+    expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.VALUE, 'Length out of bounds.'))
   })
 
   it('should work with simple strings', () => {
@@ -45,7 +45,7 @@ describe('Function SEARCH', () => {
     expect(engine.getCellValue(adr('A1'))).toEqual(1)
     expect(engine.getCellValue(adr('A2'))).toEqual(2)
     expect(engine.getCellValue(adr('A3'))).toEqual(3)
-    expect(engine.getCellValue(adr('A4'))).toEqual(detailedError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A4'))).toEqual(detailedError(ErrorType.VALUE, 'Pattern not found.'))
   })
 
   it('should work with wildcards', () => {
@@ -60,7 +60,7 @@ describe('Function SEARCH', () => {
     expect(engine.getCellValue(adr('A1'))).toEqual(1)
     expect(engine.getCellValue(adr('A2'))).toEqual(4)
     expect(engine.getCellValue(adr('A3'))).toEqual(7)
-    expect(engine.getCellValue(adr('A4'))).toEqual(detailedError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A4'))).toEqual(detailedError(ErrorType.VALUE, 'Pattern not found.'))
     expect(engine.getCellValue(adr('A5'))).toEqual(6)
   })
 
@@ -76,7 +76,7 @@ describe('Function SEARCH', () => {
     expect(engine.getCellValue(adr('A1'))).toEqual(1)
     expect(engine.getCellValue(adr('A2'))).toEqual(4)
     expect(engine.getCellValue(adr('A3'))).toEqual(7)
-    expect(engine.getCellValue(adr('A4'))).toEqual(detailedError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A4'))).toEqual(detailedError(ErrorType.VALUE, 'Pattern not found.'))
     expect(engine.getCellValue(adr('A5'))).toEqual(6)
   })
 

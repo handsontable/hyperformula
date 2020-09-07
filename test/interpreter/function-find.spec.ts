@@ -29,9 +29,9 @@ describe('Function FIND', () => {
       ['=FIND("foo", "bar", 4)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE))
-    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.VALUE))
-    expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE, 'Index out of bounds.'))
+    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.VALUE, 'Index out of bounds.'))
+    expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.VALUE, 'Index out of bounds.'))
   })
 
   it('should work', () => {
@@ -47,9 +47,9 @@ describe('Function FIND', () => {
     expect(engine.getCellValue(adr('A1'))).toEqual(1)
     expect(engine.getCellValue(adr('A2'))).toEqual(2)
     expect(engine.getCellValue(adr('A3'))).toEqual(3)
-    expect(engine.getCellValue(adr('A4'))).toEqual(detailedError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A4'))).toEqual(detailedError(ErrorType.VALUE, 'Pattern not found.'))
     expect(engine.getCellValue(adr('A5'))).toEqual(1)
-    expect(engine.getCellValue(adr('A6'))).toEqual(detailedError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A6'))).toEqual(detailedError(ErrorType.VALUE, 'Pattern not found.'))
   })
 
   it('should be case sensitive', () => {
@@ -60,9 +60,9 @@ describe('Function FIND', () => {
       ['=FIND("R", "baR")'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE, 'Pattern not found.'))
     expect(engine.getCellValue(adr('A2'))).toEqual(3)
-    expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.VALUE, 'Pattern not found.'))
     expect(engine.getCellValue(adr('A4'))).toEqual(3)
   })
 

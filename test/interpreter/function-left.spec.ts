@@ -41,7 +41,7 @@ describe('Function LEFT', () => {
       ['=LEFT("foo", -1)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE, 'Length cannot be negative.'))
   })
 
   it('should work', () => {
