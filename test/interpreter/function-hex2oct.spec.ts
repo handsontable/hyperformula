@@ -18,9 +18,9 @@ describe('function HEX2OCT', () => {
       ['=HEX2OCT(TRUE())'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM))
-    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NUM))
-    expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.NUM))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM, 'String is not a hexadecimal number.'))
+    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NUM, 'String is not a hexadecimal number.'))
+    expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.NUM, 'String is not a hexadecimal number.'))
   })
 
   it('should work', () => {
@@ -81,8 +81,8 @@ describe('function HEX2OCT', () => {
       ['=HEX2OCT("FFDFFFFFFF")'],
       ['=HEX2OCT("3FFFFFFF")'],    ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM))
-    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NUM))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM, 'Value in base too small.'))
+    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NUM, 'Value in base too large.'))
   })
 
   it('input cannot have more than 10 digits', () => {
@@ -91,7 +91,7 @@ describe('function HEX2OCT', () => {
 
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM, 'String is not a hexadecimal number.'))
   })
 
   it('should respect second argument and fill with zeros for positive arguments', () => {
@@ -110,8 +110,8 @@ describe('function HEX2OCT', () => {
       ['=HEX2OCT(433141, "3")'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM))
-    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NUM))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM, 'Value in base too long.'))
+    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NUM, 'Value in base too long.'))
   })
 
   it('second argument should not affect negative results', () => {
@@ -130,7 +130,7 @@ describe('function HEX2OCT', () => {
       ['=HEX2OCT(2, 12)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM, 'Value in base too long.'))
     expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NUM, 'Value too large.'))
   })
 

@@ -18,9 +18,9 @@ describe('function BIN2OCT', () => {
       ['=BIN2OCT(TRUE())'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM))
-    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NUM))
-    expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.NUM))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM, 'String is not a binary number.'))
+    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NUM, 'String is not a binary number.'))
+    expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.NUM, 'String is not a binary number.'))
   })
 
   it('should work', () => {
@@ -74,7 +74,7 @@ describe('function BIN2OCT', () => {
       ['=BIN2OCT(1010101010)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM, 'String is not a binary number.'))
     expect(engine.getCellValue(adr('A2'))).toEqual('7777777252')
   })
 
@@ -104,8 +104,8 @@ describe('function BIN2OCT', () => {
       ['=BIN2OCT(-2, 12)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM))
-    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NUM))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM, 'String is not a binary number.'))
+    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NUM, 'Value too large.'))
   })
 
   // Inconsistency with Product 1

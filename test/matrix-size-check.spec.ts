@@ -20,7 +20,7 @@ describe('Matrix size check tests', () => {
     const ast = parser.parse('=mmult(A1:B3,C1:E3)', simpleCellAddress(0, 0, 0)).ast
 
     const size = checkMatrixSize(ast, adr('A1'))
-    expect(size).toEqual(new CellError(ErrorType.VALUE))
+    expect(size).toEqual(new CellError(ErrorType.VALUE, 'Matrix dimensions are not compatible.'))
   })
 
   it('check recurisve', () => {
@@ -36,7 +36,7 @@ describe('Matrix size check tests', () => {
     const ast = parser.parse('=mmult(mmult(A1:B3,C1:E3), A1:B3)', simpleCellAddress(0, 0, 0)).ast
 
     const size = checkMatrixSize(ast, adr('A1'))
-    expect(size).toEqual(new CellError(ErrorType.VALUE))
+    expect(size).toEqual(new CellError(ErrorType.VALUE, 'Matrix dimensions are not compatible.'))
   })
 
   it('check maxpool', () => {

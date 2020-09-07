@@ -19,8 +19,8 @@ describe('Function INDEX', () => {
       ['=INDEX(B1:B1, 1, "bar")'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM))
-    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NUM))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM, 'Wrong type of argument.'))
+    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NUM, 'Wrong type of argument.'))
   })
 
   it('requires 2nd argument to be in bounds of range', () => {
@@ -33,12 +33,12 @@ describe('Function INDEX', () => {
       ['=INDEX(B1, 2, 1)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM))
-    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NUM))
-    expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.NUM))
-    expect(engine.getCellValue(adr('A4'))).toEqual(detailedError(ErrorType.NUM))
-    expect(engine.getCellValue(adr('A5'))).toEqual(detailedError(ErrorType.NUM))
-    expect(engine.getCellValue(adr('A6'))).toEqual(detailedError(ErrorType.NUM))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM, 'Value cannot be negative.'))
+    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NUM, 'Value too large.'))
+    expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.NUM, 'Value cannot be negative.'))
+    expect(engine.getCellValue(adr('A4'))).toEqual(detailedError(ErrorType.NUM, 'Value too large.'))
+    expect(engine.getCellValue(adr('A5'))).toEqual(detailedError(ErrorType.NUM, 'Value cannot be negative.'))
+    expect(engine.getCellValue(adr('A6'))).toEqual(detailedError(ErrorType.NUM, 'Value too large.'))
   })
 
   it('requires 2nd and 3rd arguments to be in bounds of range', () => {
@@ -51,12 +51,12 @@ describe('Function INDEX', () => {
       ['=INDEX(B1, 1, 2)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM))
-    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NUM))
-    expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.NUM))
-    expect(engine.getCellValue(adr('A4'))).toEqual(detailedError(ErrorType.NUM))
-    expect(engine.getCellValue(adr('A5'))).toEqual(detailedError(ErrorType.NUM))
-    expect(engine.getCellValue(adr('A6'))).toEqual(detailedError(ErrorType.NUM))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM, 'Value cannot be negative.'))
+    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NUM, 'Value too large.'))
+    expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.NUM, 'Value cannot be negative.'))
+    expect(engine.getCellValue(adr('A4'))).toEqual(detailedError(ErrorType.NUM, 'Value too large.'))
+    expect(engine.getCellValue(adr('A5'))).toEqual(detailedError(ErrorType.NUM, 'Value cannot be negative.'))
+    expect(engine.getCellValue(adr('A6'))).toEqual(detailedError(ErrorType.NUM, 'Value too large.'))
   })
 
   it('works for range and nonzero arguments', () => {

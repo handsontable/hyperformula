@@ -48,9 +48,9 @@ describe('Function TIME', () => {
     const engine = HyperFormula.buildFromArray([
       ['=TIME(-1, 59, 0)', '=TIME(0, -1, 59)', '=TIME(0, 1, -61)'],
     ], config)
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM))
-    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.NUM))
-    expect(engine.getCellValue(adr('C1'))).toEqual(detailedError(ErrorType.NUM))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM, 'Time cannot be negative.'))
+    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.NUM, 'Time cannot be negative.'))
+    expect(engine.getCellValue(adr('C1'))).toEqual(detailedError(ErrorType.NUM, 'Time cannot be negative.'))
   })
 
   it('fractions', () => {
@@ -105,9 +105,9 @@ describe('Function TIME', () => {
       ['=TIME(0, FOOBAR(), 4/0)'],
       ['=TIME(0, 1, FOOBAR())'],
     ], config)
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NAME))
-    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NAME))
-    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NAME))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NAME, 'Function name FOOBAR not recognized.'))
+    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NAME, 'Function name FOOBAR not recognized.'))
+    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NAME, 'Function name FOOBAR not recognized.'))
   })
 
   // Inconsistency with Product 1

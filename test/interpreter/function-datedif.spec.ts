@@ -30,7 +30,7 @@ describe('Function DATEDIF', () => {
       ['=DATEDIF(1.9, 1.8, "Y")'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM, 'Mode not recognized.'))
     expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NUM,'Start date needs to be earlier than end date.'))
     expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.NUM, 'Start date needs to be earlier than end date.'))
   })

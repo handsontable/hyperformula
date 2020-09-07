@@ -24,8 +24,8 @@ describe('Interpreter - CHOOSE function', () => {
       ['=CHOOSE(1.5,2,3)', '=CHOOSE(0,2,3,4)', '=CHOOSE(5,2,3,4,5)']
     ])
     expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM, 'Selector needs to be integer.'))
-    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.NUM))
-    expect(engine.getCellValue(adr('C1'))).toEqual(detailedError(ErrorType.NUM))
+    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.NUM, 'Selector needs to be at least 1.'))
+    expect(engine.getCellValue(adr('C1'))).toEqual(detailedError(ErrorType.NUM, 'Selector cannot exceed number of arguments.'))
   })
 
   it('Coercions', () => {

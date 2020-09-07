@@ -39,8 +39,8 @@ describe('Function DB', () => {
     ])
     //product #1 returns #NUM! instead of an actual value
     expect(engine.getCellValue(adr('A1'))).toBeCloseTo(15845.10)
-    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.NUM))
-    expect(engine.getCellValue(adr('C1'))).toEqual(detailedError(ErrorType.NUM))
+    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.NUM, 'Period number cannot exceed life length.'))
+    expect(engine.getCellValue(adr('C1'))).toEqual(detailedError(ErrorType.NUM, 'Period number cannot exceed life length.'))
 
   })
 })

@@ -18,9 +18,9 @@ describe('function BIN2DEC', () => {
       ['=BIN2DEC(TRUE())'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM))
-    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NUM))
-    expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.NUM))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM, 'String is not a binary number.'))
+    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NUM, 'String is not a binary number.'))
+    expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.NUM, 'String is not a binary number.'))
   })
 
   it('should work only for 10 bits', () => {
@@ -29,7 +29,7 @@ describe('function BIN2DEC', () => {
       ['=BIN2DEC(1010101010)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM, 'String is not a binary number.'))
     expect(engine.getCellValue(adr('A2'))).toEqual(-342)
   })
 

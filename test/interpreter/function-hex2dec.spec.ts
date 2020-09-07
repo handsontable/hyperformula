@@ -18,9 +18,9 @@ describe('function HEX2DEC', () => {
       ['=HEX2DEC(TRUE())'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM))
-    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NUM))
-    expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.NUM))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM, 'String is not a hexadecimal number.'))
+    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NUM, 'String is not a hexadecimal number.'))
+    expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.NUM, 'String is not a hexadecimal number.'))
   })
 
   it('should work', () => {
@@ -82,7 +82,7 @@ describe('function HEX2DEC', () => {
       ['=HEX2DEC("7777EE70D2")'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM, 'String is not a hexadecimal number.'))
     expect(engine.getCellValue(adr('A2'))).toEqual(513113223378)
   })
 

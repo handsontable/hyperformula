@@ -28,9 +28,9 @@ describe('Function AVERAGEIF - argument validations and combinations', () => {
       ['=AVERAGEIF(B1:D1, ">0", B2)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE))
-    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.VALUE))
-    expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE, 'Dimensions do not match.'))
+    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.VALUE, 'Dimensions do not match.'))
+    expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.VALUE, 'Dimensions do not match.'))
   })
 
   it('error when different height dimension of arguments',  () => {
@@ -40,9 +40,9 @@ describe('Function AVERAGEIF - argument validations and combinations', () => {
       ['=AVERAGEIF(B1:B2, ">0", C1)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE))
-    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.VALUE))
-    expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE, 'Dimensions do not match.'))
+    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.VALUE, 'Dimensions do not match.'))
+    expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.VALUE, 'Dimensions do not match.'))
   })
 
   it('error when number of elements match but dimensions doesnt',  () => {
@@ -50,7 +50,7 @@ describe('Function AVERAGEIF - argument validations and combinations', () => {
       ['=AVERAGEIF(B1:B2, ">0", B1:C1)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE, 'Dimensions do not match.'))
   })
 
   it('scalars are treated like singular arrays', () => {

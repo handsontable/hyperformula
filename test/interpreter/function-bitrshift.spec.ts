@@ -75,7 +75,7 @@ describe('function BITRSHIFT', () => {
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqual(140737488355328)
-    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NUM))
+    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NUM, 'Result of bitshift is too long.'))
   })
 
   it('works only for positions from -53 to 53', () => {

@@ -92,6 +92,6 @@ describe('Function MEDIAN', () => {
       ['=MEDIAN("12", "11", "13")'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM, 'Needs at least one value.'))
   })
 })

@@ -68,10 +68,10 @@ describe('function DEC2BIN', () => {
       ['=DEC2BIN(512)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM, 'Value in base too small.'))
     expect(engine.getCellValue(adr('A2'))).toEqual('1000000000')
     expect(engine.getCellValue(adr('A3'))).toEqual('111111111')
-    expect(engine.getCellValue(adr('A4'))).toEqual(detailedError(ErrorType.NUM))
+    expect(engine.getCellValue(adr('A4'))).toEqual(detailedError(ErrorType.NUM, 'Value in base too large.'))
   })
 
   it('should respect second argument and fill with zeros for positive arguments', () => {
@@ -90,8 +90,8 @@ describe('function DEC2BIN', () => {
       ['=DEC2BIN(777, "4")'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM))
-    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NUM))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM, 'Value in base too long.'))
+    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NUM, 'Value in base too large.'))
   })
 
   it('should ignore second argument for negative numbers', () => {
@@ -111,7 +111,7 @@ describe('function DEC2BIN', () => {
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM, 'Value too small.'))
-    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NUM, 'Value too small.'))
+    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NUM, 'Value too large.'))
   })
 
   // Inconsistency with Product 1

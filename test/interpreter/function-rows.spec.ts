@@ -20,7 +20,7 @@ describe('Function ROWS', () => {
   it('doesnt work with scalars', () => {
     const engine = HyperFormula.buildFromArray([['=ROWS(A1)']])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE, 'Cell range expected.'))
   })
 
   // Inconsistency with Product 1
@@ -31,8 +31,8 @@ describe('Function ROWS', () => {
       ['=ROWS(A1)'],
     ])
 
-    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.VALUE))
-    expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.VALUE, 'Cell range expected.'))
+    expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.VALUE, 'Cell range expected.'))
   })
 
   // Inconsistency with Product 1
@@ -43,7 +43,7 @@ describe('Function ROWS', () => {
       ['=ROWS(MMULT(A1:B2, A1:B2))'],
     ])
 
-    expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.VALUE, 'Cell range expected.'))
   })
 
   it('should work when adding column', () => {

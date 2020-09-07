@@ -50,13 +50,13 @@ describe('Matrix plugin', () => {
     ])
 
     expect(engine.getCellValue(adr('C1'))).toEqual(detailedError(ErrorType.VALUE, 'Number-only range expected.'))
-    expect(engine.getCellValue(adr('D1'))).toEqual(detailedError(ErrorType.VALUE))
-    expect(engine.getCellValue(adr('C2'))).toEqual(detailedError(ErrorType.VALUE))
-    expect(engine.getCellValue(adr('D2'))).toEqual(detailedError(ErrorType.VALUE))
-    expect(engine.getCellValue(adr('C3'))).toEqual(detailedError(ErrorType.VALUE))
-    expect(engine.getCellValue(adr('D4'))).toEqual(detailedError(ErrorType.VALUE))
-    expect(engine.getCellValue(adr('C3'))).toEqual(detailedError(ErrorType.VALUE))
-    expect(engine.getCellValue(adr('D4'))).toEqual(detailedError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('D1'))).toEqual(detailedError(ErrorType.VALUE, 'Number-only range expected.'))
+    expect(engine.getCellValue(adr('C2'))).toEqual(detailedError(ErrorType.VALUE, 'Number-only range expected.'))
+    expect(engine.getCellValue(adr('D2'))).toEqual(detailedError(ErrorType.VALUE, 'Number-only range expected.'))
+    expect(engine.getCellValue(adr('C3'))).toEqual(detailedError(ErrorType.VALUE, 'Number-only range expected.'))
+    expect(engine.getCellValue(adr('D4'))).toEqual(detailedError(ErrorType.VALUE, 'Number-only range expected.'))
+    expect(engine.getCellValue(adr('C3'))).toEqual(detailedError(ErrorType.VALUE, 'Number-only range expected.'))
+    expect(engine.getCellValue(adr('D4'))).toEqual(detailedError(ErrorType.VALUE, 'Number-only range expected.'))
   })
 
   it('nested matrix multiplication', () => {

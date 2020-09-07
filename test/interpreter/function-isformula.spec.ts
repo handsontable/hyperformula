@@ -42,9 +42,9 @@ describe('Function ISFORMULA', () => {
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA, 'At least one argument required.'))
-    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.NA, 'Wrong number of arguments'))
-    expect(engine.getCellValue(adr('C1'))).toEqual(detailedError(ErrorType.NA, 'At least one argument required.'))
-    expect(engine.getCellValue(adr('D1'))).toEqual(detailedError(ErrorType.NA, 'At least one argument required.'))
+    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.NA, 'Wrong number of arguments.'))
+    expect(engine.getCellValue(adr('C1'))).toEqual(detailedError(ErrorType.NA, 'Cell reference required.'))
+    expect(engine.getCellValue(adr('D1'))).toEqual(detailedError(ErrorType.NA, 'Cell reference required.'))
   })
 
   it('should work for itself', () => {

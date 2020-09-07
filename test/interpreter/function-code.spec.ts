@@ -18,7 +18,7 @@ describe('Function CODE', () => {
       ['=CODE("")'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE, 'Empty-string argument not allowed.'))
   })
 
   it('should work for single chars', () => {

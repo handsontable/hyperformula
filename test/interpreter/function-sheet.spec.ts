@@ -51,8 +51,8 @@ describe('Function SHEET', () => {
       'Sheet1': [['=SHEET("FOO")', '=SHEET(1)']],
     })
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA))
-    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.NA))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA, 'Sheet does not exist.'))
+    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.NA, 'Sheet does not exist.'))
   })
 
   it('should coerce', () => {

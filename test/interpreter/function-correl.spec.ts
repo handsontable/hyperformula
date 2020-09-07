@@ -18,7 +18,7 @@ describe('CORREL', () => {
       ['=CORREL(B1:B5, C1:C6)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA, 'Ranges need to be of equal length.'))
   })
 
   it('works (simple)',  () => {
@@ -52,9 +52,9 @@ describe('CORREL', () => {
       ['=CORREL("foo", "bar")'],
     ])
 
-    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.DIV_BY_ZERO))
-    expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.DIV_BY_ZERO))
-    expect(engine.getCellValue(adr('A4'))).toEqual(detailedError(ErrorType.DIV_BY_ZERO))
+    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.DIV_BY_ZERO, 'Range needs to contain at least two elements.'))
+    expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.DIV_BY_ZERO, 'Range needs to contain at least two elements.'))
+    expect(engine.getCellValue(adr('A4'))).toEqual(detailedError(ErrorType.DIV_BY_ZERO, 'Range needs to contain at least two elements.'))
   })
 
   it('doesnt do coercions, nonnumeric values are skipped',  () => {

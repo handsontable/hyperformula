@@ -15,9 +15,9 @@ describe('Interpreter - SWITCH function', () => {
     const engine = HyperFormula.buildFromArray([
       ['=SWITCH(1,2,3)', '=SWITCH(1,2,3,4)', '=SWITCH(1,2,3,4,5)']
     ])
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA, 'No default option.'))
     expect(engine.getCellValue(adr('B1'))).toEqual(4)
-    expect(engine.getCellValue(adr('C1'))).toEqual(detailedError(ErrorType.NA))
+    expect(engine.getCellValue(adr('C1'))).toEqual(detailedError(ErrorType.NA, 'No default option.'))
   })
 
   it('Should work with precision', () => {

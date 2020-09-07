@@ -19,8 +19,8 @@ describe('Function DECIMAL', () => {
       ['=DECIMAL("123XYZ", 33)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM))
-    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NUM))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM, 'String is not a hexadecimal number.'))
+    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NUM, 'String is not a hexadecimal number.'))
   })
 
   it('should work', () => {
@@ -52,7 +52,7 @@ describe('Function DECIMAL', () => {
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqual(5.78960446186581e+76)
-    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NUM))
+    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NUM, 'String is not a hexadecimal number.'))
   })
 
   it('should work only for bases from 2 to 36', () => {
