@@ -74,8 +74,8 @@ describe('Function MEDIAN', () => {
       ['=MEDIAN(TRUE())'],
     ])
 
-    expect(engine.getCellValue(adr('D1'))).toEqual(detailedError(ErrorType.NUM))
-    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NUM))
+    expect(engine.getCellValue(adr('D1'))).toEqual(detailedError(ErrorType.NUM, 'Needs at least one value.'))
+    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NUM, 'Needs at least one value.'))
   })
 
   it('ignores nonnumeric values as long as theres at least one numeric value', () => {

@@ -18,9 +18,9 @@ describe('function BIN2HEX', () => {
       ['=BIN2HEX(TRUE())'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM))
-    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NUM))
-    expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.NUM))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM, 'String is not a binary number.'))
+    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NUM, 'String is not a binary number.'))
+    expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.NUM, 'String is not a binary number.'))
   })
 
   it('should work', () => {
@@ -74,7 +74,7 @@ describe('function BIN2HEX', () => {
       ['=BIN2HEX(1010101010)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM, 'String is not a binary number.'))
     expect(engine.getCellValue(adr('A2'))).toEqual('FFFFFFFEAA')
   })
 
@@ -104,8 +104,8 @@ describe('function BIN2HEX', () => {
       ['=BIN2HEX(-2, 12)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM))
-    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NUM))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM, 'String is not a binary number.'))
+    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NUM, 'String is not a binary number.'))
   })
 
   // Inconsistency with Product 1

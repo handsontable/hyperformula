@@ -28,31 +28,31 @@ describe('Function LOG', () => {
   it('for zero', () => {
     const engine = HyperFormula.buildFromArray([['=LOG(0, 42)']])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM, 'Value too small.'))
   })
 
   it('for negative value', () => {
     const engine = HyperFormula.buildFromArray([['=LOG(-42, 42)']])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM, 'Value too small.'))
   })
 
   it('for zero base', () => {
     const engine = HyperFormula.buildFromArray([['=LOG(42, 0)']])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM, 'Value too small.'))
   })
 
   it('for 1 base', () => {
     const engine = HyperFormula.buildFromArray([['=LOG(42, 1)']])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM, 'Infinite value.'))
   })
 
   it('for negative base', () => {
     const engine = HyperFormula.buildFromArray([['=LOG(42, -42)']])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM, 'Value too small.'))
   })
 
   it('wrong number of arguments', () => {
@@ -70,8 +70,8 @@ describe('Function LOG', () => {
 
     expect(engine.getCellValue(adr('B1'))).toBe(1)
     expect(engine.getCellValue(adr('C1'))).toBe(1)
-    expect(engine.getCellValue(adr('B2'))).toEqual(detailedError(ErrorType.NUM))
-    expect(engine.getCellValue(adr('C2'))).toEqual(detailedError(ErrorType.NUM))
+    expect(engine.getCellValue(adr('B2'))).toEqual(detailedError(ErrorType.NUM, 'Value too small.'))
+    expect(engine.getCellValue(adr('C2'))).toEqual(detailedError(ErrorType.NUM, 'Value too small.'))
   })
 
   it('errors propagation', () => {

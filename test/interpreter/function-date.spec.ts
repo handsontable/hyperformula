@@ -33,7 +33,7 @@ describe('Function DATE', () => {
     const engine = HyperFormula.buildFromArray([
       ['=DATE(-1900, 1, 1)', '=DATE(1901, -1, 2)', '=DATE(2000,-13,2)', '=DATE(1915, 10, -24)', '=DATE(1900, 1, -100000)', '=DATE(1900, 1, -200000)', '=DATE(-1,1,1)'],
     ], config)
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE, 'Invalid date.'))
     expect(dateNumberToString(engine.getCellValue(adr('B1')), config)).toEqual('02/11/1900')
     expect(dateNumberToString(engine.getCellValue(adr('C1')), config)).toEqual('02/11/1998')
     expect(dateNumberToString(engine.getCellValue(adr('D1')), config)).toEqual('06/09/1915')
@@ -94,9 +94,9 @@ describe('Function DATE', () => {
       ['=DATE(2000, FOOBAR(), 4/0)'],
       ['=DATE(2000, 1, FOOBAR())'],
     ], config)
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NAME))
-    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NAME))
-    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NAME))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NAME, 'Function name FOOBAR not recognized.'))
+    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NAME, 'Function name FOOBAR not recognized.'))
+    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NAME, 'Function name FOOBAR not recognized.'))
   })
 
   // Inconsistency with Product 1

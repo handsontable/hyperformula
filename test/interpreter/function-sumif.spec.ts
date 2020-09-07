@@ -57,7 +57,7 @@ describe('Function SUMIF - argument validations and combinations', () => {
       ['=SUMIF(B1:B2, "><foo", C1:C2)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE, 'Incorrect criterion.'))
   })
 
   it('error when different width dimension of arguments',  () => {
@@ -67,9 +67,9 @@ describe('Function SUMIF - argument validations and combinations', () => {
       ['=SUMIF(B1:D1, ">0", B2)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE, 'Incorrect criterion.'))
-    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.VALUE, 'Incorrect criterion.'))
-    expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.VALUE, 'Incorrect criterion.'))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE, 'Dimensions do not match.'))
+    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.VALUE, 'Dimensions do not match.'))
+    expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.VALUE, 'Dimensions do not match.'))
   })
 
   it('error when different height dimension of arguments',  () => {
@@ -438,8 +438,8 @@ describe('Function SUMIFS - argument validations and combinations', () => {
       ['=SUMIFS(B1:B2, C1:C2, "=1", C1:C2, "><foo")'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE))
-    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE, 'Incorrect criterion.'))
+    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.VALUE, 'Incorrect criterion.'))
   })
 
   it('error when different width dimension of arguments',  () => {
@@ -450,10 +450,10 @@ describe('Function SUMIFS - argument validations and combinations', () => {
       ['=SUMIFS(B1:D1, B2:D2, ">0", B2:E2, ">0")'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE, 'Incorrect criterion.'))
-    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.VALUE, 'Incorrect criterion.'))
-    expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.VALUE, 'Incorrect criterion.'))
-    expect(engine.getCellValue(adr('A4'))).toEqual(detailedError(ErrorType.VALUE, 'Incorrect criterion.'))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE, 'Dimensions do not match.'))
+    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.VALUE, 'Dimensions do not match.'))
+    expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.VALUE, 'Dimensions do not match.'))
+    expect(engine.getCellValue(adr('A4'))).toEqual(detailedError(ErrorType.VALUE, 'Dimensions do not match.'))
   })
 
   it('error when different height dimension of arguments',  () => {
@@ -464,10 +464,10 @@ describe('Function SUMIFS - argument validations and combinations', () => {
       ['=SUMIFS(B1:B2, C1:C2, ">0", C1:C3, ">0")'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE))
-    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.VALUE))
-    expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.VALUE))
-    expect(engine.getCellValue(adr('A4'))).toEqual(detailedError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE, 'Dimensions do not match.'))
+    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.VALUE, 'Dimensions do not match.'))
+    expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.VALUE, 'Dimensions do not match.'))
+    expect(engine.getCellValue(adr('A4'))).toEqual(detailedError(ErrorType.VALUE, 'Dimensions do not match.'))
   })
 
   it('scalars are treated like singular arrays', () => {

@@ -19,9 +19,9 @@ describe('Function FORMULATEXT', () => {
       ['=FORMULATEXT(SUM(1))'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA))
-    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NA))
-    expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.NA))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA, 'Cell reference required.'))
+    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NA, 'Cell reference required.'))
+    expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.NA, 'Cell reference required.'))
   })
 
   it('should propagate expression error', () => {
@@ -63,7 +63,7 @@ describe('Function FORMULATEXT', () => {
     engine.addSheet('Sheet2')
     engine.setCellContents(adr('B1'), '=FORMULATEXT(Sheet1!A1:Sheet2!A2)')
 
-    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.REF))
+    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.REF, 'Cell reference required.'))
   })
 
   it('should work for matrix formula', () => {

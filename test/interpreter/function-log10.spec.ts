@@ -18,13 +18,13 @@ describe('Function LOG10', () => {
   it('for zero', () => {
     const engine = HyperFormula.buildFromArray([['=LOG10(0)']])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM, 'Infinite value.'))
   })
 
   it('for negative arguments', () => {
     const engine = HyperFormula.buildFromArray([['=LOG10(-42)']])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM, 'Infinite value.'))
   })
 
   it('wrong number of arguments', () => {
@@ -41,7 +41,7 @@ describe('Function LOG10', () => {
     ])
 
     expect(engine.getCellValue(adr('B1'))).toBe(1)
-    expect(engine.getCellValue(adr('B2'))).toEqual(detailedError(ErrorType.NUM))
+    expect(engine.getCellValue(adr('B2'))).toEqual(detailedError(ErrorType.NUM, 'Infinite value.'))
   })
 
   it('errors propagation', () => {

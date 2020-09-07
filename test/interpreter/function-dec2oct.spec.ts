@@ -68,7 +68,7 @@ describe('function DEC2OCT', () => {
       ['=DEC2OCT(536870912)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM, 'Value in base too small.'))
     expect(engine.getCellValue(adr('A2'))).toEqual('4000000000')
     expect(engine.getCellValue(adr('A3'))).toEqual('3777777777')
     expect(engine.getCellValue(adr('A4'))).toEqual(detailedError(ErrorType.NUM))
@@ -101,7 +101,7 @@ describe('function DEC2OCT', () => {
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM, 'Value too small.'))
-    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NUM, 'Value too small.'))
+    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NUM, 'Value too large.'))
   })
 
   // Inconsistency with Product 1

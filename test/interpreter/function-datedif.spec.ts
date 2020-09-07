@@ -32,7 +32,7 @@ describe('Function DATEDIF', () => {
 
     expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM))
     expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NUM,'Start date needs to be earlier than end date.'))
-    expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.NUM))
+    expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.NUM, 'Start date needs to be earlier than end date.'))
   })
 
   it('"D" mode', () => {
@@ -343,6 +343,6 @@ describe('Function DATEDIF', () => {
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM, 'Value too small.'))
-    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NUM))
+    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NUM, 'Value too small.'))
   })
 })

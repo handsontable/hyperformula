@@ -440,7 +440,7 @@ export class DatePlugin extends FunctionPlugin {
                 + this.interpreter.dateHelper.leapYearsCount(start.year)
             }
           default:
-            return new CellError(ErrorType.NUM)
+            return new CellError(ErrorType.NUM, 'Mode not recognized.')
         }
       }
     )

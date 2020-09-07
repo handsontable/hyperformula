@@ -140,7 +140,7 @@ describe('Function SUMPRODUCT', () => {
       ['=SUMPRODUCT(A1:A2,B1:B2)'],
     ])
 
-    expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.NAME))
+    expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.NAME, 'Function name UNKNOWNFUNCTION not recognized.'))
   })
 
   it('error when different size',  () => {
@@ -183,6 +183,6 @@ describe('Function SUMPRODUCT', () => {
       ['=SUMPRODUCT(A1:B2, D1:E2)'],
     ])
 
-    expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.NAME))
+    expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.NAME, 'Function name FOOBAR not recognized.'))
   })
 })
