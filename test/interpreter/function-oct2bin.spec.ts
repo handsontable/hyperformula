@@ -137,6 +137,6 @@ describe('function OCT2BIN', () => {
       ['=2', '=OCT2BIN(A1:A2)'],
     ])
 
-    expect(engine.getCellValue(adr('B2'))).toEqual(detailedError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('B2'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessages.WrongType))
   })
 })

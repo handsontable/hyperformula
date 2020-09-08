@@ -108,9 +108,9 @@ describe('Function DATE', () => {
       ['2', '2001', '=DATE(B1:B3, 1, 1)', '=DATE(1950, A1:A3, 1)', '=DATE(1950, 1, A1:A3)'],
       ['3', '2002'],
     ], config)
-    expect(engine.getCellValue(adr('C2'))).toEqual(detailedError(ErrorType.VALUE))
-    expect(engine.getCellValue(adr('D2'))).toEqual(detailedError(ErrorType.VALUE))
-    expect(engine.getCellValue(adr('E2'))).toEqual(detailedError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('C2'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessages.WrongType))
+    expect(engine.getCellValue(adr('D2'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessages.WrongType))
+    expect(engine.getCellValue(adr('E2'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessages.WrongType))
   })
 })
 

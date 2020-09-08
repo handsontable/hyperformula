@@ -276,7 +276,7 @@ export abstract class FunctionPlugin {
           coercedArguments.push(coercedArg)
         } else if (!ignorable) {
           //if this is first error encountered, store it
-          argCoerceFailure = argCoerceFailure ?? (new CellError(ErrorType.VALUE))
+          argCoerceFailure = argCoerceFailure ?? (new CellError(ErrorType.VALUE, ErrorMessages.WrongType))
         }
       }
     }

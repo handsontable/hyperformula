@@ -60,6 +60,6 @@ describe('Interpreter - CHOOSE function', () => {
     const engine = HyperFormula.buildFromArray([
       ['=CHOOSE(1,2,A2:A3,4,5)']
     ])
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessages.WrongType))
   })
 })

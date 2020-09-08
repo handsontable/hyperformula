@@ -37,6 +37,6 @@ describe('Function ISNA', () => {
       ['=TRUE(1)'],
       ['=TRUE(1)', '=ISNA(A1:A2)'],
     ])
-    expect(engine.getCellValue(adr('B2'))).toEqual(detailedError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('B2'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessages.WrongType))
   })
 })

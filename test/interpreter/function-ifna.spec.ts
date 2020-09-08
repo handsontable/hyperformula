@@ -50,7 +50,7 @@ describe('Function IFNA', () => {
   it('when range', () => {
     const engine = HyperFormula.buildFromArray([['=IFNA("yes", A2:A3)']])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessages.WrongType))
   })
 
   it('when cycle', () => {

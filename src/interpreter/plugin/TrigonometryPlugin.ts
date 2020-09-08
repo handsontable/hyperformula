@@ -4,6 +4,7 @@
  */
 
 import {CellError, ErrorType, InternalScalarValue, SimpleCellAddress} from '../../Cell'
+import {ErrorMessages} from '../../error-messages'
 import {ProcedureAst} from '../../parser'
 import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
 import {PI} from './MathConstantsPlugin'
@@ -235,7 +236,7 @@ export class TrigonometryPlugin extends FunctionPlugin {
 
   public acoth(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.runFunction(ast.args, formulaAddress, this.metadata('ACOTH'),
-      (arg) => (arg === 0) ? new CellError(ErrorType.NUM) : Math.atanh(1/arg)
+      (arg) => (arg === 0) ? new CellError(ErrorType.NUM, ErrorMessages.NonZero) : Math.atanh(1/arg)
     )
   }
 

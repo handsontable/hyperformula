@@ -85,7 +85,7 @@ describe('Function ROUND', () => {
       ['=2', '=ROUND(A1:A2)'],
     ])
 
-    expect(engine.getCellValue(adr('B2'))).toEqual(detailedError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('B2'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessages.WrongType))
   })
 
   // Inconsistency with Product 1
@@ -95,6 +95,6 @@ describe('Function ROUND', () => {
       ['=2', '=ROUND(42.234, A1:A2)'],
     ])
 
-    expect(engine.getCellValue(adr('B2'))).toEqual(detailedError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('B2'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessages.WrongType))
   })
 })

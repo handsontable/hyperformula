@@ -58,6 +58,7 @@ export class ErrorMessages {
   public static StartEndDate = 'Start date needs to be earlier than end date.'
   public static IncorrectDate = 'String does not represent correct Date.'
   public static IncorrectDateTime = 'String does not represent correct DateTime.'
+  public static NonZero = 'Argument cannot be 0.'
   public static FunctionName = (arg: string) => `Function name ${arg} not recognized.`
   public static NamedExpressionName = (arg: string) => `Named expression ${arg} not recognized.`
 }

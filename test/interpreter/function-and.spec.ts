@@ -29,7 +29,7 @@ describe('Function AND', () => {
     ])
 
     expect(engine.getCellValue(adr('A1'))).toBe(true)
-    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessages.WrongType))
   })
 
   it('use coercion #2', () => {
@@ -42,7 +42,7 @@ describe('Function AND', () => {
 
     expect(engine.getCellValue(adr('A1'))).toBe(true)
     expect(engine.getCellValue(adr('A2'))).toBe(true)
-    expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessages.WrongType))
   })
 
   it('if error in range found, returns first one in row-by-row order', () => {

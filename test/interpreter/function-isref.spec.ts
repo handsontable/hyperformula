@@ -45,7 +45,7 @@ describe('Function ISREF', () => {
       ['=A2', '=ISREF(A1:A3)'],
     ])
 
-    expect(engine.getCellValue(adr('B2'))).toEqual(detailedError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('B2'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessages.WrongType))
   })
 
   // Inconsistency with Product 1
