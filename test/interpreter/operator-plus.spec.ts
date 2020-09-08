@@ -21,7 +21,7 @@ describe('Operator PLUS', () => {
     ])
 
     expect(engine.getCellValue(adr('A1'))).toBe(5)
-    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.VALUE,ErrorMessages.NumberCoercion))
+    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessages.NumberCoercion))
     expect(engine.getCellValue(adr('A4'))).toEqual(6)
   })
 

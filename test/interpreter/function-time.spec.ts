@@ -81,9 +81,9 @@ describe('Function TIME', () => {
       ['=TIME(0, "foo", 1)'],
       ['=TIME(0, 1, "foo")'],
     ], config)
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE,ErrorMessages.NumberCoercion))
-    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.VALUE,ErrorMessages.NumberCoercion))
-    expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.VALUE,ErrorMessages.NumberCoercion))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessages.NumberCoercion))
+    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessages.NumberCoercion))
+    expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessages.NumberCoercion))
   })
 
   it('with coercible argument', () => {

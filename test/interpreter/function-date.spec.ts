@@ -70,9 +70,9 @@ describe('Function DATE', () => {
       ['=DATE(1900, "foo", 1)'],
       ['=DATE(1900, 1, "foo")'],
     ], config)
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE,ErrorMessages.NumberCoercion))
-    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.VALUE,ErrorMessages.NumberCoercion))
-    expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.VALUE,ErrorMessages.NumberCoercion))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessages.NumberCoercion))
+    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessages.NumberCoercion))
+    expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessages.NumberCoercion))
   })
 
   it('with coercible argument', () => {
@@ -227,7 +227,7 @@ describe( 'Function DATE + leap years', () =>{
 
     expect(dateNumberToString(engine.getCellValue(adr('A2')), config)).toEqual('03/02/1900')
     expect(dateNumberToString(engine.getCellValue(adr('A3')), config)).toEqual('03/02/1900')
-    expect(engine.getCellValue(adr('A4'))).toEqual(detailedError(ErrorType.VALUE,ErrorMessages.NumberCoercion))
+    expect(engine.getCellValue(adr('A4'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessages.NumberCoercion))
     expect(dateNumberToString(engine.getCellValue(adr('A5')), config)).toEqual('03/02/1900')
     expect(dateNumberToString(engine.getCellValue(adr('A6')), config)).toEqual('03/02/1900')
   })

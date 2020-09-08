@@ -21,9 +21,9 @@ describe('Function CEILING', () => {
       ['=CEILING(1, 2, "baz")'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE,ErrorMessages.NumberCoercion))
-    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.VALUE,ErrorMessages.NumberCoercion))
-    expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.VALUE,ErrorMessages.NumberCoercion))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessages.NumberCoercion))
+    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessages.NumberCoercion))
+    expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessages.NumberCoercion))
   })
 
   it('should ensure that value and significance have same sign', () => {

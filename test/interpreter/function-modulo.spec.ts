@@ -21,9 +21,9 @@ describe('Function MOD', () => {
       ['=MOD("foo", "baz")'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE,ErrorMessages.NumberCoercion))
-    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.VALUE,ErrorMessages.NumberCoercion))
-    expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.VALUE,ErrorMessages.NumberCoercion))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessages.NumberCoercion))
+    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessages.NumberCoercion))
+    expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessages.NumberCoercion))
   })
 
   it('should return error when dividing by 0', () => {

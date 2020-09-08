@@ -1,3 +1,8 @@
+/**
+ * @license
+ * Copyright (c) 2020 Handsoncode. All rights reserved.
+ */
+
 export class ErrorMessages {
   public static ErrorSigns = 'Distinct signs.'
   public static ErrorArgNumber = 'Wrong number of arguments.'

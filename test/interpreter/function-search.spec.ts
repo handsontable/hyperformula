@@ -20,7 +20,7 @@ describe('Function SEARCH', () => {
       ['=SEARCH("foo", "bar", "baz")'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE,ErrorMessages.NumberCoercion))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessages.NumberCoercion))
   })
 
   it('should return VALUE if third parameter is not between 1 and text length', () => {

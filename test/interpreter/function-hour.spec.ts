@@ -7,8 +7,8 @@ describe('Function HOUR', () => {
   it('with wrong arguments', () => {
     const engine = HyperFormula.buildFromArray([['=HOUR("foo")', '=HOUR("12/30/2018")', '=HOUR(1, 2)', '=HOUR()']])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE,ErrorMessages.NumberCoercion))
-    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.VALUE,ErrorMessages.NumberCoercion))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessages.NumberCoercion))
+    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessages.NumberCoercion))
     expect(engine.getCellValue(adr('C1'))).toEqual(detailedError(ErrorType.NA, ErrorMessages.ErrorArgNumber))
     expect(engine.getCellValue(adr('D1'))).toEqual(detailedError(ErrorType.NA, ErrorMessages.ErrorArgNumber))
   })

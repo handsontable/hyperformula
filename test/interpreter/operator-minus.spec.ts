@@ -19,7 +19,7 @@ describe('Operator MINUS', () => {
     ])
 
     expect(engine.getCellValue(adr('A1'))).toBe(5)
-    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.VALUE,ErrorMessages.NumberCoercion))
+    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessages.NumberCoercion))
   })
 
   it('pass error from left operand', () => {

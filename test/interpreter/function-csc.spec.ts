@@ -13,7 +13,7 @@ describe('Function CSC', () => {
   it('when value not numeric', () => {
     const engine = HyperFormula.buildFromArray([['=CSC("foo")']])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE,ErrorMessages.NumberCoercion))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessages.NumberCoercion))
   })
 
   it('wrong number of arguments', () => {

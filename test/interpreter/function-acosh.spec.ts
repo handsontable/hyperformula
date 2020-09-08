@@ -13,7 +13,7 @@ describe('Function ACOSH', () => {
   it('when value not numeric', () => {
     const engine = HyperFormula.buildFromArray([['=ACOSH("foo")']])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE,ErrorMessages.NumberCoercion))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessages.NumberCoercion))
   })
 
   it('too small', () => {

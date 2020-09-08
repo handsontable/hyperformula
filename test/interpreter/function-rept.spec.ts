@@ -20,7 +20,7 @@ describe('Function REPT', () => {
       ['=REPT("foo", "bar")'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE,ErrorMessages.NumberCoercion))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessages.NumberCoercion))
   })
 
   it('should return VALUE when second parameter is less than 0', () => {

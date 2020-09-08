@@ -20,7 +20,7 @@ describe('Percent operator', () => {
     ])
 
     expect(engine.getCellValue(adr('A1'))).toBe(0.03)
-    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.VALUE,ErrorMessages.NumberCoercion))
+    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessages.NumberCoercion))
     expect(engine.getCellValue(adr('A3'))).toEqual(0.01)
   })
 

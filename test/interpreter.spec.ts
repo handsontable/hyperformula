@@ -25,7 +25,7 @@ describe('Interpreter', () => {
   it('negative number literal - non numeric value', () => {
     const engine = HyperFormula.buildFromArray([['=-"foo"']])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE,ErrorMessages.NumberCoercion))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessages.NumberCoercion))
   })
 
   it('string literals - faulty tests', () => {
