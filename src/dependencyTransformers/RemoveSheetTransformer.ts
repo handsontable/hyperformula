@@ -33,33 +33,23 @@ export class RemoveSheetTransformer extends Transformer {
   }
 
   protected transformCellAddress<T extends CellAddress>(dependencyAddress: T, _formulaAddress: SimpleCellAddress): ErrorType.REF | false | T {
-    if (dependencyAddress.sheet === this.sheet) {
-      return ErrorType.REF
-    }
-    return false
+    return this.transformAddress(dependencyAddress)
   }
 
-  protected transformCellRange(start: CellAddress, end: CellAddress, formulaAddress: SimpleCellAddress): [CellAddress, CellAddress] | ErrorType.REF | false {
-    const newStart = this.transformCellAddress(start, formulaAddress)
-    const newEnd = this.transformCellAddress(end, formulaAddress)
-    if (newStart === ErrorType.REF || newEnd === ErrorType.REF) {
-      return ErrorType.REF
-    } else if (newStart || newEnd) {
-      return [newStart || start, newEnd || end]
-    } else {
-      return false
-    }
+  protected transformCellRange(start: CellAddress, _end: CellAddress, _formulaAddress: SimpleCellAddress): ErrorType.REF | false {
+    return this.transformAddress(start)
   }
 
-  protected transformColumnRange(start: ColumnAddress, _end: ColumnAddress, _formulaAddress: SimpleCellAddress): [ColumnAddress, ColumnAddress] | ErrorType.REF | false {
-    if (start.sheet === this.sheet || start.sheet === this.sheet) {
-      return ErrorType.REF
-    }
-    return false
+  protected transformColumnRange(start: ColumnAddress, _end: ColumnAddress, _formulaAddress: SimpleCellAddress): ErrorType.REF | false {
+    return this.transformAddress(start)
   }
 
-  protected transformRowRange(start: RowAddress, _end: RowAddress, _formulaAddress: SimpleCellAddress): [RowAddress, RowAddress] | ErrorType.REF | false {
-    if (start.sheet === this.sheet || start.sheet === this.sheet) {
+  protected transformRowRange(start: RowAddress, _end: RowAddress, _formulaAddress: SimpleCellAddress): ErrorType.REF | false {
+    return this.transformAddress(start)
+  }
+
+  private transformAddress<T extends CellAddress | RowAddress | ColumnAddress>(address: T): ErrorType.REF | false {
+    if (address.sheet === this.sheet) {
       return ErrorType.REF
     }
     return false
