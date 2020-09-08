@@ -62,7 +62,7 @@ describe('Interpreter', () => {
   it('procedures - not known procedure', () => {
     const engine = HyperFormula.buildFromArray([['=FOO()']])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NAME, 'Function name FOO not recognized.'))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NAME, ErrorMessages.FunctionName('FOO')))
   })
 
   it('errors - parsing errors', () => {

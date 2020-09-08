@@ -29,7 +29,7 @@ describe('Unary operator MINUS', () => {
 
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NAME, 'Function name FOOBAR not recognized.'))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NAME, ErrorMessages.FunctionName('FOOBAR')))
     expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.DIV_BY_ZERO))
   })
 
@@ -41,7 +41,7 @@ describe('Unary operator MINUS', () => {
       ['3'],
     ])
 
-    expect(engine.getCellValue(adr('B2'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessages.ScalarExpected))
+    expect(engine.getCellValue(adr('B2'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessages.Range))
   })
 
   it('double unary plus', () => {

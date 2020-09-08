@@ -49,7 +49,7 @@ describe('Operator PLUS', () => {
       ['=FOOBAR()', '=4/0'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NAME, 'Function name FOOBAR not recognized.'))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NAME, ErrorMessages.FunctionName('FOOBAR')))
   })
 
   // Inconsistency with Product 1
@@ -60,8 +60,8 @@ describe('Operator PLUS', () => {
       ['3'],
     ])
 
-    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessages.ScalarExpected))
-    expect(engine.getCellValue(adr('B2'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessages.ScalarExpected))
+    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessages.Range))
+    expect(engine.getCellValue(adr('B2'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessages.Range))
   })
 
   it('Plus propagates errors correctly', () => {
@@ -71,7 +71,7 @@ describe('Operator PLUS', () => {
 
     expect(engine.getCellValue(adr('C1'))).toEqual(detailedError(ErrorType.DIV_BY_ZERO))
     expect(engine.getCellValue(adr('D1'))).toEqual(detailedError(ErrorType.DIV_BY_ZERO))
-    expect(engine.getCellValue(adr('E1'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessages.ScalarExpected))
+    expect(engine.getCellValue(adr('E1'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessages.Range))
     expect(engine.getCellValue(adr('F1'))).toEqual(detailedError(ErrorType.DIV_BY_ZERO))
   })
 })

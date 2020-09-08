@@ -47,7 +47,7 @@ describe('Function LOG', () => {
   it('for 1 base', () => {
     const engine = HyperFormula.buildFromArray([['=LOG(42, 1)']])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM, ErrorMessages.Infty))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM, ErrorMessages.Infinity))
   })
 
   it('for negative base', () => {

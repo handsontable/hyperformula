@@ -1,5 +1,6 @@
 import {HyperFormula} from '../../src'
 import {ErrorType} from '../../src/Cell'
+import {ErrorMessages} from '../../src/error-messages'
 import {adr, detailedError} from '../testUtils'
 
 describe('Function ACOT', () => {
@@ -13,7 +14,7 @@ describe('Function ACOT', () => {
   it('when value not numeric', () => {
     const engine = HyperFormula.buildFromArray([['=ACOT("foo")']])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE,ErrorMessages.NumberCoercion))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessages.NumberCoercion))
   })
 
   it('wrong number of arguments', () => {

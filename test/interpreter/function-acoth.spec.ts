@@ -12,13 +12,13 @@ describe('Function ACOTH', () => {
   it('error for 1', () => {
     const engine = HyperFormula.buildFromArray([['=ACOTH(1)']])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM, ErrorMessages.Infty))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM, ErrorMessages.Infinity))
   })
 
   it('error for -1', () => {
     const engine = HyperFormula.buildFromArray([['=ACOTH(-1)']])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM, ErrorMessages.Infty))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM, ErrorMessages.Infinity))
   })
 
   it('when value not numeric', () => {

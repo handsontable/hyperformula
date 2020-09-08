@@ -1,5 +1,6 @@
 import {HyperFormula} from '../../src'
 import {ErrorType} from '../../src/Cell'
+import {ErrorMessages} from '../../src/error-messages'
 import {adr, detailedError} from '../testUtils'
 
 describe('Operator DIVISION', () => {
@@ -35,7 +36,7 @@ describe('Operator DIVISION', () => {
       ['=FOOBAR()'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NAME, 'Function name FOOBAR not recognized.'))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NAME, ErrorMessages.FunctionName('FOOBAR')))
   })
 
   it('pass error from right operand', () => {
@@ -44,7 +45,7 @@ describe('Operator DIVISION', () => {
       ['=FOOBAR()'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NAME, 'Function name FOOBAR not recognized.'))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NAME, ErrorMessages.FunctionName('FOOBAR')))
   })
 
   it('pass error from left operand if both operands have error', () => {
@@ -53,7 +54,7 @@ describe('Operator DIVISION', () => {
       ['=FOOBAR()', '=4/0'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NAME, 'Function name FOOBAR not recognized.'))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NAME, ErrorMessages.FunctionName('FOOBAR')))
   })
 
   // Inconsistency with Product 1
@@ -64,8 +65,8 @@ describe('Operator DIVISION', () => {
       ['3'],
     ])
 
-    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessages.ScalarExpected))
-    expect(engine.getCellValue(adr('B2'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessages.ScalarExpected))
+    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessages.Range))
+    expect(engine.getCellValue(adr('B2'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessages.Range))
   })
 
   it('Division propagates errors correctly', () => {
@@ -75,7 +76,7 @@ describe('Operator DIVISION', () => {
 
     expect(engine.getCellValue(adr('C1'))).toEqual(detailedError(ErrorType.DIV_BY_ZERO))
     expect(engine.getCellValue(adr('D1'))).toEqual(detailedError(ErrorType.DIV_BY_ZERO))
-    expect(engine.getCellValue(adr('E1'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessages.ScalarExpected))
+    expect(engine.getCellValue(adr('E1'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessages.Range))
     expect(engine.getCellValue(adr('F1'))).toEqual(detailedError(ErrorType.DIV_BY_ZERO))
   })
 })

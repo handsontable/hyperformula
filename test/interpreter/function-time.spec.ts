@@ -106,9 +106,9 @@ describe('Function TIME', () => {
       ['=TIME(0, FOOBAR(), 4/0)'],
       ['=TIME(0, 1, FOOBAR())'],
     ], config)
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NAME, 'Function name FOOBAR not recognized.'))
-    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NAME, 'Function name FOOBAR not recognized.'))
-    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NAME, 'Function name FOOBAR not recognized.'))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NAME, ErrorMessages.FunctionName('FOOBAR')))
+    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NAME, ErrorMessages.FunctionName('FOOBAR')))
+    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NAME, ErrorMessages.FunctionName('FOOBAR')))
   })
 
   // Inconsistency with Product 1

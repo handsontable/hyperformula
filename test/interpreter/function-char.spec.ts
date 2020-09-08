@@ -60,9 +60,9 @@ describe('Function CHAR', () => {
       ['=CHAR(256)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM, ErrorMessages.CharacterCode))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM, ErrorMessages.ValueSmall))
     expect(engine.getCellValue(adr('A2'))).toEqual('')
     expect(engine.getCellValue(adr('A3'))).toEqual('ÿ')
-    expect(engine.getCellValue(adr('A4'))).toEqual(detailedError(ErrorType.NUM, ErrorMessages.CharacterCode))
+    expect(engine.getCellValue(adr('A4'))).toEqual(detailedError(ErrorType.NUM, ErrorMessages.ValueLarge))
   })
 })

@@ -19,13 +19,13 @@ describe('Function LN', () => {
   it('for zero', () => {
     const engine = HyperFormula.buildFromArray([['=LN(0)']])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM, ErrorMessages.Infty))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM, ErrorMessages.Infinity))
   })
 
   it('for negative arguments', () => {
     const engine = HyperFormula.buildFromArray([['=LN(-42)']])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM, ErrorMessages.Infty))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM, ErrorMessages.Infinity))
   })
 
   it('wrong number of arguments', () => {
@@ -42,7 +42,7 @@ describe('Function LN', () => {
     ])
 
     expect(engine.getCellValue(adr('B1'))).toBe(1)
-    expect(engine.getCellValue(adr('B2'))).toEqual(detailedError(ErrorType.NUM, ErrorMessages.Infty))
+    expect(engine.getCellValue(adr('B2'))).toEqual(detailedError(ErrorType.NUM, ErrorMessages.Infinity))
   })
 
   it('errors propagation', () => {

@@ -32,13 +32,13 @@ describe('Function ASIN', () => {
   it('when value too large', () => {
     const engine = HyperFormula.buildFromArray([['=ASIN(1.1)']])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM, ErrorMessages.Infty))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM, ErrorMessages.Infinity))
   })
 
   it('when value too small', () => {
     const engine = HyperFormula.buildFromArray([['=ASIN(-1.1)']])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM, ErrorMessages.Infty))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM, ErrorMessages.Infinity))
   })
 
   it('wrong number of arguments', () => {

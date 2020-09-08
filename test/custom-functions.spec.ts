@@ -1,3 +1,4 @@
+import {ErrorMessages} from '../src/error-messages'
 import {FunctionPlugin} from '../src/interpreter/plugin/FunctionPlugin'
 import {ProcedureAst} from '../src/parser'
 import {ErrorType, InternalScalarValue, SimpleCellAddress} from '../src/Cell'
@@ -127,7 +128,7 @@ describe('Register static custom plugin', () => {
 
     expect(HyperFormula.getRegisteredFunctionNames('enGB')).not.toContain('FOO')
     expect(HyperFormula.getRegisteredFunctionNames('enGB')).toContain('BAR')
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NAME, 'Function name FOO not recognized.'))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NAME, ErrorMessages.FunctionName('FOO')))
     expect(engine.getCellValue(adr('B1'))).toEqual('bar')
   })
 
@@ -207,7 +208,7 @@ describe('Instance level formula registry', () => {
     expectArrayWithSameContent(['FOO', 'BAR', 'VERSION'], engine.getRegisteredFunctionNames())
     expect(engine.getCellValue(adr('A1'))).toEqual('foo')
     expect(engine.getCellValue(adr('B1'))).toEqual('bar')
-    expect(engine.getCellValue(adr('C1'))).toEqual(detailedError(ErrorType.NAME, 'Function name SUM not recognized.'))
+    expect(engine.getCellValue(adr('C1'))).toEqual(detailedError(ErrorType.NAME, ErrorMessages.FunctionName('SUM')))
   })
 
   it('modifying static plugins should not affect existing engine instance registry', () => {

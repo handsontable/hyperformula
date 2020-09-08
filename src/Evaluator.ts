@@ -172,7 +172,7 @@ export class Evaluator {
       return interpreterValue
     } else if (typeof interpreterValue === 'number') {
       if (isNumberOverflow(interpreterValue)) {
-        return new CellError(ErrorType.NUM, ErrorMessages.Infty)
+        return new CellError(ErrorType.NUM, ErrorMessages.Infinity)
       } else {
         return fixNegativeZero(interpreterValue)
       }
@@ -190,7 +190,7 @@ export class Evaluator {
     } else if (interpreterValue instanceof SimpleRangeValue && interpreterValue.hasOnlyNumbers()) {
       return interpreterValue
     } else {
-      return new CellError(ErrorType.VALUE, ErrorMessages.RangeExpected)
+      return new CellError(ErrorType.VALUE, ErrorMessages.CellRangeExpected)
     }
   }
 }

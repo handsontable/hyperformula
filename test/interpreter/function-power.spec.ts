@@ -39,7 +39,7 @@ describe('Function POWER', () => {
       ['=POWER(0, -2)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM, ErrorMessages.Infty))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM, ErrorMessages.Infinity))
   })
 
   it('should return error when result too large or too small', () => {
@@ -51,9 +51,9 @@ describe('Function POWER', () => {
     ], { smartRounding : false})
 
     expect(engine.getCellValue(adr('A1'))).toEqual(8.98846567431158e+307)
-    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NUM, ErrorMessages.Infty))
+    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NUM, ErrorMessages.Infinity))
     expect(engine.getCellValue(adr('A3'))).toEqual(-8.98846567431158e+307)
-    expect(engine.getCellValue(adr('A4'))).toEqual(detailedError(ErrorType.NUM, ErrorMessages.Infty))
+    expect(engine.getCellValue(adr('A4'))).toEqual(detailedError(ErrorType.NUM, ErrorMessages.Infinity))
   })
 
   it('should work', () => {

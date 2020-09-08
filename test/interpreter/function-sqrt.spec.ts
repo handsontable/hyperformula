@@ -9,7 +9,7 @@ describe('Function SQRT', () => {
       ['=SQRT(-2)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM, ErrorMessages.Infty))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM, ErrorMessages.Infinity))
   })
 
   it('should return error for wrong number of arguments', () => {

@@ -105,7 +105,7 @@ describe('Temporary formulas - calculation', () => {
 
     const result = engine.calculateFormula('=TRANSPOSE(A1:B2)', 'Sheet1')
 
-    expect(result).toEqual(detailedError(ErrorType.VALUE, ErrorMessages.RangeExport))
+    expect(result).toEqual(detailedError(ErrorType.VALUE, ErrorMessages.Range))
   })
 
   it('passing something which is not a formula doesnt work', () => {

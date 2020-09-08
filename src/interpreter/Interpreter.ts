@@ -170,7 +170,7 @@ export class Interpreter {
       case AstNodeType.PLUS_UNARY_OP: {
         const result = this.evaluateAst(ast.value, formulaAddress)
         if (result instanceof SimpleRangeValue) {
-          return new CellError(ErrorType.VALUE, ErrorMessages.ScalarExpected)
+          return new CellError(ErrorType.VALUE, ErrorMessages.Range)
         } else {
           return result
         }
@@ -178,7 +178,7 @@ export class Interpreter {
       case AstNodeType.MINUS_UNARY_OP: {
         const result = this.evaluateAst(ast.value, formulaAddress)
         if (result instanceof SimpleRangeValue) {
-          return new CellError(ErrorType.VALUE, ErrorMessages.ScalarExpected)
+          return new CellError(ErrorType.VALUE, ErrorMessages.Range)
         } else {
           return wrapperUnary((a) => -a,
             this.arithmeticHelper.coerceScalarToNumberOrError(result))
@@ -187,7 +187,7 @@ export class Interpreter {
       case AstNodeType.PERCENT_OP: {
         const result = this.evaluateAst(ast.value, formulaAddress)
         if (result instanceof SimpleRangeValue) {
-          return new CellError(ErrorType.VALUE, ErrorMessages.ScalarExpected)
+          return new CellError(ErrorType.VALUE, ErrorMessages.Range)
         } else {
           return wrapperUnary((a) => a/100,
             this.arithmeticHelper.coerceScalarToNumberOrError(result))
@@ -278,11 +278,11 @@ function passErrors(left: InterpreterValue, right: InterpreterValue): Maybe<Cell
   if (left instanceof CellError) {
     return left
   } else if (left instanceof SimpleRangeValue) {
-    return new CellError(ErrorType.VALUE, ErrorMessages.ScalarExpected)
+    return new CellError(ErrorType.VALUE, ErrorMessages.Range)
   } else if (right instanceof CellError) {
     return right
   } else if (right instanceof SimpleRangeValue) {
-    return new CellError(ErrorType.VALUE, ErrorMessages.ScalarExpected)
+    return new CellError(ErrorType.VALUE, ErrorMessages.Range)
   } else {
     return undefined
   }

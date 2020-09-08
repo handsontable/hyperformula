@@ -30,7 +30,7 @@ describe('function CONCATENATE', () => {
     expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.DIV_BY_ZERO))
     expect(engine.getCellValue(adr('A4'))).toEqual(detailedError(ErrorType.DIV_BY_ZERO))
     expect(engine.getCellValue(adr('A5'))).toEqual(detailedError(ErrorType.DIV_BY_ZERO))
-    expect(engine.getCellValue(adr('A6'))).toEqual(detailedError(ErrorType.NAME, 'Function name FOOBAR not recognized.'))
+    expect(engine.getCellValue(adr('A6'))).toEqual(detailedError(ErrorType.NAME, ErrorMessages.FunctionName('FOOBAR')))
   })
 
   it('empty value is empty string', () => {
