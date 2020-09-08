@@ -1,5 +1,6 @@
 import {HyperFormula} from '../../src'
 import {CellValueType, ErrorType} from '../../src/Cell'
+import {ErrorMessages} from '../../src/error-messages'
 import {adr, detailedError} from '../testUtils'
 
 describe('Function DECIMAL', () => {
@@ -9,8 +10,8 @@ describe('Function DECIMAL', () => {
       ['=DECIMAL("foo", 2, 3)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA, 'Wrong number of arguments.'))
-    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NA, 'Wrong number of arguments.'))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA, ErrorMessages.ErrorArgNumber))
+    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NA, ErrorMessages.ErrorArgNumber))
   })
 
   it('should return error when value does not correspond to base', () => {
@@ -19,8 +20,8 @@ describe('Function DECIMAL', () => {
       ['=DECIMAL("123XYZ", 33)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM, 'String is not a hexadecimal number.'))
-    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NUM, 'String is not a hexadecimal number.'))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM, ErrorMessages.NotHex))
+    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NUM, ErrorMessages.NotHex))
   })
 
   it('should work', () => {
@@ -52,7 +53,7 @@ describe('Function DECIMAL', () => {
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqual(5.78960446186581e+76)
-    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NUM, 'String is not a hexadecimal number.'))
+    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NUM, ErrorMessages.NotHex))
   })
 
   it('should work only for bases from 2 to 36', () => {
@@ -63,10 +64,10 @@ describe('Function DECIMAL', () => {
       ['=DECIMAL("XYZ", 37)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM, 'Value too small.'))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM, ErrorMessages.ValueSmall))
     expect(engine.getCellValue(adr('A2'))).toEqual(2)
     expect(engine.getCellValue(adr('A3'))).toEqual(44027)
-    expect(engine.getCellValue(adr('A4'))).toEqual(detailedError(ErrorType.NUM, 'Value too large.'))
+    expect(engine.getCellValue(adr('A4'))).toEqual(detailedError(ErrorType.NUM, ErrorMessages.ValueLarge))
   })
 
   it('should return number', () => {

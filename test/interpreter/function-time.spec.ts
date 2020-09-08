@@ -1,6 +1,7 @@
 import {HyperFormula} from '../../src'
 import {ErrorType} from '../../src/Cell'
 import {Config} from '../../src/Config'
+import {ErrorMessages} from '../../src/error-messages'
 import {adr, detailedError, timeNumberToString} from '../testUtils'
 
 describe('Function TIME', () => {
@@ -48,9 +49,9 @@ describe('Function TIME', () => {
     const engine = HyperFormula.buildFromArray([
       ['=TIME(-1, 59, 0)', '=TIME(0, -1, 59)', '=TIME(0, 1, -61)'],
     ], config)
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM, 'Time cannot be negative.'))
-    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.NUM, 'Time cannot be negative.'))
-    expect(engine.getCellValue(adr('C1'))).toEqual(detailedError(ErrorType.NUM, 'Time cannot be negative.'))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM, ErrorMessages.NegativeTime))
+    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.NUM, ErrorMessages.NegativeTime))
+    expect(engine.getCellValue(adr('C1'))).toEqual(detailedError(ErrorType.NUM, ErrorMessages.NegativeTime))
   })
 
   it('fractions', () => {
@@ -69,8 +70,8 @@ describe('Function TIME', () => {
       ['=TIME(0, 1)'],
       ['=TIME(0, 1, 1, 1)'],
     ], config)
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA, 'Wrong number of arguments.'))
-    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NA, 'Wrong number of arguments.'))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA, ErrorMessages.ErrorArgNumber))
+    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NA, ErrorMessages.ErrorArgNumber))
   })
 
   it('with incoercible argument', () => {
@@ -80,9 +81,9 @@ describe('Function TIME', () => {
       ['=TIME(0, "foo", 1)'],
       ['=TIME(0, 1, "foo")'],
     ], config)
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE, 'Value cannot be coerced to number.'))
-    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.VALUE, 'Value cannot be coerced to number.'))
-    expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.VALUE, 'Value cannot be coerced to number.'))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE,ErrorMessages.NumberCoercion))
+    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.VALUE,ErrorMessages.NumberCoercion))
+    expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.VALUE,ErrorMessages.NumberCoercion))
   })
 
   it('with coercible argument', () => {

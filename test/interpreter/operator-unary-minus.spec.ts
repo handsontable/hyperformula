@@ -1,5 +1,6 @@
 import {HyperFormula} from '../../src'
 import {ErrorType} from '../../src/Cell'
+import {ErrorMessages} from '../../src/error-messages'
 import {adr, detailedError} from '../testUtils'
 
 describe('Unary operator MINUS', () => {
@@ -18,7 +19,7 @@ describe('Unary operator MINUS', () => {
     ])
 
     expect(engine.getCellValue(adr('A1'))).toBe(-3)
-    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.VALUE, 'Value cannot be coerced to number.'))
+    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.VALUE,ErrorMessages.NumberCoercion))
   })
 
   it('pass error', () => {
@@ -40,7 +41,7 @@ describe('Unary operator MINUS', () => {
       ['3'],
     ])
 
-    expect(engine.getCellValue(adr('B2'))).toEqual(detailedError(ErrorType.VALUE, 'Non-range value expected.'))
+    expect(engine.getCellValue(adr('B2'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessages.ScalarExpected))
   })
 
   it('double unary plus', () => {

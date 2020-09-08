@@ -1,5 +1,6 @@
 import {HyperFormula} from '../../src'
 import {CellValueType, ErrorType} from '../../src/Cell'
+import {ErrorMessages} from '../../src/error-messages'
 import {adr, detailedError} from '../testUtils'
 
 describe('function DEC2BIN', () => {
@@ -8,7 +9,7 @@ describe('function DEC2BIN', () => {
       ['=DEC2BIN("foo")'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE, 'Value cannot be coerced to number.'))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE,ErrorMessages.NumberCoercion))
   })
 
   it('should return error when wrong number of argument', () => {
@@ -16,7 +17,7 @@ describe('function DEC2BIN', () => {
       ['=DEC2BIN("foo", 2, 3)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA, 'Wrong number of arguments.'))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA, ErrorMessages.ErrorArgNumber))
   })
 
   it('should work', () => {
@@ -68,10 +69,10 @@ describe('function DEC2BIN', () => {
       ['=DEC2BIN(512)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM, 'Value in base too small.'))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM, ErrorMessages.ValueBaseSmall))
     expect(engine.getCellValue(adr('A2'))).toEqual('1000000000')
     expect(engine.getCellValue(adr('A3'))).toEqual('111111111')
-    expect(engine.getCellValue(adr('A4'))).toEqual(detailedError(ErrorType.NUM, 'Value in base too large.'))
+    expect(engine.getCellValue(adr('A4'))).toEqual(detailedError(ErrorType.NUM, ErrorMessages.ValueBaseLarge))
   })
 
   it('should respect second argument and fill with zeros for positive arguments', () => {
@@ -90,8 +91,8 @@ describe('function DEC2BIN', () => {
       ['=DEC2BIN(777, "4")'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM, 'Value in base too long.'))
-    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NUM, 'Value in base too large.'))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM, ErrorMessages.ValueBaseLong))
+    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NUM, ErrorMessages.ValueBaseLarge))
   })
 
   it('should ignore second argument for negative numbers', () => {
@@ -110,8 +111,8 @@ describe('function DEC2BIN', () => {
       ['=DEC2BIN(-2, 12)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM, 'Value too small.'))
-    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NUM, 'Value too large.'))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM, ErrorMessages.ValueSmall))
+    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NUM, ErrorMessages.ValueLarge))
   })
 
   // Inconsistency with Product 1

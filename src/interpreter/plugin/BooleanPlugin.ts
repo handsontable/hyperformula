@@ -4,6 +4,7 @@
  */
 
 import {CellError, ErrorType, InternalNoErrorCellValue, InternalScalarValue, SimpleCellAddress} from '../../Cell'
+import {ErrorMessages} from '../../error-messages'
 import {ProcedureAst} from '../../parser'
 import {InterpreterValue} from '../InterpreterValue'
 import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
@@ -85,7 +86,7 @@ export class BooleanPlugin extends FunctionPlugin {
     'CHOOSE': {
       method: 'choose',
       parameters:  [
-          {argumentType: ArgumentTypes.NUMBER},
+          {argumentType: ArgumentTypes.INTEGER, minValue: 1},
           {argumentType: ArgumentTypes.SCALAR},
         ],
         repeatLastArgs: 1,
@@ -189,7 +190,7 @@ export class BooleanPlugin extends FunctionPlugin {
       if (i < n) {
         return args[i]
       } else {
-        return new CellError(ErrorType.NA, 'No default option.')
+        return new CellError(ErrorType.NA, ErrorMessages.NoDefault)
       }
     })
   }
@@ -216,12 +217,8 @@ export class BooleanPlugin extends FunctionPlugin {
 
   public choose(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.runFunction(ast.args, formulaAddress, this.metadata('CHOOSE'), (selector, ...args) => {
-      if (selector !== Math.round(selector)) {
-        return new CellError(ErrorType.NUM, 'Selector needs to be integer.')
-      } else if( selector < 1 ) {
-        return new CellError(ErrorType.NUM, 'Selector needs to be at least 1.')
-      } else if (selector > args.length) {
-        return new CellError(ErrorType.NUM, 'Selector cannot exceed number of arguments.')
+      if (selector > args.length) {
+        return new CellError(ErrorType.NUM, ErrorMessages.Selector)
       }
       return args[selector - 1]
     })

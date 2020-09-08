@@ -1,5 +1,6 @@
 import {HyperFormula} from '../../src'
 import {ErrorType} from '../../src/Cell'
+import {ErrorMessages} from '../../src/error-messages'
 import {adr, detailedError} from '../testUtils'
 
 describe('Interpreter - CHOOSE function', () => {
@@ -7,7 +8,7 @@ describe('Interpreter - CHOOSE function', () => {
     const engine = HyperFormula.buildFromArray([
       ['=CHOOSE(0)']
     ])
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA, 'Wrong number of arguments.'))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA, ErrorMessages.ErrorArgNumber))
   })
 
   it('Should work with more arguments', () => {
@@ -25,7 +26,7 @@ describe('Interpreter - CHOOSE function', () => {
     ])
     expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM, 'Selector needs to be integer.'))
     expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.NUM, 'Selector needs to be at least 1.'))
-    expect(engine.getCellValue(adr('C1'))).toEqual(detailedError(ErrorType.NUM, 'Selector cannot exceed number of arguments.'))
+    expect(engine.getCellValue(adr('C1'))).toEqual(detailedError(ErrorType.NUM, ErrorMessages.Selector))
   })
 
   it('Coercions', () => {

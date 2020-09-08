@@ -1,5 +1,6 @@
 import {HyperFormula} from '../../src'
 import {ErrorType} from '../../src/Cell'
+import {ErrorMessages} from '../../src/error-messages'
 import {adr, detailedError} from '../testUtils'
 
 describe('Interpreter - SWITCH function', () => {
@@ -7,17 +8,17 @@ describe('Interpreter - SWITCH function', () => {
     const engine = HyperFormula.buildFromArray([
       ['=SWITCH(1)', '=SWITCH(2,3)']
     ])
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA, 'Wrong number of arguments.'))
-    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.NA, 'Wrong number of arguments.'))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA, ErrorMessages.ErrorArgNumber))
+    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.NA, ErrorMessages.ErrorArgNumber))
   })
 
   it('Should work with more arguments', () => {
     const engine = HyperFormula.buildFromArray([
       ['=SWITCH(1,2,3)', '=SWITCH(1,2,3,4)', '=SWITCH(1,2,3,4,5)']
     ])
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA, 'No default option.'))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA, ErrorMessages.NoDefault))
     expect(engine.getCellValue(adr('B1'))).toEqual(4)
-    expect(engine.getCellValue(adr('C1'))).toEqual(detailedError(ErrorType.NA, 'No default option.'))
+    expect(engine.getCellValue(adr('C1'))).toEqual(detailedError(ErrorType.NA, ErrorMessages.NoDefault))
   })
 
   it('Should work with precision', () => {

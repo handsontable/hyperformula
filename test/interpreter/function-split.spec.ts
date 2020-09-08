@@ -1,13 +1,14 @@
 import {HyperFormula} from '../../src'
 import {ErrorType} from '../../src/Cell'
+import {ErrorMessages} from '../../src/error-messages'
 import {adr, detailedError} from '../testUtils'
 
 describe('Function SPLIT', () => {
   it('wrong number of arguments', () => {
     const engine = HyperFormula.buildFromArray([['=SPLIT(1)', '=SPLIT("a","b","c")']])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA, 'Wrong number of arguments.'))
-    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.NA, 'Wrong number of arguments.'))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA, ErrorMessages.ErrorArgNumber))
+    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.NA, ErrorMessages.ErrorArgNumber))
   })
   it('happy path', () => {
     const engine = HyperFormula.buildFromArray([['some words', '=SPLIT(A1, 0)']])
@@ -31,19 +32,19 @@ describe('Function SPLIT', () => {
   it('coerce first argument to string', () => {
     const engine = HyperFormula.buildFromArray([['42', '=SPLIT(A1, 1)']])
 
-    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.VALUE, 'Index out of bounds.'))
+    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessages.IndexBounds))
   })
 
   it('when 2nd arg not a number', () => {
     const engine = HyperFormula.buildFromArray([['some words', '=SPLIT(A1, "foo")']])
 
-    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.VALUE, 'Value cannot be coerced to number.'))
+    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.VALUE,ErrorMessages.NumberCoercion))
   })
 
   it('when index arg is not value within bounds', () => {
     const engine = HyperFormula.buildFromArray([['some words', '=SPLIT(A1, 17)', '=SPLIT(A1, -1)']])
 
-    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.VALUE, 'Index out of bounds.'))
-    expect(engine.getCellValue(adr('C1'))).toEqual(detailedError(ErrorType.VALUE, 'Index out of bounds.'))
+    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessages.IndexBounds))
+    expect(engine.getCellValue(adr('C1'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessages.IndexBounds))
   })
 })

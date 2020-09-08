@@ -1,6 +1,7 @@
 import {HyperFormula} from '../../src'
 import {ErrorType} from '../../src/Cell'
 import {Config} from '../../src/Config'
+import {ErrorMessages} from '../../src/error-messages'
 import {adr, dateNumberToString, detailedError} from '../testUtils'
 
 describe('Function DATE', () => {
@@ -33,13 +34,13 @@ describe('Function DATE', () => {
     const engine = HyperFormula.buildFromArray([
       ['=DATE(-1900, 1, 1)', '=DATE(1901, -1, 2)', '=DATE(2000,-13,2)', '=DATE(1915, 10, -24)', '=DATE(1900, 1, -100000)', '=DATE(1900, 1, -200000)', '=DATE(-1,1,1)'],
     ], config)
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE, 'Invalid date.'))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessages.InvalidDate))
     expect(dateNumberToString(engine.getCellValue(adr('B1')), config)).toEqual('02/11/1900')
     expect(dateNumberToString(engine.getCellValue(adr('C1')), config)).toEqual('02/11/1998')
     expect(dateNumberToString(engine.getCellValue(adr('D1')), config)).toEqual('06/09/1915')
-    expect(engine.getCellValue(adr('E1'))).toEqual(detailedError(ErrorType.NUM, 'Date outside of bounds.'))
-    expect(engine.getCellValue(adr('F1'))).toEqual(detailedError(ErrorType.NUM, 'Date outside of bounds.'))
-    expect(engine.getCellValue(adr('G1'))).toEqual(detailedError(ErrorType.NUM, 'Date outside of bounds.'))
+    expect(engine.getCellValue(adr('E1'))).toEqual(detailedError(ErrorType.NUM, ErrorMessages.DateBounds))
+    expect(engine.getCellValue(adr('F1'))).toEqual(detailedError(ErrorType.NUM, ErrorMessages.DateBounds))
+    expect(engine.getCellValue(adr('G1'))).toEqual(detailedError(ErrorType.NUM, ErrorMessages.DateBounds))
   })
 
   it('rollover', () => {
@@ -58,8 +59,8 @@ describe('Function DATE', () => {
       ['=DATE(1900, 1)'],
       ['=DATE(1900, 1, 1, 1)'],
     ], config)
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA, 'Wrong number of arguments.'))
-    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NA, 'Wrong number of arguments.'))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA, ErrorMessages.ErrorArgNumber))
+    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NA, ErrorMessages.ErrorArgNumber))
   })
 
   it('with incoercible argument', () => {
@@ -69,9 +70,9 @@ describe('Function DATE', () => {
       ['=DATE(1900, "foo", 1)'],
       ['=DATE(1900, 1, "foo")'],
     ], config)
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE, 'Value cannot be coerced to number.'))
-    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.VALUE, 'Value cannot be coerced to number.'))
-    expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.VALUE, 'Value cannot be coerced to number.'))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE,ErrorMessages.NumberCoercion))
+    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.VALUE,ErrorMessages.NumberCoercion))
+    expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.VALUE,ErrorMessages.NumberCoercion))
   })
 
   it('with coercible argument', () => {
@@ -210,7 +211,7 @@ describe( 'Function DATE + leap years', () =>{
       ['=DATE()'],
     ], config)
 
-    expect(dateNumberToString(engine.getCellValue(adr('A1')), config)).toEqual(detailedError(ErrorType.NA, 'Wrong number of arguments.'))
+    expect(dateNumberToString(engine.getCellValue(adr('A1')), config)).toEqual(detailedError(ErrorType.NA, ErrorMessages.ErrorArgNumber))
   })
 
   it('with blanks', () => {
@@ -226,7 +227,7 @@ describe( 'Function DATE + leap years', () =>{
 
     expect(dateNumberToString(engine.getCellValue(adr('A2')), config)).toEqual('03/02/1900')
     expect(dateNumberToString(engine.getCellValue(adr('A3')), config)).toEqual('03/02/1900')
-    expect(engine.getCellValue(adr('A4'))).toEqual(detailedError(ErrorType.VALUE, 'Value cannot be coerced to number.'))
+    expect(engine.getCellValue(adr('A4'))).toEqual(detailedError(ErrorType.VALUE,ErrorMessages.NumberCoercion))
     expect(dateNumberToString(engine.getCellValue(adr('A5')), config)).toEqual('03/02/1900')
     expect(dateNumberToString(engine.getCellValue(adr('A6')), config)).toEqual('03/02/1900')
   })

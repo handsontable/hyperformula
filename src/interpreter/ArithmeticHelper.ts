@@ -14,6 +14,7 @@ import {
 } from '../Cell'
 import {Config} from '../Config'
 import {DateTimeHelper} from '../DateTimeHelper'
+import {ErrorMessages} from '../error-messages'
 import {Maybe} from '../Maybe'
 import {NumberLiteralHelper} from '../NumberLiteralHelper'
 import {collatorFromConfig} from '../StringHelper'
@@ -202,7 +203,7 @@ export class ArithmeticHelper {
     if (arg instanceof CellError) {
       return arg
     }
-    return this.coerceToMaybeNumber(arg) ?? new CellError(ErrorType.VALUE, 'Value cannot be coerced to number.')
+    return this.coerceToMaybeNumber(arg) ?? new CellError(ErrorType.VALUE,ErrorMessages.NumberCoercion)
   }
 
   public coerceToMaybeNumber(arg: InternalScalarValue): Maybe<number> {

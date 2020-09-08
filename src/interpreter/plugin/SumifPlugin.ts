@@ -4,6 +4,7 @@
  */
 
 import {CellError, ErrorType, InternalScalarValue, SimpleCellAddress} from '../../Cell'
+import {ErrorMessages} from '../../error-messages'
 import {Maybe} from '../../Maybe'
 import {AstNodeType, ProcedureAst} from '../../parser'
 import {coerceToRange} from '../ArithmeticHelper'
@@ -116,7 +117,7 @@ export class SumifPlugin extends FunctionPlugin {
       (conditionArg: SimpleRangeValue, criterionValue: InternalScalarValue, valuesArg: Maybe<SimpleRangeValue>) => {
         const criterion = this.interpreter.criterionBuilder.fromCellValue(criterionValue, this.interpreter.arithmeticHelper)
         if (criterion === undefined) {
-          return new CellError(ErrorType.VALUE, 'Incorrect criterion.')
+          return new CellError(ErrorType.VALUE, ErrorMessages.Criterion)
         }
 
         valuesArg = valuesArg ?? conditionArg
@@ -139,7 +140,7 @@ export class SumifPlugin extends FunctionPlugin {
         const conditionArg = args[i] as SimpleRangeValue
         const criterionPackage = this.interpreter.criterionBuilder.fromCellValue(args[i+1], this.interpreter.arithmeticHelper)
         if (criterionPackage === undefined) {
-          return new CellError(ErrorType.VALUE, 'Incorrect criterion.')
+          return new CellError(ErrorType.VALUE, ErrorMessages.Criterion)
         }
         conditions.push(new Condition(conditionArg, criterionPackage))
       }
@@ -159,7 +160,7 @@ export class SumifPlugin extends FunctionPlugin {
       (conditionArg: SimpleRangeValue, criterionValue: InternalScalarValue, valuesArg: Maybe<SimpleRangeValue>) => {
         const criterion = this.interpreter.criterionBuilder.fromCellValue(criterionValue, this.interpreter.arithmeticHelper)
         if (criterion === undefined) {
-          return new CellError(ErrorType.VALUE, 'Incorrect criterion.')
+          return new CellError(ErrorType.VALUE, ErrorMessages.Criterion)
         }
 
         valuesArg = valuesArg ?? conditionArg
@@ -202,7 +203,7 @@ export class SumifPlugin extends FunctionPlugin {
       (conditionArg: SimpleRangeValue, criterionValue: InternalScalarValue) => {
         const criterion = this.interpreter.criterionBuilder.fromCellValue(criterionValue, this.interpreter.arithmeticHelper)
         if (criterion === undefined) {
-          return new CellError(ErrorType.VALUE, 'Incorrect criterion.')
+          return new CellError(ErrorType.VALUE, ErrorMessages.Criterion)
         }
 
         return new CriterionFunctionCompute<number>(
@@ -223,7 +224,7 @@ export class SumifPlugin extends FunctionPlugin {
         const conditionArg = args[i] as SimpleRangeValue
         const criterionPackage = this.interpreter.criterionBuilder.fromCellValue(args[i+1], this.interpreter.arithmeticHelper)
         if (criterionPackage === undefined) {
-          return new CellError(ErrorType.VALUE, 'Incorrect criterion.')
+          return new CellError(ErrorType.VALUE, ErrorMessages.Criterion)
         }
         conditions.push(new Condition(conditionArg, criterionPackage))
       }

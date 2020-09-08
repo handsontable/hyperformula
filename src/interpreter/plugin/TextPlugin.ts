@@ -4,6 +4,7 @@
  */
 
 import {CellError, ErrorType, InternalScalarValue, SimpleCellAddress} from '../../Cell'
+import {ErrorMessages} from '../../error-messages'
 import {ProcedureAst} from '../../parser'
 import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
 
@@ -117,7 +118,7 @@ export class TextPlugin extends FunctionPlugin {
       const splittedString = stringToSplit.split(' ')
 
       if (indexToUse >= splittedString.length || indexToUse < 0) {
-        return new CellError(ErrorType.VALUE, 'Index out of bounds.')
+        return new CellError(ErrorType.VALUE, ErrorMessages.IndexBounds)
       }
 
       return splittedString[indexToUse]
@@ -152,7 +153,7 @@ export class TextPlugin extends FunctionPlugin {
   public rept(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.runFunction(ast.args, formulaAddress, this.metadata('REPT'), (text: string, count: number) => {
       if (count < 0) {
-        return new CellError(ErrorType.VALUE, 'Count cannot be negative.')
+        return new CellError(ErrorType.VALUE, ErrorMessages.NegativeCount)
       }
       return text.repeat(count)
     })
@@ -161,7 +162,7 @@ export class TextPlugin extends FunctionPlugin {
   public right(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.runFunction(ast.args, formulaAddress, this.metadata('RIGHT'), (text: string, length: number) => {
       if (length < 0) {
-        return new CellError(ErrorType.VALUE, 'Length cannot be negative.')
+        return new CellError(ErrorType.VALUE, ErrorMessages.NegativeLength)
       } else if (length === 0) {
         return ''
       }
@@ -172,7 +173,7 @@ export class TextPlugin extends FunctionPlugin {
   public left(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.runFunction(ast.args, formulaAddress, this.metadata('LEFT'), (text: string, length: number) => {
       if (length < 0) {
-        return new CellError(ErrorType.VALUE, 'Length cannot be negative.')
+        return new CellError(ErrorType.VALUE, ErrorMessages.NegativeLength)
       }
       return text.slice(0, length)
     })
@@ -181,7 +182,7 @@ export class TextPlugin extends FunctionPlugin {
   public search(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.runFunction(ast.args, formulaAddress, this.metadata('SEARCH'), (pattern, text: string, startIndex: number) => {
       if (startIndex < 1 || startIndex > text.length) {
-        return new CellError(ErrorType.VALUE, 'Length out of bounds.')
+        return new CellError(ErrorType.VALUE, ErrorMessages.LengthBounds)
       }
 
       const normalizedText = text.substr(startIndex - 1).toLowerCase()
@@ -194,20 +195,20 @@ export class TextPlugin extends FunctionPlugin {
       }
 
       index = index + startIndex
-      return index > 0 ? index : new CellError(ErrorType.VALUE, 'Pattern not found.')
+      return index > 0 ? index : new CellError(ErrorType.VALUE, ErrorMessages.PatternNotFound)
     })
   }
 
   public find(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.runFunction(ast.args, formulaAddress, this.metadata('FIND'), (pattern, text: string, startIndex: number) => {
       if (startIndex < 1 || startIndex > text.length) {
-        return new CellError(ErrorType.VALUE, 'Index out of bounds.')
+        return new CellError(ErrorType.VALUE, ErrorMessages.IndexBounds)
       }
 
       const shiftedText = text.substr(startIndex - 1)
       const index = shiftedText.indexOf(pattern) + startIndex
 
-      return index > 0 ? index : new CellError(ErrorType.VALUE, 'Pattern not found.')
+      return index > 0 ? index : new CellError(ErrorType.VALUE, ErrorMessages.PatternNotFound)
     })
   }
 }

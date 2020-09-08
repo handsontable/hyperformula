@@ -1,5 +1,6 @@
 import {HyperFormula} from '../src'
 import {ErrorType} from '../src/Cell'
+import {ErrorMessages} from '../src/error-messages'
 import {detailedError} from './testUtils'
 
 describe('Temporary formulas - normalization', () => {
@@ -104,7 +105,7 @@ describe('Temporary formulas - calculation', () => {
 
     const result = engine.calculateFormula('=TRANSPOSE(A1:B2)', 'Sheet1')
 
-    expect(result).toEqual(detailedError(ErrorType.VALUE, 'Range cannot be exported.'))
+    expect(result).toEqual(detailedError(ErrorType.VALUE, ErrorMessages.RangeExport))
   })
 
   it('passing something which is not a formula doesnt work', () => {

@@ -1,5 +1,6 @@
 import {HyperFormula} from '../../src'
 import {ErrorType} from '../../src/Cell'
+import {ErrorMessages} from '../../src/error-messages'
 import {adr, detailedError} from '../testUtils'
 
 describe('Operator POWER', () => {
@@ -18,7 +19,7 @@ describe('Operator POWER', () => {
     ])
 
     expect(engine.getCellValue(adr('A1'))).toBe(512)
-    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.VALUE, 'Value cannot be coerced to number.'))
+    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.VALUE,ErrorMessages.NumberCoercion))
   })
 
   it('pass error from left operand', () => {
@@ -56,8 +57,8 @@ describe('Operator POWER', () => {
       ['3'],
     ])
 
-    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.VALUE, 'Non-range value expected.'))
-    expect(engine.getCellValue(adr('B2'))).toEqual(detailedError(ErrorType.VALUE, 'Non-range value expected.'))
+    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessages.ScalarExpected))
+    expect(engine.getCellValue(adr('B2'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessages.ScalarExpected))
   })
 
   it('Power propagates errors correctly', () => {
@@ -67,7 +68,7 @@ describe('Operator POWER', () => {
 
     expect(engine.getCellValue(adr('C1'))).toEqual(detailedError(ErrorType.DIV_BY_ZERO))
     expect(engine.getCellValue(adr('D1'))).toEqual(detailedError(ErrorType.DIV_BY_ZERO))
-    expect(engine.getCellValue(adr('E1'))).toEqual(detailedError(ErrorType.VALUE, 'Non-range value expected.'))
+    expect(engine.getCellValue(adr('E1'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessages.ScalarExpected))
     expect(engine.getCellValue(adr('F1'))).toEqual(detailedError(ErrorType.DIV_BY_ZERO))
   })
 
@@ -78,7 +79,7 @@ describe('Operator POWER', () => {
       ['3.1415', '36193.2', '=A2^B2'],
     ])
 
-    expect(engine.getCellValue(adr('C1'))).toEqual(detailedError(ErrorType.NUM, 'Infinite value.'))
-    expect(engine.getCellValue(adr('C2'))).toEqual(detailedError(ErrorType.NUM, 'Infinite value.'))
+    expect(engine.getCellValue(adr('C1'))).toEqual(detailedError(ErrorType.NUM, ErrorMessages.Infty))
+    expect(engine.getCellValue(adr('C2'))).toEqual(detailedError(ErrorType.NUM, ErrorMessages.Infty))
   })
 })

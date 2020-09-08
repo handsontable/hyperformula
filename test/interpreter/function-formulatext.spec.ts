@@ -1,4 +1,5 @@
 import {ErrorType, HyperFormula} from '../../src'
+import {ErrorMessages} from '../../src/error-messages'
 import {adr, detailedError} from '../testUtils'
 
 describe('Function FORMULATEXT', () => {
@@ -8,8 +9,8 @@ describe('Function FORMULATEXT', () => {
       ['=FORMULATEXT(B2, B3)']
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA, 'At least one argument required.'))
-    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NA, 'Wrong number of arguments.'))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA, ErrorMessages.ErrorArgNumber))
+    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NA, ErrorMessages.ErrorArgNumber))
   })
 
   it('should return N/A for wrong types of arguments', () => {
@@ -19,9 +20,9 @@ describe('Function FORMULATEXT', () => {
       ['=FORMULATEXT(SUM(1))'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA, 'Cell reference required.'))
-    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NA, 'Cell reference required.'))
-    expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.NA, 'Cell reference required.'))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA, ErrorMessages.CellRef))
+    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NA, ErrorMessages.CellRef))
+    expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.NA, ErrorMessages.CellRef))
   })
 
   it('should propagate expression error', () => {
@@ -63,7 +64,7 @@ describe('Function FORMULATEXT', () => {
     engine.addSheet('Sheet2')
     engine.setCellContents(adr('B1'), '=FORMULATEXT(Sheet1!A1:Sheet2!A2)')
 
-    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.REF, 'Cell reference expected.'))
+    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.REF, ErrorMessages.CellRef))
   })
 
   it('should work for matrix formula', () => {

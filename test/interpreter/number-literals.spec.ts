@@ -1,4 +1,5 @@
 import {HyperFormula} from '../../src'
+import {ErrorMessages} from '../../src/error-messages'
 import {adr, detailedError} from '../testUtils'
 import {ErrorType} from '../../src/Cell'
 import {Config} from '../../src/Config'
@@ -53,7 +54,7 @@ describe('Number literals', () => {
     const engine = HyperFormula.buildFromArray([['="1 000" + 2']], new Config({
       thousandSeparator: ',', functionArgSeparator: ';'
     }))
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE, 'Value cannot be coerced to number.'))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE,ErrorMessages.NumberCoercion))
   })
 
   it('should work for number with dot as thousand separator', () => {

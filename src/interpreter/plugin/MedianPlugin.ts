@@ -4,6 +4,7 @@
  */
 
 import {CellError, ErrorType, InternalScalarValue, SimpleCellAddress} from '../../Cell'
+import {ErrorMessages} from '../../error-messages'
 import {ProcedureAst} from '../../parser'
 import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
 
@@ -35,7 +36,7 @@ export class MedianPlugin extends FunctionPlugin {
     return this.runFunction(ast.args, formulaAddress, this.metadata('MEDIAN'), (...args) => {
       const values: number[] = args.filter((val: InternalScalarValue) => (typeof val === 'number'))
       if (values.length === 0) {
-        return new CellError(ErrorType.NUM, 'Needs at least one value.')
+        return new CellError(ErrorType.NUM, ErrorMessages.OneValue)
       }
       values.sort((a, b) => (a - b))
       if (values.length % 2 === 0) {

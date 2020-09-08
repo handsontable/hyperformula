@@ -1,5 +1,6 @@
 import {HyperFormula} from '../../src'
 import {ErrorType} from '../../src/Cell'
+import {ErrorMessages} from '../../src/error-messages'
 import {adr, detailedError} from '../testUtils'
 
 describe('CORREL', () => {
@@ -9,8 +10,8 @@ describe('CORREL', () => {
       ['=CORREL(B1:B5, C1:C5, D1:D5)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA, 'Wrong number of arguments.'))
-    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NA, 'Wrong number of arguments.'))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA, ErrorMessages.ErrorArgNumber))
+    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NA, ErrorMessages.ErrorArgNumber))
   })
 
   it('ranges need to have same amount of elements',  () => {
@@ -18,7 +19,7 @@ describe('CORREL', () => {
       ['=CORREL(B1:B5, C1:C6)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA, 'Ranges need to be of equal length.'))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA, ErrorMessages.EqualLength))
   })
 
   it('works (simple)',  () => {
@@ -52,9 +53,9 @@ describe('CORREL', () => {
       ['=CORREL("foo", "bar")'],
     ])
 
-    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.DIV_BY_ZERO, 'Range needs to contain at least two elements.'))
-    expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.DIV_BY_ZERO, 'Range needs to contain at least two elements.'))
-    expect(engine.getCellValue(adr('A4'))).toEqual(detailedError(ErrorType.DIV_BY_ZERO, 'Range needs to contain at least two elements.'))
+    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.DIV_BY_ZERO, ErrorMessages.TwoValues))
+    expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.DIV_BY_ZERO, ErrorMessages.TwoValues))
+    expect(engine.getCellValue(adr('A4'))).toEqual(detailedError(ErrorType.DIV_BY_ZERO, ErrorMessages.TwoValues))
   })
 
   it('doesnt do coercions, nonnumeric values are skipped',  () => {

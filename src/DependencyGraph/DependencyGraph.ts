@@ -16,6 +16,7 @@ import {
 } from '../Cell'
 import {CellDependency} from '../CellDependency'
 import {Config} from '../Config'
+import {ErrorMessages} from '../error-messages'
 import {LazilyTransformingAstService} from '../LazilyTransformingAstService'
 import {Maybe} from '../Maybe'
 import {Ast, collectDependencies, NamedExpressionDependency} from '../parser'
@@ -602,7 +603,7 @@ export class DependencyGraph {
   public getScalarValue(address: SimpleCellAddress): InternalScalarValue {
     const value = this.addressMapping.getCellValue(address)
     if (value instanceof SimpleRangeValue) {
-      return new CellError(ErrorType.VALUE, 'Range value.')
+      return new CellError(ErrorType.VALUE, ErrorMessages.Range)
     }
     return value
   }

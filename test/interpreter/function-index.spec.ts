@@ -1,5 +1,6 @@
 import {HyperFormula} from '../../src'
 import {ErrorType} from '../../src/Cell'
+import {ErrorMessages} from '../../src/error-messages'
 import {adr, detailedError} from '../testUtils'
 
 describe('Function INDEX', () => {
@@ -9,8 +10,8 @@ describe('Function INDEX', () => {
       ['=INDEX(B1:D3, 1, 1, 42)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA, 'Wrong number of arguments.'))
-    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NA, 'Wrong number of arguments.'))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA, ErrorMessages.ErrorArgNumber))
+    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NA, ErrorMessages.ErrorArgNumber))
   })
 
   it('requires 2nd and 3rd arguments to be integers', () => {
@@ -19,8 +20,8 @@ describe('Function INDEX', () => {
       ['=INDEX(B1:B1, 1, "bar")'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM, 'Wrong type of argument.'))
-    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NUM, 'Wrong type of argument.'))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM, ErrorMessages.WrongType))
+    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NUM, ErrorMessages.WrongType))
   })
 
   it('requires 2nd argument to be in bounds of range', () => {
@@ -33,12 +34,12 @@ describe('Function INDEX', () => {
       ['=INDEX(B1, 2, 1)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM, 'Value cannot be negative.'))
-    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NUM, 'Value too large.'))
-    expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.NUM, 'Value cannot be negative.'))
-    expect(engine.getCellValue(adr('A4'))).toEqual(detailedError(ErrorType.NUM, 'Value too large.'))
-    expect(engine.getCellValue(adr('A5'))).toEqual(detailedError(ErrorType.NUM, 'Value cannot be negative.'))
-    expect(engine.getCellValue(adr('A6'))).toEqual(detailedError(ErrorType.NUM, 'Value too large.'))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM, ErrorMessages.Negative))
+    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NUM, ErrorMessages.ValueLarge))
+    expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.NUM, ErrorMessages.Negative))
+    expect(engine.getCellValue(adr('A4'))).toEqual(detailedError(ErrorType.NUM, ErrorMessages.ValueLarge))
+    expect(engine.getCellValue(adr('A5'))).toEqual(detailedError(ErrorType.NUM, ErrorMessages.Negative))
+    expect(engine.getCellValue(adr('A6'))).toEqual(detailedError(ErrorType.NUM, ErrorMessages.ValueLarge))
   })
 
   it('requires 2nd and 3rd arguments to be in bounds of range', () => {
@@ -51,12 +52,12 @@ describe('Function INDEX', () => {
       ['=INDEX(B1, 1, 2)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM, 'Value cannot be negative.'))
-    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NUM, 'Value too large.'))
-    expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.NUM, 'Value cannot be negative.'))
-    expect(engine.getCellValue(adr('A4'))).toEqual(detailedError(ErrorType.NUM, 'Value too large.'))
-    expect(engine.getCellValue(adr('A5'))).toEqual(detailedError(ErrorType.NUM, 'Value cannot be negative.'))
-    expect(engine.getCellValue(adr('A6'))).toEqual(detailedError(ErrorType.NUM, 'Value too large.'))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM, ErrorMessages.Negative))
+    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NUM, ErrorMessages.ValueLarge))
+    expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.NUM, ErrorMessages.Negative))
+    expect(engine.getCellValue(adr('A4'))).toEqual(detailedError(ErrorType.NUM, ErrorMessages.ValueLarge))
+    expect(engine.getCellValue(adr('A5'))).toEqual(detailedError(ErrorType.NUM, ErrorMessages.Negative))
+    expect(engine.getCellValue(adr('A6'))).toEqual(detailedError(ErrorType.NUM, ErrorMessages.ValueLarge))
   })
 
   it('works for range and nonzero arguments', () => {
