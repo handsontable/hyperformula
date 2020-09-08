@@ -59,6 +59,7 @@ export class ErrorMessages {
   public static IncorrectDate = 'String does not represent correct Date.'
   public static IncorrectDateTime = 'String does not represent correct DateTime.'
   public static NonZero = 'Argument cannot be 0.'
+  public static CharacterCode = 'Character code out of bounds.'
   public static FunctionName = (arg: string) => `Function name ${arg} not recognized.`
   public static NamedExpressionName = (arg: string) => `Named expression ${arg} not recognized.`
 }

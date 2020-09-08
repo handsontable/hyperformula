@@ -13,7 +13,7 @@ export class CharPlugin extends FunctionPlugin {
     'CHAR': {
       method: 'char',
       parameters: [
-          {argumentType: ArgumentTypes.NUMBER, minValue: 1, maxValue: 255}
+          {argumentType: ArgumentTypes.NUMBER}
         ],
     },
   }
