@@ -4,8 +4,8 @@
  */
 
 export class ErrorMessage {
-  public static ErrorSigns = 'Distinct signs.'
-  public static ErrorArgNumber = 'Wrong number of arguments.'
+  public static DistinctSigns = 'Distinct signs.'
+  public static WrongArgNumber = 'Wrong number of arguments.'
   public static EmptyArg = 'Empty function argument.'
   public static MatrixDimensions = 'Matrix dimensions are not compatible.'
   public static ValueSmall = 'Value too small.'
@@ -56,9 +56,8 @@ export class ErrorMessage {
   public static NoDefault = 'No default option.'
   public static Selector = 'Selector cannot exceed the number of arguments.'
   public static StartEndDate = 'Start date needs to be earlier than end date.'
-  public static IncorrectDate = 'String does not represent correct Date.'
   public static IncorrectDateTime = 'String does not represent correct DateTime.'
-  public static CharacterCode = 'Character code out of bounds.'
+  public static CharacterCodeBounds = 'Character code out of bounds.'
   public static NonZero = 'Argument cannot be 0.'
   public static FunctionName = (arg: string) => `Function name ${arg} not recognized.`
   public static NamedExpressionName = (arg: string) => `Named expression ${arg} not recognized.`

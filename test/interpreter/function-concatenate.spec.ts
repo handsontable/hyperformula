@@ -7,7 +7,7 @@ describe('function CONCATENATE', () => {
   it('validate arguments', () => {
     const engine = HyperFormula.buildFromArray([['=CONCATENATE()']])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA, ErrorMessage.ErrorArgNumber))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
   })
 
   it('works', () => {

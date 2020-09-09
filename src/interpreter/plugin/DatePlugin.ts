@@ -363,7 +363,7 @@ export class DatePlugin extends FunctionPlugin {
       (date: string) => {
         const dateNumber = this.interpreter.dateHelper.dateStringToDateNumber(date)
         if(dateNumber===undefined){
-          return new CellError(ErrorType.VALUE, ErrorMessage.IncorrectDate)
+          return new CellError(ErrorType.VALUE, ErrorMessage.IncorrectDateTime)
         }
         return dateNumber%1
       }

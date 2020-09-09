@@ -167,7 +167,7 @@ export class InformationPlugin extends FunctionPlugin {
    */
   public isformula(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.runFunctionWithReferenceArgument(ast.args, formulaAddress, this.metadata('ISFORMULA'),
-      () => new CellError(ErrorType.NA, ErrorMessage.ErrorArgNumber),
+      () => new CellError(ErrorType.NA, ErrorMessage.WrongArgNumber),
       (reference: SimpleCellAddress) => {
         const vertex = this.dependencyGraph.addressMapping.getCell(reference)
         return vertex instanceof FormulaCellVertex || (vertex instanceof MatrixVertex && vertex.isFormula())
@@ -285,7 +285,7 @@ export class InformationPlugin extends FunctionPlugin {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public columns(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     if (ast.args.length !== 1) {
-      return new CellError(ErrorType.NA, ErrorMessage.ErrorArgNumber)
+      return new CellError(ErrorType.NA, ErrorMessage.WrongArgNumber)
     }
     if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
       return new CellError(ErrorType.NUM, ErrorMessage.EmptyArg )
@@ -309,7 +309,7 @@ export class InformationPlugin extends FunctionPlugin {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public rows(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     if (ast.args.length !== 1) {
-      return new CellError(ErrorType.NA, ErrorMessage.ErrorArgNumber)
+      return new CellError(ErrorType.NA, ErrorMessage.WrongArgNumber)
     }
     if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
       return new CellError(ErrorType.NUM, ErrorMessage.EmptyArg )
@@ -325,7 +325,7 @@ export class InformationPlugin extends FunctionPlugin {
   public index(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InterpreterValue {
     const rangeArg = ast.args[0]
     if (ast.args.length < 1 || ast.args.length > 3) {
-      return new CellError(ErrorType.NA, ErrorMessage.ErrorArgNumber)
+      return new CellError(ErrorType.NA, ErrorMessage.WrongArgNumber)
     }
     if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
       return new CellError(ErrorType.NUM, ErrorMessage.EmptyArg )

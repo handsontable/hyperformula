@@ -29,7 +29,7 @@ export class MatrixPlugin extends FunctionPlugin {
 
   public mmult(ast: ProcedureAst, formulaAddress: SimpleCellAddress): SimpleRangeValue | CellError {
     if (ast.args.length !== 2) {
-      return new CellError(ErrorType.NA, ErrorMessage.ErrorArgNumber)
+      return new CellError(ErrorType.NA, ErrorMessage.WrongArgNumber)
     }
     if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
       return new CellError(ErrorType.NUM, ErrorMessage.EmptyArg )
@@ -205,7 +205,7 @@ export class MatrixPlugin extends FunctionPlugin {
 
   public transpose(ast: ProcedureAst, formulaAddress: SimpleCellAddress): SimpleRangeValue | CellError {
     if (ast.args.length !== 1) {
-      return new CellError(ErrorType.NA, ErrorMessage.ErrorArgNumber)
+      return new CellError(ErrorType.NA, ErrorMessage.WrongArgNumber)
     }
     if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
       return new CellError(ErrorType.NUM, ErrorMessage.EmptyArg )

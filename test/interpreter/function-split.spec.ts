@@ -7,8 +7,8 @@ describe('Function SPLIT', () => {
   it('wrong number of arguments', () => {
     const engine = HyperFormula.buildFromArray([['=SPLIT(1)', '=SPLIT("a","b","c")']])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA, ErrorMessage.ErrorArgNumber))
-    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.NA, ErrorMessage.ErrorArgNumber))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
+    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
   })
   it('happy path', () => {
     const engine = HyperFormula.buildFromArray([['some words', '=SPLIT(A1, 0)']])

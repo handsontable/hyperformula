@@ -7,7 +7,7 @@ describe('MINA', () => {
   it('MINA with empty args', () => {
     const engine = HyperFormula.buildFromArray([['=MINA()']])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA, ErrorMessage.ErrorArgNumber))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
   })
 
   it('MINA with args', () => {

@@ -7,7 +7,7 @@ describe('AVERAGEA', () => {
   it('AVERAGEA with empty args', () => {
     const engine = HyperFormula.buildFromArray([['=AVERAGEA()']])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA, ErrorMessage.ErrorArgNumber))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
   })
 
   it('AVERAGEA with args', () => {

@@ -41,7 +41,7 @@ export function checkMatrixSize(ast: Ast, formulaAddress: SimpleCellAddress): Ma
     switch (ast.procedureName) {
       case 'MMULT': {
         if (ast.args.length !== 2) {
-          return new CellError(ErrorType.NA, ErrorMessage.ErrorArgNumber)
+          return new CellError(ErrorType.NA, ErrorMessage.WrongArgNumber)
         }
         if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
           return new CellError(ErrorType.NUM, ErrorMessage.EmptyArg )
@@ -63,7 +63,7 @@ export function checkMatrixSize(ast: Ast, formulaAddress: SimpleCellAddress): Ma
       case 'MEDIANPOOL':
       case 'MAXPOOL': {
         if (ast.args.length < 2 || ast.args.length > 3) {
-          return new CellError(ErrorType.NA, ErrorMessage.ErrorArgNumber)
+          return new CellError(ErrorType.NA, ErrorMessage.WrongArgNumber)
         }
         if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
           return new CellError(ErrorType.NUM, ErrorMessage.EmptyArg )
@@ -100,7 +100,7 @@ export function checkMatrixSize(ast: Ast, formulaAddress: SimpleCellAddress): Ma
       }
       case 'TRANSPOSE': {
         if (ast.args.length !== 1) {
-          return new CellError(ErrorType.NA, ErrorMessage.ErrorArgNumber)
+          return new CellError(ErrorType.NA, ErrorMessage.WrongArgNumber)
         }
 
         if (ast.args[0].type === AstNodeType.EMPTY) {

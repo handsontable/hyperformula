@@ -8,8 +8,8 @@ describe('Function IFERROR', () => {
     const engine = HyperFormula.buildFromArray([
       ['=IFERROR(1)', '=IFERROR(2,3,4)']
     ])
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA, ErrorMessage.ErrorArgNumber))
-    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.NA, ErrorMessage.ErrorArgNumber))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
+    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
   })
   it('when no error', () => {
     const engine = HyperFormula.buildFromArray([['=IFERROR("abcd", "no")']])

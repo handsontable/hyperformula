@@ -8,7 +8,7 @@ describe('Interpreter - CHOOSE function', () => {
     const engine = HyperFormula.buildFromArray([
       ['=CHOOSE(0)']
     ])
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA, ErrorMessage.ErrorArgNumber))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
   })
 
   it('Should work with more arguments', () => {

@@ -21,7 +21,7 @@ export class CharPlugin extends FunctionPlugin {
   public char(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.runFunction(ast.args, formulaAddress, this.metadata('CHAR'), (value: number) => {
       if (value < 1 || value >= 256) {
-        return new CellError(ErrorType.VALUE, ErrorMessage.CharacterCode)
+        return new CellError(ErrorType.VALUE, ErrorMessage.CharacterCodeBounds)
       }
 
       return String.fromCharCode(Math.trunc(value))

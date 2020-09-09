@@ -13,6 +13,6 @@ describe('Function TRUE', () => {
   it('is 0-arity', () => {
     const engine = HyperFormula.buildFromArray([['=TRUE(1)']])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA, ErrorMessage.ErrorArgNumber))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
   })
 })

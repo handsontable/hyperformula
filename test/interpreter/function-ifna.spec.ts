@@ -8,8 +8,8 @@ describe('Function IFNA', () => {
     const engine = HyperFormula.buildFromArray([
       ['=IFNA(1)', '=IFNA(2,3,4)']
     ])
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA, ErrorMessage.ErrorArgNumber))
-    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.NA, ErrorMessage.ErrorArgNumber))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
+    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
   })
   it('when no error', () => {
     const engine = HyperFormula.buildFromArray([['=IFNA("abcd", "no")']])

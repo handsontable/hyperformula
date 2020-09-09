@@ -121,7 +121,7 @@ export class NumericAggregationPlugin extends FunctionPlugin {
 
   public sumsq(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     if (ast.args.length < 1) {
-      return new CellError(ErrorType.NA, ErrorMessage.ErrorArgNumber)
+      return new CellError(ErrorType.NA, ErrorMessage.WrongArgNumber)
     }
     if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
       return new CellError(ErrorType.NUM, ErrorMessage.EmptyArg )
@@ -131,7 +131,7 @@ export class NumericAggregationPlugin extends FunctionPlugin {
 
   public countblank(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     if (ast.args.length < 1) {
-      return new CellError(ErrorType.NA, ErrorMessage.ErrorArgNumber)
+      return new CellError(ErrorType.NA, ErrorMessage.WrongArgNumber)
     }
     if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
       return new CellError(ErrorType.NUM, ErrorMessage.EmptyArg )
@@ -158,7 +158,7 @@ export class NumericAggregationPlugin extends FunctionPlugin {
    */
   public max(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     if (ast.args.length < 1) {
-      return new CellError(ErrorType.NA, ErrorMessage.ErrorArgNumber)
+      return new CellError(ErrorType.NA, ErrorMessage.WrongArgNumber)
     }
     if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
       return new CellError(ErrorType.NUM, ErrorMessage.EmptyArg )
@@ -170,7 +170,7 @@ export class NumericAggregationPlugin extends FunctionPlugin {
 
   public maxa(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     if (ast.args.length < 1) {
-      return new CellError(ErrorType.NA, ErrorMessage.ErrorArgNumber)
+      return new CellError(ErrorType.NA, ErrorMessage.WrongArgNumber)
     }
     if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
       return new CellError(ErrorType.NUM, ErrorMessage.EmptyArg )
@@ -190,7 +190,7 @@ export class NumericAggregationPlugin extends FunctionPlugin {
    */
   public min(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     if (ast.args.length < 1) {
-      return new CellError(ErrorType.NA, ErrorMessage.ErrorArgNumber)
+      return new CellError(ErrorType.NA, ErrorMessage.WrongArgNumber)
     }
     if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
       return new CellError(ErrorType.NUM, ErrorMessage.EmptyArg )
@@ -202,7 +202,7 @@ export class NumericAggregationPlugin extends FunctionPlugin {
 
   public mina(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     if (ast.args.length < 1) {
-      return new CellError(ErrorType.NA, ErrorMessage.ErrorArgNumber)
+      return new CellError(ErrorType.NA, ErrorMessage.WrongArgNumber)
     }
     if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
       return new CellError(ErrorType.NUM, ErrorMessage.EmptyArg )
@@ -214,7 +214,7 @@ export class NumericAggregationPlugin extends FunctionPlugin {
 
   public count(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     if (ast.args.length < 1) {
-      return new CellError(ErrorType.NA, ErrorMessage.ErrorArgNumber)
+      return new CellError(ErrorType.NA, ErrorMessage.WrongArgNumber)
     }
     if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
       return new CellError(ErrorType.NUM, ErrorMessage.EmptyArg )
@@ -230,7 +230,7 @@ export class NumericAggregationPlugin extends FunctionPlugin {
 
   public counta(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     if (ast.args.length < 1) {
-      return new CellError(ErrorType.NA, ErrorMessage.ErrorArgNumber)
+      return new CellError(ErrorType.NA, ErrorMessage.WrongArgNumber)
     }
     if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
       return new CellError(ErrorType.NUM, ErrorMessage.EmptyArg )
@@ -246,7 +246,7 @@ export class NumericAggregationPlugin extends FunctionPlugin {
 
   public average(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     if (ast.args.length < 1) {
-      return new CellError(ErrorType.NA, ErrorMessage.ErrorArgNumber)
+      return new CellError(ErrorType.NA, ErrorMessage.WrongArgNumber)
     }
     if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
       return new CellError(ErrorType.NUM, ErrorMessage.EmptyArg )
@@ -279,7 +279,7 @@ export class NumericAggregationPlugin extends FunctionPlugin {
 
   public averagea(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     if (ast.args.length < 1) {
-      return new CellError(ErrorType.NA, ErrorMessage.ErrorArgNumber)
+      return new CellError(ErrorType.NA, ErrorMessage.WrongArgNumber)
     }
     if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
       return new CellError(ErrorType.NUM, ErrorMessage.EmptyArg )

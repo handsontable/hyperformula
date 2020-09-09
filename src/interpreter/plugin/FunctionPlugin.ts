@@ -244,11 +244,11 @@ export abstract class FunctionPlugin {
 
     let argCoerceFailure: Maybe<CellError> = undefined
     if(functionDefinition.repeatLastArgs === undefined && argumentDefinitions.length < scalarValues.length) {
-      return new CellError(ErrorType.NA, ErrorMessage.ErrorArgNumber)
+      return new CellError(ErrorType.NA, ErrorMessage.WrongArgNumber)
     }
     if(functionDefinition.repeatLastArgs !== undefined && scalarValues.length > argumentDefinitions.length &&
       (scalarValues.length-argumentDefinitions.length)%functionDefinition.repeatLastArgs !== 0) {
-      return new CellError(ErrorType.NA, ErrorMessage.ErrorArgNumber)
+      return new CellError(ErrorType.NA, ErrorMessage.WrongArgNumber)
     }
     for(let i=0, j=0; i<Math.max(scalarValues.length, argumentDefinitions.length); i++, j++) {
       // i points to where are we in the scalarValues list,
@@ -263,7 +263,7 @@ export abstract class FunctionPlugin {
           coercedArguments.push(undefined)
         } else {
           //not enough values passed as arguments, and there was no default value and argument was not optional
-          return new CellError(ErrorType.NA, ErrorMessage.ErrorArgNumber)
+          return new CellError(ErrorType.NA, ErrorMessage.WrongArgNumber)
         }
       } else {
         //we apply coerce only to non-default values
@@ -295,7 +295,7 @@ export abstract class FunctionPlugin {
     if (args.length === 0) {
       return noArgCallback()
     } else if (args.length > 1) {
-      return new CellError(ErrorType.NA, ErrorMessage.ErrorArgNumber)
+      return new CellError(ErrorType.NA, ErrorMessage.WrongArgNumber)
     }
     const arg = args[0]
 

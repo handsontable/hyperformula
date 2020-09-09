@@ -6,7 +6,7 @@ import {adr, detailedError} from '../testUtils'
 describe('MIN', () => {
   it('MIN with empty args', () => {
     const engine = HyperFormula.buildFromArray([['=MIN()']])
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA, ErrorMessage.ErrorArgNumber))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
   })
 
   it('MIN with args', () => {

@@ -35,7 +35,7 @@ export class VlookupPlugin extends FunctionPlugin {
    */
   public vlookup(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InterpreterValue {
     if (ast.args.length < 3 || ast.args.length > 4) {
-      return new CellError(ErrorType.NA, ErrorMessage.ErrorArgNumber)
+      return new CellError(ErrorType.NA, ErrorMessage.WrongArgNumber)
     }
 
     if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
@@ -78,7 +78,7 @@ export class VlookupPlugin extends FunctionPlugin {
 
   public match(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     if (ast.args.length < 2 || ast.args.length > 3) {
-      return new CellError(ErrorType.NA, ErrorMessage.ErrorArgNumber)
+      return new CellError(ErrorType.NA, ErrorMessage.WrongArgNumber)
     }
 
     const key = this.evaluateAst(ast.args[0], formulaAddress)

@@ -59,8 +59,8 @@ describe('Function DATE', () => {
       ['=DATE(1900, 1)'],
       ['=DATE(1900, 1, 1, 1)'],
     ], config)
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA, ErrorMessage.ErrorArgNumber))
-    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NA, ErrorMessage.ErrorArgNumber))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
+    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
   })
 
   it('with incoercible argument', () => {
@@ -211,7 +211,7 @@ describe( 'Function DATE + leap years', () =>{
       ['=DATE()'],
     ], config)
 
-    expect(dateNumberToString(engine.getCellValue(adr('A1')), config)).toEqual(detailedError(ErrorType.NA, ErrorMessage.ErrorArgNumber))
+    expect(dateNumberToString(engine.getCellValue(adr('A1')), config)).toEqual(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
   })
 
   it('with blanks', () => {

@@ -7,7 +7,7 @@ describe('COUNT', () => {
   it('COUNT with empty args', () => {
     const engine = HyperFormula.buildFromArray([['=COUNT()']])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA, ErrorMessage.ErrorArgNumber))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
   })
 
   it('COUNT with args', () => {

@@ -7,8 +7,8 @@ describe('Function IF', () => {
   it('wrong number of arguments', () => {
     const engine = HyperFormula.buildFromArray([['=IF(TRUE(), "no", 1, 2)', '=IF(1)']])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA, ErrorMessage.ErrorArgNumber))
-    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.NA, ErrorMessage.ErrorArgNumber))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
+    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
   })
   it('when value is true', () => {
     const engine = HyperFormula.buildFromArray([['=IF(TRUE(), "yes", "no")']])
