@@ -57,8 +57,8 @@ describe('Operator MINUS', () => {
       ['3'],
     ])
 
-    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessage.Range))
-    expect(engine.getCellValue(adr('B2'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessage.Range))
+    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessage.ScalarExpected))
+    expect(engine.getCellValue(adr('B2'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessage.ScalarExpected))
   })
   it('Minus propagates errors correctly', () => {
     const engine = HyperFormula.buildFromArray([
@@ -67,7 +67,7 @@ describe('Operator MINUS', () => {
 
     expect(engine.getCellValue(adr('C1'))).toEqual(detailedError(ErrorType.DIV_BY_ZERO))
     expect(engine.getCellValue(adr('D1'))).toEqual(detailedError(ErrorType.DIV_BY_ZERO))
-    expect(engine.getCellValue(adr('E1'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessage.Range))
+    expect(engine.getCellValue(adr('E1'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessage.ScalarExpected))
     expect(engine.getCellValue(adr('F1'))).toEqual(detailedError(ErrorType.DIV_BY_ZERO))
   })
 })

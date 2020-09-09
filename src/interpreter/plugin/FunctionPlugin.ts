@@ -205,7 +205,7 @@ export abstract class FunctionPlugin {
             return new CellError(ErrorType.NUM, ErrorMessage.ValueSmall)
           }
           if(coercedType.argumentType === ArgumentTypes.INTEGER && !Number.isInteger(value)) {
-            return new CellError(ErrorType.NUM, ErrorMessage.IntegerValue)
+            return new CellError(ErrorType.NUM, ErrorMessage.IntegerExpected)
           }
           return value
         case ArgumentTypes.STRING:

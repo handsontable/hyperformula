@@ -101,7 +101,7 @@ describe('Function MATCH', () => {
       ['103'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA, ErrorMessage.ValueMissing))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA, ErrorMessage.ValueNotFound))
   })
 
   it('column - doesnt return result if value before searched range', () => {
@@ -113,7 +113,7 @@ describe('Function MATCH', () => {
       ['200'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA, ErrorMessage.ValueMissing))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA, ErrorMessage.ValueNotFound))
   })
 
   it('row - works when value is in first cell', () => {
@@ -158,7 +158,7 @@ describe('Function MATCH', () => {
       ['200', '200', '200', '200', '103'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA, ErrorMessage.ValueMissing))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA, ErrorMessage.ValueNotFound))
   })
 
   it('row - doesnt return result if value before searched range', () => {
@@ -167,7 +167,7 @@ describe('Function MATCH', () => {
       ['103', '200', '200', '200'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA, ErrorMessage.ValueMissing))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA, ErrorMessage.ValueNotFound))
   })
 
   it('uses binsearch', () => {

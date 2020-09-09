@@ -42,8 +42,8 @@ describe('function BITAND', () => {
       ['=BITAND(3.14, 5)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM, ErrorMessage.IntegerValue))
-    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NUM, ErrorMessage.IntegerValue))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM, ErrorMessage.IntegerExpected))
+    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NUM, ErrorMessage.IntegerExpected))
   })
 
   it('should work', () => {

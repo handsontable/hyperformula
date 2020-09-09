@@ -264,7 +264,7 @@ describe('Function TRANSPOSE', () => {
       ['=TRANSPOSE(A1:B3)'],
     ])
 
-    expect(engine.getCellValue(adr('A4'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessage.Range))
+    expect(engine.getCellValue(adr('A4'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessage.ScalarExpected))
     expect(engine.getCellValue(adr('A5'))).toBe(null)
     expect(engine.getCellValue(adr('B4'))).toBe(null)
   })

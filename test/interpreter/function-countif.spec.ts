@@ -77,7 +77,7 @@ describe('Function COUNTIF', () => {
       ['=COUNTIF(B1:B2, "><foo")'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessage.Criterion))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessage.BadCriterion))
   })
 
   it('scalars are treated like singular arrays', () => {

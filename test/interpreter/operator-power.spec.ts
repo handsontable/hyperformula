@@ -57,8 +57,8 @@ describe('Operator POWER', () => {
       ['3'],
     ])
 
-    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessage.Range))
-    expect(engine.getCellValue(adr('B2'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessage.Range))
+    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessage.ScalarExpected))
+    expect(engine.getCellValue(adr('B2'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessage.ScalarExpected))
   })
 
   it('Power propagates errors correctly', () => {
@@ -68,7 +68,7 @@ describe('Operator POWER', () => {
 
     expect(engine.getCellValue(adr('C1'))).toEqual(detailedError(ErrorType.DIV_BY_ZERO))
     expect(engine.getCellValue(adr('D1'))).toEqual(detailedError(ErrorType.DIV_BY_ZERO))
-    expect(engine.getCellValue(adr('E1'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessage.Range))
+    expect(engine.getCellValue(adr('E1'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessage.ScalarExpected))
     expect(engine.getCellValue(adr('F1'))).toEqual(detailedError(ErrorType.DIV_BY_ZERO))
   })
 

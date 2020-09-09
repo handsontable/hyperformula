@@ -299,7 +299,7 @@ export class DatePlugin extends FunctionPlugin {
         }
         const offset = weekdayOffsets.get(type)
         if(offset===undefined) {
-          return new CellError(ErrorType.NUM, ErrorMessage.Weekday)
+          return new CellError(ErrorType.NUM, ErrorMessage.BadMode)
         }
         return (absoluteDay-offset)%7+1
       }
@@ -318,7 +318,7 @@ export class DatePlugin extends FunctionPlugin {
         }
         const offset = weekdayOffsets.get(type)
         if(offset===undefined) {
-          return new CellError(ErrorType.NUM, ErrorMessage.Weekday)
+          return new CellError(ErrorType.NUM, ErrorMessage.BadMode)
         }
         return Math.floor((absoluteDay-offset)/7) - Math.floor((yearStartAbsolute-offset)/7)+1
       }
@@ -441,7 +441,7 @@ export class DatePlugin extends FunctionPlugin {
                 + this.interpreter.dateHelper.leapYearsCount(start.year)
             }
           default:
-            return new CellError(ErrorType.NUM, ErrorMessage.Weekday)
+            return new CellError(ErrorType.NUM, ErrorMessage.BadMode)
         }
       }
     )

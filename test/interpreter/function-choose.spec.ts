@@ -24,7 +24,7 @@ describe('Interpreter - CHOOSE function', () => {
     const engine = HyperFormula.buildFromArray([
       ['=CHOOSE(1.5,2,3)', '=CHOOSE(0,2,3,4)', '=CHOOSE(5,2,3,4,5)']
     ])
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM, ErrorMessage.IntegerValue))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM, ErrorMessage.IntegerExpected))
     expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.NUM, ErrorMessage.ValueSmall))
     expect(engine.getCellValue(adr('C1'))).toEqual(detailedError(ErrorType.NUM, ErrorMessage.Selector))
   })

@@ -170,7 +170,7 @@ export class Interpreter {
       case AstNodeType.PLUS_UNARY_OP: {
         const result = this.evaluateAst(ast.value, formulaAddress)
         if (result instanceof SimpleRangeValue) {
-          return new CellError(ErrorType.VALUE, ErrorMessage.Range)
+          return new CellError(ErrorType.VALUE, ErrorMessage.ScalarExpected)
         } else {
           return result
         }
@@ -178,7 +178,7 @@ export class Interpreter {
       case AstNodeType.MINUS_UNARY_OP: {
         const result = this.evaluateAst(ast.value, formulaAddress)
         if (result instanceof SimpleRangeValue) {
-          return new CellError(ErrorType.VALUE, ErrorMessage.Range)
+          return new CellError(ErrorType.VALUE, ErrorMessage.ScalarExpected)
         } else {
           return wrapperUnary((a) => -a,
             this.arithmeticHelper.coerceScalarToNumberOrError(result))
@@ -187,7 +187,7 @@ export class Interpreter {
       case AstNodeType.PERCENT_OP: {
         const result = this.evaluateAst(ast.value, formulaAddress)
         if (result instanceof SimpleRangeValue) {
-          return new CellError(ErrorType.VALUE, ErrorMessage.Range)
+          return new CellError(ErrorType.VALUE, ErrorMessage.ScalarExpected)
         } else {
           return wrapperUnary((a) => a/100,
             this.arithmeticHelper.coerceScalarToNumberOrError(result))
@@ -212,7 +212,7 @@ export class Interpreter {
       }
       case AstNodeType.CELL_RANGE: {
         if (!this.rangeSpansOneSheet(ast)) {
-          return new CellError(ErrorType.REF, ErrorMessage.RangeSheets)
+          return new CellError(ErrorType.REF, ErrorMessage.RangeManySheets)
         }
         const range = AbsoluteCellRange.fromCellRange(ast, formulaAddress)
         const matrixVertex = this.dependencyGraph.getMatrix(range)
@@ -233,14 +233,14 @@ export class Interpreter {
       }
       case AstNodeType.COLUMN_RANGE: {
         if (!this.rangeSpansOneSheet(ast)) {
-          return new CellError(ErrorType.REF, ErrorMessage.RangeSheets)
+          return new CellError(ErrorType.REF, ErrorMessage.RangeManySheets)
         }
         const range = AbsoluteColumnRange.fromColumnRange(ast, formulaAddress)
         return SimpleRangeValue.onlyRange(range, this.dependencyGraph)
       }
       case AstNodeType.ROW_RANGE: {
         if (!this.rangeSpansOneSheet(ast)) {
-          return new CellError(ErrorType.REF, ErrorMessage.RangeSheets)
+          return new CellError(ErrorType.REF, ErrorMessage.RangeManySheets)
         }
         const range = AbsoluteRowRange.fromRowRange(ast, formulaAddress)
         return SimpleRangeValue.onlyRange(range, this.dependencyGraph)
@@ -278,11 +278,11 @@ function passErrors(left: InterpreterValue, right: InterpreterValue): Maybe<Cell
   if (left instanceof CellError) {
     return left
   } else if (left instanceof SimpleRangeValue) {
-    return new CellError(ErrorType.VALUE, ErrorMessage.Range)
+    return new CellError(ErrorType.VALUE, ErrorMessage.ScalarExpected)
   } else if (right instanceof CellError) {
     return right
   } else if (right instanceof SimpleRangeValue) {
-    return new CellError(ErrorType.VALUE, ErrorMessage.Range)
+    return new CellError(ErrorType.VALUE, ErrorMessage.ScalarExpected)
   } else {
     return undefined
   }

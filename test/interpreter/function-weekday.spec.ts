@@ -31,7 +31,7 @@ describe('Function WEEKDAY', () => {
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM, ErrorMessage.ValueSmall))
-    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NUM, ErrorMessage.Weekday))
+    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NUM, ErrorMessage.BadMode))
   })
 
   it('should work for strings', () => {

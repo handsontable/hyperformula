@@ -41,7 +41,7 @@ describe('Unary operator MINUS', () => {
       ['3'],
     ])
 
-    expect(engine.getCellValue(adr('B2'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessage.Range))
+    expect(engine.getCellValue(adr('B2'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessage.ScalarExpected))
   })
 
   it('double unary plus', () => {

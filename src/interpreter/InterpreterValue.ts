@@ -141,7 +141,7 @@ export class OnlyRangeData {
     for (const cellFromRange of this._range.addresses(this.dependencyGraph)) {
       const value = this.dependencyGraph.getCellValue(cellFromRange)
       if (value instanceof SimpleRangeValue) {
-        row.push(new CellError(ErrorType.VALUE, ErrorMessage.Range))
+        row.push(new CellError(ErrorType.VALUE, ErrorMessage.ScalarExpected))
       } else if (typeof value === 'number') {
         row.push(value)
       } else {

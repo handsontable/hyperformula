@@ -50,7 +50,7 @@ describe('Interpreter', () => {
 
   it('ranges - VALUE error when evaluating without context', () => {
     const engine = HyperFormula.buildFromArray([['1'], ['2'], ['=A1:A2']])
-    expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessage.Range))
+    expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessage.ScalarExpected))
   })
 
   it('procedures - SUM with bad args', () => {
@@ -146,7 +146,7 @@ describe('Interpreter', () => {
         [''],
       ],
     })
-    expect(engine.getCellValue(adr('A1', 1))).toEqual(detailedError(ErrorType.REF, ErrorMessage.RangeSheets))
+    expect(engine.getCellValue(adr('A1', 1))).toEqual(detailedError(ErrorType.REF, ErrorMessage.RangeManySheets))
   })
 
   it('expression with parenthesis', () => {
@@ -171,11 +171,11 @@ describe('Interpreter', () => {
       ]
     })
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.REF, ErrorMessage.RangeSheets))
-    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.REF, ErrorMessage.RangeSheets))
-    expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.REF, ErrorMessage.RangeSheets))
-    expect(engine.getCellValue(adr('A4'))).toEqual(detailedError(ErrorType.REF, ErrorMessage.RangeSheets))
-    expect(engine.getCellValue(adr('A5'))).toEqual(detailedError(ErrorType.REF, ErrorMessage.RangeSheets))
-    expect(engine.getCellValue(adr('A6'))).toEqual(detailedError(ErrorType.REF, ErrorMessage.RangeSheets))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.REF, ErrorMessage.RangeManySheets))
+    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.REF, ErrorMessage.RangeManySheets))
+    expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.REF, ErrorMessage.RangeManySheets))
+    expect(engine.getCellValue(adr('A4'))).toEqual(detailedError(ErrorType.REF, ErrorMessage.RangeManySheets))
+    expect(engine.getCellValue(adr('A5'))).toEqual(detailedError(ErrorType.REF, ErrorMessage.RangeManySheets))
+    expect(engine.getCellValue(adr('A6'))).toEqual(detailedError(ErrorType.REF, ErrorMessage.RangeManySheets))
   })
 })

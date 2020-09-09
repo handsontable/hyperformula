@@ -90,7 +90,7 @@ export class Exporter {
 
   public exportValue(value: InterpreterValue): CellValue {
     if (value instanceof SimpleRangeValue) {
-      return this.detailedError(new CellError(ErrorType.VALUE, ErrorMessage.Range))
+      return this.detailedError(new CellError(ErrorType.VALUE, ErrorMessage.ScalarExpected))
     } else if (this.config.smartRounding && typeof value == 'number') {
       return this.cellValueRounding(value)
     } else if (value instanceof CellError) {

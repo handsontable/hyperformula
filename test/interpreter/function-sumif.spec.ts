@@ -58,7 +58,7 @@ describe('Function SUMIF - argument validations and combinations', () => {
       ['=SUMIF(B1:B2, "><foo", C1:C2)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessage.Criterion))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessage.BadCriterion))
   })
 
   it('error when different width dimension of arguments',  () => {
@@ -439,8 +439,8 @@ describe('Function SUMIFS - argument validations and combinations', () => {
       ['=SUMIFS(B1:B2, C1:C2, "=1", C1:C2, "><foo")'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessage.Criterion))
-    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessage.Criterion))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessage.BadCriterion))
+    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessage.BadCriterion))
   })
 
   it('error when different width dimension of arguments',  () => {

@@ -105,14 +105,14 @@ export class VlookupPlugin extends FunctionPlugin {
       const rowIndex = this.columnSearch.find(key, searchedRange, sorted !== 0)
 
       if (rowIndex === -1) {
-        return new CellError(ErrorType.NA, ErrorMessage.ValueMissing)
+        return new CellError(ErrorType.NA, ErrorMessage.ValueNotFound)
       }
 
       return rowIndex - searchedRange.start.row + 1
     } else {
       const columnIndex = this.searchInRange(key, searchedRange, false)
       if (columnIndex === -1) {
-        return new CellError(ErrorType.NA, ErrorMessage.ValueMissing)
+        return new CellError(ErrorType.NA, ErrorMessage.ValueNotFound)
       }
 
       return (columnIndex-searchedRange.start.row) + 1
@@ -139,7 +139,7 @@ export class VlookupPlugin extends FunctionPlugin {
     this.dependencyGraph.stats.end(StatType.VLOOKUP)
 
     if (rowIndex === -1) {
-      return new CellError(ErrorType.NA, ErrorMessage.ValueMissing)
+      return new CellError(ErrorType.NA, ErrorMessage.ValueNotFound)
     }
 
     const address = simpleCellAddress(range.sheet, range.start.col + index, rowIndex)

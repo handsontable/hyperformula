@@ -188,7 +188,7 @@ const sharedExamples = (builder: (sheet: Sheet, config?: Partial<ConfigParams>) 
         ['=VLOOKUP(0, A1:B3, 2, TRUE())'],
       ], {vlookupThreshold: 1})
 
-      expect(engine.getCellValue(adr('A4'))).toEqual(detailedError(ErrorType.NA, ErrorMessage.ValueMissing))
+      expect(engine.getCellValue(adr('A4'))).toEqual(detailedError(ErrorType.NA, ErrorMessage.ValueNotFound))
     })
 
     it('should return error when value not present using linear search', () => {
@@ -199,7 +199,7 @@ const sharedExamples = (builder: (sheet: Sheet, config?: Partial<ConfigParams>) 
         ['=VLOOKUP(4, A1:B3, 2, FALSE())'],
       ])
 
-      expect(engine.getCellValue(adr('A4'))).toEqual(detailedError(ErrorType.NA, ErrorMessage.ValueMissing))
+      expect(engine.getCellValue(adr('A4'))).toEqual(detailedError(ErrorType.NA, ErrorMessage.ValueNotFound))
     })
 
     it('should find value if index build during evaluation', () => {
@@ -255,7 +255,7 @@ const sharedExamples = (builder: (sheet: Sheet, config?: Partial<ConfigParams>) 
         ['{=TRANSPOSE(A2:C3)}'],
       ])
 
-      expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA, ErrorMessage.ValueMissing))
+      expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA, ErrorMessage.ValueNotFound))
 
       engine.setCellContents(adr('C2'), '4')
 

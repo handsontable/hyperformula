@@ -603,7 +603,7 @@ export class DependencyGraph {
   public getScalarValue(address: SimpleCellAddress): InternalScalarValue {
     const value = this.addressMapping.getCellValue(address)
     if (value instanceof SimpleRangeValue) {
-      return new CellError(ErrorType.VALUE, ErrorMessage.Range)
+      return new CellError(ErrorType.VALUE, ErrorMessage.ScalarExpected)
     }
     return value
   }
