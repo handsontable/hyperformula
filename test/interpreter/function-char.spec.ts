@@ -52,17 +52,21 @@ describe('Function CHAR', () => {
     expect(engine.getCellValue(adr('A3'))).toEqual('*')
   })
 
-  it('should work only for numbers from 1 to 255', () => {
+  it('should work only for integer values from 1 to 255', () => {
     const engine = HyperFormula.buildFromArray([
       ['=CHAR(0)'],
       ['=CHAR(1)'],
       ['=CHAR(255)'],
       ['=CHAR(256)'],
+      ['=CHAR(0.5)'],
+      ['=CHAR(255.5)'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessage.CharacterCode))
     expect(engine.getCellValue(adr('A2'))).toEqual('')
     expect(engine.getCellValue(adr('A3'))).toEqual('ÿ')
     expect(engine.getCellValue(adr('A4'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessage.CharacterCode))
+    expect(engine.getCellValue(adr('A5'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessage.CharacterCode))
+    expect(engine.getCellValue(adr('A6'))).toEqual('ÿ')
   })
 })
