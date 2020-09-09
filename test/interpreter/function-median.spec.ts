@@ -1,6 +1,6 @@
 import {HyperFormula} from '../../src'
 import {ErrorType} from '../../src/Cell'
-import {ErrorMessages} from '../../src/error-messages'
+import {ErrorMessage} from '../../src/error-message'
 import {adr, detailedError} from '../testUtils'
 
 describe('Function MEDIAN', () => {
@@ -66,7 +66,7 @@ describe('Function MEDIAN', () => {
       ['=MEDIAN()'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA, ErrorMessages.ErrorArgNumber))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA, ErrorMessage.ErrorArgNumber))
   })
 
   it('doesnt do coercions of nonnumeric arguments', () => {
@@ -75,8 +75,8 @@ describe('Function MEDIAN', () => {
       ['=MEDIAN(TRUE())'],
     ])
 
-    expect(engine.getCellValue(adr('D1'))).toEqual(detailedError(ErrorType.NUM, ErrorMessages.OneValue))
-    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NUM, ErrorMessages.OneValue))
+    expect(engine.getCellValue(adr('D1'))).toEqual(detailedError(ErrorType.NUM, ErrorMessage.OneValue))
+    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NUM, ErrorMessage.OneValue))
   })
 
   it('ignores nonnumeric values as long as theres at least one numeric value', () => {
@@ -93,6 +93,6 @@ describe('Function MEDIAN', () => {
       ['=MEDIAN("12", "11", "13")'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM, ErrorMessages.OneValue))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM, ErrorMessage.OneValue))
   })
 })

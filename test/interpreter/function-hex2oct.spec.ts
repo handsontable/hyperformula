@@ -1,6 +1,6 @@
 import {HyperFormula} from '../../src'
 import {CellValueType, ErrorType} from '../../src/Cell'
-import {ErrorMessages} from '../../src/error-messages'
+import {ErrorMessage} from '../../src/error-message'
 import {adr, detailedError} from '../testUtils'
 
 describe('function HEX2OCT', () => {
@@ -9,7 +9,7 @@ describe('function HEX2OCT', () => {
       ['=HEX2OCT("foo", 2, 3)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA, ErrorMessages.ErrorArgNumber))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA, ErrorMessage.ErrorArgNumber))
   })
 
   it('should not work for non-hex arguments', () => {
@@ -19,9 +19,9 @@ describe('function HEX2OCT', () => {
       ['=HEX2OCT(TRUE())'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM, ErrorMessages.NotHex))
-    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NUM, ErrorMessages.NotHex))
-    expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.NUM, ErrorMessages.NotHex))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM, ErrorMessage.NotHex))
+    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NUM, ErrorMessage.NotHex))
+    expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.NUM, ErrorMessage.NotHex))
   })
 
   it('should work', () => {
@@ -82,8 +82,8 @@ describe('function HEX2OCT', () => {
       ['=HEX2OCT("FFDFFFFFFF")'],
       ['=HEX2OCT("3FFFFFFF")'],    ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM, ErrorMessages.ValueBaseSmall))
-    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NUM, ErrorMessages.ValueBaseLarge))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM, ErrorMessage.ValueBaseSmall))
+    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NUM, ErrorMessage.ValueBaseLarge))
   })
 
   it('input cannot have more than 10 digits', () => {
@@ -92,7 +92,7 @@ describe('function HEX2OCT', () => {
 
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM, ErrorMessages.NotHex))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM, ErrorMessage.NotHex))
   })
 
   it('should respect second argument and fill with zeros for positive arguments', () => {
@@ -111,8 +111,8 @@ describe('function HEX2OCT', () => {
       ['=HEX2OCT(433141, "3")'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM, ErrorMessages.ValueBaseLong))
-    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NUM, ErrorMessages.ValueBaseLong))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM, ErrorMessage.ValueBaseLong))
+    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NUM, ErrorMessage.ValueBaseLong))
   })
 
   it('second argument should not affect negative results', () => {
@@ -131,8 +131,8 @@ describe('function HEX2OCT', () => {
       ['=HEX2OCT(2, 12)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM, ErrorMessages.ValueBaseLong))
-    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NUM, ErrorMessages.ValueLarge))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM, ErrorMessage.ValueBaseLong))
+    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NUM, ErrorMessage.ValueLarge))
   })
 
   // Inconsistency with Product 1
@@ -142,6 +142,6 @@ describe('function HEX2OCT', () => {
       ['=2', '=HEX2OCT(A1:A2)'],
     ])
 
-    expect(engine.getCellValue(adr('B2'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessages.WrongType))
+    expect(engine.getCellValue(adr('B2'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessage.WrongType))
   })
 })

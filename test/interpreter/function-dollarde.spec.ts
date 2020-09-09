@@ -1,5 +1,5 @@
 import {ErrorType, HyperFormula} from '../../src'
-import {ErrorMessages} from '../../src/error-messages'
+import {ErrorMessage} from '../../src/error-message'
 import {adr, detailedError} from '../testUtils'
 
 describe('Function DOLLARDE', () => {
@@ -8,8 +8,8 @@ describe('Function DOLLARDE', () => {
       ['=DOLLARDE(1)', '=DOLLARDE(1, 1, 1)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA, ErrorMessages.ErrorArgNumber))
-    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.NA, ErrorMessages.ErrorArgNumber))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA, ErrorMessage.ErrorArgNumber))
+    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.NA, ErrorMessage.ErrorArgNumber))
   })
 
   it('div/0 when second argument too small', () => {

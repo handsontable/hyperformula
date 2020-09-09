@@ -1,6 +1,6 @@
 import {HyperFormula, ExportedCellChange, NothingToPasteError} from '../../src'
 import {ErrorType, simpleCellAddress} from '../../src/Cell'
-import {ErrorMessages} from '../../src/error-messages'
+import {ErrorMessage} from '../../src/error-message'
 import {CellAddress} from '../../src/parser'
 import {
   adr,
@@ -189,7 +189,7 @@ describe('Copy - paste integration', () => {
     engine.copy(adr('B2'), 1, 1)
     engine.paste(adr('A1'))
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.REF, ErrorMessages.BadRef))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.REF, ErrorMessage.BadRef))
   })
 
   it('should create new range vertex - cell range', () => {

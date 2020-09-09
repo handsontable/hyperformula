@@ -6,7 +6,7 @@
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
 import {CellError, ErrorType, InternalScalarValue} from '../Cell'
 import {DependencyGraph} from '../DependencyGraph'
-import {ErrorMessages} from '../error-messages'
+import {ErrorMessage} from '../error-message'
 import {MatrixSize} from '../Matrix'
 import {Maybe} from '../Maybe'
 
@@ -141,7 +141,7 @@ export class OnlyRangeData {
     for (const cellFromRange of this._range.addresses(this.dependencyGraph)) {
       const value = this.dependencyGraph.getCellValue(cellFromRange)
       if (value instanceof SimpleRangeValue) {
-        row.push(new CellError(ErrorType.VALUE, ErrorMessages.Range))
+        row.push(new CellError(ErrorType.VALUE, ErrorMessage.Range))
       } else if (typeof value === 'number') {
         row.push(value)
       } else {

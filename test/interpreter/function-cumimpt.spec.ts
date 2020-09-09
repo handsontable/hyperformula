@@ -1,5 +1,5 @@
 import {ErrorType, HyperFormula} from '../../src'
-import {ErrorMessages} from '../../src/error-messages'
+import {ErrorMessage} from '../../src/error-message'
 import {adr, detailedError} from '../testUtils'
 
 describe('Function CUMIPMT', () => {
@@ -8,8 +8,8 @@ describe('Function CUMIPMT', () => {
       ['=CUMIPMT(1,1,1,1,1)', '=CUMIPMT(1, 1, 1, 1, 1, 1, 1)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA, ErrorMessages.ErrorArgNumber))
-    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.NA, ErrorMessages.ErrorArgNumber))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA, ErrorMessage.ErrorArgNumber))
+    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.NA, ErrorMessage.ErrorArgNumber))
   })
 
   it('should calculate the correct value with correct arguments and defaults', () => {

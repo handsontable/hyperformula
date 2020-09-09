@@ -1,5 +1,5 @@
 import {ErrorType, HyperFormula, NoOperationToRedoError, NoOperationToUndoError} from '../src'
-import {ErrorMessages} from '../src/error-messages'
+import {ErrorMessage} from '../src/error-message'
 import {adr, detailedError, expectEngineToBeTheSameAs} from './testUtils'
 
 describe('Undo - removing rows', () => {
@@ -776,7 +776,7 @@ describe('Undo - add named expression', () => {
     engine.undo()
 
     expect(engine.listNamedExpressions().length).toEqual(0)
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NAME, ErrorMessages.NamedExpressionName('foo')))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NAME, ErrorMessage.NamedExpressionName('foo')))
   })
 })
 
@@ -1591,7 +1591,7 @@ describe('Redo - remove named expression', () => {
     engine.redo()
 
     expect(engine.listNamedExpressions().length).toEqual(0)
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NAME, ErrorMessages.NamedExpressionName('foo')))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NAME, ErrorMessage.NamedExpressionName('foo')))
   })
 
   it('clears redo stack', () => {

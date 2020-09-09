@@ -1,5 +1,5 @@
 import {ErrorType, HyperFormula} from '../../src'
-import {ErrorMessages} from '../../src/error-messages'
+import {ErrorMessage} from '../../src/error-message'
 import {adr, detailedError} from '../testUtils'
 
 describe('Function DB', () => {
@@ -8,8 +8,8 @@ describe('Function DB', () => {
       ['=DB(1,1,1)', '=DB(1, 1, 1, 1, 1, 1)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA, ErrorMessages.ErrorArgNumber))
-    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.NA, ErrorMessages.ErrorArgNumber))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA, ErrorMessage.ErrorArgNumber))
+    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.NA, ErrorMessage.ErrorArgNumber))
   })
 
   it('should calculate the correct value with correct arguments and defaults', () => {
@@ -40,8 +40,8 @@ describe('Function DB', () => {
     ])
     //product #1 returns #NUM! instead of an actual value
     expect(engine.getCellValue(adr('A1'))).toBeCloseTo(15845.10)
-    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.NUM, ErrorMessages.PeriodLong))
-    expect(engine.getCellValue(adr('C1'))).toEqual(detailedError(ErrorType.NUM, ErrorMessages.PeriodLong))
+    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.NUM, ErrorMessage.PeriodLong))
+    expect(engine.getCellValue(adr('C1'))).toEqual(detailedError(ErrorType.NUM, ErrorMessage.PeriodLong))
 
   })
 })

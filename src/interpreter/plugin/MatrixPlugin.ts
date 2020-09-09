@@ -4,7 +4,7 @@
  */
 
 import {CellError, ErrorType, SimpleCellAddress} from '../../Cell'
-import {ErrorMessages} from '../../error-messages'
+import {ErrorMessage} from '../../error-message'
 import {matrixSizeForMultiplication, matrixSizeForPoolFunction, matrixSizeForTranspose} from '../../Matrix'
 import {Ast, AstNodeType, NumberAst, ProcedureAst} from '../../parser'
 import {coerceToRangeNumbersOrError} from '../ArithmeticHelper'
@@ -29,10 +29,10 @@ export class MatrixPlugin extends FunctionPlugin {
 
   public mmult(ast: ProcedureAst, formulaAddress: SimpleCellAddress): SimpleRangeValue | CellError {
     if (ast.args.length !== 2) {
-      return new CellError(ErrorType.NA, ErrorMessages.ErrorArgNumber)
+      return new CellError(ErrorType.NA, ErrorMessage.ErrorArgNumber)
     }
     if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
-      return new CellError(ErrorType.NUM, ErrorMessages.EmptyArg )
+      return new CellError(ErrorType.NUM, ErrorMessage.EmptyArg )
     }
     const [left, right] = ast.args
 
@@ -44,7 +44,7 @@ export class MatrixPlugin extends FunctionPlugin {
     } else if (rightMatrix instanceof CellError) {
       return rightMatrix
     } else if (leftMatrix === null || rightMatrix === null) {
-      return new CellError(ErrorType.VALUE, ErrorMessages.NumberRange)
+      return new CellError(ErrorType.VALUE, ErrorMessage.NumberRange)
     }
 
     const outputSize = matrixSizeForMultiplication(leftMatrix.size, rightMatrix.size)
@@ -73,21 +73,21 @@ export class MatrixPlugin extends FunctionPlugin {
     let stride = windowSize
 
     if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
-      return new CellError(ErrorType.NUM, ErrorMessages.EmptyArg )
+      return new CellError(ErrorType.NUM, ErrorMessage.EmptyArg )
     }
     if (ast.args.length === 3) {
       const strideArg = ast.args[2]
       if (strideArg.type === AstNodeType.NUMBER) {
         stride = strideArg.value
       } else {
-        return new CellError(ErrorType.VALUE, ErrorMessages.NumberExpected)
+        return new CellError(ErrorType.VALUE, ErrorMessage.NumberExpected)
       }
     }
 
     if (rangeMatrix instanceof CellError) {
       return rangeMatrix
     } else if (rangeMatrix === null) {
-      return new CellError(ErrorType.VALUE, ErrorMessages.NumberRange)
+      return new CellError(ErrorType.VALUE, ErrorMessage.NumberRange)
     }
 
     const outputSize = matrixSizeForPoolFunction(rangeMatrix.size, windowSize, stride)
@@ -117,7 +117,7 @@ export class MatrixPlugin extends FunctionPlugin {
     const [rangeArg, sizeArg] = ast.args as [Ast, NumberAst]
 
     if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
-      return new CellError(ErrorType.NUM, ErrorMessages.EmptyArg )
+      return new CellError(ErrorType.NUM, ErrorMessage.EmptyArg )
     }
     const rangeMatrix = coerceToRangeNumbersOrError(this.evaluateAst(rangeArg, formulaAddress))
     const windowSize = sizeArg.value
@@ -128,14 +128,14 @@ export class MatrixPlugin extends FunctionPlugin {
       if (strideArg.type === AstNodeType.NUMBER) {
         stride = strideArg.value
       } else {
-        return new CellError(ErrorType.VALUE, ErrorMessages.NumberExpected)
+        return new CellError(ErrorType.VALUE, ErrorMessage.NumberExpected)
       }
     }
 
     if (rangeMatrix instanceof CellError) {
       return rangeMatrix
     } else if (rangeMatrix === null) {
-      return new CellError(ErrorType.VALUE, ErrorMessages.NumberRange)
+      return new CellError(ErrorType.VALUE, ErrorMessage.NumberRange)
     }
 
     const outputSize = matrixSizeForPoolFunction(rangeMatrix.size, windowSize, stride)
@@ -205,17 +205,17 @@ export class MatrixPlugin extends FunctionPlugin {
 
   public transpose(ast: ProcedureAst, formulaAddress: SimpleCellAddress): SimpleRangeValue | CellError {
     if (ast.args.length !== 1) {
-      return new CellError(ErrorType.NA, ErrorMessages.ErrorArgNumber)
+      return new CellError(ErrorType.NA, ErrorMessage.ErrorArgNumber)
     }
     if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
-      return new CellError(ErrorType.NUM, ErrorMessages.EmptyArg )
+      return new CellError(ErrorType.NUM, ErrorMessage.EmptyArg )
     }
     const value = coerceToRangeNumbersOrError(this.evaluateAst(ast.args[0], formulaAddress))
 
     if (value instanceof CellError) {
       return value
     } else if (value === null) {
-      return new CellError(ErrorType.VALUE, ErrorMessages.NumberRange)
+      return new CellError(ErrorType.VALUE, ErrorMessage.NumberRange)
     }
 
     const input = value.rawNumbers()

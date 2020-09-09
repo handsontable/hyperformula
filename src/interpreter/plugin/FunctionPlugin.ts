@@ -8,7 +8,7 @@ import {CellError, ErrorType, InternalScalarValue, SimpleCellAddress} from '../.
 import {ColumnSearchStrategy} from '../../ColumnSearch/ColumnSearchStrategy'
 import {Config} from '../../Config'
 import {DependencyGraph} from '../../DependencyGraph'
-import {ErrorMessages} from '../../error-messages'
+import {ErrorMessage} from '../../error-message'
 import {Maybe} from '../../Maybe'
 import {Ast, AstNodeType, ProcedureAst} from '../../parser'
 import {coerceScalarToBoolean, coerceScalarToString, coerceToRange} from '../ArithmeticHelper'
@@ -193,19 +193,19 @@ export abstract class FunctionPlugin {
             return value
           }
           if(coercedType.maxValue !== undefined && value > coercedType.maxValue) {
-            return new CellError(ErrorType.NUM, ErrorMessages.ValueLarge)
+            return new CellError(ErrorType.NUM, ErrorMessage.ValueLarge)
           }
           if (coercedType.minValue !== undefined && value < coercedType.minValue) {
-            return new CellError(ErrorType.NUM, ErrorMessages.ValueSmall)
+            return new CellError(ErrorType.NUM, ErrorMessage.ValueSmall)
           }
           if(coercedType.lessThan !== undefined && value >= coercedType.lessThan) {
-            return new CellError(ErrorType.NUM, ErrorMessages.ValueLarge)
+            return new CellError(ErrorType.NUM, ErrorMessage.ValueLarge)
           }
           if (coercedType.greaterThan !== undefined && value <= coercedType.greaterThan) {
-            return new CellError(ErrorType.NUM, ErrorMessages.ValueSmall)
+            return new CellError(ErrorType.NUM, ErrorMessage.ValueSmall)
           }
           if(coercedType.argumentType === ArgumentTypes.INTEGER && !Number.isInteger(value)) {
-            return new CellError(ErrorType.NUM, ErrorMessages.IntegerValue)
+            return new CellError(ErrorType.NUM, ErrorMessage.IntegerValue)
           }
           return value
         case ArgumentTypes.STRING:
@@ -244,11 +244,11 @@ export abstract class FunctionPlugin {
 
     let argCoerceFailure: Maybe<CellError> = undefined
     if(functionDefinition.repeatLastArgs === undefined && argumentDefinitions.length < scalarValues.length) {
-      return new CellError(ErrorType.NA, ErrorMessages.ErrorArgNumber)
+      return new CellError(ErrorType.NA, ErrorMessage.ErrorArgNumber)
     }
     if(functionDefinition.repeatLastArgs !== undefined && scalarValues.length > argumentDefinitions.length &&
       (scalarValues.length-argumentDefinitions.length)%functionDefinition.repeatLastArgs !== 0) {
-      return new CellError(ErrorType.NA, ErrorMessages.ErrorArgNumber)
+      return new CellError(ErrorType.NA, ErrorMessage.ErrorArgNumber)
     }
     for(let i=0, j=0; i<Math.max(scalarValues.length, argumentDefinitions.length); i++, j++) {
       // i points to where are we in the scalarValues list,
@@ -263,7 +263,7 @@ export abstract class FunctionPlugin {
           coercedArguments.push(undefined)
         } else {
           //not enough values passed as arguments, and there was no default value and argument was not optional
-          return new CellError(ErrorType.NA, ErrorMessages.ErrorArgNumber)
+          return new CellError(ErrorType.NA, ErrorMessage.ErrorArgNumber)
         }
       } else {
         //we apply coerce only to non-default values
@@ -276,7 +276,7 @@ export abstract class FunctionPlugin {
           coercedArguments.push(coercedArg)
         } else if (!ignorable) {
           //if this is first error encountered, store it
-          argCoerceFailure = argCoerceFailure ?? (new CellError(ErrorType.VALUE, ErrorMessages.WrongType))
+          argCoerceFailure = argCoerceFailure ?? (new CellError(ErrorType.VALUE, ErrorMessage.WrongType))
         }
       }
     }
@@ -295,7 +295,7 @@ export abstract class FunctionPlugin {
     if (args.length === 0) {
       return noArgCallback()
     } else if (args.length > 1) {
-      return new CellError(ErrorType.NA, ErrorMessages.ErrorArgNumber)
+      return new CellError(ErrorType.NA, ErrorMessage.ErrorArgNumber)
     }
     const arg = args[0]
 
@@ -307,7 +307,7 @@ export abstract class FunctionPlugin {
       try {
         cellReference = AbsoluteCellRange.fromAst(arg, formulaAddress).start
       } catch (e) {
-        return new CellError(ErrorType.REF, ErrorMessages.CellRef)
+        return new CellError(ErrorType.REF, ErrorMessage.CellRef)
       }
     }
 

@@ -1,5 +1,5 @@
 import {ErrorType, HyperFormula} from '../src'
-import {ErrorMessages} from '../src/error-messages'
+import {ErrorMessage} from '../src/error-message'
 import {FunctionPlugin} from '../src/interpreter/plugin/FunctionPlugin'
 import {adr, detailedError} from './testUtils'
 import {ProcedureAst} from '../src/parser'
@@ -33,6 +33,6 @@ describe('Plugins', () => {
       ['=foo()'],
     ], {functionPlugins: [FooPlugin]})
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NAME, ErrorMessages.FunctionName('FOO')))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NAME, ErrorMessage.FunctionName('FOO')))
   })
 })

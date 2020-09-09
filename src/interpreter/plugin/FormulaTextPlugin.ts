@@ -3,7 +3,7 @@
  * Copyright (c) 2020 Handsoncode. All rights reserved.
  */
 
-import {ErrorMessages} from '../../error-messages'
+import {ErrorMessage} from '../../error-message'
 import {ProcedureAst} from '../../parser'
 import {CellError, ErrorType, InternalScalarValue, SimpleCellAddress} from '../../Cell'
 import {FunctionPlugin} from '../index'
@@ -31,9 +31,9 @@ export class FormulaTextPlugin extends FunctionPlugin {
    */
   public formulatext(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.runFunctionWithReferenceArgument(ast.args, formulaAddress, this.metadata('FORMULATEXT'),
-      () => new CellError(ErrorType.NA, ErrorMessages.ErrorArgNumber),
-      (cellReference: SimpleCellAddress) => this.serialization.getCellFormula(cellReference) ?? new CellError(ErrorType.NA, ErrorMessages.Formula),
-      () => new CellError(ErrorType.NA, ErrorMessages.CellRef)
+      () => new CellError(ErrorType.NA, ErrorMessage.ErrorArgNumber),
+      (cellReference: SimpleCellAddress) => this.serialization.getCellFormula(cellReference) ?? new CellError(ErrorType.NA, ErrorMessage.Formula),
+      () => new CellError(ErrorType.NA, ErrorMessage.CellRef)
     )
   }
 }

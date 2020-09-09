@@ -5,7 +5,7 @@
 
 import {AbsoluteCellRange} from './AbsoluteCellRange'
 import {CellError, ErrorType, SimpleCellAddress, simpleCellAddress} from './Cell'
-import {ErrorMessages} from './error-messages'
+import {ErrorMessage} from './error-message'
 import {Ast, AstNodeType} from './parser'
 
 export class MatrixSize {
@@ -41,10 +41,10 @@ export function checkMatrixSize(ast: Ast, formulaAddress: SimpleCellAddress): Ma
     switch (ast.procedureName) {
       case 'MMULT': {
         if (ast.args.length !== 2) {
-          return new CellError(ErrorType.NA, ErrorMessages.ErrorArgNumber)
+          return new CellError(ErrorType.NA, ErrorMessage.ErrorArgNumber)
         }
         if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
-          return new CellError(ErrorType.NUM, ErrorMessages.EmptyArg )
+          return new CellError(ErrorType.NUM, ErrorMessage.EmptyArg )
         }
 
         const left = checkMatrixSize(ast.args[0], formulaAddress)
@@ -55,7 +55,7 @@ export function checkMatrixSize(ast: Ast, formulaAddress: SimpleCellAddress): Ma
         } else if (right instanceof CellError) {
           return right
         } else if (left.width !== right.height) {
-          return new CellError(ErrorType.VALUE, ErrorMessages.MatrixDimensions)
+          return new CellError(ErrorType.VALUE, ErrorMessage.MatrixDimensions)
         } else {
           return matrixSizeForMultiplication(left, right)
         }
@@ -63,10 +63,10 @@ export function checkMatrixSize(ast: Ast, formulaAddress: SimpleCellAddress): Ma
       case 'MEDIANPOOL':
       case 'MAXPOOL': {
         if (ast.args.length < 2 || ast.args.length > 3) {
-          return new CellError(ErrorType.NA, ErrorMessages.ErrorArgNumber)
+          return new CellError(ErrorType.NA, ErrorMessage.ErrorArgNumber)
         }
         if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
-          return new CellError(ErrorType.NUM, ErrorMessages.EmptyArg )
+          return new CellError(ErrorType.NUM, ErrorMessage.EmptyArg )
         }
 
         const matrix = checkMatrixSize(ast.args[0], formulaAddress)
@@ -75,7 +75,7 @@ export function checkMatrixSize(ast: Ast, formulaAddress: SimpleCellAddress): Ma
         if (matrix instanceof CellError) {
           return matrix
         } else if (windowArg.type !== AstNodeType.NUMBER) {
-          return new CellError(ErrorType.VALUE, ErrorMessages.NumberExpected)
+          return new CellError(ErrorType.VALUE, ErrorMessage.NumberExpected)
         }
 
         const window = windowArg.value
@@ -86,7 +86,7 @@ export function checkMatrixSize(ast: Ast, formulaAddress: SimpleCellAddress): Ma
           if (strideArg.type === AstNodeType.NUMBER) {
             stride = strideArg.value
           } else {
-            return new CellError(ErrorType.VALUE, ErrorMessages.MatrixParams)
+            return new CellError(ErrorType.VALUE, ErrorMessage.MatrixParams)
           }
         }
 
@@ -100,18 +100,18 @@ export function checkMatrixSize(ast: Ast, formulaAddress: SimpleCellAddress): Ma
       }
       case 'TRANSPOSE': {
         if (ast.args.length !== 1) {
-          return new CellError(ErrorType.NA, ErrorMessages.ErrorArgNumber)
+          return new CellError(ErrorType.NA, ErrorMessage.ErrorArgNumber)
         }
 
         if (ast.args[0].type === AstNodeType.EMPTY) {
-          return new CellError(ErrorType.NUM, ErrorMessages.EmptyArg )
+          return new CellError(ErrorType.NUM, ErrorMessage.EmptyArg )
         }
         const size = checkMatrixSize(ast.args[0], formulaAddress)
 
         return size instanceof CellError ? size : matrixSizeForTranspose(size)
       }
       default: {
-        return new CellError(ErrorType.VALUE, ErrorMessages.MatrixFunction)
+        return new CellError(ErrorType.VALUE, ErrorMessage.MatrixFunction)
       }
     }
   } else if (ast.type === AstNodeType.CELL_RANGE) {

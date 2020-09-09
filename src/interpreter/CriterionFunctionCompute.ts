@@ -6,7 +6,7 @@
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
 import {CellError, ErrorType, InternalScalarValue, simpleCellAddress} from '../Cell'
 import {CriterionCache, DependencyGraph, RangeVertex} from '../DependencyGraph'
-import {ErrorMessages} from '../error-messages'
+import {ErrorMessage} from '../error-message'
 import {split} from '../generatorUtils'
 import {Maybe} from '../Maybe'
 import {CriterionLambda, CriterionPackage} from './Criterion'
@@ -48,7 +48,7 @@ export class CriterionFunctionCompute<T> {
   public compute(simpleValuesRange: SimpleRangeValue, conditions: Condition[]): T | CellError {
     for (const condition of conditions) {
       if (!condition.conditionRange.sameDimensionsAs(simpleValuesRange)) {
-        return new CellError(ErrorType.VALUE, ErrorMessages.EqualLength)
+        return new CellError(ErrorType.VALUE, ErrorMessage.EqualLength)
       }
     }
 

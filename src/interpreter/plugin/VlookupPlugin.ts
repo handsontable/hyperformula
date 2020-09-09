@@ -11,7 +11,7 @@ import {
   simpleCellAddress,
   SimpleCellAddress
 } from '../../Cell'
-import {ErrorMessages} from '../../error-messages'
+import {ErrorMessage} from '../../error-message'
 import {AstNodeType, ProcedureAst} from '../../parser'
 import {StatType} from '../../statistics'
 import {InterpreterValue} from '../InterpreterValue'
@@ -35,27 +35,27 @@ export class VlookupPlugin extends FunctionPlugin {
    */
   public vlookup(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InterpreterValue {
     if (ast.args.length < 3 || ast.args.length > 4) {
-      return new CellError(ErrorType.NA, ErrorMessages.ErrorArgNumber)
+      return new CellError(ErrorType.NA, ErrorMessage.ErrorArgNumber)
     }
 
     if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
-      return new CellError(ErrorType.NUM, ErrorMessages.EmptyArg )
+      return new CellError(ErrorType.NUM, ErrorMessage.EmptyArg )
     }
 
     const key = this.evaluateAst(ast.args[0], formulaAddress)
     if (typeof key !== 'string' && typeof key !== 'number' && typeof key !== 'boolean') {
-      return new CellError(ErrorType.VALUE, ErrorMessages.WrongType)
+      return new CellError(ErrorType.VALUE, ErrorMessage.WrongType)
     }
 
     const rangeArg = ast.args[1]
     if (rangeArg.type !== AstNodeType.CELL_RANGE) {
       /* gsheet returns REF */
-      return new CellError(ErrorType.VALUE, ErrorMessages.WrongType)
+      return new CellError(ErrorType.VALUE, ErrorMessage.WrongType)
     }
 
     const index = this.evaluateAst(ast.args[2], formulaAddress)
     if (typeof index !== 'number') {
-      return new CellError(ErrorType.VALUE, ErrorMessages.WrongType)
+      return new CellError(ErrorType.VALUE, ErrorMessage.WrongType)
     }
 
     let sorted: InternalScalarValue = true
@@ -64,13 +64,13 @@ export class VlookupPlugin extends FunctionPlugin {
       if (typeof computedSorted === 'boolean') {
         sorted = computedSorted
       } else {
-        return new CellError(ErrorType.VALUE, ErrorMessages.WrongType)
+        return new CellError(ErrorType.VALUE, ErrorMessage.WrongType)
       }
     }
 
     const range = AbsoluteCellRange.fromCellRange(rangeArg, formulaAddress)
     if (index > range.width()) {
-      return new CellError(ErrorType.REF, ErrorMessages.IndexLarge)
+      return new CellError(ErrorType.REF, ErrorMessage.IndexLarge)
     }
 
     return this.doVlookup(key, range, index - 1, sorted)
@@ -78,24 +78,24 @@ export class VlookupPlugin extends FunctionPlugin {
 
   public match(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     if (ast.args.length < 2 || ast.args.length > 3) {
-      return new CellError(ErrorType.NA, ErrorMessages.ErrorArgNumber)
+      return new CellError(ErrorType.NA, ErrorMessage.ErrorArgNumber)
     }
 
     const key = this.evaluateAst(ast.args[0], formulaAddress)
     if (typeof key !== 'string' && typeof key !== 'number' && typeof key !== 'boolean') {
-      return new CellError(ErrorType.VALUE, ErrorMessages.WrongType)
+      return new CellError(ErrorType.VALUE, ErrorMessage.WrongType)
     }
 
     const rangeArg = ast.args[1]
     if (rangeArg.type !== AstNodeType.CELL_RANGE) {
-      return new CellError(ErrorType.VALUE, ErrorMessages.WrongType)
+      return new CellError(ErrorType.VALUE, ErrorMessage.WrongType)
     }
 
     let sorted: InterpreterValue = 1
     if (ast.args.length === 3) {
       sorted = this.evaluateAst(ast.args[2], formulaAddress)
       if (typeof sorted !== 'number') {
-        return new CellError(ErrorType.VALUE, ErrorMessages.WrongType)
+        return new CellError(ErrorType.VALUE, ErrorMessage.WrongType)
       }
     }
 
@@ -105,14 +105,14 @@ export class VlookupPlugin extends FunctionPlugin {
       const rowIndex = this.columnSearch.find(key, searchedRange, sorted !== 0)
 
       if (rowIndex === -1) {
-        return new CellError(ErrorType.NA, ErrorMessages.ValueMissing)
+        return new CellError(ErrorType.NA, ErrorMessage.ValueMissing)
       }
 
       return rowIndex - searchedRange.start.row + 1
     } else {
       const columnIndex = this.searchInRange(key, searchedRange, false)
       if (columnIndex === -1) {
-        return new CellError(ErrorType.NA, ErrorMessages.ValueMissing)
+        return new CellError(ErrorType.NA, ErrorMessage.ValueMissing)
       }
 
       return (columnIndex-searchedRange.start.row) + 1
@@ -139,7 +139,7 @@ export class VlookupPlugin extends FunctionPlugin {
     this.dependencyGraph.stats.end(StatType.VLOOKUP)
 
     if (rowIndex === -1) {
-      return new CellError(ErrorType.NA, ErrorMessages.ValueMissing)
+      return new CellError(ErrorType.NA, ErrorMessage.ValueMissing)
     }
 
     const address = simpleCellAddress(range.sheet, range.start.col + index, rowIndex)

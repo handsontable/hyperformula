@@ -2,7 +2,7 @@ import {HyperFormula} from '../../src'
 import {ErrorType} from '../../src'
 import {Config} from '../../src/Config'
 import {DateTimeHelper} from '../../src/DateTimeHelper'
-import {ErrorMessages} from '../../src/error-messages'
+import {ErrorMessage} from '../../src/error-message'
 import {
   ArithmeticHelper,
   coerceBooleanToNumber,
@@ -88,7 +88,7 @@ describe('#coerceScalarToNumberOrError', () => {
     expect(arithmeticHelper.coerceScalarToNumberOrError('00:00:00')).toEqual(0)
     expect(arithmeticHelper.coerceScalarToNumberOrError(true)).toEqual(1)
 
-    expect(arithmeticHelper.coerceScalarToNumberOrError('foo42')).toEqual(new CellError(ErrorType.VALUE, ErrorMessages.NumberCoercion))
+    expect(arithmeticHelper.coerceScalarToNumberOrError('foo42')).toEqual(new CellError(ErrorType.VALUE, ErrorMessage.NumberCoercion))
 
     expect(arithmeticHelper.coerceScalarToNumberOrError('1')).toEqual(1)
   })

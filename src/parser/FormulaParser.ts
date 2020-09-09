@@ -15,7 +15,7 @@ import {
 } from 'chevrotain'
 
 import {CellError, ErrorType, simpleCellAddress, SimpleCellAddress} from '../Cell'
-import {ErrorMessages} from '../error-messages'
+import {ErrorMessage} from '../error-message'
 import {Maybe} from '../Maybe'
 import {
   cellAddressFromString,
@@ -808,7 +808,7 @@ export class FormulaParser extends EmbeddedActionsParser {
     }
 
     if (absoluteCol < 0 || absoluteRow < 0) {
-      return buildCellErrorAst(new CellError(ErrorType.REF, ErrorMessages.OutOfSheet))
+      return buildCellErrorAst(new CellError(ErrorType.REF, ErrorMessage.OutOfSheet))
     }
     if (width === 1 && height === 1) {
       return buildCellReferenceAst(topLeftCorner)

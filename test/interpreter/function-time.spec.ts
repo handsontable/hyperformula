@@ -1,7 +1,7 @@
 import {HyperFormula} from '../../src'
 import {ErrorType} from '../../src/Cell'
 import {Config} from '../../src/Config'
-import {ErrorMessages} from '../../src/error-messages'
+import {ErrorMessage} from '../../src/error-message'
 import {adr, detailedError, timeNumberToString} from '../testUtils'
 
 describe('Function TIME', () => {
@@ -49,9 +49,9 @@ describe('Function TIME', () => {
     const engine = HyperFormula.buildFromArray([
       ['=TIME(-1, 59, 0)', '=TIME(0, -1, 59)', '=TIME(0, 1, -61)'],
     ], config)
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM, ErrorMessages.NegativeTime))
-    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.NUM, ErrorMessages.NegativeTime))
-    expect(engine.getCellValue(adr('C1'))).toEqual(detailedError(ErrorType.NUM, ErrorMessages.NegativeTime))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM, ErrorMessage.NegativeTime))
+    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.NUM, ErrorMessage.NegativeTime))
+    expect(engine.getCellValue(adr('C1'))).toEqual(detailedError(ErrorType.NUM, ErrorMessage.NegativeTime))
   })
 
   it('fractions', () => {
@@ -70,8 +70,8 @@ describe('Function TIME', () => {
       ['=TIME(0, 1)'],
       ['=TIME(0, 1, 1, 1)'],
     ], config)
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA, ErrorMessages.ErrorArgNumber))
-    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NA, ErrorMessages.ErrorArgNumber))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA, ErrorMessage.ErrorArgNumber))
+    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NA, ErrorMessage.ErrorArgNumber))
   })
 
   it('with incoercible argument', () => {
@@ -81,9 +81,9 @@ describe('Function TIME', () => {
       ['=TIME(0, "foo", 1)'],
       ['=TIME(0, 1, "foo")'],
     ], config)
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessages.NumberCoercion))
-    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessages.NumberCoercion))
-    expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessages.NumberCoercion))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessage.NumberCoercion))
+    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessage.NumberCoercion))
+    expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessage.NumberCoercion))
   })
 
   it('with coercible argument', () => {
@@ -106,9 +106,9 @@ describe('Function TIME', () => {
       ['=TIME(0, FOOBAR(), 4/0)'],
       ['=TIME(0, 1, FOOBAR())'],
     ], config)
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NAME, ErrorMessages.FunctionName('FOOBAR')))
-    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NAME, ErrorMessages.FunctionName('FOOBAR')))
-    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NAME, ErrorMessages.FunctionName('FOOBAR')))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NAME, ErrorMessage.FunctionName('FOOBAR')))
+    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NAME, ErrorMessage.FunctionName('FOOBAR')))
+    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NAME, ErrorMessage.FunctionName('FOOBAR')))
   })
 
   // Inconsistency with Product 1
@@ -119,9 +119,9 @@ describe('Function TIME', () => {
       ['2', '2001', '=TIME(B1:B3, 1, 1)', '=TIME(1950, A1:A3, 1)', '=TIME(1950, 1, A1:A3)'],
       ['3', '2002'],
     ], config)
-    expect(engine.getCellValue(adr('C2'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessages.WrongType))
-    expect(engine.getCellValue(adr('D2'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessages.WrongType))
-    expect(engine.getCellValue(adr('E2'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessages.WrongType))
+    expect(engine.getCellValue(adr('C2'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessage.WrongType))
+    expect(engine.getCellValue(adr('D2'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessage.WrongType))
+    expect(engine.getCellValue(adr('E2'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessage.WrongType))
   })
 })
 

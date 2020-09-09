@@ -4,7 +4,7 @@
  */
 
 import {CellError, ErrorType, InternalScalarValue, SimpleCellAddress} from '../../Cell'
-import {ErrorMessages} from '../../error-messages'
+import {ErrorMessage} from '../../error-message'
 import {AstNodeType, ProcedureAst} from '../../parser'
 import {coerceToRange} from '../ArithmeticHelper'
 import {SimpleRangeValue} from '../InterpreterValue'
@@ -24,7 +24,7 @@ export class SumprodPlugin extends FunctionPlugin {
   public sumproduct(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.runFunction(ast.args, formulaAddress, this.metadata('SUMPRODUCT'), (left: SimpleRangeValue, right: SimpleRangeValue) => {
       if (left.numberOfElements() !== right.numberOfElements()) {
-        return new CellError(ErrorType.VALUE, ErrorMessages.EqualLength)
+        return new CellError(ErrorType.VALUE, ErrorMessage.EqualLength)
       }
 
       let result = 0

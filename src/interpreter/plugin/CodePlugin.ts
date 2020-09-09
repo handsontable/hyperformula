@@ -4,7 +4,7 @@
  */
 
 import {CellError, ErrorType, InternalScalarValue, SimpleCellAddress} from '../../Cell'
-import {ErrorMessages} from '../../error-messages'
+import {ErrorMessage} from '../../error-message'
 import {ProcedureAst} from '../../parser'
 import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
 
@@ -21,7 +21,7 @@ export class CodePlugin extends FunctionPlugin {
   public code(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.runFunction(ast.args, formulaAddress, this.metadata('CODE'), (value: string) => {
       if (value.length === 0) {
-        return new CellError(ErrorType.VALUE, ErrorMessages.EmptyString)
+        return new CellError(ErrorType.VALUE, ErrorMessage.EmptyString)
       }
       return value.charCodeAt(0)
     })

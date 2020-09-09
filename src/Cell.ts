@@ -4,7 +4,7 @@
  */
 
 import {CellVertex, FormulaCellVertex, MatrixVertex, ParsingErrorVertex, ValueCellVertex} from './DependencyGraph'
-import {ErrorMessages} from './error-messages'
+import {ErrorMessage} from './error-message'
 import {CellAddress} from './parser'
 import {AddressWithSheet} from './parser/Address'
 import {InterpreterValue, SimpleRangeValue} from './interpreter/InterpreterValue'
@@ -111,7 +111,7 @@ export class CellError {
   }
 
   public static parsingError() {
-    return new CellError(ErrorType.ERROR, ErrorMessages.ParseError)
+    return new CellError(ErrorType.ERROR, ErrorMessage.ParseError)
   }
 }
 

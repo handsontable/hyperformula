@@ -1,6 +1,6 @@
 import {HyperFormula} from '../../src'
 import {ErrorType} from '../../src/Cell'
-import {ErrorMessages} from '../../src/error-messages'
+import {ErrorMessage} from '../../src/error-message'
 import {adr, detailedError} from '../testUtils'
 
 describe( 'decimal parsing', () => {
@@ -25,6 +25,6 @@ describe( 'decimal parsing', () => {
     expect(engine.getCellValue(adr('A5'))).toBe(0.8)
     expect(engine.getCellValue(adr('B5'))).toBe(0.4)
     expect(engine.getCellValue(adr('A6'))).toBe('.1.4')
-    expect(engine.getCellValue(adr('B6'))).toEqual(detailedError(ErrorType.ERROR, ErrorMessages.ParseError))
+    expect(engine.getCellValue(adr('B6'))).toEqual(detailedError(ErrorType.ERROR, ErrorMessage.ParseError))
   })
 })

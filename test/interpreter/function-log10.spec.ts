@@ -1,6 +1,6 @@
 import {HyperFormula} from '../../src'
 import {ErrorType} from '../../src/Cell'
-import {ErrorMessages} from '../../src/error-messages'
+import {ErrorMessage} from '../../src/error-message'
 import {adr, detailedError} from '../testUtils'
 
 describe('Function LOG10', () => {
@@ -13,26 +13,26 @@ describe('Function LOG10', () => {
   it('when value not numeric', () => {
     const engine = HyperFormula.buildFromArray([['=LOG10("foo")']])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessages.NumberCoercion))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessage.NumberCoercion))
   })
 
   it('for zero', () => {
     const engine = HyperFormula.buildFromArray([['=LOG10(0)']])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM, ErrorMessages.Infinity))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM, ErrorMessage.Infinity))
   })
 
   it('for negative arguments', () => {
     const engine = HyperFormula.buildFromArray([['=LOG10(-42)']])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM, ErrorMessages.Infinity))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM, ErrorMessage.Infinity))
   })
 
   it('wrong number of arguments', () => {
     const engine = HyperFormula.buildFromArray([['=LOG10()', '=LOG10(1,-1)']])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA, ErrorMessages.ErrorArgNumber))
-    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.NA, ErrorMessages.ErrorArgNumber))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA, ErrorMessage.ErrorArgNumber))
+    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.NA, ErrorMessage.ErrorArgNumber))
   })
 
   it('use number coercion',  () => {
@@ -42,7 +42,7 @@ describe('Function LOG10', () => {
     ])
 
     expect(engine.getCellValue(adr('B1'))).toBe(1)
-    expect(engine.getCellValue(adr('B2'))).toEqual(detailedError(ErrorType.NUM, ErrorMessages.Infinity))
+    expect(engine.getCellValue(adr('B2'))).toEqual(detailedError(ErrorType.NUM, ErrorMessage.Infinity))
   })
 
   it('errors propagation', () => {
@@ -61,6 +61,6 @@ describe('Function LOG10', () => {
       ['-1'],
     ])
 
-    expect(engine.getCellValue(adr('B2'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessages.WrongType))
+    expect(engine.getCellValue(adr('B2'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessage.WrongType))
   })
 })

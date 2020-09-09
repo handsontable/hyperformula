@@ -1,6 +1,6 @@
 import {CellError, ErrorType, simpleCellAddress} from '../src/Cell'
 import {Config} from '../src/Config'
-import {ErrorMessages} from '../src/error-messages'
+import {ErrorMessage} from '../src/error-message'
 import {checkMatrixSize, MatrixSize} from '../src/Matrix'
 import {adr} from './testUtils'
 import {buildEmptyParserWithCaching} from './parser/common'
@@ -21,7 +21,7 @@ describe('Matrix size check tests', () => {
     const ast = parser.parse('=mmult(A1:B3,C1:E3)', simpleCellAddress(0, 0, 0)).ast
 
     const size = checkMatrixSize(ast, adr('A1'))
-    expect(size).toEqual(new CellError(ErrorType.VALUE, ErrorMessages.MatrixDimensions))
+    expect(size).toEqual(new CellError(ErrorType.VALUE, ErrorMessage.MatrixDimensions))
   })
 
   it('check recurisve', () => {
@@ -37,7 +37,7 @@ describe('Matrix size check tests', () => {
     const ast = parser.parse('=mmult(mmult(A1:B3,C1:E3), A1:B3)', simpleCellAddress(0, 0, 0)).ast
 
     const size = checkMatrixSize(ast, adr('A1'))
-    expect(size).toEqual(new CellError(ErrorType.VALUE, ErrorMessages.MatrixDimensions))
+    expect(size).toEqual(new CellError(ErrorType.VALUE, ErrorMessage.MatrixDimensions))
   })
 
   it('check maxpool', () => {

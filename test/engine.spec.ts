@@ -1,6 +1,6 @@
 import {DetailedCellError, ErrorType, HyperFormula} from '../src'
 import {CellType, CellValueType} from '../src/Cell'
-import {ErrorMessages} from '../src/error-messages'
+import {ErrorMessage} from '../src/error-message'
 import {plPL} from '../src/i18n/languages'
 import {adr, detailedError, expectArrayWithSameContent} from './testUtils'
 import {Config} from '../src/Config'
@@ -67,7 +67,7 @@ describe('#buildFromArray', () => {
   it('parsing error', () => {
     const engine = HyperFormula.buildFromArray([['=A1B1']])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.ERROR, ErrorMessages.ParseError))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.ERROR, ErrorMessage.ParseError))
   })
 
   it('dependency before value', () => {
@@ -112,10 +112,10 @@ describe('#buildFromArray', () => {
       ['=SUM(', '=A1']
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.ERROR, ErrorMessages.ParseError))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.ERROR, ErrorMessage.ParseError))
     expect(engine.getCellFormula(adr('A1'))).toEqual('=SUM(')
 
-    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.ERROR, ErrorMessages.ParseError))
+    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.ERROR, ErrorMessage.ParseError))
     expect(engine.getCellFormula(adr('B1'))).toEqual('=A1')
   })
 })
@@ -181,7 +181,7 @@ describe('#getCellFormula', () => {
       ['=SUM(']
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.ERROR, ErrorMessages.ParseError))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.ERROR, ErrorMessage.ParseError))
     expect(engine.getCellFormula(adr('A1'))).toEqual('=SUM(')
   })
 
@@ -190,7 +190,7 @@ describe('#getCellFormula', () => {
       ['{=TRANSPOSE(}']
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.ERROR, ErrorMessages.ParseError))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.ERROR, ErrorMessage.ParseError))
     expect(engine.getCellFormula(adr('A1'))).toEqual('{=TRANSPOSE(}')
   })
 })
@@ -272,7 +272,7 @@ describe('#getCellValue', () => {
       ['=SUM(']
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.ERROR, ErrorMessages.ParseError))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.ERROR, ErrorMessage.ParseError))
   })
 
   it('should return value of a cell in a formula matrix', () => {

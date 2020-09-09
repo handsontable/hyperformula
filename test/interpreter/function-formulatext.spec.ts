@@ -1,5 +1,5 @@
 import {ErrorType, HyperFormula} from '../../src'
-import {ErrorMessages} from '../../src/error-messages'
+import {ErrorMessage} from '../../src/error-message'
 import {adr, detailedError} from '../testUtils'
 
 describe('Function FORMULATEXT', () => {
@@ -9,8 +9,8 @@ describe('Function FORMULATEXT', () => {
       ['=FORMULATEXT(B2, B3)']
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA, ErrorMessages.ErrorArgNumber))
-    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NA, ErrorMessages.ErrorArgNumber))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA, ErrorMessage.ErrorArgNumber))
+    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NA, ErrorMessage.ErrorArgNumber))
   })
 
   it('should return N/A for wrong types of arguments', () => {
@@ -20,9 +20,9 @@ describe('Function FORMULATEXT', () => {
       ['=FORMULATEXT(SUM(1))'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA, ErrorMessages.CellRef))
-    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NA, ErrorMessages.CellRef))
-    expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.NA, ErrorMessages.CellRef))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA, ErrorMessage.CellRef))
+    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NA, ErrorMessage.CellRef))
+    expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.NA, ErrorMessage.CellRef))
   })
 
   it('should propagate expression error', () => {
@@ -64,7 +64,7 @@ describe('Function FORMULATEXT', () => {
     engine.addSheet('Sheet2')
     engine.setCellContents(adr('B1'), '=FORMULATEXT(Sheet1!A1:Sheet2!A2)')
 
-    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.REF, ErrorMessages.CellRef))
+    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.REF, ErrorMessage.CellRef))
   })
 
   it('should work for matrix formula', () => {

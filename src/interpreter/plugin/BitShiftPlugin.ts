@@ -4,7 +4,7 @@
  */
 
 import {CellError, ErrorType, InternalScalarValue, SimpleCellAddress} from '../../Cell'
-import {ErrorMessages} from '../../error-messages'
+import {ErrorMessage} from '../../error-message'
 import {ProcedureAst} from '../../parser'
 import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
 
@@ -57,7 +57,7 @@ function shiftRight(value: number, positions: number): number | CellError {
 
 function validate(result: number): number | CellError {
   if (result > MAX_48BIT_INTEGER) {
-    return new CellError(ErrorType.NUM, ErrorMessages.BitshiftLong)
+    return new CellError(ErrorType.NUM, ErrorMessage.BitshiftLong)
   } else {
     return result
   }

@@ -13,7 +13,7 @@ import {
   timeToNumber, toBasisEU,
   truncateDayInMonth
 } from '../../DateTimeHelper'
-import {ErrorMessages} from '../../error-messages'
+import {ErrorMessage} from '../../error-message'
 import {format} from '../../format/format'
 import {ProcedureAst} from '../../parser'
 import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
@@ -194,9 +194,9 @@ export class DatePlugin extends FunctionPlugin {
       const date = {year: y, month: m, day: 1}
       if (this.interpreter.dateHelper.isValidDate(date)) {
         const ret = this.interpreter.dateHelper.dateToNumber(date) + (d - 1)
-        return this.interpreter.dateHelper.getWithinBounds(ret) ?? new CellError(ErrorType.NUM, ErrorMessages.DateBounds)
+        return this.interpreter.dateHelper.getWithinBounds(ret) ?? new CellError(ErrorType.NUM, ErrorMessage.DateBounds)
       }
-      return new CellError(ErrorType.VALUE, ErrorMessages.InvalidDate)
+      return new CellError(ErrorType.VALUE, ErrorMessage.InvalidDate)
     })
   }
 
@@ -205,7 +205,7 @@ export class DatePlugin extends FunctionPlugin {
       (h, m, s) => {
         const ret = timeToNumber({hours: Math.trunc(h), minutes: Math.trunc(m), seconds: Math.trunc(s)})
         if(ret<0) {
-          return new CellError(ErrorType.NUM, ErrorMessages.NegativeTime)
+          return new CellError(ErrorType.NUM, ErrorMessage.NegativeTime)
         }
         return ret%1
       }
@@ -216,7 +216,7 @@ export class DatePlugin extends FunctionPlugin {
     return this.runFunction(ast.args, formulaAddress, this.metadata('EOMONTH'), (dateNumber, numberOfMonthsToShift) => {
       const date = this.interpreter.dateHelper.numberToSimpleDate(dateNumber)
       const ret = this.interpreter.dateHelper.dateToNumber(this.interpreter.dateHelper.endOfMonth(offsetMonth(date, numberOfMonthsToShift)))
-      return this.interpreter.dateHelper.getWithinBounds(ret) ?? new CellError(ErrorType.NUM, ErrorMessages.DateBounds)
+      return this.interpreter.dateHelper.getWithinBounds(ret) ?? new CellError(ErrorType.NUM, ErrorMessage.DateBounds)
     })
   }
 
@@ -299,7 +299,7 @@ export class DatePlugin extends FunctionPlugin {
         }
         const offset = weekdayOffsets.get(type)
         if(offset===undefined) {
-          return new CellError(ErrorType.NUM, ErrorMessages.Weekday)
+          return new CellError(ErrorType.NUM, ErrorMessage.Weekday)
         }
         return (absoluteDay-offset)%7+1
       }
@@ -318,7 +318,7 @@ export class DatePlugin extends FunctionPlugin {
         }
         const offset = weekdayOffsets.get(type)
         if(offset===undefined) {
-          return new CellError(ErrorType.NUM, ErrorMessages.Weekday)
+          return new CellError(ErrorType.NUM, ErrorMessage.Weekday)
         }
         return Math.floor((absoluteDay-offset)/7) - Math.floor((yearStartAbsolute-offset)/7)+1
       }
@@ -347,7 +347,7 @@ export class DatePlugin extends FunctionPlugin {
       (date: string) => {
         const dateTime = this.interpreter.dateHelper.parseDateTimeFromConfigFormats(date)
         if(dateTime === undefined) {
-          return new CellError(ErrorType.VALUE, ErrorMessages.IncorrectDateTime)
+          return new CellError(ErrorType.VALUE, ErrorMessage.IncorrectDateTime)
         }
         if(!instanceOfSimpleDate(dateTime)) {
           return 0
@@ -363,7 +363,7 @@ export class DatePlugin extends FunctionPlugin {
       (date: string) => {
         const dateNumber = this.interpreter.dateHelper.dateStringToDateNumber(date)
         if(dateNumber===undefined){
-          return new CellError(ErrorType.VALUE, ErrorMessages.IncorrectDate)
+          return new CellError(ErrorType.VALUE, ErrorMessage.IncorrectDate)
         }
         return dateNumber%1
       }
@@ -395,7 +395,7 @@ export class DatePlugin extends FunctionPlugin {
         const date = this.interpreter.dateHelper.numberToSimpleDate(dateNumber)
         const newDate = truncateDayInMonth(offsetMonth(date, delta))
         const ret = this.interpreter.dateHelper.dateToNumber(newDate)
-        return this.interpreter.dateHelper.getWithinBounds(ret) ?? new CellError(ErrorType.NUM, ErrorMessages.DateBounds)
+        return this.interpreter.dateHelper.getWithinBounds(ret) ?? new CellError(ErrorType.NUM, ErrorMessage.DateBounds)
       }
     )
   }
@@ -404,7 +404,7 @@ export class DatePlugin extends FunctionPlugin {
     return this.runFunction(ast.args, formulaAddress, this.metadata('DATEDIF'),
       (startDate: number, endDate: number, unit: string) => {
         if(startDate > endDate) {
-          return new CellError(ErrorType.NUM, ErrorMessages.StartEndDate)
+          return new CellError(ErrorType.NUM, ErrorMessage.StartEndDate)
         }
         if(unit === 'D') {
           return Math.floor(endDate) - Math.floor(startDate)
@@ -441,7 +441,7 @@ export class DatePlugin extends FunctionPlugin {
                 + this.interpreter.dateHelper.leapYearsCount(start.year)
             }
           default:
-            return new CellError(ErrorType.NUM, ErrorMessages.Weekday)
+            return new CellError(ErrorType.NUM, ErrorMessage.Weekday)
         }
       }
     )
