@@ -11,6 +11,7 @@ import {Config} from './Config'
 import {ContentChanges} from './ContentChanges'
 import {DateTimeHelper} from './DateTimeHelper'
 import {DependencyGraph, FormulaCellVertex, MatrixVertex, RangeVertex, Vertex} from './DependencyGraph'
+import {ErrorMessage} from './error-message'
 import {fixNegativeZero, isNumberOverflow} from './interpreter/ArithmeticHelper'
 import {FunctionRegistry} from './interpreter/FunctionRegistry'
 import {Interpreter} from './interpreter/Interpreter'
@@ -171,7 +172,7 @@ export class Evaluator {
       return interpreterValue
     } else if (typeof interpreterValue === 'number') {
       if (isNumberOverflow(interpreterValue)) {
-        return new CellError(ErrorType.NUM)
+        return new CellError(ErrorType.NUM, ErrorMessage.Infinity)
       } else {
         return fixNegativeZero(interpreterValue)
       }
@@ -189,7 +190,7 @@ export class Evaluator {
     } else if (interpreterValue instanceof SimpleRangeValue && interpreterValue.hasOnlyNumbers()) {
       return interpreterValue
     } else {
-      return new CellError(ErrorType.VALUE)
+      return new CellError(ErrorType.VALUE, ErrorMessage.CellRangeExpected)
     }
   }
 }

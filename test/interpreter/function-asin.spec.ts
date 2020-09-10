@@ -1,5 +1,6 @@
 import {HyperFormula} from '../../src'
 import {ErrorType} from '../../src/Cell'
+import {ErrorMessage} from '../../src/error-message'
 import {adr, detailedError} from '../testUtils'
 
 describe('Function ASIN', () => {
@@ -13,7 +14,7 @@ describe('Function ASIN', () => {
   it('when value not numeric', () => {
     const engine = HyperFormula.buildFromArray([['=ASIN("foo")']])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessage.NumberCoercion))
   })
 
   it('for 1 (edge)', () => {
@@ -31,20 +32,20 @@ describe('Function ASIN', () => {
   it('when value too large', () => {
     const engine = HyperFormula.buildFromArray([['=ASIN(1.1)']])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM, ErrorMessage.Infinity))
   })
 
   it('when value too small', () => {
     const engine = HyperFormula.buildFromArray([['=ASIN(-1.1)']])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM, ErrorMessage.Infinity))
   })
 
   it('wrong number of arguments', () => {
     const engine = HyperFormula.buildFromArray([['=ASIN()', '=ASIN(1,-1)']])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA))
-    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.NA))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
+    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
   })
 
   it('use number coercion',  () => {
@@ -71,6 +72,6 @@ describe('Function ASIN', () => {
       ['-1'],
     ])
 
-    expect(engine.getCellValue(adr('B2'))).toEqual(detailedError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('B2'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessage.WrongType))
   })
 })

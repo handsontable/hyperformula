@@ -1,6 +1,7 @@
 import {HyperFormula} from '../../src'
 import {ErrorType, SimpleCellAddress} from '../../src/Cell'
 import {Config} from '../../src/Config'
+import {ErrorMessage} from '../../src/error-message'
 import {adr, dateNumberToString, detailedError} from '../testUtils'
 
 const expectToHaveDate = (engine: HyperFormula, address: SimpleCellAddress, dateString: string) => {
@@ -17,10 +18,10 @@ describe('Function EOMONTH', () => {
       ['=EOMONTH(A1, "bar", "baz")'],
     ])
 
-    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.VALUE))
-    expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.VALUE))
-    expect(engine.getCellValue(adr('A4'))).toEqual(detailedError(ErrorType.NA))
-    expect(engine.getCellValue(adr('A5'))).toEqual(detailedError(ErrorType.NA))
+    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessage.NumberCoercion))
+    expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessage.NumberCoercion))
+    expect(engine.getCellValue(adr('A4'))).toEqual(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
+    expect(engine.getCellValue(adr('A5'))).toEqual(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
   })
 
   it('works for 0', () => {
@@ -154,8 +155,8 @@ describe('Function EOMONTH', () => {
       ['=DATE(2018, 3, 31)'],
     ])
 
-    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.VALUE))
-    expect(engine.getCellValue(adr('B2'))).toEqual(detailedError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessage.WrongType))
+    expect(engine.getCellValue(adr('B2'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessage.WrongType))
   })
 
   // Inconsistency with Product 1
@@ -166,7 +167,7 @@ describe('Function EOMONTH', () => {
       ['3'],
     ])
 
-    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.VALUE))
-    expect(engine.getCellValue(adr('B2'))).toEqual(detailedError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessage.WrongType))
+    expect(engine.getCellValue(adr('B2'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessage.WrongType))
   })
 })

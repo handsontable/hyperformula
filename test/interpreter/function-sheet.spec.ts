@@ -1,4 +1,5 @@
 import {ErrorType, HyperFormula} from '../../src'
+import {ErrorMessage} from '../../src/error-message'
 import {adr, detailedError} from '../testUtils'
 
 describe('Function SHEET', () => {
@@ -51,8 +52,8 @@ describe('Function SHEET', () => {
       'Sheet1': [['=SHEET("FOO")', '=SHEET(1)']],
     })
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA))
-    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.NA))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA, ErrorMessage.SheetRef))
+    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.NA, ErrorMessage.SheetRef))
   })
 
   it('should coerce', () => {

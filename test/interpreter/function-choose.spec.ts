@@ -1,5 +1,6 @@
 import {HyperFormula} from '../../src'
 import {ErrorType} from '../../src/Cell'
+import {ErrorMessage} from '../../src/error-message'
 import {adr, detailedError} from '../testUtils'
 
 describe('Interpreter - CHOOSE function', () => {
@@ -7,7 +8,7 @@ describe('Interpreter - CHOOSE function', () => {
     const engine = HyperFormula.buildFromArray([
       ['=CHOOSE(0)']
     ])
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
   })
 
   it('Should work with more arguments', () => {
@@ -23,9 +24,9 @@ describe('Interpreter - CHOOSE function', () => {
     const engine = HyperFormula.buildFromArray([
       ['=CHOOSE(1.5,2,3)', '=CHOOSE(0,2,3,4)', '=CHOOSE(5,2,3,4,5)']
     ])
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM))
-    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.NUM))
-    expect(engine.getCellValue(adr('C1'))).toEqual(detailedError(ErrorType.NUM))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM, ErrorMessage.IntegerExpected))
+    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.NUM, ErrorMessage.ValueSmall))
+    expect(engine.getCellValue(adr('C1'))).toEqual(detailedError(ErrorType.NUM, ErrorMessage.Selector))
   })
 
   it('Coercions', () => {
@@ -59,6 +60,6 @@ describe('Interpreter - CHOOSE function', () => {
     const engine = HyperFormula.buildFromArray([
       ['=CHOOSE(1,2,A2:A3,4,5)']
     ])
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessage.WrongType))
   })
 })

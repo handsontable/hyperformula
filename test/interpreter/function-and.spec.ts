@@ -1,4 +1,5 @@
 import {ErrorType, HyperFormula} from '../../src'
+import {ErrorMessage} from '../../src/error-message'
 import {adr, detailedError} from '../testUtils'
 
 describe('Function AND', () => {
@@ -28,7 +29,7 @@ describe('Function AND', () => {
     ])
 
     expect(engine.getCellValue(adr('A1'))).toBe(true)
-    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessage.WrongType))
   })
 
   it('use coercion #2', () => {
@@ -41,7 +42,7 @@ describe('Function AND', () => {
 
     expect(engine.getCellValue(adr('A1'))).toBe(true)
     expect(engine.getCellValue(adr('A2'))).toBe(true)
-    expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessage.WrongType))
   })
 
   it('if error in range found, returns first one in row-by-row order', () => {
@@ -69,7 +70,7 @@ describe('Function AND', () => {
       ['=AND()'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
   })
 
   it('is computed eagerly', () => {

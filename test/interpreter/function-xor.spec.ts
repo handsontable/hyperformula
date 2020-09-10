@@ -1,5 +1,6 @@
 import {HyperFormula} from '../../src'
 import {ErrorType} from '../../src/Cell'
+import {ErrorMessage} from '../../src/error-message'
 import {adr, detailedError} from '../testUtils'
 
 describe('Function XOR', () => {
@@ -22,7 +23,7 @@ describe('Function XOR', () => {
       ['=XOR()'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
   })
 
   it('for one argument', () => {
@@ -44,7 +45,7 @@ describe('Function XOR', () => {
 
     expect(engine.getCellValue(adr('A1'))).toBe(true)
     expect(engine.getCellValue(adr('A2'))).toBe(true)
-    expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessage.WrongType))
   })
 
   it('use coercion #2', () => {
@@ -57,7 +58,7 @@ describe('Function XOR', () => {
 
     expect(engine.getCellValue(adr('A1'))).toBe(false)
     expect(engine.getCellValue(adr('A2'))).toBe(true)
-    expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessage.WrongType))
   })
 
   it('when no coercible to number arguments', () => {
@@ -65,7 +66,7 @@ describe('Function XOR', () => {
       ['=XOR("foo")'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessage.WrongType))
   })
 
   it('returns TRUE iff odd number of TRUEs present', () => {

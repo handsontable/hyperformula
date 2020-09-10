@@ -6,6 +6,7 @@
 import {AbsoluteCellRange} from '../../AbsoluteCellRange'
 import {CellError, EmptyValue, ErrorType, InternalScalarValue, SimpleCellAddress} from '../../Cell'
 import {FormulaCellVertex, MatrixVertex} from '../../DependencyGraph'
+import {ErrorMessage} from '../../error-message'
 import {AstNodeType, ProcedureAst} from '../../parser'
 import {InterpreterValue} from '../InterpreterValue'
 import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
@@ -166,12 +167,12 @@ export class InformationPlugin extends FunctionPlugin {
    */
   public isformula(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.runFunctionWithReferenceArgument(ast.args, formulaAddress, this.metadata('ISFORMULA'),
-      () => new CellError(ErrorType.NA),
+      () => new CellError(ErrorType.NA, ErrorMessage.WrongArgNumber),
       (reference: SimpleCellAddress) => {
         const vertex = this.dependencyGraph.addressMapping.getCell(reference)
         return vertex instanceof FormulaCellVertex || (vertex instanceof MatrixVertex && vertex.isFormula())
       },
-      () => new CellError(ErrorType.NA)
+      () => new CellError(ErrorType.NA, ErrorMessage.CellRef)
     )
   }
 
@@ -284,16 +285,16 @@ export class InformationPlugin extends FunctionPlugin {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public columns(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     if (ast.args.length !== 1) {
-      return new CellError(ErrorType.NA)
+      return new CellError(ErrorType.NA, ErrorMessage.WrongArgNumber)
     }
     if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
-      return new CellError(ErrorType.NUM)
+      return new CellError(ErrorType.NUM, ErrorMessage.EmptyArg )
     }
     const rangeAst = ast.args[0]
     if (rangeAst.type === AstNodeType.CELL_RANGE) {
       return (rangeAst.end.col - rangeAst.start.col + 1)
     } else {
-      return new CellError(ErrorType.VALUE)
+      return new CellError(ErrorType.VALUE, ErrorMessage.CellRangeExpected)
     }
   }
 
@@ -308,26 +309,26 @@ export class InformationPlugin extends FunctionPlugin {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public rows(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     if (ast.args.length !== 1) {
-      return new CellError(ErrorType.NA)
+      return new CellError(ErrorType.NA, ErrorMessage.WrongArgNumber)
     }
     if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
-      return new CellError(ErrorType.NUM)
+      return new CellError(ErrorType.NUM, ErrorMessage.EmptyArg )
     }
     const rangeAst = ast.args[0]
     if (rangeAst.type === AstNodeType.CELL_RANGE) {
       return (rangeAst.end.row - rangeAst.start.row + 1)
     } else {
-      return new CellError(ErrorType.VALUE)
+      return new CellError(ErrorType.VALUE, ErrorMessage.CellRangeExpected)
     }
   }
 
   public index(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InterpreterValue {
     const rangeArg = ast.args[0]
     if (ast.args.length < 1 || ast.args.length > 3) {
-      return new CellError(ErrorType.NA)
+      return new CellError(ErrorType.NA, ErrorMessage.WrongArgNumber)
     }
     if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
-      return new CellError(ErrorType.NUM)
+      return new CellError(ErrorType.NUM, ErrorMessage.EmptyArg )
     }
 
     let width, height
@@ -343,14 +344,22 @@ export class InformationPlugin extends FunctionPlugin {
 
     const rowArg = ast.args[1]
     const rowValue = this.evaluateAst(rowArg, formulaAddress)
-    if (typeof rowValue !== 'number' || rowValue < 0 || rowValue > height) {
-      return new CellError(ErrorType.NUM)
+    if (typeof rowValue !== 'number') {
+      return new CellError(ErrorType.NUM, ErrorMessage.WrongType) //TODO: argument could be coerced
+    } else if (rowValue < 0) {
+      return new CellError(ErrorType.NUM, ErrorMessage.Negative)
+    } else if (rowValue > height) {
+      return new CellError(ErrorType.NUM, ErrorMessage.ValueLarge)
     }
 
     const columnArg = ast.args[2]
     const columnValue = this.evaluateAst(columnArg, formulaAddress)
-    if (typeof columnValue !== 'number' || columnValue < 0 || columnValue > width) {
-      return new CellError(ErrorType.NUM)
+    if (typeof columnValue !== 'number') {
+      return new CellError(ErrorType.NUM, ErrorMessage.WrongType) //TODO: argument could be coerced
+    } else if (columnValue < 0) {
+      return new CellError(ErrorType.NUM, ErrorMessage.Negative)
+    } else if (columnValue > height) {
+      return new CellError(ErrorType.NUM, ErrorMessage.ValueLarge)
     }
 
     if (columnValue === 0 || rowValue === 0 || range === undefined) {
@@ -390,7 +399,7 @@ export class InformationPlugin extends FunctionPlugin {
         if (sheetNumber !== undefined) {
           return sheetNumber + 1
         } else {
-          return new CellError(ErrorType.NA)
+          return new CellError(ErrorType.NA, ErrorMessage.SheetRef)
         }
       }
     )
@@ -409,7 +418,7 @@ export class InformationPlugin extends FunctionPlugin {
     return this.runFunctionWithReferenceArgument(ast.args, formulaAddress, {parameters: [{argumentType: ArgumentTypes.STRING}]},
       () => this.dependencyGraph.sheetMapping.numberOfSheets(), // return number of sheets if no argument
       () => 1, // return 1 for valid reference
-      () => new CellError(ErrorType.VALUE) // error otherwise
+      () => new CellError(ErrorType.VALUE, ErrorMessage.CellRef) // error otherwise
     )
   }
 }

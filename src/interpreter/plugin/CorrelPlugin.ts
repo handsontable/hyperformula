@@ -4,6 +4,7 @@
  */
 
 import {CellError, ErrorType, InternalScalarValue, SimpleCellAddress} from '../../Cell'
+import {ErrorMessage} from '../../error-message'
 import {AstNodeType, ProcedureAst} from '../../parser'
 import {coerceToRange} from '../ArithmeticHelper'
 import {SimpleRangeValue} from '../InterpreterValue'
@@ -23,11 +24,11 @@ export class CorrelPlugin extends FunctionPlugin {
   public correl(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.runFunction(ast.args, formulaAddress, this.metadata('CORREL'), (dataX: SimpleRangeValue, dataY: SimpleRangeValue) => {
       if (dataX.numberOfElements() !== dataY.numberOfElements()) {
-        return new CellError(ErrorType.NA)
+        return new CellError(ErrorType.NA, ErrorMessage.EqualLength)
       }
 
       if (dataX.numberOfElements() <= 1) {
-        return new CellError(ErrorType.DIV_BY_ZERO)
+        return new CellError(ErrorType.DIV_BY_ZERO, ErrorMessage.TwoValues)
       }
 
       return this.computePearson(dataX, dataY)

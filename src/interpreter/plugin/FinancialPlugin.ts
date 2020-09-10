@@ -4,6 +4,7 @@
  */
 
 import {CellError, ErrorType, InternalScalarValue, SimpleCellAddress} from '../../Cell'
+import {ErrorMessage} from '../../error-message'
 import {ProcedureAst} from '../../parser'
 import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
 
@@ -232,7 +233,7 @@ export class FinancialPlugin extends FunctionPlugin {
     return this.runFunction(ast.args, formulaAddress, this.metadata('CUMIPMT'),
       (rate: number, periods: number, value: number, start: number, end: number, type: number) => {
         if (start > end) {
-          return new CellError(ErrorType.NUM)
+          return new CellError(ErrorType.NUM, ErrorMessage.EndStartPeriod)
         }
         let acc = 0
         for(let i = start; i <= end; i++) {
@@ -247,7 +248,7 @@ export class FinancialPlugin extends FunctionPlugin {
     return this.runFunction(ast.args, formulaAddress, this.metadata('CUMPRINC'),
       (rate: number, periods: number, value: number, start: number, end: number, type: number) => {
         if (start > end) {
-          return new CellError(ErrorType.NUM)
+          return new CellError(ErrorType.NUM, ErrorMessage.EndStartPeriod)
         }
         let acc = 0
         for(let i = start; i <= end; i++) {
@@ -262,7 +263,7 @@ export class FinancialPlugin extends FunctionPlugin {
     return this.runFunction(ast.args, formulaAddress, this.metadata('DB'),
       (cost: number, salvage: number, life: number, period: number, month: number) => {
         if ((month===12 && period > life) || (period > life+1)) {
-          return new CellError(ErrorType.NUM)
+          return new CellError(ErrorType.NUM, ErrorMessage.PeriodLong)
         }
 
         if (salvage >= cost) {
