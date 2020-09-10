@@ -61,7 +61,7 @@ export class Interpreter {
    */
   public evaluateAst(ast: Ast, formulaAddress: SimpleCellAddress): InterpreterValue {
     if(this.config.licenseKeyValidityState !== LicenseKeyValidityState.VALID) {
-      return new CellError(ErrorType.LIC, `License key is ${this.config.licenseKeyValidityState}.`)
+      return new CellError(ErrorType.LIC, ErrorMessage.LicenseKey(this.config.licenseKeyValidityState))
     }
     switch (ast.type) {
       case AstNodeType.EMPTY: {

@@ -7,6 +7,7 @@ import {CellError, ErrorType, simpleCellAddress, SimpleCellAddress} from './Cell
 import {CellValue, DetailedCellError, Exporter, NoErrorCellValue} from './CellValue'
 import {Config} from './Config'
 import {DependencyGraph, FormulaCellVertex, MatrixVertex, ParsingErrorVertex} from './DependencyGraph'
+import {ErrorMessage} from './error-message'
 import {LicenseKeyValidityState} from './helpers/licenseKeyValidator'
 import {Maybe} from './Maybe'
 import {buildLexerConfig, Unparser} from './parser'
@@ -59,7 +60,7 @@ export class Serialization {
 
   public getCellValue(address: SimpleCellAddress): CellValue {
     if(this.config.licenseKeyValidityState !== LicenseKeyValidityState.VALID) {
-      return new DetailedCellError(new CellError(ErrorType.LIC, `License key is ${this.config.licenseKeyValidityState}.`), `#${ErrorType.LIC}!`)
+      return new DetailedCellError(new CellError(ErrorType.LIC, ErrorMessage.LicenseKey(this.config.licenseKeyValidityState)), `#${ErrorType.LIC}!`)
     }
     return this.exporter.exportValue(this.dependencyGraph.getScalarValue(address))
   }
