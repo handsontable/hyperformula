@@ -1,3 +1,4 @@
+import {ErrorMessage} from '../src/error-message'
 import {FunctionPlugin} from '../src/interpreter/plugin/FunctionPlugin'
 import {ProcedureAst} from '../src/parser'
 import {ErrorType, InternalScalarValue, SimpleCellAddress} from '../src/Cell'
@@ -5,7 +6,7 @@ import {FunctionPluginValidationError, HyperFormula} from '../src'
 import {adr, detailedError, expectArrayWithSameContent} from './testUtils'
 import {SumifPlugin} from '../src/interpreter/plugin/SumifPlugin'
 import {NumericAggregationPlugin} from '../src/interpreter/plugin/NumericAggregationPlugin'
-import {plPL} from '../src/i18n'
+import {plPL} from '../src/i18n/languages'
 import {VersionPlugin} from '../src/interpreter/plugin/VersionPlugin'
 import {ProtectedFunctionError, ProtectedFunctionTranslationError} from '../src/errors'
 
@@ -127,7 +128,7 @@ describe('Register static custom plugin', () => {
 
     expect(HyperFormula.getRegisteredFunctionNames('enGB')).not.toContain('FOO')
     expect(HyperFormula.getRegisteredFunctionNames('enGB')).toContain('BAR')
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NAME))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NAME, ErrorMessage.FunctionName('FOO')))
     expect(engine.getCellValue(adr('B1'))).toEqual('bar')
   })
 
@@ -207,7 +208,7 @@ describe('Instance level formula registry', () => {
     expectArrayWithSameContent(['FOO', 'BAR', 'VERSION'], engine.getRegisteredFunctionNames())
     expect(engine.getCellValue(adr('A1'))).toEqual('foo')
     expect(engine.getCellValue(adr('B1'))).toEqual('bar')
-    expect(engine.getCellValue(adr('C1'))).toEqual(detailedError(ErrorType.NAME))
+    expect(engine.getCellValue(adr('C1'))).toEqual(detailedError(ErrorType.NAME, ErrorMessage.FunctionName('SUM')))
   })
 
   it('modifying static plugins should not affect existing engine instance registry', () => {

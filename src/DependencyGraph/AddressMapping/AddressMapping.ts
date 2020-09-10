@@ -3,9 +3,9 @@
  * Copyright (c) 2020 Handsoncode. All rights reserved.
  */
 
-import {EmptyValue, InternalCellValue, SimpleCellAddress} from '../../Cell'
-import {ColumnsSpan} from '../../ColumnsSpan'
-import {RowsSpan} from '../../RowsSpan'
+import {EmptyValue, SimpleCellAddress} from '../../Cell'
+import {InterpreterValue} from '../../interpreter/InterpreterValue'
+import {ColumnsSpan, RowsSpan} from '../../Span'
 import {MatrixVertex} from '../index'
 import {CellVertex} from '../Vertex'
 import {ChooseAddressMapping} from './ChooseAddressMappingPolicy'
@@ -65,7 +65,7 @@ export class AddressMapping {
     this.addSheet(sheetId, new strategyConstructor(width, height))
   }
 
-  public getCellValue(address: SimpleCellAddress): InternalCellValue {
+  public getCellValue(address: SimpleCellAddress): InterpreterValue {
     const vertex = this.getCell(address)
 
     if (vertex === null) {

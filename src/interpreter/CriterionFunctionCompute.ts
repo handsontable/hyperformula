@@ -6,6 +6,7 @@
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
 import {CellError, ErrorType, InternalScalarValue, simpleCellAddress} from '../Cell'
 import {CriterionCache, DependencyGraph, RangeVertex} from '../DependencyGraph'
+import {ErrorMessage} from '../error-message'
 import {split} from '../generatorUtils'
 import {Maybe} from '../Maybe'
 import {CriterionLambda, CriterionPackage} from './Criterion'
@@ -47,7 +48,7 @@ export class CriterionFunctionCompute<T> {
   public compute(simpleValuesRange: SimpleRangeValue, conditions: Condition[]): T | CellError {
     for (const condition of conditions) {
       if (!condition.conditionRange.sameDimensionsAs(simpleValuesRange)) {
-        return new CellError(ErrorType.VALUE)
+        return new CellError(ErrorType.VALUE, ErrorMessage.EqualLength)
       }
     }
 
@@ -108,7 +109,7 @@ export class CriterionFunctionCompute<T> {
   private evaluateRangeValue(simpleValuesRange: SimpleRangeValue, conditions: Condition[]) {
     const criterionLambdas = conditions.map((condition) => condition.criterionPackage.lambda)
     const values = Array.from(simpleValuesRange.valuesFromTopLeftCorner()).map(this.mapFunction)[Symbol.iterator]()
-    const conditionsIterators = conditions.map((condition) => condition.conditionRange.valuesFromTopLeftCorner())
+    const conditionsIterators = conditions.map((condition) => condition.conditionRange.iterateValuesFromTopLeftCorner())
     const filteredValues = ifFilter(criterionLambdas, conditionsIterators, values)
     return this.reduceFunction(filteredValues)
   }

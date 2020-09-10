@@ -5,21 +5,23 @@
 
 import {AbsoluteCellRange} from './AbsoluteCellRange'
 import {absolutizeDependencies} from './absolutizeDependencies'
-import {CellError, ErrorType, InternalCellValue, SimpleCellAddress} from './Cell'
+import {CellError, EmptyValue, ErrorType, SimpleCellAddress} from './Cell'
 import {ColumnSearchStrategy} from './ColumnSearch/ColumnSearchStrategy'
 import {Config} from './Config'
 import {ContentChanges} from './ContentChanges'
 import {DateTimeHelper} from './DateTimeHelper'
 import {DependencyGraph, FormulaCellVertex, MatrixVertex, RangeVertex, Vertex} from './DependencyGraph'
+import {ErrorMessage} from './error-message'
 import {fixNegativeZero, isNumberOverflow} from './interpreter/ArithmeticHelper'
-import {Interpreter} from './interpreter/Interpreter'
-import {SimpleRangeValue} from './interpreter/InterpreterValue'
-import {Matrix} from './Matrix'
-import {Ast, RelativeDependency} from './parser'
-import {Statistics, StatType} from './statistics'
-import {NumberLiteralHelper} from './NumberLiteralHelper'
-import {NamedExpressions} from './NamedExpressions'
 import {FunctionRegistry} from './interpreter/FunctionRegistry'
+import {Interpreter} from './interpreter/Interpreter'
+import {InterpreterValue, SimpleRangeValue} from './interpreter/InterpreterValue'
+import {Matrix} from './Matrix'
+import {NamedExpressions} from './NamedExpressions'
+import {NumberLiteralHelper} from './NumberLiteralHelper'
+import {Ast, RelativeDependency} from './parser'
+import {Serialization} from './Serialization'
+import {Statistics, StatType} from './statistics'
 
 export class Evaluator {
   private interpreter: Interpreter
@@ -29,12 +31,13 @@ export class Evaluator {
     private readonly columnSearch: ColumnSearchStrategy,
     private readonly config: Config,
     private readonly stats: Statistics,
-    private readonly dateHelper: DateTimeHelper,
+    public readonly dateHelper: DateTimeHelper,
     private readonly numberLiteralsHelper: NumberLiteralHelper,
     private readonly functionRegistry: FunctionRegistry,
-    private readonly namedExpressions: NamedExpressions
+    private readonly namedExpressions: NamedExpressions,
+    private readonly serialization: Serialization
   ) {
-    this.interpreter = new Interpreter(this.dependencyGraph, this.columnSearch, this.config, this.stats, this.dateHelper, this.numberLiteralsHelper, this.functionRegistry, this.namedExpressions)
+    this.interpreter = new Interpreter(this.dependencyGraph, this.columnSearch, this.config, this.stats, this.dateHelper, this.numberLiteralsHelper, this.functionRegistry, this.namedExpressions, this.serialization)
   }
 
   public run(): void {
@@ -92,6 +95,8 @@ export class Evaluator {
           if (vertex instanceof RangeVertex) {
             vertex.clearCache()
           } else if (vertex instanceof FormulaCellVertex) {
+            const address = vertex.getAddress(this.dependencyGraph.lazilyTransformingAstService)
+            this.columnSearch.remove(vertex.valueOrNull(), address)
             const error = new CellError(ErrorType.CYCLE)
             vertex.setCellValue(error)
             changes.addChange(error, vertex.address)
@@ -106,7 +111,7 @@ export class Evaluator {
     this.interpreter.destroy()
   }
 
-  public runAndForget(ast: Ast, address: SimpleCellAddress, dependencies: RelativeDependency[]): InternalCellValue {
+  public runAndForget(ast: Ast, address: SimpleCellAddress, dependencies: RelativeDependency[]): InterpreterValue {
     const tmpRanges: RangeVertex[] = []
     for (const dep of absolutizeDependencies(dependencies, address)) {
       if (dep instanceof AbsoluteCellRange) {
@@ -161,16 +166,18 @@ export class Evaluator {
     })
   }
 
-  private evaluateAstToCellValue(ast: Ast, formulaAddress: SimpleCellAddress): InternalCellValue {
+  private evaluateAstToCellValue(ast: Ast, formulaAddress: SimpleCellAddress): InterpreterValue {
     const interpreterValue = this.interpreter.evaluateAst(ast, formulaAddress)
     if (interpreterValue instanceof SimpleRangeValue) {
       return interpreterValue
     } else if (typeof interpreterValue === 'number') {
       if (isNumberOverflow(interpreterValue)) {
-        return new CellError(ErrorType.NUM)
+        return new CellError(ErrorType.NUM, ErrorMessage.Infinity)
       } else {
         return fixNegativeZero(interpreterValue)
       }
+    } else if (interpreterValue === EmptyValue && this.config.evaluateNullToZero) {
+      return 0
     } else {
       return interpreterValue
     }
@@ -183,7 +190,7 @@ export class Evaluator {
     } else if (interpreterValue instanceof SimpleRangeValue && interpreterValue.hasOnlyNumbers()) {
       return interpreterValue
     } else {
-      return new CellError(ErrorType.VALUE)
+      return new CellError(ErrorType.VALUE, ErrorMessage.CellRangeExpected)
     }
   }
 }

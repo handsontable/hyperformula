@@ -83,7 +83,7 @@ export interface ConfigParams {
    *
    * Any configuration of at least two of hh, mm, ss is accepted as a time, and they can be put in any order.
    *
-   * @default ['hh:mm', 'hh:mm:ss']
+   * @default ['hh:mm', 'hh:mm:ss.sss']
    *
    * @category Date and Time
    */
@@ -114,7 +114,12 @@ export interface ConfigParams {
    */
   language: string,
   /**
-   * License key for commercial version of HyperFormula.
+   * A license key of HyperFormula accepts the following values:
+   * * `agpl-v3` string if you want to use the software on AGPL v3 license terms,
+   * * `non-commercial-and-evaluation` string if you want to use our limited versions,
+   * * a valid license key string, if you bought the commercial license.
+   *
+   * For more details visit [this guide](/guide/license-key.html)
    *
    * @default undefined
    *
@@ -194,6 +199,15 @@ export interface ConfigParams {
    */
   matrixDetectionThreshold: number,
   /**
+   * Sets the compatibility mode for behaviour of null value.
+   * If set, formula evaluating to null evaluates to 0 instead.
+   *
+   * @default false
+   *
+   * @category Engine
+   */
+  evaluateNullToZero: boolean,
+  /**
    * Two-digit values when interpreted as a year can be either 19xx or 20xx.
    * If `xx <= nullYear` its latter, otherwise its former.
    *
@@ -246,7 +260,7 @@ export interface ConfigParams {
    *
    * @default defaultStringifyDuration
    *
-   * @category DateTime
+   * @category Date and Time
    */
   stringifyDuration: (time: SimpleTime, timeFormat: string) => Maybe<string>,
   /**
@@ -310,7 +324,7 @@ export interface ConfigParams {
    * @default false
    * @category String
    */
-  useRegularExpresssions: boolean,
+  useRegularExpressions: boolean,
   /**
    * If set true, then criterions in functions (SUMIF, COUNTIF, ...) can use wildcards '*' and '?'.
    *
@@ -367,6 +381,7 @@ export class Config implements ConfigParams, ParserConfig {
     localeLang: 'en',
     matrixDetection: true,
     matrixDetectionThreshold: 100,
+    evaluateNullToZero: false,
     nullYear: 30,
     parseDateTime: defaultParseToDateTime,
     stringifyDateTime: defaultStringifyDateTime,
@@ -378,7 +393,7 @@ export class Config implements ConfigParams, ParserConfig {
     vlookupThreshold: 20,
     nullDate: {year: 1899, month: 12, day: 30},
     undoLimit: 20,
-    useRegularExpresssions: false,
+    useRegularExpressions: false,
     useWildcards: true,
     matchWholeCell: true,
     maxRows: 40_000,
@@ -423,6 +438,8 @@ export class Config implements ConfigParams, ParserConfig {
   /** @inheritDoc */
   public readonly matrixDetectionThreshold: number
   /** @inheritDoc */
+  public readonly evaluateNullToZero: boolean
+  /** @inheritDoc */
   public readonly nullYear: number
   /** @inheritDoc */
   public readonly parseDateTime: (dateString: string, dateFormats: string) => Maybe<SimpleDateTime>
@@ -462,7 +479,7 @@ export class Config implements ConfigParams, ParserConfig {
    * @internal
    */
   public readonly translationPackage: TranslationPackage
-  public readonly useRegularExpresssions: boolean
+  public readonly useRegularExpressions: boolean
   public readonly useWildcards: boolean
   public readonly matchWholeCell: boolean
   /**
@@ -502,6 +519,7 @@ export class Config implements ConfigParams, ParserConfig {
       smartRounding,
       matrixDetection,
       matrixDetectionThreshold,
+      evaluateNullToZero,
       nullYear,
       parseDateTime,
       stringifyDateTime,
@@ -513,7 +531,7 @@ export class Config implements ConfigParams, ParserConfig {
       nullDate,
       useStats,
       undoLimit,
-      useRegularExpresssions,
+      useRegularExpressions,
       useWildcards,
       matchWholeCell,
       maxRows,
@@ -540,6 +558,7 @@ export class Config implements ConfigParams, ParserConfig {
     this.matrixDetection = this.valueFromParam(matrixDetection, 'boolean', 'matrixDetection')
     this.matrixDetectionThreshold = this.valueFromParam(matrixDetectionThreshold, 'number', 'matrixDetectionThreshold')
     this.validateNumberToBeAtLeast(this.matrixDetectionThreshold, 'matrixDetectionThreshold', 1)
+    this.evaluateNullToZero = this.valueFromParam(evaluateNullToZero, 'boolean', 'evaluateNullToZero')
     this.nullYear = this.valueFromParam(nullYear, 'number', 'nullYear')
     this.validateNumberToBeAtLeast(this.nullYear, 'nullYear', 0)
     this.validateNumberToBeAtMost(this.nullYear, 'nullYear', 100)
@@ -559,7 +578,7 @@ export class Config implements ConfigParams, ParserConfig {
     this.nullDate = this.valueFromParamCheck(nullDate, instanceOfSimpleDate, 'IDate', 'nullDate')
     this.leapYear1900 = this.valueFromParam(leapYear1900, 'boolean', 'leapYear1900')
     this.undoLimit = this.valueFromParam(undoLimit, 'number', 'undoLimit')
-    this.useRegularExpresssions = this.valueFromParam(useRegularExpresssions, 'boolean', 'useRegularExpresssions')
+    this.useRegularExpressions = this.valueFromParam(useRegularExpressions, 'boolean', 'useRegularExpressions')
     this.useWildcards = this.valueFromParam(useWildcards, 'boolean', 'useWildcards')
     this.matchWholeCell = this.valueFromParam(matchWholeCell, 'boolean', 'matchWholeCell')
     this.validateNumberToBeAtLeast(this.undoLimit, 'undoLimit', 0)

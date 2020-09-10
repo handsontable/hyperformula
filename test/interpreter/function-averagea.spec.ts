@@ -1,12 +1,13 @@
 import {HyperFormula} from '../../src'
 import {ErrorType} from '../../src/Cell'
+import {ErrorMessage} from '../../src/error-message'
 import {adr, detailedError} from '../testUtils'
 
 describe('AVERAGEA', () => {
   it('AVERAGEA with empty args', () => {
     const engine = HyperFormula.buildFromArray([['=AVERAGEA()']])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
   })
 
   it('AVERAGEA with args', () => {

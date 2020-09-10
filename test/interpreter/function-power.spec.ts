@@ -1,5 +1,6 @@
 import {HyperFormula} from '../../src'
 import {ErrorType} from '../../src/Cell'
+import {ErrorMessage} from '../../src/error-message'
 import {adr, detailedError} from '../testUtils'
 
 describe('Function POWER', () => {
@@ -9,8 +10,8 @@ describe('Function POWER', () => {
       ['=POWER(1, 2, 3)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA))
-    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NA))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
+    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
   })
 
   it('should not work for arguemnts of wrong type', () => {
@@ -20,9 +21,9 @@ describe('Function POWER', () => {
       ['=POWER("foo", "baz")'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE))
-    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.VALUE))
-    expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessage.NumberCoercion))
+    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessage.NumberCoercion))
+    expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessage.NumberCoercion))
   })
 
   it('should return 1 for 0^0', () => {
@@ -38,7 +39,7 @@ describe('Function POWER', () => {
       ['=POWER(0, -2)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM, ErrorMessage.Infinity))
   })
 
   it('should return error when result too large or too small', () => {
@@ -50,9 +51,9 @@ describe('Function POWER', () => {
     ], { smartRounding : false})
 
     expect(engine.getCellValue(adr('A1'))).toEqual(8.98846567431158e+307)
-    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NUM))
+    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NUM, ErrorMessage.Infinity))
     expect(engine.getCellValue(adr('A3'))).toEqual(-8.98846567431158e+307)
-    expect(engine.getCellValue(adr('A4'))).toEqual(detailedError(ErrorType.NUM))
+    expect(engine.getCellValue(adr('A4'))).toEqual(detailedError(ErrorType.NUM, ErrorMessage.Infinity))
   })
 
   it('should work', () => {

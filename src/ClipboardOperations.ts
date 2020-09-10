@@ -119,7 +119,7 @@ export class ClipboardOperations {
 
     if (invalidSimpleCellAddress(destinationLeftCorner) ||
       !this.dependencyGraph.sheetMapping.hasSheetWithId(destinationLeftCorner.sheet)) {
-      throw new InvalidArgumentsError()
+      throw new InvalidArgumentsError('a valid target address.')
     }
 
     const targetRange = AbsoluteCellRange.spanFrom(destinationLeftCorner, this.clipboard.width, this.clipboard.height)

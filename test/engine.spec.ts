@@ -1,6 +1,7 @@
-import {DetailedCellError, ErrorType, HyperFormula, NoSheetWithIdError, SheetNameAlreadyTakenError} from '../src'
+import {DetailedCellError, ErrorType, HyperFormula} from '../src'
 import {CellType, CellValueType} from '../src/Cell'
-import {plPL} from '../src/i18n'
+import {ErrorMessage} from '../src/error-message'
+import {plPL} from '../src/i18n/languages'
 import {adr, detailedError, expectArrayWithSameContent} from './testUtils'
 import {Config} from '../src/Config'
 
@@ -66,7 +67,7 @@ describe('#buildFromArray', () => {
   it('parsing error', () => {
     const engine = HyperFormula.buildFromArray([['=A1B1']])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.ERROR, 'Parsing error'))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.ERROR, ErrorMessage.ParseError))
   })
 
   it('dependency before value', () => {
@@ -111,10 +112,10 @@ describe('#buildFromArray', () => {
       ['=SUM(', '=A1']
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.ERROR, 'Parsing error'))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.ERROR, ErrorMessage.ParseError))
     expect(engine.getCellFormula(adr('A1'))).toEqual('=SUM(')
 
-    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.ERROR, 'Parsing error'))
+    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.ERROR, ErrorMessage.ParseError))
     expect(engine.getCellFormula(adr('B1'))).toEqual('=A1')
   })
 })
@@ -180,7 +181,7 @@ describe('#getCellFormula', () => {
       ['=SUM(']
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.ERROR, 'Parsing error'))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.ERROR, ErrorMessage.ParseError))
     expect(engine.getCellFormula(adr('A1'))).toEqual('=SUM(')
   })
 
@@ -189,7 +190,7 @@ describe('#getCellFormula', () => {
       ['{=TRANSPOSE(}']
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.ERROR, 'Parsing error'))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.ERROR, ErrorMessage.ParseError))
     expect(engine.getCellFormula(adr('A1'))).toEqual('{=TRANSPOSE(}')
   })
 })
@@ -227,7 +228,7 @@ describe('#getSheetFormulas', () => {
 
     const out = engine.getSheetFormulas(0)
 
-    expectArrayWithSameContent([['=SUM(1, A2)', '=TRUE()', undefined], ['=SUM(', undefined, undefined]], out)
+    expectArrayWithSameContent([['=SUM(1, A2)', '=TRUE()'], ['=SUM(']], out)
   })
 })
 
@@ -271,7 +272,7 @@ describe('#getCellValue', () => {
       ['=SUM(']
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.ERROR, 'Parsing error'))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.ERROR, ErrorMessage.ParseError))
   })
 
   it('should return value of a cell in a formula matrix', () => {
@@ -703,5 +704,40 @@ describe('#isCellPartOfMatrix', () => {
     expect(engine.isCellPartOfMatrix(adr('B1'))).toEqual(false)
     expect(engine.isCellPartOfMatrix(adr('C1'))).toEqual(false)
     expect(engine.isCellPartOfMatrix(adr('D1'))).toEqual(false)
+  })
+})
+
+describe('dateTime', () => {
+  it('dateTime', () => {
+    const engine = HyperFormula.buildEmpty()
+    expect(engine.numberToDateTime(43845.1)).toEqual({'day': 15, 'hours': 2, 'minutes': 24, 'month': 1, 'seconds': 0, 'year': 2020})
+    expect(engine.numberToDate(43845)).toEqual({'day': 15, 'month': 1, 'year': 2020})
+    expect(engine.numberToTime(1.1)).toEqual({'hours': 26, 'minutes': 24, 'seconds': 0})
+  })
+})
+
+describe('Graph dependency topological ordering module', () => {
+  it('should build correctly when rows are dependant on cells that are not yet processed #1', () => {
+    expect(() => HyperFormula.buildFromArray([
+      ['=A3+A2'],
+      ['=A3'],
+    ])).not.toThrowError()
+  })
+
+  it('should build correctly when rows are dependant on cells that are not yet processed #2', () => {
+    expect(() => HyperFormula.buildFromArray([
+      ['=A4+A3+A2'],
+      ['=A4+A3'],
+      ['=A4'],
+    ])).not.toThrowError()
+  })
+
+  it('should build correctly when rows are dependant on cells that are not yet processed #3', () => {
+    expect(() => HyperFormula.buildFromArray([
+      ['=A5+A4+A3+A2'],
+      ['=A5+A4+A3'],
+      ['=A5+A4'],
+      ['=A5'],
+    ])).not.toThrowError()
   })
 })

@@ -7,9 +7,10 @@ import {
   colStart,
   detailedError,
   extractColumnRange,
-  extractRange,
   extractReference,
-  extractRowRange, rowEnd, rowStart
+  extractRowRange,
+  rowEnd,
+  rowStart
 } from '../testUtils'
 
 describe('Ensure it is possible to move columns', () => {
@@ -84,12 +85,12 @@ describe('Move columns', () => {
       ['1', '2'],
     ])
 
-    expect(() => engine.moveColumns(0, 0, 1, -1)).toThrow(new InvalidArgumentsError())
-    expect(() => engine.moveColumns(0, 0, 1, 1)).toThrow(new InvalidArgumentsError())
-    expect(() => engine.moveColumns(0, 0, 1, 0)).toThrow(new InvalidArgumentsError())
-    expect(() => engine.moveColumns(0, 0, 2, 0)).toThrow(new InvalidArgumentsError())
-    expect(() => engine.moveColumns(0, 0, 2, 1)).toThrow(new InvalidArgumentsError())
-    expect(() => engine.moveColumns(0, 0, 2, 2)).toThrow(new InvalidArgumentsError())
+    expect(() => engine.moveColumns(0, 0, 1, -1)).toThrow(new InvalidArgumentsError('column number to be nonnegative and number of columns to add to be positive.'))
+    expect(() => engine.moveColumns(0, 0, 1, 1)).toThrow(new InvalidArgumentsError('a valid range of columns to move.'))
+    expect(() => engine.moveColumns(0, 0, 1, 0)).toThrow(new InvalidArgumentsError('a valid range of columns to move.'))
+    expect(() => engine.moveColumns(0, 0, 2, 0)).toThrow(new InvalidArgumentsError('a valid range of columns to move.'))
+    expect(() => engine.moveColumns(0, 0, 2, 1)).toThrow(new InvalidArgumentsError('a valid range of columns to move.'))
+    expect(() => engine.moveColumns(0, 0, 2, 2)).toThrow(new InvalidArgumentsError('a valid range of columns to move.'))
   })
 
   it('should move one column', () => {
@@ -176,27 +177,25 @@ describe('Move columns', () => {
   it('should adjust range', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '2'],
-      ['',  '=COUNTBLANK(A1:B1)'],
+      ['', '=COUNTBLANK(A1:B1)'],
     ])
 
     engine.moveColumns(0, 1, 1, 3)
-    const range = extractRange(engine, adr('C2'))
 
-    expect(range.start.col).toEqual(0)
-    expect(range.end.col).toEqual(2)
-    expect(engine.getCellValue(adr('C2'))).toEqual(1)
+    expect(engine.getCellFormula(adr('C2'))).toEqual('=COUNTBLANK(A1:A1)')
+    expect(engine.getCellValue(adr('C2'))).toEqual(0)
   })
 
   it('should return changes', () => {
     const engine = HyperFormula.buildFromArray([
-      ['1', '2'],
-      ['',  '=COUNTBLANK(A1:B1)'],
+      ['1', null],
+      ['', '=COUNTBLANK(A1:B1)'],
     ])
 
     const changes = engine.moveColumns(0, 1, 1, 3)
 
     expect(changes.length).toEqual(1)
-    expect(changes).toContainEqual(new ExportedCellChange(simpleCellAddress( 0, 2, 1), 1 ))
+    expect(changes).toContainEqual(new ExportedCellChange(simpleCellAddress(0, 2, 1), 0))
   })
 
   it('should return #CYCLE when moving formula onto referred range', () => {
@@ -229,6 +228,16 @@ describe('Move columns', () => {
 
     expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.CYCLE))
     expect(engine.getCellFormula(adr('B1'))).toEqual('=SUM(A1:C1)')
+  })
+
+  it('should produce only one history entry', () => {
+    const engine = HyperFormula.buildFromArray([[0, 1, 2, 3]])
+
+    const version = engine.lazilyTransformingAstService.version()
+
+    engine.moveColumns(0, 1, 1, 3)
+
+    expect(engine.lazilyTransformingAstService.version()).toEqual(version + 1)
   })
 })
 

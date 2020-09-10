@@ -1,5 +1,6 @@
 import {HyperFormula, ExportedCellChange, NothingToPasteError} from '../../src'
 import {ErrorType, simpleCellAddress} from '../../src/Cell'
+import {ErrorMessage} from '../../src/error-message'
 import {CellAddress} from '../../src/parser'
 import {
   adr,
@@ -19,27 +20,27 @@ describe('Copy - paste integration', () => {
 
     expect(() => {
       engine.copy(adr('A1'), 0, 42)
-    }).toThrowError('Invalid arguments, expected width to be positive integer')
+    }).toThrowError('Invalid arguments, expected width to be positive integer.')
 
     expect(() => {
       engine.copy(adr('A1'), -1, 42)
-    }).toThrowError('Invalid arguments, expected width to be positive integer')
+    }).toThrowError('Invalid arguments, expected width to be positive integer.')
 
     expect(() => {
       engine.copy(adr('A1'), 3.14, 42)
-    }).toThrowError('Invalid arguments, expected width to be positive integer')
+    }).toThrowError('Invalid arguments, expected width to be positive integer.')
 
     expect(() => {
       engine.copy(adr('A1'), 42, 0)
-    }).toThrowError('Invalid arguments, expected height to be positive integer')
+    }).toThrowError('Invalid arguments, expected height to be positive integer.')
 
     expect(() => {
       engine.copy(adr('A1'), 42, -1)
-    }).toThrowError('Invalid arguments, expected height to be positive integer')
+    }).toThrowError('Invalid arguments, expected height to be positive integer.')
 
     expect(() => {
       engine.copy(adr('A1'), 42, 3.14)
-    }).toThrowError('Invalid arguments, expected height to be positive integer')
+    }).toThrowError('Invalid arguments, expected height to be positive integer.')
   })
 
   it('paste raise error when there is nothing in clipboard', () => {
@@ -188,7 +189,7 @@ describe('Copy - paste integration', () => {
     engine.copy(adr('B2'), 1, 1)
     engine.paste(adr('A1'))
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.REF))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.REF, ErrorMessage.BadRef))
   })
 
   it('should create new range vertex - cell range', () => {
@@ -366,7 +367,7 @@ describe('Copy - paste integration', () => {
 
     expect(() => {
       engine.paste(adr('A1', 1))
-    }).toThrowError('Invalid arguments, expected undefined')
+    }).toThrowError('Invalid arguments, expected a valid target address.')
   })
 
   it('should copy references with absolute sheet id', () => {

@@ -2,7 +2,7 @@ import {DetailedCellError, HyperFormula} from '../src'
 import {CellError, EmptyValue, ErrorType} from '../src/Cell'
 import {Exporter} from '../src/CellValue'
 import {Config} from '../src/Config'
-import {plPL} from '../src/i18n'
+import {plPL} from '../src/i18n/languages'
 import {detailedError} from './testUtils'
 import {NamedExpressions} from '../src/NamedExpressions'
 

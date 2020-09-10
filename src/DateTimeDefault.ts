@@ -80,14 +80,14 @@ export function defaultParseToTime(timeItems: string[], timeFormat: string): May
   if (!/^\d+$/.test(hourString)) {
     return undefined
   }
-  let hour = Number(hourString)
+  let hours = Number(hourString)
   if (ampm !== undefined) {
-    if (hour < 0 || hour > 12) {
+    if (hours < 0 || hours > 12) {
       return undefined
     }
-    hour = hour % 12
+    hours = hours % 12
     if (ampm) {
-      hour = hour + 12
+      hours = hours + 12
     }
   }
 
@@ -95,16 +95,16 @@ export function defaultParseToTime(timeItems: string[], timeFormat: string): May
   if (!/^\d+$/.test(minuteString)) {
     return undefined
   }
-  const minute = Number(minuteString)
+  const minutes = Number(minuteString)
 
   const secondString = secondIndex !== -1 ? timeItems[secondIndex] : '0'
   if (!/^\d+(\.\d+)?$/.test(secondString)) {
     return undefined
   }
-  let second = Number(secondString)
-  second = Math.round(second * Math.pow(10, fractionOfSecondPrecision))/Math.pow(10, fractionOfSecondPrecision)
+  let seconds = Number(secondString)
+  seconds = Math.round(seconds * Math.pow(10, fractionOfSecondPrecision))/Math.pow(10, fractionOfSecondPrecision)
 
-  return {hour, minute, second}
+  return {hours, minutes, seconds}
 }
 
 export function defaultParseToDate(dateItems: string[], dateFormat: string): Maybe<SimpleDate> {

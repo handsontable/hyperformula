@@ -7,8 +7,7 @@ import {Statistics, StatType} from './statistics'
 import {ClipboardCell, ClipboardCellType} from './ClipboardOperations'
 import {EmptyValue, invalidSimpleCellAddress, simpleCellAddress, SimpleCellAddress} from './Cell'
 import {CellContent, CellContentParser, RawCellContent} from './CellContentParser'
-import {RowsSpan} from './RowsSpan'
-import {ColumnsSpan} from './ColumnsSpan'
+import {ColumnsSpan, RowsSpan} from './Span'
 import {ContentChanges} from './ContentChanges'
 import {ColumnSearchStrategy} from './ColumnSearch/ColumnSearchStrategy'
 import {absolutizeDependencies} from './absolutizeDependencies'
@@ -234,8 +233,10 @@ export class Operations {
     return this.sheetMapping.renameSheet(sheetId, newName)
   }
 
-  public moveRows(sheet: number, startRow: number, numberOfRows: number, targetRow: number): void {
+  public moveRows(sheet: number, startRow: number, numberOfRows: number, targetRow: number): number {
     const rowsToAdd = RowsSpan.fromNumberOfRows(sheet, targetRow, numberOfRows)
+    this.lazilyTransformingAstService.beginCombinedMode(sheet)
+
     this.doAddRows(rowsToAdd)
 
     if (targetRow < startRow) {
@@ -247,10 +248,14 @@ export class Operations {
     this.moveCells(startAddress, Number.POSITIVE_INFINITY, numberOfRows, targetAddress)
     const rowsToRemove = RowsSpan.fromNumberOfRows(sheet, startRow, numberOfRows)
     this.doRemoveRows(rowsToRemove)
+
+    return this.lazilyTransformingAstService.commitCombinedMode()
   }
 
-  public moveColumns(sheet: number, startColumn: number, numberOfColumns: number, targetColumn: number): void {
+  public moveColumns(sheet: number, startColumn: number, numberOfColumns: number, targetColumn: number): number {
     const columnsToAdd = ColumnsSpan.fromNumberOfColumns(sheet, targetColumn, numberOfColumns)
+    this.lazilyTransformingAstService.beginCombinedMode(sheet)
+
     this.doAddColumns(columnsToAdd)
 
     if (targetColumn < startColumn) {
@@ -262,6 +267,8 @@ export class Operations {
     this.moveCells(startAddress, numberOfColumns, Number.POSITIVE_INFINITY, targetAddress)
     const columnsToRemove = ColumnsSpan.fromNumberOfColumns(sheet, startColumn, numberOfColumns)
     this.doRemoveColumns(columnsToRemove)
+
+    return this.lazilyTransformingAstService.commitCombinedMode()
   }
 
   public moveCells(sourceLeftCorner: SimpleCellAddress, width: number, height: number, destinationLeftCorner: SimpleCellAddress): MoveCellsResult {
@@ -353,7 +360,7 @@ export class Operations {
       !this.sheetMapping.hasSheetWithId(sourceLeftCorner.sheet) ||
       !this.sheetMapping.hasSheetWithId(destinationLeftCorner.sheet)
     ) {
-      throw new InvalidArgumentsError()
+      throw new InvalidArgumentsError('a valid range of cells to move.')
     }
 
     const sourceRange = AbsoluteCellRange.spanFrom(sourceLeftCorner, width, height)
@@ -520,7 +527,6 @@ export class Operations {
     if (vertex === null || vertex instanceof EmptyCellVertex) {
       return {type: ClipboardCellType.EMPTY}
     } else if (vertex instanceof ValueCellVertex) {
-      /* TODO should we copy errors? */
       return {type: ClipboardCellType.VALUE, value: vertex.getCellValue()}
     } else if (vertex instanceof MatrixVertex) {
       return {type: ClipboardCellType.VALUE, value: vertex.getMatrixCellValue(address)}

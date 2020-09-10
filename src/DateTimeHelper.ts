@@ -16,9 +16,9 @@ export interface SimpleDate {
 }
 
 export interface SimpleTime {
-  hour: number,
-  minute: number,
-  second: number,
+  hours: number,
+  minutes: number,
+  seconds: number,
 }
 
 export type SimpleDateTime = SimpleDate & SimpleTime
@@ -35,7 +35,7 @@ export function instanceOfSimpleDate(obj: any): obj is SimpleDate {
 
 export function instanceOfSimpleTime(obj: any): obj is SimpleTime {
   if( obj && (typeof obj === 'object' || typeof obj === 'function')) {
-    return 'hour' in obj && typeof obj.hour === 'number' && 'minute' in obj && typeof obj.minute === 'number' && 'second' in obj && typeof obj.second === 'number'
+    return 'hours' in obj && typeof obj.hours === 'number' && 'minutes' in obj && typeof obj.minutes === 'number' && 'seconds' in obj && typeof obj.seconds === 'number'
   } else {
     return false
   }
@@ -48,32 +48,34 @@ export class DateTimeHelper {
   private readonly maxDateValue: number
   private readonly epochYearZero: number
   private readonly parseDateTime: (dateString: string, dateFormat: string, timeFormat: string) => Maybe<DateTime>
+  private readonly leapYear1900: boolean
   constructor(private readonly config: Config) {
     this.minDateAboluteValue = this.dateToNumberFromZero(config.nullDate)
     this.maxDateValue = this.dateToNumber(maxDate)
+    this.leapYear1900 = config.leapYear1900
 
     // code below fixes epochYearStart while being leapYear1900 sensitive
     // if nullDate is earlier than fateful 28 Feb 1900 and 1900 is not supposed to be leap year, then we should
     // add two days (this is the config default)
     // otherwise only one day
-    if(!config.leapYear1900 && 0 <= this.dateToNumber({year: 1900, month: 2, day: 28})) {
-      this.epochYearZero = this.numberToDate(2).year
+    if(!this.leapYear1900 && 0 <= this.dateToNumber({year: 1900, month: 2, day: 28})) {
+      this.epochYearZero = this.numberToSimpleDate(2).year
     } else {
-      this.epochYearZero = this.numberToDate(1).year
+      this.epochYearZero = this.numberToSimpleDate(1).year
     }
     this.parseDateTime = config.parseDateTime
   }
 
-  public getWithinBounds(dayNumber: number) {
-    return (dayNumber <= this.maxDateValue) && (dayNumber >= 0)
+  public getWithinBounds(dayNumber: number): Maybe<number> {
+    return (dayNumber <= this.maxDateValue) && (dayNumber >= 0) ? dayNumber : undefined
   }
 
   public dateStringToDateNumber(dateTimeString: string): Maybe<number> {
-    const dateTime = this.parseDateTimeFromFormats(dateTimeString, this.config.dateFormats, this.config.timeFormats)
+    const dateTime = this.parseDateTimeFromConfigFormats(dateTimeString)
     if(dateTime === undefined) {
       return undefined
     }
-    return (instanceOfSimpleTime(dateTime) ? this.timeToNumber(dateTime) : 0) +
+    return (instanceOfSimpleTime(dateTime) ? timeToNumber(dateTime) : 0) +
       (instanceOfSimpleDate(dateTime) ? this.dateToNumber(dateTime) : 0)
   }
 
@@ -94,10 +96,13 @@ export class DateTimeHelper {
     return dateTime
   }
 
-  private parseDateTimeFromFormats(dateString: string, dateFormats: string[], timeFormats: string[]): Maybe<DateTime> {
+  public parseDateTimeFromConfigFormats(dateTimeString: string): Maybe<DateTime> {
+    return this.parseDateTimeFromFormats(dateTimeString, this.config.dateFormats, this.config.timeFormats)
+  }
+  private parseDateTimeFromFormats(dateTimeString: string, dateFormats: string[], timeFormats: string[]): Maybe<DateTime> {
     for (const dateFormat of dateFormats) {
       for (const timeFormat of timeFormats) {
-        const dateTime = this.parseSingleFormat(dateString, dateFormat, timeFormat)
+        const dateTime = this.parseSingleFormat(dateTimeString, dateFormat, timeFormat)
         if (dateTime !== undefined) {
           return dateTime
         }
@@ -136,12 +141,12 @@ export class DateTimeHelper {
     return this.dateToNumberFromZero(date) - this.minDateAboluteValue
   }
 
-  public timeToNumber(time: SimpleTime): number {
-    return ((time.second/60+time.minute)/60+time.hour)/24
+  public relativeNumberToAbsoluteNumber(arg: number): number {
+    return arg + this.minDateAboluteValue - (this.leapYear1900?1:0)
   }
 
-  public numberToDate(arg: number): SimpleDate {
-    const dateNumber = arg + this.minDateAboluteValue
+  public numberToSimpleDate(arg: number): SimpleDate {
+    const dateNumber = Math.floor(arg) + this.minDateAboluteValue
     let year = Math.floor(dateNumber / 365.2425)
     if (this.dateToNumberFromZero({year: year + 1, month: 1, day: 1}) <= dateNumber) {
       year++
@@ -150,28 +155,25 @@ export class DateTimeHelper {
     }
 
     const dayOfYear = dateNumber - this.dateToNumberFromZero( {year, month: 1, day: 1})
-    const month = dayToMonth(
-      (this.isLeapYear(year) && dayOfYear >= 59) ? dayOfYear - 1 : dayOfYear,
-    )
-    const day = dayOfYear - prefSumDays[month]
+    const month = dayToMonth(dayOfYear - (this.isLeapYear(year) && dayOfYear >= 59 ? 1 : 0))
+    const day = dayOfYear - prefSumDays[month] - (this.isLeapYear(year) && month>1?1:0)
     return {year, month: month + 1, day: day + 1}
   }
 
-  public numberToTime(arg: number): SimpleTime {
-    let second = Math.round(arg*60*60*24 * 1000000000) / 1000000000
-    let minute = Math.floor(second / 60)
-    second = second % 60
-    const hour = Math.floor(minute / 60)
-    minute = minute % 60
-    return {hour, minute, second}
+  public numberToSimpleDateTime(arg: number): SimpleDateTime {
+    return {...this.numberToSimpleDate(Math.floor(arg)), ...numberToSimpleTime(arg%1)}
   }
 
-  public numberToDateTime(arg: number): SimpleDateTime {
-    return {...this.numberToDate(Math.floor(arg)), ...this.numberToTime(arg%1)}
-  }
-
-  private leapYearsCount(year: number): number {
+  public leapYearsCount(year: number): number {
     return Math.floor(year / 4) - Math.floor(year / 100) + Math.floor(year / 400) + (this.config.leapYear1900 && year >= 1900 ? 1 : 0)
+  }
+
+  private countLeapDays(date: SimpleDate): number {
+    if(date.month>2 || (date.month === 2 && date.day >= 29)) {
+      return this.leapYearsCount(date.year)
+    } else {
+      return this.leapYearsCount(date.year-1)
+    }
   }
 
   private dateToNumberFromZero(date: SimpleDate): number {
@@ -187,6 +189,53 @@ export class DateTimeHelper {
       return year === 1900 && this.config.leapYear1900
     } else {
       return true
+    }
+  }
+
+  public daysInMonth(year: number, month: number): number {
+    if(this.isLeapYear(year) && month === 2) {
+      return 29
+    } else {
+      return numDays[month-1]
+    }
+  }
+
+  public endOfMonth(date: SimpleDate): SimpleDate {
+    return {year: date.year, month: date.month, day: this.daysInMonth(date.year, date.month)}
+  }
+
+  public toBasisUS(start: SimpleDate, end: SimpleDate): [SimpleDate, SimpleDate] {
+    if(start.day === 31 ) {
+      start.day = 30
+    }
+    if(start.day === 30 && end.day === 31) {
+      end.day = 30
+    }
+    if(start.month===2 && start.day === this.daysInMonth(start.year, start.month)) {
+      start.day = 30
+      if(end.month===2 && end.day === this.daysInMonth(end.year, end.month)) {
+        end.day = 30
+      }
+    }
+    return [start, end]
+  }
+
+  public yearLengthForBasis(start: SimpleDate, end: SimpleDate): number {
+    if(start.year !== end.year) {
+      if ((start.year + 1 !== end.year) || (start.month < end.month) || (start.month === end.month && start.day < end.day)) {
+        // this is true IFF at least one year of gap between dates
+        return (this.leapYearsCount(end.year) - this.leapYearsCount(start.year-1))/(end.year-start.year+1) + 365
+      }
+      if(this.countLeapDays(end) !== this.countLeapDays({year: start.year, month: start.month, day: start.day-1})) {
+        return 366
+      } else {
+        return 365
+      }
+    }
+    if (this.isLeapYear(start.year)) {
+      return 366
+    } else {
+      return 365
     }
   }
 }
@@ -207,11 +256,37 @@ function dayToMonth(dayOfYear: number): number {
   return month
 }
 
-export function endOfMonth(date: SimpleDate): SimpleDate {
-  return {year: date.year, month: date.month, day: numDays[date.month - 1]}
-}
-
 export function offsetMonth(date: SimpleDate, offset: number): SimpleDate {
   const totalM = 12 * date.year + date.month - 1 + offset
   return {year: Math.floor(totalM / 12), month: totalM % 12 + 1, day: date.day}
 }
+
+export function truncateDayInMonth(date: SimpleDate): SimpleDate {
+  return {year: date.year, month: date.month, day: Math.min(date.day, numDays[date.month-1])}
+}
+
+export function roundToNearestSecond(arg: number): number {
+  return Math.round(arg*3600*24)/(3600*24)
+}
+
+export function numberToSimpleTime(arg: number): SimpleTime {
+  arg = Math.round(arg*24*60*60*100000) / (24*60*60*100000)
+  arg *= 24
+  const hours = Math.floor(arg)
+  arg -= hours
+  arg *= 60
+  const minutes = Math.floor(arg)
+  arg -= minutes
+  arg *= 60
+  const seconds = Math.round(arg*100000) / 100000
+  return {hours, minutes, seconds}
+}
+
+export function timeToNumber(time: SimpleTime): number {
+  return ((time.seconds/60+time.minutes)/60+time.hours)/24
+}
+
+export function toBasisEU(date: SimpleDate): SimpleDate {
+  return {year: date.year, month: date.month, day: Math.min(30, date.day)}
+}
+

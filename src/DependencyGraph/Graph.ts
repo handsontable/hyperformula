@@ -3,10 +3,18 @@
  * Copyright (c) 2020 Handsoncode. All rights reserved.
  */
 
-export type DependencyQuery<T> = (vertex: T) => Set<T> | null
+import {Maybe} from '../Maybe'
+
+export type DependencyQuery<T> = (vertex: T) => Maybe<T[]>
 
 export interface TopSortResult<T> {
   sorted: T[], cycled: T[], 
+}
+
+enum NodeVisitStatus {
+  ON_STACK,
+  PROCESSED,
+  POPPED,
 }
 
 /**
@@ -123,7 +131,7 @@ export class Graph<T> {
     return result
   }
 
-  public removeNode(node: T): Set<T> {
+  public removeNode(node: T): T[] {
     for (const adjacentNode of this.adjacentNodes(node).values()) {
       this.markNodeAsSpecialRecentlyChanged(adjacentNode)
     }
@@ -188,51 +196,67 @@ export class Graph<T> {
     const entranceTime: Map<T, number> = new Map()
     const low: Map<T, number> = new Map()
     const parent: Map<T, T | null> = new Map()
-    const processed: Set<T> = new Set()
-    const onStack: Set<T> = new Set()
+
+    // node status life cycle:
+    // undefined -> ON_STACK -> PROCESSED -> POPPED
+    const nodeStatus: Map<T, NodeVisitStatus> = new Map()
     const order: T[] = []
 
     let time: number = 0
 
     modifiedNodes.reverse().forEach( (v: T) => {
-      if (processed.has(v)) {
+      if (nodeStatus.get(v) !== undefined) {
         return
       }
-      entranceTime.set(v, time)
-      // order.push(v)
-      low.set(v, time)
-      parent.set(v, null)
       time++
       const DFSstack: T[] = [v]
-      onStack.add(v)
+      nodeStatus.set(v, NodeVisitStatus.ON_STACK)
       while ( DFSstack.length > 0 ) {
         const u = DFSstack[ DFSstack.length - 1 ]
-        if ( processed.has(u) ) { // leaving this DFS subtree
-          const pu = parent.get(u)
-          if ( pu !==  null ) {
-            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-            low.set(pu!, Math.min(low.get(pu!)!, low.get(u)!))
-          }
-          DFSstack.pop()
-          onStack.delete(u)
-          order.push(u)
-        } else {
-          processed.add(u)
-          entranceTime.set(u, time)
-          low.set(u, time)
-          this.adjacentNodes(u).forEach( (t: T) => {
-            if (entranceTime.get(t) !== undefined) { // forward edge or backward edge
-              if (onStack.has(t)) { // backward edge
-                // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-                low.set(u, Math.min(low.get(u)!, entranceTime.get(t)!))
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        switch(nodeStatus.get(u)!) {
+          case NodeVisitStatus.ON_STACK: {
+            nodeStatus.set(u, NodeVisitStatus.PROCESSED)
+            entranceTime.set(u, time)
+            low.set(u, time)
+            this.adjacentNodes(u).forEach( (t: T) => {
+              switch(nodeStatus.get(t)){
+                case NodeVisitStatus.POPPED:
+                  break
+                case NodeVisitStatus.PROCESSED: { //backward edge
+                  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                  low.set(u, Math.min(low.get(u)!, entranceTime.get(t)!))
+                  break
+                }
+                case undefined: // not visited
+                  // process as in the case of ON_STACK
+                  // eslint-disable-next-line no-fallthrough
+                case NodeVisitStatus.ON_STACK: { // or visited but not processed
+                  parent.set(t, u)
+                  DFSstack.push(t)
+                  nodeStatus.set(t, NodeVisitStatus.ON_STACK)
+                  time++
+                  break
+                }
               }
-            } else {
-              parent.set(t, u)
-              DFSstack.push(t)
-              onStack.add(t)
-              time++
+            })
+            break
+          }
+          case NodeVisitStatus.PROCESSED: { // leaving this DFS subtree
+            const pu = parent.get(u)
+            if ( pu !==  null ) {
+              // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+              low.set(pu!, Math.min(low.get(pu!)!, low.get(u)!))
             }
-          })
+            nodeStatus.set(u, NodeVisitStatus.POPPED)
+            order.push(u)
+            DFSstack.pop()
+            break
+          }
+          case NodeVisitStatus.POPPED: { // it's a 'shadow' copy, we already processed this vertex and can ignore it
+            DFSstack.pop()
+            break
+          }
         }
       }
     })
@@ -300,14 +324,14 @@ export class Graph<T> {
     this.clearSpecialNodesRecentlyChanged()
   }
 
-  private removeDependencies(node: T): Set<T> {
-    const dependentNodes = this.dependencyQuery(node)
-    if (!dependentNodes) {
-      return new Set()
+  private removeDependencies(node: T): T[] {
+    const dependencies = this.dependencyQuery(node)
+    if (!dependencies) {
+      return []
     }
-    for (const dependentNode of dependentNodes) {
-      this.softRemoveEdge(dependentNode, node)
+    for (const dependency of dependencies) {
+      this.softRemoveEdge(dependency, node)
     }
-    return dependentNodes
+    return dependencies
   }
 }

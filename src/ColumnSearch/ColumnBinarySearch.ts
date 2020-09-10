@@ -5,12 +5,12 @@
 
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
 import {InternalNoErrorCellValue, InternalScalarValue, SimpleCellAddress} from '../Cell'
-import {ColumnsSpan} from '../ColumnsSpan'
 import {Config} from '../Config'
 import {DependencyGraph} from '../DependencyGraph'
 import {rangeLowerBound} from '../interpreter/binarySearch'
 import {Matrix} from '../Matrix'
 import {ColumnSearchStrategy} from './ColumnSearchStrategy'
+import {ColumnsSpan} from '../Span'
 
 export class ColumnBinarySearch implements ColumnSearchStrategy {
   constructor(

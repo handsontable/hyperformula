@@ -13,9 +13,9 @@ import {RowAddress} from './RowAddress'
 export type SheetMappingFn = (sheetName: string) => Maybe<number>
 export type SheetIndexMappingFn = (sheetIndex: number) => Maybe<string>
 
-const addressRegex = new RegExp(`^((([A-Za-z0-9_\u00C0-\u02AF]+)|'([A-Za-z0-9${additionalCharactersAllowedInQuotes}_\u00C0-\u02AF]+)')!)?(\\$?)([A-Za-z]+)(\\$?)([0-9]+)\$`)
-const columnRegex = new RegExp(`^((([A-Za-z0-9_\u00C0-\u02AF]+)|'([A-Za-z0-9${additionalCharactersAllowedInQuotes}_\u00C0-\u02AF]+)')!)?(\\$?)([A-Za-z]+)`)
-const rowRegex = new RegExp(`^((([A-Za-z0-9_\u00C0-\u02AF]+)|'([A-Za-z0-9${additionalCharactersAllowedInQuotes}_\u00C0-\u02AF]+)')!)?(\\$?)([0-9]+)`)
+const addressRegex = new RegExp(`^((([A-Za-z0-9_\u00C0-\u02AF]+)|'([A-Za-z0-9${additionalCharactersAllowedInQuotes}_\u00C0-\u02AF]+)')!)?(\\$?)([A-Za-z]+)(\\$?)([0-9]+)$`)
+const columnRegex = new RegExp(`^((([A-Za-z0-9_\u00C0-\u02AF]+)|'([A-Za-z0-9${additionalCharactersAllowedInQuotes}_\u00C0-\u02AF]+)')!)?(\\$?)([A-Za-z]+)$`)
+const rowRegex = new RegExp(`^((([A-Za-z0-9_\u00C0-\u02AF]+)|'([A-Za-z0-9${additionalCharactersAllowedInQuotes}_\u00C0-\u02AF]+)')!)?(\\$?)([0-9]+)$`)
 
 /**
  * Computes R0C0 representation of cell address based on it's string representation and base address.
@@ -88,7 +88,7 @@ export const rowAddressFromString = (sheetMapping: SheetMappingFn, stringAddress
 }
 
 /**
- * Computes simple (absolute) address of a cell address based on it's string representation.
+ * Computes simple (absolute) address of a cell address based on its string representation.
  * If sheet name present in string representation but is not present in sheet mapping, returns undefined.
  * If sheet name is not present in string representation, returns {@param sheetContext} as sheet number
  *

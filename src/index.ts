@@ -14,7 +14,8 @@ import {
 } from './CellValue'
 import {HyperFormula} from './HyperFormula'
 import {Config, ConfigParams} from './Config'
-import {languages, RawTranslationPackage} from './i18n'
+import {RawTranslationPackage} from './i18n'
+import enGB from './i18n/languages/enGB'
 import {Sheet, SheetDimensions, Sheets} from './Sheet'
 import {RawCellContent} from './CellContentParser'
 import {NamedExpression, NamedExpressionOptions} from './NamedExpressions'
@@ -49,7 +50,7 @@ import {
   UnableToParseError
 } from './errors'
 import * as plugins from './interpreter/plugin'
-import {FunctionPluginDefinition} from './interpreter'
+import {FunctionArgument, FunctionPlugin, FunctionPluginDefinition} from './interpreter'
 import {ColumnRowIndex} from './CrudOperations'
 
 /** @internal */
@@ -66,6 +67,7 @@ class HyperFormulaNS extends HyperFormula {
   public static EvaluationSuspendedError = EvaluationSuspendedError
   public static ExpectedOneOfValuesError = ExpectedOneOfValuesError
   public static ExpectedValueOfTypeError = ExpectedValueOfTypeError
+  public static FunctionPlugin = FunctionPlugin
   public static FunctionPluginValidationError = FunctionPluginValidationError
   public static InvalidAddressError = InvalidAddressError
   public static InvalidArgumentsError = InvalidArgumentsError
@@ -92,7 +94,9 @@ class HyperFormulaNS extends HyperFormula {
 }
 
 const defaultLanguage = Config.defaultConfig.language
-HyperFormula.registerLanguage(defaultLanguage, languages[defaultLanguage])
+
+HyperFormula.registerLanguage(defaultLanguage, enGB)
+HyperFormula.languages[enGB.langCode] = enGB
 
 for (const pluginName of Object.getOwnPropertyNames(plugins)) {
   if (!pluginName.startsWith('_')) {
@@ -117,6 +121,7 @@ export {
   ColumnRowIndex,
   RawTranslationPackage,
   FunctionPluginDefinition,
+  FunctionArgument,
   NamedExpression,
   NamedExpressionOptions,
   HyperFormula,
@@ -131,6 +136,7 @@ export {
   EvaluationSuspendedError,
   ExpectedOneOfValuesError,
   ExpectedValueOfTypeError,
+  FunctionPlugin,
   FunctionPluginValidationError,
   InvalidAddressError,
   InvalidArgumentsError,
