@@ -16,7 +16,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added 13 trigonometry functions: SEC, CSC, SINH, COSH, TANH, COTH, SECH, CSCH, ACOT, ASINH, ACOSH, ATANH, ACOTH. (#485)
 - Added 6 engineering functions: OCT2BIN, OCT2DEC, OCT2HEX, HEX2BIN, HEX2OCT, HEX2DEC. (#497)
 - Added a configuration option to evaluate reference to an empty cells as a zero. (#476)
-- Added detailed error messages for error values (#506). 
+- Added detailed error messages for error values. (#506)
+- Added ability to handle more characters in quoted sheet names. (#509)
+- Added support for escaping apostrophe character in quoted sheet names. (#64)
 
 ### Changed
 - Operation `moveCells` creating cyclic dependencies does not cause losing original formula. (#479)
@@ -30,8 +32,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed undo of `moveColumns`/`moveRows` operations. (#479)
 - Fixed name-collision issue in translations. (#486)
 - Fixed bug in concatenation + nullValue. (#495)
-- Fixed bug when undoing irreversible operation (#502)
-- Fixed minor issue with CHAR function logic (#510)
+- Fixed bug when undoing irreversible operation. (#502)
+- Fixed minor issue with CHAR function logic. (#510)
+- Fixed `simpleCellAddressToString` behaviour when converting quoted sheet names. (#514)
 
 ## [0.1.3] - 2020-07-21
 

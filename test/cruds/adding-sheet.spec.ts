@@ -7,6 +7,7 @@ describe('Adding sheet - checking if its possible', () => {
     const engine = HyperFormula.buildEmpty()
 
     expect(engine.isItPossibleToAddSheet('Sheet1')).toEqual(true)
+    expect(engine.isItPossibleToAddSheet('~`!@#$%^&*()_-+_=/|?{}[]\\"')).toEqual(true)
   })
 
   it('no', () => {
