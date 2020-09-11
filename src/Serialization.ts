@@ -23,9 +23,6 @@ export class Serialization {
   }
 
   public getCellFormula(address: SimpleCellAddress): Maybe<string> {
-    if(this.config.licenseKeyValidityState !== LicenseKeyValidityState.VALID) {
-      return undefined
-    }
     const formulaVertex = this.dependencyGraph.getCell(address)
     if (formulaVertex instanceof FormulaCellVertex) {
       const formula = formulaVertex.getFormula(this.dependencyGraph.lazilyTransformingAstService)
