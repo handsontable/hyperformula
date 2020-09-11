@@ -25,12 +25,17 @@ export enum ErrorType {
   /** Cyclic dependency. */
   CYCLE = 'CYCLE',
 
-  /* Wrong address reference. */
+  /** Wrong address reference. */
   REF = 'REF',
 
-  /* Generic error */
+  /** Invalid/missing licence error. */
+  LIC = 'LIC',
+
+  /** Generic error */
   ERROR = 'ERROR'
 }
+
+export type TranslatableErrorType = Exclude<ErrorType, ErrorType.LIC>
 
 export const EmptyValue = Symbol('Empty value')
 export type EmptyValueType = typeof EmptyValue

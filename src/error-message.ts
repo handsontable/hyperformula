@@ -61,4 +61,5 @@ export class ErrorMessage {
   public static NonZero = 'Argument cannot be 0.'
   public static FunctionName = (arg: string) => `Function name ${arg} not recognized.`
   public static NamedExpressionName = (arg: string) => `Named expression ${arg} not recognized.`
+  public static LicenseKey = (arg: string) => `License key is ${arg}.`
 }

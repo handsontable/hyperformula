@@ -3,10 +3,12 @@
  * Copyright (c) 2020 Handsoncode. All rights reserved.
  */
 
-import {simpleCellAddress, SimpleCellAddress} from './Cell'
+import {CellError, ErrorType, simpleCellAddress, SimpleCellAddress} from './Cell'
 import {CellValue, DetailedCellError, Exporter, NoErrorCellValue} from './CellValue'
 import {Config} from './Config'
 import {DependencyGraph, FormulaCellVertex, MatrixVertex, ParsingErrorVertex} from './DependencyGraph'
+import {ErrorMessage} from './error-message'
+import {LicenseKeyValidityState} from './helpers/licenseKeyValidator'
 import {Maybe} from './Maybe'
 import {buildLexerConfig, Unparser} from './parser'
 import {NamedExpressions} from './NamedExpressions'
