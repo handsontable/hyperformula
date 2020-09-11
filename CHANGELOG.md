@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added 6 engineering functions: OCT2BIN, OCT2DEC, OCT2HEX, HEX2BIN, HEX2OCT, HEX2DEC. (#497)
 - Added a configuration option to evaluate reference to an empty cells as a zero. (#476)
 - Added detailed error messages for error values (#506). 
+- Added new error type: missing licence. (#306)
 
 ### Changed
 - Operation `moveCells` creating cyclic dependencies does not cause losing original formula. (#479)
