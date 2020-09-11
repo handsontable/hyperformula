@@ -107,10 +107,11 @@ export class Unparser {
   }
 
   private unparseSheetName(sheetId: number): string {
-    const sheetName = this.sheetMappingFn(sheetId)
+    let sheetName = this.sheetMappingFn(sheetId)
     if (this.simpleSheetNameRegex.test(sheetName)) {
       return sheetName
     } else {
+      sheetName = sheetName.replace(/'/g, "''")
       return `'${sheetName}'`
     }
   }

@@ -43,7 +43,7 @@ export const ConcatenateOp = createToken({name: 'ConcatenateOp', pattern: /&/})
 
 /* addresses */
 export const simpleSheetName = '[A-Za-z0-9_\u00C0-\u02AF]+'
-export const quotedSheetName = "'(((?!').)*)'"
+export const quotedSheetName = "'(((?!').|'')*)'"
 export const sheetNameRegexp = `(${simpleSheetName}|${quotedSheetName})!`
 
 export const CellReference = createToken({

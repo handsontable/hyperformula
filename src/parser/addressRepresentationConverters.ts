@@ -99,7 +99,9 @@ export const simpleCellAddressFromString = (sheetMapping: SheetMappingFn, string
   let sheet = extractSheetNumber(result, sheetMapping)
   if (sheet === undefined) {
     return undefined
-  } else if (sheet === null) {
+  }
+
+  if (sheet === null) {
     sheet = sheetContext
   }
 
@@ -164,11 +166,12 @@ export function columnIndexToLabel(column: number) {
 }
 
 function extractSheetNumber(regexResult: RegExpExecArray, sheetMapping: SheetMappingFn): number | null | undefined {
-  const maybeSheetName = regexResult[3] ?? regexResult[2]
+  let maybeSheetName = regexResult[3] ?? regexResult[2]
 
   let sheet = null
 
   if (maybeSheetName) {
+    maybeSheetName = maybeSheetName.replace(/''/g, "'")
     sheet = sheetMapping(maybeSheetName)
     if (sheet === undefined) {
       return undefined

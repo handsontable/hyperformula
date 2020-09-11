@@ -426,13 +426,13 @@ describe('cell references and ranges', () => {
     expect(ast.reference.sheet).toBe(1)
   })
 
-  xit('escaping support', () => {
+  it('sheet name inside quotes with escaped quote', () => {
     const sheetMapping = new SheetMapping(buildTranslationPackage(enGB))
     sheetMapping.addSheet('Sheet1')
-    sheetMapping.addSheet("Some'sheet")
+    sheetMapping.addSheet("Name'with'quotes")
     const parser = buildEmptyParserWithCaching(new Config(), sheetMapping)
 
-    const ast = parser.parse("='Some''sheet'!A1", simpleCellAddress(0, 0, 0)).ast as CellReferenceAst
+    const ast = parser.parse("='Name''with''quotes'!A1", simpleCellAddress(0, 0, 0)).ast as CellReferenceAst
     expect(ast.type).toBe(AstNodeType.CELL_REFERENCE)
     expect(ast.reference.sheet).toBe(1)
   })
