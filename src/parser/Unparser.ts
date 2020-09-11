@@ -14,13 +14,15 @@ import {
   RowRangeAst,
 } from './Ast'
 import {binaryOpTokenMap} from './binaryOpTokenMap'
-import {additionalCharactersAllowedInQuotes, ILexerConfig} from './LexerConfig'
+import {ILexerConfig, simpleSheetName} from './LexerConfig'
 import {ParserConfig} from './ParserConfig'
 import {NamedExpressions} from '../NamedExpressions'
 
 export type SheetMappingFn = (sheetId: number) => string
 
 export class Unparser {
+  private simpleSheetNameRegex = new RegExp(`^${simpleSheetName}$`)
+
   constructor(
     private readonly config: ParserConfig,
     private readonly lexerConfig: ILexerConfig,
@@ -105,11 +107,11 @@ export class Unparser {
   }
 
   private unparseSheetName(sheetId: number): string {
-    const sheet = this.sheetMappingFn(sheetId)
-    if (new RegExp(additionalCharactersAllowedInQuotes).exec(sheet)) {
-      return `'${sheet}'`
+    const sheetName = this.sheetMappingFn(sheetId)
+    if (this.simpleSheetNameRegex.test(sheetName)) {
+      return sheetName
     } else {
-      return sheet
+      return `'${sheetName}'`
     }
   }
 

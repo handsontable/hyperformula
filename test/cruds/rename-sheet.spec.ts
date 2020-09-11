@@ -5,6 +5,7 @@ describe('Is it possible to rename sheet', () => {
     const engine = HyperFormula.buildFromSheets({ 'Sheet1': []})
 
     expect(engine.isItPossibleToRenameSheet(0, 'Foo')).toEqual(true)
+    expect(engine.isItPossibleToRenameSheet(0, '~`!@#$%^&*()_-+_=/|?{}[]\"')).toEqual(true)
   })
 
   it('true if same name', () => {
