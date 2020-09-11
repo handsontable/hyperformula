@@ -14,17 +14,17 @@ import {
   RowRangeAst,
 } from './Ast'
 import {binaryOpTokenMap} from './binaryOpTokenMap'
-import {additionalCharactersAllowedInQuotes, ILexerConfig} from './LexerConfig'
+import {ILexerConfig} from './LexerConfig'
 import {ParserConfig} from './ParserConfig'
 import {NamedExpressions} from '../NamedExpressions'
-
-export type SheetMappingFn = (sheetId: number) => string
+import {SheetIndexMappingFn, sheetIndexToString} from './addressRepresentationConverters'
+import {NoSheetWithIdError} from '../index'
 
 export class Unparser {
   constructor(
     private readonly config: ParserConfig,
     private readonly lexerConfig: ILexerConfig,
-    private readonly sheetMappingFn: SheetMappingFn,
+    private readonly sheetMappingFn: SheetIndexMappingFn,
     private readonly namedExpressions: NamedExpressions,
   ) {
   }
@@ -105,12 +105,11 @@ export class Unparser {
   }
 
   private unparseSheetName(sheetId: number): string {
-    const sheet = this.sheetMappingFn(sheetId)
-    if (new RegExp(additionalCharactersAllowedInQuotes).exec(sheet)) {
-      return `'${sheet}'`
-    } else {
-      return sheet
+    const sheetName = sheetIndexToString(sheetId, this.sheetMappingFn)
+    if (sheetName === undefined) {
+      throw new NoSheetWithIdError(sheetId)
     }
+    return sheetName
   }
 
   private formatRange(ast: CellRangeAst | ColumnRangeAst | RowRangeAst, baseAddress: SimpleCellAddress): string {
