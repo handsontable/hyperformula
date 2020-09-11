@@ -1,5 +1,6 @@
 import {HyperFormula} from '../src'
 import {ErrorType} from '../src/Cell'
+import {ErrorMessage} from '../src/error-message'
 import {detailedError} from './testUtils'
 
 describe('Temporary formulas - normalization', () => {
@@ -104,7 +105,7 @@ describe('Temporary formulas - calculation', () => {
 
     const result = engine.calculateFormula('=TRANSPOSE(A1:B2)', 'Sheet1')
 
-    expect(result).toEqual(detailedError(ErrorType.VALUE))
+    expect(result).toEqual(detailedError(ErrorType.VALUE, ErrorMessage.ScalarExpected))
   })
 
   it('passing something which is not a formula doesnt work', () => {

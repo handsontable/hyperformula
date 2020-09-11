@@ -4,6 +4,7 @@
  */
 
 import {CellError, ErrorType, InternalScalarValue, SimpleCellAddress} from '../../Cell'
+import {ErrorMessage} from '../../error-message'
 import {padLeft} from '../../format/format'
 import {Maybe} from '../../Maybe'
 import {ProcedureAst} from '../../parser'
@@ -137,7 +138,7 @@ export class RadixConversionPlugin extends FunctionPlugin {
     return this.runFunction(ast.args, formulaAddress, this.metadata('BIN2DEC'), (binary) => {
         const binaryWithSign = coerceStringToBase(binary, 2, MAX_LENGTH)
         if(binaryWithSign === undefined) {
-          return new CellError(ErrorType.NUM)
+          return new CellError(ErrorType.NUM, ErrorMessage.NotBinary)
         }
         return twoComplementToDecimal(binaryWithSign, 2)
       })
@@ -147,7 +148,7 @@ export class RadixConversionPlugin extends FunctionPlugin {
     return this.runFunction(ast.args, formulaAddress, this.metadata('BIN2OCT'), (binary, places) => {
       const binaryWithSign = coerceStringToBase(binary, 2, MAX_LENGTH)
       if(binaryWithSign === undefined) {
-        return new CellError(ErrorType.NUM)
+        return new CellError(ErrorType.NUM, ErrorMessage.NotBinary)
       }
       return decimalToBaseWithExactPadding(twoComplementToDecimal(binaryWithSign, 2), 8, places)
     })
@@ -157,7 +158,7 @@ export class RadixConversionPlugin extends FunctionPlugin {
     return this.runFunction(ast.args, formulaAddress, this.metadata('BIN2HEX'), (binary, places) => {
       const binaryWithSign = coerceStringToBase(binary, 2, MAX_LENGTH)
       if(binaryWithSign === undefined) {
-        return new CellError(ErrorType.NUM)
+        return new CellError(ErrorType.NUM, ErrorMessage.NotBinary)
       }
       return decimalToBaseWithExactPadding(twoComplementToDecimal(binaryWithSign, 2), 16, places)
     })
@@ -167,7 +168,7 @@ export class RadixConversionPlugin extends FunctionPlugin {
     return this.runFunction(ast.args, formulaAddress, this.metadata('OCT2DEC'), (octal) => {
         const octalWithSign = coerceStringToBase(octal, 8, MAX_LENGTH)
         if(octalWithSign === undefined) {
-          return new CellError(ErrorType.NUM)
+          return new CellError(ErrorType.NUM, ErrorMessage.NotOctal)
         }
         return twoComplementToDecimal(octalWithSign, 8)
       })
@@ -177,7 +178,7 @@ export class RadixConversionPlugin extends FunctionPlugin {
     return this.runFunction(ast.args, formulaAddress, this.metadata('OCT2BIN'), (octal, places) => {
       const octalWithSign = coerceStringToBase(octal, 8, MAX_LENGTH)
       if(octalWithSign === undefined) {
-        return new CellError(ErrorType.NUM)
+        return new CellError(ErrorType.NUM, ErrorMessage.NotOctal)
       }
       return decimalToBaseWithExactPadding(twoComplementToDecimal(octalWithSign, 8), 2, places)
     })
@@ -187,7 +188,7 @@ export class RadixConversionPlugin extends FunctionPlugin {
     return this.runFunction(ast.args, formulaAddress, this.metadata('OCT2HEX'), (octal, places) => {
       const octalWithSign = coerceStringToBase(octal, 8, MAX_LENGTH)
       if(octalWithSign === undefined) {
-        return new CellError(ErrorType.NUM)
+        return new CellError(ErrorType.NUM, ErrorMessage.NotOctal)
       }
       return decimalToBaseWithExactPadding(twoComplementToDecimal(octalWithSign, 8), 16, places)
     })
@@ -197,7 +198,7 @@ export class RadixConversionPlugin extends FunctionPlugin {
     return this.runFunction(ast.args, formulaAddress, this.metadata('HEX2DEC'), (hexadecimal) => {
         const hexadecimalWithSign = coerceStringToBase(hexadecimal, 16, MAX_LENGTH)
         if(hexadecimalWithSign === undefined) {
-          return new CellError(ErrorType.NUM)
+          return new CellError(ErrorType.NUM, ErrorMessage.NotHex)
         }
         return twoComplementToDecimal(hexadecimalWithSign, 16)
       })
@@ -207,7 +208,7 @@ export class RadixConversionPlugin extends FunctionPlugin {
     return this.runFunction(ast.args, formulaAddress, this.metadata('HEX2BIN'), (hexadecimal, places) => {
       const hexadecimalWithSign = coerceStringToBase(hexadecimal, 16, MAX_LENGTH)
       if(hexadecimalWithSign === undefined) {
-        return new CellError(ErrorType.NUM)
+        return new CellError(ErrorType.NUM, ErrorMessage.NotHex)
       }
       return decimalToBaseWithExactPadding(twoComplementToDecimal(hexadecimalWithSign, 16), 2, places)
     })
@@ -217,7 +218,7 @@ export class RadixConversionPlugin extends FunctionPlugin {
     return this.runFunction(ast.args, formulaAddress, this.metadata('HEX2OCT'), (hexadecimal, places) => {
       const hexadecimalWithSign = coerceStringToBase(hexadecimal, 16, MAX_LENGTH)
       if(hexadecimalWithSign === undefined) {
-        return new CellError(ErrorType.NUM)
+        return new CellError(ErrorType.NUM, ErrorMessage.NotHex)
       }
       return decimalToBaseWithExactPadding(twoComplementToDecimal(hexadecimalWithSign, 16), 8, places)
     })
@@ -231,7 +232,7 @@ export class RadixConversionPlugin extends FunctionPlugin {
     return this.runFunction(ast.args, formulaAddress, this.metadata('DECIMAL'), (arg, base) => {
       const input = coerceStringToBase(arg, base, DECIMAL_NUMBER_OF_BITS)
       if(input === undefined) {
-        return new CellError(ErrorType.NUM)
+        return new CellError(ErrorType.NUM, ErrorMessage.NotHex)
       }
       return parseInt(input, base)
     })
@@ -248,14 +249,17 @@ function coerceStringToBase(value: string, base: number, maxLength: number): May
 }
 
 function decimalToBaseWithExactPadding(value: number, base: number, places?: number): string | CellError {
-  if (value > maxValFromBase(base) || value < minValFromBase(base) ) {
-    return new CellError(ErrorType.NUM)
+  if (value > maxValFromBase(base)) {
+    return new CellError(ErrorType.NUM, ErrorMessage.ValueBaseLarge)
+  }
+  if (value < minValFromBase(base) ) {
+    return new CellError(ErrorType.NUM, ErrorMessage.ValueBaseSmall)
   }
   const result = decimalToRadixComplement(value, base)
   if (places === undefined || value < 0) {
     return result
   } else if (result.length > places) {
-    return new CellError(ErrorType.NUM)
+    return new CellError(ErrorType.NUM, ErrorMessage.ValueBaseLong)
   } else {
     return padLeft(result, places)
   }

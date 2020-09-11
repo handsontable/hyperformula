@@ -4,6 +4,7 @@
  */
 
 import {CellError, ErrorType, InternalScalarValue, SimpleCellAddress} from '../../Cell'
+import {ErrorMessage} from '../../error-message'
 import {ProcedureAst} from '../../parser'
 import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
 
@@ -19,11 +20,11 @@ export class CharPlugin extends FunctionPlugin {
 
   public char(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.runFunction(ast.args, formulaAddress, this.metadata('CHAR'), (value: number) => {
-      if (value < 1 || value > 255) {
-        return new CellError(ErrorType.NUM)
+      if (value < 1 || value >= 256) {
+        return new CellError(ErrorType.VALUE, ErrorMessage.CharacterCodeBounds)
       }
 
-      return String.fromCharCode(value)
+      return String.fromCharCode(Math.trunc(value))
     })
   }
 }
