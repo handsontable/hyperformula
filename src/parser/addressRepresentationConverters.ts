@@ -7,7 +7,7 @@ import {simpleCellAddress, SimpleCellAddress} from '../Cell'
 import {Maybe} from '../Maybe'
 import {CellAddress} from './CellAddress'
 import {ColumnAddress} from './ColumnAddress'
-import {sheetNameRegexp} from './LexerConfig'
+import {sheetNameRegexp, simpleSheetName} from './LexerConfig'
 import {RowAddress} from './RowAddress'
 
 export type SheetMappingFn = (sheetName: string) => Maybe<number>
@@ -16,6 +16,7 @@ export type SheetIndexMappingFn = (sheetIndex: number) => Maybe<string>
 const addressRegex = new RegExp(`^(${sheetNameRegexp})?(\\$?)([A-Za-z]+)(\\$?)([0-9]+)$`)
 const columnRegex = new RegExp(`^(${sheetNameRegexp})?(\\$?)([A-Za-z]+)$`)
 const rowRegex = new RegExp(`^(${sheetNameRegexp})?(\\$?)([0-9]+)$`)
+const simpleSheetNameRegex = new RegExp(`^${simpleSheetName}$`)
 
 /**
  * Computes R0C0 representation of cell address based on it's string representation and base address.
@@ -119,7 +120,7 @@ export const simpleCellAddressFromString = (sheetMapping: SheetMappingFn, string
  * */
 export const simpleCellAddressToString = (sheetIndexMapping: SheetIndexMappingFn, address: SimpleCellAddress, sheetIndex: number): Maybe<string> => {
   const column = columnIndexToLabel(address.col)
-  const sheetName = sheetIndexMapping(address.sheet)
+  const sheetName = sheetIndexToString(address.sheet, sheetIndexMapping)
 
   if (sheetName === undefined) {
     return undefined
@@ -163,6 +164,20 @@ export function columnIndexToLabel(column: number) {
   }
 
   return result.toUpperCase()
+}
+
+export function sheetIndexToString(sheetId: number, sheetMappingFn: SheetIndexMappingFn): string | undefined {
+  let sheetName = sheetMappingFn(sheetId)
+  if (sheetName === undefined) {
+    return undefined
+  }
+
+  if (simpleSheetNameRegex.test(sheetName)) {
+    return sheetName
+  } else {
+    sheetName = sheetName.replace(/'/g, "''")
+    return `'${sheetName}'`
+  }
 }
 
 function extractSheetNumber(regexResult: RegExpExecArray, sheetMapping: SheetMappingFn): number | null | undefined {

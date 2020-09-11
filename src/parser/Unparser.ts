@@ -14,19 +14,17 @@ import {
   RowRangeAst,
 } from './Ast'
 import {binaryOpTokenMap} from './binaryOpTokenMap'
-import {ILexerConfig, simpleSheetName} from './LexerConfig'
+import {ILexerConfig} from './LexerConfig'
 import {ParserConfig} from './ParserConfig'
 import {NamedExpressions} from '../NamedExpressions'
-
-export type SheetMappingFn = (sheetId: number) => string
+import {SheetIndexMappingFn, sheetIndexToString} from './addressRepresentationConverters'
+import {NoSheetWithIdError} from '../index'
 
 export class Unparser {
-  private simpleSheetNameRegex = new RegExp(`^${simpleSheetName}$`)
-
   constructor(
     private readonly config: ParserConfig,
     private readonly lexerConfig: ILexerConfig,
-    private readonly sheetMappingFn: SheetMappingFn,
+    private readonly sheetMappingFn: SheetIndexMappingFn,
     private readonly namedExpressions: NamedExpressions,
   ) {
   }
@@ -107,13 +105,11 @@ export class Unparser {
   }
 
   private unparseSheetName(sheetId: number): string {
-    let sheetName = this.sheetMappingFn(sheetId)
-    if (this.simpleSheetNameRegex.test(sheetName)) {
-      return sheetName
-    } else {
-      sheetName = sheetName.replace(/'/g, "''")
-      return `'${sheetName}'`
+    const sheetName = sheetIndexToString(sheetId, this.sheetMappingFn)
+    if (sheetName === undefined) {
+      throw new NoSheetWithIdError(sheetId)
     }
+    return sheetName
   }
 
   private formatRange(ast: CellRangeAst | ColumnRangeAst | RowRangeAst, baseAddress: SimpleCellAddress): string {
