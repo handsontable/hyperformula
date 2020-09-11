@@ -60,9 +60,6 @@ export class Interpreter {
    * @param formulaAddress - address of the cell in which formula is located
    */
   public evaluateAst(ast: Ast, formulaAddress: SimpleCellAddress): InterpreterValue {
-    if(this.config.licenseKeyValidityState !== LicenseKeyValidityState.VALID) {
-      return new CellError(ErrorType.LIC, ErrorMessage.LicenseKey(this.config.licenseKeyValidityState))
-    }
     switch (ast.type) {
       case AstNodeType.EMPTY: {
         return EmptyValue
@@ -198,6 +195,9 @@ export class Interpreter {
         }
       }
       case AstNodeType.FUNCTION_CALL: {
+        if(this.config.licenseKeyValidityState !== LicenseKeyValidityState.VALID && !FunctionRegistry.functionIsProtected(ast.procedureName)) {
+          return new CellError(ErrorType.LIC, ErrorMessage.LicenseKey(this.config.licenseKeyValidityState))
+        }
         const pluginEntry = this.functionRegistry.getFunction(ast.procedureName)
         if (pluginEntry && this.config.translationPackage.isFunctionTranslated(ast.procedureName)) {
           const [pluginFunction, pluginInstance] = pluginEntry as [string, any]

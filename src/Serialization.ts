@@ -42,9 +42,6 @@ export class Serialization {
   }
 
   public getCellSerialized(address: SimpleCellAddress): NoErrorCellValue {
-    if(this.config.licenseKeyValidityState !== LicenseKeyValidityState.VALID) {
-      return `#${ErrorType.LIC}!`
-    }
     const formula: Maybe<string> = this.getCellFormula(address)
     if (formula !== undefined) {
       return formula
@@ -59,9 +56,6 @@ export class Serialization {
   }
 
   public getCellValue(address: SimpleCellAddress): CellValue {
-    if(this.config.licenseKeyValidityState !== LicenseKeyValidityState.VALID) {
-      return new DetailedCellError(new CellError(ErrorType.LIC, ErrorMessage.LicenseKey(this.config.licenseKeyValidityState)), `#${ErrorType.LIC}!`)
-    }
     return this.exporter.exportValue(this.dependencyGraph.getScalarValue(address))
   }
 
