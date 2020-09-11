@@ -11,7 +11,7 @@ import {Maybe} from '../../Maybe'
 import {AstNodeType, CellRangeAst, ProcedureAst} from '../../parser'
 import {coerceToRange, max, maxa, min, mina} from '../ArithmeticHelper'
 import {SimpleRangeValue} from '../InterpreterValue'
-import {FunctionPlugin} from './FunctionPlugin'
+import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
 import {ColumnRangeAst, RowRangeAst} from '../../parser/Ast'
 
 export type BinaryOperation<T> = (left: T, right: T) => T
@@ -89,6 +89,11 @@ export class NumericAggregationPlugin extends FunctionPlugin {
     },
     'COUNTBLANK': {
       method: 'countblank',
+      parameters: [
+        {argumentType: ArgumentTypes.SCALAR}
+      ],
+      repeatLastArgs: 1,
+      expandRanges: true,
     },
     'COUNT': {
       method: 'count',
@@ -130,22 +135,15 @@ export class NumericAggregationPlugin extends FunctionPlugin {
   }
 
   public countblank(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    if (ast.args.length < 1) {
-      return new CellError(ErrorType.NA, ErrorMessage.WrongArgNumber)
-    }
-    if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
-      return new CellError(ErrorType.NUM, ErrorMessage.EmptyArg )
-    }
-    let counter = 0
-    for (const arg of ast.args) {
-      const rangeValue = coerceToRange(this.evaluateAst(arg, formulaAddress))
-      for (const value of rangeValue.valuesFromTopLeftCorner()) {
-        if (value === EmptyValue) {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('COUNTBLANK'), (...args) => {
+      let counter = 0
+      for(const arg of args) {
+        if(arg === EmptyValue) {
           counter++
         }
       }
-    }
-    return counter
+      return counter
+    })
   }
 
   /**
