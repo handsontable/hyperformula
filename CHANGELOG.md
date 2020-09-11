@@ -18,6 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added a configuration option to evaluate reference to an empty cells as a zero. (#476)
 - Added detailed error messages for error values. (#506)
 - Added ability to handle more characters in quoted sheet names. (#509)
+- Added support for escaping apostrophe character in quoted sheet names. (#514)
 
 ### Changed
 - Operation `moveCells` creating cyclic dependencies does not cause losing original formula. (#479)
