@@ -332,8 +332,14 @@ export class NumericAggregationPlugin extends FunctionPlugin {
       } else {
         value = this.evaluateAst(arg, formulaAddress)
         if (value instanceof SimpleRangeValue) {
-          value = Array.from(value.valuesFromTopLeftCorner()).map(mapFunction).reduce(reducingFunction,initialAccValue)
+          value = Array.from(value.valuesFromTopLeftCorner())
+            .filter((arg) => (typeof arg === 'number'))
+            .map(mapFunction)
+            .reduce(reducingFunction,initialAccValue)
         } else if (arg.type === AstNodeType.CELL_REFERENCE) {
+          if(typeof value !== 'number') {
+            return acc
+          }
           value = mapFunction(value)
           value = reducingFunction(initialAccValue, value)
         } else {
