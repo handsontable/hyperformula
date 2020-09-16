@@ -16,13 +16,13 @@ import {ColumnRangeAst, RowRangeAst} from '../../parser/Ast'
 
 export type BinaryOperation<T> = (left: T, right: T) => T
 
-export type MapOperation<T> = (arg: InternalScalarValue) => T
+export type MapOperation<T> = (arg: number) => T
 
-function idMap(arg: InternalScalarValue): InternalScalarValue {
+function idMap(arg: number): number {
   return arg
 }
 
-function square(arg: InternalScalarValue): InternalScalarValue {
+function square(arg: number): number {
   if (arg instanceof CellError) {
     return arg
   } else if (typeof arg === 'number') {
@@ -325,15 +325,18 @@ export class NumericAggregationPlugin extends FunctionPlugin {
    * @param coerceFunction
    * */
   private reduce<T>(ast: ProcedureAst, formulaAddress: SimpleCellAddress, initialAccValue: T, functionName: string, reducingFunction: BinaryOperation<T>, mapFunction: MapOperation<T>): T {
-    return ast.args.reduce((acc: T, arg) => {
+    return ast.args.reduce((acc: T | CellError, arg) => {
+      if(acc instanceof CellError) {
+        return acc
+      }
       let value
       if (arg.type === AstNodeType.CELL_RANGE || arg.type === AstNodeType.COLUMN_RANGE || arg.type === AstNodeType.ROW_RANGE) {
         value = this.evaluateRange(arg, formulaAddress, acc, functionName, reducingFunction, mapFunction)
       } else {
         value = this.evaluateAst(arg, formulaAddress)
         if (value instanceof SimpleRangeValue) {
-          value = Array.from(value.valuesFromTopLeftCorner())
-            .filter((arg) => (typeof arg === 'number'))
+          value = (Array.from(value.valuesFromTopLeftCorner())
+            .filter((arg) => (typeof arg === 'number')) as number[])
             .map(mapFunction)
             .reduce(reducingFunction,initialAccValue)
         } else if (arg.type === AstNodeType.CELL_REFERENCE) {
@@ -344,6 +347,9 @@ export class NumericAggregationPlugin extends FunctionPlugin {
           value = reducingFunction(initialAccValue, value)
         } else {
           value = this.coerceScalarToNumberOrError(value)
+          if(value instanceof CellError) {
+            return value
+          }
           value = mapFunction(value)
         }
 
