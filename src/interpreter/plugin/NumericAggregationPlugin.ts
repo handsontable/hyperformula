@@ -121,7 +121,7 @@ export class NumericAggregationPlugin extends FunctionPlugin {
     if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
       return new CellError(ErrorType.NUM, ErrorMessage.EmptyArg )
     }
-    return this.reduce(ast, formulaAddress, 0, 'SUM', this.interpreter.arithmeticHelper.nonstrictadd, idMap, (arg) => this.coerceScalarToNumberOrError(arg))
+    return this.reduce(ast, formulaAddress, 0, 'SUM', this.interpreter.arithmeticHelper.nonstrictadd, idMap)
   }
 
   public sumsq(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
@@ -131,7 +131,7 @@ export class NumericAggregationPlugin extends FunctionPlugin {
     if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
       return new CellError(ErrorType.NUM, ErrorMessage.EmptyArg )
     }
-    return this.reduce(ast, formulaAddress, 0, 'SUMSQ', this.interpreter.arithmeticHelper.nonstrictadd, square, (arg) => this.coerceScalarToNumberOrError(arg))
+    return this.reduce(ast, formulaAddress, 0, 'SUMSQ', this.interpreter.arithmeticHelper.nonstrictadd, square)
   }
 
   public countblank(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
@@ -161,7 +161,7 @@ export class NumericAggregationPlugin extends FunctionPlugin {
     if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
       return new CellError(ErrorType.NUM, ErrorMessage.EmptyArg )
     }
-    const value = this.reduce(ast, formulaAddress, Number.NEGATIVE_INFINITY, 'MAX', max, idMap, (arg) => this.coerceScalarToNumberOrError(arg))
+    const value = this.reduce(ast, formulaAddress, Number.NEGATIVE_INFINITY, 'MAX', max, idMap)
 
     return zeroForInfinite(value)
   }
@@ -173,7 +173,7 @@ export class NumericAggregationPlugin extends FunctionPlugin {
     if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
       return new CellError(ErrorType.NUM, ErrorMessage.EmptyArg )
     }
-    const value = this.reduce(ast, formulaAddress, Number.NEGATIVE_INFINITY, 'MAXA', maxa, idMap, (arg) => this.coerceScalarToNumberOrError(arg))
+    const value = this.reduce(ast, formulaAddress, Number.NEGATIVE_INFINITY, 'MAXA', maxa, idMap)
 
     return zeroForInfinite(value)
   }
@@ -193,7 +193,7 @@ export class NumericAggregationPlugin extends FunctionPlugin {
     if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
       return new CellError(ErrorType.NUM, ErrorMessage.EmptyArg )
     }
-    const value = this.reduce(ast, formulaAddress, Number.POSITIVE_INFINITY, 'MIN', min, idMap, (arg) => this.coerceScalarToNumberOrError(arg))
+    const value = this.reduce(ast, formulaAddress, Number.POSITIVE_INFINITY, 'MIN', min, idMap)
 
     return zeroForInfinite(value)
   }
@@ -205,7 +205,7 @@ export class NumericAggregationPlugin extends FunctionPlugin {
     if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
       return new CellError(ErrorType.NUM, ErrorMessage.EmptyArg )
     }
-    const value = this.reduce(ast, formulaAddress, Number.POSITIVE_INFINITY, 'MINA', mina, idMap, (arg) => this.coerceScalarToNumberOrError(arg))
+    const value = this.reduce(ast, formulaAddress, Number.POSITIVE_INFINITY, 'MINA', mina, idMap)
 
     return zeroForInfinite(value)
   }
@@ -221,7 +221,7 @@ export class NumericAggregationPlugin extends FunctionPlugin {
       return left + right
     }, (arg): number => {
       return (typeof arg === 'number') ? 1 : 0
-    }, (arg) => this.coerceScalarToNumberOrError(arg))
+    })
 
     return value
   }
@@ -237,7 +237,7 @@ export class NumericAggregationPlugin extends FunctionPlugin {
       return left + right
     }, (arg): number => {
       return (arg === EmptyValue) ? 0 : 1
-    }, (arg) => this.coerceScalarToNumberOrError(arg))
+    })
 
     return value
   }
@@ -266,7 +266,7 @@ export class NumericAggregationPlugin extends FunctionPlugin {
       } else {
         return AverageResult.empty
       }
-    }, (arg) => this.coerceScalarToNumberOrError(arg))
+    })
 
     if (result instanceof CellError) {
       return result
@@ -304,7 +304,7 @@ export class NumericAggregationPlugin extends FunctionPlugin {
           return AverageResult.single(coercedArg)
         }
       }
-    }, (arg) => this.coerceScalarToNumberOrError(arg))
+    })
 
     if (result instanceof CellError) {
       return result
@@ -324,7 +324,7 @@ export class NumericAggregationPlugin extends FunctionPlugin {
    * @param mapFunction
    * @param coerceFunction
    * */
-  private reduce<T>(ast: ProcedureAst, formulaAddress: SimpleCellAddress, initialAccValue: T, functionName: string, reducingFunction: BinaryOperation<T>, mapFunction: MapOperation<T>, coerceFunction: (arg: InternalScalarValue) => InternalScalarValue): T {
+  private reduce<T>(ast: ProcedureAst, formulaAddress: SimpleCellAddress, initialAccValue: T, functionName: string, reducingFunction: BinaryOperation<T>, mapFunction: MapOperation<T>): T {
     return ast.args.reduce((acc: T, arg) => {
       let value
       if (arg.type === AstNodeType.CELL_RANGE || arg.type === AstNodeType.COLUMN_RANGE || arg.type === AstNodeType.ROW_RANGE) {
@@ -337,7 +337,7 @@ export class NumericAggregationPlugin extends FunctionPlugin {
           value = mapFunction(value)
           value = reducingFunction(initialAccValue, value)
         } else {
-          value = coerceFunction(value)
+          value = this.coerceScalarToNumberOrError(value)
           value = mapFunction(value)
         }
 
