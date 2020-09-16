@@ -135,13 +135,13 @@ export class NumericAggregationPlugin extends FunctionPlugin {
   }
 
   public countblank(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('COUNTBLANK'), (...args) => {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('COUNTBLANK'), (...args: InternalScalarValue[]) => {
       let counter = 0
-      for(const arg of args) {
+      args.forEach((arg) => {
         if(arg === EmptyValue) {
           counter++
         }
-      }
+      })
       return counter
     })
   }
@@ -332,7 +332,7 @@ export class NumericAggregationPlugin extends FunctionPlugin {
       } else {
         value = this.evaluateAst(arg, formulaAddress)
         if (value instanceof SimpleRangeValue) {
-          value = this.reduceRange(Array.from(value.valuesFromTopLeftCorner()).map(mapFunction), initialAccValue, reducingFunction)
+          value = Array.from(value.valuesFromTopLeftCorner()).map(mapFunction).reduce(reducingFunction,initialAccValue)
         } else if (arg.type === AstNodeType.CELL_REFERENCE) {
           value = mapFunction(value)
           value = reducingFunction(initialAccValue, value)
@@ -345,21 +345,6 @@ export class NumericAggregationPlugin extends FunctionPlugin {
 
       return reducingFunction(acc, value)
     }, initialAccValue)
-  }
-
-  /**
-   * Reduces list of cell values with given reducing function
-   *
-   * @param rangeValues - list of values to reduce
-   * @param initialAccValue - initial accumulator value for reducing function
-   * @param reducingFunction - reducing function
-   */
-  private reduceRange<T>(rangeValues: T[], initialAccValue: T, reducingFunction: BinaryOperation<T>): T {
-    let acc = initialAccValue
-    for (const val of rangeValues) {
-      acc = reducingFunction(acc, val)
-    }
-    return acc
   }
 
   /**
@@ -391,7 +376,7 @@ export class NumericAggregationPlugin extends FunctionPlugin {
     let value = rangeVertex.getFunctionValue(functionName) as T
     if (!value) {
       const rangeValues = this.getRangeValues(functionName, range, mapFunction)
-      value = this.reduceRange(rangeValues, initialAccValue, reducingFunction)
+      value = rangeValues.reduce(reducingFunction, initialAccValue)
       rangeVertex.setFunctionValue(functionName, value)
     }
 
