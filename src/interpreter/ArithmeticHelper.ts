@@ -341,32 +341,6 @@ export function max(left: InternalScalarValue, right: InternalScalarValue): Inte
   }
 }
 
-export function maxa(left: InternalScalarValue, right: InternalScalarValue): InternalScalarValue {
-  if (left instanceof CellError) {
-    return left
-  }
-  if (right instanceof CellError) {
-    return right
-  }
-  if (typeof left === 'boolean') {
-    left = coerceBooleanToNumber(left)
-  }
-  if (typeof right === 'boolean') {
-    right = coerceBooleanToNumber(right)
-  }
-  if (typeof left === 'number') {
-    if (typeof right === 'number') {
-      return Math.max(left, right)
-    } else {
-      return left
-    }
-  } else if (typeof right === 'number') {
-    return right
-  } else {
-    return Number.NEGATIVE_INFINITY
-  }
-}
-
 /**
  * Returns min from two numbers
  *
@@ -383,32 +357,6 @@ export function min(left: InternalScalarValue, right: InternalScalarValue): Inte
   }
   if (right instanceof CellError) {
     return right
-  }
-  if (typeof left === 'number') {
-    if (typeof right === 'number') {
-      return Math.min(left, right)
-    } else {
-      return left
-    }
-  } else if (typeof right === 'number') {
-    return right
-  } else {
-    return Number.POSITIVE_INFINITY
-  }
-}
-
-export function mina(left: InternalScalarValue, right: InternalScalarValue): InternalScalarValue {
-  if (left instanceof CellError) {
-    return left
-  }
-  if (right instanceof CellError) {
-    return right
-  }
-  if (typeof left === 'boolean') {
-    left = coerceBooleanToNumber(left)
-  }
-  if (typeof right === 'boolean') {
-    right = coerceBooleanToNumber(right)
   }
   if (typeof left === 'number') {
     if (typeof right === 'number') {

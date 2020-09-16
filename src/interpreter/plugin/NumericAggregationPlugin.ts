@@ -4,13 +4,12 @@
  */
 
 import assert from 'assert'
-import {type} from 'os'
 import {AbsoluteCellRange, DIFFERENT_SHEETS_ERROR} from '../../AbsoluteCellRange'
 import {CellError, EmptyValue, ErrorType, InternalScalarValue, SimpleCellAddress} from '../../Cell'
 import {ErrorMessage} from '../../error-message'
 import {Maybe} from '../../Maybe'
 import {AstNodeType, CellRangeAst, ProcedureAst} from '../../parser'
-import {coerceToRange, max, maxa, min, mina} from '../ArithmeticHelper'
+import {coerceBooleanToNumber} from '../ArithmeticHelper'
 import {SimpleRangeValue} from '../InterpreterValue'
 import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
 import {ColumnRangeAst, RowRangeAst} from '../../parser/Ast'
@@ -154,7 +153,7 @@ export class NumericAggregationPlugin extends FunctionPlugin {
     if (ast.args.length < 1) {
       return new CellError(ErrorType.NA, ErrorMessage.WrongArgNumber)
     }
-    const value = this.reduce(ast, formulaAddress, Number.POSITIVE_INFINITY, 'MAXA', Math.max, idMap, this.numbersStringsBooleans)
+    const value = this.reduce(ast, formulaAddress, Number.POSITIVE_INFINITY, 'MAXA', Math.max, idMap, this.numbersBooleans)
 
     return zeroForInfinite(value)
   }
@@ -180,7 +179,7 @@ export class NumericAggregationPlugin extends FunctionPlugin {
     if (ast.args.length < 1) {
       return new CellError(ErrorType.NA, ErrorMessage.WrongArgNumber)
     }
-    const value = this.reduce(ast, formulaAddress, Number.POSITIVE_INFINITY, 'MINA', Math.min, idMap, this.numbersStringsBooleans)
+    const value = this.reduce(ast, formulaAddress, Number.POSITIVE_INFINITY, 'MINA', Math.min, idMap, this.numbersBooleans)
 
     return zeroForInfinite(value)
   }
@@ -235,7 +234,7 @@ export class NumericAggregationPlugin extends FunctionPlugin {
     const result = this.reduce<AverageResult>(ast, formulaAddress, AverageResult.empty, 'AVERAGE',
       (left, right) => left.compose(right),
      (arg): AverageResult  => AverageResult.single(arg),
-     this.numbersStringsBooleans
+     this.numbersBooleans
     )
 
     if (result instanceof CellError) {
@@ -253,13 +252,11 @@ export class NumericAggregationPlugin extends FunctionPlugin {
     }
   }
 
-  private numbersStringsBooleans = (arg: InternalScalarValue): Maybe<number> => {
-    let val: Maybe<InternalScalarValue> = arg
-    if(typeof arg === 'string' || typeof arg === 'boolean') {
-      val = this.interpreter.arithmeticHelper.coerceToMaybeNumber(val)
-    }
-    if(typeof val === 'number') {
-      return val
+  private numbersBooleans = (arg: InternalScalarValue): Maybe<number> => {
+    if(typeof arg === 'boolean') {
+      return coerceBooleanToNumber(arg)
+    } else if(typeof arg === 'number') {
+      return arg
     } else {
       return undefined
     }
