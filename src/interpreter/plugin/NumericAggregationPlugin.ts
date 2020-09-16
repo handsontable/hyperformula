@@ -324,7 +324,7 @@ export class NumericAggregationPlugin extends FunctionPlugin {
    * @param mapFunction
    * @param coerceFunction
    * */
-  private reduce<T>(ast: ProcedureAst, formulaAddress: SimpleCellAddress, initialAccValue: T, functionName: string, reducingFunction: BinaryOperation<T>, mapFunction: MapOperation<T>): T {
+  private reduce<T>(ast: ProcedureAst, formulaAddress: SimpleCellAddress, initialAccValue: T, functionName: string, reducingFunction: BinaryOperation<T>, mapFunction: MapOperation<T>): CellError | T {
     return ast.args.reduce((acc: T | CellError, arg) => {
       if(acc instanceof CellError) {
         return acc
