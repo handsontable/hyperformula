@@ -85,6 +85,7 @@ const dictionary: RawTranslationPackage = {
     ERF: 'VIRHEFUNKTIO',
     ERFC: 'VIRHEFUNKTIO.KOMPLEMENTTI',
     EVEN: 'PARILLINEN',
+    EXACT: 'VERTAA',
     EXP: 'EKSPONENTTI',
     FALSE: 'EPÄTOSI',
     FIND: 'ETSI',

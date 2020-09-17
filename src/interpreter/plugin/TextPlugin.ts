@@ -16,78 +16,85 @@ export class TextPlugin extends FunctionPlugin {
     'CONCATENATE': {
       method: 'concatenate',
       parameters: [
-          {argumentType: ArgumentTypes.STRING}
-        ],
-        repeatLastArgs: 1,
-        expandRanges: true,
+        {argumentType: ArgumentTypes.STRING}
+      ],
+      repeatLastArgs: 1,
+      expandRanges: true,
+    },
+    'EXACT': {
+      method: 'exact',
+      parameters: [
+        {argumentType: ArgumentTypes.STRING},
+        {argumentType: ArgumentTypes.STRING}
+      ]
     },
     'SPLIT': {
       method: 'split',
       parameters: [
-          {argumentType: ArgumentTypes.STRING},
-          {argumentType: ArgumentTypes.NUMBER},
-        ]
+        {argumentType: ArgumentTypes.STRING},
+        {argumentType: ArgumentTypes.NUMBER},
+      ]
     },
     'LEN': {
       method: 'len',
       parameters: [
-          {argumentType: ArgumentTypes.STRING}
-        ]
+        {argumentType: ArgumentTypes.STRING}
+      ]
     },
     'TRIM': {
       method: 'trim',
       parameters: [
-          {argumentType: ArgumentTypes.STRING}
-        ]
+        {argumentType: ArgumentTypes.STRING}
+      ]
     },
     'PROPER': {
       method: 'proper',
       parameters: [
-          {argumentType: ArgumentTypes.STRING}
-        ]
+        {argumentType: ArgumentTypes.STRING}
+      ]
     },
     'CLEAN': {
       method: 'clean',
       parameters: [
-          {argumentType: ArgumentTypes.STRING}
-        ]
+        {argumentType: ArgumentTypes.STRING}
+      ]
     },
     'REPT': {
       method: 'rept',
       parameters: [
-          {argumentType: ArgumentTypes.STRING},
-          {argumentType: ArgumentTypes.NUMBER},
-        ]
+        {argumentType: ArgumentTypes.STRING},
+        {argumentType: ArgumentTypes.NUMBER},
+      ]
     },
     'RIGHT': {
       method: 'right',
       parameters: [
-          {argumentType: ArgumentTypes.STRING},
-          {argumentType: ArgumentTypes.NUMBER, defaultValue: 1},
-        ]
+        {argumentType: ArgumentTypes.STRING},
+        {argumentType: ArgumentTypes.NUMBER, defaultValue: 1},
+      ]
     },
     'LEFT': {
       method: 'left',
       parameters: [
-          {argumentType: ArgumentTypes.STRING},
-          {argumentType: ArgumentTypes.NUMBER, defaultValue: 1},
-        ]
+        {argumentType: ArgumentTypes.STRING},
+        {argumentType: ArgumentTypes.NUMBER, defaultValue: 1},
+      ]
     },
     'SEARCH': {
       method: 'search',
       parameters: [
-          {argumentType: ArgumentTypes.STRING},
-          {argumentType: ArgumentTypes.STRING},
-          {argumentType: ArgumentTypes.NUMBER, defaultValue: 1},
-        ]
+        {argumentType: ArgumentTypes.STRING},
+        {argumentType: ArgumentTypes.STRING},
+        {argumentType: ArgumentTypes.NUMBER, defaultValue: 1},
+      ]
     },
     'FIND': {
       method: 'find',
       parameters: [
-          {argumentType: ArgumentTypes.STRING},
-          {argumentType: ArgumentTypes.STRING},
-          {argumentType: ArgumentTypes.NUMBER, defaultValue: 1},
-        ]
+        {argumentType: ArgumentTypes.STRING},
+        {argumentType: ArgumentTypes.STRING},
+        {argumentType: ArgumentTypes.NUMBER, defaultValue: 1},
+      ]
     }
   }
 
@@ -147,6 +154,12 @@ export class TextPlugin extends FunctionPlugin {
     return this.runFunction(ast.args, formulaAddress, this.metadata('CLEAN'), (arg: string) => {
       // eslint-disable-next-line no-control-regex
       return arg.replace(/[\u0000-\u001F]/g, '')
+    })
+  }
+
+  public exact(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('EXACT'), (left: string, right: string) => {
+      return left === right
     })
   }
 

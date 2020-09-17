@@ -85,6 +85,7 @@ const dictionary: RawTranslationPackage = {
     ERF: 'FUNKCJA.BŁ',
     ERFC: 'KOMP.FUNKCJA.BŁ',
     EVEN: 'ZAOKR.DO.PARZ',
+    EXACT: 'PORÓWNAJ',
     EXP: 'EXP',
     FALSE: 'FAŁSZ',
     FIND: 'ZNAJDŹ',

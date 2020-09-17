@@ -85,6 +85,7 @@ const dictionary: RawTranslationPackage = {
     ERF: 'FUNERRO',
     ERFC: 'FUNERROCOMPL',
     EVEN: 'PAR',
+    EXACT: 'EXATO',
     EXP: 'EXP',
     FALSE: 'FALSO',
     FIND: 'PROCURAR',

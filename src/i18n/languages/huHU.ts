@@ -85,6 +85,7 @@ const dictionary: RawTranslationPackage = {
     ERF: 'HIBAF',
     ERFC: 'HIBAF.KOMPLEMENTER',
     EVEN: 'PÁROS',
+    EXACT: 'AZONOS',
     EXP: 'KITEVŐ',
     FALSE: 'HAMIS',
     FIND: 'SZÖVEG.TALÁL',

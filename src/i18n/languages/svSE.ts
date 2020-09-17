@@ -85,6 +85,7 @@ const dictionary: RawTranslationPackage = {
     ERF: 'FELF',
     ERFC: 'FELFK',
     EVEN: 'JÄMN',
+    EXACT: 'EXAKT',
     EXP: 'EXP',
     FALSE: 'FALSKT',
     FIND: 'HITTA',

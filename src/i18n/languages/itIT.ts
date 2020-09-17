@@ -85,6 +85,7 @@ const dictionary: RawTranslationPackage = {
     ERF: 'FUNZ.ERRORE',
     ERFC: 'FUNZ.ERRORE.COMP',
     EVEN: 'PARI',
+    EXACT: 'IDENTICO',
     EXP: 'EXP',
     FALSE: 'FALSO',
     FIND: 'TROVA',

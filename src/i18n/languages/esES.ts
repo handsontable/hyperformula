@@ -85,6 +85,7 @@ export const dictionary: RawTranslationPackage = {
     ERF: 'FUN.ERROR',
     ERFC: 'FUN.ERROR.COMPL',
     EVEN: 'REDONDEA.PAR',
+    EXACT: 'IGUAL',
     EXP: 'EXP',
     FALSE: 'FALSO',
     FIND: 'ENCONTRAR',
