@@ -57,4 +57,19 @@ describe('COUNT', () => {
 
     expect(engine.getCellValue(adr('A3'))).toEqual(2)
   })
+
+  it('should work with explicit error in arg', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=COUNT(NA())'],
+    ])
+    expect(engine.getCellValue(adr('A1'))).toEqual(0)
+  })
+
+  it('should work for empty arg', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=COUNT(1,)'],
+    ])
+
+    expect(engine.getCellValue(adr('A1'))).toEqual(2)
+  })
 })
