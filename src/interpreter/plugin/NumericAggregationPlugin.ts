@@ -18,7 +18,7 @@ export type BinaryOperation<T> = (left: T, right: T) => T
 
 export type MapOperation<T> = (arg: number) => T
 
-type coercionOperation = (arg: InternalScalarValue) => Maybe<number>
+type coercionOperation = (arg: InternalScalarValue) => Maybe<number | CellError>
 
 function idMap(arg: number): number {
   return arg
@@ -144,7 +144,7 @@ export class NumericAggregationPlugin extends FunctionPlugin {
     if (ast.args.length < 1) {
       return new CellError(ErrorType.NA, ErrorMessage.WrongArgNumber)
     }
-    const value = this.reduce(ast, formulaAddress, Number.POSITIVE_INFINITY, 'MAX', Math.max, idMap, this.strictlyNumbers)
+    const value = this.reduce(ast, formulaAddress, Number.NEGATIVE_INFINITY, 'MAX', Math.max, idMap, this.strictlyNumbers)
 
     return zeroForInfinite(value)
   }
@@ -153,7 +153,9 @@ export class NumericAggregationPlugin extends FunctionPlugin {
     if (ast.args.length < 1) {
       return new CellError(ErrorType.NA, ErrorMessage.WrongArgNumber)
     }
-    const value = this.reduce(ast, formulaAddress, Number.POSITIVE_INFINITY, 'MAXA', Math.max, idMap, this.numbersBooleans)
+    const value = this.reduce(ast, formulaAddress, Number.NEGATIVE_INFINITY, 'MAXA',
+      (left, right) => Math.max(left,right),
+      idMap, this.numbersBooleans)
 
     return zeroForInfinite(value)
   }
@@ -244,18 +246,18 @@ export class NumericAggregationPlugin extends FunctionPlugin {
     }
   }
 
-  private strictlyNumbers = (arg: InternalScalarValue): Maybe<number> => {
-    if(typeof arg === 'number') {
+  private strictlyNumbers = (arg: InternalScalarValue): Maybe<CellError | number> => {
+    if(typeof arg === 'number' || arg instanceof CellError) {
       return arg
     } else {
       return undefined
     }
   }
 
-  private numbersBooleans = (arg: InternalScalarValue): Maybe<number> => {
+  private numbersBooleans = (arg: InternalScalarValue): Maybe<CellError | number> => {
     if(typeof arg === 'boolean') {
       return coerceBooleanToNumber(arg)
-    } else if(typeof arg === 'number') {
+    } else if(typeof arg === 'number' || arg instanceof CellError) {
       return arg
     } else {
       return undefined
@@ -278,37 +280,32 @@ export class NumericAggregationPlugin extends FunctionPlugin {
       if(acc instanceof CellError) {
         return acc
       }
-      let value
       if (arg.type === AstNodeType.CELL_RANGE || arg.type === AstNodeType.COLUMN_RANGE || arg.type === AstNodeType.ROW_RANGE) {
-        value = this.evaluateRange(arg, formulaAddress, acc, functionName, reducingFunction, mapFunction, coercionFunction)
-        if(value instanceof CellError) {
-          return value
-        }
-      } else {
-        value = this.evaluateAst(arg, formulaAddress)
-        if (value instanceof SimpleRangeValue) {
-          value = (Array.from(value.valuesFromTopLeftCorner())
-            .map(coercionFunction)
-            .filter((arg) => (arg !== undefined)) as number[])
-            .map(mapFunction)
-            .reduce(reducingFunction,initialAccValue)
-        } else if (arg.type === AstNodeType.CELL_REFERENCE) {
-          value = coercionFunction(value)
-          if (value === undefined) {
-            return acc
-          }
-          value = mapFunction(value)
-        } else {
-          value = this.coerceScalarToNumberOrError(value)
-          if(value instanceof CellError) {
-            return value
-          }
-          value = mapFunction(value)
-        }
-
+        return this.evaluateRange(arg, formulaAddress, acc, functionName, reducingFunction, mapFunction, coercionFunction)
+      }
+      let value
+      value = this.evaluateAst(arg, formulaAddress)
+      if (value instanceof SimpleRangeValue) {
+        return (Array.from(value.valuesFromTopLeftCorner())
+          .map(coercionFunction)
+          .filter((arg) => (arg !== undefined)) as number[])
+          .map(mapFunction)
+          .reduce(reducingFunction,acc)
       }
 
-      return reducingFunction(acc, value)
+      if (arg.type === AstNodeType.CELL_REFERENCE) {
+        value = coercionFunction(value)
+        if (value === undefined) {
+          return acc
+        }
+      } else {
+        value = this.coerceScalarToNumberOrError(value)
+      }
+      if(value instanceof CellError) {
+        return value
+      }
+
+      return reducingFunction(acc, mapFunction(value))
     }, initialAccValue)
   }
 
@@ -366,7 +363,7 @@ export class NumericAggregationPlugin extends FunctionPlugin {
    * @param range - cell range
    */
   private getRangeValues<T>(functionName: string, range: AbsoluteCellRange, mapFunction: MapOperation<T>, coercionFunction: coercionOperation): (T | CellError)[] {
-    const rangeResult: T[] = []
+    const rangeResult: (T | CellError)[] = []
     const {smallerRangeVertex, restRange} = this.dependencyGraph.rangeMapping.findSmallerRange(range)
     const currentRangeVertex = this.dependencyGraph.getRange(range.start, range.end)!
     let actualRange: AbsoluteCellRange
@@ -377,7 +374,9 @@ export class NumericAggregationPlugin extends FunctionPlugin {
       } else {
         for (const cellFromRange of smallerRangeVertex.range.addresses(this.dependencyGraph)) {
           const val = coercionFunction(this.dependencyGraph.getScalarValue(cellFromRange))
-          if(val !== undefined) {
+          if(val instanceof CellError) {
+            rangeResult.push(val)
+          } else if(val !== undefined) {
             rangeResult.push(mapFunction(val))
           }
         }
@@ -388,7 +387,9 @@ export class NumericAggregationPlugin extends FunctionPlugin {
     }
     for (const cellFromRange of actualRange.addresses(this.dependencyGraph)) {
       const val = coercionFunction(this.dependencyGraph.getScalarValue(cellFromRange))
-      if(val !== undefined) {
+      if(val instanceof CellError) {
+        rangeResult.push(val)
+      } else if(val !== undefined) {
         rangeResult.push(mapFunction(val))
       }
     }
