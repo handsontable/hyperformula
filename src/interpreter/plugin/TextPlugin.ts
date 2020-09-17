@@ -47,6 +47,14 @@ export class TextPlugin extends FunctionPlugin {
         {argumentType: ArgumentTypes.STRING}
       ]
     },
+    'MID': {
+      method: 'mid',
+      parameters: [
+        {argumentType: ArgumentTypes.STRING},
+        {argumentType: ArgumentTypes.NUMBER},
+        {argumentType: ArgumentTypes.NUMBER},
+      ]
+    },
     'TRIM': {
       method: 'trim',
       parameters: [
@@ -207,6 +215,18 @@ export class TextPlugin extends FunctionPlugin {
         return new CellError(ErrorType.VALUE, ErrorMessage.NegativeLength)
       }
       return text.slice(0, length)
+    })
+  }
+
+  public mid(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('MID'), (text: string, startPosition: number, numberOfChars: number) => {
+      if (startPosition < 1) {
+        return new CellError(ErrorType.VALUE, ErrorMessage.LessThanOne)
+      }
+      if (numberOfChars < 0) {
+        return new CellError(ErrorType.VALUE, ErrorMessage.Negative)
+      }
+      return text.substr(startPosition - 1, numberOfChars)
     })
   }
 

@@ -128,6 +128,7 @@ const dictionary: RawTranslationPackage = {
     MAXPOOL: 'MAXPOOL',
     MEDIAN: 'MEDIANE',
     MEDIANPOOL: 'MEDIANPOOL',
+    MID: 'STXT',
     MIN: 'MIN',
     MINA: 'MINA',
     MINUTE: 'MINUTE',
