@@ -32,6 +32,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed bug in concatenation + nullValue. (#495)
 - Fixed bug when undoing irreversible operation (#502)
 - Fixed minor issue with CHAR function logic (#510)
+- Fixed issues with numeric aggregation functions (#515) 
 
 ## [0.1.3] - 2020-07-21
 
