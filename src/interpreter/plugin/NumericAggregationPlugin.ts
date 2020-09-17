@@ -113,14 +113,14 @@ export class NumericAggregationPlugin extends FunctionPlugin {
     if (ast.args.length < 1) {
       return new CellError(ErrorType.NA, ErrorMessage.WrongArgNumber)
     }
-    return this.reduce(ast, formulaAddress, 0, 'SUM', this.addWithEpsilon, idMap, this.strictlyNumbers)
+    return this.reduce(ast, formulaAddress, 0, 'SUM', this.addWithEpsilon, idMap, strictlyNumbers)
   }
 
   public sumsq(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     if (ast.args.length < 1) {
       return new CellError(ErrorType.NA, ErrorMessage.WrongArgNumber)
     }
-    return this.reduce(ast, formulaAddress, 0, 'SUMSQ', this.addWithEpsilon, (arg) => arg*arg, this.strictlyNumbers)
+    return this.reduce(ast, formulaAddress, 0, 'SUMSQ', this.addWithEpsilon, (arg) => arg*arg, strictlyNumbers)
   }
 
   public countblank(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
@@ -149,7 +149,7 @@ export class NumericAggregationPlugin extends FunctionPlugin {
     }
     const value = this.reduce(ast, formulaAddress, Number.NEGATIVE_INFINITY, 'MAX',
       (left, right) => Math.max(left, right),
-      idMap, this.strictlyNumbers)
+      idMap, strictlyNumbers)
 
     return zeroForInfinite(value)
   }
@@ -160,7 +160,7 @@ export class NumericAggregationPlugin extends FunctionPlugin {
     }
     const value = this.reduce(ast, formulaAddress, Number.NEGATIVE_INFINITY, 'MAXA',
       (left, right) => Math.max(left, right),
-      idMap, this.numbersBooleans)
+      idMap, numbersBooleans)
 
     return zeroForInfinite(value)
   }
@@ -179,7 +179,7 @@ export class NumericAggregationPlugin extends FunctionPlugin {
     }
     const value = this.reduce(ast, formulaAddress, Number.POSITIVE_INFINITY, 'MIN',
       (left, right) => Math.min(left, right),
-      idMap, this.strictlyNumbers)
+      idMap, strictlyNumbers)
 
     return zeroForInfinite(value)
   }
@@ -190,7 +190,7 @@ export class NumericAggregationPlugin extends FunctionPlugin {
     }
     const value = this.reduce(ast, formulaAddress, Number.POSITIVE_INFINITY, 'MINA',
       (left, right) => Math.min(left, right),
-      idMap, this.numbersBooleans)
+      idMap, numbersBooleans)
 
     return zeroForInfinite(value)
   }
@@ -228,7 +228,7 @@ export class NumericAggregationPlugin extends FunctionPlugin {
     }, (arg): AverageResult => {
         return AverageResult.single(arg)
       },
-      this.strictlyNumbers
+      strictlyNumbers
     )
 
     if (result instanceof CellError) {
@@ -245,33 +245,13 @@ export class NumericAggregationPlugin extends FunctionPlugin {
     const result = this.reduce<AverageResult>(ast, formulaAddress, AverageResult.empty, 'AVERAGE',
       (left, right) => left.compose(right),
      (arg): AverageResult  => AverageResult.single(arg),
-     this.numbersBooleans
+     numbersBooleans
     )
 
     if (result instanceof CellError) {
       return result
     } else {
       return result.averageValue() ?? new CellError(ErrorType.DIV_BY_ZERO)
-    }
-  }
-
-  private strictlyNumbers = (arg: InternalScalarValue): Maybe<CellError | number> => {
-    if(typeof arg === 'number' || arg instanceof CellError) {
-      return arg
-    } else {
-      return undefined
-    }
-  }
-
-  private numbersBooleans = (arg: InternalScalarValue): Maybe<CellError | number> => {
-    if(typeof arg === 'boolean') {
-      return coerceBooleanToNumber(arg)
-    } else if(typeof arg === 'number' || arg instanceof CellError) {
-      return arg
-    } else if(typeof arg === 'string') {
-      return 0
-    } else {
-      return undefined
     }
   }
 
@@ -428,3 +408,24 @@ export class NumericAggregationPlugin extends FunctionPlugin {
     return rangeResult
   }
 }
+
+function strictlyNumbers(arg: InternalScalarValue): Maybe<CellError | number> {
+  if(typeof arg === 'number' || arg instanceof CellError) {
+    return arg
+  } else {
+    return undefined
+  }
+}
+
+function numbersBooleans(arg: InternalScalarValue): Maybe<CellError | number> {
+  if(typeof arg === 'boolean') {
+    return coerceBooleanToNumber(arg)
+  } else if(typeof arg === 'number' || arg instanceof CellError) {
+    return arg
+  } else if(typeof arg === 'string') {
+    return 0
+  } else {
+    return undefined
+  }
+}
+
