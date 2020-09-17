@@ -95,4 +95,14 @@ describe('Function MEDIAN', () => {
 
     expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM, ErrorMessage.OneValue))
   })
+
+  it('empty args as 0', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=MEDIAN(1,2,3,,)'],
+      ['=MEDIAN(,)']
+    ])
+
+    expect(engine.getCellValue(adr('A1'))).toEqual(1)
+    expect(engine.getCellValue(adr('A2'))).toEqual(0)
+  })
 })
