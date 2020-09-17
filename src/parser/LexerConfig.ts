@@ -42,8 +42,9 @@ export const LessThanOrEqualOp = createToken({name: 'LessThanOrEqualOp', pattern
 export const ConcatenateOp = createToken({name: 'ConcatenateOp', pattern: /&/})
 
 /* addresses */
-export const additionalCharactersAllowedInQuotes = ' ' // It's included in regexps, so escape characters which have special regexp semantics
-export const sheetNameRegexp = `([A-Za-z0-9_\u00C0-\u02AF]+|'[A-Za-z0-9${additionalCharactersAllowedInQuotes}_\u00C0-\u02AF]+')!`
+export const simpleSheetName = '[A-Za-z0-9_\u00C0-\u02AF]+'
+export const quotedSheetName = "'(((?!').|'')*)'"
+export const sheetNameRegexp = `(${simpleSheetName}|${quotedSheetName})!`
 
 export const CellReference = createToken({
   name: 'CellReference',

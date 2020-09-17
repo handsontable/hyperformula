@@ -38,6 +38,10 @@ describe('cellAddressFromString', () => {
     const sheetMapping = new SheetMapping(buildTranslationPackage(enGB))
     const sheet1 = sheetMapping.addSheet('Sheet1')
     const sheet2 = sheetMapping.addSheet('Sheet2')
+    const sheet3 = sheetMapping.addSheet('~`!@#$%^&*()_-+_=/|?{}[]\"')
+
+    expect(cellAddressFromString(sheetMapping.get, 'Sheet1!B3', simpleCellAddress(sheet1, 0, 0))).toEqual(CellAddress.relative(sheet1, 1, 2))
     expect(cellAddressFromString(sheetMapping.get, 'Sheet2!B3', simpleCellAddress(sheet1, 0, 0))).toEqual(CellAddress.relative(sheet2, 1, 2))
+    expect(cellAddressFromString(sheetMapping.get, "'~`!@#$%^&*()_-+_=/|?{}[]\"'!B3", simpleCellAddress(sheet1, 0, 0))).toEqual(CellAddress.relative(sheet3, 1, 2))
   })
 })

@@ -32,8 +32,7 @@ describe('simpleCellAddressFromString', () => {
 
 describe('simpleCellAddressToString', () => {
   const sheetIndexMappingFunction = (index: number): Maybe<string> => {
-    const name = ['Sheet1', 'Sheet2', 'Sheet3'][index]
-    return name
+    return ['Sheet1', 'Sheet2', 'Sheet3', '~`!@#$%^&*()_-+_=/|?{}[]"', "Sheet'With'Quotes"][index]
   }
 
   it('should return string representation', () => {
@@ -43,6 +42,14 @@ describe('simpleCellAddressToString', () => {
 
   it('should return string representation with sheet name', () => {
     expect(simpleCellAddressToString(sheetIndexMappingFunction, simpleCellAddress(0, 0, 0), 1)).toEqual('Sheet1!A1')
+  })
+
+  it('should quote sheet names with special characters', () => {
+    expect(simpleCellAddressToString(sheetIndexMappingFunction, simpleCellAddress(3, 0, 0), 1)).toEqual("'~`!@#$%^&*()_-+_=/|?{}[]\"'!A1")
+  })
+
+  it('should escape quote in quotes', () => {
+    expect(simpleCellAddressToString(sheetIndexMappingFunction, simpleCellAddress(4, 0, 0), 1)).toEqual("'Sheet''With''Quotes'!A1")
   })
 
   it('should return undefined', () => {
