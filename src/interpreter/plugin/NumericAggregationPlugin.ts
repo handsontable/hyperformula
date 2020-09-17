@@ -11,7 +11,7 @@ import {Maybe} from '../../Maybe'
 import {AstNodeType, CellRangeAst, ProcedureAst} from '../../parser'
 import {coerceBooleanToNumber} from '../ArithmeticHelper'
 import {SimpleRangeValue} from '../InterpreterValue'
-import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
+import {FunctionPlugin} from './FunctionPlugin'
 import {ColumnRangeAst, RowRangeAst} from '../../parser/Ast'
 
 export type BinaryOperation<T> = (left: T, right: T) => T
