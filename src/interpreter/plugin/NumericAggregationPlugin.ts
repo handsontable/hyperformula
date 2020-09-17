@@ -79,14 +79,6 @@ export class NumericAggregationPlugin extends FunctionPlugin {
     'MINA': {
       method: 'mina',
     },
-    'COUNTBLANK': {
-      method: 'countblank',
-      parameters: [
-        {argumentType: ArgumentTypes.SCALAR}
-      ],
-      repeatLastArgs: 1,
-      expandRanges: true,
-    },
     'COUNT': {
       method: 'count',
     },
@@ -123,17 +115,6 @@ export class NumericAggregationPlugin extends FunctionPlugin {
     return this.reduce(ast, formulaAddress, 0, 'SUMSQ', this.addWithEpsilon, (arg) => arg*arg, strictlyNumbers)
   }
 
-  public countblank(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('COUNTBLANK'), (...args: InternalScalarValue[]) => {
-      let counter = 0
-      args.forEach((arg) => {
-        if(arg === EmptyValue) {
-          counter++
-        }
-      })
-      return counter
-    })
-  }
 
   /**
    * Corresponds to MAX(Number1, Number2, ...).
