@@ -5,8 +5,12 @@ import {adr, detailedError} from '../testUtils'
 
 describe('COUNTBLANK', () => {
   it('with empty args', () => {
-    const engine = HyperFormula.buildFromArray([['=COUNTBLANK()']])
+    const engine = HyperFormula.buildFromArray([
+      ['=COUNTBLANK()'],
+      ['=COUNTBLANK(,)']
+    ])
     expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
+    expect(engine.getCellValue(adr('A2'))).toEqual(2)
   })
 
   it('with args', () => {

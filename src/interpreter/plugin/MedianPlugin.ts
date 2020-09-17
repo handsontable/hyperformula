@@ -35,7 +35,7 @@ export class MedianPlugin extends FunctionPlugin {
   public median(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.runFunction(ast.args, formulaAddress, this.metadata('MEDIAN'), (...args) => {
       const values: number[] = args.filter((val: InternalScalarValue) => (typeof val === 'number'))
-      ast.args.forEach((arg) => {
+      ast.args.forEach((arg) => { //ugly but works
         if(arg.type === AstNodeType.EMPTY) {
           values.push(0)
         }
