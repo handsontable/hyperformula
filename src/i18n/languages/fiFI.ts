@@ -180,6 +180,7 @@ const dictionary: RawTranslationPackage = {
     SUMSQ: 'NELIÖSUMMA',
     SWITCH: '',
     SYD: 'VUOSIPOISTO',
+    T: 'T',
     TAN: 'TAN',
     TANH: 'TANH',
     TBILLEQ: 'OBLIG.TUOTTOPROS',

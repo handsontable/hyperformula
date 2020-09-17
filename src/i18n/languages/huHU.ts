@@ -180,6 +180,7 @@ const dictionary: RawTranslationPackage = {
     SUMSQ: 'NÉGYZETÖSSZEG',
     SWITCH: '',
     SYD: 'ÉSZÖ',
+    T: 'T',
     TAN: 'TAN',
     TANH: 'TANH',
     TBILLEQ: 'KJEGY.EGYENÉRT',

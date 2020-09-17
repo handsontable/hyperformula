@@ -180,6 +180,7 @@ const dictionary: RawTranslationPackage = {
     SUMSQ: 'SUMSQ',
     SWITCH: 'PRZEŁĄCZ',
     SYD: 'SYD',
+    T: 'T',
     TAN: 'TAN',
     TANH: 'TANH',
     TBILLEQ: 'RENT.EKW.BS',

@@ -180,6 +180,7 @@ const dictionary: RawTranslationPackage = {
     SUMSQ: 'KVADRATSUMMA',
     SWITCH: '',
     SYD: 'ÅRSAVSKR',
+    T: 'T',
     TAN: 'TAN',
     TANH: 'TANH',
     TBILLEQ: 'SSVXEKV',

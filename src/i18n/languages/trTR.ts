@@ -180,6 +180,7 @@ const dictionary: RawTranslationPackage = {
     SUMSQ: 'TOPKARE',
     SWITCH: '',
     SYD: 'YAT',
+    T: 'T',
     TAN: 'TAN',
     TANH: 'TANH',
     TBILLEQ: 'HTAHEŞ',

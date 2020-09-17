@@ -180,6 +180,7 @@ export const dictionary: RawTranslationPackage = {
     SUMSQ: 'SUMA.CUADRADOS',
     SWITCH: '',
     SYD: 'SYD',
+    T: 'T',
     TAN: 'TAN',
     TANH: 'TANH',
     TBILLEQ: 'LETRA.DE.TEST.EQV.A.BONO',

@@ -61,6 +61,12 @@ export class TextPlugin extends FunctionPlugin {
         {argumentType: ArgumentTypes.STRING}
       ]
     },
+    'T': {
+      method: 't',
+      parameters: [
+        {argumentType: ArgumentTypes.SCALAR}
+      ]
+    },
     'PROPER': {
       method: 'proper',
       parameters: [
@@ -260,6 +266,15 @@ export class TextPlugin extends FunctionPlugin {
       const index = shiftedText.indexOf(pattern) + startIndex
 
       return index > 0 ? index : new CellError(ErrorType.VALUE, ErrorMessage.PatternNotFound)
+    })
+  }
+
+  public t(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('T'), (arg: InternalScalarValue) => {
+      if (arg instanceof CellError) {
+        return arg
+      }
+      return typeof arg === 'string' ? arg : ''
     })
   }
 
