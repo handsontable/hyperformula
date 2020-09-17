@@ -121,6 +121,7 @@ const dictionary: RawTranslationPackage = {
     LN: 'LUONNLOG',
     LOG10: 'LOG10',
     LOG: 'LOG',
+    LOWER: 'PIENET',
     MATCH: 'VASTINE',
     MAX: 'MAKS',
     MAXA: 'MAKSA',

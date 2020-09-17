@@ -41,6 +41,12 @@ export class TextPlugin extends FunctionPlugin {
         {argumentType: ArgumentTypes.STRING}
       ]
     },
+    'LOWER': {
+      method: 'lower',
+      parameters: [
+        {argumentType: ArgumentTypes.STRING}
+      ]
+    },
     'TRIM': {
       method: 'trim',
       parameters: [
@@ -135,6 +141,12 @@ export class TextPlugin extends FunctionPlugin {
   public len(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.runFunction(ast.args, formulaAddress, this.metadata('LEN'), (arg: string) => {
       return arg.length
+    })
+  }
+
+  public lower(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('LOWER'), (arg: string) => {
+      return arg.toLowerCase()
     })
   }
 

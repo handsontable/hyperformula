@@ -121,6 +121,7 @@ const dictionary: RawTranslationPackage = {
     LN: 'LN',
     LOG10: 'LOG10',
     LOG: 'LOG',
+    LOWER: 'KLEIN',
     MATCH: 'VERGLEICH',
     MAX: 'MAX',
     MAXA: 'MAXA',
