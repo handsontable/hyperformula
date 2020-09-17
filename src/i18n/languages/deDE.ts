@@ -192,6 +192,7 @@ const dictionary: RawTranslationPackage = {
     TRIM: 'GLÄTTEN',
     TRUE: 'WAHR',
     TRUNC: 'KÜRZEN',
+    UPPER: 'GROSS',
     VLOOKUP: 'SVERWEIS',
     WEEKDAY: 'WOCHENTAG',
     WEEKNUM: 'KALENDERWOCHE',

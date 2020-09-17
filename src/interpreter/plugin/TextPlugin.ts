@@ -101,7 +101,13 @@ export class TextPlugin extends FunctionPlugin {
         {argumentType: ArgumentTypes.STRING},
         {argumentType: ArgumentTypes.NUMBER, defaultValue: 1},
       ]
-    }
+    },
+    'UPPER': {
+      method: 'upper',
+      parameters: [
+        {argumentType: ArgumentTypes.STRING}
+      ]
+    },
   }
 
   /**
@@ -234,6 +240,12 @@ export class TextPlugin extends FunctionPlugin {
       const index = shiftedText.indexOf(pattern) + startIndex
 
       return index > 0 ? index : new CellError(ErrorType.VALUE, ErrorMessage.PatternNotFound)
+    })
+  }
+
+  public upper(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('UPPER'), (arg: string) => {
+      return arg.toUpperCase()
     })
   }
 }

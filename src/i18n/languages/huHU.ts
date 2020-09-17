@@ -192,6 +192,7 @@ const dictionary: RawTranslationPackage = {
     TRIM: 'KIMETSZ',
     TRUE: 'IGAZ',
     TRUNC: 'CSONK',
+    UPPER: 'NAGYBETŰS',
     VLOOKUP: 'FKERES',
     WEEKDAY: 'HÉT.NAPJA',
     WEEKNUM: 'HÉT.SZÁMA',

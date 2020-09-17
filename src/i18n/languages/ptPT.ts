@@ -192,6 +192,7 @@ const dictionary: RawTranslationPackage = {
     TRIM: 'ARRUMAR',
     TRUE: 'VERDADEIRO',
     TRUNC: 'TRUNCAR',
+    UPPER: 'MAIÚSCULA',
     VLOOKUP: 'PROCV',
     WEEKDAY: 'DIA.DA.SEMANA',
     WEEKNUM: 'NÚMSEMANA',

@@ -192,6 +192,7 @@ const dictionary: RawTranslationPackage = {
     TRIM: 'RENSA',
     TRUE: 'SANT',
     TRUNC: 'AVKORTA',
+    UPPER: 'VERSALER',
     VLOOKUP: 'LETARAD',
     WEEKDAY: 'VECKODAG',
     WEEKNUM: 'VECKONR',

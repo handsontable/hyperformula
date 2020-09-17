@@ -192,6 +192,7 @@ export const dictionary: RawTranslationPackage = {
     TRIM: 'ESPACIOS',
     TRUE: 'VERDADERO',
     TRUNC: 'TRUNCAR',
+    UPPER: 'MAYUSC',
     VLOOKUP: 'BUSCARV',
     WEEKDAY: 'DIASEM',
     WEEKNUM: 'NUM.DE.SEMANA',

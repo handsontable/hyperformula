@@ -192,6 +192,7 @@ const dictionary: RawTranslationPackage = {
     TRIM: 'USUŃ.ZBĘDNE.ODSTĘPY',
     TRUE: 'PRAWDA',
     TRUNC: 'LICZBA.CAŁK',
+    UPPER: 'LITERY.WIELKIE',
     VLOOKUP: 'WYSZUKAJ.PIONOWO',
     WEEKDAY: 'DZIEŃ.TYG',
     WEEKNUM: 'NUM.TYG',

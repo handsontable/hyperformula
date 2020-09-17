@@ -192,6 +192,7 @@ const dictionary: RawTranslationPackage = {
     TRIM: 'SPATIES.WISSEN',
     TRUE: 'WAAR',
     TRUNC: 'GEHEEL',
+    UPPER: 'HOOFDLETTERS',
     VLOOKUP: 'VERT.ZOEKEN',
     WEEKDAY: 'WEEKDAG',
     WEEKNUM: 'WEEKNUMMER',

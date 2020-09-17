@@ -192,6 +192,7 @@ const dictionary: RawTranslationPackage = {
     TRIM: 'SUPPRESPACE',
     TRUE: 'VRAI',
     TRUNC: 'TRONQUE',
+    UPPER: 'MAJUSCULE',
     VLOOKUP: 'RECHERCHEV',
     WEEKDAY: 'JOURSEM',
     WEEKNUM: 'NO.SEMAINE',

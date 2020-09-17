@@ -192,6 +192,7 @@ const dictionary: RawTranslationPackage = {
     TRIM: 'KIRP',
     TRUE: 'DOĞRU',
     TRUNC: 'NSAT',
+    UPPER: 'BÜYÜKHARF',
     VLOOKUP: 'DÜŞEYARA',
     WEEKDAY: 'HAFTANINGÜNÜ',
     WEEKNUM: 'HAFTASAY',

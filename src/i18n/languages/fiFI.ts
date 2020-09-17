@@ -192,6 +192,7 @@ const dictionary: RawTranslationPackage = {
     TRIM: 'POISTA.VÄLIT',
     TRUE: 'TOSI',
     TRUNC: 'KATKAISE',
+    UPPER: 'ISOT',
     VLOOKUP: 'PHAKU',
     WEEKDAY: 'VIIKONPÄIVÄ',
     WEEKNUM: 'VIIKKO.NRO',

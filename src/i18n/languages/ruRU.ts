@@ -192,6 +192,7 @@ const dictionary: RawTranslationPackage = {
     TRIM: 'СЖПРОБЕЛЫ',
     TRUE: 'ИСТИНА',
     TRUNC: 'ОТБР',
+    UPPER: 'ПРОПИСН',
     VLOOKUP: 'ВПР',
     WEEKDAY: 'ДЕНЬНЕД',
     WEEKNUM: 'НОМНЕДЕЛИ',

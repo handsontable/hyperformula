@@ -192,6 +192,7 @@ const dictionary: RawTranslationPackage = {
     TRIM: 'FJERN.OVERFLØDIGE.BLANKE',
     TRUE: 'TRUE',
     TRUNC: 'AFKORT',
+    UPPER: 'STORE.BOGSTAVER',
     VLOOKUP: 'LOPSLAG',
     WEEKDAY: 'UGEDAG',
     WEEKNUM: 'UGE.NR',
