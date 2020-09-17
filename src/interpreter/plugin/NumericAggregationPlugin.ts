@@ -148,7 +148,7 @@ export class NumericAggregationPlugin extends FunctionPlugin {
       return new CellError(ErrorType.NA, ErrorMessage.WrongArgNumber)
     }
     const value = this.reduce(ast, formulaAddress, Number.NEGATIVE_INFINITY, 'MAX',
-      (left, right) => Math.max(left,right),
+      (left, right) => Math.max(left, right),
       idMap, this.strictlyNumbers)
 
     return zeroForInfinite(value)
@@ -159,7 +159,7 @@ export class NumericAggregationPlugin extends FunctionPlugin {
       return new CellError(ErrorType.NA, ErrorMessage.WrongArgNumber)
     }
     const value = this.reduce(ast, formulaAddress, Number.NEGATIVE_INFINITY, 'MAXA',
-      (left, right) => Math.max(left,right),
+      (left, right) => Math.max(left, right),
       idMap, this.numbersBooleans)
 
     return zeroForInfinite(value)
@@ -178,7 +178,7 @@ export class NumericAggregationPlugin extends FunctionPlugin {
       return new CellError(ErrorType.NA, ErrorMessage.WrongArgNumber)
     }
     const value = this.reduce(ast, formulaAddress, Number.POSITIVE_INFINITY, 'MIN',
-      (left, right) => Math.min(left,right),
+      (left, right) => Math.min(left, right),
       idMap, this.strictlyNumbers)
 
     return zeroForInfinite(value)
@@ -189,7 +189,7 @@ export class NumericAggregationPlugin extends FunctionPlugin {
       return new CellError(ErrorType.NA, ErrorMessage.WrongArgNumber)
     }
     const value = this.reduce(ast, formulaAddress, Number.POSITIVE_INFINITY, 'MINA',
-      (left, right) => Math.min(left,right),
+      (left, right) => Math.min(left, right),
       idMap, this.numbersBooleans)
 
     return zeroForInfinite(value)
@@ -309,15 +309,15 @@ export class NumericAggregationPlugin extends FunctionPlugin {
               return mapFunction(arg)
             }
           })
-          .reduce((left,right) => {
+          .reduce((left, right) => {
             if(left instanceof CellError) {
               return left
             } else if(right instanceof CellError) {
               return right
             } else {
-              return reducingFunction(left,right)
+              return reducingFunction(left, right)
             }
-          },acc)
+          }, acc)
       }
 
       if (arg.type === AstNodeType.CELL_REFERENCE) {
