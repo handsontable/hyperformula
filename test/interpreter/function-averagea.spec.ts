@@ -36,7 +36,7 @@ describe('AVERAGEA', () => {
       ['39', null, '=AVERAGEA(A3:B3)'],
     ])
 
-    expect(engine.getCellValue(adr('C1'))).toEqual(20)
+    expect(engine.getCellValue(adr('C1'))).toEqual(19.5)
     expect(engine.getCellValue(adr('C2'))).toEqual(20)
     expect(engine.getCellValue(adr('C3'))).toEqual(39)
   })

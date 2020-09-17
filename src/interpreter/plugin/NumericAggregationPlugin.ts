@@ -110,14 +110,17 @@ export class NumericAggregationPlugin extends FunctionPlugin {
    * @param formulaAddress
    */
   public sum(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.reduce(ast, formulaAddress, 0, 'SUM', (left,right) => left+right, idMap, this.strictlyNumbers)
+    if (ast.args.length < 1) {
+      return new CellError(ErrorType.NA, ErrorMessage.WrongArgNumber)
+    }
+    return this.reduce(ast, formulaAddress, 0, 'SUM', this.addWithEpsilon, idMap, this.strictlyNumbers)
   }
 
   public sumsq(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     if (ast.args.length < 1) {
       return new CellError(ErrorType.NA, ErrorMessage.WrongArgNumber)
     }
-    return this.reduce(ast, formulaAddress, 0, 'SUMSQ', (left, right) => left+right, (arg) => arg*arg, this.strictlyNumbers)
+    return this.reduce(ast, formulaAddress, 0, 'SUMSQ', this.addWithEpsilon, (arg) => arg*arg, this.strictlyNumbers)
   }
 
   public countblank(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
@@ -144,7 +147,9 @@ export class NumericAggregationPlugin extends FunctionPlugin {
     if (ast.args.length < 1) {
       return new CellError(ErrorType.NA, ErrorMessage.WrongArgNumber)
     }
-    const value = this.reduce(ast, formulaAddress, Number.NEGATIVE_INFINITY, 'MAX', Math.max, idMap, this.strictlyNumbers)
+    const value = this.reduce(ast, formulaAddress, Number.NEGATIVE_INFINITY, 'MAX',
+      (left, right) => Math.max(left,right),
+      idMap, this.strictlyNumbers)
 
     return zeroForInfinite(value)
   }
@@ -172,7 +177,9 @@ export class NumericAggregationPlugin extends FunctionPlugin {
     if (ast.args.length < 1) {
       return new CellError(ErrorType.NA, ErrorMessage.WrongArgNumber)
     }
-    const value = this.reduce(ast, formulaAddress, Number.POSITIVE_INFINITY, 'MIN', Math.min, idMap, this.strictlyNumbers)
+    const value = this.reduce(ast, formulaAddress, Number.POSITIVE_INFINITY, 'MIN',
+      (left, right) => Math.min(left,right),
+      idMap, this.strictlyNumbers)
 
     return zeroForInfinite(value)
   }
@@ -181,7 +188,9 @@ export class NumericAggregationPlugin extends FunctionPlugin {
     if (ast.args.length < 1) {
       return new CellError(ErrorType.NA, ErrorMessage.WrongArgNumber)
     }
-    const value = this.reduce(ast, formulaAddress, Number.POSITIVE_INFINITY, 'MINA', Math.min, idMap, this.numbersBooleans)
+    const value = this.reduce(ast, formulaAddress, Number.POSITIVE_INFINITY, 'MINA',
+      (left, right) => Math.min(left,right),
+      idMap, this.numbersBooleans)
 
     return zeroForInfinite(value)
   }
@@ -259,10 +268,14 @@ export class NumericAggregationPlugin extends FunctionPlugin {
       return coerceBooleanToNumber(arg)
     } else if(typeof arg === 'number' || arg instanceof CellError) {
       return arg
+    } else if(typeof arg === 'string') {
+      return 0
     } else {
       return undefined
     }
   }
+
+  private addWithEpsilon = (left: number, right: number): number => this.interpreter.arithmeticHelper.addWithEpsilon(left, right)
 
   /**
    * Reduces procedure arguments with given reducing function
