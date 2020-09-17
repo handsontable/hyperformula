@@ -301,9 +301,23 @@ export class NumericAggregationPlugin extends FunctionPlugin {
       if (value instanceof SimpleRangeValue) {
         return (Array.from(value.valuesFromTopLeftCorner())
           .map(coercionFunction)
-          .filter((arg) => (arg !== undefined)) as number[])
-          .map(mapFunction)
-          .reduce(reducingFunction,acc)
+          .filter((arg) => (arg !== undefined)) as (CellError | number)[])
+          .map((arg) => {
+            if(arg instanceof CellError){
+              return arg
+            } else {
+              return mapFunction(arg)
+            }
+          })
+          .reduce((left,right) => {
+            if(left instanceof CellError) {
+              return left
+            } else if(right instanceof CellError) {
+              return right
+            } else {
+              return reducingFunction(left,right)
+            }
+          },acc)
       }
 
       if (arg.type === AstNodeType.CELL_REFERENCE) {
@@ -313,6 +327,10 @@ export class NumericAggregationPlugin extends FunctionPlugin {
         }
       } else {
         value = this.coerceScalarToNumberOrError(value)
+        value = coercionFunction(value)
+        if (value === undefined) {
+          return acc
+        }
       }
       if(value instanceof CellError) {
         return value

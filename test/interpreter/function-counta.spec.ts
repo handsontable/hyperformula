@@ -38,7 +38,7 @@ describe('COUNTA', () => {
     expect(engine.getCellValue(adr('A3'))).toEqual(4)
   })
 
-  it('error ranges doesnt count', () => {
+  it('error in ranges', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '2'],
       ['3', '4'],

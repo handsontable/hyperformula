@@ -73,3 +73,12 @@ describe('AVERAGE function', () => {
     expect(engine.getCellValue(adr('A1'))).toEqual(2)
   })
 })
+
+describe('COUNT function', () => {
+  it('should work with explicit error in arg', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=COUNT(NA())'],
+    ])
+    expect(engine.getCellValue(adr('A1'))).toEqual(0)
+  })
+})

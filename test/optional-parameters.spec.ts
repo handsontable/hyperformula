@@ -61,7 +61,7 @@ describe('Nonexistent metadata', () => {
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqual(1901)
-    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NUM, ErrorMessage.EmptyArg )) //TODO when SUM() is fixed, it should evaluate to 1
+    expect(engine.getCellValue(adr('A2'))).toEqual(1)
     expect(engine.getCellValue(adr('A3'))).toEqual('abcd')
   })
 

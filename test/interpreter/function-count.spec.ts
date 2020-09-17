@@ -1,5 +1,4 @@
-import {HyperFormula} from '../../src'
-import {ErrorType} from '../../src/Cell'
+import {ErrorType, HyperFormula} from '../../src'
 import {ErrorMessage} from '../../src/error-message'
 import {adr, detailedError} from '../testUtils'
 
@@ -38,7 +37,7 @@ describe('COUNT', () => {
     expect(engine.getCellValue(adr('A3'))).toEqual(4)
   })
 
-  it('error ranges doesnt count', () => {
+  it('error in ranges', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '2'],
       ['3', '4'],

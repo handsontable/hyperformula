@@ -43,12 +43,13 @@ describe('AVERAGEA', () => {
 
   it('error when no meaningful arguments', () => {
     const engine = HyperFormula.buildFromArray([
-      ['foo'],
-      [null],
-      ['=AVERAGEA(A1:A2)']
+      [null, 'foo'],
+      [null, null],
+      ['=AVERAGEA(A1:A2)', '=AVERAGEA(B1:B2)']
     ])
 
     expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.DIV_BY_ZERO))
+    expect(engine.getCellValue(adr('B3'))).toEqual(0)
   })
 
   it('over a range value', () => {
