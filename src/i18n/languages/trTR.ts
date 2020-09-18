@@ -148,6 +148,7 @@ const dictionary: RawTranslationPackage = {
     OR: 'VEYA',
     PI: 'Pİ',
     PMT: 'DEVRESEL_ÖDEME',
+    SUBSTITUTE: 'YERİNEKOY',
     POWER: 'KUVVET',
     PPMT: 'ANA_PARA_ÖDEMESİ',
     PROPER: 'YAZIM.DÜZENİ',

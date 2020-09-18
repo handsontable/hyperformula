@@ -148,6 +148,7 @@ const dictionary: RawTranslationPackage = {
     OR: 'LUB',
     PI: 'PI',
     PMT: 'PMT',
+    SUBSTITUTE: 'PODSTAW',
     POWER: 'POTĘGA',
     PPMT: 'PPMT',
     PROPER: 'Z.WIELKIEJ.LITERY',

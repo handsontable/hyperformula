@@ -148,6 +148,7 @@ const dictionary: RawTranslationPackage = {
     OR: 'ELLER',
     PI: 'PI',
     PMT: 'AVDRAG',
+    SUBSTITUTE: 'BYTT.UT',
     POWER: 'OPPHØYD.I',
     PPMT: 'AMORT',
     PROPER: 'STOR.FORBOKSTAV',

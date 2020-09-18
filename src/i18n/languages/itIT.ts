@@ -148,6 +148,7 @@ const dictionary: RawTranslationPackage = {
     OR: 'O',
     PI: 'PI.GRECO',
     PMT: 'RATA',
+    SUBSTITUTE: 'SOSTITUISCI',
     POWER: 'POTENZA',
     PPMT: 'P.RATA',
     PROPER: 'MAIUSC.INIZ',

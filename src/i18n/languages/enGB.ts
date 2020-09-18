@@ -148,6 +148,7 @@ const dictionary: RawTranslationPackage = {
     OR: 'OR',
     PI: 'PI',
     PMT: 'PMT',
+    SUBSTITUTE: 'SUBSTITUTE',
     POWER: 'POWER',
     PPMT: 'PPMT',
     PROPER: 'PROPER',

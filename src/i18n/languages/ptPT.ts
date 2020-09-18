@@ -148,6 +148,7 @@ const dictionary: RawTranslationPackage = {
     OR: 'OU',
     PI: 'PI',
     PMT: 'PGTO',
+    SUBSTITUTE: 'SUBSTITUIR',
     POWER: 'POTÊNCIA',
     PPMT: 'PPGTO',
     PROPER: 'PRI.MAIÚSCULA',

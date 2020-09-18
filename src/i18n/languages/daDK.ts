@@ -148,6 +148,7 @@ const dictionary: RawTranslationPackage = {
     OR: 'ELLER',
     PI: 'PI',
     PMT: 'YDELSE',
+    SUBSTITUTE: 'UDSKIFT',
     POWER: 'POTENS',
     PPMT: 'H.YDELSE',
     PROPER: 'STORT.FORBOGSTAV',

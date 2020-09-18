@@ -108,6 +108,15 @@ export class TextPlugin extends FunctionPlugin {
         {argumentType: ArgumentTypes.NUMBER, defaultValue: 1},
       ]
     },
+    'SUBSTITUTE': {
+      method: 'substitute',
+      parameters: [
+        {argumentType: ArgumentTypes.STRING},
+        {argumentType: ArgumentTypes.STRING},
+        {argumentType: ArgumentTypes.STRING},
+        {argumentType: ArgumentTypes.NUMBER, optionalArg: true}
+      ]
+    },
     'FIND': {
       method: 'find',
       parameters: [
@@ -253,6 +262,30 @@ export class TextPlugin extends FunctionPlugin {
 
       index = index + startIndex
       return index > 0 ? index : new CellError(ErrorType.VALUE, ErrorMessage.PatternNotFound)
+    })
+  }
+
+  public substitute(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('SUBSTITUTE'), (text: string, oldText: string, newText: string, occurrence: number | undefined) => {
+      const oldTextRegexp = new RegExp(oldText, 'g')
+
+      if (occurrence === undefined) {
+        return text.replace(oldTextRegexp, newText)
+      }
+
+      if (occurrence < 1) {
+        return new CellError(ErrorType.VALUE, ErrorMessage.LessThanOne)
+      }
+
+      let substr: RegExpExecArray | null
+      let i = 0
+      while ((substr = oldTextRegexp.exec(text)) !== null) {
+        if (occurrence === ++i) {
+          return text.slice(0, substr.index) + newText + text.slice(oldTextRegexp.lastIndex)
+        }
+      }
+
+      return text
     })
   }
 

@@ -33,7 +33,7 @@ export interface FunctionArguments {
   expandRanges?: boolean,
 }
 
-export interface FunctionMetadata extends FunctionArguments{
+export interface FunctionMetadata extends FunctionArguments {
   method: string,
   isVolatile?: boolean,
   isDependentOnSheetStructureChange?: boolean,
@@ -177,8 +177,8 @@ export abstract class FunctionPlugin {
   public coerceScalarToNumberOrError = (arg: InternalScalarValue): number | CellError => this.interpreter.arithmeticHelper.coerceScalarToNumberOrError(arg)
 
   public coerceToType(arg: InterpreterValue, coercedType: FunctionArgument): Maybe<InterpreterValue> {
-    if(arg instanceof SimpleRangeValue) {
-      if(coercedType.argumentType === ArgumentTypes.RANGE) {
+    if (arg instanceof SimpleRangeValue) {
+      if (coercedType.argumentType === ArgumentTypes.RANGE) {
         return arg
       } else {
         return undefined
@@ -189,22 +189,22 @@ export abstract class FunctionPlugin {
         case ArgumentTypes.NUMBER:
           // eslint-disable-next-line no-case-declarations
           const value = this.coerceScalarToNumberOrError(arg)
-          if(typeof value !== 'number') {
+          if (typeof value !== 'number') {
             return value
           }
-          if(coercedType.maxValue !== undefined && value > coercedType.maxValue) {
+          if (coercedType.maxValue !== undefined && value > coercedType.maxValue) {
             return new CellError(ErrorType.NUM, ErrorMessage.ValueLarge)
           }
           if (coercedType.minValue !== undefined && value < coercedType.minValue) {
             return new CellError(ErrorType.NUM, ErrorMessage.ValueSmall)
           }
-          if(coercedType.lessThan !== undefined && value >= coercedType.lessThan) {
+          if (coercedType.lessThan !== undefined && value >= coercedType.lessThan) {
             return new CellError(ErrorType.NUM, ErrorMessage.ValueLarge)
           }
           if (coercedType.greaterThan !== undefined && value <= coercedType.greaterThan) {
             return new CellError(ErrorType.NUM, ErrorMessage.ValueSmall)
           }
-          if(coercedType.argumentType === ArgumentTypes.INTEGER && !Number.isInteger(value)) {
+          if (coercedType.argumentType === ArgumentTypes.INTEGER && !Number.isInteger(value)) {
             return new CellError(ErrorType.NUM, ErrorMessage.IntegerExpected)
           }
           return value
@@ -217,7 +217,7 @@ export abstract class FunctionPlugin {
         case ArgumentTypes.NOERROR:
           return arg
         case ArgumentTypes.RANGE:
-          if(arg instanceof CellError) {
+          if (arg instanceof CellError) {
             return arg
           }
           return coerceToRange(arg)
@@ -234,7 +234,7 @@ export abstract class FunctionPlugin {
     const argumentDefinitions: FunctionArgument[] = functionDefinition.parameters!
     let scalarValues: [InterpreterValue, boolean][]
 
-    if(functionDefinition.expandRanges) {
+    if (functionDefinition.expandRanges) {
       scalarValues = this.listOfScalarValues(args, formulaAddress)
     } else {
       scalarValues = args.map((ast) => [this.evaluateAst(ast, formulaAddress), false])
@@ -243,23 +243,23 @@ export abstract class FunctionPlugin {
     const coercedArguments: Maybe<InterpreterValue>[] = []
 
     let argCoerceFailure: Maybe<CellError> = undefined
-    if(functionDefinition.repeatLastArgs === undefined && argumentDefinitions.length < scalarValues.length) {
+    if (functionDefinition.repeatLastArgs === undefined && argumentDefinitions.length < scalarValues.length) {
       return new CellError(ErrorType.NA, ErrorMessage.WrongArgNumber)
     }
-    if(functionDefinition.repeatLastArgs !== undefined && scalarValues.length > argumentDefinitions.length &&
-      (scalarValues.length-argumentDefinitions.length)%functionDefinition.repeatLastArgs !== 0) {
+    if (functionDefinition.repeatLastArgs !== undefined && scalarValues.length > argumentDefinitions.length &&
+      (scalarValues.length - argumentDefinitions.length) % functionDefinition.repeatLastArgs !== 0) {
       return new CellError(ErrorType.NA, ErrorMessage.WrongArgNumber)
     }
-    for(let i=0, j=0; i<Math.max(scalarValues.length, argumentDefinitions.length); i++, j++) {
+    for (let i = 0, j = 0; i < Math.max(scalarValues.length, argumentDefinitions.length); i++, j++) {
       // i points to where are we in the scalarValues list,
       // j points to where are we in the argumentDefinitions list
-      if(j===argumentDefinitions.length) {
+      if (j === argumentDefinitions.length) {
         j -= functionDefinition.repeatLastArgs!
       }
       const [val, ignorable] = scalarValues[i] ?? [undefined, undefined]
       const arg = val ?? argumentDefinitions[j]?.defaultValue
-      if(arg === undefined) {
-        if(argumentDefinitions[j]?.optionalArg) {
+      if (arg === undefined) {
+        if (argumentDefinitions[j]?.optionalArg) {
           coercedArguments.push(undefined)
         } else {
           //not enough values passed as arguments, and there was no default value and argument was not optional
@@ -268,7 +268,7 @@ export abstract class FunctionPlugin {
       } else {
         //we apply coerce only to non-default values
         const coercedArg = val !== undefined ? this.coerceToType(arg, argumentDefinitions[j]) : arg
-        if(coercedArg !== undefined) {
+        if (coercedArg !== undefined) {
           if (coercedArg instanceof CellError && argumentDefinitions[j].argumentType !== ArgumentTypes.SCALAR) {
             //if this is first error encountered, store it
             argCoerceFailure = argCoerceFailure ?? coercedArg

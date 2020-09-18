@@ -148,6 +148,7 @@ const dictionary: RawTranslationPackage = {
     OR: 'TAI',
     PI: 'PII',
     PMT: 'MAKSU',
+    SUBSTITUTE: 'VAIHDA',
     POWER: 'POTENSSI',
     PPMT: 'PPMT',
     PROPER: 'ERISNIMI',

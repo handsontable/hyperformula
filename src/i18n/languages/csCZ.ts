@@ -148,6 +148,7 @@ const dictionary: RawTranslationPackage = {
     OR: 'NEBO',
     PI: 'PI',
     PMT: 'PLATBA',
+    SUBSTITUTE: 'DOSADIT',
     POWER: 'POWER',
     PPMT: 'PLATBA.ZÁKLAD',
     PROPER: 'VELKÁ2',

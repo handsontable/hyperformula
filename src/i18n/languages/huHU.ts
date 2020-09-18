@@ -148,6 +148,7 @@ const dictionary: RawTranslationPackage = {
     OR: 'VAGY',
     PI: 'PI',
     PMT: 'RÉSZLET',
+    SUBSTITUTE: 'HELYETTE',
     POWER: 'HATVÁNY',
     PPMT: 'PRÉSZLET',
     PROPER: 'TNÉV',
