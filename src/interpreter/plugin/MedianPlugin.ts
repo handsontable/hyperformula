@@ -17,10 +17,10 @@ export class MedianPlugin extends FunctionPlugin {
     'MEDIAN': {
       method: 'median',
       parameters: [
-          {argumentType: ArgumentTypes.NOERROR},
-        ],
-        repeatLastArgs: 1,
-        expandRanges: true,
+        {argumentType: ArgumentTypes.NOERROR},
+      ],
+      repeatLastArgs: 1,
+      expandRanges: true,
     },
   }
 
@@ -36,7 +36,7 @@ export class MedianPlugin extends FunctionPlugin {
     return this.runFunction(ast.args, formulaAddress, this.metadata('MEDIAN'), (...args) => {
       const values: number[] = args.filter((val: InternalScalarValue) => (typeof val === 'number'))
       ast.args.forEach((arg) => { //ugly but works
-        if(arg.type === AstNodeType.EMPTY) {
+        if (arg.type === AstNodeType.EMPTY) {
           values.push(0)
         }
       })
