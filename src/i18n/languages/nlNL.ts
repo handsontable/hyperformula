@@ -202,6 +202,7 @@ const dictionary: RawTranslationPackage = {
     XOR: 'EX.OF',
     YEAR: 'JAAR',
     YEARFRAC: 'JAAR.DEEL',
+    REPLACE: 'VERVANGEN',
   },
   langCode: 'nlNL',
   ui: {

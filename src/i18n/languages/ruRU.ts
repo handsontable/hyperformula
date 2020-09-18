@@ -202,6 +202,7 @@ const dictionary: RawTranslationPackage = {
     XOR: 'ИСКЛИЛИ',
     YEAR: 'ГОД',
     YEARFRAC: 'ДОЛЯГОДА',
+    REPLACE: 'ЗАМЕНИТЬ',
   },
   langCode: 'ruRU',
   ui: {

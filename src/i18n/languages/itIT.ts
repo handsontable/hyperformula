@@ -202,6 +202,7 @@ const dictionary: RawTranslationPackage = {
     XOR: 'XOR',
     YEAR: 'ANNO',
     YEARFRAC: 'FRAZIONE.ANNO',
+    REPLACE: 'RIMPIAZZA',
   },
   langCode: 'itIT',
   ui: {

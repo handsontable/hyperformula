@@ -202,6 +202,7 @@ const dictionary: RawTranslationPackage = {
     XOR: 'XELLER',
     YEAR: 'ÅR',
     YEARFRAC: 'ÅR.BRØK',
+    REPLACE: 'ERSTAT',
   },
   langCode: 'daDK',
   ui: {

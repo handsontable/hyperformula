@@ -202,6 +202,7 @@ const dictionary: RawTranslationPackage = {
     XOR: 'XODER',
     YEAR: 'JAHR',
     YEARFRAC: 'BRTEILJAHRE',
+    REPLACE: 'ERSETZEN',
   },
   langCode: 'deDE',
   ui: {

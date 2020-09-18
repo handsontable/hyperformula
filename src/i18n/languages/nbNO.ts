@@ -202,6 +202,7 @@ const dictionary: RawTranslationPackage = {
     XOR: 'EKSKLUSIVELLER',
     YEAR: 'ÅR',
     YEARFRAC: 'ÅRDEL',
+    REPLACE: 'ERSTATT',
   },
   langCode: 'nbNO',
   ui: {

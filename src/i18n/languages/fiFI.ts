@@ -202,6 +202,7 @@ const dictionary: RawTranslationPackage = {
     XOR: 'EHDOTON.TAI',
     YEAR: 'VUOSI',
     YEARFRAC: 'VUOSI.OSA',
+    REPLACE: 'KORVAA',
   },
   langCode: 'fiFI',
   ui: {

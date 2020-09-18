@@ -202,6 +202,7 @@ const dictionary: RawTranslationPackage = {
     XOR: 'XVAGY',
     YEAR: 'ÉV',
     YEARFRAC: 'TÖRTÉV',
+    REPLACE: 'CSERE',
   },
   langCode: 'huHU',
   ui: {

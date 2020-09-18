@@ -202,6 +202,7 @@ const dictionary: RawTranslationPackage = {
     XOR: 'OUEXCL',
     YEAR: 'ANO',
     YEARFRAC: 'FRAÇÃOANO',
+    REPLACE: 'MUDAR',
   },
   langCode: 'ptPT',
   ui: {

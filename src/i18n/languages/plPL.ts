@@ -202,6 +202,7 @@ const dictionary: RawTranslationPackage = {
     XOR: 'XOR',
     YEAR: 'ROK',
     YEARFRAC: 'CZĘŚĆ.ROKU',
+    REPLACE: 'ZASTĄP',
   },
   langCode: 'plPL',
   ui: {

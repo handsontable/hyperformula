@@ -202,6 +202,7 @@ const dictionary: RawTranslationPackage = {
     XOR: 'OUX',
     YEAR: 'ANNEE',
     YEARFRAC: 'FRACTION.ANNEE',
+    REPLACE: 'REMPLACER',
   },
   langCode: 'frFR',
   ui: {
