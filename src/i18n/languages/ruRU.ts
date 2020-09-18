@@ -195,6 +195,7 @@ const dictionary: RawTranslationPackage = {
     TRIM: 'СЖПРОБЕЛЫ',
     TRUE: 'ИСТИНА',
     TRUNC: 'ОТБР',
+    UNICHAR: 'ЮНИСИМВ',
     UNICODE: 'UNICODE',
     UPPER: 'ПРОПИСН',
     VLOOKUP: 'ВПР',

@@ -195,6 +195,7 @@ const dictionary: RawTranslationPackage = {
     TRIM: 'KIMETSZ',
     TRUE: 'IGAZ',
     TRUNC: 'CSONK',
+    UNICHAR: 'UNIKARAKTER',
     UNICODE: 'UNICODE',
     UPPER: 'NAGYBETŰS',
     VLOOKUP: 'FKERES',

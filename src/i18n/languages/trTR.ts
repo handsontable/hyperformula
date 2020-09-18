@@ -195,6 +195,7 @@ const dictionary: RawTranslationPackage = {
     TRIM: 'KIRP',
     TRUE: 'DOĞRU',
     TRUNC: 'NSAT',
+    UNICHAR: 'UNICODEKARAKTERİ',
     UNICODE: 'UNICODE',
     UPPER: 'BÜYÜKHARF',
     VLOOKUP: 'DÜŞEYARA',

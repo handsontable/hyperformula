@@ -195,6 +195,7 @@ const dictionary: RawTranslationPackage = {
     TRIM: 'ANNULLA.SPAZI',
     TRUE: 'VERO',
     TRUNC: 'TRONCA',
+    UNICHAR: 'CARATT.UNI',
     UNICODE: 'UNICODE',
     UPPER: 'MAIUSC',
     VLOOKUP: 'CERCA.VERT',

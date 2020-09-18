@@ -64,4 +64,20 @@ describe('Function UNICODE', () => {
 
         expect(engine.getCellValueType(adr('A1'))).toEqual(CellValueType.NUMBER)
     })
+
+    it('should be identity when composed with UNICHAR', () => {
+        const engine = HyperFormula.buildFromArray([
+            ['=UNICODE(UNICHAR(1))'],
+            ['=UNICODE(UNICHAR(128))'],
+            ['=UNICODE(UNICHAR(256))'],
+            ['=UNICODE(UNICHAR(8364))'],
+            ['=UNICODE(UNICHAR(1114111))']
+        ])
+
+        expect(engine.getCellValue(adr('A1'))).toEqual(1)
+        expect(engine.getCellValue(adr('A2'))).toEqual(128)
+        expect(engine.getCellValue(adr('A3'))).toEqual(256)
+        expect(engine.getCellValue(adr('A4'))).toEqual(8364)
+        expect(engine.getCellValue(adr('A5'))).toEqual(1114111)
+    })
 })

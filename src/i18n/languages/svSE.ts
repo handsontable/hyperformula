@@ -195,6 +195,7 @@ const dictionary: RawTranslationPackage = {
     TRIM: 'RENSA',
     TRUE: 'SANT',
     TRUNC: 'AVKORTA',
+    UNICHAR: 'UNICHAR',
     UNICODE: 'UNICODE',
     UPPER: 'VERSALER',
     VLOOKUP: 'LETARAD',
