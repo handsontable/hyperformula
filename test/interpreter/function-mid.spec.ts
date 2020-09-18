@@ -70,4 +70,12 @@ describe('Function MID', () => {
     expect(engine.getCellValue(adr('A1'))).toEqual('RU')
     expect(engine.getCellValue(adr('A2'))).toEqual('0')
   })
+
+  it('should return error for range', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=MID(B1:B2, 1, 2)'],
+    ])
+
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessage.WrongType))
+  })
 })

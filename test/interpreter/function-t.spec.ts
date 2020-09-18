@@ -44,4 +44,12 @@ describe('Function T', () => {
     expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.DIV_BY_ZERO))
     expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NAME, ErrorMessage.FunctionName('FOO')))
   })
+
+  it('should return error for range', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=T(B1:B2)'],
+    ])
+
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessage.WrongType))
+  })
 })

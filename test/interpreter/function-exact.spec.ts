@@ -48,4 +48,14 @@ describe('Function EXACT', () => {
     expect(engine.getCellValue(adr('A3'))).toBe(true)
     expect(engine.getCellValue(adr('A4'))).toBe(true)
   })
+
+  it('should return error for range', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=EXACT("foo",B1:B2)'],
+      ['=EXACT(B1:B2,"foo")'],
+    ])
+
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessage.WrongType))
+    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessage.WrongType))
+  })
 })

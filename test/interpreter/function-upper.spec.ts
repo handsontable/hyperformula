@@ -38,4 +38,12 @@ describe('Function UPPER', () => {
     expect(engine.getCellValue(adr('A1'))).toEqual('TRUE')
     expect(engine.getCellValue(adr('A2'))).toEqual('0')
   })
+
+  it('should return error for range', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=UPPER(B1:B2)'],
+    ])
+
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessage.WrongType))
+  })
 })
