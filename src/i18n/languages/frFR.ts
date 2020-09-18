@@ -195,6 +195,7 @@ const dictionary: RawTranslationPackage = {
     TRIM: 'SUPPRESPACE',
     TRUE: 'VRAI',
     TRUNC: 'TRONQUE',
+    UNICODE: 'UNICODE',
     UPPER: 'MAJUSCULE',
     VLOOKUP: 'RECHERCHEV',
     WEEKDAY: 'JOURSEM',

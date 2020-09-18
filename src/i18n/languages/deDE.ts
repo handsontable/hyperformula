@@ -195,6 +195,7 @@ const dictionary: RawTranslationPackage = {
     TRIM: 'GLÄTTEN',
     TRUE: 'WAHR',
     TRUNC: 'KÜRZEN',
+    UNICODE: 'UNICODE',
     UPPER: 'GROSS',
     VLOOKUP: 'SVERWEIS',
     WEEKDAY: 'WOCHENTAG',

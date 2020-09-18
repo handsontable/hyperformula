@@ -195,6 +195,7 @@ const dictionary: RawTranslationPackage = {
     TRIM: 'SPATIES.WISSEN',
     TRUE: 'WAAR',
     TRUNC: 'GEHEEL',
+    UNICODE: 'UNICODE',
     UPPER: 'HOOFDLETTERS',
     VLOOKUP: 'VERT.ZOEKEN',
     WEEKDAY: 'WEEKDAG',
