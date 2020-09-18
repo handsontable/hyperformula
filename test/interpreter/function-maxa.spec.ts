@@ -38,7 +38,7 @@ describe('MAXA', () => {
 
   it('MAXA of strings and -1',  () => {
     const engine =  HyperFormula.buildFromArray([['foo'], ['bar'], ['-1'], ['=MAXA(A1:A3)']])
-    expect(engine.getCellValue(adr('A4'))).toEqual(-1)
+    expect(engine.getCellValue(adr('A4'))).toEqual(0)
   })
 
   it('MAXA of empty value',  () => {
@@ -47,8 +47,12 @@ describe('MAXA', () => {
   })
 
   it('MAXA of empty value and some negative number',  () => {
-    const engine =  HyperFormula.buildFromArray([['', '-1', '=MAXA(A1,B1)']])
-    expect(engine.getCellValue(adr('C1'))).toEqual(-1)
+    const engine =  HyperFormula.buildFromArray([
+      ['', '-1', '=MAXA(A1,B1)'],
+      [null, '-1', '=MAXA(A2,B2)'],
+    ])
+    expect(engine.getCellValue(adr('C1'))).toEqual(0)
+    expect(engine.getCellValue(adr('C2'))).toEqual(-1)
   })
 
   it('over a range value', () => {
