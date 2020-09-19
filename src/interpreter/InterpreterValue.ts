@@ -164,13 +164,12 @@ export class OnlyRangeData {
 export type RangeData = ArrayData | OnlyRangeData
 
 export class SimpleRangeValue {
-
   public get size(): MatrixSize {
     return this.data.size
   }
 
-  public static onlyNumbersDataWithRange(data: number[][], size: MatrixSize, _range: AbsoluteCellRange): SimpleRangeValue {
-    return new SimpleRangeValue(new ArrayData(size, data, true))
+  public static onlyNumbersDataWithRange(data: number[][], size: MatrixSize, range: AbsoluteCellRange): SimpleRangeValue {
+    return new SimpleRangeValue(new ArrayData(size, data, true), range)
   }
 
   public static onlyNumbersDataWithoutRange(data: number[][], size: MatrixSize): SimpleRangeValue {
@@ -185,8 +184,10 @@ export class SimpleRangeValue {
     const hasOnlyNumbers = (typeof scalar === 'number')
     return new SimpleRangeValue(new ArrayData({ width: 1, height: 1 }, [[scalar]], hasOnlyNumbers))
   }
+
   constructor(
     public readonly data: RangeData,
+    private readonly _range?: AbsoluteCellRange
   ) {
   }
 
@@ -223,7 +224,7 @@ export class SimpleRangeValue {
   }
 
   public range(): Maybe<AbsoluteCellRange> {
-    return this.data.range()
+    return this._range ?? this.data.range()
   }
 
   public sameDimensionsAs(other: SimpleRangeValue): boolean {
