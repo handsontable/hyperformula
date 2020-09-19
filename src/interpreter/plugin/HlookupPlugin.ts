@@ -23,7 +23,7 @@ export class HlookupPlugin extends FunctionPlugin {
     'HLOOKUP': {
       method: 'hlookup',
       parameters: [
-        {argumentType: ArgumentTypes.SCALAR},
+        {argumentType: ArgumentTypes.NOERROR},
         {argumentType: ArgumentTypes.RANGE},
         {argumentType: ArgumentTypes.NUMBER},
         {argumentType: ArgumentTypes.BOOLEAN, defaultValue: true},

@@ -60,6 +60,16 @@ describe('Function HLOOKUP', () => {
 
       expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.REF, ErrorMessage.IndexLarge))
     })
+
+    it('should propagate errors properly', () => {
+      const engine = HyperFormula.buildFromArray([
+        ['=HLOOKUP(1/0, B1:B1, 1)'],
+        ['=HLOOKUP(1, B1:B1, 1/0)'],
+      ])
+
+      expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.DIV_BY_ZERO))
+      expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.DIV_BY_ZERO))
+    })
   })
 
   describe('HLOOKUP', () => {

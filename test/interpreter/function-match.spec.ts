@@ -17,7 +17,7 @@ describe('Function MATCH', () => {
 
   it('validates that 1st argument is number, string or boolean', () => {
     const engine = HyperFormula.buildFromArray([
-      ['=MATCH(1/0, B1:B1)'],
+      ['=MATCH(C1:C2, B1:B1)'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessage.WrongType))
@@ -33,10 +33,20 @@ describe('Function MATCH', () => {
 
   it('validates that 3rd argument is number', () => {
     const engine = HyperFormula.buildFromArray([
-      ['=MATCH(0, B1:B1, 1/0)'],
+      ['=MATCH(0, B1:B1, "a")'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessage.WrongType))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessage.NumberCoercion))
+  })
+
+  it('should propagate errors properly', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=MATCH(1/0, B1:B1)'],
+      ['=MATCH(1, B1:B1, 1/0)'],
+    ])
+
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.DIV_BY_ZERO))
+    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.DIV_BY_ZERO))
   })
 
   it('column - works when value is in first cell', () => {

@@ -22,7 +22,7 @@ export class VlookupPlugin extends FunctionPlugin {
     'VLOOKUP': {
       method: 'vlookup',
       parameters: [
-        {argumentType: ArgumentTypes.SCALAR},
+        {argumentType: ArgumentTypes.NOERROR},
         {argumentType: ArgumentTypes.RANGE},
         {argumentType: ArgumentTypes.NUMBER},
         {argumentType: ArgumentTypes.BOOLEAN, defaultValue: true},
@@ -30,6 +30,11 @@ export class VlookupPlugin extends FunctionPlugin {
     },
     'MATCH': {
       method: 'match',
+      parameters: [
+        {argumentType: ArgumentTypes.NOERROR},
+        {argumentType: ArgumentTypes.RANGE},
+        {argumentType: ArgumentTypes.NUMBER, defaultValue: 1},
+      ]
     },
   }
 
@@ -40,8 +45,9 @@ export class VlookupPlugin extends FunctionPlugin {
    * @param formulaAddress
    */
   public vlookup(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('VLOOKUP'), (key: InterpreterValue, rangeValue: SimpleRangeValue, index: number, sorted: boolean) => {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('VLOOKUP'), (key: InternalScalarValue, rangeValue: SimpleRangeValue, index: number, sorted: boolean) => {
       const range = rangeValue.range()
+
       if (range === undefined) {
         return new CellError(ErrorType.VALUE, ErrorMessage.WrongType)
       }
@@ -54,57 +60,14 @@ export class VlookupPlugin extends FunctionPlugin {
   }
 
   public match(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    if (ast.args.length < 2 || ast.args.length > 3) {
-      return new CellError(ErrorType.NA, ErrorMessage.WrongArgNumber)
-    }
-
-    const key = this.evaluateAst(ast.args[0], formulaAddress)
-    if (typeof key !== 'string' && typeof key !== 'number' && typeof key !== 'boolean') {
-      return new CellError(ErrorType.VALUE, ErrorMessage.WrongType)
-    }
-
-    const rangeArg = ast.args[1]
-    if (rangeArg.type !== AstNodeType.CELL_RANGE) {
-      return new CellError(ErrorType.VALUE, ErrorMessage.WrongType)
-    }
-
-    let sorted: InterpreterValue = 1
-    if (ast.args.length === 3) {
-      sorted = this.evaluateAst(ast.args[2], formulaAddress)
-      if (typeof sorted !== 'number') {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('MATCH'), (key: InternalScalarValue, rangeValue: SimpleRangeValue, sorted: number) => {
+      const range = rangeValue.range()
+      if (range === undefined) {
         return new CellError(ErrorType.VALUE, ErrorMessage.WrongType)
       }
-    }
 
-    const searchedRange = AbsoluteCellRange.fromCellRange(rangeArg, formulaAddress)
-
-    if (searchedRange.width() === 1) {
-      const rowIndex = this.columnSearch.find(key, searchedRange, sorted !== 0)
-
-      if (rowIndex === -1) {
-        return new CellError(ErrorType.NA, ErrorMessage.ValueNotFound)
-      }
-
-      return rowIndex - searchedRange.start.row + 1
-    } else {
-      const columnIndex = this.searchInRange(key, searchedRange, false)
-      if (columnIndex === -1) {
-        return new CellError(ErrorType.NA, ErrorMessage.ValueNotFound)
-      }
-
-      return (columnIndex-searchedRange.start.row) + 1
-    }
-  }
-
-  private searchInRange(key: any, range: AbsoluteCellRange, sorted: boolean): number {
-    if(!sorted && typeof key === 'string' && this.interpreter.arithmeticHelper.requiresRegex(key)) {
-      return this.columnSearch.advancedFind(
-        this.interpreter.arithmeticHelper.eqMatcherFunction(key),
-        range
-      )
-    } else {
-      return this.columnSearch.find(key, range, sorted)
-    }
+      return this.doMatch(key, range, sorted)
+    })
   }
 
   private doVlookup(key: any, range: AbsoluteCellRange, index: number, sorted: boolean): InternalScalarValue {
@@ -126,5 +89,35 @@ export class VlookupPlugin extends FunctionPlugin {
       return new CellError(ErrorType.VALUE, ErrorMessage.WrongType)
     }
     return value
+  }
+
+  private doMatch(key: any, range: AbsoluteCellRange, sorted: number): InternalScalarValue {
+    if (range.width() === 1) {
+      const rowIndex = this.columnSearch.find(key, range, sorted !== 0)
+
+      if (rowIndex === -1) {
+        return new CellError(ErrorType.NA, ErrorMessage.ValueNotFound)
+      }
+
+      return rowIndex - range.start.row + 1
+    } else {
+      const columnIndex = this.searchInRange(key, range, false)
+      if (columnIndex === -1) {
+        return new CellError(ErrorType.NA, ErrorMessage.ValueNotFound)
+      }
+
+      return (columnIndex - range.start.row) + 1
+    }
+  }
+
+  private searchInRange(key: any, range: AbsoluteCellRange, sorted: boolean): number {
+    if (!sorted && typeof key === 'string' && this.interpreter.arithmeticHelper.requiresRegex(key)) {
+      return this.columnSearch.advancedFind(
+        this.interpreter.arithmeticHelper.eqMatcherFunction(key),
+        range
+      )
+    } else {
+      return this.columnSearch.find(key, range, sorted)
+    }
   }
 }
