@@ -42,7 +42,7 @@ describe('Function HLOOKUP', () => {
         ['=HLOOKUP(1, A2:B3, "foo", TRUE())'],
       ])
 
-      expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessage.WrongType))
+      expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessage.NumberCoercion))
     })
 
     it('wrong type of fourth argument', () => {
