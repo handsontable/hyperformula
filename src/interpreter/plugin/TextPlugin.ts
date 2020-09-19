@@ -196,7 +196,7 @@ export class TextPlugin extends FunctionPlugin {
 
   public proper(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.runFunction(ast.args, formulaAddress, this.metadata('PROPER'), (arg: string) => {
-      return arg.replace(/\w\S*/g, word => word.charAt(0).toUpperCase() + word.substr(1).toLowerCase())
+      return arg.replace(/\w\S*/g, word => word.charAt(0).toUpperCase() + word.substring(1).toLowerCase())
     })
   }
 
@@ -250,7 +250,7 @@ export class TextPlugin extends FunctionPlugin {
       if (numberOfChars < 0) {
         return new CellError(ErrorType.VALUE, ErrorMessage.Negative)
       }
-      return text.substr(startPosition - 1, numberOfChars)
+      return text.substring(startPosition - 1, startPosition + numberOfChars - 1)
     })
   }
 
@@ -262,7 +262,7 @@ export class TextPlugin extends FunctionPlugin {
       if (numberOfChars < 0) {
         return new CellError(ErrorType.VALUE, ErrorMessage.NegativeLength)
       }
-      return text.substr(0, startPosition - 1) + newText + text.substr(startPosition + numberOfChars - 1, text.length)
+      return text.substring(0, startPosition - 1) + newText + text.substring(startPosition + numberOfChars - 1)
     })
   }
 
@@ -272,7 +272,7 @@ export class TextPlugin extends FunctionPlugin {
         return new CellError(ErrorType.VALUE, ErrorMessage.LengthBounds)
       }
 
-      const normalizedText = text.substr(startIndex - 1).toLowerCase()
+      const normalizedText = text.substring(startIndex - 1).toLowerCase()
 
       let index: number
       if (this.interpreter.arithmeticHelper.requiresRegex(pattern)) {
@@ -298,11 +298,11 @@ export class TextPlugin extends FunctionPlugin {
         return new CellError(ErrorType.VALUE, ErrorMessage.LessThanOne)
       }
 
-      let substr: RegExpExecArray | null
+      let match: RegExpExecArray | null
       let i = 0
-      while ((substr = oldTextRegexp.exec(text)) !== null) {
+      while ((match = oldTextRegexp.exec(text)) !== null) {
         if (occurrence === ++i) {
-          return text.slice(0, substr.index) + newText + text.slice(oldTextRegexp.lastIndex)
+          return text.substring(0, match.index) + newText + text.substring(oldTextRegexp.lastIndex)
         }
       }
 
@@ -316,7 +316,7 @@ export class TextPlugin extends FunctionPlugin {
         return new CellError(ErrorType.VALUE, ErrorMessage.IndexBounds)
       }
 
-      const shiftedText = text.substr(startIndex - 1)
+      const shiftedText = text.substring(startIndex - 1)
       const index = shiftedText.indexOf(pattern) + startIndex
 
       return index > 0 ? index : new CellError(ErrorType.VALUE, ErrorMessage.PatternNotFound)
