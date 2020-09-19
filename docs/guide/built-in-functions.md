@@ -62,26 +62,26 @@ lets you design your own [custom functions](custom-functions).
 | Function ID | Category | Description | Syntax |
 | :--- | :--- | :--- | :--- |
 | DATE | Date and time | Calculates a date specified by year, month, day, and displays it in the cell's formatting. | DATE(Year; Month; Day) |
-| DATEDIF | Date and time | Calculates distance between two dates, in provided unit parameter. | DATEDIF(Date1; Date2; Units) |
-| DATEVALUE | Date and time | Interprets string as date. | DATEVALUE(Datestring) |
+| DATEDIF <Badge text="v0.2.0"/>| Date and time | Calculates distance between two dates, in provided unit parameter. | DATEDIF(Date1; Date2; Units) |
+| DATEVALUE <Badge text="v0.2.0"/>| Date and time | Interprets string as date. | DATEVALUE(Datestring) |
 | DAY | Date and time | Returns the day of the given date value. | DAY(Number) |
 | DAYS | Date and time | Calculates the difference between two date values. | DAYS(Date2; Date1) |
-| DAYS360 | Date and time | Calculates the difference between two date values in days, in 360-day basis. | DAYS360(Date2; Date1[; Format]) |
-| EDATE | Date and time | Shifts the given startdate by given number of months. | EDATE(Startdate; Months) |
+| DAYS360 <Badge text="v0.2.0"/>| Date and time | Calculates the difference between two date values in days, in 360-day basis. | DAYS360(Date2; Date1[; Format]) |
+| EDATE <Badge text="v0.2.0"/>| Date and time | Shifts the given startdate by given number of months. | EDATE(Startdate; Months) |
 | EOMONTH | Date and time | Returns the date of the last day of a month which falls months away from the start date. | EOMONTH(Startdate; Months) |
-| HOUR | Date and time | Returns hour component of given time. | HOUR(Time) |
-| ISOWEEKNUM | Date and time |   Returns an ISO week number that corresponds to the week of year. | ISOWEEKNUM(Date) |
-| MINUTE | Date and time | Returns minute component of given time. | MINUTE(Time) |
+| HOUR <Badge text="v0.2.0"/>| Date and time | Returns hour component of given time. | HOUR(Time) |
+| ISOWEEKNUM <Badge text="v0.2.0"/>| Date and time |   Returns an ISO week number that corresponds to the week of year. | ISOWEEKNUM(Date) |
+| MINUTE <Badge text="v0.2.0"/>| Date and time | Returns minute component of given time. | MINUTE(Time) |
 | MONTH | Date and time | Returns the month for the given date value. | MONTH(Number) |
-| NOW | Date and time | Returns current date + time. | NOW() |
-| SECOND | Date and time | Returns second component of given time. | SECOND(Time) |
-| TIME | Date and time | Calculates time from given hour, minute and second. | TIME(Hour; Minute; Second) |
-| TIMEVALUE | Date and time | Interprets string as time. | TIMEVALUE(Timestring) |
-| TODAY | Date and time | Returns current date. | TODAY() |
-| WEEKDAY | Date and time |  Computes a number between 1-7 representing the day of week. | WEEKDAY(Date; Type) |
-| WEEKNUM | Date and time |   Returns a week number that corresponds to the week of year. | WEEKNUM(Date; Type) |
+| NOW <Badge text="v0.2.0"/>| Date and time | Returns current date + time. | NOW() |
+| SECOND <Badge text="v0.2.0"/>| Date and time | Returns second component of given time. | SECOND(Time) |
+| TIME <Badge text="v0.2.0"/>| Date and time | Calculates time from given hour, minute and second. | TIME(Hour; Minute; Second) |
+| TIMEVALUE <Badge text="v0.2.0"/>| Date and time | Interprets string as time. | TIMEVALUE(Timestring) |
+| TODAY <Badge text="v0.2.0"/>| Date and time | Returns current date. | TODAY() |
+| WEEKDAY <Badge text="v0.2.0"/>| Date and time |  Computes a number between 1-7 representing the day of week. | WEEKDAY(Date; Type) |
+| WEEKNUM <Badge text="v0.2.0"/>| Date and time |   Returns a week number that corresponds to the week of year. | WEEKNUM(Date; Type) |
 | YEAR | Date and time | Returns the year as a number according to the internal calculation rules. | YEAR(Number) |
-| YEARFRAC | Date and time | Computes the difference between two date values, in fraction of years. |  YEARFRAC(Date2; Date1[; Format]) |
+| YEARFRAC <Badge text="v0.2.0"/>| Date and time | Computes the difference between two date values, in fraction of years. |  YEARFRAC(Date2; Date1[; Format]) |
 | BIN2DEC | Engineering | The result is the decimal number for the binary number entered. | BIN2DEC(Number) |
 | BIN2HEX | Engineering | The result is the hexadecimal number for the binary number entered. | BIN2HEX(Number; Places) |
 | BIN2OCT | Engineering | The result is the octal number for the binary number entered. | BIN2OCT(Number; Places) |
@@ -96,50 +96,50 @@ lets you design your own [custom functions](custom-functions).
 | DELTA | Engineering | Returns TRUE (1) if both numbers are equal, otherwise returns FALSE (0). | DELTA(Number_1; Number_2) |
 | ERF | Engineering | Returns values of the Gaussian error integral. | ERF(Lower_Limit; Upper_Limit) |
 | ERFC | Engineering | Returns complementary values of the Gaussian error integral between x and infinity. | ERFC(Lower_Limit) |
-| HEX2BIN | Engineering | The result is the binary number for the hexadecimal number entered. | HEX2BIN(Number; Places) |
-| HEX2DEC | Engineering | The result is the decimal number for the hexadecimal number entered. | HEX2DEC(Number) |
-| HEX2OCT | Engineering | The result is the octal number for the hexadecimal number entered. | HEX2OCT(Number; Places) |
-| OCT2BIN | Engineering | The result is the binary number for the octal number entered. | OCT2BIN(Number; Places) |
-| OCT2DEC | Engineering | The result is the decimal number for the octal number entered. | OCT2DEC(Number) |
-| OCT2HEX | Engineering | The result is the hexadecimal number for the octal number entered. | OCT2HEX(Number; Places) |
-| ISBINARY | Information | Returns TRUE if provided value is a valid binary number. | ISBINARY(Value) |
+| HEX2BIN <Badge text="v0.2.0"/>| Engineering | The result is the binary number for the hexadecimal number entered. | HEX2BIN(Number; Places) |
+| HEX2DEC <Badge text="v0.2.0"/>| Engineering | The result is the decimal number for the hexadecimal number entered. | HEX2DEC(Number) |
+| HEX2OCT <Badge text="v0.2.0"/>| Engineering | The result is the octal number for the hexadecimal number entered. | HEX2OCT(Number; Places) |
+| OCT2BIN <Badge text="v0.2.0"/>| Engineering | The result is the binary number for the octal number entered. | OCT2BIN(Number; Places) |
+| OCT2DEC <Badge text="v0.2.0"/>| Engineering | The result is the decimal number for the octal number entered. | OCT2DEC(Number) |
+| OCT2HEX <Badge text="v0.2.0"/>| Engineering | The result is the hexadecimal number for the octal number entered. | OCT2HEX(Number; Places) |
+| ISBINARY <Badge text="v0.2.0"/>| Information | Returns TRUE if provided value is a valid binary number. | ISBINARY(Value) |
 | ISBLANK | Information | Returns TRUE if the reference to a cell is blank. | ISBLANK(Value) |
-| ISERR | Information | Returns TRUE if the value is error value except #N/A!. | ISERR(Value) |
+| ISERR <Badge text="v0.2.0"/>| Information | Returns TRUE if the value is error value except #N/A!. | ISERR(Value) |
 | ISERROR | Information | Returns TRUE if the value is general error value. | ISERROR(Value) |
 | ISEVEN | Information | Returns TRUE if the value is an even integer, or FALSE if the value is odd. | ISEVEN(Value) |
-| ISFORMULA | Information | Checks whether referenced cell is a formula. | ISFORMULA(Value) |
+| ISFORMULA <Badge text="v0.2.0"/>| Information | Checks whether referenced cell is a formula. | ISFORMULA(Value) |
 | ISLOGICAL | Information | Tests for a logical value (TRUE or FALSE). | ISLOGICAL(Value) |
-| ISNA | Information | Returns TRUE if the value is #N/A! error. | ISNA(Value) |
+| ISNA <Badge text="v0.2.0"/>| Information | Returns TRUE if the value is #N/A! error. | ISNA(Value) |
 | ISNONTEXT | Information | Tests if the cell contents are text or numbers, and returns FALSE if the contents are text. | ISNONTEXT(Value) |
 | ISNUMBER | Information | Returns TRUE if the value refers to a number. | ISNUMBER(Value) |
 | ISODD | Information | Returns TRUE if the value is odd, or FALSE if the number is even. | ISODD(Value) |
-| ISREF | Information | Returns TRUE if provided value is #REF! error. | ISREF(Value) |
+| ISREF <Badge text="v0.2.0"/>| Information | Returns TRUE if provided value is #REF! error. | ISREF(Value) |
 | ISTEXT | Information | Returns TRUE if the cell contents refer to text. | ISTEXT(Value) |
-| SHEET | Information | Returns sheet number of a given value or a formula sheet number if no argument is provided. | SHEET([Value]) |
-| SHEETS | Information | Returns number of sheet of a given reference or number of all sheets in workbook when no argument is provided. | SHEETS([Value]) |
-| NA | Information | Returns #N/A! error value.| NA(Value) |
-| CUMIPMT | Financial |  Returns the cumulative interest paid on a loan between a start period and an end period. | CUMIPMT(Rate; Nper; Pv; Start, End; type) |
-| CUMPRINC | Financial | Returns the cumulative principal paid on a loan between a start period and an end period. | CUMPRINC(Rate; Nper; Pv; Start; End; Type) |
-| DB | Financial | Returns the depreciation of an asset for a period using the fixed-declining balance method. | DB(Cost; Salvage; Life; Period[; Month]) |
-| DDB | Financial | Returns the depreciation of an asset for a period using the double-declining balance method. | DDB(Cost, Salvage; Life; Period[; Factor]) |
-| DOLLARDE | Financial | Converts a price entered with a special notation to a price displayed as a decimal number. | DOLLARDE(Price, Fraction) |
-| DOLLARFR | Financial | Converts a price displayed as a decimal number to a price entered with a special notation. | DOLLARFR(Price, Fraction) |
-| EFFECT | Financial | Calculates the effective annual interest rate from a nominal interest rate and the number of compounding periods per year. | EFFECT (Nominal_rate; Npery) |
-| FV | Financial | Returns the future value of an investment. | FV(Rate; Nper; Pmt[; Pv;[ Type]]) |
-| IPMT | Financial | Returns the interest portion of a given loan payment in a given payment period. | IPMT(Rate; Per; Nper; Pv[; Fv[; Type]]) |
-| ISPMT | Financial | Returns the interest paid for a given period of an investment with equal principal payments. | ISPMT(Rate; Per; Nper; Value) |
-| NOMINAL | Financial | Returns the nominal interest rate. | NOMINAL(Effect_rate; Npery) |
-| NPER | Financial | Returns the number of periods for an investment assuming periodic, constant payments and a constant interest rate. | NPER(Rate; Pmt; Pv[; Fv[; Type]]) |
-| PMT | Financial | Returns the periodic payment for a loan. | PMT(Rate; Nper; Pv[; Fv[; Type]]) |
-| PPMT | Financial | Calculates the principal portion of a given loan payment. | PPMT(Rate; Per; Nper; Pv[; Fv[; Type]]) |
-| PV | Financial | Returns the present value of an investment. | PV(Rate; Nper; Pmt[; Fv[; Type]]) |
-| RATE | Financial |  Returns the interest rate per period of an annuity. | RATE(Nper; Pmt; Pv[; Fv[; Type[; guess]]]) |
-| RRI | Financial | Returns an equivalent interest rate for the growth of an investment. | RRI(Nper; Pv; Fv) |
-| SLN | Financial | Returns the depreciation of an asset for one period, based on a straight-line method. | SLN(Cost; Salvage; Life) |
-| SYD | Financial | Returns the "sum-of-years" depreciation for an asset in a period. | SYD(Cost; Salvage; Life; Period) |
-| TBILLEQ | Financial | Returns the bond-equivalent yield for a Treasury bill. | TBILLEQ(Settlement; Maturity; Discount) |
-| TBILLPRICE | Financial | Returns the price per $100 face value for a Treasury bill. | TBILLPRICE(Settlement; Maturity; Discount) |
-| TBILLYIELD | Financial | Returns the yield for a Treasury bill. | TBILLYIELD(Settlement; Maturity; Price) |
+| SHEET <Badge text="v0.2.0"/>| Information | Returns sheet number of a given value or a formula sheet number if no argument is provided. | SHEET([Value]) |
+| SHEETS <Badge text="v0.2.0"/>| Information | Returns number of sheet of a given reference or number of all sheets in workbook when no argument is provided. | SHEETS([Value]) |
+| NA <Badge text="v0.2.0"/>| Information | Returns #N/A! error value.| NA(Value) |
+| CUMIPMT <Badge text="v0.2.0"/>| Financial |  Returns the cumulative interest paid on a loan between a start period and an end period. | CUMIPMT(Rate; Nper; Pv; Start, End; type) |
+| CUMPRINC <Badge text="v0.2.0"/>| Financial | Returns the cumulative principal paid on a loan between a start period and an end period. | CUMPRINC(Rate; Nper; Pv; Start; End; Type) |
+| DB <Badge text="v0.2.0"/>| Financial | Returns the depreciation of an asset for a period using the fixed-declining balance method. | DB(Cost; Salvage; Life; Period[; Month]) |
+| DDB <Badge text="v0.2.0"/>| Financial | Returns the depreciation of an asset for a period using the double-declining balance method. | DDB(Cost, Salvage; Life; Period[; Factor]) |
+| DOLLARDE <Badge text="v0.2.0"/>| Financial | Converts a price entered with a special notation to a price displayed as a decimal number. | DOLLARDE(Price, Fraction) |
+| DOLLARFR <Badge text="v0.2.0"/>| Financial | Converts a price displayed as a decimal number to a price entered with a special notation. | DOLLARFR(Price, Fraction) |
+| EFFECT <Badge text="v0.2.0"/>| Financial | Calculates the effective annual interest rate from a nominal interest rate and the number of compounding periods per year. | EFFECT (Nominal_rate; Npery) |
+| FV <Badge text="v0.2.0"/> | Financial | Returns the future value of an investment. | FV(Rate; Nper; Pmt[; Pv;[ Type]]) |
+| IPMT <Badge text="v0.2.0"/>| Financial | Returns the interest portion of a given loan payment in a given payment period. | IPMT(Rate; Per; Nper; Pv[; Fv[; Type]]) |
+| ISPMT <Badge text="v0.2.0"/>| Financial | Returns the interest paid for a given period of an investment with equal principal payments. | ISPMT(Rate; Per; Nper; Value) |
+| NOMINAL <Badge text="v0.2.0"/>| Financial | Returns the nominal interest rate. | NOMINAL(Effect_rate; Npery) |
+| NPER <Badge text="v0.2.0"/>| Financial | Returns the number of periods for an investment assuming periodic, constant payments and a constant interest rate. | NPER(Rate; Pmt; Pv[; Fv[; Type]]) |
+| PMT <Badge text="v0.2.0"/>| Financial | Returns the periodic payment for a loan. | PMT(Rate; Nper; Pv[; Fv[; Type]]) |
+| PPMT <Badge text="v0.2.0"/>| Financial | Calculates the principal portion of a given loan payment. | PPMT(Rate; Per; Nper; Pv[; Fv[; Type]]) |
+| PV <Badge text="v0.2.0"/>| Financial | Returns the present value of an investment. | PV(Rate; Nper; Pmt[; Fv[; Type]]) |
+| RATE <Badge text="v0.2.0"/>| Financial |  Returns the interest rate per period of an annuity. | RATE(Nper; Pmt; Pv[; Fv[; Type[; guess]]]) |
+| RRI <Badge text="v0.2.0"/>| Financial | Returns an equivalent interest rate for the growth of an investment. | RRI(Nper; Pv; Fv) |
+| SLN <Badge text="v0.2.0"/>| Financial | Returns the depreciation of an asset for one period, based on a straight-line method. | SLN(Cost; Salvage; Life) |
+| SYD <Badge text="v0.2.0"/>| Financial | Returns the "sum-of-years" depreciation for an asset in a period. | SYD(Cost; Salvage; Life; Period) |
+| TBILLEQ <Badge text="v0.2.0"/>| Financial | Returns the bond-equivalent yield for a Treasury bill. | TBILLEQ(Settlement; Maturity; Discount) |
+| TBILLPRICE <Badge text="v0.2.0"/>| Financial | Returns the price per $100 face value for a Treasury bill. | TBILLPRICE(Settlement; Maturity; Discount) |
+| TBILLYIELD <Badge text="v0.2.0"/>| Financial | Returns the yield for a Treasury bill. | TBILLYIELD(Settlement; Maturity; Price) |
 | AND | Logical | Returns TRUE if all arguments are TRUE. | AND(Logicalvalue1; Logicalvalue2 ...Logicalvalue30) |
 | FALSE | Logical | Returns the logical value FALSE. | FALSE() |
 | IF | Logical | Specifies a logical test to be performed. | IF(Test; Then value; Otherwisevalue) |
@@ -152,7 +152,7 @@ lets you design your own [custom functions](custom-functions).
 | XOR | Logical | Returns true if an odd number of arguments evaluates to TRUE. | XOR(Logicalvalue1; Logicalvalue2 ...Logicalvalue30) |
 | CHOOSE | Lookup and reference | Uses an index to return a value from a list of up to 30 values.| CHOOSE(Index; Value1; ...; Value30) |
 | COLUMNS | Lookup and reference | Returns the number of columns in the given reference. | COLUMNS(Array) |
-| FORMULATEXT | Lookup and reference | Returns a formula in a given cell as a string. | FORMULATEXT(Reference) |
+| FORMULATEXT <Badge text="v0.2.0"/>| Lookup and reference | Returns a formula in a given cell as a string. | FORMULATEXT(Reference) |
 | INDEX | Lookup and reference | Returns the content of a cell, specified by row and column number, or an optional range name. | INDEX(Reference; Row; Column; Range) |
 | MATCH | Lookup and reference | Returns the relative position of an item in an array that matches a specified value. | MATCH(Searchcriterion; Lookuparray; Type) |
 | OFFSET | Lookup and reference | Returns the value of a cell offset by a certain number of rows and columns from a given reference point. | OFFSET(Reference; Rows; Columns; Height; Width) |
@@ -160,23 +160,23 @@ lets you design your own [custom functions](custom-functions).
 | VLOOKUP | Lookup and reference | Searches vertically with reference to adjacent cells to the right. | VLOOKUP(Search_Criterion; Array; Index; Sort_Order) |
 | ABS | Math and trigonometry | Returns the absolute value of a number. | ABS(Number) |
 | ACOS | Math and trigonometry | Returns the inverse trigonometric cosine of a number. | ACOS(Number) |
-| ACOSH | Math and trigonometry | Returns the inverse harmonic cosine of a number. | ACOSH(Number) |
-| ACOT | Math and trigonometry | Returns the inverse trigonometric cotangent of a number. | ACOT(Number) |
-| ACOTH | Math and trigonometry | Returns the inverse harmonic cotangent of a number. | ACOTH(Number) |
+| ACOSH <Badge text="v0.2.0"/>| Math and trigonometry | Returns the inverse harmonic cosine of a number. | ACOSH(Number) |
+| ACOT <Badge text="v0.2.0"/>| Math and trigonometry | Returns the inverse trigonometric cotangent of a number. | ACOT(Number) |
+| ACOTH <Badge text="v0.2.0"/>| Math and trigonometry | Returns the inverse harmonic cotangent of a number. | ACOTH(Number) |
 | ASIN | Math and trigonometry | Returns the inverse trigonometric sine of a number. | ASIN(Number) |
-| ASINH | Math and trigonometry | Returns the inverse harmonic sine of a number. | ASINH(Number) |
+| ASINH <Badge text="v0.2.0"/>| Math and trigonometry | Returns the inverse harmonic sine of a number. | ASINH(Number) |
 | ATAN | Math and trigonometry | Returns the inverse trigonometric tangent of a number. | ATAN(Number) |
 | ATAN2 | Math and trigonometry | Returns the inverse trigonometric tangent of the specified x and y coordinates. | ATAN2(Numberx; Numbery) |
-| ATANH | Math and trigonometry | Returns the inverse harmonic tangent of a number. | ATANH(Number) |
+| ATANH <Badge text="v0.2.0"/>| Math and trigonometry | Returns the inverse harmonic tangent of a number. | ATANH(Number) |
 | BASE | Math and trigonometry | Converts a positive integer to a specified base into a text from the numbering system. | BASE(Number; Radix; [Minimumlength]) |
 | CEILING | Math and trigonometry | Rounds a number up to the nearest multiple of Significance. | CEILING(Number; Significance; Mode) |
 | COS | Math and trigonometry | Returns the cosine of the given angle (in radians). | COS(Number) |
-| COSH | Math and trigonometry | Returns the hyperbolic cosine of the given value. | COSH(Number) |
+| COSH <Badge text="v0.2.0"/>| Math and trigonometry | Returns the hyperbolic cosine of the given value. | COSH(Number) |
 | COT | Math and trigonometry | Returns the cotangent of the given angle (in radians). | COT(Number) |
-| COTH | Math and trigonometry | Returns the hyperbolic cotangent of the given value. | COTH(Number) |
+| COTH <Badge text="v0.2.0"/>| Math and trigonometry | Returns the hyperbolic cotangent of the given value. | COTH(Number) |
 | COUNTUNIQUE | Math and trigonometry | Counts the number of unique values in a list of specified values and ranges. | COUNTUNIQUE(Value1, [Value2, ...]) |
-| CSC | Math and trigonometry | Returns the cosecans of the given angle (in radians). | CSC(Number) |
-| CSCH | Math and trigonometry | Returns the hyperbolic cosecans of the given value. | CSCH(Number) |
+| CSC <Badge text="v0.2.0"/>| Math and trigonometry | Returns the cosecans of the given angle (in radians). | CSC(Number) |
+| CSCH <Badge text="v0.2.0"/>| Math and trigonometry | Returns the hyperbolic cosecans of the given value. | CSCH(Number) |
 | DECIMAL | Math and trigonometry | Converts text with characters from a number system to a positive integer in the base radix given. | DECIMAL("Text"; Radix) |
 | DEGREES | Math and trigonometry | Converts radians into degrees. | DEGREES(Number) |
 | EVEN | Math and trigonometry | Rounds a positive number up to the next even integer and a negative number down to the next even integer. | EVEN(Number) |
@@ -194,10 +194,10 @@ lets you design your own [custom functions](custom-functions).
 | ROUND | Math and trigonometry | Rounds a number to a certain number of decimal places. | ROUND(Number; Count) |
 | ROUNDDOWN | Math and trigonometry | Rounds a number down, toward zero, to a certain precision. | ROUNDDOWN(Number; Count) |
 | ROUNDUP | Math and trigonometry | Rounds a number up, away from zero, to a certain precision. | ROUNDUP(Number; Count) |
-| SEC | Math and trigonometry | Returns the secans of the given angle (in radians). | SEC(Number) |
-| SECH | Math and trigonometry | Returns the hyperbolic secans of the given value. | SEC(Number) |
+| SEC <Badge text="v0.2.0"/>| Math and trigonometry | Returns the secans of the given angle (in radians). | SEC(Number) |
+| SECH <Badge text="v0.2.0"/>| Math and trigonometry | Returns the hyperbolic secans of the given value. | SEC(Number) |
 | SIN | Math and trigonometry | Returns the sine of the given angle (in radians). | SIN(Number) |
-| SINH | Math and trigonometry | Returns the hyperbolic sine of the given value. | SINH(Number) |
+| SINH <Badge text="v0.2.0"/>| Math and trigonometry | Returns the hyperbolic sine of the given value. | SINH(Number) |
 | SQRT | Math and trigonometry | Returns the positive square root of a number. | SQRT(Number) |
 | SUM | Math and trigonometry | Adds all the numbers in a range of cells. | SUM(Number1; Number2; ...; Number30) |
 | SUMIF | Math and trigonometry | Adds the cells specified by given criteria. | SUMIF(Range; Criteria; Sumrange) |
@@ -205,7 +205,7 @@ lets you design your own [custom functions](custom-functions).
 | SUMPRODUCT | Math and trigonometry | Multiplies corresponding elements in the given arrays, and returns the sum of those products. | SUMPRODUCT(Array1; Array2...Array30) |
 | SUMSQ | Math and trigonometry | Returns the sum of the squares of the arguments | SUMSQ(Number1; Number2; ...; Number30) |
 | TAN | Math and trigonometry | Returns the tangent of the given angle (in radians). | TAN(Number) |
-| TANH | Math and trigonometry | Returns the hyperbolic tangent of the given value. | TANH(Number) |
+| TANH <Badge text="v0.2.0"/>| Math and trigonometry | Returns the hyperbolic tangent of the given value. | TANH(Number) |
 | TRUNC | Math and trigonometry | Truncates a number by removing decimal places. | TRUNC(Number; Count) |
 | MMULT | Matrix functions | Calculates the array product of two arrays. | MMULT(Array; Array) |
 | MEDIANPOOL | Matrix functions | Calculates a smaller range which is a median of a Window_size, in a given Range, for every Stride element. | MEDIANPOOL(Range, Window_size, Stride) |
@@ -230,12 +230,12 @@ lets you design your own [custom functions](custom-functions).
 | CONCATENATE | Text | Combines several text strings into one string. | CONCATENATE("Text1"; ...; "Text30") |
 | SPLIT | Text | Divides text around a specified character or string, and puts each fragment into a separate cell in the row. | SPLIT(Text, Delimiter, [Split_by_each], [Remove_empty_text]) |
 | TEXT | Text | Converts a number into text according to a given format. | TEXT(Number; Format) |
-| LEN | Text | Returns length of a given text. | LEN("Text") | 
-| TRIM | Text | Strips extra spaces from text. | TRIM("Text") |
-| PROPER | Text | Capitalizes words given text string. | PROPER("Text") |
-| CLEAN | Text | Returns text that has been "cleaned" of line breaks and other non-printable characters. | CLEAN("Text") |
-| REPT | Text | Repeats text a given number of times. | REPT("Text"; Number) |
-| RIGHT | Text | Extracts a given number of characters from the right side of a text string. | RIGHT("Text"; Number) |
-| LEFT | Text | Extracts a given number of characters from the left side of a text string. | LEFT("Text"; Number) |
-| SEARCH | Text | Returns the location of one text string inside another. (Allows the use of wildcards.) | SEARCH( "Text1"; "Text2"[; Number]) |
-| FIND | Text | Returns the location of one text string inside another. | FIND( "Text1"; "Text2"[; Number]) |
+| LEN <Badge text="v0.2.0"/>| Text | Returns length of a given text. | LEN("Text") |
+| TRIM <Badge text="v0.2.0"/>| Text | Strips extra spaces from text. | TRIM("Text") |
+| PROPER <Badge text="v0.2.0"/>| Text | Capitalizes words given text string. | PROPER("Text") |
+| CLEAN <Badge text="v0.2.0"/>| Text | Returns text that has been "cleaned" of line breaks and other non-printable characters. | CLEAN("Text") |
+| REPT <Badge text="v0.2.0"/>| Text | Repeats text a given number of times. | REPT("Text"; Number) |
+| RIGHT <Badge text="v0.2.0"/>| Text | Extracts a given number of characters from the right side of a text string. | RIGHT("Text"; Number) |
+| LEFT <Badge text="v0.2.0"/>| Text | Extracts a given number of characters from the left side of a text string. | LEFT("Text"; Number) |
+| SEARCH <Badge text="v0.2.0"/>| Text | Returns the location of one text string inside another. (Allows the use of wildcards.) | SEARCH( "Text1"; "Text2"[; Number]) |
+| FIND <Badge text="v0.2.0"/>| Text | Returns the location of one text string inside another. | FIND( "Text1"; "Text2"[; Number]) |
