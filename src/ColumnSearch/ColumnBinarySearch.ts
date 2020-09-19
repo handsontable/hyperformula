@@ -42,7 +42,7 @@ export class ColumnBinarySearch implements ColumnSearchStrategy {
       const index =  values.indexOf(key)
       return index < 0 ? index : index + range.start.row
     } else {
-      return rangeLowerBound(range, key, this.dependencyGraph)
+      return rangeLowerBound(range, key, this.dependencyGraph, 'row')
     }
   }
 

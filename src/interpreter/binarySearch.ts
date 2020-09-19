@@ -6,45 +6,36 @@
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
 import {InternalScalarValue, simpleCellAddress} from '../Cell'
 import {DependencyGraph} from '../DependencyGraph'
+import {InterpreterValue} from './InterpreterValue'
 
 /*
 * If key exists returns first index of key element in range of sorted values
 * Otherwise returns first index of greatest element smaller than key
 * assuming sorted values in range
 * */
-export function rangeLowerBound(range: AbsoluteCellRange, key: InternalScalarValue, dependencyGraph: DependencyGraph): number {
-  let start = range.start.row
-  let end = range.end.row
+export function rangeLowerBound(range: AbsoluteCellRange, key: InternalScalarValue, dependencyGraph: DependencyGraph, coordinate: 'row' | 'col'): number {
+  const start = range.start[coordinate]
+  const end = range.end[coordinate]
 
-  while (start <= end) {
-    const center = Math.floor((start + end) / 2)
-    const cmp = compare(key, dependencyGraph.getCellValue(simpleCellAddress(range.sheet, range.start.col, center)))
-    if (cmp > 0) {
-      start = center + 1
-    } else if (cmp < 0) {
-      end = center - 1
-    } else if (start != center) {
-      end = center
-    } else {
-      return center
-    }
+  let centerValueFn
+  if (coordinate === 'row') {
+    centerValueFn = (center: number) =>  dependencyGraph.getCellValue(simpleCellAddress(range.sheet, range.start.col, center))
+  } else {
+    centerValueFn = (center: number) =>  dependencyGraph.getCellValue(simpleCellAddress(range.sheet, center, range.start.row))
   }
 
-  return end
+  return lowerBound(centerValueFn, key, start, end)
 }
 
 /*
-* If key exists returns first index of key element in sorted array
+* If key exists returns first index of key element
 * Otherwise returns first index of greatest element smaller than key
-* assuming sorted array
+* assuming sorted values
 * */
-export function lowerBound(values: InternalScalarValue[], key: any): number {
-  let start = 0
-  let end = values.length - 1
-
+export function lowerBound(value: (index: number) => InterpreterValue, key: any, start: number, end: number): number {
   while (start <= end) {
     const center = Math.floor((start + end) / 2)
-    const cmp = compare(key, values[center])
+    const cmp = compare(key, value(center))
     if (cmp > 0) {
       start = center + 1
     } else if (cmp < 0) {
