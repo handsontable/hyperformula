@@ -17,10 +17,12 @@ describe('Function SUBSTITUTE', () => {
     const engine = HyperFormula.buildFromArray([
       ['=SUBSTITUTE("foo", "f", "bb")'],
       ['=SUBSTITUTE("foobar", "o", "uu")'],
+      ['=SUBSTITUTE("fooobar", "oo", "x")']
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqual('bboo')
     expect(engine.getCellValue(adr('A2'))).toEqual('fuuuubar')
+    expect(engine.getCellValue(adr('A3'))).toEqual('fxobar')
   })
 
   it('should substitute new text for nth occurrence of a string', () => {
