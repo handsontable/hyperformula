@@ -94,6 +94,7 @@ const dictionary: RawTranslationPackage = {
     HEX2BIN: 'HEX.TILL.BIN',
     HEX2DEC: 'HEX.TILL.DEC',
     HEX2OCT: 'HEX.TILL.OKT',
+    HLOOKUP: 'LETAKOLUMN',
     HOUR: 'TIMME',
     IF: 'OM',
     IFERROR: 'OMFEL',

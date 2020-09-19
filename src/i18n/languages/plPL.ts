@@ -94,6 +94,7 @@ const dictionary: RawTranslationPackage = {
     HEX2BIN: 'SZESN.NA.DWÓJK',
     HEX2DEC: 'SZESN.NA.DZIES',
     HEX2OCT: 'SZESN.NA.ÓSM',
+    HLOOKUP: 'WYSZUKAJ.POZIOMO',
     HOUR: 'GODZINA',
     IF: 'JEŻELI',
     IFERROR: 'JEŻELI.BŁĄD',

@@ -94,6 +94,7 @@ const dictionary: RawTranslationPackage = {
     HEX2BIN: 'HEX.TIL.BIN',
     HEX2DEC: 'HEX.TIL.DEC',
     HEX2OCT: 'HEX.TIL.OKT',
+    HLOOKUP: 'VOPSLAG',
     HOUR: 'TIME',
     IF: 'HVIS',
     IFERROR: 'HVIS.FEJL',
