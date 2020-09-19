@@ -248,7 +248,7 @@ export class TextPlugin extends FunctionPlugin {
         return new CellError(ErrorType.VALUE, ErrorMessage.LessThanOne)
       }
       if (numberOfChars < 0) {
-        return new CellError(ErrorType.VALUE, ErrorMessage.Negative)
+        return new CellError(ErrorType.VALUE, ErrorMessage.NegativeLength)
       }
       return text.substring(startPosition - 1, startPosition + numberOfChars - 1)
     })

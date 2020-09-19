@@ -58,7 +58,7 @@ describe('Function MID', () => {
       ['=MID("foo", 1, -1)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessage.Negative))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessage.NegativeLength))
   })
 
   it('should coerce', () => {
