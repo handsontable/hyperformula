@@ -5,6 +5,7 @@
 
  /**
  * This is a class for detailed error messages across HyperFormula.
+ *
  * @since 0.2.0
  */
 export class ErrorMessage {
