@@ -162,6 +162,7 @@ const dictionary: RawTranslationPackage = {
     ROUND: 'AFRUND',
     ROUNDDOWN: 'RUND.NED',
     ROUNDUP: 'RUND.OP',
+    ROW: 'RÆKKE',
     ROWS: 'RÆKKER',
     RRI: 'RRI',
     SEARCH: 'SØG',

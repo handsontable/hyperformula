@@ -290,7 +290,7 @@ export abstract class FunctionPlugin {
     argumentDefinitions: FunctionArguments,
     noArgCallback: () => InternalScalarValue,
     referenceCallback: (reference: SimpleCellAddress) => InternalScalarValue,
-    nonReferenceCallback: (...arg: any) => InternalScalarValue
+    nonReferenceCallback: (...arg: any) => InternalScalarValue = () => new CellError(ErrorType.NA, ErrorMessage.CellRefExpected)
   ) => {
     if (args.length === 0) {
       return noArgCallback()
@@ -307,7 +307,7 @@ export abstract class FunctionPlugin {
       try {
         cellReference = AbsoluteCellRange.fromAst(arg, formulaAddress).start
       } catch (e) {
-        return new CellError(ErrorType.REF, ErrorMessage.CellRef)
+        return new CellError(ErrorType.REF, ErrorMessage.CellRefExpected)
       }
     }
 

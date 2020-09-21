@@ -162,6 +162,7 @@ const dictionary: RawTranslationPackage = {
     ROUND: 'ОКРУГЛ',
     ROUNDDOWN: 'ОКРУГЛВНИЗ',
     ROUNDUP: 'ОКРУГЛВВЕРХ',
+    ROW: 'СТРОКА',
     ROWS: 'ЧСТРОК',
     RRI: 'ЭКВ.СТАВКА',
     SEARCH: 'ПОИСК',

@@ -94,6 +94,14 @@ export class InformationPlugin extends FunctionPlugin {
     'NA': {
       method: 'na'
     },
+    'ROW': {
+      method: 'row',
+      parameters:  [
+        {argumentType: ArgumentTypes.NOERROR, optional: true}
+      ],
+      isDependentOnSheetStructureChange: true,
+      doesNotNeedArgumentsToBeComputed: true,
+    },
     'ROWS': {
       method: 'rows',
       isDependentOnSheetStructureChange: true,
@@ -171,8 +179,7 @@ export class InformationPlugin extends FunctionPlugin {
       (reference: SimpleCellAddress) => {
         const vertex = this.dependencyGraph.addressMapping.getCell(reference)
         return vertex instanceof FormulaCellVertex || (vertex instanceof MatrixVertex && vertex.isFormula())
-      },
-      () => new CellError(ErrorType.NA, ErrorMessage.CellRef)
+      }
     )
   }
 
@@ -246,7 +253,6 @@ export class InformationPlugin extends FunctionPlugin {
     )
   }
 
-
   /**
    * Corresponds to ISTEXT(value)
    *
@@ -296,6 +302,13 @@ export class InformationPlugin extends FunctionPlugin {
     } else {
       return new CellError(ErrorType.VALUE, ErrorMessage.CellRangeExpected)
     }
+  }
+
+  public row(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunctionWithReferenceArgument(ast.args, formulaAddress, this.metadata('ROW'),
+      () => formulaAddress.row + 1,
+      (reference: SimpleCellAddress) => reference.row + 1
+    )
   }
 
   /**
@@ -418,7 +431,7 @@ export class InformationPlugin extends FunctionPlugin {
     return this.runFunctionWithReferenceArgument(ast.args, formulaAddress, {parameters: [{argumentType: ArgumentTypes.STRING}]},
       () => this.dependencyGraph.sheetMapping.numberOfSheets(), // return number of sheets if no argument
       () => 1, // return 1 for valid reference
-      () => new CellError(ErrorType.VALUE, ErrorMessage.CellRef) // error otherwise
+      () => new CellError(ErrorType.VALUE, ErrorMessage.CellRefExpected) // error otherwise
     )
   }
 }

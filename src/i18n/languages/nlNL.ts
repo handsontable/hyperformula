@@ -162,6 +162,7 @@ const dictionary: RawTranslationPackage = {
     ROUND: 'AFRONDEN',
     ROUNDDOWN: 'AFRONDEN.NAAR.BENEDEN',
     ROUNDUP: 'AFRONDEN.NAAR.BOVEN',
+    ROW: 'RIJ',
     ROWS: 'RIJEN',
     RRI: 'RRI',
     SEARCH: 'VIND.SPEC',

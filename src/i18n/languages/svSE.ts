@@ -162,6 +162,7 @@ const dictionary: RawTranslationPackage = {
     ROUND: 'AVRUNDA',
     ROUNDDOWN: 'AVRUNDA.NEDÅT',
     ROUNDUP: 'AVRUNDA.UPPÅT',
+    ROW: 'RAD',
     ROWS: 'RADER',
     RRI: 'RRI',
     SEARCH: 'SÖK',
