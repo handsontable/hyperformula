@@ -46,6 +46,7 @@ const dictionary: RawTranslationPackage = {
     CHOOSE: 'VÁLASZT',
     CLEAN: 'TISZTÍT',
     CODE: 'KÓD',
+    COLUMN: 'OSZLOP',
     COLUMNS: 'OSZLOPOK',
     CONCATENATE: 'ÖSSZEFŰZ',
     CORREL: 'KORREL',

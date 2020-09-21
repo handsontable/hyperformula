@@ -46,6 +46,7 @@ const dictionary: RawTranslationPackage = {
     CHOOSE: 'VALITSE.INDEKSI',
     CLEAN: 'SIIVOA',
     CODE: 'KOODI',
+    COLUMN: 'SARAKE',
     COLUMNS: 'SARAKKEET',
     CONCATENATE: 'KETJUTA',
     CORREL: 'KORRELAATIO',

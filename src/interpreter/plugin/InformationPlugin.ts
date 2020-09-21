@@ -16,6 +16,14 @@ import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
  */
 export class InformationPlugin extends FunctionPlugin {
   public static implementedFunctions = {
+    'COLUMN': {
+      method: 'column',
+      parameters:  [
+        {argumentType: ArgumentTypes.NOERROR, optional: true}
+      ],
+      isDependentOnSheetStructureChange: true,
+      doesNotNeedArgumentsToBeComputed: true,
+    },
     'COLUMNS': {
       method: 'columns',
       isDependentOnSheetStructureChange: true,
@@ -280,6 +288,14 @@ export class InformationPlugin extends FunctionPlugin {
       (typeof arg !== 'string')
     )
   }
+
+  public column(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunctionWithReferenceArgument(ast.args, formulaAddress, this.metadata('COLUMN'),
+      () => formulaAddress.col + 1,
+      (reference: SimpleCellAddress) => reference.col + 1
+    )
+  }
+
   /**
    * Corresponds to COLUMNS(range)
    *
@@ -288,7 +304,6 @@ export class InformationPlugin extends FunctionPlugin {
    * @param ast
    * @param formulaAddress
    */
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public columns(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     if (ast.args.length !== 1) {
       return new CellError(ErrorType.NA, ErrorMessage.WrongArgNumber)
@@ -319,7 +334,6 @@ export class InformationPlugin extends FunctionPlugin {
    * @param ast
    * @param formulaAddress
    */
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public rows(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     if (ast.args.length !== 1) {
       return new CellError(ErrorType.NA, ErrorMessage.WrongArgNumber)

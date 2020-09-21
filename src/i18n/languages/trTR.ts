@@ -46,6 +46,7 @@ const dictionary: RawTranslationPackage = {
     CHOOSE: 'ELEMAN',
     CLEAN: 'TEMİZ',
     CODE: 'KOD',
+    COLUMN: 'SÜTUN',
     COLUMNS: 'SÜTUNSAY',
     CONCATENATE: 'BİRLEŞTİR',
     CORREL: 'KORELASYON',

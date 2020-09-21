@@ -46,6 +46,7 @@ const dictionary: RawTranslationPackage = {
     CHOOSE: 'ZVOLIT',
     CLEAN: 'VYČISTIT',
     CODE: 'KÓD',
+    COLUMN: 'SLOUPEC',
     COLUMNS: 'SLOUPCE',
     CONCATENATE: 'CONCATENATE',
     CORREL: 'CORREL',
