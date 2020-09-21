@@ -3,6 +3,10 @@
  * Copyright (c) 2020 Handsoncode. All rights reserved.
  */
 
+ /**
+ * This is a class for detailed error messages across HyperFormula.
+ * @since 0.2.0
+ */
 export class ErrorMessage {
   public static DistinctSigns = 'Distinct signs.'
   public static WrongArgNumber = 'Wrong number of arguments.'
