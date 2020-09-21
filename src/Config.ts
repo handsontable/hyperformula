@@ -205,6 +205,8 @@ export interface ConfigParams {
    * @default false
    *
    * @category Engine
+   *
+   * @since 0.2.0
    */
   evaluateNullToZero: boolean,
   /**
