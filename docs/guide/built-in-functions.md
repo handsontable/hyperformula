@@ -236,7 +236,7 @@ lets you design your own [custom functions](custom-functions).
 | LOWER | Text | Returns text converted to lowercase. | LOWER(Text) | 
 | MID | Text | Returns substring of a given length starting from Start_position. | MID(Text, Start_position, Length) | 
 | PROPER | Text | Capitalizes words given text string. | PROPER("Text") |
-| REPLACE | Text | Replaces substring of a text of a given length that starts at given position. | SUBSTITUTE(Text; Start_position; Length; New_text) |
+| REPLACE | Text | Replaces substring of a text of a given length that starts at given position. | REPLACE(Text; Start_position; Length; New_text) |
 | REPT | Text | Repeats text a given number of times. | REPT("Text"; Number) |
 | RIGHT | Text | Extracts a given number of characters from the right side of a text string. | RIGHT("Text"; Number) |
 | SEARCH | Text | Returns the location of one text string inside another. (Allows the use of wildcards.) | SEARCH( "Text1"; "Text2"[; Number]) |
