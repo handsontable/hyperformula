@@ -289,6 +289,14 @@ export class InformationPlugin extends FunctionPlugin {
     )
   }
 
+  /**
+   * Corresponds to COLUMN(reference)
+   *
+   * Returns column number of a reference or a formula cell if reference not provided
+   *
+   * @param ast
+   * @param formulaAddress
+   */
   public column(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.runFunctionWithReferenceArgument(ast.args, formulaAddress, this.metadata('COLUMN'),
       () => formulaAddress.col + 1,
@@ -319,6 +327,14 @@ export class InformationPlugin extends FunctionPlugin {
     }
   }
 
+  /**
+   * Corresponds to ROW(reference)
+   *
+   * Returns row number of a reference or a formula cell if reference not provided
+   *
+   * @param ast
+   * @param formulaAddress
+   */
   public row(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.runFunctionWithReferenceArgument(ast.args, formulaAddress, this.metadata('ROW'),
       () => formulaAddress.row + 1,
