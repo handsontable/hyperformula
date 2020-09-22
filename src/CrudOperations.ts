@@ -141,15 +141,15 @@ export class CrudOperations {
     this.ensureItIsPossibleToMoveRows(sheet, startRow, numberOfRows, targetRow)
     this.undoRedo.clearRedoStack()
     this.clipboardOperations.abortCut()
-    this.operations.moveRows(sheet, startRow, numberOfRows, targetRow)
-    this.undoRedo.saveOperation(new MoveRowsUndoEntry(sheet, startRow, numberOfRows, targetRow))
+    const version = this.operations.moveRows(sheet, startRow, numberOfRows, targetRow)
+    this.undoRedo.saveOperation(new MoveRowsUndoEntry(sheet, startRow, numberOfRows, targetRow, version))
   }
 
   public moveColumns(sheet: number, startColumn: number, numberOfColumns: number, targetColumn: number): void {
     this.ensureItIsPossibleToMoveColumns(sheet, startColumn, numberOfColumns, targetColumn)
     this.undoRedo.clearRedoStack()
-    this.operations.moveColumns(sheet, startColumn, numberOfColumns, targetColumn)
-    this.undoRedo.saveOperation(new MoveColumnsUndoEntry(sheet, startColumn, numberOfColumns, targetColumn))
+    const version = this.operations.moveColumns(sheet, startColumn, numberOfColumns, targetColumn)
+    this.undoRedo.saveOperation(new MoveColumnsUndoEntry(sheet, startColumn, numberOfColumns, targetColumn, version))
   }
 
   public cut(sourceLeftCorner: SimpleCellAddress, width: number, height: number): void {

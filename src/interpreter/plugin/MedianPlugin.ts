@@ -4,8 +4,9 @@
  */
 
 import {CellError, ErrorType, InternalScalarValue, SimpleCellAddress} from '../../Cell'
+import {ErrorMessage} from '../../error-message'
 import {AstNodeType, ProcedureAst} from '../../parser'
-import {FunctionPlugin} from './FunctionPlugin'
+import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
 
 /**
  * Interpreter plugin containing MEDIAN function
@@ -15,6 +16,11 @@ export class MedianPlugin extends FunctionPlugin {
   public static implementedFunctions = {
     'MEDIAN': {
       method: 'median',
+      parameters: [
+        {argumentType: ArgumentTypes.NOERROR},
+      ],
+      repeatLastArgs: 1,
+      expandRanges: true,
     },
   }
 
@@ -27,32 +33,22 @@ export class MedianPlugin extends FunctionPlugin {
    * @param formulaAddress
    */
   public median(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    if (ast.args.length === 0) {
-      return new CellError(ErrorType.NA)
-    }
-    if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
-      return new CellError(ErrorType.NUM)
-    }
-
-    const values: number[] = []
-    for (const scalarValue of this.iterateOverScalarValues(ast.args, formulaAddress)) {
-      if (scalarValue instanceof CellError) {
-        return scalarValue
-      } else if (typeof scalarValue === 'number') {
-        values.push(scalarValue)
+    return this.runFunction(ast.args, formulaAddress, this.metadata('MEDIAN'), (...args) => {
+      const values: number[] = args.filter((val: InternalScalarValue) => (typeof val === 'number'))
+      ast.args.forEach((arg) => { //ugly but works
+        if (arg.type === AstNodeType.EMPTY) {
+          values.push(0)
+        }
+      })
+      if (values.length === 0) {
+        return new CellError(ErrorType.NUM, ErrorMessage.OneValue)
       }
-    }
-
-    if (values.length === 0) {
-      return new CellError(ErrorType.NUM)
-    }
-
-    values.sort((a, b) => (a - b))
-
-    if (values.length % 2 === 0) {
-      return (values[(values.length / 2) - 1] + values[values.length / 2]) / 2
-    } else {
-      return values[Math.floor(values.length / 2)]
-    }
+      values.sort((a, b) => (a - b))
+      if (values.length % 2 === 0) {
+        return (values[(values.length / 2) - 1] + values[values.length / 2]) / 2
+      } else {
+        return values[Math.floor(values.length / 2)]
+      }
+    })
   }
 }

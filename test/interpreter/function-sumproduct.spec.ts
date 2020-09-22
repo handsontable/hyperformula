@@ -1,5 +1,6 @@
 import {HyperFormula} from '../../src'
 import {ErrorType} from '../../src/Cell'
+import {ErrorMessage} from '../../src/error-message'
 import {adr, detailedError} from '../testUtils'
 
 describe('Function SUMPRODUCT', () => {
@@ -11,8 +12,8 @@ describe('Function SUMPRODUCT', () => {
       ['=SUMPRODUCT(A1:A3)', '=SUMPRODUCT(A1:A3,B1:B3,A1:A2)'],
     ])
 
-    expect(engine.getCellValue(adr('A4'))).toEqual(detailedError(ErrorType.NA))
-    expect(engine.getCellValue(adr('B4'))).toEqual(detailedError(ErrorType.NA))
+    expect(engine.getCellValue(adr('A4'))).toEqual(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
+    expect(engine.getCellValue(adr('B4'))).toEqual(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
   })
 
   it('works',  () => {
@@ -140,7 +141,7 @@ describe('Function SUMPRODUCT', () => {
       ['=SUMPRODUCT(A1:A2,B1:B2)'],
     ])
 
-    expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.NAME))
+    expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.NAME, ErrorMessage.FunctionName('UNKNOWNFUNCTION')))
   })
 
   it('error when different size',  () => {
@@ -151,8 +152,8 @@ describe('Function SUMPRODUCT', () => {
       ['=SUMPRODUCT(A1:B2,C1:D1)'],
     ])
 
-    expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.VALUE))
-    expect(engine.getCellValue(adr('A4'))).toEqual(detailedError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessage.EqualLength))
+    expect(engine.getCellValue(adr('A4'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessage.EqualLength))
   })
 
   it('works with matrices',  () => {
@@ -183,6 +184,6 @@ describe('Function SUMPRODUCT', () => {
       ['=SUMPRODUCT(A1:B2, D1:E2)'],
     ])
 
-    expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.NAME))
+    expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.NAME, ErrorMessage.FunctionName('FOOBAR')))
   })
 })

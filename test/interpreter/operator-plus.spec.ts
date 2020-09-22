@@ -1,5 +1,6 @@
 import {HyperFormula} from '../../src'
 import {ErrorType} from '../../src/Cell'
+import {ErrorMessage} from '../../src/error-message'
 import {adr, detailedError} from '../testUtils'
 
 describe('Operator PLUS', () => {
@@ -20,7 +21,7 @@ describe('Operator PLUS', () => {
     ])
 
     expect(engine.getCellValue(adr('A1'))).toBe(5)
-    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessage.NumberCoercion))
     expect(engine.getCellValue(adr('A4'))).toEqual(6)
   })
 
@@ -48,7 +49,7 @@ describe('Operator PLUS', () => {
       ['=FOOBAR()', '=4/0'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NAME))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NAME, ErrorMessage.FunctionName('FOOBAR')))
   })
 
   // Inconsistency with Product 1
@@ -59,8 +60,8 @@ describe('Operator PLUS', () => {
       ['3'],
     ])
 
-    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.VALUE))
-    expect(engine.getCellValue(adr('B2'))).toEqual(detailedError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessage.ScalarExpected))
+    expect(engine.getCellValue(adr('B2'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessage.ScalarExpected))
   })
 
   it('Plus propagates errors correctly', () => {
@@ -70,7 +71,7 @@ describe('Operator PLUS', () => {
 
     expect(engine.getCellValue(adr('C1'))).toEqual(detailedError(ErrorType.DIV_BY_ZERO))
     expect(engine.getCellValue(adr('D1'))).toEqual(detailedError(ErrorType.DIV_BY_ZERO))
-    expect(engine.getCellValue(adr('E1'))).toEqual(detailedError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('E1'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessage.ScalarExpected))
     expect(engine.getCellValue(adr('F1'))).toEqual(detailedError(ErrorType.DIV_BY_ZERO))
   })
 })

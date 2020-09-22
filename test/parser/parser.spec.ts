@@ -32,6 +32,7 @@ import {adr, unregisterAllLanguages} from '../testUtils'
 import {RowAddress} from '../../src/parser/RowAddress'
 import {columnIndexToLabel} from '../../src/parser/addressRepresentationConverters'
 import {buildEmptyParserWithCaching} from './common'
+import {sheetNameRegexp} from '../../src/parser/LexerConfig'
 
 describe('ParserWithCaching', () => {
   beforeEach(() => {
@@ -102,74 +103,6 @@ describe('ParserWithCaching', () => {
     expect(ast.right.type).toBe(AstNodeType.POWER_OP)
   })
 
-  it('SUM function without args', () => {
-    const parser = buildEmptyParserWithCaching(new Config())
-    const ast = parser.parse('=SUM()', simpleCellAddress(0, 0, 0)).ast as ProcedureAst
-    expect(ast.type).toBe(AstNodeType.FUNCTION_CALL)
-    expect(ast.procedureName).toBe('SUM')
-    expect(ast.args.length).toBe(0)
-  })
-
-  it('function without polish characters', () => {
-    const parser = buildEmptyParserWithCaching(new Config())
-    const ast = parser.parse('=żółćąęźśńŻÓŁĆĄĘŹŚŃ()', simpleCellAddress(0, 0, 0)).ast as ProcedureAst
-    expect(ast.type).toBe(AstNodeType.FUNCTION_CALL)
-    expect(ast.procedureName).toBe('ŻÓŁĆĄĘŹŚŃŻÓŁĆĄĘŹŚŃ')
-    expect(ast.args.length).toBe(0)
-  })
-
-  it('function with dot separator', () => {
-    const parser = buildEmptyParserWithCaching(new Config({ language: 'plPL' }), new SheetMapping(buildTranslationPackage(plPL)))
-    const ast = parser.parse('=NR.SER.OST.DN.MIEŚ()', simpleCellAddress(0, 0, 0)).ast as ProcedureAst
-    expect(ast.type).toBe(AstNodeType.FUNCTION_CALL)
-    expect(ast.procedureName).toBe('EOMONTH')
-    expect(ast.args.length).toBe(0)
-  })
-
-  it('function name should be translated during parsing', () => {
-    const parser = buildEmptyParserWithCaching(new Config({ language: 'plPL' }), new SheetMapping(buildTranslationPackage(plPL)))
-    const ast = parser.parse('=SUMA()', simpleCellAddress(0, 0, 0)).ast as ProcedureAst
-    expect(ast.type).toBe(AstNodeType.FUNCTION_CALL)
-    expect(ast.procedureName).toBe('SUM')
-    expect(ast.args.length).toBe(0)
-  })
-
-  it('function with number', () => {
-    const parser = buildEmptyParserWithCaching(new Config())
-    const ast = parser.parse('=DEC2BIN(4)', simpleCellAddress(0, 0, 0)).ast as ProcedureAst
-    expect(ast.type).toBe(AstNodeType.FUNCTION_CALL)
-    expect(ast.procedureName).toEqual('DEC2BIN')
-  })
-
-  it('should leave original name if procedure translation not known', () => {
-    const parser = buildEmptyParserWithCaching(new Config({ language: 'plPL' }), new SheetMapping(buildTranslationPackage(plPL)))
-    const ast = parser.parse('=FOOBAR()', simpleCellAddress(0, 0, 0)).ast as ProcedureAst
-    expect(ast.type).toBe(AstNodeType.FUNCTION_CALL)
-    expect(ast.procedureName).toBe('FOOBAR')
-    expect(ast.args.length).toBe(0)
-  })
-
-  it('SUM function with args', () => {
-    const parser = buildEmptyParserWithCaching(new Config())
-    const ast = parser.parse('=SUM(1, A1)', simpleCellAddress(0, 0, 0)).ast as ProcedureAst
-    expect(ast.type).toBe(AstNodeType.FUNCTION_CALL)
-    expect(ast.procedureName).toBe('SUM')
-    expect(ast.args[0]!.type).toBe(AstNodeType.NUMBER)
-    expect(ast.args[1]!.type).toBe(AstNodeType.CELL_REFERENCE)
-  })
-
-  it('SUM function with expression arg', () => {
-    const parser = buildEmptyParserWithCaching(new Config())
-    const ast = parser.parse('=SUM(1 / 2 + SUM(1,2))', simpleCellAddress(0, 0, 0)).ast as ProcedureAst
-    expect(ast.type).toBe(AstNodeType.FUNCTION_CALL)
-    expect(ast.args.length).toBe(1)
-    expect(ast.args[0]!.type).toBe(AstNodeType.PLUS_OP)
-
-    const arg = ast.args[0] as PlusOpAst
-    expect(arg.left.type).toBe(AstNodeType.DIV_OP)
-    expect(arg.right.type).toBe(AstNodeType.FUNCTION_CALL)
-  })
-
   it('joining nodes without braces', () => {
     const parser = buildEmptyParserWithCaching(new Config())
     const ast = parser.parse('=1 + 2 + 3', simpleCellAddress(0, 0, 0)).ast as PlusOpAst
@@ -220,13 +153,6 @@ describe('ParserWithCaching', () => {
     expect(float.value).toBe(3.14)
   })
 
-  it('functions should not be case sensitive', () => {
-    const parser = buildEmptyParserWithCaching(new Config())
-    const ast = parser.parse('=sum(1)', simpleCellAddress(0, 0, 0)).ast as ProcedureAst
-    expect(ast.type).toBe(AstNodeType.FUNCTION_CALL)
-    expect(ast.procedureName).toBe('SUM')
-  })
-
   it('allow to accept different lexer configs', () => {
     const parser1 = buildEmptyParserWithCaching(new Config())
     const parser2 = buildEmptyParserWithCaching(new Config({ functionArgSeparator: ';' }), new SheetMapping(buildTranslationPackage(enGB)))
@@ -266,15 +192,99 @@ describe('ParserWithCaching', () => {
     expect(ast.rawInput).toBe('Sheet2!A1')
     expect(ast.error.type).toBe(ErrorType.REF)
   })
+})
 
-  it('named expression ast', () => {
+describe('Functions', () => {
+  beforeEach(() => {
+    unregisterAllLanguages()
+    HyperFormula.registerLanguage(plPL.langCode, plPL)
+    HyperFormula.registerLanguage(enGB.langCode, enGB)
+  })
+
+  it('SUM function without args', () => {
+    const parser = buildEmptyParserWithCaching(new Config())
+    const ast = parser.parse('=SUM()', simpleCellAddress(0, 0, 0)).ast as ProcedureAst
+    expect(ast.type).toBe(AstNodeType.FUNCTION_CALL)
+    expect(ast.procedureName).toBe('SUM')
+    expect(ast.args.length).toBe(0)
+  })
+
+  it('SUM function with args', () => {
+    const parser = buildEmptyParserWithCaching(new Config())
+    const ast = parser.parse('=SUM(1, A1)', simpleCellAddress(0, 0, 0)).ast as ProcedureAst
+    expect(ast.type).toBe(AstNodeType.FUNCTION_CALL)
+    expect(ast.procedureName).toBe('SUM')
+    expect(ast.args[0]!.type).toBe(AstNodeType.NUMBER)
+    expect(ast.args[1]!.type).toBe(AstNodeType.CELL_REFERENCE)
+  })
+
+  it('SUM function with expression arg', () => {
+    const parser = buildEmptyParserWithCaching(new Config())
+    const ast = parser.parse('=SUM(1 / 2 + SUM(1,2))', simpleCellAddress(0, 0, 0)).ast as ProcedureAst
+    expect(ast.type).toBe(AstNodeType.FUNCTION_CALL)
+    expect(ast.args.length).toBe(1)
+    expect(ast.args[0]!.type).toBe(AstNodeType.PLUS_OP)
+
+    const arg = ast.args[0] as PlusOpAst
+    expect(arg.left.type).toBe(AstNodeType.DIV_OP)
+    expect(arg.right.type).toBe(AstNodeType.FUNCTION_CALL)
+  })
+
+  it('function without polish characters', () => {
+    const parser = buildEmptyParserWithCaching(new Config())
+    const ast = parser.parse('=żółćąęźśńŻÓŁĆĄĘŹŚŃ()', simpleCellAddress(0, 0, 0)).ast as ProcedureAst
+    expect(ast.type).toBe(AstNodeType.FUNCTION_CALL)
+    expect(ast.procedureName).toBe('ŻÓŁĆĄĘŹŚŃŻÓŁĆĄĘŹŚŃ')
+    expect(ast.args.length).toBe(0)
+  })
+
+  it('function with dot separator', () => {
+    const parser = buildEmptyParserWithCaching(new Config({ language: 'plPL' }), new SheetMapping(buildTranslationPackage(plPL)))
+    const ast = parser.parse('=NR.SER.OST.DN.MIEŚ()', simpleCellAddress(0, 0, 0)).ast as ProcedureAst
+    expect(ast.type).toBe(AstNodeType.FUNCTION_CALL)
+    expect(ast.procedureName).toBe('EOMONTH')
+    expect(ast.args.length).toBe(0)
+  })
+
+  it('function name should be translated during parsing', () => {
+    const parser = buildEmptyParserWithCaching(new Config({ language: 'plPL' }), new SheetMapping(buildTranslationPackage(plPL)))
+    const ast = parser.parse('=SUMA()', simpleCellAddress(0, 0, 0)).ast as ProcedureAst
+    expect(ast.type).toBe(AstNodeType.FUNCTION_CALL)
+    expect(ast.procedureName).toBe('SUM')
+    expect(ast.args.length).toBe(0)
+  })
+
+  it('function with number', () => {
+    const parser = buildEmptyParserWithCaching(new Config())
+    const ast = parser.parse('=DEC2BIN(4)', simpleCellAddress(0, 0, 0)).ast as ProcedureAst
+    expect(ast.type).toBe(AstNodeType.FUNCTION_CALL)
+    expect(ast.procedureName).toEqual('DEC2BIN')
+  })
+
+  it('should leave original name if procedure translation not known', () => {
+    const parser = buildEmptyParserWithCaching(new Config({ language: 'plPL' }), new SheetMapping(buildTranslationPackage(plPL)))
+    const ast = parser.parse('=FOOBAR()', simpleCellAddress(0, 0, 0)).ast as ProcedureAst
+    expect(ast.type).toBe(AstNodeType.FUNCTION_CALL)
+    expect(ast.procedureName).toBe('FOOBAR')
+    expect(ast.args.length).toBe(0)
+  })
+
+  it('should be case insensitive', () => {
+    const parser = buildEmptyParserWithCaching(new Config())
+    const ast = parser.parse('=sum(1)', simpleCellAddress(0, 0, 0)).ast as ProcedureAst
+    expect(ast.type).toBe(AstNodeType.FUNCTION_CALL)
+    expect(ast.procedureName).toBe('SUM')
+  })
+
+  it('should be a valid function name', () => {
     const parser = buildEmptyParserWithCaching(new Config())
 
-    const ast = parser.parse('= true', simpleCellAddress(0, 0, 0)).ast as NamedExpressionAst
-
-    expect(ast.type).toBe(AstNodeType.NAMED_EXPRESSION)
-    expect(ast.expressionName).toBe('true')
-    expect(ast.leadingWhitespace).toBe(' ')
+    expect((parser.parse('=A()', adr('A1')).ast as ProcedureAst).procedureName).toEqual('A')
+    expect((parser.parse('=AA()', adr('A1')).ast as ProcedureAst).procedureName).toEqual('AA')
+    expect((parser.parse('=A.B()', adr('A1')).ast as ProcedureAst).procedureName).toEqual('A.B')
+    expect((parser.parse('=A.B.C()', adr('A1')).ast as ProcedureAst).procedureName).toEqual('A.B.C')
+    expect((parser.parse('=A_B()', adr('A1')).ast as ProcedureAst).procedureName).toEqual('A_B')
+    expect((parser.parse('=A42()', adr('A1')).ast as ProcedureAst).procedureName).toEqual('A42')
   })
 })
 
@@ -405,13 +415,24 @@ describe('cell references and ranges', () => {
     expect(ast.reference.sheet).toBe(1)
   })
 
-  xit('escaping support', () => {
+  it('sheet name inside quotes with special characters', () => {
     const sheetMapping = new SheetMapping(buildTranslationPackage(enGB))
     sheetMapping.addSheet('Sheet1')
-    sheetMapping.addSheet("Some'sheet")
+    sheetMapping.addSheet('~`!@#$%^&*()_-+_=/|?{}[]\"')
     const parser = buildEmptyParserWithCaching(new Config(), sheetMapping)
 
-    const ast = parser.parse("='Some''sheet'!A1", simpleCellAddress(0, 0, 0)).ast as CellReferenceAst
+    const ast = parser.parse("='~`!@#$%^&*()_-+_=/|?{}[]\"'!A2", simpleCellAddress(0, 0, 0)).ast as CellReferenceAst
+    expect(ast.type).toBe(AstNodeType.CELL_REFERENCE)
+    expect(ast.reference.sheet).toBe(1)
+  })
+
+  it('sheet name inside quotes with escaped quote', () => {
+    const sheetMapping = new SheetMapping(buildTranslationPackage(enGB))
+    sheetMapping.addSheet('Sheet1')
+    sheetMapping.addSheet("Name'with'quotes")
+    const parser = buildEmptyParserWithCaching(new Config(), sheetMapping)
+
+    const ast = parser.parse("='Name''with''quotes'!A1", simpleCellAddress(0, 0, 0)).ast as CellReferenceAst
     expect(ast.type).toBe(AstNodeType.CELL_REFERENCE)
     expect(ast.reference.sheet).toBe(1)
   })
@@ -696,6 +717,30 @@ describe('Row ranges', () => {
   })
 })
 
+describe('Named expressions', () => {
+  it('should be a valid name for named expression', () => {
+    const parser = buildEmptyParserWithCaching(new Config())
+
+    expect((parser.parse('=_A', adr('A1')).ast as NamedExpressionAst).expressionName).toEqual('_A')
+    expect((parser.parse('=A', adr('A1')).ast as NamedExpressionAst).expressionName).toEqual('A')
+    expect((parser.parse('=Aa', adr('A1')).ast as NamedExpressionAst).expressionName).toEqual('Aa')
+    expect((parser.parse('=B.', adr('A1')).ast as NamedExpressionAst).expressionName).toEqual('B.')
+    expect((parser.parse('=foo_bar', adr('A1')).ast as NamedExpressionAst).expressionName).toEqual('foo_bar')
+    expect((parser.parse('=A...', adr('A1')).ast as NamedExpressionAst).expressionName).toEqual('A...')
+    expect((parser.parse('=B___', adr('A1')).ast as NamedExpressionAst).expressionName).toEqual('B___')
+  })
+
+  it('named expression ast with leading whitespace', () => {
+    const parser = buildEmptyParserWithCaching(new Config())
+
+    const ast = parser.parse('= true', adr('A1')).ast as NamedExpressionAst
+
+    expect(ast.type).toBe(AstNodeType.NAMED_EXPRESSION)
+    expect(ast.expressionName).toBe('true')
+    expect(ast.leadingWhitespace).toBe(' ')
+  })
+})
+
 describe('Parsing errors', () => {
   it('errors - lexing errors', () => {
     const parser = buildEmptyParserWithCaching(new Config())
@@ -707,21 +752,6 @@ describe('Parsing errors', () => {
       expect(ast.type).toBe(AstNodeType.ERROR)
       expect(errors[0].type).toBe(ParsingErrorType.LexingError)
     })
-  })
-
-  it('parsing error - column name without whole range', () => {
-    const parser = buildEmptyParserWithCaching(new Config())
-
-    const { ast, errors } = parser.parse('=A', simpleCellAddress(0, 0, 0))
-    expect(ast.type).toBe(AstNodeType.ERROR)
-    expect(errors[0].type).toBe(ParsingErrorType.LexingError)
-  })
-
-  it('parsing error - column name in procedure without whole range', () => {
-    const parser = buildEmptyParserWithCaching(new Config())
-
-    const { errors } = parser.parse('=SUM(A)', simpleCellAddress(0, 0, 0))
-    expect(errors[0].type).toBe(ParsingErrorType.LexingError)
   })
 
   it('parsing error - not all input parsed', () => {

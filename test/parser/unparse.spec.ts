@@ -16,6 +16,7 @@ describe('Unparse', () => {
   sheetMapping.addSheet('Sheet1')
   sheetMapping.addSheet('Sheet2')
   sheetMapping.addSheet('Sheet with spaces')
+  sheetMapping.addSheet("Sheet'With'Quotes")
   const parser = buildEmptyParserWithCaching(config, sheetMapping)
   const namedExpressions = new NamedExpressions()
   const unparser = new Unparser(config, lexerConfig, sheetMapping.fetchDisplayName, namedExpressions)
@@ -367,7 +368,15 @@ describe('Unparse', () => {
     expect(unparsed).toEqual(formula)
   })
 
-  it('unparsing sheet names in ragnes sometimes have to wrap in quotes', () => {
+  it('unparsing sheet names in quotes should escape single quotes', () => {
+    const formula = "='Sheet''With''Quotes'!A1"
+    const ast = parser.parse(formula, simpleCellAddress(1, 0, 0)).ast
+    const unparsed = unparser.unparse(ast, adr('A1', 1))
+
+    expect(unparsed).toEqual(formula)
+  })
+
+  it('unparsing sheet names in ranges sometimes have to wrap in quotes', () => {
     const formula = "='Sheet with spaces'!A1:B1"
     const ast = parser.parse(formula, simpleCellAddress(0, 0, 0)).ast
     const unparsed = unparser.unparse(ast, adr('A1', 0))

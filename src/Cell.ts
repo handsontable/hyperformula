@@ -4,9 +4,10 @@
  */
 
 import {CellVertex, FormulaCellVertex, MatrixVertex, ParsingErrorVertex, ValueCellVertex} from './DependencyGraph'
+import {ErrorMessage} from './error-message'
 import {CellAddress} from './parser'
 import {AddressWithSheet} from './parser/Address'
-import {SimpleRangeValue} from './interpreter/InterpreterValue'
+import {InterpreterValue, SimpleRangeValue} from './interpreter/InterpreterValue'
 
 /**
  * Possible errors returned by our interpreter.
@@ -24,18 +25,22 @@ export enum ErrorType {
   /** Cyclic dependency. */
   CYCLE = 'CYCLE',
 
-  /* Wrong address reference. */
+  /** Wrong address reference. */
   REF = 'REF',
 
-  /* Generic error */
+  /** Invalid/missing licence error. */
+  LIC = 'LIC',
+
+  /** Generic error */
   ERROR = 'ERROR'
 }
+
+export type TranslatableErrorType = Exclude<ErrorType, ErrorType.LIC>
 
 export const EmptyValue = Symbol('Empty value')
 export type EmptyValueType = typeof EmptyValue
 export type InternalNoErrorCellValue = number | string | boolean | EmptyValueType
 export type InternalScalarValue = InternalNoErrorCellValue | CellError
-export type InternalCellValue = InternalScalarValue | SimpleRangeValue
 
 export enum CellType {
   FORMULA = 'FORMULA',
@@ -82,7 +87,7 @@ export const CellValueTypeOrd = (arg: CellValueType): number => {
   }
 }
 
-export const getCellValueType = (cellValue: InternalCellValue): CellValueType => {
+export const getCellValueType = (cellValue: InterpreterValue): CellValueType => {
   if (cellValue === EmptyValue) {
     return CellValueType.EMPTY
   }
@@ -111,7 +116,7 @@ export class CellError {
   }
 
   public static parsingError() {
-    return new CellError(ErrorType.ERROR, 'Parsing error')
+    return new CellError(ErrorType.ERROR, ErrorMessage.ParseError)
   }
 }
 

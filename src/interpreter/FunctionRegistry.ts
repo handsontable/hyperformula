@@ -116,7 +116,7 @@ export class FunctionRegistry {
     }
   }
 
-  private static functionIsProtected(functionId: string) {
+  public static functionIsProtected(functionId: string) {
     return this._protectedPlugins.has(functionId)
   }
 

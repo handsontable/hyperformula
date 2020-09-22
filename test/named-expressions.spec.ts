@@ -1,4 +1,5 @@
 import {HyperFormula, ExportedNamedExpressionChange, ExportedCellChange} from '../src'
+import {ErrorMessage} from '../src/error-message'
 import {adr, detailedError} from './testUtils'
 import {ErrorType} from '../src/Cell'
 import {NoRelativeAddressesAllowedError, NoSheetWithNameError} from '../src/errors'
@@ -12,6 +13,13 @@ describe('Named expressions - checking if its possible', () => {
     expect(engine.isItPossibleToAddNamedExpression('foo', null)).toBe(true)
     expect(engine.isItPossibleToAddNamedExpression('foo', '=Sheet1!$A$1')).toBe(true)
     expect(engine.isItPossibleToAddNamedExpression('foo', '=Sheet1!$A$1', 'Sheet1')).toBe(true)
+    expect(engine.isItPossibleToAddNamedExpression('_A', 1)).toBe(true)
+    expect(engine.isItPossibleToAddNamedExpression('A', 1)).toBe(true)
+    expect(engine.isItPossibleToAddNamedExpression('Aa', 1)).toBe(true)
+    expect(engine.isItPossibleToAddNamedExpression('B.', 1)).toBe(true)
+    expect(engine.isItPossibleToAddNamedExpression('foo_bar', 1)).toBe(true)
+    expect(engine.isItPossibleToAddNamedExpression('A...', 1)).toBe(true)
+    expect(engine.isItPossibleToAddNamedExpression('B___', 1)).toBe(true)
   })
 
   it('no if expression name invalid', () => {
@@ -500,7 +508,7 @@ describe('Named expressions - evaluation', () => {
       ['=FOO']
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NAME))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NAME, ErrorMessage.NamedExpressionName('FOO')))
   })
 
   it('named expression dependency works if named expression was defined later', () => {
@@ -523,7 +531,7 @@ describe('Named expressions - evaluation', () => {
 
     engine.removeNamedExpression('FOO')
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NAME))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NAME, ErrorMessage.NamedExpressionName('FOO')))
   })
 
   it('removing node dependent on named expression', () => {
@@ -591,7 +599,7 @@ describe('Named expressions - evaluation', () => {
     const a1 = engine.dependencyGraph.fetchCell(adr('A1'))
     expect(engine.graph.existsEdge(localFooVertex, a1)).toBe(false)
     expect(engine.graph.existsEdge(globalFooVertex, a1)).toBe(true)
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NAME))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NAME, ErrorMessage.NamedExpressionName('foo')))
   })
 
   it('adding local named expression binds all the edges from global one', () => {
@@ -644,7 +652,7 @@ describe('Named expressions - cross scope', () => {
     engine.addNamedExpression('expr', '=Sheet1!$A$1', 'Sheet1')
 
     expect(engine.getCellValue(adr('B1'))).toEqual('foo')
-    expect(engine.getCellValue(adr('B1', 1))).toEqual(detailedError(ErrorType.NAME))
+    expect(engine.getCellValue(adr('B1', 1))).toEqual(detailedError(ErrorType.NAME, ErrorMessage.NamedExpressionName('expr')))
   })
 
   it('should add named expression to global scope when moving formula to other sheet', () => {

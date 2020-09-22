@@ -8,12 +8,13 @@ import {
   CellValueTypeOrd,
   EmptyValue,
   ErrorType,
-  getCellValueType, InternalCellValue,
+  getCellValueType,
   InternalNoErrorCellValue,
   InternalScalarValue
 } from '../Cell'
 import {Config} from '../Config'
 import {DateTimeHelper} from '../DateTimeHelper'
+import {ErrorMessage} from '../error-message'
 import {Maybe} from '../Maybe'
 import {NumberLiteralHelper} from '../NumberLiteralHelper'
 import {collatorFromConfig} from '../StringHelper'
@@ -32,16 +33,22 @@ export class ArithmeticHelper {
     this.actualEps = config.smartRounding ? config.precisionEpsilon : 0
   }
 
-  public eqMatcherFunction(pattern: string): (arg: InternalCellValue) => boolean {
+  public eqMatcherFunction(pattern: string): (arg: InterpreterValue) => boolean {
     const regexp = this.buildRegex(pattern)
     return (cellValue) => (typeof cellValue === 'string' && regexp.test(this.normalizeString(cellValue)))
   }
 
-  public neqMatcherFunction(pattern: string): (arg: InternalCellValue) => boolean {
+  public neqMatcherFunction(pattern: string): (arg: InterpreterValue) => boolean {
     const regexp = this.buildRegex(pattern)
     return (cellValue) => {
       return (typeof cellValue !== 'string' || !regexp.test(this.normalizeString(cellValue)))
     }
+  }
+
+  public searchString(pattern: string, text: string): number {
+    const regexp = this.buildRegex(pattern, false)
+    const result = regexp.exec(text)
+    return result?.index ?? -1
   }
 
   public requiresRegex(pattern: string): boolean {
@@ -57,7 +64,7 @@ export class ArithmeticHelper {
     return false
   }
 
-  private buildRegex(pattern: string): RegExp {
+  private buildRegex(pattern: string, matchWholeCell: boolean = true): RegExp {
     pattern = this.normalizeString(pattern)
     let regexpStr
     let useWildcards = this.config.useWildcards
@@ -77,7 +84,7 @@ export class ArithmeticHelper {
     } else {
       regexpStr = escapeAllCharacters(pattern, this.config.caseSensitive)
     }
-    if(this.config.matchWholeCell) {
+    if(this.config.matchWholeCell && matchWholeCell) {
       return RegExp('^('+ regexpStr + ')$')
     } else {
       return RegExp(regexpStr)
@@ -139,17 +146,7 @@ export class ArithmeticHelper {
     return this.collator.compare(left, right)
   }
 
-  public add(left: number | CellError, right: number | CellError): number | CellError {
-    if (left instanceof CellError) {
-      return left
-    } else if (right instanceof CellError) {
-      return right
-    } else {
-      return this.addWithEpsilon(left, right)
-    }
-  }
-
-  private addWithEpsilon(left: number, right: number): number {
+  public addWithEpsilon = (left: number, right: number) => {
     const ret = left + right
     if (Math.abs(ret) < this.actualEps * Math.abs(left)) {
       return 0
@@ -162,8 +159,6 @@ export class ArithmeticHelper {
    * Adds two numbers
    *
    * Implementation of adding which is used in interpreter.
-   *
-   * Errors are propagated, non-numerical values are ignored.
    *
    * @param left - left operand of addition
    * @param right - right operand of addition
@@ -191,24 +186,16 @@ export class ArithmeticHelper {
    *
    * Implementation of subtracting which is used in interpreter.
    *
-   * Errors are propagated.
-   *
    * @param left - left operand of subtraction
    * @param right - right operand of subtraction
    * @param eps - precision of comparison
    */
-  public subtract(left: number | CellError, right: number | CellError): number | CellError {
-    if (left instanceof CellError) {
-      return left
-    } else if (right instanceof CellError) {
-      return right
+  public subtract = (left: number, right: number) => {
+    const ret = left - right
+    if (Math.abs(ret) < this.actualEps * Math.abs(left)) {
+      return 0
     } else {
-      const ret = left - right
-      if (Math.abs(ret) < this.actualEps * Math.abs(left)) {
-        return 0
-      } else {
-        return ret
-      }
+      return ret
     }
   }
 
@@ -216,16 +203,16 @@ export class ArithmeticHelper {
     if (arg instanceof CellError) {
       return arg
     }
-    return this.coerceToMaybeNumber(arg) ?? new CellError(ErrorType.VALUE)
+    return this.coerceToMaybeNumber(arg) ?? new CellError(ErrorType.VALUE, ErrorMessage.NumberCoercion)
   }
 
-  public coerceToMaybeNumber(arg: InternalNoErrorCellValue): Maybe<number> {
+  public coerceToMaybeNumber(arg: InternalScalarValue): Maybe<number> {
     return this.coerceNonDateScalarToMaybeNumber(arg) ?? (
       typeof arg === 'string' ? this.dateTimeHelper.dateStringToDateNumber(arg) : undefined
     )
   }
 
-  public coerceNonDateScalarToMaybeNumber(arg: InternalNoErrorCellValue): Maybe<number> {
+  public coerceNonDateScalarToMaybeNumber(arg: InternalScalarValue): Maybe<number> {
     if (arg === EmptyValue) {
       return 0
     } else if (typeof arg === 'string' && this.numberLiteralsHelper.isNumber(arg)) {
@@ -283,10 +270,8 @@ export function coerceEmptyToValue(arg: InternalNoErrorCellValue): InternalNoErr
  *
  * @param arg
  */
-export function coerceScalarToBoolean(arg: InternalScalarValue): boolean | CellError | null {
-  if (arg instanceof SimpleRangeValue) {
-    return new CellError(ErrorType.VALUE)
-  } else if (arg instanceof CellError || typeof arg === 'boolean') {
+export function coerceScalarToBoolean(arg: InternalScalarValue): boolean | CellError | undefined {
+  if (arg instanceof CellError || typeof arg === 'boolean') {
     return arg
   } else if (arg === EmptyValue) {
     return false
@@ -301,7 +286,7 @@ export function coerceScalarToBoolean(arg: InternalScalarValue): boolean | CellE
     } else if (argUppered === '') {
       return false
     } else {
-      return null
+      return undefined
     }
   }
 }
@@ -318,173 +303,11 @@ export function coerceScalarToString(arg: InternalScalarValue): string | CellErr
   }
 }
 
-/**
- * Multiplies two numbers
- *
- * Implementation of multiplication which is used in interpreter.
- *
- * Errors are propagated.
- *
- * @param left - left operand of multiplication
- * @param right - right operand of multiplication
- */
-export function multiply(left: number | CellError, right: number | CellError): number | CellError {
-  if (left instanceof CellError) {
-    return left
-  } else if (right instanceof CellError) {
-    return right
-  } else {
-    return left * right
-  }
-}
-
-export function power(left: number | CellError, right: number | CellError): number | CellError {
-  if (left instanceof CellError) {
-    return left
-  } else if (right instanceof CellError) {
-    return right
-  } else {
-    return Math.pow(left, right)
-  }
-}
-
-export function divide(left: number | CellError, right: number | CellError): number | CellError {
-  if (left instanceof CellError) {
-    return left
-  } else if (right instanceof CellError) {
-    return right
-  } else if (right === 0) {
+export function divide(left: number, right: number): number | CellError {
+  if (right === 0) {
     return new CellError(ErrorType.DIV_BY_ZERO)
   } else {
     return (left / right)
-  }
-}
-
-export function unaryminus(value: number | CellError): number | CellError {
-  if (value instanceof CellError) {
-    return value
-  } else {
-    return -value
-  }
-}
-
-export function percent(value: number | CellError): number | CellError {
-  if (value instanceof CellError) {
-    return value
-  } else {
-    return value / 100
-  }
-}
-
-/**
- * Returns max from two numbers
- *
- * Implementation of max function which is used in interpreter.
- *
- * Errors are propagated, non-numerical values are neutral.
- *
- * @param left - left operand of addition
- * @param right - right operand of addition
- */
-export function max(left: InternalScalarValue, right: InternalScalarValue): InternalScalarValue {
-  if (left instanceof CellError) {
-    return left
-  }
-  if (right instanceof CellError) {
-    return right
-  }
-  if (typeof left === 'number') {
-    if (typeof right === 'number') {
-      return Math.max(left, right)
-    } else {
-      return left
-    }
-  } else if (typeof right === 'number') {
-    return right
-  } else {
-    return Number.NEGATIVE_INFINITY
-  }
-}
-
-export function maxa(left: InternalScalarValue, right: InternalScalarValue): InternalScalarValue {
-  if (left instanceof CellError) {
-    return left
-  }
-  if (right instanceof CellError) {
-    return right
-  }
-  if (typeof left === 'boolean') {
-    left = coerceBooleanToNumber(left)
-  }
-  if (typeof right === 'boolean') {
-    right = coerceBooleanToNumber(right)
-  }
-  if (typeof left === 'number') {
-    if (typeof right === 'number') {
-      return Math.max(left, right)
-    } else {
-      return left
-    }
-  } else if (typeof right === 'number') {
-    return right
-  } else {
-    return Number.NEGATIVE_INFINITY
-  }
-}
-
-/**
- * Returns min from two numbers
- *
- * Implementation of min function which is used in interpreter.
- *
- * Errors are propagated, non-numerical values are neutral.
- *
- * @param left - left operand of addition
- * @param right - right operand of addition
- */
-export function min(left: InternalScalarValue, right: InternalScalarValue): InternalScalarValue {
-  if (left instanceof CellError) {
-    return left
-  }
-  if (right instanceof CellError) {
-    return right
-  }
-  if (typeof left === 'number') {
-    if (typeof right === 'number') {
-      return Math.min(left, right)
-    } else {
-      return left
-    }
-  } else if (typeof right === 'number') {
-    return right
-  } else {
-    return Number.POSITIVE_INFINITY
-  }
-}
-
-export function mina(left: InternalScalarValue, right: InternalScalarValue): InternalScalarValue {
-  if (left instanceof CellError) {
-    return left
-  }
-  if (right instanceof CellError) {
-    return right
-  }
-  if (typeof left === 'boolean') {
-    left = coerceBooleanToNumber(left)
-  }
-  if (typeof right === 'boolean') {
-    right = coerceBooleanToNumber(right)
-  }
-  if (typeof left === 'number') {
-    if (typeof right === 'number') {
-      return Math.min(left, right)
-    } else {
-      return left
-    }
-  } else if (typeof right === 'number') {
-    return right
-  } else {
-    return Number.POSITIVE_INFINITY
   }
 }
 

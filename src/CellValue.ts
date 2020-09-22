@@ -3,11 +3,12 @@
  * Copyright (c) 2020 Handsoncode. All rights reserved.
  */
 
-import {CellError, EmptyValue, ErrorType, InternalCellValue, simpleCellAddress, SimpleCellAddress} from './Cell'
+import {CellError, EmptyValue, ErrorType, simpleCellAddress, SimpleCellAddress} from './Cell'
 import {Config} from './Config'
 import {CellValueChange} from './ContentChanges'
+import {ErrorMessage} from './error-message'
 import {NamedExpressions} from './NamedExpressions'
-import {SimpleRangeValue} from './interpreter/InterpreterValue'
+import {InterpreterValue, SimpleRangeValue} from './interpreter/InterpreterValue'
 
 export type NoErrorCellValue = number | string | boolean | null
 export type CellValue = NoErrorCellValue | DetailedCellError
@@ -87,9 +88,9 @@ export class Exporter {
     }
   }
 
-  public exportValue(value: InternalCellValue): CellValue {
+  public exportValue(value: InterpreterValue): CellValue {
     if (value instanceof SimpleRangeValue) {
-      return this.detailedError(new CellError(ErrorType.VALUE))
+      return this.detailedError(new CellError(ErrorType.VALUE, ErrorMessage.ScalarExpected))
     } else if (this.config.smartRounding && typeof value == 'number') {
       return this.cellValueRounding(value)
     } else if (value instanceof CellError) {

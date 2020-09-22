@@ -1,12 +1,13 @@
 import {HyperFormula} from '../../src'
 import {ErrorType} from '../../src/Cell'
+import {ErrorMessage} from '../../src/error-message'
 import {adr, detailedError} from '../testUtils'
 
 describe('COUNTA', () => {
   it('COUNTA with empty args', () => {
     const engine = HyperFormula.buildFromArray([['=COUNTA()']])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
   })
 
   it('COUNTA with args', () => {
@@ -37,7 +38,7 @@ describe('COUNTA', () => {
     expect(engine.getCellValue(adr('A3'))).toEqual(4)
   })
 
-  it('error ranges doesnt count', () => {
+  it('error in ranges', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '2'],
       ['3', '4'],
@@ -56,5 +57,20 @@ describe('COUNTA', () => {
     ])
 
     expect(engine.getCellValue(adr('A3'))).toEqual(4)
+  })
+
+  it('should work with explicit error in arg', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=COUNTA(NA())'],
+    ])
+    expect(engine.getCellValue(adr('A1'))).toEqual(1)
+  })
+
+  it('should work for empty arg', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=COUNTA(1,)'],
+    ])
+
+    expect(engine.getCellValue(adr('A1'))).toEqual(2) //Compatible with product 2
   })
 })

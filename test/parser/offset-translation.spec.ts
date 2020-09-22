@@ -1,5 +1,6 @@
 import {CellError, ErrorType, simpleCellAddress} from '../../src/Cell'
 import {Config} from '../../src/Config'
+import {ErrorMessage} from '../../src/error-message'
 import {AstNodeType, CellAddress, CellRangeAst, CellReferenceAst, ErrorAst} from '../../src/parser'
 import {buildEmptyParserWithCaching} from './common'
 
@@ -155,7 +156,7 @@ describe('Parser - OFFSET to reference translation', () => {
 
     const {ast, errors} = parser.parse('=OFFSET(A1, -1, 0)', simpleCellAddress(0, 0, 0))
     expect(errors.length).toBe(0)
-    expect((ast as ErrorAst).error).toEqual(new CellError(ErrorType.REF, 'Resulting reference is out of the sheet'))
+    expect((ast as ErrorAst).error).toEqual(new CellError(ErrorType.REF, ErrorMessage.OutOfSheet))
   })
 
   it('OFFSET resulting reference out of the sheet in top left column', () => {
@@ -163,7 +164,7 @@ describe('Parser - OFFSET to reference translation', () => {
 
     const {ast, errors} = parser.parse('=OFFSET(A1, 0, -1)', simpleCellAddress(0, 0, 0))
     expect(errors.length).toBe(0)
-    expect((ast as ErrorAst).error).toEqual(new CellError(ErrorType.REF, 'Resulting reference is out of the sheet'))
+    expect((ast as ErrorAst).error).toEqual(new CellError(ErrorType.REF, ErrorMessage.OutOfSheet))
   })
 
   it('OFFSET case insensitive', () => {

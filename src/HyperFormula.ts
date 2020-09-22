@@ -10,7 +10,7 @@ import {CellValue, ExportedChange, Exporter, NoErrorCellValue} from './CellValue
 import {ColumnSearchStrategy} from './ColumnSearch/ColumnSearchStrategy'
 import {Config, ConfigParams} from './Config'
 import {ColumnRowIndex, CrudOperations} from './CrudOperations'
-import {DateTime} from './DateTimeHelper'
+import {DateTime, numberToSimpleTime} from './DateTimeHelper'
 import {buildTranslationPackage, RawTranslationPackage, TranslationPackage} from './i18n'
 import {normalizeAddedIndexes, normalizeRemovedIndexes} from './Operations'
 import {
@@ -854,7 +854,7 @@ export class HyperFormula implements TypedEmitter {
   }
 
   /**
-   * Updates the config with given new parameters.
+   * Updates the config with given new metadata.
    *
    * @param {Partial<ConfigParams>} newParams configuration options to be updated or added
    *
@@ -900,7 +900,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * @example
    * ```js
-   * // should return all config parameters including default and those which were added
+   * // should return all config metadata including default and those which were added
    * const hfConfig = hfInstance.getConfig();
    * ```
    *
@@ -2192,6 +2192,72 @@ export class HyperFormula implements TypedEmitter {
   }
 
   /**
+   * Returns all addresses and ranges whose computation depends on input address or range provided.
+   *
+   * @param {SimpleCellAddress | AbsoluteCellRange} address - object representation of an absolute address or range of addresses
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromArray( [ ['1', '=A1', '=A1+B1'] ] );
+   *
+   * hfInstance.getCellDependents({ sheet: 0, col: 0, row: 0});
+   * // should return [{ sheet: 0, col: 1, row: 0}, { sheet: 0, col: 2, row: 0}]
+   * ```
+   *
+   * @category Helpers
+   *
+   * @since 0.2.0
+   */
+  public getCellDependents(address: SimpleCellAddress | AbsoluteCellRange): (AbsoluteCellRange | SimpleCellAddress)[] {
+    let vertex
+    if(address instanceof AbsoluteCellRange) {
+      vertex = this._dependencyGraph.rangeMapping.getRange(address.start, address.end)
+      if(vertex===undefined) {
+        return []
+      }
+    } else {
+      vertex = this._dependencyGraph.addressMapping.getCell(address)
+      if(vertex===null) {
+        return []
+      }
+    }
+    return this._dependencyGraph.getAdjacentNodesAddresses(vertex)
+  }
+
+  /**
+   * Returns all addresses and ranges necessary for computation of a given address or range.
+   *
+   * @param {SimpleCellAddress | AbsoluteCellRange} address - object representation of an absolute address or range of addresses
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromArray( [ ['1', '=A1', '=A1+B1'] ] );
+   *
+   * hfInstance.getCellPrecedents({ sheet: 0, col: 2, row: 0});
+   * // should return [{ sheet: 0, col: 0, row: 0}, { sheet: 0, col: 1, row: 0}]
+   * ```
+   *
+   * @category Helpers
+   *
+   * @since 0.2.0
+   */
+  public getCellPrecedents(address: SimpleCellAddress | AbsoluteCellRange): (AbsoluteCellRange | SimpleCellAddress)[] {
+    let vertex
+    if(address instanceof AbsoluteCellRange) {
+      vertex = this._dependencyGraph.rangeMapping.getRange(address.start, address.end)
+      if(vertex===undefined) {
+        return []
+      }
+    } else {
+      vertex = this._dependencyGraph.addressMapping.getCell(address)
+      if(vertex===null) {
+        return []
+      }
+    }
+    return this._dependencyGraph.dependencyQueryAddresses(vertex) ?? []
+  }
+
+  /**
    * Returns a unique sheet name assigned to the sheet of a given ID or `undefined` if the there is no sheet with a given ID.
    *
    * @param {number} sheetId - ID of the sheet, for which we want to retrieve name
@@ -3212,7 +3278,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Helpers
    */
   public numberToTime(val: number): DateTime {
-    return this._evaluator.dateHelper.numberToSimpleTime(val)
+    return numberToSimpleTime(val)
   }
 
   private extractTemporaryFormula(formulaString: string, sheetId: number = 1): [Maybe<Ast>, SimpleCellAddress, RelativeDependency[]] {

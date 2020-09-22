@@ -3,7 +3,8 @@
  * Copyright (c) 2020 Handsoncode. All rights reserved.
  */
 
-import {InternalCellValue, SimpleCellAddress} from '../Cell'
+import {SimpleCellAddress} from '../Cell'
+import {InterpreterValue} from '../interpreter/InterpreterValue'
 import {LazilyTransformingAstService} from '../LazilyTransformingAstService'
 import {Ast} from '../parser'
 
@@ -12,7 +13,7 @@ import {Ast} from '../parser'
  */
 export class FormulaCellVertex {
   /** Most recently computed value of this formula. */
-  private cachedCellValue: InternalCellValue | null
+  private cachedCellValue: InterpreterValue | null
 
   constructor(
     /** Formula in AST format */
@@ -60,19 +61,23 @@ export class FormulaCellVertex {
   /**
    * Sets computed cell value stored in this vertex
    */
-  public setCellValue(cellValue: InternalCellValue) {
+  public setCellValue(cellValue: InterpreterValue) {
     this.cachedCellValue = cellValue
   }
 
   /**
    * Returns cell value stored in vertex
    */
-  public getCellValue(): InternalCellValue {
+  public getCellValue(): InterpreterValue {
     if (this.cachedCellValue !== null) {
       return this.cachedCellValue
     } else {
       throw Error('Value of the formula cell is not computed.')
     }
+  }
+
+  public valueOrNull(): InterpreterValue | null {
+    return this.cachedCellValue
   }
 
   public isComputed() {

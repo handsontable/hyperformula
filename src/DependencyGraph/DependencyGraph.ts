@@ -10,13 +10,13 @@ import {
   CellError,
   EmptyValue,
   ErrorType,
-  InternalCellValue,
   InternalScalarValue,
   simpleCellAddress,
   SimpleCellAddress
 } from '../Cell'
 import {CellDependency} from '../CellDependency'
 import {Config} from '../Config'
+import {ErrorMessage} from '../error-message'
 import {LazilyTransformingAstService} from '../LazilyTransformingAstService'
 import {Maybe} from '../Maybe'
 import {Ast, collectDependencies, NamedExpressionDependency} from '../parser'
@@ -41,7 +41,7 @@ import {RangeMapping} from './RangeMapping'
 import {SheetMapping} from './SheetMapping'
 import {ValueCellVertexValue} from './ValueCellVertex'
 import {FunctionRegistry} from '../interpreter/FunctionRegistry'
-import {SimpleRangeValue} from '../interpreter/InterpreterValue'
+import {InterpreterValue, SimpleRangeValue} from '../interpreter/InterpreterValue'
 
 export class DependencyGraph {
   /*
@@ -76,7 +76,7 @@ export class DependencyGraph {
     public readonly functionRegistry: FunctionRegistry,
     public readonly namedExpressions: NamedExpressions,
   ) {
-    this.graph = new Graph<Vertex>(this.dependencyQuery)
+    this.graph = new Graph<Vertex>(this.dependencyQueryVertices)
   }
 
   public setFormulaToCell(address: SimpleCellAddress, ast: Ast, dependencies: CellDependency[], hasVolatileFunction: boolean, hasStructuralChangeFunction: boolean) {
@@ -457,11 +457,9 @@ export class DependencyGraph {
           this.addressMapping.removeCell(targetAddress)
         }
         for (const adjacentNode of this.graph.adjacentNodes(targetVertex)) {
-          if (adjacentNode !== sourceVertex) {
-            sourceVertex = sourceVertex || this.fetchCellOrCreateEmpty(targetAddress)
-            this.graph.addEdge(sourceVertex, adjacentNode)
-            this.graph.markNodeAsSpecialRecentlyChanged(sourceVertex)
-          }
+          sourceVertex = sourceVertex ?? this.fetchCellOrCreateEmpty(targetAddress)
+          this.graph.addEdge(sourceVertex, adjacentNode)
+          this.graph.markNodeAsSpecialRecentlyChanged(sourceVertex)
         }
         this.removeVertex(targetVertex)
       }
@@ -598,14 +596,14 @@ export class DependencyGraph {
     return this.addressMapping.getCell(address)
   }
 
-  public getCellValue(address: SimpleCellAddress): InternalCellValue {
+  public getCellValue(address: SimpleCellAddress): InterpreterValue {
     return this.addressMapping.getCellValue(address)
   }
 
   public getScalarValue(address: SimpleCellAddress): InternalScalarValue {
     const value = this.addressMapping.getCellValue(address)
     if (value instanceof SimpleRangeValue) {
-      return new CellError(ErrorType.VALUE)
+      return new CellError(ErrorType.VALUE, ErrorMessage.ScalarExpected)
     }
     return value
   }
@@ -721,52 +719,86 @@ export class DependencyGraph {
     }
   }
 
-  public dependencyQuery: (vertex: Vertex) => Set<Vertex> | null = (vertex: Vertex) => {
+  public dependencyQueryAddresses: (vertex: Vertex) => Maybe<(SimpleCellAddress | AbsoluteCellRange)[]> = (vertex: Vertex) => {
+    if (vertex instanceof RangeVertex) {
+      return this.rangeDependencyQuery(vertex).map(([address, _]) => address)
+    } else {
+      const dependenciesResult = this.formulaDependencyQuery(vertex)
+      if (dependenciesResult !== undefined) {
+        const [address, dependencies] = dependenciesResult
+        return dependencies.map((dependency: CellDependency) => {
+          if (dependency instanceof NamedExpressionDependency) {
+            const namedExpression = this.namedExpressions.namedExpressionOrPlaceholder(dependency.name, address.sheet)
+            return namedExpression.address
+          } else {
+            return dependency
+          }
+        })
+      } else {
+        return undefined
+      }
+    }
+  }
+
+  public dependencyQueryVertices: (vertex: Vertex) => Maybe<Vertex[]> = (vertex: Vertex) => {
+    if (vertex instanceof RangeVertex) {
+      return this.rangeDependencyQuery(vertex).map(([_, vertex]) => vertex)
+    } else {
+      const dependenciesResult = this.formulaDependencyQuery(vertex)
+      if (dependenciesResult !== undefined) {
+        const [address, dependencies] = dependenciesResult
+        return dependencies.map((dependency: CellDependency) => {
+          if (dependency instanceof AbsoluteCellRange) {
+            return this.rangeMapping.fetchRange(dependency.start, dependency.end)
+          } else if (dependency instanceof NamedExpressionDependency) {
+            const namedExpression = this.namedExpressions.namedExpressionOrPlaceholder(dependency.name, address.sheet)
+            return this.addressMapping.fetchCell(namedExpression.address)
+          } else {
+            return this.addressMapping.fetchCell(dependency)
+          }
+        })
+      } else {
+        return undefined
+      }
+    }
+  }
+
+  private rangeDependencyQuery = (vertex: RangeVertex) => {
+    const allDeps: [(SimpleCellAddress | AbsoluteCellRange), Vertex][] = []
+    const {smallerRangeVertex, restRange} = this.rangeMapping.findSmallerRange(vertex.range) //checking whether this range was splitted by bruteForce or not
+    let range
+    if (smallerRangeVertex !== null && this.graph.adjacentNodes(smallerRangeVertex).has(vertex)) {
+      range = restRange
+      allDeps.push([new AbsoluteCellRange(smallerRangeVertex.start, smallerRangeVertex.end), smallerRangeVertex])
+    } else { //did we ever need to use full range
+      range = vertex.range
+    }
+    for (const address of range.addresses(this)) {
+      const cell = this.addressMapping.getCell(address)
+      if (cell instanceof EmptyCellVertex) {
+        cell.address = address
+      }
+      if (cell !== null) {
+        allDeps.push([address, cell])
+      }
+    }
+    return allDeps
+  }
+
+  private formulaDependencyQuery: (vertex: Vertex) => Maybe<[SimpleCellAddress, CellDependency[]]> = (vertex: Vertex) => {
     let formula: Ast
     let address: SimpleCellAddress
-
     if (vertex instanceof FormulaCellVertex) {
       address = vertex.getAddress(this.lazilyTransformingAstService)
       formula = vertex.getFormula(this.lazilyTransformingAstService)
     } else if (vertex instanceof MatrixVertex && vertex.isFormula()) {
       address = vertex.getAddress()
       formula = vertex.getFormula()!
-    } else if (vertex instanceof RangeVertex) {
-      const allDeps: Set<Vertex> = new Set()
-      const {smallerRangeVertex, restRange} = this.rangeMapping.findSmallerRange(vertex.range) //checking whether this range was splitted by bruteForce or not
-      let range
-      if (smallerRangeVertex !== null && this.graph.adjacentNodes(smallerRangeVertex).has(vertex)) {
-        range = restRange
-        allDeps.add(smallerRangeVertex)
-      } else { //did we ever need to use full range
-        range = vertex.range
-      }
-      for (const address of range.addresses(this)) {
-        const cell = this.addressMapping.getCell(address)
-        if (cell instanceof EmptyCellVertex) {
-          cell.address = address
-        }
-        if (cell !== null) {
-          allDeps.add(cell)
-        }
-      }
-      return allDeps
     } else {
-      return null
+      return undefined
     }
-
     const deps = collectDependencies(formula!, this.functionRegistry)
-    const absoluteDeps = absolutizeDependencies(deps, address)
-    return new Set(absoluteDeps.map((dep: CellDependency) => {
-      if (dep instanceof AbsoluteCellRange) {
-        return this.rangeMapping.fetchRange(dep.start, dep.end)
-      } else if (dep instanceof NamedExpressionDependency) {
-        const namedExpression = this.namedExpressions.namedExpressionOrPlaceholder(dep.name, address.sheet)
-        return this.addressMapping.fetchCell(namedExpression.address)
-      } else {
-        return this.addressMapping.fetchCell(dep)
-      }
-    }))
+    return [address, absolutizeDependencies(deps, address)]
   }
 
   private addStructuralNodesToChangeSet() {
@@ -853,7 +885,7 @@ export class DependencyGraph {
   }
 
   private truncateRanges(span: Span, coordinate: (address: SimpleCellAddress) => number) {
-    const { verticesToRemove, verticesToMerge } = this.rangeMapping.truncateRanges(span, coordinate)
+    const {verticesToRemove, verticesToMerge} = this.rangeMapping.truncateRanges(span, coordinate)
     for (const [existingVertex, mergedVertex] of verticesToMerge) {
       this.mergeRangeVertices(existingVertex, mergedVertex)
     }
@@ -909,7 +941,7 @@ export class DependencyGraph {
   }
 
   private removeVertexAndCleanupDependencies(vertex: Vertex) {
-    const dependencies = this.graph.removeNode(vertex)
+    const dependencies = new Set(this.graph.removeNode(vertex))
     while (dependencies.size > 0) {
       const vertex: Vertex = dependencies.values().next().value
       dependencies.delete(vertex)
@@ -924,5 +956,21 @@ export class DependencyGraph {
         }
       }
     }
+  }
+
+  public getAdjacentNodesAddresses(vertex: Vertex): (AbsoluteCellRange | SimpleCellAddress)[] {
+    const deps = this.graph.adjacentNodes(vertex)
+    const ret: (AbsoluteCellRange | SimpleCellAddress)[] = []
+    deps.forEach((vertex: Vertex) => {
+      const castVertex = vertex as RangeVertex | FormulaCellVertex | MatrixVertex
+      if (castVertex instanceof RangeVertex) {
+        ret.push(new AbsoluteCellRange(castVertex.start, castVertex.end))
+      } else if (castVertex instanceof FormulaCellVertex) {
+        ret.push(castVertex.getAddress(this.lazilyTransformingAstService))
+      } else {
+        ret.push(castVertex.getAddress())
+      }
+    })
+    return ret
   }
 }

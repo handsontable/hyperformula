@@ -1,4 +1,4 @@
-import {HyperFormula, NoSheetWithIdError} from '../../src'
+import {ErrorType, HyperFormula, NoSheetWithIdError} from '../../src'
 import {AbsoluteCellRange} from '../../src/AbsoluteCellRange'
 import {EmptyValue, simpleCellAddress} from '../../src/Cell'
 import {ColumnIndex} from '../../src/ColumnSearch/ColumnIndex'
@@ -6,8 +6,8 @@ import {EmptyCellVertex, ValueCellVertex} from '../../src/DependencyGraph'
 import {CellAddress} from '../../src/parser'
 import {
   adr,
+  detailedError,
   expectArrayWithSameContent,
-  expectReferenceToHaveRefError,
   expectEngineToBeTheSameAs,
   extractMatrixRange,
   extractRange,
@@ -33,7 +33,7 @@ describe('Address dependencies, moved formulas', () => {
     expect(extractReference(engine, adr('B4'))).toEqual(CellAddress.absolute(null, 0, 0))
   })
 
-  it('should return #REF when overriding referred dependency to external cell', () => {
+  it('should return #CYCLE when overriding referred dependency to external cell', () => {
     const engine = HyperFormula.buildFromArray([
       ['=B1', '1'],
       ['=$B2', '2'],
@@ -44,22 +44,26 @@ describe('Address dependencies, moved formulas', () => {
     engine.cut(adr('A1'), 1, 4)
     engine.paste(adr('B1'))
 
-    expectReferenceToHaveRefError(engine, adr('B1'))
-    expectReferenceToHaveRefError(engine, adr('B2'))
-    expectReferenceToHaveRefError(engine, adr('B3'))
-    expectReferenceToHaveRefError(engine, adr('B4'))
+    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.CYCLE))
+    expect(engine.getCellValue(adr('B2'))).toEqual(detailedError(ErrorType.CYCLE))
+    expect(engine.getCellValue(adr('B3'))).toEqual(detailedError(ErrorType.CYCLE))
+    expect(engine.getCellValue(adr('B4'))).toEqual(detailedError(ErrorType.CYCLE))
+    expect(engine.getCellFormula(adr('B1'))).toEqual('=B1')
+    expect(engine.getCellFormula(adr('B2'))).toEqual('=$B2')
+    expect(engine.getCellFormula(adr('B3'))).toEqual('=B$3')
+    expect(engine.getCellFormula(adr('B4'))).toEqual('=$B$4')
   })
 
-  it('should return #REF when any of moved cells overrides external dependency', () => {
+  it('should work when overriding moved dependency', () => {
     const engine = HyperFormula.buildFromArray([
       ['=B2', '1'],
       ['3', '2'],
     ])
 
-    engine.cut(adr('A1'), 1, 2)
-    engine.paste(adr('B1'))
+    engine.moveCells(adr('A1'), 1, 2, adr('B1'))
 
-    expectReferenceToHaveRefError(engine, adr('B1'))
+    expect(engine.getCellValue(adr('B1'))).toEqual(3)
+    expect(engine.getCellValue(adr('B2'))).toEqual(3)
   })
 
   it('should update internal dependency when overriding dependent cell', () => {
@@ -755,7 +759,7 @@ describe('column index', () => {
 
   it('should update column index when moving cell - REFs', () => {
     const engine = HyperFormula.buildFromArray([
-      ['=B2', '1'],
+      ['=B1', '1'],
       ['3', '2'],
     ], {useColumnIndex: true})
 
