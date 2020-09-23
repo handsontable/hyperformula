@@ -112,6 +112,7 @@ export class CellError {
   constructor(
     public readonly type: ErrorType,
     public readonly message?: string,
+    public address?: SimpleCellAddress,
   ) {
   }
 

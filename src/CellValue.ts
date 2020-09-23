@@ -53,13 +53,14 @@ export class ExportedNamedExpressionChange {
 export class DetailedCellError {
   public readonly type: ErrorType
   public readonly message: string
-
+  public address?: SimpleCellAddress
   constructor(
     error: CellError,
     public readonly value: string,
   ) {
     this.type = error.type
     this.message = error.message || ''
+    this.address = error.address
   }
 }
 
