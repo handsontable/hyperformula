@@ -9,6 +9,7 @@ import {CellValueChange} from './ContentChanges'
 import {ErrorMessage} from './error-message'
 import {NamedExpressions} from './NamedExpressions'
 import {InterpreterValue, SimpleRangeValue} from './interpreter/InterpreterValue'
+import {SheetIndexMappingFn, simpleCellAddressToString} from './parser/addressRepresentationConverters'
 
 export type NoErrorCellValue = number | string | boolean | null
 export type CellValue = NoErrorCellValue | DetailedCellError
@@ -53,14 +54,13 @@ export class ExportedNamedExpressionChange {
 export class DetailedCellError {
   public readonly type: ErrorType
   public readonly message: string
-  public address?: SimpleCellAddress
   constructor(
     error: CellError,
     public readonly value: string,
+    public address?: string,
   ) {
     this.type = error.type
     this.message = error.message || ''
-    this.address = error.address
   }
 }
 
@@ -68,6 +68,7 @@ export class Exporter {
   constructor(
     private readonly config: Config,
     private readonly namedExpressions: NamedExpressions,
+    private readonly sheetIndexMapping: SheetIndexMappingFn,
   ) {
   }
 
@@ -104,7 +105,11 @@ export class Exporter {
   }
 
   private detailedError(error: CellError): DetailedCellError {
-    return new DetailedCellError(error, this.config.translationPackage.getErrorTranslation(error.type))
+    let address = undefined
+    if(error.address !== undefined) {
+      address = simpleCellAddressToString(this.sheetIndexMapping, error.address, -1)
+    }
+    return new DetailedCellError(error, this.config.translationPackage.getErrorTranslation(error.type), address)
   }
 
   private cellValueRounding(value: number): number {

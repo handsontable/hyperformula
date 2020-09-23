@@ -1,4 +1,4 @@
-import {ErrorType} from '../src/Cell'
+import {CellError, ErrorType} from '../src/Cell'
 import {Config} from '../src/Config'
 import {DateTimeHelper} from '../src/DateTimeHelper'
 import {ArithmeticHelper} from '../src/interpreter/ArithmeticHelper'
@@ -70,7 +70,7 @@ describe('Criterion', () => {
   })
 
   it('null when criterion being error', () => {
-    expect(criterionBuilder.parseCriterion(detailedError(ErrorType.VALUE), arithmeticHelper)).toEqual(undefined)
+    expect(criterionBuilder.parseCriterion(new CellError(ErrorType.VALUE), arithmeticHelper)).toEqual(undefined)
   })
 
   it('works with criterion being just value', () => {

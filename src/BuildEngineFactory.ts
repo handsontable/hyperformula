@@ -80,7 +80,7 @@ export class BuildEngineFactory {
     lazilyTransformingAstService.undoRedo = crudOperations.undoRedo
     lazilyTransformingAstService.parser = parser
 
-    const exporter = new Exporter(config, namedExpressions)
+    const exporter = new Exporter(config, namedExpressions, sheetMapping.fetchDisplayName)
     const serialization = new Serialization(dependencyGraph, unparser, config, exporter)
 
     const evaluator = new Evaluator(dependencyGraph, columnSearch, config, stats, dateHelper, numberLiteralHelper, functionRegistry, namedExpressions, serialization)
