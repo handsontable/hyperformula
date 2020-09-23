@@ -99,6 +99,7 @@ export const dictionary: RawTranslationPackage = {
     IFNA: 'IFNA',
     INDEX: 'INDICE',
     INT: 'ENTERO',
+    INTERVAL: 'INTERVAL', //FIXME
     IPMT: 'PAGOINT',
     ISBINARY: 'ISBINARY',
     ISBLANK: 'ESBLANCO',

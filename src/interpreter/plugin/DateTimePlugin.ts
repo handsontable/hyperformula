@@ -21,7 +21,7 @@ import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
 /**
  * Interpreter plugin containing date-specific functions
  */
-export class DatePlugin extends FunctionPlugin {
+export class DateTimePlugin extends FunctionPlugin {
   public static implementedFunctions = {
     'DATE': {
       method: 'date',
@@ -167,6 +167,12 @@ export class DatePlugin extends FunctionPlugin {
         {argumentType: ArgumentTypes.NUMBER, minValue: 0},
         {argumentType: ArgumentTypes.NUMBER, minValue: 0},
         {argumentType: ArgumentTypes.INTEGER, defaultValue: 0, minValue: 0, maxValue: 4},
+      ],
+    },
+    'INTERVAL': {
+      method: 'interval',
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER, minValue: 0},
       ],
     },
   }
@@ -488,6 +494,32 @@ export class DatePlugin extends FunctionPlugin {
             return this.days360Core(startDate, endDate, true) / 360
         }
         throw new Error('Should not be reachable.')
+      }
+    )
+  }
+
+  public interval(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('INTERVAL'),
+      (arg: number) => {
+        arg = Math.trunc(arg)
+        const second = arg%60
+        arg = Math.trunc(arg/60)
+        const minute = arg%60
+        arg = Math.trunc(arg/60)
+        const hour = arg%24
+        arg = Math.trunc(arg/24)
+        const day = arg%30
+        arg = Math.trunc(arg/30)
+        const month = arg%12
+        const year = Math.trunc(arg/12)
+
+        return 'P' + ((year  > 0) ? year  + 'Y' : '')
+          + ((month > 0) ? month + 'M' : '')
+          + ((day   > 0) ? day   + 'D' : '')
+          + 'T'
+          + ((hour  > 0) ? hour  + 'H' : '')
+          + ((minute   > 0) ? minute   + 'M' : '')
+          + ((second   > 0) ? second   + 'S' : '')
       }
     )
   }

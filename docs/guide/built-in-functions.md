@@ -70,6 +70,7 @@ lets you design your own [custom functions](custom-functions).
 | EDATE | Date and time | Shifts the given startdate by given number of months. | EDATE(Startdate; Months) |
 | EOMONTH | Date and time | Returns the date of the last day of a month which falls months away from the start date. | EOMONTH(Startdate; Months) |
 | HOUR | Date and time | Returns hour component of given time. | HOUR(Time) |
+| INTERVAL | Date and time | Returns interval string from given number of seconds. | INTERVAL(Seconds) |
 | ISOWEEKNUM | Date and time |   Returns an ISO week number that corresponds to the week of year. | ISOWEEKNUM(Date) |
 | MINUTE | Date and time | Returns minute component of given time. | MINUTE(Time) |
 | MONTH | Date and time | Returns the month for the given date value. | MONTH(Number) |

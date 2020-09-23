@@ -99,6 +99,7 @@ const dictionary: RawTranslationPackage = {
     IFNA: 'JEŻELI.ND',
     INDEX: 'INDEKS',
     INT: 'ZAOKR.DO.CAŁK',
+    INTERVAL: 'INTERVAL', //FIXME
     IPMT: 'IPMT',
     ISBINARY: 'ISBINARY',
     ISBLANK: 'CZY.PUSTA',

@@ -99,6 +99,7 @@ const dictionary: RawTranslationPackage = {
     IFNA: 'EĞERYOKSA',
     INDEX: 'İNDİS',
     INT: 'TAMSAYI',
+    INTERVAL: 'INTERVAL', //FIXME
     IPMT: 'FAİZTUTARI',
     ISBINARY: 'ISBINARY',
     ISBLANK: 'EBOŞSA',
