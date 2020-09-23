@@ -67,10 +67,12 @@ const sharedExamples = (builder: (sheet: Sheet, config?: Partial<ConfigParams>) 
       const engine = HyperFormula.buildFromArray([
         ['=VLOOKUP(1/0, B1:B1, 1)'],
         ['=VLOOKUP(1, B1:B1, 1/0)'],
+        ['=VLOOKUP(1, A10:A11, 1, NA())']
       ])
 
       expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.DIV_BY_ZERO))
       expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.DIV_BY_ZERO))
+      expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.NA))
     })
   })
 
