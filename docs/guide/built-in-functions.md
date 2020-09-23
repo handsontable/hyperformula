@@ -226,16 +226,26 @@ lets you design your own [custom functions](custom-functions).
 | MIN | Statistical | Returns the minimum value in a list of arguments. | MIN(Number1; Number2; ...Number30) |
 | MINA | Statistical | Returns the minimum value in a list of arguments. | MINA(Value1; Value2; ... Value30) |
 | CHAR | Text | Converts a number into a character according to the current code table. | CHAR(Number) |
+| CLEAN <br><Badge text="v0.2.0"/>| Text | Returns text that has been "cleaned" of line breaks and other non-printable characters. | CLEAN("Text") |
+| CLEAN | Text | Returns text that has been "cleaned" of line breaks and other non-printable characters. | CLEAN("Text") |
 | CODE | Text | Returns a numeric code for the first character in a text string. | CODE("Text") |
 | CONCATENATE | Text | Combines several text strings into one string. | CONCATENATE("Text1"; ...; "Text30") |
-| SPLIT | Text | Divides text around a specified character or string, and puts each fragment into a separate cell in the row. | SPLIT(Text, Delimiter, [Split_by_each], [Remove_empty_text]) |
-| TEXT | Text | Converts a number into text according to a given format. | TEXT(Number; Format) |
+| EXACT | Text | Returns TRUE if both text strings are exactly the same. | EXACT(Text; Text) |
+| FIND <br><Badge text="v0.2.0"/>| Text | Returns the location of one text string inside another. | FIND( "Text1"; "Text2"[; Number]) |
+| LEFT <br><Badge text="v0.2.0"/>| Text | Extracts a given number of characters from the left side of a text string. | LEFT("Text"; Number) |
 | LEN <br><Badge text="v0.2.0"/>| Text | Returns length of a given text. | LEN("Text") |
-| TRIM <br><Badge text="v0.2.0"/>| Text | Strips extra spaces from text. | TRIM("Text") |
+| LOWER | Text | Returns text converted to lowercase. | LOWER(Text) |
+| MID | Text | Returns substring of a given length starting from Start_position. | MID(Text, Start_position, Length) |
 | PROPER <br><Badge text="v0.2.0"/>| Text | Capitalizes words given text string. | PROPER("Text") |
-| CLEAN <br><Badge text="v0.2.0"/>| Text | Returns text that has been "cleaned" of line breaks and other non-printable characters. | CLEAN("Text") |
+| REPLACE | Text | Replaces substring of a text of a given length that starts at given position. | REPLACE(Text; Start_position; Length; New_text) |
 | REPT <br><Badge text="v0.2.0"/>| Text | Repeats text a given number of times. | REPT("Text"; Number) |
 | RIGHT <br><Badge text="v0.2.0"/>| Text | Extracts a given number of characters from the right side of a text string. | RIGHT("Text"; Number) |
-| LEFT <br><Badge text="v0.2.0"/>| Text | Extracts a given number of characters from the left side of a text string. | LEFT("Text"; Number) |
 | SEARCH <br><Badge text="v0.2.0"/>| Text | Returns the location of one text string inside another. (Allows the use of wildcards.) | SEARCH( "Text1"; "Text2"[; Number]) |
-| FIND <br><Badge text="v0.2.0"/>| Text | Returns the location of one text string inside another. | FIND( "Text1"; "Text2"[; Number]) |
+| SPLIT | Text | Divides text around a specified character or string, and puts each fragment into a separate cell in the row. | SPLIT(Text, Delimiter, [Split_by_each], [Remove_empty_text]) |
+| SUBSTITUTE | Text | Returns string where occurrences of Old_text are replaced by New_text. Replaces only specific occurrence if last parameter is provided.  | SUBSTITUTE(Text; Old_text; New_text; [Occurrence]) |
+| T | Text | Returns text if given value is text, empty string otherwise. | T(Value) |
+| TEXT | Text | Converts a number into text according to a given format. | TEXT(Number; Format) |
+| TRIM <br><Badge text="v0.2.0"/>| Text | Strips extra spaces from text. | TRIM("Text") |
+| UNICHAR | Text | Returns the character created by using provided code point. | UNICHAR(Number) |
+| UNICODE | Text | Returns the Unicode code point of a first character of a text. | UNICODE(Text) |
+| UPPER | Text | Returns text converted to uppercase. | UPPER(Text) |

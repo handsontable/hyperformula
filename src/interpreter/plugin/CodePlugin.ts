@@ -13,8 +13,14 @@ export class CodePlugin extends FunctionPlugin {
     'CODE': {
       method: 'code',
       parameters: [
-          {argumentType: ArgumentTypes.STRING}
-        ]
+        {argumentType: ArgumentTypes.STRING}
+      ]
+    },
+    'UNICODE': {
+      method: 'unicode',
+      parameters: [
+        {argumentType: ArgumentTypes.STRING}
+      ]
     },
   }
 
@@ -24,6 +30,12 @@ export class CodePlugin extends FunctionPlugin {
         return new CellError(ErrorType.VALUE, ErrorMessage.EmptyString)
       }
       return value.charCodeAt(0)
+    })
+  }
+
+  public unicode(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('UNICODE'), (value: string) => {
+      return value.codePointAt(0) ?? new CellError(ErrorType.VALUE, ErrorMessage.EmptyString)
     })
   }
 }
