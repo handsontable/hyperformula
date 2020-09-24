@@ -880,10 +880,19 @@ export class HyperFormula implements TypedEmitter {
     const newEngine = BuildEngineFactory.rebuildWithConfig(newConfig, serializedSheets, this._stats)
 
     const storedNamedExpressions = this._namedExpressions.workbookStore.getAllNamedExpressions().map(expr => {
-        const val = this.getCellSerialized(expr.address)
-        return {expr, val}
+        return {expr,
+          val: this.getCellSerialized(expr.address),
+          sheet: undefined as Maybe<string>}
       }
     )
+
+    this._namedExpressions.worksheetStores.forEach((store, sheetNum) => {
+      store.getAllNamedExpressions().forEach(expr => {
+        storedNamedExpressions.push({expr,
+          val: this.getCellSerialized(expr.address),
+          sheet: this.getSheetName(sheetNum)!})
+      })
+    })
 
     this._config = newEngine.config
     this._stats = newEngine.stats
@@ -903,7 +912,7 @@ export class HyperFormula implements TypedEmitter {
     storedNamedExpressions.forEach((arg) => {
       const expr = arg.expr
       const val = arg.val
-      this.addNamedExpression(expr.displayName, val, undefined, expr.options)
+      this.addNamedExpression(expr.displayName, val, arg.sheet, expr.options)
     })
   }
 

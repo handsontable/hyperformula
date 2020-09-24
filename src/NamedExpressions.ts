@@ -96,6 +96,10 @@ class WorksheetStore {
     return this.mapping.has(this.normalizeExpressionName(expressionName))
   }
 
+  public getAllNamedExpressions(): InternalNamedExpression[] {
+    return Array.from(this.mapping.values()).filter((ne: InternalNamedExpression) => ne.added)
+  }
+
   private normalizeExpressionName(expressionName: string): string {
     return expressionName.toLowerCase()
   }
