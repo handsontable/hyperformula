@@ -6,7 +6,7 @@
 import {AbsoluteCellRange} from './AbsoluteCellRange'
 import {CellType, CellValueType, getCellType, getCellValueType, SimpleCellAddress} from './Cell'
 import {CellContent, CellContentParser, RawCellContent} from './CellContentParser'
-import {CellValue, ExportedChange, Exporter, NoErrorCellValue} from './CellValue'
+import {CellValue, DetailedCellError, ExportedChange, Exporter, NoErrorCellValue} from './CellValue'
 import {ColumnSearchStrategy} from './ColumnSearch/ColumnSearchStrategy'
 import {Config, ConfigParams} from './Config'
 import {ColumnRowIndex, CrudOperations} from './CrudOperations'
@@ -879,6 +879,13 @@ export class HyperFormula implements TypedEmitter {
 
     const newEngine = BuildEngineFactory.rebuildWithConfig(newConfig, serializedSheets, this._stats)
 
+    const storedNamedExpressions = this._namedExpressions.getAllNamedExpressionsNames().map(name => {
+        const expr = this._namedExpressions.workbookNamedExpressionOrPlaceholder(name)
+        const val = this.getCellSerialized(expr.address)
+        return {expr,val}
+      }
+    )
+
     this._config = newEngine.config
     this._stats = newEngine.stats
     this._dependencyGraph = newEngine.dependencyGraph
@@ -893,6 +900,12 @@ export class HyperFormula implements TypedEmitter {
     this._namedExpressions = newEngine.namedExpressions
     this._serialization = newEngine.serialization
     this._functionRegistry = newEngine.functionRegistry
+
+    storedNamedExpressions.forEach((arg) => {
+      const expr = arg.expr
+      const val = arg.val
+      this.addNamedExpression(expr.displayName, val, undefined, expr.options)
+    })
   }
 
   /**

@@ -151,7 +151,7 @@ export class NamedExpressions {
   }
 
   public nearestNamedExpression(expressionName: string, sheetId: number): Maybe<InternalNamedExpression> {
-    return this.worksheetStore(sheetId).get(expressionName) || this.workbookStore.getExisting(expressionName)
+    return this.worksheetStore(sheetId).get(expressionName) ?? this.workbookStore.getExisting(expressionName)
   }
 
   public isExpressionInScope(expressionName: string, sheetId: number): boolean {
@@ -187,7 +187,7 @@ export class NamedExpressions {
     }
   }
 
-  private worksheetStore(sheetId: number) {
+  private worksheetStore(sheetId: number): WorksheetStore {
     let store = this.worksheetStores.get(sheetId)
     if (!store) {
       store = new WorksheetStore()
