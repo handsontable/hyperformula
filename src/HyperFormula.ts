@@ -882,7 +882,7 @@ export class HyperFormula implements TypedEmitter {
     const storedNamedExpressions = this._namedExpressions.getAllNamedExpressionsNames().map(name => {
         const expr = this._namedExpressions.workbookNamedExpressionOrPlaceholder(name)
         const val = this.getCellSerialized(expr.address)
-        return {expr,val}
+        return {expr, val}
       }
     )
 
