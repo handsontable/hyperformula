@@ -11,6 +11,7 @@ describe('Date helpers', () => {
     expect(dateHelper.dateToNumber({year: 1900, month: 12, day: 31})).toBe(366)
     expect(dateHelper.dateToNumber({year: 2018, month: 12, day: 31})).toBe(43465)
   })
+
   it('#dateToNumber should return number representation of a date, excel compatibility', () => {
     const dateHelper = new DateTimeHelper(new Config({leapYear1900: true}))
     expect(dateHelper.dateToNumber({year: 1900, month: 1, day: 1})).toBe(2)
@@ -184,7 +185,6 @@ describe('Date helpers, other zero date', () => {
 })
 
 describe('Custom date parsing', () => {
-
   function customParseDate(dateString: string, dateFormat: string): Maybe<SimpleDate> {
     const momentDate = moment(dateString, dateFormat, true)
     if(momentDate.isValid()){
