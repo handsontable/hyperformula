@@ -3,72 +3,161 @@
  * Copyright (c) 2020 Handsoncode. All rights reserved.
  */
 
-import {CellError, EmptyValue, ErrorType} from './Cell'
-import {CellValue, DetailedCellError, ExportedCellChange, ExportedNamedExpressionChange} from './CellValue'
+import {CellType, CellValueType, ErrorType, SimpleCellAddress} from './Cell'
 import {
+  CellValue,
+  DetailedCellError,
+  ExportedCellChange,
+  ExportedChange,
+  ExportedNamedExpressionChange,
+  NoErrorCellValue
+} from './CellValue'
+import {HyperFormula} from './HyperFormula'
+import {Config, ConfigParams} from './Config'
+import {RawTranslationPackage} from './i18n'
+import enGB from './i18n/languages/enGB'
+import {Sheet, SheetDimensions, Sheets} from './Sheet'
+import {RawCellContent} from './CellContentParser'
+import {NamedExpression, NamedExpressionOptions} from './NamedExpressions'
+import {
+  ConfigValueTooBigError,
+  ConfigValueTooSmallError,
   EvaluationSuspendedError,
+  ExpectedOneOfValuesError,
+  ExpectedValueOfTypeError,
+  FunctionPluginValidationError,
   InvalidAddressError,
   InvalidArgumentsError,
+  LanguageAlreadyRegisteredError,
+  LanguageNotRegisteredError,
+  MatrixFormulasNotSupportedError,
+  MissingTranslationError,
+  NamedExpressionDoesNotExistError,
+  NamedExpressionNameIsAlreadyTakenError,
+  NamedExpressionNameIsInvalidError,
   NoOperationToRedoError,
   NoOperationToUndoError,
+  NoRelativeAddressesAllowedError,
   NoSheetWithIdError,
   NoSheetWithNameError,
   NotAFormulaError,
   NothingToPasteError,
-  SheetSizeLimitExceededError
+  ProtectedFunctionTranslationError,
+  SheetNameAlreadyTakenError,
+  SheetSizeLimitExceededError,
+  SourceLocationHasMatrixError,
+  TargetLocationHasMatrixError,
+  UnableToParseError
 } from './errors'
-import {HyperFormula} from './HyperFormula'
-import {Config} from './Config'
-import {languages} from './i18n'
-import {LazilyTransformingAstService} from './LazilyTransformingAstService'
-import {Sheets} from './Sheet'
+import * as plugins from './interpreter/plugin'
+import {FunctionArgument, FunctionPlugin, FunctionPluginDefinition} from './interpreter'
+import {ColumnRowIndex} from './CrudOperations'
 
 /** @internal */
 class HyperFormulaNS extends HyperFormula {
   public static HyperFormula = HyperFormula
-  public static NoSheetWithIdError = NoSheetWithIdError
-  public static NoSheetWithNameError = NoSheetWithNameError
-  public static SheetSizeLimitExceededError = SheetSizeLimitExceededError
-  public static InvalidAddressError = InvalidAddressError
-  public static EmptyValue = EmptyValue
+  public static ErrorType = ErrorType
+  public static CellType = CellType
+  public static CellValueType = CellValueType
   public static DetailedCellError = DetailedCellError
-  public static NoOperationToUndoError = NoOperationToUndoError
-  public static NoOperationToRedoError = NoOperationToRedoError
-  public static NothingToPasteError = NothingToPasteError
-  public static LazilyTransformingAstService = LazilyTransformingAstService
   public static ExportedCellChange = ExportedCellChange
   public static ExportedNamedExpressionChange = ExportedNamedExpressionChange
+  public static ConfigValueTooBigError = ConfigValueTooBigError
+  public static ConfigValueTooSmallError = ConfigValueTooSmallError
   public static EvaluationSuspendedError = EvaluationSuspendedError
-  public static NotAFormulaError = NotAFormulaError
-  public static ErrorType = ErrorType
-  public static CellError = CellError
+  public static ExpectedOneOfValuesError = ExpectedOneOfValuesError
+  public static ExpectedValueOfTypeError = ExpectedValueOfTypeError
+  public static FunctionPlugin = FunctionPlugin
+  public static FunctionPluginValidationError = FunctionPluginValidationError
+  public static InvalidAddressError = InvalidAddressError
   public static InvalidArgumentsError = InvalidArgumentsError
+  public static LanguageNotRegisteredError = LanguageNotRegisteredError
+  public static LanguageAlreadyRegisteredError = LanguageAlreadyRegisteredError
+  public static MatrixFormulasNotSupportedError = MatrixFormulasNotSupportedError
+  public static MissingTranslationError = MissingTranslationError
+  public static NamedExpressionDoesNotExistError = NamedExpressionDoesNotExistError
+  public static NamedExpressionNameIsAlreadyTakenError = NamedExpressionNameIsAlreadyTakenError
+  public static NamedExpressionNameIsInvalidError = NamedExpressionNameIsInvalidError
+  public static NoOperationToRedoError = NoOperationToRedoError
+  public static NoOperationToUndoError = NoOperationToUndoError
+  public static NoRelativeAddressesAllowedError = NoRelativeAddressesAllowedError
+  public static NoSheetWithIdError = NoSheetWithIdError
+  public static NoSheetWithNameError = NoSheetWithNameError
+  public static NotAFormulaError = NotAFormulaError
+  public static NothingToPasteError = NothingToPasteError
+  public static ProtectedFunctionTranslationError = ProtectedFunctionTranslationError
+  public static SheetNameAlreadyTakenError = SheetNameAlreadyTakenError
+  public static SheetSizeLimitExceededError = SheetSizeLimitExceededError
+  public static SourceLocationHasMatrixError = SourceLocationHasMatrixError
+  public static TargetLocationHasMatrixError = TargetLocationHasMatrixError
+  public static UnableToParseError = UnableToParseError
 }
 
 const defaultLanguage = Config.defaultConfig.language
-HyperFormula.registerLanguage(defaultLanguage, languages[defaultLanguage])
+
+HyperFormula.registerLanguage(defaultLanguage, enGB)
+HyperFormula.languages[enGB.langCode] = enGB
+
+for (const pluginName of Object.getOwnPropertyNames(plugins)) {
+  if (!pluginName.startsWith('_')) {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+    // @ts-ignore
+    HyperFormula.registerFunctionPlugin(plugins[pluginName])
+  }
+}
 
 export default HyperFormulaNS
 
 export {
-  Sheets,
-  HyperFormula,
-  NoSheetWithIdError,
-  NoSheetWithNameError,
-  SheetSizeLimitExceededError,
-  InvalidAddressError,
-  InvalidArgumentsError,
-  NotAFormulaError,
   CellValue,
-  EmptyValue,
-  CellError,
-  DetailedCellError,
-  LazilyTransformingAstService,
+  NoErrorCellValue,
+  ConfigParams,
+  ExportedChange,
+  RawCellContent,
+  Sheet,
+  Sheets,
+  SheetDimensions,
+  SimpleCellAddress,
+  ColumnRowIndex,
+  RawTranslationPackage,
+  FunctionPluginDefinition,
+  FunctionArgument,
+  NamedExpression,
+  NamedExpressionOptions,
+  HyperFormula,
+  CellType,
+  CellValueType,
+  ErrorType,
   ExportedCellChange,
   ExportedNamedExpressionChange,
-  NoOperationToUndoError,
-  NoOperationToRedoError,
-  NothingToPasteError,
+  DetailedCellError,
+  ConfigValueTooBigError,
+  ConfigValueTooSmallError,
   EvaluationSuspendedError,
-  ErrorType
+  ExpectedOneOfValuesError,
+  ExpectedValueOfTypeError,
+  FunctionPlugin,
+  FunctionPluginValidationError,
+  InvalidAddressError,
+  InvalidArgumentsError,
+  LanguageAlreadyRegisteredError,
+  LanguageNotRegisteredError,
+  MatrixFormulasNotSupportedError,
+  MissingTranslationError,
+  NamedExpressionDoesNotExistError,
+  NamedExpressionNameIsAlreadyTakenError,
+  NamedExpressionNameIsInvalidError,
+  NoOperationToRedoError,
+  NoOperationToUndoError,
+  NoRelativeAddressesAllowedError,
+  NoSheetWithIdError,
+  NoSheetWithNameError,
+  NotAFormulaError,
+  NothingToPasteError,
+  ProtectedFunctionTranslationError,
+  SheetNameAlreadyTakenError,
+  SheetSizeLimitExceededError,
+  SourceLocationHasMatrixError,
+  TargetLocationHasMatrixError,
+  UnableToParseError,
 }

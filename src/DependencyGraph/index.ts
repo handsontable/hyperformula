@@ -5,7 +5,7 @@
 
 export {DependencyGraph} from './DependencyGraph'
 export {AddressMapping} from './AddressMapping/AddressMapping'
-export {Graph, IGetDependenciesQuery} from './Graph'
+export {Graph} from './Graph'
 export {RangeMapping} from './RangeMapping'
 export {SheetMapping} from './SheetMapping'
 export {MatrixMapping} from './MatrixMapping'

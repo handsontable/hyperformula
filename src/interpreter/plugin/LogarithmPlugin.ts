@@ -3,80 +3,45 @@
  * Copyright (c) 2020 Handsoncode. All rights reserved.
  */
 
-import {CellError, ErrorType, InternalCellValue, SimpleCellAddress} from '../../Cell'
-import {AstNodeType, ProcedureAst} from '../../parser'
-import {SimpleRangeValue} from '../InterpreterValue'
-import {FunctionPlugin} from './FunctionPlugin'
+import {InternalScalarValue, SimpleCellAddress} from '../../Cell'
+import {ProcedureAst} from '../../parser'
+import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
 
 export class LogarithmPlugin extends FunctionPlugin {
 
   public static implementedFunctions = {
-    log10: {
-      translationKey: 'LOG10',
+    'LOG10': {
+      method: 'log10',
+      parameters: [
+          {argumentType: ArgumentTypes.NUMBER}
+        ]
     },
-    log: {
-      translationKey: 'LOG',
+    'LOG': {
+      method: 'log',
+      parameters: [
+          {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
+          {argumentType: ArgumentTypes.NUMBER, defaultValue: 10, greaterThan: 0},
+        ]
     },
-    ln: {
-      translationKey: 'LN',
+    'LN': {
+      method: 'ln',
+      parameters: [
+          {argumentType: ArgumentTypes.NUMBER}
+        ]
     },
   }
 
-  public log10(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
-    return this.templateWithOneCoercedToNumberArgument(ast, formulaAddress, (arg) => {
-      if (arg > 0) {
-        return Math.log10(arg)
-      } else {
-        return new CellError(ErrorType.NUM)
-      }
-    })
+  public log10(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('LOG10'), Math.log10)
   }
 
-  public log(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
-    if (ast.args.length < 1 || ast.args.length > 2) {
-      return new CellError(ErrorType.NA)
-    }
-
-    if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
-      return new CellError(ErrorType.NUM)
-    }
-    const arg = this.evaluateAst(ast.args[0], formulaAddress)
-    if (arg instanceof SimpleRangeValue) {
-      return new CellError(ErrorType.VALUE)
-    }
-
-    let coercedLogarithmicBase
-    if (ast.args[1]) {
-      const logarithmicBase = this.evaluateAst(ast.args[1], formulaAddress)
-      if (logarithmicBase instanceof SimpleRangeValue) {
-        return new CellError(ErrorType.VALUE)
-      }
-      coercedLogarithmicBase = this.coerceScalarToNumberOrError(logarithmicBase)
-    } else {
-      coercedLogarithmicBase = 10
-    }
-
-    const coercedArg = this.coerceScalarToNumberOrError(arg)
-    if (coercedArg instanceof CellError) {
-      return coercedArg
-    } else if (coercedLogarithmicBase instanceof CellError) {
-      return coercedLogarithmicBase
-    } else {
-      if (coercedArg > 0 && coercedLogarithmicBase > 0) {
-        return (Math.log(coercedArg) / Math.log(coercedLogarithmicBase))
-      } else {
-        return new CellError(ErrorType.NUM)
-      }
-    }
+  public log(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('LOG'),
+      (arg: number, base: number) => Math.log(arg) / Math.log(base)
+    )
   }
 
-  public ln(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
-    return this.templateWithOneCoercedToNumberArgument(ast, formulaAddress, (arg) => {
-      if (arg > 0) {
-        return Math.log(arg)
-      } else {
-        return new CellError(ErrorType.NUM)
-      }
-    })
+  public ln(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('LN'), Math.log)
   }
 }

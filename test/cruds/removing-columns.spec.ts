@@ -1,4 +1,4 @@
-import {HyperFormula, ExportedCellChange} from '../../src'
+import {ExportedCellChange, HyperFormula} from '../../src'
 import {AbsoluteCellRange} from '../../src/AbsoluteCellRange'
 import {ColumnIndex} from '../../src/ColumnSearch/ColumnIndex'
 import {MatrixVertex, RangeVertex} from '../../src/DependencyGraph'
@@ -13,6 +13,8 @@ import {
   extractMatrixRange,
   extractRange,
   extractReference,
+  verifyRangesInSheet,
+  verifyValues,
 } from '../testUtils'
 
 describe('Removing columns - checking if its possible', () => {
@@ -449,9 +451,9 @@ describe('Removing columns - reevaluation', () => {
     const a2 = engine.addressMapping.getCell(adr('A2'))
     const a3 = engine.addressMapping.getCell(adr('A3'))
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const a2setCellValueSpy = jest.spyOn(a2 as any, 'setCellValue')
+    const a2setCellValueSpy = spyOn(a2 as any, 'setCellValue')
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const a3setCellValueSpy = jest.spyOn(a3 as any, 'setCellValue')
+    const a3setCellValueSpy = spyOn(a3 as any, 'setCellValue')
 
     engine.removeColumns(0, [1, 1])
 
@@ -465,7 +467,7 @@ describe('Removing columns - reevaluation', () => {
     ])
     const d1 = engine.addressMapping.getCell(adr('D1'))
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const d1setCellValueSpy = jest.spyOn(d1 as any, 'setCellValue')
+    const d1setCellValueSpy = spyOn(d1 as any, 'setCellValue')
 
     engine.removeColumns(0, [1, 1])
 
@@ -480,7 +482,7 @@ describe('Removing columns - reevaluation', () => {
 
     const c1 = engine.addressMapping.getCell(adr('C1'))
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const c1setCellValueSpy = jest.spyOn(c1 as any, 'setCellValue')
+    const c1setCellValueSpy = spyOn(c1 as any, 'setCellValue')
 
     engine.removeColumns(0, [0, 2])
 
@@ -507,7 +509,7 @@ describe('Removing columns - matrices', () => {
       ['3', '4'],
     ])
 
-    expect(() => engine.removeColumns(0, [2, 1])).toThrowError('It is not possible to remove column within matrix')
+    expect(() => engine.removeColumns(0, [2, 1])).toThrowError('Cannot perform this operation, source location has a matrix inside.')
   })
 
   it('should remove column from numeric matrix', () => {
@@ -746,7 +748,7 @@ describe('Removing columns - sheet dimensions', () => {
     ])
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const recalcSpy = jest.spyOn(engine.evaluator as any, 'partialRun')
+    const recalcSpy = spyOn(engine.evaluator as any, 'partialRun')
     engine.removeColumns(0, [1, 1])
     engine.removeColumns(0, [10, 6])
 
@@ -832,5 +834,105 @@ describe('Removing columns - row range', () => {
       ['2', '2'],
       [null, '=SUM(1:2)']
     ]))
+  })
+})
+
+describe('Removing columns - merge ranges', () => {
+  it('should merge ranges', () => {
+    const engine = HyperFormula.buildFromArray([])
+    engine.setCellContents({sheet: 0, col: 1, row: 2}, 7)
+    engine.setCellContents({sheet: 0, col: 0, row: 3}, '=SUM(B2:C3)')
+    engine.setCellContents({sheet: 0, col: 0, row: 6}, '=SUM(A4:B6)')
+    engine.setCellContents({sheet: 0, col: 2, row: 6}, '=SUM(A4:A6)')
+
+    verifyRangesInSheet(engine, 0, ['A4:A6', 'A4:B6', 'B2:C3'])
+    verifyValues(engine)
+
+    engine.addColumns(0, [0, 2])
+
+    verifyRangesInSheet(engine, 0, ['C4:C6', 'C4:D6', 'D2:E3'])
+    verifyValues(engine)
+
+    engine.removeColumns(0, [3, 1])
+
+    verifyRangesInSheet(engine, 0, ['C4:C6', 'D2:D3'])
+    verifyValues(engine)
+  })
+
+  it('Should properly deallocate all nodes', () => {
+    const engine = HyperFormula.buildFromArray([])
+    engine.setCellContents({sheet: 0, col: 2, row: 3}, '=SUM(B2:C2)')
+    engine.setCellContents({sheet: 0, col: 3, row: 5}, '=SUM(B2:C3)')
+
+    engine.addColumns(0, [2, 2])
+    engine.removeColumns(0, [4, 1])
+
+    verifyRangesInSheet(engine, 0, ['B2:D2', 'B2:D3'])
+    verifyValues(engine)
+
+    engine.setCellContents({sheet: 0, col: 4, row: 5}, null)
+
+    verifyRangesInSheet(engine, 0, [])
+    verifyValues(engine)
+    expect(engine.dependencyGraph.graph.nodesCount()).toBe(0)
+    expect(engine.dependencyGraph.rangeMapping.getMappingSize(0)).toBe(0)
+  })
+
+  it('should merge ranges in proper order', () => {
+    const engine = HyperFormula.buildFromArray([])
+    engine.setCellContents({sheet: 0, col: 0, row: 0}, '=SUM(D5:F5)')
+    engine.setCellContents({sheet: 0, col: 1, row: 0}, '=SUM(D5:E5)')
+    engine.setCellContents({sheet: 0, col: 2, row: 0}, '=SUM(D5:D5)')
+
+    engine.removeColumns(0, [4, 1])
+
+    verifyRangesInSheet(engine, 0, ['D5:E5', 'D5:D5'])
+    verifyValues(engine)
+
+    engine.setCellContents(adr('A1'), null)
+    engine.setCellContents(adr('B1'), null)
+    engine.setCellContents(adr('C1'), null)
+
+    verifyRangesInSheet(engine, 0, [])
+    verifyValues(engine)
+  })
+
+  it('should merge ranges when removing multiple columns', () => {
+    const engine = HyperFormula.buildFromArray([])
+    engine.setCellContents({sheet: 0, col: 3, row: 0}, '=SUM(A5:A5)')
+    engine.setCellContents({sheet: 0, col: 0, row: 0}, '=SUM(A5:C5)')
+
+    verifyRangesInSheet(engine, 0, ['A5:A5', 'A5:C5'])
+
+    engine.removeColumns(0, [1, 2])
+
+    verifyRangesInSheet(engine, 0, ['A5:A5'])
+    verifyValues(engine)
+
+    engine.setCellContents(adr('A1'), null)
+    engine.setCellContents(adr('B1'), null)
+
+    verifyRangesInSheet(engine, 0, [])
+    verifyValues(engine)
+  })
+
+  it('should undo merge ranges', () => {
+    const engine = HyperFormula.buildFromArray([])
+    engine.setCellContents({sheet: 0, col: 2, row: 1}, 7)
+    engine.setCellContents({sheet: 0, col: 3, row: 0}, '=SUM(B2:C3)')
+    engine.setCellContents({sheet: 0, col: 6, row: 0}, '=SUM(A4:B6)')
+    engine.setCellContents({sheet: 0, col: 6, row: 2}, '=SUM(A4:A6)')
+
+    engine.addColumns(0, [0, 2])
+    engine.removeColumns(0, [3, 1])
+
+    verifyRangesInSheet(engine, 0, ['C4:C6', 'D2:D3'])
+    verifyValues(engine)
+
+    engine.undo()
+
+    verifyRangesInSheet(engine, 0, ['C4:C6', 'C4:D6', 'D2:E3'])
+
+    verifyValues(engine)
   })
 })

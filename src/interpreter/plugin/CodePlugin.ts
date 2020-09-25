@@ -3,23 +3,39 @@
  * Copyright (c) 2020 Handsoncode. All rights reserved.
  */
 
-import {CellError, ErrorType, InternalCellValue, SimpleCellAddress} from '../../Cell'
+import {CellError, ErrorType, InternalScalarValue, SimpleCellAddress} from '../../Cell'
+import {ErrorMessage} from '../../error-message'
 import {ProcedureAst} from '../../parser'
-import {FunctionPlugin} from './FunctionPlugin'
+import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
 
 export class CodePlugin extends FunctionPlugin {
   public static implementedFunctions = {
-    code: {
-      translationKey: 'CODE',
+    'CODE': {
+      method: 'code',
+      parameters: [
+        {argumentType: ArgumentTypes.STRING}
+      ]
+    },
+    'UNICODE': {
+      method: 'unicode',
+      parameters: [
+        {argumentType: ArgumentTypes.STRING}
+      ]
     },
   }
 
-  public code(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
-    return this.templateWithOneCoercedToStringArgument(ast, formulaAddress, (value: string) => {
+  public code(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('CODE'), (value: string) => {
       if (value.length === 0) {
-        return new CellError(ErrorType.VALUE)
+        return new CellError(ErrorType.VALUE, ErrorMessage.EmptyString)
       }
       return value.charCodeAt(0)
+    })
+  }
+
+  public unicode(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('UNICODE'), (value: string) => {
+      return value.codePointAt(0) ?? new CellError(ErrorType.VALUE, ErrorMessage.EmptyString)
     })
   }
 }

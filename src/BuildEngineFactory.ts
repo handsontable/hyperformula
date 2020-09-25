@@ -20,7 +20,8 @@ import {buildLexerConfig, ParserWithCaching, Unparser} from './parser'
 import {Serialization} from './Serialization'
 import {EmptyStatistics, Statistics, StatType} from './statistics'
 import {SheetSizeLimitExceededError} from './errors'
-import {findBoundaries, Sheet, Sheets} from './Sheet'
+import {findBoundaries, Sheet, Sheets, validateAsSheet} from './Sheet'
+import {FunctionRegistry} from './interpreter/FunctionRegistry'
 
 export type EngineState = {
   config: Config,
@@ -36,14 +37,17 @@ export type EngineState = {
   exporter: Exporter,
   namedExpressions: NamedExpressions,
   serialization: Serialization,
+  functionRegistry: FunctionRegistry,
 }
 
 export class BuildEngineFactory {
   private static buildEngine(config: Config, sheets: Sheets = {}, stats: Statistics = config.useStats ? new Statistics() : new EmptyStatistics()): EngineState {
     stats.start(StatType.BUILD_ENGINE_TOTAL)
 
+    const namedExpressions = new NamedExpressions()
+    const functionRegistry = new FunctionRegistry(config)
     const lazilyTransformingAstService = new LazilyTransformingAstService(stats)
-    const dependencyGraph = DependencyGraph.buildEmpty(lazilyTransformingAstService, config, stats)
+    const dependencyGraph = DependencyGraph.buildEmpty(lazilyTransformingAstService, config, functionRegistry, namedExpressions, stats)
     const columnSearch = buildColumnSearchStrategy(dependencyGraph, config, stats)
     const sheetMapping = dependencyGraph.sheetMapping
     const addressMapping = dependencyGraph.addressMapping
@@ -51,6 +55,7 @@ export class BuildEngineFactory {
     for (const sheetName in sheets) {
       if (Object.prototype.hasOwnProperty.call(sheets, sheetName)) {
         const sheet = sheets[sheetName]
+        validateAsSheet(sheet)
         const boundaries = findBoundaries(sheet)
         if (boundaries.height > config.maxRows || boundaries.width > config.maxColumns) {
           throw new SheetSizeLimitExceededError()
@@ -60,28 +65,26 @@ export class BuildEngineFactory {
       }
     }
 
-    const notEmpty = sheetMapping.numberOfSheets() > 0
-    const parser = new ParserWithCaching(config, notEmpty ? sheetMapping.get : sheetMapping.fetch)
-    const unparser = new Unparser(config, buildLexerConfig(config), sheetMapping.fetchDisplayName)
+    const parser = new ParserWithCaching(config, functionRegistry, sheetMapping.get)
+    const unparser = new Unparser(config, buildLexerConfig(config), sheetMapping.fetchDisplayName, namedExpressions)
     const dateHelper = new DateTimeHelper(config)
     const numberLiteralHelper = new NumberLiteralHelper(config)
     const cellContentParser = new CellContentParser(config, dateHelper, numberLiteralHelper)
 
+    const crudOperations = new CrudOperations(config, stats, dependencyGraph, columnSearch, parser, cellContentParser, lazilyTransformingAstService, namedExpressions)
     stats.measure(StatType.GRAPH_BUILD, () => {
       const graphBuilder = new GraphBuilder(dependencyGraph, columnSearch, parser, cellContentParser, config, stats)
       graphBuilder.buildGraph(sheets)
     })
 
-    const crudOperations = new CrudOperations(config, stats, dependencyGraph, columnSearch, parser, cellContentParser, lazilyTransformingAstService)
     lazilyTransformingAstService.undoRedo = crudOperations.undoRedo
     lazilyTransformingAstService.parser = parser
 
-    const evaluator = new Evaluator(dependencyGraph, columnSearch, config, stats, dateHelper, numberLiteralHelper)
-    evaluator.run()
-
-    const namedExpressions = new NamedExpressions(cellContentParser, dependencyGraph, parser, crudOperations)
     const exporter = new Exporter(config, namedExpressions)
     const serialization = new Serialization(dependencyGraph, unparser, config, exporter)
+
+    const evaluator = new Evaluator(dependencyGraph, columnSearch, config, stats, dateHelper, numberLiteralHelper, functionRegistry, namedExpressions, serialization)
+    evaluator.run()
 
     stats.end(StatType.BUILD_ENGINE_TOTAL)
 
@@ -98,7 +101,8 @@ export class BuildEngineFactory {
       crudOperations,
       exporter,
       namedExpressions,
-      serialization
+      serialization,
+      functionRegistry,
     }
   }
 

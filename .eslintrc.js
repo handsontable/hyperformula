@@ -7,7 +7,8 @@ module.exports = {
   ],
   parserOptions: {
     tsconfigRootDir: __dirname,
-    project: ['./tsconfig.json', './tsconfig.test.json'],
+    project: './tsconfig.test.json',
+    createDefaultProgram: true,
   },
   extends: [
     'eslint:recommended',
@@ -65,10 +66,16 @@ module.exports = {
   },
   overrides: [
     {
-      files: '**/src/**/*.ts',
+      files: ['**/src/**/*.ts'],
       rules: {
-        'license-header/header': [ 'error', './.config/license-header.js' ],
+        'license-header/header': [ 'error', './.config/source-license-header.js' ],
       }
-    }
-  ]
+    },
+    {
+      files: ['**/src/i18n/languages/**/*.ts'],
+      rules: {
+        'sort-keys': ['error', 'asc'],
+      }
+    },
+  ],
 };

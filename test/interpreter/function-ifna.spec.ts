@@ -1,5 +1,6 @@
 import {HyperFormula} from '../../src'
 import {ErrorType} from '../../src/Cell'
+import {ErrorMessage} from '../../src/error-message'
 import {adr, detailedError} from '../testUtils'
 
 describe('Function IFNA', () => {
@@ -7,8 +8,8 @@ describe('Function IFNA', () => {
     const engine = HyperFormula.buildFromArray([
       ['=IFNA(1)', '=IFNA(2,3,4)']
     ])
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA))
-    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.NA))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
+    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
   })
   it('when no error', () => {
     const engine = HyperFormula.buildFromArray([['=IFNA("abcd", "no")']])
@@ -49,7 +50,7 @@ describe('Function IFNA', () => {
   it('when range', () => {
     const engine = HyperFormula.buildFromArray([['=IFNA("yes", A2:A3)']])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessage.WrongType))
   })
 
   it('when cycle', () => {

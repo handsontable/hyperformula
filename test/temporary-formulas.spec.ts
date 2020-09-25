@@ -1,5 +1,6 @@
 import {HyperFormula} from '../src'
 import {ErrorType} from '../src/Cell'
+import {ErrorMessage} from '../src/error-message'
 import {detailedError} from './testUtils'
 
 describe('Temporary formulas - normalization', () => {
@@ -27,6 +28,13 @@ describe('Temporary formulas - normalization', () => {
     const normalizedFormula = engine.normalizeFormula('=3*$a$1')
 
     expect(normalizedFormula).toEqual('=3*$A$1')
+
+  it('wont normalize sheet names of not existing sheets', () => {
+    const engine = HyperFormula.buildEmpty()
+
+    const formula = '=ShEeT1!A1+10'
+
+    expect(engine.normalizeFormula(formula)).toBe('=ShEeT1!A1+10')
   })
 })
 
@@ -57,6 +65,15 @@ describe('Temporary formulas - validation', () => {
 
     expect(engine.validateFormula('=#N/A')).toBe(true)
   })
+
+  it('validateFormula fails with an empty engine', () => {
+    const engine = HyperFormula.buildEmpty()
+
+    const formula = '=Sheet1!A1+10'
+
+    expect(engine.validateFormula(formula)).toBe(true)
+  })
+})
 
 describe('Temporary formulas - calculation', () => {
   it('basic usage', () => {
@@ -89,6 +106,14 @@ describe('Temporary formulas - calculation', () => {
     }).toThrowError(/no sheet with name/)
   })
 
+  it('SUM with range args', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1', '2'],
+      ['3', '4']
+    ])
+    expect(engine.calculateFormula('=SUM(A1:B2)', 'Sheet1')).toEqual(10)
+  })
+
   it('non-scalars doesnt work', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '2'],
@@ -97,7 +122,7 @@ describe('Temporary formulas - calculation', () => {
 
     const result = engine.calculateFormula('=TRANSPOSE(A1:B2)', 'Sheet1')
 
-    expect(result).toEqual(detailedError(ErrorType.VALUE))
+    expect(result).toEqual(detailedError(ErrorType.VALUE, ErrorMessage.ScalarExpected))
   })
 
   it('passing something which is not a formula doesnt work', () => {

@@ -1,8 +1,6 @@
-import {HyperFormula, NoOperationToUndoError, NoOperationToRedoError} from '../src'
-import {
-  expectEngineToBeTheSameAs,
-  adr
-} from './testUtils'
+import {ErrorType, HyperFormula, NoOperationToRedoError, NoOperationToUndoError} from '../src'
+import {ErrorMessage} from '../src/error-message'
+import {adr, detailedError, expectEngineToBeTheSameAs} from './testUtils'
 
 describe('Undo - removing rows', () => {
   it('works for empty row', () => {
@@ -163,30 +161,94 @@ describe('Undo - adding rows', () => {
 describe('Undo - moving rows', () => {
   it('works', () => {
     const sheet = [
-      ['1'],
-      ['2'],
-      ['3'], // move first row before this one
+      [0], [1], [2], [3], [4], [5], [6], [7],
     ]
     const engine = HyperFormula.buildFromArray(sheet)
-    engine.moveRows(0, 0, 1, 2)
-
+    engine.moveRows(0, 1, 3, 7)
     engine.undo()
 
     expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray(sheet))
+  })
+
+  it('works in both directions', () => {
+    const sheet = [
+      [0], [1], [2], [3], [4], [5], [6], [7],
+    ]
+    const engine = HyperFormula.buildFromArray(sheet)
+    engine.moveRows(0, 4, 3, 2)
+    engine.undo()
+
+    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray(sheet))
+  })
+
+  it('should restore range', () => {
+    const engine = HyperFormula.buildFromArray([
+      [1, null],
+      [2, '=SUM(A1:A2)'],
+    ])
+    engine.moveRows(0, 1, 1, 3)
+    engine.undo()
+
+    expect(engine.getCellFormula(adr('B2'))).toEqual('=SUM(A1:A2)')
+  })
+
+  it('should restore range when moving other way', () => {
+    const engine = HyperFormula.buildFromArray([
+      [1, null],
+      [2, '=SUM(A1:A2)'],
+    ])
+
+    engine.moveRows(0, 2, 1, 1)
+    engine.undo()
+
+    expect(engine.getCellFormula(adr('B2'))).toEqual('=SUM(A1:A2)')
   })
 })
 
 describe('Undo - moving columns', () => {
   it('works', () => {
     const sheet = [
-      ['1', '2', '3'],
+      [0, 1, 2, 3, 4, 5, 6, 7],
     ]
     const engine = HyperFormula.buildFromArray(sheet)
-    engine.moveColumns(0, 0, 1, 2)
-
+    engine.moveColumns(0, 1, 3, 7)
     engine.undo()
 
     expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray(sheet))
+  })
+
+  it('works in both directions', () => {
+    const sheet = [
+      [0, 1, 2, 3, 4, 5, 6, 7],
+    ]
+    const engine = HyperFormula.buildFromArray(sheet)
+    engine.moveColumns(0, 4, 3, 2)
+    engine.undo()
+
+    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray(sheet))
+  })
+
+  it('should restore range', () => {
+    const engine = HyperFormula.buildFromArray([
+      [1, 2],
+      [null, '=SUM(A1:B1)'],
+    ])
+    engine.moveColumns(0, 1, 1, 3)
+    engine.undo()
+
+    expect(engine.getCellFormula(adr('B2'))).toEqual('=SUM(A1:B1)')
+  })
+
+  it('should restore range when moving to left', () => {
+    const engine = HyperFormula.buildFromArray([
+      [1, 2],
+      [null, '=SUM(A1:B1)'],
+    ])
+
+    engine.moveColumns(0, 2, 1, 1)
+    engine.undo()
+
+    expect(engine.getCellFormula(adr('B2'))).toEqual('=SUM(A1:B1)')
   })
 })
 
@@ -400,6 +462,28 @@ describe('Undo - removing sheet', () => {
   })
 })
 
+describe('Undo - renaming sheet', () => {
+  it('undo previous operation if name not changes', () => {
+    const engine = HyperFormula.buildFromSheets({ 'Sheet1': [[1]] })
+    engine.setCellContents(adr('A1'), [[2]])
+    engine.renameSheet(0, 'Sheet1')
+
+    engine.undo()
+
+    expect(engine.getCellValue(adr('A1'))).toEqual(1)
+    expect(engine.getSheetName(0)).toEqual('Sheet1')
+  })
+
+  it('undo rename sheet', () => {
+    const engine = HyperFormula.buildFromSheets({ 'Sheet1': [[1]] })
+    engine.renameSheet(0, 'Foo')
+
+    engine.undo()
+
+    expect(engine.getSheetName(0)).toEqual('Sheet1')
+  })
+})
+
 describe('Undo - setting cell content', () => {
   it('works for simple values', () => {
     const sheet = [
@@ -574,6 +658,34 @@ describe('Undo - moving cells', () => {
 
     expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray(sheet))
   })
+
+  it('removed added global named expression', () => {
+    const engine = HyperFormula.buildFromSheets({
+      'Sheet1': [],
+      'Sheet2': []
+    })
+    engine.addNamedExpression('foo', 'bar', 'Sheet1')
+    engine.setCellContents(adr('A1'), '=foo')
+    engine.moveCells(adr('A1'), 1, 1, adr('A1', 1))
+
+    engine.undo()
+
+    expect(engine.getNamedExpressionValue('foo')).toEqual(undefined)
+  })
+
+  it('remove global named expression even if it was added after formula', () => {
+    const engine = HyperFormula.buildFromSheets({
+      'Sheet1': [['=foo']],
+      'Sheet2': []
+    })
+    engine.addNamedExpression('foo', 'bar', 'Sheet1')
+    engine.moveCells(adr('A1'), 1, 1, adr('A1', 1))
+
+    engine.undo()
+
+    expect(engine.getNamedExpressionValue('foo', 'Sheet1')).toEqual('bar')
+    expect(engine.getNamedExpressionValue('foo')).toEqual(undefined)
+  })
 })
 
 describe('Undo - cut-paste', () => {
@@ -603,6 +715,22 @@ describe('Undo - cut-paste', () => {
 
     expect(engine.isClipboardEmpty()).toBe(true)
   })
+
+  it('removed added global named expression', () => {
+    const engine = HyperFormula.buildFromSheets({
+      'Sheet1': [],
+      'Sheet2': []
+    })
+    engine.addNamedExpression('foo', 'bar', 'Sheet1')
+    engine.setCellContents(adr('A1'), '=foo')
+    engine.cut(adr('A1'), 1, 1)
+    engine.paste(adr('A1', 1))
+
+    engine.undo()
+
+    expect(engine.getNamedExpressionValue('foo', 'Sheet1')).toEqual('bar')
+    expect(engine.getNamedExpressionValue('foo')).toEqual(undefined)
+  })
 })
 
 describe('Undo - copy-paste', () => {
@@ -619,6 +747,69 @@ describe('Undo - copy-paste', () => {
 
     expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray(sheet))
   })
+
+  it('removed added global named expression', () => {
+    const engine = HyperFormula.buildFromSheets({
+      'Sheet1': [],
+      'Sheet2': []
+    })
+    engine.addNamedExpression('foo', 'bar', 'Sheet1')
+    engine.setCellContents(adr('A1'), '=foo')
+    engine.copy(adr('A1'), 1, 1)
+    engine.paste(adr('A1', 1))
+
+    engine.undo()
+
+    expect(engine.getNamedExpressionValue('foo', 'Sheet1')).toEqual('bar')
+    expect(engine.getNamedExpressionValue('foo')).toEqual(undefined)
+  })
+})
+
+describe('Undo - add named expression', () => {
+  it('works', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=foo']
+    ])
+
+    engine.addNamedExpression('foo', 'foo')
+
+    engine.undo()
+
+    expect(engine.listNamedExpressions().length).toEqual(0)
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NAME, ErrorMessage.NamedExpressionName('foo')))
+  })
+})
+
+describe('Undo - remove named expression', () => {
+  it('works', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=foo']
+    ])
+
+    engine.addNamedExpression('foo', 'foo')
+    engine.removeNamedExpression('foo')
+
+    engine.undo()
+
+    expect(engine.listNamedExpressions().length).toEqual(1)
+    expect(engine.getCellValue(adr('A1'))).toEqual('foo')
+  })
+})
+
+describe('Undo - change named expression', () => {
+  it('works', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=foo']
+    ])
+
+    engine.addNamedExpression('foo', 'foo')
+    engine.changeNamedExpression('foo', 'bar')
+
+    engine.undo()
+
+    expect(engine.listNamedExpressions().length).toEqual(1)
+    expect(engine.getCellValue(adr('A1'))).toEqual('foo')
+  })
 })
 
 describe('Undo', () => {
@@ -627,7 +818,7 @@ describe('Undo', () => {
 
     expect(() => {
       engine.undo()
-    }).toThrowError(new NoOperationToUndoError())
+    }).toThrow(new NoOperationToUndoError())
   })
 
   it('undo recomputes and return changes', () => {
@@ -698,6 +889,16 @@ describe('Undo', () => {
     engine.setCellContents(adr('A1'), '4')
 
     expect(engine.isThereSomethingToUndo()).toBe(true)
+  })
+
+  it('restore AST after irreversible operation', () => {
+    const engine = HyperFormula.buildFromArray([])
+    engine.setCellContents(adr('E1'), '=SUM(A1:C1)')
+    engine.addColumns(0, [3, 1])
+    engine.removeColumns(0, [0, 1])
+
+    expect(() => engine.undo()).not.toThrowError()
+    expect(engine.getCellFormula(adr('F1'))).toEqual('=SUM(A1:C1)')
   })
 })
 
@@ -1078,6 +1279,28 @@ describe('Redo - adding sheet', () => {
   })
 })
 
+describe('Redo - renaming sheet', () => {
+  it('redo rename sheet', () => {
+    const engine = HyperFormula.buildFromSheets({ 'Sheet1': [[1]] })
+    engine.renameSheet(0, 'Foo')
+    engine.undo()
+
+    engine.redo()
+
+    expect(engine.getSheetName(0)).toEqual('Foo')
+  })
+
+  it('clears redo stack', () => {
+    const engine = HyperFormula.buildFromArray([])
+    engine.setCellContents(adr('A1'), 42)
+    engine.undo()
+
+    engine.renameSheet(0, 'Foo')
+
+    expect(engine.isThereSomethingToRedo()).toBe(false)
+  })
+})
+
 describe('Redo - clearing sheet', () => {
   it('works', () => {
     const engine = HyperFormula.buildFromArray([
@@ -1329,6 +1552,88 @@ describe('Redo - setting sheet contents', () => {
   })
 })
 
+describe('Redo - add named expression', () => {
+  it('works', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=foo']
+    ])
+
+    engine.addNamedExpression('foo', 'foo')
+    engine.undo()
+
+    engine.redo()
+
+    expect(engine.listNamedExpressions().length).toEqual(1)
+    expect(engine.getCellValue(adr('A1'))).toEqual('foo')
+  })
+
+  it('clears redo stack', () => {
+    const engine = HyperFormula.buildFromArray([])
+    engine.setCellContents(adr('A1'), 42)
+    engine.undo()
+
+    engine.addNamedExpression('foo', 'foo')
+
+    expect(engine.isThereSomethingToRedo()).toBe(false)
+  })
+})
+
+describe('Redo - remove named expression', () => {
+  it('works', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=foo']
+    ])
+
+    engine.addNamedExpression('foo', 'foo')
+    engine.removeNamedExpression('foo')
+    engine.undo()
+
+    engine.redo()
+
+    expect(engine.listNamedExpressions().length).toEqual(0)
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NAME, ErrorMessage.NamedExpressionName('foo')))
+  })
+
+  it('clears redo stack', () => {
+    const engine = HyperFormula.buildFromArray([])
+    engine.addNamedExpression('foo', 'foo')
+    engine.setCellContents(adr('A1'), 42)
+    engine.undo()
+
+    engine.removeNamedExpression('foo')
+
+    expect(engine.isThereSomethingToRedo()).toBe(false)
+  })
+})
+
+describe('Redo - change named expression', () => {
+  it('works', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=foo']
+    ])
+
+    engine.addNamedExpression('foo', 'foo')
+    engine.changeNamedExpression('foo', 'bar')
+    engine.undo()
+
+    engine.redo()
+
+    expect(engine.listNamedExpressions().length).toEqual(1)
+    expect(engine.getCellValue(adr('A1'))).toEqual('bar')
+  })
+
+  it('clears redo stack', () => {
+    const engine = HyperFormula.buildFromArray([])
+    engine.addNamedExpression('foo', 'foo')
+    engine.setCellContents(adr('A1'), 42)
+    engine.undo()
+
+    engine.changeNamedExpression('foo', 'foo')
+
+    expect(engine.isThereSomethingToRedo()).toBe(false)
+  })
+})
+
 describe('Redo - batch mode', () => {
   it('multiple batched operations are one redo', () => {
     const engine = HyperFormula.buildFromArray([
@@ -1370,7 +1675,7 @@ describe('Redo', () => {
 
     expect(() => {
       engine.redo()
-    }).toThrowError(new NoOperationToRedoError())
+    }).toThrow(new NoOperationToRedoError())
   })
 
   it('redo recomputes and return changes', () => {

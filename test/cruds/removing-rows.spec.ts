@@ -12,7 +12,7 @@ import {
   expectReferenceToHaveRefError,
   extractMatrixRange,
   extractRange,
-  extractReference,
+  extractReference, verifyRangesInSheet, verifyValues,
 } from '../testUtils'
 
 describe('Removing rows - checking if its possible', () => {
@@ -516,9 +516,9 @@ describe('Removing rows - reevaluation', () => {
     const b1 = engine.addressMapping.getCell(adr('B1'))
     const c1 = engine.addressMapping.getCell(adr('C1'))
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const b1setCellValueSpy = jest.spyOn(b1 as any, 'setCellValue')
+    const b1setCellValueSpy = spyOn(b1 as any, 'setCellValue')
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const c1setCellValueSpy = jest.spyOn(c1 as any, 'setCellValue')
+    const c1setCellValueSpy = spyOn(c1 as any, 'setCellValue')
 
     engine.removeRows(0, [1, 1])
 
@@ -533,7 +533,7 @@ describe('Removing rows - reevaluation', () => {
     ])
     const c1 = engine.addressMapping.getCell(adr('C1'))
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const c1setCellValueSpy = jest.spyOn(c1 as any, 'setCellValue')
+    const c1setCellValueSpy = spyOn(c1 as any, 'setCellValue')
 
     engine.removeRows(0, [1, 1])
 
@@ -549,7 +549,7 @@ describe('Removing rows - reevaluation', () => {
 
     const a3 = engine.addressMapping.getCell(adr('A3'))
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const a3setCellValueSpy = jest.spyOn(a3 as any, 'setCellValue')
+    const a3setCellValueSpy = spyOn(a3 as any, 'setCellValue')
 
     engine.removeRows(0, [0, 2])
 
@@ -566,7 +566,7 @@ describe('Removing rows - matrices', () => {
       ['{=MMULT(A1:B2, A1:B2)}'],
     ])
 
-    expect(() => engine.removeRows(0, [2, 1])).toThrowError('It is not possible to remove row with matrix')
+    expect(() => engine.removeRows(0, [2, 1])).toThrowError('Cannot perform this operation, source location has a matrix inside.')
   })
 
   it('should remove row from numeric matrix', () => {
@@ -793,7 +793,7 @@ describe('Removing rows - sheet dimensions', () => {
     ])
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const recalcSpy = jest.spyOn(engine.evaluator as any, 'partialRun')
+    const recalcSpy = spyOn(engine.evaluator as any, 'partialRun')
     engine.removeRows(0, [1, 1])
     engine.removeRows(0, [10, 6])
 
@@ -810,7 +810,7 @@ describe('Removing rows - sheet dimensions', () => {
       ['2'],
     ])
 
-    expect(() => engine.removeRows(0, [1, 0])).toThrow(new InvalidArgumentsError())
+    expect(() => engine.removeRows(0, [1, 0])).toThrow(new InvalidArgumentsError('starting row to be smaller than the ending row.'))
   })
 
   it('returns changed values', () => {
@@ -833,7 +833,7 @@ describe('Removing rows - column index', () => {
       ['1', '=VLOOKUP(2, A1:A10, 1, TRUE())'],
       [null],
       ['2'],
-    ], { useColumnIndex: true })
+    ], {useColumnIndex: true})
 
     engine.removeRows(0, [1, 1])
 
@@ -905,5 +905,184 @@ describe('Removing rows - column range', () => {
       ['1', '2'],
       ['1', '2', '=SUM(A:B)'],
     ]))
+  })
+})
+
+describe('Removing rows - merge ranges', () => {
+  it('should work', () => {
+    const engine = HyperFormula.buildFromArray([])
+    engine.setCellContents({sheet: 0, col: 4, row: 0}, '=SUM(A1:C1)')
+    engine.setCellContents({sheet: 0, col: 3, row: 1}, '=SUM(A1:C2)')
+    engine.setCellContents({sheet: 0, col: 4, row: 0}, '=SUM(A1:C2)')
+
+    verifyRangesInSheet(engine, 0, ['A1:C1', 'A1:C2'])
+
+    engine.addRows(0, [1, 2])
+    engine.removeRows(0, [3, 1])
+
+    verifyRangesInSheet(engine, 0, ['A1:C1', 'A1:C2', 'A1:C3'])
+
+    engine.setCellContents({sheet: 0, col: 4, row: 0}, '=SUM(B2:B3)')
+    engine.addRows(0, [1, 2])
+
+    verifyRangesInSheet(engine, 0, ['B4:B5'])
+  })
+
+  it('should not remove too much', () => {
+    const engine = HyperFormula.buildFromArray([])
+    engine.setCellContents({sheet: 0, col: 3, row: 0}, '=SUM(A1:C2)')
+    engine.setCellContents({sheet: 0, col: 4, row: 0}, '=SUM(A1:C1)')
+
+    verifyRangesInSheet(engine, 0, ['A1:C1', 'A1:C2'])
+
+    engine.addRows(0, [0, 2])
+    engine.removeRows(0, [3, 1])
+
+    verifyRangesInSheet(engine, 0, ['A3:C3'])
+    verifyValues(engine)
+
+    engine.setCellContents({sheet: 0, col: 3, row: 2}, '=SUM(A2:B3)')
+    engine.setCellContents({sheet: 0, col: 4, row: 2}, '=SUM(A2:B3)')
+
+    verifyRangesInSheet(engine, 0, ['A2:B3'])
+    verifyValues(engine)
+  })
+
+  it('should merge ranges', () => {
+    const engine = HyperFormula.buildFromArray([])
+    engine.setCellContents({sheet: 0, col: 2, row: 1}, 7)
+    engine.setCellContents({sheet: 0, col: 3, row: 0}, '=SUM(B2:C3)')
+    engine.setCellContents({sheet: 0, col: 6, row: 0}, '=SUM(D1:F2)')
+    engine.setCellContents({sheet: 0, col: 6, row: 2}, '=SUM(D1:F1)')
+
+    verifyRangesInSheet(engine, 0, ['D1:F1', 'D1:F2', 'B2:C3'])
+    verifyValues(engine)
+
+    engine.addRows(0, [0, 2])
+
+    verifyRangesInSheet(engine, 0, ['D3:F3', 'D3:F4', 'B4:C5'])
+    verifyValues(engine)
+
+    engine.removeRows(0, [3, 1])
+
+    verifyRangesInSheet(engine, 0, ['D3:F3', 'B4:C4'])
+    verifyValues(engine)
+  })
+
+  it('Should properly deallocate all nodes', () => {
+    const engine = HyperFormula.buildFromArray([])
+    engine.setCellContents({sheet: 0, col: 3, row: 2}, '=SUM(B2:C2)')
+    engine.setCellContents({sheet: 0, col: 5, row: 3}, '=SUM(B2:C3)')
+
+    engine.addRows(0, [2, 2])
+    engine.removeRows(0, [4, 1])
+
+    verifyRangesInSheet(engine, 0, ['B2:C2', 'B2:C3', 'B2:C4'])
+    verifyValues(engine)
+
+    engine.setCellContents({sheet: 0, col: 5, row: 4}, null)
+
+    verifyRangesInSheet(engine, 0, [])
+    verifyValues(engine)
+    expect(engine.dependencyGraph.graph.nodesCount()).toBe(0)
+    expect(engine.dependencyGraph.rangeMapping.getMappingSize(0)).toBe(0)
+  })
+
+  it('should merge ranges in proper order', () => {
+    const engine = HyperFormula.buildFromArray([])
+    engine.setCellContents({sheet: 0, col: 0, row: 0}, '=SUM(A4:A6)')
+    engine.setCellContents({sheet: 0, col: 0, row: 1}, '=SUM(A4:A5)')
+    engine.setCellContents({sheet: 0, col: 0, row: 2}, '=SUM(A4:A4)')
+
+    engine.removeRows(0, [4, 1])
+
+    verifyRangesInSheet(engine, 0, ['A4:A5', 'A4:A4'])
+    verifyValues(engine)
+
+    engine.setCellContents(adr('A1'), null)
+    engine.setCellContents(adr('A2'), null)
+    engine.setCellContents(adr('A3'), null)
+
+    verifyRangesInSheet(engine, 0, [])
+    verifyValues(engine)
+  })
+
+  it('should merge ranges with subranges in proper order', () => {
+    const engine = HyperFormula.buildFromArray([])
+    engine.setCellContents({sheet: 0, col: 0, row: 1}, '=SUM(E1:E1)')
+    engine.setCellContents({sheet: 0, col: 0, row: 0}, '=SUM(E1:E2)')
+
+    engine.addRows(0, [1, 2])
+
+    verifyRangesInSheet(engine, 0, ['E1:E1', 'E1:E2', 'E1:E3', 'E1:E4'])
+    verifyValues(engine)
+
+    engine.removeRows(0, [2, 1])
+
+    verifyRangesInSheet(engine, 0, ['E1:E1', 'E1:E2', 'E1:E3'])
+    verifyValues(engine)
+
+    engine.setCellContents(adr('A1'), null)
+    engine.setCellContents(adr('A3'), null)
+
+    verifyRangesInSheet(engine, 0, [])
+    verifyValues(engine)
+  })
+
+  it('should merge ranges when removing multiple rows', () => {
+    const engine = HyperFormula.buildFromArray([])
+    engine.setCellContents({sheet: 0, col: 0, row: 3}, '=SUM(E1:E1)')
+    engine.setCellContents({sheet: 0, col: 0, row: 0}, '=SUM(E1:E3)')
+
+    verifyRangesInSheet(engine, 0, ['E1:E1', 'E1:E3'])
+
+    engine.removeRows(0, [1, 2])
+
+    verifyRangesInSheet(engine, 0, ['E1:E1'])
+    verifyValues(engine)
+
+    engine.setCellContents(adr('A1'), null)
+    engine.setCellContents(adr('A2'), null)
+
+    verifyRangesInSheet(engine, 0, [])
+    verifyValues(engine)
+  })
+
+  it('should merge ranges when removing multiple rows 2', () => {
+    const engine = HyperFormula.buildFromArray([])
+    engine.setCellContents({sheet: 0, col: 0, row: 3}, '=SUM(E1:E1)')
+    engine.setCellContents({sheet: 0, col: 0, row: 2}, '=SUM(E1:E2)')
+
+    engine.addRows(0, [1, 2])
+
+    verifyRangesInSheet(engine, 0, ['E1:E1', 'E1:E2', 'E1:E3', 'E1:E4'])
+
+    engine.setCellContents({sheet: 0, col: 0, row: 5}, '=SUM(E4:E4)')
+
+    verifyRangesInSheet(engine, 0, ['E1:E1', 'E1:E2', 'E1:E3', 'E1:E4', 'E4:E4'])
+
+    engine.removeRows(0, [1, 3])
+
+    verifyRangesInSheet(engine, 0, ['E1:E1'])
+    verifyValues(engine)
+  })
+
+  it('should undo merge ranges', () => {
+    const engine = HyperFormula.buildFromArray([])
+    engine.setCellContents({sheet: 0, col: 2, row: 1}, 7)
+    engine.setCellContents({sheet: 0, col: 3, row: 0}, '=SUM(B2:C3)')
+    engine.setCellContents({sheet: 0, col: 6, row: 0}, '=SUM(D1:F2)')
+    engine.setCellContents({sheet: 0, col: 6, row: 2}, '=SUM(D1:F1)')
+
+    engine.addRows(0, [0, 2])
+    engine.removeRows(0, [3, 1])
+
+    verifyRangesInSheet(engine, 0, ['D3:F3', 'B4:C4'])
+    verifyValues(engine)
+
+    engine.undo()
+
+    verifyRangesInSheet(engine, 0, ['D3:F3', 'D3:F4', 'B4:C5'])
+    verifyValues(engine)
   })
 })

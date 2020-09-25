@@ -1,23 +1,26 @@
-import {HyperFormula} from '../src'
-import {ErrorType} from '../src'
-import {FunctionPlugin, PluginFunctionType} from '../src/interpreter/plugin/FunctionPlugin'
+import {ErrorType, HyperFormula} from '../src'
+import {ErrorMessage} from '../src/error-message'
+import {FunctionPlugin} from '../src/interpreter/plugin/FunctionPlugin'
 import {adr, detailedError} from './testUtils'
+import {ProcedureAst} from '../src/parser'
+import {SimpleCellAddress} from '../src/Cell'
 
 class FooPlugin extends FunctionPlugin {
   public static implementedFunctions = {
-    foo: {
-      translationKey: 'FOO',
+    'FOO': {
+      method: 'foo',
     },
   }
 
-  public foo: PluginFunctionType = () => {
+  public foo(_ast: ProcedureAst, _formulaAddress: SimpleCellAddress) {
     return 42
   }
 }
 
+
 describe('Plugins', () => {
-  it('Extending with a plugin',  () => {
-    HyperFormula.getLanguage('enGB').extendFunctions({FOO: 'FOO'})
+  it('Extending with a plugin', () => {
+    HyperFormula.getLanguage('enGB').extendFunctions({'FOO': 'FOO'})
     const engine = HyperFormula.buildFromArray([
       ['=foo()'],
     ], {functionPlugins: [FooPlugin]})
@@ -25,11 +28,11 @@ describe('Plugins', () => {
     expect(engine.getCellValue(adr('A1'))).toBe(42)
   })
 
-  it('cleanup',  () => {
+  it('cleanup', () => {
     const engine = HyperFormula.buildFromArray([
       ['=foo()'],
     ], {functionPlugins: [FooPlugin]})
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NAME))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NAME, ErrorMessage.FunctionName('FOO')))
   })
 })

@@ -40,7 +40,7 @@ export class MoveCellsTransformer extends Transformer {
   }
 
   protected fixNodeAddress(address: SimpleCellAddress): SimpleCellAddress {
-    return simpleCellAddress(address.sheet, address.col + this.toRight, address.row + this.toBottom)
+    return simpleCellAddress(this.toSheet, address.col + this.toRight, address.row + this.toBottom)
   }
 
   protected transformCellAddress<T extends CellAddress>(dependencyAddress: T, formulaAddress: SimpleCellAddress): ErrorType.REF | false | T {
@@ -59,34 +59,38 @@ export class MoveCellsTransformer extends Transformer {
     return this.transformRange(start, end, formulaAddress)
   }
 
-  private transformAddress<T extends CellAddress | RowAddress | ColumnAddress>(dependencyAddress: T, formulaAddress: SimpleCellAddress): ErrorType.REF | false | T {
+  private transformAddress<T extends CellAddress | RowAddress | ColumnAddress>(dependencyAddress: T, formulaAddress: SimpleCellAddress): T {
     const sourceRange = this.sourceRange
-    const targetRange = sourceRange.shifted(this.toRight, this.toBottom)
 
     if (dependencyAddress instanceof CellAddress) {
       const absoluteDependencyAddress = dependencyAddress.toSimpleCellAddress(formulaAddress)
       if (sourceRange.addressInRange(absoluteDependencyAddress)) { // If dependency is internal, move only absolute dimensions
         return dependencyAddress.shiftAbsoluteDimensions(this.toRight, this.toBottom) as T
-
-      } else if (targetRange.addressInRange(absoluteDependencyAddress)) {  // If dependency is external and moved range overrides it return REF
-        return ErrorType.REF
       }
     }
 
     return dependencyAddress.shiftRelativeDimensions(-this.toRight, -this.toBottom) as T
   }
 
+  private transformRange<T extends CellAddress | RowAddress | ColumnAddress>(start: T,  end: T, formulaAddress: SimpleCellAddress): [T, T] {
+    const sourceRange = this.sourceRange
 
-  private transformRange<T extends CellAddress | RowAddress | ColumnAddress>(start: T,  end: T, formulaAddress: SimpleCellAddress): [T, T] | ErrorType.REF | false {
-    const newStart = this.transformAddress(start, formulaAddress)
-    const newEnd = this.transformAddress(end, formulaAddress)
-    if (newStart === ErrorType.REF || newEnd === ErrorType.REF) {
-      return ErrorType.REF
-    } else if (newStart || newEnd) {
-      return [newStart || start, newEnd || end]
-    } else {
-      return false
+    if (start instanceof CellAddress && end instanceof CellAddress) {
+      const absoluteStart = start.toSimpleCellAddress(formulaAddress)
+      const absoluteEnd = end.toSimpleCellAddress(formulaAddress)
+
+      if (sourceRange.addressInRange(absoluteStart) && sourceRange.addressInRange(absoluteEnd)) {
+        return [
+          start.shiftAbsoluteDimensions(this.toRight, this.toBottom) as T,
+          end.shiftAbsoluteDimensions(this.toRight, this.toBottom) as T
+        ]
+      }
     }
+
+    return [
+      start.shiftRelativeDimensions(-this.toRight, -this.toBottom) as T,
+      end.shiftRelativeDimensions(-this.toRight, -this.toBottom) as T
+    ]
   }
 }
 

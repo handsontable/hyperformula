@@ -3,85 +3,52 @@
  * Copyright (c) 2020 Handsoncode. All rights reserved.
  */
 
-import {AbsoluteCellRange} from '../../AbsoluteCellRange'
-import {CellError, ErrorType, InternalCellValue, simpleCellAddress, SimpleCellAddress} from '../../Cell'
-import {DependencyGraph, RangeVertex} from '../../DependencyGraph'
+import {CellError, ErrorType, InternalScalarValue, SimpleCellAddress} from '../../Cell'
+import {ErrorMessage} from '../../error-message'
 import {AstNodeType, ProcedureAst} from '../../parser'
 import {coerceToRange} from '../ArithmeticHelper'
 import {SimpleRangeValue} from '../InterpreterValue'
-import {FunctionPlugin} from './FunctionPlugin'
+import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
 
 export class SumprodPlugin extends FunctionPlugin {
   public static implementedFunctions = {
-    sumprod: {
-      translationKey: 'SUMPRODUCT',
+    'SUMPRODUCT': {
+      method: 'sumproduct',
+      parameters: [
+        {argumentType: ArgumentTypes.RANGE},
+        {argumentType: ArgumentTypes.RANGE},
+      ],
     },
   }
 
-  public sumprod(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
-    if (ast.args.length !== 2) {
-      return new CellError(ErrorType.NA)
-    }
-    if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
-      return new CellError(ErrorType.NUM)
-    }
-    const [left, right] = ast.args
+  public sumproduct(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('SUMPRODUCT'), (left: SimpleRangeValue, right: SimpleRangeValue) => {
+      if (left.numberOfElements() !== right.numberOfElements()) {
+        return new CellError(ErrorType.VALUE, ErrorMessage.EqualLength)
+      }
 
-    const leftArgValue = coerceToRange(this.evaluateAst(left, formulaAddress))
-    const rightArgValue = coerceToRange(this.evaluateAst(right, formulaAddress))
+      let result = 0
 
-    if (leftArgValue.numberOfElements() !== rightArgValue.numberOfElements()) {
-      return new CellError(ErrorType.VALUE)
-    }
+      const lit = left.iterateValuesFromTopLeftCorner()
+      const rit = right.iterateValuesFromTopLeftCorner()
+      let l, r
 
-    return this.reduceSumprod(leftArgValue, rightArgValue)
-  }
-
-  private reduceSumprod(left: SimpleRangeValue, right: SimpleRangeValue): number | CellError {
-    let result = 0
-
-    const lit = left.valuesFromTopLeftCorner()
-    const rit = right.valuesFromTopLeftCorner()
-    let l, r
-
-    while (l = lit.next(), r = rit.next(), !l.done && !r.done) {
-      if (l.value instanceof CellError) {
-        return l.value
-      } else if (r.value instanceof CellError) {
-        return r.value
-      } else {
-        const lval = this.coerceScalarToNumberOrError(l.value)
-        const rval = this.coerceScalarToNumberOrError(r.value)
-        if (typeof lval === 'number' && typeof rval === 'number') {
-          result += lval * rval
+      while (l = lit.next(), r = rit.next(), !l.done && !r.done) {
+        if (l.value instanceof CellError) {
+          return l.value
+        } else if (r.value instanceof CellError) {
+          return r.value
+        } else {
+          const lval = this.coerceScalarToNumberOrError(l.value)
+          const rval = this.coerceScalarToNumberOrError(r.value)
+          if (typeof lval === 'number' && typeof rval === 'number') {
+            result += lval * rval
+          }
         }
       }
-    }
 
-    return result
+      return result
+    })
   }
 }
 
-/**
- * Finds smaller range does have own vertex.
- *
- * @param rangeMapping - range mapping dependency
- * @param ranges - ranges to find smaller range in
- */
-export const findSmallerRange = (dependencyGraph: DependencyGraph, range: AbsoluteCellRange): { smallerRangeVertex: RangeVertex | null, restRange: AbsoluteCellRange } => {
-  if (range.height() > 1 && Number.isFinite(range.height())) {
-    const valuesRangeEndRowLess = simpleCellAddress(range.end.sheet, range.end.col, range.end.row - 1)
-    const rowLessVertex = dependencyGraph.getRange(range.start, valuesRangeEndRowLess)
-    if (rowLessVertex) {
-      const restRange = new AbsoluteCellRange(simpleCellAddress(range.start.sheet, range.start.col, range.end.row), range.end)
-      return {
-        smallerRangeVertex: rowLessVertex,
-        restRange,
-      }
-    }
-  }
-  return {
-    smallerRangeVertex: null,
-    restRange: range,
-  }
-}

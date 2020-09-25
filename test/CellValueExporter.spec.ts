@@ -1,8 +1,8 @@
-import {CellError, DetailedCellError, EmptyValue, HyperFormula} from '../src'
-import {ErrorType} from '../src/Cell'
+import {DetailedCellError, HyperFormula} from '../src'
+import {CellError, EmptyValue, ErrorType} from '../src/Cell'
 import {Exporter} from '../src/CellValue'
 import {Config} from '../src/Config'
-import {plPL} from '../src/i18n'
+import {plPL} from '../src/i18n/languages'
 import {detailedError} from './testUtils'
 import {NamedExpressions} from '../src/NamedExpressions'
 
@@ -19,7 +19,7 @@ describe( 'rounding', () => {
     expect(cellValueExporter.exportValue(true)).toBe(true)
     expect(cellValueExporter.exportValue(false)).toBe(false)
     expect(cellValueExporter.exportValue(1)).toBe(1)
-    expect(cellValueExporter.exportValue(EmptyValue)).toBe(EmptyValue)
+    expect(cellValueExporter.exportValue(EmptyValue)).toBe(null)
     expect(cellValueExporter.exportValue('abcd')).toBe('abcd')
   })
 
@@ -35,7 +35,7 @@ describe( 'rounding', () => {
     expect(cellValueExporter.exportValue(true)).toBe(true)
     expect(cellValueExporter.exportValue(false)).toBe(false)
     expect(cellValueExporter.exportValue(1)).toBe(1)
-    expect(cellValueExporter.exportValue(EmptyValue)).toBe(EmptyValue)
+    expect(cellValueExporter.exportValue(EmptyValue)).toBe(null)
     expect(cellValueExporter.exportValue('abcd')).toBe('abcd')
   })
 })

@@ -3,28 +3,28 @@
  * Copyright (c) 2020 Handsoncode. All rights reserved.
  */
 
-import {CellError, ErrorType, InternalCellValue, SimpleCellAddress} from '../../Cell'
+import {CellError, ErrorType, InternalScalarValue, SimpleCellAddress} from '../../Cell'
 import {ProcedureAst} from '../../parser'
-import {FunctionPlugin} from './FunctionPlugin'
+import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
 
 export class ModuloPlugin extends FunctionPlugin {
   public static implementedFunctions = {
-    modulo: {
-      translationKey: 'MOD',
+    'MOD': {
+      method: 'mod',
+      parameters: [
+        { argumentType: ArgumentTypes.NUMBER },
+        { argumentType: ArgumentTypes.NUMBER },
+      ],
     },
   }
 
-  public modulo(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
-    const validationResult = this.validateTwoNumericArguments(ast, formulaAddress)
-    if (validationResult instanceof CellError) {
-      return validationResult
-    }
-    const [dividend, divisor] = validationResult
-
-    if (divisor === 0) {
-      return new CellError(ErrorType.DIV_BY_ZERO)
-    }
-
-    return dividend % divisor
+  public mod(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('MOD'), (dividend: number, divisor: number) => {
+      if (divisor === 0) {
+        return new CellError(ErrorType.DIV_BY_ZERO)
+      } else {
+        return dividend % divisor
+      }
+    })
   }
 }

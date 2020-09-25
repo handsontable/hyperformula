@@ -15,6 +15,7 @@ import {
 } from 'chevrotain'
 
 import {CellError, ErrorType, simpleCellAddress, SimpleCellAddress} from '../Cell'
+import {ErrorMessage} from '../error-message'
 import {Maybe} from '../Maybe'
 import {
   cellAddressFromString,
@@ -40,6 +41,7 @@ import {
   buildLessThanOrEqualOpAst,
   buildMinusOpAst,
   buildMinusUnaryOpAst,
+  buildNamedExpressionAst,
   buildNotEqualOpAst,
   buildNumberAst,
   buildParenthesisAst,
@@ -77,6 +79,7 @@ import {
   LParen,
   MinusOp,
   MultiplicationOp,
+  NamedExpression,
   NotEqualOp,
   PercentOp,
   PlusOp,
@@ -327,7 +330,7 @@ export class FormulaParser extends EmbeddedActionsParser {
       {
         ALT: () => {
           const op = this.CONSUME(AdditionOp) as IExtendedToken
-          const value = this.SUBRULE(this.rightUnaryOpAtomicExpression)
+          const value = this.SUBRULE(this.atomicExpression)
           if (tokenMatcher(op, PlusOp)) {
             return buildPlusUnaryOpAst(value, op.leadingWhitespace)
           } else if (tokenMatcher(op, MinusOp)) {
@@ -385,6 +388,9 @@ export class FormulaParser extends EmbeddedActionsParser {
         ALT: () => this.SUBRULE(this.procedureExpression),
       },
       {
+        ALT: () => this.SUBRULE(this.namedExpressionExpression),
+      },
+      {
         ALT: () => {
           const number = this.CONSUME(this.lexerConfig.NumberLiteral) as IExtendedToken
           return buildNumberAst(this.numericStringToNumber(number.image), number.leadingWhitespace)
@@ -438,6 +444,11 @@ export class FormulaParser extends EmbeddedActionsParser {
 
     const rParenToken = this.CONSUME(RParen) as IExtendedToken
     return buildProcedureAst(canonicalProcedureName, args, procedureNameToken.leadingWhitespace, rParenToken.leadingWhitespace)
+  })
+
+  private namedExpressionExpression: AstRule = this.RULE('namedExpressionExpression', () => {
+    const name = this.CONSUME(NamedExpression) as IExtendedToken
+    return buildNamedExpressionAst(name.image, name.leadingWhitespace)
   })
 
   /**
@@ -797,7 +808,7 @@ export class FormulaParser extends EmbeddedActionsParser {
     }
 
     if (absoluteCol < 0 || absoluteRow < 0) {
-      return buildCellErrorAst(new CellError(ErrorType.REF, 'Resulting reference is out of the sheet'))
+      return buildCellErrorAst(new CellError(ErrorType.REF, ErrorMessage.OutOfSheet))
     }
     if (width === 1 && height === 1) {
       return buildCellReferenceAst(topLeftCorner)

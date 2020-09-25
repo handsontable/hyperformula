@@ -1,12 +1,13 @@
 import {HyperFormula} from '../../src'
 import {ErrorType} from '../../src/Cell'
+import {ErrorMessage} from '../../src/error-message'
 import {adr, detailedError} from '../testUtils'
 
 describe('AVERAGEA', () => {
   it('AVERAGEA with empty args', () => {
     const engine = HyperFormula.buildFromArray([['=AVERAGEA()']])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
   })
 
   it('AVERAGEA with args', () => {
@@ -35,19 +36,20 @@ describe('AVERAGEA', () => {
       ['39', null, '=AVERAGEA(A3:B3)'],
     ])
 
-    expect(engine.getCellValue(adr('C1'))).toEqual(20)
+    expect(engine.getCellValue(adr('C1'))).toEqual(19.5)
     expect(engine.getCellValue(adr('C2'))).toEqual(20)
     expect(engine.getCellValue(adr('C3'))).toEqual(39)
   })
 
   it('error when no meaningful arguments', () => {
     const engine = HyperFormula.buildFromArray([
-      ['foo'],
-      [null],
-      ['=AVERAGEA(A1:A2)']
+      [null, 'foo'],
+      [null, null],
+      ['=AVERAGEA(A1:A2)', '=AVERAGEA(B1:B2)']
     ])
 
     expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.DIV_BY_ZERO))
+    expect(engine.getCellValue(adr('B3'))).toEqual(0)
   })
 
   it('over a range value', () => {

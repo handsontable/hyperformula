@@ -1,4 +1,4 @@
-import {EmptyValue, HyperFormula} from '../../src'
+import {HyperFormula} from '../../src'
 import {AbsoluteCellRange} from '../../src/AbsoluteCellRange'
 import {adr} from '../testUtils'
 
@@ -15,8 +15,8 @@ describe('Set matrix empty', () => {
 
     dependencyGraph.setMatrixEmpty(matrixVertex)
 
-    expect(engine.getCellValue(adr('A2'))).toEqual(EmptyValue)
-    expect(engine.getCellValue(adr('A3'))).toEqual(EmptyValue)
+    expect(engine.getCellValue(adr('A2'))).toBe(null)
+    expect(engine.getCellValue(adr('A3'))).toBe(null)
     expect(dependencyGraph.matrixMapping.matrixMapping.size).toEqual(0)
   })
 
@@ -32,8 +32,8 @@ describe('Set matrix empty', () => {
 
     dependencyGraph.setMatrixEmpty(matrixVertex)
 
-    expect(engine.getCellValue(adr('A2'))).toEqual(EmptyValue)
-    expect(engine.getCellValue(adr('A3'))).toEqual(EmptyValue)
+    expect(engine.getCellValue(adr('A2'))).toBe(null)
+    expect(engine.getCellValue(adr('A3'))).toBe(null)
     expect(dependencyGraph.matrixMapping.matrixMapping.size).toEqual(0)
 
     const formula = dependencyGraph.fetchCell(adr('C1'))
@@ -58,8 +58,8 @@ describe('Set matrix empty', () => {
 
     dependencyGraph.setMatrixEmpty(matrixVertex)
 
-    expect(engine.getCellValue(adr('A2'))).toEqual(EmptyValue)
-    expect(engine.getCellValue(adr('A3'))).toEqual(EmptyValue)
+    expect(engine.getCellValue(adr('A2'))).toBe(null)
+    expect(engine.getCellValue(adr('A3'))).toBe(null)
     expect(dependencyGraph.matrixMapping.matrixMapping.size).toEqual(1)
 
     const formulaMatrix = dependencyGraph.fetchCell(adr('C1'))

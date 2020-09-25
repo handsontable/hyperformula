@@ -1,5 +1,6 @@
-import {EmptyValue, HyperFormula, ExportedCellChange, NothingToPasteError} from '../../src'
+import {HyperFormula, ExportedCellChange, NothingToPasteError} from '../../src'
 import {ErrorType, simpleCellAddress} from '../../src/Cell'
+import {ErrorMessage} from '../../src/error-message'
 import {CellAddress} from '../../src/parser'
 import {
   adr,
@@ -19,27 +20,27 @@ describe('Copy - paste integration', () => {
 
     expect(() => {
       engine.copy(adr('A1'), 0, 42)
-    }).toThrowError('Invalid arguments, expected width to be positive integer')
+    }).toThrowError('Invalid arguments, expected width to be positive integer.')
 
     expect(() => {
       engine.copy(adr('A1'), -1, 42)
-    }).toThrowError('Invalid arguments, expected width to be positive integer')
+    }).toThrowError('Invalid arguments, expected width to be positive integer.')
 
     expect(() => {
       engine.copy(adr('A1'), 3.14, 42)
-    }).toThrowError('Invalid arguments, expected width to be positive integer')
+    }).toThrowError('Invalid arguments, expected width to be positive integer.')
 
     expect(() => {
       engine.copy(adr('A1'), 42, 0)
-    }).toThrowError('Invalid arguments, expected height to be positive integer')
+    }).toThrowError('Invalid arguments, expected height to be positive integer.')
 
     expect(() => {
       engine.copy(adr('A1'), 42, -1)
-    }).toThrowError('Invalid arguments, expected height to be positive integer')
+    }).toThrowError('Invalid arguments, expected height to be positive integer.')
 
     expect(() => {
       engine.copy(adr('A1'), 42, 3.14)
-    }).toThrowError('Invalid arguments, expected height to be positive integer')
+    }).toThrowError('Invalid arguments, expected height to be positive integer.')
   })
 
   it('paste raise error when there is nothing in clipboard', () => {
@@ -47,7 +48,7 @@ describe('Copy - paste integration', () => {
 
     expect(() => {
       engine.paste(adr('A2'))
-    }).toThrowError(new NothingToPasteError())
+    }).toThrow(new NothingToPasteError())
   })
 
   it('copy should return values', () => {
@@ -80,7 +81,7 @@ describe('Copy - paste integration', () => {
     engine.copy(adr('A1'), 1, 1)
     const changes = engine.paste(adr('A2'))
 
-    expectArrayWithSameContent([new ExportedCellChange(simpleCellAddress(0, 0, 1), EmptyValue)], changes)
+    expectArrayWithSameContent([new ExportedCellChange(simpleCellAddress(0, 0, 1), null)], changes)
   })
 
   it('should work for single number', () => {
@@ -188,7 +189,7 @@ describe('Copy - paste integration', () => {
     engine.copy(adr('B2'), 1, 1)
     engine.paste(adr('A1'))
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.REF))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.REF, ErrorMessage.BadRef))
   })
 
   it('should create new range vertex - cell range', () => {
@@ -204,7 +205,7 @@ describe('Copy - paste integration', () => {
 
     expect(engine.getCellValue(adr('B3'))).toEqual(7)
     expect(Array.from(engine.dependencyGraph.rangeMapping.rangesInSheet(0)).length).toBe(2)
-    expect(engine.dependencyGraph.getRange(adr('B1'), adr('B2'))).not.toBeNull()
+    expect(engine.dependencyGraph.getRange(adr('B1'), adr('B2'))).not.toBeUndefined()
   })
 
   it('should create new range vertex - column range', () => {
@@ -219,7 +220,7 @@ describe('Copy - paste integration', () => {
 
     expect(engine.getCellValue(adr('E1'))).toEqual(18)
     expect(Array.from(engine.dependencyGraph.rangeMapping.rangesInSheet(0)).length).toBe(2)
-    expect(engine.dependencyGraph.getRange(colStart('B'), colEnd('C'))).not.toBeNull()
+    expect(engine.dependencyGraph.getRange(colStart('B'), colEnd('C'))).not.toBeUndefined()
   })
 
   it('should create new range vertex - row range', () => {
@@ -236,7 +237,7 @@ describe('Copy - paste integration', () => {
 
     expect(engine.getCellValue(adr('A5'))).toEqual(18)
     expect(Array.from(engine.dependencyGraph.rangeMapping.rangesInSheet(0)).length).toBe(2)
-    expect(engine.dependencyGraph.getRange(rowStart(2), rowEnd(3))).not.toBeNull()
+    expect(engine.dependencyGraph.getRange(rowStart(2), rowEnd(3))).not.toBeUndefined()
   })
 
   it('should update edges between infinite range and pasted values', () => {
@@ -366,7 +367,7 @@ describe('Copy - paste integration', () => {
 
     expect(() => {
       engine.paste(adr('A1', 1))
-    }).toThrowError('Invalid arguments')
+    }).toThrowError('Invalid arguments, expected a valid target address.')
   })
 
   it('should copy references with absolute sheet id', () => {

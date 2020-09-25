@@ -235,7 +235,7 @@ describe('remove sheet - adjust address mapping', () => {
 
     engine.removeSheet('Sheet1')
 
-    expect(() => engine.addressMapping.strategyFor(0)).toThrow(new Error("There's no sheet with id = 0"))
+    expect(() => engine.addressMapping.strategyFor(0)).toThrowError("There's no sheet with id = 0")
   })
 })
 
@@ -294,7 +294,7 @@ describe('remove sheet - adjust column index', () => {
       ['1'],
     ], { useColumnIndex: true })
     const index = engine.columnSearch as ColumnIndex
-    const removeSheetSpy = jest.spyOn(index, 'removeSheet')
+    const removeSheetSpy = spyOn(index, 'removeSheet')
 
     engine.removeSheet('Sheet1')
 

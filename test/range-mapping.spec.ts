@@ -8,7 +8,7 @@ describe('RangeMapping', () => {
     const start = adr('A1')
     const end = adr('U50')
 
-    expect(mapping.getRange(start, end)).toBe(null)
+    expect(mapping.getRange(start, end)).toBe(undefined)
   })
 
   it('setting range mapping', () => {

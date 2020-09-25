@@ -1,5 +1,4 @@
 import {findBoundaries} from '../src/Sheet'
-import {EmptyValue} from '../src'
 
 describe('findBoundaries', () => {
   it('find correct dimensions', () => {
@@ -19,7 +18,7 @@ describe('findBoundaries', () => {
   it('find correct dimensions when empty cell in the middle of the row', () => {
     expect(findBoundaries([
       ['1', '2'],
-      ['1', '2', EmptyValue, '4'],
+      ['1', '2', null, '4'],
     ])).toMatchObject({height: 2, width: 4})
   })
 
@@ -27,7 +26,7 @@ describe('findBoundaries', () => {
     expect(findBoundaries([
       ['1', '2'],
       ['1', '2'],
-      [EmptyValue],
+      [null],
       [],
     ])).toMatchObject({height: 2, width: 2})
   })
@@ -63,7 +62,7 @@ describe('findBoundaries', () => {
 
   it('does not count empty value', () => {
     expect(findBoundaries([
-      ['1', EmptyValue],
+      ['1', null],
       ['1', '2'],
     ])).toMatchObject({fill: 3 / 4})
   })

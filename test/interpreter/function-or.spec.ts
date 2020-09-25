@@ -1,5 +1,6 @@
 import {HyperFormula} from '../../src'
 import {ErrorType} from '../../src/Cell'
+import {ErrorMessage} from '../../src/error-message'
 import {adr, detailedError} from '../testUtils'
 
 describe('Function OR', () => {
@@ -11,17 +12,30 @@ describe('Function OR', () => {
     expect(engine.getCellValue(adr('A1'))).toBe(true)
     expect(engine.getCellValue(adr('B1'))).toBe(false)
     expect(engine.getCellValue(adr('C1'))).toBe(true)
-    expect(engine.getCellValue(adr('D1'))).toEqual(detailedError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('D1'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessage.WrongType))
   })
 
-  it('use coercion', () => {
+  it('use coercion #1', () => {
     const engine = HyperFormula.buildFromArray([
       ['=OR("TRUE", 0)'],
       ['=OR("foo", 0)'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toBe(true)
-    expect(engine.getCellValue(adr('A2'))).toBe(false)
+    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessage.WrongType))
+  })
+
+  it('use coercion #2', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=OR(A4:B4)'],
+      ['=OR(C4:D4)'],
+      ['=OR(C4:D4, "foo")'],
+      ['TRUE', 1, 'foo', '=TRUE()'],
+    ])
+
+    expect(engine.getCellValue(adr('A1'))).toBe(true)
+    expect(engine.getCellValue(adr('A2'))).toBe(true)
+    expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessage.WrongType))
   })
 
   it('function OR with numerical arguments', () => {
@@ -39,7 +53,7 @@ describe('Function OR', () => {
       ['=OR()'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
   })
 
   it('if error in range found, returns first one in row-by-row order', () => {

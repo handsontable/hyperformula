@@ -1,6 +1,7 @@
 import {HyperFormula} from '../../src'
 import {ErrorType} from '../../src/Cell'
 import {ColumnBinarySearch} from '../../src/ColumnSearch/ColumnBinarySearch'
+import {ErrorMessage} from '../../src/error-message'
 import {adr, detailedError} from '../testUtils'
 
 describe('Function MATCH', () => {
@@ -10,8 +11,8 @@ describe('Function MATCH', () => {
       ['=MATCH(1, B1:B3, 0, 42)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA))
-    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NA))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
+    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
   })
 
   it('validates that 1st argument is number, string or boolean', () => {
@@ -19,7 +20,7 @@ describe('Function MATCH', () => {
       ['=MATCH(1/0, B1:B1)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessage.WrongType))
   })
 
   it('validates that 2nd argument is range', () => {
@@ -27,7 +28,7 @@ describe('Function MATCH', () => {
       ['=MATCH(1, 42)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessage.WrongType))
   })
 
   it('validates that 3rd argument is number', () => {
@@ -35,7 +36,7 @@ describe('Function MATCH', () => {
       ['=MATCH(0, B1:B1, 1/0)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessage.WrongType))
   })
 
   it('column - works when value is in first cell', () => {
@@ -100,7 +101,7 @@ describe('Function MATCH', () => {
       ['103'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA, ErrorMessage.ValueNotFound))
   })
 
   it('column - doesnt return result if value before searched range', () => {
@@ -112,7 +113,7 @@ describe('Function MATCH', () => {
       ['200'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA, ErrorMessage.ValueNotFound))
   })
 
   it('row - works when value is in first cell', () => {
@@ -157,7 +158,7 @@ describe('Function MATCH', () => {
       ['200', '200', '200', '200', '103'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA, ErrorMessage.ValueNotFound))
   })
 
   it('row - doesnt return result if value before searched range', () => {
@@ -166,12 +167,12 @@ describe('Function MATCH', () => {
       ['103', '200', '200', '200'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA, ErrorMessage.ValueNotFound))
   })
 
   it('uses binsearch', () => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const spy = jest.spyOn(ColumnBinarySearch.prototype as any, 'computeListOfValuesInRange')
+    const spy = spyOn(ColumnBinarySearch.prototype as any, 'computeListOfValuesInRange')
 
     const engine = HyperFormula.buildFromArray([
       ['=MATCH(400, A2:A5, 1)'],
@@ -188,7 +189,7 @@ describe('Function MATCH', () => {
 
   it('uses indexOf', () => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const spy = jest.spyOn(ColumnBinarySearch.prototype as any, 'computeListOfValuesInRange')
+    const spy = spyOn(ColumnBinarySearch.prototype as any, 'computeListOfValuesInRange')
 
     const engine = HyperFormula.buildFromArray([
       ['=MATCH(400, A2:A5, 0)'],

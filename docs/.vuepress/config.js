@@ -8,7 +8,16 @@ module.exports = {
   title: 'HyperFormula (v' + HyperFormula.version + ')',
   description: 'HyperFormula is an open-source, high-performance calculation engine for spreadsheets and web applications.',
   head: [
-    ['meta', { name: 'robots', content: 'noindex,nofollow' }],
+    // Google Tag Manager, an extra element within the `ssr.html` file.
+    ['script', {}, `
+      (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+      new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+      j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+      'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+      })(window,document,'script','dataLayer','GTM-N59TZXR');
+    `],
+    // Google Console
+    ['meta', { name: 'google-site-verification', content: 'MZpSOa8SNvFLRRGwUQpYVZ78kIHQoPVdVbafHhJ_d4Q' }]
   ],
   base: '/hyperformula/',
   plugins: [
@@ -26,6 +35,8 @@ module.exports = {
         $page.version = HyperFormula.version
         // inject current HF buildDate as {{ $page.buildDate }} variable
         $page.buildDate = HyperFormula.buildDate
+        // inject current HF releaseDate as {{ $page.releaseDate }} variable
+        $page.releaseDate = HyperFormula.releaseDate
       },
       chainMarkdown (config) {
         // inject custom markdown highlight with our aliases to formula syntax
@@ -40,16 +51,25 @@ module.exports = {
     extendMarkdown: md => {
       md.use(regexPlugin, {
         name: 'Replace HT_BUILD_DATE',
-        regex: /\(process\.env\.HT_BUILD_DATE/,
+        regex: /(process\.env\.HT_BUILD_DATE as string)/,
         replace: () => `'${HyperFormula.buildDate}'`
       })
       md.use(regexPlugin, {
         name: 'Replace HT_VERSION',
-        regex: /\(process\.env\.HT_VERSION/,
+        regex: /(process\.env\.HT_VERSION as string)/,
         replace: () => `'${HyperFormula.version}'`
+      })
+      md.use(regexPlugin, {
+        name: 'Replace HT_RELEASE_DATE',
+        regex: /(process\.env\.HT_RELEASE_DATE as string)/,
+        replace: () => `'${HyperFormula.releaseDate}'`
       })
     }
   },
+  // TODO: It doesn't work. It's seems that this option is bugged. Documentation says that this option is configurable,
+  // but I can't do it. Resolving priority described here: https://github.com/vuejs/vuepress/issues/882#issuecomment-425323104
+  // seems not working properlt. I've uploaded `ssr.html` file to `.vuepress/template` dictionary.
+  // ssrTemplate: 'index.ssr.html',
   themeConfig: {
     logo: '/logo.png',
     nextLinks: true,
@@ -58,7 +78,8 @@ module.exports = {
     docsRepo: 'handsontable/hyperformula',
     docsDir: 'docs',
     docsBranch: 'develop',
-    editLinks: false,
+    editLinks: true,
+    editLinkText: 'Help us improve this page',
     lastUpdated: false,
     smoothScroll: false,
     searchPlaceholder: 'Search...',
@@ -67,67 +88,13 @@ module.exports = {
     //   indexName: '<INDEX_NAME>'
     // },
     nav: [
-      { text: 'Home', link: '/' },
-      { text: 'Guide', link: '/guide/' },
-      // { text: 'Functions', link: '/functions/' },
+      { text: 'Guide', link: '/' },
       { text: 'API Reference', link: '/api/' },
     ],
     displayAllHeaders: false, // collapse other pages
     activeHeaderLinks: true,
-    sidebarDepth: 3,
+    sidebarDepth: 1,
     sidebar: {
-      '/guide/': [
-        {
-          title: 'Introduction',
-          path: '/guide/',
-        },
-        {
-          title: 'Getting started',
-          collapsable: false,
-          children: [
-            ['/guide/requirements', 'Requirements'],
-            ['/guide/compatibility', 'Browser Compatibility'],
-            ['/guide/basic-usage', 'Basic Usage'],
-            ['/guide/data-operations', 'Data Operations'],
-            ['/guide/crud-operations', 'CRUD Operations Explained'],
-            ['/guide/config-options', 'Config Options Explained'],
-            ['/guide/helpers', 'Helpers'],
-            ['/guide/working-with-events', 'Working with Events'],
-            ['/guide/handling-errors', 'Handling Errors'],
-            ['/guide/license-key', 'License Key'],
-            ['https://github.com/handsontable/hyperformula/releases', 'Release Notes'],
-            ['/guide/support', 'Support'],
-          ]
-        },
-        {
-          title: 'Going deeper',
-          collapsable: false,
-          children: [
-            ['/guide/custom-language', 'Custom Language'],
-            ['/guide/custom-function', 'Custom Function'],
-            ['/guide/multiple-sheets', 'Working with multiple sheets'],
-            ['/guide/named-expressions', 'Named Expressions'],
-            ['/guide/structured-references', 'Structured References'],
-            ['/guide/clipboard', 'Clipboard'],
-            ['/guide/batch-operations', 'Batch Operations'],
-            ['/guide/data-types', 'Supported Data Types'],
-            ['/guide/gpu-support', 'GPU Support'],
-            ['/guide/integrations', 'Integrations'],
-            ['/guide/testing-hyperformula', 'Testing HF'],
-          ],
-        },
-        {
-          title: 'Contributtor guide',
-          collapsable: false,
-          children: [
-            ['/guide/graph', 'Graph'],
-            ['/guide/working-with-documentation', 'Working with the documentation'],
-            ['/guide/writing-tests', 'Writing testst for HF'],
-            ['https://github.com/handsontable/hyperformula/blob/develop/CONTRIBUTING.md', 'CONTRIBUTING.md'],
-            ['https://github.com/handsontable/hyperformula/blob/develop/CODE_OF_CONDUCT.md', 'CODE_OF_CONDUCT.md'],
-          ],
-        },
-      ],
       '/api/': [
         {
           title: 'Introduction',
@@ -139,39 +106,123 @@ module.exports = {
           collapsable: true,
         },
         {
-          title: 'Events',
-          path: '/api/interfaces/listeners',
-          collapsable: true,
-        },
-        {
-          title: 'Options',
+          title: 'Configuration Options',
           path: '/api/interfaces/configparams',
           collapsable: true,
         },
         {
-          title: 'Errors',
+          title: 'Event Types',
+          path: '/api/interfaces/listeners',
+          alias: '/api/events',
+          collapsable: true,
+        },
+        {
+          title: 'Error Types',
           collapsable: true,
           children: fs.readdirSync(path.join(__dirname, '../api/classes'))
             .filter((n) => n.match(/.*error\.md$/))
             .map(f => `/api/classes/${f}`)
         },
+      ],
+      '/': [
         {
-          title: 'Enumerations',
-          collapsable: true,
-          children: fs.readdirSync(path.join(__dirname, '../api/enums'))
-            .map(f => `/api/enums/${f}`)
+          title: 'Introduction',
+          collapsable: false,
+          children: [
+            ['/', 'Welcome'],
+            ['/guide/demo', 'Demo'],
+          ]
         },
         {
-          title: 'Interfaces',
-          collapsable: true,
-          children: fs.readdirSync(path.join(__dirname, '../api/interfaces'))
-            .filter((n) => !n.match(/.*configparams.*/))
-            .map(f => `/api/interfaces/${f}`)
+          title: 'Overview',
+          collapsable: false,
+          children: [
+            ['/guide/supported-browsers', 'Supported browsers'],
+            ['/guide/dependencies', 'Dependencies'],
+            ['/guide/licensing', 'Licensing'],
+            ['/guide/changelog', 'Changelog'],
+            ['/guide/roadmap', 'Roadmap'],
+            ['/guide/support', 'Support'],
+          ]
         },
         {
-          title: 'Globals',
-          path: '/api/globals',
+          title: 'Getting started',
+          collapsable: false,
+          children: [
+            ['/guide/client-side-installation', 'Client-side installation'],
+            ['/guide/server-side-installation', 'Server-side installation'],
+            ['/guide/basic-usage', 'Basic usage'],
+            ['/guide/advanced-usage', 'Advanced usage'],
+            ['/guide/configuration-options', 'Configuration options'],
+            ['/guide/license-key', 'License key'],
+            ['/guide/known-limitations', 'Known limitations'],
+          ]
         },
+        {
+          title: 'Framework integration',
+          collapsable: false,
+          children: [
+            ['/guide/integration-with-react', 'Integration with React'],
+            ['/guide/integration-with-vue', 'Integration with Vue'],
+            ['/guide/integration-with-angular', 'Integration with Angular'],
+          ]
+        },
+        {
+          title: 'Data Operations',
+          collapsable: false,
+          children: [
+            ['/guide/basic-operations', 'Basic operations'],
+            ['/guide/batch-operations', 'Batch operations'],
+            ['/guide/clipboard-operations', 'Clipboard operations'],
+            ['/guide/undo-redo', 'Undo-redo'],
+            ['/guide/sorting-data', 'Sorting data'],
+          ]
+        },
+        {
+          title: 'Formula Reference',
+          collapsable: false,
+          children: [
+            ['/guide/specifications-and-limits', 'Specifications and limits'],
+            ['/guide/cell-references', 'Cell references'],
+            ['/guide/types-of-values', 'Types of values'],
+            ['/guide/types-of-errors', 'Types of errors'],
+            ['/guide/types-of-operators', 'Types of operators'],
+            ['/guide/order-of-precendece', 'Order of precedence'],
+            ['/guide/built-in-functions', 'Built-in functions'],
+            ['/guide/volatile-functions', 'Volatile functions'],
+            ['/guide/named-ranges', 'Named ranges'],
+          ]
+        },
+        {
+          title: 'Internationalization',
+          collapsable: false,
+          children: [
+            ['/guide/localizing-functions', 'Localizing functions'],
+            ['/guide/date-and-time-handling', 'Date and time handling'],
+          ]
+        },
+        {
+          title: 'Advanced topics',
+          collapsable: false,
+          children: [
+            ['/guide/key-concepts', 'Key concepts'],
+            ['/guide/building', 'Building'],
+            ['/guide/testing', 'Testing'],
+            ['/guide/custom-functions', 'Custom functions'],
+            ['/guide/performance', 'Performance'],
+          ]
+        },
+        {
+          title: 'Miscellaneous',
+          collapsable: false,
+          children: [
+            ['/guide/contributing', 'Contributing'],
+            ['/guide/code-of-conduct.md', 'Code of conduct'],
+            ['/guide/branding', 'Branding'],
+            ['/guide/acknowledgements', 'Acknowledgments'],
+            ['/guide/contact', 'Contact'],
+          ]
+        }
       ],
     },
   }

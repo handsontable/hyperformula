@@ -1,5 +1,6 @@
 import {HyperFormula} from '../../src'
 import {ErrorType} from '../../src/Cell'
+import {ErrorMessage} from '../../src/error-message'
 import {adr, detailedError} from '../testUtils'
 
 describe('Unary operator MINUS', () => {
@@ -18,7 +19,7 @@ describe('Unary operator MINUS', () => {
     ])
 
     expect(engine.getCellValue(adr('A1'))).toBe(-3)
-    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessage.NumberCoercion))
   })
 
   it('pass error', () => {
@@ -28,7 +29,7 @@ describe('Unary operator MINUS', () => {
 
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NAME))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NAME, ErrorMessage.FunctionName('FOOBAR')))
     expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.DIV_BY_ZERO))
   })
 
@@ -40,6 +41,13 @@ describe('Unary operator MINUS', () => {
       ['3'],
     ])
 
-    expect(engine.getCellValue(adr('B2'))).toEqual(detailedError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('B2'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessage.ScalarExpected))
+  })
+
+  it('double unary plus', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=--2'],
+    ])
+    expect(engine.getCellValue(adr('A1'))).toEqual(2)
   })
 })

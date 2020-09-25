@@ -32,7 +32,15 @@ describe('Interpreter - concatenate operator', () => {
       ['="foo"&TRUE()'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toBe('footrue')
+    expect(engine.getCellValue(adr('A1'))).toBe('fooTRUE')
+  })
+
+  it('Ampersand with null', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['="foo"&B1'],
+    ])
+
+    expect(engine.getCellValue(adr('A1'))).toBe('foo')
   })
 
   it('Ampersand with error', () => {

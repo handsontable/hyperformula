@@ -3,24 +3,21 @@
  * Copyright (c) 2020 Handsoncode. All rights reserved.
  */
 
-import {CellError, ErrorType, InternalCellValue, SimpleCellAddress} from '../../Cell'
+import {InternalScalarValue, SimpleCellAddress} from '../../Cell'
 import {ProcedureAst} from '../../parser'
-import {FunctionPlugin} from './FunctionPlugin'
+import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
 
 export class SqrtPlugin extends  FunctionPlugin {
   public static implementedFunctions = {
-    sqrt: {
-      translationKey: 'SQRT',
+    'SQRT': {
+      method: 'sqrt',
+      parameters: [
+        { argumentType: ArgumentTypes.NUMBER }
+      ],
     },
   }
 
-  public sqrt(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
-    return this.templateWithOneCoercedToNumberArgument(ast, formulaAddress, (input: number) => {
-      if (input < 0) {
-        return new CellError(ErrorType.NUM)
-      } else {
-        return Math.sqrt(input)
-      }
-    })
+  public sqrt(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('SQRT'), Math.sqrt)
   }
 }

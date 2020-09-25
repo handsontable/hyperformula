@@ -10,7 +10,10 @@ docs/.vuepress/api-sidebar-relative.json
 docs/.vuepress/api-sidebar.json
 typedoc/
 es/
+languages/
 lib/
+test-jasmine/
+test-jest/
 node_modules/
 typings/
 

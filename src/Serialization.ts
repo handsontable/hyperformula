@@ -3,12 +3,15 @@
  * Copyright (c) 2020 Handsoncode. All rights reserved.
  */
 
-import {NoErrorCellValue, simpleCellAddress, SimpleCellAddress} from './Cell'
-import {CellValue, DetailedCellError, Exporter} from './CellValue'
+import {CellError, ErrorType, simpleCellAddress, SimpleCellAddress} from './Cell'
+import {CellValue, DetailedCellError, Exporter, NoErrorCellValue} from './CellValue'
 import {Config} from './Config'
 import {DependencyGraph, FormulaCellVertex, MatrixVertex, ParsingErrorVertex} from './DependencyGraph'
+import {ErrorMessage} from './error-message'
+import {LicenseKeyValidityState} from './helpers/licenseKeyValidator'
 import {Maybe} from './Maybe'
 import {buildLexerConfig, Unparser} from './parser'
+import {NamedExpressions} from './NamedExpressions'
 
 export class Serialization {
   constructor(
@@ -18,6 +21,7 @@ export class Serialization {
     public readonly exporter: Exporter
   ) {
   }
+
   public getCellFormula(address: SimpleCellAddress): Maybe<string> {
     const formulaVertex = this.dependencyGraph.getCell(address)
     if (formulaVertex instanceof FormulaCellVertex) {
@@ -36,12 +40,12 @@ export class Serialization {
 
   public getCellSerialized(address: SimpleCellAddress): NoErrorCellValue {
     const formula: Maybe<string> = this.getCellFormula(address)
-    if( formula !== undefined ) {
+    if (formula !== undefined) {
       return formula
     } else {
       const value: CellValue = this.getCellValue(address)
-      if(value instanceof DetailedCellError) {
-        return this.config.translationPackage.getErrorTranslation(value.error.type)
+      if (value instanceof DetailedCellError) {
+        return this.config.translationPackage.getErrorTranslation(value.type)
       } else {
         return value
       }
@@ -49,7 +53,7 @@ export class Serialization {
   }
 
   public getCellValue(address: SimpleCellAddress): CellValue {
-    return this.exporter.exportValue(this.dependencyGraph.getCellValue(address))
+    return this.exporter.exportValue(this.dependencyGraph.getScalarValue(address))
   }
 
   public getSheetValues(sheet: number): CellValue[][] {
@@ -72,6 +76,21 @@ export class Serialization {
         const address = simpleCellAddress(sheet, j, i)
         arr[i][j] = getter(address)
       }
+      for(let j=sheetWidth-1; j>=0; j--) {
+        if(arr[i][j]===null || arr[i][j]===undefined) {
+          arr[i].pop()
+        } else {
+          break
+        }
+      }
+    }
+
+    for(let i=sheetHeight-1; i>=0; i--) {
+      if(arr[i].length===0) {
+        arr.pop()
+      } else {
+        break
+      }
     }
     return arr
   }
@@ -80,7 +99,7 @@ export class Serialization {
     const result: Record<string, T> = {}
     for (const sheetName of this.dependencyGraph.sheetMapping.displayNames()) {
       const sheetId = this.dependencyGraph.sheetMapping.fetch(sheetName)
-      result[sheetName] =  sheetGetter(sheetId)
+      result[sheetName] = sheetGetter(sheetId)
     }
     return result
   }
@@ -101,8 +120,8 @@ export class Serialization {
     return this.genericAllSheetsGetter((arg) => this.getSheetSerialized(arg))
   }
 
-  public withNewConfig(newConfig: Config): Serialization {
-    const newUnparser = new Unparser(newConfig, buildLexerConfig(newConfig), this.dependencyGraph.sheetMapping.fetchDisplayName)
+  public withNewConfig(newConfig: Config, namedExpressions: NamedExpressions): Serialization {
+    const newUnparser = new Unparser(newConfig, buildLexerConfig(newConfig), this.dependencyGraph.sheetMapping.fetchDisplayName, namedExpressions)
     return new Serialization(this.dependencyGraph, newUnparser, newConfig, this.exporter)
   }
 }

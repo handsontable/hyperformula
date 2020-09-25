@@ -1,5 +1,6 @@
 import {HyperFormula} from '../../src'
 import {ErrorType} from '../../src/Cell'
+import {ErrorMessage} from '../../src/error-message'
 import {adr, detailedError} from '../testUtils'
 import {StatType} from '../../src/statistics'
 
@@ -10,8 +11,8 @@ describe('Function COUNTIF', () => {
       ['=COUNTIF(B1:B3, ">0", B1)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA))
-    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NA))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
+    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
   })
 
   it('works',  () => {
@@ -23,6 +24,17 @@ describe('Function COUNTIF', () => {
     ])
 
     expect(engine.getCellValue(adr('A4'))).toEqual(2)
+  })
+
+  it('works with mixed types',  () => {
+    const engine =  HyperFormula.buildFromArray([
+      ['0'],
+      ['"1"'],
+      ['2'],
+      ['=COUNTIF(A1:A3, "=1")'],
+    ])
+
+    expect(engine.getCellValue(adr('A4'))).toEqual(0)
   })
 
   it('use partial cache',  () => {
@@ -60,20 +72,12 @@ describe('Function COUNTIF', () => {
     expect(engine.getCellValue(adr('B2'))).toEqual(0)
   })
 
-  it('error when 2nd arg is not a string',  () => {
-    const engine =  HyperFormula.buildFromArray([
-      ['=COUNTIF(C1:C2, 78)'],
-    ])
-
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE))
-  })
-
   it('error when criterion unparsable',  () => {
     const engine =  HyperFormula.buildFromArray([
       ['=COUNTIF(B1:B2, "><foo")'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessage.BadCriterion))
   })
 
   it('scalars are treated like singular arrays', () => {

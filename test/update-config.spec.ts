@@ -1,6 +1,7 @@
 import {HyperFormula} from '../src'
 import {ErrorType} from '../src/Cell'
-import {plPL} from '../src/i18n'
+import {ErrorMessage} from '../src/error-message'
+import {plPL} from '../src/i18n/languages'
 import {adr, detailedError} from './testUtils'
 
 describe('update config', () => {
@@ -16,7 +17,7 @@ describe('update config', () => {
     expect(engine.getCellValue(adr('C1'))).toBe(2)
     expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.DIV_BY_ZERO))
     expect(engine.getCellValue(adr('B2'))).toEqual(detailedError(ErrorType.CYCLE))
-    expect(engine.getCellValue(adr('C2'))).toEqual(detailedError(ErrorType.ERROR, 'Parsing error'))
+    expect(engine.getCellValue(adr('C2'))).toEqual(detailedError(ErrorType.ERROR, ErrorMessage.ParseError))
   })
   it('simple reload preserves formulas', () => {
     const engine = HyperFormula.buildFromArray([

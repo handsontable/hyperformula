@@ -1,5 +1,5 @@
-import {HyperFormula, SheetSizeLimitExceededError} from '../src'
-import {plPL} from '../src/i18n'
+import {HyperFormula} from '../src'
+import {plPL} from '../src/i18n/languages'
 import {adr} from './testUtils'
 
 describe('Building empty engine', () => {
@@ -74,6 +74,6 @@ describe('Building engine from arrays', () => {
         null, // broken sheet
         [6, 7]
       ] as any)
-    }).toThrowError('Cannot read property \'length\' of null')
+    }).toThrowError('Invalid arguments, expected an array of arrays.')
   })
 })

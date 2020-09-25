@@ -1,15 +1,17 @@
 import {HyperFormula} from '../../src'
 import {Config} from '../../src/Config'
 import {SheetMapping} from '../../src/DependencyGraph'
-import {buildTranslationPackage, enGB, plPL} from '../../src/i18n'
-import {buildLexerConfig, FormulaLexer, ParserWithCaching} from '../../src/parser'
+import {buildTranslationPackage} from '../../src/i18n'
+import {enGB, plPL} from '../../src/i18n/languages'
+import {buildLexerConfig, FormulaLexer} from '../../src/parser'
 import {adr, unregisterAllLanguages} from '../testUtils'
+import {buildEmptyParserWithCaching} from './common'
 
 describe('Compute hash from ast', () => {
   beforeEach(() => {
     unregisterAllLanguages()
-    HyperFormula.registerLanguage('plPL', plPL)
-    HyperFormula.registerLanguage('enGB', enGB)
+    HyperFormula.registerLanguage(plPL.langCode, plPL)
+    HyperFormula.registerLanguage(enGB.langCode, enGB)
   })
 
   const config = new Config()
@@ -17,7 +19,7 @@ describe('Compute hash from ast', () => {
   sheetMapping.addSheet('Sheet1')
   sheetMapping.addSheet('Sheet2')
   const lexer = new FormulaLexer(buildLexerConfig(config))
-  const parser = new ParserWithCaching(config, sheetMapping.get)
+  const parser = buildEmptyParserWithCaching(config, sheetMapping)
 
   function expectHashFromAstMatchHashFromTokens(formula: string) {
     const baseAddress = adr('A1')
@@ -150,7 +152,7 @@ describe('Compute hash from ast', () => {
     const sheetMapping = new SheetMapping(buildTranslationPackage(plPL))
     sheetMapping.addSheet('Sheet1')
     const lexer = new FormulaLexer(buildLexerConfig(config))
-    const parser = new ParserWithCaching(config, sheetMapping.get)
+    const parser = buildEmptyParserWithCaching(config, sheetMapping)
 
     const formula = '=SUMA(A1)'
     const address = adr('A1')
@@ -167,7 +169,7 @@ describe('Compute hash from ast', () => {
     const sheetMapping = new SheetMapping(buildTranslationPackage(plPL))
     sheetMapping.addSheet('Sheet1')
     const lexer = new FormulaLexer(buildLexerConfig(config))
-    const parser = new ParserWithCaching(config, sheetMapping.get)
+    const parser = buildEmptyParserWithCaching(config, sheetMapping)
 
     const formula = '=FooBAR(A1)'
     const address = adr('A1')
@@ -205,7 +207,7 @@ describe('Compute hash from ast', () => {
     const sheetMapping = new SheetMapping(buildTranslationPackage(plPL))
     sheetMapping.addSheet('Sheet1')
     const lexer = new FormulaLexer(buildLexerConfig(config))
-    const parser = new ParserWithCaching(config, sheetMapping.get)
+    const parser = buildEmptyParserWithCaching(config, sheetMapping)
 
 
     const formula = '=1+123,456'

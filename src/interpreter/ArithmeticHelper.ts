@@ -9,11 +9,12 @@ import {
   EmptyValue,
   ErrorType,
   getCellValueType,
-  InternalCellValue,
-  NoErrorCellValue
+  InternalNoErrorCellValue,
+  InternalScalarValue
 } from '../Cell'
 import {Config} from '../Config'
 import {DateTimeHelper} from '../DateTimeHelper'
+import {ErrorMessage} from '../error-message'
 import {Maybe} from '../Maybe'
 import {NumberLiteralHelper} from '../NumberLiteralHelper'
 import {collatorFromConfig} from '../StringHelper'
@@ -32,7 +33,75 @@ export class ArithmeticHelper {
     this.actualEps = config.smartRounding ? config.precisionEpsilon : 0
   }
 
-  public compare(left: NoErrorCellValue, right: NoErrorCellValue): number {
+  public eqMatcherFunction(pattern: string): (arg: InterpreterValue) => boolean {
+    const regexp = this.buildRegex(pattern)
+    return (cellValue) => (typeof cellValue === 'string' && regexp.test(this.normalizeString(cellValue)))
+  }
+
+  public neqMatcherFunction(pattern: string): (arg: InterpreterValue) => boolean {
+    const regexp = this.buildRegex(pattern)
+    return (cellValue) => {
+      return (typeof cellValue !== 'string' || !regexp.test(this.normalizeString(cellValue)))
+    }
+  }
+
+  public searchString(pattern: string, text: string): number {
+    const regexp = this.buildRegex(pattern, false)
+    const result = regexp.exec(text)
+    return result?.index ?? -1
+  }
+
+  public requiresRegex(pattern: string): boolean {
+    if(!this.config.useRegularExpressions && !this.config.useWildcards) {
+      return !this.config.matchWholeCell
+    }
+    for(let i=0;i<pattern.length;i++) {
+      const c = pattern.charAt(i)
+      if(isWildcard(c) || (this.config.useRegularExpressions && needsEscape(c))) {
+        return true
+      }
+    }
+    return false
+  }
+
+  private buildRegex(pattern: string, matchWholeCell: boolean = true): RegExp {
+    pattern = this.normalizeString(pattern)
+    let regexpStr
+    let useWildcards = this.config.useWildcards
+    let useRegularExpressions = this.config.useRegularExpressions
+    if(useRegularExpressions) {
+      try {
+        RegExp(pattern)
+      } catch (e) {
+        useRegularExpressions = false
+        useWildcards = false
+      }
+    }
+    if(useRegularExpressions) {
+      regexpStr = escapeNoCharacters(pattern, this.config.caseSensitive)
+    } else if(useWildcards) {
+      regexpStr = escapeNonWildcards(pattern, this.config.caseSensitive)
+    } else {
+      regexpStr = escapeAllCharacters(pattern, this.config.caseSensitive)
+    }
+    if(this.config.matchWholeCell && matchWholeCell) {
+      return RegExp('^('+ regexpStr + ')$')
+    } else {
+      return RegExp(regexpStr)
+    }
+  }
+
+  private normalizeString(str: string): string {
+    if(!this.config.caseSensitive) {
+      str = str.toLowerCase()
+    }
+    if(!this.config.accentSensitive) {
+      str = str.normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    }
+    return str
+  }
+
+  public compare(left: InternalNoErrorCellValue, right: InternalNoErrorCellValue): number {
     if (typeof left === 'string' || typeof right === 'string') {
       const leftTmp = typeof left === 'string' ? this.dateTimeHelper.dateStringToDateNumber(left) : left
       const rightTmp = typeof right === 'string' ? this.dateTimeHelper.dateStringToDateNumber(right) : right
@@ -77,17 +146,7 @@ export class ArithmeticHelper {
     return this.collator.compare(left, right)
   }
 
-  public add(left: number | CellError, right: number | CellError): number | CellError {
-    if (left instanceof CellError) {
-      return left
-    } else if (right instanceof CellError) {
-      return right
-    } else {
-      return this.addWithEpsilon(left, right)
-    }
-  }
-
-  private addWithEpsilon(left: number, right: number): number {
+  public addWithEpsilon = (left: number, right: number) => {
     const ret = left + right
     if (Math.abs(ret) < this.actualEps * Math.abs(left)) {
       return 0
@@ -101,12 +160,10 @@ export class ArithmeticHelper {
    *
    * Implementation of adding which is used in interpreter.
    *
-   * Errors are propagated, non-numerical values are ignored.
-   *
    * @param left - left operand of addition
    * @param right - right operand of addition
    */
-  public nonstrictadd = (left: InternalCellValue, right: InternalCellValue): number | CellError => {
+  public nonstrictadd = (left: InternalScalarValue, right: InternalScalarValue): number | CellError => {
     if (left instanceof CellError) {
       return left
     } else if (right instanceof CellError) {
@@ -129,47 +186,41 @@ export class ArithmeticHelper {
    *
    * Implementation of subtracting which is used in interpreter.
    *
-   * Errors are propagated.
-   *
    * @param left - left operand of subtraction
    * @param right - right operand of subtraction
    * @param eps - precision of comparison
    */
-  public subtract(left: number | CellError, right: number | CellError): number | CellError {
-    if (left instanceof CellError) {
-      return left
-    } else if (right instanceof CellError) {
-      return right
+  public subtract = (left: number, right: number) => {
+    const ret = left - right
+    if (Math.abs(ret) < this.actualEps * Math.abs(left)) {
+      return 0
     } else {
-      const ret = left - right
-      if (Math.abs(ret) < this.actualEps * Math.abs(left)) {
-        return 0
-      } else {
-        return ret
-      }
+      return ret
     }
   }
 
-  public coerceScalarToNumberOrError(arg: InternalCellValue): number | CellError {
+  public coerceScalarToNumberOrError(arg: InternalScalarValue): number | CellError {
     if (arg instanceof CellError) {
       return arg
     }
-    return this.coerceToMaybeNumber(arg) ?? new CellError(ErrorType.VALUE)
+    return this.coerceToMaybeNumber(arg) ?? new CellError(ErrorType.VALUE, ErrorMessage.NumberCoercion)
   }
 
-  public coerceToMaybeNumber(arg: NoErrorCellValue): Maybe<number> {
+  public coerceToMaybeNumber(arg: InternalScalarValue): Maybe<number> {
     return this.coerceNonDateScalarToMaybeNumber(arg) ?? (
       typeof arg === 'string' ? this.dateTimeHelper.dateStringToDateNumber(arg) : undefined
     )
   }
 
-  public coerceNonDateScalarToMaybeNumber(arg: NoErrorCellValue): Maybe<number> {
+  public coerceNonDateScalarToMaybeNumber(arg: InternalScalarValue): Maybe<number> {
     if (arg === EmptyValue) {
       return 0
-    }
-    if (typeof arg === 'string' && this.numberLiteralsHelper.isNumber(arg)) {
+    } else if (typeof arg === 'string' && this.numberLiteralsHelper.isNumber(arg)) {
       return this.numberLiteralsHelper.numericStringToNumber(arg)
     } else {
+      if(typeof arg === 'string' && arg.length>0 && arg.trim() === '') {
+        return undefined
+      }
       const coercedNumber = Number(arg)
       if (isNaN(coercedNumber)) {
         return undefined
@@ -202,7 +253,7 @@ export function coerceBooleanToNumber(arg: boolean): number {
   return Number(arg)
 }
 
-export function coerceEmptyToValue(arg: NoErrorCellValue): NoErrorCellValue {
+export function coerceEmptyToValue(arg: InternalNoErrorCellValue): InternalNoErrorCellValue {
   if (typeof arg === 'string') {
     return ''
   } else if (typeof arg === 'number') {
@@ -219,7 +270,7 @@ export function coerceEmptyToValue(arg: NoErrorCellValue): NoErrorCellValue {
  *
  * @param arg
  */
-export function coerceScalarToBoolean(arg: InternalCellValue): boolean | CellError | null {
+export function coerceScalarToBoolean(arg: InternalScalarValue): boolean | CellError | undefined {
   if (arg instanceof CellError || typeof arg === 'boolean') {
     return arg
   } else if (arg === EmptyValue) {
@@ -232,13 +283,15 @@ export function coerceScalarToBoolean(arg: InternalCellValue): boolean | CellErr
       return true
     } else if (argUppered === 'FALSE') {
       return false
+    } else if (argUppered === '') {
+      return false
     } else {
-      return null
+      return undefined
     }
   }
 }
 
-export function coerceScalarToString(arg: InternalCellValue): string | CellError {
+export function coerceScalarToString(arg: InternalScalarValue): string | CellError {
   if (arg instanceof CellError || typeof arg === 'string') {
     return arg
   } else if (arg === EmptyValue) {
@@ -250,173 +303,11 @@ export function coerceScalarToString(arg: InternalCellValue): string | CellError
   }
 }
 
-/**
- * Multiplies two numbers
- *
- * Implementation of multiplication which is used in interpreter.
- *
- * Errors are propagated.
- *
- * @param left - left operand of multiplication
- * @param right - right operand of multiplication
- */
-export function multiply(left: number | CellError, right: number | CellError): number | CellError {
-  if (left instanceof CellError) {
-    return left
-  } else if (right instanceof CellError) {
-    return right
-  } else {
-    return left * right
-  }
-}
-
-export function power(left: number | CellError, right: number | CellError): number | CellError {
-  if (left instanceof CellError) {
-    return left
-  } else if (right instanceof CellError) {
-    return right
-  } else {
-    return Math.pow(left, right)
-  }
-}
-
-export function divide(left: number | CellError, right: number | CellError): number | CellError {
-  if (left instanceof CellError) {
-    return left
-  } else if (right instanceof CellError) {
-    return right
-  } else if (right === 0) {
+export function divide(left: number, right: number): number | CellError {
+  if (right === 0) {
     return new CellError(ErrorType.DIV_BY_ZERO)
   } else {
     return (left / right)
-  }
-}
-
-export function unaryminus(value: number | CellError): number | CellError {
-  if (value instanceof CellError) {
-    return value
-  } else {
-    return -value
-  }
-}
-
-export function percent(value: number | CellError): number | CellError {
-  if (value instanceof CellError) {
-    return value
-  } else {
-    return value / 100
-  }
-}
-
-/**
- * Returns max from two numbers
- *
- * Implementation of max function which is used in interpreter.
- *
- * Errors are propagated, non-numerical values are neutral.
- *
- * @param left - left operand of addition
- * @param right - right operand of addition
- */
-export function max(left: InternalCellValue, right: InternalCellValue): InternalCellValue {
-  if (left instanceof CellError) {
-    return left
-  }
-  if (right instanceof CellError) {
-    return right
-  }
-  if (typeof left === 'number') {
-    if (typeof right === 'number') {
-      return Math.max(left, right)
-    } else {
-      return left
-    }
-  } else if (typeof right === 'number') {
-    return right
-  } else {
-    return Number.NEGATIVE_INFINITY
-  }
-}
-
-export function maxa(left: InternalCellValue, right: InternalCellValue): InternalCellValue {
-  if (left instanceof CellError) {
-    return left
-  }
-  if (right instanceof CellError) {
-    return right
-  }
-  if (typeof left === 'boolean') {
-    left = coerceBooleanToNumber(left)
-  }
-  if (typeof right === 'boolean') {
-    right = coerceBooleanToNumber(right)
-  }
-  if (typeof left === 'number') {
-    if (typeof right === 'number') {
-      return Math.max(left, right)
-    } else {
-      return left
-    }
-  } else if (typeof right === 'number') {
-    return right
-  } else {
-    return Number.NEGATIVE_INFINITY
-  }
-}
-
-/**
- * Returns min from two numbers
- *
- * Implementation of min function which is used in interpreter.
- *
- * Errors are propagated, non-numerical values are neutral.
- *
- * @param left - left operand of addition
- * @param right - right operand of addition
- */
-export function min(left: InternalCellValue, right: InternalCellValue): InternalCellValue {
-  if (left instanceof CellError) {
-    return left
-  }
-  if (right instanceof CellError) {
-    return right
-  }
-  if (typeof left === 'number') {
-    if (typeof right === 'number') {
-      return Math.min(left, right)
-    } else {
-      return left
-    }
-  } else if (typeof right === 'number') {
-    return right
-  } else {
-    return Number.POSITIVE_INFINITY
-  }
-}
-
-export function mina(left: InternalCellValue, right: InternalCellValue): InternalCellValue {
-  if (left instanceof CellError) {
-    return left
-  }
-  if (right instanceof CellError) {
-    return right
-  }
-  if (typeof left === 'boolean') {
-    left = coerceBooleanToNumber(left)
-  }
-  if (typeof right === 'boolean') {
-    right = coerceBooleanToNumber(right)
-  }
-  if (typeof left === 'number') {
-    if (typeof right === 'number') {
-      return Math.min(left, right)
-    } else {
-      return left
-    }
-  } else if (typeof right === 'number') {
-    return right
-  } else {
-    return Number.POSITIVE_INFINITY
   }
 }
 
@@ -440,4 +331,74 @@ export function fixNegativeZero(arg: number): number {
   } else {
     return arg
   }
+}
+
+function isWildcard(c: string): boolean {
+  return ['*', '?'].includes(c)
+}
+
+const escapedCharacters = ['{', '}', '[', ']', '(', ')', '<', '>', '=', '.', '+', '-', ',', '\\', '$', '^', '!']
+
+function needsEscape(c: string): boolean {
+  return escapedCharacters.includes(c)
+}
+
+function escapeNonWildcards(pattern: string, caseSensitive: boolean): string {
+  let str = ''
+  for (let i = 0; i < pattern.length; i++) {
+    const c = pattern.charAt(i)
+    if (c === '~') {
+      if (i == pattern.length - 1) {
+        str += '~'
+        continue
+      }
+      const d = pattern.charAt(i + 1)
+      if (isWildcard(d) || needsEscape(d)) {
+        str += '\\' + d
+        i++
+      } else {
+        str += d
+        i++
+      }
+    } else if (isWildcard(c)) {
+      str += '.' + c
+    } else if (needsEscape(c)) {
+      str += '\\' + c
+    } else if(caseSensitive) {
+      str += c
+    } else {
+      str += c.toLowerCase()
+    }
+  }
+  return str
+}
+
+function escapeAllCharacters(pattern: string, caseSensitive: boolean): string {
+  let str = ''
+  for (let i = 0; i < pattern.length; i++) {
+    const c = pattern.charAt(i)
+    if(isWildcard(c) || needsEscape(c)) {
+      str += '\\' + c
+    } else if(caseSensitive) {
+      str += c
+    } else {
+      str += c.toLowerCase()
+    }
+  }
+  return str
+}
+
+function escapeNoCharacters(pattern: string, caseSensitive: boolean): string {
+  let str = ''
+  for (let i = 0; i < pattern.length; i++) {
+    const c = pattern.charAt(i)
+    if(isWildcard(c) || needsEscape(c)) {
+      str += c
+    } else if(caseSensitive) {
+      str += c
+    } else {
+      str += c.toLowerCase()
+    }
+  }
+  return str
 }

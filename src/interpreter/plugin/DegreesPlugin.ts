@@ -3,20 +3,23 @@
  * Copyright (c) 2020 Handsoncode. All rights reserved.
  */
 
-import {InternalCellValue, SimpleCellAddress} from '../../Cell'
+import {InternalScalarValue, SimpleCellAddress} from '../../Cell'
 import {ProcedureAst} from '../../parser'
-import {FunctionPlugin} from './FunctionPlugin'
+import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
 
 export class DegreesPlugin extends FunctionPlugin {
   public static implementedFunctions = {
-    degrees: {
-      translationKey: 'DEGREES',
+    'DEGREES': {
+      method: 'degrees',
+      parameters: [
+          {argumentType: ArgumentTypes.NUMBER}
+        ]
     },
   }
 
-  public degrees(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
-    return this.templateWithOneCoercedToNumberArgument(ast, formulaAddress, (arg) => {
-      return arg * (180 / Math.PI)
-    })
+  public degrees(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('DEGREES'),
+      (arg) => arg * (180 / Math.PI)
+    )
   }
 }

@@ -1,12 +1,12 @@
-import {HyperFormula} from '../../src'
-import {ErrorType} from '../../src/Cell'
+import {ErrorType, HyperFormula} from '../../src'
+import {ErrorMessage} from '../../src/error-message'
 import {adr, detailedError} from '../testUtils'
 
 describe('SUM', () => {
   it('SUM without args',  () => {
     const engine =  HyperFormula.buildFromArray([['=SUM()']])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(0)
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
   })
 
   it('SUM with args',  () => {
@@ -75,7 +75,7 @@ describe('SUM', () => {
       ['=SUM("10")']
     ])
     expect(engine.getCellValue(adr('A1'))).toEqual(3)
-    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessage.NumberCoercion))
     expect(engine.getCellValue(adr('A3'))).toEqual(1)
     expect(engine.getCellValue(adr('A4'))).toEqual(10)
   })

@@ -3,50 +3,23 @@
  * Copyright (c) 2020 Handsoncode. All rights reserved.
  */
 
-import {ErrorType} from './Cell'
+import {ErrorType, TranslatableErrorType} from './Cell'
 import {defaultParseToDateTime} from './DateTimeDefault'
-import {DateTime, instanceOfSimpleDate, SimpleDate, SimpleDateTime} from './DateTimeHelper'
-import {ExpectedOneOfValues, ExpectedValueOfType} from './errors'
+import {DateTime, instanceOfSimpleDate, SimpleDate, SimpleDateTime, SimpleTime} from './DateTimeHelper'
+import {
+  ConfigValueTooSmallError,
+  ConfigValueTooBigError,
+  ExpectedValueOfTypeError,
+  ExpectedOneOfValuesError
+} from './errors'
 import {AlwaysDense, ChooseAddressMapping} from './DependencyGraph/AddressMapping/ChooseAddressMappingPolicy'
-import {defaultStringifyDateTime} from './format/format'
+import {defaultStringifyDateTime, defaultStringifyDuration} from './format/format'
 import {HyperFormula} from './HyperFormula'
 import {TranslationPackage} from './i18n'
-import {AbsPlugin} from './interpreter/plugin/AbsPlugin'
-import {BitShiftPlugin} from './interpreter/plugin/BitShiftPlugin'
-import {BitwiseLogicOperationsPlugin} from './interpreter/plugin/BitwiseLogicOperationsPlugin'
-import {BooleanPlugin} from './interpreter/plugin/BooleanPlugin'
-import {CharPlugin} from './interpreter/plugin/CharPlugin'
-import {CodePlugin} from './interpreter/plugin/CodePlugin'
-import {CorrelPlugin} from './interpreter/plugin/CorrelPlugin'
-import {CountUniquePlugin} from './interpreter/plugin/CountUniquePlugin'
-import {DatePlugin} from './interpreter/plugin/DatePlugin'
-import {DegreesPlugin} from './interpreter/plugin/DegreesPlugin'
-import {DeltaPlugin} from './interpreter/plugin/DeltaPlugin'
-import {ErrorFunctionPlugin} from './interpreter/plugin/ErrorFunctionPlugin'
-import {ExpPlugin} from './interpreter/plugin/ExpPlugin'
-import {InformationPlugin} from './interpreter/plugin/InformationPlugin'
-import {IsEvenPlugin} from './interpreter/plugin/IsEvenPlugin'
-import {IsOddPlugin} from './interpreter/plugin/IsOddPlugin'
-import {LogarithmPlugin} from './interpreter/plugin/LogarithmPlugin'
-import {MathConstantsPlugin} from './interpreter/plugin/MathConstantsPlugin'
-import {MatrixPlugin} from './interpreter/plugin/MatrixPlugin'
-import {MedianPlugin} from './interpreter/plugin/MedianPlugin'
-import {ModuloPlugin} from './interpreter/plugin/ModuloPlugin'
-import {NumericAggregationPlugin} from './interpreter/plugin/NumericAggregationPlugin'
-import {PowerPlugin} from './interpreter/plugin/PowerPlugin'
-import {RadiansPlugin} from './interpreter/plugin/RadiansPlugin'
-import {RadixConversionPlugin} from './interpreter/plugin/RadixConversionPlugin'
-import {RandomPlugin} from './interpreter/plugin/RandomPlugin'
-import {RoundingPlugin} from './interpreter/plugin/RoundingPlugin'
-import {SqrtPlugin} from './interpreter/plugin/SqrtPlugin'
-import {SumifPlugin} from './interpreter/plugin/SumifPlugin'
-import {SumprodPlugin} from './interpreter/plugin/SumprodPlugin'
-import {TextPlugin} from './interpreter/plugin/TextPlugin'
-import {TrigonometryPlugin} from './interpreter/plugin/TrigonometryPlugin'
-import {VlookupPlugin} from './interpreter/plugin/VlookupPlugin'
 import {Maybe} from './Maybe'
 import {ParserConfig} from './parser/ParserConfig'
-import {LicenseKeyValidityState, checkLicenseKeyValidity} from './helpers/licenseKeyValidator'
+import {checkLicenseKeyValidity, LicenseKeyValidityState} from './helpers/licenseKeyValidator'
+import {FunctionPluginDefinition} from './interpreter/plugin/FunctionPlugin'
 
 type GPUMode = 'gpu' | 'cpu' | 'dev'
 
@@ -87,28 +60,32 @@ export interface ConfigParams {
    * - AlwaysSparse - will use SparseStrategy for all sheets.
    *
    * @default AlwaysDense
+   *
+   * @category Engine
    */
   chooseAddressMappingPolicy: ChooseAddressMapping,
   /**
    * A list of date formats that are supported by date parsing functions.
    *
-   * The separator is ignored and it can be any of '-',' ','/'.
+   * The separator is ignored and it can be any of '-' (dash), ' ' (empty space), '/' (slash).
    *
    * Any order of YY, MM, DD is accepted as a date, and YY can be replaced with YYYY.
    *
    * @default ['MM/DD/YYYY', 'MM/DD/YY']
    *
-   * @category DateTime
+   * @category Date and Time
    */
   dateFormats: string[],
   /**
    * A list of time formats that are supported by time parsing functions.
    *
-   * The separator is ':'.
+   * The separator is ':' (colon).
    *
    * Any configuration of at least two of hh, mm, ss is accepted as a time, and they can be put in any order.
    *
-   * @default ['hh:mm', 'hh:mm:ss']
+   * @default ['hh:mm', 'hh:mm:ss.sss']
+   *
+   * @category Date and Time
    */
   timeFormats: string[],
   /**
@@ -116,12 +93,12 @@ export interface ConfigParams {
    *
    * @default ','
    *
-   * @category Syntax
+   * @category Formula Syntax
    */
   functionArgSeparator: string,
   /**
    * A decimal separator used for parsing numeric literals.
-   * Can be either '.' or ',' and must be different from [[thousandSeparator]] and [[functionArgSeparator]].
+   * Can be either '.' (period) or ',' (comma) and must be different from [[thousandSeparator]] and [[functionArgSeparator]].
    *
    * @default '.'
    *
@@ -132,17 +109,26 @@ export interface ConfigParams {
    * Code for translation package with translations of function and error names.
    *
    * @default 'enGB'
+   *
+   * @category Formula Syntax
    */
   language: string,
   /**
-   * License key for commercial version of HyperFormula.
+   * A license key of HyperFormula accepts the following values:
+   * * `agpl-v3` string if you want to use the software on AGPL v3 license terms,
+   * * `non-commercial-and-evaluation` string if you want to use our limited versions,
+   * * a valid license key string, if you bought the commercial license.
    *
-   * @default ''
+   * For more details visit [this guide](/guide/license-key.html)
+   *
+   * @default undefined
+   *
+   * @category License
    */
   licenseKey: string,
   /**
    * A thousand separator used for parsing numeric literals.
-   * Can be either empty, ',' or ' ' and must be different from [[decimalSeparator]] and [[functionArgSeparator]].
+   * Can be either empty, ',' (comma) or ' ' (empty space) and must be different from [[decimalSeparator]] and [[functionArgSeparator]].
    *
    * @default ''
    *
@@ -154,7 +140,7 @@ export interface ConfigParams {
    *
    * @default []
    *
-   * @category Syntax
+   * @category Formula Syntax
    */
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   functionPlugins: any[],
@@ -183,7 +169,7 @@ export interface ConfigParams {
    *
    * @default false
    *
-   * @category DateTime
+   * @category Date and Time
    */
   leapYear1900: boolean,
   /**
@@ -213,12 +199,23 @@ export interface ConfigParams {
    */
   matrixDetectionThreshold: number,
   /**
+   * Sets the compatibility mode for behaviour of null value.
+   * If set, formula evaluating to null evaluates to 0 instead.
+   *
+   * @default false
+   *
+   * @category Engine
+   *
+   * @since 0.2.0
+   */
+  evaluateNullToZero: boolean,
+  /**
    * Two-digit values when interpreted as a year can be either 19xx or 20xx.
    * If `xx <= nullYear` its latter, otherwise its former.
    *
    * @default 30
    *
-   * @category DateTime
+   * @category Date and Time
    */
   nullYear: number,
   /**
@@ -226,7 +223,7 @@ export interface ConfigParams {
    *
    * @default defaultParseToDateTime
    *
-   * @category DateTime
+   * @category Date and Time
    */
   parseDateTime: (dateTimeString: string, dateFormat: string, timeFormat: string) => Maybe<DateTime>,
   /**
@@ -257,9 +254,17 @@ export interface ConfigParams {
    *
    * @default defaultStringifyDateTime
    *
-   * @category DateTime
+   * @category Date and Time
    */
-  stringifyDateTime: (dateTime: SimpleDateTime, dateFormat: string) => Maybe<string>,
+  stringifyDateTime: (dateTime: SimpleDateTime, dateTimeFormat: string) => Maybe<string>,
+  /**
+   * Allows to provide a function that takes time duration prints it into string.
+   *
+   * @default defaultStringifyDuration
+   *
+   * @category Date and Time
+   */
+  stringifyDuration: (time: SimpleTime, timeFormat: string) => Maybe<string>,
   /**
    * Sets the rounding.
    * If `false`, no rounding happens, and numbers are equal if and only if they are truly identical value (see: [[precisionEpsilon]]).
@@ -304,7 +309,7 @@ export interface ConfigParams {
    *
    * @default {year: 1899, month: 12, day: 30}
    *
-   * @category DateTime
+   * @category Date and Time
    */
   nullDate: SimpleDate,
   /**
@@ -312,9 +317,30 @@ export interface ConfigParams {
    *
    * @default 20
    *
-   * @category UndoRedo
+   * @category Undo and Redo
    */
   undoLimit: number,
+  /**
+   * If set true, then criterions in functions (SUMIF, COUNTIF, ...) can use regular expressions.
+   *
+   * @default false
+   * @category String
+   */
+  useRegularExpressions: boolean,
+  /**
+   * If set true, then criterions in functions (SUMIF, COUNTIF, ...) can use wildcards '*' and '?'.
+   *
+   * @default true
+   * @category String
+   */
+  useWildcards: boolean,
+  /**
+   * Whether criterions in functions require whole cell to match the pattern, or just a subword.
+   *
+   * @default true
+   * @category String
+   */
+  matchWholeCell: boolean,
   /**
    * Maximum number of rows
    *
@@ -343,8 +369,8 @@ export class Config implements ConfigParams, ParserConfig {
     caseFirst: 'lower',
     ignorePunctuation: false,
     chooseAddressMappingPolicy: new AlwaysDense(),
-    dateFormats: ['MM/DD/YYYY', 'MM/DD/YY'],
-    timeFormats: ['hh:mm', 'hh:mm:ss'],
+    dateFormats: ['DD/MM/YYYY', 'DD/MM/YY'],
+    timeFormats: ['hh:mm', 'hh:mm:ss.sss'],
     functionArgSeparator: ',',
     decimalSeparator: '.',
     thousandSeparator: '',
@@ -357,9 +383,11 @@ export class Config implements ConfigParams, ParserConfig {
     localeLang: 'en',
     matrixDetection: true,
     matrixDetectionThreshold: 100,
+    evaluateNullToZero: false,
     nullYear: 30,
     parseDateTime: defaultParseToDateTime,
     stringifyDateTime: defaultStringifyDateTime,
+    stringifyDuration: defaultStringifyDuration,
     precisionEpsilon: 1e-13,
     precisionRounding: 14,
     useColumnIndex: false,
@@ -367,46 +395,13 @@ export class Config implements ConfigParams, ParserConfig {
     vlookupThreshold: 20,
     nullDate: {year: 1899, month: 12, day: 30},
     undoLimit: 20,
+    useRegularExpressions: false,
+    useWildcards: true,
+    matchWholeCell: true,
     maxRows: 40_000,
     maxColumns: 18_278
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  private static defaultPlugins: any[] = [
-    SumifPlugin,
-    TextPlugin,
-    NumericAggregationPlugin,
-    MedianPlugin,
-    DatePlugin,
-    BooleanPlugin,
-    InformationPlugin,
-    TrigonometryPlugin,
-    CountUniquePlugin,
-    SumprodPlugin,
-    MatrixPlugin,
-    ExpPlugin,
-    AbsPlugin,
-    DegreesPlugin,
-    RadiansPlugin,
-    RandomPlugin,
-    VlookupPlugin,
-    IsEvenPlugin,
-    IsOddPlugin,
-    RoundingPlugin,
-    RadixConversionPlugin,
-    LogarithmPlugin,
-    BitwiseLogicOperationsPlugin,
-    BitShiftPlugin,
-    PowerPlugin,
-    MathConstantsPlugin,
-    SqrtPlugin,
-    ModuloPlugin,
-    DeltaPlugin,
-    CharPlugin,
-    CodePlugin,
-    ErrorFunctionPlugin,
-    CorrelPlugin,
-  ]
   /** @inheritDoc */
   public readonly caseSensitive: boolean
   /** @inheritDoc */
@@ -431,7 +426,7 @@ export class Config implements ConfigParams, ParserConfig {
   public readonly licenseKey: string
   /** @inheritDoc */
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  public readonly functionPlugins: any[]
+  public readonly functionPlugins: FunctionPluginDefinition[]
   /** @inheritDoc */
   public readonly gpuMode: GPUMode
   /** @inheritDoc */
@@ -445,11 +440,15 @@ export class Config implements ConfigParams, ParserConfig {
   /** @inheritDoc */
   public readonly matrixDetectionThreshold: number
   /** @inheritDoc */
+  public readonly evaluateNullToZero: boolean
+  /** @inheritDoc */
   public readonly nullYear: number
   /** @inheritDoc */
   public readonly parseDateTime: (dateString: string, dateFormats: string) => Maybe<SimpleDateTime>
   /** @inheritDoc */
   public readonly stringifyDateTime: (date: SimpleDateTime, formatArg: string) => Maybe<string>
+  /** @inheritDoc */
+  public readonly stringifyDuration: (time: SimpleTime, formatArg: string) => Maybe<string>
   /** @inheritDoc */
   public readonly precisionEpsilon: number
   /** @inheritDoc */
@@ -471,7 +470,7 @@ export class Config implements ConfigParams, ParserConfig {
    *
    * @internal
    */
-  public readonly errorMapping: Record<string, ErrorType>
+  public readonly errorMapping: Record<string, TranslatableErrorType>
   /** @inheritDoc */
   public readonly maxRows: number
   /** @inheritDoc */
@@ -482,6 +481,9 @@ export class Config implements ConfigParams, ParserConfig {
    * @internal
    */
   public readonly translationPackage: TranslationPackage
+  public readonly useRegularExpressions: boolean
+  public readonly useWildcards: boolean
+  public readonly matchWholeCell: boolean
   /**
    * Set automatically based on licenseKey checking result.
    *
@@ -519,9 +521,11 @@ export class Config implements ConfigParams, ParserConfig {
       smartRounding,
       matrixDetection,
       matrixDetectionThreshold,
+      evaluateNullToZero,
       nullYear,
       parseDateTime,
       stringifyDateTime,
+      stringifyDuration,
       precisionEpsilon,
       precisionRounding,
       useColumnIndex,
@@ -529,6 +533,9 @@ export class Config implements ConfigParams, ParserConfig {
       nullDate,
       useStats,
       undoLimit,
+      useRegularExpressions,
+      useWildcards,
+      matchWholeCell,
       maxRows,
       maxColumns
     }: Partial<ConfigParams> = {},
@@ -552,21 +559,36 @@ export class Config implements ConfigParams, ParserConfig {
     this.smartRounding = this.valueFromParam(smartRounding, 'boolean', 'smartRounding')
     this.matrixDetection = this.valueFromParam(matrixDetection, 'boolean', 'matrixDetection')
     this.matrixDetectionThreshold = this.valueFromParam(matrixDetectionThreshold, 'number', 'matrixDetectionThreshold')
+    this.validateNumberToBeAtLeast(this.matrixDetectionThreshold, 'matrixDetectionThreshold', 1)
+    this.evaluateNullToZero = this.valueFromParam(evaluateNullToZero, 'boolean', 'evaluateNullToZero')
     this.nullYear = this.valueFromParam(nullYear, 'number', 'nullYear')
+    this.validateNumberToBeAtLeast(this.nullYear, 'nullYear', 0)
+    this.validateNumberToBeAtMost(this.nullYear, 'nullYear', 100)
     this.precisionRounding = this.valueFromParam(precisionRounding, 'number', 'precisionRounding')
+    this.validateNumberToBeAtLeast(this.precisionRounding, 'precisionRounding', 0)
     this.precisionEpsilon = this.valueFromParam(precisionEpsilon, 'number', 'precisionEpsilon')
+    this.validateNumberToBeAtLeast(this.precisionEpsilon, 'precisionEpsilon', 0)
     this.useColumnIndex = this.valueFromParam(useColumnIndex, 'boolean', 'useColumnIndex')
     this.useStats = this.valueFromParam(useStats, 'boolean', 'useStats')
     this.vlookupThreshold = this.valueFromParam(vlookupThreshold, 'number', 'vlookupThreshold')
+    this.validateNumberToBeAtLeast(this.vlookupThreshold, 'vlookupThreshold', 1)
     this.parseDateTime = this.valueFromParam(parseDateTime, 'function', 'parseDateTime')
     this.stringifyDateTime = this.valueFromParam(stringifyDateTime, 'function', 'stringifyDateTime')
+    this.stringifyDuration = this.valueFromParam(stringifyDuration, 'function', 'stringifyDuration')
     this.translationPackage = HyperFormula.getLanguage(this.language)
     this.errorMapping = this.translationPackage.buildErrorMapping()
     this.nullDate = this.valueFromParamCheck(nullDate, instanceOfSimpleDate, 'IDate', 'nullDate')
     this.leapYear1900 = this.valueFromParam(leapYear1900, 'boolean', 'leapYear1900')
     this.undoLimit = this.valueFromParam(undoLimit, 'number', 'undoLimit')
+    this.useRegularExpressions = this.valueFromParam(useRegularExpressions, 'boolean', 'useRegularExpressions')
+    this.useWildcards = this.valueFromParam(useWildcards, 'boolean', 'useWildcards')
+    this.matchWholeCell = this.valueFromParam(matchWholeCell, 'boolean', 'matchWholeCell')
+    this.validateNumberToBeAtLeast(this.undoLimit, 'undoLimit', 0)
     this.maxRows = this.valueFromParam(maxRows, 'number', 'maxRows')
+    this.validateNumberToBeAtLeast(this.maxRows, 'maxRows', 1)
     this.maxColumns = this.valueFromParam(maxColumns, 'number', 'maxColumns')
+    this.validateNumberToBeAtLeast(this.maxColumns, 'maxColumns', 1)
+
 
     this.checkIfParametersNotInConflict(
       {value: this.decimalSeparator, name: 'decimalSeparator'},
@@ -586,64 +608,6 @@ export class Config implements ConfigParams, ParserConfig {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  public allFunctionPlugins(): any[] {
-    return [...Config.defaultPlugins, ...this.functionPlugins]
-  }
-
-  public volatileFunctions(): Set<string> {
-    const volatileFunctions = new Set<string>()
-
-    for (const plugin of this.allFunctionPlugins()) {
-      for (const functionKey in plugin.implementedFunctions) {
-        const pluginFunctionData = plugin.implementedFunctions[functionKey]
-        if (pluginFunctionData.isVolatile) {
-          volatileFunctions.add(this.translationPackage.getFunctionTranslation(pluginFunctionData.translationKey))
-        }
-      }
-    }
-
-    return volatileFunctions
-  }
-
-  public structuralChangeFunctions(): Set<string> {
-    const structuralChangeFunctions = new Set<string>()
-
-    for (const plugin of this.allFunctionPlugins()) {
-      for (const functionKey in plugin.implementedFunctions) {
-        const pluginFunctionData = plugin.implementedFunctions[functionKey]
-        if (pluginFunctionData.isDependentOnSheetStructureChange) {
-          structuralChangeFunctions.add(this.translationPackage.getFunctionTranslation(pluginFunctionData.translationKey))
-        }
-      }
-    }
-    return structuralChangeFunctions
-  }
-
-  public functionsWhichDoesNotNeedArgumentsToBeComputed(): Set<string> {
-    const functionsWhichDoesNotNeedArgumentsToBeComputed = new Set<string>()
-
-    for (const plugin of this.allFunctionPlugins()) {
-      for (const functionKey in plugin.implementedFunctions) {
-        const pluginFunctionData = plugin.implementedFunctions[functionKey]
-        if (pluginFunctionData.doesNotNeedArgumentsToBeComputed) {
-          functionsWhichDoesNotNeedArgumentsToBeComputed.add(this.translationPackage.getFunctionTranslation(pluginFunctionData.translationKey))
-        }
-      }
-    }
-    return functionsWhichDoesNotNeedArgumentsToBeComputed
-  }
-
-  public static getRegisteredFunctions(): Set<String> {
-    const ret = new Set<String>()
-    for (const pluginClass of Config.defaultPlugins) {
-      Object.keys(pluginClass.implementedFunctions).forEach((pluginFunction) => {
-        ret.add(pluginClass.implementedFunctions[pluginFunction].translationKey.toUpperCase())
-      })
-    }
-    return ret
-  }
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private valueFromParam(inputValue: any, expectedType: string | string[], paramName: ConfigParamsList) {
     if (typeof inputValue === 'undefined') {
       return Config.defaultConfig[paramName]
@@ -651,13 +615,13 @@ export class Config implements ConfigParams, ParserConfig {
       if (typeof inputValue === expectedType) {
         return inputValue
       } else {
-        throw new ExpectedValueOfType(expectedType, paramName)
+        throw new ExpectedValueOfTypeError(expectedType, paramName)
       }
     } else {
       if (expectedType.includes(inputValue)) {
         return inputValue
       } else {
-        throw new ExpectedOneOfValues(expectedType.map((val: string) => '\'' + val + '\'').join(' '), paramName)
+        throw new ExpectedOneOfValuesError(expectedType.map((val: string) => '\'' + val + '\'').join(' '), paramName)
       }
     }
   }
@@ -669,7 +633,7 @@ export class Config implements ConfigParams, ParserConfig {
     } else if (typeof inputValue === 'undefined') {
       return Config.defaultConfig[paramName]
     } else {
-      throw new ExpectedValueOfType(expectedType, paramName)
+      throw new ExpectedValueOfTypeError(expectedType, paramName)
     }
   }
 
@@ -692,6 +656,18 @@ export class Config implements ConfigParams, ParserConfig {
     if (duplicates.length > 0) {
       const paramNames = duplicates.map(entry => `[${entry.sort()}]`).join('; ')
       throw new Error(`Config initialization failed. Parameters in conflict: ${paramNames}`)
+    }
+  }
+
+  private validateNumberToBeAtLeast(value: number, paramName: string, minimum: number) {
+    if (value < minimum) {
+      throw new ConfigValueTooSmallError(paramName, minimum)
+    }
+  }
+
+  private validateNumberToBeAtMost(value: number, paramName: string, maximum: number) {
+    if (value > maximum) {
+      throw new ConfigValueTooBigError(paramName, maximum)
     }
   }
 }

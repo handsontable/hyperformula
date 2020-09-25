@@ -7,15 +7,16 @@ import {simpleCellAddress, SimpleCellAddress} from '../Cell'
 import {Maybe} from '../Maybe'
 import {CellAddress} from './CellAddress'
 import {ColumnAddress} from './ColumnAddress'
-import {additionalCharactersAllowedInQuotes} from './LexerConfig'
+import {sheetNameRegexp, simpleSheetName} from './LexerConfig'
 import {RowAddress} from './RowAddress'
 
 export type SheetMappingFn = (sheetName: string) => Maybe<number>
 export type SheetIndexMappingFn = (sheetIndex: number) => Maybe<string>
 
-const addressRegex = new RegExp(`^((([A-Za-z0-9_\u00C0-\u02AF]+)|'([A-Za-z0-9${additionalCharactersAllowedInQuotes}_\u00C0-\u02AF]+)')!)?(\\$?)([A-Za-z]+)(\\$?)([0-9]+)\$`)
-const columnRegex = new RegExp(`^((([A-Za-z0-9_\u00C0-\u02AF]+)|'([A-Za-z0-9${additionalCharactersAllowedInQuotes}_\u00C0-\u02AF]+)')!)?(\\$?)([A-Za-z]+)`)
-const rowRegex = new RegExp(`^((([A-Za-z0-9_\u00C0-\u02AF]+)|'([A-Za-z0-9${additionalCharactersAllowedInQuotes}_\u00C0-\u02AF]+)')!)?(\\$?)([0-9]+)`)
+const addressRegex = new RegExp(`^(${sheetNameRegexp})?(\\$?)([A-Za-z]+)(\\$?)([0-9]+)$`)
+const columnRegex = new RegExp(`^(${sheetNameRegexp})?(\\$?)([A-Za-z]+)$`)
+const rowRegex = new RegExp(`^(${sheetNameRegexp})?(\\$?)([0-9]+)$`)
+const simpleSheetNameRegex = new RegExp(`^${simpleSheetName}$`)
 
 /**
  * Computes R0C0 representation of cell address based on it's string representation and base address.
@@ -30,15 +31,9 @@ export const cellAddressFromString = (sheetMapping: SheetMappingFn, stringAddres
 
   const col = columnLabelToIndex(result[6])
 
-  const maybeSheetName = result[3] || result[4]
-
-  let sheet = null
-
-  if (maybeSheetName) {
-    sheet = sheetMapping(maybeSheetName)
-    if (sheet === undefined) {
-      return undefined
-    }
+  const sheet = extractSheetNumber(result, sheetMapping)
+  if (sheet === undefined) {
+    return undefined
   }
 
   const row = Number(result[8]) - 1
@@ -88,7 +83,7 @@ export const rowAddressFromString = (sheetMapping: SheetMappingFn, stringAddress
 }
 
 /**
- * Computes simple (absolute) address of a cell address based on it's string representation.
+ * Computes simple (absolute) address of a cell address based on its string representation.
  * If sheet name present in string representation but is not present in sheet mapping, returns undefined.
  * If sheet name is not present in string representation, returns {@param sheetContext} as sheet number
  *
@@ -102,16 +97,13 @@ export const simpleCellAddressFromString = (sheetMapping: SheetMappingFn, string
 
   const col = columnLabelToIndex(result[6])
 
-  const maybeSheetName = result[3] || result[4]
-  let sheet
-  if (maybeSheetName) {
-    sheet = sheetMapping(maybeSheetName)
-  } else {
-    sheet = sheetContext
-  }
-
+  let sheet = extractSheetNumber(result, sheetMapping)
   if (sheet === undefined) {
     return undefined
+  }
+
+  if (sheet === null) {
+    sheet = sheetContext
   }
 
   const row = Number(result[8]) - 1
@@ -128,7 +120,7 @@ export const simpleCellAddressFromString = (sheetMapping: SheetMappingFn, string
  * */
 export const simpleCellAddressToString = (sheetIndexMapping: SheetIndexMappingFn, address: SimpleCellAddress, sheetIndex: number): Maybe<string> => {
   const column = columnIndexToLabel(address.col)
-  const sheetName = sheetIndexMapping(address.sheet)
+  const sheetName = sheetIndexToString(address.sheet, sheetIndexMapping)
 
   if (sheetName === undefined) {
     return undefined
@@ -174,12 +166,27 @@ export function columnIndexToLabel(column: number) {
   return result.toUpperCase()
 }
 
+export function sheetIndexToString(sheetId: number, sheetMappingFn: SheetIndexMappingFn): string | undefined {
+  let sheetName = sheetMappingFn(sheetId)
+  if (sheetName === undefined) {
+    return undefined
+  }
+
+  if (simpleSheetNameRegex.test(sheetName)) {
+    return sheetName
+  } else {
+    sheetName = sheetName.replace(/'/g, "''")
+    return `'${sheetName}'`
+  }
+}
+
 function extractSheetNumber(regexResult: RegExpExecArray, sheetMapping: SheetMappingFn): number | null | undefined {
-  const maybeSheetName = regexResult[3] || regexResult[4]
+  let maybeSheetName = regexResult[3] ?? regexResult[2]
 
   let sheet = null
 
   if (maybeSheetName) {
+    maybeSheetName = maybeSheetName.replace(/''/g, "'")
     sheet = sheetMapping(maybeSheetName)
     if (sheet === undefined) {
       return undefined

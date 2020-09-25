@@ -3,14 +3,14 @@
  * Copyright (c) 2020 Handsoncode. All rights reserved.
  */
 
-import {CellError, ErrorType, InternalCellValue, SimpleCellAddress} from '../../Cell'
+import {CellError, ErrorType, InternalScalarValue, SimpleCellAddress} from '../../Cell'
+import {ErrorMessage} from '../../error-message'
 import {Maybe} from '../../Maybe'
 import {AstNodeType, ProcedureAst} from '../../parser'
 import {coerceToRange} from '../ArithmeticHelper'
-import {CriterionPackage} from '../Criterion'
 import {Condition, CriterionFunctionCompute} from '../CriterionFunctionCompute'
 import {SimpleRangeValue} from '../InterpreterValue'
-import {FunctionPlugin} from './FunctionPlugin'
+import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
 
 class AverageResult {
 
@@ -60,20 +60,45 @@ function countifsCacheKey(conditions: Condition[]): string {
 
 export class SumifPlugin extends FunctionPlugin {
   public static implementedFunctions = {
-    sumif: {
-      translationKey: 'SUMIF',
+    'SUMIF': {
+      method: 'sumif',
+      parameters: [
+        {argumentType: ArgumentTypes.RANGE},
+        {argumentType: ArgumentTypes.NOERROR},
+        {argumentType: ArgumentTypes.RANGE, optionalArg: true},
+      ],
     },
-    countif: {
-      translationKey: 'COUNTIF',
+    'COUNTIF': {
+      method: 'countif',
+      parameters: [
+        {argumentType: ArgumentTypes.RANGE},
+        {argumentType: ArgumentTypes.NOERROR},
+      ],
     },
-    averageif: {
-      translationKey: 'AVERAGEIF',
+    'AVERAGEIF': {
+      method: 'averageif',
+      parameters: [
+        {argumentType: ArgumentTypes.RANGE},
+        {argumentType: ArgumentTypes.NOERROR},
+        {argumentType: ArgumentTypes.RANGE, optionalArg: true},
+      ],
     },
-    sumifs: {
-      translationKey: 'SUMIFS',
+    'SUMIFS': {
+      method: 'sumifs',
+      parameters: [
+        {argumentType: ArgumentTypes.RANGE},
+        {argumentType: ArgumentTypes.RANGE},
+        {argumentType: ArgumentTypes.NOERROR},
+      ],
+      repeatLastArgs: 2,
     },
-    countifs: {
-      translationKey: 'COUNTIFS',
+    'COUNTIFS': {
+      method: 'countifs',
+      parameters: [
+        {argumentType: ArgumentTypes.RANGE},
+        {argumentType: ArgumentTypes.NOERROR},
+      ],
+      repeatLastArgs: 2,
     },
   }
 
@@ -87,149 +112,79 @@ export class SumifPlugin extends FunctionPlugin {
    * @param ast
    * @param formulaAddress
    */
-  public sumif(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
-    if (ast.args.length < 2 || ast.args.length > 3) {
-      return new CellError(ErrorType.NA)
-    }
-    if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
-      return new CellError(ErrorType.NUM)
-    }
-    const conditionArgValue = this.evaluateAst(ast.args[0], formulaAddress)
-    if (conditionArgValue instanceof CellError) {
-      return conditionArgValue
-    }
-    const conditionArg = coerceToRange(conditionArgValue)
-
-    const criterionValue = this.evaluateAst(ast.args[1], formulaAddress)
-    if (criterionValue instanceof SimpleRangeValue) {
-      return new CellError(ErrorType.VALUE)
-    } else if (criterionValue instanceof CellError) {
-      return criterionValue
-    }
-    const criterion = CriterionPackage.fromCellValue(criterionValue, this.interpreter.arithmeticHelper)
-    if (criterion === undefined) {
-      return new CellError(ErrorType.VALUE)
-    }
-
-    let valuesArg
-    if (ast.args.length == 2) {
-      valuesArg = conditionArg
-    } else {
-      const valuesArgValue = this.evaluateAst(ast.args[2], formulaAddress)
-      if (valuesArgValue instanceof CellError) {
-        return valuesArgValue
-      }
-      valuesArg = coerceToRange(valuesArgValue)
-    }
-
-    const result = new CriterionFunctionCompute<InternalCellValue>(
-      this.interpreter,
-      sumifCacheKey,
-      0,
-      (left, right) => this.interpreter.arithmeticHelper.nonstrictadd(left, right),
-      (arg) => arg,
-    ).compute(valuesArg, [new Condition(conditionArg, criterion)])
-
-    return result
-  }
-
-  public sumifs(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
-    if (ast.args.length < 3 || ast.args.length % 2 === 0) {
-      return new CellError(ErrorType.NA)
-    }
-    if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
-      return new CellError(ErrorType.NUM)
-    }
-    const valueArgValue = this.evaluateAst(ast.args[0], formulaAddress)
-    if (valueArgValue instanceof CellError) {
-      return valueArgValue
-    }
-    const valuesArg = coerceToRange(valueArgValue)
-
-    const conditions: Condition[] = []
-    for (let i = 1; i < ast.args.length; i += 2) {
-      const conditionArgValue = this.evaluateAst(ast.args[i], formulaAddress)
-      if (conditionArgValue instanceof CellError) {
-        return conditionArgValue
-      }
-      const conditionArg = coerceToRange(conditionArgValue)
-      const criterionValue = this.evaluateAst(ast.args[i + 1], formulaAddress)
-      if (criterionValue instanceof SimpleRangeValue) {
-        return new CellError(ErrorType.VALUE)
-      } else if (criterionValue instanceof CellError) {
-        return criterionValue
-      }
-      const criterionPackage = CriterionPackage.fromCellValue(criterionValue, this.interpreter.arithmeticHelper)
-      if (criterionPackage === undefined) {
-        return new CellError(ErrorType.VALUE)
-      }
-      conditions.push(new Condition(conditionArg, criterionPackage))
-    }
-
-    const result = new CriterionFunctionCompute<InternalCellValue>(
-      this.interpreter,
-      sumifCacheKey,
-      0,
-      (left, right) => this.interpreter.arithmeticHelper.nonstrictadd(left, right),
-      (arg) => arg,
-    ).compute(valuesArg, conditions)
-
-    return result
-  }
-
-  public averageif(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
-    if (ast.args.length < 2 || ast.args.length > 3) {
-      return new CellError(ErrorType.NA)
-    }
-    if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
-      return new CellError(ErrorType.NUM)
-    }
-    const conditionArgValue = this.evaluateAst(ast.args[0], formulaAddress)
-    if (conditionArgValue instanceof CellError) {
-      return conditionArgValue
-    }
-    const conditionArg = coerceToRange(conditionArgValue)
-
-    const criterionValue = this.evaluateAst(ast.args[1], formulaAddress)
-    if (criterionValue instanceof SimpleRangeValue) {
-      return new CellError(ErrorType.VALUE)
-    } else if (criterionValue instanceof CellError) {
-      return criterionValue
-    }
-    const criterionPackage = CriterionPackage.fromCellValue(criterionValue, this.interpreter.arithmeticHelper)
-    if (criterionPackage === undefined) {
-      return new CellError(ErrorType.VALUE)
-    }
-
-    let valuesArg
-    if (ast.args.length == 2) {
-      valuesArg = conditionArg
-    } else {
-      const valuesArgValue = this.evaluateAst(ast.args[2], formulaAddress)
-      if (valuesArgValue instanceof CellError) {
-        return valuesArgValue
-      }
-      valuesArg = coerceToRange(valuesArgValue)
-    }
-
-    const averageResult = new CriterionFunctionCompute<AverageResult>(
-      this.interpreter,
-      averageifCacheKey,
-      AverageResult.empty,
-      (left, right) => left.compose(right),
-      (arg: InternalCellValue) => {
-        if (typeof arg === 'number') {
-          return AverageResult.single(arg)
-        } else {
-          return AverageResult.empty
+  public sumif(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('SUMIF'),
+      (conditionArg: SimpleRangeValue, criterionValue: InternalScalarValue, valuesArg: Maybe<SimpleRangeValue>) => {
+        const criterion = this.interpreter.criterionBuilder.fromCellValue(criterionValue, this.interpreter.arithmeticHelper)
+        if (criterion === undefined) {
+          return new CellError(ErrorType.VALUE, ErrorMessage.BadCriterion)
         }
-      },
-    ).compute(valuesArg, [new Condition(conditionArg, criterionPackage)])
-    if (averageResult instanceof CellError) {
-      return averageResult
-    } else {
-      return averageResult.averageValue() || new CellError(ErrorType.DIV_BY_ZERO)
-    }
+
+        valuesArg = valuesArg ?? conditionArg
+
+        return  new CriterionFunctionCompute<InternalScalarValue>(
+          this.interpreter,
+          sumifCacheKey,
+          0,
+          (left, right) => this.interpreter.arithmeticHelper.nonstrictadd(left, right),
+          (arg) => arg,
+        ).compute(valuesArg, [new Condition(conditionArg, criterion)])
+      }
+    )
+  }
+
+  public sumifs(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('SUMIFS'), (values: SimpleRangeValue, ...args) => {
+      const conditions: Condition[] = []
+      for (let i = 0; i < args.length; i += 2) {
+        const conditionArg = args[i] as SimpleRangeValue
+        const criterionPackage = this.interpreter.criterionBuilder.fromCellValue(args[i+1], this.interpreter.arithmeticHelper)
+        if (criterionPackage === undefined) {
+          return new CellError(ErrorType.VALUE, ErrorMessage.BadCriterion)
+        }
+        conditions.push(new Condition(conditionArg, criterionPackage))
+      }
+
+      return new CriterionFunctionCompute<InternalScalarValue>(
+        this.interpreter,
+        sumifCacheKey,
+        0,
+        (left, right) => this.interpreter.arithmeticHelper.nonstrictadd(left, right),
+        (arg) => arg,
+      ).compute(values, conditions)
+    })
+  }
+
+  public averageif(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('AVERAGEIF'),
+      (conditionArg: SimpleRangeValue, criterionValue: InternalScalarValue, valuesArg: Maybe<SimpleRangeValue>) => {
+        const criterion = this.interpreter.criterionBuilder.fromCellValue(criterionValue, this.interpreter.arithmeticHelper)
+        if (criterion === undefined) {
+          return new CellError(ErrorType.VALUE, ErrorMessage.BadCriterion)
+        }
+
+        valuesArg = valuesArg ?? conditionArg
+
+        const averageResult = new CriterionFunctionCompute<AverageResult>(
+          this.interpreter,
+          averageifCacheKey,
+          AverageResult.empty,
+          (left, right) => left.compose(right),
+          (arg: InternalScalarValue) => {
+            if (typeof arg === 'number') {
+              return AverageResult.single(arg)
+            } else {
+              return AverageResult.empty
+            }
+          },
+        ).compute(valuesArg, [new Condition(conditionArg, criterion)])
+        if (averageResult instanceof CellError) {
+          return averageResult
+        } else {
+          return averageResult.averageValue() || new CellError(ErrorType.DIV_BY_ZERO)
+        }
+      }
+    )
   }
 
   /**
@@ -243,78 +198,44 @@ export class SumifPlugin extends FunctionPlugin {
    * @param ast
    * @param formulaAddress
    */
-  public countif(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
-    if (ast.args.length !== 2) {
-      return new CellError(ErrorType.NA)
-    }
+  public countif(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('COUNTIF'),
+      (conditionArg: SimpleRangeValue, criterionValue: InternalScalarValue) => {
+        const criterion = this.interpreter.criterionBuilder.fromCellValue(criterionValue, this.interpreter.arithmeticHelper)
+        if (criterion === undefined) {
+          return new CellError(ErrorType.VALUE, ErrorMessage.BadCriterion)
+        }
 
-    if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
-      return new CellError(ErrorType.NUM)
-    }
-    const conditionArgValue = this.evaluateAst(ast.args[0], formulaAddress)
-    if (conditionArgValue instanceof CellError) {
-      return conditionArgValue
-    }
-    const conditionArg = coerceToRange(conditionArgValue)
-
-    const criterionValue = this.evaluateAst(ast.args[1], formulaAddress)
-    if (criterionValue instanceof SimpleRangeValue) {
-      return new CellError(ErrorType.VALUE)
-    } else if (criterionValue instanceof CellError) {
-      return criterionValue
-    }
-    const criterionPackage = CriterionPackage.fromCellValue(criterionValue, this.interpreter.arithmeticHelper)
-    if (criterionPackage === undefined) {
-      return new CellError(ErrorType.VALUE)
-    }
-
-    const result = new CriterionFunctionCompute<number>(
-      this.interpreter,
-      () => 'COUNTIF',
-      0,
-      (left, right) => left + right,
-      () => 1,
-    ).compute(conditionArg, [new Condition(conditionArg, criterionPackage)])
-
-    return result
+        return new CriterionFunctionCompute<number>(
+          this.interpreter,
+          () => 'COUNTIF',
+          0,
+          (left, right) => left + right,
+          () => 1,
+        ).compute(conditionArg, [new Condition(conditionArg, criterion)])
+      }
+    )
   }
 
-  public countifs(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
-    if (ast.args.length < 2 || ast.args.length % 2 === 1) {
-      return new CellError(ErrorType.NA)
-    }
-
-    if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
-      return new CellError(ErrorType.NUM)
-    }
-    const conditions: Condition[] = []
-    for (let i = 0; i < ast.args.length; i += 2) {
-      const conditionArgValue = this.evaluateAst(ast.args[i], formulaAddress)
-      if (conditionArgValue instanceof CellError) {
-        return conditionArgValue
+  public countifs(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('COUNTIFS'), (...args) => {
+      const conditions: Condition[] = []
+      for (let i = 0; i < args.length; i += 2) {
+        const conditionArg = args[i] as SimpleRangeValue
+        const criterionPackage = this.interpreter.criterionBuilder.fromCellValue(args[i+1], this.interpreter.arithmeticHelper)
+        if (criterionPackage === undefined) {
+          return new CellError(ErrorType.VALUE, ErrorMessage.BadCriterion)
+        }
+        conditions.push(new Condition(conditionArg, criterionPackage))
       }
-      const conditionArg = coerceToRange(conditionArgValue)
-      const criterionValue = this.evaluateAst(ast.args[i + 1], formulaAddress)
-      if (criterionValue instanceof SimpleRangeValue) {
-        return new CellError(ErrorType.VALUE)
-      } else if (criterionValue instanceof CellError) {
-        return criterionValue
-      }
-      const criterionPackage = CriterionPackage.fromCellValue(criterionValue, this.interpreter.arithmeticHelper)
-      if (criterionPackage === undefined) {
-        return new CellError(ErrorType.VALUE)
-      }
-      conditions.push(new Condition(conditionArg, criterionPackage))
-    }
 
-    const result = new CriterionFunctionCompute<number>(
-      this.interpreter,
-      countifsCacheKey,
-      0,
-      (left, right) => left + right,
-      () => 1,
-    ).compute(conditions[0].conditionRange, conditions)
-
-    return result
+      return new CriterionFunctionCompute<number>(
+        this.interpreter,
+        countifsCacheKey,
+        0,
+        (left, right) => left + right,
+        () => 1,
+      ).compute(conditions[0].conditionRange, conditions)
+    })
   }
 }

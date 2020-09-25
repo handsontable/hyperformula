@@ -7,8 +7,8 @@ import {adr, detailedError} from './testUtils'
 class SquarePlugin extends FunctionPlugin {
   public static implementedFunctions = {
     // Key of the mapping describes which function will be used to compute it
-    square: {
-      translationKey: 'SQUARE',
+    'SQUARE': {
+      method: 'square',
     },
   }
 
@@ -38,6 +38,10 @@ class SquarePlugin extends FunctionPlugin {
 }
 
 describe('Documentation example spec', () => {
+  beforeEach(() => {
+    HyperFormula.registerFunctionPlugin(SquarePlugin)
+  })
+
   it('works', () => {
     HyperFormula.getLanguage('enGB').extendFunctions({SQUARE: 'SQUARE'})
     const engine = HyperFormula.buildFromArray([
@@ -45,7 +49,7 @@ describe('Documentation example spec', () => {
       ['=SQUARE()'],
       ['=SQUARE(TRUE())'],
       ['=SQUARE(1/0)'],
-    ], { functionPlugins: [SquarePlugin]})
+    ])
     expect(engine.getCellValue(adr('A1'))).toEqual(4)
     expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NA))
     expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.VALUE))

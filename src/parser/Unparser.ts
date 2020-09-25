@@ -14,16 +14,18 @@ import {
   RowRangeAst,
 } from './Ast'
 import {binaryOpTokenMap} from './binaryOpTokenMap'
-import {additionalCharactersAllowedInQuotes, ILexerConfig} from './LexerConfig'
+import {ILexerConfig} from './LexerConfig'
 import {ParserConfig} from './ParserConfig'
-
-export type SheetMappingFn = (sheetId: number) => string
+import {NamedExpressions} from '../NamedExpressions'
+import {SheetIndexMappingFn, sheetIndexToString} from './addressRepresentationConverters'
+import {NoSheetWithIdError} from '../index'
 
 export class Unparser {
   constructor(
     private readonly config: ParserConfig,
     private readonly lexerConfig: ILexerConfig,
-    private readonly sheetMappingFn: SheetMappingFn,
+    private readonly sheetMappingFn: SheetIndexMappingFn,
+    private readonly namedExpressions: NamedExpressions,
   ) {
   }
 
@@ -50,6 +52,10 @@ export class Unparser {
           ast.procedureName
         const rightPart = procedureName + '(' + args + imageWithWhitespace(')', ast.internalWhitespace)
         return imageWithWhitespace(rightPart, ast.leadingWhitespace)
+      }
+      case AstNodeType.NAMED_EXPRESSION: {
+        const originalNamedExpressionName = this.namedExpressions.nearestNamedExpression(ast.expressionName, address.sheet)?.displayName
+        return imageWithWhitespace(originalNamedExpressionName || ast.expressionName, ast.leadingWhitespace)
       }
       case AstNodeType.CELL_REFERENCE: {
         let image
@@ -99,12 +105,11 @@ export class Unparser {
   }
 
   private unparseSheetName(sheetId: number): string {
-    const sheet = this.sheetMappingFn(sheetId)
-    if (new RegExp(additionalCharactersAllowedInQuotes).exec(sheet)) {
-      return `'${sheet}'`
-    } else {
-      return sheet
+    const sheetName = sheetIndexToString(sheetId, this.sheetMappingFn)
+    if (sheetName === undefined) {
+      throw new NoSheetWithIdError(sheetId)
     }
+    return sheetName
   }
 
   private formatRange(ast: CellRangeAst | ColumnRangeAst | RowRangeAst, baseAddress: SimpleCellAddress): string {

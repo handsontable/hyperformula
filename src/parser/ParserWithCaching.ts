@@ -27,6 +27,7 @@ import {
 } from './LexerConfig'
 import {ParserConfig} from './ParserConfig'
 import {formatNumber} from './Unparser'
+import {FunctionRegistry} from '../interpreter/FunctionRegistry'
 
 export interface ParsingResult {
   ast: Ast,
@@ -48,12 +49,13 @@ export class ParserWithCaching {
 
   constructor(
     private readonly config: ParserConfig,
+    private readonly functionRegistry: FunctionRegistry,
     private readonly sheetMapping: SheetMappingFn,
   ) {
     this.lexerConfig = buildLexerConfig(config)
     this.lexer = new FormulaLexer(this.lexerConfig)
     this.formulaParser = new FormulaParser(this.lexerConfig, this.sheetMapping)
-    this.cache = new Cache(this.config.volatileFunctions(), this.config.structuralChangeFunctions(), this.config.functionsWhichDoesNotNeedArgumentsToBeComputed())
+    this.cache = new Cache(this.functionRegistry)
   }
 
   /**
@@ -93,6 +95,11 @@ export class ParserWithCaching {
     const {ast, hasVolatileFunction, hasStructuralChangeFunction, relativeDependencies} = cacheResult
 
     return {ast, errors: [], hasVolatileFunction, hasStructuralChangeFunction, dependencies: relativeDependencies}
+  }
+
+  public fetchCachedResultForAst(ast: Ast): ParsingResult {
+    const hash = this.computeHashFromAst(ast)
+    return this.fetchCachedResult(hash)
   }
 
   public fetchCachedResult(hash: string): ParsingResult {
@@ -170,6 +177,9 @@ export class ParserWithCaching {
       }
       case AstNodeType.STRING: {
         return imageWithWhitespace('"' + ast.value + '"', ast.leadingWhitespace)
+      }
+      case AstNodeType.NAMED_EXPRESSION: {
+        return imageWithWhitespace(ast.expressionName, ast.leadingWhitespace)
       }
       case AstNodeType.FUNCTION_CALL: {
         const args = ast.args.map((arg) => this.computeHashOfAstNode(arg)).join(this.config.functionArgSeparator)

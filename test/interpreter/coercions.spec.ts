@@ -1,7 +1,8 @@
 import {HyperFormula} from '../../src'
-import {CellError, EmptyValue, ErrorType} from '../../src/Cell'
+import {ErrorType} from '../../src'
 import {Config} from '../../src/Config'
 import {DateTimeHelper} from '../../src/DateTimeHelper'
+import {ErrorMessage} from '../../src/error-message'
 import {
   ArithmeticHelper,
   coerceBooleanToNumber,
@@ -10,6 +11,7 @@ import {
 } from '../../src/interpreter/ArithmeticHelper'
 import {adr, detailedError} from '../testUtils'
 import {NumberLiteralHelper} from '../../src/NumberLiteralHelper'
+import {CellError, EmptyValue} from '../../src/Cell'
 
 describe('#coerceNonDateScalarToMaybeNumber', () => {
   const config = new Config()
@@ -41,8 +43,8 @@ describe('#coerceBooleanToNumber', () => {
     const dateHelper = new DateTimeHelper(config)
     const numberLiteralsHelper = new NumberLiteralHelper(config)
     const arithmeticHelper = new ArithmeticHelper(config, dateHelper, numberLiteralsHelper)
-    expect(coerceBooleanToNumber(true)).toBe(arithmeticHelper.coerceScalarToNumberOrError(true))
-    expect(coerceBooleanToNumber(false)).toBe(arithmeticHelper.coerceScalarToNumberOrError(false))
+    expect(coerceBooleanToNumber(true)).toBe(arithmeticHelper.coerceScalarToNumberOrError(true) as number)
+    expect(coerceBooleanToNumber(false)).toBe(arithmeticHelper.coerceScalarToNumberOrError(false) as number)
   })
 })
 
@@ -60,10 +62,11 @@ describe('#coerceScalarToBoolean', () => {
     expect(coerceScalarToBoolean('FALSE')).toBe(false)
     expect(coerceScalarToBoolean('true')).toBe(true)
     expect(coerceScalarToBoolean('TRUE')).toBe(true)
-    expect(coerceScalarToBoolean(' ')).toBe(null)
-    expect(coerceScalarToBoolean(' true')).toBe(null)
-    expect(coerceScalarToBoolean('true ')).toBe(null)
-    expect(coerceScalarToBoolean('prawda')).toBe(null)
+    expect(coerceScalarToBoolean(' ')).toBe(undefined)
+    expect(coerceScalarToBoolean(' true')).toBe(undefined)
+    expect(coerceScalarToBoolean('true ')).toBe(undefined)
+    expect(coerceScalarToBoolean('prawda')).toBe(undefined)
+    expect(coerceScalarToBoolean('')).toBe(false)
 
     expect(coerceScalarToBoolean(EmptyValue)).toBe(false)
 
@@ -81,11 +84,11 @@ describe('#coerceScalarToNumberOrError', () => {
 
     expect(arithmeticHelper.coerceScalarToNumberOrError(new CellError(ErrorType.DIV_BY_ZERO))).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
 
-    expect(arithmeticHelper.coerceScalarToNumberOrError('12/31/1899')).toEqual(1)
+    expect(arithmeticHelper.coerceScalarToNumberOrError('31/12/1899')).toEqual(1)
     expect(arithmeticHelper.coerceScalarToNumberOrError('00:00:00')).toEqual(0)
     expect(arithmeticHelper.coerceScalarToNumberOrError(true)).toEqual(1)
 
-    expect(arithmeticHelper.coerceScalarToNumberOrError('foo42')).toEqual(new CellError(ErrorType.VALUE))
+    expect(arithmeticHelper.coerceScalarToNumberOrError('foo42')).toEqual(new CellError(ErrorType.VALUE, ErrorMessage.NumberCoercion))
 
     expect(arithmeticHelper.coerceScalarToNumberOrError('1')).toEqual(1)
   })
@@ -136,7 +139,7 @@ describe('check if type coercions are applied', () => {
     expect(engine.getCellValue(adr('E1'))).toEqual(0) //MULT
     expect(engine.getCellValue(adr('F1'))).toEqual(0) // DIV
     expect(engine.getCellValue(adr('G1'))).toEqual(0) // EXP
-    expect(engine.getCellValue(adr('H1'))).toEqual(EmptyValue) // UNARY PLUS
+    expect(engine.getCellValue(adr('H1'))).toBe(null) // UNARY PLUS
     expect(engine.getCellValue(adr('I1'))).toEqual(0) // UNARY MINUS
     expect(engine.getCellValue(adr('J1'))).toEqual(0) // PERCENTAGE
   })

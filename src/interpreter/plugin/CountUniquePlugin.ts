@@ -3,17 +3,22 @@
  * Copyright (c) 2020 Handsoncode. All rights reserved.
  */
 
-import {CellError, EmptyValueType, ErrorType, InternalCellValue, SimpleCellAddress} from '../../Cell'
-import {AstNodeType, ProcedureAst} from '../../parser'
-import {FunctionPlugin} from './FunctionPlugin'
+import {CellError, EmptyValueType, ErrorType, InternalScalarValue, SimpleCellAddress} from '../../Cell'
+import {ProcedureAst} from '../../parser'
+import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
 
 /**
  * Interpreter plugin containing COUNTUNIQUE function
  */
 export class CountUniquePlugin extends FunctionPlugin {
   public static implementedFunctions = {
-    countunique: {
-      translationKey: 'COUNTUNIQUE',
+    'COUNTUNIQUE': {
+      method: 'countunique',
+      parameters: [
+          {argumentType: ArgumentTypes.SCALAR},
+        ],
+        repeatLastArgs: 1,
+        expandRanges: true,
     },
   }
 
@@ -25,25 +30,20 @@ export class CountUniquePlugin extends FunctionPlugin {
    * @param ast
    * @param formulaAddress
    */
-  public countunique(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
-    if (ast.args.length === 0) {
-      return new CellError(ErrorType.NA)
-    }
-    if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
-      return new CellError(ErrorType.NUM)
-    }
+  public countunique(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('COUNTUNIQUE'), (...args: InternalScalarValue[]) => {
+      const valuesSet = new Set<number | string | boolean | EmptyValueType>()
+      const errorsSet = new Set<ErrorType>()
 
-    const valuesSet = new Set<number | string | boolean | EmptyValueType>()
-    const errorsSet = new Set<ErrorType>()
-
-    for (const scalarValue of this.iterateOverScalarValues(ast.args, formulaAddress)) {
-      if (scalarValue instanceof CellError) {
-        errorsSet.add(scalarValue.type)
-      } else if (scalarValue !== '') {
-        valuesSet.add(scalarValue)
+      for (const scalarValue of args) {
+        if (scalarValue instanceof CellError) {
+          errorsSet.add(scalarValue.type)
+        } else if (scalarValue !== '') {
+          valuesSet.add(scalarValue)
+        }
       }
-    }
 
-    return valuesSet.size + errorsSet.size
+      return valuesSet.size + errorsSet.size
+    })
   }
 }

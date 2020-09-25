@@ -1,8 +1,9 @@
-import {EmptyValue, ExportedCellChange, HyperFormula, InvalidAddressError, NoSheetWithIdError} from '../../src'
+import {ExportedCellChange, HyperFormula, InvalidAddressError, NoSheetWithIdError} from '../../src'
 import {ErrorType, simpleCellAddress} from '../../src/Cell'
 import {ColumnIndex} from '../../src/ColumnSearch/ColumnIndex'
 import {EmptyCellVertex, MatrixVertex} from '../../src/DependencyGraph'
-import {adr, colEnd, colStart, detailedError, rowEnd, rowStart} from '../testUtils'
+import {ErrorMessage} from '../../src/error-message'
+import {adr, colEnd, colStart, detailedError, expectArrayWithSameContent, rowEnd, rowStart} from '../testUtils'
 import {Config} from '../../src/Config'
 import {SheetSizeLimitExceededError} from '../../src/errors'
 
@@ -122,9 +123,9 @@ describe('changing cell content', () => {
 
     const a1 = engine.addressMapping.fetchCell(adr('A1'))
     const a2 = engine.addressMapping.fetchCell(adr('B1'))
-    expect(a1).toEqual(new EmptyCellVertex())
+    expect(a1).toBeInstanceOf(EmptyCellVertex)
     expect(engine.graph.existsEdge(a1, a2)).toBe(true)
-    expect(engine.getCellValue(adr('A1'))).toBe(EmptyValue)
+    expect(engine.getCellValue(adr('A1'))).toBe(null)
   })
 
   it('update formula to empty cell', () => {
@@ -137,9 +138,8 @@ describe('changing cell content', () => {
 
     expect(engine.graph.existsEdge(a1, b1)).toBe(true)
     expect(engine.getCellValue(adr('B1'))).toBe(1)
-
     engine.setCellContents(adr('B1'), [[null]])
-    expect(engine.getCellValue(adr('B1'))).toBe(EmptyValue)
+    expect(engine.getCellValue(adr('B1'))).toBe(null)
     expect(engine.graph.nodes).not.toContain(b1)
     expect(engine.graph.existsEdge(a1, b1)).toBe(false)
   })
@@ -179,10 +179,10 @@ describe('changing cell content', () => {
     const engine = HyperFormula.buildFromArray(sheet)
     const b1 = engine.addressMapping.getCell(adr('B1'))
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const b1setCellValueSpy = jest.spyOn(b1 as any, 'setCellValue')
+    const b1setCellValueSpy = spyOn(b1 as any, 'setCellValue')
     const c1 = engine.addressMapping.getCell(adr('C1'))
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const c1setCellValueSpy = jest.spyOn(c1 as any, 'setCellValue')
+    const c1setCellValueSpy = spyOn(c1 as any, 'setCellValue')
 
     engine.setCellContents(adr('B1'), [['2']])
 
@@ -199,7 +199,7 @@ describe('changing cell content', () => {
     expect(engine.getCellValue(adr('B1'))).toBe(2)
     engine.setCellContents(adr('B1'), null)
     expect(engine.addressMapping.getCell(adr('B1'))).toBe(null)
-    expect(engine.getCellValue(adr('B1'))).toBe(EmptyValue)
+    expect(engine.getCellValue(adr('B1'))).toBe(null)
   })
 
   it('update value cell to error literal', () => {
@@ -220,6 +220,15 @@ describe('changing cell content', () => {
     engine.setCellContents(adr('A1'), '#FOO!')
 
     expect(engine.getCellValue(adr('A1'))).toEqual('#FOO!')
+  })
+
+  it('update value cell to invalid formula', () => {
+    const engine = HyperFormula.buildFromArray([[1]])
+
+    engine.setCellContents(adr('A1'), '=SUM(')
+
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.ERROR, ErrorMessage.ParseError))
+    expect(engine.getCellFormula(adr('A1'))).toEqual('=SUM(')
   })
 
   it('rewrite part of sheet with matrix', () => {
@@ -296,7 +305,7 @@ describe('changing cell content', () => {
     engine.setCellContents(adr('A1'), null)
     const a1 = engine.addressMapping.getCell(adr('A1'))
     expect(a1).toBe(null)
-    expect(engine.getCellValue(adr('A1'))).toBe(EmptyValue)
+    expect(engine.getCellValue(adr('A1'))).toBe(null)
   })
 
   it('set number for the first time', () => {
@@ -400,9 +409,9 @@ describe('changing cell content', () => {
     const a2 = engine.addressMapping.getCell(adr('A2'))
     const b2 = engine.addressMapping.getCell(adr('B2'))
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const a2setCellValueSpy = jest.spyOn(a2 as any, 'setCellValue')
+    const a2setCellValueSpy = spyOn(a2 as any, 'setCellValue')
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const b2setCellValueSpy = jest.spyOn(b2 as any, 'setCellValue')
+    const b2setCellValueSpy = spyOn(b2 as any, 'setCellValue')
 
     engine.setCellContents(adr('A1'), '3')
     expect(a2setCellValueSpy).toHaveBeenCalled()
@@ -417,7 +426,7 @@ describe('changing cell content', () => {
 
     expect(() => {
       engine.setCellContents(adr('A2'), '{=TRANSPOSE(C1:C2)}')
-    }).toThrow('You cannot modify only part of an array')
+    }).toThrowError('You cannot modify only part of an array')
   })
 
   it('is not possible to set cell content in sheet which does not exist', () => {
@@ -452,7 +461,7 @@ describe('changing cell content', () => {
     engine.setCellContents(adr('C1'), '=COLUMNS(A1:B1)')
     const c1 = engine.addressMapping.getCell(adr('C1'))
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const c1setCellValueSpy = jest.spyOn(c1 as any, 'setCellValue')
+    const c1setCellValueSpy = spyOn(c1 as any, 'setCellValue')
     engine.removeRows(0, [1, 1])
 
     expect(c1setCellValueSpy).toHaveBeenCalled()
@@ -481,8 +490,8 @@ describe('changing cell content', () => {
     const changes = engine.setCellContents(adr('A1'), '2')
 
     expect(changes.length).toBe(2)
-    expect(changes).toContainEqual(new ExportedCellChange(simpleCellAddress(0, 0, 0), 2))
-    expect(changes).toContainEqual(new ExportedCellChange(simpleCellAddress(0, 1, 0), 2))
+    expect(changes[0]).toMatchObject(new ExportedCellChange(simpleCellAddress(0, 0, 0), 2))
+    expect(changes[1]).toMatchObject(new ExportedCellChange(simpleCellAddress(0, 1, 0), 2))
   })
 
   it('returns dependent matrix value changes', () => {
@@ -496,7 +505,7 @@ describe('changing cell content', () => {
     const changes = engine.setCellContents(adr('A1'), '2')
 
     expect(changes.length).toBe(5)
-    expect(changes.map((change) => change.newValue)).toEqual(expect.arrayContaining([2, 10, 12, 18, 22]))
+    expectArrayWithSameContent(changes.map((change) => change.newValue), [2, 10, 12, 18, 22])
   })
 
   it('returns change of numeric matrix', () => {
@@ -517,7 +526,7 @@ describe('changing cell content', () => {
 
     engine.setCellContents(adr('A1'), '=SUM(')
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.ERROR, 'Parsing error'))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.ERROR, ErrorMessage.ParseError))
   })
 
   it('update dependecy value cell to parsing error ', () => {
@@ -531,8 +540,8 @@ describe('changing cell content', () => {
     const a1 = engine.addressMapping.fetchCell(adr('A1'))
     const b1 = engine.addressMapping.fetchCell(adr('B1'))
     expect(engine.graph.existsEdge(a1, b1)).toBe(true)
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.ERROR, 'Parsing error'))
-    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.ERROR, 'Parsing error'))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.ERROR, ErrorMessage.ParseError))
+    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.ERROR, ErrorMessage.ParseError))
   })
 
   it('update formula cell to parsing error ', () => {
@@ -548,7 +557,7 @@ describe('changing cell content', () => {
     expect(engine.graph.existsEdge(a1, b1)).toBe(false)
 
     expect(engine.getCellValue(adr('A1'))).toEqual(1)
-    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.ERROR, 'Parsing error'))
+    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.ERROR, ErrorMessage.ParseError))
   })
 
   it('update parsing error to formula', () => {
@@ -567,7 +576,7 @@ describe('changing cell content', () => {
 
     engine.setCellContents(adr('A1'), '{=TRANSPOSE(}')
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.ERROR, 'Parsing error'))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.ERROR, ErrorMessage.ParseError))
     expect(engine.getCellFormula(adr('A1'))).toEqual('{=TRANSPOSE(}')
   })
 
@@ -585,8 +594,8 @@ describe('changing cell content', () => {
     const cellInLastColumn = simpleCellAddress(0, Config.defaultConfig.maxColumns, 0)
     const cellInLastRow = simpleCellAddress(0, 0, Config.defaultConfig.maxRows)
 
-    expect(() => engine.setCellContents(cellInLastColumn, EmptyValue)).not.toThrow()
-    expect(() => engine.setCellContents(cellInLastRow, EmptyValue)).not.toThrow()
+    expect(() => engine.setCellContents(cellInLastColumn, null)).not.toThrow()
+    expect(() => engine.setCellContents(cellInLastRow, null)).not.toThrow()
   })
 })
 
@@ -628,7 +637,7 @@ describe('change multiple cells contents', () => {
     ]
     const engine = HyperFormula.buildFromArray(sheet)
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const evaluatorCallSpy = jest.spyOn(engine.evaluator as any, 'partialRun')
+    const evaluatorCallSpy = spyOn(engine.evaluator as any, 'partialRun')
 
     engine.setCellContents(adr('B1'), [
       ['12', '13'],
@@ -647,7 +656,7 @@ describe('change multiple cells contents', () => {
 
     expect(() => {
       engine.setCellContents(adr('A1'), [['42', '{=MMULT(A1:B2,A1:B2)}']])
-    }).toThrow('Cant change matrices in batch operation')
+    }).toThrowError('Cant change matrices in batch operation')
     expect(engine.getCellValue(adr('A1'))).toBe(1)
   })
 
@@ -662,7 +671,7 @@ describe('change multiple cells contents', () => {
     const changes = engine.setCellContents(adr('A1'), [['7', '8'], ['9', '10']])
 
     expect(changes.length).toEqual(4)
-    expect(changes.map((change) => change.newValue)).toEqual(expect.arrayContaining([7, 8, 9, 10]))
+    expectArrayWithSameContent(changes.map((change) => change.newValue), [7, 8, 9, 10])
   })
 
   it('returns changes of mutliple values dependent formulas', () => {
@@ -677,7 +686,7 @@ describe('change multiple cells contents', () => {
     const changes = engine.setCellContents(adr('A1'), [['7', '8'], ['9', '10']])
 
     expect(changes.length).toEqual(6)
-    expect(changes.map((change) => change.newValue)).toEqual(expect.arrayContaining([7, 8, 9, 10, 15, 18]))
+    expectArrayWithSameContent(changes.map((change) => change.newValue), [7, 8, 9, 10, 15, 18])
   })
 
   it('should throw when trying to set cell contents outside sheet limits', () => {
@@ -699,8 +708,8 @@ describe('updating column index', () => {
 
     engine.setCellContents(adr('B2'), '8')
 
-    expect((engine.columnSearch as ColumnIndex).getValueIndex(0, 1, 4).index).toEqual(expect.arrayContaining([]))
-    expect((engine.columnSearch as ColumnIndex).getValueIndex(0, 1, 8).index).toEqual(expect.arrayContaining([1]))
+    expectArrayWithSameContent((engine.columnSearch as ColumnIndex).getValueIndex(0, 1, 4).index, [])
+    expectArrayWithSameContent((engine.columnSearch as ColumnIndex).getValueIndex(0, 1, 8).index, [1])
   })
 
   it('should update column index when changing value inside numeric matrix', () => {
@@ -711,8 +720,8 @@ describe('updating column index', () => {
 
     engine.setCellContents(adr('B2'), '8')
 
-    expect((engine.columnSearch as ColumnIndex).getValueIndex(0, 1, 4).index).toEqual(expect.arrayContaining([]))
-    expect((engine.columnSearch as ColumnIndex).getValueIndex(0, 1, 8).index).toEqual(expect.arrayContaining([1]))
+    expectArrayWithSameContent((engine.columnSearch as ColumnIndex).getValueIndex(0, 1, 4).index, [])
+    expectArrayWithSameContent((engine.columnSearch as ColumnIndex).getValueIndex(0, 1, 8).index, [1])
   })
 })
 

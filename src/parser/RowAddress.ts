@@ -30,6 +30,10 @@ export class RowAddress implements AddressWithRow {
     return (this.type === ReferenceType.RELATIVE)
   }
 
+  public isAbsolute(): boolean {
+    return (this.type === ReferenceType.ABSOLUTE && this.sheet !== null)
+  }
+
   public moved(toSheet: number, toRight: number, toBottom: number): RowAddress {
     const newSheet = this.sheet === null ? null : toSheet
     return new RowAddress(newSheet, this.row + toBottom, this.type)

@@ -1,9 +1,9 @@
 import {CellValue, DetailedCellError, HyperFormula} from '../src'
 import {AbsoluteCellRange, AbsoluteColumnRange, AbsoluteRowRange} from '../src/AbsoluteCellRange'
-import {CellError, ErrorType, InternalCellValue, SimpleCellAddress, simpleCellAddress} from '../src/Cell'
+import {CellError, ErrorType, SimpleCellAddress, simpleCellAddress} from '../src/Cell'
 import {Config} from '../src/Config'
 import {DateTimeHelper} from '../src/DateTimeHelper'
-import {FormulaCellVertex, MatrixVertex} from '../src/DependencyGraph'
+import {FormulaCellVertex, MatrixVertex, RangeVertex} from '../src/DependencyGraph'
 import {defaultStringifyDateTime} from '../src/format/format'
 import {
   AstNodeType,
@@ -11,7 +11,7 @@ import {
   CellAddress,
   CellRangeAst,
   CellReferenceAst,
-  ProcedureAst,
+  ProcedureAst, simpleCellAddressToString,
 } from '../src/parser'
 import {EngineComparator} from './graphComparator'
 import {ColumnRangeAst, RowRangeAst} from '../src/parser/Ast'
@@ -54,10 +54,44 @@ export const expectFunctionToHaveRefError = (engine: HyperFormula, address: Simp
   expect(formula.args.find((arg) => arg!==undefined && arg.type === AstNodeType.ERROR)).toEqual(buildCellErrorAst(new CellError(ErrorType.REF)))
 }
 
+export const rangeAddr = (range: AbsoluteCellRange) => {
+  const start = simpleCellAddressToString(() => '', range.start, 0)
+  const end = simpleCellAddressToString(() => '', range.end, 0)
+  return `${start}:${end}`
+}
+
+export const verifyRangesInSheet = (engine: HyperFormula, sheet: number,  ranges: string[]) => {
+  const rangeVerticesInMapping = Array.from(engine.rangeMapping.rangesInSheet(sheet))
+    .map((vertex) => rangeAddr(vertex.range))
+
+  const rangeVerticesInGraph = Array.from(engine.graph.nodes.values()).filter(vertex => vertex instanceof RangeVertex)
+    .map(vertex => rangeAddr((vertex as RangeVertex).range))
+
+  expectNoDuplicates(rangeVerticesInGraph)
+  expectNoDuplicates(rangeVerticesInMapping)
+  expectArrayWithSameContent(rangeVerticesInGraph, ranges)
+  expectArrayWithSameContent(rangeVerticesInMapping, ranges)
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const expectNoDuplicates = (array: any[]) => {
+  expect(new Set(array).size === array.length).toBe(true)
+}
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const expectArrayWithSameContent = (expected: any[], actual: any[]) => {
   expect(actual.length).toBe(expected.length)
-  expect(actual).toEqual(expect.arrayContaining(expected))
+  for(const iter of expected) {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+    // @ts-ignore
+    expect(actual).toContainEqual(iter)
+  }
+}
+
+export const verifyValues = (engine: HyperFormula) => {
+  const serialization = engine.getAllSheetsSerialized()
+  const engine2 = HyperFormula.buildFromSheets(serialization)
+  expect(engine.getAllSheetsValues()).toEqual(engine2.getAllSheetsValues())
 }
 
 export const rowStart = (input: number, sheet: number = 0): SimpleCellAddress => {
@@ -112,12 +146,21 @@ export function dateNumberToString(dateNumber: CellValue, config: Config): strin
   if(dateNumber instanceof DetailedCellError) {
     return dateNumber
   }
-  const dateHelper = new DateTimeHelper(config)
-  const dateString = defaultStringifyDateTime(dateHelper.numberToDateTime(dateNumber as number), config.dateFormats[0])
-  return dateString ? dateString : ''
+  const dateTimeHelper = new DateTimeHelper(config)
+  const dateString = defaultStringifyDateTime(dateTimeHelper.numberToSimpleDateTime(dateNumber as number), config.dateFormats[0])
+  return dateString ?? ''
 }
 
-export function expectCloseTo(actual: InternalCellValue, expected: number, precision: number = 0.000001) {
+export function timeNumberToString(timeNumber: CellValue, config: Config): string | DetailedCellError {
+  if(timeNumber instanceof DetailedCellError) {
+    return timeNumber
+  }
+  const dateTimeHelper = new DateTimeHelper(config)
+  const timeString = defaultStringifyDateTime(dateTimeHelper.numberToSimpleDateTime(timeNumber as number), 'hh:mm:ss.sss')
+  return timeString ?? ''
+}
+
+export function expectCloseTo(actual: CellValue, expected: number, precision: number = 0.000001) {
   if (typeof actual !== 'number') {
     expect(true).toBe(false)
   } else {

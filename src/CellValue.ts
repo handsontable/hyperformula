@@ -3,18 +3,21 @@
  * Copyright (c) 2020 Handsoncode. All rights reserved.
  */
 
-import {CellError, ErrorType, InternalCellValue, NoErrorCellValue, simpleCellAddress, SimpleCellAddress} from './Cell'
+import {CellError, EmptyValue, ErrorType, simpleCellAddress, SimpleCellAddress} from './Cell'
 import {Config} from './Config'
 import {CellValueChange} from './ContentChanges'
+import {ErrorMessage} from './error-message'
 import {NamedExpressions} from './NamedExpressions'
+import {InterpreterValue, SimpleRangeValue} from './interpreter/InterpreterValue'
 
+export type NoErrorCellValue = number | string | boolean | null
 export type CellValue = NoErrorCellValue | DetailedCellError
 
 export type ExportedChange = ExportedCellChange | ExportedNamedExpressionChange
 
-  /**
-   * A list of cells which values changed after the operation, their absolute addresses and new values.
-   */
+/**
+ * A list of cells which values changed after the operation, their absolute addresses and new values.
+ */
 export class ExportedCellChange {
   constructor(
     public readonly address: SimpleCellAddress,
@@ -48,18 +51,15 @@ export class ExportedNamedExpressionChange {
 }
 
 export class DetailedCellError {
+  public readonly type: ErrorType
+  public readonly message: string
+
   constructor(
-    public readonly error: CellError,
+    error: CellError,
     public readonly value: string,
   ) {
-  }
-
-  public get type(): ErrorType {
-    return this.error.type
-  }
-
-  public get message(): string {
-    return this.error.message || ''
+    this.type = error.type
+    this.message = error.message || ''
   }
 }
 
@@ -72,8 +72,12 @@ export class Exporter {
 
   public exportChange(change: CellValueChange): ExportedChange {
     if (change.sheet === NamedExpressions.SHEET_FOR_WORKBOOK_EXPRESSIONS) {
+      const namedExpression = this.namedExpressions.namedExpressionInAddress(change.row)
+      if (!namedExpression) {
+        throw 'Missing named expression'
+      }
       return new ExportedNamedExpressionChange(
-        this.namedExpressions.fetchNameForNamedExpressionRow(change.row),
+        namedExpression.displayName,
         this.exportValue(change.value),
       )
     } else {
@@ -84,11 +88,15 @@ export class Exporter {
     }
   }
 
-  public exportValue(value: InternalCellValue): CellValue {
-    if (this.config.smartRounding && typeof value == 'number' && !Number.isInteger(value)) {
+  public exportValue(value: InterpreterValue): CellValue {
+    if (value instanceof SimpleRangeValue) {
+      return this.detailedError(new CellError(ErrorType.VALUE, ErrorMessage.ScalarExpected))
+    } else if (this.config.smartRounding && typeof value == 'number') {
       return this.cellValueRounding(value)
     } else if (value instanceof CellError) {
       return this.detailedError(value)
+    } else if (value === EmptyValue) {
+      return null
     } else {
       return value
     }
@@ -99,7 +107,11 @@ export class Exporter {
   }
 
   private cellValueRounding(value: number): number {
-    const placesMultiplier = Math.pow(10, this.config.precisionRounding)
+    if (value === 0) {
+      return value
+    }
+    const magnitudeMultiplierExponent = Math.floor(Math.log10(Math.abs(value)))
+    const placesMultiplier = Math.pow(10, this.config.precisionRounding - magnitudeMultiplierExponent)
     if (value < 0) {
       return -Math.round(-value * placesMultiplier) / placesMultiplier
     } else {

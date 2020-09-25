@@ -1,5 +1,6 @@
 import {HyperFormula} from '../../src'
 import {ErrorType} from '../../src/Cell'
+import {ErrorMessage} from '../../src/error-message'
 import {adr, detailedError} from '../testUtils'
 
 describe('Unary operator PLUS', () => {
@@ -28,7 +29,7 @@ describe('Unary operator PLUS', () => {
 
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NAME))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NAME, ErrorMessage.FunctionName('FOOBAR')))
     expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.DIV_BY_ZERO))
   })
 
@@ -40,7 +41,7 @@ describe('Unary operator PLUS', () => {
       ['3'],
     ])
 
-    expect(engine.getCellValue(adr('B2'))).toEqual(detailedError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('B2'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessage.ScalarExpected))
   })
 
   it('string given by reference should return string with UNARY+', () => {
@@ -49,5 +50,12 @@ describe('Unary operator PLUS', () => {
       ['=+A1']
     ])
     expect(engine.getCellValue(adr('A2'))).toEqual('Liz') // UNARY PLUS value
+  })
+
+  it('double unary plus', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=++2'],
+    ])
+    expect(engine.getCellValue(adr('A1'))).toEqual(2)
   })
 })

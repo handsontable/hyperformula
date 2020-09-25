@@ -3,44 +3,41 @@
  * Copyright (c) 2020 Handsoncode. All rights reserved.
  */
 
-import {CellError, ErrorType, InternalCellValue, SimpleCellAddress} from '../../Cell'
+import {CellError, ErrorType, InternalScalarValue, SimpleCellAddress} from '../../Cell'
+import {ErrorMessage} from '../../error-message'
 import {AstNodeType, ProcedureAst} from '../../parser'
 import {coerceToRange} from '../ArithmeticHelper'
 import {SimpleRangeValue} from '../InterpreterValue'
-import {FunctionPlugin} from './FunctionPlugin'
+import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
 
 export class CorrelPlugin extends FunctionPlugin {
   public static implementedFunctions = {
-    correl: {
-      translationKey: 'CORREL',
+    'CORREL': {
+      method: 'correl',
+      parameters: [
+        {argumentType: ArgumentTypes.RANGE},
+        {argumentType: ArgumentTypes.RANGE},
+      ],
     },
   }
 
-  public correl(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
-    if (ast.args.length != 2) {
-      return new CellError(ErrorType.NA)
-    }
-    if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
-      return new CellError(ErrorType.NUM)
-    }
+  public correl(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('CORREL'), (dataX: SimpleRangeValue, dataY: SimpleRangeValue) => {
+      if (dataX.numberOfElements() !== dataY.numberOfElements()) {
+        return new CellError(ErrorType.NA, ErrorMessage.EqualLength)
+      }
 
-    const dataX = coerceToRange(this.evaluateAst(ast.args[0], formulaAddress))
-    const dataY = coerceToRange(this.evaluateAst(ast.args[1], formulaAddress))
+      if (dataX.numberOfElements() <= 1) {
+        return new CellError(ErrorType.DIV_BY_ZERO, ErrorMessage.TwoValues)
+      }
 
-    if (dataX.numberOfElements() !== dataY.numberOfElements()) {
-      return new CellError(ErrorType.NA)
-    }
-
-    if (dataX.numberOfElements() <= 1) {
-      return new CellError(ErrorType.DIV_BY_ZERO)
-    }
-
-    return this.computePearson(dataX, dataY)
+      return this.computePearson(dataX, dataY)
+    })
   }
 
   private computePearson(dataX: SimpleRangeValue, dataY: SimpleRangeValue): number | CellError {
-    const xit = dataX.valuesFromTopLeftCorner()
-    const yit = dataY.valuesFromTopLeftCorner()
+    const xit = dataX.iterateValuesFromTopLeftCorner()
+    const yit = dataY.iterateValuesFromTopLeftCorner()
     let x, y
 
     let count = 0

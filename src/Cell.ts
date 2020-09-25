@@ -3,9 +3,11 @@
  * Copyright (c) 2020 Handsoncode. All rights reserved.
  */
 
-import {CellVertex, FormulaCellVertex, MatrixVertex, ValueCellVertex} from './DependencyGraph'
+import {CellVertex, FormulaCellVertex, MatrixVertex, ParsingErrorVertex, ValueCellVertex} from './DependencyGraph'
+import {ErrorMessage} from './error-message'
 import {CellAddress} from './parser'
 import {AddressWithSheet} from './parser/Address'
+import {InterpreterValue, SimpleRangeValue} from './interpreter/InterpreterValue'
 
 /**
  * Possible errors returned by our interpreter.
@@ -23,17 +25,22 @@ export enum ErrorType {
   /** Cyclic dependency. */
   CYCLE = 'CYCLE',
 
-  /* Wrong address reference. */
+  /** Wrong address reference. */
   REF = 'REF',
 
-  /* Generic error */
+  /** Invalid/missing licence error. */
+  LIC = 'LIC',
+
+  /** Generic error */
   ERROR = 'ERROR'
 }
 
-export const EmptyValue = Symbol()
+export type TranslatableErrorType = Exclude<ErrorType, ErrorType.LIC>
+
+export const EmptyValue = Symbol('Empty value')
 export type EmptyValueType = typeof EmptyValue
-export type NoErrorCellValue = number | string | boolean | EmptyValueType
-export type InternalCellValue = NoErrorCellValue | CellError
+export type InternalNoErrorCellValue = number | string | boolean | EmptyValueType
+export type InternalScalarValue = InternalNoErrorCellValue | CellError
 
 export enum CellType {
   FORMULA = 'FORMULA',
@@ -43,7 +50,7 @@ export enum CellType {
 }
 
 export const getCellType = (vertex: CellVertex | null): CellType => {
-  if (vertex instanceof FormulaCellVertex) {
+  if (vertex instanceof FormulaCellVertex || vertex instanceof ParsingErrorVertex) {
     return CellType.FORMULA
   }
   if (vertex instanceof ValueCellVertex
@@ -80,12 +87,12 @@ export const CellValueTypeOrd = (arg: CellValueType): number => {
   }
 }
 
-export const getCellValueType = (cellValue: InternalCellValue): CellValueType => {
+export const getCellValueType = (cellValue: InterpreterValue): CellValueType => {
   if (cellValue === EmptyValue) {
     return CellValueType.EMPTY
   }
 
-  if (cellValue instanceof CellError) {
+  if (cellValue instanceof CellError || cellValue instanceof SimpleRangeValue) {
     return CellValueType.ERROR
   }
 
@@ -109,7 +116,7 @@ export class CellError {
   }
 
   public static parsingError() {
-    return new CellError(ErrorType.ERROR, 'Parsing error')
+    return new CellError(ErrorType.ERROR, ErrorMessage.ParseError)
   }
 }
 

@@ -35,6 +35,10 @@ export class ColumnAddress implements AddressWithColumn {
     return (this.type === ReferenceType.RELATIVE)
   }
 
+  public isAbsolute(): boolean {
+    return (this.type === ReferenceType.ABSOLUTE && this.sheet !== null)
+  }
+
   public moved(toSheet: number, toRight: number, _toBottom: number): ColumnAddress {
     const newSheet = this.sheet === null ? null : toSheet
     return new ColumnAddress(newSheet, this.col + toRight, this.type)
