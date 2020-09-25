@@ -22,12 +22,13 @@ describe('Temporary formulas - normalization', () => {
     expect(normalizedFormula2).toEqual('=SUM(SHET1!A1:A100)')
   })
 
-  it('works with absolute addressing', () => { 
+  it('works with absolute addressing', () => {
     const engine = HyperFormula.buildFromArray([])
 
     const normalizedFormula = engine.normalizeFormula('=3*$a$1')
 
     expect(normalizedFormula).toEqual('=3*$A$1')
+  })
 
   it('wont normalize sheet names of not existing sheets', () => {
     const engine = HyperFormula.buildEmpty()
