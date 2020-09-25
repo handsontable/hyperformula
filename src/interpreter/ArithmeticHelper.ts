@@ -303,6 +303,10 @@ export function coerceScalarToString(arg: InternalScalarValue): string | CellErr
   }
 }
 
+export function coerceEmptyValueToZero(arg: InternalScalarValue): InternalScalarValue {
+  return arg === EmptyValue ? 0 : arg
+}
+
 export function divide(left: number, right: number): number | CellError {
   if (right === 0) {
     return new CellError(ErrorType.DIV_BY_ZERO)

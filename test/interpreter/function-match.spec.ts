@@ -1,5 +1,5 @@
 import {ErrorType, HyperFormula} from '../../src'
-import {ColumnBinarySearch} from '../../src/ColumnSearch/ColumnBinarySearch'
+import {ColumnBinarySearch} from '../../src/Lookup/ColumnBinarySearch'
 import {ErrorMessage} from '../../src/error-message'
 import {adr, detailedError} from '../testUtils'
 

@@ -1,6 +1,6 @@
 import {ExportedCellChange, HyperFormula, InvalidAddressError, NoSheetWithIdError} from '../../src'
 import {ErrorType, simpleCellAddress} from '../../src/Cell'
-import {ColumnIndex} from '../../src/ColumnSearch/ColumnIndex'
+import {ColumnIndex} from '../../src/Lookup/ColumnIndex'
 import {EmptyCellVertex, MatrixVertex} from '../../src/DependencyGraph'
 import {ErrorMessage} from '../../src/error-message'
 import {adr, colEnd, colStart, detailedError, expectArrayWithSameContent, rowEnd, rowStart} from '../testUtils'

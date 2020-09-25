@@ -4,8 +4,8 @@
  */
 
 import {AbsoluteCellRange} from '../../AbsoluteCellRange'
-import {CellError, ErrorType, InternalScalarValue, SimpleCellAddress} from '../../Cell'
-import {ColumnSearchStrategy} from '../../ColumnSearch/ColumnSearchStrategy'
+import {CellError, ErrorType, InternalNoErrorCellValue, InternalScalarValue, SimpleCellAddress} from '../../Cell'
+import {ColumnSearchStrategy, SearchStrategy} from '../../Lookup/SearchStrategy'
 import {Config} from '../../Config'
 import {DependencyGraph} from '../../DependencyGraph'
 import {ErrorMessage} from '../../error-message'
@@ -133,7 +133,7 @@ export abstract class FunctionPlugin {
   public static implementedFunctions: ImplementedFunctions
   protected readonly interpreter: Interpreter
   protected readonly dependencyGraph: DependencyGraph
-  protected readonly columnSearch: ColumnSearchStrategy
+  protected readonly columnSearch: SearchStrategy
   protected readonly config: Config
   protected readonly serialization: Serialization
 
@@ -162,16 +162,6 @@ export abstract class FunctionPlugin {
       }
     }
     return ret
-  }
-
-  protected computeListOfValuesInRange(range: AbsoluteCellRange): InternalScalarValue[] {
-    const values: InternalScalarValue[] = []
-    for (const cellFromRange of range.addresses(this.dependencyGraph)) {
-      const value = this.dependencyGraph.getScalarValue(cellFromRange)
-      values.push(value)
-    }
-
-    return values
   }
 
   public coerceScalarToNumberOrError = (arg: InternalScalarValue): number | CellError => this.interpreter.arithmeticHelper.coerceScalarToNumberOrError(arg)
