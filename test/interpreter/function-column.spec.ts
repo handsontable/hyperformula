@@ -72,4 +72,16 @@ describe('Function COLUMN', () => {
     expect(engine.getCellValue(adr('A1'))).toEqual(3)
     expect(engine.getCellValue(adr('A2'))).toEqual(1)
   })
+
+  it('should be dependent on sheet structure changes', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1'],
+      ['=COLUMN(A1)']
+    ])
+    expect(engine.getCellValue(adr('A2'))).toEqual(1)
+
+    engine.addColumns(0, [0, 1])
+
+    expect(engine.getCellValue(adr('B2'))).toEqual(2)
+  })
 })
