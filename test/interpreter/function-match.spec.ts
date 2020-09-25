@@ -1,5 +1,4 @@
-import {HyperFormula} from '../../src'
-import {ErrorType} from '../../src/Cell'
+import {ErrorType, HyperFormula} from '../../src'
 import {ColumnBinarySearch} from '../../src/ColumnSearch/ColumnBinarySearch'
 import {ErrorMessage} from '../../src/error-message'
 import {adr, detailedError} from '../testUtils'
@@ -225,5 +224,30 @@ describe('Function MATCH', () => {
     ], { vlookupThreshold: 1 })
 
     expect(engine.getCellValue(adr('A1'))).toEqual(2)
+  })
+
+  it('should coerce empty arg to 0', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['-5'],
+      ['-2'],
+      ['0'],
+      ['2'],
+      ['5'],
+      ['=MATCH(0, A1:A5)'],
+      ['=MATCH(, A1:A5)'],
+    ])
+
+    expect(engine.getCellValue(adr('A6'))).toEqual(3)
+    expect(engine.getCellValue(adr('A7'))).toEqual(3)
+  })
+
+  it('should return NA when range is not a single column or row', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['0', '1'],
+      ['2', '3'],
+      ['=MATCH(0, A1:B2)'],
+    ])
+
+    expect(engine.getCellValue(adr('C1'))).toEqual(detailedError(ErrorType.NA))
   })
 })

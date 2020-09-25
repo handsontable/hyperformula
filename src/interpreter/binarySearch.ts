@@ -32,7 +32,7 @@ export function rangeLowerBound(range: AbsoluteCellRange, key: InternalScalarVal
 * Otherwise returns first index of greatest element smaller than key
 * assuming sorted values
 * */
-export function lowerBound(value: (index: number) => InterpreterValue, key: any, start: number, end: number): number {
+export function lowerBound(value: (index: number) => InterpreterValue, key: InternalScalarValue, start: number, end: number): number {
   while (start <= end) {
     const center = Math.floor((start + end) / 2)
     const cmp = compare(key, value(center))

@@ -65,10 +65,12 @@ describe('Function HLOOKUP', () => {
       const engine = HyperFormula.buildFromArray([
         ['=HLOOKUP(1/0, B1:B1, 1)'],
         ['=HLOOKUP(1, B1:B1, 1/0)'],
+        ['=HLOOKUP(1, A10:A11, 1, NA())']
       ])
 
       expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.DIV_BY_ZERO))
       expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.DIV_BY_ZERO))
+      expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.NA))
     })
   })
 
@@ -213,6 +215,18 @@ describe('Function HLOOKUP', () => {
       ], {useColumnIndex: false})
 
       expect(engine.getCellValue(adr('A1'))).toEqual(4)
+    })
+
+    it('should coerce empty arg to 0', () => {
+      const engine = HyperFormula.buildFromArray([
+        [ '0', '2', '3', '4', '5' ],
+        [ 'a', 'b', 'c', 'd', 'e' ],
+        ['=VLOOKUP(F3, A1:E2, 2)'],
+        ['=VLOOKUP(, A1:E2, 2)'],
+      ])
+
+      expect(engine.getCellValue(adr('A3'))).toEqual('a')
+      expect(engine.getCellValue(adr('A4'))).toEqual('a')
     })
   })
 })

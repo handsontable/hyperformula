@@ -273,6 +273,21 @@ const sharedExamples = (builder: (sheet: Sheet, config?: Partial<ConfigParams>) 
 
       expect(engine.getCellValue(adr('A1'))).toEqual(6)
     })
+
+    it('should coerce empty arg to 0', () => {
+      const engine = builder([
+        ['0', 'a'],
+        ['2', 'b'],
+        ['3', 'c'],
+        ['4', 'd'],
+        ['5', 'e'],
+        ['=VLOOKUP(C3, A1:B5, 2)'],
+        ['=VLOOKUP(, A1:B5, 2)'],
+      ])
+
+      expect(engine.getCellValue(adr('A6'))).toEqual('a')
+      expect(engine.getCellValue(adr('A7'))).toEqual('a')
+    })
   })
 }
 
