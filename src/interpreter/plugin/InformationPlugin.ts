@@ -379,13 +379,13 @@ export class InformationPlugin extends FunctionPlugin {
    */
   public index(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.runFunction(ast.args, formulaAddress, this.metadata('INDEX'), (rangeValue: SimpleRangeValue, row: number, col: number) => {
-      const range = rangeValue.range()
       if (col < 1 || row < 1) {
         return new CellError(ErrorType.VALUE, ErrorMessage.LessThanOne)
       }
       if (col > rangeValue.width() || row > rangeValue.height()) {
         return new CellError(ErrorType.NUM, ErrorMessage.ValueLarge)
       }
+      const range = rangeValue.range()
       if (range === undefined) {
         return rangeValue.topLeftCornerValue() ?? new CellError(ErrorType.VALUE, ErrorMessage.CellRangeExpected)
       }
