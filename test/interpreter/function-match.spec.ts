@@ -1,7 +1,7 @@
 import {ErrorType, HyperFormula} from '../../src'
-import {ColumnBinarySearch} from '../../src/Lookup/ColumnBinarySearch'
 import {ErrorMessage} from '../../src/error-message'
 import {adr, detailedError} from '../testUtils'
+import {DependencyGraph} from '../../src/DependencyGraph'
 
 describe('Function MATCH', () => {
   it('validates number of arguments', () => {
@@ -181,7 +181,7 @@ describe('Function MATCH', () => {
 
   it('uses binsearch', () => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const spy = spyOn(ColumnBinarySearch.prototype as any, 'computeListOfValuesInRange')
+    const spy = spyOn(DependencyGraph.prototype as any, 'computeListOfValuesInRange')
 
     const engine = HyperFormula.buildFromArray([
       ['=MATCH(400, A2:A5, 1)'],
@@ -198,7 +198,7 @@ describe('Function MATCH', () => {
 
   it('uses indexOf', () => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const spy = spyOn(ColumnBinarySearch.prototype as any, 'computeListOfValuesInRange')
+    const spy = spyOn(DependencyGraph.prototype as any, 'computeListOfValuesInRange')
 
     const engine = HyperFormula.buildFromArray([
       ['=MATCH(400, A2:A5, 0)'],

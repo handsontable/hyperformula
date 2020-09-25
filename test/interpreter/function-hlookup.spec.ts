@@ -221,8 +221,8 @@ describe('Function HLOOKUP', () => {
       const engine = HyperFormula.buildFromArray([
         [ '0', '2', '3', '4', '5' ],
         [ 'a', 'b', 'c', 'd', 'e' ],
-        ['=VLOOKUP(F3, A1:E2, 2)'],
-        ['=VLOOKUP(, A1:E2, 2)'],
+        ['=HLOOKUP(F3, A1:E2, 2)'],
+        ['=HLOOKUP(, A1:E2, 2)'],
       ])
 
       expect(engine.getCellValue(adr('A3'))).toEqual('a')

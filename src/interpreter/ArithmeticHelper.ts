@@ -303,7 +303,7 @@ export function coerceScalarToString(arg: InternalScalarValue): string | CellErr
   }
 }
 
-export function coerceEmptyValueToZero(arg: InternalScalarValue): InternalScalarValue {
+export function coerceEmptyValueToZero(arg: InternalNoErrorCellValue): InternalNoErrorCellValue {
   return arg === EmptyValue ? 0 : arg
 }
 

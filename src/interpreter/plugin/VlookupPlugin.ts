@@ -15,10 +15,11 @@ import {
 import {ErrorMessage} from '../../error-message'
 import {ProcedureAst} from '../../parser'
 import {StatType} from '../../statistics'
-import {InterpreterValue, SimpleRangeValue} from '../InterpreterValue'
+import {SimpleRangeValue} from '../InterpreterValue'
 import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
 import {SearchStrategy} from '../../Lookup/SearchStrategy'
 import {RowSearchStrategy} from '../../Lookup/RowSearchStrategy'
+import {coerceEmptyValueToZero} from '../ArithmeticHelper'
 
 export class VlookupPlugin extends FunctionPlugin {
   private rowSearchStrategy: RowSearchStrategy = new RowSearchStrategy(this.config, this.dependencyGraph)
@@ -59,7 +60,7 @@ export class VlookupPlugin extends FunctionPlugin {
    * @param formulaAddress
    */
   public vlookup(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('VLOOKUP'), (key: InternalScalarValue, rangeValue: SimpleRangeValue, index: number, sorted: boolean) => {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('VLOOKUP'), (key: InternalNoErrorCellValue, rangeValue: SimpleRangeValue, index: number, sorted: boolean) => {
       const range = rangeValue.range()
 
       if (range === undefined) {
@@ -69,7 +70,7 @@ export class VlookupPlugin extends FunctionPlugin {
         return new CellError(ErrorType.REF, ErrorMessage.IndexLarge)
       }
 
-      return this.doVlookup(key, range, index - 1, sorted)
+      return this.doVlookup(coerceEmptyValueToZero(key), range, index - 1, sorted)
     })
   }
 
@@ -80,7 +81,7 @@ export class VlookupPlugin extends FunctionPlugin {
    * @param formulaAddress
    */
   public hlookup(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('HLOOKUP'), (key: InterpreterValue, rangeValue: SimpleRangeValue, index: number, sorted: boolean) => {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('HLOOKUP'), (key: InternalNoErrorCellValue, rangeValue: SimpleRangeValue, index: number, sorted: boolean) => {
       const range = rangeValue.range()
       if (range === undefined) {
         return new CellError(ErrorType.VALUE, ErrorMessage.WrongType)
@@ -89,22 +90,22 @@ export class VlookupPlugin extends FunctionPlugin {
         return new CellError(ErrorType.REF, ErrorMessage.IndexLarge)
       }
 
-      return this.doHlookup(key, range, index - 1, sorted)
+      return this.doHlookup(coerceEmptyValueToZero(key), range, index - 1, sorted)
     })
   }
 
   public match(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('MATCH'), (key: InternalScalarValue, rangeValue: SimpleRangeValue, sorted: number) => {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('MATCH'), (key: InternalNoErrorCellValue, rangeValue: SimpleRangeValue, sorted: number) => {
       const range = rangeValue.range()
       if (range === undefined) {
         return new CellError(ErrorType.VALUE, ErrorMessage.WrongType)
       }
 
-      return this.doMatch(key, range, sorted)
+      return this.doMatch(coerceEmptyValueToZero(key), range, sorted)
     })
   }
 
-  private doVlookup(key: any, range: AbsoluteCellRange, index: number, sorted: boolean): InternalScalarValue {
+  private doVlookup(key: InternalNoErrorCellValue, range: AbsoluteCellRange, index: number, sorted: boolean): InternalScalarValue {
     this.dependencyGraph.stats.start(StatType.VLOOKUP)
 
     const searchedRange = AbsoluteCellRange.spanFrom(range.start, 1, range.height())
@@ -125,7 +126,7 @@ export class VlookupPlugin extends FunctionPlugin {
     return value
   }
 
-  private doHlookup(key: any, range: AbsoluteCellRange, index: number, sorted: boolean): InternalScalarValue {
+  private doHlookup(key: InternalNoErrorCellValue, range: AbsoluteCellRange, index: number, sorted: boolean): InternalScalarValue {
     const searchedRange = AbsoluteCellRange.spanFrom(range.start, range.width(), 1)
     const colIndex = this.searchInRange(key, searchedRange, sorted, this.rowSearchStrategy)
 
@@ -143,7 +144,7 @@ export class VlookupPlugin extends FunctionPlugin {
     return value
   }
 
-  private doMatch(key: any, range: AbsoluteCellRange, sorted: number): InternalScalarValue {
+  private doMatch(key: InternalNoErrorCellValue, range: AbsoluteCellRange, sorted: number): InternalScalarValue {
     if (range.width() === 1) {
       const rowIndex = this.columnSearch.find(key, range, sorted !== 0)
 
