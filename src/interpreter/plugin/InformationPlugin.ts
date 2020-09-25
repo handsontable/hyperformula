@@ -3,12 +3,11 @@
  * Copyright (c) 2020 Handsoncode. All rights reserved.
  */
 
-import {AbsoluteCellRange} from '../../AbsoluteCellRange'
 import {CellError, EmptyValue, ErrorType, InternalScalarValue, SimpleCellAddress} from '../../Cell'
 import {FormulaCellVertex, MatrixVertex} from '../../DependencyGraph'
 import {ErrorMessage} from '../../error-message'
 import {AstNodeType, ProcedureAst} from '../../parser'
-import {InterpreterValue} from '../InterpreterValue'
+import {SimpleRangeValue} from '../InterpreterValue'
 import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
 
 /**
@@ -18,7 +17,7 @@ export class InformationPlugin extends FunctionPlugin {
   public static implementedFunctions = {
     'COLUMN': {
       method: 'column',
-      parameters:  [
+      parameters: [
         {argumentType: ArgumentTypes.NOERROR, optional: true}
       ],
       isDependentOnSheetStructureChange: true,
@@ -37,13 +36,13 @@ export class InformationPlugin extends FunctionPlugin {
     },
     'ISERR': {
       method: 'iserr',
-      parameters:  [
+      parameters: [
         {argumentType: ArgumentTypes.SCALAR}
       ]
     },
     'ISFORMULA': {
       method: 'isformula',
-      parameters:  [
+      parameters: [
         {argumentType: ArgumentTypes.NOERROR}
       ],
       doesNotNeedArgumentsToBeComputed: true
@@ -56,55 +55,60 @@ export class InformationPlugin extends FunctionPlugin {
     },
     'ISREF': {
       method: 'isref',
-      parameters:[
+      parameters: [
         {argumentType: ArgumentTypes.SCALAR}
       ]
     },
     'ISERROR': {
       method: 'iserror',
       parameters: [
-        { argumentType: ArgumentTypes.SCALAR}
+        {argumentType: ArgumentTypes.SCALAR}
       ]
     },
     'ISBLANK': {
       method: 'isblank',
       parameters: [
-        { argumentType: ArgumentTypes.SCALAR}
+        {argumentType: ArgumentTypes.SCALAR}
       ]
     },
     'ISNUMBER': {
       method: 'isnumber',
       parameters: [
-        { argumentType: ArgumentTypes.SCALAR}
+        {argumentType: ArgumentTypes.SCALAR}
       ]
     },
     'ISLOGICAL': {
       method: 'islogical',
       parameters: [
-        { argumentType: ArgumentTypes.SCALAR}
+        {argumentType: ArgumentTypes.SCALAR}
       ]
     },
     'ISTEXT': {
       method: 'istext',
       parameters: [
-        { argumentType: ArgumentTypes.SCALAR}
+        {argumentType: ArgumentTypes.SCALAR}
       ]
     },
     'ISNONTEXT': {
       method: 'isnontext',
       parameters: [
-        { argumentType: ArgumentTypes.SCALAR}
+        {argumentType: ArgumentTypes.SCALAR}
       ]
     },
     'INDEX': {
       method: 'index',
+      parameters: [
+        {argumentType: ArgumentTypes.RANGE},
+        {argumentType: ArgumentTypes.NUMBER},
+        {argumentType: ArgumentTypes.NUMBER, defaultValue: 1},
+      ]
     },
     'NA': {
       method: 'na'
     },
     'ROW': {
       method: 'row',
-      parameters:  [
+      parameters: [
         {argumentType: ArgumentTypes.NOERROR, optional: true}
       ],
       isDependentOnSheetStructureChange: true,
@@ -117,7 +121,7 @@ export class InformationPlugin extends FunctionPlugin {
     },
     'SHEET': {
       method: 'sheet',
-      parameters:  [
+      parameters: [
         {argumentType: ArgumentTypes.NOERROR}
       ],
       doesNotNeedArgumentsToBeComputed: true
@@ -317,7 +321,7 @@ export class InformationPlugin extends FunctionPlugin {
       return new CellError(ErrorType.NA, ErrorMessage.WrongArgNumber)
     }
     if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
-      return new CellError(ErrorType.NUM, ErrorMessage.EmptyArg )
+      return new CellError(ErrorType.NUM, ErrorMessage.EmptyArg)
     }
     const rangeAst = ast.args[0]
     if (rangeAst.type === AstNodeType.CELL_RANGE) {
@@ -355,7 +359,7 @@ export class InformationPlugin extends FunctionPlugin {
       return new CellError(ErrorType.NA, ErrorMessage.WrongArgNumber)
     }
     if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
-      return new CellError(ErrorType.NUM, ErrorMessage.EmptyArg )
+      return new CellError(ErrorType.NUM, ErrorMessage.EmptyArg)
     }
     const rangeAst = ast.args[0]
     if (rangeAst.type === AstNodeType.CELL_RANGE) {
@@ -365,52 +369,29 @@ export class InformationPlugin extends FunctionPlugin {
     }
   }
 
-  public index(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InterpreterValue {
-    const rangeArg = ast.args[0]
-    if (ast.args.length < 1 || ast.args.length > 3) {
-      return new CellError(ErrorType.NA, ErrorMessage.WrongArgNumber)
-    }
-    if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
-      return new CellError(ErrorType.NUM, ErrorMessage.EmptyArg )
-    }
-
-    let width, height
-    let range
-    if (rangeArg.type === AstNodeType.CELL_RANGE) {
-      range = AbsoluteCellRange.fromCellRange(rangeArg, formulaAddress)
-      width = range.width()
-      height = range.height()
-    } else {
-      width = 1
-      height = 1
-    }
-
-    const rowArg = ast.args[1]
-    const rowValue = this.evaluateAst(rowArg, formulaAddress)
-    if (typeof rowValue !== 'number') {
-      return new CellError(ErrorType.NUM, ErrorMessage.WrongType) //TODO: argument could be coerced
-    } else if (rowValue < 0) {
-      return new CellError(ErrorType.NUM, ErrorMessage.Negative)
-    } else if (rowValue > height) {
-      return new CellError(ErrorType.NUM, ErrorMessage.ValueLarge)
-    }
-
-    const columnArg = ast.args[2]
-    const columnValue = this.evaluateAst(columnArg, formulaAddress)
-    if (typeof columnValue !== 'number') {
-      return new CellError(ErrorType.NUM, ErrorMessage.WrongType) //TODO: argument could be coerced
-    } else if (columnValue < 0) {
-      return new CellError(ErrorType.NUM, ErrorMessage.Negative)
-    } else if (columnValue > height) {
-      return new CellError(ErrorType.NUM, ErrorMessage.ValueLarge)
-    }
-
-    if (columnValue === 0 || rowValue === 0 || range === undefined) {
-      throw Error('Not implemented yet')
-    }
-
-    const address = range.getAddress(columnValue - 1, rowValue - 1)
-    return this.dependencyGraph.getCellValue(address)
+  /**
+   * Corresponds to INDEX(range;)
+   *
+   * Returns number of rows in provided range of cells
+   *
+   * @param ast
+   * @param formulaAddress
+   */
+  public index(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('INDEX'), (rangeValue: SimpleRangeValue, row: number, col: number) => {
+      const range = rangeValue.range()
+      if (col < 1 || row < 1) {
+        return new CellError(ErrorType.VALUE, ErrorMessage.LessThanOne)
+      }
+      if (col > rangeValue.width() || row > rangeValue.height()) {
+        return new CellError(ErrorType.NUM, ErrorMessage.ValueLarge)
+      }
+      if (range === undefined) {
+        return rangeValue.topLeftCornerValue() ?? new CellError(ErrorType.VALUE, ErrorMessage.CellRangeExpected)
+      }
+      const address = range.getAddress(col - 1, row - 1)
+      return this.dependencyGraph.getScalarValue(address)
+    })
   }
 
   /**

@@ -19,8 +19,8 @@ describe('Function INDEX', () => {
       ['=INDEX(B1:B1, 1, "bar")'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM, ErrorMessage.WrongType))
-    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NUM, ErrorMessage.WrongType))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessage.NumberCoercion))
+    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessage.NumberCoercion))
   })
 
   it('requires 2nd argument to be in bounds of range', () => {
@@ -33,11 +33,11 @@ describe('Function INDEX', () => {
       ['=INDEX(B1, 2, 1)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM, ErrorMessage.Negative))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessage.LessThanOne))
     expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NUM, ErrorMessage.ValueLarge))
-    expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.NUM, ErrorMessage.Negative))
+    expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessage.LessThanOne))
     expect(engine.getCellValue(adr('A4'))).toEqual(detailedError(ErrorType.NUM, ErrorMessage.ValueLarge))
-    expect(engine.getCellValue(adr('A5'))).toEqual(detailedError(ErrorType.NUM, ErrorMessage.Negative))
+    expect(engine.getCellValue(adr('A5'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessage.LessThanOne))
     expect(engine.getCellValue(adr('A6'))).toEqual(detailedError(ErrorType.NUM, ErrorMessage.ValueLarge))
   })
 
@@ -51,11 +51,11 @@ describe('Function INDEX', () => {
       ['=INDEX(B1, 1, 2)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM, ErrorMessage.Negative))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessage.LessThanOne))
     expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NUM, ErrorMessage.ValueLarge))
-    expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.NUM, ErrorMessage.Negative))
+    expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessage.LessThanOne))
     expect(engine.getCellValue(adr('A4'))).toEqual(detailedError(ErrorType.NUM, ErrorMessage.ValueLarge))
-    expect(engine.getCellValue(adr('A5'))).toEqual(detailedError(ErrorType.NUM, ErrorMessage.Negative))
+    expect(engine.getCellValue(adr('A5'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessage.LessThanOne))
     expect(engine.getCellValue(adr('A6'))).toEqual(detailedError(ErrorType.NUM, ErrorMessage.ValueLarge))
   })
 
@@ -90,8 +90,29 @@ describe('Function INDEX', () => {
       ['=INDEX(B1:D5,,)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE))
-    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.VALUE))
-    expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessage.LessThanOne))
+    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessage.LessThanOne))
+    expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessage.LessThanOne))
+  })
+
+  it('should work for scalars too', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['foo'],
+      ['=INDEX(A1, 1, 1)'],
+      ['=INDEX(42, 1, 1)'],
+    ])
+
+    expect(engine.getCellValue(adr('A2'))).toEqual('foo')
+    expect(engine.getCellValue(adr('A3'))).toEqual(42)
+  })
+
+  it('should assume first column if no last argument', () => {
+    const engine = HyperFormula.buildFromArray([
+      [1, 2],
+      [3, 4],
+      ['=INDEX(A1:B2, 2)'],
+    ])
+
+    expect(engine.getCellValue(adr('A3'))).toEqual(3)
   })
 })

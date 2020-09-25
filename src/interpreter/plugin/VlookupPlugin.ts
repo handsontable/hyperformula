@@ -66,6 +66,9 @@ export class VlookupPlugin extends FunctionPlugin {
       if (range === undefined) {
         return new CellError(ErrorType.VALUE, ErrorMessage.WrongType)
       }
+      if (index < 1) {
+        return new CellError(ErrorType.VALUE, ErrorMessage.LessThanOne)
+      }
       if (index > range.width()) {
         return new CellError(ErrorType.REF, ErrorMessage.IndexLarge)
       }
@@ -85,6 +88,9 @@ export class VlookupPlugin extends FunctionPlugin {
       const range = rangeValue.range()
       if (range === undefined) {
         return new CellError(ErrorType.VALUE, ErrorMessage.WrongType)
+      }
+      if (index < 1) {
+        return new CellError(ErrorType.VALUE, ErrorMessage.LessThanOne)
       }
       if (index > range.height()) {
         return new CellError(ErrorType.REF, ErrorMessage.IndexLarge)

@@ -26,6 +26,13 @@ export class ArrayData {
     return this._hasOnlyNumbers
   }
 
+  public topLeftCorner(): Maybe<InternalScalarValue> {
+    if (this.size.height > 0 && this.size.width > 0) {
+      return this.data[0][0]
+    }
+    return undefined
+  }
+
   public valuesFromTopLeftCorner(): InternalScalarValue[] {
     const ret = []
     for (let i = 0; i < this.size.height; i++) {
@@ -97,6 +104,13 @@ export class OnlyRangeData {
     }
 
     return this._hasOnlyNumbers
+  }
+
+  public topLeftCorner(): Maybe<InternalScalarValue> {
+    if (this.data !== undefined && this.size.height > 0 && this.size.width > 0) {
+      return this.data[0][0]
+    }
+    return undefined
   }
 
   public range() {
@@ -201,6 +215,10 @@ export class SimpleRangeValue {
 
   public raw(): InternalScalarValue[][] {
     return this.data.raw()
+  }
+
+  public topLeftCornerValue(): Maybe<InternalScalarValue> {
+    return this.data.topLeftCorner()
   }
 
   public valuesFromTopLeftCorner(): InternalScalarValue[] {

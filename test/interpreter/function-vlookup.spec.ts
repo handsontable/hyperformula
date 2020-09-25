@@ -63,6 +63,16 @@ const sharedExamples = (builder: (sheet: Sheet, config?: Partial<ConfigParams>) 
       expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.REF, ErrorMessage.IndexLarge))
     })
 
+    it('should return error when index is less than one', () => {
+      const engine = builder([
+        ['=VLOOKUP(1, C2:D3, 0)'],
+        ['=VLOOKUP(1, C2:D3, -1)'],
+      ])
+
+      expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessage.LessThanOne))
+      expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessage.LessThanOne))
+    })
+
     it('should propagate errors properly', () => {
       const engine = HyperFormula.buildFromArray([
         ['=VLOOKUP(1/0, B1:B1, 1)'],
@@ -326,7 +336,7 @@ describe('BinarySearchStrategy', () => {
     expect(engine.getCellValue(adr('A1'))).toEqual(4)
   })
 
-  it('should calculate indexes properly when using naitve approach', () => {
+  it('should calculate indexes properly when using naive approach', () => {
     const engine = HyperFormula.buildFromArray([
       ['=VLOOKUP(4, A5:A10, 1, FALSE())'],
       [],
