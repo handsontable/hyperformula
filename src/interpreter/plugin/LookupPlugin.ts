@@ -21,7 +21,7 @@ import {SearchStrategy} from '../../Lookup/SearchStrategy'
 import {RowSearchStrategy} from '../../Lookup/RowSearchStrategy'
 import {zeroIfEmpty} from '../ArithmeticHelper'
 
-export class VlookupPlugin extends FunctionPlugin {
+export class LookupPlugin extends FunctionPlugin {
   private rowSearch: RowSearchStrategy = new RowSearchStrategy(this.config, this.dependencyGraph)
 
   public static implementedFunctions = {
