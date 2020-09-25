@@ -19,10 +19,10 @@ import {SimpleRangeValue} from '../InterpreterValue'
 import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
 import {SearchStrategy} from '../../Lookup/SearchStrategy'
 import {RowSearchStrategy} from '../../Lookup/RowSearchStrategy'
-import {coerceEmptyValueToZero} from '../ArithmeticHelper'
+import {zeroIfEmpty} from '../ArithmeticHelper'
 
 export class VlookupPlugin extends FunctionPlugin {
-  private rowSearchStrategy: RowSearchStrategy = new RowSearchStrategy(this.config, this.dependencyGraph)
+  private rowSearch: RowSearchStrategy = new RowSearchStrategy(this.config, this.dependencyGraph)
 
   public static implementedFunctions = {
     'VLOOKUP': {
@@ -70,7 +70,7 @@ export class VlookupPlugin extends FunctionPlugin {
         return new CellError(ErrorType.REF, ErrorMessage.IndexLarge)
       }
 
-      return this.doVlookup(coerceEmptyValueToZero(key), range, index - 1, sorted)
+      return this.doVlookup(zeroIfEmpty(key), range, index - 1, sorted)
     })
   }
 
@@ -90,7 +90,7 @@ export class VlookupPlugin extends FunctionPlugin {
         return new CellError(ErrorType.REF, ErrorMessage.IndexLarge)
       }
 
-      return this.doHlookup(coerceEmptyValueToZero(key), range, index - 1, sorted)
+      return this.doHlookup(zeroIfEmpty(key), range, index - 1, sorted)
     })
   }
 
@@ -101,7 +101,7 @@ export class VlookupPlugin extends FunctionPlugin {
         return new CellError(ErrorType.VALUE, ErrorMessage.WrongType)
       }
 
-      return this.doMatch(coerceEmptyValueToZero(key), range, sorted)
+      return this.doMatch(zeroIfEmpty(key), range, sorted)
     })
   }
 
@@ -128,7 +128,7 @@ export class VlookupPlugin extends FunctionPlugin {
 
   private doHlookup(key: InternalNoErrorCellValue, range: AbsoluteCellRange, index: number, sorted: boolean): InternalScalarValue {
     const searchedRange = AbsoluteCellRange.spanFrom(range.start, range.width(), 1)
-    const colIndex = this.searchInRange(key, searchedRange, sorted, this.rowSearchStrategy)
+    const colIndex = this.searchInRange(key, searchedRange, sorted, this.rowSearch)
 
     if (colIndex === -1) {
       return new CellError(ErrorType.NA, ErrorMessage.ValueNotFound)
@@ -145,21 +145,21 @@ export class VlookupPlugin extends FunctionPlugin {
   }
 
   private doMatch(key: InternalNoErrorCellValue, range: AbsoluteCellRange, sorted: number): InternalScalarValue {
+    if (range.width() > 1 && range.height() > 1) {
+      return new CellError(ErrorType.NA)
+    }
     if (range.width() === 1) {
-      const rowIndex = this.columnSearch.find(key, range, sorted !== 0)
-
-      if (rowIndex === -1) {
+      const index = this.columnSearch.find(key, range, sorted !== 0)
+      if (index === -1) {
         return new CellError(ErrorType.NA, ErrorMessage.ValueNotFound)
       }
-
-      return rowIndex - range.start.row + 1
+      return index - range.start.row + 1
     } else {
-      const columnIndex = this.searchInRange(key, range, false, this.columnSearch)
-      if (columnIndex === -1) {
+      const index = this.rowSearch.find(key, range, sorted !== 0)
+      if (index === -1) {
         return new CellError(ErrorType.NA, ErrorMessage.ValueNotFound)
       }
-
-      return (columnIndex - range.start.row) + 1
+      return index - range.start.col + 1
     }
   }
 

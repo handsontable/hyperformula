@@ -248,6 +248,6 @@ describe('Function MATCH', () => {
       ['=MATCH(0, A1:B2)'],
     ])
 
-    expect(engine.getCellValue(adr('C1'))).toEqual(detailedError(ErrorType.NA))
+    expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.NA))
   })
 })
