@@ -238,5 +238,23 @@ describe('Function HLOOKUP', () => {
       expect(engine.getCellValue(adr('A3'))).toEqual('a')
       expect(engine.getCellValue(adr('A4'))).toEqual('a')
     })
+
+    it('should not coerce', () => {
+      const engine = HyperFormula.buildFromArray([
+        ['=HLOOKUP("1", A2:C2, 1)'],
+        [1, 2, 3],
+      ])
+
+      expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA, ErrorMessage.ValueNotFound))
+    })
+
+    it('should coerce null to zero when using naive approach', () => {
+      const engine = HyperFormula.buildFromArray([
+        ['=HLOOKUP(, A2:C2, 1, FALSE())'],
+        [1, 3, 0],
+      ], {useColumnIndex: false})
+
+      expect(engine.getCellValue(adr('A1'))).toEqual(0)
+    })
   })
 })

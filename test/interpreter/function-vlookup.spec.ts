@@ -1,5 +1,4 @@
-import {HyperFormula} from '../../src'
-import {ErrorType} from '../../src/Cell'
+import {ErrorType, HyperFormula} from '../../src'
 import {ConfigParams} from '../../src/Config'
 import {ErrorMessage} from '../../src/error-message'
 import {adr, detailedError} from '../testUtils'
@@ -298,6 +297,17 @@ const sharedExamples = (builder: (sheet: Sheet, config?: Partial<ConfigParams>) 
       expect(engine.getCellValue(adr('A6'))).toEqual('a')
       expect(engine.getCellValue(adr('A7'))).toEqual('a')
     })
+
+    it('should not coerce', () => {
+      const engine = HyperFormula.buildFromArray([
+        ['=VLOOKUP("1", A2:A4, 1)'],
+        [1],
+        [2],
+        [3],
+      ])
+
+      expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA, ErrorMessage.ValueNotFound))
+    })
   })
 }
 
@@ -350,5 +360,16 @@ describe('BinarySearchStrategy', () => {
     ], {useColumnIndex: false})
 
     expect(engine.getCellValue(adr('A1'))).toEqual(4)
+  })
+
+  it('should coerce null to zero when using naive approach', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=VLOOKUP(, A2:A4, 1, FALSE())'],
+      [1],
+      [3],
+      [0],
+    ], {useColumnIndex: false})
+
+    expect(engine.getCellValue(adr('A1'))).toEqual(0)
   })
 })
