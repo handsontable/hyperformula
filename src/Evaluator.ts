@@ -170,12 +170,6 @@ export class Evaluator {
     const interpreterValue = this.interpreter.evaluateAst(ast, formulaAddress)
     if (interpreterValue instanceof SimpleRangeValue) {
       return interpreterValue
-    } else if (typeof interpreterValue === 'number') {
-      if (isNumberOverflow(interpreterValue)) {
-        return new CellError(ErrorType.NUM, ErrorMessage.Infinity)
-      } else {
-        return fixNegativeZero(interpreterValue)
-      }
     } else if (interpreterValue === EmptyValue && this.config.evaluateNullToZero) {
       return 0
     } else {
