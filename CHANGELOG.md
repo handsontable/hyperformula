@@ -8,7 +8,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - Added 9 text functions EXACT, LOWER, UPPER, MID, T, SUBSTITUTE, REPLACE, UNICODE, UNICHAR. (#159)
-- Added 11 information functions HLOOKUP, ROW, COLUMN (#158)
+- Added 3 information functions HLOOKUP, ROW, COLUMN (#158)
+
+### Fixed
+- Fixed multiple issues with VLOOKUP function. (#526, #528)
+- Fixed MATCH and INDEX functions compatiblity. (#520)
 
 ## [0.2.0] - 2020-09-22
 
