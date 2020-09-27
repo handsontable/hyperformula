@@ -27,7 +27,7 @@ import {NumberLiteralHelper} from '../NumberLiteralHelper'
 import {Ast, AstNodeType, CellRangeAst, ColumnRangeAst, RowRangeAst} from '../parser/Ast'
 import {Serialization} from '../Serialization'
 import {Statistics} from '../statistics/Statistics'
-import {ArithmeticHelper, coerceScalarToString, divide} from './ArithmeticHelper'
+import {ArithmeticHelper, coerceScalarToString, divide, fixNegativeZero, isNumberOverflow} from './ArithmeticHelper'
 import {CriterionBuilder} from './Criterion'
 import {FunctionRegistry} from './FunctionRegistry'
 import {InterpreterValue, SimpleRangeValue} from './InterpreterValue'
@@ -53,16 +53,24 @@ export class Interpreter {
     this.criterionBuilder = new CriterionBuilder(config)
   }
 
+  public evaluateAst(ast: Ast, formulaAddress: SimpleCellAddress): InterpreterValue {
+    let val = this.evaluateAstWithoutPostoprocessing(ast, formulaAddress)
+    if (typeof val === 'number') {
+      if (isNumberOverflow(val)) {
+        val = new CellError(ErrorType.NUM, ErrorMessage.NaN)
+      } else {
+        val = fixNegativeZero(val)
+      }
+    }
+    return wrapperForAddress(val, formulaAddress)
+  }
   /**
    * Calculates cell value from formula abstract syntax tree
    *
    * @param formula - abstract syntax tree of formula
    * @param formulaAddress - address of the cell in which formula is located
    */
-  public evaluateAst(ast: Ast, formulaAddress: SimpleCellAddress): InterpreterValue {
-    return wrapperForAddress(this.evaluateAstWithoutWrapper(ast,formulaAddress), formulaAddress)
-  }
-  private evaluateAstWithoutWrapper(ast: Ast, formulaAddress: SimpleCellAddress): InterpreterValue {
+  private evaluateAstWithoutPostoprocessing(ast: Ast, formulaAddress: SimpleCellAddress): InterpreterValue {
     switch (ast.type) {
       case AstNodeType.EMPTY: {
         return EmptyValue
