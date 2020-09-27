@@ -57,7 +57,7 @@ export class DetailedCellError {
   constructor(
     error: CellError,
     public readonly value: string,
-    public address?: string,
+    public readonly address?: string,
   ) {
     this.type = error.type
     this.message = error.message || ''
