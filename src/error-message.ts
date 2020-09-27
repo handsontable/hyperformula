@@ -26,7 +26,7 @@ export class ErrorMessage {
   public static DateBounds = 'Date outside of bounds.'
   public static OutOfSheet = 'Resulting reference is out of the sheet.'
   public static WrongType = 'Wrong type of argument.'
-  public static Infinity = 'Infinite value.'
+  public static NaN = 'NaN value encountered.'
   public static EqualLength = 'Ranges need to be of equal length.'
   public static Negative = 'Value cannot be negative.'
   public static NotBinary = 'String does not represent a binary number.'
