@@ -3,7 +3,7 @@ import {CellError} from '../../../src/Cell'
 
 declare global {
   namespace jest {
-    interface Matchers<R,T> {
+    interface Matchers<R, T> {
       toEqualError(expected: any): CustomMatcherResult,
     }
   }
@@ -20,5 +20,5 @@ export const toEqualMatcherJest: jest.ExpectExtendMap = {toEqualError(received: 
     localExp = {...expected}
     localExp.address = undefined
   }
-  return { pass: this.equals(localRec,localExp), message: () => '' }
+  return { pass: this.equals(localRec, localExp), message: () => '' }
 }}
