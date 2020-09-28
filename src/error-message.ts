@@ -3,6 +3,11 @@
  * Copyright (c) 2020 Handsoncode. All rights reserved.
  */
 
+ /**
+ * This is a class for detailed error messages across HyperFormula.
+ *
+ * @since 0.2.0
+ */
 export class ErrorMessage {
   public static DistinctSigns = 'Distinct signs.'
   public static WrongArgNumber = 'Wrong number of arguments.'
@@ -21,7 +26,7 @@ export class ErrorMessage {
   public static DateBounds = 'Date outside of bounds.'
   public static OutOfSheet = 'Resulting reference is out of the sheet.'
   public static WrongType = 'Wrong type of argument.'
-  public static Infinity = 'Infinite value.'
+  public static NaN = 'NaN or infinite value encountered.'
   public static EqualLength = 'Ranges need to be of equal length.'
   public static Negative = 'Value cannot be negative.'
   public static NotBinary = 'String does not represent a binary number.'
@@ -59,6 +64,7 @@ export class ErrorMessage {
   public static IncorrectDateTime = 'String does not represent correct DateTime.'
   public static CharacterCodeBounds = 'Character code out of bounds.'
   public static NonZero = 'Argument cannot be 0.'
+  public static LessThanOne = 'Argument cannot be less than 1.'
   public static FunctionName = (arg: string) => `Function name ${arg} not recognized.`
   public static NamedExpressionName = (arg: string) => `Named expression ${arg} not recognized.`
   public static LicenseKey = (arg: string) => `License key is ${arg}.`

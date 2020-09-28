@@ -1,5 +1,40 @@
 # Changelog
 
+## 0.2.0
+**Release date: September 22, 2020**
+
+### Added
+- Added 9 text functions LEN, TRIM, PROPER, CLEAN, REPT, RIGHT, LEFT, SEARCH, FIND. [#221](https://github.com/handsontable/hyperformula/issues/221)
+- Added helper methods for keeping track of cell/range dependencies: `getCellPrecedents` and `getCellDependents`. [#441](https://github.com/handsontable/hyperformula/issues/441)
+- Added 22 financial functions FV, PMT, PPMT, IPMT, CUMIPMT, CUMPRINC, DB, DDB, DOLLARDE, DOLLARFR, EFFECT, ISPMT, NOMINAL, NPER, RATE, PV, RRI, SLN, SYD, TBILLEQ, TBILLPRICE, TBILLYIELD. [#494](https://github.com/handsontable/hyperformula/issues/494)
+- Added FORMULATEXT function. [#422](https://github.com/handsontable/hyperformula/pull/422)
+- Added 8 information functions ISERR, ISNA, ISREF, NA, SHEET, SHEETS, ISBINARY, ISFORMULA. [#481](https://github.com/handsontable/hyperformula/issues/481)
+- Added 15 date functions: WEEKDAY, DATEVALUE, HOUR, MINUTE, SECOND, TIME, TIMEVALUE, NOW, TODAY, EDATE, WEEKNUM, ISOWEEKNUM, DATEDIF, DAYS360, YEARFRAC. [#483](https://github.com/handsontable/hyperformula/issues/483)
+- Added 13 trigonometry functions: SEC, CSC, SINH, COSH, TANH, COTH, SECH, CSCH, ACOT, ASINH, ACOSH, ATANH, ACOTH. [#485](https://github.com/handsontable/hyperformula/issues/485)
+- Added 6 engineering functions: OCT2BIN, OCT2DEC, OCT2HEX, HEX2BIN, HEX2OCT, HEX2DEC. [#497](https://github.com/handsontable/hyperformula/issues/497)
+- Added a configuration option to evaluate reference to an empty cells as a zero. [#476](https://github.com/handsontable/hyperformula/issues/476)
+- Added new error type: missing licence. [#306](https://github.com/handsontable/hyperformula/issues/306)
+- Added detailed error messages for error values. [#506](https://github.com/handsontable/hyperformula/issues/506)
+- Added ability to handle more characters in quoted sheet names. [#509](https://github.com/handsontable/hyperformula/issues/509)
+- Added support for escaping apostrophe character in quoted sheet names. [#64](https://github.com/handsontable/hyperformula/issues/64)
+
+### Changed
+- Operation `moveCells` creating cyclic dependencies does not cause losing original formula. [#479](https://github.com/handsontable/hyperformula/issues/479)
+- Simplified adding new function modules, reworked (simplified) implementations of existing modules. [#480](https://github.com/handsontable/hyperformula/issues/480)
+
+### Fixed
+- Fixed hardcoding of languages in i18n tests. [#471](https://github.com/handsontable/hyperformula/issues/471)
+- Fixed many compilation warnings based on LGTM analysis. [#473](https://github.com/handsontable/hyperformula/issues/473)
+- Fixed `moveCells` behaviour when moving part of a range. [#479](https://github.com/handsontable/hyperformula/issues/479)
+- Fixed `moveColumns`/`moveRows` inconsistent behaviour. [#479](https://github.com/handsontable/hyperformula/issues/479)
+- Fixed undo of `moveColumns`/`moveRows` operations. [#479](https://github.com/handsontable/hyperformula/issues/479)
+- Fixed name-collision issue in translations. [#486](https://github.com/handsontable/hyperformula/issues/486)
+- Fixed bug in concatenation + `nullValue`. [#495](https://github.com/handsontable/hyperformula/issues/495)
+- Fixed bug when undoing irreversible operation. [#502](https://github.com/handsontable/hyperformula/issues/502)
+- Fixed minor issue with CHAR function logic. [#510](https://github.com/handsontable/hyperformula/issues/510)
+- Fixed `simpleCellAddressToString` behaviour when converting quoted sheet names. [#514](https://github.com/handsontable/hyperformula/issues/514)
+- Fixed issues with numeric aggregation functions. [#515](https://github.com/handsontable/hyperformula/issues/515)
+
 ## 0.1.3
 **Release date: July 21, 2020**
 

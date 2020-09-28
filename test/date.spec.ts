@@ -11,6 +11,7 @@ describe('Date helpers', () => {
     expect(dateHelper.dateToNumber({year: 1900, month: 12, day: 31})).toBe(366)
     expect(dateHelper.dateToNumber({year: 2018, month: 12, day: 31})).toBe(43465)
   })
+
   it('#dateToNumber should return number representation of a date, excel compatibility', () => {
     const dateHelper = new DateTimeHelper(new Config({leapYear1900: true}))
     expect(dateHelper.dateToNumber({year: 1900, month: 1, day: 1})).toBe(2)
@@ -110,6 +111,24 @@ describe('Date helpers', () => {
     expect(dateHelper1.dateStringToDateNumber('99/12/31')).toBe(36525)
     const dateHelper2 = new DateTimeHelper(new Config({dateFormats : ['MM/DD/YY', 'YY/MM/DD']}))
     expect(dateHelper2.dateStringToDateNumber('99/12/31')).toBe(36525)
+    const dateHelper3 = new DateTimeHelper(new Config({dateFormats : ['YYYY/DD/MM']}))
+    expect(dateHelper3.dateStringToDateNumber('1999/12/31')).toBe(undefined)
+    const dateHelper4 = new DateTimeHelper(new Config({dateFormats : ['YYYY/MM/DD']}))
+    expect(dateHelper4.dateStringToDateNumber('1999/12/31')).toBe(36525)
+    const dateHelper5 = new DateTimeHelper(new Config({dateFormats : ['MM/YYYY/DD']}))
+    expect(dateHelper5.dateStringToDateNumber('12/1999/31')).toBe(36525)
+    const dateHelper6 = new DateTimeHelper(new Config({dateFormats : ['DD/YYYY/MM']}))
+    expect(dateHelper6.dateStringToDateNumber('31/1999/12')).toBe(36525)
+    const dateHelper7 = new DateTimeHelper(new Config({dateFormats : ['DD/MM/YYYY']}))
+    expect(dateHelper7.dateStringToDateNumber('31/12/1999')).toBe(36525)
+    const dateHelper8 = new DateTimeHelper(new Config({dateFormats : ['YY/DD/MM']}))
+    expect(dateHelper8.dateStringToDateNumber('99/31/12')).toBe(36525)
+    const dateHelper9 = new DateTimeHelper(new Config({dateFormats : ['MM/YY/DD']}))
+    expect(dateHelper9.dateStringToDateNumber('12/99/31')).toBe(36525)
+    const dateHelper10 = new DateTimeHelper(new Config({dateFormats : ['DD/MM/YY']}))
+    expect(dateHelper10.dateStringToDateNumber('31/12/99')).toBe(36525)
+    const dateHelper11 = new DateTimeHelper(new Config({dateFormats : ['DD/YY/MM']}))
+    expect(dateHelper11.dateStringToDateNumber('31/99/12')).toBe(36525)
   })
 
   it('stringToDateNumber - other time formats', () => {
@@ -166,7 +185,6 @@ describe('Date helpers, other zero date', () => {
 })
 
 describe('Custom date parsing', () => {
-
   function customParseDate(dateString: string, dateFormat: string): Maybe<SimpleDate> {
     const momentDate = moment(dateString, dateFormat, true)
     if(momentDate.isValid()){
