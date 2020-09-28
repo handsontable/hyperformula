@@ -19,7 +19,7 @@ describe('Function ACOSH', () => {
   it('too small', () => {
     const engine = HyperFormula.buildFromArray([['=ACOSH(0.9)']])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM, ErrorMessage.Infinity))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM, ErrorMessage.NaN))
   })
 
 

@@ -79,7 +79,7 @@ describe('Operator POWER', () => {
       ['3.1415', '36193.2', '=A2^B2'],
     ])
 
-    expect(engine.getCellValue(adr('C1'))).toEqual(detailedError(ErrorType.NUM, ErrorMessage.Infinity))
-    expect(engine.getCellValue(adr('C2'))).toEqual(detailedError(ErrorType.NUM, ErrorMessage.Infinity))
+    expect(engine.getCellValue(adr('C1'))).toEqual(detailedError(ErrorType.NUM, ErrorMessage.NaN))
+    expect(engine.getCellValue(adr('C2'))).toEqual(detailedError(ErrorType.NUM, ErrorMessage.NaN))
   })
 })

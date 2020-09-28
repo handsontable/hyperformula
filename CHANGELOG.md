@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - Fixed issue with config update that does not preserve named expressions. (#527)
+- Fixed minor issue with arithmetic operations error messages. (#532)
 
 ## [0.2.0] - 2020-09-22
 
