@@ -94,7 +94,7 @@ const sharedExamples = (builder: (sheet: Sheet, config?: Partial<ConfigParams>) 
         ['4', 'd'],
         ['5', 'e'],
         ['=VLOOKUP(2, A1:B5, 2)'],
-      ], {vlookupThreshold: 1})
+      ], {binarySearchThreshold: 1})
 
       expect(engine.getCellValue(adr('A6'))).toEqual('b')
     })
@@ -172,7 +172,7 @@ const sharedExamples = (builder: (sheet: Sheet, config?: Partial<ConfigParams>) 
         ['=TRUE()', 'd'],
         ['foo', 'e'],
         ['=VLOOKUP(TRUE(), A1:B5, 2, FALSE())'],
-      ], {vlookupThreshold: 1})
+      ], {binarySearchThreshold: 1})
 
       expect(engine.getCellValue(adr('A6'))).toEqual('d')
     })
@@ -196,7 +196,7 @@ const sharedExamples = (builder: (sheet: Sheet, config?: Partial<ConfigParams>) 
         ['2', 'b'],
         ['3', 'c'],
         ['=VLOOKUP(4, A1:B3, 2, TRUE())'],
-      ], {vlookupThreshold: 1})
+      ], {binarySearchThreshold: 1})
 
       expect(engine.getCellValue(adr('A4'))).toEqual('c')
     })
@@ -207,7 +207,7 @@ const sharedExamples = (builder: (sheet: Sheet, config?: Partial<ConfigParams>) 
         ['2', 'b'],
         ['3', 'c'],
         ['=VLOOKUP(0, A1:B3, 2, TRUE())'],
-      ], {vlookupThreshold: 1})
+      ], {binarySearchThreshold: 1})
 
       expect(engine.getCellValue(adr('A4'))).toEqual(detailedError(ErrorType.NA, ErrorMessage.ValueNotFound))
     })
@@ -229,7 +229,7 @@ const sharedExamples = (builder: (sheet: Sheet, config?: Partial<ConfigParams>) 
         ['1', 'b'],
         ['2', 'c'],
         ['=VLOOKUP(1, A1:B3, 2, TRUE())'],
-      ], {vlookupThreshold: 1})
+      ], {binarySearchThreshold: 1})
 
       expect(engine.getCellValue(adr('A4'))).toEqual('a')
     })
@@ -341,7 +341,7 @@ describe('BinarySearchStrategy', () => {
       ['3'],
       ['4'],
       ['5'],
-    ], {useColumnIndex: false, vlookupThreshold: 1})
+    ], {useColumnIndex: false, binarySearchThreshold: 1})
 
     expect(engine.getCellValue(adr('A1'))).toEqual(4)
   })

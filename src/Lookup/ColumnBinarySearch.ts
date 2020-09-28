@@ -41,7 +41,7 @@ export class ColumnBinarySearch extends AdvancedFind implements ColumnSearchStra
   public destroy(): void {}
 
   public find(key: InternalNoErrorCellValue, range: AbsoluteCellRange, sorted: boolean): number {
-    if (range.height() < this.config.vlookupThreshold || !sorted) {
+    if (range.height() < this.config.binarySearchThreshold || !sorted) {
       const values = this.dependencyGraph.computeListOfValuesInRange(range)
       const index =  values.indexOf(key)
       return index < 0 ? index : index + range.start.row

@@ -190,7 +190,7 @@ describe('Function MATCH', () => {
       ['300'],
       ['400'],
       ['500'],
-    ], { vlookupThreshold: 1 })
+    ], { binarySearchThreshold: 1 })
 
     expect(spy).not.toHaveBeenCalled()
     expect(engine.getCellValue(adr('A1'))).toEqual(4)
@@ -207,7 +207,7 @@ describe('Function MATCH', () => {
       ['300'],
       ['400'],
       ['500'],
-    ], { vlookupThreshold: 1 })
+    ], { binarySearchThreshold: 1 })
 
     expect(spy).toHaveBeenCalled()
     expect(engine.getCellValue(adr('A1'))).toEqual(4)
@@ -221,7 +221,7 @@ describe('Function MATCH', () => {
       ['300'],
       ['400'],
       ['500'],
-    ], { vlookupThreshold: 1 })
+    ], { binarySearchThreshold: 1 })
 
     expect(engine.getCellValue(adr('A1'))).toEqual(2)
   })

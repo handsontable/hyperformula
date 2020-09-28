@@ -90,7 +90,7 @@ describe('Function HLOOKUP', () => {
         ['1', '2', '3', '4', '5'],
         ['a', 'b', 'c', 'd', 'e'],
         ['=HLOOKUP(2, A1:E2, 2)']
-      ], {vlookupThreshold: 1})
+      ], {binarySearchThreshold: 1})
 
       expect(engine.getCellValue(adr('A3'))).toEqual('b')
     })
@@ -140,7 +140,7 @@ describe('Function HLOOKUP', () => {
         ['1', '2', '3', '=TRUE()', 'foo'],
         ['a', 'b', 'c', 'd', 'e'],
         ['=HLOOKUP(TRUE(), A1:E2, 2, FALSE())'],
-      ], {vlookupThreshold: 1})
+      ], {binarySearchThreshold: 1})
 
       expect(engine.getCellValue(adr('A3'))).toEqual('d')
     })
@@ -160,7 +160,7 @@ describe('Function HLOOKUP', () => {
         ['1', '2', '3'],
         ['a', 'b', 'c'],
         ['=HLOOKUP(4, A1:C2, 2, TRUE())'],
-      ], {vlookupThreshold: 1})
+      ], {binarySearchThreshold: 1})
 
       expect(engine.getCellValue(adr('A3'))).toEqual('c')
     })
@@ -170,7 +170,7 @@ describe('Function HLOOKUP', () => {
         ['1', '2', '3'],
         ['a', 'b', 'c'],
         ['=HLOOKUP(0, A1:C2, 2, TRUE())'],
-      ], {vlookupThreshold: 1})
+      ], {binarySearchThreshold: 1})
 
       expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.NA, ErrorMessage.ValueNotFound))
     })
@@ -190,7 +190,7 @@ describe('Function HLOOKUP', () => {
         ['=B1', '1', '2'],
         ['a', 'b', 'c'],
         ['=HLOOKUP(1, A1:C2, 2, TRUE())'],
-      ], {vlookupThreshold: 1})
+      ], {binarySearchThreshold: 1})
 
       expect(engine.getCellValue(adr('A3'))).toEqual('a')
     })
@@ -214,7 +214,7 @@ describe('Function HLOOKUP', () => {
     it('should calculate indexes properly when using binary search', () => {
       const engine = HyperFormula.buildFromArray([
         ['=HLOOKUP(4, E1:J1, 1, TRUE())', null, null, null, '1', '2', '3', '4', '5']
-      ], {useColumnIndex: false, vlookupThreshold: 1})
+      ], {useColumnIndex: false, binarySearchThreshold: 1})
 
       expect(engine.getCellValue(adr('A1'))).toEqual(4)
     })

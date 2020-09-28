@@ -704,7 +704,7 @@ describe('updating column index', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '2'],
       ['3', '15'],
-    ], {matrixDetection: false, vlookupThreshold: 1, useColumnIndex: true})
+    ], {matrixDetection: false, binarySearchThreshold: 1, useColumnIndex: true})
 
     engine.setCellContents(adr('B2'), '8')
 
@@ -716,7 +716,7 @@ describe('updating column index', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '2'],
       ['3', '15'],
-    ], {matrixDetection: true, matrixDetectionThreshold: 1, vlookupThreshold: 1, useColumnIndex: true})
+    ], {matrixDetection: true, matrixDetectionThreshold: 1, binarySearchThreshold: 1, useColumnIndex: true})
 
     engine.setCellContents(adr('B2'), '8')
 

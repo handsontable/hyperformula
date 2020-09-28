@@ -20,7 +20,7 @@ export class RowSearchStrategy extends AdvancedFind implements SearchStrategy {
   }
 
   public find(key: InternalNoErrorCellValue, range: AbsoluteCellRange, sorted: boolean): number {
-    if (range.width() < this.config.vlookupThreshold || !sorted) {
+    if (range.width() < this.config.binarySearchThreshold || !sorted) {
       const values = this.dependencyGraph.computeListOfValuesInRange(range)
       const index =  values.indexOf(key)
       return index < 0 ? index : index + range.start.col
