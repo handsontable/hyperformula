@@ -204,6 +204,8 @@ const dictionary: RawTranslationPackage = {
     VLOOKUP: 'FKERES',
     WEEKDAY: 'HÉT.NAPJA',
     WEEKNUM: 'HÉT.SZÁMA',
+    WORKDAY: 'KALK.MUNKANAP',
+    'WORKDAY.INTL': 'KALK.MUNKANAP.INTL',
     XOR: 'XVAGY',
     YEAR: 'ÉV',
     YEARFRAC: 'TÖRTÉV',

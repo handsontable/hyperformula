@@ -204,6 +204,8 @@ const dictionary: RawTranslationPackage = {
     VLOOKUP: 'SVERWEIS',
     WEEKDAY: 'WOCHENTAG',
     WEEKNUM: 'KALENDERWOCHE',
+    WORKDAY: 'ARBEITSTAG',
+    'WORKDAY.INTL': 'ARBEITSTAG.INTL',
     XOR: 'XODER',
     YEAR: 'JAHR',
     YEARFRAC: 'BRTEILJAHRE',

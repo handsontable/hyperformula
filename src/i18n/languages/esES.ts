@@ -204,6 +204,8 @@ export const dictionary: RawTranslationPackage = {
     VLOOKUP: 'BUSCARV',
     WEEKDAY: 'DIASEM',
     WEEKNUM: 'NUM.DE.SEMANA',
+    WORKDAY: 'DIA.LAB',
+    'WORKDAY.INTL': 'DIA.LAB.INTL',
     XOR: 'XOR',
     YEAR: 'AÑO',
     YEARFRAC: 'FRAC.AÑO',

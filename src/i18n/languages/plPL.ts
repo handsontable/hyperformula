@@ -204,6 +204,8 @@ const dictionary: RawTranslationPackage = {
     VLOOKUP: 'WYSZUKAJ.PIONOWO',
     WEEKDAY: 'DZIEŃ.TYG',
     WEEKNUM: 'NUM.TYG',
+    WORKDAY: 'DZIEŃ.ROBOCZY',
+    'WORKDAY.INTL': 'DZIEŃ.ROBOCZY.NIESTAND',
     XOR: 'XOR',
     YEAR: 'ROK',
     YEARFRAC: 'CZĘŚĆ.ROKU',
