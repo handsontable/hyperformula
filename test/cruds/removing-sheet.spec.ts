@@ -1,7 +1,7 @@
 import {HyperFormula, ExportedCellChange} from '../../src'
 import {AbsoluteCellRange} from '../../src/AbsoluteCellRange'
 import {ErrorType, simpleCellAddress} from '../../src/Cell'
-import {ColumnIndex} from '../../src/ColumnSearch/ColumnIndex'
+import {ColumnIndex} from '../../src/Lookup/ColumnIndex'
 import {MatrixVertex} from '../../src/DependencyGraph'
 import {NoSheetWithNameError} from '../../src'
 import {CellAddress} from '../../src/parser'

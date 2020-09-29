@@ -8,7 +8,7 @@ import {invalidSimpleCellAddress, simpleCellAddress, SimpleCellAddress} from './
 import {CellContent, CellContentParser, isMatrix, RawCellContent} from './CellContentParser'
 import {ClipboardCell, ClipboardOperations} from './ClipboardOperations'
 import {AddColumnsCommand, AddRowsCommand, Operations, RemoveColumnsCommand, RemoveRowsCommand} from './Operations'
-import {ColumnSearchStrategy} from './ColumnSearch/ColumnSearchStrategy'
+import {ColumnSearchStrategy} from './Lookup/SearchStrategy'
 import {Config} from './Config'
 import {ContentChanges} from './ContentChanges'
 import {DependencyGraph, SheetMapping} from './DependencyGraph'

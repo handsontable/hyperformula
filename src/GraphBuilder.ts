@@ -7,7 +7,7 @@ import {absolutizeDependencies} from './absolutizeDependencies'
 import {CellError, simpleCellAddress, SimpleCellAddress} from './Cell'
 import {CellContent, CellContentParser} from './CellContentParser'
 import {CellDependency} from './CellDependency'
-import {ColumnSearchStrategy} from './ColumnSearch/ColumnSearchStrategy'
+import {ColumnSearchStrategy} from './Lookup/SearchStrategy'
 import {Config} from './Config'
 import {
   DependencyGraph,

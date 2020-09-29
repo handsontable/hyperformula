@@ -18,7 +18,7 @@ import {Matrix} from '../Matrix'
 import {ColumnsSpan, RowsSpan} from '../Span'
 import {Statistics, StatType} from '../statistics'
 import {ColumnBinarySearch} from './ColumnBinarySearch'
-import {ColumnSearchStrategy} from './ColumnSearchStrategy'
+import {ColumnSearchStrategy} from './SearchStrategy'
 import {AddRowsTransformer} from '../dependencyTransformers/AddRowsTransformer'
 import {RemoveRowsTransformer} from '../dependencyTransformers/RemoveRowsTransformer'
 import {FormulaTransformer} from '../dependencyTransformers/Transformer'
@@ -112,7 +112,7 @@ export class ColumnIndex implements ColumnSearchStrategy {
     return rowNumber <= range.end.row ? rowNumber : this.binarySearchStrategy.find(key, range, sorted)
   }
 
-  public advancedFind(keyMatcher: (arg: InterpreterValue) => boolean, range: AbsoluteCellRange): number {
+  public advancedFind(keyMatcher: (arg: InternalScalarValue) => boolean, range: AbsoluteCellRange): number {
     return this.binarySearchStrategy.advancedFind(keyMatcher, range)
   }
 
