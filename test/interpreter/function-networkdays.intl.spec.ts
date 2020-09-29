@@ -84,4 +84,18 @@ describe('Function NETWORKDAYS.INTL', () => {
     expect(engine.getCellValue(adr('A5'))).toEqual(34)
     expect(engine.getCellValue(adr('A6'))).toEqual(5)
   })
+
+  it('checks types in last argument', () => {
+    const engine = HyperFormula.buildFromArray([
+      [true, '\'1', null, '=NA()'],
+      ['=NETWORKDAYS.INTL(1000, 1, 1, A1:A1)'],
+      ['=NETWORKDAYS.INTL(1000, 1, 1, B1:B1)'],
+      ['=NETWORKDAYS.INTL(1000, 1, 1, C1:C1)'],
+      ['=NETWORKDAYS.INTL(1000, 1, 1, A1:D1)'],
+    ])
+    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessage.WrongType))
+    expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessage.WrongType))
+    expect(engine.getCellValue(adr('A4'))).toEqual(715)
+    expect(engine.getCellValue(adr('A5'))).toEqual(detailedError(ErrorType.NA))
+  })
 })

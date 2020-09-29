@@ -207,7 +207,7 @@ export class DateTimePlugin extends FunctionPlugin {
       method: 'workday',
       parameters: [
         {argumentType: ArgumentTypes.NUMBER, minValue: 0},
-        {argumentType: ArgumentTypes.NUMBER, minValue: 0},
+        {argumentType: ArgumentTypes.NUMBER},
         {argumentType: ArgumentTypes.RANGE, optionalArg: true}
       ],
     },
@@ -215,7 +215,7 @@ export class DateTimePlugin extends FunctionPlugin {
       method: 'workdayintl',
       parameters: [
         {argumentType: ArgumentTypes.NUMBER, minValue: 0},
-        {argumentType: ArgumentTypes.NUMBER, minValue: 0},
+        {argumentType: ArgumentTypes.NUMBER},
         {argumentType: ArgumentTypes.NOERROR, defaultValue: 1},
         {argumentType: ArgumentTypes.RANGE, optionalArg: true}
       ],

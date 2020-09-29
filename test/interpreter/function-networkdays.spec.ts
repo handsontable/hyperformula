@@ -56,4 +56,18 @@ describe('Function NETWORKDAYS', () => {
     expect(engine.getCellValue(adr('A5'))).toEqual(26)
     expect(engine.getCellValue(adr('A6'))).toEqual(3)
   })
+
+  it('checks types in last argument', () => {
+    const engine = HyperFormula.buildFromArray([
+      [true, '\'1', null, '=NA()'],
+      ['=NETWORKDAYS(1000, 1, A1:A1)'],
+      ['=NETWORKDAYS(1000, 1, B1:B1)'],
+      ['=NETWORKDAYS(1000, 1, C1:C1)'],
+      ['=NETWORKDAYS(1000, 1, A1:D1)'],
+    ])
+    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessage.WrongType))
+    expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessage.WrongType))
+    expect(engine.getCellValue(adr('A4'))).toEqual(715)
+    expect(engine.getCellValue(adr('A5'))).toEqual(detailedError(ErrorType.NA))
+  })
 })
