@@ -8,7 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - Added 9 text functions EXACT, LOWER, UPPER, MID, T, SUBSTITUTE, REPLACE, UNICODE, UNICHAR. (#159)
-- Added 3 datetime functions: INTERVAL, NETWORKDAYS, NETWORKDAYS.INTL.
+- Added 5 datetime functions: INTERVAL, NETWORKDAYS, NETWORKDAYS.INTL, WORKDAY, WORKDAY.INTL.
 
 ### Fixed
 - Fixed minor issue with arithmetic operations error messages. (#532)

@@ -83,6 +83,8 @@ lets you design your own [custom functions](custom-functions).
 | TODAY <br><Badge text="v0.2.0"/>| Date and time | Returns current date. | TODAY() |
 | WEEKDAY <br><Badge text="v0.2.0"/>| Date and time |  Computes a number between 1-7 representing the day of week. | WEEKDAY(Date; Type) |
 | WEEKNUM <br><Badge text="v0.2.0"/>| Date and time |   Returns a week number that corresponds to the week of year. | WEEKNUM(Date; Type) |
+| WORKDAY | Date and time | Returns the working day number of days from start day. | WORKDAY(Date, Shift[; Holidays]) |
+| WORKDAY.INTL | Date and time | Returns the working day number of days from start day. | WORKDAY(Date, Shift[; Mode[; Holidays]]) |
 | YEAR | Date and time | Returns the year as a number according to the internal calculation rules. | YEAR(Number) |
 | YEARFRAC <br><Badge text="v0.2.0"/>| Date and time | Computes the difference between two date values, in fraction of years. |  YEARFRAC(Date2; Date1[; Format]) |
 | BIN2DEC | Engineering | The result is the decimal number for the binary number entered. | BIN2DEC(Number) |
