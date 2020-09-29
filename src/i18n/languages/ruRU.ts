@@ -138,6 +138,7 @@ const dictionary: RawTranslationPackage = {
     MONTH: 'МЕСЯЦ',
     NA: 'НД',
     NETWORKDAYS: 'ЧИСТРАБДНИ',
+    'NETWORKDAYS.INTL': 'ЧИСТРАБДНИ.МЕЖД',
     NOMINAL: 'НОМИНАЛ',
     NOT: 'НЕ',
     NOW: 'ТДАТА',

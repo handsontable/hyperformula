@@ -138,6 +138,7 @@ const dictionary: RawTranslationPackage = {
     MONTH: 'KUUKAUSI',
     NA: 'PUUTTUU',
     NETWORKDAYS: 'TYÖPÄIVÄT',
+    'NETWORKDAYS.INTL': 'TYÖPÄIVÄT.KANSVÄL',
     NOMINAL: 'KORKO.VUOSI',
     NOT: 'EI',
     NOW: 'NYT',

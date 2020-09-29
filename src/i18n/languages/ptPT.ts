@@ -138,6 +138,7 @@ const dictionary: RawTranslationPackage = {
     MONTH: 'MÊS',
     NA: 'NÃO.DISP',
     NETWORKDAYS: 'DIATRABALHOTOTAL',
+    'NETWORKDAYS.INTL': 'DIATRABALHOTOTAL.INTL',
     NOMINAL: 'NOMINAL',
     NOT: 'NÃO',
     NOW: 'AGORA',
