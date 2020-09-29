@@ -41,7 +41,7 @@ import {
   simpleCellAddressToString,
   Unparser,
 } from './parser'
-import {Serialization} from './Serialization'
+import {Serialization, SerializedNamedExpression} from './Serialization'
 import {Statistics, StatType} from './statistics'
 import {Emitter, Events, Listeners, TypedEmitter} from './Emitter'
 import {BuildEngineFactory, EngineState} from './BuildEngineFactory'
@@ -876,23 +876,9 @@ export class HyperFormula implements TypedEmitter {
 
     const configNewLanguage = this._config.mergeConfig({language: newParams.language})
     const serializedSheets = this._serialization.withNewConfig(configNewLanguage, this._namedExpressions).getAllSheetsSerialized()
+    const serializedNamedExpressions = this._serialization.getAllNamedExpressionsSerialized()
 
     const newEngine = BuildEngineFactory.rebuildWithConfig(newConfig, serializedSheets, this._stats)
-
-    const storedNamedExpressions = this._namedExpressions.workbookStore.getAllNamedExpressions().map(expr => {
-        return {expr,
-          val: this.getCellSerialized(expr.address),
-          sheet: undefined as Maybe<string>}
-      }
-    )
-
-    this._namedExpressions.worksheetStores.forEach((store, sheetNum) => {
-      store.getAllNamedExpressions().forEach(expr => {
-        storedNamedExpressions.push({expr,
-          val: this.getCellSerialized(expr.address),
-          sheet: this.getSheetName(sheetNum)!})
-      })
-    })
 
     this._config = newEngine.config
     this._stats = newEngine.stats
@@ -909,10 +895,8 @@ export class HyperFormula implements TypedEmitter {
     this._serialization = newEngine.serialization
     this._functionRegistry = newEngine.functionRegistry
 
-    storedNamedExpressions.forEach((arg) => {
-      const expr = arg.expr
-      const val = arg.val
-      this.addNamedExpression(expr.displayName, val, arg.sheet, expr.options)
+    serializedNamedExpressions.forEach((entry: SerializedNamedExpression) => {
+      this.addNamedExpression(entry.name, entry.expression, entry.scope, entry.options)
     })
   }
 
