@@ -74,6 +74,8 @@ lets you design your own [custom functions](custom-functions).
 | ISOWEEKNUM <br><Badge text="v0.2.0"/>| Date and time |   Returns an ISO week number that corresponds to the week of year. | ISOWEEKNUM(Date) |
 | MINUTE <br><Badge text="v0.2.0"/>| Date and time | Returns minute component of given time. | MINUTE(Time) |
 | MONTH | Date and time | Returns the month for the given date value. | MONTH(Number) |
+| NETWORKDAYS | Date and time | Returns the number of working days between two given dates. | NETWORKDAYS(Date1; Date2[; Holidays]) | 
+| NETWORKDAYS.INTL | Date and time | Returns the number of working days between two given dates. | NETWORKDAYS.INTL(Date1; Date2[; Mode [; Holidays]]) | 
 | NOW <br><Badge text="v0.2.0"/>| Date and time | Returns current date + time. | NOW() |
 | SECOND <br><Badge text="v0.2.0"/>| Date and time | Returns second component of given time. | SECOND(Time) |
 | TIME <br><Badge text="v0.2.0"/>| Date and time | Calculates time from given hour, minute and second. | TIME(Hour; Minute; Second) |
