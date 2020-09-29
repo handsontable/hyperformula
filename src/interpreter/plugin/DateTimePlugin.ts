@@ -558,14 +558,16 @@ export class DateTimePlugin extends FunctionPlugin {
   }
 
   public networkdaysintl(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('NETWORKDAYS.INTL'),this.networkdayscore)
+    return this.runFunction(ast.args, formulaAddress, this.metadata('NETWORKDAYS.INTL'),
+      (start, end, weekend, holidays) => this.networkdayscore(start, end, weekend, holidays)
+      )
   }
 
   private networkdayscore(start: number, end: number, weekend: InternalNoErrorCellValue, holidays?: SimpleRangeValue): InternalScalarValue {
     start = Math.trunc(start)
     end = Math.trunc(end)
     if(start>end) {
-      [start,end] = [end,start]
+      [start, end] = [end, start]
     }
     if(typeof weekend !== 'number' && typeof weekend !== 'string') {
       return new CellError(ErrorType.VALUE, ErrorMessage.WrongType)
@@ -574,7 +576,7 @@ export class DateTimePlugin extends FunctionPlugin {
     let weekendPattern
 
     if(typeof weekend === 'string') {
-      if(weekend.length !== 7 && !/\b(0|1)\b*/.test(weekend)) {
+      if(weekend.length !== 7 || !/^(0|1)*$/.test(weekend)) {
         return new CellError(ErrorType.NUM, ErrorMessage.WeekendString)
       } else {
         weekendPattern = weekend
@@ -591,7 +593,7 @@ export class DateTimePlugin extends FunctionPlugin {
       return uniqueHolidays
     }
 
-    const cnt = [0,0,0,0,0,0,0]
+    const cnt = [0, 0, 0, 0, 0, 0, 0]
     const absoluteEnd = Math.floor(this.interpreter.dateHelper.relativeNumberToAbsoluteNumber(end))
     const absoluteStart = Math.floor(this.interpreter.dateHelper.relativeNumberToAbsoluteNumber(start))
     for(let i=0;i<7;i++) {
@@ -602,13 +604,13 @@ export class DateTimePlugin extends FunctionPlugin {
     uniqueHolidays.forEach((arg) => {
       if(arg>=start && arg <= end) {
         const absoluteArg = Math.floor(this.interpreter.dateHelper.relativeNumberToAbsoluteNumber(arg))
-        cnt[(absoluteArg-1)%7] += 1
+        cnt[(absoluteArg-1)%7] -= 1
       }
     })
 
     let ans = 0
     for(let i=0;i<7;i++) {
-      if(weekendPattern.charAt(i) === '1') {
+      if(weekendPattern.charAt(i) === '0') {
         ans += cnt[i]
       }
     }
@@ -624,7 +626,7 @@ function simpleRangeToUniqueNumbers(range: SimpleRangeValue): (number[] | CellEr
       return val
     }
   }
-  let processedHolidays: number[] = []
+  const processedHolidays: number[] = []
   for(let i=0; i<holidaysArr.length; i++) {
     const val = holidaysArr[i] as InternalNoErrorCellValue
     if(val === EmptyValue) {

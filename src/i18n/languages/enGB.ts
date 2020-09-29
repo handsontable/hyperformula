@@ -137,6 +137,8 @@ const dictionary: RawTranslationPackage = {
     MOD: 'MOD',
     MONTH: 'MONTH',
     NA: 'NA',
+    NETWORKDAYS: 'NETWORKDAYS',
+    'NETWORKDAYS.INTL': 'NETWORKDAYS.INTL',
     NOMINAL: 'NOMINAL',
     NOT: 'NOT',
     NOW: 'NOW',
