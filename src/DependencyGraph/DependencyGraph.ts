@@ -763,6 +763,15 @@ export class DependencyGraph {
     }
   }
 
+  public computeListOfValuesInRange(range: AbsoluteCellRange): InternalScalarValue[] {
+    const values: InternalScalarValue[] = []
+    for (const cellFromRange of range.addresses(this)) {
+      const value = this.getScalarValue(cellFromRange)
+      values.push(value)
+    }
+    return values
+  }
+
   private rangeDependencyQuery = (vertex: RangeVertex) => {
     const allDeps: [(SimpleCellAddress | AbsoluteCellRange), Vertex][] = []
     const {smallerRangeVertex, restRange} = this.rangeMapping.findSmallerRange(vertex.range) //checking whether this range was splitted by bruteForce or not

@@ -9,7 +9,7 @@ import {EmptyValue, invalidSimpleCellAddress, simpleCellAddress, SimpleCellAddre
 import {CellContent, CellContentParser, RawCellContent} from './CellContentParser'
 import {ColumnsSpan, RowsSpan} from './Span'
 import {ContentChanges} from './ContentChanges'
-import {ColumnSearchStrategy} from './ColumnSearch/ColumnSearchStrategy'
+import {ColumnSearchStrategy} from './Lookup/SearchStrategy'
 import {absolutizeDependencies} from './absolutizeDependencies'
 import {LazilyTransformingAstService} from './LazilyTransformingAstService'
 import {buildMatrixVertex} from './GraphBuilder'

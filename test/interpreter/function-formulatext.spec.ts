@@ -20,9 +20,9 @@ describe('Function FORMULATEXT', () => {
       ['=FORMULATEXT(SUM(1))'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA, ErrorMessage.CellRef))
-    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NA, ErrorMessage.CellRef))
-    expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.NA, ErrorMessage.CellRef))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA, ErrorMessage.CellRefExpected))
+    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NA, ErrorMessage.CellRefExpected))
+    expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.NA, ErrorMessage.CellRefExpected))
   })
 
   it('should propagate expression error', () => {
@@ -64,7 +64,7 @@ describe('Function FORMULATEXT', () => {
     engine.addSheet('Sheet2')
     engine.setCellContents(adr('B1'), '=FORMULATEXT(Sheet1!A1:Sheet2!A2)')
 
-    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.REF, ErrorMessage.CellRef))
+    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.REF, ErrorMessage.CellRefExpected))
   })
 
   it('should work for matrix formula', () => {
