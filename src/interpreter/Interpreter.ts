@@ -13,7 +13,7 @@ import {
   invalidSimpleCellAddress,
   SimpleCellAddress
 } from '../Cell'
-import {ColumnSearchStrategy} from '../ColumnSearch/ColumnSearchStrategy'
+import {ColumnSearchStrategy} from '../Lookup/SearchStrategy'
 import {Config} from '../Config'
 import {DateTimeHelper} from '../DateTimeHelper'
 import {DependencyGraph} from '../DependencyGraph'

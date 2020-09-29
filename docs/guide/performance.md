@@ -19,7 +19,7 @@ Leaving this option disabled will cause the engine to use binary
 search when dealing with sorted data, and the naive approach otherwise.
 Binary search will not be used when the size of the data being searched
 doesn't exceed a given threshold which can be customized using the
-`vlookupThreshold` option in the configuration.
+`binarySearchThreshold` option in the configuration.
 
 ## Address mapping strategies
 

@@ -7,7 +7,7 @@ import {AbsoluteCellRange} from './AbsoluteCellRange'
 import {CellType, CellValueType, getCellType, getCellValueType, SimpleCellAddress} from './Cell'
 import {CellContent, CellContentParser, RawCellContent} from './CellContentParser'
 import {CellValue, ExportedChange, Exporter, NoErrorCellValue} from './CellValue'
-import {ColumnSearchStrategy} from './ColumnSearch/ColumnSearchStrategy'
+import {ColumnSearchStrategy} from './Lookup/SearchStrategy'
 import {Config, ConfigParams} from './Config'
 import {ColumnRowIndex, CrudOperations} from './CrudOperations'
 import {DateTime, numberToSimpleTime} from './DateTimeHelper'
@@ -41,7 +41,7 @@ import {
   simpleCellAddressToString,
   Unparser,
 } from './parser'
-import {Serialization} from './Serialization'
+import {Serialization, SerializedNamedExpression} from './Serialization'
 import {Statistics, StatType} from './statistics'
 import {Emitter, Events, Listeners, TypedEmitter} from './Emitter'
 import {BuildEngineFactory, EngineState} from './BuildEngineFactory'
@@ -876,6 +876,7 @@ export class HyperFormula implements TypedEmitter {
 
     const configNewLanguage = this._config.mergeConfig({language: newParams.language})
     const serializedSheets = this._serialization.withNewConfig(configNewLanguage, this._namedExpressions).getAllSheetsSerialized()
+    const serializedNamedExpressions = this._serialization.getAllNamedExpressionsSerialized()
 
     const newEngine = BuildEngineFactory.rebuildWithConfig(newConfig, serializedSheets, this._stats)
 
@@ -893,6 +894,10 @@ export class HyperFormula implements TypedEmitter {
     this._namedExpressions = newEngine.namedExpressions
     this._serialization = newEngine.serialization
     this._functionRegistry = newEngine.functionRegistry
+
+    serializedNamedExpressions.forEach((entry: SerializedNamedExpression) => {
+      this.addNamedExpression(entry.name, entry.expression, entry.scope, entry.options)
+    })
   }
 
   /**

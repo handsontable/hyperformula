@@ -1,6 +1,6 @@
 import {ExportedCellChange, HyperFormula, InvalidAddressError, NoSheetWithIdError} from '../../src'
 import {ErrorType, simpleCellAddress} from '../../src/Cell'
-import {ColumnIndex} from '../../src/ColumnSearch/ColumnIndex'
+import {ColumnIndex} from '../../src/Lookup/ColumnIndex'
 import {EmptyCellVertex, MatrixVertex} from '../../src/DependencyGraph'
 import {ErrorMessage} from '../../src/error-message'
 import {adr, colEnd, colStart, detailedError, expectArrayWithSameContent, rowEnd, rowStart} from '../testUtils'
@@ -704,7 +704,7 @@ describe('updating column index', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '2'],
       ['3', '15'],
-    ], {matrixDetection: false, vlookupThreshold: 1, useColumnIndex: true})
+    ], {matrixDetection: false, binarySearchThreshold: 1, useColumnIndex: true})
 
     engine.setCellContents(adr('B2'), '8')
 
@@ -716,7 +716,7 @@ describe('updating column index', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '2'],
       ['3', '15'],
-    ], {matrixDetection: true, matrixDetectionThreshold: 1, vlookupThreshold: 1, useColumnIndex: true})
+    ], {matrixDetection: true, matrixDetectionThreshold: 1, binarySearchThreshold: 1, useColumnIndex: true})
 
     engine.setCellContents(adr('B2'), '8')
 

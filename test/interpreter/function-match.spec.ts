@@ -1,8 +1,7 @@
-import {HyperFormula} from '../../src'
-import {ErrorType} from '../../src/Cell'
-import {ColumnBinarySearch} from '../../src/ColumnSearch/ColumnBinarySearch'
+import {ErrorType, HyperFormula} from '../../src'
 import {ErrorMessage} from '../../src/error-message'
 import {adr, detailedError} from '../testUtils'
+import {DependencyGraph} from '../../src/DependencyGraph'
 
 describe('Function MATCH', () => {
   it('validates number of arguments', () => {
@@ -17,7 +16,7 @@ describe('Function MATCH', () => {
 
   it('validates that 1st argument is number, string or boolean', () => {
     const engine = HyperFormula.buildFromArray([
-      ['=MATCH(1/0, B1:B1)'],
+      ['=MATCH(C1:C2, B1:B1)'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessage.WrongType))
@@ -33,10 +32,20 @@ describe('Function MATCH', () => {
 
   it('validates that 3rd argument is number', () => {
     const engine = HyperFormula.buildFromArray([
-      ['=MATCH(0, B1:B1, 1/0)'],
+      ['=MATCH(0, B1:B1, "a")'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessage.WrongType))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessage.NumberCoercion))
+  })
+
+  it('should propagate errors properly', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=MATCH(1/0, B1:B1)'],
+      ['=MATCH(1, B1:B1, 1/0)'],
+    ])
+
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.DIV_BY_ZERO))
+    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.DIV_BY_ZERO))
   })
 
   it('column - works when value is in first cell', () => {
@@ -172,7 +181,7 @@ describe('Function MATCH', () => {
 
   it('uses binsearch', () => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const spy = spyOn(ColumnBinarySearch.prototype as any, 'computeListOfValuesInRange')
+    const spy = spyOn(DependencyGraph.prototype as any, 'computeListOfValuesInRange')
 
     const engine = HyperFormula.buildFromArray([
       ['=MATCH(400, A2:A5, 1)'],
@@ -181,7 +190,7 @@ describe('Function MATCH', () => {
       ['300'],
       ['400'],
       ['500'],
-    ], { vlookupThreshold: 1 })
+    ], { binarySearchThreshold: 1 })
 
     expect(spy).not.toHaveBeenCalled()
     expect(engine.getCellValue(adr('A1'))).toEqual(4)
@@ -189,7 +198,7 @@ describe('Function MATCH', () => {
 
   it('uses indexOf', () => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const spy = spyOn(ColumnBinarySearch.prototype as any, 'computeListOfValuesInRange')
+    const spy = spyOn(DependencyGraph.prototype as any, 'computeListOfValuesInRange')
 
     const engine = HyperFormula.buildFromArray([
       ['=MATCH(400, A2:A5, 0)'],
@@ -198,7 +207,7 @@ describe('Function MATCH', () => {
       ['300'],
       ['400'],
       ['500'],
-    ], { vlookupThreshold: 1 })
+    ], { binarySearchThreshold: 1 })
 
     expect(spy).toHaveBeenCalled()
     expect(engine.getCellValue(adr('A1'))).toEqual(4)
@@ -212,8 +221,55 @@ describe('Function MATCH', () => {
       ['300'],
       ['400'],
       ['500'],
-    ], { vlookupThreshold: 1 })
+    ], { binarySearchThreshold: 1 })
 
     expect(engine.getCellValue(adr('A1'))).toEqual(2)
+  })
+
+  it('should coerce empty arg to 0', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['-5'],
+      ['-2'],
+      ['0'],
+      ['2'],
+      ['5'],
+      ['=MATCH(0, A1:A5)'],
+      ['=MATCH(, A1:A5)'],
+    ])
+
+    expect(engine.getCellValue(adr('A6'))).toEqual(3)
+    expect(engine.getCellValue(adr('A7'))).toEqual(3)
+  })
+
+  it('should return NA when range is not a single column or row', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['0', '1'],
+      ['2', '3'],
+      ['=MATCH(0, A1:B2)'],
+    ])
+
+    expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.NA))
+  })
+
+  it('should not coerce', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=MATCH("1", A2:A4)'],
+      [1],
+      [2],
+      [3],
+    ])
+
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA, ErrorMessage.ValueNotFound))
+  })
+
+  it('should coerce null to zero when using naive approach', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=MATCH(, A2:A4, 0)'],
+      [1],
+      [3],
+      [0],
+    ], {useColumnIndex: false})
+
+    expect(engine.getCellValue(adr('A1'))).toEqual(3)
   })
 })

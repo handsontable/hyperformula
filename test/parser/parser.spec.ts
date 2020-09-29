@@ -32,7 +32,6 @@ import {adr, unregisterAllLanguages} from '../testUtils'
 import {RowAddress} from '../../src/parser/RowAddress'
 import {columnIndexToLabel} from '../../src/parser/addressRepresentationConverters'
 import {buildEmptyParserWithCaching} from './common'
-import {sheetNameRegexp} from '../../src/parser/LexerConfig'
 
 describe('ParserWithCaching', () => {
   beforeEach(() => {
