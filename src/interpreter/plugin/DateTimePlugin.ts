@@ -24,6 +24,7 @@ import {
 } from '../../DateTimeHelper'
 import {ErrorMessage} from '../../error-message'
 import {format} from '../../format/format'
+import {Maybe} from '../../Maybe'
 import {ProcedureAst} from '../../parser'
 import {SimpleRangeValue} from '../InterpreterValue'
 import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
@@ -202,6 +203,23 @@ export class DateTimePlugin extends FunctionPlugin {
         {argumentType: ArgumentTypes.RANGE, optionalArg: true}
       ],
     },
+    // 'WORKDAY': {
+    //   method: 'workday',
+    //   parameters: [
+    //     {argumentType: ArgumentTypes.NUMBER, minValue: 0},
+    //     {argumentType: ArgumentTypes.NUMBER, minValue: 0},
+    //     {argumentType: ArgumentTypes.RANGE, optionalArg: true}
+    //   ],
+    // },
+    // 'WORKDAY.INTL': {
+    //   method: 'workdayintl',
+    //   parameters: [
+    //     {argumentType: ArgumentTypes.NUMBER, minValue: 0},
+    //     {argumentType: ArgumentTypes.NUMBER, minValue: 0},
+    //     {argumentType: ArgumentTypes.NOERROR, defaultValue: 1},
+    //     {argumentType: ArgumentTypes.RANGE, optionalArg: true}
+    //   ],
+    // },
   }
 
   /**
@@ -563,6 +581,18 @@ export class DateTimePlugin extends FunctionPlugin {
       )
   }
 
+  // public workday(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+  //   return this.runFunction(ast.args, formulaAddress, this.metadata('WORKDAY'),
+  //     (start, end, holidays) => this.workdaycore(start, end, 1, holidays)
+  //   )
+  // }
+  //
+  // public workdayintl(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+  //   return this.runFunction(ast.args, formulaAddress, this.metadata('WORKDAY.INTL'),
+  //     (start, end, weekend, holidays) => this.workdaycore(start, end, weekend, holidays)
+  //   )
+  // }
+
   private networkdayscore(start: number, end: number, weekend: InternalNoErrorCellValue, holidays?: SimpleRangeValue): InternalScalarValue {
     start = Math.trunc(start)
     end = Math.trunc(end)
@@ -573,7 +603,7 @@ export class DateTimePlugin extends FunctionPlugin {
       return new CellError(ErrorType.VALUE, ErrorMessage.WrongType)
     }
 
-    let weekendPattern
+    let weekendPattern: Maybe<string>
 
     if(typeof weekend === 'string') {
       if(weekend.length !== 7 || !/^(0|1)*$/.test(weekend)) {
@@ -593,27 +623,32 @@ export class DateTimePlugin extends FunctionPlugin {
       return uniqueHolidays
     }
 
-    const cnt = [0, 0, 0, 0, 0, 0, 0]
-    const absoluteEnd = Math.floor(this.interpreter.dateHelper.relativeNumberToAbsoluteNumber(end))
-    const absoluteStart = Math.floor(this.interpreter.dateHelper.relativeNumberToAbsoluteNumber(start))
-    for(let i=0;i<7;i++) {
-      cnt[i] += Math.floor((absoluteEnd+6-i)/7)
-      cnt[i] -= Math.floor((absoluteStart-1+6-i)/7)
-    }
-
-    uniqueHolidays.forEach((arg) => {
-      if(arg>=start && arg <= end) {
-        const absoluteArg = Math.floor(this.interpreter.dateHelper.relativeNumberToAbsoluteNumber(arg))
-        cnt[(absoluteArg-1)%7] -= 1
-      }
+    const filteredHolidays = uniqueHolidays.filter((arg) => {
+      const val = this.interpreter.dateHelper.relativeNumberToAbsoluteNumber(arg)
+      const i = (val-1)%7
+      return (weekendPattern!.charAt(i) === '0')
     })
 
+    return this.countWorkdays(start, end, weekendPattern, filteredHolidays)
+  }
+
+  private countWorkdays(start: number, end: number, weekendPattern: string, sortedHolidays: number[]): number {
+    const absoluteEnd = Math.floor(this.interpreter.dateHelper.relativeNumberToAbsoluteNumber(end))
+    const absoluteStart = Math.floor(this.interpreter.dateHelper.relativeNumberToAbsoluteNumber(start))
     let ans = 0
     for(let i=0;i<7;i++) {
       if(weekendPattern.charAt(i) === '0') {
-        ans += cnt[i]
+        ans += Math.floor((absoluteEnd + 6 - i) / 7)
+        ans -= Math.floor((absoluteStart - 1 + 6 - i) / 7)
       }
     }
+
+    sortedHolidays.forEach((arg) => {
+      if(arg>=start && arg <= end) {
+        ans--
+      }
+    })
+
     return ans
   }
 }
