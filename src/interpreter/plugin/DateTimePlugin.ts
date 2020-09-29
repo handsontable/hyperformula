@@ -769,7 +769,9 @@ function simpleRangeToUniqueNumbers(range: SimpleRangeValue): (number[] | CellEr
       return new CellError(ErrorType.VALUE, ErrorMessage.WrongType)
     }
   }
-  return [...new Set(processedHolidays)].sort(function(a, b){return a-b})
+  return [...new Set(processedHolidays)].sort(function(a, b){
+return a-b
+})
 }
 
 const weekdayOffsets = new Map([[1, 0], [2, 1], [11, 1], [12, 2], [13, 3], [14, 4], [15, 5], [16, 6], [17, 0]])

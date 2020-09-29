@@ -49,7 +49,7 @@ describe('Function WORKDAY', () => {
 
   it('should output correct values', () => {
     const engine = HyperFormula.buildFromArray([
-      ['01/01/2020','=A1+5','=A1+8','=A1+9','=A1+15','=A1+18','=A1+19','=A1+32','=A1+54','=A1+55'],
+      ['01/01/2020', '=A1+5', '=A1+8', '=A1+9', '=A1+15', '=A1+18', '=A1+19', '=A1+32', '=A1+54', '=A1+55'],
       ['=WORKDAY(A1, 65, A1:J1)'],
       ['=WORKDAY(A1+7, 6, A1:J1)'],
       ['=WORKDAY(A1+7, 62, A1:J1)'],
