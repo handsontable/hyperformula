@@ -5,7 +5,7 @@ import {plPL} from '../src/i18n/languages'
 import {adr, detailedError} from './testUtils'
 
 describe('update config', () => {
-  it('simple reload preserves values', () => {
+  it('simple reload preserves all values', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '=A1', '=SUM(A1:B1)'],
       ['#DIV/0!', '=B2', '=F(']

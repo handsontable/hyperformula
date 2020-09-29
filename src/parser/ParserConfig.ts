@@ -3,7 +3,7 @@
  * Copyright (c) 2020 Handsoncode. All rights reserved.
  */
 
-import {ErrorType, TranslatableErrorType} from '../Cell'
+import {TranslatableErrorType} from '../Cell'
 import {TranslationPackage} from '../i18n'
 
 export interface ParserConfig {

@@ -302,7 +302,11 @@ export class Operations {
 
     const addedGlobalNamedExpressions = this.updateNamedExpressionsForMovedCells(sourceLeftCorner, width, height, destinationLeftCorner)
 
-    return {version: version!, overwrittenCellsData: currentDataAtTarget, addedGlobalNamedExpressions: addedGlobalNamedExpressions}
+    return {
+      version: version!,
+      overwrittenCellsData: currentDataAtTarget,
+      addedGlobalNamedExpressions: addedGlobalNamedExpressions
+    }
   }
 
   public addNamedExpression(expressionName: string, expression: RawCellContent, sheetId?: number, options?: NamedExpressionOptions) {
@@ -319,7 +323,7 @@ export class Operations {
     this.adjustNamedExpressionEdges(restoredNamedExpression, expressionName, sheetId)
   }
 
-  public changeNamedExpressionExpression(expressionName: string, newExpression: RawCellContent, sheetId?: number, options?: NamedExpressionOptions): [InternalNamedExpression, ClipboardCell]  {
+  public changeNamedExpressionExpression(expressionName: string, newExpression: RawCellContent, sheetId?: number, options?: NamedExpressionOptions): [InternalNamedExpression, ClipboardCell] {
     const namedExpression = this.namedExpressions.namedExpressionForScope(expressionName, sheetId)
     if (!namedExpression) {
       throw new NamedExpressionDoesNotExistError(expressionName)
@@ -686,22 +690,21 @@ export class Operations {
   }
 
   private adjustNamedExpressionEdges(namedExpression: InternalNamedExpression, expressionName: string, sheetId?: number) {
-    if (sheetId !== undefined) {
-      const localVertex = this.dependencyGraph.fetchCellOrCreateEmpty(namedExpression.address)
-      const globalNamedExpression = this.namedExpressions.workbookNamedExpressionOrPlaceholder(expressionName)
-      const globalVertex = this.dependencyGraph.fetchCellOrCreateEmpty(globalNamedExpression.address)
-      for (const adjacentNode of this.dependencyGraph.graph.adjacentNodes(globalVertex)) {
-        if ((adjacentNode instanceof FormulaCellVertex || adjacentNode instanceof MatrixVertex) && adjacentNode.cellAddress.sheet === sheetId) {
-          const ast = adjacentNode.getFormula(this.lazilyTransformingAstService)
-          if (ast) {
-            const formulaAddress = adjacentNode.getAddress(this.lazilyTransformingAstService)
-            const {dependencies} = this.parser.fetchCachedResultForAst(ast)
-            for (const dependency of absolutizeDependencies(dependencies, formulaAddress)) {
-              if (dependency instanceof NamedExpressionDependency && dependency.name.toLowerCase() === namedExpression.displayName.toLowerCase()) {
-                this.dependencyGraph.graph.removeEdge(globalVertex, adjacentNode)
-                this.dependencyGraph.graph.addEdge(localVertex, adjacentNode)
-              }
-            }
+    if (sheetId === undefined) {
+      return
+    }
+    const localVertex = this.dependencyGraph.fetchCellOrCreateEmpty(namedExpression.address)
+    const globalNamedExpression = this.namedExpressions.workbookNamedExpressionOrPlaceholder(expressionName)
+    const globalVertex = this.dependencyGraph.fetchCellOrCreateEmpty(globalNamedExpression.address)
+    for (const adjacentNode of this.dependencyGraph.graph.adjacentNodes(globalVertex)) {
+      if (adjacentNode instanceof FormulaCellVertex && adjacentNode.cellAddress.sheet === sheetId) {
+        const ast = adjacentNode.getFormula(this.lazilyTransformingAstService)
+        const formulaAddress = adjacentNode.getAddress(this.lazilyTransformingAstService)
+        const {dependencies} = this.parser.fetchCachedResultForAst(ast)
+        for (const dependency of absolutizeDependencies(dependencies, formulaAddress)) {
+          if (dependency instanceof NamedExpressionDependency && dependency.name.toLowerCase() === namedExpression.displayName.toLowerCase()) {
+            this.dependencyGraph.graph.removeEdge(globalVertex, adjacentNode)
+            this.dependencyGraph.graph.addEdge(localVertex, adjacentNode)
           }
         }
       }
