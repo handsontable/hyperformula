@@ -203,23 +203,23 @@ export class DateTimePlugin extends FunctionPlugin {
         {argumentType: ArgumentTypes.RANGE, optionalArg: true}
       ],
     },
-    // 'WORKDAY': {
-    //   method: 'workday',
-    //   parameters: [
-    //     {argumentType: ArgumentTypes.NUMBER, minValue: 0},
-    //     {argumentType: ArgumentTypes.NUMBER, minValue: 0},
-    //     {argumentType: ArgumentTypes.RANGE, optionalArg: true}
-    //   ],
-    // },
-    // 'WORKDAY.INTL': {
-    //   method: 'workdayintl',
-    //   parameters: [
-    //     {argumentType: ArgumentTypes.NUMBER, minValue: 0},
-    //     {argumentType: ArgumentTypes.NUMBER, minValue: 0},
-    //     {argumentType: ArgumentTypes.NOERROR, defaultValue: 1},
-    //     {argumentType: ArgumentTypes.RANGE, optionalArg: true}
-    //   ],
-    // },
+    'WORKDAY': {
+      method: 'workday',
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER, minValue: 0},
+        {argumentType: ArgumentTypes.NUMBER, minValue: 0},
+        {argumentType: ArgumentTypes.RANGE, optionalArg: true}
+      ],
+    },
+    'WORKDAY.INTL': {
+      method: 'workdayintl',
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER, minValue: 0},
+        {argumentType: ArgumentTypes.NUMBER, minValue: 0},
+        {argumentType: ArgumentTypes.NOERROR, defaultValue: 1},
+        {argumentType: ArgumentTypes.RANGE, optionalArg: true}
+      ],
+    },
   }
 
   /**
@@ -581,17 +581,17 @@ export class DateTimePlugin extends FunctionPlugin {
       )
   }
 
-  // public workday(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-  //   return this.runFunction(ast.args, formulaAddress, this.metadata('WORKDAY'),
-  //     (start, end, holidays) => this.workdaycore(start, end, 1, holidays)
-  //   )
-  // }
-  //
-  // public workdayintl(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-  //   return this.runFunction(ast.args, formulaAddress, this.metadata('WORKDAY.INTL'),
-  //     (start, end, weekend, holidays) => this.workdaycore(start, end, weekend, holidays)
-  //   )
-  // }
+  public workday(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('WORKDAY'),
+      (start, end, holidays) => this.workdaycore(start, end, 1, holidays)
+    )
+  }
+
+  public workdayintl(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('WORKDAY.INTL'),
+      (start, end, weekend, holidays) => this.workdaycore(start, end, weekend, holidays)
+    )
+  }
 
   private networkdayscore(start: number, end: number, weekend: InternalNoErrorCellValue, holidays?: SimpleRangeValue): InternalScalarValue {
     start = Math.trunc(start)
@@ -632,6 +632,78 @@ export class DateTimePlugin extends FunctionPlugin {
     return this.countWorkdays(start, end, weekendPattern, filteredHolidays)
   }
 
+  private workdaycore(start: number, delta: number, weekend: InternalNoErrorCellValue, holidays?: SimpleRangeValue): InternalScalarValue {
+    start = Math.trunc(start)
+    delta = Math.trunc(delta)
+
+    if(typeof weekend !== 'number' && typeof weekend !== 'string') {
+      return new CellError(ErrorType.VALUE, ErrorMessage.WrongType)
+    }
+
+    let weekendPattern: Maybe<string>
+
+    if(typeof weekend === 'string') {
+      if(weekend.length !== 7 || !/^(0|1)*$/.test(weekend) || weekend === '1111111') {
+        return new CellError(ErrorType.NUM, ErrorMessage.WeekendString)
+      } else {
+        weekendPattern = weekend
+      }
+    } else {
+      weekendPattern = workdayPatterns.get(weekend)
+      if(weekendPattern === undefined) {
+        return new CellError(ErrorType.NUM, ErrorMessage.BadMode)
+      }
+    }
+
+    const uniqueHolidays = (holidays !== undefined) ? simpleRangeToUniqueNumbers(holidays) : []
+    if(uniqueHolidays instanceof CellError) {
+      return uniqueHolidays
+    }
+
+    const filteredHolidays = uniqueHolidays.filter((arg) => {
+      const val = this.interpreter.dateHelper.relativeNumberToAbsoluteNumber(arg)
+      const i = (val-1)%7
+      return (weekendPattern!.charAt(i) === '0')
+    })
+
+    if(delta > 0) {
+      let upper = 1
+      while(this.countWorkdays(start+1, start+upper, weekendPattern, filteredHolidays) < delta) {
+        upper *= 2
+      }
+      let lower = 1
+      while(lower+1<upper) {
+        const mid = Math.trunc((lower+upper)/2)
+        if(this.countWorkdays(start+1, start+mid, weekendPattern, filteredHolidays) < delta) {
+          lower = mid
+        } else {
+          upper = mid
+        }
+      }
+      return start+upper
+    } else if (delta < 0) {
+      delta *= -1
+      let upper = 1
+      while(this.countWorkdays(start-upper, start-1, weekendPattern, filteredHolidays) < delta) {
+        upper *= 2
+      }
+      let lower = 1
+      while(lower+1<upper) {
+        const mid = Math.trunc((lower+upper)/2)
+        if(this.countWorkdays(start-mid, start-1, weekendPattern, filteredHolidays) < delta) {
+          lower = mid
+        } else {
+          upper = mid
+        }
+      }
+      return start-upper
+    } else {
+      return start
+    }
+
+  }
+
+
   private countWorkdays(start: number, end: number, weekendPattern: string, sortedHolidays: number[]): number {
     const absoluteEnd = Math.floor(this.interpreter.dateHelper.relativeNumberToAbsoluteNumber(end))
     const absoluteStart = Math.floor(this.interpreter.dateHelper.relativeNumberToAbsoluteNumber(start))
@@ -643,16 +715,7 @@ export class DateTimePlugin extends FunctionPlugin {
       }
     }
 
-
-    // sortedHolidays.forEach((arg) => {
-    //   if(arg>=start && arg < end+1) {
-    //     ans--
-    //   }
-    // })
-    const low = binsearch(start, sortedHolidays)
-    const high = binsearch(end+1, sortedHolidays)
-    ans -= high - low
-    // ans -= binsearch(end+1, sortedHolidays)- binsearch(start, sortedHolidays)
+    ans -= binsearch(end+1, sortedHolidays)- binsearch(start, sortedHolidays)
 
     return ans
   }
@@ -676,7 +739,7 @@ function binsearch(val: number, sortedArray: number[]): number {
   let lower = 0 //sortedArray[lower] < val
   let upper = sortedArray.length-1 //sortedArray[upper] >= val
   while(lower+1<upper) {
-    let mid = Math.floor((upper+lower)/2)
+    const mid = Math.floor((upper+lower)/2)
     if(sortedArray[mid] >= val) {
       upper = mid
     } else {
