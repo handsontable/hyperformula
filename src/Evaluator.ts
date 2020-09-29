@@ -12,7 +12,6 @@ import {ContentChanges} from './ContentChanges'
 import {DateTimeHelper} from './DateTimeHelper'
 import {DependencyGraph, FormulaCellVertex, MatrixVertex, RangeVertex, Vertex} from './DependencyGraph'
 import {ErrorMessage} from './error-message'
-import {fixNegativeZero, isNumberOverflow} from './interpreter/ArithmeticHelper'
 import {FunctionRegistry} from './interpreter/FunctionRegistry'
 import {Interpreter} from './interpreter/Interpreter'
 import {InterpreterValue, SimpleRangeValue} from './interpreter/InterpreterValue'
@@ -170,12 +169,6 @@ export class Evaluator {
     const interpreterValue = this.interpreter.evaluateAst(ast, formulaAddress)
     if (interpreterValue instanceof SimpleRangeValue) {
       return interpreterValue
-    } else if (typeof interpreterValue === 'number') {
-      if (isNumberOverflow(interpreterValue)) {
-        return new CellError(ErrorType.NUM, ErrorMessage.Infinity)
-      } else {
-        return fixNegativeZero(interpreterValue)
-      }
     } else if (interpreterValue === EmptyValue && this.config.evaluateNullToZero) {
       return 0
     } else {

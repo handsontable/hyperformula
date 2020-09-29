@@ -7,9 +7,11 @@ describe('Function SQRT', () => {
   it('should return error for negative numbers', () => {
     const engine = HyperFormula.buildFromArray([
       ['=SQRT(-2)'],
+      ['=SQRT(-2)+1']
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM, ErrorMessage.Infinity))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM, ErrorMessage.NaN))
+    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NUM, ErrorMessage.NaN))
   })
 
   it('should return error for wrong number of arguments', () => {
