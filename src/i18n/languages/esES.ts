@@ -137,6 +137,7 @@ export const dictionary: RawTranslationPackage = {
     MOD: 'RESIDUO',
     MONTH: 'MES',
     NA: 'NOD',
+    NETWORKDAYS: 'DIAS.LAB',
     NOMINAL: 'TASA.NOMINAL',
     NOT: 'NO',
     NOW: 'AHORA',

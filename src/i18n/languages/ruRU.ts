@@ -137,6 +137,7 @@ const dictionary: RawTranslationPackage = {
     MOD: 'ОСТАТ',
     MONTH: 'МЕСЯЦ',
     NA: 'НД',
+    NETWORKDAYS: 'ЧИСТРАБДНИ',
     NOMINAL: 'НОМИНАЛ',
     NOT: 'НЕ',
     NOW: 'ТДАТА',

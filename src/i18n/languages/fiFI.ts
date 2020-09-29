@@ -137,6 +137,7 @@ const dictionary: RawTranslationPackage = {
     MOD: 'JAKOJ',
     MONTH: 'KUUKAUSI',
     NA: 'PUUTTUU',
+    NETWORKDAYS: 'TYÖPÄIVÄT',
     NOMINAL: 'KORKO.VUOSI',
     NOT: 'EI',
     NOW: 'NYT',
