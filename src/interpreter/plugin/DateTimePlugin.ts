@@ -643,14 +643,47 @@ export class DateTimePlugin extends FunctionPlugin {
       }
     }
 
-    sortedHolidays.forEach((arg) => {
-      if(arg>=start && arg <= end) {
-        ans--
-      }
-    })
+
+    // sortedHolidays.forEach((arg) => {
+    //   if(arg>=start && arg < end+1) {
+    //     ans--
+    //   }
+    // })
+    const low = binsearch(start, sortedHolidays)
+    const high = binsearch(end+1, sortedHolidays)
+    ans -= high - low
+    // ans -= binsearch(end+1, sortedHolidays)- binsearch(start, sortedHolidays)
 
     return ans
   }
+}
+
+/**
+ * Returns i such that:
+ * sortedArray[i-1] < val <= sortedArray[i]
+ *
+ */
+function binsearch(val: number, sortedArray: number[]): number {
+  if(sortedArray.length === 0) {
+    return 0
+  }
+  if(val <= sortedArray[0]) {
+    return 0
+  }
+  if(sortedArray[sortedArray.length-1] < val) {
+    return sortedArray.length
+  }
+  let lower = 0 //sortedArray[lower] < val
+  let upper = sortedArray.length-1 //sortedArray[upper] >= val
+  while(lower+1<upper) {
+    let mid = Math.floor((upper+lower)/2)
+    if(sortedArray[mid] >= val) {
+      upper = mid
+    } else {
+      lower = mid
+    }
+  }
+  return upper
 }
 
 function simpleRangeToUniqueNumbers(range: SimpleRangeValue): (number[] | CellError) {
@@ -673,7 +706,7 @@ function simpleRangeToUniqueNumbers(range: SimpleRangeValue): (number[] | CellEr
       return new CellError(ErrorType.VALUE, ErrorMessage.WrongType)
     }
   }
-  return [...new Set(processedHolidays)]
+  return [...new Set(processedHolidays)].sort(function(a, b){return a-b})
 }
 
 const weekdayOffsets = new Map([[1, 0], [2, 1], [11, 1], [12, 2], [13, 3], [14, 4], [15, 5], [16, 6], [17, 0]])
