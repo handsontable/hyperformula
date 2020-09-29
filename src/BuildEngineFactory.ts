@@ -6,7 +6,7 @@
 import {LazilyTransformingAstService} from './LazilyTransformingAstService'
 import {CellContentParser} from './CellContentParser'
 import {Exporter} from './CellValue'
-import {buildColumnSearchStrategy, ColumnSearchStrategy} from './ColumnSearch/ColumnSearchStrategy'
+import {buildColumnSearchStrategy, ColumnSearchStrategy} from './Lookup/SearchStrategy'
 import {Config, ConfigParams} from './Config'
 import {DateTimeHelper} from './DateTimeHelper'
 import {CrudOperations} from './CrudOperations'

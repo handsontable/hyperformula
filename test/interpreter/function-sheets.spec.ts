@@ -24,9 +24,9 @@ describe('Function SHEETS', () => {
   it('should return VALUE for non-reference parameter', () => {
     const engine = HyperFormula.buildFromArray([['=SHEETS(1)', '=SHEETS("foo")', '=SHEETS(TRUE())']])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessage.CellRef))
-    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessage.CellRef))
-    expect(engine.getCellValue(adr('C1'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessage.CellRef))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessage.CellRefExpected))
+    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessage.CellRefExpected))
+    expect(engine.getCellValue(adr('C1'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessage.CellRefExpected))
   })
 
   it('should propagate errors', () => {

@@ -9,14 +9,18 @@ import {Config} from '../Config'
 import {DependencyGraph} from '../DependencyGraph'
 import {rangeLowerBound} from '../interpreter/binarySearch'
 import {Matrix} from '../Matrix'
-import {ColumnSearchStrategy} from './ColumnSearchStrategy'
+import {ColumnSearchStrategy} from './SearchStrategy'
 import {ColumnsSpan} from '../Span'
+import {AdvancedFind} from './AdvancedFind'
 
-export class ColumnBinarySearch implements ColumnSearchStrategy {
+export class ColumnBinarySearch extends AdvancedFind implements ColumnSearchStrategy {
   constructor(
-    private dependencyGraph: DependencyGraph,
+    protected dependencyGraph: DependencyGraph,
     private config: Config,
-  ) {}
+  ) {
+    super(dependencyGraph)
+  }
+
   // eslint-disable-next-line @typescript-eslint/no-unused-vars 
   public add(value: InternalScalarValue | Matrix, address: SimpleCellAddress): void {}
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -37,31 +41,12 @@ export class ColumnBinarySearch implements ColumnSearchStrategy {
   public destroy(): void {}
 
   public find(key: InternalNoErrorCellValue, range: AbsoluteCellRange, sorted: boolean): number {
-    if (range.height() < this.config.vlookupThreshold || !sorted) {
-      const values = this.computeListOfValuesInRange(range)
+    if (range.height() < this.config.binarySearchThreshold || !sorted) {
+      const values = this.dependencyGraph.computeListOfValuesInRange(range)
       const index =  values.indexOf(key)
       return index < 0 ? index : index + range.start.row
     } else {
-      return rangeLowerBound(range, key, this.dependencyGraph)
+      return rangeLowerBound(range, key, this.dependencyGraph, 'row')
     }
-  }
-
-  public advancedFind(keyMatcher: (arg: InternalScalarValue) => boolean, range: AbsoluteCellRange): number {
-    const values = this.computeListOfValuesInRange(range)
-    for(let i=0; i<values.length; i++) {
-      if(keyMatcher(values[i])) {
-        return i + range.start.row
-      }
-    }
-    return -1
-  }
-
-  private computeListOfValuesInRange(range: AbsoluteCellRange): InternalScalarValue[] {
-    const values: InternalScalarValue[] = []
-    for (const cellFromRange of range.addresses(this.dependencyGraph)) {
-      const value = this.dependencyGraph.getScalarValue(cellFromRange)
-      values.push(value)
-    }
-    return values
   }
 }

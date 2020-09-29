@@ -33,7 +33,7 @@ export class ErrorMessage {
   public static NotOctal = 'String does not represent an octal number.'
   public static NotHex = 'String does not represent a hexadecimal number.'
   public static EndStartPeriod = 'End period needs to be at least start period.'
-  public static CellRef = 'Cell reference expected.'
+  public static CellRefExpected = 'Cell reference expected.'
   public static BadRef = 'Address is not correct.'
   public static NumberRange = 'Number-only range expected.'
   public static ValueNotFound = 'Value not found.'
