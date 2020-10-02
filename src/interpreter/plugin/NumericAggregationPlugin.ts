@@ -11,7 +11,7 @@ import {Maybe} from '../../Maybe'
 import {AstNodeType, CellRangeAst, ProcedureAst} from '../../parser'
 import {coerceBooleanToNumber} from '../ArithmeticHelper'
 import {SimpleRangeValue} from '../InterpreterValue'
-import {FunctionPlugin} from './FunctionPlugin'
+import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
 import {ColumnRangeAst, RowRangeAst} from '../../parser/Ast'
 
 export type BinaryOperation<T> = (left: T, right: T) => T
@@ -91,6 +91,14 @@ export class NumericAggregationPlugin extends FunctionPlugin {
     'AVERAGEA': {
       method: 'averagea',
     },
+    'SUBTOTAL': {
+      method: 'subtotal',
+      parameters: [
+        { argumentType: ArgumentTypes.NUMBER },
+        { argumentType: ArgumentTypes.RANGE }
+      ],
+      repeatLastArgs: 1
+    }
   }
 
   /**
@@ -234,6 +242,12 @@ export class NumericAggregationPlugin extends FunctionPlugin {
     } else {
       return result.averageValue() ?? new CellError(ErrorType.DIV_BY_ZERO)
     }
+  }
+
+  public subtotal(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('SUBTOTAL'), (type: number, ...args: SimpleRangeValue[]) => {
+      return 0
+    })
   }
 
   private addWithEpsilon = (left: number, right: number): number => this.interpreter.arithmeticHelper.addWithEpsilon(left, right)

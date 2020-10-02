@@ -177,6 +177,7 @@ const dictionary: RawTranslationPackage = {
     SLN: 'DPD',
     SPLIT: 'SPLIT',
     SQRT: 'RAIZ',
+    SUBTOTAL: 'SUBTOTAL',
     SUM: 'SOMA',
     SUMIF: 'SOMASE',
     SUMIFS: 'SOMASES',

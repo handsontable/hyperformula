@@ -177,6 +177,7 @@ export const dictionary: RawTranslationPackage = {
     SLN: 'SLN',
     SPLIT: 'SPLIT',
     SQRT: 'RAIZ',
+    SUBTOTAL: 'SUBTOTALES',
     SUM: 'SUMA',
     SUMIF: 'SUMAR.SI',
     SUMIFS: 'SUMAR.SI.CONJUNTO',

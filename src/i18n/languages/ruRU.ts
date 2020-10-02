@@ -177,6 +177,7 @@ const dictionary: RawTranslationPackage = {
     SLN: 'АПЛ',
     SPLIT: 'SPLIT',
     SQRT: 'КОРЕНЬ',
+    SUBTOTAL: 'ПРОМЕЖУТОЧНЫЕ.ИТОГИ',
     SUM: 'СУММ',
     SUMIF: 'СУММЕСЛИ',
     SUMIFS: 'СУММЕСЛИМН',

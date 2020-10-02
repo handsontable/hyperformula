@@ -177,6 +177,7 @@ const dictionary: RawTranslationPackage = {
     SLN: 'LCSA',
     SPLIT: 'SPLIT',
     SQRT: 'GYÖK',
+    SUBTOTAL: 'RÉSZÖSSZEG',
     SUM: 'SZUM',
     SUMIF: 'SZUMHA',
     SUMIFS: 'SZUMHATÖBB',
