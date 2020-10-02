@@ -707,7 +707,7 @@ export class DateTimePlugin extends FunctionPlugin {
       .filter((arg) => {
       const val = this.interpreter.dateHelper.relativeNumberToAbsoluteNumber(arg)
       const i = (val-1)%7
-      return (weekendPattern!.charAt(i) === '0')
+      return (weekendPattern.charAt(i) === '0')
     })
   }
 
