@@ -596,8 +596,10 @@ export class DateTimePlugin extends FunctionPlugin {
   private networkdayscore(start: number, end: number, weekend: InternalNoErrorCellValue, holidays?: SimpleRangeValue): InternalScalarValue {
     start = Math.trunc(start)
     end = Math.trunc(end)
+    let multiplier = 1
     if(start>end) {
       [start, end] = [end, start]
+      multiplier = -1
     }
     if(typeof weekend !== 'number' && typeof weekend !== 'string') {
       return new CellError(ErrorType.VALUE, ErrorMessage.WrongType)
@@ -629,7 +631,7 @@ export class DateTimePlugin extends FunctionPlugin {
       return (weekendPattern!.charAt(i) === '0')
     })
 
-    return this.countWorkdays(start, end, weekendPattern, filteredHolidays)
+    return multiplier * this.countWorkdays(start, end, weekendPattern, filteredHolidays)
   }
 
   private workdaycore(start: number, delta: number, weekend: InternalNoErrorCellValue, holidays?: SimpleRangeValue): InternalScalarValue {
@@ -715,7 +717,7 @@ export class DateTimePlugin extends FunctionPlugin {
       }
     }
 
-    ans -= binsearch(end+1, sortedHolidays)- binsearch(start, sortedHolidays)
+    ans -= lowerbound(end+1, sortedHolidays)- lowerbound(start, sortedHolidays)
 
     return ans
   }
@@ -726,7 +728,7 @@ export class DateTimePlugin extends FunctionPlugin {
  * sortedArray[i-1] < val <= sortedArray[i]
  *
  */
-function binsearch(val: number, sortedArray: number[]): number {
+function lowerbound(val: number, sortedArray: number[]): number {
   if(sortedArray.length === 0) {
     return 0
   }

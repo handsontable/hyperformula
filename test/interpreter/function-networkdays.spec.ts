@@ -22,7 +22,7 @@ describe('Function NETWORKDAYS', () => {
     expect(engine.getCellValue(adr('A1'))).toEqual(0)
     expect(engine.getCellValue(adr('A2'))).toEqual(5)
     expect(engine.getCellValue(adr('A3'))).toEqual(5)
-    expect(engine.getCellValue(adr('A4'))).toEqual(5)
+    expect(engine.getCellValue(adr('A4'))).toEqual(-5)
   })
 
   it('this year', () => {
@@ -67,7 +67,7 @@ describe('Function NETWORKDAYS', () => {
     ])
     expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessage.WrongType))
     expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessage.WrongType))
-    expect(engine.getCellValue(adr('A4'))).toEqual(715)
+    expect(engine.getCellValue(adr('A4'))).toEqual(-715)
     expect(engine.getCellValue(adr('A5'))).toEqual(detailedError(ErrorType.NA))
   })
 })
