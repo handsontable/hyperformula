@@ -601,23 +601,10 @@ export class DateTimePlugin extends FunctionPlugin {
       [start, end] = [end, start]
       multiplier = -1
     }
-    if(typeof weekend !== 'number' && typeof weekend !== 'string') {
-      return new CellError(ErrorType.VALUE, ErrorMessage.WrongType)
-    }
 
-    let weekendPattern: Maybe<string>
-
-    if(typeof weekend === 'string') {
-      if(weekend.length !== 7 || !/^(0|1)*$/.test(weekend)) {
-        return new CellError(ErrorType.NUM, ErrorMessage.WeekendString)
-      } else {
-        weekendPattern = weekend
-      }
-    } else {
-      weekendPattern = workdayPatterns.get(weekend)
-      if(weekendPattern === undefined) {
-        return new CellError(ErrorType.NUM, ErrorMessage.BadMode)
-      }
+    const weekendPattern = computeWeekendPattern(weekend)
+    if(weekendPattern instanceof CellError) {
+      return weekendPattern
     }
 
     const uniqueHolidays = (holidays !== undefined) ? simpleRangeToUniqueNumbers(holidays) : []
@@ -638,23 +625,12 @@ export class DateTimePlugin extends FunctionPlugin {
     start = Math.trunc(start)
     delta = Math.trunc(delta)
 
-    if(typeof weekend !== 'number' && typeof weekend !== 'string') {
-      return new CellError(ErrorType.VALUE, ErrorMessage.WrongType)
+    if(weekend === '1111111') {
+      return new CellError(ErrorType.NUM, ErrorMessage.WeekendString)
     }
-
-    let weekendPattern: Maybe<string>
-
-    if(typeof weekend === 'string') {
-      if(weekend.length !== 7 || !/^(0|1)*$/.test(weekend) || weekend === '1111111') {
-        return new CellError(ErrorType.NUM, ErrorMessage.WeekendString)
-      } else {
-        weekendPattern = weekend
-      }
-    } else {
-      weekendPattern = workdayPatterns.get(weekend)
-      if(weekendPattern === undefined) {
-        return new CellError(ErrorType.NUM, ErrorMessage.BadMode)
-      }
+    const weekendPattern = computeWeekendPattern(weekend)
+    if(weekendPattern instanceof CellError) {
+      return weekendPattern
     }
 
     const uniqueHolidays = (holidays !== undefined) ? simpleRangeToUniqueNumbers(holidays) : []
@@ -717,7 +693,7 @@ export class DateTimePlugin extends FunctionPlugin {
       }
     }
 
-    ans -= lowerbound(end+1, sortedHolidays)- lowerbound(start, sortedHolidays)
+    ans -= lowerBound(end+1, sortedHolidays)- lowerBound(start, sortedHolidays)
 
     return ans
   }
@@ -728,7 +704,7 @@ export class DateTimePlugin extends FunctionPlugin {
  * sortedArray[i-1] < val <= sortedArray[i]
  *
  */
-function lowerbound(val: number, sortedArray: number[]): number {
+function lowerBound(val: number, sortedArray: number[]): number {
   if(sortedArray.length === 0) {
     return 0
   }
@@ -774,6 +750,21 @@ function simpleRangeToUniqueNumbers(range: SimpleRangeValue): (number[] | CellEr
   return [...new Set(processedHolidays)].sort(function(a, b){
 return a-b
 })
+}
+
+function computeWeekendPattern(weekend: InternalNoErrorCellValue): string | CellError {
+  if(typeof weekend !== 'number' && typeof weekend !== 'string') {
+    return new CellError(ErrorType.VALUE, ErrorMessage.WrongType)
+  }
+  if(typeof weekend === 'string') {
+    if(weekend.length !== 7 || !/^(0|1)*$/.test(weekend) || weekend === '1111111') {
+      return new CellError(ErrorType.NUM, ErrorMessage.WeekendString)
+    } else {
+      return weekend
+    }
+  } else {
+    return workdayPatterns.get(weekend) ?? new CellError(ErrorType.NUM, ErrorMessage.BadMode)
+  }
 }
 
 const weekdayOffsets = new Map([[1, 0], [2, 1], [11, 1], [12, 2], [13, 3], [14, 4], [15, 5], [16, 6], [17, 0]])
