@@ -7,7 +7,7 @@ describe('SUMSQ', () => {
   it('SUMSQ without args',  () => {
     const engine = HyperFormula.buildFromArray([['=SUMSQ()']])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
   })
 
   it('SUMSQ with args', () => {
@@ -80,6 +80,6 @@ describe('SUMSQ', () => {
       ['=SUMSQ(A1:B2)'],
     ])
 
-    expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.DIV_BY_ZERO))
+    expect(engine.getCellValue(adr('A3'))).toEqualError(detailedError(ErrorType.DIV_BY_ZERO))
   })
 })

@@ -19,7 +19,7 @@ describe('Unary operator MINUS', () => {
     ])
 
     expect(engine.getCellValue(adr('A1'))).toBe(-3)
-    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessage.NumberCoercion))
+    expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.NumberCoercion))
   })
 
   it('pass error', () => {
@@ -29,8 +29,8 @@ describe('Unary operator MINUS', () => {
 
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NAME, ErrorMessage.FunctionName('FOOBAR')))
-    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.DIV_BY_ZERO))
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NAME, ErrorMessage.FunctionName('FOOBAR')))
+    expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.DIV_BY_ZERO))
   })
 
   // Inconsistency with Product 1
@@ -41,7 +41,7 @@ describe('Unary operator MINUS', () => {
       ['3'],
     ])
 
-    expect(engine.getCellValue(adr('B2'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessage.ScalarExpected))
+    expect(engine.getCellValue(adr('B2'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.ScalarExpected))
   })
 
   it('double unary plus', () => {

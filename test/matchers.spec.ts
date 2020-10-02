@@ -5,7 +5,7 @@ import {adr} from './testUtils'
 describe('Matchers', () => {
   it('two values', () => {
     expect(1).toEqualError(1)
-    expect( () =>
+    expect(() =>
       expect(1).toEqualError(2)
     ).toThrow()
   })
@@ -18,13 +18,13 @@ describe('Matchers', () => {
       new CellError(ErrorType.ERROR, '')
     )
 
-    expect( () => expect(
+    expect(() => expect(
       new CellError(ErrorType.ERROR, 'a', adr('A1'))
     ).toEqualError(
       new CellError(ErrorType.ERROR, '', adr('A1'))
     )).toThrow()
 
-    expect( () => expect(
+    expect(() => expect(
       new CellError(ErrorType.NA, '', adr('A1'))
     ).toEqualError(
       new CellError(ErrorType.ERROR, '', adr('A1'))
@@ -38,7 +38,7 @@ describe('Matchers', () => {
       new DetailedCellError(new CellError(ErrorType.ERROR), '', 'A1')
     )
 
-    expect( () =>
+    expect(() =>
       expect(
         new DetailedCellError(new CellError(ErrorType.ERROR), 'a')
       ).toEqualError(
@@ -53,6 +53,5 @@ describe('Matchers', () => {
     ).toEqualError(
       {type: ErrorType.ERROR, message: '', address: undefined}
     )).toThrow()
-
   })
 })

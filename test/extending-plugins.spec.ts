@@ -33,6 +33,6 @@ describe('Plugins', () => {
       ['=foo()'],
     ], {functionPlugins: [FooPlugin]})
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NAME, ErrorMessage.FunctionName('FOO')))
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NAME, ErrorMessage.FunctionName('FOO')))
   })
 })

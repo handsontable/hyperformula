@@ -8,8 +8,8 @@ describe('Function RRI', () => {
       ['=RRI(1,1)', '=RRI(1, 1, 1, 1)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
-    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
+    expect(engine.getCellValue(adr('B1'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
   })
 
   it('should calculate the correct value with correct arguments and defaults', () => {
@@ -23,7 +23,7 @@ describe('Function RRI', () => {
     expect(engine.getCellValue(adr('C1'))).toBeCloseTo(-0.9990234375)
     //inconsistency with product #1 (returns #NUM!)
     expect(engine.getCellValue(adr('A2'))).toBeCloseTo(0)
-    expect(engine.getCellValue(adr('B2'))).toEqual(detailedError(ErrorType.NUM))
-    expect(engine.getCellValue(adr('C2'))).toEqual(detailedError(ErrorType.NUM))
+    expect(engine.getCellValue(adr('B2'))).toEqualError(detailedError(ErrorType.NUM))
+    expect(engine.getCellValue(adr('C2'))).toEqualError(detailedError(ErrorType.NUM))
   })
 })

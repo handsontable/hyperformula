@@ -48,6 +48,6 @@ describe('Interpreter - concatenate operator', () => {
       ['=1/0', '=A1&TRUE()'],
     ])
 
-    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.DIV_BY_ZERO))
+    expect(engine.getCellValue(adr('B1'))).toEqualError(detailedError(ErrorType.DIV_BY_ZERO))
   })
 })

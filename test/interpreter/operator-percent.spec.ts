@@ -20,7 +20,7 @@ describe('Percent operator', () => {
     ])
 
     expect(engine.getCellValue(adr('A1'))).toBe(0.03)
-    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessage.NumberCoercion))
+    expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.NumberCoercion))
     expect(engine.getCellValue(adr('A3'))).toEqual(0.01)
   })
 
@@ -39,7 +39,7 @@ describe('Percent operator', () => {
       ['=FOOBAR()'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NAME, ErrorMessage.FunctionName('FOOBAR')))
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NAME, ErrorMessage.FunctionName('FOOBAR')))
   })
 
   it('works with other operator and coercion', () => {
@@ -56,6 +56,6 @@ describe('Percent operator', () => {
       ['3'],
     ])
 
-    expect(engine.getCellValue(adr('B2'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessage.ScalarExpected))
+    expect(engine.getCellValue(adr('B2'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.ScalarExpected))
   })
 })

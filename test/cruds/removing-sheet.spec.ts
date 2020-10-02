@@ -10,7 +10,7 @@ import {
   expectArrayWithSameContent,
   expectReferenceToHaveRefError,
   expectEngineToBeTheSameAs,
-  extractReference,
+  extractReference, detailedErrorWithOrigin,
 } from '../testUtils'
 
 describe('Removing sheet - checking if its possible', () => {
@@ -225,7 +225,7 @@ describe('remove sheet - adjust formula dependencies', () => {
     const changes = engine.removeSheet('Sheet2')
 
     expect(changes.length).toBe(1)
-    expect(changes).toContainEqual(new ExportedCellChange(simpleCellAddress(0, 0, 0), detailedError(ErrorType.REF)))
+    expect(changes).toContainEqual(new ExportedCellChange(simpleCellAddress(0, 0, 0), detailedErrorWithOrigin(ErrorType.REF, 'Sheet1!A1')))
   })
 })
 

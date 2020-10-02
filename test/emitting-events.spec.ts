@@ -2,7 +2,7 @@ import {HyperFormula, ExportedCellChange, ExportedNamedExpressionChange} from '.
 import {Events} from '../src/Emitter'
 import {ErrorType} from '../src/Cell'
 
-import { adr, detailedError } from './testUtils'
+import {adr, detailedError, detailedErrorWithOrigin} from './testUtils'
 import {NamedExpressionDoesNotExistError} from '../src/errors'
 
 describe('Events', () => {
@@ -28,7 +28,7 @@ describe('Events', () => {
     engine.removeSheet('Sheet2')
 
     expect(handler).toHaveBeenCalledTimes(1)
-    expect(handler).toHaveBeenCalledWith('Sheet2', [new ExportedCellChange(adr('A1'), detailedError(ErrorType.REF))])
+    expect(handler).toHaveBeenCalledWith('Sheet2', [new ExportedCellChange(adr('A1'), detailedErrorWithOrigin(ErrorType.REF, 'Sheet1!A1'))])
   })
 
   it('sheetRemoved name contains actual display name', function() {
@@ -42,7 +42,7 @@ describe('Events', () => {
     engine.removeSheet('sheet2')
 
     expect(handler).toHaveBeenCalledTimes(1)
-    expect(handler).toHaveBeenCalledWith('Sheet2', [new ExportedCellChange(adr('A1'), detailedError(ErrorType.REF))])
+    expect(handler).toHaveBeenCalledWith('Sheet2', [new ExportedCellChange(adr('A1'), detailedErrorWithOrigin(ErrorType.REF, 'Sheet1!A1'))])
   })
 
   it('sheetRenamed works', () => {

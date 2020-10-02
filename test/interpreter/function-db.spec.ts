@@ -8,8 +8,8 @@ describe('Function DB', () => {
       ['=DB(1,1,1)', '=DB(1, 1, 1, 1, 1, 1)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
-    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
+    expect(engine.getCellValue(adr('B1'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
   })
 
   it('should calculate the correct value with correct arguments and defaults', () => {
@@ -40,8 +40,8 @@ describe('Function DB', () => {
     ])
     //product #1 returns #NUM! instead of an actual value
     expect(engine.getCellValue(adr('A1'))).toBeCloseTo(15845.10)
-    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.NUM, ErrorMessage.PeriodLong))
-    expect(engine.getCellValue(adr('C1'))).toEqual(detailedError(ErrorType.NUM, ErrorMessage.PeriodLong))
+    expect(engine.getCellValue(adr('B1'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.PeriodLong))
+    expect(engine.getCellValue(adr('C1'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.PeriodLong))
 
   })
 })
