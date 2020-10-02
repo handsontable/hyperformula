@@ -607,17 +607,10 @@ export class DateTimePlugin extends FunctionPlugin {
       return weekendPattern
     }
 
-    const uniqueHolidays = (holidays !== undefined) ? simpleRangeToUniqueNumbers(holidays) : []
-    if(uniqueHolidays instanceof CellError) {
-      return uniqueHolidays
+    const filteredHolidays = this.simpleRangeToFilteredHolidays(holidays, weekendPattern)
+    if(filteredHolidays instanceof CellError) {
+      return filteredHolidays
     }
-
-    const filteredHolidays = uniqueHolidays.filter((arg) => {
-      const val = this.interpreter.dateHelper.relativeNumberToAbsoluteNumber(arg)
-      const i = (val-1)%7
-      return (weekendPattern!.charAt(i) === '0')
-    })
-
     return multiplier * this.countWorkdays(start, end, weekendPattern, filteredHolidays)
   }
 
@@ -633,16 +626,10 @@ export class DateTimePlugin extends FunctionPlugin {
       return weekendPattern
     }
 
-    const uniqueHolidays = (holidays !== undefined) ? simpleRangeToUniqueNumbers(holidays) : []
-    if(uniqueHolidays instanceof CellError) {
-      return uniqueHolidays
+    const filteredHolidays = this.simpleRangeToFilteredHolidays(holidays, weekendPattern)
+    if(filteredHolidays instanceof CellError) {
+      return filteredHolidays
     }
-
-    const filteredHolidays = uniqueHolidays.filter((arg) => {
-      const val = this.interpreter.dateHelper.relativeNumberToAbsoluteNumber(arg)
-      const i = (val-1)%7
-      return (weekendPattern!.charAt(i) === '0')
-    })
 
     if(delta > 0) {
       let upper = 1
@@ -678,9 +665,7 @@ export class DateTimePlugin extends FunctionPlugin {
     } else {
       return start
     }
-
   }
-
 
   private countWorkdays(start: number, end: number, weekendPattern: string, sortedHolidays: number[]): number {
     const absoluteEnd = Math.floor(this.interpreter.dateHelper.relativeNumberToAbsoluteNumber(end))
@@ -697,6 +682,35 @@ export class DateTimePlugin extends FunctionPlugin {
 
     return ans
   }
+
+  private simpleRangeToFilteredHolidays(holidays: Maybe<SimpleRangeValue>, weekendPattern: string): number[] | CellError {
+    const holidaysArr = holidays?.valuesFromTopLeftCorner() ?? []
+    for(let i=0; i<holidaysArr.length; i++) {
+      const val = holidaysArr[i]
+      if(val instanceof CellError) {
+        return val
+      }
+    }
+    const processedHolidays: number[] = []
+    for(let i=0; i<holidaysArr.length; i++) {
+      const val = holidaysArr[i] as InternalNoErrorCellValue
+      if(val === EmptyValue) {
+        continue
+      }
+      if(typeof val === 'number') {
+        processedHolidays.push(Math.trunc(val))
+      } else {
+        return new CellError(ErrorType.VALUE, ErrorMessage.WrongType)
+      }
+    }
+    return [...new Set(processedHolidays)].sort((a, b) => a-b)
+      .filter((arg) => {
+      const val = this.interpreter.dateHelper.relativeNumberToAbsoluteNumber(arg)
+      const i = (val-1)%7
+      return (weekendPattern!.charAt(i) === '0')
+    })
+  }
+
 }
 
 /**
@@ -725,31 +739,6 @@ function lowerBound(val: number, sortedArray: number[]): number {
     }
   }
   return upper
-}
-
-function simpleRangeToUniqueNumbers(range: SimpleRangeValue): (number[] | CellError) {
-  const holidaysArr = range?.valuesFromTopLeftCorner()
-  for(let i=0; i<holidaysArr.length; i++) {
-    const val = holidaysArr[i]
-    if(val instanceof CellError) {
-      return val
-    }
-  }
-  const processedHolidays: number[] = []
-  for(let i=0; i<holidaysArr.length; i++) {
-    const val = holidaysArr[i] as InternalNoErrorCellValue
-    if(val === EmptyValue) {
-      continue
-    }
-    if(typeof val === 'number') {
-      processedHolidays.push(Math.trunc(val))
-    } else {
-      return new CellError(ErrorType.VALUE, ErrorMessage.WrongType)
-    }
-  }
-  return [...new Set(processedHolidays)].sort(function(a, b){
-return a-b
-})
 }
 
 function computeWeekendPattern(weekend: InternalNoErrorCellValue): string | CellError {
