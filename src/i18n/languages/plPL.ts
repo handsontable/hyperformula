@@ -150,6 +150,7 @@ const dictionary: RawTranslationPackage = {
     OR: 'LUB',
     PI: 'PI',
     PMT: 'PMT',
+    PRODUCT: 'ILOCZYN',
     POWER: 'POTĘGA',
     PPMT: 'PPMT',
     PROPER: 'Z.WIELKIEJ.LITERY',

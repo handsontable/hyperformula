@@ -150,6 +150,7 @@ const dictionary: RawTranslationPackage = {
     OR: 'O',
     PI: 'PI.GRECO',
     PMT: 'RATA',
+    PRODUCT: 'PRODOTTO',
     POWER: 'POTENZA',
     PPMT: 'P.RATA',
     PROPER: 'MAIUSC.INIZ',

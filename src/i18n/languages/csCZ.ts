@@ -150,6 +150,7 @@ const dictionary: RawTranslationPackage = {
     OR: 'NEBO',
     PI: 'PI',
     PMT: 'PLATBA',
+    PRODUCT: 'SOUČIN',
     POWER: 'POWER',
     PPMT: 'PLATBA.ZÁKLAD',
     PROPER: 'VELKÁ2',

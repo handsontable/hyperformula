@@ -91,6 +91,9 @@ export class NumericAggregationPlugin extends FunctionPlugin {
     'AVERAGEA': {
       method: 'averagea',
     },
+    'PRODUCT': {
+      method: 'product',
+    },
     'SUBTOTAL': {
       method: 'subtotal',
       parameters: [
@@ -183,6 +186,10 @@ export class NumericAggregationPlugin extends FunctionPlugin {
     }
   }
 
+  public product(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.doProduct(ast.args, formulaAddress)
+  }
+
   public subtotal(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     if (ast.args.length < 1) {
       return new CellError(ErrorType.NA, ErrorMessage.WrongArgNumber)
@@ -206,6 +213,9 @@ export class NumericAggregationPlugin extends FunctionPlugin {
       case 5:
       case 105:
         return this.doMin(args, formulaAddress)
+      case 6:
+      case 106:
+        return this.doProduct(args, formulaAddress)
       case 9:
       case 109:
         return this.doSum(args, formulaAddress)
@@ -268,6 +278,10 @@ export class NumericAggregationPlugin extends FunctionPlugin {
 
   private doSum(args: Ast[], formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.reduce(args, formulaAddress, 0, 'SUM', this.addWithEpsilon, identityMap, strictlyNumbers)
+  }
+
+  private doProduct(args: Ast[], formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.reduce(args, formulaAddress, 1, 'PRODUCT', (left, right) => left * right, identityMap, strictlyNumbers)
   }
 
   private addWithEpsilon = (left: number, right: number): number => this.interpreter.arithmeticHelper.addWithEpsilon(left, right)

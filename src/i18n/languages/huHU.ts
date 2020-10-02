@@ -150,6 +150,7 @@ const dictionary: RawTranslationPackage = {
     OR: 'VAGY',
     PI: 'PI',
     PMT: 'RÉSZLET',
+    PRODUCT: 'SZORZAT',
     POWER: 'HATVÁNY',
     PPMT: 'PRÉSZLET',
     PROPER: 'TNÉV',

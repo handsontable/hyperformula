@@ -150,6 +150,7 @@ const dictionary: RawTranslationPackage = {
     OR: 'VEYA',
     PI: 'Pİ',
     PMT: 'DEVRESEL_ÖDEME',
+    PRODUCT: 'ÇARPIM',
     POWER: 'KUVVET',
     PPMT: 'ANA_PARA_ÖDEMESİ',
     PROPER: 'YAZIM.DÜZENİ',

@@ -150,6 +150,7 @@ export const dictionary: RawTranslationPackage = {
     OR: 'O',
     PI: 'PI',
     PMT: 'PAGO',
+    PRODUCT: 'PRODUCTO',
     POWER: 'POTENCIA',
     PPMT: 'PAGOPRIN',
     PROPER: 'NOMPROPIO',

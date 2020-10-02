@@ -68,6 +68,19 @@ describe('Function SUBTOTAL', () => {
     expect(engine.getCellValue(adr('B1'))).toEqual(2)
   })
 
+  it('should calculate PRODUCT', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=SUBTOTAL(6, A2:A4, A5)', '=SUBTOTAL(106, A2:A4, A5)'],
+      [3],
+      [5],
+      [2],
+      [4]
+    ])
+
+    expect(engine.getCellValue(adr('A1'))).toEqual(120)
+    expect(engine.getCellValue(adr('B1'))).toEqual(120)
+  })
+
   it('should calculate SUM', () => {
     const engine = HyperFormula.buildFromArray([
       ['=SUBTOTAL(9, A2:A4, A5)', '=SUBTOTAL(109, A2:A4, A5)'],
