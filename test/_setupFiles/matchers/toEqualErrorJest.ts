@@ -20,8 +20,9 @@ export const toEqualMatcherJest: jest.ExpectExtendMap = {toEqualError(received: 
     localExp = {...expected}
     localExp.address = undefined
   }
+  const result = this.equals(localRec, localExp)
   return {
-    pass: this.equals(localRec, localExp),
-    message: () => ''
+    pass: result,
+    message: () => (result ? '' : `Expected ${received} to be match ${expected}.`)
   }
 }}

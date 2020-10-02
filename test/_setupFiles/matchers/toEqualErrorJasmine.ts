@@ -28,9 +28,10 @@ export const toEqualErrorMatcherJasmine: CustomMatcherFactories = {
           localExp = {...expected}
           localExp.address = undefined
         }
+        const result = util.equals(localRec, localExp)
         return {
-          pass: util.equals(received, expected),
-          message: ''
+          pass: result,
+          message: result ? '' : `Expected ${received} to be match ${expected}.`
         }
       },
     }
