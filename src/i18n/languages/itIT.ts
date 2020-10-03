@@ -178,6 +178,7 @@ const dictionary: RawTranslationPackage = {
     SLN: 'AMMORT.COST',
     SPLIT: 'SPLIT',
     SQRT: 'RADQ',
+    'STDEV.P': 'DEV.ST.P',
     SUBSTITUTE: 'SOSTITUISCI',
     SUBTOTAL: 'SUBTOTALE',
     SUM: 'SOMMA',

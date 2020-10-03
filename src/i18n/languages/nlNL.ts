@@ -178,6 +178,7 @@ const dictionary: RawTranslationPackage = {
     SLN: 'LIN.AFSCHR',
     SPLIT: 'SPLIT',
     SQRT: 'WORTEL',
+    'STDEV.P': 'STDEV.P',
     SUBSTITUTE: 'SUBSTITUEREN',
     SUBTOTAL: 'SUBTOTAAL',
     SUM: 'SOM',

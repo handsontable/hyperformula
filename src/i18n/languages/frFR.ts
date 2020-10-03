@@ -178,6 +178,7 @@ const dictionary: RawTranslationPackage = {
     SLN: 'AMORLIN',
     SPLIT: 'SPLIT',
     SQRT: 'RACINE',
+    'STDEV.P': 'ECARTYPE.PEARSON',
     SUBSTITUTE: 'SUBSTITUE',
     SUBTOTAL: 'SOUS.TOTAL',
     SUM: 'SOMME',

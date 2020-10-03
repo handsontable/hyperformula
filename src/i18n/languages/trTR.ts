@@ -178,6 +178,7 @@ const dictionary: RawTranslationPackage = {
     SLN: 'DA',
     SPLIT: 'SPLIT',
     SQRT: 'KAREKÖK',
+    'STDEV.P': 'STDSAPMA.P',
     SUBSTITUTE: 'YERİNEKOY',
     SUBTOTAL: 'ALTTOPLAM   SUMY.CZĘŚCIOWE',
     SUM: 'TOPLA',
