@@ -178,8 +178,8 @@ const dictionary: RawTranslationPackage = {
     SLN: 'SLN',
     SPLIT: 'PODZIEL.TEKST',
     SQRT: 'PIERWIASTEK',
-    'STDEV.P': 'ODCH.STAND.POPUL',
-    'STDEV.S': 'ODCH.STAND.POPUL',
+    'STDEV.P': 'ODCH.STAND.POPUL', //FIXME
+    'STDEV.S': 'ODCH.STANDARD.PRÓBKI', //FIXME
     SUBSTITUTE: 'PODSTAW',
     SUBTOTAL: 'SUMY.CZĘŚCIOWE',
     SUM: 'SUMA',
