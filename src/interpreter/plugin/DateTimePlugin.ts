@@ -618,9 +618,6 @@ export class DateTimePlugin extends FunctionPlugin {
     start = Math.trunc(start)
     delta = Math.trunc(delta)
 
-    if(weekend === '1111111') {
-      return new CellError(ErrorType.NUM, ErrorMessage.WeekendString)
-    }
     const weekendPattern = computeWeekendPattern(weekend)
     if(weekendPattern instanceof CellError) {
       return weekendPattern

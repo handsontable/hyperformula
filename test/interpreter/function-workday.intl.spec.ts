@@ -18,11 +18,13 @@ describe('Function WORKDAY.INTL', () => {
       ['=WORKDAY.INTL(0, 1, "1")'],
       ['=WORKDAY.INTL(0, 1, "1010102")'],
       ['=WORKDAY.INTL(0, 1, -1)'],
+      ['=WORKDAY.INTL(0, 1, "1111111")'],
     ])
     expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessage.WrongType))
     expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NUM, ErrorMessage.WeekendString))
     expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.NUM, ErrorMessage.WeekendString))
     expect(engine.getCellValue(adr('A4'))).toEqual(detailedError(ErrorType.NUM, ErrorMessage.BadMode))
+    expect(engine.getCellValue(adr('A5'))).toEqual(detailedError(ErrorType.NUM, ErrorMessage.WeekendString))
   })
 
   it('works correctly for first two arguments', () => {
