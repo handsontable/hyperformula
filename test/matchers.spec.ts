@@ -1,57 +1,53 @@
-import {DetailedCellError} from '../src'
 import {CellError, ErrorType} from '../src/Cell'
 import {adr} from './testUtils'
+import {DetailedCellError} from '../src'
 
 describe('Matchers', () => {
-  it('two values', () => {
+  it('should compare two simple values', () => {
     expect(1).toEqualError(1)
-    expect(() =>
-      expect(1).toEqualError(2)
-    ).toThrow()
+    expect(1).not.toEqualError(2)
   })
 
 
-  it('two cell errors', () => {
+  it('should compare two cell errors ignoring addresses', () => {
     expect(
       new CellError(ErrorType.ERROR, '', adr('A1'))
     ).toEqualError(
       new CellError(ErrorType.ERROR, '')
     )
 
-    expect(() => expect(
+    expect(
       new CellError(ErrorType.ERROR, 'a', adr('A1'))
-    ).toEqualError(
+    ).not.toEqualError(
       new CellError(ErrorType.ERROR, '', adr('A1'))
-    )).toThrow()
+    )
 
-    expect(() => expect(
+    expect(
       new CellError(ErrorType.NA, '', adr('A1'))
-    ).toEqualError(
+    ).not.toEqualError(
       new CellError(ErrorType.ERROR, '', adr('A1'))
-    )).toThrow()
+    )
   })
 
-  it('two detailed errors', () => {
+  it('compare two detailed errors ignoring addresses', () => {
     expect(
       new DetailedCellError(new CellError(ErrorType.ERROR), '')
     ).toEqualError(
       new DetailedCellError(new CellError(ErrorType.ERROR), '', 'A1')
     )
 
-    expect(() =>
-      expect(
-        new DetailedCellError(new CellError(ErrorType.ERROR), 'a')
-      ).toEqualError(
-        new DetailedCellError(new CellError(ErrorType.ERROR), '', 'A1')
-      )
-    ).toThrow()
+    expect(
+      new DetailedCellError(new CellError(ErrorType.ERROR), 'a')
+    ).not.toEqualError(
+      new DetailedCellError(new CellError(ErrorType.ERROR), '', 'A1')
+    )
   })
 
-  it('two ad-hoc objects', () => {
-    expect(() => expect(
+  it('should compare two ad-hoc objects', () => {
+    expect(
       {type: ErrorType.ERROR, message: '', address: adr('A1')}
     ).toEqualError(
       {type: ErrorType.ERROR, message: '', address: undefined}
-    )).toThrow()
+    )
   })
 })

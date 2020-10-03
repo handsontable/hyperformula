@@ -1,6 +1,3 @@
-import {DetailedCellError} from '../../../src'
-import {CellError} from '../../../src/Cell'
-
 type CustomMatcher = jasmine.CustomMatcher
 type CustomMatcherFactories = jasmine.CustomMatcherFactories
 type CustomMatcherResult = jasmine.CustomMatcherResult
@@ -9,29 +6,27 @@ type MatchersUtil = jasmine.MatchersUtil
 declare global {
   namespace jasmine {
     interface Matchers<T> {
-      toEqualError(expected: object, expectationFailOutput?: string): boolean,
+      toEqualError(expected: any, expectationFailOutput?: string): boolean,
     }
   }
 }
 
 export const toEqualErrorMatcherJasmine: CustomMatcherFactories = {
-  toEqualError: function(util: MatchersUtil): CustomMatcher {
+  toEqualError: function (util: MatchersUtil): CustomMatcher {
     return {
-      compare: function(received: any, expected: any): CustomMatcherResult {
-        let localRec = received
-        if(received instanceof CellError || received instanceof DetailedCellError) {
-          localRec = {...received}
-          localRec.address = undefined
+      compare: function (received: any, expected: any): CustomMatcherResult {
+        let result
+        if (typeof received === 'object' && typeof expected === 'object') {
+          result = util.equals(
+            {...received, address: undefined},
+            {...expected, address: undefined}
+          )
+        } else {
+          result = util.equals(received, expected)
         }
-        let localExp = expected
-        if(expected instanceof CellError || expected instanceof DetailedCellError) {
-          localExp = {...expected}
-          localExp.address = undefined
-        }
-        const result = util.equals(localRec, localExp)
         return {
           pass: result,
-          message: result ? '' : `Expected ${received} to be match ${expected}.`
+          message: result ? '' : `Expected ${JSON.stringify(received, null, 2)} to match ${JSON.stringify(expected, null, 2)}.`
         }
       },
     }

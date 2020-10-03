@@ -32,7 +32,8 @@ module.exports = {
 
   // The paths to modules that run some code to configure or set up the testing environment after each test
   setupFilesAfterEnv: [
-    '<rootDir>/test/_setupFiles/bootstrap.ts'
+    '<rootDir>/test/_setupFiles/bootstrap.ts',
+    '<rootDir>/test/_setupFiles/jest/bootstrap.ts'
   ],
 
   // The test environment that will be used for testing

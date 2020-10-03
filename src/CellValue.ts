@@ -107,7 +107,11 @@ export class Exporter {
   private detailedError(error: CellError): DetailedCellError {
     let address = undefined
     if(error.address !== undefined) {
-      address = simpleCellAddressToString(this.sheetIndexMapping, error.address, -1)
+      if (error.address.sheet === NamedExpressions.SHEET_FOR_WORKBOOK_EXPRESSIONS) {
+        address = this.namedExpressions.namedExpressionInAddress(error.address.row)?.displayName
+      } else {
+        address = simpleCellAddressToString(this.sheetIndexMapping, error.address, -1)
+      }
     }
     return new DetailedCellError(error, this.config.translationPackage.getErrorTranslation(error.type), address)
   }
