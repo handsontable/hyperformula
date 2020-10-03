@@ -179,6 +179,7 @@ const dictionary: RawTranslationPackage = {
     SPLIT: 'SPLIT',
     SQRT: 'RAIZ',
     'STDEV.P': 'DESVPAD.P',
+    'STDEV.S': 'DESVPAD.A',
     SUBSTITUTE: 'SUBSTITUIR',
     SUBTOTAL: 'SUBTOTAL',
     SUM: 'SOMA',

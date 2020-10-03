@@ -179,6 +179,7 @@ const dictionary: RawTranslationPackage = {
     SPLIT: 'SPLIT',
     SQRT: 'NELIÖJUURI',
     'STDEV.P': 'KESKIHAJONTA.P',
+    'STDEV.S': 'KESKIHAJONTA.S',
     SUBSTITUTE: 'VAIHDA',
     SUBTOTAL: 'VÄLISUMMA',
     SUM: 'SUMMA',

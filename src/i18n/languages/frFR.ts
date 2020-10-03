@@ -179,6 +179,7 @@ const dictionary: RawTranslationPackage = {
     SPLIT: 'SPLIT',
     SQRT: 'RACINE',
     'STDEV.P': 'ECARTYPE.PEARSON',
+    'STDEV.S': 'ECARTYPE.STANDARD',
     SUBSTITUTE: 'SUBSTITUE',
     SUBTOTAL: 'SOUS.TOTAL',
     SUM: 'SOMME',
