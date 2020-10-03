@@ -9,10 +9,10 @@ import {CellError, EmptyValue, ErrorType, InternalScalarValue, SimpleCellAddress
 import {ErrorMessage} from '../../error-message'
 import {Maybe} from '../../Maybe'
 import {Ast, AstNodeType, CellRangeAst, ProcedureAst} from '../../parser'
+import {ColumnRangeAst, RowRangeAst} from '../../parser/Ast'
 import {coerceBooleanToNumber} from '../ArithmeticHelper'
 import {SimpleRangeValue} from '../InterpreterValue'
 import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
-import {ColumnRangeAst, RowRangeAst} from '../../parser/Ast'
 
 export type BinaryOperation<T> = (left: T, right: T) => T
 
@@ -32,27 +32,44 @@ function zeroForInfinite(value: InternalScalarValue) {
   }
 }
 
-class AverageResult {
+class MomentsAggregate {
 
-  public static empty = new AverageResult(0, 0)
+  public static empty = new MomentsAggregate(0,0, 0)
 
-  public static single(arg: number): AverageResult {
-    return new AverageResult(arg, 1)
+  public static single(arg: number): MomentsAggregate {
+    return new MomentsAggregate(arg*arg, arg, 1)
   }
 
   constructor(
+    public readonly sumsq: number,
     public readonly sum: number,
     public readonly count: number,
   ) {
   }
 
-  public compose(other: AverageResult) {
-    return new AverageResult(this.sum + other.sum, this.count + other.count)
+  public compose(other: MomentsAggregate) {
+    return new MomentsAggregate(this.sumsq + other.sumsq, this.sum + other.sum, this.count + other.count)
   }
 
   public averageValue(): Maybe<number> {
     if (this.count > 0) {
       return this.sum / this.count
+    } else {
+      return undefined
+    }
+  }
+
+  public varSValue(): Maybe<number> {
+    if(this.count > 1) {
+      return (this.sumsq - (this.sum*this.sum)/this.count)/(this.count-1)
+    } else {
+      return undefined
+    }
+  }
+
+  public varPValue(): Maybe<number> {
+    if(this.count > 0) {
+      return (this.sumsq - (this.sum*this.sum)/this.count)/this.count
     } else {
       return undefined
     }
@@ -93,6 +110,18 @@ export class NumericAggregationPlugin extends FunctionPlugin {
     },
     'PRODUCT': {
       method: 'product',
+    },
+    'VAR.S': {
+      method: 'vars',
+    },
+    'VAR.P': {
+      method: 'varp',
+    },
+    'STDEV.S': {
+      method: 'stdevs',
+    },
+    'STDEV.P': {
+      method: 'stdevp',
     },
     'SUBTOTAL': {
       method: 'subtotal',
@@ -173,9 +202,9 @@ export class NumericAggregationPlugin extends FunctionPlugin {
   }
 
   public averagea(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    const result = this.reduce<AverageResult>(ast.args, formulaAddress, AverageResult.empty, 'AVERAGE',
+    const result = this.reduce<MomentsAggregate>(ast.args, formulaAddress, MomentsAggregate.empty, 'AVERAGEA',
       (left, right) => left.compose(right),
-      (arg): AverageResult => AverageResult.single(arg),
+      (arg): MomentsAggregate => MomentsAggregate.single(arg),
       numbersBooleans
     )
 
@@ -184,6 +213,22 @@ export class NumericAggregationPlugin extends FunctionPlugin {
     } else {
       return result.averageValue() ?? new CellError(ErrorType.DIV_BY_ZERO)
     }
+  }
+
+  public vars(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.doVarS(ast.args, formulaAddress)
+  }
+
+  public varp(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.doVarP(ast.args, formulaAddress)
+  }
+
+  public stdevs(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.doStdevS(ast.args, formulaAddress)
+  }
+
+  public stdevp(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.doStdevP(ast.args, formulaAddress)
   }
 
   public product(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
@@ -216,19 +261,31 @@ export class NumericAggregationPlugin extends FunctionPlugin {
       case 6:
       case 106:
         return this.doProduct(args, formulaAddress)
+      case 7:
+      case 107:
+        return this.doStdevS(args, formulaAddress)
+      case 8:
+      case 108:
+        return this.doStdevP(args, formulaAddress)
       case 9:
       case 109:
         return this.doSum(args, formulaAddress)
+      case 10:
+      case 110:
+        return this.doVarS(args, formulaAddress)
+      case 11:
+      case 111:
+        return this.doVarP(args, formulaAddress)
       default:
-        throw new Error('TODO')
+        return new CellError(ErrorType.VALUE, ErrorMessage.BadMode)
     }
   }
 
   private doAverage(args: Ast[], formulaAddress: SimpleCellAddress): InternalScalarValue {
-    const result = this.reduce<AverageResult>(args, formulaAddress, AverageResult.empty, 'AVERAGE', (left, right) => {
+    const result = this.reduce<MomentsAggregate>(args, formulaAddress, MomentsAggregate.empty, '_AGGREGATE', (left, right) => {
         return left.compose(right)
-      }, (arg): AverageResult => {
-        return AverageResult.single(arg)
+      }, (arg): MomentsAggregate => {
+        return MomentsAggregate.single(arg)
       },
       strictlyNumbers
     )
@@ -237,6 +294,72 @@ export class NumericAggregationPlugin extends FunctionPlugin {
       return result
     } else {
       return result.averageValue() ?? new CellError(ErrorType.DIV_BY_ZERO)
+    }
+  }
+
+  private doVarS(args: Ast[], formulaAddress: SimpleCellAddress): InternalScalarValue {
+    const result = this.reduce<MomentsAggregate>(args, formulaAddress, MomentsAggregate.empty, '_AGGREGATE', (left, right) => {
+        return left.compose(right)
+      }, (arg): MomentsAggregate => {
+        return MomentsAggregate.single(arg)
+      },
+      strictlyNumbers
+    )
+
+    if (result instanceof CellError) {
+      return result
+    } else {
+      return result.varSValue() ?? new CellError(ErrorType.DIV_BY_ZERO)
+    }
+  }
+
+  private doVarP(args: Ast[], formulaAddress: SimpleCellAddress): InternalScalarValue {
+    const result = this.reduce<MomentsAggregate>(args, formulaAddress, MomentsAggregate.empty, '_AGGREGATE', (left, right) => {
+        return left.compose(right)
+      }, (arg): MomentsAggregate => {
+        return MomentsAggregate.single(arg)
+      },
+      strictlyNumbers
+    )
+
+    if (result instanceof CellError) {
+      return result
+    } else {
+      return result.varPValue() ?? new CellError(ErrorType.DIV_BY_ZERO)
+    }
+  }
+
+  private doStdevS(args: Ast[], formulaAddress: SimpleCellAddress): InternalScalarValue {
+    const result = this.reduce<MomentsAggregate>(args, formulaAddress, MomentsAggregate.empty, '_AGGREGATE', (left, right) => {
+        return left.compose(right)
+      }, (arg): MomentsAggregate => {
+        return MomentsAggregate.single(arg)
+      },
+      strictlyNumbers
+    )
+
+    if (result instanceof CellError) {
+      return result
+    } else {
+      const val = result.varSValue()
+      return val === undefined  ? new CellError(ErrorType.DIV_BY_ZERO) : Math.sqrt(val)
+    }
+  }
+
+  private doStdevP(args: Ast[], formulaAddress: SimpleCellAddress): InternalScalarValue {
+    const result = this.reduce<MomentsAggregate>(args, formulaAddress, MomentsAggregate.empty, '_AGGREGATE', (left, right) => {
+        return left.compose(right)
+      }, (arg): MomentsAggregate => {
+        return MomentsAggregate.single(arg)
+      },
+      strictlyNumbers
+    )
+
+    if (result instanceof CellError) {
+      return result
+    } else {
+      const val = result.varPValue()
+      return val === undefined  ? new CellError(ErrorType.DIV_BY_ZERO) : Math.sqrt(val)
     }
   }
 

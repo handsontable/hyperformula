@@ -1,5 +1,6 @@
-import {HyperFormula} from '../../src'
-import {adr} from '../testUtils'
+import {ErrorType, HyperFormula} from '../../src'
+import {ErrorMessage} from '../../src/error-message'
+import {adr, detailedError} from '../testUtils'
 
 describe('Function SUBTOTAL', () => {
   it('should calculate AVERAGE', () => {
@@ -81,6 +82,32 @@ describe('Function SUBTOTAL', () => {
     expect(engine.getCellValue(adr('B1'))).toEqual(120)
   })
 
+  it('should calculate STDEV.S', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=SUBTOTAL(7, A2:A4, A5)', '=SUBTOTAL(107, A2:A4, A5)'],
+      [3],
+      [5],
+      [2],
+      [4]
+    ])
+
+    expect(engine.getCellValue(adr('A1'))).toBeCloseTo(1.29099444873581,6)
+    expect(engine.getCellValue(adr('B1'))).toBeCloseTo(1.29099444873581,6)
+  })
+
+  it('should calculate STDEV.P', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=SUBTOTAL(8, A2:A4, A5)', '=SUBTOTAL(108, A2:A4, A5)'],
+      [3],
+      [5],
+      [2],
+      [4]
+    ])
+
+    expect(engine.getCellValue(adr('A1'))).toBeCloseTo(1.11803398875, 6)
+    expect(engine.getCellValue(adr('B1'))).toBeCloseTo(1.11803398875, 6)
+  })
+
   it('should calculate SUM', () => {
     const engine = HyperFormula.buildFromArray([
       ['=SUBTOTAL(9, A2:A4, A5)', '=SUBTOTAL(109, A2:A4, A5)'],
@@ -92,5 +119,43 @@ describe('Function SUBTOTAL', () => {
 
     expect(engine.getCellValue(adr('A1'))).toEqual(14)
     expect(engine.getCellValue(adr('B1'))).toEqual(14)
+  })
+
+  it('should calculate VAR.S', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=SUBTOTAL(10, A2:A4, A5)', '=SUBTOTAL(110, A2:A4, A5)'],
+      [3],
+      [5],
+      [2],
+      [4]
+    ])
+
+    expect(engine.getCellValue(adr('A1'))).toBeCloseTo(5/3,6)
+    expect(engine.getCellValue(adr('B1'))).toBeCloseTo(5/3, 6)
+  })
+
+  it('should calculate VAR.P', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=SUBTOTAL(11, A2:A4, A5)', '=SUBTOTAL(111, A2:A4, A5)'],
+      [3],
+      [5],
+      [2],
+      [4]
+    ])
+
+    expect(engine.getCellValue(adr('A1'))).toEqual(5/4)
+    expect(engine.getCellValue(adr('B1'))).toEqual(5/4)
+  })
+
+  it('should return correct error', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=SUBTOTAL(12345, A2:A4, A5)'],
+      [3],
+      [5],
+      [2],
+      [4]
+    ])
+
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessage.BadMode))
   })
 })
