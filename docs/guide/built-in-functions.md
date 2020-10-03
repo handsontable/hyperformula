@@ -202,6 +202,7 @@ lets you design your own [custom functions](custom-functions).
 | SIN | Math and trigonometry | Returns the sine of the given angle (in radians). | SIN(Number) |
 | SINH <br><Badge text="v0.2.0"/>| Math and trigonometry | Returns the hyperbolic sine of the given value. | SINH(Number) |
 | SQRT | Math and trigonometry | Returns the positive square root of a number. | SQRT(Number) |
+| SUBTOTAL | Math and trigonometry | Computes aggregation using function specified by number. | SUBTOTAL(Function; Number1; Number2; ... Number30) |
 | SUM | Math and trigonometry | Adds all the numbers in a range of cells. | SUM(Number1; Number2; ...; Number30) |
 | SUMIF | Math and trigonometry | Adds the cells specified by given criteria. | SUMIF(Range; Criteria; Sumrange) |
 | SUMIFS | Math and trigonometry | Returns the sum of the values of cells in a range that meets multiple criteria in multiple ranges. | SUMIFS(Sum_Range ; Criterion_range1 ; Criterion1 [ ; Criterion_range2 ; Criterion2 [;...]]) |
@@ -228,6 +229,10 @@ lets you design your own [custom functions](custom-functions).
 | MEDIAN | Statistical | Returns the median of a set of numbers. | MEDIAN(Number1; Number2; ...Number30) |
 | MIN | Statistical | Returns the minimum value in a list of arguments. | MIN(Number1; Number2; ...Number30) |
 | MINA | Statistical | Returns the minimum value in a list of arguments. | MINA(Value1; Value2; ... Value30) |
+| STDEV.P | Statistical | Returns standard deviation of a population. | STDEV.P(Value1; Value2; ... Value30) |
+| STDEV.S | Statistical | Returns standard deviation of a sample. | STDEV.S(Value1; Value2; ... Value30) |
+| VAR.P | Statistical | Returns variance of a population. | VAR.P(Value1; Value2; ... Value30) |
+| VAR.S | Statistical | Returns variance of a sample. | VAR.S(Value1; Value2; ... Value30) |
 | CHAR | Text | Converts a number into a character according to the current code table. | CHAR(Number) |
 | CLEAN <br><Badge text="v0.2.0"/>| Text | Returns text that has been "cleaned" of line breaks and other non-printable characters. | CLEAN("Text") |
 | CLEAN | Text | Returns text that has been "cleaned" of line breaks and other non-printable characters. | CLEAN("Text") |
