@@ -65,6 +65,7 @@ export class ErrorMessage {
   public static CharacterCodeBounds = 'Character code out of bounds.'
   public static NonZero = 'Argument cannot be 0.'
   public static LessThanOne = 'Argument cannot be less than 1.'
+  public static WeekendString = 'Incorrect weekend bitmask string.'
   public static FunctionName = (arg: string) => `Function name ${arg} not recognized.`
   public static NamedExpressionName = (arg: string) => `Named expression ${arg} not recognized.`
   public static LicenseKey = (arg: string) => `License key is ${arg}.`
