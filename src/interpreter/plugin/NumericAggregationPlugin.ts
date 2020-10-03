@@ -34,7 +34,7 @@ function zeroForInfinite(value: InternalScalarValue) {
 
 class MomentsAggregate {
 
-  public static empty = new MomentsAggregate(0,0, 0)
+  public static empty = new MomentsAggregate(0, 0, 0)
 
   public static single(arg: number): MomentsAggregate {
     return new MomentsAggregate(arg*arg, arg, 1)

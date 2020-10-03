@@ -91,8 +91,8 @@ describe('Function SUBTOTAL', () => {
       [4]
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toBeCloseTo(1.29099444873581,6)
-    expect(engine.getCellValue(adr('B1'))).toBeCloseTo(1.29099444873581,6)
+    expect(engine.getCellValue(adr('A1'))).toBeCloseTo(1.29099444873581, 6)
+    expect(engine.getCellValue(adr('B1'))).toBeCloseTo(1.29099444873581, 6)
   })
 
   it('should calculate STDEV.P', () => {
@@ -130,7 +130,7 @@ describe('Function SUBTOTAL', () => {
       [4]
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toBeCloseTo(5/3,6)
+    expect(engine.getCellValue(adr('A1'))).toBeCloseTo(5/3, 6)
     expect(engine.getCellValue(adr('B1'))).toBeCloseTo(5/3, 6)
   })
 
