@@ -206,6 +206,7 @@ export const dictionary: RawTranslationPackage = {
     UNICHAR: 'UNICHAR',
     UNICODE: 'UNICODE',
     UPPER: 'MAYUSC',
+    'VAR.P': 'VAR.P',
     VLOOKUP: 'BUSCARV',
     WEEKDAY: 'DIASEM',
     WEEKNUM: 'NUM.DE.SEMANA',

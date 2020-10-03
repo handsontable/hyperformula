@@ -206,6 +206,7 @@ const dictionary: RawTranslationPackage = {
     UNICHAR: 'UNICODEKARAKTERİ',
     UNICODE: 'UNICODE',
     UPPER: 'BÜYÜKHARF',
+    'VAR.P': 'VAR.P',
     VLOOKUP: 'DÜŞEYARA',
     WEEKDAY: 'HAFTANINGÜNÜ',
     WEEKNUM: 'HAFTASAY',

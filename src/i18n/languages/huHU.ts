@@ -206,6 +206,7 @@ const dictionary: RawTranslationPackage = {
     UNICHAR: 'UNIKARAKTER',
     UNICODE: 'UNICODE',
     UPPER: 'NAGYBETŰS',
+    'VAR.P': 'VAR.S',
     VLOOKUP: 'FKERES',
     WEEKDAY: 'HÉT.NAPJA',
     WEEKNUM: 'HÉT.SZÁMA',

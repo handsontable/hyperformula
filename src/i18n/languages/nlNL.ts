@@ -206,6 +206,7 @@ const dictionary: RawTranslationPackage = {
     UNICHAR: 'UNITEKEN',
     UNICODE: 'UNICODE',
     UPPER: 'HOOFDLETTERS',
+    'VAR.P': 'VAR.P',
     VLOOKUP: 'VERT.ZOEKEN',
     WEEKDAY: 'WEEKDAG',
     WEEKNUM: 'WEEKNUMMER',

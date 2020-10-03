@@ -206,6 +206,7 @@ const dictionary: RawTranslationPackage = {
     UNICHAR: 'UNICODEMERKKI',
     UNICODE: 'UNICODE',
     UPPER: 'ISOT',
+    'VAR.P': 'VAR.P',
     VLOOKUP: 'PHAKU',
     WEEKDAY: 'VIIKONPÄIVÄ',
     WEEKNUM: 'VIIKKO.NRO',
