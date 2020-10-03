@@ -207,6 +207,7 @@ const dictionary: RawTranslationPackage = {
     UNICODE: 'UNICODE',
     UPPER: 'MAJUSCULE',
     'VAR.P': 'VAR.P.N',
+    'VAR.S': 'VAR.S',
     VLOOKUP: 'RECHERCHEV',
     WEEKDAY: 'JOURSEM',
     WEEKNUM: 'NO.SEMAINE',
