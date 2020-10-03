@@ -6,7 +6,7 @@ describe('Address preservation.', () => {
     const engine = HyperFormula.buildFromArray([
       ['=NA()', '=A1']
     ])
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedErrorWithOrigin(ErrorType.NA, 'Sheet1!A1'))
-    expect(engine.getCellValue(adr('B1'))).toEqual(detailedErrorWithOrigin(ErrorType.NA, 'Sheet1!A1'))
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedErrorWithOrigin(ErrorType.NA, 'Sheet1!A1'))
+    expect(engine.getCellValue(adr('B1'))).toEqualError(detailedErrorWithOrigin(ErrorType.NA, 'Sheet1!A1'))
   })
 })
