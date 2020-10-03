@@ -1,3 +1,3 @@
 export { toContainEqualMatcher } from './toContainEqual'
 export { toMatchObjectMatcher } from './toMatchObject'
-export { toEqualErrorMatcherJasmine } from './toEqualErrorJasmine'
+export { toEqualErrorMatcher } from './toEqualError'

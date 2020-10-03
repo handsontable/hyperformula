@@ -7,7 +7,7 @@ import {Config} from '../../src/Config'
 import {AlwaysSparse} from '../../src/DependencyGraph/AddressMapping/ChooseAddressMappingPolicy'
 import {enGB} from '../../src/i18n/languages'
 import {unregisterAllLanguages} from './../testUtils'
-import {toContainEqualMatcher, toEqualErrorMatcherJasmine, toMatchObjectMatcher} from './matchers'
+import {toContainEqualMatcher, toEqualErrorMatcher, toMatchObjectMatcher} from './matchers'
 import * as plugins from '../../src/interpreter/plugin'
 
 Config.defaultConfig = Object.assign({}, Config.defaultConfig, {
@@ -57,7 +57,7 @@ beforeAll(() => {
     jasmine.addMatchers({
       ...toContainEqualMatcher,
       ...toMatchObjectMatcher,
-      ...toEqualErrorMatcherJasmine,
+      ...toEqualErrorMatcher,
     })
   }
 })
