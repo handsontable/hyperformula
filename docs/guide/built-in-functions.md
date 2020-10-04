@@ -229,9 +229,13 @@ lets you design your own [custom functions](custom-functions).
 | MEDIAN | Statistical | Returns the median of a set of numbers. | MEDIAN(Number1; Number2; ...Number30) |
 | MIN | Statistical | Returns the minimum value in a list of arguments. | MIN(Number1; Number2; ...Number30) |
 | MINA | Statistical | Returns the minimum value in a list of arguments. | MINA(Value1; Value2; ... Value30) |
+| STDEVA | Statistical | Returns standard deviation of a sample. | STDEVA(Value1; Value2; ... Value30) |
 | STDEV.P | Statistical | Returns standard deviation of a population. | STDEV.P(Value1; Value2; ... Value30) |
+| STDEVPA | Statistical | Returns standard deviation of a population. | STDEVPA(Value1; Value2; ... Value30) |
 | STDEV.S | Statistical | Returns standard deviation of a sample. | STDEV.S(Value1; Value2; ... Value30) |
+| VARA | Statistical | Returns variance of a sample. | VARA(Value1; Value2; ... Value30) |
 | VAR.P | Statistical | Returns variance of a population. | VAR.P(Value1; Value2; ... Value30) |
+| VARPA | Statistical | Returns variance of a population. | VARPA(Value1; Value2; ... Value30) |
 | VAR.S | Statistical | Returns variance of a sample. | VAR.S(Value1; Value2; ... Value30) |
 | CHAR | Text | Converts a number into a character according to the current code table. | CHAR(Number) |
 | CLEAN <br><Badge text="v0.2.0"/>| Text | Returns text that has been "cleaned" of line breaks and other non-printable characters. | CLEAN("Text") |
