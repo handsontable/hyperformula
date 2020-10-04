@@ -229,6 +229,27 @@ export class ArithmeticHelper {
       }
     }
   }
+
+  public simpleRangeToCoercedNumbers(range: SimpleRangeValue): number[] | CellError {
+    const arr = range.valuesFromTopLeftCorner()
+    for(let i=0; i<arr.length; i++) {
+      const val = arr[i]
+      if(val instanceof CellError) {
+        return val
+      }
+    }
+
+    const ret: number[] = []
+    for(let i=0; i<arr.length; i++) {
+      const val = this.coerceScalarToNumberOrError(arr[i] as InternalNoErrorCellValue)
+      if(val instanceof CellError) {
+        return val
+      }
+      ret.push(val)
+    }
+
+    return ret
+  }
 }
 
 export function coerceToRange(arg: InterpreterValue): SimpleRangeValue {

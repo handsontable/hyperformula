@@ -92,6 +92,7 @@ const dictionary: RawTranslationPackage = {
     FIND: 'ETSI',
     FORMULATEXT: 'KAAVA.TEKSTI',
     FV: 'TULEVA.ARVO',
+    FVSCHEDULE: 'TULEVA.ARVO.ERIKORKO',
     HEX2BIN: 'HEKSABIN',
     HEX2DEC: 'HEKSADES',
     HEX2OCT: 'HEKSAOKT',

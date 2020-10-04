@@ -92,6 +92,7 @@ const dictionary: RawTranslationPackage = {
     FIND: 'BUL',
     FORMULATEXT: 'FORMÜLMETNİ',
     FV: 'GD',
+    FVSCHEDULE: 'GDPROGRAM',
     HEX2BIN: 'HEX2BIN',
     HEX2DEC: 'HEX2DEC',
     HEX2OCT: 'HEX2OCT',

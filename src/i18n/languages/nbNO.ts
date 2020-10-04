@@ -92,6 +92,7 @@ const dictionary: RawTranslationPackage = {
     FIND: 'FINN',
     FORMULATEXT: 'FORMELTEKST',
     FV: 'SLUTTVERDI',
+    FVSCHEDULE: 'SVPLAN',
     HEX2BIN: 'HEKSTILBIN',
     HEX2DEC: 'HEKSTILDES',
     HEX2OCT: 'HEKSTILOKT',

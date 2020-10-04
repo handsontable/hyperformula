@@ -92,6 +92,7 @@ const dictionary: RawTranslationPackage = {
     FIND: 'TROVA',
     FORMULATEXT: 'TESTO.FORMULA',
     FV: 'VAL.FUT',
+    FVSCHEDULE: 'VAL.FUT.CAPITALE',
     HEX2BIN: 'HEX.BINARIO',
     HEX2DEC: 'HEX.DECIMALE',
     HEX2OCT: 'HEX.OCT',

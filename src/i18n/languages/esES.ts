@@ -92,6 +92,7 @@ export const dictionary: RawTranslationPackage = {
     FIND: 'ENCONTRAR',
     FORMULATEXT: 'FORMULATEXTO',
     FV: 'VF',
+    FVSCHEDULE: 'VF.PLAN',
     HEX2BIN: 'HEX.A.BIN',
     HEX2DEC: 'HEX.A.DEC',
     HEX2OCT: 'HEX.A.OCT',

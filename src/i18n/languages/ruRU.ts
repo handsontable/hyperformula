@@ -92,6 +92,7 @@ const dictionary: RawTranslationPackage = {
     FIND: 'НАЙТИ',
     FORMULATEXT: 'Ф.ТЕКСТ',
     FV: 'БС',
+    FVSCHEDULE: 'БЗРАСПИС',
     HEX2BIN: 'ШЕСТН.В.ДВ',
     HEX2DEC: 'ШЕСТН.В.ДЕС',
     HEX2OCT: 'ШЕСТН.В.ВОСЬМ',

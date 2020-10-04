@@ -92,6 +92,7 @@ const dictionary: RawTranslationPackage = {
     FIND: 'FIND',
     FORMULATEXT: 'FORMELTEKST',
     FV: 'FV',
+    FVSCHEDULE: 'FVTABEL',
     HEX2BIN: 'HEX.TIL.BIN',
     HEX2DEC: 'HEX.TIL.DEC',
     HEX2OCT: 'HEX.TIL.OKT',

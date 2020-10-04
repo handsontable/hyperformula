@@ -92,6 +92,7 @@ const dictionary: RawTranslationPackage = {
     FIND: 'HITTA',
     FORMULATEXT: 'FORMELTEXT',
     FV: 'SLUTVÄRDE',
+    FVSCHEDULE: 'FÖRRÄNTNING',
     HEX2BIN: 'HEX.TILL.BIN',
     HEX2DEC: 'HEX.TILL.DEC',
     HEX2OCT: 'HEX.TILL.OKT',

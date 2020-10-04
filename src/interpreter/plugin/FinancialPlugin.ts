@@ -6,6 +6,7 @@
 import {CellError, ErrorType, InternalScalarValue, SimpleCellAddress} from '../../Cell'
 import {ErrorMessage} from '../../error-message'
 import {ProcedureAst} from '../../parser'
+import {SimpleRangeValue} from '../InterpreterValue'
 import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
 
 export class FinancialPlugin extends FunctionPlugin {
@@ -209,6 +210,13 @@ export class FinancialPlugin extends FunctionPlugin {
         {argumentType: ArgumentTypes.NUMBER, minValue: 0},
         {argumentType: ArgumentTypes.NUMBER, minValue: 0},
         {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
+      ]
+    },
+    'FVSCHEDULE': {
+      method: 'fvschedule',
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER},
+        {argumentType: ArgumentTypes.RANGE},
       ]
     },
   }
@@ -558,6 +566,20 @@ export class FinancialPlugin extends FunctionPlugin {
         return (100 - price) * 360 / (price * (maturity - settlement))
       }
     )
+  }
+
+  public fvschedule(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('FVSCHEDULE'),
+      (value: number, ratios: SimpleRangeValue) => {
+        const ratiosArray = this.interpreter.arithmeticHelper.simpleRangeToCoercedNumbers(ratios)
+        if(ratiosArray instanceof CellError) {
+          return ratiosArray
+        }
+        ratiosArray.forEach(arg => {
+          value *= 1+arg
+        })
+        return value
+      })
   }
 }
 

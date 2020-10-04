@@ -92,6 +92,7 @@ const dictionary: RawTranslationPackage = {
     FIND: 'PROCURAR',
     FORMULATEXT: 'FÓRMULA.TEXTO',
     FV: 'VF',
+    FVSCHEDULE: 'VFPLANO',
     HEX2BIN: 'HEXABIN',
     HEX2DEC: 'HEXADEC',
     HEX2OCT: 'HEXAOCT',

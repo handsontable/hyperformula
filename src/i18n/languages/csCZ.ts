@@ -92,6 +92,7 @@ const dictionary: RawTranslationPackage = {
     FIND: 'NAJÍT',
     FORMULATEXT: 'FORMULATEXT',
     FV: 'BUDHODNOTA',
+    FVSCHEDULE: 'FVSCHEDULE',
     HEX2BIN: 'HEX2BIN',
     HEX2DEC: 'HEX2DEC',
     HEX2OCT: 'HEX2OCT',

@@ -92,6 +92,7 @@ const dictionary: RawTranslationPackage = {
     FIND: 'VIND.ALLES',
     FORMULATEXT: 'FORMULETEKST',
     FV: 'TW',
+    FVSCHEDULE: 'TOEK.WAARDE2',
     HEX2BIN: 'HEX.N.BIN',
     HEX2DEC: 'HEX.N.DEC',
     HEX2OCT: 'HEX.N.OCT',

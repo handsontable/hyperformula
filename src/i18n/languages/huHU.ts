@@ -92,6 +92,7 @@ const dictionary: RawTranslationPackage = {
     FIND: 'SZÖVEG.TALÁL',
     FORMULATEXT: 'KÉPLETSZÖVEG',
     FV: 'JBÉ',
+    FVSCHEDULE: 'KJÉ',
     HEX2BIN: 'HEX.BIN',
     HEX2DEC: 'HEX.DEC',
     HEX2OCT: 'HEX.OKT',
