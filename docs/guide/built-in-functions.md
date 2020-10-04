@@ -131,6 +131,7 @@ lets you design your own [custom functions](custom-functions).
 | DOLLARFR <br><Badge text="v0.2.0"/>| Financial | Converts a price displayed as a decimal number to a price entered with a special notation. | DOLLARFR(Price, Fraction) |
 | EFFECT <br><Badge text="v0.2.0"/>| Financial | Calculates the effective annual interest rate from a nominal interest rate and the number of compounding periods per year. | EFFECT (Nominal_rate; Npery) |
 | FV <br><Badge text="v0.2.0"/> | Financial | Returns the future value of an investment. | FV(Rate; Nper; Pmt[; Pv;[ Type]]) |
+| FVSCHEDULE | Financial | Returns the future value of an investment based on a rate schedule. | FV(Pv; Schedule) |
 | IPMT <br><Badge text="v0.2.0"/>| Financial | Returns the interest portion of a given loan payment in a given payment period. | IPMT(Rate; Per; Nper; Pv[; Fv[; Type]]) |
 | ISPMT <br><Badge text="v0.2.0"/>| Financial | Returns the interest paid for a given period of an investment with equal principal payments. | ISPMT(Rate; Per; Nper; Value) |
 | NOMINAL <br><Badge text="v0.2.0"/>| Financial | Returns the nominal interest rate. | NOMINAL(Effect_rate; Npery) |
