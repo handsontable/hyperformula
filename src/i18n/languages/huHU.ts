@@ -178,6 +178,7 @@ const dictionary: RawTranslationPackage = {
     SLN: 'LCSA',
     SPLIT: 'SPLIT',
     SQRT: 'GYÖK',
+    STDEVA: 'SZÓRÁSA',
     'STDEV.P': 'SZÓR.S',
     'STDEV.S': 'SZÓR.M',
     SUBSTITUTE: 'HELYETTE',

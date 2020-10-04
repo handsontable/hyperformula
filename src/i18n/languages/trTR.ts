@@ -178,6 +178,7 @@ const dictionary: RawTranslationPackage = {
     SLN: 'DA',
     SPLIT: 'SPLIT',
     SQRT: 'KAREKÖK',
+    STDEVA: 'STDSAPMAA',
     'STDEV.P': 'STDSAPMA.P',
     'STDEV.S': 'STDSAPMA.S',
     SUBSTITUTE: 'YERİNEKOY',

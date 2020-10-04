@@ -178,6 +178,7 @@ const dictionary: RawTranslationPackage = {
     SLN: 'AMORLIN',
     SPLIT: 'SPLIT',
     SQRT: 'RACINE',
+    STDEVA: 'STDEVA',
     'STDEV.P': 'ECARTYPE.PEARSON',
     'STDEV.S': 'ECARTYPE.STANDARD',
     SUBSTITUTE: 'SUBSTITUE',

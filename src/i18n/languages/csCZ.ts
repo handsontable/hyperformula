@@ -178,6 +178,7 @@ const dictionary: RawTranslationPackage = {
     SLN: 'ODPIS.LIN',
     SPLIT: 'SPLIT',
     SQRT: 'ODMOCNINA',
+    STDEVA: 'STDEVA',
     'STDEV.P': 'SMODCH.P',
     'STDEV.S': 'SMODCH.VÝBĚR.S',
     SUBSTITUTE: 'DOSADIT',

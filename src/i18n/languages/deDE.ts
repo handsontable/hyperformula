@@ -178,6 +178,7 @@ const dictionary: RawTranslationPackage = {
     SLN: 'LIA',
     SPLIT: 'SPLIT',
     SQRT: 'WURZEL',
+    STDEVA: 'STABWA',
     'STDEV.P': 'STABW.N',
     'STDEV.S': 'STABW.S',
     SUBSTITUTE: 'WECHSELN',

@@ -178,6 +178,7 @@ const dictionary: RawTranslationPackage = {
     SLN: 'STP',
     SPLIT: 'SPLIT',
     SQRT: 'NELIÖJUURI',
+    STDEVA: 'KESKIHAJONTAA',
     'STDEV.P': 'KESKIHAJONTA.P',
     'STDEV.S': 'KESKIHAJONTA.S',
     SUBSTITUTE: 'VAIHDA',

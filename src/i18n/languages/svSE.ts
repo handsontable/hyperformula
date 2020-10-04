@@ -178,6 +178,7 @@ const dictionary: RawTranslationPackage = {
     SLN: 'LINAVSKR',
     SPLIT: 'SPLIT',
     SQRT: 'ROT',
+    STDEVA: 'STDEVA',
     'STDEV.P': 'STDAV.P',
     'STDEV.S': 'STDAV.S',
     SUBSTITUTE: 'BYT.UT',

@@ -178,6 +178,7 @@ export const dictionary: RawTranslationPackage = {
     SLN: 'SLN',
     SPLIT: 'SPLIT',
     SQRT: 'RAIZ',
+    STDEVA: 'DESVESTA',
     'STDEV.P': 'DESVEST.P',
     'STDEV.S': 'DESVEST.M',
     SUBSTITUTE: 'SUSTITUIR',
