@@ -210,6 +210,7 @@ const dictionary: RawTranslationPackage = {
     UPPER: 'STORE',
     VARA: 'VARIANSA',
     'VAR.P': 'VARIANS.P',
+    VARPA: 'VARIANSPA',
     'VAR.S': 'VARIANS.S',
     VLOOKUP: 'FINN.RAD',
     WEEKDAY: 'UKEDAG',

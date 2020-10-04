@@ -210,6 +210,7 @@ export const dictionary: RawTranslationPackage = {
     UPPER: 'MAYUSC',
     VARA: 'VARA',
     'VAR.P': 'VAR.P',
+    VARPA: 'VARPA',
     'VAR.S': 'VAR.S',
     VLOOKUP: 'BUSCARV',
     WEEKDAY: 'DIASEM',

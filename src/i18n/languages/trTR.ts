@@ -210,6 +210,7 @@ const dictionary: RawTranslationPackage = {
     UPPER: 'BÜYÜKHARF',
     VARA: 'VARA',
     'VAR.P': 'VAR.P',
+    VARPA: 'VARSA',
     'VAR.S': 'VAR.S',
     VLOOKUP: 'DÜŞEYARA',
     WEEKDAY: 'HAFTANINGÜNÜ',

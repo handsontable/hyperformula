@@ -210,6 +210,7 @@ const dictionary: RawTranslationPackage = {
     UPPER: 'ISOT',
     VARA: 'VARA',
     'VAR.P': 'VAR.P',
+    VARPA: 'VARPA',
     'VAR.S': 'VAR.S',
     VLOOKUP: 'PHAKU',
     WEEKDAY: 'VIIKONPÄIVÄ',
