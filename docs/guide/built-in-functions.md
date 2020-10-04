@@ -70,9 +70,12 @@ lets you design your own [custom functions](custom-functions).
 | EDATE <br><Badge text="v0.2.0"/>| Date and time | Shifts the given startdate by given number of months. | EDATE(Startdate; Months) |
 | EOMONTH | Date and time | Returns the date of the last day of a month which falls months away from the start date. | EOMONTH(Startdate; Months) |
 | HOUR <br><Badge text="v0.2.0"/>| Date and time | Returns hour component of given time. | HOUR(Time) |
+| INTERVAL | Date and time | Returns interval string from given number of seconds. | INTERVAL(Seconds) |
 | ISOWEEKNUM <br><Badge text="v0.2.0"/>| Date and time |   Returns an ISO week number that corresponds to the week of year. | ISOWEEKNUM(Date) |
 | MINUTE <br><Badge text="v0.2.0"/>| Date and time | Returns minute component of given time. | MINUTE(Time) |
 | MONTH | Date and time | Returns the month for the given date value. | MONTH(Number) |
+| NETWORKDAYS | Date and time | Returns the number of working days between two given dates. | NETWORKDAYS(Date1; Date2[; Holidays]) | 
+| NETWORKDAYS.INTL | Date and time | Returns the number of working days between two given dates. | NETWORKDAYS.INTL(Date1; Date2[; Mode [; Holidays]]) | 
 | NOW <br><Badge text="v0.2.0"/>| Date and time | Returns current date + time. | NOW() |
 | SECOND <br><Badge text="v0.2.0"/>| Date and time | Returns second component of given time. | SECOND(Time) |
 | TIME <br><Badge text="v0.2.0"/>| Date and time | Calculates time from given hour, minute and second. | TIME(Hour; Minute; Second) |
@@ -80,6 +83,8 @@ lets you design your own [custom functions](custom-functions).
 | TODAY <br><Badge text="v0.2.0"/>| Date and time | Returns current date. | TODAY() |
 | WEEKDAY <br><Badge text="v0.2.0"/>| Date and time |  Computes a number between 1-7 representing the day of week. | WEEKDAY(Date; Type) |
 | WEEKNUM <br><Badge text="v0.2.0"/>| Date and time |   Returns a week number that corresponds to the week of year. | WEEKNUM(Date; Type) |
+| WORKDAY | Date and time | Returns the working day number of days from start day. | WORKDAY(Date, Shift[; Holidays]) |
+| WORKDAY.INTL | Date and time | Returns the working day number of days from start day. | WORKDAY(Date, Shift[; Mode[; Holidays]]) |
 | YEAR | Date and time | Returns the year as a number according to the internal calculation rules. | YEAR(Number) |
 | YEARFRAC <br><Badge text="v0.2.0"/>| Date and time | Computes the difference between two date values, in fraction of years. |  YEARFRAC(Date2; Date1[; Format]) |
 | BIN2DEC | Engineering | The result is the decimal number for the binary number entered. | BIN2DEC(Number) |
