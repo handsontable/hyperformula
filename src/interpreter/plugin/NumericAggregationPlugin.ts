@@ -288,7 +288,6 @@ export class NumericAggregationPlugin extends FunctionPlugin {
     if (ast.args.length < 1) {
       return new CellError(ErrorType.NA, ErrorMessage.WrongArgNumber)
     }
-    /* TODO use runFunction and pass tail? */
     const functionType = this.coerceToType(this.evaluateAst(ast.args[0], formulaAddress), {argumentType: ArgumentTypes.NUMBER})
     const args = ast.args.slice(1)
     switch (functionType) {
