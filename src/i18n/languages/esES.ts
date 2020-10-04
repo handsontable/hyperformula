@@ -180,6 +180,7 @@ export const dictionary: RawTranslationPackage = {
     SQRT: 'RAIZ',
     STDEVA: 'DESVESTA',
     'STDEV.P': 'DESVEST.P',
+    STDEVPA: 'DESVESTPA',
     'STDEV.S': 'DESVEST.M',
     SUBSTITUTE: 'SUSTITUIR',
     SUBTOTAL: 'SUBTOTALES',

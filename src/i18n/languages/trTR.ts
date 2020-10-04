@@ -180,6 +180,7 @@ const dictionary: RawTranslationPackage = {
     SQRT: 'KAREKÖK',
     STDEVA: 'STDSAPMAA',
     'STDEV.P': 'STDSAPMA.P',
+    STDEVPA: 'STDSAPMASA',
     'STDEV.S': 'STDSAPMA.S',
     SUBSTITUTE: 'YERİNEKOY',
     SUBTOTAL: 'ALTTOPLAM   SUMY.CZĘŚCIOWE',

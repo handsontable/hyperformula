@@ -180,6 +180,7 @@ const dictionary: RawTranslationPackage = {
     SQRT: 'NELIÖJUURI',
     STDEVA: 'KESKIHAJONTAA',
     'STDEV.P': 'KESKIHAJONTA.P',
+    STDEVPA: 'KESKIHAJONTAPA',
     'STDEV.S': 'KESKIHAJONTA.S',
     SUBSTITUTE: 'VAIHDA',
     SUBTOTAL: 'VÄLISUMMA',

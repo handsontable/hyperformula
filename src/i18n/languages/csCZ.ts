@@ -180,6 +180,7 @@ const dictionary: RawTranslationPackage = {
     SQRT: 'ODMOCNINA',
     STDEVA: 'STDEVA',
     'STDEV.P': 'SMODCH.P',
+    STDEVPA: 'STDEVPA',
     'STDEV.S': 'SMODCH.VÝBĚR.S',
     SUBSTITUTE: 'DOSADIT',
     SUBTOTAL: 'SUBTOTAL',

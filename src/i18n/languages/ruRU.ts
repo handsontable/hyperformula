@@ -180,6 +180,7 @@ const dictionary: RawTranslationPackage = {
     SQRT: 'КОРЕНЬ',
     STDEVA: 'СТАНДОТКЛОНА',
     'STDEV.P': 'СТАНДОТКЛОН.Г',
+    STDEVPA: 'СТАНДОТКЛОНПА',
     'STDEV.S': 'СТАНДОТКЛОН.В',
     SUBSTITUTE: 'ПОДСТАВИТЬ',
     SUBTOTAL: 'ПРОМЕЖУТОЧНЫЕ.ИТОГИ',

@@ -180,6 +180,7 @@ const dictionary: RawTranslationPackage = {
     SQRT: 'GYÖK',
     STDEVA: 'SZÓRÁSA',
     'STDEV.P': 'SZÓR.S',
+    STDEVPA: 'SZÓRÁSPA',
     'STDEV.S': 'SZÓR.M',
     SUBSTITUTE: 'HELYETTE',
     SUBTOTAL: 'RÉSZÖSSZEG',

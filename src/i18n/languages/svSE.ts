@@ -180,6 +180,7 @@ const dictionary: RawTranslationPackage = {
     SQRT: 'ROT',
     STDEVA: 'STDEVA',
     'STDEV.P': 'STDAV.P',
+    STDEVPA: 'STDEVPA',
     'STDEV.S': 'STDAV.S',
     SUBSTITUTE: 'BYT.UT',
     SUBTOTAL: 'DELSUMMA',

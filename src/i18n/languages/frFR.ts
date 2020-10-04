@@ -180,6 +180,7 @@ const dictionary: RawTranslationPackage = {
     SQRT: 'RACINE',
     STDEVA: 'STDEVA',
     'STDEV.P': 'ECARTYPE.PEARSON',
+    STDEVPA: 'STDEVPA',
     'STDEV.S': 'ECARTYPE.STANDARD',
     SUBSTITUTE: 'SUBSTITUE',
     SUBTOTAL: 'SOUS.TOTAL',
