@@ -117,19 +117,26 @@ export class NumericAggregationPlugin extends FunctionPlugin {
     'VAR.P': {
       method: 'varp',
     },
+    'VARA': {
+      method: 'vara',
+    },
+    'VARPA': {
+      method: 'varpa',
+    },
     'STDEV.S': {
       method: 'stdevs',
     },
     'STDEV.P': {
       method: 'stdevp',
     },
+    'STDEVA': {
+      method: 'stdeva',
+    },
+    'STDEVPA': {
+      method: 'stdevpa',
+    },
     'SUBTOTAL': {
       method: 'subtotal',
-      parameters: [
-        {argumentType: ArgumentTypes.NUMBER},
-        {argumentType: ArgumentTypes.RANGE}
-      ],
-      repeatLastArgs: 1
     }
   }
 
@@ -202,7 +209,7 @@ export class NumericAggregationPlugin extends FunctionPlugin {
   }
 
   public averagea(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    const result = this.reduce<MomentsAggregate>(ast.args, formulaAddress, MomentsAggregate.empty, 'AVERAGEA',
+    const result = this.reduce<MomentsAggregate>(ast.args, formulaAddress, MomentsAggregate.empty, '_AGGREGATE_A',
       (left, right) => left.compose(right),
       (arg): MomentsAggregate => MomentsAggregate.single(arg),
       numbersBooleans
@@ -223,12 +230,54 @@ export class NumericAggregationPlugin extends FunctionPlugin {
     return this.doVarP(ast.args, formulaAddress)
   }
 
+  public vara(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    const result = this.reduceAggregateA(ast.args, formulaAddress)
+
+    if (result instanceof CellError) {
+      return result
+    } else {
+      return result.varSValue() ?? new CellError(ErrorType.DIV_BY_ZERO)
+    }
+  }
+
+  public varpa(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    const result = this.reduceAggregateA(ast.args, formulaAddress)
+
+    if (result instanceof CellError) {
+      return result
+    } else {
+      return result.varPValue() ?? new CellError(ErrorType.DIV_BY_ZERO)
+    }
+  }
+
   public stdevs(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.doStdevS(ast.args, formulaAddress)
   }
 
   public stdevp(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.doStdevP(ast.args, formulaAddress)
+  }
+
+  public stdeva(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    const result = this.reduceAggregateA(ast.args, formulaAddress)
+
+    if (result instanceof CellError) {
+      return result
+    } else {
+      const val = result.varSValue()
+      return val === undefined  ? new CellError(ErrorType.DIV_BY_ZERO) : Math.sqrt(val)
+    }
+  }
+
+  public stdevpa(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    const result = this.reduceAggregateA(ast.args, formulaAddress)
+
+    if (result instanceof CellError) {
+      return result
+    } else {
+      const val = result.varPValue()
+      return val === undefined  ? new CellError(ErrorType.DIV_BY_ZERO) : Math.sqrt(val)
+    }
   }
 
   public product(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
@@ -281,14 +330,28 @@ export class NumericAggregationPlugin extends FunctionPlugin {
     }
   }
 
-  private doAverage(args: Ast[], formulaAddress: SimpleCellAddress): InternalScalarValue {
-    const result = this.reduce<MomentsAggregate>(args, formulaAddress, MomentsAggregate.empty, '_AGGREGATE', (left, right) => {
+  private reduceAggregate(args: Ast[], formulaAddress: SimpleCellAddress): MomentsAggregate | CellError{
+    return this.reduce<MomentsAggregate>(args, formulaAddress, MomentsAggregate.empty, '_AGGREGATE', (left, right) => {
         return left.compose(right)
       }, (arg): MomentsAggregate => {
         return MomentsAggregate.single(arg)
       },
       strictlyNumbers
     )
+  }
+
+  private reduceAggregateA(args: Ast[], formulaAddress: SimpleCellAddress): MomentsAggregate | CellError{
+    return this.reduce<MomentsAggregate>(args, formulaAddress, MomentsAggregate.empty, '_AGGREGATE_A', (left, right) => {
+        return left.compose(right)
+      }, (arg): MomentsAggregate => {
+        return MomentsAggregate.single(arg)
+      },
+      numbersBooleans
+    )
+  }
+
+  private doAverage(args: Ast[], formulaAddress: SimpleCellAddress): InternalScalarValue {
+    const result = this.reduceAggregate(args, formulaAddress)
 
     if (result instanceof CellError) {
       return result
@@ -298,13 +361,7 @@ export class NumericAggregationPlugin extends FunctionPlugin {
   }
 
   private doVarS(args: Ast[], formulaAddress: SimpleCellAddress): InternalScalarValue {
-    const result = this.reduce<MomentsAggregate>(args, formulaAddress, MomentsAggregate.empty, '_AGGREGATE', (left, right) => {
-        return left.compose(right)
-      }, (arg): MomentsAggregate => {
-        return MomentsAggregate.single(arg)
-      },
-      strictlyNumbers
-    )
+    const result = this.reduceAggregate(args, formulaAddress)
 
     if (result instanceof CellError) {
       return result
@@ -314,13 +371,7 @@ export class NumericAggregationPlugin extends FunctionPlugin {
   }
 
   private doVarP(args: Ast[], formulaAddress: SimpleCellAddress): InternalScalarValue {
-    const result = this.reduce<MomentsAggregate>(args, formulaAddress, MomentsAggregate.empty, '_AGGREGATE', (left, right) => {
-        return left.compose(right)
-      }, (arg): MomentsAggregate => {
-        return MomentsAggregate.single(arg)
-      },
-      strictlyNumbers
-    )
+    const result = this.reduceAggregate(args, formulaAddress)
 
     if (result instanceof CellError) {
       return result
@@ -330,13 +381,7 @@ export class NumericAggregationPlugin extends FunctionPlugin {
   }
 
   private doStdevS(args: Ast[], formulaAddress: SimpleCellAddress): InternalScalarValue {
-    const result = this.reduce<MomentsAggregate>(args, formulaAddress, MomentsAggregate.empty, '_AGGREGATE', (left, right) => {
-        return left.compose(right)
-      }, (arg): MomentsAggregate => {
-        return MomentsAggregate.single(arg)
-      },
-      strictlyNumbers
-    )
+    const result = this.reduceAggregate(args, formulaAddress)
 
     if (result instanceof CellError) {
       return result
@@ -347,13 +392,7 @@ export class NumericAggregationPlugin extends FunctionPlugin {
   }
 
   private doStdevP(args: Ast[], formulaAddress: SimpleCellAddress): InternalScalarValue {
-    const result = this.reduce<MomentsAggregate>(args, formulaAddress, MomentsAggregate.empty, '_AGGREGATE', (left, right) => {
-        return left.compose(right)
-      }, (arg): MomentsAggregate => {
-        return MomentsAggregate.single(arg)
-      },
-      strictlyNumbers
-    )
+    const result = this.reduceAggregate(args, formulaAddress)
 
     if (result instanceof CellError) {
       return result
