@@ -106,11 +106,12 @@ export class Exporter {
 
   private detailedError(error: CellError): DetailedCellError {
     let address = undefined
-    if(error.address !== undefined) {
-      if (error.address.sheet === NamedExpressions.SHEET_FOR_WORKBOOK_EXPRESSIONS) {
-        address = this.namedExpressions.namedExpressionInAddress(error.address.row)?.displayName
+    const originAddress = error.getOriginAddress()
+    if(originAddress !== undefined) {
+      if (originAddress.sheet === NamedExpressions.SHEET_FOR_WORKBOOK_EXPRESSIONS) {
+        address = this.namedExpressions.namedExpressionInAddress(originAddress.row)?.displayName
       } else {
-        address = simpleCellAddressToString(this.sheetIndexMapping, error.address, -1)
+        address = simpleCellAddressToString(this.sheetIndexMapping, originAddress, -1)
       }
     }
     return new DetailedCellError(error, this.config.translationPackage.getErrorTranslation(error.type), address)

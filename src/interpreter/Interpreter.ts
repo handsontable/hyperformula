@@ -57,7 +57,7 @@ export class Interpreter {
     let val = this.evaluateAstWithoutPostoprocessing(ast, formulaAddress)
     if (typeof val === 'number') {
       if (isNumberOverflow(val)) {
-        return new CellError(ErrorType.NUM, ErrorMessage.NaN, formulaAddress)
+        return new CellError(ErrorType.NUM, ErrorMessage.NaN)
       } else {
         val = fixNegativeZero(val)
       }
@@ -323,7 +323,7 @@ function wrapperBinary<T extends InterpreterValue>(op: (a: T, b: T) => Interpret
 
 function wrapperForAddress(val: InterpreterValue, adr: SimpleCellAddress): InterpreterValue {
   if(val instanceof CellError) {
-    val.address = val.address ?? adr
+    val.attachAddress(adr)
   }
   return val
 }

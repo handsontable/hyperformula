@@ -5,6 +5,7 @@
 
 import {CellVertex, FormulaCellVertex, MatrixVertex, ParsingErrorVertex, ValueCellVertex} from './DependencyGraph'
 import {ErrorMessage} from './error-message'
+import {Maybe} from './Maybe'
 import {CellAddress} from './parser'
 import {AddressWithSheet} from './parser/Address'
 import {InterpreterValue, SimpleRangeValue} from './interpreter/InterpreterValue'
@@ -112,8 +113,16 @@ export class CellError {
   constructor(
     public readonly type: ErrorType,
     public readonly message?: string,
-    public address?: SimpleCellAddress,
+    private address?: SimpleCellAddress
   ) {
+  }
+
+  public getOriginAddress(): Maybe<SimpleCellAddress> {
+    return this.address
+  }
+
+  public attachAddress(address: SimpleCellAddress): void {
+    this.address = this.address ?? address
   }
 
   public static parsingError() {
