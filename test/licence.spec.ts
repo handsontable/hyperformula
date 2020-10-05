@@ -1,5 +1,4 @@
 import {ErrorType, HyperFormula} from '../src'
-import {CellError} from '../src/Cell'
 import {ErrorMessage} from '../src/error-message'
 import {adr, detailedError} from './testUtils'
 

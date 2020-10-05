@@ -7,7 +7,6 @@ import {FormulaCellVertex, MatrixVertex, RangeVertex} from '../src/DependencyGra
 import {defaultStringifyDateTime} from '../src/format/format'
 import {
   AstNodeType,
-  buildCellErrorAst,
   CellAddress,
   CellRangeAst,
   CellReferenceAst, ErrorAst,

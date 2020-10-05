@@ -6,7 +6,7 @@ import {MatrixVertex} from '../../src/DependencyGraph'
 import {NoSheetWithNameError} from '../../src'
 import {CellAddress} from '../../src/parser'
 import {
-  adr, detailedError,
+  adr,
   expectArrayWithSameContent,
   expectReferenceToHaveRefError,
   expectEngineToBeTheSameAs,

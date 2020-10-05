@@ -4,7 +4,6 @@ import {DateTimeHelper} from '../src/DateTimeHelper'
 import {ArithmeticHelper} from '../src/interpreter/ArithmeticHelper'
 import {buildCriterion, CriterionBuilder, CriterionType} from '../src/interpreter/Criterion'
 import {NumberLiteralHelper} from '../src/NumberLiteralHelper'
-import {detailedError} from './testUtils'
 
 describe('Criterion', () => {
   const config = new Config()

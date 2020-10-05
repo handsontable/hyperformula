@@ -2,7 +2,7 @@ import {HyperFormula, ExportedCellChange, ExportedNamedExpressionChange} from '.
 import {Events} from '../src/Emitter'
 import {ErrorType} from '../src/Cell'
 
-import {adr, detailedError, detailedErrorWithOrigin} from './testUtils'
+import {adr, detailedErrorWithOrigin} from './testUtils'
 import {NamedExpressionDoesNotExistError} from '../src/errors'
 
 describe('Events', () => {
