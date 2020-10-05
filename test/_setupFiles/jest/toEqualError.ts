@@ -9,8 +9,10 @@ declare global {
   }
 }
 
-export const toEqualError: ExpectExtendMap = {toEqualError(received: any, expected: any): CustomMatcherResult {
+export const toEqualError: ExpectExtendMap = {
+  toEqualError(received: any, expected: any): CustomMatcherResult {
     let result = false
+
     if (typeof received === 'object' && typeof expected === 'object') {
       result = this.equals(
         {...received, address: undefined},
