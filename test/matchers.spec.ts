@@ -43,7 +43,7 @@ describe('Matchers', () => {
     )
   })
 
-  it('should compare two ad-hoc objects', () => {
+  it('should compare two ad-hoc objects ignoring addresses', () => {
     expect(
       {type: ErrorType.ERROR, message: '', address: adr('A1')}
     ).toEqualError(
