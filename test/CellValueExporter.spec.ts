@@ -1,7 +1,7 @@
 import {DetailedCellError, HyperFormula} from '../src'
 import {CellError, EmptyValue, ErrorType} from '../src/Cell'
-import {Exporter} from '../src/CellValue'
 import {Config} from '../src/Config'
+import {Exporter} from '../src/Exporter'
 import {plPL} from '../src/i18n/languages'
 import {SheetIndexMappingFn} from '../src/parser/addressRepresentationConverters'
 import {detailedError} from './testUtils'
