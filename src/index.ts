@@ -7,11 +7,13 @@ import {CellType, CellValueType, ErrorType, SimpleCellAddress} from './Cell'
 import {
   CellValue,
   DetailedCellError,
+  NoErrorCellValue
+} from './CellValue'
+import {
   ExportedCellChange,
   ExportedChange,
   ExportedNamedExpressionChange,
-  NoErrorCellValue
-} from './CellValue'
+} from './Exporter'
 import {HyperFormula} from './HyperFormula'
 import {Config, ConfigParams} from './Config'
 import {RawTranslationPackage} from './i18n'
