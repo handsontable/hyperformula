@@ -57,7 +57,7 @@ export class Interpreter {
     let val = this.evaluateAstWithoutPostoprocessing(ast, formulaAddress)
     if (typeof val === 'number') {
       if (isNumberOverflow(val)) {
-        val = new CellError(ErrorType.NUM, ErrorMessage.NaN)
+        return new CellError(ErrorType.NUM, ErrorMessage.NaN, formulaAddress)
       } else {
         val = fixNegativeZero(val)
       }
