@@ -23,7 +23,7 @@ export const toEqualError: ExpectExtendMap = {
     }
     return {
       pass: result,
-      message: () => (result ? '' : `Expected ${received} to be match ${expected}.`)
+      message: () => (result ? '' : `Expected ${JSON.stringify(received, null, 2)} to match ${JSON.stringify(expected, null, 2)}.`)
     }
   }
 }
