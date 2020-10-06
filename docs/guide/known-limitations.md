@@ -35,3 +35,4 @@ you can't compare the arguments in a formula like this:
   * Structured references ("Tables")
   * Currency data type
   * Relative named expressions
+* Functions cannot use UI metadata (e.g. hidden rows for SUBTOTAL).
