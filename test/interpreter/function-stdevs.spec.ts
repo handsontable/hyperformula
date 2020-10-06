@@ -16,9 +16,9 @@ describe('Function STDEV.S', () => {
   it('should calculate standard deviation (sample)', () => {
     const engine = HyperFormula.buildFromArray([
       ['=STDEV.S(2, 3)'],
-      ['=STDEV.S(B2:D2, E2, F2)', 2, 3, 'foo', 'bar', 4],
+      ['=STDEV.S(B2:I2, 2, 3, 4, TRUE(), FALSE(), "1",)', 2, 3, 4, true, false, 'a', '\'1', null],
     ])
     expect(engine.getCellValue(adr('A1'))).toBeCloseTo(0.707106781186548, 6)
-    expect(engine.getCellValue(adr('A2'))).toEqual(1)
+    expect(engine.getCellValue(adr('A2'))).toBeCloseTo(1.49071198499986, 6)
   })
 })

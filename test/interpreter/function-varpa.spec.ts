@@ -14,9 +14,9 @@ describe('Function VARPA', () => {
   it('should calculate variance (population)', () => {
     const engine = HyperFormula.buildFromArray([
       ['=VARPA(2, 3)'],
-      ['=VARPA(B2:D2, E2, F2)', 2, 3, 'foo', 'bar', 4],
+      ['=VARPA(B2:I2, 2, 3, 4, TRUE(), FALSE(), "1",)', 2, 3, 4, true, false, 'a', '\'1', null],
     ])
     expect(engine.getCellValue(adr('A1'))).toEqual(0.25)
-    expect(engine.getCellValue(adr('A2'))).toEqual(2.56)
+    expect(engine.getCellValue(adr('A2'))).toBeCloseTo(2.10714285714286, 6)
   })
 })

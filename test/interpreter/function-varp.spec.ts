@@ -14,9 +14,9 @@ describe('Function VAR.P', () => {
   it('should calculate variance (population)', () => {
     const engine = HyperFormula.buildFromArray([
       ['=VAR.P(2, 3)'],
-      ['=VAR.P(B2:D2, E2, F2)', 2, 3, 'foo', 'bar', 4],
+      ['=VAR.P(B2:I2, 2, 3, 4, TRUE(), FALSE(), "1",)', 2, 3, 4, true, false, 'a', '\'1', null],
     ])
     expect(engine.getCellValue(adr('A1'))).toEqual(0.25)
-    expect(engine.getCellValue(adr('A2'))).toBeCloseTo(2/3, 6)
+    expect(engine.getCellValue(adr('A2'))).toBeCloseTo(2, 6)
   })
 })
