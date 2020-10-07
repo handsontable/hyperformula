@@ -134,6 +134,7 @@ lets you design your own [custom functions](custom-functions).
 | FVSCHEDULE | Financial | Returns the future value of an investment based on a rate schedule. | FV(Pv; Schedule) |
 | IPMT <br><Badge text="v0.2.0"/>| Financial | Returns the interest portion of a given loan payment in a given payment period. | IPMT(Rate; Per; Nper; Pv[; Fv[; Type]]) |
 | ISPMT <br><Badge text="v0.2.0"/>| Financial | Returns the interest paid for a given period of an investment with equal principal payments. | ISPMT(Rate; Per; Nper; Value) |
+| MIRR | Financial | Returns modified internal value for cashflows. | MIRR(Flows; FRate; RRate) |
 | NOMINAL <br><Badge text="v0.2.0"/>| Financial | Returns the nominal interest rate. | NOMINAL(Effect_rate; Npery) |
 | NPER <br><Badge text="v0.2.0"/>| Financial | Returns the number of periods for an investment assuming periodic, constant payments and a constant interest rate. | NPER(Rate; Pmt; Pv[; Fv[; Type]]) |
 | NPV | Financial | Returns net present value. | NPV(Rate; Value1; ...; Value30) |
