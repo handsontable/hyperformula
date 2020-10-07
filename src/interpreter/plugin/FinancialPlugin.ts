@@ -227,6 +227,14 @@ export class FinancialPlugin extends FunctionPlugin {
       ],
       repeatLastArgs: 1
     },
+    'MIRR': {
+      method: 'mirr',
+      parameters: [
+        {argumentType: ArgumentTypes.RANGE},
+        {argumentType: ArgumentTypes.NUMBER, greaterThan: -1},
+        {argumentType: ArgumentTypes.NUMBER, greaterThan: -1},
+      ],
+    },
   }
 
   public pmt(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
@@ -598,6 +606,43 @@ export class FinancialPlugin extends FunctionPlugin {
           return coerced
         }
         return npvCore(rate, coerced)
+      }
+    )
+  }
+
+  public mirr(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('MIRR'),
+      (range: SimpleRangeValue, frate: number, rrate: number) => {
+        const vals = this.interpreter.arithmeticHelper.manyToExactNumbers(range.valuesFromTopLeftCorner())
+        if(vals instanceof CellError) {
+          return vals
+        }
+        let posFlag = false
+        let negFlag = false
+        const posValues: number[] = []
+        const negValues: number[] = []
+        for(const val of vals) {
+          if(val>0) {
+            posFlag = true
+            posValues.push(val)
+            negValues.push(0)
+          } else if(val<0) {
+            negFlag = true
+            negValues.push(val)
+            posValues.push(0)
+          } else {
+            negValues.push(0)
+            posValues.push(0)
+          }
+        }
+        if(!posFlag || !negFlag) {
+          return new CellError(ErrorType.DIV_BY_ZERO)
+        }
+        const n = vals.length
+        return Math.pow(
+          (-npvCore(rrate, posValues)*Math.pow(1+rrate,n)/npvCore(frate, negValues)/(1+frate)),
+          1/(n-1)
+        )-1
       }
     )
   }
