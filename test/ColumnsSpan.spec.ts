@@ -1,6 +1,6 @@
 import {ColumnsSpan} from '../src/Span'
 
-describe('ColumnsSpan', () => {
+xdescribe('ColumnsSpan', () => {
   it('raise error when starting column is less than 0', () => {
     expect(() => {
       new ColumnsSpan(0, -1, 0)
