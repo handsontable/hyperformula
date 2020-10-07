@@ -136,6 +136,7 @@ const dictionary: RawTranslationPackage = {
     MIN: 'MIN',
     MINA: 'MINA',
     MINUTE: 'MINUTA',
+    MIRR: 'MOD.MÍRA.VÝNOSNOSTI',
     MMULT: 'SOUČIN.MATIC',
     MOD: 'MOD',
     MONTH: 'MĚSÍC',

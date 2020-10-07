@@ -19,10 +19,12 @@ describe('Function MIRR', () => {
       ['=MIRR(B2:C2,1,1)',-1,1],
       ['=MIRR(B3:E3,0.2,0.1)',-1,0,-1,1],
       ['=MIRR(B4:E4,0.2,0.1)',-1,0,-1,-1],
+      ['=MIRR(B5:G5,0.2,0.1)',-1,0,'abcd', true,-1,1],
     ])
     expect(engine.getCellValue(adr('A1'))).toEqual(3)
     expect(engine.getCellValue(adr('A2'))).toEqual(0)
     expect(engine.getCellValue(adr('A3'))).toBeCloseTo(-0.161201673643132,6)
     expect(engine.getCellValue(adr('A4'))).toEqual(detailedError(ErrorType.DIV_BY_ZERO))
+    expect(engine.getCellValue(adr('A5'))).toBeCloseTo(-0.161201673643132,6)
   })
 })

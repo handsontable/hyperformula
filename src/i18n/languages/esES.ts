@@ -136,6 +136,7 @@ export const dictionary: RawTranslationPackage = {
     MIN: 'MIN',
     MINA: 'MINA',
     MINUTE: 'MINUTO',
+    MIRR: 'TIRM',
     MMULT: 'MMULT',
     MOD: 'RESIDUO',
     MONTH: 'MES',
