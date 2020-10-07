@@ -9,7 +9,7 @@ import {
   EmptyValue,
   ErrorType,
   getCellValueType,
-  InternalNoErrorCellValue,
+  InternalNoErrorScalarValue,
   InternalScalarValue
 } from '../Cell'
 import {Config} from '../Config'
@@ -101,7 +101,7 @@ export class ArithmeticHelper {
     return str
   }
 
-  public compare(left: InternalNoErrorCellValue, right: InternalNoErrorCellValue): number {
+  public compare(left: InternalNoErrorScalarValue, right: InternalNoErrorScalarValue): number {
     if (typeof left === 'string' || typeof right === 'string') {
       const leftTmp = typeof left === 'string' ? this.dateTimeHelper.dateStringToDateNumber(left) : left
       const rightTmp = typeof right === 'string' ? this.dateTimeHelper.dateStringToDateNumber(right) : right
@@ -230,24 +230,64 @@ export class ArithmeticHelper {
     }
   }
 
-  public simpleRangeToCoercedNumbers(range: SimpleRangeValue): number[] | CellError {
-    const arr = range.valuesFromTopLeftCorner()
-    for(let i=0; i<arr.length; i++) {
-      const val = arr[i]
-      if(val instanceof CellError) {
-        return val
+  public manyToCoercedNumbers(args: InternalScalarValue[]): number[] | CellError {
+    for(const arg of args) {
+      if(arg instanceof CellError) {
+        return arg
       }
     }
 
     const ret: number[] = []
-    for(let i=0; i<arr.length; i++) {
-      const val = this.coerceScalarToNumberOrError(arr[i] as InternalNoErrorCellValue)
-      if(val instanceof CellError) {
-        return val
+    for(const arg of args as InternalNoErrorScalarValue[]) {
+      const coerced = this.coerceScalarToNumberOrError(arg)
+      if(coerced instanceof CellError) {
+        return coerced
       }
-      ret.push(val)
+      ret.push(coerced)
     }
 
+    return ret
+  }
+
+  public coerceNumbersExpandRanges(args: InterpreterValue[]): number[] | CellError {
+    const vals: (number | SimpleRangeValue)[] = []
+    for(const arg of args) {
+      if(arg instanceof SimpleRangeValue) {
+        vals.push(arg)
+      } else {
+        const coerced = this.coerceScalarToNumberOrError(arg)
+        if(coerced instanceof CellError) {
+          return coerced
+        } else {
+          vals.push(coerced)
+        }
+      }
+    }
+    const expandedVals: number[] = []
+    for(const val of vals) {
+      if(val instanceof SimpleRangeValue) {
+        const arr = this.manyToExactNumbers(val.valuesFromTopLeftCorner())
+        if(arr instanceof CellError) {
+          return arr
+        } else {
+          expandedVals.push(...arr)
+        }
+      } else {
+        expandedVals.push(val)
+      }
+    }
+    return expandedVals
+  }
+
+  public manyToExactNumbers(args: InternalScalarValue[]): number[] | CellError {
+    const ret: number[] = []
+    for(const arg of args) {
+      if(arg instanceof CellError) {
+        return arg
+      } else if (typeof arg === 'number') {
+        ret.push(arg)
+      }
+    }
     return ret
   }
 }
@@ -274,7 +314,7 @@ export function coerceBooleanToNumber(arg: boolean): number {
   return Number(arg)
 }
 
-export function coerceEmptyToValue(arg: InternalNoErrorCellValue): InternalNoErrorCellValue {
+export function coerceEmptyToValue(arg: InternalNoErrorScalarValue): InternalNoErrorScalarValue {
   if (typeof arg === 'string') {
     return ''
   } else if (typeof arg === 'number') {
@@ -324,7 +364,7 @@ export function coerceScalarToString(arg: InternalScalarValue): string | CellErr
   }
 }
 
-export function zeroIfEmpty(arg: InternalNoErrorCellValue): InternalNoErrorCellValue {
+export function zeroIfEmpty(arg: InternalNoErrorScalarValue): InternalNoErrorScalarValue {
   return arg === EmptyValue ? 0 : arg
 }
 

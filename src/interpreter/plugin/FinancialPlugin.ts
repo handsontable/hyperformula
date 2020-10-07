@@ -6,7 +6,7 @@
 import {CellError, ErrorType, InternalScalarValue, SimpleCellAddress} from '../../Cell'
 import {ErrorMessage} from '../../error-message'
 import {ProcedureAst} from '../../parser'
-import {SimpleRangeValue} from '../InterpreterValue'
+import {InterpreterValue, SimpleRangeValue} from '../InterpreterValue'
 import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
 
 export class FinancialPlugin extends FunctionPlugin {
@@ -218,6 +218,14 @@ export class FinancialPlugin extends FunctionPlugin {
         {argumentType: ArgumentTypes.NUMBER},
         {argumentType: ArgumentTypes.RANGE},
       ]
+    },
+    'NPV': {
+      method: 'npv',
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER},
+        {argumentType: ArgumentTypes.ANY},
+      ],
+      repeatLastArgs: 1
     },
   }
 
@@ -571,7 +579,7 @@ export class FinancialPlugin extends FunctionPlugin {
   public fvschedule(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.runFunction(ast.args, formulaAddress, this.metadata('FVSCHEDULE'),
       (value: number, ratios: SimpleRangeValue) => {
-        const ratiosArray = this.interpreter.arithmeticHelper.simpleRangeToCoercedNumbers(ratios)
+        const ratiosArray = this.interpreter.arithmeticHelper.manyToCoercedNumbers(ratios.valuesFromTopLeftCorner())
         if(ratiosArray instanceof CellError) {
           return ratiosArray
         }
@@ -580,6 +588,18 @@ export class FinancialPlugin extends FunctionPlugin {
         })
         return value
       })
+  }
+
+  public npv(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('NPV'),
+      (rate: number, ...args: InterpreterValue[]) => {
+        const coerced = this.interpreter.arithmeticHelper.coerceNumbersExpandRanges(args)
+        if(coerced instanceof CellError) {
+          return coerced
+        }
+        return npvCore(rate, coerced)
+      }
+    )
   }
 }
 
@@ -612,4 +632,16 @@ function fvCore(rate: number, periods: number, payment: number, value: number, t
 
 function ppmtCore(rate: number, period: number, periods: number, present: number, future: number, type: number): number {
   return pmtCore(rate, periods, present, future, type) - ipmtCore(rate, period, periods, present, future, type)
+}
+
+function npvCore(rate: number, args: number[]): number {
+  let acc = 0
+  for(let i=args.length-1;i>=0;i--) {
+    acc += args[i]
+    if(acc===0 && rate===-1) {
+      continue
+    }
+    acc /= 1+rate
+  }
+  return acc
 }

@@ -146,6 +146,7 @@ const dictionary: RawTranslationPackage = {
     NOT: 'NIET',
     NOW: 'NU',
     NPER: 'NPER',
+    NPV: 'NHW',
     OCT2BIN: 'OCT.N.BIN',
     OCT2DEC: 'OCT.N.DEC',
     OCT2HEX: 'OCT.N.HEX',

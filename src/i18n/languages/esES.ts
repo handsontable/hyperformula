@@ -146,6 +146,7 @@ export const dictionary: RawTranslationPackage = {
     NOT: 'NO',
     NOW: 'AHORA',
     NPER: 'NPER',
+    NPV: 'VNA',
     OCT2BIN: 'OCT.A.BIN',
     OCT2DEC: 'OCT.A.DEC',
     OCT2HEX: 'OCT.A.HEX',

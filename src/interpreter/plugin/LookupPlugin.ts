@@ -7,7 +7,7 @@ import {AbsoluteCellRange} from '../../AbsoluteCellRange'
 import {
   CellError,
   ErrorType,
-  InternalNoErrorCellValue,
+  InternalNoErrorScalarValue,
   InternalScalarValue,
   simpleCellAddress,
   SimpleCellAddress
@@ -60,7 +60,7 @@ export class LookupPlugin extends FunctionPlugin {
    * @param formulaAddress
    */
   public vlookup(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('VLOOKUP'), (key: InternalNoErrorCellValue, rangeValue: SimpleRangeValue, index: number, sorted: boolean) => {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('VLOOKUP'), (key: InternalNoErrorScalarValue, rangeValue: SimpleRangeValue, index: number, sorted: boolean) => {
       const range = rangeValue.range()
 
       if (range === undefined) {
@@ -84,7 +84,7 @@ export class LookupPlugin extends FunctionPlugin {
    * @param formulaAddress
    */
   public hlookup(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('HLOOKUP'), (key: InternalNoErrorCellValue, rangeValue: SimpleRangeValue, index: number, sorted: boolean) => {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('HLOOKUP'), (key: InternalNoErrorScalarValue, rangeValue: SimpleRangeValue, index: number, sorted: boolean) => {
       const range = rangeValue.range()
       if (range === undefined) {
         return new CellError(ErrorType.VALUE, ErrorMessage.WrongType)
@@ -101,7 +101,7 @@ export class LookupPlugin extends FunctionPlugin {
   }
 
   public match(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('MATCH'), (key: InternalNoErrorCellValue, rangeValue: SimpleRangeValue, sorted: number) => {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('MATCH'), (key: InternalNoErrorScalarValue, rangeValue: SimpleRangeValue, sorted: number) => {
       const range = rangeValue.range()
       if (range === undefined) {
         return new CellError(ErrorType.VALUE, ErrorMessage.WrongType)
@@ -111,7 +111,7 @@ export class LookupPlugin extends FunctionPlugin {
     })
   }
 
-  private doVlookup(key: InternalNoErrorCellValue, range: AbsoluteCellRange, index: number, sorted: boolean): InternalScalarValue {
+  private doVlookup(key: InternalNoErrorScalarValue, range: AbsoluteCellRange, index: number, sorted: boolean): InternalScalarValue {
     this.dependencyGraph.stats.start(StatType.VLOOKUP)
 
     const searchedRange = AbsoluteCellRange.spanFrom(range.start, 1, range.height())
@@ -132,7 +132,7 @@ export class LookupPlugin extends FunctionPlugin {
     return value
   }
 
-  private doHlookup(key: InternalNoErrorCellValue, range: AbsoluteCellRange, index: number, sorted: boolean): InternalScalarValue {
+  private doHlookup(key: InternalNoErrorScalarValue, range: AbsoluteCellRange, index: number, sorted: boolean): InternalScalarValue {
     const searchedRange = AbsoluteCellRange.spanFrom(range.start, range.width(), 1)
     const colIndex = this.searchInRange(key, searchedRange, sorted, this.rowSearch)
 
@@ -150,7 +150,7 @@ export class LookupPlugin extends FunctionPlugin {
     return value
   }
 
-  private doMatch(key: InternalNoErrorCellValue, range: AbsoluteCellRange, sorted: number): InternalScalarValue {
+  private doMatch(key: InternalNoErrorScalarValue, range: AbsoluteCellRange, sorted: number): InternalScalarValue {
     if (range.width() > 1 && range.height() > 1) {
       return new CellError(ErrorType.NA)
     }
@@ -169,7 +169,7 @@ export class LookupPlugin extends FunctionPlugin {
     }
   }
 
-  protected searchInRange(key: InternalNoErrorCellValue, range: AbsoluteCellRange, sorted: boolean, searchStrategy: SearchStrategy): number {
+  protected searchInRange(key: InternalNoErrorScalarValue, range: AbsoluteCellRange, sorted: boolean, searchStrategy: SearchStrategy): number {
     if(!sorted && typeof key === 'string' && this.interpreter.arithmeticHelper.requiresRegex(key)) {
       return searchStrategy.advancedFind(
         this.interpreter.arithmeticHelper.eqMatcherFunction(key),

@@ -146,6 +146,7 @@ const dictionary: RawTranslationPackage = {
     NOT: 'ICKE',
     NOW: 'NU',
     NPER: 'PERIODER',
+    NPV: 'NETNUVÄRDE',
     OCT2BIN: 'OKT.TILL.BIN',
     OCT2DEC: 'OKT.TILL.DEC',
     OCT2HEX: 'OKT.TILL.HEX',

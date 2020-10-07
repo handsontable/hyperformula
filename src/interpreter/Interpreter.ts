@@ -9,7 +9,7 @@ import {
   CellError,
   EmptyValue,
   ErrorType,
-  InternalNoErrorCellValue,
+  InternalNoErrorScalarValue,
   invalidSimpleCellAddress,
   SimpleCellAddress
 } from '../Cell'
@@ -92,53 +92,53 @@ export class Interpreter {
         const rightResult = this.evaluateAst(ast.right, formulaAddress)
         return passErrors(leftResult, rightResult) ??
           wrapperBinary((a, b) => a.concat(b),
-            coerceScalarToString(leftResult as InternalNoErrorCellValue),
-            coerceScalarToString(rightResult as InternalNoErrorCellValue)
+            coerceScalarToString(leftResult as InternalNoErrorScalarValue),
+            coerceScalarToString(rightResult as InternalNoErrorScalarValue)
           )
       }
       case AstNodeType.EQUALS_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
         const rightResult = this.evaluateAst(ast.right, formulaAddress)
         return passErrors(leftResult, rightResult) ??
-          this.arithmeticHelper.compare(leftResult as InternalNoErrorCellValue, rightResult as InternalNoErrorCellValue) === 0
+          this.arithmeticHelper.compare(leftResult as InternalNoErrorScalarValue, rightResult as InternalNoErrorScalarValue) === 0
       }
       case AstNodeType.NOT_EQUAL_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
         const rightResult = this.evaluateAst(ast.right, formulaAddress)
         return passErrors(leftResult, rightResult) ??
-          this.arithmeticHelper.compare(leftResult as InternalNoErrorCellValue, rightResult as InternalNoErrorCellValue) !== 0
+          this.arithmeticHelper.compare(leftResult as InternalNoErrorScalarValue, rightResult as InternalNoErrorScalarValue) !== 0
       }
       case AstNodeType.GREATER_THAN_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
         const rightResult = this.evaluateAst(ast.right, formulaAddress)
         return passErrors(leftResult, rightResult) ??
-          this.arithmeticHelper.compare(leftResult as InternalNoErrorCellValue, rightResult as InternalNoErrorCellValue) > 0
+          this.arithmeticHelper.compare(leftResult as InternalNoErrorScalarValue, rightResult as InternalNoErrorScalarValue) > 0
       }
       case AstNodeType.LESS_THAN_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
         const rightResult = this.evaluateAst(ast.right, formulaAddress)
         return passErrors(leftResult, rightResult) ??
-          this.arithmeticHelper.compare(leftResult as InternalNoErrorCellValue, rightResult as InternalNoErrorCellValue) < 0
+          this.arithmeticHelper.compare(leftResult as InternalNoErrorScalarValue, rightResult as InternalNoErrorScalarValue) < 0
       }
       case AstNodeType.GREATER_THAN_OR_EQUAL_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
         const rightResult = this.evaluateAst(ast.right, formulaAddress)
         return passErrors(leftResult, rightResult) ??
-          this.arithmeticHelper.compare(leftResult as InternalNoErrorCellValue, rightResult as InternalNoErrorCellValue) >= 0
+          this.arithmeticHelper.compare(leftResult as InternalNoErrorScalarValue, rightResult as InternalNoErrorScalarValue) >= 0
       }
       case AstNodeType.LESS_THAN_OR_EQUAL_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
         const rightResult = this.evaluateAst(ast.right, formulaAddress)
         return passErrors(leftResult, rightResult) ??
-          this.arithmeticHelper.compare(leftResult as InternalNoErrorCellValue, rightResult as InternalNoErrorCellValue) <= 0
+          this.arithmeticHelper.compare(leftResult as InternalNoErrorScalarValue, rightResult as InternalNoErrorScalarValue) <= 0
       }
       case AstNodeType.PLUS_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
         const rightResult = this.evaluateAst(ast.right, formulaAddress)
         return passErrors(leftResult, rightResult) ??
           wrapperBinary(this.arithmeticHelper.addWithEpsilon,
-            this.arithmeticHelper.coerceScalarToNumberOrError(leftResult as InternalNoErrorCellValue),
-            this.arithmeticHelper.coerceScalarToNumberOrError(rightResult as InternalNoErrorCellValue)
+            this.arithmeticHelper.coerceScalarToNumberOrError(leftResult as InternalNoErrorScalarValue),
+            this.arithmeticHelper.coerceScalarToNumberOrError(rightResult as InternalNoErrorScalarValue)
           )
       }
       case AstNodeType.MINUS_OP: {
@@ -146,8 +146,8 @@ export class Interpreter {
         const rightResult = this.evaluateAst(ast.right, formulaAddress)
         return passErrors(leftResult, rightResult) ??
           wrapperBinary(this.arithmeticHelper.subtract,
-            this.arithmeticHelper.coerceScalarToNumberOrError(leftResult as InternalNoErrorCellValue),
-            this.arithmeticHelper.coerceScalarToNumberOrError(rightResult as InternalNoErrorCellValue)
+            this.arithmeticHelper.coerceScalarToNumberOrError(leftResult as InternalNoErrorScalarValue),
+            this.arithmeticHelper.coerceScalarToNumberOrError(rightResult as InternalNoErrorScalarValue)
           )
       }
       case AstNodeType.TIMES_OP: {
@@ -156,8 +156,8 @@ export class Interpreter {
         return passErrors(leftResult, rightResult) ??
           wrapperBinary(
             (a, b) => a*b,
-            this.arithmeticHelper.coerceScalarToNumberOrError(leftResult as InternalNoErrorCellValue),
-            this.arithmeticHelper.coerceScalarToNumberOrError(rightResult as InternalNoErrorCellValue)
+            this.arithmeticHelper.coerceScalarToNumberOrError(leftResult as InternalNoErrorScalarValue),
+            this.arithmeticHelper.coerceScalarToNumberOrError(rightResult as InternalNoErrorScalarValue)
           )
       }
       case AstNodeType.POWER_OP: {
@@ -166,8 +166,8 @@ export class Interpreter {
         return passErrors(leftResult, rightResult) ??
           wrapperBinary(
             Math.pow,
-            this.arithmeticHelper.coerceScalarToNumberOrError(leftResult as InternalNoErrorCellValue),
-            this.arithmeticHelper.coerceScalarToNumberOrError(rightResult as InternalNoErrorCellValue)
+            this.arithmeticHelper.coerceScalarToNumberOrError(leftResult as InternalNoErrorScalarValue),
+            this.arithmeticHelper.coerceScalarToNumberOrError(rightResult as InternalNoErrorScalarValue)
           )
       }
       case AstNodeType.DIV_OP: {
@@ -176,8 +176,8 @@ export class Interpreter {
         return passErrors(leftResult, rightResult) ??
           wrapperBinary(
             divide,
-            this.arithmeticHelper.coerceScalarToNumberOrError(leftResult as InternalNoErrorCellValue),
-            this.arithmeticHelper.coerceScalarToNumberOrError(rightResult as InternalNoErrorCellValue)
+            this.arithmeticHelper.coerceScalarToNumberOrError(leftResult as InternalNoErrorScalarValue),
+            this.arithmeticHelper.coerceScalarToNumberOrError(rightResult as InternalNoErrorScalarValue)
           )
       }
       case AstNodeType.PLUS_UNARY_OP: {
