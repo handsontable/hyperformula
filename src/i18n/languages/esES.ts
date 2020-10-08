@@ -213,6 +213,7 @@ export const dictionary: RawTranslationPackage = {
     WEEKNUM: 'NUM.DE.SEMANA',
     WORKDAY: 'DIA.LAB',
     'WORKDAY.INTL': 'DIA.LAB.INTL',
+    XNPV: 'VNA.NO.PER',
     XOR: 'XOR',
     YEAR: 'AÑO',
     YEARFRAC: 'FRAC.AÑO',

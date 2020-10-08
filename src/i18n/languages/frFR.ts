@@ -213,6 +213,7 @@ const dictionary: RawTranslationPackage = {
     WEEKNUM: 'NO.SEMAINE',
     WORKDAY: 'SERIE.JOUR.OUVRE',
     'WORKDAY.INTL': 'SERIE.JOUR.OUVRE.INTL',
+    XNPV: 'VAN.PAIEMENTS',
     XOR: 'OUX',
     YEAR: 'ANNEE',
     YEARFRAC: 'FRACTION.ANNEE',

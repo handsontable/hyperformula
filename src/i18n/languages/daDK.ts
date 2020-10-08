@@ -213,6 +213,7 @@ const dictionary: RawTranslationPackage = {
     WEEKNUM: 'UGE.NR',
     WORKDAY: 'ARBEJDSDAG',
     'WORKDAY.INTL': 'ARBEJDSDAG.INTL',
+    XNPV: 'NETTO.NUTIDSVÆRDI',
     XOR: 'XELLER',
     YEAR: 'ÅR',
     YEARFRAC: 'ÅR.BRØK',

@@ -213,6 +213,7 @@ const dictionary: RawTranslationPackage = {
     WEEKNUM: 'HÉT.SZÁMA',
     WORKDAY: 'KALK.MUNKANAP',
     'WORKDAY.INTL': 'KALK.MUNKANAP.INTL',
+    XNPV: 'XNJÉ',
     XOR: 'XVAGY',
     YEAR: 'ÉV',
     YEARFRAC: 'TÖRTÉV',
