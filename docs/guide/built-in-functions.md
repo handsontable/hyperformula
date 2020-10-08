@@ -149,6 +149,7 @@ lets you design your own [custom functions](custom-functions).
 | TBILLEQ <br><Badge text="v0.2.0"/>| Financial | Returns the bond-equivalent yield for a Treasury bill. | TBILLEQ(Settlement; Maturity; Discount) |
 | TBILLPRICE <br><Badge text="v0.2.0"/>| Financial | Returns the price per $100 face value for a Treasury bill. | TBILLPRICE(Settlement; Maturity; Discount) |
 | TBILLYIELD <br><Badge text="v0.2.0"/>| Financial | Returns the yield for a Treasury bill. | TBILLYIELD(Settlement; Maturity; Price) |
+| XNPV | Financial | Returns net present value. | XNPV(Rate; Payments; Dates) |
 | AND | Logical | Returns TRUE if all arguments are TRUE. | AND(Logicalvalue1; Logicalvalue2 ...Logicalvalue30) |
 | FALSE | Logical | Returns the logical value FALSE. | FALSE() |
 | IF | Logical | Specifies a logical test to be performed. | IF(Test; Then value; Otherwisevalue) |
