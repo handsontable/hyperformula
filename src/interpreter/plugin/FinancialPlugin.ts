@@ -235,6 +235,14 @@ export class FinancialPlugin extends FunctionPlugin {
         {argumentType: ArgumentTypes.NUMBER, greaterThan: -1},
       ],
     },
+    'PDURATION': {
+      method: 'pduration',
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
+        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
+        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
+      ],
+    },
   }
 
   public pmt(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
@@ -644,6 +652,12 @@ export class FinancialPlugin extends FunctionPlugin {
           1/(n-1)
         )-1
       }
+    )
+  }
+
+  public pduration(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('PDURATION'),
+      (rate: number, pv: number, fv: number) => (Math.log(fv) - Math.log(pv))/Math.log(1+rate)
     )
   }
 }
