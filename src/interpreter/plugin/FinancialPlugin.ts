@@ -680,7 +680,7 @@ export class FinancialPlugin extends FunctionPlugin {
         }
         const valArrNum = valArr as number[]
         const dateArr = dates.valuesFromTopLeftCorner()
-        for(let date of dateArr) {
+        for(const date of dateArr) {
           if(typeof date !== 'number') {
             return new CellError(ErrorType.NUM, ErrorMessage.NumberExpected)
           }
