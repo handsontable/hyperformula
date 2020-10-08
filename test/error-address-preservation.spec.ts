@@ -1,5 +1,5 @@
 import {ErrorType, HyperFormula} from '../src'
-import {adr, detailedError, detailedErrorWithOrigin} from './testUtils'
+import {adr, detailedErrorWithOrigin} from './testUtils'
 
 describe('Address preservation.', () => {
   it('Should work in the basic case.', () => {
