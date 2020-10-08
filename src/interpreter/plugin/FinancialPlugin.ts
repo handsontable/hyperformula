@@ -640,7 +640,7 @@ export class FinancialPlugin extends FunctionPlugin {
         }
         const n = vals.length
         return Math.pow(
-          (-npvCore(rrate, posValues)*Math.pow(1+rrate,n)/npvCore(frate, negValues)/(1+frate)),
+          (-npvCore(rrate, posValues)*Math.pow(1+rrate, n)/npvCore(frate, negValues)/(1+frate)),
           1/(n-1)
         )-1
       }
