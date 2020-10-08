@@ -673,14 +673,14 @@ export class FinancialPlugin extends FunctionPlugin {
     return this.runFunction(ast.args, formulaAddress, this.metadata('XNPV'),
       (rate: number, values: SimpleRangeValue, dates: SimpleRangeValue) => {
         const valArr = values.valuesFromTopLeftCorner()
-        for(let val of valArr) {
+        for(const val of valArr) {
           if(typeof val !== 'number') {
             return new CellError(ErrorType.NUM, ErrorMessage.NumberExpected)
           }
         }
         const valArrNum = valArr as number[]
         const dateArr = dates.valuesFromTopLeftCorner()
-        for(let date of dateArr) {
+        for(const date of dateArr) {
           if(typeof date !== 'number') {
             return new CellError(ErrorType.NUM, ErrorMessage.NumberExpected)
           }
