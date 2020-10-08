@@ -138,6 +138,7 @@ lets you design your own [custom functions](custom-functions).
 | NOMINAL <br><Badge text="v0.2.0"/>| Financial | Returns the nominal interest rate. | NOMINAL(Effect_rate; Npery) |
 | NPER <br><Badge text="v0.2.0"/>| Financial | Returns the number of periods for an investment assuming periodic, constant payments and a constant interest rate. | NPER(Rate; Pmt; Pv[; Fv[; Type]]) |
 | NPV | Financial | Returns net present value. | NPV(Rate; Value1; ...; Value30) |
+| PDURATION | Financial | Returns number of periods to reach specific value. | PDURATION(Rate; Pv; Fv) |
 | PMT <br><Badge text="v0.2.0"/>| Financial | Returns the periodic payment for a loan. | PMT(Rate; Nper; Pv[; Fv[; Type]]) |
 | PPMT <br><Badge text="v0.2.0"/>| Financial | Calculates the principal portion of a given loan payment. | PPMT(Rate; Per; Nper; Pv[; Fv[; Type]]) |
 | PV <br><Badge text="v0.2.0"/>| Financial | Returns the present value of an investment. | PV(Rate; Nper; Pmt[; Fv[; Type]]) |
