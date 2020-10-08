@@ -113,16 +113,16 @@ export class CellError {
   constructor(
     public readonly type: ErrorType,
     public readonly message?: string,
-    private address?: SimpleCellAddress
+    public readonly address?: SimpleCellAddress
   ) {
   }
 
-  public getOriginAddress(): Maybe<SimpleCellAddress> {
-    return this.address
-  }
-
-  public attachAddress(address: SimpleCellAddress): void {
-    this.address = this.address ?? address
+  public attachAddress(address: SimpleCellAddress): CellError {
+    if(this.address === undefined) {
+      return new CellError(this.type, this.message, address)
+    } else {
+      return this
+    }
   }
 
   public static parsingError() {

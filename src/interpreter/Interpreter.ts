@@ -323,7 +323,7 @@ function wrapperBinary<T extends InterpreterValue>(op: (a: T, b: T) => Interpret
 
 function wrapperForAddress(val: InterpreterValue, adr: SimpleCellAddress): InterpreterValue {
   if(val instanceof CellError) {
-    val.attachAddress(adr)
+    return val.attachAddress(adr)
   }
   return val
 }

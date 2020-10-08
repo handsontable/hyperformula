@@ -94,7 +94,7 @@ export class Exporter {
 
   private detailedError(error: CellError): DetailedCellError {
     let address = undefined
-    const originAddress = error.getOriginAddress()
+    const originAddress = error.address
     if(originAddress !== undefined) {
       if (originAddress.sheet === NamedExpressions.SHEET_FOR_WORKBOOK_EXPRESSIONS) {
         address = this.namedExpressions.namedExpressionInAddress(originAddress.row)?.displayName
