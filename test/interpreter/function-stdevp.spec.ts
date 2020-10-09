@@ -15,8 +15,10 @@ describe('Function STDEV.P', () => {
     const engine = HyperFormula.buildFromArray([
       ['=STDEV.P(2, 3)'],
       ['=STDEV.P(B2:I2, 2, 3, 4, TRUE(), FALSE(), "1",)', 2, 3, 4, true, false, 'a', '\'1', null],
+      ['=STDEV.P(1)'],
     ])
     expect(engine.getCellValue(adr('A1'))).toEqual(0.5)
     expect(engine.getCellValue(adr('A2'))).toBeCloseTo(1.4142135623731, 6)
+    expect(engine.getCellValue(adr('A3'))).toEqual(0)
   })
 })

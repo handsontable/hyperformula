@@ -15,8 +15,10 @@ describe('Function VARPA', () => {
     const engine = HyperFormula.buildFromArray([
       ['=VARPA(2, 3)'],
       ['=VARPA(B2:I2, 2, 3, 4, TRUE(), FALSE(), "1",)', 2, 3, 4, true, false, 'a', '\'1', null],
+      ['=VARPA(1)'],
     ])
     expect(engine.getCellValue(adr('A1'))).toEqual(0.25)
     expect(engine.getCellValue(adr('A2'))).toBeCloseTo(2.10714285714286, 6)
+    expect(engine.getCellValue(adr('A3'))).toEqual(0)
   })
 })
