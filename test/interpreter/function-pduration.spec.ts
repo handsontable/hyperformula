@@ -15,11 +15,19 @@ describe('Function PDURATION', () => {
   it('should calculate the correct value with correct arguments and defaults', () => {
     const engine = HyperFormula.buildFromArray([
       ['=PDURATION(2%, 12, 24)'],
+    ])
+
+    expect(engine.getCellValue(adr('A1'))).toBeCloseTo(35.00278878, 6)
+  })
+
+  it('should return proper error', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=PDURATION(-1, 12, 24)'],
       ['=PDURATION(2%, -12, -24)'],
       ['=PDURATION(0, 1, 1)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toBeCloseTo(35.00278878, 6)
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM, ErrorMessage.ValueSmall))
     expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NUM, ErrorMessage.ValueSmall))
     expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.NUM, ErrorMessage.ValueSmall))
   })

@@ -230,25 +230,6 @@ export class ArithmeticHelper {
     }
   }
 
-  public manyToCoercedNumbers(args: InternalScalarValue[]): number[] | CellError {
-    for(const arg of args) {
-      if(arg instanceof CellError) {
-        return arg
-      }
-    }
-
-    const ret: number[] = []
-    for(const arg of args as InternalNoErrorScalarValue[]) {
-      const coerced = this.coerceScalarToNumberOrError(arg)
-      if(coerced instanceof CellError) {
-        return coerced
-      }
-      ret.push(coerced)
-    }
-
-    return ret
-  }
-
   public coerceNumbersExpandRanges(args: InterpreterValue[]): number[] | CellError {
     const vals: (number | SimpleRangeValue)[] = []
     for(const arg of args) {

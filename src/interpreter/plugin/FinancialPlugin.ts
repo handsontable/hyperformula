@@ -3,7 +3,7 @@
  * Copyright (c) 2020 Handsoncode. All rights reserved.
  */
 
-import {CellError, ErrorType, InternalScalarValue, SimpleCellAddress} from '../../Cell'
+import {CellError, EmptyValue, ErrorType, InternalScalarValue, SimpleCellAddress} from '../../Cell'
 import {ErrorMessage} from '../../error-message'
 import {ProcedureAst} from '../../parser'
 import {InterpreterValue, SimpleRangeValue} from '../InterpreterValue'
@@ -603,13 +603,19 @@ export class FinancialPlugin extends FunctionPlugin {
   public fvschedule(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.runFunction(ast.args, formulaAddress, this.metadata('FVSCHEDULE'),
       (value: number, ratios: SimpleRangeValue) => {
-        const ratiosArray = this.interpreter.arithmeticHelper.manyToCoercedNumbers(ratios.valuesFromTopLeftCorner())
-        if(ratiosArray instanceof CellError) {
-          return ratiosArray
+        const vals = ratios.valuesFromTopLeftCorner()
+        for(const val of vals) {
+          if(val instanceof CellError) {
+            return val
+          }
         }
-        ratiosArray.forEach(arg => {
-          value *= 1+arg
-        })
+        for(const val of vals) {
+          if(typeof val === 'number') {
+            value *= 1+val
+          } else if(val !== EmptyValue) {
+            return new CellError(ErrorType.VALUE, ErrorMessage.NumberExpected)
+          }
+        }
         return value
       })
   }
@@ -675,14 +681,14 @@ export class FinancialPlugin extends FunctionPlugin {
         const valArr = values.valuesFromTopLeftCorner()
         for(const val of valArr) {
           if(typeof val !== 'number') {
-            return new CellError(ErrorType.NUM, ErrorMessage.NumberExpected)
+            return new CellError(ErrorType.VALUE, ErrorMessage.NumberExpected)
           }
         }
         const valArrNum = valArr as number[]
         const dateArr = dates.valuesFromTopLeftCorner()
         for(const date of dateArr) {
           if(typeof date !== 'number') {
-            return new CellError(ErrorType.NUM, ErrorMessage.NumberExpected)
+            return new CellError(ErrorType.VALUE, ErrorMessage.NumberExpected)
           }
         }
         const dateArrNum = dateArr as number[]

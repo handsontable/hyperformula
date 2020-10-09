@@ -15,16 +15,22 @@ describe('Function FVSCHEDULE', () => {
   it('should calculate the correct value with correct arguments and defaults', () => {
     const engine = HyperFormula.buildFromArray([
       ['=FVSCHEDULE(1, 1)'],
-      ['=FVSCHEDULE(2, B2:C2)', 1, 1],
-      ['=FVSCHEDULE(2, B3:C3)', '\'1', true],
-      ['=FVSCHEDULE(1, B4:C4)', 'abcd', '=NA()'],
-      ['=FVSCHEDULE(1, B5)', 'abcd']
+      ['=FVSCHEDULE(2, B2:D2)', 1, 1, null],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqual(2)
     expect(engine.getCellValue(adr('A2'))).toEqual(8)
-    expect(engine.getCellValue(adr('A3'))).toEqual(8)
-    expect(engine.getCellValue(adr('A4'))).toEqual(detailedError(ErrorType.NA))
-    expect(engine.getCellValue(adr('A5'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessage.NumberCoercion))
+  })
+
+  it('should return proper error', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=FVSCHEDULE(2, B1:C1)', '\'1', true],
+      ['=FVSCHEDULE(1, B2:C2)', 'abcd', '=NA()'],
+      ['=FVSCHEDULE(1, B3)', 'abcd']
+    ])
+
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessage.NumberExpected))
+    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NA))
+    expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessage.NumberExpected))
   })
 })
