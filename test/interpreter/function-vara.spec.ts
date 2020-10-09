@@ -16,9 +16,11 @@ describe('Function VARA', () => {
   it('should calculate variance (sample)', () => {
     const engine = HyperFormula.buildFromArray([
       ['=VARA(2, 3)'],
-      ['=VARA(B2:I2, 2, 3, 4, TRUE(), FALSE(), "1",)', 2, 3, 4, true, false, 'a', '\'1', null],
+      ['=VARA(2, 3, 4, TRUE(), FALSE(), "1",)'],
+      ['=VARA(B3:I3)', 2, 3, 4, true, false, 'a', '\'1', null],
     ])
     expect(engine.getCellValue(adr('A1'))).toEqual(0.5)
-    expect(engine.getCellValue(adr('A2'))).toBeCloseTo(2.26923076923077)
+    expect(engine.getCellValue(adr('A2'))).toBeCloseTo(2.28571428571429)
+    expect(engine.getCellValue(adr('A3'))).toBeCloseTo(2.61904761904762)
   })
 })
