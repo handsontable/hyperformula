@@ -1,0 +1,14 @@
+codecov:
+  require_ci_to_pass: yes
+  
+coverage:
+  range: 70..100
+  round: down
+  precision: 2
+
+comment:
+  layout: "reach, diff, flags, files"
+  behavior: default
+  require_changes: false
+  require_base: no
+  require_head: no
