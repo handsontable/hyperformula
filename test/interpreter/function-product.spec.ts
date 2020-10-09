@@ -19,6 +19,6 @@ describe('Function PRODUCT', () => {
       ])
       expect(engine.getCellValue(adr('A1'))).toEqual(6)
       expect(engine.getCellValue(adr('A2'))).toEqual(24)
-      expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.VALUE,ErrorMessage.NumberCoercion))
+      expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessage.NumberCoercion))
   })
 })
