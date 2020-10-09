@@ -27,8 +27,8 @@ describe('Function NPV', () => {
   it('order of arguments matters', () => {
     const engine = HyperFormula.buildFromArray([
       ['=NPV(1, A2:B3)'],
-      [1,2],
-      [3,4],
+      [1, 2],
+      [3, 4],
     ])
     expect(engine.getCellValue(adr('A1'))).toEqual(1.625)
   })

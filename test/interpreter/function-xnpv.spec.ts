@@ -19,7 +19,7 @@ describe('Function XNPV', () => {
       [1, 2, 3, 4],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM,ErrorMessage.ValueSmall))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM, ErrorMessage.ValueSmall))
     expect(engine.getCellValue(adr('B1'))).toBeCloseTo(9.94002794561453, 6)
     expect(engine.getCellValue(adr('C1'))).toBeCloseTo(9.99477922863743, 6)
   })
