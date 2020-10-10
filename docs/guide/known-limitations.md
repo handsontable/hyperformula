@@ -35,3 +35,4 @@ you can't compare the arguments in a formula like this:
   * Structured references ("Tables")
   * Currency data type
   * Relative named expressions
+* We immediately instantiate references to single cells to their values instead of treating them as 1-length ranges, which slightly changes behavior of some functions (e.g. NPV).
