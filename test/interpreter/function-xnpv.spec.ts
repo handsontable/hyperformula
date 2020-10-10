@@ -12,16 +12,19 @@ describe('Function XNPV', () => {
     expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
   })
 
-  it('should accept Rate values that are greater than 0.', () => {
+  /**
+   * Product #2 implements only Rate>0 (even though states in the documentation that Rate>-1).
+   */
+  it('should accept Rate values that are greater than -1.', () => {
     const engine = HyperFormula.buildFromArray([
-      ['=XNPV(0, A2:D2, A3:D3)', '=XNPV(2, A2:D2, A3:D3)', '=XNPV(0.1, A2:D2, A3:D3)'],
+      ['=XNPV(-1, A2:D2, A3:D3)', '=XNPV(2, A2:D2, A3:D3)', '=XNPV(-0.9, A2:D2, A3:D3)'],
       [1, 2, 3, 4],
       [1, 2, 3, 4],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM, ErrorMessage.ValueSmall))
     expect(engine.getCellValue(adr('B1'))).toBeCloseTo(9.94002794561453, 6)
-    expect(engine.getCellValue(adr('C1'))).toBeCloseTo(9.99477922863743, 6)
+    expect(engine.getCellValue(adr('C1'))).toBeCloseTo(10.1271695921145, 6)
   })
 
   it('should calculate the correct value', () => {

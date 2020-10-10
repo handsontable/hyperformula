@@ -246,7 +246,7 @@ export class FinancialPlugin extends FunctionPlugin {
     'XNPV': {
       method: 'xnpv',
       parameters: [
-        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
+        {argumentType: ArgumentTypes.NUMBER, greaterThan: -1},
         {argumentType: ArgumentTypes.RANGE},
         {argumentType: ArgumentTypes.RANGE},
       ],
