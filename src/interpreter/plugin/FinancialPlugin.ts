@@ -231,8 +231,8 @@ export class FinancialPlugin extends FunctionPlugin {
       method: 'mirr',
       parameters: [
         {argumentType: ArgumentTypes.RANGE},
-        {argumentType: ArgumentTypes.NUMBER, greaterThan: -1},
-        {argumentType: ArgumentTypes.NUMBER, greaterThan: -1},
+        {argumentType: ArgumentTypes.NUMBER},
+        {argumentType: ArgumentTypes.NUMBER},
       ],
     },
     'PDURATION': {
