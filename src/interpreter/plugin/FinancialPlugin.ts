@@ -697,11 +697,11 @@ export class FinancialPlugin extends FunctionPlugin {
         }
         const n = dateArrNum.length
         let ret = 0
+        if(dateArrNum[0]  < 0) {
+          return new CellError(ErrorType.NUM, ErrorMessage.ValueSmall)
+        }
         for(let i=0;i<n;i++) {
           dateArrNum[i] = Math.floor(dateArrNum[i])
-          if(dateArrNum[i]  < 0) {
-            return new CellError(ErrorType.NUM, ErrorMessage.ValueSmall)
-          }
           if(dateArrNum[i]<dateArrNum[0]) {
             return new CellError(ErrorType.NUM, ErrorMessage.ValueSmall)
           }
