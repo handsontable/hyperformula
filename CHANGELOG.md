@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added 5 datetime functions: INTERVAL, NETWORKDAYS, NETWORKDAYS.INTL, WORKDAY, WORKDAY.INTL. (#153)
 - Added 3 information functions HLOOKUP, ROW, COLUMN. (#158)
 - Added 8 statistical functions VAR.P, VAR.S, VARA, VARPA, STDEV.P, STDEV.S, STDEVA, STDEVPA.
-- Added 2 mathematical function SUBTOTAL, PRODUCT.
+- Added 2 mathematical functions SUBTOTAL, PRODUCT.
 
 ### Fixed
 - Fixed multiple issues with VLOOKUP function. (#526, #528)
