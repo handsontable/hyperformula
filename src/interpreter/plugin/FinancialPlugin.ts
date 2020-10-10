@@ -627,7 +627,11 @@ export class FinancialPlugin extends FunctionPlugin {
         if(coerced instanceof CellError) {
           return coerced
         }
-        return npvCore(rate, coerced)
+        const res = npvCore(rate, coerced)
+        if(!Number.isFinite(res) && rate === -1) {
+          return new CellError(ErrorType.DIV_BY_ZERO)
+        }
+        return res
       }
     )
   }
