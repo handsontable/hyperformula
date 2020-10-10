@@ -627,11 +627,7 @@ export class FinancialPlugin extends FunctionPlugin {
         if(coerced instanceof CellError) {
           return coerced
         }
-        const res = npvCore(rate, coerced)
-        if(!Number.isFinite(res) && rate === -1) {
-          return new CellError(ErrorType.DIV_BY_ZERO)
-        }
-        return res
+        return npvCore(rate, coerced)
       }
     )
   }
@@ -665,8 +661,16 @@ export class FinancialPlugin extends FunctionPlugin {
           return new CellError(ErrorType.DIV_BY_ZERO)
         }
         const n = vals.length
+        const nom = npvCore(rrate, posValues)
+        if(nom instanceof CellError) {
+          return nom
+        }
+        const denom = npvCore(frate, negValues)
+        if(denom instanceof CellError) {
+          return denom
+        }
         return Math.pow(
-          (-npvCore(rrate, posValues)*Math.pow(1+rrate, n)/npvCore(frate, negValues)/(1+frate)),
+          (-nom*Math.pow(1+rrate, n)/denom/(1+frate)),
           1/(n-1)
         )-1
       }
@@ -748,12 +752,16 @@ function ppmtCore(rate: number, period: number, periods: number, present: number
   return pmtCore(rate, periods, present, future, type) - ipmtCore(rate, period, periods, present, future, type)
 }
 
-function npvCore(rate: number, args: number[]): number {
+function npvCore(rate: number, args: number[]): number | CellError {
   let acc = 0
   for(let i=args.length-1;i>=0;i--) {
     acc += args[i]
-    if(acc===0 && rate===-1) {
-      continue
+    if(rate===-1) {
+      if (acc === 0) {
+        continue
+      } else {
+        return new CellError(ErrorType.DIV_BY_ZERO)
+      }
     }
     acc /= 1+rate
   }
