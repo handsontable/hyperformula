@@ -46,7 +46,7 @@ describe('Function NPV', () => {
 
 
   /**
-   * Discrepancy with products #1 and #2.
+   * Inconsistency with products #1 and #2.
    */
   it('cell reference', () => {
     const engine = HyperFormula.buildFromArray([
