@@ -193,7 +193,7 @@ export class Interpreter {
         if (result instanceof SimpleRangeValue) {
           return new CellError(ErrorType.VALUE, ErrorMessage.ScalarExpected)
         } else {
-          return wrapperUnary((a) => -a,
+          return wrapperUnary(a => -a,
             this.arithmeticHelper.coerceScalarToNumberOrError(result))
         }
       }
@@ -202,7 +202,7 @@ export class Interpreter {
         if (result instanceof SimpleRangeValue) {
           return new CellError(ErrorType.VALUE, ErrorMessage.ScalarExpected)
         } else {
-          return wrapperUnary((a) => a/100,
+          return wrapperUnary(a => a/100,
             this.arithmeticHelper.coerceScalarToNumberOrError(result))
         }
       }
