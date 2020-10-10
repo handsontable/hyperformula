@@ -52,6 +52,6 @@ describe('Function NPV', () => {
     const engine = HyperFormula.buildFromArray([
       ['=NPV(1,B1)', true]
     ])
-    expect(engine.getCellValue(adr('A1'))).toEqual(0.5) //Should be 0.
+    expect(engine.getCellValue(adr('A1'))).toEqual(0.5) //Both products #1 and #2 return 0 here.
   })
 })
