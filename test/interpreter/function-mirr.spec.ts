@@ -15,15 +15,15 @@ describe('Function MIRR', () => {
 
   it('should return correct value', () => {
     const engine = HyperFormula.buildFromArray([
-      ['=MIRR(B1:C1,1,1)', 1, -1],
+      ['=MIRR(B1:F1,0.3,-0.1)',1,2,-3,-5,8],
       ['=MIRR(B2:C2,1,1)', -1, 1],
       ['=MIRR(B3:E3,0.2,0.1)', -1, 0, -1, 1],
-      ['=MIRR(B3:E3,0.2,0.1)', -1, -1, 1],
+      ['=MIRR(B4:D4,0.2,0.1)', -1, -1, 1],
     ])
-    expect(engine.getCellValue(adr('A1'))).toEqual(3)
+    expect(engine.getCellValue(adr('A1'))).toBeCloseTo(0.257018945686308, 6)
     expect(engine.getCellValue(adr('A2'))).toEqual(0)
     expect(engine.getCellValue(adr('A3'))).toBeCloseTo(-0.161201673643132, 6)
-    expect(engine.getCellValue(adr('A4'))).toBeCloseTo(-0.161201673643132, 6) // different value without 0
+    expect(engine.getCellValue(adr('A4'))).toBeCloseTo(-0.261451054124004, 6) // different value without 0
   })
   
   it('should return #DIV/0! if at least one positive and one negative values condtion is not met', () => {
