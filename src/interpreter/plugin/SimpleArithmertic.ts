@@ -45,8 +45,8 @@ export class SimpleArithmerticPlugin extends  FunctionPlugin {
         { argumentType: ArgumentTypes.NOERROR },
       ]
     },
-    'GTE': {
-      method: 'gte',
+    'GEQ': {
+      method: 'geq',
       parameters: [
         { argumentType: ArgumentTypes.NOERROR },
         { argumentType: ArgumentTypes.NOERROR },
@@ -59,8 +59,8 @@ export class SimpleArithmerticPlugin extends  FunctionPlugin {
         { argumentType: ArgumentTypes.NOERROR },
       ]
     },
-    'LTE': {
-      method: 'lte',
+    'LEQ': {
+      method: 'leq',
       parameters: [
         { argumentType: ArgumentTypes.NOERROR },
         { argumentType: ArgumentTypes.NOERROR },
