@@ -15,7 +15,7 @@ describe('Function MIRR', () => {
 
   it('should return correct value', () => {
     const engine = HyperFormula.buildFromArray([
-      ['=MIRR(B1:F1,0.3,-0.1)',1,2,-3,-5,8],
+      ['=MIRR(B1:F1,0.3,-0.1)', 1, 2, -3, -5, 8],
       ['=MIRR(B2:C2,1,1)', -1, 1],
       ['=MIRR(B3:E3,0.2,0.1)', -1, 0, -1, 1],
       ['=MIRR(B4:D4,0.2,0.1)', -1, -1, 1],
