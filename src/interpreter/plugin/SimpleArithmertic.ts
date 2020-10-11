@@ -116,7 +116,7 @@ export class SimpleArithmerticPlugin extends  FunctionPlugin {
 
   public add(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.runFunction(ast.args, formulaAddress, this.metadata('ADD'),
-      (a: number, b: number) => this.interpreter.arithmeticHelper.addWithEpsilon(a,b)
+      (a: number, b: number) => this.interpreter.arithmeticHelper.addWithEpsilon(a, b)
       )
   }
 
@@ -174,7 +174,7 @@ export class SimpleArithmerticPlugin extends  FunctionPlugin {
 
   public minus(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.runFunction(ast.args, formulaAddress, this.metadata('MINUS'),
-      (a: number, b: number) => this.interpreter.arithmeticHelper.subtract(a,b)
+      (a: number, b: number) => this.interpreter.arithmeticHelper.subtract(a, b)
     )
   }
 
@@ -202,6 +202,7 @@ export class SimpleArithmerticPlugin extends  FunctionPlugin {
     )
   }
 
+  //eslint-disable-next-line @typescript-eslint/camelcase
   public unary_percent(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.runFunction(ast.args, formulaAddress, this.metadata('UNARY_PERCENT'),
       (a => a/100)
