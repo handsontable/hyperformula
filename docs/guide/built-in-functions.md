@@ -171,6 +171,7 @@ lets you design your own [custom functions](custom-functions).
 | ACOSH <br><Badge text="v0.2.0"/>| Math and trigonometry | Returns the inverse harmonic cosine of a number. | ACOSH(Number) |
 | ACOT <br><Badge text="v0.2.0"/>| Math and trigonometry | Returns the inverse trigonometric cotangent of a number. | ACOT(Number) |
 | ACOTH <br><Badge text="v0.2.0"/>| Math and trigonometry | Returns the inverse harmonic cotangent of a number. | ACOTH(Number) |
+| ADD | Math and trigonometry | Adds two values. | ADD(Numbe; Number) |
 | ASIN | Math and trigonometry | Returns the inverse trigonometric sine of a number. | ASIN(Number) |
 | ASINH <br><Badge text="v0.2.0"/>| Math and trigonometry | Returns the inverse harmonic sine of a number. | ASINH(Number) |
 | ATAN | Math and trigonometry | Returns the inverse trigonometric tangent of a number. | ATAN(Number) |
@@ -178,6 +179,7 @@ lets you design your own [custom functions](custom-functions).
 | ATANH <br><Badge text="v0.2.0"/>| Math and trigonometry | Returns the inverse harmonic tangent of a number. | ATANH(Number) |
 | BASE | Math and trigonometry | Converts a positive integer to a specified base into a text from the numbering system. | BASE(Number; Radix; [Minimumlength]) |
 | CEILING | Math and trigonometry | Rounds a number up to the nearest multiple of Significance. | CEILING(Number; Significance; Mode) |
+| CONCAT | Math and trigonometry | Concatenates two strings. | CONCAT(String; String) |
 | COS | Math and trigonometry | Returns the cosine of the given angle (in radians). | COS(Number) |
 | COSH <br><Badge text="v0.2.0"/>| Math and trigonometry | Returns the hyperbolic cosine of the given value. | COSH(Number) |
 | COT | Math and trigonometry | Returns the cotangent of the given angle (in radians). | COT(Number) |
@@ -187,15 +189,25 @@ lets you design your own [custom functions](custom-functions).
 | CSCH <br><Badge text="v0.2.0"/>| Math and trigonometry | Returns the hyperbolic cosecans of the given value. | CSCH(Number) |
 | DECIMAL | Math and trigonometry | Converts text with characters from a number system to a positive integer in the base radix given. | DECIMAL("Text"; Radix) |
 | DEGREES | Math and trigonometry | Converts radians into degrees. | DEGREES(Number) |
+| DIVIDE | Math and trigonometry | Divides two values. | DIVIDE(Number; Number) |
+| EQ | Math and trigonometry | Tests two values for equality. | EQ(Value; Value) |
 | EVEN | Math and trigonometry | Rounds a positive number up to the next even integer and a negative number down to the next even integer. | EVEN(Number) |
 | EXP | Math and trigonometry | Returns e raised to the power of a number. | EXP(Number) |
+| GEQ | Math and trigonometry | Tests two values for greater-equal relation. | GEQ(Value; Value) |
+| GT | Math and trigonometry | Tests two values for greater-than relation. | GT(Value; Value) |
 | INT | Math and trigonometry | Rounds a number down to the nearest integer. | INT(Number) |
+| LEQ | Math and trigonometry | Tests two values for less-equal relation. | LEQ(Value; Value) |
 | LN | Math and trigonometry | Returns the natural logarithm based on the constant e of a number. | LN(Number) |
 | LOG | Math and trigonometry | Returns the logarithm of a number to the specified base. | LOG(Number; Base) |
 | LOG10 | Math and trigonometry | Returns the base-10 logarithm of a number. | LOG10(Number) |
+| LT | Math and trigonometry | Tests two values for less-than relation. | LT(Value; Value) |
+| MINUS | Math and trigonometry | Subtracts two values. | MINUS(Number; Number) |
 | MOD | Math and trigonometry | Returns the remainder when one integer is divided by another. | MOD(Dividend; Divisor) |
+| MULTIPLY | Math and trigonometry | Multiplies two values. | MULTIPLY(Number; Number) |
+| NE | Math and trigonometry | Tests two values for inequality. | NE(Value; Value) |
 | ODD | Math and trigonometry | Rounds a positive number up to the nearest odd integer and a negative number down to the nearest odd integer. | ODD(Number) |
 | PI | Math and trigonometry | Returns 3.14159265358979, the value of the mathematical constant PI to 14 decimal places. | PI() |
+| POW | Math and trigonometry | Computes power of two values. | POW(Number; Number) |
 | POWER | Math and trigonometry | Returns a number raised to another number. | POWER(Base; Exponent) |
 | RADIANS | Math and trigonometry | Converts degrees to radians. | RADIANS(Number) |
 | RAND | Math and trigonometry | Returns a random number between 0 and 1. | RAND() |
@@ -215,25 +227,13 @@ lets you design your own [custom functions](custom-functions).
 | TAN | Math and trigonometry | Returns the tangent of the given angle (in radians). | TAN(Number) |
 | TANH <br><Badge text="v0.2.0"/>| Math and trigonometry | Returns the hyperbolic tangent of the given value. | TANH(Number) |
 | TRUNC | Math and trigonometry | Truncates a number by removing decimal places. | TRUNC(Number; Count) |
+| UMINUS | Math and trigonometry | Negates the value. | UMINUS(Number) |
+| UNARY_PERCENT | Math and trigonometry | Applies percent operator. | UNARY_PERCENT(Number) |
+| UPLUS | Math and trigonometry | Applies unary plus. | UPLUS(Number) |
 | MMULT | Matrix functions | Calculates the array product of two arrays. | MMULT(Array; Array) |
 | MEDIANPOOL | Matrix functions | Calculates a smaller range which is a median of a Window_size, in a given Range, for every Stride element. | MEDIANPOOL(Range, Window_size, Stride) |
 | MAXPOOL | Matrix functions | Calculates a smaller range which is a maximum of a Window_size, in a given Range, for every Stride element. | MAXPOOL(Range, Window_size, Stride) |
 | TRANSPOSE | Matrix functions | Transposes the rows and columns of an array. | TRANSPOSE(Array) |
-| ADD | Operator | Adds two values. | ADD(Numbe; Number) |
-| CONCAT | Operator | Concatenates two strings. | CONCAT(String; String) |
-| DIVIDE | Operator | Divides two values. | DIVIDE(Number; Number) |
-| EQ | Operator | Tests two values for equality. | EQ(Value; Value) |
-| GT | Operator | Tests two values for greater-than relation. | GT(Value; Value) |
-| GEQ | Operator | Tests two values for greater-equal relation. | GEQ(Value; Value) |
-| LT | Operator | Tests two values for less-than relation. | LT(Value; Value) |
-| LEQ | Operator | Tests two values for less-equal relation. | LEQ(Value; Value) |
-| MINUS | Operator | Subtracts two values. | MINUS(Number; Number) |
-| MULTIPLY | Operator | Multiplies two values. | MULTIPLY(Number; Number) |
-| NE | Operator | Tests two values for inequality. | NE(Value; Value) |
-| POW | Operator | Computes power of two values. | POW(Number; Number) |
-| UMINUS | Operator | Negates the value. | UMINUS(Number) |
-| UNARY_PERCENT | Operator | Applies percent operator. | UNARY_PERCENT(Number) |
-| UPLUS | Operator | Applies unary plus. | UPLUS(Number) |
 | AVERAGE | Statistical | Returns the average of the arguments. | AVERAGE(Number1; Number2; ...Number30) |
 | AVERAGEA | Statistical | Returns the average of the arguments. | AVERAGEA(Value1; Value2; ... Value30) |
 | AVERAGEIF | Statistical | Returns the arithmetic mean of all cells in a range that satisfy a given condition. | AVERAGEIF(Range; Criterion [; Average_Range ]) |
