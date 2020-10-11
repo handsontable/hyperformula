@@ -219,6 +219,21 @@ lets you design your own [custom functions](custom-functions).
 | MEDIANPOOL | Matrix functions | Calculates a smaller range which is a median of a Window_size, in a given Range, for every Stride element. | MEDIANPOOL(Range, Window_size, Stride) |
 | MAXPOOL | Matrix functions | Calculates a smaller range which is a maximum of a Window_size, in a given Range, for every Stride element. | MAXPOOL(Range, Window_size, Stride) |
 | TRANSPOSE | Matrix functions | Transposes the rows and columns of an array. | TRANSPOSE(Array) |
+| ADD | Operator | Adds two values. | ADD(Numbe; Number) |
+| CONCAT | Operator | Concatenates two strings. | CONCAT(String; String) |
+| DIVIDE | Operator | Divides two values. | DIVIDE(Number; Number) |
+| EQ | Operator | Tests two values for equality. | EQ(Value; Value) |
+| GT | Operator | Tests two values for greater-than relation. | GT(Value; Value) |
+| GEQ | Operator | Tests two values for greater-equal relation. | GEQ(Value; Value) |
+| LT | Operator | Tests two values for less-than relation. | LT(Value; Value) |
+| LEQ | Operator | Tests two values for less-equal relation. | LEQ(Value; Value) |
+| MINUS | Operator | Subtracts two values. | MINUS(Number; Number) |
+| MULTIPLY | Operator | Multiplies two values. | MULTIPLY(Number; Number) |
+| NE | Operator | Tests two values for inequality. | NE(Value; Value) |
+| POW | Operator | Computes power of two values. | POW(Number; Number) |
+| UMINUS | Operator | Negates the value. | UMINUS(Number) |
+| UNARY_PERCENT | Operator | Applies percent operator. | UNARY_PERCENT(Number) |
+| UPLUS | Operator | Applies unary plus. | UPLUS(Number) |
 | AVERAGE | Statistical | Returns the average of the arguments. | AVERAGE(Number1; Number2; ...Number30) |
 | AVERAGEA | Statistical | Returns the average of the arguments. | AVERAGEA(Value1; Value2; ... Value30) |
 | AVERAGEIF | Statistical | Returns the arithmetic mean of all cells in a range that satisfy a given condition. | AVERAGEIF(Range; Criterion [; Average_Range ]) |
