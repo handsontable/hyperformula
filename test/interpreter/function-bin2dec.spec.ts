@@ -19,9 +19,9 @@ describe('function BIN2DEC', () => {
       ['=BIN2DEC(TRUE())'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM, ErrorMessage.NotBinary))
-    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NUM, ErrorMessage.NotBinary))
-    expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.NUM, ErrorMessage.NotBinary))
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.NotBinary))
+    expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.NotBinary))
+    expect(engine.getCellValue(adr('A3'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.NotBinary))
   })
 
   it('should work only for 10 bits', () => {
@@ -30,7 +30,7 @@ describe('function BIN2DEC', () => {
       ['=BIN2DEC(1010101010)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM, ErrorMessage.NotBinary))
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.NotBinary))
     expect(engine.getCellValue(adr('A2'))).toEqual(-342)
   })
 

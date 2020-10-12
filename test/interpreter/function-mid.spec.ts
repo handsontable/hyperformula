@@ -10,9 +10,9 @@ describe('Function MID', () => {
       ['=MID("foo", "bar", "baz", "qux")'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
-    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
-    expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
+    expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
+    expect(engine.getCellValue(adr('A3'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
   })
 
   it('should return substring', () => {
@@ -49,8 +49,8 @@ describe('Function MID', () => {
       ['=MID("foo", -1, 1)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessage.LessThanOne))
-    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessage.LessThanOne))
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.LessThanOne))
+    expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.LessThanOne))
   })
 
   it('should return #VALUE! if number of chars is negative', () => {
@@ -58,7 +58,7 @@ describe('Function MID', () => {
       ['=MID("foo", 1, -1)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessage.NegativeLength))
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.NegativeLength))
   })
 
   it('should coerce', () => {
@@ -76,6 +76,6 @@ describe('Function MID', () => {
       ['=MID(B1:B2, 1, 2)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessage.WrongType))
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.WrongType))
   })
 })

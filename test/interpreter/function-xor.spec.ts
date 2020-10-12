@@ -23,7 +23,7 @@ describe('Function XOR', () => {
       ['=XOR()'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
   })
 
   it('for one argument', () => {
@@ -45,7 +45,7 @@ describe('Function XOR', () => {
 
     expect(engine.getCellValue(adr('A1'))).toBe(true)
     expect(engine.getCellValue(adr('A2'))).toBe(true)
-    expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessage.WrongType))
+    expect(engine.getCellValue(adr('A3'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.WrongType))
   })
 
   it('use coercion #2', () => {
@@ -58,7 +58,7 @@ describe('Function XOR', () => {
 
     expect(engine.getCellValue(adr('A1'))).toBe(false)
     expect(engine.getCellValue(adr('A2'))).toBe(true)
-    expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessage.WrongType))
+    expect(engine.getCellValue(adr('A3'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.WrongType))
   })
 
   it('when no coercible to number arguments', () => {
@@ -66,7 +66,7 @@ describe('Function XOR', () => {
       ['=XOR("foo")'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessage.WrongType))
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.WrongType))
   })
 
   it('returns TRUE iff odd number of TRUEs present', () => {
@@ -88,7 +88,7 @@ describe('Function XOR', () => {
       ['=XOR(A1:B2)'],
     ])
 
-    expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.DIV_BY_ZERO))
+    expect(engine.getCellValue(adr('A3'))).toEqualError(detailedError(ErrorType.DIV_BY_ZERO))
   })
 
   it('works with ranges', () => {
@@ -108,6 +108,6 @@ describe('Function XOR', () => {
       ['=XOR(A1:B2)'],
     ])
 
-    expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.DIV_BY_ZERO))
+    expect(engine.getCellValue(adr('A3'))).toEqualError(detailedError(ErrorType.DIV_BY_ZERO))
   })
 })

@@ -54,16 +54,15 @@ export class Interpreter {
   }
 
   public evaluateAst(ast: Ast, formulaAddress: SimpleCellAddress): InterpreterValue {
-    const val = this.evaluateAstWithoutPostoprocessing(ast, formulaAddress)
+    let val = this.evaluateAstWithoutPostoprocessing(ast, formulaAddress)
     if (typeof val === 'number') {
       if (isNumberOverflow(val)) {
         return new CellError(ErrorType.NUM, ErrorMessage.NaN)
       } else {
-        return fixNegativeZero(val)
+        val = fixNegativeZero(val)
       }
-    } else {
-      return val
     }
+    return wrapperForAddress(val, formulaAddress)
   }
   /**
    * Calculates cell value from formula abstract syntax tree
@@ -71,7 +70,7 @@ export class Interpreter {
    * @param formula - abstract syntax tree of formula
    * @param formulaAddress - address of the cell in which formula is located
    */
-  public evaluateAstWithoutPostoprocessing(ast: Ast, formulaAddress: SimpleCellAddress): InterpreterValue {
+  private evaluateAstWithoutPostoprocessing(ast: Ast, formulaAddress: SimpleCellAddress): InterpreterValue {
     switch (ast.type) {
       case AstNodeType.EMPTY: {
         return EmptyValue
@@ -322,3 +321,9 @@ function wrapperBinary<T extends InterpreterValue>(op: (a: T, b: T) => Interpret
   }
 }
 
+function wrapperForAddress(val: InterpreterValue, adr: SimpleCellAddress): InterpreterValue {
+  if(val instanceof CellError) {
+    return val.attachAddress(adr)
+  }
+  return val
+}

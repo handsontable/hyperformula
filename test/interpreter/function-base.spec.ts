@@ -9,7 +9,7 @@ describe('function BASE', () => {
       ['=BASE("foo", 2, 3)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessage.NumberCoercion))
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.NumberCoercion))
   })
 
   it('should return error when wrong number of argument', () => {
@@ -18,8 +18,8 @@ describe('function BASE', () => {
       ['=BASE("foo", 2, 3, 4)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
-    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
+    expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
   })
 
   it('should work', () => {
@@ -83,7 +83,7 @@ describe('function BASE', () => {
       ['=BASE(-2, 5)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM, ErrorMessage.ValueSmall))
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.ValueSmall))
   })
 
   it('should allow base from 2 to 36', () => {
@@ -94,9 +94,9 @@ describe('function BASE', () => {
       ['=BASE(2, 37)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM, ErrorMessage.ValueSmall))
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.ValueSmall))
     expect(engine.getCellValue(adr('A2'))).toEqual('10')
     expect(engine.getCellValue(adr('A3'))).toEqual('2')
-    expect(engine.getCellValue(adr('A4'))).toEqual(detailedError(ErrorType.NUM, ErrorMessage.ValueLarge))
+    expect(engine.getCellValue(adr('A4'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.ValueLarge))
   })
 })

@@ -123,7 +123,7 @@ describe('check if type coercions are applied', () => {
     expect(engine.getCellValue(adr('C1'))).toEqual(1) //ADD
     expect(engine.getCellValue(adr('D1'))).toEqual(1) //SUB
     expect(engine.getCellValue(adr('E1'))).toEqual(0) //MULT
-    expect(engine.getCellValue(adr('F1'))).toEqual(detailedError(ErrorType.DIV_BY_ZERO)) // DIV
+    expect(engine.getCellValue(adr('F1'))).toEqualError(detailedError(ErrorType.DIV_BY_ZERO)) // DIV
     expect(engine.getCellValue(adr('G1'))).toEqual(1) // EXP
     expect(engine.getCellValue(adr('H1'))).toEqual(true) // UNARY PLUS
     expect(engine.getCellValue(adr('I1'))).toEqual(-1) // UNARY MINUS
@@ -162,7 +162,7 @@ describe('check if type coercions are applied', () => {
     expect(engine.getCellValue(adr('C1'))).toEqual(1) //ADD
     expect(engine.getCellValue(adr('D1'))).toEqual(1) //SUB
     expect(engine.getCellValue(adr('E1'))).toEqual(0) //MULT
-    expect(engine.getCellValue(adr('F1'))).toEqual(detailedError(ErrorType.DIV_BY_ZERO)) // DIV
+    expect(engine.getCellValue(adr('F1'))).toEqualError(detailedError(ErrorType.DIV_BY_ZERO)) // DIV
     expect(engine.getCellValue(adr('G1'))).toEqual(1) // EXP
   })
 
@@ -184,7 +184,7 @@ describe('check if type coercions are applied', () => {
     expect(engine.getCellValue(adr('C1'))).toEqual(0) //ADD
     expect(engine.getCellValue(adr('D1'))).toEqual(0) //SUB
     expect(engine.getCellValue(adr('E1'))).toEqual(0) //MULT
-    expect(engine.getCellValue(adr('F1'))).toEqual(detailedError(ErrorType.DIV_BY_ZERO)) // DIV
+    expect(engine.getCellValue(adr('F1'))).toEqualError(detailedError(ErrorType.DIV_BY_ZERO)) // DIV
     expect(engine.getCellValue(adr('G1'))).toEqual(1) // EXP
     expect(engine.getCellValue(adr('H1'))).toEqual(false) // UNARY PLUS
     expect(engine.getCellValue(adr('I1'))).toEqual(0) // UNARY MINUS
@@ -198,7 +198,7 @@ describe('check if type coercions are applied', () => {
     expect(engine.getCellValue(adr('C1'))).toEqual(0) //ADD
     expect(engine.getCellValue(adr('D1'))).toEqual(0) //SUB
     expect(engine.getCellValue(adr('E1'))).toEqual(0) //MULT
-    expect(engine.getCellValue(adr('F1'))).toEqual(detailedError(ErrorType.DIV_BY_ZERO)) // DIV
+    expect(engine.getCellValue(adr('F1'))).toEqualError(detailedError(ErrorType.DIV_BY_ZERO)) // DIV
     expect(engine.getCellValue(adr('G1'))).toEqual(1) // EXP
   })
   it( 'order operations, \'\' vs null', () => {

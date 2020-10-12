@@ -9,7 +9,7 @@ describe('function DEC2OCT', () => {
       ['=DEC2OCT("foo")'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessage.NumberCoercion))
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.NumberCoercion))
   })
 
   it('should return error when wrong number of argument', () => {
@@ -17,7 +17,7 @@ describe('function DEC2OCT', () => {
       ['=DEC2OCT("foo", 2, 3)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
   })
 
   it('should work', () => {
@@ -69,10 +69,10 @@ describe('function DEC2OCT', () => {
       ['=DEC2OCT(536870912)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM, ErrorMessage.ValueBaseSmall))
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.ValueBaseSmall))
     expect(engine.getCellValue(adr('A2'))).toEqual('4000000000')
     expect(engine.getCellValue(adr('A3'))).toEqual('3777777777')
-    expect(engine.getCellValue(adr('A4'))).toEqual(detailedError(ErrorType.NUM, ErrorMessage.ValueBaseLarge))
+    expect(engine.getCellValue(adr('A4'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.ValueBaseLarge))
   })
 
   it('should respect second argument and fill with zeros for positive arguments', () => {
@@ -101,8 +101,8 @@ describe('function DEC2OCT', () => {
       ['=DEC2OCT(-2, 12)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM, ErrorMessage.ValueSmall))
-    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NUM, ErrorMessage.ValueLarge))
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.ValueSmall))
+    expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.ValueLarge))
   })
 
   // Inconsistency with Product 1
@@ -112,6 +112,6 @@ describe('function DEC2OCT', () => {
       ['=2', '=DEC2OCT(A1:A2)'],
     ])
 
-    expect(engine.getCellValue(adr('B2'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessage.WrongType))
+    expect(engine.getCellValue(adr('B2'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.WrongType))
   })
 })

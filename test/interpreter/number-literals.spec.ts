@@ -54,7 +54,7 @@ describe('Number literals', () => {
     const engine = HyperFormula.buildFromArray([['="1 000" + 2']], new Config({
       thousandSeparator: ',', functionArgSeparator: ';'
     }))
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessage.NumberCoercion))
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.NumberCoercion))
   })
 
   it('should work for number with dot as thousand separator', () => {

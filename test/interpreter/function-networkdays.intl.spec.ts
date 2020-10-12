@@ -8,8 +8,8 @@ describe('Function NETWORKDAYS.INTL', () => {
       ['=NETWORKDAYS.INTL(1)', '=NETWORKDAYS.INTL(1, 1, 1, 1, 1)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
-    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
+    expect(engine.getCellValue(adr('B1'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
   })
 
   it('should check for types or value of third argument', () => {
@@ -20,11 +20,11 @@ describe('Function NETWORKDAYS.INTL', () => {
       ['=NETWORKDAYS.INTL(0, 1, -1)'],
       ['=NETWORKDAYS.INTL(0, 1, "1111111")'],
     ])
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessage.WrongType))
-    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NUM, ErrorMessage.WeekendString))
-    expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.NUM, ErrorMessage.WeekendString))
-    expect(engine.getCellValue(adr('A4'))).toEqual(detailedError(ErrorType.NUM, ErrorMessage.BadMode))
-    expect(engine.getCellValue(adr('A5'))).toEqual(detailedError(ErrorType.NUM, ErrorMessage.WeekendString))
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.WrongType))
+    expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.WeekendString))
+    expect(engine.getCellValue(adr('A3'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.WeekendString))
+    expect(engine.getCellValue(adr('A4'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.BadMode))
+    expect(engine.getCellValue(adr('A5'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.WeekendString))
   })
 
   it('works correctly for first two arguments', () => {
@@ -95,9 +95,9 @@ describe('Function NETWORKDAYS.INTL', () => {
       ['=NETWORKDAYS.INTL(1000, 1, 1, C1:C1)'],
       ['=NETWORKDAYS.INTL(1000, 1, 1, A1:D1)'],
     ])
-    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessage.WrongType))
-    expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessage.WrongType))
+    expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.WrongType))
+    expect(engine.getCellValue(adr('A3'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.WrongType))
     expect(engine.getCellValue(adr('A4'))).toEqual(-715)
-    expect(engine.getCellValue(adr('A5'))).toEqual(detailedError(ErrorType.NA))
+    expect(engine.getCellValue(adr('A5'))).toEqualError(detailedError(ErrorType.NA))
   })
 })

@@ -7,8 +7,8 @@ describe('Function SPLIT', () => {
   it('wrong number of arguments', () => {
     const engine = HyperFormula.buildFromArray([['=SPLIT(1)', '=SPLIT("a","b","c")']])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
-    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
+    expect(engine.getCellValue(adr('B1'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
   })
   it('happy path', () => {
     const engine = HyperFormula.buildFromArray([['some words', '=SPLIT(A1, 0)']])
@@ -32,19 +32,19 @@ describe('Function SPLIT', () => {
   it('coerce first argument to string', () => {
     const engine = HyperFormula.buildFromArray([['42', '=SPLIT(A1, 1)']])
 
-    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessage.IndexBounds))
+    expect(engine.getCellValue(adr('B1'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.IndexBounds))
   })
 
   it('when 2nd arg not a number', () => {
     const engine = HyperFormula.buildFromArray([['some words', '=SPLIT(A1, "foo")']])
 
-    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessage.NumberCoercion))
+    expect(engine.getCellValue(adr('B1'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.NumberCoercion))
   })
 
   it('when index arg is not value within bounds', () => {
     const engine = HyperFormula.buildFromArray([['some words', '=SPLIT(A1, 17)', '=SPLIT(A1, -1)']])
 
-    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessage.IndexBounds))
-    expect(engine.getCellValue(adr('C1'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessage.IndexBounds))
+    expect(engine.getCellValue(adr('B1'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.IndexBounds))
+    expect(engine.getCellValue(adr('C1'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.IndexBounds))
   })
 })
