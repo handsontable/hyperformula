@@ -213,21 +213,21 @@ const dictionary: RawTranslationPackage = {
     YEAR: 'ROK',
     YEARFRAC: 'YEARFRAC',
     REPLACE: 'NAHRADIT',
-    ADD: 'ADD',
-    CONCAT: 'CONCAT',
-    DIVIDE: 'DIVIDE',
-    EQ: 'EQ',
-    GT: 'GT',
-    GEQ: 'GEQ',
-    LT: 'LT',
-    LEQ: 'LEQ',
-    MINUS: 'MINUS',
-    MULTIPLY: 'MULTIPLY',
-    NE: 'NE',
-    POW: 'POW',
-    UMINUS: 'UMINUS',
-    UNARY_PERCENT: 'UNARY_PERCENT',
-    UPLUS: 'UPLUS',
+    ADD: 'ADD', //FIXME
+    CONCAT: 'CONCAT', //FIXME
+    DIVIDE: 'DIVIDE', //FIXME
+    EQ: 'EQ', //FIXME
+    GT: 'GT', //FIXME
+    GTE: 'GTE', //FIXME
+    LT: 'LT', //FIXME
+    LTE: 'LTE', //FIXME
+    MINUS: 'MINUS', //FIXME
+    MULTIPLY: 'MULTIPLY', //FIXME
+    NE: '_NE', //FIXME (NE -> _NE to avoid conflict with NOT translation)
+    POW: 'POW', //FIXME
+    UMINUS: 'UMINUS', //FIXME
+    UNARY_PERCENT: 'UNARY_PERCENT', //FIXME
+    UPLUS: 'UPLUS', //FIXME
   },
   langCode: 'csCZ',
   ui: {

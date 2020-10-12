@@ -14,12 +14,12 @@ describe('Function CONCAT', () => {
 
   it('should calculate the correct value with correct defaults', () => {
     const engine = HyperFormula.buildFromArray([
-      ['=CONCAT("a","b")'],
+      ['=CONCAT("hokuspokus","czarymary")'],
       ['=CONCAT(,"a")'],
       ['=CONCAT(,)']
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual('ab')
+    expect(engine.getCellValue(adr('A1'))).toEqual('hokuspokusczarymary')
     expect(engine.getCellValue(adr('A2'))).toEqual('a')
     expect(engine.getCellValue(adr('A3'))).toEqual('')
   })

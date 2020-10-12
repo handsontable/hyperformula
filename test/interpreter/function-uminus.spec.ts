@@ -15,9 +15,11 @@ describe('Function UMINUS', () => {
   it('should calculate the correct value with correct defaults', () => {
     const engine = HyperFormula.buildFromArray([
       ['=UMINUS(2)'],
+      ['=UMINUS(-3)'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqual(-2)
+    expect(engine.getCellValue(adr('A2'))).toEqual(3)
   })
 
   it('should coerce to correct types', () => {

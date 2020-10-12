@@ -2,10 +2,10 @@ import {ErrorType, HyperFormula} from '../../src'
 import {ErrorMessage} from '../../src/error-message'
 import {adr, detailedError} from '../testUtils'
 
-describe('Function LEQ', () => {
+describe('Function LTE', () => {
   it('should return #NA! error with the wrong number of arguments', () => {
     const engine = HyperFormula.buildFromArray([
-      ['=LEQ(1)', '=LEQ(1, 1, 1)'],
+      ['=LTE(1)', '=LTE(1, 1, 1)'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
@@ -14,19 +14,19 @@ describe('Function LEQ', () => {
 
   it('should calculate the correct value', () => {
     const engine = HyperFormula.buildFromArray([
-      ['=LEQ(1,0)'],
-      ['=LEQ(1,1)'],
-      ['=LEQ("1","0")'],
-      ['=LEQ("1","1")'],
-      ['=LEQ(TRUE(),FALSE())'],
-      ['=LEQ(TRUE(),TRUE())'],
-      ['=LEQ(,)'],
-      ['=LEQ(1,)'],
-      ['=LEQ("1",)'],
-      ['=LEQ(TRUE(),)'],
-      ['=LEQ("1",1)'],
-      ['=LEQ(TRUE(),1)'],
-      ['=LEQ(TRUE(),"1")'],
+      ['=LTE(1,0)'],
+      ['=LTE(1,1)'],
+      ['=LTE("1","0")'],
+      ['=LTE("1","1")'],
+      ['=LTE(TRUE(),FALSE())'],
+      ['=LTE(TRUE(),TRUE())'],
+      ['=LTE(,)'],
+      ['=LTE(1,)'],
+      ['=LTE("1",)'],
+      ['=LTE(TRUE(),)'],
+      ['=LTE("1",1)'],
+      ['=LTE(TRUE(),1)'],
+      ['=LTE(TRUE(),"1")'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqual(false)
@@ -46,8 +46,8 @@ describe('Function LEQ', () => {
 
   it('should throw correct error', () => {
     const engine = HyperFormula.buildFromArray([
-      ['=LEQ(NA(),)'],
-      ['=LEQ(B2:C2,)'],
+      ['=LTE(NA(),)'],
+      ['=LTE(B2:C2,)'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA))

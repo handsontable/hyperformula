@@ -14,12 +14,12 @@ describe('Function DIVIDE', () => {
 
   it('should calculate the correct value with correct defaults', () => {
     const engine = HyperFormula.buildFromArray([
-      ['=DIVIDE(6,3)'],
+      ['=DIVIDE(6,4)'],
       ['=DIVIDE(,1)'],
       ['=DIVIDE(,)']
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(2)
+    expect(engine.getCellValue(adr('A1'))).toEqual(1.5)
     expect(engine.getCellValue(adr('A2'))).toEqual(0)
     expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.DIV_BY_ZERO))
   })

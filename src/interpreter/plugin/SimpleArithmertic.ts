@@ -45,8 +45,8 @@ export class SimpleArithmerticPlugin extends  FunctionPlugin {
         { argumentType: ArgumentTypes.NOERROR },
       ]
     },
-    'GEQ': {
-      method: 'geq',
+    'GTE': {
+      method: 'gte',
       parameters: [
         { argumentType: ArgumentTypes.NOERROR },
         { argumentType: ArgumentTypes.NOERROR },
@@ -59,8 +59,8 @@ export class SimpleArithmerticPlugin extends  FunctionPlugin {
         { argumentType: ArgumentTypes.NOERROR },
       ]
     },
-    'LEQ': {
-      method: 'leq',
+    'LTE': {
+      method: 'lte',
       parameters: [
         { argumentType: ArgumentTypes.NOERROR },
         { argumentType: ArgumentTypes.NOERROR },
@@ -148,8 +148,8 @@ export class SimpleArithmerticPlugin extends  FunctionPlugin {
     )
   }
 
-  public geq(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('GEQ'),
+  public gte(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('GTE'),
       (a: InternalNoErrorCellValue, b: InternalNoErrorCellValue) => (
         this.interpreter.arithmeticHelper.compare(a, b) >= 0
       )
@@ -164,8 +164,8 @@ export class SimpleArithmerticPlugin extends  FunctionPlugin {
     )
   }
 
-  public leq(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('LEQ'),
+  public lte(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('LTE'),
       (a: InternalNoErrorCellValue, b: InternalNoErrorCellValue) => (
         this.interpreter.arithmeticHelper.compare(a, b) <= 0
       )

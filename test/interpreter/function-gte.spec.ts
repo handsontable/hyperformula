@@ -2,10 +2,10 @@ import {ErrorType, HyperFormula} from '../../src'
 import {ErrorMessage} from '../../src/error-message'
 import {adr, detailedError} from '../testUtils'
 
-describe('Function GEQ', () => {
+describe('Function GTE', () => {
   it('should return #NA! error with the wrong number of arguments', () => {
     const engine = HyperFormula.buildFromArray([
-      ['=GEQ(1)', '=GEQ(1, 1, 1)'],
+      ['=GTE(1)', '=GTE(1, 1, 1)'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
@@ -14,19 +14,19 @@ describe('Function GEQ', () => {
 
   it('should calculate the correct value', () => {
     const engine = HyperFormula.buildFromArray([
-      ['=GEQ(1,0)'],
-      ['=GEQ(1,1)'],
-      ['=GEQ("1","0")'],
-      ['=GEQ("1","1")'],
-      ['=GEQ(TRUE(),FALSE())'],
-      ['=GEQ(TRUE(),TRUE())'],
-      ['=GEQ(,)'],
-      ['=GEQ(1,)'],
-      ['=GEQ("1",)'],
-      ['=GEQ(TRUE(),)'],
-      ['=GEQ("1",1)'],
-      ['=GEQ(TRUE(),1)'],
-      ['=GEQ(TRUE(),"1")'],
+      ['=GTE(1,0)'],
+      ['=GTE(1,1)'],
+      ['=GTE("1","0")'],
+      ['=GTE("1","1")'],
+      ['=GTE(TRUE(),FALSE())'],
+      ['=GTE(TRUE(),TRUE())'],
+      ['=GTE(,)'],
+      ['=GTE(1,)'],
+      ['=GTE("1",)'],
+      ['=GTE(TRUE(),)'],
+      ['=GTE("1",1)'],
+      ['=GTE(TRUE(),1)'],
+      ['=GTE(TRUE(),"1")'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqual(true)
@@ -46,8 +46,8 @@ describe('Function GEQ', () => {
 
   it('should throw correct error', () => {
     const engine = HyperFormula.buildFromArray([
-      ['=GEQ(NA(),)'],
-      ['=GEQ(B2:C2,)'],
+      ['=GTE(NA(),)'],
+      ['=GTE(B2:C2,)'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA))

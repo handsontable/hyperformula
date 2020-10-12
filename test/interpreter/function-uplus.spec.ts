@@ -15,9 +15,11 @@ describe('Function UPLUS', () => {
   it('should calculate the correct value with correct defaults', () => {
     const engine = HyperFormula.buildFromArray([
       ['=UPLUS(2)'],
+      ['=UPLUS(-3)'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqual(2)
+    expect(engine.getCellValue(adr('A2'))).toEqual(-3)
   })
 
   it('should coerce to correct types', () => {

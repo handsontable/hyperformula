@@ -213,21 +213,21 @@ const dictionary: RawTranslationPackage = {
     YEAR: 'YIL',
     YEARFRAC: 'YILORAN',
     REPLACE: 'DEĞİŞTİR',
-    ADD: 'ADD',
-    CONCAT: 'CONCAT',
-    DIVIDE: 'DIVIDE',
-    EQ: 'EQ',
-    GT: 'GT',
-    GEQ: 'GEQ',
-    LT: 'LT',
-    LEQ: 'LEQ',
-    MINUS: 'MINUS',
-    MULTIPLY: 'MULTIPLY',
-    NE: 'NE',
-    POW: 'POW',
-    UMINUS: 'UMINUS',
-    UNARY_PERCENT: 'UNARY_PERCENT',
-    UPLUS: 'UPLUS',
+    ADD: 'ADD', //FIXME
+    CONCAT: 'CONCAT', //FIXME
+    DIVIDE: 'DIVIDE', //FIXME
+    EQ: 'EQ', //FIXME
+    GT: 'GT', //FIXME
+    GTE: 'GTE', //FIXME
+    LT: 'LT', //FIXME
+    LTE: 'LTE', //FIXME
+    MINUS: 'MINUS', //FIXME
+    MULTIPLY: 'MULTIPLY', //FIXME
+    NE: 'NE', //FIXME
+    POW: 'POW', //FIXME
+    UMINUS: 'UMINUS', //FIXME
+    UNARY_PERCENT: 'UNARY_PERCENT', //FIXME
+    UPLUS: 'UPLUS', //FIXME
   },
   langCode: 'trTR',
   ui: {
