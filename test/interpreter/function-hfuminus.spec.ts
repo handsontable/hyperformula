@@ -16,10 +16,12 @@ describe('Function HF.UMINUS', () => {
     const engine = HyperFormula.buildFromArray([
       ['=HF.UMINUS(2)'],
       ['=HF.UMINUS(-3)'],
+      ['=HF.UMINUS(0)']
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqual(-2)
     expect(engine.getCellValue(adr('A2'))).toEqual(3)
+    expect(engine.getCellValue(adr('A3'))).toEqual(0)
   })
 
   it('should coerce to correct types', () => {
