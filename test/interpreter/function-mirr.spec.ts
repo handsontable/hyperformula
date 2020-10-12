@@ -9,8 +9,8 @@ describe('Function MIRR', () => {
       ['=MIRR(1,1,1,1)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
-    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
+    expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
   })
 
   it('should return correct value', () => {
@@ -33,8 +33,8 @@ describe('Function MIRR', () => {
       ['=MIRR(B1:E1,0.2,0.1)', -1, 0, -1, -1],
       ['=MIRR(B2:E2,0.2,0.1)', 1, 0, 1, 1],
     ])
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.DIV_BY_ZERO))
-    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.DIV_BY_ZERO))
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.DIV_BY_ZERO))
+    expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.DIV_BY_ZERO))
   })
 
   it('should return #DIV/0! if any rate is -1', () => {
@@ -42,8 +42,8 @@ describe('Function MIRR', () => {
       ['=MIRR(B1:E1,-1,0.1)', -1, 1, -1, -1],
       ['=MIRR(B2:E2,0.2,-1)', 1, -1, 1, 1],
     ])
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.DIV_BY_ZERO))
-    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.DIV_BY_ZERO))
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.DIV_BY_ZERO))
+    expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.DIV_BY_ZERO))
   })
 
   it('should ignore text, boolean and empty values', () => {

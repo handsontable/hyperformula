@@ -8,8 +8,8 @@ describe('Function XNPV', () => {
       ['=XNPV(1,1)', '=XNPV(1, 1, 1, 1)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
-    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
+    expect(engine.getCellValue(adr('B1'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
   })
 
   /**
@@ -22,7 +22,7 @@ describe('Function XNPV', () => {
       [1, 2, 3, 4],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM, ErrorMessage.ValueSmall))
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.ValueSmall))
     expect(engine.getCellValue(adr('B1'))).toBeCloseTo(9.94002794561453, 6)
     expect(engine.getCellValue(adr('C1'))).toBeCloseTo(10.1271695921145, 6)
   })
@@ -59,8 +59,8 @@ describe('Function XNPV', () => {
       ['=XNPV(1, B2:C2, D2:E2)', 1, 2, 3.1, true],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessage.NumberExpected))
-    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessage.NumberExpected))
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.NumberExpected))
+    expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.NumberExpected))
   })
 
   /**
@@ -72,8 +72,8 @@ describe('Function XNPV', () => {
       ['=XNPV(1, B2:D2, E2:F2)', 1, 2, 3, 4, 5],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM, ErrorMessage.EqualLength))
-    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NUM, ErrorMessage.EqualLength))
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.EqualLength))
+    expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.EqualLength))
   })
 
   it('should evaluate to #NUM! if dates are in wrong order', () => {
@@ -81,7 +81,7 @@ describe('Function XNPV', () => {
       ['=XNPV(1, B1:C1, D1:E1)', 1, 2, 4, 3],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM, ErrorMessage.ValueSmall))
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.ValueSmall))
   })
 
   it('should evaluate to #NUM! if dates are too small', () => {
@@ -89,6 +89,6 @@ describe('Function XNPV', () => {
       ['=XNPV(1, B1:C1, D1:E1)', 1, 2, -1, 4],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM, ErrorMessage.ValueSmall))
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.ValueSmall))
   })
 })
