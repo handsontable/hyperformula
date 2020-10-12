@@ -16,6 +16,7 @@ describe('Function UMINUS', () => {
     const engine = HyperFormula.buildFromArray([
       ['=UMINUS(2)'],
       ['=UMINUS(-3)'],
+      ['=UMINUS(0)']
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqual(-2)
