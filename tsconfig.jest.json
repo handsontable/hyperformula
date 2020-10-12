@@ -5,6 +5,6 @@
     "types": ["jest", "node"]
   },
   "extends": "./tsconfig",
-  "include": ["src", "test"],
+  "include": [],
   "exclude": []
 }
