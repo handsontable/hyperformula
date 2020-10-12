@@ -50,7 +50,7 @@ describe('Function MEDIAN', () => {
       ['=3/0', '=MEDIAN(A1)'],
     ])
 
-    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.DIV_BY_ZERO))
+    expect(engine.getCellValue(adr('B1'))).toEqualError(detailedError(ErrorType.DIV_BY_ZERO))
   })
 
   it('propagates first error from range argument', () => {
@@ -58,7 +58,7 @@ describe('Function MEDIAN', () => {
       ['=3/0', '=FOO(', '=MEDIAN(A1:B1)'],
     ])
 
-    expect(engine.getCellValue(adr('C1'))).toEqual(detailedError(ErrorType.DIV_BY_ZERO))
+    expect(engine.getCellValue(adr('C1'))).toEqualError(detailedError(ErrorType.DIV_BY_ZERO))
   })
 
   it('return error when no arguments', () => {
@@ -66,7 +66,7 @@ describe('Function MEDIAN', () => {
       ['=MEDIAN()'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
   })
 
   it('doesnt do coercions of nonnumeric arguments', () => {
@@ -75,8 +75,8 @@ describe('Function MEDIAN', () => {
       ['=MEDIAN(TRUE())'],
     ])
 
-    expect(engine.getCellValue(adr('D1'))).toEqual(detailedError(ErrorType.NUM, ErrorMessage.OneValue))
-    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NUM, ErrorMessage.OneValue))
+    expect(engine.getCellValue(adr('D1'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.OneValue))
+    expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.OneValue))
   })
 
   it('ignores nonnumeric values as long as theres at least one numeric value', () => {
@@ -93,7 +93,7 @@ describe('Function MEDIAN', () => {
       ['=MEDIAN("12", "11", "13")'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM, ErrorMessage.OneValue))
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.OneValue))
   })
 
   it('empty args as 0', () => {
