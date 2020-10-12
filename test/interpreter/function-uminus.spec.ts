@@ -21,6 +21,7 @@ describe('Function UMINUS', () => {
 
     expect(engine.getCellValue(adr('A1'))).toEqual(-2)
     expect(engine.getCellValue(adr('A2'))).toEqual(3)
+    expect(engine.getCellValue(adr('A3'))).toEqual(0)
   })
 
   it('should coerce to correct types', () => {
