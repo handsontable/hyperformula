@@ -50,7 +50,7 @@ describe('Nonexistent metadata', () => {
       ['=LOG(10,)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM, ErrorMessage.ValueSmall))
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.ValueSmall))
   })
 
   it('other function coerce EmptyValue', () => {
