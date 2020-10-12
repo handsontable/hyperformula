@@ -213,21 +213,21 @@ const dictionary: RawTranslationPackage = {
     YEAR: 'ÉV',
     YEARFRAC: 'TÖRTÉV',
     REPLACE: 'CSERE',
-    ADD: 'ADD', //FIXME
-    CONCAT: 'CONCAT', //FIXME
-    DIVIDE: 'DIVIDE', //FIXME
-    EQ: 'EQ', //FIXME
-    GT: 'GT', //FIXME
-    GTE: 'GTE', //FIXME
-    LT: 'LT', //FIXME
-    LTE: 'LTE', //FIXME
-    MINUS: 'MINUS', //FIXME
-    MULTIPLY: 'MULTIPLY', //FIXME
-    NE: 'NE', //FIXME
-    POW: 'POW', //FIXME
-    UMINUS: 'UMINUS', //FIXME
-    UNARY_PERCENT: 'UNARY_PERCENT', //FIXME
-    UPLUS: 'UPLUS', //FIXME
+    HFADD: 'HF.ADD',
+    HFCONCAT: 'HF.CONCAT',
+    HFDIVIDE: 'HF.DIVIDE',
+    HFEQ: 'HF.EQ',
+    HFGT: 'HF.GT',
+    HFGTE: 'HF.GTE',
+    HFLT: 'HF.LT',
+    HFLTE: 'HF.LTE',
+    HFMINUS: 'HF.MINUS',
+    HFMULTIPLY: 'HF.MULTIPLY',
+    HFNE: 'HF.NE',
+    HFPOW: 'HF.POW',
+    HFUMINUS: 'HF.UMINUS',
+    HFUNARY_PERCENT: 'HF.UNARY_PERCENT',
+    HFUPLUS: 'HF.UPLUS',
   },
   langCode: 'huHU',
   ui: {
