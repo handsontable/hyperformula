@@ -52,8 +52,8 @@ describe('Function SHEET', () => {
       'Sheet1': [['=SHEET("FOO")', '=SHEET(1)']],
     })
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA, ErrorMessage.SheetRef))
-    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.NA, ErrorMessage.SheetRef))
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.SheetRef))
+    expect(engine.getCellValue(adr('B1'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.SheetRef))
   })
 
   it('should coerce', () => {
@@ -71,7 +71,7 @@ describe('Function SHEET', () => {
   it('should propagate errors', () => {
     const engine = HyperFormula.buildFromArray([['=SHEET(1/0)']])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.DIV_BY_ZERO))
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.DIV_BY_ZERO))
   })
 
   it('should work for itself', () => {

@@ -18,7 +18,7 @@ describe('Rebuilding engine', () => {
     engine.addNamedExpression('FALSE', '=FALSE()', 'Sheet1')
     engine.rebuildAndRecalculate()
     expect(engine.getCellValue(adr('A1', 0))).toEqual(false)
-    expect(engine.getCellValue(adr('A1', 1))).toEqual(detailedError(ErrorType.NAME, ErrorMessage.NamedExpressionName('FALSE')))
+    expect(engine.getCellValue(adr('A1', 1))).toEqualError(detailedError(ErrorType.NAME, ErrorMessage.NamedExpressionName('FALSE')))
   })
 
   it('named references should work after rebuild', () => {

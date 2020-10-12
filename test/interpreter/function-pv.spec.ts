@@ -8,8 +8,8 @@ describe('Function PV', () => {
       ['=PV(1,1)', '=PV(1, 1, 1, 1, 1, 1)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
-    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
+    expect(engine.getCellValue(adr('B1'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
   })
 
   it('should calculate the correct value with correct arguments and defaults', () => {
@@ -22,7 +22,7 @@ describe('Function PV', () => {
     expect(engine.getCellValue(adr('B1'))).toBeCloseTo(-2140.081155, 6)
     expect(engine.getCellValue(adr('C1'))).toBeCloseTo(-2177.909007, 6)
     expect(engine.getCellValue(adr('A2'))).toBeCloseTo(-1.01010101010099e+50, 6)
-    expect(engine.getCellValue(adr('B2'))).toEqual(detailedError(ErrorType.DIV_BY_ZERO))
+    expect(engine.getCellValue(adr('B2'))).toEqualError(detailedError(ErrorType.DIV_BY_ZERO))
     expect(engine.getCellValue(adr('C2'))).toBeCloseTo(-400, 6)
   })
 })

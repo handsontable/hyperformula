@@ -4,9 +4,10 @@
  */
 
 import {simpleCellAddress, SimpleCellAddress} from './Cell'
-import {CellValue, DetailedCellError, Exporter, NoErrorCellValue} from './CellValue'
+import {CellValue, DetailedCellError, NoErrorCellValue} from './CellValue'
 import {Config} from './Config'
 import {DependencyGraph, FormulaCellVertex, MatrixVertex, ParsingErrorVertex} from './DependencyGraph'
+import {Exporter} from './Exporter'
 import {Maybe} from './Maybe'
 import {buildLexerConfig, Unparser} from './parser'
 import {NamedExpressionOptions, NamedExpressions} from './NamedExpressions'

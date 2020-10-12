@@ -9,7 +9,7 @@ describe('COUNTBLANK', () => {
       ['=COUNTBLANK()'],
       ['=COUNTBLANK(,)']
     ])
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
     expect(engine.getCellValue(adr('A2'))).toEqual(2)
   })
 
@@ -54,7 +54,7 @@ describe('COUNTBLANK', () => {
       ['=COUNTBLANK(A1:A3)']
     ])
 
-    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.CYCLE))
+    expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.CYCLE))
     expect(engine.getCellValue(adr('A4'))).toEqual(1)
   })
 })

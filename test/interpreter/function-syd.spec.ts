@@ -8,8 +8,8 @@ describe('Function SYD', () => {
       ['=SYD(1,1,1)', '=SYD(1, 1, 1, 1, 1)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
-    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
+    expect(engine.getCellValue(adr('B1'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
   })
 
   it('should calculate the correct value with correct arguments and defaults', () => {
@@ -19,7 +19,7 @@ describe('Function SYD', () => {
 
     expect(engine.getCellValue(adr('A1'))).toBeCloseTo(33.4562211981567)
     expect(engine.getCellValue(adr('B1'))).toBeCloseTo(30.4147465437788)
-    expect(engine.getCellValue(adr('C1'))).toEqual(detailedError(ErrorType.NUM))
+    expect(engine.getCellValue(adr('C1'))).toEqualError(detailedError(ErrorType.NUM))
     expect(engine.getCellValue(adr('D1'))).toBeCloseTo(33)
   })
 })
