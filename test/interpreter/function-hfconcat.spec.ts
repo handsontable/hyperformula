@@ -2,10 +2,10 @@ import {ErrorType, HyperFormula} from '../../src'
 import {ErrorMessage} from '../../src/error-message'
 import {adr, detailedError} from '../testUtils'
 
-describe('Function CONCAT', () => {
+describe('Function HF.CONCAT', () => {
   it('should return #NA! error with the wrong number of arguments', () => {
     const engine = HyperFormula.buildFromArray([
-      ['=CONCAT(1)', '=CONCAT(1, 1, 1)'],
+      ['=HF.CONCAT(1)', '=HF.CONCAT(1, 1, 1)'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
@@ -14,9 +14,9 @@ describe('Function CONCAT', () => {
 
   it('should calculate the correct value with correct defaults', () => {
     const engine = HyperFormula.buildFromArray([
-      ['=CONCAT("hokuspokus","czarymary")'],
-      ['=CONCAT(,"a")'],
-      ['=CONCAT(,)']
+      ['=HF.CONCAT("hokuspokus","czarymary")'],
+      ['=HF.CONCAT(,"a")'],
+      ['=HF.CONCAT(,)']
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqual('hokuspokusczarymary')
@@ -26,8 +26,8 @@ describe('Function CONCAT', () => {
 
   it('should coerce to correct types', () => {
     const engine = HyperFormula.buildFromArray([
-      ['=CONCAT(TRUE(),B1)'],
-      ['=CONCAT(1,)'],
+      ['=HF.CONCAT(TRUE(),B1)'],
+      ['=HF.CONCAT(1,)'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqual('TRUE')
@@ -36,8 +36,8 @@ describe('Function CONCAT', () => {
 
   it('should throw correct error', () => {
     const engine = HyperFormula.buildFromArray([
-      ['=CONCAT(NA(),)'],
-      ['=CONCAT(B2:C2,)'],
+      ['=HF.CONCAT(NA(),)'],
+      ['=HF.CONCAT(B2:C2,)'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA))

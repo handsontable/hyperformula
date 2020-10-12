@@ -2,10 +2,10 @@ import {ErrorType, HyperFormula} from '../../src'
 import {ErrorMessage} from '../../src/error-message'
 import {adr, detailedError} from '../testUtils'
 
-describe('Function EQ', () => {
+describe('Function HF.EQ', () => {
   it('should return #NA! error with the wrong number of arguments', () => {
     const engine = HyperFormula.buildFromArray([
-      ['=EQ(1)', '=EQ(1, 1, 1)'],
+      ['=HF.EQ(1)', '=HF.EQ(1, 1, 1)'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
@@ -14,19 +14,19 @@ describe('Function EQ', () => {
 
   it('should calculate the correct value', () => {
     const engine = HyperFormula.buildFromArray([
-      ['=EQ(1,0)'],
-      ['=EQ(1,1)'],
-      ['=EQ("1","0")'],
-      ['=EQ("1","1")'],
-      ['=EQ(TRUE(),FALSE())'],
-      ['=EQ(TRUE(),TRUE())'],
-      ['=EQ(,)'],
-      ['=EQ(1,)'],
-      ['=EQ("1",)'],
-      ['=EQ(TRUE(),)'],
-      ['=EQ("1",1)'],
-      ['=EQ(TRUE(),1)'],
-      ['=EQ(TRUE(),"1")'],
+      ['=HF.EQ(1,0)'],
+      ['=HF.EQ(1,1)'],
+      ['=HF.EQ("1","0")'],
+      ['=HF.EQ("1","1")'],
+      ['=HF.EQ(TRUE(),FALSE())'],
+      ['=HF.EQ(TRUE(),TRUE())'],
+      ['=HF.EQ(,)'],
+      ['=HF.EQ(1,)'],
+      ['=HF.EQ("1",)'],
+      ['=HF.EQ(TRUE(),)'],
+      ['=HF.EQ("1",1)'],
+      ['=HF.EQ(TRUE(),1)'],
+      ['=HF.EQ(TRUE(),"1")'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqual(false)
@@ -46,8 +46,8 @@ describe('Function EQ', () => {
 
   it('should throw correct error', () => {
     const engine = HyperFormula.buildFromArray([
-      ['=EQ(NA(),)'],
-      ['=EQ(B2:C2,)'],
+      ['=HF.EQ(NA(),)'],
+      ['=HF.EQ(B2:C2,)'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA))

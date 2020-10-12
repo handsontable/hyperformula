@@ -2,10 +2,10 @@ import {ErrorType, HyperFormula} from '../../src'
 import {ErrorMessage} from '../../src/error-message'
 import {adr, detailedError} from '../testUtils'
 
-describe('Function MULTIPLY', () => {
+describe('Function HF.DIVIDE', () => {
   it('should return #NA! error with the wrong number of arguments', () => {
     const engine = HyperFormula.buildFromArray([
-      ['=MULTIPLY(1)', '=MULTIPLY(1, 1, 1)'],
+      ['=HF.DIVIDE(1)', '=HF.DIVIDE(1, 1, 1)'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
@@ -14,21 +14,21 @@ describe('Function MULTIPLY', () => {
 
   it('should calculate the correct value with correct defaults', () => {
     const engine = HyperFormula.buildFromArray([
-      ['=MULTIPLY(2,3)'],
-      ['=MULTIPLY(1,)'],
-      ['=MULTIPLY(,)']
+      ['=HF.DIVIDE(6,4)'],
+      ['=HF.DIVIDE(,1)'],
+      ['=HF.DIVIDE(,)']
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(6)
+    expect(engine.getCellValue(adr('A1'))).toEqual(1.5)
     expect(engine.getCellValue(adr('A2'))).toEqual(0)
-    expect(engine.getCellValue(adr('A3'))).toEqual(0)
+    expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.DIV_BY_ZERO))
   })
 
   it('should coerce to correct types', () => {
     const engine = HyperFormula.buildFromArray([
-      ['=MULTIPLY(TRUE(),1)'],
-      ['=MULTIPLY(B2,1)'],
-      ['=MULTIPLY("1",1)'],
+      ['=HF.DIVIDE(TRUE(),1)'],
+      ['=HF.DIVIDE(B2,1)'],
+      ['=HF.DIVIDE("1",1)'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqual(1)
@@ -38,9 +38,9 @@ describe('Function MULTIPLY', () => {
 
   it('should throw correct error', () => {
     const engine = HyperFormula.buildFromArray([
-      ['=MULTIPLY("abcd",)'],
-      ['=MULTIPLY(NA(),)'],
-      ['=MULTIPLY(B3:C3,)'],
+      ['=HF.DIVIDE("abcd",)'],
+      ['=HF.DIVIDE(NA(),)'],
+      ['=HF.DIVIDE(B3:C3,)'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessage.NumberCoercion))

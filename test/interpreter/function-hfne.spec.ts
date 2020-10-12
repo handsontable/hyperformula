@@ -2,10 +2,10 @@ import {ErrorType, HyperFormula} from '../../src'
 import {ErrorMessage} from '../../src/error-message'
 import {adr, detailedError} from '../testUtils'
 
-describe('Function NE', () => {
+describe('Function HF.NE', () => {
   it('should return #NA! error with the wrong number of arguments', () => {
     const engine = HyperFormula.buildFromArray([
-      ['=NE(1)', '=NE(1, 1, 1)'],
+      ['=HF.NE(1)', '=HF.NE(1, 1, 1)'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
@@ -14,19 +14,19 @@ describe('Function NE', () => {
 
   it('should calculate the correct value', () => {
     const engine = HyperFormula.buildFromArray([
-      ['=NE(1,0)'],
-      ['=NE(1,1)'],
-      ['=NE("1","0")'],
-      ['=NE("1","1")'],
-      ['=NE(TRUE(),FALSE())'],
-      ['=NE(TRUE(),TRUE())'],
-      ['=NE(,)'],
-      ['=NE(1,)'],
-      ['=NE("1",)'],
-      ['=NE(TRUE(),)'],
-      ['=NE("1",1)'],
-      ['=NE(TRUE(),1)'],
-      ['=NE(TRUE(),"1")'],
+      ['=HF.NE(1,0)'],
+      ['=HF.NE(1,1)'],
+      ['=HF.NE("1","0")'],
+      ['=HF.NE("1","1")'],
+      ['=HF.NE(TRUE(),FALSE())'],
+      ['=HF.NE(TRUE(),TRUE())'],
+      ['=HF.NE(,)'],
+      ['=HF.NE(1,)'],
+      ['=HF.NE("1",)'],
+      ['=HF.NE(TRUE(),)'],
+      ['=HF.NE("1",1)'],
+      ['=HF.NE(TRUE(),1)'],
+      ['=HF.NE(TRUE(),"1")'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqual(true)
@@ -46,8 +46,8 @@ describe('Function NE', () => {
 
   it('should throw correct error', () => {
     const engine = HyperFormula.buildFromArray([
-      ['=NE(NA(),)'],
-      ['=NE(B2:C2,)'],
+      ['=HF.NE(NA(),)'],
+      ['=HF.NE(B2:C2,)'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA))

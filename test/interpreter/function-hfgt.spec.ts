@@ -2,10 +2,10 @@ import {ErrorType, HyperFormula} from '../../src'
 import {ErrorMessage} from '../../src/error-message'
 import {adr, detailedError} from '../testUtils'
 
-describe('Function GT', () => {
+describe('Function HF.GT', () => {
   it('should return #NA! error with the wrong number of arguments', () => {
     const engine = HyperFormula.buildFromArray([
-      ['=GT(1)', '=GT(1, 1, 1)'],
+      ['=HF.GT(1)', '=HF.GT(1, 1, 1)'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
@@ -14,19 +14,19 @@ describe('Function GT', () => {
 
   it('should calculate the correct value', () => {
     const engine = HyperFormula.buildFromArray([
-      ['=GT(1,0)'],
-      ['=GT(1,1)'],
-      ['=GT("1","0")'],
-      ['=GT("1","1")'],
-      ['=GT(TRUE(),FALSE())'],
-      ['=GT(TRUE(),TRUE())'],
-      ['=GT(,)'],
-      ['=GT(1,)'],
-      ['=GT("1",)'],
-      ['=GT(TRUE(),)'],
-      ['=GT("1",1)'],
-      ['=GT(TRUE(),1)'],
-      ['=GT(TRUE(),"1")'],
+      ['=HF.GT(1,0)'],
+      ['=HF.GT(1,1)'],
+      ['=HF.GT("1","0")'],
+      ['=HF.GT("1","1")'],
+      ['=HF.GT(TRUE(),FALSE())'],
+      ['=HF.GT(TRUE(),TRUE())'],
+      ['=HF.GT(,)'],
+      ['=HF.GT(1,)'],
+      ['=HF.GT("1",)'],
+      ['=HF.GT(TRUE(),)'],
+      ['=HF.GT("1",1)'],
+      ['=HF.GT(TRUE(),1)'],
+      ['=HF.GT(TRUE(),"1")'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqual(true)
@@ -46,8 +46,8 @@ describe('Function GT', () => {
 
   it('should throw correct error', () => {
     const engine = HyperFormula.buildFromArray([
-      ['=GT(NA(),)'],
-      ['=GT(B2:C2,)'],
+      ['=HF.GT(NA(),)'],
+      ['=HF.GT(B2:C2,)'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA))
