@@ -16,12 +16,14 @@ describe('Function HF.DIVIDE', () => {
     const engine = HyperFormula.buildFromArray([
       ['=HF.DIVIDE(6,4)'],
       ['=HF.DIVIDE(,1)'],
+      ['=HF.DIVIDE(1,)'],
       ['=HF.DIVIDE(,)']
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqual(1.5)
     expect(engine.getCellValue(adr('A2'))).toEqual(0)
     expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.DIV_BY_ZERO))
+    expect(engine.getCellValue(adr('A4'))).toEqual(detailedError(ErrorType.DIV_BY_ZERO))
   })
 
   it('should coerce to correct types', () => {
