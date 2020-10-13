@@ -213,6 +213,7 @@ const dictionary: RawTranslationPackage = {
     YEAR: 'ÉV',
     YEARFRAC: 'TÖRTÉV',
     REPLACE: 'CSERE',
+    ROMAN: 'RÓMAI',
   },
   langCode: 'huHU',
   ui: {

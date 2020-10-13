@@ -213,6 +213,7 @@ const dictionary: RawTranslationPackage = {
     YEAR: 'VUOSI',
     YEARFRAC: 'VUOSI.OSA',
     REPLACE: 'KORVAA',
+    ROMAN: 'ROMAN',
   },
   langCode: 'fiFI',
   ui: {

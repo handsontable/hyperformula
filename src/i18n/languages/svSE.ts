@@ -213,6 +213,7 @@ const dictionary: RawTranslationPackage = {
     YEAR: 'ÅR',
     YEARFRAC: 'ÅRDEL',
     REPLACE: 'ERSÄTT',
+    ROMAN: 'ROMERSK',
   },
   langCode: 'svSE',
   ui: {

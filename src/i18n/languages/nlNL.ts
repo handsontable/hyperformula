@@ -213,6 +213,7 @@ const dictionary: RawTranslationPackage = {
     YEAR: 'JAAR',
     YEARFRAC: 'JAAR.DEEL',
     REPLACE: 'VERVANGEN',
+    ROMAN: 'ROMEINS',
   },
   langCode: 'nlNL',
   ui: {

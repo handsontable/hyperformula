@@ -213,6 +213,7 @@ const dictionary: RawTranslationPackage = {
     YEAR: 'ÅR',
     YEARFRAC: 'ÅR.BRØK',
     REPLACE: 'ERSTAT',
+    ROMAN: 'ROMERTAL',
   },
   langCode: 'daDK',
   ui: {

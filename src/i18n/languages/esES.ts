@@ -213,6 +213,7 @@ export const dictionary: RawTranslationPackage = {
     YEAR: 'AÑO',
     YEARFRAC: 'FRAC.AÑO',
     REPLACE: 'REEMPLAZAR',
+    ROMAN: 'NUMERO.ROMANO',
   },
   langCode: 'esES',
   ui: {

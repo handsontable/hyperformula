@@ -213,6 +213,7 @@ const dictionary: RawTranslationPackage = {
     YEAR: 'ГОД',
     YEARFRAC: 'ДОЛЯГОДА',
     REPLACE: 'ЗАМЕНИТЬ',
+    ROMAN: 'РИМСКОЕ',
   },
   langCode: 'ruRU',
   ui: {

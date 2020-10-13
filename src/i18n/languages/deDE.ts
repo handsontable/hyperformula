@@ -213,6 +213,7 @@ const dictionary: RawTranslationPackage = {
     YEAR: 'JAHR',
     YEARFRAC: 'BRTEILJAHRE',
     REPLACE: 'ERSETZEN',
+    ROMAN: 'RÖMISCH',
   },
   langCode: 'deDE',
   ui: {

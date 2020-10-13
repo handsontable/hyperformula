@@ -213,6 +213,7 @@ const dictionary: RawTranslationPackage = {
     YEAR: 'ROK',
     YEARFRAC: 'CZĘŚĆ.ROKU',
     REPLACE: 'ZASTĄP',
+    ROMAN: 'RZYMSKIE',
   },
   langCode: 'plPL',
   ui: {
