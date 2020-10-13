@@ -163,6 +163,7 @@ const dictionary: RawTranslationPackage = {
     RATE: 'RATE',
     REPT: 'REPT',
     RIGHT: 'RIGHT',
+    ROMAN: 'ROMAN',
     ROUND: 'ROUND',
     ROUNDDOWN: 'ROUNDDOWN',
     ROUNDUP: 'ROUNDUP',
