@@ -199,6 +199,7 @@ lets you design your own [custom functions](custom-functions).
 | POWER | Math and trigonometry | Returns a number raised to another number. | POWER(Base; Exponent) |
 | RADIANS | Math and trigonometry | Converts degrees to radians. | RADIANS(Number) |
 | RAND | Math and trigonometry | Returns a random number between 0 and 1. | RAND() |
+| ROMAN | Math and trigonometry | Converts number to Roman form. | ROMAN(Number[; Mode]) |
 | ROUND | Math and trigonometry | Rounds a number to a certain number of decimal places. | ROUND(Number; Count) |
 | ROUNDDOWN | Math and trigonometry | Rounds a number down, toward zero, to a certain precision. | ROUNDDOWN(Number; Count) |
 | ROUNDUP | Math and trigonometry | Rounds a number up, away from zero, to a certain precision. | ROUNDUP(Number; Count) |
