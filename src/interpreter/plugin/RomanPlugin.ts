@@ -127,67 +127,54 @@ function eatToken(input: string, acc: number, ...tokens: {token: string, val: nu
 
 function romanMode(val: number, mode: number): string {
   let ret = ''
-  ret += ({0: '', 1000: 'M', 2000: 'MM', 3000: 'MMM'} as Record<number, string>)[val - val%1000]
+  ret += 'M'.repeat(Math.floor(val/1000))
   val %= 1000
   if(mode===4) {
-    if(val===999) {
-      ret += 'IM'
-      return ret
-    } else if(val===499) {
-      ret += 'ID'
-      return ret
-    }
+    [val, ret] = absorb(val, ret, 'IM', 999, 1000);
+    [val, ret] = absorb(val, ret, 'ID', 499, 500);
   }
   if(mode>=3) {
-    if(val>=995) {
-      ret += 'VM'
-      val -= 995
-    } else if(val>=495 && val < 500) {
-      ret += 'VD'
-      val -= 495
-    }
+    [val, ret] = absorb(val, ret, 'VM', 995, 1000);
+    [val, ret] = absorb(val, ret, 'VD', 495, 500);
   }
   if(mode>=2) {
-    if(val>=990) {
-      ret += 'XM'
-      val -= 990
-    } else if(val>=490 && val < 500) {
-      ret += 'XD'
-      val -= 490
-    }
+    [val, ret] = absorb(val, ret, 'XM', 990, 1000);
+    [val, ret] = absorb(val, ret, 'XD', 490, 500);
   }
   if(mode>=1) {
-    if (val >= 950) {
-      ret += 'LM'
-      val -= 950
-    } else if (val >= 450 && val < 500) {
-      ret += 'LD'
-      val -= 450
-    }
+    [val, ret] = absorb(val, ret, 'LM', 950, 1000);
+    [val, ret] = absorb(val, ret, 'LD', 450, 500);
   }
-  ret += (({0: '', 100: 'C', 200: 'CC', 300: 'CCC', 400: 'CD', 500: 'D', 600: 'DC', 700: 'DCC', 800: 'DCCC', 900: 'CM'}) as Record<number, string>)[val - val%100]
+  [val, ret] = absorb(val, ret, 'CM', 900, 1000);
+  [val, ret] = absorb(val, ret, 'CD', 400, 500);
+  [val, ret] = absorb(val, ret, 'D', 500, 900);
+  ret += 'C'.repeat(Math.floor(val/100))
   val %= 100
   if(mode>=2) {
-    if(val===99) {
-      ret += 'IC'
-      return ret
-    } else if(val===49) {
-      ret += 'IL'
-      return ret
-    }
+    [val, ret] = absorb(val, ret, 'IC', 99, 100);
+    [val, ret] = absorb(val, ret, 'IL', 49, 50);
   }
-  if(mode>0) {
-    if (val >= 95) {
-      ret += 'VC'
-      val -= 95
-    } else if (val >= 45 && val < 50) {
-      ret += 'VL'
-      val -= 45
-    }
+  if(mode>=1) {
+    [val, ret] = absorb(val, ret, 'VC', 95, 100);
+    [val, ret] = absorb(val, ret, 'VL', 45, 50);
   }
-  ret += (({0: '', 10: 'X', 20: 'XX', 30: 'XXX', 40: 'XL', 50: 'L', 60: 'LX', 70: 'LXX', 80: 'LXXX', 90: 'XC'}) as Record<number, string>)[val - val%10]
-  val %= 10
-  ret += (({0: '', 1: 'I', 2: 'II', 3: 'III', 4: 'IV', 5: 'V', 6: 'VI', 7: 'VII', 8: 'VIII', 9: 'IX'}) as Record<number, string>)[val]
+  [val, ret] = absorb(val, ret, 'XC', 90, 100);
+  [val, ret] = absorb(val, ret, 'XL', 40, 50);
+  [val, ret] = absorb(val, ret, 'L', 50, 90);
+  ret += 'X'.repeat(Math.floor(val/10))
+  val %= 10;
+  [val, ret] = absorb(val, ret, 'IX', 9, 10);
+  [val, ret] = absorb(val, ret, 'IV', 4, 5);
+  [val, ret] = absorb(val, ret, 'V', 5, 9);
+  ret += 'I'.repeat(val)
   return ret
+}
+
+function absorb(val: number, acc: string, token: string, lower: number, upper: number): [number, string] {
+  if(val>=lower && val<upper) {
+    return [val-lower, acc+token]
+  } else {
+    return [val,acc]
+  }
 }
 
