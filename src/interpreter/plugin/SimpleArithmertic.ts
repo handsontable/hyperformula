@@ -3,9 +3,8 @@
  * Copyright (c) 2020 Handsoncode. All rights reserved.
  */
 
-import {InternalNoErrorCellValue, InternalScalarValue, SimpleCellAddress} from '../../Cell'
+import {InternalScalarValue, SimpleCellAddress} from '../../Cell'
 import {ProcedureAst} from '../../parser'
-import {divide} from '../ArithmeticHelper'
 import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
 
 export class SimpleArithmerticPlugin extends  FunctionPlugin {
@@ -116,79 +115,67 @@ export class SimpleArithmerticPlugin extends  FunctionPlugin {
 
   public add(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.runFunction(ast.args, formulaAddress, this.metadata('HF.ADD'),
-      (a: number, b: number) => this.interpreter.arithmeticHelper.addWithEpsilon(a, b)
-      )
+      this.interpreter.arithmeticHelper.addWithEpsilon
+    )
   }
 
   public concat(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.runFunction(ast.args, formulaAddress, this.metadata('HF.CONCAT'),
-      (a: string, b: string) => a.concat(b)
+      this.interpreter.arithmeticHelper.concat
     )
   }
 
   public divide(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.runFunction(ast.args, formulaAddress, this.metadata('HF.DIVIDE'),
-      divide
+      this.interpreter.arithmeticHelper.divide
     )
   }
 
   public eq(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.runFunction(ast.args, formulaAddress, this.metadata('HF.EQ'),
-      (a: InternalNoErrorCellValue, b: InternalNoErrorCellValue) => (
-        this.interpreter.arithmeticHelper.compare(a, b) === 0
-      )
+        this.interpreter.arithmeticHelper.eq
     )
   }
 
   public gt(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.runFunction(ast.args, formulaAddress, this.metadata('HF.GT'),
-      (a: InternalNoErrorCellValue, b: InternalNoErrorCellValue) => (
-        this.interpreter.arithmeticHelper.compare(a, b) > 0
-      )
+        this.interpreter.arithmeticHelper.gt
     )
   }
 
   public gte(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.runFunction(ast.args, formulaAddress, this.metadata('HF.GTE'),
-      (a: InternalNoErrorCellValue, b: InternalNoErrorCellValue) => (
-        this.interpreter.arithmeticHelper.compare(a, b) >= 0
-      )
+        this.interpreter.arithmeticHelper.geq
     )
   }
 
   public lt(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.runFunction(ast.args, formulaAddress, this.metadata('HF.LT'),
-      (a: InternalNoErrorCellValue, b: InternalNoErrorCellValue) => (
-        this.interpreter.arithmeticHelper.compare(a, b) < 0
-      )
+        this.interpreter.arithmeticHelper.lt
     )
   }
 
   public lte(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.runFunction(ast.args, formulaAddress, this.metadata('HF.LTE'),
-      (a: InternalNoErrorCellValue, b: InternalNoErrorCellValue) => (
-        this.interpreter.arithmeticHelper.compare(a, b) <= 0
-      )
+        this.interpreter.arithmeticHelper.leq
     )
   }
 
   public minus(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.runFunction(ast.args, formulaAddress, this.metadata('HF.MINUS'),
-      (a: number, b: number) => this.interpreter.arithmeticHelper.subtract(a, b)
+      this.interpreter.arithmeticHelper.subtract
     )
   }
 
   public multiply(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.runFunction(ast.args, formulaAddress, this.metadata('HF.MULTIPLY'),
-      (a: number, b: number) => a*b
+      this.interpreter.arithmeticHelper.multiply
     )
   }
 
   public ne(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.runFunction(ast.args, formulaAddress, this.metadata('HF.NE'),
-      (a: InternalNoErrorCellValue, b: InternalNoErrorCellValue) => (
-        this.interpreter.arithmeticHelper.compare(a, b) !== 0
-      )
+        this.interpreter.arithmeticHelper.neq
     )
   }
 
@@ -198,20 +185,20 @@ export class SimpleArithmerticPlugin extends  FunctionPlugin {
 
   public uminus(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.runFunction(ast.args, formulaAddress, this.metadata('HF.UMINUS'),
-      (a => -a)
+      this.interpreter.arithmeticHelper.unary_minus
     )
   }
 
   //eslint-disable-next-line @typescript-eslint/camelcase
   public unary_percent(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.runFunction(ast.args, formulaAddress, this.metadata('HF.UNARY_PERCENT'),
-      (a => a/100)
-    )
+      this.interpreter.arithmeticHelper.unary_percent
+  )
   }
 
   public uplus(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.runFunction(ast.args, formulaAddress, this.metadata('HF.UPLUS'),
-      (a => a)
+      this.interpreter.arithmeticHelper.unary_plus
     )
   }
 }
