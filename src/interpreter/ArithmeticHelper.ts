@@ -101,28 +101,28 @@ export class ArithmeticHelper {
     return str
   }
 
-  public lt(left: InternalNoErrorCellValue, right: InternalNoErrorCellValue): boolean {
-    return this.compare(left,right) < 0
+  public lt = (left: InternalNoErrorCellValue, right: InternalNoErrorCellValue): boolean => {
+    return this.compare(left, right) < 0
   }
 
-  public leq(left: InternalNoErrorCellValue, right: InternalNoErrorCellValue): boolean {
-    return this.compare(left,right) <= 0
+  public leq = (left: InternalNoErrorCellValue, right: InternalNoErrorCellValue): boolean => {
+    return this.compare(left, right) <= 0
   }
 
-  public gt(left: InternalNoErrorCellValue, right: InternalNoErrorCellValue): boolean {
-    return this.compare(left,right) > 0
+  public gt = (left: InternalNoErrorCellValue, right: InternalNoErrorCellValue): boolean => {
+    return this.compare(left, right) > 0
   }
 
-  public geq(left: InternalNoErrorCellValue, right: InternalNoErrorCellValue): boolean {
-    return this.compare(left,right) >= 0
+  public geq = (left: InternalNoErrorCellValue, right: InternalNoErrorCellValue): boolean => {
+    return this.compare(left, right) >= 0
   }
 
-  public eq(left: InternalNoErrorCellValue, right: InternalNoErrorCellValue): boolean {
-    return this.compare(left,right) === 0
+  public eq = (left: InternalNoErrorCellValue, right: InternalNoErrorCellValue): boolean => {
+    return this.compare(left, right) === 0
   }
 
-  public neq(left: InternalNoErrorCellValue, right: InternalNoErrorCellValue): boolean {
-    return this.compare(left,right) !== 0
+  public neq = (left: InternalNoErrorCellValue, right: InternalNoErrorCellValue): boolean => {
+    return this.compare(left, right) !== 0
   }
 
   private compare(left: InternalNoErrorCellValue, right: InternalNoErrorCellValue): number {
@@ -166,9 +166,11 @@ export class ArithmeticHelper {
     }
   }
 
-  public stringCmp(left: string, right: string): number {
+  private stringCmp(left: string, right: string): number {
     return this.collator.compare(left, right)
   }
+
+  public pow = Math.pow
 
   public addWithEpsilon = (left: number, right: number) => {
     const ret = left + right
@@ -179,19 +181,19 @@ export class ArithmeticHelper {
     }
   }
 
-  public unary_minus(arg: number): number {
+  public unaryMinus = (arg: number): number => {
     return -arg
   }
 
-  public unary_plus(arg: number): number {
+  public unaryPlus = (arg: number): number => {
     return arg
   }
 
-  public unary_percent(arg: number): number {
+  public unaryPercent = (arg: number): number => {
     return arg/100
   }
 
-  public concat(left: string, right: string): string {
+  public concat = (left: string, right: string): string => {
     return left.concat(right)
   }
   /**
@@ -238,7 +240,7 @@ export class ArithmeticHelper {
     }
   }
 
-  public divide(left: number, right: number): number | CellError {
+  public divide = (left: number, right: number): number | CellError => {
     if (right === 0) {
       return new CellError(ErrorType.DIV_BY_ZERO)
     } else {
@@ -246,7 +248,7 @@ export class ArithmeticHelper {
     }
   }
 
-  public multiply(left: number, right: number): number {
+  public multiply = (left: number, right: number): number => {
     return left*right
   }
 

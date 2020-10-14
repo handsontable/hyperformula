@@ -175,30 +175,32 @@ export class SimpleArithmerticPlugin extends  FunctionPlugin {
 
   public ne(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.runFunction(ast.args, formulaAddress, this.metadata('HF.NE'),
-        this.interpreter.arithmeticHelper.neq
+      this.interpreter.arithmeticHelper.neq
     )
   }
 
   public pow(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('HF.POW'), Math.pow)
+    return this.runFunction(ast.args, formulaAddress, this.metadata('HF.POW'),
+      this.interpreter.arithmeticHelper.pow
+    )
   }
 
   public uminus(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.runFunction(ast.args, formulaAddress, this.metadata('HF.UMINUS'),
-      this.interpreter.arithmeticHelper.unary_minus
+      this.interpreter.arithmeticHelper.unaryMinus
     )
   }
 
   //eslint-disable-next-line @typescript-eslint/camelcase
   public unary_percent(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.runFunction(ast.args, formulaAddress, this.metadata('HF.UNARY_PERCENT'),
-      this.interpreter.arithmeticHelper.unary_percent
-  )
+      this.interpreter.arithmeticHelper.unaryPercent
+    )
   }
 
   public uplus(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.runFunction(ast.args, formulaAddress, this.metadata('HF.UPLUS'),
-      this.interpreter.arithmeticHelper.unary_plus
+      this.interpreter.arithmeticHelper.unaryPlus
     )
   }
 }

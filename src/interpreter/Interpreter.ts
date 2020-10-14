@@ -164,7 +164,7 @@ export class Interpreter {
         const rightResult = this.evaluateAst(ast.right, formulaAddress)
         return passErrors(leftResult, rightResult) ??
           wrapperBinary(
-            Math.pow,
+            this.arithmeticHelper.pow,
             this.arithmeticHelper.coerceScalarToNumberOrError(leftResult as InternalNoErrorCellValue),
             this.arithmeticHelper.coerceScalarToNumberOrError(rightResult as InternalNoErrorCellValue)
           )
@@ -184,7 +184,7 @@ export class Interpreter {
         if (result instanceof SimpleRangeValue) {
           return new CellError(ErrorType.VALUE, ErrorMessage.ScalarExpected)
         } else {
-          return wrapperUnary(this.arithmeticHelper.unary_plus,
+          return wrapperUnary(this.arithmeticHelper.unaryPlus,
             this.arithmeticHelper.coerceScalarToNumberOrError(result))
         }
       }
@@ -193,7 +193,7 @@ export class Interpreter {
         if (result instanceof SimpleRangeValue) {
           return new CellError(ErrorType.VALUE, ErrorMessage.ScalarExpected)
         } else {
-          return wrapperUnary(this.arithmeticHelper.unary_minus,
+          return wrapperUnary(this.arithmeticHelper.unaryMinus,
             this.arithmeticHelper.coerceScalarToNumberOrError(result))
         }
       }
@@ -202,7 +202,7 @@ export class Interpreter {
         if (result instanceof SimpleRangeValue) {
           return new CellError(ErrorType.VALUE, ErrorMessage.ScalarExpected)
         } else {
-          return wrapperUnary(this.arithmeticHelper.unary_percent,
+          return wrapperUnary(this.arithmeticHelper.unaryPercent,
             this.arithmeticHelper.coerceScalarToNumberOrError(result))
         }
       }
