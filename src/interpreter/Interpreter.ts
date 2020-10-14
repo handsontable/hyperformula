@@ -183,9 +183,10 @@ export class Interpreter {
         const result = this.evaluateAst(ast.value, formulaAddress)
         if (result instanceof SimpleRangeValue) {
           return new CellError(ErrorType.VALUE, ErrorMessage.ScalarExpected)
+        } else if(typeof result === 'number') {
+         return this.arithmeticHelper.unaryPlus(result)
         } else {
-          return wrapperUnary(this.arithmeticHelper.unaryPlus,
-            this.arithmeticHelper.coerceScalarToNumberOrError(result))
+          return result
         }
       }
       case AstNodeType.MINUS_UNARY_OP: {
