@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added 3 information functions HLOOKUP, ROW, COLUMN. (#158)
 - Added 8 statistical functions VAR.P, VAR.S, VARA, VARPA, STDEV.P, STDEV.S, STDEVA, STDEVPA.
 - Added 2 mathematical functions SUBTOTAL, PRODUCT.
+- Added 15 operator functions HF.ADD, HF.CONCAT, HF.DIVIDE, HF.EQ, HF.GT, HF.GTE, HF.LT, HF.LTE, HF.MINUS, HF.MULTIPLY, HF.NE, HF.POW, HF.UMINUS, HF.UNARY_PERCENT, HF.UPLUS.
 
 ### Fixed
 - Fixed multiple issues with VLOOKUP function. (#526, #528)
