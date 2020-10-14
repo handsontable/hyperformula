@@ -14,13 +14,30 @@ describe('Function VARPA', () => {
   it('should calculate variance (population)', () => {
     const engine = HyperFormula.buildFromArray([
       ['=VARPA(2, 3)'],
-      ['=VARPA(2, 3, 4, TRUE(), FALSE(), "1",)'],
-      ['=VARPA(B3:I3)', 2, 3, 4, true, false, 'a', '\'1', null],
       ['=VARPA(1)'],
     ])
     expect(engine.getCellValue(adr('A1'))).toEqual(0.25)
-    expect(engine.getCellValue(adr('A2'))).toBeCloseTo(1.95918367346939, 6)
-    expect(engine.getCellValue(adr('A3'))).toBeCloseTo(2.24489795918367, 6)
-    expect(engine.getCellValue(adr('A4'))).toEqual(0)
+    expect(engine.getCellValue(adr('A2'))).toEqual(0)
+  })
+
+  it('should coerce explicit argument to numbers', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=VARPA(2, 3, 4, TRUE(), FALSE(), "1",)'],
+    ])
+    expect(engine.getCellValue(adr('A1'))).toBeCloseTo(1.95918367346939, 6)
+  })
+
+  it('should ignore non-numeric values in ranges', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=VARPA(B1:I1)', 2, 3, 4, true, false, 'a', '\'1', null],
+    ])
+    expect(engine.getCellValue(adr('A1'))).toBeCloseTo(2.24489795918367, 6)
+  })
+
+  it('should propagate errors', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=VARPA(B1:I1)', 2, 3, 4, '=NA()', false, 'a', '\'1', null],
+    ])
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NA))
   })
 })

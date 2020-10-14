@@ -16,11 +16,29 @@ describe('Function VAR.S', () => {
   it('should calculate variance (sample)', () => {
     const engine = HyperFormula.buildFromArray([
       ['=VAR.S(2, 3)'],
-      ['=VAR.S(2, 3, 4, TRUE(), FALSE(), "1",)'],
-      ['=VAR.S(B3:I3)', 2, 3, 4, true, false, 'a', '\'1', null],
     ])
     expect(engine.getCellValue(adr('A1'))).toEqual(0.5)
-    expect(engine.getCellValue(adr('A2'))).toBeCloseTo(2.28571428571429, 6) //inconsistency with product #1
-    expect(engine.getCellValue(adr('A3'))).toEqual(1)
+  })
+
+
+  it('should coerce explicit argument to numbers', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=VAR.S(2, 3, 4, TRUE(), FALSE(), "1",)'],
+    ])
+    expect(engine.getCellValue(adr('A1'))).toBeCloseTo(2.28571428571429, 6) //inconsistency with product #1
+  })
+
+  it('should ignore non-numeric values in ranges', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=VAR.S(B1:I1)', 2, 3, 4, true, false, 'a', '\'1', null],
+    ])
+    expect(engine.getCellValue(adr('A1'))).toEqual(1)
+  })
+
+  it('should propagate errors', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=VAR.S(B1:I1)', 2, 3, 4, '=NA()', false, 'a', '\'1', null],
+    ])
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NA))
   })
 })

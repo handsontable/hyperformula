@@ -16,11 +16,28 @@ describe('Function STDEVA', () => {
   it('should calculate standard deviation (sample)', () => {
     const engine = HyperFormula.buildFromArray([
       ['=STDEVA(2, 3)'],
-      ['=STDEVA(2, 3, 4, TRUE(), FALSE(), "1",)'],
-      ['=STDEVA(B3:I3)', 2, 3, 4, true, false, 'a', '\'1', null],
     ])
-    expect(engine.getCellValue(adr('A1'))).toBeCloseTo(0.707106781186548, 6)
-    expect(engine.getCellValue(adr('A2'))).toBeCloseTo(1.51185789203691, 6)
-    expect(engine.getCellValue(adr('A3'))).toBeCloseTo(1.61834718742537, 6)
+    expect(engine.getCellValue(adr('A1'))).toEqual(0.707106781186548)
+  })
+
+  it('should coerce explicit argument to numbers', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=STDEVA(2, 3, 4, TRUE(), FALSE(), "1",)'],
+    ])
+    expect(engine.getCellValue(adr('A1'))).toBeCloseTo(1.51185789203691)
+  })
+
+  it('should ignore non-numeric values in ranges', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=STDEVA(B1:I1)', 2, 3, 4, true, false, 'a', '\'1', null],
+    ])
+    expect(engine.getCellValue(adr('A1'))).toBeCloseTo(1.61834718742537)
+  })
+
+  it('should propagate errors', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=STDEVA(B1:I1)', 2, 3, 4, '=NA()', false, 'a', '\'1', null],
+    ])
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NA))
   })
 })
