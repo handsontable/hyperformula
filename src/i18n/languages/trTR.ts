@@ -214,6 +214,7 @@ const dictionary: RawTranslationPackage = {
     YEARFRAC: 'YILORAN',
     REPLACE: 'DEĞİŞTİR',
     ROMAN: 'ROMEN',
+    ARABIC: 'ARAPÇA',
   },
   langCode: 'trTR',
   ui: {

@@ -214,6 +214,7 @@ const dictionary: RawTranslationPackage = {
     YEARFRAC: 'ÅR.BRØK',
     REPLACE: 'ERSTAT',
     ROMAN: 'ROMERTAL',
+    ARABIC: 'ARABISK',
   },
   langCode: 'daDK',
   ui: {

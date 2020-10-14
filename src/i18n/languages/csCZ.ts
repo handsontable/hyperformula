@@ -214,6 +214,7 @@ const dictionary: RawTranslationPackage = {
     YEARFRAC: 'YEARFRAC',
     REPLACE: 'NAHRADIT',
     ROMAN: 'ROMAN',
+    ARABIC: 'ARABIC',
   },
   langCode: 'csCZ',
   ui: {

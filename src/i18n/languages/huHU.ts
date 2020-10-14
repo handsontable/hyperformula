@@ -214,6 +214,7 @@ const dictionary: RawTranslationPackage = {
     YEARFRAC: 'TÖRTÉV',
     REPLACE: 'CSERE',
     ROMAN: 'RÓMAI',
+    ARABIC: 'ARAB',
   },
   langCode: 'huHU',
   ui: {

@@ -171,6 +171,7 @@ lets you design your own [custom functions](custom-functions).
 | ACOSH <br><Badge text="v0.2.0"/>| Math and trigonometry | Returns the inverse harmonic cosine of a number. | ACOSH(Number) |
 | ACOT <br><Badge text="v0.2.0"/>| Math and trigonometry | Returns the inverse trigonometric cotangent of a number. | ACOT(Number) |
 | ACOTH <br><Badge text="v0.2.0"/>| Math and trigonometry | Returns the inverse harmonic cotangent of a number. | ACOTH(Number) |
+| ARABIC | Math and trigonometry | Converts number from roman form. | ARABIC(String) |
 | ASIN | Math and trigonometry | Returns the inverse trigonometric sine of a number. | ASIN(Number) |
 | ASINH <br><Badge text="v0.2.0"/>| Math and trigonometry | Returns the inverse harmonic sine of a number. | ASINH(Number) |
 | ATAN | Math and trigonometry | Returns the inverse trigonometric tangent of a number. | ATAN(Number) |
@@ -199,7 +200,7 @@ lets you design your own [custom functions](custom-functions).
 | POWER | Math and trigonometry | Returns a number raised to another number. | POWER(Base; Exponent) |
 | RADIANS | Math and trigonometry | Converts degrees to radians. | RADIANS(Number) |
 | RAND | Math and trigonometry | Returns a random number between 0 and 1. | RAND() |
-| ROMAN | Math and trigonometry | Converts number to Roman form. | ROMAN(Number[; Mode]) |
+| ROMAN | Math and trigonometry | Converts number to roman form. | ROMAN(Number[; Mode]) |
 | ROUND | Math and trigonometry | Rounds a number to a certain number of decimal places. | ROUND(Number; Count) |
 | ROUNDDOWN | Math and trigonometry | Rounds a number down, toward zero, to a certain precision. | ROUNDDOWN(Number; Count) |
 | ROUNDUP | Math and trigonometry | Rounds a number up, away from zero, to a certain precision. | ROUNDUP(Number; Count) |

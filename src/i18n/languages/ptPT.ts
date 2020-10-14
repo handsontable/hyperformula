@@ -214,6 +214,7 @@ const dictionary: RawTranslationPackage = {
     YEARFRAC: 'FRAÇÃOANO',
     REPLACE: 'MUDAR',
     ROMAN: 'ROMANO',
+    ARABIC: 'CARDINAL',
   },
   langCode: 'ptPT',
   ui: {

@@ -214,6 +214,7 @@ const dictionary: RawTranslationPackage = {
     YEARFRAC: 'CZĘŚĆ.ROKU',
     REPLACE: 'ZASTĄP',
     ROMAN: 'RZYMSKIE',
+    ARABIC: 'ARABSKA',
   },
   langCode: 'plPL',
   ui: {

@@ -214,6 +214,7 @@ const dictionary: RawTranslationPackage = {
     YEARFRAC: 'JAAR.DEEL',
     REPLACE: 'VERVANGEN',
     ROMAN: 'ROMEINS',
+    ARABIC: 'ARABISCH',
   },
   langCode: 'nlNL',
   ui: {

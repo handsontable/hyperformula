@@ -214,6 +214,7 @@ const dictionary: RawTranslationPackage = {
     YEARFRAC: 'VUOSI.OSA',
     REPLACE: 'KORVAA',
     ROMAN: 'ROMAN',
+    ARABIC: 'ARABIA',
   },
   langCode: 'fiFI',
   ui: {

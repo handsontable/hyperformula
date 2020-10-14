@@ -214,6 +214,7 @@ const dictionary: RawTranslationPackage = {
     YEARFRAC: 'ДОЛЯГОДА',
     REPLACE: 'ЗАМЕНИТЬ',
     ROMAN: 'РИМСКОЕ',
+    ARABIC: 'АРАБСКОЕ',
   },
   langCode: 'ruRU',
   ui: {

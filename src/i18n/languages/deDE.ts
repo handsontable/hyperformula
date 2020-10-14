@@ -214,6 +214,7 @@ const dictionary: RawTranslationPackage = {
     YEARFRAC: 'BRTEILJAHRE',
     REPLACE: 'ERSETZEN',
     ROMAN: 'RÖMISCH',
+    ARABIC: 'ARABISCH',
   },
   langCode: 'deDE',
   ui: {
