@@ -238,6 +238,10 @@ const dictionary: RawTranslationPackage = {
     'HF.UMINUS': 'HF.UMINUS',
     'HF.UNARY_PERCENT': 'HF.UNARY_PERCENT',
     'HF.UPLUS': 'HF.UPLUS',
+    VAR: 'VAR',
+    VARP: 'VARP',
+    STDEV: 'KESKIHAJONTA',
+    STDEVP: 'KESKIHAJONTAP',
   },
   langCode: 'fiFI',
   ui: {

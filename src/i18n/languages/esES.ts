@@ -238,6 +238,10 @@ export const dictionary: RawTranslationPackage = {
     'HF.UMINUS': 'HF.UMINUS',
     'HF.UNARY_PERCENT': 'HF.UNARY_PERCENT',
     'HF.UPLUS': 'HF.UPLUS',
+    VAR: 'VAR',
+    VARP: 'VARP',
+    STDEV: 'DESVEST',
+    STDEVP: 'DESVESTP',
   },
   langCode: 'esES',
   ui: {

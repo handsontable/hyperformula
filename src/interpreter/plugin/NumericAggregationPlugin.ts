@@ -114,8 +114,14 @@ export class NumericAggregationPlugin extends FunctionPlugin {
     'VAR.S': {
       method: 'vars',
     },
+    'VAR': {
+      method: 'vars', //alias of VAR.S
+    },
     'VAR.P': {
       method: 'varp',
+    },
+    'VARP': {
+      method: 'varp', //alias of VAR.P
     },
     'VARA': {
       method: 'vara',
@@ -126,8 +132,14 @@ export class NumericAggregationPlugin extends FunctionPlugin {
     'STDEV.S': {
       method: 'stdevs',
     },
+    'STDEV': {
+      method: 'stdevs', //alias of STDEV.S
+    },
     'STDEV.P': {
       method: 'stdevp',
+    },
+    'STDEVP': {
+      method: 'stdevp', //alias of STDEVP
     },
     'STDEVA': {
       method: 'stdeva',
