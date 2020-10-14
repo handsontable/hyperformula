@@ -189,21 +189,21 @@ lets you design your own [custom functions](custom-functions).
 | DEGREES | Math and trigonometry | Converts radians into degrees. | DEGREES(Number) |
 | EVEN | Math and trigonometry | Rounds a positive number up to the next even integer and a negative number down to the next even integer. | EVEN(Number) |
 | EXP | Math and trigonometry | Returns e raised to the power of a number. | EXP(Number) |
-| HF.ADD | Math and trigonometry | Adds two values. | HF.ADD(Number; Number) |
-| HF.CONCAT | Math and trigonometry | Concatenates two strings. | HF.CONCAT(String; String) |
-| HF.DIVIDE | Math and trigonometry | Divides two values. | HF.DIVIDE(Number; Number) |
-| HF.EQ | Math and trigonometry | Tests two values for equality. | HF.EQ(Value; Value) |
-| HF.LTE | Math and trigonometry | Tests two values for less-equal relation. | HF.LEQ(Value; Value) |
-| HF.LT | Math and trigonometry | Tests two values for less-than relation. | HF.LT(Value; Value) |
-| HF.GTE | Math and trigonometry | Tests two values for greater-equal relation. | HF.GEQ(Value; Value) |
-| HF.GT | Math and trigonometry | Tests two values for greater-than relation. | HF.GT(Value; Value) |
-| HF.MINUS | Math and trigonometry | Subtracts two values. | HF.MINUS(Number; Number) |
-| HF.MULTIPLY | Math and trigonometry | Multiplies two values. | HF.MULTIPLY(Number; Number) |
-| HF.NE | Math and trigonometry | Tests two values for inequality. | HF.NE(Value; Value) |
-| HF.POW | Math and trigonometry | Computes power of two values. | HF.POW(Number; Number) |
-| HF.UMINUS | Math and trigonometry | Negates the value. | HF.UMINUS(Number) |
-| HF.UNARY_PERCENT | Math and trigonometry | Applies percent operator. | HF.UNARY_PERCENT(Number) |
-| HF.UPLUS | Math and trigonometry | Applies unary plus. | HF.UPLUS(Number) |
+| HF.ADD | Operator | Adds two values. | HF.ADD(Number; Number) |
+| HF.CONCAT | Operator | Concatenates two strings. | HF.CONCAT(String; String) |
+| HF.DIVIDE | Operator | Divides two values. | HF.DIVIDE(Number; Number) |
+| HF.EQ | Operator | Tests two values for equality. | HF.EQ(Value; Value) |
+| HF.LTE | Operator | Tests two values for less-equal relation. | HF.LEQ(Value; Value) |
+| HF.LT | Operator | Tests two values for less-than relation. | HF.LT(Value; Value) |
+| HF.GTE | Operator | Tests two values for greater-equal relation. | HF.GEQ(Value; Value) |
+| HF.GT | Operator | Tests two values for greater-than relation. | HF.GT(Value; Value) |
+| HF.MINUS | Operator | Subtracts two values. | HF.MINUS(Number; Number) |
+| HF.MULTIPLY | Operator | Multiplies two values. | HF.MULTIPLY(Number; Number) |
+| HF.NE | Operator | Tests two values for inequality. | HF.NE(Value; Value) |
+| HF.POW | Operator | Computes power of two values. | HF.POW(Number; Number) |
+| HF.UMINUS | Operator | Negates the value. | HF.UMINUS(Number) |
+| HF.UNARY_PERCENT | Operator | Applies percent operator. | HF.UNARY_PERCENT(Number) |
+| HF.UPLUS | Operator | Applies unary plus. | HF.UPLUS(Number) |
 | INT | Math and trigonometry | Rounds a number down to the nearest integer. | INT(Number) |
 | LN | Math and trigonometry | Returns the natural logarithm based on the constant e of a number. | LN(Number) |
 | LOG | Math and trigonometry | Returns the logarithm of a number to the specified base. | LOG(Number; Base) |
