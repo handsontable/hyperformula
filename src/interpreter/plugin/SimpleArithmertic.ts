@@ -100,7 +100,7 @@ export class SimpleArithmerticPlugin extends  FunctionPlugin {
       ],
     },
     'HF.UNARY_PERCENT': {
-      method: 'unary_percent',
+      method: 'upercent',
       parameters: [
         { argumentType: ArgumentTypes.NUMBER },
       ],
@@ -191,8 +191,7 @@ export class SimpleArithmerticPlugin extends  FunctionPlugin {
     )
   }
 
-  //eslint-disable-next-line @typescript-eslint/camelcase
-  public unary_percent(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+  public upercent(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.runFunction(ast.args, formulaAddress, this.metadata('HF.UNARY_PERCENT'),
       this.interpreter.arithmeticHelper.unaryPercent
     )
