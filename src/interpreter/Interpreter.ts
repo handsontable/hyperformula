@@ -27,7 +27,7 @@ import {NumberLiteralHelper} from '../NumberLiteralHelper'
 import {Ast, AstNodeType, CellRangeAst, ColumnRangeAst, RowRangeAst} from '../parser/Ast'
 import {Serialization} from '../Serialization'
 import {Statistics} from '../statistics/Statistics'
-import {ArithmeticHelper, coerceScalarToString, divide, fixNegativeZero, isNumberOverflow} from './ArithmeticHelper'
+import {ArithmeticHelper, coerceScalarToString, fixNegativeZero, isNumberOverflow} from './ArithmeticHelper'
 import {CriterionBuilder} from './Criterion'
 import {FunctionRegistry} from './FunctionRegistry'
 import {InterpreterValue, SimpleRangeValue} from './InterpreterValue'
@@ -90,7 +90,7 @@ export class Interpreter {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
         const rightResult = this.evaluateAst(ast.right, formulaAddress)
         return passErrors(leftResult, rightResult) ??
-          wrapperBinary((a, b) => a.concat(b),
+          wrapperBinary(this.arithmeticHelper.concat,
             coerceScalarToString(leftResult as InternalNoErrorScalarValue),
             coerceScalarToString(rightResult as InternalNoErrorScalarValue)
           )
@@ -99,37 +99,37 @@ export class Interpreter {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
         const rightResult = this.evaluateAst(ast.right, formulaAddress)
         return passErrors(leftResult, rightResult) ??
-          this.arithmeticHelper.compare(leftResult as InternalNoErrorScalarValue, rightResult as InternalNoErrorScalarValue) === 0
+          this.arithmeticHelper.eq(leftResult as InternalNoErrorScalarValue, rightResult as InternalNoErrorScalarValue)
       }
       case AstNodeType.NOT_EQUAL_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
         const rightResult = this.evaluateAst(ast.right, formulaAddress)
         return passErrors(leftResult, rightResult) ??
-          this.arithmeticHelper.compare(leftResult as InternalNoErrorScalarValue, rightResult as InternalNoErrorScalarValue) !== 0
+          this.arithmeticHelper.neq(leftResult as InternalNoErrorScalarValue, rightResult as InternalNoErrorScalarValue)
       }
       case AstNodeType.GREATER_THAN_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
         const rightResult = this.evaluateAst(ast.right, formulaAddress)
         return passErrors(leftResult, rightResult) ??
-          this.arithmeticHelper.compare(leftResult as InternalNoErrorScalarValue, rightResult as InternalNoErrorScalarValue) > 0
+          this.arithmeticHelper.gt(leftResult as InternalNoErrorScalarValue, rightResult as InternalNoErrorScalarValue)
       }
       case AstNodeType.LESS_THAN_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
         const rightResult = this.evaluateAst(ast.right, formulaAddress)
         return passErrors(leftResult, rightResult) ??
-          this.arithmeticHelper.compare(leftResult as InternalNoErrorScalarValue, rightResult as InternalNoErrorScalarValue) < 0
+          this.arithmeticHelper.lt(leftResult as InternalNoErrorScalarValue, rightResult as InternalNoErrorScalarValue)
       }
       case AstNodeType.GREATER_THAN_OR_EQUAL_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
         const rightResult = this.evaluateAst(ast.right, formulaAddress)
         return passErrors(leftResult, rightResult) ??
-          this.arithmeticHelper.compare(leftResult as InternalNoErrorScalarValue, rightResult as InternalNoErrorScalarValue) >= 0
+          this.arithmeticHelper.geq(leftResult as InternalNoErrorScalarValue, rightResult as InternalNoErrorScalarValue)
       }
       case AstNodeType.LESS_THAN_OR_EQUAL_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
         const rightResult = this.evaluateAst(ast.right, formulaAddress)
         return passErrors(leftResult, rightResult) ??
-          this.arithmeticHelper.compare(leftResult as InternalNoErrorScalarValue, rightResult as InternalNoErrorScalarValue) <= 0
+          this.arithmeticHelper.leq(leftResult as InternalNoErrorScalarValue, rightResult as InternalNoErrorScalarValue)
       }
       case AstNodeType.PLUS_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
@@ -154,7 +154,7 @@ export class Interpreter {
         const rightResult = this.evaluateAst(ast.right, formulaAddress)
         return passErrors(leftResult, rightResult) ??
           wrapperBinary(
-            (a, b) => a*b,
+            this.arithmeticHelper.multiply,
             this.arithmeticHelper.coerceScalarToNumberOrError(leftResult as InternalNoErrorScalarValue),
             this.arithmeticHelper.coerceScalarToNumberOrError(rightResult as InternalNoErrorScalarValue)
           )
@@ -164,7 +164,7 @@ export class Interpreter {
         const rightResult = this.evaluateAst(ast.right, formulaAddress)
         return passErrors(leftResult, rightResult) ??
           wrapperBinary(
-            Math.pow,
+            this.arithmeticHelper.pow,
             this.arithmeticHelper.coerceScalarToNumberOrError(leftResult as InternalNoErrorScalarValue),
             this.arithmeticHelper.coerceScalarToNumberOrError(rightResult as InternalNoErrorScalarValue)
           )
@@ -174,7 +174,7 @@ export class Interpreter {
         const rightResult = this.evaluateAst(ast.right, formulaAddress)
         return passErrors(leftResult, rightResult) ??
           wrapperBinary(
-            divide,
+            this.arithmeticHelper.divide,
             this.arithmeticHelper.coerceScalarToNumberOrError(leftResult as InternalNoErrorScalarValue),
             this.arithmeticHelper.coerceScalarToNumberOrError(rightResult as InternalNoErrorScalarValue)
           )
@@ -183,6 +183,8 @@ export class Interpreter {
         const result = this.evaluateAst(ast.value, formulaAddress)
         if (result instanceof SimpleRangeValue) {
           return new CellError(ErrorType.VALUE, ErrorMessage.ScalarExpected)
+        } else if(typeof result === 'number') {
+         return this.arithmeticHelper.unaryPlus(result)
         } else {
           return result
         }
@@ -192,7 +194,7 @@ export class Interpreter {
         if (result instanceof SimpleRangeValue) {
           return new CellError(ErrorType.VALUE, ErrorMessage.ScalarExpected)
         } else {
-          return wrapperUnary((a) => -a,
+          return wrapperUnary(this.arithmeticHelper.unaryMinus,
             this.arithmeticHelper.coerceScalarToNumberOrError(result))
         }
       }
@@ -201,7 +203,7 @@ export class Interpreter {
         if (result instanceof SimpleRangeValue) {
           return new CellError(ErrorType.VALUE, ErrorMessage.ScalarExpected)
         } else {
-          return wrapperUnary((a) => a/100,
+          return wrapperUnary(this.arithmeticHelper.unaryPercent,
             this.arithmeticHelper.coerceScalarToNumberOrError(result))
         }
       }

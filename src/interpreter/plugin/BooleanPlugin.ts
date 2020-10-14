@@ -183,7 +183,7 @@ export class BooleanPlugin extends FunctionPlugin {
         if (args[i] instanceof CellError) {
           continue
         }
-        if (this.interpreter.arithmeticHelper.compare(selector, args[i] as InternalNoErrorScalarValue) === 0) {
+        if (this.interpreter.arithmeticHelper.eq(selector, args[i] as InternalNoErrorScalarValue)) {
           return args[i + 1]
         }
       }

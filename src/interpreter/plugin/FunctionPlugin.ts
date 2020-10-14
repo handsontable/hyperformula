@@ -320,6 +320,6 @@ export abstract class FunctionPlugin {
     if (params !== undefined) {
       return params
     }
-    throw new Error('Should not be undefined')
+    throw new Error(`No metadata for function ${name}.`)
   }
 }
