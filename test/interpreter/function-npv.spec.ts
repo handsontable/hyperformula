@@ -11,17 +11,22 @@ describe('Function NPV', () => {
     expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
   })
 
-  it('should return correct value', () => {
+  it('should ignore logical and text values', () => {
     const engine = HyperFormula.buildFromArray([
       ['=NPV(1, B1:C1)', 1, 'abcd'],
       ['=NPV(1, B2:C2)', true, 1],
-      ['=NPV(1, TRUE(), 1)'],
       ['=NPV(-1, 0)'],
     ])
     expect(engine.getCellValue(adr('A1'))).toEqual(0.5)
     expect(engine.getCellValue(adr('A2'))).toEqual(0.5)
-    expect(engine.getCellValue(adr('A3'))).toEqual(0.75)
-    expect(engine.getCellValue(adr('A4'))).toEqual(0)
+    expect(engine.getCellValue(adr('A3'))).toEqual(0)
+  })
+
+  it('should be compatible with product #2', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=NPV(1, TRUE(), 1)'],
+    ])
+    expect(engine.getCellValue(adr('A1'))).toEqual(0.75) //product #1 returns 0.5
   })
 
   it('order of arguments matters', () => {
