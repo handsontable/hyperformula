@@ -101,7 +101,31 @@ export class ArithmeticHelper {
     return str
   }
 
-  public compare(left: InternalNoErrorCellValue, right: InternalNoErrorCellValue): number {
+  public lt = (left: InternalNoErrorCellValue, right: InternalNoErrorCellValue): boolean => {
+    return this.compare(left, right) < 0
+  }
+
+  public leq = (left: InternalNoErrorCellValue, right: InternalNoErrorCellValue): boolean => {
+    return this.compare(left, right) <= 0
+  }
+
+  public gt = (left: InternalNoErrorCellValue, right: InternalNoErrorCellValue): boolean => {
+    return this.compare(left, right) > 0
+  }
+
+  public geq = (left: InternalNoErrorCellValue, right: InternalNoErrorCellValue): boolean => {
+    return this.compare(left, right) >= 0
+  }
+
+  public eq = (left: InternalNoErrorCellValue, right: InternalNoErrorCellValue): boolean => {
+    return this.compare(left, right) === 0
+  }
+
+  public neq = (left: InternalNoErrorCellValue, right: InternalNoErrorCellValue): boolean => {
+    return this.compare(left, right) !== 0
+  }
+
+  private compare(left: InternalNoErrorCellValue, right: InternalNoErrorCellValue): number {
     if (typeof left === 'string' || typeof right === 'string') {
       const leftTmp = typeof left === 'string' ? this.dateTimeHelper.dateStringToDateNumber(left) : left
       const rightTmp = typeof right === 'string' ? this.dateTimeHelper.dateStringToDateNumber(right) : right
@@ -142,9 +166,11 @@ export class ArithmeticHelper {
     }
   }
 
-  public stringCmp(left: string, right: string): number {
+  private stringCmp(left: string, right: string): number {
     return this.collator.compare(left, right)
   }
+
+  public pow = Math.pow
 
   public addWithEpsilon = (left: number, right: number) => {
     const ret = left + right
@@ -155,6 +181,21 @@ export class ArithmeticHelper {
     }
   }
 
+  public unaryMinus = (arg: number): number => {
+    return -arg
+  }
+
+  public unaryPlus = (arg: number): number => {
+    return arg
+  }
+
+  public unaryPercent = (arg: number): number => {
+    return arg/100
+  }
+
+  public concat = (left: string, right: string): string => {
+    return left.concat(right)
+  }
   /**
    * Adds two numbers
    *
@@ -197,6 +238,18 @@ export class ArithmeticHelper {
     } else {
       return ret
     }
+  }
+
+  public divide = (left: number, right: number): number | CellError => {
+    if (right === 0) {
+      return new CellError(ErrorType.DIV_BY_ZERO)
+    } else {
+      return (left / right)
+    }
+  }
+
+  public multiply = (left: number, right: number): number => {
+    return left*right
   }
 
   public coerceScalarToNumberOrError(arg: InternalScalarValue): number | CellError {
@@ -305,14 +358,6 @@ export function coerceScalarToString(arg: InternalScalarValue): string | CellErr
 
 export function zeroIfEmpty(arg: InternalNoErrorCellValue): InternalNoErrorCellValue {
   return arg === EmptyValue ? 0 : arg
-}
-
-export function divide(left: number, right: number): number | CellError {
-  if (right === 0) {
-    return new CellError(ErrorType.DIV_BY_ZERO)
-  } else {
-    return (left / right)
-  }
 }
 
 export function numberCmp(left: number, right: number): number {

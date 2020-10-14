@@ -190,6 +190,21 @@ lets you design your own [custom functions](custom-functions).
 | DEGREES | Math and trigonometry | Converts radians into degrees. | DEGREES(Number) |
 | EVEN | Math and trigonometry | Rounds a positive number up to the next even integer and a negative number down to the next even integer. | EVEN(Number) |
 | EXP | Math and trigonometry | Returns e raised to the power of a number. | EXP(Number) |
+| HF.ADD | Operator | Adds two values. | HF.ADD(Number; Number) |
+| HF.CONCAT | Operator | Concatenates two strings. | HF.CONCAT(String; String) |
+| HF.DIVIDE | Operator | Divides two values. | HF.DIVIDE(Number; Number) |
+| HF.EQ | Operator | Tests two values for equality. | HF.EQ(Value; Value) |
+| HF.LTE | Operator | Tests two values for less-equal relation. | HF.LEQ(Value; Value) |
+| HF.LT | Operator | Tests two values for less-than relation. | HF.LT(Value; Value) |
+| HF.GTE | Operator | Tests two values for greater-equal relation. | HF.GEQ(Value; Value) |
+| HF.GT | Operator | Tests two values for greater-than relation. | HF.GT(Value; Value) |
+| HF.MINUS | Operator | Subtracts two values. | HF.MINUS(Number; Number) |
+| HF.MULTIPLY | Operator | Multiplies two values. | HF.MULTIPLY(Number; Number) |
+| HF.NE | Operator | Tests two values for inequality. | HF.NE(Value; Value) |
+| HF.POW | Operator | Computes power of two values. | HF.POW(Number; Number) |
+| HF.UMINUS | Operator | Negates the value. | HF.UMINUS(Number) |
+| HF.UNARY_PERCENT | Operator | Applies percent operator. | HF.UNARY_PERCENT(Number) |
+| HF.UPLUS | Operator | Applies unary plus. | HF.UPLUS(Number) |
 | INT | Math and trigonometry | Rounds a number down to the nearest integer. | INT(Number) |
 | LN | Math and trigonometry | Returns the natural logarithm based on the constant e of a number. | LN(Number) |
 | LOG | Math and trigonometry | Returns the logarithm of a number to the specified base. | LOG(Number; Base) |
@@ -198,6 +213,7 @@ lets you design your own [custom functions](custom-functions).
 | ODD | Math and trigonometry | Rounds a positive number up to the nearest odd integer and a negative number down to the nearest odd integer. | ODD(Number) |
 | PI | Math and trigonometry | Returns 3.14159265358979, the value of the mathematical constant PI to 14 decimal places. | PI() |
 | POWER | Math and trigonometry | Returns a number raised to another number. | POWER(Base; Exponent) |
+| PRODUCT | Math and trigonometry | Returns product of numbers. | PRODUCT(Number1; Number2; ...; Number30) |
 | RADIANS | Math and trigonometry | Converts degrees to radians. | RADIANS(Number) |
 | RAND | Math and trigonometry | Returns a random number between 0 and 1. | RAND() |
 | ROMAN | Math and trigonometry | Converts number to roman form. | ROMAN(Number[; Mode]) |
@@ -209,6 +225,7 @@ lets you design your own [custom functions](custom-functions).
 | SIN | Math and trigonometry | Returns the sine of the given angle (in radians). | SIN(Number) |
 | SINH <br><Badge text="v0.2.0"/>| Math and trigonometry | Returns the hyperbolic sine of the given value. | SINH(Number) |
 | SQRT | Math and trigonometry | Returns the positive square root of a number. | SQRT(Number) |
+| SUBTOTAL | Math and trigonometry | Computes aggregation using function specified by number. | SUBTOTAL(Function; Number1; Number2; ... Number30) |
 | SUM | Math and trigonometry | Adds all the numbers in a range of cells. | SUM(Number1; Number2; ...; Number30) |
 | SUMIF | Math and trigonometry | Adds the cells specified by given criteria. | SUMIF(Range; Criteria; Sumrange) |
 | SUMIFS | Math and trigonometry | Returns the sum of the values of cells in a range that meets multiple criteria in multiple ranges. | SUMIFS(Sum_Range ; Criterion_range1 ; Criterion1 [ ; Criterion_range2 ; Criterion2 [;...]]) |
@@ -235,6 +252,18 @@ lets you design your own [custom functions](custom-functions).
 | MEDIAN | Statistical | Returns the median of a set of numbers. | MEDIAN(Number1; Number2; ...Number30) |
 | MIN | Statistical | Returns the minimum value in a list of arguments. | MIN(Number1; Number2; ...Number30) |
 | MINA | Statistical | Returns the minimum value in a list of arguments. | MINA(Value1; Value2; ... Value30) |
+| STDEV | Statistical | Returns standard deviation of a sample. | STDEV(Value1; Value2; ... Value30) |
+| STDEVA | Statistical | Returns standard deviation of a sample. | STDEVA(Value1; Value2; ... Value30) |
+| STDEVP | Statistical | Returns standard deviation of a population. | STDEVP(Value1; Value2; ... Value30) |
+| STDEV.P | Statistical | Returns standard deviation of a population. | STDEV.P(Value1; Value2; ... Value30) |
+| STDEVPA | Statistical | Returns standard deviation of a population. | STDEVPA(Value1; Value2; ... Value30) |
+| STDEV.S | Statistical | Returns standard deviation of a sample. | STDEV.S(Value1; Value2; ... Value30) |
+| VAR | Statistical | Returns variance of a sample. | VAR(Value1; Value2; ... Value30) |
+| VARA | Statistical | Returns variance of a sample. | VARA(Value1; Value2; ... Value30) |
+| VARP | Statistical | Returns variance of a population. | VARP(Value1; Value2; ... Value30) |
+| VAR.P | Statistical | Returns variance of a population. | VAR.P(Value1; Value2; ... Value30) |
+| VARPA | Statistical | Returns variance of a population. | VARPA(Value1; Value2; ... Value30) |
+| VAR.S | Statistical | Returns variance of a sample. | VAR.S(Value1; Value2; ... Value30) |
 | CHAR | Text | Converts a number into a character according to the current code table. | CHAR(Number) |
 | CLEAN <br><Badge text="v0.2.0"/>| Text | Returns text that has been "cleaned" of line breaks and other non-printable characters. | CLEAN("Text") |
 | CLEAN | Text | Returns text that has been "cleaned" of line breaks and other non-printable characters. | CLEAN("Text") |
