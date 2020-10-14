@@ -27,7 +27,7 @@ describe('Function VARPA', () => {
     expect(engine.getCellValue(adr('A1'))).toBeCloseTo(1.95918367346939, 6)
   })
 
-  it('should ignore non-numeric values in ranges', () => {
+  it('should evaluate TRUE to 1, FALSE to 0 and coerce text representation of numbers', () => {
     const engine = HyperFormula.buildFromArray([
       ['=VARPA(B1:I1)', 2, 3, 4, true, false, 'a', '\'1', null],
     ])
