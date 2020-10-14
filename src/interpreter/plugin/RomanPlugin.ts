@@ -17,6 +17,12 @@ export class RomanPlugin extends FunctionPlugin {
         { argumentType: ArgumentTypes.NOERROR, optionalArg: true, defaultValue: 0 }
       ],
     },
+    'ARABIC': {
+      method: 'arabic',
+      parameters: [
+        { argumentType: ArgumentTypes.STRING},
+      ],
+    },
   }
 
   public roman(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
@@ -43,6 +49,80 @@ export class RomanPlugin extends FunctionPlugin {
       }
     )
   }
+
+  public arabic(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('ARABIC'),
+      (input: string) => {
+        input = input.trim().toUpperCase()
+        let minusSign = false
+        if(input.startsWith('-')) {
+          input = input.slice(1)
+          minusSign = true
+          if(input==='') {
+            return new CellError(ErrorType.VALUE, ErrorMessage.Roman)
+          }
+        }
+        let ans = 0;
+        [input,ans] = eatToken(input, ans,
+          {token: 'MMM', val: 3000},
+          {token: 'MM', val: 2000},
+          {token: 'M', val: 1000},);
+        [input,ans] = eatToken(input, ans,
+          {token: 'IM', val: 999},
+          {token: 'VM', val: 995},
+          {token: 'XM', val: 990},
+          {token: 'LM', val: 950},
+          {token: 'CM', val: 900},);
+        [input,ans] = eatToken(input, ans,
+          {token: 'D', val: 500},
+          {token: 'ID', val: 499},
+          {token: 'VD', val: 495},
+          {token: 'XD', val: 490},
+          {token: 'LD', val: 450},
+          {token: 'CD', val: 400},);
+        [input,ans] = eatToken(input, ans,
+          {token: 'CCC', val: 300},
+          {token: 'CC', val: 200},
+          {token: 'C', val: 100},);
+        [input,ans] = eatToken(input, ans,
+          {token: 'IC', val: 99},
+          {token: 'VC', val: 95},
+          {token: 'XC', val: 90},);
+        [input,ans] = eatToken(input, ans,
+          {token: 'L', val: 50},
+          {token: 'IL', val: 49},
+          {token: 'VL', val: 45},
+          {token: 'XL', val: 40},
+        );
+        [input,ans] = eatToken(input, ans,
+          {token: 'XXX', val: 30},
+          {token: 'XX', val: 20},
+          {token: 'X', val: 10},);
+        [input,ans] = eatToken(input, ans, {token: 'IX', val: 9});
+        [input,ans] = eatToken(input, ans,
+          {token: 'V', val: 5},
+          {token: 'IV', val: 4});
+        [input,ans] = eatToken(input, ans,
+          {token: 'III', val: 3},
+          {token: 'II', val: 2},
+          {token: 'I', val: 1},);
+        if(input !== '') {
+          return new CellError(ErrorType.VALUE, ErrorMessage.Roman)
+        } else {
+          return (minusSign?-1:1) * ans
+        }
+      }
+    )
+  }
+}
+
+function eatToken(input: string, acc: number, ...tokens: {token: string, val: number}[]): [string, number] {
+  for(let token of tokens) {
+    if(input.startsWith(token.token)) {
+      return [input.slice(token.token.length), acc+token.val]
+    }
+  }
+  return [input, acc]
 }
 
 function romanMode(val: number, mode: number): string {

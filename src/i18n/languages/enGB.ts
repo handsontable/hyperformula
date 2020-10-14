@@ -24,6 +24,7 @@ const dictionary: RawTranslationPackage = {
     ACOT: 'ACOT',
     ACOTH: 'ACOTH',
     AND: 'AND',
+    ARABIC: 'ARABIC',
     ASIN: 'ASIN',
     ASINH: 'ASINH',
     ATAN2: 'ATAN2',
