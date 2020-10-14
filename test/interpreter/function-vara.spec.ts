@@ -27,7 +27,7 @@ describe('Function VARA', () => {
     expect(engine.getCellValue(adr('A1'))).toBeCloseTo(2.28571428571429)
   })
 
-  it('should ignore non-numeric values in ranges', () => {
+  it('should evaluate TRUE to 1, FALSE to 0 and coerce text representation of numbers', () => {
     const engine = HyperFormula.buildFromArray([
       ['=VARA(B1:I1)', 2, 3, 4, true, false, 'a', '\'1', null],
     ])
