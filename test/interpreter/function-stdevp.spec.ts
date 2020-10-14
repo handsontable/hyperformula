@@ -27,7 +27,7 @@ describe('Function STDEV.P', () => {
     expect(engine.getCellValue(adr('A1'))).toBeCloseTo(1.39970842444753, 6) //inconsistency with product #1
   })
 
-  it('should ignore non-numeric values in ranges', () => {
+  it('should ignore non-numeric values in ranges, including ignoring logical values and text representation of numbers', () => {
     const engine = HyperFormula.buildFromArray([
       ['=STDEV.P(B1:I1)', 2, 3, 4, true, false, 'a', '\'1', null],
     ])

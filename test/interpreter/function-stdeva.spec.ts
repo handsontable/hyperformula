@@ -27,7 +27,7 @@ describe('Function STDEVA', () => {
     expect(engine.getCellValue(adr('A1'))).toBeCloseTo(1.51185789203691)
   })
 
-  it('should ignore non-numeric values in ranges', () => {
+  it('should evaluate TRUE to 1, FALSE to 0 and text to 0', () => {
     const engine = HyperFormula.buildFromArray([
       ['=STDEVA(B1:I1)', 2, 3, 4, true, false, 'a', '\'1', null],
     ])
