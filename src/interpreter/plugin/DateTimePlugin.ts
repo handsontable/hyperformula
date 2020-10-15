@@ -7,7 +7,7 @@ import {
   CellError,
   EmptyValue,
   ErrorType,
-  InternalNoErrorCellValue,
+  InternalNoErrorScalarValue,
   InternalScalarValue,
   SimpleCellAddress
 } from '../../Cell'
@@ -593,7 +593,7 @@ export class DateTimePlugin extends FunctionPlugin {
     )
   }
 
-  private networkdayscore(start: number, end: number, weekend: InternalNoErrorCellValue, holidays?: SimpleRangeValue): InternalScalarValue {
+  private networkdayscore(start: number, end: number, weekend: InternalNoErrorScalarValue, holidays?: SimpleRangeValue): InternalScalarValue {
     start = Math.trunc(start)
     end = Math.trunc(end)
     let multiplier = 1
@@ -614,7 +614,7 @@ export class DateTimePlugin extends FunctionPlugin {
     return multiplier * this.countWorkdays(start, end, weekendPattern, filteredHolidays)
   }
 
-  private workdaycore(start: number, delta: number, weekend: InternalNoErrorCellValue, holidays?: SimpleRangeValue): InternalScalarValue {
+  private workdaycore(start: number, delta: number, weekend: InternalNoErrorScalarValue, holidays?: SimpleRangeValue): InternalScalarValue {
     start = Math.trunc(start)
     delta = Math.trunc(delta)
 
@@ -682,15 +682,13 @@ export class DateTimePlugin extends FunctionPlugin {
 
   private simpleRangeToFilteredHolidays(holidays: Maybe<SimpleRangeValue>, weekendPattern: string): number[] | CellError {
     const holidaysArr = holidays?.valuesFromTopLeftCorner() ?? []
-    for(let i=0; i<holidaysArr.length; i++) {
-      const val = holidaysArr[i]
+    for(const val of holidaysArr) {
       if(val instanceof CellError) {
         return val
       }
     }
     const processedHolidays: number[] = []
-    for(let i=0; i<holidaysArr.length; i++) {
-      const val = holidaysArr[i] as InternalNoErrorCellValue
+    for(const val of holidaysArr as InternalNoErrorScalarValue[]) {
       if(val === EmptyValue) {
         continue
       }
@@ -738,7 +736,7 @@ function lowerBound(val: number, sortedArray: number[]): number {
   return upper
 }
 
-function computeWeekendPattern(weekend: InternalNoErrorCellValue): string | CellError {
+function computeWeekendPattern(weekend: InternalNoErrorScalarValue): string | CellError {
   if(typeof weekend !== 'number' && typeof weekend !== 'string') {
     return new CellError(ErrorType.VALUE, ErrorMessage.WrongType)
   }

@@ -4,7 +4,7 @@
  */
 
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
-import {InternalNoErrorCellValue, InternalScalarValue, SimpleCellAddress} from '../Cell'
+import {InternalNoErrorScalarValue, InternalScalarValue, SimpleCellAddress} from '../Cell'
 import {Config} from '../Config'
 import {DependencyGraph} from '../DependencyGraph'
 import {InterpreterValue} from '../interpreter/InterpreterValue'
@@ -15,7 +15,7 @@ import {ColumnIndex} from './ColumnIndex'
 import {ColumnsSpan} from '../Span'
 
 export interface SearchStrategy {
-  find(key: InternalNoErrorCellValue, range: AbsoluteCellRange, sorted: boolean): number,
+  find(key: InternalNoErrorScalarValue, range: AbsoluteCellRange, sorted: boolean): number,
 
   advancedFind(keyMatcher: (arg: InternalScalarValue) => boolean, range: AbsoluteCellRange): number,
 }

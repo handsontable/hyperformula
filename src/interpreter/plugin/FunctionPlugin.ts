@@ -82,6 +82,11 @@ export enum ArgumentTypes {
    * Integer type.
    */
   INTEGER = 'INTEGER',
+
+  /**
+   * Range or scalar.
+   */
+  ANY = 'ANY',
 }
 
 export interface FunctionArgument {
@@ -168,10 +173,12 @@ export abstract class FunctionPlugin {
 
   public coerceToType(arg: InterpreterValue, coercedType: FunctionArgument): Maybe<InterpreterValue> {
     if (arg instanceof SimpleRangeValue) {
-      if (coercedType.argumentType === ArgumentTypes.RANGE) {
-        return arg
-      } else {
-        return undefined
+      switch(coercedType.argumentType) {
+        case ArgumentTypes.RANGE:
+        case ArgumentTypes.ANY:
+          return arg
+        default:
+          return undefined
       }
     } else {
       switch (coercedType.argumentType) {
@@ -203,8 +210,8 @@ export abstract class FunctionPlugin {
         case ArgumentTypes.BOOLEAN:
           return coerceScalarToBoolean(arg)
         case ArgumentTypes.SCALAR:
-          return arg
         case ArgumentTypes.NOERROR:
+        case ArgumentTypes.ANY:
           return arg
         case ArgumentTypes.RANGE:
           if (arg instanceof CellError) {
