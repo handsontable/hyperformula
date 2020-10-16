@@ -250,6 +250,7 @@ const dictionary: RawTranslationPackage = {
     STDEV: 'DEV.ST',
     STDEVP: 'DEV.ST.POP',
     FACT: 'FATTORIALE',
+    FACTDOUBLE: 'FATT.DOPPIO',
   },
   langCode: 'itIT',
   ui: {

@@ -250,6 +250,7 @@ const dictionary: RawTranslationPackage = {
     STDEV: 'STABW',
     STDEVP: 'STABWN',
     FACT: 'FAKULTÄT',
+    FACTDOUBLE: 'ZWEIFAKULTÄT',
   },
   langCode: 'deDE',
   ui: {

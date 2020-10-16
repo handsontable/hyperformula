@@ -250,6 +250,7 @@ const dictionary: RawTranslationPackage = {
     STDEV: 'STDSAPMA',
     STDEVP: 'STDSAPMAS',
     FACT: 'ÇARPINIM',
+    FACTDOUBLE: 'ÇİFTFAKTÖR',
   },
   langCode: 'trTR',
   ui: {

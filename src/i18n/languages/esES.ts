@@ -250,6 +250,7 @@ export const dictionary: RawTranslationPackage = {
     STDEV: 'DESVEST',
     STDEVP: 'DESVESTP',
     FACT: 'FACT',
+    FACTDOUBLE: 'FACT.DOBLE',
   },
   langCode: 'esES',
   ui: {

@@ -250,6 +250,7 @@ const dictionary: RawTranslationPackage = {
     STDEV: 'SZÓRÁS',
     STDEVP: 'SZÓRÁSP',
     FACT: 'FAKT',
+    FACTDOUBLE: 'FAKTDUPLA',
   },
   langCode: 'huHU',
   ui: {

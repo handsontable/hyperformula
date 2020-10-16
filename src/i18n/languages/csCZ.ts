@@ -250,6 +250,7 @@ const dictionary: RawTranslationPackage = {
     STDEV: 'SMODCH.VÝBĚR',
     STDEVP: 'SMODCH',
     FACT: 'FAKTORIÁL',
+    FACTDOUBLE: 'FACTDOUBLE',
   },
   langCode: 'csCZ',
   ui: {

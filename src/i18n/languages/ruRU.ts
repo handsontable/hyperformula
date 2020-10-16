@@ -250,6 +250,7 @@ const dictionary: RawTranslationPackage = {
     STDEV: 'СТАНДОТКЛОН',
     STDEVP: 'СТАНДОТКЛОНП',
     FACT: 'ФАКТР',
+    FACTDOUBLE: 'ДВФАКТР',
   },
   langCode: 'ruRU',
   ui: {
