@@ -194,7 +194,8 @@ lets you design your own [custom functions](custom-functions).
 | DECIMAL | Math and trigonometry | Converts text with characters from a number system to a positive integer in the base radix given. | DECIMAL("Text"; Radix) |
 | DEGREES | Math and trigonometry | Converts radians into degrees. | DEGREES(Number) |
 | EVEN | Math and trigonometry | Rounds a positive number up to the next even integer and a negative number down to the next even integer. | EVEN(Number) |
-| EXP | Math and trigonometry | Returns e raised to the power of a number. | EXP(Number) |
+| EXP | Math and trigonometry | Returns constant e raised to the power of a number. | EXP(Number) |
+| FACT | Math and trigonometry | Returns a factorial of a number. | FACT(Number) |
 | HF.ADD | Operator | Adds two values. | HF.ADD(Number; Number) |
 | HF.CONCAT | Operator | Concatenates two strings. | HF.CONCAT(String; String) |
 | HF.DIVIDE | Operator | Divides two values. | HF.DIVIDE(Number; Number) |
