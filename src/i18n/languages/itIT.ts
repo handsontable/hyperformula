@@ -251,6 +251,8 @@ const dictionary: RawTranslationPackage = {
     STDEVP: 'DEV.ST.POP',
     FACT: 'FATTORIALE',
     FACTDOUBLE: 'FATT.DOPPIO',
+    COMBIN: 'COMBINAZIONE',
+    COMBINA: 'COMBINAZIONE.VALORI',
   },
   langCode: 'itIT',
   ui: {

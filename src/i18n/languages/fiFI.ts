@@ -251,6 +251,8 @@ const dictionary: RawTranslationPackage = {
     STDEVP: 'KESKIHAJONTAP',
     FACT: 'KERTOMA',
     FACTDOUBLE: 'KERTOMA.OSA',
+    COMBIN: 'KOMBINAATIO',
+    COMBINA: 'KOMBINAATIOA',
   },
   langCode: 'fiFI',
   ui: {

@@ -251,6 +251,8 @@ const dictionary: RawTranslationPackage = {
     STDEVP: 'DESVPADP',
     FACT: 'FATORIAL',
     FACTDOUBLE: 'FATDUPLO',
+    COMBIN: 'COMBIN',
+    COMBINA: 'COMBINA',
   },
   langCode: 'ptPT',
   ui: {

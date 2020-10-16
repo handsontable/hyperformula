@@ -251,6 +251,8 @@ export const dictionary: RawTranslationPackage = {
     STDEVP: 'DESVESTP',
     FACT: 'FACT',
     FACTDOUBLE: 'FACT.DOBLE',
+    COMBIN: 'COMBINAT',
+    COMBINA: 'COMBINA',
   },
   langCode: 'esES',
   ui: {

@@ -251,6 +251,8 @@ const dictionary: RawTranslationPackage = {
     STDEVP: 'СТАНДОТКЛОНП',
     FACT: 'ФАКТР',
     FACTDOUBLE: 'ДВФАКТР',
+    COMBIN: 'ЧИСЛКОМБ',
+    COMBINA: 'ЧИСЛКОМБА',
   },
   langCode: 'ruRU',
   ui: {

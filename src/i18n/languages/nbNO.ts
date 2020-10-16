@@ -251,6 +251,8 @@ const dictionary: RawTranslationPackage = {
     STDEVP: 'STDAVP',
     FACT: 'FAKULTET',
     FACTDOUBLE: 'DOBBELFAKT',
+    COMBIN: 'KOMBINASJON',
+    COMBINA: 'KOMBINASJONA',
   },
   langCode: 'nbNO',
   ui: {

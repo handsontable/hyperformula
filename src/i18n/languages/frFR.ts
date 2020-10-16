@@ -251,6 +251,8 @@ const dictionary: RawTranslationPackage = {
     STDEVP: 'ECARTYPEP',
     FACT: 'FACT',
     FACTDOUBLE: 'FACTDOUBLE',
+    COMBIN: 'COMBIN',
+    COMBINA: 'COMBINA',
   },
   langCode: 'frFR',
   ui: {

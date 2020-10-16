@@ -251,6 +251,8 @@ const dictionary: RawTranslationPackage = {
     STDEVP: 'SMODCH',
     FACT: 'FAKTORIÁL',
     FACTDOUBLE: 'FACTDOUBLE',
+    COMBIN: 'KOMBINACE',
+    COMBINA: 'COMBINA',
   },
   langCode: 'csCZ',
   ui: {

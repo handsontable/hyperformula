@@ -251,6 +251,8 @@ const dictionary: RawTranslationPackage = {
     STDEVP: 'SZÓRÁSP',
     FACT: 'FAKT',
     FACTDOUBLE: 'FAKTDUPLA',
+    COMBIN: 'KOMBINÁCIÓK',
+    COMBINA: 'KOMBINÁCIÓK.ISM',
   },
   langCode: 'huHU',
   ui: {

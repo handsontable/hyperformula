@@ -251,6 +251,8 @@ const dictionary: RawTranslationPackage = {
     STDEVP: 'STDSAPMAS',
     FACT: 'ÇARPINIM',
     FACTDOUBLE: 'ÇİFTFAKTÖR',
+    COMBIN: 'KOMBİNASYON',
+    COMBINA: 'KOMBİNASYONA',
   },
   langCode: 'trTR',
   ui: {

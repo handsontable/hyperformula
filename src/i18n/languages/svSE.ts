@@ -251,6 +251,8 @@ const dictionary: RawTranslationPackage = {
     STDEVP: 'STDAVP',
     FACT: 'FAKULTET',
     FACTDOUBLE: 'DUBBELFAKULTET',
+    COMBIN: 'KOMBIN',
+    COMBINA: 'COMBINA',
   },
   langCode: 'svSE',
   ui: {

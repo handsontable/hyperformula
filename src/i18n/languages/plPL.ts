@@ -251,6 +251,8 @@ const dictionary: RawTranslationPackage = {
     STDEVP: 'ODCH.STANDARD.POPUL',
     FACT: 'SILNIA',
     FACTDOUBLE: 'SILNIA.DWUKR',
+    COMBIN: 'KOMBINACJE',
+    COMBINA: 'KOMBINACJE.A',
   },
   langCode: 'plPL',
   ui: {
