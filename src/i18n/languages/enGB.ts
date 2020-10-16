@@ -248,7 +248,8 @@ const dictionary: RawTranslationPackage = {
     VARP: 'VARP',
     VAR: 'VAR',
     STDEVP: 'STDEVP',
-    STDEV: 'STDEV'
+    STDEV: 'STDEV',
+    FACT: 'FACT',
   },
   langCode: 'enGB',
   ui: {
