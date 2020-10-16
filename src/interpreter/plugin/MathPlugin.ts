@@ -86,7 +86,7 @@ export class MathPlugin extends FunctionPlugin {
         if(n===0 && m===0) {
           return 1
         }
-        return combin(n+m-1,m)
+        return combin(n+m-1, m)
       }
     )
   }
