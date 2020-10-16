@@ -249,6 +249,7 @@ const dictionary: RawTranslationPackage = {
     VARP: 'VAR',
     STDEV: 'SMODCH.VÝBĚR',
     STDEVP: 'SMODCH',
+    FACT: 'FAKTORIÁL',
   },
   langCode: 'csCZ',
   ui: {

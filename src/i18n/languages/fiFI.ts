@@ -249,6 +249,7 @@ const dictionary: RawTranslationPackage = {
     VARP: 'VARP',
     STDEV: 'KESKIHAJONTA',
     STDEVP: 'KESKIHAJONTAP',
+    FACT: 'KERTOMA',
   },
   langCode: 'fiFI',
   ui: {

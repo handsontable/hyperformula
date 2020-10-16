@@ -249,6 +249,7 @@ const dictionary: RawTranslationPackage = {
     VARP: 'VARIANSP',
     STDEV: 'STDAFV',
     STDEVP: 'STDAFVP',
+    FACT: 'FAKULTET',
   },
   langCode: 'daDK',
   ui: {

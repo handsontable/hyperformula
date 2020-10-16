@@ -249,6 +249,7 @@ const dictionary: RawTranslationPackage = {
     VARP: 'VARP',
     STDEV: 'SZÓRÁS',
     STDEVP: 'SZÓRÁSP',
+    FACT: 'FAKT',
   },
   langCode: 'huHU',
   ui: {

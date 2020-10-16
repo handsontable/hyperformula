@@ -249,6 +249,7 @@ const dictionary: RawTranslationPackage = {
     VARP: 'VARP',
     STDEV: 'DESVPAD',
     STDEVP: 'DESVPADP',
+    FACT: 'FATORIAL',
   },
   langCode: 'ptPT',
   ui: {

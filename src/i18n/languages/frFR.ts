@@ -249,6 +249,7 @@ const dictionary: RawTranslationPackage = {
     VARP: 'VAR.P',
     STDEV: 'ECARTYPE',
     STDEVP: 'ECARTYPEP',
+    FACT: 'FACT',
   },
   langCode: 'frFR',
   ui: {

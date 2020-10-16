@@ -249,6 +249,7 @@ const dictionary: RawTranslationPackage = {
     VARP: 'VARS',
     STDEV: 'STDSAPMA',
     STDEVP: 'STDSAPMAS',
+    FACT: 'ÇARPINIM',
   },
   langCode: 'trTR',
   ui: {

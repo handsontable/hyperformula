@@ -249,6 +249,7 @@ const dictionary: RawTranslationPackage = {
     VARP: 'WARIANCJA.POPUL',
     STDEV: 'ODCH.STANDARDOWE',
     STDEVP: 'ODCH.STANDARD.POPUL',
+    FACT: 'SILNIA',
   },
   langCode: 'plPL',
   ui: {

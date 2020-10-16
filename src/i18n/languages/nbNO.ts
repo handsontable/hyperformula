@@ -249,6 +249,7 @@ const dictionary: RawTranslationPackage = {
     VARP: 'VARIANSP',
     STDEV: 'STDAV',
     STDEVP: 'STDAVP',
+    FACT: 'FAKULTET',
   },
   langCode: 'nbNO',
   ui: {

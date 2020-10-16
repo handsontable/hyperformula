@@ -249,6 +249,7 @@ export const dictionary: RawTranslationPackage = {
     VARP: 'VARP',
     STDEV: 'DESVEST',
     STDEVP: 'DESVESTP',
+    FACT: 'FACT',
   },
   langCode: 'esES',
   ui: {

@@ -249,6 +249,7 @@ const dictionary: RawTranslationPackage = {
     VARP: 'VARIANZEN',
     STDEV: 'STABW',
     STDEVP: 'STABWN',
+    FACT: 'FAKULTÄT',
   },
   langCode: 'deDE',
   ui: {

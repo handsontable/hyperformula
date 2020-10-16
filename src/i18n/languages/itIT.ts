@@ -249,6 +249,7 @@ const dictionary: RawTranslationPackage = {
     VARP: 'VAR.POP',
     STDEV: 'DEV.ST',
     STDEVP: 'DEV.ST.POP',
+    FACT: 'FATTORIALE',
   },
   langCode: 'itIT',
   ui: {
