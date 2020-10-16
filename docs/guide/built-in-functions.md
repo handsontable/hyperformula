@@ -196,21 +196,7 @@ lets you design your own [custom functions](custom-functions).
 | EVEN | Math and trigonometry | Rounds a positive number up to the next even integer and a negative number down to the next even integer. | EVEN(Number) |
 | EXP | Math and trigonometry | Returns constant e raised to the power of a number. | EXP(Number) |
 | FACT | Math and trigonometry | Returns a factorial of a number. | FACT(Number) |
-| HF.ADD | Operator | Adds two values. | HF.ADD(Number; Number) |
-| HF.CONCAT | Operator | Concatenates two strings. | HF.CONCAT(String; String) |
-| HF.DIVIDE | Operator | Divides two values. | HF.DIVIDE(Number; Number) |
-| HF.EQ | Operator | Tests two values for equality. | HF.EQ(Value; Value) |
-| HF.LTE | Operator | Tests two values for less-equal relation. | HF.LEQ(Value; Value) |
-| HF.LT | Operator | Tests two values for less-than relation. | HF.LT(Value; Value) |
-| HF.GTE | Operator | Tests two values for greater-equal relation. | HF.GEQ(Value; Value) |
-| HF.GT | Operator | Tests two values for greater-than relation. | HF.GT(Value; Value) |
-| HF.MINUS | Operator | Subtracts two values. | HF.MINUS(Number; Number) |
-| HF.MULTIPLY | Operator | Multiplies two values. | HF.MULTIPLY(Number; Number) |
-| HF.NE | Operator | Tests two values for inequality. | HF.NE(Value; Value) |
-| HF.POW | Operator | Computes power of two values. | HF.POW(Number; Number) |
-| HF.UMINUS | Operator | Negates the value. | HF.UMINUS(Number) |
-| HF.UNARY_PERCENT | Operator | Applies percent operator. | HF.UNARY_PERCENT(Number) |
-| HF.UPLUS | Operator | Applies unary plus. | HF.UPLUS(Number) |
+| FACTDOUBLE | Math and trigonometry | Returns a double factorial of a number. | FACTDOUBLE(Number) |
 | INT | Math and trigonometry | Rounds a number down to the nearest integer. | INT(Number) |
 | LN | Math and trigonometry | Returns the natural logarithm based on the constant e of a number. | LN(Number) |
 | LOG | Math and trigonometry | Returns the logarithm of a number to the specified base. | LOG(Number; Base) |
@@ -244,6 +230,21 @@ lets you design your own [custom functions](custom-functions).
 | MEDIANPOOL | Matrix functions | Calculates a smaller range which is a median of a Window_size, in a given Range, for every Stride element. | MEDIANPOOL(Range, Window_size, Stride) |
 | MAXPOOL | Matrix functions | Calculates a smaller range which is a maximum of a Window_size, in a given Range, for every Stride element. | MAXPOOL(Range, Window_size, Stride) |
 | TRANSPOSE | Matrix functions | Transposes the rows and columns of an array. | TRANSPOSE(Array) |
+| HF.ADD | Operator | Adds two values. | HF.ADD(Number; Number) |
+| HF.CONCAT | Operator | Concatenates two strings. | HF.CONCAT(String; String) |
+| HF.DIVIDE | Operator | Divides two values. | HF.DIVIDE(Number; Number) |
+| HF.EQ | Operator | Tests two values for equality. | HF.EQ(Value; Value) |
+| HF.LTE | Operator | Tests two values for less-equal relation. | HF.LEQ(Value; Value) |
+| HF.LT | Operator | Tests two values for less-than relation. | HF.LT(Value; Value) |
+| HF.GTE | Operator | Tests two values for greater-equal relation. | HF.GEQ(Value; Value) |
+| HF.GT | Operator | Tests two values for greater-than relation. | HF.GT(Value; Value) |
+| HF.MINUS | Operator | Subtracts two values. | HF.MINUS(Number; Number) |
+| HF.MULTIPLY | Operator | Multiplies two values. | HF.MULTIPLY(Number; Number) |
+| HF.NE | Operator | Tests two values for inequality. | HF.NE(Value; Value) |
+| HF.POW | Operator | Computes power of two values. | HF.POW(Number; Number) |
+| HF.UMINUS | Operator | Negates the value. | HF.UMINUS(Number) |
+| HF.UNARY_PERCENT | Operator | Applies percent operator. | HF.UNARY_PERCENT(Number) |
+| HF.UPLUS | Operator | Applies unary plus. | HF.UPLUS(Number) |
 | AVERAGE | Statistical | Returns the average of the arguments. | AVERAGE(Number1; Number2; ...Number30) |
 | AVERAGEA | Statistical | Returns the average of the arguments. | AVERAGEA(Value1; Value2; ... Value30) |
 | AVERAGEIF | Statistical | Returns the arithmetic mean of all cells in a range that satisfy a given condition. | AVERAGEIF(Range; Criterion [; Average_Range ]) |
