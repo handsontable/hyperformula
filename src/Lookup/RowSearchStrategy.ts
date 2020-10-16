@@ -4,7 +4,7 @@
  */
 
 import {SearchStrategy} from './SearchStrategy'
-import {InternalNoErrorCellValue} from '../Cell'
+import {InternalNoErrorScalarValue} from '../Cell'
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
 import {rangeLowerBound} from '../interpreter/binarySearch'
 import {Config} from '../Config'
@@ -19,7 +19,7 @@ export class RowSearchStrategy extends AdvancedFind implements SearchStrategy {
     super(dependencyGraph)
   }
 
-  public find(key: InternalNoErrorCellValue, range: AbsoluteCellRange, sorted: boolean): number {
+  public find(key: InternalNoErrorScalarValue, range: AbsoluteCellRange, sorted: boolean): number {
     if (range.width() < this.config.binarySearchThreshold || !sorted) {
       const values = this.dependencyGraph.computeListOfValuesInRange(range)
       const index =  values.indexOf(key)

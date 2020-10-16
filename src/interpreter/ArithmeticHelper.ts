@@ -9,7 +9,7 @@ import {
   EmptyValue,
   ErrorType,
   getCellValueType,
-  InternalNoErrorCellValue,
+  InternalNoErrorScalarValue,
   InternalScalarValue
 } from '../Cell'
 import {Config} from '../Config'
@@ -101,31 +101,31 @@ export class ArithmeticHelper {
     return str
   }
 
-  public lt = (left: InternalNoErrorCellValue, right: InternalNoErrorCellValue): boolean => {
+  public lt = (left: InternalNoErrorScalarValue, right: InternalNoErrorScalarValue): boolean => {
     return this.compare(left, right) < 0
   }
 
-  public leq = (left: InternalNoErrorCellValue, right: InternalNoErrorCellValue): boolean => {
+  public leq = (left: InternalNoErrorScalarValue, right: InternalNoErrorScalarValue): boolean => {
     return this.compare(left, right) <= 0
   }
 
-  public gt = (left: InternalNoErrorCellValue, right: InternalNoErrorCellValue): boolean => {
+  public gt = (left: InternalNoErrorScalarValue, right: InternalNoErrorScalarValue): boolean => {
     return this.compare(left, right) > 0
   }
 
-  public geq = (left: InternalNoErrorCellValue, right: InternalNoErrorCellValue): boolean => {
+  public geq = (left: InternalNoErrorScalarValue, right: InternalNoErrorScalarValue): boolean => {
     return this.compare(left, right) >= 0
   }
 
-  public eq = (left: InternalNoErrorCellValue, right: InternalNoErrorCellValue): boolean => {
+  public eq = (left: InternalNoErrorScalarValue, right: InternalNoErrorScalarValue): boolean => {
     return this.compare(left, right) === 0
   }
 
-  public neq = (left: InternalNoErrorCellValue, right: InternalNoErrorCellValue): boolean => {
+  public neq = (left: InternalNoErrorScalarValue, right: InternalNoErrorScalarValue): boolean => {
     return this.compare(left, right) !== 0
   }
 
-  private compare(left: InternalNoErrorCellValue, right: InternalNoErrorCellValue): number {
+  private compare(left: InternalNoErrorScalarValue, right: InternalNoErrorScalarValue): number {
     if (typeof left === 'string' || typeof right === 'string') {
       const leftTmp = typeof left === 'string' ? this.dateTimeHelper.dateStringToDateNumber(left) : left
       const rightTmp = typeof right === 'string' ? this.dateTimeHelper.dateStringToDateNumber(right) : right
@@ -282,6 +282,48 @@ export class ArithmeticHelper {
       }
     }
   }
+
+  public coerceNumbersExpandRanges(args: InterpreterValue[]): number[] | CellError {
+    const vals: (number | SimpleRangeValue)[] = []
+    for(const arg of args) {
+      if(arg instanceof SimpleRangeValue) {
+        vals.push(arg)
+      } else {
+        const coerced = this.coerceScalarToNumberOrError(arg)
+        if(coerced instanceof CellError) {
+          return coerced
+        } else {
+          vals.push(coerced)
+        }
+      }
+    }
+    const expandedVals: number[] = []
+    for(const val of vals) {
+      if(val instanceof SimpleRangeValue) {
+        const arr = this.manyToExactNumbers(val.valuesFromTopLeftCorner())
+        if(arr instanceof CellError) {
+          return arr
+        } else {
+          expandedVals.push(...arr)
+        }
+      } else {
+        expandedVals.push(val)
+      }
+    }
+    return expandedVals
+  }
+
+  public manyToExactNumbers(args: InternalScalarValue[]): number[] | CellError {
+    const ret: number[] = []
+    for(const arg of args) {
+      if(arg instanceof CellError) {
+        return arg
+      } else if (typeof arg === 'number') {
+        ret.push(arg)
+      }
+    }
+    return ret
+  }
 }
 
 export function coerceToRange(arg: InterpreterValue): SimpleRangeValue {
@@ -306,7 +348,7 @@ export function coerceBooleanToNumber(arg: boolean): number {
   return Number(arg)
 }
 
-export function coerceEmptyToValue(arg: InternalNoErrorCellValue): InternalNoErrorCellValue {
+export function coerceEmptyToValue(arg: InternalNoErrorScalarValue): InternalNoErrorScalarValue {
   if (typeof arg === 'string') {
     return ''
   } else if (typeof arg === 'number') {
@@ -356,7 +398,7 @@ export function coerceScalarToString(arg: InternalScalarValue): string | CellErr
   }
 }
 
-export function zeroIfEmpty(arg: InternalNoErrorCellValue): InternalNoErrorCellValue {
+export function zeroIfEmpty(arg: InternalNoErrorScalarValue): InternalNoErrorScalarValue {
   return arg === EmptyValue ? 0 : arg
 }
 

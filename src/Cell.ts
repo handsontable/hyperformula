@@ -39,8 +39,8 @@ export type TranslatableErrorType = Exclude<ErrorType, ErrorType.LIC>
 
 export const EmptyValue = Symbol('Empty value')
 export type EmptyValueType = typeof EmptyValue
-export type InternalNoErrorCellValue = number | string | boolean | EmptyValueType
-export type InternalScalarValue = InternalNoErrorCellValue | CellError
+export type InternalNoErrorScalarValue = number | string | boolean | EmptyValueType
+export type InternalScalarValue = InternalNoErrorScalarValue | CellError
 
 export enum CellType {
   FORMULA = 'FORMULA',

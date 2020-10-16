@@ -3,9 +3,10 @@
  * Copyright (c) 2020 Handsoncode. All rights reserved.
  */
 
-import {CellError, ErrorType, InternalScalarValue, SimpleCellAddress} from '../../Cell'
+import {CellError, EmptyValue, ErrorType, InternalScalarValue, SimpleCellAddress} from '../../Cell'
 import {ErrorMessage} from '../../error-message'
 import {ProcedureAst} from '../../parser'
+import {InterpreterValue, SimpleRangeValue} from '../InterpreterValue'
 import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
 
 export class FinancialPlugin extends FunctionPlugin {
@@ -210,6 +211,45 @@ export class FinancialPlugin extends FunctionPlugin {
         {argumentType: ArgumentTypes.NUMBER, minValue: 0},
         {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
       ]
+    },
+    'FVSCHEDULE': {
+      method: 'fvschedule',
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER},
+        {argumentType: ArgumentTypes.RANGE},
+      ]
+    },
+    'NPV': {
+      method: 'npv',
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER},
+        {argumentType: ArgumentTypes.ANY},
+      ],
+      repeatLastArgs: 1
+    },
+    'MIRR': {
+      method: 'mirr',
+      parameters: [
+        {argumentType: ArgumentTypes.RANGE},
+        {argumentType: ArgumentTypes.NUMBER},
+        {argumentType: ArgumentTypes.NUMBER},
+      ],
+    },
+    'PDURATION': {
+      method: 'pduration',
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
+        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
+        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
+      ],
+    },
+    'XNPV': {
+      method: 'xnpv',
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER, greaterThan: -1},
+        {argumentType: ArgumentTypes.RANGE},
+        {argumentType: ArgumentTypes.RANGE},
+      ],
     },
   }
 
@@ -559,6 +599,126 @@ export class FinancialPlugin extends FunctionPlugin {
       }
     )
   }
+
+  public fvschedule(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('FVSCHEDULE'),
+      (value: number, ratios: SimpleRangeValue) => {
+        const vals = ratios.valuesFromTopLeftCorner()
+        for(const val of vals) {
+          if(val instanceof CellError) {
+            return val
+          }
+        }
+        for(const val of vals) {
+          if(typeof val === 'number') {
+            value *= 1+val
+          } else if(val !== EmptyValue) {
+            return new CellError(ErrorType.VALUE, ErrorMessage.NumberExpected)
+          }
+        }
+        return value
+      })
+  }
+
+  public npv(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('NPV'),
+      (rate: number, ...args: InterpreterValue[]) => {
+        const coerced = this.interpreter.arithmeticHelper.coerceNumbersExpandRanges(args)
+        if(coerced instanceof CellError) {
+          return coerced
+        }
+        return npvCore(rate, coerced)
+      }
+    )
+  }
+
+  public mirr(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('MIRR'),
+      (range: SimpleRangeValue, frate: number, rrate: number) => {
+        const vals = this.interpreter.arithmeticHelper.manyToExactNumbers(range.valuesFromTopLeftCorner())
+        if(vals instanceof CellError) {
+          return vals
+        }
+        let posFlag = false
+        let negFlag = false
+        const posValues: number[] = []
+        const negValues: number[] = []
+        for(const val of vals) {
+          if(val>0) {
+            posFlag = true
+            posValues.push(val)
+            negValues.push(0)
+          } else if(val<0) {
+            negFlag = true
+            negValues.push(val)
+            posValues.push(0)
+          } else {
+            negValues.push(0)
+            posValues.push(0)
+          }
+        }
+        if(!posFlag || !negFlag) {
+          return new CellError(ErrorType.DIV_BY_ZERO)
+        }
+        const n = vals.length
+        const nom = npvCore(rrate, posValues)
+        if(nom instanceof CellError) {
+          return nom
+        }
+        const denom = npvCore(frate, negValues)
+        if(denom instanceof CellError) {
+          return denom
+        }
+        return Math.pow(
+          (-nom*Math.pow(1+rrate, n)/denom/(1+frate)),
+          1/(n-1)
+        )-1
+      }
+    )
+  }
+
+  public pduration(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('PDURATION'),
+      (rate: number, pv: number, fv: number) => (Math.log(fv) - Math.log(pv))/Math.log(1+rate)
+    )
+  }
+
+  public xnpv(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('XNPV'),
+      (rate: number, values: SimpleRangeValue, dates: SimpleRangeValue) => {
+        const valArr = values.valuesFromTopLeftCorner()
+        for(const val of valArr) {
+          if(typeof val !== 'number') {
+            return new CellError(ErrorType.VALUE, ErrorMessage.NumberExpected)
+          }
+        }
+        const valArrNum = valArr as number[]
+        const dateArr = dates.valuesFromTopLeftCorner()
+        for(const date of dateArr) {
+          if(typeof date !== 'number') {
+            return new CellError(ErrorType.VALUE, ErrorMessage.NumberExpected)
+          }
+        }
+        const dateArrNum = dateArr as number[]
+        if(dateArrNum.length !== valArrNum.length) {
+          return new CellError(ErrorType.NUM, ErrorMessage.EqualLength)
+        }
+        const n = dateArrNum.length
+        let ret = 0
+        if(dateArrNum[0]  < 0) {
+          return new CellError(ErrorType.NUM, ErrorMessage.ValueSmall)
+        }
+        for(let i=0;i<n;i++) {
+          dateArrNum[i] = Math.floor(dateArrNum[i])
+          if(dateArrNum[i]<dateArrNum[0]) {
+            return new CellError(ErrorType.NUM, ErrorMessage.ValueSmall)
+          }
+          ret += valArrNum[i] / Math.pow(1+rate, (dateArrNum[i]-dateArrNum[0])/365)
+        }
+        return ret
+      }
+    )
+  }
 }
 
 function pmtCore(rate: number, periods: number, present: number, future: number, type: number): number {
@@ -590,4 +750,20 @@ function fvCore(rate: number, periods: number, payment: number, value: number, t
 
 function ppmtCore(rate: number, period: number, periods: number, present: number, future: number, type: number): number {
   return pmtCore(rate, periods, present, future, type) - ipmtCore(rate, period, periods, present, future, type)
+}
+
+function npvCore(rate: number, args: number[]): number | CellError {
+  let acc = 0
+  for(let i=args.length-1;i>=0;i--) {
+    acc += args[i]
+    if(rate===-1) {
+      if (acc === 0) {
+        continue
+      } else {
+        return new CellError(ErrorType.DIV_BY_ZERO)
+      }
+    }
+    acc /= 1+rate
+  }
+  return acc
 }

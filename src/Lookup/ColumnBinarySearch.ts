@@ -4,7 +4,7 @@
  */
 
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
-import {InternalNoErrorCellValue, InternalScalarValue, SimpleCellAddress} from '../Cell'
+import {InternalNoErrorScalarValue, InternalScalarValue, SimpleCellAddress} from '../Cell'
 import {Config} from '../Config'
 import {DependencyGraph} from '../DependencyGraph'
 import {rangeLowerBound} from '../interpreter/binarySearch'
@@ -40,7 +40,7 @@ export class ColumnBinarySearch extends AdvancedFind implements ColumnSearchStra
 
   public destroy(): void {}
 
-  public find(key: InternalNoErrorCellValue, range: AbsoluteCellRange, sorted: boolean): number {
+  public find(key: InternalNoErrorScalarValue, range: AbsoluteCellRange, sorted: boolean): number {
     if (range.height() < this.config.binarySearchThreshold || !sorted) {
       const values = this.dependencyGraph.computeListOfValuesInRange(range)
       const index =  values.indexOf(key)
