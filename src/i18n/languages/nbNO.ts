@@ -255,6 +255,7 @@ const dictionary: RawTranslationPackage = {
     COMBINA: 'KOMBINASJONA',
     GCD: 'SFF',
     LCM: 'MFM',
+    MROUND: 'MRUND',
   },
   langCode: 'nbNO',
   ui: {

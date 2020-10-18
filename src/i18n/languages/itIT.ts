@@ -255,6 +255,7 @@ const dictionary: RawTranslationPackage = {
     COMBINA: 'COMBINAZIONE.VALORI',
     GCD: 'MCD',
     LCM: 'MCM',
+    MROUND: 'ARROTONDA.MULTIPLO',
   },
   langCode: 'itIT',
   ui: {

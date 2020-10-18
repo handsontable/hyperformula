@@ -255,6 +255,7 @@ const dictionary: RawTranslationPackage = {
     COMBINA: 'COMBINA',
     GCD: 'SGD',
     LCM: 'MGM',
+    MROUND: 'MAVRUNDA',
   },
   langCode: 'svSE',
   ui: {

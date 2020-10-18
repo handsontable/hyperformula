@@ -255,6 +255,7 @@ const dictionary: RawTranslationPackage = {
     COMBINA: 'KOMBINAATIOA',
     GCD: 'SUURIN.YHT.TEKIJÄ',
     LCM: 'PIENIN.YHT.JAETTAVA',
+    MROUND: 'PYÖRISTÄ.KERR',
   },
   langCode: 'fiFI',
   ui: {

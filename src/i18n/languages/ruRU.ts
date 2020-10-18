@@ -255,6 +255,7 @@ const dictionary: RawTranslationPackage = {
     COMBINA: 'ЧИСЛКОМБА',
     GCD: 'НОД',
     LCM: 'НОК',
+    MROUND: 'ОКРУГЛТ',
   },
   langCode: 'ruRU',
   ui: {

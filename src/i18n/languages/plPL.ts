@@ -255,6 +255,7 @@ const dictionary: RawTranslationPackage = {
     COMBINA: 'KOMBINACJE.A',
     GCD: 'NAJW.WSP.DZIEL',
     LCM: 'NAJMN.WSP.WIEL',
+    MROUND: 'ZAOKR.DO.WIELOKR',
   },
   langCode: 'plPL',
   ui: {

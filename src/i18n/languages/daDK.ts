@@ -255,6 +255,7 @@ const dictionary: RawTranslationPackage = {
     COMBINA: 'KOMBINA',
     GCD: 'STØRSTE.FÆLLES.DIVISOR',
     LCM: 'MINDSTE.FÆLLES.MULTIPLUM',
+    MROUND: 'MAFRUND',
   },
   langCode: 'daDK',
   ui: {

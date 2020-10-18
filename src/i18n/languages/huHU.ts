@@ -255,6 +255,7 @@ const dictionary: RawTranslationPackage = {
     COMBINA: 'KOMBINÁCIÓK.ISM',
     GCD: 'LKO',
     LCM: 'LKT',
+    MROUND: 'TÖBBSZ.KEREKÍT',
   },
   langCode: 'huHU',
   ui: {

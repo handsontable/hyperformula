@@ -255,6 +255,7 @@ const dictionary: RawTranslationPackage = {
     COMBINA: 'COMBINA',
     GCD: 'PGCD',
     LCM: 'PPCM',
+    MROUND: 'ARRONDI.AU.MULTIPLE',
   },
   langCode: 'frFR',
   ui: {
