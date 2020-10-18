@@ -158,10 +158,10 @@ function combin(n: number, m: number): number {
 
 function binaryGCD(a: number, b: number): number {
   if(a<b) {
-    [a,b] = [b,a]
+    [a, b] = [b, a]
   }
   while(b>0) {
-    [a,b] = [b, a%b]
+    [a, b] = [b, a%b]
   }
   return a
 }
@@ -170,5 +170,5 @@ function binaryLCM(a: number, b: number): number {
   if(a==0 || b===0) {
     return 0
   }
-  return a * (b/binaryGCD(a,b))
+  return a * (b/binaryGCD(a, b))
 }
