@@ -51,6 +51,13 @@ export class MathPlugin extends FunctionPlugin {
       ],
       repeatLastArgs: 1
     },
+    'MROUND': {
+      method: 'mround',
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER},
+        {argumentType: ArgumentTypes.NUMBER},
+      ],
+    },
   }
 
   public fact(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
@@ -140,6 +147,20 @@ export class MathPlugin extends FunctionPlugin {
           ret = binaryLCM(ret, Math.trunc(val))
         }
         return ret
+      }
+    )
+  }
+
+  public mround(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('MROUND'),
+      (nom: number, denom: number) => {
+        if(denom===0) {
+          return 0
+        }
+        if((nom>0 && denom<0) || (nom<0 && denom>0)) {
+          return new CellError(ErrorType.NUM, ErrorMessage.DistinctSigns)
+        }
+        return Math.round(nom/denom)*denom
       }
     )
   }
