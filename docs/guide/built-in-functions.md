@@ -206,6 +206,7 @@ lets you design your own [custom functions](custom-functions).
 | LOG | Math and trigonometry | Returns the logarithm of a number to the specified base. | LOG(Number; Base) |
 | LOG10 | Math and trigonometry | Returns the base-10 logarithm of a number. | LOG10(Number) |
 | MOD | Math and trigonometry | Returns the remainder when one integer is divided by another. | MOD(Dividend; Divisor) |
+| MROUND | Math and trigonometry | Rounds number to the neares multiplicity. | MROUND(Number; Base) |
 | ODD | Math and trigonometry | Rounds a positive number up to the nearest odd integer and a negative number down to the nearest odd integer. | ODD(Number) |
 | PI | Math and trigonometry | Returns 3.14159265358979, the value of the mathematical constant PI to 14 decimal places. | PI() |
 | POWER | Math and trigonometry | Returns a number raised to another number. | POWER(Base; Exponent) |
