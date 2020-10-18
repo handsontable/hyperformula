@@ -253,6 +253,7 @@ const dictionary: RawTranslationPackage = {
     FACTDOUBLE: 'FATT.DOPPIO',
     COMBIN: 'COMBINAZIONE',
     COMBINA: 'COMBINAZIONE.VALORI',
+    GCD: 'MCD',
   },
   langCode: 'itIT',
   ui: {

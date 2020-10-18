@@ -253,6 +253,7 @@ const dictionary: RawTranslationPackage = {
     FACTDOUBLE: 'DUBBELE.FACULTEIT',
     COMBIN: 'COMBINATIES',
     COMBINA: 'COMBIN.A',
+    GCD: 'GGD',
   },
   langCode: 'nlNL',
   ui: {

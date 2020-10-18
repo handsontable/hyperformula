@@ -253,6 +253,7 @@ export const dictionary: RawTranslationPackage = {
     FACTDOUBLE: 'FACT.DOBLE',
     COMBIN: 'COMBINAT',
     COMBINA: 'COMBINA',
+    GCD: 'M.C.D',
   },
   langCode: 'esES',
   ui: {

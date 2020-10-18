@@ -253,6 +253,7 @@ const dictionary: RawTranslationPackage = {
     FACTDOUBLE: 'DOBBELFAKT',
     COMBIN: 'KOMBINASJON',
     COMBINA: 'KOMBINASJONA',
+    GCD: 'SFF',
   },
   langCode: 'nbNO',
   ui: {

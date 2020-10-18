@@ -253,6 +253,7 @@ const dictionary: RawTranslationPackage = {
     FACTDOUBLE: 'KERTOMA.OSA',
     COMBIN: 'KOMBINAATIO',
     COMBINA: 'KOMBINAATIOA',
+    GCD: 'SUURIN.YHT.TEKIJÄ',
   },
   langCode: 'fiFI',
   ui: {

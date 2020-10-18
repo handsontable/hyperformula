@@ -253,6 +253,7 @@ const dictionary: RawTranslationPackage = {
     FACTDOUBLE: 'FATDUPLO',
     COMBIN: 'COMBIN',
     COMBINA: 'COMBINA',
+    GCD: 'MDC',
   },
   langCode: 'ptPT',
   ui: {

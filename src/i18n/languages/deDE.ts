@@ -253,6 +253,7 @@ const dictionary: RawTranslationPackage = {
     FACTDOUBLE: 'ZWEIFAKULTÄT',
     COMBIN: 'KOMBINATIONEN',
     COMBINA: 'KOMBINA',
+    GCD: 'GGT',
   },
   langCode: 'deDE',
   ui: {

@@ -253,6 +253,7 @@ const dictionary: RawTranslationPackage = {
     FACTDOUBLE: 'FAKTDUPLA',
     COMBIN: 'KOMBINÁCIÓK',
     COMBINA: 'KOMBINÁCIÓK.ISM',
+    GCD: 'LKO',
   },
   langCode: 'huHU',
   ui: {

@@ -253,6 +253,7 @@ const dictionary: RawTranslationPackage = {
     FACTDOUBLE: 'DOBBELT.FAKULTET',
     COMBIN: 'KOMBIN',
     COMBINA: 'KOMBINA',
+    GCD: 'STØRSTE.FÆLLES.DIVISOR',
   },
   langCode: 'daDK',
   ui: {

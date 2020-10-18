@@ -6,6 +6,7 @@
 import {CellError, ErrorType, InternalScalarValue, SimpleCellAddress} from '../../Cell'
 import {ErrorMessage} from '../../error-message'
 import {ProcedureAst} from '../../parser'
+import {InterpreterValue} from '../InterpreterValue'
 import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
 
 export class MathPlugin extends FunctionPlugin {
@@ -35,6 +36,20 @@ export class MathPlugin extends FunctionPlugin {
         {argumentType: ArgumentTypes.NUMBER, minValue: 0},
         {argumentType: ArgumentTypes.NUMBER, minValue: 0}
       ]
+    },
+    'GCD': {
+      method: 'gcd',
+      parameters: [
+        {argumentType: ArgumentTypes.ANY},
+      ],
+      repeatLastArgs: 1
+    },
+    'LCM': {
+      method: 'lcm',
+      parameters: [
+        {argumentType: ArgumentTypes.ANY},
+      ],
+      repeatLastArgs: 1
     },
   }
 
@@ -90,6 +105,44 @@ export class MathPlugin extends FunctionPlugin {
       }
     )
   }
+
+  public gcd(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('GCD'),
+      (...args: InterpreterValue[]) => {
+        const processedArgs = this.interpreter.arithmeticHelper.coerceNumbersCoerceRangesDropNulls(args)
+        if(processedArgs instanceof CellError) {
+          return processedArgs
+        }
+        let ret = 0
+        for(const val of processedArgs) {
+          if(val<0) {
+            return new CellError(ErrorType.NUM, ErrorMessage.ValueSmall)
+          }
+          ret = binaryGCD(ret, Math.trunc(val))
+        }
+        return ret
+      }
+    )
+  }
+
+  public lcm(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('LCM'),
+      (...args: InterpreterValue[]) => {
+        const processedArgs = this.interpreter.arithmeticHelper.coerceNumbersCoerceRangesDropNulls(args)
+        if(processedArgs instanceof CellError) {
+          return processedArgs
+        }
+        let ret = 1
+        for(const val of processedArgs) {
+          if(val<0) {
+            return new CellError(ErrorType.NUM, ErrorMessage.ValueSmall)
+          }
+          ret = binaryLCM(ret, Math.trunc(val))
+        }
+        return ret
+      }
+    )
+  }
 }
 
 function combin(n: number, m: number): number {
@@ -97,21 +150,25 @@ function combin(n: number, m: number): number {
     m = n-m
   }
   let ret = 1
-  let j=1, i=n-m+1
-  while(i<=n || j<=m) {
-    if(i>n) {
-      ret /= j
-      j++
-    } else if(j>m) {
-      ret *= i
-      i++
-    } else if(ret<1000000000) {
-      ret *= i
-      i++
-    } else {
-      ret /= j
-      j++
-    }
+  for(let i=1;i<=m;i++) {
+    ret *= (n-m+i)/i
   }
   return Math.round(ret)
+}
+
+function binaryGCD(a: number, b: number): number {
+  if(a<b) {
+    [a,b] = [b,a]
+  }
+  while(b>0) {
+    [a,b] = [b, a%b]
+  }
+  return a
+}
+
+function binaryLCM(a: number, b: number): number {
+  if(a==0 || b===0) {
+    return 0
+  }
+  return a * (b/binaryGCD(a,b))
 }

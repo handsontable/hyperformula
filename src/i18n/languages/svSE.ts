@@ -253,6 +253,7 @@ const dictionary: RawTranslationPackage = {
     FACTDOUBLE: 'DUBBELFAKULTET',
     COMBIN: 'KOMBIN',
     COMBINA: 'COMBINA',
+    GCD: 'SGD',
   },
   langCode: 'svSE',
   ui: {

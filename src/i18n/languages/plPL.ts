@@ -253,6 +253,7 @@ const dictionary: RawTranslationPackage = {
     FACTDOUBLE: 'SILNIA.DWUKR',
     COMBIN: 'KOMBINACJE',
     COMBINA: 'KOMBINACJE.A',
+    GCD: 'NAJW.WSP.DZIEL',
   },
   langCode: 'plPL',
   ui: {

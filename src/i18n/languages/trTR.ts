@@ -253,6 +253,7 @@ const dictionary: RawTranslationPackage = {
     FACTDOUBLE: 'ÇİFTFAKTÖR',
     COMBIN: 'KOMBİNASYON',
     COMBINA: 'KOMBİNASYONA',
+    GCD: 'OBEB',
   },
   langCode: 'trTR',
   ui: {

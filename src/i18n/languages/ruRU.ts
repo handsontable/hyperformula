@@ -253,6 +253,7 @@ const dictionary: RawTranslationPackage = {
     FACTDOUBLE: 'ДВФАКТР',
     COMBIN: 'ЧИСЛКОМБ',
     COMBINA: 'ЧИСЛКОМБА',
+    GCD: 'НОД',
   },
   langCode: 'ruRU',
   ui: {

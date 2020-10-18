@@ -283,7 +283,7 @@ export class ArithmeticHelper {
     }
   }
 
-  public coerceNumbersExpandRanges(args: InterpreterValue[]): number[] | CellError {
+  public coerceNumbersExactRanges(args: InterpreterValue[]): number[] | CellError {
     const vals: (number | SimpleRangeValue)[] = []
     for(const arg of args) {
       if(arg instanceof SimpleRangeValue) {
@@ -313,6 +313,36 @@ export class ArithmeticHelper {
     return expandedVals
   }
 
+  public coerceNumbersCoerceRangesDropNulls(args: InterpreterValue[]): number[] | CellError {
+    const vals: (number | SimpleRangeValue)[] = []
+    for(const arg of args) {
+      if(arg instanceof SimpleRangeValue) {
+        vals.push(arg)
+      } else {
+        const coerced = this.coerceScalarToNumberOrError(arg)
+        if(coerced instanceof CellError) {
+          return coerced
+        } else {
+          vals.push(coerced)
+        }
+      }
+    }
+    const expandedVals: number[] = []
+    for(const val of vals) {
+      if(val instanceof SimpleRangeValue) {
+        const arr = this.manyToCoercedNumbersDropNulls(val.valuesFromTopLeftCorner())
+        if(arr instanceof CellError) {
+          return arr
+        } else {
+          expandedVals.push(...arr)
+        }
+      } else {
+        expandedVals.push(val)
+      }
+    }
+    return expandedVals
+  }
+
   public manyToExactNumbers(args: InternalScalarValue[]): number[] | CellError {
     const ret: number[] = []
     for(const arg of args) {
@@ -320,6 +350,23 @@ export class ArithmeticHelper {
         return arg
       } else if (typeof arg === 'number') {
         ret.push(arg)
+      }
+    }
+    return ret
+  }
+
+  public manyToCoercedNumbersDropNulls(args: InternalScalarValue[]): number[] | CellError {
+    const ret: number[] = []
+    for(const arg of args) {
+      if(arg instanceof CellError) {
+        return arg
+      }
+      if(arg === EmptyValue) {
+        continue
+      }
+      const coerced = this.coerceScalarToNumberOrError(arg)
+      if (typeof coerced === 'number') {
+        ret.push(coerced)
       }
     }
     return ret
