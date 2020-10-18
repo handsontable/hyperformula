@@ -199,7 +199,9 @@ lets you design your own [custom functions](custom-functions).
 | EXP | Math and trigonometry | Returns constant e raised to the power of a number. | EXP(Number) |
 | FACT | Math and trigonometry | Returns a factorial of a number. | FACT(Number) |
 | FACTDOUBLE | Math and trigonometry | Returns a double factorial of a number. | FACTDOUBLE(Number) |
+| GCD | Math and trigonometry | Computes greatest common divisor of numbers. | GCD(Number1; Number2; ...) |
 | INT | Math and trigonometry | Rounds a number down to the nearest integer. | INT(Number) |
+| LCM | Math and trigonometry | Computes least common multiplicity of numbers. | LCM(Number1; Number2; ...) |
 | LN | Math and trigonometry | Returns the natural logarithm based on the constant e of a number. | LN(Number) |
 | LOG | Math and trigonometry | Returns the logarithm of a number to the specified base. | LOG(Number; Base) |
 | LOG10 | Math and trigonometry | Returns the base-10 logarithm of a number. | LOG10(Number) |

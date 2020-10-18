@@ -254,6 +254,7 @@ export const dictionary: RawTranslationPackage = {
     COMBIN: 'COMBINAT',
     COMBINA: 'COMBINA',
     GCD: 'M.C.D',
+    LCM: 'M.C.M',
   },
   langCode: 'esES',
   ui: {

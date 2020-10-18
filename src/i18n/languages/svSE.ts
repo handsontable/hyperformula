@@ -254,6 +254,7 @@ const dictionary: RawTranslationPackage = {
     COMBIN: 'KOMBIN',
     COMBINA: 'COMBINA',
     GCD: 'SGD',
+    LCM: 'MGM',
   },
   langCode: 'svSE',
   ui: {
