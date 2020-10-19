@@ -258,6 +258,7 @@ export const dictionary: RawTranslationPackage = {
     MROUND: 'REDOND.MULT',
     MULTINOMIAL: 'MULTINOMIAL',
     QUOTIENT: 'COCIENTE',
+    RANDBETWEEN: 'ALEATORIO.ENTRE',
   },
   langCode: 'esES',
   ui: {

@@ -258,6 +258,7 @@ const dictionary: RawTranslationPackage = {
     MROUND: 'TÖBBSZ.KEREKÍT',
     MULTINOMIAL: 'SZORHÁNYFAKT',
     QUOTIENT: 'KVÓCIENS',
+    RANDBETWEEN: 'VÉLETLEN.KÖZÖTT',
   },
   langCode: 'huHU',
   ui: {

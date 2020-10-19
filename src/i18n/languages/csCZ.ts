@@ -258,6 +258,7 @@ const dictionary: RawTranslationPackage = {
     MROUND: 'MROUND',
     MULTINOMIAL: 'MULTINOMIAL',
     QUOTIENT: 'QUOTIENT',
+    RANDBETWEEN: 'RANDBETWEEN',
   },
   langCode: 'csCZ',
   ui: {

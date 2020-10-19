@@ -258,6 +258,7 @@ const dictionary: RawTranslationPackage = {
     MROUND: 'ARRONDI.AU.MULTIPLE',
     MULTINOMIAL: 'MULTINOMIALE',
     QUOTIENT: 'QUOTIENT',
+    RANDBETWEEN: 'ALEA.ENTRE.BORNES',
   },
   langCode: 'frFR',
   ui: {

@@ -258,6 +258,7 @@ const dictionary: RawTranslationPackage = {
     MROUND: 'ОКРУГЛТ',
     MULTINOMIAL: 'МУЛЬТИНОМ',
     QUOTIENT: 'ЧАСТНОЕ',
+    RANDBETWEEN: 'СЛУЧМЕЖДУ',
   },
   langCode: 'ruRU',
   ui: {

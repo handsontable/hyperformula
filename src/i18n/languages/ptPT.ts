@@ -258,6 +258,7 @@ const dictionary: RawTranslationPackage = {
     MROUND: 'MARRED',
     MULTINOMIAL: 'MULTINOMIAL',
     QUOTIENT: 'QUOCIENTE',
+    RANDBETWEEN: 'ALEATÓRIOENTRE',
   },
   langCode: 'ptPT',
   ui: {

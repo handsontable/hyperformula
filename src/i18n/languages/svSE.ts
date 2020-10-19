@@ -258,6 +258,7 @@ const dictionary: RawTranslationPackage = {
     MROUND: 'MAVRUNDA',
     MULTINOMIAL: 'MULTINOMIAL',
     QUOTIENT: 'KVOT',
+    RANDBETWEEN: 'SLUMP.MELLAN',
   },
   langCode: 'svSE',
   ui: {

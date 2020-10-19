@@ -258,6 +258,7 @@ const dictionary: RawTranslationPackage = {
     MROUND: 'KYUVARLA',
     MULTINOMIAL: 'ÇOKTERİMLİ',
     QUOTIENT: 'BÖLÜM',
+    RANDBETWEEN: 'RASTGELEARADA',
   },
   langCode: 'trTR',
   ui: {

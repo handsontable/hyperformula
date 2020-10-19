@@ -258,6 +258,7 @@ const dictionary: RawTranslationPackage = {
     MROUND: 'PYÖRISTÄ.KERR',
     MULTINOMIAL: 'MULTINOMI',
     QUOTIENT: 'OSAMÄÄRÄ',
+    RANDBETWEEN: 'SATUNNAISLUKU.VÄLILTÄ',
   },
   langCode: 'fiFI',
   ui: {

@@ -215,6 +215,7 @@ lets you design your own [custom functions](custom-functions).
 | QUOTIENT | Math and trigonometry | Returns integer part of a division. | QUOTIENT(Dividend; Divisor) |
 | RADIANS | Math and trigonometry | Converts degrees to radians. | RADIANS(Number) |
 | RAND | Math and trigonometry | Returns a random number between 0 and 1. | RAND() |
+| RANDBETWEEN | Math and trigonometry | Returns a random integer between two numbers. | RAND(Lowerbound; Upperbound) |
 | ROMAN | Math and trigonometry | Converts number to roman form. | ROMAN(Number[; Mode]) |
 | ROUND | Math and trigonometry | Rounds a number to a certain number of decimal places. | ROUND(Number; Count) |
 | ROUNDDOWN | Math and trigonometry | Rounds a number down, toward zero, to a certain precision. | ROUNDDOWN(Number; Count) |

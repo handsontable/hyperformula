@@ -258,6 +258,7 @@ const dictionary: RawTranslationPackage = {
     MROUND: 'ZAOKR.DO.WIELOKR',
     MULTINOMIAL: 'WIELOMIAN',
     QUOTIENT: 'CZ.CAŁK.DZIELENIA',
+    RANDBETWEEN: 'LOS.ZAKR',
   },
   langCode: 'plPL',
   ui: {

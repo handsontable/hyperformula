@@ -258,6 +258,7 @@ const dictionary: RawTranslationPackage = {
     MROUND: 'ARROTONDA.MULTIPLO',
     MULTINOMIAL: 'MULTINOMIALE',
     QUOTIENT: 'QUOZIENTE',
+    RANDBETWEEN: 'CASUALE.TRA',
   },
   langCode: 'itIT',
   ui: {

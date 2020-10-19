@@ -258,6 +258,7 @@ const dictionary: RawTranslationPackage = {
     MROUND: 'AFRONDEN.N.VEELVOUD',
     MULTINOMIAL: 'MULTINOMIAAL',
     QUOTIENT: 'QUOTIENT',
+    RANDBETWEEN: 'ASELECTTUSSEN',
   },
   langCode: 'nlNL',
   ui: {

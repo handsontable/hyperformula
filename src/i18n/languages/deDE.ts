@@ -258,6 +258,7 @@ const dictionary: RawTranslationPackage = {
     MROUND: 'VRUNDEN',
     MULTINOMIAL: 'POLYNOMIAL',
     QUOTIENT: 'QUOTIENT',
+    RANDBETWEEN: 'ZUFALLSBEREICH',
   },
   langCode: 'deDE',
   ui: {
