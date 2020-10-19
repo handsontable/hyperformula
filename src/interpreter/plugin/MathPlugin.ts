@@ -58,6 +58,14 @@ export class MathPlugin extends FunctionPlugin {
         {argumentType: ArgumentTypes.NUMBER},
       ],
     },
+    'MULTINOMIAL': {
+      method: 'multinomial',
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER},
+      ],
+      repeatLastArgs: 1,
+      expandRanges: true,
+    },
   }
 
   public fact(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
@@ -161,6 +169,26 @@ export class MathPlugin extends FunctionPlugin {
           return new CellError(ErrorType.NUM, ErrorMessage.DistinctSigns)
         }
         return Math.round(nom/denom)*denom
+      }
+    )
+  }
+
+  public multinomial(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('MULTINOMIAL'),
+      (...args: number[]) => {
+        let n = 0
+        let ans = 1
+        for(let arg of args) {
+          if(arg<0) {
+            return new CellError(ErrorType.NUM, ErrorMessage.ValueSmall)
+          }
+          arg = Math.trunc(arg)
+          for(let i=1;i<=arg;i++) {
+            ans *= (n+i)/i
+          }
+          n += arg
+        }
+        return Math.round(ans)
       }
     )
   }

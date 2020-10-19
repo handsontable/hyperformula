@@ -256,6 +256,7 @@ const dictionary: RawTranslationPackage = {
     GCD: 'GCD',
     LCM: 'LCM',
     MROUND: 'MROUND',
+    MULTINOMIAL: 'MULTINOMIAL',
   },
   langCode: 'enGB',
   ui: {
