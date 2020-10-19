@@ -224,8 +224,8 @@ describe('Move rows', () => {
 
     engine.moveRows(0, 3, 1, 1)
 
-    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.CYCLE))
-    expect(engine.getCellValue(adr('A5'))).toEqual(detailedError(ErrorType.CYCLE))
+    expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.CYCLE))
+    expect(engine.getCellValue(adr('A5'))).toEqualError(detailedError(ErrorType.CYCLE))
   })
 
   it('should produce only one history entry', () => {
@@ -279,7 +279,7 @@ describe('Move rows - row ranges', () => {
 
     engine.moveRows(0, 0, 1, 2)
 
-    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.CYCLE))
+    expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.CYCLE))
     expect(engine.getCellFormula(adr('A2'))).toEqual('=SUM(1:3)')
   })
 })

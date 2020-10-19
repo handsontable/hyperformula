@@ -7,7 +7,7 @@ import {Config} from '../../src/Config'
 import {AlwaysSparse} from '../../src/DependencyGraph/AddressMapping/ChooseAddressMappingPolicy'
 import {enGB} from '../../src/i18n/languages'
 import {unregisterAllLanguages} from './../testUtils'
-import {toContainEqualMatcher, toMatchObjectMatcher} from './matchers'
+import {toContainEqualMatcher, toEqualErrorMatcher, toMatchObjectMatcher} from './matchers'
 import * as plugins from '../../src/interpreter/plugin'
 
 Config.defaultConfig = Object.assign({}, Config.defaultConfig, {
@@ -53,17 +53,15 @@ beforeEach(() => {
 })
 
 beforeAll(() => {
-  if(jestPresent) {
-    if (global.gc) {
-      global.gc()
-    }
-    // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
-    // @ts-ignore
-    spyOn = jest.spyOn
-  } else {
+  if(!jestPresent) {
     jasmine.addMatchers({
       ...toContainEqualMatcher,
       ...toMatchObjectMatcher,
+      ...toEqualErrorMatcher,
     })
+  } else {
+    if (global.gc) {
+      global.gc()
+    }
   }
 })

@@ -8,8 +8,8 @@ describe('Function TBILLYIELD', () => {
       ['=TBILLYIELD(1,1)', '=TBILLYIELD(1, 1, 1, 1)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
-    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
+    expect(engine.getCellValue(adr('B1'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
   })
 
   it('should calculate the correct value with correct arguments and defaults', () => {
@@ -30,7 +30,7 @@ describe('Function TBILLYIELD', () => {
     expect(engine.getCellValue(adr('C3'))).toBeCloseTo(-0.181818181818182, 6)
     expect(engine.getCellValue(adr('A4'))).toBeCloseTo(8.87671232876712, 6)
     expect(engine.getCellValue(adr('B4'))).toBeCloseTo(8.87671232876712, 6)
-    expect(engine.getCellValue(adr('A5'))).toEqual(detailedError(ErrorType.NUM))
-    expect(engine.getCellValue(adr('A6'))).toEqual(detailedError(ErrorType.NUM))
+    expect(engine.getCellValue(adr('A5'))).toEqualError(detailedError(ErrorType.NUM))
+    expect(engine.getCellValue(adr('A6'))).toEqualError(detailedError(ErrorType.NUM))
   })
 })

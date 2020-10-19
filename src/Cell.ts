@@ -39,8 +39,8 @@ export type TranslatableErrorType = Exclude<ErrorType, ErrorType.LIC>
 
 export const EmptyValue = Symbol('Empty value')
 export type EmptyValueType = typeof EmptyValue
-export type InternalNoErrorCellValue = number | string | boolean | EmptyValueType
-export type InternalScalarValue = InternalNoErrorCellValue | CellError
+export type InternalNoErrorScalarValue = number | string | boolean | EmptyValueType
+export type InternalScalarValue = InternalNoErrorScalarValue | CellError
 
 export enum CellType {
   FORMULA = 'FORMULA',
@@ -112,7 +112,16 @@ export class CellError {
   constructor(
     public readonly type: ErrorType,
     public readonly message?: string,
+    public readonly address?: SimpleCellAddress
   ) {
+  }
+
+  public attachAddress(address: SimpleCellAddress): CellError {
+    if(this.address === undefined) {
+      return new CellError(this.type, this.message, address)
+    } else {
+      return this
+    }
   }
 
   public static parsingError() {

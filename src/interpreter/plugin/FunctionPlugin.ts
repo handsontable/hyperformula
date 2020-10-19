@@ -4,8 +4,8 @@
  */
 
 import {AbsoluteCellRange} from '../../AbsoluteCellRange'
-import {CellError, ErrorType, InternalNoErrorCellValue, InternalScalarValue, SimpleCellAddress} from '../../Cell'
-import {ColumnSearchStrategy, SearchStrategy} from '../../Lookup/SearchStrategy'
+import {CellError, ErrorType, InternalScalarValue, SimpleCellAddress} from '../../Cell'
+import {SearchStrategy} from '../../Lookup/SearchStrategy'
 import {Config} from '../../Config'
 import {DependencyGraph} from '../../DependencyGraph'
 import {ErrorMessage} from '../../error-message'
@@ -82,6 +82,11 @@ export enum ArgumentTypes {
    * Integer type.
    */
   INTEGER = 'INTEGER',
+
+  /**
+   * Range or scalar.
+   */
+  ANY = 'ANY',
 }
 
 export interface FunctionArgument {
@@ -168,10 +173,12 @@ export abstract class FunctionPlugin {
 
   public coerceToType(arg: InterpreterValue, coercedType: FunctionArgument): Maybe<InterpreterValue> {
     if (arg instanceof SimpleRangeValue) {
-      if (coercedType.argumentType === ArgumentTypes.RANGE) {
-        return arg
-      } else {
-        return undefined
+      switch(coercedType.argumentType) {
+        case ArgumentTypes.RANGE:
+        case ArgumentTypes.ANY:
+          return arg
+        default:
+          return undefined
       }
     } else {
       switch (coercedType.argumentType) {
@@ -203,8 +210,8 @@ export abstract class FunctionPlugin {
         case ArgumentTypes.BOOLEAN:
           return coerceScalarToBoolean(arg)
         case ArgumentTypes.SCALAR:
-          return arg
         case ArgumentTypes.NOERROR:
+        case ArgumentTypes.ANY:
           return arg
         case ArgumentTypes.RANGE:
           if (arg instanceof CellError) {
@@ -313,6 +320,6 @@ export abstract class FunctionPlugin {
     if (params !== undefined) {
       return params
     }
-    throw new Error('Should not be undefined')
+    throw new Error(`No metadata for function ${name}.`)
   }
 }

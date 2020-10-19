@@ -3,8 +3,8 @@
  * Copyright (c) 2020 Handsoncode. All rights reserved.
  */
 
-import {ExportedChange} from './CellValue'
 import {TinyEmitter} from 'tiny-emitter'
+import {ExportedChange} from './Exporter'
 
 export enum Events {
   SheetAdded = 'sheetAdded',

@@ -209,7 +209,7 @@ describe('changing cell content', () => {
 
     engine.setCellContents(adr('A1'), '#DIV/0!')
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.DIV_BY_ZERO))
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.DIV_BY_ZERO))
   })
 
   it('update value cell to error-like literal', () => {
@@ -227,7 +227,7 @@ describe('changing cell content', () => {
 
     engine.setCellContents(adr('A1'), '=SUM(')
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.ERROR, ErrorMessage.ParseError))
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.ERROR, ErrorMessage.ParseError))
     expect(engine.getCellFormula(adr('A1'))).toEqual('=SUM(')
   })
 
@@ -526,7 +526,7 @@ describe('changing cell content', () => {
 
     engine.setCellContents(adr('A1'), '=SUM(')
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.ERROR, ErrorMessage.ParseError))
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.ERROR, ErrorMessage.ParseError))
   })
 
   it('update dependecy value cell to parsing error ', () => {
@@ -540,8 +540,8 @@ describe('changing cell content', () => {
     const a1 = engine.addressMapping.fetchCell(adr('A1'))
     const b1 = engine.addressMapping.fetchCell(adr('B1'))
     expect(engine.graph.existsEdge(a1, b1)).toBe(true)
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.ERROR, ErrorMessage.ParseError))
-    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.ERROR, ErrorMessage.ParseError))
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.ERROR, ErrorMessage.ParseError))
+    expect(engine.getCellValue(adr('B1'))).toEqualError(detailedError(ErrorType.ERROR, ErrorMessage.ParseError))
   })
 
   it('update formula cell to parsing error ', () => {
@@ -557,7 +557,7 @@ describe('changing cell content', () => {
     expect(engine.graph.existsEdge(a1, b1)).toBe(false)
 
     expect(engine.getCellValue(adr('A1'))).toEqual(1)
-    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.ERROR, ErrorMessage.ParseError))
+    expect(engine.getCellValue(adr('B1'))).toEqualError(detailedError(ErrorType.ERROR, ErrorMessage.ParseError))
   })
 
   it('update parsing error to formula', () => {
@@ -576,7 +576,7 @@ describe('changing cell content', () => {
 
     engine.setCellContents(adr('A1'), '{=TRANSPOSE(}')
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.ERROR, ErrorMessage.ParseError))
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.ERROR, ErrorMessage.ParseError))
     expect(engine.getCellFormula(adr('A1'))).toEqual('{=TRANSPOSE(}')
   })
 

@@ -6,7 +6,7 @@
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
 import {
   CellError,
-  InternalNoErrorCellValue,
+  InternalNoErrorScalarValue,
   InternalScalarValue,
   movedSimpleCellAddress,
   SimpleCellAddress
@@ -94,7 +94,7 @@ export class ColumnIndex implements ColumnSearchStrategy {
     }
   }
 
-  public find(key: InternalNoErrorCellValue, range: AbsoluteCellRange, sorted: boolean): number {
+  public find(key: InternalNoErrorScalarValue, range: AbsoluteCellRange, sorted: boolean): number {
     this.ensureRecentData(range.sheet, range.start.col, key)
 
     const columnMap = this.getColumnMap(range.sheet, range.start.col)
