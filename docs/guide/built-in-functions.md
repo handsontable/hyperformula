@@ -212,6 +212,7 @@ lets you design your own [custom functions](custom-functions).
 | PI | Math and trigonometry | Returns 3.14159265358979, the value of the mathematical constant PI to 14 decimal places. | PI() |
 | POWER | Math and trigonometry | Returns a number raised to another number. | POWER(Base; Exponent) |
 | PRODUCT | Math and trigonometry | Returns product of numbers. | PRODUCT(Number1; Number2; ...; Number30) |
+| QUOTIENT | Math and trigonometry | Returns integer part of a division. | QUOTIENT(Dividend; Divisor) |
 | RADIANS | Math and trigonometry | Converts degrees to radians. | RADIANS(Number) |
 | RAND | Math and trigonometry | Returns a random number between 0 and 1. | RAND() |
 | ROMAN | Math and trigonometry | Converts number to roman form. | ROMAN(Number[; Mode]) |
