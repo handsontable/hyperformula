@@ -257,6 +257,7 @@ const dictionary: RawTranslationPackage = {
     LCM: 'НОК',
     MROUND: 'ОКРУГЛТ',
     MULTINOMIAL: 'МУЛЬТИНОМ',
+    QUOTIENT: 'ЧАСТНОЕ',
   },
   langCode: 'ruRU',
   ui: {

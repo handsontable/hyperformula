@@ -257,6 +257,7 @@ const dictionary: RawTranslationPackage = {
     LCM: 'MMC',
     MROUND: 'MARRED',
     MULTINOMIAL: 'MULTINOMIAL',
+    QUOTIENT: 'QUOCIENTE',
   },
   langCode: 'ptPT',
   ui: {

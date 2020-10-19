@@ -257,6 +257,7 @@ const dictionary: RawTranslationPackage = {
     LCM: 'OKEK',
     MROUND: 'KYUVARLA',
     MULTINOMIAL: 'ÇOKTERİMLİ',
+    QUOTIENT: 'BÖLÜM',
   },
   langCode: 'trTR',
   ui: {

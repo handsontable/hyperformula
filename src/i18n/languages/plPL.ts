@@ -257,6 +257,7 @@ const dictionary: RawTranslationPackage = {
     LCM: 'NAJMN.WSP.WIEL',
     MROUND: 'ZAOKR.DO.WIELOKR',
     MULTINOMIAL: 'WIELOMIAN',
+    QUOTIENT: 'CZ.CAŁK.DZIELENIA',
   },
   langCode: 'plPL',
   ui: {

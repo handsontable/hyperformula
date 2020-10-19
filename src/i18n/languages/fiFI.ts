@@ -257,6 +257,7 @@ const dictionary: RawTranslationPackage = {
     LCM: 'PIENIN.YHT.JAETTAVA',
     MROUND: 'PYÖRISTÄ.KERR',
     MULTINOMIAL: 'MULTINOMI',
+    QUOTIENT: 'OSAMÄÄRÄ',
   },
   langCode: 'fiFI',
   ui: {

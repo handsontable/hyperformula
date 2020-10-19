@@ -257,6 +257,7 @@ const dictionary: RawTranslationPackage = {
     LCM: 'KGV',
     MROUND: 'VRUNDEN',
     MULTINOMIAL: 'POLYNOMIAL',
+    QUOTIENT: 'QUOTIENT',
   },
   langCode: 'deDE',
   ui: {

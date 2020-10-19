@@ -257,6 +257,7 @@ const dictionary: RawTranslationPackage = {
     LCM: 'MCM',
     MROUND: 'ARROTONDA.MULTIPLO',
     MULTINOMIAL: 'MULTINOMIALE',
+    QUOTIENT: 'QUOZIENTE',
   },
   langCode: 'itIT',
   ui: {

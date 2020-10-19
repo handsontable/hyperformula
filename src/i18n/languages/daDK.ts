@@ -257,6 +257,7 @@ const dictionary: RawTranslationPackage = {
     LCM: 'MINDSTE.FÆLLES.MULTIPLUM',
     MROUND: 'MAFRUND',
     MULTINOMIAL: 'MULTINOMIAL',
+    QUOTIENT: 'KVOTIENT',
   },
   langCode: 'daDK',
   ui: {

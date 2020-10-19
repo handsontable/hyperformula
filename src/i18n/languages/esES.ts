@@ -257,6 +257,7 @@ export const dictionary: RawTranslationPackage = {
     LCM: 'M.C.M',
     MROUND: 'REDOND.MULT',
     MULTINOMIAL: 'MULTINOMIAL',
+    QUOTIENT: 'COCIENTE',
   },
   langCode: 'esES',
   ui: {

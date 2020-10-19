@@ -257,6 +257,7 @@ const dictionary: RawTranslationPackage = {
     LCM: 'PPCM',
     MROUND: 'ARRONDI.AU.MULTIPLE',
     MULTINOMIAL: 'MULTINOMIALE',
+    QUOTIENT: 'QUOTIENT',
   },
   langCode: 'frFR',
   ui: {

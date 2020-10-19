@@ -257,6 +257,7 @@ const dictionary: RawTranslationPackage = {
     LCM: 'LKT',
     MROUND: 'TÖBBSZ.KEREKÍT',
     MULTINOMIAL: 'SZORHÁNYFAKT',
+    QUOTIENT: 'KVÓCIENS',
   },
   langCode: 'huHU',
   ui: {

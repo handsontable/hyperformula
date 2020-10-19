@@ -257,6 +257,7 @@ const dictionary: RawTranslationPackage = {
     LCM: 'MFM',
     MROUND: 'MRUND',
     MULTINOMIAL: 'MULTINOMINELL',
+    QUOTIENT: 'KVOTIENT',
   },
   langCode: 'nbNO',
   ui: {
