@@ -26,7 +26,7 @@ describe('Function MULTINOMIAL', () => {
     ])
 
     expect(engine.getCellValue(adr('A1'))).toBe(49008960)
-    expect(engine.getCellValue(adr('B1')) as number/2.20917676017678e+38).toBeCloseTo(1,6)
+    expect(engine.getCellValue(adr('B1')) as number/2.20917676017678e+38).toBeCloseTo(1, 6)
   })
 
   it('accepts single arg', () => {
@@ -62,8 +62,8 @@ describe('Function MULTINOMIAL', () => {
       ['=MULTINOMIAL("abcd",4)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.VALUE,ErrorMessage.NumberCoercion))
-    expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.VALUE,ErrorMessage.NumberCoercion))
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.NumberCoercion))
+    expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.NumberCoercion))
   })
 
   it('checks bounds', () => {
