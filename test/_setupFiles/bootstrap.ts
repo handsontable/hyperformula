@@ -54,6 +54,9 @@ beforeEach(() => {
 
 beforeAll(() => {
   if(jestPresent) {
+    if (global.gc) {
+      global.gc()
+    }
     // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
     // @ts-ignore
     spyOn = jest.spyOn

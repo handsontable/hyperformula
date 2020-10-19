@@ -47,7 +47,7 @@ jobs:
 
       - name: Run tests
         run: |
-          npm run test:unit --  --logHeapUsage --detect-leaks --coverage
+          npm run test:unit.ci -- --coverage
           
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@6004246f47ab62d32be025ce173b241cd84ac58e # https://github.com/codecov/codecov-action/releases/tag/v1.0.13
