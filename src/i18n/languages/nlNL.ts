@@ -256,6 +256,7 @@ const dictionary: RawTranslationPackage = {
     GCD: 'GGD',
     LCM: 'KGV',
     MROUND: 'AFRONDEN.N.VEELVOUD',
+    MULTINOMIAL: 'MULTINOMIAAL',
   },
   langCode: 'nlNL',
   ui: {

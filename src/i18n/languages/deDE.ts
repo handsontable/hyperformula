@@ -256,6 +256,7 @@ const dictionary: RawTranslationPackage = {
     GCD: 'GGT',
     LCM: 'KGV',
     MROUND: 'VRUNDEN',
+    MULTINOMIAL: 'POLYNOMIAL',
   },
   langCode: 'deDE',
   ui: {

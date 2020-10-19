@@ -256,6 +256,7 @@ const dictionary: RawTranslationPackage = {
     GCD: 'STØRSTE.FÆLLES.DIVISOR',
     LCM: 'MINDSTE.FÆLLES.MULTIPLUM',
     MROUND: 'MAFRUND',
+    MULTINOMIAL: 'MULTINOMIAL',
   },
   langCode: 'daDK',
   ui: {

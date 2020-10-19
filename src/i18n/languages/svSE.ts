@@ -256,6 +256,7 @@ const dictionary: RawTranslationPackage = {
     GCD: 'SGD',
     LCM: 'MGM',
     MROUND: 'MAVRUNDA',
+    MULTINOMIAL: 'MULTINOMIAL',
   },
   langCode: 'svSE',
   ui: {

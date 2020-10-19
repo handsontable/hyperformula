@@ -256,6 +256,7 @@ const dictionary: RawTranslationPackage = {
     GCD: 'SUURIN.YHT.TEKIJÄ',
     LCM: 'PIENIN.YHT.JAETTAVA',
     MROUND: 'PYÖRISTÄ.KERR',
+    MULTINOMIAL: 'MULTINOMI',
   },
   langCode: 'fiFI',
   ui: {
