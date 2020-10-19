@@ -66,6 +66,13 @@ export class MathPlugin extends FunctionPlugin {
       repeatLastArgs: 1,
       expandRanges: true,
     },
+    'QUOTIENT': {
+      method: 'quotient',
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER},
+        {argumentType: ArgumentTypes.NUMBER},
+      ],
+    },
   }
 
   public fact(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
@@ -189,6 +196,16 @@ export class MathPlugin extends FunctionPlugin {
           n += arg
         }
         return Math.round(ans)
+      }
+    )
+  }
+  public quotient(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('QUOTIENT'),
+      (nom: number, denom: number) => {
+        if(denom===0) {
+          return new CellError(ErrorType.DIV_BY_ZERO)
+        }
+        return Math.trunc(nom/denom)
       }
     )
   }
