@@ -67,6 +67,7 @@ export class ErrorMessage {
   public static LessThanOne = 'Argument cannot be less than 1.'
   public static WeekendString = 'Incorrect weekend bitmask string.'
   public static Roman = 'Invalid roman numeral.'
+  public static WrongOrder = 'Values in wrong order.'
   public static FunctionName = (arg: string) => `Function name ${arg} not recognized.`
   public static NamedExpressionName = (arg: string) => `Named expression ${arg} not recognized.`
   public static LicenseKey = (arg: string) => `License key is ${arg}.`
