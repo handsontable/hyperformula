@@ -260,6 +260,7 @@ const dictionary: RawTranslationPackage = {
     QUOTIENT: 'QUOTIENT',
     RANDBETWEEN: 'ASELECTTUSSEN',
     SERIESSUM: 'SOM.MACHTREEKS',
+    SIGN: 'POS.NEG',
   },
   langCode: 'nlNL',
   ui: {

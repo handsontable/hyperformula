@@ -260,6 +260,7 @@ const dictionary: RawTranslationPackage = {
     QUOTIENT: 'QUOZIENTE',
     RANDBETWEEN: 'CASUALE.TRA',
     SERIESSUM: 'SOMMA.SERIE',
+    SIGN: 'SEGNO',
   },
   langCode: 'itIT',
   ui: {

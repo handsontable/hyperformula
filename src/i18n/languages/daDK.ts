@@ -260,6 +260,7 @@ const dictionary: RawTranslationPackage = {
     QUOTIENT: 'KVOTIENT',
     RANDBETWEEN: 'SLUMPMELLEM',
     SERIESSUM: 'SERIESUM',
+    SIGN: 'FORTEGN',
   },
   langCode: 'daDK',
   ui: {

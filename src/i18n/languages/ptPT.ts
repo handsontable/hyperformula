@@ -260,6 +260,7 @@ const dictionary: RawTranslationPackage = {
     QUOTIENT: 'QUOCIENTE',
     RANDBETWEEN: 'ALEATÓRIOENTRE',
     SERIESSUM: 'SOMASEQÜÊNCIA',
+    SIGN: 'SINAL',
   },
   langCode: 'ptPT',
   ui: {

@@ -225,6 +225,7 @@ lets you design your own [custom functions](custom-functions).
 | SERIESSUM | Math and trigonometry | Evaluates series at a point. | SERIESSUM(Number; Number; Number; Coefficients)
 | SIN | Math and trigonometry | Returns the sine of the given angle (in radians). | SIN(Number) |
 | SINH <br><Badge text="v0.2.0"/>| Math and trigonometry | Returns the hyperbolic sine of the given value. | SINH(Number) |
+| SIGN | Math and trigonometry | Returns sign of a number. | SIGN(Number) |
 | SQRT | Math and trigonometry | Returns the positive square root of a number. | SQRT(Number) |
 | SUBTOTAL | Math and trigonometry | Computes aggregation using function specified by number. | SUBTOTAL(Function; Number1; Number2; ... Number30) |
 | SUM | Math and trigonometry | Adds all the numbers in a range of cells. | SUM(Number1; Number2; ...; Number30) |

@@ -260,6 +260,7 @@ const dictionary: RawTranslationPackage = {
     QUOTIENT: 'OSAMÄÄRÄ',
     RANDBETWEEN: 'SATUNNAISLUKU.VÄLILTÄ',
     SERIESSUM: 'SARJA.SUMMA',
+    SIGN: 'ETUMERKKI',
   },
   langCode: 'fiFI',
   ui: {

@@ -260,6 +260,7 @@ const dictionary: RawTranslationPackage = {
     QUOTIENT: 'CZ.CAŁK.DZIELENIA',
     RANDBETWEEN: 'LOS.ZAKR',
     SERIESSUM: 'SUMA.SZER.POT',
+    SIGN: 'ZNAK.LICZBY',
   },
   langCode: 'plPL',
   ui: {

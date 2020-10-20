@@ -82,6 +82,12 @@ export class MathPlugin extends FunctionPlugin {
         {argumentType: ArgumentTypes.RANGE},
       ],
     },
+    'SIGN': {
+      method: 'sign',
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER},
+      ],
+    },
   }
 
   public fact(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
@@ -233,6 +239,20 @@ export class MathPlugin extends FunctionPlugin {
           ret += coef
         }
         return ret * Math.pow(x, n)
+      }
+    )
+  }
+
+  public sign(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('SIGN'),
+      (arg: number) => {
+        if(arg>0) {
+          return 1
+        } else if(arg<0) {
+          return -1
+        } else {
+          return 0
+        }
       }
     )
   }

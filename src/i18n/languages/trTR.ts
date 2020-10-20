@@ -260,6 +260,7 @@ const dictionary: RawTranslationPackage = {
     QUOTIENT: 'BÖLÜM',
     RANDBETWEEN: 'RASTGELEARADA',
     SERIESSUM: 'SERİTOPLA',
+    SIGN: 'İŞARET',
   },
   langCode: 'trTR',
   ui: {

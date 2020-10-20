@@ -260,6 +260,7 @@ const dictionary: RawTranslationPackage = {
     QUOTIENT: 'ЧАСТНОЕ',
     RANDBETWEEN: 'СЛУЧМЕЖДУ',
     SERIESSUM: 'РЯД.СУММ',
+    SIGN: 'ЗНАК',
   },
   langCode: 'ruRU',
   ui: {

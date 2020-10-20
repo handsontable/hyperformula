@@ -317,7 +317,7 @@ export class ArithmeticHelper {
     return expandedVals
   }
 
-  public manyToExactNumbers(args: InternalScalarValue[]): number[] | CellError {
+  public manyToExactNumbers = (args: InternalScalarValue[]): number[] | CellError => {
     const ret: number[] = []
     for(const arg of args) {
       if(arg instanceof CellError) {
@@ -329,7 +329,7 @@ export class ArithmeticHelper {
     return ret
   }
 
-  public manyToOnlyNumbersDropNulls(args: InternalScalarValue[]): number[] | CellError {
+  public manyToOnlyNumbersDropNulls = (args: InternalScalarValue[]): number[] | CellError => {
     const ret: number[] = []
     for(const arg of args) {
       if(arg instanceof CellError) {
@@ -345,7 +345,7 @@ export class ArithmeticHelper {
     return ret
   }
 
-  public manyToCoercedNumbersDropNulls(args: InternalScalarValue[]): number[] | CellError {
+  public manyToCoercedNumbersDropNulls = (args: InternalScalarValue[]): number[] | CellError => {
     const ret: number[] = []
     for(const arg of args) {
       if(arg instanceof CellError) {

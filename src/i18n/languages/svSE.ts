@@ -260,6 +260,7 @@ const dictionary: RawTranslationPackage = {
     QUOTIENT: 'KVOT',
     RANDBETWEEN: 'SLUMP.MELLAN',
     SERIESSUM: 'SERIESUMMA',
+    SIGN: 'TECKEN',
   },
   langCode: 'svSE',
   ui: {

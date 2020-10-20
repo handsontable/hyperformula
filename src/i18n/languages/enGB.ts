@@ -259,7 +259,8 @@ const dictionary: RawTranslationPackage = {
     MULTINOMIAL: 'MULTINOMIAL',
     QUOTIENT: 'QUOTIENT',
     RANDBETWEEN: 'RANDBETWEEN',
-    SERIESSUM: 'SERIESSUM'
+    SERIESSUM: 'SERIESSUM',
+    SIGN: 'SIGN',
   },
   langCode: 'enGB',
   ui: {

@@ -260,6 +260,7 @@ export const dictionary: RawTranslationPackage = {
     QUOTIENT: 'COCIENTE',
     RANDBETWEEN: 'ALEATORIO.ENTRE',
     SERIESSUM: 'SUMA.SERIES',
+    SIGN: 'SIGNO',
   },
   langCode: 'esES',
   ui: {

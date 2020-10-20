@@ -260,6 +260,7 @@ const dictionary: RawTranslationPackage = {
     QUOTIENT: 'KVOTIENT',
     RANDBETWEEN: 'TILFELDIGMELLOM',
     SERIESSUM: 'SUMMER.REKKE',
+    SIGN: 'FORTEGN',
   },
   langCode: 'nbNO',
   ui: {

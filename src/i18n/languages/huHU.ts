@@ -260,6 +260,7 @@ const dictionary: RawTranslationPackage = {
     QUOTIENT: 'KVÓCIENS',
     RANDBETWEEN: 'VÉLETLEN.KÖZÖTT',
     SERIESSUM: 'SORÖSSZEG',
+    SIGN: 'ELŐJEL',
   },
   langCode: 'huHU',
   ui: {

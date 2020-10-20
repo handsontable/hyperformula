@@ -260,6 +260,7 @@ const dictionary: RawTranslationPackage = {
     QUOTIENT: 'QUOTIENT',
     RANDBETWEEN: 'ZUFALLSBEREICH',
     SERIESSUM: 'POTENZREIHE',
+    SIGN: 'VORZEICHEN',
   },
   langCode: 'deDE',
   ui: {
