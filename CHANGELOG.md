@@ -6,10 +6,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.0] - 2020-10-22
+
 ### Added
 - Added 9 text functions EXACT, LOWER, UPPER, MID, T, SUBSTITUTE, REPLACE, UNICODE, UNICHAR. (#159)
 - Added 5 datetime functions: INTERVAL, NETWORKDAYS, NETWORKDAYS.INTL, WORKDAY, WORKDAY.INTL. (#153)
-- Added 3 information functions HLOOKUP, ROW, COLUMN. (#158)
+- Added 3 information functions HLOOKUP, ROW, COLUMN. (PR #520)
 - Added 5 financial functions FVSCHEDULE, NPV, MIRR, PDURATION, XNPV. (PR #542)
 - Added 12 statistical functions VAR.P, VAR.S, VARA, VARPA, STDEV.P, STDEV.S, STDEVA, STDEVPA, VARP, VAR, STDEVP, STDEV. (PR #536)
 - Added 2 mathematical functions SUBTOTAL, PRODUCT. (PR #536)
@@ -17,7 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - Fixed multiple issues with VLOOKUP function. (#526, #528)
-- Fixed MATCH and INDEX functions compatiblity. (#520)
+- Fixed MATCH and INDEX functions compatiblity. (PR #520)
 - Fixed issue with config update that does not preserve named expressions. (#527)
 - Fixed minor issue with arithmetic operations error messages. (#532)
 
