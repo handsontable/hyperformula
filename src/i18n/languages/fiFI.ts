@@ -259,6 +259,7 @@ const dictionary: RawTranslationPackage = {
     MULTINOMIAL: 'MULTINOMI',
     QUOTIENT: 'OSAMÄÄRÄ',
     RANDBETWEEN: 'SATUNNAISLUKU.VÄLILTÄ',
+    SERIESSUM: 'SARJA.SUMMA',
   },
   langCode: 'fiFI',
   ui: {

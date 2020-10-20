@@ -259,6 +259,7 @@ export const dictionary: RawTranslationPackage = {
     MULTINOMIAL: 'MULTINOMIAL',
     QUOTIENT: 'COCIENTE',
     RANDBETWEEN: 'ALEATORIO.ENTRE',
+    SERIESSUM: 'SUMA.SERIES',
   },
   langCode: 'esES',
   ui: {

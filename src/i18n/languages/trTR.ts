@@ -259,6 +259,7 @@ const dictionary: RawTranslationPackage = {
     MULTINOMIAL: 'ÇOKTERİMLİ',
     QUOTIENT: 'BÖLÜM',
     RANDBETWEEN: 'RASTGELEARADA',
+    SERIESSUM: 'SERİTOPLA',
   },
   langCode: 'trTR',
   ui: {

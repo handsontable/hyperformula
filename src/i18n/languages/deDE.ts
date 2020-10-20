@@ -259,6 +259,7 @@ const dictionary: RawTranslationPackage = {
     MULTINOMIAL: 'POLYNOMIAL',
     QUOTIENT: 'QUOTIENT',
     RANDBETWEEN: 'ZUFALLSBEREICH',
+    SERIESSUM: 'POTENZREIHE',
   },
   langCode: 'deDE',
   ui: {

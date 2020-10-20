@@ -259,6 +259,7 @@ const dictionary: RawTranslationPackage = {
     MULTINOMIAL: 'МУЛЬТИНОМ',
     QUOTIENT: 'ЧАСТНОЕ',
     RANDBETWEEN: 'СЛУЧМЕЖДУ',
+    SERIESSUM: 'РЯД.СУММ',
   },
   langCode: 'ruRU',
   ui: {

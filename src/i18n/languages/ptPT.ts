@@ -259,6 +259,7 @@ const dictionary: RawTranslationPackage = {
     MULTINOMIAL: 'MULTINOMIAL',
     QUOTIENT: 'QUOCIENTE',
     RANDBETWEEN: 'ALEATÓRIOENTRE',
+    SERIESSUM: 'SOMASEQÜÊNCIA',
   },
   langCode: 'ptPT',
   ui: {

@@ -259,6 +259,7 @@ const dictionary: RawTranslationPackage = {
     MULTINOMIAL: 'MULTINOMIAAL',
     QUOTIENT: 'QUOTIENT',
     RANDBETWEEN: 'ASELECTTUSSEN',
+    SERIESSUM: 'SOM.MACHTREEKS',
   },
   langCode: 'nlNL',
   ui: {

@@ -259,6 +259,7 @@ const dictionary: RawTranslationPackage = {
     MULTINOMIAL: 'MULTINOMIAL',
     QUOTIENT: 'KVOTIENT',
     RANDBETWEEN: 'SLUMPMELLEM',
+    SERIESSUM: 'SERIESUM',
   },
   langCode: 'daDK',
   ui: {

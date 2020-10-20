@@ -259,6 +259,7 @@ const dictionary: RawTranslationPackage = {
     MULTINOMIAL: 'MULTINOMIAL',
     QUOTIENT: 'KVOT',
     RANDBETWEEN: 'SLUMP.MELLAN',
+    SERIESSUM: 'SERIESUMMA',
   },
   langCode: 'svSE',
   ui: {

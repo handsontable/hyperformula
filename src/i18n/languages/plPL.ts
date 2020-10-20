@@ -259,6 +259,7 @@ const dictionary: RawTranslationPackage = {
     MULTINOMIAL: 'WIELOMIAN',
     QUOTIENT: 'CZ.CAŁK.DZIELENIA',
     RANDBETWEEN: 'LOS.ZAKR',
+    SERIESSUM: 'SUMA.SZER.POT',
   },
   langCode: 'plPL',
   ui: {

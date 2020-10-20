@@ -259,6 +259,7 @@ const dictionary: RawTranslationPackage = {
     MULTINOMIAL: 'MULTINOMINELL',
     QUOTIENT: 'KVOTIENT',
     RANDBETWEEN: 'TILFELDIGMELLOM',
+    SERIESSUM: 'SUMMER.REKKE',
   },
   langCode: 'nbNO',
   ui: {

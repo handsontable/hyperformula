@@ -222,6 +222,7 @@ lets you design your own [custom functions](custom-functions).
 | ROUNDUP | Math and trigonometry | Rounds a number up, away from zero, to a certain precision. | ROUNDUP(Number; Count) |
 | SEC <br><Badge text="v0.2.0"/>| Math and trigonometry | Returns the secans of the given angle (in radians). | SEC(Number) |
 | SECH <br><Badge text="v0.2.0"/>| Math and trigonometry | Returns the hyperbolic secans of the given value. | SEC(Number) |
+| SERIESSUM | Math and trigonometry | Evaluates series at a point. | SERIESSUM(Number; Number; Number; Coefficients)
 | SIN | Math and trigonometry | Returns the sine of the given angle (in radians). | SIN(Number) |
 | SINH <br><Badge text="v0.2.0"/>| Math and trigonometry | Returns the hyperbolic sine of the given value. | SINH(Number) |
 | SQRT | Math and trigonometry | Returns the positive square root of a number. | SQRT(Number) |

@@ -259,6 +259,7 @@ const dictionary: RawTranslationPackage = {
     MULTINOMIAL: 'SZORHÁNYFAKT',
     QUOTIENT: 'KVÓCIENS',
     RANDBETWEEN: 'VÉLETLEN.KÖZÖTT',
+    SERIESSUM: 'SORÖSSZEG',
   },
   langCode: 'huHU',
   ui: {
