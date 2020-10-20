@@ -261,6 +261,7 @@ const dictionary: RawTranslationPackage = {
     RANDBETWEEN: 'SATUNNAISLUKU.VÄLILTÄ',
     SERIESSUM: 'SARJA.SUMMA',
     SIGN: 'ETUMERKKI',
+    SQRTPI: 'NELIÖJUURI.PII',
   },
   langCode: 'fiFI',
   ui: {

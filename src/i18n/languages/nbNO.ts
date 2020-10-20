@@ -261,6 +261,7 @@ const dictionary: RawTranslationPackage = {
     RANDBETWEEN: 'TILFELDIGMELLOM',
     SERIESSUM: 'SUMMER.REKKE',
     SIGN: 'FORTEGN',
+    SQRTPI: 'ROTPI',
   },
   langCode: 'nbNO',
   ui: {

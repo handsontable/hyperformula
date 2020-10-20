@@ -261,6 +261,7 @@ const dictionary: RawTranslationPackage = {
     RANDBETWEEN: 'ALEATÓRIOENTRE',
     SERIESSUM: 'SOMASEQÜÊNCIA',
     SIGN: 'SINAL',
+    SQRTPI: 'RAIZPI',
   },
   langCode: 'ptPT',
   ui: {

@@ -261,6 +261,7 @@ const dictionary: RawTranslationPackage = {
     RANDBETWEEN: 'ASELECTTUSSEN',
     SERIESSUM: 'SOM.MACHTREEKS',
     SIGN: 'POS.NEG',
+    SQRTPI: 'WORTEL.PI',
   },
   langCode: 'nlNL',
   ui: {

@@ -261,6 +261,7 @@ export const dictionary: RawTranslationPackage = {
     RANDBETWEEN: 'ALEATORIO.ENTRE',
     SERIESSUM: 'SUMA.SERIES',
     SIGN: 'SIGNO',
+    SQRTPI: 'RAIZ2PI',
   },
   langCode: 'esES',
   ui: {

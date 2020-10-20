@@ -261,6 +261,7 @@ const dictionary: RawTranslationPackage = {
     RANDBETWEEN: 'ZUFALLSBEREICH',
     SERIESSUM: 'POTENZREIHE',
     SIGN: 'VORZEICHEN',
+    SQRTPI: 'WURZELPI',
   },
   langCode: 'deDE',
   ui: {

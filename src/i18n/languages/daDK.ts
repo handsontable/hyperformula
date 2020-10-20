@@ -261,6 +261,7 @@ const dictionary: RawTranslationPackage = {
     RANDBETWEEN: 'SLUMPMELLEM',
     SERIESSUM: 'SERIESUM',
     SIGN: 'FORTEGN',
+    SQRTPI: 'KVRODPI',
   },
   langCode: 'daDK',
   ui: {

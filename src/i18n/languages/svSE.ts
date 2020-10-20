@@ -261,6 +261,7 @@ const dictionary: RawTranslationPackage = {
     RANDBETWEEN: 'SLUMP.MELLAN',
     SERIESSUM: 'SERIESUMMA',
     SIGN: 'TECKEN',
+    SQRTPI: 'ROTPI',
   },
   langCode: 'svSE',
   ui: {

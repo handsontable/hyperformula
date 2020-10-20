@@ -261,6 +261,7 @@ const dictionary: RawTranslationPackage = {
     RANDBETWEEN: 'СЛУЧМЕЖДУ',
     SERIESSUM: 'РЯД.СУММ',
     SIGN: 'ЗНАК',
+    SQRTPI: 'КОРЕНЬПИ',
   },
   langCode: 'ruRU',
   ui: {

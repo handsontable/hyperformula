@@ -261,6 +261,7 @@ const dictionary: RawTranslationPackage = {
     RANDBETWEEN: 'VÉLETLEN.KÖZÖTT',
     SERIESSUM: 'SORÖSSZEG',
     SIGN: 'ELŐJEL',
+    SQRTPI: 'GYÖKPI',
   },
   langCode: 'huHU',
   ui: {

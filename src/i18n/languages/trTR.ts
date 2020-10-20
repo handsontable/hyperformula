@@ -261,6 +261,7 @@ const dictionary: RawTranslationPackage = {
     RANDBETWEEN: 'RASTGELEARADA',
     SERIESSUM: 'SERİTOPLA',
     SIGN: 'İŞARET',
+    SQRTPI: 'KAREKÖKPİ',
   },
   langCode: 'trTR',
   ui: {

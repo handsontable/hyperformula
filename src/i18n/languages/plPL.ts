@@ -261,6 +261,7 @@ const dictionary: RawTranslationPackage = {
     RANDBETWEEN: 'LOS.ZAKR',
     SERIESSUM: 'SUMA.SZER.POT',
     SIGN: 'ZNAK.LICZBY',
+    SQRTPI: 'PIERW.PI',
   },
   langCode: 'plPL',
   ui: {
