@@ -6,7 +6,7 @@
 import {CellError, ErrorType, InternalScalarValue, SimpleCellAddress} from '../../Cell'
 import {ErrorMessage} from '../../error-message'
 import {ProcedureAst} from '../../parser'
-import {InterpreterValue} from '../InterpreterValue'
+import {InterpreterValue, SimpleRangeValue} from '../InterpreterValue'
 import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
 
 export class MathPlugin extends FunctionPlugin {
@@ -71,6 +71,15 @@ export class MathPlugin extends FunctionPlugin {
       parameters: [
         {argumentType: ArgumentTypes.NUMBER},
         {argumentType: ArgumentTypes.NUMBER},
+      ],
+    },
+    'SERIESSUM': {
+      method: 'seriessum',
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER},
+        {argumentType: ArgumentTypes.NUMBER},
+        {argumentType: ArgumentTypes.NUMBER},
+        {argumentType: ArgumentTypes.RANGE},
       ],
     },
   }
@@ -199,6 +208,7 @@ export class MathPlugin extends FunctionPlugin {
       }
     )
   }
+
   public quotient(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.runFunction(ast.args, formulaAddress, this.metadata('QUOTIENT'),
       (nom: number, denom: number) => {
@@ -206,6 +216,23 @@ export class MathPlugin extends FunctionPlugin {
           return new CellError(ErrorType.DIV_BY_ZERO)
         }
         return Math.trunc(nom/denom)
+      }
+    )
+  }
+
+  public seriessum(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('SERIESSUM'),
+      (x: number, n: number, m: number, range: SimpleRangeValue) => {
+        const coefs = this.interpreter.arithmeticHelper.manyToOnlyNumbersDropNulls(range.valuesFromTopLeftCorner())
+        if(coefs instanceof CellError) {
+          return coefs
+        }
+        let ret = 0
+        for(const coef of coefs.reverse()) {
+          ret *= Math.pow(x, m)
+          ret += coef
+        }
+        return ret * Math.pow(x, n)
       }
     )
   }

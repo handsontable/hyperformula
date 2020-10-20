@@ -283,37 +283,11 @@ export class ArithmeticHelper {
     }
   }
 
-  public coerceNumbersExactRanges(args: InterpreterValue[]): number[] | CellError {
-    const vals: (number | SimpleRangeValue)[] = []
-    for(const arg of args) {
-      if(arg instanceof SimpleRangeValue) {
-        vals.push(arg)
-      } else {
-        const coerced = this.coerceScalarToNumberOrError(arg)
-        if(coerced instanceof CellError) {
-          return coerced
-        } else {
-          vals.push(coerced)
-        }
-      }
-    }
-    const expandedVals: number[] = []
-    for(const val of vals) {
-      if(val instanceof SimpleRangeValue) {
-        const arr = this.manyToExactNumbers(val.valuesFromTopLeftCorner())
-        if(arr instanceof CellError) {
-          return arr
-        } else {
-          expandedVals.push(...arr)
-        }
-      } else {
-        expandedVals.push(val)
-      }
-    }
-    return expandedVals
-  }
+  public coerceNumbersExactRanges = (args: InterpreterValue[]): number[] | CellError =>  this.manyToNumbers(args, this.manyToExactNumbers)
 
-  public coerceNumbersCoerceRangesDropNulls(args: InterpreterValue[]): number[] | CellError {
+  public coerceNumbersCoerceRangesDropNulls = (args: InterpreterValue[]): number[] | CellError =>  this.manyToNumbers(args, this.manyToCoercedNumbersDropNulls)
+
+  private manyToNumbers(args: InterpreterValue[], rangeFn: (args: InternalScalarValue[]) => number[] | CellError): number[] | CellError {
     const vals: (number | SimpleRangeValue)[] = []
     for(const arg of args) {
       if(arg instanceof SimpleRangeValue) {
@@ -330,7 +304,7 @@ export class ArithmeticHelper {
     const expandedVals: number[] = []
     for(const val of vals) {
       if(val instanceof SimpleRangeValue) {
-        const arr = this.manyToCoercedNumbersDropNulls(val.valuesFromTopLeftCorner())
+        const arr = rangeFn(val.valuesFromTopLeftCorner())
         if(arr instanceof CellError) {
           return arr
         } else {
@@ -350,6 +324,22 @@ export class ArithmeticHelper {
         return arg
       } else if (typeof arg === 'number') {
         ret.push(arg)
+      }
+    }
+    return ret
+  }
+
+  public manyToOnlyNumbersDropNulls(args: InternalScalarValue[]): number[] | CellError {
+    const ret: number[] = []
+    for(const arg of args) {
+      if(arg instanceof CellError) {
+        return arg
+      } else if(arg === EmptyValue) {
+        continue
+      } else if (typeof arg === 'number') {
+        ret.push(arg)
+      } else {
+        return new CellError(ErrorType.VALUE, ErrorMessage.NumberExpected)
       }
     }
     return ret
