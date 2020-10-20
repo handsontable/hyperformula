@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.3.0
+**Release date: October 22, 2020**
+
 ## 0.2.0
 **Release date: September 22, 2020**
 
