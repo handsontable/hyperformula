@@ -16,7 +16,7 @@
 - Fixed multiple issues with VLOOKUP function. [#526](https://github.com/handsontable/hyperformula/issues/526) and  [#528](https://github.com/handsontable/hyperformula/issues/528)
 - Fixed MATCH and INDEX functions compatiblity. [#520](https://github.com/handsontable/hyperformula/pull/520)
 - Fixed issue with config update that does not preserve named expressions. [#527](https://github.com/handsontable/hyperformula/issues/527)
-- Fixed minor issue with arithmetic operations error messages. (#532) [#532](https://github.com/handsontable/hyperformula/issues/532)
+- Fixed minor issue with arithmetic operations error messages. [#532](https://github.com/handsontable/hyperformula/issues/532)
 
 ## 0.2.0
 **Release date: September 22, 2020**
