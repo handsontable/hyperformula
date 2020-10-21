@@ -3,6 +3,7 @@
  * Copyright (c) 2020 Handsoncode. All rights reserved.
  */
 
+import {type} from 'os'
 import {CellError, ErrorType, InternalScalarValue, SimpleCellAddress} from '../../Cell'
 import {ErrorMessage} from '../../error-message'
 import {ProcedureAst} from '../../parser'
@@ -86,6 +87,27 @@ export class MathPlugin extends FunctionPlugin {
       method: 'sign',
       parameters: [
         {argumentType: ArgumentTypes.NUMBER},
+      ],
+    },
+    'SUMX2MY2': {
+      method: 'sumx2my2',
+      parameters: [
+        {argumentType: ArgumentTypes.RANGE},
+        {argumentType: ArgumentTypes.RANGE},
+      ],
+    },
+    'SUMX2PY2': {
+      method: 'sumx2py2',
+      parameters: [
+        {argumentType: ArgumentTypes.RANGE},
+        {argumentType: ArgumentTypes.RANGE},
+      ],
+    },
+    'SUMXMY2': {
+      method: 'sumxmy2',
+      parameters: [
+        {argumentType: ArgumentTypes.RANGE},
+        {argumentType: ArgumentTypes.RANGE},
       ],
     },
   }
@@ -253,6 +275,90 @@ export class MathPlugin extends FunctionPlugin {
         } else {
           return 0
         }
+      }
+    )
+  }
+
+  public sumx2my2(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('SUMX2MY2'),
+      (rangeX: SimpleRangeValue, rangeY: SimpleRangeValue) => {
+        const valsX = rangeX.valuesFromTopLeftCorner()
+        const valsY = rangeY.valuesFromTopLeftCorner()
+        if(valsX.length !== valsY.length) {
+          return new CellError(ErrorType.NA, ErrorMessage.EqualLength)
+        }
+        const n = valsX.length
+        let ret = 0
+        for(let i=0;i<n;i++) {
+          const valX = valsX[i]
+          const valY = valsY[i]
+          if(valX instanceof CellError) {
+            return valX
+          }
+          if(valY instanceof CellError) {
+            return valY
+          }
+          if(typeof valX === 'number' && typeof valY === 'number') {
+            ret += valX*valX - valY*valY
+          }
+        }
+        return ret
+      }
+    )
+  }
+
+  public sumx2py2(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('SUMX2PY2'),
+      (rangeX: SimpleRangeValue, rangeY: SimpleRangeValue) => {
+        const valsX = rangeX.valuesFromTopLeftCorner()
+        const valsY = rangeY.valuesFromTopLeftCorner()
+        if(valsX.length !== valsY.length) {
+          return new CellError(ErrorType.NA, ErrorMessage.EqualLength)
+        }
+        const n = valsX.length
+        let ret = 0
+        for(let i=0;i<n;i++) {
+          const valX = valsX[i]
+          const valY = valsY[i]
+          if(valX instanceof CellError) {
+            return valX
+          }
+          if(valY instanceof CellError) {
+            return valY
+          }
+          if(typeof valX === 'number' && typeof valY === 'number') {
+            ret += valX*valX + valY*valY
+          }
+        }
+        return ret
+      }
+    )
+  }
+
+  public sumxmy2(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('SUMXMY2'),
+      (rangeX: SimpleRangeValue, rangeY: SimpleRangeValue) => {
+        const valsX = rangeX.valuesFromTopLeftCorner()
+        const valsY = rangeY.valuesFromTopLeftCorner()
+        if(valsX.length !== valsY.length) {
+          return new CellError(ErrorType.NA, ErrorMessage.EqualLength)
+        }
+        const n = valsX.length
+        let ret = 0
+        for(let i=0;i<n;i++) {
+          const valX = valsX[i]
+          const valY = valsY[i]
+          if(valX instanceof CellError) {
+            return valX
+          }
+          if(valY instanceof CellError) {
+            return valY
+          }
+          if(typeof valX === 'number' && typeof valY === 'number') {
+            ret += (valX-valY)*(valX-valY)
+          }
+        }
+        return ret
       }
     )
   }
