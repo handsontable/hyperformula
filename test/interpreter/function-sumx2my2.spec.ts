@@ -16,8 +16,8 @@ describe('Function SUMX2MY2', () => {
   it('should return correct output', () => {
     const engine = HyperFormula.buildFromArray([
       ['=SUMX2MY2(A2:D2, A3:D3)'],
-      [1,2,3,4],
-      [5,4,2,1],
+      [1, 2, 3, 4],
+      [5, 4, 2, 1],
     ])
     expect(engine.getCellValue(adr('A1'))).toEqual(-16)
   })
@@ -32,8 +32,8 @@ describe('Function SUMX2MY2', () => {
   it('should propagate errors', () => {
     const engine = HyperFormula.buildFromArray([
       ['=SUMX2MY2(A2:E2, A3:E3)'],
-      [1,2,3,'=NA()',5,6],
-      [5,4,2,1,5,10],
+      [1, 2, 3, '=NA()', 5, 6],
+      [5, 4, 2, 1, 5, 10],
     ])
     expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NA))
   })
@@ -41,8 +41,8 @@ describe('Function SUMX2MY2', () => {
   it('should ignore non-number inputs', () => {
     const engine = HyperFormula.buildFromArray([
       ['=SUMX2MY2(A2:D2, A3:D3)'],
-      [null,2,'\'1',4],
-      [5,'\'abcd',2,true],
+      [null, 2, '\'1', 4],
+      [5, '\'abcd', 2, true],
     ])
     expect(engine.getCellValue(adr('A1'))).toEqual(0)
   })
