@@ -59,5 +59,9 @@ beforeAll(() => {
       ...toMatchObjectMatcher,
       ...toEqualErrorMatcher,
     })
+  } else {
+    if (global.gc) {
+      global.gc()
+    }
   }
 })
