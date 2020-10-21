@@ -23,7 +23,7 @@ describe('Function FACT', () => {
     expect(engine.getCellValue(adr('A1'))).toBe(1)
     expect(engine.getCellValue(adr('A2'))).toBe(1)
     expect(engine.getCellValue(adr('A3'))).toBe(3628800)
-    expect(engine.getCellValue(adr('A4'))).toBeCloseTo(7.257415615307999e+306)
+    expect(engine.getCellValue(adr('A4')) as number / 7.257415615307999e+306).toBeCloseTo(1, 6)
   })
 
   it('rounds argument', () => {
@@ -37,7 +37,7 @@ describe('Function FACT', () => {
     expect(engine.getCellValue(adr('A1'))).toBe(1)
     expect(engine.getCellValue(adr('A2'))).toBe(1)
     expect(engine.getCellValue(adr('A3'))).toBe(3628800)
-    expect(engine.getCellValue(adr('A4'))).toBeCloseTo(7.257415615307999e+306)
+    expect(engine.getCellValue(adr('A4')) as number / 7.257415615307999e+306).toBeCloseTo(1, 6)
   })
 
   it('checks bounds', () => {
