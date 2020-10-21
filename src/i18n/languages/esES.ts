@@ -262,6 +262,9 @@ export const dictionary: RawTranslationPackage = {
     SERIESSUM: 'SUMA.SERIES',
     SIGN: 'SIGNO',
     SQRTPI: 'RAIZ2PI',
+    SUMX2MY2: 'SUMAX2MENOSY2',
+    SUMX2PY2: 'SUMAX2MASY2',
+    SUMXMY2: 'SUMAXMENOSY2',
   },
   langCode: 'esES',
   ui: {

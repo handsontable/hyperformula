@@ -262,6 +262,9 @@ const dictionary: RawTranslationPackage = {
     SERIESSUM: 'SERIESUMMA',
     SIGN: 'TECKEN',
     SQRTPI: 'ROTPI',
+    SUMX2MY2: 'SUMMAX2MY2',
+    SUMX2PY2: 'SUMMAX2PY2',
+    SUMXMY2: 'SUMMAXMY2',
   },
   langCode: 'svSE',
   ui: {

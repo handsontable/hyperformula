@@ -262,6 +262,9 @@ const dictionary: RawTranslationPackage = {
     SERIESSUM: 'SERIESUM',
     SIGN: 'FORTEGN',
     SQRTPI: 'KVRODPI',
+    SUMX2MY2: 'SUMX2MY2',
+    SUMX2PY2: 'SUMX2PY2',
+    SUMXMY2: 'SUMXMY2',
   },
   langCode: 'daDK',
   ui: {

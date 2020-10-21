@@ -262,6 +262,9 @@ const dictionary: RawTranslationPackage = {
     SERIESSUM: 'SOMASEQÜÊNCIA',
     SIGN: 'SINAL',
     SQRTPI: 'RAIZPI',
+    SUMX2MY2: 'SOMAX2DY2',
+    SUMX2PY2: 'SOMAX2SY2',
+    SUMXMY2: 'SOMAXMY2',
   },
   langCode: 'ptPT',
   ui: {

@@ -262,6 +262,9 @@ const dictionary: RawTranslationPackage = {
     SERIESSUM: 'SOMMA.SERIE',
     SIGN: 'SEGNO',
     SQRTPI: 'RADQ.PI.GRECO',
+    SUMX2MY2: 'SOMMA.DIFF.Q',
+    SUMX2PY2: 'SOMMA.SOMMA.Q',
+    SUMXMY2: 'SOMMA.Q.DIFF',
   },
   langCode: 'itIT',
   ui: {

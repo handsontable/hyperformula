@@ -262,6 +262,9 @@ const dictionary: RawTranslationPackage = {
     SERIESSUM: 'SERİTOPLA',
     SIGN: 'İŞARET',
     SQRTPI: 'KAREKÖKPİ',
+    SUMX2MY2: 'TOPX2EY2',
+    SUMX2PY2: 'TOPX2AY2',
+    SUMXMY2: 'TOPXEY2',
   },
   langCode: 'trTR',
   ui: {

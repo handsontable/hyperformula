@@ -262,6 +262,9 @@ const dictionary: RawTranslationPackage = {
     SERIESSUM: 'SARJA.SUMMA',
     SIGN: 'ETUMERKKI',
     SQRTPI: 'NELIÖJUURI.PII',
+    SUMX2MY2: 'NELIÖSUMMIEN.EROTUS',
+    SUMX2PY2: 'NELIÖSUMMIEN.SUMMA',
+    SUMXMY2: 'EROTUSTEN.NELIÖSUMMA',
   },
   langCode: 'fiFI',
   ui: {

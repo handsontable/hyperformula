@@ -262,6 +262,9 @@ const dictionary: RawTranslationPackage = {
     SERIESSUM: 'SUMMER.REKKE',
     SIGN: 'FORTEGN',
     SQRTPI: 'ROTPI',
+    SUMX2MY2: 'SUMMERX2MY2',
+    SUMX2PY2: 'SUMMERX2PY2',
+    SUMXMY2: 'SUMMERXMY2',
   },
   langCode: 'nbNO',
   ui: {

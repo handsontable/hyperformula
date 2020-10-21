@@ -262,6 +262,9 @@ const dictionary: RawTranslationPackage = {
     SERIESSUM: 'SORÖSSZEG',
     SIGN: 'ELŐJEL',
     SQRTPI: 'GYÖKPI',
+    SUMX2MY2: 'SZUMX2BŐLY2',
+    SUMX2PY2: 'SZUMX2MEGY2',
+    SUMXMY2: 'SZUMXBŐLY2',
   },
   langCode: 'huHU',
   ui: {

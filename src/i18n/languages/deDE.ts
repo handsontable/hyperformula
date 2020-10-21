@@ -262,6 +262,9 @@ const dictionary: RawTranslationPackage = {
     SERIESSUM: 'POTENZREIHE',
     SIGN: 'VORZEICHEN',
     SQRTPI: 'WURZELPI',
+    SUMX2MY2: 'SUMMEX2MY2',
+    SUMX2PY2: 'SUMMEX2PY2',
+    SUMXMY2: 'SUMMEXMY2',
   },
   langCode: 'deDE',
   ui: {

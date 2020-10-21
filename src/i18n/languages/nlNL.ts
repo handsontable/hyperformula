@@ -262,6 +262,9 @@ const dictionary: RawTranslationPackage = {
     SERIESSUM: 'SOM.MACHTREEKS',
     SIGN: 'POS.NEG',
     SQRTPI: 'WORTEL.PI',
+    SUMX2MY2: 'SOM.X2MINY2',
+    SUMX2PY2: 'SOM.X2PLUSY2',
+    SUMXMY2: 'SOM.XMINY.2',
   },
   langCode: 'nlNL',
   ui: {

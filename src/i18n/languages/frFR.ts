@@ -262,6 +262,9 @@ const dictionary: RawTranslationPackage = {
     SERIESSUM: 'SOMME.SERIES',
     SIGN: 'SIGNE',
     SQRTPI: 'RACINE.PI',
+    SUMX2MY2: 'SOMME.X2MY2',
+    SUMX2PY2: 'SOMME.X2PY2',
+    SUMXMY2: 'SOMME.XMY2',
   },
   langCode: 'frFR',
   ui: {

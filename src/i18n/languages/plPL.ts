@@ -262,6 +262,9 @@ const dictionary: RawTranslationPackage = {
     SERIESSUM: 'SUMA.SZER.POT',
     SIGN: 'ZNAK.LICZBY',
     SQRTPI: 'PIERW.PI',
+    SUMX2MY2: 'SUMA.X2.M.Y2',
+    SUMX2PY2: 'SUMA.X2.P.Y2',
+    SUMXMY2: 'SUMA.XMY.2',
   },
   langCode: 'plPL',
   ui: {

@@ -262,6 +262,9 @@ const dictionary: RawTranslationPackage = {
     SERIESSUM: 'РЯД.СУММ',
     SIGN: 'ЗНАК',
     SQRTPI: 'КОРЕНЬПИ',
+    SUMX2MY2: 'СУММРАЗНКВ',
+    SUMX2PY2: 'СУММСУММКВ',
+    SUMXMY2: 'СУММКВРАЗН',
   },
   langCode: 'ruRU',
   ui: {
