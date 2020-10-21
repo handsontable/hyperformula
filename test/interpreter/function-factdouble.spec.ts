@@ -23,7 +23,7 @@ describe('Function FACTDOUBLE', () => {
     expect(engine.getCellValue(adr('A1'))).toBe(1)
     expect(engine.getCellValue(adr('A2'))).toBe(1)
     expect(engine.getCellValue(adr('A3'))).toBe(3840)
-    expect(engine.getCellValue(adr('A4'))).toBeCloseTo(1.23775688540895e+293)
+    expect(engine.getCellValue(adr('A4')) as number / 1.23775688540895e+293).toBeCloseTo(1,6)
   })
 
   it('rounds argument', () => {
@@ -37,7 +37,7 @@ describe('Function FACTDOUBLE', () => {
     expect(engine.getCellValue(adr('A1'))).toBe(1)
     expect(engine.getCellValue(adr('A2'))).toBe(1)
     expect(engine.getCellValue(adr('A3'))).toBe(3840)
-    expect(engine.getCellValue(adr('A4'))).toBeCloseTo(1.23775688540895e+293)
+    expect(engine.getCellValue(adr('A4')) as number / 1.23775688540895e+293).toBeCloseTo(1, 6)
   })
 
   it('checks bounds', () => {
