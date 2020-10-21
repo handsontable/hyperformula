@@ -234,6 +234,9 @@ lets you design your own [custom functions](custom-functions).
 | SUMIFS | Math and trigonometry | Returns the sum of the values of cells in a range that meets multiple criteria in multiple ranges. | SUMIFS(Sum_Range ; Criterion_range1 ; Criterion1 [ ; Criterion_range2 ; Criterion2 [;...]]) |
 | SUMPRODUCT | Math and trigonometry | Multiplies corresponding elements in the given arrays, and returns the sum of those products. | SUMPRODUCT(Array1; Array2...Array30) |
 | SUMSQ | Math and trigonometry | Returns the sum of the squares of the arguments | SUMSQ(Number1; Number2; ...; Number30) |
+| SUMX2MY2 | Math and trigonometry | Returns the sum of the square differences. | SUMX2MY2(Range1; Range2) |
+| SUMX2PY2 | Math and trigonometry | Returns the sum of the square sums. | SUMX2PY2(Range1; Range2) |
+| SUMXMY2 | Math and trigonometry | Returns the sum of the square of differences. | SUMXMY2(Range1; Range2) |
 | TAN | Math and trigonometry | Returns the tangent of the given angle (in radians). | TAN(Number) |
 | TANH <br><Badge text="v0.2.0"/>| Math and trigonometry | Returns the hyperbolic tangent of the given value. | TANH(Number) |
 | TRUNC | Math and trigonometry | Truncates a number by removing decimal places. | TRUNC(Number; Count) |
