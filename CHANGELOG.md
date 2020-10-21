@@ -19,8 +19,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - Fixed multiple issues with VLOOKUP function. (#526, #528)
 - Fixed MATCH and INDEX functions compatiblity. (#520)
-
-### Fixed
 - Fixed issue with config update that does not preserve named expressions. (#527)
 - Fixed minor issue with arithmetic operations error messages. (#532)
 
