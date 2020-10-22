@@ -47,6 +47,14 @@ describe('Function LCM', () => {
     expect(engine.getCellValue(adr('B1'))).toBe(0)
   })
 
+  it('handles overflow', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=LCM(1000000,1000001,1000002,1000003)'],
+    ])
+
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.ValueLarge))
+  })
+
   it('coerces to number', () => {
     const engine = HyperFormula.buildFromArray([
       ['=LCM("4",2)'],

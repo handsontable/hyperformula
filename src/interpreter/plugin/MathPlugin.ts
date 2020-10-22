@@ -3,7 +3,6 @@
  * Copyright (c) 2020 Handsoncode. All rights reserved.
  */
 
-import {type} from 'os'
 import {CellError, ErrorType, InternalScalarValue, SimpleCellAddress} from '../../Cell'
 import {ErrorMessage} from '../../error-message'
 import {ProcedureAst} from '../../parser'
@@ -197,6 +196,9 @@ export class MathPlugin extends FunctionPlugin {
             return new CellError(ErrorType.NUM, ErrorMessage.ValueSmall)
           }
           ret = binaryLCM(ret, Math.trunc(val))
+        }
+        if(ret>=(1<<53)) {
+          return new CellError(ErrorType.NUM, ErrorMessage.ValueLarge)
         }
         return ret
       }
