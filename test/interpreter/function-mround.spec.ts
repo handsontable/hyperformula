@@ -61,4 +61,13 @@ describe('Function MROUND', () => {
     expect(engine.getCellValue(adr('A5'))).toEqual(-39)
     expect(engine.getCellValue(adr('A6'))).toEqual(-12)
   })
+
+  it('known limitations', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=MROUND(6.05, 0.1)'],
+      ['=MROUND(7.05, 0.1)'],
+    ])
+    expect(engine.getCellValue(adr('A1'))).toEqual(6)
+    expect(engine.getCellValue(adr('A2'))).toEqual(7.1)
+  })
 })
