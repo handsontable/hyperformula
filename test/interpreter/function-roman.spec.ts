@@ -27,7 +27,7 @@ describe('Function ROMAN', () => {
     expect(engine.getCellValue(adr('A5'))).toEqual('LDVLIV')
   })
 
-  it('should throw correct error', () => {
+  it('should throw correct error if arguments are out of bounds', () => {
     const engine = HyperFormula.buildFromArray([
       ['=ROMAN(0)'],
       ['=ROMAN(4000)'],
