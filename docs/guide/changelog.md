@@ -1,5 +1,23 @@
 # Changelog
 
+## 0.3.0
+**Release date: October 22, 2020**
+
+### Added
+- Added 9 text functions EXACT, LOWER, UPPER, MID, T, SUBSTITUTE, REPLACE, UNICODE, UNICHAR. [#159](https://github.com/handsontable/hyperformula/issues/159)
+- Added 5 datetime functions: INTERVAL, NETWORKDAYS, NETWORKDAYS.INTL, WORKDAY, WORKDAY.INTL. [#153](https://github.com/handsontable/hyperformula/issues/153)
+- Added 3 information functions HLOOKUP, ROW, COLUMN. [#520](https://github.com/handsontable/hyperformula/pull/520)
+- Added 5 financial functions FVSCHEDULE, NPV, MIRR, PDURATION, XNPV. [#542](https://github.com/handsontable/hyperformula/pull/542)
+- Added 12 statistical functions VAR.P, VAR.S, VARA, VARPA, STDEV.P, STDEV.S, STDEVA, STDEVPA, VARP, VAR, STDEVP, STDEV. [#536](https://github.com/handsontable/hyperformula/pull/536)
+- Added 2 mathematical functions SUBTOTAL, PRODUCT. [#536](https://github.com/handsontable/hyperformula/pull/536)
+- Added 15 operator functions HF.ADD, HF.CONCAT, HF.DIVIDE, HF.EQ, HF.GT, HF.GTE, HF.LT, HF.LTE, HF.MINUS, HF.MULTIPLY, HF.NE, HF.POW, HF.UMINUS, HF.UNARY_PERCENT, HF.UPLUS. [#543](https://github.com/handsontable/hyperformula/pull/543)
+
+### Fixed
+- Fixed multiple issues with VLOOKUP function. [#526](https://github.com/handsontable/hyperformula/issues/526) and  [#528](https://github.com/handsontable/hyperformula/issues/528)
+- Fixed MATCH and INDEX functions compatiblity. [#520](https://github.com/handsontable/hyperformula/pull/520)
+- Fixed issue with config update that does not preserve named expressions. [#527](https://github.com/handsontable/hyperformula/issues/527)
+- Fixed minor issue with arithmetic operations error messages. [#532](https://github.com/handsontable/hyperformula/issues/532)
+
 ## 0.2.0
 **Release date: September 22, 2020**
 
