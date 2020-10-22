@@ -113,7 +113,7 @@ export class RomanPlugin extends FunctionPlugin {
           {token: 'III', val: 3},
           {token: 'II', val: 2},
           {token: 'I', val: 1},
-          );
+          )
         if(input !== '') {
           return new CellError(ErrorType.VALUE, ErrorMessage.Roman)
         } else {
@@ -139,41 +139,41 @@ function romanMode(val: number, mode: number): string {
   val %= 1000
   if(mode===4) {
     [val, ret] = absorb(val, ret, 'IM', 999, 1000);
-    [val, ret] = absorb(val, ret, 'ID', 499, 500);
+    [val, ret] = absorb(val, ret, 'ID', 499, 500)
   }
   if(mode>=3) {
     [val, ret] = absorb(val, ret, 'VM', 995, 1000);
-    [val, ret] = absorb(val, ret, 'VD', 495, 500);
+    [val, ret] = absorb(val, ret, 'VD', 495, 500)
   }
   if(mode>=2) {
     [val, ret] = absorb(val, ret, 'XM', 990, 1000);
-    [val, ret] = absorb(val, ret, 'XD', 490, 500);
+    [val, ret] = absorb(val, ret, 'XD', 490, 500)
   }
   if(mode>=1) {
     [val, ret] = absorb(val, ret, 'LM', 950, 1000);
-    [val, ret] = absorb(val, ret, 'LD', 450, 500);
+    [val, ret] = absorb(val, ret, 'LD', 450, 500)
   }
   [val, ret] = absorb(val, ret, 'CM', 900, 1000);
   [val, ret] = absorb(val, ret, 'CD', 400, 500);
-  [val, ret] = absorb(val, ret, 'D', 500, 900);
+  [val, ret] = absorb(val, ret, 'D', 500, 900)
   ret += 'C'.repeat(Math.floor(val/100))
   val %= 100
   if(mode>=2) {
     [val, ret] = absorb(val, ret, 'IC', 99, 100);
-    [val, ret] = absorb(val, ret, 'IL', 49, 50);
+    [val, ret] = absorb(val, ret, 'IL', 49, 50)
   }
   if(mode>=1) {
     [val, ret] = absorb(val, ret, 'VC', 95, 100);
-    [val, ret] = absorb(val, ret, 'VL', 45, 50);
+    [val, ret] = absorb(val, ret, 'VL', 45, 50)
   }
   [val, ret] = absorb(val, ret, 'XC', 90, 100);
   [val, ret] = absorb(val, ret, 'XL', 40, 50);
-  [val, ret] = absorb(val, ret, 'L', 50, 90);
+  [val, ret] = absorb(val, ret, 'L', 50, 90)
   ret += 'X'.repeat(Math.floor(val/10))
   val %= 10;
   [val, ret] = absorb(val, ret, 'IX', 9, 10);
   [val, ret] = absorb(val, ret, 'IV', 4, 5);
-  [val, ret] = absorb(val, ret, 'V', 5, 9);
+  [val, ret] = absorb(val, ret, 'V', 5, 9)
   ret += 'I'.repeat(val)
   return ret
 }
