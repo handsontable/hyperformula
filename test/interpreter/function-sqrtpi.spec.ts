@@ -12,6 +12,7 @@ describe('Function SQRTPI', () => {
     expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
     expect(engine.getCellValue(adr('B1'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
   })
+
   it('works', () => {
     const engine = HyperFormula.buildFromArray([
       ['=SQRTPI(0)'],
