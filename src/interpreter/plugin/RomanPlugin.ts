@@ -59,7 +59,7 @@ export class RomanPlugin extends FunctionPlugin {
           input = input.slice(1)
           minusSign = true
           if(input==='') {
-            return new CellError(ErrorType.VALUE, ErrorMessage.Roman)
+            return new CellError(ErrorType.VALUE, ErrorMessage.InvalidRoman)
           }
         }
         let ans = 0;
@@ -115,7 +115,7 @@ export class RomanPlugin extends FunctionPlugin {
           {token: 'I', val: 1},
           )
         if(input !== '') {
-          return new CellError(ErrorType.VALUE, ErrorMessage.Roman)
+          return new CellError(ErrorType.VALUE, ErrorMessage.InvalidRoman)
         } else {
           return (minusSign?-1:1) * ans
         }
