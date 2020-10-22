@@ -62,7 +62,11 @@ describe('Function MROUND', () => {
     expect(engine.getCellValue(adr('A6'))).toEqual(-12)
   })
 
-  it('known limitations', () => {
+  /**
+   * Tests below are results of how floating point arithmetic works.
+   * This behavior is undefined, and this is test for consistency between platforms.
+   */
+  xit('known limitations', () => {
     const engine = HyperFormula.buildFromArray([
       ['=MROUND(6.05, 0.1)'],
       ['=MROUND(7.05, 0.1)'],
