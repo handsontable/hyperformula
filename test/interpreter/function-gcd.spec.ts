@@ -81,6 +81,14 @@ describe('Function GCD', () => {
     expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.NumberCoercion))
   })
 
+  it('handles overflow', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=GCD(1000000000000000000.0)'],
+    ])
+
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.ValueLarge))
+  })
+
   it('checks bounds', () => {
     const engine = HyperFormula.buildFromArray([
       ['=GCD(-1,5)'],

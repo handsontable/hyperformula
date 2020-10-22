@@ -178,6 +178,9 @@ export class MathPlugin extends FunctionPlugin {
           }
           ret = binaryGCD(ret, Math.trunc(val))
         }
+        if(ret>Number.MAX_SAFE_INTEGER) {
+          return new CellError(ErrorType.NUM, ErrorMessage.ValueLarge)
+        }
         return ret
       }
     )
@@ -197,7 +200,7 @@ export class MathPlugin extends FunctionPlugin {
           }
           ret = binaryLCM(ret, Math.trunc(val))
         }
-        if(ret>=(1<<53)) {
+        if(ret>Number.MAX_SAFE_INTEGER) {
           return new CellError(ErrorType.NUM, ErrorMessage.ValueLarge)
         }
         return ret
@@ -388,7 +391,7 @@ function binaryGCD(a: number, b: number): number {
 }
 
 function binaryLCM(a: number, b: number): number {
-  if(a==0 || b===0) {
+  if(a===0 || b===0) {
     return 0
   }
   return a * (b/binaryGCD(a, b))
