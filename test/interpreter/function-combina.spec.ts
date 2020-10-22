@@ -38,7 +38,7 @@ describe('Function COMBINA', () => {
     expect(engine.getCellValue(adr('A10')) as number/1.41325918108873e+308).toBeCloseTo(1, 6)
   })
 
-  it('rounds argument', () => {
+  it('truncates argument', () => {
     const engine = HyperFormula.buildFromArray([
       ['=COMBINA(9.9,6.6)'],
       ['=COMBINA(518, 512.9)'],
