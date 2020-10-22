@@ -21,8 +21,8 @@ describe('Function ROMAN', () => {
       ['=ROMAN(499, 1.1)'],
     ])
     expect(engine.getCellValue(adr('A1'))).toEqual('CDXCIX')
-    expect(engine.getCellValue(adr('A2'))).toEqual('ID')
-    expect(engine.getCellValue(adr('A3'))).toEqual('CDXCIX')
+    expect(engine.getCellValue(adr('A2'))).toEqual('CDXCIX')
+    expect(engine.getCellValue(adr('A3'))).toEqual('ID')
     expect(engine.getCellValue(adr('A4'))).toEqual('CDXCIX')
     expect(engine.getCellValue(adr('A5'))).toEqual('LDVLIV')
   })

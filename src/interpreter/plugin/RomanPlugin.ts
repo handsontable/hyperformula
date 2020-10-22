@@ -30,9 +30,9 @@ export class RomanPlugin extends FunctionPlugin {
       (val: number, mode: InternalScalarValue) => {
         val = Math.trunc(val)
         if(mode === false) {
-          mode = 0
-        } else if(mode === true) {
           mode = 4
+        } else if(mode === true) {
+          mode = 0
         }
         mode = this.coerceScalarToNumberOrError(mode)
         if(mode instanceof CellError) {
