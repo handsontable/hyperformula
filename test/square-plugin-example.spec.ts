@@ -51,8 +51,8 @@ describe('Documentation example spec', () => {
       ['=SQUARE(1/0)'],
     ])
     expect(engine.getCellValue(adr('A1'))).toEqual(4)
-    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NA))
-    expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.VALUE))
-    expect(engine.getCellValue(adr('A4'))).toEqual(detailedError(ErrorType.DIV_BY_ZERO))
+    expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.NA))
+    expect(engine.getCellValue(adr('A3'))).toEqualError(detailedError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A4'))).toEqualError(detailedError(ErrorType.DIV_BY_ZERO))
   })
 })

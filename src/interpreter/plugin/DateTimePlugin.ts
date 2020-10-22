@@ -3,25 +3,36 @@
  * Copyright (c) 2020 Handsoncode. All rights reserved.
  */
 
-import {CellError, ErrorType, InternalScalarValue, SimpleCellAddress} from '../../Cell'
+import {
+  CellError,
+  EmptyValue,
+  ErrorType,
+  InternalNoErrorScalarValue,
+  InternalScalarValue,
+  SimpleCellAddress
+} from '../../Cell'
 import {
   instanceOfSimpleDate,
   instanceOfSimpleTime,
   numberToSimpleTime,
   offsetMonth,
-  roundToNearestSecond, SimpleDate,
-  timeToNumber, toBasisEU,
+  roundToNearestSecond,
+  SimpleDate,
+  timeToNumber,
+  toBasisEU,
   truncateDayInMonth
 } from '../../DateTimeHelper'
 import {ErrorMessage} from '../../error-message'
 import {format} from '../../format/format'
+import {Maybe} from '../../Maybe'
 import {ProcedureAst} from '../../parser'
+import {SimpleRangeValue} from '../InterpreterValue'
 import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
 
 /**
  * Interpreter plugin containing date-specific functions
  */
-export class DatePlugin extends FunctionPlugin {
+export class DateTimePlugin extends FunctionPlugin {
   public static implementedFunctions = {
     'DATE': {
       method: 'date',
@@ -167,6 +178,46 @@ export class DatePlugin extends FunctionPlugin {
         {argumentType: ArgumentTypes.NUMBER, minValue: 0},
         {argumentType: ArgumentTypes.NUMBER, minValue: 0},
         {argumentType: ArgumentTypes.INTEGER, defaultValue: 0, minValue: 0, maxValue: 4},
+      ],
+    },
+    'INTERVAL': {
+      method: 'interval',
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER, minValue: 0},
+      ],
+    },
+    'NETWORKDAYS': {
+      method: 'networkdays',
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER, minValue: 0},
+        {argumentType: ArgumentTypes.NUMBER, minValue: 0},
+        {argumentType: ArgumentTypes.RANGE, optionalArg: true}
+      ],
+    },
+    'NETWORKDAYS.INTL': {
+      method: 'networkdaysintl',
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER, minValue: 0},
+        {argumentType: ArgumentTypes.NUMBER, minValue: 0},
+        {argumentType: ArgumentTypes.NOERROR, defaultValue: 1},
+        {argumentType: ArgumentTypes.RANGE, optionalArg: true}
+      ],
+    },
+    'WORKDAY': {
+      method: 'workday',
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER, minValue: 0},
+        {argumentType: ArgumentTypes.NUMBER},
+        {argumentType: ArgumentTypes.RANGE, optionalArg: true}
+      ],
+    },
+    'WORKDAY.INTL': {
+      method: 'workdayintl',
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER, minValue: 0},
+        {argumentType: ArgumentTypes.NUMBER},
+        {argumentType: ArgumentTypes.NOERROR, defaultValue: 1},
+        {argumentType: ArgumentTypes.RANGE, optionalArg: true}
       ],
     },
   }
@@ -491,6 +542,230 @@ export class DatePlugin extends FunctionPlugin {
       }
     )
   }
+
+  public interval(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('INTERVAL'),
+      (arg: number) => {
+        arg = Math.trunc(arg)
+        const second = arg%60
+        arg = Math.trunc(arg/60)
+        const minute = arg%60
+        arg = Math.trunc(arg/60)
+        const hour = arg%24
+        arg = Math.trunc(arg/24)
+        const day = arg%30
+        arg = Math.trunc(arg/30)
+        const month = arg%12
+        const year = Math.trunc(arg/12)
+
+        return 'P' + ((year  > 0) ? year  + 'Y' : '')
+          + ((month > 0) ? month + 'M' : '')
+          + ((day   > 0) ? day   + 'D' : '')
+          + 'T'
+          + ((hour  > 0) ? hour  + 'H' : '')
+          + ((minute   > 0) ? minute   + 'M' : '')
+          + ((second   > 0) ? second   + 'S' : '')
+      }
+    )
+  }
+
+  public networkdays(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('NETWORKDAYS'),
+      (start, end, holidays) => this.networkdayscore(start, end, 1, holidays)
+      )
+  }
+
+  public networkdaysintl(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('NETWORKDAYS.INTL'),
+      (start, end, weekend, holidays) => this.networkdayscore(start, end, weekend, holidays)
+      )
+  }
+
+  public workday(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('WORKDAY'),
+      (start, end, holidays) => this.workdaycore(start, end, 1, holidays)
+    )
+  }
+
+  public workdayintl(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('WORKDAY.INTL'),
+      (start, end, weekend, holidays) => this.workdaycore(start, end, weekend, holidays)
+    )
+  }
+
+  private networkdayscore(start: number, end: number, weekend: InternalNoErrorScalarValue, holidays?: SimpleRangeValue): InternalScalarValue {
+    start = Math.trunc(start)
+    end = Math.trunc(end)
+    let multiplier = 1
+    if(start>end) {
+      [start, end] = [end, start]
+      multiplier = -1
+    }
+
+    const weekendPattern = computeWeekendPattern(weekend)
+    if(weekendPattern instanceof CellError) {
+      return weekendPattern
+    }
+
+    const filteredHolidays = this.simpleRangeToFilteredHolidays(holidays, weekendPattern)
+    if(filteredHolidays instanceof CellError) {
+      return filteredHolidays
+    }
+    return multiplier * this.countWorkdays(start, end, weekendPattern, filteredHolidays)
+  }
+
+  private workdaycore(start: number, delta: number, weekend: InternalNoErrorScalarValue, holidays?: SimpleRangeValue): InternalScalarValue {
+    start = Math.trunc(start)
+    delta = Math.trunc(delta)
+
+    const weekendPattern = computeWeekendPattern(weekend)
+    if(weekendPattern instanceof CellError) {
+      return weekendPattern
+    }
+
+    const filteredHolidays = this.simpleRangeToFilteredHolidays(holidays, weekendPattern)
+    if(filteredHolidays instanceof CellError) {
+      return filteredHolidays
+    }
+
+    if(delta > 0) {
+      let upper = 1
+      while(this.countWorkdays(start+1, start+upper, weekendPattern, filteredHolidays) < delta) {
+        upper *= 2
+      }
+      let lower = 1
+      while(lower+1<upper) {
+        const mid = Math.trunc((lower+upper)/2)
+        if(this.countWorkdays(start+1, start+mid, weekendPattern, filteredHolidays) < delta) {
+          lower = mid
+        } else {
+          upper = mid
+        }
+      }
+      return start+upper
+    } else if (delta < 0) {
+      delta *= -1
+      let upper = 1
+      while(this.countWorkdays(start-upper, start-1, weekendPattern, filteredHolidays) < delta) {
+        upper *= 2
+      }
+      let lower = 1
+      while(lower+1<upper) {
+        const mid = Math.trunc((lower+upper)/2)
+        if(this.countWorkdays(start-mid, start-1, weekendPattern, filteredHolidays) < delta) {
+          lower = mid
+        } else {
+          upper = mid
+        }
+      }
+      return start-upper
+    } else {
+      return start
+    }
+  }
+
+  private countWorkdays(start: number, end: number, weekendPattern: string, sortedHolidays: number[]): number {
+    const absoluteEnd = Math.floor(this.interpreter.dateHelper.relativeNumberToAbsoluteNumber(end))
+    const absoluteStart = Math.floor(this.interpreter.dateHelper.relativeNumberToAbsoluteNumber(start))
+    let ans = 0
+    for(let i=0;i<7;i++) {
+      if(weekendPattern.charAt(i) === '0') {
+        ans += Math.floor((absoluteEnd + 6 - i) / 7)
+        ans -= Math.floor((absoluteStart - 1 + 6 - i) / 7)
+      }
+    }
+
+    ans -= lowerBound(end+1, sortedHolidays)- lowerBound(start, sortedHolidays)
+
+    return ans
+  }
+
+  private simpleRangeToFilteredHolidays(holidays: Maybe<SimpleRangeValue>, weekendPattern: string): number[] | CellError {
+    const holidaysArr = holidays?.valuesFromTopLeftCorner() ?? []
+    for(const val of holidaysArr) {
+      if(val instanceof CellError) {
+        return val
+      }
+    }
+    const processedHolidays: number[] = []
+    for(const val of holidaysArr as InternalNoErrorScalarValue[]) {
+      if(val === EmptyValue) {
+        continue
+      }
+      if(typeof val === 'number') {
+        processedHolidays.push(Math.trunc(val))
+      } else {
+        return new CellError(ErrorType.VALUE, ErrorMessage.WrongType)
+      }
+    }
+    return [...new Set(processedHolidays)].sort((a, b) => a-b)
+      .filter((arg) => {
+      const val = this.interpreter.dateHelper.relativeNumberToAbsoluteNumber(arg)
+      const i = (val-1)%7
+      return (weekendPattern.charAt(i) === '0')
+    })
+  }
+
+}
+
+/**
+ * Returns i such that:
+ * sortedArray[i-1] < val <= sortedArray[i]
+ *
+ */
+function lowerBound(val: number, sortedArray: number[]): number {
+  if(sortedArray.length === 0) {
+    return 0
+  }
+  if(val <= sortedArray[0]) {
+    return 0
+  }
+  if(sortedArray[sortedArray.length-1] < val) {
+    return sortedArray.length
+  }
+  let lower = 0 //sortedArray[lower] < val
+  let upper = sortedArray.length-1 //sortedArray[upper] >= val
+  while(lower+1<upper) {
+    const mid = Math.floor((upper+lower)/2)
+    if(sortedArray[mid] >= val) {
+      upper = mid
+    } else {
+      lower = mid
+    }
+  }
+  return upper
+}
+
+function computeWeekendPattern(weekend: InternalNoErrorScalarValue): string | CellError {
+  if(typeof weekend !== 'number' && typeof weekend !== 'string') {
+    return new CellError(ErrorType.VALUE, ErrorMessage.WrongType)
+  }
+  if(typeof weekend === 'string') {
+    if(weekend.length !== 7 || !/^(0|1)*$/.test(weekend) || weekend === '1111111') {
+      return new CellError(ErrorType.NUM, ErrorMessage.WeekendString)
+    } else {
+      return weekend
+    }
+  } else {
+    return workdayPatterns.get(weekend) ?? new CellError(ErrorType.NUM, ErrorMessage.BadMode)
+  }
 }
 
 const weekdayOffsets = new Map([[1, 0], [2, 1], [11, 1], [12, 2], [13, 3], [14, 4], [15, 5], [16, 6], [17, 0]])
+
+const workdayPatterns = new Map([
+  [1, '0000011'],
+  [2, '1000001'],
+  [3, '1100000'],
+  [4, '0110000'],
+  [5, '0011000'],
+  [6, '0001100'],
+  [7, '0000110'],
+  [11, '0000001'],
+  [12, '1000000'],
+  [13, '0100000'],
+  [14, '0010000'],
+  [15, '0001000'],
+  [16, '0000100'],
+  [17, '0000010'],
+])

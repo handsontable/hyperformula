@@ -4,7 +4,7 @@
  */
 
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
-import {InternalNoErrorCellValue, InternalScalarValue, SimpleCellAddress} from '../Cell'
+import {InternalNoErrorScalarValue, InternalScalarValue, SimpleCellAddress} from '../Cell'
 import {Config} from '../Config'
 import {DependencyGraph} from '../DependencyGraph'
 import {InterpreterValue} from '../interpreter/InterpreterValue'
@@ -14,7 +14,13 @@ import {ColumnBinarySearch} from './ColumnBinarySearch'
 import {ColumnIndex} from './ColumnIndex'
 import {ColumnsSpan} from '../Span'
 
-export interface ColumnSearchStrategy {
+export interface SearchStrategy {
+  find(key: InternalNoErrorScalarValue, range: AbsoluteCellRange, sorted: boolean): number,
+
+  advancedFind(keyMatcher: (arg: InternalScalarValue) => boolean, range: AbsoluteCellRange): number,
+}
+
+export interface ColumnSearchStrategy extends SearchStrategy {
   add(value: InterpreterValue | Matrix, address: SimpleCellAddress): void,
 
   remove(value: InterpreterValue | Matrix | null, address: SimpleCellAddress): void,
@@ -30,10 +36,6 @@ export interface ColumnSearchStrategy {
   moveValues(range: IterableIterator<[InternalScalarValue, SimpleCellAddress]>, toRight: number, toBottom: number, toSheet: number): void,
 
   removeValues(range: IterableIterator<[InternalScalarValue, SimpleCellAddress]>): void,
-
-  find(key: InternalNoErrorCellValue, range: AbsoluteCellRange, sorted: boolean): number,
-
-  advancedFind(keyMatcher: (arg: InterpreterValue) => boolean, range: AbsoluteCellRange): number,
 
   destroy(): void,
 }

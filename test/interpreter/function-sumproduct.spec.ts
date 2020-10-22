@@ -12,8 +12,8 @@ describe('Function SUMPRODUCT', () => {
       ['=SUMPRODUCT(A1:A3)', '=SUMPRODUCT(A1:A3,B1:B3,A1:A2)'],
     ])
 
-    expect(engine.getCellValue(adr('A4'))).toEqual(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
-    expect(engine.getCellValue(adr('B4'))).toEqual(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
+    expect(engine.getCellValue(adr('A4'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
+    expect(engine.getCellValue(adr('B4'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
   })
 
   it('works',  () => {
@@ -121,7 +121,7 @@ describe('Function SUMPRODUCT', () => {
       ['=SUMPRODUCT(A1:A2,B1:B2)'],
     ])
 
-    expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.DIV_BY_ZERO))
+    expect(engine.getCellValue(adr('A3'))).toEqualError(detailedError(ErrorType.DIV_BY_ZERO))
   })
 
   it('error if error is somewhere in left value',  () => {
@@ -131,7 +131,7 @@ describe('Function SUMPRODUCT', () => {
       ['=SUMPRODUCT(A1:A2,B1:B2)'],
     ])
 
-    expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.DIV_BY_ZERO))
+    expect(engine.getCellValue(adr('A3'))).toEqualError(detailedError(ErrorType.DIV_BY_ZERO))
   })
 
   it('error in left has precedence over error in right',  () => {
@@ -141,7 +141,7 @@ describe('Function SUMPRODUCT', () => {
       ['=SUMPRODUCT(A1:A2,B1:B2)'],
     ])
 
-    expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.NAME, ErrorMessage.FunctionName('UNKNOWNFUNCTION')))
+    expect(engine.getCellValue(adr('A3'))).toEqualError(detailedError(ErrorType.NAME, ErrorMessage.FunctionName('UNKNOWNFUNCTION')))
   })
 
   it('error when different size',  () => {
@@ -152,8 +152,8 @@ describe('Function SUMPRODUCT', () => {
       ['=SUMPRODUCT(A1:B2,C1:D1)'],
     ])
 
-    expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessage.EqualLength))
-    expect(engine.getCellValue(adr('A4'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessage.EqualLength))
+    expect(engine.getCellValue(adr('A3'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.EqualLength))
+    expect(engine.getCellValue(adr('A4'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.EqualLength))
   })
 
   it('works with matrices',  () => {
@@ -184,6 +184,6 @@ describe('Function SUMPRODUCT', () => {
       ['=SUMPRODUCT(A1:B2, D1:E2)'],
     ])
 
-    expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.NAME, ErrorMessage.FunctionName('FOOBAR')))
+    expect(engine.getCellValue(adr('A3'))).toEqualError(detailedError(ErrorType.NAME, ErrorMessage.FunctionName('FOOBAR')))
   })
 })

@@ -6,13 +6,12 @@
 import {AbsoluteCellRange} from './AbsoluteCellRange'
 import {absolutizeDependencies} from './absolutizeDependencies'
 import {CellError, EmptyValue, ErrorType, SimpleCellAddress} from './Cell'
-import {ColumnSearchStrategy} from './ColumnSearch/ColumnSearchStrategy'
+import {ColumnSearchStrategy} from './Lookup/SearchStrategy'
 import {Config} from './Config'
 import {ContentChanges} from './ContentChanges'
 import {DateTimeHelper} from './DateTimeHelper'
 import {DependencyGraph, FormulaCellVertex, MatrixVertex, RangeVertex, Vertex} from './DependencyGraph'
 import {ErrorMessage} from './error-message'
-import {fixNegativeZero, isNumberOverflow} from './interpreter/ArithmeticHelper'
 import {FunctionRegistry} from './interpreter/FunctionRegistry'
 import {Interpreter} from './interpreter/Interpreter'
 import {InterpreterValue, SimpleRangeValue} from './interpreter/InterpreterValue'
@@ -97,7 +96,7 @@ export class Evaluator {
           } else if (vertex instanceof FormulaCellVertex) {
             const address = vertex.getAddress(this.dependencyGraph.lazilyTransformingAstService)
             this.columnSearch.remove(vertex.valueOrNull(), address)
-            const error = new CellError(ErrorType.CYCLE)
+            const error = new CellError(ErrorType.CYCLE, undefined, vertex.address)
             vertex.setCellValue(error)
             changes.addChange(error, vertex.address)
           }
@@ -138,7 +137,7 @@ export class Evaluator {
   private recomputeFormulas(cycled: Vertex[], sorted: Vertex[]): void {
     cycled.forEach((vertex: Vertex) => {
       if (vertex instanceof FormulaCellVertex) {
-        vertex.setCellValue(new CellError(ErrorType.CYCLE))
+        vertex.setCellValue(new CellError(ErrorType.CYCLE, undefined, vertex.address))
       }
     })
     sorted.forEach((vertex: Vertex) => {
@@ -170,12 +169,6 @@ export class Evaluator {
     const interpreterValue = this.interpreter.evaluateAst(ast, formulaAddress)
     if (interpreterValue instanceof SimpleRangeValue) {
       return interpreterValue
-    } else if (typeof interpreterValue === 'number') {
-      if (isNumberOverflow(interpreterValue)) {
-        return new CellError(ErrorType.NUM, ErrorMessage.Infinity)
-      } else {
-        return fixNegativeZero(interpreterValue)
-      }
     } else if (interpreterValue === EmptyValue && this.config.evaluateNullToZero) {
       return 0
     } else {

@@ -148,6 +148,13 @@ describe('Config', () => {
     expect(() => new Config({ vlookupThreshold: 0 })).toThrowError('Config parameter vlookupThreshold should be at least 1')
   })
 
+  it('#binarySearchThreshold', () => {
+    expect(() => new Config({ binarySearchThreshold: 1 })).not.toThrowError()
+    expect(() => new Config({ binarySearchThreshold: 42 })).not.toThrowError()
+    expect(() => new Config({ binarySearchThreshold: Infinity })).not.toThrowError()
+    expect(() => new Config({ binarySearchThreshold: 0 })).toThrowError('Config parameter binarySearchThreshold should be at least 1')
+  })
+
   it('#matrixDetectionThreshold', () => {
     expect(() => new Config({ matrixDetectionThreshold: 1 })).not.toThrowError()
     expect(() => new Config({ matrixDetectionThreshold: 42 })).not.toThrowError()

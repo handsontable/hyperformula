@@ -10,8 +10,8 @@ describe('Function CHAR', () => {
       ['=CHAR(1, 2)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
-    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
+    expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
   })
 
   it('should not work for wrong type of arguments', () => {
@@ -19,7 +19,7 @@ describe('Function CHAR', () => {
       ['=CHAR("foo")'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessage.NumberCoercion))
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.NumberCoercion))
   })
 
   it('should work', () => {
@@ -52,7 +52,7 @@ describe('Function CHAR', () => {
     expect(engine.getCellValue(adr('A3'))).toEqual('*')
   })
 
-  it('should work only for integer values from 1 to 255', () => {
+  it('should work only for values from 1 to 255 truncating decimal part', () => {
     const engine = HyperFormula.buildFromArray([
       ['=CHAR(0)'],
       ['=CHAR(1)'],
@@ -62,11 +62,11 @@ describe('Function CHAR', () => {
       ['=CHAR(255.5)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessage.CharacterCodeBounds))
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.CharacterCodeBounds))
     expect(engine.getCellValue(adr('A2'))).toEqual('')
     expect(engine.getCellValue(adr('A3'))).toEqual('ÿ')
-    expect(engine.getCellValue(adr('A4'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessage.CharacterCodeBounds))
-    expect(engine.getCellValue(adr('A5'))).toEqual(detailedError(ErrorType.VALUE, ErrorMessage.CharacterCodeBounds))
+    expect(engine.getCellValue(adr('A4'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.CharacterCodeBounds))
+    expect(engine.getCellValue(adr('A5'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.CharacterCodeBounds))
     expect(engine.getCellValue(adr('A6'))).toEqual('ÿ')
   })
 })

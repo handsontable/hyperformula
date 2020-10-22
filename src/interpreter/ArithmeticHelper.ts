@@ -9,7 +9,7 @@ import {
   EmptyValue,
   ErrorType,
   getCellValueType,
-  InternalNoErrorCellValue,
+  InternalNoErrorScalarValue,
   InternalScalarValue
 } from '../Cell'
 import {Config} from '../Config'
@@ -101,7 +101,31 @@ export class ArithmeticHelper {
     return str
   }
 
-  public compare(left: InternalNoErrorCellValue, right: InternalNoErrorCellValue): number {
+  public lt = (left: InternalNoErrorScalarValue, right: InternalNoErrorScalarValue): boolean => {
+    return this.compare(left, right) < 0
+  }
+
+  public leq = (left: InternalNoErrorScalarValue, right: InternalNoErrorScalarValue): boolean => {
+    return this.compare(left, right) <= 0
+  }
+
+  public gt = (left: InternalNoErrorScalarValue, right: InternalNoErrorScalarValue): boolean => {
+    return this.compare(left, right) > 0
+  }
+
+  public geq = (left: InternalNoErrorScalarValue, right: InternalNoErrorScalarValue): boolean => {
+    return this.compare(left, right) >= 0
+  }
+
+  public eq = (left: InternalNoErrorScalarValue, right: InternalNoErrorScalarValue): boolean => {
+    return this.compare(left, right) === 0
+  }
+
+  public neq = (left: InternalNoErrorScalarValue, right: InternalNoErrorScalarValue): boolean => {
+    return this.compare(left, right) !== 0
+  }
+
+  private compare(left: InternalNoErrorScalarValue, right: InternalNoErrorScalarValue): number {
     if (typeof left === 'string' || typeof right === 'string') {
       const leftTmp = typeof left === 'string' ? this.dateTimeHelper.dateStringToDateNumber(left) : left
       const rightTmp = typeof right === 'string' ? this.dateTimeHelper.dateStringToDateNumber(right) : right
@@ -142,9 +166,11 @@ export class ArithmeticHelper {
     }
   }
 
-  public stringCmp(left: string, right: string): number {
+  private stringCmp(left: string, right: string): number {
     return this.collator.compare(left, right)
   }
+
+  public pow = Math.pow
 
   public addWithEpsilon = (left: number, right: number) => {
     const ret = left + right
@@ -155,6 +181,21 @@ export class ArithmeticHelper {
     }
   }
 
+  public unaryMinus = (arg: number): number => {
+    return -arg
+  }
+
+  public unaryPlus = (arg: number): number => {
+    return arg
+  }
+
+  public unaryPercent = (arg: number): number => {
+    return arg/100
+  }
+
+  public concat = (left: string, right: string): string => {
+    return left.concat(right)
+  }
   /**
    * Adds two numbers
    *
@@ -199,6 +240,18 @@ export class ArithmeticHelper {
     }
   }
 
+  public divide = (left: number, right: number): number | CellError => {
+    if (right === 0) {
+      return new CellError(ErrorType.DIV_BY_ZERO)
+    } else {
+      return (left / right)
+    }
+  }
+
+  public multiply = (left: number, right: number): number => {
+    return left*right
+  }
+
   public coerceScalarToNumberOrError(arg: InternalScalarValue): number | CellError {
     if (arg instanceof CellError) {
       return arg
@@ -229,6 +282,48 @@ export class ArithmeticHelper {
       }
     }
   }
+
+  public coerceNumbersExpandRanges(args: InterpreterValue[]): number[] | CellError {
+    const vals: (number | SimpleRangeValue)[] = []
+    for(const arg of args) {
+      if(arg instanceof SimpleRangeValue) {
+        vals.push(arg)
+      } else {
+        const coerced = this.coerceScalarToNumberOrError(arg)
+        if(coerced instanceof CellError) {
+          return coerced
+        } else {
+          vals.push(coerced)
+        }
+      }
+    }
+    const expandedVals: number[] = []
+    for(const val of vals) {
+      if(val instanceof SimpleRangeValue) {
+        const arr = this.manyToExactNumbers(val.valuesFromTopLeftCorner())
+        if(arr instanceof CellError) {
+          return arr
+        } else {
+          expandedVals.push(...arr)
+        }
+      } else {
+        expandedVals.push(val)
+      }
+    }
+    return expandedVals
+  }
+
+  public manyToExactNumbers(args: InternalScalarValue[]): number[] | CellError {
+    const ret: number[] = []
+    for(const arg of args) {
+      if(arg instanceof CellError) {
+        return arg
+      } else if (typeof arg === 'number') {
+        ret.push(arg)
+      }
+    }
+    return ret
+  }
 }
 
 export function coerceToRange(arg: InterpreterValue): SimpleRangeValue {
@@ -253,7 +348,7 @@ export function coerceBooleanToNumber(arg: boolean): number {
   return Number(arg)
 }
 
-export function coerceEmptyToValue(arg: InternalNoErrorCellValue): InternalNoErrorCellValue {
+export function coerceEmptyToValue(arg: InternalNoErrorScalarValue): InternalNoErrorScalarValue {
   if (typeof arg === 'string') {
     return ''
   } else if (typeof arg === 'number') {
@@ -303,12 +398,8 @@ export function coerceScalarToString(arg: InternalScalarValue): string | CellErr
   }
 }
 
-export function divide(left: number, right: number): number | CellError {
-  if (right === 0) {
-    return new CellError(ErrorType.DIV_BY_ZERO)
-  } else {
-    return (left / right)
-  }
+export function zeroIfEmpty(arg: InternalNoErrorScalarValue): InternalNoErrorScalarValue {
+  return arg === EmptyValue ? 0 : arg
 }
 
 export function numberCmp(left: number, right: number): number {

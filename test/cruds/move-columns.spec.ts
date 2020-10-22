@@ -205,8 +205,8 @@ describe('Move columns', () => {
 
     engine.moveColumns(0, 3, 1, 1)
 
-    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.CYCLE))
-    expect(engine.getCellValue(adr('E1'))).toEqual(detailedError(ErrorType.CYCLE))
+    expect(engine.getCellValue(adr('B1'))).toEqualError(detailedError(ErrorType.CYCLE))
+    expect(engine.getCellValue(adr('E1'))).toEqualError(detailedError(ErrorType.CYCLE))
   })
 
   it('should work with moving formulas', () => {
@@ -226,7 +226,7 @@ describe('Move columns', () => {
 
     engine.moveColumns(0, 0, 1, 2)
 
-    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.CYCLE))
+    expect(engine.getCellValue(adr('B1'))).toEqualError(detailedError(ErrorType.CYCLE))
     expect(engine.getCellFormula(adr('B1'))).toEqual('=SUM(A1:C1)')
   })
 
@@ -275,7 +275,7 @@ describe('Move columns - column ranges', () => {
 
     engine.moveColumns(0, 0, 1, 2)
 
-    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.CYCLE))
+    expect(engine.getCellValue(adr('B1'))).toEqualError(detailedError(ErrorType.CYCLE))
     expect(engine.getCellFormula(adr('B1'))).toEqual('=SUM(A:C)')
   })
 })

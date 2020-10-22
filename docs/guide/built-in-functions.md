@@ -48,7 +48,7 @@ lets you design your own [custom functions](custom-functions).
 ## Demo
 
 <iframe
-     src="https://codesandbox.io/embed/github/handsontable/hyperformula-demos/tree/0.2.x/built-in-functions?autoresize=1&fontsize=11&hidenavigation=1&theme=light&view=preview"
+     src="https://codesandbox.io/embed/github/handsontable/hyperformula-demos/tree/0.3.x/built-in-functions?autoresize=1&fontsize=11&hidenavigation=1&theme=light&view=preview"
      style="width:100%; height:500px; border:0; border-radius: 4px; overflow:hidden;"
      title="handsontable/hyperformula-demos: built-in-functions"
      allow="accelerometer; ambient-light-sensor; camera; encrypted-media; geolocation; gyroscope; hid; microphone; midi; payment; usb; vr; xr-spatial-tracking"
@@ -70,9 +70,12 @@ lets you design your own [custom functions](custom-functions).
 | EDATE <br><Badge text="v0.2.0"/>| Date and time | Shifts the given startdate by given number of months. | EDATE(Startdate; Months) |
 | EOMONTH | Date and time | Returns the date of the last day of a month which falls months away from the start date. | EOMONTH(Startdate; Months) |
 | HOUR <br><Badge text="v0.2.0"/>| Date and time | Returns hour component of given time. | HOUR(Time) |
+| INTERVAL <br><Badge text="v0.3.0"/>| Date and time | Returns interval string from given number of seconds. | INTERVAL(Seconds) |
 | ISOWEEKNUM <br><Badge text="v0.2.0"/>| Date and time |   Returns an ISO week number that corresponds to the week of year. | ISOWEEKNUM(Date) |
 | MINUTE <br><Badge text="v0.2.0"/>| Date and time | Returns minute component of given time. | MINUTE(Time) |
 | MONTH | Date and time | Returns the month for the given date value. | MONTH(Number) |
+| NETWORKDAYS <br><Badge text="v0.3.0"/>| Date and time | Returns the number of working days between two given dates. | NETWORKDAYS(Date1; Date2[; Holidays]) | 
+| NETWORKDAYS.INTL <br><Badge text="v0.3.0"/>| Date and time | Returns the number of working days between two given dates. | NETWORKDAYS.INTL(Date1; Date2[; Mode [; Holidays]]) | 
 | NOW <br><Badge text="v0.2.0"/>| Date and time | Returns current date + time. | NOW() |
 | SECOND <br><Badge text="v0.2.0"/>| Date and time | Returns second component of given time. | SECOND(Time) |
 | TIME <br><Badge text="v0.2.0"/>| Date and time | Calculates time from given hour, minute and second. | TIME(Hour; Minute; Second) |
@@ -80,6 +83,8 @@ lets you design your own [custom functions](custom-functions).
 | TODAY <br><Badge text="v0.2.0"/>| Date and time | Returns current date. | TODAY() |
 | WEEKDAY <br><Badge text="v0.2.0"/>| Date and time |  Computes a number between 1-7 representing the day of week. | WEEKDAY(Date; Type) |
 | WEEKNUM <br><Badge text="v0.2.0"/>| Date and time |   Returns a week number that corresponds to the week of year. | WEEKNUM(Date; Type) |
+| WORKDAY <br><Badge text="v0.3.0"/>| Date and time | Returns the working day number of days from start day. | WORKDAY(Date, Shift[; Holidays]) |
+| WORKDAY.INTL <br><Badge text="v0.3.0"/>| Date and time | Returns the working day number of days from start day. | WORKDAY(Date, Shift[; Mode[; Holidays]]) |
 | YEAR | Date and time | Returns the year as a number according to the internal calculation rules. | YEAR(Number) |
 | YEARFRAC <br><Badge text="v0.2.0"/>| Date and time | Computes the difference between two date values, in fraction of years. |  YEARFRAC(Date2; Date1[; Format]) |
 | BIN2DEC | Engineering | The result is the decimal number for the binary number entered. | BIN2DEC(Number) |
@@ -126,10 +131,14 @@ lets you design your own [custom functions](custom-functions).
 | DOLLARFR <br><Badge text="v0.2.0"/>| Financial | Converts a price displayed as a decimal number to a price entered with a special notation. | DOLLARFR(Price, Fraction) |
 | EFFECT <br><Badge text="v0.2.0"/>| Financial | Calculates the effective annual interest rate from a nominal interest rate and the number of compounding periods per year. | EFFECT (Nominal_rate; Npery) |
 | FV <br><Badge text="v0.2.0"/> | Financial | Returns the future value of an investment. | FV(Rate; Nper; Pmt[; Pv;[ Type]]) |
+| FVSCHEDULE <br><Badge text="v0.3.0"/>| Financial | Returns the future value of an investment based on a rate schedule. | FV(Pv; Schedule) |
 | IPMT <br><Badge text="v0.2.0"/>| Financial | Returns the interest portion of a given loan payment in a given payment period. | IPMT(Rate; Per; Nper; Pv[; Fv[; Type]]) |
 | ISPMT <br><Badge text="v0.2.0"/>| Financial | Returns the interest paid for a given period of an investment with equal principal payments. | ISPMT(Rate; Per; Nper; Value) |
+| MIRR <br><Badge text="v0.3.0"/>| Financial | Returns modified internal value for cashflows. | MIRR(Flows; FRate; RRate) |
 | NOMINAL <br><Badge text="v0.2.0"/>| Financial | Returns the nominal interest rate. | NOMINAL(Effect_rate; Npery) |
 | NPER <br><Badge text="v0.2.0"/>| Financial | Returns the number of periods for an investment assuming periodic, constant payments and a constant interest rate. | NPER(Rate; Pmt; Pv[; Fv[; Type]]) |
+| NPV <br><Badge text="v0.3.0"/>| Financial | Returns net present value. | NPV(Rate; Value1; ...; Value30) |
+| PDURATION <br><Badge text="v0.3.0"/>| Financial | Returns number of periods to reach specific value. | PDURATION(Rate; Pv; Fv) |
 | PMT <br><Badge text="v0.2.0"/>| Financial | Returns the periodic payment for a loan. | PMT(Rate; Nper; Pv[; Fv[; Type]]) |
 | PPMT <br><Badge text="v0.2.0"/>| Financial | Calculates the principal portion of a given loan payment. | PPMT(Rate; Per; Nper; Pv[; Fv[; Type]]) |
 | PV <br><Badge text="v0.2.0"/>| Financial | Returns the present value of an investment. | PV(Rate; Nper; Pmt[; Fv[; Type]]) |
@@ -140,6 +149,7 @@ lets you design your own [custom functions](custom-functions).
 | TBILLEQ <br><Badge text="v0.2.0"/>| Financial | Returns the bond-equivalent yield for a Treasury bill. | TBILLEQ(Settlement; Maturity; Discount) |
 | TBILLPRICE <br><Badge text="v0.2.0"/>| Financial | Returns the price per $100 face value for a Treasury bill. | TBILLPRICE(Settlement; Maturity; Discount) |
 | TBILLYIELD <br><Badge text="v0.2.0"/>| Financial | Returns the yield for a Treasury bill. | TBILLYIELD(Settlement; Maturity; Price) |
+| XNPV <br><Badge text="v0.3.0"/>| Financial | Returns net present value. | XNPV(Rate; Payments; Dates) |
 | AND | Logical | Returns TRUE if all arguments are TRUE. | AND(Logicalvalue1; Logicalvalue2 ...Logicalvalue30) |
 | FALSE | Logical | Returns the logical value FALSE. | FALSE() |
 | IF | Logical | Specifies a logical test to be performed. | IF(Test; Then value; Otherwisevalue) |
@@ -151,11 +161,14 @@ lets you design your own [custom functions](custom-functions).
 | TRUE | Logical | The logical value is set to TRUE. | TRUE() |
 | XOR | Logical | Returns true if an odd number of arguments evaluates to TRUE. | XOR(Logicalvalue1; Logicalvalue2 ...Logicalvalue30) |
 | CHOOSE | Lookup and reference | Uses an index to return a value from a list of up to 30 values.| CHOOSE(Index; Value1; ...; Value30) |
+| COLUMN <br><Badge text="v0.3.0"/>| Lookup and reference | Returns column number of a given reference or formula reference if argument not provided. | COLUMNS([Reference]) |
 | COLUMNS | Lookup and reference | Returns the number of columns in the given reference. | COLUMNS(Array) |
 | FORMULATEXT <br><Badge text="v0.2.0"/>| Lookup and reference | Returns a formula in a given cell as a string. | FORMULATEXT(Reference) |
+| HLOOKUP <br><Badge text="v0.3.0"/>| Lookup and reference | Searches horizontally with reference to adjacent cells to the bottom. | HLOOKUP(Search_Criterion; Array; Index; Sort_Order) |
 | INDEX | Lookup and reference | Returns the content of a cell, specified by row and column number, or an optional range name. | INDEX(Reference; Row; Column; Range) |
 | MATCH | Lookup and reference | Returns the relative position of an item in an array that matches a specified value. | MATCH(Searchcriterion; Lookuparray; Type) |
 | OFFSET | Lookup and reference | Returns the value of a cell offset by a certain number of rows and columns from a given reference point. | OFFSET(Reference; Rows; Columns; Height; Width) |
+| ROW <br><Badge text="v0.3.0"/>| Lookup and reference | Returns row number of a given reference or formula reference if argument not provided. | ROW([Reference]) |
 | ROWS | Lookup and reference | Returns the number of rows in the given reference. | ROWS(Array) |
 | VLOOKUP | Lookup and reference | Searches vertically with reference to adjacent cells to the right. | VLOOKUP(Search_Criterion; Array; Index; Sort_Order) |
 | ABS | Math and trigonometry | Returns the absolute value of a number. | ABS(Number) |
@@ -181,6 +194,21 @@ lets you design your own [custom functions](custom-functions).
 | DEGREES | Math and trigonometry | Converts radians into degrees. | DEGREES(Number) |
 | EVEN | Math and trigonometry | Rounds a positive number up to the next even integer and a negative number down to the next even integer. | EVEN(Number) |
 | EXP | Math and trigonometry | Returns e raised to the power of a number. | EXP(Number) |
+| HF.ADD <br><Badge text="v0.3.0"/>| Operator | Adds two values. | HF.ADD(Number; Number) |
+| HF.CONCAT <br><Badge text="v0.3.0"/>| Operator | Concatenates two strings. | HF.CONCAT(String; String) |
+| HF.DIVIDE <br><Badge text="v0.3.0"/>| Operator | Divides two values. | HF.DIVIDE(Number; Number) |
+| HF.EQ <br><Badge text="v0.3.0"/>| Operator | Tests two values for equality. | HF.EQ(Value; Value) |
+| HF.LTE <br><Badge text="v0.3.0"/>| Operator | Tests two values for less-equal relation. | HF.LEQ(Value; Value) |
+| HF.LT <br><Badge text="v0.3.0"/>| Operator | Tests two values for less-than relation. | HF.LT(Value; Value) |
+| HF.GTE | Operator | Tests two values for greater-equal relation. | HF.GEQ(Value; Value) |
+| HF.GT <br><Badge text="v0.3.0"/>| Operator | Tests two values for greater-than relation. | HF.GT(Value; Value) |
+| HF.MINUS <br><Badge text="v0.3.0"/>| Operator | Subtracts two values. | HF.MINUS(Number; Number) |
+| HF.MULTIPLY <br><Badge text="v0.3.0"/>| Operator | Multiplies two values. | HF.MULTIPLY(Number; Number) |
+| HF.NE <br><Badge text="v0.3.0"/>| Operator | Tests two values for inequality. | HF.NE(Value; Value) |
+| HF.POW <br><Badge text="v0.3.0"/>| Operator | Computes power of two values. | HF.POW(Number; Number) |
+| HF.UMINUS <br><Badge text="v0.3.0"/>| Operator | Negates the value. | HF.UMINUS(Number) |
+| HF.UNARY_PERCENT <br><Badge text="v0.3.0"/>| Operator | Applies percent operator. | HF.UNARY_PERCENT(Number) |
+| HF.UPLUS <br><Badge text="v0.3.0"/>| Operator | Applies unary plus. | HF.UPLUS(Number) |
 | INT | Math and trigonometry | Rounds a number down to the nearest integer. | INT(Number) |
 | LN | Math and trigonometry | Returns the natural logarithm based on the constant e of a number. | LN(Number) |
 | LOG | Math and trigonometry | Returns the logarithm of a number to the specified base. | LOG(Number; Base) |
@@ -189,6 +217,7 @@ lets you design your own [custom functions](custom-functions).
 | ODD | Math and trigonometry | Rounds a positive number up to the nearest odd integer and a negative number down to the nearest odd integer. | ODD(Number) |
 | PI | Math and trigonometry | Returns 3.14159265358979, the value of the mathematical constant PI to 14 decimal places. | PI() |
 | POWER | Math and trigonometry | Returns a number raised to another number. | POWER(Base; Exponent) |
+| PRODUCT <br><Badge text="v0.3.0"/>| Math and trigonometry | Returns product of numbers. | PRODUCT(Number1; Number2; ...; Number30) |
 | RADIANS | Math and trigonometry | Converts degrees to radians. | RADIANS(Number) |
 | RAND | Math and trigonometry | Returns a random number between 0 and 1. | RAND() |
 | ROUND | Math and trigonometry | Rounds a number to a certain number of decimal places. | ROUND(Number; Count) |
@@ -199,6 +228,7 @@ lets you design your own [custom functions](custom-functions).
 | SIN | Math and trigonometry | Returns the sine of the given angle (in radians). | SIN(Number) |
 | SINH <br><Badge text="v0.2.0"/>| Math and trigonometry | Returns the hyperbolic sine of the given value. | SINH(Number) |
 | SQRT | Math and trigonometry | Returns the positive square root of a number. | SQRT(Number) |
+| SUBTOTAL <br><Badge text="v0.3.0"/>| Math and trigonometry | Computes aggregation using function specified by number. | SUBTOTAL(Function; Number1; Number2; ... Number30) |
 | SUM | Math and trigonometry | Adds all the numbers in a range of cells. | SUM(Number1; Number2; ...; Number30) |
 | SUMIF | Math and trigonometry | Adds the cells specified by given criteria. | SUMIF(Range; Criteria; Sumrange) |
 | SUMIFS | Math and trigonometry | Returns the sum of the values of cells in a range that meets multiple criteria in multiple ranges. | SUMIFS(Sum_Range ; Criterion_range1 ; Criterion1 [ ; Criterion_range2 ; Criterion2 [;...]]) |
@@ -225,17 +255,39 @@ lets you design your own [custom functions](custom-functions).
 | MEDIAN | Statistical | Returns the median of a set of numbers. | MEDIAN(Number1; Number2; ...Number30) |
 | MIN | Statistical | Returns the minimum value in a list of arguments. | MIN(Number1; Number2; ...Number30) |
 | MINA | Statistical | Returns the minimum value in a list of arguments. | MINA(Value1; Value2; ... Value30) |
+| STDEV <br><Badge text="v0.3.0"/>| Statistical | Returns standard deviation of a sample. | STDEV(Value1; Value2; ... Value30) |
+| STDEVA <br><Badge text="v0.3.0"/>| Statistical | Returns standard deviation of a sample. | STDEVA(Value1; Value2; ... Value30) |
+| STDEVP <br><Badge text="v0.3.0"/>| Statistical | Returns standard deviation of a population. | STDEVP(Value1; Value2; ... Value30) |
+| STDEV.P <br><Badge text="v0.3.0"/>| Statistical | Returns standard deviation of a population. | STDEV.P(Value1; Value2; ... Value30) |
+| STDEVPA <br><Badge text="v0.3.0"/>| Statistical | Returns standard deviation of a population. | STDEVPA(Value1; Value2; ... Value30) |
+| STDEV.S <br><Badge text="v0.3.0"/>| Statistical | Returns standard deviation of a sample. | STDEV.S(Value1; Value2; ... Value30) |
+| VAR <br><Badge text="v0.3.0"/>| Statistical | Returns variance of a sample. | VAR(Value1; Value2; ... Value30) |
+| VARA <br><Badge text="v0.3.0"/>| Statistical | Returns variance of a sample. | VARA(Value1; Value2; ... Value30) |
+| VARP <br><Badge text="v0.3.0"/>| Statistical | Returns variance of a population. | VARP(Value1; Value2; ... Value30) |
+| VAR.P <br><Badge text="v0.3.0"/>| Statistical | Returns variance of a population. | VAR.P(Value1; Value2; ... Value30) |
+| VARPA <br><Badge text="v0.3.0"/>| Statistical | Returns variance of a population. | VARPA(Value1; Value2; ... Value30) |
+| VAR.S <br><Badge text="v0.3.0"/>| Statistical | Returns variance of a sample. | VAR.S(Value1; Value2; ... Value30) |
 | CHAR | Text | Converts a number into a character according to the current code table. | CHAR(Number) |
+| CLEAN <br><Badge text="v0.2.0"/>| Text | Returns text that has been "cleaned" of line breaks and other non-printable characters. | CLEAN("Text") |
+| CLEAN | Text | Returns text that has been "cleaned" of line breaks and other non-printable characters. | CLEAN("Text") |
 | CODE | Text | Returns a numeric code for the first character in a text string. | CODE("Text") |
 | CONCATENATE | Text | Combines several text strings into one string. | CONCATENATE("Text1"; ...; "Text30") |
-| SPLIT | Text | Divides text around a specified character or string, and puts each fragment into a separate cell in the row. | SPLIT(Text, Delimiter, [Split_by_each], [Remove_empty_text]) |
-| TEXT | Text | Converts a number into text according to a given format. | TEXT(Number; Format) |
+| EXACT <br><Badge text="v0.3.0"/> | Text | Returns TRUE if both text strings are exactly the same. | EXACT(Text; Text) |
+| FIND <br><Badge text="v0.2.0"/>| Text | Returns the location of one text string inside another. | FIND( "Text1"; "Text2"[; Number]) |
+| LEFT <br><Badge text="v0.2.0"/>| Text | Extracts a given number of characters from the left side of a text string. | LEFT("Text"; Number) |
 | LEN <br><Badge text="v0.2.0"/>| Text | Returns length of a given text. | LEN("Text") |
-| TRIM <br><Badge text="v0.2.0"/>| Text | Strips extra spaces from text. | TRIM("Text") |
+| LOWER <br><Badge text="v0.3.0"/>| Text | Returns text converted to lowercase. | LOWER(Text) |
+| MID <br><Badge text="v0.3.0"/>| Text | Returns substring of a given length starting from Start_position. | MID(Text, Start_position, Length) |
 | PROPER <br><Badge text="v0.2.0"/>| Text | Capitalizes words given text string. | PROPER("Text") |
-| CLEAN <br><Badge text="v0.2.0"/>| Text | Returns text that has been "cleaned" of line breaks and other non-printable characters. | CLEAN("Text") |
+| REPLACE <br><Badge text="v0.3.0"/>| Text | Replaces substring of a text of a given length that starts at given position. | REPLACE(Text; Start_position; Length; New_text) |
 | REPT <br><Badge text="v0.2.0"/>| Text | Repeats text a given number of times. | REPT("Text"; Number) |
 | RIGHT <br><Badge text="v0.2.0"/>| Text | Extracts a given number of characters from the right side of a text string. | RIGHT("Text"; Number) |
-| LEFT <br><Badge text="v0.2.0"/>| Text | Extracts a given number of characters from the left side of a text string. | LEFT("Text"; Number) |
 | SEARCH <br><Badge text="v0.2.0"/>| Text | Returns the location of one text string inside another. (Allows the use of wildcards.) | SEARCH( "Text1"; "Text2"[; Number]) |
-| FIND <br><Badge text="v0.2.0"/>| Text | Returns the location of one text string inside another. | FIND( "Text1"; "Text2"[; Number]) |
+| SPLIT | Text | Divides text around a specified character or string, and puts each fragment into a separate cell in the row. | SPLIT(Text, Delimiter, [Split_by_each], [Remove_empty_text]) |
+| SUBSTITUTE <br><Badge text="v0.3.0"/>| Text | Returns string where occurrences of Old_text are replaced by New_text. Replaces only specific occurrence if last parameter is provided.  | SUBSTITUTE(Text; Old_text; New_text; [Occurrence]) |
+| T <br><Badge text="v0.3.0"/>| Text | Returns text if given value is text, empty string otherwise. | T(Value) |
+| TEXT | Text | Converts a number into text according to a given format. | TEXT(Number; Format) |
+| TRIM <br><Badge text="v0.2.0"/>| Text | Strips extra spaces from text. | TRIM("Text") |
+| UNICHAR <br><Badge text="v0.3.0"/>| Text | Returns the character created by using provided code point. | UNICHAR(Number) |
+| UNICODE <br><Badge text="v0.3.0"/>| Text | Returns the Unicode code point of a first character of a text. | UNICODE(Text) |
+| UPPER <br><Badge text="v0.3.0"/>| Text | Returns text converted to uppercase. | UPPER(Text) |

@@ -7,7 +7,7 @@ describe('Function PI', () => {
   it('wrong number of arguments', () => {
     const engine = HyperFormula.buildFromArray([['=PI(1)']])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
   })
   it('should return PI with proper precision', () => {
     const engine = HyperFormula.buildFromArray([
