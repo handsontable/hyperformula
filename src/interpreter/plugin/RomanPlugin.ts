@@ -20,7 +20,7 @@ export class RomanPlugin extends FunctionPlugin {
     'ARABIC': {
       method: 'arabic',
       parameters: [
-        { argumentType: ArgumentTypes.STRING},
+        { argumentType: ArgumentTypes.STRING },
       ],
     },
   }
@@ -177,4 +177,3 @@ function absorb(val: number, acc: string, token: string, lower: number, upper: n
     return [val, acc]
   }
 }
-
