@@ -246,7 +246,16 @@ const dictionary: RawTranslationPackage = {
     VARP: 'VARP',
     VAR: 'VAR',
     STDEVP: 'STDEVP',
-    STDEV: 'STDEV'
+    STDEV: 'STDEV',
+    'EXPON.DIST': 'EXPON.DIST',
+    FISHER: 'FISHER',
+    FISHERINV: 'FISHERINV',
+    GAMMA: 'GAMMA',
+    'GAMMA.DIST': 'GAMMA.DIST',
+    GAMMALN: 'GAMMALN',
+    'GAMMALN.PRECISE': 'GAMMALN.PRECISE',
+    'GAMMA.INV': 'GAMMA.INV',
+    GAUSS: 'GAUSS',
   },
   langCode: 'enGB',
   ui: {
