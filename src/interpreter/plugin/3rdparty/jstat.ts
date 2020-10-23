@@ -86,7 +86,7 @@ export function gammafn(x: number): number {
     return Infinity;
   }
   if (y <= 0) {
-    res = y % 1 + 3.6e-16;
+    res = y % 1;
     if (res) {
       fact = (!(y & 1) ? 1 : -1) * Math.PI / Math.sin(Math.PI * res);
       y = 1 - y;

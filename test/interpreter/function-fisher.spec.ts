@@ -4,7 +4,6 @@ import {ErrorMessage} from '../../src/error-message'
 import {adr, detailedError} from '../testUtils'
 
 describe('Function FISHER', () => {
-
   it('should return error for wrong number of arguments', () => {
     const engine = HyperFormula.buildFromArray([
       ['=FISHER()'],
