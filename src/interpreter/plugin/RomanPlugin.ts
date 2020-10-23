@@ -52,136 +52,134 @@ export class RomanPlugin extends FunctionPlugin {
 
   public arabic(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.runFunction(ast.args, formulaAddress, this.metadata('ARABIC'),
-      (input: string) => {
-        input = input.trim().toUpperCase()
+      (inputString: string) => {
+        inputString = inputString.trim().toUpperCase()
         let minusSign = false
-        if(input.startsWith('-')) {
-          input = input.slice(1)
+        if(inputString.startsWith('-')) {
+          inputString = inputString.slice(1)
           minusSign = true
-          if(input==='') {
+          if(inputString==='') {
             return new CellError(ErrorType.VALUE, ErrorMessage.InvalidRoman)
           }
         }
-        let ans = 0;
-        [input, ans] = eatToken(input, ans,
+        const work = {input: inputString, acc: 0}
+        eatToken(work,
           {token: 'MMM', val: 3000},
           {token: 'MM', val: 2000},
           {token: 'M', val: 1000},
-          );
-        [input, ans] = eatToken(input, ans,
+        )
+        eatToken(work,
           {token: 'IM', val: 999},
           {token: 'VM', val: 995},
           {token: 'XM', val: 990},
           {token: 'LM', val: 950},
           {token: 'CM', val: 900},
-          );
-        [input, ans] = eatToken(input, ans,
+        )
+        eatToken(work,
           {token: 'D', val: 500},
           {token: 'ID', val: 499},
           {token: 'VD', val: 495},
           {token: 'XD', val: 490},
           {token: 'LD', val: 450},
           {token: 'CD', val: 400},
-          );
-        [input, ans] = eatToken(input, ans,
+        )
+        eatToken(work,
           {token: 'CCC', val: 300},
           {token: 'CC', val: 200},
           {token: 'C', val: 100},
-          );
-        [input, ans] = eatToken(input, ans,
+        )
+        eatToken(work,
           {token: 'IC', val: 99},
           {token: 'VC', val: 95},
           {token: 'XC', val: 90},
-          );
-        [input, ans] = eatToken(input, ans,
+        )
+        eatToken(work,
           {token: 'L', val: 50},
           {token: 'IL', val: 49},
           {token: 'VL', val: 45},
           {token: 'XL', val: 40},
-        );
-        [input, ans] = eatToken(input, ans,
+        )
+        eatToken(work,
           {token: 'XXX', val: 30},
           {token: 'XX', val: 20},
           {token: 'X', val: 10},
-          );
-        [input, ans] = eatToken(input, ans, {token: 'IX', val: 9});
-        [input, ans] = eatToken(input, ans,
+        )
+        eatToken(work, {token: 'IX', val: 9});
+        eatToken(work,
           {token: 'V', val: 5},
           {token: 'IV', val: 4},
-          );
-        [input, ans] = eatToken(input, ans,
+        )
+        eatToken(work,
           {token: 'III', val: 3},
           {token: 'II', val: 2},
           {token: 'I', val: 1},
-          )
-        if(input !== '') {
+        )
+        if(work.input !== '') {
           return new CellError(ErrorType.VALUE, ErrorMessage.InvalidRoman)
         } else {
-          return (minusSign?-1:1) * ans
+          return minusSign?-work.acc:work.acc
         }
       }
     )
   }
 }
 
-function eatToken(input: string, acc: number, ...tokens: {token: string, val: number}[]): [string, number] {
+function eatToken(inputAcc: {input: string, acc: number}, ...tokens: {token: string, val: number}[]) {
   for(const token of tokens) {
-    if(input.startsWith(token.token)) {
-      return [input.slice(token.token.length), acc+token.val]
+    if(inputAcc.input.startsWith(token.token)) {
+      inputAcc.input = inputAcc.input.slice(token.token.length)
+      inputAcc.acc += token.val
+      break
     }
   }
-  return [input, acc]
 }
 
-function romanMode(val: number, mode: number): string {
-  let ret = ''
-  ret += 'M'.repeat(Math.floor(val/1000))
-  val %= 1000
+function romanMode(input: number, mode: number): string {
+  const work = {val: input%1000, acc: 'M'.repeat(Math.floor(input/1000))}
   if(mode===4) {
-    [val, ret] = absorb(val, ret, 'IM', 999, 1000);
-    [val, ret] = absorb(val, ret, 'ID', 499, 500)
+    absorb(work, 'IM', 999, 1000);
+    absorb(work, 'ID', 499, 500)
   }
   if(mode>=3) {
-    [val, ret] = absorb(val, ret, 'VM', 995, 1000);
-    [val, ret] = absorb(val, ret, 'VD', 495, 500)
+    absorb(work, 'VM', 995, 1000);
+    absorb(work, 'VD', 495, 500)
   }
   if(mode>=2) {
-    [val, ret] = absorb(val, ret, 'XM', 990, 1000);
-    [val, ret] = absorb(val, ret, 'XD', 490, 500)
+    absorb(work, 'XM', 990, 1000);
+    absorb(work, 'XD', 490, 500)
   }
   if(mode>=1) {
-    [val, ret] = absorb(val, ret, 'LM', 950, 1000);
-    [val, ret] = absorb(val, ret, 'LD', 450, 500)
+    absorb(work, 'LM', 950, 1000);
+    absorb(work, 'LD', 450, 500)
   }
-  [val, ret] = absorb(val, ret, 'CM', 900, 1000);
-  [val, ret] = absorb(val, ret, 'CD', 400, 500);
-  [val, ret] = absorb(val, ret, 'D', 500, 900)
-  ret += 'C'.repeat(Math.floor(val/100))
-  val %= 100
+  absorb(work, 'CM', 900, 1000);
+  absorb(work, 'CD', 400, 500);
+  absorb(work, 'D', 500, 900)
+  work.acc += 'C'.repeat(Math.floor(work.val/100))
+  work.val %= 100
   if(mode>=2) {
-    [val, ret] = absorb(val, ret, 'IC', 99, 100);
-    [val, ret] = absorb(val, ret, 'IL', 49, 50)
+    absorb(work, 'IC', 99, 100);
+    absorb(work, 'IL', 49, 50)
   }
   if(mode>=1) {
-    [val, ret] = absorb(val, ret, 'VC', 95, 100);
-    [val, ret] = absorb(val, ret, 'VL', 45, 50)
+    absorb(work, 'VC', 95, 100);
+    absorb(work, 'VL', 45, 50)
   }
-  [val, ret] = absorb(val, ret, 'XC', 90, 100);
-  [val, ret] = absorb(val, ret, 'XL', 40, 50);
-  [val, ret] = absorb(val, ret, 'L', 50, 90)
-  ret += 'X'.repeat(Math.floor(val/10))
-  val %= 10;
-  [val, ret] = absorb(val, ret, 'IX', 9, 10);
-  [val, ret] = absorb(val, ret, 'IV', 4, 5);
-  [val, ret] = absorb(val, ret, 'V', 5, 9)
-  ret += 'I'.repeat(val)
-  return ret
+  absorb(work, 'XC', 90, 100);
+  absorb(work, 'XL', 40, 50);
+  absorb(work, 'L', 50, 90)
+  work.acc += 'X'.repeat(Math.floor(work.val/10))
+  work.val %= 10;
+  absorb(work, 'IX', 9, 10);
+  absorb(work, 'IV', 4, 5);
+  absorb(work, 'V', 5, 9)
+  work.acc += 'I'.repeat(work.val)
+  return work.acc
 }
 
-function absorb(val: number, acc: string, token: string, lower: number, upper: number): [number, string] {
-  if(val>=lower && val<upper) {
-    return [val-lower, acc+token]
-  } else {
-    return [val, acc]
+function absorb(valAcc: {val: number, acc: string}, token: string, lower: number, upper: number) {
+  if(valAcc.val>=lower && valAcc.val<upper) {
+    valAcc.val -= lower
+    valAcc.acc += token
   }
 }
