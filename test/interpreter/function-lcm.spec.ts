@@ -52,6 +52,7 @@ describe('Function LCM', () => {
       ['=LCM(1000000,1000001,1000002,1000003)'],
     ])
 
+    //inconsistency with product #1
     expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.ValueLarge))
   })
 

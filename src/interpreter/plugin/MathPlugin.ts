@@ -180,6 +180,7 @@ export class MathPlugin extends FunctionPlugin {
           ret = binaryGCD(ret, Math.trunc(val))
         }
         if(ret>Number.MAX_SAFE_INTEGER) {
+          //inconsistency with product #1
           return new CellError(ErrorType.NUM, ErrorMessage.ValueLarge)
         }
         return ret
@@ -202,6 +203,7 @@ export class MathPlugin extends FunctionPlugin {
           ret = binaryLCM(ret, Math.trunc(val))
         }
         if(ret>Number.MAX_SAFE_INTEGER) {
+          //inconsistency with product #1
           return new CellError(ErrorType.NUM, ErrorMessage.ValueLarge)
         }
         return ret

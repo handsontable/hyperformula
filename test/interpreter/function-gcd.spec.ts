@@ -86,6 +86,7 @@ describe('Function GCD', () => {
       ['=GCD(1000000000000000000.0)'],
     ])
 
+    //inconsistency with product #1
     expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.ValueLarge))
   })
 
