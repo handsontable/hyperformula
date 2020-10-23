@@ -140,7 +140,7 @@ export class MathPlugin extends FunctionPlugin {
     return this.runFunction(ast.args, formulaAddress, this.metadata('COMBIN'),
       (n: number, m: number) => {
         if(m>n) {
-          return new CellError(ErrorType.NUM, ErrorMessage.ValueLarge)
+          return new CellError(ErrorType.NUM, ErrorMessage.WrongOrder)
         }
         n = Math.trunc(n)
         m = Math.trunc(m)
