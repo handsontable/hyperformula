@@ -176,6 +176,7 @@ lets you design your own [custom functions](custom-functions).
 | ACOSH <br><Badge text="v0.2.0"/>| Math and trigonometry | Returns the inverse harmonic cosine of a number. | ACOSH(Number) |
 | ACOT <br><Badge text="v0.2.0"/>| Math and trigonometry | Returns the inverse trigonometric cotangent of a number. | ACOT(Number) |
 | ACOTH <br><Badge text="v0.2.0"/>| Math and trigonometry | Returns the inverse harmonic cotangent of a number. | ACOTH(Number) |
+| ARABIC | Math and trigonometry | Converts number from roman form. | ARABIC(String) |
 | ASIN | Math and trigonometry | Returns the inverse trigonometric sine of a number. | ASIN(Number) |
 | ASINH <br><Badge text="v0.2.0"/>| Math and trigonometry | Returns the inverse harmonic sine of a number. | ASINH(Number) |
 | ATAN | Math and trigonometry | Returns the inverse trigonometric tangent of a number. | ATAN(Number) |
@@ -183,6 +184,8 @@ lets you design your own [custom functions](custom-functions).
 | ATANH <br><Badge text="v0.2.0"/>| Math and trigonometry | Returns the inverse harmonic tangent of a number. | ATANH(Number) |
 | BASE | Math and trigonometry | Converts a positive integer to a specified base into a text from the numbering system. | BASE(Number; Radix; [Minimumlength]) |
 | CEILING | Math and trigonometry | Rounds a number up to the nearest multiple of Significance. | CEILING(Number; Significance; Mode) |
+| COMBIN | Math and trigonometry | Returns number of combinations (without repetitions). | COMBIN(Number; Number) |
+| COMBINA | Math and trigonometry | Returns number of combinations (with repetitions). | COMBINA(Number; Number) |
 | COS | Math and trigonometry | Returns the cosine of the given angle (in radians). | COS(Number) |
 | COSH <br><Badge text="v0.2.0"/>| Math and trigonometry | Returns the hyperbolic cosine of the given value. | COSH(Number) |
 | COT | Math and trigonometry | Returns the cotangent of the given angle (in radians). | COT(Number) |
@@ -193,7 +196,55 @@ lets you design your own [custom functions](custom-functions).
 | DECIMAL | Math and trigonometry | Converts text with characters from a number system to a positive integer in the base radix given. | DECIMAL("Text"; Radix) |
 | DEGREES | Math and trigonometry | Converts radians into degrees. | DEGREES(Number) |
 | EVEN | Math and trigonometry | Rounds a positive number up to the next even integer and a negative number down to the next even integer. | EVEN(Number) |
-| EXP | Math and trigonometry | Returns e raised to the power of a number. | EXP(Number) |
+| EXP | Math and trigonometry | Returns constant e raised to the power of a number. | EXP(Number) |
+| FACT | Math and trigonometry | Returns a factorial of a number. | FACT(Number) |
+| FACTDOUBLE | Math and trigonometry | Returns a double factorial of a number. | FACTDOUBLE(Number) |
+| GCD | Math and trigonometry | Computes greatest common divisor of numbers. | GCD(Number1; Number2; ...) |
+| INT | Math and trigonometry | Rounds a number down to the nearest integer. | INT(Number) |
+| LCM | Math and trigonometry | Computes least common multiplicity of numbers. | LCM(Number1; Number2; ...) |
+| LN | Math and trigonometry | Returns the natural logarithm based on the constant e of a number. | LN(Number) |
+| LOG | Math and trigonometry | Returns the logarithm of a number to the specified base. | LOG(Number; Base) |
+| LOG10 | Math and trigonometry | Returns the base-10 logarithm of a number. | LOG10(Number) |
+| MOD | Math and trigonometry | Returns the remainder when one integer is divided by another. | MOD(Dividend; Divisor) |
+| MROUND | Math and trigonometry | Rounds number to the neares multiplicity. | MROUND(Number; Base) |
+| MULTINOMIAL | Math and trigonometry. | Returns number of multiset combinations. | MULTINOMIAL(Number1; Number2; ...) |
+| ODD | Math and trigonometry | Rounds a positive number up to the nearest odd integer and a negative number down to the nearest odd integer. | ODD(Number) |
+| PI | Math and trigonometry | Returns 3.14159265358979, the value of the mathematical constant PI to 14 decimal places. | PI() |
+| POWER | Math and trigonometry | Returns a number raised to another number. | POWER(Base; Exponent) |
+| PRODUCT | Math and trigonometry | Returns product of numbers. | PRODUCT(Number1; Number2; ...; Number30) |
+| PRODUCT <br><Badge text="v0.3.0"/>| Math and trigonometry | Returns product of numbers. | PRODUCT(Number1; Number2; ...; Number30) |
+| QUOTIENT | Math and trigonometry | Returns integer part of a division. | QUOTIENT(Dividend; Divisor) |
+| RADIANS | Math and trigonometry | Converts degrees to radians. | RADIANS(Number) |
+| RAND | Math and trigonometry | Returns a random number between 0 and 1. | RAND() |
+| RANDBETWEEN | Math and trigonometry | Returns a random integer between two numbers. | RAND(Lowerbound; Upperbound) |
+| ROMAN | Math and trigonometry | Converts number to roman form. | ROMAN(Number[; Mode]) |
+| ROUND | Math and trigonometry | Rounds a number to a certain number of decimal places. | ROUND(Number; Count) |
+| ROUNDDOWN | Math and trigonometry | Rounds a number down, toward zero, to a certain precision. | ROUNDDOWN(Number; Count) |
+| ROUNDUP | Math and trigonometry | Rounds a number up, away from zero, to a certain precision. | ROUNDUP(Number; Count) |
+| SEC <br><Badge text="v0.2.0"/>| Math and trigonometry | Returns the secans of the given angle (in radians). | SEC(Number) |
+| SECH <br><Badge text="v0.2.0"/>| Math and trigonometry | Returns the hyperbolic secans of the given value. | SEC(Number) |
+| SERIESSUM | Math and trigonometry | Evaluates series at a point. | SERIESSUM(Number; Number; Number; Coefficients)
+| SIN | Math and trigonometry | Returns the sine of the given angle (in radians). | SIN(Number) |
+| SINH <br><Badge text="v0.2.0"/>| Math and trigonometry | Returns the hyperbolic sine of the given value. | SINH(Number) |
+| SIGN | Math and trigonometry | Returns sign of a number. | SIGN(Number) |
+| SQRT | Math and trigonometry | Returns the positive square root of a number. | SQRT(Number) |
+| SQRTPI | Math and trigonometry | Returns sqrt of number times pi. | SQRTPI(Number) |
+| SUBTOTAL <br><Badge text="v0.3.0"/>| Math and trigonometry | Computes aggregation using function specified by number. | SUBTOTAL(Function; Number1; Number2; ... Number30) |
+| SUM | Math and trigonometry | Adds all the numbers in a range of cells. | SUM(Number1; Number2; ...; Number30) |
+| SUMIF | Math and trigonometry | Adds the cells specified by given criteria. | SUMIF(Range; Criteria; Sumrange) |
+| SUMIFS | Math and trigonometry | Returns the sum of the values of cells in a range that meets multiple criteria in multiple ranges. | SUMIFS(Sum_Range ; Criterion_range1 ; Criterion1 [ ; Criterion_range2 ; Criterion2 [;...]]) |
+| SUMPRODUCT | Math and trigonometry | Multiplies corresponding elements in the given arrays, and returns the sum of those products. | SUMPRODUCT(Array1; Array2...Array30) |
+| SUMSQ | Math and trigonometry | Returns the sum of the squares of the arguments | SUMSQ(Number1; Number2; ...; Number30) |
+| SUMX2MY2 | Math and trigonometry | Returns the sum of the square differences. | SUMX2MY2(Range1; Range2) |
+| SUMX2PY2 | Math and trigonometry | Returns the sum of the square sums. | SUMX2PY2(Range1; Range2) |
+| SUMXMY2 | Math and trigonometry | Returns the sum of the square of differences. | SUMXMY2(Range1; Range2) |
+| TAN | Math and trigonometry | Returns the tangent of the given angle (in radians). | TAN(Number) |
+| TANH <br><Badge text="v0.2.0"/>| Math and trigonometry | Returns the hyperbolic tangent of the given value. | TANH(Number) |
+| TRUNC | Math and trigonometry | Truncates a number by removing decimal places. | TRUNC(Number; Count) |
+| MMULT | Matrix functions | Calculates the array product of two arrays. | MMULT(Array; Array) |
+| MEDIANPOOL | Matrix functions | Calculates a smaller range which is a median of a Window_size, in a given Range, for every Stride element. | MEDIANPOOL(Range, Window_size, Stride) |
+| MAXPOOL | Matrix functions | Calculates a smaller range which is a maximum of a Window_size, in a given Range, for every Stride element. | MAXPOOL(Range, Window_size, Stride) |
+| TRANSPOSE | Matrix functions | Transposes the rows and columns of an array. | TRANSPOSE(Array) |
 | HF.ADD <br><Badge text="v0.3.0"/>| Operator | Adds two values. | HF.ADD(Number; Number) |
 | HF.CONCAT <br><Badge text="v0.3.0"/>| Operator | Concatenates two strings. | HF.CONCAT(String; String) |
 | HF.DIVIDE <br><Badge text="v0.3.0"/>| Operator | Divides two values. | HF.DIVIDE(Number; Number) |
@@ -209,38 +260,6 @@ lets you design your own [custom functions](custom-functions).
 | HF.UMINUS <br><Badge text="v0.3.0"/>| Operator | Negates the value. | HF.UMINUS(Number) |
 | HF.UNARY_PERCENT <br><Badge text="v0.3.0"/>| Operator | Applies percent operator. | HF.UNARY_PERCENT(Number) |
 | HF.UPLUS <br><Badge text="v0.3.0"/>| Operator | Applies unary plus. | HF.UPLUS(Number) |
-| INT | Math and trigonometry | Rounds a number down to the nearest integer. | INT(Number) |
-| LN | Math and trigonometry | Returns the natural logarithm based on the constant e of a number. | LN(Number) |
-| LOG | Math and trigonometry | Returns the logarithm of a number to the specified base. | LOG(Number; Base) |
-| LOG10 | Math and trigonometry | Returns the base-10 logarithm of a number. | LOG10(Number) |
-| MOD | Math and trigonometry | Returns the remainder when one integer is divided by another. | MOD(Dividend; Divisor) |
-| ODD | Math and trigonometry | Rounds a positive number up to the nearest odd integer and a negative number down to the nearest odd integer. | ODD(Number) |
-| PI | Math and trigonometry | Returns 3.14159265358979, the value of the mathematical constant PI to 14 decimal places. | PI() |
-| POWER | Math and trigonometry | Returns a number raised to another number. | POWER(Base; Exponent) |
-| PRODUCT <br><Badge text="v0.3.0"/>| Math and trigonometry | Returns product of numbers. | PRODUCT(Number1; Number2; ...; Number30) |
-| RADIANS | Math and trigonometry | Converts degrees to radians. | RADIANS(Number) |
-| RAND | Math and trigonometry | Returns a random number between 0 and 1. | RAND() |
-| ROUND | Math and trigonometry | Rounds a number to a certain number of decimal places. | ROUND(Number; Count) |
-| ROUNDDOWN | Math and trigonometry | Rounds a number down, toward zero, to a certain precision. | ROUNDDOWN(Number; Count) |
-| ROUNDUP | Math and trigonometry | Rounds a number up, away from zero, to a certain precision. | ROUNDUP(Number; Count) |
-| SEC <br><Badge text="v0.2.0"/>| Math and trigonometry | Returns the secans of the given angle (in radians). | SEC(Number) |
-| SECH <br><Badge text="v0.2.0"/>| Math and trigonometry | Returns the hyperbolic secans of the given value. | SEC(Number) |
-| SIN | Math and trigonometry | Returns the sine of the given angle (in radians). | SIN(Number) |
-| SINH <br><Badge text="v0.2.0"/>| Math and trigonometry | Returns the hyperbolic sine of the given value. | SINH(Number) |
-| SQRT | Math and trigonometry | Returns the positive square root of a number. | SQRT(Number) |
-| SUBTOTAL <br><Badge text="v0.3.0"/>| Math and trigonometry | Computes aggregation using function specified by number. | SUBTOTAL(Function; Number1; Number2; ... Number30) |
-| SUM | Math and trigonometry | Adds all the numbers in a range of cells. | SUM(Number1; Number2; ...; Number30) |
-| SUMIF | Math and trigonometry | Adds the cells specified by given criteria. | SUMIF(Range; Criteria; Sumrange) |
-| SUMIFS | Math and trigonometry | Returns the sum of the values of cells in a range that meets multiple criteria in multiple ranges. | SUMIFS(Sum_Range ; Criterion_range1 ; Criterion1 [ ; Criterion_range2 ; Criterion2 [;...]]) |
-| SUMPRODUCT | Math and trigonometry | Multiplies corresponding elements in the given arrays, and returns the sum of those products. | SUMPRODUCT(Array1; Array2...Array30) |
-| SUMSQ | Math and trigonometry | Returns the sum of the squares of the arguments | SUMSQ(Number1; Number2; ...; Number30) |
-| TAN | Math and trigonometry | Returns the tangent of the given angle (in radians). | TAN(Number) |
-| TANH <br><Badge text="v0.2.0"/>| Math and trigonometry | Returns the hyperbolic tangent of the given value. | TANH(Number) |
-| TRUNC | Math and trigonometry | Truncates a number by removing decimal places. | TRUNC(Number; Count) |
-| MMULT | Matrix functions | Calculates the array product of two arrays. | MMULT(Array; Array) |
-| MEDIANPOOL | Matrix functions | Calculates a smaller range which is a median of a Window_size, in a given Range, for every Stride element. | MEDIANPOOL(Range, Window_size, Stride) |
-| MAXPOOL | Matrix functions | Calculates a smaller range which is a maximum of a Window_size, in a given Range, for every Stride element. | MAXPOOL(Range, Window_size, Stride) |
-| TRANSPOSE | Matrix functions | Transposes the rows and columns of an array. | TRANSPOSE(Array) |
 | AVERAGE | Statistical | Returns the average of the arguments. | AVERAGE(Number1; Number2; ...Number30) |
 | AVERAGEA | Statistical | Returns the average of the arguments. | AVERAGEA(Value1; Value2; ... Value30) |
 | AVERAGEIF | Statistical | Returns the arithmetic mean of all cells in a range that satisfy a given condition. | AVERAGEIF(Range; Criterion [; Average_Range ]) |
