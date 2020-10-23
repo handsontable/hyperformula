@@ -65,8 +65,9 @@ describe('Function MROUND', () => {
   /**
    * Tests below are results of how floating point arithmetic works.
    * This behavior is undefined, and this is test for consistency between platforms.
+   * If this test starts throwing errors, it should be disabled.
    */
-  xit('known limitations', () => {
+  it('known limitations', () => {
     const engine = HyperFormula.buildFromArray([
       ['=MROUND(6.05, 0.1)'],
       ['=MROUND(7.05, 0.1)'],
