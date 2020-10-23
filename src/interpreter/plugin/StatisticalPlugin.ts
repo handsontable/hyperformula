@@ -73,7 +73,7 @@ export class StatisticalPlugin extends  FunctionPlugin {
     'GAMMA.INV': {
       method: 'gammainv',
       parameters: [
-        {argumentType: ArgumentTypes.NUMBER, minValue: 0, maxValue: 1},
+        {argumentType: ArgumentTypes.NUMBER, minValue: 0, lessThan: 1},
         {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
         {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
       ]
@@ -146,7 +146,7 @@ export class StatisticalPlugin extends  FunctionPlugin {
   }
 
   public gammainv(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('GAMMALN'), gamma.inv)
+    return this.runFunction(ast.args, formulaAddress, this.metadata('GAMMA.INV'), gamma.inv)
   }
 
   public gauss(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
