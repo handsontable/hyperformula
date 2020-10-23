@@ -269,6 +269,18 @@ lets you design your own [custom functions](custom-functions).
 | COUNTBLANK | Statistical | Returns the number of empty cells. | COUNTBLANK(Range) |
 | COUNTIF | Statistical | Returns the number of cells that meet with certain criteria within a cell range. | COUNTIF(Range; Criteria) |
 | COUNTIFS | Statistical | Returns the count of rows or columns that meet criteria in multiple ranges. | COUNTIFS(Range1; Criterion1 [; Range2; Criterion2 [; ...]]) |
+| EXPON.DIST | Statistical | Returns density of a exponential distribution. | EXPON.DIST(Number1; Number2; Boolean) |
+| EXPONDIST | Statistical | Returns density of a exponential distribution. | EXPONDIST(Number1; Number2; Boolean) |
+| FISHER | Statistical | Returns Fisher transformation value. | FISHER(Number) |
+| FISHERINV | Statistical | Returns inverse Fischer transformation value. | FISHERINV(Number) |
+| GAMMA | Statistical | Returns value of Gamma function. | GAMMA(Number) |
+| GAMMA.DIST | Statistical | Returns density of Gamma distribution. | GAMMA.DIST(Number1; Number2; Number3; Boolean) |
+| GAMMADIST | Statistical | Returns density of Gamma distribution. | GAMMADIST(Number1; Number2; Number3; Boolean) |
+| GAMMALN | Statistical | Returns natural logarithm of Gamma function. | GAMMALN(Number) |
+| GAMMALN.PRECISE | Statistical | Returns natural logarithm of Gamma function. | GAMMALN.PRECISE(Number) |
+| GAMMA.INV | Statistical | Returns inverse Gamma distribution value. | GAMMA.INV(Number1; Number2; Number3) |
+| GAMMAINV | Statistical | Returns inverse Gamma distribution value. | GAMMAINV(Number1; Number2; Number3) |
+| GAUSS | Statistical | Returns the probability of Gaussian variable fall more than this many times standard deviation from mean. | GAUSS(Number) |
 | MAX | Statistical | Returns the maximum value in a list of arguments. | MAX(Number1; Number2; ...Number30) |
 | MAXA | Statistical | Returns the maximum value in a list of arguments. | MAXA(Value1; Value2; ... Value30) |
 | MEDIAN | Statistical | Returns the median of a set of numbers. | MEDIAN(Number1; Number2; ...Number30) |
