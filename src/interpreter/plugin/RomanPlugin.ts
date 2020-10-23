@@ -104,7 +104,7 @@ export class RomanPlugin extends FunctionPlugin {
           {token: 'XX', val: 20},
           {token: 'X', val: 10},
         )
-        eatToken(work, {token: 'IX', val: 9});
+        eatToken(work, {token: 'IX', val: 9})
         eatToken(work,
           {token: 'V', val: 5},
           {token: 'IV', val: 4},
@@ -137,41 +137,41 @@ function eatToken(inputAcc: {input: string, acc: number}, ...tokens: {token: str
 function romanMode(input: number, mode: number): string {
   const work = {val: input%1000, acc: 'M'.repeat(Math.floor(input/1000))}
   if(mode===4) {
-    absorb(work, 'IM', 999, 1000);
+    absorb(work, 'IM', 999, 1000)
     absorb(work, 'ID', 499, 500)
   }
   if(mode>=3) {
-    absorb(work, 'VM', 995, 1000);
+    absorb(work, 'VM', 995, 1000)
     absorb(work, 'VD', 495, 500)
   }
   if(mode>=2) {
-    absorb(work, 'XM', 990, 1000);
+    absorb(work, 'XM', 990, 1000)
     absorb(work, 'XD', 490, 500)
   }
   if(mode>=1) {
-    absorb(work, 'LM', 950, 1000);
+    absorb(work, 'LM', 950, 1000)
     absorb(work, 'LD', 450, 500)
   }
-  absorb(work, 'CM', 900, 1000);
-  absorb(work, 'CD', 400, 500);
+  absorb(work, 'CM', 900, 1000)
+  absorb(work, 'CD', 400, 500)
   absorb(work, 'D', 500, 900)
   work.acc += 'C'.repeat(Math.floor(work.val/100))
   work.val %= 100
   if(mode>=2) {
-    absorb(work, 'IC', 99, 100);
+    absorb(work, 'IC', 99, 100)
     absorb(work, 'IL', 49, 50)
   }
   if(mode>=1) {
-    absorb(work, 'VC', 95, 100);
+    absorb(work, 'VC', 95, 100)
     absorb(work, 'VL', 45, 50)
   }
-  absorb(work, 'XC', 90, 100);
-  absorb(work, 'XL', 40, 50);
+  absorb(work, 'XC', 90, 100)
+  absorb(work, 'XL', 40, 50)
   absorb(work, 'L', 50, 90)
   work.acc += 'X'.repeat(Math.floor(work.val/10))
-  work.val %= 10;
-  absorb(work, 'IX', 9, 10);
-  absorb(work, 'IV', 4, 5);
+  work.val %= 10
+  absorb(work, 'IX', 9, 10)
+  absorb(work, 'IV', 4, 5)
   absorb(work, 'V', 5, 9)
   work.acc += 'I'.repeat(work.val)
   return work.acc
