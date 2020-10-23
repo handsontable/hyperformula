@@ -14,13 +14,13 @@ export class MathPlugin extends FunctionPlugin {
     'FACT': {
       method: 'fact',
       parameters: [
-        {argumentType: ArgumentTypes.NUMBER, minValue: 0, lessThan: 171}
+        {argumentType: ArgumentTypes.NUMBER, minValue: 0, maxValue: 170}
       ]
     },
     'FACTDOUBLE': {
       method: 'factdouble',
       parameters: [
-        {argumentType: ArgumentTypes.NUMBER, minValue: 0, lessThan: 289}
+        {argumentType: ArgumentTypes.NUMBER, minValue: 0, maxValue: 288}
       ]
     },
     'COMBIN': {
@@ -154,6 +154,7 @@ export class MathPlugin extends FunctionPlugin {
         n = Math.trunc(n)
         m = Math.trunc(m)
         if(n+m-1 >= 1030) {
+          //Product #2 does not enforce this
           return new CellError(ErrorType.NUM, ErrorMessage.ValueLarge)
         }
         if(n===0 && m===0) {

@@ -31,13 +31,13 @@ describe('Function FACTDOUBLE', () => {
       ['=FACTDOUBLE(0.9)'],
       ['=FACTDOUBLE(1.1)'],
       ['=FACTDOUBLE(10.42)'],
-      ['=FACTDOUBLE(288.9)'],
+      ['=FACTDOUBLE(287.9)'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toBe(1)
     expect(engine.getCellValue(adr('A2'))).toBe(1)
     expect(engine.getCellValue(adr('A3'))).toBe(3840)
-    expect(engine.getCellValue(adr('A4')) as number / 1.23775688540895e+293).toBeCloseTo(1, 6)
+    expect(engine.getCellValue(adr('A4')) as number / 5.81436347598024e+291).toBeCloseTo(1, 6)
   })
 
   it('checks bounds', () => {
