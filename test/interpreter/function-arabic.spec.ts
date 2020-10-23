@@ -46,9 +46,11 @@ describe('Function ARABIC', () => {
     const engine = HyperFormula.buildFromArray([
       ['=ARABIC("MMMIMIDCCCICILXXXIXIVIII")'],
       ['=ARABIC("-I")'],
+      ['=ARABIC(" ")'],
     ])
     expect(engine.getCellValue(adr('A1'))).toEqual(4992)
     expect(engine.getCellValue(adr('A2'))).toEqual(-1)
+    expect(engine.getCellValue(adr('A3'))).toEqual(0)
   })
 
   it('should output correct value for roman numerals from mode 0', () => {
