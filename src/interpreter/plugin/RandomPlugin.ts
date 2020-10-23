@@ -3,15 +3,24 @@
  * Copyright (c) 2020 Handsoncode. All rights reserved.
  */
 
-import {InternalScalarValue, SimpleCellAddress} from '../../Cell'
+import {CellError, ErrorType, InternalScalarValue, SimpleCellAddress} from '../../Cell'
+import {ErrorMessage} from '../../error-message'
 import {ProcedureAst} from '../../parser'
-import {FunctionPlugin} from './FunctionPlugin'
+import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
 
 export class RandomPlugin extends FunctionPlugin {
   public static implementedFunctions = {
     'RAND': {
       method: 'rand',
       parameters: [],
+      isVolatile: true,
+    },
+    'RANDBETWEEN': {
+      method: 'randbetween',
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER},
+        {argumentType: ArgumentTypes.NUMBER},
+      ],
       isVolatile: true,
     },
   }
@@ -27,5 +36,21 @@ export class RandomPlugin extends FunctionPlugin {
    */
   public rand(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.runFunction(ast.args, formulaAddress, this.metadata('RAND'), Math.random)
+  }
+
+  public randbetween(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('RANDBETWEEN'),
+      (lower: number, upper: number) => {
+        if(upper<lower) {
+          return new CellError(ErrorType.NUM, ErrorMessage.WrongOrder)
+        }
+        lower = Math.ceil(lower)
+        upper = Math.floor(upper)+1
+        if(lower === upper) {
+          upper += 1
+        }
+        return lower + Math.floor(Math.random()*(upper-lower))
+      }
+    )
   }
 }

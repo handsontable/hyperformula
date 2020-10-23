@@ -31,6 +31,14 @@ export class StatisticalPlugin extends  FunctionPlugin {
         {argumentType: ArgumentTypes.BOOLEAN},
       ]
     },
+    'EXPONDIST': {
+      method: 'expondist',
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER, minValue: 0},
+        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
+        {argumentType: ArgumentTypes.BOOLEAN},
+      ]
+    },
     'FISHER': {
       method: 'fisher',
       parameters: [
@@ -58,6 +66,15 @@ export class StatisticalPlugin extends  FunctionPlugin {
         {argumentType: ArgumentTypes.BOOLEAN},
       ]
     },
+    'GAMMADIST': {
+      method: 'gammadist',
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER, minValue: 0},
+        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
+        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
+        {argumentType: ArgumentTypes.BOOLEAN},
+      ]
+    },
     'GAMMALN': {
       method: 'gammaln',
       parameters: [
@@ -71,6 +88,14 @@ export class StatisticalPlugin extends  FunctionPlugin {
       ]
     },
     'GAMMA.INV': {
+      method: 'gammainv',
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER, minValue: 0, lessThan: 1},
+        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
+        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
+      ]
+    },
+    'GAMMAINV': {
       method: 'gammainv',
       parameters: [
         {argumentType: ArgumentTypes.NUMBER, minValue: 0, lessThan: 1},
