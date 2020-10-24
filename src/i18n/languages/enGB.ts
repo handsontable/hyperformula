@@ -277,6 +277,10 @@ const dictionary: RawTranslationPackage = {
     'EXPONDIST': 'EXPONDIST',
     GAMMADIST: 'GAMMADIST',
     GAMMAINV: 'GAMMAINV',
+    'BETA.DIST': 'BETA.DIST',
+    BETADIST: 'BETA.DIST',
+    'BETA.INV': 'BETA.INV',
+    BETAINV: 'BETAINV',
   },
   langCode: 'enGB',
   ui: {

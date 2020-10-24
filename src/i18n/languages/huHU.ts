@@ -277,6 +277,10 @@ const dictionary: RawTranslationPackage = {
     GAMMALN: 'GAMMALN',
     'GAMMALN.PRECISE': 'GAMMALN.PONTOS',
     GAUSS: 'GAUSS',
+    'BETA.DIST': 'BÉTA.ELOSZL',
+    BETADIST: 'BÉTA.ELOSZLÁS',
+    'BETA.INV': 'BÉTA.INVERZ',
+    BETAINV: 'INVERZ.BÉTA',
   },
   langCode: 'huHU',
   ui: {

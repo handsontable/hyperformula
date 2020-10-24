@@ -277,6 +277,10 @@ const dictionary: RawTranslationPackage = {
     GAMMALN: 'GAMMALN',
     'GAMMALN.PRECISE': 'GAMMALN.TARKKA',
     GAUSS: 'GAUSS',
+    'BETA.DIST': 'BEETA.JAKAUMA',
+    BETADIST: 'BEETAJAKAUMA',
+    'BETA.INV': 'BEETA.KÄÄNT',
+    BETAINV: 'BEETAJAKAUMA.KÄÄNT',
   },
   langCode: 'fiFI',
   ui: {

@@ -277,6 +277,10 @@ const dictionary: RawTranslationPackage = {
     GAMMALN: 'GAMMALN',
     'GAMMALN.PRECISE': 'GAMMALN.EXAKT',
     GAUSS: 'GAUSS',
+    'BETA.DIST': 'BETA.FÖRD',
+    BETADIST: 'BETAFÖRD',
+    'BETA.INV': 'BETA.INV',
+    BETAINV: 'BETAINV',
   },
   langCode: 'svSE',
   ui: {

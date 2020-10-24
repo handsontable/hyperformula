@@ -277,6 +277,10 @@ export const dictionary: RawTranslationPackage = {
     GAMMALN: 'GAMMA.LN',
     'GAMMALN.PRECISE': 'GAMMA.LN.EXACTO',
     GAUSS: 'GAUSS',
+    'BETA.DIST': 'DISTR.BETA.N',
+    BETADIST: 'DISTR.BETA',
+    'BETA.INV': 'INV.BETA.N',
+    BETAINV: 'DISTR.BETA.INV',
   },
   langCode: 'esES',
   ui: {

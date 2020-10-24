@@ -277,6 +277,10 @@ const dictionary: RawTranslationPackage = {
     GAMMALN: 'ГАММАНЛОГ',
     'GAMMALN.PRECISE': 'ГАММАНЛОГ.ТОЧН',
     GAUSS: 'ГАУСС',
+    'BETA.DIST': 'БЕТА.РАСП',
+    BETADIST: 'БЕТАРАСП',
+    'BETA.INV': 'БЕТА.ОБР',
+    BETAINV: 'БЕТАОБР',
   },
   langCode: 'ruRU',
   ui: {

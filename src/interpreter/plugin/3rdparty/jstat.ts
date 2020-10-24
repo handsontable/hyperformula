@@ -277,3 +277,158 @@ export const normal = {
     return -1.41421356237309505 * std * erfcinv(2 * p) + mean
   }
 }
+
+export const beta = {
+  pdf: function pdf(x: number, alpha: number, beta: number) {
+    // PDF is zero outside the support
+    if (x > 1 || x < 0)
+      return 0;
+    // PDF is one for the uniform case
+    if (alpha == 1 && beta == 1)
+      return 1;
+
+    if (alpha < 512 && beta < 512) {
+      return (Math.pow(x, alpha - 1) * Math.pow(1 - x, beta - 1)) /
+        betafn(alpha, beta)!;
+    } else {
+      return Math.exp((alpha - 1) * Math.log(x) +
+        (beta - 1) * Math.log(1 - x) -
+        betaln(alpha, beta));
+    }
+  },
+
+  cdf: function cdf(x: number, alpha: number, beta: number) {
+    return (x > 1 || x < 0) ? +(x > 1)  : ibeta(x, alpha, beta);
+  },
+
+  inv: function inv(x: number, alpha: number, beta: number) {
+    return ibetainv(x, alpha, beta);
+  },
+}
+
+function betafn(x: number, y: number) {
+  // ensure arguments are positive
+  if (x <= 0 || y <= 0)
+    return undefined;
+  // make sure x + y doesn't exceed the upper limit of usable values
+  return (x + y > 170)
+    ? Math.exp(betaln(x, y))
+    : gammafn(x) * gammafn(y) / gammafn(x + y);
+};
+
+function betaln(x: number, y: number) {
+  return gammaln(x) + gammaln(y) - gammaln(x + y);
+};
+
+function ibetainv(p: number, a: number, b: number) {
+  var EPS = 1e-8;
+  var a1 = a - 1;
+  var b1 = b - 1;
+  var j = 0;
+  var lna, lnb, pp, t, u, err, x, al, h, w, afac;
+  if (p <= 0)
+    return 0;
+  if (p >= 1)
+    return 1;
+  if (a >= 1 && b >= 1) {
+    pp = (p < 0.5) ? p : 1 - p;
+    t = Math.sqrt(-2 * Math.log(pp));
+    x = (2.30753 + t * 0.27061) / (1 + t* (0.99229 + t * 0.04481)) - t;
+    if (p < 0.5)
+      x = -x;
+    al = (x * x - 3) / 6;
+    h = 2 / (1 / (2 * a - 1)  + 1 / (2 * b - 1));
+    w = (x * Math.sqrt(al + h) / h) - (1 / (2 * b - 1) - 1 / (2 * a - 1)) *
+      (al + 5 / 6 - 2 / (3 * h));
+    x = a / (a + b * Math.exp(2 * w));
+  } else {
+    lna = Math.log(a / (a + b));
+    lnb = Math.log(b / (a + b));
+    t = Math.exp(a * lna) / a;
+    u = Math.exp(b * lnb) / b;
+    w = t + u;
+    if (p < t / w)
+      x = Math.pow(a * w * p, 1 / a);
+    else
+      x = 1 - Math.pow(b * w * (1 - p), 1 / b);
+  }
+  afac = -gammaln(a) - gammaln(b) + gammaln(a + b);
+  for(; j < 10; j++) {
+    if (x === 0 || x === 1)
+      return x;
+    // @ts-ignore
+    err = ibeta(x, a, b) - p;
+    t = Math.exp(a1 * Math.log(x) + b1 * Math.log(1 - x) + afac);
+    u = err / t;
+    x -= (t = u / (1 - 0.5 * Math.min(1, u * (a1 / x - b1 / (1 - x)))));
+    if (x <= 0)
+      x = 0.5 * (x + t);
+    if (x >= 1)
+      x = 0.5 * (x + t + 1);
+    if (Math.abs(t) < EPS * x && j > 0)
+      break;
+  }
+  return x;
+};
+
+function ibeta(x: number, a: number, b: number) {
+  // Factors in front of the continued fraction.
+  var bt = (x === 0 || x === 1) ?  0 :
+    Math.exp(gammaln(a + b) - gammaln(a) -
+      gammaln(b) + a * Math.log(x) + b *
+      Math.log(1 - x));
+  if (x < 0 || x > 1)
+    return false;
+  if (x < (a + 1) / (a + b + 2))
+    // Use continued fraction directly.
+    return bt * betacf(x, a, b) / a;
+  // else use continued fraction after making the symmetry transformation.
+  return 1 - bt * betacf(1 - x, b, a) / b;
+};
+
+function betacf(x: number, a: number, b: number) {
+  var fpmin = 1e-30;
+  var m = 1;
+  var qab = a + b;
+  var qap = a + 1;
+  var qam = a - 1;
+  var c = 1;
+  var d = 1 - qab * x / qap;
+  var m2, aa, del, h;
+
+  // These q's will be used in factors that occur in the coefficients
+  if (Math.abs(d) < fpmin)
+    d = fpmin;
+  d = 1 / d;
+  h = d;
+
+  for (; m <= 100; m++) {
+    m2 = 2 * m;
+    aa = m * (b - m) * x / ((qam + m2) * (a + m2));
+    // One step (the even one) of the recurrence
+    d = 1 + aa * d;
+    if (Math.abs(d) < fpmin)
+      d = fpmin;
+    c = 1 + aa / c;
+    if (Math.abs(c) < fpmin)
+      c = fpmin;
+    d = 1 / d;
+    h *= d * c;
+    aa = -(a + m) * (qab + m) * x / ((a + m2) * (qap + m2));
+    // Next step of the recurrence (the odd one)
+    d = 1 + aa * d;
+    if (Math.abs(d) < fpmin)
+      d = fpmin;
+    c = 1 + aa / c;
+    if (Math.abs(c) < fpmin)
+      c = fpmin;
+    d = 1 / d;
+    del = d * c;
+    h *= del;
+    if (Math.abs(del - 1.0) < 3e-7)
+      break;
+  }
+
+  return h;
+};
+

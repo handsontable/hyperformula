@@ -277,6 +277,10 @@ const dictionary: RawTranslationPackage = {
     GAMMALN: 'ROZKŁAD.LIN.GAMMA',
     'GAMMALN.PRECISE': 'ROZKŁAD.LIN.GAMMA.DOKŁ',
     GAUSS: 'GAUSS',
+    'BETA.DIST': 'ROZKŁ.BETA',
+    BETADIST: 'ROZKŁAD.BETA',
+    'BETA.INV': 'ROZKŁ.BETA.ODWR',
+    BETAINV: 'ROZKŁAD.BETA.ODW',
   },
   langCode: 'plPL',
   ui: {

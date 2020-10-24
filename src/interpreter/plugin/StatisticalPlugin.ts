@@ -3,9 +3,10 @@
  * Copyright (c) 2020 Handsoncode. All rights reserved.
  */
 
-import {InternalScalarValue, SimpleCellAddress} from '../../Cell'
+import {CellError, ErrorType, InternalScalarValue, SimpleCellAddress} from '../../Cell'
+import {ErrorMessage} from '../../error-message'
 import {ProcedureAst} from '../../parser'
-import {normal, erf, erfc, exponential, gamma, gammafn, gammaln} from './3rdparty/jstat'
+import {beta, erf, erfc, exponential, gamma, gammafn, gammaln, normal} from './3rdparty/jstat'
 import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
 
 export class StatisticalPlugin extends  FunctionPlugin {
@@ -109,6 +110,38 @@ export class StatisticalPlugin extends  FunctionPlugin {
         {argumentType: ArgumentTypes.NUMBER}
       ]
     },
+    'BETA.DIST': {
+      method: 'betadist',
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER},
+        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
+        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
+        {argumentType: ArgumentTypes.BOOLEAN},
+        {argumentType: ArgumentTypes.NUMBER, defaultValue: 0},
+        {argumentType: ArgumentTypes.NUMBER, defaultValue: 1},
+      ]
+    },
+    'BETADIST': {
+      method: 'betadist',
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER},
+        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
+        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
+        {argumentType: ArgumentTypes.BOOLEAN},
+        {argumentType: ArgumentTypes.NUMBER, defaultValue: 0},
+        {argumentType: ArgumentTypes.NUMBER, defaultValue: 1},
+      ]
+    },
+    'BETA.INV': {
+      method: 'betainv',
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0, maxValue: 1},
+        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
+        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
+        {argumentType: ArgumentTypes.NUMBER, defaultValue: 0},
+        {argumentType: ArgumentTypes.NUMBER, defaultValue: 1},
+      ]
+    },
   }
 
   public erf(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
@@ -156,11 +189,11 @@ export class StatisticalPlugin extends  FunctionPlugin {
 
   public gammadist(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.runFunction(ast.args, formulaAddress, this.metadata('GAMMA.DIST'),
-      (value: number, alpha: number, beta: number, cumulative: boolean) => {
+      (value: number, alphaVal: number, betaVal: number, cumulative: boolean) => {
         if(cumulative) {
-          return gamma.cdf(value, alpha, beta)
+          return gamma.cdf(value, alphaVal, betaVal)
         } else {
-          return gamma.pdf(value, alpha, beta)
+          return gamma.pdf(value, alphaVal, betaVal)
         }
       }
     )
@@ -177,6 +210,36 @@ export class StatisticalPlugin extends  FunctionPlugin {
   public gauss(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.runFunction(ast.args, formulaAddress, this.metadata('GAUSS'),
       (z: number) => normal.cdf(z, 0, 1) - 0.5
+    )
+  }
+
+  public betadist(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('BETA.DIST'),
+      (x: number, alphaVal: number, betaVal: number, cumulative: boolean, A: number, B: number) => {
+        if(x<=A) {
+          return new CellError(ErrorType.NUM, ErrorMessage.ValueSmall)
+        } else if(x>=B) {
+          return new CellError(ErrorType.NUM, ErrorMessage.ValueLarge)
+        }
+        x = (x - A) / (B - A)
+        if(cumulative) {
+          return beta.cdf(x, alphaVal, betaVal)
+        } else {
+          return beta.pdf(x, alphaVal, betaVal)
+        }
+      }
+    )
+  }
+
+  public betainv(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('BETA.INV'),
+      (x: number, alphaVal: number, betaVal: number, A: number, B: number) => {
+        if (A >= B) {
+          return new CellError(ErrorType.NUM, ErrorMessage.WrongOrder)
+        } else {
+          return beta.inv(x, alphaVal, betaVal) * (B - A) + A
+        }
+      }
     )
   }
 }
