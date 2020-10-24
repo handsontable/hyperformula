@@ -281,6 +281,9 @@ const dictionary: RawTranslationPackage = {
     BETADIST: 'BEETAJAKAUMA',
     'BETA.INV': 'BEETA.KÄÄNT',
     BETAINV: 'BEETAJAKAUMA.KÄÄNT',
+    'BINOM.DIST': 'BINOMI.JAKAUMA',
+    BINOMDIST: 'BINOMIJAKAUMA',
+    'BINOM.INV': 'BINOMIJAKAUMA.KÄÄNT',
   },
   langCode: 'fiFI',
   ui: {

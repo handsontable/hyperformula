@@ -281,6 +281,9 @@ export const dictionary: RawTranslationPackage = {
     BETADIST: 'DISTR.BETA',
     'BETA.INV': 'INV.BETA.N',
     BETAINV: 'DISTR.BETA.INV',
+    'BINOM.DIST': 'DISTR.BINOM.N',
+    BINOMDIST: 'DISTR.BINOM',
+    'BINOM.INV': 'INV.BINOM',
   },
   langCode: 'esES',
   ui: {

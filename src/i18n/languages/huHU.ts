@@ -281,6 +281,9 @@ const dictionary: RawTranslationPackage = {
     BETADIST: 'BÉTA.ELOSZLÁS',
     'BETA.INV': 'BÉTA.INVERZ',
     BETAINV: 'INVERZ.BÉTA',
+    'BINOM.DIST': 'BINOM.ELOSZL',
+    BINOMDIST: 'BINOM.ELOSZLÁS',
+    'BINOM.INV': 'BINOM.INVERZ',
   },
   langCode: 'huHU',
   ui: {

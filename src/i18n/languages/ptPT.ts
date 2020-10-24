@@ -281,6 +281,9 @@ const dictionary: RawTranslationPackage = {
     BETADIST: 'DISTBETA',
     'BETA.INV': 'INV.BETA',
     BETAINV: 'BETA.ACUM.INV',
+    'BINOM.DIST': 'DISTR.BINOM',
+    BINOMDIST: 'DISTRBINOM',
+    'BINOM.INV': 'INV.BINOM',
   },
   langCode: 'ptPT',
   ui: {

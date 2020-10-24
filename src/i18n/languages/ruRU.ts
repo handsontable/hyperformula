@@ -281,6 +281,9 @@ const dictionary: RawTranslationPackage = {
     BETADIST: 'БЕТАРАСП',
     'BETA.INV': 'БЕТА.ОБР',
     BETAINV: 'БЕТАОБР',
+    'BINOM.DIST': 'БИНОМ.РАСП',
+    BINOMDIST: 'БИНОМРАСП',
+    'BINOM.INV': 'БИНОМ.ОБР',
   },
   langCode: 'ruRU',
   ui: {

@@ -281,6 +281,9 @@ const dictionary: RawTranslationPackage = {
     BETADIST: 'BETADIST',
     'BETA.INV': 'BETA.INV',
     BETAINV: 'BETAINV',
+    'BINOM.DIST': 'BINOM.DIST',
+    BINOMDIST: 'BINOMDIST',
+    'BINOM.INV': 'BINOM.INV',
   },
   langCode: 'csCZ',
   ui: {

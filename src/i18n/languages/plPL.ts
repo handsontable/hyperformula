@@ -281,6 +281,9 @@ const dictionary: RawTranslationPackage = {
     BETADIST: 'ROZKŁAD.BETA',
     'BETA.INV': 'ROZKŁ.BETA.ODWR',
     BETAINV: 'ROZKŁAD.BETA.ODW',
+    'BINOM.DIST': 'ROZKŁ.DWUM',
+    BINOMDIST: 'ROZKŁAD.DWUM',
+    'BINOM.INV': 'ROZKŁ.DWUM.ODWR',
   },
   langCode: 'plPL',
   ui: {

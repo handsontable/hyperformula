@@ -281,6 +281,9 @@ const dictionary: RawTranslationPackage = {
     BETADIST: 'BETAVERT',
     'BETA.INV': 'BETA.INV',
     BETAINV: 'BETAINV',
+    'BINOM.DIST': 'BINOM.VERT',
+    BINOMDIST: 'BINOMVERT',
+    'BINOM.INV': 'BINOM.INV',
   },
   langCode: 'deDE',
   ui: {

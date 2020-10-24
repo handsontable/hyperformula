@@ -6,7 +6,7 @@
 import {CellError, ErrorType, InternalScalarValue, SimpleCellAddress} from '../../Cell'
 import {ErrorMessage} from '../../error-message'
 import {ProcedureAst} from '../../parser'
-import {beta, erf, erfc, exponential, gamma, gammafn, gammaln, normal} from './3rdparty/jstat'
+import {beta, binomial, erf, erfc, exponential, gamma, gammafn, gammaln, normal} from './3rdparty/jstat'
 import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
 
 export class StatisticalPlugin extends  FunctionPlugin {
@@ -142,6 +142,43 @@ export class StatisticalPlugin extends  FunctionPlugin {
         {argumentType: ArgumentTypes.NUMBER, defaultValue: 1},
       ]
     },
+    'BETAINV': {
+      method: 'betainv',
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0, maxValue: 1},
+        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
+        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
+        {argumentType: ArgumentTypes.NUMBER, defaultValue: 0},
+        {argumentType: ArgumentTypes.NUMBER, defaultValue: 1},
+      ]
+    },
+    'BINOM.DIST': {
+      method: 'binomialdist',
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER, minValue: 0},
+        {argumentType: ArgumentTypes.NUMBER, minValue: 0},
+        {argumentType: ArgumentTypes.NUMBER, minValue: 0, maxValue: 1},
+        {argumentType: ArgumentTypes.BOOLEAN},
+      ]
+    },
+    'BINOMDIST': {
+      method: 'binomialdist',
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER, minValue: 0},
+        {argumentType: ArgumentTypes.NUMBER, minValue: 0},
+        {argumentType: ArgumentTypes.NUMBER, minValue: 0, maxValue: 1},
+        {argumentType: ArgumentTypes.BOOLEAN},
+      ]
+    },
+    'BINOM.INV': {
+      method: 'binomialinv',
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER, minValue: 0},
+        {argumentType: ArgumentTypes.NUMBER, minValue: 0, maxValue: 1},
+        {argumentType: ArgumentTypes.NUMBER, minValue: 0, maxValue: 1},
+        {argumentType: ArgumentTypes.BOOLEAN},
+      ]
+    },
   }
 
   public erf(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
@@ -238,6 +275,38 @@ export class StatisticalPlugin extends  FunctionPlugin {
           return new CellError(ErrorType.NUM, ErrorMessage.WrongOrder)
         } else {
           return beta.inv(x, alphaVal, betaVal) * (B - A) + A
+        }
+      }
+    )
+  }
+
+  public binomialdist(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('BINOM.DIST'),
+      (succ: number, trials: number, prob: number, cumulative: boolean) => {
+        if(succ>trials) {
+          return new CellError(ErrorType.NUM, ErrorMessage.WrongOrder)
+        }
+        succ = Math.trunc(succ)
+        trials = Math.trunc(trials)
+        if(cumulative) {
+          return binomial.cdf(succ, trials, prob)
+        } else {
+          return binomial.pdf(succ, trials, prob)
+        }
+      }
+    )
+  }
+
+  public binomialinv(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('BINOM.INV'),
+      (trials: number, prob: number, alpha: number) => {
+        trials = Math.trunc(trials)
+        var x = 0;
+        while (true) {
+          if (binomial.cdf(x, trials, prob) >= alpha) {
+            return x;
+          }
+          x++;
         }
       }
     )

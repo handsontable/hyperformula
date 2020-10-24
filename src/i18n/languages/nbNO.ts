@@ -281,6 +281,9 @@ const dictionary: RawTranslationPackage = {
     BETADIST: 'BETA.FORDELING',
     'BETA.INV': 'BETA.INV',
     BETAINV: 'INVERS.BETA.FORDELING',
+    'BINOM.DIST': 'BINOM.FORDELING.N',
+    BINOMDIST: 'BINOM.FORDELING',
+    'BINOM.INV': 'BINOM.INV',
   },
   langCode: 'nbNO',
   ui: {

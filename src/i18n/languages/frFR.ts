@@ -281,6 +281,9 @@ const dictionary: RawTranslationPackage = {
     BETADIST: 'LOI.BETA',
     'BETA.INV': 'BETA.INVERSE.N',
     BETAINV: 'BETA.INVERSE',
+    'BINOM.DIST': 'LOI.BINOMIALE.N',
+    BINOMDIST: 'LOI.BINOMIALE',
+    'BINOM.INV': 'LOI.BINOMIALE.INVERSE',
   },
   langCode: 'frFR',
   ui: {
