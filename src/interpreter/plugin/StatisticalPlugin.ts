@@ -175,8 +175,7 @@ export class StatisticalPlugin extends  FunctionPlugin {
       parameters: [
         {argumentType: ArgumentTypes.NUMBER, minValue: 0},
         {argumentType: ArgumentTypes.NUMBER, minValue: 0, maxValue: 1},
-        {argumentType: ArgumentTypes.NUMBER, minValue: 0, maxValue: 1},
-        {argumentType: ArgumentTypes.BOOLEAN},
+        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0, lessThan: 1},
       ]
     },
   }
@@ -301,13 +300,17 @@ export class StatisticalPlugin extends  FunctionPlugin {
     return this.runFunction(ast.args, formulaAddress, this.metadata('BINOM.INV'),
       (trials: number, prob: number, alpha: number) => {
         trials = Math.trunc(trials)
-        var x = 0;
-        while (true) {
-          if (binomial.cdf(x, trials, prob) >= alpha) {
-            return x;
+        let lower = -1
+        let upper = trials
+        while(upper>lower+1) {
+          const mid = Math.trunc((lower+upper)/2)
+          if(binomial.cdf(mid, trials, prob) >= alpha) {
+            upper = mid
+          } else {
+            lower = mid
           }
-          x++;
         }
+        return upper
       }
     )
   }
