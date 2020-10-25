@@ -263,6 +263,10 @@ lets you design your own [custom functions](custom-functions).
 | AVERAGE | Statistical | Returns the average of the arguments. | AVERAGE(Number1; Number2; ...Number30) |
 | AVERAGEA | Statistical | Returns the average of the arguments. | AVERAGEA(Value1; Value2; ... Value30) |
 | AVERAGEIF | Statistical | Returns the arithmetic mean of all cells in a range that satisfy a given condition. | AVERAGEIF(Range; Criterion [; Average_Range ]) |
+| BESSELI | Statistical | Returns value of Bessel function. | BESSELI(x; n) |
+| BESSELJ | Statistical | Returns value of Bessel function. | BESSELJ(x; n) |
+| BESSELK | Statistical | Returns value of Bessel function. | BESSELK(x; n) |
+| BESSELY | Statistical | Returns value of Bessel function. | BESSELY(x; n) |
 | BETA.DIST | Statistical | Returns the denisty of Beta distribution. | BETA.DIST(Number1; Number2; Number3; Boolean[; Number4[; Number5]]) |
 | BETADIST | Statistical | Returns the denisty of Beta distribution. | BETADIST(Number1; Number2; Number3; Boolean[; Number4[; Number5]]) |
 | BETA.INV | Statistical | Returns the inverse Beta distribution value. | BETA.INV(Number1; Number2; Number3[; Number4[; Number5]]) |
