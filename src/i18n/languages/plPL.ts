@@ -284,6 +284,10 @@ const dictionary: RawTranslationPackage = {
     'BINOM.DIST': 'ROZKŁ.DWUM',
     BINOMDIST: 'ROZKŁAD.DWUM',
     'BINOM.INV': 'ROZKŁ.DWUM.ODWR',
+    BESSELI: 'BESSEL.I',
+    BESSELJ: 'BESSEL.J',
+    BESSELK: 'BESSEL.K',
+    BESSELY: 'BESSEL.Y',
   },
   langCode: 'plPL',
   ui: {

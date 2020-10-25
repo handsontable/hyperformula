@@ -284,6 +284,10 @@ const dictionary: RawTranslationPackage = {
     'BINOM.DIST': 'BINOM.FÖRD',
     BINOMDIST: 'BINOMFÖRD',
     'BINOM.INV': 'BINOM.INV',
+    BESSELI: 'BESSELI',
+    BESSELJ: 'BESSELJ',
+    BESSELK: 'BESSELK',
+    BESSELY: 'BESSELY',
   },
   langCode: 'svSE',
   ui: {

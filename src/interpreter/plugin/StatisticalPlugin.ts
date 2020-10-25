@@ -3,7 +3,7 @@
  * Copyright (c) 2020 Handsoncode. All rights reserved.
  */
 
-import {besseli} from 'bessel'
+import {besseli, besselj, besselk, bessely} from './3rdparty/bessel/bessel'
 import {CellError, ErrorType, InternalScalarValue, SimpleCellAddress} from '../../Cell'
 import {ErrorMessage} from '../../error-message'
 import {ProcedureAst} from '../../parser'
@@ -345,19 +345,27 @@ export class StatisticalPlugin extends  FunctionPlugin {
   }
 
   public besselifn(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('BESSELI'), besseli)
+    return this.runFunction(ast.args, formulaAddress, this.metadata('BESSELI'),
+      (x: number, n: number) => besseli(x, Math.trunc(n))
+    )
   }
 
   public besseljfn(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('BESSELJ'), besselj)
+    return this.runFunction(ast.args, formulaAddress, this.metadata('BESSELJ'),
+      (x: number, n: number) => besselj(x, Math.trunc(n))
+    )
   }
 
   public besselkfn(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('BESSELK'), besselk)
+    return this.runFunction(ast.args, formulaAddress, this.metadata('BESSELK'),
+      (x: number, n: number) => besselk(x, Math.trunc(n))
+    )
   }
 
   public besselyfn(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('BESSELY'), bessely)
+    return this.runFunction(ast.args, formulaAddress, this.metadata('BESSELY'),
+      (x: number, n: number) => bessely(x, Math.trunc(n))
+    )
   }
 }
 

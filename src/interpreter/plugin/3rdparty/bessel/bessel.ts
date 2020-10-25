@@ -2,7 +2,9 @@
 /* bessel.js (C) 2013-present SheetJS -- http://sheetjs.com */
 var M = Math;
 
+// @ts-ignore
 function _horner(arr, v) { for(var i = 0, z = 0; i < arr.length; ++i) z = v * z + arr[i]; return z; }
+// @ts-ignore
 function _bessel_iter(x, n, f0, f1, sign) {
     if(n === 0) return f0;
     if(n === 1) return f1;
@@ -13,7 +15,9 @@ function _bessel_iter(x, n, f0, f1, sign) {
     }
     return f2;
 }
+// @ts-ignore
 function _bessel_wrap(bessel0, bessel1, name, nonzero, sign) {
+// @ts-ignore
     return function bessel(x,n) {
         if(nonzero) {
             if(x === 0) return (nonzero == 1 ? -Infinity : Infinity);
@@ -28,7 +32,7 @@ function _bessel_wrap(bessel0, bessel1, name, nonzero, sign) {
     };
 }
 
-export var besselj = (function() {
+export var besselj: (x: number, n: number) => number = (function() {
     var W = 0.636619772; // 2 / Math.PI
 
     var b0_a1a = [57568490574.0, -13362590354.0, 651619640.7, -11214424.18, 77392.33017, -184.9052456].reverse();
@@ -36,6 +40,7 @@ export var besselj = (function() {
     var b0_a1b = [1.0, -0.1098628627e-2, 0.2734510407e-4, -0.2073370639e-5, 0.2093887211e-6].reverse();
     var b0_a2b = [-0.1562499995e-1, 0.1430488765e-3, -0.6911147651e-5, 0.7621095161e-6, -0.934935152e-7].reverse();
 
+// @ts-ignore
     function bessel0(x) {
         var a=0, a1=0, a2=0, y = x * x;
         if(x < 8) {
@@ -57,6 +62,7 @@ export var besselj = (function() {
     var b1_a1b = [1.0, 0.183105e-2, -0.3516396496e-4, 0.2457520174e-5, -0.240337019e-6].reverse();
     var b1_a2b = [0.04687499995, -0.2002690873e-3, 0.8449199096e-5, -0.88228987e-6, 0.105787412e-6].reverse();
 
+// @ts-ignore
     function bessel1(x) {
         var a=0, a1=0, a2=0, y = x*x, xx = M.abs(x) - 2.356194491;
         if(Math.abs(x)< 8) {
@@ -73,6 +79,7 @@ export var besselj = (function() {
         return a;
     }
 
+// @ts-ignore
     return function besselj(x, n) {
         n = Math.round(n);
         if(!isFinite(x)) return isNaN(x) ? x : 0;
@@ -112,7 +119,7 @@ export var besselj = (function() {
     };
 })();
 
-export var bessely = (function() {
+export var bessely: (x: number, n: number) => number = (function() {
     var W = 0.636619772;
 
     var b0_a1a = [-2957821389.0, 7062834065.0, -512359803.6, 10879881.29, -86327.92757, 228.4622733].reverse();
@@ -120,6 +127,7 @@ export var bessely = (function() {
     var b0_a1b = [1.0, -0.1098628627e-2, 0.2734510407e-4, -0.2073370639e-5, 0.2093887211e-6].reverse();
     var b0_a2b = [-0.1562499995e-1, 0.1430488765e-3, -0.6911147651e-5, 0.7621095161e-6, -0.934945152e-7].reverse();
 
+// @ts-ignore
     function bessel0(x) {
         var a=0, a1=0, a2=0, y = x * x, xx = x - 0.785398164;
         if(x < 8) {
@@ -140,6 +148,7 @@ export var bessely = (function() {
     var b1_a1b = [1.0, 0.183105e-2, -0.3516396496e-4, 0.2457520174e-5, -0.240337019e-6].reverse();
     var b1_a2b = [0.04687499995, -0.2002690873e-3, 0.8449199096e-5, -0.88228987e-6, 0.105787412e-6].reverse();
 
+// @ts-ignore
     function bessel1(x) {
         var a=0, a1=0, a2=0, y = x*x, xx = x - 2.356194491;
         if(x < 8) {
@@ -158,10 +167,11 @@ export var bessely = (function() {
     return _bessel_wrap(bessel0, bessel1, 'BESSELY', 1, -1);
 })();
 
-export var besseli = (function() {
+export var besseli: (x: number, n: number) => number = (function() {
     var b0_a = [1.0, 3.5156229, 3.0899424, 1.2067492, 0.2659732, 0.360768e-1, 0.45813e-2].reverse();
     var b0_b = [0.39894228, 0.1328592e-1, 0.225319e-2, -0.157565e-2, 0.916281e-2, -0.2057706e-1, 0.2635537e-1, -0.1647633e-1, 0.392377e-2].reverse();
 
+// @ts-ignore
     function bessel0(x) {
         if(x <= 3.75) return _horner(b0_a, x*x/(3.75*3.75));
         return M.exp(M.abs(x))/M.sqrt(M.abs(x))*_horner(b0_b, 3.75/M.abs(x));
@@ -170,11 +180,13 @@ export var besseli = (function() {
     var b1_a = [0.5, 0.87890594, 0.51498869, 0.15084934, 0.2658733e-1, 0.301532e-2, 0.32411e-3].reverse();
     var b1_b = [0.39894228, -0.3988024e-1, -0.362018e-2, 0.163801e-2, -0.1031555e-1, 0.2282967e-1, -0.2895312e-1, 0.1787654e-1, -0.420059e-2].reverse();
 
+// @ts-ignore
     function bessel1(x) {
         if(x < 3.75) return x * _horner(b1_a, x*x/(3.75*3.75));
         return (x < 0 ? -1 : 1) * M.exp(M.abs(x))/M.sqrt(M.abs(x))*_horner(b1_b, 3.75/M.abs(x));
     }
 
+// @ts-ignore
     return function besseli(x, n) {
         n = Math.round(n);
         if(n === 0) return bessel0(x);
@@ -201,10 +213,11 @@ export var besseli = (function() {
 
 })();
 
-export var besselk = (function() {
+export var besselk: (x: number, n: number) => number = (function() {
     var b0_a = [-0.57721566, 0.42278420, 0.23069756, 0.3488590e-1, 0.262698e-2, 0.10750e-3, 0.74e-5].reverse();
     var b0_b = [1.25331414, -0.7832358e-1, 0.2189568e-1, -0.1062446e-1, 0.587872e-2, -0.251540e-2, 0.53208e-3].reverse();
 
+// @ts-ignore
     function bessel0(x) {
         if(x <= 2) return -M.log(x/2) * besseli(x,0) + _horner(b0_a, x*x/4);
         return M.exp(-x) / M.sqrt(x) * _horner(b0_b, 2/x);
@@ -213,6 +226,7 @@ export var besselk = (function() {
     var b1_a = [1.0, 0.15443144, -0.67278579, -0.18156897, -0.1919402e-1, -0.110404e-2, -0.4686e-4].reverse();
     var b1_b = [1.25331414, 0.23498619, -0.3655620e-1, 0.1504268e-1, -0.780353e-2, 0.325614e-2, -0.68245e-3].reverse();
 
+// @ts-ignore
     function bessel1(x) {
         if(x <= 2) return M.log(x/2) * besseli(x,1) + (1/x) * _horner(b1_a, x*x/4);
         return M.exp(-x)/M.sqrt(x)*_horner(b1_b, 2/x);

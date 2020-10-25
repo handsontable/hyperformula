@@ -284,6 +284,10 @@ const dictionary: RawTranslationPackage = {
     'BINOM.DIST': 'BINOMI.JAKAUMA',
     BINOMDIST: 'BINOMIJAKAUMA',
     'BINOM.INV': 'BINOMIJAKAUMA.KÄÄNT',
+    BESSELI: 'BESSELI',
+    BESSELJ: 'BESSELJ',
+    BESSELK: 'BESSELK',
+    BESSELY: 'BESSELY',
   },
   langCode: 'fiFI',
   ui: {

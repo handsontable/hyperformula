@@ -284,6 +284,10 @@ const dictionary: RawTranslationPackage = {
     'BINOM.DIST': 'BİNOM.DAĞ',
     BINOMDIST: 'BİNOMDAĞ',
     'BINOM.INV': 'BİNOM.TERS',
+    BESSELI: 'BESSELI',
+    BESSELJ: 'BESSELJ',
+    BESSELK: 'BESSELK',
+    BESSELY: 'BESSELY',
   },
   langCode: 'trTR',
   ui: {

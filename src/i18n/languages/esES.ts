@@ -284,6 +284,10 @@ export const dictionary: RawTranslationPackage = {
     'BINOM.DIST': 'DISTR.BINOM.N',
     BINOMDIST: 'DISTR.BINOM',
     'BINOM.INV': 'INV.BINOM',
+    BESSELI: 'BESSELI',
+    BESSELJ: 'BESSELJ',
+    BESSELK: 'BESSELK',
+    BESSELY: 'BESSELY',
   },
   langCode: 'esES',
   ui: {

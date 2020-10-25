@@ -284,6 +284,10 @@ const dictionary: RawTranslationPackage = {
     'BINOM.DIST': 'BINOMIAL.FORDELING',
     BINOMDIST: 'BINOMIALFORDELING',
     'BINOM.INV': 'BINOMIAL.INV',
+    BESSELI: 'BESSELI',
+    BESSELJ: 'BESSELJ',
+    BESSELK: 'BESSELK',
+    BESSELY: 'BESSELY',
   },
   langCode: 'daDK',
   ui: {

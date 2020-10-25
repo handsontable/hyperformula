@@ -284,6 +284,10 @@ const dictionary: RawTranslationPackage = {
     'BINOM.DIST': 'LOI.BINOMIALE.N',
     BINOMDIST: 'LOI.BINOMIALE',
     'BINOM.INV': 'LOI.BINOMIALE.INVERSE',
+    BESSELI: 'BESSELI',
+    BESSELJ: 'BESSELJ',
+    BESSELK: 'BESSELK',
+    BESSELY: 'BESSELY',
   },
   langCode: 'frFR',
   ui: {

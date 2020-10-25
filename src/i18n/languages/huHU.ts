@@ -284,6 +284,10 @@ const dictionary: RawTranslationPackage = {
     'BINOM.DIST': 'BINOM.ELOSZL',
     BINOMDIST: 'BINOM.ELOSZLÁS',
     'BINOM.INV': 'BINOM.INVERZ',
+    BESSELI: 'BESSELI',
+    BESSELJ: 'BESSELJ',
+    BESSELK: 'BESSELK',
+    BESSELY: 'BESSELY',
   },
   langCode: 'huHU',
   ui: {
