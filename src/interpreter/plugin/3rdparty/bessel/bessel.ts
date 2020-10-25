@@ -1,4 +1,4 @@
-
+/* eslint-disable */
 /* bessel.js (C) 2013-present SheetJS -- http://sheetjs.com */
 var M = Math;
 
