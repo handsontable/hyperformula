@@ -3,10 +3,11 @@
  * Copyright (c) 2020 Handsoncode. All rights reserved.
  */
 
+import {besseli} from 'bessel'
 import {CellError, ErrorType, InternalScalarValue, SimpleCellAddress} from '../../Cell'
 import {ErrorMessage} from '../../error-message'
 import {ProcedureAst} from '../../parser'
-import {beta, binomial, erf, erfc, exponential, gamma, gammafn, gammaln, normal} from './3rdparty/jstat'
+import {beta, binomial, erf, erfc, exponential, gamma, gammafn, gammaln, normal} from './3rdparty/jstat/jstat'
 import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
 
 export class StatisticalPlugin extends  FunctionPlugin {
@@ -178,6 +179,34 @@ export class StatisticalPlugin extends  FunctionPlugin {
         {argumentType: ArgumentTypes.NUMBER, greaterThan: 0, lessThan: 1},
       ]
     },
+    'BESSELI': {
+      method: 'besselifn',
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER},
+        {argumentType: ArgumentTypes.NUMBER, minValue: 0},
+      ]
+    },
+    'BESSELJ': {
+      method: 'besseljfn',
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER},
+        {argumentType: ArgumentTypes.NUMBER, minValue: 0},
+      ]
+    },
+    'BESSELK': {
+      method: 'besselkfn',
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER},
+        {argumentType: ArgumentTypes.NUMBER, minValue: 0},
+      ]
+    },
+    'BESSELY': {
+      method: 'besselyfn',
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER},
+        {argumentType: ArgumentTypes.NUMBER, minValue: 0},
+      ]
+    },
   }
 
   public erf(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
@@ -313,6 +342,22 @@ export class StatisticalPlugin extends  FunctionPlugin {
         return upper
       }
     )
+  }
+
+  public besselifn(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('BESSELI'), besseli)
+  }
+
+  public besseljfn(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('BESSELJ'), besselj)
+  }
+
+  public besselkfn(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('BESSELK'), besselk)
+  }
+
+  public besselyfn(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('BESSELY'), bessely)
   }
 }
 

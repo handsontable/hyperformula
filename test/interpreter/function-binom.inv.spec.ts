@@ -47,7 +47,7 @@ describe('Function BINOM.INV', () => {
       '=BINOM.INV(10, 0.5, 0.999)'],
     ])
 
-    expect(engine.getSheetValues(0)).toEqual([[1,1,2,2,3,4,4,5,5,5,6,6,7,8,8,9,9]])
+    expect(engine.getSheetValues(0)).toEqual([[1, 1, 2, 2, 3, 4, 4, 5, 5, 5, 6, 6, 7, 8, 8, 9, 9]])
   })
 
   it('should work, different p-value', () => {
@@ -65,7 +65,7 @@ describe('Function BINOM.INV', () => {
         '=BINOM.INV(10, 0.8, 0.999)'],
     ])
 
-    expect(engine.getSheetValues(0)).toEqual([[4,6,7,7,8,8,8,9,9,10,10]])
+    expect(engine.getSheetValues(0)).toEqual([[4, 6, 7, 7, 8, 8, 8, 9, 9, 10, 10]])
   })
 
   it('should work, small number of trials', () => {
@@ -83,7 +83,7 @@ describe('Function BINOM.INV', () => {
         '=BINOM.INV(0, 0.8, 0.999)'],
     ])
 
-    expect(engine.getSheetValues(0)).toEqual([[0,0,0,0,0,0,0,0,0,0,0]])
+    expect(engine.getSheetValues(0)).toEqual([[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]])
   })
 
   it('should work, another small number of trials', () => {
@@ -101,7 +101,7 @@ describe('Function BINOM.INV', () => {
         '=BINOM.INV(1, 0.8, 0.999)'],
     ])
 
-    expect(engine.getSheetValues(0)).toEqual([[0,0,0,1,1,1,1,1,1,1,1]])
+    expect(engine.getSheetValues(0)).toEqual([[0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1]])
     //both products #1 and #2 return 0 for '=BINOM.INV(1, 0.8, 0.2)', which is incorrect
   })
 
@@ -120,7 +120,7 @@ describe('Function BINOM.INV', () => {
         '=BINOM.INV(1000, 0.8, 0.999)'],
     ])
 
-    expect(engine.getSheetValues(0)).toEqual([[760,784,789,793,797,800,803,807,811,816,838]])
+    expect(engine.getSheetValues(0)).toEqual([[760, 784, 789, 793, 797, 800, 803, 807, 811, 816, 838]])
   })
 
   it('truncation works', () => {
@@ -138,7 +138,7 @@ describe('Function BINOM.INV', () => {
         '=BINOM.INV(1000.999, 0.8, 0.999)'],
     ])
 
-    expect(engine.getSheetValues(0)).toEqual([[760,784,789,793,797,800,803,807,811,816,838]])
+    expect(engine.getSheetValues(0)).toEqual([[760, 784, 789, 793, 797, 800, 803, 807, 811, 816, 838]])
   })
 
   it('checks bounds', () => {
