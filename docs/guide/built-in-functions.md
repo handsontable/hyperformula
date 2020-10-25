@@ -267,6 +267,9 @@ lets you design your own [custom functions](custom-functions).
 | BETADIST | Statistical | Returns the denisty of Beta distribution. | BETADIST(Number1; Number2; Number3; Boolean[; Number4[; Number5]]) |
 | BETA.INV | Statistical | Returns the inverse Beta distribution value. | BETA.INV(Number1; Number2; Number3[; Number4[; Number5]]) |
 | BETAINV | Statistical | Returns the inverse of Beta distribution value. | BETAINV(Number1; Number2; Number3[; Number4[; Number5]]) |
+| BINOM.DIST | Statistical | Returns density of binomial distribution. | BINOM.DIST(Number1; Number2; Number3; Boolean) |
+| BINOMDIST | Statistical | Returns density of binomial distribution. | BINOMDIST(Number1; Number2; Number3; Boolean) |
+| BINOM.INV | Statistical | Returns inverse binomial distribution value. | BINOM.INV(Number1; Number2; Number3) |
 | CORREL | Statistical | Returns the correlation coefficient between two data sets. | CORREL(Data1; Data2) |
 | COUNT | Statistical | Counts how many numbers are in the list of arguments. | COUNT(Value1; Value2; ... Value30) |
 | COUNTA | Statistical | Counts how many values are in the list of arguments. | COUNTA(Value1; Value2; ... Value30) |
