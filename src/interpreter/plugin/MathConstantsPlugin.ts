@@ -5,10 +5,9 @@
 
 import {InternalScalarValue, SimpleCellAddress} from '../../Cell'
 import {ProcedureAst} from '../../parser'
-import {FunctionPlugin} from './FunctionPlugin'
+import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
 
-const PI = parseFloat(Math.PI.toFixed(14))
-const E = parseFloat(Math.E.toFixed(14))
+export const PI = parseFloat(Math.PI.toFixed(14))
 
 export class MathConstantsPlugin extends FunctionPlugin {
   public static implementedFunctions = {
@@ -16,9 +15,11 @@ export class MathConstantsPlugin extends FunctionPlugin {
       method: 'pi',
       parameters: [],
     },
-    'E': {
-      method: 'e',
-      parameters: [],
+    'SQRTPI': {
+      method: 'sqrtpi',
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER, minValue: 0}
+      ],
     },
   }
 
@@ -28,9 +29,9 @@ export class MathConstantsPlugin extends FunctionPlugin {
     )
   }
 
-  public e(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('E'),
-      () => E
+  public sqrtpi(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('SQRTPI'),
+      (arg: number) => Math.sqrt(PI*arg)
     )
   }
 }

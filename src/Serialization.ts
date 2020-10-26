@@ -4,12 +4,20 @@
  */
 
 import {simpleCellAddress, SimpleCellAddress} from './Cell'
-import {CellValue, DetailedCellError, Exporter, NoErrorCellValue} from './CellValue'
+import {CellValue, DetailedCellError, NoErrorCellValue} from './CellValue'
 import {Config} from './Config'
 import {DependencyGraph, FormulaCellVertex, MatrixVertex, ParsingErrorVertex} from './DependencyGraph'
+import {Exporter} from './Exporter'
 import {Maybe} from './Maybe'
 import {buildLexerConfig, Unparser} from './parser'
-import {NamedExpressions} from './NamedExpressions'
+import {NamedExpressionOptions, NamedExpressions} from './NamedExpressions'
+
+export interface SerializedNamedExpression {
+  name: string,
+  expression: NoErrorCellValue,
+  scope: Maybe<string>,
+  options: Maybe<NamedExpressionOptions>,
+}
 
 export class Serialization {
   constructor(
@@ -74,8 +82,8 @@ export class Serialization {
         const address = simpleCellAddress(sheet, j, i)
         arr[i][j] = getter(address)
       }
-      for(let j=sheetWidth-1; j>=0; j--) {
-        if(arr[i][j]===null || arr[i][j]===undefined) {
+      for (let j = sheetWidth - 1; j >= 0; j--) {
+        if (arr[i][j] === null || arr[i][j] === undefined) {
           arr[i].pop()
         } else {
           break
@@ -83,8 +91,8 @@ export class Serialization {
       }
     }
 
-    for(let i=sheetHeight-1; i>=0; i--) {
-      if(arr[i].length===0) {
+    for (let i = sheetHeight - 1; i >= 0; i--) {
+      if (arr[i].length === 0) {
         arr.pop()
       } else {
         break
@@ -116,6 +124,21 @@ export class Serialization {
 
   public getAllSheetsSerialized(): Record<string, NoErrorCellValue[][]> {
     return this.genericAllSheetsGetter((arg) => this.getSheetSerialized(arg))
+  }
+
+  public getAllNamedExpressionsSerialized(): SerializedNamedExpression[] {
+    return this.dependencyGraph.namedExpressions.getAllNamedExpressions().map((entry) => {
+      const scope: Maybe<string> = entry.scope !== undefined
+        ? this.dependencyGraph.sheetMapping.fetchDisplayName(entry.scope)
+        : undefined
+
+      return {
+        name: entry.expression.displayName,
+        expression: this.getCellSerialized(entry.expression.address),
+        scope: scope,
+        options: entry.expression.options
+      }
+    })
   }
 
   public withNewConfig(newConfig: Config, namedExpressions: NamedExpressions): Serialization {

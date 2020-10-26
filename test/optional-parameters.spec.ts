@@ -1,5 +1,6 @@
 import {ErrorType, HyperFormula} from '../src'
 import {SimpleCellAddress} from '../src/Cell'
+import {ErrorMessage} from '../src/error-message'
 import {ArgumentTypes, FunctionPlugin} from '../src/interpreter/plugin/FunctionPlugin'
 import {ProcedureAst} from '../src/parser'
 import {adr, detailedError} from './testUtils'
@@ -49,7 +50,7 @@ describe('Nonexistent metadata', () => {
       ['=LOG(10,)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM))
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.ValueSmall))
   })
 
   it('other function coerce EmptyValue', () => {
@@ -60,7 +61,7 @@ describe('Nonexistent metadata', () => {
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqual(1901)
-    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NUM)) //TODO when SUM() is fixed, it should evaluate to 1
+    expect(engine.getCellValue(adr('A2'))).toEqual(1)
     expect(engine.getCellValue(adr('A3'))).toEqual('abcd')
   })
 

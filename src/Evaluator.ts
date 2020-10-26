@@ -5,22 +5,22 @@
 
 import {AbsoluteCellRange} from './AbsoluteCellRange'
 import {absolutizeDependencies} from './absolutizeDependencies'
-import {CellError, ErrorType, SimpleCellAddress} from './Cell'
-import {ColumnSearchStrategy} from './ColumnSearch/ColumnSearchStrategy'
+import {CellError, EmptyValue, ErrorType, SimpleCellAddress} from './Cell'
+import {ColumnSearchStrategy} from './Lookup/SearchStrategy'
 import {Config} from './Config'
 import {ContentChanges} from './ContentChanges'
 import {DateTimeHelper} from './DateTimeHelper'
 import {DependencyGraph, FormulaCellVertex, MatrixVertex, RangeVertex, Vertex} from './DependencyGraph'
-import {fixNegativeZero, isNumberOverflow} from './interpreter/ArithmeticHelper'
+import {ErrorMessage} from './error-message'
+import {FunctionRegistry} from './interpreter/FunctionRegistry'
 import {Interpreter} from './interpreter/Interpreter'
 import {InterpreterValue, SimpleRangeValue} from './interpreter/InterpreterValue'
 import {Matrix} from './Matrix'
-import {Ast, RelativeDependency} from './parser'
-import {Statistics, StatType} from './statistics'
-import {NumberLiteralHelper} from './NumberLiteralHelper'
 import {NamedExpressions} from './NamedExpressions'
-import {FunctionRegistry} from './interpreter/FunctionRegistry'
+import {NumberLiteralHelper} from './NumberLiteralHelper'
+import {Ast, RelativeDependency} from './parser'
 import {Serialization} from './Serialization'
+import {Statistics, StatType} from './statistics'
 
 export class Evaluator {
   private interpreter: Interpreter
@@ -96,7 +96,7 @@ export class Evaluator {
           } else if (vertex instanceof FormulaCellVertex) {
             const address = vertex.getAddress(this.dependencyGraph.lazilyTransformingAstService)
             this.columnSearch.remove(vertex.valueOrNull(), address)
-            const error = new CellError(ErrorType.CYCLE)
+            const error = new CellError(ErrorType.CYCLE, undefined, vertex.address)
             vertex.setCellValue(error)
             changes.addChange(error, vertex.address)
           }
@@ -137,7 +137,7 @@ export class Evaluator {
   private recomputeFormulas(cycled: Vertex[], sorted: Vertex[]): void {
     cycled.forEach((vertex: Vertex) => {
       if (vertex instanceof FormulaCellVertex) {
-        vertex.setCellValue(new CellError(ErrorType.CYCLE))
+        vertex.setCellValue(new CellError(ErrorType.CYCLE, undefined, vertex.address))
       }
     })
     sorted.forEach((vertex: Vertex) => {
@@ -169,12 +169,8 @@ export class Evaluator {
     const interpreterValue = this.interpreter.evaluateAst(ast, formulaAddress)
     if (interpreterValue instanceof SimpleRangeValue) {
       return interpreterValue
-    } else if (typeof interpreterValue === 'number') {
-      if (isNumberOverflow(interpreterValue)) {
-        return new CellError(ErrorType.NUM)
-      } else {
-        return fixNegativeZero(interpreterValue)
-      }
+    } else if (interpreterValue === EmptyValue && this.config.evaluateNullToZero) {
+      return 0
     } else {
       return interpreterValue
     }
@@ -187,7 +183,7 @@ export class Evaluator {
     } else if (interpreterValue instanceof SimpleRangeValue && interpreterValue.hasOnlyNumbers()) {
       return interpreterValue
     } else {
-      return new CellError(ErrorType.VALUE)
+      return new CellError(ErrorType.VALUE, ErrorMessage.CellRangeExpected)
     }
   }
 }

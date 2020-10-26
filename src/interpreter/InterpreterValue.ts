@@ -6,6 +6,7 @@
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
 import {CellError, ErrorType, InternalScalarValue} from '../Cell'
 import {DependencyGraph} from '../DependencyGraph'
+import {ErrorMessage} from '../error-message'
 import {MatrixSize} from '../Matrix'
 import {Maybe} from '../Maybe'
 
@@ -23,6 +24,13 @@ export class ArrayData {
 
   public hasOnlyNumbers() {
     return this._hasOnlyNumbers
+  }
+
+  public topLeftCorner(): Maybe<InternalScalarValue> {
+    if (this.size.height > 0 && this.size.width > 0) {
+      return this.data[0][0]
+    }
+    return undefined
   }
 
   public valuesFromTopLeftCorner(): InternalScalarValue[] {
@@ -98,6 +106,13 @@ export class OnlyRangeData {
     return this._hasOnlyNumbers
   }
 
+  public topLeftCorner(): Maybe<InternalScalarValue> {
+    if (this.data !== undefined && this.size.height > 0 && this.size.width > 0) {
+      return this.data[0][0]
+    }
+    return undefined
+  }
+
   public range() {
     return this._range
   }
@@ -140,7 +155,7 @@ export class OnlyRangeData {
     for (const cellFromRange of this._range.addresses(this.dependencyGraph)) {
       const value = this.dependencyGraph.getCellValue(cellFromRange)
       if (value instanceof SimpleRangeValue) {
-        row.push(new CellError(ErrorType.VALUE))
+        row.push(new CellError(ErrorType.VALUE, ErrorMessage.ScalarExpected))
       } else if (typeof value === 'number') {
         row.push(value)
       } else {
@@ -163,13 +178,12 @@ export class OnlyRangeData {
 export type RangeData = ArrayData | OnlyRangeData
 
 export class SimpleRangeValue {
-
   public get size(): MatrixSize {
     return this.data.size
   }
 
-  public static onlyNumbersDataWithRange(data: number[][], size: MatrixSize, _range: AbsoluteCellRange): SimpleRangeValue {
-    return new SimpleRangeValue(new ArrayData(size, data, true))
+  public static onlyNumbersDataWithRange(data: number[][], size: MatrixSize, range: AbsoluteCellRange): SimpleRangeValue {
+    return new SimpleRangeValue(new ArrayData(size, data, true), range)
   }
 
   public static onlyNumbersDataWithoutRange(data: number[][], size: MatrixSize): SimpleRangeValue {
@@ -184,8 +198,10 @@ export class SimpleRangeValue {
     const hasOnlyNumbers = (typeof scalar === 'number')
     return new SimpleRangeValue(new ArrayData({ width: 1, height: 1 }, [[scalar]], hasOnlyNumbers))
   }
+
   constructor(
     public readonly data: RangeData,
+    private readonly _range?: AbsoluteCellRange
   ) {
   }
 
@@ -199,6 +215,10 @@ export class SimpleRangeValue {
 
   public raw(): InternalScalarValue[][] {
     return this.data.raw()
+  }
+
+  public topLeftCornerValue(): Maybe<InternalScalarValue> {
+    return this.data.topLeftCorner()
   }
 
   public valuesFromTopLeftCorner(): InternalScalarValue[] {
@@ -222,7 +242,7 @@ export class SimpleRangeValue {
   }
 
   public range(): Maybe<AbsoluteCellRange> {
-    return this.data.range()
+    return this._range ?? this.data.range()
   }
 
   public sameDimensionsAs(other: SimpleRangeValue): boolean {

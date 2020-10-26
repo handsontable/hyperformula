@@ -16,7 +16,7 @@ import {
 } from '../Cell'
 import {CellDependency} from '../CellDependency'
 import {Config} from '../Config'
-import {Dependencies} from '../GraphBuilder'
+import {ErrorMessage} from '../error-message'
 import {LazilyTransformingAstService} from '../LazilyTransformingAstService'
 import {Maybe} from '../Maybe'
 import {Ast, collectDependencies, NamedExpressionDependency} from '../parser'
@@ -603,7 +603,7 @@ export class DependencyGraph {
   public getScalarValue(address: SimpleCellAddress): InternalScalarValue {
     const value = this.addressMapping.getCellValue(address)
     if (value instanceof SimpleRangeValue) {
-      return new CellError(ErrorType.VALUE)
+      return new CellError(ErrorType.VALUE, ErrorMessage.ScalarExpected)
     }
     return value
   }
@@ -761,6 +761,15 @@ export class DependencyGraph {
         return undefined
       }
     }
+  }
+
+  public computeListOfValuesInRange(range: AbsoluteCellRange): InternalScalarValue[] {
+    const values: InternalScalarValue[] = []
+    for (const cellFromRange of range.addresses(this)) {
+      const value = this.getScalarValue(cellFromRange)
+      values.push(value)
+    }
+    return values
   }
 
   private rangeDependencyQuery = (vertex: RangeVertex) => {

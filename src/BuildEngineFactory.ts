@@ -3,10 +3,10 @@
  * Copyright (c) 2020 Handsoncode. All rights reserved.
  */
 
+import {Exporter} from './Exporter'
 import {LazilyTransformingAstService} from './LazilyTransformingAstService'
 import {CellContentParser} from './CellContentParser'
-import {Exporter} from './CellValue'
-import {buildColumnSearchStrategy, ColumnSearchStrategy} from './ColumnSearch/ColumnSearchStrategy'
+import {buildColumnSearchStrategy, ColumnSearchStrategy} from './Lookup/SearchStrategy'
 import {Config, ConfigParams} from './Config'
 import {DateTimeHelper} from './DateTimeHelper'
 import {CrudOperations} from './CrudOperations'
@@ -80,7 +80,7 @@ export class BuildEngineFactory {
     lazilyTransformingAstService.undoRedo = crudOperations.undoRedo
     lazilyTransformingAstService.parser = parser
 
-    const exporter = new Exporter(config, namedExpressions)
+    const exporter = new Exporter(config, namedExpressions, sheetMapping.fetchDisplayName)
     const serialization = new Serialization(dependencyGraph, unparser, config, exporter)
 
     const evaluator = new Evaluator(dependencyGraph, columnSearch, config, stats, dateHelper, numberLiteralHelper, functionRegistry, namedExpressions, serialization)

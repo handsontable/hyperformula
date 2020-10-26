@@ -30,7 +30,8 @@ The table below presents a list of volatile functions supported by HyperFormula 
 
 | Function ID | Description |
 | :--- | :--- |
-| RAND | Returns a random number between 0 and 1. |
+| RAND | Returns a random number between 0 and 1. Always volatile. |
+| RANDBETWEEN | Returns a random integer between two numbers. Always volatile. |
 | COLUMNS | Returns the number of columns in the given reference. |
 | ROWS | Returns the number of rows in the given reference. |
 

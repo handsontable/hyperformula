@@ -88,6 +88,16 @@ describe('i18n', () => {
     })
   })
 
+  it('functions should have unique names in a single language', () => {
+    allLanguages.forEach(lang => {
+      const names = Object.values(lang.functions)
+      names.sort()
+      for(let i=0;i<names.length-1;i++) {
+        expect(names[i]).not.toEqual(names[i+1])
+      }
+    })
+  })
+
   it('translation package sanitization', () => {
     // eslint-disable-next-line
     // @ts-ignore

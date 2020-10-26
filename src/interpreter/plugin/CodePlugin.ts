@@ -4,6 +4,7 @@
  */
 
 import {CellError, ErrorType, InternalScalarValue, SimpleCellAddress} from '../../Cell'
+import {ErrorMessage} from '../../error-message'
 import {ProcedureAst} from '../../parser'
 import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
 
@@ -12,17 +13,29 @@ export class CodePlugin extends FunctionPlugin {
     'CODE': {
       method: 'code',
       parameters: [
-          {argumentType: ArgumentTypes.STRING}
-        ]
+        {argumentType: ArgumentTypes.STRING}
+      ]
+    },
+    'UNICODE': {
+      method: 'unicode',
+      parameters: [
+        {argumentType: ArgumentTypes.STRING}
+      ]
     },
   }
 
   public code(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.runFunction(ast.args, formulaAddress, this.metadata('CODE'), (value: string) => {
       if (value.length === 0) {
-        return new CellError(ErrorType.VALUE)
+        return new CellError(ErrorType.VALUE, ErrorMessage.EmptyString)
       }
       return value.charCodeAt(0)
+    })
+  }
+
+  public unicode(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('UNICODE'), (value: string) => {
+      return value.codePointAt(0) ?? new CellError(ErrorType.VALUE, ErrorMessage.EmptyString)
     })
   }
 }

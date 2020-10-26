@@ -18,7 +18,7 @@ describe('EmptyValue tests', () => {
     expect(engine.getCellValue(adr('I1'))).toEqual(0) // ADD
     expect(engine.getCellValue(adr('J1'))).toEqual(0) // SUB
     expect(engine.getCellValue(adr('K1'))).toEqual(0) // MULT
-    expect(engine.getCellValue(adr('L1'))).toEqual(detailedError(ErrorType.DIV_BY_ZERO)) // DIV
+    expect(engine.getCellValue(adr('L1'))).toEqualError(detailedError(ErrorType.DIV_BY_ZERO)) // DIV
     expect(engine.getCellValue(adr('M1'))).toEqual(1) // EXP
     expect(engine.getCellValue(adr('N1'))).toEqual('') // CONCAT
     expect(engine.getCellValue(adr('O1'))).toBe(null) // UNARY PLUS
@@ -40,9 +40,9 @@ describe('EmptyValue tests', () => {
     expect(engine.getCellValue(adr('I1'))).toEqual(1) // ADD
     expect(engine.getCellValue(adr('J1'))).toEqual(1) // SUB
     expect(engine.getCellValue(adr('K1'))).toEqual(0) // MULT
-    expect(engine.getCellValue(adr('L1'))).toEqual(detailedError(ErrorType.DIV_BY_ZERO)) // DIV
+    expect(engine.getCellValue(adr('L1'))).toEqualError(detailedError(ErrorType.DIV_BY_ZERO)) // DIV
     expect(engine.getCellValue(adr('M1'))).toEqual(1) // EXP
-    expect(engine.getCellValue(adr('N1'))).toEqual('true') // CONCAT
+    expect(engine.getCellValue(adr('N1'))).toEqual('TRUE') // CONCAT
     expect(engine.getCellValue(adr('O1'))).toEqual(true) // UNARY PLUS
     expect(engine.getCellValue(adr('P1'))).toEqual(-1) // UNARY MINUS
     expect(engine.getCellValue(adr('Q1'))).toEqual(0.01) // PERCENTAGE

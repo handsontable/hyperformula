@@ -1,5 +1,6 @@
 import {HyperFormula} from '../src'
 import {ErrorType} from '../src/Cell'
+import {ErrorMessage} from '../src/error-message'
 import {detailedError} from './testUtils'
 
 describe('Temporary formulas - normalization', () => {
@@ -9,6 +10,24 @@ describe('Temporary formulas - normalization', () => {
     const normalizedFormula = engine.normalizeFormula('=SHEET1!A1+10')
 
     expect(normalizedFormula).toEqual('=Sheet1!A1+10')
+  })
+
+  it('fail with a typo', () => { 
+    const engine = HyperFormula.buildFromArray([])
+
+    const normalizedFormula = engine.normalizeFormula('=SHET1!A1+10')
+    const normalizedFormula2 = engine.normalizeFormula('=SUM(SHET1!A1:A100)')
+   
+    expect(normalizedFormula).toEqual('=SHET1!A1+10')
+    expect(normalizedFormula2).toEqual('=SUM(SHET1!A1:A100)')
+  })
+
+  it('works with absolute addressing', () => {
+    const engine = HyperFormula.buildFromArray([])
+
+    const normalizedFormula = engine.normalizeFormula('=3*$a$1')
+
+    expect(normalizedFormula).toEqual('=3*$A$1')
   })
 
   it('wont normalize sheet names of not existing sheets', () => {
@@ -39,7 +58,7 @@ describe('Temporary formulas - validation', () => {
   it('fail when not a formula', () => {
     const engine = HyperFormula.buildFromArray([])
 
-    expect(engine.validateFormula('=SOME SYNTAX ERROR')).toBe(false)
+    expect(engine.validateFormula('=SOME SYNTAX ERRORS')).toBe(false)
   })
 
   it('ok when literal error', () => {
@@ -104,7 +123,7 @@ describe('Temporary formulas - calculation', () => {
 
     const result = engine.calculateFormula('=TRANSPOSE(A1:B2)', 'Sheet1')
 
-    expect(result).toEqual(detailedError(ErrorType.VALUE))
+    expect(result).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.ScalarExpected))
   })
 
   it('passing something which is not a formula doesnt work', () => {

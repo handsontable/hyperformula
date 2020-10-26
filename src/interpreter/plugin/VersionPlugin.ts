@@ -3,10 +3,12 @@
  * Copyright (c) 2020 Handsoncode. All rights reserved.
  */
 
+import {SimpleCellAddress} from '../../Cell'
+import {ProcedureAst} from '../../parser'
 import {InterpreterValue} from '../InterpreterValue'
-import { FunctionPlugin } from './FunctionPlugin'
-import { HyperFormula } from '../../HyperFormula'
-import { LicenseKeyValidityState } from '../../helpers/licenseKeyValidator'
+import {FunctionPlugin} from './FunctionPlugin'
+import {HyperFormula} from '../../HyperFormula'
+import {LicenseKeyValidityState} from '../../helpers/licenseKeyValidator'
 
 const LICENSE_STATUS_MAP = new Map([
   ['agpl-v3', 1],
@@ -20,26 +22,27 @@ export class VersionPlugin extends FunctionPlugin {
   public static implementedFunctions = {
     'VERSION': {
       method: 'version',
+      parameters: [],
     },
   }
 
-  public version(): InterpreterValue {
-    const {
-      licenseKeyValidityState: validityState,
-      licenseKey,
-    } = this.config
-    let status
+  public version(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InterpreterValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('VERSION'), () => {
+      const {
+        licenseKeyValidityState: validityState,
+        licenseKey,
+      } = this.config
+      let status
 
-    if (LICENSE_STATUS_MAP.has(licenseKey)) {
-      status = LICENSE_STATUS_MAP.get(licenseKey)
+      if (LICENSE_STATUS_MAP.has(licenseKey)) {
+        status = LICENSE_STATUS_MAP.get(licenseKey)
+      } else if (LICENSE_STATUS_MAP.has(validityState)) {
+        status = LICENSE_STATUS_MAP.get(validityState)
+      } else if (validityState === LicenseKeyValidityState.VALID) {
+        status = licenseKey.slice(-5)
+      }
 
-    } else if (LICENSE_STATUS_MAP.has(validityState)) {
-      status = LICENSE_STATUS_MAP.get(validityState)
-
-    } else if (!status && validityState === LicenseKeyValidityState.VALID) {
-      status = licenseKey.slice(-5)
-    }
-
-    return `HyperFormula v${HyperFormula.version}, ${status}`
+      return `HyperFormula v${HyperFormula.version}, ${status}`
+    })
   }
 }

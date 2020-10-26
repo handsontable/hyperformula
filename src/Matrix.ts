@@ -5,6 +5,7 @@
 
 import {AbsoluteCellRange} from './AbsoluteCellRange'
 import {CellError, ErrorType, SimpleCellAddress, simpleCellAddress} from './Cell'
+import {ErrorMessage} from './error-message'
 import {Ast, AstNodeType} from './parser'
 
 export class MatrixSize {
@@ -40,10 +41,10 @@ export function checkMatrixSize(ast: Ast, formulaAddress: SimpleCellAddress): Ma
     switch (ast.procedureName) {
       case 'MMULT': {
         if (ast.args.length !== 2) {
-          return new CellError(ErrorType.NA)
+          return new CellError(ErrorType.NA, ErrorMessage.WrongArgNumber)
         }
         if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
-          return new CellError(ErrorType.NUM)
+          return new CellError(ErrorType.NUM, ErrorMessage.EmptyArg )
         }
 
         const left = checkMatrixSize(ast.args[0], formulaAddress)
@@ -54,7 +55,7 @@ export function checkMatrixSize(ast: Ast, formulaAddress: SimpleCellAddress): Ma
         } else if (right instanceof CellError) {
           return right
         } else if (left.width !== right.height) {
-          return new CellError(ErrorType.VALUE)
+          return new CellError(ErrorType.VALUE, ErrorMessage.MatrixDimensions)
         } else {
           return matrixSizeForMultiplication(left, right)
         }
@@ -62,10 +63,10 @@ export function checkMatrixSize(ast: Ast, formulaAddress: SimpleCellAddress): Ma
       case 'MEDIANPOOL':
       case 'MAXPOOL': {
         if (ast.args.length < 2 || ast.args.length > 3) {
-          return new CellError(ErrorType.NA)
+          return new CellError(ErrorType.NA, ErrorMessage.WrongArgNumber)
         }
         if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
-          return new CellError(ErrorType.NUM)
+          return new CellError(ErrorType.NUM, ErrorMessage.EmptyArg )
         }
 
         const matrix = checkMatrixSize(ast.args[0], formulaAddress)
@@ -74,7 +75,7 @@ export function checkMatrixSize(ast: Ast, formulaAddress: SimpleCellAddress): Ma
         if (matrix instanceof CellError) {
           return matrix
         } else if (windowArg.type !== AstNodeType.NUMBER) {
-          return new CellError(ErrorType.VALUE)
+          return new CellError(ErrorType.VALUE, ErrorMessage.NumberExpected)
         }
 
         const window = windowArg.value
@@ -85,32 +86,32 @@ export function checkMatrixSize(ast: Ast, formulaAddress: SimpleCellAddress): Ma
           if (strideArg.type === AstNodeType.NUMBER) {
             stride = strideArg.value
           } else {
-            return new CellError(ErrorType.VALUE)
+            return new CellError(ErrorType.VALUE, ErrorMessage.MatrixParams)
           }
         }
 
         if (window > matrix.width || window > matrix.height
           || stride > window
           || (matrix.width - window) % stride !== 0 || (matrix.height - window) % stride !== 0) {
-          return new CellError(ErrorType.VALUE)
+          return new CellError(ErrorType.VALUE) //TODO
         }
 
         return matrixSizeForPoolFunction(matrix, window, stride)
       }
       case 'TRANSPOSE': {
         if (ast.args.length !== 1) {
-          return new CellError(ErrorType.NA)
+          return new CellError(ErrorType.NA, ErrorMessage.WrongArgNumber)
         }
 
         if (ast.args[0].type === AstNodeType.EMPTY) {
-          return new CellError(ErrorType.NUM)
+          return new CellError(ErrorType.NUM, ErrorMessage.EmptyArg )
         }
         const size = checkMatrixSize(ast.args[0], formulaAddress)
 
         return size instanceof CellError ? size : matrixSizeForTranspose(size)
       }
       default: {
-        return new CellError(ErrorType.VALUE)
+        return new CellError(ErrorType.VALUE, ErrorMessage.MatrixFunction)
       }
     }
   } else if (ast.type === AstNodeType.CELL_RANGE) {
@@ -119,7 +120,7 @@ export function checkMatrixSize(ast: Ast, formulaAddress: SimpleCellAddress): Ma
   } else if (ast.type === AstNodeType.NUMBER || ast.type === AstNodeType.CELL_REFERENCE) {
     return {width: 1, height: 1}
   } else {
-    return new CellError(ErrorType.VALUE)
+    return new CellError(ErrorType.VALUE) //TODO
   }
 }
 

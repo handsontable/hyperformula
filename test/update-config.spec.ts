@@ -1,10 +1,11 @@
 import {HyperFormula} from '../src'
 import {ErrorType} from '../src/Cell'
+import {ErrorMessage} from '../src/error-message'
 import {plPL} from '../src/i18n/languages'
 import {adr, detailedError} from './testUtils'
 
 describe('update config', () => {
-  it('simple reload preserves values', () => {
+  it('simple reload preserves all values', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '=A1', '=SUM(A1:B1)'],
       ['#DIV/0!', '=B2', '=F(']
@@ -14,9 +15,9 @@ describe('update config', () => {
     expect(engine.getCellValue(adr('A1'))).toBe(1)
     expect(engine.getCellValue(adr('B1'))).toBe(1)
     expect(engine.getCellValue(adr('C1'))).toBe(2)
-    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.DIV_BY_ZERO))
-    expect(engine.getCellValue(adr('B2'))).toEqual(detailedError(ErrorType.CYCLE))
-    expect(engine.getCellValue(adr('C2'))).toEqual(detailedError(ErrorType.ERROR, 'Parsing error'))
+    expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.DIV_BY_ZERO))
+    expect(engine.getCellValue(adr('B2'))).toEqualError(detailedError(ErrorType.CYCLE))
+    expect(engine.getCellValue(adr('C2'))).toEqualError(detailedError(ErrorType.ERROR, ErrorMessage.ParseError))
   })
   it('simple reload preserves formulas', () => {
     const engine = HyperFormula.buildFromArray([

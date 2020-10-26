@@ -1,16 +1,16 @@
 import {HyperFormula, ExportedCellChange} from '../../src'
 import {AbsoluteCellRange} from '../../src/AbsoluteCellRange'
 import {ErrorType, simpleCellAddress} from '../../src/Cell'
-import {ColumnIndex} from '../../src/ColumnSearch/ColumnIndex'
+import {ColumnIndex} from '../../src/Lookup/ColumnIndex'
 import {MatrixVertex} from '../../src/DependencyGraph'
 import {NoSheetWithNameError} from '../../src'
 import {CellAddress} from '../../src/parser'
 import {
-  adr, detailedError,
+  adr,
   expectArrayWithSameContent,
   expectReferenceToHaveRefError,
   expectEngineToBeTheSameAs,
-  extractReference,
+  extractReference, detailedErrorWithOrigin,
 } from '../testUtils'
 
 describe('Removing sheet - checking if its possible', () => {
@@ -212,21 +212,6 @@ describe('remove sheet - adjust formula dependencies', () => {
     expectReferenceToHaveRefError(engine, adr('A4'))
   })
 
-  it('should be #REF after removing sheet #2', () => {
-    const engine = HyperFormula.buildFromSheets({
-      Sheet1: [
-        ['=Sheet2!A:B'],
-      ],
-      Sheet2: [
-        ['1'],
-      ],
-    })
-
-    engine.removeSheet('Sheet2')
-
-    expectReferenceToHaveRefError(engine, adr('A1'))
-  })
-
   it('should return changed values', () => {
     const engine = HyperFormula.buildFromSheets({
       Sheet1: [
@@ -240,7 +225,7 @@ describe('remove sheet - adjust formula dependencies', () => {
     const changes = engine.removeSheet('Sheet2')
 
     expect(changes.length).toBe(1)
-    expect(changes).toContainEqual(new ExportedCellChange(simpleCellAddress(0, 0, 0), detailedError(ErrorType.REF)))
+    expect(changes).toContainEqual(new ExportedCellChange(simpleCellAddress(0, 0, 0), detailedErrorWithOrigin(ErrorType.REF, 'Sheet1!A1')))
   })
 })
 

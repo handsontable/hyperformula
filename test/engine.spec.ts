@@ -1,5 +1,6 @@
 import {DetailedCellError, ErrorType, HyperFormula} from '../src'
 import {CellType, CellValueType} from '../src/Cell'
+import {ErrorMessage} from '../src/error-message'
 import {plPL} from '../src/i18n/languages'
 import {adr, detailedError, expectArrayWithSameContent} from './testUtils'
 import {Config} from '../src/Config'
@@ -38,14 +39,14 @@ describe('#buildFromArray', () => {
   it('cycle', () => {
     const engine = HyperFormula.buildFromArray([['=B1', '=C1', '=A1']])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.CYCLE))
-    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.CYCLE))
-    expect(engine.getCellValue(adr('C1'))).toEqual(detailedError(ErrorType.CYCLE))
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.CYCLE))
+    expect(engine.getCellValue(adr('B1'))).toEqualError(detailedError(ErrorType.CYCLE))
+    expect(engine.getCellValue(adr('C1'))).toEqualError(detailedError(ErrorType.CYCLE))
   })
 
   it('cycle with formula', () => {
     const engine = HyperFormula.buildFromArray([['5', '=A1+B1']])
-    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.CYCLE))
+    expect(engine.getCellValue(adr('B1'))).toEqualError(detailedError(ErrorType.CYCLE))
   })
 
   it('operator precedence', () => {
@@ -66,7 +67,7 @@ describe('#buildFromArray', () => {
   it('parsing error', () => {
     const engine = HyperFormula.buildFromArray([['=A1B1']])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.ERROR, 'Parsing error'))
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.ERROR, ErrorMessage.ParseError))
   })
 
   it('dependency before value', () => {
@@ -103,7 +104,7 @@ describe('#buildFromArray', () => {
     const engine = HyperFormula.buildFromArray([['=Sheet2!A2']])
 
     expect(engine.getCellFormula(adr('A1'))).toEqual('=Sheet2!A2')
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.REF))
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.REF))
   })
 
   it('should propagate parsing errors', () => {
@@ -111,10 +112,10 @@ describe('#buildFromArray', () => {
       ['=SUM(', '=A1']
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.ERROR, 'Parsing error'))
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.ERROR, ErrorMessage.ParseError))
     expect(engine.getCellFormula(adr('A1'))).toEqual('=SUM(')
 
-    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.ERROR, 'Parsing error'))
+    expect(engine.getCellValue(adr('B1'))).toEqualError(detailedError(ErrorType.ERROR, ErrorMessage.ParseError))
     expect(engine.getCellFormula(adr('B1'))).toEqual('=A1')
   })
 })
@@ -180,7 +181,7 @@ describe('#getCellFormula', () => {
       ['=SUM(']
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.ERROR, 'Parsing error'))
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.ERROR, ErrorMessage.ParseError))
     expect(engine.getCellFormula(adr('A1'))).toEqual('=SUM(')
   })
 
@@ -189,7 +190,7 @@ describe('#getCellFormula', () => {
       ['{=TRANSPOSE(}']
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.ERROR, 'Parsing error'))
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.ERROR, ErrorMessage.ParseError))
     expect(engine.getCellFormula(adr('A1'))).toEqual('{=TRANSPOSE(}')
   })
 })
@@ -263,7 +264,7 @@ describe('#getCellValue', () => {
     expect(engine.getCellValue(adr('A1'))).toEqual(1)
     expect(engine.getCellValue(adr('B1'))).toEqual(2)
     expect(engine.getCellValue(adr('C1'))).toEqual(true)
-    expect(engine.getCellValue(adr('D1'))).toEqual(detailedError(ErrorType.DIV_BY_ZERO))
+    expect(engine.getCellValue(adr('D1'))).toEqualError(detailedError(ErrorType.DIV_BY_ZERO))
   })
 
   it('should return parsing error value', () => {
@@ -271,7 +272,7 @@ describe('#getCellValue', () => {
       ['=SUM(']
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.ERROR, 'Parsing error'))
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.ERROR, ErrorMessage.ParseError))
   })
 
   it('should return value of a cell in a formula matrix', () => {
@@ -301,7 +302,7 @@ describe('#getCellValue', () => {
     ], {language: 'plPL'})
 
     const error = engine.getCellValue(adr('A1')) as DetailedCellError
-    expect(error).toEqual(detailedError(ErrorType.VALUE, '', new Config({language: 'plPL'})))
+    expect(error).toEqualError(detailedError(ErrorType.VALUE, '', new Config({language: 'plPL'})))
     expect(error.value).toEqual('#ARG!')
   })
 })

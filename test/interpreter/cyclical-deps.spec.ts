@@ -9,9 +9,9 @@ describe('Cyclical dependencies and error literals', () => {
       ['=ISERROR(A1)', '=ISERROR(B1)']
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.CYCLE))
-    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.CYCLE))
-    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.CYCLE))
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.CYCLE))
+    expect(engine.getCellValue(adr('B1'))).toEqualError(detailedError(ErrorType.CYCLE))
+    expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.CYCLE))
     expect(engine.getCellValue(adr('B2'))).toEqual(true)
   })
   it('Errors should be parsed and propagated', () => {
@@ -19,10 +19,10 @@ describe('Cyclical dependencies and error literals', () => {
       ['=B1', '=A1', '=ISERROR(B1)', '=C1+D1', '=ISERROR(D1)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.CYCLE))
-    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.CYCLE))
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.CYCLE))
+    expect(engine.getCellValue(adr('B1'))).toEqualError(detailedError(ErrorType.CYCLE))
     expect(engine.getCellValue(adr('C1'))).toEqual(true)
-    expect(engine.getCellValue(adr('D1'))).toEqual(detailedError(ErrorType.CYCLE))
+    expect(engine.getCellValue(adr('D1'))).toEqualError(detailedError(ErrorType.CYCLE))
     expect(engine.getCellValue(adr('E1'))).toEqual(true)
   })
 })

@@ -1,12 +1,13 @@
 import {HyperFormula} from '../../src'
 import {ErrorType} from '../../src/Cell'
+import {ErrorMessage} from '../../src/error-message'
 import {adr, detailedError} from '../testUtils'
 
 describe('MINA', () => {
   it('MINA with empty args', () => {
     const engine = HyperFormula.buildFromArray([['=MINA()']])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA))
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
   })
 
   it('MINA with args', () => {
@@ -42,9 +43,13 @@ describe('MINA', () => {
   })
 
   it('MINA of empty value and some positive number', () => {
-    const engine = HyperFormula.buildFromArray([['', '1', '=MINA(A1,B1)']])
+    const engine = HyperFormula.buildFromArray([
+      ['', '1', '=MINA(A1,B1)'],
+      [null, '1', '=MINA(A2,B2)'],
+    ])
 
-    expect(engine.getCellValue(adr('C1'))).toEqual(1)
+    expect(engine.getCellValue(adr('C1'))).toEqual(0)
+    expect(engine.getCellValue(adr('C2'))).toEqual(1)
   })
 
   it('over a range value', () => {
@@ -64,6 +69,6 @@ describe('MINA', () => {
       ['=MINA(A1:B2)'],
     ])
 
-    expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.DIV_BY_ZERO))
+    expect(engine.getCellValue(adr('A3'))).toEqualError(detailedError(ErrorType.DIV_BY_ZERO))
   })
 })

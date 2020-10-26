@@ -3,7 +3,7 @@
  * Copyright (c) 2020 Handsoncode. All rights reserved.
  */
 
-import {ErrorType} from './Cell'
+import {TranslatableErrorType} from './Cell'
 import {defaultParseToDateTime} from './DateTimeDefault'
 import {DateTime, instanceOfSimpleDate, SimpleDate, SimpleDateTime, SimpleTime} from './DateTimeHelper'
 import {
@@ -199,6 +199,17 @@ export interface ConfigParams {
    */
   matrixDetectionThreshold: number,
   /**
+   * Sets the compatibility mode for behaviour of null value.
+   * If set, formula evaluating to null evaluates to 0 instead.
+   *
+   * @default false
+   *
+   * @category Engine
+   *
+   * @since 0.2.0
+   */
+  evaluateNullToZero: boolean,
+  /**
    * Two-digit values when interpreted as a year can be either 19xx or 20xx.
    * If `xx <= nullYear` its latter, otherwise its former.
    *
@@ -285,13 +296,25 @@ export interface ConfigParams {
   /**
    * Determines minimum number of elements a range must have in order to use binary search.
    * Shorter ranges will be searched naively.
-   * Used by VLOOKUP and MATCH functions.
+   * Used by VLOOKUP, HLOOKUP and MATCH functions.
+   *
+   * @default 20
+   *
+   * @category Engine
+   *
+   * @deprecated Use {@link binarySearchThreshold} instead.
+   */
+  vlookupThreshold: number,
+  /**
+   * Determines minimum number of elements a range must have in order to use binary search.
+   * Shorter ranges will be searched naively.
+   * Used by VLOOKUP, HLOOKUP and MATCH functions.
    *
    * @default 20
    *
    * @category Engine
    */
-  vlookupThreshold: number,
+  binarySearchThreshold: number,
   /**
    * Allows to set a specific date from which the number of days will be counted.
    * Dates are represented internally as a number of days that passed since this `nullDate`.
@@ -372,6 +395,7 @@ export class Config implements ConfigParams, ParserConfig {
     localeLang: 'en',
     matrixDetection: true,
     matrixDetectionThreshold: 100,
+    evaluateNullToZero: false,
     nullYear: 30,
     parseDateTime: defaultParseToDateTime,
     stringifyDateTime: defaultStringifyDateTime,
@@ -381,6 +405,7 @@ export class Config implements ConfigParams, ParserConfig {
     useColumnIndex: false,
     useStats: false,
     vlookupThreshold: 20,
+    binarySearchThreshold: 20,
     nullDate: {year: 1899, month: 12, day: 30},
     undoLimit: 20,
     useRegularExpressions: false,
@@ -413,7 +438,7 @@ export class Config implements ConfigParams, ParserConfig {
   /** @inheritDoc */
   public readonly licenseKey: string
   /** @inheritDoc */
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   public readonly functionPlugins: FunctionPluginDefinition[]
   /** @inheritDoc */
   public readonly gpuMode: GPUMode
@@ -427,6 +452,8 @@ export class Config implements ConfigParams, ParserConfig {
   public readonly localeLang: string
   /** @inheritDoc */
   public readonly matrixDetectionThreshold: number
+  /** @inheritDoc */
+  public readonly evaluateNullToZero: boolean
   /** @inheritDoc */
   public readonly nullYear: number
   /** @inheritDoc */
@@ -448,6 +475,8 @@ export class Config implements ConfigParams, ParserConfig {
   /** @inheritDoc */
   public readonly vlookupThreshold: number
   /** @inheritDoc */
+  public readonly binarySearchThreshold: number
+  /** @inheritDoc */
   public readonly nullDate: SimpleDate
   /** @inheritDoc */
   public readonly undoLimit: number
@@ -456,7 +485,7 @@ export class Config implements ConfigParams, ParserConfig {
    *
    * @internal
    */
-  public readonly errorMapping: Record<string, ErrorType>
+  public readonly errorMapping: Record<string, TranslatableErrorType>
   /** @inheritDoc */
   public readonly maxRows: number
   /** @inheritDoc */
@@ -507,6 +536,7 @@ export class Config implements ConfigParams, ParserConfig {
       smartRounding,
       matrixDetection,
       matrixDetectionThreshold,
+      evaluateNullToZero,
       nullYear,
       parseDateTime,
       stringifyDateTime,
@@ -515,6 +545,7 @@ export class Config implements ConfigParams, ParserConfig {
       precisionRounding,
       useColumnIndex,
       vlookupThreshold,
+      binarySearchThreshold,
       nullDate,
       useStats,
       undoLimit,
@@ -545,6 +576,7 @@ export class Config implements ConfigParams, ParserConfig {
     this.matrixDetection = this.valueFromParam(matrixDetection, 'boolean', 'matrixDetection')
     this.matrixDetectionThreshold = this.valueFromParam(matrixDetectionThreshold, 'number', 'matrixDetectionThreshold')
     this.validateNumberToBeAtLeast(this.matrixDetectionThreshold, 'matrixDetectionThreshold', 1)
+    this.evaluateNullToZero = this.valueFromParam(evaluateNullToZero, 'boolean', 'evaluateNullToZero')
     this.nullYear = this.valueFromParam(nullYear, 'number', 'nullYear')
     this.validateNumberToBeAtLeast(this.nullYear, 'nullYear', 0)
     this.validateNumberToBeAtMost(this.nullYear, 'nullYear', 100)
@@ -556,6 +588,8 @@ export class Config implements ConfigParams, ParserConfig {
     this.useStats = this.valueFromParam(useStats, 'boolean', 'useStats')
     this.vlookupThreshold = this.valueFromParam(vlookupThreshold, 'number', 'vlookupThreshold')
     this.validateNumberToBeAtLeast(this.vlookupThreshold, 'vlookupThreshold', 1)
+    this.binarySearchThreshold = this.valueFromParam(binarySearchThreshold ?? vlookupThreshold, 'number', 'vlookupThreshold')
+    this.validateNumberToBeAtLeast(this.binarySearchThreshold, 'binarySearchThreshold', 1)
     this.parseDateTime = this.valueFromParam(parseDateTime, 'function', 'parseDateTime')
     this.stringifyDateTime = this.valueFromParam(stringifyDateTime, 'function', 'stringifyDateTime')
     this.stringifyDuration = this.valueFromParam(stringifyDuration, 'function', 'stringifyDuration')
@@ -573,6 +607,7 @@ export class Config implements ConfigParams, ParserConfig {
     this.maxColumns = this.valueFromParam(maxColumns, 'number', 'maxColumns')
     this.validateNumberToBeAtLeast(this.maxColumns, 'maxColumns', 1)
 
+    this.warnDeprecatedIfUsed(vlookupThreshold, 'vlookupThreshold', 'v.0.3.0', 'binarySearchThreshold')
 
     this.checkIfParametersNotInConflict(
       {value: this.decimalSeparator, name: 'decimalSeparator'},
@@ -589,6 +624,12 @@ export class Config implements ConfigParams, ParserConfig {
     const mergedConfig: ConfigParams = Object.assign({}, this.getConfig(), init)
 
     return new Config(mergedConfig)
+  }
+
+  private warnDeprecatedIfUsed(inputValue: any, paramName: string, fromVersion: string, replacementName: string) {
+    if (inputValue !== undefined) {
+      console.warn(`${paramName} option is deprecated since ${fromVersion}, please use ${replacementName}`)
+    }
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

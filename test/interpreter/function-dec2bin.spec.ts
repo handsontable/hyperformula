@@ -1,5 +1,6 @@
 import {HyperFormula} from '../../src'
 import {CellValueType, ErrorType} from '../../src/Cell'
+import {ErrorMessage} from '../../src/error-message'
 import {adr, detailedError} from '../testUtils'
 
 describe('function DEC2BIN', () => {
@@ -8,7 +9,7 @@ describe('function DEC2BIN', () => {
       ['=DEC2BIN("foo")'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.NumberCoercion))
   })
 
   it('should return error when wrong number of argument', () => {
@@ -16,7 +17,7 @@ describe('function DEC2BIN', () => {
       ['=DEC2BIN("foo", 2, 3)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA))
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
   })
 
   it('should work', () => {
@@ -68,10 +69,10 @@ describe('function DEC2BIN', () => {
       ['=DEC2BIN(512)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM))
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.ValueBaseSmall))
     expect(engine.getCellValue(adr('A2'))).toEqual('1000000000')
     expect(engine.getCellValue(adr('A3'))).toEqual('111111111')
-    expect(engine.getCellValue(adr('A4'))).toEqual(detailedError(ErrorType.NUM))
+    expect(engine.getCellValue(adr('A4'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.ValueBaseLarge))
   })
 
   it('should respect second argument and fill with zeros for positive arguments', () => {
@@ -82,6 +83,16 @@ describe('function DEC2BIN', () => {
 
     expect(engine.getCellValue(adr('A1'))).toEqual('00000010')
     expect(engine.getCellValue(adr('A2'))).toEqual('0101')
+  })
+
+  it('should fail if the result is longer than the desired number of digits', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=DEC2BIN(50, 1)'],
+      ['=DEC2BIN(777, "4")'],
+    ])
+
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.ValueBaseLong))
+    expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.ValueBaseLarge))
   })
 
   it('should ignore second argument for negative numbers', () => {
@@ -100,8 +111,8 @@ describe('function DEC2BIN', () => {
       ['=DEC2BIN(-2, 12)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM))
-    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NUM))
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.ValueSmall))
+    expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.ValueLarge))
   })
 
   // Inconsistency with Product 1
@@ -111,6 +122,6 @@ describe('function DEC2BIN', () => {
       ['=2', '=DEC2BIN(A1:A2)'],
     ])
 
-    expect(engine.getCellValue(adr('B2'))).toEqual(detailedError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('B2'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.WrongType))
   })
 })

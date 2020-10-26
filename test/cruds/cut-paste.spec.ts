@@ -1,7 +1,7 @@
 import {ErrorType, HyperFormula, NoSheetWithIdError} from '../../src'
 import {AbsoluteCellRange} from '../../src/AbsoluteCellRange'
 import {EmptyValue, simpleCellAddress} from '../../src/Cell'
-import {ColumnIndex} from '../../src/ColumnSearch/ColumnIndex'
+import {ColumnIndex} from '../../src/Lookup/ColumnIndex'
 import {EmptyCellVertex, ValueCellVertex} from '../../src/DependencyGraph'
 import {CellAddress} from '../../src/parser'
 import {
@@ -44,10 +44,10 @@ describe('Address dependencies, moved formulas', () => {
     engine.cut(adr('A1'), 1, 4)
     engine.paste(adr('B1'))
 
-    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.CYCLE))
-    expect(engine.getCellValue(adr('B2'))).toEqual(detailedError(ErrorType.CYCLE))
-    expect(engine.getCellValue(adr('B3'))).toEqual(detailedError(ErrorType.CYCLE))
-    expect(engine.getCellValue(adr('B4'))).toEqual(detailedError(ErrorType.CYCLE))
+    expect(engine.getCellValue(adr('B1'))).toEqualError(detailedError(ErrorType.CYCLE))
+    expect(engine.getCellValue(adr('B2'))).toEqualError(detailedError(ErrorType.CYCLE))
+    expect(engine.getCellValue(adr('B3'))).toEqualError(detailedError(ErrorType.CYCLE))
+    expect(engine.getCellValue(adr('B4'))).toEqualError(detailedError(ErrorType.CYCLE))
     expect(engine.getCellFormula(adr('B1'))).toEqual('=B1')
     expect(engine.getCellFormula(adr('B2'))).toEqual('=$B2')
     expect(engine.getCellFormula(adr('B3'))).toEqual('=B$3')

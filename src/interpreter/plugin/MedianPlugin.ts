@@ -4,7 +4,8 @@
  */
 
 import {CellError, ErrorType, InternalScalarValue, SimpleCellAddress} from '../../Cell'
-import {ProcedureAst} from '../../parser'
+import {ErrorMessage} from '../../error-message'
+import {AstNodeType, ProcedureAst} from '../../parser'
 import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
 
 /**
@@ -16,10 +17,10 @@ export class MedianPlugin extends FunctionPlugin {
     'MEDIAN': {
       method: 'median',
       parameters: [
-          {argumentType: ArgumentTypes.NOERROR},
-        ],
-        repeatLastArg: true,
-        expandRanges: true,
+        {argumentType: ArgumentTypes.NOERROR},
+      ],
+      repeatLastArgs: 1,
+      expandRanges: true,
     },
   }
 
@@ -34,8 +35,13 @@ export class MedianPlugin extends FunctionPlugin {
   public median(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.runFunction(ast.args, formulaAddress, this.metadata('MEDIAN'), (...args) => {
       const values: number[] = args.filter((val: InternalScalarValue) => (typeof val === 'number'))
+      ast.args.forEach((arg) => { //ugly but works
+        if (arg.type === AstNodeType.EMPTY) {
+          values.push(0)
+        }
+      })
       if (values.length === 0) {
-        return new CellError(ErrorType.NUM)
+        return new CellError(ErrorType.NUM, ErrorMessage.OneValue)
       }
       values.sort((a, b) => (a - b))
       if (values.length % 2 === 0) {

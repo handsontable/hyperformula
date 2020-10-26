@@ -9,11 +9,12 @@ import {
   EmptyValue,
   ErrorType,
   getCellValueType,
-  InternalNoErrorCellValue,
+  InternalNoErrorScalarValue,
   InternalScalarValue
 } from '../Cell'
 import {Config} from '../Config'
 import {DateTimeHelper} from '../DateTimeHelper'
+import {ErrorMessage} from '../error-message'
 import {Maybe} from '../Maybe'
 import {NumberLiteralHelper} from '../NumberLiteralHelper'
 import {collatorFromConfig} from '../StringHelper'
@@ -100,7 +101,31 @@ export class ArithmeticHelper {
     return str
   }
 
-  public compare(left: InternalNoErrorCellValue, right: InternalNoErrorCellValue): number {
+  public lt = (left: InternalNoErrorScalarValue, right: InternalNoErrorScalarValue): boolean => {
+    return this.compare(left, right) < 0
+  }
+
+  public leq = (left: InternalNoErrorScalarValue, right: InternalNoErrorScalarValue): boolean => {
+    return this.compare(left, right) <= 0
+  }
+
+  public gt = (left: InternalNoErrorScalarValue, right: InternalNoErrorScalarValue): boolean => {
+    return this.compare(left, right) > 0
+  }
+
+  public geq = (left: InternalNoErrorScalarValue, right: InternalNoErrorScalarValue): boolean => {
+    return this.compare(left, right) >= 0
+  }
+
+  public eq = (left: InternalNoErrorScalarValue, right: InternalNoErrorScalarValue): boolean => {
+    return this.compare(left, right) === 0
+  }
+
+  public neq = (left: InternalNoErrorScalarValue, right: InternalNoErrorScalarValue): boolean => {
+    return this.compare(left, right) !== 0
+  }
+
+  private compare(left: InternalNoErrorScalarValue, right: InternalNoErrorScalarValue): number {
     if (typeof left === 'string' || typeof right === 'string') {
       const leftTmp = typeof left === 'string' ? this.dateTimeHelper.dateStringToDateNumber(left) : left
       const rightTmp = typeof right === 'string' ? this.dateTimeHelper.dateStringToDateNumber(right) : right
@@ -141,21 +166,13 @@ export class ArithmeticHelper {
     }
   }
 
-  public stringCmp(left: string, right: string): number {
+  private stringCmp(left: string, right: string): number {
     return this.collator.compare(left, right)
   }
 
-  public add(left: number | CellError, right: number | CellError): number | CellError {
-    if (left instanceof CellError) {
-      return left
-    } else if (right instanceof CellError) {
-      return right
-    } else {
-      return this.addWithEpsilon(left, right)
-    }
-  }
+  public pow = Math.pow
 
-  private addWithEpsilon(left: number, right: number): number {
+  public addWithEpsilon = (left: number, right: number) => {
     const ret = left + right
     if (Math.abs(ret) < this.actualEps * Math.abs(left)) {
       return 0
@@ -164,12 +181,25 @@ export class ArithmeticHelper {
     }
   }
 
+  public unaryMinus = (arg: number): number => {
+    return -arg
+  }
+
+  public unaryPlus = (arg: number): number => {
+    return arg
+  }
+
+  public unaryPercent = (arg: number): number => {
+    return arg/100
+  }
+
+  public concat = (left: string, right: string): string => {
+    return left.concat(right)
+  }
   /**
    * Adds two numbers
    *
    * Implementation of adding which is used in interpreter.
-   *
-   * Errors are propagated, non-numerical values are ignored.
    *
    * @param left - left operand of addition
    * @param right - right operand of addition
@@ -197,32 +227,36 @@ export class ArithmeticHelper {
    *
    * Implementation of subtracting which is used in interpreter.
    *
-   * Errors are propagated.
-   *
    * @param left - left operand of subtraction
    * @param right - right operand of subtraction
    * @param eps - precision of comparison
    */
-  public subtract(left: number | CellError, right: number | CellError): number | CellError {
-    if (left instanceof CellError) {
-      return left
-    } else if (right instanceof CellError) {
-      return right
+  public subtract = (left: number, right: number) => {
+    const ret = left - right
+    if (Math.abs(ret) < this.actualEps * Math.abs(left)) {
+      return 0
     } else {
-      const ret = left - right
-      if (Math.abs(ret) < this.actualEps * Math.abs(left)) {
-        return 0
-      } else {
-        return ret
-      }
+      return ret
     }
+  }
+
+  public divide = (left: number, right: number): number | CellError => {
+    if (right === 0) {
+      return new CellError(ErrorType.DIV_BY_ZERO)
+    } else {
+      return (left / right)
+    }
+  }
+
+  public multiply = (left: number, right: number): number => {
+    return left*right
   }
 
   public coerceScalarToNumberOrError(arg: InternalScalarValue): number | CellError {
     if (arg instanceof CellError) {
       return arg
     }
-    return this.coerceToMaybeNumber(arg) ?? new CellError(ErrorType.VALUE)
+    return this.coerceToMaybeNumber(arg) ?? new CellError(ErrorType.VALUE, ErrorMessage.NumberCoercion)
   }
 
   public coerceToMaybeNumber(arg: InternalScalarValue): Maybe<number> {
@@ -248,6 +282,85 @@ export class ArithmeticHelper {
       }
     }
   }
+
+  public coerceNumbersExactRanges = (args: InterpreterValue[]): number[] | CellError =>  this.manyToNumbers(args, this.manyToExactNumbers)
+
+  public coerceNumbersCoerceRangesDropNulls = (args: InterpreterValue[]): number[] | CellError =>  this.manyToNumbers(args, this.manyToCoercedNumbersDropNulls)
+
+  private manyToNumbers(args: InterpreterValue[], rangeFn: (args: InternalScalarValue[]) => number[] | CellError): number[] | CellError {
+    const vals: (number | SimpleRangeValue)[] = []
+    for(const arg of args) {
+      if(arg instanceof SimpleRangeValue) {
+        vals.push(arg)
+      } else {
+        const coerced = this.coerceScalarToNumberOrError(arg)
+        if(coerced instanceof CellError) {
+          return coerced
+        } else {
+          vals.push(coerced)
+        }
+      }
+    }
+    const expandedVals: number[] = []
+    for(const val of vals) {
+      if(val instanceof SimpleRangeValue) {
+        const arr = rangeFn(val.valuesFromTopLeftCorner())
+        if(arr instanceof CellError) {
+          return arr
+        } else {
+          expandedVals.push(...arr)
+        }
+      } else {
+        expandedVals.push(val)
+      }
+    }
+    return expandedVals
+  }
+
+  public manyToExactNumbers = (args: InternalScalarValue[]): number[] | CellError => {
+    const ret: number[] = []
+    for(const arg of args) {
+      if(arg instanceof CellError) {
+        return arg
+      } else if (typeof arg === 'number') {
+        ret.push(arg)
+      }
+    }
+    return ret
+  }
+
+  public manyToOnlyNumbersDropNulls = (args: InternalScalarValue[]): number[] | CellError => {
+    const ret: number[] = []
+    for(const arg of args) {
+      if(arg instanceof CellError) {
+        return arg
+      } else if(arg === EmptyValue) {
+        continue
+      } else if (typeof arg === 'number') {
+        ret.push(arg)
+      } else {
+        return new CellError(ErrorType.VALUE, ErrorMessage.NumberExpected)
+      }
+    }
+    return ret
+  }
+
+  public manyToCoercedNumbersDropNulls = (args: InternalScalarValue[]): number[] | CellError => {
+    const ret: number[] = []
+    for(const arg of args) {
+      if(arg instanceof CellError) {
+        return arg
+      }
+      if(arg === EmptyValue) {
+        continue
+      }
+      const coerced = this.coerceScalarToNumberOrError(arg)
+      if (typeof coerced === 'number') {
+        ret.push(coerced)
+      }
+    }
+    return ret
+  }
 }
 
 export function coerceToRange(arg: InterpreterValue): SimpleRangeValue {
@@ -272,7 +385,7 @@ export function coerceBooleanToNumber(arg: boolean): number {
   return Number(arg)
 }
 
-export function coerceEmptyToValue(arg: InternalNoErrorCellValue): InternalNoErrorCellValue {
+export function coerceEmptyToValue(arg: InternalNoErrorScalarValue): InternalNoErrorScalarValue {
   if (typeof arg === 'string') {
     return ''
   } else if (typeof arg === 'number') {
@@ -322,174 +435,8 @@ export function coerceScalarToString(arg: InternalScalarValue): string | CellErr
   }
 }
 
-/**
- * Multiplies two numbers
- *
- * Implementation of multiplication which is used in interpreter.
- *
- * Errors are propagated.
- *
- * @param left - left operand of multiplication
- * @param right - right operand of multiplication
- */
-export function multiply(left: number | CellError, right: number | CellError): number | CellError {
-  if (left instanceof CellError) {
-    return left
-  } else if (right instanceof CellError) {
-    return right
-  } else {
-    return left * right
-  }
-}
-
-export function power(left: number | CellError, right: number | CellError): number | CellError {
-  if (left instanceof CellError) {
-    return left
-  } else if (right instanceof CellError) {
-    return right
-  } else {
-    return Math.pow(left, right)
-  }
-}
-
-export function divide(left: number | CellError, right: number | CellError): number | CellError {
-  if (left instanceof CellError) {
-    return left
-  } else if (right instanceof CellError) {
-    return right
-  } else if (right === 0) {
-    return new CellError(ErrorType.DIV_BY_ZERO)
-  } else {
-    return (left / right)
-  }
-}
-
-export function unaryminus(value: number | CellError): number | CellError {
-  if (value instanceof CellError) {
-    return value
-  } else {
-    return -value
-  }
-}
-
-export function percent(value: number | CellError): number | CellError {
-  if (value instanceof CellError) {
-    return value
-  } else {
-    return value / 100
-  }
-}
-
-/**
- * Returns max from two numbers
- *
- * Implementation of max function which is used in interpreter.
- *
- * Errors are propagated, non-numerical values are neutral.
- *
- * @param left - left operand of addition
- * @param right - right operand of addition
- */
-export function max(left: InternalScalarValue, right: InternalScalarValue): InternalScalarValue {
-  if (left instanceof CellError) {
-    return left
-  }
-  if (right instanceof CellError) {
-    return right
-  }
-  if (typeof left === 'number') {
-    if (typeof right === 'number') {
-      return Math.max(left, right)
-    } else {
-      return left
-    }
-  } else if (typeof right === 'number') {
-    return right
-  } else {
-    return Number.NEGATIVE_INFINITY
-  }
-}
-
-export function maxa(left: InternalScalarValue, right: InternalScalarValue): InternalScalarValue {
-  if (left instanceof CellError) {
-    return left
-  }
-  if (right instanceof CellError) {
-    return right
-  }
-  if (typeof left === 'boolean') {
-    left = coerceBooleanToNumber(left)
-  }
-  if (typeof right === 'boolean') {
-    right = coerceBooleanToNumber(right)
-  }
-  if (typeof left === 'number') {
-    if (typeof right === 'number') {
-      return Math.max(left, right)
-    } else {
-      return left
-    }
-  } else if (typeof right === 'number') {
-    return right
-  } else {
-    return Number.NEGATIVE_INFINITY
-  }
-}
-
-/**
- * Returns min from two numbers
- *
- * Implementation of min function which is used in interpreter.
- *
- * Errors are propagated, non-numerical values are neutral.
- *
- * @param left - left operand of addition
- * @param right - right operand of addition
- */
-export function min(left: InternalScalarValue, right: InternalScalarValue): InternalScalarValue {
-  if (left instanceof CellError) {
-    return left
-  }
-  if (right instanceof CellError) {
-    return right
-  }
-  if (typeof left === 'number') {
-    if (typeof right === 'number') {
-      return Math.min(left, right)
-    } else {
-      return left
-    }
-  } else if (typeof right === 'number') {
-    return right
-  } else {
-    return Number.POSITIVE_INFINITY
-  }
-}
-
-export function mina(left: InternalScalarValue, right: InternalScalarValue): InternalScalarValue {
-  if (left instanceof CellError) {
-    return left
-  }
-  if (right instanceof CellError) {
-    return right
-  }
-  if (typeof left === 'boolean') {
-    left = coerceBooleanToNumber(left)
-  }
-  if (typeof right === 'boolean') {
-    right = coerceBooleanToNumber(right)
-  }
-  if (typeof left === 'number') {
-    if (typeof right === 'number') {
-      return Math.min(left, right)
-    } else {
-      return left
-    }
-  } else if (typeof right === 'number') {
-    return right
-  } else {
-    return Number.POSITIVE_INFINITY
-  }
+export function zeroIfEmpty(arg: InternalNoErrorScalarValue): InternalNoErrorScalarValue {
+  return arg === EmptyValue ? 0 : arg
 }
 
 export function numberCmp(left: number, right: number): number {
