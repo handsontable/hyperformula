@@ -3,11 +3,11 @@ import {ErrorType} from '../../src/Cell'
 import {ErrorMessage} from '../../src/error-message'
 import {adr, detailedError} from '../testUtils'
 
-describe('Function EXPON.DIST', () => {
+describe('Function CHISQ.INV.RT', () => {
   it('should return error for wrong number of arguments', () => {
     const engine = HyperFormula.buildFromArray([
-      ['=EXPON.DIST(1, 2)'],
-      ['=EXPON.DIST(1, 2, 3, 4)'],
+      ['=CHISQ.INV.RT(1)'],
+      ['=CHISQ.INV.RT(1, 2, 3)'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
@@ -16,45 +16,45 @@ describe('Function EXPON.DIST', () => {
 
   it('should return error for arguments of wrong type', () => {
     const engine = HyperFormula.buildFromArray([
-      ['=EXPON.DIST("foo", 2, TRUE())'],
-      ['=EXPON.DIST(1, "baz", TRUE())'],
-      ['=EXPON.DIST(1, 2, "abcd")'],
+      ['=CHISQ.INV.RT("foo", 2)'],
+      ['=CHISQ.INV.RT(1, "baz")'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.NumberCoercion))
     expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.NumberCoercion))
-    expect(engine.getCellValue(adr('A3'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.WrongType))
   })
 
-  it('should work as cdf', () => {
+  it('should work', () => {
     const engine = HyperFormula.buildFromArray([
-      ['=EXPON.DIST(1, 1, TRUE())'],
-      ['=EXPON.DIST(3, 2, TRUE())'],
+      ['=CHISQ.INV.RT(0.1, 1)'],
+      ['=CHISQ.INV.RT(0.9, 2)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toBeCloseTo(0.632120558828558, 6)
-    expect(engine.getCellValue(adr('A2'))).toBeCloseTo(0.997521247823334, 6)
+    expect(engine.getCellValue(adr('A1'))).toBeCloseTo(2.70554345409603, 6)
+    expect(engine.getCellValue(adr('A2'))).toBeCloseTo(0.210721031315653, 6)
   })
 
-  it('should work as pdf', () => {
+  it('truncates second arg', () => {
     const engine = HyperFormula.buildFromArray([
-      ['=EXPON.DIST(1, 1, FALSE())'],
-      ['=EXPON.DIST(3, 2, FALSE())'],
+      ['=CHISQ.INV.RT(0.1, 1.9)'],
+      ['=CHISQ.INV.RT(0.9, 2.9)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toBeCloseTo(0.367879441171442, 6)
-    expect(engine.getCellValue(adr('A2'))).toBeCloseTo(0.00495750435333272, 6)
+    expect(engine.getCellValue(adr('A1'))).toBeCloseTo(2.70554345409603, 6)
+    expect(engine.getCellValue(adr('A2'))).toBeCloseTo(0.210721031315653, 6)
   })
 
   it('checks bounds', () => {
     const engine = HyperFormula.buildFromArray([
-      ['=EXPON.DIST(0, 1, FALSE())'],
-      ['=EXPON.DIST(-0.00001, 1, FALSE())'],
-      ['=EXPON.DIST(1, 0, FALSE())'],
+      ['=CHISQ.INV.RT(0.5, 0.999)'],
+      ['=CHISQ.INV.RT(0.5, 10000000000.1)'],
+      ['=CHISQ.INV.RT(-0.0001, 2)'],
+      ['=CHISQ.INV.RT(1.0001, 2)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(1)
-    expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.ValueSmall))
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.ValueSmall))
+    expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.ValueLarge))
     expect(engine.getCellValue(adr('A3'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.ValueSmall))
+    expect(engine.getCellValue(adr('A4'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.ValueLarge))
   })
 })

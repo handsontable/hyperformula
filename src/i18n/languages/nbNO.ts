@@ -288,6 +288,12 @@ const dictionary: RawTranslationPackage = {
     BESSELJ: 'BESSELJ',
     BESSELK: 'BESSELK',
     BESSELY: 'BESSELY',
+    CHIDIST: 'KJI.FORDELING',
+    CHIINV: 'INVERS.KJI.FORDELING',
+    'CHISQ.DIST': 'KJIKVADRAT.FORDELING',
+    'CHISQ.DIST.RT': 'KJIKVADRAT.FORDELING.H',
+    'CHISQ.INV': 'KJIKVADRAT.INV',
+    'CHISQ.INV.RT': 'KJIKVADRAT.INV.H',
   },
   langCode: 'nbNO',
   ui: {

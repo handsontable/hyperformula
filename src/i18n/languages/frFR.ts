@@ -288,6 +288,12 @@ const dictionary: RawTranslationPackage = {
     BESSELJ: 'BESSELJ',
     BESSELK: 'BESSELK',
     BESSELY: 'BESSELY',
+    CHIDIST: 'LOI.KHIDEUX',
+    CHIINV: 'KHIDEUX.INVERSE',
+    'CHISQ.DIST': 'LOI.KHIDEUX.N',
+    'CHISQ.DIST.RT': 'LOI.KHIDEUX.DROITE',
+    'CHISQ.INV': 'LOI.KHIDEUX.INVERSE',
+    'CHISQ.INV.RT': 'LOI.KHIDEUX.INVERSE.DROITE',
   },
   langCode: 'frFR',
   ui: {

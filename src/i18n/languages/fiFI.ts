@@ -288,6 +288,12 @@ const dictionary: RawTranslationPackage = {
     BESSELJ: 'BESSELJ',
     BESSELK: 'BESSELK',
     BESSELY: 'BESSELY',
+    CHIDIST: 'CHIJAKAUMA',
+    CHIINV: 'CHIJAKAUMA.KÄÄNT',
+    'CHISQ.DIST': 'CHINELIÖ.JAKAUMA',
+    'CHISQ.DIST.RT': 'CHINELIÖ.JAKAUMA.OH',
+    'CHISQ.INV': 'CHINELIÖ.KÄÄNT',
+    'CHISQ.INV.RT': 'CHINELIÖ.KÄÄNT.OH',
   },
   langCode: 'fiFI',
   ui: {

@@ -515,3 +515,23 @@ export function factorial(n: number) {
   return n < 0 ? NaN : gammafn(n + 1);
 };
 
+export const chisquare = {
+  pdf: function pdf(x: number, dof: number) {
+    if (x < 0)
+      return 0;
+    return (x === 0 && dof === 2) ? 0.5 :
+      Math.exp((dof / 2 - 1) * Math.log(x) - x / 2 - (dof / 2) *
+        Math.log(2) - gammaln(dof / 2));
+  },
+
+  cdf: function cdf(x: number, dof: number) {
+    if (x < 0)
+      return 0;
+    return lowRegGamma(dof / 2, x / 2);
+  },
+
+  inv: function(p: number, dof: number) {
+    return 2 * gammapinv(p, 0.5 * dof);
+  }
+}
+

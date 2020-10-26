@@ -288,6 +288,12 @@ const dictionary: RawTranslationPackage = {
     BESSELJ: 'БЕССЕЛЬ.J',
     BESSELK: 'БЕССЕЛЬ.K',
     BESSELY: 'БЕССЕЛЬ.Y',
+    CHIDIST: 'ХИ2РАСП',
+    CHIINV: 'ХИ2ОБР',
+    'CHISQ.DIST': 'ХИ2.РАСП',
+    'CHISQ.DIST.RT': 'ХИ2.РАСП.ПХ',
+    'CHISQ.INV': 'ХИ2.ОБР',
+    'CHISQ.INV.RT': 'ХИ2.ОБР.ПХ',
   },
   langCode: 'ruRU',
   ui: {

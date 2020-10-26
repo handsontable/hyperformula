@@ -288,6 +288,12 @@ const dictionary: RawTranslationPackage = {
     BESSELJ: 'BESSELJ',
     BESSELK: 'BESSELK',
     BESSELY: 'BESSELY',
+    CHIDIST: 'KHI.ELOSZLÁS',
+    CHIINV: 'INVERZ.KHI',
+    'CHISQ.DIST': 'KHINÉGYZET.ELOSZLÁS',
+    'CHISQ.DIST.RT': 'KHINÉGYZET.ELOSZLÁS.JOBB',
+    'CHISQ.INV': 'KHINÉGYZET.INVERZ',
+    'CHISQ.INV.RT': 'KHINÉGYZET.INVERZ.JOBB',
   },
   langCode: 'huHU',
   ui: {

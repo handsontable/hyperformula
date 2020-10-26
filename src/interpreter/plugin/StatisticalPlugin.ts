@@ -3,11 +3,22 @@
  * Copyright (c) 2020 Handsoncode. All rights reserved.
  */
 
-import {besseli, besselj, besselk, bessely} from './3rdparty/bessel/bessel'
 import {CellError, ErrorType, InternalScalarValue, SimpleCellAddress} from '../../Cell'
 import {ErrorMessage} from '../../error-message'
 import {ProcedureAst} from '../../parser'
-import {beta, binomial, erf, erfc, exponential, gamma, gammafn, gammaln, normal} from './3rdparty/jstat/jstat'
+import {besseli, besselj, besselk, bessely} from './3rdparty/bessel/bessel'
+import {
+  beta,
+  binomial,
+  chisquare,
+  erf,
+  erfc,
+  exponential,
+  gamma,
+  gammafn,
+  gammaln,
+  normal
+} from './3rdparty/jstat/jstat'
 import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
 
 export class StatisticalPlugin extends  FunctionPlugin {
@@ -207,6 +218,49 @@ export class StatisticalPlugin extends  FunctionPlugin {
         {argumentType: ArgumentTypes.NUMBER, minValue: 0},
       ]
     },
+    'CHISQ.DIST': {
+      method: 'chisqdist',
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER},
+        {argumentType: ArgumentTypes.NUMBER, minValue: 1, maxValue: 1e10},
+        {argumentType: ArgumentTypes.BOOLEAN},
+      ]
+    },
+    'CHISQ.DIST.RT': {
+      method: 'chisqdistrt',
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER},
+        {argumentType: ArgumentTypes.NUMBER, minValue: 1, maxValue: 1e10},
+      ]
+    },
+    'CHISQ.INV': {
+      method: 'chisqinv',
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER, minValue: 0, maxValue: 1},
+        {argumentType: ArgumentTypes.NUMBER, minValue: 1, maxValue: 1e10},
+      ]
+    },
+    'CHISQ.INV.RT': {
+      method: 'chisqinvrt',
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER, minValue: 0, maxValue: 1},
+        {argumentType: ArgumentTypes.NUMBER, minValue: 1, maxValue: 1e10},
+      ]
+    },
+    'CHIDIST': {
+      method: 'chisqdistrt',
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER},
+        {argumentType: ArgumentTypes.NUMBER, minValue: 1, maxValue: 1e10},
+      ]
+    },
+    'CHIINV': {
+      method: 'chisqinvrt',
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER, minValue: 0, maxValue: 1},
+        {argumentType: ArgumentTypes.NUMBER, minValue: 1, maxValue: 1e10},
+      ]
+    },
   }
 
   public erf(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
@@ -365,6 +419,46 @@ export class StatisticalPlugin extends  FunctionPlugin {
   public besselyfn(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.runFunction(ast.args, formulaAddress, this.metadata('BESSELY'),
       (x: number, n: number) => bessely(x, Math.trunc(n))
+    )
+  }
+
+  public chisqdist(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('CHISQ.DIST'),
+      (x: number, deg: number, cumulative: boolean) => {
+        deg = Math.trunc(deg)
+        if(cumulative) {
+          return chisquare.cdf(x, deg)
+        } else {
+          return chisquare.pdf(x, deg)
+        }
+      }
+    )
+  }
+
+  public chisqdistrt(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('CHISQ.DIST.RT'),
+      (x: number, deg: number) => {
+        deg = Math.trunc(deg)
+        return 1 - chisquare.cdf(x, deg)
+      }
+    )
+  }
+
+  public chisqinv(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('CHISQ.INV'),
+      (p: number, deg: number) => {
+        deg = Math.trunc(deg)
+        return chisquare.inv(p, deg)
+      }
+    )
+  }
+
+  public chisqinvrt(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('CHISQ.INV.RT'),
+      (p: number, deg: number) => {
+        deg = Math.trunc(deg)
+        return chisquare.inv(1.0 - p, deg)
+      }
     )
   }
 }

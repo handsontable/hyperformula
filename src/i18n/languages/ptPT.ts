@@ -288,6 +288,12 @@ const dictionary: RawTranslationPackage = {
     BESSELJ: 'BESSELJ',
     BESSELK: 'BESSELK',
     BESSELY: 'BESSELY',
+    CHIDIST: 'DIST.QUI',
+    CHIINV: 'INV.QUI',
+    'CHISQ.DIST': 'DIST.QUIQUA',
+    'CHISQ.DIST.RT': 'DIST.QUIQUA.CD',
+    'CHISQ.INV': 'INV.QUIQUA',
+    'CHISQ.INV.RT': 'INV.QUIQUA.CD',
   },
   langCode: 'ptPT',
   ui: {

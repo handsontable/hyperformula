@@ -288,6 +288,12 @@ export const dictionary: RawTranslationPackage = {
     BESSELJ: 'BESSELJ',
     BESSELK: 'BESSELK',
     BESSELY: 'BESSELY',
+    CHIDIST: 'DISTR.CHI',
+    CHIINV: 'PRUEBA.CHI.INV',
+    'CHISQ.DIST': 'DISTR.CHICUAD',
+    'CHISQ.DIST.RT': 'DISTR.CHICUAD.CD',
+    'CHISQ.INV': 'INV.CHICUAD',
+    'CHISQ.INV.RT': 'INV.CHICUAD.CD',
   },
   langCode: 'esES',
   ui: {
