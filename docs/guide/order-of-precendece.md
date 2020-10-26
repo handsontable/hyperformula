@@ -81,7 +81,7 @@ performs operations (from highest to lowest priority).
 
 HyperFormula calculates the formulas in parentheses first so by using
 them you can override the default order of evaluation. For instance,
-consider this formula: =7*8+2. After the equal sign, there are
+consider this formula: =7 * 8 + 2. After the equal sign, there are
 operands (7, 8, 2) that are separated by operators (* and +).
 Following the order of calculations, HyperFormula computes 7*8 first
 and then adds 2. The correct answer to this equation is 58.

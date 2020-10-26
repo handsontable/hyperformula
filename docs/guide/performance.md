@@ -17,8 +17,8 @@ not be used despite the option `useColumnIndex` enabled when  using
 
 Leaving this option disabled will cause the engine to use binary
 search when dealing with sorted data, and the naive approach otherwise.
-Binary search will not be used when the size of the data being searched
-doesn't exceed a given threshold which can be customized using the
+However, binary search will not be used if the size of the data being
+searched is below a given threshold, which can be customized using the
 `binarySearchThreshold` option in the configuration.
 
 ## Address mapping strategies
