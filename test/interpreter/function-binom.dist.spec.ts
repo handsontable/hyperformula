@@ -19,7 +19,7 @@ describe('Function BINOM.DIST', () => {
       ['=BINOM.DIST("foo", 2, 3, TRUE())'],
       ['=BINOM.DIST(1, "baz", 3, TRUE())'],
       ['=BINOM.DIST(1, 2, "baz", TRUE())'],
-      ['=BINOM.DIST(1, 2, 3, "abcd")'],
+      ['=BINOM.DIST(1, 1, 1, "abcd")'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.NumberCoercion))
