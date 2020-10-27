@@ -1,6 +1,6 @@
 # Contributing
 
-You are welcome to contribute to HyperFormula development. Your help
+You are welcome to contribute to HyperFormula's development. Your help
 is much appreciated in any of the following topics:
 
 * Making pull requests
@@ -15,16 +15,16 @@ is much appreciated in any of the following topics:
 
 ## Good first issue
 
-Adding a new function will be a huge help for the library growth and
-should not be too problematic for the first issue. Extending the
+Adding a new function would be a huge help for the growth of the
+library and should not be too problematic for a first issue. Extending the
 library of translations is also a good task to start with.
 [Here](https://docs.google.com/spreadsheets/d/1UUskn4ZDDjLGSpO6kg73DOvabNoeqLbkJYyVfLyYlYw)
-you can find a list of functions' translations.
+you can find a list of function translations.
 
-Visit [building](building.md) and [testing](testing.md) sections to
+Visit the [building](building.md) and [testing](testing.md) sections to
 get more info about these topics and check the list of commands you
 can run in this project. Check the `/i18n`
-folder in the project - all translations are kept just right there.
+folder in the project - all translations are kept there.
 For the functions see the `interpreter/plugin` folder. Both of them
 are a good starting point.
 
@@ -37,7 +37,7 @@ to allow us to use and publish your changes.
 the merging process.
 3. Always make the target of your pull request the `develop` branch,
 not `master`.
-4. For any change you make, add test specs in the `test` folder.
+4. For any change you make, add test specs to the `test` folder.
 5. Please lint the code. See the section about using linter.
 6. Add a comprehensive description of all the changes.
 
