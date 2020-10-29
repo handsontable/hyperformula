@@ -437,10 +437,7 @@ export class StatisticalPlugin extends  FunctionPlugin {
 
   public chisqdistrt(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.runFunction(ast.args, formulaAddress, this.metadata('CHISQ.DIST.RT'),
-      (x: number, deg: number) => {
-        deg = Math.trunc(deg)
-        return 1 - chisquare.cdf(x, deg)
-      }
+      (x: number, deg: number) => 1 - chisquare.cdf(x, Math.trunc(deg))
     )
   }
 
@@ -462,5 +459,4 @@ export class StatisticalPlugin extends  FunctionPlugin {
     )
   }
 }
-
 
