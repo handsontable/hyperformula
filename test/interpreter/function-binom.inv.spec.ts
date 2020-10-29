@@ -102,7 +102,7 @@ describe('Function BINOM.INV', () => {
     ])
 
     expect(engine.getSheetValues(0)).toEqual([[0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1]])
-    //both products #1 and #2 return 0 for '=BINOM.INV(1, 0.8, 0.2)', which is incorrect
+    //both products #1 and #2 return 1 for '=BINOM.INV(1, 0.8, 0.2)', which is incorrect
   })
 
   it('should work, large number of trials', () => {
