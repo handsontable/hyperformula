@@ -4,14 +4,14 @@
 
 <img :src="$withBase('/hf-high-lvl-diagram.svg')">
 
-The data processing consists of three phases.
+Data processing consists of three phases.
 
 ## Phase 1. Parsing and construction of ASTs
 
 Formulas need to be parsed and represented as a
 so-called
 [Abstract Syntax Tree](https://en.wikipedia.org/wiki/Abstract_syntax_tree)
-(AST). For example, the AST for `7*3-SIN(A5)` looks will look
+(AST). For example, the AST for `7*3-SIN(A5)` will look
 similar to this graph:
 
 <img :src="$withBase('/ast.png')">
@@ -39,10 +39,10 @@ definitely need more attention.
 
 ## Grammar
 
-For this parsing purposes, the library uses the
+For parsing purposes, the library uses the
 [Chevrotain](http://sap.github.io/chevrotain/docs/) parser, which turns
 out to be more efficient than popular [Jison](https://zaa.ch/jison/).
-The language of acceptable formulas is described with a LL(k) grammar
+The language of acceptable formulas is described with an LL(k) grammar
 using Chevrotain Domain Specific Language. See details of the grammar
 in the
 [FormulaParser](https://github.com/handsontable/hyperformula/blob/master/src/parser/FormulaParser.ts)
@@ -58,10 +58,10 @@ already been parsed and reuse the constructed AST.
 
 A scenario with repeating formulas is somewhat idealized; in practice,
 most formulas will be distinct. Fortunately, formulas in spreadsheets
-usually have a defined structure and share some patterns. Especially,
-after filling cells using a fill handle (that little square in the
-bottom right corner of a visual cell representation), neighboring
-cells contain similar formulas, for example:
+usually have a defined structure and share some patterns. Neighboring
+cells often contain similar formulas, especially after filling cells
+using a fill handle (that little square in the bottom right corner of
+a visual cell representation). For example:
 
 * `B2=A2-C2+B1`
 * `B3=A3-C3+B2`
@@ -75,10 +75,10 @@ relative addressing of cells.
 
 ## Relative addressing
 
-HyperFormula stores the offset to the referenced formula, for example
-`B2=B5 + C1` can be rewritten to `B2=[B+0][2+3] + [B+1][2-1]` or in short
-`B2=[0][+3] + [+1][-1]`. Then, the above example with `B2,B3` and `B4`
-can be rewritten as `B2=B3=B4=[-1][0] - [1][0] + [0][-1]` and now the three
+HyperFormula stores the offset to the referenced formula. For example
+`B2=B5 + C1` can be rewritten as `B2=[B+0][2+3] + [B+1][2-1]` or in short
+`B2=[0][+3] + [+1][-1]`. Then, the above example with `B2,B3`,  and `B4`
+can be rewritten as `B2=B3=B4=[-1][0] - [1][0] + [0][-1]`. Now the three
 cells have exactly the same formulas.
 
 By using relative addressing HyperFormula unifies formulas from many

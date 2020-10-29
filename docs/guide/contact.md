@@ -1,6 +1,6 @@
 # Contact
 
-HyperFormula is a product of Handsoncode, a company that stands behind
+HyperFormula is a product of Handsoncode, the company that stands behind
 [Handsontable](https://handsontable.com/). We are here to answer all
 your questions regarding pricing, licensing, support, and security.
 We typically reply within a few hours during our working hours:

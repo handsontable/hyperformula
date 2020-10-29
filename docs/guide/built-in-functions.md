@@ -5,10 +5,10 @@
 HyperFormula comes with an extensive library of pre-built functions.
 You can use them to create complex formulas for any business application.
 Formula syntax and logic of function are similar to what is
-considered a standard in modern spreadsheet software. That is
+considered the standard in modern spreadsheet software. That is
 because a spreadsheet is probably the most universal software
 ever created. We wanted the same flexibility for HyperFormula
-but without the constrains of the spreadsheet UI.
+but without the constraints of the spreadsheet UI.
 
 All implemented functions are grouped into 8 different categories:
 
@@ -27,7 +27,7 @@ are yet to be supported._
 
 ## Language packs
 
-HypeFormula provides translation packs for 16 languages thus making
+HyperFormula provides translation packs for 16 languages thus making
 it easier to create localized applications. The supported languages
 are: English (default), Czech, Danish, Dutch, Finnish, French,
 German, Hungarian, Italian, Norwegian, Polish, Portuguese, Russian,
