@@ -14,7 +14,7 @@ describe('function BITAND', () => {
     expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
   })
 
-  it('should not work for arguemnts of wrong type', () => {
+  it('should not work for arguments of wrong type', () => {
     const engine = HyperFormula.buildFromArray([
       ['=BITAND(1, "foo")'],
       ['=BITAND("bar", 4)'],
