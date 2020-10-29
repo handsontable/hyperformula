@@ -294,6 +294,12 @@ const dictionary: RawTranslationPackage = {
     'CHISQ.DIST.RT': 'KJIKVADRAT.FORDELING.H',
     'CHISQ.INV': 'KJIKVADRAT.INV',
     'CHISQ.INV.RT': 'KJIKVADRAT.INV.H',
+    'F.DIST': 'F.FORDELING',
+    'F.DIST.RT': 'F.FORDELING.H',
+    'F.INV': 'F.INV',
+    'F.INV.RT': 'F.INV.H',
+    FDIST: 'FFORDELING',
+    FINV: 'FFORDELING.INVERS',
   },
   langCode: 'nbNO',
   ui: {

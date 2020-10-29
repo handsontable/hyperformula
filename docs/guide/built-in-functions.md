@@ -288,6 +288,12 @@ lets you design your own [custom functions](custom-functions).
 | COUNTIFS | Statistical | Returns the count of rows or columns that meet criteria in multiple ranges. | COUNTIFS(Range1; Criterion1 [; Range2; Criterion2 [; ...]]) |
 | EXPON.DIST | Statistical | Returns density of a exponential distribution. | EXPON.DIST(Number1; Number2; Boolean) |
 | EXPONDIST | Statistical | Returns density of a exponential distribution. | EXPONDIST(Number1; Number2; Boolean) |
+| FDIST | Statistical | Returns probability of F right-side distribution. | FDIST(X; Degree1; Degree2) |
+| FINV | Statistical | Returns inverse of F right-side distribution. | FINV(P; Degree1; Degree2) |
+| F.DIST | Statistical | Returns value of F distribution. | F.DIST(X; Degree1; Degree2; Mode) |
+| F.DIST.RT | Statistical | Returns probability of F right-side distribution. | F.DIST.RT(X; Degree1; Degree2) |
+| F.INV | Statistical | Returns inverse of F distribution. | F.INV.RT(P; Degree1; Degree2) |
+| F.INV.RT | Statistical | Returns inverse of F right-side distribution. | F.INV.RT(P; Degree1; Degree2) |
 | FISHER | Statistical | Returns Fisher transformation value. | FISHER(Number) |
 | FISHERINV | Statistical | Returns inverse Fischer transformation value. | FISHERINV(Number) |
 | GAMMA | Statistical | Returns value of Gamma function. | GAMMA(Number) |

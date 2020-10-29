@@ -294,6 +294,12 @@ const dictionary: RawTranslationPackage = {
     'CHISQ.DIST.RT': 'ХИ2.РАСП.ПХ',
     'CHISQ.INV': 'ХИ2.ОБР',
     'CHISQ.INV.RT': 'ХИ2.ОБР.ПХ',
+    'F.DIST': 'F.РАСП',
+    'F.DIST.RT': 'F.РАСП.ПХ',
+    'F.INV': 'F.ОБР',
+    'F.INV.RT': 'F.ОБР.ПХ',
+    FDIST: 'FРАСП',
+    FINV: 'FРАСПОБР',
   },
   langCode: 'ruRU',
   ui: {

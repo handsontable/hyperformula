@@ -294,6 +294,12 @@ const dictionary: RawTranslationPackage = {
     'CHISQ.DIST.RT': 'KHINÉGYZET.ELOSZLÁS.JOBB',
     'CHISQ.INV': 'KHINÉGYZET.INVERZ',
     'CHISQ.INV.RT': 'KHINÉGYZET.INVERZ.JOBB',
+    'F.DIST': 'F.ELOSZL',
+    'F.DIST.RT': 'F.ELOSZLÁS.JOBB',
+    'F.INV': 'F.INVERZ',
+    'F.INV.RT': 'F.INVERZ.JOBB',
+    FDIST: 'F.ELOSZLÁS',
+    FINV: 'INVERZ.F',
   },
   langCode: 'huHU',
   ui: {

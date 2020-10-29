@@ -294,6 +294,12 @@ const dictionary: RawTranslationPackage = {
     'CHISQ.DIST.RT': 'CHINELIÖ.JAKAUMA.OH',
     'CHISQ.INV': 'CHINELIÖ.KÄÄNT',
     'CHISQ.INV.RT': 'CHINELIÖ.KÄÄNT.OH',
+    'F.DIST': 'F.JAKAUMA',
+    'F.DIST.RT': 'F.JAKAUMA.OH',
+    'F.INV': 'F.KÄÄNT',
+    'F.INV.RT': 'F.KÄÄNT.OH',
+    FDIST: 'FJAKAUMA',
+    FINV: 'FJAKAUMA.KÄÄNT',
   },
   langCode: 'fiFI',
   ui: {

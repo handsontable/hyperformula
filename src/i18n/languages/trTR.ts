@@ -294,6 +294,12 @@ const dictionary: RawTranslationPackage = {
     'CHISQ.DIST.RT': 'KİKARE.DAĞ.SAĞK',
     'CHISQ.INV': 'KİKARE.TERS',
     'CHISQ.INV.RT': 'KİKARE.TERS.SAĞK',
+    'F.DIST': 'F.DAĞ',
+    'F.DIST.RT': 'F.DAĞ.SAĞK',
+    'F.INV': 'F.TERS',
+    'F.INV.RT': 'F.TERS.SAĞK',
+    FDIST: 'FDAĞ',
+    FINV: 'FTERS',
   },
   langCode: 'trTR',
   ui: {

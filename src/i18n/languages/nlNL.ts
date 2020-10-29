@@ -294,6 +294,12 @@ const dictionary: RawTranslationPackage = {
     'CHISQ.DIST.RT': 'CHIKW.VERD.RECHTS',
     'CHISQ.INV': 'CHIKW.INV',
     'CHISQ.INV.RT': 'CHIKW.INV.RECHTS',
+    'F.DIST': 'F.VERD',
+    'F.DIST.RT': 'F.VERD.RECHTS',
+    'F.INV': 'F.INV',
+    'F.INV.RT': 'F.INV.RECHTS',
+    FDIST: 'F.VERDELING',
+    FINV: 'F.INVERSE',
   },
   langCode: 'nlNL',
   ui: {

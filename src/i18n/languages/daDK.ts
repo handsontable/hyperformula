@@ -294,6 +294,12 @@ const dictionary: RawTranslationPackage = {
     'CHISQ.DIST.RT': 'CHI2.FORD.RT',
     'CHISQ.INV': 'CHI2.INV',
     'CHISQ.INV.RT': 'CHI2.INV.RT',
+    'F.DIST': 'F.FORDELING',
+    'F.DIST.RT': 'F.FORDELING.RT',
+    'F.INV': 'F.INV',
+    'F.INV.RT': 'F.INV.RT',
+    FDIST: 'FFORDELING',
+    FINV: 'FINV',
   },
   langCode: 'daDK',
   ui: {

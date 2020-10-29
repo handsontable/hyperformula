@@ -294,6 +294,12 @@ const dictionary: RawTranslationPackage = {
     'CHISQ.DIST.RT': 'CHISQ.DIST.RT',
     'CHISQ.INV': 'CHISQ.INV',
     'CHISQ.INV.RT': 'CHISQ.INV.RT',
+    'F.DIST': 'F.DIST',
+    'F.DIST.RT': 'F.DIST.RT',
+    'F.INV': 'F.INV',
+    'F.INV.RT': 'F.INV.RT',
+    FDIST: 'FDIST',
+    FINV: 'FINV',
   },
   langCode: 'csCZ',
   ui: {

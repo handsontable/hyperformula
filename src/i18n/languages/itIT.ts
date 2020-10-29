@@ -294,6 +294,12 @@ const dictionary: RawTranslationPackage = {
     'CHISQ.DIST.RT': 'DISTRIB.CHI.QUAD.DS',
     'CHISQ.INV': 'INV.CHI.QUAD',
     'CHISQ.INV.RT': 'INV.CHI.QUAD.DS',
+    'F.DIST': 'DISTRIBF',
+    'F.DIST.RT': 'DISTRIB.F.DS',
+    'F.INV': 'INVF',
+    'F.INV.RT': 'INV.F.DS',
+    FDIST: 'DISTRIB.F',
+    FINV: 'INV.F',
   },
   langCode: 'itIT',
   ui: {

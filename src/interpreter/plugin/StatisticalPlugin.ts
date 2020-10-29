@@ -9,7 +9,7 @@ import {ProcedureAst} from '../../parser'
 import {besseli, besselj, besselk, bessely} from './3rdparty/bessel/bessel'
 import {
   beta,
-  binomial,
+  binomial, centralF,
   chisquare,
   erf,
   erfc,
@@ -261,6 +261,55 @@ export class StatisticalPlugin extends  FunctionPlugin {
         {argumentType: ArgumentTypes.NUMBER, minValue: 1, maxValue: 1e10},
       ]
     },
+    'F.DIST': {
+      method: 'fdist',
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER, minValue: 0},
+        {argumentType: ArgumentTypes.NUMBER, minValue: 1},
+        {argumentType: ArgumentTypes.NUMBER, minValue: 1},
+        {argumentType: ArgumentTypes.BOOLEAN},
+      ]
+    },
+    'F.DIST.RT': {
+      method: 'fdistrt',
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER, minValue: 0},
+        {argumentType: ArgumentTypes.NUMBER, minValue: 1},
+        {argumentType: ArgumentTypes.NUMBER, minValue: 1},
+      ]
+    },
+    'F.INV': {
+      method: 'finv',
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER, minValue: 0, maxValue: 1},
+        {argumentType: ArgumentTypes.NUMBER, minValue: 1},
+        {argumentType: ArgumentTypes.NUMBER, minValue: 1},
+      ]
+    },
+    'F.INV.RT': {
+      method: 'finvrt',
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER, minValue: 0, maxValue: 1},
+        {argumentType: ArgumentTypes.NUMBER, minValue: 1},
+        {argumentType: ArgumentTypes.NUMBER, minValue: 1},
+      ]
+    },
+    'FDIST': {
+      method: 'fdistrt',
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER, minValue: 0},
+        {argumentType: ArgumentTypes.NUMBER, minValue: 1},
+        {argumentType: ArgumentTypes.NUMBER, minValue: 1},
+      ]
+    },
+    'FINV': {
+      method: 'finvrt',
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER, minValue: 0, maxValue: 1},
+        {argumentType: ArgumentTypes.NUMBER, minValue: 1},
+        {argumentType: ArgumentTypes.NUMBER, minValue: 1},
+      ]
+    },
   }
 
   public erf(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
@@ -458,6 +507,50 @@ export class StatisticalPlugin extends  FunctionPlugin {
       (p: number, deg: number) => {
         deg = Math.trunc(deg)
         return chisquare.inv(1.0 - p, deg)
+      }
+    )
+  }
+
+  public fdist(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('F.DIST'),
+      (x: number, deg1: number, deg2: number, cumulative: boolean) => {
+        deg1 = Math.trunc(deg1)
+        deg2 = Math.trunc(deg2)
+        if(cumulative) {
+          return centralF.cdf(x, deg1, deg2)
+        } else {
+          return centralF.pdf(x, deg1, deg2)
+        }
+      }
+    )
+  }
+
+  public fdistrt(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('F.DIST.RT'),
+      (x: number, deg1: number, deg2: number) => {
+        deg1 = Math.trunc(deg1)
+        deg2 = Math.trunc(deg2)
+        return 1 - centralF.cdf(x, deg1, deg2)
+      }
+    )
+  }
+
+  public finv(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('F.INV'),
+      (p: number, deg1: number, deg2: number) => {
+        deg1 = Math.trunc(deg1)
+        deg2 = Math.trunc(deg2)
+        return centralF.inv(p, deg1, deg2)
+      }
+    )
+  }
+
+  public finvrt(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('F.INV.RT'),
+      (p: number, deg1: number, deg2: number) => {
+        deg1 = Math.trunc(deg1)
+        deg2 = Math.trunc(deg2)
+        return centralF.inv(1.0 - p, deg1, deg2)
       }
     )
   }

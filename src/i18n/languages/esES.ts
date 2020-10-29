@@ -294,6 +294,12 @@ export const dictionary: RawTranslationPackage = {
     'CHISQ.DIST.RT': 'DISTR.CHICUAD.CD',
     'CHISQ.INV': 'INV.CHICUAD',
     'CHISQ.INV.RT': 'INV.CHICUAD.CD',
+    'F.DIST': 'DISTR.F.N',
+    'F.DIST.RT': 'DISTR.F.CD',
+    'F.INV': 'INV.F',
+    'F.INV.RT': 'INV.F.CD',
+    FDIST: 'DISTR.F',
+    FINV: 'DISTR.F.INV',
   },
   langCode: 'esES',
   ui: {

@@ -294,6 +294,12 @@ const dictionary: RawTranslationPackage = {
     'CHISQ.DIST.RT': 'ROZKŁ.CHI.PŚ',
     'CHISQ.INV': 'ROZKŁ.CHI.ODWR',
     'CHISQ.INV.RT': 'ROZKŁ.CHI.ODWR.PŚ',
+    'F.DIST': 'ROZKŁ.F',
+    'F.DIST.RT': 'ROZKŁ.F.PŚ',
+    'F.INV': 'ROZKŁ.F.ODWR',
+    'F.INV.RT': 'ROZKŁ.F.ODWR.PŚ',
+    FDIST: 'ROZKŁAD.F',
+    FINV: 'ROZKŁAD.F.ODW',
   },
   langCode: 'plPL',
   ui: {

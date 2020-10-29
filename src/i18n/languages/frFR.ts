@@ -294,6 +294,12 @@ const dictionary: RawTranslationPackage = {
     'CHISQ.DIST.RT': 'LOI.KHIDEUX.DROITE',
     'CHISQ.INV': 'LOI.KHIDEUX.INVERSE',
     'CHISQ.INV.RT': 'LOI.KHIDEUX.INVERSE.DROITE',
+    'F.DIST': 'LOI.F.N',
+    'F.DIST.RT': 'LOI.F.DROITE',
+    'F.INV': 'INVERSE.LOI.F.N',
+    'F.INV.RT': 'INVERSE.LOI.F.DROITE',
+    FDIST: 'LOI.F.',
+    FINV: 'INVERSE.LOI.F.',
   },
   langCode: 'frFR',
   ui: {

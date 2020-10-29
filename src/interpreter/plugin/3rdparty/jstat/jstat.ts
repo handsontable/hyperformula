@@ -535,3 +535,43 @@ export const chisquare = {
   }
 }
 
+export const centralF = {
+  // This implementation of the pdf function avoids float overflow
+  // See the way that R calculates this value:
+  // https://svn.r-project.org/R/trunk/src/nmath/df.c
+  pdf: function pdf(x: number, df1: number, df2: number) {
+    var p, q, f;
+
+    if (x < 0)
+      return 0;
+
+    if (df1 <= 2) {
+      if (x === 0 && df1 < 2) {
+        return Infinity;
+      }
+      if (x === 0 && df1 === 2) {
+        return 1;
+      }
+      return (1 / betafn(df1 / 2, df2 / 2)!) *
+        Math.pow(df1 / df2, df1 / 2) *
+        Math.pow(x, (df1 / 2) - 1) *
+        Math.pow((1 + (df1 / df2) * x), -(df1 + df2) / 2);
+    }
+
+    p = (df1 * x) / (df2 + x * df1);
+    q = df2 / (df2 + x * df1);
+    f = df1 * q / 2.0;
+    return f * binomial.pdf((df1 - 2) / 2, (df1 + df2 - 2) / 2, p);
+  },
+
+  cdf: function cdf(x: number, df1: number, df2: number): number {
+    if (x < 0)
+      return 0;
+    return <number> ibeta((df1 * x) / (df1 * x + df2), df1 / 2, df2 / 2);
+  },
+
+  inv: function inv(x: number, df1: number, df2: number) {
+    return df2 / (df1 * (1 / ibetainv(x, df1 / 2, df2 / 2) - 1));
+  },
+}
+

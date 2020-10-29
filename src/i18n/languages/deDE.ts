@@ -294,6 +294,12 @@ const dictionary: RawTranslationPackage = {
     'CHISQ.DIST.RT': 'CHIQU.VERT.RE',
     'CHISQ.INV': 'CHIQU.INV',
     'CHISQ.INV.RT': 'CHIQU.INV.RE',
+    'F.DIST': 'F.VERT',
+    'F.DIST.RT': 'F.VERT.RE',
+    'F.INV': 'F.INV',
+    'F.INV.RT': 'F.INV.RE',
+    FDIST: 'FVERT',
+    FINV: 'FINV',
   },
   langCode: 'deDE',
   ui: {
