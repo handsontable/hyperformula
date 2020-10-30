@@ -302,6 +302,8 @@ const dictionary: RawTranslationPackage = {
     FINV: 'INVERSE.LOI.F.',
     WEIBULL: 'LOI.WEIBULL',
     'WEIBULL.DIST': 'LOI.WEIBULL.N',
+    POISSON: 'LOI.POISSON',
+    'POISSON.DIST': 'LOI.POISSON.N',
   },
   langCode: 'frFR',
   ui: {

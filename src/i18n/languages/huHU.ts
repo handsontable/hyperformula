@@ -302,6 +302,8 @@ const dictionary: RawTranslationPackage = {
     FINV: 'INVERZ.F',
     WEIBULL: 'WEIBULL',
     'WEIBULL.DIST': 'WEIBULL.ELOSZLÁS',
+    POISSON: 'POISSON',
+    'POISSON.DIST': 'POISSON.ELOSZLÁS',
   },
   langCode: 'huHU',
   ui: {

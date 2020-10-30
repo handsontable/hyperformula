@@ -302,6 +302,8 @@ export const dictionary: RawTranslationPackage = {
     FINV: 'DISTR.F.INV',
     WEIBULL: 'DIST.WEIBULL',
     'WEIBULL.DIST': 'DISTR.WEIBULL',
+    POISSON: 'POISSON',
+    'POISSON.DIST': 'POISSON.DIST',
   },
   langCode: 'esES',
   ui: {

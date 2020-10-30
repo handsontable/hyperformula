@@ -302,6 +302,8 @@ const dictionary: RawTranslationPackage = {
     FINV: 'FINV',
     WEIBULL: 'WEIBULL',
     'WEIBULL.DIST': 'WEIBULL.FÖRD',
+    POISSON: 'POISSON',
+    'POISSON.DIST': 'POISSON.FÖRD',
   },
   langCode: 'svSE',
   ui: {

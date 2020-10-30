@@ -302,6 +302,8 @@ const dictionary: RawTranslationPackage = {
     FINV: 'FJAKAUMA.KÄÄNT',
     WEIBULL: 'WEIBULL',
     'WEIBULL.DIST': 'WEIBULL.JAKAUMA',
+    POISSON: 'POISSON',
+    'POISSON.DIST': 'POISSON.JAKAUMA',
   },
   langCode: 'fiFI',
   ui: {

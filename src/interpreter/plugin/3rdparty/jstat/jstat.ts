@@ -588,3 +588,23 @@ export const weibull = {
   },
 }
 
+export const poisson = {
+  pdf: function pdf(k: number, l: number) {
+    if (l < 0 || (k % 1) !== 0 || k < 0) {
+      return 0;
+    }
+
+    return Math.pow(l, k) * Math.exp(-l) / factorial(k);
+  },
+
+  cdf: function cdf(x: number, l: number) {
+    var k = 0;
+    if (x < 0) return 0;
+    var sum = 0;
+    for (; k <= x; k++) {
+      sum += poisson.pdf(k, l);
+    }
+    return sum;
+  },
+}
+

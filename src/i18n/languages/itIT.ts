@@ -302,6 +302,8 @@ const dictionary: RawTranslationPackage = {
     FINV: 'INV.F',
     WEIBULL: 'WEIBULL',
     'WEIBULL.DIST': 'DISTRIB.WEIBULL',
+    POISSON: 'POISSON',
+    'POISSON.DIST': 'DISTRIB.POISSON',
   },
   langCode: 'itIT',
   ui: {
