@@ -1,10 +1,11 @@
 /* eslint-disable */
-/* bessel.js (C) 2013-present SheetJS -- http://sheetjs.com */
 /**
  * @license
- *                                  Apache License
- Version 2.0, January 2004
- http://www.apache.org/licenses/
+ bessel.js (C) 2013-present SheetJS -- http://sheetjs.com
+ 
+                                 Apache License
+                           Version 2.0, January 2004
+                        http://www.apache.org/licenses/
 
  TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION
 
