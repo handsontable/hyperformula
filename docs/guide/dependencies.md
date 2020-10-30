@@ -11,6 +11,8 @@ features.
 | [core-js](https://github.com/zloirock/core-js) | The MIT License | Denis Pushkarev |
 | [tiny-emitter](https://github.com/scottcorgan/tiny-emitter) | The MIT License | Scott Corgan |
 | [regenerator-runtime](https://github.com/facebook/regenerator/tree/master/packages/regenerator-runtime) | The MIT License | Facebook, Inc. |
+| [jStat](https://github.com/jstat/jstat) | The MIT License | jStat |
+| [bessel](https://github.com/SheetJS/bessel) | Apache License | SheetJS |
 
 <br>
 
