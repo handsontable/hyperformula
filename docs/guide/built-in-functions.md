@@ -288,7 +288,6 @@ lets you design your own [custom functions](custom-functions).
 | VAR.S <br><Badge text="v0.3.0"/>| Statistical | Returns variance of a sample. | VAR.S(Value1; Value2; ... Value30) |
 | CHAR | Text | Converts a number into a character according to the current code table. | CHAR(Number) |
 | CLEAN <br><Badge text="v0.2.0"/>| Text | Returns text that has been "cleaned" of line breaks and other non-printable characters. | CLEAN("Text") |
-| CLEAN | Text | Returns text that has been "cleaned" of line breaks and other non-printable characters. | CLEAN("Text") |
 | CODE | Text | Returns a numeric code for the first character in a text string. | CODE("Text") |
 | CONCATENATE | Text | Combines several text strings into one string. | CONCATENATE("Text1"; ...; "Text30") |
 | EXACT <br><Badge text="v0.3.0"/> | Text | Returns TRUE if both text strings are exactly the same. | EXACT(Text; Text) |
