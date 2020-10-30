@@ -47,10 +47,8 @@ describe('Function CHISQ.DIST.RT', () => {
   it('checks bounds', () => {
     const engine = HyperFormula.buildFromArray([
       ['=CHISQ.DIST.RT(10, 0.999)'],
-      ['=CHISQ.DIST.RT(10, 10000000000.1)'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.ValueSmall))
-    expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.ValueLarge))
   })
 })

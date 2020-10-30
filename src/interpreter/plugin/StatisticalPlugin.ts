@@ -244,7 +244,7 @@ export class StatisticalPlugin extends  FunctionPlugin {
       method: 'chisqinvrt',
       parameters: [
         {argumentType: ArgumentTypes.NUMBER, minValue: 0, maxValue: 1},
-        {argumentType: ArgumentTypes.NUMBER, minValue: 1, maxValue: 1e10},
+        {argumentType: ArgumentTypes.NUMBER, minValue: 1},
       ]
     },
     'CHIDIST': {
@@ -298,7 +298,7 @@ export class StatisticalPlugin extends  FunctionPlugin {
 
   public fisherinv(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.runFunction(ast.args, formulaAddress, this.metadata('FISHERINV'),
-      (y: number) => (Math.exp(2 * y) - 1) / (Math.exp(2 * y) + 1)
+      (y: number) => 1 - 2 / (Math.exp(2 * y) + 1)
     )
   }
 
@@ -443,19 +443,13 @@ export class StatisticalPlugin extends  FunctionPlugin {
 
   public chisqinv(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.runFunction(ast.args, formulaAddress, this.metadata('CHISQ.INV'),
-      (p: number, deg: number) => {
-        deg = Math.trunc(deg)
-        return chisquare.inv(p, deg)
-      }
+      (p: number, deg: number) => chisquare.inv(p, Math.trunc(deg))
     )
   }
 
   public chisqinvrt(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.runFunction(ast.args, formulaAddress, this.metadata('CHISQ.INV.RT'),
-      (p: number, deg: number) => {
-        deg = Math.trunc(deg)
-        return chisquare.inv(1.0 - p, deg)
-      }
+      (p: number, deg: number) => chisquare.inv(1.0 - p, Math.trunc(deg))
     )
   }
 }

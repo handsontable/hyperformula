@@ -59,10 +59,8 @@ describe('Function CHISQ.DIST', () => {
   it('checks bounds', () => {
     const engine = HyperFormula.buildFromArray([
       ['=CHISQ.DIST(10, 0.999, FALSE())'],
-      ['=CHISQ.DIST(10, 10000000000.1, FALSE())'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.ValueSmall))
-    expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.ValueLarge))
   })
 })
