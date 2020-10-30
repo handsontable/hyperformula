@@ -1,4 +1,3 @@
-/* eslint-disable */
 /**
  * @license
  Copyright (c) 2013 jStat
