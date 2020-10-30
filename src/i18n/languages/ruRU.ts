@@ -300,6 +300,8 @@ const dictionary: RawTranslationPackage = {
     'F.INV.RT': 'F.ОБР.ПХ',
     FDIST: 'FРАСП',
     FINV: 'FРАСПОБР',
+    WEIBULL: 'ВЕЙБУЛЛ',
+    'WEIBULL.DIST': 'ВЕЙБУЛЛ.РАСП',
   },
   langCode: 'ruRU',
   ui: {

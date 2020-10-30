@@ -300,6 +300,8 @@ const dictionary: RawTranslationPackage = {
     'F.INV.RT': 'F.KÄÄNT.OH',
     FDIST: 'FJAKAUMA',
     FINV: 'FJAKAUMA.KÄÄNT',
+    WEIBULL: 'WEIBULL',
+    'WEIBULL.DIST': 'WEIBULL.JAKAUMA',
   },
   langCode: 'fiFI',
   ui: {

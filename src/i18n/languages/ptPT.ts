@@ -300,6 +300,8 @@ const dictionary: RawTranslationPackage = {
     'F.INV.RT': 'INV.F.CD',
     FDIST: 'DISTF',
     FINV: 'INVF',
+    WEIBULL: 'WEIBULL',
+    'WEIBULL.DIST': 'DIST.WEIBULL',
   },
   langCode: 'ptPT',
   ui: {

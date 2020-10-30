@@ -17,7 +17,7 @@ import {
   gamma,
   gammafn,
   gammaln,
-  normal
+  normal, weibull
 } from './3rdparty/jstat/jstat'
 import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
 
@@ -310,6 +310,24 @@ export class StatisticalPlugin extends  FunctionPlugin {
         {argumentType: ArgumentTypes.NUMBER, minValue: 1},
       ]
     },
+    'WEIBULL.DIST': {
+      method: 'weibulldist',
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER, minValue: 0},
+        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
+        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
+        {argumentType: ArgumentTypes.BOOLEAN},
+      ]
+    },
+    'WEIBULL': {
+      method: 'weibulldist',
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER, minValue: 0},
+        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
+        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
+        {argumentType: ArgumentTypes.BOOLEAN},
+      ]
+    },
   }
 
   public erf(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
@@ -527,30 +545,31 @@ export class StatisticalPlugin extends  FunctionPlugin {
 
   public fdistrt(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.runFunction(ast.args, formulaAddress, this.metadata('F.DIST.RT'),
-      (x: number, deg1: number, deg2: number) => {
-        deg1 = Math.trunc(deg1)
-        deg2 = Math.trunc(deg2)
-        return 1 - centralF.cdf(x, deg1, deg2)
-      }
+      (x: number, deg1: number, deg2: number) => 1 - centralF.cdf(x, Math.trunc(deg1), Math.trunc(deg2))
+
     )
   }
 
   public finv(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.runFunction(ast.args, formulaAddress, this.metadata('F.INV'),
-      (p: number, deg1: number, deg2: number) => {
-        deg1 = Math.trunc(deg1)
-        deg2 = Math.trunc(deg2)
-        return centralF.inv(p, deg1, deg2)
-      }
+      (p: number, deg1: number, deg2: number) => centralF.inv(p, Math.trunc(deg1), Math.trunc(deg2))
     )
   }
 
   public finvrt(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.runFunction(ast.args, formulaAddress, this.metadata('F.INV.RT'),
-      (p: number, deg1: number, deg2: number) => {
-        deg1 = Math.trunc(deg1)
-        deg2 = Math.trunc(deg2)
-        return centralF.inv(1.0 - p, deg1, deg2)
+      (p: number, deg1: number, deg2: number) => centralF.inv(1.0 - p, Math.trunc(deg1), Math.trunc(deg2))
+    )
+  }
+
+  public weibulldist(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('WEIBULL.DIST'),
+      (x: number, alpha: number, beta: number, cumulative: boolean) => {
+        if(cumulative) {
+          return weibull.cdf(x, alpha, beta)
+        } else {
+          return weibull.pdf(x, alpha, beta)
+        }
       }
     )
   }

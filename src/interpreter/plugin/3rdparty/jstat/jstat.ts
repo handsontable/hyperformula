@@ -575,3 +575,16 @@ export const centralF = {
   },
 }
 
+export const weibull = {
+  pdf: function pdf(x: number, scale: number, shape: number) {
+    if (x < 0 || scale < 0 || shape < 0)
+      return 0;
+    return (shape / scale) * Math.pow((x / scale), (shape - 1)) *
+      Math.exp(-(Math.pow((x / scale), shape)));
+  },
+
+  cdf: function cdf(x: number, scale: number, shape: number) {
+    return x < 0 ? 0 : 1 - Math.exp(-Math.pow((x / scale), shape));
+  },
+}
+

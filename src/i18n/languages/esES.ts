@@ -300,6 +300,8 @@ export const dictionary: RawTranslationPackage = {
     'F.INV.RT': 'INV.F.CD',
     FDIST: 'DISTR.F',
     FINV: 'DISTR.F.INV',
+    WEIBULL: 'DIST.WEIBULL',
+    'WEIBULL.DIST': 'DISTR.WEIBULL',
   },
   langCode: 'esES',
   ui: {

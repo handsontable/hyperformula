@@ -300,6 +300,8 @@ const dictionary: RawTranslationPackage = {
     'F.INV.RT': 'F.INV.RT',
     FDIST: 'FFORDELING',
     FINV: 'FINV',
+    WEIBULL: 'WEIBULL',
+    'WEIBULL.DIST': 'WEIBULL.FORDELING',
   },
   langCode: 'daDK',
   ui: {

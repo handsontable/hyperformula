@@ -300,6 +300,8 @@ const dictionary: RawTranslationPackage = {
     'F.INV.RT': 'INVERSE.LOI.F.DROITE',
     FDIST: 'LOI.F.',
     FINV: 'INVERSE.LOI.F.',
+    WEIBULL: 'LOI.WEIBULL',
+    'WEIBULL.DIST': 'LOI.WEIBULL.N',
   },
   langCode: 'frFR',
   ui: {

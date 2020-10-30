@@ -300,6 +300,8 @@ const dictionary: RawTranslationPackage = {
     'F.INV.RT': 'ROZKŁ.F.ODWR.PŚ',
     FDIST: 'ROZKŁAD.F',
     FINV: 'ROZKŁAD.F.ODW',
+    WEIBULL: 'ROZKŁAD.WEIBULL',
+    'WEIBULL.DIST': 'ROZKŁ.WEIBULL',
   },
   langCode: 'plPL',
   ui: {
