@@ -55,4 +55,34 @@ describe('Function ISFORMULA', () => {
 
     expect(engine.getCellValue(adr('A1'))).toEqual(true)
   })
+
+  it('should collect dependencies of inner function and return argument type error', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=SIN(1)'],
+      ['=ISFORMULA(SUM(A1,A3))'],
+      ['=SIN(1)'],
+    ])
+
+    expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.CellRefExpected))
+  })
+
+  it('should propagate error of inner function', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=1/0'],
+      ['=ISFORMULA(SUM(A1, A3))'],
+      ['=1/0']
+    ])
+
+    expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.DIV_BY_ZERO))
+  })
+
+  it('should return #CYCLE! when cyclic reference occurs not directly in COLUMN', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=ISFORMULA(SUM(A1))'],
+      ['=ISFORMULA(A1+A2)'],
+    ])
+
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.CYCLE))
+    expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.CYCLE))
+  })
 })
