@@ -32,6 +32,7 @@ describe('Function GAMMA', () => {
     expect(engine.getCellValue(adr('A1'))).toEqual(1)
     expect(engine.getCellValue(adr('A2'))).toBeCloseTo(1.77245385588014, 6)
     expect(engine.getCellValue(adr('A3')) as number / 1133278.39212948).toBeCloseTo(1, 6)
+    //product #1 returns NUM for the following test
     expect(engine.getCellValue(adr('A4'))).toBeCloseTo(-0.94530871782981, 6)
   })
 

@@ -10,6 +10,7 @@ describe('Function BETA.DIST', () => {
       ['=BETA.DIST(1, 2, 3, 4, 5, 6, 7)'],
     ])
 
+    //product #1 returns 1
     expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
     expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
   })
@@ -62,6 +63,7 @@ describe('Function BETA.DIST', () => {
     expect(engine.getCellValue(adr('A2'))).toBeCloseTo(0.8125, 6)
   })
 
+  //product #1 returns 0 for tests 1,2,4,5
   it('checks bounds', () => {
     const engine = HyperFormula.buildFromArray([
       ['=BETA.DIST(0, 1, 1, FALSE())'],
