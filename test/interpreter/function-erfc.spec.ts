@@ -1,7 +1,7 @@
 import {HyperFormula} from '../../src'
 import {ErrorType} from '../../src/Cell'
 import {ErrorMessage} from '../../src/error-message'
-import {adr, detailedError, expectCloseTo} from '../testUtils'
+import {adr, detailedError} from '../testUtils'
 
 describe('Function ERFC', () => {
   const precision = 0.0000003
@@ -31,9 +31,9 @@ describe('Function ERFC', () => {
       ['=ERFC(0.5)'],
     ])
 
-    expectCloseTo(engine.getCellValue(adr('A1')), 1, precision)
-    expectCloseTo(engine.getCellValue(adr('A2')), 0.004677734981047288, precision)
-    expectCloseTo(engine.getCellValue(adr('A3')), 0.4795001221869535, precision)
+    expect(engine.getCellValue(adr('A1'))).toEqual(1)
+    expect(engine.getCellValue(adr('A2'))).toBeCloseTo(0.004677734981047288, 6)
+    expect(engine.getCellValue(adr('A3'))).toBeCloseTo(0.4795001221869535, 6)
   })
 
   it('should work for negative numbers', () => {
@@ -42,7 +42,7 @@ describe('Function ERFC', () => {
       ['=ERFC(-14.8)'],
     ])
 
-    expectCloseTo(engine.getCellValue(adr('A1')), 2, precision)
-    expectCloseTo(engine.getCellValue(adr('A2')), 2, precision)
+    expect(engine.getCellValue(adr('A1'))).toBe(2)
+    expect(engine.getCellValue(adr('A2'))).toBe(2)
   })
 })
