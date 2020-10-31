@@ -3,11 +3,11 @@ import {ErrorType} from '../../src/Cell'
 import {ErrorMessage} from '../../src/error-message'
 import {adr, detailedError} from '../testUtils'
 
-describe('Function WEIBULL.DIST', () => {
+describe('Function POISSON.DIST', () => {
   it('should return error for wrong number of arguments', () => {
     const engine = HyperFormula.buildFromArray([
-      ['=WEIBULL.DIST(1, 2, 3)'],
-      ['=WEIBULL.DIST(1, 2, 3, 4, 5)'],
+      ['=POISSON.DIST(1, 2)'],
+      ['=POISSON.DIST(1, 2, 3, 4)'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
@@ -16,49 +16,45 @@ describe('Function WEIBULL.DIST', () => {
 
   it('should return error for arguments of wrong type', () => {
     const engine = HyperFormula.buildFromArray([
-      ['=WEIBULL.DIST("foo", 2, 3, TRUE())'],
-      ['=WEIBULL.DIST(1, "baz", 3, TRUE())'],
-      ['=WEIBULL.DIST(1, 2, "baz", TRUE())'],
-      ['=WEIBULL.DIST(1, 2, 3, "abcd")'],
+      ['=POISSON.DIST("foo", 2, TRUE())'],
+      ['=POISSON.DIST(1, "baz", TRUE())'],
+      ['=POISSON.DIST(1, 2, "BCD")'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.NumberCoercion))
     expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.NumberCoercion))
-    expect(engine.getCellValue(adr('A3'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.NumberCoercion))
-    expect(engine.getCellValue(adr('A4'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.WrongType))
+    expect(engine.getCellValue(adr('A3'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.WrongType))
   })
 
   it('should work as cdf', () => {
     const engine = HyperFormula.buildFromArray([
-      ['=WEIBULL.DIST(0.1, 1, 2, TRUE())'],
-      ['=WEIBULL.DIST(0.5, 2, 4, TRUE())'],
+      ['=POISSON.DIST(10, 1, TRUE())'],
+      ['=POISSON.DIST(5, 2, TRUE())'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toBeCloseTo(0.00995016625083189, 6)
-    expect(engine.getCellValue(adr('A2'))).toBeCloseTo(0.00389863052988249, 6)
+    expect(engine.getCellValue(adr('A1'))).toBeCloseTo(0.999999989952234, 6)
+    expect(engine.getCellValue(adr('A2'))).toBeCloseTo(0.983436391519386, 6)
   })
 
   it('should work as pdf', () => {
     const engine = HyperFormula.buildFromArray([
-      ['=WEIBULL.DIST(0.1, 1, 2, FALSE())'],
-      ['=WEIBULL.DIST(0.5, 2, 4, FALSE())'],
+      ['=POISSON.DIST(10, 1, FALSE())'],
+      ['=POISSON.DIST(5, 2, FALSE())'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toBeCloseTo(0.198009966749834, 6)
-    expect(engine.getCellValue(adr('A2'))).toBeCloseTo(0.0311281677959412, 6)
+    expect(engine.getCellValue(adr('A1')) as number / 1.0137771196303e-7).toBeCloseTo(1, 6)
+    expect(engine.getCellValue(adr('A2'))).toBeCloseTo(0.0360894088630967, 6)
   })
 
   it('checks bounds', () => {
     const engine = HyperFormula.buildFromArray([
-      ['=WEIBULL.DIST(0, 1, 1, FALSE())'],
-      ['=WEIBULL.DIST(-0.01, 0.01, 0.01, FALSE())'],
-      ['=WEIBULL.DIST(0, 0, 0.01, FALSE())'],
-      ['=WEIBULL.DIST(0, 0.01, 0, FALSE())'],
+      ['=POISSON.DIST(0, 0, FALSE())'],
+      ['=POISSON.DIST(-0.01, 0, FALSE())'],
+      ['=POISSON.DIST(0, -0.01, FALSE())'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqual(1)
     expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.ValueSmall))
     expect(engine.getCellValue(adr('A3'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.ValueSmall))
-    expect(engine.getCellValue(adr('A4'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.ValueSmall))
   })
 })

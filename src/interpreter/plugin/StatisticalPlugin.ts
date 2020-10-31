@@ -17,7 +17,7 @@ import {
   gamma,
   gammafn,
   gammaln,
-  normal, weibull
+  normal, poisson, weibull
 } from './3rdparty/jstat/jstat'
 import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
 
@@ -328,6 +328,22 @@ export class StatisticalPlugin extends  FunctionPlugin {
         {argumentType: ArgumentTypes.BOOLEAN},
       ]
     },
+    'POISSON.DIST': {
+      method: 'poissondist',
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER, minValue: 0},
+        {argumentType: ArgumentTypes.NUMBER, minValue: 0},
+        {argumentType: ArgumentTypes.BOOLEAN},
+      ]
+    },
+    'POISSON': {
+      method: 'poissondist',
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER, minValue: 0},
+        {argumentType: ArgumentTypes.NUMBER, minValue: 0},
+        {argumentType: ArgumentTypes.BOOLEAN},
+      ]
+    },
   }
 
   public erf(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
@@ -569,6 +585,19 @@ export class StatisticalPlugin extends  FunctionPlugin {
           return weibull.cdf(x, alpha, beta)
         } else {
           return weibull.pdf(x, alpha, beta)
+        }
+      }
+    )
+  }
+
+  public poissondist(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('POISSON.DIST'),
+      (x: number, mean: number, cumulative: boolean) => {
+        x = Math.trunc(x)
+        if(cumulative) {
+          return poisson.cdf(x, mean)
+        } else {
+          return poisson.pdf(x, mean)
         }
       }
     )

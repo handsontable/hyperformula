@@ -607,4 +607,3 @@ export const poisson = {
     return sum;
   },
 }
-
