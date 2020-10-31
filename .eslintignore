@@ -1,6 +1,9 @@
 # Common files
 node_modules
 
+# 3rd party
+src/interpreter/plugin/3rdparty
+
 # Configurations
 *.config.js
 karma.*

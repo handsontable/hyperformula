@@ -288,12 +288,15 @@ lets you design your own [custom functions](custom-functions).
 | COUNTIFS | Statistical | Returns the count of rows or columns that meet criteria in multiple ranges. | COUNTIFS(Range1; Criterion1 [; Range2; Criterion2 [; ...]]) |
 | EXPON.DIST | Statistical | Returns density of a exponential distribution. | EXPON.DIST(Number1; Number2; Boolean) |
 | EXPONDIST | Statistical | Returns density of a exponential distribution. | EXPONDIST(Number1; Number2; Boolean) |
+<<<<<<< HEAD
 | FDIST | Statistical | Returns probability of F right-side distribution. | FDIST(X; Degree1; Degree2) |
 | FINV | Statistical | Returns inverse of F right-side distribution. | FINV(P; Degree1; Degree2) |
 | F.DIST | Statistical | Returns value of F distribution. | F.DIST(X; Degree1; Degree2; Mode) |
 | F.DIST.RT | Statistical | Returns probability of F right-side distribution. | F.DIST.RT(X; Degree1; Degree2) |
 | F.INV | Statistical | Returns inverse of F distribution. | F.INV.RT(P; Degree1; Degree2) |
 | F.INV.RT | Statistical | Returns inverse of F right-side distribution. | F.INV.RT(P; Degree1; Degree2) |
+=======
+>>>>>>> develop
 | FISHER | Statistical | Returns Fisher transformation value. | FISHER(Number) |
 | FISHERINV | Statistical | Returns inverse Fischer transformation value. | FISHERINV(Number) |
 | GAMMA | Statistical | Returns value of Gamma function. | GAMMA(Number) |
@@ -325,7 +328,6 @@ lets you design your own [custom functions](custom-functions).
 | WEIBULL.DIST | Statistical | Returns density of Weibull distribution. | WEIBULL.DIST(Number1; Number2; Number3; Boolean) |
 | CHAR | Text | Converts a number into a character according to the current code table. | CHAR(Number) |
 | CLEAN <br><Badge text="v0.2.0"/>| Text | Returns text that has been "cleaned" of line breaks and other non-printable characters. | CLEAN("Text") |
-| CLEAN | Text | Returns text that has been "cleaned" of line breaks and other non-printable characters. | CLEAN("Text") |
 | CODE | Text | Returns a numeric code for the first character in a text string. | CODE("Text") |
 | CONCATENATE | Text | Combines several text strings into one string. | CONCATENATE("Text1"; ...; "Text30") |
 | EXACT <br><Badge text="v0.3.0"/> | Text | Returns TRUE if both text strings are exactly the same. | EXACT(Text; Text) |

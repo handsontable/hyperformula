@@ -101,8 +101,8 @@ describe('Function BINOM.INV', () => {
         '=BINOM.INV(1, 0.8, 0.999)'],
     ])
 
+    //both products #1 and #2 return 1 for '=BINOM.INV(1, 0.8, 0.2)', which is incorrect
     expect(engine.getSheetValues(0)).toEqual([[0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1]])
-    //both products #1 and #2 return 0 for '=BINOM.INV(1, 0.8, 0.2)', which is incorrect
   })
 
   it('should work, large number of trials', () => {
@@ -154,8 +154,11 @@ describe('Function BINOM.INV', () => {
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqual(0)
+    //product #1 returns 0 for the following test
     expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.ValueSmall))
+    //both products #1 and #2 return NUM for '=BINOM.INV(10, 0, 0.5)', which is incorrect
     expect(engine.getCellValue(adr('A3'))).toEqual(0)
+    //both products #1 and #2 return NUM for '=BINOM.INV(10, 1, 0.5)', which is incorrect
     expect(engine.getCellValue(adr('A4'))).toEqual(10)
     expect(engine.getCellValue(adr('A5'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.ValueSmall))
     expect(engine.getCellValue(adr('A6'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.ValueLarge))

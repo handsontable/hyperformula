@@ -47,14 +47,12 @@ describe('Function CHISQ.INV.RT', () => {
   it('checks bounds', () => {
     const engine = HyperFormula.buildFromArray([
       ['=CHISQ.INV.RT(0.5, 0.999)'],
-      ['=CHISQ.INV.RT(0.5, 10000000000.1)'],
       ['=CHISQ.INV.RT(-0.0001, 2)'],
       ['=CHISQ.INV.RT(1.0001, 2)'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.ValueSmall))
-    expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.ValueLarge))
-    expect(engine.getCellValue(adr('A3'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.ValueSmall))
-    expect(engine.getCellValue(adr('A4'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.ValueLarge))
+    expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.ValueSmall))
+    expect(engine.getCellValue(adr('A3'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.ValueLarge))
   })
 })
