@@ -304,6 +304,8 @@ const dictionary: RawTranslationPackage = {
     'WEIBULL.DIST': 'WEIBULL.FORDELING',
     POISSON: 'POISSON',
     'POISSON.DIST': 'POISSON.FORDELING',
+    'HYPGEOM.DIST': 'HYPGEO.FORDELING',
+    HYPGEOMDIST: 'HYPGEOFORDELING',
   },
   langCode: 'daDK',
   ui: {

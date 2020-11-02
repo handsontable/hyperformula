@@ -304,6 +304,8 @@ const dictionary: RawTranslationPackage = {
     'WEIBULL.DIST': 'WEIBULL.ELOSZLÁS',
     POISSON: 'POISSON',
     'POISSON.DIST': 'POISSON.ELOSZLÁS',
+    'HYPGEOM.DIST': 'HIPGEOM.ELOSZLÁS',
+    HYPGEOMDIST: 'HIPERGEOM.ELOSZLÁS',
   },
   langCode: 'huHU',
   ui: {

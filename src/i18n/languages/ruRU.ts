@@ -304,6 +304,8 @@ const dictionary: RawTranslationPackage = {
     'WEIBULL.DIST': 'ВЕЙБУЛЛ.РАСП',
     POISSON: 'ПУАССОН',
     'POISSON.DIST': 'ПУАССОН.РАСП',
+    'HYPGEOM.DIST': 'ГИПЕРГЕОМ.РАСП',
+    HYPGEOMDIST: 'ГИПЕРГЕОМЕТ',
   },
   langCode: 'ruRU',
   ui: {

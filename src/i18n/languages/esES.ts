@@ -304,6 +304,8 @@ export const dictionary: RawTranslationPackage = {
     'WEIBULL.DIST': 'DISTR.WEIBULL',
     POISSON: 'POISSON',
     'POISSON.DIST': 'POISSON.DIST',
+    'HYPGEOM.DIST': 'DISTR.HIPERGEOM.N',
+    HYPGEOMDIST: 'DISTR.HIPERGEOM',
   },
   langCode: 'esES',
   ui: {

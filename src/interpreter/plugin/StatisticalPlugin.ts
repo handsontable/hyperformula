@@ -571,11 +571,11 @@ export class StatisticalPlugin extends  FunctionPlugin {
 
   public weibulldist(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.runFunction(ast.args, formulaAddress, this.metadata('WEIBULL.DIST'),
-      (x: number, alpha: number, beta: number, cumulative: boolean) => {
+      (x: number, shape: number, scale: number, cumulative: boolean) => {
         if(cumulative) {
-          return weibull.cdf(x, alpha, beta)
+          return weibull.cdf(x, scale, shape)
         } else {
-          return weibull.pdf(x, alpha, beta)
+          return weibull.pdf(x, scale, shape)
         }
       }
     )

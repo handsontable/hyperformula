@@ -34,8 +34,8 @@ describe('Function WEIBULL.DIST', () => {
       ['=WEIBULL.DIST(0.5, 2, 4, TRUE())'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toBeCloseTo(0.00995016625083189, 6)
-    expect(engine.getCellValue(adr('A2'))).toBeCloseTo(0.00389863052988249, 6)
+    expect(engine.getCellValue(adr('A1'))).toBeCloseTo(0.048770575499286, 6)
+    expect(engine.getCellValue(adr('A2'))).toBeCloseTo(0.0155035629945915, 6)
   })
 
   it('should work as pdf', () => {
@@ -44,8 +44,8 @@ describe('Function WEIBULL.DIST', () => {
       ['=WEIBULL.DIST(0.5, 2, 4, FALSE())'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toBeCloseTo(0.198009966749834, 6)
-    expect(engine.getCellValue(adr('A2'))).toBeCloseTo(0.0311281677959412, 6)
+    expect(engine.getCellValue(adr('A1'))).toBeCloseTo(0.475614712250357, 6)
+    expect(engine.getCellValue(adr('A2'))).toBeCloseTo(0.061531027312838, 6)
   })
 
   it('checks bounds', () => {

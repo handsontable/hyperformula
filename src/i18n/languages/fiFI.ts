@@ -304,6 +304,8 @@ const dictionary: RawTranslationPackage = {
     'WEIBULL.DIST': 'WEIBULL.JAKAUMA',
     POISSON: 'POISSON',
     'POISSON.DIST': 'POISSON.JAKAUMA',
+    'HYPGEOM.DIST': 'HYPERGEOM_JAKAUMA',
+    HYPGEOMDIST: 'HYPERGEOM.JAKAUMA',
   },
   langCode: 'fiFI',
   ui: {

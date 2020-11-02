@@ -304,6 +304,8 @@ const dictionary: RawTranslationPackage = {
     'WEIBULL.DIST': 'DISTRIB.WEIBULL',
     POISSON: 'POISSON',
     'POISSON.DIST': 'DISTRIB.POISSON',
+    'HYPGEOM.DIST': 'DISTRIB.IPERGEOM.N',
+    HYPGEOMDIST: 'DISTRIB.IPERGEOM',
   },
   langCode: 'itIT',
   ui: {
