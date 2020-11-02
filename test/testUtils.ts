@@ -168,14 +168,6 @@ export function timeNumberToString(timeNumber: CellValue, config: Config): strin
   return timeString ?? ''
 }
 
-export function expectCloseTo(actual: CellValue, expected: number, precision: number = 0.000001) {
-  if (typeof actual !== 'number') {
-    expect(true).toBe(false)
-  } else {
-    expect(Math.abs(actual - expected)).toBeLessThan(precision)
-  }
-}
-
 export function unregisterAllLanguages() {
   for (const langCode of HyperFormula.getRegisteredLanguagesCodes()) {
     HyperFormula.unregisterLanguage(langCode)
