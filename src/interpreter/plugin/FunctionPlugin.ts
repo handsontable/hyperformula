@@ -5,16 +5,16 @@
 
 import {AbsoluteCellRange} from '../../AbsoluteCellRange'
 import {CellError, ErrorType, InternalScalarValue, SimpleCellAddress} from '../../Cell'
-import {SearchStrategy} from '../../Lookup/SearchStrategy'
 import {Config} from '../../Config'
 import {DependencyGraph} from '../../DependencyGraph'
 import {ErrorMessage} from '../../error-message'
+import {SearchStrategy} from '../../Lookup/SearchStrategy'
 import {Maybe} from '../../Maybe'
 import {Ast, AstNodeType, ProcedureAst} from '../../parser'
+import {Serialization} from '../../Serialization'
 import {coerceScalarToBoolean, coerceScalarToString, coerceToRange} from '../ArithmeticHelper'
 import {Interpreter} from '../Interpreter'
 import {InterpreterValue, SimpleRangeValue} from '../InterpreterValue'
-import {Serialization} from '../../Serialization'
 
 export interface ImplementedFunctions {
   [formulaId: string]: FunctionMetadata,
@@ -294,7 +294,11 @@ export abstract class FunctionPlugin {
     } else if (args.length > 1) {
       return new CellError(ErrorType.NA, ErrorMessage.WrongArgNumber)
     }
-    const arg = args[0]
+    let arg = args[0]
+
+    while(arg.type === AstNodeType.PARENTHESIS) {
+      arg = arg.expression
+    }
 
     let cellReference: Maybe<SimpleCellAddress>
 

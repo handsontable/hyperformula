@@ -75,7 +75,7 @@ const collectDependenciesFn = (ast: Ast, functionRegistry: FunctionRegistry, dep
       collectDependenciesFn(ast.right, functionRegistry, dependenciesSet, true)
       return
     case AstNodeType.PARENTHESIS:
-      collectDependenciesFn(ast.expression, functionRegistry, dependenciesSet, false)
+      collectDependenciesFn(ast.expression, functionRegistry, dependenciesSet, needArgument)
       return
     case AstNodeType.FUNCTION_CALL: {
       const functionNeedArgument = !functionRegistry.doesFunctionNeedArgumentToBeComputed(ast.procedureName)
