@@ -9,15 +9,18 @@ import {ProcedureAst} from '../../parser'
 import {besseli, besselj, besselk, bessely} from './3rdparty/bessel/bessel'
 import {
   beta,
-  binomial, centralF,
+  binomial,
+  centralF,
   chisquare,
   erf,
   erfc,
   exponential,
   gamma,
   gammafn,
-  gammaln,
-  normal, poisson, weibull
+  gammaln, hypgeom,
+  normal,
+  poisson,
+  weibull
 } from './3rdparty/jstat/jstat'
 import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
 
@@ -344,6 +347,26 @@ export class StatisticalPlugin extends  FunctionPlugin {
         {argumentType: ArgumentTypes.BOOLEAN},
       ]
     },
+    'HYPGEOM.DIST': {
+      method: 'hypgeomdist',
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER, minValue: 0},
+        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
+        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
+        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
+        {argumentType: ArgumentTypes.BOOLEAN},
+      ]
+    },
+    'HYPGEOMDIST': {
+      method: 'hypgeomdist',
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER, minValue: 0},
+        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
+        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
+        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
+        {argumentType: ArgumentTypes.BOOLEAN},
+      ]
+    },
   }
 
   public erf(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
@@ -589,6 +612,35 @@ export class StatisticalPlugin extends  FunctionPlugin {
           return poisson.cdf(x, mean)
         } else {
           return poisson.pdf(x, mean)
+        }
+      }
+    )
+  }
+
+  public hypgeomdist(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('HYPGEOM.DIST'),
+      (s: number, number_s: number, population_s: number, number_pop: number, cumulative: boolean) => {
+        if(s > number_s || s > population_s) {
+          return new CellError(ErrorType.NUM, ErrorMessage.ValueLarge)
+        }
+        if(s < number_s - number_pop + population_s) {
+          return new CellError(ErrorType.NUM, ErrorMessage.ValueSmall)
+        }
+        if(number_s > number_pop) {
+          return new CellError(ErrorType.NUM, ErrorMessage.ValueLarge)
+        }
+        if(population_s > number_pop) {
+          return new CellError(ErrorType.NUM, ErrorMessage.ValueLarge)
+        }
+        s = Math.trunc(s)
+        number_s = Math.trunc(number_s)
+        population_s = Math.trunc(population_s)
+        number_pop = Math.trunc(number_pop)
+
+        if(cumulative) {
+          return hypgeom.cdf(s, number_pop, population_s, number_s)
+        } else {
+          return hypgeom.pdf(s, number_pop, population_s, number_s)
         }
       }
     )
