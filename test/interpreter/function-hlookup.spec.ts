@@ -257,4 +257,13 @@ describe('Function HLOOKUP', () => {
       expect(engine.getCellValue(adr('A1'))).toEqual(0)
     })
   })
+
+  it('should work on row ranges', () => {
+    const engine = HyperFormula.buildFromArray([
+      [ '=HLOOKUP(2,2:3,2)'],
+      [ 1, 2, 3],
+      [ 'a', 'b', 'c'],
+    ], {binarySearchThreshold: 1})
+    expect(engine.getCellValue(adr('A1'))).toEqual('b')
+  })
 })
