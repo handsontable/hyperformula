@@ -196,6 +196,7 @@ export class Graph<T> {
     const entranceTime: Map<T, number> = new Map()
     const low: Map<T, number> = new Map()
     const parent: Map<T, T> = new Map()
+    const inSCC: Set<T> = new Set()
 
     // node status life cycle:
     // undefined -> ON_STACK -> PROCESSED -> POPPED
@@ -204,53 +205,68 @@ export class Graph<T> {
 
     let time: number = 0
 
+    const sccNonSingletons: Set<T> = new Set()
+
     modifiedNodes.reverse().forEach( (v: T) => {
       if (nodeStatus.get(v) !== undefined) {
         return
       }
-      time++
       const DFSstack: T[] = [v]
+      const SCCstack: T[] = []
       nodeStatus.set(v, NodeVisitStatus.ON_STACK)
       while ( DFSstack.length > 0 ) {
         const u = DFSstack[ DFSstack.length - 1 ]
+        let m: number
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         switch(nodeStatus.get(u)!) {
           case NodeVisitStatus.ON_STACK: {
-            nodeStatus.set(u, NodeVisitStatus.PROCESSED)
             entranceTime.set(u, time)
             low.set(u, time)
+            SCCstack.push(u)
+            time++
             this.adjacentNodes(u).forEach( (t: T) => {
-              switch(nodeStatus.get(t)){
-                case NodeVisitStatus.POPPED:
-                  break
-                case NodeVisitStatus.PROCESSED: { //backward edge
-                  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-                  low.set(u, Math.min(low.get(u)!, entranceTime.get(t)!))
-                  break
-                }
-                case undefined: // not visited
-                  // process as in the case of ON_STACK
-                  // eslint-disable-next-line no-fallthrough
-                case NodeVisitStatus.ON_STACK: { // or visited but not processed
-                  parent.set(t, u)
-                  DFSstack.push(t)
-                  nodeStatus.set(t, NodeVisitStatus.ON_STACK)
-                  time++
-                  break
-                }
+              if(entranceTime.get(t) === undefined) {
+                DFSstack.push(t)
+                parent.set(t, u)
+                nodeStatus.set(t, NodeVisitStatus.ON_STACK)
               }
             })
+            nodeStatus.set(u, NodeVisitStatus.PROCESSED)
             break
           }
           case NodeVisitStatus.PROCESSED: { // leaving this DFS subtree
-            const pu = parent.get(u)
-            if ( pu !==  undefined) {
-              // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-              low.set(pu, Math.min(low.get(pu)!, low.get(u)!))
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+            m = entranceTime.get(u)!
+            this.adjacentNodes(u).forEach((t: T) => {
+              if (!inSCC.has(t)) {
+                if (parent.get(t) === u) {
+                  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                  m = Math.min(m, low.get(t)!)
+                } else {
+                  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                  m = Math.min(m, entranceTime.get(t)!)
+                }
+              }
+            })
+            low.set(u, m)
+            if (m === entranceTime.get(u)) {
+              const R: T[] = []
+              do {
+                R.push(SCCstack[SCCstack.length - 1])
+                SCCstack.pop()
+              } while (R[R.length - 1] !== u)
+              R.forEach((t) => {
+                inSCC.add(t)
+              })
+              order.push(...R)
+              if(R.length>1) {
+                R.forEach((t) => {
+                  sccNonSingletons.add(t)
+                })
+              }
             }
-            nodeStatus.set(u, NodeVisitStatus.POPPED)
-            order.push(u)
             DFSstack.pop()
+            nodeStatus.set(u, NodeVisitStatus.POPPED)
             break
           }
           case NodeVisitStatus.POPPED: { // it's a 'shadow' copy, we already processed this vertex and can ignore it
@@ -261,46 +277,21 @@ export class Graph<T> {
       }
     })
 
-    const sccMap: Map<T, T> = new Map()
-    const sccNonSingletons: Set<T> = new Set()
-    order.reverse()
-    order.forEach( (v: T) => {
-      if (entranceTime.get(v) === low.get(v)) {
-        sccMap.set(v, v)
-      } else {
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        sccMap.set(v, sccMap.get(parent.get(v) as T)!)
-      }
-    })
-
-    this.edges.forEach( (targets: Set<T>, v: T) => {
-      targets.forEach( (u: T) => {
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        const uRepr = sccMap.get(u)!
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        const vRepr = sccMap.get(v)!
-        if (uRepr === vRepr) {
-          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-          sccNonSingletons.add(uRepr)
-        }
-      })
-    })
-
     const shouldBeUpdatedMapping = new Set(modifiedNodes)
 
     const sorted: T[] = []
     const cycled: T[] = []
-    order.forEach( (t: T) => {
+    order.reverse().forEach( (t: T) => {
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        if (!sccNonSingletons.has(sccMap.get(t)!)) {
+        if (sccNonSingletons.has(t) || this.adjacentNodes(t).has(t)) {
+          cycled.push(t)
+          onCycle(t)
+          this.adjacentNodes(t).forEach( (s: T) => shouldBeUpdatedMapping.add(s) )
+        } else {
           sorted.push(t)
           if ( shouldBeUpdatedMapping.has(t) && operatingFunction(t)) {
             this.adjacentNodes(t).forEach( (s: T) => shouldBeUpdatedMapping.add(s) )
           }
-        } else {
-          cycled.push(t)
-          onCycle(t)
-          this.adjacentNodes(t).forEach( (s: T) => shouldBeUpdatedMapping.add(s) )
         }
       })
     return { sorted, cycled }
