@@ -195,7 +195,7 @@ export class Graph<T> {
 
     const entranceTime: Map<T, number> = new Map()
     const low: Map<T, number> = new Map()
-    const parent: Map<T, T | null> = new Map()
+    const parent: Map<T, T> = new Map()
 
     // node status life cycle:
     // undefined -> ON_STACK -> PROCESSED -> POPPED
@@ -244,9 +244,9 @@ export class Graph<T> {
           }
           case NodeVisitStatus.PROCESSED: { // leaving this DFS subtree
             const pu = parent.get(u)
-            if ( pu !==  null ) {
+            if ( pu !==  undefined) {
               // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-              low.set(pu!, Math.min(low.get(pu!)!, low.get(u)!))
+              low.set(pu, Math.min(low.get(pu)!, low.get(u)!))
             }
             nodeStatus.set(u, NodeVisitStatus.POPPED)
             order.push(u)
