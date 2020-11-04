@@ -185,7 +185,8 @@ export class Graph<T> {
 
   /**
    *
-   * computes topological sort order, but vertices that are on cycles are kept separate
+   * an iterative implementation of Tarjan's algorithm for finding strongly connected compontents
+   * returns vertices in order of topological sort, but vertices that are on cycles are kept separate
    *
    * @param modifiedNodes - seed for computation. During engine init run, all of the vertices of grap. In recomputation run, changed vertices.
    * @param operatingFunction - recomputes value of a node, and returns whether a change occured
@@ -216,7 +217,6 @@ export class Graph<T> {
       nodeStatus.set(v, NodeVisitStatus.ON_STACK)
       while ( DFSstack.length > 0 ) {
         const u = DFSstack[ DFSstack.length - 1 ]
-        let m: number
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         switch(nodeStatus.get(u)!) {
           case NodeVisitStatus.ON_STACK: {
@@ -235,32 +235,33 @@ export class Graph<T> {
             break
           }
           case NodeVisitStatus.PROCESSED: { // leaving this DFS subtree
+            let uLow: number
             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-            m = entranceTime.get(u)!
+            uLow = entranceTime.get(u)!
             this.adjacentNodes(u).forEach((t: T) => {
               if (!inSCC.has(t)) {
                 if (parent.get(t) === u) {
                   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-                  m = Math.min(m, low.get(t)!)
+                  uLow = Math.min(uLow, low.get(t)!)
                 } else {
                   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-                  m = Math.min(m, entranceTime.get(t)!)
+                  uLow = Math.min(uLow, entranceTime.get(t)!)
                 }
               }
             })
-            low.set(u, m)
-            if (m === entranceTime.get(u)) {
-              const R: T[] = []
+            low.set(u, uLow)
+            if (uLow === entranceTime.get(u)) {
+              const currentSCC: T[] = []
               do {
-                R.push(SCCstack[SCCstack.length - 1])
+                currentSCC.push(SCCstack[SCCstack.length - 1])
                 SCCstack.pop()
-              } while (R[R.length - 1] !== u)
-              R.forEach((t) => {
+              } while (currentSCC[currentSCC.length - 1] !== u)
+              currentSCC.forEach((t) => {
                 inSCC.add(t)
               })
-              order.push(...R)
-              if(R.length>1) {
-                R.forEach((t) => {
+              order.push(...currentSCC)
+              if(currentSCC.length>1) {
+                currentSCC.forEach((t) => {
                   sccNonSingletons.add(t)
                 })
               }
