@@ -372,4 +372,13 @@ describe('BinarySearchStrategy', () => {
 
     expect(engine.getCellValue(adr('A1'))).toEqual(0)
   })
+
+  it('should work on column ranges', () => {
+    const engine = HyperFormula.buildFromArray([
+      [ '=VLOOKUP(2,B:C,2)', 1, 'a'],
+      [null, 2, 'b'],
+      [null, 3, 'c'],
+    ], {binarySearchThreshold: 1})
+    expect(engine.getCellValue(adr('A1'))).toEqual('b')
+  })
 })

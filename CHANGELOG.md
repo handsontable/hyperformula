@@ -13,6 +13,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - Fixed a problem with dependencies not collected for specific functions. (#550, #549)
 - Fixed a minor problem with dependencies under nested parenthesis. (#549, #558)
+- Fixed a problem with HLOOKUP/VLOOKUP getting stuck in binary search. (#559, #562)
+- Fixed a problem with logic of dependency resolving. (#561, #563)
 
 ## [0.3.0] - 2020-10-22
 
