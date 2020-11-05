@@ -69,10 +69,14 @@ describe('Function HYPGEOM.DIST', () => {
       ['=HYPGEOM.DIST(12.1, 12, 20, 40, TRUE())'],
       ['=HYPGEOM.DIST(12, 20, 12, 40, TRUE())'],
       ['=HYPGEOM.DIST(12.1, 20, 12, 40, TRUE())'],
-      ['=HYPGEOM.DIST(4, 20, 12, 20, TRUE())'],
-      ['=HYPGEOM.DIST(4, 20, 12, 19.9, TRUE())'],
-      ['=HYPGEOM.DIST(4, 12, 20, 20, TRUE())'],
-      ['=HYPGEOM.DIST(4, 12, 20, 19.9, TRUE())'],
+      ['=HYPGEOM.DIST(4, 20, 4, 20, TRUE())'],
+      ['=HYPGEOM.DIST(4, 20, 4, 19.9, TRUE())'],
+      ['=HYPGEOM.DIST(4, 4, 20, 20, TRUE())'],
+      ['=HYPGEOM.DIST(4, 4, 20, 19.9, TRUE())'],
+      ['=HYPGEOM.DIST(10, 20, 20, 30, TRUE())'],
+      ['=HYPGEOM.DIST(10, 20.1, 20, 30, TRUE())'],
+      ['=HYPGEOM.DIST(0, 0.1, 0.1, 0.9, TRUE())'],
+      ['=HYPGEOM.DIST(10.9, 21, 20, 30.9, TRUE())'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toBeCloseTo(0.0000225475753840604, 6)
@@ -81,9 +85,14 @@ describe('Function HYPGEOM.DIST', () => {
     expect(engine.getCellValue(adr('A4'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.ValueLarge))
     expect(engine.getCellValue(adr('A5'))).toEqual(1)
     expect(engine.getCellValue(adr('A6'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.ValueLarge))
-    expect(engine.getCellValue(adr('A7'))).toEqual(0)
+    expect(engine.getCellValue(adr('A7'))).toEqual(1)
     expect(engine.getCellValue(adr('A8'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.ValueLarge))
-    expect(engine.getCellValue(adr('A9'))).toEqual(0)
+    expect(engine.getCellValue(adr('A9'))).toEqual(1)
     expect(engine.getCellValue(adr('A10'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.ValueLarge))
+    expect(engine.getCellValue(adr('A11'))).toBeCloseTo( 0.00614930629923134, 6)
+    expect(engine.getCellValue(adr('A12'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.ValueLarge))
+    expect(engine.getCellValue(adr('A13'))).toEqual(1)
+    //value should be 0 or Error, product #1 gives different answer
+    expect(engine.getCellValue(adr('A14'))).toEqual(0)
   })
 })

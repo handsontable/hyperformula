@@ -623,6 +623,9 @@ export class StatisticalPlugin extends  FunctionPlugin {
         if(s > numberS || s > populationS || numberS > numberPop || populationS > numberPop) {
           return new CellError(ErrorType.NUM, ErrorMessage.ValueLarge)
         }
+        if(s+numberPop < populationS+numberS) {
+          return new CellError(ErrorType.NUM, ErrorMessage.ValueLarge)
+        }
         s = Math.trunc(s)
         numberS = Math.trunc(numberS)
         populationS = Math.trunc(populationS)
