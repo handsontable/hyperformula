@@ -306,6 +306,11 @@ const dictionary: RawTranslationPackage = {
     'POISSON.DIST': 'DISTRIB.POISSON',
     'HYPGEOM.DIST': 'DISTRIB.IPERGEOM.N',
     HYPGEOMDIST: 'DISTRIB.IPERGEOM',
+    'T.DIST': 'DISTRIB.T.N',
+    'T.DIST.2T': 'DISTRIB.T.2T',
+    'T.DIST.RT': 'DISTRIB.T.DS',
+    'T.INV': 'INVT',
+    'T.INV.2T': 'INV.T.2T',
   },
   langCode: 'itIT',
   ui: {

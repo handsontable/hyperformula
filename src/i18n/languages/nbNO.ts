@@ -306,6 +306,11 @@ const dictionary: RawTranslationPackage = {
     'POISSON.DIST': 'POISSON.FORDELING',
     'HYPGEOM.DIST': 'HYPGEOM.FORDELING.N',
     HYPGEOMDIST: 'HYPGEOM.FORDELING',
+    'T.DIST': 'T.FORDELING',
+    'T.DIST.2T': 'T.FORDELING.2T',
+    'T.DIST.RT': 'T.FORDELING.H',
+    'T.INV': 'T.INV',
+    'T.INV.2T': 'T.INV.2T',
   },
   langCode: 'nbNO',
   ui: {

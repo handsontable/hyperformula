@@ -306,6 +306,11 @@ const dictionary: RawTranslationPackage = {
     'POISSON.DIST': 'ПУАССОН.РАСП',
     'HYPGEOM.DIST': 'ГИПЕРГЕОМ.РАСП',
     HYPGEOMDIST: 'ГИПЕРГЕОМЕТ',
+    'T.DIST': 'СТЬЮДЕНТ.РАСП',
+    'T.DIST.2T': 'СТЬЮДЕНТ.РАСП.2Х',
+    'T.DIST.RT': 'СТЬЮДЕНТ.РАСП.ПХ',
+    'T.INV': 'СТЬЮДЕНТ.ОБР',
+    'T.INV.2T': 'СТЬЮДЕНТ.ОБР.2Х',
   },
   langCode: 'ruRU',
   ui: {

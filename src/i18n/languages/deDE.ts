@@ -306,6 +306,11 @@ const dictionary: RawTranslationPackage = {
     'POISSON.DIST': 'POISSON.VERT',
     'HYPGEOM.DIST': 'HYPGEOM.VERT',
     HYPGEOMDIST: 'HYPGEOMVERT',
+    'T.DIST': 'T.VERT',
+    'T.DIST.2T': 'T.VERT.2S',
+    'T.DIST.RT': 'T.VERT.RE',
+    'T.INV': 'T.INV',
+    'T.INV.2T': 'T.INV.2S',
   },
   langCode: 'deDE',
   ui: {

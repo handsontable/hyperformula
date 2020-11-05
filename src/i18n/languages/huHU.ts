@@ -306,6 +306,11 @@ const dictionary: RawTranslationPackage = {
     'POISSON.DIST': 'POISSON.ELOSZLÁS',
     'HYPGEOM.DIST': 'HIPGEOM.ELOSZLÁS',
     HYPGEOMDIST: 'HIPERGEOM.ELOSZLÁS',
+    'T.DIST': 'T.ELOSZL',
+    'T.DIST.2T': 'T.ELOSZLÁS.2SZ',
+    'T.DIST.RT': 'T.ELOSZLÁS.JOBB',
+    'T.INV': 'T.INVERZ',
+    'T.INV.2T': 'T.INVERZ.2SZ',
   },
   langCode: 'huHU',
   ui: {

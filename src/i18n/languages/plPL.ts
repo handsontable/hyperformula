@@ -306,6 +306,11 @@ const dictionary: RawTranslationPackage = {
     'POISSON.DIST': 'ROZKŁ.POISSON',
     'HYPGEOM.DIST': 'ROZKŁ.HIPERGEOM',
     HYPGEOMDIST: 'ROZKŁAD.HIPERGEOM',
+    'T.DIST': 'ROZKŁ.T.PS',
+    'T.DIST.2T': 'ROZKŁ.T.DŚ',
+    'T.DIST.RT': 'ROZKŁ.T.PŚ',
+    'T.INV': 'ROZKŁ.T.ODWR',
+    'T.INV.2T': 'ROZKŁ.T.ODWR.DŚ',
   },
   langCode: 'plPL',
   ui: {

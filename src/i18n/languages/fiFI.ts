@@ -306,6 +306,11 @@ const dictionary: RawTranslationPackage = {
     'POISSON.DIST': 'POISSON.JAKAUMA',
     'HYPGEOM.DIST': 'HYPERGEOM_JAKAUMA',
     HYPGEOMDIST: 'HYPERGEOM.JAKAUMA',
+    'T.DIST': 'T.JAKAUMA',
+    'T.DIST.2T': 'T.JAKAUMA.2S',
+    'T.DIST.RT': 'T.JAKAUMA.OH',
+    'T.INV': 'T.KÄÄNT',
+    'T.INV.2T': 'T.KÄÄNT.2S',
   },
   langCode: 'fiFI',
   ui: {
