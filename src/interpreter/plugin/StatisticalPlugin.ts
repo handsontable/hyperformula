@@ -261,7 +261,7 @@ export class StatisticalPlugin extends  FunctionPlugin {
       method: 'chisqinvrt',
       parameters: [
         {argumentType: ArgumentTypes.NUMBER, minValue: 0, maxValue: 1},
-        {argumentType: ArgumentTypes.NUMBER, minValue: 1, maxValue: 1e10},
+        {argumentType: ArgumentTypes.NUMBER, minValue: 1},
       ]
     },
     'F.DIST': {
