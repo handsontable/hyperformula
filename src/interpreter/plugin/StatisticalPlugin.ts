@@ -619,19 +619,19 @@ export class StatisticalPlugin extends  FunctionPlugin {
 
   public hypgeomdist(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.runFunction(ast.args, formulaAddress, this.metadata('HYPGEOM.DIST'),
-      (s: number, number_s: number, population_s: number, number_pop: number, cumulative: boolean) => {
-        if(s > number_s || s > population_s || number_s > number_pop || population_s > number_pop) {
+      (s: number, numberS: number, populationS: number, numberPop: number, cumulative: boolean) => {
+        if(s > numberS || s > populationS || numberS > numberPop || populationS > numberPop) {
           return new CellError(ErrorType.NUM, ErrorMessage.ValueLarge)
         }
         s = Math.trunc(s)
-        number_s = Math.trunc(number_s)
-        population_s = Math.trunc(population_s)
-        number_pop = Math.trunc(number_pop)
+        numberS = Math.trunc(numberS)
+        populationS = Math.trunc(populationS)
+        numberPop = Math.trunc(numberPop)
 
         if(cumulative) {
-          return hypgeom.cdf(s, number_pop, population_s, number_s)
+          return hypgeom.cdf(s, numberPop, populationS, numberS)
         } else {
-          return hypgeom.pdf(s, number_pop, population_s, number_s)
+          return hypgeom.pdf(s, numberPop, populationS, numberS)
         }
       }
     )

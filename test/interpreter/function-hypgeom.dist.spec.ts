@@ -75,7 +75,7 @@ describe('Function HYPGEOM.DIST', () => {
       ['=HYPGEOM.DIST(4, 12, 20, 19.9, TRUE())'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toBeCloseTo(0.0000225475753840604,6)
+    expect(engine.getCellValue(adr('A1'))).toBeCloseTo(0.0000225475753840604, 6)
     expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.ValueSmall))
     expect(engine.getCellValue(adr('A3'))).toEqual(1)
     expect(engine.getCellValue(adr('A4'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.ValueLarge))
