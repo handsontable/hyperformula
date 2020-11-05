@@ -620,16 +620,7 @@ export class StatisticalPlugin extends  FunctionPlugin {
   public hypgeomdist(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.runFunction(ast.args, formulaAddress, this.metadata('HYPGEOM.DIST'),
       (s: number, number_s: number, population_s: number, number_pop: number, cumulative: boolean) => {
-        if(s > number_s || s > population_s) {
-          return new CellError(ErrorType.NUM, ErrorMessage.ValueLarge)
-        }
-        if(s < number_s - number_pop + population_s) {
-          return new CellError(ErrorType.NUM, ErrorMessage.ValueSmall)
-        }
-        if(number_s > number_pop) {
-          return new CellError(ErrorType.NUM, ErrorMessage.ValueLarge)
-        }
-        if(population_s > number_pop) {
+        if(s > number_s || s > population_s || number_s > number_pop || population_s > number_pop) {
           return new CellError(ErrorType.NUM, ErrorMessage.ValueLarge)
         }
         s = Math.trunc(s)
