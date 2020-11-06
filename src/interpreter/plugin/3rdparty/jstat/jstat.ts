@@ -788,3 +788,23 @@ export const hypgeom = {
     }
   }
 }
+
+export const studentt = {
+  pdf: function pdf(x: number, dof: number) {
+    dof = dof > 1e100 ? 1e100 : dof;
+    return (1 / (Math.sqrt(dof) * betafn(0.5, dof / 2)!)) *
+      Math.pow(1 + ((x * x) / dof), -((dof + 1) / 2));
+  },
+
+  cdf: function cdf(x: number, dof: number) {
+    var dof2 = dof / 2;
+    return ibeta((x + Math.sqrt(x * x + dof)) /
+      (2 * Math.sqrt(x * x + dof)), dof2, dof2);
+  },
+
+  inv: function(p: number, dof: number) {
+    var x = ibetainv(2 * Math.min(p, 1 - p), 0.5 * dof, 0.5);
+    x = Math.sqrt(dof * (1 - x) / x);
+    return (p > 0.5) ? x : -x;
+  },
+}
