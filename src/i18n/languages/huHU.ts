@@ -311,6 +311,8 @@ const dictionary: RawTranslationPackage = {
     'T.DIST.RT': 'T.ELOSZLÁS.JOBB',
     'T.INV': 'T.INVERZ',
     'T.INV.2T': 'T.INVERZ.2SZ',
+    TDIST: 'T.ELOSZLÁS',
+    TINV: 'INVERZ.T',
   },
   langCode: 'huHU',
   ui: {

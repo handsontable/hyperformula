@@ -311,6 +311,8 @@ const dictionary: RawTranslationPackage = {
     'T.DIST.RT': 'СТЬЮДЕНТ.РАСП.ПХ',
     'T.INV': 'СТЬЮДЕНТ.ОБР',
     'T.INV.2T': 'СТЬЮДЕНТ.ОБР.2Х',
+    TDIST: 'СТЬЮДРАСП',
+    TINV: 'СТЬЮДРАСПОБР',
   },
   langCode: 'ruRU',
   ui: {

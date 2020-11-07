@@ -311,6 +311,8 @@ const dictionary: RawTranslationPackage = {
     'T.DIST.RT': 'T.JAKAUMA.OH',
     'T.INV': 'T.KÄÄNT',
     'T.INV.2T': 'T.KÄÄNT.2S',
+    TDIST: 'TJAKAUMA',
+    TINV: 'TJAKAUMA.KÄÄNT',
   },
   langCode: 'fiFI',
   ui: {

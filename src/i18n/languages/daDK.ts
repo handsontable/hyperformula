@@ -311,6 +311,8 @@ const dictionary: RawTranslationPackage = {
     'T.DIST.RT': 'T.FORDELING.RT',
     'T.INV': 'T.INV',
     'T.INV.2T': 'T.INV.2T',
+    TDIST: 'TFORDELING',
+    TINV: 'TINV',
   },
   langCode: 'daDK',
   ui: {

@@ -311,6 +311,8 @@ const dictionary: RawTranslationPackage = {
     'T.DIST.RT': 'T.VERT.RE',
     'T.INV': 'T.INV',
     'T.INV.2T': 'T.INV.2S',
+    TDIST: 'TVERT',
+    TINV: 'TINV',
   },
   langCode: 'deDE',
   ui: {

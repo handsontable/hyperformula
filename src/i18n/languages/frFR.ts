@@ -311,6 +311,8 @@ const dictionary: RawTranslationPackage = {
     'T.DIST.RT': 'LOI.STUDENT.DROITE',
     'T.INV': 'LOI.STUDENT.INVERSE.N',
     'T.INV.2T': 'LOI.STUDENT.INVERSE.BILATERALE',
+    TDIST: 'LOI.STUDENT',
+    TINV: 'LOI.STUDENT.INVERSE',
   },
   langCode: 'frFR',
   ui: {

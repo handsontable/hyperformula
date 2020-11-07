@@ -311,6 +311,8 @@ const dictionary: RawTranslationPackage = {
     'T.DIST.RT': 'ROZKŁ.T.PŚ',
     'T.INV': 'ROZKŁ.T.ODWR',
     'T.INV.2T': 'ROZKŁ.T.ODWR.DŚ',
+    TDIST: 'ROZKŁAD.T',
+    TINV: 'ROZKŁAD.T.ODW',
   },
   langCode: 'plPL',
   ui: {

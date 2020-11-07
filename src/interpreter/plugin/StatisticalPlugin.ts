@@ -17,9 +17,11 @@ import {
   exponential,
   gamma,
   gammafn,
-  gammaln, hypgeom,
+  gammaln,
+  hypgeom,
   normal,
-  poisson, studentt,
+  poisson,
+  studentt,
   weibull
 } from './3rdparty/jstat/jstat'
 import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
@@ -389,6 +391,14 @@ export class StatisticalPlugin extends  FunctionPlugin {
         {argumentType: ArgumentTypes.NUMBER, minValue: 1},
       ]
     },
+    'TDIST': {
+      method: 'tdistold',
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER, minValue: 0},
+        {argumentType: ArgumentTypes.NUMBER, minValue: 1},
+        {argumentType: ArgumentTypes.INTEGER, minValue: 1, maxValue: 2},
+      ]
+    },
     'T.INV': {
       method: 'tinv',
       parameters: [
@@ -397,6 +407,13 @@ export class StatisticalPlugin extends  FunctionPlugin {
       ]
     },
     'T.INV.2T': {
+      method: 'tinv2t',
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0, maxValue: 1},
+        {argumentType: ArgumentTypes.NUMBER, minValue: 1},
+      ]
+    },
+    'TINV': {
       method: 'tinv2t',
       parameters: [
         {argumentType: ArgumentTypes.NUMBER, greaterThan: 0, maxValue: 1},
@@ -698,6 +715,12 @@ export class StatisticalPlugin extends  FunctionPlugin {
   public tdistrt(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.runFunction(ast.args, formulaAddress, this.metadata('T.DIST.RT'),
       (x: number, deg: number) => 1 - studentt.cdf(x, Math.trunc(deg))
+    )
+  }
+
+  public tdistold(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('TDIST'),
+      (x: number, deg: number, mode: number) => mode*(1 - studentt.cdf(x, Math.trunc(deg)))
     )
   }
 

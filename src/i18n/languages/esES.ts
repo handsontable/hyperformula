@@ -311,6 +311,8 @@ export const dictionary: RawTranslationPackage = {
     'T.DIST.RT': 'DISTR.T.CD',
     'T.INV': 'INV.T',
     'T.INV.2T': 'INV.T.2C',
+    TDIST: 'DISTR.T',
+    TINV: 'DISTR.T.INV',
   },
   langCode: 'esES',
   ui: {

@@ -311,6 +311,8 @@ const dictionary: RawTranslationPackage = {
     'T.DIST.RT': 'T.DIST.RT',
     'T.INV': 'T.INV',
     'T.INV.2T': 'T.INV.2T',
+    TDIST: 'TDIST',
+    TINV: 'TINV',
   },
   langCode: 'csCZ',
   ui: {
