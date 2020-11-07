@@ -19,7 +19,7 @@ import {
   gammafn,
   gammaln, hypgeom,
   normal,
-  poisson,
+  poisson, studentt,
   weibull
 } from './3rdparty/jstat/jstat'
 import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
@@ -367,6 +367,42 @@ export class StatisticalPlugin extends  FunctionPlugin {
         {argumentType: ArgumentTypes.BOOLEAN},
       ]
     },
+    'T.DIST': {
+      method: 'tdist',
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER},
+        {argumentType: ArgumentTypes.NUMBER, minValue: 1},
+        {argumentType: ArgumentTypes.BOOLEAN},
+      ]
+    },
+    'T.DIST.2T': {
+      method: 'tdist2t',
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER, minValue: 0},
+        {argumentType: ArgumentTypes.NUMBER, minValue: 1},
+      ]
+    },
+    'T.DIST.RT': {
+      method: 'tdistrt',
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER},
+        {argumentType: ArgumentTypes.NUMBER, minValue: 1},
+      ]
+    },
+    'T.INV': {
+      method: 'tinv',
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0, lessThan: 1},
+        {argumentType: ArgumentTypes.NUMBER, minValue: 1},
+      ]
+    },
+    'T.INV.2T': {
+      method: 'tinv2t',
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0, maxValue: 1},
+        {argumentType: ArgumentTypes.NUMBER, minValue: 1},
+      ]
+    },
   }
 
   public erf(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
@@ -637,6 +673,43 @@ export class StatisticalPlugin extends  FunctionPlugin {
           return hypgeom.pdf(s, numberPop, populationS, numberS)
         }
       }
+    )
+  }
+
+  public tdist(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('T.DIST'),
+      (x: number, deg: number, cumulative: boolean) => {
+        deg = Math.trunc(deg)
+        if(cumulative) {
+          return studentt.cdf(x, deg)
+        } else {
+          return studentt.pdf(x, deg)
+        }
+      }
+    )
+  }
+
+  public tdist2t(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('T.DIST.2T'),
+      (x: number, deg: number) => (1 - studentt.cdf(x , Math.trunc(deg))) * 2
+    )
+  }
+
+  public tdistrt(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('T.DIST.RT'),
+      (x: number, deg: number) => 1 - studentt.cdf(x , Math.trunc(deg))
+    )
+  }
+
+  public tinv(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('T.INV'),
+      (p: number, deg: number) => studentt.inv(p , Math.trunc(deg))
+    )
+  }
+
+  public tinv2t(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('T.INV.2T'),
+      (p: number, deg: number) => studentt.inv(1-p/2 , Math.trunc(deg))
     )
   }
 }

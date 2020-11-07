@@ -796,9 +796,9 @@ export const studentt = {
       Math.pow(1 + ((x * x) / dof), -((dof + 1) / 2));
   },
 
-  cdf: function cdf(x: number, dof: number) {
+  cdf: function cdf(x: number, dof: number): number {
     var dof2 = dof / 2;
-    return ibeta((x + Math.sqrt(x * x + dof)) /
+    return <number> ibeta((x + Math.sqrt(x * x + dof)) /
       (2 * Math.sqrt(x * x + dof)), dof2, dof2);
   },
 
