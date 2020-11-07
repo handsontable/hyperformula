@@ -317,6 +317,11 @@ lets you design your own [custom functions](custom-functions).
 | STDEV.P <br><Badge text="v0.3.0"/>| Statistical | Returns standard deviation of a population. | STDEV.P(Value1; Value2; ... Value30) |
 | STDEVPA <br><Badge text="v0.3.0"/>| Statistical | Returns standard deviation of a population. | STDEVPA(Value1; Value2; ... Value30) |
 | STDEV.S <br><Badge text="v0.3.0"/>| Statistical | Returns standard deviation of a sample. | STDEV.S(Value1; Value2; ... Value30) |
+| T.DIST | Statistical | Returns density of Student-t distribution. | T.DIST(X; Degrees; Mode) |
+| T.DIST.2T | Statistical | Returns density of Student-t distribution, both-sided. | T.DIST.2T(X; Degrees) |
+| T.DIST.RT | Statistical | Returns density of Student-t distribution, right-tailed. | T.DIST.RT(X; Degrees) |
+| T.INV | Statistical | Returns inverse Student-t distribution. | T.INV(P; Degrees) |
+| T.INV.2T | Statistical | Returns inverse Student-t distribution, both-sided. | T.INV.2T(P; Degrees) |
 | VAR <br><Badge text="v0.3.0"/>| Statistical | Returns variance of a sample. | VAR(Value1; Value2; ... Value30) |
 | VARA <br><Badge text="v0.3.0"/>| Statistical | Returns variance of a sample. | VARA(Value1; Value2; ... Value30) |
 | VARP <br><Badge text="v0.3.0"/>| Statistical | Returns variance of a population. | VARP(Value1; Value2; ... Value30) |
