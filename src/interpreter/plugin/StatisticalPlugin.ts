@@ -691,25 +691,25 @@ export class StatisticalPlugin extends  FunctionPlugin {
 
   public tdist2t(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.runFunction(ast.args, formulaAddress, this.metadata('T.DIST.2T'),
-      (x: number, deg: number) => (1 - studentt.cdf(x , Math.trunc(deg))) * 2
+      (x: number, deg: number) => (1 - studentt.cdf(x, Math.trunc(deg))) * 2
     )
   }
 
   public tdistrt(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.runFunction(ast.args, formulaAddress, this.metadata('T.DIST.RT'),
-      (x: number, deg: number) => 1 - studentt.cdf(x , Math.trunc(deg))
+      (x: number, deg: number) => 1 - studentt.cdf(x, Math.trunc(deg))
     )
   }
 
   public tinv(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.runFunction(ast.args, formulaAddress, this.metadata('T.INV'),
-      (p: number, deg: number) => studentt.inv(p , Math.trunc(deg))
+      (p: number, deg: number) => studentt.inv(p, Math.trunc(deg))
     )
   }
 
   public tinv2t(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.runFunction(ast.args, formulaAddress, this.metadata('T.INV.2T'),
-      (p: number, deg: number) => studentt.inv(1-p/2 , Math.trunc(deg))
+      (p: number, deg: number) => studentt.inv(1-p/2, Math.trunc(deg))
     )
   }
 }
