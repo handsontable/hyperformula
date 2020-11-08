@@ -313,6 +313,10 @@ const dictionary: RawTranslationPackage = {
     'T.INV.2T': 'ROZKŁ.T.ODWR.DŚ',
     TDIST: 'ROZKŁAD.T',
     TINV: 'ROZKŁAD.T.ODW',
+    LOGINV: 'ROZKŁAD.LOG.ODW',
+    'LOGNORM.DIST': 'ROZKŁ.LOG',
+    'LOGNORM.INV': 'ROZKŁ.LOG.ODWR',
+    LOGNORMDIST: 'ROZKŁAD.LOG',
   },
   langCode: 'plPL',
   ui: {

@@ -313,6 +313,10 @@ const dictionary: RawTranslationPackage = {
     'T.INV.2T': 'T.INV.2T',
     TDIST: 'TFORDELING',
     TINV: 'TINV',
+    LOGINV: 'LOGINV',
+    'LOGNORM.DIST': 'LOGNORM.FORDELING',
+    'LOGNORM.INV': 'LOGNORM.INV',
+    LOGNORMDIST: 'LOGNORMFORD',
   },
   langCode: 'nbNO',
   ui: {

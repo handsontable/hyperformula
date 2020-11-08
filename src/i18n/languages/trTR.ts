@@ -313,6 +313,10 @@ const dictionary: RawTranslationPackage = {
     'T.INV.2T': 'T.TERS.2K',
     TDIST: 'TDAĞ',
     TINV: 'TTERS',
+    LOGINV: 'LOGTERS',
+    'LOGNORM.DIST': 'LOGNORM.DAĞ',
+    'LOGNORM.INV': 'LOGNORM.TERS',
+    LOGNORMDIST: 'LOGNORMDAĞ',
   },
   langCode: 'trTR',
   ui: {

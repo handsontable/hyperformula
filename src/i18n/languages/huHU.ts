@@ -313,6 +313,10 @@ const dictionary: RawTranslationPackage = {
     'T.INV.2T': 'T.INVERZ.2SZ',
     TDIST: 'T.ELOSZLÁS',
     TINV: 'INVERZ.T',
+    LOGINV: 'INVERZ.LOG.ELOSZLÁS',
+    'LOGNORM.DIST': 'LOGNORM.ELOSZLÁS',
+    'LOGNORM.INV': 'LOGNORM.INVERZ',
+    LOGNORMDIST: 'LOG.ELOSZLÁS',
   },
   langCode: 'huHU',
   ui: {

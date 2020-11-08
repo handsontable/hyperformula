@@ -808,3 +808,24 @@ export const studentt = {
     return (p > 0.5) ? x : -x;
   },
 }
+
+export const lognormal = {
+  pdf: function pdf(x: number, mu: number, sigma: number) {
+    if (x <= 0)
+      return 0;
+    return Math.exp(-Math.log(x) - 0.5 * Math.log(2 * Math.PI) -
+      Math.log(sigma) - Math.pow(Math.log(x) - mu, 2) /
+      (2 * sigma * sigma));
+  },
+
+  cdf: function cdf(x: number, mu: number, sigma: number) {
+    if (x < 0)
+      return 0;
+    return 0.5 +
+      (0.5 * erf((Math.log(x) - mu) / Math.sqrt(2 * sigma * sigma)));
+  },
+
+  inv: function(p: number, mu: number, sigma: number) {
+    return Math.exp(-1.41421356237309505 * sigma * erfcinv(2 * p) + mu);
+  },
+}

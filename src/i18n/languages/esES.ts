@@ -313,6 +313,10 @@ export const dictionary: RawTranslationPackage = {
     'T.INV.2T': 'INV.T.2C',
     TDIST: 'DISTR.T',
     TINV: 'DISTR.T.INV',
+    LOGINV: 'DISTR.LOG.INV',
+    'LOGNORM.DIST': 'DISTR.LOGNORM',
+    'LOGNORM.INV': 'INV.LOGNORM',
+    LOGNORMDIST: 'DISTR.LOG.NORM',
   },
   langCode: 'esES',
   ui: {

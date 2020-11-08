@@ -313,6 +313,10 @@ const dictionary: RawTranslationPackage = {
     'T.INV.2T': 'T.KÄÄNT.2S',
     TDIST: 'TJAKAUMA',
     TINV: 'TJAKAUMA.KÄÄNT',
+    LOGINV: 'LOGNORM.JAKAUMA.KÄÄNT',
+    'LOGNORM.DIST': 'LOGNORM_JAKAUMA',
+    'LOGNORM.INV': 'LOGNORM.KÄÄNT',
+    LOGNORMDIST: 'LOGNORM.JAKAUMA',
   },
   langCode: 'fiFI',
   ui: {

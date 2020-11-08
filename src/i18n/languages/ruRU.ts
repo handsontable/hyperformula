@@ -313,6 +313,10 @@ const dictionary: RawTranslationPackage = {
     'T.INV.2T': 'СТЬЮДЕНТ.ОБР.2Х',
     TDIST: 'СТЬЮДРАСП',
     TINV: 'СТЬЮДРАСПОБР',
+    LOGINV: 'ЛОГНОРМОБР',
+    'LOGNORM.DIST': 'ЛОГНОРМ.РАСП',
+    'LOGNORM.INV': 'ЛОГНОРМ.ОБР',
+    LOGNORMDIST: 'ЛОГНОРМРАСП',
   },
   langCode: 'ruRU',
   ui: {

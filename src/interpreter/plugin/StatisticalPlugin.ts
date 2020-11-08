@@ -18,7 +18,7 @@ import {
   gamma,
   gammafn,
   gammaln,
-  hypgeom,
+  hypgeom, lognormal,
   normal,
   poisson,
   studentt,
@@ -420,6 +420,40 @@ export class StatisticalPlugin extends  FunctionPlugin {
         {argumentType: ArgumentTypes.NUMBER, minValue: 1},
       ]
     },
+    'LOGNORM.DIST': {
+      method: 'lognormdist',
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
+        {argumentType: ArgumentTypes.NUMBER},
+        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
+        {argumentType: ArgumentTypes.BOOLEAN},
+      ]
+    },
+    'LOGNORM.INV': {
+      method: 'lognorminv',
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0, lessThan: 1},
+        {argumentType: ArgumentTypes.NUMBER},
+        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
+      ]
+    },
+    'LOGNORMDIST': {
+      method: 'lognormdist',
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
+        {argumentType: ArgumentTypes.NUMBER},
+        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
+        {argumentType: ArgumentTypes.BOOLEAN},
+      ]
+    },
+    'LOGINV': {
+      method: 'lognorminv',
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0, lessThan: 1},
+        {argumentType: ArgumentTypes.NUMBER},
+        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
+      ]
+    },
   }
 
   public erf(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
@@ -733,6 +767,24 @@ export class StatisticalPlugin extends  FunctionPlugin {
   public tinv2t(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.runFunction(ast.args, formulaAddress, this.metadata('T.INV.2T'),
       (p: number, deg: number) => studentt.inv(1-p/2, Math.trunc(deg))
+    )
+  }
+
+  public lognormdist(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('LOGNORM.DIST'),
+      (x: number, mean: number, stddev: number, cumulative: boolean) => {
+        if(cumulative) {
+          return lognormal.cdf(x, mean, stddev)
+        } else {
+          return lognormal.pdf(x, mean, stddev)
+        }
+      }
+    )
+  }
+
+  public lognorminv(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('LOGNORM.INV'),
+      (p: number, mean: number, stddev: number) => lognormal.inv(p, mean, stddev)
     )
   }
 }
