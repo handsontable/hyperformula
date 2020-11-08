@@ -454,6 +454,66 @@ export class StatisticalPlugin extends  FunctionPlugin {
         {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
       ]
     },
+    'NORM.DIST': {
+      method: 'normdist',
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER},
+        {argumentType: ArgumentTypes.NUMBER},
+        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
+        {argumentType: ArgumentTypes.BOOLEAN},
+      ]
+    },
+    'NORM.INV': {
+      method: 'norminv',
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0, lessThan: 1},
+        {argumentType: ArgumentTypes.NUMBER},
+        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
+      ]
+    },
+    'NORM.S.DIST': {
+      method: 'normsdist',
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER},
+        {argumentType: ArgumentTypes.BOOLEAN},
+      ]
+    },
+    'NORM.S.INV': {
+      method: 'normsinv',
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0, lessThan: 1},
+      ]
+    },
+    'NORMDIST': {
+      method: 'normdist',
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER},
+        {argumentType: ArgumentTypes.NUMBER},
+        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
+        {argumentType: ArgumentTypes.BOOLEAN},
+      ]
+    },
+    'NORMINV': {
+      method: 'norminv',
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0, lessThan: 1},
+        {argumentType: ArgumentTypes.NUMBER},
+        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
+      ]
+    },
+    'NORMSDIST': {
+      method: 'normsdist',
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER},
+        {argumentType: ArgumentTypes.BOOLEAN},
+      ]
+    },
+    'NORMSINV': {
+      method: 'normsinv',
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0, lessThan: 1},
+      ]
+    },
   }
 
   public erf(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
@@ -785,6 +845,42 @@ export class StatisticalPlugin extends  FunctionPlugin {
   public lognorminv(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.runFunction(ast.args, formulaAddress, this.metadata('LOGNORM.INV'),
       (p: number, mean: number, stddev: number) => lognormal.inv(p, mean, stddev)
+    )
+  }
+
+  public normdist(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('NORM.DIST'),
+      (x: number, mean: number, stddev: number, cumulative: boolean) => {
+        if(cumulative) {
+          return normal.cdf(x, mean, stddev)
+        } else {
+          return normal.pdf(x, mean, stddev)
+        }
+      }
+    )
+  }
+
+  public norminv(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('NORM.INV'),
+      (p: number, mean: number, stddev: number) => normal.inv(p, mean, stddev)
+    )
+  }
+
+  public normsdist(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('NORM.S.DIST'),
+      (x: number, cumulative: boolean) => {
+        if(cumulative) {
+          return normal.cdf(x, 0, 1)
+        } else {
+          return normal.pdf(x, 0, 1)
+        }
+      }
+    )
+  }
+
+  public normsinv(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('NORM.S.INV'),
+      (p: number) => normal.inv(p, 0, 1)
     )
   }
 }
