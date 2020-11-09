@@ -18,7 +18,7 @@ import {
   gamma,
   gammafn,
   gammaln,
-  hypgeom, lognormal,
+  hypgeom, lognormal, negbin,
   normal,
   poisson,
   studentt,
@@ -520,6 +520,15 @@ export class StatisticalPlugin extends  FunctionPlugin {
         {argumentType: ArgumentTypes.NUMBER}
       ]
     },
+    'NEGBINOM.DIST': {
+      method: 'negbinomdist',
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER, minValue: 0},
+        {argumentType: ArgumentTypes.NUMBER, minValue: 1},
+        {argumentType: ArgumentTypes.NUMBER, minValue: 0, maxValue: 1},
+        {argumentType: ArgumentTypes.BOOLEAN},
+      ]
+    },
   }
 
   public erf(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
@@ -889,10 +898,24 @@ export class StatisticalPlugin extends  FunctionPlugin {
       (p: number) => normal.inv(p, 0, 1)
     )
   }
-  
+
   public phi(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.runFunction(ast.args, formulaAddress, this.metadata('PHI'),
       (x: number) => normal.pdf(x, 0, 1)
+    )
+  }
+
+  public negbinomdist(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('NEGBINOM.DIST'),
+      (nf: number, ns: number, p: number, cumulative: boolean) => {
+        nf = Math.trunc(nf)
+        ns = Math.trunc(ns)
+        if(cumulative) {
+          return negbin.cdf(nf, ns, p)
+        } else {
+          return negbin.pdf(nf, ns, p)
+        }
+      }
     )
   }
 }

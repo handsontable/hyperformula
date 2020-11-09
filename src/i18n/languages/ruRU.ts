@@ -326,6 +326,8 @@ const dictionary: RawTranslationPackage = {
     NORMSDIST: 'НОРМСТРАСП',
     NORMSINV: 'НОРМСТОБР',
     PHI: 'ФИ',
+    'NEGBINOM.DIST': 'ОТРБИНОМ.РАСП',
+    NEGBINOMDIST: 'ОТРБИНОМРАСП',
   },
   langCode: 'ruRU',
   ui: {

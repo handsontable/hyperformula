@@ -326,6 +326,8 @@ const dictionary: RawTranslationPackage = {
     NORMSDIST: 'NORMSFORDELING',
     NORMSINV: 'NORMSINV',
     PHI: 'PHI',
+    'NEGBINOM.DIST': 'NEGBINOM.FORDELING.N',
+    NEGBINOMDIST: 'NEGBINOM.FORDELING',
   },
   langCode: 'nbNO',
   ui: {

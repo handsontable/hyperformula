@@ -303,27 +303,29 @@ lets you design your own [custom functions](custom-functions).
 | GAMMALN.PRECISE | Statistical | Returns natural logarithm of Gamma function. | GAMMALN.PRECISE(Number) |
 | GAMMA.INV | Statistical | Returns inverse Gamma distribution value. | GAMMA.INV(Number1; Number2; Number3) |
 | GAMMAINV | Statistical | Returns inverse Gamma distribution value. | GAMMAINV(Number1; Number2; Number3) |
-| GAUSS | Statistical | Returns the probability of Gaussian variable fall more than this many times standard deviation from mean. | GAUSS(Number) |
-| HYPGEOMDIST | Statistical | Returns density of Hypergeometric distribution. | HYPGEOMDIST(Number1; Number2; Number3; Number4; Boolean) |
-| HYPGEOM.DIST | Statistical | Returns density of Hypergeometric distribution. | HYPGEOM.DIST(Number1; Number2; Number3; Number4; Boolean) |
-| LOGNORM.DIST | Statistical | Returns density of Lognormal distribution. | LOGNORM.DIST(X; Mean; Stddev; Mode) |
-| LOGNORMDIST | Statistical | Returns density of Lognormal distribution. | LOGNORMDIST(X; Mean; Stddev; Mode) |
-| LOGNORM.INV | Statistical | Returns value of inverse Lognormal distribution. | LOGNORM.INV(P; Mean; Stddev) |
-| LOGINV | Statistical | Returns value of inverse Lognormal distribution. | LOGINV(P; Mean; Stddev) |
+| GAUSS | Statistical | Returns the probability of gaussian variable fall more than this many times standard deviation from mean. | GAUSS(Number) |
+| HYPGEOMDIST | Statistical | Returns density of hypergeometric distribution. | HYPGEOMDIST(Number1; Number2; Number3; Number4; Boolean) |
+| HYPGEOM.DIST | Statistical | Returns density of hypergeometric distribution. | HYPGEOM.DIST(Number1; Number2; Number3; Number4; Boolean) |
+| LOGNORM.DIST | Statistical | Returns density of lognormal distribution. | LOGNORM.DIST(X; Mean; Stddev; Mode) |
+| LOGNORMDIST | Statistical | Returns density of lognormal distribution. | LOGNORMDIST(X; Mean; Stddev; Mode) |
+| LOGNORM.INV | Statistical | Returns value of inverse lognormal distribution. | LOGNORM.INV(P; Mean; Stddev) |
+| LOGINV | Statistical | Returns value of inverse lognormal distribution. | LOGINV(P; Mean; Stddev) |
 | MAX | Statistical | Returns the maximum value in a list of arguments. | MAX(Number1; Number2; ...Number30) |
 | MAXA | Statistical | Returns the maximum value in a list of arguments. | MAXA(Value1; Value2; ... Value30) |
 | MEDIAN | Statistical | Returns the median of a set of numbers. | MEDIAN(Number1; Number2; ...Number30) |
 | MIN | Statistical | Returns the minimum value in a list of arguments. | MIN(Number1; Number2; ...Number30) |
 | MINA | Statistical | Returns the minimum value in a list of arguments. | MINA(Value1; Value2; ... Value30) |
-| NORM.DIST | Statistical | Returns density of Normal distribution. | NORM.DIST(X; Mean; Stddev; Mode) |
-| NORMDIST | Statistical | Returns density of Normal distribution. | NORMDIST(X; Mean; Stddev; Mode) |
-| NORM.S.DIST | Statistical | Returns density of Normal distribution. | NORM.S.DIST(X; Mode) |
-| NORMDIST | Statistical | Returns density of Normal distribution. | NORMSDIST(X; Mode) |
-| NORM.INV | Statistical | Returns value of inverse Normal distribution. | NORM.INV(P; Mean; Stddev) |
-| NORMINV | Statistical | Returns value of inverse Normal distribution. | NORMINV(P; Mean; Stddev) |
-| NORM.S.INV | Statistical | Returns value of inverse Normal distribution. | NORM.S.INV(P) |
-| NORMSINV | Statistical | Returns value of inverse Normal distribution. | NORMSINV(P) |
-| PHI | Statistical | Returns probability densitity of Normal distribution. | PHI(X) |
+| NEGBINOM.DIST | Statistical | Returns density of negative binomial distribution. | NEGBINOM.DIST(Number1; Number2; Number3; Mode) |
+| NEGBINOMDIST | Statistical | Returns density of negative binomial distribution. | NEGBINOMDIST(Number1; Number2; Number3; Mode) |
+| NORM.DIST | Statistical | Returns density of normal distribution. | NORM.DIST(X; Mean; Stddev; Mode) |
+| NORMDIST | Statistical | Returns density of normal distribution. | NORMDIST(X; Mean; Stddev; Mode) |
+| NORM.S.DIST | Statistical | Returns density of normal distribution. | NORM.S.DIST(X; Mode) |
+| NORMDIST | Statistical | Returns density of normal distribution. | NORMSDIST(X; Mode) |
+| NORM.INV | Statistical | Returns value of inverse normal distribution. | NORM.INV(P; Mean; Stddev) |
+| NORMINV | Statistical | Returns value of inverse normal distribution. | NORMINV(P; Mean; Stddev) |
+| NORM.S.INV | Statistical | Returns value of inverse normal distribution. | NORM.S.INV(P) |
+| NORMSINV | Statistical | Returns value of inverse normal distribution. | NORMSINV(P) |
+| PHI | Statistical | Returns probability densitity of normal distribution. | PHI(X) |
 | STDEV <br><Badge text="v0.3.0"/>| Statistical | Returns standard deviation of a sample. | STDEV(Value1; Value2; ... Value30) |
 | STDEVA <br><Badge text="v0.3.0"/>| Statistical | Returns standard deviation of a sample. | STDEVA(Value1; Value2; ... Value30) |
 | STDEVP <br><Badge text="v0.3.0"/>| Statistical | Returns standard deviation of a population. | STDEVP(Value1; Value2; ... Value30) |

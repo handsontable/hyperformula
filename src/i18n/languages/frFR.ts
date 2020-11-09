@@ -326,6 +326,8 @@ const dictionary: RawTranslationPackage = {
     NORMSDIST: 'LOI.NORMALE.STANDARD',
     NORMSINV: 'LOI.NORMALE.STANDARD.INVERSE',
     PHI: 'PHI',
+    'NEGBINOM.DIST': 'LOI.BINOMIALE.NEG.N',
+    NEGBINOMDIST: 'LOI.BINOMIALE.NEG',
   },
   langCode: 'frFR',
   ui: {

@@ -326,6 +326,8 @@ const dictionary: RawTranslationPackage = {
     NORMSDIST: 'ROZKŁAD.NORMALNY.S',
     NORMSINV: 'ROZKŁAD.NORMALNY.S.ODW',
     PHI: 'PHI',
+    'NEGBINOM.DIST': 'ROZKŁ.DWUM.PRZEC',
+    NEGBINOMDIST: 'ROZKŁAD.DWUM.PRZEC',
   },
   langCode: 'plPL',
   ui: {

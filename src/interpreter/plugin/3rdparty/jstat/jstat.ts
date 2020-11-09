@@ -829,3 +829,24 @@ export const lognormal = {
     return Math.exp(-1.41421356237309505 * sigma * erfcinv(2 * p) + mu);
   },
 }
+
+export const negbin = {
+  pdf: function pdf(k: number, r: number, p: number) {
+    if (k !== k >>> 0)
+      return false;
+    if (k < 0)
+      return 0;
+    return combination(k + r - 1, r - 1) *
+      Math.pow(1 - p, k) * Math.pow(p, r);
+  },
+
+  cdf: function cdf(x: number, r: number, p: number) {
+    var sum = 0,
+      k = 0;
+    if (x < 0) return 0;
+    for (; k <= x; k++) {
+      sum += <number> negbin.pdf(k, r, p);
+    }
+    return sum;
+  }
+}

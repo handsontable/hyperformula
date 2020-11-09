@@ -326,6 +326,8 @@ const dictionary: RawTranslationPackage = {
     NORMINV: 'NORMTERS',
     NORMSDIST: 'NORMSDAĞ',
     NORMSINV: 'NORMSTERS',
+    'NEGBINOM.DIST': 'NEGBİNOM.DAĞ',
+    NEGBINOMDIST: 'NEGBİNOMDAĞ',
   },
   langCode: 'trTR',
   ui: {
