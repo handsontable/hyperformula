@@ -514,6 +514,12 @@ export class StatisticalPlugin extends  FunctionPlugin {
         {argumentType: ArgumentTypes.NUMBER, greaterThan: 0, lessThan: 1},
       ]
     },
+    'PHI': {
+      method: 'phi',
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER}
+      ]
+    },
   }
 
   public erf(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
@@ -881,6 +887,12 @@ export class StatisticalPlugin extends  FunctionPlugin {
   public normsinv(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.runFunction(ast.args, formulaAddress, this.metadata('NORM.S.INV'),
       (p: number) => normal.inv(p, 0, 1)
+    )
+  }
+  
+  public phi(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('PHI'),
+      (x: number) => normal.pdf(x, 0, 1)
     )
   }
 }

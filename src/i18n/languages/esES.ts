@@ -325,6 +325,7 @@ export const dictionary: RawTranslationPackage = {
     NORMINV: 'DISTR.NORM.INV',
     NORMSDIST: 'DISTR.NORM.ESTAND',
     NORMSINV: 'DISTR.NORM.ESTAND.INV',
+    PHI: 'PHI',
   },
   langCode: 'esES',
   ui: {

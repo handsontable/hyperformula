@@ -323,6 +323,7 @@ lets you design your own [custom functions](custom-functions).
 | NORMINV | Statistical | Returns value of inverse Normal distribution. | NORMINV(P; Mean; Stddev) |
 | NORM.S.INV | Statistical | Returns value of inverse Normal distribution. | NORM.S.INV(P) |
 | NORMSINV | Statistical | Returns value of inverse Normal distribution. | NORMSINV(P) |
+| PHI | Statistical | Returns probability densitity of Normal distribution. | PHI(X) |
 | STDEV <br><Badge text="v0.3.0"/>| Statistical | Returns standard deviation of a sample. | STDEV(Value1; Value2; ... Value30) |
 | STDEVA <br><Badge text="v0.3.0"/>| Statistical | Returns standard deviation of a sample. | STDEVA(Value1; Value2; ... Value30) |
 | STDEVP <br><Badge text="v0.3.0"/>| Statistical | Returns standard deviation of a population. | STDEVP(Value1; Value2; ... Value30) |

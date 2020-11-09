@@ -325,6 +325,7 @@ const dictionary: RawTranslationPackage = {
     NORMINV: 'INV.NORM',
     NORMSDIST: 'DISTNORMP',
     NORMSINV: 'INV.NORMP',
+    PHI: 'PHI',
   },
   langCode: 'ptPT',
   ui: {

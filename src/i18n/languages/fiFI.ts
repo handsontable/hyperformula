@@ -325,6 +325,7 @@ const dictionary: RawTranslationPackage = {
     NORMINV: 'NORM.JAKAUMA.KÄÄNT',
     NORMSDIST: 'NORM.JAKAUMA.NORMIT',
     NORMSINV: 'NORM.JAKAUMA.NORMIT.KÄÄNT',
+    PHI: 'FII',
   },
   langCode: 'fiFI',
   ui: {

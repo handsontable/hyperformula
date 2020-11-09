@@ -325,6 +325,7 @@ const dictionary: RawTranslationPackage = {
     NORMINV: 'INVERZ.NORM',
     NORMSDIST: 'STNORMELOSZL',
     NORMSINV: 'INVERZ.STNORM',
+    PHI: 'FI',
   },
   langCode: 'huHU',
   ui: {

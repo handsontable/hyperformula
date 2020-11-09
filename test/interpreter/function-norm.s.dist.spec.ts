@@ -31,7 +31,7 @@ describe('Function NORM.S.DIST', () => {
     ])
 
     expect(engine.getCellValue(adr('A1'))).toBeCloseTo(0.158655253931457, 6)
-    expect(engine.getCellValue(adr('A2'))).toBeCloseTo(0.353830233327276, 6)
+    expect(engine.getCellValue(adr('A2'))).toBeCloseTo(0.691462461274013, 6)
   })
 
   it('should work as pdf', () => {
@@ -40,7 +40,7 @@ describe('Function NORM.S.DIST', () => {
       ['=NORM.S.DIST(0.5, FALSE())'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toBeCloseTo(0.120985362259572, 6)
-    expect(engine.getCellValue(adr('A2'))).toBeCloseTo(0.0929637734674423, 6)
+    expect(engine.getCellValue(adr('A1'))).toBeCloseTo(0.241970724519143, 6)
+    expect(engine.getCellValue(adr('A2'))).toBeCloseTo(0.3520653267643, 6)
   })
 })

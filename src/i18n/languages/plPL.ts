@@ -325,6 +325,7 @@ const dictionary: RawTranslationPackage = {
     NORMINV: 'ROZKŁAD.NORMALNY.ODW',
     NORMSDIST: 'ROZKŁAD.NORMALNY.S',
     NORMSINV: 'ROZKŁAD.NORMALNY.S.ODW',
+    PHI: 'PHI',
   },
   langCode: 'plPL',
   ui: {

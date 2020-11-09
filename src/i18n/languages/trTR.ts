@@ -318,6 +318,7 @@ const dictionary: RawTranslationPackage = {
     'LOGNORM.INV': 'LOGNORM.TERS',
     LOGNORMDIST: 'LOGNORMDAĞ',
     'NORM.DIST': 'NORM.DAĞ',
+    PHI: 'PHI',
     'NORM.INV': 'NORM.TERS',
     'NORM.S.DIST': 'NORM.S.DAĞ',
     'NORM.S.INV': 'NORM.S.TERS',
