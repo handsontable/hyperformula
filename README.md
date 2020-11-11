@@ -36,7 +36,7 @@ and [custom functions](https://handsontable.github.io/hyperformula/guide/custom-
   - [JavaScript](https://handsontable.github.io/hyperformula/guide/demo.html)
   - [React](https://handsontable.github.io/hyperformula/guide/integration-with-react.html)
   - [Vue.js](https://handsontable.github.io/hyperformula/guide/integration-with-vue.html)
-  - [Angular.js](https://handsontable.github.io/hyperformula/guide/integration-with-angular.html)
+  - [Angular](https://handsontable.github.io/hyperformula/guide/integration-with-angular.html)
 - [Installation](https://handsontable.github.io/hyperformula/guide/client-side-installation.html)
 - [Basic usage](https://handsontable.github.io/hyperformula/guide/basic-usage.html)
 - [API Reference](https://handsontable.github.io/hyperformula/api/)
