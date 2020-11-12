@@ -306,6 +306,7 @@ lets you design your own [custom functions](custom-functions).
 | GAUSS | Statistical | Returns the probability of gaussian variable fall more than this many times standard deviation from mean. | GAUSS(Number) |
 | HYPGEOMDIST | Statistical | Returns density of hypergeometric distribution. | HYPGEOMDIST(Number1; Number2; Number3; Number4; Boolean) |
 | HYPGEOM.DIST | Statistical | Returns density of hypergeometric distribution. | HYPGEOM.DIST(Number1; Number2; Number3; Number4; Boolean) |
+| LARGE | Statistical | Returns k-th largest value in a range. | LARGE(Range; K) |
 | LOGNORM.DIST | Statistical | Returns density of lognormal distribution. | LOGNORM.DIST(X; Mean; Stddev; Mode) |
 | LOGNORMDIST | Statistical | Returns density of lognormal distribution. | LOGNORMDIST(X; Mean; Stddev; Mode) |
 | LOGNORM.INV | Statistical | Returns value of inverse lognormal distribution. | LOGNORM.INV(P; Mean; Stddev) |
@@ -328,6 +329,7 @@ lets you design your own [custom functions](custom-functions).
 | PHI | Statistical | Returns probability densitity of normal distribution. | PHI(X) |
 | POISSON | Statistical | Returns density of Poisson distribution. | POISSON(X; Mean; Mode) |
 | POISSON.DIST | Statistical | Returns density of Poisson distribution. | POISSON.DIST(X; Mean; Mode) |
+| SMALL | Statistical | Returns k-th smallest value in a range. | SMALL(Range; K) |
 | STDEV <br><Badge text="v0.3.0"/>| Statistical | Returns standard deviation of a sample. | STDEV(Value1; Value2; ... Value30) |
 | STDEVA <br><Badge text="v0.3.0"/>| Statistical | Returns standard deviation of a sample. | STDEVA(Value1; Value2; ... Value30) |
 | STDEVP <br><Badge text="v0.3.0"/>| Statistical | Returns standard deviation of a population. | STDEVP(Value1; Value2; ... Value30) |
