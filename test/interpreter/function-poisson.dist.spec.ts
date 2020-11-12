@@ -46,6 +46,16 @@ describe('Function POISSON.DIST', () => {
     expect(engine.getCellValue(adr('A2'))).toBeCloseTo(0.0360894088630967, 6)
   })
 
+  it('should truncate first arg', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=POISSON.DIST(10.9, 1, TRUE())'],
+      ['=POISSON.DIST(5.9, 2, TRUE())'],
+    ])
+
+    expect(engine.getCellValue(adr('A1'))).toBeCloseTo(0.999999989952234, 6)
+    expect(engine.getCellValue(adr('A2'))).toBeCloseTo(0.983436391519386, 6)
+  })
+
   it('checks bounds', () => {
     const engine = HyperFormula.buildFromArray([
       ['=POISSON.DIST(0, 0, FALSE())'],

@@ -326,6 +326,8 @@ lets you design your own [custom functions](custom-functions).
 | NORM.S.INV | Statistical | Returns value of inverse normal distribution. | NORM.S.INV(P) |
 | NORMSINV | Statistical | Returns value of inverse normal distribution. | NORMSINV(P) |
 | PHI | Statistical | Returns probability densitity of normal distribution. | PHI(X) |
+| POISSON | Statistical | Returns density of Poisson distribution. | POISSON(X; Mean; Mode) |
+| POISSON.DIST | Statistical | Returns density of Poisson distribution. | POISSON.DIST(X; Mean; Mode) |
 | STDEV <br><Badge text="v0.3.0"/>| Statistical | Returns standard deviation of a sample. | STDEV(Value1; Value2; ... Value30) |
 | STDEVA <br><Badge text="v0.3.0"/>| Statistical | Returns standard deviation of a sample. | STDEVA(Value1; Value2; ... Value30) |
 | STDEVP <br><Badge text="v0.3.0"/>| Statistical | Returns standard deviation of a population. | STDEVP(Value1; Value2; ... Value30) |
