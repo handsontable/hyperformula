@@ -74,7 +74,7 @@ export class MedianPlugin extends FunctionPlugin {
         if(vals instanceof CellError) {
           return vals
         }
-        vals.sort((a,b) => a-b)
+        vals.sort((a, b) => a-b)
         n = Math.trunc(n)
         if(n > vals.length) {
           return new CellError(ErrorType.NUM, ErrorMessage.ValueLarge)
@@ -91,7 +91,7 @@ export class MedianPlugin extends FunctionPlugin {
         if(vals instanceof CellError) {
           return vals
         }
-        vals.sort((a,b) => a-b)
+        vals.sort((a, b) => a-b)
         n = Math.trunc(n)
         if(n > vals.length) {
           return new CellError(ErrorType.NUM, ErrorMessage.ValueLarge)
