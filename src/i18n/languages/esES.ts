@@ -328,6 +328,8 @@ export const dictionary: RawTranslationPackage = {
     PHI: 'PHI',
     'NEGBINOM.DIST': 'NEGBINOM.DIST',
     NEGBINOMDIST: 'NEGBINOMDIST',
+    LARGE: 'K.ESIMO.MAYOR',
+    SMALL: 'K.ESIMO.MENOR',
   },
   langCode: 'esES',
   ui: {

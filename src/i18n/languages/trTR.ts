@@ -328,6 +328,8 @@ const dictionary: RawTranslationPackage = {
     NORMSINV: 'NORMSTERS',
     'NEGBINOM.DIST': 'NEGBİNOM.DAĞ',
     NEGBINOMDIST: 'NEGBİNOMDAĞ',
+    LARGE: 'BÜYÜK',
+    SMALL: 'KÜÇÜK',
   },
   langCode: 'trTR',
   ui: {

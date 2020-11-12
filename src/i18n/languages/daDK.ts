@@ -328,6 +328,8 @@ const dictionary: RawTranslationPackage = {
     PHI: 'PHI',
     'NEGBINOM.DIST': 'NEGBINOM.FORDELING',
     NEGBINOMDIST: 'NEGBINOMFORDELING',
+    LARGE: 'STØRSTE',
+    SMALL: 'MINDSTE',
   },
   langCode: 'daDK',
   ui: {

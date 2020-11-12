@@ -328,6 +328,8 @@ const dictionary: RawTranslationPackage = {
     PHI: 'PHI',
     'NEGBINOM.DIST': 'ROZKŁ.DWUM.PRZEC',
     NEGBINOMDIST: 'ROZKŁAD.DWUM.PRZEC',
+    LARGE: 'MAX.K',
+    SMALL: 'MIN.K',
   },
   langCode: 'plPL',
   ui: {

@@ -328,6 +328,8 @@ const dictionary: RawTranslationPackage = {
     PHI: 'PHI',
     'NEGBINOM.DIST': 'DISTRIB.BINOM.NEG.N',
     NEGBINOMDIST: 'DISTRIB.BINOM.NEG',
+    LARGE: 'GRANDE',
+    SMALL: 'PICCOLO',
   },
   langCode: 'itIT',
   ui: {
