@@ -7,7 +7,7 @@ import {FunctionMetadata, FunctionPlugin, FunctionPluginDefinition} from './plug
 import {Interpreter} from './Interpreter'
 import {Maybe} from '../Maybe'
 import {Config} from '../Config'
-import {FunctionPluginValidationError, ProtectedFunctionError} from '../errors'
+import {AliasAlreadyExisting, AliasTargetEmpty, FunctionPluginValidationError, ProtectedFunctionError} from '../errors'
 import {TranslationSet} from '../i18n'
 import {HyperFormula} from '../HyperFormula'
 import {VersionPlugin} from './plugin/VersionPlugin'
@@ -25,6 +25,12 @@ export class FunctionRegistry {
   public static registerFunctionPlugin(plugin: FunctionPluginDefinition, translations?: FunctionTranslationsPackage): void {
     if(plugin.aliases !== undefined) {
       Object.entries(plugin.aliases).forEach( ([key, val]) => {
+        if(plugin.implementedFunctions[key] !== undefined) {
+          throw new AliasAlreadyExisting(key, plugin.name)
+        }
+        if(plugin.implementedFunctions[val] === undefined) {
+          throw new AliasTargetEmpty(val, plugin.name)
+        }
         plugin.implementedFunctions[key] = plugin.implementedFunctions[val]
       })
       plugin.aliases = undefined

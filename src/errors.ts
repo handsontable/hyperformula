@@ -371,3 +371,18 @@ export class NoRelativeAddressesAllowedError extends Error {
     super('Relative addresses not allowed in named expressions.')
   }
 }
+
+/**
+ * Error thrown when alias to a function is already defined.
+ */
+export class AliasAlreadyExisting extends Error {
+  constructor(name: string, pluginName: string) {
+    super(`Alias id ${name} in plugin ${pluginName} already defined as a function or alias.`)
+  }
+}
+
+export class AliasTargetEmpty extends Error {
+  constructor(name: string, pluginName: string) {
+    super(`Alias in plugin ${pluginName} points to a non-existent function id ${name}.`)
+  }
+}

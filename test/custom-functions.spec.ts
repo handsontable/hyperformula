@@ -8,7 +8,12 @@ import {SumifPlugin} from '../src/interpreter/plugin/SumifPlugin'
 import {NumericAggregationPlugin} from '../src/interpreter/plugin/NumericAggregationPlugin'
 import {plPL} from '../src/i18n/languages'
 import {VersionPlugin} from '../src/interpreter/plugin/VersionPlugin'
-import {ProtectedFunctionError, ProtectedFunctionTranslationError} from '../src/errors'
+import {
+  AliasAlreadyExisting,
+  AliasTargetEmpty,
+  ProtectedFunctionError,
+  ProtectedFunctionTranslationError
+} from '../src/errors'
 
 class FooPlugin extends FunctionPlugin {
   public static implementedFunctions = {
@@ -63,6 +68,34 @@ class InvalidPlugin extends FunctionPlugin {
 
   public bar(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return 'bar'
+  }
+}
+
+
+class EmptyAliasPlugin extends FunctionPlugin {
+  public static implementedFunctions = {
+    'FOO': {
+      method: 'foo',
+    }
+  }
+
+  public static aliases = {
+    'FOOALIAS': 'BAR',
+  }
+}
+
+class OverloadedAliasPlugin extends FunctionPlugin {
+  public static implementedFunctions = {
+    'FOO': {
+      method: 'foo',
+    },
+    'BAR': {
+      method: 'foo',
+    }
+  }
+
+  public static aliases = {
+    'FOO': 'BAR',
   }
 }
 
@@ -297,5 +330,19 @@ describe('Reserved functions', () => {
     expect(() => {
       HyperFormula.registerFunctionPlugin(FooPlugin, {'enGB': {'VERSION': 'FOOBAR'}})
     }).toThrow(new ProtectedFunctionTranslationError('VERSION'))
+  })
+})
+
+describe('aliases', () => {
+  it('should validate that alias target exists', () => {
+    expect( () => {
+      HyperFormula.registerFunctionPlugin(EmptyAliasPlugin)
+    }).toThrow(new AliasTargetEmpty('BAR', 'EmptyAliasPlugin'))
+  })
+
+  it('should validate that alias key is available', () => {
+    expect( () => {
+      HyperFormula.registerFunctionPlugin(OverloadedAliasPlugin)
+    }).toThrow(new AliasAlreadyExisting('FOO', 'OverloadedAliasPlugin'))
   })
 })
