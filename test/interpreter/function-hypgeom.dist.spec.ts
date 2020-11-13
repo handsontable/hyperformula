@@ -15,6 +15,7 @@ describe('Function HYPGEOM.DIST', () => {
     expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
   })
 
+  //In product #1, function takes 4 arguments.
   it('should return error for arguments of wrong type', () => {
     const engine = HyperFormula.buildFromArray([
       ['=HYPGEOM.DIST("foo", 2, 3, 4, TRUE())'],
@@ -31,6 +32,7 @@ describe('Function HYPGEOM.DIST', () => {
     expect(engine.getCellValue(adr('A5'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.WrongType))
   })
 
+  //In product #1, function takes 4 arguments.
   it('should work as cdf', () => {
     const engine = HyperFormula.buildFromArray([
       ['=HYPGEOM.DIST(4, 12, 20, 40, TRUE())'],
@@ -39,6 +41,7 @@ describe('Function HYPGEOM.DIST', () => {
     expect(engine.getCellValue(adr('A1'))).toBeCloseTo(0.150422391245528, 6)
   })
 
+  //In product #1, function takes 4 arguments.
   it('should work as pdf', () => {
     const engine = HyperFormula.buildFromArray([
       ['=HYPGEOM.DIST(4, 12, 20, 40, FALSE())'],
@@ -47,6 +50,7 @@ describe('Function HYPGEOM.DIST', () => {
     expect(engine.getCellValue(adr('A1'))).toBeCloseTo(0.109243002735772, 6)
   })
 
+  //In product #1, function takes 4 arguments.
   it('truncation works', () => {
     const engine = HyperFormula.buildFromArray([
       ['=HYPGEOM.DIST(4.9, 12, 20, 40, TRUE())'],
@@ -61,6 +65,7 @@ describe('Function HYPGEOM.DIST', () => {
     expect(engine.getCellValue(adr('A4'))).toBeCloseTo(0.150422391245528, 6)
   })
 
+  //In product #1, function takes 4 arguments.
   it('checks bounds', () => {
     const engine = HyperFormula.buildFromArray([
       ['=HYPGEOM.DIST(0, 12, 20, 40, TRUE())'],
@@ -82,14 +87,17 @@ describe('Function HYPGEOM.DIST', () => {
     expect(engine.getCellValue(adr('A1'))).toBeCloseTo(0.0000225475753840604, 6)
     expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.ValueSmall))
     expect(engine.getCellValue(adr('A3'))).toEqual(1)
+    //product #2 returns value here
     expect(engine.getCellValue(adr('A4'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.ValueLarge))
     expect(engine.getCellValue(adr('A5'))).toEqual(1)
+    //product #2 returns value here
     expect(engine.getCellValue(adr('A6'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.ValueLarge))
     expect(engine.getCellValue(adr('A7'))).toEqual(1)
     expect(engine.getCellValue(adr('A8'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.ValueLarge))
     expect(engine.getCellValue(adr('A9'))).toEqual(1)
     expect(engine.getCellValue(adr('A10'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.ValueLarge))
     expect(engine.getCellValue(adr('A11'))).toBeCloseTo( 0.00614930629923134, 6)
+    //product #2 returns value here
     expect(engine.getCellValue(adr('A12'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.ValueLarge))
     expect(engine.getCellValue(adr('A13'))).toEqual(1)
     //value should be 0 or Error, product #1 gives different answer

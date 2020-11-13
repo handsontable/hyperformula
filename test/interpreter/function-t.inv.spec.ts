@@ -54,6 +54,7 @@ describe('Function T.INV', () => {
     ])
 
     expect(engine.getCellValue(adr('A1'))).toBeCloseTo(-31.820515953771, 6)
+    //product #2 returns different error
     expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.ValueSmall))
     expect(engine.getCellValue(adr('A3'))).toBeCloseTo(31.820515953771, 6)
     expect(engine.getCellValue(adr('A4'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.ValueLarge))
