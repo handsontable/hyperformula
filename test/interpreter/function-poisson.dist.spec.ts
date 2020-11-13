@@ -64,7 +64,9 @@ describe('Function POISSON.DIST', () => {
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqual(1)
+    //product #1 returns value
     expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.ValueSmall))
+    //product #2 returns value
     expect(engine.getCellValue(adr('A3'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.ValueSmall))
   })
 })

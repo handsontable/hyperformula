@@ -4,6 +4,7 @@ import {ErrorMessage} from '../../src/error-message'
 import {adr, detailedError} from '../testUtils'
 
 describe('Function LOGNORM.DIST', () => {
+  //in product #1, this function takes 3 arguments
   it('should return error for wrong number of arguments', () => {
     const engine = HyperFormula.buildFromArray([
       ['=LOGNORM.DIST(1, 2, 3)'],
@@ -14,6 +15,7 @@ describe('Function LOGNORM.DIST', () => {
     expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
   })
 
+  //in product #1, this function takes 3 arguments
   it('should return error for arguments of wrong type', () => {
     const engine = HyperFormula.buildFromArray([
       ['=LOGNORM.DIST("foo", 2, 3, TRUE())'],
@@ -28,6 +30,7 @@ describe('Function LOGNORM.DIST', () => {
     expect(engine.getCellValue(adr('A4'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.WrongType))
   })
 
+  //in product #1, this function takes 3 arguments
   it('should work as cdf', () => {
     const engine = HyperFormula.buildFromArray([
       ['=LOGNORM.DIST(0.1, 1, 2, TRUE())'],
@@ -38,6 +41,7 @@ describe('Function LOGNORM.DIST', () => {
     expect(engine.getCellValue(adr('A2'))).toBeCloseTo(0.250382425968177, 6)
   })
 
+  //in product #1, this function takes 3 arguments
   it('should work as pdf', () => {
     const engine = HyperFormula.buildFromArray([
       ['=LOGNORM.DIST(0.1, 1, 2, FALSE())'],
@@ -48,6 +52,7 @@ describe('Function LOGNORM.DIST', () => {
     expect(engine.getCellValue(adr('A2'))).toBeCloseTo(0.159017142514074, 6)
   })
 
+  //in product #1, this function takes 3 arguments
   it('checks bounds', () => {
     const engine = HyperFormula.buildFromArray([
       ['=LOGNORM.DIST(0.01, 0, 0.01, FALSE())'],

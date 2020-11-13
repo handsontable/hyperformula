@@ -4,6 +4,7 @@ import {ErrorMessage} from '../../src/error-message'
 import {adr, detailedError} from '../testUtils'
 
 describe('Function NORM.S.DIST', () => {
+  //in product #1, this function takes 1 argument
   it('should return error for wrong number of arguments', () => {
     const engine = HyperFormula.buildFromArray([
       ['=NORM.S.DIST(2)'],
@@ -14,6 +15,7 @@ describe('Function NORM.S.DIST', () => {
     expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
   })
 
+  //in product #1, this function takes 1 argument
   it('should return error for arguments of wrong type', () => {
     const engine = HyperFormula.buildFromArray([
       ['=NORM.S.DIST("foo", TRUE())'],
@@ -24,6 +26,7 @@ describe('Function NORM.S.DIST', () => {
     expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.WrongType))
   })
 
+  //in product #1, this function takes 1 argument
   it('should work as cdf', () => {
     const engine = HyperFormula.buildFromArray([
       ['=NORM.S.DIST(-1, TRUE())'],
@@ -34,6 +37,7 @@ describe('Function NORM.S.DIST', () => {
     expect(engine.getCellValue(adr('A2'))).toBeCloseTo(0.691462461274013, 6)
   })
 
+  //in product #1, this function takes 1 argument
   it('should work as pdf', () => {
     const engine = HyperFormula.buildFromArray([
       ['=NORM.S.DIST(-1, FALSE())'],

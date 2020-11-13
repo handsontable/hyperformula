@@ -63,6 +63,7 @@ describe('Function T.DIST', () => {
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqual(0.159154942198517)
+    //product #2 returns different error
     expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.ValueSmall))
   })
 })

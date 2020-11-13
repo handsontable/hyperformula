@@ -72,8 +72,10 @@ describe('Function NEGBINOM.DIST', () => {
     expect(engine.getCellValue(adr('A1'))).toEqual(0.5)
     expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.ValueSmall))
     expect(engine.getCellValue(adr('A3'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.ValueSmall))
+    //product #2 returns error
     expect(engine.getCellValue(adr('A4'))).toEqual(0)
     expect(engine.getCellValue(adr('A5'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.ValueSmall))
+    //product #2 returns error
     expect(engine.getCellValue(adr('A6'))).toEqual(1)
     expect(engine.getCellValue(adr('A7'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.ValueLarge))
   })
