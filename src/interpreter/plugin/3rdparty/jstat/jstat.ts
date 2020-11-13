@@ -534,3 +534,319 @@ export const chisquare = {
   }
 }
 
+export const centralF = {
+  // This implementation of the pdf function avoids float overflow
+  // See the way that R calculates this value:
+  // https://svn.r-project.org/R/trunk/src/nmath/df.c
+  pdf: function pdf(x: number, df1: number, df2: number) {
+    var p, q, f;
+
+    if (x < 0)
+      return 0;
+
+    if (df1 <= 2) {
+      if (x === 0 && df1 < 2) {
+        return Infinity;
+      }
+      if (x === 0 && df1 === 2) {
+        return 1;
+      }
+      return (1 / betafn(df1 / 2, df2 / 2)!) *
+        Math.pow(df1 / df2, df1 / 2) *
+        Math.pow(x, (df1 / 2) - 1) *
+        Math.pow((1 + (df1 / df2) * x), -(df1 + df2) / 2);
+    }
+
+    p = (df1 * x) / (df2 + x * df1);
+    q = df2 / (df2 + x * df1);
+    f = df1 * q / 2.0;
+    return f * binomial.pdf((df1 - 2) / 2, (df1 + df2 - 2) / 2, p);
+  },
+
+  cdf: function cdf(x: number, df1: number, df2: number): number {
+    if (x < 0)
+      return 0;
+    return <number> ibeta((df1 * x) / (df1 * x + df2), df1 / 2, df2 / 2);
+  },
+
+  inv: function inv(x: number, df1: number, df2: number) {
+    return df2 / (df1 * (1 / ibetainv(x, df1 / 2, df2 / 2) - 1));
+  },
+}
+
+export const weibull = {
+  pdf: function pdf(x: number, scale: number, shape: number) {
+    if (x < 0 || scale < 0 || shape < 0)
+      return 0;
+    return (shape / scale) * Math.pow((x / scale), (shape - 1)) *
+      Math.exp(-(Math.pow((x / scale), shape)));
+  },
+
+  cdf: function cdf(x: number, scale: number, shape: number) {
+    return x < 0 ? 0 : 1 - Math.exp(-Math.pow((x / scale), shape));
+  },
+}
+
+export const poisson = {
+  pdf: function pdf(k: number, l: number) {
+    if (l < 0 || (k % 1) !== 0 || k < 0) {
+      return 0;
+    }
+
+    return Math.pow(l, k) * Math.exp(-l) / factorial(k);
+  },
+
+  cdf: function cdf(x: number, l: number) {
+    var k = 0;
+    if (x < 0) return 0;
+    var sum = 0;
+    for (; k <= x; k++) {
+      sum += poisson.pdf(k, l);
+    }
+    return sum;
+  },
+}
+
+export const hypgeom = {
+  pdf: function pdf(k: number, N: number, m: number, n: number): number {
+    // Hypergeometric PDF.
+
+    // A simplification of the CDF algorithm below.
+
+    // k = number of successes drawn
+    // N = population size
+    // m = number of successes in population
+    // n = number of items drawn from population
+
+    // if(k !== k | 0) {
+    //   return false;
+    // } else
+    if(k < 0 || k < m - (N - n)) {
+      // It's impossible to have this few successes drawn.
+      return 0;
+    } else if(k > n || k > m) {
+      // It's impossible to have this many successes drawn.
+      return 0;
+    } else if (m * 2 > N) {
+      // More than half the population is successes.
+
+      if(n * 2 > N) {
+        // More than half the population is sampled.
+
+        return hypgeom.pdf(N - m - n + k, N, N - m, N - n)
+      } else {
+        // Half or less of the population is sampled.
+
+        return hypgeom.pdf(n - k, N, N - m, n);
+      }
+
+    } else if(n * 2 > N) {
+      // Half or less is successes.
+
+      return hypgeom.pdf(m - k, N, m, N - n);
+
+    } else if(m < n) {
+      // We want to have the number of things sampled to be less than the
+      // successes available. So swap the definitions of successful and sampled.
+      return hypgeom.pdf(k, N, n, m);
+    } else {
+      // If we get here, half or less of the population was sampled, half or
+      // less of it was successes, and we had fewer sampled things than
+      // successes. Now we can do this complicated iterative algorithm in an
+      // efficient way.
+
+      // The basic premise of the algorithm is that we partially normalize our
+      // intermediate product to keep it in a numerically good region, and then
+      // finish the normalization at the end.
+
+      // This variable holds the scaled probability of the current number of
+      // successes.
+      var scaledPDF = 1;
+
+      // This keeps track of how much we have normalized.
+      var samplesDone = 0;
+
+      for(var i = 0; i < k; i++) {
+        // For every possible number of successes up to that observed...
+
+        while(scaledPDF > 1 && samplesDone < n) {
+          // Intermediate result is growing too big. Apply some of the
+          // normalization to shrink everything.
+
+          scaledPDF *= 1 - (m / (N - samplesDone));
+
+          // Say we've normalized by this sample already.
+          samplesDone++;
+        }
+
+        // Work out the partially-normalized hypergeometric PDF for the next
+        // number of successes
+        scaledPDF *= (n - i) * (m - i) / ((i + 1) * (N - m - n + i + 1));
+      }
+
+      for(; samplesDone < n; samplesDone++) {
+        // Apply all the rest of the normalization
+        scaledPDF *= 1 - (m / (N - samplesDone));
+      }
+
+      // Bound answer sanely before returning.
+      return Math.min(1, Math.max(0, scaledPDF));
+    }
+  },
+
+  cdf: function cdf(x: number, N: number, m: number, n: number): number {
+    // Hypergeometric CDF.
+
+    // This algorithm is due to Prof. Thomas S. Ferguson, <tom@math.ucla.edu>,
+    // and comes from his hypergeometric test calculator at
+    // <http://www.math.ucla.edu/~tom/distributions/Hypergeometric.html>.
+
+    // x = number of successes drawn
+    // N = population size
+    // m = number of successes in population
+    // n = number of items drawn from population
+
+    if(x < 0 || x < m - (N - n)) {
+      // It's impossible to have this few successes drawn or fewer.
+      return 0;
+    } else if(x >= n || x >= m) {
+      // We will always have this many successes or fewer.
+      return 1;
+    } else if (m * 2 > N) {
+      // More than half the population is successes.
+
+      if(n * 2 > N) {
+        // More than half the population is sampled.
+
+        return cdf(N - m - n + x, N, N - m, N - n)
+      } else {
+        // Half or less of the population is sampled.
+
+        return 1 - hypgeom.cdf(n - x - 1, N, N - m, n);
+      }
+
+    } else if(n * 2 > N) {
+      // Half or less is successes.
+
+      return 1 - hypgeom.cdf(m - x - 1, N, m, N - n);
+
+    } else if(m < n) {
+      // We want to have the number of things sampled to be less than the
+      // successes available. So swap the definitions of successful and sampled.
+      return hypgeom.cdf(x, N, n, m);
+    } else {
+      // If we get here, half or less of the population was sampled, half or
+      // less of it was successes, and we had fewer sampled things than
+      // successes. Now we can do this complicated iterative algorithm in an
+      // efficient way.
+
+      // The basic premise of the algorithm is that we partially normalize our
+      // intermediate sum to keep it in a numerically good region, and then
+      // finish the normalization at the end.
+
+      // Holds the intermediate, scaled total CDF.
+      var scaledCDF = 1;
+
+      // This variable holds the scaled probability of the current number of
+      // successes.
+      var scaledPDF = 1;
+
+      // This keeps track of how much we have normalized.
+      var samplesDone = 0;
+
+      for(var i = 0; i < x; i++) {
+        // For every possible number of successes up to that observed...
+
+        while(scaledCDF > 1 && samplesDone < n) {
+          // Intermediate result is growing too big. Apply some of the
+          // normalization to shrink everything.
+
+          var factor = 1 - (m / (N - samplesDone));
+
+          scaledPDF *= factor;
+          scaledCDF *= factor;
+
+          // Say we've normalized by this sample already.
+          samplesDone++;
+        }
+
+        // Work out the partially-normalized hypergeometric PDF for the next
+        // number of successes
+        scaledPDF *= (n - i) * (m - i) / ((i + 1) * (N - m - n + i + 1));
+
+        // Add to the CDF answer.
+        scaledCDF += scaledPDF;
+      }
+
+      for(; samplesDone < n; samplesDone++) {
+        // Apply all the rest of the normalization
+        scaledCDF *= 1 - (m / (N - samplesDone));
+      }
+
+      // Bound answer sanely before returning.
+      return Math.min(1, Math.max(0, scaledCDF));
+    }
+  }
+}
+
+export const studentt = {
+  pdf: function pdf(x: number, dof: number) {
+    dof = dof > 1e100 ? 1e100 : dof;
+    return (1 / (Math.sqrt(dof) * betafn(0.5, dof / 2)!)) *
+      Math.pow(1 + ((x * x) / dof), -((dof + 1) / 2));
+  },
+
+  cdf: function cdf(x: number, dof: number): number {
+    var dof2 = dof / 2;
+    return <number> ibeta((x + Math.sqrt(x * x + dof)) /
+      (2 * Math.sqrt(x * x + dof)), dof2, dof2);
+  },
+
+  inv: function(p: number, dof: number) {
+    var x = ibetainv(2 * Math.min(p, 1 - p), 0.5 * dof, 0.5);
+    x = Math.sqrt(dof * (1 - x) / x);
+    return (p > 0.5) ? x : -x;
+  },
+}
+
+export const lognormal = {
+  pdf: function pdf(x: number, mu: number, sigma: number) {
+    if (x <= 0)
+      return 0;
+    return Math.exp(-Math.log(x) - 0.5 * Math.log(2 * Math.PI) -
+      Math.log(sigma) - Math.pow(Math.log(x) - mu, 2) /
+      (2 * sigma * sigma));
+  },
+
+  cdf: function cdf(x: number, mu: number, sigma: number) {
+    if (x < 0)
+      return 0;
+    return 0.5 +
+      (0.5 * erf((Math.log(x) - mu) / Math.sqrt(2 * sigma * sigma)));
+  },
+
+  inv: function(p: number, mu: number, sigma: number) {
+    return Math.exp(-1.41421356237309505 * sigma * erfcinv(2 * p) + mu);
+  },
+}
+
+export const negbin = {
+  pdf: function pdf(k: number, r: number, p: number) {
+    if (k !== k >>> 0)
+      return false;
+    if (k < 0)
+      return 0;
+    return combination(k + r - 1, r - 1) *
+      Math.pow(1 - p, k) * Math.pow(p, r);
+  },
+
+  cdf: function cdf(x: number, r: number, p: number) {
+    var sum = 0,
+      k = 0;
+    if (x < 0) return 0;
+    for (; k <= x; k++) {
+      sum += <number> negbin.pdf(k, r, p);
+    }
+    return sum;
+  }
+}

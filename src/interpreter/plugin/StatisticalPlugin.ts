@@ -10,6 +10,7 @@ import {besseli, besselj, besselk, bessely} from './3rdparty/bessel/bessel'
 import {
   beta,
   binomial,
+  centralF,
   chisquare,
   erf,
   erfc,
@@ -17,7 +18,11 @@ import {
   gamma,
   gammafn,
   gammaln,
-  normal
+  hypgeom, lognormal, negbin,
+  normal,
+  poisson,
+  studentt,
+  weibull
 } from './3rdparty/jstat/jstat'
 import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
 
@@ -261,6 +266,278 @@ export class StatisticalPlugin extends  FunctionPlugin {
         {argumentType: ArgumentTypes.NUMBER, minValue: 1},
       ]
     },
+    'F.DIST': {
+      method: 'fdist',
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER, minValue: 0},
+        {argumentType: ArgumentTypes.NUMBER, minValue: 1},
+        {argumentType: ArgumentTypes.NUMBER, minValue: 1},
+        {argumentType: ArgumentTypes.BOOLEAN},
+      ]
+    },
+    'F.DIST.RT': {
+      method: 'fdistrt',
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER, minValue: 0},
+        {argumentType: ArgumentTypes.NUMBER, minValue: 1},
+        {argumentType: ArgumentTypes.NUMBER, minValue: 1},
+      ]
+    },
+    'F.INV': {
+      method: 'finv',
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER, minValue: 0, maxValue: 1},
+        {argumentType: ArgumentTypes.NUMBER, minValue: 1},
+        {argumentType: ArgumentTypes.NUMBER, minValue: 1},
+      ]
+    },
+    'F.INV.RT': {
+      method: 'finvrt',
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER, minValue: 0, maxValue: 1},
+        {argumentType: ArgumentTypes.NUMBER, minValue: 1},
+        {argumentType: ArgumentTypes.NUMBER, minValue: 1},
+      ]
+    },
+    'FDIST': {
+      method: 'fdistrt',
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER, minValue: 0},
+        {argumentType: ArgumentTypes.NUMBER, minValue: 1},
+        {argumentType: ArgumentTypes.NUMBER, minValue: 1},
+      ]
+    },
+    'FINV': {
+      method: 'finvrt',
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER, minValue: 0, maxValue: 1},
+        {argumentType: ArgumentTypes.NUMBER, minValue: 1},
+        {argumentType: ArgumentTypes.NUMBER, minValue: 1},
+      ]
+    },
+    'WEIBULL.DIST': {
+      method: 'weibulldist',
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER, minValue: 0},
+        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
+        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
+        {argumentType: ArgumentTypes.BOOLEAN},
+      ]
+    },
+    'WEIBULL': {
+      method: 'weibulldist',
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER, minValue: 0},
+        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
+        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
+        {argumentType: ArgumentTypes.BOOLEAN},
+      ]
+    },
+    'POISSON.DIST': {
+      method: 'poissondist',
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER, minValue: 0},
+        {argumentType: ArgumentTypes.NUMBER, minValue: 0},
+        {argumentType: ArgumentTypes.BOOLEAN},
+      ]
+    },
+    'POISSON': {
+      method: 'poissondist',
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER, minValue: 0},
+        {argumentType: ArgumentTypes.NUMBER, minValue: 0},
+        {argumentType: ArgumentTypes.BOOLEAN},
+      ]
+    },
+    'HYPGEOM.DIST': {
+      method: 'hypgeomdist',
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER, minValue: 0},
+        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
+        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
+        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
+        {argumentType: ArgumentTypes.BOOLEAN},
+      ]
+    },
+    'HYPGEOMDIST': {
+      method: 'hypgeomdist',
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER, minValue: 0},
+        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
+        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
+        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
+        {argumentType: ArgumentTypes.BOOLEAN},
+      ]
+    },
+    'T.DIST': {
+      method: 'tdist',
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER},
+        {argumentType: ArgumentTypes.NUMBER, minValue: 1},
+        {argumentType: ArgumentTypes.BOOLEAN},
+      ]
+    },
+    'T.DIST.2T': {
+      method: 'tdist2t',
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER, minValue: 0},
+        {argumentType: ArgumentTypes.NUMBER, minValue: 1},
+      ]
+    },
+    'T.DIST.RT': {
+      method: 'tdistrt',
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER},
+        {argumentType: ArgumentTypes.NUMBER, minValue: 1},
+      ]
+    },
+    'TDIST': {
+      method: 'tdistold',
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER, minValue: 0},
+        {argumentType: ArgumentTypes.NUMBER, minValue: 1},
+        {argumentType: ArgumentTypes.INTEGER, minValue: 1, maxValue: 2},
+      ]
+    },
+    'T.INV': {
+      method: 'tinv',
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0, lessThan: 1},
+        {argumentType: ArgumentTypes.NUMBER, minValue: 1},
+      ]
+    },
+    'T.INV.2T': {
+      method: 'tinv2t',
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0, maxValue: 1},
+        {argumentType: ArgumentTypes.NUMBER, minValue: 1},
+      ]
+    },
+    'TINV': {
+      method: 'tinv2t',
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0, maxValue: 1},
+        {argumentType: ArgumentTypes.NUMBER, minValue: 1},
+      ]
+    },
+    'LOGNORM.DIST': {
+      method: 'lognormdist',
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
+        {argumentType: ArgumentTypes.NUMBER},
+        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
+        {argumentType: ArgumentTypes.BOOLEAN},
+      ]
+    },
+    'LOGNORM.INV': {
+      method: 'lognorminv',
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0, lessThan: 1},
+        {argumentType: ArgumentTypes.NUMBER},
+        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
+      ]
+    },
+    'LOGNORMDIST': {
+      method: 'lognormdist',
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
+        {argumentType: ArgumentTypes.NUMBER},
+        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
+        {argumentType: ArgumentTypes.BOOLEAN},
+      ]
+    },
+    'LOGINV': {
+      method: 'lognorminv',
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0, lessThan: 1},
+        {argumentType: ArgumentTypes.NUMBER},
+        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
+      ]
+    },
+    'NORM.DIST': {
+      method: 'normdist',
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER},
+        {argumentType: ArgumentTypes.NUMBER},
+        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
+        {argumentType: ArgumentTypes.BOOLEAN},
+      ]
+    },
+    'NORM.INV': {
+      method: 'norminv',
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0, lessThan: 1},
+        {argumentType: ArgumentTypes.NUMBER},
+        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
+      ]
+    },
+    'NORM.S.DIST': {
+      method: 'normsdist',
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER},
+        {argumentType: ArgumentTypes.BOOLEAN},
+      ]
+    },
+    'NORM.S.INV': {
+      method: 'normsinv',
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0, lessThan: 1},
+      ]
+    },
+    'NORMDIST': {
+      method: 'normdist',
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER},
+        {argumentType: ArgumentTypes.NUMBER},
+        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
+        {argumentType: ArgumentTypes.BOOLEAN},
+      ]
+    },
+    'NORMINV': {
+      method: 'norminv',
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0, lessThan: 1},
+        {argumentType: ArgumentTypes.NUMBER},
+        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
+      ]
+    },
+    'NORMSDIST': {
+      method: 'normsdist',
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER},
+        {argumentType: ArgumentTypes.BOOLEAN},
+      ]
+    },
+    'NORMSINV': {
+      method: 'normsinv',
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0, lessThan: 1},
+      ]
+    },
+    'PHI': {
+      method: 'phi',
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER}
+      ]
+    },
+    'NEGBINOM.DIST': {
+      method: 'negbinomdist',
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER, minValue: 0},
+        {argumentType: ArgumentTypes.NUMBER, minValue: 1},
+        {argumentType: ArgumentTypes.NUMBER, minValue: 0, maxValue: 1},
+        {argumentType: ArgumentTypes.BOOLEAN},
+      ]
+    },
+    'NEGBINOMDIST': {
+      method: 'negbinomdist',
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER, minValue: 0},
+        {argumentType: ArgumentTypes.NUMBER, minValue: 1},
+        {argumentType: ArgumentTypes.NUMBER, minValue: 0, maxValue: 1},
+        {argumentType: ArgumentTypes.BOOLEAN},
+      ]
+    },
   }
 
   public erf(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
@@ -450,6 +727,204 @@ export class StatisticalPlugin extends  FunctionPlugin {
   public chisqinvrt(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.runFunction(ast.args, formulaAddress, this.metadata('CHISQ.INV.RT'),
       (p: number, deg: number) => chisquare.inv(1.0 - p, Math.trunc(deg))
+    )
+  }
+
+  public fdist(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('F.DIST'),
+      (x: number, deg1: number, deg2: number, cumulative: boolean) => {
+        deg1 = Math.trunc(deg1)
+        deg2 = Math.trunc(deg2)
+        if(cumulative) {
+          return centralF.cdf(x, deg1, deg2)
+        } else {
+          return centralF.pdf(x, deg1, deg2)
+        }
+      }
+    )
+  }
+
+  public fdistrt(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('F.DIST.RT'),
+      (x: number, deg1: number, deg2: number) => 1 - centralF.cdf(x, Math.trunc(deg1), Math.trunc(deg2))
+
+    )
+  }
+
+  public finv(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('F.INV'),
+      (p: number, deg1: number, deg2: number) => centralF.inv(p, Math.trunc(deg1), Math.trunc(deg2))
+    )
+  }
+
+  public finvrt(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('F.INV.RT'),
+      (p: number, deg1: number, deg2: number) => centralF.inv(1.0 - p, Math.trunc(deg1), Math.trunc(deg2))
+    )
+  }
+
+  public weibulldist(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('WEIBULL.DIST'),
+      (x: number, shape: number, scale: number, cumulative: boolean) => {
+        if(cumulative) {
+          return weibull.cdf(x, scale, shape)
+        } else {
+          return weibull.pdf(x, scale, shape)
+        }
+      }
+    )
+  }
+
+  public poissondist(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('POISSON.DIST'),
+      (x: number, mean: number, cumulative: boolean) => {
+        x = Math.trunc(x)
+        if(cumulative) {
+          return poisson.cdf(x, mean)
+        } else {
+          return poisson.pdf(x, mean)
+        }
+      }
+    )
+  }
+
+  public hypgeomdist(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('HYPGEOM.DIST'),
+      (s: number, numberS: number, populationS: number, numberPop: number, cumulative: boolean) => {
+        if(s > numberS || s > populationS || numberS > numberPop || populationS > numberPop) {
+          return new CellError(ErrorType.NUM, ErrorMessage.ValueLarge)
+        }
+        if(s+numberPop < populationS+numberS) {
+          return new CellError(ErrorType.NUM, ErrorMessage.ValueLarge)
+        }
+        s = Math.trunc(s)
+        numberS = Math.trunc(numberS)
+        populationS = Math.trunc(populationS)
+        numberPop = Math.trunc(numberPop)
+
+        if(cumulative) {
+          return hypgeom.cdf(s, numberPop, populationS, numberS)
+        } else {
+          return hypgeom.pdf(s, numberPop, populationS, numberS)
+        }
+      }
+    )
+  }
+
+  public tdist(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('T.DIST'),
+      (x: number, deg: number, cumulative: boolean) => {
+        deg = Math.trunc(deg)
+        if(cumulative) {
+          return studentt.cdf(x, deg)
+        } else {
+          return studentt.pdf(x, deg)
+        }
+      }
+    )
+  }
+
+  public tdist2t(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('T.DIST.2T'),
+      (x: number, deg: number) => (1 - studentt.cdf(x, Math.trunc(deg))) * 2
+    )
+  }
+
+  public tdistrt(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('T.DIST.RT'),
+      (x: number, deg: number) => 1 - studentt.cdf(x, Math.trunc(deg))
+    )
+  }
+
+  public tdistold(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('TDIST'),
+      (x: number, deg: number, mode: number) => mode*(1 - studentt.cdf(x, Math.trunc(deg)))
+    )
+  }
+
+  public tinv(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('T.INV'),
+      (p: number, deg: number) => studentt.inv(p, Math.trunc(deg))
+    )
+  }
+
+  public tinv2t(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('T.INV.2T'),
+      (p: number, deg: number) => studentt.inv(1-p/2, Math.trunc(deg))
+    )
+  }
+
+  public lognormdist(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('LOGNORM.DIST'),
+      (x: number, mean: number, stddev: number, cumulative: boolean) => {
+        if(cumulative) {
+          return lognormal.cdf(x, mean, stddev)
+        } else {
+          return lognormal.pdf(x, mean, stddev)
+        }
+      }
+    )
+  }
+
+  public lognorminv(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('LOGNORM.INV'),
+      (p: number, mean: number, stddev: number) => lognormal.inv(p, mean, stddev)
+    )
+  }
+
+  public normdist(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('NORM.DIST'),
+      (x: number, mean: number, stddev: number, cumulative: boolean) => {
+        if(cumulative) {
+          return normal.cdf(x, mean, stddev)
+        } else {
+          return normal.pdf(x, mean, stddev)
+        }
+      }
+    )
+  }
+
+  public norminv(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('NORM.INV'),
+      (p: number, mean: number, stddev: number) => normal.inv(p, mean, stddev)
+    )
+  }
+
+  public normsdist(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('NORM.S.DIST'),
+      (x: number, cumulative: boolean) => {
+        if(cumulative) {
+          return normal.cdf(x, 0, 1)
+        } else {
+          return normal.pdf(x, 0, 1)
+        }
+      }
+    )
+  }
+
+  public normsinv(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('NORM.S.INV'),
+      (p: number) => normal.inv(p, 0, 1)
+    )
+  }
+
+  public phi(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('PHI'),
+      (x: number) => normal.pdf(x, 0, 1)
+    )
+  }
+
+  public negbinomdist(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('NEGBINOM.DIST'),
+      (nf: number, ns: number, p: number, cumulative: boolean) => {
+        nf = Math.trunc(nf)
+        ns = Math.trunc(ns)
+        if(cumulative) {
+          return negbin.cdf(nf, ns, p)
+        } else {
+          return negbin.pdf(nf, ns, p)
+        }
+      }
     )
   }
 }
