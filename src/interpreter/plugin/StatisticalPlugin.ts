@@ -357,6 +357,278 @@ export class StatisticalPlugin extends  FunctionPlugin {
         {argumentType: ArgumentTypes.BOOLEAN},
       ]
     },
+    'F.DIST': {
+      method: 'fdist',
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER, minValue: 0},
+        {argumentType: ArgumentTypes.NUMBER, minValue: 1},
+        {argumentType: ArgumentTypes.NUMBER, minValue: 1},
+        {argumentType: ArgumentTypes.BOOLEAN},
+      ]
+    },
+    'F.DIST.RT': {
+      method: 'fdistrt',
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER, minValue: 0},
+        {argumentType: ArgumentTypes.NUMBER, minValue: 1},
+        {argumentType: ArgumentTypes.NUMBER, minValue: 1},
+      ]
+    },
+    'F.INV': {
+      method: 'finv',
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER, minValue: 0, maxValue: 1},
+        {argumentType: ArgumentTypes.NUMBER, minValue: 1},
+        {argumentType: ArgumentTypes.NUMBER, minValue: 1},
+      ]
+    },
+    'F.INV.RT': {
+      method: 'finvrt',
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER, minValue: 0, maxValue: 1},
+        {argumentType: ArgumentTypes.NUMBER, minValue: 1},
+        {argumentType: ArgumentTypes.NUMBER, minValue: 1},
+      ]
+    },
+    'FDIST': {
+      method: 'fdistrt',
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER, minValue: 0},
+        {argumentType: ArgumentTypes.NUMBER, minValue: 1},
+        {argumentType: ArgumentTypes.NUMBER, minValue: 1},
+      ]
+    },
+    'FINV': {
+      method: 'finvrt',
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER, minValue: 0, maxValue: 1},
+        {argumentType: ArgumentTypes.NUMBER, minValue: 1},
+        {argumentType: ArgumentTypes.NUMBER, minValue: 1},
+      ]
+    },
+    'WEIBULL.DIST': {
+      method: 'weibulldist',
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER, minValue: 0},
+        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
+        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
+        {argumentType: ArgumentTypes.BOOLEAN},
+      ]
+    },
+    'WEIBULL': {
+      method: 'weibulldist',
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER, minValue: 0},
+        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
+        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
+        {argumentType: ArgumentTypes.BOOLEAN},
+      ]
+    },
+    'POISSON.DIST': {
+      method: 'poissondist',
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER, minValue: 0},
+        {argumentType: ArgumentTypes.NUMBER, minValue: 0},
+        {argumentType: ArgumentTypes.BOOLEAN},
+      ]
+    },
+    'POISSON': {
+      method: 'poissondist',
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER, minValue: 0},
+        {argumentType: ArgumentTypes.NUMBER, minValue: 0},
+        {argumentType: ArgumentTypes.BOOLEAN},
+      ]
+    },
+    'HYPGEOM.DIST': {
+      method: 'hypgeomdist',
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER, minValue: 0},
+        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
+        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
+        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
+        {argumentType: ArgumentTypes.BOOLEAN},
+      ]
+    },
+    'HYPGEOMDIST': {
+      method: 'hypgeomdist',
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER, minValue: 0},
+        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
+        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
+        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
+        {argumentType: ArgumentTypes.BOOLEAN},
+      ]
+    },
+    'T.DIST': {
+      method: 'tdist',
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER},
+        {argumentType: ArgumentTypes.NUMBER, minValue: 1},
+        {argumentType: ArgumentTypes.BOOLEAN},
+      ]
+    },
+    'T.DIST.2T': {
+      method: 'tdist2t',
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER, minValue: 0},
+        {argumentType: ArgumentTypes.NUMBER, minValue: 1},
+      ]
+    },
+    'T.DIST.RT': {
+      method: 'tdistrt',
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER},
+        {argumentType: ArgumentTypes.NUMBER, minValue: 1},
+      ]
+    },
+    'TDIST': {
+      method: 'tdistold',
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER, minValue: 0},
+        {argumentType: ArgumentTypes.NUMBER, minValue: 1},
+        {argumentType: ArgumentTypes.INTEGER, minValue: 1, maxValue: 2},
+      ]
+    },
+    'T.INV': {
+      method: 'tinv',
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0, lessThan: 1},
+        {argumentType: ArgumentTypes.NUMBER, minValue: 1},
+      ]
+    },
+    'T.INV.2T': {
+      method: 'tinv2t',
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0, maxValue: 1},
+        {argumentType: ArgumentTypes.NUMBER, minValue: 1},
+      ]
+    },
+    'TINV': {
+      method: 'tinv2t',
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0, maxValue: 1},
+        {argumentType: ArgumentTypes.NUMBER, minValue: 1},
+      ]
+    },
+    'LOGNORM.DIST': {
+      method: 'lognormdist',
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
+        {argumentType: ArgumentTypes.NUMBER},
+        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
+        {argumentType: ArgumentTypes.BOOLEAN},
+      ]
+    },
+    'LOGNORM.INV': {
+      method: 'lognorminv',
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0, lessThan: 1},
+        {argumentType: ArgumentTypes.NUMBER},
+        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
+      ]
+    },
+    'LOGNORMDIST': {
+      method: 'lognormdist',
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
+        {argumentType: ArgumentTypes.NUMBER},
+        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
+        {argumentType: ArgumentTypes.BOOLEAN},
+      ]
+    },
+    'LOGINV': {
+      method: 'lognorminv',
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0, lessThan: 1},
+        {argumentType: ArgumentTypes.NUMBER},
+        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
+      ]
+    },
+    'NORM.DIST': {
+      method: 'normdist',
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER},
+        {argumentType: ArgumentTypes.NUMBER},
+        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
+        {argumentType: ArgumentTypes.BOOLEAN},
+      ]
+    },
+    'NORM.INV': {
+      method: 'norminv',
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0, lessThan: 1},
+        {argumentType: ArgumentTypes.NUMBER},
+        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
+      ]
+    },
+    'NORM.S.DIST': {
+      method: 'normsdist',
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER},
+        {argumentType: ArgumentTypes.BOOLEAN},
+      ]
+    },
+    'NORM.S.INV': {
+      method: 'normsinv',
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0, lessThan: 1},
+      ]
+    },
+    'NORMDIST': {
+      method: 'normdist',
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER},
+        {argumentType: ArgumentTypes.NUMBER},
+        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
+        {argumentType: ArgumentTypes.BOOLEAN},
+      ]
+    },
+    'NORMINV': {
+      method: 'norminv',
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0, lessThan: 1},
+        {argumentType: ArgumentTypes.NUMBER},
+        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
+      ]
+    },
+    'NORMSDIST': {
+      method: 'normsdist',
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER},
+        {argumentType: ArgumentTypes.BOOLEAN},
+      ]
+    },
+    'NORMSINV': {
+      method: 'normsinv',
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0, lessThan: 1},
+      ]
+    },
+    'PHI': {
+      method: 'phi',
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER}
+      ]
+    },
+    'NEGBINOM.DIST': {
+      method: 'negbinomdist',
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER, minValue: 0},
+        {argumentType: ArgumentTypes.NUMBER, minValue: 1},
+        {argumentType: ArgumentTypes.NUMBER, minValue: 0, maxValue: 1},
+        {argumentType: ArgumentTypes.BOOLEAN},
+      ]
+    },
+    'NEGBINOMDIST': {
+      method: 'negbinomdist',
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER, minValue: 0},
+        {argumentType: ArgumentTypes.NUMBER, minValue: 1},
+        {argumentType: ArgumentTypes.NUMBER, minValue: 0, maxValue: 1},
+        {argumentType: ArgumentTypes.BOOLEAN},
+      ]
+    },
   }
 
   public static aliases = {
