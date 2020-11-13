@@ -330,6 +330,7 @@ const dictionary: RawTranslationPackage = {
     NEGBINOMDIST: 'ROZKŁAD.DWUM.PRZEC',
     LARGE: 'MAX.K',
     SMALL: 'MIN.K',
+    AVEDEV: 'ODCH.ŚREDNIE',
   },
   langCode: 'plPL',
   ui: {

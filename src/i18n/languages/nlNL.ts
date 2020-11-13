@@ -330,6 +330,7 @@ const dictionary: RawTranslationPackage = {
     NEGBINOMDIST: 'NEG.BINOM.VERD',
     LARGE: 'GROOTSTE',
     SMALL: 'KLEINSTE',
+    AVEDEV: 'GEM.DEVIATIE',
   },
   langCode: 'nlNL',
   ui: {

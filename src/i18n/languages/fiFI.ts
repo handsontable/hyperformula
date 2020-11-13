@@ -330,6 +330,7 @@ const dictionary: RawTranslationPackage = {
     NEGBINOMDIST: 'BINOMIJAKAUMA.NEG',
     LARGE: 'SUURI',
     SMALL: 'PIENI',
+    AVEDEV: 'KESKIPOIKKEAMA',
   },
   langCode: 'fiFI',
   ui: {

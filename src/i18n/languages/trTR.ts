@@ -330,6 +330,7 @@ const dictionary: RawTranslationPackage = {
     NEGBINOMDIST: 'NEGBİNOMDAĞ',
     LARGE: 'BÜYÜK',
     SMALL: 'KÜÇÜK',
+    AVEDEV: 'ORTSAP',
   },
   langCode: 'trTR',
   ui: {

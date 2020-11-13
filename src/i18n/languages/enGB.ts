@@ -330,6 +330,7 @@ const dictionary: RawTranslationPackage = {
     'NEGBINOMDIST': 'NEGBINOMDIST',
     LARGE: 'LARGE',
     SMALL: 'SMALL',
+    AVEDEV: 'AVEDEV',
   },
   langCode: 'enGB',
   ui: {

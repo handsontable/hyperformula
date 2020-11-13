@@ -330,6 +330,7 @@ const dictionary: RawTranslationPackage = {
     NEGBINOMDIST: 'LOI.BINOMIALE.NEG',
     LARGE: 'GRANDE.VALEUR',
     SMALL: 'PETITE.VALEUR',
+    AVEDEV: 'ECART.MOYEN',
   },
   langCode: 'frFR',
   ui: {

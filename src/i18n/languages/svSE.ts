@@ -330,6 +330,7 @@ const dictionary: RawTranslationPackage = {
     NEGBINOMDIST: 'NEGBINOMFÖRD',
     LARGE: 'STÖRSTA',
     SMALL: 'MINSTA',
+    AVEDEV: 'MEDELAVV',
   },
   langCode: 'svSE',
   ui: {

@@ -330,6 +330,7 @@ const dictionary: RawTranslationPackage = {
     NEGBINOMDIST: 'ОТРБИНОМРАСП',
     LARGE: 'НАИБОЛЬШИЙ',
     SMALL: 'НАИМЕНЬШИЙ',
+    AVEDEV: 'СРОТКЛ',
   },
   langCode: 'ruRU',
   ui: {

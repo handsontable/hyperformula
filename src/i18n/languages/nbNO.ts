@@ -330,6 +330,7 @@ const dictionary: RawTranslationPackage = {
     NEGBINOMDIST: 'NEGBINOM.FORDELING',
     LARGE: 'N.STØRST',
     SMALL: 'N.MINST',
+    AVEDEV: 'GJENNOMSNITTSAVVIK',
   },
   langCode: 'nbNO',
   ui: {

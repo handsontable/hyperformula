@@ -330,6 +330,7 @@ export const dictionary: RawTranslationPackage = {
     NEGBINOMDIST: 'NEGBINOMDIST',
     LARGE: 'K.ESIMO.MAYOR',
     SMALL: 'K.ESIMO.MENOR',
+    AVEDEV: 'DESVPROM',
   },
   langCode: 'esES',
   ui: {
