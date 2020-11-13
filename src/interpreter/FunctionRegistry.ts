@@ -23,6 +23,12 @@ export class FunctionRegistry {
   ])
 
   public static registerFunctionPlugin(plugin: FunctionPluginDefinition, translations?: FunctionTranslationsPackage): void {
+    if(plugin.aliases !== undefined) {
+      Object.entries(plugin.aliases).forEach( ([key,val]) => {
+        plugin.implementedFunctions[key] = plugin.implementedFunctions[val]
+      })
+      plugin.aliases = undefined
+    }
     this.loadPluginFunctions(plugin, this.plugins)
     if (translations !== undefined) {
       this.loadTranslations(translations)
