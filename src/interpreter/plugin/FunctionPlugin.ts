@@ -44,7 +44,7 @@ export interface FunctionPluginDefinition {
   new(interpreter: Interpreter): FunctionPlugin,
 
   implementedFunctions: ImplementedFunctions,
-  aliases?: {[formulaId: string]: string}
+  aliases?: {[formulaId: string]: string},
 }
 
 export enum ArgumentTypes {
