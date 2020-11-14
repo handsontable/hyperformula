@@ -260,6 +260,7 @@ lets you design your own [custom functions](custom-functions).
 | HF.UMINUS <br><Badge text="v0.3.0"/>| Operator | Negates the value. | HF.UMINUS(Number) |
 | HF.UNARY_PERCENT <br><Badge text="v0.3.0"/>| Operator | Applies percent operator. | HF.UNARY_PERCENT(Number) |
 | HF.UPLUS <br><Badge text="v0.3.0"/>| Operator | Applies unary plus. | HF.UPLUS(Number) |
+| AVEDEV | Statistical | Returns the average deviation of the arguments. | AVEDEV(Number1; Number2; ...Number30) |
 | AVERAGE | Statistical | Returns the average of the arguments. | AVERAGE(Number1; Number2; ...Number30) |
 | AVERAGEA | Statistical | Returns the average of the arguments. | AVERAGEA(Value1; Value2; ... Value30) |
 | AVERAGEIF | Statistical | Returns the arithmetic mean of all cells in a range that satisfy a given condition. | AVERAGEIF(Range; Criterion [; Average_Range ]) |

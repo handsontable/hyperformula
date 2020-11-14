@@ -4,27 +4,34 @@
  */
 
 import {CellError, ErrorType, InternalScalarValue, SimpleCellAddress} from '../../Cell'
-import {ErrorMessage} from '../../error-message'
 import {ProcedureAst} from '../../parser'
-import {
-  erf,
-  erfc,
-} from './3rdparty/jstat/jstat'
+import {InterpreterValue} from '../InterpreterValue'
 import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
 
-export class StatisticalPlugin extends  FunctionPlugin {
+export class StatisticalAggregationPlugin extends  FunctionPlugin {
   public static implementedFunctions = {
-    'ERF': {
-      method: 'erf',
+    'AVEDEV': {
+      method: 'avedev',
       parameters: [
-        {argumentType: ArgumentTypes.NUMBER},
-        {argumentType: ArgumentTypes.NUMBER, optionalArg: true},
-      ]
+        {argumentType: ArgumentTypes.ANY},
+      ],
+      repeatLastArgs: 1
     },
   }
 
-  public erfc(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('ERFC'), erfc)
+  public avedev(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('AVEDEV'),
+      (...args: InterpreterValue[]) => {
+        const coerced = this.interpreter.arithmeticHelper.coerceNumbersExactRanges(args)
+        if(coerced instanceof CellError) {
+          return coerced
+        }
+        if(coerced.length===0) {
+          return new CellError(ErrorType.DIV_BY_ZERO)
+        }
+        const avg = (coerced.reduce((a,b) => a+b, 0))/coerced.length
+        return coerced.reduce((a,b) => a + Math.abs(b-avg), 0)/coerced.length
+      })
   }
 
 }
