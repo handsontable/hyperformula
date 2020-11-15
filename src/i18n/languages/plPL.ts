@@ -337,6 +337,7 @@ const dictionary: RawTranslationPackage = {
     DEVSQ: 'ODCH.KWADRATOWE',
     GEOMEAN: 'ŚREDNIA.GEOMETRYCZNA',
     HARMEAN: 'ŚREDNIA.HARMONICZNA',
+    CRITBINOM: 'PRÓG.ROZKŁAD.DWUM',
   },
   langCode: 'plPL',
   ui: {

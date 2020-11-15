@@ -337,6 +337,7 @@ const dictionary: RawTranslationPackage = {
     DEVSQ: 'KVADAVV',
     GEOMEAN: 'GEOMEDEL',
     HARMEAN: 'HARMMEDEL',
+    CRITBINOM: 'KRITBINOM',
   },
   langCode: 'svSE',
   ui: {

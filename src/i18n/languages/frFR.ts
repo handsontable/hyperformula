@@ -337,6 +337,7 @@ const dictionary: RawTranslationPackage = {
     DEVSQ: 'SOMME.CARRES.ECARTS',
     GEOMEAN: 'MOYENNE.GEOMETRIQUE',
     HARMEAN: 'MOYENNE.HARMONIQUE',
+    CRITBINOM: 'CRITERE.LOI.BINOMIALE',
   },
   langCode: 'frFR',
   ui: {

@@ -275,16 +275,17 @@ lets you design your own [custom functions](custom-functions).
 | BINOM.DIST | Statistical | Returns density of binomial distribution. | BINOM.DIST(Number1; Number2; Number3; Boolean) |
 | BINOMDIST | Statistical | Returns density of binomial distribution. | BINOMDIST(Number1; Number2; Number3; Boolean) |
 | BINOM.INV | Statistical | Returns inverse binomial distribution value. | BINOM.INV(Number1; Number2; Number3) |
-| CONFIDENCE | Statistical | Returns upper confidence bound for normal distribution. | CONFIDENCE(Alpha; Stdev; Size) |
-| CONFIDENCE.NORM | Statistical | Returns upper confidence bound for normal distribution. | CONFIDENCE.NORM(Alpha; Stdev; Size) |
-| CONFIDENCE.T | Statistical | Returns upper confidence bound for T distribution. | CONFIDENCE.T(Alpha; Stdev; Size) |
 | CHIDIST | Statistical | Returns probability of chi-square right-side distribution. | CHIDIST(X; Degrees) |
 | CHIINV | Statistical | Returns inverse of chi-square right-side distribution. | CHIINV(P; Degrees) |
 | CHISQ.DIST | Statistical | Returns value of chi-square distribution. | CHISQ.DIST(X; Degrees; Mode) |
 | CHISQ.DIST.RT | Statistical | Returns probability of chi-square right-side distribution. | CHISQ.DIST.RT(X; Degrees) |
 | CHISQ.INV | Statistical | Returns inverse of chi-square distribution. | CHISQ.INV.RT(P; Degrees) |
 | CHISQ.INV.RT | Statistical | Returns inverse of chi-square right-side distribution. | CHISQ.INV.RT(P; Degrees) |
+| CONFIDENCE | Statistical | Returns upper confidence bound for normal distribution. | CONFIDENCE(Alpha; Stdev; Size) |
+| CONFIDENCE.NORM | Statistical | Returns upper confidence bound for normal distribution. | CONFIDENCE.NORM(Alpha; Stdev; Size) |
+| CONFIDENCE.T | Statistical | Returns upper confidence bound for T distribution. | CONFIDENCE.T(Alpha; Stdev; Size) |
 | CORREL | Statistical | Returns the correlation coefficient between two data sets. | CORREL(Data1; Data2) |
+| CRITBINOM | Statistical | Returns inverse binomial distribution value. | CRITBINOM(Number1; Number2; Number3) |
 | COUNT | Statistical | Counts how many numbers are in the list of arguments. | COUNT(Value1; Value2; ... Value30) |
 | COUNTA | Statistical | Counts how many values are in the list of arguments. | COUNTA(Value1; Value2; ... Value30) |
 | COUNTBLANK | Statistical | Returns the number of empty cells. | COUNTBLANK(Range) |

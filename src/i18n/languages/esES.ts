@@ -337,6 +337,7 @@ export const dictionary: RawTranslationPackage = {
     DEVSQ: 'DESVIA2',
     GEOMEAN: 'MEDIA.GEOM',
     HARMEAN: 'MEDIA.ARMO',
+    CRITBINOM: 'BINOM.CRIT',
   },
   langCode: 'esES',
   ui: {

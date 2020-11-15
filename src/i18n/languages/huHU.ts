@@ -337,6 +337,7 @@ const dictionary: RawTranslationPackage = {
     DEVSQ: 'SQ',
     GEOMEAN: 'MÉRTANI.KÖZÉP',
     HARMEAN: 'HARM.KÖZÉP',
+    CRITBINOM: 'KRITBINOM',
   },
   langCode: 'huHU',
   ui: {

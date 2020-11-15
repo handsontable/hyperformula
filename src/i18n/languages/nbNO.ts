@@ -337,6 +337,7 @@ const dictionary: RawTranslationPackage = {
     DEVSQ: 'AVVIK.KVADRERT',
     GEOMEAN: 'GJENNOMSNITT.GEOMETRISK',
     HARMEAN: 'GJENNOMSNITT.HARMONISK',
+    CRITBINOM: 'GRENSE.BINOM',
   },
   langCode: 'nbNO',
   ui: {

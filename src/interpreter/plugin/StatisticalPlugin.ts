@@ -198,6 +198,14 @@ export class StatisticalPlugin extends  FunctionPlugin {
         {argumentType: ArgumentTypes.NUMBER, greaterThan: 0, lessThan: 1},
       ]
     },
+    'CRITBINOM': {
+      method: 'binomialinv',
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER, minValue: 0},
+        {argumentType: ArgumentTypes.NUMBER, minValue: 0, maxValue: 1},
+        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0, lessThan: 1},
+      ]
+    },
     'BESSELI': {
       method: 'besselifn',
       parameters: [

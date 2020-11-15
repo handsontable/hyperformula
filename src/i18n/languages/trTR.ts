@@ -337,6 +337,7 @@ const dictionary: RawTranslationPackage = {
     DEVSQ: 'SAPKARE',
     GEOMEAN: 'GEOORT',
     HARMEAN: 'HARORT',
+    CRITBINOM: 'KRİTİKBİNOM',
   },
   langCode: 'trTR',
   ui: {

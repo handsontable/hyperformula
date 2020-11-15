@@ -337,6 +337,7 @@ const dictionary: RawTranslationPackage = {
     DEVSQ: 'OIKAISTU.NELIÖSUMMA',
     GEOMEAN: 'KESKIARVO.GEOM',
     HARMEAN: 'KESKIARVO.HARM',
+    CRITBINOM: 'BINOMIJAKAUMA.KRIT',
   },
   langCode: 'fiFI',
   ui: {

@@ -929,3 +929,16 @@ function product(arr: number[]): number {
 export function geomean(arr: number[]): number {
   return Math.pow(product(arr), 1 / arr.length);
 }
+
+export function covariance(arr1: number[], arr2: number[]): number {
+  var u = mean(arr1);
+  var v = mean(arr2);
+  var arr1Len = arr1.length;
+  var sq_dev = new Array(arr1Len);
+  var i;
+
+  for (i = 0; i < arr1Len; i++)
+    sq_dev[i] = (arr1[i] - u) * (arr2[i] - v);
+
+  return sum(sq_dev) / (arr1Len - 1);
+}
