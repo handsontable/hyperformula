@@ -334,6 +334,7 @@ const dictionary: RawTranslationPackage = {
     CONFIDENCE: 'GÜVENİRLİK',
     'CONFIDENCE.NORM': 'GÜVENİLİRLİK.NORM',
     'CONFIDENCE.T': 'GÜVENİLİRLİK.T',
+    DEVSQ: 'SAPKARE',
   },
   langCode: 'trTR',
   ui: {

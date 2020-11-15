@@ -334,6 +334,7 @@ const dictionary: RawTranslationPackage = {
     CONFIDENCE: 'KONFIDENS',
     'CONFIDENCE.NORM': 'KONFIDENS.NORM',
     'CONFIDENCE.T': 'KONFIDENS.T',
+    DEVSQ: 'KVADAVV',
   },
   langCode: 'svSE',
   ui: {

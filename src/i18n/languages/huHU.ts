@@ -334,6 +334,7 @@ const dictionary: RawTranslationPackage = {
     CONFIDENCE: 'MEGBÍZHATÓSÁG',
     'CONFIDENCE.NORM': 'MEGBÍZHATÓSÁG.NORM',
     'CONFIDENCE.T': 'MEGBÍZHATÓSÁG.T',
+    DEVSQ: 'SQ',
   },
   langCode: 'huHU',
   ui: {

@@ -334,6 +334,7 @@ const dictionary: RawTranslationPackage = {
     CONFIDENCE: 'UFNOŚĆ',
     'CONFIDENCE.NORM': 'UFNOŚĆ.NORM',
     'CONFIDENCE.T': 'UFNOŚĆ.T',
+    DEVSQ: 'ODCH.KWADRATOWE',
   },
   langCode: 'plPL',
   ui: {

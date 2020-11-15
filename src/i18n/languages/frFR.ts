@@ -334,6 +334,7 @@ const dictionary: RawTranslationPackage = {
     CONFIDENCE: 'INTERVALLE.CONFIANCE',
     'CONFIDENCE.NORM': 'INTERVALLE.CONFIANCE.NORMAL',
     'CONFIDENCE.T': 'INTERVALLE.CONFIANCE.STUDENT',
+    DEVSQ: 'SOMME.CARRES.ECARTS',
   },
   langCode: 'frFR',
   ui: {

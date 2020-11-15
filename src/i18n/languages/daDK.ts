@@ -334,6 +334,7 @@ const dictionary: RawTranslationPackage = {
     CONFIDENCE: 'KONFIDENSINTERVAL',
     'CONFIDENCE.NORM': 'KONFIDENS.NORM',
     'CONFIDENCE.T': 'KONFIDENST',
+    DEVSQ: 'SAK',
   },
   langCode: 'daDK',
   ui: {

@@ -17,6 +17,13 @@ export class StatisticalAggregationPlugin extends  FunctionPlugin {
       ],
       repeatLastArgs: 1
     },
+    'DEVSQ': {
+      method: 'devsq',
+      parameters: [
+        {argumentType: ArgumentTypes.ANY},
+      ],
+      repeatLastArgs: 1
+    },
   }
 
   public avedev(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
@@ -34,5 +41,19 @@ export class StatisticalAggregationPlugin extends  FunctionPlugin {
       })
   }
 
+  public devsq(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('DEVSQ'),
+      (...args: InterpreterValue[]) => {
+        const coerced = this.interpreter.arithmeticHelper.coerceNumbersExactRanges(args)
+        if(coerced instanceof CellError) {
+          return coerced
+        }
+        if(coerced.length===0) {
+          return 0
+        }
+        const avg = (coerced.reduce((a,b) => a+b, 0))/coerced.length
+        return coerced.reduce((a,b) => a + Math.pow(b-avg,2), 0)
+      })
+  }
 }
 

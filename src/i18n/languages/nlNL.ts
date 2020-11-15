@@ -334,6 +334,7 @@ const dictionary: RawTranslationPackage = {
     CONFIDENCE: 'BETROUWBAARHEID',
     'CONFIDENCE.NORM': 'VERTROUWELIJKHEID.NORM',
     'CONFIDENCE.T': 'VERTROUWELIJKHEID.T',
+    DEVSQ: 'DEV.KWAD',
   },
   langCode: 'nlNL',
   ui: {

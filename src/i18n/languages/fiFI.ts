@@ -334,6 +334,7 @@ const dictionary: RawTranslationPackage = {
     CONFIDENCE: 'LUOTTAMUSVÄLI',
     'CONFIDENCE.NORM': 'LUOTTAMUSVÄLI.NORM',
     'CONFIDENCE.T': 'LUOTTAMUSVÄLI.T',
+    DEVSQ: 'OIKAISTU.NELIÖSUMMA',
   },
   langCode: 'fiFI',
   ui: {
