@@ -275,6 +275,9 @@ lets you design your own [custom functions](custom-functions).
 | BINOM.DIST | Statistical | Returns density of binomial distribution. | BINOM.DIST(Number1; Number2; Number3; Boolean) |
 | BINOMDIST | Statistical | Returns density of binomial distribution. | BINOMDIST(Number1; Number2; Number3; Boolean) |
 | BINOM.INV | Statistical | Returns inverse binomial distribution value. | BINOM.INV(Number1; Number2; Number3) |
+| CONFIDENCE | Statistical | Returns upper confidence bound for normal distribution. | CONFIDENCE(Alpha; Stdev; Size) |
+| CONFIDENCE.NORM | Statistical | Returns upper confidence bound for normal distribution. | CONFIDENCE.NORM(Alpha; Stdev; Size) |
+| CONFIDENCE.T | Statistical | Returns upper confidence bound for T distribution. | CONFIDENCE.T(Alpha; Stdev; Size) |
 | CHIDIST | Statistical | Returns probability of chi-square right-side distribution. | CHIDIST(X; Degrees) |
 | CHIINV | Statistical | Returns inverse of chi-square right-side distribution. | CHIINV(P; Degrees) |
 | CHISQ.DIST | Statistical | Returns value of chi-square distribution. | CHISQ.DIST(X; Degrees; Mode) |
@@ -307,10 +310,7 @@ lets you design your own [custom functions](custom-functions).
 | GAUSS | Statistical | Returns the probability of gaussian variable fall more than this many times standard deviation from mean. | GAUSS(Number) |
 | HYPGEOMDIST | Statistical | Returns density of hypergeometric distribution. | HYPGEOMDIST(Number1; Number2; Number3; Number4; Boolean) |
 | HYPGEOM.DIST | Statistical | Returns density of hypergeometric distribution. | HYPGEOM.DIST(Number1; Number2; Number3; Number4; Boolean) |
-<<<<<<< HEAD
 | LARGE | Statistical | Returns k-th largest value in a range. | LARGE(Range; K) |
-=======
->>>>>>> develop
 | LOGNORM.DIST | Statistical | Returns density of lognormal distribution. | LOGNORM.DIST(X; Mean; Stddev; Mode) |
 | LOGNORMDIST | Statistical | Returns density of lognormal distribution. | LOGNORMDIST(X; Mean; Stddev; Mode) |
 | LOGNORM.INV | Statistical | Returns value of inverse lognormal distribution. | LOGNORM.INV(P; Mean; Stddev) |
@@ -333,10 +333,7 @@ lets you design your own [custom functions](custom-functions).
 | PHI | Statistical | Returns probability densitity of normal distribution. | PHI(X) |
 | POISSON | Statistical | Returns density of Poisson distribution. | POISSON(X; Mean; Mode) |
 | POISSON.DIST | Statistical | Returns density of Poisson distribution. | POISSON.DIST(X; Mean; Mode) |
-<<<<<<< HEAD
 | SMALL | Statistical | Returns k-th smallest value in a range. | SMALL(Range; K) |
-=======
->>>>>>> develop
 | STDEV <br><Badge text="v0.3.0"/>| Statistical | Returns standard deviation of a sample. | STDEV(Value1; Value2; ... Value30) |
 | STDEVA <br><Badge text="v0.3.0"/>| Statistical | Returns standard deviation of a sample. | STDEVA(Value1; Value2; ... Value30) |
 | STDEVP <br><Badge text="v0.3.0"/>| Statistical | Returns standard deviation of a population. | STDEVP(Value1; Value2; ... Value30) |
