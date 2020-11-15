@@ -52,8 +52,8 @@ export class StatisticalAggregationPlugin extends  FunctionPlugin {
         if(coerced.length===0) {
           return new CellError(ErrorType.DIV_BY_ZERO)
         }
-        const avg = (coerced.reduce((a,b) => a+b, 0))/coerced.length
-        return coerced.reduce((a,b) => a + Math.abs(b-avg), 0)/coerced.length
+        const avg = (coerced.reduce((a, b) => a+b, 0))/coerced.length
+        return coerced.reduce((a, b) => a + Math.abs(b-avg), 0)/coerced.length
       })
   }
 
@@ -67,8 +67,8 @@ export class StatisticalAggregationPlugin extends  FunctionPlugin {
         if(coerced.length===0) {
           return 0
         }
-        const avg = (coerced.reduce((a,b) => a+b, 0))/coerced.length
-        return coerced.reduce((a,b) => a + Math.pow(b-avg,2), 0)
+        const avg = (coerced.reduce((a, b) => a+b, 0))/coerced.length
+        return coerced.reduce((a, b) => a + Math.pow(b-avg, 2), 0)
       })
   }
 
@@ -106,7 +106,7 @@ export class StatisticalAggregationPlugin extends  FunctionPlugin {
             return new CellError(ErrorType.NUM, ErrorMessage.ValueSmall)
           }
         }
-        return coerced.length/(coerced.reduce((a,b) => a+1/b, 0))
+        return coerced.length/(coerced.reduce((a, b) => a+1/b, 0))
       })
   }
 }
