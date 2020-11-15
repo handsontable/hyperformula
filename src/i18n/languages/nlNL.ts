@@ -335,6 +335,8 @@ const dictionary: RawTranslationPackage = {
     'CONFIDENCE.NORM': 'VERTROUWELIJKHEID.NORM',
     'CONFIDENCE.T': 'VERTROUWELIJKHEID.T',
     DEVSQ: 'DEV.KWAD',
+    GEOMEAN: 'MEETK.GEM',
+    HARMEAN: 'HARM.GEM',
   },
   langCode: 'nlNL',
   ui: {

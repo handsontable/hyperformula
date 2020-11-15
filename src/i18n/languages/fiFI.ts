@@ -335,6 +335,8 @@ const dictionary: RawTranslationPackage = {
     'CONFIDENCE.NORM': 'LUOTTAMUSVÄLI.NORM',
     'CONFIDENCE.T': 'LUOTTAMUSVÄLI.T',
     DEVSQ: 'OIKAISTU.NELIÖSUMMA',
+    GEOMEAN: 'KESKIARVO.GEOM',
+    HARMEAN: 'KESKIARVO.HARM',
   },
   langCode: 'fiFI',
   ui: {

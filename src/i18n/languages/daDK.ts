@@ -335,6 +335,8 @@ const dictionary: RawTranslationPackage = {
     'CONFIDENCE.NORM': 'KONFIDENS.NORM',
     'CONFIDENCE.T': 'KONFIDENST',
     DEVSQ: 'SAK',
+    GEOMEAN: 'GEOMIDDELVÆRDI',
+    HARMEAN: 'HARMIDDELVÆRDI',
   },
   langCode: 'daDK',
   ui: {

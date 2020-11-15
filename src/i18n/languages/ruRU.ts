@@ -335,6 +335,8 @@ const dictionary: RawTranslationPackage = {
     'CONFIDENCE.NORM': 'ДОВЕРИТ.НОРМ',
     'CONFIDENCE.T': 'ДОВЕРИТ.СТЬЮДЕНТ',
     DEVSQ: 'КВАДРОТКЛ',
+    GEOMEAN: 'СРГЕОМ',
+    HARMEAN: 'СРГАРМ',
   },
   langCode: 'ruRU',
   ui: {

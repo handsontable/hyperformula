@@ -335,6 +335,8 @@ const dictionary: RawTranslationPackage = {
     'CONFIDENCE.NORM': 'KONFIDENS.NORM',
     'CONFIDENCE.T': 'KONFIDENS.T',
     DEVSQ: 'AVVIK.KVADRERT',
+    GEOMEAN: 'GJENNOMSNITT.GEOMETRISK',
+    HARMEAN: 'GJENNOMSNITT.HARMONISK',
   },
   langCode: 'nbNO',
   ui: {

@@ -309,6 +309,8 @@ lets you design your own [custom functions](custom-functions).
 | GAMMA.INV | Statistical | Returns inverse Gamma distribution value. | GAMMA.INV(Number1; Number2; Number3) |
 | GAMMAINV | Statistical | Returns inverse Gamma distribution value. | GAMMAINV(Number1; Number2; Number3) |
 | GAUSS | Statistical | Returns the probability of gaussian variable fall more than this many times standard deviation from mean. | GAUSS(Number) |
+| GEOMEAN | Statistical | Returns the geometric average. | GEOMEAN(Number1; Number2; ...Number30) |
+| HARMEAN | Statistical | Returns the harmonic average. | HARMEAN(Number1; Number2; ...Number30) |
 | HYPGEOMDIST | Statistical | Returns density of hypergeometric distribution. | HYPGEOMDIST(Number1; Number2; Number3; Number4; Boolean) |
 | HYPGEOM.DIST | Statistical | Returns density of hypergeometric distribution. | HYPGEOM.DIST(Number1; Number2; Number3; Number4; Boolean) |
 | LARGE | Statistical | Returns k-th largest value in a range. | LARGE(Range; K) |

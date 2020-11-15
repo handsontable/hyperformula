@@ -335,6 +335,8 @@ const dictionary: RawTranslationPackage = {
     'CONFIDENCE.NORM': 'UFNOŚĆ.NORM',
     'CONFIDENCE.T': 'UFNOŚĆ.T',
     DEVSQ: 'ODCH.KWADRATOWE',
+    GEOMEAN: 'ŚREDNIA.GEOMETRYCZNA',
+    HARMEAN: 'ŚREDNIA.HARMONICZNA',
   },
   langCode: 'plPL',
   ui: {

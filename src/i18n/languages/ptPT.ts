@@ -335,6 +335,8 @@ const dictionary: RawTranslationPackage = {
     'CONFIDENCE.NORM': 'INT.CONFIANÇA.NORM',
     'CONFIDENCE.T': 'INT.CONFIANÇA.T',
     DEVSQ: 'DESVQ',
+    GEOMEAN: 'MÉDIA.GEOMÉTRICA',
+    HARMEAN: 'MÉDIA.HARMÔNICA',
   },
   langCode: 'ptPT',
   ui: {

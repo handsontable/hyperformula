@@ -917,3 +917,15 @@ export function tci() {
   ans[1] = args[0] + change;
   return ans;
 }
+
+function product(arr: number[]): number {
+  var prod = 1;
+  var i = arr.length;
+  while (--i >= 0)
+    prod *= arr[i];
+  return prod;
+}
+
+export function geomean(arr: number[]): number {
+  return Math.pow(product(arr), 1 / arr.length);
+}

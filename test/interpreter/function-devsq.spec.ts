@@ -70,10 +70,6 @@ describe('Function DEVSQ', () => {
     expect(engine.getCellValue(adr('A1'))).toBeCloseTo(0.666666666666667, 6)
   })
 
-  /**
-   * Product #2 returns 0.2:
-   * average is computed from numbers, but sum of distances to avg is divided by the original range size.
-   */
   it('ignores nonnumeric values in ranges', () => {
     const engine = HyperFormula.buildFromArray([
       ['=DEVSQ(A2:D2)'],

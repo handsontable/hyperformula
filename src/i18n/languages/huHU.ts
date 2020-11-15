@@ -335,6 +335,8 @@ const dictionary: RawTranslationPackage = {
     'CONFIDENCE.NORM': 'MEGBÍZHATÓSÁG.NORM',
     'CONFIDENCE.T': 'MEGBÍZHATÓSÁG.T',
     DEVSQ: 'SQ',
+    GEOMEAN: 'MÉRTANI.KÖZÉP',
+    HARMEAN: 'HARM.KÖZÉP',
   },
   langCode: 'huHU',
   ui: {

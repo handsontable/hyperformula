@@ -335,6 +335,8 @@ export const dictionary: RawTranslationPackage = {
     'CONFIDENCE.NORM': 'INTERVALO.CONFIANZA.NORM',
     'CONFIDENCE.T': 'INTERVALO.CONFIANZA.T',
     DEVSQ: 'DESVIA2',
+    GEOMEAN: 'MEDIA.GEOM',
+    HARMEAN: 'MEDIA.ARMO',
   },
   langCode: 'esES',
   ui: {
