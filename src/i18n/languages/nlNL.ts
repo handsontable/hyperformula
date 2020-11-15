@@ -331,6 +331,9 @@ const dictionary: RawTranslationPackage = {
     LARGE: 'GROOTSTE',
     SMALL: 'KLEINSTE',
     AVEDEV: 'GEM.DEVIATIE',
+    CONFIDENCE: 'BETROUWBAARHEID',
+    'CONFIDENCE.NORM': 'VERTROUWELIJKHEID.NORM',
+    'CONFIDENCE.T': 'VERTROUWELIJKHEID.T',
   },
   langCode: 'nlNL',
   ui: {

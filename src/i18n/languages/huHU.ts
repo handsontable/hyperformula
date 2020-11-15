@@ -331,6 +331,9 @@ const dictionary: RawTranslationPackage = {
     LARGE: 'NAGY',
     SMALL: 'KICSI',
     AVEDEV: 'ÁTL.ELTÉRÉS',
+    CONFIDENCE: 'MEGBÍZHATÓSÁG',
+    'CONFIDENCE.NORM': 'MEGBÍZHATÓSÁG.NORM',
+    'CONFIDENCE.T': 'MEGBÍZHATÓSÁG.T',
   },
   langCode: 'huHU',
   ui: {

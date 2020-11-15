@@ -18,10 +18,13 @@ import {
   gamma,
   gammafn,
   gammaln,
-  hypgeom, lognormal, negbin,
+  hypgeom,
+  lognormal,
+  negbin,
   normal,
+  normalci,
   poisson,
-  studentt,
+  studentt, tci,
   weibull
 } from './3rdparty/jstat/jstat'
 import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
@@ -538,6 +541,30 @@ export class StatisticalPlugin extends  FunctionPlugin {
         {argumentType: ArgumentTypes.BOOLEAN},
       ]
     },
+    'CONFIDENCE.NORM': {
+      method: 'confidencenorm',
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0, lessThan: 1},
+        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
+        {argumentType: ArgumentTypes.NUMBER, minValue: 1},
+      ],
+    },
+    'CONFIDENCE.T': {
+      method: 'confidencet',
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0, lessThan: 1},
+        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
+        {argumentType: ArgumentTypes.NUMBER, minValue: 1},
+      ],
+    },
+    'CONFIDENCE': {
+      method: 'confidencenorm',
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0, lessThan: 1},
+        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
+        {argumentType: ArgumentTypes.NUMBER, minValue: 1},
+      ],
+    },
   }
 
   public erf(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
@@ -924,6 +951,28 @@ export class StatisticalPlugin extends  FunctionPlugin {
         } else {
           return negbin.pdf(nf, ns, p)
         }
+      }
+    )
+  }
+
+  public confidencenorm(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('CONFIDENCE.NORM'),
+      // eslint-disable-next-line
+      // @ts-ignore
+      (alpha: number, stddev: number, size: number) => normalci(1, alpha, stddev, Math.trunc(size))[1] - 1
+    )
+  }
+
+  public confidencet(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('CONFIDENCE.T'),
+      (alpha: number, stddev: number, size: number) => {
+        size = Math.trunc(size)
+        if(size===1) {
+          return new CellError(ErrorType.DIV_BY_ZERO)
+        }
+        // eslint-disable-next-line
+        // @ts-ignore
+        return tci(1, alpha, stddev, size)[1] - 1
       }
     )
   }

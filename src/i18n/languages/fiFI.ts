@@ -331,6 +331,9 @@ const dictionary: RawTranslationPackage = {
     LARGE: 'SUURI',
     SMALL: 'PIENI',
     AVEDEV: 'KESKIPOIKKEAMA',
+    CONFIDENCE: 'LUOTTAMUSVÄLI',
+    'CONFIDENCE.NORM': 'LUOTTAMUSVÄLI.NORM',
+    'CONFIDENCE.T': 'LUOTTAMUSVÄLI.T',
   },
   langCode: 'fiFI',
   ui: {

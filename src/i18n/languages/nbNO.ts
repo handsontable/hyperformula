@@ -331,6 +331,9 @@ const dictionary: RawTranslationPackage = {
     LARGE: 'N.STØRST',
     SMALL: 'N.MINST',
     AVEDEV: 'GJENNOMSNITTSAVVIK',
+    CONFIDENCE: 'KONFIDENS',
+    'CONFIDENCE.NORM': 'KONFIDENS.NORM',
+    'CONFIDENCE.T': 'KONFIDENS.T',
   },
   langCode: 'nbNO',
   ui: {

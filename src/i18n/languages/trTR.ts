@@ -331,6 +331,9 @@ const dictionary: RawTranslationPackage = {
     LARGE: 'BÜYÜK',
     SMALL: 'KÜÇÜK',
     AVEDEV: 'ORTSAP',
+    CONFIDENCE: 'GÜVENİRLİK',
+    'CONFIDENCE.NORM': 'GÜVENİLİRLİK.NORM',
+    'CONFIDENCE.T': 'GÜVENİLİRLİK.T',
   },
   langCode: 'trTR',
   ui: {

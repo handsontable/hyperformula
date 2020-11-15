@@ -850,3 +850,70 @@ export const negbin = {
     return sum;
   }
 }
+
+function sum(arr: number[]): number {
+  var sum = 0;
+  var i = arr.length;
+  while (--i >= 0)
+    sum += arr[i];
+  return sum;
+};
+
+function mean(arr: number[]): number {
+  return sum(arr) / arr.length;
+};
+
+function sumsqerr(arr: number[]): number {
+  var meanv = mean(arr);
+  var sum = 0;
+  var i = arr.length;
+  var tmp;
+  while (--i >= 0) {
+    tmp = arr[i] - meanv;
+    sum += tmp * tmp;
+  }
+  return sum;
+};
+
+function variance(arr: number[], flag: boolean) {
+  return sumsqerr(arr) / (arr.length - (flag ? 1 : 0));
+}
+
+function stdev(arr: number[], flag: boolean) {
+  return Math.sqrt(variance(arr, flag));
+}
+
+// 2 different parameter setups
+// (value, alpha, sd, n)
+// (value, alpha, array)
+export function normalci() {
+  var args = [].slice.call(arguments),
+    ans = new Array(2),
+    change;
+  if (args.length === 4) {
+    change = Math.abs(normal.inv(args[1] / 2, 0, 1) *
+      args[2] / Math.sqrt(args[3]));
+  } else {
+    // @ts-ignore
+    change = Math.abs(normal.inv(args[1] / 2, 0, 1) * stdev(args[2]) / Math.sqrt(args[2].length));
+  }
+  ans[0] = args[0] - change;
+  ans[1] = args[0] + change;
+  return ans;
+}
+
+export function tci() {
+  var args = [].slice.call(arguments),
+    ans = new Array(2),
+    change;
+  if (args.length === 4) {
+    change = Math.abs(studentt.inv(args[1] / 2, args[3] - 1) *
+      args[2] / Math.sqrt(args[3]));
+  } else {
+    // @ts-ignore
+    change = Math.abs(studentt.inv(args[1] / 2, args[2].length - 1) * stdev(args[2], true) / Math.sqrt(args[2].length));
+  }
+  ans[0] = args[0] - change;
+  ans[1] = args[0] + change;
+  return ans;
+}

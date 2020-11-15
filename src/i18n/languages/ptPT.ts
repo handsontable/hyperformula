@@ -331,6 +331,9 @@ const dictionary: RawTranslationPackage = {
     LARGE: 'MAIOR',
     SMALL: 'MENOR',
     AVEDEV: 'DESV.MÉDIO',
+    CONFIDENCE: 'INT.CONFIANÇA',
+    'CONFIDENCE.NORM': 'INT.CONFIANÇA.NORM',
+    'CONFIDENCE.T': 'INT.CONFIANÇA.T',
   },
   langCode: 'ptPT',
   ui: {

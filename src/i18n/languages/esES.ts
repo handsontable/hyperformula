@@ -331,6 +331,9 @@ export const dictionary: RawTranslationPackage = {
     LARGE: 'K.ESIMO.MAYOR',
     SMALL: 'K.ESIMO.MENOR',
     AVEDEV: 'DESVPROM',
+    CONFIDENCE: 'INTERVALO.CONFIANZA',
+    'CONFIDENCE.NORM': 'INTERVALO.CONFIANZA.NORM',
+    'CONFIDENCE.T': 'INTERVALO.CONFIANZA.T',
   },
   langCode: 'esES',
   ui: {
