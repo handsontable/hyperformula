@@ -290,6 +290,7 @@ lets you design your own [custom functions](custom-functions).
 | COUNTBLANK | Statistical | Returns the number of empty cells. | COUNTBLANK(Range) |
 | COUNTIF | Statistical | Returns the number of cells that meet with certain criteria within a cell range. | COUNTIF(Range; Criteria) |
 | COUNTIFS | Statistical | Returns the count of rows or columns that meet criteria in multiple ranges. | COUNTIFS(Range1; Criterion1 [; Range2; Criterion2 [; ...]]) |
+| DEVSQ | Statistical | Returns sum of squared deviations. | DEVSQ(Number1; Number2; ...Number30) |
 | EXPON.DIST | Statistical | Returns density of a exponential distribution. | EXPON.DIST(Number1; Number2; Boolean) |
 | EXPONDIST | Statistical | Returns density of a exponential distribution. | EXPONDIST(Number1; Number2; Boolean) |
 | FDIST | Statistical | Returns probability of F right-side distribution. | FDIST(X; Degree1; Degree2) |
