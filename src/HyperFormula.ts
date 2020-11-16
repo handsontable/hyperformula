@@ -423,7 +423,7 @@ export class HyperFormula implements TypedEmitter {
   }
 
   /**
-   * Registers a function with a given id if such exists in a plugin
+   * Registers a function with a given id if such exists in a plugin (as a function or an alias).
    *
    * @param {string} functionId - function id, e.g. 'SUMIF'
    * @param {FunctionPluginDefinition} plugin - plugin class
