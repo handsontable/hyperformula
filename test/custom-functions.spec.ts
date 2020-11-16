@@ -52,6 +52,10 @@ class SumWithExtra extends FunctionPlugin {
     }
   }
 
+  public static aliases = {
+    'SUMALIAS': 'SUM',
+  }
+
   public sum(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     const left = this.evaluateAst(ast.args[0], formulaAddress) as number
     const right = this.evaluateAst(ast.args[1], formulaAddress) as number
@@ -169,6 +173,16 @@ describe('Register static custom plugin', () => {
     HyperFormula.registerFunction('SUM', SumWithExtra)
     const engine = HyperFormula.buildFromArray([
       ['=SUM(1, 2)', '=MAX(1, 2)']
+    ])
+
+    expect(engine.getCellValue(adr('A1'))).toEqual(45)
+    expect(engine.getCellValue(adr('B1'))).toEqual(2)
+  })
+
+  it('should allow to register only alias', () => {
+    HyperFormula.registerFunction('SUMALIAS', SumWithExtra, {'enGB': {'SUMALIAS': 'SUMALIAS'}})
+    const engine = HyperFormula.buildFromArray([
+      ['=SUMALIAS(1, 2)', '=MAX(1, 2)']
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqual(45)

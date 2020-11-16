@@ -42,7 +42,16 @@ export class FunctionRegistry {
   }
 
   public static registerFunction(functionId: string, plugin: FunctionPluginDefinition, translations?: FunctionTranslationsPackage): void {
-    const entry = plugin.implementedFunctions[functionId]
+    let entry = plugin.implementedFunctions[functionId]
+    if(entry === undefined) {
+      if(plugin.aliases !== undefined){
+        const key = plugin.aliases[functionId]
+        if(key !== undefined) {
+          entry = plugin.implementedFunctions[key]
+          plugin.implementedFunctions[functionId] = entry
+        }
+      }
+    }
     if (entry !== undefined) {
       this.loadPluginFunction(plugin, functionId, this.plugins)
     } else {
