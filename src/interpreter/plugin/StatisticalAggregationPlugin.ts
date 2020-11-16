@@ -147,7 +147,7 @@ export class StatisticalAggregationPlugin extends  FunctionPlugin {
       if (dataX.numberOfElements() <= 1) {
         return new CellError(ErrorType.DIV_BY_ZERO, ErrorMessage.TwoValues)
       }
-      const ret = parseTwoArrays(dataX,dataY)
+      const ret = parseTwoArrays(dataX, dataY)
       if(ret instanceof CellError) {
         return ret
       }
@@ -164,7 +164,7 @@ export class StatisticalAggregationPlugin extends  FunctionPlugin {
       if (dataX.numberOfElements() <= 1) {
         return new CellError(ErrorType.DIV_BY_ZERO, ErrorMessage.TwoValues)
       }
-      const ret = parseTwoArrays(dataX,dataY)
+      const ret = parseTwoArrays(dataX, dataY)
       if(ret instanceof CellError) {
         return ret
       }
@@ -184,7 +184,7 @@ export class StatisticalAggregationPlugin extends  FunctionPlugin {
       if (dataX.numberOfElements() <= 1) {
         return new CellError(ErrorType.DIV_BY_ZERO, ErrorMessage.TwoValues)
       }
-      const ret = parseTwoArrays(dataX,dataY)
+      const ret = parseTwoArrays(dataX, dataY)
       if(ret instanceof CellError) {
         return ret
       }
@@ -194,10 +194,10 @@ export class StatisticalAggregationPlugin extends  FunctionPlugin {
 }
 
 
-function parseTwoArrays(dataX: SimpleRangeValue, dataY: SimpleRangeValue): CellError | [number[],number[]] {
+function parseTwoArrays(dataX: SimpleRangeValue, dataY: SimpleRangeValue): CellError | [number[], number[]] {
   const xit = dataX.iterateValuesFromTopLeftCorner()
   const yit = dataY.iterateValuesFromTopLeftCorner()
-  let x,y
+  let x, y
   const arrX = []
   const arrY = []
   while (x = xit.next(), y = yit.next(), !x.done && !y.done) {
@@ -212,5 +212,5 @@ function parseTwoArrays(dataX: SimpleRangeValue, dataY: SimpleRangeValue): CellE
       arrY.push(yval)
     }
   }
-  return [arrX,arrY]
+  return [arrX, arrY]
 }
