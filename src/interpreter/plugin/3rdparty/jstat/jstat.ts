@@ -875,11 +875,11 @@ function sumsqerr(arr: number[]): number {
   return sum;
 };
 
-function variance(arr: number[], flag: boolean) {
+function variance(arr: number[], flag: any) {
   return sumsqerr(arr) / (arr.length - (flag ? 1 : 0));
 }
 
-function stdev(arr: number[], flag: boolean) {
+function stdev(arr: number[], flag: any) {
   return Math.sqrt(variance(arr, flag));
 }
 
@@ -941,4 +941,10 @@ export function covariance(arr1: number[], arr2: number[]): number {
     sq_dev[i] = (arr1[i] - u) * (arr2[i] - v);
 
   return sum(sq_dev) / (arr1Len - 1);
+}
+
+export function corrcoeff(arr1: number[], arr2: number[]): number {
+  return covariance(arr1, arr2) /
+    stdev(arr1, 1) /
+    stdev(arr2, 1);
 }

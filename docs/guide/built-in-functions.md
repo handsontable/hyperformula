@@ -291,6 +291,9 @@ lets you design your own [custom functions](custom-functions).
 | COUNTBLANK | Statistical | Returns the number of empty cells. | COUNTBLANK(Range) |
 | COUNTIF | Statistical | Returns the number of cells that meet with certain criteria within a cell range. | COUNTIF(Range; Criteria) |
 | COUNTIFS | Statistical | Returns the count of rows or columns that meet criteria in multiple ranges. | COUNTIFS(Range1; Criterion1 [; Range2; Criterion2 [; ...]]) |
+| COVAR | Statistical | Returns the covariance between two data sets, population normalized. | COVAR(Data1; Data2) |
+| COVARIANCE.P | Statistical | Returns the covariance between two data sets, population normalized. | COVARIANCE.P(Data1; Data2) |
+| COVARIANCE.S | Statistical | Returns the covariance between two data sets, sample normalized. | COVARIANCE.S(Data1; Data2) |
 | DEVSQ | Statistical | Returns sum of squared deviations. | DEVSQ(Number1; Number2; ...Number30) |
 | EXPON.DIST | Statistical | Returns density of a exponential distribution. | EXPON.DIST(Number1; Number2; Boolean) |
 | EXPONDIST | Statistical | Returns density of a exponential distribution. | EXPONDIST(Number1; Number2; Boolean) |

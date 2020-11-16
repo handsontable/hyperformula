@@ -338,6 +338,9 @@ const dictionary: RawTranslationPackage = {
     GEOMEAN: 'GEOMEAN',
     HARMEAN: 'HARMEAN',
     CRITBINOM: 'CRITBINOM',
+    'COVARIANCE.P': 'COVARIANCE.S',
+    'COVARIANCE.S': 'COVARIANCE.S',
+    'COVAR': 'COVAR',
   },
   langCode: 'enGB',
   ui: {
