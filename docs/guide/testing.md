@@ -6,7 +6,7 @@ to be sure that both environments are fine.
 
 * **`npm run test`** - runs the linter and all tests
 * **`npm run test:unit`** - runs unit tests
-* **`npm run coverage`** - runs code coverage
+* **`npm run coverage`** - runs unit tests and generates code coverage
 * **`npm run test:browser`** - runs tests in **karma** once and closes all open browsers
 * **`npm run test:browser.debug`** - runs test in **karma** only in Chrome until you exit the process. It watches changes in `src` and `test` directories and rebuilds them automatically.
 
