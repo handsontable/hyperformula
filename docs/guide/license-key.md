@@ -54,9 +54,8 @@ const options = {
 To determine whether a user is still entitled to use a particular
 version of the software, HyperFormula simply compares the time between
 two dates. These dates come from two sources of information. One is
-the license key which stores the date that it was first generated.
-The other is the source code which contains information about the
-date of release.
+the library build date, and the other one is the date taken from the license key.
+This process does not require any connections to the server.
 
 ## Notifications
 
