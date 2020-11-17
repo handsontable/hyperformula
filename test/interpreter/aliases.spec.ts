@@ -1,235 +1,107 @@
 import {HyperFormula} from '../../src'
 
-describe('Function NEGBINOMDIST', () => {
-  it('should be an alias of NEGBINOM.DIST', () => {
-    const engine = HyperFormula.buildEmpty()
-    const metadata1 = engine.getFunctionPlugin('NEGBINOMDIST')?.implementedFunctions!['NEGBINOMDIST']
-    const metadata2 = engine.getFunctionPlugin('NEGBINOM.DIST')?.implementedFunctions!['NEGBINOM.DIST']
-    expect(metadata1).toEqual(metadata2)
+describe('Function aliases', () => {
+  it('NEGBINOMDIST should be an alias of NEGBINOM.DIST', () => {
+    expect(HyperFormula.buildEmpty().getFunctionPlugin('NEGBINOMDIST')!.aliases!['NEGBINOMDIST']).toEqual('NEGBINOM.DIST')
   })
-})
 
-describe('Function BETADIST', () => {
-  it('should be an alias of BETA.DIST', () => {
-    const engine = HyperFormula.buildEmpty()
-    const metadata1 = engine.getFunctionPlugin('BETADIST')?.implementedFunctions!['BETADIST']
-    const metadata2 = engine.getFunctionPlugin('BETA.DIST')?.implementedFunctions!['BETA.DIST']
-    expect(metadata1).toEqual(metadata2)
+  it('BETADIST should be an alias of BETA.DIST', () => {
+    expect(HyperFormula.buildEmpty().getFunctionPlugin('BETADIST')!.aliases!['BETADIST']).toEqual('BETA.DIST')
   })
-})
 
-describe('Function EXPONDIST', () => {
-  it('should be an alias of EXPON.DIST', () => {
-    const engine = HyperFormula.buildEmpty()
-    const metadata1 = engine.getFunctionPlugin('EXPONDIST')?.implementedFunctions!['EXPONDIST']
-    const metadata2 = engine.getFunctionPlugin('EXPON.DIST')?.implementedFunctions!['EXPON.DIST']
-    expect(metadata1).toEqual(metadata2)
+  it('EXPONDIST should be an alias of EXPON.DIST', () => {
+    expect(HyperFormula.buildEmpty().getFunctionPlugin('EXPONDIST')!.aliases!['EXPONDIST']).toEqual('EXPON.DIST')
   })
-})
 
-describe('Function NORMDIST', () => {
-  it('should be an alias of NORM.DIST', () => {
-    const engine = HyperFormula.buildEmpty()
-    const metadata1 = engine.getFunctionPlugin('NORMDIST')?.implementedFunctions!['NORMDIST']
-    const metadata2 = engine.getFunctionPlugin('NORM.DIST')?.implementedFunctions!['NORM.DIST']
-    expect(metadata1).toEqual(metadata2)
+  it('NORMDIST should be an alias of NORM.DIST', () => {
+    expect(HyperFormula.buildEmpty().getFunctionPlugin('NORMDIST')!.aliases!['NORMDIST']).toEqual('NORM.DIST')
   })
-})
 
-describe('Function NORMINV', () => {
-  it('should be an alias of NORM.INV', () => {
-    const engine = HyperFormula.buildEmpty()
-    const metadata1 = engine.getFunctionPlugin('NORMINV')?.implementedFunctions!['NORMINV']
-    const metadata2 = engine.getFunctionPlugin('NORM.INV')?.implementedFunctions!['NORM.INV']
-    expect(metadata1).toEqual(metadata2)
+  it('NORMINV should be an alias of NORM.INV', () => {
+    expect(HyperFormula.buildEmpty().getFunctionPlugin('NORMINV')!.aliases!['NORMINV']).toEqual('NORM.INV')
   })
-})
 
-describe('Function NORMSDIST', () => {
-  it('should be an alias of NORM.S.DIST', () => {
-    const engine = HyperFormula.buildEmpty()
-    const metadata1 = engine.getFunctionPlugin('NORMSDIST')?.implementedFunctions!['NORMSDIST']
-    const metadata2 = engine.getFunctionPlugin('NORM.S.DIST')?.implementedFunctions!['NORM.S.DIST']
-    expect(metadata1).toEqual(metadata2)
+  it('NORMSDIST should be an alias of NORM.S.DIST', () => {
+    expect(HyperFormula.buildEmpty().getFunctionPlugin('NORMSDIST')!.aliases!['NORMSDIST']).toEqual('NORM.S.DIST')
   })
-})
 
-describe('Function NORMSINV', () => {
-  it('should be an alias of NORM.S.INV', () => {
-    const engine = HyperFormula.buildEmpty()
-    const metadata1 = engine.getFunctionPlugin('NORMSINV')?.implementedFunctions!['NORMSINV']
-    const metadata2 = engine.getFunctionPlugin('NORM.S.INV')?.implementedFunctions!['NORM.S.INV']
-    expect(metadata1).toEqual(metadata2)
+  it('NORMSINV should be an alias of NORM.S.INV', () => {
+    expect(HyperFormula.buildEmpty().getFunctionPlugin('NORMSINV')!.aliases!['NORMSINV']).toEqual('NORM.S.INV')
   })
-})
 
-describe('Function LOGINV', () => {
-  it('should be an alias of LOGNORM.INV', () => {
-    const engine = HyperFormula.buildEmpty()
-    const metadata1 = engine.getFunctionPlugin('LOGINV')?.implementedFunctions!['LOGINV']
-    const metadata2 = engine.getFunctionPlugin('LOGNORM.INV')?.implementedFunctions!['LOGNORM.INV']
-    expect(metadata1).toEqual(metadata2)
+  it('LOGINV should be an alias of LOGNORM.INV', () => {
+    expect(HyperFormula.buildEmpty().getFunctionPlugin('LOGINV')!.aliases!['LOGINV']).toEqual('LOGNORM.INV')
   })
-})
 
-describe('Function LOGNORMDIST', () => {
-  it('should be an alias of LOGNORM.DIST', () => {
-    const engine = HyperFormula.buildEmpty()
-    const metadata1 = engine.getFunctionPlugin('LOGNORMDIST')?.implementedFunctions!['LOGNORMDIST']
-    const metadata2 = engine.getFunctionPlugin('LOGNORM.DIST')?.implementedFunctions!['LOGNORM.DIST']
-    expect(metadata1).toEqual(metadata2)
+  it('LOGNORMDIST should be an alias of LOGNORM.DIST', () => {
+    expect(HyperFormula.buildEmpty().getFunctionPlugin('LOGNORMDIST')!.aliases!['LOGNORMDIST']).toEqual('LOGNORM.DIST')
   })
-})
 
-describe('Function TINV', () => {
-  it('should be an alias of T.INV.2T', () => {
-    const engine = HyperFormula.buildEmpty()
-    const metadata1 = engine.getFunctionPlugin('TINV')?.implementedFunctions!['TINV']
-    const metadata2 = engine.getFunctionPlugin('T.INV.2T')?.implementedFunctions!['T.INV.2T']
-    expect(metadata1).toEqual(metadata2)
+  it('TINV should be an alias of T.INV.2T', () => {
+    expect(HyperFormula.buildEmpty().getFunctionPlugin('TINV')!.aliases!['TINV']).toEqual('T.INV.2T')
   })
-})
 
-describe('Function HYPGEOMDIST', () => {
-  it('should be an alias of HYPGEOM.DIST', () => {
-    const engine = HyperFormula.buildEmpty()
-    const metadata1 = engine.getFunctionPlugin('HYPGEOMDIST')?.implementedFunctions!['HYPGEOMDIST']
-    const metadata2 = engine.getFunctionPlugin('HYPGEOM.DIST')?.implementedFunctions!['HYPGEOM.DIST']
-    expect(metadata1).toEqual(metadata2)
+  it('HYPGEOMDIST should be an alias of HYPGEOM.DIST', () => {
+    expect(HyperFormula.buildEmpty().getFunctionPlugin('HYPGEOMDIST')!.aliases!['HYPGEOMDIST']).toEqual('HYPGEOM.DIST')
   })
-})
 
-describe('Function POISSON', () => {
-  it('should be an alias of POISSON.DIST', () => {
-    const engine = HyperFormula.buildEmpty()
-    const metadata1 = engine.getFunctionPlugin('POISSON')?.implementedFunctions!['POISSON']
-    const metadata2 = engine.getFunctionPlugin('POISSON.DIST')?.implementedFunctions!['POISSON.DIST']
-    expect(metadata1).toEqual(metadata2)
+  it('POISSON should be an alias of POISSON.DIST', () => {
+    expect(HyperFormula.buildEmpty().getFunctionPlugin('POISSON')!.aliases!['POISSON']).toEqual('POISSON.DIST')
   })
-})
 
-describe('Function WEIBULL', () => {
-  it('should be an alias of WEIBULL.DIST', () => {
-    const engine = HyperFormula.buildEmpty()
-    const metadata1 = engine.getFunctionPlugin('WEIBULL')?.implementedFunctions!['WEIBULL']
-    const metadata2 = engine.getFunctionPlugin('WEIBULL.DIST')?.implementedFunctions!['WEIBULL.DIST']
-    expect(metadata1).toEqual(metadata2)
+  it('WEIBULL should be an alias of WEIBULL.DIST', () => {
+    expect(HyperFormula.buildEmpty().getFunctionPlugin('WEIBULL')!.aliases!['WEIBULL']).toEqual('WEIBULL.DIST')
   })
-})
 
-describe('Function FINV', () => {
-  it('should be an alias of F.INV.RT', () => {
-    const engine = HyperFormula.buildEmpty()
-    const metadata1 = engine.getFunctionPlugin('FINV')?.implementedFunctions!['FINV']
-    const metadata2 = engine.getFunctionPlugin('F.INV.RT')?.implementedFunctions!['F.INV.RT']
-    expect(metadata1).toEqual(metadata2)
+  it('FINV should be an alias of F.INV.RT', () => {
+    expect(HyperFormula.buildEmpty().getFunctionPlugin('FINV')!.aliases!['FINV']).toEqual('F.INV.RT')
   })
-})
 
-describe('Function FDIST', () => {
-  it('should be an alias of F.DIST.RT', () => {
-    const engine = HyperFormula.buildEmpty()
-    const metadata1 = engine.getFunctionPlugin('FDIST')?.implementedFunctions!['FDIST']
-    const metadata2 = engine.getFunctionPlugin('F.DIST.RT')?.implementedFunctions!['F.DIST.RT']
-    expect(metadata1).toEqual(metadata2)
+  it('FDIST should be an alias of F.DIST.RT', () => {
+    expect(HyperFormula.buildEmpty().getFunctionPlugin('FDIST')!.aliases!['FDIST']).toEqual('F.DIST.RT')
   })
-})
 
-describe('Function CHIDIST', () => {
-  it('should be an alias of CHISQ.DIST.RT', () => {
-    const engine = HyperFormula.buildEmpty()
-    const metadata1 = engine.getFunctionPlugin('CHIDIST')?.implementedFunctions!['CHIDIST']
-    const metadata2 = engine.getFunctionPlugin('CHISQ.DIST.RT')?.implementedFunctions!['CHISQ.DIST.RT']
-    expect(metadata1).toEqual(metadata2)
+  it('CHIDIST should be an alias of CHISQ.DIST.RT', () => {
+    expect(HyperFormula.buildEmpty().getFunctionPlugin('CHIDIST')!.aliases!['CHIDIST']).toEqual('CHISQ.DIST.RT')
   })
-})
 
-describe('Function CHIINV', () => {
-  it('should be an alias of CHISQ.INV.RT', () => {
-    const engine = HyperFormula.buildEmpty()
-    const metadata1 = engine.getFunctionPlugin('CHIINV')?.implementedFunctions!['CHIINV']
-    const metadata2 = engine.getFunctionPlugin('CHISQ.INV.RT')?.implementedFunctions!['CHISQ.INV.RT']
-    expect(metadata1).toEqual(metadata2)
+  it('CHIINV should be an alias of CHISQ.INV.RT', () => {
+    expect(HyperFormula.buildEmpty().getFunctionPlugin('CHIINV')!.aliases!['CHIINV']).toEqual('CHISQ.INV.RT')
   })
-})
 
-describe('Function GAMMADIST', () => {
-  it('should be an alias of GAMMA.DIST', () => {
-    const engine = HyperFormula.buildEmpty()
-    const metadata1 = engine.getFunctionPlugin('GAMMADIST')?.implementedFunctions!['GAMMADIST']
-    const metadata2 = engine.getFunctionPlugin('GAMMA.DIST')?.implementedFunctions!['GAMMA.DIST']
-    expect(metadata1).toEqual(metadata2)
+  it('GAMMADIST should be an alias of GAMMA.DIST', () => {
+    expect(HyperFormula.buildEmpty().getFunctionPlugin('GAMMADIST')!.aliases!['GAMMADIST']).toEqual('GAMMA.DIST')
   })
-})
 
-describe('Function GAMMALN.PRECISE', () => {
-  it('should be an alias of GAMMALN', () => {
-    const engine = HyperFormula.buildEmpty()
-    const metadata1 = engine.getFunctionPlugin('GAMMALN.PRECISE')?.implementedFunctions!['GAMMALN.PRECISE']
-    const metadata2 = engine.getFunctionPlugin('GAMMALN')?.implementedFunctions!['GAMMALN']
-    expect(metadata1).toEqual(metadata2)
+  it('GAMMALN.PRECISE should be an alias of GAMMALN', () => {
+    expect(HyperFormula.buildEmpty().getFunctionPlugin('GAMMALN.PRECISE')!.aliases!['GAMMALN.PRECISE']).toEqual('GAMMALN')
   })
-})
 
-describe('Function GAMMAINV', () => {
-  it('should be an alias of GAMMA.INV', () => {
-    const engine = HyperFormula.buildEmpty()
-    const metadata1 = engine.getFunctionPlugin('GAMMAINV')?.implementedFunctions!['GAMMAINV']
-    const metadata2 = engine.getFunctionPlugin('GAMMA.INV')?.implementedFunctions!['GAMMA.INV']
-    expect(metadata1).toEqual(metadata2)
+  it('GAMMAINV should be an alias of GAMMA.INV', () => {
+    expect(HyperFormula.buildEmpty().getFunctionPlugin('GAMMAINV')!.aliases!['GAMMAINV']).toEqual('GAMMA.INV')
   })
-})
 
-describe('Function BETAINV', () => {
-  it('should be an alias of BETA.INV', () => {
-    const engine = HyperFormula.buildEmpty()
-    const metadata1 = engine.getFunctionPlugin('BETAINV')?.implementedFunctions!['BETAINV']
-    const metadata2 = engine.getFunctionPlugin('BETA.INV')?.implementedFunctions!['BETA.INV']
-    expect(metadata1).toEqual(metadata2)
+  it('BETAINV should be an alias of BETA.INV', () => {
+    expect(HyperFormula.buildEmpty().getFunctionPlugin('BETAINV')!.aliases!['BETAINV']).toEqual('BETA.INV')
   })
-})
 
-describe('Function BINOMDIST', () => {
-  it('should be an alias of BINOM.DIST', () => {
-    const engine = HyperFormula.buildEmpty()
-    const metadata1 = engine.getFunctionPlugin('BINOMDIST')?.implementedFunctions!['BINOMDIST']
-    const metadata2 = engine.getFunctionPlugin('BINOM.DIST')?.implementedFunctions!['BINOM.DIST']
-    expect(metadata1).toEqual(metadata2)
+  it('BINOMDIST should be an alias of BINOM.DIST', () => {
+    expect(HyperFormula.buildEmpty().getFunctionPlugin('BINOMDIST')!.aliases!['BINOMDIST']).toEqual('BINOM.DIST')
   })
-})
 
-describe('Function STDEV', () => {
-  it('should be an alias of STDEV.S', () => {
-    const engine = HyperFormula.buildEmpty()
-    const metadata1 = engine.getFunctionPlugin('STDEV')?.implementedFunctions!['STDEV']
-    const metadata2 = engine.getFunctionPlugin('STDEV.S')?.implementedFunctions!['STDEV.S']
-    expect(metadata1).toEqual(metadata2)
+  it('STDEV should be an alias of STDEV.S', () => {
+    expect(HyperFormula.buildEmpty().getFunctionPlugin('STDEV')!.aliases!['STDEV']).toEqual('STDEV.S')
   })
-})
 
-describe('Function STDEVP', () => {
-  it('should be an alias of STDEV.P', () => {
-    const engine = HyperFormula.buildEmpty()
-    const metadata1 = engine.getFunctionPlugin('STDEVP')?.implementedFunctions!['STDEVP']
-    const metadata2 = engine.getFunctionPlugin('STDEV.P')?.implementedFunctions!['STDEV.P']
-    expect(metadata1).toEqual(metadata2)
+  it('STDEVP should be an alias of STDEV.P', () => {
+    expect(HyperFormula.buildEmpty().getFunctionPlugin('STDEVP')!.aliases!['STDEVP']).toEqual('STDEV.P')
   })
-})
 
-describe('Function VARP', () => {
-  it('should be an alias of VAR.P', () => {
-    const engine = HyperFormula.buildEmpty()
-    const metadata1 = engine.getFunctionPlugin('VARP')?.implementedFunctions!['VARP']
-    const metadata2 = engine.getFunctionPlugin('VAR.P')?.implementedFunctions!['VAR.P']
-    expect(metadata1).toEqual(metadata2)
+  it('VAR should be an alias of VAR.S', () => {
+    expect(HyperFormula.buildEmpty().getFunctionPlugin('VAR')!.aliases!['VAR']).toEqual('VAR.S')
   })
-})
 
-describe('Function VAR', () => {
-  it('should be an alias of VAR.S', () => {
-    const engine = HyperFormula.buildEmpty()
-    const metadata1 = engine.getFunctionPlugin('VAR')?.implementedFunctions!['VAR']
-    const metadata2 = engine.getFunctionPlugin('VAR.S')?.implementedFunctions!['VAR.S']
-    expect(metadata1).toEqual(metadata2)
+  it('VARP should be an alias of VAR.P', () => {
+    expect(HyperFormula.buildEmpty().getFunctionPlugin('VARP')!.aliases!['VARP']).toEqual('VAR.P')
   })
 })

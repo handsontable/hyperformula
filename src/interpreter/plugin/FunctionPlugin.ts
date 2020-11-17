@@ -137,7 +137,7 @@ export abstract class FunctionPlugin {
    * Dictionary containing functions implemented by specific plugin, along with function name translations.
    */
   public static implementedFunctions: ImplementedFunctions
-  public static aliases: Maybe<{[formulaId: string]: string}>
+  public static aliases?: {[formulaId: string]: string}
   protected readonly interpreter: Interpreter
   protected readonly dependencyGraph: DependencyGraph
   protected readonly columnSearch: SearchStrategy

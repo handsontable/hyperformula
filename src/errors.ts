@@ -381,6 +381,12 @@ export class AliasAlreadyExisting extends Error {
   }
 }
 
+export class AliasEmpty extends Error {
+  constructor(name: string, pluginName: string) {
+    super(`Alias ${name }in plugin ${pluginName} non-existent.`)
+  }
+}
+
 export class AliasTargetEmpty extends Error {
   constructor(name: string, pluginName: string) {
     super(`Alias in plugin ${pluginName} points to a non-existent function id ${name}.`)

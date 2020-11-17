@@ -351,7 +351,7 @@ describe('aliases', () => {
   it('should validate that alias target exists', () => {
     expect( () => {
       HyperFormula.registerFunctionPlugin(EmptyAliasPlugin)
-    }).toThrow(new AliasTargetEmpty('BAR', 'EmptyAliasPlugin'))
+    }).toThrow(FunctionPluginValidationError.functionMethodNotFound('foo', 'EmptyAliasPlugin'))
   })
 
   it('should validate that alias key is available', () => {
