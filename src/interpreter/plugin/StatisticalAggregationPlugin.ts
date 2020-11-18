@@ -182,7 +182,7 @@ export class StatisticalAggregationPlugin extends  FunctionPlugin {
       if(ret instanceof CellError) {
         return ret
       }
-      return Math.pow(corrcoeff(ret[0], ret[1]),2)
+      return Math.pow(corrcoeff(ret[0], ret[1]), 2)
     })
   }
 

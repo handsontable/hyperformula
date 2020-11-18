@@ -76,7 +76,7 @@ describe('RSQ', () => {
       ['=RSQ(MMULT(A1:B2, A1:B2), MMULT(B1:C2, B1:C2))'],
     ])
 
-    expect(engine.getCellValue(adr('A3'))).toBeCloseTo(0.998496749220189,6)
+    expect(engine.getCellValue(adr('A3'))).toBeCloseTo(0.998496749220189, 6)
   })
 
   it('propagates errors', () => {
