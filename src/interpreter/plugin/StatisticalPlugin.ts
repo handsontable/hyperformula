@@ -573,8 +573,8 @@ export class StatisticalPlugin extends  FunctionPlugin {
         {argumentType: ArgumentTypes.NUMBER, minValue: 1},
       ],
     },
-    'STANDARIZE': {
-      method: 'standarize',
+    'STANDARDIZE': {
+      method: 'standardize',
       parameters: [
         {argumentType: ArgumentTypes.NUMBER},
         {argumentType: ArgumentTypes.NUMBER},
@@ -993,8 +993,8 @@ export class StatisticalPlugin extends  FunctionPlugin {
     )
   }
 
-  public standarize(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('STANDARIZE'),
+  public standardize(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('STANDARDIZE'),
       (x: number, mean: number, stddev: number) => (x-mean)/stddev
     )
   }
