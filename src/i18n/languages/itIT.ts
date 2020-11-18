@@ -338,6 +338,7 @@ const dictionary: RawTranslationPackage = {
     GEOMEAN: 'MEDIA.GEOMETRICA',
     HARMEAN: 'MEDIA.ARMONICA',
     CRITBINOM: 'CRIT.BINOM',
+    PEARSON: 'PEARSON',
   },
   langCode: 'itIT',
   ui: {

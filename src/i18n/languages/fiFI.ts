@@ -338,6 +338,7 @@ const dictionary: RawTranslationPackage = {
     GEOMEAN: 'KESKIARVO.GEOM',
     HARMEAN: 'KESKIARVO.HARM',
     CRITBINOM: 'BINOMIJAKAUMA.KRIT',
+    PEARSON: 'PEARSON',
   },
   langCode: 'fiFI',
   ui: {

@@ -338,6 +338,7 @@ const dictionary: RawTranslationPackage = {
     GEOMEAN: 'MÉRTANI.KÖZÉP',
     HARMEAN: 'HARM.KÖZÉP',
     CRITBINOM: 'KRITBINOM',
+    PEARSON: 'PEARSON',
   },
   langCode: 'huHU',
   ui: {

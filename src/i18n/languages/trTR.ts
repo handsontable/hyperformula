@@ -338,6 +338,7 @@ const dictionary: RawTranslationPackage = {
     GEOMEAN: 'GEOORT',
     HARMEAN: 'HARORT',
     CRITBINOM: 'KRİTİKBİNOM',
+    PEARSON: 'PEARSON',
   },
   langCode: 'trTR',
   ui: {

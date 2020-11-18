@@ -338,6 +338,7 @@ export const dictionary: RawTranslationPackage = {
     GEOMEAN: 'MEDIA.GEOM',
     HARMEAN: 'MEDIA.ARMO',
     CRITBINOM: 'BINOM.CRIT',
+    PEARSON: 'PEARSON',
   },
   langCode: 'esES',
   ui: {

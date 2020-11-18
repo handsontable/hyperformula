@@ -337,6 +337,7 @@ lets you design your own [custom functions](custom-functions).
 | NORMINV | Statistical | Returns value of inverse normal distribution. | NORMINV(P; Mean; Stddev) |
 | NORM.S.INV | Statistical | Returns value of inverse normal distribution. | NORM.S.INV(P) |
 | NORMSINV | Statistical | Returns value of inverse normal distribution. | NORMSINV(P) |
+| PEARSON | Statistical | Returns the correlation coefficient between two data sets. | PEARSON(Data1; Data2) |
 | PHI | Statistical | Returns probability densitity of normal distribution. | PHI(X) |
 | POISSON | Statistical | Returns density of Poisson distribution. | POISSON(X; Mean; Mode) |
 | POISSON.DIST | Statistical | Returns density of Poisson distribution. | POISSON.DIST(X; Mean; Mode) |

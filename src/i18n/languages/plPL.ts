@@ -338,6 +338,7 @@ const dictionary: RawTranslationPackage = {
     GEOMEAN: 'ŚREDNIA.GEOMETRYCZNA',
     HARMEAN: 'ŚREDNIA.HARMONICZNA',
     CRITBINOM: 'PRÓG.ROZKŁAD.DWUM',
+    PEARSON: 'PEARSON',
   },
   langCode: 'plPL',
   ui: {

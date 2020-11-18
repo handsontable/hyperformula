@@ -47,6 +47,13 @@ export class StatisticalAggregationPlugin extends  FunctionPlugin {
         {argumentType: ArgumentTypes.RANGE},
       ],
     },
+    'PEARSON': {
+      method: 'correl',
+      parameters: [
+        {argumentType: ArgumentTypes.RANGE},
+        {argumentType: ArgumentTypes.RANGE},
+      ],
+    },
     'COVARIANCE.P': {
       method: 'covariancep',
       parameters: [

@@ -338,6 +338,7 @@ const dictionary: RawTranslationPackage = {
     GEOMEAN: 'MOYENNE.GEOMETRIQUE',
     HARMEAN: 'MOYENNE.HARMONIQUE',
     CRITBINOM: 'CRITERE.LOI.BINOMIALE',
+    PEARSON: 'PEARSON',
   },
   langCode: 'frFR',
   ui: {

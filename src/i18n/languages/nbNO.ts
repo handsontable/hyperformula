@@ -338,6 +338,7 @@ const dictionary: RawTranslationPackage = {
     GEOMEAN: 'GJENNOMSNITT.GEOMETRISK',
     HARMEAN: 'GJENNOMSNITT.HARMONISK',
     CRITBINOM: 'GRENSE.BINOM',
+    PEARSON: 'PEARSON',
   },
   langCode: 'nbNO',
   ui: {
