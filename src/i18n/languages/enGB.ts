@@ -342,6 +342,7 @@ const dictionary: RawTranslationPackage = {
     'COVARIANCE.S': 'COVARIANCE.S',
     'COVAR': 'COVAR',
     PEARSON: 'PEARSON',
+    RSQ: 'RSQ',
   },
   langCode: 'enGB',
   ui: {

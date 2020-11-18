@@ -54,6 +54,13 @@ export class StatisticalAggregationPlugin extends  FunctionPlugin {
         {argumentType: ArgumentTypes.RANGE},
       ],
     },
+    'RSQ': {
+      method: 'rsq',
+      parameters: [
+        {argumentType: ArgumentTypes.RANGE},
+        {argumentType: ArgumentTypes.RANGE},
+      ],
+    },
     'COVARIANCE.P': {
       method: 'covariancep',
       parameters: [
@@ -159,6 +166,23 @@ export class StatisticalAggregationPlugin extends  FunctionPlugin {
         return ret
       }
       return corrcoeff(ret[0], ret[1])
+    })
+  }
+
+  public rsq(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('RSQ'), (dataX: SimpleRangeValue, dataY: SimpleRangeValue) => {
+      if (dataX.numberOfElements() !== dataY.numberOfElements()) {
+        return new CellError(ErrorType.NA, ErrorMessage.EqualLength)
+      }
+
+      if (dataX.numberOfElements() <= 1) {
+        return new CellError(ErrorType.DIV_BY_ZERO, ErrorMessage.TwoValues)
+      }
+      const ret = parseTwoArrays(dataX, dataY)
+      if(ret instanceof CellError) {
+        return ret
+      }
+      return Math.pow(corrcoeff(ret[0], ret[1]),2)
     })
   }
 

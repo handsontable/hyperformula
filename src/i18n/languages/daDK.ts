@@ -339,6 +339,7 @@ const dictionary: RawTranslationPackage = {
     HARMEAN: 'HARMIDDELVÆRDI',
     CRITBINOM: 'KRITBINOM',
     PEARSON: 'PEARSON',
+    RSQ: 'FORKLARINGSGRAD',
   },
   langCode: 'daDK',
   ui: {

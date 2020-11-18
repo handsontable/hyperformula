@@ -339,6 +339,7 @@ const dictionary: RawTranslationPackage = {
     HARMEAN: 'GJENNOMSNITT.HARMONISK',
     CRITBINOM: 'GRENSE.BINOM',
     PEARSON: 'PEARSON',
+    RSQ: 'RKVADRAT',
   },
   langCode: 'nbNO',
   ui: {

@@ -339,6 +339,7 @@ const dictionary: RawTranslationPackage = {
     HARMEAN: 'MOYENNE.HARMONIQUE',
     CRITBINOM: 'CRITERE.LOI.BINOMIALE',
     PEARSON: 'PEARSON',
+    RSQ: 'COEFFICIENT.DETERMINATION',
   },
   langCode: 'frFR',
   ui: {

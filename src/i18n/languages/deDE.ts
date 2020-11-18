@@ -339,6 +339,7 @@ const dictionary: RawTranslationPackage = {
     HARMEAN: 'HARMITTEL',
     CRITBINOM: 'KRITBINOM',
     PEARSON: 'PEARSON',
+    RSQ: 'BESTIMMTHEITSMASS',
   },
   langCode: 'deDE',
   ui: {

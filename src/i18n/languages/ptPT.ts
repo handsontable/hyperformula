@@ -339,6 +339,7 @@ const dictionary: RawTranslationPackage = {
     HARMEAN: 'MÉDIA.HARMÔNICA',
     CRITBINOM: 'CRIT.BINOM',
     PEARSON: 'PEARSON',
+    RSQ: 'RQUAD',
   },
   langCode: 'ptPT',
   ui: {
