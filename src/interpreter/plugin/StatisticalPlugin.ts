@@ -573,6 +573,14 @@ export class StatisticalPlugin extends  FunctionPlugin {
         {argumentType: ArgumentTypes.NUMBER, minValue: 1},
       ],
     },
+    'STANDARIZE': {
+      method: 'standarize',
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER},
+        {argumentType: ArgumentTypes.NUMBER},
+        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
+      ],
+    },
   }
 
   public erf(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
@@ -982,6 +990,12 @@ export class StatisticalPlugin extends  FunctionPlugin {
         // @ts-ignore
         return tci(1, alpha, stddev, size)[1] - 1
       }
+    )
+  }
+
+  public standarize(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('STANDARIZE'),
+      (x: number, mean: number, stddev: number) => (x-mean)/stddev
     )
   }
 }

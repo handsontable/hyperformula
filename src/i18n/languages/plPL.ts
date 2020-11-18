@@ -340,6 +340,7 @@ const dictionary: RawTranslationPackage = {
     CRITBINOM: 'PRÓG.ROZKŁAD.DWUM',
     PEARSON: 'PEARSON',
     RSQ: 'R.KWADRAT',
+    STANDARDIZE: 'NORMALIZUJ',
   },
   langCode: 'plPL',
   ui: {

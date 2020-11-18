@@ -340,6 +340,7 @@ const dictionary: RawTranslationPackage = {
     CRITBINOM: 'GRENSE.BINOM',
     PEARSON: 'PEARSON',
     RSQ: 'RKVADRAT',
+    STANDARDIZE: 'NORMALISER',
   },
   langCode: 'nbNO',
   ui: {

@@ -340,6 +340,7 @@ const dictionary: RawTranslationPackage = {
     CRITBINOM: 'CRITERE.LOI.BINOMIALE',
     PEARSON: 'PEARSON',
     RSQ: 'COEFFICIENT.DETERMINATION',
+    STANDARDIZE: 'CENTREE.REDUITE',
   },
   langCode: 'frFR',
   ui: {

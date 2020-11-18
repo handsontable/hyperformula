@@ -343,6 +343,7 @@ const dictionary: RawTranslationPackage = {
     'COVAR': 'COVAR',
     PEARSON: 'PEARSON',
     RSQ: 'RSQ',
+    STANDARDIZE: 'STANDARDIZE',
   },
   langCode: 'enGB',
   ui: {

@@ -340,6 +340,7 @@ export const dictionary: RawTranslationPackage = {
     CRITBINOM: 'BINOM.CRIT',
     PEARSON: 'PEARSON',
     RSQ: 'COEFICIENTE.R2',
+    STANDARDIZE: 'NORMALIZACION',
   },
   langCode: 'esES',
   ui: {

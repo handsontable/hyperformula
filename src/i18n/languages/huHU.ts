@@ -340,6 +340,7 @@ const dictionary: RawTranslationPackage = {
     CRITBINOM: 'KRITBINOM',
     PEARSON: 'PEARSON',
     RSQ: 'RNÉGYZET',
+    STANDARDIZE: 'NORMALIZÁLÁS',
   },
   langCode: 'huHU',
   ui: {

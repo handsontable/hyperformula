@@ -340,6 +340,7 @@ const dictionary: RawTranslationPackage = {
     CRITBINOM: 'CRIT.BINOM',
     PEARSON: 'PEARSON',
     RSQ: 'RQUAD',
+    STANDARDIZE: 'PADRONIZAR',
   },
   langCode: 'ptPT',
   ui: {

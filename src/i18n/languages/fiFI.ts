@@ -340,6 +340,7 @@ const dictionary: RawTranslationPackage = {
     CRITBINOM: 'BINOMIJAKAUMA.KRIT',
     PEARSON: 'PEARSON',
     RSQ: 'PEARSON.NELIÖ',
+    STANDARDIZE: 'NORMITA',
   },
   langCode: 'fiFI',
   ui: {

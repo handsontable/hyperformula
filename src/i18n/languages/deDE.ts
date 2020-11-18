@@ -340,6 +340,7 @@ const dictionary: RawTranslationPackage = {
     CRITBINOM: 'KRITBINOM',
     PEARSON: 'PEARSON',
     RSQ: 'BESTIMMTHEITSMASS',
+    STANDARDIZE: 'STANDARDISIERUNG',
   },
   langCode: 'deDE',
   ui: {
