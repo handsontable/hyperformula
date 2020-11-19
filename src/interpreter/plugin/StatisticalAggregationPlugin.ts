@@ -7,7 +7,7 @@ import {CellError, ErrorType, InternalScalarValue, SimpleCellAddress} from '../.
 import {ErrorMessage} from '../../error-message'
 import {ProcedureAst} from '../../parser'
 import {InterpreterValue, SimpleRangeValue} from '../InterpreterValue'
-import {corrcoeff, covariance, geomean} from './3rdparty/jstat/jstat'
+import {corrcoeff, covariance, geomean, mean, normal, stdev} from './3rdparty/jstat/jstat'
 import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
 
 export class StatisticalAggregationPlugin extends  FunctionPlugin {
@@ -229,6 +229,27 @@ export class StatisticalAggregationPlugin extends  FunctionPlugin {
       }
       return covariance(ret[0], ret[1])
     })
+  }
+
+  public ztest(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('Z.TEST'),
+      (range: SimpleRangeValue, x: number, sigma?: number) => {
+        const vals = this.interpreter.arithmeticHelper.manyToExactNumbers(range.valuesFromTopLeftCorner())
+        if(vals instanceof CellError) {
+          return vals
+        }
+        if(sigma === undefined) {
+          if (vals.length < 2) {
+            return new CellError(ErrorType.DIV_BY_ZERO)
+          }
+          sigma = stdev(vals, true)
+        }
+        if(vals.length<1) {
+          return new CellError(ErrorType.NA, ErrorMessage.OneValue)
+        }
+        return 1 - normal.cdf((mean(vals)-x)/(sigma/Math.sqrt(vals.length)), 0, 1)
+      }
+    )
   }
 }
 

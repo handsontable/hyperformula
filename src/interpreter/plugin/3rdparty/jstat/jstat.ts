@@ -859,7 +859,7 @@ function sum(arr: number[]): number {
   return sum;
 };
 
-function mean(arr: number[]): number {
+export function mean(arr: number[]): number {
   return sum(arr) / arr.length;
 };
 
@@ -879,7 +879,7 @@ function variance(arr: number[], flag: any) {
   return sumsqerr(arr) / (arr.length - (flag ? 1 : 0));
 }
 
-function stdev(arr: number[], flag: any) {
+export function stdev(arr: number[], flag: any) {
   return Math.sqrt(variance(arr, flag));
 }
 
