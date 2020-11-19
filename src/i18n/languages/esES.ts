@@ -343,6 +343,8 @@ export const dictionary: RawTranslationPackage = {
     STANDARDIZE: 'NORMALIZACION',
     'Z.TEST': 'PRUEBA.Z.N',
     ZTEST: 'PRUEBA.Z',
+    'F.TEST': 'PRUEBA.F.N',
+    FTEST: 'PRUEBA.F',
   },
   langCode: 'esES',
   ui: {

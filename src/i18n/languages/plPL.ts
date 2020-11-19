@@ -343,6 +343,8 @@ const dictionary: RawTranslationPackage = {
     STANDARDIZE: 'NORMALIZUJ',
     'Z.TEST': 'Z.TEST',
     ZTEST: 'TEST.Z',
+    'F.TEST': 'F.TEST',
+    FTEST: 'TEST.F',
   },
   langCode: 'plPL',
   ui: {

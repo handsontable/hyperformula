@@ -305,6 +305,8 @@ lets you design your own [custom functions](custom-functions).
 | F.INV.RT | Statistical | Returns inverse of F right-side distribution. | F.INV.RT(P; Degree1; Degree2) |
 | FISHER | Statistical | Returns Fisher transformation value. | FISHER(Number) |
 | FISHERINV | Statistical | Returns inverse Fischer transformation value. | FISHERINV(Number) |
+| F.TEST | Statistical | Returns f-test value for a dataset. | Z.TEST(Array1; Array2) |
+| FTEST | Statistical | Returns f-test value for a dataset. | ZTEST(Array1; Array2) |
 | GAMMA | Statistical | Returns value of Gamma function. | GAMMA(Number) |
 | GAMMA.DIST | Statistical | Returns density of Gamma distribution. | GAMMA.DIST(Number1; Number2; Number3; Boolean) |
 | GAMMADIST | Statistical | Returns density of Gamma distribution. | GAMMADIST(Number1; Number2; Number3; Boolean) |

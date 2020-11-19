@@ -7,7 +7,7 @@ import {CellError, ErrorType, InternalScalarValue, SimpleCellAddress} from '../.
 import {ErrorMessage} from '../../error-message'
 import {ProcedureAst} from '../../parser'
 import {InterpreterValue, SimpleRangeValue} from '../InterpreterValue'
-import {corrcoeff, covariance, geomean, mean, normal, stdev} from './3rdparty/jstat/jstat'
+import {centralF, corrcoeff, covariance, geomean, mean, normal, stdev, sumsqerr, variance} from './3rdparty/jstat/jstat'
 import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
 
 export class StatisticalAggregationPlugin extends  FunctionPlugin {
@@ -98,6 +98,20 @@ export class StatisticalAggregationPlugin extends  FunctionPlugin {
         {argumentType: ArgumentTypes.NUMBER, optionalArg: true},
       ],
     },
+    'F.TEST': {
+      method: 'ftest',
+      parameters: [
+        {argumentType: ArgumentTypes.RANGE},
+        {argumentType: ArgumentTypes.RANGE},
+      ],
+    },
+    'FTEST': {
+      method: 'ftest',
+      parameters: [
+        {argumentType: ArgumentTypes.RANGE},
+        {argumentType: ArgumentTypes.RANGE},
+      ],
+    },
   }
 
   public avedev(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
@@ -110,7 +124,7 @@ export class StatisticalAggregationPlugin extends  FunctionPlugin {
         if(coerced.length===0) {
           return new CellError(ErrorType.DIV_BY_ZERO)
         }
-        const avg = (coerced.reduce((a, b) => a+b, 0))/coerced.length
+        const avg = mean(coerced)
         return coerced.reduce((a, b) => a + Math.abs(b-avg), 0)/coerced.length
       })
   }
@@ -125,8 +139,7 @@ export class StatisticalAggregationPlugin extends  FunctionPlugin {
         if(coerced.length===0) {
           return 0
         }
-        const avg = (coerced.reduce((a, b) => a+b, 0))/coerced.length
-        return coerced.reduce((a, b) => a + Math.pow(b-avg, 2), 0)
+        return sumsqerr(coerced)
       })
   }
 
@@ -169,51 +182,53 @@ export class StatisticalAggregationPlugin extends  FunctionPlugin {
   }
 
   public correl(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('CORREL'), (dataX: SimpleRangeValue, dataY: SimpleRangeValue) => {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('CORREL'),
+      (dataX: SimpleRangeValue, dataY: SimpleRangeValue) => {
       if (dataX.numberOfElements() !== dataY.numberOfElements()) {
         return new CellError(ErrorType.NA, ErrorMessage.EqualLength)
-      }
-
-      if (dataX.numberOfElements() <= 1) {
-        return new CellError(ErrorType.DIV_BY_ZERO, ErrorMessage.TwoValues)
       }
       const ret = parseTwoArrays(dataX, dataY)
       if(ret instanceof CellError) {
         return ret
+      }
+      if (ret[0].length <= 1) {
+        return new CellError(ErrorType.DIV_BY_ZERO, ErrorMessage.TwoValues)
       }
       return corrcoeff(ret[0], ret[1])
     })
   }
 
   public rsq(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('RSQ'), (dataX: SimpleRangeValue, dataY: SimpleRangeValue) => {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('RSQ'),
+      (dataX: SimpleRangeValue, dataY: SimpleRangeValue) => {
       if (dataX.numberOfElements() !== dataY.numberOfElements()) {
         return new CellError(ErrorType.NA, ErrorMessage.EqualLength)
       }
 
-      if (dataX.numberOfElements() <= 1) {
-        return new CellError(ErrorType.DIV_BY_ZERO, ErrorMessage.TwoValues)
-      }
       const ret = parseTwoArrays(dataX, dataY)
       if(ret instanceof CellError) {
         return ret
+      }
+      if (ret[0].length <= 1) {
+        return new CellError(ErrorType.DIV_BY_ZERO, ErrorMessage.TwoValues)
       }
       return Math.pow(corrcoeff(ret[0], ret[1]), 2)
     })
   }
 
   public covariancep(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('COVARIANCE.P'), (dataX: SimpleRangeValue, dataY: SimpleRangeValue) => {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('COVARIANCE.P'),
+      (dataX: SimpleRangeValue, dataY: SimpleRangeValue) => {
       if (dataX.numberOfElements() !== dataY.numberOfElements()) {
         return new CellError(ErrorType.NA, ErrorMessage.EqualLength)
       }
 
-      if (dataX.numberOfElements() <= 1) {
-        return new CellError(ErrorType.DIV_BY_ZERO, ErrorMessage.TwoValues)
-      }
       const ret = parseTwoArrays(dataX, dataY)
       if(ret instanceof CellError) {
         return ret
+      }
+      if (ret[0].length < 1) {
+        return new CellError(ErrorType.DIV_BY_ZERO, ErrorMessage.TwoValues)
       }
       if(ret[0].length === 1) {
         return 0
@@ -223,17 +238,18 @@ export class StatisticalAggregationPlugin extends  FunctionPlugin {
   }
 
   public covariances(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('COVARIANCE.S'), (dataX: SimpleRangeValue, dataY: SimpleRangeValue) => {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('COVARIANCE.S'),
+      (dataX: SimpleRangeValue, dataY: SimpleRangeValue) => {
       if (dataX.numberOfElements() !== dataY.numberOfElements()) {
         return new CellError(ErrorType.NA, ErrorMessage.EqualLength)
       }
 
-      if (dataX.numberOfElements() <= 1) {
-        return new CellError(ErrorType.DIV_BY_ZERO, ErrorMessage.TwoValues)
-      }
       const ret = parseTwoArrays(dataX, dataY)
       if(ret instanceof CellError) {
         return ret
+      }
+      if (ret[0].length <= 1) {
+        return new CellError(ErrorType.DIV_BY_ZERO, ErrorMessage.TwoValues)
       }
       return covariance(ret[0], ret[1])
     })
@@ -261,6 +277,26 @@ export class StatisticalAggregationPlugin extends  FunctionPlugin {
         return 1 - normal.cdf((mean(vals)-x)/(sigma/Math.sqrt(vals.length)), 0, 1)
       }
     )
+  }
+
+  public ftest(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('F.TEST'),
+      (dataX: SimpleRangeValue, dataY: SimpleRangeValue) => {
+        const arrX = this.interpreter.arithmeticHelper.manyToExactNumbers(dataX.valuesFromTopLeftCorner())
+        const arrY = this.interpreter.arithmeticHelper.manyToExactNumbers(dataY.valuesFromTopLeftCorner())
+        if(arrX instanceof CellError) {
+          return arrX
+        }
+        if(arrY instanceof CellError) {
+          return arrY
+        }
+        if(arrX.length<=1 || arrY.length<=1) {
+          return new CellError(ErrorType.DIV_BY_ZERO)
+        }
+        const r = variance(arrX,true)/variance(arrY, true)
+        const v = centralF.cdf(r, arrX.length-1, arrY.length-1)
+        return 2*Math.min(v, 1-v)
+    })
   }
 }
 

@@ -343,6 +343,8 @@ const dictionary: RawTranslationPackage = {
     STANDARDIZE: 'CENTREE.REDUITE',
     'Z.TEST': 'Z.TEST',
     ZTEST: 'TEST.Z',
+    'F.TEST': 'F.TEST',
+    FTEST: 'TEST.F',
   },
   langCode: 'frFR',
   ui: {

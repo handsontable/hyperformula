@@ -343,6 +343,8 @@ const dictionary: RawTranslationPackage = {
     STANDARDIZE: 'NORMALIZÁLÁS',
     'Z.TEST': 'Z.PRÓB',
     ZTEST: 'Z.PRÓBA',
+    'F.TEST': 'F.PRÓB',
+    FTEST: 'F.PRÓBA',
   },
   langCode: 'huHU',
   ui: {

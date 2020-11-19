@@ -863,7 +863,7 @@ export function mean(arr: number[]): number {
   return sum(arr) / arr.length;
 };
 
-function sumsqerr(arr: number[]): number {
+export function sumsqerr(arr: number[]): number {
   var meanv = mean(arr);
   var sum = 0;
   var i = arr.length;
@@ -875,7 +875,7 @@ function sumsqerr(arr: number[]): number {
   return sum;
 };
 
-function variance(arr: number[], flag: any) {
+export function variance(arr: number[], flag: any) {
   return sumsqerr(arr) / (arr.length - (flag ? 1 : 0));
 }
 

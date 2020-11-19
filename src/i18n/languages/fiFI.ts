@@ -343,6 +343,8 @@ const dictionary: RawTranslationPackage = {
     STANDARDIZE: 'NORMITA',
     'Z.TEST': 'Z.TESTI',
     ZTEST: 'ZTESTI',
+    'F.TEST': 'F.TESTI',
+    FTEST: 'FTESTI',
   },
   langCode: 'fiFI',
   ui: {

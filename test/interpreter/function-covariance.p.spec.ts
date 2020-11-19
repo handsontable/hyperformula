@@ -39,23 +39,12 @@ describe('COVARIANCE.P', () => {
       ['7', '6'],
       ['1', '1'],
       ['8', '5'],
-      ['=COVARIANCE.P(A1:A5, B1:B5)']
+      ['=COVARIANCE.P(A1:A5, B1:B5)'],
+      ['=COVARIANCE.P(1,1)'],
     ])
 
     expect(engine.getCellValue(adr('A6'))).toBeCloseTo(3.72)
-  })
-
-  it('error when not enough data',  () => {
-    const engine = HyperFormula.buildFromArray([
-      ['1', '10'],
-      ['=COVARIANCE.P(A1:A1, B1:B1)'],
-      ['=COVARIANCE.P(42, 43)'],
-      ['=COVARIANCE.P("foo", "bar")'],
-    ])
-
-    expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.DIV_BY_ZERO, ErrorMessage.TwoValues))
-    expect(engine.getCellValue(adr('A3'))).toEqualError(detailedError(ErrorType.DIV_BY_ZERO, ErrorMessage.TwoValues))
-    expect(engine.getCellValue(adr('A4'))).toEqualError(detailedError(ErrorType.DIV_BY_ZERO, ErrorMessage.TwoValues))
+    expect(engine.getCellValue(adr('A6'))).toEqual(0)
   })
 
   it('doesnt do coercions, nonnumeric values are skipped',  () => {
