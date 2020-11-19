@@ -342,6 +342,7 @@ const dictionary: RawTranslationPackage = {
     RSQ: 'R.KWADRAAT',
     STANDARDIZE: 'NORMALISEREN',
     'Z.TEST': 'Z.TEST',
+    ZTEST: 'Z.TOETS',
   },
   langCode: 'nlNL',
   ui: {

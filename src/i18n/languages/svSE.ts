@@ -342,6 +342,7 @@ const dictionary: RawTranslationPackage = {
     RSQ: 'RKV',
     STANDARDIZE: 'STANDARDISERA',
     'Z.TEST': 'Z.TEST',
+    ZTEST: 'ZTEST',
   },
   langCode: 'svSE',
   ui: {

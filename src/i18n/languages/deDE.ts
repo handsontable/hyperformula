@@ -342,6 +342,7 @@ const dictionary: RawTranslationPackage = {
     RSQ: 'BESTIMMTHEITSMASS',
     STANDARDIZE: 'STANDARDISIERUNG',
     'Z.TEST': 'G.TEST',
+    ZTEST: 'GTEST',
   },
   langCode: 'deDE',
   ui: {

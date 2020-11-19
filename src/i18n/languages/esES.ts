@@ -342,6 +342,7 @@ export const dictionary: RawTranslationPackage = {
     RSQ: 'COEFICIENTE.R2',
     STANDARDIZE: 'NORMALIZACION',
     'Z.TEST': 'PRUEBA.Z.N',
+    ZTEST: 'PRUEBA.Z',
   },
   langCode: 'esES',
   ui: {

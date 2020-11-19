@@ -342,6 +342,7 @@ const dictionary: RawTranslationPackage = {
     RSQ: 'RNÉGYZET',
     STANDARDIZE: 'NORMALIZÁLÁS',
     'Z.TEST': 'Z.PRÓB',
+    ZTEST: 'Z.PRÓBA',
   },
   langCode: 'huHU',
   ui: {

@@ -342,6 +342,7 @@ const dictionary: RawTranslationPackage = {
     RSQ: 'КВПИРСОН',
     STANDARDIZE: 'НОРМАЛИЗАЦИЯ',
     'Z.TEST': 'Z.ТЕСТ',
+    ZTEST: 'ZТЕСТ',
   },
   langCode: 'ruRU',
   ui: {

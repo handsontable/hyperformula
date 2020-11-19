@@ -342,6 +342,7 @@ const dictionary: RawTranslationPackage = {
     RSQ: 'FORKLARINGSGRAD',
     STANDARDIZE: 'STANDARDISER',
     'Z.TEST': 'Z.TEST',
+    ZTEST: 'ZTEST',
   },
   langCode: 'daDK',
   ui: {

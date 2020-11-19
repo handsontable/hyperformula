@@ -342,6 +342,7 @@ const dictionary: RawTranslationPackage = {
     RSQ: 'RQ',
     STANDARDIZE: 'NORMALIZZA',
     'Z.TEST': 'TESTZ',
+    ZTEST: 'TEST.Z',
   },
   langCode: 'itIT',
   ui: {

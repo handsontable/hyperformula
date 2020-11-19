@@ -342,6 +342,7 @@ const dictionary: RawTranslationPackage = {
     RSQ: 'RKVADRAT',
     STANDARDIZE: 'NORMALISER',
     'Z.TEST': 'Z.TEST',
+    ZTEST: 'ZTEST',
   },
   langCode: 'nbNO',
   ui: {

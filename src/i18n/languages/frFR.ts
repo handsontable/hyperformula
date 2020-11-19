@@ -342,6 +342,7 @@ const dictionary: RawTranslationPackage = {
     RSQ: 'COEFFICIENT.DETERMINATION',
     STANDARDIZE: 'CENTREE.REDUITE',
     'Z.TEST': 'Z.TEST',
+    ZTEST: 'TEST.Z',
   },
   langCode: 'frFR',
   ui: {
