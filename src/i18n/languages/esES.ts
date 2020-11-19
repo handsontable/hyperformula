@@ -341,6 +341,7 @@ export const dictionary: RawTranslationPackage = {
     PEARSON: 'PEARSON',
     RSQ: 'COEFICIENTE.R2',
     STANDARDIZE: 'NORMALIZACION',
+    'Z.TEST': 'PRUEBA.Z.N',
   },
   langCode: 'esES',
   ui: {

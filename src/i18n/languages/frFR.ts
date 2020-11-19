@@ -341,6 +341,7 @@ const dictionary: RawTranslationPackage = {
     PEARSON: 'PEARSON',
     RSQ: 'COEFFICIENT.DETERMINATION',
     STANDARDIZE: 'CENTREE.REDUITE',
+    'Z.TEST': 'Z.TEST',
   },
   langCode: 'frFR',
   ui: {

@@ -341,6 +341,7 @@ const dictionary: RawTranslationPackage = {
     PEARSON: 'PEARSON',
     RSQ: 'BESTIMMTHEITSMASS',
     STANDARDIZE: 'STANDARDISIERUNG',
+    'Z.TEST': 'G.TEST',
   },
   langCode: 'deDE',
   ui: {

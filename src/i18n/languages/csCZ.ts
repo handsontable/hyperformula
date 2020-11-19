@@ -341,6 +341,7 @@ const dictionary: RawTranslationPackage = {
     PEARSON: 'PEARSON',
     RSQ: 'RKQ',
     STANDARDIZE: 'STANDARDIZE',
+    'Z.TEST': 'Z.TEST',
   },
   langCode: 'csCZ',
   ui: {

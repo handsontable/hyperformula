@@ -341,6 +341,7 @@ const dictionary: RawTranslationPackage = {
     PEARSON: 'PEARSON',
     RSQ: 'PEARSON.NELIÖ',
     STANDARDIZE: 'NORMITA',
+    'Z.TEST': 'Z.TESTI',
   },
   langCode: 'fiFI',
   ui: {
