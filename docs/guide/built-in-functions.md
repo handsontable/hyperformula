@@ -365,6 +365,8 @@ lets you design your own [custom functions](custom-functions).
 | VAR.S <br><Badge text="v0.3.0"/>| Statistical | Returns variance of a sample. | VAR.S(Value1; Value2; ... Value30) |
 | WEIBULL | Statistical | Returns density of Weibull distribution. | WEIBULL(Number1; Number2; Number3; Boolean) |
 | WEIBULL.DIST | Statistical | Returns density of Weibull distribution. | WEIBULL.DIST(Number1; Number2; Number3; Boolean) |
+| Z.TEST | Statistical | Returns z-test value for a dataset. | Z.TEST(Array; X[; Sigma]) |
+| ZTEST | Statistical | Returns z-test value for a dataset. | ZTEST(Array; X[; Sigma]) |
 | CHAR | Text | Converts a number into a character according to the current code table. | CHAR(Number) |
 | CLEAN <br><Badge text="v0.2.0"/>| Text | Returns text that has been "cleaned" of line breaks and other non-printable characters. | CLEAN("Text") |
 | CODE | Text | Returns a numeric code for the first character in a text string. | CODE("Text") |

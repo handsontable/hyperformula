@@ -240,12 +240,15 @@ export class StatisticalAggregationPlugin extends  FunctionPlugin {
         }
         if(sigma === undefined) {
           if (vals.length < 2) {
-            return new CellError(ErrorType.DIV_BY_ZERO)
+            return new CellError(ErrorType.DIV_BY_ZERO, ErrorMessage.TwoValues)
           }
           sigma = stdev(vals, true)
         }
         if(vals.length<1) {
           return new CellError(ErrorType.NA, ErrorMessage.OneValue)
+        }
+        if(sigma===0) {
+          return new CellError(ErrorType.DIV_BY_ZERO)
         }
         return 1 - normal.cdf((mean(vals)-x)/(sigma/Math.sqrt(vals.length)), 0, 1)
       }
