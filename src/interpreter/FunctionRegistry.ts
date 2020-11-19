@@ -9,8 +9,6 @@ import {Maybe} from '../Maybe'
 import {Config} from '../Config'
 import {
   AliasAlreadyExisting,
-  AliasEmpty,
-  AliasTargetEmpty,
   FunctionPluginValidationError,
   ProtectedFunctionError
 } from '../errors'

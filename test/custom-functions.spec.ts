@@ -10,7 +10,6 @@ import {plPL} from '../src/i18n/languages'
 import {VersionPlugin} from '../src/interpreter/plugin/VersionPlugin'
 import {
   AliasAlreadyExisting,
-  AliasTargetEmpty,
   ProtectedFunctionError,
   ProtectedFunctionTranslationError
 } from '../src/errors'
