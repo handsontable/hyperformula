@@ -104,59 +104,28 @@ describe('Function aliases', () => {
   it('VARP should be an alias of VAR.P', () => {
     expect(HyperFormula.buildEmpty().getFunctionPlugin('VARP')!.aliases!['VARP']).toEqual('VAR.P')
   })
-})
 
-
-describe('Function CONFIDENCE', () => {
-  it('should be an alias of CONFIDENCE.NORM', () => {
-    const engine = HyperFormula.buildEmpty()
-    const metadata1 = engine.getFunctionPlugin('CONFIDENCE')?.implementedFunctions!['CONFIDENCE']
-    const metadata2 = engine.getFunctionPlugin('CONFIDENCE.NORM')?.implementedFunctions!['CONFIDENCE.NORM']
-    expect(metadata1).toEqual(metadata2)
+  it('CONFIDENCE should be an alias of CONFIDENCE.NORM', () => {
+    expect(HyperFormula.buildEmpty().getFunctionPlugin('CONFIDENCE')!.aliases!['CONFIDENCE']).toEqual('CONFIDENCE.NORM')
   })
-})
 
-describe('Function COVAR', () => {
-  it('should be an alias of COVARIANCE.P', () => {
-    const engine = HyperFormula.buildEmpty()
-    const metadata1 = engine.getFunctionPlugin('COVAR')?.implementedFunctions!['COVAR']
-    const metadata2 = engine.getFunctionPlugin('COVARIANCE.P')?.implementedFunctions!['COVARIANCE.P']
-    expect(metadata1).toEqual(metadata2)
+  it('COVAR should be an alias of COVARIANCE.P', () => {
+    expect(HyperFormula.buildEmpty().getFunctionPlugin('COVAR')!.aliases!['COVAR']).toEqual('COVARIANCE.P')
   })
-})
 
-describe('Function CRITBINOM', () => {
-  it('should be an alias of BINOM.INV', () => {
-    const engine = HyperFormula.buildEmpty()
-    const metadata1 = engine.getFunctionPlugin('CRITBINOM')?.implementedFunctions!['CRITBINOM']
-    const metadata2 = engine.getFunctionPlugin('BINOM.INV')?.implementedFunctions!['BINOM.INV']
-    expect(metadata1).toEqual(metadata2)
+  it('CRITBINOM should be an alias of BINOM.INV', () => {
+    expect(HyperFormula.buildEmpty().getFunctionPlugin('CRITBINOM')!.aliases!['CRITBINOM']).toEqual('BINOM.INV')
   })
-})
 
-describe('Function FTEST', () => {
-  it('should be an alias of F.TEST', () => {
-    const engine = HyperFormula.buildEmpty()
-    const metadata1 = engine.getFunctionPlugin('FTEST')?.implementedFunctions!['FTEST']
-    const metadata2 = engine.getFunctionPlugin('F.TEST')?.implementedFunctions!['F.TEST']
-    expect(metadata1).toEqual(metadata2)
+  it('FTEST should be an alias of F.TEST', () => {
+    expect(HyperFormula.buildEmpty().getFunctionPlugin('FTEST')!.aliases!['FTEST']).toEqual('F.TEST')
   })
-})
 
-describe('Function PEARSON', () => {
-  it('should be an alias of CORREL', () => {
-    const engine = HyperFormula.buildEmpty()
-    const metadata1 = engine.getFunctionPlugin('PEARSON')?.implementedFunctions!['PEARSON']
-    const metadata2 = engine.getFunctionPlugin('CORREL')?.implementedFunctions!['CORREL']
-    expect(metadata1).toEqual(metadata2)
+  it('PEARSON should be an alias of CORREL', () => {
+    expect(HyperFormula.buildEmpty().getFunctionPlugin('PEARSON')!.aliases!['PEARSON']).toEqual('CORREL')
   })
-})
 
-describe('Function ZTEST', () => {
-  it('should be an alias of Z.TEST', () => {
-    const engine = HyperFormula.buildEmpty()
-    const metadata1 = engine.getFunctionPlugin('ZTEST')?.implementedFunctions!['ZTEST']
-    const metadata2 = engine.getFunctionPlugin('Z.TEST')?.implementedFunctions!['Z.TEST']
-    expect(metadata1).toEqual(metadata2)
+  it('ZTEST should be an alias of Z.TEST', () => {
+    expect(HyperFormula.buildEmpty().getFunctionPlugin('ZTEST')!.aliases!['ZTEST']).toEqual('Z.TEST')
   })
 })
