@@ -285,7 +285,6 @@ lets you design your own [custom functions](custom-functions).
 | CONFIDENCE.NORM | Statistical | Returns upper confidence bound for normal distribution. | CONFIDENCE.NORM(Alpha; Stdev; Size) |
 | CONFIDENCE.T | Statistical | Returns upper confidence bound for T distribution. | CONFIDENCE.T(Alpha; Stdev; Size) |
 | CORREL | Statistical | Returns the correlation coefficient between two data sets. | CORREL(Data1; Data2) |
-| CRITBINOM | Statistical | Returns inverse binomial distribution value. | CRITBINOM(Number1; Number2; Number3) |
 | COUNT | Statistical | Counts how many numbers are in the list of arguments. | COUNT(Value1; Value2; ... Value30) |
 | COUNTA | Statistical | Counts how many values are in the list of arguments. | COUNTA(Value1; Value2; ... Value30) |
 | COUNTBLANK | Statistical | Returns the number of empty cells. | COUNTBLANK(Range) |
@@ -294,6 +293,7 @@ lets you design your own [custom functions](custom-functions).
 | COVAR | Statistical | Returns the covariance between two data sets, population normalized. | COVAR(Data1; Data2) |
 | COVARIANCE.P | Statistical | Returns the covariance between two data sets, population normalized. | COVARIANCE.P(Data1; Data2) |
 | COVARIANCE.S | Statistical | Returns the covariance between two data sets, sample normalized. | COVARIANCE.S(Data1; Data2) |
+| CRITBINOM | Statistical | Returns inverse binomial distribution value. | CRITBINOM(Number1; Number2; Number3) |
 | DEVSQ | Statistical | Returns sum of squared deviations. | DEVSQ(Number1; Number2; ...Number30) |
 | EXPON.DIST | Statistical | Returns density of a exponential distribution. | EXPON.DIST(Number1; Number2; Boolean) |
 | EXPONDIST | Statistical | Returns density of a exponential distribution. | EXPONDIST(Number1; Number2; Boolean) |
@@ -344,6 +344,7 @@ lets you design your own [custom functions](custom-functions).
 | POISSON | Statistical | Returns density of Poisson distribution. | POISSON(X; Mean; Mode) |
 | POISSON.DIST | Statistical | Returns density of Poisson distribution. | POISSON.DIST(X; Mean; Mode) |
 | RSQ | Statistical | Returns the squared correlation coefficient between two data sets. | RSQ(Data1; Data2) |
+| SLOPE | Statistical | Returns the slope of a linear regression line. | SLOPE(Array1; Array2) |
 | SMALL | Statistical | Returns k-th smallest value in a range. | SMALL(Range; K) |
 | STANDARDIZE | Statistical | Returns normalized value wrt expected value and standard deviation. | STANDARDIZE(X; Mean; Stddev) |
 | STDEV <br><Badge text="v0.3.0"/>| Statistical | Returns standard deviation of a sample. | STDEV(Value1; Value2; ... Value30) |
