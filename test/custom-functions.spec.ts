@@ -8,7 +8,11 @@ import {SumifPlugin} from '../src/interpreter/plugin/SumifPlugin'
 import {NumericAggregationPlugin} from '../src/interpreter/plugin/NumericAggregationPlugin'
 import {plPL} from '../src/i18n/languages'
 import {VersionPlugin} from '../src/interpreter/plugin/VersionPlugin'
-import {ProtectedFunctionError, ProtectedFunctionTranslationError} from '../src/errors'
+import {
+  AliasAlreadyExisting,
+  ProtectedFunctionError,
+  ProtectedFunctionTranslationError
+} from '../src/errors'
 
 class FooPlugin extends FunctionPlugin {
   public static implementedFunctions = {
@@ -47,6 +51,10 @@ class SumWithExtra extends FunctionPlugin {
     }
   }
 
+  public static aliases = {
+    'SUMALIAS': 'SUM',
+  }
+
   public sum(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     const left = this.evaluateAst(ast.args[0], formulaAddress) as number
     const right = this.evaluateAst(ast.args[1], formulaAddress) as number
@@ -63,6 +71,34 @@ class InvalidPlugin extends FunctionPlugin {
 
   public bar(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return 'bar'
+  }
+}
+
+
+class EmptyAliasPlugin extends FunctionPlugin {
+  public static implementedFunctions = {
+    'FOO': {
+      method: 'foo',
+    }
+  }
+
+  public static aliases = {
+    'FOOALIAS': 'BAR',
+  }
+}
+
+class OverloadedAliasPlugin extends FunctionPlugin {
+  public static implementedFunctions = {
+    'FOO': {
+      method: 'foo',
+    },
+    'BAR': {
+      method: 'foo',
+    }
+  }
+
+  public static aliases = {
+    'FOO': 'BAR',
   }
 }
 
@@ -136,6 +172,16 @@ describe('Register static custom plugin', () => {
     HyperFormula.registerFunction('SUM', SumWithExtra)
     const engine = HyperFormula.buildFromArray([
       ['=SUM(1, 2)', '=MAX(1, 2)']
+    ])
+
+    expect(engine.getCellValue(adr('A1'))).toEqual(45)
+    expect(engine.getCellValue(adr('B1'))).toEqual(2)
+  })
+
+  it('should allow to register only alias', () => {
+    HyperFormula.registerFunction('SUMALIAS', SumWithExtra, {'enGB': {'SUMALIAS': 'SUMALIAS'}})
+    const engine = HyperFormula.buildFromArray([
+      ['=SUMALIAS(1, 2)', '=MAX(1, 2)']
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqual(45)
@@ -297,5 +343,19 @@ describe('Reserved functions', () => {
     expect(() => {
       HyperFormula.registerFunctionPlugin(FooPlugin, {'enGB': {'VERSION': 'FOOBAR'}})
     }).toThrow(new ProtectedFunctionTranslationError('VERSION'))
+  })
+})
+
+describe('aliases', () => {
+  it('should validate that alias target exists', () => {
+    expect( () => {
+      HyperFormula.registerFunctionPlugin(EmptyAliasPlugin)
+    }).toThrow(FunctionPluginValidationError.functionMethodNotFound('foo', 'EmptyAliasPlugin'))
+  })
+
+  it('should validate that alias key is available', () => {
+    expect( () => {
+      HyperFormula.registerFunctionPlugin(OverloadedAliasPlugin)
+    }).toThrow(new AliasAlreadyExisting('FOO', 'OverloadedAliasPlugin'))
   })
 })

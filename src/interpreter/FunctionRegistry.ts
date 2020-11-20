@@ -7,12 +7,31 @@ import {FunctionMetadata, FunctionPlugin, FunctionPluginDefinition} from './plug
 import {Interpreter} from './Interpreter'
 import {Maybe} from '../Maybe'
 import {Config} from '../Config'
-import {FunctionPluginValidationError, ProtectedFunctionError} from '../errors'
+import {
+  AliasAlreadyExisting,
+  FunctionPluginValidationError,
+  ProtectedFunctionError
+} from '../errors'
 import {TranslationSet} from '../i18n'
 import {HyperFormula} from '../HyperFormula'
 import {VersionPlugin} from './plugin/VersionPlugin'
 
 export type FunctionTranslationsPackage = Record<string, TranslationSet>
+
+function validateAndReturnMetadataFromName(functionId: string, plugin: FunctionPluginDefinition): FunctionMetadata {
+  let entry = plugin.implementedFunctions[functionId]
+  const key = plugin.aliases?.[functionId]
+  if(key!==undefined) {
+    if (entry !== undefined) {
+      throw new AliasAlreadyExisting(functionId, plugin.name)
+    }
+    entry = plugin.implementedFunctions[key]
+  }
+  if(entry === undefined) {
+    throw FunctionPluginValidationError.functionNotDeclaredInPlugin(functionId, plugin.name)
+  }
+  return entry
+}
 
 export class FunctionRegistry {
   public static plugins: Map<string, FunctionPluginDefinition> = new Map()
@@ -30,12 +49,8 @@ export class FunctionRegistry {
   }
 
   public static registerFunction(functionId: string, plugin: FunctionPluginDefinition, translations?: FunctionTranslationsPackage): void {
-    const entry = plugin.implementedFunctions[functionId]
-    if (entry !== undefined) {
-      this.loadPluginFunction(plugin, functionId, this.plugins)
-    } else {
-      throw FunctionPluginValidationError.functionNotDeclaredInPlugin(functionId, plugin.name)
-    }
+    validateAndReturnMetadataFromName(functionId, plugin)
+    this.loadPluginFunction(plugin, functionId, this.plugins)
     if (translations !== undefined) {
       this.loadTranslations(translations)
     }
@@ -97,6 +112,11 @@ export class FunctionRegistry {
     Object.keys(plugin.implementedFunctions).forEach((functionName) => {
       this.loadPluginFunction(plugin, functionName, registry)
     })
+    if(plugin.aliases !== undefined) {
+      Object.keys(plugin.aliases).forEach((functionName) => {
+        this.loadPluginFunction(plugin, functionName, registry)
+      })
+    }
   }
 
   private static loadPluginFunction(plugin: FunctionPluginDefinition, functionId: string, registry: Map<string, FunctionPluginDefinition>): void {
@@ -108,7 +128,7 @@ export class FunctionRegistry {
   }
 
   private static loadFunctionUnprotected(plugin: FunctionPluginDefinition, functionId: string, registry: Map<string, FunctionPluginDefinition>): void {
-    const methodName = plugin.implementedFunctions[functionId].method
+    const methodName = validateAndReturnMetadataFromName(functionId, plugin).method
     if (Object.prototype.hasOwnProperty.call(plugin.prototype, methodName)) {
       registry.set(functionId, plugin)
     } else {
@@ -158,7 +178,7 @@ export class FunctionRegistry {
     }
 
     for (const [functionId, plugin] of this.instancePlugins.entries()) {
-      this.categorizeFunction(functionId, plugin.implementedFunctions[functionId])
+      this.categorizeFunction(functionId, validateAndReturnMetadataFromName(functionId, plugin))
     }
   }
 
@@ -171,7 +191,7 @@ export class FunctionRegistry {
         pluginInstance = new plugin(interpreter)
         instances.push(pluginInstance)
       }
-      const methodName = plugin.implementedFunctions[functionId].method
+      const methodName = validateAndReturnMetadataFromName(functionId, plugin).method
       this.functions.set(functionId, [methodName, pluginInstance])
     }
   }

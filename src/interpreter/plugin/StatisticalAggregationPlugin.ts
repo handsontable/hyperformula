@@ -47,13 +47,6 @@ export class StatisticalAggregationPlugin extends  FunctionPlugin {
         {argumentType: ArgumentTypes.RANGE},
       ],
     },
-    'PEARSON': {
-      method: 'correl',
-      parameters: [
-        {argumentType: ArgumentTypes.RANGE},
-        {argumentType: ArgumentTypes.RANGE},
-      ],
-    },
     'RSQ': {
       method: 'rsq',
       parameters: [
@@ -75,13 +68,6 @@ export class StatisticalAggregationPlugin extends  FunctionPlugin {
         {argumentType: ArgumentTypes.RANGE},
       ],
     },
-    'COVAR': {
-      method: 'covariancep',
-      parameters: [
-        {argumentType: ArgumentTypes.RANGE},
-        {argumentType: ArgumentTypes.RANGE},
-      ],
-    },
     'Z.TEST': {
       method: 'ztest',
       parameters: [
@@ -90,22 +76,7 @@ export class StatisticalAggregationPlugin extends  FunctionPlugin {
         {argumentType: ArgumentTypes.NUMBER, optionalArg: true},
       ],
     },
-    'ZTEST': {
-      method: 'ztest',
-      parameters: [
-        {argumentType: ArgumentTypes.RANGE},
-        {argumentType: ArgumentTypes.NUMBER},
-        {argumentType: ArgumentTypes.NUMBER, optionalArg: true},
-      ],
-    },
     'F.TEST': {
-      method: 'ftest',
-      parameters: [
-        {argumentType: ArgumentTypes.RANGE},
-        {argumentType: ArgumentTypes.RANGE},
-      ],
-    },
-    'FTEST': {
       method: 'ftest',
       parameters: [
         {argumentType: ArgumentTypes.RANGE},
@@ -126,6 +97,12 @@ export class StatisticalAggregationPlugin extends  FunctionPlugin {
         {argumentType: ArgumentTypes.RANGE},
       ],
     },
+  }
+  public static aliases = {
+    'COVAR': 'COVARIANCE.P',
+    'FTEST': 'F.TEST',
+    'PEARSON': 'CORREL',
+    'ZTEST': 'Z.TEST',
   }
 
   public avedev(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
