@@ -74,7 +74,7 @@ export class BuildEngineFactory {
     const crudOperations = new CrudOperations(config, stats, dependencyGraph, columnSearch, parser, cellContentParser, lazilyTransformingAstService, namedExpressions)
     stats.measure(StatType.GRAPH_BUILD, () => {
       const graphBuilder = new GraphBuilder(dependencyGraph, columnSearch, parser, cellContentParser, config, stats)
-      graphBuilder.buildGraph(sheets)
+      graphBuilder.buildGraph(sheets, stats)
     })
 
     lazilyTransformingAstService.undoRedo = crudOperations.undoRedo

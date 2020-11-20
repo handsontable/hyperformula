@@ -7,7 +7,6 @@ import {absolutizeDependencies} from './absolutizeDependencies'
 import {CellError, simpleCellAddress, SimpleCellAddress} from './Cell'
 import {CellContent, CellContentParser} from './CellContentParser'
 import {CellDependency} from './CellDependency'
-import {ColumnSearchStrategy} from './Lookup/SearchStrategy'
 import {Config} from './Config'
 import {
   DependencyGraph,
@@ -18,10 +17,11 @@ import {
   Vertex
 } from './DependencyGraph'
 import {GraphBuilderMatrixHeuristic} from './GraphBuilderMatrixHeuristic'
+import {ColumnSearchStrategy} from './Lookup/SearchStrategy'
 import {checkMatrixSize} from './Matrix'
 import {ParserWithCaching, ProcedureAst} from './parser'
-import {Statistics, StatType} from './statistics'
 import {Sheets} from './Sheet'
+import {Statistics, StatType} from './statistics'
 
 export type Dependencies = Map<Vertex, CellDependency[]>
 
@@ -60,9 +60,9 @@ export class GraphBuilder {
    *
    * @param sheet - two-dimensional array representation of sheet
    */
-  public buildGraph(sheets: Sheets) {
-    const dependencies = this.buildStrategy.run(sheets)
-    this.processDependencies(dependencies)
+  public buildGraph(sheets: Sheets, stats: Statistics) {
+    const dependencies = stats.measure(StatType.COLLECT_DEPENDENCIES, () => this.buildStrategy.run(sheets))
+    stats.measure(StatType.PROCESS_DEPENDENCIES, () => this.processDependencies(dependencies))
   }
 
   private processDependencies(dependencies: Dependencies) {
