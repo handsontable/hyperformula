@@ -119,6 +119,13 @@ export class StatisticalAggregationPlugin extends  FunctionPlugin {
         {argumentType: ArgumentTypes.RANGE},
       ],
     },
+    'SLOPE': {
+      method: 'slope',
+      parameters: [
+        {argumentType: ArgumentTypes.RANGE},
+        {argumentType: ArgumentTypes.RANGE},
+      ],
+    },
   }
 
   public avedev(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
@@ -318,9 +325,27 @@ export class StatisticalAggregationPlugin extends  FunctionPlugin {
           return ret
         }
         if (ret[0].length <= 2) {
-          return new CellError(ErrorType.DIV_BY_ZERO, ErrorMessage.TwoValues)
+          return new CellError(ErrorType.DIV_BY_ZERO, ErrorMessage.ThreeValues)
         }
         return Math.sqrt((sumsqerr(ret[0]) - Math.pow(covariance(ret[0], ret[1])*(ret[0].length-1), 2)/sumsqerr(ret[1]))/(ret[0].length-2))
+      })
+  }
+
+  public slope(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('SLOPE'),
+      (dataX: SimpleRangeValue, dataY: SimpleRangeValue) => {
+        if (dataX.numberOfElements() !== dataY.numberOfElements()) {
+          return new CellError(ErrorType.NA, ErrorMessage.EqualLength)
+        }
+
+        const ret = parseTwoArrays(dataX, dataY)
+        if(ret instanceof CellError) {
+          return ret
+        }
+        if (ret[0].length <= 1) {
+          return new CellError(ErrorType.DIV_BY_ZERO, ErrorMessage.TwoValues)
+        }
+        return covariance(ret[0], ret[1])*(ret[0].length-1)/sumsqerr(ret[1])
       })
   }
 }
