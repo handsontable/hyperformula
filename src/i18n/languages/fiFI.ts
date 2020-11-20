@@ -347,6 +347,9 @@ const dictionary: RawTranslationPackage = {
     FTEST: 'FTESTI',
     STEYX: 'KESKIVIRHE',
     SLOPE: 'KULMAKERROIN',
+    COVAR: 'KOVARIANSSI',
+    'COVARIANCE.P': 'KOVARIANSSI.P',
+    'COVARIANCE.S': 'KOVARIANSSI.S',
   },
   langCode: 'fiFI',
   ui: {

@@ -347,6 +347,9 @@ const dictionary: RawTranslationPackage = {
     FTEST: 'F.TOETS',
     STEYX: 'STAND.FOUT.YX',
     SLOPE: 'RICHTING',
+    COVAR: 'COVARIANTIE',
+    'COVARIANCE.P': 'COVARIANTIE.P',
+    'COVARIANCE.S': 'COVARIANTIE.S',
   },
   langCode: 'nlNL',
   ui: {

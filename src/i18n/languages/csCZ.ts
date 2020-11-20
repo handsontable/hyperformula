@@ -347,6 +347,9 @@ const dictionary: RawTranslationPackage = {
     FTEST: 'FTEST',
     STEYX: 'STEYX',
     SLOPE: 'SLOPE',
+    COVAR: 'COVAR',
+    'COVARIANCE.P': 'COVARIANCE.P',
+    'COVARIANCE.S': 'COVARIANCE.S',
   },
   langCode: 'csCZ',
   ui: {

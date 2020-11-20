@@ -347,6 +347,9 @@ const dictionary: RawTranslationPackage = {
     FTEST: 'F.PRÓBA',
     STEYX: 'STHIBAYX',
     SLOPE: 'MEREDEKSÉG',
+    COVAR: 'KOVAR',
+    'COVARIANCE.P': 'KOVARIANCIA.S',
+    'COVARIANCE.S': 'KOVARIANCIA.M',
   },
   langCode: 'huHU',
   ui: {

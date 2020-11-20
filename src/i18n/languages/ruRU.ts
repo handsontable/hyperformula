@@ -347,6 +347,9 @@ const dictionary: RawTranslationPackage = {
     FTEST: 'ФТЕСТ',
     STEYX: 'СТОШYX',
     SLOPE: 'НАКЛОН',
+    COVAR: 'КОВАР',
+    'COVARIANCE.P': 'КОВАРИАЦИЯ.Г',
+    'COVARIANCE.S': 'КОВАРИАЦИЯ.В',
   },
   langCode: 'ruRU',
   ui: {

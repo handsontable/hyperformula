@@ -347,6 +347,9 @@ export const dictionary: RawTranslationPackage = {
     FTEST: 'PRUEBA.F',
     STEYX: 'ERROR.TIPICO.XY',
     SLOPE: 'PENDIENTE',
+    COVAR: 'COVAR',
+    'COVARIANCE.P': 'COVARIANCE.P',
+    'COVARIANCE.S': 'COVARIANZA.M',
   },
   langCode: 'esES',
   ui: {

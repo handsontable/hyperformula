@@ -44,7 +44,7 @@ describe('COVARIANCE.P', () => {
     ])
 
     expect(engine.getCellValue(adr('A6'))).toBeCloseTo(3.72)
-    expect(engine.getCellValue(adr('A6'))).toEqual(0)
+    expect(engine.getCellValue(adr('A7'))).toEqual(0)
   })
 
   it('doesnt do coercions, nonnumeric values are skipped',  () => {

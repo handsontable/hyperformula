@@ -347,6 +347,9 @@ const dictionary: RawTranslationPackage = {
     FTEST: 'TEST.F',
     STEYX: 'REGBŁSTD',
     SLOPE: 'NACHYLENIE',
+    COVAR: 'KOWARIANCJA',
+    'COVARIANCE.P': 'KOWARIANCJA.POPUL',
+    'COVARIANCE.S': 'KOWARIANCJA.PRÓBKI',
   },
   langCode: 'plPL',
   ui: {
