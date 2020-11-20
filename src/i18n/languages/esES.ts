@@ -345,6 +345,7 @@ export const dictionary: RawTranslationPackage = {
     ZTEST: 'PRUEBA.Z',
     'F.TEST': 'PRUEBA.F.N',
     FTEST: 'PRUEBA.F',
+    STEYX: 'ERROR.TIPICO.XY',
   },
   langCode: 'esES',
   ui: {

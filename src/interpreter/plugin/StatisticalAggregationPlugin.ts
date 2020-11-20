@@ -112,6 +112,13 @@ export class StatisticalAggregationPlugin extends  FunctionPlugin {
         {argumentType: ArgumentTypes.RANGE},
       ],
     },
+    'STEYX': {
+      method: 'steyx',
+      parameters: [
+        {argumentType: ArgumentTypes.RANGE},
+        {argumentType: ArgumentTypes.RANGE},
+      ],
+    },
   }
 
   public avedev(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
@@ -293,10 +300,28 @@ export class StatisticalAggregationPlugin extends  FunctionPlugin {
         if(arrX.length<=1 || arrY.length<=1) {
           return new CellError(ErrorType.DIV_BY_ZERO)
         }
-        const r = variance(arrX,true)/variance(arrY, true)
+        const r = variance(arrX, true)/variance(arrY, true)
         const v = centralF.cdf(r, arrX.length-1, arrY.length-1)
         return 2*Math.min(v, 1-v)
     })
+  }
+
+  public steyx(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('STEYX'),
+      (dataX: SimpleRangeValue, dataY: SimpleRangeValue) => {
+        if (dataX.numberOfElements() !== dataY.numberOfElements()) {
+          return new CellError(ErrorType.NA, ErrorMessage.EqualLength)
+        }
+
+        const ret = parseTwoArrays(dataX, dataY)
+        if(ret instanceof CellError) {
+          return ret
+        }
+        if (ret[0].length <= 2) {
+          return new CellError(ErrorType.DIV_BY_ZERO, ErrorMessage.TwoValues)
+        }
+        return Math.sqrt((sumsqerr(ret[0]) - Math.pow(covariance(ret[0], ret[1])*(ret[0].length-1), 2)/sumsqerr(ret[1]))/(ret[0].length-2))
+      })
   }
 }
 

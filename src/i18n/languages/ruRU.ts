@@ -345,6 +345,7 @@ const dictionary: RawTranslationPackage = {
     ZTEST: 'ZТЕСТ',
     'F.TEST': 'F.ТЕСТ',
     FTEST: 'ФТЕСТ',
+    STEYX: 'СТОШYX',
   },
   langCode: 'ruRU',
   ui: {

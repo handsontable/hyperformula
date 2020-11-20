@@ -344,14 +344,15 @@ lets you design your own [custom functions](custom-functions).
 | POISSON | Statistical | Returns density of Poisson distribution. | POISSON(X; Mean; Mode) |
 | POISSON.DIST | Statistical | Returns density of Poisson distribution. | POISSON.DIST(X; Mean; Mode) |
 | RSQ | Statistical | Returns the squared correlation coefficient between two data sets. | RSQ(Data1; Data2) |
-| STANDARDIZE | Statistical | Returns normalized value wrt expected value and standard deviation. | STANDARDIZE(X; Mean; Stddev) |
 | SMALL | Statistical | Returns k-th smallest value in a range. | SMALL(Range; K) |
+| STANDARDIZE | Statistical | Returns normalized value wrt expected value and standard deviation. | STANDARDIZE(X; Mean; Stddev) |
 | STDEV <br><Badge text="v0.3.0"/>| Statistical | Returns standard deviation of a sample. | STDEV(Value1; Value2; ... Value30) |
 | STDEVA <br><Badge text="v0.3.0"/>| Statistical | Returns standard deviation of a sample. | STDEVA(Value1; Value2; ... Value30) |
 | STDEVP <br><Badge text="v0.3.0"/>| Statistical | Returns standard deviation of a population. | STDEVP(Value1; Value2; ... Value30) |
 | STDEV.P <br><Badge text="v0.3.0"/>| Statistical | Returns standard deviation of a population. | STDEV.P(Value1; Value2; ... Value30) |
 | STDEVPA <br><Badge text="v0.3.0"/>| Statistical | Returns standard deviation of a population. | STDEVPA(Value1; Value2; ... Value30) |
 | STDEV.S <br><Badge text="v0.3.0"/>| Statistical | Returns standard deviation of a sample. | STDEV.S(Value1; Value2; ... Value30) |
+| STEYX | Statistical | Returns standard error for predicted of the predicted y value for each x value. | STEYX(Array1; Array2) |
 | TDIST | Statistical | Returns density of Student-t distribution, both-sided or right-tailed. | TDIST(X; Degrees; Mode) |
 | T.DIST | Statistical | Returns density of Student-t distribution. | T.DIST(X; Degrees; Mode) |
 | T.DIST.2T | Statistical | Returns density of Student-t distribution, both-sided. | T.DIST.2T(X; Degrees) |
