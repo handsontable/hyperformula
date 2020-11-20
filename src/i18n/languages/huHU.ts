@@ -346,6 +346,7 @@ const dictionary: RawTranslationPackage = {
     'F.TEST': 'F.PRÓB',
     FTEST: 'F.PRÓBA',
     STEYX: 'STHIBAYX',
+    SLOPE: 'MEREDEKSÉG',
   },
   langCode: 'huHU',
   ui: {

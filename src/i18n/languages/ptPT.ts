@@ -346,6 +346,7 @@ const dictionary: RawTranslationPackage = {
     'F.TEST': 'TESTE.F',
     FTEST: 'TESTEF',
     STEYX: 'EPADYX',
+    SLOPE: 'INCLINAÇÃO',
   },
   langCode: 'ptPT',
   ui: {

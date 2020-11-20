@@ -346,6 +346,7 @@ const dictionary: RawTranslationPackage = {
     'F.TEST': 'TESTF',
     FTEST: 'TEST.F',
     STEYX: 'ERR.STD.YX',
+    SLOPE: 'PENDENZA',
   },
   langCode: 'itIT',
   ui: {

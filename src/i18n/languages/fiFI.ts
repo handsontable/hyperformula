@@ -346,6 +346,7 @@ const dictionary: RawTranslationPackage = {
     'F.TEST': 'F.TESTI',
     FTEST: 'FTESTI',
     STEYX: 'KESKIVIRHE',
+    SLOPE: 'KULMAKERROIN',
   },
   langCode: 'fiFI',
   ui: {

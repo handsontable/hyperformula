@@ -346,6 +346,7 @@ const dictionary: RawTranslationPackage = {
     'F.TEST': 'F.TEST',
     FTEST: 'FTEST',
     STEYX: 'STANDARDFEIL',
+    SLOPE: 'STIGNINGSTALL',
   },
   langCode: 'nbNO',
   ui: {
