@@ -350,6 +350,10 @@ const dictionary: RawTranslationPackage = {
     COVAR: 'COVAR',
     'COVARIANCE.P': 'COVARIAÇÃO.P',
     'COVARIANCE.S': 'COVARIAÇÃO.S',
+    'CHISQ.TEST': 'TESTE.QUIQUA',
+    CHITEST: 'TESTE.QUI',
+    'T.TEST': 'TESTE.T',
+    TTEST: 'TESTET',
   },
   langCode: 'ptPT',
   ui: {

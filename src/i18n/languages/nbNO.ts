@@ -350,6 +350,10 @@ const dictionary: RawTranslationPackage = {
     COVAR: 'KOVARIANS',
     'COVARIANCE.P': 'KOVARIANS.P',
     'COVARIANCE.S': 'KOVARIANS.S',
+    'CHISQ.TEST': 'KJIKVADRAT.TEST',
+    CHITEST: 'KJI.TEST',
+    'T.TEST': 'T.TEST',
+    TTEST: 'TTEST',
   },
   langCode: 'nbNO',
   ui: {

@@ -350,6 +350,10 @@ const dictionary: RawTranslationPackage = {
     FTEST: 'FTEST',
     STEYX: 'STEYX',
     SLOPE: 'SLOPE',
+    'CHISQ.TEST': 'CHISQ.TEST',
+    CHITEST: 'CHITEST',
+    'T.TEST': 'T.TEST',
+    TTEST: 'TTEST',
   },
   langCode: 'enGB',
   ui: {

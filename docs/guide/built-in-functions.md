@@ -281,6 +281,8 @@ lets you design your own [custom functions](custom-functions).
 | CHISQ.DIST.RT | Statistical | Returns probability of chi-square right-side distribution. | CHISQ.DIST.RT(X; Degrees) |
 | CHISQ.INV | Statistical | Returns inverse of chi-square distribution. | CHISQ.INV.RT(P; Degrees) |
 | CHISQ.INV.RT | Statistical | Returns inverse of chi-square right-side distribution. | CHISQ.INV.RT(P; Degrees) |
+| CHISQ.TEST | Statistical | Returns chisquared-test value for a dataset. | CHISQ.TEST(Array1; Array2) |
+| CHITEST | Statistical | Returns chisquared-test value for a dataset. | CHITEST(Array1; Array2) |
 | CONFIDENCE | Statistical | Returns upper confidence bound for normal distribution. | CONFIDENCE(Alpha; Stdev; Size) |
 | CONFIDENCE.NORM | Statistical | Returns upper confidence bound for normal distribution. | CONFIDENCE.NORM(Alpha; Stdev; Size) |
 | CONFIDENCE.T | Statistical | Returns upper confidence bound for T distribution. | CONFIDENCE.T(Alpha; Stdev; Size) |

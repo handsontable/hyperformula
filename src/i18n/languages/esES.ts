@@ -350,6 +350,10 @@ export const dictionary: RawTranslationPackage = {
     COVAR: 'COVAR',
     'COVARIANCE.P': 'COVARIANCE.P',
     'COVARIANCE.S': 'COVARIANZA.M',
+    'CHISQ.TEST': 'PRUEBA.CHICUAD',
+    CHITEST: 'PRUEBA.CHI',
+    'T.TEST': 'PRUEBA.T.N',
+    TTEST: 'PRUEBA.T',
   },
   langCode: 'esES',
   ui: {

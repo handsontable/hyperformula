@@ -7,7 +7,18 @@ import {CellError, ErrorType, InternalScalarValue, SimpleCellAddress} from '../.
 import {ErrorMessage} from '../../error-message'
 import {ProcedureAst} from '../../parser'
 import {InterpreterValue, SimpleRangeValue} from '../InterpreterValue'
-import {centralF, corrcoeff, covariance, geomean, mean, normal, stdev, sumsqerr, variance} from './3rdparty/jstat/jstat'
+import {
+  centralF,
+  chisquare,
+  corrcoeff,
+  covariance,
+  geomean,
+  mean,
+  normal,
+  stdev,
+  sumsqerr,
+  variance
+} from './3rdparty/jstat/jstat'
 import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
 
 export class StatisticalAggregationPlugin extends  FunctionPlugin {
@@ -97,12 +108,20 @@ export class StatisticalAggregationPlugin extends  FunctionPlugin {
         {argumentType: ArgumentTypes.RANGE},
       ],
     },
+    'CHISQ.TEST': {
+      method: 'chisqtest',
+      parameters: [
+        {argumentType: ArgumentTypes.RANGE},
+        {argumentType: ArgumentTypes.RANGE},
+      ],
+    },
   }
   public static aliases = {
-    'COVAR': 'COVARIANCE.P',
-    'FTEST': 'F.TEST',
-    'PEARSON': 'CORREL',
-    'ZTEST': 'Z.TEST',
+    COVAR: 'COVARIANCE.P',
+    FTEST: 'F.TEST',
+    PEARSON: 'CORREL',
+    ZTEST: 'Z.TEST',
+    CHITEST: 'CHISQ.TEST',
   }
 
   public avedev(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
@@ -323,6 +342,35 @@ export class StatisticalAggregationPlugin extends  FunctionPlugin {
           return new CellError(ErrorType.DIV_BY_ZERO, ErrorMessage.TwoValues)
         }
         return covariance(ret[0], ret[1])*(ret[0].length-1)/sumsqerr(ret[1])
+      })
+  }
+
+  public chisqtest(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('CHISQ.TEST'),
+      (dataX: SimpleRangeValue, dataY: SimpleRangeValue) => {
+        const r = dataX.height()
+        const c = dataX.width()
+        if(dataY.height() !== r || dataY.width() !== c) {
+          return new CellError(ErrorType.NA, ErrorMessage.EqualLength)
+        }
+
+        const ret = parseTwoArrays(dataX, dataY)
+        if(ret instanceof CellError) {
+          return ret
+        }
+        if (ret[0].length <= 1) {
+          return new CellError(ErrorType.DIV_BY_ZERO, ErrorMessage.TwoValues)
+        }
+        let sum = 0
+        for(let i=0;i<ret[0].length;i++) {
+          if(ret[1][i] === 0) {
+            return new CellError(ErrorType.DIV_BY_ZERO)
+          } else if(ret[1][i] < 0) {
+            return new CellError(ErrorType.NUM, ErrorMessage.ValueSmall)
+          }
+          sum += Math.pow(ret[0][i]-ret[1][i], 2)/ret[1][i]
+        }
+        return 1 - chisquare.cdf(sum, (r>1 && c>1) ?(r-1)*(c-1):r*c-1 )
       })
   }
 }
