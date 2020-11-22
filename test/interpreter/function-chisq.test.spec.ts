@@ -43,7 +43,7 @@ describe('CHISQ.TEST', () => {
     expect(engine.getCellValue(adr('A3'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.EqualLength))
   })
 
-  it('validates values',  () => {
+  it('validates values #1',  () => {
     const engine = HyperFormula.buildFromArray([
       [1, 10, 1, 1, 3, 7],
       [2, 5, 1, 1, 4, 0],
@@ -53,7 +53,7 @@ describe('CHISQ.TEST', () => {
     expect(engine.getCellValue(adr('A3'))).toEqualError(detailedError(ErrorType.DIV_BY_ZERO))
   })
 
-  it('validates values',  () => {
+  it('validates values #2',  () => {
     const engine = HyperFormula.buildFromArray([
       [1, 10, 1, 1, 3, 7],
       [2, 5, 1, 1, 4, -1],

@@ -363,6 +363,8 @@ lets you design your own [custom functions](custom-functions).
 | TINV | Statistical | Returns inverse Student-t distribution, both-sided. | TINV(P; Degrees) |
 | T.INV | Statistical | Returns inverse Student-t distribution. | T.INV(P; Degrees) |
 | T.INV.2T | Statistical | Returns inverse Student-t distribution, both-sided. | T.INV.2T(P; Degrees) |
+| TTEST | Statistical | Returns t-test value for a dataset. | TTEST(Array1; Array2) |
+| T.TEST | Statistical | Returns t-test value for a dataset. | T.TEST(Array1; Array2) |
 | VAR <br><Badge text="v0.3.0"/>| Statistical | Returns variance of a sample. | VAR(Value1; Value2; ... Value30) |
 | VARA <br><Badge text="v0.3.0"/>| Statistical | Returns variance of a sample. | VARA(Value1; Value2; ... Value30) |
 | VARP <br><Badge text="v0.3.0"/>| Statistical | Returns variance of a population. | VARP(Value1; Value2; ... Value30) |
