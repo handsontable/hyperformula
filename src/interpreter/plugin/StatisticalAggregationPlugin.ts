@@ -415,7 +415,7 @@ export class StatisticalAggregationPlugin extends  FunctionPlugin {
           for(let i=0;i<n;i++) {
             sub[i] = arrX[i]-arrY[i]
           }
-          const t = Math.abs(Math.sqrt(n) * mean(sub)/stdev(sub,true))
+          const t = Math.abs(Math.sqrt(n) * mean(sub)/stdev(sub, true))
           return tails * (1 - studentt.cdf(t, n-1))
         } else if(type === 2) {
           if (n <= 1 || m <= 1) {
@@ -431,7 +431,7 @@ export class StatisticalAggregationPlugin extends  FunctionPlugin {
           const sx = variance(arrX, true)
           const sy = variance(arrY, true)
           const t = Math.abs((mean(arrX) - mean(arrY))/Math.sqrt(sx/n+sy/m))
-          const v = Math.pow(sx/n+sy/m, 2)/ (Math.pow(sx/n,2)/(n-1)+Math.pow(sy/m,2)/(m-1))
+          const v = Math.pow(sx/n+sy/m, 2)/ (Math.pow(sx/n, 2)/(n-1)+Math.pow(sy/m, 2)/(m-1))
           return tails * (1 - studentt.cdf(t, v))
         }
       })
