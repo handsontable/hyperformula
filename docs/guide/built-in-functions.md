@@ -346,6 +346,8 @@ lets you design your own [custom functions](custom-functions).
 | POISSON | Statistical | Returns density of Poisson distribution. | POISSON(X; Mean; Mode) |
 | POISSON.DIST | Statistical | Returns density of Poisson distribution. | POISSON.DIST(X; Mean; Mode) |
 | RSQ | Statistical | Returns the squared correlation coefficient between two data sets. | RSQ(Data1; Data2) |
+| SKEW | Statistical | Returns skeweness of a sample. | SKEW(Number1; Number2; ...Number30) |
+| SKEW.P | Statistical | Returns skeweness of a population. | SKEW.P(Number1; Number2; ...Number30) |
 | SLOPE | Statistical | Returns the slope of a linear regression line. | SLOPE(Array1; Array2) |
 | SMALL | Statistical | Returns k-th smallest value in a range. | SMALL(Range; K) |
 | STANDARDIZE | Statistical | Returns normalized value wrt expected value and standard deviation. | STANDARDIZE(X; Mean; Stddev) |

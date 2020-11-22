@@ -15,7 +15,8 @@ import {
   geomean,
   mean,
   normal,
-  stdev, studentt,
+  stdev,
+  studentt,
   sumsqerr,
   variance
 } from './3rdparty/jstat/jstat'
@@ -123,6 +124,20 @@ export class StatisticalAggregationPlugin extends  FunctionPlugin {
         {argumentType: ArgumentTypes.INTEGER, minValue: 1, maxValue: 2},
         {argumentType: ArgumentTypes.INTEGER, minValue: 1, maxValue: 3},
       ],
+    },
+    'SKEW': {
+      method: 'skew',
+      parameters: [
+        {argumentType: ArgumentTypes.ANY},
+      ],
+      repeatLastArgs: 1
+    },
+    'SKEW.P': {
+      method: 'skewp',
+      parameters: [
+        {argumentType: ArgumentTypes.ANY},
+      ],
+      repeatLastArgs: 1
     },
   }
   public static aliases = {
@@ -415,13 +430,20 @@ export class StatisticalAggregationPlugin extends  FunctionPlugin {
           for(let i=0;i<n;i++) {
             sub[i] = arrX[i]-arrY[i]
           }
-          const t = Math.abs(Math.sqrt(n) * mean(sub)/stdev(sub, true))
+          const s = stdev(sub, true)
+          if(s===0) {
+            return new CellError(ErrorType.DIV_BY_ZERO)
+          }
+          const t = Math.abs(Math.sqrt(n) * mean(sub)/s)
           return tails * (1 - studentt.cdf(t, n-1))
         } else if(type === 2) {
           if (n <= 1 || m <= 1) {
             return new CellError(ErrorType.DIV_BY_ZERO, ErrorMessage.TwoValues)
           }
           const s = (sumsqerr(arrX) + sumsqerr(arrY))/(n+m-2)
+          if(s===0) {
+            return new CellError(ErrorType.DIV_BY_ZERO)
+          }
           const t = Math.abs((mean(arrX)-mean(arrY))/Math.sqrt(s*(1/n+1/m)))
           return tails * (1 - studentt.cdf(t, n+m-2))
         } else {//type === 3
@@ -430,10 +452,53 @@ export class StatisticalAggregationPlugin extends  FunctionPlugin {
           }
           const sx = variance(arrX, true)
           const sy = variance(arrY, true)
+          if(sx===0 && sy===0) {
+            return new CellError(ErrorType.DIV_BY_ZERO)
+          }
           const t = Math.abs((mean(arrX) - mean(arrY))/Math.sqrt(sx/n+sy/m))
           const v = Math.pow(sx/n+sy/m, 2)/ (Math.pow(sx/n, 2)/(n-1)+Math.pow(sy/m, 2)/(m-1))
           return tails * (1 - studentt.cdf(t, v))
         }
+      })
+  }
+
+  public skew(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('SKEW'),
+      (...args: InterpreterValue[]) => {
+        const coerced = this.interpreter.arithmeticHelper.coerceNumbersExactRanges(args)
+        if(coerced instanceof CellError) {
+          return coerced
+        }
+        const n = coerced.length
+        if(n<3) {
+          return new CellError(ErrorType.DIV_BY_ZERO, ErrorMessage.ThreeValues)
+        }
+        const avg = mean(coerced)
+        const s = stdev(coerced, true)
+        if(s===0) {
+          return new CellError(ErrorType.DIV_BY_ZERO)
+        }
+        return coerced.reduce((a, b) => a + Math.pow((b-avg)/s, 3), 0) * n/(n-1)/(n-2)
+      })
+  }
+
+  public skewp(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('SKEW.P'),
+      (...args: InterpreterValue[]) => {
+        const coerced = this.interpreter.arithmeticHelper.coerceNumbersExactRanges(args)
+        if(coerced instanceof CellError) {
+          return coerced
+        }
+        const n = coerced.length
+        if(n<3) {
+          return new CellError(ErrorType.DIV_BY_ZERO, ErrorMessage.ThreeValues)
+        }
+        const avg = mean(coerced)
+        const s = stdev(coerced, false)
+        if(s===0) {
+          return new CellError(ErrorType.DIV_BY_ZERO)
+        }
+        return coerced.reduce((a, b) => a + Math.pow((b-avg)/s, 3), 0) / n
       })
   }
 }
