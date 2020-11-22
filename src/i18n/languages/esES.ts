@@ -354,6 +354,8 @@ export const dictionary: RawTranslationPackage = {
     CHITEST: 'PRUEBA.CHI',
     'T.TEST': 'PRUEBA.T.N',
     TTEST: 'PRUEBA.T',
+    SKEW: 'COEFICIENTE.ASIMETRIA',
+    'SKEW.P': 'SKEW.P',
   },
   langCode: 'esES',
   ui: {

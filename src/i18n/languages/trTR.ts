@@ -354,6 +354,8 @@ const dictionary: RawTranslationPackage = {
     CHITEST: 'KİKARETEST',
     'T.TEST': 'T.TEST',
     TTEST: 'TTEST',
+    SKEW: 'ÇARPIKLIK',
+    'SKEW.P': 'ÇARPIKLIK.P',
   },
   langCode: 'trTR',
   ui: {

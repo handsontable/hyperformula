@@ -354,6 +354,8 @@ const dictionary: RawTranslationPackage = {
     CHITEST: 'TEST.KHIDEUX',
     'T.TEST': 'T.TEST',
     TTEST: 'TEST.STUDENT',
+    SKEW: 'COEFFICIENT.ASYMETRIE',
+    'SKEW.P': 'COEFFICIENT.ASYMETRIE.P',
   },
   langCode: 'frFR',
   ui: {

@@ -354,6 +354,8 @@ const dictionary: RawTranslationPackage = {
     CHITEST: 'KHI.PRÓBA',
     'T.TEST': 'T.PRÓB',
     TTEST: 'T.PRÓBA',
+    SKEW: 'FERDESÉG',
+    'SKEW.P': 'FERDESÉG.P',
   },
   langCode: 'huHU',
   ui: {

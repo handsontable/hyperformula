@@ -354,6 +354,8 @@ const dictionary: RawTranslationPackage = {
     CHITEST: 'CHITESTI',
     'T.TEST': 'T.TESTI',
     TTEST: 'TTESTI',
+    SKEW: 'JAKAUMAN.VINOUS',
+    'SKEW.P': 'JAKAUMAN.VINOUS.POP',
   },
   langCode: 'fiFI',
   ui: {

@@ -354,6 +354,8 @@ const dictionary: RawTranslationPackage = {
     CHITEST: 'TEST.CHI',
     'T.TEST': 'TESTT',
     TTEST: 'TEST.T',
+    SKEW: 'ASIMMETRIA',
+    'SKEW.P': 'ASIMMETRIA.P',
   },
   langCode: 'itIT',
   ui: {

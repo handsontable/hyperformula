@@ -354,6 +354,8 @@ const dictionary: RawTranslationPackage = {
     CHITEST: 'CHI2TEST',
     'T.TEST': 'T.TEST',
     TTEST: 'TTEST',
+    SKEW: 'SNEDHET',
+    'SKEW.P': 'SKEW.P',
   },
   langCode: 'svSE',
   ui: {
