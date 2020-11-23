@@ -49,7 +49,6 @@ export class FunctionRegistry {
   }
 
   public static registerFunction(functionId: string, plugin: FunctionPluginDefinition, translations?: FunctionTranslationsPackage): void {
-    validateAndReturnMetadataFromName(functionId, plugin)
     this.loadPluginFunction(plugin, functionId, this.plugins)
     if (translations !== undefined) {
       this.loadTranslations(translations)

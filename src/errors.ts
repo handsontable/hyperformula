@@ -374,6 +374,9 @@ export class NoRelativeAddressesAllowedError extends Error {
 
 /**
  * Error thrown when alias to a function is already defined.
+ *
+ * @see [[registerFunctionPlugin]]
+ * @see [[registerFunction]]
  */
 export class AliasAlreadyExisting extends Error {
   constructor(name: string, pluginName: string) {
