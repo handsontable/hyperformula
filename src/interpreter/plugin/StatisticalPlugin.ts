@@ -49,14 +49,6 @@ export class StatisticalPlugin extends  FunctionPlugin {
         {argumentType: ArgumentTypes.BOOLEAN},
       ]
     },
-    'EXPONDIST': {
-      method: 'expondist',
-      parameters: [
-        {argumentType: ArgumentTypes.NUMBER, minValue: 0},
-        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
-        {argumentType: ArgumentTypes.BOOLEAN},
-      ]
-    },
     'FISHER': {
       method: 'fisher',
       parameters: [
@@ -84,36 +76,13 @@ export class StatisticalPlugin extends  FunctionPlugin {
         {argumentType: ArgumentTypes.BOOLEAN},
       ]
     },
-    'GAMMADIST': {
-      method: 'gammadist',
-      parameters: [
-        {argumentType: ArgumentTypes.NUMBER, minValue: 0},
-        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
-        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
-        {argumentType: ArgumentTypes.BOOLEAN},
-      ]
-    },
     'GAMMALN': {
       method: 'gammaln',
       parameters: [
         {argumentType: ArgumentTypes.NUMBER, greaterThan: 0}
       ]
     },
-    'GAMMALN.PRECISE': {
-      method: 'gammaln',
-      parameters: [
-        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0}
-      ]
-    },
     'GAMMA.INV': {
-      method: 'gammainv',
-      parameters: [
-        {argumentType: ArgumentTypes.NUMBER, minValue: 0, lessThan: 1},
-        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
-        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
-      ]
-    },
-    'GAMMAINV': {
       method: 'gammainv',
       parameters: [
         {argumentType: ArgumentTypes.NUMBER, minValue: 0, lessThan: 1},
@@ -138,17 +107,6 @@ export class StatisticalPlugin extends  FunctionPlugin {
         {argumentType: ArgumentTypes.NUMBER, defaultValue: 1},
       ]
     },
-    'BETADIST': {
-      method: 'betadist',
-      parameters: [
-        {argumentType: ArgumentTypes.NUMBER},
-        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
-        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
-        {argumentType: ArgumentTypes.BOOLEAN},
-        {argumentType: ArgumentTypes.NUMBER, defaultValue: 0},
-        {argumentType: ArgumentTypes.NUMBER, defaultValue: 1},
-      ]
-    },
     'BETA.INV': {
       method: 'betainv',
       parameters: [
@@ -159,26 +117,7 @@ export class StatisticalPlugin extends  FunctionPlugin {
         {argumentType: ArgumentTypes.NUMBER, defaultValue: 1},
       ]
     },
-    'BETAINV': {
-      method: 'betainv',
-      parameters: [
-        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0, maxValue: 1},
-        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
-        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
-        {argumentType: ArgumentTypes.NUMBER, defaultValue: 0},
-        {argumentType: ArgumentTypes.NUMBER, defaultValue: 1},
-      ]
-    },
     'BINOM.DIST': {
-      method: 'binomialdist',
-      parameters: [
-        {argumentType: ArgumentTypes.NUMBER, minValue: 0},
-        {argumentType: ArgumentTypes.NUMBER, minValue: 0},
-        {argumentType: ArgumentTypes.NUMBER, minValue: 0, maxValue: 1},
-        {argumentType: ArgumentTypes.BOOLEAN},
-      ]
-    },
-    'BINOMDIST': {
       method: 'binomialdist',
       parameters: [
         {argumentType: ArgumentTypes.NUMBER, minValue: 0},
@@ -252,20 +191,6 @@ export class StatisticalPlugin extends  FunctionPlugin {
         {argumentType: ArgumentTypes.NUMBER, minValue: 1},
       ]
     },
-    'CHIDIST': {
-      method: 'chisqdistrt',
-      parameters: [
-        {argumentType: ArgumentTypes.NUMBER},
-        {argumentType: ArgumentTypes.NUMBER, minValue: 1, maxValue: 1e10},
-      ]
-    },
-    'CHIINV': {
-      method: 'chisqinvrt',
-      parameters: [
-        {argumentType: ArgumentTypes.NUMBER, minValue: 0, maxValue: 1},
-        {argumentType: ArgumentTypes.NUMBER, minValue: 1},
-      ]
-    },
     'F.DIST': {
       method: 'fdist',
       parameters: [
@@ -299,32 +224,7 @@ export class StatisticalPlugin extends  FunctionPlugin {
         {argumentType: ArgumentTypes.NUMBER, minValue: 1},
       ]
     },
-    'FDIST': {
-      method: 'fdistrt',
-      parameters: [
-        {argumentType: ArgumentTypes.NUMBER, minValue: 0},
-        {argumentType: ArgumentTypes.NUMBER, minValue: 1},
-        {argumentType: ArgumentTypes.NUMBER, minValue: 1},
-      ]
-    },
-    'FINV': {
-      method: 'finvrt',
-      parameters: [
-        {argumentType: ArgumentTypes.NUMBER, minValue: 0, maxValue: 1},
-        {argumentType: ArgumentTypes.NUMBER, minValue: 1},
-        {argumentType: ArgumentTypes.NUMBER, minValue: 1},
-      ]
-    },
     'WEIBULL.DIST': {
-      method: 'weibulldist',
-      parameters: [
-        {argumentType: ArgumentTypes.NUMBER, minValue: 0},
-        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
-        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
-        {argumentType: ArgumentTypes.BOOLEAN},
-      ]
-    },
-    'WEIBULL': {
       method: 'weibulldist',
       parameters: [
         {argumentType: ArgumentTypes.NUMBER, minValue: 0},
@@ -341,25 +241,7 @@ export class StatisticalPlugin extends  FunctionPlugin {
         {argumentType: ArgumentTypes.BOOLEAN},
       ]
     },
-    'POISSON': {
-      method: 'poissondist',
-      parameters: [
-        {argumentType: ArgumentTypes.NUMBER, minValue: 0},
-        {argumentType: ArgumentTypes.NUMBER, minValue: 0},
-        {argumentType: ArgumentTypes.BOOLEAN},
-      ]
-    },
     'HYPGEOM.DIST': {
-      method: 'hypgeomdist',
-      parameters: [
-        {argumentType: ArgumentTypes.NUMBER, minValue: 0},
-        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
-        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
-        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
-        {argumentType: ArgumentTypes.BOOLEAN},
-      ]
-    },
-    'HYPGEOMDIST': {
       method: 'hypgeomdist',
       parameters: [
         {argumentType: ArgumentTypes.NUMBER, minValue: 0},
@@ -413,13 +295,6 @@ export class StatisticalPlugin extends  FunctionPlugin {
         {argumentType: ArgumentTypes.NUMBER, minValue: 1},
       ]
     },
-    'TINV': {
-      method: 'tinv2t',
-      parameters: [
-        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0, maxValue: 1},
-        {argumentType: ArgumentTypes.NUMBER, minValue: 1},
-      ]
-    },
     'LOGNORM.DIST': {
       method: 'lognormdist',
       parameters: [
@@ -430,23 +305,6 @@ export class StatisticalPlugin extends  FunctionPlugin {
       ]
     },
     'LOGNORM.INV': {
-      method: 'lognorminv',
-      parameters: [
-        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0, lessThan: 1},
-        {argumentType: ArgumentTypes.NUMBER},
-        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
-      ]
-    },
-    'LOGNORMDIST': {
-      method: 'lognormdist',
-      parameters: [
-        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
-        {argumentType: ArgumentTypes.NUMBER},
-        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
-        {argumentType: ArgumentTypes.BOOLEAN},
-      ]
-    },
-    'LOGINV': {
       method: 'lognorminv',
       parameters: [
         {argumentType: ArgumentTypes.NUMBER, greaterThan: 0, lessThan: 1},
@@ -484,36 +342,6 @@ export class StatisticalPlugin extends  FunctionPlugin {
         {argumentType: ArgumentTypes.NUMBER, greaterThan: 0, lessThan: 1},
       ]
     },
-    'NORMDIST': {
-      method: 'normdist',
-      parameters: [
-        {argumentType: ArgumentTypes.NUMBER},
-        {argumentType: ArgumentTypes.NUMBER},
-        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
-        {argumentType: ArgumentTypes.BOOLEAN},
-      ]
-    },
-    'NORMINV': {
-      method: 'norminv',
-      parameters: [
-        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0, lessThan: 1},
-        {argumentType: ArgumentTypes.NUMBER},
-        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
-      ]
-    },
-    'NORMSDIST': {
-      method: 'normsdist',
-      parameters: [
-        {argumentType: ArgumentTypes.NUMBER},
-        {argumentType: ArgumentTypes.BOOLEAN},
-      ]
-    },
-    'NORMSINV': {
-      method: 'normsinv',
-      parameters: [
-        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0, lessThan: 1},
-      ]
-    },
     'PHI': {
       method: 'phi',
       parameters: [
@@ -529,15 +357,31 @@ export class StatisticalPlugin extends  FunctionPlugin {
         {argumentType: ArgumentTypes.BOOLEAN},
       ]
     },
-    'NEGBINOMDIST': {
-      method: 'negbinomdist',
-      parameters: [
-        {argumentType: ArgumentTypes.NUMBER, minValue: 0},
-        {argumentType: ArgumentTypes.NUMBER, minValue: 1},
-        {argumentType: ArgumentTypes.NUMBER, minValue: 0, maxValue: 1},
-        {argumentType: ArgumentTypes.BOOLEAN},
-      ]
-    },
+  }
+
+  public static aliases = {
+    'NEGBINOMDIST' : 'NEGBINOM.DIST',
+    'EXPONDIST' : 'EXPON.DIST',
+    'BETADIST' : 'BETA.DIST',
+    'NORMDIST': 'NORM.DIST',
+    'NORMINV': 'NORM.INV',
+    'NORMSDIST': 'NORM.S.DIST',
+    'NORMSINV': 'NORM.S.INV',
+    'LOGNORMDIST': 'LOGNORM.DIST',
+    'LOGINV': 'LOGNORM.INV',
+    'TINV': 'T.INV.2T',
+    'HYPGEOMDIST': 'HYPGEOM.DIST',
+    'POISSON': 'POISSON.DIST',
+    'WEIBULL': 'WEIBULL.DIST',
+    'FINV': 'F.INV.RT',
+    'FDIST': 'F.DIST.RT',
+    'CHIDIST': 'CHISQ.DIST.RT',
+    'CHIINV': 'CHISQ.INV.RT',
+    'GAMMADIST': 'GAMMA.DIST',
+    'GAMMALN.PRECISE': 'GAMMALN',
+    'GAMMAINV': 'GAMMA.INV',
+    'BETAINV': 'BETA.INV',
+    'BINOMDIST': 'BINOM.DIST',
   }
 
   public erf(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {

@@ -44,6 +44,7 @@ export interface FunctionPluginDefinition {
   new(interpreter: Interpreter): FunctionPlugin,
 
   implementedFunctions: ImplementedFunctions,
+  aliases?: {[formulaId: string]: string},
 }
 
 export enum ArgumentTypes {
@@ -136,6 +137,7 @@ export abstract class FunctionPlugin {
    * Dictionary containing functions implemented by specific plugin, along with function name translations.
    */
   public static implementedFunctions: ImplementedFunctions
+  public static aliases?: {[formulaId: string]: string}
   protected readonly interpreter: Interpreter
   protected readonly dependencyGraph: DependencyGraph
   protected readonly columnSearch: SearchStrategy

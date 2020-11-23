@@ -57,7 +57,33 @@ class CountHF extends FunctionPlugin {
   };
 }
 ```
+## Aliases
 
+If you want to include aliases (multiple names to a single implemented function) inside the plugin,
+you can do this by the static `aliases` property.
+
+The property is keyed with aliases IDs, and with values being aliased functions IDs.
+
+```javascript
+// import FunctionPlugin
+import { FunctionPlugin } from 'hyperformula';
+
+// start creating a class
+class CountHF extends FunctionPlugin {
+
+// define functions inside this plugin
+  public static implementedFunctions = {
+    'HYPER': {
+    // this method's functionality will be defined in the next step
+      method: 'hyper',
+    }
+  };
+  public static aliases = {
+    'HYPER.ALIAS': 'HYPER'
+  //HYPER.ALIAS is now an alias to HYPER
+  };
+}
+```
 ## Translations
 
 There are **two ways** of adding a translation of the custom function.
