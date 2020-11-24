@@ -329,6 +329,8 @@ const dictionary: RawTranslationPackage = {
     'NEGBINOM.DIST': 'DISTRIB.BINOM.NEG.N',
     NEGBINOMDIST: 'DISTRIB.BINOM.NEG',
     'CEILING.MATH': 'ARROTONDA.ECCESSO.MAT',
+    FLOOR: 'ARROTONDA.DIFETTO',
+    'FLOOR.MATH': 'ARROTONDA.DIFETTO.MAT',
   },
   langCode: 'itIT',
   ui: {

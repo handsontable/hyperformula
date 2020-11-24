@@ -81,9 +81,21 @@ export class RoundingPlugin extends FunctionPlugin {
         { argumentType: ArgumentTypes.NUMBER },
       ],
     },
-  }
-  public static aliases = {
-    'CEILING.PRECISE': 'CEILING',
+    'FLOOR.MATH': {
+      method: 'floormath',
+      parameters: [
+        { argumentType: ArgumentTypes.NUMBER },
+        { argumentType: ArgumentTypes.NUMBER, defaultValue: 1 },
+        { argumentType: ArgumentTypes.NUMBER, defaultValue: 0 },
+      ],
+    },
+    'FLOOR': {
+      method: 'floor',
+      parameters: [
+        { argumentType: ArgumentTypes.NUMBER },
+        { argumentType: ArgumentTypes.NUMBER },
+      ],
+    },
   }
 
   public roundup(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
@@ -182,5 +194,36 @@ export class RoundingPlugin extends FunctionPlugin {
 
       return Math.ceil(value / significance) * significance
     })
+  }
+
+  public floormath(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('FLOOR.MATH'),
+      (value: number, significance: number, mode: number) => {
+        if (significance === 0 || value === 0) {
+          return 0
+        }
+
+        significance = Math.abs(significance)
+        if (mode === 1 && value < 0) {
+          significance = -significance
+        }
+
+        return Math.floor(value / significance) * significance
+      })
+  }
+
+  public floor(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('FLOOR'),
+      (value: number, significance: number) => {
+        if (significance === 0 || value === 0) {
+          return 0
+        }
+
+        if ((value > 0) && (significance < 0)) {
+          return new CellError(ErrorType.NUM, ErrorMessage.DistinctSigns)
+        }
+
+        return Math.floor(value / significance) * significance
+      })
   }
 }

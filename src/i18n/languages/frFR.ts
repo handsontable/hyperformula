@@ -329,6 +329,8 @@ const dictionary: RawTranslationPackage = {
     'NEGBINOM.DIST': 'LOI.BINOMIALE.NEG.N',
     NEGBINOMDIST: 'LOI.BINOMIALE.NEG',
     'CEILING.MATH': 'PLAFOND.MATH',
+    FLOOR: 'PLANCHER',
+    'FLOOR.MATH': 'PLANCHER.MATH',
   },
   langCode: 'frFR',
   ui: {

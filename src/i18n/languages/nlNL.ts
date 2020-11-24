@@ -329,6 +329,8 @@ const dictionary: RawTranslationPackage = {
     'NEGBINOM.DIST': 'NEGBINOM.VERD',
     NEGBINOMDIST: 'NEG.BINOM.VERD',
     'CEILING.MATH': 'AFRONDEN.BOVEN.WISK',
+    FLOOR: 'AFRONDEN.BENEDEN',
+    'FLOOR.MATH': 'AFRONDEN.BENEDEN.WISK',
   },
   langCode: 'nlNL',
   ui: {

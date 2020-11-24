@@ -329,6 +329,8 @@ const dictionary: RawTranslationPackage = {
     'NEGBINOM.DIST': 'NEGBINOM.DIST',
     'NEGBINOMDIST': 'NEGBINOMDIST',
     'CEILING.MATH': 'CEILING.MATH',
+    FLOOR: 'FLOOR',
+    'FLOOR.MATH': 'FLOOR.MATH',
   },
   langCode: 'enGB',
   ui: {

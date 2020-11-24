@@ -329,6 +329,8 @@ const dictionary: RawTranslationPackage = {
     'NEGBINOM.DIST': 'BINOMI.JAKAUMA.NEG',
     NEGBINOMDIST: 'BINOMIJAKAUMA.NEG',
     'CEILING.MATH': 'PYÖRISTÄ.KERR.YLÖS.MATEMAATTINEN',
+    FLOOR: 'PYÖRISTÄ.KERR.ALAS',
+    'FLOOR.MATH': 'PYÖRISTÄ.KERR.ALAS.MATEMAATTINEN',
   },
   langCode: 'fiFI',
   ui: {

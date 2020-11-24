@@ -329,6 +329,8 @@ const dictionary: RawTranslationPackage = {
     'NEGBINOM.DIST': 'NEGBINOM.VERT',
     NEGBINOMDIST: 'NEGBINOMVERT',
     'CEILING.MATH': 'OBERGRENZE.MATHEMATIK',
+    FLOOR: 'UNTERGRENZE',
+    'FLOOR.MATH': 'UNTERGRENZE.MATHEMATIK',
   },
   langCode: 'deDE',
   ui: {

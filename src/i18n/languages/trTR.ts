@@ -329,6 +329,8 @@ const dictionary: RawTranslationPackage = {
     'NEGBINOM.DIST': 'NEGBİNOM.DAĞ',
     NEGBINOMDIST: 'NEGBİNOMDAĞ',
     'CEILING.MATH': 'TAVANAYUVARLA.MATEMATİK',
+    FLOOR: 'TABANAYUVARLA',
+    'FLOOR.MATH': 'TABANAYUVARLA.MATEMATİK',
   },
   langCode: 'trTR',
   ui: {

@@ -329,6 +329,8 @@ const dictionary: RawTranslationPackage = {
     'NEGBINOM.DIST': 'ROZKŁ.DWUM.PRZEC',
     NEGBINOMDIST: 'ROZKŁAD.DWUM.PRZEC',
     'CEILING.MATH': 'ZAOKR.W.GÓRĘ.MATEMATYCZNE',
+    FLOOR: 'ZAOKR.W.DÓŁ',
+    'FLOOR.MATH': 'ZAOKR.W.DÓŁ.MATEMATYCZNE',
   },
   langCode: 'plPL',
   ui: {

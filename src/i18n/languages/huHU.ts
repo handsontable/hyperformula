@@ -329,6 +329,8 @@ const dictionary: RawTranslationPackage = {
     'NEGBINOM.DIST': 'NEGBINOM.ELOSZLÁS',
     NEGBINOMDIST: 'NEGBINOM.ELOSZL',
     'CEILING.MATH': 'PLAFON.MAT',
+    FLOOR: 'PADLÓ',
+    'FLOOR.MATH': 'PADLÓ.MAT',
   },
   langCode: 'huHU',
   ui: {
