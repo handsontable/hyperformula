@@ -200,6 +200,8 @@ lets you design your own [custom functions](custom-functions).
 | EXP | Math and trigonometry | Returns constant e raised to the power of a number. | EXP(Number) |
 | FACT | Math and trigonometry | Returns a factorial of a number. | FACT(Number) |
 | FACTDOUBLE | Math and trigonometry | Returns a double factorial of a number. | FACTDOUBLE(Number) |
+| FLOOR | Math and trigonometry | Rounds a number down to the nearest multiple of Significance. | FLOOR(Number; Significance) |
+| FLOOR.MATH | Math and trigonometry | Rounds a number down to the nearest multiple of Significance. | FLOOR.MATH(Number[; Significance[; Mode]]) |
 | GCD | Math and trigonometry | Computes greatest common divisor of numbers. | GCD(Number1; Number2; ...) |
 | INT | Math and trigonometry | Rounds a number down to the nearest integer. | INT(Number) |
 | LCM | Math and trigonometry | Computes least common multiplicity of numbers. | LCM(Number1; Number2; ...) |
