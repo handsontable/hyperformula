@@ -85,6 +85,11 @@ export enum ArgumentTypes {
   INTEGER = 'INTEGER',
 
   /**
+   * String representing complex number.
+   */
+  COMPLEX = 'COMPLEX',
+
+  /**
    * Range or scalar.
    */
   ANY = 'ANY',
@@ -220,6 +225,8 @@ export abstract class FunctionPlugin {
             return arg
           }
           return coerceToRange(arg)
+        case ArgumentTypes.COMPLEX:
+
       }
     }
   }

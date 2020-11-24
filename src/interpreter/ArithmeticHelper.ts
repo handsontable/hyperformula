@@ -423,6 +423,35 @@ export function coerceScalarToBoolean(arg: InternalScalarValue): boolean | CellE
   }
 }
 
+export type complex = [number, number]
+
+export function coerceScalarToComplex(arg: InternalScalarValue): complex | CellError {
+  if(arg instanceof CellError) {
+    return arg
+  } else if(arg === EmptyValue) {
+    return [0,0]
+  } else if(typeof arg === 'number') {
+    return [arg,0]
+  } else if(typeof arg === 'string') {
+    return coerceStringToComplex(arg)
+  } else {
+    return new CellError(ErrorType.NUM, ErrorMessage.ComplexNumberExpected)
+  }
+}
+
+function coerceStringToComplex(arg: string): complex | CellError {
+  arg.split(/[+-]/)
+
+}
+
+function parseComplexToken(arg: string): Maybe<complex> {
+  arg = arg.trim()
+  if(arg.length>0 && (arg[arg.length-1] === 'i' || arg[arg.length-1]==='j')) {
+    arg = arg.slice(0, arg.length-1).trim()
+
+  }
+}
+
 export function coerceScalarToString(arg: InternalScalarValue): string | CellError {
   if (arg instanceof CellError || typeof arg === 'string') {
     return arg
