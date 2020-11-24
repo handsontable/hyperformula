@@ -328,6 +328,7 @@ const dictionary: RawTranslationPackage = {
     PHI: 'PHI',
     'NEGBINOM.DIST': 'NEGBINOM.FORDELING',
     NEGBINOMDIST: 'NEGBINOMFORDELING',
+    'CEILING.MATH': 'LOFT.MAT',
   },
   langCode: 'daDK',
   ui: {

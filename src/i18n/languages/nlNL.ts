@@ -328,6 +328,7 @@ const dictionary: RawTranslationPackage = {
     PHI: 'PHI',
     'NEGBINOM.DIST': 'NEGBINOM.VERD',
     NEGBINOMDIST: 'NEG.BINOM.VERD',
+    'CEILING.MATH': 'AFRONDEN.BOVEN.WISK',
   },
   langCode: 'nlNL',
   ui: {

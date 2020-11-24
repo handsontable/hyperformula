@@ -328,6 +328,7 @@ const dictionary: RawTranslationPackage = {
     PHI: 'PHI',
     'NEGBINOM.DIST': 'ROZKŁ.DWUM.PRZEC',
     NEGBINOMDIST: 'ROZKŁAD.DWUM.PRZEC',
+    'CEILING.MATH': 'ZAOKR.W.GÓRĘ.MATEMATYCZNE',
   },
   langCode: 'plPL',
   ui: {

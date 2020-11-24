@@ -328,6 +328,7 @@ const dictionary: RawTranslationPackage = {
     PHI: 'PHI',
     'NEGBINOM.DIST': 'NEGBINOM.DIST',
     NEGBINOMDIST: 'NEGBINOMDIST',
+    'CEILING.MATH': 'CEILING.MATH',
   },
   langCode: 'csCZ',
   ui: {

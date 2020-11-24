@@ -328,6 +328,7 @@ const dictionary: RawTranslationPackage = {
     PHI: 'ФИ',
     'NEGBINOM.DIST': 'ОТРБИНОМ.РАСП',
     NEGBINOMDIST: 'ОТРБИНОМРАСП',
+    'CEILING.MATH': 'ОКРВВЕРХ.МАТ',
   },
   langCode: 'ruRU',
   ui: {

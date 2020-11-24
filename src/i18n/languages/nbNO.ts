@@ -328,6 +328,7 @@ const dictionary: RawTranslationPackage = {
     PHI: 'PHI',
     'NEGBINOM.DIST': 'NEGBINOM.FORDELING.N',
     NEGBINOMDIST: 'NEGBINOM.FORDELING',
+    'CEILING.MATH': 'AVRUND.GJELDENDE.MULTIPLUM.OPP.MATEMATISK',
   },
   langCode: 'nbNO',
   ui: {

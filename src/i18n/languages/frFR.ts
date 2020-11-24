@@ -328,6 +328,7 @@ const dictionary: RawTranslationPackage = {
     PHI: 'PHI',
     'NEGBINOM.DIST': 'LOI.BINOMIALE.NEG.N',
     NEGBINOMDIST: 'LOI.BINOMIALE.NEG',
+    'CEILING.MATH': 'PLAFOND.MATH',
   },
   langCode: 'frFR',
   ui: {

@@ -328,6 +328,7 @@ const dictionary: RawTranslationPackage = {
     PHI: 'FI',
     'NEGBINOM.DIST': 'NEGBINOM.ELOSZLÁS',
     NEGBINOMDIST: 'NEGBINOM.ELOSZL',
+    'CEILING.MATH': 'PLAFON.MAT',
   },
   langCode: 'huHU',
   ui: {

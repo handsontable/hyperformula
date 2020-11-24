@@ -66,14 +66,24 @@ export class RoundingPlugin extends FunctionPlugin {
         { argumentType: ArgumentTypes.NUMBER }
       ],
     },
-    'CEILING': {
-      method: 'ceiling',
+    'CEILING.MATH': {
+      method: 'ceilingmath',
       parameters: [
         { argumentType: ArgumentTypes.NUMBER },
         { argumentType: ArgumentTypes.NUMBER, defaultValue: 1 },
         { argumentType: ArgumentTypes.NUMBER, defaultValue: 0 },
       ],
     },
+    'CEILING': {
+      method: 'ceiling',
+      parameters: [
+        { argumentType: ArgumentTypes.NUMBER },
+        { argumentType: ArgumentTypes.NUMBER },
+      ],
+    },
+  }
+  public static aliases = {
+    'CEILING.PRECISE': 'CEILING',
   }
 
   public roundup(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
@@ -143,18 +153,31 @@ export class RoundingPlugin extends FunctionPlugin {
     })
   }
 
-  public ceiling(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('CEILING'), (value: number, significance: number, mode: number) => {
+  public ceilingmath(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('CEILING.MATH'),
+      (value: number, significance: number, mode: number) => {
       if (significance === 0 || value === 0) {
         return 0
       }
 
-      if ((value > 0) !== (significance > 0) && ast.args.length > 1) {
-        return new CellError(ErrorType.NUM, ErrorMessage.DistinctSigns)
+      significance = Math.abs(significance)
+      if (mode === 1 && value < 0) {
+        significance = -significance
       }
 
-      if (mode === 0) {
-        significance = Math.abs(significance)
+      return Math.ceil(value / significance) * significance
+    })
+  }
+
+  public ceiling(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('CEILING'),
+      (value: number, significance: number) => {
+      if (significance === 0 || value === 0) {
+        return 0
+      }
+
+      if ((value > 0) && (significance < 0)) {
+        return new CellError(ErrorType.NUM, ErrorMessage.DistinctSigns)
       }
 
       return Math.ceil(value / significance) * significance
