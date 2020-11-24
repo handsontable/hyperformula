@@ -331,6 +331,8 @@ export const dictionary: RawTranslationPackage = {
     'CEILING.MATH': 'CEILING.MATH',
     FLOOR: 'MULTIPLO.INFERIOR',
     'FLOOR.MATH': 'FLOOR.MATH',
+    'CEILING.PRECISE': 'CEILING.PRECISE', //FIXME
+    'FLOOR.PRECISE': 'FLOOR.PRECISE', //FIXME
   },
   langCode: 'esES',
   ui: {

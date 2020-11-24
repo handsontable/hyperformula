@@ -81,6 +81,13 @@ export class RoundingPlugin extends FunctionPlugin {
         { argumentType: ArgumentTypes.NUMBER },
       ],
     },
+    'CEILING.PRECISE': {
+      method: 'ceilingprecise',
+      parameters: [
+        { argumentType: ArgumentTypes.NUMBER },
+        { argumentType: ArgumentTypes.NUMBER, defaultValue: 1 },
+      ],
+    },
     'FLOOR.MATH': {
       method: 'floormath',
       parameters: [
@@ -94,6 +101,13 @@ export class RoundingPlugin extends FunctionPlugin {
       parameters: [
         { argumentType: ArgumentTypes.NUMBER },
         { argumentType: ArgumentTypes.NUMBER },
+      ],
+    },
+    'FLOOR.PRECISE': {
+      method: 'floorprecise',
+      parameters: [
+        { argumentType: ArgumentTypes.NUMBER },
+        { argumentType: ArgumentTypes.NUMBER, defaultValue: 1 },
       ],
     },
   }
@@ -196,6 +210,17 @@ export class RoundingPlugin extends FunctionPlugin {
     })
   }
 
+  public ceilingprecise(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('CEILING.PRECISE'),
+      (value: number, significance: number) => {
+        if (significance === 0 || value === 0) {
+          return 0
+        }
+        significance = Math.abs(significance)
+        return Math.ceil(value / significance) * significance
+      })
+  }
+
   public floormath(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.runFunction(ast.args, formulaAddress, this.metadata('FLOOR.MATH'),
       (value: number, significance: number, mode: number) => {
@@ -223,6 +248,18 @@ export class RoundingPlugin extends FunctionPlugin {
           return new CellError(ErrorType.NUM, ErrorMessage.DistinctSigns)
         }
 
+        return Math.floor(value / significance) * significance
+      })
+  }
+
+  public floorprecise(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('FLOOR.PRECISE'),
+      (value: number, significance: number) => {
+        if (significance === 0 || value === 0) {
+          return 0
+        }
+
+        significance = Math.abs(significance)
         return Math.floor(value / significance) * significance
       })
   }

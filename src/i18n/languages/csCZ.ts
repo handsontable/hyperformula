@@ -331,6 +331,8 @@ const dictionary: RawTranslationPackage = {
     'CEILING.MATH': 'CEILING.MATH',
     FLOOR: 'ZAOKR.DOLŮ',
     'FLOOR.MATH': 'FLOOR.MATH',
+    'CEILING.PRECISE': 'CEILING.PRECISE', //FIXME
+    'FLOOR.PRECISE': 'FLOOR.PRECISE', //FIXME
   },
   langCode: 'csCZ',
   ui: {

@@ -331,6 +331,8 @@ const dictionary: RawTranslationPackage = {
     'CEILING.MATH': 'ARROTONDA.ECCESSO.MAT',
     FLOOR: 'ARROTONDA.DIFETTO',
     'FLOOR.MATH': 'ARROTONDA.DIFETTO.MAT',
+    'CEILING.PRECISE': 'CEILING.PRECISE', //FIXME
+    'FLOOR.PRECISE': 'FLOOR.PRECISE', //FIXME
   },
   langCode: 'itIT',
   ui: {

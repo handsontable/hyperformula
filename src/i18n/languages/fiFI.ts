@@ -331,6 +331,8 @@ const dictionary: RawTranslationPackage = {
     'CEILING.MATH': 'PYÖRISTÄ.KERR.YLÖS.MATEMAATTINEN',
     FLOOR: 'PYÖRISTÄ.KERR.ALAS',
     'FLOOR.MATH': 'PYÖRISTÄ.KERR.ALAS.MATEMAATTINEN',
+    'CEILING.PRECISE': 'CEILING.PRECISE', //FIXME
+    'FLOOR.PRECISE': 'FLOOR.PRECISE', //FIXME
   },
   langCode: 'fiFI',
   ui: {

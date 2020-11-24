@@ -331,6 +331,8 @@ const dictionary: RawTranslationPackage = {
     'CEILING.MATH': 'TAVANAYUVARLA.MATEMATİK',
     FLOOR: 'TABANAYUVARLA',
     'FLOOR.MATH': 'TABANAYUVARLA.MATEMATİK',
+    'CEILING.PRECISE': 'CEILING.PRECISE', //FIXME
+    'FLOOR.PRECISE': 'FLOOR.PRECISE', //FIXME
   },
   langCode: 'trTR',
   ui: {

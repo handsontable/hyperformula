@@ -331,6 +331,8 @@ const dictionary: RawTranslationPackage = {
     'CEILING.MATH': 'ОКРВВЕРХ.МАТ',
     FLOOR: 'ОКРВНИЗ',
     'FLOOR.MATH': 'ОКРВНИЗ.МАТ',
+    'CEILING.PRECISE': 'CEILING.PRECISE', //FIXME
+    'FLOOR.PRECISE': 'FLOOR.PRECISE', //FIXME
   },
   langCode: 'ruRU',
   ui: {

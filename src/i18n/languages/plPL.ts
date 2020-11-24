@@ -331,6 +331,8 @@ const dictionary: RawTranslationPackage = {
     'CEILING.MATH': 'ZAOKR.W.GÓRĘ.MATEMATYCZNE',
     FLOOR: 'ZAOKR.W.DÓŁ',
     'FLOOR.MATH': 'ZAOKR.W.DÓŁ.MATEMATYCZNE',
+    'CEILING.PRECISE': 'CEILING.PRECISE', //FIXME
+    'FLOOR.PRECISE': 'FLOOR.PRECISE', //FIXME
   },
   langCode: 'plPL',
   ui: {

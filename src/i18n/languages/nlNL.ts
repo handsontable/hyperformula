@@ -331,6 +331,8 @@ const dictionary: RawTranslationPackage = {
     'CEILING.MATH': 'AFRONDEN.BOVEN.WISK',
     FLOOR: 'AFRONDEN.BENEDEN',
     'FLOOR.MATH': 'AFRONDEN.BENEDEN.WISK',
+    'CEILING.PRECISE': 'CEILING.PRECISE', //FIXME
+    'FLOOR.PRECISE': 'FLOOR.PRECISE', //FIXME
   },
   langCode: 'nlNL',
   ui: {

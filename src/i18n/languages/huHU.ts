@@ -331,6 +331,8 @@ const dictionary: RawTranslationPackage = {
     'CEILING.MATH': 'PLAFON.MAT',
     FLOOR: 'PADLÓ',
     'FLOOR.MATH': 'PADLÓ.MAT',
+    'CEILING.PRECISE': 'CEILING.PRECISE', //FIXME
+    'FLOOR.PRECISE': 'FLOOR.PRECISE', //FIXME
   },
   langCode: 'huHU',
   ui: {
