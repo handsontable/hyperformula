@@ -333,6 +333,7 @@ const dictionary: RawTranslationPackage = {
     'FLOOR.MATH': 'FLOOR.MATH',
     'CEILING.PRECISE': 'CEILING.PRECISE',
     'FLOOR.PRECISE': 'FLOOR.PRECISE',
+    'ISO.CEILING': 'ISO.CEILING',
   },
   langCode: 'enGB',
   ui: {

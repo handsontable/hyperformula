@@ -185,6 +185,7 @@ lets you design your own [custom functions](custom-functions).
 | BASE | Math and trigonometry | Converts a positive integer to a specified base into a text from the numbering system. | BASE(Number; Radix; [Minimumlength]) |
 | CEILING | Math and trigonometry | Rounds a number up to the nearest multiple of Significance. | CEILING(Number; Significance) |
 | CEILING.MATH | Math and trigonometry | Rounds a number up to the nearest multiple of Significance. | CEILING.MATH(Number[; Significance[; Mode]]) |
+| CEILING.PRECISE | Math and trigonometry | Rounds a number up to the nearest multiple of Significance. | CEILING.PRECISE(Number[; Significance]) |
 | COMBIN | Math and trigonometry | Returns number of combinations (without repetitions). | COMBIN(Number; Number) |
 | COMBINA | Math and trigonometry | Returns number of combinations (with repetitions). | COMBINA(Number; Number) |
 | COS | Math and trigonometry | Returns the cosine of the given angle (in radians). | COS(Number) |
@@ -202,6 +203,7 @@ lets you design your own [custom functions](custom-functions).
 | FACTDOUBLE | Math and trigonometry | Returns a double factorial of a number. | FACTDOUBLE(Number) |
 | FLOOR | Math and trigonometry | Rounds a number down to the nearest multiple of Significance. | FLOOR(Number; Significance) |
 | FLOOR.MATH | Math and trigonometry | Rounds a number down to the nearest multiple of Significance. | FLOOR.MATH(Number[; Significance[; Mode]]) |
+| FLOOR.PRECISE | Math and trigonometry | Rounds a number down to the nearest multiple of Significance. | FLOOR.PRECISE(Number[; Significance]) |
 | GCD | Math and trigonometry | Computes greatest common divisor of numbers. | GCD(Number1; Number2; ...) |
 | INT | Math and trigonometry | Rounds a number down to the nearest integer. | INT(Number) |
 | LCM | Math and trigonometry | Computes least common multiplicity of numbers. | LCM(Number1; Number2; ...) |

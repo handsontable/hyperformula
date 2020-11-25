@@ -333,6 +333,7 @@ const dictionary: RawTranslationPackage = {
     'FLOOR.MATH': 'UNTERGRENZE.MATHEMATIK',
     'CEILING.PRECISE': 'CEILING.PRECISE', //FIXME
     'FLOOR.PRECISE': 'FLOOR.PRECISE', //FIXME
+    'ISO.CEILING': 'ISO.CEILING', //FIXME
   },
   langCode: 'deDE',
   ui: {

@@ -112,6 +112,10 @@ export class RoundingPlugin extends FunctionPlugin {
     },
   }
 
+  public static aliases = {
+    'ISO.CEILING': 'CEILING.PRECISE',
+  }
+
   public roundup(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.runFunction(ast.args, formulaAddress, this.metadata('ROUNDDOWN'), (numberToRound: number, places: number): number => {
       const placesMultiplier = Math.pow(10, places)
@@ -230,7 +234,7 @@ export class RoundingPlugin extends FunctionPlugin {
 
         significance = Math.abs(significance)
         if (mode === 1 && value < 0) {
-          significance = -significance
+          significance *= -1
         }
 
         return Math.floor(value / significance) * significance
