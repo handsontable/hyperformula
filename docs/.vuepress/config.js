@@ -101,7 +101,7 @@ module.exports = {
           path: '/api/',
         },
         {
-          title: 'HyperFormula',
+          title: 'HyperFormula Class',
           path: '/api/classes/hyperformula',
           collapsable: true,
         },
