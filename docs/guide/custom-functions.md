@@ -60,7 +60,7 @@ class CountHF extends FunctionPlugin {
 ## Aliases
 
 If you want to include aliases (multiple names to a single implemented function) inside the plugin,
-you can do this by the static `aliases` property.
+you can do this with the static `aliases` property.
 
 The property is keyed with aliases IDs, and with values being aliased functions IDs.
 
