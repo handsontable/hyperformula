@@ -411,6 +411,16 @@ export class StatisticalPlugin extends  FunctionPlugin {
     BINOMDIST: 'BINOM.DIST',
     CONFIDENCE: 'CONFIDENCE.NORM',
     CRITBINOM: 'BINOM.INV',
+    WEIBULLDIST: 'WEIBULL.DIST',
+    TINV2T: 'T.INV.2T',
+    TDISTRT: 'T.DIST.RT',
+    TDIST2T: 'T.DIST.2T',
+    FINVRT: 'F.INV.RT',
+    FDISTRT: 'F.DIST.RT',
+    CHIDISTRT: 'CHISQ.DIST.RT',
+    CHIINVRT: 'CHISQ.INV.RT',
+    LOGNORMINV: 'LOGNORM.INV',
+    POISSONDIST: 'POISSON.DIST',
   }
 
   public erf(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {

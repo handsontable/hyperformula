@@ -129,4 +129,64 @@ describe('Function aliases', () => {
   it('ZTEST should be an alias of Z.TEST', () => {
     expect(engine.getFunctionPlugin('ZTEST')!.aliases!['ZTEST']).toEqual('Z.TEST')
   })
+
+  it('WEIBULLDIST should be an alias of WEIBULL.DIST', () => {
+    expect(engine.getFunctionPlugin('WEIBULLDIST')!.aliases!['WEIBULLDIST']).toEqual('WEIBULL.DIST')
+  })
+
+  it('VARS should be an alias of VAR.S', () => {
+    expect(engine.getFunctionPlugin('VARS')!.aliases!['VARS']).toEqual('VAR.S')
+  })
+
+  it('TINV2T should be an alias of T.INV.2T', () => {
+    expect(engine.getFunctionPlugin('TINV2T')!.aliases!['TINV2T']).toEqual('T.INV.2T')
+  })
+
+  it('TDISTRT should be an alias of T.DIST.RT', () => {
+    expect(engine.getFunctionPlugin('TDISTRT')!.aliases!['TDISTRT']).toEqual('T.DIST.RT')
+  })
+
+  it('TDIST2T should be an alias of T.DIST.2T', () => {
+    expect(engine.getFunctionPlugin('TDIST2T')!.aliases!['TDIST2T']).toEqual('T.DIST.2T')
+  })
+
+  it('STDEVS should be an alias of STDEV.S', () => {
+    expect(engine.getFunctionPlugin('STDEVS')!.aliases!['STDEVS']).toEqual('STDEV.S')
+  })
+
+  it('FINVRT should be an alias of F.INV.RT', () => {
+    expect(engine.getFunctionPlugin('FINVRT')!.aliases!['FINVRT']).toEqual('F.INV.RT')
+  })
+
+  it('FDISTRT should be an alias of F.DIST.RT', () => {
+    expect(engine.getFunctionPlugin('FDISTRT')!.aliases!['FDISTRT']).toEqual('F.DIST.RT')
+  })
+
+  it('CHIDISTRT should be an alias of CHISQ.DIST.RT', () => {
+    expect(engine.getFunctionPlugin('CHIDISTRT')!.aliases!['CHIDISTRT']).toEqual('CHISQ.DIST.RT')
+  })
+
+  it('CHIINVRT should be an alias of CHISQ.INV.RT', () => {
+    expect(engine.getFunctionPlugin('CHIINVRT')!.aliases!['CHIINVRT']).toEqual('CHISQ.INV.RT')
+  })
+
+  it('COVARIANCEP should be an alias of COVARIANCE.P', () => {
+    expect(engine.getFunctionPlugin('COVARIANCEP')!.aliases!['COVARIANCEP']).toEqual('COVARIANCE.P')
+  })
+
+  it('COVARIANCES should be an alias of COVARIANCE.S', () => {
+    expect(engine.getFunctionPlugin('COVARIANCES')!.aliases!['COVARIANCES']).toEqual('COVARIANCE.S')
+  })
+
+  it('LOGNORMINV should be an alias of LOGNORM.INV', () => {
+    expect(engine.getFunctionPlugin('LOGNORMINV')!.aliases!['LOGNORMINV']).toEqual('LOGNORM.INV')
+  })
+
+  it('POISSONDIST should be an alias of POISSON.DIST', () => {
+    expect(engine.getFunctionPlugin('POISSONDIST')!.aliases!['POISSONDIST']).toEqual('POISSON.DIST')
+  })
+
+  it('SKEWP should be an alias of SKEW.P', () => {
+    expect(engine.getFunctionPlugin('SKEWP')!.aliases!['SKEWP']).toEqual('SKEW.P')
+  })
 })

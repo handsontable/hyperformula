@@ -356,6 +356,21 @@ const dictionary: RawTranslationPackage = {
     TTEST: 'ТТЕСТ',
     SKEW: 'СКОС',
     'SKEW.P': 'СКОС.Г',
+    WEIBULLDIST: 'WEIBULLDIST', //FIXME
+    VARS: 'VARS', //FIXME
+    TINV2T: 'TINV2T', //FIXME
+    TDISTRT: 'TDISTRT', //FIXME
+    TDIST2T: 'TDIST2T', //FIXME
+    STDEVS: 'STDEVS', //FIXME
+    FINVRT: 'FINVRT', //FIXME
+    FDISTRT: 'FDISTRT', //FIXME
+    CHIDISTRT: 'CHIDISTRT', //FIXME
+    CHIINVRT: 'CHIINVRT', //FIXME
+    COVARIANCEP: 'COVARIANCEP', //FIXME
+    COVARIANCES: 'COVARIANCES', //FIXME
+    LOGNORMINV: 'LOGNORMINV', //FIXME
+    POISSONDIST: 'POISSONDIST', //FIXME
+    SKEWP: 'SKEWP', //FIXME
   },
   langCode: 'ruRU',
   ui: {

@@ -147,6 +147,9 @@ export class StatisticalAggregationPlugin extends  FunctionPlugin {
     ZTEST: 'Z.TEST',
     CHITEST: 'CHISQ.TEST',
     TTEST: 'T.TEST',
+    COVARIANCEP: 'COVARIANCE.P',
+    COVARIANCES: 'COVARIANCE.S',
+    SKEWP: 'SKEW.P',
   }
 
   public avedev(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
