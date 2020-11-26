@@ -141,7 +141,6 @@ module.exports = {
             ['/guide/dependencies', 'Dependencies'],
             ['/guide/licensing', 'Licensing'],
             ['/guide/changelog', 'Changelog'],
-            ['/guide/roadmap', 'Roadmap'],
             ['/guide/support', 'Support'],
           ]
         },
