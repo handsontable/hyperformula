@@ -68,7 +68,6 @@ export class ErrorMessage {
   public static WeekendString = 'Incorrect weekend bitmask string.'
   public static InvalidRoman = 'Invalid roman numeral.'
   public static WrongOrder = 'Wrong order of values.'
-  public static ComplexNumberExpected = 'Complex number expected.'
   public static FunctionName = (arg: string) => `Function name ${arg} not recognized.`
   public static NamedExpressionName = (arg: string) => `Named expression ${arg} not recognized.`
   public static LicenseKey = (arg: string) => `License key is ${arg}.`

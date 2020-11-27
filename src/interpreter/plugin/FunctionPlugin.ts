@@ -226,7 +226,7 @@ export abstract class FunctionPlugin {
           }
           return coerceToRange(arg)
         case ArgumentTypes.COMPLEX:
-
+          return 0
       }
     }
   }

@@ -268,12 +268,12 @@ export class ArithmeticHelper {
   public coerceNonDateScalarToMaybeNumber(arg: InternalScalarValue): Maybe<number> {
     if (arg === EmptyValue) {
       return 0
-    } else if (typeof arg === 'string' && this.numberLiteralsHelper.isNumber(arg)) {
-      return this.numberLiteralsHelper.numericStringToNumber(arg)
-    } else {
-      if(typeof arg === 'string' && arg.length>0 && arg.trim() === '') {
-        return undefined
+    } else if (typeof arg === 'string') {
+      if(arg === '') {
+        return 0
       }
+      return this.numberLiteralsHelper.numericStringToMaybeNumber(arg.trim())
+    } else {
       const coercedNumber = Number(arg)
       if (isNaN(coercedNumber)) {
         return undefined
@@ -440,16 +440,17 @@ export function coerceScalarToComplex(arg: InternalScalarValue): complex | CellE
 }
 
 function coerceStringToComplex(arg: string): complex | CellError {
-  arg.split(/[+-]/)
-
-}
-
-function parseComplexToken(arg: string): Maybe<complex> {
-  arg = arg.trim()
-  if(arg.length>0 && (arg[arg.length-1] === 'i' || arg[arg.length-1]==='j')) {
-    arg = arg.slice(0, arg.length-1).trim()
-
+  const regexp = /^\s*([+-]?\s*[\d\.]+(e[+-]?\d+)?)\s*([ij]?)\s*(([+-])(\s*([+-]?\s*[\d\.]+(e[+-]?\d+)?)\s*([ij]?)))?$/
+  const res = regexp.exec(arg)
+  if(res === null) {
+    return new CellError(ErrorType.NUM, ErrorMessage.ComplexNumberExpected)
   }
+  let num1 = res[1]
+  let im1 = res[3] !== ''
+  let op = res[5]
+  let num2 = res[7]
+  let im2 = res[9] !== ''
+  return new CellError(ErrorType.NUM, ErrorMessage.ComplexNumberExpected)
 }
 
 export function coerceScalarToString(arg: InternalScalarValue): string | CellError {
