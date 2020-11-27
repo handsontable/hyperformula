@@ -269,10 +269,11 @@ export class ArithmeticHelper {
     if (arg === EmptyValue) {
       return 0
     } else if (typeof arg === 'string') {
+      arg = arg.trim()
       if(arg === '') {
         return 0
       }
-      return this.numberLiteralsHelper.numericStringToMaybeNumber(arg.trim())
+      return this.numberLiteralsHelper.numericStringToMaybeNumber(arg)
     } else {
       const coercedNumber = Number(arg)
       if (isNaN(coercedNumber)) {
