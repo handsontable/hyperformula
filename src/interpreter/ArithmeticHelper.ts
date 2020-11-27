@@ -423,36 +423,6 @@ export function coerceScalarToBoolean(arg: InternalScalarValue): boolean | CellE
   }
 }
 
-export type complex = [number, number]
-
-export function coerceScalarToComplex(arg: InternalScalarValue): complex | CellError {
-  if(arg instanceof CellError) {
-    return arg
-  } else if(arg === EmptyValue) {
-    return [0,0]
-  } else if(typeof arg === 'number') {
-    return [arg,0]
-  } else if(typeof arg === 'string') {
-    return coerceStringToComplex(arg)
-  } else {
-    return new CellError(ErrorType.NUM, ErrorMessage.ComplexNumberExpected)
-  }
-}
-
-function coerceStringToComplex(arg: string): complex | CellError {
-  const regexp = /^\s*([+-]?\s*[\d\.]+(e[+-]?\d+)?)\s*([ij]?)\s*(([+-])(\s*([+-]?\s*[\d\.]+(e[+-]?\d+)?)\s*([ij]?)))?$/
-  const res = regexp.exec(arg)
-  if(res === null) {
-    return new CellError(ErrorType.NUM, ErrorMessage.ComplexNumberExpected)
-  }
-  let num1 = res[1]
-  let im1 = res[3] !== ''
-  let op = res[5]
-  let num2 = res[7]
-  let im2 = res[9] !== ''
-  return new CellError(ErrorType.NUM, ErrorMessage.ComplexNumberExpected)
-}
-
 export function coerceScalarToString(arg: InternalScalarValue): string | CellError {
   if (arg instanceof CellError || typeof arg === 'string') {
     return arg
