@@ -30,7 +30,7 @@ describe('#coerceNonDateScalarToMaybeNumber', () => {
     expect(arithmeticHelper.coerceNonDateScalarToMaybeNumber(false)).toBe(0)
     expect(arithmeticHelper.coerceNonDateScalarToMaybeNumber(EmptyValue)).toBe(0)
     expect(arithmeticHelper.coerceNonDateScalarToMaybeNumber('')).toBe(0)
-    expect(arithmeticHelper.coerceNonDateScalarToMaybeNumber(' ')).toBe(0)
+    expect(arithmeticHelper.coerceNonDateScalarToMaybeNumber(' ')).toEqual(undefined)
   })
 })
 
