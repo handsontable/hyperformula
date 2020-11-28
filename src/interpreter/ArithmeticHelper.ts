@@ -368,9 +368,9 @@ export class ArithmeticHelper {
     if(arg instanceof CellError) {
       return arg
     } else if(arg === EmptyValue) {
-      return [0,0]
+      return [0, 0]
     } else if(typeof arg === 'number') {
-      return [arg,0]
+      return [arg, 0]
     } else if(typeof arg === 'string') {
       return this.coerceStringToComplex(arg)
     } else {
@@ -379,7 +379,7 @@ export class ArithmeticHelper {
   }
 
   private coerceStringToComplex(arg: string): complex | CellError {
-    const regexp = /^\s*([+-]?)\s*(([\d\.,]+(e[+-]?\d+)?)\s*([ij]?)|([ij]))\s*(([+-])\s*([+-]?)\s*(([\d\.,]+(e[+-]?\d+)?)\s*([ij]?)|([ij])))?$/g;
+    const regexp = /^\s*([+-]?)\s*(([\d\.,]+(e[+-]?\d+)?)\s*([ij]?)|([ij]))\s*(([+-])\s*([+-]?)\s*(([\d\.,]+(e[+-]?\d+)?)\s*([ij]?)|([ij])))?$/g
 
     const match = regexp.exec(arg)
     if(match === null) {
@@ -388,7 +388,7 @@ export class ArithmeticHelper {
 
     let val1
     if(match[6]!==undefined) {
-      val1 = (match[1]==='-'?[0,-1]:[0,1]) as complex
+      val1 = (match[1]==='-'?[0, -1]:[0, 1]) as complex
     } else {
       val1 = this.parseComplexToken(match[1] + match[3], match[5])
     }
@@ -403,7 +403,7 @@ export class ArithmeticHelper {
 
     let val2
     if(match[14]!==undefined) {
-      val2 = (match[9]==='-'?[0,-1]:[0,1]) as complex
+      val2 = (match[9]==='-'?[0, -1]:[0, 1]) as complex
     } else {
       val2 = this.parseComplexToken(match[9] + match[11], match[13])
     }
@@ -427,14 +427,14 @@ export class ArithmeticHelper {
       return new CellError(ErrorType.NUM, ErrorMessage.ComplexNumberExpected)
     }
     if(mod === '') {
-      return [val,0]
+      return [val, 0]
     } else {
-      return [0,val]
+      return [0, val]
     }
   }
 }
 
-export function coerceComplexToString([re,im]: complex, symb: string): string {
+export function coerceComplexToString([re, im]: complex, symb: string): string {
   if(im===0) {
     return re.toString()
   }

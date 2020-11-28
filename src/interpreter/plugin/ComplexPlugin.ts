@@ -27,7 +27,7 @@ export class ComplexPlugin extends  FunctionPlugin {
         if(unit !== 'i' && unit !== 'j') {
           return new CellError(ErrorType.VALUE, ErrorMessage.ShouldBeIorJ)
         }
-        return coerceComplexToString([re,im], unit)
+        return coerceComplexToString([re, im], unit)
       })
   }
 }
