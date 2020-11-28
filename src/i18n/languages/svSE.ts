@@ -328,6 +328,7 @@ const dictionary: RawTranslationPackage = {
     PHI: 'PHI',
     'NEGBINOM.DIST': 'NEGBINOM.FÖRD',
     NEGBINOMDIST: 'NEGBINOMFÖRD',
+    COMPLEX: 'KOMPLEX',
   },
   langCode: 'svSE',
   ui: {

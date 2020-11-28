@@ -328,6 +328,7 @@ const dictionary: RawTranslationPackage = {
     PHI: 'FII',
     'NEGBINOM.DIST': 'BINOMI.JAKAUMA.NEG',
     NEGBINOMDIST: 'BINOMIJAKAUMA.NEG',
+    COMPLEX: 'KOMPLEKSI',
   },
   langCode: 'fiFI',
   ui: {

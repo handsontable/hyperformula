@@ -434,6 +434,30 @@ export class ArithmeticHelper {
   }
 }
 
+export function coerceComplexToString([re,im]: complex, symb: string): string {
+  if(im===0) {
+    return re.toString()
+  }
+  if(re===0) {
+    if(im===1) {
+      return symb
+    } else if(im===-1) {
+      return '-'+symb
+    } else {
+      return im.toString() + symb
+    }
+  }
+  if(im===1) {
+    return re.toString()+'+'+symb
+  } else if(im===-1) {
+    return re.toString()+'-'+symb
+  } else if(im>0) {
+    return re.toString()+'+'+im.toString()+symb
+  } else {
+    return re.toString()+im.toString()+symb
+  }
+}
+
 export function coerceToRange(arg: InterpreterValue): SimpleRangeValue {
   if (arg instanceof SimpleRangeValue) {
     return arg

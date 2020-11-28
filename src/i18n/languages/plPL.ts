@@ -328,6 +328,7 @@ const dictionary: RawTranslationPackage = {
     PHI: 'PHI',
     'NEGBINOM.DIST': 'ROZKŁ.DWUM.PRZEC',
     NEGBINOMDIST: 'ROZKŁAD.DWUM.PRZEC',
+    COMPLEX: 'LICZBA.ZESP',
   },
   langCode: 'plPL',
   ui: {
