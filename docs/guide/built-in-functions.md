@@ -95,6 +95,7 @@ lets you design your own [custom functions](custom-functions).
 | BITOR | Engineering | Returns a bitwise logical "or" of the parameters. | BITOR(Number1; Number2) |
 | BITRSHIFT | Engineering | Shifts a number right by n bits. | BITRSHIFT(Number; Shift) |
 | BITXOR | Engineering | Returns a bitwise logical "exclusive or" of the parameters. | BITXOR(Number1; Number2) |
+| COMPLEX | Engineering | Returns complex number from Re and Im parts. | COMPLEX(Re; Im[; Symbol]) |
 | DEC2BIN | Engineering | Returns the binary number for the decimal number entered between –512 and 511. | DEC2BIN(Number; Places) |
 | DEC2HEX | Engineering | Returns the hexadecimal number for the decimal number entered. | DEC2HEX(Number; Places) |
 | DEC2OCT | Engineering | Returns the octal number for the decimal number entered. | DEC2OCT(Number; Places) |
