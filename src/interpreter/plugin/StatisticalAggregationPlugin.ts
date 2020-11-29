@@ -269,7 +269,7 @@ export class StatisticalAggregationPlugin extends  FunctionPlugin {
       }
         const n = ret[0].length
       if (n < 1) {
-        return new CellError(ErrorType.DIV_BY_ZERO, ErrorMessage.TwoValues)
+        return new CellError(ErrorType.DIV_BY_ZERO, ErrorMessage.OneValue)
       }
       if(n === 1) {
         return 0

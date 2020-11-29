@@ -32,6 +32,15 @@ describe('COVARIANCE.P', () => {
     expect(engine.getCellValue(adr('A3'))).toEqual(2.5)
   })
 
+  it('error when not enough data',  () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=COVARIANCE.P(A2:A2, A2:A2)'],
+      [null]
+    ])
+
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.DIV_BY_ZERO, ErrorMessage.OneValue))
+  })
+
   it('works',  () => {
     const engine = HyperFormula.buildFromArray([
       ['2', '4'],

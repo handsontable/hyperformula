@@ -81,6 +81,7 @@ describe('Function LARGE', () => {
     expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.ValueSmall))
     expect(engine.getCellValue(adr('B1'))).toEqual(1)
     expect(engine.getCellValue(adr('C1'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.ValueLarge))
+    //inconsistency with product #2
     expect(engine.getCellValue(adr('D1'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.ValueLarge))
   })
 })
