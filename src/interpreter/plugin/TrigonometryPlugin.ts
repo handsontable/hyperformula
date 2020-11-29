@@ -177,7 +177,14 @@ export class TrigonometryPlugin extends FunctionPlugin {
   }
 
   public atan2(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('ATAN2'), Math.atan2)
+    return this.runFunction(ast.args, formulaAddress, this.metadata('ATAN2'),
+      (x: number, y: number) => {
+        if(x===0 && y===0) {
+          return new CellError(ErrorType.DIV_BY_ZERO)
+        }
+        return Math.atan2(y,x)
+      }
+    )
   }
 
   public cot(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {

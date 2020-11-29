@@ -5,9 +5,15 @@ import {adr, detailedError} from '../testUtils'
 
 describe('Function ATAN2', () => {
   it('happy path', () => {
-    const engine = HyperFormula.buildFromArray([['=ATAN2(1,1)']], { smartRounding : false})
+    const engine = HyperFormula.buildFromArray([['=ATAN2(1,2)']], { smartRounding : false})
 
-    expect(engine.getCellValue(adr('A1'))).toBe(0.7853981633974483)
+    expect(engine.getCellValue(adr('A1'))).toBeCloseTo(1.107148718, 6)
+  })
+
+  it('validates error', () => {
+    const engine = HyperFormula.buildFromArray([['=ATAN2(0,0)']], { smartRounding : false})
+
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.DIV_BY_ZERO))
   })
 
   it('when value not numeric', () => {

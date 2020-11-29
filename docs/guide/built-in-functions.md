@@ -105,6 +105,8 @@ lets you design your own [custom functions](custom-functions).
 | HEX2BIN <br><Badge text="v0.2.0"/>| Engineering | The result is the binary number for the hexadecimal number entered. | HEX2BIN(Number; Places) |
 | HEX2DEC <br><Badge text="v0.2.0"/>| Engineering | The result is the decimal number for the hexadecimal number entered. | HEX2DEC(Number) |
 | HEX2OCT <br><Badge text="v0.2.0"/>| Engineering | The result is the octal number for the hexadecimal number entered. | HEX2OCT(Number; Places) |
+| IMABS | Engineering | Returns module of a complex number. | IMABS(Complex) |
+| IMAGINARY | Engineering | Returns imaginary part of a complex number. | IMAGINARY(Complex) |
 | OCT2BIN <br><Badge text="v0.2.0"/>| Engineering | The result is the binary number for the octal number entered. | OCT2BIN(Number; Places) |
 | OCT2DEC <br><Badge text="v0.2.0"/>| Engineering | The result is the decimal number for the octal number entered. | OCT2DEC(Number) |
 | OCT2HEX <br><Badge text="v0.2.0"/>| Engineering | The result is the hexadecimal number for the octal number entered. | OCT2HEX(Number; Places) |
