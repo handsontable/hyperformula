@@ -189,4 +189,12 @@ describe('Function aliases', () => {
   it('SKEWP should be an alias of SKEW.P', () => {
     expect(engine.getFunctionPlugin('SKEWP')!.aliases!['SKEWP']).toEqual('SKEW.P')
   })
+
+  it('TTEST should be an alias of T.TEST', () => {
+    expect(engine.getFunctionPlugin('TTEST')!.aliases!['TTEST']).toEqual('T.TEST')
+  })
+
+  it('CHITEST should be an alias of CHISQ.TEST', () => {
+    expect(engine.getFunctionPlugin('CHITEST')!.aliases!['CHITEST']).toEqual('CHISQ.TEST')
+  })
 })
