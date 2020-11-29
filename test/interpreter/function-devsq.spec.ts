@@ -52,6 +52,7 @@ describe('Function DEVSQ', () => {
     expect(engine.getCellValue(adr('C1'))).toEqualError(detailedError(ErrorType.DIV_BY_ZERO))
   })
 
+  //inconsistency with product #2
   it('returns 0 for empty ranges', () => {
     const engine = HyperFormula.buildFromArray([
       ['=DEVSQ(A2:A3)'],
