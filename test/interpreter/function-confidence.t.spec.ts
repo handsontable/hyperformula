@@ -56,6 +56,7 @@ describe('Function CONFIDENCE.T', () => {
       ['=CONFIDENCE.T(0.99, 0.01, 2)'],
       ['=CONFIDENCE.T(1, 0.01, 2)'],
       ['=CONFIDENCE.T(0.01, 0.1, 0.99)'],
+      ['=CONFIDENCE.T(0.01, 0.1, 1)'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toBeCloseTo(0.450121133444994, 6)
@@ -65,5 +66,6 @@ describe('Function CONFIDENCE.T', () => {
     expect(engine.getCellValue(adr('A5'))).toBeCloseTo(0.000111081209667629, 6)
     expect(engine.getCellValue(adr('A6'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.ValueLarge))
     expect(engine.getCellValue(adr('A7'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.ValueSmall))
+    expect(engine.getCellValue(adr('A8'))).toEqualError(detailedError(ErrorType.DIV_BY_ZERO))
   })
 })
