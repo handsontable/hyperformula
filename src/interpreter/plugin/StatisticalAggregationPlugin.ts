@@ -336,7 +336,12 @@ export class StatisticalAggregationPlugin extends  FunctionPlugin {
         if(arrX.length<=1 || arrY.length<=1) {
           return new CellError(ErrorType.DIV_BY_ZERO)
         }
-        const r = variance(arrX, true)/variance(arrY, true)
+        const vx = variance(arrX, true)
+        const vy = variance(arrY, true)
+        if(vx===0 || vy===0) {
+          return new CellError(ErrorType.DIV_BY_ZERO)
+        }
+        const r = vx/vy
         const v = centralF.cdf(r, arrX.length-1, arrY.length-1)
         return 2*Math.min(v, 1-v)
     })

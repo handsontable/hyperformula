@@ -65,4 +65,14 @@ describe('F.TEST', () => {
 
     expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.DIV_BY_ZERO))
   })
+
+  it('error when 0 variance',  () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=F.TEST(A2:C2, A3:C3)'],
+      [1, 1, 1],
+      [0, 1, 0],
+    ])
+
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.DIV_BY_ZERO))
+  })
 })
