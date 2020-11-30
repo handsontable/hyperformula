@@ -434,7 +434,11 @@ export class ArithmeticHelper {
   }
 }
 
-export function coerceComplexToString([re, im]: complex, symb: string): string {
+export function coerceComplexToString([re, im]: complex, symb?: string): string | CellError {
+  if(isNaN(re) || isNaN(im)) {
+    return new CellError(ErrorType.NUM, ErrorMessage.NaN)
+  }
+  symb = symb ?? 'i'
   if(im===0) {
     return re.toString()
   }

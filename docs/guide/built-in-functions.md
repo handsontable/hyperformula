@@ -107,6 +107,18 @@ lets you design your own [custom functions](custom-functions).
 | HEX2OCT <br><Badge text="v0.2.0"/>| Engineering | The result is the octal number for the hexadecimal number entered. | HEX2OCT(Number; Places) |
 | IMABS | Engineering | Returns module of a complex number. | IMABS(Complex) |
 | IMAGINARY | Engineering | Returns imaginary part of a complex number. | IMAGINARY(Complex) |
+| IMARGUMENT | Engineering | Returns argument of a complex number. | IMARGUMENT(Complex) |
+| IMCONJUGATE | Engineering | Returns conjugate of a complex number. | IMCONJUGATE(Complex) |
+| IMCOS | Engineering | Returns cosine of a complex number. | IMCOS(Complex) |
+| IMCOSH | Engineering | Returns hyperbolic cosine of a complex number. | IMCOSH(Complex) |
+| IMCOT | Engineering | Returns cotangens of a complex number. | IMCOT(Complex) |
+| IMCSC | Engineering | Returns cosecans of a complex number. | IMCSC(Complex) |
+| IMCSCH | Engineering | Returns hyperbolic cosecans of a complex number. | IMCSCH(Complex) |
+| IMSEC | Engineering | Returns secans of a complex number. | IMSEC(Complex) |
+| IMSECH | Engineering | Returns hyperbolic secans of a complex number. | IMSECH(Complex) |
+| IMSIN | Engineering | Returns sine of a complex number. | IMSIN(Complex) |
+| IMSINH | Engineering | Returns hyperbolic sine of a complex number. | IMSINH(Complex) |
+| IMTAN | Engineering | Returns tangens of a complex number. | IMTAN(Complex) |
 | OCT2BIN <br><Badge text="v0.2.0"/>| Engineering | The result is the binary number for the octal number entered. | OCT2BIN(Number; Places) |
 | OCT2DEC <br><Badge text="v0.2.0"/>| Engineering | The result is the decimal number for the octal number entered. | OCT2DEC(Number) |
 | OCT2HEX <br><Badge text="v0.2.0"/>| Engineering | The result is the hexadecimal number for the octal number entered. | OCT2HEX(Number; Places) |
