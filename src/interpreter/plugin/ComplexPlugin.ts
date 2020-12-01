@@ -8,6 +8,7 @@ import {ErrorMessage} from '../../error-message'
 import {ProcedureAst} from '../../parser'
 import {coerceComplexToString, complex} from '../ArithmeticHelper'
 import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
+import {InterpreterValue} from '../InterpreterValue'
 
 export class ComplexPlugin extends  FunctionPlugin {
   public static implementedFunctions = {
@@ -100,6 +101,34 @@ export class ComplexPlugin extends  FunctionPlugin {
     'IMTAN': {
       method: 'imtan',
       parameters: [
+        { argumentType: ArgumentTypes.COMPLEX },
+      ],
+    },
+    'IMDIV': {
+      method: 'imdiv',
+      parameters: [
+        { argumentType: ArgumentTypes.COMPLEX },
+        { argumentType: ArgumentTypes.COMPLEX },
+      ],
+    },
+    'IMPRODUCT': {
+      method: 'improduct',
+      parameters: [
+        { argumentType: ArgumentTypes.ANY },
+      ],
+      repeatLastArgs: 1,
+    },
+    'IMSUM': {
+      method: 'imsum',
+      parameters: [
+        { argumentType: ArgumentTypes.ANY },
+      ],
+      repeatLastArgs: 1,
+    },
+    'IMSUB': {
+      method: 'imsum',
+      parameters: [
+        { argumentType: ArgumentTypes.COMPLEX },
         { argumentType: ArgumentTypes.COMPLEX },
       ],
     },
@@ -202,6 +231,50 @@ export class ComplexPlugin extends  FunctionPlugin {
   public imtan(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.runFunction(ast.args, formulaAddress, this.metadata('IMTAN'),
       (arg: complex) => coerceComplexToString(div(sin(arg),cos(arg)))
+    )
+  }
+
+  public imdiv(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('IMDIV'),
+      (arg1: complex, arg2: complex) => coerceComplexToString(div(arg1, arg2))
+    )
+  }
+
+  public improduct(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('IMPRODUCT'),
+      (...args: InterpreterValue[]) => {
+        const coerced = this.interpreter.arithmeticHelper.coerceComplexExactRanges(args)
+        if (coerced instanceof CellError) {
+          return coerced
+        }
+        let prod: complex = [1,0]
+        for(const val of coerced) {
+          prod = mul(prod, val)
+        }
+        return coerceComplexToString(prod)
+      }
+    )
+  }
+
+  public imsum(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('IMSUM'),
+      (...args: InterpreterValue[]) => {
+        const coerced = this.interpreter.arithmeticHelper.coerceComplexExactRanges(args)
+        if (coerced instanceof CellError) {
+          return coerced
+        }
+        let sum: complex = [0,0]
+        for(const val of coerced) {
+          sum = add(sum, val)
+        }
+        return coerceComplexToString(sum)
+      }
+    )
+  }
+
+  public imsub(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('IMSUB'),
+      (arg1: complex, arg2: complex) => coerceComplexToString(sub(arg1, arg2))
     )
   }
 }

@@ -114,6 +114,8 @@ lets you design your own [custom functions](custom-functions).
 | IMCOT | Engineering | Returns cotangens of a complex number. | IMCOT(Complex) |
 | IMCSC | Engineering | Returns cosecans of a complex number. | IMCSC(Complex) |
 | IMCSCH | Engineering | Returns hyperbolic cosecans of a complex number. | IMCSCH(Complex) |
+| IMDIV | Engineering | Divides two complex numbers. | IMDIV(Complex1; Complex2) |
+| IMPRODUCT | Engineering | Multiplies two complex numbers. | IMPRODUCT(Complex1; Complex2) |
 | IMSEC | Engineering | Returns secans of a complex number. | IMSEC(Complex) |
 | IMSECH | Engineering | Returns hyperbolic secans of a complex number. | IMSECH(Complex) |
 | IMSIN | Engineering | Returns sine of a complex number. | IMSIN(Complex) |

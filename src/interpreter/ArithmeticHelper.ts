@@ -285,6 +285,52 @@ export class ArithmeticHelper {
     }
   }
 
+  public coerceComplexExactRanges(args: InterpreterValue[]): complex[] | CellError {
+    const vals: (complex | SimpleRangeValue)[] = []
+    for(const arg of args) {
+      if(arg instanceof SimpleRangeValue) {
+        vals.push(arg)
+      } else {
+        const coerced = this.coerceScalarToComplex(arg)
+        if(coerced instanceof CellError) {
+          return coerced
+        } else {
+          vals.push(coerced)
+        }
+      }
+    }
+    const expandedVals: complex[] = []
+    for(const val of vals) {
+      if(val instanceof SimpleRangeValue) {
+        const arr = this.manyToExactComplex(val.valuesFromTopLeftCorner())
+        if(arr instanceof CellError) {
+          return arr
+        } else {
+          expandedVals.push(...arr)
+        }
+      } else {
+        expandedVals.push(val)
+      }
+    }
+    return expandedVals
+
+  }
+
+  public manyToExactComplex = (args: InternalScalarValue[]): complex[] | CellError => {
+    const ret: complex[] = []
+    for(const arg of args) {
+      if(arg instanceof CellError) {
+        return arg
+      } else if (typeof arg === 'number' || typeof arg === 'string') {
+        const coerced = this.coerceScalarToComplex(arg)
+        if(!(coerced instanceof CellError)) {
+          ret.push(coerced)
+        }
+      }
+    }
+    return ret
+  }
+
   public coerceNumbersExactRanges = (args: InterpreterValue[]): number[] | CellError =>  this.manyToNumbers(args, this.manyToExactNumbers)
 
   public coerceNumbersCoerceRangesDropNulls = (args: InterpreterValue[]): number[] | CellError =>  this.manyToNumbers(args, this.manyToCoercedNumbersDropNulls)
