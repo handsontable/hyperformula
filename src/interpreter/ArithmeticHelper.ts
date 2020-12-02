@@ -290,7 +290,7 @@ export class ArithmeticHelper {
     for(const arg of args) {
       if(arg instanceof SimpleRangeValue) {
         vals.push(arg)
-      } else {
+      } else if(arg !== EmptyValue) {
         const coerced = this.coerceScalarToComplex(arg)
         if(coerced instanceof CellError) {
           return coerced
