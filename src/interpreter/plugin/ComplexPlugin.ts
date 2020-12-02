@@ -136,7 +136,7 @@ export class ComplexPlugin extends  FunctionPlugin {
 
   public complex(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.runFunction(ast.args, formulaAddress, this.metadata('COMPLEX'),
-      ([re, im]: complex, unit: string) => {
+      (re: number, im: number, unit: string) => {
         if(unit !== 'i' && unit !== 'j') {
           return new CellError(ErrorType.VALUE, ErrorMessage.ShouldBeIorJ)
         }

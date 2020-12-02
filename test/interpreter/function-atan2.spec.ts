@@ -34,7 +34,7 @@ describe('Function ATAN2', () => {
       ['="-1"', '="1"', '=ATAN2(A1,B1)'],
     ])
 
-    expect(engine.getCellValue(adr('C1'))).toBeCloseTo(-0.785398163397448)
+    expect(engine.getCellValue(adr('C1'))).toBeCloseTo(2.35619449019234)
   })
 
   it('errors propagation', () => {
