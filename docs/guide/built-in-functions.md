@@ -115,11 +115,13 @@ lets you design your own [custom functions](custom-functions).
 | IMCSC | Engineering | Returns cosecans of a complex number. | IMCSC(Complex) |
 | IMCSCH | Engineering | Returns hyperbolic cosecans of a complex number. | IMCSCH(Complex) |
 | IMDIV | Engineering | Divides two complex numbers. | IMDIV(Complex1; Complex2) |
-| IMPRODUCT | Engineering | Multiplies two complex numbers. | IMPRODUCT(Complex1; Complex2) |
+| IMPRODUCT | Engineering | Multiplies complex numbers. | IMPRODUCT(Complex1 ...Complex30) |
 | IMSEC | Engineering | Returns secans of a complex number. | IMSEC(Complex) |
 | IMSECH | Engineering | Returns hyperbolic secans of a complex number. | IMSECH(Complex) |
 | IMSIN | Engineering | Returns sine of a complex number. | IMSIN(Complex) |
 | IMSINH | Engineering | Returns hyperbolic sine of a complex number. | IMSINH(Complex) |
+| IMSUB | Engineering | Subtracts two complex numbers. | IMSUB(Complex1; Complex2) |
+| IMSUM | Engineering | Adds complex numbers. | IMSUM(Complex1 ...Complex30) |
 | IMTAN | Engineering | Returns tangens of a complex number. | IMTAN(Complex) |
 | OCT2BIN <br><Badge text="v0.2.0"/>| Engineering | The result is the binary number for the octal number entered. | OCT2BIN(Number; Places) |
 | OCT2DEC <br><Badge text="v0.2.0"/>| Engineering | The result is the decimal number for the octal number entered. | OCT2DEC(Number) |
