@@ -481,7 +481,7 @@ export class ArithmeticHelper {
 }
 
 export function coerceComplexToString([re, im]: complex, symb?: string): string | CellError {
-  if(isNaN(re) || isNaN(im)) {
+  if(!isFinite(re) || !isFinite(im)) {
     return new CellError(ErrorType.NUM, ErrorMessage.NaN)
   }
   symb = symb ?? 'i'

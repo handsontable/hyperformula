@@ -115,7 +115,12 @@ lets you design your own [custom functions](custom-functions).
 | IMCSC | Engineering | Returns cosecans of a complex number. | IMCSC(Complex) |
 | IMCSCH | Engineering | Returns hyperbolic cosecans of a complex number. | IMCSCH(Complex) |
 | IMDIV | Engineering | Divides two complex numbers. | IMDIV(Complex1; Complex2) |
+| IMEXP | Engineering | Returns exponent of a complex number. | IMEXP(Complex) |
+| IMLN | Engineering | Returns natural logarithm of a complex number. | IMLN(Complex) |
+| IMLOG2 | Engineering | Returns binary logarithm of a complex number. | IMLOG2(Complex) |
+| IMLOG10 | Engineering | Returns base-10 logarithm of a complex number. | IMLOG10(Complex) |
 | IMPRODUCT | Engineering | Multiplies complex numbers. | IMPRODUCT(Complex1 ...Complex30) |
+| IMREAL | Engineering | Returns real part of a complex number. | IMREAL(Complex) |
 | IMSEC | Engineering | Returns secans of a complex number. | IMSEC(Complex) |
 | IMSECH | Engineering | Returns hyperbolic secans of a complex number. | IMSECH(Complex) |
 | IMSIN | Engineering | Returns sine of a complex number. | IMSIN(Complex) |
