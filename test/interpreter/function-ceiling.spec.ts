@@ -3,7 +3,7 @@ import {ErrorMessage} from '../../src/error-message'
 import {adr, detailedError} from '../testUtils'
 
 describe('Function CEILING', () => {
-  /*Inconsistent with ODDF standard.*/
+  /*Inconsistent with ODFF standard.*/
   it('should return error for wrong number of arguments', () => {
     const engine = HyperFormula.buildFromArray([
       ['=CEILING(1)'],
