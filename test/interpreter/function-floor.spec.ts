@@ -3,7 +3,7 @@ import {ErrorMessage} from '../../src/error-message'
 import {adr, detailedError} from '../testUtils'
 
 describe('Function FLOOR', () => {
-  /*Inconsistent with ODDF standard.*/
+  /*Inconsistent with ODFF standard.*/
   it('should return error for wrong number of arguments', () => {
     const engine = HyperFormula.buildFromArray([
       ['=FLOOR(1)'],
