@@ -37,11 +37,11 @@ describe('Function IMPOWER', () => {
     // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
     // @ts-ignore
     const coerce = (arg: CellValue): complex => engine.evaluator.interpreter.arithmeticHelper.coerceScalarToComplex(arg)
-    expectToBeCloseForComplex(coerce(engine.getCellValue(adr('A1'))),coerce("0"),6)
-    expectToBeCloseForComplex(coerce(engine.getCellValue(adr('A2'))),coerce("1.09247705577745+0.35496731310463i"),6)
-    expectToBeCloseForComplex(coerce(engine.getCellValue(adr('A3'))),coerce("-0.12-0.16i"),6)
+    expectToBeCloseForComplex(coerce(engine.getCellValue(adr('A1'))), coerce('0'), 6)
+    expectToBeCloseForComplex(coerce(engine.getCellValue(adr('A2'))), coerce('1.09247705577745+0.35496731310463i'), 6)
+    expectToBeCloseForComplex(coerce(engine.getCellValue(adr('A3'))), coerce('-0.12-0.16i'), 6)
     expect(engine.getCellValue(adr('A4'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.NaN))
     expect(engine.getCellValue(adr('A5'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.NaN))
-    expectToBeCloseForComplex(coerce(engine.getCellValue(adr('A6'))),coerce("1"),6)
+    expectToBeCloseForComplex(coerce(engine.getCellValue(adr('A6'))), coerce('1'), 6)
   })
 })

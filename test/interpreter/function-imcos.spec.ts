@@ -32,8 +32,8 @@ describe('Function IMCOS', () => {
     // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
     // @ts-ignore
     const coerce = (arg: CellValue): complex => engine.evaluator.interpreter.arithmeticHelper.coerceScalarToComplex(arg)
-    expectToBeCloseForComplex(coerce(engine.getCellValue(adr('A1'))),coerce("1"),6)
-    expectToBeCloseForComplex(coerce(engine.getCellValue(adr('A2'))),coerce("1.5430806348"),6)
-    expectToBeCloseForComplex(coerce(engine.getCellValue(adr('A3'))),coerce("-27.0349456030742+3.85115333481178i"),6)
+    expectToBeCloseForComplex(coerce(engine.getCellValue(adr('A1'))), coerce('1'), 6)
+    expectToBeCloseForComplex(coerce(engine.getCellValue(adr('A2'))), coerce('1.5430806348'), 6)
+    expectToBeCloseForComplex(coerce(engine.getCellValue(adr('A3'))), coerce('-27.0349456030742+3.85115333481178i'), 6)
   })
 })

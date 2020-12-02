@@ -32,8 +32,8 @@ describe('Function IMCOT', () => {
     // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
     // @ts-ignore
     const coerce = (arg: CellValue): complex => engine.evaluator.interpreter.arithmeticHelper.coerceScalarToComplex(arg)
-    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NUM,ErrorMessage.NaN))
-    expectToBeCloseForComplex(coerce(engine.getCellValue(adr('A2'))),coerce("-1.31303528549933i"),6)
-    expectToBeCloseForComplex(coerce(engine.getCellValue(adr('A3'))),coerce("0.000187587737983659-1.00064439247156i"),6)
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.NaN))
+    expectToBeCloseForComplex(coerce(engine.getCellValue(adr('A2'))), coerce('-1.31303528549933i'), 6)
+    expectToBeCloseForComplex(coerce(engine.getCellValue(adr('A3'))), coerce('0.000187587737983659-1.00064439247156i'), 6)
   })
 })

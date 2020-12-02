@@ -23,10 +23,10 @@ describe('Function IMPRODUCT', () => {
     // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
     // @ts-ignore
     const coerce = (arg: CellValue): complex => engine.evaluator.interpreter.arithmeticHelper.coerceScalarToComplex(arg)
-    expectToBeCloseForComplex(coerce(engine.getCellValue(adr('A1'))),coerce("0"),6)
-    expectToBeCloseForComplex(coerce(engine.getCellValue(adr('A2'))),coerce("-1.5i"),6)
-    expectToBeCloseForComplex(coerce(engine.getCellValue(adr('A3'))),coerce("-42+6i"),6)
-    expectToBeCloseForComplex(coerce(engine.getCellValue(adr('A4'))),coerce("i"),6)
+    expectToBeCloseForComplex(coerce(engine.getCellValue(adr('A1'))), coerce('0'), 6)
+    expectToBeCloseForComplex(coerce(engine.getCellValue(adr('A2'))), coerce('-1.5i'), 6)
+    expectToBeCloseForComplex(coerce(engine.getCellValue(adr('A3'))), coerce('-42+6i'), 6)
+    expectToBeCloseForComplex(coerce(engine.getCellValue(adr('A4'))), coerce('i'), 6)
   })
 
   it('should fail for non-coercible explicit arguments', () => {
@@ -41,7 +41,7 @@ describe('Function IMPRODUCT', () => {
 
   it('should not coerce range arguments', () => {
     const engine = HyperFormula.buildFromArray([
-      ['=IMPRODUCT(B1:C1)', 1, "2+i"],
+      ['=IMPRODUCT(B1:C1)', 1, '2+i'],
       ['=IMPRODUCT(B2:D2)', 1, null, null],
       ['=IMPRODUCT(B3:D3)', 'i', 'abcd', true],
       ['=IMPRODUCT(B4:D4,)', 'i', '=NA()', 1],
@@ -50,9 +50,9 @@ describe('Function IMPRODUCT', () => {
     // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
     // @ts-ignore
     const coerce = (arg: CellValue): complex => engine.evaluator.interpreter.arithmeticHelper.coerceScalarToComplex(arg)
-    expectToBeCloseForComplex(coerce(engine.getCellValue(adr('A1'))),coerce("2+i"),6)
-    expectToBeCloseForComplex(coerce(engine.getCellValue(adr('A2'))),coerce("1"),6)
-    expectToBeCloseForComplex(coerce(engine.getCellValue(adr('A3'))),coerce("i"),6)
+    expectToBeCloseForComplex(coerce(engine.getCellValue(adr('A1'))), coerce('2+i'), 6)
+    expectToBeCloseForComplex(coerce(engine.getCellValue(adr('A2'))), coerce('1'), 6)
+    expectToBeCloseForComplex(coerce(engine.getCellValue(adr('A3'))), coerce('i'), 6)
     expect(engine.getCellValue(adr('A4'))).toEqualError(detailedError(ErrorType.NA))
   })
 })

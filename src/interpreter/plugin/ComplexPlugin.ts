@@ -194,30 +194,30 @@ export class ComplexPlugin extends  FunctionPlugin {
 
   public imaginary(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.runFunction(ast.args, formulaAddress, this.metadata('IMAGINARY'),
-      ([re,im]: complex) => im
+      ([re, im]: complex) => im
     )
   }
 
   public imreal(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.runFunction(ast.args, formulaAddress, this.metadata('IMREAL'),
-      ([re,im]: complex) => re
+      ([re, im]: complex) => re
     )
   }
 
   public imargument(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.runFunction(ast.args, formulaAddress, this.metadata('IMARGUMENT'),
-      ([re,im]: complex) => {
+      ([re, im]: complex) => {
         if(re===0 && im===0) {
           return new CellError(ErrorType.DIV_BY_ZERO)
         }
-        return Math.atan2(im,re)
+        return Math.atan2(im, re)
       }
     )
   }
 
   public imconjugate(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.runFunction(ast.args, formulaAddress, this.metadata('IMCONJUGATE'),
-      ([re,im]: complex) => coerceComplexToString([re,-im])
+      ([re, im]: complex) => coerceComplexToString([re, -im])
     )
   }
 
@@ -235,31 +235,31 @@ export class ComplexPlugin extends  FunctionPlugin {
 
   public imcot(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.runFunction(ast.args, formulaAddress, this.metadata('IMCOT'),
-      (arg: complex) => coerceComplexToString(div(cos(arg),sin(arg)))
+      (arg: complex) => coerceComplexToString(div(cos(arg), sin(arg)))
     )
   }
 
   public imcsc(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.runFunction(ast.args, formulaAddress, this.metadata('IMCSC'),
-      (arg: complex) => coerceComplexToString(div([1,0],sin(arg)))
+      (arg: complex) => coerceComplexToString(div([1, 0], sin(arg)))
     )
   }
 
   public imcsch(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.runFunction(ast.args, formulaAddress, this.metadata('IMCSCH'),
-      (arg: complex) => coerceComplexToString(div([1,0],sinh(arg)))
+      (arg: complex) => coerceComplexToString(div([1, 0], sinh(arg)))
     )
   }
 
   public imsec(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.runFunction(ast.args, formulaAddress, this.metadata('IMSEC'),
-      (arg: complex) => coerceComplexToString(div([1,0],cos(arg)))
+      (arg: complex) => coerceComplexToString(div([1, 0], cos(arg)))
     )
   }
 
   public imsech(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.runFunction(ast.args, formulaAddress, this.metadata('IMSECH'),
-      (arg: complex) => coerceComplexToString(div([1,0],cosh(arg)))
+      (arg: complex) => coerceComplexToString(div([1, 0], cosh(arg)))
     )
   }
 
@@ -277,7 +277,7 @@ export class ComplexPlugin extends  FunctionPlugin {
 
   public imtan(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.runFunction(ast.args, formulaAddress, this.metadata('IMTAN'),
-      (arg: complex) => coerceComplexToString(div(sin(arg),cos(arg)))
+      (arg: complex) => coerceComplexToString(div(sin(arg), cos(arg)))
     )
   }
 
@@ -294,7 +294,7 @@ export class ComplexPlugin extends  FunctionPlugin {
         if (coerced instanceof CellError) {
           return coerced
         }
-        let prod: complex = [1,0]
+        let prod: complex = [1, 0]
         for(const val of coerced) {
           prod = mul(prod, val)
         }
@@ -310,7 +310,7 @@ export class ComplexPlugin extends  FunctionPlugin {
         if (coerced instanceof CellError) {
           return coerced
         }
-        let sum: complex = [0,0]
+        let sum: complex = [0, 0]
         for(const val of coerced) {
           sum = add(sum, val)
         }
@@ -340,7 +340,7 @@ export class ComplexPlugin extends  FunctionPlugin {
   public imlog10(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.runFunction(ast.args, formulaAddress, this.metadata('IMLOG10'),
       (arg: complex) => {
-        const [re,im] = ln(arg)
+        const [re, im] = ln(arg)
         const c = Math.log(10)
         return coerceComplexToString([re/c, im/c])
       }
@@ -350,7 +350,7 @@ export class ComplexPlugin extends  FunctionPlugin {
   public imlog2(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.runFunction(ast.args, formulaAddress, this.metadata('IMLOG2'),
       (arg: complex) => {
-        const [re,im] = ln(arg)
+        const [re, im] = ln(arg)
         const c = Math.log(2)
         return coerceComplexToString([re/c, im/c])
       }
@@ -359,64 +359,64 @@ export class ComplexPlugin extends  FunctionPlugin {
 
   public impower(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.runFunction(ast.args, formulaAddress, this.metadata('IMPOWER'),
-      (arg: complex, n: number) => coerceComplexToString(power(arg,n))
+      (arg: complex, n: number) => coerceComplexToString(power(arg, n))
     )
   }
 
   public imsqrt(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.runFunction(ast.args, formulaAddress, this.metadata('IMSQRT'),
-      (arg: complex) => coerceComplexToString(power(arg,0.5))
+      (arg: complex) => coerceComplexToString(power(arg, 0.5))
     )
   }
 }
 
-function add([re1,im1]: complex, [re2,im2]: complex): complex {
-  return [re1+re2,im1+im2]
+function add([re1, im1]: complex, [re2, im2]: complex): complex {
+  return [re1+re2, im1+im2]
 }
 
-function sub([re1,im1]: complex, [re2,im2]: complex): complex {
-  return [re1-re2,im1-im2]
+function sub([re1, im1]: complex, [re2, im2]: complex): complex {
+  return [re1-re2, im1-im2]
 }
 
-function mul([re1,im1]: complex, [re2,im2]: complex): complex {
-  return [re1*re2-im1*im2,re1*im2+re2*im1]
+function mul([re1, im1]: complex, [re2, im2]: complex): complex {
+  return [re1*re2-im1*im2, re1*im2+re2*im1]
 }
 
-function div([re1,im1]: complex, [re2,im2]: complex): complex {
-  const denom = Math.pow(re2,2)+Math.pow(im2,2)
-  const [nomRe,nomIm] = mul([re1,im1],[re2,-im2])
-  return [nomRe/denom,nomIm/denom]
+function div([re1, im1]: complex, [re2, im2]: complex): complex {
+  const denom = Math.pow(re2, 2)+Math.pow(im2, 2)
+  const [nomRe, nomIm] = mul([re1, im1], [re2, -im2])
+  return [nomRe/denom, nomIm/denom]
 }
 
-function cos([re,im]: complex): complex {
+function cos([re, im]: complex): complex {
   return [Math.cos(re)*Math.cosh(im), -Math.sin(re)*Math.sinh(im)]
 }
 
-function cosh([re,im]: complex): complex {
+function cosh([re, im]: complex): complex {
   return [Math.cosh(re)*Math.cos(im), Math.sinh(re)*Math.sin(im)]
 }
 
-function sin([re,im]: complex): complex {
-  return [Math.sin(re)*Math.cosh(im),Math.cos(re)*Math.sinh(im)]
+function sin([re, im]: complex): complex {
+  return [Math.sin(re)*Math.cosh(im), Math.cos(re)*Math.sinh(im)]
 }
 
-function sinh([re,im]: complex): complex {
-  return [Math.sinh(re)*Math.cos(im),Math.cosh(re)*Math.sin(im)]
+function sinh([re, im]: complex): complex {
+  return [Math.sinh(re)*Math.cos(im), Math.cosh(re)*Math.sin(im)]
 }
 
-function exp([re,im]: complex): complex {
-  return [Math.exp(re)*Math.cos(im),Math.exp(re)*Math.sin(im)]
+function exp([re, im]: complex): complex {
+  return [Math.exp(re)*Math.cos(im), Math.exp(re)*Math.sin(im)]
 }
 
-function abs([re,im]: complex): number {
+function abs([re, im]: complex): number {
   return Math.sqrt(re*re+im*im)
 }
 
-function ln([re,im]: complex): complex {
-  return [Math.log(abs([re,im])), Math.atan2(im,re)]
+function ln([re, im]: complex): complex {
+  return [Math.log(abs([re, im])), Math.atan2(im, re)]
 }
 
 function power(arg: complex, n: number) {
-  const [re,im] = ln(arg)
-  return exp([n*re,n*im])
+  const [re, im] = ln(arg)
+  return exp([n*re, n*im])
 }

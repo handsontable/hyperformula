@@ -182,7 +182,7 @@ export class TrigonometryPlugin extends FunctionPlugin {
         if(x===0 && y===0) {
           return new CellError(ErrorType.DIV_BY_ZERO)
         }
-        return Math.atan2(y,x)
+        return Math.atan2(y, x)
       }
     )
   }
