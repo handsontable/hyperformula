@@ -162,6 +162,19 @@ export class ComplexPlugin extends  FunctionPlugin {
         { argumentType: ArgumentTypes.COMPLEX },
       ],
     },
+    'IMPOWER': {
+      method: 'impower',
+      parameters: [
+        { argumentType: ArgumentTypes.COMPLEX },
+        { argumentType: ArgumentTypes.NUMBER },
+      ],
+    },
+    'IMSQRT': {
+      method: 'imsqrt',
+      parameters: [
+        { argumentType: ArgumentTypes.COMPLEX },
+      ],
+    },
   }
 
   public complex(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
@@ -343,6 +356,18 @@ export class ComplexPlugin extends  FunctionPlugin {
       }
     )
   }
+
+  public impower(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('IMPOWER'),
+      (arg: complex, n: number) => coerceComplexToString(power(arg,n))
+    )
+  }
+
+  public imsqrt(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('IMSQRT'),
+      (arg: complex) => coerceComplexToString(power(arg,0.5))
+    )
+  }
 }
 
 function add([re1,im1]: complex, [re2,im2]: complex): complex {
@@ -389,4 +414,9 @@ function abs([re,im]: complex): number {
 
 function ln([re,im]: complex): complex {
   return [Math.log(abs([re,im])), Math.atan2(im,re)]
+}
+
+function power(arg: complex, n: number) {
+  const [re,im] = ln(arg)
+  return exp([n*re,n*im])
 }
