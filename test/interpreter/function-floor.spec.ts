@@ -42,7 +42,7 @@ describe('Function FLOOR', () => {
     expect(engine.getCellValue(adr('A6'))).toEqual(0)
   })
 
-  /*Inconsistent with ODDF standard.*/
+  /*Inconsistent with ODFF standard.*/
   it('negative values', () => {
     const engine = HyperFormula.buildFromArray([
       ['=FLOOR(11, 2)'],
