@@ -62,6 +62,9 @@ describe('Function AVEDEV', () => {
     expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.DIV_BY_ZERO))
   })
 
+  /**
+   * Product #2 returns 0
+   */
   it('does coercions of nonnumeric explicit arguments', () => {
     const engine = HyperFormula.buildFromArray([
       ['=AVEDEV(TRUE(),FALSE(),)']
@@ -76,7 +79,7 @@ describe('Function AVEDEV', () => {
    */
   it('ignores nonnumeric values in ranges', () => {
     const engine = HyperFormula.buildFromArray([
-      ['=AVEDEV(A2:D2)'],
+      ['=AVEDEV(A2:E2)'],
       [0, 1, false, null, '\'0']
     ])
 

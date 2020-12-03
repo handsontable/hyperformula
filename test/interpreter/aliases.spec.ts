@@ -197,4 +197,8 @@ describe('Function aliases', () => {
   it('CHITEST should be an alias of CHISQ.TEST', () => {
     expect(engine.getFunctionPlugin('CHITEST')!.aliases!['CHITEST']).toEqual('CHISQ.TEST')
   })
+
+  it('ISO.CEILING should be an alias of CEILING.PRECISE', () => {
+    expect(engine.getFunctionPlugin('ISO.CEILING')!.aliases!['ISO.CEILING']).toEqual('CEILING.PRECISE')
+  })
 })

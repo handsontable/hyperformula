@@ -371,6 +371,12 @@ const dictionary: RawTranslationPackage = {
     LOGNORMINV: 'LOGNORMINV', //FIXME
     POISSONDIST: 'POISSONDIST', //FIXME
     SKEWP: 'SKEWP', //FIXME
+    'CEILING.MATH': 'ARRED.CIMA',
+    FLOOR: 'ARREDMULTB',
+    'FLOOR.MATH': 'ARRED.BAIXO',
+    'CEILING.PRECISE': 'CEILING.PRECISE', //FIXME
+    'FLOOR.PRECISE': 'FLOOR.PRECISE', //FIXME
+    'ISO.CEILING': 'ISO.CEILING', //FIXME
   },
   langCode: 'ptPT',
   ui: {

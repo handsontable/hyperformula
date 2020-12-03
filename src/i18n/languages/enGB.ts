@@ -371,6 +371,12 @@ const dictionary: RawTranslationPackage = {
     LOGNORMINV: 'LOGNORMINV',
     POISSONDIST: 'POISSONDIST',
     SKEWP: 'SKEWP',
+    'CEILING.MATH': 'CEILING.MATH',
+    FLOOR: 'FLOOR',
+    'FLOOR.MATH': 'FLOOR.MATH',
+    'CEILING.PRECISE': 'CEILING.PRECISE',
+    'FLOOR.PRECISE': 'FLOOR.PRECISE',
+    'ISO.CEILING': 'ISO.CEILING',
   },
   langCode: 'enGB',
   ui: {
