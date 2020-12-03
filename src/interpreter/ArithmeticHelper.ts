@@ -488,7 +488,7 @@ export function coerceComplexToString([re, im]: complex, symb?: string): string 
   if(im===0) {
     return `${re}`
   }
-  const imStr = `${im === -1 || im === 1 ? "" : Math.abs(im)}${symb}`
+  const imStr = `${im === -1 || im === 1 ? '' : Math.abs(im)}${symb}`
   if(re===0) {
     return `${im < 0 ? '-' : ''}${imStr}`
   }
