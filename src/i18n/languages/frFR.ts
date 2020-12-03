@@ -328,6 +328,12 @@ const dictionary: RawTranslationPackage = {
     PHI: 'PHI',
     'NEGBINOM.DIST': 'LOI.BINOMIALE.NEG.N',
     NEGBINOMDIST: 'LOI.BINOMIALE.NEG',
+    'CEILING.MATH': 'PLAFOND.MATH',
+    FLOOR: 'PLANCHER',
+    'FLOOR.MATH': 'PLANCHER.MATH',
+    'CEILING.PRECISE': 'CEILING.PRECISE', //FIXME
+    'FLOOR.PRECISE': 'FLOOR.PRECISE', //FIXME
+    'ISO.CEILING': 'ISO.CEILING', //FIXME
   },
   langCode: 'frFR',
   ui: {

@@ -66,14 +66,54 @@ export class RoundingPlugin extends FunctionPlugin {
         { argumentType: ArgumentTypes.NUMBER }
       ],
     },
-    'CEILING': {
-      method: 'ceiling',
+    'CEILING.MATH': {
+      method: 'ceilingmath',
       parameters: [
         { argumentType: ArgumentTypes.NUMBER },
         { argumentType: ArgumentTypes.NUMBER, defaultValue: 1 },
         { argumentType: ArgumentTypes.NUMBER, defaultValue: 0 },
       ],
     },
+    'CEILING': {
+      method: 'ceiling',
+      parameters: [
+        { argumentType: ArgumentTypes.NUMBER },
+        { argumentType: ArgumentTypes.NUMBER },
+      ],
+    },
+    'CEILING.PRECISE': {
+      method: 'ceilingprecise',
+      parameters: [
+        { argumentType: ArgumentTypes.NUMBER },
+        { argumentType: ArgumentTypes.NUMBER, defaultValue: 1 },
+      ],
+    },
+    'FLOOR.MATH': {
+      method: 'floormath',
+      parameters: [
+        { argumentType: ArgumentTypes.NUMBER },
+        { argumentType: ArgumentTypes.NUMBER, defaultValue: 1 },
+        { argumentType: ArgumentTypes.NUMBER, defaultValue: 0 },
+      ],
+    },
+    'FLOOR': {
+      method: 'floor',
+      parameters: [
+        { argumentType: ArgumentTypes.NUMBER },
+        { argumentType: ArgumentTypes.NUMBER },
+      ],
+    },
+    'FLOOR.PRECISE': {
+      method: 'floorprecise',
+      parameters: [
+        { argumentType: ArgumentTypes.NUMBER },
+        { argumentType: ArgumentTypes.NUMBER, defaultValue: 1 },
+      ],
+    },
+  }
+
+  public static aliases = {
+    'ISO.CEILING': 'CEILING.PRECISE',
   }
 
   public roundup(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
@@ -143,21 +183,94 @@ export class RoundingPlugin extends FunctionPlugin {
     })
   }
 
-  public ceiling(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('CEILING'), (value: number, significance: number, mode: number) => {
+  public ceilingmath(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('CEILING.MATH'),
+      (value: number, significance: number, mode: number) => {
       if (significance === 0 || value === 0) {
         return 0
       }
 
-      if ((value > 0) !== (significance > 0) && ast.args.length > 1) {
-        return new CellError(ErrorType.NUM, ErrorMessage.DistinctSigns)
-      }
-
-      if (mode === 0) {
-        significance = Math.abs(significance)
+      significance = Math.abs(significance)
+      if (mode === 1 && value < 0) {
+        significance = -significance
       }
 
       return Math.ceil(value / significance) * significance
     })
+  }
+
+  public ceiling(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('CEILING'),
+      (value: number, significance: number) => {
+        if(value === 0) {
+          return 0
+        }
+        if (significance === 0) {
+          return new CellError(ErrorType.DIV_BY_ZERO)
+        }
+
+      if ((value > 0) && (significance < 0)) {
+        return new CellError(ErrorType.NUM, ErrorMessage.DistinctSigns)
+      }
+
+      return Math.ceil(value / significance) * significance
+    })
+  }
+
+  public ceilingprecise(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('CEILING.PRECISE'),
+      (value: number, significance: number) => {
+        if (significance === 0 || value === 0) {
+          return 0
+        }
+        significance = Math.abs(significance)
+        return Math.ceil(value / significance) * significance
+      })
+  }
+
+  public floormath(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('FLOOR.MATH'),
+      (value: number, significance: number, mode: number) => {
+        if (significance === 0 || value === 0) {
+          return 0
+        }
+
+        significance = Math.abs(significance)
+        if (mode === 1 && value < 0) {
+          significance *= -1
+        }
+
+        return Math.floor(value / significance) * significance
+      })
+  }
+
+  public floor(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('FLOOR'),
+      (value: number, significance: number) => {
+        if(value === 0) {
+          return 0
+        }
+        if (significance === 0) {
+          return new CellError(ErrorType.DIV_BY_ZERO)
+        }
+
+        if ((value > 0) && (significance < 0)) {
+          return new CellError(ErrorType.NUM, ErrorMessage.DistinctSigns)
+        }
+
+        return Math.floor(value / significance) * significance
+      })
+  }
+
+  public floorprecise(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('FLOOR.PRECISE'),
+      (value: number, significance: number) => {
+        if (significance === 0 || value === 0) {
+          return 0
+        }
+
+        significance = Math.abs(significance)
+        return Math.floor(value / significance) * significance
+      })
   }
 }

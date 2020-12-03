@@ -105,4 +105,8 @@ describe('Function aliases', () => {
   it('VARP should be an alias of VAR.P', () => {
     expect(engine.getFunctionPlugin('VARP')!.aliases!['VARP']).toEqual('VAR.P')
   })
+
+  it('ISO.CEILING should be an alias of CEILING.PRECISE', () => {
+    expect(engine.getFunctionPlugin('ISO.CEILING')!.aliases!['ISO.CEILING']).toEqual('CEILING.PRECISE')
+  })
 })
