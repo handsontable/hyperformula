@@ -484,7 +484,7 @@ export function coerceComplexToString([re, im]: complex, symb?: string): string 
   if(!isFinite(re) || !isFinite(im)) {
     return new CellError(ErrorType.NUM, ErrorMessage.NaN)
   }
-  symb = symb ?? 'i'
+  symb = symb ?? COMPLEX_NUMBER_SYMBOL
   if(im===0) {
     return `${re}`
   }
