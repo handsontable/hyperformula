@@ -354,6 +354,12 @@ const dictionary: RawTranslationPackage = {
     IMSUB: 'RÓŻN.LICZB.ZESP',
     IMSUM: 'SUMA.LICZB.ZESP',
     IMTAN: 'TAN.LICZBY.ZESP',
+    'CEILING.MATH': 'ZAOKR.W.GÓRĘ.MATEMATYCZNE',
+    FLOOR: 'ZAOKR.W.DÓŁ',
+    'FLOOR.MATH': 'ZAOKR.W.DÓŁ.MATEMATYCZNE',
+    'CEILING.PRECISE': 'CEILING.PRECISE', //FIXME
+    'FLOOR.PRECISE': 'FLOOR.PRECISE', //FIXME
+    'ISO.CEILING': 'ISO.CEILING', //FIXME
   },
   langCode: 'plPL',
   ui: {

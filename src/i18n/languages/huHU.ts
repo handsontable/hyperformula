@@ -354,6 +354,12 @@ const dictionary: RawTranslationPackage = {
     IMSUB: 'KÉPZ.KÜL',
     IMSUM: 'KÉPZ.ÖSSZEG',
     IMTAN: 'KÉPZ.TAN',
+    'CEILING.MATH': 'PLAFON.MAT',
+    FLOOR: 'PADLÓ',
+    'FLOOR.MATH': 'PADLÓ.MAT',
+    'CEILING.PRECISE': 'CEILING.PRECISE', //FIXME
+    'FLOOR.PRECISE': 'FLOOR.PRECISE', //FIXME
+    'ISO.CEILING': 'ISO.CEILING', //FIXME
   },
   langCode: 'huHU',
   ui: {

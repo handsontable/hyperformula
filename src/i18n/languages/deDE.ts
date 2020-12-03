@@ -354,6 +354,12 @@ const dictionary: RawTranslationPackage = {
     IMSUB: 'IMSUB',
     IMSUM: 'IMSUMME',
     IMTAN: 'IMATAN',
+    'CEILING.MATH': 'OBERGRENZE.MATHEMATIK',
+    FLOOR: 'UNTERGRENZE',
+    'FLOOR.MATH': 'UNTERGRENZE.MATHEMATIK',
+    'CEILING.PRECISE': 'CEILING.PRECISE', //FIXME
+    'FLOOR.PRECISE': 'FLOOR.PRECISE', //FIXME
+    'ISO.CEILING': 'ISO.CEILING', //FIXME
   },
   langCode: 'deDE',
   ui: {

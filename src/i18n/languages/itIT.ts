@@ -354,6 +354,12 @@ const dictionary: RawTranslationPackage = {
     IMSUB: 'COMP.DIFF',
     IMSUM: 'COMP.SOMMA',
     IMTAN: 'COMP.TAN',
+    'CEILING.MATH': 'ARROTONDA.ECCESSO.MAT',
+    FLOOR: 'ARROTONDA.DIFETTO',
+    'FLOOR.MATH': 'ARROTONDA.DIFETTO.MAT',
+    'CEILING.PRECISE': 'CEILING.PRECISE', //FIXME
+    'FLOOR.PRECISE': 'FLOOR.PRECISE', //FIXME
+    'ISO.CEILING': 'ISO.CEILING', //FIXME
   },
   langCode: 'itIT',
   ui: {

@@ -354,6 +354,12 @@ const dictionary: RawTranslationPackage = {
     IMSUB: 'МНИМ.РАЗН',
     IMSUM: 'МНИМ.СУММ',
     IMTAN: 'МНИМ.TAN',
+    'CEILING.MATH': 'ОКРВВЕРХ.МАТ',
+    FLOOR: 'ОКРВНИЗ',
+    'FLOOR.MATH': 'ОКРВНИЗ.МАТ',
+    'CEILING.PRECISE': 'CEILING.PRECISE', //FIXME
+    'FLOOR.PRECISE': 'FLOOR.PRECISE', //FIXME
+    'ISO.CEILING': 'ISO.CEILING', //FIXME
   },
   langCode: 'ruRU',
   ui: {

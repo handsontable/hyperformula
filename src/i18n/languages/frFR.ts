@@ -354,6 +354,12 @@ const dictionary: RawTranslationPackage = {
     IMSUB: 'COMPLEXE.DIFFERENCE',
     IMSUM: 'COMPLEXE.SOMME',
     IMTAN: 'COMPLEXE.TAN',
+    'CEILING.MATH': 'PLAFOND.MATH',
+    FLOOR: 'PLANCHER',
+    'FLOOR.MATH': 'PLANCHER.MATH',
+    'CEILING.PRECISE': 'CEILING.PRECISE', //FIXME
+    'FLOOR.PRECISE': 'FLOOR.PRECISE', //FIXME
+    'ISO.CEILING': 'ISO.CEILING', //FIXME
   },
   langCode: 'frFR',
   ui: {

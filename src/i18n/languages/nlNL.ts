@@ -354,6 +354,12 @@ const dictionary: RawTranslationPackage = {
     IMSUB: 'C.VERSCHIL',
     IMSUM: 'C.SOM',
     IMTAN: 'C.TAN',
+    'CEILING.MATH': 'AFRONDEN.BOVEN.WISK',
+    FLOOR: 'AFRONDEN.BENEDEN',
+    'FLOOR.MATH': 'AFRONDEN.BENEDEN.WISK',
+    'CEILING.PRECISE': 'CEILING.PRECISE', //FIXME
+    'FLOOR.PRECISE': 'FLOOR.PRECISE', //FIXME
+    'ISO.CEILING': 'ISO.CEILING', //FIXME
   },
   langCode: 'nlNL',
   ui: {
