@@ -53,14 +53,24 @@ describe('CHISQ.TEST', () => {
     expect(engine.getCellValue(adr('A3'))).toEqualError(detailedError(ErrorType.DIV_BY_ZERO))
   })
 
-  it('validates values #2',  () => {
+  it('accepts negative values',  () => {
     const engine = HyperFormula.buildFromArray([
       [1, 10, 1, 1, 3, 7],
       [2, 5, 1, 1, 4, -1],
       ['=CHISQ.TEST(A1:C2, D1:F2)']
     ])
 
-    expect(engine.getCellValue(adr('A3'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.ValueSmall))
+    expect(engine.getCellValue(adr('A3'))).toBeCloseTo(0.0000858340104264999, 9)
+  })
+
+  it('but checks intermediate values for negatives',  () => {
+    const engine = HyperFormula.buildFromArray([
+      [1, 10, 1, 1, 3, 7],
+      [2, 5, 1, 1, 4, -0.001],
+      ['=CHISQ.TEST(A1:C2, D1:F2)']
+    ])
+
+    expect(engine.getCellValue(adr('A3'))).toEqualError(detailedError(ErrorType.NUM,ErrorMessage.NaN))
   })
 
   it('doesnt do coercions, nonnumeric values are skipped',  () => {

@@ -405,10 +405,11 @@ export class StatisticalAggregationPlugin extends  FunctionPlugin {
         for(let i=0;i<ret[0].length;i++) {
           if(ret[1][i] === 0) {
             return new CellError(ErrorType.DIV_BY_ZERO)
-          } else if(ret[1][i] < 0) {
-            return new CellError(ErrorType.NUM, ErrorMessage.ValueSmall)
           }
           sum += Math.pow(ret[0][i]-ret[1][i], 2)/ret[1][i]
+        }
+        if(sum<0) {
+          return new CellError(ErrorType.NUM, ErrorMessage.NaN)
         }
         return 1 - chisquare.cdf(sum, (r>1 && c>1) ?(r-1)*(c-1):r*c-1 )
       })
