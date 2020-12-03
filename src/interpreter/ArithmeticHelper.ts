@@ -486,26 +486,13 @@ export function coerceComplexToString([re, im]: complex, symb?: string): string 
   }
   symb = symb ?? 'i'
   if(im===0) {
-    return re.toString()
+    return `${re}`
   }
+  const imStr = `${im === -1 || im === 1 ? "" : Math.abs(im)}${symb}`
   if(re===0) {
-    if(im===1) {
-      return symb
-    } else if(im===-1) {
-      return '-'+symb
-    } else {
-      return im.toString() + symb
-    }
+    return `${im < 0 ? '-' : ''}${imStr}`
   }
-  if(im===1) {
-    return re.toString()+'+'+symb
-  } else if(im===-1) {
-    return re.toString()+'-'+symb
-  } else if(im>0) {
-    return `${re}+${im}${symb}`
-  } else {
-    return re.toString()+im.toString()+symb
-  }
+  return `${re}${im < 0 ? '-' : '+'}${imStr}`
 }
 
 export function coerceToRange(arg: InterpreterValue): SimpleRangeValue {
