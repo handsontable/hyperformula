@@ -502,7 +502,7 @@ export function coerceComplexToString([re, im]: complex, symb?: string): string 
   } else if(im===-1) {
     return re.toString()+'-'+symb
   } else if(im>0) {
-    return re.toString()+'+'+im.toString()+symb
+    return `${re}+${im}${symb}`
   } else {
     return re.toString()+im.toString()+symb
   }
