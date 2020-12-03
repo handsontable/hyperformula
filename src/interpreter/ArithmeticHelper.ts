@@ -23,6 +23,10 @@ import Collator = Intl.Collator
 
 export type complex = [number, number]
 
+const COMPLEX_NUMBER_SYMBOL = 'i'
+const complexParsingRegexp = /^\s*([+-]?)\s*(([\d\.,]+(e[+-]?\d+)?)\s*([ij]?)|([ij]))\s*(([+-])\s*([+-]?)\s*(([\d\.,]+(e[+-]?\d+)?)\s*([ij]?)|([ij])))?$/g
+
+
 export class ArithmeticHelper {
   private readonly collator: Collator
   private readonly actualEps: number
@@ -425,9 +429,7 @@ export class ArithmeticHelper {
   }
 
   private coerceStringToComplex(arg: string): complex | CellError {
-    const regexp = /^\s*([+-]?)\s*(([\d\.,]+(e[+-]?\d+)?)\s*([ij]?)|([ij]))\s*(([+-])\s*([+-]?)\s*(([\d\.,]+(e[+-]?\d+)?)\s*([ij]?)|([ij])))?$/g
-
-    const match = regexp.exec(arg)
+    const match = complexParsingRegexp.exec(arg)
     if(match === null) {
       return new CellError(ErrorType.NUM, ErrorMessage.ComplexNumberExpected)
     }
