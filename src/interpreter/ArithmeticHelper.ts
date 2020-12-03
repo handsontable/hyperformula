@@ -268,12 +268,12 @@ export class ArithmeticHelper {
   public coerceNonDateScalarToMaybeNumber(arg: InternalScalarValue): Maybe<number> {
     if (arg === EmptyValue) {
       return 0
-    } else if (typeof arg === 'string' && this.numberLiteralsHelper.isNumber(arg)) {
-      return this.numberLiteralsHelper.numericStringToNumber(arg)
-    } else {
-      if(typeof arg === 'string' && arg.length>0 && arg.trim() === '') {
-        return undefined
+    } else if (typeof arg === 'string') {
+      if(arg === '') {
+        return 0
       }
+      return this.numberLiteralsHelper.numericStringToMaybeNumber(arg.trim())
+    } else {
       const coercedNumber = Number(arg)
       if (isNaN(coercedNumber)) {
         return undefined

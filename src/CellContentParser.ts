@@ -128,8 +128,9 @@ export class CellContentParser {
         return new CellContent.Error(this.config.errorMapping[content.toUpperCase()])
       } else {
         const trimmedContent = content.trim()
-        if (this.numberLiteralsHelper.isNumber(trimmedContent)) {
-          return new CellContent.Number(this.numberLiteralsHelper.numericStringToNumber(trimmedContent))
+        const parseAsNum = this.numberLiteralsHelper.numericStringToMaybeNumber(trimmedContent)
+        if(parseAsNum !== undefined) {
+          return new CellContent.Number(parseAsNum)
         }
         const parsedDateNumber = this.dateHelper.dateStringToDateNumber(trimmedContent)
         if (parsedDateNumber !== undefined) {

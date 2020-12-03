@@ -105,7 +105,7 @@ export const buildLexerConfig = (config: ParserConfig): ILexerConfig => {
 
   /* configurable tokens */
   const ArgSeparator = createToken({name: 'ArgSeparator', pattern: config.functionArgSeparator})
-  const NumberLiteral = createToken({name: 'NumberLiteral', pattern: new RegExp(`[\\d]*[${config.decimalSeparator}]?[\\d]+`)})
+  const NumberLiteral = createToken({name: 'NumberLiteral', pattern: new RegExp(`(([${config.decimalSeparator}]\\d+)|(\\d+([${config.decimalSeparator}]\\d*)?))(e[+-]?\\d+)?`)})
   const OffsetProcedureName = createToken({name: 'OffsetProcedureName', pattern: new RegExp(offsetProcedureNameLiteral, 'i')})
 
   /* order is important, first pattern is used */
