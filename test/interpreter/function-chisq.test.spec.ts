@@ -73,7 +73,7 @@ describe('CHISQ.TEST', () => {
       ['=CHISQ.TEST(A1:C2, D1:F2)']
     ])
 
-    expect(engine.getCellValue(adr('A3'))).toEqualError(detailedError(ErrorType.NUM,ErrorMessage.NaN))
+    expect(engine.getCellValue(adr('A3'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.NaN))
   })
 
   it('doesnt do coercions, nonnumeric values are skipped',  () => {
