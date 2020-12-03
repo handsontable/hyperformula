@@ -13,7 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added support for scientific notation. (#579)
 
 ### Changed
-- Changed CEILING function implementation to be consistent with existing implementations.
+- Changed CEILING function implementation to be consistent with existing implementations. (#582)
 
 ### Fixed
 - Fixed a problem with dependencies not collected for specific functions. (#550, #549)

@@ -202,9 +202,12 @@ export class RoundingPlugin extends FunctionPlugin {
   public ceiling(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.runFunction(ast.args, formulaAddress, this.metadata('CEILING'),
       (value: number, significance: number) => {
-      if (significance === 0 || value === 0) {
-        return 0
-      }
+        if(value === 0) {
+          return 0
+        }
+        if (significance === 0) {
+          return new CellError(ErrorType.DIV_BY_ZERO)
+        }
 
       if ((value > 0) && (significance < 0)) {
         return new CellError(ErrorType.NUM, ErrorMessage.DistinctSigns)
@@ -244,8 +247,11 @@ export class RoundingPlugin extends FunctionPlugin {
   public floor(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.runFunction(ast.args, formulaAddress, this.metadata('FLOOR'),
       (value: number, significance: number) => {
-        if (significance === 0 || value === 0) {
+        if(value === 0) {
           return 0
+        }
+        if (significance === 0) {
+          return new CellError(ErrorType.DIV_BY_ZERO)
         }
 
         if ((value > 0) && (significance < 0)) {

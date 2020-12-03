@@ -32,14 +32,16 @@ describe('Function FLOOR', () => {
       ['=FLOOR(-3.14, -1.8)'],
       ['=FLOOR(-3.14, 0)'],
       ['=FLOOR(3.14, 0)'],
+      ['=FLOOR(0, 0)'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqual(4.2)
     expect(engine.getCellValue(adr('A2'))).toEqual(4.2)
     expect(engine.getCellValue(adr('A3'))).toEqual(4)
     expect(engine.getCellValue(adr('A4'))).toEqual(-1.8)
-    expect(engine.getCellValue(adr('A5'))).toEqual(0)
-    expect(engine.getCellValue(adr('A6'))).toEqual(0)
+    expect(engine.getCellValue(adr('A5'))).toEqualError(detailedError(ErrorType.DIV_BY_ZERO))
+    expect(engine.getCellValue(adr('A6'))).toEqualError(detailedError(ErrorType.DIV_BY_ZERO))
+    expect(engine.getCellValue(adr('A7'))).toEqual(0)
   })
 
   /*Inconsistent with ODFF standard.*/
