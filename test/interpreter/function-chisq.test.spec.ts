@@ -33,6 +33,9 @@ describe('CHISQ.TEST', () => {
     expect(engine.getCellValue(adr('A3'))).toBeCloseTo(0.00000054330486, 9)
   })
 
+  /**
+   * product #2 accepts this as a valid input
+   */
   it('validates dimensions',  () => {
     const engine = HyperFormula.buildFromArray([
       [1, 10, 1, 1, 3, 7],

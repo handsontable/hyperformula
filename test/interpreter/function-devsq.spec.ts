@@ -63,6 +63,9 @@ describe('Function DEVSQ', () => {
     expect(engine.getCellValue(adr('A1'))).toEqual(0)
   })
 
+  /**
+   * product #1 does not coerce the input
+   */
   it('does coercions of nonnumeric explicit arguments', () => {
     const engine = HyperFormula.buildFromArray([
       ['=DEVSQ(TRUE(),FALSE(),)']

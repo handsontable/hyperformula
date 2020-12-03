@@ -37,6 +37,9 @@ describe('Function SKEW.P', () => {
     expect(engine.getCellValue(adr('C1'))).toEqualError(detailedError(ErrorType.NA))
   })
 
+  /**
+   * product #1 does not coerce the input
+   */
   it('does coercions of nonnumeric explicit arguments', () => {
     const engine = HyperFormula.buildFromArray([
       ['=SKEW.P(TRUE(),FALSE(),)']

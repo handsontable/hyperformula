@@ -63,7 +63,7 @@ describe('Function AVEDEV', () => {
   })
 
   /**
-   * Product #2 returns 0
+   * Product #1 returns 0
    */
   it('does coercions of nonnumeric explicit arguments', () => {
     const engine = HyperFormula.buildFromArray([

@@ -72,6 +72,9 @@ describe('Function HARMEAN', () => {
     expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.OneValue))
   })
 
+  /**
+   * product #1 does not coerce the input
+   */
   it('does coercions of nonnumeric explicit arguments', () => {
     const engine = HyperFormula.buildFromArray([
       ['=HARMEAN(TRUE(),"4")']
