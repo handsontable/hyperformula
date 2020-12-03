@@ -1,7 +1,6 @@
-import {CellValue, ErrorType, HyperFormula} from '../../src'
+import {ErrorType, HyperFormula} from '../../src'
 import {ErrorMessage} from '../../src/error-message'
-import {complex} from '../../src/interpreter/ArithmeticHelper'
-import {adr, detailedError, expectToBeCloseForComplex} from '../testUtils'
+import {adr, detailedError} from '../testUtils'
 
 describe('Function IMSUM', () => {
   it('should return error for wrong number of arguments', () => {
@@ -20,13 +19,10 @@ describe('Function IMSUM', () => {
       ['=IMSUM("i",)'],
     ])
 
-    // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
-    // @ts-ignore
-    const coerce = (arg: CellValue): complex => engine.evaluator.interpreter.arithmeticHelper.coerceScalarToComplex(arg)
-    expectToBeCloseForComplex(coerce(engine.getCellValue(adr('A1'))), coerce('0'), 6)
-    expectToBeCloseForComplex(coerce(engine.getCellValue(adr('A2'))), coerce('-1.5+i'), 6)
-    expectToBeCloseForComplex(coerce(engine.getCellValue(adr('A3'))), coerce('4+5i'), 6)
-    expectToBeCloseForComplex(coerce(engine.getCellValue(adr('A4'))), coerce('i'), 6)
+    expect(engine.getCellValue(adr('A1'))).toEqual('0')
+    expect(engine.getCellValue(adr('A2'))).toEqual('-1.5+i')
+    expect(engine.getCellValue(adr('A3'))).toEqual('4+5i')
+    expect(engine.getCellValue(adr('A4'))).toEqual('i')
   })
 
   it('should fail for non-coercible explicit arguments', () => {
@@ -47,12 +43,9 @@ describe('Function IMSUM', () => {
       ['=IMSUM(B4:D4,)', 'i', '=NA()', 1],
     ])
 
-    // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
-    // @ts-ignore
-    const coerce = (arg: CellValue): complex => engine.evaluator.interpreter.arithmeticHelper.coerceScalarToComplex(arg)
-    expectToBeCloseForComplex(coerce(engine.getCellValue(adr('A1'))), coerce('3+i'), 6)
-    expectToBeCloseForComplex(coerce(engine.getCellValue(adr('A2'))), coerce('1'), 6)
-    expectToBeCloseForComplex(coerce(engine.getCellValue(adr('A3'))), coerce('i'), 6)
+    expect(engine.getCellValue(adr('A1'))).toEqual('3+i')
+    expect(engine.getCellValue(adr('A2'))).toEqual('1')
+    expect(engine.getCellValue(adr('A3'))).toEqual('i')
     expect(engine.getCellValue(adr('A4'))).toEqualError(detailedError(ErrorType.NA))
   })
 })

@@ -1,6 +1,5 @@
-import {CellValue, ErrorType, HyperFormula} from '../../src'
+import {ErrorType, HyperFormula} from '../../src'
 import {ErrorMessage} from '../../src/error-message'
-import {complex} from '../../src/interpreter/ArithmeticHelper'
 import {adr, detailedError, expectToBeCloseForComplex} from '../testUtils'
 
 describe('Function IMCOSH', () => {
@@ -29,11 +28,8 @@ describe('Function IMCOSH', () => {
       ['=IMCOSH("-3+4i")'],
     ])
 
-    // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
-    // @ts-ignore
-    const coerce = (arg: CellValue): complex => engine.evaluator.interpreter.arithmeticHelper.coerceScalarToComplex(arg)
-    expectToBeCloseForComplex(coerce(engine.getCellValue(adr('A1'))), coerce('1'), 6)
-    expectToBeCloseForComplex(coerce(engine.getCellValue(adr('A2'))), coerce('0.5403023058681398'), 6)
-    expectToBeCloseForComplex(coerce(engine.getCellValue(adr('A3'))), coerce('-6.58066304055116+7.58155274274655i'), 6)
+    expectToBeCloseForComplex(engine, 'A1', '1')
+    expectToBeCloseForComplex(engine, 'A2', '0.5403023058681398')
+    expectToBeCloseForComplex(engine, 'A3', '-6.58066304055116+7.58155274274655i')
   })
 })

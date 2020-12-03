@@ -1,6 +1,5 @@
-import {CellValue, ErrorType, HyperFormula} from '../../src'
+import {ErrorType, HyperFormula} from '../../src'
 import {ErrorMessage} from '../../src/error-message'
-import {complex} from '../../src/interpreter/ArithmeticHelper'
 import {adr, detailedError, expectToBeCloseForComplex} from '../testUtils'
 
 describe('Function IMTAN', () => {
@@ -29,11 +28,8 @@ describe('Function IMTAN', () => {
       ['=IMTAN("-3+4i")'],
     ])
 
-    // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
-    // @ts-ignore
-    const coerce = (arg: CellValue): complex => engine.evaluator.interpreter.arithmeticHelper.coerceScalarToComplex(arg)
-    expectToBeCloseForComplex(coerce(engine.getCellValue(adr('A1'))), coerce('0'), 6)
-    expectToBeCloseForComplex(coerce(engine.getCellValue(adr('A2'))), coerce('0.761594155955765i'), 6)
-    expectToBeCloseForComplex(coerce(engine.getCellValue(adr('A3'))), coerce('0.000187346204629478+0.999355987381473i'), 6)
+    expectToBeCloseForComplex(engine, 'A1', '0')
+    expectToBeCloseForComplex(engine, 'A2', '0.761594155955765i')
+    expectToBeCloseForComplex(engine, 'A3', '0.000187346204629478+0.999355987381473i')
   })
 })
