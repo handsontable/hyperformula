@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added function aliases mechanism. (#569)
 - Added support for scientific notation. (#579)
 - Added 26 math functions COMPLEX, IMABS, IMAGINARY, IMARGUMENT, IMCONJUGATE, IMCOS, IMCOSH, IMCOT, IMCSC, IMCSCH, IMDIV, IMEXP, IMLN, IMLOG10, IMLOG2, IMPOWER, IMPRODUCT, IMREAL, IMSEC, IMSECH, IMSIN, IMSINH, IMSQRT, IMSUB,  IMSUM, IMTAN. 
+- Added support for complex numbers. (#281)
 
 ### Fixed
 - Fixed a problem with dependencies not collected for specific functions. (#550, #549)
