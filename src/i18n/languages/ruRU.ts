@@ -354,6 +354,49 @@ const dictionary: RawTranslationPackage = {
     IMSUB: 'МНИМ.РАЗН',
     IMSUM: 'МНИМ.СУММ',
     IMTAN: 'МНИМ.TAN',
+    LARGE: 'НАИБОЛЬШИЙ',
+    SMALL: 'НАИМЕНЬШИЙ',
+    AVEDEV: 'СРОТКЛ',
+    CONFIDENCE: 'ДОВЕРИТ',
+    'CONFIDENCE.NORM': 'ДОВЕРИТ.НОРМ',
+    'CONFIDENCE.T': 'ДОВЕРИТ.СТЬЮДЕНТ',
+    DEVSQ: 'КВАДРОТКЛ',
+    GEOMEAN: 'СРГЕОМ',
+    HARMEAN: 'СРГАРМ',
+    CRITBINOM: 'КРИТБИНОМ',
+    PEARSON: 'PEARSON',
+    RSQ: 'КВПИРСОН',
+    STANDARDIZE: 'НОРМАЛИЗАЦИЯ',
+    'Z.TEST': 'Z.ТЕСТ',
+    ZTEST: 'ZТЕСТ',
+    'F.TEST': 'F.ТЕСТ',
+    FTEST: 'ФТЕСТ',
+    STEYX: 'СТОШYX',
+    SLOPE: 'НАКЛОН',
+    COVAR: 'КОВАР',
+    'COVARIANCE.P': 'КОВАРИАЦИЯ.Г',
+    'COVARIANCE.S': 'КОВАРИАЦИЯ.В',
+    'CHISQ.TEST': 'ХИ2.ТЕСТ',
+    CHITEST: 'ХИ2ТЕСТ',
+    'T.TEST': 'СТЬЮДЕНТ.ТЕСТ',
+    TTEST: 'ТТЕСТ',
+    SKEW: 'СКОС',
+    'SKEW.P': 'СКОС.Г',
+    WEIBULLDIST: 'WEIBULLDIST', //FIXME
+    VARS: 'VARS', //FIXME
+    TINV2T: 'TINV2T', //FIXME
+    TDISTRT: 'TDISTRT', //FIXME
+    TDIST2T: 'TDIST2T', //FIXME
+    STDEVS: 'STDEVS', //FIXME
+    FINVRT: 'FINVRT', //FIXME
+    FDISTRT: 'FDISTRT', //FIXME
+    CHIDISTRT: 'CHIDISTRT', //FIXME
+    CHIINVRT: 'CHIINVRT', //FIXME
+    COVARIANCEP: 'COVARIANCEP', //FIXME
+    COVARIANCES: 'COVARIANCES', //FIXME
+    LOGNORMINV: 'LOGNORMINV', //FIXME
+    POISSONDIST: 'POISSONDIST', //FIXME
+    SKEWP: 'SKEWP', //FIXME
     'CEILING.MATH': 'ОКРВВЕРХ.МАТ',
     FLOOR: 'ОКРВНИЗ',
     'FLOOR.MATH': 'ОКРВНИЗ.МАТ',

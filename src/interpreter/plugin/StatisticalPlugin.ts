@@ -18,10 +18,13 @@ import {
   gamma,
   gammafn,
   gammaln,
-  hypgeom, lognormal, negbin,
+  hypgeom,
+  lognormal,
+  negbin,
   normal,
+  normalci,
   poisson,
-  studentt,
+  studentt, tci,
   weibull
 } from './3rdparty/jstat/jstat'
 import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
@@ -357,31 +360,67 @@ export class StatisticalPlugin extends  FunctionPlugin {
         {argumentType: ArgumentTypes.BOOLEAN},
       ]
     },
+    'CONFIDENCE.NORM': {
+      method: 'confidencenorm',
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0, lessThan: 1},
+        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
+        {argumentType: ArgumentTypes.NUMBER, minValue: 1},
+      ],
+    },
+    'CONFIDENCE.T': {
+      method: 'confidencet',
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0, lessThan: 1},
+        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
+        {argumentType: ArgumentTypes.NUMBER, minValue: 1},
+      ],
+    },
+    'STANDARDIZE': {
+      method: 'standardize',
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER},
+        {argumentType: ArgumentTypes.NUMBER},
+        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
+      ],
+    },
   }
 
   public static aliases = {
-    'NEGBINOMDIST' : 'NEGBINOM.DIST',
-    'EXPONDIST' : 'EXPON.DIST',
-    'BETADIST' : 'BETA.DIST',
-    'NORMDIST': 'NORM.DIST',
-    'NORMINV': 'NORM.INV',
-    'NORMSDIST': 'NORM.S.DIST',
-    'NORMSINV': 'NORM.S.INV',
-    'LOGNORMDIST': 'LOGNORM.DIST',
-    'LOGINV': 'LOGNORM.INV',
-    'TINV': 'T.INV.2T',
-    'HYPGEOMDIST': 'HYPGEOM.DIST',
-    'POISSON': 'POISSON.DIST',
-    'WEIBULL': 'WEIBULL.DIST',
-    'FINV': 'F.INV.RT',
-    'FDIST': 'F.DIST.RT',
-    'CHIDIST': 'CHISQ.DIST.RT',
-    'CHIINV': 'CHISQ.INV.RT',
-    'GAMMADIST': 'GAMMA.DIST',
+    NEGBINOMDIST : 'NEGBINOM.DIST',
+    EXPONDIST : 'EXPON.DIST',
+    BETADIST : 'BETA.DIST',
+    NORMDIST: 'NORM.DIST',
+    NORMINV: 'NORM.INV',
+    NORMSDIST: 'NORM.S.DIST',
+    NORMSINV: 'NORM.S.INV',
+    LOGNORMDIST: 'LOGNORM.DIST',
+    LOGINV: 'LOGNORM.INV',
+    TINV: 'T.INV.2T',
+    HYPGEOMDIST: 'HYPGEOM.DIST',
+    POISSON: 'POISSON.DIST',
+    WEIBULL: 'WEIBULL.DIST',
+    FINV: 'F.INV.RT',
+    FDIST: 'F.DIST.RT',
+    CHIDIST: 'CHISQ.DIST.RT',
+    CHIINV: 'CHISQ.INV.RT',
+    GAMMADIST: 'GAMMA.DIST',
     'GAMMALN.PRECISE': 'GAMMALN',
-    'GAMMAINV': 'GAMMA.INV',
-    'BETAINV': 'BETA.INV',
-    'BINOMDIST': 'BINOM.DIST',
+    GAMMAINV: 'GAMMA.INV',
+    BETAINV: 'BETA.INV',
+    BINOMDIST: 'BINOM.DIST',
+    CONFIDENCE: 'CONFIDENCE.NORM',
+    CRITBINOM: 'BINOM.INV',
+    WEIBULLDIST: 'WEIBULL.DIST',
+    TINV2T: 'T.INV.2T',
+    TDISTRT: 'T.DIST.RT',
+    TDIST2T: 'T.DIST.2T',
+    FINVRT: 'F.INV.RT',
+    FDISTRT: 'F.DIST.RT',
+    CHIDISTRT: 'CHISQ.DIST.RT',
+    CHIINVRT: 'CHISQ.INV.RT',
+    LOGNORMINV: 'LOGNORM.INV',
+    POISSONDIST: 'POISSON.DIST',
   }
 
   public erf(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
@@ -769,6 +808,34 @@ export class StatisticalPlugin extends  FunctionPlugin {
           return negbin.pdf(nf, ns, p)
         }
       }
+    )
+  }
+
+  public confidencenorm(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('CONFIDENCE.NORM'),
+      // eslint-disable-next-line
+      // @ts-ignore
+      (alpha: number, stddev: number, size: number) => normalci(1, alpha, stddev, Math.trunc(size))[1] - 1
+    )
+  }
+
+  public confidencet(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('CONFIDENCE.T'),
+      (alpha: number, stddev: number, size: number) => {
+        size = Math.trunc(size)
+        if(size===1) {
+          return new CellError(ErrorType.DIV_BY_ZERO)
+        }
+        // eslint-disable-next-line
+        // @ts-ignore
+        return tci(1, alpha, stddev, size)[1] - 1
+      }
+    )
+  }
+
+  public standardize(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('STANDARDIZE'),
+      (x: number, mean: number, stddev: number) => (x-mean)/stddev
     )
   }
 }
