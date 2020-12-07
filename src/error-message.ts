@@ -45,6 +45,7 @@ export class ErrorMessage {
   public static MatrixParams = 'Matrix function parameters are not compatible.'
   public static OneValue = 'Needs at least one value.'
   public static TwoValues = 'Range needs to contain at least two elements.'
+  public static ThreeValues = 'Range needs to contain at least three elements.'
   public static IndexBounds = 'Index out of bounds.'
   public static IndexLarge = 'Index too large.'
   public static Formula = 'Expected formula.'
@@ -66,6 +67,8 @@ export class ErrorMessage {
   public static NonZero = 'Argument cannot be 0.'
   public static LessThanOne = 'Argument cannot be less than 1.'
   public static WeekendString = 'Incorrect weekend bitmask string.'
+  public static InvalidRoman = 'Invalid roman numeral.'
+  public static WrongOrder = 'Wrong order of values.'
   public static FunctionName = (arg: string) => `Function name ${arg} not recognized.`
   public static NamedExpressionName = (arg: string) => `Named expression ${arg} not recognized.`
   public static LicenseKey = (arg: string) => `License key is ${arg}.`

@@ -333,11 +333,11 @@ export class AbsoluteCellRange {
     return this.end.col >= maxColumns || this.end.row >= maxRows
   }
 
-  protected effectiveEndColumn(_dependencyGraph: DependencyGraph): number {
+  public effectiveEndColumn(_dependencyGraph: DependencyGraph): number {
     return this.end.col
   }
 
-  protected effectiveEndRow(_dependencyGraph: DependencyGraph): number {
+  public effectiveEndRow(_dependencyGraph: DependencyGraph): number {
     return this.end.row
   }
 }
@@ -388,7 +388,7 @@ export class AbsoluteColumnRange extends AbsoluteCellRange {
     return this.end.col >= maxColumns
   }
 
-  protected effectiveEndRow(dependencyGraph: DependencyGraph): number {
+  public effectiveEndRow(dependencyGraph: DependencyGraph): number {
     return dependencyGraph.getSheetHeight(this.sheet) - 1
   }
 }
@@ -438,7 +438,7 @@ export class AbsoluteRowRange extends AbsoluteCellRange {
     return this.end.row >= maxRows
   }
 
-  protected effectiveEndColumn(dependencyGraph: DependencyGraph): number {
+  public effectiveEndColumn(dependencyGraph: DependencyGraph): number {
     return dependencyGraph.getSheetWidth(this.sheet) - 1
   }
 }

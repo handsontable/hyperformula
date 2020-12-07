@@ -14,8 +14,13 @@ import {InterpreterValue} from './InterpreterValue'
 * assuming sorted values in range
 * */
 export function rangeLowerBound(range: AbsoluteCellRange, key: InternalScalarValue, dependencyGraph: DependencyGraph, coordinate: 'row' | 'col'): number {
+  let end
+  if(coordinate === 'col') {
+    end = range.effectiveEndColumn(dependencyGraph)
+  } else {
+    end = range.effectiveEndRow(dependencyGraph)
+  }
   const start = range.start[coordinate]
-  const end = range.end[coordinate]
 
   let centerValueFn
   if (coordinate === 'row') {

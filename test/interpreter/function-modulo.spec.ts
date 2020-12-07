@@ -14,7 +14,7 @@ describe('Function MOD', () => {
     expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
   })
 
-  it('should not work for arguemnts of wrong type', () => {
+  it('should not work for arguments of wrong type', () => {
     const engine = HyperFormula.buildFromArray([
       ['=MOD(1, "foo")'],
       ['=MOD("bar", 4)'],

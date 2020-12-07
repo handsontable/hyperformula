@@ -5,10 +5,10 @@
 HyperFormula comes with an extensive library of pre-built functions.
 You can use them to create complex formulas for any business application.
 Formula syntax and logic of function are similar to what is
-considered a standard in modern spreadsheet software. That is
+considered the standard in modern spreadsheet software. That is
 because a spreadsheet is probably the most universal software
 ever created. We wanted the same flexibility for HyperFormula
-but without the constrains of the spreadsheet UI.
+but without the constraints of the spreadsheet UI.
 
 All implemented functions are grouped into 8 different categories:
 
@@ -27,7 +27,7 @@ are yet to be supported._
 
 ## Language packs
 
-HypeFormula provides translation packs for 16 languages thus making
+HyperFormula provides translation packs for 16 languages thus making
 it easier to create localized applications. The supported languages
 are: English (default), Czech, Danish, Dutch, Finnish, French,
 German, Hungarian, Italian, Norwegian, Polish, Portuguese, Russian,
@@ -176,13 +176,18 @@ lets you design your own [custom functions](custom-functions).
 | ACOSH <br><Badge text="v0.2.0"/>| Math and trigonometry | Returns the inverse harmonic cosine of a number. | ACOSH(Number) |
 | ACOT <br><Badge text="v0.2.0"/>| Math and trigonometry | Returns the inverse trigonometric cotangent of a number. | ACOT(Number) |
 | ACOTH <br><Badge text="v0.2.0"/>| Math and trigonometry | Returns the inverse harmonic cotangent of a number. | ACOTH(Number) |
+| ARABIC | Math and trigonometry | Converts number from roman form. | ARABIC(String) |
 | ASIN | Math and trigonometry | Returns the inverse trigonometric sine of a number. | ASIN(Number) |
 | ASINH <br><Badge text="v0.2.0"/>| Math and trigonometry | Returns the inverse harmonic sine of a number. | ASINH(Number) |
 | ATAN | Math and trigonometry | Returns the inverse trigonometric tangent of a number. | ATAN(Number) |
 | ATAN2 | Math and trigonometry | Returns the inverse trigonometric tangent of the specified x and y coordinates. | ATAN2(Numberx; Numbery) |
 | ATANH <br><Badge text="v0.2.0"/>| Math and trigonometry | Returns the inverse harmonic tangent of a number. | ATANH(Number) |
 | BASE | Math and trigonometry | Converts a positive integer to a specified base into a text from the numbering system. | BASE(Number; Radix; [Minimumlength]) |
-| CEILING | Math and trigonometry | Rounds a number up to the nearest multiple of Significance. | CEILING(Number; Significance; Mode) |
+| CEILING | Math and trigonometry | Rounds a number up to the nearest multiple of Significance. | CEILING(Number; Significance) |
+| CEILING.MATH | Math and trigonometry | Rounds a number up to the nearest multiple of Significance. | CEILING.MATH(Number[; Significance[; Mode]]) |
+| CEILING.PRECISE | Math and trigonometry | Rounds a number up to the nearest multiple of Significance. | CEILING.PRECISE(Number[; Significance]) |
+| COMBIN | Math and trigonometry | Returns number of combinations (without repetitions). | COMBIN(Number; Number) |
+| COMBINA | Math and trigonometry | Returns number of combinations (with repetitions). | COMBINA(Number; Number) |
 | COS | Math and trigonometry | Returns the cosine of the given angle (in radians). | COS(Number) |
 | COSH <br><Badge text="v0.2.0"/>| Math and trigonometry | Returns the hyperbolic cosine of the given value. | COSH(Number) |
 | COT | Math and trigonometry | Returns the cotangent of the given angle (in radians). | COT(Number) |
@@ -193,7 +198,59 @@ lets you design your own [custom functions](custom-functions).
 | DECIMAL | Math and trigonometry | Converts text with characters from a number system to a positive integer in the base radix given. | DECIMAL("Text"; Radix) |
 | DEGREES | Math and trigonometry | Converts radians into degrees. | DEGREES(Number) |
 | EVEN | Math and trigonometry | Rounds a positive number up to the next even integer and a negative number down to the next even integer. | EVEN(Number) |
-| EXP | Math and trigonometry | Returns e raised to the power of a number. | EXP(Number) |
+| EXP | Math and trigonometry | Returns constant e raised to the power of a number. | EXP(Number) |
+| FACT | Math and trigonometry | Returns a factorial of a number. | FACT(Number) |
+| FACTDOUBLE | Math and trigonometry | Returns a double factorial of a number. | FACTDOUBLE(Number) |
+| FLOOR | Math and trigonometry | Rounds a number down to the nearest multiple of Significance. | FLOOR(Number; Significance) |
+| FLOOR.MATH | Math and trigonometry | Rounds a number down to the nearest multiple of Significance. | FLOOR.MATH(Number[; Significance[; Mode]]) |
+| FLOOR.PRECISE | Math and trigonometry | Rounds a number down to the nearest multiple of Significance. | FLOOR.PRECISE(Number[; Significance]) |
+| GCD | Math and trigonometry | Computes greatest common divisor of numbers. | GCD(Number1; Number2; ...) |
+| INT | Math and trigonometry | Rounds a number down to the nearest integer. | INT(Number) |
+| ISO.CEILINGE | Math and trigonometry | Rounds a number up to the nearest multiple of Significance. | ISO.CEILING(Number[; Significance]) |
+| LCM | Math and trigonometry | Computes least common multiplicity of numbers. | LCM(Number1; Number2; ...) |
+| LN | Math and trigonometry | Returns the natural logarithm based on the constant e of a number. | LN(Number) |
+| LOG | Math and trigonometry | Returns the logarithm of a number to the specified base. | LOG(Number; Base) |
+| LOG10 | Math and trigonometry | Returns the base-10 logarithm of a number. | LOG10(Number) |
+| MOD | Math and trigonometry | Returns the remainder when one integer is divided by another. | MOD(Dividend; Divisor) |
+| MROUND | Math and trigonometry | Rounds number to the neares multiplicity. | MROUND(Number; Base) |
+| MULTINOMIAL | Math and trigonometry. | Returns number of multiset combinations. | MULTINOMIAL(Number1; Number2; ...) |
+| ODD | Math and trigonometry | Rounds a positive number up to the nearest odd integer and a negative number down to the nearest odd integer. | ODD(Number) |
+| PI | Math and trigonometry | Returns 3.14159265358979, the value of the mathematical constant PI to 14 decimal places. | PI() |
+| POWER | Math and trigonometry | Returns a number raised to another number. | POWER(Base; Exponent) |
+| PRODUCT | Math and trigonometry | Returns product of numbers. | PRODUCT(Number1; Number2; ...; Number30) |
+| PRODUCT <br><Badge text="v0.3.0"/>| Math and trigonometry | Returns product of numbers. | PRODUCT(Number1; Number2; ...; Number30) |
+| QUOTIENT | Math and trigonometry | Returns integer part of a division. | QUOTIENT(Dividend; Divisor) |
+| RADIANS | Math and trigonometry | Converts degrees to radians. | RADIANS(Number) |
+| RAND | Math and trigonometry | Returns a random number between 0 and 1. | RAND() |
+| RANDBETWEEN | Math and trigonometry | Returns a random integer between two numbers. | RAND(Lowerbound; Upperbound) |
+| ROMAN | Math and trigonometry | Converts number to roman form. | ROMAN(Number[; Mode]) |
+| ROUND | Math and trigonometry | Rounds a number to a certain number of decimal places. | ROUND(Number; Count) |
+| ROUNDDOWN | Math and trigonometry | Rounds a number down, toward zero, to a certain precision. | ROUNDDOWN(Number; Count) |
+| ROUNDUP | Math and trigonometry | Rounds a number up, away from zero, to a certain precision. | ROUNDUP(Number; Count) |
+| SEC <br><Badge text="v0.2.0"/>| Math and trigonometry | Returns the secans of the given angle (in radians). | SEC(Number) |
+| SECH <br><Badge text="v0.2.0"/>| Math and trigonometry | Returns the hyperbolic secans of the given value. | SEC(Number) |
+| SERIESSUM | Math and trigonometry | Evaluates series at a point. | SERIESSUM(Number; Number; Number; Coefficients)
+| SIN | Math and trigonometry | Returns the sine of the given angle (in radians). | SIN(Number) |
+| SINH <br><Badge text="v0.2.0"/>| Math and trigonometry | Returns the hyperbolic sine of the given value. | SINH(Number) |
+| SIGN | Math and trigonometry | Returns sign of a number. | SIGN(Number) |
+| SQRT | Math and trigonometry | Returns the positive square root of a number. | SQRT(Number) |
+| SQRTPI | Math and trigonometry | Returns sqrt of number times pi. | SQRTPI(Number) |
+| SUBTOTAL <br><Badge text="v0.3.0"/>| Math and trigonometry | Computes aggregation using function specified by number. | SUBTOTAL(Function; Number1; Number2; ... Number30) |
+| SUM | Math and trigonometry | Adds all the numbers in a range of cells. | SUM(Number1; Number2; ...; Number30) |
+| SUMIF | Math and trigonometry | Adds the cells specified by given criteria. | SUMIF(Range; Criteria; Sumrange) |
+| SUMIFS | Math and trigonometry | Returns the sum of the values of cells in a range that meets multiple criteria in multiple ranges. | SUMIFS(Sum_Range ; Criterion_range1 ; Criterion1 [ ; Criterion_range2 ; Criterion2 [;...]]) |
+| SUMPRODUCT | Math and trigonometry | Multiplies corresponding elements in the given arrays, and returns the sum of those products. | SUMPRODUCT(Array1; Array2...Array30) |
+| SUMSQ | Math and trigonometry | Returns the sum of the squares of the arguments | SUMSQ(Number1; Number2; ...; Number30) |
+| SUMX2MY2 | Math and trigonometry | Returns the sum of the square differences. | SUMX2MY2(Range1; Range2) |
+| SUMX2PY2 | Math and trigonometry | Returns the sum of the square sums. | SUMX2PY2(Range1; Range2) |
+| SUMXMY2 | Math and trigonometry | Returns the sum of the square of differences. | SUMXMY2(Range1; Range2) |
+| TAN | Math and trigonometry | Returns the tangent of the given angle (in radians). | TAN(Number) |
+| TANH <br><Badge text="v0.2.0"/>| Math and trigonometry | Returns the hyperbolic tangent of the given value. | TANH(Number) |
+| TRUNC | Math and trigonometry | Truncates a number by removing decimal places. | TRUNC(Number; Count) |
+| MMULT | Matrix functions | Calculates the array product of two arrays. | MMULT(Array; Array) |
+| MEDIANPOOL | Matrix functions | Calculates a smaller range which is a median of a Window_size, in a given Range, for every Stride element. | MEDIANPOOL(Range, Window_size, Stride) |
+| MAXPOOL | Matrix functions | Calculates a smaller range which is a maximum of a Window_size, in a given Range, for every Stride element. | MAXPOOL(Range, Window_size, Stride) |
+| TRANSPOSE | Matrix functions | Transposes the rows and columns of an array. | TRANSPOSE(Array) |
 | HF.ADD <br><Badge text="v0.3.0"/>| Operator | Adds two values. | HF.ADD(Number; Number) |
 | HF.CONCAT <br><Badge text="v0.3.0"/>| Operator | Concatenates two strings. | HF.CONCAT(String; String) |
 | HF.DIVIDE <br><Badge text="v0.3.0"/>| Operator | Divides two values. | HF.DIVIDE(Number; Number) |
@@ -209,67 +266,140 @@ lets you design your own [custom functions](custom-functions).
 | HF.UMINUS <br><Badge text="v0.3.0"/>| Operator | Negates the value. | HF.UMINUS(Number) |
 | HF.UNARY_PERCENT <br><Badge text="v0.3.0"/>| Operator | Applies percent operator. | HF.UNARY_PERCENT(Number) |
 | HF.UPLUS <br><Badge text="v0.3.0"/>| Operator | Applies unary plus. | HF.UPLUS(Number) |
-| INT | Math and trigonometry | Rounds a number down to the nearest integer. | INT(Number) |
-| LN | Math and trigonometry | Returns the natural logarithm based on the constant e of a number. | LN(Number) |
-| LOG | Math and trigonometry | Returns the logarithm of a number to the specified base. | LOG(Number; Base) |
-| LOG10 | Math and trigonometry | Returns the base-10 logarithm of a number. | LOG10(Number) |
-| MOD | Math and trigonometry | Returns the remainder when one integer is divided by another. | MOD(Dividend; Divisor) |
-| ODD | Math and trigonometry | Rounds a positive number up to the nearest odd integer and a negative number down to the nearest odd integer. | ODD(Number) |
-| PI | Math and trigonometry | Returns 3.14159265358979, the value of the mathematical constant PI to 14 decimal places. | PI() |
-| POWER | Math and trigonometry | Returns a number raised to another number. | POWER(Base; Exponent) |
-| PRODUCT <br><Badge text="v0.3.0"/>| Math and trigonometry | Returns product of numbers. | PRODUCT(Number1; Number2; ...; Number30) |
-| RADIANS | Math and trigonometry | Converts degrees to radians. | RADIANS(Number) |
-| RAND | Math and trigonometry | Returns a random number between 0 and 1. | RAND() |
-| ROUND | Math and trigonometry | Rounds a number to a certain number of decimal places. | ROUND(Number; Count) |
-| ROUNDDOWN | Math and trigonometry | Rounds a number down, toward zero, to a certain precision. | ROUNDDOWN(Number; Count) |
-| ROUNDUP | Math and trigonometry | Rounds a number up, away from zero, to a certain precision. | ROUNDUP(Number; Count) |
-| SEC <br><Badge text="v0.2.0"/>| Math and trigonometry | Returns the secans of the given angle (in radians). | SEC(Number) |
-| SECH <br><Badge text="v0.2.0"/>| Math and trigonometry | Returns the hyperbolic secans of the given value. | SEC(Number) |
-| SIN | Math and trigonometry | Returns the sine of the given angle (in radians). | SIN(Number) |
-| SINH <br><Badge text="v0.2.0"/>| Math and trigonometry | Returns the hyperbolic sine of the given value. | SINH(Number) |
-| SQRT | Math and trigonometry | Returns the positive square root of a number. | SQRT(Number) |
-| SUBTOTAL <br><Badge text="v0.3.0"/>| Math and trigonometry | Computes aggregation using function specified by number. | SUBTOTAL(Function; Number1; Number2; ... Number30) |
-| SUM | Math and trigonometry | Adds all the numbers in a range of cells. | SUM(Number1; Number2; ...; Number30) |
-| SUMIF | Math and trigonometry | Adds the cells specified by given criteria. | SUMIF(Range; Criteria; Sumrange) |
-| SUMIFS | Math and trigonometry | Returns the sum of the values of cells in a range that meets multiple criteria in multiple ranges. | SUMIFS(Sum_Range ; Criterion_range1 ; Criterion1 [ ; Criterion_range2 ; Criterion2 [;...]]) |
-| SUMPRODUCT | Math and trigonometry | Multiplies corresponding elements in the given arrays, and returns the sum of those products. | SUMPRODUCT(Array1; Array2...Array30) |
-| SUMSQ | Math and trigonometry | Returns the sum of the squares of the arguments | SUMSQ(Number1; Number2; ...; Number30) |
-| TAN | Math and trigonometry | Returns the tangent of the given angle (in radians). | TAN(Number) |
-| TANH <br><Badge text="v0.2.0"/>| Math and trigonometry | Returns the hyperbolic tangent of the given value. | TANH(Number) |
-| TRUNC | Math and trigonometry | Truncates a number by removing decimal places. | TRUNC(Number; Count) |
-| MMULT | Matrix functions | Calculates the array product of two arrays. | MMULT(Array; Array) |
-| MEDIANPOOL | Matrix functions | Calculates a smaller range which is a median of a Window_size, in a given Range, for every Stride element. | MEDIANPOOL(Range, Window_size, Stride) |
-| MAXPOOL | Matrix functions | Calculates a smaller range which is a maximum of a Window_size, in a given Range, for every Stride element. | MAXPOOL(Range, Window_size, Stride) |
-| TRANSPOSE | Matrix functions | Transposes the rows and columns of an array. | TRANSPOSE(Array) |
+| AVEDEV | Statistical | Returns the average deviation of the arguments. | AVEDEV(Number1; Number2; ...Number30) |
 | AVERAGE | Statistical | Returns the average of the arguments. | AVERAGE(Number1; Number2; ...Number30) |
 | AVERAGEA | Statistical | Returns the average of the arguments. | AVERAGEA(Value1; Value2; ... Value30) |
 | AVERAGEIF | Statistical | Returns the arithmetic mean of all cells in a range that satisfy a given condition. | AVERAGEIF(Range; Criterion [; Average_Range ]) |
+| BESSELI | Statistical | Returns value of Bessel function. | BESSELI(x; n) |
+| BESSELJ | Statistical | Returns value of Bessel function. | BESSELJ(x; n) |
+| BESSELK | Statistical | Returns value of Bessel function. | BESSELK(x; n) |
+| BESSELY | Statistical | Returns value of Bessel function. | BESSELY(x; n) |
+| BETA.DIST | Statistical | Returns the denisty of Beta distribution. | BETA.DIST(Number1; Number2; Number3; Boolean[; Number4[; Number5]]) |
+| BETADIST | Statistical | Returns the denisty of Beta distribution. | BETADIST(Number1; Number2; Number3; Boolean[; Number4[; Number5]]) |
+| BETA.INV | Statistical | Returns the inverse Beta distribution value. | BETA.INV(Number1; Number2; Number3[; Number4[; Number5]]) |
+| BETAINV | Statistical | Returns the inverse of Beta distribution value. | BETAINV(Number1; Number2; Number3[; Number4[; Number5]]) |
+| BINOM.DIST | Statistical | Returns density of binomial distribution. | BINOM.DIST(Number1; Number2; Number3; Boolean) |
+| BINOMDIST | Statistical | Returns density of binomial distribution. | BINOMDIST(Number1; Number2; Number3; Boolean) |
+| BINOM.INV | Statistical | Returns inverse binomial distribution value. | BINOM.INV(Number1; Number2; Number3) |
+| CHIDIST | Statistical | Returns probability of chi-square right-side distribution. | CHIDIST(X; Degrees) |
+| CHIINV | Statistical | Returns inverse of chi-square right-side distribution. | CHIINV(P; Degrees) |
+| CHIINVRT | Statistical | Returns inverse of chi-square right-side distribution. | CHIINVRT(P; Degrees) |
+| CHISQ.DIST | Statistical | Returns value of chi-square distribution. | CHISQ.DIST(X; Degrees; Mode) |
+| CHIDISTRT | Statistical | Returns probability of chi-square right-side distribution. | CHIDISTRT(X; Degrees) |
+| CHISQ.DIST.RT | Statistical | Returns probability of chi-square right-side distribution. | CHISQ.DIST.RT(X; Degrees) |
+| CHISQ.INV | Statistical | Returns inverse of chi-square distribution. | CHISQ.INV.RT(P; Degrees) |
+| CHISQ.INV.RT | Statistical | Returns inverse of chi-square right-side distribution. | CHISQ.INV.RT(P; Degrees) |
+| CHISQ.TEST | Statistical | Returns chisquared-test value for a dataset. | CHISQ.TEST(Array1; Array2) |
+| CHITEST | Statistical | Returns chisquared-test value for a dataset. | CHITEST(Array1; Array2) |
+| CONFIDENCE | Statistical | Returns upper confidence bound for normal distribution. | CONFIDENCE(Alpha; Stdev; Size) |
+| CONFIDENCE.NORM | Statistical | Returns upper confidence bound for normal distribution. | CONFIDENCE.NORM(Alpha; Stdev; Size) |
+| CONFIDENCE.T | Statistical | Returns upper confidence bound for T distribution. | CONFIDENCE.T(Alpha; Stdev; Size) |
 | CORREL | Statistical | Returns the correlation coefficient between two data sets. | CORREL(Data1; Data2) |
 | COUNT | Statistical | Counts how many numbers are in the list of arguments. | COUNT(Value1; Value2; ... Value30) |
 | COUNTA | Statistical | Counts how many values are in the list of arguments. | COUNTA(Value1; Value2; ... Value30) |
 | COUNTBLANK | Statistical | Returns the number of empty cells. | COUNTBLANK(Range) |
 | COUNTIF | Statistical | Returns the number of cells that meet with certain criteria within a cell range. | COUNTIF(Range; Criteria) |
 | COUNTIFS | Statistical | Returns the count of rows or columns that meet criteria in multiple ranges. | COUNTIFS(Range1; Criterion1 [; Range2; Criterion2 [; ...]]) |
+| COVAR | Statistical | Returns the covariance between two data sets, population normalized. | COVAR(Data1; Data2) |
+| COVARIANCE.P | Statistical | Returns the covariance between two data sets, population normalized. | COVARIANCE.P(Data1; Data2) |
+| COVARIANCEP | Statistical | Returns the covariance between two data sets, population normalized. | COVARIANCEP(Data1; Data2) |
+| COVARIANCE.S | Statistical | Returns the covariance between two data sets, sample normalized. | COVARIANCE.S(Data1; Data2) |
+| COVARIANCES | Statistical | Returns the covariance between two data sets, sample normalized. | COVARIANCES(Data1; Data2) |
+| CRITBINOM | Statistical | Returns inverse binomial distribution value. | CRITBINOM(Number1; Number2; Number3) |
+| DEVSQ | Statistical | Returns sum of squared deviations. | DEVSQ(Number1; Number2; ...Number30) |
+| EXPON.DIST | Statistical | Returns density of a exponential distribution. | EXPON.DIST(Number1; Number2; Boolean) |
+| EXPONDIST | Statistical | Returns density of a exponential distribution. | EXPONDIST(Number1; Number2; Boolean) |
+| FDIST | Statistical | Returns probability of F right-side distribution. | FDIST(X; Degree1; Degree2) |
+| FINV | Statistical | Returns inverse of F right-side distribution. | FINV(P; Degree1; Degree2) |
+| F.DIST | Statistical | Returns value of F distribution. | F.DIST(X; Degree1; Degree2; Mode) |
+| F.DIST.RT | Statistical | Returns probability of F right-side distribution. | F.DIST.RT(X; Degree1; Degree2) |
+| FDISTRT | Statistical | Returns probability of F right-side distribution. | FDISTRT(X; Degree1; Degree2) |
+| F.INV | Statistical | Returns inverse of F distribution. | F.INV.RT(P; Degree1; Degree2) |
+| F.INV.RT | Statistical | Returns inverse of F right-side distribution. | F.INV.RT(P; Degree1; Degree2) |
+| FINVRT | Statistical | Returns inverse of F right-side distribution. | FINVRT(P; Degree1; Degree2) |
+| FISHER | Statistical | Returns Fisher transformation value. | FISHER(Number) |
+| FISHERINV | Statistical | Returns inverse Fischer transformation value. | FISHERINV(Number) |
+| F.TEST | Statistical | Returns f-test value for a dataset. | Z.TEST(Array1; Array2) |
+| FTEST | Statistical | Returns f-test value for a dataset. | ZTEST(Array1; Array2) |
+| GAMMA | Statistical | Returns value of Gamma function. | GAMMA(Number) |
+| GAMMA.DIST | Statistical | Returns density of Gamma distribution. | GAMMA.DIST(Number1; Number2; Number3; Boolean) |
+| GAMMADIST | Statistical | Returns density of Gamma distribution. | GAMMADIST(Number1; Number2; Number3; Boolean) |
+| GAMMALN | Statistical | Returns natural logarithm of Gamma function. | GAMMALN(Number) |
+| GAMMALN.PRECISE | Statistical | Returns natural logarithm of Gamma function. | GAMMALN.PRECISE(Number) |
+| GAMMA.INV | Statistical | Returns inverse Gamma distribution value. | GAMMA.INV(Number1; Number2; Number3) |
+| GAMMAINV | Statistical | Returns inverse Gamma distribution value. | GAMMAINV(Number1; Number2; Number3) |
+| GAUSS | Statistical | Returns the probability of gaussian variable fall more than this many times standard deviation from mean. | GAUSS(Number) |
+| GEOMEAN | Statistical | Returns the geometric average. | GEOMEAN(Number1; Number2; ...Number30) |
+| HARMEAN | Statistical | Returns the harmonic average. | HARMEAN(Number1; Number2; ...Number30) |
+| HYPGEOMDIST | Statistical | Returns density of hypergeometric distribution. | HYPGEOMDIST(Number1; Number2; Number3; Number4; Boolean) |
+| HYPGEOM.DIST | Statistical | Returns density of hypergeometric distribution. | HYPGEOM.DIST(Number1; Number2; Number3; Number4; Boolean) |
+| LARGE | Statistical | Returns k-th largest value in a range. | LARGE(Range; K) |
+| LOGNORM.DIST | Statistical | Returns density of lognormal distribution. | LOGNORM.DIST(X; Mean; Stddev; Mode) |
+| LOGNORMDIST | Statistical | Returns density of lognormal distribution. | LOGNORMDIST(X; Mean; Stddev; Mode) |
+| LOGNORM.INV | Statistical | Returns value of inverse lognormal distribution. | LOGNORM.INV(P; Mean; Stddev) |
+| LOGNORMINV | Statistical | Returns value of inverse lognormal distribution. | LOGNORMINV(P; Mean; Stddev) |
+| LOGINV | Statistical | Returns value of inverse lognormal distribution. | LOGINV(P; Mean; Stddev) |
 | MAX | Statistical | Returns the maximum value in a list of arguments. | MAX(Number1; Number2; ...Number30) |
 | MAXA | Statistical | Returns the maximum value in a list of arguments. | MAXA(Value1; Value2; ... Value30) |
 | MEDIAN | Statistical | Returns the median of a set of numbers. | MEDIAN(Number1; Number2; ...Number30) |
 | MIN | Statistical | Returns the minimum value in a list of arguments. | MIN(Number1; Number2; ...Number30) |
 | MINA | Statistical | Returns the minimum value in a list of arguments. | MINA(Value1; Value2; ... Value30) |
+| NEGBINOM.DIST | Statistical | Returns density of negative binomial distribution. | NEGBINOM.DIST(Number1; Number2; Number3; Mode) |
+| NEGBINOMDIST | Statistical | Returns density of negative binomial distribution. | NEGBINOMDIST(Number1; Number2; Number3; Mode) |
+| NORM.DIST | Statistical | Returns density of normal distribution. | NORM.DIST(X; Mean; Stddev; Mode) |
+| NORMDIST | Statistical | Returns density of normal distribution. | NORMDIST(X; Mean; Stddev; Mode) |
+| NORM.S.DIST | Statistical | Returns density of normal distribution. | NORM.S.DIST(X; Mode) |
+| NORMDIST | Statistical | Returns density of normal distribution. | NORMSDIST(X; Mode) |
+| NORM.INV | Statistical | Returns value of inverse normal distribution. | NORM.INV(P; Mean; Stddev) |
+| NORMINV | Statistical | Returns value of inverse normal distribution. | NORMINV(P; Mean; Stddev) |
+| NORM.S.INV | Statistical | Returns value of inverse normal distribution. | NORM.S.INV(P) |
+| NORMSINV | Statistical | Returns value of inverse normal distribution. | NORMSINV(P) |
+| PEARSON | Statistical | Returns the correlation coefficient between two data sets. | PEARSON(Data1; Data2) |
+| PHI | Statistical | Returns probability densitity of normal distribution. | PHI(X) |
+| POISSON | Statistical | Returns density of Poisson distribution. | POISSON(X; Mean; Mode) |
+| POISSON.DIST | Statistical | Returns density of Poisson distribution. | POISSON.DIST(X; Mean; Mode) |
+| POISSONDIST | Statistical | Returns density of Poisson distribution. | POISSONDIST(X; Mean; Mode) |
+| RSQ | Statistical | Returns the squared correlation coefficient between two data sets. | RSQ(Data1; Data2) |
+| SKEW | Statistical | Returns skeweness of a sample. | SKEW(Number1; Number2; ...Number30) |
+| SKEW.P | Statistical | Returns skeweness of a population. | SKEW.P(Number1; Number2; ...Number30) |
+| SKEWP | Statistical | Returns skeweness of a population. | SKEWP(Number1; Number2; ...Number30) |
+| SLOPE | Statistical | Returns the slope of a linear regression line. | SLOPE(Array1; Array2) |
+| SMALL | Statistical | Returns k-th smallest value in a range. | SMALL(Range; K) |
+| STANDARDIZE | Statistical | Returns normalized value wrt expected value and standard deviation. | STANDARDIZE(X; Mean; Stddev) |
 | STDEV <br><Badge text="v0.3.0"/>| Statistical | Returns standard deviation of a sample. | STDEV(Value1; Value2; ... Value30) |
 | STDEVA <br><Badge text="v0.3.0"/>| Statistical | Returns standard deviation of a sample. | STDEVA(Value1; Value2; ... Value30) |
 | STDEVP <br><Badge text="v0.3.0"/>| Statistical | Returns standard deviation of a population. | STDEVP(Value1; Value2; ... Value30) |
 | STDEV.P <br><Badge text="v0.3.0"/>| Statistical | Returns standard deviation of a population. | STDEV.P(Value1; Value2; ... Value30) |
 | STDEVPA <br><Badge text="v0.3.0"/>| Statistical | Returns standard deviation of a population. | STDEVPA(Value1; Value2; ... Value30) |
 | STDEV.S <br><Badge text="v0.3.0"/>| Statistical | Returns standard deviation of a sample. | STDEV.S(Value1; Value2; ... Value30) |
+| STDEVS <br><Badge text="v0.3.0"/>| Statistical | Returns standard deviation of a sample. | STDEVS(Value1; Value2; ... Value30) |
+| STEYX | Statistical | Returns standard error for predicted of the predicted y value for each x value. | STEYX(Array1; Array2) |
+| TDIST | Statistical | Returns density of Student-t distribution, both-sided or right-tailed. | TDIST(X; Degrees; Mode) |
+| T.DIST | Statistical | Returns density of Student-t distribution. | T.DIST(X; Degrees; Mode) |
+| T.DIST.2T | Statistical | Returns density of Student-t distribution, both-sided. | T.DIST.2T(X; Degrees) |
+| TDIST2T | Statistical | Returns density of Student-t distribution, both-sided. | TDIST2T(X; Degrees) |
+| T.DIST.RT | Statistical | Returns density of Student-t distribution, right-tailed. | T.DIST.RT(X; Degrees) |
+| TDISTRT | Statistical | Returns density of Student-t distribution, right-tailed. | TDISTRT(X; Degrees) |
+| TINV | Statistical | Returns inverse Student-t distribution, both-sided. | TINV(P; Degrees) |
+| T.INV | Statistical | Returns inverse Student-t distribution. | T.INV(P; Degrees) |
+| T.INV.2T | Statistical | Returns inverse Student-t distribution, both-sided. | T.INV.2T(P; Degrees) |
+| TINV2T | Statistical | Returns inverse Student-t distribution, both-sided. | TINV2T(P; Degrees) |
+| TTEST | Statistical | Returns t-test value for a dataset. | TTEST(Array1; Array2) |
+| T.TEST | Statistical | Returns t-test value for a dataset. | T.TEST(Array1; Array2) |
 | VAR <br><Badge text="v0.3.0"/>| Statistical | Returns variance of a sample. | VAR(Value1; Value2; ... Value30) |
 | VARA <br><Badge text="v0.3.0"/>| Statistical | Returns variance of a sample. | VARA(Value1; Value2; ... Value30) |
 | VARP <br><Badge text="v0.3.0"/>| Statistical | Returns variance of a population. | VARP(Value1; Value2; ... Value30) |
 | VAR.P <br><Badge text="v0.3.0"/>| Statistical | Returns variance of a population. | VAR.P(Value1; Value2; ... Value30) |
 | VARPA <br><Badge text="v0.3.0"/>| Statistical | Returns variance of a population. | VARPA(Value1; Value2; ... Value30) |
 | VAR.S <br><Badge text="v0.3.0"/>| Statistical | Returns variance of a sample. | VAR.S(Value1; Value2; ... Value30) |
+| VARS <br><Badge text="v0.3.0"/>| Statistical | Returns variance of a sample. | VARS(Value1; Value2; ... Value30) |
+| WEIBULL | Statistical | Returns density of Weibull distribution. | WEIBULL(Number1; Number2; Number3; Boolean) |
+| WEIBULL.DIST | Statistical | Returns density of Weibull distribution. | WEIBULL.DIST(Number1; Number2; Number3; Boolean) |
+| WEIBULLDIST | Statistical | Returns density of Weibull distribution. | WEIBULLDIST(Number1; Number2; Number3; Boolean) |
+| Z.TEST | Statistical | Returns z-test value for a dataset. | Z.TEST(Array; X[; Sigma]) |
+| ZTEST | Statistical | Returns z-test value for a dataset. | ZTEST(Array; X[; Sigma]) |
 | CHAR | Text | Converts a number into a character according to the current code table. | CHAR(Number) |
 | CLEAN <br><Badge text="v0.2.0"/>| Text | Returns text that has been "cleaned" of line breaks and other non-printable characters. | CLEAN("Text") |
-| CLEAN | Text | Returns text that has been "cleaned" of line breaks and other non-printable characters. | CLEAN("Text") |
 | CODE | Text | Returns a numeric code for the first character in a text string. | CODE("Text") |
 | CONCATENATE | Text | Combines several text strings into one string. | CONCATENATE("Text1"; ...; "Text30") |
 | EXACT <br><Badge text="v0.3.0"/> | Text | Returns TRUE if both text strings are exactly the same. | EXACT(Text; Text) |

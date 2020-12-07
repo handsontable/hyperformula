@@ -623,7 +623,7 @@ export class FinancialPlugin extends FunctionPlugin {
   public npv(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.runFunction(ast.args, formulaAddress, this.metadata('NPV'),
       (rate: number, ...args: InterpreterValue[]) => {
-        const coerced = this.interpreter.arithmeticHelper.coerceNumbersExpandRanges(args)
+        const coerced = this.interpreter.arithmeticHelper.coerceNumbersExactRanges(args)
         if(coerced instanceof CellError) {
           return coerced
         }

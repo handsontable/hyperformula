@@ -1,19 +1,19 @@
 # Volatile functions
 
-If you work with spreadsheet software regularly then you probably
+If you work with spreadsheet software regularly then you've probably
 heard about Volatile Functions. They are distinctive because they
 affect the way the calculation engine works. **Every cell that is
-dependent on a volatile function is recalculated on every worksheet
-change triggered by the operations enlisted further below
+dependent on a volatile function is recalculated upon every worksheet
+change triggered by the operations listed further below
 (volatile actions).**
 
-HyperFormula uses the dependency tree to keep track of all related
-cells and ranges of cells. On top of that, it constructs the
+HyperFormula uses a dependency tree to keep track of all related
+cells and ranges of cells. On top of that, it constructs a
 calculation chain which determines the order in which the recalculation
 process should be done.
 
 Normally only cells that are marked as "dirty" are calculated
-selectively. However, it is not the case when a volatile function
+selectively. However, this is not the case when a volatile function
 exists somewhere within the workbook. Volatile functions are always
 treated as "dirty" so they are recalculated whenever a certain
 action is triggered.
@@ -24,20 +24,14 @@ the engine. Use them with caution, especially in large workbooks.
 
 ## Volatile functions
 
-HyperFormula supports RAND function which is always volatile which
-means that it triggers the recalculation of the cells across the
-entire calculation chain and regardless of the arguments passed in the
-formula. There are two other functions: COLUMNS and ROWS, they are
-usually non-volatile unless you perform an action on columns or rows
-like adding, removing them. In such cases, they behave like volatile
-functions.
+HyperFormula supports the RAND function, which is always volatile. This means it triggers the recalculation of the cells across the entire calculation chain, regardless of the arguments passed in the formula. There are two other functions: COLUMNS and ROWS. They are usually non-volatile, unless you perform an action on columns or rows like adding or removing them. In such cases, they behave like volatile functions.
 
-The table below presents a list of volatile functions supported by
-HyperFormula that might be volatile:
+The table below presents a list of volatile functions supported by HyperFormula that might be volatile:
 
 | Function ID | Description |
 | :--- | :--- |
 | RAND | Returns a random number between 0 and 1. Always volatile. |
+| RANDBETWEEN | Returns a random integer between two numbers. Always volatile. |
 | COLUMNS | Returns the number of columns in the given reference. |
 | ROWS | Returns the number of rows in the given reference. |
 
@@ -51,10 +45,10 @@ These actions trigger the recalculation process of volatile functions:
 | :--- | :--- |
 | Recalculate on demand | `rebuildAndRecalculate` |
 | Resume an automatic recalculation mode | `resumeEvaluation` |
-| Bathes operations | `batch` |
-| Modify a cell content | `setCellContents` |
-| Modify a sheet content | `setSheetContent` |
-| Clear a sheet from the content | `clearSheet` |
+| Batch operations | `batch` |
+| Modify cell content | `setCellContents` |
+| Modify sheet content | `setSheetContent` |
+| Clear sheet content | `clearSheet` |
 | Insert a row | `addRows` |
 | Remove a row | `removeRows` |
 | Insert a column | `addColumns` |
@@ -81,12 +75,12 @@ To reduce the negative effect you can try
 
 ## Volatile custom functions
 
-There is a way to define a custom function that you consider volatile.
-To do so, when you implement own function you need to define it as
-a volatile:
+There is a way to designate a custom function as being volatile.
+To do so, when you implement your own function you need to define it as
+volatile:
 
 ```javascript
-// this is an example of how RAND function is implemented
+// this is an example of how the RAND function is implemented
 // you can do the same with your own custom function
   'RAND': {
       method: 'rand',

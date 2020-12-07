@@ -35,6 +35,10 @@ you can't compare the arguments in a formula like this:
   * Structured references ("Tables")
   * Currency data type
   * Relative named expressions
-  * We immediately instantiate references to single cells to their values instead of treating them as 1-length ranges, which slightly changes behavior of some functions (e.g. NPV).
   * Functions cannot use UI metadata (e.g. hidden rows for SUBTOTAL).
-  * SUBTOTAL function does not ignore nested subtotals.
+
+## Nuances of the implemented functions
+* We immediately instantiate references to single cells to their values instead of treating them as 1-length ranges, which slightly changes behavior of some functions (e.g. NPV).
+* SUBTOTAL function does not ignore nested subtotals.
+* CHISQ.INV, CHISQ.INV.RT, CHISQ.DIST.RT, CHIDIST, CHIINV and CHISQ.DIST (CHISQ.DIST in CDF mode): Running time grows linearly with the value of the second parameter, degrees_of_freedom (slow for values>1e7).
+* GAMMA.DIST, GAMMA.INV, GAMMADIST, GAMMAINV (GAMMA.DIST and GAMMADIST in CDF mode): Running time grows linearly with the value of the second parameter, alpha (slow for values>1e7). 
