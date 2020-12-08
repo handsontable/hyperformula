@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added function aliases mechanism. (#569)
 - Added 6 math function CEILING.MATH, FLOOR.MATH, FLOOR, CEILING.PRECISE, FLOOR.PRECISE, ISO.CEILING.
 - Added support for scientific notation. (#579)
+- Added 26 math functions COMPLEX, IMABS, IMAGINARY, IMARGUMENT, IMCONJUGATE, IMCOS, IMCOSH, IMCOT, IMCSC, IMCSCH, IMDIV, IMEXP, IMLN, IMLOG10, IMLOG2, IMPOWER, IMPRODUCT, IMREAL, IMSEC, IMSECH, IMSIN, IMSINH, IMSQRT, IMSUB,  IMSUM, IMTAN. 
+- Added support for complex numbers. (#281)
 
 ### Changed
 - Changed CEILING function implementation to be consistent with existing implementations. (#582)
@@ -20,6 +22,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed a minor problem with dependencies under nested parenthesis. (#549, #558)
 - Fixed a problem with HLOOKUP/VLOOKUP getting stuck in binary search. (#559, #562)
 - Fixed a problem with logic of dependency resolving. (#561, #563)
+- Fixed a minor bug with ATAN2 function. (#581)
 
 ## [0.3.0] - 2020-10-22
 

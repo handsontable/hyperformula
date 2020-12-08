@@ -21,6 +21,12 @@ import {collatorFromConfig} from '../StringHelper'
 import {InterpreterValue, SimpleRangeValue} from './InterpreterValue'
 import Collator = Intl.Collator
 
+export type complex = [number, number]
+
+const COMPLEX_NUMBER_SYMBOL = 'i'
+const complexParsingRegexp = /^\s*([+-]?)\s*(([\d\.,]+(e[+-]?\d+)?)\s*([ij]?)|([ij]))\s*(([+-])\s*([+-]?)\s*(([\d\.,]+(e[+-]?\d+)?)\s*([ij]?)|([ij])))?$/
+
+
 export class ArithmeticHelper {
   private readonly collator: Collator
   private readonly actualEps: number
@@ -283,6 +289,52 @@ export class ArithmeticHelper {
     }
   }
 
+  public coerceComplexExactRanges(args: InterpreterValue[]): complex[] | CellError {
+    const vals: (complex | SimpleRangeValue)[] = []
+    for(const arg of args) {
+      if(arg instanceof SimpleRangeValue) {
+        vals.push(arg)
+      } else if(arg !== EmptyValue) {
+        const coerced = this.coerceScalarToComplex(arg)
+        if(coerced instanceof CellError) {
+          return coerced
+        } else {
+          vals.push(coerced)
+        }
+      }
+    }
+    const expandedVals: complex[] = []
+    for(const val of vals) {
+      if(val instanceof SimpleRangeValue) {
+        const arr = this.manyToExactComplex(val.valuesFromTopLeftCorner())
+        if(arr instanceof CellError) {
+          return arr
+        } else {
+          expandedVals.push(...arr)
+        }
+      } else {
+        expandedVals.push(val)
+      }
+    }
+    return expandedVals
+
+  }
+
+  public manyToExactComplex = (args: InternalScalarValue[]): complex[] | CellError => {
+    const ret: complex[] = []
+    for(const arg of args) {
+      if(arg instanceof CellError) {
+        return arg
+      } else if (typeof arg === 'number' || typeof arg === 'string') {
+        const coerced = this.coerceScalarToComplex(arg)
+        if(!(coerced instanceof CellError)) {
+          ret.push(coerced)
+        }
+      }
+    }
+    return ret
+  }
+
   public coerceNumbersExactRanges = (args: InterpreterValue[]): number[] | CellError =>  this.manyToNumbers(args, this.manyToExactNumbers)
 
   public coerceNumbersCoerceRangesDropNulls = (args: InterpreterValue[]): number[] | CellError =>  this.manyToNumbers(args, this.manyToCoercedNumbersDropNulls)
@@ -361,6 +413,88 @@ export class ArithmeticHelper {
     }
     return ret
   }
+
+  public coerceScalarToComplex(arg: InternalScalarValue): complex | CellError {
+    if(arg instanceof CellError) {
+      return arg
+    } else if(arg === EmptyValue) {
+      return [0, 0]
+    } else if(typeof arg === 'number') {
+      return [arg, 0]
+    } else if(typeof arg === 'string') {
+      return this.coerceStringToComplex(arg)
+    } else {
+      return new CellError(ErrorType.NUM, ErrorMessage.ComplexNumberExpected)
+    }
+  }
+
+  private coerceStringToComplex(arg: string): complex | CellError {
+    const match = complexParsingRegexp.exec(arg)
+    if(match === null) {
+      return new CellError(ErrorType.NUM, ErrorMessage.ComplexNumberExpected)
+    }
+
+    let val1
+    if(match[6]!==undefined) {
+      val1 = (match[1]==='-'?[0, -1]:[0, 1]) as complex
+    } else {
+      val1 = this.parseComplexToken(match[1] + match[3], match[5])
+    }
+
+    if(val1 instanceof CellError) {
+      return val1
+    }
+
+    if(match[8] === undefined) {
+      return val1
+    }
+
+    let val2
+    if(match[14]!==undefined) {
+      val2 = (match[9]==='-'?[0, -1]:[0, 1]) as complex
+    } else {
+      val2 = this.parseComplexToken(match[9] + match[11], match[13])
+    }
+    if(val2 instanceof CellError) {
+      return val2
+    }
+    if((match[5]!=='') || (match[13]==='')) {
+      return new CellError(ErrorType.NUM, ErrorMessage.ComplexNumberExpected)
+    }
+
+    if(match[8] === '+') {
+      return [val1[0]+val2[0], val1[1]+val2[1]]
+    } else {
+      return [val1[0]-val2[0], val1[1]-val2[1]]
+    }
+  }
+
+  private parseComplexToken(arg: string, mod: string): complex | CellError {
+    const val = this.coerceNonDateScalarToMaybeNumber(arg)
+    if(val === undefined) {
+      return new CellError(ErrorType.NUM, ErrorMessage.ComplexNumberExpected)
+    }
+    if(mod === '') {
+      return [val, 0]
+    } else {
+      return [0, val]
+    }
+  }
+}
+
+export function coerceComplexToString([re, im]: complex, symb?: string): string | CellError {
+  if(!isFinite(re) || !isFinite(im)) {
+    return new CellError(ErrorType.NUM, ErrorMessage.NaN)
+  }
+  symb = symb ?? COMPLEX_NUMBER_SYMBOL
+  if(im===0) {
+    return `${re}`
+  }
+  const imStr = `${im === -1 || im === 1 ? '' : Math.abs(im)}${symb}`
+  if(re===0) {
+    return `${im < 0 ? '-' : ''}${imStr}`
+  }
+  return `${re}${im < 0 ? '-' : '+'}${imStr}`
 }
 
 export function coerceToRange(arg: InterpreterValue): SimpleRangeValue {
