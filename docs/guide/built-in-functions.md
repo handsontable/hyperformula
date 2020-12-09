@@ -95,6 +95,7 @@ lets you design your own [custom functions](custom-functions).
 | BITOR | Engineering | Returns a bitwise logical "or" of the parameters. | BITOR(Number1; Number2) |
 | BITRSHIFT | Engineering | Shifts a number right by n bits. | BITRSHIFT(Number; Shift) |
 | BITXOR | Engineering | Returns a bitwise logical "exclusive or" of the parameters. | BITXOR(Number1; Number2) |
+| COMPLEX | Engineering | Returns complex number from Re and Im parts. | COMPLEX(Re; Im[; Symbol]) |
 | DEC2BIN | Engineering | Returns the binary number for the decimal number entered between –512 and 511. | DEC2BIN(Number; Places) |
 | DEC2HEX | Engineering | Returns the hexadecimal number for the decimal number entered. | DEC2HEX(Number; Places) |
 | DEC2OCT | Engineering | Returns the octal number for the decimal number entered. | DEC2OCT(Number; Places) |
@@ -104,6 +105,31 @@ lets you design your own [custom functions](custom-functions).
 | HEX2BIN <br><Badge text="v0.2.0"/>| Engineering | The result is the binary number for the hexadecimal number entered. | HEX2BIN(Number; Places) |
 | HEX2DEC <br><Badge text="v0.2.0"/>| Engineering | The result is the decimal number for the hexadecimal number entered. | HEX2DEC(Number) |
 | HEX2OCT <br><Badge text="v0.2.0"/>| Engineering | The result is the octal number for the hexadecimal number entered. | HEX2OCT(Number; Places) |
+| IMABS | Engineering | Returns module of a complex number. | IMABS(Complex) |
+| IMAGINARY | Engineering | Returns imaginary part of a complex number. | IMAGINARY(Complex) |
+| IMARGUMENT | Engineering | Returns argument of a complex number. | IMARGUMENT(Complex) |
+| IMCONJUGATE | Engineering | Returns conjugate of a complex number. | IMCONJUGATE(Complex) |
+| IMCOS | Engineering | Returns cosine of a complex number. | IMCOS(Complex) |
+| IMCOSH | Engineering | Returns hyperbolic cosine of a complex number. | IMCOSH(Complex) |
+| IMCOT | Engineering | Returns cotangens of a complex number. | IMCOT(Complex) |
+| IMCSC | Engineering | Returns cosecans of a complex number. | IMCSC(Complex) |
+| IMCSCH | Engineering | Returns hyperbolic cosecans of a complex number. | IMCSCH(Complex) |
+| IMDIV | Engineering | Divides two complex numbers. | IMDIV(Complex1; Complex2) |
+| IMEXP | Engineering | Returns exponent of a complex number. | IMEXP(Complex) |
+| IMLN | Engineering | Returns natural logarithm of a complex number. | IMLN(Complex) |
+| IMLOG2 | Engineering | Returns binary logarithm of a complex number. | IMLOG2(Complex) |
+| IMLOG10 | Engineering | Returns base-10 logarithm of a complex number. | IMLOG10(Complex) |
+| IMPOWER | Engineering | Returns a complex number raised to a given power. | IMPOWER(Complex; Number) |
+| IMPRODUCT | Engineering | Multiplies complex numbers. | IMPRODUCT(Complex1 ...Complex30) |
+| IMREAL | Engineering | Returns real part of a complex number. | IMREAL(Complex) |
+| IMSEC | Engineering | Returns secans of a complex number. | IMSEC(Complex) |
+| IMSECH | Engineering | Returns hyperbolic secans of a complex number. | IMSECH(Complex) |
+| IMSIN | Engineering | Returns sine of a complex number. | IMSIN(Complex) |
+| IMSINH | Engineering | Returns hyperbolic sine of a complex number. | IMSINH(Complex) |
+| IMSQRT | Engineering | Returns a square root of a complex number. | IMSQRT(Complex) |
+| IMSUB | Engineering | Subtracts two complex numbers. | IMSUB(Complex1; Complex2) |
+| IMSUM | Engineering | Adds complex numbers. | IMSUM(Complex1 ...Complex30) |
+| IMTAN | Engineering | Returns tangens of a complex number. | IMTAN(Complex) |
 | OCT2BIN <br><Badge text="v0.2.0"/>| Engineering | The result is the binary number for the octal number entered. | OCT2BIN(Number; Places) |
 | OCT2DEC <br><Badge text="v0.2.0"/>| Engineering | The result is the decimal number for the octal number entered. | OCT2DEC(Number) |
 | OCT2HEX <br><Badge text="v0.2.0"/>| Engineering | The result is the hexadecimal number for the octal number entered. | OCT2HEX(Number; Places) |
