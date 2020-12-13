@@ -7,6 +7,7 @@ import {AbsoluteCellRange} from './AbsoluteCellRange'
 import {invalidSimpleCellAddress, simpleCellAddress, SimpleCellAddress} from './Cell'
 import {CellContent, CellContentParser, isMatrix, RawCellContent} from './CellContentParser'
 import {ClipboardCell, ClipboardOperations} from './ClipboardOperations'
+import {ExportedChange} from './Exporter'
 import {AddColumnsCommand, AddRowsCommand, Operations, RemoveColumnsCommand, RemoveRowsCommand} from './Operations'
 import {ColumnSearchStrategy} from './Lookup/SearchStrategy'
 import {Config} from './Config'
@@ -56,7 +57,7 @@ import {
   RemoveRowsUndoEntry,
   RemoveSheetUndoEntry,
   RenameSheetUndoEntry,
-  SetCellContentsUndoEntry,
+  SetCellContentsUndoEntry, SetRowOrderUndoEntry,
   SetSheetContentUndoEntry,
   UndoRedo
 } from './UndoRedo'
@@ -291,6 +292,32 @@ export class CrudOperations {
     const oldSheetContent = this.operations.getSheetClipboardCells(sheetId)
     this.operations.setSheetContent(sheetId, values)
     this.undoRedo.saveOperation(new SetSheetContentUndoEntry(sheetId, oldSheetContent, values))
+  }
+
+  public setRowOrder(sheetId: number, rowMapping: Map<number, number>): void {
+    if (!this.sheetMapping.hasSheetWithId(sheetId)) {
+      throw new NoSheetWithIdError(sheetId)
+    }
+    this.validateRowMapping(sheetId, rowMapping)
+    this.operations.setRowOrder(sheetId, rowMapping)
+    this.undoRedo.saveOperation(new SetRowOrderUndoEntry(sheetId, rowMapping))
+  }
+
+  private validateRowMapping(sheetId: number, rowMapping: Map<number, number>): void {
+    const sheetHeight = this.dependencyGraph.getSheetHeight(sheetId)
+    const values = Array.from(rowMapping.values()).sort((a,b) => a-b)
+    const keys = Array.from(rowMapping.keys()).sort((a,b) => a-b)
+
+    for(let pos of keys) {
+      if(!isNonnegativeInteger(pos) || pos >= sheetHeight) {
+        throw new InvalidArgumentsError('row number to be nonnegative integer and less than sheet height.')
+      }
+    }
+    for(let i=0;i<values.length;i++) {
+      if(values[i]!==keys[i]) {
+        throw new InvalidArgumentsError('target row numbers to be permutation of source row numbers.')
+      }
+    }
   }
 
   public undo() {

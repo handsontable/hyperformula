@@ -46,6 +46,14 @@ export class AddRowsUndoEntry {
   }
 }
 
+export class SetRowOrderUndoEntry {
+  constructor(
+    public readonly sheetId: number,
+    public readonly rowMapping: Map<number, number>
+  ) {
+  }
+}
+
 export class SetSheetContentUndoEntry {
   constructor(
     public readonly sheetId: number,
@@ -220,6 +228,7 @@ type UndoStackEntry
   | AddNamedExpressionUndoEntry
   | RemoveNamedExpressionUndoEntry
   | ChangeNamedExpressionUndoEntry
+  | SetRowOrderUndoEntry
 
 export class UndoRedo {
   private undoStack: UndoStackEntry[] = []
@@ -333,6 +342,8 @@ export class UndoRedo {
       this.undoRemoveNamedExpression(operation)
     } else if (operation instanceof ChangeNamedExpressionUndoEntry) {
       this.undoChangeNamedExpression(operation)
+    } else if (operation instanceof SetRowOrderUndoEntry) {
+      this.undoSetRowOrder(operation)
     } else {
       throw 'Unknown element'
     }
@@ -495,6 +506,11 @@ export class UndoRedo {
     this.operations.restoreNamedExpression(operation.namedExpression, operation.oldContent, operation.scope)
   }
 
+  private undoSetRowOrder(operation: SetRowOrderUndoEntry) {
+    const reverseMap = new Map(Array.from(operation.rowMapping, a => a.reverse()) as [number,number][])
+    this.operations.setRowOrder(operation.sheetId, reverseMap)
+  }
+
   public redo() {
     const operation = this.redoStack.pop()
 
@@ -544,6 +560,8 @@ export class UndoRedo {
       this.redoRemoveNamedExpression(operation)
     } else if (operation instanceof ChangeNamedExpressionUndoEntry) {
       this.redoChangeNamedExpression(operation)
+    } else if (operation instanceof SetRowOrderUndoEntry) {
+      this.redoSetRowOrder(operation)
     } else {
       throw 'Unknown element'
     }
@@ -632,6 +650,10 @@ export class UndoRedo {
 
   private redoChangeNamedExpression(operation: ChangeNamedExpressionUndoEntry) {
     this.operations.changeNamedExpressionExpression(operation.namedExpression.displayName, operation.newContent, operation.scope, operation.options)
+  }
+
+  private redoSetRowOrder(operation: SetRowOrderUndoEntry) {
+    this.operations.setRowOrder(operation.sheetId, operation.rowMapping)
   }
 
   private restoreOldDataFromVersion(version: number) {

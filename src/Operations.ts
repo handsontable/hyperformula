@@ -309,6 +309,23 @@ export class Operations {
     }
   }
 
+  public setRowOrder(sheetId: number, rowMapping: Map<number, number>): void {
+    const buffer: [SimpleCellAddress, ClipboardCell][][] = []
+    for(const [source, target] of rowMapping.entries() ) {
+      if(source!==target) {
+        const row = this.getRangeClipboardCells(AbsoluteCellRange.spanFrom({sheet: sheetId, col: 0, row: source},Infinity,1))
+        buffer.push(
+          row.map(
+            ([{sheet, col, row}, cell]) => [{sheet, col, row: target},cell]
+          )
+        )
+      }
+    }
+    buffer.forEach(
+      row => this.restoreClipboardCells(sheetId, row.values())
+    )
+  }
+
   public addNamedExpression(expressionName: string, expression: RawCellContent, sheetId?: number, options?: NamedExpressionOptions) {
     this.storeNamedExpressionInCell(this.namedExpressions.lookupNextAddress(expressionName, sheetId), expression)
     const namedExpression = this.namedExpressions.addNamedExpression(expressionName, sheetId, options)

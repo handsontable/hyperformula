@@ -1126,6 +1126,11 @@ export class HyperFormula implements TypedEmitter {
     return this.recomputeIfDependencyGraphNeedsIt()
   }
 
+  public setRowOrder(sheetId: number, rowMapping: Map<number, number>): ExportedChange[] {
+    this._crudOperations.setRowOrder(sheetId, rowMapping)
+    return this.recomputeIfDependencyGraphNeedsIt()
+  }
+
   /**
    * Returns information whether it is possible to add rows into a specified position in a given sheet.
    * Checks against particular rules to ascertain that addRows can be called.
