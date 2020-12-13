@@ -309,9 +309,9 @@ export class Operations {
     }
   }
 
-  public setRowOrder(sheetId: number, rowMapping: Map<number, number>): void {
+  public setRowOrder(sheetId: number, rowMapping: [number, number][]): void {
     const buffer: [SimpleCellAddress, ClipboardCell][][] = []
-    for(const [source, target] of rowMapping.entries() ) {
+    for(const [source, target] of rowMapping ) {
       if(source!==target) {
         const row = this.getRangeClipboardCells(AbsoluteCellRange.spanFrom({sheet: sheetId, col: 0, row: source},Infinity,1))
         buffer.push(

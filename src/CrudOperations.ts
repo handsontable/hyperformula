@@ -294,7 +294,7 @@ export class CrudOperations {
     this.undoRedo.saveOperation(new SetSheetContentUndoEntry(sheetId, oldSheetContent, values))
   }
 
-  public setRowOrder(sheetId: number, rowMapping: Map<number, number>): void {
+  public setRowOrder(sheetId: number, rowMapping: [number, number][]): void {
     if (!this.sheetMapping.hasSheetWithId(sheetId)) {
       throw new NoSheetWithIdError(sheetId)
     }
@@ -303,18 +303,23 @@ export class CrudOperations {
     this.undoRedo.saveOperation(new SetRowOrderUndoEntry(sheetId, rowMapping))
   }
 
-  private validateRowMapping(sheetId: number, rowMapping: Map<number, number>): void {
+  private validateRowMapping(sheetId: number, rowMapping: [number, number][]): void {
     const sheetHeight = this.dependencyGraph.getSheetHeight(sheetId)
-    const values = Array.from(rowMapping.values()).sort((a,b) => a-b)
-    const keys = Array.from(rowMapping.keys()).sort((a,b) => a-b)
+    const sources = rowMapping.map(([a,b])=>a).sort((a,b) => a-b)
+    const targets = rowMapping.map(([a,b])=>b).sort((a,b) => a-b)
 
-    for(let pos of keys) {
+    for(let pos of sources) {
       if(!isNonnegativeInteger(pos) || pos >= sheetHeight) {
-        throw new InvalidArgumentsError('row number to be nonnegative integer and less than sheet height.')
+        throw new InvalidArgumentsError('row numbers to be nonnegative integers and less than sheet height.')
       }
     }
-    for(let i=0;i<values.length;i++) {
-      if(values[i]!==keys[i]) {
+    for(let i=0;i<sources.length-1;i++) {
+      if(sources[i]===sources[i+1]) {
+        throw new InvalidArgumentsError('source row numbers to be unique.')
+      }
+    }
+    for(let i=0;i<sources.length;i++) {
+      if(sources[i]!==targets[i]) {
         throw new InvalidArgumentsError('target row numbers to be permutation of source row numbers.')
       }
     }

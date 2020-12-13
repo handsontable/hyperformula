@@ -49,7 +49,7 @@ export class AddRowsUndoEntry {
 export class SetRowOrderUndoEntry {
   constructor(
     public readonly sheetId: number,
-    public readonly rowMapping: Map<number, number>
+    public readonly rowMapping: [number, number][]
   ) {
   }
 }
@@ -507,7 +507,7 @@ export class UndoRedo {
   }
 
   private undoSetRowOrder(operation: SetRowOrderUndoEntry) {
-    const reverseMap = new Map(Array.from(operation.rowMapping, a => a.reverse()) as [number,number][])
+    const reverseMap = operation.rowMapping.map(([source,target]) => [target,source] as [number,number])
     this.operations.setRowOrder(operation.sheetId, reverseMap)
   }
 

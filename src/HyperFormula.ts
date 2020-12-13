@@ -1126,7 +1126,7 @@ export class HyperFormula implements TypedEmitter {
     return this.recomputeIfDependencyGraphNeedsIt()
   }
 
-  public setRowOrder(sheetId: number, rowMapping: Map<number, number>): ExportedChange[] {
+  public setRowOrder(sheetId: number, rowMapping: [number, number][]): ExportedChange[] {
     this._crudOperations.setRowOrder(sheetId, rowMapping)
     return this.recomputeIfDependencyGraphNeedsIt()
   }
