@@ -12,7 +12,7 @@ import {SearchStrategy} from '../../Lookup/SearchStrategy'
 import {Maybe} from '../../Maybe'
 import {Ast, AstNodeType, ProcedureAst} from '../../parser'
 import {Serialization} from '../../Serialization'
-import {coerceScalarToBoolean, coerceScalarToString, coerceToRange} from '../ArithmeticHelper'
+import {coerceScalarToBoolean, coerceScalarToString, coerceToRange, complex} from '../ArithmeticHelper'
 import {Interpreter} from '../Interpreter'
 import {InterpreterValue, SimpleRangeValue} from '../InterpreterValue'
 
@@ -83,6 +83,11 @@ export enum ArgumentTypes {
    * Integer type.
    */
   INTEGER = 'INTEGER',
+
+  /**
+   * String representing complex number.
+   */
+  COMPLEX = 'COMPLEX',
 
   /**
    * Range or scalar.
@@ -173,7 +178,7 @@ export abstract class FunctionPlugin {
 
   public coerceScalarToNumberOrError = (arg: InternalScalarValue): number | CellError => this.interpreter.arithmeticHelper.coerceScalarToNumberOrError(arg)
 
-  public coerceToType(arg: InterpreterValue, coercedType: FunctionArgument): Maybe<InterpreterValue> {
+  public coerceToType(arg: InterpreterValue, coercedType: FunctionArgument): Maybe<InterpreterValue | complex> {
     if (arg instanceof SimpleRangeValue) {
       switch(coercedType.argumentType) {
         case ArgumentTypes.RANGE:
@@ -220,6 +225,8 @@ export abstract class FunctionPlugin {
             return arg
           }
           return coerceToRange(arg)
+        case ArgumentTypes.COMPLEX:
+          return this.interpreter.arithmeticHelper.coerceScalarToComplex(arg)
       }
     }
   }
@@ -239,7 +246,7 @@ export abstract class FunctionPlugin {
       scalarValues = args.map((ast) => [this.evaluateAst(ast, formulaAddress), false])
     }
 
-    const coercedArguments: Maybe<InterpreterValue>[] = []
+    const coercedArguments: Maybe<InterpreterValue | complex>[] = []
 
     let argCoerceFailure: Maybe<CellError> = undefined
     if (functionDefinition.repeatLastArgs === undefined && argumentDefinitions.length < scalarValues.length) {

@@ -4,6 +4,7 @@
  */
 
 import {Config} from './Config'
+import {Maybe} from './Maybe'
 
 export class NumberLiteralHelper {
   private readonly numberPattern: RegExp
@@ -15,13 +16,26 @@ export class NumberLiteralHelper {
     const thousandSeparator = this.config.thousandSeparator === '.' ? `\\${this.config.thousandSeparator}` : this.config.thousandSeparator
     const decimalSeparator = this.config.decimalSeparator === '.' ? `\\${this.config.decimalSeparator}` : this.config.decimalSeparator
 
-    this.numberPattern = new RegExp(`^([+-]?((${decimalSeparator}\\d+)|(\\d+(${thousandSeparator}\\d{3,})*(${decimalSeparator}\\d+)?)))$`)
+    this.numberPattern = new RegExp(`^([+-]?((${decimalSeparator}\\d+)|(\\d+(${thousandSeparator}\\d{3,})*(${decimalSeparator}\\d*)?)))(e[+-]?\\d+)?$`)
     this.allThousandSeparatorsRegex = new RegExp(`${thousandSeparator}`, 'g')
   }
-  
+
+  public numericStringToMaybeNumber(input: string): Maybe<number> {
+    if(this.numberPattern.test(input)) {
+      const num = this.numericStringToNumber(input)
+      if(isNaN(num)) {
+        return undefined
+      }
+    return num
+    }
+    return undefined
+  }
+
   public isNumber(input: string): boolean {
-    const match =  this.numberPattern.test(input)
-    return match
+    if (this.numberPattern.test(input)) {
+      return !isNaN(this.numericStringToNumber(input))
+    }
+    return false
   }
 
   public numericStringToNumber(input: string): number {

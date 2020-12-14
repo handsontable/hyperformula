@@ -5,6 +5,7 @@ import {Config} from '../src/Config'
 import {DateTimeHelper} from '../src/DateTimeHelper'
 import {FormulaCellVertex, MatrixVertex, RangeVertex} from '../src/DependencyGraph'
 import {defaultStringifyDateTime} from '../src/format/format'
+import {complex} from '../src/interpreter/ArithmeticHelper'
 import {
   AstNodeType,
   CellAddress,
@@ -88,6 +89,16 @@ export const expectArrayWithSameContent = (expected: any[], actual: any[]) => {
     // @ts-ignore
     expect(actual).toContainEqual(iter)
   }
+}
+
+export const expectToBeCloseForComplex = (engine: HyperFormula, cell: string, expected: string, precision?: number) => {
+  // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+  // @ts-ignore
+  const coerce = (arg: CellValue): complex => engine.evaluator.interpreter.arithmeticHelper.coerceScalarToComplex(arg)
+  const actualVal: complex = coerce(engine.getCellValue(adr(cell)))
+  const expectedVal: complex = coerce(expected)
+  expect(expectedVal[0]).toBeCloseTo(actualVal[0], precision)
+  expect(expectedVal[1]).toBeCloseTo(actualVal[1], precision)
 }
 
 export const verifyValues = (engine: HyperFormula) => {

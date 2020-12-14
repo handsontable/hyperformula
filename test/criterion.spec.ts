@@ -47,6 +47,10 @@ describe('Criterion', () => {
     expect(criterionBuilder.parseCriterion('>=100.5', arithmeticHelper)).toEqual(buildCriterion(CriterionType.GREATER_THAN_OR_EQUAL, 100.5))
   })
 
+  it('works with scientific notation', () => {
+    expect(criterionBuilder.parseCriterion('>=1e5', arithmeticHelper)).toEqual(buildCriterion(CriterionType.GREATER_THAN_OR_EQUAL, 100000))
+  })
+
   it('works with strings', () => {
     expect(criterionBuilder.parseCriterion('=asdf', arithmeticHelper)).toEqual(buildCriterion(CriterionType.EQUAL, 'asdf'))
   })

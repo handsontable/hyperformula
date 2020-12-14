@@ -6,6 +6,7 @@
 import {CellError, ErrorType, InternalScalarValue, SimpleCellAddress} from '../../Cell'
 import {ErrorMessage} from '../../error-message'
 import {AstNodeType, ProcedureAst} from '../../parser'
+import {SimpleRangeValue} from '../InterpreterValue'
 import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
 
 /**
@@ -21,6 +22,20 @@ export class MedianPlugin extends FunctionPlugin {
       ],
       repeatLastArgs: 1,
       expandRanges: true,
+    },
+    'LARGE': {
+      method: 'large',
+      parameters: [
+        {argumentType: ArgumentTypes.RANGE},
+        {argumentType: ArgumentTypes.NUMBER, minValue: 1},
+      ],
+    },
+    'SMALL': {
+      method: 'small',
+      parameters: [
+        {argumentType: ArgumentTypes.RANGE},
+        {argumentType: ArgumentTypes.NUMBER, minValue: 1},
+      ],
     },
   }
 
@@ -50,5 +65,39 @@ export class MedianPlugin extends FunctionPlugin {
         return values[Math.floor(values.length / 2)]
       }
     })
+  }
+
+  public large(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('LARGE'),
+      (range: SimpleRangeValue, n: number) => {
+        const vals = this.interpreter.arithmeticHelper.manyToExactNumbers(range.valuesFromTopLeftCorner())
+        if(vals instanceof CellError) {
+          return vals
+        }
+        vals.sort((a, b) => a-b)
+        n = Math.trunc(n)
+        if(n > vals.length) {
+          return new CellError(ErrorType.NUM, ErrorMessage.ValueLarge)
+        }
+        return vals[vals.length-n]
+      }
+    )
+  }
+
+  public small(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('SMALL'),
+      (range: SimpleRangeValue, n: number) => {
+        const vals = this.interpreter.arithmeticHelper.manyToExactNumbers(range.valuesFromTopLeftCorner())
+        if(vals instanceof CellError) {
+          return vals
+        }
+        vals.sort((a, b) => a-b)
+        n = Math.trunc(n)
+        if(n > vals.length) {
+          return new CellError(ErrorType.NUM, ErrorMessage.ValueLarge)
+        }
+        return vals[n-1]
+      }
+    )
   }
 }

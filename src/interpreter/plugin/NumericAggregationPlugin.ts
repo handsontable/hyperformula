@@ -141,10 +141,12 @@ export class NumericAggregationPlugin extends FunctionPlugin {
   }
 
   public static aliases = {
-    'VAR': 'VAR.S',
-    'VARP': 'VAR.P',
-    'STDEV': 'STDEV.S',
-    'STDEVP': 'STDEV.P',
+    VAR: 'VAR.S',
+    VARP: 'VAR.P',
+    STDEV: 'STDEV.S',
+    STDEVP: 'STDEV.P',
+    VARS: 'VAR.S',
+    STDEVS: 'STDEV.S',
   }
 
   /**
