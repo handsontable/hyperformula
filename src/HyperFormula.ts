@@ -1126,6 +1126,49 @@ export class HyperFormula implements TypedEmitter {
     return this.recomputeIfDependencyGraphNeedsIt()
   }
 
+  /**
+   * Reorders rows of a sheet according to a permutation.
+   *
+   * Note that this method may trigger dependency graph recalculation.
+   *
+   * @param {number} sheetId - ID of a sheet to operate on
+   * @param {[number, number][]} rowMapping - array mapping original positions to final positions of rows
+   *
+   * @fires [[valuesUpdated]] if recalculation was triggered by this change
+   *
+   * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
+   * @throws an error when rowMapping does not define correct row permutation for some subset of rows of the given sheet
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromArray([
+   *  [1],
+   *  [2],
+   *  [4, 5],
+   * ]);
+   *
+   * // should set swap rows 0 and 2 in place, returns:
+   * // [{
+   * //   address: { sheet: 0, col: 0, row: 2 },
+   * //   newValue: 1,
+   * // },
+   * // {
+   * //   address: { sheet: 0, col: 1, row: 2 },
+   * //   newValue: null,
+   * // },
+   * // {
+   * //   address: { sheet: 0, col: 0, row: 0 },
+   * //   newValue: 4,
+   * // },
+   * // {
+   * //   address: { sheet: 0, col: 1, row: 0 },
+   * //   newValue: 5,
+   * // }]
+   * const changes = hfInstance.setRowOrder(0, [[0,2],[2,0]]);
+   * ```
+   *
+   * @category Cells
+   */
   public setRowOrder(sheetId: number, rowMapping: [number, number][]): ExportedChange[] {
     this._crudOperations.setRowOrder(sheetId, rowMapping)
     return this.recomputeIfDependencyGraphNeedsIt()
