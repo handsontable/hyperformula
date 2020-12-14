@@ -82,3 +82,26 @@ describe('should correctly work', () => {
     expect(engine.getSheetSerialized(0)).toEqual([['=C-1:C8',8,9], ['=A3','=B3:B4',3], ['=A11','=B11:B16',6]])
   })
 })
+
+describe('reorder working with undo', () => {
+  it('should work on static engine', () => {
+    const engine = HyperFormula.buildFromArray([[1,2,3], [4,5,6], [7,8,9]])
+    engine.setRowOrder(0, [[0,1],[1,2],[2,0]])
+    engine.undo()
+    expect(engine.getSheetSerialized(0)).toEqual([[1,2,3], [4,5,6], [7,8,9]])
+  })
+
+  it('should work with external references', () => {
+    const engine = HyperFormula.buildFromArray([[1,2,3], [4,5,6], [7,8,9], ['=A1', '=SUM(A2:A3)']])
+    engine.setRowOrder(0, [[0,1],[1,2],[2,0]])
+    engine.undo()
+    expect(engine.getSheetSerialized(0)).toEqual([[1,2,3], [4,5,6], [7,8,9], ['=A1', '=SUM(A2:A3)']])
+  })
+
+  it('should work with internal references', () => {
+    const engine = HyperFormula.buildFromArray([['=A2','=B2:B3',3], ['=A10','=B10:B15',6], ['=C1:C10',8,9]])
+    engine.setRowOrder(0, [[0,1],[1,2],[2,0]])
+    engine.undo()
+    expect(engine.getSheetSerialized(0)).toEqual([['=A2','=B2:B3',3], ['=A10','=B10:B15',6], ['=C1:C10',8,9]])
+  })
+})
