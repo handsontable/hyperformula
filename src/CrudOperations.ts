@@ -299,6 +299,8 @@ export class CrudOperations {
       throw new NoSheetWithIdError(sheetId)
     }
     this.validateRowMapping(sheetId, rowMapping)
+    this.undoRedo.clearRedoStack()
+    this.clipboardOperations.abortCut()
     this.operations.setRowOrder(sheetId, rowMapping)
     this.undoRedo.saveOperation(new SetRowOrderUndoEntry(sheetId, rowMapping))
   }
