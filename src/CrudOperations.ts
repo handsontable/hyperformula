@@ -307,10 +307,10 @@ export class CrudOperations {
 
   private validateRowMapping(sheetId: number, rowMapping: [number, number][]): void {
     const sheetHeight = this.dependencyGraph.getSheetHeight(sheetId)
-    const sources = rowMapping.map(([a,b])=>a).sort((a,b) => a-b)
-    const targets = rowMapping.map(([a,b])=>b).sort((a,b) => a-b)
+    const sources = rowMapping.map(([a, b])=>a).sort((a, b) => a-b)
+    const targets = rowMapping.map(([a, b])=>b).sort((a, b) => a-b)
 
-    for(let pos of sources) {
+    for(const pos of sources) {
       if(!isNonnegativeInteger(pos) || pos >= sheetHeight) {
         throw new InvalidArgumentsError('row numbers to be nonnegative integers and less than sheet height.')
       }

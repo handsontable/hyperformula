@@ -507,7 +507,7 @@ export class UndoRedo {
   }
 
   private undoSetRowOrder(operation: SetRowOrderUndoEntry) {
-    const reverseMap = operation.rowMapping.map(([source,target]) => [target,source] as [number,number])
+    const reverseMap = operation.rowMapping.map(([source, target]) => [target, source] as [number, number])
     this.operations.setRowOrder(operation.sheetId, reverseMap)
   }
 
