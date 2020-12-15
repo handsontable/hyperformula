@@ -313,7 +313,9 @@ export class Operations {
     const buffer: [SimpleCellAddress, ClipboardCell][][] = []
     for(const [source, target] of rowMapping ) {
       if(source!==target) {
-        const row = this.getRangeClipboardCells(AbsoluteCellRange.spanFrom({sheet: sheetId, col: 0, row: source},Infinity,1))
+        const rowRange = AbsoluteCellRange.spanFrom({sheet: sheetId, col: 0, row: source},Infinity,1)
+        this.dependencyGraph.breakNumericMatricesInRange(rowRange)
+        const row = this.getRangeClipboardCells(rowRange)
         buffer.push(
           row.map(
             ([{sheet, col, row}, cell]) => [{sheet, col, row: target},cell]
