@@ -4,6 +4,8 @@ const HyperFormula = require('../../dist/hyperformula.full');
 const fs = require('fs');
 const path = require('path');
 
+const searchPattern = new RegExp('^/api', 'i');
+
 module.exports = {
   title: 'HyperFormula (v' + HyperFormula.version + ')',
   description: 'HyperFormula is an open-source, high-performance calculation engine for spreadsheets and web applications.',
@@ -37,6 +39,12 @@ module.exports = {
         $page.buildDate = HyperFormula.buildDate
         // inject current HF releaseDate as {{ $page.releaseDate }} variable
         $page.releaseDate = HyperFormula.releaseDate
+        // inject current HF function count as {{ $page.functionsCount }} variable
+        $page.functionsCount = HyperFormula.getRegisteredFunctionNames('enGB').length
+
+        if (searchPattern.test($page.path)) {
+          $page.frontmatter.editLink = false
+        }
       },
       chainMarkdown (config) {
         // inject custom markdown highlight with our aliases to formula syntax
