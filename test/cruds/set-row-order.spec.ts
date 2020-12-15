@@ -36,6 +36,20 @@ describe('setting row order - checking if it is possible', () => {
       engine.setRowOrder(0, [[0, 0], [1, 1], [2, 1]])
     ).toThrowError('Invalid arguments, expected target row numbers to be permutation of source row numbers.')
   })
+
+  it('should check for matrices', () => {
+    const engine = HyperFormula.buildFromArray([[0], [0], ['{=1}']])
+    expect(() =>
+      engine.setRowOrder(0, [[0, 2], [1, 1], [2, 0]])
+    ).toThrowError('Cannot perform this operation, source location has a matrix inside.')
+  })
+
+  it('should check for matrices only in moved rows', () => {
+    const engine = HyperFormula.buildFromArray([[0], ['{=1}'], [0]])
+    expect(() =>
+      engine.setRowOrder(0, [[0, 2], [1, 1], [2, 0]])
+    ).not.toThrowError()
+  })
 })
 
 describe('should correctly work', () => {

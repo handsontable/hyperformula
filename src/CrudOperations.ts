@@ -57,7 +57,7 @@ import {
   RemoveRowsUndoEntry,
   RemoveSheetUndoEntry,
   RenameSheetUndoEntry,
-  SetCellContentsUndoEntry, SetRowOrderUndoEntry,
+  SetCellContentsUndoEntry, SetColumnOrderUndoEntry, SetRowOrderUndoEntry,
   SetSheetContentUndoEntry,
   UndoRedo
 } from './UndoRedo'
