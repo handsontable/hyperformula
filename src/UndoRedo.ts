@@ -54,6 +54,14 @@ export class SetRowOrderUndoEntry {
   }
 }
 
+export class SetColumnOrderUndoEntry {
+  constructor(
+    public readonly sheetId: number,
+    public readonly columnMapping: [number, number][]
+  ) {
+  }
+}
+
 export class SetSheetContentUndoEntry {
   constructor(
     public readonly sheetId: number,
@@ -229,6 +237,7 @@ type UndoStackEntry
   | RemoveNamedExpressionUndoEntry
   | ChangeNamedExpressionUndoEntry
   | SetRowOrderUndoEntry
+  | SetColumnOrderUndoEntry
 
 export class UndoRedo {
   private undoStack: UndoStackEntry[] = []
@@ -344,6 +353,8 @@ export class UndoRedo {
       this.undoChangeNamedExpression(operation)
     } else if (operation instanceof SetRowOrderUndoEntry) {
       this.undoSetRowOrder(operation)
+    } else if (operation instanceof SetColumnOrderUndoEntry) {
+      this.undoSetColumnOrder(operation)
     } else {
       throw 'Unknown element'
     }
@@ -511,6 +522,11 @@ export class UndoRedo {
     this.operations.setRowOrder(operation.sheetId, reverseMap)
   }
 
+  private undoSetColumnOrder(operation: SetColumnOrderUndoEntry) {
+    const reverseMap = operation.columnMapping.map(([source, target]) => [target, source] as [number, number])
+    this.operations.setColumnOrder(operation.sheetId, reverseMap)
+  }
+
   public redo() {
     const operation = this.redoStack.pop()
 
@@ -562,6 +578,8 @@ export class UndoRedo {
       this.redoChangeNamedExpression(operation)
     } else if (operation instanceof SetRowOrderUndoEntry) {
       this.redoSetRowOrder(operation)
+    } else if (operation instanceof SetColumnOrderUndoEntry) {
+      this.redoSetColumnOrder(operation)
     } else {
       throw 'Unknown element'
     }
@@ -654,6 +672,10 @@ export class UndoRedo {
 
   private redoSetRowOrder(operation: SetRowOrderUndoEntry) {
     this.operations.setRowOrder(operation.sheetId, operation.rowMapping)
+  }
+
+  private redoSetColumnOrder(operation: SetColumnOrderUndoEntry) {
+    this.operations.setColumnOrder(operation.sheetId, operation.columnMapping)
   }
 
   private restoreOldDataFromVersion(version: number) {

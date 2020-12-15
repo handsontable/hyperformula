@@ -298,31 +298,42 @@ export class CrudOperations {
     if (!this.sheetMapping.hasSheetWithId(sheetId)) {
       throw new NoSheetWithIdError(sheetId)
     }
-    this.validateRowMapping(sheetId, rowMapping)
+    this.validateRowOrColumnMapping(sheetId, rowMapping, 'row')
     this.undoRedo.clearRedoStack()
     this.clipboardOperations.abortCut()
     this.operations.setRowOrder(sheetId, rowMapping)
     this.undoRedo.saveOperation(new SetRowOrderUndoEntry(sheetId, rowMapping))
   }
 
-  private validateRowMapping(sheetId: number, rowMapping: [number, number][]): void {
-    const sheetHeight = this.dependencyGraph.getSheetHeight(sheetId)
+  public setColumnOrder(sheetId: number, columnMapping: [number, number][]): void {
+    if (!this.sheetMapping.hasSheetWithId(sheetId)) {
+      throw new NoSheetWithIdError(sheetId)
+    }
+    this.validateRowOrColumnMapping(sheetId, columnMapping, 'column')
+    this.undoRedo.clearRedoStack()
+    this.clipboardOperations.abortCut()
+    this.operations.setColumnOrder(sheetId, columnMapping)
+    this.undoRedo.saveOperation(new SetColumnOrderUndoEntry(sheetId, columnMapping))
+  }
+
+  private validateRowOrColumnMapping(sheetId: number, rowMapping: [number, number][], rowOrColumn: 'row' | 'column'): void {
+    const limit = rowOrColumn === 'row' ? this.dependencyGraph.getSheetHeight(sheetId) : this.dependencyGraph.getSheetWidth(sheetId)
     const sources = rowMapping.map(([a, b])=>a).sort((a, b) => a-b)
     const targets = rowMapping.map(([a, b])=>b).sort((a, b) => a-b)
 
     for(const pos of sources) {
-      if(!isNonnegativeInteger(pos) || pos >= sheetHeight) {
-        throw new InvalidArgumentsError('row numbers to be nonnegative integers and less than sheet height.')
+      if(!isNonnegativeInteger(pos) || pos >= limit) {
+        throw new InvalidArgumentsError(`${rowOrColumn} numbers to be nonnegative integers and less than sheet height.`)
       }
     }
     for(let i=0;i<sources.length-1;i++) {
       if(sources[i]===sources[i+1]) {
-        throw new InvalidArgumentsError('source row numbers to be unique.')
+        throw new InvalidArgumentsError(`source ${rowOrColumn} numbers to be unique.`)
       }
     }
     for(let i=0;i<sources.length;i++) {
       if(sources[i]!==targets[i]) {
-        throw new InvalidArgumentsError('target row numbers to be permutation of source row numbers.')
+        throw new InvalidArgumentsError(`target ${rowOrColumn} numbers to be permutation of source ${rowOrColumn} numbers.`)
       }
     }
   }

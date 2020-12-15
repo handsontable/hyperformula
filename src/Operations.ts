@@ -314,6 +314,9 @@ export class Operations {
     for(const [source, target] of rowMapping ) {
       if(source!==target) {
         const rowRange = AbsoluteCellRange.spanFrom({sheet: sheetId, col: 0, row: source}, Infinity, 1)
+        if (this.dependencyGraph.matrixMapping.isFormulaMatrixInRange(rowRange)) {
+          throw new SourceLocationHasMatrixError()
+        }
         this.dependencyGraph.breakNumericMatricesInRange(rowRange)
         const row = this.getRangeClipboardCells(rowRange)
         buffer.push(
@@ -325,6 +328,28 @@ export class Operations {
     }
     buffer.forEach(
       row => this.restoreClipboardCells(sheetId, row.values())
+    )
+  }
+
+  public setColumnOrder(sheetId: number, columnMapping: [number, number][]): void {
+    const buffer: [SimpleCellAddress, ClipboardCell][][] = []
+    for(const [source, target] of columnMapping ) {
+      if(source!==target) {
+        const rowRange = AbsoluteCellRange.spanFrom({sheet: sheetId, col: source, row: 0}, 1, Infinity)
+        if (this.dependencyGraph.matrixMapping.isFormulaMatrixInRange(rowRange)) {
+          throw new SourceLocationHasMatrixError()
+        }
+        this.dependencyGraph.breakNumericMatricesInRange(rowRange)
+        const column = this.getRangeClipboardCells(rowRange)
+        buffer.push(
+          column.map(
+            ([{sheet, col, row}, cell]) => [{sheet, col: target, row}, cell]
+          )
+        )
+      }
+    }
+    buffer.forEach(
+      column => this.restoreClipboardCells(sheetId, column.values())
     )
   }
 
