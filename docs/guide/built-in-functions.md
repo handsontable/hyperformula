@@ -232,7 +232,7 @@ lets you design your own [custom functions](custom-functions).
 | FLOOR.PRECISE <br><Badge text="v0.4.0"/>| Math and trigonometry | Rounds a number down to the nearest multiple of Significance. | FLOOR.PRECISE(Number[; Significance]) |
 | GCD <br><Badge text="v0.4.0"/>| Math and trigonometry | Computes greatest common divisor of numbers. | GCD(Number1; Number2; ...) |
 | INT | Math and trigonometry | Rounds a number down to the nearest integer. | INT(Number) |
-| ISO.CEILINGE | Math and trigonometry | Rounds a number up to the nearest multiple of Significance. | ISO.CEILING(Number[; Significance]) |
+| ISO.CEILING <br><Badge text="v0.4.0"/>| Math and trigonometry | Rounds a number up to the nearest multiple of Significance. | ISO.CEILING(Number[; Significance]) |
 | LCM <br><Badge text="v0.4.0"/>| Math and trigonometry | Computes least common multiplicity of numbers. | LCM(Number1; Number2; ...) |
 | LN | Math and trigonometry | Returns the natural logarithm based on the constant e of a number. | LN(Number) |
 | LOG | Math and trigonometry | Returns the logarithm of a number to the specified base. | LOG(Number; Base) |
