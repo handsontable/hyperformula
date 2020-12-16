@@ -3,7 +3,6 @@
 ## Overview
 
 HyperFormula comes with an extensive library of pre-built functions.
-Currently, it supports **{{ $page.functionsCount }}** functions.
 You can use them to create complex formulas for any business application.
 Formula syntax and logic of function are similar to what is
 considered the standard in modern spreadsheet software. That is
@@ -11,7 +10,7 @@ because a spreadsheet is probably the most universal software
 ever created. We wanted the same flexibility for HyperFormula
 but without the constraints of the spreadsheet UI.
 
-All implemented functions are grouped into 8 different categories:
+The latest version of HyperFormula has an extensive collection of {{ $page.functionsCount }} functions in 8 categories:
 
 * Date and time
 * Engineering
@@ -58,7 +57,7 @@ lets you design your own [custom functions](custom-functions).
 
 <br><br>
 
-## List of available functions ({{ $page.functionsCount }})
+## List of available functions (total: {{ $page.functionsCount }})
 
 | Function ID | Category | Description | Syntax |
 | :--- | :--- | :--- | :--- |
