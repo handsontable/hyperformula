@@ -335,7 +335,7 @@ lets you design your own [custom functions](custom-functions).
 | DEVSQ <br><Badge text="v0.4.0"/>| Statistical | Returns sum of squared deviations. | DEVSQ(Number1; Number2; ...Number30) |
 | EXPON.DIST <br><Badge text="v0.4.0"/>| Statistical | Returns density of a exponential distribution. | EXPON.DIST(Number1; Number2; Boolean) |
 | EXPONDIST <br><Badge text="v0.4.0"/>| Statistical | Returns density of a exponential distribution. | EXPONDIST(Number1; Number2; Boolean) |
-| FDIST<br><Badge text="v0.4.0"/>| Statistical | Returns probability of F right-side distribution. | FDIST(X; Degree1; Degree2) |
+| FDIST <br><Badge text="v0.4.0"/>| Statistical | Returns probability of F right-side distribution. | FDIST(X; Degree1; Degree2) |
 | FINV <br><Badge text="v0.4.0"/>| Statistical | Returns inverse of F right-side distribution. | FINV(P; Degree1; Degree2) |
 | F.DIST <br><Badge text="v0.4.0"/>| Statistical | Returns value of F distribution. | F.DIST(X; Degree1; Degree2; Mode) |
 | F.DIST.RT <br><Badge text="v0.4.0"/>| Statistical | Returns probability of F right-side distribution. | F.DIST.RT(X; Degree1; Degree2) |
