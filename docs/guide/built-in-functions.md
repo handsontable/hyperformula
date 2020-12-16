@@ -398,7 +398,7 @@ lets you design your own [custom functions](custom-functions).
 | STDEV.P <br><Badge text="v0.3.0"/>| Statistical | Returns standard deviation of a population. | STDEV.P(Value1; Value2; ... Value30) |
 | STDEVPA <br><Badge text="v0.3.0"/>| Statistical | Returns standard deviation of a population. | STDEVPA(Value1; Value2; ... Value30) |
 | STDEV.S <br><Badge text="v0.3.0"/>| Statistical | Returns standard deviation of a sample. | STDEV.S(Value1; Value2; ... Value30) |
-| STDEVS <br><Badge text="v0.3.0"/>| Statistical | Returns standard deviation of a sample. | STDEVS(Value1; Value2; ... Value30) |
+| STDEVS <br><Badge text="v0.4.0"/>| Statistical | Returns standard deviation of a sample. | STDEVS(Value1; Value2; ... Value30) |
 | STEYX <br><Badge text="v0.4.0"/>| Statistical | Returns standard error for predicted of the predicted y value for each x value. | STEYX(Array1; Array2) |
 | TDIST <br><Badge text="v0.4.0"/>| Statistical | Returns density of Student-t distribution, both-sided or right-tailed. | TDIST(X; Degrees; Mode) |
 | T.DIST <br><Badge text="v0.4.0"/>| Statistical | Returns density of Student-t distribution. | T.DIST(X; Degrees; Mode) |
@@ -418,7 +418,7 @@ lets you design your own [custom functions](custom-functions).
 | VAR.P <br><Badge text="v0.3.0"/>| Statistical | Returns variance of a population. | VAR.P(Value1; Value2; ... Value30) |
 | VARPA <br><Badge text="v0.3.0"/>| Statistical | Returns variance of a population. | VARPA(Value1; Value2; ... Value30) |
 | VAR.S <br><Badge text="v0.3.0"/>| Statistical | Returns variance of a sample. | VAR.S(Value1; Value2; ... Value30) |
-| VARS <br><Badge text="v0.3.0"/>| Statistical | Returns variance of a sample. | VARS(Value1; Value2; ... Value30) |
+| VARS <br><Badge text="v0.4.0"/>| Statistical | Returns variance of a sample. | VARS(Value1; Value2; ... Value30) |
 | WEIBULL <br><Badge text="v0.4.0"/>| Statistical | Returns density of Weibull distribution. | WEIBULL(Number1; Number2; Number3; Boolean) |
 | WEIBULL.DIST <br><Badge text="v0.4.0"/>| Statistical | Returns density of Weibull distribution. | WEIBULL.DIST(Number1; Number2; Number3; Boolean) |
 | WEIBULLDIST <br><Badge text="v0.4.0"/>| Statistical | Returns density of Weibull distribution. | WEIBULLDIST(Number1; Number2; Number3; Boolean) |
