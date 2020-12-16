@@ -3,6 +3,7 @@
 ## Overview
 
 HyperFormula comes with an extensive library of pre-built functions.
+Currently, it supports **{{ $page.functionsCount }}** functions.
 You can use them to create complex formulas for any business application.
 Formula syntax and logic of function are similar to what is
 considered the standard in modern spreadsheet software. That is
@@ -57,7 +58,7 @@ lets you design your own [custom functions](custom-functions).
 
 <br><br>
 
-## List of available functions
+## List of available functions ({{ $page.functionsCount }})
 
 | Function ID | Category | Description | Syntax |
 | :--- | :--- | :--- | :--- |
