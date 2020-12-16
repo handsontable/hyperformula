@@ -10,7 +10,7 @@ because a spreadsheet is probably the most universal software
 ever created. We wanted the same flexibility for HyperFormula
 but without the constraints of the spreadsheet UI.
 
-All implemented functions are grouped into 8 different categories:
+The latest version of HyperFormula has an extensive collection of **{{ $page.functionsCount }}** functions grouped into 9 categories:
 
 * Date and time
 * Engineering
@@ -57,7 +57,7 @@ lets you design your own [custom functions](custom-functions).
 
 <br><br>
 
-## List of available functions
+## List of available functions (total: {{ $page.functionsCount }})
 
 | Function ID | Category | Description | Syntax |
 | :--- | :--- | :--- | :--- |
