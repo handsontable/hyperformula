@@ -1174,6 +1174,48 @@ export class HyperFormula implements TypedEmitter {
     return this.recomputeIfDependencyGraphNeedsIt()
   }
 
+  /**
+   * Reorders columns of a sheet according to a permutation.
+   *
+   * Note that this method may trigger dependency graph recalculation.
+   *
+   * @param {number} sheetId - ID of a sheet to operate on
+   * @param {[number, number][]} columnMapping - array mapping original positions to final positions of columns
+   *
+   * @fires [[valuesUpdated]] if recalculation was triggered by this change
+   *
+   * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
+   * @throws an error when columnMapping does not define correct column permutation for some subset of columns of the given sheet
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromArray([
+   *  [1, 2, 4],
+   *  [5]
+   * ]);
+   *
+   * // should set swap columns 0 and 2 in place, returns:
+   * // [{
+   * //   address: { sheet: 0, col: 2, row: 0 },
+   * //   newValue: 1,
+   * // },
+   * // {
+   * //   address: { sheet: 0, col: 2, row: 1 },
+   * //   newValue: 5,
+   * // },
+   * // {
+   * //   address: { sheet: 0, col: 0, row: 0 },
+   * //   newValue: 4,
+   * // },
+   * // {
+   * //   address: { sheet: 0, col: 0, row: 1 },
+   * //   newValue: null,
+   * // }]
+   * const changes = hfInstance.setRowOrder(0, [[0,2],[2,0]]);
+   * ```
+   *
+   * @category Cells
+   */
   public setColumnOrder(sheetId: number, columnMapping: [number, number][]): ExportedChange[] {
     this._crudOperations.setColumnOrder(sheetId, columnMapping)
     return this.recomputeIfDependencyGraphNeedsIt()
