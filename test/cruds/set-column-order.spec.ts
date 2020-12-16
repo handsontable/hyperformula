@@ -93,7 +93,7 @@ describe('should correctly work', () => {
   it('should work with internal references', () => {
     const engine = HyperFormula.buildFromArray([['=A2', '=SUM(B2:B3)', 3], [1, '=SUM(B10:B15)', '=A10'], ['=SUM(D1:D10)', 8, 9]])
     engine.setColumnOrder(0, [[0, 1], [1, 2], [2, 0]])
-    expect(engine.getSheetSerialized(0)).toEqual([[3, '=B2', '=SUM(C2:C3)'], ['=10', 1, '=SUM(C10:C15)'], [9, '=SUM(E1:E10)', 8]])
+    expect(engine.getSheetSerialized(0)).toEqual([[3, '=B2', '=SUM(C2:C3)'], ['=#REF!', 1, '=SUM(C10:C15)'], [9, '=SUM(E1:E10)', 8]])
   })
 })
 
@@ -143,6 +143,6 @@ describe('reorder working with redo', () => {
     engine.setColumnOrder(0, [[0, 1], [1, 2], [2, 0]])
     engine.undo()
     engine.redo()
-    expect(engine.getSheetSerialized(0)).toEqual([[3, '=B2', '=SUM(C2:C3)'], ['=10', 1, '=SUM(C10:C15)'], [9, '=SUM(E1:E10)', 8]])
+    expect(engine.getSheetSerialized(0)).toEqual([[3, '=B2', '=SUM(C2:C3)'], ['=#REF!', 1, '=SUM(C10:C15)'], [9, '=SUM(E1:E10)', 8]])
   })
 })

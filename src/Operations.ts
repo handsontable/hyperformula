@@ -27,6 +27,7 @@ import {
 } from './DependencyGraph'
 import {ValueCellVertexValue} from './DependencyGraph/ValueCellVertex'
 import {
+  InvalidAddressError,
   InvalidArgumentsError,
   NamedExpressionDoesNotExistError,
   NoRelativeAddressesAllowedError,
@@ -690,7 +691,8 @@ export class Operations {
 
   public setFormulaToCellFromCache(formulaHash: string, address: SimpleCellAddress) {
     const {ast, hasVolatileFunction, hasStructuralChangeFunction, dependencies} = this.parser.fetchCachedResult(formulaHash)
-    this.dependencyGraph.setFormulaToCell(address, ast, absolutizeDependencies(dependencies, address), hasVolatileFunction, hasStructuralChangeFunction)
+    const absoluteDependencies = absolutizeDependencies(dependencies, address)
+    this.dependencyGraph.setFormulaToCell(address, ast, absoluteDependencies, hasVolatileFunction, hasStructuralChangeFunction)
   }
 
   public setParsingErrorToCell(rawInput: string, errors: ParsingError[], address: SimpleCellAddress) {

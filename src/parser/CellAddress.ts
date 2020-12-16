@@ -4,7 +4,7 @@
  */
 
 import {
-  absoluteSheetReference,
+  absoluteSheetReference, ErrorType, invalidSimpleCellAddress,
   simpleCellAddress,
   SimpleCellAddress,
   simpleColumnAddress,
@@ -12,6 +12,7 @@ import {
   simpleRowAddress,
   SimpleRowAddress,
 } from '../Cell'
+import {Maybe} from '../Maybe'
 import {columnIndexToLabel} from './addressRepresentationConverters'
 import {AddressWithColumn, AddressWithRow} from './Address'
 
@@ -158,8 +159,11 @@ export class CellAddress implements AddressWithColumn, AddressWithRow {
     }
   }
 
-  public unparse(baseAddress: SimpleCellAddress): string {
+  public unparse(baseAddress: SimpleCellAddress): Maybe<string> {
     const simpleAddress = this.toSimpleCellAddress(baseAddress)
+    if(invalidSimpleCellAddress(simpleAddress)) {
+      return undefined
+    }
     const column = columnIndexToLabel(simpleAddress.col)
     const rowDollar = this.type === CellReferenceType.CELL_REFERENCE_ABSOLUTE || this.type === CellReferenceType.CELL_REFERENCE_ABSOLUTE_ROW ? '$' : ''
     const colDollar = this.type === CellReferenceType.CELL_REFERENCE_ABSOLUTE || this.type === CellReferenceType.CELL_REFERENCE_ABSOLUTE_COL ? '$' : ''
