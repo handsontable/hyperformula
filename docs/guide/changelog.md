@@ -1,5 +1,24 @@
 # Changelog
 
+## 0.4.0
+**Release date: December 17, 2020**
+### Added
+- Added 50 mathematical functions: ROMAN, ARABIC, FACT, FACTDOUBLE, COMBIN, COMBINA, GCD, LCM, MROUND, MULTINOMIAL, QUOTIENT, RANDBETWEEN, SERIESSUM, SIGN, SQRTPI, SUMX2MY2, SUMX2PY2, SUMXMY2, CEILING.MATH, FLOOR.MATH, FLOOR, CEILING.PRECISE, FLOOR.PRECISE, ISO.CEILING, COMPLEX, IMABS, IMAGINARY, IMARGUMENT, IMCONJUGATE, IMCOS, IMCOSH, IMCOT, IMCSC, IMCSCH, IMDIV, IMEXP, IMLN, IMLOG10, IMLOG2, IMPOWER, IMPRODUCT, IMREAL, IMSEC, IMSECH, IMSIN, IMSINH, IMSQRT, IMSUB,  IMSUM, IMTAN. [#537](https://github.com/handsontable/hyperformula/issues/537), [#582](https://github.com/handsontable/hyperformula/issues/582), [#281](https://github.com/handsontable/hyperformula/issues/281), [#581](https://github.com/handsontable/hyperformula/issues/581)
+- Added 106 statistical functions: EXPON.DIST, EXPONDIST, FISHER, FISHERINV, GAMMA, GAMMA.DIST, GAMMADIST, GAMMALN, GAMMALN.PRECISE, GAMMA.INV, GAMMAINV, GAUSS, BETA.DIST, BETADIST, BETA.INV, BETAINV, BINOM.DIST, BINOMDIST, BINOM.INV, BESSELI, BESSELJ, BESSELK, BESSELY, CHISQ.DIST, CHISQ.DIST.RT, CHISQ.INV, CHISQ.INV.RT, CHIDIST, CHIINV, F.DIST, F.DIST.RT, F.INV, F.INV.RT, FDIST, FINV, WEIBULL, WEIBULL.DIST, HYPGEOMDIST, HYPGEOM.DIST, T.DIST, T.DIST.2T, T.DIST.RT, T.INV, T.INV.2T, TDIST, TINV, LOGNORM.DIST, LOGNORMDIST, LOGNORM.INV, LOGINV, NORM.DIST, NORMDIST, NORM.S.DIST, NORMSDIST, NORM.INV, NORMINV, NORM.S.INV, NORMSINV, PHI, NEGBINOM.DIST, NEGBINOMDIST, POISSON, POISSON.DIST, LARGE, SMALL, AVEDEV, CONFIDENCE, CONFIDENCE.NORM, CONFIDENCE.T, DEVSQ, GEOMEAN, HARMEAN, CRITBINOM, COVAR, COVARIANCE.P, COVARIANCE.S, PEARSON, RSQ, STANDARDIZE, Z.TEST, ZTEST, F.TEST, FTEST, STEYX, SLOPE, CHITEST, CHISQ.TEST, T.TEST, TTEST, SKEW.P, SKEW, WEIBULLDIST, VARS, TINV2T, TDISTRT, TDIST2T, STDEVS, FINVRT, FDISTRT, CHIDISTRT, CHIINVRT, COVARIANCEP, COVARIANCES, LOGNORMINV, POISSONDIST, SKEWP. [#152](https://github.com/handsontable/hyperformula/issues/152), [#154](https://github.com/handsontable/hyperformula/issues/154), [#160](https://github.com/handsontable/hyperformula/issues/160)
+- Added function aliases mechanism. [#569](https://github.com/handsontable/hyperformula/pull/569)
+- Added support for scientific notation. [#579](https://github.com/handsontable/hyperformula/issues/579)
+- Added support for complex numbers. [#281](https://github.com/handsontable/hyperformula/issues/281)
+
+### Changed
+- Changed CEILING function implementation to be consistent with existing implementations. [#582](https://github.com/handsontable/hyperformula/issues/582)
+
+### Fixed
+- Fixed a problem with dependencies not collected for specific functions. [#550](https://github.com/handsontable/hyperformula/issues/550), [#549](https://github.com/handsontable/hyperformula/issues/549)
+- Fixed a minor problem with dependencies under nested parenthesis. [#549](https://github.com/handsontable/hyperformula/issues/549), [#558](https://github.com/handsontable/hyperformula/issues/558)
+- Fixed a problem with HLOOKUP/VLOOKUP getting stuck in binary search. [#559](https://github.com/handsontable/hyperformula/issues/559), [#562](https://github.com/handsontable/hyperformula/issues/562)
+- Fixed a problem with the logic of dependency resolving. [#561](https://github.com/handsontable/hyperformula/issues/561), [#563](https://github.com/handsontable/hyperformula/pull/563)
+- Fixed a minor bug with ATAN2 function. [#581](https://github.com/handsontable/hyperformula/issues/581)
+
 ## 0.3.0
 **Release date: October 22, 2020**
 
