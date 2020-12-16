@@ -24,6 +24,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed a problem with HLOOKUP/VLOOKUP getting stuck in binary search. (#559, #562)
 - Fixed a problem with logic of dependency resolving. (#561, #563)
 - Fixed a minor bug with ATAN2 function. (#581)
+- Fixed a bug with serialization of some addresses after CRUDs. (#587)
 
 ## [0.3.0] - 2020-10-22
 
