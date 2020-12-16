@@ -68,7 +68,7 @@ describe('should correctly work', () => {
   it('should work on static engine with uneven column', () => {
     const engine = HyperFormula.buildFromArray([[1, 2], [3, 4], [5]], {chooseAddressMappingPolicy: new AlwaysSparse()})
     engine.setColumnOrder(0, [[0, 1], [1, 0]])
-    expect(engine.getSheetSerialized(0)).toEqual([[2,1], [4, 3], [null, 5]])
+    expect(engine.getSheetSerialized(0)).toEqual([[2, 1], [4, 3], [null, 5]])
   })
 
   it('should work with more complicated permutations', () => {
