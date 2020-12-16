@@ -95,7 +95,7 @@ lets you design your own [custom functions](custom-functions).
 | BITOR | Engineering | Returns a bitwise logical "or" of the parameters. | BITOR(Number1; Number2) |
 | BITRSHIFT | Engineering | Shifts a number right by n bits. | BITRSHIFT(Number; Shift) |
 | BITXOR | Engineering | Returns a bitwise logical "exclusive or" of the parameters. | BITXOR(Number1; Number2) |
-| COMPLEX | Engineering | Returns complex number from Re and Im parts. | COMPLEX(Re; Im[; Symbol]) |
+| COMPLEX <br><Badge text="v0.4.0"/>| Engineering | Returns complex number from Re and Im parts. | COMPLEX(Re; Im[; Symbol]) |
 | DEC2BIN | Engineering | Returns the binary number for the decimal number entered between –512 and 511. | DEC2BIN(Number; Places) |
 | DEC2HEX | Engineering | Returns the hexadecimal number for the decimal number entered. | DEC2HEX(Number; Places) |
 | DEC2OCT | Engineering | Returns the octal number for the decimal number entered. | DEC2OCT(Number; Places) |
@@ -105,31 +105,31 @@ lets you design your own [custom functions](custom-functions).
 | HEX2BIN <br><Badge text="v0.2.0"/>| Engineering | The result is the binary number for the hexadecimal number entered. | HEX2BIN(Number; Places) |
 | HEX2DEC <br><Badge text="v0.2.0"/>| Engineering | The result is the decimal number for the hexadecimal number entered. | HEX2DEC(Number) |
 | HEX2OCT <br><Badge text="v0.2.0"/>| Engineering | The result is the octal number for the hexadecimal number entered. | HEX2OCT(Number; Places) |
-| IMABS | Engineering | Returns module of a complex number. | IMABS(Complex) |
-| IMAGINARY | Engineering | Returns imaginary part of a complex number. | IMAGINARY(Complex) |
-| IMARGUMENT | Engineering | Returns argument of a complex number. | IMARGUMENT(Complex) |
-| IMCONJUGATE | Engineering | Returns conjugate of a complex number. | IMCONJUGATE(Complex) |
-| IMCOS | Engineering | Returns cosine of a complex number. | IMCOS(Complex) |
-| IMCOSH | Engineering | Returns hyperbolic cosine of a complex number. | IMCOSH(Complex) |
-| IMCOT | Engineering | Returns cotangens of a complex number. | IMCOT(Complex) |
-| IMCSC | Engineering | Returns cosecans of a complex number. | IMCSC(Complex) |
-| IMCSCH | Engineering | Returns hyperbolic cosecans of a complex number. | IMCSCH(Complex) |
-| IMDIV | Engineering | Divides two complex numbers. | IMDIV(Complex1; Complex2) |
-| IMEXP | Engineering | Returns exponent of a complex number. | IMEXP(Complex) |
-| IMLN | Engineering | Returns natural logarithm of a complex number. | IMLN(Complex) |
-| IMLOG2 | Engineering | Returns binary logarithm of a complex number. | IMLOG2(Complex) |
-| IMLOG10 | Engineering | Returns base-10 logarithm of a complex number. | IMLOG10(Complex) |
-| IMPOWER | Engineering | Returns a complex number raised to a given power. | IMPOWER(Complex; Number) |
-| IMPRODUCT | Engineering | Multiplies complex numbers. | IMPRODUCT(Complex1 ...Complex30) |
-| IMREAL | Engineering | Returns real part of a complex number. | IMREAL(Complex) |
-| IMSEC | Engineering | Returns secans of a complex number. | IMSEC(Complex) |
-| IMSECH | Engineering | Returns hyperbolic secans of a complex number. | IMSECH(Complex) |
-| IMSIN | Engineering | Returns sine of a complex number. | IMSIN(Complex) |
-| IMSINH | Engineering | Returns hyperbolic sine of a complex number. | IMSINH(Complex) |
-| IMSQRT | Engineering | Returns a square root of a complex number. | IMSQRT(Complex) |
-| IMSUB | Engineering | Subtracts two complex numbers. | IMSUB(Complex1; Complex2) |
-| IMSUM | Engineering | Adds complex numbers. | IMSUM(Complex1 ...Complex30) |
-| IMTAN | Engineering | Returns tangens of a complex number. | IMTAN(Complex) |
+| IMABS <br><Badge text="v0.4.0"/>| Engineering | Returns module of a complex number. | IMABS(Complex) |
+| IMAGINARY <br><Badge text="v0.4.0"/>| Engineering | Returns imaginary part of a complex number. | IMAGINARY(Complex) |
+| IMARGUMENT <br><Badge text="v0.4.0"/>| Engineering | Returns argument of a complex number. | IMARGUMENT(Complex) |
+| IMCONJUGATE <br><Badge text="v0.4.0"/>| Engineering | Returns conjugate of a complex number. | IMCONJUGATE(Complex) |
+| IMCOS <br><Badge text="v0.4.0"/>| Engineering | Returns cosine of a complex number. | IMCOS(Complex) |
+| IMCOSH <br><Badge text="v0.4.0"/>| Engineering | Returns hyperbolic cosine of a complex number. | IMCOSH(Complex) |
+| IMCOT <br><Badge text="v0.4.0"/>| Engineering | Returns cotangens of a complex number. | IMCOT(Complex) |
+| IMCSC <br><Badge text="v0.4.0"/>| Engineering | Returns cosecans of a complex number. | IMCSC(Complex) |
+| IMCSCH <br><Badge text="v0.4.0"/>| Engineering | Returns hyperbolic cosecans of a complex number. | IMCSCH(Complex) |
+| IMDIV <br><Badge text="v0.4.0"/>| Engineering | Divides two complex numbers. | IMDIV(Complex1; Complex2) |
+| IMEXP <br><Badge text="v0.4.0"/>| Engineering | Returns exponent of a complex number. | IMEXP(Complex) |
+| IMLN <br><Badge text="v0.4.0"/>| Engineering | Returns natural logarithm of a complex number. | IMLN(Complex) |
+| IMLOG2 <br><Badge text="v0.4.0"/>| Engineering | Returns binary logarithm of a complex number. | IMLOG2(Complex) |
+| IMLOG10 <br><Badge text="v0.4.0"/>| Engineering | Returns base-10 logarithm of a complex number. | IMLOG10(Complex) |
+| IMPOWER <br><Badge text="v0.4.0"/>| Engineering | Returns a complex number raised to a given power. | IMPOWER(Complex; Number) |
+| IMPRODUCT <br><Badge text="v0.4.0"/>| Engineering | Multiplies complex numbers. | IMPRODUCT(Complex1 ...Complex30) |
+| IMREAL <br><Badge text="v0.4.0"/>| Engineering | Returns real part of a complex number. | IMREAL(Complex) |
+| IMSEC <br><Badge text="v0.4.0"/>| Engineering | Returns secans of a complex number. | IMSEC(Complex) |
+| IMSECH <br><Badge text="v0.4.0"/>| Engineering | Returns hyperbolic secans of a complex number. | IMSECH(Complex) |
+| IMSIN <br><Badge text="v0.4.0"/>| Engineering | Returns sine of a complex number. | IMSIN(Complex) |
+| IMSINH <br><Badge text="v0.4.0"/>| Engineering | Returns hyperbolic sine of a complex number. | IMSINH(Complex) |
+| IMSQRT <br><Badge text="v0.4.0"/>| Engineering | Returns a square root of a complex number. | IMSQRT(Complex) |
+| IMSUB <br><Badge text="v0.4.0"/>| Engineering | Subtracts two complex numbers. | IMSUB(Complex1; Complex2) |
+| IMSUM <br><Badge text="v0.4.0"/>| Engineering | Adds complex numbers. | IMSUM(Complex1 ...Complex30) |
+| IMTAN <br><Badge text="v0.4.0"/> | Engineering | Returns tangens of a complex number. | IMTAN(Complex) |
 | OCT2BIN <br><Badge text="v0.2.0"/>| Engineering | The result is the binary number for the octal number entered. | OCT2BIN(Number; Places) |
 | OCT2DEC <br><Badge text="v0.2.0"/>| Engineering | The result is the decimal number for the octal number entered. | OCT2DEC(Number) |
 | OCT2HEX <br><Badge text="v0.2.0"/>| Engineering | The result is the hexadecimal number for the octal number entered. | OCT2HEX(Number; Places) |
@@ -202,7 +202,7 @@ lets you design your own [custom functions](custom-functions).
 | ACOSH <br><Badge text="v0.2.0"/>| Math and trigonometry | Returns the inverse harmonic cosine of a number. | ACOSH(Number) |
 | ACOT <br><Badge text="v0.2.0"/>| Math and trigonometry | Returns the inverse trigonometric cotangent of a number. | ACOT(Number) |
 | ACOTH <br><Badge text="v0.2.0"/>| Math and trigonometry | Returns the inverse harmonic cotangent of a number. | ACOTH(Number) |
-| ARABIC | Math and trigonometry | Converts number from roman form. | ARABIC(String) |
+| ARABIC <br><Badge text="v0.4.0"/> | Math and trigonometry | Converts number from roman form. | ARABIC(String) |
 | ASIN | Math and trigonometry | Returns the inverse trigonometric sine of a number. | ASIN(Number) |
 | ASINH <br><Badge text="v0.2.0"/>| Math and trigonometry | Returns the inverse harmonic sine of a number. | ASINH(Number) |
 | ATAN | Math and trigonometry | Returns the inverse trigonometric tangent of a number. | ATAN(Number) |
@@ -210,10 +210,10 @@ lets you design your own [custom functions](custom-functions).
 | ATANH <br><Badge text="v0.2.0"/>| Math and trigonometry | Returns the inverse harmonic tangent of a number. | ATANH(Number) |
 | BASE | Math and trigonometry | Converts a positive integer to a specified base into a text from the numbering system. | BASE(Number; Radix; [Minimumlength]) |
 | CEILING | Math and trigonometry | Rounds a number up to the nearest multiple of Significance. | CEILING(Number; Significance) |
-| CEILING.MATH | Math and trigonometry | Rounds a number up to the nearest multiple of Significance. | CEILING.MATH(Number[; Significance[; Mode]]) |
-| CEILING.PRECISE | Math and trigonometry | Rounds a number up to the nearest multiple of Significance. | CEILING.PRECISE(Number[; Significance]) |
-| COMBIN | Math and trigonometry | Returns number of combinations (without repetitions). | COMBIN(Number; Number) |
-| COMBINA | Math and trigonometry | Returns number of combinations (with repetitions). | COMBINA(Number; Number) |
+| CEILING.MATH <br><Badge text="v0.4.0"/>| Math and trigonometry | Rounds a number up to the nearest multiple of Significance. | CEILING.MATH(Number[; Significance[; Mode]]) |
+| CEILING.PRECISE <br><Badge text="v0.4.0"/>| Math and trigonometry | Rounds a number up to the nearest multiple of Significance. | CEILING.PRECISE(Number[; Significance]) |
+| COMBIN <br><Badge text="v0.4.0"/>| Math and trigonometry | Returns number of combinations (without repetitions). | COMBIN(Number; Number) |
+| COMBINA <br><Badge text="v0.4.0"/>| Math and trigonometry | Returns number of combinations (with repetitions). | COMBINA(Number; Number) |
 | COS | Math and trigonometry | Returns the cosine of the given angle (in radians). | COS(Number) |
 | COSH <br><Badge text="v0.2.0"/>| Math and trigonometry | Returns the hyperbolic cosine of the given value. | COSH(Number) |
 | COT | Math and trigonometry | Returns the cotangent of the given angle (in radians). | COT(Number) |
@@ -225,51 +225,51 @@ lets you design your own [custom functions](custom-functions).
 | DEGREES | Math and trigonometry | Converts radians into degrees. | DEGREES(Number) |
 | EVEN | Math and trigonometry | Rounds a positive number up to the next even integer and a negative number down to the next even integer. | EVEN(Number) |
 | EXP | Math and trigonometry | Returns constant e raised to the power of a number. | EXP(Number) |
-| FACT | Math and trigonometry | Returns a factorial of a number. | FACT(Number) |
-| FACTDOUBLE | Math and trigonometry | Returns a double factorial of a number. | FACTDOUBLE(Number) |
-| FLOOR | Math and trigonometry | Rounds a number down to the nearest multiple of Significance. | FLOOR(Number; Significance) |
-| FLOOR.MATH | Math and trigonometry | Rounds a number down to the nearest multiple of Significance. | FLOOR.MATH(Number[; Significance[; Mode]]) |
-| FLOOR.PRECISE | Math and trigonometry | Rounds a number down to the nearest multiple of Significance. | FLOOR.PRECISE(Number[; Significance]) |
-| GCD | Math and trigonometry | Computes greatest common divisor of numbers. | GCD(Number1; Number2; ...) |
+| FACT <br><Badge text="v0.4.0"/>| Math and trigonometry | Returns a factorial of a number. | FACT(Number) |
+| FACTDOUBLE <br><Badge text="v0.4.0"/>| Math and trigonometry | Returns a double factorial of a number. | FACTDOUBLE(Number) |
+| FLOOR <br><Badge text="v0.4.0"/>| Math and trigonometry | Rounds a number down to the nearest multiple of Significance. | FLOOR(Number; Significance) |
+| FLOOR.MATH <br><Badge text="v0.4.0"/>| Math and trigonometry | Rounds a number down to the nearest multiple of Significance. | FLOOR.MATH(Number[; Significance[; Mode]]) |
+| FLOOR.PRECISE <br><Badge text="v0.4.0"/>| Math and trigonometry | Rounds a number down to the nearest multiple of Significance. | FLOOR.PRECISE(Number[; Significance]) |
+| GCD <br><Badge text="v0.4.0"/>| Math and trigonometry | Computes greatest common divisor of numbers. | GCD(Number1; Number2; ...) |
 | INT | Math and trigonometry | Rounds a number down to the nearest integer. | INT(Number) |
 | ISO.CEILINGE | Math and trigonometry | Rounds a number up to the nearest multiple of Significance. | ISO.CEILING(Number[; Significance]) |
-| LCM | Math and trigonometry | Computes least common multiplicity of numbers. | LCM(Number1; Number2; ...) |
+| LCM <br><Badge text="v0.4.0"/>| Math and trigonometry | Computes least common multiplicity of numbers. | LCM(Number1; Number2; ...) |
 | LN | Math and trigonometry | Returns the natural logarithm based on the constant e of a number. | LN(Number) |
 | LOG | Math and trigonometry | Returns the logarithm of a number to the specified base. | LOG(Number; Base) |
 | LOG10 | Math and trigonometry | Returns the base-10 logarithm of a number. | LOG10(Number) |
 | MOD | Math and trigonometry | Returns the remainder when one integer is divided by another. | MOD(Dividend; Divisor) |
-| MROUND | Math and trigonometry | Rounds number to the neares multiplicity. | MROUND(Number; Base) |
-| MULTINOMIAL | Math and trigonometry. | Returns number of multiset combinations. | MULTINOMIAL(Number1; Number2; ...) |
+| MROUND <br><Badge text="v0.4.0"/>| Math and trigonometry | Rounds number to the neares multiplicity. | MROUND(Number; Base) |
+| MULTINOMIAL <br><Badge text="v0.4.0"/>| Math and trigonometry. | Returns number of multiset combinations. | MULTINOMIAL(Number1; Number2; ...) |
 | ODD | Math and trigonometry | Rounds a positive number up to the nearest odd integer and a negative number down to the nearest odd integer. | ODD(Number) |
 | PI | Math and trigonometry | Returns 3.14159265358979, the value of the mathematical constant PI to 14 decimal places. | PI() |
 | POWER | Math and trigonometry | Returns a number raised to another number. | POWER(Base; Exponent) |
 | PRODUCT | Math and trigonometry | Returns product of numbers. | PRODUCT(Number1; Number2; ...; Number30) |
 | PRODUCT <br><Badge text="v0.3.0"/>| Math and trigonometry | Returns product of numbers. | PRODUCT(Number1; Number2; ...; Number30) |
-| QUOTIENT | Math and trigonometry | Returns integer part of a division. | QUOTIENT(Dividend; Divisor) |
+| QUOTIENT <br><Badge text="v0.4.0"/>| Math and trigonometry | Returns integer part of a division. | QUOTIENT(Dividend; Divisor) |
 | RADIANS | Math and trigonometry | Converts degrees to radians. | RADIANS(Number) |
 | RAND | Math and trigonometry | Returns a random number between 0 and 1. | RAND() |
-| RANDBETWEEN | Math and trigonometry | Returns a random integer between two numbers. | RAND(Lowerbound; Upperbound) |
-| ROMAN | Math and trigonometry | Converts number to roman form. | ROMAN(Number[; Mode]) |
+| RANDBETWEEN <br><Badge text="v0.4.0"/>| Math and trigonometry | Returns a random integer between two numbers. | RAND(Lowerbound; Upperbound) |
+| ROMAN <br><Badge text="v0.4.0"/>| Math and trigonometry | Converts number to roman form. | ROMAN(Number[; Mode]) |
 | ROUND | Math and trigonometry | Rounds a number to a certain number of decimal places. | ROUND(Number; Count) |
 | ROUNDDOWN | Math and trigonometry | Rounds a number down, toward zero, to a certain precision. | ROUNDDOWN(Number; Count) |
 | ROUNDUP | Math and trigonometry | Rounds a number up, away from zero, to a certain precision. | ROUNDUP(Number; Count) |
 | SEC <br><Badge text="v0.2.0"/>| Math and trigonometry | Returns the secans of the given angle (in radians). | SEC(Number) |
 | SECH <br><Badge text="v0.2.0"/>| Math and trigonometry | Returns the hyperbolic secans of the given value. | SEC(Number) |
-| SERIESSUM | Math and trigonometry | Evaluates series at a point. | SERIESSUM(Number; Number; Number; Coefficients)
+| SERIESSUM <br><Badge text="v0.4.0"/>| Math and trigonometry | Evaluates series at a point. | SERIESSUM(Number; Number; Number; Coefficients)
 | SIN | Math and trigonometry | Returns the sine of the given angle (in radians). | SIN(Number) |
 | SINH <br><Badge text="v0.2.0"/>| Math and trigonometry | Returns the hyperbolic sine of the given value. | SINH(Number) |
-| SIGN | Math and trigonometry | Returns sign of a number. | SIGN(Number) |
+| SIGN <br><Badge text="v0.4.0"/>| Math and trigonometry | Returns sign of a number. | SIGN(Number) |
 | SQRT | Math and trigonometry | Returns the positive square root of a number. | SQRT(Number) |
-| SQRTPI | Math and trigonometry | Returns sqrt of number times pi. | SQRTPI(Number) |
+| SQRTPI <br><Badge text="v0.4.0"/>| Math and trigonometry | Returns sqrt of number times pi. | SQRTPI(Number) |
 | SUBTOTAL <br><Badge text="v0.3.0"/>| Math and trigonometry | Computes aggregation using function specified by number. | SUBTOTAL(Function; Number1; Number2; ... Number30) |
 | SUM | Math and trigonometry | Adds all the numbers in a range of cells. | SUM(Number1; Number2; ...; Number30) |
 | SUMIF | Math and trigonometry | Adds the cells specified by given criteria. | SUMIF(Range; Criteria; Sumrange) |
 | SUMIFS | Math and trigonometry | Returns the sum of the values of cells in a range that meets multiple criteria in multiple ranges. | SUMIFS(Sum_Range ; Criterion_range1 ; Criterion1 [ ; Criterion_range2 ; Criterion2 [;...]]) |
 | SUMPRODUCT | Math and trigonometry | Multiplies corresponding elements in the given arrays, and returns the sum of those products. | SUMPRODUCT(Array1; Array2...Array30) |
 | SUMSQ | Math and trigonometry | Returns the sum of the squares of the arguments | SUMSQ(Number1; Number2; ...; Number30) |
-| SUMX2MY2 | Math and trigonometry | Returns the sum of the square differences. | SUMX2MY2(Range1; Range2) |
-| SUMX2PY2 | Math and trigonometry | Returns the sum of the square sums. | SUMX2PY2(Range1; Range2) |
-| SUMXMY2 | Math and trigonometry | Returns the sum of the square of differences. | SUMXMY2(Range1; Range2) |
+| SUMX2MY2 <br><Badge text="v0.4.0"/>| Math and trigonometry | Returns the sum of the square differences. | SUMX2MY2(Range1; Range2) |
+| SUMX2PY2 <br><Badge text="v0.4.0"/>| Math and trigonometry | Returns the sum of the square sums. | SUMX2PY2(Range1; Range2) |
+| SUMXMY2 <br><Badge text="v0.4.0"/>| Math and trigonometry | Returns the sum of the square of differences. | SUMXMY2(Range1; Range2) |
 | TAN | Math and trigonometry | Returns the tangent of the given angle (in radians). | TAN(Number) |
 | TANH <br><Badge text="v0.2.0"/>| Math and trigonometry | Returns the hyperbolic tangent of the given value. | TANH(Number) |
 | TRUNC | Math and trigonometry | Truncates a number by removing decimal places. | TRUNC(Number; Count) |
