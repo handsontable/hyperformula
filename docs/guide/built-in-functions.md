@@ -292,106 +292,106 @@ lets you design your own [custom functions](custom-functions).
 | HF.UMINUS <br><Badge text="v0.3.0"/>| Operator | Negates the value. | HF.UMINUS(Number) |
 | HF.UNARY_PERCENT <br><Badge text="v0.3.0"/>| Operator | Applies percent operator. | HF.UNARY_PERCENT(Number) |
 | HF.UPLUS <br><Badge text="v0.3.0"/>| Operator | Applies unary plus. | HF.UPLUS(Number) |
-| AVEDEV | Statistical | Returns the average deviation of the arguments. | AVEDEV(Number1; Number2; ...Number30) |
+| AVEDEV <br><Badge text="v0.4.0"/>| Statistical | Returns the average deviation of the arguments. | AVEDEV(Number1; Number2; ...Number30) |
 | AVERAGE | Statistical | Returns the average of the arguments. | AVERAGE(Number1; Number2; ...Number30) |
 | AVERAGEA | Statistical | Returns the average of the arguments. | AVERAGEA(Value1; Value2; ... Value30) |
 | AVERAGEIF | Statistical | Returns the arithmetic mean of all cells in a range that satisfy a given condition. | AVERAGEIF(Range; Criterion [; Average_Range ]) |
-| BESSELI | Statistical | Returns value of Bessel function. | BESSELI(x; n) |
-| BESSELJ | Statistical | Returns value of Bessel function. | BESSELJ(x; n) |
-| BESSELK | Statistical | Returns value of Bessel function. | BESSELK(x; n) |
-| BESSELY | Statistical | Returns value of Bessel function. | BESSELY(x; n) |
-| BETA.DIST | Statistical | Returns the denisty of Beta distribution. | BETA.DIST(Number1; Number2; Number3; Boolean[; Number4[; Number5]]) |
-| BETADIST | Statistical | Returns the denisty of Beta distribution. | BETADIST(Number1; Number2; Number3; Boolean[; Number4[; Number5]]) |
-| BETA.INV | Statistical | Returns the inverse Beta distribution value. | BETA.INV(Number1; Number2; Number3[; Number4[; Number5]]) |
-| BETAINV | Statistical | Returns the inverse of Beta distribution value. | BETAINV(Number1; Number2; Number3[; Number4[; Number5]]) |
-| BINOM.DIST | Statistical | Returns density of binomial distribution. | BINOM.DIST(Number1; Number2; Number3; Boolean) |
-| BINOMDIST | Statistical | Returns density of binomial distribution. | BINOMDIST(Number1; Number2; Number3; Boolean) |
-| BINOM.INV | Statistical | Returns inverse binomial distribution value. | BINOM.INV(Number1; Number2; Number3) |
-| CHIDIST | Statistical | Returns probability of chi-square right-side distribution. | CHIDIST(X; Degrees) |
-| CHIINV | Statistical | Returns inverse of chi-square right-side distribution. | CHIINV(P; Degrees) |
-| CHIINVRT | Statistical | Returns inverse of chi-square right-side distribution. | CHIINVRT(P; Degrees) |
-| CHISQ.DIST | Statistical | Returns value of chi-square distribution. | CHISQ.DIST(X; Degrees; Mode) |
-| CHIDISTRT | Statistical | Returns probability of chi-square right-side distribution. | CHIDISTRT(X; Degrees) |
-| CHISQ.DIST.RT | Statistical | Returns probability of chi-square right-side distribution. | CHISQ.DIST.RT(X; Degrees) |
-| CHISQ.INV | Statistical | Returns inverse of chi-square distribution. | CHISQ.INV.RT(P; Degrees) |
-| CHISQ.INV.RT | Statistical | Returns inverse of chi-square right-side distribution. | CHISQ.INV.RT(P; Degrees) |
-| CHISQ.TEST | Statistical | Returns chisquared-test value for a dataset. | CHISQ.TEST(Array1; Array2) |
-| CHITEST | Statistical | Returns chisquared-test value for a dataset. | CHITEST(Array1; Array2) |
-| CONFIDENCE | Statistical | Returns upper confidence bound for normal distribution. | CONFIDENCE(Alpha; Stdev; Size) |
-| CONFIDENCE.NORM | Statistical | Returns upper confidence bound for normal distribution. | CONFIDENCE.NORM(Alpha; Stdev; Size) |
-| CONFIDENCE.T | Statistical | Returns upper confidence bound for T distribution. | CONFIDENCE.T(Alpha; Stdev; Size) |
+| BESSELI <br><Badge text="v0.4.0"/> | Statistical | Returns value of Bessel function. | BESSELI(x; n) |
+| BESSELJ <br><Badge text="v0.4.0"/> | Statistical | Returns value of Bessel function. | BESSELJ(x; n) |
+| BESSELK <br><Badge text="v0.4.0"/> | Statistical | Returns value of Bessel function. | BESSELK(x; n) |
+| BESSELY <br><Badge text="v0.4.0"/> | Statistical | Returns value of Bessel function. | BESSELY(x; n) |
+| BETA.DIST <br><Badge text="v0.4.0"/>| Statistical | Returns the denisty of Beta distribution. | BETA.DIST(Number1; Number2; Number3; Boolean[; Number4[; Number5]]) |
+| BETADIST <br><Badge text="v0.4.0"/>| Statistical | Returns the denisty of Beta distribution. | BETADIST(Number1; Number2; Number3; Boolean[; Number4[; Number5]]) |
+| BETA.INV <br><Badge text="v0.4.0"/>| Statistical | Returns the inverse Beta distribution value. | BETA.INV(Number1; Number2; Number3[; Number4[; Number5]]) |
+| BETAINV <br><Badge text="v0.4.0"/>| Statistical | Returns the inverse of Beta distribution value. | BETAINV(Number1; Number2; Number3[; Number4[; Number5]]) |
+| BINOM.DIST <br><Badge text="v0.4.0"/>| Statistical | Returns density of binomial distribution. | BINOM.DIST(Number1; Number2; Number3; Boolean) |
+| BINOMDIST <br><Badge text="v0.4.0"/>| Statistical | Returns density of binomial distribution. | BINOMDIST(Number1; Number2; Number3; Boolean) |
+| BINOM.INV <br><Badge text="v0.4.0"/>| Statistical | Returns inverse binomial distribution value. | BINOM.INV(Number1; Number2; Number3) |
+| CHIDIST <br><Badge text="v0.4.0"/> | Statistical | Returns probability of chi-square right-side distribution. | CHIDIST(X; Degrees) |
+| CHIINV <br><Badge text="v0.4.0"/> | Statistical | Returns inverse of chi-square right-side distribution. | CHIINV(P; Degrees) |
+| CHIINVRT <br><Badge text="v0.4.0"/>| Statistical | Returns inverse of chi-square right-side distribution. | CHIINVRT(P; Degrees) |
+| CHISQ.DIST <br><Badge text="v0.4.0"/>| Statistical | Returns value of chi-square distribution. | CHISQ.DIST(X; Degrees; Mode) |
+| CHIDISTRT <br><Badge text="v0.4.0"/>| Statistical | Returns probability of chi-square right-side distribution. | CHIDISTRT(X; Degrees) |
+| CHISQ.DIST.RT <br><Badge text="v0.4.0"/>| Statistical | Returns probability of chi-square right-side distribution. | CHISQ.DIST.RT(X; Degrees) |
+| CHISQ.INV <br><Badge text="v0.4.0"/> | Statistical | Returns inverse of chi-square distribution. | CHISQ.INV.RT(P; Degrees) |
+| CHISQ.INV.RT <br><Badge text="v0.4.0"/> | Statistical | Returns inverse of chi-square right-side distribution. | CHISQ.INV.RT(P; Degrees) |
+| CHISQ.TEST <br><Badge text="v0.4.0"/>| Statistical | Returns chisquared-test value for a dataset. | CHISQ.TEST(Array1; Array2) |
+| CHITEST <br><Badge text="v0.4.0"/>| Statistical | Returns chisquared-test value for a dataset. | CHITEST(Array1; Array2) |
+| CONFIDENCE <br><Badge text="v0.4.0"/>| Statistical | Returns upper confidence bound for normal distribution. | CONFIDENCE(Alpha; Stdev; Size) |
+| CONFIDENCE.NORM <br><Badge text="v0.4.0"/>| Statistical | Returns upper confidence bound for normal distribution. | CONFIDENCE.NORM(Alpha; Stdev; Size) |
+| CONFIDENCE.T <br><Badge text="v0.4.0"/>| Statistical | Returns upper confidence bound for T distribution. | CONFIDENCE.T(Alpha; Stdev; Size) |
 | CORREL | Statistical | Returns the correlation coefficient between two data sets. | CORREL(Data1; Data2) |
 | COUNT | Statistical | Counts how many numbers are in the list of arguments. | COUNT(Value1; Value2; ... Value30) |
 | COUNTA | Statistical | Counts how many values are in the list of arguments. | COUNTA(Value1; Value2; ... Value30) |
 | COUNTBLANK | Statistical | Returns the number of empty cells. | COUNTBLANK(Range) |
 | COUNTIF | Statistical | Returns the number of cells that meet with certain criteria within a cell range. | COUNTIF(Range; Criteria) |
 | COUNTIFS | Statistical | Returns the count of rows or columns that meet criteria in multiple ranges. | COUNTIFS(Range1; Criterion1 [; Range2; Criterion2 [; ...]]) |
-| COVAR | Statistical | Returns the covariance between two data sets, population normalized. | COVAR(Data1; Data2) |
-| COVARIANCE.P | Statistical | Returns the covariance between two data sets, population normalized. | COVARIANCE.P(Data1; Data2) |
-| COVARIANCEP | Statistical | Returns the covariance between two data sets, population normalized. | COVARIANCEP(Data1; Data2) |
-| COVARIANCE.S | Statistical | Returns the covariance between two data sets, sample normalized. | COVARIANCE.S(Data1; Data2) |
-| COVARIANCES | Statistical | Returns the covariance between two data sets, sample normalized. | COVARIANCES(Data1; Data2) |
-| CRITBINOM | Statistical | Returns inverse binomial distribution value. | CRITBINOM(Number1; Number2; Number3) |
-| DEVSQ | Statistical | Returns sum of squared deviations. | DEVSQ(Number1; Number2; ...Number30) |
-| EXPON.DIST | Statistical | Returns density of a exponential distribution. | EXPON.DIST(Number1; Number2; Boolean) |
-| EXPONDIST | Statistical | Returns density of a exponential distribution. | EXPONDIST(Number1; Number2; Boolean) |
-| FDIST | Statistical | Returns probability of F right-side distribution. | FDIST(X; Degree1; Degree2) |
-| FINV | Statistical | Returns inverse of F right-side distribution. | FINV(P; Degree1; Degree2) |
-| F.DIST | Statistical | Returns value of F distribution. | F.DIST(X; Degree1; Degree2; Mode) |
-| F.DIST.RT | Statistical | Returns probability of F right-side distribution. | F.DIST.RT(X; Degree1; Degree2) |
-| FDISTRT | Statistical | Returns probability of F right-side distribution. | FDISTRT(X; Degree1; Degree2) |
-| F.INV | Statistical | Returns inverse of F distribution. | F.INV.RT(P; Degree1; Degree2) |
-| F.INV.RT | Statistical | Returns inverse of F right-side distribution. | F.INV.RT(P; Degree1; Degree2) |
-| FINVRT | Statistical | Returns inverse of F right-side distribution. | FINVRT(P; Degree1; Degree2) |
-| FISHER | Statistical | Returns Fisher transformation value. | FISHER(Number) |
-| FISHERINV | Statistical | Returns inverse Fischer transformation value. | FISHERINV(Number) |
-| F.TEST | Statistical | Returns f-test value for a dataset. | Z.TEST(Array1; Array2) |
-| FTEST | Statistical | Returns f-test value for a dataset. | ZTEST(Array1; Array2) |
-| GAMMA | Statistical | Returns value of Gamma function. | GAMMA(Number) |
-| GAMMA.DIST | Statistical | Returns density of Gamma distribution. | GAMMA.DIST(Number1; Number2; Number3; Boolean) |
-| GAMMADIST | Statistical | Returns density of Gamma distribution. | GAMMADIST(Number1; Number2; Number3; Boolean) |
-| GAMMALN | Statistical | Returns natural logarithm of Gamma function. | GAMMALN(Number) |
-| GAMMALN.PRECISE | Statistical | Returns natural logarithm of Gamma function. | GAMMALN.PRECISE(Number) |
-| GAMMA.INV | Statistical | Returns inverse Gamma distribution value. | GAMMA.INV(Number1; Number2; Number3) |
-| GAMMAINV | Statistical | Returns inverse Gamma distribution value. | GAMMAINV(Number1; Number2; Number3) |
-| GAUSS | Statistical | Returns the probability of gaussian variable fall more than this many times standard deviation from mean. | GAUSS(Number) |
-| GEOMEAN | Statistical | Returns the geometric average. | GEOMEAN(Number1; Number2; ...Number30) |
-| HARMEAN | Statistical | Returns the harmonic average. | HARMEAN(Number1; Number2; ...Number30) |
-| HYPGEOMDIST | Statistical | Returns density of hypergeometric distribution. | HYPGEOMDIST(Number1; Number2; Number3; Number4; Boolean) |
-| HYPGEOM.DIST | Statistical | Returns density of hypergeometric distribution. | HYPGEOM.DIST(Number1; Number2; Number3; Number4; Boolean) |
-| LARGE | Statistical | Returns k-th largest value in a range. | LARGE(Range; K) |
-| LOGNORM.DIST | Statistical | Returns density of lognormal distribution. | LOGNORM.DIST(X; Mean; Stddev; Mode) |
-| LOGNORMDIST | Statistical | Returns density of lognormal distribution. | LOGNORMDIST(X; Mean; Stddev; Mode) |
-| LOGNORM.INV | Statistical | Returns value of inverse lognormal distribution. | LOGNORM.INV(P; Mean; Stddev) |
-| LOGNORMINV | Statistical | Returns value of inverse lognormal distribution. | LOGNORMINV(P; Mean; Stddev) |
-| LOGINV | Statistical | Returns value of inverse lognormal distribution. | LOGINV(P; Mean; Stddev) |
+| COVAR <br><Badge text="v0.4.0"/>| Statistical | Returns the covariance between two data sets, population normalized. | COVAR(Data1; Data2) |
+| COVARIANCE.P <br><Badge text="v0.4.0"/>| Statistical | Returns the covariance between two data sets, population normalized. | COVARIANCE.P(Data1; Data2) |
+| COVARIANCEP <br><Badge text="v0.4.0"/>| Statistical | Returns the covariance between two data sets, population normalized. | COVARIANCEP(Data1; Data2) |
+| COVARIANCE.S <br><Badge text="v0.4.0"/>| Statistical | Returns the covariance between two data sets, sample normalized. | COVARIANCE.S(Data1; Data2) |
+| COVARIANCES <br><Badge text="v0.4.0"/> | Statistical | Returns the covariance between two data sets, sample normalized. | COVARIANCES(Data1; Data2) |
+| CRITBINOM <br><Badge text="v0.4.0"/>| Statistical | Returns inverse binomial distribution value. | CRITBINOM(Number1; Number2; Number3) |
+| DEVSQ <br><Badge text="v0.4.0"/>| Statistical | Returns sum of squared deviations. | DEVSQ(Number1; Number2; ...Number30) |
+| EXPON.DIST <br><Badge text="v0.4.0"/>| Statistical | Returns density of a exponential distribution. | EXPON.DIST(Number1; Number2; Boolean) |
+| EXPONDIST <br><Badge text="v0.4.0"/>| Statistical | Returns density of a exponential distribution. | EXPONDIST(Number1; Number2; Boolean) |
+| FDIST<br><Badge text="v0.4.0"/>| Statistical | Returns probability of F right-side distribution. | FDIST(X; Degree1; Degree2) |
+| FINV <br><Badge text="v0.4.0"/>| Statistical | Returns inverse of F right-side distribution. | FINV(P; Degree1; Degree2) |
+| F.DIST <br><Badge text="v0.4.0"/>| Statistical | Returns value of F distribution. | F.DIST(X; Degree1; Degree2; Mode) |
+| F.DIST.RT <br><Badge text="v0.4.0"/>| Statistical | Returns probability of F right-side distribution. | F.DIST.RT(X; Degree1; Degree2) |
+| FDISTRT <br><Badge text="v0.4.0"/>| Statistical | Returns probability of F right-side distribution. | FDISTRT(X; Degree1; Degree2) |
+| F.INV <br><Badge text="v0.4.0"/>| Statistical | Returns inverse of F distribution. | F.INV.RT(P; Degree1; Degree2) |
+| F.INV.RT <br><Badge text="v0.4.0"/>| Statistical | Returns inverse of F right-side distribution. | F.INV.RT(P; Degree1; Degree2) |
+| FINVRT <br><Badge text="v0.4.0"/>| Statistical | Returns inverse of F right-side distribution. | FINVRT(P; Degree1; Degree2) |
+| FISHER <br><Badge text="v0.4.0"/>| Statistical | Returns Fisher transformation value. | FISHER(Number) |
+| FISHERINV <br><Badge text="v0.4.0"/>| Statistical | Returns inverse Fischer transformation value. | FISHERINV(Number) |
+| F.TEST <br><Badge text="v0.4.0"/>| Statistical | Returns f-test value for a dataset. | Z.TEST(Array1; Array2) |
+| FTEST <br><Badge text="v0.4.0"/>| Statistical | Returns f-test value for a dataset. | ZTEST(Array1; Array2) |
+| GAMMA <br><Badge text="v0.4.0"/>| Statistical | Returns value of Gamma function. | GAMMA(Number) |
+| GAMMA.DIST <br><Badge text="v0.4.0"/>| Statistical | Returns density of Gamma distribution. | GAMMA.DIST(Number1; Number2; Number3; Boolean) |
+| GAMMADIST <br><Badge text="v0.4.0"/>| Statistical | Returns density of Gamma distribution. | GAMMADIST(Number1; Number2; Number3; Boolean) |
+| GAMMALN <br><Badge text="v0.4.0"/>| Statistical | Returns natural logarithm of Gamma function. | GAMMALN(Number) |
+| GAMMALN.PRECISE <br><Badge text="v0.4.0"/>| Statistical | Returns natural logarithm of Gamma function. | GAMMALN.PRECISE(Number) |
+| GAMMA.INV <br><Badge text="v0.4.0"/>| Statistical | Returns inverse Gamma distribution value. | GAMMA.INV(Number1; Number2; Number3) |
+| GAMMAINV <br><Badge text="v0.4.0"/>| Statistical | Returns inverse Gamma distribution value. | GAMMAINV(Number1; Number2; Number3) |
+| GAUSS <br><Badge text="v0.4.0"/>| Statistical | Returns the probability of gaussian variable fall more than this many times standard deviation from mean. | GAUSS(Number) |
+| GEOMEAN <br><Badge text="v0.4.0"/>| Statistical | Returns the geometric average. | GEOMEAN(Number1; Number2; ...Number30) |
+| HARMEAN <br><Badge text="v0.4.0"/>| Statistical | Returns the harmonic average. | HARMEAN(Number1; Number2; ...Number30) |
+| HYPGEOMDIST <br><Badge text="v0.4.0"/> | Statistical | Returns density of hypergeometric distribution. | HYPGEOMDIST(Number1; Number2; Number3; Number4; Boolean) |
+| HYPGEOM.DIST <br><Badge text="v0.4.0"/> | Statistical | Returns density of hypergeometric distribution. | HYPGEOM.DIST(Number1; Number2; Number3; Number4; Boolean) |
+| LARGE <br><Badge text="v0.4.0"/>| Statistical | Returns k-th largest value in a range. | LARGE(Range; K) |
+| LOGNORM.DIST <br><Badge text="v0.4.0"/>| Statistical | Returns density of lognormal distribution. | LOGNORM.DIST(X; Mean; Stddev; Mode) |
+| LOGNORMDIST <br><Badge text="v0.4.0"/>| Statistical | Returns density of lognormal distribution. | LOGNORMDIST(X; Mean; Stddev; Mode) |
+| LOGNORM.INV <br><Badge text="v0.4.0"/>| Statistical | Returns value of inverse lognormal distribution. | LOGNORM.INV(P; Mean; Stddev) |
+| LOGNORMINV <br><Badge text="v0.4.0"/> | Statistical | Returns value of inverse lognormal distribution. | LOGNORMINV(P; Mean; Stddev) |
+| LOGINV <br><Badge text="v0.4.0"/> | Statistical | Returns value of inverse lognormal distribution. | LOGINV(P; Mean; Stddev) |
 | MAX | Statistical | Returns the maximum value in a list of arguments. | MAX(Number1; Number2; ...Number30) |
 | MAXA | Statistical | Returns the maximum value in a list of arguments. | MAXA(Value1; Value2; ... Value30) |
 | MEDIAN | Statistical | Returns the median of a set of numbers. | MEDIAN(Number1; Number2; ...Number30) |
 | MIN | Statistical | Returns the minimum value in a list of arguments. | MIN(Number1; Number2; ...Number30) |
 | MINA | Statistical | Returns the minimum value in a list of arguments. | MINA(Value1; Value2; ... Value30) |
-| NEGBINOM.DIST | Statistical | Returns density of negative binomial distribution. | NEGBINOM.DIST(Number1; Number2; Number3; Mode) |
-| NEGBINOMDIST | Statistical | Returns density of negative binomial distribution. | NEGBINOMDIST(Number1; Number2; Number3; Mode) |
-| NORM.DIST | Statistical | Returns density of normal distribution. | NORM.DIST(X; Mean; Stddev; Mode) |
-| NORMDIST | Statistical | Returns density of normal distribution. | NORMDIST(X; Mean; Stddev; Mode) |
-| NORM.S.DIST | Statistical | Returns density of normal distribution. | NORM.S.DIST(X; Mode) |
-| NORMDIST | Statistical | Returns density of normal distribution. | NORMSDIST(X; Mode) |
-| NORM.INV | Statistical | Returns value of inverse normal distribution. | NORM.INV(P; Mean; Stddev) |
-| NORMINV | Statistical | Returns value of inverse normal distribution. | NORMINV(P; Mean; Stddev) |
-| NORM.S.INV | Statistical | Returns value of inverse normal distribution. | NORM.S.INV(P) |
-| NORMSINV | Statistical | Returns value of inverse normal distribution. | NORMSINV(P) |
-| PEARSON | Statistical | Returns the correlation coefficient between two data sets. | PEARSON(Data1; Data2) |
-| PHI | Statistical | Returns probability densitity of normal distribution. | PHI(X) |
-| POISSON | Statistical | Returns density of Poisson distribution. | POISSON(X; Mean; Mode) |
-| POISSON.DIST | Statistical | Returns density of Poisson distribution. | POISSON.DIST(X; Mean; Mode) |
-| POISSONDIST | Statistical | Returns density of Poisson distribution. | POISSONDIST(X; Mean; Mode) |
-| RSQ | Statistical | Returns the squared correlation coefficient between two data sets. | RSQ(Data1; Data2) |
-| SKEW | Statistical | Returns skeweness of a sample. | SKEW(Number1; Number2; ...Number30) |
-| SKEW.P | Statistical | Returns skeweness of a population. | SKEW.P(Number1; Number2; ...Number30) |
-| SKEWP | Statistical | Returns skeweness of a population. | SKEWP(Number1; Number2; ...Number30) |
-| SLOPE | Statistical | Returns the slope of a linear regression line. | SLOPE(Array1; Array2) |
-| SMALL | Statistical | Returns k-th smallest value in a range. | SMALL(Range; K) |
-| STANDARDIZE | Statistical | Returns normalized value wrt expected value and standard deviation. | STANDARDIZE(X; Mean; Stddev) |
+| NEGBINOM.DIST <br><Badge text="v0.4.0"/>| Statistical | Returns density of negative binomial distribution. | NEGBINOM.DIST(Number1; Number2; Number3; Mode) |
+| NEGBINOMDIST <br><Badge text="v0.4.0"/>| Statistical | Returns density of negative binomial distribution. | NEGBINOMDIST(Number1; Number2; Number3; Mode) |
+| NORM.DIST <br><Badge text="v0.4.0"/>| Statistical | Returns density of normal distribution. | NORM.DIST(X; Mean; Stddev; Mode) |
+| NORMDIST <br><Badge text="v0.4.0"/>| Statistical | Returns density of normal distribution. | NORMDIST(X; Mean; Stddev; Mode) |
+| NORM.S.DIST <br><Badge text="v0.4.0"/>| Statistical | Returns density of normal distribution. | NORM.S.DIST(X; Mode) |
+| NORMDIST <br><Badge text="v0.4.0"/>| Statistical | Returns density of normal distribution. | NORMSDIST(X; Mode) |
+| NORM.INV <br><Badge text="v0.4.0"/>| Statistical | Returns value of inverse normal distribution. | NORM.INV(P; Mean; Stddev) |
+| NORMINV <br><Badge text="v0.4.0"/>| Statistical | Returns value of inverse normal distribution. | NORMINV(P; Mean; Stddev) |
+| NORM.S.INV <br><Badge text="v0.4.0"/>| Statistical | Returns value of inverse normal distribution. | NORM.S.INV(P) |
+| NORMSINV <br><Badge text="v0.4.0"/>| Statistical | Returns value of inverse normal distribution. | NORMSINV(P) |
+| PEARSON <br><Badge text="v0.4.0"/>| Statistical | Returns the correlation coefficient between two data sets. | PEARSON(Data1; Data2) |
+| PHI <br><Badge text="v0.4.0"/>| Statistical | Returns probability densitity of normal distribution. | PHI(X) |
+| POISSON <br><Badge text="v0.4.0"/>| Statistical | Returns density of Poisson distribution. | POISSON(X; Mean; Mode) |
+| POISSON.DIST <br><Badge text="v0.4.0"/>| Statistical | Returns density of Poisson distribution. | POISSON.DIST(X; Mean; Mode) |
+| POISSONDIST <br><Badge text="v0.4.0"/>| Statistical | Returns density of Poisson distribution. | POISSONDIST(X; Mean; Mode) |
+| RSQ <br><Badge text="v0.4.0"/>| Statistical | Returns the squared correlation coefficient between two data sets. | RSQ(Data1; Data2) |
+| SKEW <br><Badge text="v0.4.0"/>| Statistical | Returns skeweness of a sample. | SKEW(Number1; Number2; ...Number30) |
+| SKEW.P <br><Badge text="v0.4.0"/>| Statistical | Returns skeweness of a population. | SKEW.P(Number1; Number2; ...Number30) |
+| SKEWP <br><Badge text="v0.4.0"/>| Statistical | Returns skeweness of a population. | SKEWP(Number1; Number2; ...Number30) |
+| SLOPE <br><Badge text="v0.4.0"/>| Statistical | Returns the slope of a linear regression line. | SLOPE(Array1; Array2) |
+| SMALL <br><Badge text="v0.4.0"/>| Statistical | Returns k-th smallest value in a range. | SMALL(Range; K) |
+| STANDARDIZE <br><Badge text="v0.4.0"/>| Statistical | Returns normalized value wrt expected value and standard deviation. | STANDARDIZE(X; Mean; Stddev) |
 | STDEV <br><Badge text="v0.3.0"/>| Statistical | Returns standard deviation of a sample. | STDEV(Value1; Value2; ... Value30) |
 | STDEVA <br><Badge text="v0.3.0"/>| Statistical | Returns standard deviation of a sample. | STDEVA(Value1; Value2; ... Value30) |
 | STDEVP <br><Badge text="v0.3.0"/>| Statistical | Returns standard deviation of a population. | STDEVP(Value1; Value2; ... Value30) |
@@ -399,19 +399,19 @@ lets you design your own [custom functions](custom-functions).
 | STDEVPA <br><Badge text="v0.3.0"/>| Statistical | Returns standard deviation of a population. | STDEVPA(Value1; Value2; ... Value30) |
 | STDEV.S <br><Badge text="v0.3.0"/>| Statistical | Returns standard deviation of a sample. | STDEV.S(Value1; Value2; ... Value30) |
 | STDEVS <br><Badge text="v0.3.0"/>| Statistical | Returns standard deviation of a sample. | STDEVS(Value1; Value2; ... Value30) |
-| STEYX | Statistical | Returns standard error for predicted of the predicted y value for each x value. | STEYX(Array1; Array2) |
-| TDIST | Statistical | Returns density of Student-t distribution, both-sided or right-tailed. | TDIST(X; Degrees; Mode) |
-| T.DIST | Statistical | Returns density of Student-t distribution. | T.DIST(X; Degrees; Mode) |
-| T.DIST.2T | Statistical | Returns density of Student-t distribution, both-sided. | T.DIST.2T(X; Degrees) |
-| TDIST2T | Statistical | Returns density of Student-t distribution, both-sided. | TDIST2T(X; Degrees) |
-| T.DIST.RT | Statistical | Returns density of Student-t distribution, right-tailed. | T.DIST.RT(X; Degrees) |
-| TDISTRT | Statistical | Returns density of Student-t distribution, right-tailed. | TDISTRT(X; Degrees) |
-| TINV | Statistical | Returns inverse Student-t distribution, both-sided. | TINV(P; Degrees) |
-| T.INV | Statistical | Returns inverse Student-t distribution. | T.INV(P; Degrees) |
-| T.INV.2T | Statistical | Returns inverse Student-t distribution, both-sided. | T.INV.2T(P; Degrees) |
-| TINV2T | Statistical | Returns inverse Student-t distribution, both-sided. | TINV2T(P; Degrees) |
-| TTEST | Statistical | Returns t-test value for a dataset. | TTEST(Array1; Array2) |
-| T.TEST | Statistical | Returns t-test value for a dataset. | T.TEST(Array1; Array2) |
+| STEYX <br><Badge text="v0.4.0"/>| Statistical | Returns standard error for predicted of the predicted y value for each x value. | STEYX(Array1; Array2) |
+| TDIST <br><Badge text="v0.4.0"/>| Statistical | Returns density of Student-t distribution, both-sided or right-tailed. | TDIST(X; Degrees; Mode) |
+| T.DIST <br><Badge text="v0.4.0"/>| Statistical | Returns density of Student-t distribution. | T.DIST(X; Degrees; Mode) |
+| T.DIST.2T <br><Badge text="v0.4.0"/>| Statistical | Returns density of Student-t distribution, both-sided. | T.DIST.2T(X; Degrees) |
+| TDIST2T <br><Badge text="v0.4.0"/> | Statistical | Returns density of Student-t distribution, both-sided. | TDIST2T(X; Degrees) |
+| T.DIST.RT <br><Badge text="v0.4.0"/>| Statistical | Returns density of Student-t distribution, right-tailed. | T.DIST.RT(X; Degrees) |
+| TDISTRT <br><Badge text="v0.4.0"/> | Statistical | Returns density of Student-t distribution, right-tailed. | TDISTRT(X; Degrees) |
+| TINV <br><Badge text="v0.4.0"/>| Statistical | Returns inverse Student-t distribution, both-sided. | TINV(P; Degrees) |
+| T.INV <br><Badge text="v0.4.0"/>| Statistical | Returns inverse Student-t distribution. | T.INV(P; Degrees) |
+| T.INV.2T <br><Badge text="v0.4.0"/>| Statistical | Returns inverse Student-t distribution, both-sided. | T.INV.2T(P; Degrees) |
+| TINV2T <br><Badge text="v0.4.0"/> | Statistical | Returns inverse Student-t distribution, both-sided. | TINV2T(P; Degrees) |
+| TTEST <br><Badge text="v0.4.0"/>| Statistical | Returns t-test value for a dataset. | TTEST(Array1; Array2) |
+| T.TEST <br><Badge text="v0.4.0"/>| Statistical | Returns t-test value for a dataset. | T.TEST(Array1; Array2) |
 | VAR <br><Badge text="v0.3.0"/>| Statistical | Returns variance of a sample. | VAR(Value1; Value2; ... Value30) |
 | VARA <br><Badge text="v0.3.0"/>| Statistical | Returns variance of a sample. | VARA(Value1; Value2; ... Value30) |
 | VARP <br><Badge text="v0.3.0"/>| Statistical | Returns variance of a population. | VARP(Value1; Value2; ... Value30) |
@@ -419,11 +419,11 @@ lets you design your own [custom functions](custom-functions).
 | VARPA <br><Badge text="v0.3.0"/>| Statistical | Returns variance of a population. | VARPA(Value1; Value2; ... Value30) |
 | VAR.S <br><Badge text="v0.3.0"/>| Statistical | Returns variance of a sample. | VAR.S(Value1; Value2; ... Value30) |
 | VARS <br><Badge text="v0.3.0"/>| Statistical | Returns variance of a sample. | VARS(Value1; Value2; ... Value30) |
-| WEIBULL | Statistical | Returns density of Weibull distribution. | WEIBULL(Number1; Number2; Number3; Boolean) |
-| WEIBULL.DIST | Statistical | Returns density of Weibull distribution. | WEIBULL.DIST(Number1; Number2; Number3; Boolean) |
-| WEIBULLDIST | Statistical | Returns density of Weibull distribution. | WEIBULLDIST(Number1; Number2; Number3; Boolean) |
-| Z.TEST | Statistical | Returns z-test value for a dataset. | Z.TEST(Array; X[; Sigma]) |
-| ZTEST | Statistical | Returns z-test value for a dataset. | ZTEST(Array; X[; Sigma]) |
+| WEIBULL <br><Badge text="v0.4.0"/>| Statistical | Returns density of Weibull distribution. | WEIBULL(Number1; Number2; Number3; Boolean) |
+| WEIBULL.DIST <br><Badge text="v0.4.0"/>| Statistical | Returns density of Weibull distribution. | WEIBULL.DIST(Number1; Number2; Number3; Boolean) |
+| WEIBULLDIST <br><Badge text="v0.4.0"/>| Statistical | Returns density of Weibull distribution. | WEIBULLDIST(Number1; Number2; Number3; Boolean) |
+| Z.TEST <br><Badge text="v0.4.0"/>| Statistical | Returns z-test value for a dataset. | Z.TEST(Array; X[; Sigma]) |
+| ZTEST <br><Badge text="v0.4.0"/>| Statistical | Returns z-test value for a dataset. | ZTEST(Array; X[; Sigma]) |
 | CHAR | Text | Converts a number into a character according to the current code table. | CHAR(Number) |
 | CLEAN <br><Badge text="v0.2.0"/>| Text | Returns text that has been "cleaned" of line breaks and other non-printable characters. | CLEAN("Text") |
 | CODE | Text | Returns a numeric code for the first character in a text string. | CODE("Text") |
