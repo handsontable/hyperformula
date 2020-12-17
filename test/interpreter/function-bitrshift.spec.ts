@@ -14,7 +14,7 @@ describe('function BITRSHIFT', () => {
     expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
   })
 
-  it('should not work for arguemnts of wrong type', () => {
+  it('should not work for arguments of wrong type', () => {
     const engine = HyperFormula.buildFromArray([
       ['=BITRSHIFT(1, "foo")'],
       ['=BITRSHIFT("bar", 4)'],

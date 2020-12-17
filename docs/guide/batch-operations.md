@@ -5,7 +5,7 @@ This allows you to put multiple CRUD and move operations into a
 single operation.
 
 In some cases, batch operations can result in better performance,
-especially when your app requires to do a large number of operations.
+especially when your app requires doing a large number of operations.
 
 ## How to batch
 
@@ -64,12 +64,6 @@ hfInstance.setSheetContent('MySheet2', [['50'], ['60']]);
 const changes = hfInstance.resumeEvaluation();
 ```
 
-When you have performed the operations you wanted to, you can resume
-evaluation by calling the `resumeEvaluation` method which will trigger
-recalculation. Just like with the `batch` method, it returns a list of
-cells whose values changed after the operation, their absolute addresses,
-and new values. `resumeEvaluation` will also trigger the calculation.
-
 You can resume the evaluation by calling the `resumeEvaluation` method
 which triggers the recalculation. Just like in the case of the `batch`
 method, it returns a list of cells which values changed after the
@@ -77,7 +71,7 @@ operation, together with their absolute addresses, and new values.
 
 ### Adjusting need with the `isEvaluationSuspended` method
 
-Each time you need to check if the evaluation is suspended you can
+When you need to check if the evaluation is suspended you can
 call the `isEvaluationSuspended` method.
 
 ```javascript
@@ -113,18 +107,18 @@ These operations have an impact on calculation results and may affect
 the performance.
 
 Batching can be useful when there is a need for multiple memory-consuming
-operations. In this case, you should consider using them to achieve
+operations. In this case, you should consider using it to achieve
 better performance in the application you develop; it will result
 in faster calculation across the whole HyperFormula instance.
 
 Batching can also be useful when you decide to use HyperFormula
 on the [server-side](server-side-installation). Several operations
-might be sent as a single one.
+can be sent as a single one.
 
 ## Demo
 
 <iframe
-     src="https://codesandbox.io/embed/github/handsontable/hyperformula-demos/tree/0.3.x/batch-operations?autoresize=1&fontsize=11&hidenavigation=1&theme=light&view=preview"
+     src="https://codesandbox.io/embed/github/handsontable/hyperformula-demos/tree/0.4.x/batch-operations?autoresize=1&fontsize=11&hidenavigation=1&theme=light&view=preview"
      style="width:100%; height:500px; border:0; border-radius: 4px; overflow:hidden;"
      title="handsontable/hyperformula-demos: batch-operations"
      allow="accelerometer; ambient-light-sensor; camera; encrypted-media; geolocation; gyroscope; hid; microphone; midi; payment; usb; vr; xr-spatial-tracking"

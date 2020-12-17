@@ -2,37 +2,37 @@
 
 We implemented various techniques to boost the performance of
 HyperFormula. In some cases, turning them on or off might increase
-the performance of your app. Below we provide a number of tips,
+the performance of your app. Below we provide a number of tips on
 how to speed it up.
 
 ## VLOOKUP/MATCH
 
 If you are planning to use VLOOKUP or MATCH heavily in your app,
-you may consider enabling the `useColumnIndex` flag in HyperFormula
+you may consider enabling the `useColumnIndex` flag in the HyperFormula
 configuration. It will increase memory usage but can significantly
 improve the performance of these two functions, especially when
 running on unsorted or very large data sets. The column index will
-not be used despite the option `useColumnIndex` being enabled in case
-of using **wildcards** or **regular expressions**.
+not be used despite the option `useColumnIndex` enabled when  using
+**wildcards** or **regular expressions**.
 
 Leaving this option disabled will cause the engine to use binary
 search when dealing with sorted data, and the naive approach otherwise.
-Binary search will not be used when the size of the data being searched
-doesn't exceed a given threshold which can be customized using the
+However, binary search will not be used if the size of the data being
+searched is below a given threshold, which can be customized using the
 `binarySearchThreshold` option in the configuration.
 
 ## Address mapping strategies
 
 HyperFormula uses two approaches to store the mapping of cell
 addresses in order to optimize memory usage. The choice of the
-strategy is made independently for each sheet. Option
-`chooseAddressMappingPolicy` allows changing the way the strategy
-will be chosen.
+strategy is made independently for each sheet. The
+`chooseAddressMappingPolicy` option allows for changing the way
+the strategy will be chosen.
 
-You may use one of three built-in policies: 
+You may use one of three built-in policies:
 
 * `AlwaysDense` – uses dense mapping for each sheet. This policy is
-particularly useful when the spreadsheet is a dense-filled rectangle.
+particularly useful when the spreadsheet is a densely filled rectangle.
 * `AlwaysSparse` – uses sparse mapping for each sheet. This approach
 is useful when in your spreadsheet/dataset there are relatively few
 cells filled, but located very far from each other.
@@ -46,7 +46,7 @@ HyperFormula is able to optimize underlying data structures when it
 detects consistent areas of numerical data. It is especially useful
 when dealing with calculations on huge numerical data sets. You may
 consider disabling this option completely by setting `matrixDetection`
-to false or adjusting `matrixDetectionThreshold` option to customize
+to false or adjusting the `matrixDetectionThreshold` option to customize
 the size of the numerical areas to better fit your use case.
 
 It is worth mentioning that some of the CRUD operations, like
@@ -70,32 +70,32 @@ The first option is to call `suspendEvaluation` before making
 changes and `resumeEvaluation` at a convenient moment.
 
 The second option is to pass the callback function with multiple
-operations to [batch function](batch-operations.md). Recalculation
+operations to a [batch function](batch-operations.md). Recalculation
 will be suspended before performing operations and resumed after them.
-In cases when you perform operations which may not cause a
+In cases where you perform operations which may not cause a
 recalculation but only change the shape of the worksheet, like
-`addRows`, `removeRows`, `moveColumns` , we do not recommend suspending
+`addRows`, `removeRows`, or `moveColumns` , we do not recommend suspending
 recalculation, as this may have a slightly negative impact on
 performance.
 
 ## GPU acceleration
 
-Some formulas, e.g. MMULT, MAXPOOL, MEDIANPOOL, benefit from the
+Some formulas, e.g. MMULT, MAXPOOL, MEDIANPOOL, benefit from
 GPU acceleration. Thanks to the cores running thousands of threads
-at once, they calculate the input data sets even 9x faster than when
-using CPU. According to our observations the bigger the data set is,
-the bigger is the performance gain.
+at once, they calculate the input data sets up to 9x faster than
+when using the CPU. According to our observations the bigger the data set is,
+the bigger the performance gain.
 
-**For small data sets, the difference between CPU and GPU is
+**For small data sets, the difference between the CPU and GPU is
 non-significant.**
 
 ## Benchmarks
 
-HyperFormula performance has been tested on different devices,
+HyperFormula's performance has been tested on different devices,
 operating systems, and browsers. The table below presents the result
-of performed tests in which the engine multiplies two matrices of
-2000 cells - each using MMULT formula. The main objective of this
-benchmark is to show a significant difference in performance between
+of tests in which the engine multiplies two matrices of
+2000 cells, each using the MMULT formula. The main objective of this
+benchmark is to show a significant difference in performance between the
 CPU and GPU.
 
 The tests were run on three different physical machines with the

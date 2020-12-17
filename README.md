@@ -6,6 +6,8 @@
 
 [![GitHub Workflow Status](https://img.shields.io/github/workflow/status/handsontable/hyperformula/Test)](https://github.com/handsontable/hyperformula/actions?query=workflow%3ATest+branch%3Amaster)
 [![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fhandsontable%2Fhyperformula.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fhandsontable%2Fhyperformula?ref=badge_shield)
+[![codecov](https://codecov.io/gh/handsontable/hyperformula/branch/master/graph/badge.svg?token=5k9ZQv8azO)](https://codecov.io/gh/handsontable/hyperformula)
+[![Language grade: JavaScript](https://img.shields.io/lgtm/grade/javascript/g/handsontable/hyperformula.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/handsontable/hyperformula/context:javascript)
 [![Known Vulnerabilities](https://snyk.io/test/github/handsontable/hyperformula/badge.svg?targetFile=package.json)](https://snyk.io/test/github/handsontable/hyperformula?targetFile=package.json)
 [![GitHub contributors](https://img.shields.io/github/contributors/handsontable/hyperformula)](https://github.com/handsontable/hyperformula/graphs/contributors)
 
@@ -35,8 +37,8 @@ and [custom functions](https://handsontable.github.io/hyperformula/guide/custom-
 - Demos
   - [JavaScript](https://handsontable.github.io/hyperformula/guide/demo.html)
   - [React](https://handsontable.github.io/hyperformula/guide/integration-with-react.html)
-  - [Vue.js](https://handsontable.github.io/hyperformula/guide/integration-with-vue.html)
-  - [Angular.js](https://handsontable.github.io/hyperformula/guide/integration-with-angular.html)
+  - [Vue](https://handsontable.github.io/hyperformula/guide/integration-with-vue.html)
+  - [Angular](https://handsontable.github.io/hyperformula/guide/integration-with-angular.html)
 - [Installation](https://handsontable.github.io/hyperformula/guide/client-side-installation.html)
 - [Basic usage](https://handsontable.github.io/hyperformula/guide/basic-usage.html)
 - [API Reference](https://handsontable.github.io/hyperformula/api/)

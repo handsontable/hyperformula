@@ -1,6 +1,6 @@
 # Acknowledgments
 
-We wouldn't have made this project without co-financing from the
+We couldn't have done this project without co-financing from the
 European Regional Development Funds, a part of the Smart Growth
 Operational Programme. Specifically, the project has been implemented
 within the "Fast Track" support programme of the Polish National

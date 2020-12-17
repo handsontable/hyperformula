@@ -5,6 +5,7 @@ import {Config} from '../src/Config'
 import {DateTimeHelper} from '../src/DateTimeHelper'
 import {FormulaCellVertex, MatrixVertex, RangeVertex} from '../src/DependencyGraph'
 import {defaultStringifyDateTime} from '../src/format/format'
+import {complex} from '../src/interpreter/ArithmeticHelper'
 import {
   AstNodeType,
   CellAddress,
@@ -90,6 +91,16 @@ export const expectArrayWithSameContent = (expected: any[], actual: any[]) => {
   }
 }
 
+export const expectToBeCloseForComplex = (engine: HyperFormula, cell: string, expected: string, precision?: number) => {
+  // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+  // @ts-ignore
+  const coerce = (arg: CellValue): complex => engine.evaluator.interpreter.arithmeticHelper.coerceScalarToComplex(arg)
+  const actualVal: complex = coerce(engine.getCellValue(adr(cell)))
+  const expectedVal: complex = coerce(expected)
+  expect(expectedVal[0]).toBeCloseTo(actualVal[0], precision)
+  expect(expectedVal[1]).toBeCloseTo(actualVal[1], precision)
+}
+
 export const verifyValues = (engine: HyperFormula) => {
   const serialization = engine.getAllSheetsSerialized()
   const engine2 = HyperFormula.buildFromSheets(serialization)
@@ -166,14 +177,6 @@ export function timeNumberToString(timeNumber: CellValue, config: Config): strin
   const dateTimeHelper = new DateTimeHelper(config)
   const timeString = defaultStringifyDateTime(dateTimeHelper.numberToSimpleDateTime(timeNumber as number), 'hh:mm:ss.sss')
   return timeString ?? ''
-}
-
-export function expectCloseTo(actual: CellValue, expected: number, precision: number = 0.000001) {
-  if (typeof actual !== 'number') {
-    expect(true).toBe(false)
-  } else {
-    expect(Math.abs(actual - expected)).toBeLessThan(precision)
-  }
 }
 
 export function unregisterAllLanguages() {

@@ -5,18 +5,18 @@ and paste**. These methods allow you to integrate the functionality
 of interacting with the clipboard.
 
 ::: tip
-Below provided methods store cut or copied data in a reference inside
-the memory, not directly in system clipboard.
+The methods provided below store cut or copied data in a reference inside
+the memory, not directly in the system clipboard.
 :::
 
 ## Copy
 
-You can copy the content of the cells by using the `copy` method.
+You can copy cell content by using the `copy` method.
 This method requires you to pass the arguments as follows:
 
 * The source left corner of a block of cells to be copied
 * Width of the block
-* Height of the block 
+* Height of the block
 
 ```javascript
 const hfInstance = HyperFormula.buildFromArray([
@@ -29,21 +29,21 @@ const clipboardContent = hfInstance.copy({ sheet: 0, col: 1, row: 0 }, 1, 1);
 
 Depending on what was copied, the data is stored as:
 
-* an array of arrays,
-* a number,
-* a string,
-* a boolean,
-* an empty value.
+* an array of arrays
+* a number
+* a string
+* a boolean
+* an empty value
 
 If a copied source formula contains named expressions which were
-defined for a local scope and will be pasted to a sheet which is
+defined for a local scope and it is pasted to a sheet which is
 out of scope for these expressions, their scope will switch to global.
 If a copied named expression's scope is the same as the target's,
 the local scope will remain the same.
 
 ## Cut
 
-You can cut the content of the cells by using the `cut` method. This
+You can cut cell content by using the `cut` method. This
 method requires you to pass the arguments as follows:
 
 * The source left corner of a block of cells to be copied
@@ -64,17 +64,17 @@ const clipboardContent = hfInstance.cut({ sheet: 0, col: 0, row: 0 }, 1, 1);
 
 ## Paste
 
-You can paste the content of the cells by using the `paste` method.
+You can paste cell content by using the `paste` method.
 This method requires only one parameter - the target left corner
-into the content will be pasted.
+into into which the content will be pasted.
 
-If the `paste` method is called after the `copy` , it will paste
+If the `paste` method is called after `copy` , it will paste
 copied values and formulas into a block of cells. If it is called
 after `cut` , it will perform the `moveCells` operation into the
 block of cells. The `paste` method does nothing if the clipboard
 is empty.
 
-The `paste` method triggers the recalculation for the formulas
+The `paste` method triggers recalculation of the formulas
 affected by this operation. When it is called after `cut`, it
 will remove the content that was cut. This may have an impact
 on many related cells in the workbook.
@@ -92,12 +92,11 @@ hfInstance.copy({ sheet: 0, col: 0, row: 0 }, 1, 1);
 const changes = hfInstance.paste({ sheet: 0, col: 1, row: 0 });
 ```
 
-**Cut and paste** behave similarly to the `move` operation so if in
-the cell B1 there is a formula '=A1' it will stay '=A1' after being
-placed into B2.
+**Cut and paste** behaves similarly to the `move` operation, so if the formula
+ '=A1' is in cell B1 it will stay '=A1' after being placed into B2.
 
-**Copy and paste** behave a bit differently. If '=A1' will be copied
-from B1 into B2 cell it will become '=A2'.
+**Copy and paste** behaves a bit differently. If '=A1' is copied from
+cell B1 into B2 it will become '=A2'.
 
 ## Clear the clipboard
 
@@ -108,7 +107,7 @@ inside the clipboard: `isClipboardEmpty` .
 ## Demo
 
 <iframe
-     src="https://codesandbox.io/embed/github/handsontable/hyperformula-demos/tree/0.3.x/clipboard-operations?autoresize=1&fontsize=11&hidenavigation=1&theme=light&view=preview"
+     src="https://codesandbox.io/embed/github/handsontable/hyperformula-demos/tree/0.4.x/clipboard-operations?autoresize=1&fontsize=11&hidenavigation=1&theme=light&view=preview"
      style="width:100%; height:500px; border:0; border-radius: 4px; overflow:hidden;"
      title="handsontable/hyperformula-demos: clipboard-operations"
      allow="accelerometer; ambient-light-sensor; camera; encrypted-media; geolocation; gyroscope; hid; microphone; midi; payment; usb; vr; xr-spatial-tracking"

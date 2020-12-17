@@ -2,7 +2,7 @@
 
 HyperFormula can be customized through easy-to-setup `options`.
 
-The only mandatory option is `licenseKey`. It has a
+The only mandatory key is `licenseKey`. It has a
 [dedicated section](license-key.md) in which you can find all allowed
 types of key values.
 
