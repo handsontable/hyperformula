@@ -59,7 +59,9 @@ lets you design your own [custom functions](custom-functions).
 
 <br><br>
 
-## List of available functions (total: {{ $page.functionsCount }})
+## List of available functions
+
+Total number of functions: **{{ $page.functionsCount }}**
 
 ### Date and time
 
