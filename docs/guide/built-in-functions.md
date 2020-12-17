@@ -62,6 +62,7 @@ lets you design your own [custom functions](custom-functions).
 ## List of available functions (total: {{ $page.functionsCount }})
 
 ### Date and time
+
 | Function ID | Description | Syntax |
 | :--- | :--- | :--- |
 | DATE | Date and time | Calculates a date specified by year, month, day, and displays it in the cell's formatting. | DATE(Year; Month; Day) |
@@ -196,6 +197,7 @@ lets you design your own [custom functions](custom-functions).
 | XNPV <br><Badge text="v0.3.0"/>| Returns net present value. | XNPV(Rate; Payments; Dates) |
 
 ### Logical
+
 | Function ID | Description | Syntax |
 | :--- | :--- | :--- |
 | AND | Returns TRUE if all arguments are TRUE. | AND(Logicalvalue1; Logicalvalue2 ...Logicalvalue30) |
@@ -210,6 +212,7 @@ lets you design your own [custom functions](custom-functions).
 | XOR | Returns true if an odd number of arguments evaluates to TRUE. | XOR(Logicalvalue1; Logicalvalue2 ...Logicalvalue30) |
 
 ### Lookup and reference
+
 | Function ID | Description | Syntax |
 | :--- | :--- | :--- |
 | CHOOSE | Uses an index to return a value from a list of up to 30 values.| CHOOSE(Index; Value1; ...; Value30) |
@@ -225,6 +228,7 @@ lets you design your own [custom functions](custom-functions).
 | VLOOKUP | Searches vertically with reference to adjacent cells to the right. | VLOOKUP(Search_Criterion; Array; Index; Sort_Order) |
 
 ### Math and trigonometry
+
 | Function ID | Description | Syntax |
 | :--- | :--- | :--- |
 | ABS | Returns the absolute value of a number. | ABS(Number) |
@@ -305,6 +309,7 @@ lets you design your own [custom functions](custom-functions).
 | TRUNC | Truncates a number by removing decimal places. | TRUNC(Number; Count) |
 
 ### Matrix functions
+
 | Function ID | Description | Syntax |
 | :--- | :--- | :--- |
 | MMULT | Calculates the array product of two arrays. | MMULT(Array; Array) |
@@ -313,6 +318,7 @@ lets you design your own [custom functions](custom-functions).
 | TRANSPOSE | Transposes the rows and columns of an array. | TRANSPOSE(Array) |
 
 ### Operator
+
 | Function ID | Description | Syntax |
 | :--- | :--- | :--- |
 | HF.ADD <br><Badge text="v0.3.0"/>| Adds two values. | HF.ADD(Number; Number) |
@@ -332,6 +338,7 @@ lets you design your own [custom functions](custom-functions).
 | HF.UPLUS <br><Badge text="v0.3.0"/>| Applies unary plus. | HF.UPLUS(Number) |
 
 ### Statistical
+
 | Function ID | Description | Syntax |
 | :--- | :--- | :--- |
 | AVEDEV <br><Badge text="v0.4.0"/>| Returns the average deviation of the arguments. | AVEDEV(Number1; Number2; ...Number30) |
@@ -468,6 +475,7 @@ lets you design your own [custom functions](custom-functions).
 | ZTEST <br><Badge text="v0.4.0"/>| Returns z-test value for a dataset. | ZTEST(Array; X[; Sigma]) |
 
 ### Text
+
 | Function ID | Description | Syntax |
 | :--- | :--- | :--- |
 | CHAR | Converts a number into a character according to the current code table. | CHAR(Number) |
