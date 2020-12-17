@@ -59,7 +59,7 @@ class CountHF extends FunctionPlugin {
 ```
 ## Aliases
 
-Aliases are available since the **0.4.0** version.
+Aliases are available since the <Badge text="v0.4.0"/> version.
 
 If you want to include aliases (multiple names to a single implemented function) inside the plugin,
 you can do this with the static `aliases` property.

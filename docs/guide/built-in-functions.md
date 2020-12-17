@@ -90,7 +90,9 @@ lets you design your own [custom functions](custom-functions).
 | WORKDAY.INTL <br><Badge text="v0.3.0"/>| Returns the working day number of days from start day. | WORKDAY(Date, Shift[; Mode[; Holidays]]) |
 | YEAR | Returns the year as a number according to the internal calculation rules. | YEAR(Number) |
 | YEARFRAC <br><Badge text="v0.2.0"/>| Computes the difference between two date values, in fraction of years. |  YEARFRAC(Date2; Date1[; Format]) |
+
 ### Engineering
+
 | Function ID | Description | Syntax |
 | :--- | :--- | :--- |
 | BIN2DEC | The result is the decimal number for the binary number entered. | BIN2DEC(Number) |
@@ -139,7 +141,9 @@ lets you design your own [custom functions](custom-functions).
 | OCT2BIN <br><Badge text="v0.2.0"/>| The result is the binary number for the octal number entered. | OCT2BIN(Number; Places) |
 | OCT2DEC <br><Badge text="v0.2.0"/>| The result is the decimal number for the octal number entered. | OCT2DEC(Number) |
 | OCT2HEX <br><Badge text="v0.2.0"/>| The result is the hexadecimal number for the octal number entered. | OCT2HEX(Number; Places) |
+
 ### Information
+
 | Function ID | Description | Syntax |
 | :--- | :--- | :--- |
 | ISBINARY <br><Badge text="v0.2.0"/>| Returns TRUE if provided value is a valid binary number. | ISBINARY(Value) |
@@ -158,7 +162,9 @@ lets you design your own [custom functions](custom-functions).
 | SHEET <br><Badge text="v0.2.0"/>| Returns sheet number of a given value or a formula sheet number if no argument is provided. | SHEET([Value]) |
 | SHEETS <br><Badge text="v0.2.0"/>| Returns number of sheet of a given reference or number of all sheets in workbook when no argument is provided. | SHEETS([Value]) |
 | NA <br><Badge text="v0.2.0"/>| Returns #N/A! error value.| NA(Value) |
+
 ### Financial
+
 | Function ID | Description | Syntax |
 | :--- | :--- | :--- |
 | CUMIPMT <br><Badge text="v0.2.0"/>| Returns the cumulative interest paid on a loan between a start period and an end period. | CUMIPMT(Rate; Nper; Pv; Start, End; type) |
