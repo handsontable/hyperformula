@@ -7,9 +7,7 @@ import GPU from 'gpu.js'
 import {AbsoluteCellRange, AbsoluteColumnRange, AbsoluteRowRange} from '../AbsoluteCellRange'
 import {
   CellError,
-  EmptyValue,
   ErrorType,
-  InternalNoErrorScalarValue,
   invalidSimpleCellAddress,
   SimpleCellAddress
 } from '../Cell'
@@ -30,7 +28,8 @@ import {Statistics} from '../statistics/Statistics'
 import {ArithmeticHelper, coerceScalarToString, fixNegativeZero, isNumberOverflow} from './ArithmeticHelper'
 import {CriterionBuilder} from './Criterion'
 import {FunctionRegistry} from './FunctionRegistry'
-import {InterpreterValue, SimpleRangeValue} from './InterpreterValue'
+import {EmptyValue, InternalNoErrorScalarValue, InterpreterValue} from './InterpreterValue'
+import {SimpleRangeValue} from './SimpleRangeValue'
 
 export class Interpreter {
   private gpu?: GPU.GPU
@@ -54,7 +53,7 @@ export class Interpreter {
   }
 
   public evaluateAst(ast: Ast, formulaAddress: SimpleCellAddress): InterpreterValue {
-    let val = this.evaluateAstWithoutPostoprocessing(ast, formulaAddress)
+    let val = this.evaluateAstWithoutPostprocessing(ast, formulaAddress)
     if (typeof val === 'number') {
       if (isNumberOverflow(val)) {
         return new CellError(ErrorType.NUM, ErrorMessage.NaN)
@@ -70,7 +69,7 @@ export class Interpreter {
    * @param formula - abstract syntax tree of formula
    * @param formulaAddress - address of the cell in which formula is located
    */
-  private evaluateAstWithoutPostoprocessing(ast: Ast, formulaAddress: SimpleCellAddress): InterpreterValue {
+  private evaluateAstWithoutPostprocessing(ast: Ast, formulaAddress: SimpleCellAddress): InterpreterValue {
     switch (ast.type) {
       case AstNodeType.EMPTY: {
         return EmptyValue

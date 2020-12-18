@@ -5,9 +5,10 @@
 
 import {CellVertex, FormulaCellVertex, MatrixVertex, ParsingErrorVertex, ValueCellVertex} from './DependencyGraph'
 import {ErrorMessage} from './error-message'
+import {EmptyValue, InterpreterValue} from './interpreter/InterpreterValue'
+import {SimpleRangeValue} from './interpreter/SimpleRangeValue'
 import {CellAddress} from './parser'
 import {AddressWithSheet} from './parser/Address'
-import {InterpreterValue, SimpleRangeValue} from './interpreter/InterpreterValue'
 
 /**
  * Possible errors returned by our interpreter.
@@ -36,11 +37,6 @@ export enum ErrorType {
 }
 
 export type TranslatableErrorType = Exclude<ErrorType, ErrorType.LIC>
-
-export const EmptyValue = Symbol('Empty value')
-export type EmptyValueType = typeof EmptyValue
-export type InternalNoErrorScalarValue = number | string | boolean | EmptyValueType
-export type InternalScalarValue = InternalNoErrorScalarValue | CellError
 
 export enum CellType {
   FORMULA = 'FORMULA',

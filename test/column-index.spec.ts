@@ -1,6 +1,7 @@
 import {deepStrictEqual} from 'assert'
 import {AbsoluteCellRange} from '../src/AbsoluteCellRange'
 import {CellError, ErrorType, simpleCellAddress} from '../src/Cell'
+import {SimpleRangeValue} from '../src/interpreter/SimpleRangeValue'
 import {ColumnIndex} from '../src/Lookup/ColumnIndex'
 import {NamedExpressions} from '../src/NamedExpressions'
 import {Config} from '../src/Config'
@@ -12,7 +13,6 @@ import {AddRowsTransformer} from '../src/dependencyTransformers/AddRowsTransform
 import {RemoveRowsTransformer} from '../src/dependencyTransformers/RemoveRowsTransformer'
 import {DependencyGraph} from '../src/DependencyGraph'
 import {FunctionRegistry} from '../src/interpreter/FunctionRegistry'
-import {SimpleRangeValue} from '../src/interpreter/InterpreterValue'
 import {LazilyTransformingAstService} from '../src/LazilyTransformingAstService'
 
 function buildEmptyIndex(transformingService: LazilyTransformingAstService, config: Config, statistics: Statistics): ColumnIndex {

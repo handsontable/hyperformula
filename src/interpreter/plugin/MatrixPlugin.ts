@@ -8,7 +8,7 @@ import {ErrorMessage} from '../../error-message'
 import {matrixSizeForMultiplication, matrixSizeForPoolFunction, matrixSizeForTranspose} from '../../Matrix'
 import {Ast, AstNodeType, NumberAst, ProcedureAst} from '../../parser'
 import {coerceToRangeNumbersOrError} from '../ArithmeticHelper'
-import {SimpleRangeValue} from '../InterpreterValue'
+import {SimpleRangeValue} from '../SimpleRangeValue'
 import {FunctionPlugin} from './FunctionPlugin'
 
 export class MatrixPlugin extends FunctionPlugin {

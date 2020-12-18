@@ -3,11 +3,12 @@
  * Copyright (c) 2020 Handsoncode. All rights reserved.
  */
 
-import {CellError, EmptyValue, ErrorType, InternalScalarValue, SimpleCellAddress} from '../../Cell'
+import {CellError, ErrorType, SimpleCellAddress} from '../../Cell'
 import {FormulaCellVertex, MatrixVertex} from '../../DependencyGraph'
 import {ErrorMessage} from '../../error-message'
 import {AstNodeType, ProcedureAst} from '../../parser'
-import {SimpleRangeValue} from '../InterpreterValue'
+import {EmptyValue, InternalScalarValue} from '../InterpreterValue'
+import {SimpleRangeValue} from '../SimpleRangeValue'
 import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
 
 /**

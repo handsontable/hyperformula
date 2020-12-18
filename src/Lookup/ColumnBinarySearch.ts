@@ -4,10 +4,11 @@
  */
 
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
-import {InternalNoErrorScalarValue, InternalScalarValue, SimpleCellAddress} from '../Cell'
+import {SimpleCellAddress} from '../Cell'
 import {Config} from '../Config'
 import {DependencyGraph} from '../DependencyGraph'
 import {rangeLowerBound} from '../interpreter/binarySearch'
+import {InternalNoErrorScalarValue, InternalScalarValue} from '../interpreter/InterpreterValue'
 import {Matrix} from '../Matrix'
 import {ColumnSearchStrategy} from './SearchStrategy'
 import {ColumnsSpan} from '../Span'

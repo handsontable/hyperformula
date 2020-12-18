@@ -8,15 +8,14 @@ import {AbsoluteCellRange} from '../AbsoluteCellRange'
 import {absolutizeDependencies} from '../absolutizeDependencies'
 import {
   CellError,
-  EmptyValue,
   ErrorType,
-  InternalScalarValue,
   simpleCellAddress,
   SimpleCellAddress
 } from '../Cell'
 import {CellDependency} from '../CellDependency'
 import {Config} from '../Config'
 import {ErrorMessage} from '../error-message'
+import {SimpleRangeValue} from '../interpreter/SimpleRangeValue'
 import {LazilyTransformingAstService} from '../LazilyTransformingAstService'
 import {Maybe} from '../Maybe'
 import {Ast, collectDependencies, NamedExpressionDependency} from '../parser'
@@ -41,7 +40,7 @@ import {RangeMapping} from './RangeMapping'
 import {SheetMapping} from './SheetMapping'
 import {ValueCellVertexValue} from './ValueCellVertex'
 import {FunctionRegistry} from '../interpreter/FunctionRegistry'
-import {InterpreterValue, SimpleRangeValue} from '../interpreter/InterpreterValue'
+import {EmptyValue, InternalScalarValue, InterpreterValue} from '../interpreter/InterpreterValue'
 
 export class DependencyGraph {
   /*

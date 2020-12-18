@@ -6,13 +6,12 @@
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
 import {
   CellError,
-  InternalNoErrorScalarValue,
-  InternalScalarValue,
   movedSimpleCellAddress,
   SimpleCellAddress
 } from '../Cell'
 import {Config} from '../Config'
 import {DependencyGraph} from '../DependencyGraph'
+import {SimpleRangeValue} from '../interpreter/SimpleRangeValue'
 import {LazilyTransformingAstService} from '../LazilyTransformingAstService'
 import {Matrix} from '../Matrix'
 import {ColumnsSpan, RowsSpan} from '../Span'
@@ -22,7 +21,11 @@ import {ColumnSearchStrategy} from './SearchStrategy'
 import {AddRowsTransformer} from '../dependencyTransformers/AddRowsTransformer'
 import {RemoveRowsTransformer} from '../dependencyTransformers/RemoveRowsTransformer'
 import {FormulaTransformer} from '../dependencyTransformers/Transformer'
-import {InterpreterValue, SimpleRangeValue} from '../interpreter/InterpreterValue'
+import {
+  InternalNoErrorScalarValue,
+  InternalScalarValue,
+  InterpreterValue
+} from '../interpreter/InterpreterValue'
 
 type ColumnMap = Map<InterpreterValue, ValueIndex>
 

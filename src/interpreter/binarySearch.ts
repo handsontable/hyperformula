@@ -4,9 +4,9 @@
  */
 
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
-import {InternalScalarValue, simpleCellAddress} from '../Cell'
+import {simpleCellAddress} from '../Cell'
 import {DependencyGraph} from '../DependencyGraph'
-import {InterpreterValue} from './InterpreterValue'
+import {InternalScalarValue, InterpreterValue} from './InterpreterValue'
 
 /*
 * If key exists returns first index of key element in range of sorted values

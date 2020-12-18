@@ -4,8 +4,8 @@
  */
 
 import {DependencyGraph} from '../DependencyGraph'
-import {InternalScalarValue} from '../Cell'
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
+import {InternalScalarValue} from '../interpreter/InterpreterValue'
 
 export abstract class AdvancedFind {
   protected constructor(

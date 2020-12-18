@@ -7,15 +7,14 @@ import {AbsoluteCellRange} from '../../AbsoluteCellRange'
 import {
   CellError,
   ErrorType,
-  InternalNoErrorScalarValue,
-  InternalScalarValue,
   simpleCellAddress,
   SimpleCellAddress
 } from '../../Cell'
 import {ErrorMessage} from '../../error-message'
 import {ProcedureAst} from '../../parser'
 import {StatType} from '../../statistics'
-import {SimpleRangeValue} from '../InterpreterValue'
+import {InternalNoErrorScalarValue, InternalScalarValue} from '../InterpreterValue'
+import {SimpleRangeValue} from '../SimpleRangeValue'
 import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
 import {SearchStrategy} from '../../Lookup/SearchStrategy'
 import {RowSearchStrategy} from '../../Lookup/RowSearchStrategy'

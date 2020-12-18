@@ -6,11 +6,8 @@
 import {
   CellError,
   CellValueTypeOrd,
-  EmptyValue,
   ErrorType,
-  getCellValueType,
-  InternalNoErrorScalarValue,
-  InternalScalarValue
+  getCellValueType
 } from '../Cell'
 import {Config} from '../Config'
 import {DateTimeHelper} from '../DateTimeHelper'
@@ -18,7 +15,13 @@ import {ErrorMessage} from '../error-message'
 import {Maybe} from '../Maybe'
 import {NumberLiteralHelper} from '../NumberLiteralHelper'
 import {collatorFromConfig} from '../StringHelper'
-import {InterpreterValue, SimpleRangeValue} from './InterpreterValue'
+import {
+  EmptyValue,
+  InternalNoErrorScalarValue,
+  InternalScalarValue,
+  InterpreterValue
+} from './InterpreterValue'
+import {SimpleRangeValue} from './SimpleRangeValue'
 import Collator = Intl.Collator
 
 export type complex = [number, number]

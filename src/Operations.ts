@@ -3,9 +3,10 @@
  * Copyright (c) 2020 Handsoncode. All rights reserved.
  */
 
+import {EmptyValue} from './interpreter/InterpreterValue'
 import {Statistics, StatType} from './statistics'
 import {ClipboardCell, ClipboardCellType} from './ClipboardOperations'
-import {EmptyValue, invalidSimpleCellAddress, simpleCellAddress, SimpleCellAddress} from './Cell'
+import {invalidSimpleCellAddress, simpleCellAddress, SimpleCellAddress} from './Cell'
 import {CellContent, CellContentParser, RawCellContent} from './CellContentParser'
 import {ColumnsSpan, RowsSpan} from './Span'
 import {ContentChanges} from './ContentChanges'

@@ -3,8 +3,8 @@
  * Copyright (c) 2020 Handsoncode. All rights reserved.
  */
 
+import {InternalNoErrorScalarValue} from '../interpreter/InterpreterValue'
 import {SearchStrategy} from './SearchStrategy'
-import {InternalNoErrorScalarValue} from '../Cell'
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
 import {rangeLowerBound} from '../interpreter/binarySearch'
 import {Config} from '../Config'

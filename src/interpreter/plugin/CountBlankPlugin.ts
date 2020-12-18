@@ -3,8 +3,9 @@
  * Copyright (c) 2020 Handsoncode. All rights reserved.
  */
 
-import {EmptyValue, InternalScalarValue, SimpleCellAddress} from '../../Cell'
+import {SimpleCellAddress} from '../../Cell'
 import {ProcedureAst} from '../../parser'
+import {EmptyValue, InternalScalarValue} from '../InterpreterValue'
 import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
 
 /**

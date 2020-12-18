@@ -4,7 +4,7 @@
  */
 
 import {AbsoluteCellRange} from '../../AbsoluteCellRange'
-import {CellError, ErrorType, InternalScalarValue, SimpleCellAddress} from '../../Cell'
+import {CellError, ErrorType, SimpleCellAddress} from '../../Cell'
 import {Config} from '../../Config'
 import {DependencyGraph} from '../../DependencyGraph'
 import {ErrorMessage} from '../../error-message'
@@ -14,7 +14,8 @@ import {Ast, AstNodeType, ProcedureAst} from '../../parser'
 import {Serialization} from '../../Serialization'
 import {coerceScalarToBoolean, coerceScalarToString, coerceToRange, complex} from '../ArithmeticHelper'
 import {Interpreter} from '../Interpreter'
-import {InterpreterValue, SimpleRangeValue} from '../InterpreterValue'
+import {InternalScalarValue, InterpreterValue} from '../InterpreterValue'
+import {SimpleRangeValue} from '../SimpleRangeValue'
 
 export interface ImplementedFunctions {
   [formulaId: string]: FunctionMetadata,

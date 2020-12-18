@@ -4,14 +4,15 @@
  */
 
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
-import {CellError, ErrorType, InternalScalarValue, simpleCellAddress} from '../Cell'
+import {CellError, ErrorType, simpleCellAddress} from '../Cell'
 import {CriterionCache, DependencyGraph, RangeVertex} from '../DependencyGraph'
 import {ErrorMessage} from '../error-message'
 import {split} from '../generatorUtils'
 import {Maybe} from '../Maybe'
 import {CriterionLambda, CriterionPackage} from './Criterion'
 import {Interpreter} from './Interpreter'
-import {SimpleRangeValue} from './InterpreterValue'
+import {InternalScalarValue} from './InterpreterValue'
+import {SimpleRangeValue} from './SimpleRangeValue'
 
 const findSmallerRangeForMany = (dependencyGraph: DependencyGraph, conditionRanges: AbsoluteCellRange[], valuesRange: AbsoluteCellRange): {smallerRangeVertex: RangeVertex | null, restConditionRanges: AbsoluteCellRange[], restValuesRange: AbsoluteCellRange} => {
   if (valuesRange.end.row > valuesRange.start.row) {

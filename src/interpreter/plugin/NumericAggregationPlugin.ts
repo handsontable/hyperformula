@@ -5,13 +5,14 @@
 
 import assert from 'assert'
 import {AbsoluteCellRange, DIFFERENT_SHEETS_ERROR} from '../../AbsoluteCellRange'
-import {CellError, EmptyValue, ErrorType, InternalScalarValue, SimpleCellAddress} from '../../Cell'
+import {CellError, ErrorType, SimpleCellAddress} from '../../Cell'
 import {ErrorMessage} from '../../error-message'
 import {Maybe} from '../../Maybe'
 import {Ast, AstNodeType, CellRangeAst, ProcedureAst} from '../../parser'
 import {ColumnRangeAst, RowRangeAst} from '../../parser/Ast'
 import {coerceBooleanToNumber} from '../ArithmeticHelper'
-import {SimpleRangeValue} from '../InterpreterValue'
+import {EmptyValue, InternalScalarValue} from '../InterpreterValue'
+import {SimpleRangeValue} from '../SimpleRangeValue'
 import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
 
 export type BinaryOperation<T> = (left: T, right: T) => T

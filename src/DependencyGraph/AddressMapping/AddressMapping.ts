@@ -3,8 +3,8 @@
  * Copyright (c) 2020 Handsoncode. All rights reserved.
  */
 
-import {EmptyValue, SimpleCellAddress} from '../../Cell'
-import {InterpreterValue} from '../../interpreter/InterpreterValue'
+import {SimpleCellAddress} from '../../Cell'
+import {EmptyValue, InterpreterValue} from '../../interpreter/InterpreterValue'
 import {ColumnsSpan, RowsSpan} from '../../Span'
 import {MatrixVertex} from '../index'
 import {CellVertex} from '../Vertex'

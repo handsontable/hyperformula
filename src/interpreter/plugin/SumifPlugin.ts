@@ -3,12 +3,13 @@
  * Copyright (c) 2020 Handsoncode. All rights reserved.
  */
 
-import {CellError, ErrorType, InternalScalarValue, SimpleCellAddress} from '../../Cell'
+import {CellError, ErrorType, SimpleCellAddress} from '../../Cell'
 import {ErrorMessage} from '../../error-message'
 import {Maybe} from '../../Maybe'
 import {ProcedureAst} from '../../parser'
 import {Condition, CriterionFunctionCompute} from '../CriterionFunctionCompute'
-import {SimpleRangeValue} from '../InterpreterValue'
+import {InternalScalarValue} from '../InterpreterValue'
+import {SimpleRangeValue} from '../SimpleRangeValue'
 import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
 
 class AverageResult {

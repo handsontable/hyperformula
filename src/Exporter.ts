@@ -3,7 +3,7 @@
  * Copyright (c) 2020 Handsoncode. All rights reserved.
  */
 
-import {CellError, EmptyValue, ErrorType, SimpleCellAddress, simpleCellAddress} from './Cell'
+import {CellError, ErrorType, SimpleCellAddress, simpleCellAddress} from './Cell'
 import {
   CellValue,
   DetailedCellError,
@@ -11,7 +11,8 @@ import {
 import {Config} from './Config'
 import {CellValueChange} from './ContentChanges'
 import {ErrorMessage} from './error-message'
-import {InterpreterValue, SimpleRangeValue} from './interpreter/InterpreterValue'
+import {EmptyValue, InterpreterValue} from './interpreter/InterpreterValue'
+import {SimpleRangeValue} from './interpreter/SimpleRangeValue'
 import {NamedExpressions} from './NamedExpressions'
 import {SheetIndexMappingFn, simpleCellAddressToString} from './parser/addressRepresentationConverters'
 

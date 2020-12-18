@@ -1,5 +1,5 @@
 import {ErrorType, HyperFormula} from '../../src'
-import {CellError, EmptyValue} from '../../src/Cell'
+import {CellError} from '../../src/Cell'
 import {Config} from '../../src/Config'
 import {DateTimeHelper} from '../../src/DateTimeHelper'
 import {ErrorMessage} from '../../src/error-message'
@@ -9,6 +9,7 @@ import {
   coerceScalarToBoolean,
   coerceScalarToString
 } from '../../src/interpreter/ArithmeticHelper'
+import {EmptyValue} from '../../src/interpreter/InterpreterValue'
 import {NumberLiteralHelper} from '../../src/NumberLiteralHelper'
 import {adr, detailedError} from '../testUtils'
 

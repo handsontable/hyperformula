@@ -5,7 +5,8 @@
 
 import {AbsoluteCellRange} from './AbsoluteCellRange'
 import {absolutizeDependencies} from './absolutizeDependencies'
-import {CellError, EmptyValue, ErrorType, SimpleCellAddress} from './Cell'
+import {CellError, ErrorType, SimpleCellAddress} from './Cell'
+import {SimpleRangeValue} from './interpreter/SimpleRangeValue'
 import {ColumnSearchStrategy} from './Lookup/SearchStrategy'
 import {Config} from './Config'
 import {ContentChanges} from './ContentChanges'
@@ -14,7 +15,7 @@ import {DependencyGraph, FormulaCellVertex, MatrixVertex, RangeVertex, Vertex} f
 import {ErrorMessage} from './error-message'
 import {FunctionRegistry} from './interpreter/FunctionRegistry'
 import {Interpreter} from './interpreter/Interpreter'
-import {InterpreterValue, SimpleRangeValue} from './interpreter/InterpreterValue'
+import {EmptyValue, InterpreterValue} from './interpreter/InterpreterValue'
 import {Matrix} from './Matrix'
 import {NamedExpressions} from './NamedExpressions'
 import {NumberLiteralHelper} from './NumberLiteralHelper'

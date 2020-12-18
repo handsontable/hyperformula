@@ -5,10 +5,7 @@
 
 import {
   CellError,
-  EmptyValue,
   ErrorType,
-  InternalNoErrorScalarValue,
-  InternalScalarValue,
   SimpleCellAddress
 } from '../../Cell'
 import {
@@ -26,7 +23,8 @@ import {ErrorMessage} from '../../error-message'
 import {format} from '../../format/format'
 import {Maybe} from '../../Maybe'
 import {ProcedureAst} from '../../parser'
-import {SimpleRangeValue} from '../InterpreterValue'
+import {EmptyValue, InternalNoErrorScalarValue, InternalScalarValue} from '../InterpreterValue'
+import {SimpleRangeValue} from '../SimpleRangeValue'
 import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
 
 /**

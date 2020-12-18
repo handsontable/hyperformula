@@ -3,10 +3,10 @@
  * Copyright (c) 2020 Handsoncode. All rights reserved.
  */
 
-import {EmptyValue, InternalScalarValue} from '../Cell'
 import {Config} from '../Config'
 import {Maybe} from '../Maybe'
 import {ArithmeticHelper} from './ArithmeticHelper'
+import {EmptyValue, InternalScalarValue} from './InterpreterValue'
 
 export enum CriterionType {
   GREATER_THAN = 'GREATER_THAN',

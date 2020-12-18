@@ -3,10 +3,10 @@
  * Copyright (c) 2020 Handsoncode. All rights reserved.
  */
 
-import {InternalScalarValue} from '../Cell'
 import {Config} from '../Config'
 import {secondsExtendedRegexp} from '../DateTimeDefault'
 import {DateTimeHelper, numberToSimpleTime, SimpleDateTime, SimpleTime} from '../DateTimeHelper'
+import {InternalScalarValue} from '../interpreter/InterpreterValue'
 import {Maybe} from '../Maybe'
 import {FormatToken, parseForDateTimeFormat, parseForNumberFormat, TokenType} from './parser'
 
