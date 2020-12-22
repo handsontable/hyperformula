@@ -16,10 +16,10 @@ import {Maybe} from '../Maybe'
 import {NumberLiteralHelper} from '../NumberLiteralHelper'
 import {collatorFromConfig} from '../StringHelper'
 import {
-  EmptyValue,
+  EmptyValue, ExtendedBoolean, ExtendedNumber, ExtendedString, getRawNoErrorValue, getRawScalarValue,
   InternalNoErrorScalarValue,
   InternalScalarValue,
-  InterpreterValue
+  InterpreterValue, RegularNumber
 } from './InterpreterValue'
 import {SimpleRangeValue} from './SimpleRangeValue'
 import Collator = Intl.Collator
@@ -44,13 +44,13 @@ export class ArithmeticHelper {
 
   public eqMatcherFunction(pattern: string): (arg: InterpreterValue) => boolean {
     const regexp = this.buildRegex(pattern)
-    return (cellValue) => (typeof cellValue === 'string' && regexp.test(this.normalizeString(cellValue)))
+    return (cellValue) => (cellValue instanceof ExtendedString && regexp.test(this.normalizeString(cellValue.get())))
   }
 
   public neqMatcherFunction(pattern: string): (arg: InterpreterValue) => boolean {
     const regexp = this.buildRegex(pattern)
     return (cellValue) => {
-      return (typeof cellValue !== 'string' || !regexp.test(this.normalizeString(cellValue)))
+      return (!(cellValue instanceof ExtendedString) || !regexp.test(this.normalizeString(cellValue.get())))
     }
   }
 
@@ -135,10 +135,10 @@ export class ArithmeticHelper {
   }
 
   private compare(left: InternalNoErrorScalarValue, right: InternalNoErrorScalarValue): number {
-    if (typeof left === 'string' || typeof right === 'string') {
-      const leftTmp = typeof left === 'string' ? this.dateTimeHelper.dateStringToDateNumber(left) : left
-      const rightTmp = typeof right === 'string' ? this.dateTimeHelper.dateStringToDateNumber(right) : right
-      if (typeof leftTmp === 'number' && typeof rightTmp === 'number') {
+    if (left instanceof ExtendedString || right instanceof ExtendedString) {
+      const leftTmp = left instanceof ExtendedString ? this.dateTimeHelper.dateStringToDateNumber(left.get()) : left
+      const rightTmp = right instanceof ExtendedString ? this.dateTimeHelper.dateStringToDateNumber(right.get()) : right
+      if (leftTmp instanceof ExtendedNumber && rightTmp instanceof ExtendedNumber) {
         return this.floatCmp(leftTmp, rightTmp)
       }
     }
@@ -149,11 +149,11 @@ export class ArithmeticHelper {
       right = coerceEmptyToValue(left)
     }
 
-    if ( typeof left === 'string' && typeof right === 'string') {
-      return this.stringCmp(left, right)
-    } else if ( typeof left === 'boolean' && typeof right === 'boolean' ) {
-      return numberCmp(coerceBooleanToNumber(left), coerceBooleanToNumber(right))
-    } else if ( typeof left === 'number' && typeof right === 'number' ) {
+    if ( left instanceof ExtendedString && right instanceof ExtendedString ) {
+      return this.stringCmp(left.get(), right.get())
+    } else if ( left instanceof ExtendedBoolean && right instanceof ExtendedBoolean ) {
+      return numberCmp(coerceBooleanToNumber(left).get(), coerceBooleanToNumber(right).get())
+    } else if ( left instanceof ExtendedNumber && right instanceof ExtendedNumber ) {
       return this.floatCmp(left, right)
     } else if ( left === EmptyValue && right === EmptyValue ) {
       return 0
@@ -162,7 +162,9 @@ export class ArithmeticHelper {
     }
   }
 
-  public floatCmp(left: number, right: number): number {
+  public floatCmp(leftArg: ExtendedNumber, rightArg: ExtendedNumber): number {
+    const left = leftArg.get()
+    const right = rightArg.get()
     const mod = (1 + this.actualEps)
     if ((right >= 0) && (left * mod >= right) && (left <= right * mod)) {
       return 0
@@ -181,29 +183,34 @@ export class ArithmeticHelper {
 
   public pow = Math.pow
 
-  public addWithEpsilon = (left: number, right: number) => {
+  //FIXME
+  public addWithEpsilon = (leftArg: ExtendedNumber, rightArg: ExtendedNumber) => {
+    const left = leftArg.get()
+    const right = rightArg.get()
     const ret = left + right
     if (Math.abs(ret) < this.actualEps * Math.abs(left)) {
-      return 0
+      return new RegularNumber(0)
     } else {
-      return ret
+      return new RegularNumber(ret)
     }
   }
 
-  public unaryMinus = (arg: number): number => {
-    return -arg
+  //FIXME
+  public unaryMinus = (arg: ExtendedNumber): ExtendedNumber => {
+    return new RegularNumber(-arg.get())
   }
 
-  public unaryPlus = (arg: number): number => {
+  public unaryPlus = (arg: ExtendedNumber): ExtendedNumber => {
     return arg
   }
 
-  public unaryPercent = (arg: number): number => {
-    return arg/100
+  //FIXME
+  public unaryPercent = (arg: ExtendedNumber): ExtendedNumber => {
+    return new RegularNumber(arg.get()/100)
   }
 
-  public concat = (left: string, right: string): string => {
-    return left.concat(right)
+  public concat = (left: ExtendedString, right: ExtendedString): ExtendedString => {
+    return new ExtendedString(left.get().concat(right.get()))
   }
   /**
    * Adds two numbers
@@ -213,21 +220,21 @@ export class ArithmeticHelper {
    * @param left - left operand of addition
    * @param right - right operand of addition
    */
-  public nonstrictadd = (left: InternalScalarValue, right: InternalScalarValue): number | CellError => {
+  public nonstrictadd = (left: InternalScalarValue, right: InternalScalarValue): ExtendedNumber | CellError => {
     if (left instanceof CellError) {
       return left
     } else if (right instanceof CellError) {
       return right
-    } else if (typeof left === 'number') {
-      if (typeof right === 'number') {
+    } else if (left instanceof ExtendedNumber) {
+      if (right instanceof ExtendedNumber) {
         return this.addWithEpsilon(left, right)
       } else {
         return left
       }
-    } else if (typeof right === 'number') {
+    } else if (right instanceof ExtendedNumber) {
       return right
     } else {
-      return 0
+      return new RegularNumber(0)
     }
   }
 
@@ -240,54 +247,62 @@ export class ArithmeticHelper {
    * @param right - right operand of subtraction
    * @param eps - precision of comparison
    */
-  public subtract = (left: number, right: number) => {
+  public subtract = (leftArg: ExtendedNumber, rightArg: ExtendedNumber) => {
+    const left = leftArg.get()
+    const right = rightArg.get()
     const ret = left - right
     if (Math.abs(ret) < this.actualEps * Math.abs(left)) {
-      return 0
+      return new RegularNumber(0)
     } else {
-      return ret
+      return new RegularNumber(ret)
     }
   }
 
-  public divide = (left: number, right: number): number | CellError => {
+  public divide = (leftArg: ExtendedNumber, rightArg: ExtendedNumber): ExtendedNumber | CellError => {
+    const left = leftArg.get()
+    const right = rightArg.get()
     if (right === 0) {
       return new CellError(ErrorType.DIV_BY_ZERO)
     } else {
-      return (left / right)
+      return new RegularNumber(left / right)
     }
   }
 
-  public multiply = (left: number, right: number): number => {
-    return left*right
+  public multiply = (left: ExtendedNumber, right: ExtendedNumber): ExtendedNumber => {
+    return new RegularNumber(left.get()*right.get())
   }
 
-  public coerceScalarToNumberOrError(arg: InternalScalarValue): number | CellError {
+  public coerceScalarToNumberOrError(arg: InternalScalarValue): ExtendedNumber | CellError {
     if (arg instanceof CellError) {
       return arg
     }
     return this.coerceToMaybeNumber(arg) ?? new CellError(ErrorType.VALUE, ErrorMessage.NumberCoercion)
   }
 
-  public coerceToMaybeNumber(arg: InternalScalarValue): Maybe<number> {
+  public coerceToMaybeNumber(arg: InternalScalarValue): Maybe<ExtendedNumber> {
     return this.coerceNonDateScalarToMaybeNumber(arg) ?? (
-      typeof arg === 'string' ? this.dateTimeHelper.dateStringToDateNumber(arg) : undefined
+      arg instanceof ExtendedString ? this.dateTimeHelper.dateStringToDateNumber(arg.get()) : undefined
     )
   }
 
-  public coerceNonDateScalarToMaybeNumber(arg: InternalScalarValue): Maybe<number> {
+  public coerceNonDateScalarToMaybeNumber(arg: InternalScalarValue): Maybe<ExtendedNumber> {
     if (arg === EmptyValue) {
-      return 0
-    } else if (typeof arg === 'string') {
-      if(arg === '') {
-        return 0
+      return new RegularNumber(0)
+    } else if (arg instanceof ExtendedString) {
+      if(arg.get() === '') {
+        return new RegularNumber(0)
       }
-      return this.numberLiteralsHelper.numericStringToMaybeNumber(arg.trim())
+      const val = this.numberLiteralsHelper.numericStringToMaybeNumber(arg.get().trim())
+      if(val===undefined) {
+        return undefined
+      }
+      return new RegularNumber(val)
     } else {
-      const coercedNumber = Number(arg)
+      const coercedNumber = Number(getRawScalarValue(arg))
       if (isNaN(coercedNumber)) {
         return undefined
       } else {
-        return coercedNumber
+        return new RegularNumber(coercedNumber)
       }
     }
   }
@@ -328,7 +343,7 @@ export class ArithmeticHelper {
     for(const arg of args) {
       if(arg instanceof CellError) {
         return arg
-      } else if (typeof arg === 'number' || typeof arg === 'string') {
+      } else if (arg instanceof ExtendedNumber || arg instanceof ExtendedString) {
         const coerced = this.coerceScalarToComplex(arg)
         if(!(coerced instanceof CellError)) {
           ret.push(coerced)
@@ -352,7 +367,7 @@ export class ArithmeticHelper {
         if(coerced instanceof CellError) {
           return coerced
         } else {
-          vals.push(coerced)
+          vals.push(coerced.get())
         }
       }
     }
@@ -377,8 +392,8 @@ export class ArithmeticHelper {
     for(const arg of args) {
       if(arg instanceof CellError) {
         return arg
-      } else if (typeof arg === 'number') {
-        ret.push(arg)
+      } else if (arg instanceof ExtendedNumber) {
+        ret.push(arg.get())
       }
     }
     return ret
@@ -390,9 +405,8 @@ export class ArithmeticHelper {
       if(arg instanceof CellError) {
         return arg
       } else if(arg === EmptyValue) {
-        continue
-      } else if (typeof arg === 'number') {
-        ret.push(arg)
+      } else if (arg instanceof ExtendedNumber) {
+        ret.push(arg.get())
       } else {
         return new CellError(ErrorType.VALUE, ErrorMessage.NumberExpected)
       }
@@ -410,8 +424,8 @@ export class ArithmeticHelper {
         continue
       }
       const coerced = this.coerceScalarToNumberOrError(arg)
-      if (typeof coerced === 'number') {
-        ret.push(coerced)
+      if (coerced instanceof ExtendedNumber) {
+        ret.push(coerced.get())
       }
     }
     return ret
@@ -422,10 +436,10 @@ export class ArithmeticHelper {
       return arg
     } else if(arg === EmptyValue) {
       return [0, 0]
-    } else if(typeof arg === 'number') {
-      return [arg, 0]
-    } else if(typeof arg === 'string') {
-      return this.coerceStringToComplex(arg)
+    } else if(arg instanceof ExtendedNumber) {
+      return [arg.get(), 0]
+    } else if(arg instanceof ExtendedString) {
+      return this.coerceStringToComplex(arg.get())
     } else {
       return new CellError(ErrorType.NUM, ErrorMessage.ComplexNumberExpected)
     }
@@ -473,14 +487,14 @@ export class ArithmeticHelper {
   }
 
   private parseComplexToken(arg: string, mod: string): complex | CellError {
-    const val = this.coerceNonDateScalarToMaybeNumber(arg)
+    const val = this.coerceNonDateScalarToMaybeNumber(new ExtendedString(arg))
     if(val === undefined) {
       return new CellError(ErrorType.NUM, ErrorMessage.ComplexNumberExpected)
     }
     if(mod === '') {
-      return [val, 0]
+      return [val.get(), 0]
     } else {
-      return [0, val]
+      return [0, val.get()]
     }
   }
 }
@@ -511,24 +525,24 @@ export function coerceToRange(arg: InterpreterValue): SimpleRangeValue {
 export function coerceToRangeNumbersOrError(arg: InterpreterValue): SimpleRangeValue | CellError | null {
   if ((arg instanceof SimpleRangeValue && arg.hasOnlyNumbers()) || arg instanceof CellError) {
     return arg
-  } else if (typeof arg === 'number') {
+  } else if (arg instanceof ExtendedNumber) {
     return SimpleRangeValue.fromScalar(arg)
   } else {
     return null
   }
 }
 
-export function coerceBooleanToNumber(arg: boolean): number {
-  return Number(arg)
+export function coerceBooleanToNumber(arg: ExtendedBoolean): ExtendedNumber {
+  return new RegularNumber(Number(arg.get()))
 }
 
 export function coerceEmptyToValue(arg: InternalNoErrorScalarValue): InternalNoErrorScalarValue {
-  if (typeof arg === 'string') {
-    return ''
-  } else if (typeof arg === 'number') {
-    return 0
-  } else if (typeof arg === 'boolean') {
-    return false
+  if (arg instanceof ExtendedString) {
+    return new ExtendedString('')
+  } else if (arg instanceof ExtendedNumber) {
+    return new RegularNumber(0)
+  } else if (arg instanceof ExtendedBoolean) {
+    return new ExtendedBoolean(false)
   } else {
     return EmptyValue
   }
@@ -539,41 +553,41 @@ export function coerceEmptyToValue(arg: InternalNoErrorScalarValue): InternalNoE
  *
  * @param arg
  */
-export function coerceScalarToBoolean(arg: InternalScalarValue): boolean | CellError | undefined {
-  if (arg instanceof CellError || typeof arg === 'boolean') {
+export function coerceScalarToBoolean(arg: InternalScalarValue): ExtendedBoolean | CellError | undefined {
+  if (arg instanceof CellError || arg instanceof ExtendedBoolean) {
     return arg
   } else if (arg === EmptyValue) {
-    return false
-  } else if (typeof arg === 'number') {
-    return arg !== 0
+    return new ExtendedBoolean(false)
+  } else if (arg instanceof ExtendedNumber) {
+    return new ExtendedBoolean(arg.get() !== 0)
   } else {
-    const argUppered = arg.toUpperCase()
+    const argUppered = arg.get().toUpperCase()
     if (argUppered === 'TRUE') {
-      return true
+      return new ExtendedBoolean(true)
     } else if (argUppered === 'FALSE') {
-      return false
+      return new ExtendedBoolean(false)
     } else if (argUppered === '') {
-      return false
+      return new ExtendedBoolean(false)
     } else {
       return undefined
     }
   }
 }
 
-export function coerceScalarToString(arg: InternalScalarValue): string | CellError {
-  if (arg instanceof CellError || typeof arg === 'string') {
+export function coerceScalarToString(arg: InternalScalarValue): ExtendedString | CellError {
+  if (arg instanceof CellError || arg instanceof ExtendedString) {
     return arg
   } else if (arg === EmptyValue) {
-    return ''
-  } else if (typeof arg === 'number') {
-    return arg.toString()
+    return new ExtendedString('')
+  } else if (arg instanceof ExtendedNumber) {
+    return new ExtendedString(arg.get().toString())
   } else {
-    return arg ? 'TRUE' : 'FALSE'
+    return new ExtendedString(arg.get() ? 'TRUE' : 'FALSE')
   }
 }
 
 export function zeroIfEmpty(arg: InternalNoErrorScalarValue): InternalNoErrorScalarValue {
-  return arg === EmptyValue ? 0 : arg
+  return arg === EmptyValue ? new RegularNumber(0) : arg
 }
 
 export function numberCmp(left: number, right: number): number {

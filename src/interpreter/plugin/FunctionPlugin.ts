@@ -14,7 +14,13 @@ import {Ast, AstNodeType, ProcedureAst} from '../../parser'
 import {Serialization} from '../../Serialization'
 import {coerceScalarToBoolean, coerceScalarToString, coerceToRange, complex} from '../ArithmeticHelper'
 import {Interpreter} from '../Interpreter'
-import {InternalScalarValue, InterpreterValue} from '../InterpreterValue'
+import {
+  ExtendedNumber,
+  getRawInterpreterValue,
+  InternalScalarValue,
+  InterpreterValue,
+  RawNoErrorScalarValue
+} from '../InterpreterValue'
 import {SimpleRangeValue} from '../SimpleRangeValue'
 
 export interface ImplementedFunctions {
@@ -100,6 +106,12 @@ export interface FunctionArgument {
   argumentType: ArgumentTypes,
 
   /**
+   * Argument should be passed with full type information.
+   * (e.g. Date/DateTime/Time/Currency/Percentage for numbers)
+   */
+  passSubtype?: boolean
+
+  /**
    * If argument is missing, its value defaults to this.
    */
   defaultValue?: InternalScalarValue,
@@ -177,14 +189,16 @@ export abstract class FunctionPlugin {
     return ret
   }
 
-  public coerceScalarToNumberOrError = (arg: InternalScalarValue): number | CellError => this.interpreter.arithmeticHelper.coerceScalarToNumberOrError(arg)
+  public coerceScalarToNumberOrError = (arg: InternalScalarValue): ExtendedNumber | CellError => this.interpreter.arithmeticHelper.coerceScalarToNumberOrError(arg)
 
-  public coerceToType(arg: InterpreterValue, coercedType: FunctionArgument): Maybe<InterpreterValue | complex> {
+  public coerceToType(arg: InterpreterValue, coercedType: FunctionArgument): Maybe<InterpreterValue | complex | RawNoErrorScalarValue> {
+    let ret
     if (arg instanceof SimpleRangeValue) {
       switch(coercedType.argumentType) {
         case ArgumentTypes.RANGE:
         case ArgumentTypes.ANY:
-          return arg
+          ret = arg
+          break
         default:
           return undefined
       }
@@ -193,10 +207,12 @@ export abstract class FunctionPlugin {
         case ArgumentTypes.INTEGER:
         case ArgumentTypes.NUMBER:
           // eslint-disable-next-line no-case-declarations
-          const value = this.coerceScalarToNumberOrError(arg)
-          if (typeof value !== 'number') {
-            return value
+          const coerced = this.coerceScalarToNumberOrError(arg)
+          if (!(coerced instanceof ExtendedNumber)) {
+            ret = coerced
+            break
           }
+          const value = coerced.get()
           if (coercedType.maxValue !== undefined && value > coercedType.maxValue) {
             return new CellError(ErrorType.NUM, ErrorMessage.ValueLarge)
           }
@@ -212,23 +228,33 @@ export abstract class FunctionPlugin {
           if (coercedType.argumentType === ArgumentTypes.INTEGER && !Number.isInteger(value)) {
             return new CellError(ErrorType.NUM, ErrorMessage.IntegerExpected)
           }
-          return value
+          ret = coerced
+          break
         case ArgumentTypes.STRING:
-          return coerceScalarToString(arg)
+          ret = coerceScalarToString(arg)
+          break
         case ArgumentTypes.BOOLEAN:
-          return coerceScalarToBoolean(arg)
+          ret = coerceScalarToBoolean(arg)
+          break
         case ArgumentTypes.SCALAR:
         case ArgumentTypes.NOERROR:
         case ArgumentTypes.ANY:
-          return arg
+          ret = arg
+          break
         case ArgumentTypes.RANGE:
           if (arg instanceof CellError) {
             return arg
           }
-          return coerceToRange(arg)
+          ret = coerceToRange(arg)
+          break
         case ArgumentTypes.COMPLEX:
           return this.interpreter.arithmeticHelper.coerceScalarToComplex(arg)
       }
+    }
+    if(coercedType.passSubtype || ret === undefined) {
+      return ret
+    } else {
+      return getRawInterpreterValue(ret)
     }
   }
 
@@ -247,7 +273,7 @@ export abstract class FunctionPlugin {
       scalarValues = args.map((ast) => [this.evaluateAst(ast, formulaAddress), false])
     }
 
-    const coercedArguments: Maybe<InterpreterValue | complex>[] = []
+    const coercedArguments: Maybe<InterpreterValue | complex | RawNoErrorScalarValue>[] = []
 
     let argCoerceFailure: Maybe<CellError> = undefined
     if (functionDefinition.repeatLastArgs === undefined && argumentDefinitions.length < scalarValues.length) {

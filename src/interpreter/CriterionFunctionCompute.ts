@@ -11,7 +11,7 @@ import {split} from '../generatorUtils'
 import {Maybe} from '../Maybe'
 import {CriterionLambda, CriterionPackage} from './Criterion'
 import {Interpreter} from './Interpreter'
-import {InternalScalarValue} from './InterpreterValue'
+import {getRawScalarValue, InternalScalarValue} from './InterpreterValue'
 import {SimpleRangeValue} from './SimpleRangeValue'
 
 const findSmallerRangeForMany = (dependencyGraph: DependencyGraph, conditionRanges: AbsoluteCellRange[], valuesRange: AbsoluteCellRange): {smallerRangeVertex: RangeVertex | null, restConditionRanges: AbsoluteCellRange[], restValuesRange: AbsoluteCellRange} => {
@@ -159,7 +159,7 @@ function* ifFilter<T>(criterionLambdas: CriterionLambda[], conditionalIterables:
       return
     }
     const conditionalFirsts = conditionalSplits.map((cs) => (cs.value as InternalScalarValue))
-    if (zip(conditionalFirsts, criterionLambdas).every(([conditionalFirst, criterionLambda]) => criterionLambda(conditionalFirst))) {
+    if (zip(conditionalFirsts, criterionLambdas).every(([conditionalFirst, criterionLambda]) => criterionLambda(getRawScalarValue(conditionalFirst)))) {
       yield computable
     }
     conditionalIterables = conditionalSplits.map((cs) => cs.rest)

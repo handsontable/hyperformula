@@ -6,7 +6,7 @@
 import {Config} from '../Config'
 import {Maybe} from '../Maybe'
 import {ArithmeticHelper} from './ArithmeticHelper'
-import {EmptyValue, InternalScalarValue} from './InterpreterValue'
+import {EmptyValue, InternalScalarValue, RawScalarValue} from './InterpreterValue'
 
 export enum CriterionType {
   GREATER_THAN = 'GREATER_THAN',
@@ -95,7 +95,7 @@ function StrToCriterionType(str: string): Maybe<CriterionType> {
   }
 }
 
-export type CriterionLambda = (cellValue: InternalScalarValue) => boolean
+export type CriterionLambda = (cellValue: RawScalarValue) => boolean
 export const buildCriterionLambda = (criterion: Criterion, arithmeticHelper: ArithmeticHelper): CriterionLambda => {
   switch (criterion.operator) {
     case CriterionType.GREATER_THAN: {

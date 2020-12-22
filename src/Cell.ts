@@ -5,7 +5,13 @@
 
 import {CellVertex, FormulaCellVertex, MatrixVertex, ParsingErrorVertex, ValueCellVertex} from './DependencyGraph'
 import {ErrorMessage} from './error-message'
-import {EmptyValue, InterpreterValue} from './interpreter/InterpreterValue'
+import {
+  EmptyValue,
+  ExtendedBoolean,
+  ExtendedNumber,
+  ExtendedString,
+  InterpreterValue
+} from './interpreter/InterpreterValue'
 import {SimpleRangeValue} from './interpreter/SimpleRangeValue'
 import {CellAddress} from './parser'
 import {AddressWithSheet} from './parser/Address'
@@ -92,13 +98,12 @@ export const getCellValueType = (cellValue: InterpreterValue): CellValueType => 
     return CellValueType.ERROR
   }
 
-  switch (typeof cellValue) {
-    case 'string':
-      return CellValueType.STRING
-    case 'number':
-      return CellValueType.NUMBER
-    case 'boolean':
-      return CellValueType.BOOLEAN
+  if(cellValue instanceof ExtendedString) {
+    return CellValueType.STRING
+  } else if(cellValue instanceof ExtendedNumber) {
+    return CellValueType.NUMBER
+  } else if(cellValue instanceof ExtendedBoolean) {
+    return CellValueType.BOOLEAN
   }
 
   throw new Error('Cell value not computed')

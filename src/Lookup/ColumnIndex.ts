@@ -24,7 +24,7 @@ import {FormulaTransformer} from '../dependencyTransformers/Transformer'
 import {
   InternalNoErrorScalarValue,
   InternalScalarValue,
-  InterpreterValue
+  InterpreterValue, RegularNumber
 } from '../interpreter/InterpreterValue'
 
 type ColumnMap = Map<InterpreterValue, ValueIndex>
@@ -54,7 +54,7 @@ export class ColumnIndex implements ColumnSearchStrategy {
   public add(value: InterpreterValue | Matrix, address: SimpleCellAddress) {
     if (value instanceof Matrix) {
       for (const [matrixValue, cellAddress] of value.generateValues(address)) {
-        this.addSingleCellValue(matrixValue, cellAddress)
+        this.addSingleCellValue(new RegularNumber(matrixValue), cellAddress)
       }
     } else if (!(value instanceof CellError || value instanceof SimpleRangeValue)) {
       this.addSingleCellValue(value, address)
@@ -68,7 +68,7 @@ export class ColumnIndex implements ColumnSearchStrategy {
 
     if (value instanceof Matrix) {
       for (const [matrixValue, cellAddress] of value.generateValues(address)) {
-        this.removeSingleValue(matrixValue, cellAddress)
+        this.removeSingleValue(new RegularNumber(matrixValue), cellAddress)
       }
     } else {
       this.removeSingleValue(value, address)
