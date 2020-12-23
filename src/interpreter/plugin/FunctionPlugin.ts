@@ -18,8 +18,8 @@ import {
   ExtendedNumber,
   getRawInterpreterValue,
   InternalScalarValue,
-  InterpreterValue,
-  RawNoErrorScalarValue
+  InterpreterValue, putRawScalarValue,
+  RawNoErrorScalarValue, RawScalarValue
 } from '../InterpreterValue'
 import {SimpleRangeValue} from '../SimpleRangeValue'
 
@@ -114,7 +114,7 @@ export interface FunctionArgument {
   /**
    * If argument is missing, its value defaults to this.
    */
-  defaultValue?: InternalScalarValue,
+  defaultValue?: InternalScalarValue | RawScalarValue,
 
   /**
    * If argument is missing, and no defaultValue provided, undefined is supplied as a value, instead of throwing an error.
@@ -262,7 +262,7 @@ export abstract class FunctionPlugin {
     args: Ast[],
     formulaAddress: SimpleCellAddress,
     functionDefinition: FunctionArguments,
-    fn: (...arg: any) => InternalScalarValue
+    fn: (...arg: any) => InternalScalarValue | RawScalarValue
   ) => {
     const argumentDefinitions: FunctionArgument[] = functionDefinition.parameters!
     let scalarValues: [InterpreterValue, boolean][]
@@ -314,7 +314,7 @@ export abstract class FunctionPlugin {
       }
     }
 
-    return argCoerceFailure ?? fn(...coercedArguments)
+    return putRawScalarValue(argCoerceFailure ?? fn(...coercedArguments))
   }
 
   protected runFunctionWithReferenceArgument = (

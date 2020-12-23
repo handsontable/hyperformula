@@ -13,7 +13,7 @@ import {
 import {ErrorMessage} from '../../error-message'
 import {ProcedureAst} from '../../parser'
 import {StatType} from '../../statistics'
-import {InternalNoErrorScalarValue, InternalScalarValue} from '../InterpreterValue'
+import {InternalNoErrorScalarValue, InternalScalarValue, RegularNumber} from '../InterpreterValue'
 import {SimpleRangeValue} from '../SimpleRangeValue'
 import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
 import {SearchStrategy} from '../../Lookup/SearchStrategy'
@@ -158,13 +158,13 @@ export class LookupPlugin extends FunctionPlugin {
       if (index === -1) {
         return new CellError(ErrorType.NA, ErrorMessage.ValueNotFound)
       }
-      return index - range.start.row + 1
+      return new RegularNumber(index - range.start.row + 1)
     } else {
       const index = this.rowSearch.find(key, range, sorted !== 0)
       if (index === -1) {
         return new CellError(ErrorType.NA, ErrorMessage.ValueNotFound)
       }
-      return index - range.start.col + 1
+      return new RegularNumber(index - range.start.col + 1)
     }
   }
 

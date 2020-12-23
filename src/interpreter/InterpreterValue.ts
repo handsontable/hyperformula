@@ -40,7 +40,7 @@ export function getRawNoErrorValue(val: InternalNoErrorScalarValue): RawNoErrorS
   }
 }
 
-export function putRawInternalValue(val: RawInterpreterValue): InterpreterValue {
+export function putRawScalarValue(val: RawScalarValue | InternalScalarValue): InternalScalarValue {
   if(typeof val === 'number') {
     return new RegularNumber(val)
   } else if(typeof val === 'string') {

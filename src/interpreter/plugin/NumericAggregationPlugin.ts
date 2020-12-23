@@ -11,23 +11,30 @@ import {Maybe} from '../../Maybe'
 import {Ast, AstNodeType, CellRangeAst, ProcedureAst} from '../../parser'
 import {ColumnRangeAst, RowRangeAst} from '../../parser/Ast'
 import {coerceBooleanToNumber} from '../ArithmeticHelper'
-import {EmptyValue, InternalScalarValue} from '../InterpreterValue'
+import {
+  EmptyValue,
+  ExtendedBoolean,
+  ExtendedNumber,
+  ExtendedString,
+  InternalScalarValue,
+  RegularNumber
+} from '../InterpreterValue'
 import {SimpleRangeValue} from '../SimpleRangeValue'
 import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
 
 export type BinaryOperation<T> = (left: T, right: T) => T
 
-export type MapOperation<T> = (arg: number) => T
+export type MapOperation<T> = (arg: ExtendedNumber) => T
 
-type coercionOperation = (arg: InternalScalarValue) => Maybe<number | CellError>
+type coercionOperation = (arg: InternalScalarValue) => Maybe<ExtendedNumber | CellError>
 
-function identityMap(arg: number): number {
+function identityMap<T>(arg: T): T {
   return arg
 }
 
 function zeroForInfinite(value: InternalScalarValue) {
-  if (typeof value === 'number' && !Number.isFinite(value)) {
-    return 0
+  if (value instanceof ExtendedNumber && !Number.isFinite(value.get())) {
+    return new RegularNumber(0)
   } else {
     return value
   }
@@ -163,7 +170,7 @@ export class NumericAggregationPlugin extends FunctionPlugin {
   }
 
   public sumsq(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.reduce(ast.args, formulaAddress, 0, 'SUMSQ', this.addWithEpsilon, (arg) => arg * arg, strictlyNumbers)
+    return this.reduce(ast.args, formulaAddress, new RegularNumber(0), 'SUMSQ', this.addWithEpsilon, (arg) => new RegularNumber(Math.pow(arg.get(),2)), strictlyNumbers)
   }
 
   /**
@@ -179,8 +186,8 @@ export class NumericAggregationPlugin extends FunctionPlugin {
   }
 
   public maxa(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    const value = this.reduce(ast.args, formulaAddress, Number.NEGATIVE_INFINITY, 'MAXA',
-      (left, right) => Math.max(left, right),
+    const value = this.reduce(ast.args, formulaAddress, new RegularNumber(Number.NEGATIVE_INFINITY), 'MAXA',
+      (left, right) => new RegularNumber(Math.max(left.get(), right.get())),
       identityMap, numbersBooleans)
 
     return zeroForInfinite(value)
@@ -199,8 +206,8 @@ export class NumericAggregationPlugin extends FunctionPlugin {
   }
 
   public mina(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    const value = this.reduce(ast.args, formulaAddress, Number.POSITIVE_INFINITY, 'MINA',
-      (left, right) => Math.min(left, right),
+    const value = this.reduce(ast.args, formulaAddress, new RegularNumber(Number.POSITIVE_INFINITY), 'MINA',
+      (left, right) => new RegularNumber(Math.min(left.get(), right.get())),
       identityMap, numbersBooleans)
 
     return zeroForInfinite(value)
@@ -221,14 +228,15 @@ export class NumericAggregationPlugin extends FunctionPlugin {
   public averagea(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     const result = this.reduce<MomentsAggregate>(ast.args, formulaAddress, MomentsAggregate.empty, '_AGGREGATE_A',
       (left, right) => left.compose(right),
-      (arg): MomentsAggregate => MomentsAggregate.single(arg),
+      (arg): MomentsAggregate => MomentsAggregate.single(arg.get()),
       numbersBooleans
     )
 
     if (result instanceof CellError) {
       return result
     } else {
-      return result.averageValue() ?? new CellError(ErrorType.DIV_BY_ZERO)
+      const val = result.averageValue()
+      return val === undefined  ? new CellError(ErrorType.DIV_BY_ZERO) : new RegularNumber(val)
     }
   }
 
@@ -246,7 +254,8 @@ export class NumericAggregationPlugin extends FunctionPlugin {
     if (result instanceof CellError) {
       return result
     } else {
-      return result.varSValue() ?? new CellError(ErrorType.DIV_BY_ZERO)
+      const val = result.varSValue()
+      return val === undefined  ? new CellError(ErrorType.DIV_BY_ZERO) : new RegularNumber(val)
     }
   }
 
@@ -256,7 +265,8 @@ export class NumericAggregationPlugin extends FunctionPlugin {
     if (result instanceof CellError) {
       return result
     } else {
-      return result.varPValue() ?? new CellError(ErrorType.DIV_BY_ZERO)
+      const val = result.varPValue()
+      return val === undefined  ? new CellError(ErrorType.DIV_BY_ZERO) : new RegularNumber(val)
     }
   }
 
@@ -275,7 +285,7 @@ export class NumericAggregationPlugin extends FunctionPlugin {
       return result
     } else {
       const val = result.varSValue()
-      return val === undefined  ? new CellError(ErrorType.DIV_BY_ZERO) : Math.sqrt(val)
+      return val === undefined  ? new CellError(ErrorType.DIV_BY_ZERO) : new RegularNumber(Math.sqrt(val))
     }
   }
 
@@ -286,7 +296,7 @@ export class NumericAggregationPlugin extends FunctionPlugin {
       return result
     } else {
       const val = result.varPValue()
-      return val === undefined  ? new CellError(ErrorType.DIV_BY_ZERO) : Math.sqrt(val)
+      return val === undefined  ? new CellError(ErrorType.DIV_BY_ZERO) : new RegularNumber(Math.sqrt(val))
     }
   }
 
@@ -343,7 +353,7 @@ export class NumericAggregationPlugin extends FunctionPlugin {
     return this.reduce<MomentsAggregate>(args, formulaAddress, MomentsAggregate.empty, '_AGGREGATE', (left, right) => {
         return left.compose(right)
       }, (arg): MomentsAggregate => {
-        return MomentsAggregate.single(arg)
+        return MomentsAggregate.single(arg.get())
       },
       strictlyNumbers
     )
@@ -353,7 +363,7 @@ export class NumericAggregationPlugin extends FunctionPlugin {
     return this.reduce<MomentsAggregate>(args, formulaAddress, MomentsAggregate.empty, '_AGGREGATE_A', (left, right) => {
         return left.compose(right)
       }, (arg): MomentsAggregate => {
-        return MomentsAggregate.single(arg)
+        return MomentsAggregate.single(arg.get())
       },
       numbersBooleans
     )
@@ -365,7 +375,8 @@ export class NumericAggregationPlugin extends FunctionPlugin {
     if (result instanceof CellError) {
       return result
     } else {
-      return result.averageValue() ?? new CellError(ErrorType.DIV_BY_ZERO)
+      const val = result.averageValue()
+      return val === undefined  ? new CellError(ErrorType.DIV_BY_ZERO) : new RegularNumber(val)
     }
   }
 
@@ -375,7 +386,8 @@ export class NumericAggregationPlugin extends FunctionPlugin {
     if (result instanceof CellError) {
       return result
     } else {
-      return result.varSValue() ?? new CellError(ErrorType.DIV_BY_ZERO)
+      const val = result.varSValue()
+      return val === undefined  ? new CellError(ErrorType.DIV_BY_ZERO) : new RegularNumber(val)
     }
   }
 
@@ -385,7 +397,8 @@ export class NumericAggregationPlugin extends FunctionPlugin {
     if (result instanceof CellError) {
       return result
     } else {
-      return result.varPValue() ?? new CellError(ErrorType.DIV_BY_ZERO)
+      const val = result.varPValue()
+      return val === undefined  ? new CellError(ErrorType.DIV_BY_ZERO) : new RegularNumber(val)
     }
   }
 
@@ -396,7 +409,7 @@ export class NumericAggregationPlugin extends FunctionPlugin {
       return result
     } else {
       const val = result.varSValue()
-      return val === undefined  ? new CellError(ErrorType.DIV_BY_ZERO) : Math.sqrt(val)
+      return val === undefined  ? new CellError(ErrorType.DIV_BY_ZERO) : new RegularNumber(Math.sqrt(val))
     }
   }
 
@@ -407,31 +420,31 @@ export class NumericAggregationPlugin extends FunctionPlugin {
       return result
     } else {
       const val = result.varPValue()
-      return val === undefined  ? new CellError(ErrorType.DIV_BY_ZERO) : Math.sqrt(val)
+      return val === undefined  ? new CellError(ErrorType.DIV_BY_ZERO) : new RegularNumber(Math.sqrt(val))
     }
   }
 
   private doCount(args: Ast[], formulaAddress: SimpleCellAddress): InternalScalarValue {
-    const value = this.reduce(args, formulaAddress, 0, 'COUNT',
-      (left, right) => left + right, identityMap,
-      (arg) => (typeof arg === 'number') ? 1 : 0
+    const value = this.reduce(args, formulaAddress, new RegularNumber(0), 'COUNT',
+      (left, right) => new RegularNumber(left.get() + right.get()), identityMap,
+      (arg) => new RegularNumber((arg instanceof ExtendedNumber) ? 1 : 0)
     )
 
     return value
   }
 
   private doCounta(args: Ast[], formulaAddress: SimpleCellAddress): InternalScalarValue {
-    const value = this.reduce(args, formulaAddress, 0, 'COUNTA', (left, right) => left + right,
+    const value = this.reduce(args, formulaAddress, new RegularNumber(0), 'COUNTA', (left, right) => new RegularNumber(left.get() + right.get()),
       identityMap,
-      (arg) => (arg === EmptyValue) ? 0 : 1
+      (arg) => new RegularNumber((arg === EmptyValue) ? 0 : 1)
     )
 
     return value
   }
 
   private doMax(args: Ast[], formulaAddress: SimpleCellAddress): InternalScalarValue {
-    const value = this.reduce(args, formulaAddress, Number.NEGATIVE_INFINITY, 'MAX',
-      (left, right) => Math.max(left, right),
+    const value = this.reduce(args, formulaAddress, new RegularNumber(Number.NEGATIVE_INFINITY), 'MAX',
+      (left, right) => new RegularNumber(Math.max(left.get(), right.get())),
       identityMap, strictlyNumbers
     )
 
@@ -439,8 +452,8 @@ export class NumericAggregationPlugin extends FunctionPlugin {
   }
 
   private doMin(args: Ast[], formulaAddress: SimpleCellAddress): InternalScalarValue {
-    const value = this.reduce(args, formulaAddress, Number.POSITIVE_INFINITY, 'MIN',
-      (left, right) => Math.min(left, right),
+    const value = this.reduce(args, formulaAddress, new RegularNumber(Number.POSITIVE_INFINITY), 'MIN',
+      (left, right) => new RegularNumber(Math.min(left.get(), right.get())),
       identityMap, strictlyNumbers
     )
 
@@ -448,14 +461,14 @@ export class NumericAggregationPlugin extends FunctionPlugin {
   }
 
   private doSum(args: Ast[], formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.reduce(args, formulaAddress, 0, 'SUM', this.addWithEpsilon, identityMap, strictlyNumbers)
+    return this.reduce(args, formulaAddress, new RegularNumber(0), 'SUM', this.addWithEpsilon, identityMap, strictlyNumbers)
   }
 
   private doProduct(args: Ast[], formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.reduce(args, formulaAddress, 1, 'PRODUCT', (left, right) => left * right, identityMap, strictlyNumbers)
+    return this.reduce(args, formulaAddress, new RegularNumber(1), 'PRODUCT', (left, right) => new RegularNumber(left.get() * right.get()), identityMap, strictlyNumbers)
   }
 
-  private addWithEpsilon = (left: number, right: number): number => this.interpreter.arithmeticHelper.addWithEpsilon(left, right)
+  private addWithEpsilon = (left: ExtendedNumber, right: ExtendedNumber): RegularNumber => this.interpreter.arithmeticHelper.addWithEpsilon(left, right)
 
   /**
    * Reduces procedure arguments with given reducing function
@@ -491,7 +504,7 @@ export class NumericAggregationPlugin extends FunctionPlugin {
             if (arg instanceof CellError) {
               return arg
             } else {
-              return mapFunction(arg)
+              return mapFunction(new RegularNumber(arg))
             }
           })
           .reduce((left, right) => {
@@ -613,21 +626,21 @@ export class NumericAggregationPlugin extends FunctionPlugin {
   }
 }
 
-function strictlyNumbers(arg: InternalScalarValue): Maybe<CellError | number> {
-  if (typeof arg === 'number' || arg instanceof CellError) {
+function strictlyNumbers(arg: InternalScalarValue): Maybe<CellError | ExtendedNumber> {
+  if (arg instanceof ExtendedNumber || arg instanceof CellError) {
     return arg
   } else {
     return undefined
   }
 }
 
-function numbersBooleans(arg: InternalScalarValue): Maybe<CellError | number> {
-  if (typeof arg === 'boolean') {
+function numbersBooleans(arg: InternalScalarValue): Maybe<CellError | ExtendedNumber> {
+  if (arg instanceof ExtendedBoolean) {
     return coerceBooleanToNumber(arg)
-  } else if (typeof arg === 'number' || arg instanceof CellError) {
+  } else if (arg instanceof ExtendedNumber || arg instanceof CellError) {
     return arg
-  } else if (typeof arg === 'string') {
-    return 0
+  } else if (arg instanceof ExtendedString) {
+    return new RegularNumber(0)
   } else {
     return undefined
   }
