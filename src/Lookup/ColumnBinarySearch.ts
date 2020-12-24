@@ -8,7 +8,13 @@ import {SimpleCellAddress} from '../Cell'
 import {Config} from '../Config'
 import {DependencyGraph} from '../DependencyGraph'
 import {rangeLowerBound} from '../interpreter/binarySearch'
-import {InternalNoErrorScalarValue, InternalScalarValue} from '../interpreter/InterpreterValue'
+import {
+  getRawScalarValue,
+  InternalNoErrorScalarValue,
+  InternalScalarValue,
+  RawNoErrorScalarValue,
+  RawScalarValue
+} from '../interpreter/InterpreterValue'
 import {Matrix} from '../Matrix'
 import {ColumnSearchStrategy} from './SearchStrategy'
 import {ColumnsSpan} from '../Span'
@@ -23,11 +29,11 @@ export class ColumnBinarySearch extends AdvancedFind implements ColumnSearchStra
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars 
-  public add(value: InternalScalarValue | Matrix, address: SimpleCellAddress): void {}
+  public add(value: RawScalarValue | Matrix, address: SimpleCellAddress): void {}
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  public remove(value: InternalScalarValue | Matrix | null, address: SimpleCellAddress): void {}
+  public remove(value: RawScalarValue | Matrix | null, address: SimpleCellAddress): void {}
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  public change(oldValue: InternalScalarValue | Matrix | null, newValue: InternalScalarValue | Matrix, address: SimpleCellAddress): void {}
+  public change(oldValue: RawScalarValue | Matrix | null, newValue: RawScalarValue | Matrix, address: SimpleCellAddress): void {}
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public addColumns(columnsSpan: ColumnsSpan): void {}
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -35,15 +41,15 @@ export class ColumnBinarySearch extends AdvancedFind implements ColumnSearchStra
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public removeSheet(sheetId: number): void {}
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  public moveValues(sourceRange: IterableIterator<[InternalScalarValue, SimpleCellAddress]>, toRight: number, toBottom: number, toSheet: number): void {}
+  public moveValues(sourceRange: IterableIterator<[RawScalarValue, SimpleCellAddress]>, toRight: number, toBottom: number, toSheet: number): void {}
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  public removeValues(range: IterableIterator<[InternalScalarValue, SimpleCellAddress]>): void {}
+  public removeValues(range: IterableIterator<[RawScalarValue, SimpleCellAddress]>): void {}
 
   public destroy(): void {}
 
-  public find(key: InternalNoErrorScalarValue, range: AbsoluteCellRange, sorted: boolean): number {
+  public find(key: RawNoErrorScalarValue, range: AbsoluteCellRange, sorted: boolean): number {
     if (range.height() < this.config.binarySearchThreshold || !sorted) {
-      const values = this.dependencyGraph.computeListOfValuesInRange(range)
+      const values = this.dependencyGraph.computeListOfValuesInRange(range).map(getRawScalarValue)
       const index =  values.indexOf(key)
       return index < 0 ? index : index + range.start.row
     } else {

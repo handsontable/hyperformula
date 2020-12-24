@@ -19,7 +19,7 @@ import {
   EmptyValue, ExtendedBoolean, ExtendedNumber, ExtendedString, getRawNoErrorValue, getRawScalarValue,
   InternalNoErrorScalarValue,
   InternalScalarValue,
-  InterpreterValue, RegularNumber
+  InterpreterValue, RawNoErrorScalarValue, RegularNumber
 } from './InterpreterValue'
 import {SimpleRangeValue} from './SimpleRangeValue'
 import Collator = Intl.Collator
@@ -586,8 +586,8 @@ export function coerceScalarToString(arg: InternalScalarValue): ExtendedString |
   }
 }
 
-export function zeroIfEmpty(arg: InternalNoErrorScalarValue): InternalNoErrorScalarValue {
-  return arg === EmptyValue ? new RegularNumber(0) : arg
+export function zeroIfEmpty(arg: RawNoErrorScalarValue): RawNoErrorScalarValue {
+  return arg === EmptyValue ? 0 : arg
 }
 
 export function numberCmp(left: number, right: number): number {

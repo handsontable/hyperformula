@@ -64,7 +64,7 @@ export class LookupPlugin extends FunctionPlugin {
    * @param formulaAddress
    */
   public vlookup(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('VLOOKUP'), (key: InternalNoErrorScalarValue, rangeValue: SimpleRangeValue, index: number, sorted: boolean) => {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('VLOOKUP'), (key: RawNoErrorScalarValue, rangeValue: SimpleRangeValue, index: number, sorted: boolean) => {
       const range = rangeValue.range()
 
       if (range === undefined) {
@@ -88,7 +88,7 @@ export class LookupPlugin extends FunctionPlugin {
    * @param formulaAddress
    */
   public hlookup(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('HLOOKUP'), (key: InternalNoErrorScalarValue, rangeValue: SimpleRangeValue, index: number, sorted: boolean) => {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('HLOOKUP'), (key: RawNoErrorScalarValue, rangeValue: SimpleRangeValue, index: number, sorted: boolean) => {
       const range = rangeValue.range()
       if (range === undefined) {
         return new CellError(ErrorType.VALUE, ErrorMessage.WrongType)
@@ -105,7 +105,7 @@ export class LookupPlugin extends FunctionPlugin {
   }
 
   public match(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('MATCH'), (key: InternalNoErrorScalarValue, rangeValue: SimpleRangeValue, sorted: number) => {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('MATCH'), (key: RawNoErrorScalarValue, rangeValue: SimpleRangeValue, sorted: number) => {
       const range = rangeValue.range()
       if (range === undefined) {
         return new CellError(ErrorType.VALUE, ErrorMessage.WrongType)
