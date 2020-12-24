@@ -5,7 +5,7 @@
 
 import {CellError, ErrorType, SimpleCellAddress} from '../../Cell'
 import {ProcedureAst} from '../../parser'
-import {EmptyValueType, InternalScalarValue} from '../InterpreterValue'
+import {EmptyValueType, InternalScalarValue, RawScalarValue} from '../InterpreterValue'
 import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
 
 /**
@@ -32,7 +32,7 @@ export class CountUniquePlugin extends FunctionPlugin {
    * @param formulaAddress
    */
   public countunique(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('COUNTUNIQUE'), (...args: InternalScalarValue[]) => {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('COUNTUNIQUE'), (...args: RawScalarValue[]) => {
       const valuesSet = new Set<number | string | boolean | EmptyValueType>()
       const errorsSet = new Set<ErrorType>()
 

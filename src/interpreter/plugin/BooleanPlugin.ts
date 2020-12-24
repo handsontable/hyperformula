@@ -26,8 +26,8 @@ export class BooleanPlugin extends FunctionPlugin {
       method: 'conditionalIf',
       parameters: [
           {argumentType: ArgumentTypes.BOOLEAN},
-          {argumentType: ArgumentTypes.SCALAR},
-          {argumentType: ArgumentTypes.SCALAR, defaultValue: false},
+          {argumentType: ArgumentTypes.SCALAR, passSubtype: true},
+          {argumentType: ArgumentTypes.SCALAR, defaultValue: false, passSubtype: true},
         ],
     },
     'AND': {
@@ -63,31 +63,31 @@ export class BooleanPlugin extends FunctionPlugin {
     'SWITCH': {
       method: 'switch',
       parameters: [
-          {argumentType: ArgumentTypes.NOERROR},
-          {argumentType: ArgumentTypes.SCALAR},
-          {argumentType: ArgumentTypes.SCALAR},
+          {argumentType: ArgumentTypes.NOERROR, passSubtype: true},
+          {argumentType: ArgumentTypes.SCALAR, passSubtype: true},
+          {argumentType: ArgumentTypes.SCALAR, passSubtype: true},
         ],
         repeatLastArgs: 1,
     },
     'IFERROR': {
       method: 'iferror',
       parameters:  [
-          {argumentType: ArgumentTypes.SCALAR},
-          {argumentType: ArgumentTypes.SCALAR},
+          {argumentType: ArgumentTypes.SCALAR, passSubtype: true},
+          {argumentType: ArgumentTypes.SCALAR, passSubtype: true},
         ]
     },
     'IFNA': {
       method: 'ifna',
       parameters: [
-          {argumentType: ArgumentTypes.SCALAR},
-          {argumentType: ArgumentTypes.SCALAR},
+          {argumentType: ArgumentTypes.SCALAR, passSubtype: true},
+          {argumentType: ArgumentTypes.SCALAR, passSubtype: true},
         ]
     },
     'CHOOSE': {
       method: 'choose',
       parameters:  [
           {argumentType: ArgumentTypes.INTEGER, minValue: 1},
-          {argumentType: ArgumentTypes.SCALAR},
+          {argumentType: ArgumentTypes.SCALAR, passSubtype: true},
         ],
         repeatLastArgs: 1,
     },

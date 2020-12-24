@@ -6,7 +6,7 @@
 import {CellError, ErrorType, SimpleCellAddress} from '../../Cell'
 import {ErrorMessage} from '../../error-message'
 import {ProcedureAst} from '../../parser'
-import {EmptyValue, InternalScalarValue, InterpreterValue} from '../InterpreterValue'
+import {EmptyValue, ExtendedNumber, InternalScalarValue, InterpreterValue} from '../InterpreterValue'
 import {SimpleRangeValue} from '../SimpleRangeValue'
 import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
 
@@ -224,7 +224,7 @@ export class FinancialPlugin extends FunctionPlugin {
       method: 'npv',
       parameters: [
         {argumentType: ArgumentTypes.NUMBER},
-        {argumentType: ArgumentTypes.ANY},
+        {argumentType: ArgumentTypes.ANY, passSubtype: true},
       ],
       repeatLastArgs: 1
     },
@@ -611,8 +611,8 @@ export class FinancialPlugin extends FunctionPlugin {
           }
         }
         for(const val of vals) {
-          if(typeof val === 'number') {
-            value *= 1+val
+          if(val instanceof ExtendedNumber) {
+            value *= 1+val.get()
           } else if(val !== EmptyValue) {
             return new CellError(ErrorType.VALUE, ErrorMessage.NumberExpected)
           }
@@ -689,18 +689,18 @@ export class FinancialPlugin extends FunctionPlugin {
       (rate: number, values: SimpleRangeValue, dates: SimpleRangeValue) => {
         const valArr = values.valuesFromTopLeftCorner()
         for(const val of valArr) {
-          if(typeof val !== 'number') {
+          if(!(val instanceof ExtendedNumber)) {
             return new CellError(ErrorType.VALUE, ErrorMessage.NumberExpected)
           }
         }
-        const valArrNum = valArr as number[]
+        const valArrNum = (valArr as ExtendedNumber[]).map((val) => val.get())
         const dateArr = dates.valuesFromTopLeftCorner()
         for(const date of dateArr) {
-          if(typeof date !== 'number') {
+          if(!(date instanceof ExtendedNumber)) {
             return new CellError(ErrorType.VALUE, ErrorMessage.NumberExpected)
           }
         }
-        const dateArrNum = dateArr as number[]
+        const dateArrNum = (dateArr as ExtendedNumber[]).map((val) => val.get())
         if(dateArrNum.length !== valArrNum.length) {
           return new CellError(ErrorType.NUM, ErrorMessage.EqualLength)
         }

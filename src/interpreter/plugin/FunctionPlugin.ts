@@ -321,12 +321,12 @@ export abstract class FunctionPlugin {
     args: Ast[],
     formulaAddress: SimpleCellAddress,
     argumentDefinitions: FunctionArguments,
-    noArgCallback: () => InternalScalarValue,
-    referenceCallback: (reference: SimpleCellAddress) => InternalScalarValue,
-    nonReferenceCallback: (...arg: any) => InternalScalarValue = () => new CellError(ErrorType.NA, ErrorMessage.CellRefExpected)
+    noArgCallback: () => InternalScalarValue | RawScalarValue,
+    referenceCallback: (reference: SimpleCellAddress) => InternalScalarValue | RawScalarValue,
+    nonReferenceCallback: (...arg: any) => InternalScalarValue | RawScalarValue = () => new CellError(ErrorType.NA, ErrorMessage.CellRefExpected)
   ) => {
     if (args.length === 0) {
-      return noArgCallback()
+      return putRawScalarValue(noArgCallback())
     } else if (args.length > 1) {
       return new CellError(ErrorType.NA, ErrorMessage.WrongArgNumber)
     }
@@ -349,7 +349,7 @@ export abstract class FunctionPlugin {
     }
 
     if (cellReference !== undefined) {
-      return referenceCallback(cellReference)
+      return putRawScalarValue(referenceCallback(cellReference))
     }
 
     return this.runFunction(args, formulaAddress, argumentDefinitions, nonReferenceCallback)

@@ -7,7 +7,14 @@ import {CellError, ErrorType, SimpleCellAddress} from '../../Cell'
 import {FormulaCellVertex, MatrixVertex} from '../../DependencyGraph'
 import {ErrorMessage} from '../../error-message'
 import {AstNodeType, ProcedureAst} from '../../parser'
-import {EmptyValue, InternalScalarValue} from '../InterpreterValue'
+import {
+  EmptyValue,
+  ExtendedBoolean,
+  ExtendedNumber,
+  ExtendedString,
+  InternalScalarValue,
+  RegularNumber
+} from '../InterpreterValue'
 import {SimpleRangeValue} from '../SimpleRangeValue'
 import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
 
@@ -234,7 +241,7 @@ export class InformationPlugin extends FunctionPlugin {
    */
   public isnumber(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.runFunction(ast.args, formulaAddress, this.metadata('ISNUMBER'), (arg: InternalScalarValue) =>
-      (typeof arg === 'number')
+      (arg instanceof ExtendedNumber)
     )
   }
 
@@ -248,7 +255,7 @@ export class InformationPlugin extends FunctionPlugin {
    */
   public islogical(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.runFunction(ast.args, formulaAddress, this.metadata('ISLOGICAL'), (arg: InternalScalarValue) =>
-      (typeof arg === 'boolean')
+      (arg instanceof ExtendedBoolean)
     )
   }
 
@@ -276,7 +283,7 @@ export class InformationPlugin extends FunctionPlugin {
    */
   public istext(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.runFunction(ast.args, formulaAddress, this.metadata('ISTEXT'), (arg: InternalScalarValue) =>
-      (typeof arg === 'string')
+      (arg instanceof ExtendedString)
     )
   }
 
@@ -290,7 +297,7 @@ export class InformationPlugin extends FunctionPlugin {
    */
   public isnontext(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.runFunction(ast.args, formulaAddress, this.metadata('ISNONTEXT'), (arg: InternalScalarValue) =>
-      (typeof arg !== 'string')
+      !(arg instanceof ExtendedString)
     )
   }
 
@@ -326,7 +333,7 @@ export class InformationPlugin extends FunctionPlugin {
     }
     const rangeAst = ast.args[0]
     if (rangeAst.type === AstNodeType.CELL_RANGE) {
-      return (rangeAst.end.col - rangeAst.start.col + 1)
+      return new RegularNumber(rangeAst.end.col - rangeAst.start.col + 1)
     } else {
       return new CellError(ErrorType.VALUE, ErrorMessage.CellRangeExpected)
     }
@@ -364,7 +371,7 @@ export class InformationPlugin extends FunctionPlugin {
     }
     const rangeAst = ast.args[0]
     if (rangeAst.type === AstNodeType.CELL_RANGE) {
-      return (rangeAst.end.row - rangeAst.start.row + 1)
+      return new RegularNumber(rangeAst.end.row - rangeAst.start.row + 1)
     } else {
       return new CellError(ErrorType.VALUE, ErrorMessage.CellRangeExpected)
     }

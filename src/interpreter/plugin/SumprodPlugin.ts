@@ -6,7 +6,7 @@
 import {CellError, ErrorType, SimpleCellAddress} from '../../Cell'
 import {ErrorMessage} from '../../error-message'
 import {ProcedureAst} from '../../parser'
-import {InternalScalarValue} from '../InterpreterValue'
+import {ExtendedNumber, InternalScalarValue} from '../InterpreterValue'
 import {SimpleRangeValue} from '../SimpleRangeValue'
 import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
 
@@ -41,8 +41,8 @@ export class SumprodPlugin extends FunctionPlugin {
         } else {
           const lval = this.coerceScalarToNumberOrError(l.value)
           const rval = this.coerceScalarToNumberOrError(r.value)
-          if (typeof lval === 'number' && typeof rval === 'number') {
-            result += lval * rval
+          if (lval instanceof ExtendedNumber && rval instanceof ExtendedNumber) {
+            result += lval.get() * rval.get()
           }
         }
       }

@@ -6,7 +6,7 @@
 import {CellError, ErrorType, SimpleCellAddress} from '../../Cell'
 import {ErrorMessage} from '../../error-message'
 import {ProcedureAst} from '../../parser'
-import {InternalScalarValue} from '../InterpreterValue'
+import {InternalScalarValue, RawScalarValue} from '../InterpreterValue'
 import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
 
 /**
@@ -325,7 +325,7 @@ export class TextPlugin extends FunctionPlugin {
   }
 
   public t(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('T'), (arg: InternalScalarValue) => {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('T'), (arg: RawScalarValue) => {
       if (arg instanceof CellError) {
         return arg
       }

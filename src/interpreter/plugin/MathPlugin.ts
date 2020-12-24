@@ -6,7 +6,7 @@
 import {CellError, ErrorType, SimpleCellAddress} from '../../Cell'
 import {ErrorMessage} from '../../error-message'
 import {ProcedureAst} from '../../parser'
-import {InternalScalarValue, InterpreterValue} from '../InterpreterValue'
+import {ExtendedNumber, InternalScalarValue, InterpreterValue} from '../InterpreterValue'
 import {SimpleRangeValue} from '../SimpleRangeValue'
 import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
 
@@ -307,8 +307,8 @@ export class MathPlugin extends FunctionPlugin {
           if(valY instanceof CellError) {
             return valY
           }
-          if(typeof valX === 'number' && typeof valY === 'number') {
-            ret += valX*valX - valY*valY
+          if(valX instanceof ExtendedNumber && valY instanceof ExtendedNumber) {
+            ret += Math.pow(valX.get(),2) - Math.pow(valY.get(),2)
           }
         }
         return ret
@@ -335,8 +335,8 @@ export class MathPlugin extends FunctionPlugin {
           if(valY instanceof CellError) {
             return valY
           }
-          if(typeof valX === 'number' && typeof valY === 'number') {
-            ret += valX*valX + valY*valY
+          if(valX instanceof ExtendedNumber && valY instanceof ExtendedNumber) {
+            ret += Math.pow(valX.get(),2) + Math.pow(valY.get(),2)
           }
         }
         return ret
@@ -363,8 +363,8 @@ export class MathPlugin extends FunctionPlugin {
           if(valY instanceof CellError) {
             return valY
           }
-          if(typeof valX === 'number' && typeof valY === 'number') {
-            ret += (valX-valY)*(valX-valY)
+          if(valX instanceof ExtendedNumber && valY instanceof ExtendedNumber) {
+            ret += Math.pow(valX.get()-valY.get(),2)
           }
         }
         return ret

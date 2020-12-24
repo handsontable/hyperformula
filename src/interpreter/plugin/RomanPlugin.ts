@@ -6,7 +6,7 @@
 import {CellError, ErrorType, SimpleCellAddress} from '../../Cell'
 import {ErrorMessage} from '../../error-message'
 import {ProcedureAst} from '../../parser'
-import {InternalScalarValue} from '../InterpreterValue'
+import {getRawScalarValue, InternalScalarValue, putRawScalarValue, RawScalarValue} from '../InterpreterValue'
 import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
 
 export class RomanPlugin extends FunctionPlugin {
@@ -28,18 +28,18 @@ export class RomanPlugin extends FunctionPlugin {
 
   public roman(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.runFunction(ast.args, formulaAddress, this.metadata('ROMAN'),
-      (val: number, mode: InternalScalarValue) => {
+      (val: number, mode: RawScalarValue) => {
         val = Math.trunc(val)
         if(mode === false) {
           mode = 4
         } else if(mode === true) {
           mode = 0
         }
-        mode = this.coerceScalarToNumberOrError(mode)
+        mode = getRawScalarValue(this.coerceScalarToNumberOrError(putRawScalarValue(mode)))
         if(mode instanceof CellError) {
           return mode
         }
-        mode = Math.trunc(mode)
+        mode = Math.trunc(mode as number)
         if(mode < 0) {
           return new CellError(ErrorType.VALUE, ErrorMessage.ValueSmall)
         }

@@ -8,7 +8,7 @@ import {ErrorMessage} from '../../error-message'
 import {Maybe} from '../../Maybe'
 import {ProcedureAst} from '../../parser'
 import {Condition, CriterionFunctionCompute} from '../CriterionFunctionCompute'
-import {InternalScalarValue} from '../InterpreterValue'
+import {ExtendedNumber, InternalScalarValue, RegularNumber} from '../InterpreterValue'
 import {SimpleRangeValue} from '../SimpleRangeValue'
 import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
 
@@ -125,7 +125,7 @@ export class SumifPlugin extends FunctionPlugin {
         return  new CriterionFunctionCompute<InternalScalarValue>(
           this.interpreter,
           sumifCacheKey,
-          0,
+          new RegularNumber(0),
           (left, right) => this.interpreter.arithmeticHelper.nonstrictadd(left, right),
           (arg) => arg,
         ).compute(valuesArg, [new Condition(conditionArg, criterion)])
@@ -148,7 +148,7 @@ export class SumifPlugin extends FunctionPlugin {
       return new CriterionFunctionCompute<InternalScalarValue>(
         this.interpreter,
         sumifCacheKey,
-        0,
+        new RegularNumber(0),
         (left, right) => this.interpreter.arithmeticHelper.nonstrictadd(left, right),
         (arg) => arg,
       ).compute(values, conditions)
@@ -171,8 +171,8 @@ export class SumifPlugin extends FunctionPlugin {
           AverageResult.empty,
           (left, right) => left.compose(right),
           (arg: InternalScalarValue) => {
-            if (typeof arg === 'number') {
-              return AverageResult.single(arg)
+            if (arg instanceof ExtendedNumber) {
+              return AverageResult.single(arg.get())
             } else {
               return AverageResult.empty
             }
