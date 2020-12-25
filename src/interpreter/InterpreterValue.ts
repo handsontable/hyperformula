@@ -46,6 +46,9 @@ export abstract class ExtendedNumber implements ExtendedVal {
   public get(): number {
     return this.val
   }
+  public clone(val: number): this{
+    return new (<any>this.constructor)(val)
+  }
 }
 
 export class RegularNumber extends ExtendedNumber {}

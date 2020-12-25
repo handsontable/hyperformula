@@ -181,7 +181,9 @@ export class ArithmeticHelper {
     return this.collator.compare(left, right)
   }
 
-  public pow = Math.pow
+  public pow = (left: ExtendedNumber, right: ExtendedNumber) => {
+    return new RegularNumber(Math.pow(left.get(), right.get()))
+  }
 
   //FIXME
   public addWithEpsilon = (leftArg: ExtendedNumber, rightArg: ExtendedNumber) => {
@@ -604,9 +606,9 @@ export function isNumberOverflow(arg: number): boolean {
   return (isNaN(arg) || arg === Infinity || arg === -Infinity)
 }
 
-export function fixNegativeZero(arg: number): number {
-  if (arg === 0) {
-    return 0
+export function fixNegativeZero(arg: ExtendedNumber): ExtendedNumber {
+  if (arg.get() === 0) {
+    return arg.clone(0)
   } else {
     return arg
   }
