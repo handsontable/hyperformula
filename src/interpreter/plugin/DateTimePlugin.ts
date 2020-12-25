@@ -23,7 +23,14 @@ import {ErrorMessage} from '../../error-message'
 import {format} from '../../format/format'
 import {Maybe} from '../../Maybe'
 import {ProcedureAst} from '../../parser'
-import {EmptyValue, InternalNoErrorScalarValue, InternalScalarValue} from '../InterpreterValue'
+import {
+  DateNumber,
+  DateTimeNumber,
+  EmptyValue,
+  InternalNoErrorScalarValue,
+  InternalScalarValue, RawNoErrorScalarValue,
+  TimeNumber
+} from '../InterpreterValue'
 import {SimpleRangeValue} from '../SimpleRangeValue'
 import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
 
@@ -242,8 +249,12 @@ export class DateTimePlugin extends FunctionPlugin {
 
       const date = {year: y, month: m, day: 1}
       if (this.interpreter.dateHelper.isValidDate(date)) {
-        const ret = this.interpreter.dateHelper.dateToNumber(date) + (d - 1)
-        return this.interpreter.dateHelper.getWithinBounds(ret) ?? new CellError(ErrorType.NUM, ErrorMessage.DateBounds)
+        let ret: Maybe<number> = this.interpreter.dateHelper.dateToNumber(date) + (d - 1)
+        ret = this.interpreter.dateHelper.getWithinBounds(ret)
+        if(ret === undefined) {
+          return new CellError(ErrorType.NUM, ErrorMessage.DateBounds)
+        }
+        return new DateNumber(ret)
       }
       return new CellError(ErrorType.VALUE, ErrorMessage.InvalidDate)
     })
@@ -256,7 +267,7 @@ export class DateTimePlugin extends FunctionPlugin {
         if(ret<0) {
           return new CellError(ErrorType.NUM, ErrorMessage.NegativeTime)
         }
-        return ret%1
+        return new TimeNumber(ret%1)
       }
     )
   }
@@ -264,8 +275,12 @@ export class DateTimePlugin extends FunctionPlugin {
   public eomonth(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.runFunction(ast.args, formulaAddress, this.metadata('EOMONTH'), (dateNumber, numberOfMonthsToShift) => {
       const date = this.interpreter.dateHelper.numberToSimpleDate(dateNumber)
-      const ret = this.interpreter.dateHelper.dateToNumber(this.interpreter.dateHelper.endOfMonth(offsetMonth(date, numberOfMonthsToShift)))
-      return this.interpreter.dateHelper.getWithinBounds(ret) ?? new CellError(ErrorType.NUM, ErrorMessage.DateBounds)
+      let ret: Maybe<number> = this.interpreter.dateHelper.dateToNumber(this.interpreter.dateHelper.endOfMonth(offsetMonth(date, numberOfMonthsToShift)))
+      ret = this.interpreter.dateHelper.getWithinBounds(ret)
+      if(ret === undefined) {
+        return new CellError(ErrorType.NUM, ErrorMessage.DateBounds)
+      }
+      return new DateNumber(ret)
     })
   }
 
@@ -335,7 +350,7 @@ export class DateTimePlugin extends FunctionPlugin {
    */
   public text(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.runFunction(ast.args, formulaAddress, this.metadata('TEXT'),
-      (numberRepresentation, formatArg) =>format(numberRepresentation, formatArg, this.config, this.interpreter.dateHelper)
+      (numberRepresentation, formatArg) => format(numberRepresentation, formatArg, this.config, this.interpreter.dateHelper)
     )
   }
 
@@ -401,8 +416,8 @@ export class DateTimePlugin extends FunctionPlugin {
         if(!instanceOfSimpleDate(dateTime)) {
           return 0
         }
-        return (instanceOfSimpleTime(dateTime) ? Math.trunc(timeToNumber(dateTime)) : 0) +
-          this.interpreter.dateHelper.dateToNumber(dateTime)
+        return new DateNumber((instanceOfSimpleTime(dateTime) ? Math.trunc(timeToNumber(dateTime)) : 0) +
+          this.interpreter.dateHelper.dateToNumber(dateTime))
       }
     )
   }
@@ -414,7 +429,7 @@ export class DateTimePlugin extends FunctionPlugin {
         if(dateNumber===undefined){
           return new CellError(ErrorType.VALUE, ErrorMessage.IncorrectDateTime)
         }
-        return dateNumber%1
+        return new TimeNumber(dateNumber.get()%1)
       }
     )
   }
@@ -423,8 +438,8 @@ export class DateTimePlugin extends FunctionPlugin {
     return this.runFunction(ast.args, formulaAddress, this.metadata('NOW'),
       () => {
         const now = new Date()
-        return timeToNumber({hours: now.getHours(), minutes: now.getMinutes(), seconds: now.getSeconds()})+
-          this.interpreter.dateHelper.dateToNumber({year: now.getFullYear(), month: now.getMonth()+1, day: now.getDay()})
+        return new DateTimeNumber(timeToNumber({hours: now.getHours(), minutes: now.getMinutes(), seconds: now.getSeconds()})+
+          this.interpreter.dateHelper.dateToNumber({year: now.getFullYear(), month: now.getMonth()+1, day: now.getDay()}))
       }
     )
   }
@@ -433,7 +448,7 @@ export class DateTimePlugin extends FunctionPlugin {
     return this.runFunction(ast.args, formulaAddress, this.metadata('TODAY'),
       () => {
         const now = new Date()
-        return this.interpreter.dateHelper.dateToNumber({year: now.getFullYear(), month: now.getMonth()+1, day: now.getDay()})
+        return new DateNumber(this.interpreter.dateHelper.dateToNumber({year: now.getFullYear(), month: now.getMonth()+1, day: now.getDay()}))
       }
     )
   }
@@ -443,8 +458,12 @@ export class DateTimePlugin extends FunctionPlugin {
       (dateNumber: number, delta: number) => {
         const date = this.interpreter.dateHelper.numberToSimpleDate(dateNumber)
         const newDate = truncateDayInMonth(offsetMonth(date, delta))
-        const ret = this.interpreter.dateHelper.dateToNumber(newDate)
-        return this.interpreter.dateHelper.getWithinBounds(ret) ?? new CellError(ErrorType.NUM, ErrorMessage.DateBounds)
+        let ret: Maybe<number> = this.interpreter.dateHelper.dateToNumber(newDate)
+        ret = this.interpreter.dateHelper.getWithinBounds(ret)
+        if(ret === undefined) {
+          return new CellError(ErrorType.NUM, ErrorMessage.DateBounds)
+        }
+        return new DateNumber(ret)
       }
     )
   }
@@ -591,7 +610,7 @@ export class DateTimePlugin extends FunctionPlugin {
     )
   }
 
-  private networkdayscore(start: number, end: number, weekend: InternalNoErrorScalarValue, holidays?: SimpleRangeValue): InternalScalarValue {
+  private networkdayscore(start: number, end: number, weekend: RawNoErrorScalarValue, holidays?: SimpleRangeValue): InternalScalarValue {
     start = Math.trunc(start)
     end = Math.trunc(end)
     let multiplier = 1
@@ -734,7 +753,7 @@ function lowerBound(val: number, sortedArray: number[]): number {
   return upper
 }
 
-function computeWeekendPattern(weekend: InternalNoErrorScalarValue): string | CellError {
+function computeWeekendPattern(weekend: RawNoErrorScalarValue): string | CellError {
   if(typeof weekend !== 'number' && typeof weekend !== 'string') {
     return new CellError(ErrorType.VALUE, ErrorMessage.WrongType)
   }

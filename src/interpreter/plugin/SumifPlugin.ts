@@ -8,7 +8,7 @@ import {ErrorMessage} from '../../error-message'
 import {Maybe} from '../../Maybe'
 import {ProcedureAst} from '../../parser'
 import {Condition, CriterionFunctionCompute} from '../CriterionFunctionCompute'
-import {ExtendedNumber, InternalScalarValue, RegularNumber} from '../InterpreterValue'
+import {ExtendedNumber, InternalScalarValue, RawScalarValue, RegularNumber} from '../InterpreterValue'
 import {SimpleRangeValue} from '../SimpleRangeValue'
 import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
 
@@ -114,7 +114,7 @@ export class SumifPlugin extends FunctionPlugin {
    */
   public sumif(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.runFunction(ast.args, formulaAddress, this.metadata('SUMIF'),
-      (conditionArg: SimpleRangeValue, criterionValue: InternalScalarValue, valuesArg: Maybe<SimpleRangeValue>) => {
+      (conditionArg: SimpleRangeValue, criterionValue: RawScalarValue, valuesArg: Maybe<SimpleRangeValue>) => {
         const criterion = this.interpreter.criterionBuilder.fromCellValue(criterionValue, this.interpreter.arithmeticHelper)
         if (criterion === undefined) {
           return new CellError(ErrorType.VALUE, ErrorMessage.BadCriterion)
@@ -157,7 +157,7 @@ export class SumifPlugin extends FunctionPlugin {
 
   public averageif(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.runFunction(ast.args, formulaAddress, this.metadata('AVERAGEIF'),
-      (conditionArg: SimpleRangeValue, criterionValue: InternalScalarValue, valuesArg: Maybe<SimpleRangeValue>) => {
+      (conditionArg: SimpleRangeValue, criterionValue: RawScalarValue, valuesArg: Maybe<SimpleRangeValue>) => {
         const criterion = this.interpreter.criterionBuilder.fromCellValue(criterionValue, this.interpreter.arithmeticHelper)
         if (criterion === undefined) {
           return new CellError(ErrorType.VALUE, ErrorMessage.BadCriterion)
@@ -200,7 +200,7 @@ export class SumifPlugin extends FunctionPlugin {
    */
   public countif(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.runFunction(ast.args, formulaAddress, this.metadata('COUNTIF'),
-      (conditionArg: SimpleRangeValue, criterionValue: InternalScalarValue) => {
+      (conditionArg: SimpleRangeValue, criterionValue: RawScalarValue) => {
         const criterion = this.interpreter.criterionBuilder.fromCellValue(criterionValue, this.interpreter.arithmeticHelper)
         if (criterion === undefined) {
           return new CellError(ErrorType.VALUE, ErrorMessage.BadCriterion)

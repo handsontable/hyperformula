@@ -19,7 +19,7 @@ import {
   EmptyValue, ExtendedBoolean, ExtendedNumber, ExtendedString, getRawNoErrorValue, getRawScalarValue,
   InternalNoErrorScalarValue,
   InternalScalarValue,
-  InterpreterValue, RawNoErrorScalarValue, RegularNumber
+  InterpreterValue, RawInterpreterValue, RawNoErrorScalarValue, RegularNumber
 } from './InterpreterValue'
 import {SimpleRangeValue} from './SimpleRangeValue'
 import Collator = Intl.Collator
@@ -42,15 +42,15 @@ export class ArithmeticHelper {
     this.actualEps = config.smartRounding ? config.precisionEpsilon : 0
   }
 
-  public eqMatcherFunction(pattern: string): (arg: InterpreterValue) => boolean {
+  public eqMatcherFunction(pattern: string): (arg: RawInterpreterValue) => boolean {
     const regexp = this.buildRegex(pattern)
-    return (cellValue) => (cellValue instanceof ExtendedString && regexp.test(this.normalizeString(cellValue.get())))
+    return (cellValue) => (typeof cellValue === 'string' && regexp.test(this.normalizeString(cellValue)))
   }
 
-  public neqMatcherFunction(pattern: string): (arg: InterpreterValue) => boolean {
+  public neqMatcherFunction(pattern: string): (arg: RawInterpreterValue) => boolean {
     const regexp = this.buildRegex(pattern)
     return (cellValue) => {
-      return (!(cellValue instanceof ExtendedString) || !regexp.test(this.normalizeString(cellValue.get())))
+      return (!(typeof cellValue === 'string') || !regexp.test(this.normalizeString(cellValue)))
     }
   }
 
@@ -162,9 +162,9 @@ export class ArithmeticHelper {
     }
   }
 
-  public floatCmp(leftArg: ExtendedNumber, rightArg: ExtendedNumber): number {
-    const left = leftArg.get()
-    const right = rightArg.get()
+  public floatCmp(leftArg: ExtendedNumber | number, rightArg: ExtendedNumber | number): number {
+    const left = leftArg instanceof ExtendedNumber ? leftArg.get() : leftArg
+    const right = rightArg instanceof ExtendedNumber ? rightArg.get() : rightArg
     const mod = (1 + this.actualEps)
     if ((right >= 0) && (left * mod >= right) && (left <= right * mod)) {
       return 0

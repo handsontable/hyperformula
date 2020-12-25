@@ -6,7 +6,7 @@
 import {CellError, ErrorType, SimpleCellAddress} from '../../Cell'
 import {ErrorMessage} from '../../error-message'
 import {ProcedureAst} from '../../parser'
-import {InternalScalarValue, InterpreterValue} from '../InterpreterValue'
+import {ExtendedNumber, InternalScalarValue, InterpreterValue} from '../InterpreterValue'
 import {SimpleRangeValue} from '../SimpleRangeValue'
 import {
   centralF,
@@ -28,28 +28,28 @@ export class StatisticalAggregationPlugin extends  FunctionPlugin {
     'AVEDEV': {
       method: 'avedev',
       parameters: [
-        {argumentType: ArgumentTypes.ANY},
+        {argumentType: ArgumentTypes.ANY, passSubtype: true},
       ],
       repeatLastArgs: 1
     },
     'DEVSQ': {
       method: 'devsq',
       parameters: [
-        {argumentType: ArgumentTypes.ANY},
+        {argumentType: ArgumentTypes.ANY, passSubtype: true},
       ],
       repeatLastArgs: 1
     },
     'GEOMEAN': {
       method: 'geomean',
       parameters: [
-        {argumentType: ArgumentTypes.ANY},
+        {argumentType: ArgumentTypes.ANY, passSubtype: true},
       ],
       repeatLastArgs: 1
     },
     'HARMEAN': {
       method: 'harmean',
       parameters: [
-        {argumentType: ArgumentTypes.ANY},
+        {argumentType: ArgumentTypes.ANY, passSubtype: true},
       ],
       repeatLastArgs: 1
     },
@@ -129,14 +129,14 @@ export class StatisticalAggregationPlugin extends  FunctionPlugin {
     'SKEW': {
       method: 'skew',
       parameters: [
-        {argumentType: ArgumentTypes.ANY},
+        {argumentType: ArgumentTypes.ANY, passSubtype: true},
       ],
       repeatLastArgs: 1
     },
     'SKEW.P': {
       method: 'skewp',
       parameters: [
-        {argumentType: ArgumentTypes.ANY},
+        {argumentType: ArgumentTypes.ANY, passSubtype: true},
       ],
       repeatLastArgs: 1
     },
@@ -521,15 +521,15 @@ function parseTwoArrays(dataX: SimpleRangeValue, dataY: SimpleRangeValue): CellE
   const arrX = []
   const arrY = []
   while (x = xit.next(), y = yit.next(), !x.done && !y.done) {
-    const xval = x.value
-    const yval = y.value
+    const xval: InternalScalarValue = x.value
+    const yval: InternalScalarValue = y.value
     if (xval instanceof CellError) {
       return xval
     } else if (yval instanceof CellError) {
       return yval
-    } else if (typeof xval === 'number' && typeof yval === 'number') {
-      arrX.push(xval)
-      arrY.push(yval)
+    } else if (xval instanceof ExtendedNumber && yval instanceof ExtendedNumber ) {
+      arrX.push(xval.get())
+      arrY.push(yval.get())
     }
   }
   return [arrX, arrY]

@@ -41,14 +41,14 @@ export class MathPlugin extends FunctionPlugin {
     'GCD': {
       method: 'gcd',
       parameters: [
-        {argumentType: ArgumentTypes.ANY},
+        {argumentType: ArgumentTypes.ANY, passSubtype: true},
       ],
       repeatLastArgs: 1
     },
     'LCM': {
       method: 'lcm',
       parameters: [
-        {argumentType: ArgumentTypes.ANY},
+        {argumentType: ArgumentTypes.ANY, passSubtype: true},
       ],
       repeatLastArgs: 1
     },

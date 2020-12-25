@@ -6,7 +6,7 @@
 import {Config} from '../Config'
 import {Maybe} from '../Maybe'
 import {ArithmeticHelper} from './ArithmeticHelper'
-import {EmptyValue, InternalScalarValue, RawScalarValue} from './InterpreterValue'
+import {EmptyValue, ExtendedString, InternalScalarValue, putRawScalarValue, RawScalarValue} from './InterpreterValue'
 
 export enum CriterionType {
   GREATER_THAN = 'GREATER_THAN',
@@ -30,7 +30,7 @@ export class CriterionBuilder {
     this.falseString = config.translationPackage.getMaybeFunctionTranslation('FALSE')?.toLowerCase() ?? 'false'
   }
 
-  public fromCellValue(raw: InternalScalarValue, arithmeticHelper: ArithmeticHelper): Maybe<CriterionPackage> {
+  public fromCellValue(raw: RawScalarValue, arithmeticHelper: ArithmeticHelper): Maybe<CriterionPackage> {
     if (typeof raw !== 'string' && typeof raw !== 'boolean' && typeof raw !== 'number') {
       return undefined
     }
@@ -43,7 +43,7 @@ export class CriterionBuilder {
     return {raw, lambda: buildCriterionLambda(criterion, arithmeticHelper)}
   }
 
-  public parseCriterion(criterion: InternalScalarValue, arithmeticHelper: ArithmeticHelper): Maybe<Criterion> {
+  public parseCriterion(criterion: RawScalarValue, arithmeticHelper: ArithmeticHelper): Maybe<Criterion> {
     if (typeof criterion === 'number' || typeof criterion === 'boolean') {
       return buildCriterion(CriterionType.EQUAL, criterion)
     } else if (typeof criterion === 'string') {
@@ -59,7 +59,7 @@ export class CriterionBuilder {
         criterionType = CriterionType.EQUAL
         criterionValue = criterion
       }
-      const value = arithmeticHelper.coerceToMaybeNumber(criterionValue)
+      const value = arithmeticHelper.coerceToMaybeNumber(putRawScalarValue(criterionValue))
       const boolvalue = criterionValue.toLowerCase()===this.trueString ? true : criterionValue.toLowerCase() === this.falseString ? false : undefined
       if(criterionType === undefined) {
         return undefined
@@ -71,7 +71,7 @@ export class CriterionBuilder {
           return buildCriterion(criterionType, boolvalue ?? criterionValue)
         }
       } else {
-        return buildCriterion(criterionType, value)
+        return buildCriterion(criterionType, value.get())
       }
     }
     return undefined
@@ -139,7 +139,7 @@ export const buildCriterionLambda = (criterion: Criterion, arithmeticHelper: Ari
             if(cellValue==='') {
               return false
             }
-            const val = arithmeticHelper.coerceToMaybeNumber(cellValue)
+            const val = arithmeticHelper.coerceToMaybeNumber(new ExtendedString(cellValue))
             if(val === undefined) {
               return false
             }
@@ -165,7 +165,7 @@ export const buildCriterionLambda = (criterion: Criterion, arithmeticHelper: Ari
             if(cellValue === '') {
               return true
             }
-            const val = arithmeticHelper.coerceToMaybeNumber(cellValue)
+            const val = arithmeticHelper.coerceToMaybeNumber(new ExtendedString(cellValue))
             if(val === undefined) {
               return true
             }
