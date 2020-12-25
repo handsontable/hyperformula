@@ -26,9 +26,9 @@ import {ProcedureAst} from '../../parser'
 import {
   DateNumber,
   DateTimeNumber,
-  EmptyValue,
+  EmptyValue, ExtendedNumber,
   InternalNoErrorScalarValue,
-  InternalScalarValue, RawNoErrorScalarValue,
+  InternalScalarValue, RawNoErrorScalarValue, RawScalarValue, RegularNumber,
   TimeNumber
 } from '../InterpreterValue'
 import {SimpleRangeValue} from '../SimpleRangeValue'
@@ -610,7 +610,7 @@ export class DateTimePlugin extends FunctionPlugin {
     )
   }
 
-  private networkdayscore(start: number, end: number, weekend: RawNoErrorScalarValue, holidays?: SimpleRangeValue): InternalScalarValue {
+  private networkdayscore(start: number, end: number, weekend: RawNoErrorScalarValue, holidays?: SimpleRangeValue): RawScalarValue {
     start = Math.trunc(start)
     end = Math.trunc(end)
     let multiplier = 1
@@ -631,7 +631,7 @@ export class DateTimePlugin extends FunctionPlugin {
     return multiplier * this.countWorkdays(start, end, weekendPattern, filteredHolidays)
   }
 
-  private workdaycore(start: number, delta: number, weekend: InternalNoErrorScalarValue, holidays?: SimpleRangeValue): InternalScalarValue {
+  private workdaycore(start: number, delta: number, weekend: RawNoErrorScalarValue, holidays?: SimpleRangeValue): RawScalarValue {
     start = Math.trunc(start)
     delta = Math.trunc(delta)
 
@@ -709,8 +709,8 @@ export class DateTimePlugin extends FunctionPlugin {
       if(val === EmptyValue) {
         continue
       }
-      if(typeof val === 'number') {
-        processedHolidays.push(Math.trunc(val))
+      if(val instanceof ExtendedNumber) {
+        processedHolidays.push(Math.trunc(val.get()))
       } else {
         return new CellError(ErrorType.VALUE, ErrorMessage.WrongType)
       }
