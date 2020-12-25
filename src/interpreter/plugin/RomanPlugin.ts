@@ -6,7 +6,12 @@
 import {CellError, ErrorType, SimpleCellAddress} from '../../Cell'
 import {ErrorMessage} from '../../error-message'
 import {ProcedureAst} from '../../parser'
-import {getRawScalarValue, InternalScalarValue, putRawScalarValue, RawScalarValue} from '../InterpreterValue'
+import {
+  getRawValue,
+  InternalScalarValue,
+  putRawValue,
+  RawScalarValue
+} from '../InterpreterValue'
 import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
 
 export class RomanPlugin extends FunctionPlugin {
@@ -35,7 +40,7 @@ export class RomanPlugin extends FunctionPlugin {
         } else if(mode === true) {
           mode = 0
         }
-        mode = getRawScalarValue(this.coerceScalarToNumberOrError(putRawScalarValue(mode)))
+        mode = getRawValue(this.coerceScalarToNumberOrError(putRawValue(mode)))
         if(mode instanceof CellError) {
           return mode
         }

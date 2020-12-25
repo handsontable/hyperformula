@@ -15,7 +15,7 @@ import {DependencyGraph, FormulaCellVertex, MatrixVertex, RangeVertex, Vertex} f
 import {ErrorMessage} from './error-message'
 import {FunctionRegistry} from './interpreter/FunctionRegistry'
 import {Interpreter} from './interpreter/Interpreter'
-import {EmptyValue, InterpreterValue} from './interpreter/InterpreterValue'
+import {EmptyValue, getRawValue, InterpreterValue, RegularNumber} from './interpreter/InterpreterValue'
 import {Matrix} from './Matrix'
 import {NamedExpressions} from './NamedExpressions'
 import {NumberLiteralHelper} from './NumberLiteralHelper'
@@ -64,7 +64,7 @@ export class Evaluator {
             vertex.setCellValue(newCellValue)
             if (newCellValue !== currentValue) {
               changes.addChange(newCellValue, address)
-              this.columnSearch.change(currentValue, newCellValue, address)
+              this.columnSearch.change(getRawValue(currentValue), getRawValue(newCellValue), address)
               return true
             }
             return false
@@ -96,7 +96,7 @@ export class Evaluator {
             vertex.clearCache()
           } else if (vertex instanceof FormulaCellVertex) {
             const address = vertex.getAddress(this.dependencyGraph.lazilyTransformingAstService)
-            this.columnSearch.remove(vertex.valueOrNull(), address)
+            this.columnSearch.remove(getRawValue(vertex.valueOrNull()), address)
             const error = new CellError(ErrorType.CYCLE, undefined, vertex.address)
             vertex.setCellValue(error)
             changes.addChange(error, vertex.address)
@@ -147,7 +147,7 @@ export class Evaluator {
         const formula = vertex.getFormula(this.dependencyGraph.lazilyTransformingAstService)
         const newCellValue = this.evaluateAstToCellValue(formula, address)
         vertex.setCellValue(newCellValue)
-        this.columnSearch.add(newCellValue, address)
+        this.columnSearch.add(getRawValue(newCellValue), address)
       } else if (vertex instanceof MatrixVertex && vertex.isFormula()) {
         const address = vertex.getAddress()
         const formula = vertex.getFormula() as Ast
@@ -171,7 +171,7 @@ export class Evaluator {
     if (interpreterValue instanceof SimpleRangeValue) {
       return interpreterValue
     } else if (interpreterValue === EmptyValue && this.config.evaluateNullToZero) {
-      return 0
+      return new RegularNumber(0)
     } else {
       return interpreterValue
     }

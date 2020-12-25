@@ -16,7 +16,7 @@ export type RawNoErrorScalarValue = number | string | boolean | EmptyValueType
 export type RawScalarValue = RawNoErrorScalarValue | CellError
 export type RawInterpreterValue = RawScalarValue | SimpleRangeValue
 
-export function getRawInterpreterValue(val: InterpreterValue): RawInterpreterValue {
+export function getRawValue<T>(val: ExtendedNumber | ExtendedString | ExtendedBoolean | T): number | string | boolean | T {
   if(val instanceof ExtendedNumber || val instanceof ExtendedBoolean || val instanceof ExtendedString) {
     return val.get()
   } else {
@@ -24,28 +24,13 @@ export function getRawInterpreterValue(val: InterpreterValue): RawInterpreterVal
   }
 }
 
-export function getRawScalarValue(val: InternalScalarValue): RawScalarValue {
-  if(val instanceof ExtendedNumber || val instanceof ExtendedBoolean || val instanceof ExtendedString) {
-    return val.get()
-  } else {
-    return val
-  }
-}
 
-export function getRawNoErrorValue(val: InternalNoErrorScalarValue): RawNoErrorScalarValue {
-  if(val instanceof ExtendedNumber || val instanceof ExtendedBoolean || val instanceof ExtendedString) {
-    return val.get()
-  } else {
-    return val
-  }
-}
-
-export function putRawScalarValue(val: RawScalarValue | InternalScalarValue): InternalScalarValue {
-  if(typeof val === 'number') {
+export function putRawValue<T>(val: number | string | boolean | T): ExtendedNumber | ExtendedString | ExtendedBoolean | T {
+  if (typeof val === 'number') {
     return new RegularNumber(val)
-  } else if(typeof val === 'string') {
+  } else if (typeof val === 'string') {
     return new ExtendedString(val)
-  } else if(typeof val === 'boolean') {
+  } else if (typeof val === 'boolean') {
     return new ExtendedBoolean(val)
   } else {
     return val

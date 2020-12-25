@@ -16,7 +16,7 @@ import {Maybe} from '../Maybe'
 import {NumberLiteralHelper} from '../NumberLiteralHelper'
 import {collatorFromConfig} from '../StringHelper'
 import {
-  EmptyValue, ExtendedBoolean, ExtendedNumber, ExtendedString, getRawNoErrorValue, getRawScalarValue,
+  EmptyValue, ExtendedBoolean, ExtendedNumber, ExtendedString, getRawValue,
   InternalNoErrorScalarValue,
   InternalScalarValue,
   InterpreterValue, RawInterpreterValue, RawNoErrorScalarValue, RegularNumber
@@ -298,7 +298,7 @@ export class ArithmeticHelper {
       }
       return new RegularNumber(val)
     } else {
-      const coercedNumber = Number(getRawScalarValue(arg))
+      const coercedNumber = Number(getRawValue(arg))
       if (isNaN(coercedNumber)) {
         return undefined
       } else {

@@ -8,9 +8,8 @@ import {CellError, simpleCellAddress} from '../Cell'
 import {DependencyGraph} from '../DependencyGraph'
 import {
   EmptyValue,
-  getRawInterpreterValue,
-  getRawScalarValue,
-  InterpreterValue, RawInterpreterValue,
+  getRawValue,
+  RawInterpreterValue,
   RawScalarValue
 } from './InterpreterValue'
 
@@ -30,9 +29,9 @@ export function rangeLowerBound(range: AbsoluteCellRange, key: RawScalarValue, d
 
   let centerValueFn
   if (coordinate === 'row') {
-    centerValueFn = (center: number) =>  getRawInterpreterValue(dependencyGraph.getCellValue(simpleCellAddress(range.sheet, range.start.col, center)))
+    centerValueFn = (center: number) =>  getRawValue(dependencyGraph.getCellValue(simpleCellAddress(range.sheet, range.start.col, center)))
   } else {
-    centerValueFn = (center: number) =>  getRawInterpreterValue(dependencyGraph.getCellValue(simpleCellAddress(range.sheet, center, range.start.row)))
+    centerValueFn = (center: number) =>  getRawValue(dependencyGraph.getCellValue(simpleCellAddress(range.sheet, center, range.start.row)))
   }
 
   return lowerBound(centerValueFn, key, start, end)

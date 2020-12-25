@@ -9,9 +9,7 @@ import {Config} from '../Config'
 import {DependencyGraph} from '../DependencyGraph'
 import {rangeLowerBound} from '../interpreter/binarySearch'
 import {
-  getRawScalarValue,
-  InternalNoErrorScalarValue,
-  InternalScalarValue,
+  getRawValue,
   RawNoErrorScalarValue,
   RawScalarValue
 } from '../interpreter/InterpreterValue'
@@ -49,7 +47,7 @@ export class ColumnBinarySearch extends AdvancedFind implements ColumnSearchStra
 
   public find(key: RawNoErrorScalarValue, range: AbsoluteCellRange, sorted: boolean): number {
     if (range.height() < this.config.binarySearchThreshold || !sorted) {
-      const values = this.dependencyGraph.computeListOfValuesInRange(range).map(getRawScalarValue)
+      const values = this.dependencyGraph.computeListOfValuesInRange(range).map(getRawValue)
       const index =  values.indexOf(key)
       return index < 0 ? index : index + range.start.row
     } else {

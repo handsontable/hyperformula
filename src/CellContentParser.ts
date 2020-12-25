@@ -134,7 +134,7 @@ export class CellContentParser {
         }
         const parsedDateNumber = this.dateHelper.dateStringToDateNumber(trimmedContent)
         if (parsedDateNumber !== undefined) {
-          return new CellContent.Number(parsedDateNumber)
+          return new CellContent.Number(parsedDateNumber.get())
         } else {
           return new CellContent.String(
             content.startsWith('\'') ? content.slice(1) : content,

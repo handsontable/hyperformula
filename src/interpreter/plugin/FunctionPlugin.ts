@@ -16,9 +16,9 @@ import {coerceScalarToBoolean, coerceScalarToString, coerceToRange, complex} fro
 import {Interpreter} from '../Interpreter'
 import {
   ExtendedNumber,
-  getRawInterpreterValue,
+  getRawValue,
   InternalScalarValue,
-  InterpreterValue, putRawScalarValue,
+  InterpreterValue, putRawValue,
   RawNoErrorScalarValue, RawScalarValue
 } from '../InterpreterValue'
 import {SimpleRangeValue} from '../SimpleRangeValue'
@@ -254,7 +254,7 @@ export abstract class FunctionPlugin {
     if(coercedType.passSubtype || ret === undefined) {
       return ret
     } else {
-      return getRawInterpreterValue(ret)
+      return getRawValue(ret)
     }
   }
 
@@ -314,7 +314,7 @@ export abstract class FunctionPlugin {
       }
     }
 
-    return putRawScalarValue(argCoerceFailure ?? fn(...coercedArguments))
+    return putRawValue(argCoerceFailure ?? fn(...coercedArguments))
   }
 
   protected runFunctionWithReferenceArgument = (
@@ -326,7 +326,7 @@ export abstract class FunctionPlugin {
     nonReferenceCallback: (...arg: any) => InternalScalarValue | RawScalarValue = () => new CellError(ErrorType.NA, ErrorMessage.CellRefExpected)
   ) => {
     if (args.length === 0) {
-      return putRawScalarValue(noArgCallback())
+      return putRawValue(noArgCallback())
     } else if (args.length > 1) {
       return new CellError(ErrorType.NA, ErrorMessage.WrongArgNumber)
     }
@@ -349,7 +349,7 @@ export abstract class FunctionPlugin {
     }
 
     if (cellReference !== undefined) {
-      return putRawScalarValue(referenceCallback(cellReference))
+      return putRawValue(referenceCallback(cellReference))
     }
 
     return this.runFunction(args, formulaAddress, argumentDefinitions, nonReferenceCallback)

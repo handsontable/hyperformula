@@ -6,7 +6,7 @@
 import {Config} from '../Config'
 import {Maybe} from '../Maybe'
 import {ArithmeticHelper} from './ArithmeticHelper'
-import {EmptyValue, ExtendedString, InternalScalarValue, putRawScalarValue, RawScalarValue} from './InterpreterValue'
+import {EmptyValue, ExtendedString, putRawValue, RawScalarValue} from './InterpreterValue'
 
 export enum CriterionType {
   GREATER_THAN = 'GREATER_THAN',
@@ -59,7 +59,7 @@ export class CriterionBuilder {
         criterionType = CriterionType.EQUAL
         criterionValue = criterion
       }
-      const value = arithmeticHelper.coerceToMaybeNumber(putRawScalarValue(criterionValue))
+      const value = arithmeticHelper.coerceToMaybeNumber(putRawValue(criterionValue))
       const boolvalue = criterionValue.toLowerCase()===this.trueString ? true : criterionValue.toLowerCase() === this.falseString ? false : undefined
       if(criterionType === undefined) {
         return undefined

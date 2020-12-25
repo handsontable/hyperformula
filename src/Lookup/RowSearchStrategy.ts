@@ -3,7 +3,7 @@
  * Copyright (c) 2020 Handsoncode. All rights reserved.
  */
 
-import {getRawScalarValue, RawNoErrorScalarValue} from '../interpreter/InterpreterValue'
+import {getRawValue, RawNoErrorScalarValue} from '../interpreter/InterpreterValue'
 import {SearchStrategy} from './SearchStrategy'
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
 import {rangeLowerBound} from '../interpreter/binarySearch'
@@ -21,7 +21,7 @@ export class RowSearchStrategy extends AdvancedFind implements SearchStrategy {
 
   public find(key: RawNoErrorScalarValue, range: AbsoluteCellRange, sorted: boolean): number {
     if (range.width() < this.config.binarySearchThreshold || !sorted) {
-      const values = this.dependencyGraph.computeListOfValuesInRange(range).map(getRawScalarValue)
+      const values = this.dependencyGraph.computeListOfValuesInRange(range).map(getRawValue)
       const index =  values.indexOf(key)
       return index < 0 ? index : index + range.start.col
     } else {
