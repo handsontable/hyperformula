@@ -115,7 +115,7 @@ export class ColumnIndex implements ColumnSearchStrategy {
     return rowNumber <= range.end.row ? rowNumber : this.binarySearchStrategy.find(key, range, sorted)
   }
 
-  public advancedFind(keyMatcher: (arg: InternalScalarValue) => boolean, range: AbsoluteCellRange): number {
+  public advancedFind(keyMatcher: (arg: RawInterpreterValue) => boolean, range: AbsoluteCellRange): number {
     return this.binarySearchStrategy.advancedFind(keyMatcher, range)
   }
 

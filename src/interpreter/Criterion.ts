@@ -59,7 +59,7 @@ export class CriterionBuilder {
         criterionType = CriterionType.EQUAL
         criterionValue = criterion
       }
-      const value = arithmeticHelper.coerceToMaybeNumber(putRawValue(criterionValue))
+      const value = arithmeticHelper.coerceToMaybeNumber(putRawValue(criterionValue as RawScalarValue))
       const boolvalue = criterionValue.toLowerCase()===this.trueString ? true : criterionValue.toLowerCase() === this.falseString ? false : undefined
       if(criterionType === undefined) {
         return undefined

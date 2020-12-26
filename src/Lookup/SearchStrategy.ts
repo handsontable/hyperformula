@@ -22,7 +22,7 @@ import {ColumnsSpan} from '../Span'
 export interface SearchStrategy {
   find(key: RawNoErrorScalarValue, range: AbsoluteCellRange, sorted: boolean): number,
 
-  advancedFind(keyMatcher: (arg: InternalScalarValue) => boolean, range: AbsoluteCellRange): number,
+  advancedFind(keyMatcher: (arg: RawInterpreterValue) => boolean, range: AbsoluteCellRange): number,
 }
 
 export interface ColumnSearchStrategy extends SearchStrategy {

@@ -65,7 +65,7 @@ export class Interpreter {
       if (isNumberOverflow(val.get())) {
         return new CellError(ErrorType.NUM, ErrorMessage.NaN)
       } else {
-        val = fixNegativeZero(val)
+        val = val.clone(fixNegativeZero(val.get()))
       }
     }
     return wrapperForAddress(val, formulaAddress)

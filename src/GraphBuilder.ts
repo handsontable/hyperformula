@@ -7,6 +7,7 @@ import {absolutizeDependencies} from './absolutizeDependencies'
 import {CellError, simpleCellAddress, SimpleCellAddress} from './Cell'
 import {CellContent, CellContentParser} from './CellContentParser'
 import {CellDependency} from './CellDependency'
+import {putRawValue, RawScalarValue, RegularNumber} from './interpreter/InterpreterValue'
 import {ColumnSearchStrategy} from './Lookup/SearchStrategy'
 import {Config} from './Config'
 import {
@@ -132,7 +133,7 @@ export class SimpleStrategy implements GraphBuilderStrategy {
           } else if (parsedCellContent instanceof CellContent.Empty) {
             /* we don't care about empty cells here */
           } else {
-            const vertex = new ValueCellVertex(parsedCellContent.value)
+            const vertex = new ValueCellVertex(putRawValue(parsedCellContent.value))
             this.columnIndex.add(parsedCellContent.value, address)
             this.dependencyGraph.addVertex(address, vertex)
           }
@@ -203,7 +204,7 @@ export class MatrixDetectionStrategy implements GraphBuilderStrategy {
           } else if (parsedCellContent instanceof CellContent.Number) {
             matrixHeuristic.add(address)
           } else {
-            const vertex = new ValueCellVertex(parsedCellContent.value)
+            const vertex = new ValueCellVertex(putRawValue(parsedCellContent.value))
             this.columnSearch.add(parsedCellContent.value, address)
             this.dependencyGraph.addVertex(address, vertex)
           }
@@ -218,7 +219,7 @@ export class MatrixDetectionStrategy implements GraphBuilderStrategy {
       const elem = notMatrices[i]
       for (const address of elem.cells.reverse()) {
         const value = sheets[this.dependencyGraph.getSheetName(address.sheet)][address.row][address.col]
-        const vertex = new ValueCellVertex(Number(value))
+        const vertex = new ValueCellVertex(new RegularNumber(Number(value)))
         this.columnSearch.add(Number(value), address)
         this.dependencyGraph.addVertex(address, vertex)
       }

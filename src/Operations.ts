@@ -3,7 +3,7 @@
  * Copyright (c) 2020 Handsoncode. All rights reserved.
  */
 
-import {EmptyValue} from './interpreter/InterpreterValue'
+import {EmptyValue, getRawValue, putRawValue, RegularNumber} from './interpreter/InterpreterValue'
 import {Statistics, StatType} from './statistics'
 import {ClipboardCell, ClipboardCellType} from './ClipboardOperations'
 import {invalidSimpleCellAddress, simpleCellAddress, SimpleCellAddress} from './Cell'
@@ -287,9 +287,9 @@ export class Operations {
 
     const currentDataAtTarget = this.getRangeClipboardCells(targetRange)
 
-    const valuesToRemove = this.dependencyGraph.valuesFromRange(targetRange)
+    const valuesToRemove = this.dependencyGraph.rawValuesFromRange(targetRange)
     this.columnSearch.removeValues(valuesToRemove)
-    const valuesToMove = this.dependencyGraph.valuesFromRange(sourceRange)
+    const valuesToMove = this.dependencyGraph.rawValuesFromRange(sourceRange)
     this.columnSearch.moveValues(valuesToMove, toRight, toBottom, toSheet)
 
     let version: number
@@ -586,8 +586,8 @@ export class Operations {
       const oldValue = this.dependencyGraph.getCellValue(address)
       this.dependencyGraph.graph.markNodeAsSpecialRecentlyChanged(vertex)
       vertex.setMatrixCellValue(address, newValue)
-      this.columnSearch.change(oldValue, newValue, address)
-      this.changes.addChange(newValue, address)
+      this.columnSearch.change(getRawValue(oldValue), newValue, address)
+      this.changes.addChange(new RegularNumber(newValue), address)
     } else if (!(vertex instanceof MatrixVertex) && parsedCellContent instanceof CellContent.MatrixFormula) {
       const {ast, errors, dependencies} = this.parser.parse(parsedCellContent.formula, address)
       if (errors.length > 0) {
@@ -634,13 +634,13 @@ export class Operations {
   public setValueToCell(value: ValueCellVertexValue, address: SimpleCellAddress) {
     const oldValue = this.dependencyGraph.getCellValue(address)
     this.dependencyGraph.setValueToCell(address, value)
-    this.columnSearch.change(oldValue, value, address)
-    this.changes.addChange(value, address)
+    this.columnSearch.change(getRawValue(oldValue), value, address)
+    this.changes.addChange(putRawValue(value), address)
   }
 
   public setCellEmpty(address: SimpleCellAddress) {
     const oldValue = this.dependencyGraph.getCellValue(address)
-    this.columnSearch.remove(oldValue, address)
+    this.columnSearch.remove(getRawValue(oldValue), address)
     this.changes.addChange(EmptyValue, address)
     this.dependencyGraph.setCellEmpty(address)
   }

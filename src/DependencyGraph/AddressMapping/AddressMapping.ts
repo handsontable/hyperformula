@@ -4,7 +4,7 @@
  */
 
 import {SimpleCellAddress} from '../../Cell'
-import {EmptyValue, InterpreterValue} from '../../interpreter/InterpreterValue'
+import {EmptyValue, InterpreterValue, putRawValue} from '../../interpreter/InterpreterValue'
 import {ColumnsSpan, RowsSpan} from '../../Span'
 import {MatrixVertex} from '../index'
 import {CellVertex} from '../Vertex'
@@ -71,9 +71,9 @@ export class AddressMapping {
     if (vertex === null) {
       return EmptyValue
     } else if (vertex instanceof MatrixVertex) {
-      return vertex.getMatrixCellValue(address)
+      return putRawValue(vertex.getMatrixCellValue(address))
     } else {
-      return vertex.getCellValue()
+      return vertex.getCellValue() as InterpreterValue
     }
   }
 

@@ -5,7 +5,7 @@
 
 import {DependencyGraph} from '../DependencyGraph'
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
-import {InternalScalarValue} from '../interpreter/InterpreterValue'
+import {getRawValue, InternalScalarValue, RawInterpreterValue} from '../interpreter/InterpreterValue'
 
 export abstract class AdvancedFind {
   protected constructor(
@@ -13,10 +13,10 @@ export abstract class AdvancedFind {
   ) {
   }
 
-  public advancedFind(keyMatcher: (arg: InternalScalarValue) => boolean, range: AbsoluteCellRange): number {
+  public advancedFind(keyMatcher: (arg: RawInterpreterValue) => boolean, range: AbsoluteCellRange): number {
     const values = this.dependencyGraph.computeListOfValuesInRange(range)
     for (let i = 0; i < values.length; i++) {
-      if (keyMatcher(values[i])) {
+      if (keyMatcher(getRawValue(values[i]))) {
         return i + range.start.col
       }
     }

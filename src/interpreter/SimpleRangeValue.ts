@@ -9,12 +9,12 @@ import {DependencyGraph} from '../DependencyGraph'
 import {ErrorMessage} from '../error-message'
 import {MatrixSize} from '../Matrix'
 import {Maybe} from '../Maybe'
-import {InternalScalarValue} from './InterpreterValue'
+import {ExtendedNumber, getRawValue, InternalScalarValue, putRawValue, RawScalarValue} from './InterpreterValue'
 
 export class ArrayData {
   constructor(
     public readonly size: MatrixSize,
-    public readonly data: InternalScalarValue[][],
+    public readonly data: RawScalarValue[][],
     public _hasOnlyNumbers: boolean,
   ) {
   }
@@ -27,14 +27,14 @@ export class ArrayData {
     return this._hasOnlyNumbers
   }
 
-  public topLeftCorner(): Maybe<InternalScalarValue> {
+  public topLeftCorner(): Maybe<RawScalarValue> {
     if (this.size.height > 0 && this.size.width > 0) {
       return this.data[0][0]
     }
     return undefined
   }
 
-  public valuesFromTopLeftCorner(): InternalScalarValue[] {
+  public valuesFromTopLeftCorner(): RawScalarValue[] {
     const ret = []
     for (let i = 0; i < this.size.height; i++) {
       for (let j = 0; j < this.size.width; j++) {
@@ -44,7 +44,7 @@ export class ArrayData {
     return ret
   }
 
-  public* iterateValuesFromTopLeftCorner(): IterableIterator<InternalScalarValue> {
+  public* iterateValuesFromTopLeftCorner(): IterableIterator<RawScalarValue> {
     for (let i = 0; i < this.size.height; i++) {
       for (let j = 0; j < this.size.width; j++) {
         yield this.data[i][j]
@@ -52,7 +52,7 @@ export class ArrayData {
     }
   }
 
-  public raw(): InternalScalarValue[][] {
+  public raw(): RawScalarValue[][] {
     return this.data
   }
 
@@ -66,7 +66,7 @@ export class ArrayData {
 }
 
 export class OnlyRangeData {
-  public data: Maybe<InternalScalarValue[][]>
+  public data?: RawScalarValue[][]
   public _hasOnlyNumbers?: boolean
 
   constructor(
@@ -76,7 +76,7 @@ export class OnlyRangeData {
   ) {
   }
 
-  public raw(): InternalScalarValue[][] {
+  public raw(): RawScalarValue[][] {
     this.ensureThatComputed()
 
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -107,7 +107,7 @@ export class OnlyRangeData {
     return this._hasOnlyNumbers
   }
 
-  public topLeftCorner(): Maybe<InternalScalarValue> {
+  public topLeftCorner(): Maybe<RawScalarValue> {
     if (this.data !== undefined && this.size.height > 0 && this.size.width > 0) {
       return this.data[0][0]
     }
@@ -118,7 +118,7 @@ export class OnlyRangeData {
     return this._range
   }
 
-  public valuesFromTopLeftCorner(): InternalScalarValue[] {
+  public valuesFromTopLeftCorner(): RawScalarValue[] {
     this.ensureThatComputed()
 
     const ret = []
@@ -131,7 +131,7 @@ export class OnlyRangeData {
     return ret
   }
 
-  public* iterateValuesFromTopLeftCorner(): IterableIterator<InternalScalarValue> {
+  public* iterateValuesFromTopLeftCorner(): IterableIterator<RawScalarValue> {
     this.ensureThatComputed()
 
     for (let i = 0; i < this.data!.length; i++) {
@@ -148,8 +148,8 @@ export class OnlyRangeData {
     }
   }
 
-  private computeDataFromDependencyGraph(): InternalScalarValue[][] {
-    const result: InternalScalarValue[][] = []
+  private computeDataFromDependencyGraph(): RawScalarValue[][] {
+    const result: RawScalarValue[][] = []
 
     let i = 0
     let row = []
@@ -157,10 +157,10 @@ export class OnlyRangeData {
       const value = this.dependencyGraph.getCellValue(cellFromRange)
       if (value instanceof SimpleRangeValue) {
         row.push(new CellError(ErrorType.VALUE, ErrorMessage.ScalarExpected))
-      } else if (typeof value === 'number') {
-        row.push(value)
+      } else if (value instanceof ExtendedNumber) {
+        row.push(value.get())
       } else {
-        row.push(value)
+        row.push(getRawValue(value))
         this._hasOnlyNumbers = false
       }
       ++i
@@ -198,7 +198,7 @@ export class SimpleRangeValue {
     }, range, dependencyGraph))
   }
 
-  public static fromScalar(scalar: InternalScalarValue): SimpleRangeValue {
+  public static fromScalar(scalar: RawScalarValue): SimpleRangeValue {
     const hasOnlyNumbers = (typeof scalar === 'number')
     return new SimpleRangeValue(new ArrayData({width: 1, height: 1}, [[scalar]], hasOnlyNumbers))
   }
@@ -217,19 +217,19 @@ export class SimpleRangeValue {
     return this.data.size.height
   }
 
-  public raw(): InternalScalarValue[][] {
+  public raw(): RawScalarValue[][] {
     return this.data.raw()
   }
 
-  public topLeftCornerValue(): Maybe<InternalScalarValue> {
+  public topLeftCornerValue(): Maybe<RawScalarValue> {
     return this.data.topLeftCorner()
   }
 
-  public valuesFromTopLeftCorner(): InternalScalarValue[] {
+  public valuesFromTopLeftCorner(): RawScalarValue[] {
     return this.data.valuesFromTopLeftCorner()
   }
 
-  public* iterateValuesFromTopLeftCorner(): IterableIterator<InternalScalarValue> {
+  public* iterateValuesFromTopLeftCorner(): IterableIterator<RawScalarValue> {
     yield* this.data.iterateValuesFromTopLeftCorner()
   }
 
