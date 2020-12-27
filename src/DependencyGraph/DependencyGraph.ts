@@ -41,11 +41,11 @@ import {SheetMapping} from './SheetMapping'
 import {ValueCellVertexValue} from './ValueCellVertex'
 import {FunctionRegistry} from '../interpreter/FunctionRegistry'
 import {
-  EmptyValue, ExtendedNumber,
+  EmptyValue, RichNumber,
   getRawValue,
   InternalScalarValue,
   InterpreterValue,
-  RawScalarValue
+  RawScalarValue, ExtendedNumber
 } from '../interpreter/InterpreterValue'
 
 export class DependencyGraph {
@@ -505,7 +505,7 @@ export class DependencyGraph {
     const adjacentNodes = this.graph.adjacentNodes(matrixVertex)
 
     for (const address of matrixRange.addresses(this)) {
-      const value = (this.getCellValue(address) as ExtendedNumber).get() // We wouldn't need that typecast if we would take values from Matrix
+      const value = this.getCellValue(address) as ExtendedNumber // We wouldn't need that typecast if we would take values from Matrix
       const valueVertex = new ValueCellVertex(value)
       this.addVertex(address, valueVertex)
     }

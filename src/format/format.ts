@@ -6,7 +6,7 @@
 import {Config} from '../Config'
 import {secondsExtendedRegexp} from '../DateTimeDefault'
 import {DateTimeHelper, numberToSimpleTime, SimpleDateTime, SimpleTime} from '../DateTimeHelper'
-import {InternalScalarValue, RawScalarValue} from '../interpreter/InterpreterValue'
+import {RawScalarValue} from '../interpreter/InterpreterValue'
 import {Maybe} from '../Maybe'
 import {FormatToken, parseForDateTimeFormat, parseForNumberFormat, TokenType} from './parser'
 

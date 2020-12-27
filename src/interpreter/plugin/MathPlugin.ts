@@ -6,7 +6,7 @@
 import {CellError, ErrorType, SimpleCellAddress} from '../../Cell'
 import {ErrorMessage} from '../../error-message'
 import {ProcedureAst} from '../../parser'
-import {ExtendedNumber, InternalScalarValue, InterpreterValue} from '../InterpreterValue'
+import {InternalScalarValue, RawInterpreterValue} from '../InterpreterValue'
 import {SimpleRangeValue} from '../SimpleRangeValue'
 import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
 
@@ -41,14 +41,14 @@ export class MathPlugin extends FunctionPlugin {
     'GCD': {
       method: 'gcd',
       parameters: [
-        {argumentType: ArgumentTypes.ANY, passSubtype: true},
+        {argumentType: ArgumentTypes.ANY},
       ],
       repeatLastArgs: 1
     },
     'LCM': {
       method: 'lcm',
       parameters: [
-        {argumentType: ArgumentTypes.ANY, passSubtype: true},
+        {argumentType: ArgumentTypes.ANY},
       ],
       repeatLastArgs: 1
     },
@@ -168,7 +168,7 @@ export class MathPlugin extends FunctionPlugin {
 
   public gcd(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.runFunction(ast.args, formulaAddress, this.metadata('GCD'),
-      (...args: InterpreterValue[]) => {
+      (...args: RawInterpreterValue[]) => {
         const processedArgs = this.interpreter.arithmeticHelper.coerceNumbersCoerceRangesDropNulls(args)
         if(processedArgs instanceof CellError) {
           return processedArgs
@@ -191,7 +191,7 @@ export class MathPlugin extends FunctionPlugin {
 
   public lcm(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.runFunction(ast.args, formulaAddress, this.metadata('LCM'),
-      (...args: InterpreterValue[]) => {
+      (...args: RawInterpreterValue[]) => {
         const processedArgs = this.interpreter.arithmeticHelper.coerceNumbersCoerceRangesDropNulls(args)
         if(processedArgs instanceof CellError) {
           return processedArgs
@@ -307,8 +307,8 @@ export class MathPlugin extends FunctionPlugin {
           if(valY instanceof CellError) {
             return valY
           }
-          if(valX instanceof ExtendedNumber && valY instanceof ExtendedNumber) {
-            ret += Math.pow(valX.get(),2) - Math.pow(valY.get(),2)
+          if(typeof valX === 'number' && typeof valY === 'number') {
+            ret += Math.pow(valX,2) - Math.pow(valY,2)
           }
         }
         return ret
@@ -335,8 +335,8 @@ export class MathPlugin extends FunctionPlugin {
           if(valY instanceof CellError) {
             return valY
           }
-          if(valX instanceof ExtendedNumber && valY instanceof ExtendedNumber) {
-            ret += Math.pow(valX.get(),2) + Math.pow(valY.get(),2)
+          if(typeof valX === 'number' && typeof valY === 'number') {
+            ret += Math.pow(valX,2) + Math.pow(valY,2)
           }
         }
         return ret
@@ -363,8 +363,8 @@ export class MathPlugin extends FunctionPlugin {
           if(valY instanceof CellError) {
             return valY
           }
-          if(valX instanceof ExtendedNumber && valY instanceof ExtendedNumber) {
-            ret += Math.pow(valX.get()-valY.get(),2)
+          if(typeof valX === 'number' && typeof valY === 'number') {
+            ret += Math.pow(valX-valY,2)
           }
         }
         return ret

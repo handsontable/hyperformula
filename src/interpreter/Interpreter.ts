@@ -29,12 +29,9 @@ import {ArithmeticHelper, coerceScalarToString, fixNegativeZero, isNumberOverflo
 import {CriterionBuilder} from './Criterion'
 import {FunctionRegistry} from './FunctionRegistry'
 import {
-  EmptyValue, ExtendedBoolean,
-  ExtendedNumber,
+  EmptyValue,
   InternalNoErrorScalarValue,
-  InterpreterValue,
-  putRawValue,
-  RawInterpreterValue
+  InterpreterValue, isExtendedNumber, getRawValue, cloneNumber,
 } from './InterpreterValue'
 import {SimpleRangeValue} from './SimpleRangeValue'
 
@@ -61,11 +58,11 @@ export class Interpreter {
 
   public evaluateAst(ast: Ast, formulaAddress: SimpleCellAddress): InterpreterValue {
     let val = this.evaluateAstWithoutPostprocessing(ast, formulaAddress)
-    if (val instanceof ExtendedNumber) {
-      if (isNumberOverflow(val.get())) {
+    if (isExtendedNumber(val)) {
+      if (isNumberOverflow(getRawValue(val))) {
         return new CellError(ErrorType.NUM, ErrorMessage.NaN)
       } else {
-        val = val.clone(fixNegativeZero(val.get()))
+        val = cloneNumber(val, fixNegativeZero(getRawValue(val)))
       }
     }
     return wrapperForAddress(val, formulaAddress)
@@ -90,7 +87,7 @@ export class Interpreter {
       }
       case AstNodeType.NUMBER:
       case AstNodeType.STRING: {
-        return putRawValue(ast.value as RawInterpreterValue)
+        return ast.value
       }
       case AstNodeType.CONCATENATE_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
@@ -105,37 +102,37 @@ export class Interpreter {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
         const rightResult = this.evaluateAst(ast.right, formulaAddress)
         return passErrors(leftResult, rightResult) ??
-          new ExtendedBoolean(this.arithmeticHelper.eq(leftResult as InternalNoErrorScalarValue, rightResult as InternalNoErrorScalarValue))
+          this.arithmeticHelper.eq(leftResult as InternalNoErrorScalarValue, rightResult as InternalNoErrorScalarValue)
       }
       case AstNodeType.NOT_EQUAL_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
         const rightResult = this.evaluateAst(ast.right, formulaAddress)
         return passErrors(leftResult, rightResult) ??
-          new ExtendedBoolean(this.arithmeticHelper.neq(leftResult as InternalNoErrorScalarValue, rightResult as InternalNoErrorScalarValue))
+          this.arithmeticHelper.neq(leftResult as InternalNoErrorScalarValue, rightResult as InternalNoErrorScalarValue)
       }
       case AstNodeType.GREATER_THAN_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
         const rightResult = this.evaluateAst(ast.right, formulaAddress)
         return passErrors(leftResult, rightResult) ??
-          new ExtendedBoolean(this.arithmeticHelper.gt(leftResult as InternalNoErrorScalarValue, rightResult as InternalNoErrorScalarValue))
+          this.arithmeticHelper.gt(leftResult as InternalNoErrorScalarValue, rightResult as InternalNoErrorScalarValue)
       }
       case AstNodeType.LESS_THAN_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
         const rightResult = this.evaluateAst(ast.right, formulaAddress)
         return passErrors(leftResult, rightResult) ??
-          new ExtendedBoolean(this.arithmeticHelper.lt(leftResult as InternalNoErrorScalarValue, rightResult as InternalNoErrorScalarValue))
+          this.arithmeticHelper.lt(leftResult as InternalNoErrorScalarValue, rightResult as InternalNoErrorScalarValue)
       }
       case AstNodeType.GREATER_THAN_OR_EQUAL_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
         const rightResult = this.evaluateAst(ast.right, formulaAddress)
         return passErrors(leftResult, rightResult) ??
-          new ExtendedBoolean(this.arithmeticHelper.geq(leftResult as InternalNoErrorScalarValue, rightResult as InternalNoErrorScalarValue))
+          this.arithmeticHelper.geq(leftResult as InternalNoErrorScalarValue, rightResult as InternalNoErrorScalarValue)
       }
       case AstNodeType.LESS_THAN_OR_EQUAL_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
         const rightResult = this.evaluateAst(ast.right, formulaAddress)
         return passErrors(leftResult, rightResult) ??
-          new ExtendedBoolean(this.arithmeticHelper.leq(leftResult as InternalNoErrorScalarValue, rightResult as InternalNoErrorScalarValue))
+          this.arithmeticHelper.leq(leftResult as InternalNoErrorScalarValue, rightResult as InternalNoErrorScalarValue)
       }
       case AstNodeType.PLUS_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
@@ -189,7 +186,7 @@ export class Interpreter {
         const result = this.evaluateAst(ast.value, formulaAddress)
         if (result instanceof SimpleRangeValue) {
           return new CellError(ErrorType.VALUE, ErrorMessage.ScalarExpected)
-        } else if(result instanceof ExtendedNumber) {
+        } else if(isExtendedNumber(result)) {
          return this.arithmeticHelper.unaryPlus(result)
         } else {
           return result

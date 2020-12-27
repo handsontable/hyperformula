@@ -11,7 +11,7 @@ import {split} from '../generatorUtils'
 import {Maybe} from '../Maybe'
 import {CriterionLambda, CriterionPackage} from './Criterion'
 import {Interpreter} from './Interpreter'
-import {getRawValue, InternalScalarValue} from './InterpreterValue'
+import {getRawValue, InternalScalarValue, RawScalarValue} from './InterpreterValue'
 import {SimpleRangeValue} from './SimpleRangeValue'
 
 const findSmallerRangeForMany = (dependencyGraph: DependencyGraph, conditionRanges: AbsoluteCellRange[], valuesRange: AbsoluteCellRange): {smallerRangeVertex: RangeVertex | null, restConditionRanges: AbsoluteCellRange[], restValuesRange: AbsoluteCellRange} => {
@@ -41,7 +41,7 @@ export class CriterionFunctionCompute<T> {
     private readonly cacheKey: (conditions: Condition[]) => string,
     private readonly reduceInitialValue: T,
     private readonly composeFunction: (left: T, right: T) => T,
-    private readonly mapFunction: (arg: InternalScalarValue) => T,
+    private readonly mapFunction: (arg: RawScalarValue) => T,
   ) {
     this.dependencyGraph = this.interpreter.dependencyGraph
   }
@@ -146,20 +146,20 @@ export class Condition {
   }
 }
 
-function * getRangeValues(dependencyGraph: DependencyGraph, cellRange: AbsoluteCellRange): IterableIterator<InternalScalarValue> {
+function * getRangeValues(dependencyGraph: DependencyGraph, cellRange: AbsoluteCellRange): IterableIterator<RawScalarValue> {
   for (const cellFromRange of cellRange.addresses(dependencyGraph)) {
-    yield dependencyGraph.getScalarValue(cellFromRange)
+    yield getRawValue(dependencyGraph.getScalarValue(cellFromRange))
   }
 }
 
-function* ifFilter<T>(criterionLambdas: CriterionLambda[], conditionalIterables: IterableIterator<InternalScalarValue>[], computableIterable: IterableIterator<T>): IterableIterator<T> {
+function* ifFilter<T>(criterionLambdas: CriterionLambda[], conditionalIterables: IterableIterator<RawScalarValue>[], computableIterable: IterableIterator<T>): IterableIterator<T> {
   for (const computable of computableIterable) {
     const conditionalSplits = conditionalIterables.map((conditionalIterable) => split(conditionalIterable))
     if (!conditionalSplits.every((cs) => Object.prototype.hasOwnProperty.call(cs, 'value'))) {
       return
     }
-    const conditionalFirsts = conditionalSplits.map((cs) => (cs.value as InternalScalarValue))
-    if (zip(conditionalFirsts, criterionLambdas).every(([conditionalFirst, criterionLambda]) => criterionLambda(getRawValue(conditionalFirst)))) {
+    const conditionalFirsts = conditionalSplits.map((cs) => (cs.value as RawScalarValue))
+    if (zip(conditionalFirsts, criterionLambdas).every(([conditionalFirst, criterionLambda]) => criterionLambda(conditionalFirst))) {
       yield computable
     }
     conditionalIterables = conditionalSplits.map((cs) => cs.rest)

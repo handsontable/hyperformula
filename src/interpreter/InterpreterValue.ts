@@ -8,41 +8,24 @@ import {SimpleRangeValue} from './SimpleRangeValue'
 
 export const EmptyValue = Symbol('Empty value')
 export type EmptyValueType = typeof EmptyValue
-export type InternalNoErrorScalarValue = ExtendedNumber | ExtendedString | ExtendedBoolean | EmptyValueType
-export type InternalScalarValue = InternalNoErrorScalarValue | CellError
-export type InterpreterValue = InternalScalarValue | SimpleRangeValue
+export type InternalNoErrorScalarValue = RichNumber | RawNoErrorScalarValue
+export type InternalScalarValue = RichNumber | RawScalarValue
+export type InterpreterValue = RichNumber | RawInterpreterValue
 
 export type RawNoErrorScalarValue = number | string | boolean | EmptyValueType
 export type RawScalarValue = RawNoErrorScalarValue | CellError
 export type RawInterpreterValue = RawScalarValue | SimpleRangeValue
 
-export function getRawValue<T>(val: ExtendedNumber | ExtendedString | ExtendedBoolean | T): number | string | boolean | T {
-  if(val instanceof ExtendedNumber || val instanceof ExtendedBoolean || val instanceof ExtendedString) {
+export function getRawValue<T>(val: RichNumber | T): number | T {
+  if(val instanceof RichNumber) {
     return val.get()
   } else {
     return val
   }
 }
 
-
-export function putRawValue<T>(val: number | string | boolean | T): ExtendedNumber | ExtendedString | ExtendedBoolean | T {
-  if (typeof val === 'number') {
-    return new RegularNumber(val)
-  } else if (typeof val === 'string') {
-    return new ExtendedString(val)
-  } else if (typeof val === 'boolean') {
-    return new ExtendedBoolean(val)
-  } else {
-    return val
-  }
-}
-
-export interface ExtendedVal {
-  get(): number | string | boolean
-}
-
-export abstract class ExtendedNumber implements ExtendedVal {
-  constructor(private val: number) {}
+export abstract class RichNumber {
+  constructor(public val: number) {}
   public get(): number {
     return this.val
   }
@@ -51,23 +34,21 @@ export abstract class ExtendedNumber implements ExtendedVal {
   }
 }
 
-export class RegularNumber extends ExtendedNumber {}
-export class DateNumber extends ExtendedNumber {}
-export class CurrencyNumber extends ExtendedNumber {}
-export class TimeNumber extends ExtendedNumber {}
-export class DateTimeNumber extends ExtendedNumber {}
-
-export class ExtendedString implements ExtendedVal {
-  constructor(private val: string) {}
-  public get(): string {
-    return this.val
+export function cloneNumber(val: ExtendedNumber, newVal: number): ExtendedNumber {
+  if(typeof val === 'number') {
+    return newVal
+  } else {
+    return val.clone(newVal)
   }
 }
 
-export class ExtendedBoolean implements ExtendedVal {
-  constructor(private val: boolean) {}
-  public get(): boolean {
-    return this.val
-  }
-}
+export class DateNumber extends RichNumber {}
+export class CurrencyNumber extends RichNumber {}
+export class TimeNumber extends RichNumber {}
+export class DateTimeNumber extends RichNumber {}
 
+export type ExtendedNumber = number | RichNumber
+
+export function isExtendedNumber(val: InterpreterValue): val is ExtendedNumber {
+  return (typeof val === 'number') || (val instanceof RichNumber)
+}

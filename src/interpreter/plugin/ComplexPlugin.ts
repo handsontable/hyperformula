@@ -8,7 +8,7 @@ import {ErrorMessage} from '../../error-message'
 import {ProcedureAst} from '../../parser'
 import {coerceComplexToString, complex} from '../ArithmeticHelper'
 import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
-import {InternalScalarValue, InterpreterValue} from '../InterpreterValue'
+import {InternalScalarValue, RawInterpreterValue} from '../InterpreterValue'
 
 export class ComplexPlugin extends  FunctionPlugin {
   public static implementedFunctions = {
@@ -289,7 +289,7 @@ export class ComplexPlugin extends  FunctionPlugin {
 
   public improduct(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.runFunction(ast.args, formulaAddress, this.metadata('IMPRODUCT'),
-      (...args: InterpreterValue[]) => {
+      (...args: RawInterpreterValue[]) => {
         const coerced = this.interpreter.arithmeticHelper.coerceComplexExactRanges(args)
         if (coerced instanceof CellError) {
           return coerced
@@ -305,7 +305,7 @@ export class ComplexPlugin extends  FunctionPlugin {
 
   public imsum(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.runFunction(ast.args, formulaAddress, this.metadata('IMSUM'),
-      (...args: InterpreterValue[]) => {
+      (...args: RawInterpreterValue[]) => {
         const coerced = this.interpreter.arithmeticHelper.coerceComplexExactRanges(args)
         if (coerced instanceof CellError) {
           return coerced

@@ -6,7 +6,11 @@
 import {CellError, ErrorType, SimpleCellAddress} from '../../Cell'
 import {ErrorMessage} from '../../error-message'
 import {ProcedureAst} from '../../parser'
-import {EmptyValue, ExtendedNumber, InternalScalarValue, InterpreterValue} from '../InterpreterValue'
+import {
+  EmptyValue,
+  InternalScalarValue,
+  RawInterpreterValue, isExtendedNumber, getRawValue
+} from '../InterpreterValue'
 import {SimpleRangeValue} from '../SimpleRangeValue'
 import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
 
@@ -224,7 +228,7 @@ export class FinancialPlugin extends FunctionPlugin {
       method: 'npv',
       parameters: [
         {argumentType: ArgumentTypes.NUMBER},
-        {argumentType: ArgumentTypes.ANY, passSubtype: true},
+        {argumentType: ArgumentTypes.ANY},
       ],
       repeatLastArgs: 1
     },
@@ -611,8 +615,8 @@ export class FinancialPlugin extends FunctionPlugin {
           }
         }
         for(const val of vals) {
-          if(val instanceof ExtendedNumber) {
-            value *= 1+val.get()
+          if(isExtendedNumber(val)) {
+            value *= 1+getRawValue(val)
           } else if(val !== EmptyValue) {
             return new CellError(ErrorType.VALUE, ErrorMessage.NumberExpected)
           }
@@ -623,7 +627,7 @@ export class FinancialPlugin extends FunctionPlugin {
 
   public npv(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.runFunction(ast.args, formulaAddress, this.metadata('NPV'),
-      (rate: number, ...args: InterpreterValue[]) => {
+      (rate: number, ...args: RawInterpreterValue[]) => {
         const coerced = this.interpreter.arithmeticHelper.coerceNumbersExactRanges(args)
         if(coerced instanceof CellError) {
           return coerced
@@ -689,18 +693,18 @@ export class FinancialPlugin extends FunctionPlugin {
       (rate: number, values: SimpleRangeValue, dates: SimpleRangeValue) => {
         const valArr = values.valuesFromTopLeftCorner()
         for(const val of valArr) {
-          if(!(val instanceof ExtendedNumber)) {
+          if(typeof val !== 'number') {
             return new CellError(ErrorType.VALUE, ErrorMessage.NumberExpected)
           }
         }
-        const valArrNum = (valArr as ExtendedNumber[]).map((val) => val.get())
+        const valArrNum = valArr as number[]
         const dateArr = dates.valuesFromTopLeftCorner()
         for(const date of dateArr) {
-          if(!(date instanceof ExtendedNumber)) {
+          if(typeof date !== 'number') {
             return new CellError(ErrorType.VALUE, ErrorMessage.NumberExpected)
           }
         }
-        const dateArrNum = (dateArr as ExtendedNumber[]).map((val) => val.get())
+        const dateArrNum = dateArr as number[]
         if(dateArrNum.length !== valArrNum.length) {
           return new CellError(ErrorType.NUM, ErrorMessage.EqualLength)
         }

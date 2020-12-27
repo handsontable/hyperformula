@@ -4,7 +4,7 @@
  */
 
 import {Config} from './Config'
-import {DateNumber, DateTimeNumber, ExtendedNumber, RegularNumber, TimeNumber} from './interpreter/InterpreterValue'
+import {DateNumber, DateTimeNumber, ExtendedNumber, TimeNumber} from './interpreter/InterpreterValue'
 import {Maybe} from './Maybe'
 
 const numDays: number[] = [ 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
@@ -86,7 +86,7 @@ export class DateTimeHelper {
       if(instanceOfSimpleDate(dateTime)) {
         return new DateNumber( this.dateToNumber(dateTime) )
       } else {
-        return new RegularNumber(0)
+        return 0
       }
     }
   }

@@ -7,10 +7,7 @@ import {CellVertex, FormulaCellVertex, MatrixVertex, ParsingErrorVertex, ValueCe
 import {ErrorMessage} from './error-message'
 import {
   EmptyValue,
-  ExtendedBoolean,
-  ExtendedNumber,
-  ExtendedString,
-  InterpreterValue
+  InterpreterValue, isExtendedNumber
 } from './interpreter/InterpreterValue'
 import {SimpleRangeValue} from './interpreter/SimpleRangeValue'
 import {CellAddress} from './parser'
@@ -98,11 +95,11 @@ export const getCellValueType = (cellValue: InterpreterValue): CellValueType => 
     return CellValueType.ERROR
   }
 
-  if(cellValue instanceof ExtendedString) {
+  if(typeof cellValue === 'string') {
     return CellValueType.STRING
-  } else if(cellValue instanceof ExtendedNumber) {
+  } else if(isExtendedNumber(cellValue)) {
     return CellValueType.NUMBER
-  } else if(cellValue instanceof ExtendedBoolean) {
+  } else if(typeof cellValue === 'boolean') {
     return CellValueType.BOOLEAN
   }
 

@@ -4,9 +4,9 @@
  */
 
 import {CellError} from '../Cell'
-import {ExtendedBoolean, ExtendedNumber, ExtendedString} from '../interpreter/InterpreterValue'
+import {ExtendedNumber} from '../interpreter/InterpreterValue'
 
-export type ValueCellVertexValue = ExtendedNumber | ExtendedBoolean | ExtendedString | CellError
+export type ValueCellVertexValue = ExtendedNumber | boolean | string | CellError
 
 /**
  * Represents vertex which keeps static cell value

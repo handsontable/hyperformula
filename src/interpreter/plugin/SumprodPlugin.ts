@@ -6,7 +6,7 @@
 import {CellError, ErrorType, SimpleCellAddress} from '../../Cell'
 import {ErrorMessage} from '../../error-message'
 import {ProcedureAst} from '../../parser'
-import {ExtendedNumber, InternalScalarValue} from '../InterpreterValue'
+import {RichNumber, InternalScalarValue, putRawValue} from '../InterpreterValue'
 import {SimpleRangeValue} from '../SimpleRangeValue'
 import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
 
@@ -39,9 +39,9 @@ export class SumprodPlugin extends FunctionPlugin {
         } else if (r.value instanceof CellError) {
           return r.value
         } else {
-          const lval = this.coerceScalarToNumberOrError(l.value)
-          const rval = this.coerceScalarToNumberOrError(r.value)
-          if (lval instanceof ExtendedNumber && rval instanceof ExtendedNumber) {
+          const lval = this.coerceScalarToNumberOrError(putRawValue(l.value))
+          const rval = this.coerceScalarToNumberOrError(putRawValue(r.value))
+          if (lval instanceof RichNumber && rval instanceof RichNumber) {
             result += lval.get() * rval.get()
           }
         }

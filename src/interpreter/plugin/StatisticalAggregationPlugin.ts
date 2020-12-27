@@ -6,7 +6,7 @@
 import {CellError, ErrorType, SimpleCellAddress} from '../../Cell'
 import {ErrorMessage} from '../../error-message'
 import {ProcedureAst} from '../../parser'
-import {ExtendedNumber, InternalScalarValue, InterpreterValue} from '../InterpreterValue'
+import {RichNumber, InternalScalarValue, InterpreterValue, RawScalarValue} from '../InterpreterValue'
 import {SimpleRangeValue} from '../SimpleRangeValue'
 import {
   centralF,
@@ -521,15 +521,15 @@ function parseTwoArrays(dataX: SimpleRangeValue, dataY: SimpleRangeValue): CellE
   const arrX = []
   const arrY = []
   while (x = xit.next(), y = yit.next(), !x.done && !y.done) {
-    const xval: InternalScalarValue = x.value
-    const yval: InternalScalarValue = y.value
+    const xval: RawScalarValue = x.value
+    const yval: RawScalarValue = y.value
     if (xval instanceof CellError) {
       return xval
     } else if (yval instanceof CellError) {
       return yval
-    } else if (xval instanceof ExtendedNumber && yval instanceof ExtendedNumber ) {
-      arrX.push(xval.get())
-      arrY.push(yval.get())
+    } else if (typeof xval === 'number' && typeof yval === 'number') {
+      arrX.push(xval)
+      arrY.push(yval)
     }
   }
   return [arrX, arrY]

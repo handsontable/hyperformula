@@ -15,11 +15,10 @@ import {Serialization} from '../../Serialization'
 import {coerceScalarToBoolean, coerceScalarToString, coerceToRange, complex} from '../ArithmeticHelper'
 import {Interpreter} from '../Interpreter'
 import {
-  ExtendedNumber,
   getRawValue,
   InternalScalarValue,
-  InterpreterValue, putRawValue,
-  RawNoErrorScalarValue, RawScalarValue
+  InterpreterValue,
+  RawNoErrorScalarValue, RawScalarValue, ExtendedNumber, isExtendedNumber
 } from '../InterpreterValue'
 import {SimpleRangeValue} from '../SimpleRangeValue'
 
@@ -208,11 +207,11 @@ export abstract class FunctionPlugin {
         case ArgumentTypes.NUMBER:
           // eslint-disable-next-line no-case-declarations
           const coerced = this.coerceScalarToNumberOrError(arg)
-          if (!(coerced instanceof ExtendedNumber)) {
+          if (!isExtendedNumber(coerced)) {
             ret = coerced
             break
           }
-          const value = coerced.get()
+          const value = getRawValue(coerced)
           if (coercedType.maxValue !== undefined && value > coercedType.maxValue) {
             return new CellError(ErrorType.NUM, ErrorMessage.ValueLarge)
           }
@@ -245,10 +244,10 @@ export abstract class FunctionPlugin {
           if (arg instanceof CellError) {
             return arg
           }
-          ret = coerceToRange(arg)
+          ret = coerceToRange(getRawValue(arg))
           break
         case ArgumentTypes.COMPLEX:
-          return this.interpreter.arithmeticHelper.coerceScalarToComplex(arg)
+          return this.interpreter.arithmeticHelper.coerceScalarToComplex(getRawValue(arg))
       }
     }
     if(coercedType.passSubtype || ret === undefined) {
@@ -262,7 +261,7 @@ export abstract class FunctionPlugin {
     args: Ast[],
     formulaAddress: SimpleCellAddress,
     functionDefinition: FunctionArguments,
-    fn: (...arg: any) => InternalScalarValue | RawScalarValue
+    fn: (...arg: any) => InternalScalarValue
   ) => {
     const argumentDefinitions: FunctionArgument[] = functionDefinition.parameters!
     let scalarValues: [InterpreterValue, boolean][]
@@ -314,7 +313,7 @@ export abstract class FunctionPlugin {
       }
     }
 
-    return putRawValue(argCoerceFailure ?? fn(...coercedArguments))
+    return argCoerceFailure ?? fn(...coercedArguments)
   }
 
   protected runFunctionWithReferenceArgument = (
@@ -322,11 +321,11 @@ export abstract class FunctionPlugin {
     formulaAddress: SimpleCellAddress,
     argumentDefinitions: FunctionArguments,
     noArgCallback: () => InternalScalarValue | RawScalarValue,
-    referenceCallback: (reference: SimpleCellAddress) => InternalScalarValue | RawScalarValue,
-    nonReferenceCallback: (...arg: any) => InternalScalarValue | RawScalarValue = () => new CellError(ErrorType.NA, ErrorMessage.CellRefExpected)
+    referenceCallback: (reference: SimpleCellAddress) => InternalScalarValue,
+    nonReferenceCallback: (...arg: any) => InternalScalarValue = () => new CellError(ErrorType.NA, ErrorMessage.CellRefExpected)
   ) => {
     if (args.length === 0) {
-      return putRawValue(noArgCallback())
+      return noArgCallback()
     } else if (args.length > 1) {
       return new CellError(ErrorType.NA, ErrorMessage.WrongArgNumber)
     }
@@ -349,7 +348,7 @@ export abstract class FunctionPlugin {
     }
 
     if (cellReference !== undefined) {
-      return putRawValue(referenceCallback(cellReference))
+      return referenceCallback(cellReference)
     }
 
     return this.runFunction(args, formulaAddress, argumentDefinitions, nonReferenceCallback)

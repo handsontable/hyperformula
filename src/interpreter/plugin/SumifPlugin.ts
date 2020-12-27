@@ -8,7 +8,7 @@ import {ErrorMessage} from '../../error-message'
 import {Maybe} from '../../Maybe'
 import {ProcedureAst} from '../../parser'
 import {Condition, CriterionFunctionCompute} from '../CriterionFunctionCompute'
-import {ExtendedNumber, InternalScalarValue, RawScalarValue, RegularNumber} from '../InterpreterValue'
+import {RichNumber, InternalScalarValue, RawScalarValue, RegularNumber} from '../InterpreterValue'
 import {SimpleRangeValue} from '../SimpleRangeValue'
 import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
 
@@ -122,10 +122,10 @@ export class SumifPlugin extends FunctionPlugin {
 
         valuesArg = valuesArg ?? conditionArg
 
-        return  new CriterionFunctionCompute<InternalScalarValue>(
+        return  new CriterionFunctionCompute<RawScalarValue>(
           this.interpreter,
           sumifCacheKey,
-          new RegularNumber(0),
+          0,
           (left, right) => this.interpreter.arithmeticHelper.nonstrictadd(left, right),
           (arg) => arg,
         ).compute(valuesArg, [new Condition(conditionArg, criterion)])
@@ -145,10 +145,10 @@ export class SumifPlugin extends FunctionPlugin {
         conditions.push(new Condition(conditionArg, criterionPackage))
       }
 
-      return new CriterionFunctionCompute<InternalScalarValue>(
+      return new CriterionFunctionCompute<RawScalarValue>(
         this.interpreter,
         sumifCacheKey,
-        new RegularNumber(0),
+        0,
         (left, right) => this.interpreter.arithmeticHelper.nonstrictadd(left, right),
         (arg) => arg,
       ).compute(values, conditions)
@@ -170,8 +170,8 @@ export class SumifPlugin extends FunctionPlugin {
           averageifCacheKey,
           AverageResult.empty,
           (left, right) => left.compose(right),
-          (arg: InternalScalarValue) => {
-            if (arg instanceof ExtendedNumber) {
+          (arg: RawScalarValue) => {
+            if (arg instanceof RichNumber) {
               return AverageResult.single(arg.get())
             } else {
               return AverageResult.empty

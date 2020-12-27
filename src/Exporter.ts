@@ -11,7 +11,7 @@ import {
 import {Config} from './Config'
 import {CellValueChange} from './ContentChanges'
 import {ErrorMessage} from './error-message'
-import {EmptyValue, ExtendedNumber, InterpreterValue} from './interpreter/InterpreterValue'
+import {EmptyValue, RichNumber, InterpreterValue, getRawValue} from './interpreter/InterpreterValue'
 import {SimpleRangeValue} from './interpreter/SimpleRangeValue'
 import {NamedExpressions} from './NamedExpressions'
 import {SheetIndexMappingFn, simpleCellAddressToString} from './parser/addressRepresentationConverters'
@@ -82,14 +82,14 @@ export class Exporter {
   public exportValue(value: InterpreterValue): CellValue {
     if (value instanceof SimpleRangeValue) {
       return this.detailedError(new CellError(ErrorType.VALUE, ErrorMessage.ScalarExpected))
-    } else if (this.config.smartRounding && value instanceof ExtendedNumber) {
+    } else if (this.config.smartRounding && value instanceof RichNumber) {
       return this.cellValueRounding(value.get())
     } else if (value instanceof CellError) {
       return this.detailedError(value)
     } else if (value === EmptyValue) {
       return null
     } else {
-      return value.get()
+      return getRawValue(value)
     }
   }
 

@@ -26,10 +26,10 @@ import {ProcedureAst} from '../../parser'
 import {
   DateNumber,
   DateTimeNumber,
-  EmptyValue, ExtendedNumber,
+  EmptyValue,
   InternalNoErrorScalarValue,
-  InternalScalarValue, RawNoErrorScalarValue, RawScalarValue, RegularNumber,
-  TimeNumber
+  InternalScalarValue, RawNoErrorScalarValue, RawScalarValue,
+  TimeNumber, getRawValue, isExtendedNumber
 } from '../InterpreterValue'
 import {SimpleRangeValue} from '../SimpleRangeValue'
 import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
@@ -429,7 +429,7 @@ export class DateTimePlugin extends FunctionPlugin {
         if(dateNumber===undefined){
           return new CellError(ErrorType.VALUE, ErrorMessage.IncorrectDateTime)
         }
-        return new TimeNumber(dateNumber.get()%1)
+        return new TimeNumber(getRawValue(dateNumber)%1)
       }
     )
   }
@@ -709,8 +709,8 @@ export class DateTimePlugin extends FunctionPlugin {
       if(val === EmptyValue) {
         continue
       }
-      if(val instanceof ExtendedNumber) {
-        processedHolidays.push(Math.trunc(val.get()))
+      if(isExtendedNumber(val)) {
+        processedHolidays.push(Math.trunc(getRawValue(val)))
       } else {
         return new CellError(ErrorType.VALUE, ErrorMessage.WrongType)
       }

@@ -13,11 +13,8 @@ import {ColumnRangeAst, RowRangeAst} from '../../parser/Ast'
 import {coerceBooleanToNumber} from '../ArithmeticHelper'
 import {
   EmptyValue,
-  ExtendedBoolean,
-  ExtendedNumber,
-  ExtendedString,
-  InternalScalarValue,
-  RegularNumber
+  RichNumber,
+  InternalScalarValue, isExtendedNumber, getRawValue, ExtendedNumber,
 } from '../InterpreterValue'
 import {SimpleRangeValue} from '../SimpleRangeValue'
 import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
@@ -33,8 +30,8 @@ function identityMap<T>(arg: T): T {
 }
 
 function zeroForInfinite(value: InternalScalarValue) {
-  if (value instanceof ExtendedNumber && !Number.isFinite(value.get())) {
-    return new RegularNumber(0)
+  if (isExtendedNumber(value) && !Number.isFinite(getRawValue(value))) {
+    return 0
   } else {
     return value
   }
@@ -170,7 +167,7 @@ export class NumericAggregationPlugin extends FunctionPlugin {
   }
 
   public sumsq(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.reduce(ast.args, formulaAddress, new RegularNumber(0), 'SUMSQ', this.addWithEpsilon, (arg) => new RegularNumber(Math.pow(arg.get(),2)), strictlyNumbers)
+    return this.reduce(ast.args, formulaAddress, 0, 'SUMSQ', this.addWithEpsilon, (arg: ExtendedNumber) => Math.pow(getRawValue(arg),2), strictlyNumbers)
   }
 
   /**
@@ -186,8 +183,8 @@ export class NumericAggregationPlugin extends FunctionPlugin {
   }
 
   public maxa(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    const value = this.reduce(ast.args, formulaAddress, new RegularNumber(Number.NEGATIVE_INFINITY), 'MAXA',
-      (left, right) => new RegularNumber(Math.max(left.get(), right.get())),
+    const value = this.reduce(ast.args, formulaAddress, Number.NEGATIVE_INFINITY, 'MAXA',
+      (left, right) => Math.max(left, right),
       identityMap, numbersBooleans)
 
     return zeroForInfinite(value)
@@ -427,7 +424,7 @@ export class NumericAggregationPlugin extends FunctionPlugin {
   private doCount(args: Ast[], formulaAddress: SimpleCellAddress): InternalScalarValue {
     const value = this.reduce(args, formulaAddress, new RegularNumber(0), 'COUNT',
       (left, right) => new RegularNumber(left.get() + right.get()), identityMap,
-      (arg) => new RegularNumber((arg instanceof ExtendedNumber) ? 1 : 0)
+      (arg) => new RegularNumber((arg instanceof RichNumber) ? 1 : 0)
     )
 
     return value
@@ -468,7 +465,7 @@ export class NumericAggregationPlugin extends FunctionPlugin {
     return this.reduce(args, formulaAddress, new RegularNumber(1), 'PRODUCT', (left, right) => new RegularNumber(left.get() * right.get()), identityMap, strictlyNumbers)
   }
 
-  private addWithEpsilon = (left: ExtendedNumber, right: ExtendedNumber): RegularNumber => this.interpreter.arithmeticHelper.addWithEpsilon(left, right)
+  private addWithEpsilon = (left: ExtendedNumber, right: ExtendedNumber): ExtendedNumber => this.interpreter.arithmeticHelper.addWithEpsilon(left, right)
 
   /**
    * Reduces procedure arguments with given reducing function
@@ -504,7 +501,7 @@ export class NumericAggregationPlugin extends FunctionPlugin {
             if (arg instanceof CellError) {
               return arg
             } else {
-              return mapFunction(new RegularNumber(arg))
+              return mapFunction(arg)
             }
           })
           .reduce((left, right) => {
@@ -626,18 +623,18 @@ export class NumericAggregationPlugin extends FunctionPlugin {
   }
 }
 
-function strictlyNumbers(arg: InternalScalarValue): Maybe<CellError | ExtendedNumber> {
-  if (arg instanceof ExtendedNumber || arg instanceof CellError) {
+function strictlyNumbers(arg: InternalScalarValue): Maybe<CellError | RichNumber> {
+  if (arg instanceof RichNumber || arg instanceof CellError) {
     return arg
   } else {
     return undefined
   }
 }
 
-function numbersBooleans(arg: InternalScalarValue): Maybe<CellError | ExtendedNumber> {
+function numbersBooleans(arg: InternalScalarValue): Maybe<CellError | RichNumber> {
   if (arg instanceof ExtendedBoolean) {
     return coerceBooleanToNumber(arg)
-  } else if (arg instanceof ExtendedNumber || arg instanceof CellError) {
+  } else if (arg instanceof RichNumber || arg instanceof CellError) {
     return arg
   } else if (arg instanceof ExtendedString) {
     return new RegularNumber(0)
