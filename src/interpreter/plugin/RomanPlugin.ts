@@ -9,7 +9,6 @@ import {ProcedureAst} from '../../parser'
 import {
   getRawValue,
   InternalScalarValue,
-  putRawValue,
   RawScalarValue
 } from '../InterpreterValue'
 import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
@@ -40,7 +39,7 @@ export class RomanPlugin extends FunctionPlugin {
         } else if(mode === true) {
           mode = 0
         }
-        mode = getRawValue(this.coerceScalarToNumberOrError(putRawValue(mode)))
+        mode = getRawValue(this.coerceScalarToNumberOrError(mode))
         if(mode instanceof CellError) {
           return mode
         }
