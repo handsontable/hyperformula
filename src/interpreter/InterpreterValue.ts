@@ -49,6 +49,6 @@ export class DateTimeNumber extends RichNumber {}
 
 export type ExtendedNumber = number | RichNumber
 
-export function isExtendedNumber(val: InterpreterValue): val is ExtendedNumber {
+export function isExtendedNumber(val: any): val is ExtendedNumber {
   return (typeof val === 'number') || (val instanceof RichNumber)
 }

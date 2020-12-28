@@ -138,7 +138,7 @@ export class ArithmeticHelper {
     if (typeof left === 'string' || typeof right === 'string') {
       const leftTmp = typeof left === 'string' ? this.dateTimeHelper.dateStringToDateNumber(left) : left
       const rightTmp = typeof right === 'string' ? this.dateTimeHelper.dateStringToDateNumber(right) : right
-      if (typeof leftTmp === 'number' && typeof rightTmp === 'number') {
+      if (isExtendedNumber(leftTmp) && isExtendedNumber(rightTmp)) {
         return this.floatCmp(leftTmp, rightTmp)
       }
     }

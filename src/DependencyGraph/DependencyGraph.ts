@@ -41,7 +41,7 @@ import {SheetMapping} from './SheetMapping'
 import {ValueCellVertexValue} from './ValueCellVertex'
 import {FunctionRegistry} from '../interpreter/FunctionRegistry'
 import {
-  EmptyValue, RichNumber,
+  EmptyValue,
   getRawValue,
   InternalScalarValue,
   InterpreterValue,

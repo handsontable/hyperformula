@@ -2,6 +2,7 @@ import {ErrorType} from '../src/Cell'
 import {CellContent, CellContentParser} from '../src/CellContentParser'
 import {Config} from '../src/Config'
 import {DateTimeHelper} from '../src/DateTimeHelper'
+import {DateNumber} from '../src/interpreter/InterpreterValue'
 import {NumberLiteralHelper} from '../src/NumberLiteralHelper'
 
 describe('CellContentParser', () => {
@@ -115,8 +116,8 @@ describe('CellContentParser', () => {
   })
 
   it('date parsing', () => {
-    expect(cellContentParser.parse('02-02-2020')).toEqual(new CellContent.Number(43863))
-    expect(cellContentParser.parse('  02-02-2020')).toEqual(new CellContent.Number(43863))
+    expect(cellContentParser.parse('02-02-2020')).toEqual(new CellContent.Number(new DateNumber(43863)))
+    expect(cellContentParser.parse('  02-02-2020')).toEqual(new CellContent.Number(new DateNumber(43863)))
   })
 
   it('JS Date parsing', () => {

@@ -13,7 +13,6 @@ import {ColumnRangeAst, RowRangeAst} from '../../parser/Ast'
 import {coerceBooleanToNumber} from '../ArithmeticHelper'
 import {
   EmptyValue,
-  RichNumber,
   InternalScalarValue, isExtendedNumber, getRawValue, ExtendedNumber,
 } from '../InterpreterValue'
 import {SimpleRangeValue} from '../SimpleRangeValue'
@@ -278,7 +277,8 @@ export class NumericAggregationPlugin extends FunctionPlugin {
     if (result instanceof CellError) {
       return result
     } else {
-      return result.varSValue() ?? new CellError(ErrorType.DIV_BY_ZERO)
+      const val = result.varSValue()
+      return val === undefined  ? new CellError(ErrorType.DIV_BY_ZERO) : Math.sqrt(val)
     }
   }
 
@@ -288,7 +288,8 @@ export class NumericAggregationPlugin extends FunctionPlugin {
     if (result instanceof CellError) {
       return result
     } else {
-      return result.varPValue() ?? new CellError(ErrorType.DIV_BY_ZERO)
+      const val = result.varPValue()
+      return val === undefined  ? new CellError(ErrorType.DIV_BY_ZERO) : Math.sqrt(val)
     }
   }
 
@@ -442,7 +443,7 @@ export class NumericAggregationPlugin extends FunctionPlugin {
   }
 
   private doMin(args: Ast[], formulaAddress: SimpleCellAddress): InternalScalarValue {
-    const value = this.reduce(args, formulaAddress, Number.NEGATIVE_INFINITY, 'MAX',
+    const value = this.reduce(args, formulaAddress, Number.POSITIVE_INFINITY, 'MAX',
       (left: number, right: number) => Math.min(left, right),
       getRawValue, strictlyNumbers
     )
