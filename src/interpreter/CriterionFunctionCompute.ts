@@ -41,7 +41,7 @@ export class CriterionFunctionCompute<T> {
     private readonly cacheKey: (conditions: Condition[]) => string,
     private readonly reduceInitialValue: T,
     private readonly composeFunction: (left: T, right: T) => T,
-    private readonly mapFunction: (arg: RawScalarValue) => T,
+    private readonly mapFunction: (arg: InternalScalarValue) => T,
   ) {
     this.dependencyGraph = this.interpreter.dependencyGraph
   }
@@ -152,7 +152,7 @@ function * getRangeValues(dependencyGraph: DependencyGraph, cellRange: AbsoluteC
   }
 }
 
-function* ifFilter<T>(criterionLambdas: CriterionLambda[], conditionalIterables: IterableIterator<RawScalarValue>[], computableIterable: IterableIterator<T>): IterableIterator<T> {
+function* ifFilter<T>(criterionLambdas: CriterionLambda[], conditionalIterables: IterableIterator<InternalScalarValue>[], computableIterable: IterableIterator<T>): IterableIterator<T> {
   for (const computable of computableIterable) {
     const conditionalSplits = conditionalIterables.map((conditionalIterable) => split(conditionalIterable))
     if (!conditionalSplits.every((cs) => Object.prototype.hasOwnProperty.call(cs, 'value'))) {

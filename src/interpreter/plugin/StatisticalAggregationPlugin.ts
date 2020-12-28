@@ -6,7 +6,13 @@
 import {CellError, ErrorType, SimpleCellAddress} from '../../Cell'
 import {ErrorMessage} from '../../error-message'
 import {ProcedureAst} from '../../parser'
-import {RichNumber, InternalScalarValue, InterpreterValue, RawScalarValue} from '../InterpreterValue'
+import {
+  RichNumber,
+  InternalScalarValue,
+  InterpreterValue,
+  RawScalarValue,
+  RawInterpreterValue, isExtendedNumber, getRawValue
+} from '../InterpreterValue'
 import {SimpleRangeValue} from '../SimpleRangeValue'
 import {
   centralF,
@@ -28,28 +34,28 @@ export class StatisticalAggregationPlugin extends  FunctionPlugin {
     'AVEDEV': {
       method: 'avedev',
       parameters: [
-        {argumentType: ArgumentTypes.ANY, passSubtype: true},
+        {argumentType: ArgumentTypes.ANY},
       ],
       repeatLastArgs: 1
     },
     'DEVSQ': {
       method: 'devsq',
       parameters: [
-        {argumentType: ArgumentTypes.ANY, passSubtype: true},
+        {argumentType: ArgumentTypes.ANY},
       ],
       repeatLastArgs: 1
     },
     'GEOMEAN': {
       method: 'geomean',
       parameters: [
-        {argumentType: ArgumentTypes.ANY, passSubtype: true},
+        {argumentType: ArgumentTypes.ANY},
       ],
       repeatLastArgs: 1
     },
     'HARMEAN': {
       method: 'harmean',
       parameters: [
-        {argumentType: ArgumentTypes.ANY, passSubtype: true},
+        {argumentType: ArgumentTypes.ANY},
       ],
       repeatLastArgs: 1
     },
@@ -129,14 +135,14 @@ export class StatisticalAggregationPlugin extends  FunctionPlugin {
     'SKEW': {
       method: 'skew',
       parameters: [
-        {argumentType: ArgumentTypes.ANY, passSubtype: true},
+        {argumentType: ArgumentTypes.ANY},
       ],
       repeatLastArgs: 1
     },
     'SKEW.P': {
       method: 'skewp',
       parameters: [
-        {argumentType: ArgumentTypes.ANY, passSubtype: true},
+        {argumentType: ArgumentTypes.ANY},
       ],
       repeatLastArgs: 1
     },
@@ -155,7 +161,7 @@ export class StatisticalAggregationPlugin extends  FunctionPlugin {
 
   public avedev(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.runFunction(ast.args, formulaAddress, this.metadata('AVEDEV'),
-      (...args: InterpreterValue[]) => {
+      (...args: RawInterpreterValue[]) => {
         const coerced = this.interpreter.arithmeticHelper.coerceNumbersExactRanges(args)
         if(coerced instanceof CellError) {
           return coerced
@@ -170,7 +176,7 @@ export class StatisticalAggregationPlugin extends  FunctionPlugin {
 
   public devsq(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.runFunction(ast.args, formulaAddress, this.metadata('DEVSQ'),
-      (...args: InterpreterValue[]) => {
+      (...args: RawInterpreterValue[]) => {
         const coerced = this.interpreter.arithmeticHelper.coerceNumbersExactRanges(args)
         if(coerced instanceof CellError) {
           return coerced
@@ -184,7 +190,7 @@ export class StatisticalAggregationPlugin extends  FunctionPlugin {
 
   public geomean(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.runFunction(ast.args, formulaAddress, this.metadata('GEOMEAN'),
-      (...args: InterpreterValue[]) => {
+      (...args: RawInterpreterValue[]) => {
         const coerced = this.interpreter.arithmeticHelper.coerceNumbersExactRanges(args)
         if(coerced instanceof CellError) {
           return coerced
@@ -203,7 +209,7 @@ export class StatisticalAggregationPlugin extends  FunctionPlugin {
 
   public harmean(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.runFunction(ast.args, formulaAddress, this.metadata('HARMEAN'),
-      (...args: InterpreterValue[]) => {
+      (...args: RawInterpreterValue[]) => {
         const coerced = this.interpreter.arithmeticHelper.coerceNumbersExactRanges(args)
         if(coerced instanceof CellError) {
           return coerced
@@ -474,7 +480,7 @@ export class StatisticalAggregationPlugin extends  FunctionPlugin {
 
   public skew(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.runFunction(ast.args, formulaAddress, this.metadata('SKEW'),
-      (...args: InterpreterValue[]) => {
+      (...args: RawInterpreterValue[]) => {
         const coerced = this.interpreter.arithmeticHelper.coerceNumbersExactRanges(args)
         if(coerced instanceof CellError) {
           return coerced
@@ -494,7 +500,7 @@ export class StatisticalAggregationPlugin extends  FunctionPlugin {
 
   public skewp(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.runFunction(ast.args, formulaAddress, this.metadata('SKEW.P'),
-      (...args: InterpreterValue[]) => {
+      (...args: RawInterpreterValue[]) => {
         const coerced = this.interpreter.arithmeticHelper.coerceNumbersExactRanges(args)
         if(coerced instanceof CellError) {
           return coerced
@@ -521,15 +527,15 @@ function parseTwoArrays(dataX: SimpleRangeValue, dataY: SimpleRangeValue): CellE
   const arrX = []
   const arrY = []
   while (x = xit.next(), y = yit.next(), !x.done && !y.done) {
-    const xval: RawScalarValue = x.value
-    const yval: RawScalarValue = y.value
+    const xval: InternalScalarValue = x.value
+    const yval: InternalScalarValue = y.value
     if (xval instanceof CellError) {
       return xval
     } else if (yval instanceof CellError) {
       return yval
-    } else if (typeof xval === 'number' && typeof yval === 'number') {
-      arrX.push(xval)
-      arrY.push(yval)
+    } else if (isExtendedNumber(xval) && isExtendedNumber(yval)) {
+      arrX.push(getRawValue(xval))
+      arrY.push(getRawValue(yval))
     }
   }
   return [arrX, arrY]

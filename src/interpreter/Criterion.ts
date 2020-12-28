@@ -6,7 +6,7 @@
 import {Config} from '../Config'
 import {Maybe} from '../Maybe'
 import {ArithmeticHelper} from './ArithmeticHelper'
-import {EmptyValue, ExtendedString, putRawValue, RawScalarValue} from './InterpreterValue'
+import {EmptyValue, getRawValue, RawScalarValue} from './InterpreterValue'
 
 export enum CriterionType {
   GREATER_THAN = 'GREATER_THAN',
@@ -59,7 +59,7 @@ export class CriterionBuilder {
         criterionType = CriterionType.EQUAL
         criterionValue = criterion
       }
-      const value = arithmeticHelper.coerceToMaybeNumber(putRawValue(criterionValue as RawScalarValue))
+      const value = arithmeticHelper.coerceToMaybeNumber(criterionValue)
       const boolvalue = criterionValue.toLowerCase()===this.trueString ? true : criterionValue.toLowerCase() === this.falseString ? false : undefined
       if(criterionType === undefined) {
         return undefined
@@ -71,7 +71,7 @@ export class CriterionBuilder {
           return buildCriterion(criterionType, boolvalue ?? criterionValue)
         }
       } else {
-        return buildCriterion(criterionType, value.get())
+        return buildCriterion(criterionType, getRawValue(value))
       }
     }
     return undefined
@@ -139,7 +139,7 @@ export const buildCriterionLambda = (criterion: Criterion, arithmeticHelper: Ari
             if(cellValue==='') {
               return false
             }
-            const val = arithmeticHelper.coerceToMaybeNumber(new ExtendedString(cellValue))
+            const val = arithmeticHelper.coerceToMaybeNumber(cellValue)
             if(val === undefined) {
               return false
             }
@@ -165,7 +165,7 @@ export const buildCriterionLambda = (criterion: Criterion, arithmeticHelper: Ari
             if(cellValue === '') {
               return true
             }
-            const val = arithmeticHelper.coerceToMaybeNumber(new ExtendedString(cellValue))
+            const val = arithmeticHelper.coerceToMaybeNumber(cellValue)
             if(val === undefined) {
               return true
             }

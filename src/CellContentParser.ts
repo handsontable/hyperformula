@@ -8,14 +8,15 @@ import {Config} from './Config'
 import {DateTimeHelper} from './DateTimeHelper'
 import {UnableToParseError} from './errors'
 import {fixNegativeZero, isNumberOverflow} from './interpreter/ArithmeticHelper'
+import {cloneNumber, ExtendedNumber, getRawValue} from './interpreter/InterpreterValue'
 import {NumberLiteralHelper} from './NumberLiteralHelper'
 
 export type RawCellContent = Date | string | number | boolean | null | undefined
 
 export namespace CellContent {
   export class Number {
-    constructor(public readonly value: number) {
-      this.value = fixNegativeZero(this.value)
+    constructor(public readonly value: ExtendedNumber) {
+      this.value = cloneNumber(this.value, fixNegativeZero(getRawValue(this.value)))
     }
   }
 
@@ -134,7 +135,7 @@ export class CellContentParser {
         }
         const parsedDateNumber = this.dateHelper.dateStringToDateNumber(trimmedContent)
         if (parsedDateNumber !== undefined) {
-          return new CellContent.Number(parsedDateNumber.get())
+          return new CellContent.Number(parsedDateNumber)
         } else {
           return new CellContent.String(
             content.startsWith('\'') ? content.slice(1) : content,

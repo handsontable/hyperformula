@@ -22,9 +22,7 @@ import {AddRowsTransformer} from '../dependencyTransformers/AddRowsTransformer'
 import {RemoveRowsTransformer} from '../dependencyTransformers/RemoveRowsTransformer'
 import {FormulaTransformer} from '../dependencyTransformers/Transformer'
 import {
-  InternalNoErrorScalarValue,
-  InternalScalarValue,
-  InterpreterValue, RawInterpreterValue, RawNoErrorScalarValue, RawScalarValue, RegularNumber
+  RawInterpreterValue, RawNoErrorScalarValue, RawScalarValue
 } from '../interpreter/InterpreterValue'
 
 type ColumnMap = Map<RawInterpreterValue, ValueIndex>

@@ -8,9 +8,7 @@ import {SimpleCellAddress} from '../Cell'
 import {Config} from '../Config'
 import {DependencyGraph} from '../DependencyGraph'
 import {
-  InternalNoErrorScalarValue,
-  InternalScalarValue,
-  InterpreterValue, RawInterpreterValue,
+  RawInterpreterValue,
   RawNoErrorScalarValue, RawScalarValue
 } from '../interpreter/InterpreterValue'
 import {Matrix} from '../Matrix'

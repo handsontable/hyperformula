@@ -8,7 +8,7 @@ import {ErrorMessage} from '../../error-message'
 import {Maybe} from '../../Maybe'
 import {ProcedureAst} from '../../parser'
 import {Condition, CriterionFunctionCompute} from '../CriterionFunctionCompute'
-import {RichNumber, InternalScalarValue, RawScalarValue, RegularNumber} from '../InterpreterValue'
+import {InternalScalarValue, RawScalarValue, isExtendedNumber, getRawValue} from '../InterpreterValue'
 import {SimpleRangeValue} from '../SimpleRangeValue'
 import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
 
@@ -127,7 +127,7 @@ export class SumifPlugin extends FunctionPlugin {
           sumifCacheKey,
           0,
           (left, right) => this.interpreter.arithmeticHelper.nonstrictadd(left, right),
-          (arg) => arg,
+          (arg) => getRawValue(arg),
         ).compute(valuesArg, [new Condition(conditionArg, criterion)])
       }
     )
@@ -150,7 +150,7 @@ export class SumifPlugin extends FunctionPlugin {
         sumifCacheKey,
         0,
         (left, right) => this.interpreter.arithmeticHelper.nonstrictadd(left, right),
-        (arg) => arg,
+        (arg) => getRawValue(arg),
       ).compute(values, conditions)
     })
   }
@@ -170,9 +170,9 @@ export class SumifPlugin extends FunctionPlugin {
           averageifCacheKey,
           AverageResult.empty,
           (left, right) => left.compose(right),
-          (arg: RawScalarValue) => {
-            if (arg instanceof RichNumber) {
-              return AverageResult.single(arg.get())
+          (arg) => {
+            if (isExtendedNumber(arg)) {
+              return AverageResult.single(getRawValue(arg))
             } else {
               return AverageResult.empty
             }

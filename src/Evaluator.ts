@@ -15,7 +15,7 @@ import {DependencyGraph, FormulaCellVertex, MatrixVertex, RangeVertex, Vertex} f
 import {ErrorMessage} from './error-message'
 import {FunctionRegistry} from './interpreter/FunctionRegistry'
 import {Interpreter} from './interpreter/Interpreter'
-import {EmptyValue, getRawValue, InterpreterValue, RegularNumber} from './interpreter/InterpreterValue'
+import {EmptyValue, getRawValue, InterpreterValue} from './interpreter/InterpreterValue'
 import {Matrix} from './Matrix'
 import {NamedExpressions} from './NamedExpressions'
 import {NumberLiteralHelper} from './NumberLiteralHelper'
@@ -171,7 +171,7 @@ export class Evaluator {
     if (interpreterValue instanceof SimpleRangeValue) {
       return interpreterValue
     } else if (interpreterValue === EmptyValue && this.config.evaluateNullToZero) {
-      return new RegularNumber(0)
+      return 0
     } else {
       return interpreterValue
     }
