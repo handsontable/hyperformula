@@ -59,6 +59,8 @@ class CountHF extends FunctionPlugin {
 ```
 ## Aliases
 
+Aliases are available since the <Badge text="v0.4.0"  vertical="middle"/> version.
+
 If you want to include aliases (multiple names to a single implemented function) inside the plugin,
 you can do this with the static `aliases` property.
 
@@ -197,7 +199,7 @@ console.log(A1Value);
 ## Demo
 
 <iframe
-     src="https://codesandbox.io/embed/github/handsontable/hyperformula-demos/tree/0.3.x/custom-functions?autoresize=1&fontsize=11&hidenavigation=1&theme=light&view=preview"
+     src="https://codesandbox.io/embed/github/handsontable/hyperformula-demos/tree/0.4.x/custom-functions?autoresize=1&fontsize=11&hidenavigation=1&theme=light&view=preview"
      style="width:100%; height:500px; border:0; border-radius: 4px; overflow:hidden;"
      title="handsontable/hyperformula-demos: custom-functions"
      allow="accelerometer; ambient-light-sensor; camera; encrypted-media; geolocation; gyroscope; hid; microphone; midi; payment; usb; vr; xr-spatial-tracking"
