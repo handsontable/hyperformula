@@ -4,11 +4,11 @@
  */
 
 import {CellError, ErrorType, SimpleCellAddress, simpleCellAddress} from './Cell'
-import {CellValue, DetailedCellError,} from './CellValue'
+import {CellValue, DetailedCellError, } from './CellValue'
 import {Config} from './Config'
 import {CellValueChange} from './ContentChanges'
 import {ErrorMessage} from './error-message'
-import {EmptyValue, getRawValue, InterpreterValue, isExtendedNumber,} from './interpreter/InterpreterValue'
+import {EmptyValue, getRawValue, InterpreterValue, isExtendedNumber, } from './interpreter/InterpreterValue'
 import {SimpleRangeValue} from './interpreter/SimpleRangeValue'
 import {NamedExpressions} from './NamedExpressions'
 import {SheetIndexMappingFn, simpleCellAddressToString} from './parser/addressRepresentationConverters'
