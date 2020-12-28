@@ -6,11 +6,7 @@
 import {CellError, ErrorType, SimpleCellAddress} from '../../Cell'
 import {ErrorMessage} from '../../error-message'
 import {ProcedureAst} from '../../parser'
-import {
-  getRawValue,
-  InternalScalarValue,
-  RawScalarValue
-} from '../InterpreterValue'
+import {getRawValue, InternalScalarValue, RawScalarValue} from '../InterpreterValue'
 import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
 
 export class RomanPlugin extends FunctionPlugin {

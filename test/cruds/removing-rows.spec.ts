@@ -1,18 +1,20 @@
-import {HyperFormula, ExportedCellChange} from '../../src'
-import {simpleCellAddress} from '../../src/Cell'
+import {ExportedCellChange, HyperFormula, InvalidArgumentsError} from '../../src'
 import {AbsoluteCellRange} from '../../src/AbsoluteCellRange'
-import {ColumnIndex} from '../../src/Lookup/ColumnIndex'
+import {simpleCellAddress} from '../../src/Cell'
 import {MatrixVertex} from '../../src/DependencyGraph'
-import {InvalidArgumentsError} from '../../src'
+import {ColumnIndex} from '../../src/Lookup/ColumnIndex'
 import {CellAddress} from '../../src/parser'
 import {
-  adr, expectArrayWithSameContent,
+  adr,
+  expectArrayWithSameContent,
   expectEngineToBeTheSameAs,
   expectFunctionToHaveRefError,
   expectReferenceToHaveRefError,
   extractMatrixRange,
   extractRange,
-  extractReference, verifyRangesInSheet, verifyValues,
+  extractReference,
+  verifyRangesInSheet,
+  verifyValues,
 } from '../testUtils'
 
 describe('Removing rows - checking if its possible', () => {

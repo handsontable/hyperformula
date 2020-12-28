@@ -3,12 +3,7 @@
  * Copyright (c) 2020 Handsoncode. All rights reserved.
  */
 
-import {
-  CellError,
-  CellValueTypeOrd,
-  ErrorType,
-  getCellValueType
-} from '../Cell'
+import {CellError, CellValueTypeOrd, ErrorType, getCellValueType} from '../Cell'
 import {Config} from '../Config'
 import {DateTimeHelper} from '../DateTimeHelper'
 import {ErrorMessage} from '../error-message'
@@ -16,10 +11,16 @@ import {Maybe} from '../Maybe'
 import {NumberLiteralHelper} from '../NumberLiteralHelper'
 import {collatorFromConfig} from '../StringHelper'
 import {
-  EmptyValue, getRawValue,
+  EmptyValue,
+  ExtendedNumber,
+  getRawValue,
   InternalNoErrorScalarValue,
   InternalScalarValue,
-  InterpreterValue, RawInterpreterValue, RawNoErrorScalarValue, RawScalarValue, ExtendedNumber, isExtendedNumber
+  InterpreterValue,
+  isExtendedNumber,
+  RawInterpreterValue,
+  RawNoErrorScalarValue,
+  RawScalarValue
 } from './InterpreterValue'
 import {SimpleRangeValue} from './SimpleRangeValue'
 import Collator = Intl.Collator

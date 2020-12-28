@@ -5,10 +5,7 @@
 
 import {CellVertex, FormulaCellVertex, MatrixVertex, ParsingErrorVertex, ValueCellVertex} from './DependencyGraph'
 import {ErrorMessage} from './error-message'
-import {
-  EmptyValue,
-  InterpreterValue, isExtendedNumber
-} from './interpreter/InterpreterValue'
+import {EmptyValue, InterpreterValue, isExtendedNumber} from './interpreter/InterpreterValue'
 import {SimpleRangeValue} from './interpreter/SimpleRangeValue'
 import {CellAddress} from './parser'
 import {AddressWithSheet} from './parser/Address'

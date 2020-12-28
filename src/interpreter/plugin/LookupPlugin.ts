@@ -4,24 +4,16 @@
  */
 
 import {AbsoluteCellRange} from '../../AbsoluteCellRange'
-import {
-  CellError,
-  ErrorType,
-  simpleCellAddress,
-  SimpleCellAddress
-} from '../../Cell'
+import {CellError, ErrorType, simpleCellAddress, SimpleCellAddress} from '../../Cell'
 import {ErrorMessage} from '../../error-message'
+import {RowSearchStrategy} from '../../Lookup/RowSearchStrategy'
+import {SearchStrategy} from '../../Lookup/SearchStrategy'
 import {ProcedureAst} from '../../parser'
 import {StatType} from '../../statistics'
-import {
-  InternalScalarValue,
-  RawNoErrorScalarValue,
-} from '../InterpreterValue'
+import {zeroIfEmpty} from '../ArithmeticHelper'
+import {InternalScalarValue, RawNoErrorScalarValue,} from '../InterpreterValue'
 import {SimpleRangeValue} from '../SimpleRangeValue'
 import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
-import {SearchStrategy} from '../../Lookup/SearchStrategy'
-import {RowSearchStrategy} from '../../Lookup/RowSearchStrategy'
-import {zeroIfEmpty} from '../ArithmeticHelper'
 
 export class LookupPlugin extends FunctionPlugin {
   private rowSearch: RowSearchStrategy = new RowSearchStrategy(this.config, this.dependencyGraph)

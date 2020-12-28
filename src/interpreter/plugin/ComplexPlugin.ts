@@ -7,8 +7,8 @@ import {CellError, ErrorType, SimpleCellAddress} from '../../Cell'
 import {ErrorMessage} from '../../error-message'
 import {ProcedureAst} from '../../parser'
 import {coerceComplexToString, complex} from '../ArithmeticHelper'
-import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
 import {InternalScalarValue, RawInterpreterValue} from '../InterpreterValue'
+import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
 
 export class ComplexPlugin extends  FunctionPlugin {
   public static implementedFunctions = {

@@ -3,13 +3,13 @@
  * Copyright (c) 2020 Handsoncode. All rights reserved.
  */
 
-import {getRawValue, RawNoErrorScalarValue} from '../interpreter/InterpreterValue'
-import {SearchStrategy} from './SearchStrategy'
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
-import {rangeLowerBound} from '../interpreter/binarySearch'
 import {Config} from '../Config'
 import {DependencyGraph} from '../DependencyGraph'
+import {rangeLowerBound} from '../interpreter/binarySearch'
+import {getRawValue, RawNoErrorScalarValue} from '../interpreter/InterpreterValue'
 import {AdvancedFind} from './AdvancedFind'
+import {SearchStrategy} from './SearchStrategy'
 
 export class RowSearchStrategy extends AdvancedFind implements SearchStrategy {
   constructor(

@@ -6,13 +6,7 @@
 import {CellError, ErrorType, SimpleCellAddress} from '../../Cell'
 import {ErrorMessage} from '../../error-message'
 import {ProcedureAst} from '../../parser'
-import {
-  RichNumber,
-  InternalScalarValue,
-  InterpreterValue,
-  RawScalarValue,
-  RawInterpreterValue, isExtendedNumber, getRawValue
-} from '../InterpreterValue'
+import {getRawValue, InternalScalarValue, isExtendedNumber, RawInterpreterValue} from '../InterpreterValue'
 import {SimpleRangeValue} from '../SimpleRangeValue'
 import {
   centralF,

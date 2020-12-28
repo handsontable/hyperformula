@@ -3,11 +3,7 @@
  * Copyright (c) 2020 Handsoncode. All rights reserved.
  */
 
-import {
-  CellError,
-  ErrorType,
-  SimpleCellAddress
-} from '../../Cell'
+import {CellError, ErrorType, SimpleCellAddress} from '../../Cell'
 import {
   instanceOfSimpleDate,
   instanceOfSimpleTime,
@@ -27,9 +23,13 @@ import {
   DateNumber,
   DateTimeNumber,
   EmptyValue,
+  getRawValue,
   InternalNoErrorScalarValue,
-  InternalScalarValue, RawNoErrorScalarValue, RawScalarValue,
-  TimeNumber, getRawValue, isExtendedNumber
+  InternalScalarValue,
+  isExtendedNumber,
+  RawNoErrorScalarValue,
+  RawScalarValue,
+  TimeNumber
 } from '../InterpreterValue'
 import {SimpleRangeValue} from '../SimpleRangeValue'
 import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'

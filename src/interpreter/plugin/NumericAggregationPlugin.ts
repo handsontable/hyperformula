@@ -11,10 +11,7 @@ import {Maybe} from '../../Maybe'
 import {Ast, AstNodeType, CellRangeAst, ProcedureAst} from '../../parser'
 import {ColumnRangeAst, RowRangeAst} from '../../parser/Ast'
 import {coerceBooleanToNumber} from '../ArithmeticHelper'
-import {
-  EmptyValue,
-  InternalScalarValue, isExtendedNumber, getRawValue, ExtendedNumber,
-} from '../InterpreterValue'
+import {EmptyValue, ExtendedNumber, getRawValue, InternalScalarValue, isExtendedNumber,} from '../InterpreterValue'
 import {SimpleRangeValue} from '../SimpleRangeValue'
 import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
 

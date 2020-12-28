@@ -25,7 +25,8 @@ import {
   normal,
   normalci,
   poisson,
-  studentt, tci,
+  studentt,
+  tci,
   weibull
 } from './3rdparty/jstat/jstat'
 import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'

@@ -3,17 +3,13 @@
  * Copyright (c) 2020 Handsoncode. All rights reserved.
  */
 
-import {FunctionMetadata, FunctionPlugin, FunctionPluginDefinition} from './plugin/FunctionPlugin'
-import {Interpreter} from './Interpreter'
-import {Maybe} from '../Maybe'
 import {Config} from '../Config'
-import {
-  AliasAlreadyExisting,
-  FunctionPluginValidationError,
-  ProtectedFunctionError
-} from '../errors'
-import {TranslationSet} from '../i18n'
+import {AliasAlreadyExisting, FunctionPluginValidationError, ProtectedFunctionError} from '../errors'
 import {HyperFormula} from '../HyperFormula'
+import {TranslationSet} from '../i18n'
+import {Maybe} from '../Maybe'
+import {Interpreter} from './Interpreter'
+import {FunctionMetadata, FunctionPlugin, FunctionPluginDefinition} from './plugin/FunctionPlugin'
 import {VersionPlugin} from './plugin/VersionPlugin'
 
 export type FunctionTranslationsPackage = Record<string, TranslationSet>

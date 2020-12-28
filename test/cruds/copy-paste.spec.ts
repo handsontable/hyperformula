@@ -1,6 +1,8 @@
-import {HyperFormula, ExportedCellChange, NothingToPasteError} from '../../src'
+import {ExportedCellChange, HyperFormula, NothingToPasteError} from '../../src'
 import {ErrorType, simpleCellAddress} from '../../src/Cell'
+import {Config} from '../../src/Config'
 import {ErrorMessage} from '../../src/error-message'
+import {SheetSizeLimitExceededError} from '../../src/errors'
 import {CellAddress} from '../../src/parser'
 import {
   adr,
@@ -8,11 +10,10 @@ import {
   colStart,
   detailedError,
   expectArrayWithSameContent,
-  extractReference, rowEnd,
+  extractReference,
+  rowEnd,
   rowStart,
 } from '../testUtils'
-import {Config} from '../../src/Config'
-import {SheetSizeLimitExceededError} from '../../src/errors'
 
 describe('Copy - paste integration', () => {
   it('copy should validate arguments', () => {

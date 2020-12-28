@@ -4,8 +4,8 @@
  */
 
 import {absoluteSheetReference, SimpleCellAddress, simpleRowAddress, SimpleRowAddress} from '../Cell'
-import {ReferenceType} from './ColumnAddress'
 import {AddressWithRow} from './Address'
+import {ReferenceType} from './ColumnAddress'
 
 export class RowAddress implements AddressWithRow {
   private constructor(

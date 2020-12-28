@@ -1,9 +1,11 @@
 import {ErrorType, HyperFormula} from '../../src'
 import {AbsoluteCellRange} from '../../src/AbsoluteCellRange'
 import {simpleCellAddress} from '../../src/Cell'
+import {Config} from '../../src/Config'
+import {EmptyCellVertex, FormulaCellVertex, ValueCellVertex} from '../../src/DependencyGraph'
+import {SheetSizeLimitExceededError} from '../../src/errors'
 import {EmptyValue} from '../../src/interpreter/InterpreterValue'
 import {ColumnIndex} from '../../src/Lookup/ColumnIndex'
-import {EmptyCellVertex, FormulaCellVertex, ValueCellVertex} from '../../src/DependencyGraph'
 import {CellAddress} from '../../src/parser'
 import {
   adr,
@@ -20,8 +22,6 @@ import {
   rowEnd,
   rowStart,
 } from '../testUtils'
-import {Config} from '../../src/Config'
-import {SheetSizeLimitExceededError} from '../../src/errors'
 
 describe('Moving rows - checking if its possible', () => {
   it('source top left corner should have valid coordinates', () => {

@@ -12,8 +12,8 @@ import {
   simpleRowAddress,
   SimpleRowAddress,
 } from '../Cell'
-import {columnIndexToLabel} from './addressRepresentationConverters'
 import {AddressWithColumn, AddressWithRow} from './Address'
+import {columnIndexToLabel} from './addressRepresentationConverters'
 
 /** Possible kinds of cell references */
 export enum CellReferenceType {

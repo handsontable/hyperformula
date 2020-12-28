@@ -5,18 +5,13 @@
 
 import GPU from 'gpu.js'
 import {AbsoluteCellRange, AbsoluteColumnRange, AbsoluteRowRange} from '../AbsoluteCellRange'
-import {
-  CellError,
-  ErrorType,
-  invalidSimpleCellAddress,
-  SimpleCellAddress
-} from '../Cell'
-import {ColumnSearchStrategy} from '../Lookup/SearchStrategy'
+import {CellError, ErrorType, invalidSimpleCellAddress, SimpleCellAddress} from '../Cell'
 import {Config} from '../Config'
 import {DateTimeHelper} from '../DateTimeHelper'
 import {DependencyGraph} from '../DependencyGraph'
-import {LicenseKeyValidityState} from '../helpers/licenseKeyValidator'
 import {ErrorMessage} from '../error-message'
+import {LicenseKeyValidityState} from '../helpers/licenseKeyValidator'
+import {ColumnSearchStrategy} from '../Lookup/SearchStrategy'
 import {Matrix, NotComputedMatrix} from '../Matrix'
 import {Maybe} from '../Maybe'
 import {NamedExpressions} from '../NamedExpressions'
@@ -29,9 +24,12 @@ import {ArithmeticHelper, coerceScalarToString, fixNegativeZero, isNumberOverflo
 import {CriterionBuilder} from './Criterion'
 import {FunctionRegistry} from './FunctionRegistry'
 import {
+  cloneNumber,
   EmptyValue,
+  getRawValue,
   InternalNoErrorScalarValue,
-  InterpreterValue, isExtendedNumber, getRawValue, cloneNumber,
+  InterpreterValue,
+  isExtendedNumber,
 } from './InterpreterValue'
 import {SimpleRangeValue} from './SimpleRangeValue'
 

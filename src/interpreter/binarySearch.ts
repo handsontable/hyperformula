@@ -6,12 +6,7 @@
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
 import {CellError, simpleCellAddress} from '../Cell'
 import {DependencyGraph} from '../DependencyGraph'
-import {
-  EmptyValue,
-  getRawValue,
-  RawInterpreterValue,
-  RawScalarValue
-} from './InterpreterValue'
+import {EmptyValue, getRawValue, RawInterpreterValue, RawScalarValue} from './InterpreterValue'
 
 /*
 * If key exists returns first index of key element in range of sorted values

@@ -5,7 +5,6 @@
 
 import {SimpleCellAddress} from './Cell'
 
-
 /**
  * Error thrown when the sheet of a given ID does not exist.
  */

@@ -6,20 +6,20 @@
 import {TranslatableErrorType} from './Cell'
 import {defaultParseToDateTime} from './DateTimeDefault'
 import {DateTime, instanceOfSimpleDate, SimpleDate, SimpleDateTime, SimpleTime} from './DateTimeHelper'
-import {
-  ConfigValueTooSmallError,
-  ConfigValueTooBigError,
-  ExpectedValueOfTypeError,
-  ExpectedOneOfValuesError
-} from './errors'
 import {AlwaysDense, ChooseAddressMapping} from './DependencyGraph/AddressMapping/ChooseAddressMappingPolicy'
+import {
+  ConfigValueTooBigError,
+  ConfigValueTooSmallError,
+  ExpectedOneOfValuesError,
+  ExpectedValueOfTypeError
+} from './errors'
 import {defaultStringifyDateTime, defaultStringifyDuration} from './format/format'
+import {checkLicenseKeyValidity, LicenseKeyValidityState} from './helpers/licenseKeyValidator'
 import {HyperFormula} from './HyperFormula'
 import {TranslationPackage} from './i18n'
+import {FunctionPluginDefinition} from './interpreter/plugin/FunctionPlugin'
 import {Maybe} from './Maybe'
 import {ParserConfig} from './parser/ParserConfig'
-import {checkLicenseKeyValidity, LicenseKeyValidityState} from './helpers/licenseKeyValidator'
-import {FunctionPluginDefinition} from './interpreter/plugin/FunctionPlugin'
 
 type GPUMode = 'gpu' | 'cpu' | 'dev'
 

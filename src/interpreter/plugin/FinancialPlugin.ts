@@ -6,11 +6,7 @@
 import {CellError, ErrorType, SimpleCellAddress} from '../../Cell'
 import {ErrorMessage} from '../../error-message'
 import {ProcedureAst} from '../../parser'
-import {
-  EmptyValue,
-  InternalScalarValue,
-  RawInterpreterValue, isExtendedNumber, getRawValue
-} from '../InterpreterValue'
+import {EmptyValue, getRawValue, InternalScalarValue, isExtendedNumber, RawInterpreterValue} from '../InterpreterValue'
 import {SimpleRangeValue} from '../SimpleRangeValue'
 import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
 

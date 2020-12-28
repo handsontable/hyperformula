@@ -3,8 +3,8 @@
  * Copyright (c) 2020 Handsoncode. All rights reserved.
  */
 
-import {StatType} from './StatType'
 import {Statistics} from './Statistics'
+import {StatType} from './StatType'
 
 /** Do not store stats in the memory. Stats are not needed on daily basis */
 export class EmptyStatistics extends Statistics {

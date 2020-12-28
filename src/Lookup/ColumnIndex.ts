@@ -4,13 +4,13 @@
  */
 
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
-import {
-  CellError,
-  movedSimpleCellAddress,
-  SimpleCellAddress
-} from '../Cell'
+import {CellError, movedSimpleCellAddress, SimpleCellAddress} from '../Cell'
 import {Config} from '../Config'
 import {DependencyGraph} from '../DependencyGraph'
+import {AddRowsTransformer} from '../dependencyTransformers/AddRowsTransformer'
+import {RemoveRowsTransformer} from '../dependencyTransformers/RemoveRowsTransformer'
+import {FormulaTransformer} from '../dependencyTransformers/Transformer'
+import {RawInterpreterValue, RawNoErrorScalarValue, RawScalarValue} from '../interpreter/InterpreterValue'
 import {SimpleRangeValue} from '../interpreter/SimpleRangeValue'
 import {LazilyTransformingAstService} from '../LazilyTransformingAstService'
 import {Matrix} from '../Matrix'
@@ -18,12 +18,6 @@ import {ColumnsSpan, RowsSpan} from '../Span'
 import {Statistics, StatType} from '../statistics'
 import {ColumnBinarySearch} from './ColumnBinarySearch'
 import {ColumnSearchStrategy} from './SearchStrategy'
-import {AddRowsTransformer} from '../dependencyTransformers/AddRowsTransformer'
-import {RemoveRowsTransformer} from '../dependencyTransformers/RemoveRowsTransformer'
-import {FormulaTransformer} from '../dependencyTransformers/Transformer'
-import {
-  RawInterpreterValue, RawNoErrorScalarValue, RawScalarValue
-} from '../interpreter/InterpreterValue'
 
 type ColumnMap = Map<RawInterpreterValue, ValueIndex>
 

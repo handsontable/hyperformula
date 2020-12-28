@@ -7,15 +7,12 @@ import {AbsoluteCellRange} from '../AbsoluteCellRange'
 import {SimpleCellAddress} from '../Cell'
 import {Config} from '../Config'
 import {DependencyGraph} from '../DependencyGraph'
-import {
-  RawInterpreterValue,
-  RawNoErrorScalarValue, RawScalarValue
-} from '../interpreter/InterpreterValue'
+import {RawInterpreterValue, RawNoErrorScalarValue, RawScalarValue} from '../interpreter/InterpreterValue'
 import {Matrix} from '../Matrix'
+import {ColumnsSpan} from '../Span'
 import {Statistics} from '../statistics/Statistics'
 import {ColumnBinarySearch} from './ColumnBinarySearch'
 import {ColumnIndex} from './ColumnIndex'
-import {ColumnsSpan} from '../Span'
 
 export interface SearchStrategy {
   find(key: RawNoErrorScalarValue, range: AbsoluteCellRange, sorted: boolean): number,

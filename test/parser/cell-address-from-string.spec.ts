@@ -2,8 +2,7 @@ import {simpleCellAddress} from '../../src/Cell'
 import {SheetMapping} from '../../src/DependencyGraph'
 import {buildTranslationPackage} from '../../src/i18n'
 import {enGB} from '../../src/i18n/languages'
-import {cellAddressFromString} from '../../src/parser'
-import {CellAddress} from '../../src/parser'
+import {CellAddress, cellAddressFromString} from '../../src/parser'
 
 describe('cellAddressFromString', () => {
   it('is zero based', () => {

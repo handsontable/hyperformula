@@ -8,7 +8,7 @@ import {ErrorMessage} from '../../error-message'
 import {Maybe} from '../../Maybe'
 import {ProcedureAst} from '../../parser'
 import {Condition, CriterionFunctionCompute} from '../CriterionFunctionCompute'
-import {InternalScalarValue, RawScalarValue, isExtendedNumber, getRawValue} from '../InterpreterValue'
+import {getRawValue, InternalScalarValue, isExtendedNumber, RawScalarValue} from '../InterpreterValue'
 import {SimpleRangeValue} from '../SimpleRangeValue'
 import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
 

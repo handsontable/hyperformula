@@ -4,8 +4,8 @@
  */
 
 import {absoluteSheetReference, SimpleCellAddress, simpleColumnAddress, SimpleColumnAddress} from '../Cell'
-import {columnIndexToLabel} from './addressRepresentationConverters'
 import {AddressWithColumn} from './Address'
+import {columnIndexToLabel} from './addressRepresentationConverters'
 
 export enum ReferenceType {
   RELATIVE = 'RELATIVE',
