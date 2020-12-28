@@ -43,7 +43,7 @@ export class RomanPlugin extends FunctionPlugin {
         if(mode instanceof CellError) {
           return mode
         }
-        mode = Math.trunc(mode as number)
+        mode = Math.trunc(mode)
         if(mode < 0) {
           return new CellError(ErrorType.VALUE, ErrorMessage.ValueSmall)
         }

@@ -30,7 +30,7 @@ export abstract class RichNumber {
     return this.val
   }
   public clone(val: number): this{
-    return new (<any>this.constructor)(val)
+    return new (this.constructor as any)(val)
   }
 }
 

@@ -108,7 +108,7 @@ export interface FunctionArgument {
    * Argument should be passed with full type information.
    * (e.g. Date/DateTime/Time/Currency/Percentage for numbers)
    */
-  passSubtype?: boolean
+  passSubtype?: boolean,
 
   /**
    * If argument is missing, its value defaults to this.
@@ -211,6 +211,7 @@ export abstract class FunctionPlugin {
             ret = coerced
             break
           }
+          // eslint-disable-next-line no-case-declarations
           const value = getRawValue(coerced)
           if (coercedType.maxValue !== undefined && value > coercedType.maxValue) {
             return new CellError(ErrorType.NUM, ErrorMessage.ValueLarge)

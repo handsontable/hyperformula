@@ -308,7 +308,7 @@ export class MathPlugin extends FunctionPlugin {
             return valY
           }
           if(typeof valX === 'number' && typeof valY === 'number') {
-            ret += Math.pow(valX,2) - Math.pow(valY,2)
+            ret += Math.pow(valX, 2) - Math.pow(valY, 2)
           }
         }
         return ret
@@ -336,7 +336,7 @@ export class MathPlugin extends FunctionPlugin {
             return valY
           }
           if(typeof valX === 'number' && typeof valY === 'number') {
-            ret += Math.pow(valX,2) + Math.pow(valY,2)
+            ret += Math.pow(valX, 2) + Math.pow(valY, 2)
           }
         }
         return ret
@@ -364,7 +364,7 @@ export class MathPlugin extends FunctionPlugin {
             return valY
           }
           if(typeof valX === 'number' && typeof valY === 'number') {
-            ret += Math.pow(valX-valY,2)
+            ret += Math.pow(valX-valY, 2)
           }
         }
         return ret

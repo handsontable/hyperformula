@@ -73,7 +73,7 @@ export class AddressMapping {
     } else if (vertex instanceof MatrixVertex) {
       return vertex.getMatrixCellValue(address)
     } else {
-      return vertex.getCellValue() as InterpreterValue
+      return vertex.getCellValue()
     }
   }
 

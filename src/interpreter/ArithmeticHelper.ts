@@ -194,7 +194,7 @@ export class ArithmeticHelper {
     }
   }
   //FIXME
-  public addWithEpsilon = (left: ExtendedNumber, right: ExtendedNumber): ExtendedNumber => this.addWithEpsilonRaw(getRawValue(left),getRawValue(right))
+  public addWithEpsilon = (left: ExtendedNumber, right: ExtendedNumber): ExtendedNumber => this.addWithEpsilonRaw(getRawValue(left), getRawValue(right))
 
 
   //FIXME
@@ -397,6 +397,7 @@ export class ArithmeticHelper {
       if(arg instanceof CellError) {
         return arg
       } else if(arg === EmptyValue) {
+        continue
       } else if (isExtendedNumber(arg)) {
         ret.push(getRawValue(arg))
       } else {

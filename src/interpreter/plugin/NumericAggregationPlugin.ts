@@ -166,7 +166,7 @@ export class NumericAggregationPlugin extends FunctionPlugin {
   }
 
   public sumsq(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.reduce(ast.args, formulaAddress, 0, 'SUMSQ', this.addWithEpsilonRaw, (arg: ExtendedNumber) => Math.pow(getRawValue(arg),2), strictlyNumbers)
+    return this.reduce(ast.args, formulaAddress, 0, 'SUMSQ', this.addWithEpsilonRaw, (arg: ExtendedNumber) => Math.pow(getRawValue(arg), 2), strictlyNumbers)
   }
 
   /**
