@@ -52,3 +52,26 @@ export type ExtendedNumber = number | RichNumber
 export function isExtendedNumber(val: any): val is ExtendedNumber {
   return (typeof val === 'number') || (val instanceof RichNumber)
 }
+
+export enum NumberType {
+  Raw = 'Raw',
+  Date = 'Date',
+  Time = 'Time',
+  DateTime = 'DateTime',
+  Currency = 'Currency',
+}
+
+export function ExtendedNumberFactory(type: NumberType, value: number): ExtendedNumber {
+  switch (type) {
+    case NumberType.Raw:
+      return value
+    case NumberType.Currency:
+      return new CurrencyNumber(value)
+    case NumberType.Date:
+      return new DateNumber(value)
+    case NumberType.DateTime:
+      return new DateTimeNumber(value)
+    case NumberType.Time:
+      return new TimeNumber(value)
+  }
+}
