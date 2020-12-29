@@ -1214,7 +1214,7 @@ export class HyperFormula implements TypedEmitter {
    * const changes = hfInstance.setRowOrder(0, [[0,2],[2,0]]);
    * ```
    *
-   * @category Cells
+   * @category Columns
    */
   public setColumnOrder(sheetId: number, columnMapping: [number, number][]): ExportedChange[] {
     this._crudOperations.setColumnOrder(sheetId, columnMapping)
