@@ -125,9 +125,11 @@ export class Unparser {
       endSheet = this.unparseSheetName(ast.end.sheet) + '!'
     }
 
-    const unparsedStart = ast.start.unparse(baseAddress) ?? this.config.translationPackage.getErrorTranslation(ErrorType.REF)
-    const unparsedEnd = ast.end.unparse(baseAddress) ?? this.config.translationPackage.getErrorTranslation(ErrorType.REF)
-
+    const unparsedStart = ast.start.unparse(baseAddress)
+    const unparsedEnd = ast.end.unparse(baseAddress)
+    if(unparsedStart === undefined || unparsedEnd === undefined) {
+      return this.config.translationPackage.getErrorTranslation(ErrorType.REF)
+    }
     return `${startSheeet}${unparsedStart}:${endSheet}${unparsedEnd}`
   }
 }

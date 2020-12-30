@@ -202,7 +202,7 @@ describe('Copy - paste integration', () => {
     engine.copy(adr('B2'), 1, 1)
     engine.paste(adr('A1'))
 
-    expect(engine.getCellSerialized(adr('A1'))).toEqual('=#REF!:A1')
+    expect(engine.getCellSerialized(adr('A1'))).toEqual('=#REF!')
   })
 
   it('should return ref when pasted column range is out of scope', () => {
@@ -214,7 +214,7 @@ describe('Copy - paste integration', () => {
     engine.copy(adr('B2'), 1, 1)
     engine.paste(adr('A1'))
 
-    expect(engine.getCellSerialized(adr('A1'))).toEqual('=#REF!:A')
+    expect(engine.getCellSerialized(adr('A1'))).toEqual('=#REF!')
   })
 
   it('should return ref when pasted row range is out of scope', () => {
@@ -226,7 +226,7 @@ describe('Copy - paste integration', () => {
     engine.copy(adr('B2'), 1, 1)
     engine.paste(adr('A1'))
 
-    expect(engine.getCellSerialized(adr('A1'))).toEqual('=#REF!:1')
+    expect(engine.getCellSerialized(adr('A1'))).toEqual('=#REF!')
   })
 
   it('should create new range vertex - cell range', () => {
