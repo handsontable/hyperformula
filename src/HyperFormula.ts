@@ -1165,17 +1165,17 @@ export class HyperFormula implements TypedEmitter {
    * //   address: { sheet: 0, col: 1, row: 0 },
    * //   newValue: 5,
    * // }]
-   * const changes = hfInstance.setRowOrder(0, [[0,2],[2,0]]);
+   * const changes = hfInstance.swapRowIndexes(0, [[0,2],[2,0]]);
    * ```
    *
    * @category Rows
    */
-  public setRowOrder(sheetId: number, rowMapping: [number, number][]): ExportedChange[] {
+  public swapRowIndexes(sheetId: number, rowMapping: [number, number][]): ExportedChange[] {
     this._crudOperations.setRowOrder(sheetId, rowMapping)
     return this.recomputeIfDependencyGraphNeedsIt()
   }
 
-  public isItPossibleToSetRowOrder(sheetId: number, rowMapping: [number,number][]): boolean {
+  public isItPossibleToSwapRowIndexes(sheetId: number, rowMapping: [number, number][]): boolean {
     try {
       this._crudOperations.validateSetRowOrder(sheetId, rowMapping)
     } catch (e) {
@@ -1222,17 +1222,17 @@ export class HyperFormula implements TypedEmitter {
    * //   address: { sheet: 0, col: 0, row: 1 },
    * //   newValue: null,
    * // }]
-   * const changes = hfInstance.setRowOrder(0, [[0,2],[2,0]]);
+   * const changes = hfInstance.swapColumnIndexes(0, [[0,2],[2,0]]);
    * ```
    *
    * @category Columns
    */
-  public setColumnOrder(sheetId: number, columnMapping: [number, number][]): ExportedChange[] {
+  public swapColumnIndexes(sheetId: number, columnMapping: [number, number][]): ExportedChange[] {
     this._crudOperations.setColumnOrder(sheetId, columnMapping)
     return this.recomputeIfDependencyGraphNeedsIt()
   }
 
-  public isItPossibleToSetColumnOrder(sheetId: number, columnMapping: [number,number][]): boolean {
+  public isItPossibleToSwapColumnIndexes(sheetId: number, columnMapping: [number, number][]): boolean {
     try {
       this._crudOperations.validateSetColumnOrder(sheetId, columnMapping)
     } catch (e) {

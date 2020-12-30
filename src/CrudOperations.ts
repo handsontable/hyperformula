@@ -302,7 +302,7 @@ export class CrudOperations {
     this.undoRedo.saveOperation(new SetRowOrderUndoEntry(sheetId, rowMapping))
   }
 
-  public validateSetRowOrder(sheetId: number, rowMapping: [number,number][]): void {
+  public validateSetRowOrder(sheetId: number, rowMapping: [number, number][]): void {
     if (!this.sheetMapping.hasSheetWithId(sheetId)) {
       throw new NoSheetWithIdError(sheetId)
     }
@@ -317,7 +317,7 @@ export class CrudOperations {
     this.undoRedo.saveOperation(new SetColumnOrderUndoEntry(sheetId, columnMapping))
   }
 
-  public validateSetColumnOrder(sheetId: number, columnMapping: [number,number][]): void {
+  public validateSetColumnOrder(sheetId: number, columnMapping: [number, number][]): void {
     if (!this.sheetMapping.hasSheetWithId(sheetId)) {
       throw new NoSheetWithIdError(sheetId)
     }
