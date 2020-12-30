@@ -295,25 +295,33 @@ export class CrudOperations {
   }
 
   public setRowOrder(sheetId: number, rowMapping: [number, number][]): void {
-    if (!this.sheetMapping.hasSheetWithId(sheetId)) {
-      throw new NoSheetWithIdError(sheetId)
-    }
-    this.validateRowOrColumnMapping(sheetId, rowMapping, 'row')
+    this.validateSetRowOrder(sheetId, rowMapping)
     this.undoRedo.clearRedoStack()
     this.clipboardOperations.abortCut()
     this.operations.setRowOrder(sheetId, rowMapping)
     this.undoRedo.saveOperation(new SetRowOrderUndoEntry(sheetId, rowMapping))
   }
 
-  public setColumnOrder(sheetId: number, columnMapping: [number, number][]): void {
+  public validateSetRowOrder(sheetId: number, rowMapping: [number,number][]): void {
     if (!this.sheetMapping.hasSheetWithId(sheetId)) {
       throw new NoSheetWithIdError(sheetId)
     }
-    this.validateRowOrColumnMapping(sheetId, columnMapping, 'column')
+    this.validateRowOrColumnMapping(sheetId, rowMapping, 'row')
+  }
+
+  public setColumnOrder(sheetId: number, columnMapping: [number, number][]): void {
+    this.validateSetColumnOrder(sheetId, columnMapping)
     this.undoRedo.clearRedoStack()
     this.clipboardOperations.abortCut()
     this.operations.setColumnOrder(sheetId, columnMapping)
     this.undoRedo.saveOperation(new SetColumnOrderUndoEntry(sheetId, columnMapping))
+  }
+
+  public validateSetColumnOrder(sheetId: number, columnMapping: [number,number][]): void {
+    if (!this.sheetMapping.hasSheetWithId(sheetId)) {
+      throw new NoSheetWithIdError(sheetId)
+    }
+    this.validateRowOrColumnMapping(sheetId, columnMapping, 'column')
   }
 
   private validateRowOrColumnMapping(sheetId: number, rowMapping: [number, number][], rowOrColumn: 'row' | 'column'): void {

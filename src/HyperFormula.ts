@@ -1138,6 +1138,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
    * @throws an error when rowMapping does not define correct row permutation for some subset of rows of the given sheet
+   * @throws [[SourceLocationHasMatrixError]] when the selected position has matrix inside
    *
    * @example
    * ```js
@@ -1174,6 +1175,15 @@ export class HyperFormula implements TypedEmitter {
     return this.recomputeIfDependencyGraphNeedsIt()
   }
 
+  public isItPossibleToSetRowOrder(sheetId: number, rowMapping: [number,number][]): boolean {
+    try {
+      this._crudOperations.validateSetRowOrder(sheetId, rowMapping)
+    } catch (e) {
+      return false
+    }
+    return this._crudOperations.operations.testRowOrderForMatrices(sheetId, rowMapping)
+  }
+
   /**
    * Reorders columns of a sheet according to a permutation.
    *
@@ -1186,6 +1196,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
    * @throws an error when columnMapping does not define correct column permutation for some subset of columns of the given sheet
+   * @throws [[SourceLocationHasMatrixError]] when the selected position has matrix inside
    *
    * @example
    * ```js
@@ -1219,6 +1230,15 @@ export class HyperFormula implements TypedEmitter {
   public setColumnOrder(sheetId: number, columnMapping: [number, number][]): ExportedChange[] {
     this._crudOperations.setColumnOrder(sheetId, columnMapping)
     return this.recomputeIfDependencyGraphNeedsIt()
+  }
+
+  public isItPossibleToSetColumnOrder(sheetId: number, columnMapping: [number,number][]): boolean {
+    try {
+      this._crudOperations.validateSetColumnOrder(sheetId, columnMapping)
+    } catch (e) {
+      return false
+    }
+    return this._crudOperations.operations.testColumnOrderForMatrices(sheetId, columnMapping)
   }
 
   /**
