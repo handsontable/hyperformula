@@ -1177,11 +1177,26 @@ export class HyperFormula implements TypedEmitter {
 
   public isItPossibleToSwapRowIndexes(sheetId: number, rowMapping: [number, number][]): boolean {
     try {
-      this._crudOperations.validateSetRowOrder(sheetId, rowMapping)
+      this._crudOperations.validateSwapRowIndexes(sheetId, rowMapping)
+      return this._crudOperations.operations.testRowOrderForMatrices(sheetId, rowMapping)
     } catch (e) {
       return false
     }
-    return this._crudOperations.operations.testRowOrderForMatrices(sheetId, rowMapping)
+  }
+
+  public setRowOrder(sheetId: number, newRowOrder: number[]): ExportedChange[] {
+    const mapping = this._crudOperations.mappingFromOrder(sheetId, newRowOrder, 'row')
+    return this.swapRowIndexes(sheetId, mapping)
+  }
+
+  public isItPossibleToSetRowOrder(sheetId: number, newRowOrder: number[]): boolean {
+    try {
+      const rowMapping = this._crudOperations.mappingFromOrder(sheetId, newRowOrder, 'row')
+      this._crudOperations.validateSwapRowIndexes(sheetId, rowMapping)
+      return this._crudOperations.operations.testRowOrderForMatrices(sheetId, rowMapping)
+    } catch (e) {
+      return false
+    }
   }
 
   /**
@@ -1234,13 +1249,27 @@ export class HyperFormula implements TypedEmitter {
 
   public isItPossibleToSwapColumnIndexes(sheetId: number, columnMapping: [number, number][]): boolean {
     try {
-      this._crudOperations.validateSetColumnOrder(sheetId, columnMapping)
+      this._crudOperations.validateSwapColumnIndexes(sheetId, columnMapping)
     } catch (e) {
       return false
     }
     return this._crudOperations.operations.testColumnOrderForMatrices(sheetId, columnMapping)
   }
 
+  public setColumnOrder(sheetId: number, newColumnOrder: number[]): ExportedChange[] {
+    const mapping = this._crudOperations.mappingFromOrder(sheetId, newColumnOrder, 'column')
+    return this.swapColumnIndexes(sheetId, mapping)
+  }
+
+  public isItPossibleToSetColumnOrder(sheetId: number, newRowOrder: number[]): boolean {
+    try {
+      const columnMapping = this._crudOperations.mappingFromOrder(sheetId, newRowOrder, 'column')
+      this._crudOperations.validateSwapColumnIndexes(sheetId, columnMapping)
+      return this._crudOperations.operations.testColumnOrderForMatrices(sheetId, columnMapping)
+    } catch (e) {
+      return false
+    }
+  }
   /**
    * Returns information whether it is possible to add rows into a specified position in a given sheet.
    * Checks against particular rules to ascertain that addRows can be called.

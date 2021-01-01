@@ -294,14 +294,14 @@ export class CrudOperations {
   }
 
   public setRowOrder(sheetId: number, rowMapping: [number, number][]): void {
-    this.validateSetRowOrder(sheetId, rowMapping)
+    this.validateSwapRowIndexes(sheetId, rowMapping)
     this.undoRedo.clearRedoStack()
     this.clipboardOperations.abortCut()
     this.operations.setRowOrder(sheetId, rowMapping)
     this.undoRedo.saveOperation(new SetRowOrderUndoEntry(sheetId, rowMapping))
   }
 
-  public validateSetRowOrder(sheetId: number, rowMapping: [number, number][]): void {
+  public validateSwapRowIndexes(sheetId: number, rowMapping: [number, number][]): void {
     if (!this.sheetMapping.hasSheetWithId(sheetId)) {
       throw new NoSheetWithIdError(sheetId)
     }
@@ -309,18 +309,35 @@ export class CrudOperations {
   }
 
   public setColumnOrder(sheetId: number, columnMapping: [number, number][]): void {
-    this.validateSetColumnOrder(sheetId, columnMapping)
+    this.validateSwapColumnIndexes(sheetId, columnMapping)
     this.undoRedo.clearRedoStack()
     this.clipboardOperations.abortCut()
     this.operations.setColumnOrder(sheetId, columnMapping)
     this.undoRedo.saveOperation(new SetColumnOrderUndoEntry(sheetId, columnMapping))
   }
 
-  public validateSetColumnOrder(sheetId: number, columnMapping: [number, number][]): void {
+  public validateSwapColumnIndexes(sheetId: number, columnMapping: [number, number][]): void {
     if (!this.sheetMapping.hasSheetWithId(sheetId)) {
       throw new NoSheetWithIdError(sheetId)
     }
     this.validateRowOrColumnMapping(sheetId, columnMapping, 'column')
+  }
+
+  public mappingFromOrder(sheetId: number, newOrder: number[], rowOrColumn: 'row' | 'column'): [number,number][] {
+    if (!this.sheetMapping.hasSheetWithId(sheetId)) {
+      throw new NoSheetWithIdError(sheetId)
+    }
+    const limit = rowOrColumn === 'row' ? this.dependencyGraph.getSheetHeight(sheetId) : this.dependencyGraph.getSheetWidth(sheetId)
+    if(newOrder.length !== limit) {
+      throw new InvalidArgumentsError(`number of ${rowOrColumn}s provided to be sheet ${rowOrColumn==='row'?'height':'width'}.`)
+    }
+    const ret: [number,number][] = []
+    for(let i=0;i<limit;i++) {
+      if(newOrder[i]!==i) {
+        ret.push([i,newOrder[i]])
+      }
+    }
+    return ret
   }
 
   private validateRowOrColumnMapping(sheetId: number, rowMapping: [number, number][], rowOrColumn: 'row' | 'column'): void {
@@ -330,7 +347,7 @@ export class CrudOperations {
 
     for(const pos of sources) {
       if(!isNonnegativeInteger(pos) || pos >= limit) {
-        throw new InvalidArgumentsError(`${rowOrColumn} numbers to be nonnegative integers and less than sheet height.`)
+        throw new InvalidArgumentsError(`${rowOrColumn} numbers to be nonnegative integers and less than sheet ${rowOrColumn==='row'?'height':'width'}.`)
       }
     }
     for(let i=0;i<sources.length-1;i++) {
