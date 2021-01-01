@@ -1034,4 +1034,32 @@ describe('aborting cut paste', () => {
 
     expect(engine.isClipboardEmpty()).toBe(true)
   })
+
+  it('should be aborted when swapping rows', () => {
+    const engine = HyperFormula.buildFromArray([['1']])
+    engine.cut(adr('A1'), 1, 1)
+    engine.swapRowIndexes(0, [[0,0]])
+    expect(engine.isClipboardEmpty()).toBe(true)
+  })
+
+  it('should be aborted when swapping columns', () => {
+    const engine = HyperFormula.buildFromArray([['1']])
+    engine.cut(adr('A1'), 1, 1)
+    engine.swapColumnIndexes(0, [[0,0]])
+    expect(engine.isClipboardEmpty()).toBe(true)
+  })
+
+  it('should be aborted when setting row order', () => {
+    const engine = HyperFormula.buildFromArray([['1']])
+    engine.cut(adr('A1'), 1, 1)
+    engine.setRowOrder(0, [0])
+    expect(engine.isClipboardEmpty()).toBe(true)
+  })
+
+  it('should be aborted when setting column order', () => {
+    const engine = HyperFormula.buildFromArray([['1']])
+    engine.cut(adr('A1'), 1, 1)
+    engine.setColumnOrder(0, [0])
+    expect(engine.isClipboardEmpty()).toBe(true)
+  })
 })

@@ -323,7 +323,7 @@ export class CrudOperations {
     this.validateRowOrColumnMapping(sheetId, columnMapping, 'column')
   }
 
-  public mappingFromOrder(sheetId: number, newOrder: number[], rowOrColumn: 'row' | 'column'): [number,number][] {
+  public mappingFromOrder(sheetId: number, newOrder: number[], rowOrColumn: 'row' | 'column'): [number, number][] {
     if (!this.sheetMapping.hasSheetWithId(sheetId)) {
       throw new NoSheetWithIdError(sheetId)
     }
@@ -331,10 +331,10 @@ export class CrudOperations {
     if(newOrder.length !== limit) {
       throw new InvalidArgumentsError(`number of ${rowOrColumn}s provided to be sheet ${rowOrColumn==='row'?'height':'width'}.`)
     }
-    const ret: [number,number][] = []
+    const ret: [number, number][] = []
     for(let i=0;i<limit;i++) {
       if(newOrder[i]!==i) {
-        ret.push([i,newOrder[i]])
+        ret.push([i, newOrder[i]])
       }
     }
     return ret
