@@ -1,5 +1,6 @@
 import {HyperFormula} from '../../src'
 import {AlwaysSparse} from '../../src/DependencyGraph/AddressMapping/ChooseAddressMappingPolicy'
+import {adr} from '../testUtils'
 
 describe('swapping columns - checking if it is possible', () => {
   it('should validate numbers for negative columns', () => {
@@ -162,6 +163,16 @@ describe('swapping rows working with redo', () => {
     engine.redo()
     expect(engine.getSheetSerialized(0)).toEqual([[3, '=B2', '=SUM(C2:C3)'], ['=#REF!', 1, '=SUM(C10:C15)'], [9, '=SUM(E1:E10)', 8]])
   })
+
+  it('clears redo stack', () => {
+    const engine = HyperFormula.buildFromArray([[1]])
+    engine.setCellContents(adr('A1'), 42)
+    engine.undo()
+
+    engine.swapColumnIndexes(0, [[0,0]])
+
+    expect(engine.isThereSomethingToRedo()).toBe(false)
+  })
 })
 
 describe('setting column order - checking if it is possible', () => {
@@ -316,5 +327,15 @@ describe('reorder working with redo', () => {
     expect(engine.isItPossibleToSetColumnOrder(0, [1, 2, 0, 3, 4])).toEqual(true)
     engine.redo()
     expect(engine.getSheetSerialized(0)).toEqual([[3, '=B2', '=SUM(C2:C3)'], ['=#REF!', 1, '=SUM(C10:C15)'], [9, '=SUM(E1:E10)', 8]])
+  })
+
+  it('clears redo stack', () => {
+    const engine = HyperFormula.buildFromArray([[1]])
+    engine.setCellContents(adr('A1'), 42)
+    engine.undo()
+
+    engine.setColumnOrder(0, [0])
+
+    expect(engine.isThereSomethingToRedo()).toBe(false)
   })
 })
