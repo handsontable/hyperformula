@@ -169,7 +169,7 @@ describe('swapping rows working with redo', () => {
     engine.setCellContents(adr('A1'), 42)
     engine.undo()
 
-    engine.swapColumnIndexes(0, [[0,0]])
+    engine.swapColumnIndexes(0, [[0, 0]])
 
     expect(engine.isThereSomethingToRedo()).toBe(false)
   })
