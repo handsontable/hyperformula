@@ -571,7 +571,7 @@ export function coerceScalarToString(arg: InternalScalarValue): string | CellErr
   } else if (arg === EmptyValue) {
     return ''
   } else if (isExtendedNumber(arg)) {
-    return arg.toString()
+    return getRawValue(arg).toString()
   } else {
     return arg ? 'TRUE' : 'FALSE'
   }
