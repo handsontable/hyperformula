@@ -80,7 +80,7 @@ export function ExtendedNumberFactory(type: NumberType, value: number): Extended
   }
 }
 
-export function TypeOfExtendedNumber(arg: ExtendedNumber): NumberType {
+export function getTypeOfExtendedNumber(arg: ExtendedNumber): NumberType {
   if(arg instanceof DateNumber) {
     return NumberType.DateTime
   } else if(arg instanceof TimeNumber) {
@@ -95,3 +95,4 @@ export function TypeOfExtendedNumber(arg: ExtendedNumber): NumberType {
     return NumberType.Raw
   }
 }
+
