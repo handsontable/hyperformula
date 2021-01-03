@@ -46,6 +46,7 @@ export class DateNumber extends RichNumber {}
 export class CurrencyNumber extends RichNumber {}
 export class TimeNumber extends RichNumber {}
 export class DateTimeNumber extends RichNumber {}
+export class PercentNumber extends RichNumber {}
 
 export type ExtendedNumber = number | RichNumber
 
@@ -59,6 +60,7 @@ export enum NumberType {
   Time = 'Time',
   DateTime = 'DateTime',
   Currency = 'Currency',
+  Percent = 'Percent',
 }
 
 export function ExtendedNumberFactory(type: NumberType, value: number): ExtendedNumber {
@@ -73,5 +75,7 @@ export function ExtendedNumberFactory(type: NumberType, value: number): Extended
       return new DateTimeNumber(value)
     case NumberType.Time:
       return new TimeNumber(value)
+    case NumberType.Percent:
+      return new PercentNumber(value)
   }
 }

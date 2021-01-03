@@ -17,7 +17,7 @@ import {
   InternalNoErrorScalarValue,
   InternalScalarValue,
   InterpreterValue,
-  isExtendedNumber,
+  isExtendedNumber, PercentNumber,
   RawInterpreterValue,
   RawNoErrorScalarValue,
   RawScalarValue
@@ -207,16 +207,13 @@ export class ArithmeticHelper {
     return arg
   }
 
-  //FIXME
   public unaryPercent = (arg: ExtendedNumber): ExtendedNumber => {
-    return getRawValue(arg)/100
+    return new PercentNumber(getRawValue(arg)/100)
   }
 
   public concat = (left: string, right: string): string => {
     return left.concat(right)
   }
-
-
 
   public nonstrictadd = (left: RawScalarValue, right: RawScalarValue): number | CellError => {
     if (left instanceof CellError) {
