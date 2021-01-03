@@ -79,3 +79,19 @@ export function ExtendedNumberFactory(type: NumberType, value: number): Extended
       return new PercentNumber(value)
   }
 }
+
+export function TypeOfExtendedNumber(arg: ExtendedNumber): NumberType {
+  if(arg instanceof DateNumber) {
+    return NumberType.DateTime
+  } else if(arg instanceof TimeNumber) {
+    return NumberType.Time
+  } else if(arg instanceof DateTimeNumber) {
+    return NumberType.DateTime
+  } else if(arg instanceof CurrencyNumber) {
+    return NumberType.Currency
+  } else if(arg instanceof PercentNumber) {
+    return NumberType.Percent
+  } else {
+    return NumberType.Raw
+  }
+}
