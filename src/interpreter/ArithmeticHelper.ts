@@ -210,7 +210,7 @@ export class ArithmeticHelper {
   }
 
   public unaryMinus = (arg: ExtendedNumber): ExtendedNumber => {
-    return ExtendedNumberFactory(getTypeOfExtendedNumber(arg),-getRawValue(arg))
+    return ExtendedNumberFactory(getTypeOfExtendedNumber(arg), -getRawValue(arg))
   }
 
   public unaryPlus = (arg: ExtendedNumber): ExtendedNumber => {
