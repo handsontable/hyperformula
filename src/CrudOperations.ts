@@ -345,17 +345,13 @@ export class CrudOperations {
     const sources = rowMapping.map(([a, b])=>a).sort((a, b) => a-b)
     const targets = rowMapping.map(([a, b])=>b).sort((a, b) => a-b)
 
-    for(const pos of sources) {
-      if(!isNonnegativeInteger(pos) || pos >= limit) {
+    for(let i=0;i<sources.length;i++) {
+      if(!isNonnegativeInteger(sources[i]) || sources[i] >= limit) {
         throw new InvalidArgumentsError(`${rowOrColumn} numbers to be nonnegative integers and less than sheet ${rowOrColumn==='row'?'height':'width'}.`)
       }
-    }
-    for(let i=0;i<sources.length-1;i++) {
       if(sources[i]===sources[i+1]) {
         throw new InvalidArgumentsError(`source ${rowOrColumn} numbers to be unique.`)
       }
-    }
-    for(let i=0;i<sources.length;i++) {
       if(sources[i]!==targets[i]) {
         throw new InvalidArgumentsError(`target ${rowOrColumn} numbers to be permutation of source ${rowOrColumn} numbers.`)
       }

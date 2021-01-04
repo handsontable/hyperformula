@@ -23,7 +23,7 @@ describe('swapping rows - checking if it is possible', () => {
     const engine = HyperFormula.buildFromArray([[0], [0], [0]])
     expect(engine.isItPossibleToSwapRowIndexes(0, [[1, 1], [3, 0]])).toEqual(false)
     expect(() =>
-      engine.swapRowIndexes(0, [[1, 1], [3, 0]])
+      engine.swapRowIndexes(0, [[3, 0]])
     ).toThrowError('Invalid arguments, expected row numbers to be nonnegative integers and less than sheet height.')
   })
 

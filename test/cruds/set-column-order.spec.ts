@@ -23,7 +23,7 @@ describe('swapping columns - checking if it is possible', () => {
     const engine = HyperFormula.buildFromArray([[0, 0, 0]])
     expect(engine.isItPossibleToSwapColumnIndexes(0, [[1, 1], [3, 0]])).toEqual(false)
     expect(() =>
-      engine.swapColumnIndexes(0, [[1, 1], [3, 0]])
+      engine.swapColumnIndexes(0, [[3, 0]])
     ).toThrowError('Invalid arguments, expected column numbers to be nonnegative integers and less than sheet width.')
   })
 
