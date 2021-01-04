@@ -343,7 +343,7 @@ export class CrudOperations {
   private validateRowOrColumnMapping(sheetId: number, rowMapping: [number, number][], rowOrColumn: 'row' | 'column'): void {
     const limit = rowOrColumn === 'row' ? this.dependencyGraph.getSheetHeight(sheetId) : this.dependencyGraph.getSheetWidth(sheetId)
     const sources = rowMapping.map(([a, b])=>a).sort((a, b) => a-b)
-    const targets = rowMapping.map(([a, b])=>b).sort((a, b) => a-b)
+    const targets = rowMapping.map(([_, b])=>b).sort((a, b) => a-b)
 
     for(let i=0;i<sources.length;i++) {
       if(!isNonnegativeInteger(sources[i]) || sources[i] >= limit) {
