@@ -3,7 +3,7 @@
  * Copyright (c) 2020 Handsoncode. All rights reserved.
  */
 
-import {ErrorType, invalidSimpleCellAddress, SimpleCellAddress} from '../Cell'
+import {ErrorType, SimpleCellAddress} from '../Cell'
 import {NoSheetWithIdError} from '../index'
 import {NamedExpressions} from '../NamedExpressions'
 import {SheetIndexMappingFn, sheetIndexToString} from './addressRepresentationConverters'

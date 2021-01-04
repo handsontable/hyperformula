@@ -5,14 +5,14 @@
 
 import {
   absoluteSheetReference,
-  invalidSimpleColumnAddress, invalidSimpleRowAddress,
+  invalidSimpleRowAddress,
   SimpleCellAddress,
   simpleRowAddress,
   SimpleRowAddress
 } from '../Cell'
 import {Maybe} from '../Maybe'
-import {ReferenceType} from './ColumnAddress'
 import {AddressWithRow} from './Address'
+import {ReferenceType} from './ColumnAddress'
 
 export class RowAddress implements AddressWithRow {
   private constructor(

@@ -3,16 +3,14 @@
  * Copyright (c) 2020 Handsoncode. All rights reserved.
  */
 
-import {Statistics, StatType} from './statistics'
-import {ClipboardCell, ClipboardCellType} from './ClipboardOperations'
+import {AbsoluteCellRange} from './AbsoluteCellRange'
+import {absolutizeDependencies} from './absolutizeDependencies'
 import {EmptyValue, invalidSimpleCellAddress, simpleCellAddress, SimpleCellAddress} from './Cell'
 import {CellContent, CellContentParser, RawCellContent} from './CellContentParser'
-import {ColumnsSpan, RowsSpan} from './Span'
+import {ClipboardCell, ClipboardCellType} from './ClipboardOperations'
+import {Config} from './Config'
 import {ContentChanges} from './ContentChanges'
-import {ColumnSearchStrategy} from './Lookup/SearchStrategy'
-import {absolutizeDependencies} from './absolutizeDependencies'
-import {LazilyTransformingAstService} from './LazilyTransformingAstService'
-import {buildMatrixVertex} from './GraphBuilder'
+import {ColumnRowIndex} from './CrudOperations'
 import {
   AddressMapping,
   CellVertex,
@@ -26,8 +24,13 @@ import {
   ValueCellVertex
 } from './DependencyGraph'
 import {ValueCellVertexValue} from './DependencyGraph/ValueCellVertex'
+import {AddColumnsTransformer} from './dependencyTransformers/AddColumnsTransformer'
+import {AddRowsTransformer} from './dependencyTransformers/AddRowsTransformer'
+import {MoveCellsTransformer} from './dependencyTransformers/MoveCellsTransformer'
+import {RemoveColumnsTransformer} from './dependencyTransformers/RemoveColumnsTransformer'
+import {RemoveRowsTransformer} from './dependencyTransformers/RemoveRowsTransformer'
+import {RemoveSheetTransformer} from './dependencyTransformers/RemoveSheetTransformer'
 import {
-  InvalidAddressError,
   InvalidArgumentsError,
   NamedExpressionDoesNotExistError,
   NoRelativeAddressesAllowedError,
@@ -35,24 +38,20 @@ import {
   SourceLocationHasMatrixError,
   TargetLocationHasMatrixError
 } from './errors'
-import {NamedExpressionDependency, ParserWithCaching, ProcedureAst, RelativeDependency} from './parser'
-import {ParsingError} from './parser/Ast'
-import {AddRowsTransformer} from './dependencyTransformers/AddRowsTransformer'
-import {RemoveRowsTransformer} from './dependencyTransformers/RemoveRowsTransformer'
-import {AddColumnsTransformer} from './dependencyTransformers/AddColumnsTransformer'
-import {MoveCellsTransformer} from './dependencyTransformers/MoveCellsTransformer'
-import {RemoveSheetTransformer} from './dependencyTransformers/RemoveSheetTransformer'
-import {RemoveColumnsTransformer} from './dependencyTransformers/RemoveColumnsTransformer'
-import {AbsoluteCellRange} from './AbsoluteCellRange'
-import {findBoundaries, Sheet} from './Sheet'
-import {Config} from './Config'
+import {buildMatrixVertex} from './GraphBuilder'
+import {LazilyTransformingAstService} from './LazilyTransformingAstService'
+import {ColumnSearchStrategy} from './Lookup/SearchStrategy'
 import {
   doesContainRelativeReferences,
   InternalNamedExpression,
   NamedExpressionOptions,
   NamedExpressions
 } from './NamedExpressions'
-import {ColumnRowIndex} from './CrudOperations'
+import {NamedExpressionDependency, ParserWithCaching, ProcedureAst, RelativeDependency} from './parser'
+import {ParsingError} from './parser/Ast'
+import {findBoundaries, Sheet} from './Sheet'
+import {ColumnsSpan, RowsSpan} from './Span'
+import {Statistics, StatType} from './statistics'
 
 export class RemoveRowsCommand {
   constructor(

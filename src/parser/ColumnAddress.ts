@@ -5,14 +5,14 @@
 
 import {
   absoluteSheetReference,
-  invalidSimpleCellAddress, invalidSimpleColumnAddress,
+  invalidSimpleColumnAddress,
   SimpleCellAddress,
   simpleColumnAddress,
   SimpleColumnAddress
 } from '../Cell'
 import {Maybe} from '../Maybe'
-import {columnIndexToLabel} from './addressRepresentationConverters'
 import {AddressWithColumn} from './Address'
+import {columnIndexToLabel} from './addressRepresentationConverters'
 
 export enum ReferenceType {
   RELATIVE = 'RELATIVE',

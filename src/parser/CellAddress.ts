@@ -4,7 +4,8 @@
  */
 
 import {
-  absoluteSheetReference, ErrorType, invalidSimpleCellAddress,
+  absoluteSheetReference,
+  invalidSimpleCellAddress,
   simpleCellAddress,
   SimpleCellAddress,
   simpleColumnAddress,
@@ -13,8 +14,8 @@ import {
   SimpleRowAddress,
 } from '../Cell'
 import {Maybe} from '../Maybe'
-import {columnIndexToLabel} from './addressRepresentationConverters'
 import {AddressWithColumn, AddressWithRow} from './Address'
+import {columnIndexToLabel} from './addressRepresentationConverters'
 
 /** Possible kinds of cell references */
 export enum CellReferenceType {
