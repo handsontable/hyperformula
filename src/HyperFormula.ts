@@ -1137,7 +1137,7 @@ export class HyperFormula implements TypedEmitter {
    * @fires [[valuesUpdated]] if recalculation was triggered by this change
    *
    * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
-   * @throws an error when rowMapping does not define correct row permutation for some subset of rows of the given sheet
+   * @throws [[InvalidArgumentsError]] an error when rowMapping does not define correct row permutation for some subset of rows of the given sheet
    * @throws [[SourceLocationHasMatrixError]] when the selected position has matrix inside
    *
    * @example
