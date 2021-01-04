@@ -1190,10 +1190,10 @@ export class HyperFormula implements TypedEmitter {
    * ]);
    *
    * // returns true
-   * hfInstance.swapRowIndexes(0, [[0,2],[2,0]]);
+   * const isSwappable = hfInstance.isItPossibleToSwapRowIndexes(0, [[0,2],[2,0]]);
    *
    * // returns false
-   * hfInstance.swapRowIndexes(0, [[0,1]]);
+   * const isSwappable = hfInstance.isItPossibleToSwapRowIndexes(0, [[0,1]]);
    * ```
    *
    * @category Rows
