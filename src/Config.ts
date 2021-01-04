@@ -8,6 +8,7 @@ import {defaultParseToDateTime} from './DateTimeDefault'
 import {DateTime, instanceOfSimpleDate, SimpleDate, SimpleDateTime, SimpleTime} from './DateTimeHelper'
 import {AlwaysDense, ChooseAddressMapping} from './DependencyGraph/AddressMapping/ChooseAddressMappingPolicy'
 import {
+  ConfigValueEmpty,
   ConfigValueTooBigError,
   ConfigValueTooSmallError,
   ExpectedOneOfValuesError,
@@ -64,6 +65,14 @@ export interface ConfigParams {
    * @category Engine
    */
   chooseAddressMappingPolicy: ChooseAddressMapping,
+  /**
+   * Symbol used to denote currency numbers.
+   *
+   * @default '$'
+   *
+   * @category Number
+   */
+  currencySymbol: string,
   /**
    * A list of date formats that are supported by date parsing functions.
    *
@@ -412,7 +421,8 @@ export class Config implements ConfigParams, ParserConfig {
     useWildcards: true,
     matchWholeCell: true,
     maxRows: 40_000,
-    maxColumns: 18_278
+    maxColumns: 18_278,
+    currencySymbol: '$',
   }
 
   /** @inheritDoc */
@@ -478,6 +488,8 @@ export class Config implements ConfigParams, ParserConfig {
   public readonly binarySearchThreshold: number
   /** @inheritDoc */
   public readonly nullDate: SimpleDate
+  /** @inheritDoc */
+  public readonly currencySymbol: string
   /** @inheritDoc */
   public readonly undoLimit: number
   /**
@@ -553,7 +565,8 @@ export class Config implements ConfigParams, ParserConfig {
       useWildcards,
       matchWholeCell,
       maxRows,
-      maxColumns
+      maxColumns,
+      currencySymbol,
     }: Partial<ConfigParams> = {},
   ) {
     this.accentSensitive = this.valueFromParam(accentSensitive, 'boolean', 'accentSensitive')
@@ -605,6 +618,10 @@ export class Config implements ConfigParams, ParserConfig {
     this.maxRows = this.valueFromParam(maxRows, 'number', 'maxRows')
     this.validateNumberToBeAtLeast(this.maxRows, 'maxRows', 1)
     this.maxColumns = this.valueFromParam(maxColumns, 'number', 'maxColumns')
+    this.currencySymbol = this.valueFromParam(currencySymbol, 'string', 'currencySymbol')
+    if(this.currencySymbol === '') {
+      throw new ConfigValueEmpty('currencySymbol')
+    }
     this.validateNumberToBeAtLeast(this.maxColumns, 'maxColumns', 1)
 
     this.warnDeprecatedIfUsed(vlookupThreshold, 'vlookupThreshold', 'v.0.3.0', 'binarySearchThreshold')

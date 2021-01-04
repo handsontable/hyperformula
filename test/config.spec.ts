@@ -117,6 +117,11 @@ describe('Config', () => {
     }).toThrowError('Config initialization failed. Parameters in conflict: [decimalSeparator,functionArgSeparator,thousandSeparator]')
   })
 
+  it('should throw error when currency symbol is empty', () => {
+    expect(() => {
+      new Config({ currencySymbol: '' })
+    }).toThrowError('Config parameter currencySymbol cannot be empty.')
+  })
 
   it('should throw error when decimal separator is not correct', () => {
     expect(() => {
