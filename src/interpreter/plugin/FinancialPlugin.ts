@@ -6,7 +6,14 @@
 import {CellError, ErrorType, SimpleCellAddress} from '../../Cell'
 import {ErrorMessage} from '../../error-message'
 import {ProcedureAst} from '../../parser'
-import {EmptyValue, getRawValue, InternalScalarValue, isExtendedNumber, RawInterpreterValue} from '../InterpreterValue'
+import {
+  CurrencyNumber,
+  EmptyValue,
+  getRawValue,
+  InternalScalarValue,
+  isExtendedNumber,
+  RawInterpreterValue
+} from '../InterpreterValue'
 import {SimpleRangeValue} from '../SimpleRangeValue'
 import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
 
@@ -255,19 +262,33 @@ export class FinancialPlugin extends FunctionPlugin {
   }
 
   public pmt(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('PMT'), pmtCore)
+    return this.runFunction(ast.args, formulaAddress, this.metadata('PMT'),
+      // eslint-disable-next-line
+      // @ts-ignore
+      (...args) => new CurrencyNumber(pmtCore(...args)))
   }
 
   public ipmt(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('IPMT'), ipmtCore)
+    return this.runFunction(ast.args, formulaAddress, this.metadata('IPMT'),
+      // eslint-disable-next-line
+      // @ts-ignore
+      (...args) => new CurrencyNumber(ipmtCore(...args)))
   }
 
   public ppmt(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('PPMT'), ppmtCore)
+    return this.runFunction(ast.args, formulaAddress, this.metadata('PPMT'),
+      // eslint-disable-next-line
+      // @ts-ignore
+      (...args) => new CurrencyNumber(ppmtCore(...args))
+    )
   }
 
   public fv(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('FV'), fvCore)
+    return this.runFunction(ast.args, formulaAddress, this.metadata('FV'),
+      // eslint-disable-next-line
+      // @ts-ignore
+      (...args) => new CurrencyNumber(fvCore(...args))
+    )
   }
 
   public cumipmt(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
@@ -280,7 +301,7 @@ export class FinancialPlugin extends FunctionPlugin {
         for(let i = start; i <= end; i++) {
           acc += ipmtCore(rate, i, periods, value, 0, type)
         }
-        return acc
+        return new CurrencyNumber(acc)
       }
     )
   }
@@ -295,7 +316,7 @@ export class FinancialPlugin extends FunctionPlugin {
         for(let i = start; i <= end; i++) {
           acc += ppmtCore(rate, i, periods, value, 0, type)
         }
-        return acc
+        return new CurrencyNumber(acc)
       }
     )
   }
