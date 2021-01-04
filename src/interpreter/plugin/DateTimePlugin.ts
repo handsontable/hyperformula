@@ -20,16 +20,14 @@ import {format} from '../../format/format'
 import {Maybe} from '../../Maybe'
 import {ProcedureAst} from '../../parser'
 import {
-  DateNumber,
   DateTimeNumber,
   EmptyValue,
   getRawValue,
   InternalNoErrorScalarValue,
   InternalScalarValue,
-  isExtendedNumber,
+  isExtendedNumber, NumberType,
   RawNoErrorScalarValue,
   RawScalarValue,
-  TimeNumber
 } from '../InterpreterValue'
 import {SimpleRangeValue} from '../SimpleRangeValue'
 import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
@@ -45,7 +43,8 @@ export class DateTimePlugin extends FunctionPlugin {
           {argumentType: ArgumentTypes.NUMBER},
           {argumentType: ArgumentTypes.NUMBER},
           {argumentType: ArgumentTypes.NUMBER},
-        ]
+        ],
+      returnNumberType: NumberType.Date
       },
     'TIME': {
       method: 'time',
@@ -53,7 +52,8 @@ export class DateTimePlugin extends FunctionPlugin {
           {argumentType: ArgumentTypes.NUMBER},
           {argumentType: ArgumentTypes.NUMBER},
           {argumentType: ArgumentTypes.NUMBER},
-        ]
+        ],
+      returnNumberType: NumberType.Time
     },
     'MONTH': {
       method: 'month',
@@ -97,7 +97,8 @@ export class DateTimePlugin extends FunctionPlugin {
       parameters: [
           {argumentType: ArgumentTypes.NUMBER, minValue: 0},
           {argumentType: ArgumentTypes.NUMBER},
-        ]
+        ],
+      returnNumberType: NumberType.Date
     },
     'DAY': {
       method: 'day',
@@ -136,23 +137,27 @@ export class DateTimePlugin extends FunctionPlugin {
       method: 'datevalue',
       parameters: [
           {argumentType: ArgumentTypes.STRING},
-        ]
+        ],
+      returnNumberType: NumberType.Date
     },
     'TIMEVALUE': {
       method: 'timevalue',
       parameters: [
           {argumentType: ArgumentTypes.STRING},
-        ]
+        ],
+      returnNumberType: NumberType.Time
     },
     'NOW': {
       method: 'now',
       parameters: [],
       isVolatile: true,
+      returnNumberType: NumberType.DateTime
     },
     'TODAY': {
       method: 'today',
       parameters: [],
       isVolatile: true,
+      returnNumberType: NumberType.Date
     },
     'EDATE': {
       method: 'edate',
@@ -160,6 +165,7 @@ export class DateTimePlugin extends FunctionPlugin {
           {argumentType: ArgumentTypes.NUMBER, minValue: 0},
           {argumentType: ArgumentTypes.NUMBER},
         ],
+      returnNumberType: NumberType.Date
     },
     'DAYS360': {
       method: 'days360',
@@ -254,7 +260,7 @@ export class DateTimePlugin extends FunctionPlugin {
         if(ret === undefined) {
           return new CellError(ErrorType.NUM, ErrorMessage.DateBounds)
         }
-        return new DateNumber(ret)
+        return ret
       }
       return new CellError(ErrorType.VALUE, ErrorMessage.InvalidDate)
     })
@@ -267,7 +273,7 @@ export class DateTimePlugin extends FunctionPlugin {
         if(ret<0) {
           return new CellError(ErrorType.NUM, ErrorMessage.NegativeTime)
         }
-        return new TimeNumber(ret%1)
+        return ret%1
       }
     )
   }
@@ -280,7 +286,7 @@ export class DateTimePlugin extends FunctionPlugin {
       if(ret === undefined) {
         return new CellError(ErrorType.NUM, ErrorMessage.DateBounds)
       }
-      return new DateNumber(ret)
+      return ret
     })
   }
 
@@ -416,8 +422,8 @@ export class DateTimePlugin extends FunctionPlugin {
         if(!instanceOfSimpleDate(dateTime)) {
           return 0
         }
-        return new DateNumber((instanceOfSimpleTime(dateTime) ? Math.trunc(timeToNumber(dateTime)) : 0) +
-          this.interpreter.dateHelper.dateToNumber(dateTime))
+        return (instanceOfSimpleTime(dateTime) ? Math.trunc(timeToNumber(dateTime)) : 0) +
+          this.interpreter.dateHelper.dateToNumber(dateTime)
       }
     )
   }
@@ -429,7 +435,7 @@ export class DateTimePlugin extends FunctionPlugin {
         if(dateNumber===undefined){
           return new CellError(ErrorType.VALUE, ErrorMessage.IncorrectDateTime)
         }
-        return new TimeNumber(getRawValue(dateNumber)%1)
+        return getRawValue(dateNumber)%1
       }
     )
   }
@@ -438,8 +444,8 @@ export class DateTimePlugin extends FunctionPlugin {
     return this.runFunction(ast.args, formulaAddress, this.metadata('NOW'),
       () => {
         const now = new Date()
-        return new DateTimeNumber(timeToNumber({hours: now.getHours(), minutes: now.getMinutes(), seconds: now.getSeconds()})+
-          this.interpreter.dateHelper.dateToNumber({year: now.getFullYear(), month: now.getMonth()+1, day: now.getDay()}))
+        return timeToNumber({hours: now.getHours(), minutes: now.getMinutes(), seconds: now.getSeconds()})+
+          this.interpreter.dateHelper.dateToNumber({year: now.getFullYear(), month: now.getMonth()+1, day: now.getDay()})
       }
     )
   }
@@ -448,7 +454,7 @@ export class DateTimePlugin extends FunctionPlugin {
     return this.runFunction(ast.args, formulaAddress, this.metadata('TODAY'),
       () => {
         const now = new Date()
-        return new DateNumber(this.interpreter.dateHelper.dateToNumber({year: now.getFullYear(), month: now.getMonth()+1, day: now.getDay()}))
+        return this.interpreter.dateHelper.dateToNumber({year: now.getFullYear(), month: now.getMonth()+1, day: now.getDay()})
       }
     )
   }
@@ -463,7 +469,7 @@ export class DateTimePlugin extends FunctionPlugin {
         if(ret === undefined) {
           return new CellError(ErrorType.NUM, ErrorMessage.DateBounds)
         }
-        return new DateNumber(ret)
+        return ret
       }
     )
   }

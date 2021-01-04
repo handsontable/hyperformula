@@ -15,11 +15,11 @@ import {Serialization} from '../../Serialization'
 import {coerceScalarToBoolean, coerceScalarToString, coerceToRange, complex} from '../ArithmeticHelper'
 import {Interpreter} from '../Interpreter'
 import {
-  ExtendedNumber,
+  ExtendedNumber, ExtendedNumberFactory,
   getRawValue,
   InternalScalarValue,
   InterpreterValue,
-  isExtendedNumber,
+  isExtendedNumber, NumberType,
   RawNoErrorScalarValue,
   RawScalarValue
 } from '../InterpreterValue'
@@ -40,6 +40,11 @@ export interface FunctionArguments {
    * Ranges in arguments are inlined to (possibly multiple) scalar arguments.
    */
   expandRanges?: boolean,
+
+  /**
+   * Return number value is packed into this subtype.
+   */
+  returnNumberType?: NumberType,
 }
 
 export interface FunctionMetadata extends FunctionArguments {
@@ -317,7 +322,7 @@ export abstract class FunctionPlugin {
       }
     }
 
-    return argCoerceFailure ?? fn(...coercedArguments)
+    return argCoerceFailure ?? returnNumberWrapper(fn(...coercedArguments), functionDefinition.returnNumberType)
   }
 
   protected runFunctionWithReferenceArgument = (
@@ -329,7 +334,7 @@ export abstract class FunctionPlugin {
     nonReferenceCallback: (...arg: any) => InternalScalarValue = () => new CellError(ErrorType.NA, ErrorMessage.CellRefExpected)
   ) => {
     if (args.length === 0) {
-      return noArgCallback()
+      return returnNumberWrapper(noArgCallback(),argumentDefinitions.returnNumberType)
     } else if (args.length > 1) {
       return new CellError(ErrorType.NA, ErrorMessage.WrongArgNumber)
     }
@@ -352,7 +357,7 @@ export abstract class FunctionPlugin {
     }
 
     if (cellReference !== undefined) {
-      return referenceCallback(cellReference)
+      return returnNumberWrapper(referenceCallback(cellReference),argumentDefinitions.returnNumberType)
     }
 
     return this.runFunction(args, formulaAddress, argumentDefinitions, nonReferenceCallback)
@@ -364,5 +369,13 @@ export abstract class FunctionPlugin {
       return params
     }
     throw new Error(`No metadata for function ${name}.`)
+  }
+}
+
+function returnNumberWrapper(val: InternalScalarValue, type?: NumberType): InternalScalarValue {
+  if(type !== undefined && isExtendedNumber(val)) {
+    return ExtendedNumberFactory(type, getRawValue(val))
+  } else {
+    return val
   }
 }

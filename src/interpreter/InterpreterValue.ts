@@ -95,4 +95,3 @@ export function getTypeOfExtendedNumber(arg: ExtendedNumber): NumberType {
     return NumberType.Raw
   }
 }
-
