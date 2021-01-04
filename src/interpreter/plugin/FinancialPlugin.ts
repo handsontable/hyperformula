@@ -11,7 +11,7 @@ import {
   EmptyValue,
   getRawValue,
   InternalScalarValue,
-  isExtendedNumber,
+  isExtendedNumber, NumberType,
   RawInterpreterValue
 } from '../InterpreterValue'
 import {SimpleRangeValue} from '../SimpleRangeValue'
@@ -27,7 +27,8 @@ export class FinancialPlugin extends FunctionPlugin {
           {argumentType: ArgumentTypes.NUMBER},
           {argumentType: ArgumentTypes.NUMBER, defaultValue: 0},
           {argumentType: ArgumentTypes.NUMBER, defaultValue: 0},
-        ]
+        ],
+      returnNumberType: NumberType.Currency
     },
     'IPMT': {
       method: 'ipmt',
@@ -38,7 +39,8 @@ export class FinancialPlugin extends FunctionPlugin {
           {argumentType: ArgumentTypes.NUMBER},
           {argumentType: ArgumentTypes.NUMBER, defaultValue: 0},
           {argumentType: ArgumentTypes.NUMBER, defaultValue: 0},
-        ]
+        ],
+      returnNumberType: NumberType.Currency
     },
     'PPMT': {
       method: 'ppmt',
@@ -49,7 +51,8 @@ export class FinancialPlugin extends FunctionPlugin {
           {argumentType: ArgumentTypes.NUMBER},
           {argumentType: ArgumentTypes.NUMBER, defaultValue: 0},
           {argumentType: ArgumentTypes.NUMBER, defaultValue: 0},
-        ]
+        ],
+      returnNumberType: NumberType.Currency
     },
     'FV': {
       method: 'fv',
@@ -59,7 +62,8 @@ export class FinancialPlugin extends FunctionPlugin {
           {argumentType: ArgumentTypes.NUMBER},
           {argumentType: ArgumentTypes.NUMBER, defaultValue: 0},
           {argumentType: ArgumentTypes.NUMBER, defaultValue: 0},
-        ]
+        ],
+      returnNumberType: NumberType.Currency
     },
     'CUMIPMT': {
       method: 'cumipmt',
@@ -70,7 +74,8 @@ export class FinancialPlugin extends FunctionPlugin {
         {argumentType: ArgumentTypes.INTEGER, minValue: 1},
         {argumentType: ArgumentTypes.INTEGER, minValue: 1},
         {argumentType: ArgumentTypes.INTEGER, minValue: 0, maxValue: 1},
-      ]
+      ],
+      returnNumberType: NumberType.Currency
     },
     'CUMPRINC': {
       method: 'cumprinc',
@@ -81,7 +86,8 @@ export class FinancialPlugin extends FunctionPlugin {
         {argumentType: ArgumentTypes.INTEGER, minValue: 1},
         {argumentType: ArgumentTypes.INTEGER, minValue: 1},
         {argumentType: ArgumentTypes.INTEGER, minValue: 0, maxValue: 1},
-      ]
+      ],
+      returnNumberType: NumberType.Currency
     },
     'DB': {
       method: 'db',
@@ -91,7 +97,8 @@ export class FinancialPlugin extends FunctionPlugin {
         {argumentType: ArgumentTypes.INTEGER, minValue: 0},
         {argumentType: ArgumentTypes.INTEGER, minValue: 0},
         {argumentType: ArgumentTypes.INTEGER, minValue: 1, maxValue: 12, defaultValue: 12},
-      ]
+      ],
+      returnNumberType: NumberType.Currency
     },
     'DDB': {
       method: 'ddb',
@@ -101,28 +108,30 @@ export class FinancialPlugin extends FunctionPlugin {
         {argumentType: ArgumentTypes.INTEGER, minValue: 0},
         {argumentType: ArgumentTypes.NUMBER, minValue: 0},
         {argumentType: ArgumentTypes.NUMBER, greaterThan: 0, defaultValue: 2},
-      ]
+      ],
+      returnNumberType: NumberType.Currency
     },
     'DOLLARDE': {
       method: 'dollarde',
       parameters: [
         {argumentType: ArgumentTypes.NUMBER},
         {argumentType: ArgumentTypes.NUMBER, minValue: 0},
-      ]
+      ],
     },
     'DOLLARFR': {
       method: 'dollarfr',
       parameters: [
         {argumentType: ArgumentTypes.NUMBER},
         {argumentType: ArgumentTypes.NUMBER, minValue: 0},
-      ]
+      ],
     },
     'EFFECT': {
       method: 'effect',
       parameters: [
         {argumentType: ArgumentTypes.NUMBER, minValue: 0},
         {argumentType: ArgumentTypes.NUMBER, minValue: 1},
-      ]
+      ],
+      returnNumberType: NumberType.Percent
     },
     'ISPMT': {
       method: 'ispmt',
@@ -131,14 +140,15 @@ export class FinancialPlugin extends FunctionPlugin {
         {argumentType: ArgumentTypes.NUMBER},
         {argumentType: ArgumentTypes.NUMBER},
         {argumentType: ArgumentTypes.NUMBER},
-      ]
+      ],
     },
     'NOMINAL': {
       method: 'nominal',
       parameters: [
         {argumentType: ArgumentTypes.NUMBER, minValue: 0},
         {argumentType: ArgumentTypes.NUMBER, minValue: 1},
-      ]
+      ],
+      returnNumberType: NumberType.Percent
     },
     'NPER': {
       method: 'nper',
@@ -148,7 +158,7 @@ export class FinancialPlugin extends FunctionPlugin {
         {argumentType: ArgumentTypes.NUMBER},
         {argumentType: ArgumentTypes.NUMBER, defaultValue: 0},
         {argumentType: ArgumentTypes.NUMBER, defaultValue: 0},
-      ]
+      ],
     },
     'PV': {
       method: 'pv',
@@ -158,7 +168,8 @@ export class FinancialPlugin extends FunctionPlugin {
         {argumentType: ArgumentTypes.NUMBER},
         {argumentType: ArgumentTypes.NUMBER, defaultValue: 0},
         {argumentType: ArgumentTypes.NUMBER, defaultValue: 0},
-      ]
+      ],
+      returnNumberType: NumberType.Currency
     },
     'RATE': {
       method: 'rate',
@@ -169,7 +180,8 @@ export class FinancialPlugin extends FunctionPlugin {
         {argumentType: ArgumentTypes.NUMBER, defaultValue: 0},
         {argumentType: ArgumentTypes.NUMBER, defaultValue: 0},
         {argumentType: ArgumentTypes.NUMBER, defaultValue: 0.1},
-      ]
+      ],
+      returnNumberType: NumberType.Percent
     },
     'RRI': {
       method: 'rri',
@@ -177,7 +189,8 @@ export class FinancialPlugin extends FunctionPlugin {
         {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
         {argumentType: ArgumentTypes.NUMBER},
         {argumentType: ArgumentTypes.NUMBER},
-      ]
+      ],
+      returnNumberType: NumberType.Percent
     },
     'SLN': {
       method: 'sln',
@@ -185,7 +198,8 @@ export class FinancialPlugin extends FunctionPlugin {
         {argumentType: ArgumentTypes.NUMBER},
         {argumentType: ArgumentTypes.NUMBER},
         {argumentType: ArgumentTypes.NUMBER},
-      ]
+      ],
+      returnNumberType: NumberType.Currency
     },
     'SYD': {
       method: 'syd',
@@ -194,7 +208,8 @@ export class FinancialPlugin extends FunctionPlugin {
         {argumentType: ArgumentTypes.NUMBER},
         {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
         {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
-      ]
+      ],
+      returnNumberType: NumberType.Currency
     },
     'TBILLEQ': {
       method: 'tbilleq',
@@ -202,7 +217,8 @@ export class FinancialPlugin extends FunctionPlugin {
         {argumentType: ArgumentTypes.NUMBER, minValue: 0},
         {argumentType: ArgumentTypes.NUMBER, minValue: 0},
         {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
-      ]
+      ],
+      returnNumberType: NumberType.Percent
     },
     'TBILLPRICE': {
       method: 'tbillprice',
@@ -210,7 +226,8 @@ export class FinancialPlugin extends FunctionPlugin {
         {argumentType: ArgumentTypes.NUMBER, minValue: 0},
         {argumentType: ArgumentTypes.NUMBER, minValue: 0},
         {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
-      ]
+      ],
+      returnNumberType: NumberType.Currency
     },
     'TBILLYIELD': {
       method: 'tbillyield',
@@ -218,14 +235,16 @@ export class FinancialPlugin extends FunctionPlugin {
         {argumentType: ArgumentTypes.NUMBER, minValue: 0},
         {argumentType: ArgumentTypes.NUMBER, minValue: 0},
         {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
-      ]
+      ],
+      returnNumberType: NumberType.Percent
     },
     'FVSCHEDULE': {
       method: 'fvschedule',
       parameters: [
         {argumentType: ArgumentTypes.NUMBER},
         {argumentType: ArgumentTypes.RANGE},
-      ]
+      ],
+      returnNumberType: NumberType.Currency
     },
     'NPV': {
       method: 'npv',
@@ -233,7 +252,8 @@ export class FinancialPlugin extends FunctionPlugin {
         {argumentType: ArgumentTypes.NUMBER},
         {argumentType: ArgumentTypes.ANY},
       ],
-      repeatLastArgs: 1
+      repeatLastArgs: 1,
+      returnNumberType: NumberType.Currency
     },
     'MIRR': {
       method: 'mirr',
@@ -242,6 +262,7 @@ export class FinancialPlugin extends FunctionPlugin {
         {argumentType: ArgumentTypes.NUMBER},
         {argumentType: ArgumentTypes.NUMBER},
       ],
+      returnNumberType: NumberType.Percent
     },
     'PDURATION': {
       method: 'pduration',
@@ -262,33 +283,19 @@ export class FinancialPlugin extends FunctionPlugin {
   }
 
   public pmt(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('PMT'),
-      // eslint-disable-next-line
-      // @ts-ignore
-      (...args) => new CurrencyNumber(pmtCore(...args)))
+    return this.runFunction(ast.args, formulaAddress, this.metadata('PMT'),pmtCore)
   }
 
   public ipmt(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('IPMT'),
-      // eslint-disable-next-line
-      // @ts-ignore
-      (...args) => new CurrencyNumber(ipmtCore(...args)))
+    return this.runFunction(ast.args, formulaAddress, this.metadata('IPMT'),ipmtCore)
   }
 
   public ppmt(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('PPMT'),
-      // eslint-disable-next-line
-      // @ts-ignore
-      (...args) => new CurrencyNumber(ppmtCore(...args))
-    )
+    return this.runFunction(ast.args, formulaAddress, this.metadata('PPMT'),ppmtCore)
   }
 
   public fv(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('FV'),
-      // eslint-disable-next-line
-      // @ts-ignore
-      (...args) => new CurrencyNumber(fvCore(...args))
-    )
+    return this.runFunction(ast.args, formulaAddress, this.metadata('FV'),fvCore)
   }
 
   public cumipmt(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
@@ -301,7 +308,7 @@ export class FinancialPlugin extends FunctionPlugin {
         for(let i = start; i <= end; i++) {
           acc += ipmtCore(rate, i, periods, value, 0, type)
         }
-        return new CurrencyNumber(acc)
+        return acc
       }
     )
   }
@@ -316,7 +323,7 @@ export class FinancialPlugin extends FunctionPlugin {
         for(let i = start; i <= end; i++) {
           acc += ppmtCore(rate, i, periods, value, 0, type)
         }
-        return new CurrencyNumber(acc)
+        return acc
       }
     )
   }
