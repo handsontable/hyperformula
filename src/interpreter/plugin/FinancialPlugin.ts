@@ -283,19 +283,19 @@ export class FinancialPlugin extends FunctionPlugin {
   }
 
   public pmt(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('PMT'),pmtCore)
+    return this.runFunction(ast.args, formulaAddress, this.metadata('PMT'), pmtCore)
   }
 
   public ipmt(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('IPMT'),ipmtCore)
+    return this.runFunction(ast.args, formulaAddress, this.metadata('IPMT'), ipmtCore)
   }
 
   public ppmt(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('PPMT'),ppmtCore)
+    return this.runFunction(ast.args, formulaAddress, this.metadata('PPMT'), ppmtCore)
   }
 
   public fv(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('FV'),fvCore)
+    return this.runFunction(ast.args, formulaAddress, this.metadata('FV'), fvCore)
   }
 
   public cumipmt(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {

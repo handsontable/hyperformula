@@ -334,7 +334,7 @@ export abstract class FunctionPlugin {
     nonReferenceCallback: (...arg: any) => InternalScalarValue = () => new CellError(ErrorType.NA, ErrorMessage.CellRefExpected)
   ) => {
     if (args.length === 0) {
-      return returnNumberWrapper(noArgCallback(),argumentDefinitions.returnNumberType)
+      return returnNumberWrapper(noArgCallback(), argumentDefinitions.returnNumberType)
     } else if (args.length > 1) {
       return new CellError(ErrorType.NA, ErrorMessage.WrongArgNumber)
     }
@@ -357,7 +357,7 @@ export abstract class FunctionPlugin {
     }
 
     if (cellReference !== undefined) {
-      return returnNumberWrapper(referenceCallback(cellReference),argumentDefinitions.returnNumberType)
+      return returnNumberWrapper(referenceCallback(cellReference), argumentDefinitions.returnNumberType)
     }
 
     return this.runFunction(args, formulaAddress, argumentDefinitions, nonReferenceCallback)
