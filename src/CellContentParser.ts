@@ -8,7 +8,7 @@ import {Config} from './Config'
 import {DateTimeHelper} from './DateTimeHelper'
 import {UnableToParseError} from './errors'
 import {fixNegativeZero, isNumberOverflow} from './interpreter/ArithmeticHelper'
-import {cloneNumber, ExtendedNumber, getRawValue} from './interpreter/InterpreterValue'
+import {cloneNumber, CurrencyNumber, ExtendedNumber, getRawValue, PercentNumber} from './interpreter/InterpreterValue'
 import {NumberLiteralHelper} from './NumberLiteralHelper'
 
 export type RawCellContent = Date | string | number | boolean | null | undefined
@@ -128,9 +128,28 @@ export class CellContentParser {
       } else if (isError(content, this.config.errorMapping)) {
         return new CellContent.Error(this.config.errorMapping[content.toUpperCase()])
       } else {
-        const trimmedContent = content.trim()
-        const parseAsNum = this.numberLiteralsHelper.numericStringToMaybeNumber(trimmedContent)
-        if(parseAsNum !== undefined) {
+        let trimmedContent = content.trim()
+        let mode = 0
+        if(trimmedContent.endsWith('%')) {
+          mode = 1
+          trimmedContent = trimmedContent.slice(0, trimmedContent.length-1)
+        } else if(trimmedContent.endsWith(this.config.currencySymbol)) {
+          mode = 2
+          trimmedContent = trimmedContent.slice(0, trimmedContent.length - this.config.currencySymbol.length)
+        } else if(trimmedContent.startsWith(this.config.currencySymbol)) {
+          mode = 2
+          trimmedContent = trimmedContent.slice(this.config.currencySymbol.length)
+        }
+        const val = this.numberLiteralsHelper.numericStringToMaybeNumber(trimmedContent)
+        if(val !== undefined) {
+          let parseAsNum
+          if(mode === 1) {
+            parseAsNum = new PercentNumber(val/100)
+          } else if(mode === 2) {
+            parseAsNum = new CurrencyNumber(val)
+          } else {
+            parseAsNum = val
+          }
           return new CellContent.Number(parseAsNum)
         }
         const parsedDateNumber = this.dateHelper.dateStringToDateNumber(trimmedContent)

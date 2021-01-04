@@ -2,7 +2,7 @@ import {ErrorType} from '../src/Cell'
 import {CellContent, CellContentParser} from '../src/CellContentParser'
 import {Config} from '../src/Config'
 import {DateTimeHelper} from '../src/DateTimeHelper'
-import {DateNumber} from '../src/interpreter/InterpreterValue'
+import {CurrencyNumber, DateNumber, PercentNumber} from '../src/interpreter/InterpreterValue'
 import {NumberLiteralHelper} from '../src/NumberLiteralHelper'
 
 describe('CellContentParser', () => {
@@ -131,5 +131,30 @@ describe('CellContentParser', () => {
     expect(cellContentParser.parse('\' 1')).toEqual(new CellContent.String(' 1'))
     expect(cellContentParser.parse(' \'1')).toEqual(new CellContent.String(' \'1'))
     expect(cellContentParser.parse('\'02-02-2020')).toEqual(new CellContent.String('02-02-2020'))
+  })
+
+  it('currency parsing', () => {
+    expect(cellContentParser.parse('1$')).toEqual(new CellContent.Number(new CurrencyNumber(1)))
+    expect(cellContentParser.parse('$1')).toEqual(new CellContent.Number(new CurrencyNumber(1)))
+    expect(cellContentParser.parse('-1.1e1$')).toEqual(new CellContent.Number(new CurrencyNumber(-11)))
+    expect(cellContentParser.parse('$-1.1e1')).toEqual(new CellContent.Number(new CurrencyNumber(-11)))
+    expect(cellContentParser.parse(' 1$ ')).toEqual(new CellContent.Number(new CurrencyNumber(1)))
+    expect(cellContentParser.parse(' $1 ')).toEqual(new CellContent.Number(new CurrencyNumber(1)))
+    expect(cellContentParser.parse('1 $')).toEqual(new CellContent.String('1 $'))
+    expect(cellContentParser.parse('$ 1')).toEqual(new CellContent.String('$ 1'))
+  })
+
+  it('other currency parsing', () => {
+    expect(cellContentParser.parse('1PLN')).toEqual(new CellContent.String('1PLN'))
+    const configPLN = new Config({currencySymbol: 'PLN'})
+    const cellContentParserPLN = new CellContentParser(configPLN, new DateTimeHelper(configPLN), new NumberLiteralHelper(configPLN))
+    expect(cellContentParserPLN.parse('1PLN')).toEqual(new CellContent.Number(new CurrencyNumber(1)))
+  })
+
+  it('percentage parsing', () => {
+    expect(cellContentParser.parse('100%')).toEqual(new CellContent.Number(new PercentNumber(1)))
+    expect(cellContentParser.parse('-1.1e3%')).toEqual(new CellContent.Number(new PercentNumber(-11)))
+    expect(cellContentParser.parse(' 100% ')).toEqual(new CellContent.Number(new PercentNumber(1)))
+    expect(cellContentParser.parse('100 %')).toEqual(new CellContent.String('100 %'))
   })
 })
