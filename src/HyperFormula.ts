@@ -1137,7 +1137,7 @@ export class HyperFormula implements TypedEmitter {
    * @fires [[valuesUpdated]] if recalculation was triggered by this change
    *
    * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
-   * @throws [[InvalidArgumentsError]] an error when rowMapping does not define correct row permutation for some subset of rows of the given sheet
+   * @throws [[InvalidArgumentsError]] when rowMapping does not define correct row permutation for some subset of rows of the given sheet
    * @throws [[SourceLocationHasMatrixError]] when the selected position has matrix inside
    *
    * @example
@@ -1218,7 +1218,7 @@ export class HyperFormula implements TypedEmitter {
    * @fires [[valuesUpdated]] if recalculation was triggered by this change
    *
    * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
-   * @throws an error when rowMapping does not define correct row permutation for some subset of rows of the given sheet
+   * @throws [[InvalidArgumentsError]] when rowMapping does not define correct row permutation for some subset of rows of the given sheet
    * @throws [[SourceLocationHasMatrixError]] when the selected position has matrix inside
    *
    * @example
@@ -1271,10 +1271,10 @@ export class HyperFormula implements TypedEmitter {
    * ]);
    *
    * // returns true
-   * hfInstance.setRowOrder(0, [2, 1, 0]);
+   * hfInstance.isItPossibleToSetRowOrder(0, [2, 1, 0]);
    *
    * // returns false
-   * hfInstance.setRowOrder(0, [2]);
+   * hfInstance.isItPossibleToSetRowOrder(0, [2]);
    * ```
    *
    * @category Rows
@@ -1300,7 +1300,7 @@ export class HyperFormula implements TypedEmitter {
    * @fires [[valuesUpdated]] if recalculation was triggered by this change
    *
    * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
-   * @throws an error when columnMapping does not define correct column permutation for some subset of columns of the given sheet
+   * @throws [[InvalidArgumentsError]] when columnMapping does not define correct column permutation for some subset of columns of the given sheet
    * @throws [[SourceLocationHasMatrixError]] when the selected position has matrix inside
    *
    * @example
@@ -1350,10 +1350,10 @@ export class HyperFormula implements TypedEmitter {
    * ]);
    *
    * // returns true
-   * hfInstance.swapColumnIndexes(0, [[0,2],[2,0]]);
+   * hfInstance.isItPossibleToSwapColumnIndexes(0, [[0,2],[2,0]]);
    *
    * // returns false
-   * hfInstance.swapColumnIndexes(0, [[0,1]]);
+   * hfInstance.isItPossibleToSwapColumnIndexes(0, [[0,1]]);
    * ```
    *
    * @category Columns
@@ -1378,7 +1378,7 @@ export class HyperFormula implements TypedEmitter {
    * @fires [[valuesUpdated]] if recalculation was triggered by this change
    *
    * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
-   * @throws an error when columnMapping does not define correct column permutation for some subset of columns of the given sheet
+   * @throws [[InvalidArgumentsError]] when columnMapping does not define correct column permutation for some subset of columns of the given sheet
    * @throws [[SourceLocationHasMatrixError]] when the selected position has matrix inside
    *
    * @example
@@ -1429,10 +1429,10 @@ export class HyperFormula implements TypedEmitter {
    * ]);
    *
    * // returns true
-   * hfInstance.setColumnOrder(0, [2, 1, 0]]);
+   * hfInstance.isItPossibleToSetColumnOrder(0, [2, 1, 0]]);
    *
    * // returns false
-   * hfInstance.setColumnOrder(0, [1]]);
+   * hfInstance.isItPossibleToSetColumnOrder(0, [1]]);
    * ```
    *
    * @category Columns
