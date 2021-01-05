@@ -3,7 +3,7 @@
  * Copyright (c) 2020 Handsoncode. All rights reserved.
  */
 
-import {CellType, CellValueType, ErrorType, SimpleCellAddress} from './Cell'
+import {CellType, CellValueDetailedType, CellValueType, ErrorType, SimpleCellAddress} from './Cell'
 import {RawCellContent} from './CellContentParser'
 import {CellValue, DetailedCellError, NoErrorCellValue} from './CellValue'
 import {Config, ConfigParams} from './Config'
@@ -53,6 +53,7 @@ class HyperFormulaNS extends HyperFormula {
   public static ErrorType = ErrorType
   public static CellType = CellType
   public static CellValueType = CellValueType
+  public static CellValueDetailedType = CellValueDetailedType
   public static DetailedCellError = DetailedCellError
   public static ExportedCellChange = ExportedCellChange
   public static ExportedNamedExpressionChange = ExportedNamedExpressionChange
