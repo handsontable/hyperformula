@@ -1,5 +1,5 @@
 import {HyperFormula} from '../../src'
-import {ErrorType} from '../../src/Cell'
+import {CellValueDetailedType, ErrorType} from '../../src/Cell'
 import {Config} from '../../src/Config'
 import {ErrorMessage} from '../../src/error-message'
 import {adr, detailedError, timeNumberToString} from '../testUtils'
@@ -12,6 +12,7 @@ describe('Function TIME', () => {
     ], config)
     expect(engine.getCellValue(adr('A1'))).toEqual(0)
     expect(timeNumberToString(engine.getCellValue(adr('A1')), config)).toEqual('00:00:00')
+    expect(engine.getCellValueDetailedType(adr('A1'))).toBe(CellValueDetailedType.NUMBER_TIME)
     expect(engine.getCellValue(adr('B1'))).toEqual(0.875625)
     expect(timeNumberToString(engine.getCellValue(adr('B1')), config)).toEqual('21:00:54')
     expect(engine.getCellValue(adr('C1'))).toBeCloseTo(0.132222222222222)

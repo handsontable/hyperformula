@@ -20,7 +20,6 @@ import {format} from '../../format/format'
 import {Maybe} from '../../Maybe'
 import {ProcedureAst} from '../../parser'
 import {
-  DateTimeNumber,
   EmptyValue,
   getRawValue,
   InternalNoErrorScalarValue,

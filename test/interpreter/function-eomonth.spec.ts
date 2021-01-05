@@ -1,5 +1,5 @@
 import {HyperFormula} from '../../src'
-import {ErrorType, SimpleCellAddress} from '../../src/Cell'
+import {CellValueDetailedType, ErrorType, SimpleCellAddress} from '../../src/Cell'
 import {Config} from '../../src/Config'
 import {ErrorMessage} from '../../src/error-message'
 import {adr, dateNumberToString, detailedError} from '../testUtils'
@@ -19,6 +19,7 @@ describe('Function EOMONTH', () => {
     ])
 
     expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.NumberCoercion))
+    expect(engine.getCellValueDetailedType(adr('A2'))).toBe(CellValueDetailedType.NUMBER_DATE)
     expect(engine.getCellValue(adr('A3'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.NumberCoercion))
     expect(engine.getCellValue(adr('A4'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
     expect(engine.getCellValue(adr('A5'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))

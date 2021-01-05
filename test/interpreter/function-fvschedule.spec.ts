@@ -1,4 +1,5 @@
 import {ErrorType, HyperFormula} from '../../src'
+import {CellValueDetailedType} from '../../src/Cell'
 import {ErrorMessage} from '../../src/error-message'
 import {adr, detailedError} from '../testUtils'
 
@@ -19,6 +20,7 @@ describe('Function FVSCHEDULE', () => {
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqual(2)
+    expect(engine.getCellValueDetailedType(adr('A1'))).toBe(CellValueDetailedType.NUMBER_CURRENCY)
     expect(engine.getCellValue(adr('A2'))).toEqual(8)
   })
 
