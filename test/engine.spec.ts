@@ -1,5 +1,5 @@
 import {DetailedCellError, ErrorType, HyperFormula} from '../src'
-import {CellType, CellValueType} from '../src/Cell'
+import {CellType, CellValueDetailedType, CellValueType} from '../src/Cell'
 import {ErrorMessage} from '../src/error-message'
 import {plPL} from '../src/i18n/languages'
 import {adr, detailedError, expectArrayWithSameContent} from './testUtils'
@@ -604,6 +604,67 @@ describe('#getCellType', () => {
     const engine = HyperFormula.buildFromArray([['=SUM(']])
 
     expect(engine.getCellType(adr('A1'))).toBe(CellType.FORMULA)
+  })
+})
+
+describe('#getCellValueDetailedType', () => {
+  it('string', () => {
+    const engine = HyperFormula.buildFromArray([['foo']])
+    expect(engine.getCellValueDetailedType(adr('A1'))).toBe(CellValueDetailedType.STRING)
+  })
+
+  it('number raw', () => {
+    const engine = HyperFormula.buildFromArray([['42']])
+    expect(engine.getCellValueDetailedType(adr('A1'))).toBe(CellValueDetailedType.NUMBER_RAW)
+  })
+
+  it('number currency', () => {
+    const engine = HyperFormula.buildFromArray([['42$']])
+    expect(engine.getCellValueDetailedType(adr('A1'))).toBe(CellValueDetailedType.NUMBER_CURRENCY)
+  })
+
+  it('number percent', () => {
+    const engine = HyperFormula.buildFromArray([['42%']])
+    expect(engine.getCellValueDetailedType(adr('A1'))).toBe(CellValueDetailedType.NUMBER_PERCENT)
+  })
+
+  it('number date', () => {
+    const engine = HyperFormula.buildFromArray([['01/01/1967']])
+    expect(engine.getCellValueDetailedType(adr('A1'))).toBe(CellValueDetailedType.NUMBER_DATE)
+  })
+
+  it('number datetime', () => {
+    const engine = HyperFormula.buildFromArray([['01/01/1967 15:34']])
+    expect(engine.getCellValueDetailedType(adr('A1'))).toBe(CellValueDetailedType.NUMBER_DATETIME)
+  })
+
+  it('number time', () => {
+    const engine = HyperFormula.buildFromArray([['15:34']])
+    expect(engine.getCellValueDetailedType(adr('A1'))).toBe(CellValueDetailedType.NUMBER_TIME)
+  })
+
+  it('boolean', () => {
+    const engine = HyperFormula.buildFromArray([['=TRUE()']])
+    expect(engine.getCellValueDetailedType(adr('A1'))).toBe(CellValueDetailedType.BOOLEAN)
+  })
+
+  it('empty value', () => {
+    const engine = HyperFormula.buildFromArray([[null]])
+    expect(engine.getCellValueDetailedType(adr('A1'))).toBe(CellValueDetailedType.EMPTY)
+    expect(engine.getCellValueDetailedType(adr('B1'))).toBe(CellValueDetailedType.EMPTY)
+  })
+
+  it('error', () => {
+    const engine = HyperFormula.buildFromArray([['=1/0', '=SU()', '=A1']])
+    expect(engine.getCellValueDetailedType(adr('A1'))).toBe(CellValueDetailedType.ERROR)
+    expect(engine.getCellValueDetailedType(adr('B1'))).toBe(CellValueDetailedType.ERROR)
+    expect(engine.getCellValueDetailedType(adr('C1'))).toBe(CellValueDetailedType.ERROR)
+  })
+
+  it('formula evaluating to range', () => {
+    const engine = HyperFormula.buildFromArray([['=B1:B2', '=C:D']])
+    expect(engine.getCellValueDetailedType(adr('A1'))).toBe(CellValueDetailedType.ERROR)
+    expect(engine.getCellValueDetailedType(adr('B1'))).toBe(CellValueDetailedType.ERROR)
   })
 })
 

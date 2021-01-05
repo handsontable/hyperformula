@@ -5,7 +5,15 @@
 
 import {CellVertex, FormulaCellVertex, MatrixVertex, ParsingErrorVertex, ValueCellVertex} from './DependencyGraph'
 import {ErrorMessage} from './error-message'
-import {EmptyValue, InterpreterValue, isExtendedNumber} from './interpreter/InterpreterValue'
+import {
+  CurrencyNumber,
+  DateNumber,
+  DateTimeNumber,
+  EmptyValue,
+  InterpreterValue,
+  isExtendedNumber, PercentNumber,
+  TimeNumber
+} from './interpreter/InterpreterValue'
 import {SimpleRangeValue} from './interpreter/SimpleRangeValue'
 import {CellAddress} from './parser'
 import {AddressWithSheet} from './parser/Address'
@@ -68,6 +76,19 @@ export enum CellValueType {
   ERROR = 'ERROR',
 }
 
+export enum CellValueDetailedType {
+  EMPTY = 'EMPTY',
+  STRING = 'STRING',
+  BOOLEAN = 'BOOLEAN',
+  ERROR = 'ERROR',
+  NUMBER_RAW = 'NUMBER_RAW',
+  NUMBER_DATE = 'NUMBER_DATE',
+  NUMBER_TIME = 'NUMBER_TIME',
+  NUMBER_DATETIME = 'NUMBER_DATETIME',
+  NUMBER_PERCENT = 'NUMBER_PERCENT',
+  NUMBER_CURRENCY = 'NUMBER_CURRENCY',
+}
+
 export const CellValueTypeOrd = (arg: CellValueType): number => {
   switch (arg) {
     case CellValueType.EMPTY:
@@ -98,6 +119,36 @@ export const getCellValueType = (cellValue: InterpreterValue): CellValueType => 
     return CellValueType.NUMBER
   } else if(typeof cellValue === 'boolean') {
     return CellValueType.BOOLEAN
+  }
+
+  throw new Error('Cell value not computed')
+}
+
+export const getCellValueDetailedType = (cellValue: InterpreterValue): CellValueDetailedType => {
+  if (cellValue === EmptyValue) {
+    return CellValueDetailedType.EMPTY
+  }
+
+  if (cellValue instanceof CellError || cellValue instanceof SimpleRangeValue) {
+    return CellValueDetailedType.ERROR
+  }
+
+  if(typeof cellValue === 'string') {
+    return CellValueDetailedType.STRING
+  } else if(typeof cellValue === 'boolean') {
+    return CellValueDetailedType.BOOLEAN
+  } else if(typeof cellValue === 'number') {
+    return CellValueDetailedType.NUMBER_RAW
+  } else if(cellValue instanceof DateNumber) {
+    return CellValueDetailedType.NUMBER_DATE
+  } else if(cellValue instanceof TimeNumber) {
+    return CellValueDetailedType.NUMBER_TIME
+  } else if(cellValue instanceof DateTimeNumber) {
+    return CellValueDetailedType.NUMBER_DATETIME
+  } else if(cellValue instanceof PercentNumber) {
+    return CellValueDetailedType.NUMBER_PERCENT
+  } else if(cellValue instanceof CurrencyNumber) {
+    return CellValueDetailedType.NUMBER_CURRENCY
   }
 
   throw new Error('Cell value not computed')

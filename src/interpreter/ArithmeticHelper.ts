@@ -724,10 +724,10 @@ function inferExtendedNumberTypeMultiplicative(left: NumberType, right: NumberTy
     right = NumberType.Raw
   }
   if(left === NumberType.Raw) {
-    right
+    return right
   }
   if(right === NumberType.Raw) {
-    left
+    return left
   }
   return NumberType.Raw
 }

@@ -4,7 +4,7 @@
  */
 
 import {AbsoluteCellRange} from './AbsoluteCellRange'
-import {CellType, CellValueType, getCellType, getCellValueType, SimpleCellAddress} from './Cell'
+import {CellType, CellValueDetailedType, CellValueType, getCellType, getCellValueType, getCellValueDetailedType, SimpleCellAddress} from './Cell'
 import {CellContent, CellContentParser, RawCellContent} from './CellContentParser'
 import {CellValue, NoErrorCellValue} from './CellValue'
 import {ExportedChange, Exporter} from './Exporter'
@@ -2502,6 +2502,35 @@ export class HyperFormula implements TypedEmitter {
     this.ensureEvaluationIsNotSuspended()
     const value = this.dependencyGraph.getCellValue(cellAddress)
     return getCellValueType(value)
+  }
+
+  /**
+   * Returns detailed type of the cell value of a given address.
+   * The methods accepts cell coordinates as object with column, row and sheet numbers.
+   *
+   * @param {SimpleCellAddress} cellAddress - cell coordinates
+   *
+   * @throws [[EvaluationSuspendedError]] when the evaluation is suspended
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromArray([
+   *  ['1%', '1$'],
+   * ]);
+   *
+   * // should return 'NUMBER_PERCENT', cell value type of provided coordinates is a number with a format inference percent.
+   * const cellValue = hfInstance.getCellValueType({ sheet: 0, col: 1, row: 0 });
+   *
+   * // should return 'NUMBER_CURRENCY', cell value type of provided coordinates is a number with a format inference currency.
+   * const cellValue = hfInstance.getCellValueType({ sheet: 0, col: 0, row: 0 });
+   * ```
+   *
+   * @category Cells
+   */
+  public getCellValueDetailedType(cellAddress: SimpleCellAddress): CellValueDetailedType {
+    this.ensureEvaluationIsNotSuspended()
+    const value = this.dependencyGraph.getCellValue(cellAddress)
+    return getCellValueDetailedType(value)
   }
 
   /**

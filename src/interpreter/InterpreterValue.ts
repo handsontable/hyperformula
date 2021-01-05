@@ -82,7 +82,7 @@ export function ExtendedNumberFactory(type: NumberType, value: number): Extended
 
 export function getTypeOfExtendedNumber(arg: ExtendedNumber): NumberType {
   if(arg instanceof DateNumber) {
-    return NumberType.DateTime
+    return NumberType.Date
   } else if(arg instanceof TimeNumber) {
     return NumberType.Time
   } else if(arg instanceof DateTimeNumber) {
