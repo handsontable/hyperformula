@@ -1,4 +1,5 @@
 import {ErrorType, HyperFormula} from '../../src'
+import {CellValueDetailedType} from '../../src/Cell'
 import {ErrorMessage} from '../../src/error-message'
 import {adr, detailedError} from '../testUtils'
 
@@ -46,5 +47,10 @@ describe('Function HF.MINUS', () => {
     expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.NumberCoercion))
     expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.NA))
     expect(engine.getCellValue(adr('A3'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.WrongType))
+  })
+
+  it('passes subtypes', () => {
+    const engine = HyperFormula.buildFromArray([['=HF.MINUS(B1,C1)', '1$', 1]])
+    expect(engine.getCellValueDetailedType(adr('A1'))).toBe(CellValueDetailedType.NUMBER_CURRENCY)
   })
 })

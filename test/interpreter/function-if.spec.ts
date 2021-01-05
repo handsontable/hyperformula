@@ -1,5 +1,5 @@
 import {HyperFormula} from '../../src'
-import {ErrorType} from '../../src/Cell'
+import {CellValueDetailedType, ErrorType} from '../../src/Cell'
 import {ErrorMessage} from '../../src/error-message'
 import {adr, detailedError} from '../testUtils'
 
@@ -49,6 +49,16 @@ describe('Function IF', () => {
     const engine = HyperFormula.buildFromArray([['=IF(TRUE(), 4/0, "no")']])
 
     expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.DIV_BY_ZERO))
+  })
+
+  it('passes subtypes of second arg', () => {
+    const engine = HyperFormula.buildFromArray([['=IF(TRUE(),B1,C1)', '1%', '1']])
+    expect(engine.getCellValueDetailedType(adr('A1'))).toBe(CellValueDetailedType.NUMBER_PERCENT)
+  })
+
+  it('passes subtypes of third arg', () => {
+    const engine = HyperFormula.buildFromArray([['=IF(FALSE(),B1,C1)', '1', '1%']])
+    expect(engine.getCellValueDetailedType(adr('A1'))).toBe(CellValueDetailedType.NUMBER_PERCENT)
   })
 
   it('passes correct value when other arg is an error', () => {

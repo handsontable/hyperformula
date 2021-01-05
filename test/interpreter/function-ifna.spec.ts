@@ -1,5 +1,5 @@
 import {HyperFormula} from '../../src'
-import {ErrorType} from '../../src/Cell'
+import {CellValueDetailedType, ErrorType} from '../../src/Cell'
 import {ErrorMessage} from '../../src/error-message'
 import {adr, detailedError} from '../testUtils'
 
@@ -63,5 +63,17 @@ describe('Function IFNA', () => {
     const engine = HyperFormula.buildFromArray([['=IFNA(1, B1)', '=B1']])
 
     expect(engine.getCellValue(adr('A1'))).toEqual(1)
+  })
+
+  it('preserves types of first arg', () => {
+    const engine = HyperFormula.buildFromArray([['=IFNA(B1, 1)', '1%' ]])
+
+    expect(engine.getCellValueDetailedType(adr('A1'))).toBe(CellValueDetailedType.NUMBER_PERCENT)
+  })
+
+  it('preserves types of second arg', () => {
+    const engine = HyperFormula.buildFromArray([['=IFNA(NA(), B1)', '1%' ]])
+
+    expect(engine.getCellValueDetailedType(adr('A1'))).toBe(CellValueDetailedType.NUMBER_PERCENT)
   })
 })
