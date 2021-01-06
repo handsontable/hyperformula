@@ -38,7 +38,7 @@ import {
   TargetLocationHasMatrixError,
   UnableToParseError
 } from './errors'
-import {ExportedCellChange, ExportedChange, ExportedNamedExpressionChange,} from './Exporter'
+import {ExportedCellChange, ExportedChange, ExportedNamedExpressionChange, } from './Exporter'
 import {HyperFormula} from './HyperFormula'
 import {RawTranslationPackage} from './i18n'
 import enGB from './i18n/languages/enGB'
