@@ -314,9 +314,6 @@ export class Operations {
     for(const [source, target] of rowMapping ) {
       if(source!==target) {
         const rowRange = AbsoluteCellRange.spanFrom({sheet: sheetId, col: 0, row: source}, Infinity, 1)
-        if (this.dependencyGraph.matrixMapping.isFormulaMatrixInRange(rowRange)) {
-          throw new SourceLocationHasMatrixError()
-        }
         this.dependencyGraph.breakNumericMatricesInRange(rowRange)
         const row = this.getRangeClipboardCells(rowRange)
         buffer.push(
@@ -336,9 +333,6 @@ export class Operations {
     for(const [source, target] of columnMapping ) {
       if(source!==target) {
         const rowRange = AbsoluteCellRange.spanFrom({sheet: sheetId, col: source, row: 0}, 1, Infinity)
-        if (this.dependencyGraph.matrixMapping.isFormulaMatrixInRange(rowRange)) {
-          throw new SourceLocationHasMatrixError()
-        }
         this.dependencyGraph.breakNumericMatricesInRange(rowRange)
         const column = this.getRangeClipboardCells(rowRange)
         buffer.push(

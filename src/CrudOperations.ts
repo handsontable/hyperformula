@@ -295,6 +295,7 @@ export class CrudOperations {
 
   public setRowOrder(sheetId: number, rowMapping: [number, number][]): void {
     this.validateSwapRowIndexes(sheetId, rowMapping)
+    this.testRowOrderForMatrices(sheetId, rowMapping)
     this.undoRedo.clearRedoStack()
     this.clipboardOperations.abortCut()
     this.operations.setRowOrder(sheetId, rowMapping)
@@ -308,21 +309,21 @@ export class CrudOperations {
     this.validateRowOrColumnMapping(sheetId, rowMapping, 'row')
   }
 
-  public testColumnOrderForMatrices(sheetId: number, columnMapping: [number, number][]): boolean {
+  public testColumnOrderForMatrices(sheetId: number, columnMapping: [number, number][]): void {
     for(const [source, target] of columnMapping ) {
       if(source!==target) {
         const rowRange = AbsoluteCellRange.spanFrom({sheet: sheetId, col: source, row: 0}, 1, Infinity)
         if (this.dependencyGraph.matrixMapping.isFormulaMatrixInRange(rowRange)) {
-          return false
+          throw new SourceLocationHasMatrixError()
         }
       }
     }
-    return true
   }
 
 
   public setColumnOrder(sheetId: number, columnMapping: [number, number][]): void {
     this.validateSwapColumnIndexes(sheetId, columnMapping)
+    this.testColumnOrderForMatrices(sheetId, columnMapping)
     this.undoRedo.clearRedoStack()
     this.clipboardOperations.abortCut()
     this.operations.setColumnOrder(sheetId, columnMapping)
@@ -336,16 +337,15 @@ export class CrudOperations {
     this.validateRowOrColumnMapping(sheetId, columnMapping, 'column')
   }
 
-  public testRowOrderForMatrices(sheetId: number, rowMapping: [number, number][]): boolean {
+  public testRowOrderForMatrices(sheetId: number, rowMapping: [number, number][]): void {
     for(const [source, target] of rowMapping ) {
       if(source!==target) {
         const rowRange = AbsoluteCellRange.spanFrom({sheet: sheetId, col: 0, row: source}, Infinity, 1)
         if (this.dependencyGraph.matrixMapping.isFormulaMatrixInRange(rowRange)) {
-          return false
+          throw new SourceLocationHasMatrixError()
         }
       }
     }
-    return true
   }
 
 
