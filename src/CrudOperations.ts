@@ -308,6 +308,19 @@ export class CrudOperations {
     this.validateRowOrColumnMapping(sheetId, rowMapping, 'row')
   }
 
+  public testColumnOrderForMatrices(sheetId: number, columnMapping: [number, number][]): boolean {
+    for(const [source, target] of columnMapping ) {
+      if(source!==target) {
+        const rowRange = AbsoluteCellRange.spanFrom({sheet: sheetId, col: source, row: 0}, 1, Infinity)
+        if (this.dependencyGraph.matrixMapping.isFormulaMatrixInRange(rowRange)) {
+          return false
+        }
+      }
+    }
+    return true
+  }
+
+
   public setColumnOrder(sheetId: number, columnMapping: [number, number][]): void {
     this.validateSwapColumnIndexes(sheetId, columnMapping)
     this.undoRedo.clearRedoStack()
@@ -322,6 +335,19 @@ export class CrudOperations {
     }
     this.validateRowOrColumnMapping(sheetId, columnMapping, 'column')
   }
+
+  public testRowOrderForMatrices(sheetId: number, rowMapping: [number, number][]): boolean {
+    for(const [source, target] of rowMapping ) {
+      if(source!==target) {
+        const rowRange = AbsoluteCellRange.spanFrom({sheet: sheetId, col: 0, row: source}, Infinity, 1)
+        if (this.dependencyGraph.matrixMapping.isFormulaMatrixInRange(rowRange)) {
+          return false
+        }
+      }
+    }
+    return true
+  }
+
 
   public mappingFromOrder(sheetId: number, newOrder: number[], rowOrColumn: 'row' | 'column'): [number, number][] {
     if (!this.sheetMapping.hasSheetWithId(sheetId)) {

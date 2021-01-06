@@ -1201,7 +1201,7 @@ export class HyperFormula implements TypedEmitter {
   public isItPossibleToSwapRowIndexes(sheetId: number, rowMapping: [number, number][]): boolean {
     try {
       this._crudOperations.validateSwapRowIndexes(sheetId, rowMapping)
-      return this._crudOperations.operations.testRowOrderForMatrices(sheetId, rowMapping)
+      return this._crudOperations.testRowOrderForMatrices(sheetId, rowMapping)
     } catch (e) {
       return false
     }
@@ -1283,7 +1283,7 @@ export class HyperFormula implements TypedEmitter {
     try {
       const rowMapping = this._crudOperations.mappingFromOrder(sheetId, newRowOrder, 'row')
       this._crudOperations.validateSwapRowIndexes(sheetId, rowMapping)
-      return this._crudOperations.operations.testRowOrderForMatrices(sheetId, rowMapping)
+      return this._crudOperations.testRowOrderForMatrices(sheetId, rowMapping)
     } catch (e) {
       return false
     }
@@ -1364,7 +1364,7 @@ export class HyperFormula implements TypedEmitter {
     } catch (e) {
       return false
     }
-    return this._crudOperations.operations.testColumnOrderForMatrices(sheetId, columnMapping)
+    return this._crudOperations.testColumnOrderForMatrices(sheetId, columnMapping)
   }
 
   /**
@@ -1441,7 +1441,7 @@ export class HyperFormula implements TypedEmitter {
     try {
       const columnMapping = this._crudOperations.mappingFromOrder(sheetId, newRowOrder, 'column')
       this._crudOperations.validateSwapColumnIndexes(sheetId, columnMapping)
-      return this._crudOperations.operations.testColumnOrderForMatrices(sheetId, columnMapping)
+      return this._crudOperations.testColumnOrderForMatrices(sheetId, columnMapping)
     } catch (e) {
       return false
     }
