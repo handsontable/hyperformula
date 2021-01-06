@@ -6,6 +6,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- Added support for row and column reordering. (#343)
+
+### Fixed
+- Fixed a bug with serialization of some addresses after CRUDs. (#587)
+
 ## [0.4.0] - 2020-12-17
 
 ### Changed
@@ -17,7 +23,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added function aliases mechanism. (PR #569)
 - Added support for scientific notation. (#579)
 - Added support for complex numbers. (#281)
-- Added support for row and column reordering. (#343)
 
 ### Fixed
 - Fixed a problem with dependencies not collected for specific functions. (#550, #549)
@@ -25,7 +30,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed a problem with HLOOKUP/VLOOKUP getting stuck in binary search. (#559, #562)
 - Fixed a problem with the logic of dependency resolving. (#561, #563)
 - Fixed a minor bug with ATAN2 function. (#581)
-- Fixed a bug with serialization of some addresses after CRUDs. (#587)
 
 ## [0.3.0] - 2020-10-22
 
