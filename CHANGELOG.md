@@ -6,6 +6,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- Added support for row and column reordering. (#343)
+
+### Fixed
+- Fixed a bug with serialization of some addresses after CRUDs. (#587)
+
 ## [0.4.0] - 2020-12-17
 
 ### Changed

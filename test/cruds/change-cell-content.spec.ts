@@ -660,7 +660,7 @@ describe('change multiple cells contents', () => {
     expect(engine.getCellValue(adr('A1'))).toBe(1)
   })
 
-  it('returns changes of mutliple values', () => {
+  it('returns changes of multiple values', () => {
     const sheet = [
       ['1', '2'],
       ['3', '4'],
@@ -674,7 +674,7 @@ describe('change multiple cells contents', () => {
     expectArrayWithSameContent(changes.map((change) => change.newValue), [7, 8, 9, 10])
   })
 
-  it('returns changes of mutliple values dependent formulas', () => {
+  it('returns changes of multiple values dependent formulas', () => {
     const sheet = [
       ['1', '2'],
       ['3', '4'],

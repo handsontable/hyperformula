@@ -183,13 +183,50 @@ describe('Copy - paste integration', () => {
   it('should return ref when pasted reference is out of scope', () => {
     const engine = HyperFormula.buildFromArray([
       [null, null],
-      [null, '=B1'],
+      [null, '=A1'],
     ])
 
     engine.copy(adr('B2'), 1, 1)
     engine.paste(adr('A1'))
 
     expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.REF, ErrorMessage.BadRef))
+    expect(engine.getCellSerialized(adr('A1'))).toEqual('=#REF!')
+  })
+
+  it('should return ref when pasted range is out of scope', () => {
+    const engine = HyperFormula.buildFromArray([
+      [null, null],
+      [null, '=A1:B2'],
+    ])
+
+    engine.copy(adr('B2'), 1, 1)
+    engine.paste(adr('A1'))
+
+    expect(engine.getCellSerialized(adr('A1'))).toEqual('=#REF!')
+  })
+
+  it('should return ref when pasted column range is out of scope', () => {
+    const engine = HyperFormula.buildFromArray([
+      [null, null],
+      [null, '=A:B'],
+    ])
+
+    engine.copy(adr('B2'), 1, 1)
+    engine.paste(adr('A1'))
+
+    expect(engine.getCellSerialized(adr('A1'))).toEqual('=#REF!')
+  })
+
+  it('should return ref when pasted row range is out of scope', () => {
+    const engine = HyperFormula.buildFromArray([
+      [null, null],
+      [null, '=1:2'],
+    ])
+
+    engine.copy(adr('B2'), 1, 1)
+    engine.paste(adr('A1'))
+
+    expect(engine.getCellSerialized(adr('A1'))).toEqual('=#REF!')
   })
 
   it('should create new range vertex - cell range', () => {
