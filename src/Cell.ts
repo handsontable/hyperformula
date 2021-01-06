@@ -182,12 +182,16 @@ export interface SimpleRowAddress {
 
 export const simpleRowAddress = (sheet: number, row: number): SimpleRowAddress => ({sheet, row})
 
+export const invalidSimpleRowAddress = (address: SimpleRowAddress): boolean => (address.row < 0)
+
 export interface SimpleColumnAddress {
   col: number,
   sheet: number,
 }
 
 export const simpleColumnAddress = (sheet: number, col: number): SimpleColumnAddress => ({sheet, col})
+
+export const invalidSimpleColumnAddress = (address: SimpleColumnAddress): boolean => (address.col < 0)
 
 export interface SimpleCellAddress {
   col: number,

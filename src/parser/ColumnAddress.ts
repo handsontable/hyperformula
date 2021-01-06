@@ -3,7 +3,14 @@
  * Copyright (c) 2020 Handsoncode. All rights reserved.
  */
 
-import {absoluteSheetReference, SimpleCellAddress, simpleColumnAddress, SimpleColumnAddress} from '../Cell'
+import {
+  absoluteSheetReference,
+  invalidSimpleColumnAddress,
+  SimpleCellAddress,
+  simpleColumnAddress,
+  SimpleColumnAddress
+} from '../Cell'
+import {Maybe} from '../Maybe'
 import {AddressWithColumn} from './Address'
 import {columnIndexToLabel} from './addressRepresentationConverters'
 
@@ -83,8 +90,11 @@ export class ColumnAddress implements AddressWithColumn {
     }
   }
 
-  public unparse(baseAddress: SimpleCellAddress): string {
+  public unparse(baseAddress: SimpleCellAddress): Maybe<string> {
     const simpleAddress = this.toSimpleColumnAddress(baseAddress)
+    if(invalidSimpleColumnAddress(simpleAddress)) {
+      return undefined
+    }
     const column = columnIndexToLabel(simpleAddress.col)
     const dollar = this.type === ReferenceType.ABSOLUTE ? '$' : ''
     return `${dollar}${column}`
