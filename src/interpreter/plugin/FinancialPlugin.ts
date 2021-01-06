@@ -7,11 +7,11 @@ import {CellError, ErrorType, SimpleCellAddress} from '../../Cell'
 import {ErrorMessage} from '../../error-message'
 import {ProcedureAst} from '../../parser'
 import {
-  CurrencyNumber,
   EmptyValue,
   getRawValue,
   InternalScalarValue,
-  isExtendedNumber, NumberType,
+  isExtendedNumber,
+  NumberType,
   RawInterpreterValue
 } from '../InterpreterValue'
 import {SimpleRangeValue} from '../SimpleRangeValue'

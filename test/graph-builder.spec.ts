@@ -1,8 +1,8 @@
 import {HyperFormula} from '../src'
-import {EmptyCellVertex, MatrixVertex, ValueCellVertex} from '../src/DependencyGraph'
-import {adr, colEnd, colStart} from './testUtils'
 import {Config} from '../src/Config'
+import {EmptyCellVertex, MatrixVertex, ValueCellVertex} from '../src/DependencyGraph'
 import {SheetSizeLimitExceededError} from '../src/errors'
+import {adr, colEnd, colStart} from './testUtils'
 
 describe('GraphBuilder', () => {
   it('build sheet with simple number cell', () => {

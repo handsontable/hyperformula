@@ -11,7 +11,8 @@ import {
   DateTimeNumber,
   EmptyValue,
   InterpreterValue,
-  isExtendedNumber, PercentNumber,
+  isExtendedNumber,
+  PercentNumber,
   TimeNumber
 } from './interpreter/InterpreterValue'
 import {SimpleRangeValue} from './interpreter/SimpleRangeValue'

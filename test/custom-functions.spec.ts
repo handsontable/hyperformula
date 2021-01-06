@@ -1,19 +1,15 @@
+import {FunctionPluginValidationError, HyperFormula} from '../src'
+import {ErrorType, SimpleCellAddress} from '../src/Cell'
 import {ErrorMessage} from '../src/error-message'
+import {AliasAlreadyExisting, ProtectedFunctionError, ProtectedFunctionTranslationError} from '../src/errors'
+import {plPL} from '../src/i18n/languages'
 import {InternalScalarValue} from '../src/interpreter/InterpreterValue'
 import {FunctionPlugin} from '../src/interpreter/plugin/FunctionPlugin'
-import {ProcedureAst} from '../src/parser'
-import {ErrorType, SimpleCellAddress} from '../src/Cell'
-import {FunctionPluginValidationError, HyperFormula} from '../src'
-import {adr, detailedError, expectArrayWithSameContent} from './testUtils'
-import {SumifPlugin} from '../src/interpreter/plugin/SumifPlugin'
 import {NumericAggregationPlugin} from '../src/interpreter/plugin/NumericAggregationPlugin'
-import {plPL} from '../src/i18n/languages'
+import {SumifPlugin} from '../src/interpreter/plugin/SumifPlugin'
 import {VersionPlugin} from '../src/interpreter/plugin/VersionPlugin'
-import {
-  AliasAlreadyExisting,
-  ProtectedFunctionError,
-  ProtectedFunctionTranslationError
-} from '../src/errors'
+import {ProcedureAst} from '../src/parser'
+import {adr, detailedError, expectArrayWithSameContent} from './testUtils'
 
 class FooPlugin extends FunctionPlugin {
   public static implementedFunctions = {

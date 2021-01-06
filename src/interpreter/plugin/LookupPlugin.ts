@@ -11,7 +11,7 @@ import {SearchStrategy} from '../../Lookup/SearchStrategy'
 import {ProcedureAst} from '../../parser'
 import {StatType} from '../../statistics'
 import {zeroIfEmpty} from '../ArithmeticHelper'
-import {InternalScalarValue, RawNoErrorScalarValue, } from '../InterpreterValue'
+import {InternalScalarValue, RawNoErrorScalarValue,} from '../InterpreterValue'
 import {SimpleRangeValue} from '../SimpleRangeValue'
 import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
 

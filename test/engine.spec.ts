@@ -1,9 +1,9 @@
 import {DetailedCellError, ErrorType, HyperFormula} from '../src'
 import {CellType, CellValueDetailedType, CellValueType} from '../src/Cell'
+import {Config} from '../src/Config'
 import {ErrorMessage} from '../src/error-message'
 import {plPL} from '../src/i18n/languages'
 import {adr, detailedError, expectArrayWithSameContent} from './testUtils'
-import {Config} from '../src/Config'
 
 describe('#buildFromArray', () => {
   it('load single value', () => {

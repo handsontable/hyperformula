@@ -1,15 +1,16 @@
 import {CellValue, ConfigParams, HyperFormula, Sheet} from '../../src'
+import {Maybe} from '../../src/Maybe'
 import {
   average,
   EnrichedStatType,
   enrichStatistics,
   ExtStatType,
   measureCruds,
-  reduceStats, Stats,
+  reduceStats,
+  Stats,
   statsTreePrint,
   statsTreePrintCruds
 } from './utils/stats'
-import {Maybe} from '../../src/Maybe'
 
 export interface Config {
   expectedTime?: number,

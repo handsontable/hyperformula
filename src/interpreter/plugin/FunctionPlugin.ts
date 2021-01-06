@@ -15,11 +15,13 @@ import {Serialization} from '../../Serialization'
 import {coerceScalarToBoolean, coerceScalarToString, coerceToRange, complex} from '../ArithmeticHelper'
 import {Interpreter} from '../Interpreter'
 import {
-  ExtendedNumber, ExtendedNumberFactory,
+  ExtendedNumber,
+  ExtendedNumberFactory,
   getRawValue,
   InternalScalarValue,
   InterpreterValue,
-  isExtendedNumber, NumberType,
+  isExtendedNumber,
+  NumberType,
   RawNoErrorScalarValue,
   RawScalarValue
 } from '../InterpreterValue'

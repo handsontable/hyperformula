@@ -24,7 +24,8 @@ import {
   getRawValue,
   InternalNoErrorScalarValue,
   InternalScalarValue,
-  isExtendedNumber, NumberType,
+  isExtendedNumber,
+  NumberType,
   RawNoErrorScalarValue,
   RawScalarValue,
 } from '../InterpreterValue'

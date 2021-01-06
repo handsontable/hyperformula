@@ -1,6 +1,6 @@
+import moment from 'moment'
 import {Config} from '../src/Config'
 import {DateTimeHelper, SimpleDate} from '../src/DateTimeHelper'
-import moment from 'moment'
 import {DateNumber, DateTimeNumber, getRawValue, TimeNumber} from '../src/interpreter/InterpreterValue'
 import {Maybe} from '../src/Maybe'
 
