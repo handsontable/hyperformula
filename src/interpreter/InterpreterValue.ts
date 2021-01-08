@@ -18,7 +18,7 @@ export type RawInterpreterValue = RawScalarValue | SimpleRangeValue
 
 export function getRawValue<T>(val: RichNumber | T): number | T {
   if(val instanceof RichNumber) {
-    return val.get()
+    return val.getRawValue()
   } else {
     return val
   }
@@ -26,13 +26,13 @@ export function getRawValue<T>(val: RichNumber | T): number | T {
 
 export abstract class RichNumber {
   constructor(public val: number) {}
-  public get(): number {
+  public getRawValue(): number {
     return this.val
   }
   public clone(val: number): this{
     return new (this.constructor as any)(val)
   }
-  abstract type(): NumberType
+  abstract getDetailedType(): NumberType
 }
 
 export function cloneNumber(val: ExtendedNumber, newVal: number): ExtendedNumber {
@@ -44,31 +44,31 @@ export function cloneNumber(val: ExtendedNumber, newVal: number): ExtendedNumber
 }
 
 export class DateNumber extends RichNumber {
-  public type(): NumberType {
+  public getDetailedType(): NumberType {
     return NumberType.Date
   }
 }
 
 export class CurrencyNumber extends RichNumber {
-  public type(): NumberType {
+  public getDetailedType(): NumberType {
     return NumberType.Currency
   }
 }
 
 export class TimeNumber extends RichNumber {
-  public type(): NumberType {
+  public getDetailedType(): NumberType {
     return NumberType.Time
   }
 }
 
 export class DateTimeNumber extends RichNumber {
-  public type(): NumberType {
+  public getDetailedType(): NumberType {
     return NumberType.DateTime
   }
 }
 
 export class PercentNumber extends RichNumber {
-  public type(): NumberType {
+  public getDetailedType(): NumberType {
     return NumberType.Percent
   }
 }
@@ -107,7 +107,7 @@ export function ExtendedNumberFactory(type: NumberType, value: number): Extended
 
 export function getTypeOfExtendedNumber(arg: ExtendedNumber): NumberType {
   if(arg instanceof RichNumber) {
-    return arg.type()
+    return arg.getDetailedType()
   } else {
     return NumberType.Raw
   }
