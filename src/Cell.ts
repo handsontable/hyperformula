@@ -11,7 +11,7 @@ import {
   DateTimeNumber,
   EmptyValue, ExtendedNumber, getTypeOfExtendedNumber,
   InterpreterValue,
-  isExtendedNumber,
+  isExtendedNumber, NumberType,
   PercentNumber,
   TimeNumber
 } from './interpreter/InterpreterValue'
@@ -69,7 +69,7 @@ export const getCellType = (vertex: CellVertex | null): CellType => {
   return CellType.EMPTY
 }
 
-export enum CellValueType {
+enum CellValueNoNumber {
   EMPTY = 'EMPTY',
   NUMBER = 'NUMBER',
   STRING = 'STRING',
@@ -77,18 +77,15 @@ export enum CellValueType {
   ERROR = 'ERROR',
 }
 
-export enum CellValueDetailedType {
-  EMPTY = 'EMPTY',
-  STRING = 'STRING',
-  BOOLEAN = 'BOOLEAN',
-  ERROR = 'ERROR',
-  NUMBER_RAW = 'NUMBER_RAW',
-  NUMBER_DATE = 'NUMBER_DATE',
-  NUMBER_TIME = 'NUMBER_TIME',
-  NUMBER_DATETIME = 'NUMBER_DATETIME',
-  NUMBER_PERCENT = 'NUMBER_PERCENT',
-  NUMBER_CURRENCY = 'NUMBER_CURRENCY',
+enum NUMBER {
+  NUMBER = 'NUMBER'
 }
+
+export type CellValueType = CellValueNoNumber | NUMBER
+export const CellValueType = {...CellValueNoNumber, ...NUMBER}
+
+export type CellValueDetailedType = CellValueNoNumber | NumberType
+export const CellValueDetailedType = {...CellValueNoNumber, ...NumberType}
 
 export const CellValueTypeOrd = (arg: CellValueType): number => {
   switch (arg) {
@@ -103,6 +100,7 @@ export const CellValueTypeOrd = (arg: CellValueType): number => {
     case CellValueType.ERROR:
       return 4
   }
+  throw new Error('Cell value not computed')
 }
 
 export const getCellValueType = (cellValue: InterpreterValue): CellValueType => {
@@ -128,9 +126,9 @@ export const getCellValueType = (cellValue: InterpreterValue): CellValueType => 
 export const getCellValueDetailedType = (cellValue: InterpreterValue): CellValueDetailedType => {
   const cellType = getCellValueType(cellValue)
   if(cellType === CellValueType.NUMBER) {
-    return getTypeOfExtendedNumber(cellValue as ExtendedNumber) as any as CellValueDetailedType
+    return getTypeOfExtendedNumber(cellValue as ExtendedNumber)
   } else {
-    return cellType as any as CellValueDetailedType
+    return cellType
   }
 }
 
