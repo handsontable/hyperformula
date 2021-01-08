@@ -6,14 +6,9 @@
 import {CellVertex, FormulaCellVertex, MatrixVertex, ParsingErrorVertex, ValueCellVertex} from './DependencyGraph'
 import {ErrorMessage} from './error-message'
 import {
-  CurrencyNumber,
-  DateNumber,
-  DateTimeNumber,
   EmptyValue, ExtendedNumber, getTypeOfExtendedNumber,
   InterpreterValue,
   isExtendedNumber, NumberType,
-  PercentNumber,
-  TimeNumber
 } from './interpreter/InterpreterValue'
 import {SimpleRangeValue} from './interpreter/SimpleRangeValue'
 import {CellAddress} from './parser'
