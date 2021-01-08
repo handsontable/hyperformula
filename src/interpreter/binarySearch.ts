@@ -6,14 +6,14 @@
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
 import {CellError, simpleCellAddress} from '../Cell'
 import {DependencyGraph} from '../DependencyGraph'
-import {EmptyValue, getRawValue, RawInterpreterValue, RawScalarValue} from './InterpreterValue'
+import {EmptyValue, getRawValue, RawInterpreterValue, RawNoErrorScalarValue, RawScalarValue} from './InterpreterValue'
 
 /*
 * If key exists returns first index of key element in range of sorted values
 * Otherwise returns first index of greatest element smaller than key
 * assuming sorted values in range
 * */
-export function rangeLowerBound(range: AbsoluteCellRange, key: RawScalarValue, dependencyGraph: DependencyGraph, coordinate: 'row' | 'col'): number {
+export function rangeLowerBound(range: AbsoluteCellRange, key: RawNoErrorScalarValue, dependencyGraph: DependencyGraph, coordinate: 'row' | 'col'): number {
   let end
   if(coordinate === 'col') {
     end = range.effectiveEndColumn(dependencyGraph)
@@ -37,7 +37,7 @@ export function rangeLowerBound(range: AbsoluteCellRange, key: RawScalarValue, d
 * Otherwise returns first index of greatest element smaller than key
 * assuming sorted values
 * */
-export function lowerBound(value: (index: number) => RawInterpreterValue, key: RawScalarValue, start: number, end: number): number {
+export function lowerBound(value: (index: number) => RawInterpreterValue, key: RawNoErrorScalarValue, start: number, end: number): number {
   while (start <= end) {
     const center = Math.floor((start + end) / 2)
     const cmp = compare(key, value(center))
@@ -58,9 +58,9 @@ export function lowerBound(value: (index: number) => RawInterpreterValue, key: R
 /*
 * numbers < strings < false < true
 * */
-export function compare(left: RawScalarValue, right: RawInterpreterValue): number {
+export function compare(left: RawNoErrorScalarValue, right: RawInterpreterValue): number {
   if (typeof left === typeof right) {
-    if(left === EmptyValue || left instanceof CellError) {
+    if(left === EmptyValue) {
       return 0
     }
     return (left < (right as string | number | boolean) ? -1 : (left > (right as string | number | boolean) ? 1 : 0))
@@ -69,9 +69,6 @@ export function compare(left: RawScalarValue, right: RawInterpreterValue): numbe
     return -1
   }
   if(right === EmptyValue) {
-    return 1
-  }
-  if(left instanceof CellError) {
     return 1
   }
   if(right instanceof CellError) {
