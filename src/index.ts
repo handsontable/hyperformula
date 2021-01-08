@@ -3,7 +3,7 @@
  * Copyright (c) 2020 Handsoncode. All rights reserved.
  */
 
-import {CellType, CellValueDetailedType, CellValueType, ErrorType, SimpleCellAddress} from './Cell'
+import {CellType, CellValueDetailedType, CellValueType, ErrorType, SimpleCellAddress, CellValueJustNumber, CellValueNoNumber} from './Cell'
 import {RawCellContent} from './CellContentParser'
 import {CellValue, DetailedCellError, NoErrorCellValue} from './CellValue'
 import {Config, ConfigParams} from './Config'

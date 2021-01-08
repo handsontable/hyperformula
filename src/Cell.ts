@@ -64,7 +64,7 @@ export const getCellType = (vertex: CellVertex | null): CellType => {
   return CellType.EMPTY
 }
 
-enum CellValueNoNumber {
+export enum CellValueNoNumber {
   EMPTY = 'EMPTY',
   NUMBER = 'NUMBER',
   STRING = 'STRING',
@@ -72,7 +72,7 @@ enum CellValueNoNumber {
   ERROR = 'ERROR',
 }
 
-enum CellValueJustNumber {
+export enum CellValueJustNumber {
   NUMBER = 'NUMBER'
 }
 
