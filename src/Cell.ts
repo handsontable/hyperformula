@@ -9,7 +9,7 @@ import {
   CurrencyNumber,
   DateNumber,
   DateTimeNumber,
-  EmptyValue,
+  EmptyValue, ExtendedNumber, getTypeOfExtendedNumber,
   InterpreterValue,
   isExtendedNumber,
   PercentNumber,
@@ -126,33 +126,12 @@ export const getCellValueType = (cellValue: InterpreterValue): CellValueType => 
 }
 
 export const getCellValueDetailedType = (cellValue: InterpreterValue): CellValueDetailedType => {
-  if (cellValue === EmptyValue) {
-    return CellValueDetailedType.EMPTY
+  const cellType = getCellValueType(cellValue)
+  if(cellType === CellValueType.NUMBER) {
+    return getTypeOfExtendedNumber(cellValue as ExtendedNumber) as any as CellValueDetailedType
+  } else {
+    return cellType as any as CellValueDetailedType
   }
-
-  if (cellValue instanceof CellError || cellValue instanceof SimpleRangeValue) {
-    return CellValueDetailedType.ERROR
-  }
-
-  if(typeof cellValue === 'string') {
-    return CellValueDetailedType.STRING
-  } else if(typeof cellValue === 'boolean') {
-    return CellValueDetailedType.BOOLEAN
-  } else if(typeof cellValue === 'number') {
-    return CellValueDetailedType.NUMBER_RAW
-  } else if(cellValue instanceof DateNumber) {
-    return CellValueDetailedType.NUMBER_DATE
-  } else if(cellValue instanceof TimeNumber) {
-    return CellValueDetailedType.NUMBER_TIME
-  } else if(cellValue instanceof DateTimeNumber) {
-    return CellValueDetailedType.NUMBER_DATETIME
-  } else if(cellValue instanceof PercentNumber) {
-    return CellValueDetailedType.NUMBER_PERCENT
-  } else if(cellValue instanceof CurrencyNumber) {
-    return CellValueDetailedType.NUMBER_CURRENCY
-  }
-
-  throw new Error('Cell value not computed')
 }
 
 export class CellError {

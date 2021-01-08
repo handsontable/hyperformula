@@ -45,31 +45,31 @@ export function cloneNumber(val: ExtendedNumber, newVal: number): ExtendedNumber
 
 export class DateNumber extends RichNumber {
   public getDetailedType(): NumberType {
-    return NumberType.Date
+    return NumberType.NUMBER_DATE
   }
 }
 
 export class CurrencyNumber extends RichNumber {
   public getDetailedType(): NumberType {
-    return NumberType.Currency
+    return NumberType.NUMBER_CURRENCY
   }
 }
 
 export class TimeNumber extends RichNumber {
   public getDetailedType(): NumberType {
-    return NumberType.Time
+    return NumberType.NUMBER_TIME
   }
 }
 
 export class DateTimeNumber extends RichNumber {
   public getDetailedType(): NumberType {
-    return NumberType.DateTime
+    return NumberType.NUMBER_DATETIME
   }
 }
 
 export class PercentNumber extends RichNumber {
   public getDetailedType(): NumberType {
-    return NumberType.Percent
+    return NumberType.NUMBER_PERCENT
   }
 }
 
@@ -80,27 +80,27 @@ export function isExtendedNumber(val: any): val is ExtendedNumber {
 }
 
 export enum NumberType {
-  Raw = 'Raw',
-  Date = 'Date',
-  Time = 'Time',
-  DateTime = 'DateTime',
-  Currency = 'Currency',
-  Percent = 'Percent',
+  NUMBER_RAW = 'NUMBER_RAW',
+  NUMBER_DATE = 'NUMBER_DATE',
+  NUMBER_TIME = 'NUMBER_TIME',
+  NUMBER_DATETIME = 'NUMBER_DATETIME',
+  NUMBER_CURRENCY = 'NUMBER_CURRENCY',
+  NUMBER_PERCENT = 'NUMBER_PERCENT',
 }
 
 export function ExtendedNumberFactory(type: NumberType, value: number): ExtendedNumber {
   switch (type) {
-    case NumberType.Raw:
+    case NumberType.NUMBER_RAW:
       return value
-    case NumberType.Currency:
+    case NumberType.NUMBER_CURRENCY:
       return new CurrencyNumber(value)
-    case NumberType.Date:
+    case NumberType.NUMBER_DATE:
       return new DateNumber(value)
-    case NumberType.DateTime:
+    case NumberType.NUMBER_DATETIME:
       return new DateTimeNumber(value)
-    case NumberType.Time:
+    case NumberType.NUMBER_TIME:
       return new TimeNumber(value)
-    case NumberType.Percent:
+    case NumberType.NUMBER_PERCENT:
       return new PercentNumber(value)
   }
 }
@@ -109,6 +109,6 @@ export function getTypeOfExtendedNumber(arg: ExtendedNumber): NumberType {
   if(arg instanceof RichNumber) {
     return arg.getDetailedType()
   } else {
-    return NumberType.Raw
+    return NumberType.NUMBER_RAW
   }
 }

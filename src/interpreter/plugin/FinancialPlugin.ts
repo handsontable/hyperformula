@@ -28,7 +28,7 @@ export class FinancialPlugin extends FunctionPlugin {
           {argumentType: ArgumentTypes.NUMBER, defaultValue: 0},
           {argumentType: ArgumentTypes.NUMBER, defaultValue: 0},
         ],
-      returnNumberType: NumberType.Currency
+      returnNumberType: NumberType.NUMBER_CURRENCY
     },
     'IPMT': {
       method: 'ipmt',
@@ -40,7 +40,7 @@ export class FinancialPlugin extends FunctionPlugin {
           {argumentType: ArgumentTypes.NUMBER, defaultValue: 0},
           {argumentType: ArgumentTypes.NUMBER, defaultValue: 0},
         ],
-      returnNumberType: NumberType.Currency
+      returnNumberType: NumberType.NUMBER_CURRENCY
     },
     'PPMT': {
       method: 'ppmt',
@@ -52,7 +52,7 @@ export class FinancialPlugin extends FunctionPlugin {
           {argumentType: ArgumentTypes.NUMBER, defaultValue: 0},
           {argumentType: ArgumentTypes.NUMBER, defaultValue: 0},
         ],
-      returnNumberType: NumberType.Currency
+      returnNumberType: NumberType.NUMBER_CURRENCY
     },
     'FV': {
       method: 'fv',
@@ -63,7 +63,7 @@ export class FinancialPlugin extends FunctionPlugin {
           {argumentType: ArgumentTypes.NUMBER, defaultValue: 0},
           {argumentType: ArgumentTypes.NUMBER, defaultValue: 0},
         ],
-      returnNumberType: NumberType.Currency
+      returnNumberType: NumberType.NUMBER_CURRENCY
     },
     'CUMIPMT': {
       method: 'cumipmt',
@@ -75,7 +75,7 @@ export class FinancialPlugin extends FunctionPlugin {
         {argumentType: ArgumentTypes.INTEGER, minValue: 1},
         {argumentType: ArgumentTypes.INTEGER, minValue: 0, maxValue: 1},
       ],
-      returnNumberType: NumberType.Currency
+      returnNumberType: NumberType.NUMBER_CURRENCY
     },
     'CUMPRINC': {
       method: 'cumprinc',
@@ -87,7 +87,7 @@ export class FinancialPlugin extends FunctionPlugin {
         {argumentType: ArgumentTypes.INTEGER, minValue: 1},
         {argumentType: ArgumentTypes.INTEGER, minValue: 0, maxValue: 1},
       ],
-      returnNumberType: NumberType.Currency
+      returnNumberType: NumberType.NUMBER_CURRENCY
     },
     'DB': {
       method: 'db',
@@ -98,7 +98,7 @@ export class FinancialPlugin extends FunctionPlugin {
         {argumentType: ArgumentTypes.INTEGER, minValue: 0},
         {argumentType: ArgumentTypes.INTEGER, minValue: 1, maxValue: 12, defaultValue: 12},
       ],
-      returnNumberType: NumberType.Currency
+      returnNumberType: NumberType.NUMBER_CURRENCY
     },
     'DDB': {
       method: 'ddb',
@@ -109,7 +109,7 @@ export class FinancialPlugin extends FunctionPlugin {
         {argumentType: ArgumentTypes.NUMBER, minValue: 0},
         {argumentType: ArgumentTypes.NUMBER, greaterThan: 0, defaultValue: 2},
       ],
-      returnNumberType: NumberType.Currency
+      returnNumberType: NumberType.NUMBER_CURRENCY
     },
     'DOLLARDE': {
       method: 'dollarde',
@@ -131,7 +131,7 @@ export class FinancialPlugin extends FunctionPlugin {
         {argumentType: ArgumentTypes.NUMBER, minValue: 0},
         {argumentType: ArgumentTypes.NUMBER, minValue: 1},
       ],
-      returnNumberType: NumberType.Percent
+      returnNumberType: NumberType.NUMBER_PERCENT
     },
     'ISPMT': {
       method: 'ispmt',
@@ -148,7 +148,7 @@ export class FinancialPlugin extends FunctionPlugin {
         {argumentType: ArgumentTypes.NUMBER, minValue: 0},
         {argumentType: ArgumentTypes.NUMBER, minValue: 1},
       ],
-      returnNumberType: NumberType.Percent
+      returnNumberType: NumberType.NUMBER_PERCENT
     },
     'NPER': {
       method: 'nper',
@@ -169,7 +169,7 @@ export class FinancialPlugin extends FunctionPlugin {
         {argumentType: ArgumentTypes.NUMBER, defaultValue: 0},
         {argumentType: ArgumentTypes.NUMBER, defaultValue: 0},
       ],
-      returnNumberType: NumberType.Currency
+      returnNumberType: NumberType.NUMBER_CURRENCY
     },
     'RATE': {
       method: 'rate',
@@ -181,7 +181,7 @@ export class FinancialPlugin extends FunctionPlugin {
         {argumentType: ArgumentTypes.NUMBER, defaultValue: 0},
         {argumentType: ArgumentTypes.NUMBER, defaultValue: 0.1},
       ],
-      returnNumberType: NumberType.Percent
+      returnNumberType: NumberType.NUMBER_PERCENT
     },
     'RRI': {
       method: 'rri',
@@ -190,7 +190,7 @@ export class FinancialPlugin extends FunctionPlugin {
         {argumentType: ArgumentTypes.NUMBER},
         {argumentType: ArgumentTypes.NUMBER},
       ],
-      returnNumberType: NumberType.Percent
+      returnNumberType: NumberType.NUMBER_PERCENT
     },
     'SLN': {
       method: 'sln',
@@ -199,7 +199,7 @@ export class FinancialPlugin extends FunctionPlugin {
         {argumentType: ArgumentTypes.NUMBER},
         {argumentType: ArgumentTypes.NUMBER},
       ],
-      returnNumberType: NumberType.Currency
+      returnNumberType: NumberType.NUMBER_CURRENCY
     },
     'SYD': {
       method: 'syd',
@@ -209,7 +209,7 @@ export class FinancialPlugin extends FunctionPlugin {
         {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
         {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
       ],
-      returnNumberType: NumberType.Currency
+      returnNumberType: NumberType.NUMBER_CURRENCY
     },
     'TBILLEQ': {
       method: 'tbilleq',
@@ -218,7 +218,7 @@ export class FinancialPlugin extends FunctionPlugin {
         {argumentType: ArgumentTypes.NUMBER, minValue: 0},
         {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
       ],
-      returnNumberType: NumberType.Percent
+      returnNumberType: NumberType.NUMBER_PERCENT
     },
     'TBILLPRICE': {
       method: 'tbillprice',
@@ -227,7 +227,7 @@ export class FinancialPlugin extends FunctionPlugin {
         {argumentType: ArgumentTypes.NUMBER, minValue: 0},
         {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
       ],
-      returnNumberType: NumberType.Currency
+      returnNumberType: NumberType.NUMBER_CURRENCY
     },
     'TBILLYIELD': {
       method: 'tbillyield',
@@ -236,7 +236,7 @@ export class FinancialPlugin extends FunctionPlugin {
         {argumentType: ArgumentTypes.NUMBER, minValue: 0},
         {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
       ],
-      returnNumberType: NumberType.Percent
+      returnNumberType: NumberType.NUMBER_PERCENT
     },
     'FVSCHEDULE': {
       method: 'fvschedule',
@@ -244,7 +244,7 @@ export class FinancialPlugin extends FunctionPlugin {
         {argumentType: ArgumentTypes.NUMBER},
         {argumentType: ArgumentTypes.RANGE},
       ],
-      returnNumberType: NumberType.Currency
+      returnNumberType: NumberType.NUMBER_CURRENCY
     },
     'NPV': {
       method: 'npv',
@@ -253,7 +253,7 @@ export class FinancialPlugin extends FunctionPlugin {
         {argumentType: ArgumentTypes.ANY},
       ],
       repeatLastArgs: 1,
-      returnNumberType: NumberType.Currency
+      returnNumberType: NumberType.NUMBER_CURRENCY
     },
     'MIRR': {
       method: 'mirr',
@@ -262,7 +262,7 @@ export class FinancialPlugin extends FunctionPlugin {
         {argumentType: ArgumentTypes.NUMBER},
         {argumentType: ArgumentTypes.NUMBER},
       ],
-      returnNumberType: NumberType.Percent
+      returnNumberType: NumberType.NUMBER_PERCENT
     },
     'PDURATION': {
       method: 'pduration',

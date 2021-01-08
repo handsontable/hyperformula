@@ -44,7 +44,7 @@ export class DateTimePlugin extends FunctionPlugin {
           {argumentType: ArgumentTypes.NUMBER},
           {argumentType: ArgumentTypes.NUMBER},
         ],
-      returnNumberType: NumberType.Date
+      returnNumberType: NumberType.NUMBER_DATE
       },
     'TIME': {
       method: 'time',
@@ -53,7 +53,7 @@ export class DateTimePlugin extends FunctionPlugin {
           {argumentType: ArgumentTypes.NUMBER},
           {argumentType: ArgumentTypes.NUMBER},
         ],
-      returnNumberType: NumberType.Time
+      returnNumberType: NumberType.NUMBER_TIME
     },
     'MONTH': {
       method: 'month',
@@ -98,7 +98,7 @@ export class DateTimePlugin extends FunctionPlugin {
           {argumentType: ArgumentTypes.NUMBER, minValue: 0},
           {argumentType: ArgumentTypes.NUMBER},
         ],
-      returnNumberType: NumberType.Date
+      returnNumberType: NumberType.NUMBER_DATE
     },
     'DAY': {
       method: 'day',
@@ -138,26 +138,26 @@ export class DateTimePlugin extends FunctionPlugin {
       parameters: [
           {argumentType: ArgumentTypes.STRING},
         ],
-      returnNumberType: NumberType.Date
+      returnNumberType: NumberType.NUMBER_DATE
     },
     'TIMEVALUE': {
       method: 'timevalue',
       parameters: [
           {argumentType: ArgumentTypes.STRING},
         ],
-      returnNumberType: NumberType.Time
+      returnNumberType: NumberType.NUMBER_TIME
     },
     'NOW': {
       method: 'now',
       parameters: [],
       isVolatile: true,
-      returnNumberType: NumberType.DateTime
+      returnNumberType: NumberType.NUMBER_DATETIME
     },
     'TODAY': {
       method: 'today',
       parameters: [],
       isVolatile: true,
-      returnNumberType: NumberType.Date
+      returnNumberType: NumberType.NUMBER_DATE
     },
     'EDATE': {
       method: 'edate',
@@ -165,7 +165,7 @@ export class DateTimePlugin extends FunctionPlugin {
           {argumentType: ArgumentTypes.NUMBER, minValue: 0},
           {argumentType: ArgumentTypes.NUMBER},
         ],
-      returnNumberType: NumberType.Date
+      returnNumberType: NumberType.NUMBER_DATE
     },
     'DAYS360': {
       method: 'days360',

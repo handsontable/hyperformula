@@ -697,37 +697,37 @@ function escapeNoCharacters(pattern: string, caseSensitive: boolean): string {
 }
 
 function inferExtendedNumberTypeAdditive(left: NumberType, right: NumberType): NumberType {
-  if(left === NumberType.Raw) {
+  if(left === NumberType.NUMBER_RAW) {
     return right
   }
-  if(right === NumberType.Raw) {
+  if(right === NumberType.NUMBER_RAW) {
     return left
   }
-  if((left === NumberType.DateTime || left === NumberType.Date)
-    && (right === NumberType.DateTime || right === NumberType.Date)) {
-    return NumberType.Raw
+  if((left === NumberType.NUMBER_DATETIME || left === NumberType.NUMBER_DATE)
+    && (right === NumberType.NUMBER_DATETIME || right === NumberType.NUMBER_DATE)) {
+    return NumberType.NUMBER_RAW
   }
-  if((left === NumberType.DateTime || left === NumberType.Time || left === NumberType.Date)
-    && (right === NumberType.DateTime || right === NumberType.Time || right === NumberType.Date)) {
+  if((left === NumberType.NUMBER_DATETIME || left === NumberType.NUMBER_TIME || left === NumberType.NUMBER_DATE)
+    && (right === NumberType.NUMBER_DATETIME || right === NumberType.NUMBER_TIME || right === NumberType.NUMBER_DATE)) {
     if(left !== right) {
-      return NumberType.DateTime
+      return NumberType.NUMBER_DATETIME
     }
   }
   return left
 }
 
 function inferExtendedNumberTypeMultiplicative(left: NumberType, right: NumberType): NumberType {
-  if(left === NumberType.Percent) {
-    left = NumberType.Raw
+  if(left === NumberType.NUMBER_PERCENT) {
+    left = NumberType.NUMBER_RAW
   }
-  if(right === NumberType.Percent) {
-    right = NumberType.Raw
+  if(right === NumberType.NUMBER_PERCENT) {
+    right = NumberType.NUMBER_RAW
   }
-  if(left === NumberType.Raw) {
+  if(left === NumberType.NUMBER_RAW) {
     return right
   }
-  if(right === NumberType.Raw) {
+  if(right === NumberType.NUMBER_RAW) {
     return left
   }
-  return NumberType.Raw
+  return NumberType.NUMBER_RAW
 }
