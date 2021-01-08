@@ -72,12 +72,12 @@ enum CellValueNoNumber {
   ERROR = 'ERROR',
 }
 
-enum NUMBER {
+enum CellValueJustNumber {
   NUMBER = 'NUMBER'
 }
 
-export type CellValueType = CellValueNoNumber | NUMBER
-export const CellValueType = {...CellValueNoNumber, ...NUMBER}
+export type CellValueType = CellValueNoNumber | CellValueJustNumber
+export const CellValueType = {...CellValueNoNumber, ...CellValueJustNumber}
 
 export type CellValueDetailedType = CellValueNoNumber | NumberType
 export const CellValueDetailedType = {...CellValueNoNumber, ...NumberType}
