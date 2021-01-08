@@ -32,6 +32,7 @@ export abstract class RichNumber {
   public clone(val: number): this{
     return new (this.constructor as any)(val)
   }
+  abstract type(): NumberType
 }
 
 export function cloneNumber(val: ExtendedNumber, newVal: number): ExtendedNumber {
@@ -42,11 +43,35 @@ export function cloneNumber(val: ExtendedNumber, newVal: number): ExtendedNumber
   }
 }
 
-export class DateNumber extends RichNumber {}
-export class CurrencyNumber extends RichNumber {}
-export class TimeNumber extends RichNumber {}
-export class DateTimeNumber extends RichNumber {}
-export class PercentNumber extends RichNumber {}
+export class DateNumber extends RichNumber {
+  public type(): NumberType {
+    return NumberType.Date
+  }
+}
+
+export class CurrencyNumber extends RichNumber {
+  public type(): NumberType {
+    return NumberType.Currency
+  }
+}
+
+export class TimeNumber extends RichNumber {
+  public type(): NumberType {
+    return NumberType.Time
+  }
+}
+
+export class DateTimeNumber extends RichNumber {
+  public type(): NumberType {
+    return NumberType.DateTime
+  }
+}
+
+export class PercentNumber extends RichNumber {
+  public type(): NumberType {
+    return NumberType.Percent
+  }
+}
 
 export type ExtendedNumber = number | RichNumber
 
@@ -81,16 +106,8 @@ export function ExtendedNumberFactory(type: NumberType, value: number): Extended
 }
 
 export function getTypeOfExtendedNumber(arg: ExtendedNumber): NumberType {
-  if(arg instanceof DateNumber) {
-    return NumberType.Date
-  } else if(arg instanceof TimeNumber) {
-    return NumberType.Time
-  } else if(arg instanceof DateTimeNumber) {
-    return NumberType.DateTime
-  } else if(arg instanceof CurrencyNumber) {
-    return NumberType.Currency
-  } else if(arg instanceof PercentNumber) {
-    return NumberType.Percent
+  if(arg instanceof RichNumber) {
+    return arg.type()
   } else {
     return NumberType.Raw
   }
