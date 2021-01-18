@@ -233,8 +233,7 @@ export class InformationPlugin extends FunctionPlugin {
    * @param formulaAddress
    */
   public isnumber(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('ISNUMBER'), isExtendedNumber
-    )
+    return this.runFunction(ast.args, formulaAddress, this.metadata('ISNUMBER'), isExtendedNumber)
   }
 
   /**
