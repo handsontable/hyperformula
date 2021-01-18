@@ -2844,10 +2844,10 @@ export class HyperFormula implements TypedEmitter {
    * ]);
    *
    * // should return 'NUMBER_PERCENT', cell value type of provided coordinates is a number with a format inference percent.
-   * const cellValue = hfInstance.getCellValueType({ sheet: 0, col: 1, row: 0 });
+   * const cellType = hfInstance.getCellValueType({ sheet: 0, col: 1, row: 0 });
    *
    * // should return 'NUMBER_CURRENCY', cell value type of provided coordinates is a number with a format inference currency.
-   * const cellValue = hfInstance.getCellValueType({ sheet: 0, col: 0, row: 0 });
+   * const cellType = hfInstance.getCellValueType({ sheet: 0, col: 0, row: 0 });
    * ```
    *
    * @category Cells
