@@ -198,7 +198,6 @@ export class ArithmeticHelper {
       return ret
     }
   }
-  //FIXME
   public addWithEpsilon = (left: ExtendedNumber, right: ExtendedNumber): ExtendedNumber => {
     return ExtendedNumberFactory(
       inferExtendedNumberTypeAdditive(
