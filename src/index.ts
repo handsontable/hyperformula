@@ -122,6 +122,7 @@ export {
   HyperFormula,
   CellType,
   CellValueType,
+  CellValueDetailedType,
   ErrorType,
   ExportedCellChange,
   ExportedNamedExpressionChange,
