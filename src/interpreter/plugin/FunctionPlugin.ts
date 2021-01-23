@@ -237,57 +237,7 @@ export abstract class FunctionPlugin {
     functionDefinition: FunctionArguments,
     fn: (...arg: any) => InternalScalarValue
   ) => {
-    const argumentDefinitions: FunctionArgument[] = functionDefinition.parameters!
-    let scalarValues: [InterpreterValue, boolean][]
-
-    if (functionDefinition.expandRanges) {
-      scalarValues = this.listOfScalarValues(args, formulaAddress)
-    } else {
-      scalarValues = args.map((ast) => [this.evaluateAst(ast, formulaAddress), false])
-    }
-
-    const coercedArguments: Maybe<InterpreterValue | complex>[] = []
-
-    let argCoerceFailure: Maybe<CellError> = undefined
-    if (functionDefinition.repeatLastArgs === undefined && argumentDefinitions.length < scalarValues.length) {
-      return new CellError(ErrorType.NA, ErrorMessage.WrongArgNumber)
-    }
-    if (functionDefinition.repeatLastArgs !== undefined && scalarValues.length > argumentDefinitions.length &&
-      (scalarValues.length - argumentDefinitions.length) % functionDefinition.repeatLastArgs !== 0) {
-      return new CellError(ErrorType.NA, ErrorMessage.WrongArgNumber)
-    }
-    for (let i = 0, j = 0; i < Math.max(scalarValues.length, argumentDefinitions.length); i++, j++) {
-      // i points to where are we in the scalarValues list,
-      // j points to where are we in the argumentDefinitions list
-      if (j === argumentDefinitions.length) {
-        j -= functionDefinition.repeatLastArgs!
-      }
-      const [val, ignorable] = scalarValues[i] ?? [undefined, undefined]
-      const arg = val ?? argumentDefinitions[j]?.defaultValue
-      if (arg === undefined) {
-        if (argumentDefinitions[j]?.optionalArg) {
-          coercedArguments.push(undefined)
-        } else {
-          //not enough values passed as arguments, and there was no default value and argument was not optional
-          return new CellError(ErrorType.NA, ErrorMessage.WrongArgNumber)
-        }
-      } else {
-        //we apply coerce only to non-default values
-        const coercedArg = val !== undefined ? this.coerceToType(arg, argumentDefinitions[j]) : arg
-        if (coercedArg !== undefined) {
-          if (coercedArg instanceof CellError && argumentDefinitions[j].argumentType !== ArgumentTypes.SCALAR) {
-            //if this is first error encountered, store it
-            argCoerceFailure = argCoerceFailure ?? coercedArg
-          }
-          coercedArguments.push(coercedArg)
-        } else if (!ignorable) {
-          //if this is first error encountered, store it
-          argCoerceFailure = argCoerceFailure ?? (new CellError(ErrorType.VALUE, ErrorMessage.WrongType))
-        }
-      }
-    }
-
-    return argCoerceFailure ?? fn(...coercedArguments)
+    return this.runFunctionTemplate(args, formulaAddress, functionDefinition, fn)
   }
 
   protected runMatrixFunction = (
@@ -295,6 +245,15 @@ export abstract class FunctionPlugin {
     formulaAddress: SimpleCellAddress,
     functionDefinition: FunctionArguments,
     fn: (...arg: any) => InterpreterValue
+  ) => {
+    return this.runFunctionTemplate(args, formulaAddress, functionDefinition, fn)
+  }
+
+  private runFunctionTemplate = (
+    args: Ast[],
+    formulaAddress: SimpleCellAddress,
+    functionDefinition: FunctionArguments,
+    fn: (...arg: any) => any
   ) => {
     const argumentDefinitions: FunctionArgument[] = functionDefinition.parameters!
     let scalarValues: [InterpreterValue, boolean][]
