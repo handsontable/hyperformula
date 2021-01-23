@@ -62,7 +62,11 @@ export class MatrixPlugin extends FunctionPlugin {
 
   constructor(interpreter: Interpreter) {
     super(interpreter)
-    this.createKernel = this.createGpuKernel
+    if (this.config.gpuMode === 'fallback') {
+      this.createKernel = this.createCpuKernel
+    } else {
+      this.createKernel = this.createGpuJsKernel
+    }
   }
 
   public mmult(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InterpreterValue {
@@ -72,7 +76,7 @@ export class MatrixPlugin extends FunctionPlugin {
       }
       const outputSize = matrixSizeForMultiplication(leftMatrix.size, rightMatrix.size)
 
-      const result = this.createKernel(function (a: number[][], b: number[][], width: number): number {
+      const result = this.createKernel(function(a: number[][], b: number[][], width: number): number {
         let sum = 0
         for (let i = 0; i < width; ++i) {
           sum += a[this.thread.y as number][i] * b[i][this.thread.x]
@@ -91,7 +95,7 @@ export class MatrixPlugin extends FunctionPlugin {
       }
       const outputSize = matrixSizeForPoolFunction(matrix.size, windowSize, stride)
 
-      const result = this.createKernel(function (a: number[][], windowSize: number, stride: number): number {
+      const result = this.createKernel(function(a: number[][], windowSize: number, stride: number): number {
         const leftCornerX = this.thread.x * stride
         const leftCornerY = this.thread.y as number * stride
         let currentMax = a[leftCornerY][leftCornerX]
@@ -114,7 +118,7 @@ export class MatrixPlugin extends FunctionPlugin {
       }
       const outputSize = matrixSizeForPoolFunction(matrix.size, windowSize, stride)
 
-      const result = this.createKernel(function (a: number[][], windowSize: number, stride: number): number {
+      const result = this.createKernel(function(a: number[][], windowSize: number, stride: number): number {
         const leftCornerX = this.thread.x * stride
         const leftCornerY = this.thread.y as number * stride
         let currentMax = a[leftCornerY][leftCornerX]
@@ -204,7 +208,7 @@ export class MatrixPlugin extends FunctionPlugin {
     }
   }
 
-  private createGpuKernel = (kernel: KernelFunction, outputSize: MatrixSize): KernelRunShortcut => {
+  private createGpuJsKernel = (kernel: KernelFunction, outputSize: MatrixSize): KernelRunShortcut => {
     return this.interpreter.getGpuInstance()
       .createKernel(kernel)
       .setPrecision('unsigned')
