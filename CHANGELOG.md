@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - Added support for row and column reordering. (#343)
+- Added ability to fallback to plain CPU implementation for functions that uses GPU.js (#355)
 
 ### Fixed
 - Fixed a bug with serialization of some addresses after CRUDs. (#587)
