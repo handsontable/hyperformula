@@ -273,10 +273,17 @@ export class Interpreter {
   }
 
   public getGpuInstance(): GPU.GPU {
+    const mode = this.config.gpuMode
+
+    if (mode === 'fallback') {
+      throw Error('Cannot instantiate GPU.js when fallback mode is active.')
+    }
+
     if (!this.gpu) {
       const GPUConstructor = GPU.GPU || GPU
-      this.gpu = new GPUConstructor({mode: this.config.gpuMode})
+      this.gpu = new GPUConstructor({ mode })
     }
+
     return this.gpu
   }
 

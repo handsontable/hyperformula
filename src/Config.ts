@@ -7,10 +7,10 @@ import {TranslatableErrorType} from './Cell'
 import {defaultParseToDateTime} from './DateTimeDefault'
 import {DateTime, instanceOfSimpleDate, SimpleDate, SimpleDateTime, SimpleTime} from './DateTimeHelper'
 import {
-  ConfigValueTooSmallError,
   ConfigValueTooBigError,
-  ExpectedValueOfTypeError,
-  ExpectedOneOfValuesError
+  ConfigValueTooSmallError,
+  ExpectedOneOfValuesError,
+  ExpectedValueOfTypeError
 } from './errors'
 import {AlwaysDense, ChooseAddressMapping} from './DependencyGraph/AddressMapping/ChooseAddressMappingPolicy'
 import {defaultStringifyDateTime, defaultStringifyDuration} from './format/format'
@@ -19,11 +19,12 @@ import {TranslationPackage} from './i18n'
 import {Maybe} from './Maybe'
 import {ParserConfig} from './parser/ParserConfig'
 import {checkLicenseKeyValidity, LicenseKeyValidityState} from './helpers/licenseKeyValidator'
-import {FunctionPluginDefinition} from './interpreter/plugin/FunctionPlugin'
+import {FunctionPluginDefinition} from './interpreter'
+import GPU from 'gpu.js'
 
-type GPUMode = 'gpu' | 'cpu' | 'dev'
+type GPUMode = 'gpu' | 'cpu' | 'dev' | 'fallback'
 
-const PossibleGPUModeString: GPUMode[] = ['gpu', 'cpu', 'dev']
+const PossibleGPUModeString: GPUMode[] = ['gpu', 'cpu', 'dev', 'fallback']
 
 export interface ConfigParams {
   /**
@@ -614,6 +615,10 @@ export class Config implements ConfigParams, ParserConfig {
       {value: this.functionArgSeparator, name: 'functionArgSeparator'},
       {value: this.thousandSeparator, name: 'thousandSeparator'}
     )
+
+    if (GPU === undefined) {
+      this.gpuMode = 'fallback'
+    }
   }
 
   public getConfig(): ConfigParams { //TODO: avoid pollution

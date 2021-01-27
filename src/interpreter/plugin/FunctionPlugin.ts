@@ -237,6 +237,24 @@ export abstract class FunctionPlugin {
     functionDefinition: FunctionArguments,
     fn: (...arg: any) => InternalScalarValue
   ) => {
+    return this.runFunctionTemplate(args, formulaAddress, functionDefinition, fn)
+  }
+
+  protected runMatrixFunction = (
+    args: Ast[],
+    formulaAddress: SimpleCellAddress,
+    functionDefinition: FunctionArguments,
+    fn: (...arg: any) => InterpreterValue
+  ) => {
+    return this.runFunctionTemplate(args, formulaAddress, functionDefinition, fn)
+  }
+
+  private runFunctionTemplate = (
+    args: Ast[],
+    formulaAddress: SimpleCellAddress,
+    functionDefinition: FunctionArguments,
+    fn: (...arg: any) => any
+  ) => {
     const argumentDefinitions: FunctionArgument[] = functionDefinition.parameters!
     let scalarValues: [InterpreterValue, boolean][]
 
