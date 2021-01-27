@@ -618,7 +618,6 @@ export class Config implements ConfigParams, ParserConfig {
 
     if (GPU === undefined) {
       this.gpuMode = 'fallback'
-      console.warn('GPU.js not detected. Matrix functions will use plain CPU implementation.')
     }
   }
 
