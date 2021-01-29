@@ -11,9 +11,9 @@ import {Maybe} from '../Maybe'
 import {NumberLiteralHelper} from '../NumberLiteralHelper'
 import {collatorFromConfig} from '../StringHelper'
 import {
+  CurrencyNumber, DateNumber, DateTimeNumber,
   EmptyValue,
   ExtendedNumber,
-  ExtendedNumberFactory,
   getRawValue,
   getTypeOfExtendedNumber,
   InternalNoErrorScalarValue,
@@ -24,7 +24,7 @@ import {
   PercentNumber,
   RawInterpreterValue,
   RawNoErrorScalarValue,
-  RawScalarValue
+  RawScalarValue, TimeNumber
 } from './InterpreterValue'
 import {SimpleRangeValue} from './SimpleRangeValue'
 import Collator = Intl.Collator
@@ -199,7 +199,7 @@ export class ArithmeticHelper {
     }
   }
   public addWithEpsilon = (left: ExtendedNumber, right: ExtendedNumber): ExtendedNumber => {
-    return ExtendedNumberFactory(
+    return this.ExtendedNumberFactory(
       inferExtendedNumberTypeAdditive(
         getTypeOfExtendedNumber(left),
         getTypeOfExtendedNumber(right)
@@ -209,7 +209,7 @@ export class ArithmeticHelper {
   }
 
   public unaryMinus = (arg: ExtendedNumber): ExtendedNumber => {
-    return ExtendedNumberFactory(getTypeOfExtendedNumber(arg), -getRawValue(arg))
+    return this.ExtendedNumberFactory(getTypeOfExtendedNumber(arg), -getRawValue(arg))
   }
 
   public unaryPlus = (arg: ExtendedNumber): ExtendedNumber => {
@@ -262,7 +262,7 @@ export class ArithmeticHelper {
     if (Math.abs(ret) < this.actualEps * Math.abs(left)) {
       ret = 0
     }
-    return ExtendedNumberFactory(typeOfResult, ret)
+    return this.ExtendedNumberFactory(typeOfResult, ret)
   }
 
   public divide = (leftArg: ExtendedNumber, rightArg: ExtendedNumber): ExtendedNumber | CellError => {
@@ -275,7 +275,7 @@ export class ArithmeticHelper {
         getTypeOfExtendedNumber(leftArg),
         getTypeOfExtendedNumber(rightArg)
       )
-      return ExtendedNumberFactory(typeOfResult, left / right)
+      return this.ExtendedNumberFactory(typeOfResult, left / right)
     }
   }
 
@@ -284,7 +284,7 @@ export class ArithmeticHelper {
       getTypeOfExtendedNumber(left),
       getTypeOfExtendedNumber(right)
     )
-    return ExtendedNumberFactory(typeOfResult, getRawValue(left)*getRawValue(right))
+    return this.ExtendedNumberFactory(typeOfResult, getRawValue(left)*getRawValue(right))
   }
 
   public coerceScalarToNumberOrError(arg: InternalScalarValue): ExtendedNumber | CellError {
@@ -508,6 +508,28 @@ export class ArithmeticHelper {
       return [0, val]
     }
   }
+  public ExtendedNumberFactory(type: NumberType, value: number): ExtendedNumber {
+    switch (type) {
+      case NumberType.NUMBER_RAW:
+        return value
+      case NumberType.NUMBER_CURRENCY: {
+        if(this.config.currencySymbol.length>0) {
+          return new CurrencyNumber(value, this.config.currencySymbol[0])
+        } else {
+          return new CurrencyNumber(value)
+        }
+      }
+      case NumberType.NUMBER_DATE:
+        return new DateNumber(value)
+      case NumberType.NUMBER_DATETIME:
+        return new DateTimeNumber(value)
+      case NumberType.NUMBER_TIME:
+        return new TimeNumber(value)
+      case NumberType.NUMBER_PERCENT:
+        return new PercentNumber(value)
+    }
+  }
+
 }
 
 export function coerceComplexToString([re, im]: complex, symb?: string): string | CellError {

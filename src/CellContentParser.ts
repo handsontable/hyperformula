@@ -9,6 +9,7 @@ import {DateTimeHelper} from './DateTimeHelper'
 import {UnableToParseError} from './errors'
 import {fixNegativeZero, isNumberOverflow} from './interpreter/ArithmeticHelper'
 import {cloneNumber, CurrencyNumber, ExtendedNumber, getRawValue, PercentNumber} from './interpreter/InterpreterValue'
+import {Maybe} from './Maybe'
 import {NumberLiteralHelper} from './NumberLiteralHelper'
 
 export type RawCellContent = Date | string | number | boolean | null | undefined
@@ -99,6 +100,19 @@ export class CellContentParser {
     private readonly config: Config,
     private readonly dateHelper: DateTimeHelper,
     private readonly numberLiteralsHelper: NumberLiteralHelper) {
+
+  }
+
+  private currencyMatcher(token: string): Maybe<[string,string]> {
+    for(const currency in this.config.currencySymbol) {
+      if(token.startsWith(currency)) {
+        return [currency, token.slice(currency.length)]
+      }
+      if(token.endsWith(currency)) {
+        return [currency, token.slice(0, token.length - currency.length)]
+      }
+    }
+    return undefined
   }
 
   public parse(content: RawCellContent): CellContent.Type {
@@ -130,23 +144,26 @@ export class CellContentParser {
       } else {
         let trimmedContent = content.trim()
         let mode = 0
+        let currency
         if(trimmedContent.endsWith('%')) {
           mode = 1
           trimmedContent = trimmedContent.slice(0, trimmedContent.length-1)
-        } else if(trimmedContent.endsWith(this.config.currencySymbol)) {
-          mode = 2
-          trimmedContent = trimmedContent.slice(0, trimmedContent.length - this.config.currencySymbol.length)
-        } else if(trimmedContent.startsWith(this.config.currencySymbol)) {
-          mode = 2
-          trimmedContent = trimmedContent.slice(this.config.currencySymbol.length)
+        } else {
+          const res = this.currencyMatcher(trimmedContent)
+          if(res !== undefined) {
+            mode = 2;
+            [trimmedContent, currency] = res
+          }
         }
+
+
         const val = this.numberLiteralsHelper.numericStringToMaybeNumber(trimmedContent)
         if(val !== undefined) {
           let parseAsNum
           if(mode === 1) {
             parseAsNum = new PercentNumber(val/100)
           } else if(mode === 2) {
-            parseAsNum = new CurrencyNumber(val)
+            parseAsNum = new CurrencyNumber(val, currency as string)
           } else {
             parseAsNum = val
           }

@@ -50,6 +50,10 @@ export class DateNumber extends RichNumber {
 }
 
 export class CurrencyNumber extends RichNumber {
+  constructor(public val: number,
+              public currency?: string) {
+    super(val)
+  }
   public getDetailedType(): NumberType {
     return NumberType.NUMBER_CURRENCY
   }
@@ -86,23 +90,6 @@ export enum NumberType {
   NUMBER_DATETIME = 'NUMBER_DATETIME',
   NUMBER_CURRENCY = 'NUMBER_CURRENCY',
   NUMBER_PERCENT = 'NUMBER_PERCENT',
-}
-
-export function ExtendedNumberFactory(type: NumberType, value: number): ExtendedNumber {
-  switch (type) {
-    case NumberType.NUMBER_RAW:
-      return value
-    case NumberType.NUMBER_CURRENCY:
-      return new CurrencyNumber(value)
-    case NumberType.NUMBER_DATE:
-      return new DateNumber(value)
-    case NumberType.NUMBER_DATETIME:
-      return new DateTimeNumber(value)
-    case NumberType.NUMBER_TIME:
-      return new TimeNumber(value)
-    case NumberType.NUMBER_PERCENT:
-      return new PercentNumber(value)
-  }
 }
 
 export function getTypeOfExtendedNumber(arg: ExtendedNumber): NumberType {
