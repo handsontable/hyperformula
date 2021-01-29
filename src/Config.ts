@@ -146,7 +146,11 @@ export interface ConfigParams {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   functionPlugins: any[],
   /**
-   * TODO
+   * A GPU.js constructor used by matrix functions. When not provided, plain cpu implementation will be used.
+   *
+   * @default undefined
+   *
+   * @category Engine
    */
   gpujs?: typeof GPU,
   /**
