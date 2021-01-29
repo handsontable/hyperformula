@@ -66,13 +66,13 @@ export interface ConfigParams {
    */
   chooseAddressMappingPolicy: ChooseAddressMapping,
   /**
-   * Symbol used to denote currency numbers.
+   * Symbols used to denote currency numbers.
    *
-   * @default '$'
+   * @default ['$']
    *
    * @category Number
    */
-  currencySymbol: string,
+  currencySymbol: string[],
   /**
    * A list of date formats that are supported by date parsing functions.
    *
@@ -422,7 +422,7 @@ export class Config implements ConfigParams, ParserConfig {
     matchWholeCell: true,
     maxRows: 40_000,
     maxColumns: 18_278,
-    currencySymbol: '$',
+    currencySymbol: ['$'],
   }
 
   /** @inheritDoc */
@@ -489,7 +489,7 @@ export class Config implements ConfigParams, ParserConfig {
   /** @inheritDoc */
   public readonly nullDate: SimpleDate
   /** @inheritDoc */
-  public readonly currencySymbol: string
+  public readonly currencySymbol: string[]
   /** @inheritDoc */
   public readonly undoLimit: number
   /**
@@ -618,10 +618,15 @@ export class Config implements ConfigParams, ParserConfig {
     this.maxRows = this.valueFromParam(maxRows, 'number', 'maxRows')
     this.validateNumberToBeAtLeast(this.maxRows, 'maxRows', 1)
     this.maxColumns = this.valueFromParam(maxColumns, 'number', 'maxColumns')
-    this.currencySymbol = this.valueFromParam(currencySymbol, 'string', 'currencySymbol')
-    if(this.currencySymbol === '') {
-      throw new ConfigValueEmpty('currencySymbol')
-    }
+    this.currencySymbol = this.valueFromParamCheck(currencySymbol, Array.isArray, 'array',  'currencySymbol')
+    this.currencySymbol.forEach((val) => {
+      if(typeof val !== 'string') {
+        throw new ExpectedValueOfTypeError('string[]', 'currencySymbol')
+      }
+      if(val === '') {
+        throw new ConfigValueEmpty('currencySymbol')
+      }
+    })
     this.validateNumberToBeAtLeast(this.maxColumns, 'maxColumns', 1)
 
     this.warnDeprecatedIfUsed(vlookupThreshold, 'vlookupThreshold', 'v.0.3.0', 'binarySearchThreshold')
