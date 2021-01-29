@@ -119,8 +119,16 @@ describe('Config', () => {
 
   it('should throw error when currency symbol is empty', () => {
     expect(() => {
-      new Config({ currencySymbol: '' })
+      new Config({ currencySymbol: [''] })
     }).toThrowError('Config parameter currencySymbol cannot be empty.')
+  })
+
+  it('should throw error when currency symbol is not an array', () => {
+    expect(() => {
+      // eslint-disable-next-line
+      // @ts-ignore
+      new Config({ currencySymbol: '$' })
+    }).toThrowError('Expected value of type: array for config parameter: currencySymbol')
   })
 
   it('should throw error when decimal separator is not correct', () => {

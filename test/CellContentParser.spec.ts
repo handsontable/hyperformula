@@ -146,7 +146,7 @@ describe('CellContentParser', () => {
 
   it('other currency parsing', () => {
     expect(cellContentParser.parse('1PLN')).toEqual(new CellContent.String('1PLN'))
-    const configPLN = new Config({currencySymbol: 'PLN'})
+    const configPLN = new Config({currencySymbol: ['PLN']})
     const cellContentParserPLN = new CellContentParser(configPLN, new DateTimeHelper(configPLN), new NumberLiteralHelper(configPLN))
     expect(cellContentParserPLN.parse('1PLN')).toEqual(new CellContent.Number(new CurrencyNumber(1)))
   })
