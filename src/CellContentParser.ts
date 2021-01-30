@@ -103,7 +103,7 @@ export class CellContentParser {
 
   }
 
-  private currencyMatcher(token: string): Maybe<[string,string]> {
+  private currencyMatcher(token: string): Maybe<[string, string]> {
     for(const currency of this.config.currencySymbol) {
       if(token.startsWith(currency)) {
         return [currency, token.slice(currency.length)]
