@@ -16,20 +16,28 @@ export type RawNoErrorScalarValue = number | string | boolean | EmptyValueType
 export type RawScalarValue = RawNoErrorScalarValue | CellError
 export type RawInterpreterValue = RawScalarValue | SimpleRangeValue
 
-export function getRawValue<T>(val: RichNumber | T): number | T {
-  if(val instanceof RichNumber) {
-    return val.getRawValue()
+export function getRawValue<T>(num: RichNumber | T): number | T {
+  if(num instanceof RichNumber) {
+    return num.val
   } else {
-    return val
+    return num
+  }
+}
+
+export type FormatInfo = string | undefined
+
+export function getFormat<T>(num: RichNumber | T): FormatInfo {
+  if(num instanceof RichNumber) {
+    return num.format
+  } else {
+    return undefined
   }
 }
 
 export abstract class RichNumber {
-  constructor(public val: number) {}
-  public getRawValue(): number {
-    return this.val
-  }
-  public clone(val: number): this{
+  constructor(public val: number,
+              public format?: string) {}
+  public fromNumber(val: number): this {
     return new (this.constructor as any)(val)
   }
   abstract getDetailedType(): NumberType
@@ -39,7 +47,9 @@ export function cloneNumber(val: ExtendedNumber, newVal: number): ExtendedNumber
   if(typeof val === 'number') {
     return newVal
   } else {
-    return val.clone(newVal)
+    const ret = val.fromNumber(newVal)
+    ret.format = val.format
+    return ret
   }
 }
 
@@ -50,10 +60,6 @@ export class DateNumber extends RichNumber {
 }
 
 export class CurrencyNumber extends RichNumber {
-  constructor(public val: number,
-              public currency?: string) {
-    super(val)
-  }
   public getDetailedType(): NumberType {
     return NumberType.NUMBER_CURRENCY
   }

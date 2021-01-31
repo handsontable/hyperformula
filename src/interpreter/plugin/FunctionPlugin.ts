@@ -15,7 +15,7 @@ import {Serialization} from '../../Serialization'
 import {coerceScalarToBoolean, coerceScalarToString, coerceToRange, complex} from '../ArithmeticHelper'
 import {Interpreter} from '../Interpreter'
 import {
-  ExtendedNumber,
+  ExtendedNumber, FormatInfo,
   getRawValue,
   InternalScalarValue,
   InterpreterValue,
@@ -372,9 +372,9 @@ export abstract class FunctionPlugin {
     throw new Error(`No metadata for function ${name}.`)
   }
 
-  private returnNumberWrapper(val: InternalScalarValue, type?: NumberType): InternalScalarValue {
+  private returnNumberWrapper(val: InternalScalarValue, type?: NumberType, format?: FormatInfo): InternalScalarValue {
     if(type !== undefined && isExtendedNumber(val)) {
-      return this.interpreter.arithmeticHelper.ExtendedNumberFactory(type, getRawValue(val))
+      return this.interpreter.arithmeticHelper.ExtendedNumberFactory(getRawValue(val), type, format)
     } else {
       return val
     }

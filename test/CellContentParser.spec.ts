@@ -134,12 +134,12 @@ describe('CellContentParser', () => {
   })
 
   it('currency parsing', () => {
-    expect(cellContentParser.parse('1$')).toEqual(new CellContent.Number(new CurrencyNumber(1)))
-    expect(cellContentParser.parse('$1')).toEqual(new CellContent.Number(new CurrencyNumber(1)))
-    expect(cellContentParser.parse('-1.1e1$')).toEqual(new CellContent.Number(new CurrencyNumber(-11)))
-    expect(cellContentParser.parse('$-1.1e1')).toEqual(new CellContent.Number(new CurrencyNumber(-11)))
-    expect(cellContentParser.parse(' 1$ ')).toEqual(new CellContent.Number(new CurrencyNumber(1)))
-    expect(cellContentParser.parse(' $1 ')).toEqual(new CellContent.Number(new CurrencyNumber(1)))
+    expect(cellContentParser.parse('1$')).toEqual(new CellContent.Number(new CurrencyNumber(1, '$')))
+    expect(cellContentParser.parse('$1')).toEqual(new CellContent.Number(new CurrencyNumber(1, '$')))
+    expect(cellContentParser.parse('-1.1e1$')).toEqual(new CellContent.Number(new CurrencyNumber(-11, '$')))
+    expect(cellContentParser.parse('$-1.1e1')).toEqual(new CellContent.Number(new CurrencyNumber(-11, '$')))
+    expect(cellContentParser.parse(' 1$ ')).toEqual(new CellContent.Number(new CurrencyNumber(1, '$')))
+    expect(cellContentParser.parse(' $1 ')).toEqual(new CellContent.Number(new CurrencyNumber(1, '$')))
     expect(cellContentParser.parse('1 $')).toEqual(new CellContent.String('1 $'))
     expect(cellContentParser.parse('$ 1')).toEqual(new CellContent.String('$ 1'))
   })
@@ -148,7 +148,7 @@ describe('CellContentParser', () => {
     expect(cellContentParser.parse('1PLN')).toEqual(new CellContent.String('1PLN'))
     const configPLN = new Config({currencySymbol: ['PLN']})
     const cellContentParserPLN = new CellContentParser(configPLN, new DateTimeHelper(configPLN), new NumberLiteralHelper(configPLN))
-    expect(cellContentParserPLN.parse('1PLN')).toEqual(new CellContent.Number(new CurrencyNumber(1)))
+    expect(cellContentParserPLN.parse('1PLN')).toEqual(new CellContent.Number(new CurrencyNumber(1, 'PLN')))
   })
 
   it('percentage parsing', () => {

@@ -234,3 +234,97 @@ describe('arithmetic operations', () => {
     expect(engine.getCellValueDetailedType(adr('F2'))).toBe(CellValueDetailedType.NUMBER_DATETIME)
   })
 })
+
+describe('formatting info', () => {
+  it('should be preserved by unary minus', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1$', '1', '1PLN'],
+      ['=-A1', '=-B1', '=C1'],
+    ], {currencySymbol: ['$', 'PLN']})
+    expect(engine.getCellValueFormat(adr('A2'))).toBe('$')
+    expect(engine.getCellValueFormat(adr('B2'))).toBe(undefined)
+    expect(engine.getCellValueFormat(adr('C2'))).toBe('PLN')
+  })
+
+  it('should be preserved by unary plus', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1$', '1', '1PLN'],
+      ['=+A1', '=+B1', '=+C1'],
+    ], {currencySymbol: ['$', 'PLN']})
+    expect(engine.getCellValueFormat(adr('A2'))).toBe('$')
+    expect(engine.getCellValueFormat(adr('B2'))).toBe(undefined)
+    expect(engine.getCellValueFormat(adr('C2'))).toBe('PLN')
+  })
+
+  it('should be preserved by addition', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1$', '1', '1PLN'],
+      ['=A1+A1', '=A1+B1', '=A1+C1'],
+      ['=B1+A1', '=B1+B1', '=B1+C1'],
+      ['=C1+A1', '=C1+B1', '=C1+C1'],
+    ], {currencySymbol: ['$', 'PLN']})
+    expect(engine.getCellValueFormat(adr('A2'))).toBe('$')
+    expect(engine.getCellValueFormat(adr('B2'))).toBe('$')
+    expect(engine.getCellValueFormat(adr('C2'))).toBe('$')
+    expect(engine.getCellValueFormat(adr('A3'))).toBe('$')
+    expect(engine.getCellValueFormat(adr('B3'))).toBe(undefined)
+    expect(engine.getCellValueFormat(adr('C3'))).toBe('PLN')
+    expect(engine.getCellValueFormat(adr('A4'))).toBe('PLN')
+    expect(engine.getCellValueFormat(adr('B4'))).toBe('PLN')
+    expect(engine.getCellValueFormat(adr('C4'))).toBe('PLN')
+  })
+
+  it('should be preserved by subtraction', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1$', '1', '1PLN'],
+      ['=A1-A1', '=A1-B1', '=A1-C1'],
+      ['=B1-A1', '=B1-B1', '=B1-C1'],
+      ['=C1-A1', '=C1-B1', '=C1-C1'],
+    ], {currencySymbol: ['$', 'PLN']})
+    expect(engine.getCellValueFormat(adr('A2'))).toBe('$')
+    expect(engine.getCellValueFormat(adr('B2'))).toBe('$')
+    expect(engine.getCellValueFormat(adr('C2'))).toBe('$')
+    expect(engine.getCellValueFormat(adr('A3'))).toBe('$')
+    expect(engine.getCellValueFormat(adr('B3'))).toBe(undefined)
+    expect(engine.getCellValueFormat(adr('C3'))).toBe('PLN')
+    expect(engine.getCellValueFormat(adr('A4'))).toBe('PLN')
+    expect(engine.getCellValueFormat(adr('B4'))).toBe('PLN')
+    expect(engine.getCellValueFormat(adr('C4'))).toBe('PLN')
+  })
+
+  it('should be preserved by multiplication', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1$', '1', '1PLN'],
+      ['=A1*A1', '=A1*B1', '=A1*C1'],
+      ['=B1*A1', '=B1*B1', '=B1*C1'],
+      ['=C1*A1', '=C1*B1', '=C1*C1'],
+    ], {currencySymbol: ['$', 'PLN']})
+    expect(engine.getCellValueFormat(adr('A2'))).toBe(undefined)
+    expect(engine.getCellValueFormat(adr('B2'))).toBe('$')
+    expect(engine.getCellValueFormat(adr('C2'))).toBe(undefined)
+    expect(engine.getCellValueFormat(adr('A3'))).toBe('$')
+    expect(engine.getCellValueFormat(adr('B3'))).toBe(undefined)
+    expect(engine.getCellValueFormat(adr('C3'))).toBe('PLN')
+    expect(engine.getCellValueFormat(adr('A4'))).toBe(undefined)
+    expect(engine.getCellValueFormat(adr('B4'))).toBe('PLN')
+    expect(engine.getCellValueFormat(adr('C4'))).toBe(undefined)
+  })
+
+  it('should be preserved by division', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1$', '1', '1PLN'],
+      ['=A1/A1', '=A1/B1', '=A1/C1'],
+      ['=B1/A1', '=B1/B1', '=B1/C1'],
+      ['=C1/A1', '=C1/B1', '=C1/C1'],
+    ], {currencySymbol: ['$', 'PLN']})
+    expect(engine.getCellValueFormat(adr('A2'))).toBe(undefined)
+    expect(engine.getCellValueFormat(adr('B2'))).toBe('$')
+    expect(engine.getCellValueFormat(adr('C2'))).toBe(undefined)
+    expect(engine.getCellValueFormat(adr('A3'))).toBe('$')
+    expect(engine.getCellValueFormat(adr('B3'))).toBe(undefined)
+    expect(engine.getCellValueFormat(adr('C3'))).toBe('PLN')
+    expect(engine.getCellValueFormat(adr('A4'))).toBe(undefined)
+    expect(engine.getCellValueFormat(adr('B4'))).toBe('PLN')
+    expect(engine.getCellValueFormat(adr('C4'))).toBe(undefined)
+  })
+})
