@@ -2845,10 +2845,10 @@ export class HyperFormula implements TypedEmitter {
    * ]);
    *
    * // should return 'NUMBER_PERCENT', cell value type of provided coordinates is a number with a format inference percent.
-   * const cellType = hfInstance.getCellValueType({ sheet: 0, col: 1, row: 0 });
+   * const cellType = hfInstance.getCellValueType({ sheet: 0, col: 0, row: 0 });
    *
    * // should return 'NUMBER_CURRENCY', cell value type of provided coordinates is a number with a format inference currency.
-   * const cellType = hfInstance.getCellValueType({ sheet: 0, col: 0, row: 0 });
+   * const cellType = hfInstance.getCellValueType({ sheet: 0, col: 1, row: 0 });
    * ```
    *
    * @category Cells
@@ -2860,7 +2860,7 @@ export class HyperFormula implements TypedEmitter {
   }
 
   /**
-   * Returns detailed type of the cell value of a given address.
+   * Returns auxilary format information of the cell value of a given address.
    * The methods accepts cell coordinates as object with column, row and sheet numbers.
    *
    * @param {SimpleCellAddress} cellAddress - cell coordinates
@@ -2870,14 +2870,14 @@ export class HyperFormula implements TypedEmitter {
    * @example
    * ```js
    * const hfInstance = HyperFormula.buildFromArray([
-   *  ['1%', '1$'],
+   *  ['1$', '1'],
    * ]);
    *
-   * // should return 'NUMBER_PERCENT', cell value type of provided coordinates is a number with a format inference percent.
-   * const cellType = hfInstance.getCellValueType({ sheet: 0, col: 1, row: 0 });
-   *
-   * // should return 'NUMBER_CURRENCY', cell value type of provided coordinates is a number with a format inference currency.
+   * // should return '$', cell value type of provided coordinates is a number with a format inference currency, parsed as using '$' as currency.
    * const cellType = hfInstance.getCellValueType({ sheet: 0, col: 0, row: 0 });
+   *
+   * // should return undefined, cell value type of provided coordinates is a number with no format information.
+   * const cellType = hfInstance.getCellValueType({ sheet: 0, col: 1, row: 0 });
    * ```
    *
    * @category Cells

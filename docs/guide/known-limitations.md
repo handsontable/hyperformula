@@ -28,7 +28,6 @@ you can't compare the arguments in a formula like this:
 * There is no relative referencing in named ranges.
 * The library doesn't offer (at least not yet) the following features:
   * 3D references
-  * Complex numbers
   * Constant arrays
   * Dynamic arrays
   * Asynchronous functions
