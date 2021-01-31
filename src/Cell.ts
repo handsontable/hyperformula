@@ -6,8 +6,7 @@
 import {CellVertex, FormulaCellVertex, MatrixVertex, ParsingErrorVertex, ValueCellVertex} from './DependencyGraph'
 import {ErrorMessage} from './error-message'
 import {
-  CurrencyNumber,
-  EmptyValue, ExtendedNumber, getFormat, getTypeOfExtendedNumber,
+  EmptyValue, getFormat, getTypeOfExtendedNumber,
   InterpreterValue,
   isExtendedNumber, NumberType,
 } from './interpreter/InterpreterValue'
