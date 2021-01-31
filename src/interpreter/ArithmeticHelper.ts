@@ -722,22 +722,22 @@ function escapeNoCharacters(pattern: string, caseSensitive: boolean): string {
 
 function inferExtendedNumberTypeAdditive(left: NumberType, right: NumberType, leftFormat: FormatInfo, rightFormat: FormatInfo): [NumberType, FormatInfo] {
   if(left === NumberType.NUMBER_RAW) {
-    return [right,rightFormat]
+    return [right, rightFormat]
   }
   if(right === NumberType.NUMBER_RAW) {
-    return [left,leftFormat]
+    return [left, leftFormat]
   }
   if((left === NumberType.NUMBER_DATETIME || left === NumberType.NUMBER_DATE)
     && (right === NumberType.NUMBER_DATETIME || right === NumberType.NUMBER_DATE)) {
-    return [NumberType.NUMBER_RAW,undefined]
+    return [NumberType.NUMBER_RAW, undefined]
   }
   if((left === NumberType.NUMBER_DATETIME || left === NumberType.NUMBER_TIME || left === NumberType.NUMBER_DATE)
     && (right === NumberType.NUMBER_DATETIME || right === NumberType.NUMBER_TIME || right === NumberType.NUMBER_DATE)) {
     if(left !== right) {
-      return [NumberType.NUMBER_DATETIME,undefined]
+      return [NumberType.NUMBER_DATETIME, undefined]
     }
   }
-  return [left,leftFormat]
+  return [left, leftFormat]
 }
 
 function inferExtendedNumberTypeMultiplicative(left: NumberType, right: NumberType, leftFormat: FormatInfo, rightFormat: FormatInfo): [NumberType, FormatInfo] {
@@ -750,10 +750,10 @@ function inferExtendedNumberTypeMultiplicative(left: NumberType, right: NumberTy
     rightFormat = undefined
   }
   if(left === NumberType.NUMBER_RAW) {
-    return [right,rightFormat]
+    return [right, rightFormat]
   }
   if(right === NumberType.NUMBER_RAW) {
-    return [left,leftFormat]
+    return [left, leftFormat]
   }
-  return [NumberType.NUMBER_RAW,undefined]
+  return [NumberType.NUMBER_RAW, undefined]
 }

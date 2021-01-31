@@ -121,7 +121,7 @@ export const getCellValueType = (cellValue: InterpreterValue): CellValueType => 
 
 export const getCellValueDetailedType = (cellValue: InterpreterValue): CellValueDetailedType => {
   if(isExtendedNumber(cellValue)) {
-    return getTypeOfExtendedNumber(cellValue as ExtendedNumber)
+    return getTypeOfExtendedNumber(cellValue)
   } else {
     return getCellValueType(cellValue) as CellValueDetailedType
   }
