@@ -3,7 +3,6 @@
  * Copyright (c) 2020 Handsoncode. All rights reserved.
  */
 
-import GPU from 'gpu.js'
 import {AbsoluteCellRange, AbsoluteColumnRange, AbsoluteRowRange} from '../AbsoluteCellRange'
 import {
   CellError,
@@ -31,9 +30,10 @@ import {ArithmeticHelper, coerceScalarToString, fixNegativeZero, isNumberOverflo
 import {CriterionBuilder} from './Criterion'
 import {FunctionRegistry} from './FunctionRegistry'
 import {InterpreterValue, SimpleRangeValue} from './InterpreterValue'
+import type {GPU} from 'gpu.js'
 
 export class Interpreter {
-  private gpu?: GPU.GPU
+  private gpu?: GPU
   public readonly arithmeticHelper: ArithmeticHelper
   public readonly criterionBuilder: CriterionBuilder
 
@@ -64,6 +64,7 @@ export class Interpreter {
     }
     return wrapperForAddress(val, formulaAddress)
   }
+
   /**
    * Calculates cell value from formula abstract syntax tree
    *
@@ -183,8 +184,8 @@ export class Interpreter {
         const result = this.evaluateAst(ast.value, formulaAddress)
         if (result instanceof SimpleRangeValue) {
           return new CellError(ErrorType.VALUE, ErrorMessage.ScalarExpected)
-        } else if(typeof result === 'number') {
-         return this.arithmeticHelper.unaryPlus(result)
+        } else if (typeof result === 'number') {
+          return this.arithmeticHelper.unaryPlus(result)
         } else {
           return result
         }
@@ -208,7 +209,7 @@ export class Interpreter {
         }
       }
       case AstNodeType.FUNCTION_CALL: {
-        if(this.config.licenseKeyValidityState !== LicenseKeyValidityState.VALID && !FunctionRegistry.functionIsProtected(ast.procedureName)) {
+        if (this.config.licenseKeyValidityState !== LicenseKeyValidityState.VALID && !FunctionRegistry.functionIsProtected(ast.procedureName)) {
           return new CellError(ErrorType.LIC, ErrorMessage.LicenseKey(this.config.licenseKeyValidityState))
         }
         const pluginEntry = this.functionRegistry.getFunction(ast.procedureName)
@@ -272,16 +273,16 @@ export class Interpreter {
     }
   }
 
-  public getGpuInstance(): GPU.GPU {
+  public getGpuInstance(): GPU {
     const mode = this.config.gpuMode
+    const gpujs = this.config.gpujs
 
-    if (mode === 'fallback') {
-      throw Error('Cannot instantiate GPU.js when fallback mode is active.')
+    if (gpujs === undefined) {
+      throw Error('Cannot instantiate GPU.js. Constructor not provided.')
     }
 
     if (!this.gpu) {
-      const GPUConstructor = GPU.GPU || GPU
-      this.gpu = new GPUConstructor({ mode })
+      this.gpu = new gpujs({mode})
     }
 
     return this.gpu
@@ -313,7 +314,7 @@ function passErrors(left: InterpreterValue, right: InterpreterValue): Maybe<Cell
 }
 
 function wrapperUnary<T extends InterpreterValue>(op: (a: T) => InterpreterValue, a: T | CellError): InterpreterValue {
-  if(a instanceof CellError) {
+  if (a instanceof CellError) {
     return a
   } else {
     return op(a)
@@ -321,9 +322,9 @@ function wrapperUnary<T extends InterpreterValue>(op: (a: T) => InterpreterValue
 }
 
 function wrapperBinary<T extends InterpreterValue>(op: (a: T, b: T) => InterpreterValue, a: T | CellError, b: T | CellError): InterpreterValue {
-  if(a instanceof CellError) {
+  if (a instanceof CellError) {
     return a
-  } else if(b instanceof CellError) {
+  } else if (b instanceof CellError) {
     return b
   } else {
     return op(a, b)
@@ -331,7 +332,7 @@ function wrapperBinary<T extends InterpreterValue>(op: (a: T, b: T) => Interpret
 }
 
 function wrapperForAddress(val: InterpreterValue, adr: SimpleCellAddress): InterpreterValue {
-  if(val instanceof CellError) {
+  if (val instanceof CellError) {
     return val.attachAddress(adr)
   }
   return val

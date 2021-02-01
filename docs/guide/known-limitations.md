@@ -10,8 +10,8 @@ market (~450 functions on average).
 culture-insensitive strings. HyperFormula requires the full
 International Components for Unicode (ICU) to be supported.
 [Learn more](https://nodejs.org/api/intl.html#intl_embed_the_entire_icu_full_icu)
-* GPU acceleration is used only by matrix functions: MMULT,
-TRANSPOSE, MEDIANPOOL, MAXPOOL.
+* GPU acceleration is used only by matrix functions: MMULT, MEDIANPOOL, MAXPOOL.
+* GPU.js works only in browsers that support ES6. [Learn more](enabling-gpu-acceleration.md)
 * Sorting and filtering are not natively supported. However,
 we simulate sorting using the move operations.
 * Multiple workbooks are not supported. One instance of HyperFormula

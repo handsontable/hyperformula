@@ -62,7 +62,7 @@ export class MatrixPlugin extends FunctionPlugin {
 
   constructor(interpreter: Interpreter) {
     super(interpreter)
-    if (this.config.gpuMode === 'fallback') {
+    if (this.config.gpujs === undefined) {
       this.createKernel = this.createCpuKernel
     } else {
       this.createKernel = this.createGpuJsKernel
