@@ -24,16 +24,6 @@ export function getRawValue<T>(num: RichNumber | T): number | T {
   }
 }
 
-export type FormatInfo = string | undefined
-
-export function getFormat<T>(num: RichNumber | T): FormatInfo {
-  if(num instanceof RichNumber) {
-    return num.format
-  } else {
-    return undefined
-  }
-}
-
 export abstract class RichNumber {
   constructor(public val: number,
               public format?: string) {}
@@ -98,10 +88,22 @@ export enum NumberType {
   NUMBER_PERCENT = 'NUMBER_PERCENT',
 }
 
-export function getTypeOfExtendedNumber(arg: ExtendedNumber): NumberType {
-  if(arg instanceof RichNumber) {
-    return arg.getDetailedType()
+export function getTypeOfExtendedNumber(num: ExtendedNumber): NumberType {
+  if(num instanceof RichNumber) {
+    return num.getDetailedType()
   } else {
     return NumberType.NUMBER_RAW
   }
 }
+
+export type FormatInfo = string | undefined
+export type NumberTypeWithFormat = {type: NumberType, format?: FormatInfo}
+
+export function getTypeFormatOfExtendedNumber(num: ExtendedNumber): NumberTypeWithFormat {
+  if(num instanceof RichNumber) {
+    return {type: num.getDetailedType(), format: num.format}
+  } else {
+    return {type: NumberType.NUMBER_RAW}
+  }
+}
+
