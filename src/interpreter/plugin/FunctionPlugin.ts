@@ -374,7 +374,7 @@ export abstract class FunctionPlugin {
 
   private returnNumberWrapper(val: InternalScalarValue, type?: NumberType, format?: FormatInfo): InternalScalarValue {
     if(type !== undefined && isExtendedNumber(val)) {
-      return this.interpreter.arithmeticHelper.ExtendedNumberFactory(getRawValue(val), type, format)
+      return this.interpreter.arithmeticHelper.ExtendedNumberFactory(getRawValue(val), {type, format})
     } else {
       return val
     }
