@@ -2874,10 +2874,10 @@ export class HyperFormula implements TypedEmitter {
    * ]);
    *
    * // should return '$', cell value type of provided coordinates is a number with a format inference currency, parsed as using '$' as currency.
-   * const cellType = hfInstance.getCellValueFormat({ sheet: 0, col: 0, row: 0 });
+   * const cellFormat = hfInstance.getCellValueFormat({ sheet: 0, col: 0, row: 0 });
    *
    * // should return undefined, cell value type of provided coordinates is a number with no format information.
-   * const cellType = hfInstance.getCellValueFormat({ sheet: 0, col: 1, row: 0 });
+   * const cellFormat = hfInstance.getCellValueFormat({ sheet: 0, col: 1, row: 0 });
    * ```
    *
    * @category Cells
