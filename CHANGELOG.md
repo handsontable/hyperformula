@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added support for row and column reordering. (#343)
 - Added type inferrence for subtypes for number. (#313)
 - Added parsing of number literals containing '%' or currency symbol (default '$').
+- Added ability to fallback to plain CPU implementation for functions that uses GPU.js (#355)
 
 ### Fixed
 - Fixed a bug with serialization of some addresses after CRUDs. (#587)

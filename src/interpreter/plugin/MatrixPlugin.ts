@@ -10,224 +10,214 @@ import {Ast, AstNodeType, NumberAst, ProcedureAst} from '../../parser'
 import {coerceToRangeNumbersOrError} from '../ArithmeticHelper'
 import {SimpleRangeValue} from '../SimpleRangeValue'
 import {FunctionPlugin} from './FunctionPlugin'
+import {MatrixSize, matrixSizeForMultiplication, matrixSizeForPoolFunction, matrixSizeForTranspose} from '../../Matrix'
+import {ProcedureAst} from '../../parser'
+import {InterpreterValue, SimpleRangeValue} from '../InterpreterValue'
+import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
+import {Interpreter} from '../Interpreter'
+
+export type KernelRunShortcut = (...args: any[]) => number[][]
+
+export type KernelFunction = ((
+  this: KernelFunctionThis,
+  ...args: any[]
+) => number)
+
+export interface KernelFunctionThis {
+  thread: {
+    x: number,
+    y?: number,
+  },
+}
+
 
 export class MatrixPlugin extends FunctionPlugin {
   public static implementedFunctions = {
     'MMULT': {
       method: 'mmult',
+      parameters: [
+        {argumentType: ArgumentTypes.RANGE},
+        {argumentType: ArgumentTypes.RANGE},
+      ],
     },
     'TRANSPOSE': {
       method: 'transpose',
+      parameters: [
+        {argumentType: ArgumentTypes.RANGE},
+      ],
     },
     'MAXPOOL': {
       method: 'maxpool',
+      parameters: [
+        {argumentType: ArgumentTypes.RANGE},
+        {argumentType: ArgumentTypes.NUMBER},
+        {argumentType: ArgumentTypes.NUMBER, optionalArg: true},
+      ],
     },
     'MEDIANPOOL': {
       method: 'medianpool',
+      parameters: [
+        {argumentType: ArgumentTypes.RANGE},
+        {argumentType: ArgumentTypes.NUMBER},
+        {argumentType: ArgumentTypes.NUMBER, optionalArg: true},
+      ],
     },
   }
 
-  public mmult(ast: ProcedureAst, formulaAddress: SimpleCellAddress): SimpleRangeValue | CellError {
-    if (ast.args.length !== 2) {
-      return new CellError(ErrorType.NA, ErrorMessage.WrongArgNumber)
+  private readonly createKernel: (kernel: KernelFunction, outputSize: MatrixSize) => KernelRunShortcut
+
+  constructor(interpreter: Interpreter) {
+    super(interpreter)
+    if (this.config.gpuMode === 'fallback') {
+      this.createKernel = this.createCpuKernel
+    } else {
+      this.createKernel = this.createGpuJsKernel
     }
-    if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
-      return new CellError(ErrorType.NUM, ErrorMessage.EmptyArg )
-    }
-    const [left, right] = ast.args
-
-    const leftMatrix = coerceToRangeNumbersOrError(this.evaluateAst(left, formulaAddress))
-    const rightMatrix = coerceToRangeNumbersOrError(this.evaluateAst(right, formulaAddress))
-
-    if (leftMatrix instanceof CellError) {
-      return leftMatrix
-    } else if (rightMatrix instanceof CellError) {
-      return rightMatrix
-    } else if (leftMatrix === null || rightMatrix === null) {
-      return new CellError(ErrorType.VALUE, ErrorMessage.NumberRange)
-    }
-
-    const outputSize = matrixSizeForMultiplication(leftMatrix.size, rightMatrix.size)
-
-    const gpu = this.interpreter.getGpuInstance()
-    const kernel = gpu.createKernel(function(a: number[][], b: number[][], width: number) {
-      let sum = 0
-      for (let i = 0; i < width; ++i) {
-        sum += a[this.thread.y as number][i] * b[i][this.thread.x]
-      }
-      return sum
-    }).setPrecision('unsigned')
-      .setOutput([outputSize.width, outputSize.height])
-
-    return SimpleRangeValue.onlyNumbersDataWithoutRange(
-      kernel(leftMatrix.rawNumbers(), rightMatrix.rawNumbers(), leftMatrix.width()) as number[][],
-      outputSize,
-    )
   }
 
-  public maxpool(ast: ProcedureAst, formulaAddress: SimpleCellAddress): SimpleRangeValue | CellError {
-    const [rangeArg, sizeArg] = ast.args as [Ast, NumberAst]
-
-    const rangeMatrix = coerceToRangeNumbersOrError(this.evaluateAst(rangeArg, formulaAddress))
-    const windowSize = sizeArg.value
-    let stride = windowSize
-
-    if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
-      return new CellError(ErrorType.NUM, ErrorMessage.EmptyArg )
-    }
-    if (ast.args.length === 3) {
-      const strideArg = ast.args[2]
-      if (strideArg.type === AstNodeType.NUMBER) {
-        stride = strideArg.value
-      } else {
-        return new CellError(ErrorType.VALUE, ErrorMessage.NumberExpected)
+  public mmult(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InterpreterValue {
+    return this.runMatrixFunction(ast.args, formulaAddress, this.metadata('MMULT'), (leftMatrix: SimpleRangeValue, rightMatrix: SimpleRangeValue) => {
+      if (!leftMatrix.hasOnlyNumbers() || !rightMatrix.hasOnlyNumbers()) {
+        return new CellError(ErrorType.VALUE, ErrorMessage.NumberRange)
       }
-    }
+      const outputSize = matrixSizeForMultiplication(leftMatrix.size, rightMatrix.size)
 
-    if (rangeMatrix instanceof CellError) {
-      return rangeMatrix
-    } else if (rangeMatrix === null) {
-      return new CellError(ErrorType.VALUE, ErrorMessage.NumberRange)
-    }
-
-    const outputSize = matrixSizeForPoolFunction(rangeMatrix.size, windowSize, stride)
-
-    /* istanbul ignore next: gpu.js */
-    const gpu = this.interpreter.getGpuInstance()
-    const kernel = gpu.createKernel(function(a: number[][], windowSize: number, stride: number) {
-      const leftCornerX = this.thread.x * stride
-      const leftCornerY = this.thread.y as number * stride
-      let currentMax = a[leftCornerY][leftCornerX]
-      for (let i = 0; i < windowSize; i++) {
-        for (let j = 0; j < windowSize; j++) {
-          currentMax = Math.max(currentMax, a[leftCornerY + i][leftCornerX + j])
+      const result = this.createKernel(function(a: number[][], b: number[][], width: number): number {
+        let sum = 0
+        for (let i = 0; i < width; ++i) {
+          sum += a[this.thread.y as number][i] * b[i][this.thread.x]
         }
-      }
-      return currentMax
-    }).setPrecision('unsigned')
-      .setOutput([outputSize.width, outputSize.height])
+        return sum
+      }, outputSize)(leftMatrix.rawNumbers(), rightMatrix.rawNumbers(), leftMatrix.width())
 
-    return SimpleRangeValue.onlyNumbersDataWithoutRange(
-      kernel(rangeMatrix.rawNumbers(), windowSize, stride) as number[][],
-      outputSize,
-    )
+      return SimpleRangeValue.onlyNumbersDataWithoutRange(result, outputSize)
+    })
   }
 
-  public medianpool(ast: ProcedureAst, formulaAddress: SimpleCellAddress): SimpleRangeValue | CellError {
-    const [rangeArg, sizeArg] = ast.args as [Ast, NumberAst]
-
-    if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
-      return new CellError(ErrorType.NUM, ErrorMessage.EmptyArg )
-    }
-    const rangeMatrix = coerceToRangeNumbersOrError(this.evaluateAst(rangeArg, formulaAddress))
-    const windowSize = sizeArg.value
-    let stride = windowSize
-
-    if (ast.args.length === 3) {
-      const strideArg = ast.args[2]
-      if (strideArg.type === AstNodeType.NUMBER) {
-        stride = strideArg.value
-      } else {
-        return new CellError(ErrorType.VALUE, ErrorMessage.NumberExpected)
+  public maxpool(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InterpreterValue {
+    return this.runMatrixFunction(ast.args, formulaAddress, this.metadata('MAXPOOL'), (matrix: SimpleRangeValue, windowSize: number, stride: number = windowSize) => {
+      if (!matrix.hasOnlyNumbers()) {
+        return new CellError(ErrorType.VALUE, ErrorMessage.NumberRange)
       }
-    }
+      const outputSize = matrixSizeForPoolFunction(matrix.size, windowSize, stride)
 
-    if (rangeMatrix instanceof CellError) {
-      return rangeMatrix
-    } else if (rangeMatrix === null) {
-      return new CellError(ErrorType.VALUE, ErrorMessage.NumberRange)
-    }
-
-    const outputSize = matrixSizeForPoolFunction(rangeMatrix.size, windowSize, stride)
-
-    /* istanbul ignore next: gpu.js */
-    const gpu = this.interpreter.getGpuInstance()
-    const kernel = gpu.createKernel(function(a: number[][], windowSize: number, stride: number) {
-      const leftCornerX = this.thread.x * stride
-      const leftCornerY = this.thread.y as number * stride
-      let currentMax = a[leftCornerY][leftCornerX]
-      for (let i = 0; i < windowSize; i++) {
-        for (let j = 0; j < windowSize; j++) {
-          currentMax = Math.max(currentMax, a[leftCornerY + i][leftCornerX + j])
+      const result = this.createKernel(function(a: number[][], windowSize: number, stride: number): number {
+        const leftCornerX = this.thread.x * stride
+        const leftCornerY = this.thread.y as number * stride
+        let currentMax = a[leftCornerY][leftCornerX]
+        for (let i = 0; i < windowSize; i++) {
+          for (let j = 0; j < windowSize; j++) {
+            currentMax = Math.max(currentMax, a[leftCornerY + i][leftCornerX + j])
+          }
         }
-      }
-      let currentMin = a[leftCornerY][leftCornerX]
-      for (let i2 = 0; i2 < windowSize; i2++) {
-        for (let j2 = 0; j2 < windowSize; j2++) {
-          currentMin = Math.min(currentMin, a[leftCornerY + i2][leftCornerX + j2])
-        }
-      }
+        return currentMax
+      }, outputSize)(matrix.rawNumbers(), windowSize, stride)
 
-      const numberOfElements = windowSize * windowSize
-      let leftEnd = currentMin
-      let rightEnd = currentMax
-      let result = 42
-      for (let iter = 0; iter < 32; iter++) {
-        const medianGuess = (leftEnd + rightEnd) / 2
-        let medianGuessCount = 0
-        for (let i3 = 0; i3 < windowSize; i3++) {
-          for (let j3 = 0; j3 < windowSize; j3++) {
-            if (a[leftCornerY + i3][leftCornerX + j3] > medianGuess) {
-              medianGuessCount++
+      return SimpleRangeValue.onlyNumbersDataWithoutRange(result, outputSize)
+    })
+  }
+
+  public medianpool(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InterpreterValue {
+    return this.runMatrixFunction(ast.args, formulaAddress, this.metadata('MEDIANPOOL'), (matrix: SimpleRangeValue, windowSize: number, stride: number = windowSize) => {
+      if (!matrix.hasOnlyNumbers()) {
+        return new CellError(ErrorType.VALUE, ErrorMessage.NumberRange)
+      }
+      const outputSize = matrixSizeForPoolFunction(matrix.size, windowSize, stride)
+
+      const result = this.createKernel(function(a: number[][], windowSize: number, stride: number): number {
+        const leftCornerX = this.thread.x * stride
+        const leftCornerY = this.thread.y as number * stride
+        let currentMax = a[leftCornerY][leftCornerX]
+        for (let i = 0; i < windowSize; i++) {
+          for (let j = 0; j < windowSize; j++) {
+            currentMax = Math.max(currentMax, a[leftCornerY + i][leftCornerX + j])
+          }
+        }
+        let currentMin = a[leftCornerY][leftCornerX]
+        for (let i2 = 0; i2 < windowSize; i2++) {
+          for (let j2 = 0; j2 < windowSize; j2++) {
+            currentMin = Math.min(currentMin, a[leftCornerY + i2][leftCornerX + j2])
+          }
+        }
+
+        const numberOfElements = windowSize * windowSize
+        let leftEnd = currentMin
+        let rightEnd = currentMax
+        let result = 42
+        for (let iter = 0; iter < 32; iter++) {
+          const medianGuess = (leftEnd + rightEnd) / 2
+          let medianGuessCount = 0
+          for (let i3 = 0; i3 < windowSize; i3++) {
+            for (let j3 = 0; j3 < windowSize; j3++) {
+              if (a[leftCornerY + i3][leftCornerX + j3] > medianGuess) {
+                medianGuessCount++
+              }
+            }
+          }
+
+          if (windowSize % 2 === 0) {
+            if (medianGuessCount === numberOfElements / 2) {
+              result = medianGuess
+              break
+            } else if (medianGuessCount > numberOfElements / 2) {
+              leftEnd = medianGuess
+            } else {
+              rightEnd = medianGuess
+            }
+          } else {
+            if (medianGuessCount === (numberOfElements - 1) / 2) {
+              result = medianGuess
+              break
+            } else if (medianGuessCount > (numberOfElements - 1) / 2) {
+              leftEnd = medianGuess
+            } else {
+              rightEnd = medianGuess
             }
           }
         }
+        return result
+      }, outputSize)(matrix.rawNumbers(), windowSize, stride)
 
-        if (windowSize % 2 === 0) {
-          if (medianGuessCount === numberOfElements / 2) {
-            result = medianGuess
-            break
-          } else if (medianGuessCount > numberOfElements / 2) {
-            leftEnd = medianGuess
-          } else {
-            rightEnd = medianGuess
-          }
-        } else {
-          if (medianGuessCount === (numberOfElements - 1) / 2) {
-            result = medianGuess
-            break
-          } else if (medianGuessCount > (numberOfElements - 1) / 2) {
-            leftEnd = medianGuess
-          } else {
-            rightEnd = medianGuess
-          }
+      return SimpleRangeValue.onlyNumbersDataWithoutRange(result, outputSize)
+    })
+  }
+
+  public transpose(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InterpreterValue {
+    return this.runMatrixFunction(ast.args, formulaAddress, this.metadata('TRANSPOSE'), (matrix: SimpleRangeValue) => {
+      if (!matrix.hasOnlyNumbers()) {
+        return new CellError(ErrorType.VALUE, ErrorMessage.NumberRange)
+      }
+      const input = matrix.rawNumbers()
+      const inputSize = matrix.size
+      const result: number[][] = []
+      for (let i = 0; i < inputSize.width; ++i) {
+        result[i] = []
+        for (let j = 0; j < inputSize.height; ++j) {
+          result[i][j] = input[j][i]
+        }
+      }
+
+      return SimpleRangeValue.onlyNumbersDataWithoutRange(result, matrixSizeForTranspose(inputSize))
+    })
+  }
+
+  private createCpuKernel = (kernel: KernelFunction, outputSize: MatrixSize): KernelRunShortcut => {
+    return function(...args: any[]) {
+      const result: number[][] = []
+      for (let y = 0; y < outputSize.height; ++y) {
+        result.push([])
+        for (let x = 0; x < outputSize.width; ++x) {
+          result[y][x] = kernel.apply({ thread: { x, y }}, args)
         }
       }
       return result
-    }).setPrecision('unsigned')
-      .setOutput([outputSize.width, outputSize.height])
-
-    return SimpleRangeValue.onlyNumbersDataWithoutRange(
-      kernel(rangeMatrix.rawNumbers(), windowSize, stride) as number[][],
-      outputSize,
-    )
+    }
   }
 
-  public transpose(ast: ProcedureAst, formulaAddress: SimpleCellAddress): SimpleRangeValue | CellError {
-    if (ast.args.length !== 1) {
-      return new CellError(ErrorType.NA, ErrorMessage.WrongArgNumber)
-    }
-    if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
-      return new CellError(ErrorType.NUM, ErrorMessage.EmptyArg )
-    }
-    const value = coerceToRangeNumbersOrError(this.evaluateAst(ast.args[0], formulaAddress))
-
-    if (value instanceof CellError) {
-      return value
-    } else if (value === null) {
-      return new CellError(ErrorType.VALUE, ErrorMessage.NumberRange)
-    }
-
-    const input = value.rawNumbers()
-    const inputSize = value.size
-    const result: number[][] = []
-    for (let i = 0; i < inputSize.width; ++i) {
-      result[i] = []
-      for (let j = 0; j < inputSize.height; ++j) {
-        result[i][j] = input[j][i]
-      }
-    }
-
-    return SimpleRangeValue.onlyNumbersDataWithoutRange(result, matrixSizeForTranspose(inputSize))
+  private createGpuJsKernel = (kernel: KernelFunction, outputSize: MatrixSize): KernelRunShortcut => {
+    return this.interpreter.getGpuInstance()
+      .createKernel(kernel)
+      .setPrecision('unsigned')
+      .setOutput([outputSize.width, outputSize.height]) as KernelRunShortcut
   }
 }

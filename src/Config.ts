@@ -21,10 +21,13 @@ import {TranslationPackage} from './i18n'
 import {FunctionPluginDefinition} from './interpreter/plugin/FunctionPlugin'
 import {Maybe} from './Maybe'
 import {ParserConfig} from './parser/ParserConfig'
+import {checkLicenseKeyValidity, LicenseKeyValidityState} from './helpers/licenseKeyValidator'
+import {FunctionPluginDefinition} from './interpreter'
+import GPU from 'gpu.js'
 
-type GPUMode = 'gpu' | 'cpu' | 'dev'
+type GPUMode = 'gpu' | 'cpu' | 'dev' | 'fallback'
 
-const PossibleGPUModeString: GPUMode[] = ['gpu', 'cpu', 'dev']
+const PossibleGPUModeString: GPUMode[] = ['gpu', 'cpu', 'dev', 'fallback']
 
 export interface ConfigParams {
   /**
@@ -636,6 +639,10 @@ export class Config implements ConfigParams, ParserConfig {
       {value: this.functionArgSeparator, name: 'functionArgSeparator'},
       {value: this.thousandSeparator, name: 'thousandSeparator'}
     )
+
+    if (GPU === undefined) {
+      this.gpuMode = 'fallback'
+    }
   }
 
   public getConfig(): ConfigParams { //TODO: avoid pollution
