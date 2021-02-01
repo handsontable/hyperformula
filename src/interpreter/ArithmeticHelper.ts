@@ -11,20 +11,20 @@ import {Maybe} from '../Maybe'
 import {NumberLiteralHelper} from '../NumberLiteralHelper'
 import {collatorFromConfig} from '../StringHelper'
 import {
+  cloneNumber,
+  CurrencyNumber, DateNumber, DateTimeNumber,
   EmptyValue,
   ExtendedNumber,
-  ExtendedNumberFactory,
-  getRawValue,
-  getTypeOfExtendedNumber,
+  getRawValue, getTypeFormatOfExtendedNumber,
   InternalNoErrorScalarValue,
   InternalScalarValue,
   InterpreterValue,
   isExtendedNumber,
-  NumberType,
+  NumberType, NumberTypeWithFormat,
   PercentNumber,
   RawInterpreterValue,
   RawNoErrorScalarValue,
-  RawScalarValue
+  RawScalarValue, TimeNumber
 } from './InterpreterValue'
 import {SimpleRangeValue} from './SimpleRangeValue'
 import Collator = Intl.Collator
@@ -199,17 +199,12 @@ export class ArithmeticHelper {
     }
   }
   public addWithEpsilon = (left: ExtendedNumber, right: ExtendedNumber): ExtendedNumber => {
-    return ExtendedNumberFactory(
-      inferExtendedNumberTypeAdditive(
-        getTypeOfExtendedNumber(left),
-        getTypeOfExtendedNumber(right)
-      ),
-      this.addWithEpsilonRaw(getRawValue(left), getRawValue(right))
-    )
+    const typeOfResult = inferExtendedNumberTypeAdditive(left, right)
+    return this.ExtendedNumberFactory(this.addWithEpsilonRaw(getRawValue(left), getRawValue(right)), typeOfResult)
   }
 
   public unaryMinus = (arg: ExtendedNumber): ExtendedNumber => {
-    return ExtendedNumberFactory(getTypeOfExtendedNumber(arg), -getRawValue(arg))
+    return cloneNumber(arg, -getRawValue(arg))
   }
 
   public unaryPlus = (arg: ExtendedNumber): ExtendedNumber => {
@@ -252,17 +247,14 @@ export class ArithmeticHelper {
    * @param eps - precision of comparison
    */
   public subtract = (leftArg: ExtendedNumber, rightArg: ExtendedNumber): ExtendedNumber => {
-    const typeOfResult = inferExtendedNumberTypeAdditive(
-      getTypeOfExtendedNumber(leftArg),
-      getTypeOfExtendedNumber(rightArg)
-    )
+    const typeOfResult = inferExtendedNumberTypeAdditive(leftArg, rightArg)
     const left = getRawValue(leftArg)
     const right = getRawValue(rightArg)
     let ret = left - right
     if (Math.abs(ret) < this.actualEps * Math.abs(left)) {
       ret = 0
     }
-    return ExtendedNumberFactory(typeOfResult, ret)
+    return this.ExtendedNumberFactory(ret, typeOfResult)
   }
 
   public divide = (leftArg: ExtendedNumber, rightArg: ExtendedNumber): ExtendedNumber | CellError => {
@@ -271,20 +263,14 @@ export class ArithmeticHelper {
     if (right === 0) {
       return new CellError(ErrorType.DIV_BY_ZERO)
     } else {
-      const typeOfResult = inferExtendedNumberTypeMultiplicative(
-        getTypeOfExtendedNumber(leftArg),
-        getTypeOfExtendedNumber(rightArg)
-      )
-      return ExtendedNumberFactory(typeOfResult, left / right)
+      const typeOfResult = inferExtendedNumberTypeMultiplicative(leftArg, rightArg)
+      return this.ExtendedNumberFactory(left / right, typeOfResult)
     }
   }
 
   public multiply = (left: ExtendedNumber, right: ExtendedNumber): ExtendedNumber => {
-    const typeOfResult = inferExtendedNumberTypeMultiplicative(
-      getTypeOfExtendedNumber(left),
-      getTypeOfExtendedNumber(right)
-    )
-    return ExtendedNumberFactory(typeOfResult, getRawValue(left)*getRawValue(right))
+    const typeOfResult = inferExtendedNumberTypeMultiplicative(left, right)
+    return this.ExtendedNumberFactory(getRawValue(left)*getRawValue(right), typeOfResult)
   }
 
   public coerceScalarToNumberOrError(arg: InternalScalarValue): ExtendedNumber | CellError {
@@ -508,6 +494,25 @@ export class ArithmeticHelper {
       return [0, val]
     }
   }
+
+  public ExtendedNumberFactory(value: number, typeFormat: NumberTypeWithFormat): ExtendedNumber {
+    const {type, format} = typeFormat
+    switch (type) {
+      case NumberType.NUMBER_RAW:
+        return value
+      case NumberType.NUMBER_CURRENCY: {
+        return new CurrencyNumber(value, format ?? this.config.currencySymbol[0])
+      }
+      case NumberType.NUMBER_DATE:
+        return new DateNumber(value, format)
+      case NumberType.NUMBER_DATETIME:
+        return new DateTimeNumber(value, format)
+      case NumberType.NUMBER_TIME:
+        return new TimeNumber(value, format)
+      case NumberType.NUMBER_PERCENT:
+        return new PercentNumber(value, format)
+    }
+  }
 }
 
 export function coerceComplexToString([re, im]: complex, symb?: string): string | CellError {
@@ -695,38 +700,44 @@ function escapeNoCharacters(pattern: string, caseSensitive: boolean): string {
   return str
 }
 
-function inferExtendedNumberTypeAdditive(left: NumberType, right: NumberType): NumberType {
-  if(left === NumberType.NUMBER_RAW) {
-    return right
+function inferExtendedNumberTypeAdditive(leftArg: ExtendedNumber, rightArg: ExtendedNumber): NumberTypeWithFormat {
+  const {type: leftType, format: leftFormat} = getTypeFormatOfExtendedNumber(leftArg)
+  const {type: rightType, format: rightFormat} = getTypeFormatOfExtendedNumber(rightArg)
+  if(leftType === NumberType.NUMBER_RAW) {
+    return {type: rightType, format: rightFormat}
   }
-  if(right === NumberType.NUMBER_RAW) {
-    return left
+  if(rightType === NumberType.NUMBER_RAW) {
+    return {type: leftType, format: leftFormat}
   }
-  if((left === NumberType.NUMBER_DATETIME || left === NumberType.NUMBER_DATE)
-    && (right === NumberType.NUMBER_DATETIME || right === NumberType.NUMBER_DATE)) {
-    return NumberType.NUMBER_RAW
+  if((leftType === NumberType.NUMBER_DATETIME || leftType === NumberType.NUMBER_DATE)
+    && (rightType === NumberType.NUMBER_DATETIME || rightType === NumberType.NUMBER_DATE)) {
+    return {type: NumberType.NUMBER_RAW}
   }
-  if((left === NumberType.NUMBER_DATETIME || left === NumberType.NUMBER_TIME || left === NumberType.NUMBER_DATE)
-    && (right === NumberType.NUMBER_DATETIME || right === NumberType.NUMBER_TIME || right === NumberType.NUMBER_DATE)) {
-    if(left !== right) {
-      return NumberType.NUMBER_DATETIME
+  if((leftType === NumberType.NUMBER_DATETIME || leftType === NumberType.NUMBER_TIME || leftType === NumberType.NUMBER_DATE)
+    && (rightType === NumberType.NUMBER_DATETIME || rightType === NumberType.NUMBER_TIME || rightType === NumberType.NUMBER_DATE)) {
+    if(leftType !== rightType) {
+      return {type: NumberType.NUMBER_DATETIME}
     }
   }
-  return left
+  return {type: leftType, format: leftFormat}
 }
 
-function inferExtendedNumberTypeMultiplicative(left: NumberType, right: NumberType): NumberType {
-  if(left === NumberType.NUMBER_PERCENT) {
-    left = NumberType.NUMBER_RAW
+function inferExtendedNumberTypeMultiplicative(leftArg: ExtendedNumber, rightArg: ExtendedNumber): NumberTypeWithFormat {
+  let {type: leftType, format: leftFormat} = getTypeFormatOfExtendedNumber(leftArg)
+  let {type: rightType, format: rightFormat} = getTypeFormatOfExtendedNumber(rightArg)
+  if(leftType === NumberType.NUMBER_PERCENT) {
+    leftType = NumberType.NUMBER_RAW
+    leftFormat = undefined
   }
-  if(right === NumberType.NUMBER_PERCENT) {
-    right = NumberType.NUMBER_RAW
+  if(rightType === NumberType.NUMBER_PERCENT) {
+    rightType = NumberType.NUMBER_RAW
+    rightFormat = undefined
   }
-  if(left === NumberType.NUMBER_RAW) {
-    return right
+  if(leftType === NumberType.NUMBER_RAW) {
+    return {type: rightType, format: rightFormat}
   }
-  if(right === NumberType.NUMBER_RAW) {
-    return left
+  if(rightType === NumberType.NUMBER_RAW) {
+    return {type: leftType, format: leftFormat}
   }
-  return NumberType.NUMBER_RAW
+  return {type: NumberType.NUMBER_RAW}
 }

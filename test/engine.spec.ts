@@ -668,6 +668,18 @@ describe('#getCellValueDetailedType', () => {
   })
 })
 
+describe('#getCellValueFormat', () => {
+  it('non-currency', () => {
+    const engine = HyperFormula.buildFromArray([['foo']])
+    expect(engine.getCellValueFormat(adr('A1'))).toEqual(undefined)
+  })
+
+  it('currency', () => {
+    const engine = HyperFormula.buildFromArray([['1PLN']], {currencySymbol: ['PLN', '$']})
+    expect(engine.getCellValueFormat(adr('A1'))).toEqual('PLN')
+  })
+})
+
 describe('#getCellValueType', () => {
   it('string', () => {
     const engine = HyperFormula.buildFromArray([['foo']])

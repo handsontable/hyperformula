@@ -46,6 +46,7 @@ import {FunctionArgument, FunctionPlugin, FunctionPluginDefinition} from './inte
 import * as plugins from './interpreter/plugin'
 import {NamedExpression, NamedExpressionOptions} from './NamedExpressions'
 import {Sheet, SheetDimensions, Sheets} from './Sheet'
+import {FormatInfo} from './interpreter/InterpreterValue'
 
 /** @internal */
 class HyperFormulaNS extends HyperFormula {
@@ -109,6 +110,7 @@ export {
   ConfigParams,
   ExportedChange,
   RawCellContent,
+  FormatInfo,
   Sheet,
   Sheets,
   SheetDimensions,
