@@ -16,7 +16,6 @@ import {
   EmptyValue,
   ExtendedNumber,
   getRawValue, getTypeFormatOfExtendedNumber,
-  getTypeOfExtendedNumber,
   InternalNoErrorScalarValue,
   InternalScalarValue,
   InterpreterValue,

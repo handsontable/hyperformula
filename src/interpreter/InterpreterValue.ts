@@ -97,6 +97,15 @@ export function getTypeOfExtendedNumber(num: ExtendedNumber): NumberType {
 }
 
 export type FormatInfo = string | undefined
+
+export function getFormatOfExtendedNumber(num: ExtendedNumber): FormatInfo {
+  if(num instanceof RichNumber) {
+    return num.format
+  } else {
+    return undefined
+  }
+}
+
 export type NumberTypeWithFormat = {type: NumberType, format?: FormatInfo}
 
 export function getTypeFormatOfExtendedNumber(num: ExtendedNumber): NumberTypeWithFormat {
