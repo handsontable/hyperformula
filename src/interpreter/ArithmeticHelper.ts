@@ -701,8 +701,8 @@ function escapeNoCharacters(pattern: string, caseSensitive: boolean): string {
 }
 
 function inferExtendedNumberTypeAdditive(leftArg: ExtendedNumber, rightArg: ExtendedNumber): NumberTypeWithFormat {
-  let {type: leftType, format: leftFormat} = getTypeFormatOfExtendedNumber(leftArg)
-  let {type: rightType, format: rightFormat} = getTypeFormatOfExtendedNumber(rightArg)
+  const {type: leftType, format: leftFormat} = getTypeFormatOfExtendedNumber(leftArg)
+  const {type: rightType, format: rightFormat} = getTypeFormatOfExtendedNumber(rightArg)
   if(leftType === NumberType.NUMBER_RAW) {
     return {type: rightType, format: rightFormat}
   }
