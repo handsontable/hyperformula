@@ -15,10 +15,8 @@ import {
   ExpectedValueOfTypeError
 } from './errors'
 import {defaultStringifyDateTime, defaultStringifyDuration} from './format/format'
-import {checkLicenseKeyValidity, LicenseKeyValidityState} from './helpers/licenseKeyValidator'
 import {HyperFormula} from './HyperFormula'
 import {TranslationPackage} from './i18n'
-import {FunctionPluginDefinition} from './interpreter/plugin/FunctionPlugin'
 import {Maybe} from './Maybe'
 import {ParserConfig} from './parser/ParserConfig'
 import {checkLicenseKeyValidity, LicenseKeyValidityState} from './helpers/licenseKeyValidator'

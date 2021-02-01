@@ -5,14 +5,10 @@
 
 import {CellError, ErrorType, SimpleCellAddress} from '../../Cell'
 import {ErrorMessage} from '../../error-message'
-import {matrixSizeForMultiplication, matrixSizeForPoolFunction, matrixSizeForTranspose} from '../../Matrix'
-import {Ast, AstNodeType, NumberAst, ProcedureAst} from '../../parser'
-import {coerceToRangeNumbersOrError} from '../ArithmeticHelper'
-import {SimpleRangeValue} from '../SimpleRangeValue'
-import {FunctionPlugin} from './FunctionPlugin'
 import {MatrixSize, matrixSizeForMultiplication, matrixSizeForPoolFunction, matrixSizeForTranspose} from '../../Matrix'
 import {ProcedureAst} from '../../parser'
-import {InterpreterValue, SimpleRangeValue} from '../InterpreterValue'
+import {InterpreterValue} from '../InterpreterValue'
+import {SimpleRangeValue} from '../SimpleRangeValue'
 import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
 import {Interpreter} from '../Interpreter'
 
