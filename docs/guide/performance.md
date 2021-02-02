@@ -89,6 +89,8 @@ the bigger the performance gain.
 **For small data sets, the difference between the CPU and GPU is
 non-significant.**
 
+[See how to enable GPU acceleration &#8594;](enabling-gpu-acceleration.md)
+
 ## Benchmarks
 
 HyperFormula's performance has been tested on different devices,

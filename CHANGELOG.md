@@ -6,6 +6,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- GPU.js constructor needs to be provided directly to engine configuration. (#355)
+
 ### Added
 - Added support for row and column reordering. (#343)
 - Added type inferrence for subtypes for number. (#313)

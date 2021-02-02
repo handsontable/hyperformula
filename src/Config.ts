@@ -21,11 +21,11 @@ import {Maybe} from './Maybe'
 import {ParserConfig} from './parser/ParserConfig'
 import {checkLicenseKeyValidity, LicenseKeyValidityState} from './helpers/licenseKeyValidator'
 import {FunctionPluginDefinition} from './interpreter'
-import GPU from 'gpu.js'
+import type { GPU } from 'gpu.js'
 
-type GPUMode = 'gpu' | 'cpu' | 'dev' | 'fallback'
+type GPUMode = 'gpu' | 'cpu' | 'dev'
 
-const PossibleGPUModeString: GPUMode[] = ['gpu', 'cpu', 'dev', 'fallback']
+const PossibleGPUModeString: GPUMode[] = ['gpu', 'cpu', 'dev']
 
 export interface ConfigParams {
   /**
@@ -154,6 +154,14 @@ export interface ConfigParams {
    */
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   functionPlugins: any[],
+  /**
+   * A GPU.js constructor used by matrix functions. When not provided, plain cpu implementation will be used.
+   *
+   * @default undefined
+   *
+   * @category Engine
+   */
+  gpujs?: typeof GPU,
   /**
    * Allows to set GPU or CPU for use in matrix calculations.
    * When set to 'gpu' it will try to use GPU for matrix calculations. Setting it to 'cpu' will force CPU usage.
@@ -399,6 +407,7 @@ export class Config implements ConfigParams, ParserConfig {
     language: 'enGB',
     licenseKey: '',
     functionPlugins: [],
+    gpujs: undefined,
     gpuMode: 'gpu',
     leapYear1900: false,
     smartRounding: true,
@@ -451,6 +460,8 @@ export class Config implements ConfigParams, ParserConfig {
   /** @inheritDoc */
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   public readonly functionPlugins: FunctionPluginDefinition[]
+  /** @inheritDoc */
+  public readonly gpujs?: typeof GPU
   /** @inheritDoc */
   public readonly gpuMode: GPUMode
   /** @inheritDoc */
@@ -542,6 +553,7 @@ export class Config implements ConfigParams, ParserConfig {
       language,
       licenseKey,
       functionPlugins,
+      gpujs,
       gpuMode,
       ignorePunctuation,
       leapYear1900,
@@ -585,6 +597,7 @@ export class Config implements ConfigParams, ParserConfig {
     this.thousandSeparator = this.valueFromParam(thousandSeparator, ['', ',', ' ', '.'], 'thousandSeparator')
     this.localeLang = this.valueFromParam(localeLang, 'string', 'localeLang')
     this.functionPlugins = functionPlugins ?? Config.defaultConfig.functionPlugins
+    this.gpujs = gpujs ?? Config.defaultConfig.gpujs
     this.gpuMode = this.valueFromParam(gpuMode, PossibleGPUModeString, 'gpuMode')
     this.smartRounding = this.valueFromParam(smartRounding, 'boolean', 'smartRounding')
     this.matrixDetection = this.valueFromParam(matrixDetection, 'boolean', 'matrixDetection')
@@ -637,10 +650,6 @@ export class Config implements ConfigParams, ParserConfig {
       {value: this.functionArgSeparator, name: 'functionArgSeparator'},
       {value: this.thousandSeparator, name: 'thousandSeparator'}
     )
-
-    if (GPU === undefined) {
-      this.gpuMode = 'fallback'
-    }
   }
 
   public getConfig(): ConfigParams { //TODO: avoid pollution

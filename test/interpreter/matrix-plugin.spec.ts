@@ -4,6 +4,7 @@ import {ErrorMessage} from '../../src/error-message'
 import {MatrixPlugin} from '../../src/interpreter/plugin/MatrixPlugin'
 import {adr, detailedError} from '../testUtils'
 import {ConfigParams} from '../../src/Config'
+import GPU from 'gpu.js'
 
 describe('Matrix plugin', () => {
   beforeAll(() => {
@@ -210,9 +211,9 @@ describe('Matrix plugin', () => {
     })
   }
 
-  describe('GPU.js', () => sharedExamples({gpuMode: 'cpu'}))
+  describe('GPU.js', () => sharedExamples({gpujs: GPU.GPU ?? GPU, gpuMode: 'cpu'}))
 
-  describe('CPU fallback', () => sharedExamples({gpuMode: 'fallback'}))
+  describe('CPU fallback', () => sharedExamples({}))
 })
 
 describe('Function TRANSPOSE', () => {

@@ -96,7 +96,7 @@ describe('Config', () => {
     expect(() => new Config({dateFormats: {}})).toThrowError('Expected value of type: array for config parameter: dateFormats')
     // eslint-disable-next-line
     // @ts-ignore
-    expect(() => new Config({gpuMode: 'abcd'})).toThrowError('Expected one of \'gpu\' \'cpu\' \'dev\' \'fallback\' for config parameter: gpuMode')
+    expect(() => new Config({gpuMode: 'abcd'})).toThrowError('Expected one of \'gpu\' \'cpu\' \'dev\' for config parameter: gpuMode')
     // eslint-disable-next-line
     // @ts-ignore
     expect(() => new Config({caseFirst: 'abcd'})).toThrowError('Expected one of \'upper\' \'lower\' \'false\' for config parameter: caseFirst')
