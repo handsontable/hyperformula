@@ -1,8 +1,8 @@
 import {HyperFormula} from '../../src'
 import {ErrorType} from '../../src/Cell'
 import {ErrorMessage} from '../../src/error-message'
-import {adr, detailedError} from '../testUtils'
 import {StatType} from '../../src/statistics'
+import {adr, detailedError} from '../testUtils'
 
 describe('Function COUNTIFS', () => {
   it('validates number of arguments', () => {

@@ -3,8 +3,9 @@
  * Copyright (c) 2020 Handsoncode. All rights reserved.
  */
 
-import {InternalScalarValue, SimpleCellAddress} from '../../Cell'
+import {SimpleCellAddress} from '../../Cell'
 import {ProcedureAst} from '../../parser'
+import {InternalScalarValue} from '../InterpreterValue'
 import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
 
 export class SimpleArithmerticPlugin extends  FunctionPlugin {
@@ -12,103 +13,103 @@ export class SimpleArithmerticPlugin extends  FunctionPlugin {
     'HF.ADD': {
       method: 'add',
       parameters: [
-        { argumentType: ArgumentTypes.NUMBER },
-        { argumentType: ArgumentTypes.NUMBER },
+        { argumentType: ArgumentTypes.NUMBER, passSubtype: true },
+        { argumentType: ArgumentTypes.NUMBER, passSubtype: true },
       ],
     },
     'HF.CONCAT' : {
       method: 'concat',
       parameters: [
-        { argumentType: ArgumentTypes.STRING },
-        { argumentType: ArgumentTypes.STRING },
+        { argumentType: ArgumentTypes.STRING, passSubtype: true },
+        { argumentType: ArgumentTypes.STRING, passSubtype: true },
       ],
     },
     'HF.DIVIDE': {
       method: 'divide',
       parameters: [
-        { argumentType: ArgumentTypes.NUMBER },
-        { argumentType: ArgumentTypes.NUMBER },
+        { argumentType: ArgumentTypes.NUMBER, passSubtype: true },
+        { argumentType: ArgumentTypes.NUMBER, passSubtype: true },
       ],
     },
     'HF.EQ': {
       method: 'eq',
       parameters: [
-        { argumentType: ArgumentTypes.NOERROR },
-        { argumentType: ArgumentTypes.NOERROR },
+        { argumentType: ArgumentTypes.NOERROR, passSubtype: true },
+        { argumentType: ArgumentTypes.NOERROR, passSubtype: true },
       ]
     },
     'HF.GT': {
       method: 'gt',
       parameters: [
-        { argumentType: ArgumentTypes.NOERROR },
-        { argumentType: ArgumentTypes.NOERROR },
+        { argumentType: ArgumentTypes.NOERROR, passSubtype: true },
+        { argumentType: ArgumentTypes.NOERROR, passSubtype: true },
       ]
     },
     'HF.GTE': {
       method: 'gte',
       parameters: [
-        { argumentType: ArgumentTypes.NOERROR },
-        { argumentType: ArgumentTypes.NOERROR },
+        { argumentType: ArgumentTypes.NOERROR, passSubtype: true },
+        { argumentType: ArgumentTypes.NOERROR, passSubtype: true },
       ]
     },
     'HF.LT': {
       method: 'lt',
       parameters: [
-        { argumentType: ArgumentTypes.NOERROR },
-        { argumentType: ArgumentTypes.NOERROR },
+        { argumentType: ArgumentTypes.NOERROR, passSubtype: true },
+        { argumentType: ArgumentTypes.NOERROR, passSubtype: true },
       ]
     },
     'HF.LTE': {
       method: 'lte',
       parameters: [
-        { argumentType: ArgumentTypes.NOERROR },
-        { argumentType: ArgumentTypes.NOERROR },
+        { argumentType: ArgumentTypes.NOERROR, passSubtype: true },
+        { argumentType: ArgumentTypes.NOERROR, passSubtype: true },
       ]
     },
     'HF.MINUS': {
       method: 'minus',
       parameters: [
-        { argumentType: ArgumentTypes.NUMBER },
-        { argumentType: ArgumentTypes.NUMBER },
+        { argumentType: ArgumentTypes.NUMBER, passSubtype: true },
+        { argumentType: ArgumentTypes.NUMBER, passSubtype: true },
       ],
     },
     'HF.MULTIPLY': {
       method: 'multiply',
       parameters: [
-        { argumentType: ArgumentTypes.NUMBER },
-        { argumentType: ArgumentTypes.NUMBER },
+        { argumentType: ArgumentTypes.NUMBER, passSubtype: true },
+        { argumentType: ArgumentTypes.NUMBER, passSubtype: true },
       ],
     },
     'HF.NE': {
       method: 'ne',
       parameters: [
-        { argumentType: ArgumentTypes.NOERROR },
-        { argumentType: ArgumentTypes.NOERROR },
+        { argumentType: ArgumentTypes.NOERROR, passSubtype: true },
+        { argumentType: ArgumentTypes.NOERROR, passSubtype: true },
       ]
     },
     'HF.POW': {
       method: 'pow',
       parameters: [
-        { argumentType: ArgumentTypes.NUMBER },
-        { argumentType: ArgumentTypes.NUMBER },
+        { argumentType: ArgumentTypes.NUMBER, passSubtype: true },
+        { argumentType: ArgumentTypes.NUMBER, passSubtype: true },
       ],
     },
     'HF.UMINUS': {
       method: 'uminus',
       parameters: [
-        { argumentType: ArgumentTypes.NUMBER },
+        { argumentType: ArgumentTypes.NUMBER, passSubtype: true },
       ],
     },
     'HF.UNARY_PERCENT': {
       method: 'upercent',
       parameters: [
-        { argumentType: ArgumentTypes.NUMBER },
+        { argumentType: ArgumentTypes.NUMBER, passSubtype: true },
       ],
     },
     'HF.UPLUS': {
       method: 'uplus',
       parameters: [
-        { argumentType: ArgumentTypes.NUMBER },
+        { argumentType: ArgumentTypes.NUMBER, passSubtype: true },
       ],
     },
   }

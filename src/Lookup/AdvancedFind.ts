@@ -3,9 +3,9 @@
  * Copyright (c) 2020 Handsoncode. All rights reserved.
  */
 
-import {DependencyGraph} from '../DependencyGraph'
-import {InternalScalarValue} from '../Cell'
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
+import {DependencyGraph} from '../DependencyGraph'
+import {getRawValue, RawInterpreterValue} from '../interpreter/InterpreterValue'
 
 export abstract class AdvancedFind {
   protected constructor(
@@ -13,10 +13,10 @@ export abstract class AdvancedFind {
   ) {
   }
 
-  public advancedFind(keyMatcher: (arg: InternalScalarValue) => boolean, range: AbsoluteCellRange): number {
+  public advancedFind(keyMatcher: (arg: RawInterpreterValue) => boolean, range: AbsoluteCellRange): number {
     const values = this.dependencyGraph.computeListOfValuesInRange(range)
     for (let i = 0; i < values.length; i++) {
-      if (keyMatcher(values[i])) {
+      if (keyMatcher(getRawValue(values[i]))) {
         return i + range.start.col
       }
     }

@@ -1,9 +1,9 @@
-import {batch, benchmarkCruds, BenchmarkResult} from './benchmark'
-import {adr} from './utils/utils'
 import {HyperFormula} from '../../src'
+import {batch, benchmarkCruds, BenchmarkResult} from './benchmark'
 import {sheet as sheetAGenerator} from './sheets/09-sheet-a'
 import {sheet as sheetBGenerator} from './sheets/10-sheet-b'
 import {sheet as columnRangesGenerator} from './sheets/column-ranges'
+import {adr} from './utils/utils'
 
 (() => {
 

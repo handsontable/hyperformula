@@ -1,11 +1,11 @@
 import {HyperFormula, LanguageAlreadyRegisteredError, LanguageNotRegisteredError} from '../src'
+import {ProtectedFunctionTranslationError} from '../src/errors'
 import {RawTranslationPackage, TranslationPackage} from '../src/i18n'
-import {plPL} from '../src/i18n/languages'
 import * as languages from '../src/i18n/languages'
+import {plPL} from '../src/i18n/languages'
+import {FunctionRegistry} from '../src/interpreter/FunctionRegistry'
 import {CellAddress} from '../src/parser'
 import {adr, extractReference} from './testUtils'
-import {FunctionRegistry} from '../src/interpreter/FunctionRegistry'
-import {ProtectedFunctionTranslationError} from '../src/errors'
 
 describe('i18n', () => {
   // eslint-disable-next-line @typescript-eslint/ban-ts-ignore

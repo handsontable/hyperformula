@@ -1,4 +1,4 @@
-import { JSDOM } from 'jsdom'
+import {JSDOM} from 'jsdom'
 
 const dom = new JSDOM('<html><body></body></html>')
 

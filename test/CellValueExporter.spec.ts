@@ -1,11 +1,12 @@
 import {DetailedCellError, HyperFormula} from '../src'
-import {CellError, EmptyValue, ErrorType} from '../src/Cell'
+import {CellError, ErrorType} from '../src/Cell'
 import {Config} from '../src/Config'
 import {Exporter} from '../src/Exporter'
 import {plPL} from '../src/i18n/languages'
+import {EmptyValue} from '../src/interpreter/InterpreterValue'
+import {NamedExpressions} from '../src/NamedExpressions'
 import {SheetIndexMappingFn} from '../src/parser/addressRepresentationConverters'
 import {detailedError} from './testUtils'
-import {NamedExpressions} from '../src/NamedExpressions'
 
 const namedExpressionsMock = {} as NamedExpressions
 const sheetIndexMock = {} as SheetIndexMappingFn

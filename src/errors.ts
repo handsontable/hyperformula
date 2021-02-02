@@ -5,7 +5,6 @@
 
 import {SimpleCellAddress} from './Cell'
 
-
 /**
  * Error thrown when the sheet of a given ID does not exist.
  */
@@ -169,6 +168,22 @@ export class UnableToParseError extends Error {
 export class ExpectedValueOfTypeError extends Error {
   constructor(expectedType: string, paramName: string) {
     super(`Expected value of type: ${expectedType} for config parameter: ${paramName}`)
+  }
+}
+
+/**
+ * Error thrown when supplied config parameter value is an empty string.
+ * This error might be thrown while setting or updating the [[ConfigParams]].
+ * The following methods accept [[ConfigParams]] as a parameter:
+ *
+ * @see [[buildEmpty]]
+ * @see [[buildFromArray]]
+ * @see [[buildFromSheets]]
+ * @see [[updateConfig]]
+ */
+export class ConfigValueEmpty extends Error {
+  constructor(paramName: string) {
+    super(`Config parameter ${paramName} cannot be empty.`)
   }
 }
 

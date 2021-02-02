@@ -1,5 +1,4 @@
-import {HyperFormula} from '../../src'
-import {CellValueType, ErrorType} from '../../src'
+import {CellValueType, ErrorType, HyperFormula} from '../../src'
 import {ErrorMessage} from '../../src/error-message'
 import {adr, detailedError} from '../testUtils'
 

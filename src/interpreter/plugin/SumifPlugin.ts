@@ -3,12 +3,13 @@
  * Copyright (c) 2020 Handsoncode. All rights reserved.
  */
 
-import {CellError, ErrorType, InternalScalarValue, SimpleCellAddress} from '../../Cell'
+import {CellError, ErrorType, SimpleCellAddress} from '../../Cell'
 import {ErrorMessage} from '../../error-message'
 import {Maybe} from '../../Maybe'
 import {ProcedureAst} from '../../parser'
 import {Condition, CriterionFunctionCompute} from '../CriterionFunctionCompute'
-import {SimpleRangeValue} from '../InterpreterValue'
+import {getRawValue, InternalScalarValue, isExtendedNumber, RawScalarValue} from '../InterpreterValue'
+import {SimpleRangeValue} from '../SimpleRangeValue'
 import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
 
 class AverageResult {
@@ -113,7 +114,7 @@ export class SumifPlugin extends FunctionPlugin {
    */
   public sumif(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.runFunction(ast.args, formulaAddress, this.metadata('SUMIF'),
-      (conditionArg: SimpleRangeValue, criterionValue: InternalScalarValue, valuesArg: Maybe<SimpleRangeValue>) => {
+      (conditionArg: SimpleRangeValue, criterionValue: RawScalarValue, valuesArg: Maybe<SimpleRangeValue>) => {
         const criterion = this.interpreter.criterionBuilder.fromCellValue(criterionValue, this.interpreter.arithmeticHelper)
         if (criterion === undefined) {
           return new CellError(ErrorType.VALUE, ErrorMessage.BadCriterion)
@@ -121,12 +122,12 @@ export class SumifPlugin extends FunctionPlugin {
 
         valuesArg = valuesArg ?? conditionArg
 
-        return  new CriterionFunctionCompute<InternalScalarValue>(
+        return  new CriterionFunctionCompute<RawScalarValue>(
           this.interpreter,
           sumifCacheKey,
           0,
           (left, right) => this.interpreter.arithmeticHelper.nonstrictadd(left, right),
-          (arg) => arg,
+          (arg) => getRawValue(arg),
         ).compute(valuesArg, [new Condition(conditionArg, criterion)])
       }
     )
@@ -144,19 +145,19 @@ export class SumifPlugin extends FunctionPlugin {
         conditions.push(new Condition(conditionArg, criterionPackage))
       }
 
-      return new CriterionFunctionCompute<InternalScalarValue>(
+      return new CriterionFunctionCompute<RawScalarValue>(
         this.interpreter,
         sumifCacheKey,
         0,
         (left, right) => this.interpreter.arithmeticHelper.nonstrictadd(left, right),
-        (arg) => arg,
+        (arg) => getRawValue(arg),
       ).compute(values, conditions)
     })
   }
 
   public averageif(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.runFunction(ast.args, formulaAddress, this.metadata('AVERAGEIF'),
-      (conditionArg: SimpleRangeValue, criterionValue: InternalScalarValue, valuesArg: Maybe<SimpleRangeValue>) => {
+      (conditionArg: SimpleRangeValue, criterionValue: RawScalarValue, valuesArg: Maybe<SimpleRangeValue>) => {
         const criterion = this.interpreter.criterionBuilder.fromCellValue(criterionValue, this.interpreter.arithmeticHelper)
         if (criterion === undefined) {
           return new CellError(ErrorType.VALUE, ErrorMessage.BadCriterion)
@@ -169,9 +170,9 @@ export class SumifPlugin extends FunctionPlugin {
           averageifCacheKey,
           AverageResult.empty,
           (left, right) => left.compose(right),
-          (arg: InternalScalarValue) => {
-            if (typeof arg === 'number') {
-              return AverageResult.single(arg)
+          (arg) => {
+            if (isExtendedNumber(arg)) {
+              return AverageResult.single(getRawValue(arg))
             } else {
               return AverageResult.empty
             }
@@ -199,7 +200,7 @@ export class SumifPlugin extends FunctionPlugin {
    */
   public countif(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.runFunction(ast.args, formulaAddress, this.metadata('COUNTIF'),
-      (conditionArg: SimpleRangeValue, criterionValue: InternalScalarValue) => {
+      (conditionArg: SimpleRangeValue, criterionValue: RawScalarValue) => {
         const criterion = this.interpreter.criterionBuilder.fromCellValue(criterionValue, this.interpreter.arithmeticHelper)
         if (criterion === undefined) {
           return new CellError(ErrorType.VALUE, ErrorMessage.BadCriterion)

@@ -1,8 +1,8 @@
 import {HyperFormula} from '../src'
 import {Config} from '../src/Config'
 import {enGB, plPL} from '../src/i18n/languages'
+import {EmptyValue} from '../src/interpreter/InterpreterValue'
 import {unregisterAllLanguages} from './testUtils'
-import {EmptyValue} from '../src/Cell'
 
 describe('Config', () => {
   beforeEach(() => {
@@ -117,6 +117,19 @@ describe('Config', () => {
     }).toThrowError('Config initialization failed. Parameters in conflict: [decimalSeparator,functionArgSeparator,thousandSeparator]')
   })
 
+  it('should throw error when currency symbol is empty', () => {
+    expect(() => {
+      new Config({ currencySymbol: [''] })
+    }).toThrowError('Config parameter currencySymbol cannot be empty.')
+  })
+
+  it('should throw error when currency symbol is not an array', () => {
+    expect(() => {
+      // eslint-disable-next-line
+      // @ts-ignore
+      new Config({ currencySymbol: '$' })
+    }).toThrowError('Expected value of type: array for config parameter: currencySymbol')
+  })
 
   it('should throw error when decimal separator is not correct', () => {
     expect(() => {

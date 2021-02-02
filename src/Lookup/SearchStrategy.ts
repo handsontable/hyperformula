@@ -4,28 +4,28 @@
  */
 
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
-import {InternalNoErrorScalarValue, InternalScalarValue, SimpleCellAddress} from '../Cell'
+import {SimpleCellAddress} from '../Cell'
 import {Config} from '../Config'
 import {DependencyGraph} from '../DependencyGraph'
-import {InterpreterValue} from '../interpreter/InterpreterValue'
+import {RawInterpreterValue, RawNoErrorScalarValue, RawScalarValue} from '../interpreter/InterpreterValue'
 import {Matrix} from '../Matrix'
+import {ColumnsSpan} from '../Span'
 import {Statistics} from '../statistics/Statistics'
 import {ColumnBinarySearch} from './ColumnBinarySearch'
 import {ColumnIndex} from './ColumnIndex'
-import {ColumnsSpan} from '../Span'
 
 export interface SearchStrategy {
-  find(key: InternalNoErrorScalarValue, range: AbsoluteCellRange, sorted: boolean): number,
+  find(key: RawNoErrorScalarValue, range: AbsoluteCellRange, sorted: boolean): number,
 
-  advancedFind(keyMatcher: (arg: InternalScalarValue) => boolean, range: AbsoluteCellRange): number,
+  advancedFind(keyMatcher: (arg: RawInterpreterValue) => boolean, range: AbsoluteCellRange): number,
 }
 
 export interface ColumnSearchStrategy extends SearchStrategy {
-  add(value: InterpreterValue | Matrix, address: SimpleCellAddress): void,
+  add(value: RawInterpreterValue | Matrix, address: SimpleCellAddress): void,
 
-  remove(value: InterpreterValue | Matrix | null, address: SimpleCellAddress): void,
+  remove(value: RawInterpreterValue | Matrix | null, address: SimpleCellAddress): void,
 
-  change(oldValue: InterpreterValue | Matrix | null, newValue: InterpreterValue | Matrix, address: SimpleCellAddress): void,
+  change(oldValue: RawInterpreterValue | Matrix | null, newValue: RawInterpreterValue | Matrix, address: SimpleCellAddress): void,
 
   addColumns(columnsSpan: ColumnsSpan): void,
 
@@ -33,9 +33,9 @@ export interface ColumnSearchStrategy extends SearchStrategy {
 
   removeSheet(sheetId: number): void,
 
-  moveValues(range: IterableIterator<[InternalScalarValue, SimpleCellAddress]>, toRight: number, toBottom: number, toSheet: number): void,
+  moveValues(range: IterableIterator<[RawScalarValue, SimpleCellAddress]>, toRight: number, toBottom: number, toSheet: number): void,
 
-  removeValues(range: IterableIterator<[InternalScalarValue, SimpleCellAddress]>): void,
+  removeValues(range: IterableIterator<[RawScalarValue, SimpleCellAddress]>): void,
 
   destroy(): void,
 }

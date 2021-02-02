@@ -4,22 +4,16 @@
  */
 
 import {AbsoluteCellRange} from '../../AbsoluteCellRange'
-import {
-  CellError,
-  ErrorType,
-  InternalNoErrorScalarValue,
-  InternalScalarValue,
-  simpleCellAddress,
-  SimpleCellAddress
-} from '../../Cell'
+import {CellError, ErrorType, simpleCellAddress, SimpleCellAddress} from '../../Cell'
 import {ErrorMessage} from '../../error-message'
+import {RowSearchStrategy} from '../../Lookup/RowSearchStrategy'
+import {SearchStrategy} from '../../Lookup/SearchStrategy'
 import {ProcedureAst} from '../../parser'
 import {StatType} from '../../statistics'
-import {SimpleRangeValue} from '../InterpreterValue'
-import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
-import {SearchStrategy} from '../../Lookup/SearchStrategy'
-import {RowSearchStrategy} from '../../Lookup/RowSearchStrategy'
 import {zeroIfEmpty} from '../ArithmeticHelper'
+import {InternalScalarValue, RawNoErrorScalarValue, } from '../InterpreterValue'
+import {SimpleRangeValue} from '../SimpleRangeValue'
+import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
 
 export class LookupPlugin extends FunctionPlugin {
   private rowSearch: RowSearchStrategy = new RowSearchStrategy(this.config, this.dependencyGraph)
@@ -60,7 +54,7 @@ export class LookupPlugin extends FunctionPlugin {
    * @param formulaAddress
    */
   public vlookup(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('VLOOKUP'), (key: InternalNoErrorScalarValue, rangeValue: SimpleRangeValue, index: number, sorted: boolean) => {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('VLOOKUP'), (key: RawNoErrorScalarValue, rangeValue: SimpleRangeValue, index: number, sorted: boolean) => {
       const range = rangeValue.range()
 
       if (range === undefined) {
@@ -84,7 +78,7 @@ export class LookupPlugin extends FunctionPlugin {
    * @param formulaAddress
    */
   public hlookup(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('HLOOKUP'), (key: InternalNoErrorScalarValue, rangeValue: SimpleRangeValue, index: number, sorted: boolean) => {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('HLOOKUP'), (key: RawNoErrorScalarValue, rangeValue: SimpleRangeValue, index: number, sorted: boolean) => {
       const range = rangeValue.range()
       if (range === undefined) {
         return new CellError(ErrorType.VALUE, ErrorMessage.WrongType)
@@ -101,7 +95,7 @@ export class LookupPlugin extends FunctionPlugin {
   }
 
   public match(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('MATCH'), (key: InternalNoErrorScalarValue, rangeValue: SimpleRangeValue, sorted: number) => {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('MATCH'), (key: RawNoErrorScalarValue, rangeValue: SimpleRangeValue, sorted: number) => {
       const range = rangeValue.range()
       if (range === undefined) {
         return new CellError(ErrorType.VALUE, ErrorMessage.WrongType)
@@ -111,7 +105,7 @@ export class LookupPlugin extends FunctionPlugin {
     })
   }
 
-  private doVlookup(key: InternalNoErrorScalarValue, range: AbsoluteCellRange, index: number, sorted: boolean): InternalScalarValue {
+  private doVlookup(key: RawNoErrorScalarValue, range: AbsoluteCellRange, index: number, sorted: boolean): InternalScalarValue {
     this.dependencyGraph.stats.start(StatType.VLOOKUP)
 
     const searchedRange = AbsoluteCellRange.spanFrom(range.start, 1, range.height())
@@ -132,7 +126,7 @@ export class LookupPlugin extends FunctionPlugin {
     return value
   }
 
-  private doHlookup(key: InternalNoErrorScalarValue, range: AbsoluteCellRange, index: number, sorted: boolean): InternalScalarValue {
+  private doHlookup(key: RawNoErrorScalarValue, range: AbsoluteCellRange, index: number, sorted: boolean): InternalScalarValue {
     const searchedRange = AbsoluteCellRange.spanFrom(range.start, range.width(), 1)
     const colIndex = this.searchInRange(key, searchedRange, sorted, this.rowSearch)
 
@@ -150,7 +144,7 @@ export class LookupPlugin extends FunctionPlugin {
     return value
   }
 
-  private doMatch(key: InternalNoErrorScalarValue, range: AbsoluteCellRange, sorted: number): InternalScalarValue {
+  private doMatch(key: RawNoErrorScalarValue, range: AbsoluteCellRange, sorted: number): InternalScalarValue {
     if (range.width() > 1 && range.height() > 1) {
       return new CellError(ErrorType.NA)
     }
@@ -169,7 +163,7 @@ export class LookupPlugin extends FunctionPlugin {
     }
   }
 
-  protected searchInRange(key: InternalNoErrorScalarValue, range: AbsoluteCellRange, sorted: boolean, searchStrategy: SearchStrategy): number {
+  protected searchInRange(key: RawNoErrorScalarValue, range: AbsoluteCellRange, sorted: boolean, searchStrategy: SearchStrategy): number {
     if(!sorted && typeof key === 'string' && this.interpreter.arithmeticHelper.requiresRegex(key)) {
       return searchStrategy.advancedFind(
         this.interpreter.arithmeticHelper.eqMatcherFunction(key),

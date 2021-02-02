@@ -7,6 +7,7 @@ import {absolutizeDependencies} from './absolutizeDependencies'
 import {CellError, simpleCellAddress, SimpleCellAddress} from './Cell'
 import {CellContent, CellContentParser} from './CellContentParser'
 import {CellDependency} from './CellDependency'
+import {getRawValue} from './interpreter/InterpreterValue'
 import {ColumnSearchStrategy} from './Lookup/SearchStrategy'
 import {Config} from './Config'
 import {
@@ -133,7 +134,7 @@ export class SimpleStrategy implements GraphBuilderStrategy {
             /* we don't care about empty cells here */
           } else {
             const vertex = new ValueCellVertex(parsedCellContent.value)
-            this.columnIndex.add(parsedCellContent.value, address)
+            this.columnIndex.add(getRawValue(parsedCellContent.value), address)
             this.dependencyGraph.addVertex(address, vertex)
           }
         }

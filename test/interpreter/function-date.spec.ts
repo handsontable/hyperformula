@@ -1,5 +1,5 @@
 import {HyperFormula} from '../../src'
-import {ErrorType} from '../../src/Cell'
+import {CellValueDetailedType, ErrorType} from '../../src/Cell'
 import {Config} from '../../src/Config'
 import {ErrorMessage} from '../../src/error-message'
 import {adr, dateNumberToString, detailedError} from '../testUtils'
@@ -11,6 +11,7 @@ describe('Function DATE', () => {
       ['=DATE(1900, 1, 1)', '=DATE(1900, 1, 2)', '=DATE(1915, 10, 24)'],
     ], config)
     expect(engine.getCellValue(adr('A1'))).toEqual(2)
+    expect(engine.getCellValueDetailedType(adr('A1'))).toBe(CellValueDetailedType.NUMBER_DATE)
     expect(dateNumberToString(engine.getCellValue(adr('A1')), config)).toEqual('01/01/1900')
     expect(engine.getCellValue(adr('B1'))).toEqual(3)
     expect(dateNumberToString(engine.getCellValue(adr('B1')), config)).toEqual('02/01/1900')

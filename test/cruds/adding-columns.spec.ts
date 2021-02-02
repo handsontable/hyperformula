@@ -1,11 +1,11 @@
-import {HyperFormula, ExportedCellChange} from '../../src'
+import {ExportedCellChange, HyperFormula} from '../../src'
 import {AbsoluteCellRange} from '../../src/AbsoluteCellRange'
-import { simpleCellAddress} from '../../src/Cell'
-import {ColumnIndex} from '../../src/Lookup/ColumnIndex'
-import { FormulaCellVertex, MatrixVertex} from '../../src/DependencyGraph'
-import {adr, expectArrayWithSameContent, extractMatrixRange, extractRange} from '../testUtils'
+import {simpleCellAddress} from '../../src/Cell'
 import {Config} from '../../src/Config'
+import {FormulaCellVertex, MatrixVertex} from '../../src/DependencyGraph'
 import {SheetSizeLimitExceededError} from '../../src/errors'
+import {ColumnIndex} from '../../src/Lookup/ColumnIndex'
+import {adr, expectArrayWithSameContent, extractMatrixRange, extractRange} from '../testUtils'
 
 describe('Adding column - checking if its possible', () => {
   it('no if starting column is negative', () => {

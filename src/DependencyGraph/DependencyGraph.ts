@@ -8,15 +8,14 @@ import {AbsoluteCellRange} from '../AbsoluteCellRange'
 import {absolutizeDependencies} from '../absolutizeDependencies'
 import {
   CellError,
-  EmptyValue,
   ErrorType,
-  InternalScalarValue,
   simpleCellAddress,
   SimpleCellAddress
 } from '../Cell'
 import {CellDependency} from '../CellDependency'
 import {Config} from '../Config'
 import {ErrorMessage} from '../error-message'
+import {SimpleRangeValue} from '../interpreter/SimpleRangeValue'
 import {LazilyTransformingAstService} from '../LazilyTransformingAstService'
 import {Maybe} from '../Maybe'
 import {Ast, collectDependencies, NamedExpressionDependency} from '../parser'
@@ -41,7 +40,13 @@ import {RangeMapping} from './RangeMapping'
 import {SheetMapping} from './SheetMapping'
 import {ValueCellVertexValue} from './ValueCellVertex'
 import {FunctionRegistry} from '../interpreter/FunctionRegistry'
-import {InterpreterValue, SimpleRangeValue} from '../interpreter/InterpreterValue'
+import {
+  EmptyValue,
+  getRawValue,
+  InternalScalarValue,
+  InterpreterValue,
+  RawScalarValue, ExtendedNumber
+} from '../interpreter/InterpreterValue'
 
 export class DependencyGraph {
   /*
@@ -500,7 +505,7 @@ export class DependencyGraph {
     const adjacentNodes = this.graph.adjacentNodes(matrixVertex)
 
     for (const address of matrixRange.addresses(this)) {
-      const value = this.getCellValue(address) as number // We wouldn't need that typecast if we would take values from Matrix
+      const value = this.getCellValue(address) as ExtendedNumber // We wouldn't need that typecast if we would take values from Matrix
       const valueVertex = new ValueCellVertex(value)
       this.addVertex(address, valueVertex)
     }
@@ -685,11 +690,11 @@ export class DependencyGraph {
     }
   }
 
-  public* valuesFromRange(range: AbsoluteCellRange): IterableIterator<[InternalScalarValue, SimpleCellAddress]> {
+  public* rawValuesFromRange(range: AbsoluteCellRange): IterableIterator<[RawScalarValue, SimpleCellAddress]> {
     for (const address of range.addresses(this)) {
       const value = this.getScalarValue(address)
       if (value !== EmptyValue) {
-        yield [value, address]
+        yield [getRawValue(value), address]
       }
     }
   }

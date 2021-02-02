@@ -5,27 +5,28 @@
 
 import assert from 'assert'
 import {AbsoluteCellRange, DIFFERENT_SHEETS_ERROR} from '../../AbsoluteCellRange'
-import {CellError, EmptyValue, ErrorType, InternalScalarValue, SimpleCellAddress} from '../../Cell'
+import {CellError, ErrorType, SimpleCellAddress} from '../../Cell'
 import {ErrorMessage} from '../../error-message'
 import {Maybe} from '../../Maybe'
 import {Ast, AstNodeType, CellRangeAst, ProcedureAst} from '../../parser'
 import {ColumnRangeAst, RowRangeAst} from '../../parser/Ast'
 import {coerceBooleanToNumber} from '../ArithmeticHelper'
-import {SimpleRangeValue} from '../InterpreterValue'
+import {EmptyValue, ExtendedNumber, getRawValue, InternalScalarValue, isExtendedNumber, } from '../InterpreterValue'
+import {SimpleRangeValue} from '../SimpleRangeValue'
 import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
 
 export type BinaryOperation<T> = (left: T, right: T) => T
 
-export type MapOperation<T> = (arg: number) => T
+export type MapOperation<T> = (arg: ExtendedNumber) => T
 
-type coercionOperation = (arg: InternalScalarValue) => Maybe<number | CellError>
+type coercionOperation = (arg: InternalScalarValue) => Maybe<ExtendedNumber | CellError>
 
-function identityMap(arg: number): number {
+function identityMap<T>(arg: T): T {
   return arg
 }
 
 function zeroForInfinite(value: InternalScalarValue) {
-  if (typeof value === 'number' && !Number.isFinite(value)) {
+  if (isExtendedNumber(value) && !Number.isFinite(getRawValue(value))) {
     return 0
   } else {
     return value
@@ -162,7 +163,7 @@ export class NumericAggregationPlugin extends FunctionPlugin {
   }
 
   public sumsq(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.reduce(ast.args, formulaAddress, 0, 'SUMSQ', this.addWithEpsilon, (arg) => arg * arg, strictlyNumbers)
+    return this.reduce(ast.args, formulaAddress, 0, 'SUMSQ', this.addWithEpsilonRaw, (arg: ExtendedNumber) => Math.pow(getRawValue(arg), 2), strictlyNumbers)
   }
 
   /**
@@ -179,8 +180,8 @@ export class NumericAggregationPlugin extends FunctionPlugin {
 
   public maxa(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     const value = this.reduce(ast.args, formulaAddress, Number.NEGATIVE_INFINITY, 'MAXA',
-      (left, right) => Math.max(left, right),
-      identityMap, numbersBooleans)
+      (left: number, right: number) => Math.max(left, right),
+      getRawValue, numbersBooleans)
 
     return zeroForInfinite(value)
   }
@@ -199,8 +200,8 @@ export class NumericAggregationPlugin extends FunctionPlugin {
 
   public mina(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     const value = this.reduce(ast.args, formulaAddress, Number.POSITIVE_INFINITY, 'MINA',
-      (left, right) => Math.min(left, right),
-      identityMap, numbersBooleans)
+      (left: number, right: number) => Math.min(left, right),
+      getRawValue, numbersBooleans)
 
     return zeroForInfinite(value)
   }
@@ -220,7 +221,7 @@ export class NumericAggregationPlugin extends FunctionPlugin {
   public averagea(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     const result = this.reduce<MomentsAggregate>(ast.args, formulaAddress, MomentsAggregate.empty, '_AGGREGATE_A',
       (left, right) => left.compose(right),
-      (arg): MomentsAggregate => MomentsAggregate.single(arg),
+      (arg): MomentsAggregate => MomentsAggregate.single(getRawValue(arg)),
       numbersBooleans
     )
 
@@ -342,7 +343,7 @@ export class NumericAggregationPlugin extends FunctionPlugin {
     return this.reduce<MomentsAggregate>(args, formulaAddress, MomentsAggregate.empty, '_AGGREGATE', (left, right) => {
         return left.compose(right)
       }, (arg): MomentsAggregate => {
-        return MomentsAggregate.single(arg)
+        return MomentsAggregate.single(getRawValue(arg))
       },
       strictlyNumbers
     )
@@ -352,7 +353,7 @@ export class NumericAggregationPlugin extends FunctionPlugin {
     return this.reduce<MomentsAggregate>(args, formulaAddress, MomentsAggregate.empty, '_AGGREGATE_A', (left, right) => {
         return left.compose(right)
       }, (arg): MomentsAggregate => {
-        return MomentsAggregate.single(arg)
+        return MomentsAggregate.single(getRawValue(arg))
       },
       numbersBooleans
     )
@@ -412,16 +413,17 @@ export class NumericAggregationPlugin extends FunctionPlugin {
 
   private doCount(args: Ast[], formulaAddress: SimpleCellAddress): InternalScalarValue {
     const value = this.reduce(args, formulaAddress, 0, 'COUNT',
-      (left, right) => left + right, identityMap,
-      (arg) => (typeof arg === 'number') ? 1 : 0
+      (left: number, right: number) => left + right,
+      getRawValue,
+      (arg) => (isExtendedNumber(arg)) ? 1 : 0
     )
 
     return value
   }
 
   private doCounta(args: Ast[], formulaAddress: SimpleCellAddress): InternalScalarValue {
-    const value = this.reduce(args, formulaAddress, 0, 'COUNTA', (left, right) => left + right,
-      identityMap,
+    const value = this.reduce(args, formulaAddress, 0, 'COUNTA', (left: number, right: number) => left + right,
+      getRawValue,
       (arg) => (arg === EmptyValue) ? 0 : 1
     )
 
@@ -430,31 +432,31 @@ export class NumericAggregationPlugin extends FunctionPlugin {
 
   private doMax(args: Ast[], formulaAddress: SimpleCellAddress): InternalScalarValue {
     const value = this.reduce(args, formulaAddress, Number.NEGATIVE_INFINITY, 'MAX',
-      (left, right) => Math.max(left, right),
-      identityMap, strictlyNumbers
+      (left: number, right: number) => Math.max(left, right),
+      getRawValue, strictlyNumbers
     )
 
     return zeroForInfinite(value)
   }
 
   private doMin(args: Ast[], formulaAddress: SimpleCellAddress): InternalScalarValue {
-    const value = this.reduce(args, formulaAddress, Number.POSITIVE_INFINITY, 'MIN',
-      (left, right) => Math.min(left, right),
-      identityMap, strictlyNumbers
+    const value = this.reduce(args, formulaAddress, Number.POSITIVE_INFINITY, 'MAX',
+      (left: number, right: number) => Math.min(left, right),
+      getRawValue, strictlyNumbers
     )
 
     return zeroForInfinite(value)
   }
 
   private doSum(args: Ast[], formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.reduce(args, formulaAddress, 0, 'SUM', this.addWithEpsilon, identityMap, strictlyNumbers)
+    return this.reduce(args, formulaAddress, 0, 'SUM', this.addWithEpsilonRaw, getRawValue, strictlyNumbers)
   }
 
   private doProduct(args: Ast[], formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.reduce(args, formulaAddress, 1, 'PRODUCT', (left, right) => left * right, identityMap, strictlyNumbers)
+    return this.reduce(args, formulaAddress, 1, 'PRODUCT', (left, right) => left * right, getRawValue, strictlyNumbers)
   }
 
-  private addWithEpsilon = (left: number, right: number): number => this.interpreter.arithmeticHelper.addWithEpsilon(left, right)
+  private addWithEpsilonRaw = (left: number, right: number) => this.interpreter.arithmeticHelper.addWithEpsilonRaw(left, right)
 
   /**
    * Reduces procedure arguments with given reducing function
@@ -612,18 +614,18 @@ export class NumericAggregationPlugin extends FunctionPlugin {
   }
 }
 
-function strictlyNumbers(arg: InternalScalarValue): Maybe<CellError | number> {
-  if (typeof arg === 'number' || arg instanceof CellError) {
+function strictlyNumbers(arg: InternalScalarValue): Maybe<CellError | ExtendedNumber> {
+  if (isExtendedNumber(arg) || arg instanceof CellError) {
     return arg
   } else {
     return undefined
   }
 }
 
-function numbersBooleans(arg: InternalScalarValue): Maybe<CellError | number> {
+function numbersBooleans(arg: InternalScalarValue): Maybe<CellError | ExtendedNumber> {
   if (typeof arg === 'boolean') {
     return coerceBooleanToNumber(arg)
-  } else if (typeof arg === 'number' || arg instanceof CellError) {
+  } else if (isExtendedNumber(arg) || arg instanceof CellError) {
     return arg
   } else if (typeof arg === 'string') {
     return 0

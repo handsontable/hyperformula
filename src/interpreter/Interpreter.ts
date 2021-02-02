@@ -4,20 +4,13 @@
  */
 
 import {AbsoluteCellRange, AbsoluteColumnRange, AbsoluteRowRange} from '../AbsoluteCellRange'
-import {
-  CellError,
-  EmptyValue,
-  ErrorType,
-  InternalNoErrorScalarValue,
-  invalidSimpleCellAddress,
-  SimpleCellAddress
-} from '../Cell'
-import {ColumnSearchStrategy} from '../Lookup/SearchStrategy'
+import {CellError, ErrorType, invalidSimpleCellAddress, SimpleCellAddress} from '../Cell'
 import {Config} from '../Config'
 import {DateTimeHelper} from '../DateTimeHelper'
 import {DependencyGraph} from '../DependencyGraph'
-import {LicenseKeyValidityState} from '../helpers/licenseKeyValidator'
 import {ErrorMessage} from '../error-message'
+import {LicenseKeyValidityState} from '../helpers/licenseKeyValidator'
+import {ColumnSearchStrategy} from '../Lookup/SearchStrategy'
 import {Matrix, NotComputedMatrix} from '../Matrix'
 import {Maybe} from '../Maybe'
 import {NamedExpressions} from '../NamedExpressions'
@@ -29,8 +22,16 @@ import {Statistics} from '../statistics/Statistics'
 import {ArithmeticHelper, coerceScalarToString, fixNegativeZero, isNumberOverflow} from './ArithmeticHelper'
 import {CriterionBuilder} from './Criterion'
 import {FunctionRegistry} from './FunctionRegistry'
-import {InterpreterValue, SimpleRangeValue} from './InterpreterValue'
+import {
+  cloneNumber,
+  EmptyValue,
+  getRawValue,
+  InternalNoErrorScalarValue,
+  isExtendedNumber,
+} from './InterpreterValue'
+import {InterpreterValue} from './InterpreterValue'
 import type {GPU} from 'gpu.js'
+import {SimpleRangeValue} from './SimpleRangeValue'
 
 export class Interpreter {
   private gpu?: GPU
@@ -54,12 +55,12 @@ export class Interpreter {
   }
 
   public evaluateAst(ast: Ast, formulaAddress: SimpleCellAddress): InterpreterValue {
-    let val = this.evaluateAstWithoutPostoprocessing(ast, formulaAddress)
-    if (typeof val === 'number') {
-      if (isNumberOverflow(val)) {
+    let val = this.evaluateAstWithoutPostprocessing(ast, formulaAddress)
+    if (isExtendedNumber(val)) {
+      if (isNumberOverflow(getRawValue(val))) {
         return new CellError(ErrorType.NUM, ErrorMessage.NaN)
       } else {
-        val = fixNegativeZero(val)
+        val = cloneNumber(val, fixNegativeZero(getRawValue(val)))
       }
     }
     return wrapperForAddress(val, formulaAddress)
@@ -71,7 +72,7 @@ export class Interpreter {
    * @param formula - abstract syntax tree of formula
    * @param formulaAddress - address of the cell in which formula is located
    */
-  private evaluateAstWithoutPostoprocessing(ast: Ast, formulaAddress: SimpleCellAddress): InterpreterValue {
+  private evaluateAstWithoutPostprocessing(ast: Ast, formulaAddress: SimpleCellAddress): InterpreterValue {
     switch (ast.type) {
       case AstNodeType.EMPTY: {
         return EmptyValue
@@ -184,8 +185,8 @@ export class Interpreter {
         const result = this.evaluateAst(ast.value, formulaAddress)
         if (result instanceof SimpleRangeValue) {
           return new CellError(ErrorType.VALUE, ErrorMessage.ScalarExpected)
-        } else if (typeof result === 'number') {
-          return this.arithmeticHelper.unaryPlus(result)
+        } else if(isExtendedNumber(result)) {
+         return this.arithmeticHelper.unaryPlus(result)
         } else {
           return result
         }

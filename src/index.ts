@@ -3,24 +3,11 @@
  * Copyright (c) 2020 Handsoncode. All rights reserved.
  */
 
-import {CellType, CellValueType, ErrorType, SimpleCellAddress} from './Cell'
-import {
-  CellValue,
-  DetailedCellError,
-  NoErrorCellValue
-} from './CellValue'
-import {
-  ExportedCellChange,
-  ExportedChange,
-  ExportedNamedExpressionChange,
-} from './Exporter'
-import {HyperFormula} from './HyperFormula'
-import {Config, ConfigParams} from './Config'
-import {RawTranslationPackage} from './i18n'
-import enGB from './i18n/languages/enGB'
-import {Sheet, SheetDimensions, Sheets} from './Sheet'
+import {CellType, CellValueDetailedType, CellValueType, ErrorType, SimpleCellAddress, CellValueJustNumber, CellValueNoNumber} from './Cell'
 import {RawCellContent} from './CellContentParser'
-import {NamedExpression, NamedExpressionOptions} from './NamedExpressions'
+import {CellValue, DetailedCellError, NoErrorCellValue} from './CellValue'
+import {Config, ConfigParams} from './Config'
+import {ColumnRowIndex} from './CrudOperations'
 import {
   ConfigValueTooBigError,
   ConfigValueTooSmallError,
@@ -51,9 +38,15 @@ import {
   TargetLocationHasMatrixError,
   UnableToParseError
 } from './errors'
-import * as plugins from './interpreter/plugin'
+import {ExportedCellChange, ExportedChange, ExportedNamedExpressionChange} from './Exporter'
+import {HyperFormula} from './HyperFormula'
+import {RawTranslationPackage} from './i18n'
+import enGB from './i18n/languages/enGB'
 import {FunctionArgument, FunctionPlugin, FunctionPluginDefinition} from './interpreter'
-import {ColumnRowIndex} from './CrudOperations'
+import * as plugins from './interpreter/plugin'
+import {NamedExpression, NamedExpressionOptions} from './NamedExpressions'
+import {Sheet, SheetDimensions, Sheets} from './Sheet'
+import {FormatInfo} from './interpreter/InterpreterValue'
 
 /** @internal */
 class HyperFormulaNS extends HyperFormula {
@@ -61,6 +54,7 @@ class HyperFormulaNS extends HyperFormula {
   public static ErrorType = ErrorType
   public static CellType = CellType
   public static CellValueType = CellValueType
+  public static CellValueDetailedType = CellValueDetailedType
   public static DetailedCellError = DetailedCellError
   public static ExportedCellChange = ExportedCellChange
   public static ExportedNamedExpressionChange = ExportedNamedExpressionChange
@@ -116,6 +110,7 @@ export {
   ConfigParams,
   ExportedChange,
   RawCellContent,
+  FormatInfo,
   Sheet,
   Sheets,
   SheetDimensions,
@@ -129,6 +124,7 @@ export {
   HyperFormula,
   CellType,
   CellValueType,
+  CellValueDetailedType,
   ErrorType,
   ExportedCellChange,
   ExportedNamedExpressionChange,

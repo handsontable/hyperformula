@@ -1,4 +1,5 @@
 import {ErrorType, HyperFormula} from '../../src'
+import {CellValueDetailedType} from '../../src/Cell'
 import {ErrorMessage} from '../../src/error-message'
 import {adr, detailedError} from '../testUtils'
 
@@ -18,6 +19,7 @@ describe('Function NPV', () => {
       ['=NPV(-1, 0)'],
     ])
     expect(engine.getCellValue(adr('A1'))).toEqual(0.5)
+    expect(engine.getCellValueDetailedType(adr('A1'))).toBe(CellValueDetailedType.NUMBER_CURRENCY)
     expect(engine.getCellValue(adr('A2'))).toEqual(0.5)
     expect(engine.getCellValue(adr('A3'))).toEqual(0)
   })

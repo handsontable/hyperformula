@@ -1,9 +1,9 @@
-import {HyperFormula, ExportedNamedExpressionChange, ExportedCellChange} from '../src'
-import {ErrorMessage} from '../src/error-message'
-import {adr, detailedError} from './testUtils'
+import {ExportedCellChange, ExportedNamedExpressionChange, HyperFormula} from '../src'
 import {ErrorType} from '../src/Cell'
-import {NoRelativeAddressesAllowedError, NoSheetWithNameError} from '../src/errors'
 import {Vertex} from '../src/DependencyGraph/Vertex'
+import {ErrorMessage} from '../src/error-message'
+import {NoRelativeAddressesAllowedError, NoSheetWithNameError} from '../src/errors'
+import {adr, detailedError} from './testUtils'
 
 describe('Named expressions - checking if its possible', () => {
   it('should be possible to add named expression', () => {

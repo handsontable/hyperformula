@@ -1,9 +1,9 @@
-import {HyperFormula, ExportedCellChange, ExportedNamedExpressionChange} from '../src'
-import {Events} from '../src/Emitter'
+import {ExportedCellChange, ExportedNamedExpressionChange, HyperFormula} from '../src'
 import {ErrorType} from '../src/Cell'
+import {Events} from '../src/Emitter'
+import {NamedExpressionDoesNotExistError} from '../src/errors'
 
 import {adr, detailedErrorWithOrigin} from './testUtils'
-import {NamedExpressionDoesNotExistError} from '../src/errors'
 
 describe('Events', () => {
   it('sheetAdded works', function() {

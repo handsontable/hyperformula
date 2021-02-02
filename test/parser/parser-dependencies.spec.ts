@@ -2,9 +2,9 @@ import {AbsoluteCellRange} from '../../src/AbsoluteCellRange'
 import {absolutizeDependencies} from '../../src/absolutizeDependencies'
 import {simpleCellAddress} from '../../src/Cell'
 import {Config} from '../../src/Config'
+import {NamedExpressionDependency} from '../../src/parser'
 import {adr, expectArrayWithSameContent} from '../testUtils'
 import {buildEmptyParserWithCaching} from './common'
-import {NamedExpressionDependency} from '../../src/parser'
 
 describe('Parsing collecting dependencies', () => {
   it('works for CELL_REFERENCE with relative dependency', () => {

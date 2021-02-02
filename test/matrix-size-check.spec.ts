@@ -2,9 +2,8 @@ import {CellError, ErrorType, simpleCellAddress} from '../src/Cell'
 import {Config} from '../src/Config'
 import {ErrorMessage} from '../src/error-message'
 import {checkMatrixSize, MatrixSize} from '../src/Matrix'
-import {adr} from './testUtils'
 import {buildEmptyParserWithCaching} from './parser/common'
-
+import {adr} from './testUtils'
 
 describe('Matrix size check tests', () => {
 

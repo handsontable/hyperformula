@@ -211,7 +211,7 @@ describe( 'Value-fixed', () => {
 })
 
 describe( 'tests', () => {
-  it('addition of small numbers with smartRounding', () => {
+  it('addition of small numbers with smartRounding #1', () => {
     const engine = HyperFormula.buildFromArray([
       ['0.000123456789', '1', '=A1+B1'],
     ],  { smartRounding: true })
@@ -219,7 +219,7 @@ describe( 'tests', () => {
     expect(engine.getCellValue(adr('C1'))).toEqual(1.000123456789)
   })
 
-  it('addition of small numbers with smartRounding', () => {
+  it('addition of small numbers with smartRounding #2', () => {
     const engine = HyperFormula.buildFromArray([
       ['0.000123456789', '1', '=A1+B1'],
     ], { smartRounding: true, precisionRounding: 9 })

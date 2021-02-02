@@ -3,10 +3,11 @@
  * Copyright (c) 2020 Handsoncode. All rights reserved.
  */
 
-import {CellError, ErrorType, InternalScalarValue, SimpleCellAddress} from '../../Cell'
+import {CellError, ErrorType, SimpleCellAddress} from '../../Cell'
 import {ErrorMessage} from '../../error-message'
 import {AstNodeType, ProcedureAst} from '../../parser'
-import {SimpleRangeValue} from '../InterpreterValue'
+import {InternalScalarValue, RawScalarValue} from '../InterpreterValue'
+import {SimpleRangeValue} from '../SimpleRangeValue'
 import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
 
 /**
@@ -48,8 +49,8 @@ export class MedianPlugin extends FunctionPlugin {
    * @param formulaAddress
    */
   public median(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('MEDIAN'), (...args) => {
-      const values: number[] = args.filter((val: InternalScalarValue) => (typeof val === 'number'))
+    return this.runFunction(ast.args, formulaAddress, this.metadata('MEDIAN'), (...args: RawScalarValue[]) => {
+      const values: number[] = (args.filter((val: RawScalarValue) => (typeof val === 'number')) as number[])
       ast.args.forEach((arg) => { //ugly but works
         if (arg.type === AstNodeType.EMPTY) {
           values.push(0)

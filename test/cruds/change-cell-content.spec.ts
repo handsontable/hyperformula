@@ -1,11 +1,11 @@
 import {ExportedCellChange, HyperFormula, InvalidAddressError, NoSheetWithIdError} from '../../src'
 import {ErrorType, simpleCellAddress} from '../../src/Cell'
-import {ColumnIndex} from '../../src/Lookup/ColumnIndex'
+import {Config} from '../../src/Config'
 import {EmptyCellVertex, MatrixVertex} from '../../src/DependencyGraph'
 import {ErrorMessage} from '../../src/error-message'
-import {adr, colEnd, colStart, detailedError, expectArrayWithSameContent, rowEnd, rowStart} from '../testUtils'
-import {Config} from '../../src/Config'
 import {SheetSizeLimitExceededError} from '../../src/errors'
+import {ColumnIndex} from '../../src/Lookup/ColumnIndex'
+import {adr, colEnd, colStart, detailedError, expectArrayWithSameContent, rowEnd, rowStart} from '../testUtils'
 
 describe('Changing cell content - checking if its possible', () => {
   it('address should have valid coordinates', () => {

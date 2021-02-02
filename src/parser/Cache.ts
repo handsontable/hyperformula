@@ -3,9 +3,9 @@
  * Copyright (c) 2020 Handsoncode. All rights reserved.
  */
 
+import {FunctionRegistry} from '../interpreter/FunctionRegistry'
 import {AstNodeType, collectDependencies, RelativeDependency} from './'
 import {Ast} from './Ast'
-import {FunctionRegistry} from '../interpreter/FunctionRegistry'
 
 export interface CacheEntry {
   ast: Ast,

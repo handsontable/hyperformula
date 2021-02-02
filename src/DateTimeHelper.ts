@@ -4,6 +4,7 @@
  */
 
 import {Config} from './Config'
+import {DateNumber, DateTimeNumber, ExtendedNumber, TimeNumber} from './interpreter/InterpreterValue'
 import {Maybe} from './Maybe'
 
 const numDays: number[] = [ 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
@@ -70,13 +71,24 @@ export class DateTimeHelper {
     return (dayNumber <= this.maxDateValue) && (dayNumber >= 0) ? dayNumber : undefined
   }
 
-  public dateStringToDateNumber(dateTimeString: string): Maybe<number> {
+  public dateStringToDateNumber(dateTimeString: string): Maybe<ExtendedNumber> {
     const dateTime = this.parseDateTimeFromConfigFormats(dateTimeString)
     if(dateTime === undefined) {
       return undefined
     }
-    return (instanceOfSimpleTime(dateTime) ? timeToNumber(dateTime) : 0) +
-      (instanceOfSimpleDate(dateTime) ? this.dateToNumber(dateTime) : 0)
+    if(instanceOfSimpleTime(dateTime)) {
+      if(instanceOfSimpleDate(dateTime)) {
+        return new DateTimeNumber(timeToNumber(dateTime) + this.dateToNumber(dateTime) )
+      } else {
+        return new TimeNumber(timeToNumber(dateTime))
+      }
+    } else {
+      if(instanceOfSimpleDate(dateTime)) {
+        return new DateNumber( this.dateToNumber(dateTime) )
+      } else {
+        return 0
+      }
+    }
   }
 
   private parseSingleFormat(dateString: string, dateFormat: string, timeFormat: string): Maybe<DateTime> {

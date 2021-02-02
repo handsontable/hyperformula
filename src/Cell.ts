@@ -5,9 +5,14 @@
 
 import {CellVertex, FormulaCellVertex, MatrixVertex, ParsingErrorVertex, ValueCellVertex} from './DependencyGraph'
 import {ErrorMessage} from './error-message'
+import {
+  EmptyValue, getFormatOfExtendedNumber, getTypeOfExtendedNumber,
+  InterpreterValue,
+  isExtendedNumber, NumberType,
+} from './interpreter/InterpreterValue'
+import {SimpleRangeValue} from './interpreter/SimpleRangeValue'
 import {CellAddress} from './parser'
 import {AddressWithSheet} from './parser/Address'
-import {InterpreterValue, SimpleRangeValue} from './interpreter/InterpreterValue'
 
 /**
  * Possible errors returned by our interpreter.
@@ -37,11 +42,6 @@ export enum ErrorType {
 
 export type TranslatableErrorType = Exclude<ErrorType, ErrorType.LIC>
 
-export const EmptyValue = Symbol('Empty value')
-export type EmptyValueType = typeof EmptyValue
-export type InternalNoErrorScalarValue = number | string | boolean | EmptyValueType
-export type InternalScalarValue = InternalNoErrorScalarValue | CellError
-
 export enum CellType {
   FORMULA = 'FORMULA',
   VALUE = 'VALUE',
@@ -64,13 +64,23 @@ export const getCellType = (vertex: CellVertex | null): CellType => {
   return CellType.EMPTY
 }
 
-export enum CellValueType {
+export enum CellValueNoNumber {
   EMPTY = 'EMPTY',
   NUMBER = 'NUMBER',
   STRING = 'STRING',
   BOOLEAN = 'BOOLEAN',
   ERROR = 'ERROR',
 }
+
+export enum CellValueJustNumber {
+  NUMBER = 'NUMBER'
+}
+
+export type CellValueType = CellValueNoNumber | CellValueJustNumber
+export const CellValueType = {...CellValueNoNumber, ...CellValueJustNumber}
+
+export type CellValueDetailedType = CellValueNoNumber | NumberType
+export const CellValueDetailedType = {...CellValueNoNumber, ...NumberType}
 
 export const CellValueTypeOrd = (arg: CellValueType): number => {
   switch (arg) {
@@ -85,6 +95,7 @@ export const CellValueTypeOrd = (arg: CellValueType): number => {
     case CellValueType.ERROR:
       return 4
   }
+  throw new Error('Cell value not computed')
 }
 
 export const getCellValueType = (cellValue: InterpreterValue): CellValueType => {
@@ -96,16 +107,31 @@ export const getCellValueType = (cellValue: InterpreterValue): CellValueType => 
     return CellValueType.ERROR
   }
 
-  switch (typeof cellValue) {
-    case 'string':
-      return CellValueType.STRING
-    case 'number':
-      return CellValueType.NUMBER
-    case 'boolean':
-      return CellValueType.BOOLEAN
+  if(typeof cellValue === 'string') {
+    return CellValueType.STRING
+  } else if(isExtendedNumber(cellValue)) {
+    return CellValueType.NUMBER
+  } else if(typeof cellValue === 'boolean') {
+    return CellValueType.BOOLEAN
   }
 
   throw new Error('Cell value not computed')
+}
+
+export const getCellValueDetailedType = (cellValue: InterpreterValue): CellValueDetailedType => {
+  if(isExtendedNumber(cellValue)) {
+    return getTypeOfExtendedNumber(cellValue)
+  } else {
+    return getCellValueType(cellValue) as CellValueDetailedType
+  }
+}
+
+export const getCellValueFormat = (cellValue: InterpreterValue): string | undefined => {
+  if(isExtendedNumber(cellValue)) {
+    return getFormatOfExtendedNumber(cellValue)
+  } else {
+    return undefined
+  }
 }
 
 export class CellError {

@@ -7,7 +7,8 @@ import {CellError, ErrorType, SimpleCellAddress} from '../../Cell'
 import {ErrorMessage} from '../../error-message'
 import {MatrixSize, matrixSizeForMultiplication, matrixSizeForPoolFunction, matrixSizeForTranspose} from '../../Matrix'
 import {ProcedureAst} from '../../parser'
-import {InterpreterValue, SimpleRangeValue} from '../InterpreterValue'
+import {InterpreterValue} from '../InterpreterValue'
+import {SimpleRangeValue} from '../SimpleRangeValue'
 import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
 import {Interpreter} from '../Interpreter'
 
@@ -24,6 +25,7 @@ export interface KernelFunctionThis {
     y?: number,
   },
 }
+
 
 export class MatrixPlugin extends FunctionPlugin {
   public static implementedFunctions = {
