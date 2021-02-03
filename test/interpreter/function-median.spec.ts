@@ -85,7 +85,7 @@ describe('Function MEDIAN', () => {
       ['=MEDIAN(TRUE(), "foobar", 42)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.VALUE,ErrorMessage.NumberCoercion))
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.NumberCoercion))
   })
 
   it('coerces given string arguments', () => {
