@@ -3,10 +3,11 @@
  * Copyright (c) 2020 Handsoncode. All rights reserved.
  */
 
-import {CellError, ErrorType, InternalScalarValue, SimpleCellAddress} from '../../Cell'
+import {CellError, ErrorType, SimpleCellAddress} from '../../Cell'
 import {ErrorMessage} from '../../error-message'
 import {ProcedureAst} from '../../parser'
-import {SimpleRangeValue} from '../InterpreterValue'
+import {getRawValue, InternalScalarValue, isExtendedNumber} from '../InterpreterValue'
+import {SimpleRangeValue} from '../SimpleRangeValue'
 import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
 
 export class SumprodPlugin extends FunctionPlugin {
@@ -40,8 +41,8 @@ export class SumprodPlugin extends FunctionPlugin {
         } else {
           const lval = this.coerceScalarToNumberOrError(l.value)
           const rval = this.coerceScalarToNumberOrError(r.value)
-          if (typeof lval === 'number' && typeof rval === 'number') {
-            result += lval * rval
+          if (isExtendedNumber(lval) && isExtendedNumber(rval)) {
+            result += getRawValue(lval) * getRawValue(rval)
           }
         }
       }

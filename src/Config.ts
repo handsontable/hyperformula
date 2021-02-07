@@ -6,20 +6,22 @@
 import {TranslatableErrorType} from './Cell'
 import {defaultParseToDateTime} from './DateTimeDefault'
 import {DateTime, instanceOfSimpleDate, SimpleDate, SimpleDateTime, SimpleTime} from './DateTimeHelper'
-import {
-  ConfigValueTooSmallError,
-  ConfigValueTooBigError,
-  ExpectedValueOfTypeError,
-  ExpectedOneOfValuesError
-} from './errors'
 import {AlwaysDense, ChooseAddressMapping} from './DependencyGraph/AddressMapping/ChooseAddressMappingPolicy'
+import {
+  ConfigValueEmpty,
+  ConfigValueTooBigError,
+  ConfigValueTooSmallError,
+  ExpectedOneOfValuesError,
+  ExpectedValueOfTypeError
+} from './errors'
 import {defaultStringifyDateTime, defaultStringifyDuration} from './format/format'
 import {HyperFormula} from './HyperFormula'
 import {TranslationPackage} from './i18n'
 import {Maybe} from './Maybe'
 import {ParserConfig} from './parser/ParserConfig'
 import {checkLicenseKeyValidity, LicenseKeyValidityState} from './helpers/licenseKeyValidator'
-import {FunctionPluginDefinition} from './interpreter/plugin/FunctionPlugin'
+import {FunctionPluginDefinition} from './interpreter'
+import type { GPU } from 'gpu.js'
 
 type GPUMode = 'gpu' | 'cpu' | 'dev'
 
@@ -64,6 +66,14 @@ export interface ConfigParams {
    * @category Engine
    */
   chooseAddressMappingPolicy: ChooseAddressMapping,
+  /**
+   * Symbols used to denote currency numbers.
+   *
+   * @default ['$']
+   *
+   * @category Number
+   */
+  currencySymbol: string[],
   /**
    * A list of date formats that are supported by date parsing functions.
    *
@@ -144,6 +154,14 @@ export interface ConfigParams {
    */
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   functionPlugins: any[],
+  /**
+   * A GPU.js constructor used by matrix functions. When not provided, plain cpu implementation will be used.
+   *
+   * @default undefined
+   *
+   * @category Engine
+   */
+  gpujs?: typeof GPU,
   /**
    * Allows to set GPU or CPU for use in matrix calculations.
    * When set to 'gpu' it will try to use GPU for matrix calculations. Setting it to 'cpu' will force CPU usage.
@@ -389,6 +407,7 @@ export class Config implements ConfigParams, ParserConfig {
     language: 'enGB',
     licenseKey: '',
     functionPlugins: [],
+    gpujs: undefined,
     gpuMode: 'gpu',
     leapYear1900: false,
     smartRounding: true,
@@ -412,7 +431,8 @@ export class Config implements ConfigParams, ParserConfig {
     useWildcards: true,
     matchWholeCell: true,
     maxRows: 40_000,
-    maxColumns: 18_278
+    maxColumns: 18_278,
+    currencySymbol: ['$'],
   }
 
   /** @inheritDoc */
@@ -440,6 +460,8 @@ export class Config implements ConfigParams, ParserConfig {
   /** @inheritDoc */
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   public readonly functionPlugins: FunctionPluginDefinition[]
+  /** @inheritDoc */
+  public readonly gpujs?: typeof GPU
   /** @inheritDoc */
   public readonly gpuMode: GPUMode
   /** @inheritDoc */
@@ -478,6 +500,8 @@ export class Config implements ConfigParams, ParserConfig {
   public readonly binarySearchThreshold: number
   /** @inheritDoc */
   public readonly nullDate: SimpleDate
+  /** @inheritDoc */
+  public readonly currencySymbol: string[]
   /** @inheritDoc */
   public readonly undoLimit: number
   /**
@@ -529,6 +553,7 @@ export class Config implements ConfigParams, ParserConfig {
       language,
       licenseKey,
       functionPlugins,
+      gpujs,
       gpuMode,
       ignorePunctuation,
       leapYear1900,
@@ -553,7 +578,8 @@ export class Config implements ConfigParams, ParserConfig {
       useWildcards,
       matchWholeCell,
       maxRows,
-      maxColumns
+      maxColumns,
+      currencySymbol,
     }: Partial<ConfigParams> = {},
   ) {
     this.accentSensitive = this.valueFromParam(accentSensitive, 'boolean', 'accentSensitive')
@@ -571,6 +597,7 @@ export class Config implements ConfigParams, ParserConfig {
     this.thousandSeparator = this.valueFromParam(thousandSeparator, ['', ',', ' ', '.'], 'thousandSeparator')
     this.localeLang = this.valueFromParam(localeLang, 'string', 'localeLang')
     this.functionPlugins = functionPlugins ?? Config.defaultConfig.functionPlugins
+    this.gpujs = gpujs ?? Config.defaultConfig.gpujs
     this.gpuMode = this.valueFromParam(gpuMode, PossibleGPUModeString, 'gpuMode')
     this.smartRounding = this.valueFromParam(smartRounding, 'boolean', 'smartRounding')
     this.matrixDetection = this.valueFromParam(matrixDetection, 'boolean', 'matrixDetection')
@@ -605,6 +632,15 @@ export class Config implements ConfigParams, ParserConfig {
     this.maxRows = this.valueFromParam(maxRows, 'number', 'maxRows')
     this.validateNumberToBeAtLeast(this.maxRows, 'maxRows', 1)
     this.maxColumns = this.valueFromParam(maxColumns, 'number', 'maxColumns')
+    this.currencySymbol = this.valueFromParamCheck(currencySymbol, Array.isArray, 'array',  'currencySymbol')
+    this.currencySymbol.forEach((val) => {
+      if(typeof val !== 'string') {
+        throw new ExpectedValueOfTypeError('string[]', 'currencySymbol')
+      }
+      if(val === '') {
+        throw new ConfigValueEmpty('currencySymbol')
+      }
+    })
     this.validateNumberToBeAtLeast(this.maxColumns, 'maxColumns', 1)
 
     this.warnDeprecatedIfUsed(vlookupThreshold, 'vlookupThreshold', 'v.0.3.0', 'binarySearchThreshold')

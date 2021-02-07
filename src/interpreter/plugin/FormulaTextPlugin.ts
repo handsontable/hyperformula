@@ -3,10 +3,11 @@
  * Copyright (c) 2020 Handsoncode. All rights reserved.
  */
 
+import {CellError, ErrorType, SimpleCellAddress} from '../../Cell'
 import {ErrorMessage} from '../../error-message'
 import {ProcedureAst} from '../../parser'
-import {CellError, ErrorType, InternalScalarValue, SimpleCellAddress} from '../../Cell'
 import {FunctionPlugin} from '../index'
+import {InternalScalarValue} from '../InterpreterValue'
 import {ArgumentTypes} from './FunctionPlugin'
 
 export class FormulaTextPlugin extends FunctionPlugin {

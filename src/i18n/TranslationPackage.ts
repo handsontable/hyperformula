@@ -4,8 +4,8 @@
  */
 
 import {ErrorType, TranslatableErrorType} from '../Cell'
-import {Maybe} from '../Maybe'
 import {MissingTranslationError, ProtectedFunctionTranslationError} from '../errors'
+import {Maybe} from '../Maybe'
 import {ErrorTranslationSet, TranslationSet, UIElement, UITranslationSet} from './index'
 
 export interface RawTranslationPackage {

@@ -3,9 +3,16 @@
  * Copyright (c) 2020 Handsoncode. All rights reserved.
  */
 
-import {absoluteSheetReference, SimpleCellAddress, simpleRowAddress, SimpleRowAddress} from '../Cell'
-import {ReferenceType} from './ColumnAddress'
+import {
+  absoluteSheetReference,
+  invalidSimpleRowAddress,
+  SimpleCellAddress,
+  simpleRowAddress,
+  SimpleRowAddress
+} from '../Cell'
+import {Maybe} from '../Maybe'
 import {AddressWithRow} from './Address'
+import {ReferenceType} from './ColumnAddress'
 
 export class RowAddress implements AddressWithRow {
   private constructor(
@@ -78,8 +85,11 @@ export class RowAddress implements AddressWithRow {
     }
   }
 
-  public unparse(baseAddress: SimpleCellAddress): string {
+  public unparse(baseAddress: SimpleCellAddress): Maybe<string> {
     const simpleAddress = this.toSimpleRowAddress(baseAddress)
+    if(invalidSimpleRowAddress(simpleAddress)) {
+      return undefined
+    }
     const dollar = this.type === ReferenceType.ABSOLUTE ? '$' : ''
     return `${dollar}${simpleAddress.row + 1}`
   }

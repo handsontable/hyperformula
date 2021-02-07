@@ -1,6 +1,6 @@
 import {ErrorType, HyperFormula} from '../../src'
-import {adr, detailedError} from '../testUtils'
 import {ErrorMessage} from '../../src/error-message'
+import {adr, detailedError} from '../testUtils'
 
 describe('Function SUBSTITUTE', () => {
   it('should take three or four parameters', () => {

@@ -1,4 +1,5 @@
 import {ErrorType, HyperFormula} from '../../src'
+import {CellValueDetailedType} from '../../src/Cell'
 import {ErrorMessage} from '../../src/error-message'
 import {adr, detailedError} from '../testUtils'
 
@@ -23,6 +24,7 @@ describe('Function TBILLEQ', () => {
     ])
 
     expect(engine.getCellValue(adr('A1'))).toBeCloseTo(0.104285714285714, 6)
+    expect(engine.getCellValueDetailedType(adr('A1'))).toBe(CellValueDetailedType.NUMBER_PERCENT)
     //inconsistency with products #1 & #2
     expect(engine.getCellValue(adr('A2'))).toBeCloseTo(0.112654320987654, 6)
     //inconsistency with products #1 & #2

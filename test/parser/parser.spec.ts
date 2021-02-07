@@ -12,14 +12,15 @@ import {
   ErrorAst,
   MinusOpAst,
   MinusUnaryOpAst,
+  NamedExpressionAst,
   NumberAst,
   ParsingErrorType,
   PlusOpAst,
   PowerOpAst,
   ProcedureAst,
-  NamedExpressionAst,
   StringAst,
 } from '../../src/parser'
+import {columnIndexToLabel} from '../../src/parser/addressRepresentationConverters'
 import {
   ColumnRangeAst,
   ErrorWithRawInputAst,
@@ -28,9 +29,8 @@ import {
   RowRangeAst
 } from '../../src/parser/Ast'
 import {ColumnAddress} from '../../src/parser/ColumnAddress'
-import {adr, unregisterAllLanguages} from '../testUtils'
 import {RowAddress} from '../../src/parser/RowAddress'
-import {columnIndexToLabel} from '../../src/parser/addressRepresentationConverters'
+import {adr, unregisterAllLanguages} from '../testUtils'
 import {buildEmptyParserWithCaching} from './common'
 
 describe('ParserWithCaching', () => {

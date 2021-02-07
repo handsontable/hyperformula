@@ -4,7 +4,7 @@
  */
 
 import {AbsoluteCellRange} from '../../AbsoluteCellRange'
-import {CellError, ErrorType, InternalScalarValue, SimpleCellAddress} from '../../Cell'
+import {CellError, ErrorType, SimpleCellAddress} from '../../Cell'
 import {Config} from '../../Config'
 import {DependencyGraph} from '../../DependencyGraph'
 import {ErrorMessage} from '../../error-message'
@@ -14,7 +14,17 @@ import {Ast, AstNodeType, ProcedureAst} from '../../parser'
 import {Serialization} from '../../Serialization'
 import {coerceScalarToBoolean, coerceScalarToString, coerceToRange, complex} from '../ArithmeticHelper'
 import {Interpreter} from '../Interpreter'
-import {InterpreterValue, SimpleRangeValue} from '../InterpreterValue'
+import {
+  ExtendedNumber, FormatInfo,
+  getRawValue,
+  InternalScalarValue,
+  InterpreterValue,
+  isExtendedNumber,
+  NumberType,
+  RawNoErrorScalarValue,
+  RawScalarValue
+} from '../InterpreterValue'
+import {SimpleRangeValue} from '../SimpleRangeValue'
 
 export interface ImplementedFunctions {
   [formulaId: string]: FunctionMetadata,
@@ -31,6 +41,11 @@ export interface FunctionArguments {
    * Ranges in arguments are inlined to (possibly multiple) scalar arguments.
    */
   expandRanges?: boolean,
+
+  /**
+   * Return number value is packed into this subtype.
+   */
+  returnNumberType?: NumberType,
 }
 
 export interface FunctionMetadata extends FunctionArguments {
@@ -99,9 +114,15 @@ export interface FunctionArgument {
   argumentType: ArgumentTypes,
 
   /**
+   * Argument should be passed with full type information.
+   * (e.g. Date/DateTime/Time/Currency/Percentage for numbers)
+   */
+  passSubtype?: boolean,
+
+  /**
    * If argument is missing, its value defaults to this.
    */
-  defaultValue?: InternalScalarValue,
+  defaultValue?: InternalScalarValue | RawScalarValue,
 
   /**
    * If argument is missing, and no defaultValue provided, undefined is supplied as a value, instead of throwing an error.
@@ -176,14 +197,16 @@ export abstract class FunctionPlugin {
     return ret
   }
 
-  public coerceScalarToNumberOrError = (arg: InternalScalarValue): number | CellError => this.interpreter.arithmeticHelper.coerceScalarToNumberOrError(arg)
+  public coerceScalarToNumberOrError = (arg: InternalScalarValue): ExtendedNumber | CellError => this.interpreter.arithmeticHelper.coerceScalarToNumberOrError(arg)
 
-  public coerceToType(arg: InterpreterValue, coercedType: FunctionArgument): Maybe<InterpreterValue | complex> {
+  public coerceToType(arg: InterpreterValue, coercedType: FunctionArgument): Maybe<InterpreterValue | complex | RawNoErrorScalarValue> {
+    let ret
     if (arg instanceof SimpleRangeValue) {
       switch(coercedType.argumentType) {
         case ArgumentTypes.RANGE:
         case ArgumentTypes.ANY:
-          return arg
+          ret = arg
+          break
         default:
           return undefined
       }
@@ -192,10 +215,13 @@ export abstract class FunctionPlugin {
         case ArgumentTypes.INTEGER:
         case ArgumentTypes.NUMBER:
           // eslint-disable-next-line no-case-declarations
-          const value = this.coerceScalarToNumberOrError(arg)
-          if (typeof value !== 'number') {
-            return value
+          const coerced = this.coerceScalarToNumberOrError(arg)
+          if (!isExtendedNumber(coerced)) {
+            ret = coerced
+            break
           }
+          // eslint-disable-next-line no-case-declarations
+          const value = getRawValue(coerced)
           if (coercedType.maxValue !== undefined && value > coercedType.maxValue) {
             return new CellError(ErrorType.NUM, ErrorMessage.ValueLarge)
           }
@@ -211,23 +237,33 @@ export abstract class FunctionPlugin {
           if (coercedType.argumentType === ArgumentTypes.INTEGER && !Number.isInteger(value)) {
             return new CellError(ErrorType.NUM, ErrorMessage.IntegerExpected)
           }
-          return value
+          ret = coerced
+          break
         case ArgumentTypes.STRING:
-          return coerceScalarToString(arg)
+          ret = coerceScalarToString(arg)
+          break
         case ArgumentTypes.BOOLEAN:
-          return coerceScalarToBoolean(arg)
+          ret = coerceScalarToBoolean(arg)
+          break
         case ArgumentTypes.SCALAR:
         case ArgumentTypes.NOERROR:
         case ArgumentTypes.ANY:
-          return arg
+          ret = arg
+          break
         case ArgumentTypes.RANGE:
           if (arg instanceof CellError) {
             return arg
           }
-          return coerceToRange(arg)
+          ret = coerceToRange(getRawValue(arg))
+          break
         case ArgumentTypes.COMPLEX:
-          return this.interpreter.arithmeticHelper.coerceScalarToComplex(arg)
+          return this.interpreter.arithmeticHelper.coerceScalarToComplex(getRawValue(arg))
       }
+    }
+    if(coercedType.passSubtype || ret === undefined) {
+      return ret
+    } else {
+      return getRawValue(ret)
     }
   }
 
@@ -236,6 +272,24 @@ export abstract class FunctionPlugin {
     formulaAddress: SimpleCellAddress,
     functionDefinition: FunctionArguments,
     fn: (...arg: any) => InternalScalarValue
+  ) => {
+    return this.runFunctionTemplate(args, formulaAddress, functionDefinition, fn)
+  }
+
+  protected runMatrixFunction = (
+    args: Ast[],
+    formulaAddress: SimpleCellAddress,
+    functionDefinition: FunctionArguments,
+    fn: (...arg: any) => InterpreterValue
+  ) => {
+    return this.runFunctionTemplate(args, formulaAddress, functionDefinition, fn)
+  }
+
+  private runFunctionTemplate = (
+    args: Ast[],
+    formulaAddress: SimpleCellAddress,
+    functionDefinition: FunctionArguments,
+    fn: (...arg: any) => any
   ) => {
     const argumentDefinitions: FunctionArgument[] = functionDefinition.parameters!
     let scalarValues: [InterpreterValue, boolean][]
@@ -246,7 +300,7 @@ export abstract class FunctionPlugin {
       scalarValues = args.map((ast) => [this.evaluateAst(ast, formulaAddress), false])
     }
 
-    const coercedArguments: Maybe<InterpreterValue | complex>[] = []
+    const coercedArguments: Maybe<InterpreterValue | complex | RawNoErrorScalarValue>[] = []
 
     let argCoerceFailure: Maybe<CellError> = undefined
     if (functionDefinition.repeatLastArgs === undefined && argumentDefinitions.length < scalarValues.length) {
@@ -287,19 +341,19 @@ export abstract class FunctionPlugin {
       }
     }
 
-    return argCoerceFailure ?? fn(...coercedArguments)
+    return argCoerceFailure ?? this.returnNumberWrapper(fn(...coercedArguments), functionDefinition.returnNumberType)
   }
 
   protected runFunctionWithReferenceArgument = (
     args: Ast[],
     formulaAddress: SimpleCellAddress,
     argumentDefinitions: FunctionArguments,
-    noArgCallback: () => InternalScalarValue,
+    noArgCallback: () => InternalScalarValue | RawScalarValue,
     referenceCallback: (reference: SimpleCellAddress) => InternalScalarValue,
     nonReferenceCallback: (...arg: any) => InternalScalarValue = () => new CellError(ErrorType.NA, ErrorMessage.CellRefExpected)
   ) => {
     if (args.length === 0) {
-      return noArgCallback()
+      return this.returnNumberWrapper(noArgCallback(), argumentDefinitions.returnNumberType)
     } else if (args.length > 1) {
       return new CellError(ErrorType.NA, ErrorMessage.WrongArgNumber)
     }
@@ -322,7 +376,7 @@ export abstract class FunctionPlugin {
     }
 
     if (cellReference !== undefined) {
-      return referenceCallback(cellReference)
+      return this.returnNumberWrapper(referenceCallback(cellReference), argumentDefinitions.returnNumberType)
     }
 
     return this.runFunction(args, formulaAddress, argumentDefinitions, nonReferenceCallback)
@@ -335,4 +389,13 @@ export abstract class FunctionPlugin {
     }
     throw new Error(`No metadata for function ${name}.`)
   }
+
+  private returnNumberWrapper(val: InternalScalarValue, type?: NumberType, format?: FormatInfo): InternalScalarValue {
+    if(type !== undefined && isExtendedNumber(val)) {
+      return this.interpreter.arithmeticHelper.ExtendedNumberFactory(getRawValue(val), {type, format})
+    } else {
+      return val
+    }
+  }
 }
+

@@ -4,10 +4,11 @@
  */
 
 import {AbsoluteCellRange} from './AbsoluteCellRange'
-import {CellType, CellValueType, getCellType, getCellValueType, SimpleCellAddress} from './Cell'
+import {CellType, CellValueDetailedType, CellValueType, getCellType, getCellValueType, getCellValueDetailedType, getCellValueFormat, SimpleCellAddress} from './Cell'
 import {CellContent, CellContentParser, RawCellContent} from './CellContentParser'
 import {CellValue, NoErrorCellValue} from './CellValue'
 import {ExportedChange, Exporter} from './Exporter'
+import {FormatInfo} from './interpreter/InterpreterValue'
 import {ColumnSearchStrategy} from './Lookup/SearchStrategy'
 import {Config, ConfigParams} from './Config'
 import {ColumnRowIndex, CrudOperations} from './CrudOperations'
@@ -1124,6 +1125,331 @@ export class HyperFormula implements TypedEmitter {
   public setCellContents(topLeftCornerAddress: SimpleCellAddress, cellContents: RawCellContent[][] | RawCellContent): ExportedChange[] {
     this._crudOperations.setCellContents(topLeftCornerAddress, cellContents)
     return this.recomputeIfDependencyGraphNeedsIt()
+  }
+
+  /**
+   * Reorders rows of a sheet according to a source-target mapping.
+   *
+   * Note that this method may trigger dependency graph recalculation.
+   *
+   * @param {number} sheetId - ID of a sheet to operate on
+   * @param {[number, number][]} rowMapping - array mapping original positions to final positions of rows
+   *
+   * @fires [[valuesUpdated]] if recalculation was triggered by this change
+   *
+   * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
+   * @throws [[InvalidArgumentsError]] when rowMapping does not define correct row permutation for some subset of rows of the given sheet
+   * @throws [[SourceLocationHasMatrixError]] when the selected position has matrix inside
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromArray([
+   *  [1],
+   *  [2],
+   *  [4, 5],
+   * ]);
+   *
+   * // should set swap rows 0 and 2 in place, returns:
+   * // [{
+   * //   address: { sheet: 0, col: 0, row: 2 },
+   * //   newValue: 1,
+   * // },
+   * // {
+   * //   address: { sheet: 0, col: 1, row: 2 },
+   * //   newValue: null,
+   * // },
+   * // {
+   * //   address: { sheet: 0, col: 0, row: 0 },
+   * //   newValue: 4,
+   * // },
+   * // {
+   * //   address: { sheet: 0, col: 1, row: 0 },
+   * //   newValue: 5,
+   * // }]
+   * const changes = hfInstance.swapRowIndexes(0, [[0,2],[2,0]]);
+   * ```
+   *
+   * @category Rows
+   */
+  public swapRowIndexes(sheetId: number, rowMapping: [number, number][]): ExportedChange[] {
+    this._crudOperations.setRowOrder(sheetId, rowMapping)
+    return this.recomputeIfDependencyGraphNeedsIt()
+  }
+
+  /**
+   * Checks if it is possible to reorder rows of a sheet according to a source-target mapping.
+   *
+   * @param {number} sheetId - ID of a sheet to operate on
+   * @param {[number, number][]} rowMapping - array mapping original positions to final positions of rows
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromArray([
+   *  [1],
+   *  [2],
+   *  [4, 5],
+   * ]);
+   *
+   * // returns true
+   * const isSwappable = hfInstance.isItPossibleToSwapRowIndexes(0, [[0,2],[2,0]]);
+   *
+   * // returns false
+   * const isSwappable = hfInstance.isItPossibleToSwapRowIndexes(0, [[0,1]]);
+   * ```
+   *
+   * @category Rows
+   */
+  public isItPossibleToSwapRowIndexes(sheetId: number, rowMapping: [number, number][]): boolean {
+    try {
+      this._crudOperations.validateSwapRowIndexes(sheetId, rowMapping)
+      this._crudOperations.testRowOrderForMatrices(sheetId, rowMapping)
+      return true
+    } catch (e) {
+      return false
+    }
+  }
+
+  /**
+   * Reorders rows of a sheet according to a permutation.
+   *
+   * Note that this method may trigger dependency graph recalculation.
+   *
+   * @param {number} sheetId - ID of a sheet to operate on
+   * @param {number[]} newRowOrder - permutation of rows
+   *
+   * @fires [[valuesUpdated]] if recalculation was triggered by this change
+   *
+   * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
+   * @throws [[InvalidArgumentsError]] when rowMapping does not define correct row permutation for some subset of rows of the given sheet
+   * @throws [[SourceLocationHasMatrixError]] when the selected position has matrix inside
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromArray([
+   *  [1],
+   *  [2],
+   *  [4, 5],
+   * ]);
+   *
+   * // should set swap rows 0 and 2 in place, returns:
+   * // [{
+   * //   address: { sheet: 0, col: 0, row: 2 },
+   * //   newValue: 1,
+   * // },
+   * // {
+   * //   address: { sheet: 0, col: 1, row: 2 },
+   * //   newValue: null,
+   * // },
+   * // {
+   * //   address: { sheet: 0, col: 0, row: 0 },
+   * //   newValue: 4,
+   * // },
+   * // {
+   * //   address: { sheet: 0, col: 1, row: 0 },
+   * //   newValue: 5,
+   * // }]
+   * const changes = hfInstance.setRowOrder(0, [2, 1, 0]);
+   * ```
+   *
+   * @category Rows
+   */
+  public setRowOrder(sheetId: number, newRowOrder: number[]): ExportedChange[] {
+    const mapping = this._crudOperations.mappingFromOrder(sheetId, newRowOrder, 'row')
+    return this.swapRowIndexes(sheetId, mapping)
+  }
+
+  /**
+   * Checks if it is possible to reorder rows of a sheet according to a permutation.
+   *
+   * @param {number} sheetId - ID of a sheet to operate on
+   * @param {number[]} newRowOrder - permutation of rows
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromArray([
+   *  [1],
+   *  [2],
+   *  [4, 5],
+   * ]);
+   *
+   * // returns true
+   * hfInstance.isItPossibleToSetRowOrder(0, [2, 1, 0]);
+   *
+   * // returns false
+   * hfInstance.isItPossibleToSetRowOrder(0, [2]);
+   * ```
+   *
+   * @category Rows
+   */
+  public isItPossibleToSetRowOrder(sheetId: number, newRowOrder: number[]): boolean {
+    try {
+      const rowMapping = this._crudOperations.mappingFromOrder(sheetId, newRowOrder, 'row')
+      this._crudOperations.validateSwapRowIndexes(sheetId, rowMapping)
+      this._crudOperations.testRowOrderForMatrices(sheetId, rowMapping)
+      return true
+    } catch (e) {
+      return false
+    }
+  }
+
+  /**
+   * Reorders columns of a sheet according to a source-target mapping.
+   *
+   * Note that this method may trigger dependency graph recalculation.
+   *
+   * @param {number} sheetId - ID of a sheet to operate on
+   * @param {[number, number][]} columnMapping - array mapping original positions to final positions of columns
+   *
+   * @fires [[valuesUpdated]] if recalculation was triggered by this change
+   *
+   * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
+   * @throws [[InvalidArgumentsError]] when columnMapping does not define correct column permutation for some subset of columns of the given sheet
+   * @throws [[SourceLocationHasMatrixError]] when the selected position has matrix inside
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromArray([
+   *  [1, 2, 4],
+   *  [5]
+   * ]);
+   *
+   * // should set swap columns 0 and 2 in place, returns:
+   * // [{
+   * //   address: { sheet: 0, col: 2, row: 0 },
+   * //   newValue: 1,
+   * // },
+   * // {
+   * //   address: { sheet: 0, col: 2, row: 1 },
+   * //   newValue: 5,
+   * // },
+   * // {
+   * //   address: { sheet: 0, col: 0, row: 0 },
+   * //   newValue: 4,
+   * // },
+   * // {
+   * //   address: { sheet: 0, col: 0, row: 1 },
+   * //   newValue: null,
+   * // }]
+   * const changes = hfInstance.swapColumnIndexes(0, [[0,2],[2,0]]);
+   * ```
+   *
+   * @category Columns
+   */
+  public swapColumnIndexes(sheetId: number, columnMapping: [number, number][]): ExportedChange[] {
+    this._crudOperations.setColumnOrder(sheetId, columnMapping)
+    return this.recomputeIfDependencyGraphNeedsIt()
+  }
+
+  /**
+   * Checks if it is possible to reorder columns of a sheet according to a source-target mapping.
+   *
+   * @fires [[valuesUpdated]] if recalculation was triggered by this change
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromArray([
+   *  [1, 2, 4],
+   *  [5]
+   * ]);
+   *
+   * // returns true
+   * hfInstance.isItPossibleToSwapColumnIndexes(0, [[0,2],[2,0]]);
+   *
+   * // returns false
+   * hfInstance.isItPossibleToSwapColumnIndexes(0, [[0,1]]);
+   * ```
+   *
+   * @category Columns
+   */
+  public isItPossibleToSwapColumnIndexes(sheetId: number, columnMapping: [number, number][]): boolean {
+    try {
+      this._crudOperations.validateSwapColumnIndexes(sheetId, columnMapping)
+      this._crudOperations.testColumnOrderForMatrices(sheetId, columnMapping)
+      return true
+    } catch (e) {
+      return false
+    }
+  }
+
+  /**
+   * Reorders columns of a sheet according to a permutation.
+   *
+   * Note that this method may trigger dependency graph recalculation.
+   *
+   * @param {number} sheetId - ID of a sheet to operate on
+   * @param {number[]} newColumnOrder - permutation of columns
+   *
+   * @fires [[valuesUpdated]] if recalculation was triggered by this change
+   *
+   * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
+   * @throws [[InvalidArgumentsError]] when columnMapping does not define correct column permutation for some subset of columns of the given sheet
+   * @throws [[SourceLocationHasMatrixError]] when the selected position has matrix inside
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromArray([
+   *  [1, 2, 4],
+   *  [5]
+   * ]);
+   *
+   * // should set swap columns 0 and 2 in place, returns:
+   * // [{
+   * //   address: { sheet: 0, col: 2, row: 0 },
+   * //   newValue: 1,
+   * // },
+   * // {
+   * //   address: { sheet: 0, col: 2, row: 1 },
+   * //   newValue: 5,
+   * // },
+   * // {
+   * //   address: { sheet: 0, col: 0, row: 0 },
+   * //   newValue: 4,
+   * // },
+   * // {
+   * //   address: { sheet: 0, col: 0, row: 1 },
+   * //   newValue: null,
+   * // }]
+   * const changes = hfInstance.setColumnOrder(0, [2, 1, 0]]);
+   * ```
+   *
+   * @category Columns
+   */
+  public setColumnOrder(sheetId: number, newColumnOrder: number[]): ExportedChange[] {
+    const mapping = this._crudOperations.mappingFromOrder(sheetId, newColumnOrder, 'column')
+    return this.swapColumnIndexes(sheetId, mapping)
+  }
+
+  /**
+   * Checks if it possible to reorder columns of a sheet according to a permutation.
+   *
+   * @param {number} sheetId - ID of a sheet to operate on
+   * @param {number[]} newColumnOrder - permutation of columns
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromArray([
+   *  [1, 2, 4],
+   *  [5]
+   * ]);
+   *
+   * // returns true
+   * hfInstance.isItPossibleToSetColumnOrder(0, [2, 1, 0]]);
+   *
+   * // returns false
+   * hfInstance.isItPossibleToSetColumnOrder(0, [1]]);
+   * ```
+   *
+   * @category Columns
+   */
+  public isItPossibleToSetColumnOrder(sheetId: number, newRowOrder: number[]): boolean {
+    try {
+      const columnMapping = this._crudOperations.mappingFromOrder(sheetId, newRowOrder, 'column')
+      this._crudOperations.validateSwapColumnIndexes(sheetId, columnMapping)
+      this._crudOperations.testColumnOrderForMatrices(sheetId, columnMapping)
+      return true
+    } catch (e) {
+      return false
+    }
   }
 
   /**
@@ -2502,6 +2828,64 @@ export class HyperFormula implements TypedEmitter {
     this.ensureEvaluationIsNotSuspended()
     const value = this.dependencyGraph.getCellValue(cellAddress)
     return getCellValueType(value)
+  }
+
+  /**
+   * Returns detailed type of the cell value of a given address.
+   * The methods accepts cell coordinates as object with column, row and sheet numbers.
+   *
+   * @param {SimpleCellAddress} cellAddress - cell coordinates
+   *
+   * @throws [[EvaluationSuspendedError]] when the evaluation is suspended
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromArray([
+   *  ['1%', '1$'],
+   * ]);
+   *
+   * // should return 'NUMBER_PERCENT', cell value type of provided coordinates is a number with a format inference percent.
+   * const cellType = hfInstance.getCellValueType({ sheet: 0, col: 0, row: 0 });
+   *
+   * // should return 'NUMBER_CURRENCY', cell value type of provided coordinates is a number with a format inference currency.
+   * const cellType = hfInstance.getCellValueType({ sheet: 0, col: 1, row: 0 });
+   * ```
+   *
+   * @category Cells
+   */
+  public getCellValueDetailedType(cellAddress: SimpleCellAddress): CellValueDetailedType {
+    this.ensureEvaluationIsNotSuspended()
+    const value = this.dependencyGraph.getCellValue(cellAddress)
+    return getCellValueDetailedType(value)
+  }
+
+  /**
+   * Returns auxilary format information of the cell value of a given address.
+   * The methods accepts cell coordinates as object with column, row and sheet numbers.
+   *
+   * @param {SimpleCellAddress} cellAddress - cell coordinates
+   *
+   * @throws [[EvaluationSuspendedError]] when the evaluation is suspended
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromArray([
+   *  ['1$', '1'],
+   * ]);
+   *
+   * // should return '$', cell value type of provided coordinates is a number with a format inference currency, parsed as using '$' as currency.
+   * const cellFormat = hfInstance.getCellValueFormat({ sheet: 0, col: 0, row: 0 });
+   *
+   * // should return undefined, cell value type of provided coordinates is a number with no format information.
+   * const cellFormat = hfInstance.getCellValueFormat({ sheet: 0, col: 1, row: 0 });
+   * ```
+   *
+   * @category Cells
+   */
+  public getCellValueFormat(cellAddress: SimpleCellAddress): FormatInfo {
+    this.ensureEvaluationIsNotSuspended()
+    const value = this.dependencyGraph.getCellValue(cellAddress)
+    return getCellValueFormat(value)
   }
 
   /**

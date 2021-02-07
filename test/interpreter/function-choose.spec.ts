@@ -1,5 +1,5 @@
 import {HyperFormula} from '../../src'
-import {ErrorType} from '../../src/Cell'
+import {CellValueDetailedType, ErrorType} from '../../src/Cell'
 import {ErrorMessage} from '../../src/error-message'
 import {adr, detailedError} from '../testUtils'
 
@@ -18,6 +18,18 @@ describe('Interpreter - CHOOSE function', () => {
     expect(engine.getCellValue(adr('A1'))).toEqual(2)
     expect(engine.getCellValue(adr('B1'))).toEqual(4)
     expect(engine.getCellValue(adr('C1'))).toEqual(3)
+  })
+
+  it('should preserve types', () => {
+    const engine = HyperFormula.buildFromArray([['=CHOOSE(1,B1,3)', '1%' ]])
+
+    expect(engine.getCellValueDetailedType(adr('A1'))).toBe(CellValueDetailedType.NUMBER_PERCENT)
+  })
+
+  it('preserves types of second arg', () => {
+    const engine = HyperFormula.buildFromArray([['=IFERROR(NA(), B1)', '1%' ]])
+
+    expect(engine.getCellValueDetailedType(adr('A1'))).toBe(CellValueDetailedType.NUMBER_PERCENT)
   })
 
   it('Should fail when wrong first argument', () => {

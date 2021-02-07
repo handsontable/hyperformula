@@ -1,5 +1,5 @@
 import {HyperFormula} from '../../src'
-import {ErrorType} from '../../src/Cell'
+import {CellValueDetailedType, ErrorType} from '../../src/Cell'
 import {ErrorMessage} from '../../src/error-message'
 import {adr, detailedError} from '../testUtils'
 
@@ -14,6 +14,7 @@ describe('Interpreter - function NOW', () => {
       ['=NOW()'],
     ])
     const t1 = engine.getCellValue(adr('A1')) as number
+    expect(engine.getCellValueDetailedType(adr('A1'))).toBe(CellValueDetailedType.NUMBER_DATETIME)
     sleepFor(1000)
     engine.setCellContents(adr('A2'), null)
     const t2 = engine.getCellValue(adr('A1')) as number

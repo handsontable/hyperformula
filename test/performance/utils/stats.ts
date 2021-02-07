@@ -1,5 +1,5 @@
-import {StatType} from '../../../src/statistics'
 import {HyperFormula} from '../../../src'
+import {StatType} from '../../../src/statistics'
 
 export type Stats = Map<EnrichedStatType, number>
 

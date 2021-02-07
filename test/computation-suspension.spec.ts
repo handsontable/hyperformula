@@ -1,5 +1,5 @@
-import {HyperFormula, EvaluationSuspendedError, ExportedCellChange} from '../src'
-import { CellType } from '../src/Cell'
+import {EvaluationSuspendedError, ExportedCellChange, HyperFormula} from '../src'
+import {CellType} from '../src/Cell'
 import {adr} from './testUtils'
 
 describe('Evaluation suspension', () => {

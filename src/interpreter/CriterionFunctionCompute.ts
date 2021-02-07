@@ -4,14 +4,15 @@
  */
 
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
-import {CellError, ErrorType, InternalScalarValue, simpleCellAddress} from '../Cell'
+import {CellError, ErrorType, simpleCellAddress} from '../Cell'
 import {CriterionCache, DependencyGraph, RangeVertex} from '../DependencyGraph'
 import {ErrorMessage} from '../error-message'
 import {split} from '../generatorUtils'
 import {Maybe} from '../Maybe'
 import {CriterionLambda, CriterionPackage} from './Criterion'
 import {Interpreter} from './Interpreter'
-import {SimpleRangeValue} from './InterpreterValue'
+import {getRawValue, InternalScalarValue, RawScalarValue} from './InterpreterValue'
+import {SimpleRangeValue} from './SimpleRangeValue'
 
 const findSmallerRangeForMany = (dependencyGraph: DependencyGraph, conditionRanges: AbsoluteCellRange[], valuesRange: AbsoluteCellRange): {smallerRangeVertex: RangeVertex | null, restConditionRanges: AbsoluteCellRange[], restValuesRange: AbsoluteCellRange} => {
   if (valuesRange.end.row > valuesRange.start.row) {
@@ -145,9 +146,9 @@ export class Condition {
   }
 }
 
-function * getRangeValues(dependencyGraph: DependencyGraph, cellRange: AbsoluteCellRange): IterableIterator<InternalScalarValue> {
+function * getRangeValues(dependencyGraph: DependencyGraph, cellRange: AbsoluteCellRange): IterableIterator<RawScalarValue> {
   for (const cellFromRange of cellRange.addresses(dependencyGraph)) {
-    yield dependencyGraph.getScalarValue(cellFromRange)
+    yield getRawValue(dependencyGraph.getScalarValue(cellFromRange))
   }
 }
 
@@ -157,7 +158,7 @@ function* ifFilter<T>(criterionLambdas: CriterionLambda[], conditionalIterables:
     if (!conditionalSplits.every((cs) => Object.prototype.hasOwnProperty.call(cs, 'value'))) {
       return
     }
-    const conditionalFirsts = conditionalSplits.map((cs) => (cs.value as InternalScalarValue))
+    const conditionalFirsts = conditionalSplits.map((cs) => (cs.value as RawScalarValue))
     if (zip(conditionalFirsts, criterionLambdas).every(([conditionalFirst, criterionLambda]) => criterionLambda(conditionalFirst))) {
       yield computable
     }

@@ -1,6 +1,8 @@
-import {HyperFormula, ExportedCellChange, NothingToPasteError} from '../../src'
+import {ExportedCellChange, HyperFormula, NothingToPasteError} from '../../src'
 import {ErrorType, simpleCellAddress} from '../../src/Cell'
+import {Config} from '../../src/Config'
 import {ErrorMessage} from '../../src/error-message'
+import {SheetSizeLimitExceededError} from '../../src/errors'
 import {CellAddress} from '../../src/parser'
 import {
   adr,
@@ -8,11 +10,10 @@ import {
   colStart,
   detailedError,
   expectArrayWithSameContent,
-  extractReference, rowEnd,
+  extractReference,
+  rowEnd,
   rowStart,
 } from '../testUtils'
-import {Config} from '../../src/Config'
-import {SheetSizeLimitExceededError} from '../../src/errors'
 
 describe('Copy - paste integration', () => {
   it('copy should validate arguments', () => {
@@ -183,13 +184,50 @@ describe('Copy - paste integration', () => {
   it('should return ref when pasted reference is out of scope', () => {
     const engine = HyperFormula.buildFromArray([
       [null, null],
-      [null, '=B1'],
+      [null, '=A1'],
     ])
 
     engine.copy(adr('B2'), 1, 1)
     engine.paste(adr('A1'))
 
     expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.REF, ErrorMessage.BadRef))
+    expect(engine.getCellSerialized(adr('A1'))).toEqual('=#REF!')
+  })
+
+  it('should return ref when pasted range is out of scope', () => {
+    const engine = HyperFormula.buildFromArray([
+      [null, null],
+      [null, '=A1:B2'],
+    ])
+
+    engine.copy(adr('B2'), 1, 1)
+    engine.paste(adr('A1'))
+
+    expect(engine.getCellSerialized(adr('A1'))).toEqual('=#REF!')
+  })
+
+  it('should return ref when pasted column range is out of scope', () => {
+    const engine = HyperFormula.buildFromArray([
+      [null, null],
+      [null, '=A:B'],
+    ])
+
+    engine.copy(adr('B2'), 1, 1)
+    engine.paste(adr('A1'))
+
+    expect(engine.getCellSerialized(adr('A1'))).toEqual('=#REF!')
+  })
+
+  it('should return ref when pasted row range is out of scope', () => {
+    const engine = HyperFormula.buildFromArray([
+      [null, null],
+      [null, '=1:2'],
+    ])
+
+    engine.copy(adr('B2'), 1, 1)
+    engine.paste(adr('A1'))
+
+    expect(engine.getCellSerialized(adr('A1'))).toEqual('=#REF!')
   })
 
   it('should create new range vertex - cell range', () => {

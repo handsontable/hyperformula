@@ -1,16 +1,16 @@
-import {HyperFormula, ExportedCellChange} from '../../src'
+import {ExportedCellChange, HyperFormula, NoSheetWithNameError} from '../../src'
 import {AbsoluteCellRange} from '../../src/AbsoluteCellRange'
 import {ErrorType, simpleCellAddress} from '../../src/Cell'
-import {ColumnIndex} from '../../src/Lookup/ColumnIndex'
 import {MatrixVertex} from '../../src/DependencyGraph'
-import {NoSheetWithNameError} from '../../src'
+import {ColumnIndex} from '../../src/Lookup/ColumnIndex'
 import {CellAddress} from '../../src/parser'
 import {
   adr,
+  detailedErrorWithOrigin,
   expectArrayWithSameContent,
-  expectReferenceToHaveRefError,
   expectEngineToBeTheSameAs,
-  extractReference, detailedErrorWithOrigin,
+  expectReferenceToHaveRefError,
+  extractReference,
 } from '../testUtils'
 
 describe('Removing sheet - checking if its possible', () => {

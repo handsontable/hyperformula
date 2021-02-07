@@ -1,7 +1,7 @@
 import {ErrorType, HyperFormula} from '../../src'
+import {DependencyGraph} from '../../src/DependencyGraph'
 import {ErrorMessage} from '../../src/error-message'
 import {adr, detailedError} from '../testUtils'
-import {DependencyGraph} from '../../src/DependencyGraph'
 
 describe('Function MATCH', () => {
   it('validates number of arguments', () => {

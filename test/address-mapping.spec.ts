@@ -1,8 +1,12 @@
 import {AddressMapping, DenseStrategy, EmptyCellVertex, SparseStrategy, ValueCellVertex} from '../src/DependencyGraph'
-import {AlwaysDense, AlwaysSparse, DenseSparseChooseBasedOnThreshold} from '../src/DependencyGraph/AddressMapping/ChooseAddressMappingPolicy'
+import {
+  AlwaysDense,
+  AlwaysSparse,
+  DenseSparseChooseBasedOnThreshold
+} from '../src/DependencyGraph/AddressMapping/ChooseAddressMappingPolicy'
+import {findBoundaries} from '../src/Sheet'
 import {ColumnsSpan, RowsSpan} from '../src/Span'
 import {adr} from './testUtils'
-import {findBoundaries} from '../src/Sheet'
 
 const sharedExamples = (builder: (width: number, height: number) => AddressMapping) => {
   it('simple set', () => {

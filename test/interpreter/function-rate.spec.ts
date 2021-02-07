@@ -1,4 +1,5 @@
 import {ErrorType, HyperFormula} from '../../src'
+import {CellValueDetailedType} from '../../src/Cell'
 import {ErrorMessage} from '../../src/error-message'
 import {adr, detailedError} from '../testUtils'
 
@@ -24,6 +25,7 @@ describe('Function RATE', () => {
     ])
 
     expect(engine.getCellValue(adr('A1'))).toBeCloseTo(0.228933070977096)
+    expect(engine.getCellValueDetailedType(adr('A1'))).toBe(CellValueDetailedType.NUMBER_PERCENT)
     //inconsistency with product #1 (returns different value)
     expect(engine.getCellValue(adr('A2'))).toBeCloseTo(-0.499692679085513)
     //inconsistency with product #1 (returns different value)

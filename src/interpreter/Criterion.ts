@@ -3,10 +3,10 @@
  * Copyright (c) 2020 Handsoncode. All rights reserved.
  */
 
-import {EmptyValue, InternalScalarValue} from '../Cell'
 import {Config} from '../Config'
 import {Maybe} from '../Maybe'
 import {ArithmeticHelper} from './ArithmeticHelper'
+import {EmptyValue, getRawValue, RawScalarValue} from './InterpreterValue'
 
 export enum CriterionType {
   GREATER_THAN = 'GREATER_THAN',
@@ -30,7 +30,7 @@ export class CriterionBuilder {
     this.falseString = config.translationPackage.getMaybeFunctionTranslation('FALSE')?.toLowerCase() ?? 'false'
   }
 
-  public fromCellValue(raw: InternalScalarValue, arithmeticHelper: ArithmeticHelper): Maybe<CriterionPackage> {
+  public fromCellValue(raw: RawScalarValue, arithmeticHelper: ArithmeticHelper): Maybe<CriterionPackage> {
     if (typeof raw !== 'string' && typeof raw !== 'boolean' && typeof raw !== 'number') {
       return undefined
     }
@@ -43,7 +43,7 @@ export class CriterionBuilder {
     return {raw, lambda: buildCriterionLambda(criterion, arithmeticHelper)}
   }
 
-  public parseCriterion(criterion: InternalScalarValue, arithmeticHelper: ArithmeticHelper): Maybe<Criterion> {
+  public parseCriterion(criterion: RawScalarValue, arithmeticHelper: ArithmeticHelper): Maybe<Criterion> {
     if (typeof criterion === 'number' || typeof criterion === 'boolean') {
       return buildCriterion(CriterionType.EQUAL, criterion)
     } else if (typeof criterion === 'string') {
@@ -71,7 +71,7 @@ export class CriterionBuilder {
           return buildCriterion(criterionType, boolvalue ?? criterionValue)
         }
       } else {
-        return buildCriterion(criterionType, value)
+        return buildCriterion(criterionType, getRawValue(value))
       }
     }
     return undefined
@@ -95,7 +95,7 @@ function StrToCriterionType(str: string): Maybe<CriterionType> {
   }
 }
 
-export type CriterionLambda = (cellValue: InternalScalarValue) => boolean
+export type CriterionLambda = (cellValue: RawScalarValue) => boolean
 export const buildCriterionLambda = (criterion: Criterion, arithmeticHelper: ArithmeticHelper): CriterionLambda => {
   switch (criterion.operator) {
     case CriterionType.GREATER_THAN: {

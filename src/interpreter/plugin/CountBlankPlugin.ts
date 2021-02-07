@@ -3,8 +3,9 @@
  * Copyright (c) 2020 Handsoncode. All rights reserved.
  */
 
-import {EmptyValue, InternalScalarValue, SimpleCellAddress} from '../../Cell'
+import {SimpleCellAddress} from '../../Cell'
 import {ProcedureAst} from '../../parser'
+import {EmptyValue, InternalScalarValue, RawScalarValue} from '../InterpreterValue'
 import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
 
 /**
@@ -24,7 +25,7 @@ export class CountBlankPlugin extends FunctionPlugin {
   }
 
   public countblank(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('COUNTBLANK'), (...args: InternalScalarValue[]) => {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('COUNTBLANK'), (...args: RawScalarValue[]) => {
       let counter = 0
       args.forEach((arg) => {
         if(arg === EmptyValue) {

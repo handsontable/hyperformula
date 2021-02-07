@@ -1,6 +1,6 @@
+import {DetailedCellError} from '../src'
 import {CellError, ErrorType} from '../src/Cell'
 import {adr} from './testUtils'
-import {DetailedCellError} from '../src'
 
 describe('Matchers', () => {
   it('should compare two simple values', () => {

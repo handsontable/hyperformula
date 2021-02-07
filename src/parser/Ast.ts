@@ -5,11 +5,11 @@
 
 import {IToken} from 'chevrotain'
 import {CellError} from '../Cell'
+import {AddressWithSheet} from './Address'
 import {CellAddress} from './CellAddress'
 import {ColumnAddress} from './ColumnAddress'
 import {IExtendedToken} from './FormulaParser'
 import {RowAddress} from './RowAddress'
-import {AddressWithSheet} from './Address'
 
 export type Ast =
   NumberAst

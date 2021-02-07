@@ -1,4 +1,4 @@
-import {HyperFormula, ExportedCellChange} from '../../src'
+import {ExportedCellChange, HyperFormula} from '../../src'
 import {simpleCellAddress} from '../../src/Cell'
 import {adr, expectArrayWithSameContent} from '../testUtils'
 

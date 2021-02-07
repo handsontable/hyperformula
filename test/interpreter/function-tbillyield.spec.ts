@@ -1,4 +1,5 @@
 import {ErrorType, HyperFormula} from '../../src'
+import {CellValueDetailedType} from '../../src/Cell'
 import {ErrorMessage} from '../../src/error-message'
 import {adr, detailedError} from '../testUtils'
 
@@ -23,6 +24,7 @@ describe('Function TBILLYIELD', () => {
     ])
 
     expect(engine.getCellValue(adr('A1'))).toBeCloseTo(32.4, 6)
+    expect(engine.getCellValueDetailedType(adr('A1'))).toBe(CellValueDetailedType.NUMBER_PERCENT)
     expect(engine.getCellValue(adr('A2'))).toEqual(9)
     expect(engine.getCellValue(adr('B2'))).toBeCloseTo(17.7049180327869, 6)
     expect(engine.getCellValue(adr('A3'))).toEqual(18)

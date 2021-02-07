@@ -15,6 +15,8 @@ on the types of values.
 | DateTime | Date and Time types combined into one, like 22/06/2022 10:40:16. |
 | Error | An error returned as a result of formula calculation, like #REF! |
 | Duration | A time-based amount of time |
+| Currency | Number representing currency |
+| Percentage | Number representing percentage |
 
 ## Getting cell type
 
@@ -30,3 +32,12 @@ You can also use the `getCellValueType` method which returns
 the calculated value type, so a cell's value for the formula:
 `'=SUM(1,2,3)'` will be 'NUMBER'. Here is the list of possible cell value
 types: `'NUMBER'`, `'STRING'`, `'BOOLEAN'`, `'ERROR'`, `'EMPTY'`.
+
+## Getting detailed cell value type
+
+Currently, number type contains several subtypes (date, time, datetime, currency, percentage),
+that can be used interchangably with numbers in computation. We keep track of those, so eg if
+a function produces currency-type output, and later the value is used in arithmetic operations,
+the output of those is as well marked as currency-type. Info about those can be extracted via `getCellValueDetailedType` function.
+Auxilary information about formating (if there is any) is available via `getCellValueFormat` function. In case of currency, it would be
+the currency symbol used when parsing the currency (e.g. '$').

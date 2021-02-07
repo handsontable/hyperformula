@@ -1,10 +1,10 @@
 import {simpleCellAddress} from '../../src/Cell'
+import {Config} from '../../src/Config'
 import {SheetMapping} from '../../src/DependencyGraph'
 import {buildTranslationPackage} from '../../src/i18n'
 import {enGB} from '../../src/i18n/languages'
 import {AstNodeType, CellRangeAst, ParsingErrorType} from '../../src/parser'
 import {RangeSheetReferenceType} from '../../src/parser/Ast'
-import {Config} from '../../src/Config'
 import {buildEmptyParserWithCaching} from './common'
 
 describe('Parser - range offset', () => {

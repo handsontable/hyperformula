@@ -56,7 +56,7 @@ import {
   RemoveRowsUndoEntry,
   RemoveSheetUndoEntry,
   RenameSheetUndoEntry,
-  SetCellContentsUndoEntry,
+  SetCellContentsUndoEntry, SetColumnOrderUndoEntry, SetRowOrderUndoEntry,
   SetSheetContentUndoEntry,
   UndoRedo
 } from './UndoRedo'
@@ -291,6 +291,97 @@ export class CrudOperations {
     const oldSheetContent = this.operations.getSheetClipboardCells(sheetId)
     this.operations.setSheetContent(sheetId, values)
     this.undoRedo.saveOperation(new SetSheetContentUndoEntry(sheetId, oldSheetContent, values))
+  }
+
+  public setRowOrder(sheetId: number, rowMapping: [number, number][]): void {
+    this.validateSwapRowIndexes(sheetId, rowMapping)
+    this.testRowOrderForMatrices(sheetId, rowMapping)
+    this.undoRedo.clearRedoStack()
+    this.clipboardOperations.abortCut()
+    this.operations.setRowOrder(sheetId, rowMapping)
+    this.undoRedo.saveOperation(new SetRowOrderUndoEntry(sheetId, rowMapping))
+  }
+
+  public validateSwapRowIndexes(sheetId: number, rowMapping: [number, number][]): void {
+    if (!this.sheetMapping.hasSheetWithId(sheetId)) {
+      throw new NoSheetWithIdError(sheetId)
+    }
+    this.validateRowOrColumnMapping(sheetId, rowMapping, 'row')
+  }
+
+  public testColumnOrderForMatrices(sheetId: number, columnMapping: [number, number][]): void {
+    for(const [source, target] of columnMapping ) {
+      if(source!==target) {
+        const rowRange = AbsoluteCellRange.spanFrom({sheet: sheetId, col: source, row: 0}, 1, Infinity)
+        if (this.dependencyGraph.matrixMapping.isFormulaMatrixInRange(rowRange)) {
+          throw new SourceLocationHasMatrixError()
+        }
+      }
+    }
+  }
+
+
+  public setColumnOrder(sheetId: number, columnMapping: [number, number][]): void {
+    this.validateSwapColumnIndexes(sheetId, columnMapping)
+    this.testColumnOrderForMatrices(sheetId, columnMapping)
+    this.undoRedo.clearRedoStack()
+    this.clipboardOperations.abortCut()
+    this.operations.setColumnOrder(sheetId, columnMapping)
+    this.undoRedo.saveOperation(new SetColumnOrderUndoEntry(sheetId, columnMapping))
+  }
+
+  public validateSwapColumnIndexes(sheetId: number, columnMapping: [number, number][]): void {
+    if (!this.sheetMapping.hasSheetWithId(sheetId)) {
+      throw new NoSheetWithIdError(sheetId)
+    }
+    this.validateRowOrColumnMapping(sheetId, columnMapping, 'column')
+  }
+
+  public testRowOrderForMatrices(sheetId: number, rowMapping: [number, number][]): void {
+    for(const [source, target] of rowMapping ) {
+      if(source!==target) {
+        const rowRange = AbsoluteCellRange.spanFrom({sheet: sheetId, col: 0, row: source}, Infinity, 1)
+        if (this.dependencyGraph.matrixMapping.isFormulaMatrixInRange(rowRange)) {
+          throw new SourceLocationHasMatrixError()
+        }
+      }
+    }
+  }
+
+
+  public mappingFromOrder(sheetId: number, newOrder: number[], rowOrColumn: 'row' | 'column'): [number, number][] {
+    if (!this.sheetMapping.hasSheetWithId(sheetId)) {
+      throw new NoSheetWithIdError(sheetId)
+    }
+    const limit = rowOrColumn === 'row' ? this.dependencyGraph.getSheetHeight(sheetId) : this.dependencyGraph.getSheetWidth(sheetId)
+    if(newOrder.length !== limit) {
+      throw new InvalidArgumentsError(`number of ${rowOrColumn}s provided to be sheet ${rowOrColumn==='row'?'height':'width'}.`)
+    }
+    const ret: [number, number][] = []
+    for(let i=0;i<limit;i++) {
+      if(newOrder[i]!==i) {
+        ret.push([i, newOrder[i]])
+      }
+    }
+    return ret
+  }
+
+  private validateRowOrColumnMapping(sheetId: number, rowMapping: [number, number][], rowOrColumn: 'row' | 'column'): void {
+    const limit = rowOrColumn === 'row' ? this.dependencyGraph.getSheetHeight(sheetId) : this.dependencyGraph.getSheetWidth(sheetId)
+    const sources = rowMapping.map(([a, _])=>a).sort((a, b) => a-b)
+    const targets = rowMapping.map(([_, b])=>b).sort((a, b) => a-b)
+
+    for(let i=0;i<sources.length;i++) {
+      if(!isNonnegativeInteger(sources[i]) || sources[i] >= limit) {
+        throw new InvalidArgumentsError(`${rowOrColumn} numbers to be nonnegative integers and less than sheet ${rowOrColumn==='row'?'height':'width'}.`)
+      }
+      if(sources[i]===sources[i+1]) {
+        throw new InvalidArgumentsError(`source ${rowOrColumn} numbers to be unique.`)
+      }
+      if(sources[i]!==targets[i]) {
+        throw new InvalidArgumentsError(`target ${rowOrColumn} numbers to be permutation of source ${rowOrColumn} numbers.`)
+      }
+    }
   }
 
   public undo() {
