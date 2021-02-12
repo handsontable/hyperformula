@@ -17,6 +17,7 @@ import {
 import {ColumnRangeAst, RowRangeAst} from '../parser/Ast'
 import {ColumnAddress} from '../parser/ColumnAddress'
 import {RowAddress} from '../parser/RowAddress'
+import {ErrorMessage} from '../error-message'
 
 export interface FormulaTransformer {
   sheet: number,

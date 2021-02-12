@@ -190,7 +190,7 @@ describe('Copy - paste integration', () => {
     engine.copy(adr('B2'), 1, 1)
     engine.paste(adr('A1'))
 
-    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.REF, ErrorMessage.BadRef))
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.REF))
     expect(engine.getCellSerialized(adr('A1'))).toEqual('=#REF!')
   })
 
@@ -203,7 +203,7 @@ describe('Copy - paste integration', () => {
     engine.copy(adr('B2'), 1, 1)
     engine.paste(adr('A1'))
 
-    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.REF, ErrorMessage.BadRef))
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.REF))
     expect(engine.getCellSerialized(adr('A1'))).toEqual('=#REF!')
   })
 
@@ -217,8 +217,8 @@ describe('Copy - paste integration', () => {
     engine.copy(adr('C3'), 1, 1)
     engine.paste(adr('B2'))
 
-    expect(engine.getCellValue(adr('B2'))).toEqualError(detailedError(ErrorType.REF, ErrorMessage.BadRef))
-    expect(engine.getCellSerialized(adr('B2'))).toEqual('=#REF!')
+    expect(engine.getCellValue(adr('B2'))).toEqualError(detailedError(ErrorType.REF))
+    expect(engine.getCellSerialized(adr('B2'))).toEqual('=SUM(#REF!)')
   })
 
   it('should return ref when pasted column range is out of scope', () => {
@@ -230,7 +230,7 @@ describe('Copy - paste integration', () => {
     engine.copy(adr('B2'), 1, 1)
     engine.paste(adr('A1'))
 
-    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.REF, ErrorMessage.BadRef))
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.REF))
     expect(engine.getCellSerialized(adr('A1'))).toEqual('=#REF!')
   })
 
@@ -243,7 +243,7 @@ describe('Copy - paste integration', () => {
     engine.copy(adr('B2'), 1, 1)
     engine.paste(adr('A1'))
 
-    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.REF, ErrorMessage.BadRef))
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.REF))
     expect(engine.getCellSerialized(adr('A1'))).toEqual('=#REF!')
   })
 

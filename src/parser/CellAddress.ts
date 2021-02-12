@@ -130,6 +130,11 @@ export class CellAddress implements AddressWithColumn, AddressWithRow {
     return new CellAddress(sheet, this.col, this.row, this.type)
   }
 
+  public isInScope(baseAddress: SimpleCellAddress): boolean {
+    const absolute = this.toSimpleCellAddress(baseAddress)
+    return absolute.row >= 0 && absolute.col >= 0
+  }
+
   public shiftRelativeDimensions(toRight: number, toBottom: number): CellAddress {
     const col = this.isColumnAbsolute() ? this.col : this.col + toRight
     const row = this.isRowAbsolute() ? this.row : this.row + toBottom

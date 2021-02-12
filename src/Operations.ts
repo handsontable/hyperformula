@@ -7,7 +7,7 @@ import {EmptyValue, getRawValue} from './interpreter/InterpreterValue'
 import {ClipboardCell, ClipboardCellType} from './ClipboardOperations'
 import {invalidSimpleCellAddress, simpleCellAddress, SimpleCellAddress} from './Cell'
 import {AbsoluteCellRange} from './AbsoluteCellRange'
-import {absolutizeDependencies} from './absolutizeDependencies'
+import {absolutizeDependencies, filterDependenciesOutOfScope} from './absolutizeDependencies'
 import {CellContent, CellContentParser, RawCellContent} from './CellContentParser'
 import {Config} from './Config'
 import {ContentChanges} from './ContentChanges'
@@ -53,6 +53,7 @@ import {ParsingError} from './parser/Ast'
 import {findBoundaries, Sheet} from './Sheet'
 import {ColumnsSpan, RowsSpan} from './Span'
 import {Statistics, StatType} from './statistics'
+import {CleanOutOfScopeDependenciesTransformer} from './dependencyTransformers/CleanOutOfScopeDependenciesTransformer'
 
 export class RemoveRowsCommand {
   constructor(
@@ -686,7 +687,10 @@ export class Operations {
   public setFormulaToCellFromCache(formulaHash: string, address: SimpleCellAddress) {
     const {ast, hasVolatileFunction, hasStructuralChangeFunction, dependencies} = this.parser.fetchCachedResult(formulaHash)
     const absoluteDependencies = absolutizeDependencies(dependencies, address)
-    this.dependencyGraph.setFormulaToCell(address, ast, absoluteDependencies, hasVolatileFunction, hasStructuralChangeFunction)
+    const [cleanedAst] = new CleanOutOfScopeDependenciesTransformer(address.sheet).transformSingleAst(ast, address)
+    this.parser.rememberNewAst(cleanedAst)
+    const cleanedDependencies = filterDependenciesOutOfScope(absoluteDependencies)
+    this.dependencyGraph.setFormulaToCell(address, cleanedAst, cleanedDependencies, hasVolatileFunction, hasStructuralChangeFunction)
   }
 
   public setParsingErrorToCell(rawInput: string, errors: ParsingError[], address: SimpleCellAddress) {
