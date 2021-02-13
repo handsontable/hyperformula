@@ -311,16 +311,18 @@ export class Operations {
     }
   }
 
-  public setRowOrder(sheetId: number, rowMapping: [number, number][]): void {
+  public setRowOrder(sheetId: number, rowMapping: [number, number][]): [SimpleCellAddress, ClipboardCell][] {
     const buffer: [SimpleCellAddress, ClipboardCell][][] = []
+    let oldContent: [SimpleCellAddress, ClipboardCell][] = []
     for(const [source, target] of rowMapping ) {
       if(source!==target) {
         const rowRange = AbsoluteCellRange.spanFrom({sheet: sheetId, col: 0, row: source}, Infinity, 1)
         this.dependencyGraph.breakNumericMatricesInRange(rowRange)
         const row = this.getRangeClipboardCells(rowRange)
+        oldContent = oldContent.concat(row)
         buffer.push(
           row.map(
-            ([{sheet, col, row}, cell]) => [{sheet, col, row: target}, cell]
+            ([{sheet, col}, cell]) => [{sheet, col, row: target}, cell]
           )
         )
       }
@@ -328,15 +330,18 @@ export class Operations {
     buffer.forEach(
       row => this.restoreClipboardCells(sheetId, row.values())
     )
+    return oldContent
   }
 
-  public setColumnOrder(sheetId: number, columnMapping: [number, number][]): void {
+  public setColumnOrder(sheetId: number, columnMapping: [number, number][]): [SimpleCellAddress, ClipboardCell][]  {
     const buffer: [SimpleCellAddress, ClipboardCell][][] = []
+    let oldContent: [SimpleCellAddress, ClipboardCell][] = []
     for(const [source, target] of columnMapping ) {
       if(source!==target) {
         const rowRange = AbsoluteCellRange.spanFrom({sheet: sheetId, col: source, row: 0}, 1, Infinity)
         this.dependencyGraph.breakNumericMatricesInRange(rowRange)
         const column = this.getRangeClipboardCells(rowRange)
+        oldContent = oldContent.concat(column)
         buffer.push(
           column.map(
             ([{sheet, col, row}, cell]) => [{sheet, col: target, row}, cell]
@@ -347,6 +352,7 @@ export class Operations {
     buffer.forEach(
       column => this.restoreClipboardCells(sheetId, column.values())
     )
+    return oldContent
   }
 
   public addNamedExpression(expressionName: string, expression: RawCellContent, sheetId?: number, options?: NamedExpressionOptions) {

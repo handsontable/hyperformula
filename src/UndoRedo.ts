@@ -49,7 +49,8 @@ export class AddRowsUndoEntry {
 export class SetRowOrderUndoEntry {
   constructor(
     public readonly sheetId: number,
-    public readonly rowMapping: [number, number][]
+    public readonly rowMapping: [number, number][],
+    public readonly oldContent: [SimpleCellAddress, ClipboardCell][]
   ) {
   }
 }
@@ -57,7 +58,8 @@ export class SetRowOrderUndoEntry {
 export class SetColumnOrderUndoEntry {
   constructor(
     public readonly sheetId: number,
-    public readonly columnMapping: [number, number][]
+    public readonly columnMapping: [number, number][],
+    public readonly oldContent: [SimpleCellAddress, ClipboardCell][]
   ) {
   }
 }
@@ -518,13 +520,15 @@ export class UndoRedo {
   }
 
   private undoSetRowOrder(operation: SetRowOrderUndoEntry) {
-    const reverseMap = operation.rowMapping.map(([source, target]) => [target, source] as [number, number])
-    this.operations.setRowOrder(operation.sheetId, reverseMap)
+    for (const [address, clipboardCell] of operation.oldContent) {
+      this.operations.restoreCell(address, clipboardCell)
+    }
   }
 
   private undoSetColumnOrder(operation: SetColumnOrderUndoEntry) {
-    const reverseMap = operation.columnMapping.map(([source, target]) => [target, source] as [number, number])
-    this.operations.setColumnOrder(operation.sheetId, reverseMap)
+    for (const [address, clipboardCell] of operation.oldContent) {
+      this.operations.restoreCell(address, clipboardCell)
+    }
   }
 
   public redo() {
