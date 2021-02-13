@@ -78,8 +78,8 @@ export class ColumnAddress implements AddressWithColumn {
     return new ColumnAddress(sheet, this.col, this.type)
   }
 
-  public isInScope(baseAddress: SimpleCellAddress): boolean {
-    return this.toSimpleColumnAddress(baseAddress).col >= 0
+  public isInvalid(baseAddress: SimpleCellAddress): boolean {
+    return this.toSimpleColumnAddress(baseAddress).col < 0
   }
 
   public hash(withSheet: boolean): string {

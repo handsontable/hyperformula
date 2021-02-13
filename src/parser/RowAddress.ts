@@ -73,8 +73,8 @@ export class RowAddress implements AddressWithRow {
     return new RowAddress(sheet, this.row, this.type)
   }
 
-  public isInScope(baseAddress: SimpleCellAddress): boolean {
-    return this.toSimpleRowAddress(baseAddress).row >= 0
+  public isInvalid(baseAddress: SimpleCellAddress): boolean {
+    return this.toSimpleRowAddress(baseAddress).row < 0
   }
 
   public hash(withSheet: boolean): string {

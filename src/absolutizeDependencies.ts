@@ -3,7 +3,7 @@
  * Copyright (c) 2020 Handsoncode. All rights reserved.
  */
 
-import {SimpleCellAddress} from './Cell'
+import {invalidSimpleCellAddress, SimpleCellAddress} from './Cell'
 import {CellDependency} from './CellDependency'
 import {NamedExpressionDependency, RelativeDependency} from './parser'
 import {AbsoluteCellRange} from './AbsoluteCellRange'
@@ -15,7 +15,7 @@ import {AbsoluteCellRange} from './AbsoluteCellRange'
  * @param baseAddress - base address with regard to which make a convertion
  */
 export const absolutizeDependencies = (deps: RelativeDependency[], baseAddress: SimpleCellAddress): CellDependency[] => {
-  return deps.map((dep) => dep.absolutize(baseAddress))
+  return deps.map(dep => dep.absolutize(baseAddress))
 }
 
 export const filterDependenciesOutOfScope = (deps: CellDependency[]) => {
@@ -24,13 +24,9 @@ export const filterDependenciesOutOfScope = (deps: CellDependency[]) => {
       return true
     }
     if (dep instanceof AbsoluteCellRange) {
-      return addressInScope(dep.start) && addressInScope(dep.end)
+      return !(invalidSimpleCellAddress(dep.start) || invalidSimpleCellAddress(dep.end))
     } else {
-      return addressInScope(dep)
+      return !invalidSimpleCellAddress(dep)
     }
   })
-}
-
-function addressInScope(address: SimpleCellAddress) {
-  return address.col >= 0 && address.row >= 0
 }
