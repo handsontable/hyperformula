@@ -423,9 +423,7 @@ export class UndoRedo {
   }
 
   private undoPaste(operation: PasteUndoEntry) {
-    for (const [address, clipboardCell] of operation.oldContent) {
-      this.operations.restoreCell(address, clipboardCell)
-    }
+    this.restoreOperationOldContent(operation.oldContent)
     for (const namedExpression of operation.addedGlobalNamedExpressions) {
       this.operations.removeNamedExpression(namedExpression)
     }
@@ -447,9 +445,7 @@ export class UndoRedo {
     this.operations.forceApplyPostponedTransformations()
     this.operations.moveCells(operation.destinationLeftCorner, operation.width, operation.height, operation.sourceLeftCorner)
 
-    for (const [address, clipboardCell] of operation.overwrittenCellsData) {
-      this.operations.restoreCell(address, clipboardCell)
-    }
+    this.restoreOperationOldContent(operation.overwrittenCellsData)
 
     this.restoreOldDataFromVersion(operation.version - 1)
     for (const namedExpression of operation.addedGlobalNamedExpressions) {
@@ -520,13 +516,15 @@ export class UndoRedo {
   }
 
   private undoSetRowOrder(operation: SetRowOrderUndoEntry) {
-    for (const [address, clipboardCell] of operation.oldContent) {
-      this.operations.restoreCell(address, clipboardCell)
-    }
+    this.restoreOperationOldContent(operation.oldContent)
   }
 
   private undoSetColumnOrder(operation: SetColumnOrderUndoEntry) {
-    for (const [address, clipboardCell] of operation.oldContent) {
+    this.restoreOperationOldContent(operation.oldContent)
+  }
+
+  private restoreOperationOldContent(oldContent: [SimpleCellAddress, ClipboardCell][]) {
+    for (const [address, clipboardCell] of oldContent) {
       this.operations.restoreCell(address, clipboardCell)
     }
   }
