@@ -2537,8 +2537,6 @@ export class HyperFormula implements TypedEmitter {
    * ```
    *
    * @category Helpers
-   *
-   * @since 0.2.0
    */
   public getCellDependents(address: SimpleCellAddress | AbsoluteCellRange): (AbsoluteCellRange | SimpleCellAddress)[] {
     let vertex
@@ -2570,8 +2568,6 @@ export class HyperFormula implements TypedEmitter {
    * ```
    *
    * @category Helpers
-   *
-   * @since 0.2.0
    */
   public getCellPrecedents(address: SimpleCellAddress | AbsoluteCellRange): (AbsoluteCellRange | SimpleCellAddress)[] {
     let vertex
