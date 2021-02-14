@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright (c) 2021 Handsoncode. All rights reserved.
+ * Copyright (c) 2020 Handsoncode. All rights reserved.
  */
 
 import {CellType, CellValueDetailedType, CellValueType, ErrorType, SimpleCellAddress, CellValueJustNumber, CellValueNoNumber} from './Cell'
