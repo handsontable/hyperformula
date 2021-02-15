@@ -298,8 +298,8 @@ export class CrudOperations {
     this.testRowOrderForMatrices(sheetId, rowMapping)
     this.undoRedo.clearRedoStack()
     this.clipboardOperations.abortCut()
-    this.operations.setRowOrder(sheetId, rowMapping)
-    this.undoRedo.saveOperation(new SetRowOrderUndoEntry(sheetId, rowMapping))
+    const oldContent = this.operations.setRowOrder(sheetId, rowMapping)
+    this.undoRedo.saveOperation(new SetRowOrderUndoEntry(sheetId, rowMapping, oldContent))
   }
 
   public validateSwapRowIndexes(sheetId: number, rowMapping: [number, number][]): void {
@@ -326,8 +326,8 @@ export class CrudOperations {
     this.testColumnOrderForMatrices(sheetId, columnMapping)
     this.undoRedo.clearRedoStack()
     this.clipboardOperations.abortCut()
-    this.operations.setColumnOrder(sheetId, columnMapping)
-    this.undoRedo.saveOperation(new SetColumnOrderUndoEntry(sheetId, columnMapping))
+    const oldContent = this.operations.setColumnOrder(sheetId, columnMapping)
+    this.undoRedo.saveOperation(new SetColumnOrderUndoEntry(sheetId, columnMapping, oldContent))
   }
 
   public validateSwapColumnIndexes(sheetId: number, columnMapping: [number, number][]): void {

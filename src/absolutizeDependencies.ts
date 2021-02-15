@@ -3,9 +3,10 @@
  * Copyright (c) 2020 Handsoncode. All rights reserved.
  */
 
-import {SimpleCellAddress} from './Cell'
+import {invalidSimpleCellAddress, SimpleCellAddress} from './Cell'
 import {CellDependency} from './CellDependency'
-import {RelativeDependency} from './parser'
+import {NamedExpressionDependency, RelativeDependency} from './parser'
+import {AbsoluteCellRange} from './AbsoluteCellRange'
 
 /**
  * Converts dependencies from maybe relative addressing to absolute addressing.
@@ -14,5 +15,18 @@ import {RelativeDependency} from './parser'
  * @param baseAddress - base address with regard to which make a convertion
  */
 export const absolutizeDependencies = (deps: RelativeDependency[], baseAddress: SimpleCellAddress): CellDependency[] => {
-  return deps.map((dep) => dep.absolutize(baseAddress))
+  return deps.map(dep => dep.absolutize(baseAddress))
+}
+
+export const filterDependenciesOutOfScope = (deps: CellDependency[]) => {
+  return deps.filter(dep => {
+    if (dep instanceof NamedExpressionDependency) {
+      return true
+    }
+    if (dep instanceof AbsoluteCellRange) {
+      return !(invalidSimpleCellAddress(dep.start) || invalidSimpleCellAddress(dep.end))
+    } else {
+      return !invalidSimpleCellAddress(dep)
+    }
+  })
 }

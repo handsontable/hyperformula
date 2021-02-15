@@ -78,6 +78,10 @@ export class ColumnAddress implements AddressWithColumn {
     return new ColumnAddress(sheet, this.col, this.type)
   }
 
+  public isInvalid(baseAddress: SimpleCellAddress): boolean {
+    return this.toSimpleColumnAddress(baseAddress).col < 0
+  }
+
   public hash(withSheet: boolean): string {
     const sheetPart = withSheet && this.sheet !== null ? `#${this.sheet}` : ''
     switch (this.type) {
