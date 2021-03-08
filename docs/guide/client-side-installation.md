@@ -8,13 +8,13 @@ following command:
   
 **npm:**
 
-```
+```bash
 $ npm install hyperformula
 ```
 
 **Yarn:**
 
-```
+```bash
 $ yarn add hyperformula
 ```
 
@@ -36,7 +36,14 @@ Alternatively, you can load HyperFormula from
 `<script>` tag. This way you will make it accessible in the project as
 a `HyperFormula` global variable.
 
-```javascript
+```html
+<script src="https://cdn.jsdelivr.net/npm/hyperformula/dist/hyperformula.full.min.js"></script>
+```
+
+You may also load just a minimal build of HyperFormula, but then you have to remember to add the dependencies as well:
+
+```html
+<script src="https://cdn.jsdelivr.net/npm/chevrotain@6/lib/chevrotain.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/hyperformula/dist/hyperformula.min.js"></script>
 ```
 
@@ -49,14 +56,14 @@ descriptions.
 
 ### Clone with HTTPS
 
-```javascript
-https://github.com/handsontable/hyperformula.git
+```bash
+git clone https://github.com/handsontable/hyperformula.git
 ```
 
 ### Clone with SSH
 
-```javascript
-git@github.com:handsontable/hyperformula.git
+```bash
+git clone git@github.com:handsontable/hyperformula.git
 ```
 
 ## Download from GitHub
