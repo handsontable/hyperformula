@@ -73,6 +73,10 @@ export class RowAddress implements AddressWithRow {
     return new RowAddress(sheet, this.row, this.type)
   }
 
+  public isInvalid(baseAddress: SimpleCellAddress): boolean {
+    return this.toSimpleRowAddress(baseAddress).row < 0
+  }
+
   public hash(withSheet: boolean): string {
     const sheetPart = withSheet && this.sheet !== null ? `#${this.sheet}` : ''
     switch (this.type) {

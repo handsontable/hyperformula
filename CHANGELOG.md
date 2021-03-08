@@ -18,6 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - Fixed a bug with serialization of some addresses after CRUDs. (#587)
 - Fixed a bug with MEDIAN function implementation. (#601)
+- Fixed a bug with copy-paste operation that could cause out of scope references (#591)
 
 ## [0.4.0] - 2020-12-17
 
