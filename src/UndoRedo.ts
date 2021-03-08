@@ -49,7 +49,8 @@ export class AddRowsUndoEntry {
 export class SetRowOrderUndoEntry {
   constructor(
     public readonly sheetId: number,
-    public readonly rowMapping: [number, number][]
+    public readonly rowMapping: [number, number][],
+    public readonly oldContent: [SimpleCellAddress, ClipboardCell][]
   ) {
   }
 }
@@ -57,7 +58,8 @@ export class SetRowOrderUndoEntry {
 export class SetColumnOrderUndoEntry {
   constructor(
     public readonly sheetId: number,
-    public readonly columnMapping: [number, number][]
+    public readonly columnMapping: [number, number][],
+    public readonly oldContent: [SimpleCellAddress, ClipboardCell][]
   ) {
   }
 }
@@ -421,9 +423,7 @@ export class UndoRedo {
   }
 
   private undoPaste(operation: PasteUndoEntry) {
-    for (const [address, clipboardCell] of operation.oldContent) {
-      this.operations.restoreCell(address, clipboardCell)
-    }
+    this.restoreOperationOldContent(operation.oldContent)
     for (const namedExpression of operation.addedGlobalNamedExpressions) {
       this.operations.removeNamedExpression(namedExpression)
     }
@@ -445,9 +445,7 @@ export class UndoRedo {
     this.operations.forceApplyPostponedTransformations()
     this.operations.moveCells(operation.destinationLeftCorner, operation.width, operation.height, operation.sourceLeftCorner)
 
-    for (const [address, clipboardCell] of operation.overwrittenCellsData) {
-      this.operations.restoreCell(address, clipboardCell)
-    }
+    this.restoreOperationOldContent(operation.overwrittenCellsData)
 
     this.restoreOldDataFromVersion(operation.version - 1)
     for (const namedExpression of operation.addedGlobalNamedExpressions) {
@@ -518,13 +516,17 @@ export class UndoRedo {
   }
 
   private undoSetRowOrder(operation: SetRowOrderUndoEntry) {
-    const reverseMap = operation.rowMapping.map(([source, target]) => [target, source] as [number, number])
-    this.operations.setRowOrder(operation.sheetId, reverseMap)
+    this.restoreOperationOldContent(operation.oldContent)
   }
 
   private undoSetColumnOrder(operation: SetColumnOrderUndoEntry) {
-    const reverseMap = operation.columnMapping.map(([source, target]) => [target, source] as [number, number])
-    this.operations.setColumnOrder(operation.sheetId, reverseMap)
+    this.restoreOperationOldContent(operation.oldContent)
+  }
+
+  private restoreOperationOldContent(oldContent: [SimpleCellAddress, ClipboardCell][]) {
+    for (const [address, clipboardCell] of oldContent) {
+      this.operations.restoreCell(address, clipboardCell)
+    }
   }
 
   public redo() {
