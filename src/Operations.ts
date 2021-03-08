@@ -7,7 +7,7 @@ import {EmptyValue, getRawValue} from './interpreter/InterpreterValue'
 import {ClipboardCell, ClipboardCellType} from './ClipboardOperations'
 import {invalidSimpleCellAddress, simpleCellAddress, SimpleCellAddress} from './Cell'
 import {AbsoluteCellRange} from './AbsoluteCellRange'
-import {absolutizeDependencies} from './absolutizeDependencies'
+import {absolutizeDependencies, filterDependenciesOutOfScope} from './absolutizeDependencies'
 import {CellContent, CellContentParser, RawCellContent} from './CellContentParser'
 import {Config} from './Config'
 import {ContentChanges} from './ContentChanges'
@@ -53,6 +53,7 @@ import {ParsingError} from './parser/Ast'
 import {findBoundaries, Sheet} from './Sheet'
 import {ColumnsSpan, RowsSpan} from './Span'
 import {Statistics, StatType} from './statistics'
+import {CleanOutOfScopeDependenciesTransformer} from './dependencyTransformers/CleanOutOfScopeDependenciesTransformer'
 
 export class RemoveRowsCommand {
   constructor(
@@ -310,16 +311,18 @@ export class Operations {
     }
   }
 
-  public setRowOrder(sheetId: number, rowMapping: [number, number][]): void {
+  public setRowOrder(sheetId: number, rowMapping: [number, number][]): [SimpleCellAddress, ClipboardCell][] {
     const buffer: [SimpleCellAddress, ClipboardCell][][] = []
+    let oldContent: [SimpleCellAddress, ClipboardCell][] = []
     for(const [source, target] of rowMapping ) {
       if(source!==target) {
         const rowRange = AbsoluteCellRange.spanFrom({sheet: sheetId, col: 0, row: source}, Infinity, 1)
         this.dependencyGraph.breakNumericMatricesInRange(rowRange)
         const row = this.getRangeClipboardCells(rowRange)
+        oldContent = oldContent.concat(row)
         buffer.push(
           row.map(
-            ([{sheet, col, row}, cell]) => [{sheet, col, row: target}, cell]
+            ([{sheet, col}, cell]) => [{sheet, col, row: target}, cell]
           )
         )
       }
@@ -327,15 +330,18 @@ export class Operations {
     buffer.forEach(
       row => this.restoreClipboardCells(sheetId, row.values())
     )
+    return oldContent
   }
 
-  public setColumnOrder(sheetId: number, columnMapping: [number, number][]): void {
+  public setColumnOrder(sheetId: number, columnMapping: [number, number][]): [SimpleCellAddress, ClipboardCell][]  {
     const buffer: [SimpleCellAddress, ClipboardCell][][] = []
+    let oldContent: [SimpleCellAddress, ClipboardCell][] = []
     for(const [source, target] of columnMapping ) {
       if(source!==target) {
         const rowRange = AbsoluteCellRange.spanFrom({sheet: sheetId, col: source, row: 0}, 1, Infinity)
         this.dependencyGraph.breakNumericMatricesInRange(rowRange)
         const column = this.getRangeClipboardCells(rowRange)
+        oldContent = oldContent.concat(column)
         buffer.push(
           column.map(
             ([{sheet, col, row}, cell]) => [{sheet, col: target, row}, cell]
@@ -346,6 +352,7 @@ export class Operations {
     buffer.forEach(
       column => this.restoreClipboardCells(sheetId, column.values())
     )
+    return oldContent
   }
 
   public addNamedExpression(expressionName: string, expression: RawCellContent, sheetId?: number, options?: NamedExpressionOptions) {
@@ -686,7 +693,10 @@ export class Operations {
   public setFormulaToCellFromCache(formulaHash: string, address: SimpleCellAddress) {
     const {ast, hasVolatileFunction, hasStructuralChangeFunction, dependencies} = this.parser.fetchCachedResult(formulaHash)
     const absoluteDependencies = absolutizeDependencies(dependencies, address)
-    this.dependencyGraph.setFormulaToCell(address, ast, absoluteDependencies, hasVolatileFunction, hasStructuralChangeFunction)
+    const [cleanedAst] = new CleanOutOfScopeDependenciesTransformer(address.sheet).transformSingleAst(ast, address)
+    this.parser.rememberNewAst(cleanedAst)
+    const cleanedDependencies = filterDependenciesOutOfScope(absoluteDependencies)
+    this.dependencyGraph.setFormulaToCell(address, cleanedAst, cleanedDependencies, hasVolatileFunction, hasStructuralChangeFunction)
   }
 
   public setParsingErrorToCell(rawInput: string, errors: ParsingError[], address: SimpleCellAddress) {
