@@ -142,4 +142,4 @@ You should know that this project wouldn’t exist without co-financing from Eur
 Created by [Handsontable](https://handsontable.com), [NavAlgo](https://www.navalgo.com/en/),
 and [Contributors](https://github.com/handsontable/hyperformula/graphs/contributors).
 
-© 2020 Handsoncode
+© 2021 Handsoncode
