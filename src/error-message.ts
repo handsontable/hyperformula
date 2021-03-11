@@ -1,12 +1,10 @@
 /**
  * @license
- * Copyright (c) 2020 Handsoncode. All rights reserved.
+ * Copyright (c) 2021 Handsoncode. All rights reserved.
  */
 
  /**
  * This is a class for detailed error messages across HyperFormula.
- *
- * @since 0.2.0
  */
 export class ErrorMessage {
   public static DistinctSigns = 'Distinct signs.'

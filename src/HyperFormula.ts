@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright (c) 2020 Handsoncode. All rights reserved.
+ * Copyright (c) 2021 Handsoncode. All rights reserved.
  */
 
 import {AbsoluteCellRange} from './AbsoluteCellRange'
@@ -94,7 +94,7 @@ export class HyperFormula implements TypedEmitter {
 
   /**
    * Contains all available languages to use in registerLanguage.
-   * 
+   *
    * @category Static Properties
    */
   public static languages: Record<string, RawTranslationPackage> = {}
@@ -2088,7 +2088,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * // do an operation, for example remove columns
    * hfInstance.removeColumns(0, [0, 1]);
-   * 
+   *
    * // undo the operation
    * hfInstance.undo();
    *
@@ -2116,7 +2116,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * // do an operation, for example remove columns
    * hfInstance.removeColumns(0, [0, 1]);
-   * 
+   *
    * // undo the operation
    * hfInstance.undo();
    *
@@ -2537,8 +2537,6 @@ export class HyperFormula implements TypedEmitter {
    * ```
    *
    * @category Helpers
-   *
-   * @since 0.2.0
    */
   public getCellDependents(address: SimpleCellAddress | AbsoluteCellRange): (AbsoluteCellRange | SimpleCellAddress)[] {
     let vertex
@@ -2570,8 +2568,6 @@ export class HyperFormula implements TypedEmitter {
    * ```
    *
    * @category Helpers
-   *
-   * @since 0.2.0
    */
   public getCellPrecedents(address: SimpleCellAddress | AbsoluteCellRange): (AbsoluteCellRange | SimpleCellAddress)[] {
     let vertex
@@ -3148,8 +3144,8 @@ export class HyperFormula implements TypedEmitter {
    * @fires [[namedExpressionAdded]] always, unless [[batch]] mode is used
    * @fires [[valuesUpdated]] if recalculation was triggered by this change
    *
-   * @throws [[NamedExpressionNameIsAlreadyTaken]] when the named expression name is not available.
-   * @throws [[NamedExpressionNameIsInvalid]] when the named expression name is not valid
+   * @throws [[NamedExpressionNameIsAlreadyTakenError]] when the named expression name is not available.
+   * @throws [[NamedExpressionNameIsInvalidError]] when the named expression name is not valid
    * @throws [[MatrixFormulasNotSupportedError]] when the named expression formula is a Matrix formula
    * @throws [[NoRelativeAddressesAllowedError]] when the named expression formula contains relative references
    * @throws [[NoSheetWithNameError]] when the given sheet name does not exists
@@ -3337,7 +3333,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * @fires [[valuesUpdated]] if recalculation was triggered by this change
    *
-   * @throws [[NamedExpressionDoesNotExist]] when the given expression does not exist.
+   * @throws [[NamedExpressionDoesNotExistError]] when the given expression does not exist.
    * @throws [[NoSheetWithNameError]] when the given sheet name does not exists
    * @throws [[MatrixFormulasNotSupportedError]] when the named expression formula is a Matrix formula
    * @throws [[NoRelativeAddressesAllowedError]] when the named expression formula contains relative references
@@ -3407,7 +3403,7 @@ export class HyperFormula implements TypedEmitter {
    * @fires [[namedExpressionRemoved]] after the expression was removed
    * @fires [[valuesUpdated]] if recalculation was triggered by this change
    *
-   * @throws [[NamedExpressionDoesNotExist]] when the given expression does not exist.
+   * @throws [[NamedExpressionDoesNotExistError]] when the given expression does not exist.
    * @throws [[NoSheetWithNameError]] when the given sheet name does not exists
    *
    * @example
@@ -3659,7 +3655,7 @@ export class HyperFormula implements TypedEmitter {
    * @example
    * ```js
    * const hfInstance = HyperFormula.buildEmpty();
-   * 
+   *
    * // pass a number to be interpreted as a time
    * // should return {hours: 26, minutes: 24} for this example
    * const timeFromNumber = hfInstance.numberToTime(1.1);

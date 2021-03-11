@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright (c) 2020 Handsoncode. All rights reserved.
+ * Copyright (c) 2021 Handsoncode. All rights reserved.
  */
 
 import {TranslatableErrorType} from './Cell'
@@ -223,8 +223,6 @@ export interface ConfigParams {
    * @default false
    *
    * @category Engine
-   *
-   * @since 0.2.0
    */
   evaluateNullToZero: boolean,
   /**
