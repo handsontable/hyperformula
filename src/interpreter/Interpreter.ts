@@ -26,7 +26,7 @@ import {
   cloneNumber,
   EmptyValue,
   getRawValue,
-  InternalNoErrorScalarValue, InternalScalarValue,
+  InternalScalarValue,
   isExtendedNumber,
 } from './InterpreterValue'
 import {InterpreterValue} from './InterpreterValue'
@@ -251,40 +251,22 @@ export class Interpreter {
   }
 
   private equalOp = (arg1: InternalScalarValue, arg2: InternalScalarValue): InternalScalarValue =>
-    binaryErrorWrapper(this.arithmeticHelper.eq,
-      this.arithmeticHelper.coerceScalarToNumberOrError(arg1),
-      this.arithmeticHelper.coerceScalarToNumberOrError(arg2)
-    )
+    binaryErrorWrapper(this.arithmeticHelper.eq, arg1, arg2)
 
   private notEqualOp = (arg1: InternalScalarValue, arg2: InternalScalarValue): InternalScalarValue =>
-    binaryErrorWrapper(this.arithmeticHelper.neq,
-      this.arithmeticHelper.coerceScalarToNumberOrError(arg1),
-      this.arithmeticHelper.coerceScalarToNumberOrError(arg2)
-    )
+    binaryErrorWrapper(this.arithmeticHelper.neq, arg1, arg2)
 
   private greaterThanOp = (arg1: InternalScalarValue, arg2: InternalScalarValue): InternalScalarValue =>
-    binaryErrorWrapper(this.arithmeticHelper.gt,
-      this.arithmeticHelper.coerceScalarToNumberOrError(arg1),
-      this.arithmeticHelper.coerceScalarToNumberOrError(arg2)
-    )
+    binaryErrorWrapper(this.arithmeticHelper.gt, arg1, arg2)
 
   private lessThanOp = (arg1: InternalScalarValue, arg2: InternalScalarValue): InternalScalarValue =>
-    binaryErrorWrapper(this.arithmeticHelper.lt,
-      this.arithmeticHelper.coerceScalarToNumberOrError(arg1),
-      this.arithmeticHelper.coerceScalarToNumberOrError(arg2)
-    )
+    binaryErrorWrapper(this.arithmeticHelper.lt, arg1, arg2)
 
   private greaterThanOrEqualOp = (arg1: InternalScalarValue, arg2: InternalScalarValue): InternalScalarValue =>
-    binaryErrorWrapper(this.arithmeticHelper.geq,
-      this.arithmeticHelper.coerceScalarToNumberOrError(arg1),
-      this.arithmeticHelper.coerceScalarToNumberOrError(arg2)
-    )
+    binaryErrorWrapper(this.arithmeticHelper.geq, arg1, arg2)
 
   private lessThanOrEqualOp = (arg1: InternalScalarValue, arg2: InternalScalarValue): InternalScalarValue =>
-    binaryErrorWrapper(this.arithmeticHelper.leq,
-      this.arithmeticHelper.coerceScalarToNumberOrError(arg1),
-      this.arithmeticHelper.coerceScalarToNumberOrError(arg2)
-    )
+    binaryErrorWrapper(this.arithmeticHelper.leq, arg1, arg2)
 
   private concatOp = (arg1: InternalScalarValue, arg2: InternalScalarValue): InternalScalarValue =>
        binaryErrorWrapper(this.arithmeticHelper.concat,
@@ -335,20 +317,6 @@ export class Interpreter {
 
   private unaryPlusOp = (arg: InternalScalarValue): InternalScalarValue =>
     (isExtendedNumber(arg) ? this.arithmeticHelper.unaryPlus(arg) : arg)
-}
-
-function passErrors(left: InterpreterValue, right: InterpreterValue): Maybe<CellError> {
-  if (left instanceof CellError) {
-    return left
-  } else if (left instanceof SimpleRangeValue) {
-    return new CellError(ErrorType.VALUE, ErrorMessage.ScalarExpected)
-  } else if (right instanceof CellError) {
-    return right
-  } else if (right instanceof SimpleRangeValue) {
-    return new CellError(ErrorType.VALUE, ErrorMessage.ScalarExpected)
-  } else {
-    return undefined
-  }
 }
 
 function unaryErrorWrapper<T extends InterpreterValue>(op: (a: T) => InternalScalarValue, a: T | CellError): InternalScalarValue {
