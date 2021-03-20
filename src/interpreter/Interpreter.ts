@@ -91,62 +91,62 @@ export class Interpreter {
       case AstNodeType.CONCATENATE_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
         const rightResult = this.evaluateAst(ast.right, formulaAddress)
-        return this.concatOp(leftResult, rightResult)
+        return binaryRangeWrapper(this.concatOp, leftResult, rightResult)
       }
       case AstNodeType.EQUALS_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
         const rightResult = this.evaluateAst(ast.right, formulaAddress)
-        return this.equalOp(leftResult, rightResult)
+        return binaryRangeWrapper(this.equalOp, leftResult, rightResult)
       }
       case AstNodeType.NOT_EQUAL_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
         const rightResult = this.evaluateAst(ast.right, formulaAddress)
-        return this.notEqualOp(leftResult, rightResult)
+        return binaryRangeWrapper(this.notEqualOp, leftResult, rightResult)
       }
       case AstNodeType.GREATER_THAN_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
         const rightResult = this.evaluateAst(ast.right, formulaAddress)
-        return this.greaterThanOp(leftResult, rightResult)
+        return binaryRangeWrapper(this.greaterThanOp, leftResult, rightResult)
       }
       case AstNodeType.LESS_THAN_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
         const rightResult = this.evaluateAst(ast.right, formulaAddress)
-        return this.lessThanOp(leftResult, rightResult)
+        return binaryRangeWrapper(this.lessThanOp, leftResult, rightResult)
       }
       case AstNodeType.GREATER_THAN_OR_EQUAL_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
         const rightResult = this.evaluateAst(ast.right, formulaAddress)
-        return this.greaterThanOrEqualOp(leftResult, rightResult)
+        return binaryRangeWrapper(this.greaterThanOrEqualOp, leftResult, rightResult)
       }
       case AstNodeType.LESS_THAN_OR_EQUAL_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
         const rightResult = this.evaluateAst(ast.right, formulaAddress)
-        return this.lessThanOrEqualOp(leftResult, rightResult)
+        return binaryRangeWrapper(this.lessThanOrEqualOp, leftResult, rightResult)
       }
       case AstNodeType.PLUS_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
         const rightResult = this.evaluateAst(ast.right, formulaAddress)
-        return this.plusOp(leftResult, rightResult)
+        return binaryRangeWrapper(this.plusOp, leftResult, rightResult)
       }
       case AstNodeType.MINUS_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
         const rightResult = this.evaluateAst(ast.right, formulaAddress)
-        return this.minusOp(leftResult, rightResult)
+        return binaryRangeWrapper(this.minusOp, leftResult, rightResult)
       }
       case AstNodeType.TIMES_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
         const rightResult = this.evaluateAst(ast.right, formulaAddress)
-        return this.timesOp(leftResult, rightResult)
+        return binaryRangeWrapper(this.timesOp, leftResult, rightResult)
       }
       case AstNodeType.POWER_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
         const rightResult = this.evaluateAst(ast.right, formulaAddress)
-        return this.powerOp(leftResult, rightResult)
+        return binaryRangeWrapper(this.powerOp, leftResult, rightResult)
       }
       case AstNodeType.DIV_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
         const rightResult = this.evaluateAst(ast.right, formulaAddress)
-        return this.divOp(leftResult, rightResult)
+        return binaryRangeWrapper(this.divOp, leftResult, rightResult)
       }
       case AstNodeType.PLUS_UNARY_OP: {
         const result = this.evaluateAst(ast.value, formulaAddress)
@@ -250,87 +250,80 @@ export class Interpreter {
     return ast.start.sheet === ast.end.sheet
   }
 
-  private equalOp(arg1: InterpreterValue, arg2: InterpreterValue): InterpreterValue {
-    return passErrors(arg1, arg2) ??
-      this.arithmeticHelper.eq(arg1 as InternalNoErrorScalarValue, arg2 as InternalNoErrorScalarValue)
-  }
+  private equalOp = (arg1: InternalScalarValue, arg2: InternalScalarValue): InternalScalarValue =>
+    binaryErrorWrapper(this.arithmeticHelper.eq,
+      this.arithmeticHelper.coerceScalarToNumberOrError(arg1),
+      this.arithmeticHelper.coerceScalarToNumberOrError(arg2)
+    )
 
-  private notEqualOp(arg1: InterpreterValue, arg2: InterpreterValue): InterpreterValue {
-    return passErrors(arg1, arg2) ??
-      this.arithmeticHelper.neq(arg1 as InternalNoErrorScalarValue, arg2 as InternalNoErrorScalarValue)
-  }
+  private notEqualOp = (arg1: InternalScalarValue, arg2: InternalScalarValue): InternalScalarValue =>
+    binaryErrorWrapper(this.arithmeticHelper.neq,
+      this.arithmeticHelper.coerceScalarToNumberOrError(arg1),
+      this.arithmeticHelper.coerceScalarToNumberOrError(arg2)
+    )
 
-  private greaterThanOp(arg1: InterpreterValue, arg2: InterpreterValue): InterpreterValue {
-    return passErrors(arg1, arg2) ??
-      this.arithmeticHelper.gt(arg1 as InternalNoErrorScalarValue, arg2 as InternalNoErrorScalarValue)
-  }
+  private greaterThanOp = (arg1: InternalScalarValue, arg2: InternalScalarValue): InternalScalarValue =>
+    binaryErrorWrapper(this.arithmeticHelper.gt,
+      this.arithmeticHelper.coerceScalarToNumberOrError(arg1),
+      this.arithmeticHelper.coerceScalarToNumberOrError(arg2)
+    )
 
-  private lessThanOp(arg1: InterpreterValue, arg2: InterpreterValue): InterpreterValue {
-    return passErrors(arg1, arg2) ??
-      this.arithmeticHelper.lt(arg1 as InternalNoErrorScalarValue, arg2 as InternalNoErrorScalarValue)
-  }
+  private lessThanOp = (arg1: InternalScalarValue, arg2: InternalScalarValue): InternalScalarValue =>
+    binaryErrorWrapper(this.arithmeticHelper.lt,
+      this.arithmeticHelper.coerceScalarToNumberOrError(arg1),
+      this.arithmeticHelper.coerceScalarToNumberOrError(arg2)
+    )
 
-  private greaterThanOrEqualOp(arg1: InterpreterValue, arg2: InterpreterValue): InterpreterValue {
-    return passErrors(arg1, arg2) ??
-      this.arithmeticHelper.geq(arg1 as InternalNoErrorScalarValue, arg2 as InternalNoErrorScalarValue)
-  }
+  private greaterThanOrEqualOp = (arg1: InternalScalarValue, arg2: InternalScalarValue): InternalScalarValue =>
+    binaryErrorWrapper(this.arithmeticHelper.geq,
+      this.arithmeticHelper.coerceScalarToNumberOrError(arg1),
+      this.arithmeticHelper.coerceScalarToNumberOrError(arg2)
+    )
 
-  private lessThanOrEqualOp(arg1: InterpreterValue, arg2: InterpreterValue): InterpreterValue {
-    return passErrors(arg1, arg2) ??
-      this.arithmeticHelper.leq(arg1 as InternalNoErrorScalarValue, arg2 as InternalNoErrorScalarValue)
-  }
+  private lessThanOrEqualOp = (arg1: InternalScalarValue, arg2: InternalScalarValue): InternalScalarValue =>
+    binaryErrorWrapper(this.arithmeticHelper.leq,
+      this.arithmeticHelper.coerceScalarToNumberOrError(arg1),
+      this.arithmeticHelper.coerceScalarToNumberOrError(arg2)
+    )
 
-  private concatOp(arg1: InterpreterValue, arg2: InterpreterValue): InternalScalarValue {
-    return passErrors(arg1, arg2) ??
-      binaryErrorWrapper(this.arithmeticHelper.concat,
-        coerceScalarToString(arg1 as InternalNoErrorScalarValue),
-        coerceScalarToString(arg2 as InternalNoErrorScalarValue)
+  private concatOp = (arg1: InternalScalarValue, arg2: InternalScalarValue): InternalScalarValue =>
+       binaryErrorWrapper(this.arithmeticHelper.concat,
+        coerceScalarToString(arg1),
+        coerceScalarToString(arg2)
       )
-  }
 
-
-  private plusOp(arg1: InterpreterValue, arg2: InterpreterValue): InternalScalarValue {
-    return passErrors(arg1, arg2) ??
+  private plusOp = (arg1: InternalScalarValue, arg2: InternalScalarValue): InternalScalarValue =>
       binaryErrorWrapper(this.arithmeticHelper.addWithEpsilon,
-        this.arithmeticHelper.coerceScalarToNumberOrError(arg1 as InternalNoErrorScalarValue),
-        this.arithmeticHelper.coerceScalarToNumberOrError(arg2 as InternalNoErrorScalarValue)
+        this.arithmeticHelper.coerceScalarToNumberOrError(arg1),
+        this.arithmeticHelper.coerceScalarToNumberOrError(arg2)
       )
-  }
 
-  private minusOp(arg1: InterpreterValue, arg2: InterpreterValue): InternalScalarValue {
-    return passErrors(arg1, arg2) ??
+  private minusOp = (arg1: InternalScalarValue, arg2: InternalScalarValue): InternalScalarValue =>
       binaryErrorWrapper(this.arithmeticHelper.subtract,
-        this.arithmeticHelper.coerceScalarToNumberOrError(arg1 as InternalNoErrorScalarValue),
-        this.arithmeticHelper.coerceScalarToNumberOrError(arg2 as InternalNoErrorScalarValue)
+        this.arithmeticHelper.coerceScalarToNumberOrError(arg1),
+        this.arithmeticHelper.coerceScalarToNumberOrError(arg2)
       )
-  }
 
-  private timesOp(arg1: InterpreterValue, arg2: InterpreterValue): InternalScalarValue {
-    return passErrors(arg1, arg2) ??
+  private timesOp = (arg1: InternalScalarValue, arg2: InternalScalarValue): InternalScalarValue =>
       binaryErrorWrapper(
         this.arithmeticHelper.multiply,
-        this.arithmeticHelper.coerceScalarToNumberOrError(arg1 as InternalNoErrorScalarValue),
-        this.arithmeticHelper.coerceScalarToNumberOrError(arg2 as InternalNoErrorScalarValue)
+        this.arithmeticHelper.coerceScalarToNumberOrError(arg1),
+        this.arithmeticHelper.coerceScalarToNumberOrError(arg2)
       )
-  }
 
-  private powerOp(arg1: InterpreterValue, arg2: InterpreterValue): InternalScalarValue {
-    return passErrors(arg1, arg2) ??
+  private powerOp = (arg1: InternalScalarValue, arg2: InternalScalarValue): InternalScalarValue =>
       binaryErrorWrapper(
         this.arithmeticHelper.pow,
-        this.arithmeticHelper.coerceScalarToNumberOrError(arg1 as InternalNoErrorScalarValue),
-        this.arithmeticHelper.coerceScalarToNumberOrError(arg2 as InternalNoErrorScalarValue)
+        this.arithmeticHelper.coerceScalarToNumberOrError(arg1),
+        this.arithmeticHelper.coerceScalarToNumberOrError(arg2)
       )
-  }
 
-  private divOp(arg1: InterpreterValue, arg2: InterpreterValue): InternalScalarValue {
-    return passErrors(arg1, arg2) ??
+  private divOp = (arg1: InternalScalarValue, arg2: InternalScalarValue): InternalScalarValue =>
       binaryErrorWrapper(
         this.arithmeticHelper.divide,
-        this.arithmeticHelper.coerceScalarToNumberOrError(arg1 as InternalNoErrorScalarValue),
-        this.arithmeticHelper.coerceScalarToNumberOrError(arg2 as InternalNoErrorScalarValue)
+        this.arithmeticHelper.coerceScalarToNumberOrError(arg1),
+        this.arithmeticHelper.coerceScalarToNumberOrError(arg2)
       )
-  }
 
   private unaryMinusOp = (arg: InternalScalarValue): InternalScalarValue =>
     unaryErrorWrapper(this.arithmeticHelper.unaryMinus,
