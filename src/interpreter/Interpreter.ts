@@ -150,15 +150,15 @@ export class Interpreter {
       }
       case AstNodeType.PLUS_UNARY_OP: {
         const result = this.evaluateAst(ast.value, formulaAddress)
-        return this.unaryPlusOp(result)
+        return unaryRangeWrapper(this.unaryPlusOp, result)
       }
       case AstNodeType.MINUS_UNARY_OP: {
         const result = this.evaluateAst(ast.value, formulaAddress)
-        return unaryRangeWrapper(arg => this.unaryMinusOp(arg), result)
+        return unaryRangeWrapper(this.unaryMinusOp, result)
       }
       case AstNodeType.PERCENT_OP: {
         const result = this.evaluateAst(ast.value, formulaAddress)
-        return this.percentOp(result)
+        return unaryRangeWrapper(this.percentOp, result)
       }
       case AstNodeType.FUNCTION_CALL: {
         if (this.config.licenseKeyValidityState !== LicenseKeyValidityState.VALID && !FunctionRegistry.functionIsProtected(ast.procedureName)) {
@@ -282,7 +282,7 @@ export class Interpreter {
 
   private concatOp(arg1: InterpreterValue, arg2: InterpreterValue): InternalScalarValue {
     return passErrors(arg1, arg2) ??
-      wrapperBinary(this.arithmeticHelper.concat,
+      binaryErrorWrapper(this.arithmeticHelper.concat,
         coerceScalarToString(arg1 as InternalNoErrorScalarValue),
         coerceScalarToString(arg2 as InternalNoErrorScalarValue)
       )
@@ -291,7 +291,7 @@ export class Interpreter {
 
   private plusOp(arg1: InterpreterValue, arg2: InterpreterValue): InternalScalarValue {
     return passErrors(arg1, arg2) ??
-      wrapperBinary(this.arithmeticHelper.addWithEpsilon,
+      binaryErrorWrapper(this.arithmeticHelper.addWithEpsilon,
         this.arithmeticHelper.coerceScalarToNumberOrError(arg1 as InternalNoErrorScalarValue),
         this.arithmeticHelper.coerceScalarToNumberOrError(arg2 as InternalNoErrorScalarValue)
       )
@@ -299,7 +299,7 @@ export class Interpreter {
 
   private minusOp(arg1: InterpreterValue, arg2: InterpreterValue): InternalScalarValue {
     return passErrors(arg1, arg2) ??
-      wrapperBinary(this.arithmeticHelper.subtract,
+      binaryErrorWrapper(this.arithmeticHelper.subtract,
         this.arithmeticHelper.coerceScalarToNumberOrError(arg1 as InternalNoErrorScalarValue),
         this.arithmeticHelper.coerceScalarToNumberOrError(arg2 as InternalNoErrorScalarValue)
       )
@@ -307,7 +307,7 @@ export class Interpreter {
 
   private timesOp(arg1: InterpreterValue, arg2: InterpreterValue): InternalScalarValue {
     return passErrors(arg1, arg2) ??
-      wrapperBinary(
+      binaryErrorWrapper(
         this.arithmeticHelper.multiply,
         this.arithmeticHelper.coerceScalarToNumberOrError(arg1 as InternalNoErrorScalarValue),
         this.arithmeticHelper.coerceScalarToNumberOrError(arg2 as InternalNoErrorScalarValue)
@@ -316,7 +316,7 @@ export class Interpreter {
 
   private powerOp(arg1: InterpreterValue, arg2: InterpreterValue): InternalScalarValue {
     return passErrors(arg1, arg2) ??
-      wrapperBinary(
+      binaryErrorWrapper(
         this.arithmeticHelper.pow,
         this.arithmeticHelper.coerceScalarToNumberOrError(arg1 as InternalNoErrorScalarValue),
         this.arithmeticHelper.coerceScalarToNumberOrError(arg2 as InternalNoErrorScalarValue)
@@ -325,7 +325,7 @@ export class Interpreter {
 
   private divOp(arg1: InterpreterValue, arg2: InterpreterValue): InternalScalarValue {
     return passErrors(arg1, arg2) ??
-      wrapperBinary(
+      binaryErrorWrapper(
         this.arithmeticHelper.divide,
         this.arithmeticHelper.coerceScalarToNumberOrError(arg1 as InternalNoErrorScalarValue),
         this.arithmeticHelper.coerceScalarToNumberOrError(arg2 as InternalNoErrorScalarValue)
@@ -333,27 +333,15 @@ export class Interpreter {
   }
 
   private unaryMinusOp = (arg: InternalScalarValue): InternalScalarValue =>
-    wrapperUnary(this.arithmeticHelper.unaryMinus,
+    unaryErrorWrapper(this.arithmeticHelper.unaryMinus,
       this.arithmeticHelper.coerceScalarToNumberOrError(arg))
 
-  private percentOp(arg: InterpreterValue): InternalScalarValue {
-    if (arg instanceof SimpleRangeValue) {
-      return new CellError(ErrorType.VALUE, ErrorMessage.ScalarExpected)
-    } else {
-      return wrapperUnary(this.arithmeticHelper.unaryPercent,
+  private percentOp = (arg: InternalScalarValue): InternalScalarValue =>
+    unaryErrorWrapper(this.arithmeticHelper.unaryPercent,
         this.arithmeticHelper.coerceScalarToNumberOrError(arg))
-    }
-  }
 
-  private unaryPlusOp(arg: InterpreterValue): InternalScalarValue {
-    if (arg instanceof SimpleRangeValue) {
-      return new CellError(ErrorType.VALUE, ErrorMessage.ScalarExpected)
-    } else if(isExtendedNumber(arg)) {
-      return this.arithmeticHelper.unaryPlus(arg)
-    } else {
-      return arg
-    }
-  }
+  private unaryPlusOp = (arg: InternalScalarValue): InternalScalarValue =>
+    (isExtendedNumber(arg) ? this.arithmeticHelper.unaryPlus(arg) : arg)
 }
 
 function passErrors(left: InterpreterValue, right: InterpreterValue): Maybe<CellError> {
@@ -370,7 +358,7 @@ function passErrors(left: InterpreterValue, right: InterpreterValue): Maybe<Cell
   }
 }
 
-function wrapperUnary<T extends InterpreterValue>(op: (a: T) => InternalScalarValue, a: T | CellError): InternalScalarValue {
+function unaryErrorWrapper<T extends InterpreterValue>(op: (a: T) => InternalScalarValue, a: T | CellError): InternalScalarValue {
   if (a instanceof CellError) {
     return a
   } else {
@@ -378,7 +366,7 @@ function wrapperUnary<T extends InterpreterValue>(op: (a: T) => InternalScalarVa
   }
 }
 
-function wrapperBinary<T extends InterpreterValue>(op: (a: T, b: T) => InternalScalarValue, a: T | CellError, b: T | CellError): InternalScalarValue {
+function binaryErrorWrapper<T extends InterpreterValue>(op: (a: T, b: T) => InternalScalarValue, a: T | CellError, b: T | CellError): InternalScalarValue {
   if (a instanceof CellError) {
     return a
   } else if (b instanceof CellError) {
@@ -403,5 +391,4 @@ function unaryRangeWrapper(op: (arg: InternalScalarValue) => InternalScalarValue
     return SimpleRangeValue.onlyValues(newRaw)
   }
   return op(arg)
-
 }
