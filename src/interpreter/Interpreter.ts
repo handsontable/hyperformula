@@ -154,6 +154,9 @@ export class Interpreter {
       }
       case AstNodeType.MINUS_UNARY_OP: {
         const result = this.evaluateAst(ast.value, formulaAddress)
+        if(result instanceof SimpleRangeValue) {
+          return result.raw()
+        }
         return this.unaryMinusOp(result)
       }
       case AstNodeType.PERCENT_OP: {
@@ -250,14 +253,6 @@ export class Interpreter {
     return ast.start.sheet === ast.end.sheet
   }
 
-  private concatOp(arg1: InterpreterValue, arg2: InterpreterValue): InterpreterValue {
-    return passErrors(arg1, arg2) ??
-      wrapperBinary(this.arithmeticHelper.concat,
-        coerceScalarToString(arg1 as InternalNoErrorScalarValue),
-        coerceScalarToString(arg2 as InternalNoErrorScalarValue)
-      )
-  }
-
   private equalOp(arg1: InterpreterValue, arg2: InterpreterValue): InterpreterValue {
     return passErrors(arg1, arg2) ??
       this.arithmeticHelper.eq(arg1 as InternalNoErrorScalarValue, arg2 as InternalNoErrorScalarValue)
@@ -287,6 +282,15 @@ export class Interpreter {
     return passErrors(arg1, arg2) ??
       this.arithmeticHelper.leq(arg1 as InternalNoErrorScalarValue, arg2 as InternalNoErrorScalarValue)
   }
+
+  private concatOp(arg1: InterpreterValue, arg2: InterpreterValue): InterpreterValue {
+    return passErrors(arg1, arg2) ??
+      wrapperBinary(this.arithmeticHelper.concat,
+        coerceScalarToString(arg1 as InternalNoErrorScalarValue),
+        coerceScalarToString(arg2 as InternalNoErrorScalarValue)
+      )
+  }
+
 
   private plusOp(arg1: InterpreterValue, arg2: InterpreterValue): InterpreterValue {
     return passErrors(arg1, arg2) ??

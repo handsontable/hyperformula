@@ -9,6 +9,9 @@ import {ErrorMessage} from './error-message'
 import {Ast, AstNodeType} from './parser'
 
 export class MatrixSize {
+  public static fromMatrix<T>(matrix: T[][]): MatrixSize {
+    return new MatrixSize(matrix.length > 0 ? matrix[0].length : 0, matrix.length)
+  }
   constructor(
     public width: number,
     public height: number,
