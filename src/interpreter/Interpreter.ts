@@ -392,3 +392,36 @@ function unaryRangeWrapper(op: (arg: InternalScalarValue) => InternalScalarValue
   }
   return op(arg)
 }
+
+function binaryRangeWrapper(op: (arg1: InternalScalarValue, arg2: InternalScalarValue) => InternalScalarValue, arg1: InterpreterValue, arg2: InterpreterValue): InterpreterValue {
+  if(arg1 instanceof SimpleRangeValue || arg2 instanceof SimpleRangeValue) {
+    if(!(arg1 instanceof SimpleRangeValue)) {
+      arg1 = SimpleRangeValue.fromScalar(arg1)
+    }
+    if(!(arg2 instanceof SimpleRangeValue)) {
+      arg2 = SimpleRangeValue.fromScalar(arg2)
+    }
+    const width = Math.max(arg1.width(), arg2.width())
+    const height = Math.max(arg1.height(), arg2.height())
+    const ret: InternalScalarValue[][] = Array(height)
+    for(let i=0;i<height;i++) {
+      ret[i] = Array(width)
+    }
+    for(let i=0;i<height;i++) {
+      const i1 = (arg1.height() !== 1) ? i : 0
+      const i2 = (arg2.height() !== 1) ? i : 0
+      for(let j=0;j<width;j++) {
+        const j1 = (arg1.width() !== 1) ? j : 0
+        const j2 = (arg2.width() !== 1) ? j : 0
+        if(i1 < arg1.height() && i2 < arg2.height() && j1 < arg1.width() && j2 < arg2.width()) {
+          ret[i][j] = op(arg1.raw()[i1][j1], arg2.raw()[i2][j2])
+        } else {
+          ret[i][j] =  new CellError(ErrorType.NA)
+        }
+      }
+    }
+    return SimpleRangeValue.onlyValues(ret)
+  }
+
+  return op(arg1, arg2)
+}
