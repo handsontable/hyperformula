@@ -3,6 +3,7 @@
  * Copyright (c) 2021 Handsoncode. All rights reserved.
  */
 
+import {GPU} from 'gpu.js'
 import {AbsoluteCellRange, AbsoluteColumnRange, AbsoluteRowRange} from '../AbsoluteCellRange'
 import {CellError, ErrorType, invalidSimpleCellAddress, SimpleCellAddress} from '../Cell'
 import {Config} from '../Config'
@@ -12,7 +13,6 @@ import {ErrorMessage} from '../error-message'
 import {LicenseKeyValidityState} from '../helpers/licenseKeyValidator'
 import {ColumnSearchStrategy} from '../Lookup/SearchStrategy'
 import {Matrix, NotComputedMatrix} from '../Matrix'
-import {Maybe} from '../Maybe'
 import {NamedExpressions} from '../NamedExpressions'
 import {NumberLiteralHelper} from '../NumberLiteralHelper'
 // noinspection TypeScriptPreferShortImport
@@ -27,10 +27,9 @@ import {
   EmptyValue,
   getRawValue,
   InternalScalarValue,
+  InterpreterValue,
   isExtendedNumber,
 } from './InterpreterValue'
-import {InterpreterValue} from './InterpreterValue'
-import type {GPU} from 'gpu.js'
 import {SimpleRangeValue} from './SimpleRangeValue'
 
 export class Interpreter {
@@ -91,74 +90,74 @@ export class Interpreter {
       case AstNodeType.CONCATENATE_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
         const rightResult = this.evaluateAst(ast.right, formulaAddress)
-        return binaryRangeWrapper(this.concatOp, leftResult, rightResult)
+        return this.binaryRangeWrapper(this.concatOp, leftResult, rightResult)
       }
       case AstNodeType.EQUALS_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
         const rightResult = this.evaluateAst(ast.right, formulaAddress)
-        return binaryRangeWrapper(this.equalOp, leftResult, rightResult)
+        return this.binaryRangeWrapper(this.equalOp, leftResult, rightResult)
       }
       case AstNodeType.NOT_EQUAL_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
         const rightResult = this.evaluateAst(ast.right, formulaAddress)
-        return binaryRangeWrapper(this.notEqualOp, leftResult, rightResult)
+        return this.binaryRangeWrapper(this.notEqualOp, leftResult, rightResult)
       }
       case AstNodeType.GREATER_THAN_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
         const rightResult = this.evaluateAst(ast.right, formulaAddress)
-        return binaryRangeWrapper(this.greaterThanOp, leftResult, rightResult)
+        return this.binaryRangeWrapper(this.greaterThanOp, leftResult, rightResult)
       }
       case AstNodeType.LESS_THAN_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
         const rightResult = this.evaluateAst(ast.right, formulaAddress)
-        return binaryRangeWrapper(this.lessThanOp, leftResult, rightResult)
+        return this.binaryRangeWrapper(this.lessThanOp, leftResult, rightResult)
       }
       case AstNodeType.GREATER_THAN_OR_EQUAL_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
         const rightResult = this.evaluateAst(ast.right, formulaAddress)
-        return binaryRangeWrapper(this.greaterThanOrEqualOp, leftResult, rightResult)
+        return this.binaryRangeWrapper(this.greaterThanOrEqualOp, leftResult, rightResult)
       }
       case AstNodeType.LESS_THAN_OR_EQUAL_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
         const rightResult = this.evaluateAst(ast.right, formulaAddress)
-        return binaryRangeWrapper(this.lessThanOrEqualOp, leftResult, rightResult)
+        return this.binaryRangeWrapper(this.lessThanOrEqualOp, leftResult, rightResult)
       }
       case AstNodeType.PLUS_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
         const rightResult = this.evaluateAst(ast.right, formulaAddress)
-        return binaryRangeWrapper(this.plusOp, leftResult, rightResult)
+        return this.binaryRangeWrapper(this.plusOp, leftResult, rightResult)
       }
       case AstNodeType.MINUS_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
         const rightResult = this.evaluateAst(ast.right, formulaAddress)
-        return binaryRangeWrapper(this.minusOp, leftResult, rightResult)
+        return this.binaryRangeWrapper(this.minusOp, leftResult, rightResult)
       }
       case AstNodeType.TIMES_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
         const rightResult = this.evaluateAst(ast.right, formulaAddress)
-        return binaryRangeWrapper(this.timesOp, leftResult, rightResult)
+        return this.binaryRangeWrapper(this.timesOp, leftResult, rightResult)
       }
       case AstNodeType.POWER_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
         const rightResult = this.evaluateAst(ast.right, formulaAddress)
-        return binaryRangeWrapper(this.powerOp, leftResult, rightResult)
+        return this.binaryRangeWrapper(this.powerOp, leftResult, rightResult)
       }
       case AstNodeType.DIV_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
         const rightResult = this.evaluateAst(ast.right, formulaAddress)
-        return binaryRangeWrapper(this.divOp, leftResult, rightResult)
+        return this.binaryRangeWrapper(this.divOp, leftResult, rightResult)
       }
       case AstNodeType.PLUS_UNARY_OP: {
         const result = this.evaluateAst(ast.value, formulaAddress)
-        return unaryRangeWrapper(this.unaryPlusOp, result)
+        return this.unaryRangeWrapper(this.unaryPlusOp, result)
       }
       case AstNodeType.MINUS_UNARY_OP: {
         const result = this.evaluateAst(ast.value, formulaAddress)
-        return unaryRangeWrapper(this.unaryMinusOp, result)
+        return this.unaryRangeWrapper(this.unaryMinusOp, result)
       }
       case AstNodeType.PERCENT_OP: {
         const result = this.evaluateAst(ast.value, formulaAddress)
-        return unaryRangeWrapper(this.percentOp, result)
+        return this.unaryRangeWrapper(this.percentOp, result)
       }
       case AstNodeType.FUNCTION_CALL: {
         if (this.config.licenseKeyValidityState !== LicenseKeyValidityState.VALID && !FunctionRegistry.functionIsProtected(ast.procedureName)) {
@@ -315,25 +314,81 @@ export class Interpreter {
     unaryErrorWrapper(this.arithmeticHelper.unaryPercent,
         this.arithmeticHelper.coerceScalarToNumberOrError(arg))
 
-  private unaryPlusOp = (arg: InternalScalarValue): InternalScalarValue =>
-    (isExtendedNumber(arg) ? this.arithmeticHelper.unaryPlus(arg) : arg)
-}
+  private unaryPlusOp = (arg: InternalScalarValue): InternalScalarValue => this.arithmeticHelper.unaryPlus(arg)
 
-function unaryErrorWrapper<T extends InterpreterValue>(op: (a: T) => InternalScalarValue, a: T | CellError): InternalScalarValue {
-  if (a instanceof CellError) {
-    return a
-  } else {
-    return op(a)
+  private unaryRangeWrapper(op: (arg: InternalScalarValue) => InternalScalarValue, arg: InterpreterValue): InterpreterValue {
+    if (arg instanceof CellError) {
+      return arg
+    } else if(arg instanceof SimpleRangeValue) {
+      if(!this.config.arrays) {
+        return new CellError(ErrorType.VALUE, ErrorMessage.ScalarExpected)
+      }
+      const newRaw = arg.raw().map(
+        (row) => row.map(op)
+      )
+      return SimpleRangeValue.onlyValues(newRaw)
+    } else {
+      return op(arg)
+    }
+  }
+
+  private binaryRangeWrapper(op: (arg1: InternalScalarValue, arg2: InternalScalarValue) => InternalScalarValue, arg1: InterpreterValue, arg2: InterpreterValue): InterpreterValue {
+    if (arg1 instanceof CellError) {
+      return arg1
+    } else if(arg1 instanceof SimpleRangeValue && !this.config.arrays) {
+      return new CellError(ErrorType.VALUE, ErrorMessage.ScalarExpected)
+    } else if (arg2 instanceof CellError) {
+      return arg2
+    } else if(arg2 instanceof SimpleRangeValue && !this.config.arrays) {
+      return new CellError(ErrorType.VALUE, ErrorMessage.ScalarExpected)
+    } else if(arg1 instanceof SimpleRangeValue || arg2 instanceof SimpleRangeValue) {
+      if(!(arg1 instanceof SimpleRangeValue)) {
+        arg1 = SimpleRangeValue.fromScalar(arg1)
+      }
+      if(!(arg2 instanceof SimpleRangeValue)) {
+        arg2 = SimpleRangeValue.fromScalar(arg2)
+      }
+      const width = Math.max(arg1.width(), arg2.width())
+      const height = Math.max(arg1.height(), arg2.height())
+      const ret: InternalScalarValue[][] = Array(height)
+      for(let i=0;i<height;i++) {
+        ret[i] = Array(width)
+      }
+      for(let i=0;i<height;i++) {
+        const i1 = (arg1.height() !== 1) ? i : 0
+        const i2 = (arg2.height() !== 1) ? i : 0
+        for(let j=0;j<width;j++) {
+          const j1 = (arg1.width() !== 1) ? j : 0
+          const j2 = (arg2.width() !== 1) ? j : 0
+          if(i1 < arg1.height() && i2 < arg2.height() && j1 < arg1.width() && j2 < arg2.width()) {
+            ret[i][j] = op(arg1.raw()[i1][j1], arg2.raw()[i2][j2])
+          } else {
+            ret[i][j] =  new CellError(ErrorType.NA)
+          }
+        }
+      }
+      return SimpleRangeValue.onlyValues(ret)
+    } else {
+      return op(arg1, arg2)
+    }
   }
 }
 
-function binaryErrorWrapper<T extends InterpreterValue>(op: (a: T, b: T) => InternalScalarValue, a: T | CellError, b: T | CellError): InternalScalarValue {
-  if (a instanceof CellError) {
-    return a
-  } else if (b instanceof CellError) {
-    return b
+function unaryErrorWrapper<T extends InterpreterValue>(op: (arg: T) => InternalScalarValue, arg: T | CellError): InternalScalarValue {
+  if (arg instanceof CellError) {
+    return arg
   } else {
-    return op(a, b)
+    return op(arg)
+  }
+}
+
+function binaryErrorWrapper<T extends InterpreterValue>(op: (arg1: T, arg2: T) => InternalScalarValue, arg1: T | CellError, arg2: T | CellError): InternalScalarValue {
+  if (arg1 instanceof CellError) {
+    return arg1
+  } else if (arg2 instanceof CellError) {
+    return arg2
+  } else {
+    return op(arg1, arg2)
   }
 }
 
@@ -344,45 +399,3 @@ function wrapperForAddress(val: InterpreterValue, adr: SimpleCellAddress): Inter
   return val
 }
 
-function unaryRangeWrapper(op: (arg: InternalScalarValue) => InternalScalarValue, arg: InterpreterValue): InterpreterValue {
-  if(arg instanceof SimpleRangeValue) {
-    const newRaw = arg.raw().map(
-      (row) => row.map(op)
-    )
-    return SimpleRangeValue.onlyValues(newRaw)
-  }
-  return op(arg)
-}
-
-function binaryRangeWrapper(op: (arg1: InternalScalarValue, arg2: InternalScalarValue) => InternalScalarValue, arg1: InterpreterValue, arg2: InterpreterValue): InterpreterValue {
-  if(arg1 instanceof SimpleRangeValue || arg2 instanceof SimpleRangeValue) {
-    if(!(arg1 instanceof SimpleRangeValue)) {
-      arg1 = SimpleRangeValue.fromScalar(arg1)
-    }
-    if(!(arg2 instanceof SimpleRangeValue)) {
-      arg2 = SimpleRangeValue.fromScalar(arg2)
-    }
-    const width = Math.max(arg1.width(), arg2.width())
-    const height = Math.max(arg1.height(), arg2.height())
-    const ret: InternalScalarValue[][] = Array(height)
-    for(let i=0;i<height;i++) {
-      ret[i] = Array(width)
-    }
-    for(let i=0;i<height;i++) {
-      const i1 = (arg1.height() !== 1) ? i : 0
-      const i2 = (arg2.height() !== 1) ? i : 0
-      for(let j=0;j<width;j++) {
-        const j1 = (arg1.width() !== 1) ? j : 0
-        const j2 = (arg2.width() !== 1) ? j : 0
-        if(i1 < arg1.height() && i2 < arg2.height() && j1 < arg1.width() && j2 < arg2.width()) {
-          ret[i][j] = op(arg1.raw()[i1][j1], arg2.raw()[i2][j2])
-        } else {
-          ret[i][j] =  new CellError(ErrorType.NA)
-        }
-      }
-    }
-    return SimpleRangeValue.onlyValues(ret)
-  }
-
-  return op(arg1, arg2)
-}

@@ -207,9 +207,8 @@ export class ArithmeticHelper {
     return cloneNumber(arg, -getRawValue(arg))
   }
 
-  public unaryPlus = (arg: ExtendedNumber): ExtendedNumber => {
-    return arg
-  }
+  public unaryPlus = (arg: InternalScalarValue): InternalScalarValue => arg
+
 
   public unaryPercent = (arg: ExtendedNumber): ExtendedNumber => {
     return new PercentNumber(getRawValue(arg)/100)
