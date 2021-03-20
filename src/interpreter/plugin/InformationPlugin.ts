@@ -386,7 +386,7 @@ export class InformationPlugin extends FunctionPlugin {
       }
       const range = rangeValue.range()
       if (range === undefined) {
-        return rangeValue.topLeftCornerValue() ?? new CellError(ErrorType.VALUE, ErrorMessage.CellRangeExpected)
+        return rangeValue?.raw()?.[row-1]?.[col-1] ?? rangeValue.topLeftCornerValue() ?? new CellError(ErrorType.VALUE, ErrorMessage.CellRangeExpected)
       }
       const address = range.getAddress(col - 1, row - 1)
       return this.dependencyGraph.getScalarValue(address)
