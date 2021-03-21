@@ -104,7 +104,7 @@ export class ColumnIndex implements ColumnSearchStrategy {
 
     const index = upperBound(valueIndex.index, range.start.row)
     const rowNumber = valueIndex.index[index]
-    return rowNumber <= range.end.row ? rowNumber : this.binarySearchStrategy.find(key, range, sorted)
+    return rowNumber <= range.end.row ? rowNumber - range.start.row : this.binarySearchStrategy.find(key, range, sorted)
   }
 
   public advancedFind(keyMatcher: (arg: RawInterpreterValue) => boolean, range: AbsoluteCellRange): number {

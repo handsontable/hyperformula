@@ -45,7 +45,7 @@ export class ColumnBinarySearch extends AdvancedFind implements ColumnSearchStra
     if (range.height() < this.config.binarySearchThreshold || !sorted) {
       const values = this.dependencyGraph.computeListOfValuesInRange(range).map(getRawValue)
       const index =  values.indexOf(key)
-      return index < 0 ? index : index + range.start.row
+      return index
     } else {
       return rangeLowerBound(range, key, this.dependencyGraph, 'row')
     }

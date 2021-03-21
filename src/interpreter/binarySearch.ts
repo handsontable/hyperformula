@@ -29,7 +29,7 @@ export function rangeLowerBound(range: AbsoluteCellRange, key: RawNoErrorScalarV
     centerValueFn = (center: number) =>  getRawValue(dependencyGraph.getCellValue(simpleCellAddress(range.sheet, center, range.start.row)))
   }
 
-  return lowerBound(centerValueFn, key, start, end)
+  return lowerBound(centerValueFn, key, start, end) - start
 }
 
 /*

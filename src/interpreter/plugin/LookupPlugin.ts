@@ -11,7 +11,7 @@ import {SearchStrategy} from '../../Lookup/SearchStrategy'
 import {ProcedureAst} from '../../parser'
 import {StatType} from '../../statistics'
 import {zeroIfEmpty} from '../ArithmeticHelper'
-import {InternalScalarValue, RawNoErrorScalarValue, } from '../InterpreterValue'
+import {InternalScalarValue, RawNoErrorScalarValue,} from '../InterpreterValue'
 import {SimpleRangeValue} from '../SimpleRangeValue'
 import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
 
@@ -96,12 +96,7 @@ export class LookupPlugin extends FunctionPlugin {
 
   public match(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.runFunction(ast.args, formulaAddress, this.metadata('MATCH'), (key: RawNoErrorScalarValue, rangeValue: SimpleRangeValue, sorted: number) => {
-      const range = rangeValue.range()
-      if (range === undefined) {
-        return new CellError(ErrorType.VALUE, ErrorMessage.WrongType)
-      }
-
-      return this.doMatch(zeroIfEmpty(key), range, sorted)
+      return this.doMatch(zeroIfEmpty(key), rangeValue, sorted)
     })
   }
 
@@ -117,7 +112,7 @@ export class LookupPlugin extends FunctionPlugin {
       return new CellError(ErrorType.NA, ErrorMessage.ValueNotFound)
     }
 
-    const address = simpleCellAddress(range.sheet, range.start.col + index, rowIndex)
+    const address = simpleCellAddress(range.sheet, range.start.col + index, range.start.row + rowIndex)
     const value = this.dependencyGraph.getCellValue(address)
 
     if (value instanceof SimpleRangeValue) {
@@ -134,7 +129,7 @@ export class LookupPlugin extends FunctionPlugin {
       return new CellError(ErrorType.NA, ErrorMessage.ValueNotFound)
     }
 
-    const address = simpleCellAddress(range.sheet, colIndex, range.start.row + index)
+    const address = simpleCellAddress(range.sheet, range.start.col + colIndex, range.start.row + index)
 
     const value = this.dependencyGraph.getCellValue(address)
 
@@ -144,7 +139,11 @@ export class LookupPlugin extends FunctionPlugin {
     return value
   }
 
-  private doMatch(key: RawNoErrorScalarValue, range: AbsoluteCellRange, sorted: number): InternalScalarValue {
+  private doMatch(key: RawNoErrorScalarValue, rangeValue: SimpleRangeValue, sorted: number): InternalScalarValue {
+    const range = rangeValue.range()
+    if(range === undefined) {
+      return new CellError(ErrorType.VALUE, ErrorMessage.WrongType)
+    }
     if (range.width() > 1 && range.height() > 1) {
       return new CellError(ErrorType.NA)
     }
@@ -153,13 +152,13 @@ export class LookupPlugin extends FunctionPlugin {
       if (index === -1) {
         return new CellError(ErrorType.NA, ErrorMessage.ValueNotFound)
       }
-      return index - range.start.row + 1
+      return index + 1
     } else {
       const index = this.rowSearch.find(key, range, sorted !== 0)
       if (index === -1) {
         return new CellError(ErrorType.NA, ErrorMessage.ValueNotFound)
       }
-      return index - range.start.col + 1
+      return index + 1
     }
   }
 

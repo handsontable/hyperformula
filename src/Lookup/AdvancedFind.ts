@@ -17,7 +17,7 @@ export abstract class AdvancedFind {
     const values = this.dependencyGraph.computeListOfValuesInRange(range)
     for (let i = 0; i < values.length; i++) {
       if (keyMatcher(getRawValue(values[i]))) {
-        return i + range.start.col
+        return i
       }
     }
     return -1

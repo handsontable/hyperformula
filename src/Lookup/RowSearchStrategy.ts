@@ -23,7 +23,7 @@ export class RowSearchStrategy extends AdvancedFind implements SearchStrategy {
     if (range.width() < this.config.binarySearchThreshold || !sorted) {
       const values = this.dependencyGraph.computeListOfValuesInRange(range).map(getRawValue)
       const index =  values.indexOf(key)
-      return index < 0 ? index : index + range.start.col
+      return index
     } else {
       return rangeLowerBound(range, key, this.dependencyGraph, 'col')
     }
