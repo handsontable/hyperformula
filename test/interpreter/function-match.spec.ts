@@ -22,12 +22,12 @@ describe('Function MATCH', () => {
     expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.WrongType))
   })
 
-  it('validates that 2nd argument is range', () => {
+  it('2nd argument can be a scalar', () => {
     const engine = HyperFormula.buildFromArray([
-      ['=MATCH(1, 42)'],
+      ['=MATCH(42, 42)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.WrongType))
+    expect(engine.getCellValue(adr('A1'))).toEqual(1)
   })
 
   it('validates that 3rd argument is number', () => {

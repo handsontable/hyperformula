@@ -286,7 +286,7 @@ describe('ColumnIndex#find', () => {
     const index = buildEmptyIndex(transformService, new Config(), stats)
 
     index.add(1, adr('A2'))
-    const row = index.find(1, new AbsoluteCellRange(adr('A1'), adr('A3')), true)
+    const row = index.find(1, SimpleRangeValue.onlyRange(new AbsoluteCellRange(adr('A1'), adr('A3')),undefined!), true)
 
     expect(row).toBe(1)
   })
@@ -296,7 +296,7 @@ describe('ColumnIndex#find', () => {
 
     index.add(1, adr('A4'))
     index.add(1, adr('A10'))
-    const row = index.find(1, new AbsoluteCellRange(adr('A1'), adr('A20')), true)
+    const row = index.find(1, SimpleRangeValue.onlyRange(new AbsoluteCellRange(adr('A1'), adr('A20')),undefined!), true)
 
     expect(row).toBe(3)
   })
@@ -495,12 +495,12 @@ describe('ColumnIndex - lazy cruds', () => {
 
     transformService.addTransformation(new AddRowsTransformer(RowsSpan.fromNumberOfRows(0, 0, 1)))
 
-    const rowA = index.find(1, new AbsoluteCellRange(adr('A1'), adr('A2')), true)
+    const rowA = index.find(1, SimpleRangeValue.onlyRange(new AbsoluteCellRange(adr('A1'), adr('A2')),undefined!), true)
     expect(rowA).toEqual(1)
     expect(index.getValueIndex(0, 0, 1).index).toEqual([1])
     expect(index.getValueIndex(0, 1, 1).index).toEqual([0])
 
-    const rowB = index.find(1, new AbsoluteCellRange(adr('B1'), adr('B2')), true)
+    const rowB = index.find(1, SimpleRangeValue.onlyRange(new AbsoluteCellRange(adr('B1'), adr('B2')),undefined!), true)
     expect(rowB).toEqual(1)
     expect(index.getValueIndex(0, 0, 1).index).toEqual([1])
     expect(index.getValueIndex(0, 1, 1).index).toEqual([1])
@@ -515,12 +515,12 @@ describe('ColumnIndex - lazy cruds', () => {
 
     transformService.addTransformation(new AddRowsTransformer(RowsSpan.fromNumberOfRows(0, 0, 1)))
 
-    const row1 = index.find(1, new AbsoluteCellRange(adr('A1'), adr('A3')), true)
+    const row1 = index.find(1, SimpleRangeValue.onlyRange(new AbsoluteCellRange(adr('A1'), adr('A3')),undefined!), true)
     expect(row1).toEqual(1)
     expect(index.getValueIndex(0, 0, 1).index).toEqual([1])
     expect(index.getValueIndex(0, 0, 2).index).toEqual([1])
 
-    const row2 = index.find(2, new AbsoluteCellRange(adr('A1'), adr('A3')), true)
+    const row2 = index.find(2, SimpleRangeValue.onlyRange(new AbsoluteCellRange(adr('A1'), adr('A3')),undefined!), true)
     expect(row2).toEqual(2)
     expect(index.getValueIndex(0, 0, 1).index).toEqual([1])
     expect(index.getValueIndex(0, 0, 2).index).toEqual([2])

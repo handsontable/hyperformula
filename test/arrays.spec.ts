@@ -35,4 +35,12 @@ describe('OPs', () => {
       [8,10,detailedErrorWithOrigin(ErrorType.NA, "Sheet1!C5")],
       [detailedErrorWithOrigin(ErrorType.NA, "Sheet1!A6"),detailedErrorWithOrigin(ErrorType.NA, "Sheet1!B6"),detailedErrorWithOrigin(ErrorType.NA, "Sheet1!C6")]])
   })
+
+  it('match', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=MATCH(10,2*A2:E2)'],
+      [1,2,3,4,5],
+    ], {arrays: true})
+    expect(engine.getCellValue(adr('A1'))).toEqual(5)
+  })
 })
