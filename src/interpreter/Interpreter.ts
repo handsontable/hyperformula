@@ -30,7 +30,7 @@ import {
   InterpreterValue,
   isExtendedNumber,
 } from './InterpreterValue'
-import {SimpleRangeValue} from './SimpleRangeValue'
+import {ArrayData, SimpleRangeValue} from './SimpleRangeValue'
 
 export class Interpreter {
   private gpu?: GPU
@@ -249,22 +249,22 @@ export class Interpreter {
     return ast.start.sheet === ast.end.sheet
   }
 
-  private equalOp = (arg1: InternalScalarValue, arg2: InternalScalarValue): InternalScalarValue =>
+  private equalOp = (arg1: InternalScalarValue, arg2: InternalScalarValue): InternalScalarValue => //(arg1 === arg2)
     binaryErrorWrapper(this.arithmeticHelper.eq, arg1, arg2)
 
-  private notEqualOp = (arg1: InternalScalarValue, arg2: InternalScalarValue): InternalScalarValue =>
+  private notEqualOp = (arg1: InternalScalarValue, arg2: InternalScalarValue): InternalScalarValue => //(arg1 !== arg2)
     binaryErrorWrapper(this.arithmeticHelper.neq, arg1, arg2)
 
-  private greaterThanOp = (arg1: InternalScalarValue, arg2: InternalScalarValue): InternalScalarValue =>
+  private greaterThanOp = (arg1: InternalScalarValue, arg2: InternalScalarValue): InternalScalarValue => //((arg1 as number) > (arg2 as number))
     binaryErrorWrapper(this.arithmeticHelper.gt, arg1, arg2)
 
-  private lessThanOp = (arg1: InternalScalarValue, arg2: InternalScalarValue): InternalScalarValue =>
+  private lessThanOp = (arg1: InternalScalarValue, arg2: InternalScalarValue): InternalScalarValue => //((arg1 as number) < (arg2 as number))
     binaryErrorWrapper(this.arithmeticHelper.lt, arg1, arg2)
 
-  private greaterThanOrEqualOp = (arg1: InternalScalarValue, arg2: InternalScalarValue): InternalScalarValue =>
+  private greaterThanOrEqualOp = (arg1: InternalScalarValue, arg2: InternalScalarValue): InternalScalarValue => //((arg1 as number) >= (arg2 as number))
     binaryErrorWrapper(this.arithmeticHelper.geq, arg1, arg2)
 
-  private lessThanOrEqualOp = (arg1: InternalScalarValue, arg2: InternalScalarValue): InternalScalarValue =>
+  private lessThanOrEqualOp = (arg1: InternalScalarValue, arg2: InternalScalarValue): InternalScalarValue => //((arg1 as number) <= (arg2 as number))
     binaryErrorWrapper(this.arithmeticHelper.leq, arg1, arg2)
 
   private concatOp = (arg1: InternalScalarValue, arg2: InternalScalarValue): InternalScalarValue =>
@@ -285,12 +285,12 @@ export class Interpreter {
         this.arithmeticHelper.coerceScalarToNumberOrError(arg2)
       )
 
-  private timesOp = (arg1: InternalScalarValue, arg2: InternalScalarValue): InternalScalarValue =>
-      binaryErrorWrapper(
-        this.arithmeticHelper.multiply,
-        this.arithmeticHelper.coerceScalarToNumberOrError(arg1),
-        this.arithmeticHelper.coerceScalarToNumberOrError(arg2)
-      )
+  private timesOp = (arg1: InternalScalarValue, arg2: InternalScalarValue): InternalScalarValue => ((arg1 as number) * (arg2 as number))
+      // binaryErrorWrapper(
+      //   this.arithmeticHelper.multiply,
+      //   this.arithmeticHelper.coerceScalarToNumberOrError(arg1),
+      //   this.arithmeticHelper.coerceScalarToNumberOrError(arg2)
+      // )
 
   private powerOp = (arg1: InternalScalarValue, arg2: InternalScalarValue): InternalScalarValue =>
       binaryErrorWrapper(
@@ -343,10 +343,43 @@ export class Interpreter {
       return new CellError(ErrorType.VALUE, ErrorMessage.ScalarExpected)
     } else if(arg1 instanceof SimpleRangeValue || arg2 instanceof SimpleRangeValue) {
       if(!(arg1 instanceof SimpleRangeValue)) {
-        arg1 = SimpleRangeValue.fromScalar(arg1)
+        if((arg2 as SimpleRangeValue).adhoc) {
+          (arg2 as SimpleRangeValue).data.map((arg) => op(arg1 as InternalScalarValue, arg))
+          return arg2
+        } else {
+          arg1 = SimpleRangeValue.fromScalar(arg1)
+        }
       }
       if(!(arg2 instanceof SimpleRangeValue)) {
-        arg2 = SimpleRangeValue.fromScalar(arg2)
+        if((arg1 as SimpleRangeValue).adhoc) {
+          (arg1 as SimpleRangeValue).data.map((arg) => op(arg, arg2 as InternalScalarValue))
+          return arg1
+        } else {
+          arg2 = SimpleRangeValue.fromScalar(arg2)
+        }
+      }
+      if(arg1.width()===arg2.width() && arg1.height()===arg2.height()) {
+        if(arg1.adhoc) {
+          const raw1 = arg1.raw()
+          const raw2 = arg2.raw()
+          for(let i=0;i<raw1.length;i++) {
+            for(let j=0;j<raw1[0].length;j++) {
+              raw1[i][j] = op(raw1[i][j],raw2[i][j])
+            }
+          }
+          return arg1
+        }
+        if(arg2.adhoc) {
+          const raw1 = arg1.raw()
+          const raw2 = arg2.raw()
+          for(let i=0;i<raw1.length;i++) {
+            for(let j=0;j<raw1[0].length;j++) {
+              raw2[i][j] = op(raw1[i][j],raw2[i][j])
+            }
+          }
+          return arg2
+        }
+
       }
       const width = Math.max(arg1.width(), arg2.width())
       const height = Math.max(arg1.height(), arg2.height())
