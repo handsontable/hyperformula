@@ -351,8 +351,8 @@ export class Interpreter {
         }
       }
       if(!(arg2 instanceof SimpleRangeValue)) {
-        if((arg1 as SimpleRangeValue).adhoc) {
-          (arg1 as SimpleRangeValue).data.map((arg) => op(arg, arg2 as InternalScalarValue))
+        if((arg1).adhoc) {
+          (arg1).data.map((arg) => op(arg, arg2 as InternalScalarValue))
           return arg1
         } else {
           arg2 = SimpleRangeValue.fromScalar(arg2)
@@ -364,7 +364,7 @@ export class Interpreter {
           const raw2 = arg2.raw()
           for(let i=0;i<raw1.length;i++) {
             for(let j=0;j<raw1[0].length;j++) {
-              raw1[i][j] = op(raw1[i][j],raw2[i][j])
+              raw1[i][j] = op(raw1[i][j], raw2[i][j])
             }
           }
           return arg1
@@ -374,7 +374,7 @@ export class Interpreter {
           const raw2 = arg2.raw()
           for(let i=0;i<raw1.length;i++) {
             for(let j=0;j<raw1[0].length;j++) {
-              raw2[i][j] = op(raw1[i][j],raw2[i][j])
+              raw2[i][j] = op(raw1[i][j], raw2[i][j])
             }
           }
           return arg2
