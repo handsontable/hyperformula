@@ -285,12 +285,12 @@ export class Interpreter {
         this.arithmeticHelper.coerceScalarToNumberOrError(arg2)
       )
 
-  private timesOp = (arg1: InternalScalarValue, arg2: InternalScalarValue): InternalScalarValue => ((arg1 as number) * (arg2 as number))
-      // binaryErrorWrapper(
-      //   this.arithmeticHelper.multiply,
-      //   this.arithmeticHelper.coerceScalarToNumberOrError(arg1),
-      //   this.arithmeticHelper.coerceScalarToNumberOrError(arg2)
-      // )
+  private timesOp = (arg1: InternalScalarValue, arg2: InternalScalarValue): InternalScalarValue =>
+      binaryErrorWrapper(
+        this.arithmeticHelper.multiply,
+        this.arithmeticHelper.coerceScalarToNumberOrError(arg1),
+        this.arithmeticHelper.coerceScalarToNumberOrError(arg2)
+      )
 
   private powerOp = (arg1: InternalScalarValue, arg2: InternalScalarValue): InternalScalarValue =>
       binaryErrorWrapper(
