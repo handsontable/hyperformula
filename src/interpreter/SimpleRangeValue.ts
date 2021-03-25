@@ -168,30 +168,17 @@ export class OnlyRangeData {
   }
 
   private computeDataFromDependencyGraph(): InternalScalarValue[][] {
-    const result: InternalScalarValue[][] = []
-
-    let i = 0
-    let row = []
-    for (const cellFromRange of this._range.addresses(this.dependencyGraph)) {
+    return this._range.addressesArrayMap(this.dependencyGraph, cellFromRange => {
       const value = this.dependencyGraph.getCellValue(cellFromRange)
       if (value instanceof SimpleRangeValue) {
-        row.push(new CellError(ErrorType.VALUE, ErrorMessage.ScalarExpected))
+        return new CellError(ErrorType.VALUE, ErrorMessage.ScalarExpected)
       } else if (isExtendedNumber(value)) {
-        row.push(value)
+        return value
       } else {
-        row.push(value)
         this._hasOnlyNumbers = false
+        return value
       }
-      ++i
-
-      if (i % this.size.width === 0) {
-        i = 0
-        result.push([...row])
-        row = []
-      }
-    }
-
-    return result
+    })
   }
 }
 
