@@ -8,7 +8,7 @@ import {DateNumber, DateTimeNumber, ExtendedNumber, TimeNumber} from './interpre
 import {Maybe} from './Maybe'
 
 const numDays: number[] = [ 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
-const prefSumDays: number[] = [ 0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 303, 334 ]
+const prefSumDays: number[] = [ 0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334 ]
 
 export interface SimpleDate {
   year: number,
