@@ -39,7 +39,32 @@ describe('Date helpers', () => {
     expect(dateHelper.dateStringToDateNumber('31  12 2999')).toEqual(new DateNumber(401768))
   })
 
+  it('#stringToDateNumber - no time format', () => {
+    const dateHelper = new DateTimeHelper(new Config({timeFormats: []}))
+    expect(dateHelper.dateStringToDateNumber('16/08/1985')).toEqual(new DateNumber(31275))
+    expect(dateHelper.dateStringToDateNumber('15/01/2020')).toEqual(new DateNumber(43845))
+    expect(dateHelper.dateStringToDateNumber('29/02/2000')).toEqual(new DateNumber(36585))
+    expect(dateHelper.dateStringToDateNumber('31/12/2999')).toEqual(new DateNumber(401768))
+    expect(dateHelper.dateStringToDateNumber('31 12 2999')).toEqual(new DateNumber(401768))
+    expect(dateHelper.dateStringToDateNumber(' 31 12 2999 ')).toEqual(new DateNumber(401768))
+    expect(dateHelper.dateStringToDateNumber('31  12 2999')).toEqual(new DateNumber(401768))
+  })
+
   it('#stringToDateNumber - tests expected to return not null, times', () => {
+    const dateHelper = new DateTimeHelper(new Config())
+    expect(dateHelper.dateStringToDateNumber('00:00')).toEqual(new TimeNumber(0))
+    expect(dateHelper.dateStringToDateNumber('03:00')).toEqual(new TimeNumber(0.125))
+    expect(dateHelper.dateStringToDateNumber('24:00')).toEqual(new TimeNumber(1))
+    expect(dateHelper.dateStringToDateNumber('48:00')).toEqual(new TimeNumber(2))
+    expect(dateHelper.dateStringToDateNumber('00:01')).toEqual(new TimeNumber(0.0006944444444444445))
+    expect(dateHelper.dateStringToDateNumber('00:00:00')).toEqual(new TimeNumber(0))
+    expect(dateHelper.dateStringToDateNumber('00:00:00.001')).toEqual(new TimeNumber(1.1574074074074076e-8))
+    expect(dateHelper.dateStringToDateNumber('00:00:00.0001')).toEqual(new TimeNumber(0))
+    expect(dateHelper.dateStringToDateNumber('00:00:01')).toEqual(new TimeNumber(0.000011574074074074073))
+    expect(dateHelper.dateStringToDateNumber('00:179:60')).toEqual(new TimeNumber(0.125))
+  })
+
+  it('#stringToDateNumber - no date format', () => {
     const dateHelper = new DateTimeHelper(new Config())
     expect(dateHelper.dateStringToDateNumber('00:00')).toEqual(new TimeNumber(0))
     expect(dateHelper.dateStringToDateNumber('03:00')).toEqual(new TimeNumber(0.125))
@@ -186,7 +211,7 @@ describe('Date helpers, other zero date', () => {
 })
 
 describe('Custom date parsing', () => {
-  function customParseDate(dateString: string, dateFormat: string): Maybe<SimpleDate> {
+  function customParseDate(dateString: string, dateFormat: Maybe<string>): Maybe<SimpleDate> {
     const momentDate = moment(dateString, dateFormat, true)
     if(momentDate.isValid()){
       return {year: momentDate.year(), month: momentDate.month()+1, day: momentDate.date()}

@@ -6,7 +6,7 @@
 import {DateTime, SimpleDate, SimpleTime} from './DateTimeHelper'
 import {Maybe} from './Maybe'
 
-export function defaultParseToDateTime(dateTimeString: string, dateFormat: string, timeFormat: string): Maybe<DateTime> {
+export function defaultParseToDateTime(dateTimeString: string, dateFormat: Maybe<string>, timeFormat: Maybe<string>): Maybe<DateTime> {
   dateTimeString = dateTimeString.replace(/\s\s+/g, ' ').trim().toLowerCase()
   let ampmtoken: Maybe<string> = dateTimeString.substring(dateTimeString.length - 2)
   if (ampmtoken === 'am' || ampmtoken === 'pm') {
@@ -48,7 +48,10 @@ export function defaultParseToDateTime(dateTimeString: string, dateFormat: strin
 
 export const secondsExtendedRegexp = /^ss\.(s+|0+)$/
 
-export function defaultParseToTime(timeItems: string[], timeFormat: string): Maybe<SimpleTime> {
+function defaultParseToTime(timeItems: string[], timeFormat: Maybe<string>): Maybe<SimpleTime> {
+  if(timeFormat === undefined) {
+    return undefined
+  }
   timeFormat = timeFormat.toLowerCase()
   if (timeFormat.endsWith('am/pm')) {
     timeFormat = timeFormat.substring(0, timeFormat.length - 5).trim()
@@ -107,7 +110,10 @@ export function defaultParseToTime(timeItems: string[], timeFormat: string): May
   return {hours, minutes, seconds}
 }
 
-export function defaultParseToDate(dateItems: string[], dateFormat: string): Maybe<SimpleDate> {
+function defaultParseToDate(dateItems: string[], dateFormat: Maybe<string>): Maybe<SimpleDate> {
+  if(dateFormat === undefined) {
+    return undefined
+  }
   const formatItems = dateFormat.toLowerCase().split(/[ /.-]/g)
   if (dateItems.length !== formatItems.length) {
     return undefined
