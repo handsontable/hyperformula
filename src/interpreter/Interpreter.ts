@@ -35,7 +35,6 @@ import {SimpleRangeValue} from './SimpleRangeValue'
 
 export class Interpreter {
   private gpu?: GPU
-  public readonly arithmeticHelper: ArithmeticHelper
   public readonly criterionBuilder: CriterionBuilder
 
   constructor(
@@ -44,13 +43,12 @@ export class Interpreter {
     public readonly config: Config,
     public readonly stats: Statistics,
     public readonly dateHelper: DateTimeHelper,
-    public readonly numberLiteralsHelper: NumberLiteralHelper,
     public readonly functionRegistry: FunctionRegistry,
     public readonly namedExpressions: NamedExpressions,
-    public readonly serialization: Serialization
+    public readonly serialization: Serialization,
+    public readonly arithmeticHelper: ArithmeticHelper,
   ) {
     this.functionRegistry.initializePlugins(this)
-    this.arithmeticHelper = new ArithmeticHelper(config, dateHelper, numberLiteralsHelper)
     this.criterionBuilder = new CriterionBuilder(config)
   }
 

@@ -10,6 +10,7 @@ import {DependencyGraph} from '../DependencyGraph'
 import {AddRowsTransformer} from '../dependencyTransformers/AddRowsTransformer'
 import {RemoveRowsTransformer} from '../dependencyTransformers/RemoveRowsTransformer'
 import {FormulaTransformer} from '../dependencyTransformers/Transformer'
+import {ArithmeticHelper} from '../interpreter/ArithmeticHelper'
 import {RawInterpreterValue, RawNoErrorScalarValue, RawScalarValue} from '../interpreter/InterpreterValue'
 import {SimpleRangeValue} from '../interpreter/SimpleRangeValue'
 import {LazilyTransformingAstService} from '../LazilyTransformingAstService'
@@ -36,6 +37,7 @@ export class ColumnIndex implements ColumnSearchStrategy {
 
   constructor(
     private readonly dependencyGraph: DependencyGraph,
+    private readonly arithmeticHelper: ArithmeticHelper,
     private readonly config: Config,
     private readonly stats: Statistics,
   ) {

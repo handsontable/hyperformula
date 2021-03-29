@@ -105,7 +105,7 @@ export class ArithmeticHelper {
     }
   }
 
-  private normalizeString(str: string): string {
+  public normalizeString(str: string): string {
     if(!this.config.caseSensitive) {
       str = str.toLowerCase()
     }

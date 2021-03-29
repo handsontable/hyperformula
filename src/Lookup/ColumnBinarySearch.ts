@@ -7,6 +7,7 @@ import {AbsoluteCellRange} from '../AbsoluteCellRange'
 import {SimpleCellAddress} from '../Cell'
 import {Config} from '../Config'
 import {DependencyGraph} from '../DependencyGraph'
+import {ArithmeticHelper} from '../interpreter/ArithmeticHelper'
 import {rangeLowerBound} from '../interpreter/binarySearch'
 import {getRawValue, RawNoErrorScalarValue, RawScalarValue} from '../interpreter/InterpreterValue'
 import {Matrix} from '../Matrix'
@@ -17,6 +18,7 @@ import {ColumnSearchStrategy} from './SearchStrategy'
 export class ColumnBinarySearch extends AdvancedFind implements ColumnSearchStrategy {
   constructor(
     protected dependencyGraph: DependencyGraph,
+    private arithmeticHelper: ArithmeticHelper,
     private config: Config,
   ) {
     super(dependencyGraph)

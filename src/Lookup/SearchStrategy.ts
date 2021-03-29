@@ -7,6 +7,7 @@ import {AbsoluteCellRange} from '../AbsoluteCellRange'
 import {SimpleCellAddress} from '../Cell'
 import {Config} from '../Config'
 import {DependencyGraph} from '../DependencyGraph'
+import {ArithmeticHelper} from '../interpreter/ArithmeticHelper'
 import {RawInterpreterValue, RawNoErrorScalarValue, RawScalarValue} from '../interpreter/InterpreterValue'
 import {Matrix} from '../Matrix'
 import {ColumnsSpan} from '../Span'
@@ -40,10 +41,10 @@ export interface ColumnSearchStrategy extends SearchStrategy {
   destroy(): void,
 }
 
-export function buildColumnSearchStrategy(dependencyGraph: DependencyGraph, config: Config, statistics: Statistics): ColumnSearchStrategy {
+export function buildColumnSearchStrategy(dependencyGraph: DependencyGraph, arithmeticHelper: ArithmeticHelper, config: Config, statistics: Statistics): ColumnSearchStrategy {
   if (config.useColumnIndex) {
-    return new ColumnIndex(dependencyGraph, config, statistics)
+    return new ColumnIndex(dependencyGraph, arithmeticHelper, config, statistics)
   } else {
-    return new ColumnBinarySearch(dependencyGraph, config)
+    return new ColumnBinarySearch(dependencyGraph, arithmeticHelper, config)
   }
 }
