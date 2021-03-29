@@ -16,7 +16,7 @@ describe('Operator PLUS', () => {
     const engine = HyperFormula.buildFromArray([
       ['="2"+"3"'],
       ['="foobar"+1'],
-      ['\'3'],
+      ['3'],
       ['=A3+A3'],
     ])
 
