@@ -16,7 +16,7 @@ import {SimpleRangeValue} from '../SimpleRangeValue'
 import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
 
 export class LookupPlugin extends FunctionPlugin {
-  private rowSearch: RowSearchStrategy = new RowSearchStrategy(this.config, this.dependencyGraph)
+  private rowSearch: RowSearchStrategy = new RowSearchStrategy(this.config, this.interpreter.arithmeticHelper, this.dependencyGraph)
 
   public static implementedFunctions = {
     'VLOOKUP': {

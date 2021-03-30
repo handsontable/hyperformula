@@ -44,8 +44,13 @@ export class ColumnBinarySearch extends AdvancedFind implements ColumnSearchStra
   public destroy(): void {}
 
   public find(key: RawNoErrorScalarValue, range: AbsoluteCellRange, sorted: boolean): number {
+    if(typeof key === 'string') {
+      key = this.arithmeticHelper.normalizeString(key)
+    }
     if (range.height() < this.config.binarySearchThreshold || !sorted) {
-      const values = this.dependencyGraph.computeListOfValuesInRange(range).map(getRawValue)
+      const values = this.dependencyGraph.computeListOfValuesInRange(range).map(getRawValue).map(arg =>
+        (typeof arg === 'string') ? this.arithmeticHelper.normalizeString(arg) : arg
+      )
       const index =  values.indexOf(key)
       return index < 0 ? index : index + range.start.row
     } else {

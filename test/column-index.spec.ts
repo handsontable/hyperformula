@@ -2,15 +2,18 @@ import {deepStrictEqual} from 'assert'
 import {AbsoluteCellRange} from '../src/AbsoluteCellRange'
 import {CellError, ErrorType, simpleCellAddress} from '../src/Cell'
 import {Config} from '../src/Config'
+import {DateTimeHelper} from '../src/DateTimeHelper'
 import {DependencyGraph} from '../src/DependencyGraph'
 import {AddRowsTransformer} from '../src/dependencyTransformers/AddRowsTransformer'
 import {RemoveRowsTransformer} from '../src/dependencyTransformers/RemoveRowsTransformer'
+import {ArithmeticHelper} from '../src/interpreter/ArithmeticHelper'
 import {FunctionRegistry} from '../src/interpreter/FunctionRegistry'
 import {SimpleRangeValue} from '../src/interpreter/SimpleRangeValue'
 import {LazilyTransformingAstService} from '../src/LazilyTransformingAstService'
 import {ColumnIndex} from '../src/Lookup/ColumnIndex'
 import {Matrix, MatrixSize} from '../src/Matrix'
 import {NamedExpressions} from '../src/NamedExpressions'
+import {NumberLiteralHelper} from '../src/NumberLiteralHelper'
 import {ColumnsSpan, RowsSpan} from '../src/Span'
 import {Statistics} from '../src/statistics'
 import {adr} from './testUtils'
@@ -19,7 +22,8 @@ function buildEmptyIndex(transformingService: LazilyTransformingAstService, conf
   const functionRegistry = new FunctionRegistry(config)
   const namedExpression = new NamedExpressions()
   const dependencyGraph = DependencyGraph.buildEmpty(transformingService, config, functionRegistry, namedExpression, statistics)
-  return new ColumnIndex(dependencyGraph, config, statistics)
+  const arithmeticHelper = new ArithmeticHelper(new Config(), new DateTimeHelper(new Config()), new NumberLiteralHelper(new Config()))
+  return new ColumnIndex(dependencyGraph,arithmeticHelper,  config, statistics)
 }
 
 describe('ColumnIndex#add', () => {

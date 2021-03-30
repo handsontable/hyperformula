@@ -42,7 +42,7 @@ export class ColumnIndex implements ColumnSearchStrategy {
     private readonly stats: Statistics,
   ) {
     this.transformingService = this.dependencyGraph.lazilyTransformingAstService
-    this.binarySearchStrategy = new ColumnBinarySearch(dependencyGraph, config)
+    this.binarySearchStrategy = new ColumnBinarySearch(dependencyGraph, arithmeticHelper, config)
   }
 
   public add(value: RawInterpreterValue | Matrix, address: SimpleCellAddress) {
@@ -69,7 +69,7 @@ export class ColumnIndex implements ColumnSearchStrategy {
     }
   }
 
-  public change(oldValue: RawInterpreterValue | Matrix | null, newValue: RawScalarValue | Matrix, address: SimpleCellAddress) {
+  public change(oldValue: RawInterpreterValue | Matrix | null, newValue: RawInterpreterValue | Matrix, address: SimpleCellAddress) {
     if (oldValue === newValue) {
       return
     }
@@ -97,6 +97,10 @@ export class ColumnIndex implements ColumnSearchStrategy {
     const columnMap = this.getColumnMap(range.sheet, range.start.col)
     if (!columnMap) {
       return -1
+    }
+
+    if(typeof key === 'string') {
+      key = this.arithmeticHelper.normalizeString(key)
     }
 
     const valueIndex = columnMap.get(key)
@@ -189,6 +193,9 @@ export class ColumnIndex implements ColumnSearchStrategy {
   private addSingleCellValue(value: RawInterpreterValue, address: SimpleCellAddress) {
     this.stats.measure(StatType.BUILD_COLUMN_INDEX, () => {
       this.ensureRecentData(address.sheet, address.col, value)
+      if(typeof value === 'string') {
+        value = this.arithmeticHelper.normalizeString(value)
+      }
       const valueIndex = this.getValueIndex(address.sheet, address.col, value)
       this.addValue(valueIndex, address.row)
     })
@@ -199,6 +206,9 @@ export class ColumnIndex implements ColumnSearchStrategy {
       this.ensureRecentData(address.sheet, address.col, value)
 
       const columnMap = this.getColumnMap(address.sheet, address.col)
+      if(typeof value === 'string') {
+        value = this.arithmeticHelper.normalizeString(value)
+      }
       const valueIndex = columnMap.get(value)
       if (!valueIndex) {
         return
