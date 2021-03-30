@@ -22,7 +22,7 @@ function buildEmptyIndex(transformingService: LazilyTransformingAstService, conf
   const functionRegistry = new FunctionRegistry(config)
   const namedExpression = new NamedExpressions()
   const dependencyGraph = DependencyGraph.buildEmpty(transformingService, config, functionRegistry, namedExpression, statistics)
-  const arithmeticHelper = new ArithmeticHelper(new Config(), new DateTimeHelper(new Config()), new NumberLiteralHelper(new Config()))
+  const arithmeticHelper = new ArithmeticHelper(config, new DateTimeHelper(config), new NumberLiteralHelper(config))
   return new ColumnIndex(dependencyGraph,arithmeticHelper,  config, statistics)
 }
 
@@ -88,6 +88,30 @@ describe('ColumnIndex#add', () => {
 
     const columnMap = index.getColumnMap(0, 0)
     expect(columnMap.size).toBe(0)
+  })
+
+  it('should handle strings correctly', () => {
+    const index = buildEmptyIndex(transformingService, new Config({caseSensitive: false, accentSensitive: false}), statistics)
+    index.add('a', adr('A1'))
+    index.add('A', adr('A2'))
+    index.add('ą', adr('A3'))
+
+    const columnMap = index.getColumnMap(0, 0)
+
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    expect(columnMap.get('a')!.index.length).toBe(3)
+  })
+
+  it('should handle strings correctly with case and accent sensitive options', () => {
+    const index = buildEmptyIndex(transformingService, new Config({caseSensitive: true, accentSensitive: true}), statistics)
+    index.add('a', adr('A1'))
+    index.add('A', adr('A2'))
+    index.add('ą', adr('A3'))
+
+    const columnMap = index.getColumnMap(0, 0)
+
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    expect(columnMap.get('a')!.index.length).toBe(1)
   })
 })
 
