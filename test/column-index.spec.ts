@@ -23,7 +23,7 @@ function buildEmptyIndex(transformingService: LazilyTransformingAstService, conf
   const namedExpression = new NamedExpressions()
   const dependencyGraph = DependencyGraph.buildEmpty(transformingService, config, functionRegistry, namedExpression, statistics)
   const arithmeticHelper = new ArithmeticHelper(config, new DateTimeHelper(config), new NumberLiteralHelper(config))
-  return new ColumnIndex(dependencyGraph,arithmeticHelper,  config, statistics)
+  return new ColumnIndex(dependencyGraph, arithmeticHelper,  config, statistics)
 }
 
 describe('ColumnIndex#add', () => {

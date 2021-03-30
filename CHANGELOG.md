@@ -20,6 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed a bug with MEDIAN function implementation. (#601)
 - Fixed a bug with copy-paste operation that could cause out of scope references (#591)
 - Fixed a bug with date parsing. (#614)
+- Fixed a bug where accent/case sensitivity was ignored for LOOKUPs. (#621)
 
 ## [0.4.0] - 2020-12-17
 
