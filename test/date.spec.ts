@@ -65,7 +65,7 @@ describe('Date helpers', () => {
   })
 
   it('#stringToDateNumber - no date format', () => {
-    const dateHelper = new DateTimeHelper(new Config())
+    const dateHelper = new DateTimeHelper(new Config({dateFormats: []}))
     expect(dateHelper.dateStringToDateNumber('00:00')).toEqual(new TimeNumber(0))
     expect(dateHelper.dateStringToDateNumber('03:00')).toEqual(new TimeNumber(0.125))
     expect(dateHelper.dateStringToDateNumber('24:00')).toEqual(new TimeNumber(1))
