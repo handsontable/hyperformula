@@ -49,7 +49,7 @@ export function defaultParseToDateTime(dateTimeString: string, dateFormat: Maybe
 export const secondsExtendedRegexp = /^ss\.(s+|0+)$/
 
 function defaultParseToTime(timeItems: string[], timeFormat: Maybe<string>): Maybe<SimpleTime> {
-  if(timeFormat === undefined) {
+  if (timeFormat === undefined) {
     return undefined
   }
   timeFormat = timeFormat.toLowerCase()
@@ -111,7 +111,7 @@ function defaultParseToTime(timeItems: string[], timeFormat: Maybe<string>): May
 }
 
 function defaultParseToDate(dateItems: string[], dateFormat: Maybe<string>): Maybe<SimpleDate> {
-  if(dateFormat === undefined) {
+  if (dateFormat === undefined) {
     return undefined
   }
   const formatItems = dateFormat.toLowerCase().split(/[ /.-]/g)
