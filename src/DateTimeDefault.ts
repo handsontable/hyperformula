@@ -111,7 +111,7 @@ function defaultParseToTime(timeItems: string[], timeFormat: Maybe<string>): May
 }
 
 function defaultParseToDate(dateItems: string[], dateFormat: Maybe<string>): Maybe<SimpleDate> {
-  if(dateFormat === undefined) {
+  if (dateFormat === undefined) {
     return undefined
   }
   const formatItems = dateFormat.toLowerCase().split(/[ /.-]/g)
