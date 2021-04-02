@@ -26,7 +26,7 @@ export class RowSearchStrategy extends AdvancedFind implements SearchStrategy {
       key = this.arithmeticHelper.normalizeString(key)
     }
     if (range.width() < this.config.binarySearchThreshold || !sorted) {
-      const values = this.dependencyGraph.computeListOfValuesInRange(range).map(getRawValue).map(getRawValue).map(arg =>
+      const values = this.dependencyGraph.computeListOfValuesInRange(range).map(getRawValue).map(arg =>
         (typeof arg === 'string') ? this.arithmeticHelper.normalizeString(arg) : arg
       )
       const index =  values.indexOf(key)
