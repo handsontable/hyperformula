@@ -48,6 +48,7 @@ describe('Date helpers', () => {
     expect(dateHelper.dateStringToDateNumber('31 12 2999')).toEqual(new DateNumber(401768))
     expect(dateHelper.dateStringToDateNumber(' 31 12 2999 ')).toEqual(new DateNumber(401768))
     expect(dateHelper.dateStringToDateNumber('31  12 2999')).toEqual(new DateNumber(401768))
+    expect(dateHelper.dateStringToDateNumber('16/08/1985 3:40')).toEqual(undefined)
   })
 
   it('#stringToDateNumber - tests expected to return not null, times', () => {
@@ -76,6 +77,7 @@ describe('Date helpers', () => {
     expect(dateHelper.dateStringToDateNumber('00:00:00.0001')).toEqual(new TimeNumber(0))
     expect(dateHelper.dateStringToDateNumber('00:00:01')).toEqual(new TimeNumber(0.000011574074074074073))
     expect(dateHelper.dateStringToDateNumber('00:179:60')).toEqual(new TimeNumber(0.125))
+    expect(dateHelper.dateStringToDateNumber('16/08/1985 3:40')).toEqual(undefined)
   })
 
   it('#stringToDateNumber - fraction of seconds', () => {
