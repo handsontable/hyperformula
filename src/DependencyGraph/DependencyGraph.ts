@@ -601,12 +601,12 @@ export class DependencyGraph {
     return this.addressMapping.getCell(address)
   }
 
-  public getCellValue(address: SimpleCellAddress): InterpreterValue {
-    return this.addressMapping.getCellValue(address)
+  public getCellValue(address: SimpleCellAddress, literalValue?: boolean): InterpreterValue {
+    return this.addressMapping.getCellValue(address, literalValue)
   }
 
-  public getScalarValue(address: SimpleCellAddress): InternalScalarValue {
-    const value = this.addressMapping.getCellValue(address)
+  public getScalarValue(address: SimpleCellAddress, literalValue?: boolean): InternalScalarValue {
+    const value = this.addressMapping.getCellValue(address, literalValue)
     if (value instanceof SimpleRangeValue) {
       return new CellError(ErrorType.VALUE, ErrorMessage.ScalarExpected)
     }

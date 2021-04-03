@@ -65,7 +65,7 @@ export class AddressMapping {
     this.addSheet(sheetId, new strategyConstructor(width, height))
   }
 
-  public getCellValue(address: SimpleCellAddress): InterpreterValue {
+  public getCellValue(address: SimpleCellAddress, literalValue?: boolean): InterpreterValue {
     const vertex = this.getCell(address)
 
     if (vertex === null) {
@@ -73,7 +73,7 @@ export class AddressMapping {
     } else if (vertex instanceof MatrixVertex) {
       return vertex.getMatrixCellValue(address)
     } else {
-      return vertex.getCellValue()
+      return vertex.getCellValue(literalValue)
     }
   }
 

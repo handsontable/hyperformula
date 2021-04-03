@@ -49,7 +49,7 @@ export class Serialization {
     if (formula !== undefined) {
       return formula
     } else {
-      const value: CellValue = this.getCellValue(address)
+      const value: CellValue = this.getCellValue(address, true)
       if (value instanceof DetailedCellError) {
         return this.config.translationPackage.getErrorTranslation(value.type)
       } else {
@@ -58,8 +58,8 @@ export class Serialization {
     }
   }
 
-  public getCellValue(address: SimpleCellAddress): CellValue {
-    return this.exporter.exportValue(this.dependencyGraph.getScalarValue(address))
+  public getCellValue(address: SimpleCellAddress, literalValue?: boolean): CellValue {
+    return this.exporter.exportValue(this.dependencyGraph.getScalarValue(address, literalValue))
   }
 
   public getSheetValues(sheet: number): CellValue[][] {

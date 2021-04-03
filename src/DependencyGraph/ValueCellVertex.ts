@@ -22,7 +22,10 @@ export class ValueCellVertex {
   /**
    * Returns cell value stored in vertex
    */
-  public getCellValue(): ValueCellVertexValue {
+  public getCellValue(literalValue?: boolean): ValueCellVertexValue {
+    if(!literalValue && typeof this.cellValue === 'string') {
+      return this.cellValue.startsWith('\'') ? this.cellValue.slice(1) : this.cellValue
+    }
     return this.cellValue
   }
 
