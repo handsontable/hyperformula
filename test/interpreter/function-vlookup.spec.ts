@@ -382,20 +382,7 @@ describe('BinarySearchStrategy', () => {
     expect(engine.getCellValue(adr('A1'))).toEqual('b')
   })
 
-  it('works for strings, case sensitive', () => {
-    const engine = HyperFormula.buildFromArray([
-      ['a', '1'],
-      ['b', '2'],
-      ['c', '3'],
-      ['A', '4'],
-      ['B', '5'],
-      ['=VLOOKUP("A", A1:B5, 2, FALSE())']
-    ], {caseSensitive: true})
-
-    expect(engine.getCellValue(adr('A6'))).toEqual(4)
-  })
-
-  it('works for strings', () => {
+  it('works for strings, is not case sensitive', () => {
     const engine = HyperFormula.buildFromArray([
       ['a', '1'],
       ['b', '2'],
