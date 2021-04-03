@@ -105,7 +105,7 @@ export class ArithmeticHelper {
     }
   }
 
-  public normalizeString(str: string): string {
+  private normalizeString(str: string): string {
     if(!this.config.caseSensitive) {
       str = str.toLowerCase()
     }
@@ -741,3 +741,8 @@ function inferExtendedNumberTypeMultiplicative(leftArg: ExtendedNumber, rightArg
   }
   return {type: NumberType.NUMBER_RAW}
 }
+
+export function forceNormalizeString(str: string): string {
+  return str.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+}
+

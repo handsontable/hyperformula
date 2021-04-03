@@ -6,7 +6,6 @@
 import {AbsoluteCellRange} from './AbsoluteCellRange'
 import {absolutizeDependencies} from './absolutizeDependencies'
 import {CellError, ErrorType, SimpleCellAddress} from './Cell'
-import {ArithmeticHelper} from './interpreter/ArithmeticHelper'
 import {SimpleRangeValue} from './interpreter/SimpleRangeValue'
 import {ColumnSearchStrategy} from './Lookup/SearchStrategy'
 import {Config} from './Config'
@@ -33,12 +32,12 @@ export class Evaluator {
     private readonly config: Config,
     private readonly stats: Statistics,
     public readonly dateHelper: DateTimeHelper,
+    private readonly numberLiteralsHelper: NumberLiteralHelper,
     private readonly functionRegistry: FunctionRegistry,
     private readonly namedExpressions: NamedExpressions,
-    private readonly serialization: Serialization,
-    private readonly arithmeticHelper: ArithmeticHelper,
+    private readonly serialization: Serialization
   ) {
-    this.interpreter = new Interpreter(this.dependencyGraph, this.columnSearch, this.config, this.stats, this.dateHelper, this.functionRegistry, this.namedExpressions, this.serialization, this.arithmeticHelper)
+    this.interpreter = new Interpreter(this.dependencyGraph, this.columnSearch, this.config, this.stats, this.dateHelper, this.numberLiteralsHelper, this.functionRegistry, this.namedExpressions, this.serialization)
   }
 
   public run(): void {

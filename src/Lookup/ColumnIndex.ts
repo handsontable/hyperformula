@@ -10,7 +10,7 @@ import {DependencyGraph} from '../DependencyGraph'
 import {AddRowsTransformer} from '../dependencyTransformers/AddRowsTransformer'
 import {RemoveRowsTransformer} from '../dependencyTransformers/RemoveRowsTransformer'
 import {FormulaTransformer} from '../dependencyTransformers/Transformer'
-import {ArithmeticHelper} from '../interpreter/ArithmeticHelper'
+import {forceNormalizeString} from '../interpreter/ArithmeticHelper'
 import {RawInterpreterValue, RawNoErrorScalarValue, RawScalarValue} from '../interpreter/InterpreterValue'
 import {SimpleRangeValue} from '../interpreter/SimpleRangeValue'
 import {LazilyTransformingAstService} from '../LazilyTransformingAstService'
@@ -37,12 +37,11 @@ export class ColumnIndex implements ColumnSearchStrategy {
 
   constructor(
     private readonly dependencyGraph: DependencyGraph,
-    private readonly arithmeticHelper: ArithmeticHelper,
     private readonly config: Config,
     private readonly stats: Statistics,
   ) {
     this.transformingService = this.dependencyGraph.lazilyTransformingAstService
-    this.binarySearchStrategy = new ColumnBinarySearch(dependencyGraph, arithmeticHelper, config)
+    this.binarySearchStrategy = new ColumnBinarySearch(dependencyGraph, config)
   }
 
   public add(value: RawInterpreterValue | Matrix, address: SimpleCellAddress) {
@@ -100,7 +99,7 @@ export class ColumnIndex implements ColumnSearchStrategy {
     }
 
     if(typeof key === 'string') {
-      key = this.arithmeticHelper.normalizeString(key)
+      key = forceNormalizeString(key)
     }
 
     const valueIndex = columnMap.get(key)
@@ -194,7 +193,7 @@ export class ColumnIndex implements ColumnSearchStrategy {
     this.stats.measure(StatType.BUILD_COLUMN_INDEX, () => {
       this.ensureRecentData(address.sheet, address.col, value)
       if(typeof value === 'string') {
-        value = this.arithmeticHelper.normalizeString(value)
+        value = forceNormalizeString(value)
       }
       const valueIndex = this.getValueIndex(address.sheet, address.col, value)
       this.addValue(valueIndex, address.row)
@@ -207,7 +206,7 @@ export class ColumnIndex implements ColumnSearchStrategy {
 
       const columnMap = this.getColumnMap(address.sheet, address.col)
       if(typeof value === 'string') {
-        value = this.arithmeticHelper.normalizeString(value)
+        value = forceNormalizeString(value)
       }
       const valueIndex = columnMap.get(value)
       if (!valueIndex) {

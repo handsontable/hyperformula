@@ -7,7 +7,7 @@ import {AbsoluteCellRange} from '../AbsoluteCellRange'
 import {SimpleCellAddress} from '../Cell'
 import {Config} from '../Config'
 import {DependencyGraph} from '../DependencyGraph'
-import {ArithmeticHelper} from '../interpreter/ArithmeticHelper'
+import {forceNormalizeString} from '../interpreter/ArithmeticHelper'
 import {rangeLowerBound} from '../interpreter/binarySearch'
 import {getRawValue, RawNoErrorScalarValue, RawScalarValue} from '../interpreter/InterpreterValue'
 import {Matrix} from '../Matrix'
@@ -18,7 +18,6 @@ import {ColumnSearchStrategy} from './SearchStrategy'
 export class ColumnBinarySearch extends AdvancedFind implements ColumnSearchStrategy {
   constructor(
     protected dependencyGraph: DependencyGraph,
-    private arithmeticHelper: ArithmeticHelper,
     private config: Config,
   ) {
     super(dependencyGraph)
@@ -45,11 +44,11 @@ export class ColumnBinarySearch extends AdvancedFind implements ColumnSearchStra
 
   public find(key: RawNoErrorScalarValue, range: AbsoluteCellRange, sorted: boolean): number {
     if(typeof key === 'string') {
-      key = this.arithmeticHelper.normalizeString(key)
+      key = forceNormalizeString(key)
     }
     if (range.height() < this.config.binarySearchThreshold || !sorted) {
       const values = this.dependencyGraph.computeListOfValuesInRange(range).map(getRawValue).map(arg =>
-        (typeof arg === 'string') ? this.arithmeticHelper.normalizeString(arg) : arg
+        (typeof arg === 'string') ? forceNormalizeString(arg) : arg
       )
       const index =  values.indexOf(key)
       return index < 0 ? index : index + range.start.row

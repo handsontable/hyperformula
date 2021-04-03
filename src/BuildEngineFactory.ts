@@ -4,7 +4,6 @@
  */
 
 import {Exporter} from './Exporter'
-import {ArithmeticHelper} from './interpreter/ArithmeticHelper'
 import {LazilyTransformingAstService} from './LazilyTransformingAstService'
 import {CellContentParser} from './CellContentParser'
 import {buildColumnSearchStrategy, ColumnSearchStrategy} from './Lookup/SearchStrategy'
@@ -49,6 +48,7 @@ export class BuildEngineFactory {
     const functionRegistry = new FunctionRegistry(config)
     const lazilyTransformingAstService = new LazilyTransformingAstService(stats)
     const dependencyGraph = DependencyGraph.buildEmpty(lazilyTransformingAstService, config, functionRegistry, namedExpressions, stats)
+    const columnSearch = buildColumnSearchStrategy(dependencyGraph, config, stats)
     const sheetMapping = dependencyGraph.sheetMapping
     const addressMapping = dependencyGraph.addressMapping
 
@@ -70,8 +70,6 @@ export class BuildEngineFactory {
     const dateHelper = new DateTimeHelper(config)
     const numberLiteralHelper = new NumberLiteralHelper(config)
     const cellContentParser = new CellContentParser(config, dateHelper, numberLiteralHelper)
-    const arithmeticHelper = new ArithmeticHelper(config, dateHelper, numberLiteralHelper)
-    const columnSearch = buildColumnSearchStrategy(dependencyGraph, arithmeticHelper, config, stats)
 
     const crudOperations = new CrudOperations(config, stats, dependencyGraph, columnSearch, parser, cellContentParser, lazilyTransformingAstService, namedExpressions)
     stats.measure(StatType.GRAPH_BUILD, () => {
@@ -85,7 +83,7 @@ export class BuildEngineFactory {
     const exporter = new Exporter(config, namedExpressions, sheetMapping.fetchDisplayName)
     const serialization = new Serialization(dependencyGraph, unparser, config, exporter)
 
-    const evaluator = new Evaluator(dependencyGraph, columnSearch, config, stats, dateHelper, functionRegistry, namedExpressions, serialization, arithmeticHelper)
+    const evaluator = new Evaluator(dependencyGraph, columnSearch, config, stats, dateHelper, numberLiteralHelper, functionRegistry, namedExpressions, serialization)
     evaluator.run()
 
     stats.end(StatType.BUILD_ENGINE_TOTAL)
