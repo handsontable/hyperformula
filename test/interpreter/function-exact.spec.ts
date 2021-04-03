@@ -27,6 +27,16 @@ describe('Function EXACT', () => {
     expect(engine.getCellValue(adr('A4'))).toBe(false)
   })
 
+  it('should be case/accent sensitive', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=EXACT(B1, C1)', 'foo', 'FOO'],
+      ['=EXACT(B2, C2)', 'foo', 'fóó'],
+    ])
+
+    expect(engine.getCellValue(adr('A1'))).toBe(false)
+    expect(engine.getCellValue(adr('A2'))).toBe(false)
+  })
+
   it('should be case sensitive', () => {
     const engine = HyperFormula.buildFromArray([
       ['=EXACT(B1, C1)', 'foo', 'Foo'],

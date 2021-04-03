@@ -272,7 +272,17 @@ describe('Function HLOOKUP', () => {
       ['a', 'b', 'c', 'A', 'B'],
       [1, 2, 3, 4, 5],
       ['=HLOOKUP("A", A1:E2, 2, FALSE())']
-    ],)
+    ])
+
+    expect(engine.getCellValue(adr('A3'))).toEqual(1)
+  })
+
+  it('works for strings, is not case sensitive even if config defines case sensitivity', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['a', 'b', 'c', 'A', 'B'],
+      [1, 2, 3, 4, 5],
+      ['=HLOOKUP("A", A1:E2, 2, FALSE())']
+    ], {caseSensitive: true})
 
     expect(engine.getCellValue(adr('A3'))).toEqual(1)
   })

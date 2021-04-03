@@ -282,4 +282,14 @@ describe('Function MATCH', () => {
 
     expect(engine.getCellValue(adr('A1'))).toEqual(1)
   })
+
+  it('works for strings, is not case sensitive even if config defines case sensitivity', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=MATCH("A", A2:A5, 0)'],
+      ['a'],
+      ['A'],
+    ], {caseSensitive: true})
+
+    expect(engine.getCellValue(adr('A1'))).toEqual(1)
+  })
 })
