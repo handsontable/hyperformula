@@ -31,7 +31,7 @@ describe('Function EXACT', () => {
     const engine = HyperFormula.buildFromArray([
       ['=EXACT(B1, C1)', 'foo', 'FOO'],
       ['=EXACT(B2, C2)', 'foo', 'fóó'],
-    ])
+    ], {caseSensitive: false})
 
     expect(engine.getCellValue(adr('A1'))).toBe(false)
     expect(engine.getCellValue(adr('A2'))).toBe(false)
