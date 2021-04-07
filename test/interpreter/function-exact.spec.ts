@@ -35,7 +35,7 @@ describe('Function EXACT', () => {
 
     expect(engine.getCellValue(adr('A1'))).toBe(false)
     expect(engine.getCellValue(adr('A2'))).toBe(false)
-  })
+  }, {caseSensitive: false})
 
   it('should be case sensitive', () => {
     const engine = HyperFormula.buildFromArray([
