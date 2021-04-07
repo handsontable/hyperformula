@@ -85,6 +85,21 @@ describe('ColumnIndex#add', () => {
     const columnMap = index.getColumnMap(0, 0)
     expect(columnMap.size).toBe(0)
   })
+
+  it('should handle strings correctly', () => {
+    const index = buildEmptyIndex(transformingService, new Config({
+      caseSensitive: false,
+      accentSensitive: false
+    }), statistics)
+    index.add('a', adr('A1'))
+    index.add('A', adr('A2'))
+    index.add('ą', adr('A3'))
+
+    const columnMap = index.getColumnMap(0, 0)
+
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    expect(columnMap.get('a')!.index.length).toBe(3)
+  })
 })
 
 describe('ColumnIndex change/remove', () => {
