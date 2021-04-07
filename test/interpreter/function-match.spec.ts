@@ -278,7 +278,7 @@ describe('Function MATCH', () => {
       ['=MATCH("A", A2:A5, 0)'],
       ['a'],
       ['A'],
-    ])
+    ], {caseSensitive: false})
 
     expect(engine.getCellValue(adr('A1'))).toEqual(1)
   })
