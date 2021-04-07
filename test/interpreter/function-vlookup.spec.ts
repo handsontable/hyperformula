@@ -390,7 +390,7 @@ describe('BinarySearchStrategy', () => {
       ['A', '4'],
       ['B', '5'],
       ['=VLOOKUP("A", A1:B5, 2, FALSE())']
-    ])
+    ], {caseSensitive: false})
 
     expect(engine.getCellValue(adr('A6'))).toEqual(1)
   })
