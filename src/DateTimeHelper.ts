@@ -48,7 +48,7 @@ export class DateTimeHelper {
   private readonly minDateAboluteValue: number
   private readonly maxDateValue: number
   private readonly epochYearZero: number
-  private readonly parseDateTime: (dateString: string, dateFormat: string, timeFormat: string) => Maybe<DateTime>
+  private readonly parseDateTime: (dateString: string, dateFormat?: string, timeFormat?: string) => Maybe<DateTime>
   private readonly leapYear1900: boolean
   constructor(private readonly config: Config) {
     this.minDateAboluteValue = this.dateToNumberFromZero(config.nullDate)
@@ -91,7 +91,7 @@ export class DateTimeHelper {
     }
   }
 
-  private parseSingleFormat(dateString: string, dateFormat: string, timeFormat: string): Maybe<DateTime> {
+  private parseSingleFormat(dateString: string, dateFormat: Maybe<string>, timeFormat: Maybe<string>): Maybe<DateTime> {
     const dateTime = this.parseDateTime(dateString, dateFormat, timeFormat)
     if(instanceOfSimpleDate(dateTime)) {
       if(dateTime.year >=0 && dateTime.year < 100) {
@@ -112,8 +112,10 @@ export class DateTimeHelper {
     return this.parseDateTimeFromFormats(dateTimeString, this.config.dateFormats, this.config.timeFormats)
   }
   private parseDateTimeFromFormats(dateTimeString: string, dateFormats: string[], timeFormats: string[]): Maybe<DateTime> {
-    for (const dateFormat of dateFormats) {
-      for (const timeFormat of timeFormats) {
+    const dateFormatsIterate = dateFormats.length===0 ? [undefined] : dateFormats
+    const timeFormatsIterate = timeFormats.length===0 ? [undefined] : timeFormats
+    for (const dateFormat of dateFormatsIterate) {
+      for (const timeFormat of timeFormatsIterate) {
         const dateTime = this.parseSingleFormat(dateTimeString, dateFormat, timeFormat)
         if (dateTime !== undefined) {
           return dateTime
