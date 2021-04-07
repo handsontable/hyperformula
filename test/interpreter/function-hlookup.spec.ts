@@ -272,7 +272,7 @@ describe('Function HLOOKUP', () => {
       ['a', 'b', 'c', 'A', 'B'],
       [1, 2, 3, 4, 5],
       ['=HLOOKUP("A", A1:E2, 2, FALSE())']
-    ])
+    ], {caseSensitive: false})
 
     expect(engine.getCellValue(adr('A3'))).toEqual(1)
   })
