@@ -154,13 +154,6 @@ describe('Config', () => {
     expect(() => new Config({ undoLimit: -1 })).toThrowError('Config parameter undoLimit should be at least 0')
   })
 
-  it('#vlookupThreshold', () => {
-    expect(() => new Config({ vlookupThreshold: 1 })).not.toThrowError()
-    expect(() => new Config({ vlookupThreshold: 42 })).not.toThrowError()
-    expect(() => new Config({ vlookupThreshold: Infinity })).not.toThrowError()
-    expect(() => new Config({ vlookupThreshold: 0 })).toThrowError('Config parameter vlookupThreshold should be at least 1')
-  })
-
   it('#binarySearchThreshold', () => {
     expect(() => new Config({ binarySearchThreshold: 1 })).not.toThrowError()
     expect(() => new Config({ binarySearchThreshold: 42 })).not.toThrowError()
