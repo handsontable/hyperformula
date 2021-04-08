@@ -8,7 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - GPU.js constructor needs to be provided directly to engine configuration. (#355)
-- A `'` symbol on the input is preserved in the value for serialization. (#617)
+- An input value should be preserved through serialization more precisely. (#617)
 
 ### Added
 - Added support for row and column reordering. (#343)
