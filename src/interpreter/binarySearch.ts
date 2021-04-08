@@ -14,6 +14,7 @@ import {EmptyValue, getRawValue, RawInterpreterValue, RawNoErrorScalarValue, Raw
 * assuming sorted values in range
 * */
 export function rangeLowerBound(range: AbsoluteCellRange, key: RawNoErrorScalarValue, dependencyGraph: DependencyGraph, coordinate: 'row' | 'col'): number {
+  //IMPORTANT: this function does not normalize input strings
   let end
   if(coordinate === 'col') {
     end = range.effectiveEndColumn(dependencyGraph)
