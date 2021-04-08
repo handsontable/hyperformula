@@ -12,6 +12,7 @@ import {
   simpleCellAddress,
   SimpleCellAddress
 } from '../Cell'
+import {RawCellContent} from '../CellContentParser'
 import {CellDependency} from '../CellDependency'
 import {Config} from '../Config'
 import {ErrorMessage} from '../error-message'
@@ -112,7 +113,7 @@ export class DependencyGraph {
     this.correctInfiniteRangesDependency(address)
   }
 
-  public setValueToCell(address: SimpleCellAddress, newValue: ValueCellVertexValue) {
+  public setValueToCell(address: SimpleCellAddress, newValue: ValueCellVertexValue, rawValue: RawCellContent) {
     const vertex = this.addressMapping.getCell(address)
     this.ensureThatVertexIsNonMatrixCellVertex(vertex)
 
@@ -120,10 +121,11 @@ export class DependencyGraph {
       const oldValue = vertex.getCellValue()
       if (oldValue !== newValue) {
         vertex.setCellValue(newValue)
+        vertex.setRawValue(rawValue)
         this.graph.markNodeAsSpecialRecentlyChanged(vertex)
       }
     } else {
-      const newVertex = new ValueCellVertex(newValue)
+      const newVertex = new ValueCellVertex(newValue, rawValue)
       this.exchangeOrAddGraphNode(vertex, newVertex)
       this.addressMapping.setCell(address, newVertex)
       this.graph.markNodeAsSpecialRecentlyChanged(newVertex)
@@ -505,8 +507,8 @@ export class DependencyGraph {
     const adjacentNodes = this.graph.adjacentNodes(matrixVertex)
 
     for (const address of matrixRange.addresses(this)) {
-      const value = this.getCellValue(address) as ExtendedNumber // We wouldn't need that typecast if we would take values from Matrix
-      const valueVertex = new ValueCellVertex(value)
+      // We wouldn't need that typecast if we would take values from Matrix
+      const valueVertex = new ValueCellVertex(this.getCellValue(address) as ExtendedNumber, this.getRawValue(address))
       this.addVertex(address, valueVertex)
     }
 
@@ -601,12 +603,16 @@ export class DependencyGraph {
     return this.addressMapping.getCell(address)
   }
 
-  public getCellValue(address: SimpleCellAddress, literalValue?: boolean): InterpreterValue {
-    return this.addressMapping.getCellValue(address, literalValue)
+  public getCellValue(address: SimpleCellAddress): InterpreterValue {
+    return this.addressMapping.getCellValue(address)
   }
 
-  public getScalarValue(address: SimpleCellAddress, literalValue?: boolean): InternalScalarValue {
-    const value = this.addressMapping.getCellValue(address, literalValue)
+  public getRawValue(address: SimpleCellAddress): RawCellContent {
+    return this.addressMapping.getRawValue(address)
+  }
+
+  public getScalarValue(address: SimpleCellAddress): InternalScalarValue {
+    const value = this.addressMapping.getCellValue(address)
     if (value instanceof SimpleRangeValue) {
       return new CellError(ErrorType.VALUE, ErrorMessage.ScalarExpected)
     }

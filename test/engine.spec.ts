@@ -400,7 +400,7 @@ describe('#getCellSerialized', () => {
     ])
 
     expect(engine.getCellSerialized(adr('A1'))).toEqual(1)
-    expect(engine.getCellSerialized(adr('B1'))).toEqual(2)
+    expect(engine.getCellSerialized(adr('B1'))).toEqual('2')
     expect(engine.getCellSerialized(adr('C1'))).toEqual('foo')
     expect(engine.getCellSerialized(adr('D1'))).toEqual(true)
   })
@@ -479,7 +479,7 @@ describe('#getRangeSerialized', () => {
 
     const out = engine.getRangeSerialized(adr('A1'), 6, 1)
 
-    expectArrayWithSameContent([['=SUM(1, B1)', 2, '#VALUE!', null, '=#DIV/0!', '{=TRANSPOSE(A1:B1)}']], out)
+    expectArrayWithSameContent([['=SUM(1, B1)', '2', '#VALUE!', null, '=#DIV/0!', '{=TRANSPOSE(A1:B1)}']], out)
   })
 })
 

@@ -4,7 +4,8 @@
  */
 
 import {CellError} from '../Cell'
-import {ExtendedNumber} from '../interpreter/InterpreterValue'
+import {RawCellContent} from '../CellContentParser'
+import {ExtendedNumber, RawScalarValue} from '../interpreter/InterpreterValue'
 
 export type ValueCellVertexValue = ExtendedNumber | boolean | string | CellError
 
@@ -13,19 +14,13 @@ export type ValueCellVertexValue = ExtendedNumber | boolean | string | CellError
  */
 export class ValueCellVertex {
   /** Static cell value. */
-  private cellValue: ValueCellVertexValue
-
-  constructor(cellValue: ValueCellVertexValue) {
-    this.cellValue = cellValue
+  constructor(private cellValue: ValueCellVertexValue, private rawValue: RawCellContent) {
   }
 
   /**
    * Returns cell value stored in vertex
    */
-  public getCellValue(literalValue?: boolean): ValueCellVertexValue {
-    if(!literalValue && typeof this.cellValue === 'string') {
-      return this.cellValue.startsWith('\'') ? this.cellValue.slice(1) : this.cellValue
-    }
+  public getCellValue(): ValueCellVertexValue {
     return this.cellValue
   }
 
@@ -34,5 +29,13 @@ export class ValueCellVertex {
    */
   public setCellValue(cellValue: ValueCellVertexValue) {
     this.cellValue = cellValue
+  }
+
+  public getRawValue(): RawCellContent {
+    return this.rawValue
+  }
+
+  public setRawValue(rawValue: RawCellContent) {
+    this.rawValue = rawValue
   }
 }

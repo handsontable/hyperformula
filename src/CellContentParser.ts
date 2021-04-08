@@ -173,7 +173,7 @@ export class CellContentParser {
         if (parsedDateNumber !== undefined) {
           return new CellContent.Number(parsedDateNumber)
         } else {
-          return new CellContent.String(content)
+          return new CellContent.String(content.startsWith('\'') ? content.slice(1) : content )
         }
       }
     } else {

@@ -125,12 +125,12 @@ describe('CellContentParser', () => {
   })
 
   it( 'starts with \'', () => {
-    expect(cellContentParser.parse('\'123')).toEqual(new CellContent.String('\'123'))
-    expect(cellContentParser.parse('\'=1+1')).toEqual(new CellContent.String('\'=1+1'))
-    expect(cellContentParser.parse('\'\'1')).toEqual(new CellContent.String('\'\'1'))
-    expect(cellContentParser.parse('\' 1')).toEqual(new CellContent.String('\' 1'))
+    expect(cellContentParser.parse('\'123')).toEqual(new CellContent.String('123'))
+    expect(cellContentParser.parse('\'=1+1')).toEqual(new CellContent.String('=1+1'))
+    expect(cellContentParser.parse('\'\'1')).toEqual(new CellContent.String('\'1'))
+    expect(cellContentParser.parse('\' 1')).toEqual(new CellContent.String(' 1'))
     expect(cellContentParser.parse(' \'1')).toEqual(new CellContent.String(' \'1'))
-    expect(cellContentParser.parse('\'02-02-2020')).toEqual(new CellContent.String('\'02-02-2020'))
+    expect(cellContentParser.parse('\'02-02-2020')).toEqual(new CellContent.String('02-02-2020'))
   })
 
   it('currency parsing', () => {
