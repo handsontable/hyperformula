@@ -431,6 +431,7 @@ describe('#getCellSerialized', () => {
       ['1', '2'],
     ], {matrixDetection: true, matrixDetectionThreshold: 1})
 
+    //we are losing info about original values for values inside matrices
     expect(engine.getCellSerialized(adr('A1'))).toEqual(1)
     expect(engine.getCellSerialized(adr('B1'))).toEqual(2)
   })
