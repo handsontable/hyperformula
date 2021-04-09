@@ -6,6 +6,7 @@
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
 import {Config} from '../Config'
 import {DependencyGraph} from '../DependencyGraph'
+import {forceNormalizeString} from '../interpreter/ArithmeticHelper'
 import {rangeLowerBound} from '../interpreter/binarySearch'
 import {getRawValue, RawNoErrorScalarValue} from '../interpreter/InterpreterValue'
 import {SimpleRangeValue} from '../interpreter/SimpleRangeValue'
@@ -21,11 +22,16 @@ export class RowSearchStrategy extends AdvancedFind implements SearchStrategy {
   }
 
   public find(key: RawNoErrorScalarValue, rangeValue: SimpleRangeValue, sorted: boolean): number {
+    if(typeof key === 'string') {
+      key = forceNormalizeString(key)
+    }
     const range = rangeValue.range()
     if(range === undefined) {
       return rangeValue.valuesFromTopLeftCorner().map(getRawValue).indexOf(key)
     } else if (range.width() < this.config.binarySearchThreshold || !sorted) {
-      return this.dependencyGraph.computeListOfValuesInRange(range).map(getRawValue).indexOf(key)
+      return this.dependencyGraph.computeListOfValuesInRange(range).map(getRawValue).map(arg =>
+        (typeof arg === 'string') ? forceNormalizeString(arg) : arg
+      ).indexOf(key)
     } else {
       return rangeLowerBound(range, key, this.dependencyGraph, 'col')
     }

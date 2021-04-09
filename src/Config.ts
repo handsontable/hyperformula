@@ -242,7 +242,7 @@ export interface ConfigParams {
    *
    * @category Date and Time
    */
-  parseDateTime: (dateTimeString: string, dateFormat: string, timeFormat: string) => Maybe<DateTime>,
+  parseDateTime: (dateTimeString: string, dateFormat: Maybe<string>, timeFormat: Maybe<string>) => Maybe<DateTime>,
   /**
    * Controls how far two numerical values need to be from each other to be treated as non-equal.
    * `a` and `b` are equal if they are of the same sign and:
@@ -310,18 +310,6 @@ export interface ConfigParams {
    * @category Engine
    */
   useStats: boolean,
-  /**
-   * Determines minimum number of elements a range must have in order to use binary search.
-   * Shorter ranges will be searched naively.
-   * Used by VLOOKUP, HLOOKUP and MATCH functions.
-   *
-   * @default 20
-   *
-   * @category Engine
-   *
-   * @deprecated Use {@link binarySearchThreshold} instead.
-   */
-  vlookupThreshold: number,
   /**
    * Determines minimum number of elements a range must have in order to use binary search.
    * Shorter ranges will be searched naively.
@@ -423,7 +411,6 @@ export class Config implements ConfigParams, ParserConfig {
     precisionRounding: 14,
     useColumnIndex: false,
     useStats: false,
-    vlookupThreshold: 20,
     binarySearchThreshold: 20,
     nullDate: {year: 1899, month: 12, day: 30},
     undoLimit: 20,
@@ -480,7 +467,7 @@ export class Config implements ConfigParams, ParserConfig {
   /** @inheritDoc */
   public readonly nullYear: number
   /** @inheritDoc */
-  public readonly parseDateTime: (dateString: string, dateFormats: string) => Maybe<SimpleDateTime>
+  public readonly parseDateTime: (dateString: string, dateFormat: Maybe<string>, timeFormat: Maybe<string>) => Maybe<SimpleDateTime>
   /** @inheritDoc */
   public readonly stringifyDateTime: (date: SimpleDateTime, formatArg: string) => Maybe<string>
   /** @inheritDoc */
@@ -495,8 +482,6 @@ export class Config implements ConfigParams, ParserConfig {
   public readonly useColumnIndex: boolean
   /** @inheritDoc */
   public readonly useStats: boolean
-  /** @inheritDoc */
-  public readonly vlookupThreshold: number
   /** @inheritDoc */
   public readonly binarySearchThreshold: number
   /** @inheritDoc */
@@ -571,7 +556,6 @@ export class Config implements ConfigParams, ParserConfig {
       precisionEpsilon,
       precisionRounding,
       useColumnIndex,
-      vlookupThreshold,
       binarySearchThreshold,
       nullDate,
       useStats,
@@ -616,9 +600,7 @@ export class Config implements ConfigParams, ParserConfig {
     this.validateNumberToBeAtLeast(this.precisionEpsilon, 'precisionEpsilon', 0)
     this.useColumnIndex = this.valueFromParam(useColumnIndex, 'boolean', 'useColumnIndex')
     this.useStats = this.valueFromParam(useStats, 'boolean', 'useStats')
-    this.vlookupThreshold = this.valueFromParam(vlookupThreshold, 'number', 'vlookupThreshold')
-    this.validateNumberToBeAtLeast(this.vlookupThreshold, 'vlookupThreshold', 1)
-    this.binarySearchThreshold = this.valueFromParam(binarySearchThreshold ?? vlookupThreshold, 'number', 'vlookupThreshold')
+    this.binarySearchThreshold = this.valueFromParam(binarySearchThreshold, 'number', 'binarySearchThreshold')
     this.validateNumberToBeAtLeast(this.binarySearchThreshold, 'binarySearchThreshold', 1)
     this.parseDateTime = this.valueFromParam(parseDateTime, 'function', 'parseDateTime')
     this.stringifyDateTime = this.valueFromParam(stringifyDateTime, 'function', 'stringifyDateTime')
@@ -645,8 +627,6 @@ export class Config implements ConfigParams, ParserConfig {
       }
     })
     this.validateNumberToBeAtLeast(this.maxColumns, 'maxColumns', 1)
-
-    this.warnDeprecatedIfUsed(vlookupThreshold, 'vlookupThreshold', 'v.0.3.0', 'binarySearchThreshold')
 
     this.checkIfParametersNotInConflict(
       {value: this.decimalSeparator, name: 'decimalSeparator'},
