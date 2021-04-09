@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - GPU.js constructor needs to be provided directly to engine configuration. (#355)
+- A deprecated config option vlookupThreshold has been removed. (#620)
 
 ### Added
 - Added support for row and column reordering. (#343)
