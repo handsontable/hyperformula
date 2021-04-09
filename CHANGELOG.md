@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - GPU.js constructor needs to be provided directly to engine configuration. (#355)
+- A deprecated config option vlookupThreshold has been removed. (#620)
 
 ### Added
 - Added support for row and column reordering. (#343)
@@ -19,6 +20,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed a bug with serialization of some addresses after CRUDs. (#587)
 - Fixed a bug with MEDIAN function implementation. (#601)
 - Fixed a bug with copy-paste operation that could cause out of scope references (#591)
+- Fixed a bug with date parsing. (#614)
+- Fixed a bug where accent/case sensitivity was ignored for LOOKUPs. (#621)
+- Fixed a bug with handling of no time format/no date format scenarios. (#616)
 
 ## [0.4.0] - 2020-12-17
 
