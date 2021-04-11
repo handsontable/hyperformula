@@ -16,9 +16,9 @@ import {
   RawInterpreterValue
 } from '../InterpreterValue'
 import {SimpleRangeValue} from '../SimpleRangeValue'
-import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
+import {ArgumentTypes, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
 
-export class FinancialPlugin extends FunctionPlugin {
+export class FinancialPlugin extends FunctionPlugin implements FunctionPluginTypecheck<FinancialPlugin>{
   public static implementedFunctions = {
     'PMT': {
       method: 'pmt',

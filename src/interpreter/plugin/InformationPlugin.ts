@@ -10,12 +10,12 @@ import {AstNodeType, ProcedureAst} from '../../parser'
 import {InterpreterState} from '../InterpreterState'
 import {EmptyValue, InternalScalarValue, isExtendedNumber} from '../InterpreterValue'
 import {SimpleRangeValue} from '../SimpleRangeValue'
-import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
+import {ArgumentTypes, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
 
 /**
  * Interpreter plugin containing information functions
  */
-export class InformationPlugin extends FunctionPlugin {
+export class InformationPlugin extends FunctionPlugin implements FunctionPluginTypecheck<InformationPlugin> {
   public static implementedFunctions = {
     'COLUMN': {
       method: 'column',

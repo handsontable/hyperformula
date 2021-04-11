@@ -9,12 +9,12 @@ import {AstNodeType, ProcedureAst} from '../../parser'
 import {InterpreterState} from '../InterpreterState'
 import {InternalScalarValue, RawScalarValue} from '../InterpreterValue'
 import {SimpleRangeValue} from '../SimpleRangeValue'
-import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
+import {ArgumentTypes, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
 
 /**
  * Interpreter plugin containing MEDIAN function
  */
-export class MedianPlugin extends FunctionPlugin {
+export class MedianPlugin extends FunctionPlugin implements FunctionPluginTypecheck<MedianPlugin>{
 
   public static implementedFunctions = {
     'MEDIAN': {

@@ -7,9 +7,9 @@ import {SimpleCellAddress} from '../../Cell'
 import {ProcedureAst} from '../../parser'
 import {InterpreterState} from '../InterpreterState'
 import {InternalScalarValue} from '../InterpreterValue'
-import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
+import {ArgumentTypes, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
 
-export class IsOddPlugin extends FunctionPlugin {
+export class IsOddPlugin extends FunctionPlugin implements FunctionPluginTypecheck<IsOddPlugin>{
   public static implementedFunctions = {
     'ISODD': {
       method: 'isodd',

@@ -7,12 +7,12 @@ import {SimpleCellAddress} from '../../Cell'
 import {ProcedureAst} from '../../parser'
 import {InterpreterState} from '../InterpreterState'
 import {EmptyValue, InternalScalarValue, RawScalarValue} from '../InterpreterValue'
-import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
+import {ArgumentTypes, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
 
 /**
  * Interpreter plugin containing MEDIAN function
  */
-export class CountBlankPlugin extends FunctionPlugin {
+export class CountBlankPlugin extends FunctionPlugin implements FunctionPluginTypecheck<CountBlankPlugin>{
 
   public static implementedFunctions = {
     'COUNTBLANK': {

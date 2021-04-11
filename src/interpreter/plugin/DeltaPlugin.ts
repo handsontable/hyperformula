@@ -7,9 +7,9 @@ import {SimpleCellAddress} from '../../Cell'
 import {ProcedureAst} from '../../parser'
 import {InterpreterState} from '../InterpreterState'
 import {InternalScalarValue} from '../InterpreterValue'
-import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
+import {ArgumentTypes, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
 
-export class DeltaPlugin extends FunctionPlugin {
+export class DeltaPlugin extends FunctionPlugin implements FunctionPluginTypecheck<DeltaPlugin>{
   public static implementedFunctions = {
     'DELTA': {
       method: 'delta',

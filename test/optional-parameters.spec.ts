@@ -2,11 +2,11 @@ import {ErrorType, HyperFormula} from '../src'
 import {SimpleCellAddress} from '../src/Cell'
 import {ErrorMessage} from '../src/error-message'
 import {InterpreterState} from '../src/interpreter/InterpreterState'
-import {ArgumentTypes, FunctionPlugin} from '../src/interpreter/plugin/FunctionPlugin'
+import {ArgumentTypes, FunctionPlugin, FunctionPluginTypecheck} from '../src/interpreter/plugin/FunctionPlugin'
 import {ProcedureAst} from '../src/parser'
 import {adr, detailedError} from './testUtils'
 
-class FooPlugin extends FunctionPlugin {
+class FooPlugin extends FunctionPlugin implements FunctionPluginTypecheck<FooPlugin>{
   public static implementedFunctions = {
     'FOO': {
       method: 'foo',

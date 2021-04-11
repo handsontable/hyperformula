@@ -7,9 +7,9 @@ import {CellError, ErrorType, SimpleCellAddress} from '../../Cell'
 import {ProcedureAst} from '../../parser'
 import {InterpreterState} from '../InterpreterState'
 import {InternalScalarValue} from '../InterpreterValue'
-import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
+import {ArgumentTypes, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
 
-export class ModuloPlugin extends FunctionPlugin {
+export class ModuloPlugin extends FunctionPlugin implements FunctionPluginTypecheck<ModuloPlugin>{
   public static implementedFunctions = {
     'MOD': {
       method: 'mod',

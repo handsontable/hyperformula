@@ -8,12 +8,12 @@ import {ErrorMessage} from '../../error-message'
 import {ProcedureAst} from '../../parser'
 import {InterpreterState} from '../InterpreterState'
 import {InternalNoErrorScalarValue, InternalScalarValue, InterpreterValue} from '../InterpreterValue'
-import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
+import {ArgumentTypes, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
 
 /**
  * Interpreter plugin containing boolean functions
  */
-export class BooleanPlugin extends FunctionPlugin {
+export class BooleanPlugin extends FunctionPlugin implements FunctionPluginTypecheck<BooleanPlugin>{
   public static implementedFunctions = {
     'TRUE': {
       method: 'literalTrue',

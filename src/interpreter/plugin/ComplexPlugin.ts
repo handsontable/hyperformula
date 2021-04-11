@@ -9,9 +9,9 @@ import {ProcedureAst} from '../../parser'
 import {coerceComplexToString, complex} from '../ArithmeticHelper'
 import {InterpreterState} from '../InterpreterState'
 import {InternalScalarValue, RawInterpreterValue} from '../InterpreterValue'
-import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
+import {ArgumentTypes, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
 
-export class ComplexPlugin extends  FunctionPlugin {
+export class ComplexPlugin extends  FunctionPlugin implements FunctionPluginTypecheck<ComplexPlugin>{
   public static implementedFunctions = {
     'COMPLEX': {
       method: 'complex',

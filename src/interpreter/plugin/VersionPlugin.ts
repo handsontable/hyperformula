@@ -9,7 +9,7 @@ import {HyperFormula} from '../../HyperFormula'
 import {ProcedureAst} from '../../parser'
 import {InterpreterState} from '../InterpreterState'
 import {InterpreterValue} from '../InterpreterValue'
-import {FunctionPlugin} from './FunctionPlugin'
+import {FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
 
 const LICENSE_STATUS_MAP = new Map([
   ['agpl-v3', 1],
@@ -19,7 +19,7 @@ const LICENSE_STATUS_MAP = new Map([
   [LicenseKeyValidityState.EXPIRED, 5],
 ])
 
-export class VersionPlugin extends FunctionPlugin {
+export class VersionPlugin extends FunctionPlugin implements FunctionPluginTypecheck<VersionPlugin>{
   public static implementedFunctions = {
     'VERSION': {
       method: 'version',

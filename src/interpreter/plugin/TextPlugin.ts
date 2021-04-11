@@ -8,12 +8,12 @@ import {ErrorMessage} from '../../error-message'
 import {ProcedureAst} from '../../parser'
 import {InterpreterState} from '../InterpreterState'
 import {InternalScalarValue, RawScalarValue} from '../InterpreterValue'
-import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
+import {ArgumentTypes, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
 
 /**
  * Interpreter plugin containing text-specific functions
  */
-export class TextPlugin extends FunctionPlugin {
+export class TextPlugin extends FunctionPlugin implements FunctionPluginTypecheck<TextPlugin>{
   public static implementedFunctions = {
     'CONCATENATE': {
       method: 'concatenate',

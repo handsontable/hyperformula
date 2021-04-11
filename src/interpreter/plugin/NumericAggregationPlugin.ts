@@ -14,17 +14,13 @@ import {coerceBooleanToNumber} from '../ArithmeticHelper'
 import {InterpreterState} from '../InterpreterState'
 import {EmptyValue, ExtendedNumber, getRawValue, InternalScalarValue, isExtendedNumber, } from '../InterpreterValue'
 import {SimpleRangeValue} from '../SimpleRangeValue'
-import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
+import {ArgumentTypes, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
 
 export type BinaryOperation<T> = (left: T, right: T) => T
 
 export type MapOperation<T> = (arg: ExtendedNumber) => T
 
 type coercionOperation = (arg: InternalScalarValue) => Maybe<ExtendedNumber | CellError>
-
-function identityMap<T>(arg: T): T {
-  return arg
-}
 
 function zeroForInfinite(value: InternalScalarValue) {
   if (isExtendedNumber(value) && !Number.isFinite(getRawValue(value))) {
@@ -78,7 +74,7 @@ class MomentsAggregate {
   }
 }
 
-export class NumericAggregationPlugin extends FunctionPlugin {
+export class NumericAggregationPlugin extends FunctionPlugin implements FunctionPluginTypecheck<NumericAggregationPlugin>{
   public static implementedFunctions = {
     'SUM': {
       method: 'sum',

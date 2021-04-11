@@ -4,14 +4,15 @@
  */
 
 import {SimpleCellAddress} from '../../Cell'
+import {GraphBuilderMatrixHeuristic} from '../../GraphBuilderMatrixHeuristic'
 import {ProcedureAst} from '../../parser'
 import {InterpreterState} from '../InterpreterState'
 import {InternalScalarValue} from '../InterpreterValue'
-import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
+import {ArgumentTypes, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
 
 export const PI = parseFloat(Math.PI.toFixed(14))
 
-export class MathConstantsPlugin extends FunctionPlugin {
+export class MathConstantsPlugin extends FunctionPlugin implements FunctionPluginTypecheck<MathConstantsPlugin>{
   public static implementedFunctions = {
     'PI': {
       method: 'pi',

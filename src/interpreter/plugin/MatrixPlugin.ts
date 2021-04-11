@@ -10,7 +10,7 @@ import {ProcedureAst} from '../../parser'
 import {InterpreterState} from '../InterpreterState'
 import {InterpreterValue} from '../InterpreterValue'
 import {SimpleRangeValue} from '../SimpleRangeValue'
-import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
+import {ArgumentTypes, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
 import {Interpreter} from '../Interpreter'
 
 export type KernelRunShortcut = (...args: any[]) => number[][]
@@ -28,7 +28,7 @@ export interface KernelFunctionThis {
 }
 
 
-export class MatrixPlugin extends FunctionPlugin {
+export class MatrixPlugin extends FunctionPlugin implements FunctionPluginTypecheck<MatrixPlugin>{
   public static implementedFunctions = {
     'MMULT': {
       method: 'mmult',

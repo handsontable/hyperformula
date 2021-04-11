@@ -7,9 +7,9 @@ import {SimpleCellAddress} from '../../Cell'
 import {ProcedureAst} from '../../parser'
 import {InterpreterState} from '../InterpreterState'
 import {InternalScalarValue} from '../InterpreterValue'
-import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
+import {ArgumentTypes, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
 
-export class SqrtPlugin extends  FunctionPlugin {
+export class SqrtPlugin extends  FunctionPlugin implements FunctionPluginTypecheck<SqrtPlugin>{
   public static implementedFunctions = {
     'SQRT': {
       method: 'sqrt',

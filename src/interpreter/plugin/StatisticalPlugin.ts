@@ -30,9 +30,9 @@ import {
   tci,
   weibull
 } from './3rdparty/jstat/jstat'
-import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
+import {ArgumentTypes, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
 
-export class StatisticalPlugin extends  FunctionPlugin {
+export class StatisticalPlugin extends  FunctionPlugin implements FunctionPluginTypecheck<StatisticalPlugin>{
   public static implementedFunctions = {
     'ERF': {
       method: 'erf',

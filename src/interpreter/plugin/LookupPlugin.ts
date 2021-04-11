@@ -14,9 +14,9 @@ import {zeroIfEmpty} from '../ArithmeticHelper'
 import {InterpreterState} from '../InterpreterState'
 import {InternalScalarValue, RawNoErrorScalarValue, } from '../InterpreterValue'
 import {SimpleRangeValue} from '../SimpleRangeValue'
-import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
+import {ArgumentTypes, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
 
-export class LookupPlugin extends FunctionPlugin {
+export class LookupPlugin extends FunctionPlugin implements FunctionPluginTypecheck<LookupPlugin>{
   private rowSearch: RowSearchStrategy = new RowSearchStrategy(this.config, this.dependencyGraph)
 
   public static implementedFunctions = {

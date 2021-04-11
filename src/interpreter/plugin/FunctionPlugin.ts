@@ -156,12 +156,16 @@ export interface FunctionArgument {
 
 export type PluginFunctionType = (ast: ProcedureAst, state: InterpreterState) => InterpreterValue
 
+export type FunctionPluginTypecheck<T> = {
+  [K in keyof T]: T[K] extends PluginFunctionType ? T[K] : never
+};
+
 /**
  * Abstract class representing interpreter function plugin.
  * Plugin may contain multiple functions. Each function should be of type {@link PluginFunctionType} and needs to be
  * included in {@link implementedFunctions}
  */
-export abstract class FunctionPlugin {
+export abstract class FunctionPlugin implements FunctionPluginTypecheck<FunctionPlugin> {
   /**
    * Dictionary containing functions implemented by specific plugin, along with function name translations.
    */
@@ -172,7 +176,6 @@ export abstract class FunctionPlugin {
   protected readonly columnSearch: SearchStrategy
   protected readonly config: Config
   protected readonly serialization: Serialization
-  // [key: 'abcd' | 'efgh']: PluginFunctionType
 
   constructor(interpreter: Interpreter) {
     this.interpreter = interpreter
@@ -201,9 +204,9 @@ export abstract class FunctionPlugin {
     return ret
   }
 
-  public coerceScalarToNumberOrError = (arg: InternalScalarValue): ExtendedNumber | CellError => this.interpreter.arithmeticHelper.coerceScalarToNumberOrError(arg)
+  protected coerceScalarToNumberOrError = (arg: InternalScalarValue): ExtendedNumber | CellError => this.interpreter.arithmeticHelper.coerceScalarToNumberOrError(arg)
 
-  public coerceToType(arg: InterpreterValue, coercedType: FunctionArgument): Maybe<InterpreterValue | complex | RawNoErrorScalarValue> {
+  protected coerceToType(arg: InterpreterValue, coercedType: FunctionArgument): Maybe<InterpreterValue | complex | RawNoErrorScalarValue> {
     let ret
     if (arg instanceof SimpleRangeValue) {
       switch(coercedType.argumentType) {

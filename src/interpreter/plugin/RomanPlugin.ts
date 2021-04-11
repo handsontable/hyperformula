@@ -8,9 +8,9 @@ import {ErrorMessage} from '../../error-message'
 import {ProcedureAst} from '../../parser'
 import {InterpreterState} from '../InterpreterState'
 import {getRawValue, InternalScalarValue, RawScalarValue} from '../InterpreterValue'
-import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
+import {ArgumentTypes, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
 
-export class RomanPlugin extends FunctionPlugin {
+export class RomanPlugin extends FunctionPlugin implements FunctionPluginTypecheck<RomanPlugin>{
   public static implementedFunctions = {
     'ROMAN': {
       method: 'roman',

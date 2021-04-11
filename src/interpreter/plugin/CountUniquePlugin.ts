@@ -7,12 +7,12 @@ import {CellError, ErrorType, SimpleCellAddress} from '../../Cell'
 import {ProcedureAst} from '../../parser'
 import {InterpreterState} from '../InterpreterState'
 import {EmptyValueType, InternalScalarValue, RawScalarValue} from '../InterpreterValue'
-import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
+import {ArgumentTypes, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
 
 /**
  * Interpreter plugin containing COUNTUNIQUE function
  */
-export class CountUniquePlugin extends FunctionPlugin {
+export class CountUniquePlugin extends FunctionPlugin implements FunctionPluginTypecheck<CountUniquePlugin>{
   public static implementedFunctions = {
     'COUNTUNIQUE': {
       method: 'countunique',

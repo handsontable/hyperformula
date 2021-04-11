@@ -22,9 +22,9 @@ import {
   sumsqerr,
   variance
 } from './3rdparty/jstat/jstat'
-import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
+import {ArgumentTypes, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
 
-export class StatisticalAggregationPlugin extends  FunctionPlugin {
+export class StatisticalAggregationPlugin extends  FunctionPlugin implements FunctionPluginTypecheck<StatisticalAggregationPlugin>{
   public static implementedFunctions = {
     'AVEDEV': {
       method: 'avedev',

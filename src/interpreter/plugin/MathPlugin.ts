@@ -9,9 +9,9 @@ import {ProcedureAst} from '../../parser'
 import {InterpreterState} from '../InterpreterState'
 import {InternalScalarValue, RawInterpreterValue} from '../InterpreterValue'
 import {SimpleRangeValue} from '../SimpleRangeValue'
-import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
+import {ArgumentTypes, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
 
-export class MathPlugin extends FunctionPlugin {
+export class MathPlugin extends FunctionPlugin implements FunctionPluginTypecheck<MathPlugin>{
   public static implementedFunctions = {
     'FACT': {
       method: 'fact',

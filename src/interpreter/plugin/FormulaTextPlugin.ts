@@ -9,9 +9,9 @@ import {ProcedureAst} from '../../parser'
 import {FunctionPlugin} from '../index'
 import {InterpreterState} from '../InterpreterState'
 import {InternalScalarValue} from '../InterpreterValue'
-import {ArgumentTypes} from './FunctionPlugin'
+import {ArgumentTypes, FunctionPluginTypecheck} from './FunctionPlugin'
 
-export class FormulaTextPlugin extends FunctionPlugin {
+export class FormulaTextPlugin extends FunctionPlugin implements FunctionPluginTypecheck<FormulaTextPlugin>{
   public static implementedFunctions = {
     'FORMULATEXT': {
       method: 'formulatext',

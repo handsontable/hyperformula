@@ -8,7 +8,7 @@ import {ErrorMessage} from '../../error-message'
 import {ProcedureAst} from '../../parser'
 import {InterpreterState} from '../InterpreterState'
 import {InternalScalarValue} from '../InterpreterValue'
-import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
+import {ArgumentTypes, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
 
 export function findNextOddNumber(arg: number): number {
   const ceiled = Math.ceil(arg)
@@ -20,7 +20,7 @@ export function findNextEvenNumber(arg: number): number {
   return (ceiled % 2 === 0) ? ceiled : ceiled + 1
 }
 
-export class RoundingPlugin extends FunctionPlugin {
+export class RoundingPlugin extends FunctionPlugin implements FunctionPluginTypecheck<RoundingPlugin>{
   public static implementedFunctions = {
     'ROUNDUP': {
       method: 'roundup',

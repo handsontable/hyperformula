@@ -11,7 +11,7 @@ import {Condition, CriterionFunctionCompute} from '../CriterionFunctionCompute'
 import {InterpreterState} from '../InterpreterState'
 import {getRawValue, InternalScalarValue, isExtendedNumber, RawScalarValue} from '../InterpreterValue'
 import {SimpleRangeValue} from '../SimpleRangeValue'
-import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
+import {ArgumentTypes, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
 
 class AverageResult {
 
@@ -59,7 +59,7 @@ function countifsCacheKey(conditions: Condition[]): string {
   return ['COUNTIFS', ...conditionsStrings].join(',')
 }
 
-export class SumifPlugin extends FunctionPlugin {
+export class SumifPlugin extends FunctionPlugin implements FunctionPluginTypecheck<SumifPlugin>{
   public static implementedFunctions = {
     'SUMIF': {
       method: 'sumif',

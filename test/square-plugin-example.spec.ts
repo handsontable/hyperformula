@@ -1,10 +1,12 @@
 import {HyperFormula} from '../src'
 import {CellError, ErrorType, SimpleCellAddress} from '../src/Cell'
-import {FunctionPlugin} from '../src/interpreter/plugin/FunctionPlugin'
+import {InterpreterState} from '../src/interpreter/InterpreterState'
+import {InternalScalarValue} from '../src/interpreter/InterpreterValue'
+import {FunctionPlugin, FunctionPluginTypecheck} from '../src/interpreter/plugin/FunctionPlugin'
 import {ProcedureAst} from '../src/parser'
 import {adr, detailedError} from './testUtils'
 
-class SquarePlugin extends FunctionPlugin {
+class SquarePlugin extends FunctionPlugin implements FunctionPluginTypecheck<SquarePlugin>{
   public static implementedFunctions = {
     // Key of the mapping describes which function will be used to compute it
     'SQUARE': {
@@ -12,17 +14,17 @@ class SquarePlugin extends FunctionPlugin {
     },
   }
 
-  public square(ast: ProcedureAst, formulaAddress: SimpleCellAddress) {
+  public square(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
     // Take ast of first argument from list of arguments
     const arg = ast.args[0]
 
     // If there was no argument, return NA error
     if (!arg) {
-      return detailedError(ErrorType.NA)
+      return new CellError(ErrorType.NA)
     }
 
     // Compute value of argument
-    const argValue = this.evaluateAst(arg, formulaAddress)
+    const argValue = this.evaluateAst(arg, state)
 
     if (argValue instanceof CellError) {
       // If the value is some error, return that error
@@ -32,7 +34,7 @@ class SquarePlugin extends FunctionPlugin {
       return (argValue * argValue)
     } else {
       // If it's some other type which doesn't make sense in terms of square (string, boolean), return VALUE error
-      return detailedError(ErrorType.VALUE)
+      return new CellError(ErrorType.VALUE)
     }
   }
 }

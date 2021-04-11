@@ -7,9 +7,9 @@ import {SimpleCellAddress} from '../../Cell'
 import {ProcedureAst} from '../../parser'
 import {InterpreterState} from '../InterpreterState'
 import {InternalScalarValue} from '../InterpreterValue'
-import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
+import {ArgumentTypes, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
 
-export class DegreesPlugin extends FunctionPlugin {
+export class DegreesPlugin extends FunctionPlugin implements FunctionPluginTypecheck<DegreesPlugin>{
   public static implementedFunctions = {
     'DEGREES': {
       method: 'degrees',

@@ -10,7 +10,7 @@ import {Maybe} from '../../Maybe'
 import {ProcedureAst} from '../../parser'
 import {InterpreterState} from '../InterpreterState'
 import {InternalScalarValue} from '../InterpreterValue'
-import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
+import {ArgumentTypes, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
 
 const MAX_LENGTH = 10
 const DECIMAL_NUMBER_OF_BITS = 255
@@ -18,7 +18,7 @@ const MIN_BASE = 2
 const MAX_BASE = 36
 const ALPHABET = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'
 
-export class RadixConversionPlugin extends FunctionPlugin {
+export class RadixConversionPlugin extends FunctionPlugin implements FunctionPluginTypecheck<RadixConversionPlugin>{
   public static implementedFunctions = {
     'DEC2BIN': {
       method: 'dec2bin',
