@@ -5,6 +5,7 @@
 
 import {SimpleCellAddress} from '../../Cell'
 import {ProcedureAst} from '../../parser'
+import {InterpreterState} from '../InterpreterState'
 import {EmptyValue, InternalScalarValue, RawScalarValue} from '../InterpreterValue'
 import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
 
@@ -24,8 +25,8 @@ export class CountBlankPlugin extends FunctionPlugin {
     },
   }
 
-  public countblank(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('COUNTBLANK'), (...args: RawScalarValue[]) => {
+  public countblank(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+    return this.runFunction(ast.args, state, this.metadata('COUNTBLANK'), (...args: RawScalarValue[]) => {
       let counter = 0
       args.forEach((arg) => {
         if(arg === EmptyValue) {

@@ -6,8 +6,9 @@
 import {CellError, ErrorType, SimpleCellAddress} from '../../Cell'
 import {ErrorMessage} from '../../error-message'
 import {ProcedureAst} from '../../parser'
+import {InterpreterState} from '../InterpreterState'
 import {InternalScalarValue} from '../InterpreterValue'
-import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
+import {ArgumentTypes, FunctionPlugin, PluginFunctionType} from './FunctionPlugin'
 
 const MAX_48BIT_INTEGER = 281474976710655
 const SHIFT_MIN_POSITIONS = -53
@@ -31,12 +32,12 @@ export class BitShiftPlugin extends FunctionPlugin {
     },
   }
 
-  public bitlshift(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('BITLSHIFT'), shiftLeft)
+  public bitlshift(ast: ProcedureAst, state: InterpreterState): InternalScalarValue  {
+    return this.runFunction(ast.args, state, this.metadata('BITLSHIFT'), shiftLeft)
   }
 
-  public bitrshift(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('BITRSHIFT'), shiftRight)
+  public bitrshift(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+    return this.runFunction(ast.args, state, this.metadata('BITRSHIFT'), shiftRight)
   }
 }
 

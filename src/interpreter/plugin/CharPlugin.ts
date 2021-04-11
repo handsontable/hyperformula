@@ -6,6 +6,7 @@
 import {CellError, ErrorType, SimpleCellAddress} from '../../Cell'
 import {ErrorMessage} from '../../error-message'
 import {ProcedureAst} from '../../parser'
+import {InterpreterState} from '../InterpreterState'
 import {InternalScalarValue} from '../InterpreterValue'
 import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
 
@@ -25,8 +26,8 @@ export class CharPlugin extends FunctionPlugin {
     },
   }
 
-  public char(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('CHAR'), (value: number) => {
+  public char(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+    return this.runFunction(ast.args, state, this.metadata('CHAR'), (value: number) => {
       if (value < 1 || value >= 256) {
         return new CellError(ErrorType.VALUE, ErrorMessage.CharacterCodeBounds)
       }
@@ -35,8 +36,8 @@ export class CharPlugin extends FunctionPlugin {
     })
   }
 
-  public unichar(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('CHAR'), (value: number) => {
+  public unichar(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+    return this.runFunction(ast.args, state, this.metadata('CHAR'), (value: number) => {
       if (value < 1 || value >= 1114112) {
         return new CellError(ErrorType.VALUE, ErrorMessage.CharacterCodeBounds)
       }

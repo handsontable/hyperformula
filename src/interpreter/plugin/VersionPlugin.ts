@@ -7,6 +7,7 @@ import {SimpleCellAddress} from '../../Cell'
 import {LicenseKeyValidityState} from '../../helpers/licenseKeyValidator'
 import {HyperFormula} from '../../HyperFormula'
 import {ProcedureAst} from '../../parser'
+import {InterpreterState} from '../InterpreterState'
 import {InterpreterValue} from '../InterpreterValue'
 import {FunctionPlugin} from './FunctionPlugin'
 
@@ -26,8 +27,8 @@ export class VersionPlugin extends FunctionPlugin {
     },
   }
 
-  public version(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InterpreterValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('VERSION'), () => {
+  public version(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('VERSION'), () => {
       const {
         licenseKeyValidityState: validityState,
         licenseKey,

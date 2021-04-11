@@ -6,6 +6,7 @@
 import {CellError, ErrorType, SimpleCellAddress} from '../../Cell'
 import {ErrorMessage} from '../../error-message'
 import {ProcedureAst} from '../../parser'
+import {InterpreterState} from '../InterpreterState'
 import {InternalScalarValue} from '../InterpreterValue'
 import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
 
@@ -33,14 +34,14 @@ export class RandomPlugin extends FunctionPlugin {
    * in the range [0,1).
    *
    * @param ast
-   * @param formulaAddress
+   * @param state
    */
-  public rand(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('RAND'), Math.random)
+  public rand(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+    return this.runFunction(ast.args, state, this.metadata('RAND'), Math.random)
   }
 
-  public randbetween(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('RANDBETWEEN'),
+  public randbetween(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+    return this.runFunction(ast.args, state, this.metadata('RANDBETWEEN'),
       (lower: number, upper: number) => {
         if(upper<lower) {
           return new CellError(ErrorType.NUM, ErrorMessage.WrongOrder)

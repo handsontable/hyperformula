@@ -6,6 +6,7 @@
 import {CellError, ErrorType, SimpleCellAddress} from '../../Cell'
 import {ErrorMessage} from '../../error-message'
 import {ProcedureAst} from '../../parser'
+import {InterpreterState} from '../InterpreterState'
 import {InternalScalarValue, RawInterpreterValue} from '../InterpreterValue'
 import {SimpleRangeValue} from '../SimpleRangeValue'
 import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
@@ -112,8 +113,8 @@ export class MathPlugin extends FunctionPlugin {
     },
   }
 
-  public fact(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('FACT'),
+  public fact(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+    return this.runFunction(ast.args, state, this.metadata('FACT'),
       (arg: number) => {
         arg = Math.trunc(arg)
         let ret = 1
@@ -124,8 +125,8 @@ export class MathPlugin extends FunctionPlugin {
       })
   }
 
-  public factdouble(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('FACTDOUBLE'),
+  public factdouble(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+    return this.runFunction(ast.args, state, this.metadata('FACTDOUBLE'),
       (arg: number) => {
         arg = Math.trunc(arg)
         let ret = 1
@@ -137,8 +138,8 @@ export class MathPlugin extends FunctionPlugin {
     )
   }
 
-  public combin(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('COMBIN'),
+  public combin(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+    return this.runFunction(ast.args, state, this.metadata('COMBIN'),
       (n: number, m: number) => {
         if(m>n) {
           return new CellError(ErrorType.NUM, ErrorMessage.WrongOrder)
@@ -149,8 +150,8 @@ export class MathPlugin extends FunctionPlugin {
     })
   }
 
-  public combina(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('COMBINA'),
+  public combina(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+    return this.runFunction(ast.args, state, this.metadata('COMBINA'),
       (n: number, m: number)  => {
         n = Math.trunc(n)
         m = Math.trunc(m)
@@ -166,8 +167,8 @@ export class MathPlugin extends FunctionPlugin {
     )
   }
 
-  public gcd(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('GCD'),
+  public gcd(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+    return this.runFunction(ast.args, state, this.metadata('GCD'),
       (...args: RawInterpreterValue[]) => {
         const processedArgs = this.interpreter.arithmeticHelper.coerceNumbersCoerceRangesDropNulls(args)
         if(processedArgs instanceof CellError) {
@@ -189,8 +190,8 @@ export class MathPlugin extends FunctionPlugin {
     )
   }
 
-  public lcm(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('LCM'),
+  public lcm(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+    return this.runFunction(ast.args, state, this.metadata('LCM'),
       (...args: RawInterpreterValue[]) => {
         const processedArgs = this.interpreter.arithmeticHelper.coerceNumbersCoerceRangesDropNulls(args)
         if(processedArgs instanceof CellError) {
@@ -212,8 +213,8 @@ export class MathPlugin extends FunctionPlugin {
     )
   }
 
-  public mround(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('MROUND'),
+  public mround(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+    return this.runFunction(ast.args, state, this.metadata('MROUND'),
       (nom: number, denom: number) => {
         if(denom===0) {
           return 0
@@ -226,8 +227,8 @@ export class MathPlugin extends FunctionPlugin {
     )
   }
 
-  public multinomial(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('MULTINOMIAL'),
+  public multinomial(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+    return this.runFunction(ast.args, state, this.metadata('MULTINOMIAL'),
       (...args: number[]) => {
         let n = 0
         let ans = 1
@@ -246,8 +247,8 @@ export class MathPlugin extends FunctionPlugin {
     )
   }
 
-  public quotient(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('QUOTIENT'),
+  public quotient(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+    return this.runFunction(ast.args, state, this.metadata('QUOTIENT'),
       (nom: number, denom: number) => {
         if(denom===0) {
           return new CellError(ErrorType.DIV_BY_ZERO)
@@ -257,8 +258,8 @@ export class MathPlugin extends FunctionPlugin {
     )
   }
 
-  public seriessum(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('SERIESSUM'),
+  public seriessum(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+    return this.runFunction(ast.args, state, this.metadata('SERIESSUM'),
       (x: number, n: number, m: number, range: SimpleRangeValue) => {
         const coefs = this.interpreter.arithmeticHelper.manyToOnlyNumbersDropNulls(range.valuesFromTopLeftCorner())
         if(coefs instanceof CellError) {
@@ -274,8 +275,8 @@ export class MathPlugin extends FunctionPlugin {
     )
   }
 
-  public sign(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('SIGN'),
+  public sign(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+    return this.runFunction(ast.args, state, this.metadata('SIGN'),
       (arg: number) => {
         if(arg>0) {
           return 1
@@ -288,8 +289,8 @@ export class MathPlugin extends FunctionPlugin {
     )
   }
 
-  public sumx2my2(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('SUMX2MY2'),
+  public sumx2my2(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+    return this.runFunction(ast.args, state, this.metadata('SUMX2MY2'),
       (rangeX: SimpleRangeValue, rangeY: SimpleRangeValue) => {
         const valsX = rangeX.valuesFromTopLeftCorner()
         const valsY = rangeY.valuesFromTopLeftCorner()
@@ -316,8 +317,8 @@ export class MathPlugin extends FunctionPlugin {
     )
   }
 
-  public sumx2py2(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('SUMX2PY2'),
+  public sumx2py2(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+    return this.runFunction(ast.args, state, this.metadata('SUMX2PY2'),
       (rangeX: SimpleRangeValue, rangeY: SimpleRangeValue) => {
         const valsX = rangeX.valuesFromTopLeftCorner()
         const valsY = rangeY.valuesFromTopLeftCorner()
@@ -344,8 +345,8 @@ export class MathPlugin extends FunctionPlugin {
     )
   }
 
-  public sumxmy2(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('SUMXMY2'),
+  public sumxmy2(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+    return this.runFunction(ast.args, state, this.metadata('SUMXMY2'),
       (rangeX: SimpleRangeValue, rangeY: SimpleRangeValue) => {
         const valsX = rangeX.valuesFromTopLeftCorner()
         const valsY = rangeY.valuesFromTopLeftCorner()

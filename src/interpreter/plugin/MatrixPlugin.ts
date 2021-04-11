@@ -7,6 +7,7 @@ import {CellError, ErrorType, SimpleCellAddress} from '../../Cell'
 import {ErrorMessage} from '../../error-message'
 import {MatrixSize, matrixSizeForMultiplication, matrixSizeForPoolFunction, matrixSizeForTranspose} from '../../Matrix'
 import {ProcedureAst} from '../../parser'
+import {InterpreterState} from '../InterpreterState'
 import {InterpreterValue} from '../InterpreterValue'
 import {SimpleRangeValue} from '../SimpleRangeValue'
 import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
@@ -71,8 +72,8 @@ export class MatrixPlugin extends FunctionPlugin {
     }
   }
 
-  public mmult(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InterpreterValue {
-    return this.runMatrixFunction(ast.args, formulaAddress, this.metadata('MMULT'), (leftMatrix: SimpleRangeValue, rightMatrix: SimpleRangeValue) => {
+  public mmult(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runMatrixFunction(ast.args, state, this.metadata('MMULT'), (leftMatrix: SimpleRangeValue, rightMatrix: SimpleRangeValue) => {
       if (!leftMatrix.hasOnlyNumbers() || !rightMatrix.hasOnlyNumbers()) {
         return new CellError(ErrorType.VALUE, ErrorMessage.NumberRange)
       }
@@ -90,8 +91,8 @@ export class MatrixPlugin extends FunctionPlugin {
     })
   }
 
-  public maxpool(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InterpreterValue {
-    return this.runMatrixFunction(ast.args, formulaAddress, this.metadata('MAXPOOL'), (matrix: SimpleRangeValue, windowSize: number, stride: number = windowSize) => {
+  public maxpool(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runMatrixFunction(ast.args, state, this.metadata('MAXPOOL'), (matrix: SimpleRangeValue, windowSize: number, stride: number = windowSize) => {
       if (!matrix.hasOnlyNumbers()) {
         return new CellError(ErrorType.VALUE, ErrorMessage.NumberRange)
       }
@@ -113,8 +114,8 @@ export class MatrixPlugin extends FunctionPlugin {
     })
   }
 
-  public medianpool(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InterpreterValue {
-    return this.runMatrixFunction(ast.args, formulaAddress, this.metadata('MEDIANPOOL'), (matrix: SimpleRangeValue, windowSize: number, stride: number = windowSize) => {
+  public medianpool(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runMatrixFunction(ast.args, state, this.metadata('MEDIANPOOL'), (matrix: SimpleRangeValue, windowSize: number, stride: number = windowSize) => {
       if (!matrix.hasOnlyNumbers()) {
         return new CellError(ErrorType.VALUE, ErrorMessage.NumberRange)
       }
@@ -178,8 +179,8 @@ export class MatrixPlugin extends FunctionPlugin {
     })
   }
 
-  public transpose(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InterpreterValue {
-    return this.runMatrixFunction(ast.args, formulaAddress, this.metadata('TRANSPOSE'), (matrix: SimpleRangeValue) => {
+  public transpose(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runMatrixFunction(ast.args, state, this.metadata('TRANSPOSE'), (matrix: SimpleRangeValue) => {
       if (!matrix.hasOnlyNumbers()) {
         return new CellError(ErrorType.VALUE, ErrorMessage.NumberRange)
       }

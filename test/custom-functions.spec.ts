@@ -3,6 +3,7 @@ import {ErrorType, SimpleCellAddress} from '../src/Cell'
 import {ErrorMessage} from '../src/error-message'
 import {AliasAlreadyExisting, ProtectedFunctionError, ProtectedFunctionTranslationError} from '../src/errors'
 import {plPL} from '../src/i18n/languages'
+import {InterpreterState} from '../src/interpreter/InterpreterState'
 import {InternalScalarValue} from '../src/interpreter/InterpreterValue'
 import {FunctionPlugin} from '../src/interpreter/plugin/FunctionPlugin'
 import {NumericAggregationPlugin} from '../src/interpreter/plugin/NumericAggregationPlugin'
@@ -32,11 +33,11 @@ class FooPlugin extends FunctionPlugin {
     }
   }
 
-  public foo(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+  public foo(_ast: ProcedureAst, _state: InterpreterState): InternalScalarValue {
     return 'foo'
   }
 
-  public bar(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+  public bar(_ast: ProcedureAst, _state: InterpreterState): InternalScalarValue {
     return 'bar'
   }
 }
@@ -52,9 +53,9 @@ class SumWithExtra extends FunctionPlugin {
     'SUMALIAS': 'SUM',
   }
 
-  public sum(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    const left = this.evaluateAst(ast.args[0], formulaAddress) as number
-    const right = this.evaluateAst(ast.args[1], formulaAddress) as number
+  public sum(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+    const left = this.evaluateAst(ast.args[0], state) as number
+    const right = this.evaluateAst(ast.args[1], state) as number
     return 42 + left + right
   }
 }
@@ -66,7 +67,7 @@ class InvalidPlugin extends FunctionPlugin {
     }
   }
 
-  public bar(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+  public bar(_ast: ProcedureAst, _state: InterpreterState): InternalScalarValue {
     return 'bar'
   }
 }
@@ -106,7 +107,7 @@ class ReservedNamePlugin extends FunctionPlugin {
     }
   }
 
-  public version(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+  public version(_ast: ProcedureAst, _state: InterpreterState): InternalScalarValue {
     return 'foo'
   }
 }

@@ -5,6 +5,7 @@
 
 import {SimpleCellAddress} from '../../Cell'
 import {ProcedureAst} from '../../parser'
+import {InterpreterState} from '../InterpreterState'
 import {InternalScalarValue} from '../InterpreterValue'
 import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
 
@@ -18,8 +19,8 @@ export class DegreesPlugin extends FunctionPlugin {
     },
   }
 
-  public degrees(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('DEGREES'),
+  public degrees(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+    return this.runFunction(ast.args, state, this.metadata('DEGREES'),
       (arg) => arg * (180 / Math.PI)
     )
   }

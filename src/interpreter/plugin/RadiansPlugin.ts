@@ -5,6 +5,7 @@
 
 import {SimpleCellAddress} from '../../Cell'
 import {ProcedureAst} from '../../parser'
+import {InterpreterState} from '../InterpreterState'
 import {InternalScalarValue} from '../InterpreterValue'
 import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
 
@@ -18,8 +19,8 @@ export class RadiansPlugin extends FunctionPlugin {
     },
   }
 
-  public radians(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('RADIANS'),
+  public radians(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+    return this.runFunction(ast.args, state, this.metadata('RADIANS'),
       (arg) => arg * (Math.PI / 180)
     )
   }

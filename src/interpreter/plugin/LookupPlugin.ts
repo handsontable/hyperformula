@@ -11,6 +11,7 @@ import {SearchStrategy} from '../../Lookup/SearchStrategy'
 import {ProcedureAst} from '../../parser'
 import {StatType} from '../../statistics'
 import {zeroIfEmpty} from '../ArithmeticHelper'
+import {InterpreterState} from '../InterpreterState'
 import {InternalScalarValue, RawNoErrorScalarValue, } from '../InterpreterValue'
 import {SimpleRangeValue} from '../SimpleRangeValue'
 import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
@@ -51,10 +52,10 @@ export class LookupPlugin extends FunctionPlugin {
    * Corresponds to VLOOKUP(key, range, index, [sorted])
    *
    * @param ast
-   * @param formulaAddress
+   * @param state
    */
-  public vlookup(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('VLOOKUP'), (key: RawNoErrorScalarValue, rangeValue: SimpleRangeValue, index: number, sorted: boolean) => {
+  public vlookup(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+    return this.runFunction(ast.args, state, this.metadata('VLOOKUP'), (key: RawNoErrorScalarValue, rangeValue: SimpleRangeValue, index: number, sorted: boolean) => {
       const range = rangeValue.range()
 
       if (range === undefined) {
@@ -77,8 +78,8 @@ export class LookupPlugin extends FunctionPlugin {
    * @param ast
    * @param formulaAddress
    */
-  public hlookup(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('HLOOKUP'), (key: RawNoErrorScalarValue, rangeValue: SimpleRangeValue, index: number, sorted: boolean) => {
+  public hlookup(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+    return this.runFunction(ast.args, state, this.metadata('HLOOKUP'), (key: RawNoErrorScalarValue, rangeValue: SimpleRangeValue, index: number, sorted: boolean) => {
       const range = rangeValue.range()
       if (range === undefined) {
         return new CellError(ErrorType.VALUE, ErrorMessage.WrongType)
@@ -94,8 +95,8 @@ export class LookupPlugin extends FunctionPlugin {
     })
   }
 
-  public match(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('MATCH'), (key: RawNoErrorScalarValue, rangeValue: SimpleRangeValue, sorted: number) => {
+  public match(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+    return this.runFunction(ast.args, state, this.metadata('MATCH'), (key: RawNoErrorScalarValue, rangeValue: SimpleRangeValue, sorted: number) => {
       return this.doMatch(zeroIfEmpty(key), rangeValue, sorted)
     })
   }

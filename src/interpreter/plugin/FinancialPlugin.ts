@@ -6,6 +6,7 @@
 import {CellError, ErrorType, SimpleCellAddress} from '../../Cell'
 import {ErrorMessage} from '../../error-message'
 import {ProcedureAst} from '../../parser'
+import {InterpreterState} from '../InterpreterState'
 import {
   EmptyValue,
   getRawValue,
@@ -282,24 +283,24 @@ export class FinancialPlugin extends FunctionPlugin {
     },
   }
 
-  public pmt(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('PMT'), pmtCore)
+  public pmt(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+    return this.runFunction(ast.args, state, this.metadata('PMT'), pmtCore)
   }
 
-  public ipmt(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('IPMT'), ipmtCore)
+  public ipmt(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+    return this.runFunction(ast.args, state, this.metadata('IPMT'), ipmtCore)
   }
 
-  public ppmt(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('PPMT'), ppmtCore)
+  public ppmt(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+    return this.runFunction(ast.args, state, this.metadata('PPMT'), ppmtCore)
   }
 
-  public fv(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('FV'), fvCore)
+  public fv(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+    return this.runFunction(ast.args, state, this.metadata('FV'), fvCore)
   }
 
-  public cumipmt(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('CUMIPMT'),
+  public cumipmt(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+    return this.runFunction(ast.args, state, this.metadata('CUMIPMT'),
       (rate: number, periods: number, value: number, start: number, end: number, type: number) => {
         if (start > end) {
           return new CellError(ErrorType.NUM, ErrorMessage.EndStartPeriod)
@@ -313,8 +314,8 @@ export class FinancialPlugin extends FunctionPlugin {
     )
   }
 
-  public cumprinc(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('CUMPRINC'),
+  public cumprinc(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+    return this.runFunction(ast.args, state, this.metadata('CUMPRINC'),
       (rate: number, periods: number, value: number, start: number, end: number, type: number) => {
         if (start > end) {
           return new CellError(ErrorType.NUM, ErrorMessage.EndStartPeriod)
@@ -328,8 +329,8 @@ export class FinancialPlugin extends FunctionPlugin {
     )
   }
 
-  public db(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('DB'),
+  public db(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+    return this.runFunction(ast.args, state, this.metadata('DB'),
       (cost: number, salvage: number, life: number, period: number, month: number) => {
         if ((month===12 && period > life) || (period > life+1)) {
           return new CellError(ErrorType.NUM, ErrorMessage.PeriodLong)
@@ -360,8 +361,8 @@ export class FinancialPlugin extends FunctionPlugin {
     )
   }
 
-  public ddb(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('DDB'),
+  public ddb(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+    return this.runFunction(ast.args, state, this.metadata('DDB'),
       (cost: number, salvage: number, life: number, period: number, factor: number) => {
         if (period > life) {
           return new CellError(ErrorType.NUM)
@@ -384,8 +385,8 @@ export class FinancialPlugin extends FunctionPlugin {
     )
   }
 
-  public dollarde(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('DOLLARDE'),
+  public dollarde(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+    return this.runFunction(ast.args, state, this.metadata('DOLLARDE'),
       (dollar, fraction) => {
         if (fraction < 1) {
           return new CellError(ErrorType.DIV_BY_ZERO)
@@ -400,8 +401,8 @@ export class FinancialPlugin extends FunctionPlugin {
     )
   }
 
-  public dollarfr(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('DOLLARFR'),
+  public dollarfr(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+    return this.runFunction(ast.args, state, this.metadata('DOLLARFR'),
       (dollar, fraction) => {
         if (fraction < 1) {
           return new CellError(ErrorType.DIV_BY_ZERO)
@@ -416,8 +417,8 @@ export class FinancialPlugin extends FunctionPlugin {
     )
   }
 
-  public effect(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('EFFECT'),
+  public effect(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+    return this.runFunction(ast.args, state, this.metadata('EFFECT'),
       (rate: number, periods: number) => {
         periods = Math.trunc(periods)
         return Math.pow(1 + rate / periods, periods) - 1
@@ -425,8 +426,8 @@ export class FinancialPlugin extends FunctionPlugin {
     )
   }
 
-  public ispmt(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('ISPMT'),
+  public ispmt(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+    return this.runFunction(ast.args, state, this.metadata('ISPMT'),
       (rate, period, periods, value) => {
         if(periods===0) {
           return new CellError(ErrorType.DIV_BY_ZERO)
@@ -436,8 +437,8 @@ export class FinancialPlugin extends FunctionPlugin {
     )
   }
 
-  public nominal(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('NOMINAL'),
+  public nominal(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+    return this.runFunction(ast.args, state, this.metadata('NOMINAL'),
       (rate: number, periods: number) => {
         periods = Math.trunc(periods)
         return (Math.pow(rate + 1, 1 / periods) - 1) * periods
@@ -445,8 +446,8 @@ export class FinancialPlugin extends FunctionPlugin {
     )
   }
 
-  public nper(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('NPER'),
+  public nper(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+    return this.runFunction(ast.args, state, this.metadata('NPER'),
       (rate, payment, present, future, type) => {
         if(rate === 0) {
           if(payment === 0) {
@@ -462,8 +463,8 @@ export class FinancialPlugin extends FunctionPlugin {
     )
   }
 
-  public rate(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('RATE'),
+  public rate(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+    return this.runFunction(ast.args, state, this.metadata('RATE'),
       (periods, payment, present, future, type, guess) => {
         if(guess<=-1) {
           return new CellError(ErrorType.VALUE)
@@ -504,8 +505,8 @@ export class FinancialPlugin extends FunctionPlugin {
     )
   }
 
-  public pv(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('PV'),
+  public pv(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+    return this.runFunction(ast.args, state, this.metadata('PV'),
       (rate, periods, payment, future, type) => {
         type = type ? 1 : 0
         if(rate === -1) {
@@ -524,8 +525,8 @@ export class FinancialPlugin extends FunctionPlugin {
     )
   }
 
-  public rri(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('RRI'),
+  public rri(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+    return this.runFunction(ast.args, state, this.metadata('RRI'),
       (periods, present, future) => {
         if (present === 0 || (future < 0 && present > 0) || (future > 0 && present < 0)) {
           return new CellError(ErrorType.NUM)
@@ -536,8 +537,8 @@ export class FinancialPlugin extends FunctionPlugin {
     )
   }
 
-  public sln(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('SLN'),
+  public sln(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+    return this.runFunction(ast.args, state, this.metadata('SLN'),
       (cost, salvage, life) => {
         if (life === 0) {
           return new CellError(ErrorType.DIV_BY_ZERO)
@@ -547,8 +548,8 @@ export class FinancialPlugin extends FunctionPlugin {
     )
   }
 
-  public syd(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('SYD'),
+  public syd(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+    return this.runFunction(ast.args, state, this.metadata('SYD'),
       (cost, salvage, life, period) => {
         if (period > life) {
           return new CellError(ErrorType.NUM)
@@ -558,8 +559,8 @@ export class FinancialPlugin extends FunctionPlugin {
     )
   }
 
-  public tbilleq(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('TBILLEQ'),
+  public tbilleq(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+    return this.runFunction(ast.args, state, this.metadata('TBILLEQ'),
       (settlement, maturity, discount) => {
         settlement = Math.round(settlement)
         maturity = Math.round(maturity)
@@ -584,8 +585,8 @@ export class FinancialPlugin extends FunctionPlugin {
     )
   }
 
-  public tbillprice(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('TBILLPRICE'),
+  public tbillprice(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+    return this.runFunction(ast.args, state, this.metadata('TBILLPRICE'),
       (settlement, maturity, discount) => {
         settlement = Math.round(settlement)
         maturity = Math.round(maturity)
@@ -610,8 +611,8 @@ export class FinancialPlugin extends FunctionPlugin {
     )
   }
 
-  public tbillyield(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('TBILLYIELD'),
+  public tbillyield(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+    return this.runFunction(ast.args, state, this.metadata('TBILLYIELD'),
       (settlement, maturity, price) => {
         settlement = Math.round(settlement)
         maturity = Math.round(maturity)
@@ -629,8 +630,8 @@ export class FinancialPlugin extends FunctionPlugin {
     )
   }
 
-  public fvschedule(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('FVSCHEDULE'),
+  public fvschedule(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+    return this.runFunction(ast.args, state, this.metadata('FVSCHEDULE'),
       (value: number, ratios: SimpleRangeValue) => {
         const vals = ratios.valuesFromTopLeftCorner()
         for(const val of vals) {
@@ -649,8 +650,8 @@ export class FinancialPlugin extends FunctionPlugin {
       })
   }
 
-  public npv(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('NPV'),
+  public npv(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+    return this.runFunction(ast.args, state, this.metadata('NPV'),
       (rate: number, ...args: RawInterpreterValue[]) => {
         const coerced = this.interpreter.arithmeticHelper.coerceNumbersExactRanges(args)
         if(coerced instanceof CellError) {
@@ -661,8 +662,8 @@ export class FinancialPlugin extends FunctionPlugin {
     )
   }
 
-  public mirr(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('MIRR'),
+  public mirr(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+    return this.runFunction(ast.args, state, this.metadata('MIRR'),
       (range: SimpleRangeValue, frate: number, rrate: number) => {
         const vals = this.interpreter.arithmeticHelper.manyToExactNumbers(range.valuesFromTopLeftCorner())
         if(vals instanceof CellError) {
@@ -706,14 +707,14 @@ export class FinancialPlugin extends FunctionPlugin {
     )
   }
 
-  public pduration(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('PDURATION'),
+  public pduration(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+    return this.runFunction(ast.args, state, this.metadata('PDURATION'),
       (rate: number, pv: number, fv: number) => (Math.log(fv) - Math.log(pv))/Math.log(1+rate)
     )
   }
 
-  public xnpv(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('XNPV'),
+  public xnpv(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+    return this.runFunction(ast.args, state, this.metadata('XNPV'),
       (rate: number, values: SimpleRangeValue, dates: SimpleRangeValue) => {
         const valArr = values.valuesFromTopLeftCorner()
         for(const val of valArr) {

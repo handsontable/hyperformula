@@ -1,6 +1,7 @@
 import {ErrorType, HyperFormula} from '../src'
 import {SimpleCellAddress} from '../src/Cell'
 import {ErrorMessage} from '../src/error-message'
+import {InterpreterState} from '../src/interpreter/InterpreterState'
 import {ArgumentTypes, FunctionPlugin} from '../src/interpreter/plugin/FunctionPlugin'
 import {ProcedureAst} from '../src/parser'
 import {adr, detailedError} from './testUtils'
@@ -16,8 +17,8 @@ class FooPlugin extends FunctionPlugin {
     },
   }
 
-  public foo(ast: ProcedureAst, formulaAddress: SimpleCellAddress) {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('FOO'),
+  public foo(ast: ProcedureAst, state: InterpreterState) {
+    return this.runFunction(ast.args, state, this.metadata('FOO'),
       (arg1, arg2) => arg1+'+'+arg2
     )
   }

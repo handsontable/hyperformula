@@ -5,6 +5,7 @@
 
 import {SimpleCellAddress} from '../../Cell'
 import {ProcedureAst} from '../../parser'
+import {InterpreterState} from '../InterpreterState'
 import {InternalScalarValue} from '../InterpreterValue'
 import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
 
@@ -32,17 +33,17 @@ export class LogarithmPlugin extends FunctionPlugin {
     },
   }
 
-  public log10(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('LOG10'), Math.log10)
+  public log10(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+    return this.runFunction(ast.args, state, this.metadata('LOG10'), Math.log10)
   }
 
-  public log(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('LOG'),
+  public log(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+    return this.runFunction(ast.args, state, this.metadata('LOG'),
       (arg: number, base: number) => Math.log(arg) / Math.log(base)
     )
   }
 
-  public ln(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('LN'), Math.log)
+  public ln(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+    return this.runFunction(ast.args, state, this.metadata('LN'), Math.log)
   }
 }

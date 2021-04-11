@@ -14,6 +14,7 @@ import {Ast, AstNodeType, ProcedureAst} from '../../parser'
 import {Serialization} from '../../Serialization'
 import {coerceScalarToBoolean, coerceScalarToString, coerceToRange, complex} from '../ArithmeticHelper'
 import {Interpreter} from '../Interpreter'
+import {InterpreterState} from '../InterpreterState'
 import {
   ExtendedNumber, FormatInfo,
   getRawValue,
@@ -25,6 +26,7 @@ import {
   RawScalarValue
 } from '../InterpreterValue'
 import {SimpleRangeValue} from '../SimpleRangeValue'
+import {BooleanPlugin} from './BooleanPlugin'
 
 export interface ImplementedFunctions {
   [formulaId: string]: FunctionMetadata,
@@ -53,6 +55,7 @@ export interface FunctionMetadata extends FunctionArguments {
   isVolatile?: boolean,
   isDependentOnSheetStructureChange?: boolean,
   doesNotNeedArgumentsToBeComputed?: boolean,
+  arrayFunction?: boolean,
 }
 
 export interface FunctionPluginDefinition {
@@ -151,7 +154,7 @@ export interface FunctionArgument {
   greaterThan?: number,
 }
 
-export type PluginFunctionType = (ast: ProcedureAst, formulaAddress: SimpleCellAddress) => InternalScalarValue
+export type PluginFunctionType = (ast: ProcedureAst, state: InterpreterState) => InterpreterValue
 
 /**
  * Abstract class representing interpreter function plugin.
@@ -169,6 +172,7 @@ export abstract class FunctionPlugin {
   protected readonly columnSearch: SearchStrategy
   protected readonly config: Config
   protected readonly serialization: Serialization
+  // [key: 'abcd' | 'efgh']: PluginFunctionType
 
   constructor(interpreter: Interpreter) {
     this.interpreter = interpreter
@@ -178,14 +182,14 @@ export abstract class FunctionPlugin {
     this.serialization = interpreter.serialization
   }
 
-  protected evaluateAst(ast: Ast, formulaAddress: SimpleCellAddress): InterpreterValue {
-    return this.interpreter.evaluateAst(ast, formulaAddress)
+  protected evaluateAst(ast: Ast, state: InterpreterState): InterpreterValue {
+    return this.interpreter.evaluateAst(ast, state)
   }
 
-  protected listOfScalarValues(asts: Ast[], formulaAddress: SimpleCellAddress): [InternalScalarValue, boolean][] {
+  protected listOfScalarValues(asts: Ast[], state: InterpreterState): [InternalScalarValue, boolean][] {
     const ret: [InternalScalarValue, boolean][] = []
     for (const argAst of asts) {
-      const value = this.evaluateAst(argAst, formulaAddress)
+      const value = this.evaluateAst(argAst, state)
       if (value instanceof SimpleRangeValue) {
         for (const scalarValue of value.valuesFromTopLeftCorner()) {
           ret.push([scalarValue, true])
@@ -269,25 +273,25 @@ export abstract class FunctionPlugin {
 
   protected runFunction = (
     args: Ast[],
-    formulaAddress: SimpleCellAddress,
+    state: InterpreterState,
     functionDefinition: FunctionArguments,
     fn: (...arg: any) => InternalScalarValue
   ) => {
-    return this.runFunctionTemplate(args, formulaAddress, functionDefinition, fn)
+    return this.runFunctionTemplate(args, state, functionDefinition, fn)
   }
 
   protected runMatrixFunction = (
     args: Ast[],
-    formulaAddress: SimpleCellAddress,
+    state: InterpreterState,
     functionDefinition: FunctionArguments,
     fn: (...arg: any) => InterpreterValue
   ) => {
-    return this.runFunctionTemplate(args, formulaAddress, functionDefinition, fn)
+    return this.runFunctionTemplate(args, state, functionDefinition, fn)
   }
 
   private runFunctionTemplate = (
     args: Ast[],
-    formulaAddress: SimpleCellAddress,
+    state: InterpreterState,
     functionDefinition: FunctionArguments,
     fn: (...arg: any) => any
   ) => {
@@ -295,9 +299,9 @@ export abstract class FunctionPlugin {
     let scalarValues: [InterpreterValue, boolean][]
 
     if (functionDefinition.expandRanges) {
-      scalarValues = this.listOfScalarValues(args, formulaAddress)
+      scalarValues = this.listOfScalarValues(args, state)
     } else {
-      scalarValues = args.map((ast) => [this.evaluateAst(ast, formulaAddress), false])
+      scalarValues = args.map((ast) => [this.evaluateAst(ast, state), false])
     }
 
     const coercedArguments: Maybe<InterpreterValue | complex | RawNoErrorScalarValue>[] = []
@@ -346,7 +350,7 @@ export abstract class FunctionPlugin {
 
   protected runFunctionWithReferenceArgument = (
     args: Ast[],
-    formulaAddress: SimpleCellAddress,
+    state: InterpreterState,
     argumentDefinitions: FunctionArguments,
     noArgCallback: () => InternalScalarValue | RawScalarValue,
     referenceCallback: (reference: SimpleCellAddress) => InternalScalarValue,
@@ -366,10 +370,10 @@ export abstract class FunctionPlugin {
     let cellReference: Maybe<SimpleCellAddress>
 
     if (arg.type === AstNodeType.CELL_REFERENCE) {
-      cellReference = arg.reference.toSimpleCellAddress(formulaAddress)
+      cellReference = arg.reference.toSimpleCellAddress(state.formulaAddress)
     } else if (arg.type === AstNodeType.CELL_RANGE || arg.type === AstNodeType.COLUMN_RANGE || arg.type === AstNodeType.ROW_RANGE) {
       try {
-        cellReference = AbsoluteCellRange.fromAst(arg, formulaAddress).start
+        cellReference = AbsoluteCellRange.fromAst(arg, state.formulaAddress).start
       } catch (e) {
         return new CellError(ErrorType.REF, ErrorMessage.CellRefExpected)
       }
@@ -379,7 +383,7 @@ export abstract class FunctionPlugin {
       return this.returnNumberWrapper(referenceCallback(cellReference), argumentDefinitions.returnNumberType)
     }
 
-    return this.runFunction(args, formulaAddress, argumentDefinitions, nonReferenceCallback)
+    return this.runFunction(args, state, argumentDefinitions, nonReferenceCallback)
   }
 
   protected metadata(name: string): FunctionMetadata {
