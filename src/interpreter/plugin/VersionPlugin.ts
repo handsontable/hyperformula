@@ -3,7 +3,6 @@
  * Copyright (c) 2021 Handsoncode. All rights reserved.
  */
 
-import {SimpleCellAddress} from '../../Cell'
 import {LicenseKeyValidityState} from '../../helpers/licenseKeyValidator'
 import {HyperFormula} from '../../HyperFormula'
 import {ProcedureAst} from '../../parser'

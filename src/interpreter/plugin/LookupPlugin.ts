@@ -4,7 +4,7 @@
  */
 
 import {AbsoluteCellRange} from '../../AbsoluteCellRange'
-import {CellError, ErrorType, simpleCellAddress, SimpleCellAddress} from '../../Cell'
+import {CellError, ErrorType, simpleCellAddress} from '../../Cell'
 import {ErrorMessage} from '../../error-message'
 import {RowSearchStrategy} from '../../Lookup/RowSearchStrategy'
 import {SearchStrategy} from '../../Lookup/SearchStrategy'
@@ -12,7 +12,7 @@ import {ProcedureAst} from '../../parser'
 import {StatType} from '../../statistics'
 import {zeroIfEmpty} from '../ArithmeticHelper'
 import {InterpreterState} from '../InterpreterState'
-import {InternalScalarValue, RawNoErrorScalarValue, } from '../InterpreterValue'
+import {InternalScalarValue, RawNoErrorScalarValue,} from '../InterpreterValue'
 import {SimpleRangeValue} from '../SimpleRangeValue'
 import {ArgumentTypes, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
 

@@ -16,7 +16,8 @@ import {coerceScalarToBoolean, coerceScalarToString, coerceToRange, complex} fro
 import {Interpreter} from '../Interpreter'
 import {InterpreterState} from '../InterpreterState'
 import {
-  ExtendedNumber, FormatInfo,
+  ExtendedNumber,
+  FormatInfo,
   getRawValue,
   InternalScalarValue,
   InterpreterValue,
@@ -26,7 +27,6 @@ import {
   RawScalarValue
 } from '../InterpreterValue'
 import {SimpleRangeValue} from '../SimpleRangeValue'
-import {BooleanPlugin} from './BooleanPlugin'
 
 export interface ImplementedFunctions {
   [formulaId: string]: FunctionMetadata,

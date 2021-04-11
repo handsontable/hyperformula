@@ -92,74 +92,74 @@ export class Interpreter {
       case AstNodeType.CONCATENATE_OP: {
         const leftResult = this.evaluateAst(ast.left, state)
         const rightResult = this.evaluateAst(ast.right, state)
-        return this.binaryRangeWrapper(this.concatOp, leftResult, rightResult)
+        return this.binaryRangeWrapper(this.concatOp, leftResult, rightResult, state)
       }
       case AstNodeType.EQUALS_OP: {
         const leftResult = this.evaluateAst(ast.left, state)
         const rightResult = this.evaluateAst(ast.right, state)
-        return this.binaryRangeWrapper(this.equalOp, leftResult, rightResult)
+        return this.binaryRangeWrapper(this.equalOp, leftResult, rightResult, state)
       }
       case AstNodeType.NOT_EQUAL_OP: {
         const leftResult = this.evaluateAst(ast.left, state)
         const rightResult = this.evaluateAst(ast.right, state)
-        return this.binaryRangeWrapper(this.notEqualOp, leftResult, rightResult)
+        return this.binaryRangeWrapper(this.notEqualOp, leftResult, rightResult, state)
       }
       case AstNodeType.GREATER_THAN_OP: {
         const leftResult = this.evaluateAst(ast.left, state)
         const rightResult = this.evaluateAst(ast.right, state)
-        return this.binaryRangeWrapper(this.greaterThanOp, leftResult, rightResult)
+        return this.binaryRangeWrapper(this.greaterThanOp, leftResult, rightResult, state)
       }
       case AstNodeType.LESS_THAN_OP: {
         const leftResult = this.evaluateAst(ast.left, state)
         const rightResult = this.evaluateAst(ast.right, state)
-        return this.binaryRangeWrapper(this.lessThanOp, leftResult, rightResult)
+        return this.binaryRangeWrapper(this.lessThanOp, leftResult, rightResult, state)
       }
       case AstNodeType.GREATER_THAN_OR_EQUAL_OP: {
         const leftResult = this.evaluateAst(ast.left, state)
         const rightResult = this.evaluateAst(ast.right, state)
-        return this.binaryRangeWrapper(this.greaterThanOrEqualOp, leftResult, rightResult)
+        return this.binaryRangeWrapper(this.greaterThanOrEqualOp, leftResult, rightResult, state)
       }
       case AstNodeType.LESS_THAN_OR_EQUAL_OP: {
         const leftResult = this.evaluateAst(ast.left, state)
         const rightResult = this.evaluateAst(ast.right, state)
-        return this.binaryRangeWrapper(this.lessThanOrEqualOp, leftResult, rightResult)
+        return this.binaryRangeWrapper(this.lessThanOrEqualOp, leftResult, rightResult, state)
       }
       case AstNodeType.PLUS_OP: {
         const leftResult = this.evaluateAst(ast.left, state)
         const rightResult = this.evaluateAst(ast.right, state)
-        return this.binaryRangeWrapper(this.plusOp, leftResult, rightResult)
+        return this.binaryRangeWrapper(this.plusOp, leftResult, rightResult, state)
       }
       case AstNodeType.MINUS_OP: {
         const leftResult = this.evaluateAst(ast.left, state)
         const rightResult = this.evaluateAst(ast.right, state)
-        return this.binaryRangeWrapper(this.minusOp, leftResult, rightResult)
+        return this.binaryRangeWrapper(this.minusOp, leftResult, rightResult, state)
       }
       case AstNodeType.TIMES_OP: {
         const leftResult = this.evaluateAst(ast.left, state)
         const rightResult = this.evaluateAst(ast.right, state)
-        return this.binaryRangeWrapper(this.timesOp, leftResult, rightResult)
+        return this.binaryRangeWrapper(this.timesOp, leftResult, rightResult, state)
       }
       case AstNodeType.POWER_OP: {
         const leftResult = this.evaluateAst(ast.left, state)
         const rightResult = this.evaluateAst(ast.right, state)
-        return this.binaryRangeWrapper(this.powerOp, leftResult, rightResult)
+        return this.binaryRangeWrapper(this.powerOp, leftResult, rightResult, state)
       }
       case AstNodeType.DIV_OP: {
         const leftResult = this.evaluateAst(ast.left, state)
         const rightResult = this.evaluateAst(ast.right, state)
-        return this.binaryRangeWrapper(this.divOp, leftResult, rightResult)
+        return this.binaryRangeWrapper(this.divOp, leftResult, rightResult, state)
       }
       case AstNodeType.PLUS_UNARY_OP: {
         const result = this.evaluateAst(ast.value, state)
-        return this.unaryRangeWrapper(this.unaryPlusOp, result)
+        return this.unaryRangeWrapper(this.unaryPlusOp, result, state)
       }
       case AstNodeType.MINUS_UNARY_OP: {
         const result = this.evaluateAst(ast.value, state)
-        return this.unaryRangeWrapper(this.unaryMinusOp, result)
+        return this.unaryRangeWrapper(this.unaryMinusOp, result, state)
       }
       case AstNodeType.PERCENT_OP: {
         const result = this.evaluateAst(ast.value, state)
-        return this.unaryRangeWrapper(this.percentOp, result)
+        return this.unaryRangeWrapper(this.percentOp, result, state)
       }
       case AstNodeType.FUNCTION_CALL: {
         if (this.config.licenseKeyValidityState !== LicenseKeyValidityState.VALID && !FunctionRegistry.functionIsProtected(ast.procedureName)) {
@@ -168,7 +168,7 @@ export class Interpreter {
         const pluginEntry = this.functionRegistry.getFunction(ast.procedureName)
         if (pluginEntry && this.config.translationPackage.isFunctionTranslated(ast.procedureName)) {
           const [pluginFunction, pluginInstance] = pluginEntry
-          return (pluginInstance as any as Record<string,PluginFunctionType>)[pluginFunction](ast, state)
+          return (pluginInstance as any as Record<string,PluginFunctionType>)[pluginFunction](ast, new InterpreterState(state.formulaAddress, state.arraysFlag || this.functionRegistry.isArrayFunction(ast.procedureName)))
         } else {
           return new CellError(ErrorType.NAME, ErrorMessage.FunctionName(ast.procedureName))
         }
@@ -318,11 +318,11 @@ export class Interpreter {
 
   private unaryPlusOp = (arg: InternalScalarValue): InternalScalarValue => this.arithmeticHelper.unaryPlus(arg)
 
-  private unaryRangeWrapper(op: (arg: InternalScalarValue) => InternalScalarValue, arg: InterpreterValue): InterpreterValue {
+  private unaryRangeWrapper(op: (arg: InternalScalarValue) => InternalScalarValue, arg: InterpreterValue, state: InterpreterState): InterpreterValue {
     if (arg instanceof CellError) {
       return arg
     } else if(arg instanceof SimpleRangeValue) {
-      if(!this.config.arrays) {
+      if(!state.arraysFlag) {
         return new CellError(ErrorType.VALUE, ErrorMessage.ScalarExpected)
       }
       const newRaw = arg.raw().map(
@@ -334,14 +334,14 @@ export class Interpreter {
     }
   }
 
-  private binaryRangeWrapper(op: (arg1: InternalScalarValue, arg2: InternalScalarValue) => InternalScalarValue, arg1: InterpreterValue, arg2: InterpreterValue): InterpreterValue {
+  private binaryRangeWrapper(op: (arg1: InternalScalarValue, arg2: InternalScalarValue) => InternalScalarValue, arg1: InterpreterValue, arg2: InterpreterValue, state: InterpreterState): InterpreterValue {
     if (arg1 instanceof CellError) {
       return arg1
-    } else if(arg1 instanceof SimpleRangeValue && !this.config.arrays) {
+    } else if(arg1 instanceof SimpleRangeValue && !state.arraysFlag) {
       return new CellError(ErrorType.VALUE, ErrorMessage.ScalarExpected)
     } else if (arg2 instanceof CellError) {
       return arg2
-    } else if(arg2 instanceof SimpleRangeValue && !this.config.arrays) {
+    } else if(arg2 instanceof SimpleRangeValue && !state.arraysFlag) {
       return new CellError(ErrorType.VALUE, ErrorMessage.ScalarExpected)
     } else if(arg1 instanceof SimpleRangeValue || arg2 instanceof SimpleRangeValue) {
       if(!(arg1 instanceof SimpleRangeValue)) {
