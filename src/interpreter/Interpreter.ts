@@ -252,7 +252,7 @@ export class Interpreter {
   private equalOp = (arg1: InternalScalarValue, arg2: InternalScalarValue): InternalScalarValue =>
     binaryErrorWrapper(this.arithmeticHelper.eq, arg1, arg2)
 
-  private notEqualOp = (arg1: InternalScalarValue, arg2: InternalScalarValue): InternalScalarValue => //(arg1 !== arg2)
+  private notEqualOp = (arg1: InternalScalarValue, arg2: InternalScalarValue): InternalScalarValue =>
     binaryErrorWrapper(this.arithmeticHelper.neq, arg1, arg2)
 
   private greaterThanOp = (arg1: InternalScalarValue, arg2: InternalScalarValue): InternalScalarValue => //((arg1 as number) > (arg2 as number))
