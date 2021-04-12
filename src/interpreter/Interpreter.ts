@@ -249,7 +249,7 @@ export class Interpreter {
     return ast.start.sheet === ast.end.sheet
   }
 
-  private equalOp = (arg1: InternalScalarValue, arg2: InternalScalarValue): InternalScalarValue => //(arg1 === arg2)
+  private equalOp = (arg1: InternalScalarValue, arg2: InternalScalarValue): InternalScalarValue =>
     binaryErrorWrapper(this.arithmeticHelper.eq, arg1, arg2)
 
   private notEqualOp = (arg1: InternalScalarValue, arg2: InternalScalarValue): InternalScalarValue => //(arg1 !== arg2)
@@ -431,4 +431,3 @@ function wrapperForAddress(val: InterpreterValue, adr: SimpleCellAddress): Inter
   }
   return val
 }
-
