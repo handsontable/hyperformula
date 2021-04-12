@@ -158,7 +158,7 @@ export type PluginFunctionType = (ast: ProcedureAst, state: InterpreterState) =>
 
 export type FunctionPluginTypecheck<T> = {
   [K in keyof T]: T[K] extends PluginFunctionType ? T[K] : never
-};
+}
 
 /**
  * Abstract class representing interpreter function plugin.
