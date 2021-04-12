@@ -24,7 +24,7 @@ import {
   SparseStrategy,
   ValueCellVertex
 } from './DependencyGraph'
-import {ValueCellVertexValue} from './DependencyGraph/ValueCellVertex'
+import {RawAndParsedValue, ValueCellVertexValue} from './DependencyGraph/ValueCellVertex'
 import {AddColumnsTransformer} from './dependencyTransformers/AddColumnsTransformer'
 import {AddRowsTransformer} from './dependencyTransformers/AddRowsTransformer'
 import {MoveCellsTransformer} from './dependencyTransformers/MoveCellsTransformer'
@@ -444,7 +444,7 @@ export class Operations {
   public restoreCell(address: SimpleCellAddress, clipboardCell: ClipboardCell) {
     switch (clipboardCell.type) {
       case ClipboardCellType.VALUE: {
-        this.setValueToCell(clipboardCell.value, clipboardCell.rawValue, address)
+        this.setValueToCell(clipboardCell, address)
         break
       }
       case ClipboardCellType.FORMULA: {
@@ -577,9 +577,9 @@ export class Operations {
     if (vertex === null || vertex instanceof EmptyCellVertex) {
       return {type: ClipboardCellType.EMPTY}
     } else if (vertex instanceof ValueCellVertex) {
-      return {type: ClipboardCellType.VALUE, value: vertex.getCellValue(), rawValue: vertex.getRawValue()}
+      return {type: ClipboardCellType.VALUE, ...vertex.getValues()}
     } else if (vertex instanceof MatrixVertex) {
-      return {type: ClipboardCellType.VALUE, value: vertex.getMatrixCellValue(address), rawValue: vertex.getMatrixCellRawValue(address)}
+      return {type: ClipboardCellType.VALUE, parsedValue: vertex.getMatrixCellValue(address), rawValue: vertex.getMatrixCellRawValue(address)}
     } else if (vertex instanceof FormulaCellVertex) {
       return {
         type: ClipboardCellType.FORMULA,
@@ -659,7 +659,7 @@ export class Operations {
       } else if (parsedCellContent instanceof CellContent.MatrixFormula) {
         throw new Error('Cant happen')
       } else {
-        this.setValueToCell(parsedCellContent.value, newCellContent, address)
+        this.setValueToCell({parsedValue: parsedCellContent.value, rawValue: newCellContent}, address)
       }
     } else {
       throw new Error('Illegal operation')
@@ -676,11 +676,11 @@ export class Operations {
     }
   }
 
-  public setValueToCell(value: ValueCellVertexValue, rawValue: RawCellContent, address: SimpleCellAddress) {
+  public setValueToCell(value: RawAndParsedValue, address: SimpleCellAddress) {
     const oldValue = this.dependencyGraph.getCellValue(address)
-    this.dependencyGraph.setValueToCell(address, value, rawValue)
-    this.columnSearch.change(getRawValue(oldValue), getRawValue(value), address)
-    this.changes.addChange(value, address)
+    this.dependencyGraph.setValueToCell(address, value)
+    this.columnSearch.change(getRawValue(oldValue), getRawValue(value.parsedValue), address)
+    this.changes.addChange(value.parsedValue, address)
   }
 
   public setCellEmpty(address: SimpleCellAddress) {
@@ -776,7 +776,7 @@ export class Operations {
       if (parsedCellContent instanceof CellContent.Empty) {
         this.setCellEmpty(address)
       } else {
-        this.setValueToCell(parsedCellContent.value, expression, address)
+        this.setValueToCell({parsedValue: parsedCellContent.value, rawValue: expression}, address)
       }
     }
   }
@@ -847,7 +847,7 @@ export class Operations {
       } else if (sourceVertex instanceof EmptyCellVertex) {
         this.setCellEmpty(expression.address)
       } else if (sourceVertex instanceof ValueCellVertex) {
-        this.setValueToCell(sourceVertex.getCellValue(), sourceVertex.getRawValue(), expression.address)
+        this.setValueToCell(sourceVertex.getValues(), expression.address)
       }
     }
     return this.dependencyGraph.fetchCellOrCreateEmpty(expression.address)

@@ -39,7 +39,7 @@ import {Graph, TopSortResult} from './Graph'
 import {MatrixMapping} from './MatrixMapping'
 import {RangeMapping} from './RangeMapping'
 import {SheetMapping} from './SheetMapping'
-import {ValueCellVertexValue} from './ValueCellVertex'
+import {RawAndParsedValue, ValueCellVertexValue} from './ValueCellVertex'
 import {FunctionRegistry} from '../interpreter/FunctionRegistry'
 import {
   EmptyValue,
@@ -113,19 +113,18 @@ export class DependencyGraph {
     this.correctInfiniteRangesDependency(address)
   }
 
-  public setValueToCell(address: SimpleCellAddress, newValue: ValueCellVertexValue, rawValue: RawCellContent) {
+  public setValueToCell(address: SimpleCellAddress, value: RawAndParsedValue) {
     const vertex = this.addressMapping.getCell(address)
     this.ensureThatVertexIsNonMatrixCellVertex(vertex)
 
     if (vertex instanceof ValueCellVertex) {
-      const oldValue = vertex.getCellValue()
-      if (oldValue !== newValue) {
-        vertex.setCellValue(newValue)
-        vertex.setRawValue(rawValue)
+      const oldValue = vertex.getValues()
+      if (oldValue.rawValue !== value.rawValue) {
+        vertex.setValues(value)
         this.graph.markNodeAsSpecialRecentlyChanged(vertex)
       }
     } else {
-      const newVertex = new ValueCellVertex(newValue, rawValue)
+      const newVertex = new ValueCellVertex(value.parsedValue, value.rawValue)
       this.exchangeOrAddGraphNode(vertex, newVertex)
       this.addressMapping.setCell(address, newVertex)
       this.graph.markNodeAsSpecialRecentlyChanged(newVertex)

@@ -31,7 +31,7 @@ export enum ClipboardCellType {
 
 export interface ClipboardCellValue {
   type: ClipboardCellType.VALUE,
-  value: ValueCellVertexValue,
+  parsedValue: ValueCellVertexValue,
   rawValue: RawCellContent,
 }
 
