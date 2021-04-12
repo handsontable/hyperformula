@@ -258,7 +258,7 @@ export class Interpreter {
   private greaterThanOp = (arg1: InternalScalarValue, arg2: InternalScalarValue): InternalScalarValue =>
     binaryErrorWrapper(this.arithmeticHelper.gt, arg1, arg2)
 
-  private lessThanOp = (arg1: InternalScalarValue, arg2: InternalScalarValue): InternalScalarValue => //((arg1 as number) < (arg2 as number))
+  private lessThanOp = (arg1: InternalScalarValue, arg2: InternalScalarValue): InternalScalarValue =>
     binaryErrorWrapper(this.arithmeticHelper.lt, arg1, arg2)
 
   private greaterThanOrEqualOp = (arg1: InternalScalarValue, arg2: InternalScalarValue): InternalScalarValue => //((arg1 as number) >= (arg2 as number))
