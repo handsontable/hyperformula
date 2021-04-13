@@ -44,7 +44,7 @@ module.exports = {
     "<rootDir>/test/**/*spec.(ts|js)"
   ],
 
-  silent: false,
+  silent: true,
 
   // A map from regular expressions to paths to transformers
   transform: {
