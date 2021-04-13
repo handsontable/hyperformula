@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - Added support for array arithmetic. (#628)
+- Added performance improvements for array handling. (#629)
 - Added support for row and column reordering. (#343)
 - Added type inferrence for subtypes for number. (#313)
 - Added parsing of number literals containing '%' or currency symbol (default '$'). (#590)
