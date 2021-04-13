@@ -412,22 +412,18 @@ export class NumericAggregationPlugin extends FunctionPlugin {
   }
 
   private doCount(args: Ast[], formulaAddress: SimpleCellAddress): InternalScalarValue {
-    const value = this.reduce(args, formulaAddress, 0, 'COUNT',
+    return this.reduce(args, formulaAddress, 0, 'COUNT',
       (left: number, right: number) => left + right,
       getRawValue,
       (arg) => (isExtendedNumber(arg)) ? 1 : 0
     )
-
-    return value
   }
 
   private doCounta(args: Ast[], formulaAddress: SimpleCellAddress): InternalScalarValue {
-    const value = this.reduce(args, formulaAddress, 0, 'COUNTA', (left: number, right: number) => left + right,
+    return this.reduce(args, formulaAddress, 0, 'COUNTA', (left: number, right: number) => left + right,
       getRawValue,
       (arg) => (arg === EmptyValue) ? 0 : 1
     )
-
-    return value
   }
 
   private doMax(args: Ast[], formulaAddress: SimpleCellAddress): InternalScalarValue {

@@ -217,7 +217,8 @@ export class MatrixDetectionStrategy implements GraphBuilderStrategy {
     const notMatrices = matrixHeuristic.run(sheets)
     for (let i = notMatrices.length - 1; i >= 0; --i) {
       const elem = notMatrices[i]
-      for (const address of elem.cells.reverse()) {
+      elem.cells.reverse()
+      for (const address of elem.cells) {
         const value = sheets[this.dependencyGraph.getSheetName(address.sheet)][address.row][address.col]
         const vertex = new ValueCellVertex(Number(value))
         this.columnSearch.add(Number(value), address)

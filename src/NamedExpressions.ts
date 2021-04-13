@@ -200,11 +200,11 @@ export class NamedExpressions {
   }
 
   public namedExpressionOrPlaceholder(expressionName: string, sheetId: number): InternalNamedExpression {
-    const namedExpression = this.worksheetStore(sheetId).get(expressionName)
+    let namedExpression = this.worksheetStore(sheetId).get(expressionName)
     if (namedExpression) {
       return namedExpression
     } else {
-      let namedExpression = this.workbookStore.get(expressionName)
+      namedExpression = this.workbookStore.get(expressionName)
       if (namedExpression === undefined) {
         namedExpression = new InternalNamedExpression(expressionName, this.nextAddress(), false)
         this.workbookStore.add(namedExpression)

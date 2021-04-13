@@ -863,7 +863,7 @@ export function normalizeRemovedIndexes(indexes: ColumnRowIndex[]): ColumnRowInd
     return indexes
   }
 
-  const sorted = indexes.sort(([a], [b]) => (a < b) ? -1 : (a > b) ? 1 : 0)
+  const sorted = [...indexes].sort(([a], [b]) => a-b)
 
   /* merge overlapping and adjacent indexes */
   const merged = sorted.reduce((acc: ColumnRowIndex[], [startIndex, amount]: ColumnRowIndex) => {
@@ -894,7 +894,7 @@ export function normalizeAddedIndexes(indexes: ColumnRowIndex[]): ColumnRowIndex
     return indexes
   }
 
-  const sorted = indexes.sort(([a], [b]) => (a < b) ? -1 : (a > b) ? 1 : 0)
+  const sorted = [...indexes].sort(([a], [b]) => a-b)
 
   /* merge indexes with same start */
   const merged = sorted.reduce((acc: ColumnRowIndex[], [startIndex, amount]: ColumnRowIndex) => {
