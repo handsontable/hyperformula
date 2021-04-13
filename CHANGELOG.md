@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added ability to fallback to plain CPU implementation for functions that uses GPU.js (#355)
 
 ### Fixed
+- Fixed minor issue. (#631)
 - Fixed a bug with serialization of some addresses after CRUDs. (#587)
 - Fixed a bug with MEDIAN function implementation. (#601)
 - Fixed a bug with copy-paste operation that could cause out of scope references (#591)
