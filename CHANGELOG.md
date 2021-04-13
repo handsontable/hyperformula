@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - A deprecated config option vlookupThreshold has been removed. (#620)
 
 ### Added
+- Added support for array arithmetic. (#628)
 - Added support for row and column reordering. (#343)
 - Added type inferrence for subtypes for number. (#313)
 - Added parsing of number literals containing '%' or currency symbol (default '$'). (#590)
