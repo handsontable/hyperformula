@@ -67,12 +67,12 @@ function numberFormat(tokens: FormatToken[], value: number): RawScalarValue {
     let decimalPart = valueParts[1] || ''
 
     if (integerFormat.length > integerPart.length) {
-      const padSize = countChars(integerFormat.substr(0, integerFormat.length - integerPart.length), '0')
-      integerPart = padLeft(integerPart, padSize + integerPart.length)
+      const padSizeInteger = countChars(integerFormat.substr(0, integerFormat.length - integerPart.length), '0')
+      integerPart = padLeft(integerPart, padSizeInteger + integerPart.length)
     }
 
-    const padSize = countChars(decimalFormat.substr(decimalPart.length, decimalFormat.length - decimalPart.length), '0')
-    decimalPart = padRight(decimalPart, padSize + decimalPart.length)
+    const padSizeDecimal = countChars(decimalFormat.substr(decimalPart.length, decimalFormat.length - decimalPart.length), '0')
+    decimalPart = padRight(decimalPart, padSizeDecimal + decimalPart.length)
 
     result += integerPart + separator + decimalPart
   }

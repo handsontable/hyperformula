@@ -208,7 +208,8 @@ export class Graph<T> {
 
     const sccNonSingletons: Set<T> = new Set()
 
-    modifiedNodes.reverse().forEach( (v: T) => {
+    modifiedNodes.reverse()
+    modifiedNodes.forEach( (v: T) => {
       if (nodeStatus.get(v) !== undefined) {
         return
       }
@@ -282,7 +283,8 @@ export class Graph<T> {
 
     const sorted: T[] = []
     const cycled: T[] = []
-    order.reverse().forEach( (t: T) => {
+    order.reverse()
+    order.forEach( (t: T) => {
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         if (sccNonSingletons.has(t) || this.adjacentNodes(t).has(t)) {
           cycled.push(t)

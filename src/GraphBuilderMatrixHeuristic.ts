@@ -12,9 +12,9 @@ import {Matrix, MatrixSize} from './Matrix'
 import {Sheets} from './Sheet'
 
 export class Array2d<T> {
-  public static fromArray<T>(input: T[][]): Array2d<T> {
+  public static fromArray<U>(input: U[][]): Array2d<U> {
     const size: MatrixSize = new MatrixSize(input[0].length, input.length)
-    const array = new Array2d<T>(size)
+    const array = new Array2d<U>(size)
     for (let i = 0; i < size.height; ++i) {
       for (let j = 0; j < size.width; ++j) {
         array.set(j, i, input[i][j])

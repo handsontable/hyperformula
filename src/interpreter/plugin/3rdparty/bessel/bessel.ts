@@ -208,7 +208,12 @@
 var M = Math;
 
 // @ts-ignore
-function _horner(arr, v) { for(var i = 0, z = 0; i < arr.length; ++i) z = v * z + arr[i]; return z; }
+function _horner(arr, v) {
+    for(var i = 0, z = 0; i < arr.length; ++i) {
+        z = v * z + arr[i];
+    }
+    return z;
+}
 // @ts-ignore
 function _bessel_iter(x, n, f0, f1, sign) {
     if(n === 0) return f0;

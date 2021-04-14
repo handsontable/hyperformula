@@ -265,7 +265,8 @@ export class MathPlugin extends FunctionPlugin {
           return coefs
         }
         let ret = 0
-        for(const coef of coefs.reverse()) {
+        coefs.reverse()
+        for(const coef of coefs) {
           ret *= Math.pow(x, m)
           ret += coef
         }

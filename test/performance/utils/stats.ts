@@ -89,7 +89,7 @@ export function average(values: number[]): number {
 }
 
 export function median(values: number[]): number {
-  return values.sort()[Math.trunc(values.length / 2)]
+  return values.sort((a, b) => a-b)[Math.trunc(values.length / 2)]
 }
 
 export function stdDev(values: number[]): number {
