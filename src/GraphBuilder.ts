@@ -133,7 +133,7 @@ export class SimpleStrategy implements GraphBuilderStrategy {
           } else if (parsedCellContent instanceof CellContent.Empty) {
             /* we don't care about empty cells here */
           } else {
-            const vertex = new ValueCellVertex(parsedCellContent.value)
+            const vertex = new ValueCellVertex(parsedCellContent.value, cellContent)
             this.columnIndex.add(getRawValue(parsedCellContent.value), address)
             this.dependencyGraph.addVertex(address, vertex)
           }
@@ -204,7 +204,7 @@ export class MatrixDetectionStrategy implements GraphBuilderStrategy {
           } else if (parsedCellContent instanceof CellContent.Number) {
             matrixHeuristic.add(address)
           } else {
-            const vertex = new ValueCellVertex(parsedCellContent.value)
+            const vertex = new ValueCellVertex(parsedCellContent.value, cellContent)
             this.columnSearch.add(parsedCellContent.value, address)
             this.dependencyGraph.addVertex(address, vertex)
           }
@@ -220,7 +220,7 @@ export class MatrixDetectionStrategy implements GraphBuilderStrategy {
       elem.cells.reverse()
       for (const address of elem.cells) {
         const value = sheets[this.dependencyGraph.getSheetName(address.sheet)][address.row][address.col]
-        const vertex = new ValueCellVertex(Number(value))
+        const vertex = new ValueCellVertex(Number(value), value)
         this.columnSearch.add(Number(value), address)
         this.dependencyGraph.addVertex(address, vertex)
       }
@@ -235,7 +235,7 @@ export class MatrixDetectionStrategy implements GraphBuilderStrategy {
 export function buildMatrixVertex(ast: ProcedureAst, formulaAddress: SimpleCellAddress): MatrixVertex | ValueCellVertex {
   const size = checkMatrixSize(ast, formulaAddress)
   if (size instanceof CellError) {
-    return new ValueCellVertex(size)
+    return new ValueCellVertex(size, undefined)
   }
   return new MatrixVertex(formulaAddress, size.width, size.height, ast)
 }

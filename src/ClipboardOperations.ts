@@ -5,6 +5,7 @@
 
 import {AbsoluteCellRange} from './AbsoluteCellRange'
 import {invalidSimpleCellAddress, simpleCellAddress, SimpleCellAddress} from './Cell'
+import {RawCellContent} from './CellContentParser'
 import {Operations} from './Operations'
 import {DependencyGraph} from './DependencyGraph'
 import {ValueCellVertexValue} from './DependencyGraph/ValueCellVertex'
@@ -30,7 +31,8 @@ export enum ClipboardCellType {
 
 export interface ClipboardCellValue {
   type: ClipboardCellType.VALUE,
-  value: ValueCellVertexValue,
+  parsedValue: ValueCellVertexValue,
+  rawValue: RawCellContent,
 }
 
 export interface ClipboardCellEmpty {

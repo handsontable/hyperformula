@@ -4,17 +4,19 @@
  */
 
 import {simpleCellAddress, SimpleCellAddress} from './Cell'
+import {RawCellContent} from './CellContentParser'
 import {CellValue, DetailedCellError, NoErrorCellValue} from './CellValue'
 import {Config} from './Config'
 import {DependencyGraph, FormulaCellVertex, MatrixVertex, ParsingErrorVertex} from './DependencyGraph'
 import {Exporter} from './Exporter'
+import {RawScalarValue} from './interpreter/InterpreterValue'
 import {Maybe} from './Maybe'
 import {buildLexerConfig, Unparser} from './parser'
 import {NamedExpressionOptions, NamedExpressions} from './NamedExpressions'
 
 export interface SerializedNamedExpression {
   name: string,
-  expression: NoErrorCellValue,
+  expression: RawCellContent,
   scope: Maybe<string>,
   options: Maybe<NamedExpressionOptions>,
 }
@@ -44,22 +46,21 @@ export class Serialization {
     return undefined
   }
 
-  public getCellSerialized(address: SimpleCellAddress): NoErrorCellValue {
+  public getCellSerialized(address: SimpleCellAddress): RawCellContent {
     const formula: Maybe<string> = this.getCellFormula(address)
     if (formula !== undefined) {
       return formula
     } else {
-      const value: CellValue = this.getCellValue(address)
-      if (value instanceof DetailedCellError) {
-        return this.config.translationPackage.getErrorTranslation(value.type)
-      } else {
-        return value
-      }
+      return this.getRawValue(address)
     }
   }
 
   public getCellValue(address: SimpleCellAddress): CellValue {
     return this.exporter.exportValue(this.dependencyGraph.getScalarValue(address))
+  }
+
+  public getRawValue(address: SimpleCellAddress): RawCellContent {
+    return this.dependencyGraph.getRawValue(address)
   }
 
   public getSheetValues(sheet: number): CellValue[][] {
@@ -110,7 +111,7 @@ export class Serialization {
     return result
   }
 
-  public getSheetSerialized(sheet: number): NoErrorCellValue[][] {
+  public getSheetSerialized(sheet: number): RawCellContent[][] {
     return this.genericSheetGetter(sheet, (arg) => this.getCellSerialized(arg))
   }
 
@@ -122,7 +123,7 @@ export class Serialization {
     return this.genericAllSheetsGetter((arg) => this.getSheetFormulas(arg))
   }
 
-  public getAllSheetsSerialized(): Record<string, NoErrorCellValue[][]> {
+  public getAllSheetsSerialized(): Record<string, RawCellContent[][]> {
     return this.genericAllSheetsGetter((arg) => this.getSheetSerialized(arg))
   }
 
