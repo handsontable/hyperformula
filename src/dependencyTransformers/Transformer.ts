@@ -65,20 +65,8 @@ export abstract class Transformer implements FormulaTransformer {
       case AstNodeType.STRING: {
         return ast
       }
-      case AstNodeType.PERCENT_OP: {
-        return {
-          ...ast,
-          type: ast.type,
-          value: this.transformAst(ast.value, address),
-        }
-      }
-      case AstNodeType.MINUS_UNARY_OP: {
-        return {
-          ...ast,
-          type: ast.type,
-          value: this.transformAst(ast.value, address),
-        }
-      }
+      case AstNodeType.PERCENT_OP:
+      case AstNodeType.MINUS_UNARY_OP:
       case AstNodeType.PLUS_UNARY_OP: {
         return {
           ...ast,

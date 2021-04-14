@@ -87,7 +87,8 @@ export class RangeMapping {
     }
 
     const verticesToMerge: [RangeVertex, RangeVertex][] = []
-    for (const [oldKey, vertex] of updated.sort((left, right) => compareBy(left[1], right[1], coordinate))) {
+    updated.sort((left, right) => compareBy(left[1], right[1], coordinate))
+    for (const [oldKey, vertex] of updated) {
       const newKey = keyFromRange(vertex.range)
       if (newKey === oldKey) {
         continue

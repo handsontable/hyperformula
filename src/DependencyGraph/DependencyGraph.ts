@@ -752,7 +752,7 @@ export class DependencyGraph {
 
   public dependencyQueryVertices: (vertex: Vertex) => Maybe<Vertex[]> = (vertex: Vertex) => {
     if (vertex instanceof RangeVertex) {
-      return this.rangeDependencyQuery(vertex).map(([_, vertex]) => vertex)
+      return this.rangeDependencyQuery(vertex).map(([_, v]) => v)
     } else {
       const dependenciesResult = this.formulaDependencyQuery(vertex)
       if (dependenciesResult !== undefined) {
@@ -959,8 +959,8 @@ export class DependencyGraph {
     })
   }
 
-  private removeVertexAndCleanupDependencies(vertex: Vertex) {
-    const dependencies = new Set(this.graph.removeNode(vertex))
+  private removeVertexAndCleanupDependencies(inputVertex: Vertex) {
+    const dependencies = new Set(this.graph.removeNode(inputVertex))
     while (dependencies.size > 0) {
       const vertex: Vertex = dependencies.values().next().value
       dependencies.delete(vertex)
@@ -977,8 +977,8 @@ export class DependencyGraph {
     }
   }
 
-  public getAdjacentNodesAddresses(vertex: Vertex): (AbsoluteCellRange | SimpleCellAddress)[] {
-    const deps = this.graph.adjacentNodes(vertex)
+  public getAdjacentNodesAddresses(inputVertex: Vertex): (AbsoluteCellRange | SimpleCellAddress)[] {
+    const deps = this.graph.adjacentNodes(inputVertex)
     const ret: (AbsoluteCellRange | SimpleCellAddress)[] = []
     deps.forEach((vertex: Vertex) => {
       const castVertex = vertex as RangeVertex | FormulaCellVertex | MatrixVertex
