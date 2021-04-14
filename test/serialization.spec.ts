@@ -5,7 +5,7 @@ import {adr} from './testUtils'
 describe('serialization', () => {
   it('should not loose sheet information on serialization', () => {
     const engine1 = HyperFormula.buildFromArray([
-      [1, '2', 'foo', true, '\'1', '33$', '12/01/15']
+      [1, '2', 'foo', true, '\'1', '33$', '12/01/15', '1%', '=FOO(', '#DIV/0!', ]
     ])
 
     expect(engine1.getCellSerialized(adr('A1'))).toEqual(1)
@@ -33,8 +33,20 @@ describe('serialization', () => {
     expect(engine1.getCellValueDetailedType(adr('F1'))).toEqual(CellValueDetailedType.NUMBER_CURRENCY)
 
     expect(engine1.getCellSerialized(adr('G1'))).toEqual('12/01/15')
-    expect(engine1.getCellValueFormat(adr('G1'))).toEqual(undefined)
+    expect(engine1.getCellValueFormat(adr('G1'))).toEqual(undefined)  //this is wrong, see issue 626
     expect(engine1.getCellValueDetailedType(adr('G1'))).toEqual(CellValueDetailedType.NUMBER_DATE)
+
+    expect(engine1.getCellSerialized(adr('H1'))).toEqual('1%')
+    expect(engine1.getCellValueFormat(adr('H1'))).toEqual(undefined)
+    expect(engine1.getCellValueDetailedType(adr('H1'))).toEqual(CellValueDetailedType.NUMBER_PERCENT)
+
+    expect(engine1.getCellSerialized(adr('I1'))).toEqual('=FOO(')
+    expect(engine1.getCellValueFormat(adr('I1'))).toEqual(undefined)
+    expect(engine1.getCellValueDetailedType(adr('I1'))).toEqual(CellValueDetailedType.ERROR)
+
+    expect(engine1.getCellSerialized(adr('J1'))).toEqual('#DIV/0!')
+    expect(engine1.getCellValueFormat(adr('J1'))).toEqual(undefined)
+    expect(engine1.getCellValueDetailedType(adr('J1'))).toEqual(CellValueDetailedType.ERROR)
 
     // serialize and "send" data to server
     const serialized = engine1.getAllSheetsSerialized()
@@ -67,7 +79,19 @@ describe('serialization', () => {
     expect(engine2.getCellValueDetailedType(adr('F1'))).toEqual(CellValueDetailedType.NUMBER_CURRENCY)
 
     expect(engine2.getCellSerialized(adr('G1'))).toEqual('12/01/15')
-    expect(engine2.getCellValueFormat(adr('G1'))).toEqual(undefined)
+    expect(engine2.getCellValueFormat(adr('G1'))).toEqual(undefined)  //this is wrong, see issue 626
     expect(engine2.getCellValueDetailedType(adr('G1'))).toEqual(CellValueDetailedType.NUMBER_DATE)
+
+    expect(engine1.getCellSerialized(adr('H1'))).toEqual('1%')
+    expect(engine1.getCellValueFormat(adr('H1'))).toEqual(undefined)
+    expect(engine1.getCellValueDetailedType(adr('H1'))).toEqual(CellValueDetailedType.NUMBER_PERCENT)
+
+    expect(engine1.getCellSerialized(adr('I1'))).toEqual('=FOO(')
+    expect(engine1.getCellValueFormat(adr('I1'))).toEqual(undefined)
+    expect(engine1.getCellValueDetailedType(adr('I1'))).toEqual(CellValueDetailedType.ERROR)
+
+    expect(engine1.getCellSerialized(adr('J1'))).toEqual('#DIV/0!')
+    expect(engine1.getCellValueFormat(adr('J1'))).toEqual(undefined)
+    expect(engine1.getCellValueDetailedType(adr('J1'))).toEqual(CellValueDetailedType.ERROR)
   })
 })
