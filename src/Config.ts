@@ -698,7 +698,8 @@ export class Config implements ConfigParams, ParserConfig {
     }
 
     if (duplicates.length > 0) {
-      const paramNames = duplicates.map(entry => `[${entry.sort()}]`).join('; ')
+      duplicates.forEach(entry => entry.sort())
+      const paramNames = duplicates.map(entry => `[${entry}]`).join('; ')
       throw new Error(`Config initialization failed. Parameters in conflict: ${paramNames}`)
     }
   }

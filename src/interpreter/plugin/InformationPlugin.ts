@@ -319,7 +319,7 @@ export class InformationPlugin extends FunctionPlugin {
     if (ast.args.length !== 1) {
       return new CellError(ErrorType.NA, ErrorMessage.WrongArgNumber)
     }
-    if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
+    if (ast.args.some((astIt) => astIt.type === AstNodeType.EMPTY)) {
       return new CellError(ErrorType.NUM, ErrorMessage.EmptyArg)
     }
     const rangeAst = ast.args[0]
@@ -357,7 +357,7 @@ export class InformationPlugin extends FunctionPlugin {
     if (ast.args.length !== 1) {
       return new CellError(ErrorType.NA, ErrorMessage.WrongArgNumber)
     }
-    if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
+    if (ast.args.some((astIt) => astIt.type === AstNodeType.EMPTY)) {
       return new CellError(ErrorType.NUM, ErrorMessage.EmptyArg)
     }
     const rangeAst = ast.args[0]
