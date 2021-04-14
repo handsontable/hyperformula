@@ -643,7 +643,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * @category Cells
    */
-  public getCellSerialized(cellAddress: SimpleCellAddress): NoErrorCellValue {
+  public getCellSerialized(cellAddress: SimpleCellAddress): RawCellContent {
     this.ensureEvaluationIsNotSuspended()
     return this._serialization.getCellSerialized(cellAddress)
   }
@@ -733,7 +733,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * @category Sheets
    */
-  public getSheetSerialized(sheetId: number): NoErrorCellValue[][] {
+  public getSheetSerialized(sheetId: number): RawCellContent[][] {
     this.ensureEvaluationIsNotSuspended()
     return this._serialization.getSheetSerialized(sheetId)
   }
@@ -850,7 +850,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * @category Sheets
    */
-  public getAllSheetsSerialized(): Record<string, NoErrorCellValue[][]> {
+  public getAllSheetsSerialized(): Record<string, RawCellContent[][]> {
     this.ensureEvaluationIsNotSuspended()
     return this._serialization.getAllSheetsSerialized()
   }
@@ -2214,7 +2214,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * @category Ranges
    */
-  public getRangeSerialized(leftCorner: SimpleCellAddress, width: number, height: number): CellValue[][] {
+  public getRangeSerialized(leftCorner: SimpleCellAddress, width: number, height: number): RawCellContent[][] {
     const cellRange = AbsoluteCellRange.spanFrom(leftCorner, width, height)
     return cellRange.arrayOfAddressesInRange().map(
       (subarray) => subarray.map(
