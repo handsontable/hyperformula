@@ -12,6 +12,7 @@ import {
   simpleCellAddress,
   SimpleCellAddress
 } from '../Cell'
+import {RawCellContent} from '../CellContentParser'
 import {CellDependency} from '../CellDependency'
 import {Config} from '../Config'
 import {ErrorMessage} from '../error-message'
@@ -38,7 +39,7 @@ import {Graph, TopSortResult} from './Graph'
 import {MatrixMapping} from './MatrixMapping'
 import {RangeMapping} from './RangeMapping'
 import {SheetMapping} from './SheetMapping'
-import {ValueCellVertexValue} from './ValueCellVertex'
+import {RawAndParsedValue, ValueCellVertexValue} from './ValueCellVertex'
 import {FunctionRegistry} from '../interpreter/FunctionRegistry'
 import {
   EmptyValue,
@@ -112,18 +113,18 @@ export class DependencyGraph {
     this.correctInfiniteRangesDependency(address)
   }
 
-  public setValueToCell(address: SimpleCellAddress, newValue: ValueCellVertexValue) {
+  public setValueToCell(address: SimpleCellAddress, value: RawAndParsedValue) {
     const vertex = this.addressMapping.getCell(address)
     this.ensureThatVertexIsNonMatrixCellVertex(vertex)
 
     if (vertex instanceof ValueCellVertex) {
-      const oldValue = vertex.getCellValue()
-      if (oldValue !== newValue) {
-        vertex.setCellValue(newValue)
+      const oldValue = vertex.getValues()
+      if (oldValue.rawValue !== value.rawValue) {
+        vertex.setValues(value)
         this.graph.markNodeAsSpecialRecentlyChanged(vertex)
       }
     } else {
-      const newVertex = new ValueCellVertex(newValue)
+      const newVertex = new ValueCellVertex(value.parsedValue, value.rawValue)
       this.exchangeOrAddGraphNode(vertex, newVertex)
       this.addressMapping.setCell(address, newVertex)
       this.graph.markNodeAsSpecialRecentlyChanged(newVertex)
@@ -505,8 +506,8 @@ export class DependencyGraph {
     const adjacentNodes = this.graph.adjacentNodes(matrixVertex)
 
     for (const address of matrixRange.addresses(this)) {
-      const value = this.getCellValue(address) as ExtendedNumber // We wouldn't need that typecast if we would take values from Matrix
-      const valueVertex = new ValueCellVertex(value)
+      // We wouldn't need that typecast if we would take values from Matrix
+      const valueVertex = new ValueCellVertex(this.getCellValue(address) as ExtendedNumber, this.getRawValue(address))
       this.addVertex(address, valueVertex)
     }
 
@@ -603,6 +604,10 @@ export class DependencyGraph {
 
   public getCellValue(address: SimpleCellAddress): InterpreterValue {
     return this.addressMapping.getCellValue(address)
+  }
+
+  public getRawValue(address: SimpleCellAddress): RawCellContent {
+    return this.addressMapping.getRawValue(address)
   }
 
   public getScalarValue(address: SimpleCellAddress): InternalScalarValue {
