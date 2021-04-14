@@ -56,6 +56,11 @@ export class MatrixVertex {
     return this.matrix.get(col, row)
   }
 
+  public getMatrixCellRawValue(address: SimpleCellAddress): number | undefined {
+    const val = this.getMatrixCellValue(address)
+    return val instanceof CellError ? undefined : val
+  }
+
   public setMatrixCellValue(address: SimpleCellAddress, value: number): void {
     const col = address.col - this.cellAddress.col
     const row = address.row - this.cellAddress.row
