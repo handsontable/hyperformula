@@ -619,9 +619,9 @@ export class CrudOperations {
     }
   }
 
-  public ensureItIsPossibleToChangeCellContents(address: SimpleCellAddress, content: RawCellContent[][]) {
+  public ensureItIsPossibleToChangeCellContents(inputAddress: SimpleCellAddress, content: RawCellContent[][]) {
     const boundaries = findBoundaries(content)
-    const targetRange = AbsoluteCellRange.spanFrom(address, boundaries.width, boundaries.height)
+    const targetRange = AbsoluteCellRange.spanFrom(inputAddress, boundaries.width, boundaries.height)
     this.ensureRangeInSizeLimits(targetRange)
     for (const address of targetRange.addresses(this.dependencyGraph)) {
       this.ensureItIsPossibleToChangeContent(address)

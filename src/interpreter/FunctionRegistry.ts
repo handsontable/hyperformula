@@ -182,13 +182,13 @@ export class FunctionRegistry {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const instances: any[] = []
     for (const [functionId, plugin] of this.instancePlugins.entries()) {
-      let pluginInstance = instances.find(pluginInstance => pluginInstance instanceof plugin)
-      if (pluginInstance === undefined) {
-        pluginInstance = new plugin(interpreter)
-        instances.push(pluginInstance)
+      let foundPluginInstance = instances.find(pluginInstance => pluginInstance instanceof plugin)
+      if (foundPluginInstance === undefined) {
+        foundPluginInstance = new plugin(interpreter)
+        instances.push(foundPluginInstance)
       }
       const methodName = validateAndReturnMetadataFromName(functionId, plugin).method
-      this.functions.set(functionId, [methodName, pluginInstance])
+      this.functions.set(functionId, [methodName, foundPluginInstance])
     }
   }
 

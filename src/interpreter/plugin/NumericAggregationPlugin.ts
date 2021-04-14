@@ -409,22 +409,18 @@ export class NumericAggregationPlugin extends FunctionPlugin implements Function
   }
 
   private doCount(args: Ast[], state: InterpreterState): InternalScalarValue {
-    const value = this.reduce(args, state, 0, 'COUNT',
+    return this.reduce(args, state, 0, 'COUNT',
       (left: number, right: number) => left + right,
       getRawValue,
       (arg) => (isExtendedNumber(arg)) ? 1 : 0
     )
-
-    return value
   }
 
   private doCounta(args: Ast[], state: InterpreterState): InternalScalarValue {
-    const value = this.reduce(args, state, 0, 'COUNTA', (left: number, right: number) => left + right,
+    return this.reduce(args, state, 0, 'COUNTA', (left: number, right: number) => left + right,
       getRawValue,
       (arg) => (arg === EmptyValue) ? 0 : 1
     )
-
-    return value
   }
 
   private doMax(args: Ast[], state: InterpreterState): InternalScalarValue {
