@@ -4,8 +4,9 @@
 **Release date: April 15, 2021**
 
 ### Changed
+- **Breaking change**: A change to the type of value returned via serialization methods. [#617](https://github.com/handsontable/hyperformula/issues/617)
+- An input value should be preserved through serialization more precisely. [#617](https://github.com/handsontable/hyperformula/issues/617)
 - GPU.js constructor needs to be provided directly to engine configuration. [#355](https://github.com/handsontable/hyperformula/issues/355)
-- An input value should be preserved through serialization more precisely. A **Breaking change**: This changes the type of value returned via serialization. [#617](https://github.com/handsontable/hyperformula/issues/617)
 - A deprecated config option vlookupThreshold has been removed. [#620](https://github.com/handsontable/hyperformula/issues/620)
 
 ### Added
