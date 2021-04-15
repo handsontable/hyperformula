@@ -1,9 +1,9 @@
 import {ErrorType, HyperFormula} from '../src'
+import {SimpleCellAddress} from '../src/Cell'
 import {ErrorMessage} from '../src/error-message'
 import {FunctionPlugin} from '../src/interpreter/plugin/FunctionPlugin'
-import {adr, detailedError} from './testUtils'
 import {ProcedureAst} from '../src/parser'
-import {SimpleCellAddress} from '../src/Cell'
+import {adr, detailedError} from './testUtils'
 
 class FooPlugin extends FunctionPlugin {
   public static implementedFunctions = {

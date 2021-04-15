@@ -1,5 +1,5 @@
 import {ErrorType, HyperFormula} from '../../src'
-import {CellError, EmptyValue} from '../../src/Cell'
+import {CellError} from '../../src/Cell'
 import {Config} from '../../src/Config'
 import {DateTimeHelper} from '../../src/DateTimeHelper'
 import {ErrorMessage} from '../../src/error-message'
@@ -9,6 +9,7 @@ import {
   coerceScalarToBoolean,
   coerceScalarToString
 } from '../../src/interpreter/ArithmeticHelper'
+import {DateNumber, EmptyValue, TimeNumber} from '../../src/interpreter/InterpreterValue'
 import {NumberLiteralHelper} from '../../src/NumberLiteralHelper'
 import {adr, detailedError} from '../testUtils'
 
@@ -115,8 +116,8 @@ describe('#coerceScalarToNumberOrError', () => {
 
     expect(arithmeticHelper.coerceScalarToNumberOrError(new CellError(ErrorType.DIV_BY_ZERO))).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
 
-    expect(arithmeticHelper.coerceScalarToNumberOrError('31/12/1899')).toEqual(1)
-    expect(arithmeticHelper.coerceScalarToNumberOrError('00:00:00')).toEqual(0)
+    expect(arithmeticHelper.coerceScalarToNumberOrError('31/12/1899')).toEqual(new DateNumber(1))
+    expect(arithmeticHelper.coerceScalarToNumberOrError('00:00:00')).toEqual(new TimeNumber(0))
     expect(arithmeticHelper.coerceScalarToNumberOrError(true)).toEqual(1)
 
     expect(arithmeticHelper.coerceScalarToNumberOrError('foo42')).toEqual(new CellError(ErrorType.VALUE, ErrorMessage.NumberCoercion))

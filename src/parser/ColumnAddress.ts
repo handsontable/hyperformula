@@ -1,11 +1,18 @@
 /**
  * @license
- * Copyright (c) 2020 Handsoncode. All rights reserved.
+ * Copyright (c) 2021 Handsoncode. All rights reserved.
  */
 
-import {absoluteSheetReference, SimpleCellAddress, simpleColumnAddress, SimpleColumnAddress} from '../Cell'
-import {columnIndexToLabel} from './addressRepresentationConverters'
+import {
+  absoluteSheetReference,
+  invalidSimpleColumnAddress,
+  SimpleCellAddress,
+  simpleColumnAddress,
+  SimpleColumnAddress
+} from '../Cell'
+import {Maybe} from '../Maybe'
 import {AddressWithColumn} from './Address'
+import {columnIndexToLabel} from './addressRepresentationConverters'
 
 export enum ReferenceType {
   RELATIVE = 'RELATIVE',
@@ -71,6 +78,10 @@ export class ColumnAddress implements AddressWithColumn {
     return new ColumnAddress(sheet, this.col, this.type)
   }
 
+  public isInvalid(baseAddress: SimpleCellAddress): boolean {
+    return this.toSimpleColumnAddress(baseAddress).col < 0
+  }
+
   public hash(withSheet: boolean): string {
     const sheetPart = withSheet && this.sheet !== null ? `#${this.sheet}` : ''
     switch (this.type) {
@@ -83,8 +94,11 @@ export class ColumnAddress implements AddressWithColumn {
     }
   }
 
-  public unparse(baseAddress: SimpleCellAddress): string {
+  public unparse(baseAddress: SimpleCellAddress): Maybe<string> {
     const simpleAddress = this.toSimpleColumnAddress(baseAddress)
+    if(invalidSimpleColumnAddress(simpleAddress)) {
+      return undefined
+    }
     const column = columnIndexToLabel(simpleAddress.col)
     const dollar = this.type === ReferenceType.ABSOLUTE ? '$' : ''
     return `${dollar}${column}`

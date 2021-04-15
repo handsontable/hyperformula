@@ -1,10 +1,11 @@
 /**
  * @license
- * Copyright (c) 2020 Handsoncode. All rights reserved.
+ * Copyright (c) 2021 Handsoncode. All rights reserved.
  */
 
 import {
   absoluteSheetReference,
+  invalidSimpleCellAddress,
   simpleCellAddress,
   SimpleCellAddress,
   simpleColumnAddress,
@@ -12,8 +13,9 @@ import {
   simpleRowAddress,
   SimpleRowAddress,
 } from '../Cell'
-import {columnIndexToLabel} from './addressRepresentationConverters'
+import {Maybe} from '../Maybe'
 import {AddressWithColumn, AddressWithRow} from './Address'
+import {columnIndexToLabel} from './addressRepresentationConverters'
 
 /** Possible kinds of cell references */
 export enum CellReferenceType {
@@ -128,6 +130,10 @@ export class CellAddress implements AddressWithColumn, AddressWithRow {
     return new CellAddress(sheet, this.col, this.row, this.type)
   }
 
+  public isInvalid(baseAddress: SimpleCellAddress): boolean {
+    return invalidSimpleCellAddress(this.toSimpleCellAddress(baseAddress))
+  }
+
   public shiftRelativeDimensions(toRight: number, toBottom: number): CellAddress {
     const col = this.isColumnAbsolute() ? this.col : this.col + toRight
     const row = this.isRowAbsolute() ? this.row : this.row + toBottom
@@ -158,8 +164,11 @@ export class CellAddress implements AddressWithColumn, AddressWithRow {
     }
   }
 
-  public unparse(baseAddress: SimpleCellAddress): string {
+  public unparse(baseAddress: SimpleCellAddress): Maybe<string> {
     const simpleAddress = this.toSimpleCellAddress(baseAddress)
+    if(invalidSimpleCellAddress(simpleAddress)) {
+      return undefined
+    }
     const column = columnIndexToLabel(simpleAddress.col)
     const rowDollar = this.type === CellReferenceType.CELL_REFERENCE_ABSOLUTE || this.type === CellReferenceType.CELL_REFERENCE_ABSOLUTE_ROW ? '$' : ''
     const colDollar = this.type === CellReferenceType.CELL_REFERENCE_ABSOLUTE || this.type === CellReferenceType.CELL_REFERENCE_ABSOLUTE_COL ? '$' : ''

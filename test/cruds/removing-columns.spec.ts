@@ -1,9 +1,9 @@
 import {ExportedCellChange, HyperFormula} from '../../src'
 import {AbsoluteCellRange} from '../../src/AbsoluteCellRange'
-import {ColumnIndex} from '../../src/Lookup/ColumnIndex'
-import {MatrixVertex, RangeVertex} from '../../src/DependencyGraph'
-import {CellAddress} from '../../src/parser'
 import {simpleCellAddress} from '../../src/Cell'
+import {MatrixVertex, RangeVertex} from '../../src/DependencyGraph'
+import {ColumnIndex} from '../../src/Lookup/ColumnIndex'
+import {CellAddress} from '../../src/parser'
 import {
   adr,
   expectArrayWithSameContent,

@@ -1,18 +1,17 @@
 /**
  * @license
- * Copyright (c) 2020 Handsoncode. All rights reserved.
+ * Copyright (c) 2021 Handsoncode. All rights reserved.
  */
 
-import {Statistics, StatType} from './statistics'
+import {EmptyValue, getRawValue} from './interpreter/InterpreterValue'
 import {ClipboardCell, ClipboardCellType} from './ClipboardOperations'
-import {EmptyValue, invalidSimpleCellAddress, simpleCellAddress, SimpleCellAddress} from './Cell'
+import {CellError, invalidSimpleCellAddress, simpleCellAddress, SimpleCellAddress} from './Cell'
+import {AbsoluteCellRange} from './AbsoluteCellRange'
+import {absolutizeDependencies, filterDependenciesOutOfScope} from './absolutizeDependencies'
 import {CellContent, CellContentParser, RawCellContent} from './CellContentParser'
-import {ColumnsSpan, RowsSpan} from './Span'
+import {Config} from './Config'
 import {ContentChanges} from './ContentChanges'
-import {ColumnSearchStrategy} from './Lookup/SearchStrategy'
-import {absolutizeDependencies} from './absolutizeDependencies'
-import {LazilyTransformingAstService} from './LazilyTransformingAstService'
-import {buildMatrixVertex} from './GraphBuilder'
+import {ColumnRowIndex} from './CrudOperations'
 import {
   AddressMapping,
   CellVertex,
@@ -25,7 +24,13 @@ import {
   SparseStrategy,
   ValueCellVertex
 } from './DependencyGraph'
-import {ValueCellVertexValue} from './DependencyGraph/ValueCellVertex'
+import {RawAndParsedValue, ValueCellVertexValue} from './DependencyGraph/ValueCellVertex'
+import {AddColumnsTransformer} from './dependencyTransformers/AddColumnsTransformer'
+import {AddRowsTransformer} from './dependencyTransformers/AddRowsTransformer'
+import {MoveCellsTransformer} from './dependencyTransformers/MoveCellsTransformer'
+import {RemoveColumnsTransformer} from './dependencyTransformers/RemoveColumnsTransformer'
+import {RemoveRowsTransformer} from './dependencyTransformers/RemoveRowsTransformer'
+import {RemoveSheetTransformer} from './dependencyTransformers/RemoveSheetTransformer'
 import {
   InvalidArgumentsError,
   NamedExpressionDoesNotExistError,
@@ -34,24 +39,21 @@ import {
   SourceLocationHasMatrixError,
   TargetLocationHasMatrixError
 } from './errors'
-import {NamedExpressionDependency, ParserWithCaching, ProcedureAst, RelativeDependency} from './parser'
-import {ParsingError} from './parser/Ast'
-import {AddRowsTransformer} from './dependencyTransformers/AddRowsTransformer'
-import {RemoveRowsTransformer} from './dependencyTransformers/RemoveRowsTransformer'
-import {AddColumnsTransformer} from './dependencyTransformers/AddColumnsTransformer'
-import {MoveCellsTransformer} from './dependencyTransformers/MoveCellsTransformer'
-import {RemoveSheetTransformer} from './dependencyTransformers/RemoveSheetTransformer'
-import {RemoveColumnsTransformer} from './dependencyTransformers/RemoveColumnsTransformer'
-import {AbsoluteCellRange} from './AbsoluteCellRange'
-import {findBoundaries, Sheet} from './Sheet'
-import {Config} from './Config'
+import {buildMatrixVertex} from './GraphBuilder'
+import {LazilyTransformingAstService} from './LazilyTransformingAstService'
+import {ColumnSearchStrategy} from './Lookup/SearchStrategy'
 import {
   doesContainRelativeReferences,
   InternalNamedExpression,
   NamedExpressionOptions,
   NamedExpressions
 } from './NamedExpressions'
-import {ColumnRowIndex} from './CrudOperations'
+import {NamedExpressionDependency, ParserWithCaching, ProcedureAst, RelativeDependency} from './parser'
+import {ParsingError} from './parser/Ast'
+import {findBoundaries, Sheet} from './Sheet'
+import {ColumnsSpan, RowsSpan} from './Span'
+import {Statistics, StatType} from './statistics'
+import {CleanOutOfScopeDependenciesTransformer} from './dependencyTransformers/CleanOutOfScopeDependenciesTransformer'
 
 export class RemoveRowsCommand {
   constructor(
@@ -286,9 +288,9 @@ export class Operations {
 
     const currentDataAtTarget = this.getRangeClipboardCells(targetRange)
 
-    const valuesToRemove = this.dependencyGraph.valuesFromRange(targetRange)
+    const valuesToRemove = this.dependencyGraph.rawValuesFromRange(targetRange)
     this.columnSearch.removeValues(valuesToRemove)
-    const valuesToMove = this.dependencyGraph.valuesFromRange(sourceRange)
+    const valuesToMove = this.dependencyGraph.rawValuesFromRange(sourceRange)
     this.columnSearch.moveValues(valuesToMove, toRight, toBottom, toSheet)
 
     let version: number
@@ -307,6 +309,50 @@ export class Operations {
       overwrittenCellsData: currentDataAtTarget,
       addedGlobalNamedExpressions: addedGlobalNamedExpressions
     }
+  }
+
+  public setRowOrder(sheetId: number, rowMapping: [number, number][]): [SimpleCellAddress, ClipboardCell][] {
+    const buffer: [SimpleCellAddress, ClipboardCell][][] = []
+    let oldContent: [SimpleCellAddress, ClipboardCell][] = []
+    for(const [source, target] of rowMapping ) {
+      if(source!==target) {
+        const rowRange = AbsoluteCellRange.spanFrom({sheet: sheetId, col: 0, row: source}, Infinity, 1)
+        this.dependencyGraph.breakNumericMatricesInRange(rowRange)
+        const row = this.getRangeClipboardCells(rowRange)
+        oldContent = oldContent.concat(row)
+        buffer.push(
+          row.map(
+            ([{sheet, col}, cell]) => [{sheet, col, row: target}, cell]
+          )
+        )
+      }
+    }
+    buffer.forEach(
+      row => this.restoreClipboardCells(sheetId, row.values())
+    )
+    return oldContent
+  }
+
+  public setColumnOrder(sheetId: number, columnMapping: [number, number][]): [SimpleCellAddress, ClipboardCell][]  {
+    const buffer: [SimpleCellAddress, ClipboardCell][][] = []
+    let oldContent: [SimpleCellAddress, ClipboardCell][] = []
+    for(const [source, target] of columnMapping ) {
+      if(source!==target) {
+        const rowRange = AbsoluteCellRange.spanFrom({sheet: sheetId, col: source, row: 0}, 1, Infinity)
+        this.dependencyGraph.breakNumericMatricesInRange(rowRange)
+        const column = this.getRangeClipboardCells(rowRange)
+        oldContent = oldContent.concat(column)
+        buffer.push(
+          column.map(
+            ([{sheet, col, row}, cell]) => [{sheet, col: target, row}, cell]
+          )
+        )
+      }
+    }
+    buffer.forEach(
+      column => this.restoreClipboardCells(sheetId, column.values())
+    )
+    return oldContent
   }
 
   public addNamedExpression(expressionName: string, expression: RawCellContent, sheetId?: number, options?: NamedExpressionOptions) {
@@ -398,7 +444,7 @@ export class Operations {
   public restoreCell(address: SimpleCellAddress, clipboardCell: ClipboardCell) {
     switch (clipboardCell.type) {
       case ClipboardCellType.VALUE: {
-        this.setValueToCell(clipboardCell.value, address)
+        this.setValueToCell(clipboardCell, address)
         break
       }
       case ClipboardCellType.FORMULA: {
@@ -531,9 +577,9 @@ export class Operations {
     if (vertex === null || vertex instanceof EmptyCellVertex) {
       return {type: ClipboardCellType.EMPTY}
     } else if (vertex instanceof ValueCellVertex) {
-      return {type: ClipboardCellType.VALUE, value: vertex.getCellValue()}
+      return {type: ClipboardCellType.VALUE, ...vertex.getValues()}
     } else if (vertex instanceof MatrixVertex) {
-      return {type: ClipboardCellType.VALUE, value: vertex.getMatrixCellValue(address)}
+      return {type: ClipboardCellType.VALUE, parsedValue: vertex.getMatrixCellValue(address), rawValue: vertex.getMatrixCellRawValue(address)}
     } else if (vertex instanceof FormulaCellVertex) {
       return {
         type: ClipboardCellType.FORMULA,
@@ -584,8 +630,8 @@ export class Operations {
       const newValue = parsedCellContent.value
       const oldValue = this.dependencyGraph.getCellValue(address)
       this.dependencyGraph.graph.markNodeAsSpecialRecentlyChanged(vertex)
-      vertex.setMatrixCellValue(address, newValue)
-      this.columnSearch.change(oldValue, newValue, address)
+      vertex.setMatrixCellValue(address, getRawValue(newValue))
+      this.columnSearch.change(getRawValue(oldValue), getRawValue(newValue), address)
       this.changes.addChange(newValue, address)
     } else if (!(vertex instanceof MatrixVertex) && parsedCellContent instanceof CellContent.MatrixFormula) {
       const {ast, errors, dependencies} = this.parser.parse(parsedCellContent.formula, address)
@@ -613,7 +659,7 @@ export class Operations {
       } else if (parsedCellContent instanceof CellContent.MatrixFormula) {
         throw new Error('Cant happen')
       } else {
-        this.setValueToCell(parsedCellContent.value, address)
+        this.setValueToCell({parsedValue: parsedCellContent.value, rawValue: newCellContent}, address)
       }
     } else {
       throw new Error('Illegal operation')
@@ -630,23 +676,27 @@ export class Operations {
     }
   }
 
-  public setValueToCell(value: ValueCellVertexValue, address: SimpleCellAddress) {
+  public setValueToCell(value: RawAndParsedValue, address: SimpleCellAddress) {
     const oldValue = this.dependencyGraph.getCellValue(address)
     this.dependencyGraph.setValueToCell(address, value)
-    this.columnSearch.change(oldValue, value, address)
-    this.changes.addChange(value, address)
+    this.columnSearch.change(getRawValue(oldValue), getRawValue(value.parsedValue), address)
+    this.changes.addChange(value.parsedValue, address)
   }
 
   public setCellEmpty(address: SimpleCellAddress) {
     const oldValue = this.dependencyGraph.getCellValue(address)
-    this.columnSearch.remove(oldValue, address)
+    this.columnSearch.remove(getRawValue(oldValue), address)
     this.changes.addChange(EmptyValue, address)
     this.dependencyGraph.setCellEmpty(address)
   }
 
   public setFormulaToCellFromCache(formulaHash: string, address: SimpleCellAddress) {
     const {ast, hasVolatileFunction, hasStructuralChangeFunction, dependencies} = this.parser.fetchCachedResult(formulaHash)
-    this.dependencyGraph.setFormulaToCell(address, ast, absolutizeDependencies(dependencies, address), hasVolatileFunction, hasStructuralChangeFunction)
+    const absoluteDependencies = absolutizeDependencies(dependencies, address)
+    const [cleanedAst] = new CleanOutOfScopeDependenciesTransformer(address.sheet).transformSingleAst(ast, address)
+    this.parser.rememberNewAst(cleanedAst)
+    const cleanedDependencies = filterDependenciesOutOfScope(absoluteDependencies)
+    this.dependencyGraph.setFormulaToCell(address, cleanedAst, cleanedDependencies, hasVolatileFunction, hasStructuralChangeFunction)
   }
 
   public setParsingErrorToCell(rawInput: string, errors: ParsingError[], address: SimpleCellAddress) {
@@ -726,7 +776,7 @@ export class Operations {
       if (parsedCellContent instanceof CellContent.Empty) {
         this.setCellEmpty(address)
       } else {
-        this.setValueToCell(parsedCellContent.value, address)
+        this.setValueToCell({parsedValue: parsedCellContent.value, rawValue: expression}, address)
       }
     }
   }
@@ -797,7 +847,7 @@ export class Operations {
       } else if (sourceVertex instanceof EmptyCellVertex) {
         this.setCellEmpty(expression.address)
       } else if (sourceVertex instanceof ValueCellVertex) {
-        this.setValueToCell(sourceVertex.getCellValue(), expression.address)
+        this.setValueToCell(sourceVertex.getValues(), expression.address)
       }
     }
     return this.dependencyGraph.fetchCellOrCreateEmpty(expression.address)
@@ -813,7 +863,7 @@ export function normalizeRemovedIndexes(indexes: ColumnRowIndex[]): ColumnRowInd
     return indexes
   }
 
-  const sorted = indexes.sort(([a], [b]) => (a < b) ? -1 : (a > b) ? 1 : 0)
+  const sorted = [...indexes].sort(([a], [b]) => a-b)
 
   /* merge overlapping and adjacent indexes */
   const merged = sorted.reduce((acc: ColumnRowIndex[], [startIndex, amount]: ColumnRowIndex) => {
@@ -844,7 +894,7 @@ export function normalizeAddedIndexes(indexes: ColumnRowIndex[]): ColumnRowIndex
     return indexes
   }
 
-  const sorted = indexes.sort(([a], [b]) => (a < b) ? -1 : (a > b) ? 1 : 0)
+  const sorted = [...indexes].sort(([a], [b]) => a-b)
 
   /* merge indexes with same start */
   const merged = sorted.reduce((acc: ColumnRowIndex[], [startIndex, amount]: ColumnRowIndex) => {

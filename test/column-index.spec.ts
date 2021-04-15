@@ -1,19 +1,19 @@
 import {deepStrictEqual} from 'assert'
 import {AbsoluteCellRange} from '../src/AbsoluteCellRange'
 import {CellError, ErrorType, simpleCellAddress} from '../src/Cell'
-import {ColumnIndex} from '../src/Lookup/ColumnIndex'
-import {NamedExpressions} from '../src/NamedExpressions'
 import {Config} from '../src/Config'
+import {DependencyGraph} from '../src/DependencyGraph'
+import {AddRowsTransformer} from '../src/dependencyTransformers/AddRowsTransformer'
+import {RemoveRowsTransformer} from '../src/dependencyTransformers/RemoveRowsTransformer'
+import {FunctionRegistry} from '../src/interpreter/FunctionRegistry'
+import {SimpleRangeValue} from '../src/interpreter/SimpleRangeValue'
+import {LazilyTransformingAstService} from '../src/LazilyTransformingAstService'
+import {ColumnIndex} from '../src/Lookup/ColumnIndex'
 import {Matrix, MatrixSize} from '../src/Matrix'
+import {NamedExpressions} from '../src/NamedExpressions'
 import {ColumnsSpan, RowsSpan} from '../src/Span'
 import {Statistics} from '../src/statistics'
 import {adr} from './testUtils'
-import {AddRowsTransformer} from '../src/dependencyTransformers/AddRowsTransformer'
-import {RemoveRowsTransformer} from '../src/dependencyTransformers/RemoveRowsTransformer'
-import {DependencyGraph} from '../src/DependencyGraph'
-import {FunctionRegistry} from '../src/interpreter/FunctionRegistry'
-import {SimpleRangeValue} from '../src/interpreter/InterpreterValue'
-import {LazilyTransformingAstService} from '../src/LazilyTransformingAstService'
 
 function buildEmptyIndex(transformingService: LazilyTransformingAstService, config: Config, statistics: Statistics): ColumnIndex {
   const functionRegistry = new FunctionRegistry(config)
@@ -84,6 +84,21 @@ describe('ColumnIndex#add', () => {
 
     const columnMap = index.getColumnMap(0, 0)
     expect(columnMap.size).toBe(0)
+  })
+
+  it('should handle strings correctly', () => {
+    const index = buildEmptyIndex(transformingService, new Config({
+      caseSensitive: false,
+      accentSensitive: false
+    }), statistics)
+    index.add('a', adr('A1'))
+    index.add('A', adr('A2'))
+    index.add('ą', adr('A3'))
+
+    const columnMap = index.getColumnMap(0, 0)
+
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    expect(columnMap.get('a')!.index.length).toBe(3)
   })
 })
 

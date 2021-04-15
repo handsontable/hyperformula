@@ -1,10 +1,11 @@
 /**
  * @license
- * Copyright (c) 2020 Handsoncode. All rights reserved.
+ * Copyright (c) 2021 Handsoncode. All rights reserved.
  */
 
-import {InternalScalarValue, SimpleCellAddress} from '../../Cell'
+import {SimpleCellAddress} from '../../Cell'
 import {ProcedureAst} from '../../parser'
+import {InternalScalarValue} from '../InterpreterValue'
 import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
 
 export class DeltaPlugin extends FunctionPlugin {

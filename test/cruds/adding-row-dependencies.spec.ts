@@ -1,4 +1,4 @@
-import { HyperFormula} from '../../src'
+import {HyperFormula} from '../../src'
 import {EmptyCellVertex} from '../../src/DependencyGraph'
 import {CellAddress} from '../../src/parser'
 import {adr, colEnd, colStart, expectEngineToBeTheSameAs, extractReference, rowEnd, rowStart} from '../testUtils'

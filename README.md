@@ -123,9 +123,23 @@ in all your non-commercial projects. There is also a
 [commercial license](https://handsontable.github.io/hyperformula/guide/contact.html),
 and support services available.
 
+## Acknowledgements
+
+You should know that this project wouldn’t exist without co-financing from European Union funds under the European Regional Development Funds as a part of the Smart Growth Operational Programme. Project implemented as a part of the Polish National Centre for Research and Development: “Fast Track”.
+
+- Name of the programme: Smart Growth Operational Programme 2014-2020
+- Project name: “Development of the high-performance calculation engine for processing tabular data of the significant size on mobile devices and workstations using parallel computing and GPU.”
+- Project number: POIR.01.01.01-00-0223/18-00
+- Beneficiary: Handsoncode sp. z o.o.
+- Total budget: PLN 1 121 375.00 (USD ~295 000)
+- Amount of grant: PLN 774 742.00 (USD ~204 000)
+- Duration: 2018-2019
+
+![eu-funds](docs/.vuepress/public/eu-logos.png)
+
 ## Authors
 
 Created by [Handsontable](https://handsontable.com), [NavAlgo](https://www.navalgo.com/en/),
 and [Contributors](https://github.com/handsontable/hyperformula/graphs/contributors).
 
-© 2020 Handsoncode
+© 2021 Handsoncode

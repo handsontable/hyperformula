@@ -1,17 +1,15 @@
 /**
  * @license
- * Copyright (c) 2020 Handsoncode. All rights reserved.
+ * Copyright (c) 2021 Handsoncode. All rights reserved.
  */
 
-import {CellError, EmptyValue, ErrorType, SimpleCellAddress, simpleCellAddress} from './Cell'
-import {
-  CellValue,
-  DetailedCellError,
-} from './CellValue'
+import {CellError, ErrorType, SimpleCellAddress, simpleCellAddress} from './Cell'
+import {CellValue, DetailedCellError, } from './CellValue'
 import {Config} from './Config'
 import {CellValueChange} from './ContentChanges'
 import {ErrorMessage} from './error-message'
-import {InterpreterValue, SimpleRangeValue} from './interpreter/InterpreterValue'
+import {EmptyValue, getRawValue, InterpreterValue, isExtendedNumber, } from './interpreter/InterpreterValue'
+import {SimpleRangeValue} from './interpreter/SimpleRangeValue'
 import {NamedExpressions} from './NamedExpressions'
 import {SheetIndexMappingFn, simpleCellAddressToString} from './parser/addressRepresentationConverters'
 
@@ -81,14 +79,14 @@ export class Exporter {
   public exportValue(value: InterpreterValue): CellValue {
     if (value instanceof SimpleRangeValue) {
       return this.detailedError(new CellError(ErrorType.VALUE, ErrorMessage.ScalarExpected))
-    } else if (this.config.smartRounding && typeof value == 'number') {
-      return this.cellValueRounding(value)
+    } else if (this.config.smartRounding && isExtendedNumber(value)) {
+      return this.cellValueRounding(getRawValue(value))
     } else if (value instanceof CellError) {
       return this.detailedError(value)
     } else if (value === EmptyValue) {
       return null
     } else {
-      return value
+      return getRawValue(value)
     }
   }
 

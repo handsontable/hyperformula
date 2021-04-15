@@ -1,11 +1,12 @@
 /**
  * @license
- * Copyright (c) 2020 Handsoncode. All rights reserved.
+ * Copyright (c) 2021 Handsoncode. All rights reserved.
  */
 
-import {CellError, ErrorType, InternalScalarValue, SimpleCellAddress} from '../../Cell'
+import {CellError, ErrorType, SimpleCellAddress} from '../../Cell'
 import {ErrorMessage} from '../../error-message'
 import {ProcedureAst} from '../../parser'
+import {InternalScalarValue, RawScalarValue} from '../InterpreterValue'
 import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
 
 /**
@@ -324,7 +325,7 @@ export class TextPlugin extends FunctionPlugin {
   }
 
   public t(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('T'), (arg: InternalScalarValue) => {
+    return this.runFunction(ast.args, formulaAddress, this.metadata('T'), (arg: RawScalarValue) => {
       if (arg instanceof CellError) {
         return arg
       }

@@ -1,4 +1,4 @@
-import {equal, deepStrictEqual} from 'assert'
+import {deepStrictEqual, equal} from 'assert'
 import {HyperFormula} from '../src'
 import {AbsoluteCellRange} from '../src/AbsoluteCellRange'
 import {SimpleCellAddress, simpleCellAddress} from '../src/Cell'

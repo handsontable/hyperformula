@@ -1,8 +1,8 @@
 import {HyperFormula} from '../../src'
-import {ErrorMessage} from '../../src/error-message'
-import {adr, detailedError} from '../testUtils'
 import {ErrorType} from '../../src/Cell'
 import {Config} from '../../src/Config'
+import {ErrorMessage} from '../../src/error-message'
+import {adr, detailedError} from '../testUtils'
 
 describe('Number literals', () => {
   it('should work for integer', () => {

@@ -266,4 +266,33 @@ describe('Function HLOOKUP', () => {
     ], {binarySearchThreshold: 1})
     expect(engine.getCellValue(adr('A1'))).toEqual('b')
   })
+
+  it('works for strings, is not case sensitive', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['a', 'b', 'c', 'A', 'B'],
+      [1, 2, 3, 4, 5],
+      ['=HLOOKUP("A", A1:E2, 2, FALSE())']
+    ], {caseSensitive: false})
+
+    expect(engine.getCellValue(adr('A3'))).toEqual(1)
+  })
+
+  it('works for strings, is not case sensitive even if config defines case sensitivity', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['a', 'b', 'c', 'A', 'B'],
+      [1, 2, 3, 4, 5],
+      ['=HLOOKUP("A", A1:E2, 2, FALSE())']
+    ], {caseSensitive: true})
+
+    expect(engine.getCellValue(adr('A3'))).toEqual(1)
+  })
+
+  it('should find value in sorted range', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['a', 'B', 'c', 'd', 'e'],
+      [1, 2, 3, 4, 5],
+      ['=HLOOKUP("b", A1:E2, 2)'],
+    ], {binarySearchThreshold: 1, caseSensitive: false})
+    expect(engine.getCellValue(adr('A3'))).toEqual(2)
+  })
 })

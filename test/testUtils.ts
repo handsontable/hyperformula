@@ -10,11 +10,13 @@ import {
   AstNodeType,
   CellAddress,
   CellRangeAst,
-  CellReferenceAst, ErrorAst,
-  ProcedureAst, simpleCellAddressToString,
+  CellReferenceAst,
+  ErrorAst,
+  ProcedureAst,
+  simpleCellAddressToString,
 } from '../src/parser'
-import {EngineComparator} from './graphComparator'
 import {ColumnRangeAst, RowRangeAst} from '../src/parser/Ast'
+import {EngineComparator} from './graphComparator'
 
 export const extractReference = (engine: HyperFormula, address: SimpleCellAddress): CellAddress => {
   return ((engine.addressMapping.fetchCell(address) as FormulaCellVertex).getFormula(engine.lazilyTransformingAstService) as CellReferenceAst).reference

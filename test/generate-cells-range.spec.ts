@@ -1,13 +1,13 @@
 import {AbsoluteCellRange} from '../src/AbsoluteCellRange'
 import {SimpleCellAddress} from '../src/Cell'
-import {adr} from './testUtils'
-import {DependencyGraph} from '../src/DependencyGraph'
 import {Config} from '../src/Config'
-import {Statistics} from '../src/statistics/Statistics'
-import {NamedExpressions} from '../src/NamedExpressions'
+import {DependencyGraph} from '../src/DependencyGraph'
 import {FunctionRegistry} from '../src/interpreter/FunctionRegistry'
 import {LazilyTransformingAstService} from '../src/LazilyTransformingAstService'
+import {NamedExpressions} from '../src/NamedExpressions'
 import {RowsSpan} from '../src/Span'
+import {Statistics} from '../src/statistics/Statistics'
+import {adr} from './testUtils'
 
 describe('generateCellsFromRange', () => {
   const config = new Config()

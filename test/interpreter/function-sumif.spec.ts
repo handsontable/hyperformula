@@ -2,8 +2,8 @@ import {HyperFormula} from '../../src'
 import {ErrorType} from '../../src/Cell'
 import {ErrorMessage} from '../../src/error-message'
 import {plPL} from '../../src/i18n/languages'
-import {adr, detailedError, expectArrayWithSameContent} from '../testUtils'
 import {StatType} from '../../src/statistics'
+import {adr, detailedError, expectArrayWithSameContent} from '../testUtils'
 
 describe('Function SUMIF - argument validations and combinations', () => {
   it('requires 2 or 3 arguments', () => {

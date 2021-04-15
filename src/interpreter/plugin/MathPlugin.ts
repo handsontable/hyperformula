@@ -1,12 +1,13 @@
 /**
  * @license
- * Copyright (c) 2020 Handsoncode. All rights reserved.
+ * Copyright (c) 2021 Handsoncode. All rights reserved.
  */
 
-import {CellError, ErrorType, InternalScalarValue, SimpleCellAddress} from '../../Cell'
+import {CellError, ErrorType, SimpleCellAddress} from '../../Cell'
 import {ErrorMessage} from '../../error-message'
 import {ProcedureAst} from '../../parser'
-import {InterpreterValue, SimpleRangeValue} from '../InterpreterValue'
+import {InternalScalarValue, RawInterpreterValue} from '../InterpreterValue'
+import {SimpleRangeValue} from '../SimpleRangeValue'
 import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
 
 export class MathPlugin extends FunctionPlugin {
@@ -167,7 +168,7 @@ export class MathPlugin extends FunctionPlugin {
 
   public gcd(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.runFunction(ast.args, formulaAddress, this.metadata('GCD'),
-      (...args: InterpreterValue[]) => {
+      (...args: RawInterpreterValue[]) => {
         const processedArgs = this.interpreter.arithmeticHelper.coerceNumbersCoerceRangesDropNulls(args)
         if(processedArgs instanceof CellError) {
           return processedArgs
@@ -190,7 +191,7 @@ export class MathPlugin extends FunctionPlugin {
 
   public lcm(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.runFunction(ast.args, formulaAddress, this.metadata('LCM'),
-      (...args: InterpreterValue[]) => {
+      (...args: RawInterpreterValue[]) => {
         const processedArgs = this.interpreter.arithmeticHelper.coerceNumbersCoerceRangesDropNulls(args)
         if(processedArgs instanceof CellError) {
           return processedArgs
@@ -264,7 +265,8 @@ export class MathPlugin extends FunctionPlugin {
           return coefs
         }
         let ret = 0
-        for(const coef of coefs.reverse()) {
+        coefs.reverse()
+        for(const coef of coefs) {
           ret *= Math.pow(x, m)
           ret += coef
         }
@@ -307,7 +309,7 @@ export class MathPlugin extends FunctionPlugin {
             return valY
           }
           if(typeof valX === 'number' && typeof valY === 'number') {
-            ret += valX*valX - valY*valY
+            ret += Math.pow(valX, 2) - Math.pow(valY, 2)
           }
         }
         return ret
@@ -335,7 +337,7 @@ export class MathPlugin extends FunctionPlugin {
             return valY
           }
           if(typeof valX === 'number' && typeof valY === 'number') {
-            ret += valX*valX + valY*valY
+            ret += Math.pow(valX, 2) + Math.pow(valY, 2)
           }
         }
         return ret
@@ -363,7 +365,7 @@ export class MathPlugin extends FunctionPlugin {
             return valY
           }
           if(typeof valX === 'number' && typeof valY === 'number') {
-            ret += (valX-valY)*(valX-valY)
+            ret += Math.pow(valX-valY, 2)
           }
         }
         return ret

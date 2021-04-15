@@ -6,6 +6,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.5.0] - 2021-04-15
+
+### Changed
+- **Breaking change**: A change to the type of value returned via serialization methods. (#617)
+- An input value should be preserved through serialization more precisely. (#617)
+- GPU.js constructor needs to be provided directly to engine configuration. (#355)
+- A deprecated config option vlookupThreshold has been removed. (#620)
+
+### Added
+- Added support for row and column reordering. (#343)
+- Added type inferrence for subtypes for number. (#313)
+- Added parsing of number literals containing '%' or currency symbol (default '$'). (#590)
+- Added ability to fallback to plain CPU implementation for functions that uses GPU.js (#355)
+
+### Fixed
+- Fixed minor issue. (#631)
+- Fixed a bug with serialization of some addresses after CRUDs. (#587)
+- Fixed a bug with MEDIAN function implementation. (#601)
+- Fixed a bug with copy-paste operation that could cause out of scope references (#591)
+- Fixed a bug with date parsing. (#614)
+- Fixed a bug where accent/case sensitivity was ignored for LOOKUPs. (#621)
+- Fixed a bug with handling of no time format/no date format scenarios. (#616)
+
 ## [0.4.0] - 2020-12-17
 
 ### Changed

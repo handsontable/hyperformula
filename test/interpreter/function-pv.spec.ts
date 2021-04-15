@@ -1,4 +1,5 @@
 import {ErrorType, HyperFormula} from '../../src'
+import {CellValueDetailedType} from '../../src/Cell'
 import {ErrorMessage} from '../../src/error-message'
 import {adr, detailedError} from '../testUtils'
 
@@ -19,6 +20,7 @@ describe('Function PV', () => {
     ])
 
     expect(engine.getCellValue(adr('A1'))).toBeCloseTo(-1891.39256, 6)
+    expect(engine.getCellValueDetailedType(adr('A1'))).toBe(CellValueDetailedType.NUMBER_CURRENCY)
     expect(engine.getCellValue(adr('B1'))).toBeCloseTo(-2140.081155, 6)
     expect(engine.getCellValue(adr('C1'))).toBeCloseTo(-2177.909007, 6)
     expect(engine.getCellValue(adr('A2'))).toBeCloseTo(-1.01010101010099e+50, 6)

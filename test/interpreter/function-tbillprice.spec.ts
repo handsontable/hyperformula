@@ -1,4 +1,5 @@
 import {ErrorType, HyperFormula} from '../../src'
+import {CellValueDetailedType} from '../../src/Cell'
 import {ErrorMessage} from '../../src/error-message'
 import {adr, detailedError} from '../testUtils'
 
@@ -23,6 +24,7 @@ describe('Function TBILLPRICE', () => {
     ])
 
     expect(engine.getCellValue(adr('A1'))).toBeCloseTo(97.2222222222222, 6)
+    expect(engine.getCellValueDetailedType(adr('A1'))).toBe(CellValueDetailedType.NUMBER_CURRENCY)
     expect(engine.getCellValue(adr('A2'))).toEqual(90)
     expect(engine.getCellValue(adr('B2'))).toBeCloseTo(94.9166666666667, 6)
     //inconsistency with product #1 (returns #NUM!)

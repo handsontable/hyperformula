@@ -1,9 +1,10 @@
 /**
  * @license
- * Copyright (c) 2020 Handsoncode. All rights reserved.
+ * Copyright (c) 2021 Handsoncode. All rights reserved.
  */
 
-import {EmptyValue, EmptyValueType, SimpleCellAddress} from '../Cell'
+import {SimpleCellAddress} from '../Cell'
+import {EmptyValue, EmptyValueType} from '../interpreter/InterpreterValue'
 
 /**
  * Represents singleton vertex bound to all empty cells

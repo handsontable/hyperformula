@@ -1,9 +1,12 @@
 /**
  * @license
- * Copyright (c) 2020 Handsoncode. All rights reserved.
+ * Copyright (c) 2021 Handsoncode. All rights reserved.
  */
 
 import {ErrorType, SimpleCellAddress} from '../Cell'
+import {NoSheetWithIdError} from '../index'
+import {NamedExpressions} from '../NamedExpressions'
+import {SheetIndexMappingFn, sheetIndexToString} from './addressRepresentationConverters'
 import {
   Ast,
   AstNodeType,
@@ -16,9 +19,6 @@ import {
 import {binaryOpTokenMap} from './binaryOpTokenMap'
 import {ILexerConfig} from './LexerConfig'
 import {ParserConfig} from './ParserConfig'
-import {NamedExpressions} from '../NamedExpressions'
-import {SheetIndexMappingFn, sheetIndexToString} from './addressRepresentationConverters'
-import {NoSheetWithIdError} from '../index'
 
 export class Unparser {
   constructor(
@@ -60,10 +60,11 @@ export class Unparser {
       case AstNodeType.CELL_REFERENCE: {
         let image
         if (ast.reference.sheet !== null) {
-          image = this.unparseSheetName(ast.reference.sheet) + '!' + ast.reference.unparse(address)
+          image = this.unparseSheetName(ast.reference.sheet) + '!'
         } else {
-          image = ast.reference.unparse(address)
+          image = ''
         }
+        image += ast.reference.unparse(address) ?? this.config.translationPackage.getErrorTranslation(ErrorType.REF)
         return imageWithWhitespace(image, ast.leadingWhitespace)
       }
       case AstNodeType.COLUMN_RANGE:
@@ -124,7 +125,12 @@ export class Unparser {
       endSheet = this.unparseSheetName(ast.end.sheet) + '!'
     }
 
-    return `${startSheeet}${ast.start.unparse(baseAddress)}:${endSheet}${ast.end.unparse(baseAddress)}`
+    const unparsedStart = ast.start.unparse(baseAddress)
+    const unparsedEnd = ast.end.unparse(baseAddress)
+    if(unparsedStart === undefined || unparsedEnd === undefined) {
+      return this.config.translationPackage.getErrorTranslation(ErrorType.REF)
+    }
+    return `${startSheeet}${unparsedStart}:${endSheet}${unparsedEnd}`
   }
 }
 

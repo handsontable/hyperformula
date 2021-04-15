@@ -1,11 +1,11 @@
 import {ExportedCellChange, HyperFormula, InvalidAddressError, NoSheetWithIdError} from '../../src'
 import {ErrorType, simpleCellAddress} from '../../src/Cell'
-import {ColumnIndex} from '../../src/Lookup/ColumnIndex'
+import {Config} from '../../src/Config'
 import {EmptyCellVertex, MatrixVertex} from '../../src/DependencyGraph'
 import {ErrorMessage} from '../../src/error-message'
-import {adr, colEnd, colStart, detailedError, expectArrayWithSameContent, rowEnd, rowStart} from '../testUtils'
-import {Config} from '../../src/Config'
 import {SheetSizeLimitExceededError} from '../../src/errors'
+import {ColumnIndex} from '../../src/Lookup/ColumnIndex'
+import {adr, colEnd, colStart, detailedError, expectArrayWithSameContent, rowEnd, rowStart} from '../testUtils'
 
 describe('Changing cell content - checking if its possible', () => {
   it('address should have valid coordinates', () => {
@@ -660,7 +660,7 @@ describe('change multiple cells contents', () => {
     expect(engine.getCellValue(adr('A1'))).toBe(1)
   })
 
-  it('returns changes of mutliple values', () => {
+  it('returns changes of multiple values', () => {
     const sheet = [
       ['1', '2'],
       ['3', '4'],
@@ -674,7 +674,7 @@ describe('change multiple cells contents', () => {
     expectArrayWithSameContent(changes.map((change) => change.newValue), [7, 8, 9, 10])
   })
 
-  it('returns changes of mutliple values dependent formulas', () => {
+  it('returns changes of multiple values dependent formulas', () => {
     const sheet = [
       ['1', '2'],
       ['3', '4'],

@@ -1,14 +1,14 @@
 /**
  * @license
- * Copyright (c) 2020 Handsoncode. All rights reserved.
+ * Copyright (c) 2021 Handsoncode. All rights reserved.
  */
 
 import {SimpleCellAddress} from '../../Cell'
+import {LicenseKeyValidityState} from '../../helpers/licenseKeyValidator'
+import {HyperFormula} from '../../HyperFormula'
 import {ProcedureAst} from '../../parser'
 import {InterpreterValue} from '../InterpreterValue'
 import {FunctionPlugin} from './FunctionPlugin'
-import {HyperFormula} from '../../HyperFormula'
-import {LicenseKeyValidityState} from '../../helpers/licenseKeyValidator'
 
 const LICENSE_STATUS_MAP = new Map([
   ['agpl-v3', 1],

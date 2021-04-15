@@ -1,5 +1,5 @@
-import { HyperFormula } from '../../src'
-import { LicenseKeyValidityState } from '../../src/helpers/licenseKeyValidator'
+import {HyperFormula} from '../../src'
+import {LicenseKeyValidityState} from '../../src/helpers/licenseKeyValidator'
 
 describe('license key', () => {
   describe('valid key', () => {

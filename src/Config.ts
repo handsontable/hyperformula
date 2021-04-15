@@ -1,25 +1,27 @@
 /**
  * @license
- * Copyright (c) 2020 Handsoncode. All rights reserved.
+ * Copyright (c) 2021 Handsoncode. All rights reserved.
  */
 
 import {TranslatableErrorType} from './Cell'
 import {defaultParseToDateTime} from './DateTimeDefault'
 import {DateTime, instanceOfSimpleDate, SimpleDate, SimpleDateTime, SimpleTime} from './DateTimeHelper'
-import {
-  ConfigValueTooSmallError,
-  ConfigValueTooBigError,
-  ExpectedValueOfTypeError,
-  ExpectedOneOfValuesError
-} from './errors'
 import {AlwaysDense, ChooseAddressMapping} from './DependencyGraph/AddressMapping/ChooseAddressMappingPolicy'
+import {
+  ConfigValueEmpty,
+  ConfigValueTooBigError,
+  ConfigValueTooSmallError,
+  ExpectedOneOfValuesError,
+  ExpectedValueOfTypeError
+} from './errors'
 import {defaultStringifyDateTime, defaultStringifyDuration} from './format/format'
 import {HyperFormula} from './HyperFormula'
 import {TranslationPackage} from './i18n'
 import {Maybe} from './Maybe'
 import {ParserConfig} from './parser/ParserConfig'
 import {checkLicenseKeyValidity, LicenseKeyValidityState} from './helpers/licenseKeyValidator'
-import {FunctionPluginDefinition} from './interpreter/plugin/FunctionPlugin'
+import {FunctionPluginDefinition} from './interpreter'
+import type { GPU } from 'gpu.js'
 
 type GPUMode = 'gpu' | 'cpu' | 'dev'
 
@@ -64,6 +66,14 @@ export interface ConfigParams {
    * @category Engine
    */
   chooseAddressMappingPolicy: ChooseAddressMapping,
+  /**
+   * Symbols used to denote currency numbers.
+   *
+   * @default ['$']
+   *
+   * @category Number
+   */
+  currencySymbol: string[],
   /**
    * A list of date formats that are supported by date parsing functions.
    *
@@ -145,6 +155,14 @@ export interface ConfigParams {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   functionPlugins: any[],
   /**
+   * A GPU.js constructor used by matrix functions. When not provided, plain cpu implementation will be used.
+   *
+   * @default undefined
+   *
+   * @category Engine
+   */
+  gpujs?: typeof GPU,
+  /**
    * Allows to set GPU or CPU for use in matrix calculations.
    * When set to 'gpu' it will try to use GPU for matrix calculations. Setting it to 'cpu' will force CPU usage.
    * Other values should be used for debugging purposes only. More info can be found in GPU.js documentation.
@@ -205,8 +223,6 @@ export interface ConfigParams {
    * @default false
    *
    * @category Engine
-   *
-   * @since 0.2.0
    */
   evaluateNullToZero: boolean,
   /**
@@ -225,7 +241,7 @@ export interface ConfigParams {
    *
    * @category Date and Time
    */
-  parseDateTime: (dateTimeString: string, dateFormat: string, timeFormat: string) => Maybe<DateTime>,
+  parseDateTime: (dateTimeString: string, dateFormat: Maybe<string>, timeFormat: Maybe<string>) => Maybe<DateTime>,
   /**
    * Controls how far two numerical values need to be from each other to be treated as non-equal.
    * `a` and `b` are equal if they are of the same sign and:
@@ -293,18 +309,6 @@ export interface ConfigParams {
    * @category Engine
    */
   useStats: boolean,
-  /**
-   * Determines minimum number of elements a range must have in order to use binary search.
-   * Shorter ranges will be searched naively.
-   * Used by VLOOKUP, HLOOKUP and MATCH functions.
-   *
-   * @default 20
-   *
-   * @category Engine
-   *
-   * @deprecated Use {@link binarySearchThreshold} instead.
-   */
-  vlookupThreshold: number,
   /**
    * Determines minimum number of elements a range must have in order to use binary search.
    * Shorter ranges will be searched naively.
@@ -389,6 +393,7 @@ export class Config implements ConfigParams, ParserConfig {
     language: 'enGB',
     licenseKey: '',
     functionPlugins: [],
+    gpujs: undefined,
     gpuMode: 'gpu',
     leapYear1900: false,
     smartRounding: true,
@@ -404,7 +409,6 @@ export class Config implements ConfigParams, ParserConfig {
     precisionRounding: 14,
     useColumnIndex: false,
     useStats: false,
-    vlookupThreshold: 20,
     binarySearchThreshold: 20,
     nullDate: {year: 1899, month: 12, day: 30},
     undoLimit: 20,
@@ -412,7 +416,8 @@ export class Config implements ConfigParams, ParserConfig {
     useWildcards: true,
     matchWholeCell: true,
     maxRows: 40_000,
-    maxColumns: 18_278
+    maxColumns: 18_278,
+    currencySymbol: ['$'],
   }
 
   /** @inheritDoc */
@@ -441,6 +446,8 @@ export class Config implements ConfigParams, ParserConfig {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   public readonly functionPlugins: FunctionPluginDefinition[]
   /** @inheritDoc */
+  public readonly gpujs?: typeof GPU
+  /** @inheritDoc */
   public readonly gpuMode: GPUMode
   /** @inheritDoc */
   public readonly leapYear1900: boolean
@@ -457,7 +464,7 @@ export class Config implements ConfigParams, ParserConfig {
   /** @inheritDoc */
   public readonly nullYear: number
   /** @inheritDoc */
-  public readonly parseDateTime: (dateString: string, dateFormats: string) => Maybe<SimpleDateTime>
+  public readonly parseDateTime: (dateString: string, dateFormat: Maybe<string>, timeFormat: Maybe<string>) => Maybe<SimpleDateTime>
   /** @inheritDoc */
   public readonly stringifyDateTime: (date: SimpleDateTime, formatArg: string) => Maybe<string>
   /** @inheritDoc */
@@ -473,11 +480,11 @@ export class Config implements ConfigParams, ParserConfig {
   /** @inheritDoc */
   public readonly useStats: boolean
   /** @inheritDoc */
-  public readonly vlookupThreshold: number
-  /** @inheritDoc */
   public readonly binarySearchThreshold: number
   /** @inheritDoc */
   public readonly nullDate: SimpleDate
+  /** @inheritDoc */
+  public readonly currencySymbol: string[]
   /** @inheritDoc */
   public readonly undoLimit: number
   /**
@@ -529,6 +536,7 @@ export class Config implements ConfigParams, ParserConfig {
       language,
       licenseKey,
       functionPlugins,
+      gpujs,
       gpuMode,
       ignorePunctuation,
       leapYear1900,
@@ -544,7 +552,6 @@ export class Config implements ConfigParams, ParserConfig {
       precisionEpsilon,
       precisionRounding,
       useColumnIndex,
-      vlookupThreshold,
       binarySearchThreshold,
       nullDate,
       useStats,
@@ -553,7 +560,8 @@ export class Config implements ConfigParams, ParserConfig {
       useWildcards,
       matchWholeCell,
       maxRows,
-      maxColumns
+      maxColumns,
+      currencySymbol,
     }: Partial<ConfigParams> = {},
   ) {
     this.accentSensitive = this.valueFromParam(accentSensitive, 'boolean', 'accentSensitive')
@@ -571,6 +579,7 @@ export class Config implements ConfigParams, ParserConfig {
     this.thousandSeparator = this.valueFromParam(thousandSeparator, ['', ',', ' ', '.'], 'thousandSeparator')
     this.localeLang = this.valueFromParam(localeLang, 'string', 'localeLang')
     this.functionPlugins = functionPlugins ?? Config.defaultConfig.functionPlugins
+    this.gpujs = gpujs ?? Config.defaultConfig.gpujs
     this.gpuMode = this.valueFromParam(gpuMode, PossibleGPUModeString, 'gpuMode')
     this.smartRounding = this.valueFromParam(smartRounding, 'boolean', 'smartRounding')
     this.matrixDetection = this.valueFromParam(matrixDetection, 'boolean', 'matrixDetection')
@@ -586,9 +595,7 @@ export class Config implements ConfigParams, ParserConfig {
     this.validateNumberToBeAtLeast(this.precisionEpsilon, 'precisionEpsilon', 0)
     this.useColumnIndex = this.valueFromParam(useColumnIndex, 'boolean', 'useColumnIndex')
     this.useStats = this.valueFromParam(useStats, 'boolean', 'useStats')
-    this.vlookupThreshold = this.valueFromParam(vlookupThreshold, 'number', 'vlookupThreshold')
-    this.validateNumberToBeAtLeast(this.vlookupThreshold, 'vlookupThreshold', 1)
-    this.binarySearchThreshold = this.valueFromParam(binarySearchThreshold ?? vlookupThreshold, 'number', 'vlookupThreshold')
+    this.binarySearchThreshold = this.valueFromParam(binarySearchThreshold, 'number', 'binarySearchThreshold')
     this.validateNumberToBeAtLeast(this.binarySearchThreshold, 'binarySearchThreshold', 1)
     this.parseDateTime = this.valueFromParam(parseDateTime, 'function', 'parseDateTime')
     this.stringifyDateTime = this.valueFromParam(stringifyDateTime, 'function', 'stringifyDateTime')
@@ -605,9 +612,16 @@ export class Config implements ConfigParams, ParserConfig {
     this.maxRows = this.valueFromParam(maxRows, 'number', 'maxRows')
     this.validateNumberToBeAtLeast(this.maxRows, 'maxRows', 1)
     this.maxColumns = this.valueFromParam(maxColumns, 'number', 'maxColumns')
+    this.currencySymbol = this.valueFromParamCheck(currencySymbol, Array.isArray, 'array',  'currencySymbol')
+    this.currencySymbol.forEach((val) => {
+      if(typeof val !== 'string') {
+        throw new ExpectedValueOfTypeError('string[]', 'currencySymbol')
+      }
+      if(val === '') {
+        throw new ConfigValueEmpty('currencySymbol')
+      }
+    })
     this.validateNumberToBeAtLeast(this.maxColumns, 'maxColumns', 1)
-
-    this.warnDeprecatedIfUsed(vlookupThreshold, 'vlookupThreshold', 'v.0.3.0', 'binarySearchThreshold')
 
     this.checkIfParametersNotInConflict(
       {value: this.decimalSeparator, name: 'decimalSeparator'},
@@ -679,7 +693,8 @@ export class Config implements ConfigParams, ParserConfig {
     }
 
     if (duplicates.length > 0) {
-      const paramNames = duplicates.map(entry => `[${entry.sort()}]`).join('; ')
+      duplicates.forEach(entry => entry.sort())
+      const paramNames = duplicates.map(entry => `[${entry}]`).join('; ')
       throw new Error(`Config initialization failed. Parameters in conflict: ${paramNames}`)
     }
   }

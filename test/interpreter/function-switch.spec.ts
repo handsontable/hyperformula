@@ -1,5 +1,5 @@
 import {HyperFormula} from '../../src'
-import {ErrorType} from '../../src/Cell'
+import {CellValueDetailedType, ErrorType} from '../../src/Cell'
 import {ErrorMessage} from '../../src/error-message'
 import {adr, detailedError} from '../testUtils'
 
@@ -60,5 +60,9 @@ describe('Interpreter - SWITCH function', () => {
       ['=SWITCH(1,2,A2:A3,4,5)']
     ])
     expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.WrongType))
+  })
+  it('passes subtypes', () => {
+    const engine = HyperFormula.buildFromArray([['=SWITCH(1,1,B1)', '1%']])
+    expect(engine.getCellValueDetailedType(adr('A1'))).toBe(CellValueDetailedType.NUMBER_PERCENT)
   })
 })

@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright (c) 2020 Handsoncode. All rights reserved.
+ * Copyright (c) 2021 Handsoncode. All rights reserved.
  */
 
 import {simpleCellAddress, SimpleCellAddress} from './Cell'
@@ -42,6 +42,24 @@ export class MoveCellsUndoEntry {
 export class AddRowsUndoEntry {
   constructor(
     public readonly command: AddRowsCommand,
+  ) {
+  }
+}
+
+export class SetRowOrderUndoEntry {
+  constructor(
+    public readonly sheetId: number,
+    public readonly rowMapping: [number, number][],
+    public readonly oldContent: [SimpleCellAddress, ClipboardCell][]
+  ) {
+  }
+}
+
+export class SetColumnOrderUndoEntry {
+  constructor(
+    public readonly sheetId: number,
+    public readonly columnMapping: [number, number][],
+    public readonly oldContent: [SimpleCellAddress, ClipboardCell][]
   ) {
   }
 }
@@ -220,6 +238,8 @@ type UndoStackEntry
   | AddNamedExpressionUndoEntry
   | RemoveNamedExpressionUndoEntry
   | ChangeNamedExpressionUndoEntry
+  | SetRowOrderUndoEntry
+  | SetColumnOrderUndoEntry
 
 export class UndoRedo {
   private undoStack: UndoStackEntry[] = []
@@ -333,6 +353,10 @@ export class UndoRedo {
       this.undoRemoveNamedExpression(operation)
     } else if (operation instanceof ChangeNamedExpressionUndoEntry) {
       this.undoChangeNamedExpression(operation)
+    } else if (operation instanceof SetRowOrderUndoEntry) {
+      this.undoSetRowOrder(operation)
+    } else if (operation instanceof SetColumnOrderUndoEntry) {
+      this.undoSetColumnOrder(operation)
     } else {
       throw 'Unknown element'
     }
@@ -399,9 +423,7 @@ export class UndoRedo {
   }
 
   private undoPaste(operation: PasteUndoEntry) {
-    for (const [address, clipboardCell] of operation.oldContent) {
-      this.operations.restoreCell(address, clipboardCell)
-    }
+    this.restoreOperationOldContent(operation.oldContent)
     for (const namedExpression of operation.addedGlobalNamedExpressions) {
       this.operations.removeNamedExpression(namedExpression)
     }
@@ -423,9 +445,7 @@ export class UndoRedo {
     this.operations.forceApplyPostponedTransformations()
     this.operations.moveCells(operation.destinationLeftCorner, operation.width, operation.height, operation.sourceLeftCorner)
 
-    for (const [address, clipboardCell] of operation.overwrittenCellsData) {
-      this.operations.restoreCell(address, clipboardCell)
-    }
+    this.restoreOperationOldContent(operation.overwrittenCellsData)
 
     this.restoreOldDataFromVersion(operation.version - 1)
     for (const namedExpression of operation.addedGlobalNamedExpressions) {
@@ -495,6 +515,20 @@ export class UndoRedo {
     this.operations.restoreNamedExpression(operation.namedExpression, operation.oldContent, operation.scope)
   }
 
+  private undoSetRowOrder(operation: SetRowOrderUndoEntry) {
+    this.restoreOperationOldContent(operation.oldContent)
+  }
+
+  private undoSetColumnOrder(operation: SetColumnOrderUndoEntry) {
+    this.restoreOperationOldContent(operation.oldContent)
+  }
+
+  private restoreOperationOldContent(oldContent: [SimpleCellAddress, ClipboardCell][]) {
+    for (const [address, clipboardCell] of oldContent) {
+      this.operations.restoreCell(address, clipboardCell)
+    }
+  }
+
   public redo() {
     const operation = this.redoStack.pop()
 
@@ -544,6 +578,10 @@ export class UndoRedo {
       this.redoRemoveNamedExpression(operation)
     } else if (operation instanceof ChangeNamedExpressionUndoEntry) {
       this.redoChangeNamedExpression(operation)
+    } else if (operation instanceof SetRowOrderUndoEntry) {
+      this.redoSetRowOrder(operation)
+    } else if (operation instanceof SetColumnOrderUndoEntry) {
+      this.redoSetColumnOrder(operation)
     } else {
       throw 'Unknown element'
     }
@@ -632,6 +670,14 @@ export class UndoRedo {
 
   private redoChangeNamedExpression(operation: ChangeNamedExpressionUndoEntry) {
     this.operations.changeNamedExpressionExpression(operation.namedExpression.displayName, operation.newContent, operation.scope, operation.options)
+  }
+
+  private redoSetRowOrder(operation: SetRowOrderUndoEntry) {
+    this.operations.setRowOrder(operation.sheetId, operation.rowMapping)
+  }
+
+  private redoSetColumnOrder(operation: SetColumnOrderUndoEntry) {
+    this.operations.setColumnOrder(operation.sheetId, operation.columnMapping)
   }
 
   private restoreOldDataFromVersion(version: number) {

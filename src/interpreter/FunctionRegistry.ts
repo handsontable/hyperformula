@@ -1,19 +1,15 @@
 /**
  * @license
- * Copyright (c) 2020 Handsoncode. All rights reserved.
+ * Copyright (c) 2021 Handsoncode. All rights reserved.
  */
 
-import {FunctionMetadata, FunctionPlugin, FunctionPluginDefinition} from './plugin/FunctionPlugin'
-import {Interpreter} from './Interpreter'
-import {Maybe} from '../Maybe'
 import {Config} from '../Config'
-import {
-  AliasAlreadyExisting,
-  FunctionPluginValidationError,
-  ProtectedFunctionError
-} from '../errors'
-import {TranslationSet} from '../i18n'
+import {AliasAlreadyExisting, FunctionPluginValidationError, ProtectedFunctionError} from '../errors'
 import {HyperFormula} from '../HyperFormula'
+import {TranslationSet} from '../i18n'
+import {Maybe} from '../Maybe'
+import {Interpreter} from './Interpreter'
+import {FunctionMetadata, FunctionPlugin, FunctionPluginDefinition} from './plugin/FunctionPlugin'
 import {VersionPlugin} from './plugin/VersionPlugin'
 
 export type FunctionTranslationsPackage = Record<string, TranslationSet>
@@ -185,13 +181,13 @@ export class FunctionRegistry {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const instances: any[] = []
     for (const [functionId, plugin] of this.instancePlugins.entries()) {
-      let pluginInstance = instances.find(pluginInstance => pluginInstance instanceof plugin)
-      if (pluginInstance === undefined) {
-        pluginInstance = new plugin(interpreter)
-        instances.push(pluginInstance)
+      let foundPluginInstance = instances.find(pluginInstance => pluginInstance instanceof plugin)
+      if (foundPluginInstance === undefined) {
+        foundPluginInstance = new plugin(interpreter)
+        instances.push(foundPluginInstance)
       }
       const methodName = validateAndReturnMetadataFromName(functionId, plugin).method
-      this.functions.set(functionId, [methodName, pluginInstance])
+      this.functions.set(functionId, [methodName, foundPluginInstance])
     }
   }
 

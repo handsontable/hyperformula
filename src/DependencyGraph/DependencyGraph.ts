@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright (c) 2020 Handsoncode. All rights reserved.
+ * Copyright (c) 2021 Handsoncode. All rights reserved.
  */
 
 import assert from 'assert'
@@ -8,15 +8,15 @@ import {AbsoluteCellRange} from '../AbsoluteCellRange'
 import {absolutizeDependencies} from '../absolutizeDependencies'
 import {
   CellError,
-  EmptyValue,
   ErrorType,
-  InternalScalarValue,
   simpleCellAddress,
   SimpleCellAddress
 } from '../Cell'
+import {RawCellContent} from '../CellContentParser'
 import {CellDependency} from '../CellDependency'
 import {Config} from '../Config'
 import {ErrorMessage} from '../error-message'
+import {SimpleRangeValue} from '../interpreter/SimpleRangeValue'
 import {LazilyTransformingAstService} from '../LazilyTransformingAstService'
 import {Maybe} from '../Maybe'
 import {Ast, collectDependencies, NamedExpressionDependency} from '../parser'
@@ -39,9 +39,15 @@ import {Graph, TopSortResult} from './Graph'
 import {MatrixMapping} from './MatrixMapping'
 import {RangeMapping} from './RangeMapping'
 import {SheetMapping} from './SheetMapping'
-import {ValueCellVertexValue} from './ValueCellVertex'
+import {RawAndParsedValue, ValueCellVertexValue} from './ValueCellVertex'
 import {FunctionRegistry} from '../interpreter/FunctionRegistry'
-import {InterpreterValue, SimpleRangeValue} from '../interpreter/InterpreterValue'
+import {
+  EmptyValue,
+  getRawValue,
+  InternalScalarValue,
+  InterpreterValue,
+  RawScalarValue, ExtendedNumber
+} from '../interpreter/InterpreterValue'
 
 export class DependencyGraph {
   /*
@@ -107,18 +113,18 @@ export class DependencyGraph {
     this.correctInfiniteRangesDependency(address)
   }
 
-  public setValueToCell(address: SimpleCellAddress, newValue: ValueCellVertexValue) {
+  public setValueToCell(address: SimpleCellAddress, value: RawAndParsedValue) {
     const vertex = this.addressMapping.getCell(address)
     this.ensureThatVertexIsNonMatrixCellVertex(vertex)
 
     if (vertex instanceof ValueCellVertex) {
-      const oldValue = vertex.getCellValue()
-      if (oldValue !== newValue) {
-        vertex.setCellValue(newValue)
+      const oldValue = vertex.getValues()
+      if (oldValue.rawValue !== value.rawValue) {
+        vertex.setValues(value)
         this.graph.markNodeAsSpecialRecentlyChanged(vertex)
       }
     } else {
-      const newVertex = new ValueCellVertex(newValue)
+      const newVertex = new ValueCellVertex(value.parsedValue, value.rawValue)
       this.exchangeOrAddGraphNode(vertex, newVertex)
       this.addressMapping.setCell(address, newVertex)
       this.graph.markNodeAsSpecialRecentlyChanged(newVertex)
@@ -500,8 +506,8 @@ export class DependencyGraph {
     const adjacentNodes = this.graph.adjacentNodes(matrixVertex)
 
     for (const address of matrixRange.addresses(this)) {
-      const value = this.getCellValue(address) as number // We wouldn't need that typecast if we would take values from Matrix
-      const valueVertex = new ValueCellVertex(value)
+      // We wouldn't need that typecast if we would take values from Matrix
+      const valueVertex = new ValueCellVertex(this.getCellValue(address) as ExtendedNumber, this.getRawValue(address))
       this.addVertex(address, valueVertex)
     }
 
@@ -600,6 +606,10 @@ export class DependencyGraph {
     return this.addressMapping.getCellValue(address)
   }
 
+  public getRawValue(address: SimpleCellAddress): RawCellContent {
+    return this.addressMapping.getRawValue(address)
+  }
+
   public getScalarValue(address: SimpleCellAddress): InternalScalarValue {
     const value = this.addressMapping.getCellValue(address)
     if (value instanceof SimpleRangeValue) {
@@ -685,11 +695,11 @@ export class DependencyGraph {
     }
   }
 
-  public* valuesFromRange(range: AbsoluteCellRange): IterableIterator<[InternalScalarValue, SimpleCellAddress]> {
+  public* rawValuesFromRange(range: AbsoluteCellRange): IterableIterator<[RawScalarValue, SimpleCellAddress]> {
     for (const address of range.addresses(this)) {
       const value = this.getScalarValue(address)
       if (value !== EmptyValue) {
-        yield [value, address]
+        yield [getRawValue(value), address]
       }
     }
   }
@@ -742,7 +752,7 @@ export class DependencyGraph {
 
   public dependencyQueryVertices: (vertex: Vertex) => Maybe<Vertex[]> = (vertex: Vertex) => {
     if (vertex instanceof RangeVertex) {
-      return this.rangeDependencyQuery(vertex).map(([_, vertex]) => vertex)
+      return this.rangeDependencyQuery(vertex).map(([_, v]) => v)
     } else {
       const dependenciesResult = this.formulaDependencyQuery(vertex)
       if (dependenciesResult !== undefined) {
@@ -949,8 +959,8 @@ export class DependencyGraph {
     })
   }
 
-  private removeVertexAndCleanupDependencies(vertex: Vertex) {
-    const dependencies = new Set(this.graph.removeNode(vertex))
+  private removeVertexAndCleanupDependencies(inputVertex: Vertex) {
+    const dependencies = new Set(this.graph.removeNode(inputVertex))
     while (dependencies.size > 0) {
       const vertex: Vertex = dependencies.values().next().value
       dependencies.delete(vertex)
@@ -967,8 +977,8 @@ export class DependencyGraph {
     }
   }
 
-  public getAdjacentNodesAddresses(vertex: Vertex): (AbsoluteCellRange | SimpleCellAddress)[] {
-    const deps = this.graph.adjacentNodes(vertex)
+  public getAdjacentNodesAddresses(inputVertex: Vertex): (AbsoluteCellRange | SimpleCellAddress)[] {
+    const deps = this.graph.adjacentNodes(inputVertex)
     const ret: (AbsoluteCellRange | SimpleCellAddress)[] = []
     deps.forEach((vertex: Vertex) => {
       const castVertex = vertex as RangeVertex | FormulaCellVertex | MatrixVertex

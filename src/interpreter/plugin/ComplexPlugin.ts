@@ -1,14 +1,14 @@
 /**
  * @license
- * Copyright (c) 2020 Handsoncode. All rights reserved.
+ * Copyright (c) 2021 Handsoncode. All rights reserved.
  */
 
-import {CellError, ErrorType, InternalScalarValue, SimpleCellAddress} from '../../Cell'
+import {CellError, ErrorType, SimpleCellAddress} from '../../Cell'
 import {ErrorMessage} from '../../error-message'
 import {ProcedureAst} from '../../parser'
 import {coerceComplexToString, complex} from '../ArithmeticHelper'
+import {InternalScalarValue, RawInterpreterValue} from '../InterpreterValue'
 import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
-import {InterpreterValue} from '../InterpreterValue'
 
 export class ComplexPlugin extends  FunctionPlugin {
   public static implementedFunctions = {
@@ -289,7 +289,7 @@ export class ComplexPlugin extends  FunctionPlugin {
 
   public improduct(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.runFunction(ast.args, formulaAddress, this.metadata('IMPRODUCT'),
-      (...args: InterpreterValue[]) => {
+      (...args: RawInterpreterValue[]) => {
         const coerced = this.interpreter.arithmeticHelper.coerceComplexExactRanges(args)
         if (coerced instanceof CellError) {
           return coerced
@@ -305,7 +305,7 @@ export class ComplexPlugin extends  FunctionPlugin {
 
   public imsum(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.runFunction(ast.args, formulaAddress, this.metadata('IMSUM'),
-      (...args: InterpreterValue[]) => {
+      (...args: RawInterpreterValue[]) => {
         const coerced = this.interpreter.arithmeticHelper.coerceComplexExactRanges(args)
         if (coerced instanceof CellError) {
           return coerced

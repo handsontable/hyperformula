@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright (c) 2020 Handsoncode. All rights reserved.
+ * Copyright (c) 2021 Handsoncode. All rights reserved.
  */
 
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
@@ -54,6 +54,11 @@ export class MatrixVertex {
     const row = address.row - this.cellAddress.row
 
     return this.matrix.get(col, row)
+  }
+
+  public getMatrixCellRawValue(address: SimpleCellAddress): number | undefined {
+    const val = this.getMatrixCellValue(address)
+    return val instanceof CellError ? undefined : val
   }
 
   public setMatrixCellValue(address: SimpleCellAddress, value: number): void {

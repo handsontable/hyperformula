@@ -1,5 +1,5 @@
 import {HyperFormula} from '../../src'
-import {ErrorType, SimpleCellAddress} from '../../src/Cell'
+import {CellValueDetailedType, ErrorType, SimpleCellAddress} from '../../src/Cell'
 import {Config} from '../../src/Config'
 import {ErrorMessage} from '../../src/error-message'
 import {adr, dateNumberToString, detailedError} from '../testUtils'
@@ -31,6 +31,7 @@ describe('Function EDATE', () => {
     ])
 
     expectToHaveDate(engine, adr('A2'), '10/03/2019')
+    expect(engine.getCellValueDetailedType(adr('A2'))).toBe(CellValueDetailedType.NUMBER_DATE)
   })
 
   it('works for exact end of month', () => {

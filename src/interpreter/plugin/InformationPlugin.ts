@@ -1,13 +1,14 @@
 /**
  * @license
- * Copyright (c) 2020 Handsoncode. All rights reserved.
+ * Copyright (c) 2021 Handsoncode. All rights reserved.
  */
 
-import {CellError, EmptyValue, ErrorType, InternalScalarValue, SimpleCellAddress} from '../../Cell'
+import {CellError, ErrorType, SimpleCellAddress} from '../../Cell'
 import {FormulaCellVertex, MatrixVertex} from '../../DependencyGraph'
 import {ErrorMessage} from '../../error-message'
 import {AstNodeType, ProcedureAst} from '../../parser'
-import {SimpleRangeValue} from '../InterpreterValue'
+import {EmptyValue, InternalScalarValue, isExtendedNumber} from '../InterpreterValue'
+import {SimpleRangeValue} from '../SimpleRangeValue'
 import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
 
 /**
@@ -232,9 +233,7 @@ export class InformationPlugin extends FunctionPlugin {
    * @param formulaAddress
    */
   public isnumber(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('ISNUMBER'), (arg: InternalScalarValue) =>
-      (typeof arg === 'number')
-    )
+    return this.runFunction(ast.args, formulaAddress, this.metadata('ISNUMBER'), isExtendedNumber)
   }
 
   /**
@@ -289,7 +288,7 @@ export class InformationPlugin extends FunctionPlugin {
    */
   public isnontext(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.runFunction(ast.args, formulaAddress, this.metadata('ISNONTEXT'), (arg: InternalScalarValue) =>
-      (typeof arg !== 'string')
+      !(typeof arg === 'string')
     )
   }
 
@@ -320,12 +319,12 @@ export class InformationPlugin extends FunctionPlugin {
     if (ast.args.length !== 1) {
       return new CellError(ErrorType.NA, ErrorMessage.WrongArgNumber)
     }
-    if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
+    if (ast.args.some((astIt) => astIt.type === AstNodeType.EMPTY)) {
       return new CellError(ErrorType.NUM, ErrorMessage.EmptyArg)
     }
     const rangeAst = ast.args[0]
     if (rangeAst.type === AstNodeType.CELL_RANGE) {
-      return (rangeAst.end.col - rangeAst.start.col + 1)
+      return rangeAst.end.col - rangeAst.start.col + 1
     } else {
       return new CellError(ErrorType.VALUE, ErrorMessage.CellRangeExpected)
     }
@@ -358,12 +357,12 @@ export class InformationPlugin extends FunctionPlugin {
     if (ast.args.length !== 1) {
       return new CellError(ErrorType.NA, ErrorMessage.WrongArgNumber)
     }
-    if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
+    if (ast.args.some((astIt) => astIt.type === AstNodeType.EMPTY)) {
       return new CellError(ErrorType.NUM, ErrorMessage.EmptyArg)
     }
     const rangeAst = ast.args[0]
     if (rangeAst.type === AstNodeType.CELL_RANGE) {
-      return (rangeAst.end.row - rangeAst.start.row + 1)
+      return rangeAst.end.row - rangeAst.start.row + 1
     } else {
       return new CellError(ErrorType.VALUE, ErrorMessage.CellRangeExpected)
     }

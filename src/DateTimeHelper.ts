@@ -1,13 +1,14 @@
 /**
  * @license
- * Copyright (c) 2020 Handsoncode. All rights reserved.
+ * Copyright (c) 2021 Handsoncode. All rights reserved.
  */
 
 import {Config} from './Config'
+import {DateNumber, DateTimeNumber, ExtendedNumber, TimeNumber} from './interpreter/InterpreterValue'
 import {Maybe} from './Maybe'
 
 const numDays: number[] = [ 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
-const prefSumDays: number[] = [ 0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 303, 334 ]
+const prefSumDays: number[] = [ 0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334 ]
 
 export interface SimpleDate {
   year: number,
@@ -47,7 +48,7 @@ export class DateTimeHelper {
   private readonly minDateAboluteValue: number
   private readonly maxDateValue: number
   private readonly epochYearZero: number
-  private readonly parseDateTime: (dateString: string, dateFormat: string, timeFormat: string) => Maybe<DateTime>
+  private readonly parseDateTime: (dateString: string, dateFormat?: string, timeFormat?: string) => Maybe<DateTime>
   private readonly leapYear1900: boolean
   constructor(private readonly config: Config) {
     this.minDateAboluteValue = this.dateToNumberFromZero(config.nullDate)
@@ -70,16 +71,27 @@ export class DateTimeHelper {
     return (dayNumber <= this.maxDateValue) && (dayNumber >= 0) ? dayNumber : undefined
   }
 
-  public dateStringToDateNumber(dateTimeString: string): Maybe<number> {
+  public dateStringToDateNumber(dateTimeString: string): Maybe<ExtendedNumber> {
     const dateTime = this.parseDateTimeFromConfigFormats(dateTimeString)
     if(dateTime === undefined) {
       return undefined
     }
-    return (instanceOfSimpleTime(dateTime) ? timeToNumber(dateTime) : 0) +
-      (instanceOfSimpleDate(dateTime) ? this.dateToNumber(dateTime) : 0)
+    if(instanceOfSimpleTime(dateTime)) {
+      if(instanceOfSimpleDate(dateTime)) {
+        return new DateTimeNumber(timeToNumber(dateTime) + this.dateToNumber(dateTime) )
+      } else {
+        return new TimeNumber(timeToNumber(dateTime))
+      }
+    } else {
+      if(instanceOfSimpleDate(dateTime)) {
+        return new DateNumber( this.dateToNumber(dateTime) )
+      } else {
+        return 0
+      }
+    }
   }
 
-  private parseSingleFormat(dateString: string, dateFormat: string, timeFormat: string): Maybe<DateTime> {
+  private parseSingleFormat(dateString: string, dateFormat: Maybe<string>, timeFormat: Maybe<string>): Maybe<DateTime> {
     const dateTime = this.parseDateTime(dateString, dateFormat, timeFormat)
     if(instanceOfSimpleDate(dateTime)) {
       if(dateTime.year >=0 && dateTime.year < 100) {
@@ -100,8 +112,10 @@ export class DateTimeHelper {
     return this.parseDateTimeFromFormats(dateTimeString, this.config.dateFormats, this.config.timeFormats)
   }
   private parseDateTimeFromFormats(dateTimeString: string, dateFormats: string[], timeFormats: string[]): Maybe<DateTime> {
-    for (const dateFormat of dateFormats) {
-      for (const timeFormat of timeFormats) {
+    const dateFormatsIterate = dateFormats.length===0 ? [undefined] : dateFormats
+    const timeFormatsIterate = timeFormats.length===0 ? [undefined] : timeFormats
+    for (const dateFormat of dateFormatsIterate) {
+      for (const timeFormat of timeFormatsIterate) {
         const dateTime = this.parseSingleFormat(dateTimeString, dateFormat, timeFormat)
         if (dateTime !== undefined) {
           return dateTime

@@ -1,12 +1,13 @@
 /**
  * @license
- * Copyright (c) 2020 Handsoncode. All rights reserved.
+ * Copyright (c) 2021 Handsoncode. All rights reserved.
  */
 
-import {CellError, ErrorType, InternalScalarValue, SimpleCellAddress} from '../../Cell'
+import {CellError, ErrorType, SimpleCellAddress} from '../../Cell'
 import {ErrorMessage} from '../../error-message'
 import {ProcedureAst} from '../../parser'
-import {InterpreterValue, SimpleRangeValue} from '../InterpreterValue'
+import {getRawValue, InternalScalarValue, isExtendedNumber, RawInterpreterValue} from '../InterpreterValue'
+import {SimpleRangeValue} from '../SimpleRangeValue'
 import {
   centralF,
   chisquare,
@@ -154,7 +155,7 @@ export class StatisticalAggregationPlugin extends  FunctionPlugin {
 
   public avedev(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.runFunction(ast.args, formulaAddress, this.metadata('AVEDEV'),
-      (...args: InterpreterValue[]) => {
+      (...args: RawInterpreterValue[]) => {
         const coerced = this.interpreter.arithmeticHelper.coerceNumbersExactRanges(args)
         if(coerced instanceof CellError) {
           return coerced
@@ -169,7 +170,7 @@ export class StatisticalAggregationPlugin extends  FunctionPlugin {
 
   public devsq(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.runFunction(ast.args, formulaAddress, this.metadata('DEVSQ'),
-      (...args: InterpreterValue[]) => {
+      (...args: RawInterpreterValue[]) => {
         const coerced = this.interpreter.arithmeticHelper.coerceNumbersExactRanges(args)
         if(coerced instanceof CellError) {
           return coerced
@@ -183,7 +184,7 @@ export class StatisticalAggregationPlugin extends  FunctionPlugin {
 
   public geomean(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.runFunction(ast.args, formulaAddress, this.metadata('GEOMEAN'),
-      (...args: InterpreterValue[]) => {
+      (...args: RawInterpreterValue[]) => {
         const coerced = this.interpreter.arithmeticHelper.coerceNumbersExactRanges(args)
         if(coerced instanceof CellError) {
           return coerced
@@ -202,7 +203,7 @@ export class StatisticalAggregationPlugin extends  FunctionPlugin {
 
   public harmean(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.runFunction(ast.args, formulaAddress, this.metadata('HARMEAN'),
-      (...args: InterpreterValue[]) => {
+      (...args: RawInterpreterValue[]) => {
         const coerced = this.interpreter.arithmeticHelper.coerceNumbersExactRanges(args)
         if(coerced instanceof CellError) {
           return coerced
@@ -473,7 +474,7 @@ export class StatisticalAggregationPlugin extends  FunctionPlugin {
 
   public skew(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.runFunction(ast.args, formulaAddress, this.metadata('SKEW'),
-      (...args: InterpreterValue[]) => {
+      (...args: RawInterpreterValue[]) => {
         const coerced = this.interpreter.arithmeticHelper.coerceNumbersExactRanges(args)
         if(coerced instanceof CellError) {
           return coerced
@@ -493,7 +494,7 @@ export class StatisticalAggregationPlugin extends  FunctionPlugin {
 
   public skewp(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.runFunction(ast.args, formulaAddress, this.metadata('SKEW.P'),
-      (...args: InterpreterValue[]) => {
+      (...args: RawInterpreterValue[]) => {
         const coerced = this.interpreter.arithmeticHelper.coerceNumbersExactRanges(args)
         if(coerced instanceof CellError) {
           return coerced
@@ -520,15 +521,15 @@ function parseTwoArrays(dataX: SimpleRangeValue, dataY: SimpleRangeValue): CellE
   const arrX = []
   const arrY = []
   while (x = xit.next(), y = yit.next(), !x.done && !y.done) {
-    const xval = x.value
-    const yval = y.value
+    const xval: InternalScalarValue = x.value
+    const yval: InternalScalarValue = y.value
     if (xval instanceof CellError) {
       return xval
     } else if (yval instanceof CellError) {
       return yval
-    } else if (typeof xval === 'number' && typeof yval === 'number') {
-      arrX.push(xval)
-      arrY.push(yval)
+    } else if (isExtendedNumber(xval) && isExtendedNumber(yval)) {
+      arrX.push(getRawValue(xval))
+      arrY.push(getRawValue(yval))
     }
   }
   return [arrX, arrY]
