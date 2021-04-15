@@ -6,6 +6,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.5.0] - 2021-04-15
+
 ### Changed
 - GPU.js constructor needs to be provided directly to engine configuration. (#355)
 - An input value should be preserved through serialization more precisely. A **Breaking change**: This changes the type of value returned via serialization. (#617)
