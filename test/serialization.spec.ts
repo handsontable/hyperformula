@@ -33,7 +33,7 @@ describe('serialization', () => {
     expect(engine1.getCellValueDetailedType(adr('F1'))).toEqual(CellValueDetailedType.NUMBER_CURRENCY)
 
     expect(engine1.getCellSerialized(adr('G1'))).toEqual('12/01/15')
-    expect(engine1.getCellValueFormat(adr('G1'))).toEqual(undefined)  //this is wrong, see issue 626
+    expect(engine1.getCellValueFormat(adr('G1'))).toEqual('DD/MM/YY')
     expect(engine1.getCellValueDetailedType(adr('G1'))).toEqual(CellValueDetailedType.NUMBER_DATE)
 
     expect(engine1.getCellSerialized(adr('H1'))).toEqual('1%')
@@ -79,7 +79,7 @@ describe('serialization', () => {
     expect(engine2.getCellValueDetailedType(adr('F1'))).toEqual(CellValueDetailedType.NUMBER_CURRENCY)
 
     expect(engine2.getCellSerialized(adr('G1'))).toEqual('12/01/15')
-    expect(engine2.getCellValueFormat(adr('G1'))).toEqual(undefined)  //this is wrong, see issue 626
+    expect(engine2.getCellValueFormat(adr('G1'))).toEqual('DD/MM/YY')
     expect(engine2.getCellValueDetailedType(adr('G1'))).toEqual(CellValueDetailedType.NUMBER_DATE)
 
     expect(engine1.getCellSerialized(adr('H1'))).toEqual('1%')

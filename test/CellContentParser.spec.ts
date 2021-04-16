@@ -116,8 +116,8 @@ describe('CellContentParser', () => {
   })
 
   it('date parsing', () => {
-    expect(cellContentParser.parse('02-02-2020')).toEqual(new CellContent.Number(new DateNumber(43863)))
-    expect(cellContentParser.parse('  02-02-2020')).toEqual(new CellContent.Number(new DateNumber(43863)))
+    expect(cellContentParser.parse('02-02-2020')).toEqual(new CellContent.Number(new DateNumber(43863, 'DD/MM/YYYY')))
+    expect(cellContentParser.parse('  02-02-2020')).toEqual(new CellContent.Number(new DateNumber(43863, 'DD/MM/YYYY')))
   })
 
   it('JS Date parsing', () => {
