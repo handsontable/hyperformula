@@ -103,7 +103,7 @@ describe('Date helpers', () => {
     expect(dateHelper.dateStringToDateNumber('13:00 pm')).toBe(undefined)
     expect(dateHelper.dateStringToDateNumber('pm')).toBe(undefined)
     expect(dateHelper.dateStringToDateNumber('02/02/2020 pm')).toBe(undefined)
-    expect(dateHelper.dateStringToDateNumber('02/02/2020 12:00pm')).toEqual(new DateTimeNumber(43863.5,'DD/MM/YYYY hh:mm'))
+    expect(dateHelper.dateStringToDateNumber('02/02/2020 12:00pm')).toEqual(new DateTimeNumber(43863.5, 'DD/MM/YYYY hh:mm'))
     expect(dateHelper.dateStringToDateNumber('02/02/2020 12:9999pm')).toEqual(new DateTimeNumber(43870.44375, 'DD/MM/YYYY hh:mm'))
   })
 

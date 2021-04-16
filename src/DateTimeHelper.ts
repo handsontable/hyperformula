@@ -72,12 +72,10 @@ export class DateTimeHelper {
   }
 
   public dateStringToDateNumber(dateTimeString: string): Maybe<ExtendedNumber> {
-    let {dateTime, dateFormat, timeFormat} = this.parseDateTimeFromConfigFormats(dateTimeString)
+    const {dateTime, dateFormat = '', timeFormat = ''} = this.parseDateTimeFromConfigFormats(dateTimeString)
     if(dateTime === undefined) {
       return undefined
     }
-    dateFormat = dateFormat ?? ''
-    timeFormat = timeFormat ?? ''
     if(instanceOfSimpleTime(dateTime)) {
       if(instanceOfSimpleDate(dateTime)) {
         return new DateTimeNumber(timeToNumber(dateTime) + this.dateToNumber(dateTime), dateFormat + ' ' + timeFormat)
@@ -86,7 +84,7 @@ export class DateTimeHelper {
       }
     } else {
       if(instanceOfSimpleDate(dateTime)) {
-        return new DateNumber( this.dateToNumber(dateTime),dateFormat)
+        return new DateNumber( this.dateToNumber(dateTime), dateFormat)
       } else {
         return 0
       }
@@ -120,7 +118,7 @@ export class DateTimeHelper {
       for (const timeFormat of timeFormatsIterate) {
         const dateTime = this.parseSingleFormat(dateTimeString, dateFormat, timeFormat)
         if (dateTime !== undefined) {
-          return {dateTime,timeFormat,dateFormat}
+          return {dateTime, timeFormat, dateFormat}
         }
       }
     }
