@@ -138,7 +138,7 @@ export class CellContentParser {
         day: content.getDate(),
         month: content.getMonth() + 1,
         year: content.getFullYear()
-      }), "Date()"))
+      }), 'Date()'))
     } else if (typeof content === 'string') {
       if (isBoolean(content)) {
         return new CellContent.Boolean(content.toLowerCase() === 'true')
