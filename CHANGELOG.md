@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- Added support for array arithmetic. (#628)
+- Added ARRAYFORMULA function. (#630)
+
 ## [0.5.0] - 2021-04-15
 
 ### Changed
@@ -15,8 +19,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - A deprecated config option vlookupThreshold has been removed. (#620)
 
 ### Added
-- Added support for array arithmetic. (#628)
-- Added ARRAYFORMULA function. (#630)
 - Added support for row and column reordering. (#343)
 - Added type inferrence for subtypes for number. (#313)
 - Added parsing of number literals containing '%' or currency symbol (default '$'). (#590)
