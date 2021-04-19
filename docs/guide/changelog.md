@@ -1,5 +1,29 @@
 # Changelog
 
+## 0.5.0
+**Release date: April 15, 2021**
+
+### Changed
+- **Breaking change**: A change to the type of value returned via serialization methods. [#617](https://github.com/handsontable/hyperformula/issues/617)
+- An input value should be preserved through serialization more precisely. [#617](https://github.com/handsontable/hyperformula/issues/617)
+- GPU.js constructor needs to be provided directly to engine configuration. [#355](https://github.com/handsontable/hyperformula/issues/355)
+- A deprecated config option vlookupThreshold has been removed. [#620](https://github.com/handsontable/hyperformula/issues/620)
+
+### Added
+- Added support for row and column reordering. [#343](https://github.com/handsontable/hyperformula/issues/343)
+- Added type inferrence for subtypes for number. [#313](https://github.com/handsontable/hyperformula/issues/313)
+- Added parsing of number literals containing '%' or currency symbol (default '$'). [#590](https://github.com/handsontable/hyperformula/issues/590)
+- Added ability to fallback to plain CPU implementation for functions that uses GPU.js [#355](https://github.com/handsontable/hyperformula/issues/355)
+
+### Fixed
+- Fixed minor issue. [#631](https://github.com/handsontable/hyperformula/issues/631)
+- Fixed a bug with serialization of some addresses after CRUDs. [#587](https://github.com/handsontable/hyperformula/issues/587)
+- Fixed a bug with MEDIAN function implementation. [#601](https://github.com/handsontable/hyperformula/issues/601)
+- Fixed a bug with copy-paste operation that could cause out of scope references [#591](https://github.com/handsontable/hyperformula/issues/591)
+- Fixed a bug with date parsing. [#614](https://github.com/handsontable/hyperformula/issues/614)
+- Fixed a bug where accent/case sensitivity was ignored for LOOKUPs. [#621](https://github.com/handsontable/hyperformula/issues/621)
+- Fixed a bug with handling of no time format/no date format scenarios. [#616](https://github.com/handsontable/hyperformula/issues/616)
+
 ## 0.4.0
 **Release date: December 17, 2020**
 
