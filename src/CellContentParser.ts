@@ -48,15 +48,6 @@ export namespace CellContent {
     }
   }
 
-  export class MatrixFormula {
-    constructor(public readonly formula: string) {
-    }
-
-    public formulaWithBraces(): string {
-      return '{' + this.formula + '}'
-    }
-  }
-
   export class Error {
     public readonly value: CellError
 
@@ -65,7 +56,7 @@ export namespace CellContent {
     }
   }
 
-  export type Type = Number | String | Boolean | Empty | Formula | MatrixFormula | Error
+  export type Type = Number | String | Boolean | Empty | Formula | Error
 }
 
 /**
@@ -80,13 +71,6 @@ export function isFormula(text: string): boolean {
 export function isBoolean(text: string): boolean {
   const tl = text.toLowerCase()
   return tl === 'true' || tl === 'false'
-}
-
-export function isMatrix(text: RawCellContent): boolean {
-  if (typeof text !== 'string') {
-    return false
-  }
-  return (text.length > 1) && (text.startsWith('{')) && (text.endsWith('}'))
 }
 
 export function isError(text: string, errorMapping: Record<string, ErrorType>): boolean {
@@ -135,8 +119,6 @@ export class CellContentParser {
     } else if (typeof content === 'string') {
       if (isBoolean(content)) {
         return new CellContent.Boolean(content.toLowerCase() === 'true')
-      } else if (isMatrix(content)) {
-        return new CellContent.MatrixFormula(content.substr(1, content.length - 2))
       } else if (isFormula(content)) {
         return new CellContent.Formula(content)
       } else if (isError(content, this.config.errorMapping)) {

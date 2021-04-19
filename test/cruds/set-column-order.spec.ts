@@ -44,7 +44,7 @@ describe('swapping columns - checking if it is possible', () => {
   })
 
   it('should check for matrices', () => {
-    const engine = HyperFormula.buildFromArray([[0, 0, '{=1}']])
+    const engine = HyperFormula.buildFromArray([[0, 0, '=TRANSPOSE(A1:B1)']])
     expect(engine.isItPossibleToSwapColumnIndexes(0, [[0, 2], [1, 1], [2, 0]])).toEqual(false)
     expect(() =>
       engine.swapColumnIndexes(0, [[0, 2], [1, 1], [2, 0]])
@@ -209,14 +209,14 @@ describe('setting column order - checking if it is possible', () => {
   })
 
   it('should check for matrices', () => {
-    const engine = HyperFormula.buildFromArray([[0, 0, '{=1}']])
+    const engine = HyperFormula.buildFromArray([[0, 0, '=TRANSPOSE(A1:B1)']])
     expect(engine.isItPossibleToSetColumnOrder(0, [2, 1, 0])).toEqual(false)
     expect(() =>
       engine.setColumnOrder(0, [2, 1, 0])
     ).toThrowError('Cannot perform this operation, source location has a matrix inside.')
   })
 
-  it('should check for matrices only in moved columns', () => {
+  it('should check for matrices only in moved columns', () => { //FIXME
     const engine = HyperFormula.buildFromArray([[0, '{=1}', 0]])
     expect(engine.isItPossibleToSetColumnOrder(0, [2, 1, 0])).toEqual(true)
     expect(() =>

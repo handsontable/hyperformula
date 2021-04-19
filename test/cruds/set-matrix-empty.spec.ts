@@ -6,8 +6,7 @@ describe('Set matrix empty', () => {
   it('should set matrix empty', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '2'],
-      ['{=TRANSPOSE(A1:B1)}'],
-      ['{=TRANSPOSE(A1:B1)}'],
+      ['=TRANSPOSE(A1:B1)'],
     ])
     const dependencyGraph = engine.dependencyGraph
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -23,8 +22,7 @@ describe('Set matrix empty', () => {
   it('should adjust edges between matrix cells and formula', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '2', '=A1+A2'],
-      ['{=TRANSPOSE(A1:B1)}'],
-      ['{=TRANSPOSE(A1:B1)}'],
+      ['=TRANSPOSE(A1:B1)'],
     ])
     const dependencyGraph = engine.dependencyGraph
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -48,9 +46,8 @@ describe('Set matrix empty', () => {
 
   it('should adjust edges between matrix cells and formula matrix', () => {
     const engine = HyperFormula.buildFromArray([
-      ['1', '2', '{=TRANSPOSE(A2)}'],
-      ['{=TRANSPOSE(A1:B1)}'],
-      ['{=TRANSPOSE(A1:B1)}'],
+      ['1', '2', '=TRANSPOSE(A2)'],
+      ['=TRANSPOSE(A1:B1)'],
     ])
     const dependencyGraph = engine.dependencyGraph
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -71,8 +68,7 @@ describe('Set matrix empty', () => {
   it('should adjust edges between matrix cells and range', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '2', '=SUM(A2:A3)'],
-      ['{=TRANSPOSE(A1:B1)}'],
-      ['{=TRANSPOSE(A1:B1)}'],
+      ['=TRANSPOSE(A1:B1)'],
     ])
     const dependencyGraph = engine.dependencyGraph
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -98,8 +94,7 @@ describe('Set matrix empty', () => {
   it('should adjust edges between matrix cells and range crossing matrix', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '2', '=SUM(A1:A2)'],
-      ['{=TRANSPOSE(A1:B1)}'],
-      ['{=TRANSPOSE(A1:B1)}'],
+      ['=TRANSPOSE(A1:B1)'],
     ])
     const dependencyGraph = engine.dependencyGraph
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion

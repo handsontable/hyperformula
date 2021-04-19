@@ -6,6 +6,7 @@
 import {SimpleCellAddress} from '../../Cell'
 import {RawCellContent} from '../../CellContentParser'
 import {EmptyValue, InterpreterValue} from '../../interpreter/InterpreterValue'
+import {Maybe} from '../../Maybe'
 import {ColumnsSpan, RowsSpan} from '../../Span'
 import {EmptyCellVertex, MatrixVertex, ValueCellVertex} from '../index'
 import {CellVertex} from '../Vertex'
@@ -28,7 +29,7 @@ export class AddressMapping {
     if (!sheetMapping) {
       throw new NoSheetWithIdError(address.sheet)
     }
-    return sheetMapping.getCell(address)
+    return sheetMapping.getCell(address) ?? null
   }
 
   public fetchCell(address: SimpleCellAddress): CellVertex {

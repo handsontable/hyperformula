@@ -63,8 +63,7 @@ describe('Removing rows - checking if its possible', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '2'],
       ['3', '4'],
-      ['{=TRANSPOSE(A1:B2)}', '{=TRANSPOSE(A1:B2)}'],
-      ['{=TRANSPOSE(A1:B2)}', '{=TRANSPOSE(A1:B2)}'],
+      ['=TRANSPOSE(A1:B2)'],
       ['13'],
     ])
 
@@ -565,7 +564,7 @@ describe('Removing rows - matrices', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '2'],
       ['3', '4'],
-      ['{=MMULT(A1:B2, A1:B2)}'],
+      ['=MMULT(A1:B2, A1:B2)'],
     ])
 
     expect(() => engine.removeRows(0, [2, 1])).toThrowError('Cannot perform this operation, source location has a matrix inside.')
@@ -649,8 +648,7 @@ describe('Removing rows - matrices', () => {
       ['1', '4'],
       ['2', '5'],
       ['3', '6'],
-      ['{=TRANSPOSE(A1:B3)}', '{=TRANSPOSE(A1:B3)}, {=TRANSPOSE(A1:B3)}'],
-      ['{=TRANSPOSE(A1:B3)}', '{=TRANSPOSE(A1:B3)}, {=TRANSPOSE(A1:B3)}'],
+      ['=TRANSPOSE(A1:B3)'],
     ])
 
     engine.removeRows(0, [1, 1])
@@ -663,8 +661,7 @@ describe('Removing rows - matrices', () => {
       ['1', '4'],
       ['2', '5'],
       ['3', '6'],
-      ['{=TRANSPOSE(A1:B3)}', '{=TRANSPOSE(A1:B3)}, {=TRANSPOSE(A1:B3)}'],
-      ['{=TRANSPOSE(A1:B3)}', '{=TRANSPOSE(A1:B3)}, {=TRANSPOSE(A1:B3)}'],
+      ['=TRANSPOSE(A1:B3)'],
     ])
 
     engine.removeRows(0, [1, 1])
@@ -681,8 +678,7 @@ describe('Removing rows - matrices', () => {
         ['3', '6'],
       ],
       Sheet2: [
-        ['{=TRANSPOSE(Sheet1!A1:B3)}', '{=TRANSPOSE(Sheet1!A1:B3)}'],
-        ['{=TRANSPOSE(Sheet1!A1:B3)}', '{=TRANSPOSE(Sheet1!A1:B3)}'],
+        ['=TRANSPOSE(Sheet1!A1:B3)'],
       ],
     })
 

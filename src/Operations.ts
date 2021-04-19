@@ -42,6 +42,7 @@ import {
 import {buildMatrixVertex} from './GraphBuilder'
 import {LazilyTransformingAstService} from './LazilyTransformingAstService'
 import {ColumnSearchStrategy} from './Lookup/SearchStrategy'
+import {checkMatrixSize} from './Matrix'
 import {
   doesContainRelativeReferences,
   InternalNamedExpression,
@@ -633,31 +634,24 @@ export class Operations {
       vertex.setMatrixCellValue(address, getRawValue(newValue))
       this.columnSearch.change(getRawValue(oldValue), getRawValue(newValue), address)
       this.changes.addChange(newValue, address)
-    } else if (!(vertex instanceof MatrixVertex) && parsedCellContent instanceof CellContent.MatrixFormula) {
-      const {ast, errors, dependencies} = this.parser.parse(parsedCellContent.formula, address)
-      if (errors.length > 0) {
-        this.dependencyGraph.setParsingErrorToCell(address, new ParsingErrorVertex(errors, parsedCellContent.formulaWithBraces()))
-      } else {
-        const newVertex = buildMatrixVertex(ast as ProcedureAst, address)
-        if (newVertex instanceof ValueCellVertex) {
-          throw Error('What if new matrix vertex is not properly constructed?')
-        }
-        this.dependencyGraph.addNewMatrixVertex(newVertex)
-        this.dependencyGraph.processCellDependencies(absolutizeDependencies(dependencies, address), newVertex)
-        this.dependencyGraph.graph.markNodeAsSpecialRecentlyChanged(newVertex)
-      }
     } else if (!(vertex instanceof MatrixVertex)) {
       if (parsedCellContent instanceof CellContent.Formula) {
         const {ast, errors, hasVolatileFunction, hasStructuralChangeFunction, dependencies} = this.parser.parse(parsedCellContent.formula, address)
         if (errors.length > 0) {
           this.dependencyGraph.setParsingErrorToCell(address, new ParsingErrorVertex(errors, parsedCellContent.formula))
         } else {
-          this.dependencyGraph.setFormulaToCell(address, ast, absolutizeDependencies(dependencies, address), hasVolatileFunction, hasStructuralChangeFunction)
+          const size = checkMatrixSize(ast, address)
+          if(size instanceof CellError || (size.width<=1 && size.height<=1)) {
+            this.dependencyGraph.setFormulaToCell(address, ast, absolutizeDependencies(dependencies, address), hasVolatileFunction, hasStructuralChangeFunction)
+          } else {
+            const vertex = new MatrixVertex(address, size.width, size.height, ast)
+            this.dependencyGraph.addNewMatrixVertex(vertex)
+            this.dependencyGraph.processCellDependencies(absolutizeDependencies(dependencies, address), vertex)
+            this.dependencyGraph.graph.markNodeAsSpecialRecentlyChanged(vertex)
+          }
         }
       } else if (parsedCellContent instanceof CellContent.Empty) {
         this.setCellEmpty(address)
-      } else if (parsedCellContent instanceof CellContent.MatrixFormula) {
-        throw new Error('Cant happen')
       } else {
         this.setValueToCell({parsedValue: parsedCellContent.value, rawValue: newCellContent}, address)
       }
@@ -763,9 +757,7 @@ export class Operations {
 
   private storeNamedExpressionInCell(address: SimpleCellAddress, expression: RawCellContent) {
     const parsedCellContent = this.cellContentParser.parse(expression)
-    if (parsedCellContent instanceof CellContent.MatrixFormula) {
-      throw new Error('Matrix formulas are not supported')
-    } else if (parsedCellContent instanceof CellContent.Formula) {
+    if (parsedCellContent instanceof CellContent.Formula) {
       const parsingResult = this.parser.parse(parsedCellContent.formula, simpleCellAddress(-1, 0, 0))
       if (doesContainRelativeReferences(parsingResult.ast)) {
         throw new NoRelativeAddressesAllowedError()

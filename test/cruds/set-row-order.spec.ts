@@ -44,14 +44,14 @@ describe('swapping rows - checking if it is possible', () => {
   })
 
   it('should check for matrices', () => {
-    const engine = HyperFormula.buildFromArray([[0], [0], ['{=1}']])
+    const engine = HyperFormula.buildFromArray([[0], [0], ['=TRANSPOSE(A1:A2)']])
     expect(engine.isItPossibleToSwapRowIndexes(0, [[0, 2], [1, 1], [2, 0]])).toEqual(false)
     expect(() =>
       engine.swapRowIndexes(0, [[0, 2], [1, 1], [2, 0]])
     ).toThrowError('Cannot perform this operation, source location has a matrix inside.')
   })
 
-  it('should check for matrices only in moved rows', () => {
+  it('should check for matrices only in moved rows', () => { //FIXME
     const engine = HyperFormula.buildFromArray([[0], ['{=1}'], [0]])
     expect(engine.isItPossibleToSwapRowIndexes(0, [[0, 2], [1, 1], [2, 0]])).toEqual(true)
     expect(() =>
@@ -216,7 +216,7 @@ describe('setting row order - checking if it is possible', () => {
   })
 
   it('should check for matrices', () => {
-    const engine = HyperFormula.buildFromArray([[0], [0], ['{=1}']])
+    const engine = HyperFormula.buildFromArray([[0], [0], ['=TRANSPOSE(A1:A2)']])
     expect(engine.isItPossibleToSetRowOrder(0, [2, 1, 0])).toEqual(false)
     expect(() =>
       engine.setRowOrder(0, [2, 1, 0])

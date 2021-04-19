@@ -61,8 +61,8 @@ describe('Removing columns - checking if its possible', () => {
 
   it('no if theres a formula matrix in place where we remove', () => {
     const engine = HyperFormula.buildFromArray([
-      ['1', '2', '{=TRANSPOSE(A1:B2)}', '{=TRANSPOSE(A1:B2)}', '13'],
-      ['3', '4', '{=TRANSPOSE(A1:B2)}', '{=TRANSPOSE(A1:B2)}'],
+      ['1', '2', '=TRANSPOSE(A1:B2)', undefined, '13'],
+      ['3', '4'],
     ])
 
     expect(engine.isItPossibleToRemoveColumns(0, [1, 1])).toEqual(true)
@@ -505,7 +505,7 @@ describe('Removing columns - reevaluation', () => {
 describe('Removing columns - matrices', () => {
   it('should not remove column within formula matrix', () => {
     const engine = HyperFormula.buildFromArray([
-      ['1', '2', '{=MMULT(A1:B2, A1:B2)}'],
+      ['1', '2', '=MMULT(A1:B2, A1:B2)'],
       ['3', '4'],
     ])
 
@@ -588,9 +588,8 @@ describe('Removing columns - matrices', () => {
 
   it('MatrixVertex#formula should be updated', () => {
     const engine = HyperFormula.buildFromArray([
-      ['1', '2', '3', '{=TRANSPOSE(A1:C2)}', '{=TRANSPOSE(A1:C2)}'],
-      ['4', '5', '6', '{=TRANSPOSE(A1:C2)}', '{=TRANSPOSE(A1:C2)}'],
-      ['', '', '',    '{=TRANSPOSE(A1:C2)}', '{=TRANSPOSE(A1:C2)}'],
+      ['1', '2', '3', '=TRANSPOSE(A1:C2)'],
+      ['4', '5', '6'],
     ])
 
     engine.removeColumns(0, [1, 1])
@@ -600,9 +599,8 @@ describe('Removing columns - matrices', () => {
 
   it('MatrixVertex#address should be updated', () => {
     const engine = HyperFormula.buildFromArray([
-      ['1', '2', '3', '{=TRANSPOSE(A1:C2)}', '{=TRANSPOSE(A1:C2)}'],
-      ['4', '5', '6', '{=TRANSPOSE(A1:C2)}', '{=TRANSPOSE(A1:C2)}'],
-      ['', '', '',    '{=TRANSPOSE(A1:C2)}', '{=TRANSPOSE(A1:C2)}'],
+      ['1', '2', '3', '=TRANSPOSE(A1:C2)'],
+      ['4', '5', '6'],
     ])
 
     engine.removeColumns(0, [1, 1])
@@ -618,9 +616,7 @@ describe('Removing columns - matrices', () => {
         ['4', '5', '6'],
       ],
       Sheet2: [
-        ['{=TRANSPOSE(Sheet1!A1:C2)}', '{=TRANSPOSE(Sheet1!A1:C2)}'],
-        ['{=TRANSPOSE(Sheet1!A1:C2)}', '{=TRANSPOSE(Sheet1!A1:C2)}'],
-        ['{=TRANSPOSE(Sheet1!A1:C2)}', '{=TRANSPOSE(Sheet1!A1:C2)}'],
+        ['=TRANSPOSE(Sheet1!A1:C2)'],
       ],
     })
 

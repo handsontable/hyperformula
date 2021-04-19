@@ -115,8 +115,12 @@ export function checkMatrixSize(ast: Ast, formulaAddress: SimpleCellAddress): Ma
       }
     }
   } else if (ast.type === AstNodeType.CELL_RANGE) {
-    const range = AbsoluteCellRange.fromCellRange(ast, formulaAddress)
-    return {width: range.width(), height: range.height()}
+    try { //TODO without try-catch
+      const range = AbsoluteCellRange.fromCellRange(ast, formulaAddress)
+      return {width: range.width(), height: range.height()}
+    } catch (e) {
+      return new CellError(ErrorType.VALUE)
+    }
   } else if (ast.type === AstNodeType.NUMBER || ast.type === AstNodeType.CELL_REFERENCE) {
     return {width: 1, height: 1}
   } else {

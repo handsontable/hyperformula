@@ -249,7 +249,7 @@ describe('Named expressions - store manipulation', () => {
     const engine = HyperFormula.buildEmpty()
 
     expect(() => {
-      engine.addNamedExpression('myName', '{=TRANSPOSE(A1:B2)}')
+      engine.addNamedExpression('myName', '=TRANSPOSE(A1:B2)')
     }).toThrowError(/Matrix formulas are not supported/)
   })
 
@@ -324,7 +324,7 @@ describe('Named expressions - store manipulation', () => {
     engine.addNamedExpression('myName', '=42')
 
     expect(() => {
-      engine.changeNamedExpression('myName', '{=TRANSPOSE(A1:B2)}')
+      engine.changeNamedExpression('myName', '=TRANSPOSE(A1:B2)')
     }).toThrowError(/not supported/)
   })
 

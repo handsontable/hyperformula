@@ -53,7 +53,7 @@ describe('Disable matrix optimizatoins', () => {
     const sheet = [
       ['1', '2'],
       ['3', '4'],
-      ['{=TRANSPOSE(A1)}'],
+      ['=TRANSPOSE(A1)'],
     ]
 
     const engine = HyperFormula.buildFromArray(sheet, {matrixDetection: true, matrixDetectionThreshold: 1})
