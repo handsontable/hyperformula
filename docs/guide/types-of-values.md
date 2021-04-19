@@ -36,8 +36,8 @@ types: `'NUMBER'`, `'STRING'`, `'BOOLEAN'`, `'ERROR'`, `'EMPTY'`.
 ## Getting detailed cell value type
 
 Currently, number type contains several subtypes (date, time, datetime, currency, percentage),
-that can be used interchangably with numbers in computation. We keep track of those, so eg if
+that can be used interchangeably with numbers in computation. We keep track of those, so eg if
 a function produces currency-type output, and later the value is used in arithmetic operations,
-the output of those is as well marked as currency-type. Info about those can be extracted via `getCellValueDetailedType` function.
-Auxilary information about formating (if there is any) is available via `getCellValueFormat` function. In case of currency, it would be
+the output of those is as well-marked as currency-type. Info about those can be extracted via `getCellValueDetailedType` function.
+Auxiliary information about formatting (if there is any) is available via `getCellValueFormat` function. In case of currency, it would be
 the currency symbol used when parsing the currency (e.g. '$').

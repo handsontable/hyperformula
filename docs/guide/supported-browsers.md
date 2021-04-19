@@ -24,12 +24,6 @@ platform that is based on virtual machines.
 | UC Browser | UC Browser * |
 | QQ browser | Opera |
 
-## Internet Explorer 11
-
-There is no support for IE11 due to the issue with `gpu.js` which
-uses `gl-wiretap` as a dependency that is written in ES6 and does
-not have the ES5 build.
-
 ## * Full ICU support
 
 Browsers that do not support full-icu (e.g. UC Browser mobile) will

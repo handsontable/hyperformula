@@ -3,17 +3,12 @@
 Here are the shortcomings of HyperFormula in its current development
 stage:
 
-* The number of built-in functions is growing fast but is still far
-from what is offered by the most popular spreadsheet software on the
-market (~450 functions on average).
 * Node.js versions older than 13 don't properly compare
 culture-insensitive strings. HyperFormula requires the full
 International Components for Unicode (ICU) to be supported.
 [Learn more](https://nodejs.org/api/intl.html#intl_embed_the_entire_icu_full_icu)
 * GPU acceleration is used only by matrix functions: MMULT, MEDIANPOOL, MAXPOOL.
 * GPU.js works only in browsers that support ES6. [Learn more](enabling-gpu-acceleration.md)
-* Sorting and filtering are not natively supported. However,
-we simulate sorting using the move operations.
 * Multiple workbooks are not supported. One instance of HyperFormula
 can handle only one workbook with multiple worksheets at a time.
 * For cycle detection, all possible dependencies between cells are
