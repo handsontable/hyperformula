@@ -250,7 +250,7 @@ describe('Named expressions - store manipulation', () => {
 
     expect(() => {
       engine.addNamedExpression('myName', '=TRANSPOSE(A1:B2)')
-    }).toThrowError(/Matrix formulas are not supported/)
+    }).toThrowError(/Relative addresses not allowed in named expressions./)
   })
 
   it('retrieving non-existing named expression', () => {
@@ -325,7 +325,7 @@ describe('Named expressions - store manipulation', () => {
 
     expect(() => {
       engine.changeNamedExpression('myName', '=TRANSPOSE(A1:B2)')
-    }).toThrowError(/not supported/)
+    }).toThrowError(/Relative addresses not allowed in named expressions./)
   })
 
   it('changing not existing named expression', () => {

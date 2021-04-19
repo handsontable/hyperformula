@@ -6,8 +6,6 @@
 import {AbsoluteCellRange} from './AbsoluteCellRange'
 import {absolutizeDependencies} from './absolutizeDependencies'
 import {CellError, ErrorType, SimpleCellAddress} from './Cell'
-import {SimpleRangeValue} from './interpreter/SimpleRangeValue'
-import {ColumnSearchStrategy} from './Lookup/SearchStrategy'
 import {Config} from './Config'
 import {ContentChanges} from './ContentChanges'
 import {DateTimeHelper} from './DateTimeHelper'
@@ -16,6 +14,8 @@ import {ErrorMessage} from './error-message'
 import {FunctionRegistry} from './interpreter/FunctionRegistry'
 import {Interpreter} from './interpreter/Interpreter'
 import {EmptyValue, getRawValue, InterpreterValue} from './interpreter/InterpreterValue'
+import {OnlyRangeData, SimpleRangeValue} from './interpreter/SimpleRangeValue'
+import {ColumnSearchStrategy} from './Lookup/SearchStrategy'
 import {Matrix} from './Matrix'
 import {NamedExpressions} from './NamedExpressions'
 import {NumberLiteralHelper} from './NumberLiteralHelper'
@@ -73,15 +73,19 @@ export class Evaluator {
             const formula = vertex.getFormula() as Ast
             const currentValue = vertex.isComputed() ? vertex.getCellValue() : null
             const newCellValue = this.evaluateAstToRangeValue(formula, address)
-            if (newCellValue instanceof SimpleRangeValue) {
+            if(newCellValue instanceof SimpleRangeValue && newCellValue.hasOnlyNumbers() && !(newCellValue.onlyRangeData())) {
               const newCellMatrix = new Matrix(newCellValue.rawNumbers())
               vertex.setCellValue(newCellMatrix)
               changes.addMatrixChange(newCellMatrix, address)
               this.columnSearch.change(currentValue, newCellMatrix, address)
             } else {
-              vertex.setErrorValue(newCellValue)
-              changes.addChange(newCellValue, address)
-              this.columnSearch.change(currentValue, newCellValue, address)
+              const errorVal = newCellValue instanceof CellError ? newCellValue
+                : newCellValue.onlyRangeData() ?
+                  new CellError(ErrorType.VALUE, ErrorMessage.ScalarExpected)
+                  : new CellError(ErrorType.VALUE, ErrorMessage.CellRangeExpected)
+              vertex.setErrorValue(errorVal)
+              changes.addChange(errorVal, address)
+              this.columnSearch.change(currentValue, errorVal, address)
             }
             return true
           } else if (vertex instanceof RangeVertex) {
@@ -152,13 +156,17 @@ export class Evaluator {
         const address = vertex.getAddress()
         const formula = vertex.getFormula() as Ast
         const newCellValue = this.evaluateAstToRangeValue(formula, address)
-        if (newCellValue instanceof SimpleRangeValue) {
+        if(newCellValue instanceof SimpleRangeValue && newCellValue.hasOnlyNumbers() && !newCellValue.onlyRangeData()) {
           const newCellMatrix = new Matrix(newCellValue.rawNumbers())
           vertex.setCellValue(newCellMatrix)
           this.columnSearch.add(newCellMatrix, address)
         } else {
-          vertex.setErrorValue(newCellValue)
-          this.columnSearch.add(newCellValue, address)
+          const errorVal = newCellValue instanceof CellError ? newCellValue
+            : newCellValue.onlyRangeData() ?
+              new CellError(ErrorType.VALUE, ErrorMessage.ScalarExpected)
+              : new CellError(ErrorType.VALUE, ErrorMessage.CellRangeExpected)
+          vertex.setErrorValue(errorVal)
+          this.columnSearch.add(errorVal, address)
         }
       } else if (vertex instanceof RangeVertex) {
         vertex.clearCache()
@@ -181,10 +189,10 @@ export class Evaluator {
     const interpreterValue = this.interpreter.evaluateAst(ast, formulaAddress)
     if (interpreterValue instanceof CellError) {
       return interpreterValue
-    } else if (interpreterValue instanceof SimpleRangeValue && interpreterValue.hasOnlyNumbers()) {
+    } else if (interpreterValue instanceof SimpleRangeValue) {
       return interpreterValue
     } else {
-      return new CellError(ErrorType.VALUE, ErrorMessage.CellRangeExpected)
+      return SimpleRangeValue.fromScalar(interpreterValue)
     }
   }
 }

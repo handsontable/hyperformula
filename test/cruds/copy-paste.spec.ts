@@ -382,8 +382,7 @@ describe('Copy - paste integration', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '2'],
       ['3', '4'],
-      ['{=TRANSPOSE(A1:B2)}', '{=TRANSPOSE(A1:B2)}'],
-      ['{=TRANSPOSE(A1:B2)}', '{=TRANSPOSE(A1:B2)}']
+      ['=TRANSPOSE(A1:B2)'],
     ])
     expect(engine.matrixMapping.matrixMapping.size).toEqual(1)
 
@@ -402,8 +401,7 @@ describe('Copy - paste integration', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '2'],
       ['3', '4'],
-      ['{=TRANSPOSE(A1:B2)}', '{=TRANSPOSE(A1:B2)}'],
-      ['{=TRANSPOSE(A1:B2)}', '{=TRANSPOSE(A1:B2)}']
+      ['=TRANSPOSE(A1:B2)'],
     ])
 
     engine.copy(adr('A1'), 2, 2)

@@ -7,10 +7,10 @@ import {CellError, ErrorType, SimpleCellAddress} from '../../Cell'
 import {ErrorMessage} from '../../error-message'
 import {MatrixSize, matrixSizeForMultiplication, matrixSizeForPoolFunction, matrixSizeForTranspose} from '../../Matrix'
 import {ProcedureAst} from '../../parser'
+import {Interpreter} from '../Interpreter'
 import {InterpreterValue} from '../InterpreterValue'
 import {SimpleRangeValue} from '../SimpleRangeValue'
 import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
-import {Interpreter} from '../Interpreter'
 
 export type KernelRunShortcut = (...args: any[]) => number[][]
 
@@ -75,6 +75,9 @@ export class MatrixPlugin extends FunctionPlugin {
     return this.runMatrixFunction(ast.args, formulaAddress, this.metadata('MMULT'), (leftMatrix: SimpleRangeValue, rightMatrix: SimpleRangeValue) => {
       if (!leftMatrix.hasOnlyNumbers() || !rightMatrix.hasOnlyNumbers()) {
         return new CellError(ErrorType.VALUE, ErrorMessage.NumberRange)
+      }
+      if( rightMatrix.height() !== leftMatrix.width()) {
+        return new CellError(ErrorType.VALUE, ErrorMessage.MatrixDimensions)
       }
       const outputSize = matrixSizeForMultiplication(leftMatrix.size, rightMatrix.size)
 

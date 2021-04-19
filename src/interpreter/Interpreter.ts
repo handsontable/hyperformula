@@ -63,6 +63,9 @@ export class Interpreter {
         val = cloneNumber(val, fixNegativeZero(getRawValue(val)))
       }
     }
+    if(val instanceof SimpleRangeValue && val.height() === 1 && val.width() === 1) {
+      [[val]] = val.raw()
+    }
     return wrapperForAddress(val, formulaAddress)
   }
 
