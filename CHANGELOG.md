@@ -6,6 +6,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- Added two new fired events, for suspending and resuming execution. (#637)
+
 ## [0.5.0] - 2021-04-15
 
 ### Changed
