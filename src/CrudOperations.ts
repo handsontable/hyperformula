@@ -21,7 +21,6 @@ import {
 import {
   InvalidAddressError,
   InvalidArgumentsError,
-  MatrixFormulasNotSupportedError,
   NamedExpressionDoesNotExistError,
   NamedExpressionNameIsAlreadyTakenError,
   NamedExpressionNameIsInvalidError,
