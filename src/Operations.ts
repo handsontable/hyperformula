@@ -216,7 +216,10 @@ export class Operations {
 
     this.sheetMapping.removeSheet(sheetId)
     this.columnSearch.removeSheet(sheetId)
-    return version!
+    const scopedNamedExpressions = this.namedExpressions.getAllNamedExpressionsForScope(sheetId).map(
+      (namedexpression) => this.removeNamedExpression(namedexpression.normalizeExpressionName(), sheetId)
+    )
+    return {version: version!, scopedNamedExpressions}
   }
 
   public clearSheet(sheetId: number) {
