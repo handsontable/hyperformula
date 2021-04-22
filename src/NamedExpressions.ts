@@ -169,7 +169,7 @@ export class NamedExpressions {
   }
 
   public addNamedExpression(expressionName: string, sheetId?: number, options?: NamedExpressionOptions): InternalNamedExpression {
-    let store = sheetId === undefined ? this.workbookStore : this.worksheetStoreOrCreate(sheetId)
+    const store = sheetId === undefined ? this.workbookStore : this.worksheetStoreOrCreate(sheetId)
     let namedExpression = store.get(expressionName)
     if (namedExpression) {
       namedExpression.added = true
@@ -184,7 +184,7 @@ export class NamedExpressions {
   }
 
   public restoreNamedExpression(namedExpression: InternalNamedExpression, sheetId?: number): InternalNamedExpression {
-    let store = sheetId === undefined ? this.workbookStore : this.worksheetStoreOrCreate(sheetId)
+    const store = sheetId === undefined ? this.workbookStore : this.worksheetStoreOrCreate(sheetId)
     namedExpression.added = true
     store.add(namedExpression)
     this.addressCache.set(namedExpression.address.row, namedExpression)

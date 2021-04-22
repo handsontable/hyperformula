@@ -132,7 +132,7 @@ export class RemoveSheetUndoEntry {
     public readonly sheetName: string,
     public readonly sheetId: number,
     public readonly oldSheetContent: ClipboardCell[][],
-    public readonly scopedNamedExpressions: [InternalNamedExpression,ClipboardCell][],
+    public readonly scopedNamedExpressions: [InternalNamedExpression, ClipboardCell][],
     public readonly version: number,
   ) {
   }
@@ -472,7 +472,7 @@ export class UndoRedo {
       }
     }
 
-    for(const [namedexpression,content] of operation.scopedNamedExpressions) {
+    for(const [namedexpression, content] of operation.scopedNamedExpressions) {
       this.operations.restoreNamedExpression(namedexpression, content, sheetId)
     }
 
