@@ -366,9 +366,8 @@ export class Operations {
 
   public restoreNamedExpression(namedExpression: InternalNamedExpression, content: ClipboardCell, sheetId?: number) {
     const expressionName = namedExpression.displayName
-    const options = namedExpression.options
     this.restoreCell(namedExpression.address, content)
-    const restoredNamedExpression = this.namedExpressions.addNamedExpression(expressionName, sheetId, options)
+    const restoredNamedExpression = this.namedExpressions.restoreNamedExpression(namedExpression, sheetId)
     this.adjustNamedExpressionEdges(restoredNamedExpression, expressionName, sheetId)
   }
 

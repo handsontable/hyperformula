@@ -169,25 +169,26 @@ export class NamedExpressions {
   }
 
   public addNamedExpression(expressionName: string, sheetId?: number, options?: NamedExpressionOptions): InternalNamedExpression {
-    if (sheetId === undefined) {
-      let namedExpression = this.workbookStore.get(expressionName)
-      if (namedExpression) {
-        namedExpression.added = true
-        namedExpression.displayName = expressionName
-        namedExpression.options = options
-      } else {
-        namedExpression = new InternalNamedExpression(expressionName, this.nextAddress(), true, options)
-        this.workbookStore.add(namedExpression)
-      }
-      this.addressCache.set(namedExpression.address.row, namedExpression)
-      return namedExpression
+    let store = sheetId === undefined ? this.workbookStore : this.worksheetStoreOrCreate(sheetId)
+    let namedExpression = store.get(expressionName)
+    if (namedExpression) {
+      namedExpression.added = true
+      namedExpression.displayName = expressionName
+      namedExpression.options = options
     } else {
-      const store = this.worksheetStoreOrCreate(sheetId)
-      const namedExpression = new InternalNamedExpression(expressionName, this.nextAddress(), true, options)
+      namedExpression = new InternalNamedExpression(expressionName, this.nextAddress(), true, options)
       store.add(namedExpression)
-      this.addressCache.set(namedExpression.address.row, namedExpression)
-      return namedExpression
     }
+    this.addressCache.set(namedExpression.address.row, namedExpression)
+    return namedExpression
+  }
+
+  public restoreNamedExpression(namedExpression: InternalNamedExpression, sheetId?: number): InternalNamedExpression {
+    let store = sheetId === undefined ? this.workbookStore : this.worksheetStoreOrCreate(sheetId)
+    namedExpression.added = true
+    store.add(namedExpression)
+    this.addressCache.set(namedExpression.address.row, namedExpression)
+    return namedExpression
   }
 
   private worksheetStoreOrCreate(sheetId: number): WorksheetStore {
@@ -204,17 +205,7 @@ export class NamedExpressions {
   }
 
   public namedExpressionOrPlaceholder(expressionName: string, sheetId: number): InternalNamedExpression {
-    let namedExpression = this.worksheetStoreOrCreate(sheetId).get(expressionName)
-    if (namedExpression) {
-      return namedExpression
-    } else {
-      namedExpression = this.workbookStore.get(expressionName)
-      if (namedExpression === undefined) {
-        namedExpression = new InternalNamedExpression(expressionName, this.nextAddress(), false)
-        this.workbookStore.add(namedExpression)
-      }
-      return namedExpression
-    }
+    return this.worksheetStoreOrCreate(sheetId).get(expressionName) ?? this.workbookNamedExpressionOrPlaceholder(expressionName)
   }
 
   public workbookNamedExpressionOrPlaceholder(expressionName: string): InternalNamedExpression {
