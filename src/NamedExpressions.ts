@@ -235,6 +235,10 @@ export class NamedExpressions {
     this.addressCache.delete(namedExpression.address.row)
   }
 
+  public getAllNamedExpressionsNamesInScope(sheetId?: number): string[] {
+    return this.getAllNamedExpressions().filter(({scope}) => scope===sheetId).map((ne) => ne.expression.displayName)
+  }
+
   public getAllNamedExpressionsNames(): string[] {
     return this.getAllNamedExpressions().map((ne) => ne.expression.displayName)
   }
