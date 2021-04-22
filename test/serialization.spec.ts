@@ -48,8 +48,8 @@ describe('serialization', () => {
     expect(engine1.getCellValueFormat(adr('J1'))).toEqual(undefined)
     expect(engine1.getCellValueDetailedType(adr('J1'))).toEqual(CellValueDetailedType.ERROR)
 
-    expect(engine1.getCellSerialized(adr('K1'))).toEqual( new Date(1995,11,17))
-    expect(engine1.getCellValueFormat(adr('K1'))).toEqual("Date()")
+    expect(engine1.getCellSerialized(adr('K1'))).toEqual( new Date(1995, 11, 17))
+    expect(engine1.getCellValueFormat(adr('K1'))).toEqual('Date()')
     expect(engine1.getCellValueDetailedType(adr('K1'))).toEqual(CellValueDetailedType.NUMBER_DATE)
 
     // serialize and "send" data to server
@@ -98,8 +98,8 @@ describe('serialization', () => {
     expect(engine1.getCellValueFormat(adr('J1'))).toEqual(undefined)
     expect(engine1.getCellValueDetailedType(adr('J1'))).toEqual(CellValueDetailedType.ERROR)
 
-    expect(engine1.getCellSerialized(adr('K1'))).toEqual( new Date(1995,11,17))
-    expect(engine1.getCellValueFormat(adr('K1'))).toEqual("Date()")
+    expect(engine1.getCellSerialized(adr('K1'))).toEqual( new Date(1995, 11, 17))
+    expect(engine1.getCellValueFormat(adr('K1'))).toEqual('Date()')
     expect(engine1.getCellValueDetailedType(adr('K1'))).toEqual(CellValueDetailedType.NUMBER_DATE)
   })
 })
