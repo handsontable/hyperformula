@@ -775,7 +775,7 @@ describe('Undo - add named expression', () => {
 
     engine.undo()
 
-    expect(engine.listNamedExpressions.length).toEqual(0)
+    expect(engine.listNamedExpressions().length).toEqual(0)
     expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NAME, ErrorMessage.NamedExpressionName('foo')))
   })
 })
@@ -791,7 +791,7 @@ describe('Undo - remove named expression', () => {
 
     engine.undo()
 
-    expect(engine.listNamedExpressions.length).toEqual(1)
+    expect(engine.listNamedExpressions().length).toEqual(1)
     expect(engine.getCellValue(adr('A1'))).toEqual('foo')
   })
 })
