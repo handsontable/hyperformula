@@ -6,6 +6,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- Fixed issues with scoped named expression. (#646, #641)
+
 ## [0.5.0] - 2021-04-15
 
 ### Changed
