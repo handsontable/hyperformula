@@ -13,6 +13,8 @@ export enum Events {
   NamedExpressionAdded = 'namedExpressionAdded',
   NamedExpressionRemoved = 'namedExpressionRemoved',
   ValuesUpdated = 'valuesUpdated',
+  EvaluationSuspended = 'evaluationSuspended',
+  EvaluationResumed = 'evaluationResumed',
 }
 
 export interface Listeners {
@@ -85,6 +87,26 @@ export interface Listeners {
    * @category Values
    */
   valuesUpdated: (changes: ExportedChange[]) => any,
+
+  /**
+   * The event is triggered upon suspension of evaluation.
+   *
+   * @event
+   *
+   * @category Batch
+   */
+  evaluationSuspended: () => any,
+
+  /**
+   * The event is triggered upon resuming of evaluation.
+   *
+   * @event
+   *
+   * @param {ExportedChange[]} changes the values and location of applied changes
+   *
+   * @category Batch
+   */
+  evaluationResumed: (changes: ExportedChange[]) => any,
 }
 
 export interface TypedEmitter {

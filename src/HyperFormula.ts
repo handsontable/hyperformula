@@ -2973,6 +2973,8 @@ export class HyperFormula implements TypedEmitter {
    *
    * @param {() => void} batchOperations
    * @fires [[valuesUpdated]] if recalculation was triggered by this change
+   * @fires [[evaluationSuspended]] always
+   * @fires [[evaluationResumed]] after the recomputation of necessary values
    *
    * @example
    * ```js
@@ -3013,6 +3015,8 @@ export class HyperFormula implements TypedEmitter {
    * Suspending evaluation should result in an overall faster calculation compared to recalculating after each operation separately.
    * To resume the evaluation use [[resumeEvaluation]].
    *
+   * @fires [[evaluationSuspended]] always
+   *
    * @example
    * ```js
    * const hfInstance = HyperFormula.buildFromSheets({
@@ -3039,6 +3043,7 @@ export class HyperFormula implements TypedEmitter {
    */
   public suspendEvaluation(): void {
     this._evaluationSuspended = true
+    this._emitter.emit(Events.EvaluationSuspended)
   }
 
   /**
@@ -3046,6 +3051,8 @@ export class HyperFormula implements TypedEmitter {
    * It also triggers the recalculation and returns changes that are a result of all batched operations.
    *
    * @fires [[valuesUpdated]] if recalculation was triggered by this change
+   * @fires [[evaluationResumed]] after the recomputation of necessary values
+   *
    *
    * @example
    * ```js
@@ -3073,7 +3080,9 @@ export class HyperFormula implements TypedEmitter {
    */
   public resumeEvaluation(): ExportedChange[] {
     this._evaluationSuspended = false
-    return this.recomputeIfDependencyGraphNeedsIt()
+    const changes = this.recomputeIfDependencyGraphNeedsIt()
+    this._emitter.emit(Events.EvaluationResumed, changes)
+    return changes
   }
 
   /**
