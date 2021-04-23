@@ -108,7 +108,7 @@ export class SimpleStrategy implements GraphBuilderStrategy {
               this.dependencyGraph.addVertex(address, vertex)
             } else {
               const size = checkMatrixSize(parseResult.ast, address)
-              if(size instanceof CellError || (size.width<=1 && size.height<=1)) {
+              if(size instanceof CellError || (size.width<=1 && size.height<=1) || size.isRef) {
                 const vertex = new FormulaCellVertex(parseResult.ast, address, 0)
                 dependencies.set(vertex, absolutizeDependencies(parseResult.dependencies, address))
                 this.dependencyGraph.addVertex(address, vertex)
@@ -177,7 +177,7 @@ export class MatrixDetectionStrategy implements GraphBuilderStrategy {
               this.dependencyGraph.addVertex(address, vertex)
             } else {
               const size = checkMatrixSize(parseResult.ast, address)
-              if(size instanceof CellError || (size.width<=1 && size.height<=1)) {
+              if(size instanceof CellError || (size.width<=1 && size.height<=1) || size.isRef) {
                 const vertex = new FormulaCellVertex(parseResult.ast, address, 0)
                 dependencies.set(vertex, absolutizeDependencies(parseResult.dependencies, address))
                 this.dependencyGraph.addVertex(address, vertex)

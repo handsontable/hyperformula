@@ -641,7 +641,7 @@ export class Operations {
           this.dependencyGraph.setParsingErrorToCell(address, new ParsingErrorVertex(errors, parsedCellContent.formula))
         } else {
           const size = checkMatrixSize(ast, address)
-          if(size instanceof CellError || (size.width<=1 && size.height<=1)) {
+          if(size instanceof CellError || (size.width<=1 && size.height<=1) || size.isRef) {
             this.dependencyGraph.setFormulaToCell(address, ast, absolutizeDependencies(dependencies, address), hasVolatileFunction, hasStructuralChangeFunction)
           } else {
             const vertex = new MatrixVertex(address, size.width, size.height, ast)

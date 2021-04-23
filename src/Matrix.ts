@@ -12,6 +12,7 @@ export class MatrixSize {
   constructor(
     public width: number,
     public height: number,
+    public isRef?: boolean,
   ) {
     if (width <= 0 || height <= 0) {
       throw Error('Incorrect matrix size')
@@ -115,14 +116,16 @@ export function checkMatrixSize(ast: Ast, formulaAddress: SimpleCellAddress): Ma
       }
     }
   } else if (ast.type === AstNodeType.CELL_RANGE) {
-    try { //TODO without try-catch
-      const range = AbsoluteCellRange.fromCellRange(ast, formulaAddress)
-      return {width: range.width(), height: range.height()}
-    } catch (e) {
+    const range = AbsoluteCellRange.fromCellRangeOrUndef(ast, formulaAddress)
+    if(range === undefined) {
       return new CellError(ErrorType.VALUE)
+    } else {
+      return new MatrixSize(range.width(), range.height(), true)
     }
-  } else if (ast.type === AstNodeType.NUMBER || ast.type === AstNodeType.CELL_REFERENCE) {
-    return {width: 1, height: 1}
+  } else if (ast.type === AstNodeType.NUMBER) {
+    return new MatrixSize(1,1)
+  } else if (ast.type === AstNodeType.CELL_REFERENCE) {
+    return new MatrixSize(1,1, true)
   } else {
     return new CellError(ErrorType.VALUE) //TODO
   }

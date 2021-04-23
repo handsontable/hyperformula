@@ -655,7 +655,7 @@ describe('change multiple cells contents', () => {
     const engine = HyperFormula.buildFromArray(sheet)
 
     expect(() => {
-      engine.setCellContents(adr('A1'), [['42', '=MMULT(A1:B2,A1:B2)']])
+      engine.setCellContents(adr('A1'), [['42', '18', '=MMULT(A1:B2,A1:B2)']])
     }).toThrowError('Cant change matrices in batch operation')
     expect(engine.getCellValue(adr('A1'))).toBe(1)
   })
