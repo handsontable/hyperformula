@@ -656,16 +656,16 @@ describe('change multiple cells contents', () => {
     expect(evaluatorCallSpy).toHaveBeenCalledTimes(1)
   })
 
-  it('it not possible to change matrices', () => {
+  it('possible to change matrices', () => {
     const sheet = [
       ['1', '2'],
     ]
     const engine = HyperFormula.buildFromArray(sheet)
 
-    expect(() => {
-      engine.setCellContents(adr('A1'), [['42', '18', '=MMULT(A1:B2,A1:B2)']])
-    }).toThrowError('Cant change matrices in batch operation')
-    expect(engine.getCellValue(adr('A1'))).toBe(1)
+    engine.setCellContents(adr('A1'), [['42', '18', '=MMULT(A1:B1,TRANSPOSE(A1:B1))']])
+    expect(engine.getCellValue(adr('A1'))).toBe(42)
+    expect(engine.getCellValue(adr('B1'))).toBe(18)
+    expect(engine.getCellValue(adr('C1'))).toBe(2088)
   })
 
   it('returns changes of multiple values', () => {
