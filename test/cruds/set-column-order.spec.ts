@@ -51,16 +51,16 @@ describe('swapping columns - checking if it is possible', () => {
     ).toThrowError('Cannot perform this operation, source location has a matrix inside.')
   })
 
-  it('should check for matrices only in moved rows', () => {
-    const engine = HyperFormula.buildFromArray([[0, '{=1}', 0]])
-    expect(engine.isItPossibleToSwapColumnIndexes(0, [[0, 2], [1, 1], [2, 0]])).toEqual(true)
+  it('should check for matrices only in moved columns', () => {
+    const engine = HyperFormula.buildFromArray([[0, 0, '=TRANSPOSE(A1:B1)']])
+    expect(engine.isItPossibleToSwapColumnIndexes(0, [[0, 1], [1, 0], [2, 2]])).toEqual(true)
     expect(() =>
-      engine.swapColumnIndexes(0, [[0, 2], [1, 1], [2, 0]])
+      engine.swapColumnIndexes(0, [[0, 1], [1, 0], [2, 2]])
     ).not.toThrowError()
   })
 })
 
-describe('swapping rows should correctly work', () => {
+describe('swapping columns should correctly work', () => {
   it('should work on static engine', () => {
     const engine = HyperFormula.buildFromArray([[1, 'abcd'], [3, 3], [5, true]])
     expect(engine.isItPossibleToSwapColumnIndexes(0, [[0, 1], [1, 0]])).toEqual(true)
@@ -216,11 +216,11 @@ describe('setting column order - checking if it is possible', () => {
     ).toThrowError('Cannot perform this operation, source location has a matrix inside.')
   })
 
-  it('should check for matrices only in moved columns', () => { //FIXME
-    const engine = HyperFormula.buildFromArray([[0, '{=1}', 0]])
-    expect(engine.isItPossibleToSetColumnOrder(0, [2, 1, 0])).toEqual(true)
+  it('should check for matrices only in moved columns', () => {
+    const engine = HyperFormula.buildFromArray([[0, 0, '=TRANSPOSE(A1:B1)']])
+    expect(engine.isItPossibleToSetColumnOrder(0, [1, 0, 2])).toEqual(true)
     expect(() =>
-      engine.setColumnOrder(0, [2, 1, 0])
+      engine.setColumnOrder(0, [1, 0, 2])
     ).not.toThrowError()
   })
 })

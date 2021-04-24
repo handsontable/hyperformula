@@ -51,11 +51,11 @@ describe('swapping rows - checking if it is possible', () => {
     ).toThrowError('Cannot perform this operation, source location has a matrix inside.')
   })
 
-  it('should check for matrices only in moved rows', () => { //FIXME
-    const engine = HyperFormula.buildFromArray([[0], ['{=1}'], [0]])
-    expect(engine.isItPossibleToSwapRowIndexes(0, [[0, 2], [1, 1], [2, 0]])).toEqual(true)
+  it('should check for matrices only in moved rows', () => {
+    const engine = HyperFormula.buildFromArray([[0], [0], ['=TRANSPOSE(A1:A2)']])
+    expect(engine.isItPossibleToSwapRowIndexes(0, [[0, 1], [1, 0], [2, 2]])).toEqual(true)
     expect(() =>
-      engine.swapRowIndexes(0, [[0, 2], [1, 1], [2, 0]])
+      engine.swapRowIndexes(0, [[0, 1], [1, 0], [2, 2]])
     ).not.toThrowError()
   })
 })
@@ -224,10 +224,10 @@ describe('setting row order - checking if it is possible', () => {
   })
 
   it('should check for matrices only in moved rows', () => {
-    const engine = HyperFormula.buildFromArray([[0], ['{=1}'], [0]])
-    expect(engine.isItPossibleToSetRowOrder(0, [2, 1, 0])).toEqual(true)
+    const engine = HyperFormula.buildFromArray([[0], [0], ['=TRANSPOSE(A1:A2)']])
+    expect(engine.isItPossibleToSetRowOrder(0, [1, 0, 2])).toEqual(true)
     expect(() =>
-      engine.setRowOrder(0, [2, 1, 0])
+      engine.setRowOrder(0, [1, 0, 2])
     ).not.toThrowError()
   })
 })
