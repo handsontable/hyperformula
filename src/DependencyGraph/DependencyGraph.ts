@@ -873,9 +873,7 @@ export class DependencyGraph {
   private exchangeOrAddMatrixVertex(matrixVertex: MatrixVertex): void {
     const range = AbsoluteCellRange.spanFrom(matrixVertex.getAddress(), matrixVertex.width, matrixVertex.height)
     for (const vertex of this.verticesFromRange(range)) {
-      if (vertex instanceof MatrixVertex) {
-        throw Error('You cannot modify only part of an array')
-      }
+       this.ensureThatVertexIsNonMatrixCellVertex(vertex)
     }
 
     this.setMatrix(range, matrixVertex)

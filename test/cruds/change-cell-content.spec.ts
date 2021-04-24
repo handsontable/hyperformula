@@ -426,7 +426,7 @@ describe('changing cell content', () => {
 
     expect(() => {
       engine.setCellContents(adr('A2'), '=TRANSPOSE(C1:C2)')
-    }).toThrowError('You cannot modify only part of an array')
+    }).toThrowError('Illegal operation')
   })
 
   it('is not possible to set cell content in sheet which does not exist', () => {
