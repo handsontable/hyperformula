@@ -123,9 +123,9 @@ export function checkMatrixSize(ast: Ast, formulaAddress: SimpleCellAddress): Ma
       return new MatrixSize(range.width(), range.height(), true)
     }
   } else if (ast.type === AstNodeType.NUMBER) {
-    return new MatrixSize(1,1)
+    return new MatrixSize(1, 1)
   } else if (ast.type === AstNodeType.CELL_REFERENCE) {
-    return new MatrixSize(1,1, true)
+    return new MatrixSize(1, 1, true)
   } else {
     return new CellError(ErrorType.VALUE) //TODO
   }

@@ -115,7 +115,7 @@ describe('Adding column - matrix check', () => {
 
   it('should be possible to add row right before matrix', () => {
     const engine = HyperFormula.buildFromArray([
-      ['=TRANSPOSE(C1:D2)',undefined, '1', '2'],
+      ['=TRANSPOSE(C1:D2)', undefined, '1', '2'],
       [undefined, undefined, '3', '4'],
     ])
 

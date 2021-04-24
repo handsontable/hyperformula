@@ -753,7 +753,7 @@ describe('column index', () => {
     engine.paste(adr('B1'))
 
     const index = engine.columnSearch as ColumnIndex
-    expectArrayWithSameContent([1,2], index.getValueIndex(0, 0, 1).index)
+    expectArrayWithSameContent([1, 2], index.getValueIndex(0, 0, 1).index)
     expectArrayWithSameContent([0], index.getValueIndex(0, 1, 1).index)
   })
 
