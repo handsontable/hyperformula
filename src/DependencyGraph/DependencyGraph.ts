@@ -6,12 +6,7 @@
 import assert from 'assert'
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
 import {absolutizeDependencies} from '../absolutizeDependencies'
-import {
-  CellError,
-  ErrorType,
-  simpleCellAddress,
-  SimpleCellAddress
-} from '../Cell'
+import {CellError, ErrorType, simpleCellAddress, SimpleCellAddress} from '../Cell'
 import {RawCellContent} from '../CellContentParser'
 import {CellDependency} from '../CellDependency'
 import {Config} from '../Config'
@@ -39,15 +34,17 @@ import {Graph, TopSortResult} from './Graph'
 import {MatrixMapping} from './MatrixMapping'
 import {RangeMapping} from './RangeMapping'
 import {SheetMapping} from './SheetMapping'
-import {RawAndParsedValue, ValueCellVertexValue} from './ValueCellVertex'
+import {RawAndParsedValue} from './ValueCellVertex'
 import {FunctionRegistry} from '../interpreter/FunctionRegistry'
 import {
   EmptyValue,
+  ExtendedNumber,
   getRawValue,
   InternalScalarValue,
   InterpreterValue,
-  RawScalarValue, ExtendedNumber
+  RawScalarValue
 } from '../interpreter/InterpreterValue'
+import {MatrixSize} from '../Matrix'
 
 export class DependencyGraph {
   /*
@@ -154,6 +151,16 @@ export class DependencyGraph {
       this.removeVertex(vertex)
       this.addressMapping.removeCell(address)
     }
+  }
+
+  public setMatrixToCell(address: SimpleCellAddress, ast: Ast, dependencies: CellDependency[], size: MatrixSize) {
+    const vertex = new MatrixVertex(address, size.width, size.height, ast)
+    this.exchangeOrAddMatrixVertex(vertex)
+
+    this.processCellDependencies(dependencies, vertex)
+
+    this.graph.markNodeAsSpecialRecentlyChanged(vertex)
+    this.correctInfiniteRangesDependency(address)
   }
 
   public ensureThatVertexIsNonMatrixCellVertex(vertex: CellVertex | null) {
@@ -556,24 +563,6 @@ export class DependencyGraph {
     this.setAddressMappingForMatrixVertex(vertex, address)
   }
 
-  public addNewMatrixVertex(matrixVertex: MatrixVertex): void {
-    const range = AbsoluteCellRange.spanFrom(matrixVertex.getAddress(), matrixVertex.width, matrixVertex.height)
-    for (const vertex of this.verticesFromRange(range)) {
-      if (vertex instanceof MatrixVertex) {
-        throw Error('You cannot modify only part of an array')
-      }
-    }
-
-    this.setMatrix(range, matrixVertex)
-
-    for (const [address, vertex] of this.entriesFromRange(range)) {
-      if (vertex) {
-        this.exchangeGraphNode(vertex, matrixVertex)
-      }
-      this.setVertexAddress(address, matrixVertex)
-    }
-  }
-
   public* matrixFormulaNodes(): IterableIterator<MatrixVertex> {
     for (const vertex of this.graph.nodes) {
       if (vertex instanceof MatrixVertex && vertex.isFormula()) {
@@ -878,6 +867,22 @@ export class DependencyGraph {
           this.graph.addEdge(this.fetchCellOrCreateEmpty(address), rangeVertex)
         }
       }
+    }
+  }
+
+  private exchangeOrAddMatrixVertex(matrixVertex: MatrixVertex): void {
+    const range = AbsoluteCellRange.spanFrom(matrixVertex.getAddress(), matrixVertex.width, matrixVertex.height)
+    for (const vertex of this.verticesFromRange(range)) {
+      if (vertex instanceof MatrixVertex) {
+        throw Error('You cannot modify only part of an array')
+      }
+    }
+
+    this.setMatrix(range, matrixVertex)
+
+    for (const [address, vertex] of this.entriesFromRange(range)) {
+      this.exchangeOrAddGraphNode(vertex, matrixVertex)
+      this.addressMapping.setCell(address, matrixVertex)
     }
   }
 

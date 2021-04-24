@@ -644,10 +644,7 @@ export class Operations {
           if(size instanceof CellError || (size.width<=1 && size.height<=1) || size.isRef) {
             this.dependencyGraph.setFormulaToCell(address, ast, absolutizeDependencies(dependencies, address), hasVolatileFunction, hasStructuralChangeFunction)
           } else {
-            const vertex = new MatrixVertex(address, size.width, size.height, ast)
-            this.dependencyGraph.addNewMatrixVertex(vertex)
-            this.dependencyGraph.processCellDependencies(absolutizeDependencies(dependencies, address), vertex)
-            this.dependencyGraph.graph.markNodeAsSpecialRecentlyChanged(vertex)
+            this.dependencyGraph.setMatrixToCell(address, ast, absolutizeDependencies(dependencies, address), size)
           }
         }
       } else if (parsedCellContent instanceof CellContent.Empty) {

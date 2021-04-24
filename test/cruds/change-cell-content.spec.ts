@@ -597,6 +597,14 @@ describe('changing cell content', () => {
     expect(() => engine.setCellContents(cellInLastColumn, null)).not.toThrow()
     expect(() => engine.setCellContents(cellInLastRow, null)).not.toThrow()
   })
+
+  it('should set matrix with range out of current sheet scope', () => {
+    const sheet = [
+      ['1', '2'],
+    ]
+    const engine = HyperFormula.buildFromArray(sheet)
+    engine.setCellContents(adr('C1'), '=MMULT(A1:B2,A1:B2)')
+  })
 })
 
 describe('change multiple cells contents', () => {
