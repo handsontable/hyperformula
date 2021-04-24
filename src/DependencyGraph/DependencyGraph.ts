@@ -555,7 +555,7 @@ export class DependencyGraph {
 
   public addVertex(address: SimpleCellAddress, vertex: CellVertex): void {
     this.graph.addNode(vertex)
-    this.setVertexAddress(address, vertex)
+    this.addressMapping.setCell(address, vertex)
   }
 
   public addMatrixVertex(address: SimpleCellAddress, vertex: CellVertex): void {
@@ -605,10 +605,6 @@ export class DependencyGraph {
       return new CellError(ErrorType.VALUE, ErrorMessage.ScalarExpected)
     }
     return value
-  }
-
-  public setVertexAddress(address: SimpleCellAddress, vertex: CellVertex) {
-    this.addressMapping.setCell(address, vertex)
   }
 
   public existsEdge(fromNode: Vertex, toNode: Vertex): boolean {
@@ -885,7 +881,7 @@ export class DependencyGraph {
   }
 
   private setAddressMappingForMatrixVertex(vertex: CellVertex, formulaAddress: SimpleCellAddress): void {
-    this.setVertexAddress(formulaAddress, vertex)
+    this.addressMapping.setCell(formulaAddress, vertex)
 
     if (!(vertex instanceof MatrixVertex)) {
       return
@@ -895,7 +891,7 @@ export class DependencyGraph {
     this.setMatrix(range, vertex)
 
     for (const address of range.addresses(this)) {
-      this.setVertexAddress(address, vertex)
+      this.addressMapping.setCell(address, vertex)
     }
   }
 
