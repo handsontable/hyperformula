@@ -658,7 +658,7 @@ export class CrudOperations {
     }
   }
 
-  public scopeId(sheetName: string | undefined): number | undefined {
+  public scopeId(sheetName?: string): Maybe<number> {
     if (sheetName !== undefined) {
       this.ensureSheetExists(sheetName)
       return this.sheetMapping.fetch(sheetName)
