@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Added two new fired events, for suspending and resuming execution. (#637)
 - Added support for array arithmetic. (#628)
+- Added performance improvements for array handling. (#629)
 
 ### Fixed
 - Fixed an issue with losing formating info about DateTime numbers. (#626)

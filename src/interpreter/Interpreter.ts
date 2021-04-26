@@ -30,7 +30,7 @@ import {
   InterpreterValue,
   isExtendedNumber,
 } from './InterpreterValue'
-import {SimpleRangeValue} from './SimpleRangeValue'
+import {ArrayData, SimpleRangeValue} from './SimpleRangeValue'
 
 export class Interpreter {
   private gpu?: GPU
@@ -346,10 +346,43 @@ export class Interpreter {
       return new CellError(ErrorType.VALUE, ErrorMessage.ScalarExpected)
     } else if(arg1 instanceof SimpleRangeValue || arg2 instanceof SimpleRangeValue) {
       if(!(arg1 instanceof SimpleRangeValue)) {
-        arg1 = SimpleRangeValue.fromScalar(arg1)
+        if((arg2 as SimpleRangeValue).adhoc) {
+          (arg2 as SimpleRangeValue).data.map((arg) => op(arg1 as InternalScalarValue, arg))
+          return SimpleRangeValue.onlyValues((arg2 as SimpleRangeValue).raw())
+        } else {
+          arg1 = SimpleRangeValue.fromScalar(arg1)
+        }
       }
       if(!(arg2 instanceof SimpleRangeValue)) {
-        arg2 = SimpleRangeValue.fromScalar(arg2)
+        if(arg1.adhoc) {
+          arg1.data.map((arg) => op(arg, arg2 as InternalScalarValue))
+          return SimpleRangeValue.onlyValues(arg1.raw())
+        } else {
+          arg2 = SimpleRangeValue.fromScalar(arg2)
+        }
+      }
+      if(arg1.width()===arg2.width() && arg1.height()===arg2.height()) {
+        if(arg1.adhoc) {
+          const raw1 = arg1.raw()
+          const raw2 = arg2.raw()
+          for(let i=0;i<raw1.length;i++) {
+            for(let j=0;j<raw1[0].length;j++) {
+              raw1[i][j] = op(raw1[i][j], raw2[i][j])
+            }
+          }
+          return SimpleRangeValue.onlyValues(arg1.raw())
+        }
+        if(arg2.adhoc) {
+          const raw1 = arg1.raw()
+          const raw2 = arg2.raw()
+          for(let i=0;i<raw1.length;i++) {
+            for(let j=0;j<raw1[0].length;j++) {
+              raw2[i][j] = op(raw1[i][j], raw2[i][j])
+            }
+          }
+          return SimpleRangeValue.onlyValues(arg2.raw())
+        }
+
       }
       const width = Math.max(arg1.width(), arg2.width())
       const height = Math.max(arg1.height(), arg2.height())
@@ -401,4 +434,3 @@ function wrapperForAddress(val: InterpreterValue, adr: SimpleCellAddress): Inter
   }
   return val
 }
-
