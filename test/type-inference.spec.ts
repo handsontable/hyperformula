@@ -328,3 +328,23 @@ describe('formatting info', () => {
     expect(engine.getCellValueFormat(adr('C4'))).toBe(undefined)
   })
 })
+
+describe('Datetime formatting', () => {
+  it('should be correctly inferred by addition', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['01/01/1900', '12:00', '01/01/1900 12:00'],
+      ['=A1+A1', '=A1+B1', '=A1+C1'],
+      ['=B1+A1', '=B1+B1', '=B1+C1'],
+      ['=C1+A1', '=C1+B1', '=C1+C1'],
+    ])
+    expect(engine.getCellValueFormat(adr('A2'))).toBe(undefined)
+    expect(engine.getCellValueFormat(adr('B2'))).toBe('DD/MM/YYYY hh:mm')
+    expect(engine.getCellValueFormat(adr('C2'))).toBe(undefined)
+    expect(engine.getCellValueFormat(adr('A3'))).toBe('DD/MM/YYYY hh:mm')
+    expect(engine.getCellValueFormat(adr('B3'))).toBe('hh:mm')
+    expect(engine.getCellValueFormat(adr('C3'))).toBe('DD/MM/YYYY hh:mm')
+    expect(engine.getCellValueFormat(adr('A4'))).toBe(undefined)
+    expect(engine.getCellValueFormat(adr('B4'))).toBe('DD/MM/YYYY hh:mm')
+    expect(engine.getCellValueFormat(adr('C4'))).toBe(undefined)
+  })
+})
