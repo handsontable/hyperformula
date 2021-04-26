@@ -191,6 +191,10 @@ export class SimpleRangeValue {
     return new SimpleRangeValue(new ArrayData(size, data, true))
   }
 
+  public static onlyValues(data: InternalScalarValue[][]): SimpleRangeValue {
+    return new SimpleRangeValue(new ArrayData(MatrixSize.fromMatrix(data), data, false)) //FIXME test for _hasOnlyNumbers
+  }
+
   public static onlyRange(range: AbsoluteCellRange, dependencyGraph: DependencyGraph): SimpleRangeValue {
     return new SimpleRangeValue(new OnlyRangeData({
       width: range.width(),

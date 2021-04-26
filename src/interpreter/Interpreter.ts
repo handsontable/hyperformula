@@ -3,6 +3,7 @@
  * Copyright (c) 2021 Handsoncode. All rights reserved.
  */
 
+import {GPU} from 'gpu.js'
 import {AbsoluteCellRange, AbsoluteColumnRange, AbsoluteRowRange} from '../AbsoluteCellRange'
 import {CellError, ErrorType, invalidSimpleCellAddress, SimpleCellAddress} from '../Cell'
 import {Config} from '../Config'
@@ -12,7 +13,6 @@ import {ErrorMessage} from '../error-message'
 import {LicenseKeyValidityState} from '../helpers/licenseKeyValidator'
 import {ColumnSearchStrategy} from '../Lookup/SearchStrategy'
 import {Matrix, NotComputedMatrix} from '../Matrix'
-import {Maybe} from '../Maybe'
 import {NamedExpressions} from '../NamedExpressions'
 import {NumberLiteralHelper} from '../NumberLiteralHelper'
 // noinspection TypeScriptPreferShortImport
@@ -26,11 +26,10 @@ import {
   cloneNumber,
   EmptyValue,
   getRawValue,
-  InternalNoErrorScalarValue,
+  InternalScalarValue,
+  InterpreterValue,
   isExtendedNumber,
 } from './InterpreterValue'
-import {InterpreterValue} from './InterpreterValue'
-import type {GPU} from 'gpu.js'
 import {SimpleRangeValue} from './SimpleRangeValue'
 
 export class Interpreter {
@@ -94,123 +93,74 @@ export class Interpreter {
       case AstNodeType.CONCATENATE_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
         const rightResult = this.evaluateAst(ast.right, formulaAddress)
-        return passErrors(leftResult, rightResult) ??
-          wrapperBinary(this.arithmeticHelper.concat,
-            coerceScalarToString(leftResult as InternalNoErrorScalarValue),
-            coerceScalarToString(rightResult as InternalNoErrorScalarValue)
-          )
+        return this.binaryRangeWrapper(this.concatOp, leftResult, rightResult)
       }
       case AstNodeType.EQUALS_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
         const rightResult = this.evaluateAst(ast.right, formulaAddress)
-        return passErrors(leftResult, rightResult) ??
-          this.arithmeticHelper.eq(leftResult as InternalNoErrorScalarValue, rightResult as InternalNoErrorScalarValue)
+        return this.binaryRangeWrapper(this.equalOp, leftResult, rightResult)
       }
       case AstNodeType.NOT_EQUAL_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
         const rightResult = this.evaluateAst(ast.right, formulaAddress)
-        return passErrors(leftResult, rightResult) ??
-          this.arithmeticHelper.neq(leftResult as InternalNoErrorScalarValue, rightResult as InternalNoErrorScalarValue)
+        return this.binaryRangeWrapper(this.notEqualOp, leftResult, rightResult)
       }
       case AstNodeType.GREATER_THAN_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
         const rightResult = this.evaluateAst(ast.right, formulaAddress)
-        return passErrors(leftResult, rightResult) ??
-          this.arithmeticHelper.gt(leftResult as InternalNoErrorScalarValue, rightResult as InternalNoErrorScalarValue)
+        return this.binaryRangeWrapper(this.greaterThanOp, leftResult, rightResult)
       }
       case AstNodeType.LESS_THAN_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
         const rightResult = this.evaluateAst(ast.right, formulaAddress)
-        return passErrors(leftResult, rightResult) ??
-          this.arithmeticHelper.lt(leftResult as InternalNoErrorScalarValue, rightResult as InternalNoErrorScalarValue)
+        return this.binaryRangeWrapper(this.lessThanOp, leftResult, rightResult)
       }
       case AstNodeType.GREATER_THAN_OR_EQUAL_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
         const rightResult = this.evaluateAst(ast.right, formulaAddress)
-        return passErrors(leftResult, rightResult) ??
-          this.arithmeticHelper.geq(leftResult as InternalNoErrorScalarValue, rightResult as InternalNoErrorScalarValue)
+        return this.binaryRangeWrapper(this.greaterThanOrEqualOp, leftResult, rightResult)
       }
       case AstNodeType.LESS_THAN_OR_EQUAL_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
         const rightResult = this.evaluateAst(ast.right, formulaAddress)
-        return passErrors(leftResult, rightResult) ??
-          this.arithmeticHelper.leq(leftResult as InternalNoErrorScalarValue, rightResult as InternalNoErrorScalarValue)
+        return this.binaryRangeWrapper(this.lessThanOrEqualOp, leftResult, rightResult)
       }
       case AstNodeType.PLUS_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
         const rightResult = this.evaluateAst(ast.right, formulaAddress)
-        return passErrors(leftResult, rightResult) ??
-          wrapperBinary(this.arithmeticHelper.addWithEpsilon,
-            this.arithmeticHelper.coerceScalarToNumberOrError(leftResult as InternalNoErrorScalarValue),
-            this.arithmeticHelper.coerceScalarToNumberOrError(rightResult as InternalNoErrorScalarValue)
-          )
+        return this.binaryRangeWrapper(this.plusOp, leftResult, rightResult)
       }
       case AstNodeType.MINUS_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
         const rightResult = this.evaluateAst(ast.right, formulaAddress)
-        return passErrors(leftResult, rightResult) ??
-          wrapperBinary(this.arithmeticHelper.subtract,
-            this.arithmeticHelper.coerceScalarToNumberOrError(leftResult as InternalNoErrorScalarValue),
-            this.arithmeticHelper.coerceScalarToNumberOrError(rightResult as InternalNoErrorScalarValue)
-          )
+        return this.binaryRangeWrapper(this.minusOp, leftResult, rightResult)
       }
       case AstNodeType.TIMES_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
         const rightResult = this.evaluateAst(ast.right, formulaAddress)
-        return passErrors(leftResult, rightResult) ??
-          wrapperBinary(
-            this.arithmeticHelper.multiply,
-            this.arithmeticHelper.coerceScalarToNumberOrError(leftResult as InternalNoErrorScalarValue),
-            this.arithmeticHelper.coerceScalarToNumberOrError(rightResult as InternalNoErrorScalarValue)
-          )
+        return this.binaryRangeWrapper(this.timesOp, leftResult, rightResult)
       }
       case AstNodeType.POWER_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
         const rightResult = this.evaluateAst(ast.right, formulaAddress)
-        return passErrors(leftResult, rightResult) ??
-          wrapperBinary(
-            this.arithmeticHelper.pow,
-            this.arithmeticHelper.coerceScalarToNumberOrError(leftResult as InternalNoErrorScalarValue),
-            this.arithmeticHelper.coerceScalarToNumberOrError(rightResult as InternalNoErrorScalarValue)
-          )
+        return this.binaryRangeWrapper(this.powerOp, leftResult, rightResult)
       }
       case AstNodeType.DIV_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
         const rightResult = this.evaluateAst(ast.right, formulaAddress)
-        return passErrors(leftResult, rightResult) ??
-          wrapperBinary(
-            this.arithmeticHelper.divide,
-            this.arithmeticHelper.coerceScalarToNumberOrError(leftResult as InternalNoErrorScalarValue),
-            this.arithmeticHelper.coerceScalarToNumberOrError(rightResult as InternalNoErrorScalarValue)
-          )
+        return this.binaryRangeWrapper(this.divOp, leftResult, rightResult)
       }
       case AstNodeType.PLUS_UNARY_OP: {
         const result = this.evaluateAst(ast.value, formulaAddress)
-        if (result instanceof SimpleRangeValue) {
-          return new CellError(ErrorType.VALUE, ErrorMessage.ScalarExpected)
-        } else if(isExtendedNumber(result)) {
-         return this.arithmeticHelper.unaryPlus(result)
-        } else {
-          return result
-        }
+        return this.unaryRangeWrapper(this.unaryPlusOp, result)
       }
       case AstNodeType.MINUS_UNARY_OP: {
         const result = this.evaluateAst(ast.value, formulaAddress)
-        if (result instanceof SimpleRangeValue) {
-          return new CellError(ErrorType.VALUE, ErrorMessage.ScalarExpected)
-        } else {
-          return wrapperUnary(this.arithmeticHelper.unaryMinus,
-            this.arithmeticHelper.coerceScalarToNumberOrError(result))
-        }
+        return this.unaryRangeWrapper(this.unaryMinusOp, result)
       }
       case AstNodeType.PERCENT_OP: {
         const result = this.evaluateAst(ast.value, formulaAddress)
-        if (result instanceof SimpleRangeValue) {
-          return new CellError(ErrorType.VALUE, ErrorMessage.ScalarExpected)
-        } else {
-          return wrapperUnary(this.arithmeticHelper.unaryPercent,
-            this.arithmeticHelper.coerceScalarToNumberOrError(result))
-        }
+        return this.unaryRangeWrapper(this.percentOp, result)
       }
       case AstNodeType.FUNCTION_CALL: {
         if (this.config.licenseKeyValidityState !== LicenseKeyValidityState.VALID && !FunctionRegistry.functionIsProtected(ast.procedureName)) {
@@ -301,37 +251,147 @@ export class Interpreter {
   private rangeSpansOneSheet(ast: CellRangeAst | ColumnRangeAst | RowRangeAst): boolean {
     return ast.start.sheet === ast.end.sheet
   }
-}
 
-function passErrors(left: InterpreterValue, right: InterpreterValue): Maybe<CellError> {
-  if (left instanceof CellError) {
-    return left
-  } else if (left instanceof SimpleRangeValue) {
-    return new CellError(ErrorType.VALUE, ErrorMessage.ScalarExpected)
-  } else if (right instanceof CellError) {
-    return right
-  } else if (right instanceof SimpleRangeValue) {
-    return new CellError(ErrorType.VALUE, ErrorMessage.ScalarExpected)
-  } else {
-    return undefined
+  private equalOp = (arg1: InternalScalarValue, arg2: InternalScalarValue): InternalScalarValue =>
+    binaryErrorWrapper(this.arithmeticHelper.eq, arg1, arg2)
+
+  private notEqualOp = (arg1: InternalScalarValue, arg2: InternalScalarValue): InternalScalarValue =>
+    binaryErrorWrapper(this.arithmeticHelper.neq, arg1, arg2)
+
+  private greaterThanOp = (arg1: InternalScalarValue, arg2: InternalScalarValue): InternalScalarValue =>
+    binaryErrorWrapper(this.arithmeticHelper.gt, arg1, arg2)
+
+  private lessThanOp = (arg1: InternalScalarValue, arg2: InternalScalarValue): InternalScalarValue =>
+    binaryErrorWrapper(this.arithmeticHelper.lt, arg1, arg2)
+
+  private greaterThanOrEqualOp = (arg1: InternalScalarValue, arg2: InternalScalarValue): InternalScalarValue =>
+    binaryErrorWrapper(this.arithmeticHelper.geq, arg1, arg2)
+
+  private lessThanOrEqualOp = (arg1: InternalScalarValue, arg2: InternalScalarValue): InternalScalarValue =>
+    binaryErrorWrapper(this.arithmeticHelper.leq, arg1, arg2)
+
+  private concatOp = (arg1: InternalScalarValue, arg2: InternalScalarValue): InternalScalarValue =>
+       binaryErrorWrapper(this.arithmeticHelper.concat,
+        coerceScalarToString(arg1),
+        coerceScalarToString(arg2)
+      )
+
+  private plusOp = (arg1: InternalScalarValue, arg2: InternalScalarValue): InternalScalarValue =>
+      binaryErrorWrapper(this.arithmeticHelper.addWithEpsilon,
+        this.arithmeticHelper.coerceScalarToNumberOrError(arg1),
+        this.arithmeticHelper.coerceScalarToNumberOrError(arg2)
+      )
+
+  private minusOp = (arg1: InternalScalarValue, arg2: InternalScalarValue): InternalScalarValue =>
+      binaryErrorWrapper(this.arithmeticHelper.subtract,
+        this.arithmeticHelper.coerceScalarToNumberOrError(arg1),
+        this.arithmeticHelper.coerceScalarToNumberOrError(arg2)
+      )
+
+  private timesOp = (arg1: InternalScalarValue, arg2: InternalScalarValue): InternalScalarValue =>
+      binaryErrorWrapper(
+        this.arithmeticHelper.multiply,
+        this.arithmeticHelper.coerceScalarToNumberOrError(arg1),
+        this.arithmeticHelper.coerceScalarToNumberOrError(arg2)
+      )
+
+  private powerOp = (arg1: InternalScalarValue, arg2: InternalScalarValue): InternalScalarValue =>
+      binaryErrorWrapper(
+        this.arithmeticHelper.pow,
+        this.arithmeticHelper.coerceScalarToNumberOrError(arg1),
+        this.arithmeticHelper.coerceScalarToNumberOrError(arg2)
+      )
+
+  private divOp = (arg1: InternalScalarValue, arg2: InternalScalarValue): InternalScalarValue =>
+      binaryErrorWrapper(
+        this.arithmeticHelper.divide,
+        this.arithmeticHelper.coerceScalarToNumberOrError(arg1),
+        this.arithmeticHelper.coerceScalarToNumberOrError(arg2)
+      )
+
+  private unaryMinusOp = (arg: InternalScalarValue): InternalScalarValue =>
+    unaryErrorWrapper(this.arithmeticHelper.unaryMinus,
+      this.arithmeticHelper.coerceScalarToNumberOrError(arg))
+
+  private percentOp = (arg: InternalScalarValue): InternalScalarValue =>
+    unaryErrorWrapper(this.arithmeticHelper.unaryPercent,
+        this.arithmeticHelper.coerceScalarToNumberOrError(arg))
+
+  private unaryPlusOp = (arg: InternalScalarValue): InternalScalarValue => this.arithmeticHelper.unaryPlus(arg)
+
+  private unaryRangeWrapper(op: (arg: InternalScalarValue) => InternalScalarValue, arg: InterpreterValue): InterpreterValue {
+    if (arg instanceof CellError) {
+      return arg
+    } else if(arg instanceof SimpleRangeValue) {
+      if(!this.config.arrays) {
+        return new CellError(ErrorType.VALUE, ErrorMessage.ScalarExpected)
+      }
+      const newRaw = arg.raw().map(
+        (row) => row.map(op)
+      )
+      return SimpleRangeValue.onlyValues(newRaw)
+    } else {
+      return op(arg)
+    }
+  }
+
+  private binaryRangeWrapper(op: (arg1: InternalScalarValue, arg2: InternalScalarValue) => InternalScalarValue, arg1: InterpreterValue, arg2: InterpreterValue): InterpreterValue {
+    if (arg1 instanceof CellError) {
+      return arg1
+    } else if(arg1 instanceof SimpleRangeValue && !this.config.arrays) {
+      return new CellError(ErrorType.VALUE, ErrorMessage.ScalarExpected)
+    } else if (arg2 instanceof CellError) {
+      return arg2
+    } else if(arg2 instanceof SimpleRangeValue && !this.config.arrays) {
+      return new CellError(ErrorType.VALUE, ErrorMessage.ScalarExpected)
+    } else if(arg1 instanceof SimpleRangeValue || arg2 instanceof SimpleRangeValue) {
+      if(!(arg1 instanceof SimpleRangeValue)) {
+        arg1 = SimpleRangeValue.fromScalar(arg1)
+      }
+      if(!(arg2 instanceof SimpleRangeValue)) {
+        arg2 = SimpleRangeValue.fromScalar(arg2)
+      }
+      const width = Math.max(arg1.width(), arg2.width())
+      const height = Math.max(arg1.height(), arg2.height())
+      const ret: InternalScalarValue[][] = Array(height)
+      for(let i=0;i<height;i++) {
+        ret[i] = Array(width)
+      }
+      for(let i=0;i<height;i++) {
+        const i1 = (arg1.height() !== 1) ? i : 0
+        const i2 = (arg2.height() !== 1) ? i : 0
+        for(let j=0;j<width;j++) {
+          const j1 = (arg1.width() !== 1) ? j : 0
+          const j2 = (arg2.width() !== 1) ? j : 0
+          if(i1 < arg1.height() && i2 < arg2.height() && j1 < arg1.width() && j2 < arg2.width()) {
+            ret[i][j] = op(arg1.raw()[i1][j1], arg2.raw()[i2][j2])
+          } else {
+            ret[i][j] =  new CellError(ErrorType.NA)
+          }
+        }
+      }
+      return SimpleRangeValue.onlyValues(ret)
+    } else {
+      return op(arg1, arg2)
+    }
   }
 }
 
-function wrapperUnary<T extends InterpreterValue>(op: (a: T) => InterpreterValue, a: T | CellError): InterpreterValue {
-  if (a instanceof CellError) {
-    return a
+function unaryErrorWrapper<T extends InterpreterValue>(op: (arg: T) => InternalScalarValue, arg: T | CellError): InternalScalarValue {
+  if (arg instanceof CellError) {
+    return arg
   } else {
-    return op(a)
+    return op(arg)
   }
 }
 
-function wrapperBinary<T extends InterpreterValue>(op: (a: T, b: T) => InterpreterValue, a: T | CellError, b: T | CellError): InterpreterValue {
-  if (a instanceof CellError) {
-    return a
-  } else if (b instanceof CellError) {
-    return b
+function binaryErrorWrapper<T extends InterpreterValue>(op: (arg1: T, arg2: T) => InternalScalarValue, arg1: T | CellError, arg2: T | CellError): InternalScalarValue {
+  if (arg1 instanceof CellError) {
+    return arg1
+  } else if (arg2 instanceof CellError) {
+    return arg2
   } else {
-    return op(a, b)
+    return op(arg1, arg2)
   }
 }
 
@@ -341,3 +401,4 @@ function wrapperForAddress(val: InterpreterValue, adr: SimpleCellAddress): Inter
   }
   return val
 }
+
