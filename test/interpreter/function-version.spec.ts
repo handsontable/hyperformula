@@ -1,7 +1,7 @@
 import {HyperFormula} from '../../src'
 import {ProtectedFunctionError} from '../../src/errors'
 import {InterpreterValue} from '../../src/interpreter/InterpreterValue'
-import {FunctionPlugin} from '../../src/interpreter/plugin/FunctionPlugin'
+import {FunctionPlugin, FunctionPluginTypecheck} from '../../src/interpreter/plugin/FunctionPlugin'
 import {adr} from '../testUtils'
 
 describe('Function VERSION', () => {
@@ -68,7 +68,7 @@ describe('Function VERSION', () => {
   })
 
   describe('registering', () => {
-    class VersionExtra extends FunctionPlugin {
+    class VersionExtra extends FunctionPlugin implements FunctionPluginTypecheck<VersionExtra>{
       public static implementedFunctions = {
         'VERSION': {
           method: 'version',

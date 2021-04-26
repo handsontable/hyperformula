@@ -22,6 +22,7 @@ import {Statistics} from '../statistics/Statistics'
 import {ArithmeticHelper, coerceScalarToString, fixNegativeZero, isNumberOverflow} from './ArithmeticHelper'
 import {CriterionBuilder} from './Criterion'
 import {FunctionRegistry} from './FunctionRegistry'
+import {InterpreterState} from './InterpreterState'
 import {
   cloneNumber,
   EmptyValue,
@@ -31,6 +32,7 @@ import {
   isExtendedNumber,
 } from './InterpreterValue'
 import {ArrayData, SimpleRangeValue} from './SimpleRangeValue'
+import {FunctionPlugin, PluginFunctionType} from './plugin/FunctionPlugin'
 
 export class Interpreter {
   private gpu?: GPU
@@ -53,8 +55,8 @@ export class Interpreter {
     this.criterionBuilder = new CriterionBuilder(config)
   }
 
-  public evaluateAst(ast: Ast, formulaAddress: SimpleCellAddress): InterpreterValue {
-    let val = this.evaluateAstWithoutPostprocessing(ast, formulaAddress)
+  public evaluateAst(ast: Ast, state: InterpreterState): InterpreterValue {
+    let val = this.evaluateAstWithoutPostprocessing(ast, state)
     if (isExtendedNumber(val)) {
       if (isNumberOverflow(getRawValue(val))) {
         return new CellError(ErrorType.NUM, ErrorMessage.NaN)
@@ -65,7 +67,7 @@ export class Interpreter {
     if(val instanceof SimpleRangeValue && val.height() === 1 && val.width() === 1) {
       [[val]] = val.raw()
     }
-    return wrapperForAddress(val, formulaAddress)
+    return wrapperForAddress(val, state.formulaAddress)
   }
 
   /**
@@ -74,13 +76,13 @@ export class Interpreter {
    * @param formula - abstract syntax tree of formula
    * @param formulaAddress - address of the cell in which formula is located
    */
-  private evaluateAstWithoutPostprocessing(ast: Ast, formulaAddress: SimpleCellAddress): InterpreterValue {
+  private evaluateAstWithoutPostprocessing(ast: Ast, state: InterpreterState): InterpreterValue {
     switch (ast.type) {
       case AstNodeType.EMPTY: {
         return EmptyValue
       }
       case AstNodeType.CELL_REFERENCE: {
-        const address = ast.reference.toSimpleCellAddress(formulaAddress)
+        const address = ast.reference.toSimpleCellAddress(state.formulaAddress)
         if (invalidSimpleCellAddress(address)) {
           return new CellError(ErrorType.REF, ErrorMessage.BadRef)
         }
@@ -91,76 +93,76 @@ export class Interpreter {
         return ast.value
       }
       case AstNodeType.CONCATENATE_OP: {
-        const leftResult = this.evaluateAst(ast.left, formulaAddress)
-        const rightResult = this.evaluateAst(ast.right, formulaAddress)
-        return this.binaryRangeWrapper(this.concatOp, leftResult, rightResult)
+        const leftResult = this.evaluateAst(ast.left, state)
+        const rightResult = this.evaluateAst(ast.right, state)
+        return this.binaryRangeWrapper(this.concatOp, leftResult, rightResult, state)
       }
       case AstNodeType.EQUALS_OP: {
-        const leftResult = this.evaluateAst(ast.left, formulaAddress)
-        const rightResult = this.evaluateAst(ast.right, formulaAddress)
-        return this.binaryRangeWrapper(this.equalOp, leftResult, rightResult)
+        const leftResult = this.evaluateAst(ast.left, state)
+        const rightResult = this.evaluateAst(ast.right, state)
+        return this.binaryRangeWrapper(this.equalOp, leftResult, rightResult, state)
       }
       case AstNodeType.NOT_EQUAL_OP: {
-        const leftResult = this.evaluateAst(ast.left, formulaAddress)
-        const rightResult = this.evaluateAst(ast.right, formulaAddress)
-        return this.binaryRangeWrapper(this.notEqualOp, leftResult, rightResult)
+        const leftResult = this.evaluateAst(ast.left, state)
+        const rightResult = this.evaluateAst(ast.right, state)
+        return this.binaryRangeWrapper(this.notEqualOp, leftResult, rightResult, state)
       }
       case AstNodeType.GREATER_THAN_OP: {
-        const leftResult = this.evaluateAst(ast.left, formulaAddress)
-        const rightResult = this.evaluateAst(ast.right, formulaAddress)
-        return this.binaryRangeWrapper(this.greaterThanOp, leftResult, rightResult)
+        const leftResult = this.evaluateAst(ast.left, state)
+        const rightResult = this.evaluateAst(ast.right, state)
+        return this.binaryRangeWrapper(this.greaterThanOp, leftResult, rightResult, state)
       }
       case AstNodeType.LESS_THAN_OP: {
-        const leftResult = this.evaluateAst(ast.left, formulaAddress)
-        const rightResult = this.evaluateAst(ast.right, formulaAddress)
-        return this.binaryRangeWrapper(this.lessThanOp, leftResult, rightResult)
+        const leftResult = this.evaluateAst(ast.left, state)
+        const rightResult = this.evaluateAst(ast.right, state)
+        return this.binaryRangeWrapper(this.lessThanOp, leftResult, rightResult, state)
       }
       case AstNodeType.GREATER_THAN_OR_EQUAL_OP: {
-        const leftResult = this.evaluateAst(ast.left, formulaAddress)
-        const rightResult = this.evaluateAst(ast.right, formulaAddress)
-        return this.binaryRangeWrapper(this.greaterThanOrEqualOp, leftResult, rightResult)
+        const leftResult = this.evaluateAst(ast.left, state)
+        const rightResult = this.evaluateAst(ast.right, state)
+        return this.binaryRangeWrapper(this.greaterThanOrEqualOp, leftResult, rightResult, state)
       }
       case AstNodeType.LESS_THAN_OR_EQUAL_OP: {
-        const leftResult = this.evaluateAst(ast.left, formulaAddress)
-        const rightResult = this.evaluateAst(ast.right, formulaAddress)
-        return this.binaryRangeWrapper(this.lessThanOrEqualOp, leftResult, rightResult)
+        const leftResult = this.evaluateAst(ast.left, state)
+        const rightResult = this.evaluateAst(ast.right, state)
+        return this.binaryRangeWrapper(this.lessThanOrEqualOp, leftResult, rightResult, state)
       }
       case AstNodeType.PLUS_OP: {
-        const leftResult = this.evaluateAst(ast.left, formulaAddress)
-        const rightResult = this.evaluateAst(ast.right, formulaAddress)
-        return this.binaryRangeWrapper(this.plusOp, leftResult, rightResult)
+        const leftResult = this.evaluateAst(ast.left, state)
+        const rightResult = this.evaluateAst(ast.right, state)
+        return this.binaryRangeWrapper(this.plusOp, leftResult, rightResult, state)
       }
       case AstNodeType.MINUS_OP: {
-        const leftResult = this.evaluateAst(ast.left, formulaAddress)
-        const rightResult = this.evaluateAst(ast.right, formulaAddress)
-        return this.binaryRangeWrapper(this.minusOp, leftResult, rightResult)
+        const leftResult = this.evaluateAst(ast.left, state)
+        const rightResult = this.evaluateAst(ast.right, state)
+        return this.binaryRangeWrapper(this.minusOp, leftResult, rightResult, state)
       }
       case AstNodeType.TIMES_OP: {
-        const leftResult = this.evaluateAst(ast.left, formulaAddress)
-        const rightResult = this.evaluateAst(ast.right, formulaAddress)
-        return this.binaryRangeWrapper(this.timesOp, leftResult, rightResult)
+        const leftResult = this.evaluateAst(ast.left, state)
+        const rightResult = this.evaluateAst(ast.right, state)
+        return this.binaryRangeWrapper(this.timesOp, leftResult, rightResult, state)
       }
       case AstNodeType.POWER_OP: {
-        const leftResult = this.evaluateAst(ast.left, formulaAddress)
-        const rightResult = this.evaluateAst(ast.right, formulaAddress)
-        return this.binaryRangeWrapper(this.powerOp, leftResult, rightResult)
+        const leftResult = this.evaluateAst(ast.left, state)
+        const rightResult = this.evaluateAst(ast.right, state)
+        return this.binaryRangeWrapper(this.powerOp, leftResult, rightResult, state)
       }
       case AstNodeType.DIV_OP: {
-        const leftResult = this.evaluateAst(ast.left, formulaAddress)
-        const rightResult = this.evaluateAst(ast.right, formulaAddress)
-        return this.binaryRangeWrapper(this.divOp, leftResult, rightResult)
+        const leftResult = this.evaluateAst(ast.left, state)
+        const rightResult = this.evaluateAst(ast.right, state)
+        return this.binaryRangeWrapper(this.divOp, leftResult, rightResult, state)
       }
       case AstNodeType.PLUS_UNARY_OP: {
-        const result = this.evaluateAst(ast.value, formulaAddress)
-        return this.unaryRangeWrapper(this.unaryPlusOp, result)
+        const result = this.evaluateAst(ast.value, state)
+        return this.unaryRangeWrapper(this.unaryPlusOp, result, state)
       }
       case AstNodeType.MINUS_UNARY_OP: {
-        const result = this.evaluateAst(ast.value, formulaAddress)
-        return this.unaryRangeWrapper(this.unaryMinusOp, result)
+        const result = this.evaluateAst(ast.value, state)
+        return this.unaryRangeWrapper(this.unaryMinusOp, result, state)
       }
       case AstNodeType.PERCENT_OP: {
-        const result = this.evaluateAst(ast.value, formulaAddress)
-        return this.unaryRangeWrapper(this.percentOp, result)
+        const result = this.evaluateAst(ast.value, state)
+        return this.unaryRangeWrapper(this.percentOp, result, state)
       }
       case AstNodeType.FUNCTION_CALL: {
         if (this.config.licenseKeyValidityState !== LicenseKeyValidityState.VALID && !FunctionRegistry.functionIsProtected(ast.procedureName)) {
@@ -168,14 +170,14 @@ export class Interpreter {
         }
         const pluginEntry = this.functionRegistry.getFunction(ast.procedureName)
         if (pluginEntry && this.config.translationPackage.isFunctionTranslated(ast.procedureName)) {
-          const [pluginFunction, pluginInstance] = pluginEntry as [string, any]
-          return pluginInstance[pluginFunction](ast, formulaAddress)
+          const [pluginFunction, pluginInstance] = pluginEntry
+          return (pluginInstance as any as Record<string, PluginFunctionType>)[pluginFunction](ast, new InterpreterState(state.formulaAddress, state.arraysFlag || this.functionRegistry.isArrayFunction(ast.procedureName)))
         } else {
           return new CellError(ErrorType.NAME, ErrorMessage.FunctionName(ast.procedureName))
         }
       }
       case AstNodeType.NAMED_EXPRESSION: {
-        const namedExpression = this.namedExpressions.nearestNamedExpression(ast.expressionName, formulaAddress.sheet)
+        const namedExpression = this.namedExpressions.nearestNamedExpression(ast.expressionName, state.formulaAddress.sheet)
         if (namedExpression) {
           return this.dependencyGraph.getCellValue(namedExpression.address)
         } else {
@@ -186,7 +188,7 @@ export class Interpreter {
         if (!this.rangeSpansOneSheet(ast)) {
           return new CellError(ErrorType.REF, ErrorMessage.RangeManySheets)
         }
-        const range = AbsoluteCellRange.fromCellRange(ast, formulaAddress)
+        const range = AbsoluteCellRange.fromCellRange(ast, state.formulaAddress)
         const matrixVertex = this.dependencyGraph.getMatrix(range)
         if (matrixVertex) {
           const matrix = matrixVertex.matrix
@@ -207,18 +209,18 @@ export class Interpreter {
         if (!this.rangeSpansOneSheet(ast)) {
           return new CellError(ErrorType.REF, ErrorMessage.RangeManySheets)
         }
-        const range = AbsoluteColumnRange.fromColumnRange(ast, formulaAddress)
+        const range = AbsoluteColumnRange.fromColumnRange(ast, state.formulaAddress)
         return SimpleRangeValue.onlyRange(range, this.dependencyGraph)
       }
       case AstNodeType.ROW_RANGE: {
         if (!this.rangeSpansOneSheet(ast)) {
           return new CellError(ErrorType.REF, ErrorMessage.RangeManySheets)
         }
-        const range = AbsoluteRowRange.fromRowRange(ast, formulaAddress)
+        const range = AbsoluteRowRange.fromRowRange(ast, state.formulaAddress)
         return SimpleRangeValue.onlyRange(range, this.dependencyGraph)
       }
       case AstNodeType.PARENTHESIS: {
-        return this.evaluateAst(ast.expression, formulaAddress)
+        return this.evaluateAst(ast.expression, state)
       }
       case AstNodeType.ERROR_WITH_RAW_INPUT:
       case AstNodeType.ERROR: {
@@ -319,11 +321,11 @@ export class Interpreter {
 
   private unaryPlusOp = (arg: InternalScalarValue): InternalScalarValue => this.arithmeticHelper.unaryPlus(arg)
 
-  private unaryRangeWrapper(op: (arg: InternalScalarValue) => InternalScalarValue, arg: InterpreterValue): InterpreterValue {
+  private unaryRangeWrapper(op: (arg: InternalScalarValue) => InternalScalarValue, arg: InterpreterValue, state: InterpreterState): InterpreterValue {
     if (arg instanceof CellError) {
       return arg
     } else if(arg instanceof SimpleRangeValue) {
-      if(!this.config.arrays) {
+      if(!state.arraysFlag) {
         return new CellError(ErrorType.VALUE, ErrorMessage.ScalarExpected)
       }
       const newRaw = arg.raw().map(
@@ -335,14 +337,14 @@ export class Interpreter {
     }
   }
 
-  private binaryRangeWrapper(op: (arg1: InternalScalarValue, arg2: InternalScalarValue) => InternalScalarValue, arg1: InterpreterValue, arg2: InterpreterValue): InterpreterValue {
+  private binaryRangeWrapper(op: (arg1: InternalScalarValue, arg2: InternalScalarValue) => InternalScalarValue, arg1: InterpreterValue, arg2: InterpreterValue, state: InterpreterState): InterpreterValue {
     if (arg1 instanceof CellError) {
       return arg1
-    } else if(arg1 instanceof SimpleRangeValue && !this.config.arrays) {
+    } else if(arg1 instanceof SimpleRangeValue && !state.arraysFlag) {
       return new CellError(ErrorType.VALUE, ErrorMessage.ScalarExpected)
     } else if (arg2 instanceof CellError) {
       return arg2
-    } else if(arg2 instanceof SimpleRangeValue && !this.config.arrays) {
+    } else if(arg2 instanceof SimpleRangeValue && !state.arraysFlag) {
       return new CellError(ErrorType.VALUE, ErrorMessage.ScalarExpected)
     } else if(arg1 instanceof SimpleRangeValue || arg2 instanceof SimpleRangeValue) {
       if(!(arg1 instanceof SimpleRangeValue)) {

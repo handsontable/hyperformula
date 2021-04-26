@@ -155,6 +155,7 @@ export class FunctionRegistry {
   private readonly functions: Map<string, [string, FunctionPlugin]> = new Map()
 
   private readonly volatileFunctions: Set<string> = new Set()
+  private readonly arrayFunctions: Set<string> = new Set()
   private readonly structuralChangeFunctions: Set<string> = new Set()
   private readonly functionsWhichDoesNotNeedArgumentsToBeComputed: Set<string> = new Set()
 
@@ -216,21 +217,20 @@ export class FunctionRegistry {
     return Array.from(this.functions.keys())
   }
 
-  public doesFunctionNeedArgumentToBeComputed = (functionId: string): boolean => {
-    return this.functionsWhichDoesNotNeedArgumentsToBeComputed.has(functionId)
-  }
+  public doesFunctionNeedArgumentToBeComputed = (functionId: string): boolean => this.functionsWhichDoesNotNeedArgumentsToBeComputed.has(functionId)
 
-  public isFunctionVolatile = (functionId: string): boolean => {
-    return this.volatileFunctions.has(functionId)
-  }
+  public isFunctionVolatile = (functionId: string): boolean => this.volatileFunctions.has(functionId)
 
-  public isFunctionDependentOnSheetStructureChange = (functionId: string): boolean => {
-    return this.structuralChangeFunctions.has(functionId)
-  }
+  public isArrayFunction = (functionId: string): boolean => this.arrayFunctions.has(functionId)
+
+  public isFunctionDependentOnSheetStructureChange = (functionId: string): boolean => this.structuralChangeFunctions.has(functionId)
 
   private categorizeFunction(functionId: string, functionMetadata: FunctionMetadata): void {
     if (functionMetadata.isVolatile) {
       this.volatileFunctions.add(functionId)
+    }
+    if (functionMetadata.arrayFunction) {
+      this.arrayFunctions.add(functionId)
     }
     if (functionMetadata.doesNotNeedArgumentsToBeComputed) {
       this.functionsWhichDoesNotNeedArgumentsToBeComputed.add(functionId)

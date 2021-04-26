@@ -18,6 +18,7 @@ const dictionary: RawTranslationPackage = {
     VALUE: '#ÉRTÉK!',
   },
   functions: {
+    ARRAYFORMULA: 'ARRAYFORMULA',
     ABS: 'ABS',
     ACOS: 'ARCCOS',
     ACOSH: 'ARCCOSH',

@@ -18,6 +18,7 @@ export const dictionary: RawTranslationPackage = {
     VALUE: '#¡VALOR!',
   },
   functions: {
+    ARRAYFORMULA: 'ARRAYFORMULA',
     ABS: 'ABS',
     ACOS: 'ACOS',
     ACOSH: 'ACOSH',

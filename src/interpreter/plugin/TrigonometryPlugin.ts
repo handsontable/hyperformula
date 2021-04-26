@@ -3,17 +3,18 @@
  * Copyright (c) 2021 Handsoncode. All rights reserved.
  */
 
-import {CellError, ErrorType, SimpleCellAddress} from '../../Cell'
+import {CellError, ErrorType} from '../../Cell'
 import {ErrorMessage} from '../../error-message'
 import {ProcedureAst} from '../../parser'
+import {InterpreterState} from '../InterpreterState'
 import {InternalScalarValue} from '../InterpreterValue'
-import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
+import {ArgumentTypes, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
 import {PI} from './MathConstantsPlugin'
 
 /**
  * Interpreter plugin containing trigonometric functions
  */
-export class TrigonometryPlugin extends FunctionPlugin {
+export class TrigonometryPlugin extends FunctionPlugin implements FunctionPluginTypecheck<TrigonometryPlugin>{
 
   public static implementedFunctions = {
     'ACOS': {
@@ -151,34 +152,34 @@ export class TrigonometryPlugin extends FunctionPlugin {
    * Returns the arc cosine (or inverse cosine) of a number.
    *
    * @param ast
-   * @param formulaAddress
+   * @param state
    */
-  public acos(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('ACOS'), Math.acos)
+  public acos(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+    return this.runFunction(ast.args, state, this.metadata('ACOS'), Math.acos)
   }
 
-  public asin(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('ASIN'), Math.asin)
+  public asin(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+    return this.runFunction(ast.args, state, this.metadata('ASIN'), Math.asin)
   }
 
-  public cos(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('COS'), Math.cos)
+  public cos(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+    return this.runFunction(ast.args, state, this.metadata('COS'), Math.cos)
   }
 
-  public sin(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('SIN'), Math.sin)
+  public sin(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+    return this.runFunction(ast.args, state, this.metadata('SIN'), Math.sin)
   }
 
-  public tan(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('TAN'), Math.tan)
+  public tan(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+    return this.runFunction(ast.args, state, this.metadata('TAN'), Math.tan)
   }
 
-  public atan(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('ATAN'), Math.atan)
+  public atan(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+    return this.runFunction(ast.args, state, this.metadata('ATAN'), Math.atan)
   }
 
-  public atan2(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('ATAN2'),
+  public atan2(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+    return this.runFunction(ast.args, state, this.metadata('ATAN2'),
       (x: number, y: number) => {
         if(x===0 && y===0) {
           return new CellError(ErrorType.DIV_BY_ZERO)
@@ -188,74 +189,74 @@ export class TrigonometryPlugin extends FunctionPlugin {
     )
   }
 
-  public cot(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('COT'),
+  public cot(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+    return this.runFunction(ast.args, state, this.metadata('COT'),
       (arg) => (arg === 0) ? new CellError(ErrorType.DIV_BY_ZERO) : (1 / Math.tan(arg))
     )
   }
 
-  public acot(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('ACOT'),
+  public acot(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+    return this.runFunction(ast.args, state, this.metadata('ACOT'),
       (arg) => (arg === 0) ? PI/2 : Math.atan(1/arg)
     )
   }
 
-  public sec(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('SEC'),
+  public sec(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+    return this.runFunction(ast.args, state, this.metadata('SEC'),
       (arg: number) => 1 / Math.cos(arg)
     )
   }
 
-  public csc(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('CSC'),
+  public csc(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+    return this.runFunction(ast.args, state, this.metadata('CSC'),
       (arg) => (arg === 0) ? new CellError(ErrorType.DIV_BY_ZERO) : (1 / Math.sin(arg))
     )
   }
 
-  public sinh(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('SINH'), Math.sinh)
+  public sinh(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+    return this.runFunction(ast.args, state, this.metadata('SINH'), Math.sinh)
   }
 
-  public asinh(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('ASINH'), Math.asinh)
+  public asinh(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+    return this.runFunction(ast.args, state, this.metadata('ASINH'), Math.asinh)
   }
 
-  public cosh(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('COSH'), Math.cosh)
+  public cosh(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+    return this.runFunction(ast.args, state, this.metadata('COSH'), Math.cosh)
   }
 
-  public acosh(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('ACOSH'), Math.acosh)
+  public acosh(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+    return this.runFunction(ast.args, state, this.metadata('ACOSH'), Math.acosh)
   }
 
-  public tanh(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('TANH'), Math.tanh)
+  public tanh(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+    return this.runFunction(ast.args, state, this.metadata('TANH'), Math.tanh)
   }
 
-  public atanh(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('ATANH'), Math.atanh)
+  public atanh(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+    return this.runFunction(ast.args, state, this.metadata('ATANH'), Math.atanh)
   }
 
-  public coth(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('COTH'),
+  public coth(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+    return this.runFunction(ast.args, state, this.metadata('COTH'),
       (arg) => (arg === 0) ? new CellError(ErrorType.DIV_BY_ZERO) : (1 / Math.tanh(arg))
     )
   }
 
-  public acoth(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('ACOTH'),
+  public acoth(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+    return this.runFunction(ast.args, state, this.metadata('ACOTH'),
       (arg) => (arg === 0) ? new CellError(ErrorType.NUM, ErrorMessage.NonZero) : Math.atanh(1/arg)
     )
   }
 
-  public sech(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('SECH'),
+  public sech(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+    return this.runFunction(ast.args, state, this.metadata('SECH'),
       (arg: number) => 1 / Math.cosh(arg)
     )
   }
 
-  public csch(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('CSCH'),
+  public csch(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+    return this.runFunction(ast.args, state, this.metadata('CSCH'),
       (arg) => (arg === 0) ? new CellError(ErrorType.DIV_BY_ZERO) : (1 / Math.sinh(arg))
     )
   }
