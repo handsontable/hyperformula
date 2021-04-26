@@ -116,12 +116,12 @@ describe('CellContentParser', () => {
   })
 
   it('date parsing', () => {
-    expect(cellContentParser.parse('02-02-2020')).toEqual(new CellContent.Number(new DateNumber(43863)))
-    expect(cellContentParser.parse('  02-02-2020')).toEqual(new CellContent.Number(new DateNumber(43863)))
+    expect(cellContentParser.parse('02-02-2020')).toEqual(new CellContent.Number(new DateNumber(43863, 'DD/MM/YYYY')))
+    expect(cellContentParser.parse('  02-02-2020')).toEqual(new CellContent.Number(new DateNumber(43863, 'DD/MM/YYYY')))
   })
 
   it('JS Date parsing', () => {
-    expect(cellContentParser.parse(new Date(1995, 11, 17))).toEqual(new CellContent.Number(35050))
+    expect(cellContentParser.parse(new Date(1995, 11, 17))).toEqual(new CellContent.Number(new DateNumber(35050, 'Date()')))
   })
 
   it( 'starts with \'', () => {

@@ -415,7 +415,7 @@ export class DateTimePlugin extends FunctionPlugin {
   public datevalue(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.runFunction(ast.args, formulaAddress, this.metadata('DATEVALUE'),
       (date: string) => {
-        const dateTime = this.interpreter.dateHelper.parseDateTimeFromConfigFormats(date)
+        const {dateTime} = this.interpreter.dateHelper.parseDateTimeFromConfigFormats(date)
         if(dateTime === undefined) {
           return new CellError(ErrorType.VALUE, ErrorMessage.IncorrectDateTime)
         }
