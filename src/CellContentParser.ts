@@ -8,7 +8,14 @@ import {Config} from './Config'
 import {DateTimeHelper} from './DateTimeHelper'
 import {UnableToParseError} from './errors'
 import {fixNegativeZero, isNumberOverflow} from './interpreter/ArithmeticHelper'
-import {cloneNumber, CurrencyNumber, ExtendedNumber, getRawValue, PercentNumber} from './interpreter/InterpreterValue'
+import {
+  cloneNumber,
+  CurrencyNumber,
+  DateNumber,
+  ExtendedNumber,
+  getRawValue,
+  PercentNumber
+} from './interpreter/InterpreterValue'
 import {Maybe} from './Maybe'
 import {NumberLiteralHelper} from './NumberLiteralHelper'
 
@@ -127,11 +134,11 @@ export class CellContentParser {
     } else if (typeof content === 'boolean') {
       return new CellContent.Boolean(content)
     } else if (content instanceof Date) {
-      return new CellContent.Number(this.dateHelper.dateToNumber({
+      return new CellContent.Number(new DateNumber(this.dateHelper.dateToNumber({
         day: content.getDate(),
         month: content.getMonth() + 1,
         year: content.getFullYear()
-      }))
+      }), 'Date()'))
     } else if (typeof content === 'string') {
       if (isBoolean(content)) {
         return new CellContent.Boolean(content.toLowerCase() === 'true')

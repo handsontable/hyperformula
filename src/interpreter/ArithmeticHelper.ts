@@ -12,19 +12,24 @@ import {NumberLiteralHelper} from '../NumberLiteralHelper'
 import {collatorFromConfig} from '../StringHelper'
 import {
   cloneNumber,
-  CurrencyNumber, DateNumber, DateTimeNumber,
+  CurrencyNumber,
+  DateNumber,
+  DateTimeNumber,
   EmptyValue,
   ExtendedNumber,
-  getRawValue, getTypeFormatOfExtendedNumber,
+  getRawValue,
+  getTypeFormatOfExtendedNumber,
   InternalNoErrorScalarValue,
   InternalScalarValue,
   InterpreterValue,
   isExtendedNumber,
-  NumberType, NumberTypeWithFormat,
+  NumberType,
+  NumberTypeWithFormat,
   PercentNumber,
   RawInterpreterValue,
   RawNoErrorScalarValue,
-  RawScalarValue, TimeNumber
+  RawScalarValue,
+  TimeNumber
 } from './InterpreterValue'
 import {SimpleRangeValue} from './SimpleRangeValue'
 import Collator = Intl.Collator
@@ -712,10 +717,20 @@ function inferExtendedNumberTypeAdditive(leftArg: ExtendedNumber, rightArg: Exte
     && (rightType === NumberType.NUMBER_DATETIME || rightType === NumberType.NUMBER_DATE)) {
     return {type: NumberType.NUMBER_RAW}
   }
-  if((leftType === NumberType.NUMBER_DATETIME || leftType === NumberType.NUMBER_TIME || leftType === NumberType.NUMBER_DATE)
-    && (rightType === NumberType.NUMBER_DATETIME || rightType === NumberType.NUMBER_TIME || rightType === NumberType.NUMBER_DATE)) {
-    if(leftType !== rightType) {
-      return {type: NumberType.NUMBER_DATETIME}
+  if(leftType === NumberType.NUMBER_TIME) {
+    if(rightType === NumberType.NUMBER_DATE) {
+      return {type: NumberType.NUMBER_DATETIME, format: rightFormat + ' ' + leftFormat}
+    }
+    if(rightType === NumberType.NUMBER_DATETIME) {
+      return {type: NumberType.NUMBER_DATETIME, format: rightFormat}
+    }
+  }
+  if(rightType === NumberType.NUMBER_TIME) {
+    if(leftType === NumberType.NUMBER_DATE) {
+      return {type: NumberType.NUMBER_DATETIME, format: leftFormat + ' ' + rightFormat}
+    }
+    if(leftType === NumberType.NUMBER_DATETIME) {
+      return {type: NumberType.NUMBER_DATETIME, format: leftFormat}
     }
   }
   return {type: leftType, format: leftFormat}

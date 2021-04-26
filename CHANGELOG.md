@@ -6,9 +6,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- **Breaking change**: Moved `GPU.js` from `dependencies` to `devDependencies` and `optionalDependencies`. (#642)
+
 ### Added
+- Added two new fired events, for suspending and resuming execution. (#637)
 - Added support for array arithmetic. (#628)
 - Added ARRAYFORMULA function. (#630)
+
+### Fixed
+- Fixed an issue with losing formating info about DateTime numbers. (#626)
 
 ## [0.5.0] - 2021-04-15
 
