@@ -72,19 +72,19 @@ export class DateTimeHelper {
   }
 
   public dateStringToDateNumber(dateTimeString: string): Maybe<ExtendedNumber> {
-    const dateTime = this.parseDateTimeFromConfigFormats(dateTimeString)
+    const {dateTime, dateFormat = '', timeFormat = ''} = this.parseDateTimeFromConfigFormats(dateTimeString)
     if(dateTime === undefined) {
       return undefined
     }
     if(instanceOfSimpleTime(dateTime)) {
       if(instanceOfSimpleDate(dateTime)) {
-        return new DateTimeNumber(timeToNumber(dateTime) + this.dateToNumber(dateTime) )
+        return new DateTimeNumber(timeToNumber(dateTime) + this.dateToNumber(dateTime), dateFormat + ' ' + timeFormat)
       } else {
-        return new TimeNumber(timeToNumber(dateTime))
+        return new TimeNumber(timeToNumber(dateTime), timeFormat)
       }
     } else {
       if(instanceOfSimpleDate(dateTime)) {
-        return new DateNumber( this.dateToNumber(dateTime) )
+        return new DateNumber( this.dateToNumber(dateTime), dateFormat)
       } else {
         return 0
       }
@@ -108,21 +108,21 @@ export class DateTimeHelper {
     return dateTime
   }
 
-  public parseDateTimeFromConfigFormats(dateTimeString: string): Maybe<DateTime> {
+  public parseDateTimeFromConfigFormats(dateTimeString: string): Partial<{dateTime: DateTime, dateFormat: string, timeFormat: string}> {
     return this.parseDateTimeFromFormats(dateTimeString, this.config.dateFormats, this.config.timeFormats)
   }
-  private parseDateTimeFromFormats(dateTimeString: string, dateFormats: string[], timeFormats: string[]): Maybe<DateTime> {
+  private parseDateTimeFromFormats(dateTimeString: string, dateFormats: string[], timeFormats: string[]): Partial<{dateTime: DateTime, dateFormat: string, timeFormat: string}> {
     const dateFormatsIterate = dateFormats.length===0 ? [undefined] : dateFormats
     const timeFormatsIterate = timeFormats.length===0 ? [undefined] : timeFormats
     for (const dateFormat of dateFormatsIterate) {
       for (const timeFormat of timeFormatsIterate) {
         const dateTime = this.parseSingleFormat(dateTimeString, dateFormat, timeFormat)
         if (dateTime !== undefined) {
-          return dateTime
+          return {dateTime, timeFormat, dateFormat}
         }
       }
     }
-    return undefined
+    return {}
   }
 
   public getNullYear() {

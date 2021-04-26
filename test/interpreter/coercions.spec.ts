@@ -116,8 +116,8 @@ describe('#coerceScalarToNumberOrError', () => {
 
     expect(arithmeticHelper.coerceScalarToNumberOrError(new CellError(ErrorType.DIV_BY_ZERO))).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
 
-    expect(arithmeticHelper.coerceScalarToNumberOrError('31/12/1899')).toEqual(new DateNumber(1))
-    expect(arithmeticHelper.coerceScalarToNumberOrError('00:00:00')).toEqual(new TimeNumber(0))
+    expect(arithmeticHelper.coerceScalarToNumberOrError('31/12/1899')).toEqual(new DateNumber(1, 'DD/MM/YYYY'))
+    expect(arithmeticHelper.coerceScalarToNumberOrError('00:00:00')).toEqual(new TimeNumber(0, 'hh:mm:ss.sss'))
     expect(arithmeticHelper.coerceScalarToNumberOrError(true)).toEqual(1)
 
     expect(arithmeticHelper.coerceScalarToNumberOrError('foo42')).toEqual(new CellError(ErrorType.VALUE, ErrorMessage.NumberCoercion))
