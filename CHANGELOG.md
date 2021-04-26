@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - Added two new fired events, for suspending and resuming execution. (#637)
+- Added listing in scopes to `listNamedExpressions` method. (#638)
+
+### Fixed
+- Fixed issues with scoped named expression. (#646, #641)
 
 ### Fixed
 - Fixed an issue with losing formating info about DateTime numbers. (#626)
