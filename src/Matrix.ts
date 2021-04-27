@@ -6,6 +6,7 @@
 import {AbsoluteCellRange} from './AbsoluteCellRange'
 import {CellError, ErrorType, SimpleCellAddress, simpleCellAddress} from './Cell'
 import {ErrorMessage} from './error-message'
+import {InternalScalarValue} from './interpreter/InterpreterValue'
 import {Ast, AstNodeType} from './parser'
 
 export class MatrixSize {
@@ -180,7 +181,7 @@ export interface IMatrix {
 
   height(): number,
 
-  get(col: number, row: number): number | CellError,
+  get(col: number, row: number): InternalScalarValue,
 }
 
 export class NotComputedMatrix implements IMatrix {
@@ -203,9 +204,9 @@ export class NotComputedMatrix implements IMatrix {
 
 export class Matrix implements IMatrix {
   public size: MatrixSize
-  private readonly matrix: number[][]
+  private readonly matrix: InternalScalarValue[][]
 
-  constructor(matrix: number[][]) {
+  constructor(matrix: InternalScalarValue[][]) {
     this.size = new MatrixSize(matrix.length > 0 ? matrix[0].length : 0, matrix.length)
     this.matrix = matrix
   }
@@ -250,7 +251,7 @@ export class Matrix implements IMatrix {
     return result
   }
 
-  public get(col: number, row: number): number {
+  public get(col: number, row: number): InternalScalarValue {
     if (this.outOfBound(col, row)) {
       throw Error('Matrix index out of bound')
     }
@@ -272,11 +273,11 @@ export class Matrix implements IMatrix {
     return this.size.height
   }
 
-  public raw(): number[][] {
+  public raw(): InternalScalarValue[][] {
     return this.matrix
   }
 
-  public* generateValues(leftCorner: SimpleCellAddress): IterableIterator<[number, SimpleCellAddress]> {
+  public* generateValues(leftCorner: SimpleCellAddress): IterableIterator<[InternalScalarValue, SimpleCellAddress]> {
     for (let row = 0; row < this.size.height; ++row) {
       for (let col = 0; col < this.size.width; ++col) {
         yield [this.matrix[row][col], simpleCellAddress(leftCorner.sheet, leftCorner.col + col, leftCorner.row + row)]

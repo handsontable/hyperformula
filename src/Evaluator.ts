@@ -74,8 +74,8 @@ export class Evaluator {
             const formula = vertex.getFormula() as Ast
             const currentValue = vertex.isComputed() ? vertex.getCellValue() : null
             const newCellValue = this.evaluateAstToRangeValue(formula, new InterpreterState(address, this.config.arrays))
-            if(newCellValue instanceof SimpleRangeValue && newCellValue.hasOnlyNumbers() && !(newCellValue.onlyRangeData())) {
-              const newCellMatrix = new Matrix(newCellValue.rawNumbers())
+            if(newCellValue instanceof SimpleRangeValue && !(newCellValue.onlyRangeData())) {
+              const newCellMatrix = new Matrix(newCellValue.data)
               vertex.setCellValue(newCellMatrix)
               changes.addMatrixChange(newCellMatrix, address)
               this.columnSearch.change(currentValue, newCellMatrix, address)
@@ -157,8 +157,8 @@ export class Evaluator {
         const address = vertex.getAddress()
         const formula = vertex.getFormula() as Ast
         const newCellValue = this.evaluateAstToRangeValue(formula, new InterpreterState(address, this.config.arrays))
-        if(newCellValue instanceof SimpleRangeValue && newCellValue.hasOnlyNumbers() && !newCellValue.onlyRangeData()) {
-          const newCellMatrix = new Matrix(newCellValue.rawNumbers())
+        if(newCellValue instanceof SimpleRangeValue && !newCellValue.onlyRangeData()) {
+          const newCellMatrix = new Matrix(newCellValue.data)
           vertex.setCellValue(newCellMatrix)
           this.columnSearch.add(newCellMatrix, address)
         } else {

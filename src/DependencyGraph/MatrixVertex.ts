@@ -5,7 +5,10 @@
 
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
 import {CellError, SimpleCellAddress} from '../Cell'
+import {RawCellContent} from '../CellContentParser'
+import {EmptyValue, getRawValue, InternalScalarValue} from '../interpreter/InterpreterValue'
 import {ErroredMatrix, IMatrix, Matrix, MatrixSize, NotComputedMatrix} from '../Matrix'
+import {Maybe} from '../Maybe'
 import {Ast} from '../parser'
 import {ColumnsSpan, RowsSpan} from '../Span'
 
@@ -49,16 +52,20 @@ export class MatrixVertex {
     return this.matrix as (Matrix | CellError)
   }
 
-  public getMatrixCellValue(address: SimpleCellAddress): number | CellError {
+  public getMatrixCellValue(address: SimpleCellAddress): InternalScalarValue {
     const col = address.col - this.cellAddress.col
     const row = address.row - this.cellAddress.row
 
     return this.matrix.get(col, row)
   }
 
-  public getMatrixCellRawValue(address: SimpleCellAddress): number | undefined {
+  public getMatrixCellRawValue(address: SimpleCellAddress): Maybe<RawCellContent> {
     const val = this.getMatrixCellValue(address)
-    return val instanceof CellError ? undefined : val
+    if(val instanceof CellError || val === EmptyValue) {
+      return undefined
+    } else {
+      return getRawValue(val)
+    }
   }
 
   public setMatrixCellValue(address: SimpleCellAddress, value: number): void {
