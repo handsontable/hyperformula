@@ -241,6 +241,7 @@ export class RemoveSheetUndoEntry extends BaseUndoEntry {
     public readonly sheetName: string,
     public readonly sheetId: number,
     public readonly oldSheetContent: ClipboardCell[][],
+    public readonly scopedNamedExpressions: [InternalNamedExpression, ClipboardCell][],
     public readonly version: number,
   ) {
     super()
@@ -594,6 +595,10 @@ export class UndoRedo {
         const address = simpleCellAddress(sheetId, col, rowIndex)
         this.operations.restoreCell(address, cellType)
       }
+    }
+
+    for(const [namedexpression, content] of operation.scopedNamedExpressions) {
+      this.operations.restoreNamedExpression(namedexpression, content, sheetId)
     }
 
     this.restoreOldDataFromVersion(operation.version - 1)
