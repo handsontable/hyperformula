@@ -6,11 +6,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- **Breaking change**: Removed support for matrix formulas (`{=FORMULA}`) notation. Engine now supports formulas returning array of values (instead of only scalars). (#652)
+
+### Fixed
+- Fixed an issue with arrays and cruds. (#651)
+
 ## [0.6.0] - 2021-04-27
 
 ### Changed
 - **Breaking change**: Moved `GPU.js` from `dependencies` to `devDependencies` and `optionalDependencies`. (#642)
-- **Breaking change**: Removed support for matrix formulas (`{=FORMULA}`) notation. Engine now supports formulas returning array of values (instead of only scalars). (#652)
 
 ### Added
 - Added two new fired events, for suspending and resuming execution. (#637)
@@ -19,7 +24,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - Fixed issues with scoped named expression. (#646, #641)
 - Fixed an issue with losing formating info about DateTime numbers. (#626)
-- Fixed an issue with arrays and cruds. (#651)
 
 ## [0.5.0] - 2021-04-15
 
