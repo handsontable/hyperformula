@@ -43,7 +43,7 @@ export class SimpleRangeValue {
     if(_data===undefined) {
       this.size = new MatrixSize(range!.width(), range!.height())
     } else {
-      this.size = new MatrixSize(_data![0].length, _data!.length)
+      this.size = new MatrixSize(_data[0].length, _data.length)
     }
   }
 

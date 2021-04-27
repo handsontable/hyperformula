@@ -42,7 +42,7 @@ export function matrixSizeForPoolFunction(inputMatrix: MatrixSize, windowSize: n
 }
 
 function matrixSizeForBinaryOp(leftMatrixSize: MatrixSize, rightMatrixSize: MatrixSize): MatrixSize {
-  return new MatrixSize(Math.max(leftMatrixSize.width,rightMatrixSize.width), Math.max(leftMatrixSize.height, rightMatrixSize.height))
+  return new MatrixSize(Math.max(leftMatrixSize.width, rightMatrixSize.width), Math.max(leftMatrixSize.height, rightMatrixSize.height))
 }
 
 function matrixSizeForUnaryOp(matrixSize: MatrixSize): MatrixSize {
@@ -128,13 +128,14 @@ export function checkMatrixSize(ast: Ast, formulaAddress: SimpleCellAddress): Ma
           return new CellError(ErrorType.VALUE, ErrorMessage.MatrixFunction)
         }
       }
-    case AstNodeType.CELL_RANGE:
+    case AstNodeType.CELL_RANGE: {
       const range = AbsoluteCellRange.fromCellRangeOrUndef(ast, formulaAddress)
-      if(range === undefined) {
+      if (range === undefined) {
         return new CellError(ErrorType.VALUE)
       } else {
         return new MatrixSize(range.width(), range.height(), true)
       }
+    }
     case AstNodeType.NUMBER:
       return new MatrixSize(1, 1)
     case AstNodeType.CELL_REFERENCE:
@@ -150,27 +151,28 @@ export function checkMatrixSize(ast: Ast, formulaAddress: SimpleCellAddress): Ma
     case AstNodeType.NOT_EQUAL_OP:
     case AstNodeType.PLUS_OP:
     case AstNodeType.POWER_OP:
-    case AstNodeType.TIMES_OP:
+    case AstNodeType.TIMES_OP: {
       const left = checkMatrixSize(ast.left, formulaAddress)
-      if(left instanceof CellError) {
+      if (left instanceof CellError) {
         return left
       }
       const right = checkMatrixSize(ast.right, formulaAddress)
-      if(right instanceof CellError) {
+      if (right instanceof CellError) {
         return right
       }
       return matrixSizeForBinaryOp(left, right)
+    }
     case AstNodeType.MINUS_UNARY_OP:
     case AstNodeType.PLUS_UNARY_OP:
-    case AstNodeType.PERCENT_OP:
+    case AstNodeType.PERCENT_OP: {
       const val = checkMatrixSize(ast.value, formulaAddress)
-      if(val instanceof CellError) {
+      if (val instanceof CellError) {
         return val
       }
       return matrixSizeForUnaryOp(val)
+    }
     default:
-      return new CellError(ErrorType.VALUE) //TODO
-
+      return new CellError(ErrorType.VALUE)
   }
 }
 
