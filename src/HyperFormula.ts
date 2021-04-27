@@ -2973,6 +2973,8 @@ export class HyperFormula implements TypedEmitter {
    *
    * @param {() => void} batchOperations
    * @fires [[valuesUpdated]] if recalculation was triggered by this change
+   * @fires [[evaluationSuspended]] always
+   * @fires [[evaluationResumed]] after the recomputation of necessary values
    *
    * @example
    * ```js
@@ -3013,6 +3015,8 @@ export class HyperFormula implements TypedEmitter {
    * Suspending evaluation should result in an overall faster calculation compared to recalculating after each operation separately.
    * To resume the evaluation use [[resumeEvaluation]].
    *
+   * @fires [[evaluationSuspended]] always
+   *
    * @example
    * ```js
    * const hfInstance = HyperFormula.buildFromSheets({
@@ -3039,6 +3043,7 @@ export class HyperFormula implements TypedEmitter {
    */
   public suspendEvaluation(): void {
     this._evaluationSuspended = true
+    this._emitter.emit(Events.EvaluationSuspended)
   }
 
   /**
@@ -3046,6 +3051,8 @@ export class HyperFormula implements TypedEmitter {
    * It also triggers the recalculation and returns changes that are a result of all batched operations.
    *
    * @fires [[valuesUpdated]] if recalculation was triggered by this change
+   * @fires [[evaluationResumed]] after the recomputation of necessary values
+   *
    *
    * @example
    * ```js
@@ -3073,7 +3080,9 @@ export class HyperFormula implements TypedEmitter {
    */
   public resumeEvaluation(): ExportedChange[] {
     this._evaluationSuspended = false
-    return this.recomputeIfDependencyGraphNeedsIt()
+    const changes = this.recomputeIfDependencyGraphNeedsIt()
+    this._emitter.emit(Events.EvaluationResumed, changes)
+    return changes
   }
 
   /**
@@ -3398,7 +3407,7 @@ export class HyperFormula implements TypedEmitter {
    * Note that this method may trigger dependency graph recalculation.
    *
    * @param {string} expressionName - expression name, case insensitive.
-   * @param {string?} sheetScope - scope definition, `sheetName` for local scope or `undefined` for global scope
+   * @param {string?} scope - scope definition, `sheetName` for local scope or `undefined` for global scope
    *
    * @fires [[namedExpressionRemoved]] after the expression was removed
    * @fires [[valuesUpdated]] if recalculation was triggered by this change
@@ -3434,27 +3443,37 @@ export class HyperFormula implements TypedEmitter {
 
   /**
    * Lists all named expressions.
-   * Returns an array of expression names as strings
+   * Returns an array of expression names defined in a scope, as strings.
+   *
+   * @param {string?} scope - scope definition, `sheetName` for local scope or `undefined` for global scope
+   *
+   * @throws [[NoSheetWithNameError]] when the given sheet name does not exists
    *
    * @example
    * ```js
    * const hfInstance = HyperFormula.buildFromArray([
    *  ['42'],
    *  ['50'],
+   *  ['60'],
    * ]);
    *
-   * // add two named expressions
+   * // add two named expressions and one scoped
    * hfInstance.addNamedExpression('prettyName', '=Sheet1!A1+100');
    * hfInstance.addNamedExpression('prettyName2', '=Sheet1!A2+100');
+   * hfInstance.addNamedExpression('prettyName3', '=Sheet1!A3+100', 'Sheet1');
    *
    * // list the expressions, should return: ['prettyName', 'prettyName2'] for this example
    * const listOfExpressions = hfInstance.listNamedExpressions();
+   *
+   *  // list the expressions, should return: ['prettyName3'] for this example
+   * const listOfExpressions = hfInstance.listNamedExpressions('Sheet1');
    * ```
    *
    * @category Named Expressions
    */
-  public listNamedExpressions(): string[] {
-    return this._namedExpressions.getAllNamedExpressionsNames()
+  public listNamedExpressions(scope?: string): string[] {
+    const scopeId = this._crudOperations.scopeId(scope)
+    return this._namedExpressions.getAllNamedExpressionsNamesInScope(scopeId)
   }
 
   /**

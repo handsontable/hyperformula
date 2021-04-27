@@ -6,6 +6,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.6.0] - 2021-04-27
+
+### Changed
+- **Breaking change**: Moved `GPU.js` from `dependencies` to `devDependencies` and `optionalDependencies`. (#642)
+
+### Added
+- Added two new fired events, for suspending and resuming execution. (#637)
+- Added listing in scopes to `listNamedExpressions` method. (#638)
+
+### Fixed
+- Fixed issues with scoped named expression. (#646, #641)
+- Fixed an issue with losing formating info about DateTime numbers. (#626)
+
 ## [0.5.0] - 2021-04-15
 
 ### Changed
