@@ -12,8 +12,6 @@
 
 ### Fixed
 - Fixed issues with scoped named expression. [#646](https://github.com/handsontable/hyperformula/issues/646), [#641](https://github.com/handsontable/hyperformula/issues/641)
-
-### Fixed
 - Fixed an issue with losing formating info about DateTime numbers. [#626](https://github.com/handsontable/hyperformula/issues/626)
 
 ## 0.5.0
