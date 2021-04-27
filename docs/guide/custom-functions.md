@@ -125,12 +125,12 @@ export const myTranslations = {
 For the simplicity of a basic example, you will not pass any
 arguments. However, this method imposes a particular structure to
 be used; there are two optional arguments, `ast` and
-`state`, and the function must return the results of
+`formulaAddress`, and the function must return the results of
 the calculations.
 
 ```javascript
 // arguments here are displayed just to show the structure
-public hyper(ast, state) {
+public hyper(ast, formulaAddress) {
     return 'Hyperformula'.length;
   }
 };
@@ -152,7 +152,7 @@ export class CountHF extends FunctionPlugin {
     }
   };
 
-  public hyper(ast, state) {
+  public hyper(ast, formulaAddress) {
     return 'Hyperformula'.length
     }
   };
