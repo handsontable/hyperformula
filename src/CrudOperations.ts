@@ -220,8 +220,8 @@ export class CrudOperations {
     const sheetId = this.sheetMapping.fetch(sheetName)
     const originalName = this.sheetMapping.fetchDisplayName(sheetId)
     const oldSheetContent = this.operations.getSheetClipboardCells(sheetId)
-    const version = this.operations.removeSheet(sheetName)
-    this.undoRedo.saveOperation(new RemoveSheetUndoEntry(originalName, sheetId, oldSheetContent, version))
+    const {version, scopedNamedExpressions} = this.operations.removeSheet(sheetName)
+    this.undoRedo.saveOperation(new RemoveSheetUndoEntry(originalName, sheetId, oldSheetContent, scopedNamedExpressions, version))
   }
 
   public renameSheet(sheetId: number, newName: string): Maybe<string> {
@@ -658,7 +658,7 @@ export class CrudOperations {
     }
   }
 
-  public scopeId(sheetName: string | undefined): number | undefined {
+  public scopeId(sheetName?: string): Maybe<number> {
     if (sheetName !== undefined) {
       this.ensureSheetExists(sheetName)
       return this.sheetMapping.fetch(sheetName)

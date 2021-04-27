@@ -357,6 +357,18 @@ describe('Named expressions - store manipulation', () => {
     ])
   })
 
+  it('listing scoped named expressions', () => {
+    const engine = HyperFormula.buildFromSheets({sheet1: [], sheet2: []})
+    engine.addNamedExpression('myName.1', '=42', 'sheet1')
+    engine.addNamedExpression('myName.2', '=42', 'sheet2')
+
+    const namedExpressions = engine.listNamedExpressions('sheet2')
+
+    expect(namedExpressions).toEqual([
+      'myName.2',
+    ])
+  })
+
   it('adding named expressions is case insensitive', () => {
     const engine = HyperFormula.buildEmpty()
 
