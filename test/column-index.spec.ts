@@ -78,7 +78,7 @@ describe('ColumnIndex#add', () => {
 
   it('should ignore SimpleRangeValue', () => {
     const index = buildEmptyIndex(transformingService, new Config(), statistics)
-    const simpleRangeValue = SimpleRangeValue.onlyNumbersDataWithoutRange([[1]], new MatrixSize(1, 1))
+    const simpleRangeValue = SimpleRangeValue.onlyNumbers([[1]])
 
     index.add(simpleRangeValue, adr('A1'))
 

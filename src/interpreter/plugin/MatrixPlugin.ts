@@ -90,7 +90,7 @@ export class MatrixPlugin extends FunctionPlugin implements FunctionPluginTypech
         return sum
       }, outputSize)(leftMatrix.rawNumbers(), rightMatrix.rawNumbers(), leftMatrix.width())
 
-      return SimpleRangeValue.onlyNumbersDataWithoutRange(result, outputSize)
+      return SimpleRangeValue.onlyNumbers(result)
     })
   }
 
@@ -113,7 +113,7 @@ export class MatrixPlugin extends FunctionPlugin implements FunctionPluginTypech
         return currentMax
       }, outputSize)(matrix.rawNumbers(), windowSize, stride)
 
-      return SimpleRangeValue.onlyNumbersDataWithoutRange(result, outputSize)
+      return SimpleRangeValue.onlyNumbers(result)
     })
   }
 
@@ -178,7 +178,7 @@ export class MatrixPlugin extends FunctionPlugin implements FunctionPluginTypech
         return result
       }, outputSize)(matrix.rawNumbers(), windowSize, stride)
 
-      return SimpleRangeValue.onlyNumbersDataWithoutRange(result, outputSize)
+      return SimpleRangeValue.onlyNumbers(result)
     })
   }
 
@@ -197,7 +197,7 @@ export class MatrixPlugin extends FunctionPlugin implements FunctionPluginTypech
         }
       }
 
-      return SimpleRangeValue.onlyNumbersDataWithoutRange(result, matrixSizeForTranspose(inputSize))
+      return SimpleRangeValue.onlyNumbers(result)
     })
   }
 

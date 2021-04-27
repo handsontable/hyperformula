@@ -25,7 +25,7 @@ export class RowSearchStrategy extends AdvancedFind implements SearchStrategy {
     if(typeof key === 'string') {
       key = forceNormalizeString(key)
     }
-    const range = rangeValue.range()
+    const range = rangeValue.range
     if(range === undefined) {
       return rangeValue.valuesFromTopLeftCorner().map(getRawValue).indexOf(key)
     } else if (range.width() < this.config.binarySearchThreshold || !sorted) {

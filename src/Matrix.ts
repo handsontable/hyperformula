@@ -40,6 +40,14 @@ export function matrixSizeForPoolFunction(inputMatrix: MatrixSize, windowSize: n
   )
 }
 
+function matrixSizeForBinaryOp(leftMatrixSize: MatrixSize, rightMatrixSize: MatrixSize): MatrixSize {
+  return new MatrixSize(Math.max(leftMatrixSize.width,rightMatrixSize.width), Math.max(leftMatrixSize.height, rightMatrixSize.height))
+}
+
+function matrixSizeForUnaryOp(matrixSize: MatrixSize): MatrixSize {
+  return new MatrixSize(matrixSize.width, matrixSize.height)
+}
+
 export function checkMatrixSize(ast: Ast, formulaAddress: SimpleCellAddress): MatrixSizeCheck {
   switch (ast.type) {
     case AstNodeType.FUNCTION_CALL:
@@ -130,6 +138,35 @@ export function checkMatrixSize(ast: Ast, formulaAddress: SimpleCellAddress): Ma
       return new MatrixSize(1, 1)
     case AstNodeType.CELL_REFERENCE:
       return new MatrixSize(1, 1, true)
+    case AstNodeType.DIV_OP:
+    case AstNodeType.CONCATENATE_OP:
+    case AstNodeType.EQUALS_OP:
+    case AstNodeType.GREATER_THAN_OP:
+    case AstNodeType.GREATER_THAN_OR_EQUAL_OP:
+    case AstNodeType.LESS_THAN_OP:
+    case AstNodeType.LESS_THAN_OR_EQUAL_OP:
+    case AstNodeType.MINUS_OP:
+    case AstNodeType.NOT_EQUAL_OP:
+    case AstNodeType.PLUS_OP:
+    case AstNodeType.POWER_OP:
+    case AstNodeType.TIMES_OP:
+      const left = checkMatrixSize(ast.left, formulaAddress)
+      if(left instanceof CellError) {
+        return left
+      }
+      const right = checkMatrixSize(ast.right, formulaAddress)
+      if(right instanceof CellError) {
+        return right
+      }
+      return matrixSizeForBinaryOp(left, right)
+    case AstNodeType.MINUS_UNARY_OP:
+    case AstNodeType.PLUS_UNARY_OP:
+    case AstNodeType.PERCENT_OP:
+      const val = checkMatrixSize(ast.value, formulaAddress)
+      if(val instanceof CellError) {
+        return val
+      }
+      return matrixSizeForUnaryOp(val)
     default:
       return new CellError(ErrorType.VALUE) //TODO
 

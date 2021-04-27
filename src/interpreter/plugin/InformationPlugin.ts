@@ -385,11 +385,9 @@ export class InformationPlugin extends FunctionPlugin implements FunctionPluginT
       if (col > rangeValue.width() || row > rangeValue.height()) {
         return new CellError(ErrorType.NUM, ErrorMessage.ValueLarge)
       }
-      const range = rangeValue.range()
-      if (range === undefined) {
-        return rangeValue?.raw()?.[row-1]?.[col-1] ?? rangeValue.topLeftCornerValue() ?? new CellError(ErrorType.VALUE, ErrorMessage.CellRangeExpected)
-      }
-      const address = range.getAddress(col - 1, row - 1)
+      return rangeValue?.data?.[row-1]?.[col-1] ?? rangeValue?.data?.[0]?.[0] ?? new CellError(ErrorType.VALUE, ErrorMessage.CellRangeExpected)
+
+      const address = rangeValue.range!.getAddress(col - 1, row - 1)
       return this.dependencyGraph.getScalarValue(address)
     })
   }

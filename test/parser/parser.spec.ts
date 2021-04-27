@@ -180,7 +180,7 @@ describe('ParserWithCaching', () => {
     expect(ast.error).toEqual(new CellError(ErrorType.REF))
   })
 
-  it('refernece to address in unexsiting range returns ref error with raw input ast', () => {
+  it('refernece to address in unexsiting range returns ref error with data input ast', () => {
     const sheetMapping = new SheetMapping(buildTranslationPackage(enGB))
     sheetMapping.addSheet('Sheet1')
     const parser = buildEmptyParserWithCaching(new Config(), sheetMapping)
@@ -502,7 +502,7 @@ describe('cell references and ranges', () => {
     expect(ast.reference.sheet).toBe(null)
   })
 
-  it('cell range with unexisting start sheet should return REF error with raw input', () => {
+  it('cell range with unexisting start sheet should return REF error with data input', () => {
     const sheetMapping = new SheetMapping(buildTranslationPackage(enGB))
     sheetMapping.addSheet('Sheet1')
     sheetMapping.addSheet('Sheet2')
@@ -515,7 +515,7 @@ describe('cell references and ranges', () => {
     expect(ast.error.type).toBe(ErrorType.REF)
   })
 
-  it('cell range with unexisting end sheet should return REF error with raw input', () => {
+  it('cell range with unexisting end sheet should return REF error with data input', () => {
     const sheetMapping = new SheetMapping(buildTranslationPackage(enGB))
     sheetMapping.addSheet('Sheet1')
     sheetMapping.addSheet('Sheet2')

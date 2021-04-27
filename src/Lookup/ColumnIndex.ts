@@ -91,7 +91,7 @@ export class ColumnIndex implements ColumnSearchStrategy {
   }
 
   public find(key: RawNoErrorScalarValue, rangeValue: SimpleRangeValue, sorted: boolean): number {
-    const range = rangeValue.range()
+    const range = rangeValue.range
     if(range === undefined) {
       return this.binarySearchStrategy.find(key, rangeValue, sorted)
     }

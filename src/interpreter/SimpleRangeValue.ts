@@ -11,166 +11,68 @@ import {MatrixSize} from '../Matrix'
 import {Maybe} from '../Maybe'
 import {InternalScalarValue, isExtendedNumber} from './InterpreterValue'
 
-export class ArrayData {
-  constructor(
-    public readonly size: MatrixSize,
-    public readonly data: InternalScalarValue[][],
-    public _hasOnlyNumbers: boolean,
-  ) {
+export class SimpleRangeValue {
+  private readonly size: MatrixSize
+
+  public static numbersRange(data: InternalScalarValue[][], range: AbsoluteCellRange, dependencyGraph: DependencyGraph): SimpleRangeValue {
+    return new SimpleRangeValue(data, range, dependencyGraph, true)
   }
 
-  public range(): undefined {
-    return undefined
+  public static onlyNumbers(data: number[][]): SimpleRangeValue {
+    return new SimpleRangeValue(data, undefined, undefined, true)
   }
 
-  public hasOnlyNumbers() {
-    return this._hasOnlyNumbers
+  public static onlyValues(data: InternalScalarValue[][]): SimpleRangeValue {
+    return new SimpleRangeValue(data, undefined, undefined, undefined)
   }
 
-  public topLeftCorner(): Maybe<InternalScalarValue> {
-    if (this.size.height > 0 && this.size.width > 0) {
-      return this.data[0][0]
-    }
-    return undefined
+  public static onlyRange(range: AbsoluteCellRange, dependencyGraph: DependencyGraph): SimpleRangeValue {
+    return new SimpleRangeValue(undefined, range, dependencyGraph, undefined)
   }
 
-  public map(op: (arg: InternalScalarValue) => InternalScalarValue) {
-    for(let i=0; i<this.data.length; i++) {
-      for(let j=0; j< this.data[0].length; j++) {
-        this.data[i][j] = op(this.data[i][j])
-      }
-    }
+  public static fromScalar(scalar: InternalScalarValue): SimpleRangeValue {
+    return new SimpleRangeValue([[scalar]], undefined, undefined, undefined)
   }
-
-  public ensureThatComputed() {}
-
-  public valuesFromTopLeftCorner(): InternalScalarValue[] {
-    const ret = []
-    for (let i = 0; i < this.size.height; i++) {
-      for (let j = 0; j < this.size.width; j++) {
-        ret.push(this.data[i][j])
-      }
-    }
-    return ret
-  }
-
-  public* iterateValuesFromTopLeftCorner(): IterableIterator<InternalScalarValue> {
-    for (let i = 0; i < this.size.height; i++) {
-      for (let j = 0; j < this.size.width; j++) {
-        yield this.data[i][j]
-      }
-    }
-  }
-
-  public raw(): InternalScalarValue[][] {
-    return this.data
-  }
-
-  public rawNumbers(): number[][] {
-    if (this.hasOnlyNumbers()) {
-      return this.data as number[][]
-    } else {
-      throw new Error('Data is not only numbers')
-    }
-  }
-}
-
-export class OnlyRangeData {
-  public data?: InternalScalarValue[][]
-  public _hasOnlyNumbers?: boolean
 
   constructor(
-    public readonly size: MatrixSize,
-    public readonly _range: AbsoluteCellRange,
-    public readonly dependencyGraph: DependencyGraph,
+    private _data?: InternalScalarValue[][],
+    public readonly range?: AbsoluteCellRange,
+    private readonly dependencyGraph?: DependencyGraph,
+    private _hasOnlyNumbers?: boolean,
   ) {
-  }
-
-  public raw(): InternalScalarValue[][] {
-    this.ensureThatComputed()
-
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    return this.data!
-  }
-
-  public rawNumbers(): number[][] {
-    if (this.hasOnlyNumbers()) {
-      return this.data as number[][]
+    if(_data===undefined) {
+      this.size = new MatrixSize(range!.width(), range!.height())
     } else {
-      throw new Error('Data is not only numbers')
+      this.size = new MatrixSize(_data![0].length, _data!.length)
     }
   }
 
-  public hasOnlyNumbers() {
+  public isAdHoc(): boolean {
+    return this.range === undefined
+  }
+
+  public width(): number {
+    return this.size.width
+  }
+
+  public height(): number {
+    return this.size.height
+  }
+
+  public get data(): InternalScalarValue[][] {
     this.ensureThatComputed()
+    return this._data!
+  }
 
-    if (this._hasOnlyNumbers === undefined) {
-      for (const v of this.iterateValuesFromTopLeftCorner()) {
-        if (typeof v !== 'number') {
-          this._hasOnlyNumbers = false
-          break
-        }
-      }
-      this._hasOnlyNumbers = true
+  private ensureThatComputed() {
+    if(this._data !== undefined) {
+      return
     }
-
-    return this._hasOnlyNumbers
-  }
-
-  public topLeftCorner(): Maybe<InternalScalarValue> {
-    if (this.data !== undefined && this.size.height > 0 && this.size.width > 0) {
-      return this.data[0][0]
-    }
-    return undefined
-  }
-
-  public range() {
-    return this._range
-  }
-
-  public valuesFromTopLeftCorner(): InternalScalarValue[] {
-    this.ensureThatComputed()
-
-    const ret = []
-    for (let i = 0; i < this.data!.length; i++) {
-      for (let j = 0; j < this.data![0].length; j++) {
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        ret.push(this.data![i][j])
-      }
-    }
-    return ret
-  }
-
-  public* iterateValuesFromTopLeftCorner(): IterableIterator<InternalScalarValue> {
-    this.ensureThatComputed()
-
-    for (let i = 0; i < this.data!.length; i++) {
-      for (let j = 0; j < this.data![0].length; j++) {
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        yield this.data![i][j]
-      }
-    }
-  }
-
-  public map(op: (arg: InternalScalarValue) => InternalScalarValue) {
-    this.ensureThatComputed()
-    for(let i=0; i<this.data!.length; i++) {
-      for(let j=0; j< this.data![0].length; j++) {
-        this.data![i][j] = op(this.data![i][j])
-      }
-    }
-  }
-
-  public ensureThatComputed() {
-    if (this.data === undefined) {
-      this.data = this.computeDataFromDependencyGraph()
-    }
-  }
-
-  private computeDataFromDependencyGraph(): InternalScalarValue[][] {
-    return this._range.addressesArrayMap(this.dependencyGraph, cellFromRange => {
-      const value = this.dependencyGraph.getCellValue(cellFromRange)
+    this._hasOnlyNumbers = true
+    this._data = this.range!.addressesArrayMap(this.dependencyGraph!, cellFromRange => {
+      const value = this.dependencyGraph!.getCellValue(cellFromRange)
       if (value instanceof SimpleRangeValue) {
+        this._hasOnlyNumbers = false
         return new CellError(ErrorType.VALUE, ErrorMessage.ScalarExpected)
       } else if (isExtendedNumber(value)) {
         return value
@@ -179,85 +81,48 @@ export class OnlyRangeData {
         return value
       }
     })
-  }
-}
 
-export type RangeData = ArrayData | OnlyRangeData
-
-export class SimpleRangeValue {
-  public get size(): MatrixSize {
-    return this.data.size
-  }
-
-  public static onlyNumbersDataWithRange(data: number[][], size: MatrixSize, range: AbsoluteCellRange): SimpleRangeValue {
-    return new SimpleRangeValue(new ArrayData(size, data, true), range)
-  }
-
-  public static onlyNumbersDataWithoutRange(data: number[][], size: MatrixSize): SimpleRangeValue {
-    return new SimpleRangeValue(new ArrayData(size, data, true))
-  }
-
-  public static onlyValues(data: InternalScalarValue[][]): SimpleRangeValue {
-    return new SimpleRangeValue(new ArrayData(MatrixSize.fromMatrix(data), data, false), undefined, true) //FIXME test for _hasOnlyNumbers
-  }
-
-  public static onlyRange(range: AbsoluteCellRange, dependencyGraph: DependencyGraph): SimpleRangeValue {
-    return new SimpleRangeValue(new OnlyRangeData({
-      width: range.width(),
-      height: range.height()
-    }, range, dependencyGraph), undefined, true)
-  }
-
-  public static fromScalar(scalar: InternalScalarValue): SimpleRangeValue {
-    const hasOnlyNumbers = isExtendedNumber(scalar)
-    return new SimpleRangeValue(new ArrayData({width: 1, height: 1}, [[scalar]], hasOnlyNumbers))
-  }
-
-  constructor(
-    public readonly data: RangeData,
-    private readonly _range?: AbsoluteCellRange,
-    public readonly adhoc?: boolean
-  ) {
-  }
-
-  public width(): number {
-    return this.data.size.width
-  }
-
-  public height(): number {
-    return this.data.size.height
-  }
-
-  public raw(): InternalScalarValue[][] {
-    return this.data.raw()
-  }
-
-  public topLeftCornerValue(): Maybe<InternalScalarValue> {
-    return this.data.topLeftCorner()
   }
 
   public valuesFromTopLeftCorner(): InternalScalarValue[] {
-    return this.data.valuesFromTopLeftCorner()
+    this.ensureThatComputed()
+
+    const ret = []
+    for (let i = 0; i < this._data!.length; i++) {
+      for (let j = 0; j < this._data![0].length; j++) {
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        ret.push(this._data![i][j])
+      }
+    }
+    return ret
   }
 
   public* iterateValuesFromTopLeftCorner(): IterableIterator<InternalScalarValue> {
-    yield* this.data.iterateValuesFromTopLeftCorner()
+    yield* this.valuesFromTopLeftCorner()
   }
 
   public numberOfElements(): number {
-    return this.data.size.width * this.data.size.height
+    return this.size.width * this.size.height
   }
 
-  public hasOnlyNumbers(): boolean {
-    return this.data.hasOnlyNumbers()
+  public hasOnlyNumbers() {
+    if (this._hasOnlyNumbers === undefined) {
+      this._hasOnlyNumbers = true
+      for(const row of this.data) {
+        for(const v of row) {
+          if (typeof v !== 'number') {
+            this._hasOnlyNumbers = false
+            return false
+          }
+        }
+      }
+    }
+
+    return this._hasOnlyNumbers
   }
 
   public rawNumbers(): number[][] {
-    return this.data.rawNumbers()
-  }
-
-  public range(): Maybe<AbsoluteCellRange> {
-    return this._range ?? this.data.range()
+    return this._data as number[][]
   }
 
   public sameDimensionsAs(other: SimpleRangeValue): boolean {
@@ -265,6 +130,6 @@ export class SimpleRangeValue {
   }
 
   public onlyRangeData(): boolean {
-    return this.data instanceof OnlyRangeData
+    return this.range !== undefined
   }
 }

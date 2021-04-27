@@ -84,7 +84,7 @@ named ranges. The full list of methods is available in the
 
 You can add a named expression by using the `addNamedExpression`
 method. It accepts name for the expression, the expression as a
-raw cell content, and optionally the scope. If you do not define
+data cell content, and optionally the scope. If you do not define
 the scope it will be set to global, meaning the expression name
 will be valid for the whole workbook. If you want to add many of them, it is
 advised to do so in a [batch](batch-operations.md). This method
@@ -100,7 +100,7 @@ const changes = hfInstance.addNamedExpression('prettyName', '=Sheet1!$A$1+100', 
 
 You can change a named expression by using the `changeNamedExpression`
 method. Select the name of an expression to change and pass it as
-the first parameter,  then define the new expression as raw cell
+the first parameter,  then define the new expression as data cell
 content and optionally add the scope. If you do not define the scope
 it will be set to global, meaning the expression will be vaild for the whole workbook. If you want to change many of them, it is advised
 to do so in a [batch](batch-operations.md). This method returns

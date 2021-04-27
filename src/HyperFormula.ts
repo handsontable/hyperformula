@@ -1102,7 +1102,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * @fires [[valuesUpdated]] if recalculation was triggered by this change
    *
-   * @throws [[InvalidArgumentsError]] when the value is not an array of arrays or a raw cell value
+   * @throws [[InvalidArgumentsError]] when the value is not an array of arrays or a data cell value
    * @throws [[SheetSizeLimitExceededError]] when performing this operation would result in sheet size limits exceeding
    * @throws an error when it is an attempt to set cells content inside matrices during batch operation
    *

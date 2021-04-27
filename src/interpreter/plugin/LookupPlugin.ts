@@ -56,7 +56,7 @@ export class LookupPlugin extends FunctionPlugin implements FunctionPluginTypech
    */
   public vlookup(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
     return this.runFunction(ast.args, state, this.metadata('VLOOKUP'), (key: RawNoErrorScalarValue, rangeValue: SimpleRangeValue, index: number, sorted: boolean) => {
-      const range = rangeValue.range()
+      const range = rangeValue.range
 
       if (range === undefined) {
         return new CellError(ErrorType.VALUE, ErrorMessage.WrongType)
@@ -80,7 +80,7 @@ export class LookupPlugin extends FunctionPlugin implements FunctionPluginTypech
    */
   public hlookup(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
     return this.runFunction(ast.args, state, this.metadata('HLOOKUP'), (key: RawNoErrorScalarValue, rangeValue: SimpleRangeValue, index: number, sorted: boolean) => {
-      const range = rangeValue.range()
+      const range = rangeValue.range
       if (range === undefined) {
         return new CellError(ErrorType.VALUE, ErrorMessage.WrongType)
       }
@@ -103,10 +103,10 @@ export class LookupPlugin extends FunctionPlugin implements FunctionPluginTypech
 
   private doVlookup(key: RawNoErrorScalarValue, rangeValue: SimpleRangeValue, index: number, sorted: boolean): InternalScalarValue {
     this.dependencyGraph.stats.start(StatType.VLOOKUP)
-    const range = rangeValue.range()
+    const range = rangeValue.range
     let searchedRange
     if(range === undefined) {
-      searchedRange = SimpleRangeValue.onlyValues(rangeValue.raw().map((arg) => [arg[0]]))
+      searchedRange = SimpleRangeValue.onlyValues(rangeValue.data.map((arg) => [arg[0]]))
     } else {
       searchedRange = SimpleRangeValue.onlyRange(AbsoluteCellRange.spanFrom(range.start, 1, range.height()), this.dependencyGraph)
     }
@@ -120,7 +120,7 @@ export class LookupPlugin extends FunctionPlugin implements FunctionPluginTypech
 
     let value
     if(range === undefined) {
-      value = rangeValue.raw()[rowIndex][index]
+      value = rangeValue.data[rowIndex][index]
     } else {
       const address = simpleCellAddress(range.sheet, range.start.col + index, range.start.row + rowIndex)
       value = this.dependencyGraph.getCellValue(address)
@@ -133,10 +133,10 @@ export class LookupPlugin extends FunctionPlugin implements FunctionPluginTypech
   }
 
   private doHlookup(key: RawNoErrorScalarValue, rangeValue: SimpleRangeValue, index: number, sorted: boolean): InternalScalarValue {
-    const range = rangeValue.range()
+    const range = rangeValue.range
     let searchedRange
     if(range === undefined) {
-      searchedRange = SimpleRangeValue.onlyValues([rangeValue.raw()[0]])
+      searchedRange = SimpleRangeValue.onlyValues([rangeValue.data[0]])
     } else {
       searchedRange =  SimpleRangeValue.onlyRange(AbsoluteCellRange.spanFrom(range.start, range.width(), 1), this.dependencyGraph)
     }
@@ -149,7 +149,7 @@ export class LookupPlugin extends FunctionPlugin implements FunctionPluginTypech
 
     let value
     if(range === undefined) {
-      value = rangeValue.raw()[index][colIndex]
+      value = rangeValue.data[index][colIndex]
     } else {
       const address = simpleCellAddress(range.sheet, range.start.col + colIndex, range.start.row + index)
       value = this.dependencyGraph.getCellValue(address)
