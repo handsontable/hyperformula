@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.6.0
+**Release date: April 27, 2021**
+
+### Changed
+- **Breaking change**: Moved `GPU.js` from `dependencies` to `devDependencies` and `optionalDependencies`. [#642](https://github.com/handsontable/hyperformula/issues/642)
+
+### Added
+- Added two new fired events, for suspending and resuming execution. [#637](https://github.com/handsontable/hyperformula/issues/637)
+- Added listing in scopes to `listNamedExpressions` method. [#638](https://github.com/handsontable/hyperformula/issues/638)
+
+### Fixed
+- Fixed issues with scoped named expression. [#646](https://github.com/handsontable/hyperformula/issues/646), [#641](https://github.com/handsontable/hyperformula/issues/641)
+- Fixed an issue with losing formating info about DateTime numbers. [#626](https://github.com/handsontable/hyperformula/issues/626)
+
 ## 0.5.0
 **Release date: April 15, 2021**
 
