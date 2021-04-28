@@ -11,7 +11,7 @@ import {AddRowsTransformer} from '../dependencyTransformers/AddRowsTransformer'
 import {RemoveRowsTransformer} from '../dependencyTransformers/RemoveRowsTransformer'
 import {FormulaTransformer} from '../dependencyTransformers/Transformer'
 import {forceNormalizeString} from '../interpreter/ArithmeticHelper'
-import {RawInterpreterValue, RawNoErrorScalarValue, RawScalarValue} from '../interpreter/InterpreterValue'
+import {getRawValue, RawInterpreterValue, RawNoErrorScalarValue, RawScalarValue} from '../interpreter/InterpreterValue'
 import {SimpleRangeValue} from '../interpreter/SimpleRangeValue'
 import {LazilyTransformingAstService} from '../LazilyTransformingAstService'
 import {Matrix} from '../Matrix'
@@ -47,7 +47,7 @@ export class ColumnIndex implements ColumnSearchStrategy {
   public add(value: RawInterpreterValue | Matrix, address: SimpleCellAddress) {
     if (value instanceof Matrix) {
       for (const [matrixValue, cellAddress] of value.generateValues(address)) {
-        this.addSingleCellValue(matrixValue, cellAddress)
+        this.addSingleCellValue(getRawValue(matrixValue), cellAddress)
       }
     } else if (!(value instanceof CellError || value instanceof SimpleRangeValue)) {
       this.addSingleCellValue(value, address)
@@ -61,7 +61,7 @@ export class ColumnIndex implements ColumnSearchStrategy {
 
     if (value instanceof Matrix) {
       for (const [matrixValue, cellAddress] of value.generateValues(address)) {
-        this.removeSingleValue(matrixValue, cellAddress)
+        this.removeSingleValue(getRawValue(matrixValue), cellAddress)
       }
     } else {
       this.removeSingleValue(value, address)

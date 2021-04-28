@@ -12,7 +12,7 @@ import {Maybe} from '../Maybe'
 import {InternalScalarValue, isExtendedNumber} from './InterpreterValue'
 
 export class SimpleRangeValue {
-  private readonly size: MatrixSize
+  public readonly size: MatrixSize
 
   public static numbersRange(data: InternalScalarValue[][], range: AbsoluteCellRange, dependencyGraph: DependencyGraph): SimpleRangeValue {
     return new SimpleRangeValue(data, range, dependencyGraph, true)
@@ -75,10 +75,10 @@ export class SimpleRangeValue {
         this._hasOnlyNumbers = false
         return new CellError(ErrorType.VALUE, ErrorMessage.ScalarExpected)
       } else if (isExtendedNumber(value)) {
-        return value
+        return value as InternalScalarValue
       } else {
         this._hasOnlyNumbers = false
-        return value
+        return value as InternalScalarValue
       }
     })
 

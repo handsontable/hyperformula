@@ -3,12 +3,11 @@
  * Copyright (c) 2021 Handsoncode. All rights reserved.
  */
 
-import {EmptyValue, getRawValue} from './interpreter/InterpreterValue'
-import {ClipboardCell, ClipboardCellType} from './ClipboardOperations'
-import {CellError, invalidSimpleCellAddress, simpleCellAddress, SimpleCellAddress} from './Cell'
 import {AbsoluteCellRange} from './AbsoluteCellRange'
 import {absolutizeDependencies, filterDependenciesOutOfScope} from './absolutizeDependencies'
+import {CellError, invalidSimpleCellAddress, simpleCellAddress, SimpleCellAddress} from './Cell'
 import {CellContent, CellContentParser, RawCellContent} from './CellContentParser'
+import {ClipboardCell, ClipboardCellType} from './ClipboardOperations'
 import {Config} from './Config'
 import {ContentChanges} from './ContentChanges'
 import {ColumnRowIndex} from './CrudOperations'
@@ -24,9 +23,10 @@ import {
   SparseStrategy,
   ValueCellVertex
 } from './DependencyGraph'
-import {RawAndParsedValue, ValueCellVertexValue} from './DependencyGraph/ValueCellVertex'
+import {RawAndParsedValue} from './DependencyGraph/ValueCellVertex'
 import {AddColumnsTransformer} from './dependencyTransformers/AddColumnsTransformer'
 import {AddRowsTransformer} from './dependencyTransformers/AddRowsTransformer'
+import {CleanOutOfScopeDependenciesTransformer} from './dependencyTransformers/CleanOutOfScopeDependenciesTransformer'
 import {MoveCellsTransformer} from './dependencyTransformers/MoveCellsTransformer'
 import {RemoveColumnsTransformer} from './dependencyTransformers/RemoveColumnsTransformer'
 import {RemoveRowsTransformer} from './dependencyTransformers/RemoveRowsTransformer'
@@ -39,7 +39,7 @@ import {
   SourceLocationHasMatrixError,
   TargetLocationHasMatrixError
 } from './errors'
-import {buildMatrixVertex} from './GraphBuilder'
+import {EmptyValue, getRawValue} from './interpreter/InterpreterValue'
 import {LazilyTransformingAstService} from './LazilyTransformingAstService'
 import {ColumnSearchStrategy} from './Lookup/SearchStrategy'
 import {checkMatrixSize} from './Matrix'
@@ -49,12 +49,11 @@ import {
   NamedExpressionOptions,
   NamedExpressions
 } from './NamedExpressions'
-import {NamedExpressionDependency, ParserWithCaching, ProcedureAst, RelativeDependency} from './parser'
+import {NamedExpressionDependency, ParserWithCaching, RelativeDependency} from './parser'
 import {ParsingError} from './parser/Ast'
 import {findBoundaries, Sheet} from './Sheet'
 import {ColumnsSpan, RowsSpan} from './Span'
 import {Statistics, StatType} from './statistics'
-import {CleanOutOfScopeDependenciesTransformer} from './dependencyTransformers/CleanOutOfScopeDependenciesTransformer'
 
 export class RemoveRowsCommand {
   constructor(
@@ -582,7 +581,11 @@ export class Operations {
     } else if (vertex instanceof ValueCellVertex) {
       return {type: ClipboardCellType.VALUE, ...vertex.getValues()}
     } else if (vertex instanceof MatrixVertex) {
-      return {type: ClipboardCellType.VALUE, parsedValue: vertex.getMatrixCellValue(address), rawValue: vertex.getMatrixCellRawValue(address)}
+      const val = vertex.getMatrixCellValue(address)
+      if(val === EmptyValue) {
+        return {type: ClipboardCellType.EMPTY}
+      }
+      return {type: ClipboardCellType.VALUE, parsedValue: val, rawValue: vertex.getMatrixCellRawValue(address)}
     } else if (vertex instanceof FormulaCellVertex) {
       return {
         type: ClipboardCellType.FORMULA,
