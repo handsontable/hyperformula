@@ -125,7 +125,7 @@ export const myTranslations = {
 For the simplicity of a basic example, you will not pass any
 arguments. However, this method imposes a particular structure to
 be used; there are two optional arguments, `ast` and
-`formulaAddress`, and the function must return the results of
+`state`, and the function must return the results of
 the calculations.
 
 ```javascript
