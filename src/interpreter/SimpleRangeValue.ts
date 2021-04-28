@@ -7,8 +7,7 @@ import {AbsoluteCellRange} from '../AbsoluteCellRange'
 import {CellError, ErrorType} from '../Cell'
 import {DependencyGraph} from '../DependencyGraph'
 import {ErrorMessage} from '../error-message'
-import {MatrixSize} from '../Matrix'
-import {Maybe} from '../Maybe'
+import {MatrixSize} from '../MatrixSize'
 import {InternalScalarValue, isExtendedNumber} from './InterpreterValue'
 
 export class SimpleRangeValue {
@@ -127,9 +126,5 @@ export class SimpleRangeValue {
 
   public sameDimensionsAs(other: SimpleRangeValue): boolean {
     return this.width() === other.width() && this.height() === other.height()
-  }
-
-  public onlyRangeData(): boolean {
-    return this.range !== undefined
   }
 }

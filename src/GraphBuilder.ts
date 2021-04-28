@@ -19,7 +19,7 @@ import {
   Vertex
 } from './DependencyGraph'
 import {GraphBuilderMatrixHeuristic} from './GraphBuilderMatrixHeuristic'
-import {checkMatrixSize} from './Matrix'
+import {checkMatrixSize} from './MatrixSize'
 import {ParserWithCaching, ProcedureAst} from './parser'
 import {Statistics, StatType} from './statistics'
 import {Sheets} from './Sheet'

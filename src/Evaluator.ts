@@ -71,19 +71,19 @@ export class Evaluator {
             return false
           } else if (vertex instanceof MatrixVertex && vertex.isFormula()) {
             const address = vertex.getAddress()
-            const formula = vertex.getFormula() as Ast
+            const formula = vertex.getFormula()!
             const currentValue = vertex.isComputed() ? vertex.getCellValue() : null
             const newCellValue = this.evaluateAstToRangeValue(formula, new InterpreterState(address, this.config.arrays))
-            if(newCellValue instanceof SimpleRangeValue && !(newCellValue.onlyRangeData())) {
+            if(newCellValue instanceof SimpleRangeValue && newCellValue.isAdHoc()) {
               const newCellMatrix = new Matrix(newCellValue.data)
               vertex.setCellValue(newCellMatrix)
               changes.addMatrixChange(newCellMatrix, address)
               this.columnSearch.change(currentValue, newCellMatrix, address)
             } else {
               const errorVal = newCellValue instanceof CellError ? newCellValue
-                : newCellValue.onlyRangeData() ?
-                  new CellError(ErrorType.VALUE, ErrorMessage.ScalarExpected)
-                  : new CellError(ErrorType.VALUE, ErrorMessage.CellRangeExpected)
+                : newCellValue.isAdHoc() ?
+                  new CellError(ErrorType.VALUE, ErrorMessage.CellRangeExpected)
+                  : new CellError(ErrorType.VALUE, ErrorMessage.ScalarExpected)
               vertex.setErrorValue(errorVal)
               changes.addChange(errorVal, address)
               this.columnSearch.change(currentValue, errorVal, address)
@@ -155,17 +155,17 @@ export class Evaluator {
         this.columnSearch.add(getRawValue(newCellValue), address)
       } else if (vertex instanceof MatrixVertex && vertex.isFormula()) {
         const address = vertex.getAddress()
-        const formula = vertex.getFormula() as Ast
+        const formula = vertex.getFormula()!
         const newCellValue = this.evaluateAstToRangeValue(formula, new InterpreterState(address, this.config.arrays))
-        if(newCellValue instanceof SimpleRangeValue && !newCellValue.onlyRangeData()) {
+        if(newCellValue instanceof SimpleRangeValue && newCellValue.isAdHoc()) {
           const newCellMatrix = new Matrix(newCellValue.data)
           vertex.setCellValue(newCellMatrix)
           this.columnSearch.add(newCellMatrix, address)
         } else {
           const errorVal = newCellValue instanceof CellError ? newCellValue
-            : newCellValue.onlyRangeData() ?
-              new CellError(ErrorType.VALUE, ErrorMessage.ScalarExpected)
-              : new CellError(ErrorType.VALUE, ErrorMessage.CellRangeExpected)
+            : newCellValue.isAdHoc() ?
+              new CellError(ErrorType.VALUE, ErrorMessage.CellRangeExpected)
+              : new CellError(ErrorType.VALUE, ErrorMessage.ScalarExpected)
           vertex.setErrorValue(errorVal)
           this.columnSearch.add(errorVal, address)
         }

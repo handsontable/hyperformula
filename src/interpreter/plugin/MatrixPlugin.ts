@@ -5,7 +5,7 @@
 
 import {CellError, ErrorType} from '../../Cell'
 import {ErrorMessage} from '../../error-message'
-import {MatrixSize, matrixSizeForMultiplication, matrixSizeForPoolFunction, matrixSizeForTranspose} from '../../Matrix'
+import {MatrixSize, matrixSizeForMultiplication, matrixSizeForPoolFunction} from '../../MatrixSize'
 import {ProcedureAst} from '../../parser'
 import {Interpreter} from '../Interpreter'
 import {InterpreterValue} from '../InterpreterValue'

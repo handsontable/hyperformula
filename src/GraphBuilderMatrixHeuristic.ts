@@ -8,7 +8,8 @@ import {simpleCellAddress, SimpleCellAddress} from './Cell'
 import {CellContent, CellContentParser, RawCellContent} from './CellContentParser'
 import {ColumnSearchStrategy} from './Lookup/SearchStrategy'
 import {DependencyGraph, MatrixVertex} from './DependencyGraph'
-import {Matrix, MatrixSize} from './Matrix'
+import {Matrix} from './Matrix'
+import {MatrixSize} from './MatrixSize'
 import {Sheets} from './Sheet'
 
 export class Array2d<T> {
@@ -38,12 +39,8 @@ export class Array2d<T> {
     this.array[y][x] = value
   }
 
-  public get(x: number, y: number): T | null {
-    const row = this.array[y]
-    if (!row) {
-      return null
-    }
-    return row[x] || null
+  public get(x: number, y: number): T | undefined {
+    return this.array[y]?.[x]
   }
 
   public size() {

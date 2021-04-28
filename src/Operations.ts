@@ -42,7 +42,7 @@ import {
 import {EmptyValue, getRawValue} from './interpreter/InterpreterValue'
 import {LazilyTransformingAstService} from './LazilyTransformingAstService'
 import {ColumnSearchStrategy} from './Lookup/SearchStrategy'
-import {checkMatrixSize} from './Matrix'
+import {checkMatrixSize} from './MatrixSize'
 import {
   doesContainRelativeReferences,
   InternalNamedExpression,

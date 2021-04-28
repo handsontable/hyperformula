@@ -13,6 +13,7 @@ import {Config} from '../Config'
 import {ErrorMessage} from '../error-message'
 import {SimpleRangeValue} from '../interpreter/SimpleRangeValue'
 import {LazilyTransformingAstService} from '../LazilyTransformingAstService'
+import {MatrixSize} from '../MatrixSize'
 import {Maybe} from '../Maybe'
 import {Ast, collectDependencies, NamedExpressionDependency} from '../parser'
 import {ColumnsSpan, RowsSpan, Span} from '../Span'
@@ -44,7 +45,6 @@ import {
   InterpreterValue,
   RawScalarValue
 } from '../interpreter/InterpreterValue'
-import {MatrixSize} from '../Matrix'
 
 export class DependencyGraph {
   /*
