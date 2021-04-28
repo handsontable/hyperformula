@@ -152,7 +152,7 @@ export class CountHF extends FunctionPlugin {
     }
   };
 
-  public hyper(ast, formulaAddress) {
+  public hyper(ast, state) {
     return 'Hyperformula'.length
     }
   };
