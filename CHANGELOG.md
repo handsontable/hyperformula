@@ -6,13 +6,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- **Breaking change**: Removed support for matrix formulas (`{=FORMULA}`) notation. Engine now supports formulas returning array of values (instead of only scalars). (#652)
+
 ### Added
 - Added support for array arithmetic. (#628)
 - Added performance improvements for array handling. (#629)
 - Added ARRAYFORMULA function. (#630)
-
-### Changed
-- **Breaking change**: Removed support for matrix formulas (`{=FORMULA}`) notation. Engine now supports formulas returning array of values (instead of only scalars). (#652)
 
 ### Fixed
 - Fixed an issue with arrays and cruds. (#651)
