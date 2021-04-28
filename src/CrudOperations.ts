@@ -249,7 +249,7 @@ export class CrudOperations {
     } else {
       for (let i = 0; i < cellContents.length; i++) {
         if (!(cellContents[i] instanceof Array)) {
-          throw new InvalidArgumentsError('an array of arrays or a data cell value.')
+          throw new InvalidArgumentsError('an array of arrays or a raw cell value.')
         }
       }
     }
