@@ -130,7 +130,7 @@ the calculations.
 
 ```javascript
 // arguments here are displayed just to show the structure
-public hyper(ast, formulaAddress) {
+public hyper(ast, state) {
     return 'Hyperformula'.length;
   }
 };
