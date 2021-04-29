@@ -10,8 +10,9 @@ import {adr} from './testUtils'
 describe('Matrix size check tests', () => {
   const config = new Config()
   const functionRegistry = new FunctionRegistry(config)
+  // eslint-disable-next-line
   // @ts-ignore
-  const interpreter = new Interpreter(undefined,undefined, config, undefined, undefined, undefined, functionRegistry, undefined)
+  const interpreter = new Interpreter(undefined, undefined, config, undefined, undefined, undefined, functionRegistry, undefined)
   const matrixSizePredictor = new MatrixSizePredictor(config, functionRegistry)
   it('check', () => {
     const parser = buildEmptyParserWithCaching(new Config())

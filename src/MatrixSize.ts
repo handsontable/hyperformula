@@ -64,7 +64,7 @@ export class MatrixSizePredictor {
 
   private _checkMatrixSize(ast: Ast, state: InterpreterState): MatrixSizeCheck {
     switch (ast.type) {
-      case AstNodeType.FUNCTION_CALL:
+      case AstNodeType.FUNCTION_CALL: {
         const metadata = this.functionRegistry.getMetadata(ast.procedureName)
         const subChecks = ast.args.map((arg) => this._checkMatrixSize(arg, state))
         switch (ast.procedureName) {
@@ -73,7 +73,7 @@ export class MatrixSizePredictor {
               return new CellError(ErrorType.NA, ErrorMessage.WrongArgNumber)
             }
 
-            const [left,right] = subChecks
+            const [left, right] = subChecks
 
             if (left instanceof CellError) {
               return left
@@ -133,6 +133,7 @@ export class MatrixSizePredictor {
             return new CellError(ErrorType.VALUE, ErrorMessage.MatrixFunction)
           }
         }
+      }
       case AstNodeType.CELL_RANGE: {
         const range = AbsoluteCellRange.fromCellRangeOrUndef(ast, state.formulaAddress)
         if (range === undefined) {
