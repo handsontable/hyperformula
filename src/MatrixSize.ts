@@ -65,14 +65,15 @@ export class MatrixSizePredictor {
   private _checkMatrixSize(ast: Ast, state: InterpreterState): MatrixSizeCheck {
     switch (ast.type) {
       case AstNodeType.FUNCTION_CALL:
+        const metadata = this.functionRegistry.getMetadata(ast.procedureName)
+        const subChecks = ast.args.map((arg) => this._checkMatrixSize(arg, state))
         switch (ast.procedureName) {
           case 'MMULT': {
             if (ast.args.length !== 2) {
               return new CellError(ErrorType.NA, ErrorMessage.WrongArgNumber)
             }
 
-            const left = this._checkMatrixSize(ast.args[0], state)
-            const right = this._checkMatrixSize(ast.args[1], state)
+            const [left,right] = subChecks
 
             if (left instanceof CellError) {
               return left
@@ -90,7 +91,7 @@ export class MatrixSizePredictor {
               return new CellError(ErrorType.NA, ErrorMessage.WrongArgNumber)
             }
 
-            const matrix = this._checkMatrixSize(ast.args[0], state)
+            const matrix = subChecks[0]
             const windowArg = ast.args[1]
 
             if (matrix instanceof CellError) {
@@ -124,7 +125,7 @@ export class MatrixSizePredictor {
               return new CellError(ErrorType.NA, ErrorMessage.WrongArgNumber)
             }
 
-            const size = this._checkMatrixSize(ast.args[0], state)
+            const size = subChecks[0]
 
             return size instanceof CellError ? size : matrixSizeForTranspose(size)
           }
@@ -182,6 +183,5 @@ export class MatrixSizePredictor {
         return new CellError(ErrorType.VALUE)
     }
   }
-
 }
 

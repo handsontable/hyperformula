@@ -2,6 +2,7 @@ import {CellError, ErrorType, simpleCellAddress} from '../src/Cell'
 import {Config} from '../src/Config'
 import {ErrorMessage} from '../src/error-message'
 import {FunctionRegistry} from '../src/interpreter/FunctionRegistry'
+import {Interpreter} from '../src/interpreter/Interpreter'
 import {MatrixSize, MatrixSizePredictor} from '../src/MatrixSize'
 import {buildEmptyParserWithCaching} from './parser/common'
 import {adr} from './testUtils'
@@ -9,6 +10,8 @@ import {adr} from './testUtils'
 describe('Matrix size check tests', () => {
   const config = new Config()
   const functionRegistry = new FunctionRegistry(config)
+  // @ts-ignore
+  const interpreter = new Interpreter(undefined,undefined, config, undefined, undefined, undefined, functionRegistry, undefined)
   const matrixSizePredictor = new MatrixSizePredictor(config, functionRegistry)
   it('check', () => {
     const parser = buildEmptyParserWithCaching(new Config())
