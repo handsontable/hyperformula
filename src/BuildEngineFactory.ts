@@ -72,7 +72,7 @@ export class BuildEngineFactory {
     const numberLiteralHelper = new NumberLiteralHelper(config)
     const cellContentParser = new CellContentParser(config, dateHelper, numberLiteralHelper)
 
-    const matrixSizePredictor = new MatrixSizePredictor(config)
+    const matrixSizePredictor = new MatrixSizePredictor(config, functionRegistry)
     const crudOperations = new CrudOperations(config, stats, dependencyGraph, columnSearch, parser, cellContentParser, lazilyTransformingAstService, namedExpressions, matrixSizePredictor)
     stats.measure(StatType.GRAPH_BUILD, () => {
       const graphBuilder = new GraphBuilder(dependencyGraph, columnSearch, parser, cellContentParser, config, stats, matrixSizePredictor)

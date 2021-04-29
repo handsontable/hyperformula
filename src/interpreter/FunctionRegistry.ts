@@ -9,7 +9,7 @@ import {HyperFormula} from '../HyperFormula'
 import {TranslationSet} from '../i18n'
 import {Maybe} from '../Maybe'
 import {Interpreter} from './Interpreter'
-import {FunctionMetadata, FunctionPlugin, FunctionPluginDefinition} from './plugin/FunctionPlugin'
+import {FunctionMetadata, FunctionPlugin, FunctionPluginDefinition, PluginFunctionType} from './plugin/FunctionPlugin'
 import {VersionPlugin} from './plugin/VersionPlugin'
 
 export type FunctionTranslationsPackage = Record<string, TranslationSet>
@@ -199,8 +199,14 @@ export class FunctionRegistry {
     return this.instancePlugins.get(functionId)
   }
 
-  public getFunction(functionId: string): Maybe<[string, FunctionPlugin]> {
-    return this.functions.get(functionId)
+  public getFunction(functionId: string): Maybe<PluginFunctionType> {
+    const pluginEntry = this.functions.get(functionId)
+    if (pluginEntry !== undefined && this.config.translationPackage.isFunctionTranslated(functionId)) {
+      const [pluginFunction, pluginInstance] = pluginEntry
+      return (ast, state) => (pluginInstance as any as Record<string, PluginFunctionType>)[pluginFunction](ast, state)
+    } else {
+      return undefined
+    }
   }
 
   public getPlugins(): FunctionPluginDefinition[] {

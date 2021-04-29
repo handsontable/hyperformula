@@ -1,12 +1,15 @@
 import {CellError, ErrorType, simpleCellAddress} from '../src/Cell'
 import {Config} from '../src/Config'
 import {ErrorMessage} from '../src/error-message'
+import {FunctionRegistry} from '../src/interpreter/FunctionRegistry'
 import {MatrixSize, MatrixSizePredictor} from '../src/MatrixSize'
 import {buildEmptyParserWithCaching} from './parser/common'
 import {adr} from './testUtils'
 
 describe('Matrix size check tests', () => {
-  const matrixSizePredictor = new MatrixSizePredictor(new Config())
+  const config = new Config()
+  const functionRegistry = new FunctionRegistry(config)
+  const matrixSizePredictor = new MatrixSizePredictor(config, functionRegistry)
   it('check', () => {
     const parser = buildEmptyParserWithCaching(new Config())
     const ast = parser.parse('=mmult(A1:B3,C1:E2)', simpleCellAddress(0, 0, 0)).ast
