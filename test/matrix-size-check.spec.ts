@@ -1,17 +1,17 @@
 import {CellError, ErrorType, simpleCellAddress} from '../src/Cell'
 import {Config} from '../src/Config'
 import {ErrorMessage} from '../src/error-message'
-import {checkMatrixSize, MatrixSize} from '../src/MatrixSize'
+import {MatrixSize, MatrixSizePredictor} from '../src/MatrixSize'
 import {buildEmptyParserWithCaching} from './parser/common'
 import {adr} from './testUtils'
 
 describe('Matrix size check tests', () => {
-
+  const matrixSizePredictor = new MatrixSizePredictor(new Config())
   it('check', () => {
     const parser = buildEmptyParserWithCaching(new Config())
     const ast = parser.parse('=mmult(A1:B3,C1:E2)', simpleCellAddress(0, 0, 0)).ast
 
-    const size = checkMatrixSize(ast, adr('A1'))
+    const size = matrixSizePredictor.checkMatrixSize(ast, adr('A1'))
     expect(size).toEqual(new MatrixSize(3, 3))
   })
 
@@ -19,7 +19,7 @@ describe('Matrix size check tests', () => {
     const parser = buildEmptyParserWithCaching(new Config())
     const ast = parser.parse('=mmult(A1:B3,C1:E3)', simpleCellAddress(0, 0, 0)).ast
 
-    const size = checkMatrixSize(ast, adr('A1'))
+    const size = matrixSizePredictor.checkMatrixSize(ast, adr('A1'))
     expect(size).toEqual(new CellError(ErrorType.VALUE, ErrorMessage.MatrixDimensions))
   })
 
@@ -27,7 +27,7 @@ describe('Matrix size check tests', () => {
     const parser = buildEmptyParserWithCaching(new Config())
     const ast = parser.parse('=mmult(mmult(A1:B3,C1:E2), A1:B3)', simpleCellAddress(0, 0, 0)).ast
 
-    const size = checkMatrixSize(ast, adr('A1'))
+    const size = matrixSizePredictor.checkMatrixSize(ast, adr('A1'))
     expect(size).toEqual(new MatrixSize(2, 3))
   })
 
@@ -35,7 +35,7 @@ describe('Matrix size check tests', () => {
     const parser = buildEmptyParserWithCaching(new Config())
     const ast = parser.parse('=mmult(mmult(A1:B3,C1:E3), A1:B3)', simpleCellAddress(0, 0, 0)).ast
 
-    const size = checkMatrixSize(ast, adr('A1'))
+    const size = matrixSizePredictor.checkMatrixSize(ast, adr('A1'))
     expect(size).toEqual(new CellError(ErrorType.VALUE, ErrorMessage.MatrixDimensions))
   })
 
@@ -43,7 +43,7 @@ describe('Matrix size check tests', () => {
     const parser = buildEmptyParserWithCaching(new Config())
     const ast = parser.parse('=maxpool(A1:I9,3)', simpleCellAddress(0, 0, 0)).ast
 
-    const size = checkMatrixSize(ast, adr('A1'))
+    const size = matrixSizePredictor.checkMatrixSize(ast, adr('A1'))
     expect(size).toEqual(new MatrixSize(3, 3))
   })
 
@@ -51,7 +51,7 @@ describe('Matrix size check tests', () => {
     const parser = buildEmptyParserWithCaching(new Config())
     const ast = parser.parse('=transpose(A2)', simpleCellAddress(0, 0, 0)).ast
 
-    const size = checkMatrixSize(ast, adr('A1'))
+    const size = matrixSizePredictor.checkMatrixSize(ast, adr('A1'))
     expect(size).toEqual(new MatrixSize(1, 1))
   })
 })

@@ -42,7 +42,7 @@ import {
 import {EmptyValue, getRawValue} from './interpreter/InterpreterValue'
 import {LazilyTransformingAstService} from './LazilyTransformingAstService'
 import {ColumnSearchStrategy} from './Lookup/SearchStrategy'
-import {checkMatrixSize} from './MatrixSize'
+import {MatrixSizePredictor} from './MatrixSize'
 import {
   doesContainRelativeReferences,
   InternalNamedExpression,
@@ -164,6 +164,7 @@ export class Operations {
     private readonly lazilyTransformingAstService: LazilyTransformingAstService,
     private readonly namedExpressions: NamedExpressions,
     private readonly config: Config,
+    private readonly matrixSizePredictor: MatrixSizePredictor,
   ) {
     this.allocateNamedExpressionAddressSpace()
   }
@@ -645,7 +646,7 @@ export class Operations {
         if (errors.length > 0) {
           this.dependencyGraph.setParsingErrorToCell(address, new ParsingErrorVertex(errors, parsedCellContent.formula))
         } else {
-          const size = checkMatrixSize(ast, address)
+          const size = this.matrixSizePredictor.checkMatrixSize(ast, address)
           if(size instanceof CellError || (size.width<=1 && size.height<=1) || size.isRef) {
             this.dependencyGraph.setFormulaToCell(address, ast, absolutizeDependencies(dependencies, address), hasVolatileFunction, hasStructuralChangeFunction)
           } else {

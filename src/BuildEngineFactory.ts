@@ -14,6 +14,7 @@ import {DependencyGraph} from './DependencyGraph'
 import {Evaluator} from './Evaluator'
 import {GraphBuilder} from './GraphBuilder'
 import {UIElement} from './i18n'
+import {MatrixSizePredictor} from './MatrixSize'
 import {NamedExpressions} from './NamedExpressions'
 import {NumberLiteralHelper} from './NumberLiteralHelper'
 import {buildLexerConfig, ParserWithCaching, Unparser} from './parser'
@@ -71,9 +72,10 @@ export class BuildEngineFactory {
     const numberLiteralHelper = new NumberLiteralHelper(config)
     const cellContentParser = new CellContentParser(config, dateHelper, numberLiteralHelper)
 
-    const crudOperations = new CrudOperations(config, stats, dependencyGraph, columnSearch, parser, cellContentParser, lazilyTransformingAstService, namedExpressions)
+    const matrixSizePredictor = new MatrixSizePredictor(config)
+    const crudOperations = new CrudOperations(config, stats, dependencyGraph, columnSearch, parser, cellContentParser, lazilyTransformingAstService, namedExpressions, matrixSizePredictor)
     stats.measure(StatType.GRAPH_BUILD, () => {
-      const graphBuilder = new GraphBuilder(dependencyGraph, columnSearch, parser, cellContentParser, config, stats)
+      const graphBuilder = new GraphBuilder(dependencyGraph, columnSearch, parser, cellContentParser, config, stats, matrixSizePredictor)
       graphBuilder.buildGraph(sheets)
     })
 

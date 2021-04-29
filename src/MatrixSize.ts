@@ -1,5 +1,11 @@
+/**
+ * @license
+ * Copyright (c) 2021 Handsoncode. All rights reserved.
+ */
+
 import {AbsoluteCellRange} from './AbsoluteCellRange'
 import {CellError, ErrorType, SimpleCellAddress} from './Cell'
+import {Config} from './Config'
 import {ErrorMessage} from './error-message'
 import {Ast, AstNodeType} from './parser'
 
@@ -48,7 +54,7 @@ function matrixSizeForUnaryOp(matrixSize: MatrixSize): MatrixSize {
   return new MatrixSize(matrixSize.width, matrixSize.height)
 }
 
-export function checkMatrixSize(ast: Ast, formulaAddress: SimpleCellAddress): MatrixSizeCheck {
+function checkMatrixSize(ast: Ast, formulaAddress: SimpleCellAddress): MatrixSizeCheck {
   switch (ast.type) {
     case AstNodeType.FUNCTION_CALL:
       switch (ast.procedureName) {
@@ -172,6 +178,17 @@ export function checkMatrixSize(ast: Ast, formulaAddress: SimpleCellAddress): Ma
     }
     default:
       return new CellError(ErrorType.VALUE)
+  }
+}
+
+export class MatrixSizePredictor {
+  constructor(
+    private config: Config,
+  ) {
+  }
+
+  public checkMatrixSize(ast: Ast, formulaAddress: SimpleCellAddress): MatrixSizeCheck {
+    return checkMatrixSize(ast, formulaAddress)
   }
 }
 
