@@ -98,7 +98,7 @@ describe('Matrix size check tests', () => {
     const ast = parser.parse('=ARRAYFORMULA(A1:D3+A1:C4)', simpleCellAddress(0, 0, 0)).ast
 
     const size = matrixSizePredictor.checkMatrixSize(ast, adr('A1'))
-    expect(size).toEqual(new MatrixSize(4,4))
+    expect(size).toEqual(new MatrixSize(4, 4))
   })
 
   it('check unary array arithmetic #1', () => {
@@ -114,7 +114,7 @@ describe('Matrix size check tests', () => {
     const ast = parser.parse('=ARRAYFORMULA(-A1:B3)', simpleCellAddress(0, 0, 0)).ast
 
     const size = matrixSizePredictor.checkMatrixSize(ast, adr('A1'))
-    expect(size).toEqual(new MatrixSize(2,3))
+    expect(size).toEqual(new MatrixSize(2, 3))
   })
 })
 
@@ -131,7 +131,7 @@ describe('Matrix size check tests, with different config', () => {
     const ast = parser.parse('=A1:D3+A1:C4', simpleCellAddress(0, 0, 0)).ast
 
     const size = matrixSizePredictor.checkMatrixSize(ast, adr('A1'))
-    expect(size).toEqual(new MatrixSize(4,4))
+    expect(size).toEqual(new MatrixSize(4, 4))
   })
 
     it('check unary array arithmetic', () => {
@@ -139,6 +139,6 @@ describe('Matrix size check tests, with different config', () => {
       const ast = parser.parse('=-A1:B3', simpleCellAddress(0, 0, 0)).ast
 
       const size = matrixSizePredictor.checkMatrixSize(ast, adr('A1'))
-      expect(size).toEqual(new MatrixSize(2,3))
+      expect(size).toEqual(new MatrixSize(2, 3))
     })
 })

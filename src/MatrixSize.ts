@@ -138,7 +138,7 @@ export class MatrixSizePredictor {
             return subChecks[0]
           }
           default: {
-            return new MatrixSize(1,1)
+            return new MatrixSize(1, 1)
           }
         }
       }
