@@ -7,13 +7,13 @@ import {SimpleCellAddress} from '../Cell'
 import {LazilyTransformingAstService} from '../LazilyTransformingAstService'
 import {AddressDependency, Ast, collectDependencies} from '../parser'
 import {FormulaCellVertex} from './FormulaCellVertex'
-import {MatrixVertex} from './MatrixVertex'
+import {IMatrixVertex, MatrixVertex} from './MatrixVertex'
 import {RangeVertex} from './RangeVertex'
 import {Vertex} from './Vertex'
 import {DependencyGraph} from './DependencyGraph'
 import {FunctionRegistry} from '../interpreter/FunctionRegistry'
 
-export const collectAddressesDependentToMatrix = (funcitonRegistry: FunctionRegistry, vertex: Vertex, matrix: MatrixVertex, lazilyTransformingAstService: LazilyTransformingAstService, dependencyGraph: DependencyGraph): SimpleCellAddress[] => {
+export const collectAddressesDependentToMatrix = (funcitonRegistry: FunctionRegistry, vertex: Vertex, matrix: IMatrixVertex, lazilyTransformingAstService: LazilyTransformingAstService, dependencyGraph: DependencyGraph): SimpleCellAddress[] => {
   const range = matrix.getRange()
 
   if (vertex instanceof RangeVertex) {
