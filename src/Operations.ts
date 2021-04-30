@@ -647,7 +647,7 @@ export class Operations {
           this.dependencyGraph.setParsingErrorToCell(address, new ParsingErrorVertex(errors, parsedCellContent.formula))
         } else {
           const size = this.matrixSizePredictor.checkMatrixSize(ast, address)
-          if(size instanceof CellError || (size.width<=1 && size.height<=1) || size.isRef) {
+          if(size === undefined || (size.width<=1 && size.height<=1) || size.isRef) {
             this.dependencyGraph.setFormulaToCell(address, ast, absolutizeDependencies(dependencies, address), hasVolatileFunction, hasStructuralChangeFunction)
           } else {
             this.dependencyGraph.setMatrixToCell(address, ast, absolutizeDependencies(dependencies, address), size)

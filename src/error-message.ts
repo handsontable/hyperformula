@@ -50,7 +50,6 @@ export class ErrorMessage {
   public static NegativeCount = 'Count cannot be negative.'
   public static ParseError = 'Parsing error.'
   public static SheetRef = 'Sheet does not exist.'
-  public static MatrixFunction = 'Matrix function not recognized.'
   public static PeriodLong = 'Period number cannot exceed life length.'
   public static InvalidDate = 'Invalid date.'
   public static BitshiftLong = 'Result of bitshift is too long.'

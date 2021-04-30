@@ -27,7 +27,7 @@ describe('Matrix size check tests', () => {
     const ast = parser.parse('=mmult(A1:B3,C1:E3)', simpleCellAddress(0, 0, 0)).ast
 
     const size = matrixSizePredictor.checkMatrixSize(ast, adr('A1'))
-    expect(size).toEqual(new CellError(ErrorType.VALUE, ErrorMessage.MatrixDimensions))
+    expect(size).toEqual(undefined)
   })
 
   it('check recurisve', () => {
@@ -43,7 +43,7 @@ describe('Matrix size check tests', () => {
     const ast = parser.parse('=mmult(mmult(A1:B3,C1:E3), A1:B3)', simpleCellAddress(0, 0, 0)).ast
 
     const size = matrixSizePredictor.checkMatrixSize(ast, adr('A1'))
-    expect(size).toEqual(new CellError(ErrorType.VALUE, ErrorMessage.MatrixDimensions))
+    expect(size).toEqual(undefined)
   })
 
   it('check maxpool', () => {
