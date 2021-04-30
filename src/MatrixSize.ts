@@ -131,7 +131,7 @@ export class MatrixSizePredictor {
 
             return size === undefined ? undefined : matrixSizeForTranspose(size)
           }
-          case 'ARRAYFUNCTION': {
+          case 'ARRAYFORMULA': {
             if (ast.args.length !== 1) {
               return undefined
             }
@@ -185,6 +185,9 @@ export class MatrixSizePredictor {
       case AstNodeType.PERCENT_OP: {
         const val = this._checkMatrixSize(ast.value, state)
         if (val === undefined) {
+          return undefined
+        }
+        if(!state.arraysFlag && (val.height>1 || val.width>1)) {
           return undefined
         }
         return matrixSizeForUnaryOp(val)
