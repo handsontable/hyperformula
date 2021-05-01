@@ -744,7 +744,7 @@ export class Operations {
     const globalNamedExpression = this.namedExpressions.workbookNamedExpressionOrPlaceholder(expressionName)
     const globalVertex = this.dependencyGraph.fetchCellOrCreateEmpty(globalNamedExpression.address)
     for (const adjacentNode of this.dependencyGraph.graph.adjacentNodes(globalVertex)) {
-      if (adjacentNode instanceof FormulaCellVertex && adjacentNode.cellAddress.sheet === sheetId) {
+      if (adjacentNode instanceof FormulaCellVertex && adjacentNode.getAddress(this.lazilyTransformingAstService).sheet === sheetId) {
         const ast = adjacentNode.getFormula(this.lazilyTransformingAstService)
         const formulaAddress = adjacentNode.getAddress(this.lazilyTransformingAstService)
         const {dependencies} = this.parser.fetchCachedResultForAst(ast)
