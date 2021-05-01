@@ -130,7 +130,7 @@ describe('CellContentParser', () => {
   it('JS Date parsing', () => {
     expect(cellContentParser.parse(new Date(1995, 11, 17))).toEqual(new CellContent.Number(new DateNumber(35050, 'Date()')))
     expect(cellContentParser.parse(new Date(1995, 11, 17, 12, 0, 0))).toEqual(new CellContent.Number(new DateTimeNumber(35050.5, 'Date()')))
-    expect(cellContentParser.parse(new Date(1899, 11, 30, 6, 0 , 0))).toEqual(new CellContent.Number(new TimeNumber(0.25, 'Date()')))
+    expect(cellContentParser.parse(new Date(1899, 11, 30, 6, 0, 0))).toEqual(new CellContent.Number(new TimeNumber(0.25, 'Date()')))
     expect(cellContentParser.parse(new Date(1899, 11, 29))).toEqual(new CellContent.Error(ErrorType.NUM, ErrorMessage.DateBounds))
   })
 
