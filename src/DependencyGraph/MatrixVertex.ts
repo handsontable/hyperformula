@@ -4,14 +4,16 @@
  */
 
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
-import {CellError, SimpleCellAddress} from '../Cell'
+import {CellError, ErrorType, SimpleCellAddress} from '../Cell'
 import {RawCellContent} from '../CellContentParser'
-import {EmptyValue, getRawValue, InternalScalarValue} from '../interpreter/InterpreterValue'
+import {EmptyValue, getRawValue, InternalScalarValue, InterpreterValue} from '../interpreter/InterpreterValue'
 import {ErroredMatrix, IMatrix, Matrix, NotComputedMatrix} from '../Matrix'
 import {MatrixSize} from '../MatrixSize'
 import {Maybe} from '../Maybe'
 import {Ast} from '../parser'
 import {ColumnsSpan, RowsSpan} from '../Span'
+import {SimpleRangeValue} from '../interpreter/SimpleRangeValue'
+import {ErrorMessage} from '../error-message'
 
 export interface IMatrixVertex {
   readonly width: number,
@@ -21,9 +23,9 @@ export interface IMatrixVertex {
   cellAddress: SimpleCellAddress,
   formula?: Ast,
 
-  setCellValue(matrix: Matrix): void,
+  setCellValue(matrix: InterpreterValue): void,
   setErrorValue(error: CellError): void,
-  getCellValue(): Matrix | CellError,
+  getCellValue(): InterpreterValue,
   getMatrixCellValue(address: SimpleCellAddress): InternalScalarValue,
   getMatrixCellRawValue(address: SimpleCellAddress): Maybe<RawCellContent>,
   setMatrixCellValue(address: SimpleCellAddress, value: number): void,
@@ -68,19 +70,36 @@ export class MatrixVertex implements IMatrixVertex {
     this.matrix = new NotComputedMatrix(new MatrixSize(width, height))
   }
 
-  setCellValue(matrix: Matrix) {
-    this.matrix = matrix
+  setCellValue(value: InterpreterValue): InterpreterValue {
+    if(value instanceof SimpleRangeValue && value.isAdHoc()) {
+      this.matrix = new Matrix(value.data)
+      return value
+    } else {
+      let errorVal: CellError
+      if (value instanceof CellError) {
+        errorVal = value
+      } else if (value instanceof SimpleRangeValue) {
+        errorVal = new CellError(ErrorType.VALUE, ErrorMessage.CellRangeExpected)
+      } else {
+        /* TODO throw runtime? */
+        errorVal = new CellError(ErrorType.VALUE, ErrorMessage.ScalarExpected)
+      }
+      this.setErrorValue(errorVal)
+      return errorVal
+    }
+    /* TODO */
+    throw Error('Should not happen')
   }
 
   setErrorValue(error: CellError) {
     this.matrix = new ErroredMatrix(error, this.matrix.size)
   }
 
-  getCellValue(): Matrix | CellError {
+  getCellValue(): InterpreterValue {
     if (this.matrix instanceof NotComputedMatrix) {
       throw Error('Matrix not computed yet.')
     }
-    return this.matrix as (Matrix | CellError)
+    return this.matrix.simpleRangeValue()
   }
 
   getMatrixCellValue(address: SimpleCellAddress): InternalScalarValue {
@@ -119,7 +138,11 @@ export class MatrixVertex implements IMatrixVertex {
     this.cellAddress = address
   }
 
-  getFormula(): Maybe<Ast> {
+  getFormula(): Ast {
+    if (this.formula == undefined) {
+      /* TODO */
+      throw Error('TODO formula should not be undefined')
+    }
     return this.formula
   }
 

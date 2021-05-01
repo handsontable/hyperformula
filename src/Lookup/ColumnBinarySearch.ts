@@ -25,11 +25,11 @@ export class ColumnBinarySearch extends AdvancedFind implements ColumnSearchStra
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars 
-  public add(value: RawScalarValue | Matrix, address: SimpleCellAddress): void {}
+  public add(value: RawScalarValue, address: SimpleCellAddress): void {}
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  public remove(value: RawScalarValue | Matrix | null, address: SimpleCellAddress): void {}
+  public remove(value: RawScalarValue | null, address: SimpleCellAddress): void {}
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  public change(oldValue: RawScalarValue | Matrix | null, newValue: RawScalarValue | Matrix, address: SimpleCellAddress): void {}
+  public change(oldValue: RawScalarValue | null, newValue: RawScalarValue, address: SimpleCellAddress): void {}
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public addColumns(columnsSpan: ColumnsSpan): void {}
   // eslint-disable-next-line @typescript-eslint/no-unused-vars

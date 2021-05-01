@@ -6,6 +6,7 @@
 import {SimpleCellAddress} from './Cell'
 import {InterpreterValue} from './interpreter/InterpreterValue'
 import {Matrix} from './Matrix'
+import {SimpleRangeValue} from './interpreter/SimpleRangeValue'
 
 export interface CellValueChange {
   sheet: number,
@@ -32,14 +33,14 @@ export class ContentChanges {
     return this
   }
 
-  public addMatrixChange(newValue: Matrix, address: SimpleCellAddress): void {
-    for (const [matrixValue, cellAddress] of newValue.generateValues(address)) {
-      this.addSingleCellValue(matrixValue, cellAddress)
-    }
-  }
-
   public addChange(newValue: InterpreterValue, address: SimpleCellAddress): void {
-    this.addSingleCellValue(newValue, address)
+    if (newValue instanceof SimpleRangeValue) {
+      for (const [value, entryAddress] of newValue.entriesFromTopLeftCorner(address)) {
+        this.addSingleCellValue(value, entryAddress)
+      }
+    } else {
+      this.addSingleCellValue(newValue, address)
+    }
   }
 
   public add(...change: ChangeList) {

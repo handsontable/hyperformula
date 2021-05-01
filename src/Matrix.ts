@@ -6,6 +6,7 @@
 import {CellError, SimpleCellAddress, simpleCellAddress} from './Cell'
 import {InternalScalarValue} from './interpreter/InterpreterValue'
 import {MatrixSize} from './MatrixSize'
+import {SimpleRangeValue} from './interpreter/SimpleRangeValue'
 
 export interface IMatrix {
   size: MatrixSize,
@@ -15,6 +16,8 @@ export interface IMatrix {
   height(): number,
 
   get(col: number, row: number): InternalScalarValue,
+
+  simpleRangeValue(): SimpleRangeValue | CellError,
 }
 
 export class NotComputedMatrix implements IMatrix {
@@ -33,6 +36,10 @@ export class NotComputedMatrix implements IMatrix {
   public get(col: number, row: number): number {
     throw Error('Matrix not computed yet.')
   }
+
+  simpleRangeValue(): SimpleRangeValue {
+    throw Error('Matrix not computed yet.')
+  }
 }
 
 export class Matrix implements IMatrix {
@@ -42,6 +49,10 @@ export class Matrix implements IMatrix {
   constructor(matrix: InternalScalarValue[][]) {
     this.size = new MatrixSize(matrix.length > 0 ? matrix[0].length : 0, matrix.length)
     this.matrix = matrix
+  }
+
+  simpleRangeValue(): SimpleRangeValue {
+    return SimpleRangeValue.onlyValues(this.matrix)
   }
 
   public addRows(aboveRow: number, numberOfRows: number) {
@@ -110,14 +121,6 @@ export class Matrix implements IMatrix {
     return this.matrix
   }
 
-  public* generateValues(leftCorner: SimpleCellAddress): IterableIterator<[InternalScalarValue, SimpleCellAddress]> {
-    for (let row = 0; row < this.size.height; ++row) {
-      for (let col = 0; col < this.size.width; ++col) {
-        yield [this.matrix[row][col], simpleCellAddress(leftCorner.sheet, leftCorner.col + col, leftCorner.row + row)]
-      }
-    }
-  }
-
   private outOfBound(col: number, row: number): boolean {
     return col < 0 || row < 0 || row > this.size.height - 1 || col > this.size.width - 1
   }
@@ -141,5 +144,9 @@ export class ErroredMatrix implements IMatrix {
 
   public height(): number {
     return this.size.height
+  }
+
+  simpleRangeValue(): CellError {
+    return this.error
   }
 }

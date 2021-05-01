@@ -3,7 +3,6 @@
  * Copyright (c) 2021 Handsoncode. All rights reserved.
  */
 
-import {AbsoluteCellRange} from '../AbsoluteCellRange'
 import {CellError, movedSimpleCellAddress, SimpleCellAddress} from '../Cell'
 import {Config} from '../Config'
 import {DependencyGraph} from '../DependencyGraph'
@@ -14,7 +13,6 @@ import {forceNormalizeString} from '../interpreter/ArithmeticHelper'
 import {getRawValue, RawInterpreterValue, RawNoErrorScalarValue, RawScalarValue} from '../interpreter/InterpreterValue'
 import {SimpleRangeValue} from '../interpreter/SimpleRangeValue'
 import {LazilyTransformingAstService} from '../LazilyTransformingAstService'
-import {Matrix} from '../Matrix'
 import {ColumnsSpan, RowsSpan} from '../Span'
 import {Statistics, StatType} from '../statistics'
 import {ColumnBinarySearch} from './ColumnBinarySearch'
@@ -44,23 +42,23 @@ export class ColumnIndex implements ColumnSearchStrategy {
     this.binarySearchStrategy = new ColumnBinarySearch(dependencyGraph, config)
   }
 
-  public add(value: RawInterpreterValue | Matrix, address: SimpleCellAddress) {
-    if (value instanceof Matrix) {
-      for (const [matrixValue, cellAddress] of value.generateValues(address)) {
+  public add(value: RawInterpreterValue, address: SimpleCellAddress) {
+    if (value instanceof SimpleRangeValue) {
+      for (const [matrixValue, cellAddress] of value.entriesFromTopLeftCorner(address)) {
         this.addSingleCellValue(getRawValue(matrixValue), cellAddress)
       }
-    } else if (!(value instanceof CellError || value instanceof SimpleRangeValue)) {
+    } else if (!(value instanceof CellError)) {
       this.addSingleCellValue(value, address)
     }
   }
 
-  public remove(value: RawInterpreterValue | Matrix | null, address: SimpleCellAddress) {
+  public remove(value: RawInterpreterValue | null, address: SimpleCellAddress) {
     if (!value) {
       return
     }
 
-    if (value instanceof Matrix) {
-      for (const [matrixValue, cellAddress] of value.generateValues(address)) {
+    if (value instanceof SimpleRangeValue) {
+      for (const [matrixValue, cellAddress] of value.entriesFromTopLeftCorner(address)) {
         this.removeSingleValue(getRawValue(matrixValue), cellAddress)
       }
     } else {
@@ -68,7 +66,8 @@ export class ColumnIndex implements ColumnSearchStrategy {
     }
   }
 
-  public change(oldValue: RawInterpreterValue | Matrix | null, newValue: RawInterpreterValue | Matrix, address: SimpleCellAddress) {
+  public change(oldValue: RawInterpreterValue | null, newValue: RawInterpreterValue, address: SimpleCellAddress) {
+    /* TODO simple range value? */
     if (oldValue === newValue) {
       return
     }

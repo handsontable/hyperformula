@@ -4,7 +4,7 @@
  */
 
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
-import {CellError, ErrorType} from '../Cell'
+import {CellError, ErrorType, simpleCellAddress, SimpleCellAddress} from '../Cell'
 import {DependencyGraph} from '../DependencyGraph'
 import {ErrorMessage} from '../error-message'
 import {MatrixSize} from '../MatrixSize'
@@ -94,6 +94,15 @@ export class SimpleRangeValue {
       }
     }
     return ret
+  }
+
+  public* entriesFromTopLeftCorner(leftCorner: SimpleCellAddress): IterableIterator<[InternalScalarValue, SimpleCellAddress]> {
+    this.ensureThatComputed()
+    for (let row = 0; row < this.size.height; ++row) {
+      for (let col = 0; col < this.size.width; ++col) {
+        yield [this._data![row][col], simpleCellAddress(leftCorner.sheet, leftCorner.col + col, leftCorner.row + row)]
+      }
+    }
   }
 
   public* iterateValuesFromTopLeftCorner(): IterableIterator<InternalScalarValue> {

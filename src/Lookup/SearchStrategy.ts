@@ -22,11 +22,11 @@ export interface SearchStrategy {
 }
 
 export interface ColumnSearchStrategy extends SearchStrategy {
-  add(value: RawInterpreterValue | Matrix, address: SimpleCellAddress): void,
+  add(value: RawInterpreterValue, address: SimpleCellAddress): void,
 
-  remove(value: RawInterpreterValue | Matrix | null, address: SimpleCellAddress): void,
+  remove(value: RawInterpreterValue | null, address: SimpleCellAddress): void,
 
-  change(oldValue: RawInterpreterValue | Matrix | null, newValue: RawInterpreterValue | Matrix, address: SimpleCellAddress): void,
+  change(oldValue: RawInterpreterValue | null, newValue: RawInterpreterValue, address: SimpleCellAddress): void,
 
   addColumns(columnsSpan: ColumnsSpan): void,
 

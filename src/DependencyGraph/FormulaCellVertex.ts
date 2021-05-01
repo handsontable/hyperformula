@@ -61,8 +61,9 @@ export class FormulaCellVertex {
   /**
    * Sets computed cell value stored in this vertex
    */
-  public setCellValue(cellValue: InterpreterValue) {
+  public setCellValue(cellValue: InterpreterValue): InterpreterValue {
     this.cachedCellValue = cellValue
+    return this.cachedCellValue
   }
 
   /**
