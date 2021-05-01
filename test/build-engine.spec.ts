@@ -59,7 +59,7 @@ describe('Building engine from arrays', () => {
     const engine1 = HyperFormula.buildFromArray([['=Sheet2!A1']])
 
     engine1.addSheet('Sheet2')
-    engine1.setSheetContent('Sheet2', [['1']])
+    engine1.setSheetContent(1, [['1']])
     engine1.rebuildAndRecalculate()
 
     expect(engine1.getCellValue(adr('A1', 1))).toBe(1)

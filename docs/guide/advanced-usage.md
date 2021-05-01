@@ -74,13 +74,13 @@ Now prepare sheets and insert the data into them:
 ```javascript
 // add 'TeamA' sheet
 hfInstance.addSheet('TeamA');
-// insert playersA content into targeted 'TeamA' sheet
-hfInstance.setSheetContent('TeamA', playersA);
+// insert playersA content into targeted 'TeamA' sheet (sheetId=0)
+hfInstance.setSheetContent(0, playersA);
 
 // add 'TeamB' sheet
 hfInstance.addSheet('TeamB');
-// insert playersB content into targeted 'TeamB' sheet
-hfInstance.setSheetContent('TeamB', playersB);
+// insert playersB content into targeted 'TeamB' sheet (sheetId=1)
+hfInstance.setSheetContent(1, playersB);
 
 // check the content in the console output
 console.log(hfInstance.getAllSheetsValues());
@@ -92,7 +92,7 @@ After setting everything up, you can add formulas:
 // add a sheet named 'Formulas'
 hfInstance.addSheet('Formulas');
 // add formulas to that sheet
-hfInstance.setSheetContent('Formulas', formulas);
+hfInstance.setSheetContent(2, formulas);
 ```
 
 Almost done! Now, you can use the `getSheetValues` method to get all

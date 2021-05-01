@@ -563,7 +563,7 @@ describe('Named expressions - evaluation', () => {
     ])
     engine.addNamedExpression('FOO', '=Sheet1!$A$1 + 10')
 
-    engine.removeSheet('Sheet1')
+    engine.removeSheet(0)
 
     expect(engine.getNamedExpressionFormula('FOO')).toEqual('=#REF! + 10')
   })

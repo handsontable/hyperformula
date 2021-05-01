@@ -2395,7 +2395,7 @@ export class HyperFormula implements TypedEmitter {
    * Returns `true` if the provided name of a sheet exists and therefore it can be removed, doing [[removeSheet]] operation won't throw any errors.
    * Returns `false` if there is no sheet with a given name.
    *
-   * @param {string} sheetName - sheet name, case insensitive
+   * @param {number} sheetId - sheet ID.
    *
    * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
    * @example
@@ -2405,16 +2405,16 @@ export class HyperFormula implements TypedEmitter {
    *  MySheet2: [ ['10'] ],
    * });
    *
-   * // should return 'true' because 'MySheet2' exists and is removable
-   * const isRemovable = hfInstance.isItPossibleToRemoveSheet('MySheet2');
+   * // should return 'true' because sheet with ID 1 exists and is removable
+   * const isRemovable = hfInstance.isItPossibleToRemoveSheet(1);
    * ```
    *
    * @category Sheets
    */
-  public isItPossibleToRemoveSheet(sheetName: string): boolean {
-    validateArgToType(sheetName, 'string', 'sheetName')
+  public isItPossibleToRemoveSheet(sheetId: number): boolean {
+    validateArgToType(sheetId, 'number', 'sheetId')
     try {
-      this._crudOperations.ensureSheetExists(sheetName)
+      this._crudOperations.ensureScopeIdIsValid(sheetId)
       return true
     } catch (e) {
       return false
@@ -2426,13 +2426,13 @@ export class HyperFormula implements TypedEmitter {
    *
    * Note that this method may trigger dependency graph recalculation.
    *
-   * @param {string} sheetName - sheet name, case insensitive
+   * @param {number} sheetId - sheet ID.
    *
    * @fires [[sheetRemoved]] after the sheet was removed
    * @fires [[valuesUpdated]] if recalculation was triggered by this change
    *
    * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
-   * @throws [[NoSheetWithNameError]] when the given sheet name does not exists
+   * @throws [[NoSheetWithIdError]] when the given sheet ID does not exists
    *
    * @example
    * ```js
@@ -2447,15 +2447,15 @@ export class HyperFormula implements TypedEmitter {
    * //   address: { sheet: 0, col: 0, row: 0 },
    * //   newValue: { error: [CellError], value: '#REF!' },
    * // }]
-   * const changes = hfInstance.removeSheet('MySheet2');
+   * const changes = hfInstance.removeSheet(1);
    * ```
    *
    * @category Sheets
    */
-  public removeSheet(sheetName: string): ExportedChange[] {
-    validateArgToType(sheetName, 'string', 'sheetName')
-    const displayName = this.sheetMapping.getDisplayNameByName(sheetName)!
-    this._crudOperations.removeSheet(sheetName)
+  public removeSheet(sheetId: number): ExportedChange[] {
+    validateArgToType(sheetId, 'number', 'sheetId')
+    const displayName = this.sheetMapping.getDisplayName(sheetId)!
+    this._crudOperations.removeSheet(sheetId)
     const changes = this.recomputeIfDependencyGraphNeedsIt()
     this._emitter.emit(Events.SheetRemoved, displayName, changes)
     return changes
@@ -2466,7 +2466,7 @@ export class HyperFormula implements TypedEmitter {
    * If returns `true`, doing [[clearSheet]] operation won't throw any errors, provided name of a sheet exists and then its content can be cleared.
    * Returns `false` if there is no sheet with a given name.
    *
-   * @param {string} sheetName - sheet name, case insensitive.
+   * @param {number} sheetId - sheet ID.
    *
    * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
    * @example
@@ -2477,15 +2477,15 @@ export class HyperFormula implements TypedEmitter {
    * });
    *
    * // should return 'true' because 'MySheet2' exists and can be cleared
-   * const isClearable = hfInstance.isItPossibleToClearSheet('MySheet2');
+   * const isClearable = hfInstance.isItPossibleToClearSheet(1);
    * ```
    *
    * @category Sheets
    */
-  public isItPossibleToClearSheet(sheetName: string): boolean {
-    validateArgToType(sheetName, 'string', 'sheetName')
+  public isItPossibleToClearSheet(sheetId: number): boolean {
+    validateArgToType(sheetId, 'number', 'sheetId')
     try {
-      this._crudOperations.ensureSheetExists(sheetName)
+      this._crudOperations.ensureScopeIdIsValid(sheetId)
       return true
     } catch (e) {
       return false
@@ -2498,12 +2498,12 @@ export class HyperFormula implements TypedEmitter {
    *
    * Note that this method may trigger dependency graph recalculation.
    *
-   * @param {string} sheetName - sheet name, case insensitive.
+   * @param {number} sheetId - sheet ID.
    *
    * @fires [[valuesUpdated]] if recalculation was triggered by this change
    *
    * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
-   * @throws [[NoSheetWithNameError]] when the given sheet name does not exists
+   * @throws [[NoSheetWithIdError]] when the given sheet ID does not exists
    *
    * @example
    * ```js
@@ -2518,15 +2518,14 @@ export class HyperFormula implements TypedEmitter {
    * //   address: { sheet: 0, col: 0, row: 0 },
    * //   newValue: 0,
    * // }]
-   * const changes = hfInstance.clearSheet('MySheet2');
+   * const changes = hfInstance.clearSheet(0);
    * ```
    *
    * @category Sheets
    */
-  public clearSheet(sheetName: string): ExportedChange[] {
-    validateArgToType(sheetName, 'string', 'sheetName')
-    this._crudOperations.ensureSheetExists(sheetName)
-    this._crudOperations.clearSheet(sheetName)
+  public clearSheet(sheetId: number): ExportedChange[] {
+    validateArgToType(sheetId, 'number', 'sheetId')
+    this._crudOperations.clearSheet(sheetId)
     return this.recomputeIfDependencyGraphNeedsIt()
   }
 
@@ -2535,7 +2534,7 @@ export class HyperFormula implements TypedEmitter {
    * If returns `true`, doing [[setSheetContent]] operation won't throw any errors, the provided name of a sheet exists and then its content can be replaced.
    * Returns `false` if there is no sheet with a given name.
    *
-   * @param {string} sheetName - sheet name, case insensitive.
+   * @param {number} sheetId - sheet ID.
    * @param {RawCellContent[][]} values - array of new values
    *
    * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
@@ -2546,18 +2545,17 @@ export class HyperFormula implements TypedEmitter {
    *  MySheet2: [ ['10'] ],
    * });
    *
-   * // should return 'true' because 'MySheet1' exists
+   * // should return 'true' because 'MySheet1' (sheetId=0) exists
    * // and the provided content can be placed in this sheet
-   * const isReplaceable = hfInstance.isItPossibleToReplaceSheetContent('MySheet1', [['50'], ['60']]);
+   * const isReplaceable = hfInstance.isItPossibleToReplaceSheetContent(0, [['50'], ['60']]);
    * ```
    *
    * @category Sheets
    */
-  public isItPossibleToReplaceSheetContent(sheetName: string, values: RawCellContent[][]): boolean {
-    validateArgToType(sheetName, 'string', 'sheetName')
+  public isItPossibleToReplaceSheetContent(sheetId: number, values: RawCellContent[][]): boolean {
+    validateArgToType(sheetId, 'number', 'sheetId')
     try {
-      this._crudOperations.ensureSheetExists(sheetName)
-      const sheetId = this.sheetMapping.fetch(sheetName)
+      this._crudOperations.ensureScopeIdIsValid(sheetId)
       this._crudOperations.ensureItIsPossibleToChangeSheetContents(sheetId, values)
       return true
     } catch (e) {
@@ -2570,11 +2568,11 @@ export class HyperFormula implements TypedEmitter {
    * The new value is to be provided as an array of arrays of [[RawCellContent]].
    * The method finds sheet ID based on the provided sheet name.
    *
-   * @param {string} sheetName - sheet name, case insensitive.
+   * @param {number} sheetId - sheet ID.
    * @param {RawCellContent[][]} values - array of new values
    *
    * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
-   * @throws [[NoSheetWithNameError]] when the given sheet name does not exists
+   * @throws [[NoSheetWithIdError]] when the given sheet ID does not exists
    * @throws [[InvalidArgumentsError]] when values is not an array of arrays
    *
    * @example
@@ -2586,14 +2584,14 @@ export class HyperFormula implements TypedEmitter {
    *
    * // should return a list of cells which values changed after the operation,
    * // their absolute addresses and new values
-   * const changes = hfInstance.setSheetContent('MySheet1', [['50'], ['60']]);
+   * const changes = hfInstance.setSheetContent(0, [['50'], ['60']]);
    * ```
    *
    * @category Sheets
    */
-  public setSheetContent(sheetName: string, values: RawCellContent[][]): ExportedChange[] {
-    validateArgToType(sheetName, 'string', 'sheetName')
-    this._crudOperations.setSheetContent(sheetName, values)
+  public setSheetContent(sheetId: number, values: RawCellContent[][]): ExportedChange[] {
+    validateArgToType(sheetId, 'number', 'sheetId')
+    this._crudOperations.setSheetContent(sheetId, values)
     return this.recomputeIfDependencyGraphNeedsIt()
   }
 
@@ -3696,11 +3694,11 @@ export class HyperFormula implements TypedEmitter {
    * Calculates fire-and-forget formula, returns the calculated value.
    *
    * @param {string} formulaString -  a formula in a proper format - it must start with "="
-   * @param {string} sheetId - an ID of the sheet in context of which we evaluate formula.
+   * @param {number} sheetId - an ID of the sheet in context of which we evaluate formula.
    *
    * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
    * @throws [[NotAFormulaError]] when the provided string is not a valid formula, i.e does not start with "="
-   * @throws [[NoSheetWithNameError]] when the given sheet name does not exists
+   * @throws [[NoSheetWithIdError]] when the given sheet ID does not exists
    *
    * @example
    * ```js

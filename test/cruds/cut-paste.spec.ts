@@ -954,7 +954,7 @@ describe('aborting cut paste', () => {
     })
 
     engine.cut(adr('A1'), 1, 1)
-    engine.removeSheet('Sheet2')
+    engine.removeSheet(1)
 
     expect(engine.isClipboardEmpty()).toBe(true)
   })
@@ -977,7 +977,7 @@ describe('aborting cut paste', () => {
     })
 
     engine.cut(adr('A1'), 1, 1)
-    engine.clearSheet('Sheet2')
+    engine.clearSheet(1)
 
     expect(engine.isClipboardEmpty()).toBe(true)
   })
@@ -989,7 +989,7 @@ describe('aborting cut paste', () => {
     })
 
     engine.cut(adr('A1'), 1, 1)
-    engine.setSheetContent('Sheet2', [])
+    engine.setSheetContent(1, [])
 
     expect(engine.isClipboardEmpty()).toBe(true)
   })

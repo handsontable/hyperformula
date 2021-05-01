@@ -5,7 +5,7 @@ describe('should properly build', () => {
   it('for this test', () => {
     const engine = HyperFormula.buildEmpty()
     engine.addSheet()
-    engine.setSheetContent('Sheet1', [
+    engine.setSheetContent(0, [
       ['=MAX(B1:B2)', '=MAX(A1:A2)'],
       ['=MAX(B1:B2)', '=MAX(A1:A2)'],
     ])

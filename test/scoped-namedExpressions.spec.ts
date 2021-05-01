@@ -8,7 +8,7 @@ describe('scoped named expressions', () => {
     // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
     // @ts-ignore
     expect(engine._namedExpressions.getAllNamedExpressionsNames()).toEqual(['TRUE'])
-    engine.removeSheet('Sheet1')
+    engine.removeSheet(0)
     // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
     // @ts-ignore
     expect(engine._namedExpressions.getAllNamedExpressionsNames()).toEqual([])
@@ -17,7 +17,7 @@ describe('scoped named expressions', () => {
   it('removal should work with undo of sheet', () => {
     const engine = HyperFormula.buildFromArray([['=TRUE']])
     engine.addNamedExpression('TRUE', true, 0)
-    engine.removeSheet('Sheet1')
+    engine.removeSheet(0)
     engine.undo()
     expect(engine.getCellValue(adr('A1'))).toEqual(true)
   })

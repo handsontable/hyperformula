@@ -393,7 +393,7 @@ describe('Undo - removing columns', () => {
 describe('Undo - removing sheet', () => {
   it('works for empty sheet', () => {
     const engine = HyperFormula.buildFromArray([])
-    engine.removeSheet('Sheet1')
+    engine.removeSheet(0)
 
     engine.undo()
 
@@ -405,7 +405,7 @@ describe('Undo - removing sheet', () => {
       ['1'],
     ]
     const engine = HyperFormula.buildFromArray(sheet)
-    engine.removeSheet('Sheet1')
+    engine.removeSheet(0)
 
     engine.undo()
 
@@ -417,20 +417,11 @@ describe('Undo - removing sheet', () => {
       ['=42'],
     ]
     const engine = HyperFormula.buildFromArray(sheet)
-    engine.removeSheet('Sheet1')
+    engine.removeSheet(0)
 
     engine.undo()
 
     expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray(sheet))
-  })
-
-  it('restores original sheet name', () => {
-    const engine = HyperFormula.buildFromArray([])
-    engine.removeSheet('shEEt1')
-
-    engine.undo()
-
-    expect(engine.getSheetName(0)).toEqual('Sheet1')
   })
 
   it('restores dependent cell formulas', () => {
@@ -439,7 +430,7 @@ describe('Undo - removing sheet', () => {
       Sheet2: [['42']],
     }
     const engine = HyperFormula.buildFromSheets(sheets)
-    engine.removeSheet('Sheet2')
+    engine.removeSheet(1)
 
     engine.undo()
 
@@ -453,7 +444,7 @@ describe('Undo - removing sheet', () => {
     }
     const engine = HyperFormula.buildFromSheets(sheets)
     engine.suspendEvaluation()
-    engine.removeSheet('Sheet2')
+    engine.removeSheet(1)
 
     engine.undo()
     engine.resumeEvaluation()
@@ -548,7 +539,7 @@ describe('Undo - adding sheet', () => {
 describe('Undo - clearing sheet', () => {
   it('works for empty sheet', () => {
     const engine = HyperFormula.buildFromArray([])
-    engine.clearSheet('Sheet1')
+    engine.clearSheet(0)
 
     engine.undo()
 
@@ -560,7 +551,7 @@ describe('Undo - clearing sheet', () => {
       ['1'],
     ]
     const engine = HyperFormula.buildFromArray(sheet)
-    engine.clearSheet('Sheet1')
+    engine.clearSheet(0)
 
     engine.undo()
 
@@ -572,7 +563,7 @@ describe('Undo - clearing sheet', () => {
       ['=42'],
     ]
     const engine = HyperFormula.buildFromArray(sheet)
-    engine.clearSheet('Sheet1')
+    engine.clearSheet(0)
 
     engine.undo()
 
@@ -584,7 +575,7 @@ describe('Undo - setting sheet contents', () => {
   it('works for basic case', () => {
     const sheet = [['13']]
     const engine = HyperFormula.buildFromArray(sheet)
-    engine.setSheetContent('Sheet1', [['42']])
+    engine.setSheetContent(0, [['42']])
 
     engine.undo()
 
@@ -596,7 +587,7 @@ describe('Undo - setting sheet contents', () => {
       ['1'],
     ]
     const engine = HyperFormula.buildFromArray(sheet)
-    engine.setSheetContent('Sheet1', [['42', '43']])
+    engine.setSheetContent(0, [['42', '43']])
 
     engine.undo()
 
@@ -1223,7 +1214,7 @@ describe('Redo - removing sheet', () => {
     const engine = HyperFormula.buildFromArray([
       ['1']
     ])
-    engine.removeSheet('Sheet1')
+    engine.removeSheet(0)
     const snapshot = engine.getAllSheetsSerialized()
     engine.undo()
 
@@ -1237,7 +1228,7 @@ describe('Redo - removing sheet', () => {
     engine.setCellContents(adr('A1'), 42)
     engine.undo()
 
-    engine.removeSheet('Sheet1')
+    engine.removeSheet(0)
 
     expect(engine.isThereSomethingToRedo()).toBe(false)
   })
@@ -1306,7 +1297,7 @@ describe('Redo - clearing sheet', () => {
     const engine = HyperFormula.buildFromArray([
       ['1']
     ])
-    engine.clearSheet('Sheet1')
+    engine.clearSheet(0)
     const snapshot = engine.getAllSheetsSerialized()
     engine.undo()
 
@@ -1320,7 +1311,7 @@ describe('Redo - clearing sheet', () => {
     engine.setCellContents(adr('A1'), 42)
     engine.undo()
 
-    engine.clearSheet('Sheet1')
+    engine.clearSheet(0)
 
     expect(engine.isThereSomethingToRedo()).toBe(false)
   })
@@ -1521,7 +1512,7 @@ describe('Redo - copy-paste', () => {
 describe('Redo - setting sheet contents', () => {
   it('works for basic case', () => {
     const engine = HyperFormula.buildFromArray([['13']])
-    engine.setSheetContent('Sheet1', [['42']])
+    engine.setSheetContent(0, [['42']])
     const snapshot = engine.getAllSheetsSerialized()
     engine.undo()
 
@@ -1532,7 +1523,7 @@ describe('Redo - setting sheet contents', () => {
 
   it('also clears sheet when redoing', () => {
     const engine = HyperFormula.buildFromArray([['13', '14']])
-    engine.setSheetContent('Sheet1', [['42']])
+    engine.setSheetContent(0, [['42']])
     const snapshot = engine.getAllSheetsSerialized()
     engine.undo()
 
@@ -1546,7 +1537,7 @@ describe('Redo - setting sheet contents', () => {
     engine.setCellContents(adr('A1'), 42)
     engine.undo()
 
-    engine.setSheetContent('Sheet1', [['42']])
+    engine.setSheetContent(0, [['42']])
 
     expect(engine.isThereSomethingToRedo()).toBe(false)
   })

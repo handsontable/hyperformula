@@ -29,7 +29,6 @@ import {
   NoOperationToUndoError,
   NoRelativeAddressesAllowedError,
   NoSheetWithIdError,
-  NoSheetWithNameError,
   NothingToPasteError,
   SheetNameAlreadyTakenError,
   SheetSizeLimitExceededError,
@@ -213,14 +212,13 @@ export class CrudOperations {
     return addedSheetName
   }
 
-  public removeSheet(sheetName: string): void {
-    this.ensureSheetExists(sheetName)
+  public removeSheet(sheetId: number): void {
+    this.ensureScopeIdIsValid(sheetId)
     this.undoRedo.clearRedoStack()
     this.clipboardOperations.abortCut()
-    const sheetId = this.sheetMapping.fetch(sheetName)
     const originalName = this.sheetMapping.fetchDisplayName(sheetId)
     const oldSheetContent = this.operations.getSheetClipboardCells(sheetId)
-    const {version, scopedNamedExpressions} = this.operations.removeSheet(sheetName)
+    const {version, scopedNamedExpressions} = this.operations.removeSheet(sheetId)
     this.undoRedo.saveOperation(new RemoveSheetUndoEntry(originalName, sheetId, oldSheetContent, scopedNamedExpressions, version))
   }
 
@@ -234,11 +232,10 @@ export class CrudOperations {
     return oldName
   }
 
-  public clearSheet(sheetName: string): void {
-    this.ensureSheetExists(sheetName)
+  public clearSheet(sheetId: number): void {
+    this.ensureScopeIdIsValid(sheetId)
     this.undoRedo.clearRedoStack()
     this.clipboardOperations.abortCut()
-    const sheetId = this.sheetMapping.fetch(sheetName)
     const oldSheetContent = this.operations.getSheetClipboardCells(sheetId)
     this.operations.clearSheet(sheetId)
     this.undoRedo.saveOperation(new ClearSheetUndoEntry(sheetId, oldSheetContent))
@@ -280,9 +277,8 @@ export class CrudOperations {
     this.undoRedo.saveOperation(new SetCellContentsUndoEntry(modifiedCellContents))
   }
 
-  public setSheetContent(sheetName: string, values: RawCellContent[][]): void {
-    this.ensureSheetExists(sheetName)
-    const sheetId = this.sheetMapping.fetch(sheetName)
+  public setSheetContent(sheetId: number, values: RawCellContent[][]): void {
+    this.ensureScopeIdIsValid(sheetId)
     this.ensureItIsPossibleToChangeSheetContents(sheetId, values)
 
     validateAsSheet(values)
@@ -650,12 +646,6 @@ export class CrudOperations {
 
   public getAndClearContentChanges(): ContentChanges {
     return this.operations.getAndClearContentChanges()
-  }
-
-  public ensureSheetExists(sheetName: string): void {
-    if (!this.sheetMapping.hasSheetWithName(sheetName)) {
-      throw new NoSheetWithNameError(sheetName)
-    }
   }
 
   public ensureScopeIdIsValid(scopeId?: number): void {
