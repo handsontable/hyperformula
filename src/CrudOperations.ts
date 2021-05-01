@@ -664,14 +664,6 @@ export class CrudOperations {
     }
   }
 
-  public scopeId(sheetName?: string): Maybe<number> {
-    if (sheetName !== undefined) {
-      this.ensureSheetExists(sheetName)
-      return this.sheetMapping.fetch(sheetName)
-    }
-    return undefined
-  }
-
   private get sheetMapping(): SheetMapping {
     return this.dependencyGraph.sheetMapping
   }

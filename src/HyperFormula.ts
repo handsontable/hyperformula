@@ -3696,7 +3696,7 @@ export class HyperFormula implements TypedEmitter {
    * Calculates fire-and-forget formula, returns the calculated value.
    *
    * @param {string} formulaString -  a formula in a proper format - it must start with "="
-   * @param {string} sheetName - a name of the sheet in context of which we evaluate formula, case insensitive.
+   * @param {string} sheetId - an ID of the sheet in context of which we evaluate formula.
    *
    * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
    * @throws [[NotAFormulaError]] when the provided string is not a valid formula, i.e does not start with "="
@@ -3710,16 +3710,15 @@ export class HyperFormula implements TypedEmitter {
    * });
    *
    * // returns the value of calculated formula, '32' for this example
-   * const calculatedFormula = hfInstance.calculateFormula('=A1+10', 'Sheet1');
+   * const calculatedFormula = hfInstance.calculateFormula('=A1+10', 0);
    * ```
    *
    * @category Helpers
    */
-  public calculateFormula(formulaString: string, sheetName: string): CellValue {
+  public calculateFormula(formulaString: string, sheetId: number): CellValue {
     validateArgToType(formulaString, 'string', 'formulaString')
-    validateArgToType(sheetName, 'string', 'sheetName')
-    this._crudOperations.ensureSheetExists(sheetName)
-    const sheetId = this.sheetMapping.fetch(sheetName)
+    validateArgToType(sheetId, 'number', 'sheetId')
+    this._crudOperations.ensureScopeIdIsValid(sheetId)
     const [ast, address, dependencies] = this.extractTemporaryFormula(formulaString, sheetId)
     if (ast === undefined) {
       throw new NotAFormulaError()
