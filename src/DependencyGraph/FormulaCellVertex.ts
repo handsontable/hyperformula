@@ -8,25 +8,12 @@ import {InterpreterValue} from '../interpreter/InterpreterValue'
 import {LazilyTransformingAstService} from '../LazilyTransformingAstService'
 import {Ast} from '../parser'
 
-/**
- * Represents vertex which keeps formula
- */
-export class FormulaCellVertex {
-  /** Most recently computed value of this formula. */
-  private cachedCellValue: InterpreterValue | null
-
-  constructor(
-    /** Formula in AST format */
-    private formula: Ast,
-
-    /** Address which this vertex represents */
-    private cellAddress: SimpleCellAddress,
-
-    public version: number,
+export abstract class FormulaVertex {
+  protected constructor(
+    protected formula: Ast,
+    protected cellAddress: SimpleCellAddress,
+    public version: number
   ) {
-    this.formula = formula
-    this.cellAddress = cellAddress
-    this.cachedCellValue = null
   }
 
   /**
@@ -39,7 +26,7 @@ export class FormulaCellVertex {
 
   public ensureRecentData(updatingService: LazilyTransformingAstService) {
     if (this.version != updatingService.version()) {
-      const [newAst, newAddress, newVersion] = updatingService.applyTransformations(this.formula, this.address, this.version)
+      const [newAst, newAddress, newVersion] = updatingService.applyTransformations(this.formula, this.cellAddress, this.version)
       this.formula = newAst
       this.cellAddress = newAddress
       this.version = newVersion
@@ -54,8 +41,46 @@ export class FormulaCellVertex {
     return this.cellAddress
   }
 
+  /**
+   * Sets computed cell value stored in this vertex
+   */
+  public abstract setCellValue(cellValue: InterpreterValue): InterpreterValue
+  /**
+   * Returns cell value stored in vertex
+   */
+  public abstract getCellValue(): InterpreterValue
+
+  public abstract isComputed(): boolean
+}
+
+/**
+ * Represents vertex which keeps formula
+ */
+export class FormulaCellVertex extends FormulaVertex {
+  /** Most recently computed value of this formula. */
+  private cachedCellValue: InterpreterValue | null
+
+  constructor(
+    /** Formula in AST format */
+    formula: Ast,
+
+    /** Address which this vertex represents */
+    cellAddress: SimpleCellAddress,
+
+    version: number,
+  ) {
+    super(formula, cellAddress, version)
+    this.formula = formula
+    this.cellAddress = cellAddress
+    this.cachedCellValue = null
+  }
+
   public get address() {
     return this.cellAddress
+  }
+
+  public valueOrNull(): InterpreterValue | null {
+    return this.cachedCellValue
   }
 
   /**
@@ -75,10 +100,6 @@ export class FormulaCellVertex {
     } else {
       throw Error('Value of the formula cell is not computed.')
     }
-  }
-
-  public valueOrNull(): InterpreterValue | null {
-    return this.cachedCellValue
   }
 
   public isComputed() {

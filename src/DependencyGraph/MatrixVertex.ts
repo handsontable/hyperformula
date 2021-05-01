@@ -14,6 +14,7 @@ import {Ast} from '../parser'
 import {ColumnsSpan, RowsSpan} from '../Span'
 import {SimpleRangeValue} from '../interpreter/SimpleRangeValue'
 import {ErrorMessage} from '../error-message'
+import {FormulaVertex} from './FormulaCellVertex'
 
 export interface IMatrixVertex {
   readonly width: number,
@@ -24,7 +25,6 @@ export interface IMatrixVertex {
   formula?: Ast,
 
   setCellValue(matrix: InterpreterValue): void,
-  setErrorValue(error: CellError): void,
   getCellValue(): InterpreterValue,
   getMatrixCellValue(address: SimpleCellAddress): InternalScalarValue,
   getMatrixCellRawValue(address: SimpleCellAddress): Maybe<RawCellContent>,
@@ -47,7 +47,14 @@ export interface IMatrixVertex {
   rowsFromMatrix(): RowsSpan,
 }
 
-export class MatrixVertex implements IMatrixVertex {
+export class MatrixVertex extends FormulaVertex implements IMatrixVertex {
+  matrix: IMatrix
+
+  constructor(public cellAddress: SimpleCellAddress, width: number, height: number, public formula: Ast, version: number) {
+    super(formula, cellAddress, version)
+    this.matrix = new NotComputedMatrix(new MatrixSize(width, height))
+  }
+
   get width(): number {
     return this.matrix.width()
   }
@@ -58,16 +65,6 @@ export class MatrixVertex implements IMatrixVertex {
 
   get sheet(): number {
     return this.cellAddress.sheet
-  }
-
-  public static fromRange(range: AbsoluteCellRange, formula?: Ast): IMatrixVertex {
-    return new MatrixVertex(range.start, range.width(), range.height(), formula)
-  }
-
-  matrix: IMatrix
-
-  constructor(public cellAddress: SimpleCellAddress, width: number, height: number, public formula?: Ast) {
-    this.matrix = new NotComputedMatrix(new MatrixSize(width, height))
   }
 
   setCellValue(value: InterpreterValue): InterpreterValue {
@@ -89,10 +86,6 @@ export class MatrixVertex implements IMatrixVertex {
     }
     /* TODO */
     throw Error('Should not happen')
-  }
-
-  setErrorValue(error: CellError) {
-    this.matrix = new ErroredMatrix(error, this.matrix.size)
   }
 
   getCellValue(): InterpreterValue {
@@ -206,5 +199,9 @@ export class MatrixVertex implements IMatrixVertex {
 
   rowsFromMatrix() {
     return RowsSpan.fromNumberOfRows(this.cellAddress.sheet, this.cellAddress.row, this.height)
+  }
+
+  private setErrorValue(error: CellError) {
+    this.matrix = new ErroredMatrix(error, this.matrix.size)
   }
 }
