@@ -48,8 +48,8 @@ again in the local scope of a sheet.
 // define for a global scope
 hfInstance.addNamedExpression('MyPotato', '=SUM(100+10)');
 
-// define for the local scope of Sheet2, still a valid name
-hfInstance.addNamedExpression('MyPotato', '=Sheet2!$A$1+100', 'Sheet2');
+// define for the local scope of Sheet2 (sheetId = 1), still a valid name
+hfInstance.addNamedExpression('MyPotato', '=Sheet2!$A$1+100', 1);
 ```
 
 * The name starts with a letter or an underscore. The minimum required
@@ -92,8 +92,8 @@ returns a list of cells whose values were affected by this operation, their abso
 section in [basic operations](basic-operations) for more info.
 
 ```javascript
-// add 'prettyName' expression to the local scope of 'Sheet1'
-const changes = hfInstance.addNamedExpression('prettyName', '=Sheet1!$A$1+100', 'Sheet1');
+// add 'prettyName' expression to the local scope of 'Sheet1' (sheetId = 0)
+const changes = hfInstance.addNamedExpression('prettyName', '=Sheet1!$A$1+100', 0);
 ```
 
 ### Changing a named expression
@@ -124,8 +124,8 @@ See the changes section in
 [basic operations](basic-operations) for more info.
 
 ```javascript
-// remove 'prettyName' expression from 'Sheet1'
-const changes = hfInstance.removeNamedExpression('prettyName', 'Sheet1');
+// remove 'prettyName' expression from 'Sheet1' (sheetId=0)
+const changes = hfInstance.removeNamedExpression('prettyName', 0);
 ```
 
 ### Listing all named expressions

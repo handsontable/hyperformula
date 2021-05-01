@@ -664,7 +664,7 @@ describe('Undo - moving cells', () => {
       'Sheet1': [],
       'Sheet2': []
     })
-    engine.addNamedExpression('foo', 'bar', 'Sheet1')
+    engine.addNamedExpression('foo', 'bar', 0)
     engine.setCellContents(adr('A1'), '=foo')
     engine.moveCells(adr('A1'), 1, 1, adr('A1', 1))
 
@@ -678,12 +678,12 @@ describe('Undo - moving cells', () => {
       'Sheet1': [['=foo']],
       'Sheet2': []
     })
-    engine.addNamedExpression('foo', 'bar', 'Sheet1')
+    engine.addNamedExpression('foo', 'bar', 0)
     engine.moveCells(adr('A1'), 1, 1, adr('A1', 1))
 
     engine.undo()
 
-    expect(engine.getNamedExpressionValue('foo', 'Sheet1')).toEqual('bar')
+    expect(engine.getNamedExpressionValue('foo', 0)).toEqual('bar')
     expect(engine.getNamedExpressionValue('foo')).toEqual(undefined)
   })
 })
@@ -721,14 +721,14 @@ describe('Undo - cut-paste', () => {
       'Sheet1': [],
       'Sheet2': []
     })
-    engine.addNamedExpression('foo', 'bar', 'Sheet1')
+    engine.addNamedExpression('foo', 'bar', 0)
     engine.setCellContents(adr('A1'), '=foo')
     engine.cut(adr('A1'), 1, 1)
     engine.paste(adr('A1', 1))
 
     engine.undo()
 
-    expect(engine.getNamedExpressionValue('foo', 'Sheet1')).toEqual('bar')
+    expect(engine.getNamedExpressionValue('foo', 0)).toEqual('bar')
     expect(engine.getNamedExpressionValue('foo')).toEqual(undefined)
   })
 })
@@ -753,14 +753,14 @@ describe('Undo - copy-paste', () => {
       'Sheet1': [],
       'Sheet2': []
     })
-    engine.addNamedExpression('foo', 'bar', 'Sheet1')
+    engine.addNamedExpression('foo', 'bar', 0)
     engine.setCellContents(adr('A1'), '=foo')
     engine.copy(adr('A1'), 1, 1)
     engine.paste(adr('A1', 1))
 
     engine.undo()
 
-    expect(engine.getNamedExpressionValue('foo', 'Sheet1')).toEqual('bar')
+    expect(engine.getNamedExpressionValue('foo', 0)).toEqual('bar')
     expect(engine.getNamedExpressionValue('foo')).toEqual(undefined)
   })
 })

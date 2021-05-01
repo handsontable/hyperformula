@@ -400,8 +400,8 @@ export class CrudOperations {
     this.undoRedo.redo()
   }
 
-  public addNamedExpression(expressionName: string, expression: RawCellContent, sheetScope?: string, options?: NamedExpressionOptions) {
-    const sheetId = this.scopeId(sheetScope)
+  public addNamedExpression(expressionName: string, expression: RawCellContent, sheetId?: number, options?: NamedExpressionOptions) {
+    this.ensureScopeIdIsValid(sheetId)
     this.ensureNamedExpressionNameIsValid(expressionName, sheetId)
     this.operations.addNamedExpression(expressionName, expression, sheetId, options)
     this.undoRedo.clearRedoStack()
@@ -409,16 +409,16 @@ export class CrudOperations {
     this.undoRedo.saveOperation(new AddNamedExpressionUndoEntry(expressionName, expression, sheetId, options))
   }
 
-  public changeNamedExpressionExpression(expressionName: string, sheetScope: string | undefined, newExpression: RawCellContent, options?: NamedExpressionOptions) {
-    const sheetId = this.scopeId(sheetScope)
+  public changeNamedExpressionExpression(expressionName: string, sheetId: number | undefined, newExpression: RawCellContent, options?: NamedExpressionOptions) {
+    this.ensureScopeIdIsValid(sheetId)
     const [oldNamedExpression, content] = this.operations.changeNamedExpressionExpression(expressionName, newExpression, sheetId, options)
     this.undoRedo.clearRedoStack()
     this.clipboardOperations.abortCut()
     this.undoRedo.saveOperation(new ChangeNamedExpressionUndoEntry(oldNamedExpression, newExpression, content, sheetId, options))
   }
 
-  public removeNamedExpression(expressionName: string, sheetScope: string | undefined): InternalNamedExpression {
-    const sheetId = this.scopeId(sheetScope)
+  public removeNamedExpression(expressionName: string, sheetId?: number): InternalNamedExpression {
+    this.ensureScopeIdIsValid(sheetId)
     const [namedExpression, content] = this.operations.removeNamedExpression(expressionName, sheetId)
     this.undoRedo.clearRedoStack()
     this.clipboardOperations.abortCut()
@@ -427,23 +427,23 @@ export class CrudOperations {
     return namedExpression
   }
 
-  public ensureItIsPossibleToAddNamedExpression(expressionName: string, expression: RawCellContent, sheetScope?: string): void {
-    const scopeId = this.scopeId(sheetScope)
-    this.ensureNamedExpressionNameIsValid(expressionName, scopeId)
+  public ensureItIsPossibleToAddNamedExpression(expressionName: string, expression: RawCellContent, sheetId?: number): void {
+    this.ensureScopeIdIsValid(sheetId)
+    this.ensureNamedExpressionNameIsValid(expressionName, sheetId)
     this.ensureNamedExpressionIsValid(expression)
   }
 
-  public ensureItIsPossibleToChangeNamedExpression(expressionName: string, expression: RawCellContent, sheetScope?: string): void {
-    const scopeId = this.scopeId(sheetScope)
-    if (this.namedExpressions.namedExpressionForScope(expressionName, scopeId) === undefined) {
+  public ensureItIsPossibleToChangeNamedExpression(expressionName: string, expression: RawCellContent, sheetId?: number): void {
+    this.ensureScopeIdIsValid(sheetId)
+    if (this.namedExpressions.namedExpressionForScope(expressionName, sheetId) === undefined) {
       throw new NamedExpressionDoesNotExistError(expressionName)
     }
     this.ensureNamedExpressionIsValid(expression)
   }
 
-  public isItPossibleToRemoveNamedExpression(expressionName: string, sheetScope?: string): void {
-    const scopeId = this.scopeId(sheetScope)
-    if (this.namedExpressions.namedExpressionForScope(expressionName, scopeId) === undefined) {
+  public isItPossibleToRemoveNamedExpression(expressionName: string, sheetId?: number): void {
+    this.ensureScopeIdIsValid(sheetId)
+    if (this.namedExpressions.namedExpressionForScope(expressionName, sheetId) === undefined) {
       throw new NamedExpressionDoesNotExistError(expressionName)
     }
   }
@@ -655,6 +655,12 @@ export class CrudOperations {
   public ensureSheetExists(sheetName: string): void {
     if (!this.sheetMapping.hasSheetWithName(sheetName)) {
       throw new NoSheetWithNameError(sheetName)
+    }
+  }
+
+  public ensureScopeIdIsValid(scopeId?: number): void {
+    if(scopeId !== undefined && !this.sheetMapping.hasSheetWithId(scopeId)) {
+      throw new NoSheetWithIdError(scopeId)
     }
   }
 
