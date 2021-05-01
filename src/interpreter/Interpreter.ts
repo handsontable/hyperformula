@@ -196,7 +196,7 @@ export class Interpreter {
           } else if (matrix instanceof CellError) {
             return matrix
           } else if (matrix instanceof Matrix) {
-            return SimpleRangeValue.numbersRange(matrix.raw(), range, this.dependencyGraph)
+            return SimpleRangeValue.fromRange(matrix.raw(), range, this.dependencyGraph)
           } else {
             throw new Error('Unknown matrix')
           }

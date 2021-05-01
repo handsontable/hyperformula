@@ -13,7 +13,7 @@ import {InternalScalarValue, isExtendedNumber} from './InterpreterValue'
 export class SimpleRangeValue {
   public readonly size: MatrixSize
 
-  public static numbersRange(data: InternalScalarValue[][], range: AbsoluteCellRange, dependencyGraph: DependencyGraph): SimpleRangeValue {
+  public static fromRange(data: InternalScalarValue[][], range: AbsoluteCellRange, dependencyGraph: DependencyGraph): SimpleRangeValue {
     return new SimpleRangeValue(data, range, dependencyGraph, true)
   }
 
