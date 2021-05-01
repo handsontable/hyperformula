@@ -18,7 +18,7 @@ import {
   ValueCellVertex,
   Vertex
 } from './DependencyGraph'
-import {MatrixSizePredictor} from './MatrixSize'
+import {MatrixSize, MatrixSizePredictor} from './MatrixSize'
 import {ParserWithCaching} from './parser'
 import {Statistics, StatType} from './statistics'
 import {Sheets} from './Sheet'
@@ -112,7 +112,7 @@ export class SimpleStrategy implements GraphBuilderStrategy {
                   this.dependencyGraph.markAsDependentOnStructureChange(vertex)
                 }
               } else {
-                const vertex = new MatrixVertex(address, size.width, size.height, parseResult.ast)
+                const vertex = new MatrixVertex(parseResult.ast, address, new MatrixSize(size.width, size.height))
                 dependencies.set(vertex, absolutizeDependencies(parseResult.dependencies, address))
                 this.dependencyGraph.addMatrixVertex(address, vertex)
               }

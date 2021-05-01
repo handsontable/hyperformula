@@ -42,7 +42,7 @@ import {
 import {EmptyValue, getRawValue} from './interpreter/InterpreterValue'
 import {LazilyTransformingAstService} from './LazilyTransformingAstService'
 import {ColumnSearchStrategy} from './Lookup/SearchStrategy'
-import {MatrixSizePredictor} from './MatrixSize'
+import {MatrixSize, MatrixSizePredictor} from './MatrixSize'
 import {
   doesContainRelativeReferences,
   InternalNamedExpression,
@@ -647,11 +647,7 @@ export class Operations {
           this.dependencyGraph.setParsingErrorToCell(address, new ParsingErrorVertex(errors, parsedCellContent.formula))
         } else {
           const size = this.matrixSizePredictor.checkMatrixSize(ast, address)
-          if(size === undefined || (size.width<=1 && size.height<=1) || size.isRef) {
-            this.dependencyGraph.setFormulaToCell(address, ast, absolutizeDependencies(dependencies, address), hasVolatileFunction, hasStructuralChangeFunction)
-          } else {
-            this.dependencyGraph.setMatrixToCell(address, ast, absolutizeDependencies(dependencies, address), size)
-          }
+          this.dependencyGraph.setFormulaToCell(address, ast, absolutizeDependencies(dependencies, address), size, hasVolatileFunction, hasStructuralChangeFunction)
         }
       } else if (parsedCellContent instanceof CellContent.Empty) {
         this.setCellEmpty(address)
@@ -693,7 +689,7 @@ export class Operations {
     const [cleanedAst] = new CleanOutOfScopeDependenciesTransformer(address.sheet).transformSingleAst(ast, address)
     this.parser.rememberNewAst(cleanedAst)
     const cleanedDependencies = filterDependenciesOutOfScope(absoluteDependencies)
-    this.dependencyGraph.setFormulaToCell(address, cleanedAst, cleanedDependencies, hasVolatileFunction, hasStructuralChangeFunction)
+    this.dependencyGraph.setFormulaToCell(address, cleanedAst, cleanedDependencies, MatrixSize.scalar(), hasVolatileFunction, hasStructuralChangeFunction)
   }
 
   public setParsingErrorToCell(rawInput: string, errors: ParsingError[], address: SimpleCellAddress) {
@@ -766,7 +762,7 @@ export class Operations {
         throw new NoRelativeAddressesAllowedError()
       }
       const {ast, hasVolatileFunction, hasStructuralChangeFunction, dependencies} = parsingResult
-      this.dependencyGraph.setFormulaToCell(address, ast, absolutizeDependencies(dependencies, address), hasVolatileFunction, hasStructuralChangeFunction)
+      this.dependencyGraph.setFormulaToCell(address, ast, absolutizeDependencies(dependencies, address), MatrixSize.scalar(), hasVolatileFunction, hasStructuralChangeFunction)
     } else {
       if (parsedCellContent instanceof CellContent.Empty) {
         this.setCellEmpty(address)
@@ -838,7 +834,7 @@ export class Operations {
       if (sourceVertex instanceof FormulaCellVertex) {
         const parsingResult = this.parser.fetchCachedResultForAst(sourceVertex.getFormula(this.lazilyTransformingAstService))
         const {ast, hasVolatileFunction, hasStructuralChangeFunction, dependencies} = parsingResult
-        this.dependencyGraph.setFormulaToCell(expression.address, ast, absolutizeDependencies(dependencies, expression.address), hasVolatileFunction, hasStructuralChangeFunction)
+        this.dependencyGraph.setFormulaToCell(expression.address, ast, absolutizeDependencies(dependencies, expression.address), MatrixSize.scalar(), hasVolatileFunction, hasStructuralChangeFunction)
       } else if (sourceVertex instanceof EmptyCellVertex) {
         this.setCellEmpty(expression.address)
       } else if (sourceVertex instanceof ValueCellVertex) {

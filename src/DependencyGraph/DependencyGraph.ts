@@ -30,7 +30,7 @@ import {
   Vertex,
 } from './'
 import {AddressMapping} from './AddressMapping/AddressMapping'
-import {collectAddressesDependentToMatrix} from './collectAddressesDependentToMatrix'
+import {collectAddressesDependentToRange} from './collectAddressesDependentToRange'
 import {Graph, TopSortResult} from './Graph'
 import {MatrixMapping} from './MatrixMapping'
 import {RangeMapping} from './RangeMapping'
@@ -45,6 +45,7 @@ import {
   InterpreterValue,
   RawScalarValue
 } from '../interpreter/InterpreterValue'
+import {FormulaVertex} from './FormulaCellVertex'
 
 export class DependencyGraph {
   /*
@@ -82,12 +83,10 @@ export class DependencyGraph {
     this.graph = new Graph<Vertex>(this.dependencyQueryVertices)
   }
 
-  public setFormulaToCell(address: SimpleCellAddress, ast: Ast, dependencies: CellDependency[], hasVolatileFunction: boolean, hasStructuralChangeFunction: boolean) {
-    const vertex = this.addressMapping.getCell(address)
-    this.ensureThatVertexIsNonMatrixCellVertex(vertex)
+  public setFormulaToCell(address: SimpleCellAddress, ast: Ast, dependencies: CellDependency[], size: MatrixSize, hasVolatileFunction: boolean, hasStructuralChangeFunction: boolean) {
+    const newVertex = FormulaVertex.fromAst(ast, address, size, this.lazilyTransformingAstService.version())
+    this.exchangeOrAddFormulaVertex(newVertex)
 
-    const newVertex = new FormulaCellVertex(ast, address, this.lazilyTransformingAstService.version())
-    this.exchangeOrAddGraphNode(vertex, newVertex)
     this.addressMapping.setCell(address, newVertex)
 
     this.processCellDependencies(dependencies, newVertex)
@@ -151,16 +150,6 @@ export class DependencyGraph {
       this.removeVertex(vertex)
       this.addressMapping.removeCell(address)
     }
-  }
-
-  public setMatrixToCell(address: SimpleCellAddress, ast: Ast, dependencies: CellDependency[], size: MatrixSize) {
-    const vertex = new MatrixVertex(address, size.width, size.height, ast)
-    this.exchangeOrAddMatrixVertex(vertex)
-
-    this.processCellDependencies(dependencies, vertex)
-
-    this.graph.markNodeAsSpecialRecentlyChanged(vertex)
-    this.correctInfiniteRangesDependency(address)
   }
 
   public ensureThatVertexIsNonMatrixCellVertex(vertex: CellVertex | null) {
@@ -519,7 +508,7 @@ export class DependencyGraph {
     }
 
     for (const adjacentNode of adjacentNodes.values()) {
-      const nodeDependencies = collectAddressesDependentToMatrix(this.functionRegistry, adjacentNode, matrixVertex, this.lazilyTransformingAstService, this)
+      const nodeDependencies = collectAddressesDependentToRange(this.functionRegistry, adjacentNode, matrixVertex.getRange(), this.lazilyTransformingAstService, this)
       for (const address of nodeDependencies) {
         const vertex = this.fetchCell(address)
         this.graph.addEdge(vertex, adjacentNode)
@@ -539,7 +528,7 @@ export class DependencyGraph {
     }
 
     for (const adjacentNode of adjacentNodes.values()) {
-      const nodeDependencies = collectAddressesDependentToMatrix(this.functionRegistry, adjacentNode, matrixVertex, this.lazilyTransformingAstService, this)
+      const nodeDependencies = collectAddressesDependentToRange(this.functionRegistry, adjacentNode, matrixVertex.getRange(), this.lazilyTransformingAstService, this)
       for (const address of nodeDependencies) {
         const vertex = this.fetchCellOrCreateEmpty(address)
         this.graph.addEdge(vertex, adjacentNode)
@@ -866,17 +855,20 @@ export class DependencyGraph {
     }
   }
 
-  private exchangeOrAddMatrixVertex(matrixVertex: MatrixVertex): void {
-    const range = AbsoluteCellRange.spanFrom(matrixVertex.getAddress(), matrixVertex.width, matrixVertex.height)
+  private exchangeOrAddFormulaVertex(vertex: FormulaVertex): void {
+    const range = AbsoluteCellRange.spanFrom(vertex.getAddress(this.lazilyTransformingAstService), vertex.width, vertex.height)
+
     for (const vertex of this.verticesFromRange(range)) {
-       this.ensureThatVertexIsNonMatrixCellVertex(vertex)
+      this.ensureThatVertexIsNonMatrixCellVertex(vertex)
     }
 
-    this.setMatrix(range, matrixVertex)
+    if (vertex instanceof MatrixVertex) {
+      this.setMatrix(range, vertex)
+    }
 
-    for (const [address, vertex] of this.entriesFromRange(range)) {
-      this.exchangeOrAddGraphNode(vertex, matrixVertex)
-      this.addressMapping.setCell(address, matrixVertex)
+    for (const [address, cellVertex] of this.entriesFromRange(range)) {
+      this.exchangeOrAddGraphNode(cellVertex, vertex)
+      this.addressMapping.setCell(address, vertex)
     }
   }
 

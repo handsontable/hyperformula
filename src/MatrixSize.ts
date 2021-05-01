@@ -4,18 +4,25 @@
  */
 
 import {AbsoluteCellRange} from './AbsoluteCellRange'
-import {CellError, ErrorType, SimpleCellAddress} from './Cell'
+import {SimpleCellAddress} from './Cell'
 import {Config} from './Config'
-import {ErrorMessage} from './error-message'
 import {FunctionRegistry} from './interpreter/FunctionRegistry'
 import {InterpreterState} from './interpreter/InterpreterState'
-import {Maybe} from './Maybe'
 import {Ast, AstNodeType} from './parser'
 
 export class MatrixSize {
   public static fromMatrix<T>(matrix: T[][]): MatrixSize {
     return new MatrixSize(matrix.length > 0 ? matrix[0].length : 0, matrix.length)
   }
+
+  public static error() {
+    return new MatrixSize(1, 1, true)
+  }
+
+  public static scalar() {
+    return new MatrixSize(1, 1, false)
+  }
+
   constructor(
     public width: number,
     public height: number,
@@ -24,6 +31,10 @@ export class MatrixSize {
     if (width <= 0 || height <= 0) {
       throw Error('Incorrect matrix size')
     }
+  }
+
+  isScalar() {
+    return (this.width<=1 && this.height<=1) || this.isRef
   }
 }
 
@@ -57,11 +68,11 @@ export class MatrixSizePredictor {
   ) {
   }
 
-  public checkMatrixSize(ast: Ast, formulaAddress: SimpleCellAddress): Maybe<MatrixSize> {
+  public checkMatrixSize(ast: Ast, formulaAddress: SimpleCellAddress): MatrixSize {
     return this._checkMatrixSize(ast, {formulaAddress, arraysFlag: this.config.arrays})
   }
 
-  private _checkMatrixSize(ast: Ast, state: InterpreterState): Maybe<MatrixSize> {
+  private _checkMatrixSize(ast: Ast, state: InterpreterState): MatrixSize {
     switch (ast.type) {
       case AstNodeType.FUNCTION_CALL: {
         const metadata = this.functionRegistry.getMetadata(ast.procedureName)
@@ -69,7 +80,7 @@ export class MatrixSizePredictor {
         switch (ast.procedureName) {
           case 'MMULT': {
             if (ast.args.length !== 2) {
-              return undefined
+              return MatrixSize.error()
             }
 
             const [left, right] = subChecks
@@ -79,7 +90,7 @@ export class MatrixSizePredictor {
             } else if (right === undefined) {
               return right
             } else if (left.width !== right.height) {
-              return undefined
+              return MatrixSize.error()
             } else {
               return matrixSizeForMultiplication(left, right)
             }
@@ -87,12 +98,12 @@ export class MatrixSizePredictor {
           case 'MEDIANPOOL':
           case 'MAXPOOL': {
             if (ast.args.length < 2 || ast.args.length > 3) {
-              return undefined
+              return MatrixSize.error()
             }
 
             const matrix = subChecks[0]
             if (matrix === undefined) {
-              return undefined
+              return MatrixSize.error()
             }
             const windowArg = ast.args[1]
             let window
@@ -117,23 +128,23 @@ export class MatrixSizePredictor {
             if (window > matrix.width || window > matrix.height
               || stride > window
               || (matrix.width - window) % stride !== 0 || (matrix.height - window) % stride !== 0) {
-              return undefined
+              return MatrixSize.error()
             }
 
             return matrixSizeForPoolFunction(matrix, window, stride)
           }
           case 'TRANSPOSE': {
             if (ast.args.length !== 1) {
-              return undefined
+              return MatrixSize.error()
             }
 
             const size = subChecks[0]
 
-            return size === undefined ? undefined : matrixSizeForTranspose(size)
+            return size === undefined ? MatrixSize.error() : matrixSizeForTranspose(size)
           }
           case 'ARRAYFORMULA': {
             if (ast.args.length !== 1) {
-              return undefined
+              return MatrixSize.error()
             }
             return subChecks[0]
           }
@@ -145,7 +156,7 @@ export class MatrixSizePredictor {
       case AstNodeType.CELL_RANGE: {
         const range = AbsoluteCellRange.fromCellRangeOrUndef(ast, state.formulaAddress)
         if (range === undefined) {
-          return undefined
+          return MatrixSize.error()
         } else {
           return new MatrixSize(range.width(), range.height(), true)
         }
@@ -169,14 +180,14 @@ export class MatrixSizePredictor {
       case AstNodeType.TIMES_OP: {
         const left = this._checkMatrixSize(ast.left, state)
         if (left === undefined) {
-          return undefined
+          return MatrixSize.error()
         }
         const right = this._checkMatrixSize(ast.right, state)
         if (right === undefined) {
           return right
         }
         if(!state.arraysFlag && (left.height>1 || left.width>1 || right.height>1 || right.width>1)) {
-          return undefined
+          return MatrixSize.error()
         }
         return matrixSizeForBinaryOp(left, right)
       }
@@ -185,17 +196,17 @@ export class MatrixSizePredictor {
       case AstNodeType.PERCENT_OP: {
         const val = this._checkMatrixSize(ast.value, state)
         if (val === undefined) {
-          return undefined
+          return MatrixSize.error()
         }
         if(!state.arraysFlag && (val.height>1 || val.width>1)) {
-          return undefined
+          return MatrixSize.error()
         }
         return matrixSizeForUnaryOp(val)
       }
       case AstNodeType.EMPTY:
-        return undefined
+        return MatrixSize.error()
       default:
-        return undefined
+        return MatrixSize.error()
     }
   }
 }

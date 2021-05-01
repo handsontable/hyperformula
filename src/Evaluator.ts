@@ -23,6 +23,7 @@ import {NumberLiteralHelper} from './NumberLiteralHelper'
 import {Ast, RelativeDependency} from './parser'
 import {Serialization} from './Serialization'
 import {Statistics, StatType} from './statistics'
+import {FormulaVertex} from './DependencyGraph/FormulaCellVertex'
 
 export class Evaluator {
   private interpreter: Interpreter
@@ -57,7 +58,7 @@ export class Evaluator {
     this.stats.measure(StatType.EVALUATION, () => {
       this.dependencyGraph.graph.getTopSortedWithSccSubgraphFrom(vertices,
         (vertex: Vertex) => {
-          if (vertex instanceof FormulaCellVertex || vertex instanceof MatrixVertex) {
+          if (vertex instanceof FormulaVertex) {
             const address = vertex.getAddress(this.dependencyGraph.lazilyTransformingAstService)
             const formula = vertex.getFormula(this.dependencyGraph.lazilyTransformingAstService)
             const currentValue = vertex.isComputed() ? vertex.getCellValue() : null

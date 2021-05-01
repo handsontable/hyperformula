@@ -6,16 +6,14 @@
 import {SimpleCellAddress} from '../Cell'
 import {LazilyTransformingAstService} from '../LazilyTransformingAstService'
 import {AddressDependency, Ast, collectDependencies} from '../parser'
-import {FormulaCellVertex} from './FormulaCellVertex'
-import {IMatrixVertex, MatrixVertex} from './MatrixVertex'
+import {FormulaCellVertex, MatrixVertex} from './FormulaCellVertex'
 import {RangeVertex} from './RangeVertex'
 import {Vertex} from './Vertex'
 import {DependencyGraph} from './DependencyGraph'
 import {FunctionRegistry} from '../interpreter/FunctionRegistry'
+import {AbsoluteCellRange} from '../AbsoluteCellRange'
 
-export const collectAddressesDependentToMatrix = (funcitonRegistry: FunctionRegistry, vertex: Vertex, matrix: IMatrixVertex, lazilyTransformingAstService: LazilyTransformingAstService, dependencyGraph: DependencyGraph): SimpleCellAddress[] => {
-  const range = matrix.getRange()
-
+export const collectAddressesDependentToRange = (funcitonRegistry: FunctionRegistry, vertex: Vertex, range: AbsoluteCellRange, lazilyTransformingAstService: LazilyTransformingAstService, dependencyGraph: DependencyGraph): SimpleCellAddress[] => {
   if (vertex instanceof RangeVertex) {
     const intersection = vertex.range.intersectionWith(range)
     if (intersection !== null) {
@@ -28,12 +26,9 @@ export const collectAddressesDependentToMatrix = (funcitonRegistry: FunctionRegi
   let formula: Ast
   let address: SimpleCellAddress
 
-  if (vertex instanceof FormulaCellVertex) {
+  if (vertex instanceof FormulaCellVertex || (vertex instanceof MatrixVertex && vertex.isFormula())) {
     formula = vertex.getFormula(lazilyTransformingAstService)
     address = vertex.getAddress(lazilyTransformingAstService)
-  } else if (vertex instanceof MatrixVertex && vertex.isFormula()) {
-    formula = vertex.getFormula()!
-    address = vertex.getAddress()
   } else {
     return []
   }
