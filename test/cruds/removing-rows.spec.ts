@@ -667,7 +667,7 @@ describe('Removing rows - matrices', () => {
     engine.removeRows(0, [1, 1])
 
     const matrixVertex = engine.addressMapping.fetchCell(adr('A3')) as MatrixVertex
-    expect(matrixVertex.cellAddress).toEqual(adr('A3'))
+    expect(matrixVertex.getAddress(engine.lazilyTransformingAstService)).toEqual(adr('A3'))
   })
 
   it('MatrixVertex#formula should be updated when different sheets', () => {

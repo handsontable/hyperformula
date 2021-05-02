@@ -606,7 +606,7 @@ describe('Removing columns - matrices', () => {
     engine.removeColumns(0, [1, 1])
 
     const matrixVertex = engine.addressMapping.fetchCell(adr('C1')) as MatrixVertex
-    expect(matrixVertex.cellAddress).toEqual(adr('C1'))
+    expect(matrixVertex.getAddress(engine.lazilyTransformingAstService)).toEqual(adr('C1'))
   })
 
   it('MatrixVertex#formula should be updated when different sheets', () => {
