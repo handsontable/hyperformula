@@ -235,7 +235,7 @@ describe('Adding column - MatrixVertex', () => {
     engine.addColumns(0, [1, 1])
 
     const matrixVertex = engine.addressMapping.fetchCell(adr('D1')) as MatrixVertex
-    expect(matrixVertex.cellAddress).toEqual(adr('D1'))
+    expect(matrixVertex.getAddress(engine.lazilyTransformingAstService)).toEqual(adr('D1'))
   })
 
   it('MatrixVertex#formula should be updated when different sheets', () => {
@@ -302,9 +302,9 @@ describe('different sheet', () => {
 
     const formulaVertex = engine.addressMapping.fetchCell(adr('A1', 1)) as FormulaCellVertex
 
-    expect(formulaVertex.address).toEqual(simpleCellAddress(1, 0, 0))
+    expect(formulaVertex.getAddress(engine.lazilyTransformingAstService)).toEqual(simpleCellAddress(1, 0, 0))
     formulaVertex.getFormula(engine.lazilyTransformingAstService) // force transformations to be applied
-    expect(formulaVertex.address).toEqual(simpleCellAddress(1, 0, 0))
+    expect(formulaVertex.getAddress(engine.lazilyTransformingAstService)).toEqual(simpleCellAddress(1, 0, 0))
   })
 })
 

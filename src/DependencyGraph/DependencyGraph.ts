@@ -498,7 +498,7 @@ export class DependencyGraph {
   }
 
   public breakNumericMatrix(matrixVertex: MatrixVertex) {
-    const matrixRange = AbsoluteCellRange.spanFrom(matrixVertex.getAddress(), matrixVertex.width, matrixVertex.height)
+    const matrixRange = AbsoluteCellRange.spanFrom(matrixVertex.getAddress(this.lazilyTransformingAstService), matrixVertex.width, matrixVertex.height)
     const adjacentNodes = this.graph.adjacentNodes(matrixVertex)
 
     for (const address of matrixRange.addresses(this)) {
@@ -520,7 +520,7 @@ export class DependencyGraph {
   }
 
   public setMatrixEmpty(matrixVertex: MatrixVertex) {
-    const matrixRange = AbsoluteCellRange.spanFrom(matrixVertex.getAddress(), matrixVertex.width, matrixVertex.height)
+    const matrixRange = AbsoluteCellRange.spanFrom(matrixVertex.getAddress(this.lazilyTransformingAstService), matrixVertex.width, matrixVertex.height)
     const adjacentNodes = this.graph.adjacentNodes(matrixVertex)
 
     for (const address of matrixRange.addresses(this)) {
@@ -785,7 +785,7 @@ export class DependencyGraph {
       address = vertex.getAddress(this.lazilyTransformingAstService)
       formula = vertex.getFormula(this.lazilyTransformingAstService)
     } else if (vertex instanceof MatrixVertex && vertex.isFormula()) {
-      address = vertex.getAddress()
+      address = vertex.getAddress(this.lazilyTransformingAstService)
       formula = vertex.getFormula()!
     } else {
       return undefined
@@ -914,7 +914,7 @@ export class DependencyGraph {
   private expandMatricesAfterAddingRows(sheet: number, rowStart: number, numberOfRows: number) {
     for (const [, matrix] of this.matrixMapping.numericMatricesInRows(RowsSpan.fromRowStartAndEnd(sheet, rowStart, rowStart))) {
       matrix.addRows(sheet, rowStart, numberOfRows)
-      const addedRange = AbsoluteCellRange.spanFrom(simpleCellAddress(sheet, matrix.getAddress().col, rowStart), matrix.width, numberOfRows)
+      const addedRange = AbsoluteCellRange.spanFrom(simpleCellAddress(sheet, matrix.getAddress(this.lazilyTransformingAstService).col, rowStart), matrix.width, numberOfRows)
       for (const address of addedRange.addresses(this)) {
         this.addressMapping.setCell(address, matrix)
       }
@@ -924,7 +924,7 @@ export class DependencyGraph {
   private expandMatricesAfterAddingColumns(sheet: number, columnStart: number, numberOfColumns: number) {
     for (const [, matrix] of this.matrixMapping.numericMatricesInColumns(ColumnsSpan.fromColumnStartAndEnd(sheet, columnStart, columnStart))) {
       matrix.addColumns(sheet, columnStart, numberOfColumns)
-      const addedRange = AbsoluteCellRange.spanFrom(simpleCellAddress(sheet, columnStart, matrix.getAddress().row), numberOfColumns, matrix.height)
+      const addedRange = AbsoluteCellRange.spanFrom(simpleCellAddress(sheet, columnStart, matrix.getAddress(this.lazilyTransformingAstService).row), numberOfColumns, matrix.height)
       for (const address of addedRange.addresses(this)) {
         this.addressMapping.setCell(address, matrix)
       }
@@ -975,10 +975,8 @@ export class DependencyGraph {
       const castVertex = vertex as RangeVertex | FormulaCellVertex | MatrixVertex
       if (castVertex instanceof RangeVertex) {
         ret.push(new AbsoluteCellRange(castVertex.start, castVertex.end))
-      } else if (castVertex instanceof FormulaCellVertex) {
-        ret.push(castVertex.getAddress(this.lazilyTransformingAstService))
       } else {
-        ret.push(castVertex.getAddress())
+        ret.push(castVertex.getAddress(this.lazilyTransformingAstService))
       }
     })
     return ret

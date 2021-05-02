@@ -1,7 +1,6 @@
 import {ExportedCellChange, HyperFormula, NothingToPasteError} from '../../src'
 import {ErrorType, simpleCellAddress} from '../../src/Cell'
 import {Config} from '../../src/Config'
-import {ErrorMessage} from '../../src/error-message'
 import {SheetSizeLimitExceededError} from '../../src/errors'
 import {CellAddress} from '../../src/parser'
 import {

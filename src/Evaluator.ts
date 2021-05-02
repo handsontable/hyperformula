@@ -24,9 +24,11 @@ import {Ast, RelativeDependency} from './parser'
 import {Serialization} from './Serialization'
 import {Statistics, StatType} from './statistics'
 import {FormulaVertex} from './DependencyGraph/FormulaCellVertex'
+import {LazilyTransformingAstService} from './LazilyTransformingAstService'
 
 export class Evaluator {
   private interpreter: Interpreter
+  private lazilyTransformingAstService: LazilyTransformingAstService
 
   constructor(
     private readonly dependencyGraph: DependencyGraph,
@@ -40,6 +42,7 @@ export class Evaluator {
     private readonly serialization: Serialization
   ) {
     this.interpreter = new Interpreter(this.dependencyGraph, this.columnSearch, this.config, this.stats, this.dateHelper, this.numberLiteralsHelper, this.functionRegistry, this.namedExpressions, this.serialization)
+    this.lazilyTransformingAstService = this.dependencyGraph.lazilyTransformingAstService
   }
 
   public run(): void {
@@ -83,9 +86,9 @@ export class Evaluator {
           } else if (vertex instanceof FormulaCellVertex) {
             const address = vertex.getAddress(this.dependencyGraph.lazilyTransformingAstService)
             this.columnSearch.remove(getRawValue(vertex.valueOrNull()), address)
-            const error = new CellError(ErrorType.CYCLE, undefined, vertex.address)
+            const error = new CellError(ErrorType.CYCLE, undefined, address)
             vertex.setCellValue(error)
-            changes.addChange(error, vertex.address)
+            changes.addChange(error, address)
           }
         },
       )
@@ -124,13 +127,13 @@ export class Evaluator {
   private recomputeFormulas(cycled: Vertex[], sorted: Vertex[]): void {
     cycled.forEach((vertex: Vertex) => {
       if (vertex instanceof FormulaCellVertex) {
-        vertex.setCellValue(new CellError(ErrorType.CYCLE, undefined, vertex.address))
+        vertex.setCellValue(new CellError(ErrorType.CYCLE, undefined, vertex.getAddress(this.lazilyTransformingAstService)))
       }
     })
     sorted.forEach((vertex: Vertex) => {
       if (vertex instanceof FormulaCellVertex || vertex instanceof MatrixVertex) {
-        const address = vertex.getAddress(this.dependencyGraph.lazilyTransformingAstService)
-        const formula = vertex.getFormula(this.dependencyGraph.lazilyTransformingAstService)
+        const address = vertex.getAddress(this.lazilyTransformingAstService)
+        const formula = vertex.getFormula(this.lazilyTransformingAstService)
         const newCellValue = this.evaluateAstToCellValue(formula, new InterpreterState(address, this.config.arrays))
         const setValue = vertex.setCellValue(newCellValue)
         this.columnSearch.add(getRawValue(setValue), address)

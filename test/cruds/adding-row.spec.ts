@@ -247,7 +247,7 @@ describe('Adding row - MatrixVertex', () => {
     engine.addRows(0, [1, 1])
 
     const matrixVertex = engine.addressMapping.fetchCell(adr('A4')) as MatrixVertex
-    expect(matrixVertex.cellAddress).toEqual(adr('A4'))
+    expect(matrixVertex.getAddress(engine.lazilyTransformingAstService)).toEqual(adr('A4'))
   })
 })
 
@@ -280,9 +280,9 @@ describe('Adding row - FormulaCellVertex#address update', () => {
 
     const formulaVertex = engine.addressMapping.fetchCell(adr('A1', 1)) as FormulaCellVertex
 
-    expect(formulaVertex.address).toEqual(simpleCellAddress(1, 0, 0))
+    expect(formulaVertex.getAddress(engine.lazilyTransformingAstService)).toEqual(simpleCellAddress(1, 0, 0))
     formulaVertex.getFormula(engine.lazilyTransformingAstService) // force transformations to be applied
-    expect(formulaVertex.address).toEqual(simpleCellAddress(1, 0, 0))
+    expect(formulaVertex.getAddress(engine.lazilyTransformingAstService)).toEqual(simpleCellAddress(1, 0, 0))
   })
 })
 

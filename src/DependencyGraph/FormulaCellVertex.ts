@@ -81,7 +81,7 @@ export abstract class FormulaVertex {
 export class MatrixVertex extends FormulaVertex {
   matrix: IMatrix
 
-  constructor(public formula: Ast, public cellAddress: SimpleCellAddress, size: MatrixSize, version: number = 0) {
+  constructor(public formula: Ast, cellAddress: SimpleCellAddress, size: MatrixSize, version: number = 0) {
     super(formula, cellAddress, version)
     this.matrix = new NotComputedMatrix(size)
   }
@@ -154,11 +154,8 @@ export class MatrixVertex extends FormulaVertex {
     return AbsoluteCellRange.spanFrom(this.cellAddress, this.width, this.height)
   }
 
-  getAddress(): SimpleCellAddress {
-    return this.cellAddress
-  }
-
   setAddress(address: SimpleCellAddress) {
+    /* TODO probably we don't want this */
     this.cellAddress = address
   }
 
@@ -194,29 +191,30 @@ export class MatrixVertex extends FormulaVertex {
       (col < this.cellAddress.col + this.width)
   }
 
+  /* TODO cruds should ensure is recent data */
   addRows(sheet: number, row: number, numberOfRows: number): void {
     if (this.matrix instanceof Matrix) {
-      this.matrix.addRows(row - this.getAddress().row, numberOfRows)
+      this.matrix.addRows(row - this.cellAddress.row, numberOfRows)
     }
   }
 
   addColumns(sheet: number, column: number, numberOfColumns: number): void {
     if (this.matrix instanceof Matrix) {
-      this.matrix.addColumns(column - this.getAddress().col, numberOfColumns)
+      this.matrix.addColumns(column - this.cellAddress.col, numberOfColumns)
     }
   }
 
   removeRows(removedRows: RowsSpan): void {
     if (this.matrix instanceof Matrix) {
       const removedRowsFromMatrix = this.rowsFromMatrix().intersect(removedRows)!
-      this.matrix.removeRows(removedRowsFromMatrix.rowStart - this.getAddress().row, removedRowsFromMatrix.rowEnd - this.getAddress().row)
+      this.matrix.removeRows(removedRowsFromMatrix.rowStart - this.cellAddress.row, removedRowsFromMatrix.rowEnd - this.cellAddress.row)
     }
   }
 
   removeColumns(removedColumns: ColumnsSpan): void {
     if (this.matrix instanceof Matrix) {
       const removedColumnsFromMatrix = this.columnsFromMatrix().intersect(removedColumns)!
-      this.matrix.removeColumns(removedColumnsFromMatrix.columnStart - this.getAddress().col, removedColumnsFromMatrix.columnEnd - this.getAddress().col)
+      this.matrix.removeColumns(removedColumnsFromMatrix.columnStart - this.cellAddress.col, removedColumnsFromMatrix.columnEnd - this.cellAddress.col)
     }
   }
 
@@ -249,18 +247,12 @@ export class FormulaCellVertex extends FormulaVertex {
     formula: Ast,
 
     /** Address which this vertex represents */
-    cellAddress: SimpleCellAddress,
+    address: SimpleCellAddress,
 
     version: number,
   ) {
-    super(formula, cellAddress, version)
-    this.formula = formula
-    this.cellAddress = cellAddress
+    super(formula, address, version)
     this.cachedCellValue = null
-  }
-
-  public get address() {
-    return this.cellAddress
   }
 
   public valueOrNull(): InterpreterValue | null {
