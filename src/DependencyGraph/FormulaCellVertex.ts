@@ -81,7 +81,7 @@ export abstract class FormulaVertex {
 export class MatrixVertex extends FormulaVertex {
   matrix: IMatrix
 
-  constructor(public formula: Ast, cellAddress: SimpleCellAddress, size: MatrixSize, version: number = 0) {
+  constructor(formula: Ast, cellAddress: SimpleCellAddress, size: MatrixSize, version: number = 0) {
     super(formula, cellAddress, version)
     this.matrix = new NotComputedMatrix(size)
   }
@@ -159,15 +159,8 @@ export class MatrixVertex extends FormulaVertex {
     this.cellAddress = address
   }
 
-  getFormula(): Ast {
-    if (this.formula == undefined) {
-      /* TODO */
-      throw Error('TODO formula should not be undefined')
-    }
-    return this.formula
-  }
-
   setFormula(newFormula: Ast) {
+    /* TODO probably we don't want this */
     this.formula = newFormula
   }
 

@@ -786,7 +786,7 @@ export class DependencyGraph {
       formula = vertex.getFormula(this.lazilyTransformingAstService)
     } else if (vertex instanceof MatrixVertex && vertex.isFormula()) {
       address = vertex.getAddress(this.lazilyTransformingAstService)
-      formula = vertex.getFormula()!
+      formula = vertex.getFormula(this.lazilyTransformingAstService)!
     } else {
       return undefined
     }

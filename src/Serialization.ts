@@ -40,7 +40,7 @@ export class Serialization {
       if(matrixVertexAddress.row !== address.row || matrixVertexAddress.col !== address.col || matrixVertexAddress.sheet !== address.sheet) {
         return undefined
       }
-      const formula = formulaVertex.getFormula()
+      const formula = formulaVertex.getFormula(this.dependencyGraph.lazilyTransformingAstService)
       if (formula !== undefined) {
         return this.unparser.unparse(formula, matrixVertexAddress)
       }
