@@ -20,7 +20,7 @@ describe('Interpreter - function ARRAYFORMULA', () => {
   it('enables arrayformulas',  () => {
     const engine =  HyperFormula.buildFromArray([
       ['=SUM(ARRAYFORMULA(A2:C2+A2:C2))'],
-      [1,2,3]
+      [1, 2, 3]
     ], {arrays: false})
     expect(engine.getCellValue(adr('A1'))).toEqual(12)
   })

@@ -30,12 +30,12 @@ describe('Interpreter - function ARRAY_CONSTRAINT', () => {
         ['=ARRAY_CONSTRAINT(Sheet2!A1:C3, 2, 2)'],
       ],
       Sheet2: [
-        [1,2,3],
-        [4,5,6],
-        [7,8,9],
+        [1, 2, 3],
+        [4, 5, 6],
+        [7, 8, 9],
       ]
     })
-    expect(engine.getSheetValues(0)).toEqual([[1,2],[4,5]])
+    expect(engine.getSheetValues(0)).toEqual([[1, 2], [4, 5]])
   })
 
   it('works #4',  () => {
@@ -44,12 +44,12 @@ describe('Interpreter - function ARRAY_CONSTRAINT', () => {
         ['=ARRAY_CONSTRAINT(Sheet2!A1:C3, 2, 4)'],
       ],
       Sheet2: [
-        [1,2,3],
-        [4,5,6],
-        [7,8,9],
+        [1, 2, 3],
+        [4, 5, 6],
+        [7, 8, 9],
       ]
     })
-    expect(engine.getSheetValues(0)).toEqual([[1,2,3],[4,5,6]])
+    expect(engine.getSheetValues(0)).toEqual([[1, 2, 3], [4, 5, 6]])
   })
 
   it('validates number of arguments', () => {

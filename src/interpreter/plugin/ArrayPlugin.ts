@@ -33,13 +33,13 @@ export class ArrayPlugin extends FunctionPlugin implements FunctionPluginTypeche
   }
 
   public arrayconstraint(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
-    return this.runMatrixFunction(ast.args, state, this.metadata('ARRAY_CONSTRAINT'), (range: SimpleRangeValue, num_rows: number, num_cols: number) => {
-      num_rows = Math.min(num_rows, range.height())
-      num_cols = Math.min(num_cols, range.width())
+    return this.runMatrixFunction(ast.args, state, this.metadata('ARRAY_CONSTRAINT'), (range: SimpleRangeValue, numRows: number, numCols: number) => {
+      numRows = Math.min(numRows, range.height())
+      numCols = Math.min(numCols, range.width())
       const data: InternalScalarValue[][] = range.data
       const ret: InternalScalarValue[][] = []
-      for(let i=0;i<num_rows;i++) {
-        ret.push(data[i].slice(0,num_cols))
+      for(let i=0;i<numRows;i++) {
+        ret.push(data[i].slice(0, numCols))
       }
       return SimpleRangeValue.onlyValues(ret)
     })
