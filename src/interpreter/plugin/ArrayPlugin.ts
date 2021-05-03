@@ -18,8 +18,8 @@ export class ArrayPlugin extends FunctionPlugin implements FunctionPluginTypeche
         {argumentType: ArgumentTypes.ANY}
       ],
     },
-    'ARRAY_CONSTRAINT': {
-      method: 'arrayconstraint',
+    'ARRAY_CONSTRAIN': {
+      method: 'arrayconstrain',
       parameters: [
         {argumentType: ArgumentTypes.RANGE},
         {argumentType: ArgumentTypes.INTEGER, minValue: 1},
@@ -32,8 +32,8 @@ export class ArrayPlugin extends FunctionPlugin implements FunctionPluginTypeche
     return this.runFunction(ast.args, state, this.metadata('ARRAYFORMULA'), (value) => value)
   }
 
-  public arrayconstraint(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
-    return this.runMatrixFunction(ast.args, state, this.metadata('ARRAY_CONSTRAINT'), (range: SimpleRangeValue, numRows: number, numCols: number) => {
+  public arrayconstrain(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runMatrixFunction(ast.args, state, this.metadata('ARRAY_CONSTRAIN'), (range: SimpleRangeValue, numRows: number, numCols: number) => {
       numRows = Math.min(numRows, range.height())
       numCols = Math.min(numCols, range.width())
       const data: InternalScalarValue[][] = range.data

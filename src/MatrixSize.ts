@@ -136,7 +136,7 @@ export class MatrixSizePredictor {
             }
             return subChecks[0]
           }
-          case 'ARRAY_CONSTRAINT': {
+          case 'ARRAY_CONSTRAIN': {
             if (ast.args.length !== 3) {
               return undefined
             }
