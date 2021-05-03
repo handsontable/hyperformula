@@ -18,6 +18,7 @@ const dictionary: RawTranslationPackage = {
     VALUE: '#DEĞER!',
   },
   functions: {
+    'ARRAY_CONSTRAINT' : 'ARRAY_CONSTRAINT',
     ARRAYFORMULA: 'ARRAYFORMULA',
     ABS: 'MUTLAK',
     ACOS: 'ACOS',

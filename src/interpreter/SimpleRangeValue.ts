@@ -51,11 +51,11 @@ export class SimpleRangeValue {
   }
 
   public width(): number {
-    return this.size.width
+    return this.size.width //data[0].length
   }
 
   public height(): number {
-    return this.size.height
+    return this.size.height //data.length
   }
 
   public get data(): InternalScalarValue[][] {

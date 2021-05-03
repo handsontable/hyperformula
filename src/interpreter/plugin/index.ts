@@ -3,7 +3,7 @@
  * Copyright (c) 2021 Handsoncode. All rights reserved.
  */
 
-export {ArrayFormulaPlugin} from './ArrayFormulaPlugin'
+export {ArrayPlugin} from './ArrayPlugin'
 export {AbsPlugin} from './AbsPlugin'
 export {BitShiftPlugin} from './BitShiftPlugin'
 export {BitwiseLogicOperationsPlugin} from './BitwiseLogicOperationsPlugin'
