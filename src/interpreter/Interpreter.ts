@@ -323,29 +323,46 @@ export class Interpreter {
   private unaryRangeWrapper(op: (arg: InternalScalarValue) => InternalScalarValue, arg: InterpreterValue, state: InterpreterState): InterpreterValue {
     if (arg instanceof CellError) {
       return arg
-    } else if(arg instanceof SimpleRangeValue) {
-      if(!state.arraysFlag) {
+    }
+    if(arg instanceof SimpleRangeValue && !state.arraysFlag) {
+      if (arg.isAdHoc()) {
+        arg = arg.data[0][0]
+      } else {
         return new CellError(ErrorType.VALUE, ErrorMessage.ScalarExpected)
       }
+    }
+    if(arg instanceof SimpleRangeValue) {
       const newRaw = arg.data.map(
         (row) => row.map(op)
       )
       return SimpleRangeValue.onlyValues(newRaw)
-    } else {
-      return op(arg)
     }
+
+    return op(arg)
   }
 
   private binaryRangeWrapper(op: (arg1: InternalScalarValue, arg2: InternalScalarValue) => InternalScalarValue, arg1: InterpreterValue, arg2: InterpreterValue, state: InterpreterState): InterpreterValue {
     if (arg1 instanceof CellError) {
       return arg1
-    } else if(arg1 instanceof SimpleRangeValue && !state.arraysFlag) {
-      return new CellError(ErrorType.VALUE, ErrorMessage.ScalarExpected)
-    } else if (arg2 instanceof CellError) {
+    }
+    if(arg1 instanceof SimpleRangeValue && !state.arraysFlag) {
+      if(arg1.isAdHoc()) {
+        arg1 = arg1.data[0][0]
+      } else {
+        return new CellError(ErrorType.VALUE, ErrorMessage.ScalarExpected)
+      }
+    }
+    if (arg2 instanceof CellError) {
       return arg2
-    } else if(arg2 instanceof SimpleRangeValue && !state.arraysFlag) {
-      return new CellError(ErrorType.VALUE, ErrorMessage.ScalarExpected)
-    } else if(arg1 instanceof SimpleRangeValue || arg2 instanceof SimpleRangeValue) {
+    }
+    if(arg2 instanceof SimpleRangeValue && !state.arraysFlag) {
+      if(arg2.isAdHoc()) {
+        arg2 = arg2.data[0][0]
+      } else {
+        return new CellError(ErrorType.VALUE, ErrorMessage.ScalarExpected)
+      }
+    }
+    if(arg1 instanceof SimpleRangeValue || arg2 instanceof SimpleRangeValue) {
       if(!(arg1 instanceof SimpleRangeValue)) {
         if((arg2 as SimpleRangeValue).isAdHoc()) {
           const raw2 = (arg2 as SimpleRangeValue).data
@@ -415,9 +432,9 @@ export class Interpreter {
         }
       }
       return SimpleRangeValue.onlyValues(ret)
-    } else {
-      return op(arg1, arg2)
     }
+
+    return op(arg1, arg2)
   }
 }
 
