@@ -368,7 +368,7 @@ export class Interpreter {
           const raw2 = (arg2 as SimpleRangeValue).data
           for(let i=0;i<raw2.length;i++) {
             for(let j=0;j<raw2[0].length;j++) {
-              raw2[i][j] = op(arg1 as InternalScalarValue, raw2[i][j])
+              raw2[i][j] = op(arg1, raw2[i][j])
             }
           }
           return SimpleRangeValue.onlyValues(raw2)
