@@ -32,7 +32,6 @@ import {
   isExtendedNumber,
 } from './InterpreterValue'
 import {SimpleRangeValue} from './SimpleRangeValue'
-import {PluginFunctionType} from './plugin/FunctionPlugin'
 
 export class Interpreter {
   private gpu?: GPU
@@ -326,7 +325,10 @@ export class Interpreter {
     }
     if(arg instanceof SimpleRangeValue && !state.arraysFlag) {
       if (arg.isAdHoc()) {
-        arg = arg.data[0][0]
+        arg = arg.data[0]?.[0]
+        if(arg === undefined) {
+          return new CellError(ErrorType.REF, ErrorMessage.EmptyArray)
+        }
       } else {
         return new CellError(ErrorType.VALUE, ErrorMessage.ScalarExpected)
       }
@@ -347,7 +349,10 @@ export class Interpreter {
     }
     if(arg1 instanceof SimpleRangeValue && !state.arraysFlag) {
       if(arg1.isAdHoc()) {
-        arg1 = arg1.data[0][0]
+        arg1 = arg1.data[0]?.[0]
+        if(arg1 === undefined) {
+          return new CellError(ErrorType.REF, ErrorMessage.EmptyArray)
+        }
       } else {
         return new CellError(ErrorType.VALUE, ErrorMessage.ScalarExpected)
       }
@@ -357,7 +362,10 @@ export class Interpreter {
     }
     if(arg2 instanceof SimpleRangeValue && !state.arraysFlag) {
       if(arg2.isAdHoc()) {
-        arg2 = arg2.data[0][0]
+        arg2 = arg2.data[0]?.[0]
+        if(arg2 === undefined) {
+          return new CellError(ErrorType.REF, ErrorMessage.EmptyArray)
+        }
       } else {
         return new CellError(ErrorType.VALUE, ErrorMessage.ScalarExpected)
       }

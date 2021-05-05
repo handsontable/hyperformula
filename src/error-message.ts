@@ -10,6 +10,7 @@ export class ErrorMessage {
   public static DistinctSigns = 'Distinct signs.'
   public static WrongArgNumber = 'Wrong number of arguments.'
   public static EmptyArg = 'Empty function argument.'
+  public static EmptyArray = 'Empty array not allowed.'
   public static MatrixDimensions = 'Matrix dimensions are not compatible.'
   public static ValueSmall = 'Value too small.'
   public static ValueLarge = 'Value too large.'
