@@ -137,7 +137,7 @@ different countries.
 | Belgium | Dutch | d/MM/yyyy |
 | Bulgaria | Bulgarian | yyyy-M-d |
 | Bahrain | Arabic | dd/MM/yyyy |
-| Bosnia and Herzegovina | Serbian | yyyy-MM-dd |
+| Bosnia and Herzegovina | Bosnian | dd.MM.yyyy. |
 | Belarus | Belarusian | d.M.yyyy |
 | Bolivia | Spanish | dd-MM-yyyy |
 | Brazil | Portuguese | dd/MM/yyyy |
