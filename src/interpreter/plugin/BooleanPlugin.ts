@@ -8,6 +8,7 @@ import {ErrorMessage} from '../../error-message'
 import {ProcedureAst} from '../../parser'
 import {InterpreterState} from '../InterpreterState'
 import {InternalNoErrorScalarValue, InternalScalarValue, InterpreterValue} from '../InterpreterValue'
+import {SimpleRangeValue} from '../SimpleRangeValue'
 import {ArgumentTypes, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
 
 /**
@@ -64,7 +65,7 @@ export class BooleanPlugin extends FunctionPlugin implements FunctionPluginTypec
     'SWITCH': {
       method: 'switch',
       parameters: [
-          {argumentType: ArgumentTypes.NOERROR, passSubtype: true},
+          {argumentType: ArgumentTypes.RANGE},
           {argumentType: ArgumentTypes.SCALAR, passSubtype: true},
           {argumentType: ArgumentTypes.SCALAR, passSubtype: true},
         ],
@@ -177,22 +178,32 @@ export class BooleanPlugin extends FunctionPlugin implements FunctionPluginTypec
   }
 
   public switch(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
-    return this.runFunction(ast.args, state, this.metadata('SWITCH'), (selector, ...args) => {
+    return this.runMatrixFunction(ast.args, state, this.metadata('SWITCH'), (selectorArr: SimpleRangeValue, ...args) => {
       const n = args.length
-      let i = 0
-      for (; i + 1 < n; i += 2) {
-        if (args[i] instanceof CellError) {
-          continue
-        }
-        if (this.interpreter.arithmeticHelper.eq(selector, args[i] as InternalNoErrorScalarValue)) {
-          return args[i + 1]
-        }
+      const ret: InternalScalarValue[][] = []
+      for(const row of selectorArr.data) {
+        const newrow: InternalScalarValue[] = row.map( (selector) => {
+          let i = 0
+          if(selector instanceof CellError) {
+            return selector
+          }
+          for (; i + 1 < n; i += 2) {
+            if (args[i] instanceof CellError) {
+              continue
+            }
+            if (this.interpreter.arithmeticHelper.eq(selector as InternalNoErrorScalarValue, args[i] as InternalNoErrorScalarValue)) {
+              return args[i + 1]
+            }
+          }
+          if (i < n) {
+            return args[i]
+          } else {
+            return new CellError(ErrorType.NA, ErrorMessage.NoDefault)
+          }
+        })
+        ret.push(newrow)
       }
-      if (i < n) {
-        return args[i]
-      } else {
-        return new CellError(ErrorType.NA, ErrorMessage.NoDefault)
-      }
+      return SimpleRangeValue.onlyValues(ret)
     })
   }
 

@@ -137,6 +137,16 @@ export class MatrixSizePredictor {
             }
             return subChecks[0]
           }
+          case 'SWITCH': {
+            if(ast.args.length === 0) {
+              return undefined
+            }
+            const size = subChecks[0]
+            if(size === undefined) {
+              return undefined
+            }
+            return new MatrixSize(size.width, size.height)
+          }
           default: {
             return new MatrixSize(1, 1)
           }
