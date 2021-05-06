@@ -138,6 +138,8 @@ different countries.
 | Bulgaria | Bulgarian | yyyy-M-d |
 | Bahrain | Arabic | dd/MM/yyyy |
 | Bosnia and Herzegovina | Bosnian | dd.MM.yyyy. |
+| Bosnia and Herzegovina | Serbian | dd.MM.yyyy. |
+| Bosnia and Herzegovina | Croatian | dd.MM.yyyy. |
 | Belarus | Belarusian | d.M.yyyy |
 | Bolivia | Spanish | dd-MM-yyyy |
 | Brazil | Portuguese | dd/MM/yyyy |
