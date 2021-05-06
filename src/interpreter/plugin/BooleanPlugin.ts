@@ -191,7 +191,7 @@ export class BooleanPlugin extends FunctionPlugin implements FunctionPluginTypec
             if (args[i] instanceof CellError) {
               continue
             }
-            if (this.interpreter.arithmeticHelper.eq(selector as InternalNoErrorScalarValue, args[i] as InternalNoErrorScalarValue)) {
+            if (this.interpreter.arithmeticHelper.eq(selector, args[i] as InternalNoErrorScalarValue)) {
               return args[i + 1]
             }
           }

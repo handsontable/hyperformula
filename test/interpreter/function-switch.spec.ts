@@ -23,10 +23,10 @@ describe('Interpreter - SWITCH function', () => {
 
   it('Should work with arrays', () => {
     const engine = HyperFormula.buildFromArray([
-      [1,2,3],
+      [1, 2, 3],
       ['=SWITCH(A1:C1,1,2,3,4,5)']
     ], {arrays: false})
-    expect(engine.getSheetValues(0)).toEqual([[1,2,3],[2,5,4]])
+    expect(engine.getSheetValues(0)).toEqual([[1, 2, 3], [2, 5, 4]])
   })
 
   it('Should work with precision', () => {

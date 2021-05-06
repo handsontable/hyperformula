@@ -36,7 +36,7 @@ function validateAndReturnMetadataFromName(functionId: string, plugin: FunctionP
 }
 
 function maybeMetadataFromName(functionId: string, plugin: FunctionPluginDefinition): Maybe<FunctionMetadata> {
-  let entry = plugin.implementedFunctions[functionId]
+  const entry = plugin.implementedFunctions[functionId]
   const key = plugin.aliases?.[functionId]
   if(key === undefined) {
     return entry
