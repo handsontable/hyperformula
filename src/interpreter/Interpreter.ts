@@ -19,7 +19,13 @@ import {NumberLiteralHelper} from '../NumberLiteralHelper'
 import {Ast, AstNodeType, CellRangeAst, ColumnRangeAst, RowRangeAst} from '../parser/Ast'
 import {Serialization} from '../Serialization'
 import {Statistics} from '../statistics/Statistics'
-import {ArithmeticHelper, coerceScalarToString, fixNegativeZero, isNumberOverflow} from './ArithmeticHelper'
+import {
+  ArithmeticHelper,
+  coerceRangeToScalar,
+  coerceScalarToString,
+  fixNegativeZero,
+  isNumberOverflow
+} from './ArithmeticHelper'
 import {CriterionBuilder} from './Criterion'
 import {FunctionRegistry} from './FunctionRegistry'
 import {InterpreterState} from './InterpreterState'
@@ -320,18 +326,11 @@ export class Interpreter {
   private unaryPlusOp = (arg: InternalScalarValue): InternalScalarValue => this.arithmeticHelper.unaryPlus(arg)
 
   private unaryRangeWrapper(op: (arg: InternalScalarValue) => InternalScalarValue, arg: InterpreterValue, state: InterpreterState): InterpreterValue {
+    if(arg instanceof SimpleRangeValue && !state.arraysFlag) {
+      arg = coerceRangeToScalar(arg, state) ?? new CellError(ErrorType.VALUE, ErrorMessage.ScalarExpected)
+    }
     if (arg instanceof CellError) {
       return arg
-    }
-    if(arg instanceof SimpleRangeValue && !state.arraysFlag) {
-      if (arg.isAdHoc()) {
-        arg = arg.data[0]?.[0]
-        if(arg === undefined) {
-          return new CellError(ErrorType.REF, ErrorMessage.EmptyArray)
-        }
-      } else {
-        return new CellError(ErrorType.VALUE, ErrorMessage.ScalarExpected)
-      }
     }
     if(arg instanceof SimpleRangeValue) {
       const newRaw = arg.data.map(
@@ -344,31 +343,17 @@ export class Interpreter {
   }
 
   private binaryRangeWrapper(op: (arg1: InternalScalarValue, arg2: InternalScalarValue) => InternalScalarValue, arg1: InterpreterValue, arg2: InterpreterValue, state: InterpreterState): InterpreterValue {
+    if(arg1 instanceof SimpleRangeValue && !state.arraysFlag) {
+      arg1 = coerceRangeToScalar(arg1, state) ?? new CellError(ErrorType.VALUE, ErrorMessage.ScalarExpected)
+    }
     if (arg1 instanceof CellError) {
       return arg1
     }
-    if(arg1 instanceof SimpleRangeValue && !state.arraysFlag) {
-      if(arg1.isAdHoc()) {
-        arg1 = arg1.data[0]?.[0]
-        if(arg1 === undefined) {
-          return new CellError(ErrorType.REF, ErrorMessage.EmptyArray)
-        }
-      } else {
-        return new CellError(ErrorType.VALUE, ErrorMessage.ScalarExpected)
-      }
+    if(arg2 instanceof SimpleRangeValue && !state.arraysFlag) {
+      arg2 = coerceRangeToScalar(arg2, state) ?? new CellError(ErrorType.VALUE, ErrorMessage.ScalarExpected)
     }
     if (arg2 instanceof CellError) {
       return arg2
-    }
-    if(arg2 instanceof SimpleRangeValue && !state.arraysFlag) {
-      if(arg2.isAdHoc()) {
-        arg2 = arg2.data[0]?.[0]
-        if(arg2 === undefined) {
-          return new CellError(ErrorType.REF, ErrorMessage.EmptyArray)
-        }
-      } else {
-        return new CellError(ErrorType.VALUE, ErrorMessage.ScalarExpected)
-      }
     }
     if(arg1 instanceof SimpleRangeValue || arg2 instanceof SimpleRangeValue) {
       if(!(arg1 instanceof SimpleRangeValue)) {

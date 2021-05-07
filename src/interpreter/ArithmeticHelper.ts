@@ -10,6 +10,7 @@ import {ErrorMessage} from '../error-message'
 import {Maybe} from '../Maybe'
 import {NumberLiteralHelper} from '../NumberLiteralHelper'
 import {collatorFromConfig} from '../StringHelper'
+import {InterpreterState} from './InterpreterState'
 import {
   cloneNumber,
   CurrencyNumber,
@@ -758,5 +759,26 @@ function inferExtendedNumberTypeMultiplicative(leftArg: ExtendedNumber, rightArg
 
 export function forceNormalizeString(str: string): string {
   return str.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+}
+
+export function coerceRangeToScalar(arg: SimpleRangeValue, state: InterpreterState): Maybe<InternalScalarValue>{
+  if(arg.isAdHoc()) {
+    return arg.data[0]?.[0]
+  }
+  const range = arg.range!
+  if(state.formulaAddress.sheet === range.sheet) {
+    if (range.width() === 1) {
+      const offset = state.formulaAddress.row - range.start.row
+      if (offset >= 0 && offset < range.height()) {
+        return arg.data[offset][0]
+      }
+    } else if (range.height() === 1) {
+      const offset = state.formulaAddress.col - range.start.col
+      if (offset >= 0 && offset < range.width()) {
+        return arg.data[0][offset]
+      }
+    }
+  }
+  return undefined
 }
 

@@ -111,18 +111,5 @@ describe('Function TIME', () => {
     expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.NAME, ErrorMessage.FunctionName('FOOBAR')))
     expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.NAME, ErrorMessage.FunctionName('FOOBAR')))
   })
-
-  // Inconsistency with Product 1
-  it('range value results in VALUE error', () => {
-    const config = new Config()
-    const engine = HyperFormula.buildFromArray([
-      ['1', '2000'],
-      ['2', '2001', '=TIME(B1:B3, 1, 1)', '=TIME(1950, A1:A3, 1)', '=TIME(1950, 1, A1:A3)'],
-      ['3', '2002'],
-    ], config)
-    expect(engine.getCellValue(adr('C2'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.WrongType))
-    expect(engine.getCellValue(adr('D2'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.WrongType))
-    expect(engine.getCellValue(adr('E2'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.WrongType))
-  })
 })
 

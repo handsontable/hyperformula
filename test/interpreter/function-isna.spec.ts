@@ -31,12 +31,12 @@ describe('Function ISNA', () => {
     expect(engine.getCellValue(adr('B1'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
   })
 
-  // Inconsistency with Product 1
   it('range value results in VALUE error', () => {
     const engine = HyperFormula.buildFromArray([
       ['=TRUE(1)'],
-      ['=TRUE(1)', '=ISNA(A1:A2)'],
+      ['=TRUE(1)'],
+      ['=ISNA(A1:A2)'],
     ])
-    expect(engine.getCellValue(adr('B2'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.WrongType))
+    expect(engine.getCellValue(adr('A3'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.WrongType))
   })
 })

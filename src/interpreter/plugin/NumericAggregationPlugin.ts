@@ -295,7 +295,7 @@ export class NumericAggregationPlugin extends FunctionPlugin implements Function
     if (ast.args.length < 1) {
       return new CellError(ErrorType.NA, ErrorMessage.WrongArgNumber)
     }
-    const functionType = this.coerceToType(this.evaluateAst(ast.args[0], state), {argumentType: ArgumentTypes.NUMBER})
+    const functionType = this.coerceToType(this.evaluateAst(ast.args[0], state), {argumentType: ArgumentTypes.NUMBER}, state)
     const args = ast.args.slice(1)
     switch (functionType) {
       case 1:

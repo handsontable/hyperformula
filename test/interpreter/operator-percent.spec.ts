@@ -48,14 +48,14 @@ describe('Percent operator', () => {
     expect(engine.getCellValue(adr('A1'))).toEqual(0.01)
   })
 
-  // Inconsistency with Product 1
   it('range value results in VALUE error', () => {
     const engine = HyperFormula.buildFromArray([
       ['1'],
-      ['9', '=A1:A3%'],
+      ['9'],
       ['3'],
+      ['=A1:A3%'],
     ])
 
-    expect(engine.getCellValue(adr('B2'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.ScalarExpected))
+    expect(engine.getCellValue(adr('A4'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.ScalarExpected))
   })
 })
