@@ -35,6 +35,18 @@ function validateAndReturnMetadataFromName(functionId: string, plugin: FunctionP
   return entry
 }
 
+function maybeMetadataFromName(functionId: string, plugin: FunctionPluginDefinition): Maybe<FunctionMetadata> {
+  const entry = plugin.implementedFunctions[functionId]
+  const key = plugin.aliases?.[functionId]
+  if(key === undefined) {
+    return entry
+  }
+  if (entry !== undefined) {
+    return undefined
+  }
+  return plugin.implementedFunctions[key]
+}
+
 export class FunctionRegistry {
   public static plugins: Map<string, FunctionPluginDefinition> = new Map()
 
@@ -219,8 +231,8 @@ export class FunctionRegistry {
     const pluginEntry = this.functions.get(functionId)
     if (pluginEntry !== undefined && this.config.translationPackage.isFunctionTranslated(functionId)) {
       const [_pluginFunction, pluginInstance] = pluginEntry
-      const implementedFunctions = Object.getPrototypeOf(pluginInstance).constructor.implementedFunctions as ImplementedFunctions
-      return implementedFunctions[functionId]
+      const pluginDefinition = Object.getPrototypeOf(pluginInstance).constructor as FunctionPluginDefinition
+      return maybeMetadataFromName(functionId, pluginDefinition)
     } else {
       return undefined
     }

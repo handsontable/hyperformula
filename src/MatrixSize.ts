@@ -140,21 +140,31 @@ export class MatrixSizePredictor {
             if (ast.args.length !== 3) {
               return undefined
             }
-            if(subChecks[0]===undefined) {
+            if (subChecks[0] === undefined) {
               return undefined
             }
             let height = subChecks[0].height
             let width = subChecks[0].width
-            if(ast.args[1].type === AstNodeType.NUMBER) {
+            if (ast.args[1].type === AstNodeType.NUMBER) {
               height = Math.min(height, ast.args[1].value)
             }
-            if(ast.args[2].type === AstNodeType.NUMBER) {
+            if (ast.args[2].type === AstNodeType.NUMBER) {
               width = Math.min(width, ast.args[2].value)
             }
-            if(height<1 || width<1 || !Number.isInteger(height) || !Number.isInteger(width)) {
+            if (height < 1 || width < 1 || !Number.isInteger(height) || !Number.isInteger(width)) {
               return undefined
             }
             return new MatrixSize(width, height)
+          }
+          case 'SWITCH': {
+            if(ast.args.length === 0) {
+              return undefined
+            }
+            const size = subChecks[0]
+            if(size === undefined) {
+              return undefined
+            }
+            return new MatrixSize(size.width, size.height)
           }
           default: {
             return new MatrixSize(1, 1)

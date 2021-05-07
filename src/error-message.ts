@@ -41,7 +41,6 @@ export class ErrorMessage {
   public static ValueBaseLong = 'Value in base too long.'
   public static NegativeLength = 'Length cannot be negative.'
   public static PatternNotFound = 'Pattern not found.'
-  public static MatrixParams = 'Matrix function parameters are not compatible.'
   public static OneValue = 'Needs at least one value.'
   public static TwoValues = 'Range needs to contain at least two elements.'
   public static ThreeValues = 'Range needs to contain at least three elements.'
