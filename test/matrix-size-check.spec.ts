@@ -134,11 +134,11 @@ describe('Matrix size check tests, with different config', () => {
     expect(size).toEqual(new MatrixSize(4, 4))
   })
 
-    it('check unary array arithmetic', () => {
-      const parser = buildEmptyParserWithCaching(config)
-      const ast = parser.parse('=-A1:B3', simpleCellAddress(0, 0, 0)).ast
+  it('check unary array arithmetic', () => {
+    const parser = buildEmptyParserWithCaching(config)
+    const ast = parser.parse('=-A1:B3', simpleCellAddress(0, 0, 0)).ast
 
-      const size = matrixSizePredictor.checkMatrixSize(ast, adr('A1'))
-      expect(size).toEqual(new MatrixSize(2, 3))
-    })
+    const size = matrixSizePredictor.checkMatrixSize(ast, adr('A1'))
+    expect(size).toEqual(new MatrixSize(2, 3))
+  })
 })

@@ -24,6 +24,10 @@ export class MatrixMapping {
     this.matrixMapping.delete(range.toString())
   }
 
+  public count(): number {
+    return this.matrixMapping.size
+  }
+
   public isFormulaMatrixInRow(sheet: number, row: number): boolean {
     for (const mtx of this.matrixMapping.values()) {
       if (mtx.spansThroughSheetRows(sheet, row)) {
@@ -77,30 +81,6 @@ export class MatrixMapping {
     }
     return false
   }
-
-  // public truncateMatricesByRows(rowsSpan: RowsSpan): MatrixVertex[] {
-  //   const verticesToRemove = Array<MatrixVertex>()
-  //   for (const [key, matrix] of this.numericMatricesInRows(rowsSpan)) {
-  //     matrix.removeRows(rowsSpan)
-  //     if (matrix.height === 0) {
-  //       this.removeMatrix(key)
-  //       verticesToRemove.push(matrix)
-  //     }
-  //   }
-  //   return verticesToRemove
-  // }
-  //
-  // public truncateMatricesByColumns(columnsSpan: ColumnsSpan): MatrixVertex[] {
-  //   const verticesToRemove = Array<MatrixVertex>()
-  //   for (const [key, matrix] of this.numericMatricesInColumns(columnsSpan)) {
-  //     matrix.removeColumns(columnsSpan)
-  //     if (matrix.width === 0) {
-  //       this.removeMatrix(key)
-  //       verticesToRemove.push(matrix)
-  //     }
-  //   }
-  //   return verticesToRemove
-  // }
 
   public destroy(): void {
     this.matrixMapping.clear()

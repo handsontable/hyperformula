@@ -577,9 +577,9 @@ describe('Removing rows - matrices', () => {
       ['3', '4'],
     ], { /* TODO matrixDetectionThreshold: 1 */})
 
-    expect(Array.from(engine.matrixMapping.numericMatrices()).length).toBe(1)
+    expect(engine.matrixMapping.count()).toBe(1)
     engine.removeRows(0, [0, 2])
-    expect(Array.from(engine.matrixMapping.numericMatrices()).length).toBe(0)
+    expect(engine.matrixMapping.count()).toBe(0)
     expect(engine.graph.nodes.size).toBe(0)
   })
 
@@ -590,9 +590,9 @@ describe('Removing rows - matrices', () => {
       ['foo', 'bar'],
     ], { /* TODO matrixDetectionThreshold: 1 */})
 
-    expect(Array.from(engine.matrixMapping.numericMatrices()).length).toBe(1)
+    expect(engine.matrixMapping.count()).toBe(1)
     engine.removeRows(0, [0, 3])
-    expect(Array.from(engine.matrixMapping.numericMatrices()).length).toBe(0)
+    expect(engine.matrixMapping.count()).toBe(0)
     expect(engine.graph.nodes.size).toBe(0)
   })
 
