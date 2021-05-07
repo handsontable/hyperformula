@@ -53,11 +53,10 @@ export const getCellType = (vertex: CellVertex | null): CellType => {
   if (vertex instanceof FormulaCellVertex || vertex instanceof ParsingErrorVertex) {
     return CellType.FORMULA
   }
-  if (vertex instanceof ValueCellVertex
-      || (vertex instanceof MatrixVertex && vertex.isNumeric())) {
+  if (vertex instanceof ValueCellVertex) {
     return CellType.VALUE
   }
-  if (vertex instanceof MatrixVertex && vertex.isFormula()) {
+  if (vertex instanceof MatrixVertex) {
     return CellType.MATRIX
   }
 

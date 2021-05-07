@@ -6,7 +6,7 @@
 import {SimpleCellAddress} from '../Cell'
 import {LazilyTransformingAstService} from '../LazilyTransformingAstService'
 import {AddressDependency, Ast, collectDependencies} from '../parser'
-import {FormulaCellVertex, MatrixVertex} from './FormulaCellVertex'
+import {FormulaVertex} from './FormulaCellVertex'
 import {RangeVertex} from './RangeVertex'
 import {Vertex} from './Vertex'
 import {DependencyGraph} from './DependencyGraph'
@@ -26,7 +26,7 @@ export const collectAddressesDependentToRange = (funcitonRegistry: FunctionRegis
   let formula: Ast
   let address: SimpleCellAddress
 
-  if (vertex instanceof FormulaCellVertex || (vertex instanceof MatrixVertex && vertex.isFormula())) {
+  if (vertex instanceof FormulaVertex) {
     formula = vertex.getFormula(lazilyTransformingAstService)
     address = vertex.getAddress(lazilyTransformingAstService)
   } else {

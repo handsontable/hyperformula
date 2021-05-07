@@ -11,6 +11,7 @@ import {InterpreterState} from '../InterpreterState'
 import {EmptyValue, InternalScalarValue, isExtendedNumber} from '../InterpreterValue'
 import {SimpleRangeValue} from '../SimpleRangeValue'
 import {ArgumentTypes, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
+import {FormulaVertex} from '../../DependencyGraph/FormulaCellVertex'
 
 /**
  * Interpreter plugin containing information functions
@@ -192,7 +193,7 @@ export class InformationPlugin extends FunctionPlugin implements FunctionPluginT
       () => new CellError(ErrorType.NA, ErrorMessage.WrongArgNumber),
       (reference: SimpleCellAddress) => {
         const vertex = this.dependencyGraph.addressMapping.getCell(reference)
-        return vertex instanceof FormulaCellVertex || (vertex instanceof MatrixVertex && vertex.isFormula())
+        return vertex instanceof FormulaVertex
       }
     )
   }

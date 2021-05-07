@@ -164,14 +164,6 @@ export class MatrixVertex extends FormulaVertex {
     this.formula = newFormula
   }
 
-  isFormula(): boolean {
-    return this.formula !== undefined
-  }
-
-  isNumeric(): boolean {
-    return this.formula === undefined
-  }
-
   spansThroughSheetRows(sheet: number, startRow: number, endRow: number = startRow): boolean {
     return (this.cellAddress.sheet === sheet) &&
       (this.cellAddress.row <= endRow) &&
