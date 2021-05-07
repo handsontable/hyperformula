@@ -14,7 +14,6 @@ Config.defaultConfig = Object.assign({}, Config.defaultConfig, {
   chooseAddressMappingPolicy: new AlwaysSparse(),
   functionPlugins: [],
   gpuMode: 'cpu',
-  matrixDetection: false,
   useStats: true,
   licenseKey: 'agpl-v3',
 })

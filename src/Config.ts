@@ -200,24 +200,6 @@ export interface ConfigParams {
    */
   localeLang: string,
   /**
-   * Enables numeric matrix detection feature when set to 'true'.
-   * During build phase each rectangular area of numbers will be treated as one matrix vertex in order to optimize further calculations.
-   * Some CRUD operations may break numeric matrices into individual vertices if needed.
-   *
-   * @default true
-   *
-   * @category Engine
-   */
-  matrixDetection: boolean,
-  /**
-   * Specifies how many cells an area must have in order to be treated as a matrix. Relevant only if [[matrixDetection]] is set to `true`.
-   *
-   * @default 100
-   *
-   * @category Engine
-   */
-  matrixDetectionThreshold: number,
-  /**
    * Sets the compatibility mode for behaviour of null value.
    * If set, formula evaluating to null evaluates to 0 instead.
    *
@@ -400,8 +382,6 @@ export class Config implements ConfigParams, ParserConfig {
     leapYear1900: false,
     smartRounding: true,
     localeLang: 'en',
-    matrixDetection: true,
-    matrixDetectionThreshold: 100,
     evaluateNullToZero: false,
     nullYear: 30,
     parseDateTime: defaultParseToDateTime,
@@ -455,13 +435,9 @@ export class Config implements ConfigParams, ParserConfig {
   /** @inheritDoc */
   public readonly leapYear1900: boolean
   /** @inheritDoc */
-  public readonly matrixDetection: boolean
-  /** @inheritDoc */
   public readonly ignorePunctuation: boolean
   /** @inheritDoc */
   public readonly localeLang: string
-  /** @inheritDoc */
-  public readonly matrixDetectionThreshold: number
   /** @inheritDoc */
   public readonly evaluateNullToZero: boolean
   /** @inheritDoc */
@@ -546,8 +522,6 @@ export class Config implements ConfigParams, ParserConfig {
       leapYear1900,
       localeLang,
       smartRounding,
-      matrixDetection,
-      matrixDetectionThreshold,
       evaluateNullToZero,
       nullYear,
       parseDateTime,
@@ -587,9 +561,6 @@ export class Config implements ConfigParams, ParserConfig {
     this.gpujs = gpujs ?? Config.defaultConfig.gpujs
     this.gpuMode = this.valueFromParam(gpuMode, PossibleGPUModeString, 'gpuMode')
     this.smartRounding = this.valueFromParam(smartRounding, 'boolean', 'smartRounding')
-    this.matrixDetection = this.valueFromParam(matrixDetection, 'boolean', 'matrixDetection')
-    this.matrixDetectionThreshold = this.valueFromParam(matrixDetectionThreshold, 'number', 'matrixDetectionThreshold')
-    this.validateNumberToBeAtLeast(this.matrixDetectionThreshold, 'matrixDetectionThreshold', 1)
     this.evaluateNullToZero = this.valueFromParam(evaluateNullToZero, 'boolean', 'evaluateNullToZero')
     this.nullYear = this.valueFromParam(nullYear, 'number', 'nullYear')
     this.validateNumberToBeAtLeast(this.nullYear, 'nullYear', 0)
