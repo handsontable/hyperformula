@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added ARRAYFORMULA function. (#630)
 - Added casting to scalars from non-range arrays. (#663)
 - Added support for range interpolation. (#665)
+- Added ARRAY_CONSTRAIN function. (#661)
 
 ### Fixed
 - Fixed an issue with arrays and cruds. (#651)

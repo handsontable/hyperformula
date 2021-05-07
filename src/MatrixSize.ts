@@ -4,9 +4,8 @@
  */
 
 import {AbsoluteCellRange} from './AbsoluteCellRange'
-import {CellError, ErrorType, SimpleCellAddress} from './Cell'
+import {SimpleCellAddress} from './Cell'
 import {Config} from './Config'
-import {ErrorMessage} from './error-message'
 import {FunctionRegistry} from './interpreter/FunctionRegistry'
 import {InterpreterState} from './interpreter/InterpreterState'
 import {Maybe} from './Maybe'
@@ -136,6 +135,26 @@ export class MatrixSizePredictor {
               return undefined
             }
             return subChecks[0]
+          }
+          case 'ARRAY_CONSTRAIN': {
+            if (ast.args.length !== 3) {
+              return undefined
+            }
+            if(subChecks[0]===undefined) {
+              return undefined
+            }
+            let height = subChecks[0].height
+            let width = subChecks[0].width
+            if(ast.args[1].type === AstNodeType.NUMBER) {
+              height = Math.min(height, ast.args[1].value)
+            }
+            if(ast.args[2].type === AstNodeType.NUMBER) {
+              width = Math.min(width, ast.args[2].value)
+            }
+            if(height<1 || width<1 || !Number.isInteger(height) || !Number.isInteger(width)) {
+              return undefined
+            }
+            return new MatrixSize(width, height)
           }
           default: {
             return new MatrixSize(1, 1)
