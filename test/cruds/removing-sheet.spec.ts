@@ -118,19 +118,6 @@ describe('remove sheet', () => {
     expect(engine.sheetMapping.numberOfSheets()).toBe(0)
     expect(Array.from(engine.addressMapping.entries())).toEqual([])
   })
-
-  it('should remove sheet with numeric matrix', () => {
-    const engine = HyperFormula.buildFromSheets({
-      Sheet1: [
-        ['1', '2'],
-      ],
-    }, { matrixDetection: true, matrixDetectionThreshold: 1 })
-
-    engine.removeSheet('Sheet1')
-
-    expect(engine.sheetMapping.numberOfSheets()).toBe(0)
-    expect(Array.from(engine.addressMapping.entries())).toEqual([])
-  })
 })
 
 describe('remove sheet - adjust edges', () => {

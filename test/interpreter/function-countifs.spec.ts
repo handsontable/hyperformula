@@ -121,7 +121,7 @@ describe('Function COUNTIFS', () => {
       ['1'],
       ['2'],
       ['=COUNTIFS(A1:A2, ">0")'],
-    ], { matrixDetection: true, matrixDetectionThreshold: 1 })
+    ], { /* TODO matrixDetectionThreshold: 1 */ })
 
     expect(engine.getCellValue(adr('A3'))).toEqual(2)
   })

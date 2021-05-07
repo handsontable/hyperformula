@@ -54,25 +54,6 @@ describe('Clear sheet content', () => {
     expect(changes.length).toEqual(2)
   })
 
-  it('should clear sheet with numeric matrix', () => {
-    const engine = HyperFormula.buildFromSheets({
-      Sheet1: [
-        ['1', '2'],
-      ],
-      Sheet2: [
-        ['=Sheet1!A1'],
-        ['=Sheet1!B1'],
-      ],
-    }, { matrixDetection: true, matrixDetectionThreshold: 1 })
-
-    const changes = engine.clearSheet('Sheet1')
-
-    expect(engine.getCellValue(adr('A1', 1))).toBe(null)
-    expect(engine.getCellValue(adr('A2', 1))).toBe(null)
-
-    expect(changes.length).toEqual(2)
-  })
-
   it('should clear sheet with matrix', () => {
     const engine = HyperFormula.buildFromSheets({
       Sheet1: [

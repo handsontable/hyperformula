@@ -74,17 +74,6 @@ describe('Removing rows - checking if its possible', () => {
     expect(engine.isItPossibleToRemoveRows(0, [4, 1])).toEqual(true)
   })
 
-  it('yes if theres a numeric matrix in place where we add', () => {
-    const engine = HyperFormula.buildFromArray([
-      ['1', '2'],
-      ['3', '4'],
-    ], {matrixDetection: true, matrixDetectionThreshold: 1})
-    expect(engine.matrixMapping.matrixMapping.size).toEqual(1)
-
-    expect(engine.isItPossibleToRemoveRows(0, [0, 1])).toEqual(true)
-    expect(engine.isItPossibleToRemoveRows(0, [1, 1])).toEqual(true)
-  })
-
   it('yes otherwise', () => {
     const engine = HyperFormula.buildFromArray([[]])
 
@@ -570,24 +559,11 @@ describe('Removing rows - matrices', () => {
     expect(() => engine.removeRows(0, [2, 1])).toThrowError('Cannot perform this operation, source location has a matrix inside.')
   })
 
-  it('should remove row from numeric matrix', () => {
-    const engine = HyperFormula.buildFromArray([
-      ['1', '2'],
-      ['3', '4'],
-    ], {matrixDetection: true, matrixDetectionThreshold: 1})
-
-    engine.removeRows(0, [1, 1])
-
-    const matrix = engine.addressMapping.fetchCell(adr('A1')) as MatrixVertex
-    expect(matrix).toBeInstanceOf(MatrixVertex)
-    expect(matrix.height).toBe(1)
-  })
-
   it('should remove rows when partial overlap', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '2'],
       ['3', '4'],
-    ], {matrixDetection: true, matrixDetectionThreshold: 1})
+    ], { /* TODO matrixDetectionThreshold: 1 */})
 
     engine.removeRows(0, [1, 3])
     const matrix = engine.addressMapping.fetchCell(adr('A1')) as MatrixVertex
@@ -599,7 +575,7 @@ describe('Removing rows - matrices', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '2'],
       ['3', '4'],
-    ], {matrixDetection: true, matrixDetectionThreshold: 1})
+    ], { /* TODO matrixDetectionThreshold: 1 */})
 
     expect(Array.from(engine.matrixMapping.numericMatrices()).length).toBe(1)
     engine.removeRows(0, [0, 2])
@@ -612,7 +588,7 @@ describe('Removing rows - matrices', () => {
       ['1', '2'],
       ['3', '4'],
       ['foo', 'bar'],
-    ], {matrixDetection: true, matrixDetectionThreshold: 1})
+    ], { /* TODO matrixDetectionThreshold: 1 */})
 
     expect(Array.from(engine.matrixMapping.numericMatrices()).length).toBe(1)
     engine.removeRows(0, [0, 3])
@@ -625,7 +601,7 @@ describe('Removing rows - matrices', () => {
       ['1', '2'],
       ['1', '2'],
       ['1', '2'],
-    ], {matrixDetection: true, matrixDetectionThreshold: 1})
+    ], { /* TODO matrixDetectionThreshold: 1 */})
     expect(engine.graph.nodes.size).toBe(1)
     engine.removeRows(0, [1, 2])
     expect(engine.graph.nodes.size).toBe(1)
@@ -636,7 +612,7 @@ describe('Removing rows - matrices', () => {
       ['1', '2', '=SUM(A1:B3)'],
       ['1', '2'],
       ['1', '2'],
-    ], {matrixDetection: true, matrixDetectionThreshold: 1})
+    ], { /* TODO matrixDetectionThreshold: 1 */})
 
     engine.removeRows(0, [1, 1])
 

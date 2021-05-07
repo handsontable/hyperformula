@@ -144,48 +144,6 @@ describe('GraphBuilder', () => {
   })
 })
 
-describe('GraphBuilder with matrix detection', () => {
-  it('matrix with plain numbers', () => {
-    const engine = HyperFormula.buildFromArray([
-      ['1', '2'],
-      ['3', '4'],
-    ], { matrixDetection: true, matrixDetectionThreshold: 1 })
-
-    const a1 = engine.addressMapping.fetchCell(adr('A1'))
-    expect(engine.addressMapping.fetchCell(adr('A2'))).toBe(a1)
-    expect(engine.addressMapping.fetchCell(adr('B1'))).toBe(a1)
-    expect(engine.addressMapping.fetchCell(adr('B2'))).toBe(a1)
-    expect(engine.addressMapping.getCellValue(adr('A1'))).toEqual(1)
-    expect(engine.addressMapping.getCellValue(adr('B1'))).toEqual(2)
-    expect(engine.addressMapping.getCellValue(adr('A2'))).toEqual(3)
-    expect(engine.addressMapping.getCellValue(adr('B2'))).toEqual(4)
-  })
-
-  it('matrix detection strategy and regular values', () => {
-    const engine = HyperFormula.buildFromArray([
-      ['1', 'foobar'],
-    ], { matrixDetection: true, matrixDetectionThreshold: 2 })
-
-    expect(engine.addressMapping.fetchCell(adr('A1'))).toBeInstanceOf(ValueCellVertex)
-    expect(engine.addressMapping.fetchCell(adr('B1'))).toBeInstanceOf(ValueCellVertex)
-  })
-
-  it('matrix detection threshold', () => {
-    const engine = HyperFormula.buildFromArray([
-      ['1', '2'],
-      ['3', '4'],
-      ['', ''],
-      ['1', '2'],
-      ['3', '4'],
-      ['5', '6'],
-    ], { matrixDetection: true, matrixDetectionThreshold: 6 })
-
-    expect(engine.addressMapping.fetchCell(adr('A1'))).toBeInstanceOf(ValueCellVertex)
-    expect(engine.addressMapping.fetchCell(adr('B2'))).toBeInstanceOf(ValueCellVertex)
-    expect(engine.addressMapping.fetchCell(adr('A4'))).toBeInstanceOf(MatrixVertex)
-  })
-})
-
 describe('Sheet size limits', () => {
   it('should throw error when trying to build engine with too many columns', () => {
     const maxColumns = Config.defaultConfig.maxColumns

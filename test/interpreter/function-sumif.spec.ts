@@ -167,7 +167,7 @@ describe('Function SUMIF - argument validations and combinations', () => {
       ['1'],
       ['2'],
       ['=SUMIF(A1:A2, ">0", A1:A2)'],
-    ], { matrixDetection: true, matrixDetectionThreshold: 1 })
+    ], { /* TODO matrixDetectionThreshold: 1 */ })
 
     expect(engine.getCellValue(adr('A3'))).toEqual(3)
   })

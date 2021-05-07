@@ -44,9 +44,6 @@ describe('Config', () => {
     expect( () => new Config({smartRounding: []})).toThrowError('Expected value of type: boolean for config parameter: smartRounding')
     // eslint-disable-next-line
     // @ts-ignore
-    expect( () => new Config({matrixDetection: 0})).toThrowError('Expected value of type: boolean for config parameter: matrixDetection')
-    // eslint-disable-next-line
-    // @ts-ignore
     expect( () => new Config({useColumnIndex: Symbol()})).toThrowError('Expected value of type: boolean for config parameter: useColumnIndex')
     // eslint-disable-next-line
     // @ts-ignore
@@ -54,9 +51,6 @@ describe('Config', () => {
   })
 
   it( 'validation: number params', () => {
-    // eslint-disable-next-line
-    // @ts-ignore
-    expect(() => new Config({matrixDetectionThreshold: 'abcd'})).toThrowError('Expected value of type: number for config parameter: matrixDetectionThreshold')
     // eslint-disable-next-line
     // @ts-ignore
     expect(() => new Config({nullYear: true})).toThrowError('Expected value of type: number for config parameter: nullYear')
@@ -159,13 +153,6 @@ describe('Config', () => {
     expect(() => new Config({ binarySearchThreshold: 42 })).not.toThrowError()
     expect(() => new Config({ binarySearchThreshold: Infinity })).not.toThrowError()
     expect(() => new Config({ binarySearchThreshold: 0 })).toThrowError('Config parameter binarySearchThreshold should be at least 1')
-  })
-
-  it('#matrixDetectionThreshold', () => {
-    expect(() => new Config({ matrixDetectionThreshold: 1 })).not.toThrowError()
-    expect(() => new Config({ matrixDetectionThreshold: 42 })).not.toThrowError()
-    expect(() => new Config({ matrixDetectionThreshold: Infinity })).not.toThrowError()
-    expect(() => new Config({ matrixDetectionThreshold: 0 })).toThrowError('Config parameter matrixDetectionThreshold should be at least 1')
   })
 
   it('#precisionEpsilon', () => {

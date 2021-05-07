@@ -139,7 +139,7 @@ describe('Function AVERAGEIF - argument validations and combinations', () => {
       ['1'],
       ['2'],
       ['=AVERAGEIF(A1:A2, ">0", A1:A2)'],
-    ], { matrixDetection: true, matrixDetectionThreshold: 1 })
+    ], { /* TODO matrixDetectionThreshold: 1 */ })
 
     expect(engine.getCellValue(adr('A3'))).toEqual(1.5)
   })

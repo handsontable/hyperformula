@@ -326,57 +326,6 @@ describe('Copy - paste integration', () => {
     ], changes)
   })
 
-  it('should copy values from numeric matrix', () => {
-    const engine = HyperFormula.buildFromArray([
-      ['1', '2'],
-      ['3', '4'],
-    ], { matrixDetection: true, matrixDetectionThreshold: 1})
-    expect(engine.matrixMapping.matrixMapping.size).toEqual(1)
-
-    engine.copy(adr('A1'), 2, 2)
-    engine.paste(adr('A3'))
-
-    expect(engine.matrixMapping.matrixMapping.size).toEqual(1)
-    expect(engine.getCellValue(adr('A3'))).toEqual(1)
-    expect(engine.getCellValue(adr('B3'))).toEqual(2)
-    expect(engine.getCellValue(adr('A4'))).toEqual(3)
-    expect(engine.getCellValue(adr('B4'))).toEqual(4)
-  })
-
-  it('should be possible to paste string onto numeric matrix', () => {
-    const engine = HyperFormula.buildFromArray([
-      ['foo'],
-      ['3', '4'],
-    ], { matrixDetection: true, matrixDetectionThreshold: 1})
-    expect(engine.matrixMapping.matrixMapping.size).toEqual(1)
-
-    engine.copy(adr('A1'), 1, 1)
-    engine.paste(adr('A2'))
-
-    expect(engine.matrixMapping.matrixMapping.size).toEqual(0)
-    expect(engine.getCellValue(adr('A2'))).toEqual('foo')
-    expect(engine.getCellValue(adr('B2'))).toEqual(4)
-  })
-
-  it('should be possible to copy numeric matrix onto itself', () => {
-    const engine = HyperFormula.buildFromArray([
-      ['1', '2'],
-      ['3', '4'],
-    ], { matrixDetection: true, matrixDetectionThreshold: 1})
-    expect(engine.matrixMapping.matrixMapping.size).toEqual(1)
-
-    engine.copy(adr('A1'), 2, 2)
-    engine.paste(adr('B1'))
-
-    expect(engine.matrixMapping.matrixMapping.size).toEqual(0)
-    expect(engine.getCellValue(adr('A1'))).toEqual(1)
-    expect(engine.getCellValue(adr('A2'))).toEqual(3)
-    expect(engine.getCellValue(adr('B1'))).toEqual(1)
-    expect(engine.getCellValue(adr('B2'))).toEqual(3)
-    expect(engine.getCellValue(adr('C1'))).toEqual(2)
-    expect(engine.getCellValue(adr('C2'))).toEqual(4)
-  })
-
   it('should copy values from formula matrix', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '2'],

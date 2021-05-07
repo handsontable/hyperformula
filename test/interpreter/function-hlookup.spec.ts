@@ -203,14 +203,6 @@ describe('Function HLOOKUP', () => {
       expect(engine.getCellValue(adr('A1'))).toEqual(3)
     })
 
-    it('should work for detected matrices', () => {
-      const engine = HyperFormula.buildFromArray([
-        ['=HLOOKUP(3, C1:E1, 1, TRUE())', '1', '2', '3']
-      ], {matrixDetection: true, matrixDetectionThreshold: 1})
-
-      expect(engine.getCellValue(adr('A1'))).toEqual(3)
-    })
-
     it('should calculate indexes properly when using binary search', () => {
       const engine = HyperFormula.buildFromArray([
         ['=HLOOKUP(4, E1:J1, 1, TRUE())', null, null, null, '1', '2', '3', '4', '5']

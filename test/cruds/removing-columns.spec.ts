@@ -72,17 +72,6 @@ describe('Removing columns - checking if its possible', () => {
     expect(engine.isItPossibleToRemoveColumns(0, [4, 1])).toEqual(true)
   })
 
-  it('yes if theres a numeric matrix in place where we add', () => {
-    const engine = HyperFormula.buildFromArray([
-      ['1', '2'],
-      ['3', '4'],
-    ], {matrixDetection: true, matrixDetectionThreshold: 1})
-    expect(engine.matrixMapping.matrixMapping.size).toEqual(1)
-
-    expect(engine.isItPossibleToRemoveColumns(0, [0, 1])).toEqual(true)
-    expect(engine.isItPossibleToRemoveColumns(0, [1, 1])).toEqual(true)
-  })
-
   it('yes otherwise', () => {
     const engine = HyperFormula.buildFromArray([[]])
 
@@ -512,24 +501,11 @@ describe('Removing columns - matrices', () => {
     expect(() => engine.removeColumns(0, [2, 1])).toThrowError('Cannot perform this operation, source location has a matrix inside.')
   })
 
-  it('should remove column from numeric matrix', () => {
-    const engine = HyperFormula.buildFromArray([
-      ['1', '2', '3'],
-      ['1', '2', '3'],
-    ], {matrixDetection: true, matrixDetectionThreshold: 1})
-
-    engine.removeColumns(0, [1, 1])
-
-    const matrix = engine.addressMapping.fetchCell(adr('A1')) as MatrixVertex
-    expect(matrix).toBeInstanceOf(MatrixVertex)
-    expect(matrix.width).toBe(2)
-  })
-
   it('should remove columns when partial overlap', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '2'],
       ['3', '4'],
-    ], {matrixDetection: true, matrixDetectionThreshold: 1})
+    ], {matrixDetectionThreshold: 1})
 
     engine.removeColumns(0, [1, 3])
     const matrix = engine.addressMapping.fetchCell(adr('A1')) as MatrixVertex
@@ -541,7 +517,7 @@ describe('Removing columns - matrices', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '2'],
       ['3', '4'],
-    ], {matrixDetection: true, matrixDetectionThreshold: 1})
+    ], {matrixDetectionThreshold: 1})
 
     expect(Array.from(engine.matrixMapping.numericMatrices()).length).toBe(1)
     engine.removeColumns(0, [0, 2])
@@ -554,7 +530,7 @@ describe('Removing columns - matrices', () => {
       ['1', '2'],
       ['3', '4'],
       ['foo', 'bar'],
-    ], {matrixDetection: true, matrixDetectionThreshold: 1})
+    ], {matrixDetectionThreshold: 1})
 
     expect(Array.from(engine.matrixMapping.numericMatrices()).length).toBe(1)
     engine.removeColumns(0, [0, 3])
@@ -566,7 +542,7 @@ describe('Removing columns - matrices', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '2', '3'],
       ['1', '2', '3'],
-    ], {matrixDetection: true, matrixDetectionThreshold: 1})
+    ], {matrixDetectionThreshold: 1})
     expect(engine.graph.nodes.size).toBe(1)
     engine.removeColumns(0, [1, 1])
     expect(engine.graph.nodes.size).toBe(1)
@@ -577,7 +553,7 @@ describe('Removing columns - matrices', () => {
       ['1', '1', '1'],
       ['2', '2', '2'],
       ['=SUM(A1:C2)'],
-    ], {matrixDetection: true, matrixDetectionThreshold: 1})
+    ], {matrixDetectionThreshold: 1})
 
     expect(engine.getCellValue(adr('A3'))).toEqual(9)
 

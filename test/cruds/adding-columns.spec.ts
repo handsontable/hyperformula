@@ -80,17 +80,6 @@ describe('Adding column - checking if its possible', () => {
     expect(engine.isItPossibleToAddColumns(0, [0, 1], [5, 1])).toEqual(false)
   })
 
-  it('yes if theres a numeric matrix in place where we add', () => {
-    const engine = HyperFormula.buildFromArray([
-      ['1', '2'],
-      ['3', '4'],
-    ], {matrixDetection: true, matrixDetectionThreshold: 1})
-    expect(engine.matrixMapping.matrixMapping.size).toEqual(1)
-
-    expect(engine.isItPossibleToAddColumns(0, [0, 1])).toEqual(true)
-    expect(engine.isItPossibleToAddColumns(0, [1, 1])).toEqual(true)
-  })
-
   it('yes otherwise', () => {
     const engine = HyperFormula.buildFromArray([[]])
 
@@ -252,23 +241,6 @@ describe('Adding column - MatrixVertex', () => {
     engine.addColumns(0, [1, 1])
 
     expect(extractMatrixRange(engine, adr('A1', 1))).toEqual(new AbsoluteCellRange(adr('A1'), adr('C2')))
-  })
-})
-
-describe('Adding column - numeric matrix', () => {
-  it('add column inside numeric matrix, expand matrix', () => {
-    const engine = HyperFormula.buildFromArray([
-      ['1', '2'],
-      ['3', '4'],
-    ], { matrixDetection: true, matrixDetectionThreshold: 1})
-
-    expect(engine.getCellValue(adr('B1'))).toEqual(2)
-
-    engine.addColumns(0, [1, 2])
-
-    expect(engine.getCellValue(adr('B1'))).toEqual(0)
-    expect(engine.getCellValue(adr('C1'))).toEqual(0)
-    expect(engine.getCellValue(adr('D1'))).toEqual(2)
   })
 })
 

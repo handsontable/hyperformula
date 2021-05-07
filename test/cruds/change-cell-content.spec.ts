@@ -45,16 +45,6 @@ describe('Changing cell content - checking if its possible', () => {
     expect(engine.isItPossibleToSetCellContents(cellInLastRow, 1, 2)).toEqual(false)
   })
 
-  it('yes if numeric matrix', () => {
-    const engine = HyperFormula.buildFromArray([
-      ['1', '2'],
-      ['3', '4'],
-    ], {matrixDetection: true, matrixDetectionThreshold: 1})
-    expect(engine.matrixMapping.matrixMapping.size).toEqual(1)
-
-    expect(engine.isItPossibleToSetCellContents(adr('A2'))).toBe(true)
-  })
-
   it('yes otherwise', () => {
     const engine = HyperFormula.buildFromArray([[]])
 
@@ -389,17 +379,6 @@ describe('changing cell content', () => {
     expect(engine.getCellValue(adr('A1'))).toBe('foo')
   })
 
-  it('change numeric value inside matrix to another number', () => {
-    const engine = HyperFormula.buildFromArray([
-      ['1', '2'],
-      ['3', '4'],
-    ], {matrixDetection: true, matrixDetectionThreshold: 1})
-
-    expect(engine.getCellValue(adr('A1'))).toBe(1)
-    engine.setCellContents(adr('A1'), '5')
-    expect(engine.getCellValue(adr('A1'))).toBe(5)
-  })
-
   it('ensure that only part of the tree is evaluated', () => {
     const sheet = [
       ['1', '2'],
@@ -506,19 +485,6 @@ describe('changing cell content', () => {
 
     expect(changes.length).toBe(5)
     expectArrayWithSameContent(changes.map((change) => change.newValue), [2, 10, 12, 18, 22])
-  })
-
-  it('returns change of numeric matrix', () => {
-    const sheet = [
-      ['1', '2'],
-      ['3', '4'],
-    ]
-    const engine = HyperFormula.buildFromArray(sheet, {matrixDetection: true, matrixDetectionThreshold: 1})
-
-    const changes = engine.setCellContents(adr('A1'), '7')
-
-    expect(changes.length).toBe(1)
-    expect(changes).toContainEqual(new ExportedCellChange(simpleCellAddress(0, 0, 0), 7 ))
   })
 
   it('update empty cell to parsing error ', () => {
@@ -712,68 +678,12 @@ describe('updating column index', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '2'],
       ['3', '15'],
-    ], {matrixDetection: false, binarySearchThreshold: 1, useColumnIndex: true})
+    ], {binarySearchThreshold: 1, useColumnIndex: true})
 
     engine.setCellContents(adr('B2'), '8')
 
     expectArrayWithSameContent((engine.columnSearch as ColumnIndex).getValueIndex(0, 1, 4).index, [])
     expectArrayWithSameContent((engine.columnSearch as ColumnIndex).getValueIndex(0, 1, 8).index, [1])
-  })
-
-  it('should update column index when changing value inside numeric matrix', () => {
-    const engine = HyperFormula.buildFromArray([
-      ['1', '2'],
-      ['3', '15'],
-    ], {matrixDetection: true, matrixDetectionThreshold: 1, binarySearchThreshold: 1, useColumnIndex: true})
-
-    engine.setCellContents(adr('B2'), '8')
-
-    expectArrayWithSameContent((engine.columnSearch as ColumnIndex).getValueIndex(0, 1, 4).index, [])
-    expectArrayWithSameContent((engine.columnSearch as ColumnIndex).getValueIndex(0, 1, 8).index, [1])
-  })
-})
-
-describe('numeric matrices', () => {
-  it('should not break matrix into single vertices when changing to numeric value', () => {
-    const engine = HyperFormula.buildFromArray([
-      ['1', '2'],
-      ['3', '4'],
-    ], {matrixDetection: true, matrixDetectionThreshold: 1})
-
-    engine.setCellContents(adr('A1'), '7')
-
-    expect(engine.graph.nodesCount()).toBe(1)
-    expect(Array.from(engine.matrixMapping.numericMatrices()).length).toBe(1)
-    expect(engine.getCellValue(adr('A1'))).toBe(7)
-  })
-
-  it('should allow to change numeric matrix cell to non-numeric value', () => {
-    const engine = HyperFormula.buildFromArray([
-      ['1', '2'],
-      ['3', '4'],
-    ], {matrixDetection: true, matrixDetectionThreshold: 1})
-
-    engine.setCellContents(adr('A1'), 'foo')
-
-    expect(engine.graph.nodesCount()).toBe(4)
-    expect(Array.from(engine.matrixMapping.numericMatrices()).length).toBe(0)
-    expect(engine.getCellValue(adr('A1'))).toEqual('foo')
-  })
-
-  it('should break only affected matrix', () => {
-    const engine = HyperFormula.buildFromArray([
-      ['1', '2'],
-      ['3', '4'],
-      [null],
-      ['5', '6'],
-      ['7', '8'],
-    ], {matrixDetection: true, matrixDetectionThreshold: 1})
-
-    engine.setCellContents(adr('A1'), 'foo')
-
-    expect(engine.graph.nodesCount()).toBe(5)
-    expect(Array.from(engine.matrixMapping.numericMatrices()).length).toBe(1)
-    expect(engine.getCellValue(adr('A1'))).toBe('foo')
   })
 })
 

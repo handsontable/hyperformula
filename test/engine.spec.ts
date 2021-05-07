@@ -163,18 +163,6 @@ describe('#getCellFormula', () => {
     expect(engine.getCellFormula(adr('B4'))).toEqual(undefined)
   })
 
-  it('returns undefined for numeric matrices', () => {
-    const engine = HyperFormula.buildFromArray([
-      ['1', '1'],
-      ['1', '1'],
-    ], {matrixDetection: true, matrixDetectionThreshold: 1})
-
-    expect(engine.getCellFormula(adr('A1'))).toEqual(undefined)
-    expect(engine.getCellFormula(adr('A2'))).toEqual(undefined)
-    expect(engine.getCellFormula(adr('B1'))).toEqual(undefined)
-    expect(engine.getCellFormula(adr('B2'))).toEqual(undefined)
-  })
-
   it('returns invalid formula literal', () => {
     const engine = HyperFormula.buildFromArray([
       ['=SUM(']
@@ -282,15 +270,6 @@ describe('#getCellValue', () => {
 
     expect(engine.getCellValue(adr('A2'))).toEqual(1)
     expect(engine.getCellValue(adr('A3'))).toEqual(2)
-  })
-
-  it('should return value of a cell in numeric matrix', () => {
-    const engine = HyperFormula.buildFromArray([
-      ['1', '2'],
-    ], {matrixDetection: true, matrixDetectionThreshold: 1})
-
-    expect(engine.getCellValue(adr('A1'))).toEqual(1)
-    expect(engine.getCellValue(adr('B1'))).toEqual(2)
   })
 
   it('should return translated error', () => {
@@ -422,16 +401,6 @@ describe('#getCellSerialized', () => {
 
     expect(engine.getCellSerialized(adr('A2'))).toEqual('{=TRANSPOSE(A1:B1)}')
     expect(engine.getCellSerialized(adr('A3'))).toEqual('{=TRANSPOSE(A1:B1)}')
-  })
-
-  it('should return value of a cell in numeric matrix', () => {
-    const engine = HyperFormula.buildFromArray([
-      ['1', '2'],
-    ], {matrixDetection: true, matrixDetectionThreshold: 1})
-
-    //we are losing info about original values for values inside matrices
-    expect(engine.getCellSerialized(adr('A1'))).toEqual(1)
-    expect(engine.getCellSerialized(adr('B1'))).toEqual(2)
   })
 
   it('should return translated error', () => {
@@ -581,15 +550,6 @@ describe('#getCellType', () => {
     const engine = HyperFormula.buildFromArray([['=SUM(1, 2)']])
 
     expect(engine.getCellType(adr('A1'))).toBe(CellType.FORMULA)
-  })
-
-  it('numeric matrix', () => {
-    const engine = HyperFormula.buildFromArray([
-      ['1', '2'],
-    ], {matrixDetection: true, matrixDetectionThreshold: 1})
-
-    expect(engine.getCellType(adr('A1'))).toBe(CellType.VALUE)
-    expect(engine.getCellType(adr('B1'))).toBe(CellType.VALUE)
   })
 
   it('formula matrix', () => {

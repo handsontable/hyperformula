@@ -82,17 +82,6 @@ describe('Adding row - checking if its possible', () => {
     expect(engine.isItPossibleToAddRows(0, [0, 1], [5, 1])).toEqual(false)
   })
 
-  it('yes if theres a numeric matrix in place where we add', () => {
-    const engine = HyperFormula.buildFromArray([
-      ['1', '2'],
-      ['3', '4'],
-    ], {matrixDetection: true, matrixDetectionThreshold: 1})
-    expect(engine.matrixMapping.matrixMapping.size).toEqual(1)
-
-    expect(engine.isItPossibleToAddRows(0, [0, 1])).toEqual(true)
-    expect(engine.isItPossibleToAddRows(0, [1, 1])).toEqual(true)
-  })
-
   it('yes otherwise', () => {
     const engine = HyperFormula.buildFromArray([[]])
 
@@ -283,23 +272,6 @@ describe('Adding row - FormulaCellVertex#address update', () => {
     expect(formulaVertex.getAddress(engine.lazilyTransformingAstService)).toEqual(simpleCellAddress(1, 0, 0))
     formulaVertex.getFormula(engine.lazilyTransformingAstService) // force transformations to be applied
     expect(formulaVertex.getAddress(engine.lazilyTransformingAstService)).toEqual(simpleCellAddress(1, 0, 0))
-  })
-})
-
-describe('Adding row - matrices adjustments', () => {
-  it('add row inside numeric matrix, expand matrix', () => {
-    const engine = HyperFormula.buildFromArray([
-      ['1', '2'],
-      ['3', '4'],
-    ], {matrixDetection: true, matrixDetectionThreshold: 1})
-
-    expect(engine.getCellValue(adr('A2'))).toEqual(3)
-
-    engine.addRows(0, [1, 2])
-
-    expect(engine.getCellValue(adr('A2'))).toEqual(0)
-    expect(engine.getCellValue(adr('A3'))).toEqual(0)
-    expect(engine.getCellValue(adr('A4'))).toEqual(3)
   })
 })
 
