@@ -283,8 +283,8 @@ export class Operations {
     const sourceRange = AbsoluteCellRange.spanFrom(sourceLeftCorner, width, height)
     const targetRange = AbsoluteCellRange.spanFrom(destinationLeftCorner, width, height)
 
-    this.dependencyGraph.breakNumericMatricesInRange(sourceRange)
-    this.dependencyGraph.breakNumericMatricesInRange(targetRange)
+    // this.dependencyGraph.breakNumericMatricesInRange(sourceRange)
+    // this.dependencyGraph.breakNumericMatricesInRange(targetRange)
 
     const toRight = destinationLeftCorner.col - sourceLeftCorner.col
     const toBottom = destinationLeftCorner.row - sourceLeftCorner.row
@@ -321,7 +321,6 @@ export class Operations {
     for(const [source, target] of rowMapping ) {
       if(source!==target) {
         const rowRange = AbsoluteCellRange.spanFrom({sheet: sheetId, col: 0, row: source}, Infinity, 1)
-        this.dependencyGraph.breakNumericMatricesInRange(rowRange)
         const row = this.getRangeClipboardCells(rowRange)
         oldContent = oldContent.concat(row)
         buffer.push(
@@ -343,7 +342,6 @@ export class Operations {
     for(const [source, target] of columnMapping ) {
       if(source!==target) {
         const rowRange = AbsoluteCellRange.spanFrom({sheet: sheetId, col: source, row: 0}, 1, Infinity)
-        this.dependencyGraph.breakNumericMatricesInRange(rowRange)
         const column = this.getRangeClipboardCells(rowRange)
         oldContent = oldContent.concat(column)
         buffer.push(
@@ -628,19 +626,7 @@ export class Operations {
 
     let vertex = this.dependencyGraph.getCell(address)
 
-    if (vertex instanceof MatrixVertex && !vertex.isFormula() && !(parsedCellContent instanceof CellContent.Number)) {
-      this.dependencyGraph.breakNumericMatrix(vertex)
-      vertex = this.dependencyGraph.getCell(address)
-    }
-
-    if (vertex instanceof MatrixVertex && !vertex.isFormula() && parsedCellContent instanceof CellContent.Number) {
-      const newValue = parsedCellContent.value
-      const oldValue = this.dependencyGraph.getCellValue(address)
-      this.dependencyGraph.graph.markNodeAsSpecialRecentlyChanged(vertex)
-      vertex.setMatrixCellValue(address, getRawValue(newValue))
-      this.columnSearch.change(getRawValue(oldValue), getRawValue(newValue), address)
-      this.changes.addChange(newValue, address)
-    } else if (!(vertex instanceof MatrixVertex)) {
+    if (!(vertex instanceof MatrixVertex)) {
       if (parsedCellContent instanceof CellContent.Formula) {
         const {ast, errors, hasVolatileFunction, hasStructuralChangeFunction, dependencies} = this.parser.parse(parsedCellContent.formula, address)
         if (errors.length > 0) {
