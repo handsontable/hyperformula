@@ -7,7 +7,6 @@ import {SimpleCellAddress} from '../../Cell'
 import {RawCellContent} from '../../CellContentParser'
 import {NoSheetWithIdError} from '../../errors'
 import {EmptyValue, InterpreterValue} from '../../interpreter/InterpreterValue'
-import {Sheet, SheetBoundaries} from '../../Sheet'
 import {ColumnsSpan, RowsSpan} from '../../Span'
 import {MatrixVertex, ValueCellVertex} from '../index'
 import {CellVertex} from '../Vertex'
@@ -96,6 +95,25 @@ export class AddressMapping {
       throw Error('Sheet not initialized')
     }
     sheetMapping.setCell(address, newVertex)
+  }
+
+  public moveCell(source: SimpleCellAddress, destination: SimpleCellAddress) {
+    const sheetMapping = this.mapping.get(source.sheet)
+    if (!sheetMapping) {
+      throw Error('Sheet not initialized')
+    }
+    if (source.sheet !== destination.sheet) {
+      throw Error('Cannot move cells between sheets')
+    }
+    if (sheetMapping.has(destination)) {
+      throw new Error('Cannot move cell. Destination already occupied.')
+    }
+    const vertex = sheetMapping.getCell(source)
+    if (vertex === undefined) {
+      throw new Error('Cannot move cell. No cell with such address.')
+    }
+    this.setCell(destination, vertex)
+    this.removeCell(source)
   }
 
   public removeCell(address: SimpleCellAddress) {

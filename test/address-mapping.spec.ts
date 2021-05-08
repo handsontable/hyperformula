@@ -315,12 +315,44 @@ const sharedExamples = (builder: (width: number, height: number) => AddressMappi
     mapping.setCell(adr('A3'), new EmptyCellVertex({sheet: 0, row: 0, col: 0}))
     expect(mapping.getHeight(0)).toBe(3)
   })
+
+  it('should move cell from source to destination', () => {
+    const mapping = builder(1, 2)
+    mapping.setCell(adr('A1'), new ValueCellVertex(42, 42))
+
+    mapping.moveCell(adr('A1'), adr('A2'))
+
+    expect(mapping.has(adr('A1'))).toEqual(false)
+    expect(mapping.has(adr('A2'))).toEqual(true)
+  })
+
+  it('should throw error when trying to move not existing vertex', () => {
+    const mapping = builder(1, 2)
+
+    expect(() => mapping.moveCell(adr('A1'), adr('A2'))).toThrow(Error('Cannot move cell. No cell with such address.'))
+  })
+
+  it('should throw error when trying to move vertex onto occupied place', () => {
+    const mapping = builder(1, 2)
+    mapping.setCell(adr('A1'), new ValueCellVertex(42, 42))
+    mapping.setCell(adr('A2'), new ValueCellVertex(42, 42))
+
+    expect(() => mapping.moveCell(adr('A1'), adr('A2'))).toThrow(Error('Cannot move cell. Destination already occupied.'))
+  })
+
+  it('should throw error when trying to move vertices between sheets', () => {
+    const mapping = builder(1, 2)
+    mapping.setCell(adr('A1', 0), new ValueCellVertex(42, 42))
+
+    expect(() => mapping.moveCell(adr('A1', 0), adr('A2', 1))).toThrow('Cannot move cells between sheets.')
+  })
 }
 
 describe('SparseStrategy', () => {
   sharedExamples((maxCol: number, maxRow: number) => {
     const mapping = new AddressMapping(new AlwaysSparse())
     mapping.addSheet(0, new SparseStrategy(maxCol, maxRow))
+    mapping.addSheet(1, new SparseStrategy(maxCol, maxRow))
     return mapping
   })
 
@@ -339,6 +371,7 @@ describe('DenseStrategy', () => {
   sharedExamples((maxCol, maxRow) => {
     const mapping = new AddressMapping(new AlwaysDense())
     mapping.addSheet(0, new DenseStrategy(maxCol, maxRow))
+    mapping.addSheet(1, new DenseStrategy(maxCol, maxRow))
     return mapping
   })
 
