@@ -54,7 +54,10 @@ export class EngineComparator {
         const actualVertex = this.actual.addressMapping.getCell(address)
         if (expectedVertex === null && actualVertex === null) {
           continue
-        } else if (expectedVertex instanceof FormulaCellVertex && actualVertex instanceof FormulaCellVertex) {
+        } else if (
+          (expectedVertex instanceof FormulaCellVertex  && actualVertex instanceof FormulaCellVertex) ||
+          (expectedVertex instanceof MatrixVertex  && actualVertex instanceof MatrixVertex)
+        ) {
           const actualVertexAddress = actualVertex.getAddress(this.actual.dependencyGraph.lazilyTransformingAstService)
           const expectedVertexAddress = expectedVertex.getAddress(this.expected.dependencyGraph.lazilyTransformingAstService)
           deepStrictEqual(actualVertexAddress, expectedVertexAddress, `Different addresses in formulas. expected: ${actualVertexAddress}, actual: ${expectedVertexAddress}`)
@@ -64,8 +67,6 @@ export class EngineComparator {
           deepStrictEqual(actualVertex.getCellValue(), expectedVertex.getCellValue(), `Different values. expected: ${expectedVertex.getCellValue().toString()}, actual: ${actualVertex.getCellValue().toString()}`)
         } else if (expectedVertex instanceof EmptyCellVertex && actualVertex instanceof EmptyCellVertex) {
           continue
-        } else if (expectedVertex instanceof MatrixVertex && actualVertex instanceof MatrixVertex) {
-          throw Error('Not implemented yet.')
         } else {
           throw Error('Different vertex types')
         }
