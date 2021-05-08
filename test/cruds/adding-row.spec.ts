@@ -59,21 +59,6 @@ describe('Adding row - checking if its possible', () => {
     expect(engine.isItPossibleToAddRows(-Infinity, [0, 1])).toEqual(false)
   })
 
-  it('no if theres a formula matrix in place where we add', () => {
-    const engine = HyperFormula.buildFromArray([
-      ['1', '2'],
-      ['3', '4'],
-      ['=TRANSPOSE(A1:B2)'],
-      [],
-      ['13'],
-    ])
-
-    expect(engine.isItPossibleToAddRows(0, [1, 1])).toEqual(true)
-    expect(engine.isItPossibleToAddRows(0, [2, 1])).toEqual(true)
-    expect(engine.isItPossibleToAddRows(0, [3, 1])).toEqual(false)
-    expect(engine.isItPossibleToAddRows(0, [4, 1])).toEqual(true)
-  })
-
   it('no if adding row would exceed sheet size limit', () => {
     const engine = HyperFormula.buildFromArray(
       Array(Config.defaultConfig.maxRows - 1).fill([''])
