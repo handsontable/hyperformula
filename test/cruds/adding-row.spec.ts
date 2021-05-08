@@ -4,7 +4,8 @@ import {simpleCellAddress} from '../../src/Cell'
 import {Config} from '../../src/Config'
 import {FormulaCellVertex, MatrixVertex} from '../../src/DependencyGraph'
 import {ColumnIndex} from '../../src/Lookup/ColumnIndex'
-import {adr, expectArrayWithSameContent, extractMatrixRange} from '../testUtils'
+import {adr, expectArrayWithSameContent, expectEngineToBeTheSameAs, extractMatrixRange} from '../testUtils'
+import {AlwaysDense} from '../../src/DependencyGraph/AddressMapping/ChooseAddressMappingPolicy'
 
 describe('Adding row - checking if its possible', () => {
   it('no if starting row is negative', () => {
@@ -89,19 +90,45 @@ describe('Adding row - checking if its possible', () => {
   })
 })
 
-describe('Adding row - matrix check', () => {
-  it('raise error if trying to add a row in a row with matrix', () => {
+describe('Adding row - matrix', () => {
+  it('should be possible to add row crossing matrix', () => {
     const engine = HyperFormula.buildFromArray([
-      ['1', '2'],
-      ['3', '4'],
-      ['=TRANSPOSE(A1:B2)'],
-      [],
-      ['13'],
-    ])
+      ['1', '2', '3'],
+      ['4', '5', '6'],
+      ['foo', '=TRANSPOSE(A1:C2)'],
+      ['bar'],
+    ], {chooseAddressMappingPolicy: new AlwaysDense()})
 
-    expect(() => {
-      engine.addRows(0, [3, 1])
-    }).toThrowError('Cannot perform this operation, target location has a matrix inside.')
+    engine.addRows(0, [3, 1])
+
+    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
+      ['1', '2', '3'],
+      ['4', '5', '6'],
+      ['foo', '=TRANSPOSE(A1:C2)'],
+      [null],
+      ['bar'],
+    ]))
+  })
+
+  it('should adjust matrix address mapping when adding multiple rows', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1', '2', '3'],
+      ['4', '5', '6'],
+      ['foo', '=TRANSPOSE(A1:C2)'],
+      ['bar'],
+    ], {chooseAddressMappingPolicy: new AlwaysDense()})
+
+    engine.addRows(0, [3, 3])
+
+    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
+      ['1', '2', '3'],
+      ['4', '5', '6'],
+      ['foo', '=TRANSPOSE(A1:C2)'],
+      [null],
+      [null],
+      [null],
+      ['bar'],
+    ]))
   })
 
   it('should be possible to add row right above matrix', () => {

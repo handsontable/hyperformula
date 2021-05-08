@@ -455,13 +455,6 @@ export class CrudOperations {
       if (!isNonnegativeInteger(row) || !isPositiveInteger(numberOfRowsToAdd)) {
         throw new InvalidArgumentsError('row number to be nonnegative and number of rows to add to be positive.')
       }
-
-      if (isPositiveInteger(row)
-        && this.dependencyGraph.matrixMapping.isFormulaMatrixInRow(sheet, row - 1)
-        && this.dependencyGraph.matrixMapping.isFormulaMatrixInRow(sheet, row)
-      ) {
-        throw new TargetLocationHasMatrixError()
-      }
     }
   }
 

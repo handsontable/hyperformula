@@ -28,6 +28,14 @@ export class MatrixMapping {
     return this.matrixMapping.size
   }
 
+  public* matricesInRows(rowsSpan: RowsSpan): IterableIterator<[string, MatrixVertex]> {
+    for (const [mtxKey, mtx] of this.matrixMapping.entries()) {
+      if (mtx.spansThroughSheetRows(rowsSpan.sheet, rowsSpan.rowStart, rowsSpan.rowEnd)) {
+        yield [mtxKey, mtx]
+      }
+    }
+  }
+
   public isFormulaMatrixInRow(sheet: number, row: number): boolean {
     for (const mtx of this.matrixMapping.values()) {
       if (mtx.spansThroughSheetRows(sheet, row)) {

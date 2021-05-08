@@ -378,6 +378,10 @@ export class DependencyGraph {
       this.addressMapping.addRows(addedRows.sheet, addedRows.rowStart, addedRows.numberOfRows)
     })
 
+    this.stats.measure(StatType.ADJUSTING_MATRIX_MAPPING, () => {
+      this.fixMatricesAfterAddingRow(addedRows.sheet, addedRows.rowStart, addedRows.numberOfRows)
+    })
+
     this.stats.measure(StatType.ADJUSTING_RANGES, () => {
       this.rangeMapping.moveAllRangesInSheetAfterRowByRows(addedRows.sheet, addedRows.rowStart, addedRows.numberOfRows)
       this.fixRangesWhenAddingRows(addedRows.sheet, addedRows.rowStart, addedRows.numberOfRows)
@@ -841,6 +845,22 @@ export class DependencyGraph {
     }
     for (const rangeVertex of verticesToRemove) {
       this.removeVertexAndCleanupDependencies(rangeVertex)
+    }
+  }
+
+  private fixMatricesAfterAddingRow(sheet: number, rowStart: number, numberOfRows: number) {
+    if (rowStart <= 0) {
+      return
+    }
+    for (const [, matrix] of this.matrixMapping.matricesInRows(RowsSpan.fromRowStartAndEnd(sheet, rowStart-1, rowStart-1))) {
+      const matrixRange = matrix.getRange()
+      for (let col = matrixRange.start.col; col <= matrixRange.end.col; ++col) {
+        for (let row = rowStart; row <= matrixRange.end.row; ++row) {
+          const destination = simpleCellAddress(sheet, col, row)
+          const source = simpleCellAddress(sheet, col, row + numberOfRows)
+          this.addressMapping.moveCell(source, destination)
+        }
+      }
     }
   }
 

@@ -103,7 +103,7 @@ export class AddressMapping {
       throw Error('Sheet not initialized')
     }
     if (source.sheet !== destination.sheet) {
-      throw Error('Cannot move cells between sheets')
+      throw Error('Cannot move cells between sheets.')
     }
     if (sheetMapping.has(destination)) {
       throw new Error('Cannot move cell. Destination already occupied.')
