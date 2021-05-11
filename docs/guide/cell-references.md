@@ -62,7 +62,7 @@ scope of the expression:
 
 ```javascript
 // define for a global scope
-// sheet name not passed
+// sheet id not passed
 hfInstance.addNamedExpression('MyGlobal', '=SUM(100+10)');
 
 // define for a local scope

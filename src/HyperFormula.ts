@@ -3246,7 +3246,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * @param {string} expressionName - a name of the expression to be added
    * @param {RawCellContent} expression - the expression
-   * @param {number?} sheetId - scope definition, `sheetId` for local scope or `undefined` for global scope
+   * @param {number?} scope - scope definition, `sheetId` for local scope or `undefined` for global scope
    *
    * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
    * @throws [[NoSheetWithIdError]] if no sheet with given sheetId exists
@@ -3264,13 +3264,13 @@ export class HyperFormula implements TypedEmitter {
    *
    * @category Named Expressions
    */
-  public isItPossibleToAddNamedExpression(expressionName: string, expression: RawCellContent, sheetId?: number): boolean {
+  public isItPossibleToAddNamedExpression(expressionName: string, expression: RawCellContent, scope?: number): boolean {
     validateArgToType(expressionName, 'string', 'expressionName')
-    if(sheetId !== undefined) {
-      validateArgToType(sheetId, 'number', 'sheetId')
+    if(scope !== undefined) {
+      validateArgToType(scope, 'number', 'scope')
     }
     try {
-      this._crudOperations.ensureItIsPossibleToAddNamedExpression(expressionName, expression, sheetId)
+      this._crudOperations.ensureItIsPossibleToAddNamedExpression(expressionName, expression, scope)
       return true
     } catch (e) {
       return false
@@ -3284,7 +3284,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * @param {string} expressionName - a name of the expression to be added
    * @param {RawCellContent} expression - the expression
-   * @param {number?} sheetId - scope definition, `sheetId` for local scope or `undefined` for global scope
+   * @param {number?} scope - scope definition, `sheetId` for local scope or `undefined` for global scope
    * @param {NamedExpressionOptions?} options - additional metadata related to named expression
    *
    * @fires [[namedExpressionAdded]] always, unless [[batch]] mode is used
@@ -3315,12 +3315,12 @@ export class HyperFormula implements TypedEmitter {
    *
    * @category Named Expressions
    */
-  public addNamedExpression(expressionName: string, expression: RawCellContent, sheetId?: number, options?: NamedExpressionOptions): ExportedChange[] {
+  public addNamedExpression(expressionName: string, expression: RawCellContent, scope?: number, options?: NamedExpressionOptions): ExportedChange[] {
     validateArgToType(expressionName, 'string', 'expressionName')
-    if(sheetId !== undefined) {
-      validateArgToType(sheetId, 'number', 'sheetId')
+    if(scope !== undefined) {
+      validateArgToType(scope, 'number', 'scope')
     }
-    this._crudOperations.addNamedExpression(expressionName, expression, sheetId, options)
+    this._crudOperations.addNamedExpression(expressionName, expression, scope, options)
     const changes = this.recomputeIfDependencyGraphNeedsIt()
     this._emitter.emit(Events.NamedExpressionAdded, expressionName, changes)
     return changes
@@ -3331,7 +3331,7 @@ export class HyperFormula implements TypedEmitter {
    * Returns a [[CellValue]] or undefined if the given named expression does not exists.
    *
    * @param {string} expressionName - expression name, case insensitive.
-   * @param {number?} sheetId - scope definition, `sheetId` for local scope or `undefined` for global scope
+   * @param {number?} scope - scope definition, `sheetId` for local scope or `undefined` for global scope
    *
    * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
    * @throws [[NoSheetWithIdError]] if no sheet with given sheetId exists
@@ -3351,14 +3351,14 @@ export class HyperFormula implements TypedEmitter {
    *
    * @category Named Expressions
    */
-  public getNamedExpressionValue(expressionName: string, sheetId?: number): Maybe<CellValue> {
+  public getNamedExpressionValue(expressionName: string, scope?: number): Maybe<CellValue> {
     validateArgToType(expressionName, 'string', 'expressionName')
-    if(sheetId !== undefined) {
-      validateArgToType(sheetId, 'number', 'sheetId')
+    if(scope !== undefined) {
+      validateArgToType(scope, 'number', 'scope')
     }
     this.ensureEvaluationIsNotSuspended()
-    this._crudOperations.ensureScopeIdIsValid(sheetId)
-    const namedExpression = this._namedExpressions.namedExpressionForScope(expressionName, sheetId)
+    this._crudOperations.ensureScopeIdIsValid(scope)
+    const namedExpression = this._namedExpressions.namedExpressionForScope(expressionName, scope)
     if (namedExpression) {
       return this._serialization.getCellValue(namedExpression.address)
     } else {
@@ -3370,7 +3370,7 @@ export class HyperFormula implements TypedEmitter {
    * Returns a normalized formula string for given named expression or `undefined` for a named expression that does not exist or does not hold a formula.
    *
    * @param {string} expressionName - expression name, case insensitive.
-   * @param {number?} sheetId - scope definition, `sheetId` for local scope or `undefined` for global scope
+   * @param {number?} scope - scope definition, `sheetId` for local scope or `undefined` for global scope
    *
    * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
    * @throws [[NoSheetWithIdError]] if no sheet with given sheetId exists
@@ -3391,13 +3391,13 @@ export class HyperFormula implements TypedEmitter {
    *
    * @category Named Expressions
    */
-  public getNamedExpressionFormula(expressionName: string, sheetId?: number): Maybe<string> {
+  public getNamedExpressionFormula(expressionName: string, scope?: number): Maybe<string> {
     validateArgToType(expressionName, 'string', 'expressionName')
-    if(sheetId !== undefined) {
-      validateArgToType(sheetId, 'number', 'sheetId')
+    if(scope !== undefined) {
+      validateArgToType(scope, 'number', 'scope')
     }
-    this._crudOperations.ensureScopeIdIsValid(sheetId)
-    const namedExpression = this._namedExpressions.namedExpressionForScope(expressionName, sheetId)
+    this._crudOperations.ensureScopeIdIsValid(scope)
+    const namedExpression = this._namedExpressions.namedExpressionForScope(expressionName, scope)
     if (namedExpression === undefined) {
       return undefined
     } else {
@@ -3409,7 +3409,7 @@ export class HyperFormula implements TypedEmitter {
    * Returns named expression a normalized formula string for given named expression or `undefined` for a named expression that does not exist or does not hold a formula.
    *
    * @param {string} expressionName - expression name, case insensitive.
-   * @param {number?} sheetId - scope definition, `sheetId` for local scope or `undefined` for global scope
+   * @param {number?} scope - scope definition, `sheetId` for local scope or `undefined` for global scope
    *
    * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
    * @throws [[NoSheetWithIdError]] if no sheet with given sheetId exists
@@ -3430,12 +3430,12 @@ export class HyperFormula implements TypedEmitter {
    *
    * @category Named Expressions
    */
-  public getNamedExpression(expressionName: string, sheetId?: number): Maybe<NamedExpression> {
+  public getNamedExpression(expressionName: string, scope?: number): Maybe<NamedExpression> {
     validateArgToType(expressionName, 'string', 'expressionName')
-    if(sheetId !== undefined) {
-      validateArgToType(sheetId, 'number', 'sheetId')
+    if(scope !== undefined) {
+      validateArgToType(scope, 'number', 'scope')
     }
-    const namedExpression = this._namedExpressions.namedExpressionForScope(expressionName, sheetId)
+    const namedExpression = this._namedExpressions.namedExpressionForScope(expressionName, scope)
 
     if (namedExpression === undefined) {
       return undefined
@@ -3445,7 +3445,7 @@ export class HyperFormula implements TypedEmitter {
 
     return {
       name: expressionName,
-      scope: sheetId,
+      scope: scope,
       expression: expression,
       options: namedExpression.options
     }
@@ -3459,7 +3459,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * @param {string} expressionName - an expression name, case insensitive.
    * @param {RawCellContent} newExpression - a new expression
-   * @param {number?} sheetId - scope definition, `sheetId` for local scope or `undefined` for global scope
+   * @param {number?} scope - scope definition, `sheetId` for local scope or `undefined` for global scope
    *
    * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
    * @throws [[NoSheetWithIdError]] if no sheet with given sheetId exists
@@ -3480,13 +3480,13 @@ export class HyperFormula implements TypedEmitter {
    *
    * @category Named Expressions
    */
-  public isItPossibleToChangeNamedExpression(expressionName: string, newExpression: RawCellContent, sheetId?: number): boolean {
+  public isItPossibleToChangeNamedExpression(expressionName: string, newExpression: RawCellContent, scope?: number): boolean {
     validateArgToType(expressionName, 'string', 'expressionName')
-    if(sheetId !== undefined) {
-      validateArgToType(sheetId, 'number', 'sheetId')
+    if(scope !== undefined) {
+      validateArgToType(scope, 'number', 'scope')
     }
     try {
-      this._crudOperations.ensureItIsPossibleToChangeNamedExpression(expressionName, newExpression, sheetId)
+      this._crudOperations.ensureItIsPossibleToChangeNamedExpression(expressionName, newExpression, scope)
       return true
     } catch (e) {
       return false
@@ -3500,7 +3500,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * @param {string} expressionName - an expression name, case insensitive.
    * @param {RawCellContent} newExpression - a new expression
-   * @param {number?} sheetId - scope definition, `sheetId` for local scope or `undefined` for global scope
+   * @param {number?} scope - scope definition, `sheetId` for local scope or `undefined` for global scope
    * @param {NamedExpressionOptions?} options - additional metadata related to named expression
    *
    * @fires [[valuesUpdated]] if recalculation was triggered by this change
@@ -3526,12 +3526,12 @@ export class HyperFormula implements TypedEmitter {
    *
    * @category Named Expressions
    */
-  public changeNamedExpression(expressionName: string, newExpression: RawCellContent, sheetId?: number, options?: NamedExpressionOptions): ExportedChange[] {
+  public changeNamedExpression(expressionName: string, newExpression: RawCellContent, scope?: number, options?: NamedExpressionOptions): ExportedChange[] {
     validateArgToType(expressionName, 'string', 'expressionName')
-    if(sheetId !== undefined) {
-      validateArgToType(sheetId, 'number', 'sheetId')
+    if(scope !== undefined) {
+      validateArgToType(scope, 'number', 'scope')
     }
-    this._crudOperations.changeNamedExpressionExpression(expressionName, sheetId, newExpression, options)
+    this._crudOperations.changeNamedExpressionExpression(expressionName, scope, newExpression, options)
     return this.recomputeIfDependencyGraphNeedsIt()
   }
 
@@ -3542,7 +3542,7 @@ export class HyperFormula implements TypedEmitter {
    * Returns `false` if the operation might be disrupted.
    *
    * @param {string} expressionName - an expression name, case insensitive.
-   * @param {number?} sheetId - scope definition, `sheetId` for local scope or `undefined` for global scope
+   * @param {number?} scope - scope definition, `sheetId` for local scope or `undefined` for global scope
    *
    * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
    * @throws [[NoSheetWithIdError]] if no sheet with given sheetId exists
@@ -3563,13 +3563,13 @@ export class HyperFormula implements TypedEmitter {
    *
    * @category Named Expressions
    */
-  public isItPossibleToRemoveNamedExpression(expressionName: string, sheetId?: number): boolean {
+  public isItPossibleToRemoveNamedExpression(expressionName: string, scope?: number): boolean {
     validateArgToType(expressionName, 'string', 'expressionName')
-    if(sheetId !== undefined) {
-      validateArgToType(sheetId, 'number', 'sheetId')
+    if(scope !== undefined) {
+      validateArgToType(scope, 'number', 'scope')
     }
     try {
-      this._crudOperations.isItPossibleToRemoveNamedExpression(expressionName, sheetId)
+      this._crudOperations.isItPossibleToRemoveNamedExpression(expressionName, scope)
       return true
     } catch (e) {
       return false
@@ -3582,7 +3582,7 @@ export class HyperFormula implements TypedEmitter {
    * Note that this method may trigger dependency graph recalculation.
    *
    * @param {string} expressionName - expression name, case insensitive.
-   * @param {number?} sheetId - scope definition, `sheetId` for local scope or `undefined` for global scope
+   * @param {number?} scope - scope definition, `sheetId` for local scope or `undefined` for global scope
    *
    * @fires [[namedExpressionRemoved]] after the expression was removed
    * @fires [[valuesUpdated]] if recalculation was triggered by this change
@@ -3606,12 +3606,12 @@ export class HyperFormula implements TypedEmitter {
    *
    * @category Named Expressions
    */
-  public removeNamedExpression(expressionName: string, sheetId?: number): ExportedChange[] {
+  public removeNamedExpression(expressionName: string, scope?: number): ExportedChange[] {
     validateArgToType(expressionName, 'string', 'expressionName')
-    if(sheetId !== undefined) {
-      validateArgToType(sheetId, 'number', 'sheetId')
+    if(scope !== undefined) {
+      validateArgToType(scope, 'number', 'scope')
     }
-    const removedNamedExpression = this._crudOperations.removeNamedExpression(expressionName, sheetId)
+    const removedNamedExpression = this._crudOperations.removeNamedExpression(expressionName, scope)
     if (removedNamedExpression) {
       const changes = this.recomputeIfDependencyGraphNeedsIt()
       this._emitter.emit(Events.NamedExpressionRemoved, removedNamedExpression.displayName, changes)
@@ -3625,7 +3625,7 @@ export class HyperFormula implements TypedEmitter {
    * Lists all named expressions.
    * Returns an array of expression names defined in a scope, as strings.
    *
-   * @param {number?} sheetId - scope definition, `sheetId` for local scope or `undefined` for global scope
+   * @param {number?} scope - scope definition, `sheetId` for local scope or `undefined` for global scope
    *
    * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
    * @throws [[NoSheetWithIdError]] if no sheet with given sheetId exists
@@ -3652,12 +3652,12 @@ export class HyperFormula implements TypedEmitter {
    *
    * @category Named Expressions
    */
-  public listNamedExpressions(sheetId?: number): string[] {
-    if(sheetId !== undefined) {
-      validateArgToType(sheetId, 'number', 'sheetId')
+  public listNamedExpressions(scope?: number): string[] {
+    if(scope !== undefined) {
+      validateArgToType(scope, 'number', 'scope')
     }
-    this._crudOperations.ensureScopeIdIsValid(sheetId)
-    return this._namedExpressions.getAllNamedExpressionsNamesInScope(sheetId)
+    this._crudOperations.ensureScopeIdIsValid(scope)
+    return this._namedExpressions.getAllNamedExpressionsNamesInScope(scope)
   }
 
   /**
