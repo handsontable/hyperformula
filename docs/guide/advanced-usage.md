@@ -73,17 +73,18 @@ Now prepare sheets and insert the data into them:
 
 ```javascript
 // add 'TeamA' sheet
-hfInstance.addSheet('TeamA');
 const sheetNameA = hfInstance.addSheet('TeamA');
 // get the new sheet ID for further API calls
-const sheetIdA = hfInstance.addSheet(sheetNameA);
+const sheetIdA = hfInstance.getSheetId(sheetNameA);
 // insert playersA content into targeted 'TeamA' sheet
 hfInstance.setSheetContent(sheetIdA, playersA);
 
 // add 'TeamB' sheet
-hfInstance.addSheet('TeamB');
-// insert playersB content into targeted 'TeamB' sheet (sheetId=1)
-hfInstance.setSheetContent(1, playersB);
+const sheetNameB = hfInstance.addSheet('TeamB');
+// get the new sheet ID for further API calls
+const sheetIdB = hfInstance.getSheetId(sheetNameB);
+// insert playersB content into targeted 'TeamB' sheet
+hfInstance.setSheetContent(sheetIdB, playersB);
 
 // check the content in the console output
 console.log(hfInstance.getAllSheetsValues());
@@ -93,9 +94,11 @@ After setting everything up, you can add formulas:
 
 ```javascript
 // add a sheet named 'Formulas'
-hfInstance.addSheet('Formulas');
+const sheetNameC = hfInstance.addSheet('Formulas');
+// get the new sheet ID for further API calls
+const sheetIdC = hfInstance.getSheetId(sheetNameA);
 // add formulas to that sheet
-hfInstance.setSheetContent(2, formulas);
+hfInstance.setSheetContent(sheetIdC, formulas);
 ```
 
 Almost done! Now, you can use the `getSheetValues` method to get all
@@ -103,11 +106,11 @@ values including the calculated ones. Alternatively, you can use
 `getCellValue`to get the value from a specific cell.
 
 ```javascript
-// get sheet values from the Sheet with an ID of 2
-const sheetValues = hfInstance.getSheetValues(2);
+// get all sheet values 
+const sheetValues = hfInstance.getSheetValues(sheetIdC);
 
 // get the simple cell address of 'A1' from that sheet
-const simpleCellAddress = hfInstance.simpleCellAddressFromString('A1', 2);
+const simpleCellAddress = hfInstance.simpleCellAddressFromString('A1', sheetIdC);
 
 // check the winning team 🎉
 const winningTeam = hfInstance.getCellValue(simpleCellAddress);
