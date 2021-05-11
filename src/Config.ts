@@ -380,6 +380,8 @@ export interface ConfigParams {
 }
 
 export type ConfigParamsList = keyof ConfigParams
+type ValueOf<T> = T[keyof T]
+type ConfigParamsTypes = ValueOf<ConfigParams>
 
 export class Config implements ConfigParams, ParserConfig {
 
@@ -635,17 +637,13 @@ export class Config implements ConfigParams, ParserConfig {
   }
 
   public getConfig(): ConfigParams {
-    const ret = {}
+    const ret: Partial<ConfigParams> = {}
     for (const key in Config.defaultConfig) {
       const val = this[key as ConfigParamsList]
       if (Array.isArray(val)) {
-        // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
-        // @ts-ignore
-        ret[key] = [ ...val ]
+        (ret[key as ConfigParamsList] as ConfigParamsTypes) = [ ...val ]
       } else {
-        // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
-        // @ts-ignore
-        ret[key] = val
+        (ret[key as ConfigParamsList] as ConfigParamsTypes) = val
       }
     }
     return ret as ConfigParams
