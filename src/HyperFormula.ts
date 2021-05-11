@@ -1463,7 +1463,7 @@ export class HyperFormula implements TypedEmitter {
    * Checks if it possible to reorder columns of a sheet according to a permutation.
    *
    * @param {number} sheetId - ID of a sheet to operate on
-   * @param {number[]} newRowOrder - permutation of columns
+   * @param {number[]} newColumnOrder - permutation of columns
    *
    * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
    * @example
@@ -1482,10 +1482,10 @@ export class HyperFormula implements TypedEmitter {
    *
    * @category Columns
    */
-  public isItPossibleToSetColumnOrder(sheetId: number, newRowOrder: number[]): boolean {
+  public isItPossibleToSetColumnOrder(sheetId: number, newColumnOrder: number[]): boolean {
     validateArgToType(sheetId, 'number', 'sheetId')
     try {
-      const columnMapping = this._crudOperations.mappingFromOrder(sheetId, newRowOrder, 'column')
+      const columnMapping = this._crudOperations.mappingFromOrder(sheetId, newColumnOrder, 'column')
       this._crudOperations.validateSwapColumnIndexes(sheetId, columnMapping)
       this._crudOperations.testColumnOrderForMatrices(sheetId, columnMapping)
       return true
