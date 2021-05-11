@@ -54,8 +54,8 @@ describe('Operator MINUS', () => {
       ['1'],
       ['8'],
       ['3'],
-      [ '=10 - A1:A3'],
-      [ '=A1:A3 - 10'],
+      ['=10 - A1:A3'],
+      ['=A1:A3 - 10'],
     ])
 
     expect(engine.getCellValue(adr('A4'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.ScalarExpected))
