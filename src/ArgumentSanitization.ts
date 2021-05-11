@@ -26,7 +26,7 @@ export function configValueFromParam(inputValue: any, expectedType: string | str
     if (expectedType.includes(inputValue)) {
       return inputValue
     } else {
-      throw new ExpectedOneOfValuesError(expectedType.map((val: string) => '\'' + val + '\'').join(' '), paramName)
+      throw new ExpectedOneOfValuesError(expectedType.map((val: string) => `'${val}'`).join(' '), paramName)
     }
   }
 }

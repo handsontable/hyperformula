@@ -649,7 +649,6 @@ export class Config implements ConfigParams, ParserConfig {
     return ret as ConfigParams
   }
 
-
   public mergeConfig(init: Partial<ConfigParams>): Config {
     const mergedConfig: ConfigParams = Object.assign({}, this.getConfig(), init)
 
