@@ -78,7 +78,7 @@ const sheetNameA = hfInstance.addSheet('TeamA');
 // get the new sheet ID for further API calls
 const sheetIdA = hfInstance.addSheet(sheetNameA);
 // insert playersA content into targeted 'TeamA' sheet
-hfInstance.setSheetContent(sheetId, playersA);
+hfInstance.setSheetContent(sheetIdA, playersA);
 
 // add 'TeamB' sheet
 hfInstance.addSheet('TeamB');
