@@ -641,9 +641,11 @@ export class Config implements ConfigParams, ParserConfig {
     for (const key in Config.defaultConfig) {
       const val = this[key as ConfigParamsList]
       if (Array.isArray(val)) {
-        (ret[key as ConfigParamsList]) = [ ...val ]
+        //eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
+        (ret[key as ConfigParamsList] as ConfigParamsTypes) = [ ...val ]
       } else {
-        (ret[key as ConfigParamsList]) = val
+        //eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
+        (ret[key as ConfigParamsList] as ConfigParamsTypes) = val
       }
     }
     return ret as ConfigParams
