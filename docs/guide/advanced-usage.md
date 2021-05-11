@@ -74,9 +74,9 @@ Now prepare sheets and insert the data into them:
 ```javascript
 // add 'TeamA' sheet
 hfInstance.addSheet('TeamA');
-const sheetName = hfInstance.addSheet('TeamA');
+const sheetNameA = hfInstance.addSheet('TeamA');
 // get the new sheet ID for further API calls
-const sheetId = hfInstance.addSheet(sheetName);
+const sheetIdA = hfInstance.addSheet(sheetNameA);
 // insert playersA content into targeted 'TeamA' sheet
 hfInstance.setSheetContent(sheetId, playersA);
 
