@@ -137,6 +137,19 @@ export class MatrixSizePredictor {
             }
             return subChecks[0]
           }
+          case 'FILTER': {
+            if(ast.args.length <= 1) {
+              return undefined
+            }
+            for(const subcheck of subChecks) {
+              if(subcheck === undefined) {
+                return undefined
+              }
+            }
+            const width = Math.max(...(subChecks as MatrixSize[]).map(val => val.width))
+            const height = Math.max(...(subChecks as MatrixSize[]).map(val => val.height))
+            return new MatrixSize(width, height)
+          }
           default: {
             return new MatrixSize(1, 1)
           }
