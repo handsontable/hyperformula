@@ -641,9 +641,9 @@ export class Config implements ConfigParams, ParserConfig {
     for (const key in Config.defaultConfig) {
       const val = this[key as ConfigParamsList]
       if (Array.isArray(val)) {
-        (ret[key as ConfigParamsList] as ConfigParamsTypes) = [ ...val ]
+        (ret[key as ConfigParamsList]) = [ ...val ]
       } else {
-        (ret[key as ConfigParamsList] as ConfigParamsTypes) = val
+        (ret[key as ConfigParamsList]) = val
       }
     }
     return ret as ConfigParams
