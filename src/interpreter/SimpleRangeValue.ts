@@ -51,7 +51,7 @@ export class SimpleRangeValue {
   }
 
   public width(): number {
-    return this.size.width //data[0].length
+    return this.size.width //should be equal to this.data[0].length
   }
 
   public height(): number {
