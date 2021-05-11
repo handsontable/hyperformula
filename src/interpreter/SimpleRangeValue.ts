@@ -55,7 +55,7 @@ export class SimpleRangeValue {
   }
 
   public height(): number {
-    return this.size.height //data.length
+    return this.size.height //should be equal to this.data.length
   }
 
   public get data(): InternalScalarValue[][] {
