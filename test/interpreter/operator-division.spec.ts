@@ -64,7 +64,7 @@ describe('Operator DIVISION', () => {
       ['3'],
       ['=10 / A1:A3'],
       ['=A1:A3 / 10'],
-    ])
+    ], {arrays: false})
 
     expect(engine.getCellValue(adr('A4'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.ScalarExpected))
     expect(engine.getCellValue(adr('A5'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.ScalarExpected))

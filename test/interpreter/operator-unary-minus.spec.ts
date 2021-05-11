@@ -39,7 +39,7 @@ describe('Unary operator MINUS', () => {
       ['9'],
       ['3'],
       ['=-A1:A3']
-    ])
+    ], {arrays: false})
 
     expect(engine.getCellValue(adr('A4'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.ScalarExpected))
   })
