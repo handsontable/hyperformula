@@ -287,7 +287,7 @@ describe('Adding row - FormulaCellVertex#address update', () => {
 })
 
 describe('Adding row - matrices adjustments', () => {
-  it('add row inside numeric matrix, expand matrix', () => {
+  it('add row inside matrix, expand matrix', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '2'],
       ['3', '4'],
@@ -297,8 +297,8 @@ describe('Adding row - matrices adjustments', () => {
 
     engine.addRows(0, [1, 2])
 
-    expect(engine.getCellValue(adr('A2'))).toEqual(0)
-    expect(engine.getCellValue(adr('A3'))).toEqual(0)
+    expect(engine.getCellValue(adr('A2'))).toEqual(null)
+    expect(engine.getCellValue(adr('A3'))).toEqual(null)
     expect(engine.getCellValue(adr('A4'))).toEqual(3)
   })
 })
