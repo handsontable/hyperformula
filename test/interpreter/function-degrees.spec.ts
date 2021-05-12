@@ -41,17 +41,6 @@ describe('Function DEGREES', () => {
     expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
   })
 
-  // Inconsistency with Product 1
-  it('range value results in VALUE error', () => {
-    const engine = HyperFormula.buildFromArray([
-      ['1'],
-      ['2', '=DEGREES(A1:A3)'],
-      ['3'],
-    ])
-
-    expect(engine.getCellValue(adr('B2'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.WrongType))
-  })
-
   it('errors propagation', () => {
     const engine =  HyperFormula.buildFromArray([
       ['=DEGREES(4/0)'],
