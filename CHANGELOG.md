@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added performance improvements for array handling. (#629)
 - Added ARRAYFORMULA function. (#630)
 - Added FILTER function. (#668)
+- Added ARRAY_CONSTRAIN function. (#661)
 
 ### Fixed
 - Fixed an issue with arrays and cruds. (#651)
