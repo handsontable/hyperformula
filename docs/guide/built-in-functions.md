@@ -68,6 +68,7 @@ Total number of functions: **{{ $page.functionsCount }}**
 | Function ID | Description | Syntax |
 | :--- | :--- | :--- |
 | ARRAYFORMULA | Enables array arithmetic inside. | ARRAYFORMULA(formula) |
+| ARRAY_CONSTRAINT | Truncates array to given dimensions. | ARRAYFORMULA(Array; Height; Width) |
 
 ### Date and time
 
