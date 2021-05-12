@@ -27,6 +27,9 @@ export class InformationPlugin extends FunctionPlugin implements FunctionPluginT
     },
     'COLUMNS': {
       method: 'columns',
+      parameters: [
+        {argumentType: ArgumentTypes.RANGE}
+      ],
       isDependentOnSheetStructureChange: true,
       doesNotNeedArgumentsToBeComputed: true,
     },
@@ -106,7 +109,8 @@ export class InformationPlugin extends FunctionPlugin implements FunctionPluginT
       ]
     },
     'NA': {
-      method: 'na'
+      method: 'na',
+      parameters: [],
     },
     'ROW': {
       method: 'row',
@@ -118,6 +122,9 @@ export class InformationPlugin extends FunctionPlugin implements FunctionPluginT
     },
     'ROWS': {
       method: 'rows',
+      parameters: [
+        {argumentType: ArgumentTypes.RANGE}
+      ],
       isDependentOnSheetStructureChange: true,
       doesNotNeedArgumentsToBeComputed: true,
     },

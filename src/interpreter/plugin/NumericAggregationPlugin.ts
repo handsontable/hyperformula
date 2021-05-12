@@ -78,63 +78,144 @@ export class NumericAggregationPlugin extends FunctionPlugin implements Function
   public static implementedFunctions = {
     'SUM': {
       method: 'sum',
+      parameters: [
+        {argumentType: ArgumentTypes.ANY}
+      ],
+      repeatLastArgs: 1,
     },
     'SUMSQ': {
       method: 'sumsq',
+      parameters: [
+        {argumentType: ArgumentTypes.ANY}
+      ],
+      repeatLastArgs: 1,
     },
     'MAX': {
       method: 'max',
+      parameters: [
+        {argumentType: ArgumentTypes.ANY}
+      ],
+      repeatLastArgs: 1,
     },
     'MIN': {
       method: 'min',
+      parameters: [
+        {argumentType: ArgumentTypes.ANY}
+      ],
+      repeatLastArgs: 1,
     },
     'MAXA': {
       method: 'maxa',
+      parameters: [
+        {argumentType: ArgumentTypes.ANY}
+      ],
+      repeatLastArgs: 1,
     },
     'MINA': {
       method: 'mina',
+      parameters: [
+        {argumentType: ArgumentTypes.ANY}
+      ],
+      repeatLastArgs: 1,
     },
     'COUNT': {
       method: 'count',
+      parameters: [
+        {argumentType: ArgumentTypes.ANY}
+      ],
+      repeatLastArgs: 1,
     },
     'COUNTA': {
       method: 'counta',
+      parameters: [
+        {argumentType: ArgumentTypes.ANY}
+      ],
+      repeatLastArgs: 1,
     },
     'AVERAGE': {
       method: 'average',
+      parameters: [
+        {argumentType: ArgumentTypes.ANY}
+      ],
+      repeatLastArgs: 1,
     },
     'AVERAGEA': {
       method: 'averagea',
+      parameters: [
+        {argumentType: ArgumentTypes.ANY}
+      ],
+      repeatLastArgs: 1,
     },
     'PRODUCT': {
       method: 'product',
+      parameters: [
+        {argumentType: ArgumentTypes.ANY}
+      ],
+      repeatLastArgs: 1,
     },
     'VAR.S': {
       method: 'vars',
+      parameters: [
+        {argumentType: ArgumentTypes.ANY}
+      ],
+      repeatLastArgs: 1,
     },
     'VAR.P': {
       method: 'varp',
+      parameters: [
+        {argumentType: ArgumentTypes.ANY}
+      ],
+      repeatLastArgs: 1,
     },
     'VARA': {
       method: 'vara',
+      parameters: [
+        {argumentType: ArgumentTypes.ANY}
+      ],
+      repeatLastArgs: 1,
     },
     'VARPA': {
       method: 'varpa',
+      parameters: [
+        {argumentType: ArgumentTypes.ANY}
+      ],
+      repeatLastArgs: 1,
     },
     'STDEV.S': {
       method: 'stdevs',
+      parameters: [
+        {argumentType: ArgumentTypes.ANY}
+      ],
+      repeatLastArgs: 1,
     },
     'STDEV.P': {
       method: 'stdevp',
+      parameters: [
+        {argumentType: ArgumentTypes.ANY}
+      ],
+      repeatLastArgs: 1,
     },
     'STDEVA': {
       method: 'stdeva',
+      parameters: [
+        {argumentType: ArgumentTypes.ANY}
+      ],
+      repeatLastArgs: 1,
     },
     'STDEVPA': {
       method: 'stdevpa',
+      parameters: [
+        {argumentType: ArgumentTypes.ANY}
+      ],
+      repeatLastArgs: 1,
     },
     'SUBTOTAL': {
       method: 'subtotal',
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER},
+        {argumentType: ArgumentTypes.ANY}
+      ],
+      repeatLastArgs: 1,
     }
   }
 
@@ -292,7 +373,7 @@ export class NumericAggregationPlugin extends FunctionPlugin implements Function
   }
 
   public subtotal(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
-    if (ast.args.length < 1) {
+    if (ast.args.length < 2) {
       return new CellError(ErrorType.NA, ErrorMessage.WrongArgNumber)
     }
     const functionType = this.coerceToType(this.evaluateAst(ast.args[0], state), {argumentType: ArgumentTypes.NUMBER})
