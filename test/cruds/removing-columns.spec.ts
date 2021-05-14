@@ -501,20 +501,6 @@ describe('Removing columns - matrices', () => {
     expect(() => engine.removeColumns(0, [2, 1])).toThrowError('Cannot perform this operation, source location has a matrix inside.')
   })
 
-  it('reevaluates cells dependent on matrix vertex', () => {
-    const engine = HyperFormula.buildFromArray([
-      ['1', '1', '1'],
-      ['2', '2', '2'],
-      ['=SUM(A1:C2)'],
-    ], { /* TODO matrixDetectionThreshold: 1 */})
-
-    expect(engine.getCellValue(adr('A3'))).toEqual(9)
-
-    engine.removeColumns(0, [1, 1])
-
-    expect(engine.getCellValue(adr('A3'))).toEqual(6)
-  })
-
   it('MatrixVertex#formula should be updated', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '2', '3', '=TRANSPOSE(A1:C2)'],
