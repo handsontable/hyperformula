@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - **Breaking change**: Removed support for matrix formulas (`{=FORMULA}`) notation. Engine now supports formulas returning array of values (instead of only scalars). (#652)
 - Changed SWITCH function so it takes array as its first argument.
-- **Breaking change**: Removed numeric matrix detection. (#669)
+- **Breaking change**: Removed numeric matrix detection. Config options matrixDetection and matrixDetectionThreshold has been removed. (#669) 
 
 ### Added
 - Added support for array arithmetic. (#628)
