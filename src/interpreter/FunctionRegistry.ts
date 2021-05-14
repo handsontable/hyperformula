@@ -164,7 +164,7 @@ export class FunctionRegistry {
   private readonly arrayFunctions: Set<string> = new Set()
   private readonly structuralChangeFunctions: Set<string> = new Set()
   private readonly functionsWhichDoesNotNeedArgumentsToBeComputed: Set<string> = new Set()
-  private readonly functionsMetadata: Map<string,FunctionMetadata> = new Map()
+  private readonly functionsMetadata: Map<string, FunctionMetadata> = new Map()
 
   constructor(private config: Config) {
     if (config.functionPlugins.length > 0) {
