@@ -17,7 +17,7 @@ import {NamedExpressionOptions, NamedExpressions} from './NamedExpressions'
 export interface SerializedNamedExpression {
   name: string,
   expression: RawCellContent,
-  scope: Maybe<string>,
+  scope?: number,
   options: Maybe<NamedExpressionOptions>,
 }
 
@@ -132,14 +132,10 @@ export class Serialization {
 
   public getAllNamedExpressionsSerialized(): SerializedNamedExpression[] {
     return this.dependencyGraph.namedExpressions.getAllNamedExpressions().map((entry) => {
-      const scope: Maybe<string> = entry.scope !== undefined
-        ? this.dependencyGraph.sheetMapping.fetchDisplayName(entry.scope)
-        : undefined
-
       return {
         name: entry.expression.displayName,
         expression: this.getCellSerialized(entry.expression.address),
-        scope: scope,
+        scope: entry.scope,
         options: entry.expression.options
       }
     })

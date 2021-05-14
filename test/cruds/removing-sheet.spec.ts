@@ -1,4 +1,4 @@
-import {ExportedCellChange, HyperFormula, NoSheetWithNameError} from '../../src'
+import {ExportedCellChange, HyperFormula, NoSheetWithIdError} from '../../src'
 import {AbsoluteCellRange} from '../../src/AbsoluteCellRange'
 import {ErrorType, simpleCellAddress} from '../../src/Cell'
 import {MatrixVertex} from '../../src/DependencyGraph'
@@ -17,13 +17,13 @@ describe('Removing sheet - checking if its possible', () => {
   it('no if theres no such sheet', () => {
     const engine = HyperFormula.buildFromArray([[]])
 
-    expect(engine.isItPossibleToRemoveSheet('foo')).toEqual(false)
+    expect(engine.isItPossibleToRemoveSheet(1)).toEqual(false)
   })
 
   it('yes otherwise', () => {
     const engine = HyperFormula.buildFromArray([[]])
 
-    expect(engine.isItPossibleToRemoveSheet('Sheet1')).toEqual(true)
+    expect(engine.isItPossibleToRemoveSheet(0)).toEqual(true)
   })
 })
 
@@ -32,23 +32,14 @@ describe('remove sheet', () => {
     const engine = HyperFormula.buildFromArray([[]])
 
     expect(() => {
-      engine.removeSheet('foo')
-    }).toThrow(new NoSheetWithNameError('foo'))
+      engine.removeSheet(1)
+    }).toThrow(new NoSheetWithIdError(1))
   })
 
-  it('should remove sheet by name', () => {
+  it('should remove sheet by id', () => {
     const engine = HyperFormula.buildFromArray([['foo']])
 
-    engine.removeSheet('Sheet1')
-
-    expect(engine.sheetMapping.numberOfSheets()).toBe(0)
-    expect(Array.from(engine.addressMapping.entries())).toEqual([])
-  })
-
-  it('can remove sheet by any kind of case in name', () => {
-    const engine = HyperFormula.buildFromArray([['foo']])
-
-    engine.removeSheet('SHEET1')
+    engine.removeSheet(0)
 
     expect(engine.sheetMapping.numberOfSheets()).toBe(0)
     expect(Array.from(engine.addressMapping.entries())).toEqual([])
@@ -57,7 +48,7 @@ describe('remove sheet', () => {
   it('should remove empty sheet', () => {
     const engine = HyperFormula.buildFromArray([])
 
-    engine.removeSheet('Sheet1')
+    engine.removeSheet(0)
 
     expect(engine.sheetMapping.numberOfSheets()).toBe(0)
     expect(Array.from(engine.addressMapping.entries())).toEqual([])
@@ -69,7 +60,7 @@ describe('remove sheet', () => {
       Sheet2: [],
     })
 
-    engine.removeSheet('Sheet2')
+    engine.removeSheet(1)
 
     expect(Array.from(engine.sheetMapping.displayNames())).toEqual(['Sheet1'])
     engine.addSheet()
@@ -83,7 +74,7 @@ describe('remove sheet', () => {
       Sheet3: [],
     })
 
-    engine.removeSheet('Sheet2')
+    engine.removeSheet(1)
 
     expect(Array.from(engine.sheetMapping.displayNames())).toEqual(['Sheet1', 'Sheet3'])
     engine.addSheet()
@@ -98,7 +89,7 @@ describe('remove sheet', () => {
       ],
     })
 
-    engine.removeSheet('Sheet1')
+    engine.removeSheet(0)
 
     expect(engine.sheetMapping.numberOfSheets()).toBe(0)
     expect(Array.from(engine.addressMapping.entries())).toEqual([])
@@ -113,7 +104,7 @@ describe('remove sheet', () => {
       ],
     })
 
-    engine.removeSheet('Sheet1')
+    engine.removeSheet(0)
 
     expect(engine.sheetMapping.numberOfSheets()).toBe(0)
     expect(Array.from(engine.addressMapping.entries())).toEqual([])
@@ -126,7 +117,7 @@ describe('remove sheet', () => {
       ],
     }, { matrixDetection: true, matrixDetectionThreshold: 1 })
 
-    engine.removeSheet('Sheet1')
+    engine.removeSheet(0)
 
     expect(engine.sheetMapping.numberOfSheets()).toBe(0)
     expect(Array.from(engine.addressMapping.entries())).toEqual([])
@@ -144,7 +135,7 @@ describe('remove sheet - adjust edges', () => {
       ],
     })
 
-    engine.removeSheet('Sheet2')
+    engine.removeSheet(1)
 
     const a1 = engine.addressMapping.fetchCell(adr('A1'))
     const b1 = engine.addressMapping.fetchCell(adr('B1'))
@@ -166,7 +157,7 @@ describe('remove sheet - adjust edges', () => {
     const a1From1 = engine.addressMapping.fetchCell(adr('A1', 1))
     expect(engine.graph.existsEdge(a1From1, a1From0)).toBe(true)
 
-    engine.removeSheet('Sheet2')
+    engine.removeSheet(1)
 
     expect(engine.graph.existsEdge(a1From1, a1From0)).toBe(false)
   })
@@ -183,7 +174,7 @@ describe('remove sheet - adjust formula dependencies', () => {
       ],
     })
 
-    engine.removeSheet('Sheet2')
+    engine.removeSheet(1)
 
     const reference = extractReference(engine, adr('B1'))
 
@@ -204,7 +195,7 @@ describe('remove sheet - adjust formula dependencies', () => {
       ],
     })
 
-    engine.removeSheet('Sheet2')
+    engine.removeSheet(1)
 
     expectReferenceToHaveRefError(engine, adr('A1'))
     expectReferenceToHaveRefError(engine, adr('A2'))
@@ -222,7 +213,7 @@ describe('remove sheet - adjust formula dependencies', () => {
       ],
     })
 
-    const changes = engine.removeSheet('Sheet2')
+    const changes = engine.removeSheet(1)
 
     expect(changes.length).toBe(1)
     expect(changes).toContainEqual(new ExportedCellChange(simpleCellAddress(0, 0, 0), detailedErrorWithOrigin(ErrorType.REF, 'Sheet1!A1')))
@@ -233,7 +224,7 @@ describe('remove sheet - adjust address mapping', () => {
   it('should remove sheet from address mapping', () => {
     const engine = HyperFormula.buildFromArray([])
 
-    engine.removeSheet('Sheet1')
+    engine.removeSheet(0)
 
     expect(() => engine.addressMapping.strategyFor(0)).toThrowError("There's no sheet with id = 0")
   })
@@ -255,7 +246,7 @@ describe('remove sheet - adjust range mapping', () => {
     expect(Array.from(engine.rangeMapping.rangesInSheet(0)).length).toBe(2)
     expect(Array.from(engine.rangeMapping.rangesInSheet(1)).length).toBe(2)
 
-    engine.removeSheet('Sheet1')
+    engine.removeSheet(0)
 
     expect(Array.from(engine.rangeMapping.rangesInSheet(0)).length).toBe(0)
     expect(Array.from(engine.rangeMapping.rangesInSheet(1)).length).toBe(2)
@@ -276,7 +267,7 @@ describe('remove sheet - adjust matrix mapping', () => {
     })
     expect(engine.matrixMapping.getMatrix(AbsoluteCellRange.spanFrom(adr('A2'), 1, 2))).toBeInstanceOf(MatrixVertex)
 
-    engine.removeSheet('Sheet1')
+    engine.removeSheet(0)
 
     expect(engine.matrixMapping.getMatrix(AbsoluteCellRange.spanFrom(adr('A2'), 1, 2))).toBeUndefined()
     expect(engine.matrixMapping.getMatrix(AbsoluteCellRange.spanFrom(adr('A2', 1), 1, 2))).toBeInstanceOf(MatrixVertex)
@@ -291,7 +282,7 @@ describe('remove sheet - adjust column index', () => {
     const index = engine.columnSearch as ColumnIndex
     const removeSheetSpy = spyOn(index, 'removeSheet')
 
-    engine.removeSheet('Sheet1')
+    engine.removeSheet(0)
 
     expect(removeSheetSpy).toHaveBeenCalled()
     expectArrayWithSameContent([], index.getValueIndex(0, 0, 1).index)

@@ -203,9 +203,7 @@ export class Operations {
     return columnsRemovals
   }
 
-  public removeSheet(sheetName: string) {
-    const sheetId = this.sheetMapping.fetch(sheetName)
-
+  public removeSheet(sheetId: number) {
     this.dependencyGraph.removeSheet(sheetId)
 
     let version: number
@@ -221,6 +219,11 @@ export class Operations {
       (namedexpression) => this.removeNamedExpression(namedexpression.normalizeExpressionName(), sheetId)
     )
     return {version: version!, scopedNamedExpressions}
+  }
+
+  public removeSheetByName(sheetName: string) {
+    const sheetId = this.sheetMapping.fetch(sheetName)
+    return this.removeSheet(sheetId)
   }
 
   public clearSheet(sheetId: number) {
