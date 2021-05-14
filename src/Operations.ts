@@ -283,9 +283,6 @@ export class Operations {
     const sourceRange = AbsoluteCellRange.spanFrom(sourceLeftCorner, width, height)
     const targetRange = AbsoluteCellRange.spanFrom(destinationLeftCorner, width, height)
 
-    // this.dependencyGraph.breakNumericMatricesInRange(sourceRange)
-    // this.dependencyGraph.breakNumericMatricesInRange(targetRange)
-
     const toRight = destinationLeftCorner.col - sourceLeftCorner.col
     const toBottom = destinationLeftCorner.row - sourceLeftCorner.row
     const toSheet = destinationLeftCorner.sheet
