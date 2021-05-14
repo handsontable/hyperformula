@@ -4,6 +4,7 @@
  */
 
 import {AbsoluteCellRange} from './AbsoluteCellRange'
+import {validateArgToType} from './ArgumentSanitization'
 import {CellType, CellValueDetailedType, CellValueType, getCellType, getCellValueType, getCellValueDetailedType, getCellValueFormat, SimpleCellAddress} from './Cell'
 import {CellContent, CellContentParser, RawCellContent} from './CellContentParser'
 import {CellValue, NoErrorCellValue} from './CellValue'
@@ -294,6 +295,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * @param {string} languageCode - code string of the translation package
    *
+   * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
    * @throws [[LanguageNotRegisteredError]] when trying to retrieve not registered language
    *
    * @example
@@ -305,6 +307,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Static Methods
    */
   public static getLanguage(languageCode: string): TranslationPackage {
+    validateArgToType(languageCode, 'string', 'languageCode')
     const val = this.registeredLanguages.get(languageCode)
     if (val === undefined) {
       throw new LanguageNotRegisteredError()
@@ -319,6 +322,7 @@ export class HyperFormula implements TypedEmitter {
    * @param {string} languageCode - code string of the translation package
    * @param {RawTranslationPackage} languagePackage - translation package to be registered
    *
+   * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
    * @throws [[ProtectedFunctionTranslationError]] when trying to register translation for protected function
    * @throws [[LanguageAlreadyRegisteredError]] when given language is already registered
    *
@@ -331,6 +335,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Static Methods
    */
   public static registerLanguage(languageCode: string, languagePackage: RawTranslationPackage): void {
+    validateArgToType(languageCode, 'string', 'languageCode')
     if (this.registeredLanguages.has(languageCode)) {
       throw new LanguageAlreadyRegisteredError()
     } else {
@@ -343,6 +348,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * @param {string} languageCode - code string of the translation package
    *
+   * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
    * @throws [[LanguageNotRegisteredError]] when given language is not registered
    *
    * @example
@@ -357,6 +363,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Static Methods
    */
   public static unregisterLanguage(languageCode: string): void {
+    validateArgToType(languageCode, 'string', 'languageCode')
     if (this.registeredLanguages.has(languageCode)) {
       this.registeredLanguages.delete(languageCode)
     } else {
@@ -430,6 +437,7 @@ export class HyperFormula implements TypedEmitter {
    * @param {FunctionPluginDefinition} plugin - plugin class
    * @param translations
    *
+   * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
    * @throws [[FunctionPluginValidationError]] when function with a given id does not exists in plugin or plugin class definition is not consistent with metadata
    * @throws [[ProtectedFunctionTranslationError]] when trying to register translation for protected function
    * @example
@@ -444,6 +452,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Static Methods
    */
   public static registerFunction(functionId: string, plugin: FunctionPluginDefinition, translations?: FunctionTranslationsPackage): void {
+    validateArgToType(functionId, 'string', 'functionId')
     FunctionRegistry.registerFunction(functionId, plugin, translations)
   }
 
@@ -452,6 +461,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * @param {string} functionId - function id, e.g. 'SUMIF'
    *
+   * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
    * @example
    * ```js
    * // import your own plugin
@@ -467,6 +477,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Static Methods
    */
   public static unregisterFunction(functionId: string): void {
+    validateArgToType(functionId, 'string', 'functionId')
     FunctionRegistry.unregisterFunction(functionId)
   }
 
@@ -489,6 +500,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * @param {string} code - language code
    *
+   * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
    * @example
    * ```js
    * // return a list of function names registered for enGB
@@ -498,6 +510,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Static Methods
    */
   public static getRegisteredFunctionNames(code: string): string[] {
+    validateArgToType(code, 'string', 'code')
     const functionIds = FunctionRegistry.getRegisteredFunctionIds()
     const language = this.getLanguage(code)
     return language.getFunctionTranslations(functionIds)
@@ -508,6 +521,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * @param {string} functionId - id of a function, e.g. 'SUMIF'
    *
+   * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
    * @example
    * ```js
    * // import your own plugin
@@ -523,6 +537,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Static Methods
    */
   public static getFunctionPlugin(functionId: string): Maybe<FunctionPluginDefinition> {
+    validateArgToType(functionId, 'string', 'functionId')
     return FunctionRegistry.getFunctionPlugin(functionId)
   }
 
@@ -652,6 +667,7 @@ export class HyperFormula implements TypedEmitter {
    * Returns an array of arrays of [[CellValue]] with values of all cells from [[Sheet]].
    * Applies rounding and post-processing.
    *
+   * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
    * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
    * @throws [[EvaluationSuspendedError]] when the evaluation is suspended
    *
@@ -672,6 +688,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Sheets
    */
   public getSheetValues(sheetId: number): CellValue[][] {
+    validateArgToType(sheetId, 'number', 'sheetId')
     this.ensureEvaluationIsNotSuspended()
     return this._serialization.getSheetValues(sheetId)
   }
@@ -681,6 +698,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * @param {SimpleCellAddress} sheetId - sheet ID number
    *
+   * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
    * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
    *
    * @example
@@ -703,6 +721,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Sheets
    */
   public getSheetFormulas(sheetId: number): Maybe<string>[][] {
+    validateArgToType(sheetId, 'number', 'sheetId')
     return this._serialization.getSheetFormulas(sheetId)
   }
 
@@ -711,6 +730,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * @param {SimpleCellAddress} sheetId - sheet ID number
    *
+   * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
    * @throws [[EvaluationSuspendedError]] when the evaluation is suspended
    * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
    *
@@ -734,6 +754,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Sheets
    */
   public getSheetSerialized(sheetId: number): RawCellContent[][] {
+    validateArgToType(sheetId, 'number', 'sheetId')
     this.ensureEvaluationIsNotSuspended()
     return this._serialization.getSheetSerialized(sheetId)
   }
@@ -770,6 +791,7 @@ export class HyperFormula implements TypedEmitter {
    * Returns dimensions of a specified sheet.
    * The sheet dimensions is represented with numbers: width and height.
    *
+   * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
    * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
    *
    * @param {number} sheetId - sheet ID number
@@ -787,6 +809,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Sheets
    */
   public getSheetDimensions(sheetId: number): SheetDimensions {
+    validateArgToType(sheetId, 'number', 'sheetId')
     return {
       width: this.dependencyGraph.getSheetWidth(sheetId),
       height: this.dependencyGraph.getSheetHeight(sheetId),
@@ -1058,6 +1081,7 @@ export class HyperFormula implements TypedEmitter {
    * @param {number} width - width of the box
    * @param {number} height - height of the box
    *
+   * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
    * @example
    * ```js
    * const hfInstance = HyperFormula.buildFromArray([
@@ -1075,6 +1099,8 @@ export class HyperFormula implements TypedEmitter {
    * @category Cells
    */
   public isItPossibleToSetCellContents(topLeftCornerAddress: SimpleCellAddress, width: number = 1, height: number = 1): boolean {
+    validateArgToType(width, 'number', 'width')
+    validateArgToType(height, 'number', 'height')
     try {
       this._crudOperations.ensureRangeInSizeLimits(AbsoluteCellRange.spanFrom(topLeftCornerAddress, width, height))
       for (let i = 0; i < width; i++) {
@@ -1137,6 +1163,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * @fires [[valuesUpdated]] if recalculation was triggered by this change
    *
+   * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
    * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
    * @throws [[InvalidArgumentsError]] when rowMapping does not define correct row permutation for some subset of rows of the given sheet
    * @throws [[SourceLocationHasMatrixError]] when the selected position has matrix inside
@@ -1172,6 +1199,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Rows
    */
   public swapRowIndexes(sheetId: number, rowMapping: [number, number][]): ExportedChange[] {
+    validateArgToType(sheetId, 'number', 'sheetId')
     this._crudOperations.setRowOrder(sheetId, rowMapping)
     return this.recomputeIfDependencyGraphNeedsIt()
   }
@@ -1182,6 +1210,7 @@ export class HyperFormula implements TypedEmitter {
    * @param {number} sheetId - ID of a sheet to operate on
    * @param {[number, number][]} rowMapping - array mapping original positions to final positions of rows
    *
+   * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
    * @example
    * ```js
    * const hfInstance = HyperFormula.buildFromArray([
@@ -1200,6 +1229,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Rows
    */
   public isItPossibleToSwapRowIndexes(sheetId: number, rowMapping: [number, number][]): boolean {
+    validateArgToType(sheetId, 'number', 'sheetId')
     try {
       this._crudOperations.validateSwapRowIndexes(sheetId, rowMapping)
       this._crudOperations.testRowOrderForMatrices(sheetId, rowMapping)
@@ -1219,6 +1249,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * @fires [[valuesUpdated]] if recalculation was triggered by this change
    *
+   * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
    * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
    * @throws [[InvalidArgumentsError]] when rowMapping does not define correct row permutation for some subset of rows of the given sheet
    * @throws [[SourceLocationHasMatrixError]] when the selected position has matrix inside
@@ -1254,6 +1285,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Rows
    */
   public setRowOrder(sheetId: number, newRowOrder: number[]): ExportedChange[] {
+    validateArgToType(sheetId, 'number', 'sheetId')
     const mapping = this._crudOperations.mappingFromOrder(sheetId, newRowOrder, 'row')
     return this.swapRowIndexes(sheetId, mapping)
   }
@@ -1264,6 +1296,7 @@ export class HyperFormula implements TypedEmitter {
    * @param {number} sheetId - ID of a sheet to operate on
    * @param {number[]} newRowOrder - permutation of rows
    *
+   * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
    * @example
    * ```js
    * const hfInstance = HyperFormula.buildFromArray([
@@ -1282,6 +1315,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Rows
    */
   public isItPossibleToSetRowOrder(sheetId: number, newRowOrder: number[]): boolean {
+    validateArgToType(sheetId, 'number', 'sheetId')
     try {
       const rowMapping = this._crudOperations.mappingFromOrder(sheetId, newRowOrder, 'row')
       this._crudOperations.validateSwapRowIndexes(sheetId, rowMapping)
@@ -1302,6 +1336,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * @fires [[valuesUpdated]] if recalculation was triggered by this change
    *
+   * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
    * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
    * @throws [[InvalidArgumentsError]] when columnMapping does not define correct column permutation for some subset of columns of the given sheet
    * @throws [[SourceLocationHasMatrixError]] when the selected position has matrix inside
@@ -1336,6 +1371,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Columns
    */
   public swapColumnIndexes(sheetId: number, columnMapping: [number, number][]): ExportedChange[] {
+    validateArgToType(sheetId, 'number', 'sheetId')
     this._crudOperations.setColumnOrder(sheetId, columnMapping)
     return this.recomputeIfDependencyGraphNeedsIt()
   }
@@ -1345,6 +1381,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * @fires [[valuesUpdated]] if recalculation was triggered by this change
    *
+   * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
    * @example
    * ```js
    * const hfInstance = HyperFormula.buildFromArray([
@@ -1362,6 +1399,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Columns
    */
   public isItPossibleToSwapColumnIndexes(sheetId: number, columnMapping: [number, number][]): boolean {
+    validateArgToType(sheetId, 'number', 'sheetId')
     try {
       this._crudOperations.validateSwapColumnIndexes(sheetId, columnMapping)
       this._crudOperations.testColumnOrderForMatrices(sheetId, columnMapping)
@@ -1381,6 +1419,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * @fires [[valuesUpdated]] if recalculation was triggered by this change
    *
+   * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
    * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
    * @throws [[InvalidArgumentsError]] when columnMapping does not define correct column permutation for some subset of columns of the given sheet
    * @throws [[SourceLocationHasMatrixError]] when the selected position has matrix inside
@@ -1415,6 +1454,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Columns
    */
   public setColumnOrder(sheetId: number, newColumnOrder: number[]): ExportedChange[] {
+    validateArgToType(sheetId, 'number', 'sheetId')
     const mapping = this._crudOperations.mappingFromOrder(sheetId, newColumnOrder, 'column')
     return this.swapColumnIndexes(sheetId, mapping)
   }
@@ -1425,6 +1465,7 @@ export class HyperFormula implements TypedEmitter {
    * @param {number} sheetId - ID of a sheet to operate on
    * @param {number[]} newColumnOrder - permutation of columns
    *
+   * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
    * @example
    * ```js
    * const hfInstance = HyperFormula.buildFromArray([
@@ -1441,9 +1482,10 @@ export class HyperFormula implements TypedEmitter {
    *
    * @category Columns
    */
-  public isItPossibleToSetColumnOrder(sheetId: number, newRowOrder: number[]): boolean {
+  public isItPossibleToSetColumnOrder(sheetId: number, newColumnOrder: number[]): boolean {
+    validateArgToType(sheetId, 'number', 'sheetId')
     try {
-      const columnMapping = this._crudOperations.mappingFromOrder(sheetId, newRowOrder, 'column')
+      const columnMapping = this._crudOperations.mappingFromOrder(sheetId, newColumnOrder, 'column')
       this._crudOperations.validateSwapColumnIndexes(sheetId, columnMapping)
       this._crudOperations.testColumnOrderForMatrices(sheetId, columnMapping)
       return true
@@ -1461,6 +1503,7 @@ export class HyperFormula implements TypedEmitter {
    * @param {number} sheetId - sheet ID in which rows will be added
    * @param {ColumnRowIndex[]} indexes - non-contiguous indexes with format [row, amount], where row is a row number above which the rows will be added
    *
+   * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
    * @example
    * ```js
    * const hfInstance = HyperFormula.buildFromArray([
@@ -1475,6 +1518,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Rows
    */
   public isItPossibleToAddRows(sheetId: number, ...indexes: ColumnRowIndex[]): boolean {
+    validateArgToType(sheetId, 'number', 'sheetId')
     const normalizedIndexes = normalizeAddedIndexes(indexes)
     try {
       this._crudOperations.ensureItIsPossibleToAddRows(sheetId, ...normalizedIndexes)
@@ -1495,6 +1539,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * @fires [[valuesUpdated]] if recalculation was triggered by this change
    *
+   * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
    * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
    * @throws [[SheetSizeLimitExceededError]] when performing this operation would result in sheet size limits exceeding
    * @throws [[TargetLocationHasMatrixError]] when the selected position has matrix inside
@@ -1514,6 +1559,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Rows
    */
   public addRows(sheetId: number, ...indexes: ColumnRowIndex[]): ExportedChange[] {
+    validateArgToType(sheetId, 'number', 'sheetId')
     this._crudOperations.addRows(sheetId, ...indexes)
     return this.recomputeIfDependencyGraphNeedsIt()
   }
@@ -1527,6 +1573,7 @@ export class HyperFormula implements TypedEmitter {
    * @param {number} sheetId - sheet ID from which rows will be removed
    * @param {ColumnRowIndex[]} indexes - non-contiguous indexes with format: [row, amount]
    *
+   * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
    * @example
    * ```js
    * const hfInstance = HyperFormula.buildFromArray([
@@ -1542,6 +1589,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Rows
    */
   public isItPossibleToRemoveRows(sheetId: number, ...indexes: ColumnRowIndex[]): boolean {
+    validateArgToType(sheetId, 'number', 'sheetId')
     const normalizedIndexes = normalizeRemovedIndexes(indexes)
     try {
       this._crudOperations.ensureItIsPossibleToRemoveRows(sheetId, ...normalizedIndexes)
@@ -1562,6 +1610,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * @fires [[valuesUpdated]] if recalculation was triggered by this change
    *
+   * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
    * @throws [[InvalidArgumentsError]] when the given arguments are invalid
    * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
    * @throws [[SourceLocationHasMatrixError]] when the selected position has matrix inside
@@ -1580,6 +1629,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Rows
    */
   public removeRows(sheetId: number, ...indexes: ColumnRowIndex[]): ExportedChange[] {
+    validateArgToType(sheetId, 'number', 'sheetId')
     this._crudOperations.removeRows(sheetId, ...indexes)
     return this.recomputeIfDependencyGraphNeedsIt()
   }
@@ -1593,6 +1643,7 @@ export class HyperFormula implements TypedEmitter {
    * @param {number} sheetId - sheet ID in which columns will be added
    * @param {ColumnRowIndex[]} indexes - non-contiguous indexes with format: [column, amount], where column is a column number from which new columns will be added
    *
+   * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
    * @example
    * ```js
    * const hfInstance = HyperFormula.buildFromArray([
@@ -1607,6 +1658,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Columns
    */
   public isItPossibleToAddColumns(sheetId: number, ...indexes: ColumnRowIndex[]): boolean {
+    validateArgToType(sheetId, 'number', 'sheetId')
     const normalizedIndexes = normalizeAddedIndexes(indexes)
     try {
       this._crudOperations.ensureItIsPossibleToAddColumns(sheetId, ...normalizedIndexes)
@@ -1627,6 +1679,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * @fires [[valuesUpdated]] if recalculation was triggered by this change
    *
+   * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
    * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
    * @throws [[InvalidArgumentsError]] when the given arguments are invalid
    * @throws [[SheetSizeLimitExceededError]] when performing this operation would result in sheet size limits exceeding
@@ -1650,6 +1703,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Columns
    */
   public addColumns(sheetId: number, ...indexes: ColumnRowIndex[]): ExportedChange[] {
+    validateArgToType(sheetId, 'number', 'sheetId')
     this._crudOperations.addColumns(sheetId, ...indexes)
     return this.recomputeIfDependencyGraphNeedsIt()
   }
@@ -1663,6 +1717,7 @@ export class HyperFormula implements TypedEmitter {
    * @param {number} sheetId - sheet ID from which columns will be removed
    * @param {ColumnRowIndex[]} indexes - non-contiguous indexes with format [column, amount]
    *
+   * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
    * @example
    * ```js
    * const hfInstance = HyperFormula.buildFromArray([
@@ -1677,6 +1732,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Columns
    */
   public isItPossibleToRemoveColumns(sheetId: number, ...indexes: ColumnRowIndex[]): boolean {
+    validateArgToType(sheetId, 'number', 'sheetId')
     const normalizedIndexes = normalizeRemovedIndexes(indexes)
     try {
       this._crudOperations.ensureItIsPossibleToRemoveColumns(sheetId, ...normalizedIndexes)
@@ -1697,6 +1753,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * @fires [[valuesUpdated]] if recalculation was triggered by this change
    *
+   * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
    * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
    * @throws [[InvalidArgumentsError]] when the given arguments are invalid
    * @throws [[SourceLocationHasMatrixError]] when the selected position has matrix inside
@@ -1719,6 +1776,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Columns
    */
   public removeColumns(sheetId: number, ...indexes: ColumnRowIndex[]): ExportedChange[] {
+    validateArgToType(sheetId, 'number', 'sheetId')
     this._crudOperations.removeColumns(sheetId, ...indexes)
     return this.recomputeIfDependencyGraphNeedsIt()
   }
@@ -1734,6 +1792,7 @@ export class HyperFormula implements TypedEmitter {
    * @param {number} height - height of the cell block that is being moved
    * @param {SimpleCellAddress} destinationLeftCorner - upper left address of the target cell block
    *
+   * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
    * @example
    * ```js
    * const hfInstance = HyperFormula.buildFromArray([
@@ -1753,6 +1812,8 @@ export class HyperFormula implements TypedEmitter {
    * @category Cells
    */
   public isItPossibleToMoveCells(sourceLeftCorner: SimpleCellAddress, width: number, height: number, destinationLeftCorner: SimpleCellAddress): boolean {
+    validateArgToType(width, 'number', 'width')
+    validateArgToType(height, 'number', 'height')
     try {
       this._crudOperations.operations.ensureItIsPossibleToMoveCells(sourceLeftCorner, width, height, destinationLeftCorner)
       return true
@@ -1773,6 +1834,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * @fires [[valuesUpdated]] if recalculation was triggered by this change
    *
+   * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
    * @throws [[InvalidArgumentsError]] when the given arguments are invalid
    * @throws [[SheetSizeLimitExceededError]] when performing this operation would result in sheet size limits exceeding
    * @throws [[SourceLocationHasMatrixError]] when the source location has matrix inside - matrix cannot be moved
@@ -1800,6 +1862,8 @@ export class HyperFormula implements TypedEmitter {
    * @category Cells
    */
   public moveCells(sourceLeftCorner: SimpleCellAddress, width: number, height: number, destinationLeftCorner: SimpleCellAddress): ExportedChange[] {
+    validateArgToType(width, 'number', 'width')
+    validateArgToType(height, 'number', 'height')
     this._crudOperations.moveCells(sourceLeftCorner, width, height, destinationLeftCorner)
     return this.recomputeIfDependencyGraphNeedsIt()
   }
@@ -1815,6 +1879,7 @@ export class HyperFormula implements TypedEmitter {
    * @param {number} numberOfRows - number of rows to move
    * @param {number} targetRow - row number before which rows will be moved
    *
+   * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
    * @example
    * ```js
    * const hfInstance = HyperFormula.buildFromArray([
@@ -1830,6 +1895,10 @@ export class HyperFormula implements TypedEmitter {
    * @category Rows
    */
   public isItPossibleToMoveRows(sheetId: number, startRow: number, numberOfRows: number, targetRow: number): boolean {
+    validateArgToType(sheetId, 'number', 'sheetId')
+    validateArgToType(startRow, 'number', 'startRow')
+    validateArgToType(numberOfRows, 'number', 'numberOfRows')
+    validateArgToType(targetRow, 'number', 'targetRow')
     try {
       this._crudOperations.ensureItIsPossibleToMoveRows(sheetId, startRow, numberOfRows, targetRow)
       return true
@@ -1850,6 +1919,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * @fires [[valuesUpdated]] if recalculation was triggered by this change
    *
+   * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
    * @throws [[InvalidArgumentsError]] when the given arguments are invalid
    * @throws [[SourceLocationHasMatrixError]] when the source location has matrix inside - matrix cannot be moved
    * @throws [[TargetLocationHasMatrixError]] when the target location has matrix inside - cells cannot be replaced by the matrix
@@ -1869,6 +1939,10 @@ export class HyperFormula implements TypedEmitter {
    * @category Rows
    */
   public moveRows(sheetId: number, startRow: number, numberOfRows: number, targetRow: number): ExportedChange[] {
+    validateArgToType(sheetId, 'number', 'sheetId')
+    validateArgToType(startRow, 'number', 'startRow')
+    validateArgToType(numberOfRows, 'number', 'numberOfRows')
+    validateArgToType(targetRow, 'number', 'targetRow')
     this._crudOperations.moveRows(sheetId, startRow, numberOfRows, targetRow)
     return this.recomputeIfDependencyGraphNeedsIt()
   }
@@ -1884,6 +1958,7 @@ export class HyperFormula implements TypedEmitter {
    * @param {number} numberOfColumns - number of columns to move
    * @param {number} targetColumn - column number before which columns will be moved
    *
+   * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
    * @example
    * ```js
    * const hfInstance = HyperFormula.buildFromArray([
@@ -1898,6 +1973,10 @@ export class HyperFormula implements TypedEmitter {
    * @category Columns
    */
   public isItPossibleToMoveColumns(sheetId: number, startColumn: number, numberOfColumns: number, targetColumn: number): boolean {
+    validateArgToType(sheetId, 'number', 'sheetId')
+    validateArgToType(startColumn, 'number', 'startColumn')
+    validateArgToType(numberOfColumns, 'number', 'numberOfColumns')
+    validateArgToType(targetColumn, 'number', 'targetColumn')
     try {
       this._crudOperations.ensureItIsPossibleToMoveColumns(sheetId, startColumn, numberOfColumns, targetColumn)
       return true
@@ -1918,6 +1997,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * @fires [[valuesUpdated]] if recalculation was triggered by this change
    *
+   * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
    * @throws [[InvalidArgumentsError]] when the given arguments are invalid
    * @throws [[SourceLocationHasMatrixError]] when the source location has matrix inside - matrix cannot be moved
    * @throws [[TargetLocationHasMatrixError]] when the target location has matrix inside - cells cannot be replaced by the matrix
@@ -1943,6 +2023,10 @@ export class HyperFormula implements TypedEmitter {
    * @category Columns
    */
   public moveColumns(sheetId: number, startColumn: number, numberOfColumns: number, targetColumn: number): ExportedChange[] {
+    validateArgToType(sheetId, 'number', 'sheetId')
+    validateArgToType(startColumn, 'number', 'startColumn')
+    validateArgToType(numberOfColumns, 'number', 'numberOfColumns')
+    validateArgToType(targetColumn, 'number', 'targetColumn')
     this._crudOperations.moveColumns(sheetId, startColumn, numberOfColumns, targetColumn)
     return this.recomputeIfDependencyGraphNeedsIt()
   }
@@ -1955,6 +2039,7 @@ export class HyperFormula implements TypedEmitter {
    * @param {number} width - width of the cell block being copied
    * @param {number} height - height of the cell block being copied
    *
+   * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
    * @throws an error while attempting to copy unsupported content type
    *
    * @example
@@ -1970,6 +2055,8 @@ export class HyperFormula implements TypedEmitter {
    * @category Clipboard
    */
   public copy(sourceLeftCorner: SimpleCellAddress, width: number, height: number): CellValue[][] {
+    validateArgToType(width, 'number', 'width')
+    validateArgToType(height, 'number', 'height')
     this._crudOperations.copy(sourceLeftCorner, width, height)
     return this.getRangeValues(sourceLeftCorner, width, height)
   }
@@ -1984,6 +2071,7 @@ export class HyperFormula implements TypedEmitter {
    * @param {number} width - width of the cell block being copied
    * @param {number} height - height of the cell block being copied
    *
+   * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
    * @example
    * ```js
    * const hfInstance = HyperFormula.buildFromArray([
@@ -1997,6 +2085,8 @@ export class HyperFormula implements TypedEmitter {
    * @category Clipboard
    */
   public cut(sourceLeftCorner: SimpleCellAddress, width: number, height: number): CellValue[][] {
+    validateArgToType(width, 'number', 'width')
+    validateArgToType(height, 'number', 'height')
     this._crudOperations.cut(sourceLeftCorner, width, height)
     return this.getRangeValues(sourceLeftCorner, width, height)
   }
@@ -2137,6 +2227,7 @@ export class HyperFormula implements TypedEmitter {
    * @param {number} width - width of a range
    * @param {number} height - height of a range
    *
+   * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
    * @example
    * ```js
    * const hfInstance = HyperFormula.buildFromArray([
@@ -2153,6 +2244,8 @@ export class HyperFormula implements TypedEmitter {
    * @category Ranges
    */
   public getRangeValues(leftCorner: SimpleCellAddress, width: number, height: number): CellValue[][] {
+    validateArgToType(width, 'number', 'width')
+    validateArgToType(height, 'number', 'height')
     const cellRange = AbsoluteCellRange.spanFrom(leftCorner, width, height)
     return cellRange.arrayOfAddressesInRange().map(
       (subarray) => subarray.map(
@@ -2168,6 +2261,7 @@ export class HyperFormula implements TypedEmitter {
    * @param {number} width - width of a range
    * @param {number} height - height of a range
    *
+   * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
    * @example
    * ```js
    * const hfInstance = HyperFormula.buildFromArray([
@@ -2184,6 +2278,8 @@ export class HyperFormula implements TypedEmitter {
    * @category Ranges
    */
   public getRangeFormulas(leftCorner: SimpleCellAddress, width: number, height: number): Maybe<string>[][] {
+    validateArgToType(width, 'number', 'width')
+    validateArgToType(height, 'number', 'height')
     const cellRange = AbsoluteCellRange.spanFrom(leftCorner, width, height)
     return cellRange.arrayOfAddressesInRange().map(
       (subarray) => subarray.map(
@@ -2199,6 +2295,7 @@ export class HyperFormula implements TypedEmitter {
    * @param {number} width - width of a range
    * @param {number} height - height of a range
    *
+   * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
    * @example
    * ```js
    * const hfInstance = HyperFormula.buildFromArray([
@@ -2215,6 +2312,8 @@ export class HyperFormula implements TypedEmitter {
    * @category Ranges
    */
   public getRangeSerialized(leftCorner: SimpleCellAddress, width: number, height: number): RawCellContent[][] {
+    validateArgToType(width, 'number', 'width')
+    validateArgToType(height, 'number', 'height')
     const cellRange = AbsoluteCellRange.spanFrom(leftCorner, width, height)
     return cellRange.arrayOfAddressesInRange().map(
       (subarray) => subarray.map(
@@ -2231,6 +2330,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * @param {string} sheetName - sheet name, case insensitive
    *
+   * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
    * @example
    * ```js
    * const hfInstance = HyperFormula.buildFromSheets({
@@ -2245,6 +2345,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Sheets
    */
   public isItPossibleToAddSheet(sheetName: string): boolean {
+    validateArgToType(sheetName, 'string', 'sheetName')
     try {
       this._crudOperations.ensureItIsPossibleToAddSheet(sheetName)
       return true
@@ -2260,6 +2361,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * @fires [[sheetAdded]] after the sheet was added
    *
+   * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
    * @throws [[SheetNameAlreadyTakenError]] when sheet with a given name already exists
    *
    * @example
@@ -2280,6 +2382,9 @@ export class HyperFormula implements TypedEmitter {
    * @category Sheets
    */
   public addSheet(sheetName?: string): string {
+    if(sheetName !== undefined) {
+      validateArgToType(sheetName, 'string', 'sheetName')
+    }
     const addedSheetName = this._crudOperations.addSheet(sheetName)
     this._emitter.emit(Events.SheetAdded, addedSheetName)
     return addedSheetName
@@ -2292,6 +2397,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * @param {string} sheetName - sheet name, case insensitive
    *
+   * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
    * @example
    * ```js
    * const hfInstance = HyperFormula.buildFromSheets({
@@ -2306,6 +2412,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Sheets
    */
   public isItPossibleToRemoveSheet(sheetName: string): boolean {
+    validateArgToType(sheetName, 'string', 'sheetName')
     try {
       this._crudOperations.ensureSheetExists(sheetName)
       return true
@@ -2324,6 +2431,7 @@ export class HyperFormula implements TypedEmitter {
    * @fires [[sheetRemoved]] after the sheet was removed
    * @fires [[valuesUpdated]] if recalculation was triggered by this change
    *
+   * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
    * @throws [[NoSheetWithNameError]] when the given sheet name does not exists
    *
    * @example
@@ -2345,6 +2453,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Sheets
    */
   public removeSheet(sheetName: string): ExportedChange[] {
+    validateArgToType(sheetName, 'string', 'sheetName')
     const displayName = this.sheetMapping.getDisplayNameByName(sheetName)!
     this._crudOperations.removeSheet(sheetName)
     const changes = this.recomputeIfDependencyGraphNeedsIt()
@@ -2359,6 +2468,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * @param {string} sheetName - sheet name, case insensitive.
    *
+   * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
    * @example
    * ```js
    * const hfInstance = HyperFormula.buildFromSheets({
@@ -2373,6 +2483,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Sheets
    */
   public isItPossibleToClearSheet(sheetName: string): boolean {
+    validateArgToType(sheetName, 'string', 'sheetName')
     try {
       this._crudOperations.ensureSheetExists(sheetName)
       return true
@@ -2391,6 +2502,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * @fires [[valuesUpdated]] if recalculation was triggered by this change
    *
+   * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
    * @throws [[NoSheetWithNameError]] when the given sheet name does not exists
    *
    * @example
@@ -2412,6 +2524,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Sheets
    */
   public clearSheet(sheetName: string): ExportedChange[] {
+    validateArgToType(sheetName, 'string', 'sheetName')
     this._crudOperations.ensureSheetExists(sheetName)
     this._crudOperations.clearSheet(sheetName)
     return this.recomputeIfDependencyGraphNeedsIt()
@@ -2425,6 +2538,7 @@ export class HyperFormula implements TypedEmitter {
    * @param {string} sheetName - sheet name, case insensitive.
    * @param {RawCellContent[][]} values - array of new values
    *
+   * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
    * @example
    * ```js
    * const hfInstance = HyperFormula.buildFromSheets({
@@ -2440,6 +2554,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Sheets
    */
   public isItPossibleToReplaceSheetContent(sheetName: string, values: RawCellContent[][]): boolean {
+    validateArgToType(sheetName, 'string', 'sheetName')
     try {
       this._crudOperations.ensureSheetExists(sheetName)
       const sheetId = this.sheetMapping.fetch(sheetName)
@@ -2458,6 +2573,7 @@ export class HyperFormula implements TypedEmitter {
    * @param {string} sheetName - sheet name, case insensitive.
    * @param {RawCellContent[][]} values - array of new values
    *
+   * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
    * @throws [[NoSheetWithNameError]] when the given sheet name does not exists
    * @throws [[InvalidArgumentsError]] when values is not an array of arrays
    *
@@ -2476,6 +2592,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Sheets
    */
   public setSheetContent(sheetName: string, values: RawCellContent[][]): ExportedChange[] {
+    validateArgToType(sheetName, 'string', 'sheetName')
     this._crudOperations.setSheetContent(sheetName, values)
     return this.recomputeIfDependencyGraphNeedsIt()
   }
@@ -2489,6 +2606,7 @@ export class HyperFormula implements TypedEmitter {
    * @param {string} cellAddress - string representation of cell address in A1 notation
    * @param {number} sheetId - override sheet index regardless of sheet mapping
    *
+   * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
    * @example
    * ```js
    * const hfInstance = HyperFormula.buildEmpty();
@@ -2500,15 +2618,18 @@ export class HyperFormula implements TypedEmitter {
    * @category Helpers
    */
   public simpleCellAddressFromString(cellAddress: string, sheetId: number): Maybe<SimpleCellAddress> {
+    validateArgToType(cellAddress, 'string', 'cellAddress')
+    validateArgToType(sheetId, 'number', 'sheetId')
     return simpleCellAddressFromString(this.sheetMapping.get, cellAddress, sheetId)
   }
 
   /**
    * Returns string representation of an absolute address in A1 notation or `undefined` if the sheet index is not present in the engine.
    *
-   * @param {SimpleCellAddress} cellAddress - object representation of an absolute address
+   * @param {SimpleCellAddress} simpleCellAddress - object representation of an absolute address
    * @param {number} sheetId - if is not equal with address sheet index, string representation will contain sheet name
    *
+   * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
    * @example
    * ```js
    * const hfInstance = HyperFormula.buildEmpty();
@@ -2519,8 +2640,9 @@ export class HyperFormula implements TypedEmitter {
    *
    * @category Helpers
    */
-  public simpleCellAddressToString(cellAddress: SimpleCellAddress, sheetId: number): Maybe<string> {
-    return simpleCellAddressToString(this.sheetMapping.fetchDisplayName, cellAddress, sheetId)
+  public simpleCellAddressToString(simpleCellAddress: SimpleCellAddress, sheetId: number): Maybe<string> {
+    validateArgToType(sheetId, 'number', 'sheetId')
+    return simpleCellAddressToString(this.sheetMapping.fetchDisplayName, simpleCellAddress, sheetId)
   }
 
   /**
@@ -2590,6 +2712,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * @param {number} sheetId - ID of the sheet, for which we want to retrieve name
    *
+   * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
    * @example
    * ```js
    * const hfInstance = HyperFormula.buildFromSheets({
@@ -2604,6 +2727,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Sheets
    */
   public getSheetName(sheetId: number): Maybe<string> {
+    validateArgToType(sheetId, 'number', 'sheetId')
     return this.sheetMapping.getDisplayName(sheetId)
   }
 
@@ -2633,6 +2757,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * @param {string} sheetName - name of the sheet, for which we want to retrieve ID, case insensitive.
    *
+   * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
    * @example
    * ```js
    * const hfInstance = HyperFormula.buildFromSheets({
@@ -2647,6 +2772,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Sheets
    */
   public getSheetId(sheetName: string): Maybe<number> {
+    validateArgToType(sheetName, 'string', 'sheetName')
     return this.sheetMapping.get(sheetName)
   }
 
@@ -2655,6 +2781,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * @param {string} sheetName - name of the sheet, case insensitive.
    *
+   * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
    * @example
    * ```js
    * const hfInstance = HyperFormula.buildFromSheets({
@@ -2669,6 +2796,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Sheets
    */
   public doesSheetExist(sheetName: string): boolean {
+    validateArgToType(sheetName, 'string', 'sheetName')
     return this.sheetMapping.hasSheetWithName(sheetName)
   }
 
@@ -2911,7 +3039,7 @@ export class HyperFormula implements TypedEmitter {
    * @param {number} sheetId - a sheet number
    * @param {string} newName - a name of the sheet to be given
    *
-   *
+   * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
    * @example
    * ```js
    * const hfInstance = HyperFormula.buildFromSheets({
@@ -2926,6 +3054,8 @@ export class HyperFormula implements TypedEmitter {
    * @category Sheets
    */
   public isItPossibleToRenameSheet(sheetId: number, newName: string): boolean {
+    validateArgToType(sheetId, 'number', 'sheetId')
+    validateArgToType(newName, 'string', 'newName')
     try {
       this._crudOperations.ensureItIsPossibleToRenameSheet(sheetId, newName)
       return true
@@ -2942,8 +3072,8 @@ export class HyperFormula implements TypedEmitter {
    *
    * @fires [[sheetRenamed]] after the sheet was renamed
    *
+   * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
    * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
-   *
    * @throws [[SheetNameAlreadyTakenError]] when the provided sheet name already exists
    *
    * @example
@@ -2960,6 +3090,8 @@ export class HyperFormula implements TypedEmitter {
    * @category Sheets
    */
   public renameSheet(sheetId: number, newName: string): void {
+    validateArgToType(sheetId, 'number', 'sheetId')
+    validateArgToType(newName, 'string', 'newName')
     const oldName = this._crudOperations.renameSheet(sheetId, newName)
     if (oldName !== undefined) {
       this._emitter.emit(Events.SheetRenamed, oldName, newName)
@@ -3118,6 +3250,7 @@ export class HyperFormula implements TypedEmitter {
    * @param {RawCellContent} expression - the expression
    * @param {string?} scope - scope definition, `sheetName` for local scope or `undefined` for global scope
    *
+   * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
    * @example
    * ```js
    * const hfInstance = HyperFormula.buildFromArray([
@@ -3132,6 +3265,10 @@ export class HyperFormula implements TypedEmitter {
    * @category Named Expressions
    */
   public isItPossibleToAddNamedExpression(expressionName: string, expression: RawCellContent, scope?: string): boolean {
+    validateArgToType(expressionName, 'string', 'expressionName')
+    if(scope !== undefined) {
+      validateArgToType(scope, 'string', 'scope')
+    }
     try {
       this._crudOperations.ensureItIsPossibleToAddNamedExpression(expressionName, expression, scope)
       return true
@@ -3153,6 +3290,7 @@ export class HyperFormula implements TypedEmitter {
    * @fires [[namedExpressionAdded]] always, unless [[batch]] mode is used
    * @fires [[valuesUpdated]] if recalculation was triggered by this change
    *
+   * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
    * @throws [[NamedExpressionNameIsAlreadyTakenError]] when the named expression name is not available.
    * @throws [[NamedExpressionNameIsInvalidError]] when the named expression name is not valid
    * @throws [[MatrixFormulasNotSupportedError]] when the named expression formula is a Matrix formula
@@ -3178,6 +3316,10 @@ export class HyperFormula implements TypedEmitter {
    * @category Named Expressions
    */
   public addNamedExpression(expressionName: string, expression: RawCellContent, scope?: string, options?: NamedExpressionOptions): ExportedChange[] {
+    validateArgToType(expressionName, 'string', 'expressionName')
+    if(scope !== undefined) {
+      validateArgToType(scope, 'string', 'scope')
+    }
     this._crudOperations.addNamedExpression(expressionName, expression, scope, options)
     const changes = this.recomputeIfDependencyGraphNeedsIt()
     this._emitter.emit(Events.NamedExpressionAdded, expressionName, changes)
@@ -3191,6 +3333,7 @@ export class HyperFormula implements TypedEmitter {
    * @param {string} expressionName - expression name, case insensitive.
    * @param {string?} scope - scope definition, `sheetName` for local scope or `undefined` for global scope
    *
+   * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
    * @throws [[NoSheetWithNameError]] when the given sheet name does not exists
    *
    * @example
@@ -3209,6 +3352,10 @@ export class HyperFormula implements TypedEmitter {
    * @category Named Expressions
    */
   public getNamedExpressionValue(expressionName: string, scope?: string): Maybe<CellValue> {
+    validateArgToType(expressionName, 'string', 'expressionName')
+    if(scope !== undefined) {
+      validateArgToType(scope, 'string', 'scope')
+    }
     this.ensureEvaluationIsNotSuspended()
     const sheetId = this._crudOperations.scopeId(scope)
     const namedExpression = this._namedExpressions.namedExpressionForScope(expressionName, sheetId)
@@ -3225,6 +3372,7 @@ export class HyperFormula implements TypedEmitter {
    * @param {string} expressionName - expression name, case insensitive.
    * @param {string?} scope - scope definition, `sheetName` for local scope or `undefined` for global scope
    *
+   * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
    * @throws [[NoSheetWithNameError]] when the given sheet name does not exists
    *
    * @example
@@ -3244,6 +3392,10 @@ export class HyperFormula implements TypedEmitter {
    * @category Named Expressions
    */
   public getNamedExpressionFormula(expressionName: string, scope?: string): Maybe<string> {
+    validateArgToType(expressionName, 'string', 'expressionName')
+    if(scope !== undefined) {
+      validateArgToType(scope, 'string', 'scope')
+    }
     const sheetId = this._crudOperations.scopeId(scope)
     const namedExpression = this._namedExpressions.namedExpressionForScope(expressionName, sheetId)
     if (namedExpression === undefined) {
@@ -3259,6 +3411,7 @@ export class HyperFormula implements TypedEmitter {
    * @param {string} expressionName - expression name, case insensitive.
    * @param {string?} scope - scope definition, `sheetName` for local scope or `undefined` for global scope
    *
+   * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
    * @throws [[NoSheetWithNameError]] when the given sheet name does not exists
    *
    * @example
@@ -3278,6 +3431,10 @@ export class HyperFormula implements TypedEmitter {
    * @category Named Expressions
    */
   public getNamedExpression(expressionName: string, scope?: string): Maybe<NamedExpression> {
+    validateArgToType(expressionName, 'string', 'expressionName')
+    if(scope !== undefined) {
+      validateArgToType(scope, 'string', 'scope')
+    }
     const sheetId = this._crudOperations.scopeId(scope)
     const namedExpression = this._namedExpressions.namedExpressionForScope(expressionName, sheetId)
 
@@ -3305,6 +3462,7 @@ export class HyperFormula implements TypedEmitter {
    * @param {RawCellContent} newExpression - a new expression
    * @param {string?} scope - scope definition, `sheetName` for local scope or `undefined` for global scope
    *
+   * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
    * @example
    * ```js
    * const hfInstance = HyperFormula.buildFromArray([
@@ -3322,6 +3480,10 @@ export class HyperFormula implements TypedEmitter {
    * @category Named Expressions
    */
   public isItPossibleToChangeNamedExpression(expressionName: string, newExpression: RawCellContent, scope?: string): boolean {
+    validateArgToType(expressionName, 'string', 'expressionName')
+    if(scope !== undefined) {
+      validateArgToType(scope, 'string', 'scope')
+    }
     try {
       this._crudOperations.ensureItIsPossibleToChangeNamedExpression(expressionName, newExpression, scope)
       return true
@@ -3342,6 +3504,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * @fires [[valuesUpdated]] if recalculation was triggered by this change
    *
+   * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
    * @throws [[NamedExpressionDoesNotExistError]] when the given expression does not exist.
    * @throws [[NoSheetWithNameError]] when the given sheet name does not exists
    * @throws [[MatrixFormulasNotSupportedError]] when the named expression formula is a Matrix formula
@@ -3363,6 +3526,10 @@ export class HyperFormula implements TypedEmitter {
    * @category Named Expressions
    */
   public changeNamedExpression(expressionName: string, newExpression: RawCellContent, scope?: string, options?: NamedExpressionOptions): ExportedChange[] {
+    validateArgToType(expressionName, 'string', 'expressionName')
+    if(scope !== undefined) {
+      validateArgToType(scope, 'string', 'scope')
+    }
     this._crudOperations.changeNamedExpressionExpression(expressionName, scope, newExpression, options)
     return this.recomputeIfDependencyGraphNeedsIt()
   }
@@ -3376,6 +3543,7 @@ export class HyperFormula implements TypedEmitter {
    * @param {string} expressionName - an expression name, case insensitive.
    * @param {string?} scope - scope definition, `sheetName` for local scope or `undefined` for global scope
    *
+   * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
    * @example
    * ```js
    * const hfInstance = HyperFormula.buildFromArray([
@@ -3393,6 +3561,10 @@ export class HyperFormula implements TypedEmitter {
    * @category Named Expressions
    */
   public isItPossibleToRemoveNamedExpression(expressionName: string, scope?: string): boolean {
+    validateArgToType(expressionName, 'string', 'expressionName')
+    if(scope !== undefined) {
+      validateArgToType(scope, 'string', 'scope')
+    }
     try {
       this._crudOperations.isItPossibleToRemoveNamedExpression(expressionName, scope)
       return true
@@ -3412,6 +3584,7 @@ export class HyperFormula implements TypedEmitter {
    * @fires [[namedExpressionRemoved]] after the expression was removed
    * @fires [[valuesUpdated]] if recalculation was triggered by this change
    *
+   * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
    * @throws [[NamedExpressionDoesNotExistError]] when the given expression does not exist.
    * @throws [[NoSheetWithNameError]] when the given sheet name does not exists
    *
@@ -3431,6 +3604,10 @@ export class HyperFormula implements TypedEmitter {
    * @category Named Expressions
    */
   public removeNamedExpression(expressionName: string, scope?: string): ExportedChange[] {
+    validateArgToType(expressionName, 'string', 'expressionName')
+    if(scope !== undefined) {
+      validateArgToType(scope, 'string', 'scope')
+    }
     const removedNamedExpression = this._crudOperations.removeNamedExpression(expressionName, scope)
     if (removedNamedExpression) {
       const changes = this.recomputeIfDependencyGraphNeedsIt()
@@ -3447,6 +3624,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * @param {string?} scope - scope definition, `sheetName` for local scope or `undefined` for global scope
    *
+   * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
    * @throws [[NoSheetWithNameError]] when the given sheet name does not exists
    *
    * @example
@@ -3472,6 +3650,9 @@ export class HyperFormula implements TypedEmitter {
    * @category Named Expressions
    */
   public listNamedExpressions(scope?: string): string[] {
+    if(scope !== undefined) {
+      validateArgToType(scope, 'string', 'scope')
+    }
     const scopeId = this._crudOperations.scopeId(scope)
     return this._namedExpressions.getAllNamedExpressionsNamesInScope(scopeId)
   }
@@ -3481,6 +3662,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * @param {string} formulaString - a formula in a proper format - it must start with "="
    *
+   * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
    * @throws [[NotAFormulaError]] when the provided string is not a valid formula, i.e does not start with "="
    *
    * @example
@@ -3497,6 +3679,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Helpers
    */
   public normalizeFormula(formulaString: string): string {
+    validateArgToType(formulaString, 'string', 'formulaString')
     const [ast, address] = this.extractTemporaryFormula(formulaString)
     if (ast === undefined) {
       throw new NotAFormulaError()
@@ -3510,6 +3693,7 @@ export class HyperFormula implements TypedEmitter {
    * @param {string} formulaString -  a formula in a proper format - it must start with "="
    * @param {string} sheetName - a name of the sheet in context of which we evaluate formula, case insensitive.
    *
+   * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
    * @throws [[NotAFormulaError]] when the provided string is not a valid formula, i.e does not start with "="
    * @throws [[NoSheetWithNameError]] when the given sheet name does not exists
    *
@@ -3527,6 +3711,8 @@ export class HyperFormula implements TypedEmitter {
    * @category Helpers
    */
   public calculateFormula(formulaString: string, sheetName: string): CellValue {
+    validateArgToType(formulaString, 'string', 'formulaString')
+    validateArgToType(sheetName, 'string', 'sheetName')
     this._crudOperations.ensureSheetExists(sheetName)
     const sheetId = this.sheetMapping.fetch(sheetName)
     const [ast, address, dependencies] = this.extractTemporaryFormula(formulaString, sheetId)
@@ -3543,6 +3729,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * @param {string} formulaString -  a formula in a proper format - it must start with "="
    *
+   * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
    * @example
    * ```js
    * // checks if the given string is a valid formula, should return 'true' for this example
@@ -3552,6 +3739,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Helpers
    */
   public validateFormula(formulaString: string): boolean {
+    validateArgToType(formulaString, 'string', 'formulaString')
     const [ast] = this.extractTemporaryFormula(formulaString)
     if (ast === undefined) {
       return false
@@ -3586,6 +3774,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * @param {string} functionId - id of a function, e.g. 'SUMIF'
    *
+   * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
    * @example
    * ```js
    * // import your own plugin
@@ -3603,6 +3792,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Custom Functions
    */
   public getFunctionPlugin(functionId: string): Maybe<FunctionPluginDefinition> {
+    validateArgToType(functionId, 'string', 'functionId')
     return this._functionRegistry.getFunctionPlugin(functionId)
   }
 
@@ -3626,8 +3816,9 @@ export class HyperFormula implements TypedEmitter {
   /**
    * Interprets number as a date + time.
    *
-   * @param {number} val - number of days since nullDate, should be nonnegative, fractions are interpreted as hours/minutes/seconds.
+   * @param {number} inputNumber - number of days since nullDate, should be nonnegative, fractions are interpreted as hours/minutes/seconds.
    *
+   * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
    * @example
    * ```js
    * const hfInstance = HyperFormula.buildEmpty();
@@ -3641,15 +3832,17 @@ export class HyperFormula implements TypedEmitter {
    *
    * @category Helpers
    */
-  public numberToDateTime(val: number): DateTime {
-    return this._evaluator.dateHelper.numberToSimpleDateTime(val)
+  public numberToDateTime(inputNumber: number): DateTime {
+    validateArgToType(inputNumber, 'number', 'val')
+    return this._evaluator.dateHelper.numberToSimpleDateTime(inputNumber)
   }
 
   /**
    * Interprets number as a date.
    *
-   * @param {number} val - number of days since nullDate, should be nonnegative, fractions are ignored.
+   * @param {number} inputNumber - number of days since nullDate, should be nonnegative, fractions are ignored.
 
+   * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
    * @example
    * ```js
    * const hfInstance = HyperFormula.buildEmpty();
@@ -3662,15 +3855,17 @@ export class HyperFormula implements TypedEmitter {
    *
    * @category Helpers
    */
-  public numberToDate(val: number): DateTime {
-    return this._evaluator.dateHelper.numberToSimpleDate(val)
+  public numberToDate(inputNumber: number): DateTime {
+    validateArgToType(inputNumber, 'number', 'val')
+    return this._evaluator.dateHelper.numberToSimpleDate(inputNumber)
   }
 
   /**
    * Interprets number as a time (hours/minutes/seconds).
    *
-   * @param {number} val - time in 24h units.
+   * @param {number} inputNumber - time in 24h units.
    *
+   * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
    * @example
    * ```js
    * const hfInstance = HyperFormula.buildEmpty();
@@ -3682,8 +3877,9 @@ export class HyperFormula implements TypedEmitter {
    *
    * @category Helpers
    */
-  public numberToTime(val: number): DateTime {
-    return numberToSimpleTime(val)
+  public numberToTime(inputNumber: number): DateTime {
+    validateArgToType(inputNumber, 'number', 'val')
+    return numberToSimpleTime(inputNumber)
   }
 
   private extractTemporaryFormula(formulaString: string, sheetId: number = 1): [Maybe<Ast>, SimpleCellAddress, RelativeDependency[]] {
