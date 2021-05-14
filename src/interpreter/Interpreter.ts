@@ -19,7 +19,13 @@ import {NumberLiteralHelper} from '../NumberLiteralHelper'
 import {Ast, AstNodeType, CellRangeAst, ColumnRangeAst, RowRangeAst} from '../parser/Ast'
 import {Serialization} from '../Serialization'
 import {Statistics} from '../statistics/Statistics'
-import {ArithmeticHelper, coerceScalarToString, fixNegativeZero, isNumberOverflow} from './ArithmeticHelper'
+import {
+  ArithmeticHelper,
+  coerceRangeToScalar,
+  coerceScalarToString,
+  fixNegativeZero,
+  isNumberOverflow
+} from './ArithmeticHelper'
 import {CriterionBuilder} from './Criterion'
 import {FunctionRegistry} from './FunctionRegistry'
 import {InterpreterState} from './InterpreterState'
@@ -321,37 +327,42 @@ export class Interpreter {
   private unaryPlusOp = (arg: InternalScalarValue): InternalScalarValue => this.arithmeticHelper.unaryPlus(arg)
 
   private unaryRangeWrapper(op: (arg: InternalScalarValue) => InternalScalarValue, arg: InterpreterValue, state: InterpreterState): InterpreterValue {
+    if(arg instanceof SimpleRangeValue && !state.arraysFlag) {
+      arg = coerceRangeToScalar(arg, state) ?? new CellError(ErrorType.VALUE, ErrorMessage.ScalarExpected)
+    }
     if (arg instanceof CellError) {
       return arg
-    } else if(arg instanceof SimpleRangeValue) {
-      if(!state.arraysFlag) {
-        return new CellError(ErrorType.VALUE, ErrorMessage.ScalarExpected)
-      }
+    }
+    if(arg instanceof SimpleRangeValue) {
       const newRaw = arg.data.map(
         (row) => row.map(op)
       )
       return SimpleRangeValue.onlyValues(newRaw)
-    } else {
-      return op(arg)
     }
+
+    return op(arg)
   }
 
   private binaryRangeWrapper(op: (arg1: InternalScalarValue, arg2: InternalScalarValue) => InternalScalarValue, arg1: InterpreterValue, arg2: InterpreterValue, state: InterpreterState): InterpreterValue {
+    if(arg1 instanceof SimpleRangeValue && !state.arraysFlag) {
+      arg1 = coerceRangeToScalar(arg1, state) ?? new CellError(ErrorType.VALUE, ErrorMessage.ScalarExpected)
+    }
     if (arg1 instanceof CellError) {
       return arg1
-    } else if(arg1 instanceof SimpleRangeValue && !state.arraysFlag) {
-      return new CellError(ErrorType.VALUE, ErrorMessage.ScalarExpected)
-    } else if (arg2 instanceof CellError) {
+    }
+    if(arg2 instanceof SimpleRangeValue && !state.arraysFlag) {
+      arg2 = coerceRangeToScalar(arg2, state) ?? new CellError(ErrorType.VALUE, ErrorMessage.ScalarExpected)
+    }
+    if (arg2 instanceof CellError) {
       return arg2
-    } else if(arg2 instanceof SimpleRangeValue && !state.arraysFlag) {
-      return new CellError(ErrorType.VALUE, ErrorMessage.ScalarExpected)
-    } else if(arg1 instanceof SimpleRangeValue || arg2 instanceof SimpleRangeValue) {
+    }
+    if(arg1 instanceof SimpleRangeValue || arg2 instanceof SimpleRangeValue) {
       if(!(arg1 instanceof SimpleRangeValue)) {
         if((arg2 as SimpleRangeValue).isAdHoc()) {
           const raw2 = (arg2 as SimpleRangeValue).data
           for(let i=0;i<raw2.length;i++) {
             for(let j=0;j<raw2[0].length;j++) {
-              raw2[i][j] = op(arg1 as InternalScalarValue, raw2[i][j])
+              raw2[i][j] = op(arg1, raw2[i][j])
             }
           }
           return SimpleRangeValue.onlyValues(raw2)
@@ -393,7 +404,6 @@ export class Interpreter {
           }
           return SimpleRangeValue.onlyValues(raw2)
         }
-
       }
       const width = Math.max(arg1.width(), arg2.width())
       const height = Math.max(arg1.height(), arg2.height())
@@ -415,9 +425,9 @@ export class Interpreter {
         }
       }
       return SimpleRangeValue.onlyValues(ret)
-    } else {
-      return op(arg1, arg2)
     }
+
+    return op(arg1, arg2)
   }
 }
 
@@ -445,3 +455,4 @@ function wrapperForAddress(val: InterpreterValue, adr: SimpleCellAddress): Inter
   }
   return val
 }
+

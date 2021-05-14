@@ -226,16 +226,4 @@ describe('Function MONTH', () => {
     expect(engine.getCellValue(adr('A11'))).toEqual(12)
     expect(engine.getCellValue(adr('A12'))).toEqual(1)
   })
-
-  // Inconsistency with Product 1
-  it('range value in 1st argument results in VALUE error', () => {
-    const engine = HyperFormula.buildFromArray([
-      ['=DATE(2019, 3, 31)', '=MONTH(A1:A3)'],
-      ['=DATE(2019, 4, 31)', '=MONTH(A1:A3)'],
-      ['=DATE(2019, 5, 31)'],
-    ])
-
-    expect(engine.getCellValue(adr('B1'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.WrongType))
-    expect(engine.getCellValue(adr('B2'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.WrongType))
-  })
 })

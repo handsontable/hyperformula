@@ -69,6 +69,7 @@ Total number of functions: **{{ $page.functionsCount }}**
 | :--- | :--- | :--- |
 | ARRAYFORMULA | Enables array arithmetic inside. | ARRAYFORMULA(Formula) |
 | FILTER | Filter input array based on boolean arrays. | FILTER(Array; BoolArray1[; BoolArray2[; ...]])
+| ARRAY_CONSTRAINT | Truncates array to given dimensions. | ARRAYFORMULA(Array; Height; Width) |
 
 ### Date and time
 

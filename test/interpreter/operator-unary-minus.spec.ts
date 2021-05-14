@@ -33,15 +33,15 @@ describe('Unary operator MINUS', () => {
     expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.DIV_BY_ZERO))
   })
 
-  // Inconsistency with Product 1
   it('range value results in VALUE error', () => {
     const engine = HyperFormula.buildFromArray([
       ['1'],
-      ['9', '=-A1:A3'],
+      ['9'],
       ['3'],
-    ])
+      ['=-A1:A3']
+    ], {useArrayArithmetic: false})
 
-    expect(engine.getCellValue(adr('B2'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.ScalarExpected))
+    expect(engine.getCellValue(adr('A4'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.ScalarExpected))
   })
 
   it('double unary plus', () => {

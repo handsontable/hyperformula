@@ -119,7 +119,7 @@ describe('Matrix size check tests', () => {
 })
 
 describe('Matrix size check tests, with different config', () => {
-  const config = new Config({arrays: true})
+  const config = new Config({useArrayArithmetic: true})
   const functionRegistry = new FunctionRegistry(config)
   // eslint-disable-next-line
   // @ts-ignore

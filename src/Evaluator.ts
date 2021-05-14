@@ -61,7 +61,7 @@ export class Evaluator {
             const address = vertex.getAddress(this.dependencyGraph.lazilyTransformingAstService)
             const formula = vertex.getFormula(this.dependencyGraph.lazilyTransformingAstService)
             const currentValue = vertex.isComputed() ? vertex.getCellValue() : null
-            const newCellValue = this.evaluateAstToCellValue(formula, new InterpreterState(address, this.config.arrays))
+            const newCellValue = this.evaluateAstToCellValue(formula, new InterpreterState(address, this.config.useArrayArithmetic))
             vertex.setCellValue(newCellValue)
             if (newCellValue !== currentValue) {
               changes.addChange(newCellValue, address)
@@ -73,7 +73,7 @@ export class Evaluator {
             const address = vertex.getAddress()
             const formula = vertex.getFormula()!
             const currentValue = vertex.isComputed() ? vertex.getCellValue() : null
-            const newCellValue = this.evaluateAstToRangeValue(formula, new InterpreterState(address, this.config.arrays))
+            const newCellValue = this.evaluateAstToRangeValue(formula, new InterpreterState(address, this.config.useArrayArithmetic))
             if(newCellValue instanceof SimpleRangeValue && newCellValue.isAdHoc()) {
               const newCellMatrix = new Matrix(newCellValue.data)
               vertex.setCellValue(newCellMatrix)
@@ -132,7 +132,7 @@ export class Evaluator {
         }
       }
     }
-    const ret = this.evaluateAstToCellValue(ast, new InterpreterState(address, this.config.arrays))
+    const ret = this.evaluateAstToCellValue(ast, new InterpreterState(address, this.config.useArrayArithmetic))
 
     tmpRanges.forEach((rangeVertex) => {
       this.dependencyGraph.rangeMapping.removeRange(rangeVertex)
@@ -156,13 +156,13 @@ export class Evaluator {
       if (vertex instanceof FormulaCellVertex) {
         const address = vertex.getAddress(this.dependencyGraph.lazilyTransformingAstService)
         const formula = vertex.getFormula(this.dependencyGraph.lazilyTransformingAstService)
-        const newCellValue = this.evaluateAstToCellValue(formula, new InterpreterState(address, this.config.arrays))
+        const newCellValue = this.evaluateAstToCellValue(formula, new InterpreterState(address, this.config.useArrayArithmetic))
         vertex.setCellValue(newCellValue)
         this.columnSearch.add(getRawValue(newCellValue), address)
       } else if (vertex instanceof MatrixVertex && vertex.isFormula()) {
         const address = vertex.getAddress()
         const formula = vertex.getFormula()!
-        const newCellValue = this.evaluateAstToRangeValue(formula, new InterpreterState(address, this.config.arrays))
+        const newCellValue = this.evaluateAstToRangeValue(formula, new InterpreterState(address, this.config.useArrayArithmetic))
         if(newCellValue instanceof SimpleRangeValue && newCellValue.isAdHoc()) {
           const newCellMatrix = new Matrix(newCellValue.data)
           vertex.setCellValue(newCellMatrix)

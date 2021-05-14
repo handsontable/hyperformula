@@ -12,7 +12,13 @@ import {SearchStrategy} from '../../Lookup/SearchStrategy'
 import {Maybe} from '../../Maybe'
 import {Ast, AstNodeType, ProcedureAst} from '../../parser'
 import {Serialization} from '../../Serialization'
-import {coerceScalarToBoolean, coerceScalarToString, coerceToRange, complex} from '../ArithmeticHelper'
+import {
+  coerceRangeToScalar,
+  coerceScalarToBoolean,
+  coerceScalarToString,
+  coerceToRange,
+  complex
+} from '../ArithmeticHelper'
 import {Interpreter} from '../Interpreter'
 import {InterpreterState} from '../InterpreterState'
 import {
@@ -206,7 +212,7 @@ export abstract class FunctionPlugin implements FunctionPluginTypecheck<Function
 
   protected coerceScalarToNumberOrError = (arg: InternalScalarValue): ExtendedNumber | CellError => this.interpreter.arithmeticHelper.coerceScalarToNumberOrError(arg)
 
-  protected coerceToType(arg: InterpreterValue, coercedType: FunctionArgument): Maybe<InterpreterValue | complex | RawNoErrorScalarValue> {
+  protected coerceToType(arg: InterpreterValue, coercedType: FunctionArgument, state: InterpreterState): Maybe<InterpreterValue | complex | RawNoErrorScalarValue> {
     let ret
     if (arg instanceof SimpleRangeValue) {
       switch(coercedType.argumentType) {
@@ -214,10 +220,16 @@ export abstract class FunctionPlugin implements FunctionPluginTypecheck<Function
         case ArgumentTypes.ANY:
           ret = arg
           break
-        default:
-          return undefined
+        default: {
+          const coerce = coerceRangeToScalar(arg, state)
+          if(coerce === undefined) {
+            return undefined
+          }
+          arg = coerce
+        }
       }
-    } else {
+    }
+    if(!(arg instanceof SimpleRangeValue)) {
       switch (coercedType.argumentType) {
         case ArgumentTypes.INTEGER:
         case ArgumentTypes.NUMBER:
@@ -261,7 +273,7 @@ export abstract class FunctionPlugin implements FunctionPluginTypecheck<Function
           if (arg instanceof CellError) {
             return arg
           }
-          ret = coerceToRange(getRawValue(arg))
+          ret = coerceToRange(arg)
           break
         case ArgumentTypes.COMPLEX:
           return this.interpreter.arithmeticHelper.coerceScalarToComplex(getRawValue(arg))
@@ -334,7 +346,7 @@ export abstract class FunctionPlugin implements FunctionPluginTypecheck<Function
         }
       } else {
         //we apply coerce only to non-default values
-        const coercedArg = val !== undefined ? this.coerceToType(arg, argumentDefinitions[j]) : arg
+        const coercedArg = val !== undefined ? this.coerceToType(arg, argumentDefinitions[j], state) : arg
         if (coercedArg !== undefined) {
           if (coercedArg instanceof CellError && argumentDefinitions[j].argumentType !== ArgumentTypes.SCALAR) {
             //if this is first error encountered, store it
