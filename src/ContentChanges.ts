@@ -54,7 +54,7 @@ export class ContentChanges {
   }
 
   public isEmpty(): boolean {
-    return this.changes === []
+    return this.changes.length === 0
   }
 
   private addSingleCellValue(value: InterpreterValue, address: SimpleCellAddress) {
