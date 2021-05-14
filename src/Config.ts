@@ -32,7 +32,6 @@ type GPUMode = 'gpu' | 'cpu' | 'dev'
 const PossibleGPUModeString: GPUMode[] = ['gpu', 'cpu', 'dev']
 
 export interface ConfigParams {
-  arrays: boolean, //FIXME
   /**
    * Specifies if the string comparison is accent sensitive or not.
    * Applies to comparison operators only.
@@ -393,7 +392,6 @@ export type ConfigParamsList = keyof ConfigParams
 export class Config implements ConfigParams, ParserConfig {
 
   public static defaultConfig: ConfigParams = {
-    arrays: false,
     accentSensitive: false,
     binarySearchThreshold: 20,
     currencySymbol: ['$'],
@@ -435,7 +433,6 @@ export class Config implements ConfigParams, ParserConfig {
     useArrayArithmetic: false,
   }
 
-  public readonly arrays: boolean
   /** @inheritDoc */
   public readonly useArrayArithmetic: boolean
   /** @inheritDoc */
@@ -542,7 +539,6 @@ export class Config implements ConfigParams, ParserConfig {
 
   constructor(
     {
-      arrays,
       accentSensitive,
       binarySearchThreshold,
       caseSensitive,
