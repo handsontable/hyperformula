@@ -4,7 +4,7 @@
  */
 
 import {absolutizeDependencies} from './absolutizeDependencies'
-import {CellError, simpleCellAddress} from './Cell'
+import {simpleCellAddress} from './Cell'
 import {CellContent, CellContentParser} from './CellContentParser'
 import {CellDependency} from './CellDependency'
 import {getRawValue} from './interpreter/InterpreterValue'

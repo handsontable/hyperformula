@@ -16,6 +16,7 @@ import {Interpreter} from './interpreter/Interpreter'
 import {EmptyValue, getRawValue, InterpreterValue} from './interpreter/InterpreterValue'
 import {SimpleRangeValue} from './interpreter/SimpleRangeValue'
 import {ColumnSearchStrategy} from './Lookup/SearchStrategy'
+import {Matrix} from './Matrix'
 import {NamedExpressions} from './NamedExpressions'
 import {NumberLiteralHelper} from './NumberLiteralHelper'
 import {Ast, RelativeDependency} from './parser'
@@ -63,7 +64,7 @@ export class Evaluator {
             const address = vertex.getAddress(this.dependencyGraph.lazilyTransformingAstService)
             const formula = vertex.getFormula(this.dependencyGraph.lazilyTransformingAstService)
             const currentValue = vertex.isComputed() ? vertex.getCellValue() : null
-            const newCellValue = this.evaluateAstToCellValue(formula, new InterpreterState(address, this.config.arrays))
+            const newCellValue = this.evaluateAstToCellValue(formula, new InterpreterState(address, this.config.useArrayArithmetic))
             const setValue = vertex.setCellValue(newCellValue)
             if (newCellValue !== currentValue) {
               changes.addChange(newCellValue, address)
@@ -110,7 +111,7 @@ export class Evaluator {
         }
       }
     }
-    const ret = this.evaluateAstToCellValue(ast, new InterpreterState(address, this.config.arrays))
+    const ret = this.evaluateAstToCellValue(ast, new InterpreterState(address, this.config.useArrayArithmetic))
 
     tmpRanges.forEach((rangeVertex) => {
       this.dependencyGraph.rangeMapping.removeRange(rangeVertex)
@@ -132,7 +133,7 @@ export class Evaluator {
       if (vertex instanceof FormulaVertex) {
         const address = vertex.getAddress(this.lazilyTransformingAstService)
         const formula = vertex.getFormula(this.lazilyTransformingAstService)
-        const newCellValue = this.evaluateAstToCellValue(formula, new InterpreterState(address, this.config.arrays))
+        const newCellValue = this.evaluateAstToCellValue(formula, new InterpreterState(address, this.config.useArrayArithmetic))
         const setValue = vertex.setCellValue(newCellValue)
         this.columnSearch.add(getRawValue(setValue), address)
       } else if (vertex instanceof RangeVertex) {

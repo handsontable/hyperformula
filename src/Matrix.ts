@@ -142,13 +142,13 @@ export class Matrix implements IMatrix {
       this.addRows(this.height(), newSize.height-this.height())
     }
     if(this.height() > newSize.height) {
-      throw "Resizing to smaller matrix"
+      throw 'Resizing to smaller matrix'
     }
     if(this.width() < newSize.width) {
       this.addColumns(this.width(), newSize.width-this.width())
     }
     if(this.width() > newSize.width) {
-      throw "Resizing to smaller matrix"
+      throw 'Resizing to smaller matrix'
     }
   }
 

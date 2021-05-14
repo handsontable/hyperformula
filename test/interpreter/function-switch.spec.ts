@@ -25,7 +25,7 @@ describe('Interpreter - SWITCH function', () => {
     const engine = HyperFormula.buildFromArray([
       [1, 2, 3],
       ['=SWITCH(A1:C1,1,2,3,4,5)']
-    ], {arrays: false})
+    ], {useArrayArithmetic: false})
     expect(engine.getSheetValues(0)).toEqual([[1, 2, 3], [2, 5, 4]])
   })
 

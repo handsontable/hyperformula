@@ -4,7 +4,6 @@
  */
 
 import {CellError, ErrorType, SimpleCellAddress} from '../../Cell'
-import {FormulaCellVertex, MatrixVertex} from '../../DependencyGraph'
 import {ErrorMessage} from '../../error-message'
 import {AstNodeType, ProcedureAst} from '../../parser'
 import {InterpreterState} from '../InterpreterState'
