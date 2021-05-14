@@ -16,7 +16,7 @@ describe('Function MATCH', () => {
 
   it('validates that 1st argument is number, string or boolean', () => {
     const engine = HyperFormula.buildFromArray([
-      ['=MATCH(C1:C2, B1:B1)'],
+      ['=MATCH(C2:C3, B1:B1)'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.WrongType))
