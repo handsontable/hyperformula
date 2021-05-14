@@ -105,6 +105,10 @@ export class Evaluator {
             const error = new CellError(ErrorType.CYCLE, undefined, vertex.address)
             vertex.setCellValue(error)
             changes.addChange(error, vertex.address)
+          } else if (vertex instanceof MatrixVertex && vertex.isFormula()) {
+            const error = new CellError(ErrorType.CYCLE, undefined, vertex.cellAddress)
+            vertex.setErrorValue(error)
+            changes.addChange(error, vertex.cellAddress)
           }
         },
       )
@@ -144,6 +148,8 @@ export class Evaluator {
     cycled.forEach((vertex: Vertex) => {
       if (vertex instanceof FormulaCellVertex) {
         vertex.setCellValue(new CellError(ErrorType.CYCLE, undefined, vertex.address))
+      } else if (vertex instanceof MatrixVertex && vertex.isFormula()) {
+        vertex.setErrorValue(new CellError(ErrorType.CYCLE, undefined, vertex.cellAddress))
       }
     })
     sorted.forEach((vertex: Vertex) => {

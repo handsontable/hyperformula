@@ -35,6 +35,7 @@ export class MatrixVertex {
   }
 
   public setCellValue(matrix: Matrix) {
+    matrix.resize(this.matrix.size)
     this.matrix = matrix
   }
 
@@ -42,11 +43,11 @@ export class MatrixVertex {
     this.matrix = new ErroredMatrix(error, this.matrix.size)
   }
 
-  public getCellValue(): Matrix | CellError {
+  public getCellValue(): Matrix {
     if (this.matrix instanceof NotComputedMatrix) {
       throw Error('Matrix not computed yet.')
     }
-    return this.matrix as (Matrix | CellError)
+    return this.matrix as Matrix
   }
 
   public getMatrixCellValue(address: SimpleCellAddress): InternalScalarValue {
