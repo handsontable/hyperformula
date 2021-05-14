@@ -160,3 +160,24 @@ describe('with arrayformula, without useArrayArithmetic flag', () => {
   })
 })
 
+describe('coercion of array to scalar', () => {
+  it('actual range', () => {
+    const engine = HyperFormula.buildFromArray([[0, 2, 3], ['=SIN(A1:C1)']])
+    expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.WrongType))
+  })
+
+  it('ad-hoc array + function', () => {
+    const engine = HyperFormula.buildFromArray([[0, 2, 3], ['=SIN(ARRAYFORMULA(2*A1:C1))']])
+    expect(engine.getCellValue(adr('A2'))).toEqual(0)
+  })
+
+  it('ad-hoc array + binary op', () => {
+    const engine = HyperFormula.buildFromArray([[1, 2, 3], ['=ARRAYFORMULA(2*A1:C1)+ARRAYFORMULA(2*A1:C1)']])
+    expect(engine.getCellValue(adr('A2'))).toEqual(4)
+  })
+
+  it('ad-hoc array + unary op', () => {
+    const engine = HyperFormula.buildFromArray([[1, 2, 3], ['=-ARRAYFORMULA(2*A1:C1)']])
+    expect(engine.getCellValue(adr('A2'))).toEqual(-2)
+  })
+})
