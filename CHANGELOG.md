@@ -6,11 +6,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- **Breaking change**: Removed support for matrix formulas (`{=FORMULA}`) notation. Engine now supports formulas returning array of values (instead of only scalars). (#652)
+
 ### Added
 - Added support for array arithmetic. (#628)
 - Added ARRAYFORMULA function. (#630)
 - Added performance improvements for array handling. (#629)
 - Accepting time in JS Date() objects on the input. (#648)
+
+### Fixed
+- Fixed an issue with arrays and cruds. (#651)
 
 ## [0.6.0] - 2021-04-27
 

@@ -263,4 +263,8 @@ export class SimpleRangeValue {
   public sameDimensionsAs(other: SimpleRangeValue): boolean {
     return this.width() === other.width() && this.height() === other.height()
   }
+
+  public onlyRangeData(): boolean {
+    return this.data instanceof OnlyRangeData
+  }
 }

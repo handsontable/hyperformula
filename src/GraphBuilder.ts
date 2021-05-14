@@ -101,33 +101,27 @@ export class SimpleStrategy implements GraphBuilderStrategy {
           const address = simpleCellAddress(sheetId, j, i)
 
           const parsedCellContent = this.cellContentParser.parse(cellContent)
-          if (parsedCellContent instanceof CellContent.MatrixFormula) {
-            if (this.dependencyGraph.existsVertex(address)) {
-              continue
-            }
-            const parseResult = this.stats.measure(StatType.PARSER, () => this.parser.parse(parsedCellContent.formula, address))
-            if (parseResult.errors.length > 0) {
-              const vertex = new ParsingErrorVertex(parseResult.errors, parsedCellContent.formulaWithBraces())
-              this.dependencyGraph.addVertex(address, vertex)
-            } else {
-              const vertex = buildMatrixVertex(parseResult.ast as ProcedureAst, address)
-              dependencies.set(vertex, absolutizeDependencies(parseResult.dependencies, address))
-              this.dependencyGraph.addMatrixVertex(address, vertex)
-            }
-          } else if (parsedCellContent instanceof CellContent.Formula) {
+          if (parsedCellContent instanceof CellContent.Formula) {
             const parseResult = this.stats.measure(StatType.PARSER, () => this.parser.parse(parsedCellContent.formula, address))
             if (parseResult.errors.length > 0) {
               const vertex = new ParsingErrorVertex(parseResult.errors, parsedCellContent.formula)
               this.dependencyGraph.addVertex(address, vertex)
             } else {
-              const vertex = new FormulaCellVertex(parseResult.ast, address, 0)
-              dependencies.set(vertex, absolutizeDependencies(parseResult.dependencies, address))
-              this.dependencyGraph.addVertex(address, vertex)
-              if (parseResult.hasVolatileFunction) {
-                this.dependencyGraph.markAsVolatile(vertex)
-              }
-              if (parseResult.hasStructuralChangeFunction) {
-                this.dependencyGraph.markAsDependentOnStructureChange(vertex)
+              const size = checkMatrixSize(parseResult.ast, address)
+              if(size instanceof CellError || (size.width<=1 && size.height<=1) || size.isRef) {
+                const vertex = new FormulaCellVertex(parseResult.ast, address, 0)
+                dependencies.set(vertex, absolutizeDependencies(parseResult.dependencies, address))
+                this.dependencyGraph.addVertex(address, vertex)
+                if (parseResult.hasVolatileFunction) {
+                  this.dependencyGraph.markAsVolatile(vertex)
+                }
+                if (parseResult.hasStructuralChangeFunction) {
+                  this.dependencyGraph.markAsDependentOnStructureChange(vertex)
+                }
+              } else {
+                const vertex = new MatrixVertex(address, size.width, size.height, parseResult.ast)
+                dependencies.set(vertex, absolutizeDependencies(parseResult.dependencies, address))
+                this.dependencyGraph.addMatrixVertex(address, vertex)
               }
             }
           } else if (parsedCellContent instanceof CellContent.Empty) {
@@ -176,28 +170,28 @@ export class MatrixDetectionStrategy implements GraphBuilderStrategy {
           const address = simpleCellAddress(sheetId, j, i)
 
           const parsedCellContent = this.cellContentParser.parse(cellContent)
-          if (parsedCellContent instanceof CellContent.MatrixFormula) {
-            if (this.dependencyGraph.existsVertex(address)) {
-              continue
-            }
-            const parseResult = this.stats.measure(StatType.PARSER, () => this.parser.parse(parsedCellContent.formula, address))
-            if (parseResult.errors.length > 0) {
-              const vertex = new ParsingErrorVertex(parseResult.errors, parsedCellContent.formulaWithBraces())
-              this.dependencyGraph.addVertex(address, vertex)
-            } else {
-              const vertex = buildMatrixVertex(parseResult.ast as ProcedureAst, address)
-              dependencies.set(vertex, absolutizeDependencies(parseResult.dependencies, address))
-              this.dependencyGraph.addMatrixVertex(address, vertex)
-            }
-          } else if (parsedCellContent instanceof CellContent.Formula) {
+          if (parsedCellContent instanceof CellContent.Formula) {
             const parseResult = this.stats.measure(StatType.PARSER, () => this.parser.parse(parsedCellContent.formula, address))
             if (parseResult.errors.length > 0) {
               const vertex = new ParsingErrorVertex(parseResult.errors, parsedCellContent.formula)
               this.dependencyGraph.addVertex(address, vertex)
             } else {
-              const vertex = new FormulaCellVertex(parseResult.ast, address, 0)
-              dependencies.set(vertex, absolutizeDependencies(parseResult.dependencies, address))
-              this.dependencyGraph.addVertex(address, vertex)
+              const size = checkMatrixSize(parseResult.ast, address)
+              if(size instanceof CellError || (size.width<=1 && size.height<=1) || size.isRef) {
+                const vertex = new FormulaCellVertex(parseResult.ast, address, 0)
+                dependencies.set(vertex, absolutizeDependencies(parseResult.dependencies, address))
+                this.dependencyGraph.addVertex(address, vertex)
+                if (parseResult.hasVolatileFunction) {
+                  this.dependencyGraph.markAsVolatile(vertex)
+                }
+                if (parseResult.hasStructuralChangeFunction) {
+                  this.dependencyGraph.markAsDependentOnStructureChange(vertex)
+                }
+              } else {
+                const vertex = new MatrixVertex(address, size.width, size.height, parseResult.ast)
+                dependencies.set(vertex, absolutizeDependencies(parseResult.dependencies, address))
+                this.dependencyGraph.addMatrixVertex(address, vertex)
+              }
             }
           } else if (parsedCellContent instanceof CellContent.Empty) {
             /* we don't care about empty cells here */

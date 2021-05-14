@@ -262,7 +262,7 @@ const sharedExamples = (builder: (sheet: Sheet, config?: Partial<ConfigParams>) 
         ['=VLOOKUP(3, A4:B6, 2, TRUE())'],
         ['1', '2', '3'],
         ['4', '5', '6'],
-        ['{=TRANSPOSE(A2:C3)}'],
+        ['=TRANSPOSE(A2:C3)'],
       ])
 
       expect(engine.getCellValue(adr('A1'))).toEqual(6)
@@ -273,7 +273,7 @@ const sharedExamples = (builder: (sheet: Sheet, config?: Partial<ConfigParams>) 
         ['=VLOOKUP(4, A4:B6, 2, TRUE())'],
         ['1', '2', '3'],
         ['4', '5', '6'],
-        ['{=TRANSPOSE(A2:C3)}'],
+        ['=TRANSPOSE(A2:C3)'],
       ])
 
       expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.ValueNotFound))

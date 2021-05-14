@@ -3293,7 +3293,6 @@ export class HyperFormula implements TypedEmitter {
    * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
    * @throws [[NamedExpressionNameIsAlreadyTakenError]] when the named expression name is not available.
    * @throws [[NamedExpressionNameIsInvalidError]] when the named expression name is not valid
-   * @throws [[MatrixFormulasNotSupportedError]] when the named expression formula is a Matrix formula
    * @throws [[NoRelativeAddressesAllowedError]] when the named expression formula contains relative references
    * @throws [[NoSheetWithNameError]] when the given sheet name does not exists
    *
@@ -3507,7 +3506,6 @@ export class HyperFormula implements TypedEmitter {
    * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
    * @throws [[NamedExpressionDoesNotExistError]] when the given expression does not exist.
    * @throws [[NoSheetWithNameError]] when the given sheet name does not exists
-   * @throws [[MatrixFormulasNotSupportedError]] when the named expression formula is a Matrix formula
    * @throws [[NoRelativeAddressesAllowedError]] when the named expression formula contains relative references
    *
    * @example

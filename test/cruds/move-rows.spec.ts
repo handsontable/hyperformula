@@ -64,8 +64,7 @@ describe('Ensure it is possible to move rows', () => {
   it('should not be possible to move row with formula matrix', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '2'],
-      ['{=TRANSPOSE(A1:B1)}'],
-      ['{=TRANSPOSE(A1:B1)}'],
+      ['=TRANSPOSE(A1:B1)'],
     ])
 
     expect(engine.isItPossibleToMoveRows(0, 1, 1, 5)).toBe(false)
@@ -76,8 +75,7 @@ describe('Ensure it is possible to move rows', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '2'],
       [''],
-      ['{=TRANSPOSE(A1:B1)}'],
-      ['{=TRANSPOSE(A1:B1)}'],
+      ['=TRANSPOSE(A1:B1)'],
     ])
 
     expect(engine.isItPossibleToMoveRows(0, 0, 1, 2)).toBe(true)

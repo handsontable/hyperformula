@@ -16,15 +16,6 @@ describe('CellContentParser', () => {
   const config = new Config()
   const cellContentParser = new CellContentParser(config, new DateTimeHelper(config), new NumberLiteralHelper(config))
 
-  it('a matrix', () => {
-    expect(cellContentParser.parse('{=FOO()}')).toEqual(new CellContent.MatrixFormula('=FOO()'))
-  })
-
-  it('not a matrix', () => {
-    expect(cellContentParser.parse('{=FOO()')).not.toBeInstanceOf(CellContent.MatrixFormula)
-    expect(cellContentParser.parse('=FOO()}')).not.toEqual(CellContent.MatrixFormula)
-  })
-
   it('a formula', () => {
     expect(cellContentParser.parse('=FOO()')).toEqual(new CellContent.Formula('=FOO()'))
   })

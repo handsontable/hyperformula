@@ -36,9 +36,12 @@ export class Serialization {
       const formula = formulaVertex.getFormula(this.dependencyGraph.lazilyTransformingAstService)
       return this.unparser.unparse(formula, address)
     } else if (formulaVertex instanceof MatrixVertex) {
+      if(formulaVertex.getAddress().row !== address.row || formulaVertex.getAddress().col !== address.col || formulaVertex.getAddress().sheet !== address.sheet) {
+        return undefined
+      }
       const formula = formulaVertex.getFormula()
       if (formula) {
-        return '{' + this.unparser.unparse(formula, formulaVertex.getAddress()) + '}'
+        return this.unparser.unparse(formula, formulaVertex.getAddress())
       }
     } else if (formulaVertex instanceof ParsingErrorVertex) {
       return formulaVertex.getFormula()
