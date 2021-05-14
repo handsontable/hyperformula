@@ -255,8 +255,8 @@ describe('Adding column - MatrixVertex', () => {
   })
 })
 
-describe('Adding column - numeric matrix', () => {
-  it('add column inside numeric matrix, expand matrix', () => {
+describe('Adding column - matrix', () => {
+  it('add column inside matrix, expand matrix', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '2'],
       ['3', '4'],
@@ -266,8 +266,8 @@ describe('Adding column - numeric matrix', () => {
 
     engine.addColumns(0, [1, 2])
 
-    expect(engine.getCellValue(adr('B1'))).toEqual(0)
-    expect(engine.getCellValue(adr('C1'))).toEqual(0)
+    expect(engine.getCellValue(adr('B1'))).toEqual(null)
+    expect(engine.getCellValue(adr('C1'))).toEqual(null)
     expect(engine.getCellValue(adr('D1'))).toEqual(2)
   })
 })
