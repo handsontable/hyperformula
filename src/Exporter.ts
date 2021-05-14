@@ -4,11 +4,11 @@
  */
 
 import {CellError, ErrorType, SimpleCellAddress, simpleCellAddress} from './Cell'
-import {CellValue, DetailedCellError, } from './CellValue'
+import {CellValue, DetailedCellError,} from './CellValue'
 import {Config} from './Config'
 import {CellValueChange, ChangeExporter} from './ContentChanges'
 import {ErrorMessage} from './error-message'
-import {EmptyValue, getRawValue, InterpreterValue, isExtendedNumber, } from './interpreter/InterpreterValue'
+import {EmptyValue, getRawValue, InterpreterValue, isExtendedNumber,} from './interpreter/InterpreterValue'
 import {SimpleRangeValue} from './interpreter/SimpleRangeValue'
 import {NamedExpressions} from './NamedExpressions'
 import {SheetIndexMappingFn, simpleCellAddressToString} from './parser/addressRepresentationConverters'
@@ -45,12 +45,12 @@ export class ExportedCellChange {
 export class ExportedNamedExpressionChange {
   constructor(
     public readonly name: string,
-    public readonly newValue: CellValue,
+    public readonly newValue: CellValue | CellValue[][],
   ) {
   }
 }
 
-export class Exporter implements ChangeExporter<ExportedChange>{
+export class Exporter implements ChangeExporter<ExportedChange> {
   constructor(
     private readonly config: Config,
     private readonly namedExpressions: NamedExpressions,
@@ -62,11 +62,11 @@ export class Exporter implements ChangeExporter<ExportedChange>{
     if (change.sheet === NamedExpressions.SHEET_FOR_WORKBOOK_EXPRESSIONS) {
       const namedExpression = this.namedExpressions.namedExpressionInAddress(change.row)
       if (!namedExpression) {
-        throw 'Missing named expression'
+        throw new Error('Missing named expression')
       }
       return new ExportedNamedExpressionChange(
         namedExpression.displayName,
-        this.exportValue(change.value),
+        this.exportScalarOrRange(change.value),
       )
     } else {
       return new ExportedCellChange(
@@ -90,10 +90,18 @@ export class Exporter implements ChangeExporter<ExportedChange>{
     }
   }
 
+  private exportScalarOrRange(value: InterpreterValue): CellValue | CellValue[][] {
+    if (value instanceof SimpleRangeValue) {
+      return value.rawData().map(row => row.map(v => this.exportValue(v)))
+    } else {
+      return this.exportValue(value)
+    }
+  }
+
   private detailedError(error: CellError): DetailedCellError {
     let address = undefined
     const originAddress = error.address
-    if(originAddress !== undefined) {
+    if (originAddress !== undefined) {
       if (originAddress.sheet === NamedExpressions.SHEET_FOR_WORKBOOK_EXPRESSIONS) {
         address = this.namedExpressions.namedExpressionInAddress(originAddress.row)?.displayName
       } else {

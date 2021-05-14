@@ -133,6 +133,10 @@ export class SimpleRangeValue {
     return this._data as number[][]
   }
 
+  public rawData(): InternalScalarValue[][] {
+    return this._data ?? []
+  }
+
   public sameDimensionsAs(other: SimpleRangeValue): boolean {
     return this.width() === other.width() && this.height() === other.height()
   }

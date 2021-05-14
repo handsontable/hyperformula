@@ -5,8 +5,6 @@
 
 import {SimpleCellAddress} from './Cell'
 import {InterpreterValue} from './interpreter/InterpreterValue'
-import {Matrix} from './Matrix'
-import {SimpleRangeValue} from './interpreter/SimpleRangeValue'
 
 export interface CellValueChange {
   sheet: number,
@@ -44,7 +42,10 @@ export class ContentChanges {
   public exportChanges<T>(exporter: ChangeExporter<T>): T[] {
     const ret: T[] = []
     this.changes.forEach((e, i) => {
-      ret[i] = exporter.exportChange(this.changes[i])
+      const exportedChange = exporter.exportChange(this.changes[i])
+      if (exportedChange !== undefined) {
+        ret.push(exportedChange)
+      }
     })
     return ret
   }

@@ -852,6 +852,17 @@ describe('Named expressions - named ranges', () => {
 
     expect(engine.getCellValue(adr('C1'))).toEqual(6)
   })
+
+  it('should return array value of named expression', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1', '2'],
+      ['3', '4'],
+    ])
+
+    const changes = engine.addNamedExpression('fooo', '=TRANSPOSE(Sheet1!$A$1:Sheet1!$B$2)')
+
+    expect(changes).toContainEqual(new ExportedNamedExpressionChange('fooo', [[1, 3], [2, 4]]))
+  })
 })
 
 describe('Named expressions - options', () => {
