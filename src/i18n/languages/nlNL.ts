@@ -18,6 +18,7 @@ const dictionary: RawTranslationPackage = {
     VALUE: '#WAARDE!',
   },
   functions: {
+    ARRAYFORMULA: 'ARRAYFORMULA',
     ABS: 'ABS',
     ACOS: 'BOOGCOS',
     ACOSH: 'BOOGCOSH',

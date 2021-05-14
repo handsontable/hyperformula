@@ -3,17 +3,18 @@
  * Copyright (c) 2021 Handsoncode. All rights reserved.
  */
 
-import {CellError, ErrorType, SimpleCellAddress} from '../../Cell'
+import {CellError, ErrorType} from '../../Cell'
 import {ErrorMessage} from '../../error-message'
-import {AstNodeType, ProcedureAst} from '../../parser'
+import {ProcedureAst} from '../../parser'
+import {InterpreterState} from '../InterpreterState'
 import {InternalScalarValue, RawScalarValue} from '../InterpreterValue'
 import {SimpleRangeValue} from '../SimpleRangeValue'
-import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
+import {ArgumentTypes, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
 
 /**
  * Interpreter plugin containing MEDIAN function
  */
-export class MedianPlugin extends FunctionPlugin {
+export class MedianPlugin extends FunctionPlugin implements FunctionPluginTypecheck<MedianPlugin>{
 
   public static implementedFunctions = {
     'MEDIAN': {
@@ -45,10 +46,10 @@ export class MedianPlugin extends FunctionPlugin {
    * Returns a median of given numbers.
    *
    * @param ast
-   * @param formulaAddress
+   * @param state
    */
-  public median(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('MEDIAN'),
+  public median(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+    return this.runFunction(ast.args, state, this.metadata('MEDIAN'),
       (...args: RawScalarValue[]) => {
         const values = this.interpreter.arithmeticHelper.coerceNumbersExactRanges(args)
         if(values instanceof CellError) {
@@ -66,8 +67,8 @@ export class MedianPlugin extends FunctionPlugin {
     })
   }
 
-  public large(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('LARGE'),
+  public large(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+    return this.runFunction(ast.args, state, this.metadata('LARGE'),
       (range: SimpleRangeValue, n: number) => {
         const vals = this.interpreter.arithmeticHelper.manyToExactNumbers(range.valuesFromTopLeftCorner())
         if(vals instanceof CellError) {
@@ -83,8 +84,8 @@ export class MedianPlugin extends FunctionPlugin {
     )
   }
 
-  public small(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('SMALL'),
+  public small(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+    return this.runFunction(ast.args, state, this.metadata('SMALL'),
       (range: SimpleRangeValue, n: number) => {
         const vals = this.interpreter.arithmeticHelper.manyToExactNumbers(range.valuesFromTopLeftCorner())
         if(vals instanceof CellError) {
