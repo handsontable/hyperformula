@@ -5,7 +5,11 @@
 
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
 import {CellError, SimpleCellAddress} from '../Cell'
-import {ErroredMatrix, IMatrix, Matrix, MatrixSize, NotComputedMatrix} from '../Matrix'
+import {RawCellContent} from '../CellContentParser'
+import {EmptyValue, getRawValue, InternalScalarValue} from '../interpreter/InterpreterValue'
+import {ErroredMatrix, IMatrix, Matrix, NotComputedMatrix} from '../Matrix'
+import {MatrixSize} from '../MatrixSize'
+import {Maybe} from '../Maybe'
 import {Ast} from '../parser'
 import {ColumnsSpan, RowsSpan} from '../Span'
 
@@ -24,13 +28,9 @@ export class MatrixVertex {
   public static fromRange(range: AbsoluteCellRange, formula?: Ast): MatrixVertex {
     return new MatrixVertex(range.start, range.width(), range.height(), formula)
   }
-  public cellAddress: SimpleCellAddress
   public matrix: IMatrix
-  private formula: Ast | null
 
-  constructor(cellAddress: SimpleCellAddress, width: number, height: number, formula?: Ast) {
-    this.cellAddress = cellAddress
-    this.formula = formula || null
+  constructor(public cellAddress: SimpleCellAddress, width: number, height: number, private formula?: Ast) {
     this.matrix = new NotComputedMatrix(new MatrixSize(width, height))
   }
 
@@ -49,16 +49,20 @@ export class MatrixVertex {
     return this.matrix as (Matrix | CellError)
   }
 
-  public getMatrixCellValue(address: SimpleCellAddress): number | CellError {
+  public getMatrixCellValue(address: SimpleCellAddress): InternalScalarValue {
     const col = address.col - this.cellAddress.col
     const row = address.row - this.cellAddress.row
 
     return this.matrix.get(col, row)
   }
 
-  public getMatrixCellRawValue(address: SimpleCellAddress): number | undefined {
+  public getMatrixCellRawValue(address: SimpleCellAddress): Maybe<RawCellContent> {
     const val = this.getMatrixCellValue(address)
-    return val instanceof CellError ? undefined : val
+    if(val instanceof CellError || val === EmptyValue) {
+      return undefined
+    } else {
+      return getRawValue(val)
+    }
   }
 
   public setMatrixCellValue(address: SimpleCellAddress, value: number): void {
@@ -81,7 +85,7 @@ export class MatrixVertex {
     this.cellAddress = address
   }
 
-  public getFormula(): Ast | null {
+  public getFormula(): Maybe<Ast> {
     return this.formula
   }
 
@@ -90,11 +94,11 @@ export class MatrixVertex {
   }
 
   public isFormula(): boolean {
-    return this.formula !== null
+    return this.formula !== undefined
   }
 
   public isNumeric(): boolean {
-    return this.formula === null
+    return this.formula === undefined
   }
 
   public spansThroughSheetRows(sheet: number, startRow: number, endRow: number = startRow): boolean {

@@ -3,14 +3,29 @@ import {ErrorMessage} from '../src/error-message'
 import {adr, detailedError, detailedErrorWithOrigin} from './testUtils'
 
 describe('without arrayformula, with useArrayArithmetic flag', () => {
-  it('unary op', () => {
+  it('unary op, scalar ret', () => {
     const engine = HyperFormula.buildFromArray([[1, 2, 3], ['=SUM(-A1:C1)']], {useArrayArithmetic: true})
     expect(engine.getCellValue(adr('A2'))).toEqual(-6)
   })
 
-  it('binary op', () => {
+  it('unary op, array ret', () => {
+    const engine = HyperFormula.buildFromArray([[1, 2, 3], ['=-A1:C1']], {useArrayArithmetic: true})
+    expect(engine.getSheetValues(0)).toEqual([[1, 2, 3], [-1, -2, -3]])
+  })
+
+  it('binary op, scalar ret', () => {
     const engine = HyperFormula.buildFromArray([[1, 2, 3], [4, 5, 6], ['=SUM(2*A1:C1+A2:C2)']], {useArrayArithmetic: true})
     expect(engine.getCellValue(adr('A3'))).toEqual(27)
+  })
+
+  it('binary op, array ret', () => {
+    const engine = HyperFormula.buildFromArray([[1, 2, 3], [4, 5, 6], ['=2*A1:C1+A2:C2']], {useArrayArithmetic: true})
+    expect(engine.getSheetValues(0)).toEqual([[1, 2, 3], [4, 5, 6], [6, 9, 12]])
+  })
+
+  it('binary op, array ret, concat', () => {
+    const engine = HyperFormula.buildFromArray([['a', 'b', 'c'], ['d', 'e', 'f'], ['=A1:C1&A2:C2']], {useArrayArithmetic: true})
+    expect(engine.getSheetValues(0)).toEqual([['a', 'b', 'c'], ['d', 'e', 'f'], ['ad', 'be', 'cf']])
   })
 
   it('index', () => {
@@ -144,3 +159,4 @@ describe('with arrayformula, without useArrayArithmetic flag', () => {
     expect(engine.getCellValue(adr('A1'))).toEqual(5)
   })
 })
+

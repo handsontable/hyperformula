@@ -9,7 +9,7 @@ import {FunctionRegistry} from '../src/interpreter/FunctionRegistry'
 import {SimpleRangeValue} from '../src/interpreter/SimpleRangeValue'
 import {LazilyTransformingAstService} from '../src/LazilyTransformingAstService'
 import {ColumnIndex} from '../src/Lookup/ColumnIndex'
-import {Matrix, MatrixSize} from '../src/Matrix'
+import {Matrix} from '../src/Matrix'
 import {NamedExpressions} from '../src/NamedExpressions'
 import {ColumnsSpan, RowsSpan} from '../src/Span'
 import {Statistics} from '../src/statistics'
@@ -78,7 +78,7 @@ describe('ColumnIndex#add', () => {
 
   it('should ignore SimpleRangeValue', () => {
     const index = buildEmptyIndex(transformingService, new Config(), statistics)
-    const simpleRangeValue = SimpleRangeValue.onlyNumbersDataWithoutRange([[1]], new MatrixSize(1, 1))
+    const simpleRangeValue = SimpleRangeValue.onlyNumbers([[1]])
 
     index.add(simpleRangeValue, adr('A1'))
 

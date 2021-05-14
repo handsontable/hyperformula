@@ -47,7 +47,7 @@ export class ColumnBinarySearch extends AdvancedFind implements ColumnSearchStra
     if(typeof key === 'string') {
       key = forceNormalizeString(key)
     }
-    const range = rangeValue.range()
+    const range = rangeValue.range
     if(range === undefined) {
       return rangeValue.valuesFromTopLeftCorner().map(getRawValue).map(arg =>
         (typeof arg === 'string') ? forceNormalizeString(arg) : arg

@@ -4,7 +4,7 @@
  */
 
 import {absolutizeDependencies} from './absolutizeDependencies'
-import {CellError, simpleCellAddress, SimpleCellAddress} from './Cell'
+import {CellError, simpleCellAddress} from './Cell'
 import {CellContent, CellContentParser} from './CellContentParser'
 import {CellDependency} from './CellDependency'
 import {getRawValue} from './interpreter/InterpreterValue'
@@ -19,8 +19,8 @@ import {
   Vertex
 } from './DependencyGraph'
 import {GraphBuilderMatrixHeuristic} from './GraphBuilderMatrixHeuristic'
-import {checkMatrixSize} from './Matrix'
-import {ParserWithCaching, ProcedureAst} from './parser'
+import {MatrixSizePredictor} from './MatrixSize'
+import {ParserWithCaching} from './parser'
 import {Statistics, StatType} from './statistics'
 import {Sheets} from './Sheet'
 
@@ -34,12 +34,6 @@ export class GraphBuilder {
 
   /**
    * Configures the building service.
-   *
-   * @param graph - graph instance in which we want to add vertices and edges
-   * @param addressMapping - mapping from addresses to vertices
-   * @param rangeMapping - mapping from ranges to range vertices
-   * @param stats - dependency tracking building performance
-   * @param config - configuration of the sheet
    */
   constructor(
     private readonly dependencyGraph: DependencyGraph,
@@ -48,18 +42,17 @@ export class GraphBuilder {
     private readonly cellContentParser: CellContentParser,
     private readonly config: Config,
     private readonly stats: Statistics,
+    private readonly matrixSizePredictor: MatrixSizePredictor,
   ) {
     if (this.config.matrixDetection) {
-      this.buildStrategy = new MatrixDetectionStrategy(this.dependencyGraph, this.columnSearch, this.parser, this.stats, config.matrixDetectionThreshold, this.cellContentParser)
+      this.buildStrategy = new MatrixDetectionStrategy(dependencyGraph, columnSearch, parser, stats, config.matrixDetectionThreshold, cellContentParser, matrixSizePredictor)
     } else {
-      this.buildStrategy = new SimpleStrategy(this.dependencyGraph, this.columnSearch, this.parser, this.stats, this.cellContentParser)
+      this.buildStrategy = new SimpleStrategy(dependencyGraph, columnSearch, parser, stats, cellContentParser, matrixSizePredictor)
     }
   }
 
   /**
    * Builds graph.
-   *
-   * @param sheet - two-dimensional array representation of sheet
    */
   public buildGraph(sheets: Sheets) {
     const dependencies = this.buildStrategy.run(sheets)
@@ -84,6 +77,7 @@ export class SimpleStrategy implements GraphBuilderStrategy {
     private readonly parser: ParserWithCaching,
     private readonly stats: Statistics,
     private readonly cellContentParser: CellContentParser,
+    private readonly matrixSizePredictor: MatrixSizePredictor,
   ) {
   }
 
@@ -107,8 +101,8 @@ export class SimpleStrategy implements GraphBuilderStrategy {
               const vertex = new ParsingErrorVertex(parseResult.errors, parsedCellContent.formula)
               this.dependencyGraph.addVertex(address, vertex)
             } else {
-              const size = checkMatrixSize(parseResult.ast, address)
-              if(size instanceof CellError || (size.width<=1 && size.height<=1) || size.isRef) {
+              const size = this.matrixSizePredictor.checkMatrixSize(parseResult.ast, address)
+              if(size === undefined || (size.width<=1 && size.height<=1) || size.isRef) {
                 const vertex = new FormulaCellVertex(parseResult.ast, address, 0)
                 dependencies.set(vertex, absolutizeDependencies(parseResult.dependencies, address))
                 this.dependencyGraph.addVertex(address, vertex)
@@ -147,6 +141,7 @@ export class MatrixDetectionStrategy implements GraphBuilderStrategy {
     private readonly stats: Statistics,
     private readonly threshold: number,
     private readonly cellContentParser: CellContentParser,
+    private readonly matrixSizePredictor: MatrixSizePredictor,
   ) {}
 
   public run(sheets: Sheets): Dependencies {
@@ -176,8 +171,8 @@ export class MatrixDetectionStrategy implements GraphBuilderStrategy {
               const vertex = new ParsingErrorVertex(parseResult.errors, parsedCellContent.formula)
               this.dependencyGraph.addVertex(address, vertex)
             } else {
-              const size = checkMatrixSize(parseResult.ast, address)
-              if(size instanceof CellError || (size.width<=1 && size.height<=1) || size.isRef) {
+              const size = this.matrixSizePredictor.checkMatrixSize(parseResult.ast, address)
+              if(size === undefined || (size.width<=1 && size.height<=1) || size.isRef) {
                 const vertex = new FormulaCellVertex(parseResult.ast, address, 0)
                 dependencies.set(vertex, absolutizeDependencies(parseResult.dependencies, address))
                 this.dependencyGraph.addVertex(address, vertex)
@@ -226,10 +221,3 @@ export class MatrixDetectionStrategy implements GraphBuilderStrategy {
   }
 }
 
-export function buildMatrixVertex(ast: ProcedureAst, formulaAddress: SimpleCellAddress): MatrixVertex | ValueCellVertex {
-  const size = checkMatrixSize(ast, formulaAddress)
-  if (size instanceof CellError) {
-    return new ValueCellVertex(size, undefined)
-  }
-  return new MatrixVertex(formulaAddress, size.width, size.height, ast)
-}

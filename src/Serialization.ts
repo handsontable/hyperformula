@@ -40,7 +40,7 @@ export class Serialization {
         return undefined
       }
       const formula = formulaVertex.getFormula()
-      if (formula) {
+      if (formula !== undefined) {
         return this.unparser.unparse(formula, formulaVertex.getAddress())
       }
     } else if (formulaVertex instanceof ParsingErrorVertex) {

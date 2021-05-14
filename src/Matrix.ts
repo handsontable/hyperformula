@@ -3,136 +3,9 @@
  * Copyright (c) 2021 Handsoncode. All rights reserved.
  */
 
-import {AbsoluteCellRange} from './AbsoluteCellRange'
-import {CellError, ErrorType, SimpleCellAddress, simpleCellAddress} from './Cell'
-import {ErrorMessage} from './error-message'
-import {Ast, AstNodeType} from './parser'
-
-export class MatrixSize {
-  public static fromMatrix<T>(matrix: T[][]): MatrixSize {
-    return new MatrixSize(matrix.length > 0 ? matrix[0].length : 0, matrix.length)
-  }
-  constructor(
-    public width: number,
-    public height: number,
-    public isRef?: boolean,
-  ) {
-    if (width <= 0 || height <= 0) {
-      throw Error('Incorrect matrix size')
-    }
-  }
-}
-
-export type MatrixSizeCheck = MatrixSize | CellError
-
-export function matrixSizeForTranspose(inputSize: MatrixSize): MatrixSize {
-  return new MatrixSize(inputSize.height, inputSize.width)
-}
-
-export function matrixSizeForMultiplication(leftMatrixSize: MatrixSize, rightMatrixSize: MatrixSize): MatrixSize {
-  return new MatrixSize(rightMatrixSize.width, leftMatrixSize.height)
-}
-
-export function matrixSizeForPoolFunction(inputMatrix: MatrixSize, windowSize: number, stride: number): MatrixSize {
-  return new MatrixSize(
-    1 + (inputMatrix.width - windowSize) / stride,
-    1 + (inputMatrix.height - windowSize) / stride,
-  )
-}
-
-export function checkMatrixSize(ast: Ast, formulaAddress: SimpleCellAddress): MatrixSizeCheck {
-  if (ast.type === AstNodeType.FUNCTION_CALL) {
-    switch (ast.procedureName) {
-      case 'MMULT': {
-        if (ast.args.length !== 2) {
-          return new CellError(ErrorType.NA, ErrorMessage.WrongArgNumber)
-        }
-        if (ast.args.some((astIt) => astIt.type === AstNodeType.EMPTY)) {
-          return new CellError(ErrorType.NUM, ErrorMessage.EmptyArg )
-        }
-
-        const left = checkMatrixSize(ast.args[0], formulaAddress)
-        const right = checkMatrixSize(ast.args[1], formulaAddress)
-
-        if (left instanceof CellError) {
-          return left
-        } else if (right instanceof CellError) {
-          return right
-        } else if (left.width !== right.height) {
-          return new CellError(ErrorType.VALUE, ErrorMessage.MatrixDimensions)
-        } else {
-          return matrixSizeForMultiplication(left, right)
-        }
-      }
-      case 'MEDIANPOOL':
-      case 'MAXPOOL': {
-        if (ast.args.length < 2 || ast.args.length > 3) {
-          return new CellError(ErrorType.NA, ErrorMessage.WrongArgNumber)
-        }
-        if (ast.args.some((astIt) => astIt.type === AstNodeType.EMPTY)) {
-          return new CellError(ErrorType.NUM, ErrorMessage.EmptyArg )
-        }
-
-        const matrix = checkMatrixSize(ast.args[0], formulaAddress)
-        const windowArg = ast.args[1]
-
-        if (matrix instanceof CellError) {
-          return matrix
-        } else if (windowArg.type !== AstNodeType.NUMBER) {
-          return new CellError(ErrorType.VALUE, ErrorMessage.NumberExpected)
-        }
-
-        const window = windowArg.value
-        let stride = windowArg.value
-
-        if (ast.args.length === 3) {
-          const strideArg = ast.args[2]
-          if (strideArg.type === AstNodeType.NUMBER) {
-            stride = strideArg.value
-          } else {
-            return new CellError(ErrorType.VALUE, ErrorMessage.MatrixParams)
-          }
-        }
-
-        if (window > matrix.width || window > matrix.height
-          || stride > window
-          || (matrix.width - window) % stride !== 0 || (matrix.height - window) % stride !== 0) {
-          return new CellError(ErrorType.VALUE) //TODO
-        }
-
-        return matrixSizeForPoolFunction(matrix, window, stride)
-      }
-      case 'TRANSPOSE': {
-        if (ast.args.length !== 1) {
-          return new CellError(ErrorType.NA, ErrorMessage.WrongArgNumber)
-        }
-
-        if (ast.args[0].type === AstNodeType.EMPTY) {
-          return new CellError(ErrorType.NUM, ErrorMessage.EmptyArg )
-        }
-        const size = checkMatrixSize(ast.args[0], formulaAddress)
-
-        return size instanceof CellError ? size : matrixSizeForTranspose(size)
-      }
-      default: {
-        return new CellError(ErrorType.VALUE, ErrorMessage.MatrixFunction)
-      }
-    }
-  } else if (ast.type === AstNodeType.CELL_RANGE) {
-    const range = AbsoluteCellRange.fromCellRangeOrUndef(ast, formulaAddress)
-    if(range === undefined) {
-      return new CellError(ErrorType.VALUE)
-    } else {
-      return new MatrixSize(range.width(), range.height(), true)
-    }
-  } else if (ast.type === AstNodeType.NUMBER) {
-    return new MatrixSize(1, 1)
-  } else if (ast.type === AstNodeType.CELL_REFERENCE) {
-    return new MatrixSize(1, 1, true)
-  } else {
-    return new CellError(ErrorType.VALUE) //TODO
-  }
-}
+import {CellError, SimpleCellAddress, simpleCellAddress} from './Cell'
+import {InternalScalarValue} from './interpreter/InterpreterValue'
+import {MatrixSize} from './MatrixSize'
 
 export interface IMatrix {
   size: MatrixSize,
@@ -141,7 +14,7 @@ export interface IMatrix {
 
   height(): number,
 
-  get(col: number, row: number): number | CellError,
+  get(col: number, row: number): InternalScalarValue,
 }
 
 export class NotComputedMatrix implements IMatrix {
@@ -164,9 +37,9 @@ export class NotComputedMatrix implements IMatrix {
 
 export class Matrix implements IMatrix {
   public size: MatrixSize
-  private readonly matrix: number[][]
+  private readonly matrix: InternalScalarValue[][]
 
-  constructor(matrix: number[][]) {
+  constructor(matrix: InternalScalarValue[][]) {
     this.size = new MatrixSize(matrix.length > 0 ? matrix[0].length : 0, matrix.length)
     this.matrix = matrix
   }
@@ -211,7 +84,7 @@ export class Matrix implements IMatrix {
     return result
   }
 
-  public get(col: number, row: number): number {
+  public get(col: number, row: number): InternalScalarValue {
     if (this.outOfBound(col, row)) {
       throw Error('Matrix index out of bound')
     }
@@ -233,11 +106,11 @@ export class Matrix implements IMatrix {
     return this.size.height
   }
 
-  public raw(): number[][] {
+  public raw(): InternalScalarValue[][] {
     return this.matrix
   }
 
-  public* generateValues(leftCorner: SimpleCellAddress): IterableIterator<[number, SimpleCellAddress]> {
+  public* generateValues(leftCorner: SimpleCellAddress): IterableIterator<[InternalScalarValue, SimpleCellAddress]> {
     for (let row = 0; row < this.size.height; ++row) {
       for (let col = 0; col < this.size.width; ++col) {
         yield [this.matrix[row][col], simpleCellAddress(leftCorner.sheet, leftCorner.col + col, leftCorner.row + row)]

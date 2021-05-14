@@ -31,8 +31,7 @@ import {
   InterpreterValue,
   isExtendedNumber,
 } from './InterpreterValue'
-import {ArrayData, SimpleRangeValue} from './SimpleRangeValue'
-import {FunctionPlugin, PluginFunctionType} from './plugin/FunctionPlugin'
+import {SimpleRangeValue} from './SimpleRangeValue'
 
 export class Interpreter {
   private gpu?: GPU
@@ -65,7 +64,7 @@ export class Interpreter {
       }
     }
     if(val instanceof SimpleRangeValue && val.height() === 1 && val.width() === 1) {
-      [[val]] = val.raw()
+      [[val]] = val.data
     }
     return wrapperForAddress(val, state.formulaAddress)
   }
@@ -168,10 +167,9 @@ export class Interpreter {
         if (this.config.licenseKeyValidityState !== LicenseKeyValidityState.VALID && !FunctionRegistry.functionIsProtected(ast.procedureName)) {
           return new CellError(ErrorType.LIC, ErrorMessage.LicenseKey(this.config.licenseKeyValidityState))
         }
-        const pluginEntry = this.functionRegistry.getFunction(ast.procedureName)
-        if (pluginEntry && this.config.translationPackage.isFunctionTranslated(ast.procedureName)) {
-          const [pluginFunction, pluginInstance] = pluginEntry
-          return (pluginInstance as any as Record<string, PluginFunctionType>)[pluginFunction](ast, new InterpreterState(state.formulaAddress, state.arraysFlag || this.functionRegistry.isArrayFunction(ast.procedureName)))
+        const pluginFunction = this.functionRegistry.getFunction(ast.procedureName)
+        if(pluginFunction!==undefined) {
+          return pluginFunction(ast, new InterpreterState(state.formulaAddress, state.arraysFlag || this.functionRegistry.isArrayFunction(ast.procedureName)))
         } else {
           return new CellError(ErrorType.NAME, ErrorMessage.FunctionName(ast.procedureName))
         }
@@ -197,7 +195,7 @@ export class Interpreter {
           } else if (matrix instanceof CellError) {
             return matrix
           } else if (matrix instanceof Matrix) {
-            return SimpleRangeValue.onlyNumbersDataWithRange(matrix.raw(), matrix.size, range)
+            return SimpleRangeValue.numbersRange(matrix.raw(), range, this.dependencyGraph)
           } else {
             throw new Error('Unknown matrix')
           }
@@ -328,7 +326,7 @@ export class Interpreter {
       if(!state.arraysFlag) {
         return new CellError(ErrorType.VALUE, ErrorMessage.ScalarExpected)
       }
-      const newRaw = arg.raw().map(
+      const newRaw = arg.data.map(
         (row) => row.map(op)
       )
       return SimpleRangeValue.onlyValues(newRaw)
@@ -348,41 +346,51 @@ export class Interpreter {
       return new CellError(ErrorType.VALUE, ErrorMessage.ScalarExpected)
     } else if(arg1 instanceof SimpleRangeValue || arg2 instanceof SimpleRangeValue) {
       if(!(arg1 instanceof SimpleRangeValue)) {
-        if((arg2 as SimpleRangeValue).adhoc) {
-          (arg2 as SimpleRangeValue).data.map((arg) => op(arg1 as InternalScalarValue, arg))
-          return SimpleRangeValue.onlyValues((arg2 as SimpleRangeValue).raw())
+        if((arg2 as SimpleRangeValue).isAdHoc()) {
+          const raw2 = (arg2 as SimpleRangeValue).data
+          for(let i=0;i<raw2.length;i++) {
+            for(let j=0;j<raw2[0].length;j++) {
+              raw2[i][j] = op(arg1 as InternalScalarValue, raw2[i][j])
+            }
+          }
+          return SimpleRangeValue.onlyValues(raw2)
         } else {
           arg1 = SimpleRangeValue.fromScalar(arg1)
         }
       }
       if(!(arg2 instanceof SimpleRangeValue)) {
-        if(arg1.adhoc) {
-          arg1.data.map((arg) => op(arg, arg2 as InternalScalarValue))
-          return SimpleRangeValue.onlyValues(arg1.raw())
+        if(arg1.isAdHoc()) {
+          const raw1 = arg1.data
+          for(let i=0;i<raw1.length;i++) {
+            for(let j=0;j<raw1[0].length;j++) {
+              raw1[i][j] = op(raw1[i][j], arg2)
+            }
+          }
+          return SimpleRangeValue.onlyValues(raw1)
         } else {
           arg2 = SimpleRangeValue.fromScalar(arg2)
         }
       }
       if(arg1.width()===arg2.width() && arg1.height()===arg2.height()) {
-        if(arg1.adhoc) {
-          const raw1 = arg1.raw()
-          const raw2 = arg2.raw()
+        if(arg1.isAdHoc()) {
+          const raw1 = arg1.data
+          const raw2 = arg2.data
           for(let i=0;i<raw1.length;i++) {
             for(let j=0;j<raw1[0].length;j++) {
               raw1[i][j] = op(raw1[i][j], raw2[i][j])
             }
           }
-          return SimpleRangeValue.onlyValues(arg1.raw())
+          return SimpleRangeValue.onlyValues(raw1)
         }
-        if(arg2.adhoc) {
-          const raw1 = arg1.raw()
-          const raw2 = arg2.raw()
+        if(arg2.isAdHoc()) {
+          const raw1 = arg1.data
+          const raw2 = arg2.data
           for(let i=0;i<raw1.length;i++) {
             for(let j=0;j<raw1[0].length;j++) {
               raw2[i][j] = op(raw1[i][j], raw2[i][j])
             }
           }
-          return SimpleRangeValue.onlyValues(arg2.raw())
+          return SimpleRangeValue.onlyValues(raw2)
         }
       }
       const width = Math.max(arg1.width(), arg2.width())
@@ -398,7 +406,7 @@ export class Interpreter {
           const j1 = (arg1.width() !== 1) ? j : 0
           const j2 = (arg2.width() !== 1) ? j : 0
           if(i1 < arg1.height() && i2 < arg2.height() && j1 < arg1.width() && j2 < arg2.width()) {
-            ret[i][j] = op(arg1.raw()[i1][j1], arg2.raw()[i2][j2])
+            ret[i][j] = op(arg1.data[i1][j1], arg2.data[i2][j2])
           } else {
             ret[i][j] =  new CellError(ErrorType.NA)
           }

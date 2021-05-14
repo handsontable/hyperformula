@@ -612,7 +612,7 @@ describe('#getCellValueDetailedType', () => {
     expect(engine.getCellValueDetailedType(adr('A1'))).toBe(CellValueDetailedType.STRING)
   })
 
-  it('number raw', () => {
+  it('number data', () => {
     const engine = HyperFormula.buildFromArray([['42']])
     expect(engine.getCellValueDetailedType(adr('A1'))).toBe(CellValueDetailedType.NUMBER_RAW)
   })
