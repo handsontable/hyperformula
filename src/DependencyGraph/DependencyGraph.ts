@@ -731,7 +731,7 @@ export class DependencyGraph {
   private formulaDependencyQuery: (vertex: Vertex) => Maybe<[SimpleCellAddress, CellDependency[]]> = (vertex: Vertex) => {
     let formula: Ast
     let address: SimpleCellAddress
-    if (vertex instanceof FormulaCellVertex || vertex instanceof MatrixVertex) {
+    if (vertex instanceof FormulaVertex) {
       address = vertex.getAddress(this.lazilyTransformingAstService)
       formula = vertex.getFormula(this.lazilyTransformingAstService)
     } else {
