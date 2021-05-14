@@ -2,7 +2,14 @@ import {ErrorType} from '../src/Cell'
 import {CellContent, CellContentParser} from '../src/CellContentParser'
 import {Config} from '../src/Config'
 import {DateTimeHelper} from '../src/DateTimeHelper'
-import {CurrencyNumber, DateNumber, PercentNumber} from '../src/interpreter/InterpreterValue'
+import {ErrorMessage} from '../src/error-message'
+import {
+  CurrencyNumber,
+  DateNumber,
+  DateTimeNumber,
+  PercentNumber,
+  TimeNumber
+} from '../src/interpreter/InterpreterValue'
 import {NumberLiteralHelper} from '../src/NumberLiteralHelper'
 
 describe('CellContentParser', () => {
@@ -75,9 +82,9 @@ describe('CellContentParser', () => {
     expect(cellContentParser.parse(null)).toEqual(new CellContent.Empty())
     expect(cellContentParser.parse(undefined)).toEqual(new CellContent.Empty())
     expect(cellContentParser.parse(-0)).toEqual(new CellContent.Number(0))
-    expect(cellContentParser.parse(Infinity)).toEqual(new CellContent.Error(ErrorType.NUM))
-    expect(cellContentParser.parse(-Infinity)).toEqual(new CellContent.Error(ErrorType.NUM))
-    expect(cellContentParser.parse(NaN)).toEqual(new CellContent.Error(ErrorType.NUM))
+    expect(cellContentParser.parse(Infinity)).toEqual(new CellContent.Error(ErrorType.NUM, ErrorMessage.ValueLarge))
+    expect(cellContentParser.parse(-Infinity)).toEqual(new CellContent.Error(ErrorType.NUM, ErrorMessage.ValueLarge))
+    expect(cellContentParser.parse(NaN)).toEqual(new CellContent.Error(ErrorType.NUM, ErrorMessage.ValueLarge))
   })
 
   it('string', () => {
@@ -113,6 +120,9 @@ describe('CellContentParser', () => {
 
   it('JS Date parsing', () => {
     expect(cellContentParser.parse(new Date(1995, 11, 17))).toEqual(new CellContent.Number(new DateNumber(35050, 'Date()')))
+    expect(cellContentParser.parse(new Date(1995, 11, 17, 12, 0, 0))).toEqual(new CellContent.Number(new DateTimeNumber(35050.5, 'Date()')))
+    expect(cellContentParser.parse(new Date(1899, 11, 30, 6, 0, 0))).toEqual(new CellContent.Number(new TimeNumber(0.25, 'Date()')))
+    expect(cellContentParser.parse(new Date(1899, 11, 29))).toEqual(new CellContent.Error(ErrorType.NUM, ErrorMessage.DateBounds))
   })
 
   it( 'starts with \'', () => {
