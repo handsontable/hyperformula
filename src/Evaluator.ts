@@ -7,8 +7,6 @@ import {AbsoluteCellRange} from './AbsoluteCellRange'
 import {absolutizeDependencies} from './absolutizeDependencies'
 import {CellError, ErrorType, SimpleCellAddress} from './Cell'
 import {InterpreterState} from './interpreter/InterpreterState'
-import {SimpleRangeValue} from './interpreter/SimpleRangeValue'
-import {ColumnSearchStrategy} from './Lookup/SearchStrategy'
 import {Config} from './Config'
 import {ContentChanges} from './ContentChanges'
 import {DateTimeHelper} from './DateTimeHelper'
@@ -75,7 +73,6 @@ export class Evaluator {
             const address = vertex.getAddress()
             const formula = vertex.getFormula() as Ast
             const currentValue = vertex.isComputed() ? vertex.getCellValue() : null
-            const newCellValue = this.evaluateAstToRangeValue(formula, address)
             const newCellValue = this.evaluateAstToRangeValue(formula, new InterpreterState(address, this.config.arrays))
             if(newCellValue instanceof SimpleRangeValue && newCellValue.hasOnlyNumbers() && !(newCellValue.onlyRangeData())) {
               const newCellMatrix = new Matrix(newCellValue.rawNumbers())
