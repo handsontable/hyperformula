@@ -34,13 +34,7 @@ export class ContentChanges {
   }
 
   public addChange(newValue: InterpreterValue, address: SimpleCellAddress): void {
-    if (newValue instanceof SimpleRangeValue) {
-      for (const [value, entryAddress] of newValue.entriesFromTopLeftCorner(address)) {
-        this.addSingleCellValue(value, entryAddress)
-      }
-    } else {
-      this.addSingleCellValue(newValue, address)
-    }
+    this.addSingleCellValue(newValue, address)
   }
 
   public add(...change: ChangeList) {

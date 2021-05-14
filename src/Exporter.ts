@@ -6,7 +6,7 @@
 import {CellError, ErrorType, SimpleCellAddress, simpleCellAddress} from './Cell'
 import {CellValue, DetailedCellError, } from './CellValue'
 import {Config} from './Config'
-import {CellValueChange} from './ContentChanges'
+import {CellValueChange, ChangeExporter} from './ContentChanges'
 import {ErrorMessage} from './error-message'
 import {EmptyValue, getRawValue, InterpreterValue, isExtendedNumber, } from './interpreter/InterpreterValue'
 import {SimpleRangeValue} from './interpreter/SimpleRangeValue'
@@ -50,7 +50,7 @@ export class ExportedNamedExpressionChange {
   }
 }
 
-export class Exporter {
+export class Exporter implements ChangeExporter<ExportedChange>{
   constructor(
     private readonly config: Config,
     private readonly namedExpressions: NamedExpressions,
