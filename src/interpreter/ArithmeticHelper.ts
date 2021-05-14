@@ -534,7 +534,7 @@ export function coerceComplexToString([re, im]: complex, symb?: string): string 
   return `${re}${im < 0 ? '-' : '+'}${imStr}`
 }
 
-export function coerceToRange(arg: RawInterpreterValue): SimpleRangeValue {
+export function coerceToRange(arg: InternalScalarValue): SimpleRangeValue {
   if (arg instanceof SimpleRangeValue) {
     return arg
   } else {

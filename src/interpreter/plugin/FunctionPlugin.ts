@@ -215,9 +215,14 @@ export abstract class FunctionPlugin implements FunctionPluginTypecheck<Function
           ret = arg
           break
         default:
-          return undefined
+          if(arg.isAdHoc()) {
+            arg = arg.data[0][0]
+          } else {
+            return undefined
+          }
       }
-    } else {
+    }
+    if(!(arg instanceof SimpleRangeValue)) {
       switch (coercedType.argumentType) {
         case ArgumentTypes.INTEGER:
         case ArgumentTypes.NUMBER:
@@ -261,7 +266,7 @@ export abstract class FunctionPlugin implements FunctionPluginTypecheck<Function
           if (arg instanceof CellError) {
             return arg
           }
-          ret = coerceToRange(getRawValue(arg))
+          ret = coerceToRange(arg)
           break
         case ArgumentTypes.COMPLEX:
           return this.interpreter.arithmeticHelper.coerceScalarToComplex(getRawValue(arg))
