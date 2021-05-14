@@ -16,7 +16,7 @@ describe('integration test', () => {
         [26,	30,	'A',	132],
         [26,	30,	'B',	143],
       ]
-    }, {arrays: true}) //flag that enables ArrayFormula() everywhere
+    }, {useArrayArithmetic: true}) //flag that enables ArrayFormula() everywhere
 
     engine.addNamedExpression('LookupRange', '=Lookup!$A$1:Lookup!$D$8')
 

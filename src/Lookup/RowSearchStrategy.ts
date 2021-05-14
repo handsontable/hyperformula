@@ -29,9 +29,11 @@ export class RowSearchStrategy extends AdvancedFind implements SearchStrategy {
     if(range === undefined) {
       return rangeValue.valuesFromTopLeftCorner().map(getRawValue).indexOf(key)
     } else if (range.width() < this.config.binarySearchThreshold || !sorted) {
-      return this.dependencyGraph.computeListOfValuesInRange(range).map(getRawValue).map(arg =>
-        (typeof arg === 'string') ? forceNormalizeString(arg) : arg
-      ).indexOf(key)
+      return this.dependencyGraph.computeListOfValuesInRange(range).findIndex(arg => {
+          arg = getRawValue(arg)
+          arg = (typeof arg === 'string') ? forceNormalizeString(arg) : arg
+          return arg === key
+        })
     } else {
       return rangeLowerBound(range, key, this.dependencyGraph, 'col')
     }

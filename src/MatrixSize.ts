@@ -57,7 +57,7 @@ export class MatrixSizePredictor {
   }
 
   public checkMatrixSize(ast: Ast, formulaAddress: SimpleCellAddress): Maybe<MatrixSize> {
-    return this._checkMatrixSize(ast, {formulaAddress, arraysFlag: this.config.arrays})
+    return this._checkMatrixSize(ast, {formulaAddress, arraysFlag: this.config.useArrayArithmetic})
   }
 
   private _checkMatrixSize(ast: Ast, state: InterpreterState): Maybe<MatrixSize> {
