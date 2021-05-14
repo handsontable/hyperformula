@@ -28,7 +28,14 @@ type GPUMode = 'gpu' | 'cpu' | 'dev'
 const PossibleGPUModeString: GPUMode[] = ['gpu', 'cpu', 'dev']
 
 export interface ConfigParams {
-  useArrayArithmetic: boolean, //FIXME
+  /**
+   * Specifies if the array arithmetic operations are allowed globally, or only inside special function (like ARRAYFORMULA).
+   *
+   * @default false
+   *
+   * @category Engine
+   */
+  useArrayArithmetic: boolean,
   /**
    * Specifies if the string comparison is accent sensitive or not.
    * Applies to comparison operators only.
