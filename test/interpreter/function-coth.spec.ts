@@ -48,15 +48,4 @@ describe('Function COTH', () => {
 
     expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.DIV_BY_ZERO))
   })
-
-  // Inconsistency with Product 1
-  it('range value results in VALUE error', () => {
-    const engine = HyperFormula.buildFromArray([
-      ['0'],
-      ['1', '=COTH(A1:A3)'],
-      ['-1'],
-    ])
-
-    expect(engine.getCellValue(adr('B2'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.WrongType))
-  })
 })

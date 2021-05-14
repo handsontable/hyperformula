@@ -1,3 +1,4 @@
+import {EmptyValue} from '../src/interpreter/InterpreterValue'
 import {Matrix} from '../src/Matrix'
 
 describe('Matrix', () => {
@@ -6,7 +7,7 @@ describe('Matrix', () => {
     expect(matrix.raw()).toEqual([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
   })
 
-  it('add zero rows', () => {
+  it('add rows', () => {
     const matrix = new Matrix([
       [1, 2, 3],
       [4, 5, 6],
@@ -15,9 +16,9 @@ describe('Matrix', () => {
     matrix.addRows(1, 3)
     expect(matrix.raw()).toEqual([
       [1, 2, 3],
-      [0, 0, 0],
-      [0, 0, 0],
-      [0, 0, 0],
+      [EmptyValue, EmptyValue, EmptyValue],
+      [EmptyValue, EmptyValue, EmptyValue],
+      [EmptyValue, EmptyValue, EmptyValue],
       [4, 5, 6],
       [7, 8, 9],
     ])

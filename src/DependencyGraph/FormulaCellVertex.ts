@@ -102,7 +102,9 @@ export class MatrixVertex extends FormulaVertex {
 
   setCellValue(value: InterpreterValue): InterpreterValue {
     if (value instanceof SimpleRangeValue) {
-      this.matrix = new Matrix(value.data)
+      const matrix = new Matrix(value.data)
+      matrix.resize(this.matrix.size)
+      this.matrix = matrix
       return value
     } else {
       let errorVal: CellError

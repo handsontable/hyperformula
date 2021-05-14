@@ -63,11 +63,19 @@ lets you design your own [custom functions](custom-functions).
 
 Total number of functions: **{{ $page.functionsCount }}**
 
+### Array manipulation
+
+| Function ID | Description | Syntax |
+| :--- | :--- | :--- |
+| ARRAYFORMULA | Enables array arithmetic inside. | ARRAYFORMULA(Formula) |
+| FILTER | Filter input array based on boolean arrays. | FILTER(Array; BoolArray1[; BoolArray2[; ...]])
+| ARRAY_CONSTRAINT | Truncates array to given dimensions. | ARRAYFORMULA(Array; Height; Width) |
+
 ### Date and time
 
 | Function ID | Description | Syntax |
 | :--- | :--- | :--- |
-| DATE | Date and time | Calculates a date specified by year, month, day, and displays it in the cell's formatting. | DATE(Year; Month; Day) |
+| DATE | Calculates a date specified by year, month, day, and displays it in the cell's formatting. | DATE(Year; Month; Day) |
 | DATEDIF | Calculates distance between two dates, in provided unit parameter. | DATEDIF(Date1; Date2; Units) |
 | DATEVALUE | Interprets string as date. | DATEVALUE(Datestring) |
 | DAY | Returns the day of the given date value. | DAY(Number) |
@@ -208,7 +216,7 @@ Total number of functions: **{{ $page.functionsCount }}**
 | IFNA | Returns the value if the cell does not contains the #N/A (value not available) error value, or the alternative value if it does. | IFNA(Value; Alternate_value) |
 | IFERROR | Returns the value if the cell does not contains an error value, or the alternative value if it does. | IFERROR(Value; Alternate_value) |
 | NOT | Complements (inverts) a logical value. | NOT(Logicalvalue) |
-| SWITCH | Evaluates a list of arguments, consisting of an expression followed by a value. | SWITCH(Expression1, Value1[, Expression2, Value2[..., Expression_n, Value_n]]) |
+| SWITCH | For each value on the input array, tests its value against cases and returns corresponding value. | SWITCH(Array; Case1, Value1[, Case2, Value2[..., Case_n, Value_n[, Default]]]) |
 | OR | Returns TRUE if at least one argument is TRUE. | OR(Logicalvalue1; Logicalvalue2 ...Logicalvalue30) |
 | TRUE | The logical value is set to TRUE. | TRUE() |
 | XOR | Returns true if an odd number of arguments evaluates to TRUE. | XOR(Logicalvalue1; Logicalvalue2 ...Logicalvalue30) |

@@ -18,6 +18,8 @@ export const dictionary: RawTranslationPackage = {
     VALUE: '#¡VALOR!',
   },
   functions: {
+    FILTER: 'FILTER',
+    'ARRAY_CONSTRAIN' : 'ARRAY_CONSTRAIN',
     ARRAYFORMULA: 'ARRAYFORMULA',
     ABS: 'ABS',
     ACOS: 'ACOS',

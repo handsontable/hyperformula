@@ -18,6 +18,8 @@ const dictionary: RawTranslationPackage = {
     VALUE: '#ARVO!',
   },
   functions: {
+    FILTER: 'FILTER',
+    'ARRAY_CONSTRAIN' : 'ARRAY_CONSTRAIN',
     ARRAYFORMULA: 'ARRAYFORMULA',
     ABS: 'ITSEISARVO',
     ACOS: 'ACOS',

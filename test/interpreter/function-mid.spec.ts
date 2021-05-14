@@ -73,7 +73,7 @@ describe('Function MID', () => {
 
   it('should return error for range', () => {
     const engine = HyperFormula.buildFromArray([
-      ['=MID(B1:B2, 1, 2)'],
+      ['=MID(B2:B3, 1, 2)'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.WrongType))
