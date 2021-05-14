@@ -212,4 +212,3 @@ describe('range interpolation', () => {
     expect(engine.getCellValue(adr('A1', 1))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.ScalarExpected))
   })
 })
-
