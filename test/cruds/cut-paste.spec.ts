@@ -335,7 +335,7 @@ describe('moving ranges', () => {
   it('should not be possible to move area with matrix', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '2'],
-      ['{=TRANSPOSE(A1:B1)}'],
+      ['=TRANSPOSE(A1:B1)'],
     ])
 
     expect(() => {
@@ -347,7 +347,7 @@ describe('moving ranges', () => {
   it('should not be possible to move cells to area with matrix', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '2'],
-      ['{=TRANSPOSE(A1:B1)}'],
+      ['=TRANSPOSE(A1:B1)'],
     ])
 
     expect(() => {
@@ -712,8 +712,7 @@ describe('overlapping areas', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '2'],
       ['3', '4'],
-      ['{=TRANSPOSE(A1:B2)}', '{=TRANSPOSE(A1:B2)}'],
-      ['{=TRANSPOSE(A1:B2)}', '{=TRANSPOSE(A1:B2)}'],
+      ['=TRANSPOSE(A1:B2)'],
     ])
 
     engine.cut(simpleCellAddress(0, 0, 0), 2, 2)
@@ -729,8 +728,7 @@ describe('overlapping areas', () => {
         ['3', '4'],
       ],
       Sheet2: [
-        ['{=TRANSPOSE(Sheet1!A1:B2)}', '{=TRANSPOSE(Sheet1!A1:B2)}'],
-        ['{=TRANSPOSE(Sheet1!A1:B2)}', '{=TRANSPOSE(Sheet1!A1:B2)}'],
+        ['=TRANSPOSE(Sheet1!A1:B2)'],
       ],
     })
 
@@ -747,14 +745,15 @@ describe('column index', () => {
   it('should update column index when moving cell', () => {
     const engine = HyperFormula.buildFromArray([
       ['1'],
-      ['=VLOOKUP(1, A1:A1, 1, TRUE())'],
+      ['1'],
+      ['=VLOOKUP(1, A1:A2, 1, TRUE())'],
     ], {useColumnIndex: true})
 
     engine.cut(adr('A1'), 1, 1)
     engine.paste(adr('B1'))
 
     const index = engine.columnSearch as ColumnIndex
-    expectArrayWithSameContent([1], index.getValueIndex(0, 0, 1).index)
+    expectArrayWithSameContent([1, 2], index.getValueIndex(0, 0, 1).index)
     expectArrayWithSameContent([0], index.getValueIndex(0, 1, 1).index)
   })
 
@@ -819,7 +818,7 @@ describe('move cells with matrices', () => {
   it('should not be possible to move part of formula matrix', function() {
     const engine = HyperFormula.buildFromArray([
       ['1', '2'],
-      ['{=TRANSPOSE(A1:B1)}'],
+      ['=TRANSPOSE(A1:B1)'],
     ])
 
     expect(() => {
@@ -831,7 +830,7 @@ describe('move cells with matrices', () => {
   it('should not be possible to move formula matrix at all', function() {
     const engine = HyperFormula.buildFromArray([
       ['1', '2'],
-      ['{=TRANSPOSE(A1:B1)}'],
+      ['=TRANSPOSE(A1:B1)'],
     ])
 
     expect(() => {

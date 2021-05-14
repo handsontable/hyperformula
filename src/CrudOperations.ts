@@ -5,8 +5,9 @@
 
 import {AbsoluteCellRange} from './AbsoluteCellRange'
 import {invalidSimpleCellAddress, simpleCellAddress, SimpleCellAddress} from './Cell'
-import {CellContent, CellContentParser, isMatrix, RawCellContent} from './CellContentParser'
+import {CellContent, CellContentParser, RawCellContent} from './CellContentParser'
 import {ClipboardCell, ClipboardOperations} from './ClipboardOperations'
+import {MatrixSizePredictor} from './MatrixSize'
 import {AddColumnsCommand, AddRowsCommand, Operations, RemoveColumnsCommand, RemoveRowsCommand} from './Operations'
 import {ColumnSearchStrategy} from './Lookup/SearchStrategy'
 import {Config} from './Config'
@@ -21,7 +22,6 @@ import {
 import {
   InvalidAddressError,
   InvalidArgumentsError,
-  MatrixFormulasNotSupportedError,
   NamedExpressionDoesNotExistError,
   NamedExpressionNameIsAlreadyTakenError,
   NamedExpressionNameIsInvalidError,
@@ -87,10 +87,11 @@ export class CrudOperations {
     private readonly lazilyTransformingAstService: LazilyTransformingAstService,
     /** Storage for named expressions */
     private readonly namedExpressions: NamedExpressions,
+    private readonly matrixSizePredictor: MatrixSizePredictor,
   ) {
-    this.operations = new Operations(this.dependencyGraph, this.columnSearch, this.cellContentParser, this.parser, this.stats, this.lazilyTransformingAstService, this.namedExpressions, this.config)
-    this.clipboardOperations = new ClipboardOperations(this.dependencyGraph, this.operations, this.parser, this.lazilyTransformingAstService, this.config)
-    this.undoRedo = new UndoRedo(this.config, this.operations)
+    this.operations = new Operations(dependencyGraph, columnSearch, cellContentParser, parser, stats, lazilyTransformingAstService, namedExpressions, config, matrixSizePredictor)
+    this.clipboardOperations = new ClipboardOperations(dependencyGraph, this.operations, parser, lazilyTransformingAstService, config)
+    this.undoRedo = new UndoRedo(config, this.operations)
   }
 
   public addRows(sheet: number, ...indexes: ColumnRowIndex[]): void {
@@ -248,11 +249,6 @@ export class CrudOperations {
       for (let i = 0; i < cellContents.length; i++) {
         if (!(cellContents[i] instanceof Array)) {
           throw new InvalidArgumentsError('an array of arrays or a raw cell value.')
-        }
-        for (let j = 0; j < cellContents[i].length; j++) {
-          if (isMatrix(cellContents[i][j])) {
-            throw new Error('Cant change matrices in batch operation')
-          }
         }
       }
     }
@@ -669,9 +665,7 @@ export class CrudOperations {
 
   private ensureNamedExpressionIsValid(expression: RawCellContent): void {
     const parsedExpression = this.cellContentParser.parse(expression)
-    if (parsedExpression instanceof CellContent.MatrixFormula) {
-      throw new MatrixFormulasNotSupportedError()
-    } else if (parsedExpression instanceof CellContent.Formula) {
+    if (parsedExpression instanceof CellContent.Formula) {
       const parsingResult = this.parser.parse(parsedExpression.formula, simpleCellAddress(-1, 0, 0))
       if (doesContainRelativeReferences(parsingResult.ast)) {
         throw new NoRelativeAddressesAllowedError()

@@ -49,16 +49,4 @@ describe('Function YEAR', () => {
 
     expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.DIV_BY_ZERO))
   })
-
-  // Inconsistency with Product 1
-  it('range value in 1st argument results in VALUE error', () => {
-    const engine = HyperFormula.buildFromArray([
-      ['=DATE(2019, 3, 31)', '=YEAR(A1:A3)'],
-      ['=DATE(2018, 3, 31)', '=YEAR(A1:A3)'],
-      ['=DATE(2017, 3, 31)'],
-    ])
-
-    expect(engine.getCellValue(adr('B1'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.WrongType))
-    expect(engine.getCellValue(adr('B2'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.WrongType))
-  })
 })

@@ -1482,10 +1482,10 @@ export class HyperFormula implements TypedEmitter {
    *
    * @category Columns
    */
-  public isItPossibleToSetColumnOrder(sheetId: number, newRowOrder: number[]): boolean {
+  public isItPossibleToSetColumnOrder(sheetId: number, newColumnOrder: number[]): boolean {
     validateArgToType(sheetId, 'number', 'sheetId')
     try {
-      const columnMapping = this._crudOperations.mappingFromOrder(sheetId, newRowOrder, 'column')
+      const columnMapping = this._crudOperations.mappingFromOrder(sheetId, newColumnOrder, 'column')
       this._crudOperations.validateSwapColumnIndexes(sheetId, columnMapping)
       this._crudOperations.testColumnOrderForMatrices(sheetId, columnMapping)
       return true
@@ -3251,6 +3251,7 @@ export class HyperFormula implements TypedEmitter {
    * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
    * @throws [[NoSheetWithIdError]] if no sheet with given sheetId exists
    *
+   * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
    * @example
    * ```js
    * const hfInstance = HyperFormula.buildFromArray([
@@ -3293,7 +3294,6 @@ export class HyperFormula implements TypedEmitter {
    * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
    * @throws [[NamedExpressionNameIsAlreadyTakenError]] when the named expression name is not available.
    * @throws [[NamedExpressionNameIsInvalidError]] when the named expression name is not valid
-   * @throws [[MatrixFormulasNotSupportedError]] when the named expression formula is a Matrix formula
    * @throws [[NoRelativeAddressesAllowedError]] when the named expression formula contains relative references
    * @throws [[NoSheetWithIdError]] if no sheet with given sheetId exists
    *
@@ -3464,6 +3464,7 @@ export class HyperFormula implements TypedEmitter {
    * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
    * @throws [[NoSheetWithIdError]] if no sheet with given sheetId exists
    *
+   * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
    * @example
    * ```js
    * const hfInstance = HyperFormula.buildFromArray([
@@ -3547,6 +3548,7 @@ export class HyperFormula implements TypedEmitter {
    * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
    * @throws [[NoSheetWithIdError]] if no sheet with given sheetId exists
    *
+   * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
    * @example
    * ```js
    * const hfInstance = HyperFormula.buildFromArray([

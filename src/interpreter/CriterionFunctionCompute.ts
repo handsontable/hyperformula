@@ -64,7 +64,7 @@ export class CriterionFunctionCompute<T> {
         return cachedResult
       }
 
-      const cache = this.buildNewCriterionCache(this.cacheKey(conditions), conditions.map((c) => c.conditionRange.range()!), simpleValuesRange.range()!)
+      const cache = this.buildNewCriterionCache(this.cacheKey(conditions), conditions.map((c) => c.conditionRange.range!), simpleValuesRange.range!)
 
       if (!cache.has(fullCriterionString)) {
         cache.set(fullCriterionString, [
@@ -87,7 +87,7 @@ export class CriterionFunctionCompute<T> {
   }
 
   private tryToGetRangeVertexForRangeValue(rangeValue: SimpleRangeValue): Maybe<RangeVertex> {
-    const maybeRange = rangeValue.range()
+    const maybeRange = rangeValue.range
     if (maybeRange === undefined) {
       return undefined
     } else {

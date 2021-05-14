@@ -3,14 +3,15 @@
  * Copyright (c) 2021 Handsoncode. All rights reserved.
  */
 
-import {CellError, ErrorType, SimpleCellAddress} from '../../Cell'
+import {CellError, ErrorType} from '../../Cell'
 import {ErrorMessage} from '../../error-message'
-import {MatrixSize, matrixSizeForMultiplication, matrixSizeForPoolFunction, matrixSizeForTranspose} from '../../Matrix'
+import {MatrixSize, matrixSizeForMultiplication, matrixSizeForPoolFunction} from '../../MatrixSize'
 import {ProcedureAst} from '../../parser'
+import {Interpreter} from '../Interpreter'
 import {InterpreterValue} from '../InterpreterValue'
 import {SimpleRangeValue} from '../SimpleRangeValue'
-import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
-import {Interpreter} from '../Interpreter'
+import {InterpreterState} from '../InterpreterState'
+import {ArgumentTypes, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
 
 export type KernelRunShortcut = (...args: any[]) => number[][]
 
@@ -27,7 +28,7 @@ export interface KernelFunctionThis {
 }
 
 
-export class MatrixPlugin extends FunctionPlugin {
+export class MatrixPlugin extends FunctionPlugin implements FunctionPluginTypecheck<MatrixPlugin>{
   public static implementedFunctions = {
     'MMULT': {
       method: 'mmult',
@@ -71,10 +72,13 @@ export class MatrixPlugin extends FunctionPlugin {
     }
   }
 
-  public mmult(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InterpreterValue {
-    return this.runMatrixFunction(ast.args, formulaAddress, this.metadata('MMULT'), (leftMatrix: SimpleRangeValue, rightMatrix: SimpleRangeValue) => {
+  public mmult(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runMatrixFunction(ast.args, state, this.metadata('MMULT'), (leftMatrix: SimpleRangeValue, rightMatrix: SimpleRangeValue) => {
       if (!leftMatrix.hasOnlyNumbers() || !rightMatrix.hasOnlyNumbers()) {
         return new CellError(ErrorType.VALUE, ErrorMessage.NumberRange)
+      }
+      if( rightMatrix.height() !== leftMatrix.width()) {
+        return new CellError(ErrorType.VALUE, ErrorMessage.MatrixDimensions)
       }
       const outputSize = matrixSizeForMultiplication(leftMatrix.size, rightMatrix.size)
 
@@ -86,12 +90,12 @@ export class MatrixPlugin extends FunctionPlugin {
         return sum
       }, outputSize)(leftMatrix.rawNumbers(), rightMatrix.rawNumbers(), leftMatrix.width())
 
-      return SimpleRangeValue.onlyNumbersDataWithoutRange(result, outputSize)
+      return SimpleRangeValue.onlyNumbers(result)
     })
   }
 
-  public maxpool(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InterpreterValue {
-    return this.runMatrixFunction(ast.args, formulaAddress, this.metadata('MAXPOOL'), (matrix: SimpleRangeValue, windowSize: number, stride: number = windowSize) => {
+  public maxpool(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runMatrixFunction(ast.args, state, this.metadata('MAXPOOL'), (matrix: SimpleRangeValue, windowSize: number, stride: number = windowSize) => {
       if (!matrix.hasOnlyNumbers()) {
         return new CellError(ErrorType.VALUE, ErrorMessage.NumberRange)
       }
@@ -109,12 +113,12 @@ export class MatrixPlugin extends FunctionPlugin {
         return currentMax
       }, outputSize)(matrix.rawNumbers(), windowSize, stride)
 
-      return SimpleRangeValue.onlyNumbersDataWithoutRange(result, outputSize)
+      return SimpleRangeValue.onlyNumbers(result)
     })
   }
 
-  public medianpool(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InterpreterValue {
-    return this.runMatrixFunction(ast.args, formulaAddress, this.metadata('MEDIANPOOL'), (matrix: SimpleRangeValue, windowSize: number, stride: number = windowSize) => {
+  public medianpool(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runMatrixFunction(ast.args, state, this.metadata('MEDIANPOOL'), (matrix: SimpleRangeValue, windowSize: number, stride: number = windowSize) => {
       if (!matrix.hasOnlyNumbers()) {
         return new CellError(ErrorType.VALUE, ErrorMessage.NumberRange)
       }
@@ -174,12 +178,12 @@ export class MatrixPlugin extends FunctionPlugin {
         return result
       }, outputSize)(matrix.rawNumbers(), windowSize, stride)
 
-      return SimpleRangeValue.onlyNumbersDataWithoutRange(result, outputSize)
+      return SimpleRangeValue.onlyNumbers(result)
     })
   }
 
-  public transpose(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InterpreterValue {
-    return this.runMatrixFunction(ast.args, formulaAddress, this.metadata('TRANSPOSE'), (matrix: SimpleRangeValue) => {
+  public transpose(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runMatrixFunction(ast.args, state, this.metadata('TRANSPOSE'), (matrix: SimpleRangeValue) => {
       if (!matrix.hasOnlyNumbers()) {
         return new CellError(ErrorType.VALUE, ErrorMessage.NumberRange)
       }
@@ -193,7 +197,7 @@ export class MatrixPlugin extends FunctionPlugin {
         }
       }
 
-      return SimpleRangeValue.onlyNumbersDataWithoutRange(result, matrixSizeForTranspose(inputSize))
+      return SimpleRangeValue.onlyNumbers(result)
     })
   }
 

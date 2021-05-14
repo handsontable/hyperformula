@@ -44,7 +44,7 @@ describe('swapping rows - checking if it is possible', () => {
   })
 
   it('should check for matrices', () => {
-    const engine = HyperFormula.buildFromArray([[0], [0], ['{=1}']])
+    const engine = HyperFormula.buildFromArray([[0], [0], ['=TRANSPOSE(A1:A2)']])
     expect(engine.isItPossibleToSwapRowIndexes(0, [[0, 2], [1, 1], [2, 0]])).toEqual(false)
     expect(() =>
       engine.swapRowIndexes(0, [[0, 2], [1, 1], [2, 0]])
@@ -52,10 +52,10 @@ describe('swapping rows - checking if it is possible', () => {
   })
 
   it('should check for matrices only in moved rows', () => {
-    const engine = HyperFormula.buildFromArray([[0], ['{=1}'], [0]])
-    expect(engine.isItPossibleToSwapRowIndexes(0, [[0, 2], [1, 1], [2, 0]])).toEqual(true)
+    const engine = HyperFormula.buildFromArray([[0], [0], ['=TRANSPOSE(A1:A2)']])
+    expect(engine.isItPossibleToSwapRowIndexes(0, [[0, 1], [1, 0], [2, 2]])).toEqual(true)
     expect(() =>
-      engine.swapRowIndexes(0, [[0, 2], [1, 1], [2, 0]])
+      engine.swapRowIndexes(0, [[0, 1], [1, 0], [2, 2]])
     ).not.toThrowError()
   })
 })
@@ -216,7 +216,7 @@ describe('setting row order - checking if it is possible', () => {
   })
 
   it('should check for matrices', () => {
-    const engine = HyperFormula.buildFromArray([[0], [0], ['{=1}']])
+    const engine = HyperFormula.buildFromArray([[0], [0], ['=TRANSPOSE(A1:A2)']])
     expect(engine.isItPossibleToSetRowOrder(0, [2, 1, 0])).toEqual(false)
     expect(() =>
       engine.setRowOrder(0, [2, 1, 0])
@@ -224,10 +224,10 @@ describe('setting row order - checking if it is possible', () => {
   })
 
   it('should check for matrices only in moved rows', () => {
-    const engine = HyperFormula.buildFromArray([[0], ['{=1}'], [0]])
-    expect(engine.isItPossibleToSetRowOrder(0, [2, 1, 0])).toEqual(true)
+    const engine = HyperFormula.buildFromArray([[0], [0], ['=TRANSPOSE(A1:A2)']])
+    expect(engine.isItPossibleToSetRowOrder(0, [1, 0, 2])).toEqual(true)
     expect(() =>
-      engine.setRowOrder(0, [2, 1, 0])
+      engine.setRowOrder(0, [1, 0, 2])
     ).not.toThrowError()
   })
 })

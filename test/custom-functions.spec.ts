@@ -3,15 +3,16 @@ import {ErrorType, SimpleCellAddress} from '../src/Cell'
 import {ErrorMessage} from '../src/error-message'
 import {AliasAlreadyExisting, ProtectedFunctionError, ProtectedFunctionTranslationError} from '../src/errors'
 import {plPL} from '../src/i18n/languages'
+import {InterpreterState} from '../src/interpreter/InterpreterState'
 import {InternalScalarValue} from '../src/interpreter/InterpreterValue'
-import {FunctionPlugin} from '../src/interpreter/plugin/FunctionPlugin'
+import {FunctionPlugin, FunctionPluginTypecheck} from '../src/interpreter/plugin/FunctionPlugin'
 import {NumericAggregationPlugin} from '../src/interpreter/plugin/NumericAggregationPlugin'
 import {SumifPlugin} from '../src/interpreter/plugin/SumifPlugin'
 import {VersionPlugin} from '../src/interpreter/plugin/VersionPlugin'
 import {ProcedureAst} from '../src/parser'
 import {adr, detailedError, expectArrayWithSameContent} from './testUtils'
 
-class FooPlugin extends FunctionPlugin {
+class FooPlugin extends FunctionPlugin implements FunctionPluginTypecheck<FooPlugin>{
   public static implementedFunctions = {
     'FOO': {
       method: 'foo',
@@ -32,16 +33,16 @@ class FooPlugin extends FunctionPlugin {
     }
   }
 
-  public foo(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+  public foo(_ast: ProcedureAst, _state: InterpreterState): InternalScalarValue {
     return 'foo'
   }
 
-  public bar(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+  public bar(_ast: ProcedureAst, _state: InterpreterState): InternalScalarValue {
     return 'bar'
   }
 }
 
-class SumWithExtra extends FunctionPlugin {
+class SumWithExtra extends FunctionPlugin implements FunctionPluginTypecheck<SumWithExtra>{
   public static implementedFunctions = {
     'SUM': {
       method: 'sum',
@@ -52,27 +53,27 @@ class SumWithExtra extends FunctionPlugin {
     'SUMALIAS': 'SUM',
   }
 
-  public sum(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    const left = this.evaluateAst(ast.args[0], formulaAddress) as number
-    const right = this.evaluateAst(ast.args[1], formulaAddress) as number
+  public sum(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+    const left = this.evaluateAst(ast.args[0], state) as number
+    const right = this.evaluateAst(ast.args[1], state) as number
     return 42 + left + right
   }
 }
 
-class InvalidPlugin extends FunctionPlugin {
+class InvalidPlugin extends FunctionPlugin implements FunctionPluginTypecheck<InvalidPlugin>{
   public static implementedFunctions = {
     'FOO': {
       method: 'foo',
     }
   }
 
-  public bar(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+  public bar(_ast: ProcedureAst, _state: InterpreterState): InternalScalarValue {
     return 'bar'
   }
 }
 
 
-class EmptyAliasPlugin extends FunctionPlugin {
+class EmptyAliasPlugin extends FunctionPlugin implements FunctionPluginTypecheck<EmptyAliasPlugin>{
   public static implementedFunctions = {
     'FOO': {
       method: 'foo',
@@ -84,7 +85,7 @@ class EmptyAliasPlugin extends FunctionPlugin {
   }
 }
 
-class OverloadedAliasPlugin extends FunctionPlugin {
+class OverloadedAliasPlugin extends FunctionPlugin implements FunctionPluginTypecheck<OverloadedAliasPlugin>{
   public static implementedFunctions = {
     'FOO': {
       method: 'foo',
@@ -99,14 +100,14 @@ class OverloadedAliasPlugin extends FunctionPlugin {
   }
 }
 
-class ReservedNamePlugin extends FunctionPlugin {
+class ReservedNamePlugin extends FunctionPlugin implements FunctionPluginTypecheck<ReservedNamePlugin>{
   public static implementedFunctions = {
     'VERSION': {
       method: 'version',
     }
   }
 
-  public version(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+  public version(_ast: ProcedureAst, _state: InterpreterState): InternalScalarValue {
     return 'foo'
   }
 }

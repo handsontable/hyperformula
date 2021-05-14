@@ -62,8 +62,8 @@ describe('Adding row - checking if its possible', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '2'],
       ['3', '4'],
-      ['{=TRANSPOSE(A1:B2)}', '{=TRANSPOSE(A1:B2)}'],
-      ['{=TRANSPOSE(A1:B2)}', '{=TRANSPOSE(A1:B2)}'],
+      ['=TRANSPOSE(A1:B2)'],
+      [],
       ['13'],
     ])
 
@@ -105,8 +105,8 @@ describe('Adding row - matrix check', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '2'],
       ['3', '4'],
-      ['{=TRANSPOSE(A1:B2)}', '{=TRANSPOSE(A1:B2)}'],
-      ['{=TRANSPOSE(A1:B2)}', '{=TRANSPOSE(A1:B2)}'],
+      ['=TRANSPOSE(A1:B2)'],
+      [],
       ['13'],
     ])
 
@@ -117,8 +117,8 @@ describe('Adding row - matrix check', () => {
 
   it('should be possible to add row right above matrix', () => {
     const engine = HyperFormula.buildFromArray([
-      ['{=TRANSPOSE(A3:B4)}', '{=TRANSPOSE(A3:B4)}'],
-      ['{=TRANSPOSE(A3:B4)}', '{=TRANSPOSE(A3:B4)}'],
+      ['=TRANSPOSE(A3:B4)'],
+      [],
       ['1', '2'],
       ['3', '4'],
     ])
@@ -133,8 +133,8 @@ describe('Adding row - matrix check', () => {
 
   it('should be possible to add row right after matrix', () => {
     const engine = HyperFormula.buildFromArray([
-      ['{=TRANSPOSE(A3:B4)}', '{=TRANSPOSE(A3:B4)}'],
-      ['{=TRANSPOSE(A3:B4)}', '{=TRANSPOSE(A3:B4)}'],
+      ['=TRANSPOSE(A3:B4)'],
+      [],
       ['1', '2'],
       ['3', '4'],
     ])
@@ -213,8 +213,7 @@ describe('Adding row - MatrixVertex', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '2'],
       ['3', '4'],
-      ['{=TRANSPOSE(A1:B2)}', '{=TRANSPOSE(A1:B2)}'],
-      ['{=TRANSPOSE(A1:B2)}', '{=TRANSPOSE(A1:B2)}'],
+      ['=TRANSPOSE(A1:B2)'],
     ])
 
     engine.addRows(0, [1, 1])
@@ -229,8 +228,7 @@ describe('Adding row - MatrixVertex', () => {
         ['3', '4'],
       ],
       Sheet2: [
-        ['{=TRANSPOSE(Sheet1!A1:B2)}', '{=TRANSPOSE(Sheet1!A1:B2)}'],
-        ['{=TRANSPOSE(Sheet1!A1:B2)}', '{=TRANSPOSE(Sheet1!A1:B2)}'],
+        ['=TRANSPOSE(Sheet1!A1:B2)'],
       ],
     })
 
@@ -243,8 +241,7 @@ describe('Adding row - MatrixVertex', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '2'],
       ['3', '4'],
-      ['{=TRANSPOSE(A1:B2)}', '{=TRANSPOSE(A1:B2)}'],
-      ['{=TRANSPOSE(A1:B2)}', '{=TRANSPOSE(A1:B2)}'],
+      ['=TRANSPOSE(A1:B2)'],
     ])
 
     engine.addRows(0, [1, 1])

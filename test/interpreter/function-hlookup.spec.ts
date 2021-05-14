@@ -23,7 +23,7 @@ describe('Function HLOOKUP', () => {
 
     it('wrong type of first argument', () => {
       const engine = HyperFormula.buildFromArray([
-        ['=HLOOKUP(D1:D2, A2:B3, 2, TRUE())'],
+        ['=HLOOKUP(D1:E1, A2:B3, 2, TRUE())'],
       ])
 
       expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.WrongType))

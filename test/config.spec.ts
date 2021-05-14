@@ -206,6 +206,11 @@ describe('Config', () => {
 })
 
 describe('getConfig', () => {
+  it('should not be an instance of Config', () => {
+    const engine = HyperFormula.buildEmpty()
+    expect(engine.getConfig()).not.toBeInstanceOf(Config)
+  })
+
   it('should copy returned values', () => {
     const arr = ['mm']
     const engine = HyperFormula.buildEmpty({dateFormats: arr})

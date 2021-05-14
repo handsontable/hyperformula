@@ -4,6 +4,7 @@
  */
 
 import {SheetCellAddress, simpleCellAddress, SimpleCellAddress} from '../../Cell'
+import {Maybe} from '../../Maybe'
 import {ColumnsSpan, RowsSpan} from '../../Span'
 import {CellVertex} from '../Vertex'
 import {IAddressMappingStrategy} from './IAddressMappingStrategy'
@@ -26,12 +27,8 @@ export class SparseStrategy implements IAddressMappingStrategy {
   }
 
   /** @inheritDoc */
-  public getCell(address: SheetCellAddress): CellVertex | null {
-    const colMapping = this.mapping.get(address.col)
-    if (!colMapping) {
-      return null
-    }
-    return colMapping.get(address.row) || null
+  public getCell(address: SheetCellAddress): Maybe<CellVertex> {
+    return this.mapping.get(address.col)?.get(address.row)
   }
 
   /** @inheritDoc */

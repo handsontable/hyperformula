@@ -63,11 +63,18 @@ lets you design your own [custom functions](custom-functions).
 
 Total number of functions: **{{ $page.functionsCount }}**
 
+### Array manipulation
+
+| Function ID | Description | Syntax |
+| :--- | :--- | :--- |
+| ARRAYFORMULA | Enables array arithmetic inside. | ARRAYFORMULA(Formula) |
+| ARRAY_CONSTRAINT | Truncates array to given dimensions. | ARRAYFORMULA(Array; Height; Width) |
+
 ### Date and time
 
 | Function ID | Description | Syntax |
 | :--- | :--- | :--- |
-| DATE | Date and time | Calculates a date specified by year, month, day, and displays it in the cell's formatting. | DATE(Year; Month; Day) |
+| DATE | Calculates a date specified by year, month, day, and displays it in the cell's formatting. | DATE(Year; Month; Day) |
 | DATEDIF | Calculates distance between two dates, in provided unit parameter. | DATEDIF(Date1; Date2; Units) |
 | DATEVALUE | Interprets string as date. | DATEVALUE(Datestring) |
 | DAY | Returns the day of the given date value. | DAY(Number) |

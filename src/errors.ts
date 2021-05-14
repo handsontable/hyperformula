@@ -364,18 +364,6 @@ export class TargetLocationHasMatrixError extends Error {
 }
 
 /**
- * Error thrown when trying to use matrix expression as named expression.
- *
- * @see [[addNamedExpression]]
- * @see [[changeNamedExpression]]
- */
-export class MatrixFormulasNotSupportedError extends Error {
-  constructor() {
-    super('Matrix formulas are not supported in named expressions.')
-  }
-}
-
-/**
  * Error thrown when named expression contains relative addresses.
  *
  * @see [[addNamedExpression]]

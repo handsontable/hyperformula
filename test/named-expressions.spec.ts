@@ -249,8 +249,8 @@ describe('Named expressions - store manipulation', () => {
     const engine = HyperFormula.buildEmpty()
 
     expect(() => {
-      engine.addNamedExpression('myName', '{=TRANSPOSE(A1:B2)}')
-    }).toThrowError(/Matrix formulas are not supported/)
+      engine.addNamedExpression('myName', '=TRANSPOSE(A1:B2)')
+    }).toThrowError(/Relative addresses not allowed in named expressions./)
   })
 
   it('retrieving non-existing named expression', () => {
@@ -324,8 +324,8 @@ describe('Named expressions - store manipulation', () => {
     engine.addNamedExpression('myName', '=42')
 
     expect(() => {
-      engine.changeNamedExpression('myName', '{=TRANSPOSE(A1:B2)}')
-    }).toThrowError(/not supported/)
+      engine.changeNamedExpression('myName', '=TRANSPOSE(A1:B2)')
+    }).toThrowError(/Relative addresses not allowed in named expressions./)
   })
 
   it('changing not existing named expression', () => {

@@ -3,14 +3,14 @@
  * Copyright (c) 2021 Handsoncode. All rights reserved.
  */
 
-import {SimpleCellAddress} from '../../Cell'
 import {ProcedureAst} from '../../parser'
+import {InterpreterState} from '../InterpreterState'
 import {InternalScalarValue} from '../InterpreterValue'
-import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
+import {ArgumentTypes, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
 
 export const PI = parseFloat(Math.PI.toFixed(14))
 
-export class MathConstantsPlugin extends FunctionPlugin {
+export class MathConstantsPlugin extends FunctionPlugin implements FunctionPluginTypecheck<MathConstantsPlugin>{
   public static implementedFunctions = {
     'PI': {
       method: 'pi',
@@ -24,14 +24,14 @@ export class MathConstantsPlugin extends FunctionPlugin {
     },
   }
 
-  public pi(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('PI'),
+  public pi(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+    return this.runFunction(ast.args, state, this.metadata('PI'),
       () => PI
     )
   }
 
-  public sqrtpi(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('SQRTPI'),
+  public sqrtpi(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+    return this.runFunction(ast.args, state, this.metadata('SQRTPI'),
       (arg: number) => Math.sqrt(PI*arg)
     )
   }

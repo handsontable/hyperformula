@@ -3,12 +3,11 @@
  * Copyright (c) 2021 Handsoncode. All rights reserved.
  */
 
-import {EmptyValue, getRawValue} from './interpreter/InterpreterValue'
-import {ClipboardCell, ClipboardCellType} from './ClipboardOperations'
-import {CellError, invalidSimpleCellAddress, simpleCellAddress, SimpleCellAddress} from './Cell'
 import {AbsoluteCellRange} from './AbsoluteCellRange'
 import {absolutizeDependencies, filterDependenciesOutOfScope} from './absolutizeDependencies'
+import {CellError, invalidSimpleCellAddress, simpleCellAddress, SimpleCellAddress} from './Cell'
 import {CellContent, CellContentParser, RawCellContent} from './CellContentParser'
+import {ClipboardCell, ClipboardCellType} from './ClipboardOperations'
 import {Config} from './Config'
 import {ContentChanges} from './ContentChanges'
 import {ColumnRowIndex} from './CrudOperations'
@@ -24,9 +23,10 @@ import {
   SparseStrategy,
   ValueCellVertex
 } from './DependencyGraph'
-import {RawAndParsedValue, ValueCellVertexValue} from './DependencyGraph/ValueCellVertex'
+import {RawAndParsedValue} from './DependencyGraph/ValueCellVertex'
 import {AddColumnsTransformer} from './dependencyTransformers/AddColumnsTransformer'
 import {AddRowsTransformer} from './dependencyTransformers/AddRowsTransformer'
+import {CleanOutOfScopeDependenciesTransformer} from './dependencyTransformers/CleanOutOfScopeDependenciesTransformer'
 import {MoveCellsTransformer} from './dependencyTransformers/MoveCellsTransformer'
 import {RemoveColumnsTransformer} from './dependencyTransformers/RemoveColumnsTransformer'
 import {RemoveRowsTransformer} from './dependencyTransformers/RemoveRowsTransformer'
@@ -39,21 +39,21 @@ import {
   SourceLocationHasMatrixError,
   TargetLocationHasMatrixError
 } from './errors'
-import {buildMatrixVertex} from './GraphBuilder'
+import {EmptyValue, getRawValue} from './interpreter/InterpreterValue'
 import {LazilyTransformingAstService} from './LazilyTransformingAstService'
 import {ColumnSearchStrategy} from './Lookup/SearchStrategy'
+import {MatrixSizePredictor} from './MatrixSize'
 import {
   doesContainRelativeReferences,
   InternalNamedExpression,
   NamedExpressionOptions,
   NamedExpressions
 } from './NamedExpressions'
-import {NamedExpressionDependency, ParserWithCaching, ProcedureAst, RelativeDependency} from './parser'
+import {NamedExpressionDependency, ParserWithCaching, RelativeDependency} from './parser'
 import {ParsingError} from './parser/Ast'
 import {findBoundaries, Sheet} from './Sheet'
 import {ColumnsSpan, RowsSpan} from './Span'
 import {Statistics, StatType} from './statistics'
-import {CleanOutOfScopeDependenciesTransformer} from './dependencyTransformers/CleanOutOfScopeDependenciesTransformer'
 
 export class RemoveRowsCommand {
   constructor(
@@ -164,6 +164,7 @@ export class Operations {
     private readonly lazilyTransformingAstService: LazilyTransformingAstService,
     private readonly namedExpressions: NamedExpressions,
     private readonly config: Config,
+    private readonly matrixSizePredictor: MatrixSizePredictor,
   ) {
     this.allocateNamedExpressionAddressSpace()
   }
@@ -584,7 +585,11 @@ export class Operations {
     } else if (vertex instanceof ValueCellVertex) {
       return {type: ClipboardCellType.VALUE, ...vertex.getValues()}
     } else if (vertex instanceof MatrixVertex) {
-      return {type: ClipboardCellType.VALUE, parsedValue: vertex.getMatrixCellValue(address), rawValue: vertex.getMatrixCellRawValue(address)}
+      const val = vertex.getMatrixCellValue(address)
+      if(val === EmptyValue) {
+        return {type: ClipboardCellType.EMPTY}
+      }
+      return {type: ClipboardCellType.VALUE, parsedValue: val, rawValue: vertex.getMatrixCellRawValue(address)}
     } else if (vertex instanceof FormulaCellVertex) {
       return {
         type: ClipboardCellType.FORMULA,
@@ -638,31 +643,21 @@ export class Operations {
       vertex.setMatrixCellValue(address, getRawValue(newValue))
       this.columnSearch.change(getRawValue(oldValue), getRawValue(newValue), address)
       this.changes.addChange(newValue, address)
-    } else if (!(vertex instanceof MatrixVertex) && parsedCellContent instanceof CellContent.MatrixFormula) {
-      const {ast, errors, dependencies} = this.parser.parse(parsedCellContent.formula, address)
-      if (errors.length > 0) {
-        this.dependencyGraph.setParsingErrorToCell(address, new ParsingErrorVertex(errors, parsedCellContent.formulaWithBraces()))
-      } else {
-        const newVertex = buildMatrixVertex(ast as ProcedureAst, address)
-        if (newVertex instanceof ValueCellVertex) {
-          throw Error('What if new matrix vertex is not properly constructed?')
-        }
-        this.dependencyGraph.addNewMatrixVertex(newVertex)
-        this.dependencyGraph.processCellDependencies(absolutizeDependencies(dependencies, address), newVertex)
-        this.dependencyGraph.graph.markNodeAsSpecialRecentlyChanged(newVertex)
-      }
     } else if (!(vertex instanceof MatrixVertex)) {
       if (parsedCellContent instanceof CellContent.Formula) {
         const {ast, errors, hasVolatileFunction, hasStructuralChangeFunction, dependencies} = this.parser.parse(parsedCellContent.formula, address)
         if (errors.length > 0) {
           this.dependencyGraph.setParsingErrorToCell(address, new ParsingErrorVertex(errors, parsedCellContent.formula))
         } else {
-          this.dependencyGraph.setFormulaToCell(address, ast, absolutizeDependencies(dependencies, address), hasVolatileFunction, hasStructuralChangeFunction)
+          const size = this.matrixSizePredictor.checkMatrixSize(ast, address)
+          if(size === undefined || (size.width<=1 && size.height<=1) || size.isRef) {
+            this.dependencyGraph.setFormulaToCell(address, ast, absolutizeDependencies(dependencies, address), hasVolatileFunction, hasStructuralChangeFunction)
+          } else {
+            this.dependencyGraph.setMatrixToCell(address, ast, absolutizeDependencies(dependencies, address), size)
+          }
         }
       } else if (parsedCellContent instanceof CellContent.Empty) {
         this.setCellEmpty(address)
-      } else if (parsedCellContent instanceof CellContent.MatrixFormula) {
-        throw new Error('Cant happen')
       } else {
         this.setValueToCell({parsedValue: parsedCellContent.value, rawValue: newCellContent}, address)
       }
@@ -768,9 +763,7 @@ export class Operations {
 
   private storeNamedExpressionInCell(address: SimpleCellAddress, expression: RawCellContent) {
     const parsedCellContent = this.cellContentParser.parse(expression)
-    if (parsedCellContent instanceof CellContent.MatrixFormula) {
-      throw new Error('Matrix formulas are not supported')
-    } else if (parsedCellContent instanceof CellContent.Formula) {
+    if (parsedCellContent instanceof CellContent.Formula) {
       const parsingResult = this.parser.parse(parsedCellContent.formula, simpleCellAddress(-1, 0, 0))
       if (doesContainRelativeReferences(parsingResult.ast)) {
         throw new NoRelativeAddressesAllowedError()

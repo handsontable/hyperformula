@@ -258,24 +258,19 @@ describe('remove sheet - adjust matrix mapping', () => {
     const engine = HyperFormula.buildFromSheets({
       Sheet1: [
         ['1', '2'],
-        ['{=TRANSPOSE(A1:A1)}'],
-        ['{=TRANSPOSE(A2:A2)}'],
+        ['=TRANSPOSE(A1:B1)'],
       ],
       Sheet2: [
         ['1', '2'],
-        ['{=TRANSPOSE(A1:A1)}'],
-        ['{=TRANSPOSE(A2:A2)}'],
+        ['=TRANSPOSE(A1:B1)'],
       ],
     })
-    expect(engine.matrixMapping.getMatrix(AbsoluteCellRange.spanFrom(adr('A2'), 1, 1))).toBeInstanceOf(MatrixVertex)
-    expect(engine.matrixMapping.getMatrix(AbsoluteCellRange.spanFrom(adr('A3'), 1, 1))).toBeInstanceOf(MatrixVertex)
+    expect(engine.matrixMapping.getMatrix(AbsoluteCellRange.spanFrom(adr('A2'), 1, 2))).toBeInstanceOf(MatrixVertex)
 
     engine.removeSheet(0)
 
-    expect(engine.matrixMapping.getMatrix(AbsoluteCellRange.spanFrom(adr('A2'), 1, 1))).toBeUndefined()
-    expect(engine.matrixMapping.getMatrix(AbsoluteCellRange.spanFrom(adr('A3'), 1, 1))).toBeUndefined()
-    expect(engine.matrixMapping.getMatrix(AbsoluteCellRange.spanFrom(adr('A2', 1), 1, 1))).toBeInstanceOf(MatrixVertex)
-    expect(engine.matrixMapping.getMatrix(AbsoluteCellRange.spanFrom(adr('A3', 1), 1, 1))).toBeInstanceOf(MatrixVertex)
+    expect(engine.matrixMapping.getMatrix(AbsoluteCellRange.spanFrom(adr('A2'), 1, 2))).toBeUndefined()
+    expect(engine.matrixMapping.getMatrix(AbsoluteCellRange.spanFrom(adr('A2', 1), 1, 2))).toBeInstanceOf(MatrixVertex)
   })
 })
 

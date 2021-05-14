@@ -24,8 +24,8 @@ describe('Changing cell content - checking if its possible', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '2'],
       ['3', '4'],
-      ['{=TRANSPOSE(A1:B2)}', '{=TRANSPOSE(A1:B2)}'],
-      ['{=TRANSPOSE(A1:B2)}', '{=TRANSPOSE(A1:B2)}'],
+      ['=TRANSPOSE(A1:B2)'],
+      [],
       ['13'],
     ])
 
@@ -240,7 +240,7 @@ describe('changing cell content', () => {
     ]
     const engine = HyperFormula.buildFromArray(sheet)
 
-    engine.setCellContents(adr('A3'), '{=MMULT(A1:B2,A1:B2)}')
+    engine.setCellContents(adr('A3'), '=MMULT(A1:B2,A1:B2)')
     expect(engine.addressMapping.fetchCell(adr('A3'))).toBeInstanceOf(MatrixVertex)
     expect(engine.addressMapping.fetchCell(adr('B4'))).toBeInstanceOf(MatrixVertex)
     expect(engine.getCellValue(adr('A3'))).toBe(7)
@@ -421,12 +421,12 @@ describe('changing cell content', () => {
   it('should not be possible to edit part of a Matrix', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '2'],
-      [null, '{=TRANSPOSE(A1:B1)}'],
+      [null, '=TRANSPOSE(A1:B1)'],
     ])
 
     expect(() => {
-      engine.setCellContents(adr('A2'), '{=TRANSPOSE(C1:C2)}')
-    }).toThrowError('You cannot modify only part of an array')
+      engine.setCellContents(adr('A2'), '=TRANSPOSE(C1:C2)')
+    }).toThrowError('Illegal operation')
   })
 
   it('is not possible to set cell content in sheet which does not exist', () => {
@@ -498,7 +498,7 @@ describe('changing cell content', () => {
     const sheet = [
       ['1', '2'],
       ['3', '4'],
-      ['{=MMULT(A1:B2,A1:B2)}'],
+      ['=MMULT(A1:B2,A1:B2)'],
     ]
     const engine = HyperFormula.buildFromArray(sheet)
 
@@ -574,10 +574,10 @@ describe('changing cell content', () => {
   it('update empty cell to unparsable matrix formula', () => {
     const engine = HyperFormula.buildFromArray([])
 
-    engine.setCellContents(adr('A1'), '{=TRANSPOSE(}')
+    engine.setCellContents(adr('A1'), '=TRANSPOSE(')
 
     expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.ERROR, ErrorMessage.ParseError))
-    expect(engine.getCellFormula(adr('A1'))).toEqual('{=TRANSPOSE(}')
+    expect(engine.getCellFormula(adr('A1'))).toEqual('=TRANSPOSE(')
   })
 
   it('should throw when trying to set cell content outside sheet limits', () => {
@@ -596,6 +596,14 @@ describe('changing cell content', () => {
 
     expect(() => engine.setCellContents(cellInLastColumn, null)).not.toThrow()
     expect(() => engine.setCellContents(cellInLastRow, null)).not.toThrow()
+  })
+
+  it('should set matrix with range out of current sheet scope', () => {
+    const sheet = [
+      ['1', '2'],
+    ]
+    const engine = HyperFormula.buildFromArray(sheet)
+    engine.setCellContents(adr('C1'), '=MMULT(A1:B2,A1:B2)')
   })
 })
 
@@ -648,16 +656,16 @@ describe('change multiple cells contents', () => {
     expect(evaluatorCallSpy).toHaveBeenCalledTimes(1)
   })
 
-  it('it not possible to change matrices', () => {
+  it('possible to change matrices', () => {
     const sheet = [
       ['1', '2'],
     ]
     const engine = HyperFormula.buildFromArray(sheet)
 
-    expect(() => {
-      engine.setCellContents(adr('A1'), [['42', '{=MMULT(A1:B2,A1:B2)}']])
-    }).toThrowError('Cant change matrices in batch operation')
-    expect(engine.getCellValue(adr('A1'))).toBe(1)
+    engine.setCellContents(adr('A1'), [['42', '18', '=MMULT(A1:B1,TRANSPOSE(A1:B1))']])
+    expect(engine.getCellValue(adr('A1'))).toBe(42)
+    expect(engine.getCellValue(adr('B1'))).toBe(18)
+    expect(engine.getCellValue(adr('C1'))).toBe(2088)
   })
 
   it('returns changes of multiple values', () => {
@@ -800,7 +808,7 @@ describe('column ranges', () => {
       ['2'],
     ])
 
-    engine.setCellContents(adr('B1'), '{=TRANSPOSE(A2:A3)}')
+    engine.setCellContents(adr('B1'), '=TRANSPOSE(A2:A3)')
 
     const range = engine.rangeMapping.fetchRange(colStart('B'), colEnd('C'))
     const b1 = engine.addressMapping.fetchCell(adr('B1'))
@@ -844,7 +852,7 @@ describe('row ranges', () => {
       ['=SUM(2:3)', '1', '2'],
     ])
 
-    engine.setCellContents(adr('A2'), '{=TRANSPOSE(B1:C1)}')
+    engine.setCellContents(adr('A2'), '=TRANSPOSE(B1:C1)')
 
     const range = engine.rangeMapping.fetchRange(rowStart(2), rowEnd(3))
     const a2 = engine.addressMapping.fetchCell(adr('A2'))

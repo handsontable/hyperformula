@@ -6,8 +6,7 @@
 import {AbsoluteCellRange} from './AbsoluteCellRange'
 import {absolutizeDependencies} from './absolutizeDependencies'
 import {CellError, ErrorType, SimpleCellAddress} from './Cell'
-import {SimpleRangeValue} from './interpreter/SimpleRangeValue'
-import {ColumnSearchStrategy} from './Lookup/SearchStrategy'
+import {InterpreterState} from './interpreter/InterpreterState'
 import {Config} from './Config'
 import {ContentChanges} from './ContentChanges'
 import {DateTimeHelper} from './DateTimeHelper'
@@ -16,6 +15,8 @@ import {ErrorMessage} from './error-message'
 import {FunctionRegistry} from './interpreter/FunctionRegistry'
 import {Interpreter} from './interpreter/Interpreter'
 import {EmptyValue, getRawValue, InterpreterValue} from './interpreter/InterpreterValue'
+import {SimpleRangeValue} from './interpreter/SimpleRangeValue'
+import {ColumnSearchStrategy} from './Lookup/SearchStrategy'
 import {Matrix} from './Matrix'
 import {NamedExpressions} from './NamedExpressions'
 import {NumberLiteralHelper} from './NumberLiteralHelper'
@@ -60,7 +61,7 @@ export class Evaluator {
             const address = vertex.getAddress(this.dependencyGraph.lazilyTransformingAstService)
             const formula = vertex.getFormula(this.dependencyGraph.lazilyTransformingAstService)
             const currentValue = vertex.isComputed() ? vertex.getCellValue() : null
-            const newCellValue = this.evaluateAstToCellValue(formula, address)
+            const newCellValue = this.evaluateAstToCellValue(formula, new InterpreterState(address, this.config.useArrayArithmetic))
             vertex.setCellValue(newCellValue)
             if (newCellValue !== currentValue) {
               changes.addChange(newCellValue, address)
@@ -70,18 +71,22 @@ export class Evaluator {
             return false
           } else if (vertex instanceof MatrixVertex && vertex.isFormula()) {
             const address = vertex.getAddress()
-            const formula = vertex.getFormula() as Ast
+            const formula = vertex.getFormula()!
             const currentValue = vertex.isComputed() ? vertex.getCellValue() : null
-            const newCellValue = this.evaluateAstToRangeValue(formula, address)
-            if (newCellValue instanceof SimpleRangeValue) {
-              const newCellMatrix = new Matrix(newCellValue.rawNumbers())
+            const newCellValue = this.evaluateAstToRangeValue(formula, new InterpreterState(address, this.config.useArrayArithmetic))
+            if(newCellValue instanceof SimpleRangeValue && newCellValue.isAdHoc()) {
+              const newCellMatrix = new Matrix(newCellValue.data)
               vertex.setCellValue(newCellMatrix)
               changes.addMatrixChange(newCellMatrix, address)
               this.columnSearch.change(currentValue, newCellMatrix, address)
             } else {
-              vertex.setErrorValue(newCellValue)
-              changes.addChange(newCellValue, address)
-              this.columnSearch.change(currentValue, newCellValue, address)
+              const errorVal = newCellValue instanceof CellError ? newCellValue
+                : newCellValue.isAdHoc() ?
+                  new CellError(ErrorType.VALUE, ErrorMessage.CellRangeExpected)
+                  : new CellError(ErrorType.VALUE, ErrorMessage.ScalarExpected)
+              vertex.setErrorValue(errorVal)
+              changes.addChange(errorVal, address)
+              this.columnSearch.change(currentValue, errorVal, address)
             }
             return true
           } else if (vertex instanceof RangeVertex) {
@@ -123,7 +128,7 @@ export class Evaluator {
         }
       }
     }
-    const ret = this.evaluateAstToCellValue(ast, address)
+    const ret = this.evaluateAstToCellValue(ast, new InterpreterState(address, this.config.useArrayArithmetic))
 
     tmpRanges.forEach((rangeVertex) => {
       this.dependencyGraph.rangeMapping.removeRange(rangeVertex)
@@ -145,20 +150,24 @@ export class Evaluator {
       if (vertex instanceof FormulaCellVertex) {
         const address = vertex.getAddress(this.dependencyGraph.lazilyTransformingAstService)
         const formula = vertex.getFormula(this.dependencyGraph.lazilyTransformingAstService)
-        const newCellValue = this.evaluateAstToCellValue(formula, address)
+        const newCellValue = this.evaluateAstToCellValue(formula, new InterpreterState(address, this.config.useArrayArithmetic))
         vertex.setCellValue(newCellValue)
         this.columnSearch.add(getRawValue(newCellValue), address)
       } else if (vertex instanceof MatrixVertex && vertex.isFormula()) {
         const address = vertex.getAddress()
-        const formula = vertex.getFormula() as Ast
-        const newCellValue = this.evaluateAstToRangeValue(formula, address)
-        if (newCellValue instanceof SimpleRangeValue) {
-          const newCellMatrix = new Matrix(newCellValue.rawNumbers())
+        const formula = vertex.getFormula()!
+        const newCellValue = this.evaluateAstToRangeValue(formula, new InterpreterState(address, this.config.useArrayArithmetic))
+        if(newCellValue instanceof SimpleRangeValue && newCellValue.isAdHoc()) {
+          const newCellMatrix = new Matrix(newCellValue.data)
           vertex.setCellValue(newCellMatrix)
           this.columnSearch.add(newCellMatrix, address)
         } else {
-          vertex.setErrorValue(newCellValue)
-          this.columnSearch.add(newCellValue, address)
+          const errorVal = newCellValue instanceof CellError ? newCellValue
+            : newCellValue.isAdHoc() ?
+              new CellError(ErrorType.VALUE, ErrorMessage.CellRangeExpected)
+              : new CellError(ErrorType.VALUE, ErrorMessage.ScalarExpected)
+          vertex.setErrorValue(errorVal)
+          this.columnSearch.add(errorVal, address)
         }
       } else if (vertex instanceof RangeVertex) {
         vertex.clearCache()
@@ -166,8 +175,8 @@ export class Evaluator {
     })
   }
 
-  private evaluateAstToCellValue(ast: Ast, formulaAddress: SimpleCellAddress): InterpreterValue {
-    const interpreterValue = this.interpreter.evaluateAst(ast, formulaAddress)
+  private evaluateAstToCellValue(ast: Ast, state: InterpreterState): InterpreterValue {
+    const interpreterValue = this.interpreter.evaluateAst(ast, state)
     if (interpreterValue instanceof SimpleRangeValue) {
       return interpreterValue
     } else if (interpreterValue === EmptyValue && this.config.evaluateNullToZero) {
@@ -177,14 +186,14 @@ export class Evaluator {
     }
   }
 
-  private evaluateAstToRangeValue(ast: Ast, formulaAddress: SimpleCellAddress): SimpleRangeValue | CellError {
-    const interpreterValue = this.interpreter.evaluateAst(ast, formulaAddress)
+  private evaluateAstToRangeValue(ast: Ast, state: InterpreterState): SimpleRangeValue | CellError {
+    const interpreterValue = this.interpreter.evaluateAst(ast, state)
     if (interpreterValue instanceof CellError) {
       return interpreterValue
-    } else if (interpreterValue instanceof SimpleRangeValue && interpreterValue.hasOnlyNumbers()) {
+    } else if (interpreterValue instanceof SimpleRangeValue) {
       return interpreterValue
     } else {
-      return new CellError(ErrorType.VALUE, ErrorMessage.CellRangeExpected)
+      return SimpleRangeValue.fromScalar(interpreterValue)
     }
   }
 }

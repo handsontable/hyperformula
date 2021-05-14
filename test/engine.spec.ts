@@ -154,14 +154,13 @@ describe('#getCellFormula', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '1'],
       ['1', '1'],
-      ['{=MMULT(A1:B2,A1:B2)}', '{=MMULT(A1:B2,A1:B2)}'],
-      ['{=MMULT(A1:B2,A1:B2)}', '{=MMULT(A1:B2,A1:B2)}'],
+      ['=MMULT(A1:B2,A1:B2)'],
     ])
 
-    expect(engine.getCellFormula(adr('A3'))).toEqual('{=MMULT(A1:B2,A1:B2)}')
-    expect(engine.getCellFormula(adr('A4'))).toEqual('{=MMULT(A1:B2,A1:B2)}')
-    expect(engine.getCellFormula(adr('B3'))).toEqual('{=MMULT(A1:B2,A1:B2)}')
-    expect(engine.getCellFormula(adr('B4'))).toEqual('{=MMULT(A1:B2,A1:B2)}')
+    expect(engine.getCellFormula(adr('A3'))).toEqual('=MMULT(A1:B2,A1:B2)')
+    expect(engine.getCellFormula(adr('A4'))).toEqual(undefined)
+    expect(engine.getCellFormula(adr('B3'))).toEqual(undefined)
+    expect(engine.getCellFormula(adr('B4'))).toEqual(undefined)
   })
 
   it('returns undefined for numeric matrices', () => {
@@ -187,11 +186,11 @@ describe('#getCellFormula', () => {
 
   it('returns invalid matrix formula literal', () => {
     const engine = HyperFormula.buildFromArray([
-      ['{=TRANSPOSE(}']
+      ['=TRANSPOSE(']
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.ERROR, ErrorMessage.ParseError))
-    expect(engine.getCellFormula(adr('A1'))).toEqual('{=TRANSPOSE(}')
+    expect(engine.getCellFormula(adr('A1'))).toEqual('=TRANSPOSE(')
   })
 })
 
@@ -278,8 +277,7 @@ describe('#getCellValue', () => {
   it('should return value of a cell in a formula matrix', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '2'],
-      ['{=TRANSPOSE(A1:B1)}'],
-      ['{=TRANSPOSE(A1:B1)}'],
+      ['=TRANSPOSE(A1:B1)'],
     ])
 
     expect(engine.getCellValue(adr('A2'))).toEqual(1)
@@ -595,7 +593,7 @@ describe('#getCellType', () => {
   })
 
   it('formula matrix', () => {
-    const engine = HyperFormula.buildFromArray([['{=TRANSPOSE(C1:C2)}', '{=TRANSPOSE(C1:C2)}']])
+    const engine = HyperFormula.buildFromArray([['=TRANSPOSE(C1:C2)']])
 
     expect(engine.getCellType(adr('A1'))).toBe(CellType.MATRIX)
     expect(engine.getCellType(adr('B1'))).toBe(CellType.MATRIX)
@@ -614,7 +612,7 @@ describe('#getCellValueDetailedType', () => {
     expect(engine.getCellValueDetailedType(adr('A1'))).toBe(CellValueDetailedType.STRING)
   })
 
-  it('number raw', () => {
+  it('number data', () => {
     const engine = HyperFormula.buildFromArray([['42']])
     expect(engine.getCellValueDetailedType(adr('A1'))).toBe(CellValueDetailedType.NUMBER_RAW)
   })
@@ -726,7 +724,7 @@ describe('#doesCellHaveSimpleValue', () => {
   })
 
   it('false', () => {
-    const engine = HyperFormula.buildFromArray([['=SUM(1, 2)', null, '{=TRANSPOSE(A1:A1)}']])
+    const engine = HyperFormula.buildFromArray([['=SUM(1, 2)', null, '=TRANSPOSE(A1:A1)']])
     expect(engine.doesCellHaveSimpleValue(adr('A1'))).toEqual(false)
     expect(engine.doesCellHaveSimpleValue(adr('B1'))).toEqual(false)
     expect(engine.doesCellHaveSimpleValue(adr('C1'))).toEqual(false)
@@ -768,7 +766,7 @@ describe('#isCellEmpty', () => {
 
 describe('#isCellPartOfMatrix', () => {
   it('true', () => {
-    const engine = HyperFormula.buildFromArray([['{=TRANSPOSE(B1:B1)}']])
+    const engine = HyperFormula.buildFromArray([['=TRANSPOSE(B1:C1)']])
     expect(engine.isCellPartOfMatrix(adr('A1'))).toEqual(true)
   })
 

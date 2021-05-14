@@ -53,12 +53,12 @@ describe('Disable matrix optimizatoins', () => {
     const sheet = [
       ['1', '2'],
       ['3', '4'],
-      ['{=TRANSPOSE(A1)}'],
+      ['=TRANSPOSE(A1:B2)'],
     ]
 
     const engine = HyperFormula.buildFromArray(sheet, {matrixDetection: true, matrixDetectionThreshold: 1})
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const matrix = engine.matrixMapping.getMatrix(AbsoluteCellRange.spanFrom(adr('A3'), 1, 1))!
+    const matrix = engine.matrixMapping.getMatrix(AbsoluteCellRange.spanFrom(adr('A3'), 2, 2))!
 
     engine.dependencyGraph.disableNumericMatrices()
 
@@ -68,7 +68,7 @@ describe('Disable matrix optimizatoins', () => {
     expect(a1).toBeInstanceOf(ValueCellVertex)
 
     expect(engine.graph.getDependencies(matrix).length).toBe(1)
-    expect(engine.graph.existsEdge(a1, matrix)).toBe(true)
+    expect(engine.graph.existsEdge(a1, matrix)).toBe(false)
     expect(engine.graph.existsEdge(b1, matrix)).toBe(false)
   })
 

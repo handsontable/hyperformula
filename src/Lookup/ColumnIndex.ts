@@ -11,7 +11,7 @@ import {AddRowsTransformer} from '../dependencyTransformers/AddRowsTransformer'
 import {RemoveRowsTransformer} from '../dependencyTransformers/RemoveRowsTransformer'
 import {FormulaTransformer} from '../dependencyTransformers/Transformer'
 import {forceNormalizeString} from '../interpreter/ArithmeticHelper'
-import {RawInterpreterValue, RawNoErrorScalarValue, RawScalarValue} from '../interpreter/InterpreterValue'
+import {getRawValue, RawInterpreterValue, RawNoErrorScalarValue, RawScalarValue} from '../interpreter/InterpreterValue'
 import {SimpleRangeValue} from '../interpreter/SimpleRangeValue'
 import {LazilyTransformingAstService} from '../LazilyTransformingAstService'
 import {Matrix} from '../Matrix'
@@ -47,7 +47,7 @@ export class ColumnIndex implements ColumnSearchStrategy {
   public add(value: RawInterpreterValue | Matrix, address: SimpleCellAddress) {
     if (value instanceof Matrix) {
       for (const [matrixValue, cellAddress] of value.generateValues(address)) {
-        this.addSingleCellValue(matrixValue, cellAddress)
+        this.addSingleCellValue(getRawValue(matrixValue), cellAddress)
       }
     } else if (!(value instanceof CellError || value instanceof SimpleRangeValue)) {
       this.addSingleCellValue(value, address)
@@ -61,7 +61,7 @@ export class ColumnIndex implements ColumnSearchStrategy {
 
     if (value instanceof Matrix) {
       for (const [matrixValue, cellAddress] of value.generateValues(address)) {
-        this.removeSingleValue(matrixValue, cellAddress)
+        this.removeSingleValue(getRawValue(matrixValue), cellAddress)
       }
     } else {
       this.removeSingleValue(value, address)
@@ -90,7 +90,11 @@ export class ColumnIndex implements ColumnSearchStrategy {
     }
   }
 
-  public find(key: RawNoErrorScalarValue, range: AbsoluteCellRange, sorted: boolean): number {
+  public find(key: RawNoErrorScalarValue, rangeValue: SimpleRangeValue, sorted: boolean): number {
+    const range = rangeValue.range
+    if(range === undefined) {
+      return this.binarySearchStrategy.find(key, rangeValue, sorted)
+    }
     this.ensureRecentData(range.sheet, range.start.col, key)
 
     const columnMap = this.getColumnMap(range.sheet, range.start.col)
@@ -104,15 +108,15 @@ export class ColumnIndex implements ColumnSearchStrategy {
 
     const valueIndex = columnMap.get(key)
     if (!valueIndex) {
-      return this.binarySearchStrategy.find(key, range, sorted)
+      return this.binarySearchStrategy.find(key, rangeValue, sorted)
     }
 
     const index = upperBound(valueIndex.index, range.start.row)
     const rowNumber = valueIndex.index[index]
-    return rowNumber <= range.end.row ? rowNumber : this.binarySearchStrategy.find(key, range, sorted)
+    return rowNumber <= range.end.row ? rowNumber - range.start.row : this.binarySearchStrategy.find(key, rangeValue, sorted)
   }
 
-  public advancedFind(keyMatcher: (arg: RawInterpreterValue) => boolean, range: AbsoluteCellRange): number {
+  public advancedFind(keyMatcher: (arg: RawInterpreterValue) => boolean, range: SimpleRangeValue): number {
     return this.binarySearchStrategy.advancedFind(keyMatcher, range)
   }
 
