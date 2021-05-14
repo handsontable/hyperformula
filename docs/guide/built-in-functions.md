@@ -69,6 +69,7 @@ Total number of functions: **{{ $page.functionsCount }}**
 | :--- | :--- | :--- |
 | ARRAYFORMULA | Enables array arithmetic inside. | ARRAYFORMULA(Formula) |
 
+
 ### Date and time
 
 | Function ID | Description | Syntax |
