@@ -31,8 +31,7 @@ import {
   InterpreterValue,
   isExtendedNumber,
 } from './InterpreterValue'
-import {ArrayData, SimpleRangeValue} from './SimpleRangeValue'
-import {FunctionPlugin, PluginFunctionType} from './plugin/FunctionPlugin'
+import {SimpleRangeValue} from './SimpleRangeValue'
 
 export class Interpreter {
   private gpu?: GPU
