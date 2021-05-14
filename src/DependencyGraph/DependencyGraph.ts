@@ -152,16 +152,6 @@ export class DependencyGraph {
     }
   }
 
-  public setMatrixToCell(address: SimpleCellAddress, ast: Ast, dependencies: CellDependency[], size: MatrixSize) {
-    const vertex = new MatrixVertex(address, size.width, size.height, ast)
-    this.exchangeOrAddMatrixVertex(vertex)
-
-    this.processCellDependencies(dependencies, vertex)
-
-    this.graph.markNodeAsSpecialRecentlyChanged(vertex)
-    this.correctInfiniteRangesDependency(address)
-  }
-
   public ensureThatVertexIsNonMatrixCellVertex(vertex: CellVertex | null) {
     assert.ok(!(vertex instanceof MatrixVertex), 'Illegal operation')
   }

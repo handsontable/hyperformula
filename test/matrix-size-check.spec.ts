@@ -21,12 +21,12 @@ describe('Matrix size check tests', () => {
     expect(size).toEqual(new MatrixSize(3, 3))
   })
 
-  it('check simple wrong size', () => {
+  it('even for wrong size, we need to estimate', () => {
     const parser = buildEmptyParserWithCaching(config)
     const ast = parser.parse('=mmult(A1:B3,C1:E3)', simpleCellAddress(0, 0, 0)).ast
 
     const size = matrixSizePredictor.checkMatrixSize(ast, adr('A1'))
-    expect(size).toEqual(MatrixSize.error())
+    expect(size).toEqual(new MatrixSize(3,3))
   })
 
   it('check recursive', () => {
@@ -37,12 +37,12 @@ describe('Matrix size check tests', () => {
     expect(size).toEqual(new MatrixSize(2, 3))
   })
 
-  it('check recursive wrong size', () => {
+  it('wrong size estimation', () => {
     const parser = buildEmptyParserWithCaching(config)
     const ast = parser.parse('=mmult(mmult(A1:B3,C1:E3), A1:B3)', simpleCellAddress(0, 0, 0)).ast
 
     const size = matrixSizePredictor.checkMatrixSize(ast, adr('A1'))
-    expect(size).toEqual(MatrixSize.error())
+    expect(size).toEqual(new MatrixSize(2,3))
   })
 
   it('check maxpool', () => {
@@ -74,7 +74,7 @@ describe('Matrix size check tests', () => {
     const ast = parser.parse('=1234', simpleCellAddress(0, 0, 0)).ast
 
     const size = matrixSizePredictor.checkMatrixSize(ast, adr('A1'))
-    expect(size).toEqual(new MatrixSize(1, 1))
+    expect(size).toEqual(new MatrixSize(1, 1, false))
   })
 
   it('check cell reference', () => {
