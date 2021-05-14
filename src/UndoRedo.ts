@@ -581,7 +581,7 @@ export class UndoRedo {
 
   public undoAddSheet(operation: AddSheetUndoEntry) {
     const {sheetName} = operation
-    this.operations.removeSheet(sheetName)
+    this.operations.removeSheetByName(sheetName)
   }
 
   public undoRemoveSheet(operation: RemoveSheetUndoEntry) {
@@ -720,7 +720,7 @@ export class UndoRedo {
   }
 
   public redoRemoveSheet(operation: RemoveSheetUndoEntry) {
-    this.operations.removeSheet(operation.sheetName)
+    this.operations.removeSheetByName(operation.sheetName)
   }
 
   public redoAddSheet(operation: AddSheetUndoEntry) {

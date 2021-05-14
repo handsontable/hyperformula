@@ -9,7 +9,7 @@ import {Ast, AstNodeType} from './parser'
 
 export interface NamedExpression {
   name: string,
-  scope?: string,
+  scope?: number,
   expression?: string,
   options?: NamedExpressionOptions,
 }

@@ -82,7 +82,7 @@ describe('Temporary formulas - calculation', () => {
       ['42'],
     ])
 
-    const result = engine.calculateFormula('=Sheet1!A1+10', 'Sheet1')
+    const result = engine.calculateFormula('=Sheet1!A1+10', 0)
 
     expect(result).toEqual(52)
   })
@@ -93,8 +93,8 @@ describe('Temporary formulas - calculation', () => {
       Sheet2: [['58']],
     })
 
-    expect(engine.calculateFormula('=A1+10', 'Sheet1')).toEqual(52)
-    expect(engine.calculateFormula('=A1+10', 'Sheet2')).toEqual(68)
+    expect(engine.calculateFormula('=A1+10', 0)).toEqual(52)
+    expect(engine.calculateFormula('=A1+10', 1)).toEqual(68)
   })
 
   it('when sheet name does not exist', () => {
@@ -103,8 +103,8 @@ describe('Temporary formulas - calculation', () => {
     ])
 
     expect(() => {
-      engine.calculateFormula('=Sheet1!A1+10', 'NotExistingSheet')
-    }).toThrowError(/no sheet with name/)
+      engine.calculateFormula('=Sheet1!A1+10', 1)
+    }).toThrowError(/no sheet with id/)
   })
 
   it('SUM with range args', () => {
@@ -112,7 +112,7 @@ describe('Temporary formulas - calculation', () => {
       ['1', '2'],
       ['3', '4']
     ])
-    expect(engine.calculateFormula('=SUM(A1:B2)', 'Sheet1')).toEqual(10)
+    expect(engine.calculateFormula('=SUM(A1:B2)', 0)).toEqual(10)
   })
 
   it('non-scalars doesnt work', () => {
@@ -121,7 +121,7 @@ describe('Temporary formulas - calculation', () => {
       ['1', '2'],
     ])
 
-    const result = engine.calculateFormula('=TRANSPOSE(A1:B2)', 'Sheet1')
+    const result = engine.calculateFormula('=TRANSPOSE(A1:B2)', 0)
 
     expect(result).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.ScalarExpected))
   })
@@ -130,11 +130,11 @@ describe('Temporary formulas - calculation', () => {
     const engine = HyperFormula.buildFromArray([])
 
     expect(() => {
-      engine.calculateFormula('{=TRANSPOSE(A1:B2)}', 'Sheet1')
+      engine.calculateFormula('{=TRANSPOSE(A1:B2)}', 0)
     }).toThrowError(/not a formula/)
 
     expect(() => {
-      engine.calculateFormula('42', 'Sheet1')
+      engine.calculateFormula('42', 0)
     }).toThrowError(/not a formula/)
   })
 })
