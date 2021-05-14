@@ -403,7 +403,6 @@ export class Interpreter {
           }
           return SimpleRangeValue.onlyValues(raw2)
         }
-
       }
       const width = Math.max(arg1.width(), arg2.width())
       const height = Math.max(arg1.height(), arg2.height())
@@ -455,3 +454,4 @@ function wrapperForAddress(val: InterpreterValue, adr: SimpleCellAddress): Inter
   }
   return val
 }
+
