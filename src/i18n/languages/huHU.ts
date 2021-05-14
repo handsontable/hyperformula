@@ -18,6 +18,7 @@ const dictionary: RawTranslationPackage = {
     VALUE: '#ÉRTÉK!',
   },
   functions: {
+    'ARRAY_CONSTRAIN' : 'ARRAY_CONSTRAIN',
     ARRAYFORMULA: 'ARRAYFORMULA',
     ABS: 'ABS',
     ACOS: 'ARCCOS',
