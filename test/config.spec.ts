@@ -204,3 +204,18 @@ describe('Config', () => {
     expect(() => new Config({ nullYear: 101 })).toThrowError('Config parameter nullYear should be at most 100')
   })
 })
+
+describe('getConfig', () => {
+  it('should not be an instance of Config', () => {
+    const engine = HyperFormula.buildEmpty()
+    expect(engine.getConfig()).not.toBeInstanceOf(Config)
+  })
+
+  it('should copy returned values', () => {
+    const arr = ['mm']
+    const engine = HyperFormula.buildEmpty({dateFormats: arr})
+    const arr2 = engine.getConfig().dateFormats
+    expect(arr).toEqual(arr2)
+    expect(arr).not.toBe(arr2)
+  })
+})
