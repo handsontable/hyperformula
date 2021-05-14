@@ -39,7 +39,7 @@ describe('Unary operator PLUS', () => {
       ['9'],
       ['3'],
       ['=+A1:A3'],
-    ], {arrays: false})
+    ], {useArrayArithmetic: false})
 
     expect(engine.getCellValue(adr('A4'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.ScalarExpected))
   })
