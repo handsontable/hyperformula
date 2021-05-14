@@ -34,6 +34,16 @@ export class ArrayData {
     return undefined
   }
 
+  public map(op: (arg: InternalScalarValue) => InternalScalarValue) {
+    for(let i=0; i<this.data.length; i++) {
+      for(let j=0; j< this.data[0].length; j++) {
+        this.data[i][j] = op(this.data[i][j])
+      }
+    }
+  }
+
+  public ensureThatComputed() {}
+
   public valuesFromTopLeftCorner(): InternalScalarValue[] {
     const ret = []
     for (let i = 0; i < this.size.height; i++) {
@@ -142,37 +152,33 @@ export class OnlyRangeData {
     }
   }
 
-  private ensureThatComputed() {
+  public map(op: (arg: InternalScalarValue) => InternalScalarValue) {
+    this.ensureThatComputed()
+    for(let i=0; i<this.data!.length; i++) {
+      for(let j=0; j< this.data![0].length; j++) {
+        this.data![i][j] = op(this.data![i][j])
+      }
+    }
+  }
+
+  public ensureThatComputed() {
     if (this.data === undefined) {
       this.data = this.computeDataFromDependencyGraph()
     }
   }
 
   private computeDataFromDependencyGraph(): InternalScalarValue[][] {
-    const result: InternalScalarValue[][] = []
-
-    let i = 0
-    let row = []
-    for (const cellFromRange of this._range.addresses(this.dependencyGraph)) {
+    return this._range.addressesArrayMap(this.dependencyGraph, cellFromRange => {
       const value = this.dependencyGraph.getCellValue(cellFromRange)
       if (value instanceof SimpleRangeValue) {
-        row.push(new CellError(ErrorType.VALUE, ErrorMessage.ScalarExpected))
+        return new CellError(ErrorType.VALUE, ErrorMessage.ScalarExpected)
       } else if (isExtendedNumber(value)) {
-        row.push(value)
+        return value
       } else {
-        row.push(value)
         this._hasOnlyNumbers = false
+        return value
       }
-      ++i
-
-      if (i % this.size.width === 0) {
-        i = 0
-        result.push([...row])
-        row = []
-      }
-    }
-
-    return result
+    })
   }
 }
 
@@ -192,14 +198,14 @@ export class SimpleRangeValue {
   }
 
   public static onlyValues(data: InternalScalarValue[][]): SimpleRangeValue {
-    return new SimpleRangeValue(new ArrayData(MatrixSize.fromMatrix(data), data, false)) //FIXME test for _hasOnlyNumbers
+    return new SimpleRangeValue(new ArrayData(MatrixSize.fromMatrix(data), data, false), undefined, true) //FIXME test for _hasOnlyNumbers
   }
 
   public static onlyRange(range: AbsoluteCellRange, dependencyGraph: DependencyGraph): SimpleRangeValue {
     return new SimpleRangeValue(new OnlyRangeData({
       width: range.width(),
       height: range.height()
-    }, range, dependencyGraph))
+    }, range, dependencyGraph), undefined, true)
   }
 
   public static fromScalar(scalar: InternalScalarValue): SimpleRangeValue {
@@ -209,7 +215,8 @@ export class SimpleRangeValue {
 
   constructor(
     public readonly data: RangeData,
-    private readonly _range?: AbsoluteCellRange
+    private readonly _range?: AbsoluteCellRange,
+    public readonly adhoc?: boolean
   ) {
   }
 

@@ -262,6 +262,22 @@ export class AbsoluteCellRange {
     return this.width() === other.width() && this.height() === other.height()
   }
 
+  public addressesArrayMap<T>(dependencyGraph: DependencyGraph, op: (arg: SimpleCellAddress) => T): T[][] {
+    const ret = []
+    let currentRow = this.start.row
+    while (currentRow <= this.effectiveEndRow(dependencyGraph)) {
+      let currentColumn = this.start.col
+      const tmp = []
+      while (currentColumn <= this.effectiveEndColumn(dependencyGraph)) {
+        tmp.push(op(simpleCellAddress(this.start.sheet, currentColumn, currentRow)))
+        currentColumn++
+      }
+      ret.push(tmp)
+      currentRow++
+    }
+    return ret
+  }
+
   public* addresses(dependencyGraph: DependencyGraph): IterableIterator<SimpleCellAddress> {
     let currentRow = this.start.row
     while (currentRow <= this.effectiveEndRow(dependencyGraph)) {
