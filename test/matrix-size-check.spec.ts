@@ -26,7 +26,7 @@ describe('Matrix size check tests', () => {
     const ast = parser.parse('=mmult(A1:B3,C1:E3)', simpleCellAddress(0, 0, 0)).ast
 
     const size = matrixSizePredictor.checkMatrixSize(ast, adr('A1'))
-    expect(size).toEqual(new MatrixSize(3,3))
+    expect(size).toEqual(new MatrixSize(3, 3))
   })
 
   it('check recursive', () => {
@@ -42,7 +42,7 @@ describe('Matrix size check tests', () => {
     const ast = parser.parse('=mmult(mmult(A1:B3,C1:E3), A1:B3)', simpleCellAddress(0, 0, 0)).ast
 
     const size = matrixSizePredictor.checkMatrixSize(ast, adr('A1'))
-    expect(size).toEqual(new MatrixSize(2,3))
+    expect(size).toEqual(new MatrixSize(2, 3))
   })
 
   it('check maxpool', () => {

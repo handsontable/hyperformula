@@ -141,15 +141,15 @@ export class MatrixSizePredictor {
             if (ast.args.length <= 1) {
               return MatrixSize.error()
             }
-            const width = Math.max(...(subChecks as MatrixSize[]).map(val => val.width))
-            const height = Math.max(...(subChecks as MatrixSize[]).map(val => val.height))
+            const width = Math.max(...(subChecks).map(val => val.width))
+            const height = Math.max(...(subChecks).map(val => val.height))
             return new MatrixSize(width, height)
           }
           case 'SWITCH': {
             if (ast.args.length === 0) {
               return MatrixSize.error()
             }
-            const [{width,height}] = subChecks
+            const [{width, height}] = subChecks
             return new MatrixSize(width, height)
           }
           case 'ARRAY_CONSTRAIN': {
