@@ -4,7 +4,7 @@
  */
 
 import {CellError, SimpleCellAddress, simpleCellAddress} from './Cell'
-import {EmptyValue, InternalScalarValue} from './interpreter/InterpreterValue'
+import {EmptyValue, InternalScalarValue, InterpreterValue} from './interpreter/InterpreterValue'
 import {MatrixSize} from './MatrixSize'
 import {SimpleRangeValue} from './interpreter/SimpleRangeValue'
 
@@ -45,6 +45,14 @@ export class NotComputedMatrix implements IMatrix {
 export class Matrix implements IMatrix {
   public size: MatrixSize
   private readonly matrix: InternalScalarValue[][]
+
+  static fromInterpreterValue(value: InterpreterValue) {
+    if (value instanceof SimpleRangeValue) {
+      return new Matrix(value.data)
+    } else {
+      return new Matrix([[value]])
+    }
+  }
 
   constructor(matrix: InternalScalarValue[][]) {
     this.size = new MatrixSize(matrix.length > 0 ? matrix[0].length : 0, matrix.length)
