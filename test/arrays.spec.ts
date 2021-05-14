@@ -181,4 +181,3 @@ describe('coercion of array to scalar', () => {
     expect(engine.getCellValue(adr('A2'))).toEqual(-2)
   })
 })
-
