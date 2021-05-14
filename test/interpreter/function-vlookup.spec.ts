@@ -24,7 +24,7 @@ const sharedExamples = (builder: (sheet: Sheet, config?: Partial<ConfigParams>) 
 
     it('wrong type of first argument', () => {
       const engine = builder([
-        ['=VLOOKUP(D1:D2, A2:B3, 2, TRUE())'],
+        ['=VLOOKUP(D1:E1, A2:B3, 2, TRUE())'],
       ])
 
       expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.WrongType))

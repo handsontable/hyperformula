@@ -52,16 +52,17 @@ describe('Operator PLUS', () => {
     expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NAME, ErrorMessage.FunctionName('FOOBAR')))
   })
 
-  // Inconsistency with Product 1
   it('range value results in VALUE error', () => {
     const engine = HyperFormula.buildFromArray([
-      ['1', '=10 + A1:A3'],
-      ['2', '=A1:A3 + 10'],
+      ['1'],
+      ['2'],
       ['3'],
-    ])
+      ['=10 + A1:A3'],
+      ['=A1:A3 + 10'],
+    ], {useArrayArithmetic: false})
 
-    expect(engine.getCellValue(adr('B1'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.ScalarExpected))
-    expect(engine.getCellValue(adr('B2'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.ScalarExpected))
+    expect(engine.getCellValue(adr('A4'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.ScalarExpected))
+    expect(engine.getCellValue(adr('A5'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.ScalarExpected))
   })
 
   it('Plus propagates errors correctly', () => {
