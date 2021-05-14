@@ -388,7 +388,6 @@ export interface ConfigParams {
 }
 
 export type ConfigParamsList = keyof ConfigParams
-type ValueOf<T> = T[keyof T]
 
 export class Config implements ConfigParams, ParserConfig {
 
