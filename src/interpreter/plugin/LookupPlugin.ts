@@ -67,7 +67,7 @@ export class LookupPlugin extends FunctionPlugin {
         return new CellError(ErrorType.REF, ErrorMessage.IndexLarge)
       }
 
-      return this.doVlookup(zeroIfEmpty(key), range, index - 1, sorted)
+      return this.doVlookup(zeroIfEmpty(key), rangeValue, index - 1, sorted)
     })
   }
 
@@ -90,25 +90,25 @@ export class LookupPlugin extends FunctionPlugin {
         return new CellError(ErrorType.REF, ErrorMessage.IndexLarge)
       }
 
-      return this.doHlookup(zeroIfEmpty(key), range, index - 1, sorted)
+      return this.doHlookup(zeroIfEmpty(key), rangeValue, index - 1, sorted)
     })
   }
 
   public match(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
     return this.runFunction(ast.args, formulaAddress, this.metadata('MATCH'), (key: RawNoErrorScalarValue, rangeValue: SimpleRangeValue, sorted: number) => {
-      const range = rangeValue.range()
-      if (range === undefined) {
-        return new CellError(ErrorType.VALUE, ErrorMessage.WrongType)
-      }
-
-      return this.doMatch(zeroIfEmpty(key), range, sorted)
+      return this.doMatch(zeroIfEmpty(key), rangeValue, sorted)
     })
   }
 
-  private doVlookup(key: RawNoErrorScalarValue, range: AbsoluteCellRange, index: number, sorted: boolean): InternalScalarValue {
+  private doVlookup(key: RawNoErrorScalarValue, rangeValue: SimpleRangeValue, index: number, sorted: boolean): InternalScalarValue {
     this.dependencyGraph.stats.start(StatType.VLOOKUP)
-
-    const searchedRange = AbsoluteCellRange.spanFrom(range.start, 1, range.height())
+    const range = rangeValue.range()
+    let searchedRange
+    if(range === undefined) {
+      searchedRange = SimpleRangeValue.onlyValues(rangeValue.raw().map((arg) => [arg[0]]))
+    } else {
+      searchedRange = SimpleRangeValue.onlyRange(AbsoluteCellRange.spanFrom(range.start, 1, range.height()), this.dependencyGraph)
+    }
     const rowIndex = this.searchInRange(key, searchedRange, sorted, this.columnSearch)
 
     this.dependencyGraph.stats.end(StatType.VLOOKUP)
@@ -117,8 +117,13 @@ export class LookupPlugin extends FunctionPlugin {
       return new CellError(ErrorType.NA, ErrorMessage.ValueNotFound)
     }
 
-    const address = simpleCellAddress(range.sheet, range.start.col + index, rowIndex)
-    const value = this.dependencyGraph.getCellValue(address)
+    let value
+    if(range === undefined) {
+      value = rangeValue.raw()[rowIndex][index]
+    } else {
+      const address = simpleCellAddress(range.sheet, range.start.col + index, range.start.row + rowIndex)
+      value = this.dependencyGraph.getCellValue(address)
+    }
 
     if (value instanceof SimpleRangeValue) {
       return new CellError(ErrorType.VALUE, ErrorMessage.WrongType)
@@ -126,17 +131,28 @@ export class LookupPlugin extends FunctionPlugin {
     return value
   }
 
-  private doHlookup(key: RawNoErrorScalarValue, range: AbsoluteCellRange, index: number, sorted: boolean): InternalScalarValue {
-    const searchedRange = AbsoluteCellRange.spanFrom(range.start, range.width(), 1)
+  private doHlookup(key: RawNoErrorScalarValue, rangeValue: SimpleRangeValue, index: number, sorted: boolean): InternalScalarValue {
+    const range = rangeValue.range()
+    let searchedRange
+    if(range === undefined) {
+      searchedRange = SimpleRangeValue.onlyValues([rangeValue.raw()[0]])
+    } else {
+      searchedRange =  SimpleRangeValue.onlyRange(AbsoluteCellRange.spanFrom(range.start, range.width(), 1), this.dependencyGraph)
+    }
     const colIndex = this.searchInRange(key, searchedRange, sorted, this.rowSearch)
 
     if (colIndex === -1) {
       return new CellError(ErrorType.NA, ErrorMessage.ValueNotFound)
     }
 
-    const address = simpleCellAddress(range.sheet, colIndex, range.start.row + index)
 
-    const value = this.dependencyGraph.getCellValue(address)
+    let value
+    if(range === undefined) {
+      value = rangeValue.raw()[index][colIndex]
+    } else {
+      const address = simpleCellAddress(range.sheet, range.start.col + colIndex, range.start.row + index)
+      value = this.dependencyGraph.getCellValue(address)
+    }
 
     if (value instanceof SimpleRangeValue) {
       return new CellError(ErrorType.VALUE, ErrorMessage.WrongType)
@@ -144,26 +160,26 @@ export class LookupPlugin extends FunctionPlugin {
     return value
   }
 
-  private doMatch(key: RawNoErrorScalarValue, range: AbsoluteCellRange, sorted: number): InternalScalarValue {
-    if (range.width() > 1 && range.height() > 1) {
+  private doMatch(key: RawNoErrorScalarValue, rangeValue: SimpleRangeValue, sorted: number): InternalScalarValue {
+    if (rangeValue.width() > 1 && rangeValue.height() > 1) {
       return new CellError(ErrorType.NA)
     }
-    if (range.width() === 1) {
-      const index = this.columnSearch.find(key, range, sorted !== 0)
+    if (rangeValue.width() === 1) {
+      const index = this.columnSearch.find(key, rangeValue, sorted !== 0)
       if (index === -1) {
         return new CellError(ErrorType.NA, ErrorMessage.ValueNotFound)
       }
-      return index - range.start.row + 1
+      return index + 1
     } else {
-      const index = this.rowSearch.find(key, range, sorted !== 0)
+      const index = this.rowSearch.find(key, rangeValue, sorted !== 0)
       if (index === -1) {
         return new CellError(ErrorType.NA, ErrorMessage.ValueNotFound)
       }
-      return index - range.start.col + 1
+      return index + 1
     }
   }
 
-  protected searchInRange(key: RawNoErrorScalarValue, range: AbsoluteCellRange, sorted: boolean, searchStrategy: SearchStrategy): number {
+  protected searchInRange(key: RawNoErrorScalarValue, range: SimpleRangeValue, sorted: boolean, searchStrategy: SearchStrategy): number {
     if(!sorted && typeof key === 'string' && this.interpreter.arithmeticHelper.requiresRegex(key)) {
       return searchStrategy.advancedFind(
         this.interpreter.arithmeticHelper.eqMatcherFunction(key),
