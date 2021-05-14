@@ -9,6 +9,7 @@ import {DependencyGraph} from '../DependencyGraph'
 import {forceNormalizeString} from '../interpreter/ArithmeticHelper'
 import {rangeLowerBound} from '../interpreter/binarySearch'
 import {getRawValue, RawNoErrorScalarValue} from '../interpreter/InterpreterValue'
+import {SimpleRangeValue} from '../interpreter/SimpleRangeValue'
 import {AdvancedFind} from './AdvancedFind'
 import {SearchStrategy} from './SearchStrategy'
 
@@ -20,16 +21,17 @@ export class RowSearchStrategy extends AdvancedFind implements SearchStrategy {
     super(dependencyGraph)
   }
 
-  public find(key: RawNoErrorScalarValue, range: AbsoluteCellRange, sorted: boolean): number {
+  public find(key: RawNoErrorScalarValue, rangeValue: SimpleRangeValue, sorted: boolean): number {
     if(typeof key === 'string') {
       key = forceNormalizeString(key)
     }
-    if (range.width() < this.config.binarySearchThreshold || !sorted) {
-      const values = this.dependencyGraph.computeListOfValuesInRange(range).map(getRawValue).map(arg =>
+    const range = rangeValue.range()
+    if(range === undefined) {
+      return rangeValue.valuesFromTopLeftCorner().map(getRawValue).indexOf(key)
+    } else if (range.width() < this.config.binarySearchThreshold || !sorted) {
+      return this.dependencyGraph.computeListOfValuesInRange(range).map(getRawValue).map(arg =>
         (typeof arg === 'string') ? forceNormalizeString(arg) : arg
-      )
-      const index =  values.indexOf(key)
-      return index < 0 ? index : index + range.start.col
+      ).indexOf(key)
     } else {
       return rangeLowerBound(range, key, this.dependencyGraph, 'col')
     }
