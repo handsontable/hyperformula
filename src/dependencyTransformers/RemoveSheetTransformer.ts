@@ -3,12 +3,12 @@
  * Copyright (c) 2021 Handsoncode. All rights reserved.
  */
 
-import {Transformer} from './Transformer'
 import {ErrorType, SimpleCellAddress} from '../Cell'
 import {DependencyGraph} from '../DependencyGraph'
 import {CellAddress, ParserWithCaching} from '../parser'
 import {ColumnAddress} from '../parser/ColumnAddress'
 import {RowAddress} from '../parser/RowAddress'
+import {Transformer} from './Transformer'
 
 export class RemoveSheetTransformer extends Transformer {
   constructor(

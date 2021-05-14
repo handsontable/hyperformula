@@ -3,14 +3,14 @@
  * Copyright (c) 2021 Handsoncode. All rights reserved.
  */
 
-import {Ast, CellAddress} from '../parser'
 import {absoluteSheetReference, ErrorType, SimpleCellAddress} from '../Cell'
+import {Ast, CellAddress} from '../parser'
+import {AddressWithRow} from '../parser/Address'
 import {ColumnRangeAst} from '../parser/Ast'
-import {Transformer} from './Transformer'
-import {RowsSpan} from '../Span'
 import {ColumnAddress} from '../parser/ColumnAddress'
 import {RowAddress} from '../parser/RowAddress'
-import {AddressWithRow} from '../parser/Address'
+import {RowsSpan} from '../Span'
+import {Transformer} from './Transformer'
 
 export class RemoveRowsTransformer extends Transformer {
   constructor(

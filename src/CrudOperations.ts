@@ -7,18 +7,9 @@ import {AbsoluteCellRange} from './AbsoluteCellRange'
 import {invalidSimpleCellAddress, simpleCellAddress, SimpleCellAddress} from './Cell'
 import {CellContent, CellContentParser, RawCellContent} from './CellContentParser'
 import {ClipboardCell, ClipboardOperations} from './ClipboardOperations'
-import {MatrixSizePredictor} from './MatrixSize'
-import {AddColumnsCommand, AddRowsCommand, Operations, RemoveColumnsCommand, RemoveRowsCommand} from './Operations'
-import {ColumnSearchStrategy} from './Lookup/SearchStrategy'
 import {Config} from './Config'
 import {ContentChanges} from './ContentChanges'
 import {DependencyGraph, SheetMapping} from './DependencyGraph'
-import {
-  doesContainRelativeReferences,
-  InternalNamedExpression,
-  NamedExpressionOptions,
-  NamedExpressions
-} from './NamedExpressions'
 import {
   InvalidAddressError,
   InvalidArgumentsError,
@@ -36,7 +27,18 @@ import {
   TargetLocationHasMatrixError
 } from './errors'
 import {LazilyTransformingAstService} from './LazilyTransformingAstService'
+import {ColumnSearchStrategy} from './Lookup/SearchStrategy'
+import {MatrixSizePredictor} from './MatrixSize'
+import {Maybe} from './Maybe'
+import {
+  doesContainRelativeReferences,
+  InternalNamedExpression,
+  NamedExpressionOptions,
+  NamedExpressions
+} from './NamedExpressions'
+import {AddColumnsCommand, AddRowsCommand, Operations, RemoveColumnsCommand, RemoveRowsCommand} from './Operations'
 import {ParserWithCaching} from './parser'
+import {findBoundaries, validateAsSheet} from './Sheet'
 import {ColumnsSpan, RowsSpan} from './Span'
 import {Statistics} from './statistics'
 import {
@@ -55,12 +57,12 @@ import {
   RemoveRowsUndoEntry,
   RemoveSheetUndoEntry,
   RenameSheetUndoEntry,
-  SetCellContentsUndoEntry, SetColumnOrderUndoEntry, SetRowOrderUndoEntry,
+  SetCellContentsUndoEntry,
+  SetColumnOrderUndoEntry,
+  SetRowOrderUndoEntry,
   SetSheetContentUndoEntry,
   UndoRedo
 } from './UndoRedo'
-import {findBoundaries, validateAsSheet} from './Sheet'
-import {Maybe} from './Maybe'
 
 export type ColumnRowIndex = [number, number]
 

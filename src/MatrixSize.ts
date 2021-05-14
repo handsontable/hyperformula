@@ -8,7 +8,6 @@ import {SimpleCellAddress} from './Cell'
 import {Config} from './Config'
 import {FunctionRegistry} from './interpreter/FunctionRegistry'
 import {InterpreterState} from './interpreter/InterpreterState'
-import {Maybe} from './Maybe'
 import {Ast, AstNodeType} from './parser'
 
 export class MatrixSize {

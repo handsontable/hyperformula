@@ -4,13 +4,13 @@
  */
 
 import {CellError, ErrorType, SimpleCellAddress} from '../../Cell'
+import {FormulaVertex} from '../../DependencyGraph/FormulaCellVertex'
 import {ErrorMessage} from '../../error-message'
 import {AstNodeType, ProcedureAst} from '../../parser'
 import {InterpreterState} from '../InterpreterState'
 import {EmptyValue, InternalScalarValue, isExtendedNumber} from '../InterpreterValue'
 import {SimpleRangeValue} from '../SimpleRangeValue'
 import {ArgumentTypes, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
-import {FormulaVertex} from '../../DependencyGraph/FormulaCellVertex'
 
 /**
  * Interpreter plugin containing information functions

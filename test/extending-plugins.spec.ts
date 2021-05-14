@@ -1,5 +1,4 @@
 import {ErrorType, HyperFormula} from '../src'
-import {SimpleCellAddress} from '../src/Cell'
 import {ErrorMessage} from '../src/error-message'
 import {InterpreterState} from '../src/interpreter/InterpreterState'
 import {FunctionPlugin, FunctionPluginTypecheck} from '../src/interpreter/plugin/FunctionPlugin'

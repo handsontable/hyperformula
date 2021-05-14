@@ -1,7 +1,7 @@
-import {CellValueChange, ChangeExporter, ContentChanges} from '../src/ContentChanges'
-import {adr} from './testUtils'
-import {SimpleRangeValue} from '../src/interpreter/SimpleRangeValue'
 import {simpleCellAddress} from '../src/Cell'
+import {CellValueChange, ChangeExporter, ContentChanges} from '../src/ContentChanges'
+import {SimpleRangeValue} from '../src/interpreter/SimpleRangeValue'
+import {adr} from './testUtils'
 
 class IdentityChangeExporter implements ChangeExporter<CellValueChange>{
   exportChange(change: CellValueChange): CellValueChange {

@@ -3,17 +3,15 @@
  * Copyright (c) 2021 Handsoncode. All rights reserved.
  */
 
+import {AbsoluteCellRange} from '../AbsoluteCellRange'
 import {CellError, ErrorType, SimpleCellAddress} from '../Cell'
+import {RawCellContent} from '../CellContentParser'
 import {EmptyValue, getRawValue, InternalScalarValue, InterpreterValue} from '../interpreter/InterpreterValue'
-import {Ast} from '../parser'
-import {MatrixSize} from '../MatrixSize'
 import {LazilyTransformingAstService} from '../LazilyTransformingAstService'
 import {ErroredMatrix, IMatrix, Matrix, NotComputedMatrix} from '../Matrix'
-import {SimpleRangeValue} from '../interpreter/SimpleRangeValue'
-import {ErrorMessage} from '../error-message'
+import {MatrixSize} from '../MatrixSize'
 import {Maybe} from '../Maybe'
-import {RawCellContent} from '../CellContentParser'
-import {AbsoluteCellRange} from '../AbsoluteCellRange'
+import {Ast} from '../parser'
 import {ColumnsSpan, RowsSpan} from '../Span'
 
 export abstract class FormulaVertex {

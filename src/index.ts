@@ -3,7 +3,7 @@
  * Copyright (c) 2021 Handsoncode. All rights reserved.
  */
 
-import {CellType, CellValueDetailedType, CellValueType, ErrorType, SimpleCellAddress, CellValueJustNumber, CellValueNoNumber} from './Cell'
+import {CellType, CellValueDetailedType, CellValueType, ErrorType, SimpleCellAddress} from './Cell'
 import {RawCellContent} from './CellContentParser'
 import {CellValue, DetailedCellError, NoErrorCellValue} from './CellValue'
 import {Config, ConfigParams} from './Config'
@@ -42,10 +42,10 @@ import {HyperFormula} from './HyperFormula'
 import {RawTranslationPackage} from './i18n'
 import enGB from './i18n/languages/enGB'
 import {FunctionArgument, FunctionPlugin, FunctionPluginDefinition} from './interpreter'
+import {FormatInfo} from './interpreter/InterpreterValue'
 import * as plugins from './interpreter/plugin'
 import {NamedExpression, NamedExpressionOptions} from './NamedExpressions'
 import {Sheet, SheetDimensions, Sheets} from './Sheet'
-import {FormatInfo} from './interpreter/InterpreterValue'
 
 /** @internal */
 class HyperFormulaNS extends HyperFormula {

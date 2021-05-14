@@ -3,29 +3,26 @@
  * Copyright (c) 2021 Handsoncode. All rights reserved.
  */
 
+import {GPU} from 'gpu.js'
 import {
   configCheckIfParametersNotInConflict,
-  validateNumberToBeAtLeast,
-  validateNumberToBeAtMost,
   configValueFromParam,
-  configValueFromParamCheck
+  configValueFromParamCheck,
+  validateNumberToBeAtLeast,
+  validateNumberToBeAtMost
 } from './ArgumentSanitization'
 import {TranslatableErrorType} from './Cell'
 import {defaultParseToDateTime} from './DateTimeDefault'
 import {DateTime, instanceOfSimpleDate, SimpleDate, SimpleDateTime, SimpleTime} from './DateTimeHelper'
 import {AlwaysDense, ChooseAddressMapping} from './DependencyGraph/AddressMapping/ChooseAddressMappingPolicy'
-import {
-  ConfigValueEmpty,
-  ExpectedValueOfTypeError
-} from './errors'
+import {ConfigValueEmpty, ExpectedValueOfTypeError} from './errors'
 import {defaultStringifyDateTime, defaultStringifyDuration} from './format/format'
+import {checkLicenseKeyValidity, LicenseKeyValidityState} from './helpers/licenseKeyValidator'
 import {HyperFormula} from './HyperFormula'
 import {TranslationPackage} from './i18n'
+import {FunctionPluginDefinition} from './interpreter'
 import {Maybe} from './Maybe'
 import {ParserConfig} from './parser/ParserConfig'
-import {checkLicenseKeyValidity, LicenseKeyValidityState} from './helpers/licenseKeyValidator'
-import {FunctionPluginDefinition} from './interpreter'
-import type { GPU } from 'gpu.js'
 
 type GPUMode = 'gpu' | 'cpu' | 'dev'
 

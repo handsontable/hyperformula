@@ -3,13 +3,11 @@
  * Copyright (c) 2021 Handsoncode. All rights reserved.
  */
 
-import {AbsoluteCellRange} from '../AbsoluteCellRange'
 import {SimpleCellAddress} from '../Cell'
 import {Config} from '../Config'
 import {DependencyGraph} from '../DependencyGraph'
 import {RawInterpreterValue, RawNoErrorScalarValue, RawScalarValue} from '../interpreter/InterpreterValue'
 import {SimpleRangeValue} from '../interpreter/SimpleRangeValue'
-import {Matrix} from '../Matrix'
 import {ColumnsSpan} from '../Span'
 import {Statistics} from '../statistics/Statistics'
 import {ColumnBinarySearch} from './ColumnBinarySearch'

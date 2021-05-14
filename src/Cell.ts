@@ -6,9 +6,12 @@
 import {CellVertex, FormulaCellVertex, MatrixVertex, ParsingErrorVertex, ValueCellVertex} from './DependencyGraph'
 import {ErrorMessage} from './error-message'
 import {
-  EmptyValue, getFormatOfExtendedNumber, getTypeOfExtendedNumber,
+  EmptyValue,
+  getFormatOfExtendedNumber,
+  getTypeOfExtendedNumber,
   InterpreterValue,
-  isExtendedNumber, NumberType,
+  isExtendedNumber,
+  NumberType,
 } from './interpreter/InterpreterValue'
 import {SimpleRangeValue} from './interpreter/SimpleRangeValue'
 import {CellAddress} from './parser'

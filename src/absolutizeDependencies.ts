@@ -3,10 +3,10 @@
  * Copyright (c) 2021 Handsoncode. All rights reserved.
  */
 
+import {AbsoluteCellRange} from './AbsoluteCellRange'
 import {invalidSimpleCellAddress, SimpleCellAddress} from './Cell'
 import {CellDependency} from './CellDependency'
 import {NamedExpressionDependency, RelativeDependency} from './parser'
-import {AbsoluteCellRange} from './AbsoluteCellRange'
 
 /**
  * Converts dependencies from maybe relative addressing to absolute addressing.

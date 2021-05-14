@@ -8,9 +8,9 @@ import {ErrorMessage} from '../../error-message'
 import {MatrixSize, matrixSizeForMultiplication, matrixSizeForPoolFunction} from '../../MatrixSize'
 import {ProcedureAst} from '../../parser'
 import {Interpreter} from '../Interpreter'
+import {InterpreterState} from '../InterpreterState'
 import {InterpreterValue} from '../InterpreterValue'
 import {SimpleRangeValue} from '../SimpleRangeValue'
-import {InterpreterState} from '../InterpreterState'
 import {ArgumentTypes, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
 
 export type KernelRunShortcut = (...args: any[]) => number[][]

@@ -3,14 +3,14 @@
  * Copyright (c) 2021 Handsoncode. All rights reserved.
  */
 
-import {Ast, CellAddress} from '../parser'
 import {absoluteSheetReference, ErrorType, SimpleCellAddress} from '../Cell'
-import {RowRangeAst} from '../parser/Ast'
-import {Transformer} from './Transformer'
-import {RowAddress} from '../parser/RowAddress'
-import {ColumnAddress} from '../parser/ColumnAddress'
+import {Ast, CellAddress} from '../parser'
 import {AddressWithColumn} from '../parser/Address'
+import {RowRangeAst} from '../parser/Ast'
+import {ColumnAddress} from '../parser/ColumnAddress'
+import {RowAddress} from '../parser/RowAddress'
 import {ColumnsSpan} from '../Span'
+import {Transformer} from './Transformer'
 
 export class AddColumnsTransformer extends Transformer {
   constructor(

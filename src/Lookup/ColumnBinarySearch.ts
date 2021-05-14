@@ -3,7 +3,6 @@
  * Copyright (c) 2021 Handsoncode. All rights reserved.
  */
 
-import {AbsoluteCellRange} from '../AbsoluteCellRange'
 import {SimpleCellAddress} from '../Cell'
 import {Config} from '../Config'
 import {DependencyGraph} from '../DependencyGraph'
@@ -11,7 +10,6 @@ import {forceNormalizeString} from '../interpreter/ArithmeticHelper'
 import {rangeLowerBound} from '../interpreter/binarySearch'
 import {getRawValue, RawNoErrorScalarValue, RawScalarValue} from '../interpreter/InterpreterValue'
 import {SimpleRangeValue} from '../interpreter/SimpleRangeValue'
-import {Matrix} from '../Matrix'
 import {ColumnsSpan} from '../Span'
 import {AdvancedFind} from './AdvancedFind'
 import {ColumnSearchStrategy} from './SearchStrategy'

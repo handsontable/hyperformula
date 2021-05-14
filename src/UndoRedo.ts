@@ -4,8 +4,10 @@
  */
 
 import {simpleCellAddress, SimpleCellAddress} from './Cell'
-import {ClipboardCell} from './ClipboardOperations'
 import {RawCellContent} from './CellContentParser'
+import {ClipboardCell} from './ClipboardOperations'
+import {Config} from './Config'
+import {InternalNamedExpression, NamedExpressionOptions} from './NamedExpressions'
 import {
   AddColumnsCommand,
   AddRowsCommand,
@@ -15,8 +17,6 @@ import {
   RemoveRowsCommand,
   RowsRemoval
 } from './Operations'
-import {Config} from './Config'
-import {InternalNamedExpression, NamedExpressionOptions} from './NamedExpressions'
 
 export interface UndoEntry {
   doUndo(undoRedo: UndoRedo): void,

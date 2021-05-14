@@ -5,7 +5,7 @@
 
 import {CellError} from '../Cell'
 import {RawCellContent} from '../CellContentParser'
-import {ExtendedNumber, RawScalarValue} from '../interpreter/InterpreterValue'
+import {ExtendedNumber} from '../interpreter/InterpreterValue'
 
 export type ValueCellVertexValue = ExtendedNumber | boolean | string | CellError
 

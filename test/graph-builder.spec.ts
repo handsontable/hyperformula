@@ -1,6 +1,6 @@
 import {HyperFormula} from '../src'
 import {Config} from '../src/Config'
-import {EmptyCellVertex, MatrixVertex, ValueCellVertex} from '../src/DependencyGraph'
+import {EmptyCellVertex, ValueCellVertex} from '../src/DependencyGraph'
 import {SheetSizeLimitExceededError} from '../src/errors'
 import {adr, colEnd, colStart} from './testUtils'
 

@@ -5,14 +5,13 @@
 
 import {simpleCellAddress, SimpleCellAddress} from './Cell'
 import {RawCellContent} from './CellContentParser'
-import {CellValue, DetailedCellError, NoErrorCellValue} from './CellValue'
+import {CellValue} from './CellValue'
 import {Config} from './Config'
 import {DependencyGraph, FormulaCellVertex, MatrixVertex, ParsingErrorVertex} from './DependencyGraph'
 import {Exporter} from './Exporter'
-import {RawScalarValue} from './interpreter/InterpreterValue'
 import {Maybe} from './Maybe'
-import {buildLexerConfig, Unparser} from './parser'
 import {NamedExpressionOptions, NamedExpressions} from './NamedExpressions'
+import {buildLexerConfig, Unparser} from './parser'
 
 export interface SerializedNamedExpression {
   name: string,

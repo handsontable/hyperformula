@@ -11,14 +11,22 @@ import {RawCellContent} from '../CellContentParser'
 import {CellDependency} from '../CellDependency'
 import {Config} from '../Config'
 import {ErrorMessage} from '../error-message'
+import {FunctionRegistry} from '../interpreter/FunctionRegistry'
+import {
+  EmptyValue,
+  getRawValue,
+  InternalScalarValue,
+  InterpreterValue,
+  RawScalarValue
+} from '../interpreter/InterpreterValue'
 import {SimpleRangeValue} from '../interpreter/SimpleRangeValue'
 import {LazilyTransformingAstService} from '../LazilyTransformingAstService'
 import {MatrixSize} from '../MatrixSize'
 import {Maybe} from '../Maybe'
+import {NamedExpressions} from '../NamedExpressions'
 import {Ast, collectDependencies, NamedExpressionDependency} from '../parser'
 import {ColumnsSpan, RowsSpan, Span} from '../Span'
 import {Statistics, StatType} from '../statistics'
-import {NamedExpressions} from '../NamedExpressions'
 import {
   CellVertex,
   EmptyCellVertex,
@@ -31,21 +39,12 @@ import {
 } from './'
 import {AddressMapping} from './AddressMapping/AddressMapping'
 import {collectAddressesDependentToRange} from './collectAddressesDependentToRange'
+import {FormulaVertex} from './FormulaCellVertex'
 import {Graph, TopSortResult} from './Graph'
 import {MatrixMapping} from './MatrixMapping'
 import {RangeMapping} from './RangeMapping'
 import {SheetMapping} from './SheetMapping'
 import {RawAndParsedValue} from './ValueCellVertex'
-import {FunctionRegistry} from '../interpreter/FunctionRegistry'
-import {
-  EmptyValue,
-  ExtendedNumber,
-  getRawValue,
-  InternalScalarValue,
-  InterpreterValue,
-  RawScalarValue
-} from '../interpreter/InterpreterValue'
-import {FormulaVertex} from './FormulaCellVertex'
 
 export class DependencyGraph {
   /*

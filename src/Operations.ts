@@ -5,7 +5,7 @@
 
 import {AbsoluteCellRange} from './AbsoluteCellRange'
 import {absolutizeDependencies, filterDependenciesOutOfScope} from './absolutizeDependencies'
-import {CellError, invalidSimpleCellAddress, simpleCellAddress, SimpleCellAddress} from './Cell'
+import {invalidSimpleCellAddress, simpleCellAddress, SimpleCellAddress} from './Cell'
 import {CellContent, CellContentParser, RawCellContent} from './CellContentParser'
 import {ClipboardCell, ClipboardCellType} from './ClipboardOperations'
 import {Config} from './Config'

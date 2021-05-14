@@ -5,8 +5,8 @@
 
 import {CellError, SimpleCellAddress, simpleCellAddress} from './Cell'
 import {EmptyValue, InternalScalarValue, InterpreterValue} from './interpreter/InterpreterValue'
-import {MatrixSize} from './MatrixSize'
 import {SimpleRangeValue} from './interpreter/SimpleRangeValue'
+import {MatrixSize} from './MatrixSize'
 
 export interface IMatrix {
   size: MatrixSize,

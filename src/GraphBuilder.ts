@@ -7,8 +7,6 @@ import {absolutizeDependencies} from './absolutizeDependencies'
 import {simpleCellAddress} from './Cell'
 import {CellContent, CellContentParser} from './CellContentParser'
 import {CellDependency} from './CellDependency'
-import {getRawValue} from './interpreter/InterpreterValue'
-import {ColumnSearchStrategy} from './Lookup/SearchStrategy'
 import {Config} from './Config'
 import {
   DependencyGraph,
@@ -18,10 +16,12 @@ import {
   ValueCellVertex,
   Vertex
 } from './DependencyGraph'
+import {getRawValue} from './interpreter/InterpreterValue'
+import {ColumnSearchStrategy} from './Lookup/SearchStrategy'
 import {MatrixSize, MatrixSizePredictor} from './MatrixSize'
 import {ParserWithCaching} from './parser'
-import {Statistics, StatType} from './statistics'
 import {Sheets} from './Sheet'
+import {Statistics, StatType} from './statistics'
 
 export type Dependencies = Map<Vertex, CellDependency[]>
 

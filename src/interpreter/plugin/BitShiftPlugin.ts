@@ -8,7 +8,7 @@ import {ErrorMessage} from '../../error-message'
 import {ProcedureAst} from '../../parser'
 import {InterpreterState} from '../InterpreterState'
 import {InternalScalarValue} from '../InterpreterValue'
-import {ArgumentTypes, FunctionPlugin, FunctionPluginTypecheck, PluginFunctionType} from './FunctionPlugin'
+import {ArgumentTypes, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
 
 const MAX_48BIT_INTEGER = 281474976710655
 const SHIFT_MIN_POSITIONS = -53
