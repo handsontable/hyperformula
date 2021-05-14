@@ -101,24 +101,19 @@ export class MatrixVertex extends FormulaVertex {
   }
 
   setCellValue(value: InterpreterValue): InterpreterValue {
-    if (value instanceof SimpleRangeValue && value.isAdHoc()) {
+    if (value instanceof SimpleRangeValue) {
       this.matrix = new Matrix(value.data)
       return value
     } else {
       let errorVal: CellError
       if (value instanceof CellError) {
         errorVal = value
-      } else if (value instanceof SimpleRangeValue) {
-        errorVal = new CellError(ErrorType.VALUE, ErrorMessage.CellRangeExpected)
       } else {
-        /* TODO throw runtime? */
-        errorVal = new CellError(ErrorType.VALUE, ErrorMessage.ScalarExpected)
+        errorVal = new CellError(ErrorType.VALUE, ErrorMessage.CellRangeExpected)
       }
       this.setErrorValue(errorVal)
       return errorVal
     }
-    /* TODO */
-    throw Error('Should not happen')
   }
 
   getCellValue(): InterpreterValue {
@@ -168,12 +163,10 @@ export class MatrixVertex extends FormulaVertex {
   }
 
   setAddress(address: SimpleCellAddress) {
-    /* TODO probably we don't want this */
     this.cellAddress = address
   }
 
   setFormula(newFormula: Ast) {
-    /* TODO probably we don't want this */
     this.formula = newFormula
   }
 

@@ -67,7 +67,6 @@ export class ColumnIndex implements ColumnSearchStrategy {
   }
 
   public change(oldValue: RawInterpreterValue | null, newValue: RawInterpreterValue, address: SimpleCellAddress) {
-    /* TODO simple range value? */
     if (oldValue === newValue) {
       return
     }
