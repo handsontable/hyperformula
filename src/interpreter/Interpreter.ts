@@ -38,7 +38,6 @@ import {
   isExtendedNumber,
 } from './InterpreterValue'
 import {SimpleRangeValue} from './SimpleRangeValue'
-import {PluginFunctionType} from './plugin/FunctionPlugin'
 
 export class Interpreter {
   private gpu?: GPU
@@ -202,7 +201,7 @@ export class Interpreter {
           } else if (matrix instanceof CellError) {
             return matrix
           } else if (matrix instanceof Matrix) {
-            return SimpleRangeValue.numbersRange(matrix.raw(), range, this.dependencyGraph)
+            return SimpleRangeValue.fromRange(matrix.raw(), range, this.dependencyGraph)
           } else {
             throw new Error('Unknown matrix')
           }

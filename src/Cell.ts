@@ -6,9 +6,12 @@
 import {CellVertex, FormulaCellVertex, MatrixVertex, ParsingErrorVertex, ValueCellVertex} from './DependencyGraph'
 import {ErrorMessage} from './error-message'
 import {
-  EmptyValue, getFormatOfExtendedNumber, getTypeOfExtendedNumber,
+  EmptyValue,
+  getFormatOfExtendedNumber,
+  getTypeOfExtendedNumber,
   InterpreterValue,
-  isExtendedNumber, NumberType,
+  isExtendedNumber,
+  NumberType,
 } from './interpreter/InterpreterValue'
 import {SimpleRangeValue} from './interpreter/SimpleRangeValue'
 import {CellAddress} from './parser'
@@ -53,11 +56,10 @@ export const getCellType = (vertex: CellVertex | null): CellType => {
   if (vertex instanceof FormulaCellVertex || vertex instanceof ParsingErrorVertex) {
     return CellType.FORMULA
   }
-  if (vertex instanceof ValueCellVertex
-      || (vertex instanceof MatrixVertex && vertex.isNumeric())) {
+  if (vertex instanceof ValueCellVertex) {
     return CellType.VALUE
   }
-  if (vertex instanceof MatrixVertex && vertex.isFormula()) {
+  if (vertex instanceof MatrixVertex) {
     return CellType.MATRIX
   }
 

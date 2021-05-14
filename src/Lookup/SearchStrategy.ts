@@ -3,13 +3,11 @@
  * Copyright (c) 2021 Handsoncode. All rights reserved.
  */
 
-import {AbsoluteCellRange} from '../AbsoluteCellRange'
 import {SimpleCellAddress} from '../Cell'
 import {Config} from '../Config'
 import {DependencyGraph} from '../DependencyGraph'
 import {RawInterpreterValue, RawNoErrorScalarValue, RawScalarValue} from '../interpreter/InterpreterValue'
 import {SimpleRangeValue} from '../interpreter/SimpleRangeValue'
-import {Matrix} from '../Matrix'
 import {ColumnsSpan} from '../Span'
 import {Statistics} from '../statistics/Statistics'
 import {ColumnBinarySearch} from './ColumnBinarySearch'
@@ -22,11 +20,11 @@ export interface SearchStrategy {
 }
 
 export interface ColumnSearchStrategy extends SearchStrategy {
-  add(value: RawInterpreterValue | Matrix, address: SimpleCellAddress): void,
+  add(value: RawInterpreterValue, address: SimpleCellAddress): void,
 
-  remove(value: RawInterpreterValue | Matrix | null, address: SimpleCellAddress): void,
+  remove(value: RawInterpreterValue | null, address: SimpleCellAddress): void,
 
-  change(oldValue: RawInterpreterValue | Matrix | null, newValue: RawInterpreterValue | Matrix, address: SimpleCellAddress): void,
+  change(oldValue: RawInterpreterValue | null, newValue: RawInterpreterValue, address: SimpleCellAddress): void,
 
   addColumns(columnsSpan: ColumnsSpan): void,
 

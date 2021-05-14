@@ -80,17 +80,6 @@ describe('Adding column - checking if its possible', () => {
     expect(engine.isItPossibleToAddColumns(0, [0, 1], [5, 1])).toEqual(false)
   })
 
-  it('yes if theres a numeric matrix in place where we add', () => {
-    const engine = HyperFormula.buildFromArray([
-      ['1', '2'],
-      ['3', '4'],
-    ], {matrixDetection: true, matrixDetectionThreshold: 1})
-    expect(engine.matrixMapping.matrixMapping.size).toEqual(1)
-
-    expect(engine.isItPossibleToAddColumns(0, [0, 1])).toEqual(true)
-    expect(engine.isItPossibleToAddColumns(0, [1, 1])).toEqual(true)
-  })
-
   it('yes otherwise', () => {
     const engine = HyperFormula.buildFromArray([[]])
 
@@ -235,7 +224,7 @@ describe('Adding column - MatrixVertex', () => {
     engine.addColumns(0, [1, 1])
 
     const matrixVertex = engine.addressMapping.fetchCell(adr('D1')) as MatrixVertex
-    expect(matrixVertex.cellAddress).toEqual(adr('D1'))
+    expect(matrixVertex.getAddress(engine.lazilyTransformingAstService)).toEqual(adr('D1'))
   })
 
   it('MatrixVertex#formula should be updated when different sheets', () => {
@@ -252,23 +241,6 @@ describe('Adding column - MatrixVertex', () => {
     engine.addColumns(0, [1, 1])
 
     expect(extractMatrixRange(engine, adr('A1', 1))).toEqual(new AbsoluteCellRange(adr('A1'), adr('C2')))
-  })
-})
-
-describe('Adding column - matrix', () => {
-  it('add column inside matrix, expand matrix', () => {
-    const engine = HyperFormula.buildFromArray([
-      ['1', '2'],
-      ['3', '4'],
-    ], { matrixDetection: true, matrixDetectionThreshold: 1})
-
-    expect(engine.getCellValue(adr('B1'))).toEqual(2)
-
-    engine.addColumns(0, [1, 2])
-
-    expect(engine.getCellValue(adr('B1'))).toEqual(null)
-    expect(engine.getCellValue(adr('C1'))).toEqual(null)
-    expect(engine.getCellValue(adr('D1'))).toEqual(2)
   })
 })
 
@@ -302,9 +274,9 @@ describe('different sheet', () => {
 
     const formulaVertex = engine.addressMapping.fetchCell(adr('A1', 1)) as FormulaCellVertex
 
-    expect(formulaVertex.address).toEqual(simpleCellAddress(1, 0, 0))
+    expect(formulaVertex.getAddress(engine.lazilyTransformingAstService)).toEqual(simpleCellAddress(1, 0, 0))
     formulaVertex.getFormula(engine.lazilyTransformingAstService) // force transformations to be applied
-    expect(formulaVertex.address).toEqual(simpleCellAddress(1, 0, 0))
+    expect(formulaVertex.getAddress(engine.lazilyTransformingAstService)).toEqual(simpleCellAddress(1, 0, 0))
   })
 })
 

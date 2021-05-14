@@ -9,7 +9,6 @@ import {FunctionRegistry} from '../src/interpreter/FunctionRegistry'
 import {SimpleRangeValue} from '../src/interpreter/SimpleRangeValue'
 import {LazilyTransformingAstService} from '../src/LazilyTransformingAstService'
 import {ColumnIndex} from '../src/Lookup/ColumnIndex'
-import {Matrix} from '../src/Matrix'
 import {NamedExpressions} from '../src/NamedExpressions'
 import {ColumnsSpan, RowsSpan} from '../src/Span'
 import {Statistics} from '../src/statistics'
@@ -76,14 +75,17 @@ describe('ColumnIndex#add', () => {
     expect(columnMap.keys()).not.toContain(error)
   })
 
-  it('should ignore SimpleRangeValue', () => {
+  it('should add values from SimpleRangeValue', () => {
     const index = buildEmptyIndex(transformingService, new Config(), statistics)
-    const simpleRangeValue = SimpleRangeValue.onlyNumbers([[1]])
+    const simpleRangeValue = SimpleRangeValue.onlyNumbers([[1, 2]])
 
     index.add(simpleRangeValue, adr('A1'))
 
-    const columnMap = index.getColumnMap(0, 0)
-    expect(columnMap.size).toBe(0)
+    const columnA = index.getColumnMap(0, 0)
+    const columnB = index.getColumnMap(0, 1)
+
+    expect(columnA.size).toBe(1)
+    expect(columnB.size).toBe(1)
   })
 
   it('should handle strings correctly', () => {
@@ -162,13 +164,13 @@ describe('ColumnIndex change/remove', () => {
     expect(spyAdd).not.toHaveBeenCalled()
   })
 
-  it('should change matrix values', () => {
+  it('should change range values', () => {
     const index = buildEmptyIndex(transformingService, new Config(), statistics)
-    const matrix = new Matrix([
+    const range = SimpleRangeValue.onlyNumbers([
       [1, 2],
       [3, 4],
     ])
-    index.add(matrix, simpleCellAddress(0, 0, 0))
+    index.add(range, simpleCellAddress(0, 0, 0))
     deepStrictEqual(index.getColumnMap(0, 0), new Map([
       [1, {index: [0], version: 0}],
       [3, {index: [1], version: 0}],
@@ -178,7 +180,7 @@ describe('ColumnIndex change/remove', () => {
       [4, {index: [1], version: 0}],
     ]))
 
-    index.change(matrix, new Matrix([
+    index.change(range, SimpleRangeValue.onlyNumbers([
       [5, 6],
       [7, 8],
     ]), simpleCellAddress(0, 0, 0))

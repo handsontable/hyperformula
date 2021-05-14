@@ -4,7 +4,8 @@
  */
 
 import {CellError, SimpleCellAddress, simpleCellAddress} from './Cell'
-import {EmptyValue, InternalScalarValue} from './interpreter/InterpreterValue'
+import {EmptyValue, InternalScalarValue, InterpreterValue} from './interpreter/InterpreterValue'
+import {SimpleRangeValue} from './interpreter/SimpleRangeValue'
 import {MatrixSize} from './MatrixSize'
 
 export interface IMatrix {
@@ -15,6 +16,8 @@ export interface IMatrix {
   height(): number,
 
   get(col: number, row: number): InternalScalarValue,
+
+  simpleRangeValue(): SimpleRangeValue | CellError,
 }
 
 export class NotComputedMatrix implements IMatrix {
@@ -33,15 +36,31 @@ export class NotComputedMatrix implements IMatrix {
   public get(col: number, row: number): number {
     throw Error('Matrix not computed yet.')
   }
+
+  simpleRangeValue(): SimpleRangeValue {
+    throw Error('Matrix not computed yet.')
+  }
 }
 
 export class Matrix implements IMatrix {
   public size: MatrixSize
   private readonly matrix: InternalScalarValue[][]
 
+  static fromInterpreterValue(value: InterpreterValue) {
+    if (value instanceof SimpleRangeValue) {
+      return new Matrix(value.data)
+    } else {
+      return new Matrix([[value]])
+    }
+  }
+
   constructor(matrix: InternalScalarValue[][]) {
     this.size = new MatrixSize(matrix.length > 0 ? matrix[0].length : 0, matrix.length)
     this.matrix = matrix
+  }
+
+  simpleRangeValue(): SimpleRangeValue {
+    return SimpleRangeValue.onlyValues(this.matrix)
   }
 
   public addRows(aboveRow: number, numberOfRows: number) {
@@ -156,5 +175,9 @@ export class ErroredMatrix implements IMatrix {
 
   public height(): number {
     return this.size.height
+  }
+
+  simpleRangeValue(): CellError {
+    return this.error
   }
 }

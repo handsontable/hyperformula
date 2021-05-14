@@ -4,7 +4,6 @@
  */
 
 import {Config, ConfigParamsList} from './Config'
-
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 import {
   ConfigValueTooBigError,

@@ -4,7 +4,7 @@
  */
 
 import {CellError, ErrorType, SimpleCellAddress} from '../../Cell'
-import {FormulaCellVertex, MatrixVertex} from '../../DependencyGraph'
+import {FormulaVertex} from '../../DependencyGraph/FormulaCellVertex'
 import {ErrorMessage} from '../../error-message'
 import {AstNodeType, ProcedureAst} from '../../parser'
 import {InterpreterState} from '../InterpreterState'
@@ -199,7 +199,7 @@ export class InformationPlugin extends FunctionPlugin implements FunctionPluginT
       () => new CellError(ErrorType.NA, ErrorMessage.WrongArgNumber),
       (reference: SimpleCellAddress) => {
         const vertex = this.dependencyGraph.addressMapping.getCell(reference)
-        return vertex instanceof FormulaCellVertex || (vertex instanceof MatrixVertex && vertex.isFormula())
+        return vertex instanceof FormulaVertex
       }
     )
   }

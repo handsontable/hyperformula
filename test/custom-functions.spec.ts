@@ -1,5 +1,5 @@
 import {FunctionPluginValidationError, HyperFormula} from '../src'
-import {ErrorType, SimpleCellAddress} from '../src/Cell'
+import {ErrorType} from '../src/Cell'
 import {ErrorMessage} from '../src/error-message'
 import {AliasAlreadyExisting, ProtectedFunctionError, ProtectedFunctionTranslationError} from '../src/errors'
 import {plPL} from '../src/i18n/languages'

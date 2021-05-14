@@ -4,7 +4,7 @@
  */
 
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
-import {CellError, ErrorType} from '../Cell'
+import {CellError, ErrorType, simpleCellAddress, SimpleCellAddress} from '../Cell'
 import {DependencyGraph} from '../DependencyGraph'
 import {ErrorMessage} from '../error-message'
 import {MatrixSize} from '../MatrixSize'
@@ -13,7 +13,7 @@ import {InternalScalarValue, isExtendedNumber} from './InterpreterValue'
 export class SimpleRangeValue {
   public readonly size: MatrixSize
 
-  public static numbersRange(data: InternalScalarValue[][], range: AbsoluteCellRange, dependencyGraph: DependencyGraph): SimpleRangeValue {
+  public static fromRange(data: InternalScalarValue[][], range: AbsoluteCellRange, dependencyGraph: DependencyGraph): SimpleRangeValue {
     return new SimpleRangeValue(data, range, dependencyGraph, true)
   }
 
@@ -39,7 +39,7 @@ export class SimpleRangeValue {
     private readonly dependencyGraph?: DependencyGraph,
     private _hasOnlyNumbers?: boolean,
   ) {
-    if(_data===undefined) {
+    if (_data === undefined) {
       this.size = new MatrixSize(range!.width(), range!.height())
     } else {
       this.size = new MatrixSize(_data[0].length, _data.length)
@@ -64,7 +64,7 @@ export class SimpleRangeValue {
   }
 
   private ensureThatComputed() {
-    if(this._data !== undefined) {
+    if (this._data !== undefined) {
       return
     }
     this._hasOnlyNumbers = true
@@ -96,6 +96,15 @@ export class SimpleRangeValue {
     return ret
   }
 
+  public* entriesFromTopLeftCorner(leftCorner: SimpleCellAddress): IterableIterator<[InternalScalarValue, SimpleCellAddress]> {
+    this.ensureThatComputed()
+    for (let row = 0; row < this.size.height; ++row) {
+      for (let col = 0; col < this.size.width; ++col) {
+        yield [this._data![row][col], simpleCellAddress(leftCorner.sheet, leftCorner.col + col, leftCorner.row + row)]
+      }
+    }
+  }
+
   public* iterateValuesFromTopLeftCorner(): IterableIterator<InternalScalarValue> {
     yield* this.valuesFromTopLeftCorner()
   }
@@ -107,8 +116,8 @@ export class SimpleRangeValue {
   public hasOnlyNumbers() {
     if (this._hasOnlyNumbers === undefined) {
       this._hasOnlyNumbers = true
-      for(const row of this.data) {
-        for(const v of row) {
+      for (const row of this.data) {
+        for (const v of row) {
           if (typeof v !== 'number') {
             this._hasOnlyNumbers = false
             return false
@@ -122,6 +131,10 @@ export class SimpleRangeValue {
 
   public rawNumbers(): number[][] {
     return this._data as number[][]
+  }
+
+  public rawData(): InternalScalarValue[][] {
+    return this._data ?? []
   }
 
   public sameDimensionsAs(other: SimpleRangeValue): boolean {

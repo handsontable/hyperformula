@@ -77,23 +77,6 @@ describe('Replace sheet content', () => {
     ])
   })
 
-  it('should replace content of a sheet with numeric matrix', () => {
-    const engine = HyperFormula.buildFromSheets({
-      Sheet1: [
-        ['1', '2'],
-      ],
-      Sheet2: [
-        ['=Sheet1!A1'],
-        ['=Sheet1!B1'],
-      ],
-    }, { matrixDetection: true, matrixDetectionThreshold: 1 })
-
-    engine.setSheetContent(0, [['3']])
-
-    expect(engine.getCellValue(adr('A1', 1))).toEqual(3)
-    expect(engine.getCellValue(adr('A2', 1))).toBe(null)
-  })
-
   it('should replace content of a sheet with formula matrix', () => {
     const engine = HyperFormula.buildFromSheets({
       Sheet1: [

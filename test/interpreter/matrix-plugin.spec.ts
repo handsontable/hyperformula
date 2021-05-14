@@ -42,7 +42,7 @@ describe('Matrix plugin', () => {
       ], config)
 
       expect(engine.getCellValue(adr('A7'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.MatrixDimensions))
-      expect(engine.getCellValue(adr('B7'))).toBe(null)
+      expect(engine.getCellValue(adr('B7'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.MatrixDimensions))
     })
 
     it('matrix multiplication with string in data', () => {

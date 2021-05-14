@@ -1,5 +1,5 @@
 import {HyperFormula} from '../src'
-import {CellError, ErrorType, SimpleCellAddress} from '../src/Cell'
+import {CellError, ErrorType} from '../src/Cell'
 import {InterpreterState} from '../src/interpreter/InterpreterState'
 import {InternalScalarValue} from '../src/interpreter/InterpreterValue'
 import {FunctionPlugin, FunctionPluginTypecheck} from '../src/interpreter/plugin/FunctionPlugin'

@@ -1,7 +1,7 @@
 import {ErrorType, HyperFormula, NoSheetWithIdError} from '../../src'
 import {AbsoluteCellRange} from '../../src/AbsoluteCellRange'
 import {simpleCellAddress} from '../../src/Cell'
-import {EmptyCellVertex, ValueCellVertex} from '../../src/DependencyGraph'
+import {EmptyCellVertex} from '../../src/DependencyGraph'
 import {EmptyValue} from '../../src/interpreter/InterpreterValue'
 import {ColumnIndex} from '../../src/Lookup/ColumnIndex'
 import {CellAddress} from '../../src/parser'
@@ -837,54 +837,6 @@ describe('move cells with matrices', () => {
       engine.cut(adr('A2'), 2, 1)
       engine.paste(adr('A3'))
     }).toThrowError('Cannot perform this operation, source location has a matrix inside.')
-  })
-
-  it('should be possible to move whole numeric matrix', () => {
-    const engine = HyperFormula.buildFromArray([
-      ['1', '2'],
-    ], {matrixDetection: true, matrixDetectionThreshold: 1})
-
-    engine.cut(adr('A1'), 2, 1)
-    engine.paste(adr('A2'))
-
-    expect(engine.getCellValue(adr('A1'))).toBe(null)
-    expect(engine.getCellValue(adr('B1'))).toBe(null)
-    expect(engine.getCellValue(adr('A2'))).toEqual(1)
-    expect(engine.getCellValue(adr('B2'))).toEqual(2)
-  })
-
-  it('should be possible to move part of a numeric matrix', () => {
-    const engine = HyperFormula.buildFromArray([
-      ['1', '2'],
-    ], {matrixDetection: true, matrixDetectionThreshold: 1})
-
-    engine.cut(adr('B1'), 1, 1)
-    engine.paste(adr('B2'))
-
-    expect(engine.addressMapping.getCell(adr('A1'))).toBeInstanceOf(ValueCellVertex)
-    expect(engine.addressMapping.getCell(adr('B2'))).toBeInstanceOf(ValueCellVertex)
-    expect(engine.getCellValue(adr('A1'))).toEqual(1)
-    expect(engine.getCellValue(adr('B1'))).toBe(null)
-    expect(engine.getCellValue(adr('B2'))).toEqual(2)
-    expect(engine.matrixMapping.matrixMapping.size).toEqual(0)
-  })
-
-  it('should be possible to move matrix onto numeric matrix', () => {
-    const engine = HyperFormula.buildFromArray([
-      ['1', '2'],
-      ['foo'],
-      ['3', '4'],
-    ], {matrixDetection: true, matrixDetectionThreshold: 1})
-
-    engine.cut(adr('A1'), 2, 1)
-    engine.paste(adr('A3'))
-
-    expect(engine.addressMapping.getCell(adr('A3'))).toBeInstanceOf(ValueCellVertex)
-    expect(engine.addressMapping.getCell(adr('B3'))).toBeInstanceOf(ValueCellVertex)
-    expect(engine.getCellValue(adr('A1'))).toBe(null)
-    expect(engine.getCellValue(adr('B1'))).toBe(null)
-    expect(engine.getCellValue(adr('A3'))).toEqual(1)
-    expect(engine.getCellValue(adr('B3'))).toEqual(2)
   })
 })
 

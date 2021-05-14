@@ -9,13 +9,7 @@ import {HyperFormula} from '../HyperFormula'
 import {TranslationSet} from '../i18n'
 import {Maybe} from '../Maybe'
 import {Interpreter} from './Interpreter'
-import {
-  FunctionMetadata,
-  FunctionPlugin,
-  FunctionPluginDefinition,
-  ImplementedFunctions,
-  PluginFunctionType
-} from './plugin/FunctionPlugin'
+import {FunctionMetadata, FunctionPlugin, FunctionPluginDefinition, PluginFunctionType} from './plugin/FunctionPlugin'
 import {VersionPlugin} from './plugin/VersionPlugin'
 
 export type FunctionTranslationsPackage = Record<string, TranslationSet>

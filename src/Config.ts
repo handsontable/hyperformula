@@ -3,29 +3,26 @@
  * Copyright (c) 2021 Handsoncode. All rights reserved.
  */
 
+import {GPU} from 'gpu.js'
 import {
   configCheckIfParametersNotInConflict,
-  validateNumberToBeAtLeast,
-  validateNumberToBeAtMost,
   configValueFromParam,
-  configValueFromParamCheck
+  configValueFromParamCheck,
+  validateNumberToBeAtLeast,
+  validateNumberToBeAtMost
 } from './ArgumentSanitization'
 import {TranslatableErrorType} from './Cell'
 import {defaultParseToDateTime} from './DateTimeDefault'
 import {DateTime, instanceOfSimpleDate, SimpleDate, SimpleDateTime, SimpleTime} from './DateTimeHelper'
 import {AlwaysDense, ChooseAddressMapping} from './DependencyGraph/AddressMapping/ChooseAddressMappingPolicy'
-import {
-  ConfigValueEmpty,
-  ExpectedValueOfTypeError
-} from './errors'
+import {ConfigValueEmpty, ExpectedValueOfTypeError} from './errors'
 import {defaultStringifyDateTime, defaultStringifyDuration} from './format/format'
+import {checkLicenseKeyValidity, LicenseKeyValidityState} from './helpers/licenseKeyValidator'
 import {HyperFormula} from './HyperFormula'
 import {TranslationPackage} from './i18n'
+import {FunctionPluginDefinition} from './interpreter'
 import {Maybe} from './Maybe'
 import {ParserConfig} from './parser/ParserConfig'
-import {checkLicenseKeyValidity, LicenseKeyValidityState} from './helpers/licenseKeyValidator'
-import {FunctionPluginDefinition} from './interpreter'
-import type { GPU } from 'gpu.js'
 
 type GPUMode = 'gpu' | 'cpu' | 'dev'
 
@@ -207,24 +204,6 @@ export interface ConfigParams {
    * @category String
    */
   matchWholeCell: boolean,
-  /**
-   * Enables numeric matrix detection feature when set to 'true'.
-   * During build phase each rectangular area of numbers will be treated as one matrix vertex in order to optimize further calculations.
-   * Some CRUD operations may break numeric matrices into individual vertices if needed.
-   *
-   * @default true
-   *
-   * @category Engine
-   */
-  matrixDetection: boolean,
-  /**
-   * Specifies how many cells an area must have in order to be treated as a matrix. Relevant only if [[matrixDetection]] is set to `true`.
-   *
-   * @default 100
-   *
-   * @category Engine
-   */
-  matrixDetectionThreshold: number,
   /**
    * Maximum number of rows
    *
@@ -410,8 +389,6 @@ export class Config implements ConfigParams, ParserConfig {
     licenseKey: '',
     leapYear1900: false,
     localeLang: 'en',
-    matrixDetection: true,
-    matrixDetectionThreshold: 100,
     matchWholeCell: true,
     maxRows: 40_000,
     maxColumns: 18_278,
@@ -467,13 +444,9 @@ export class Config implements ConfigParams, ParserConfig {
   /** @inheritDoc */
   public readonly leapYear1900: boolean
   /** @inheritDoc */
-  public readonly matrixDetection: boolean
-  /** @inheritDoc */
   public readonly ignorePunctuation: boolean
   /** @inheritDoc */
   public readonly localeLang: string
-  /** @inheritDoc */
-  public readonly matrixDetectionThreshold: number
   /** @inheritDoc */
   public readonly evaluateNullToZero: boolean
   /** @inheritDoc */
@@ -557,8 +530,6 @@ export class Config implements ConfigParams, ParserConfig {
       localeLang,
       language,
       licenseKey,
-      matrixDetection,
-      matrixDetectionThreshold,
       matchWholeCell,
       maxRows,
       maxColumns,
@@ -599,9 +570,6 @@ export class Config implements ConfigParams, ParserConfig {
     this.gpujs = gpujs ?? Config.defaultConfig.gpujs
     this.gpuMode = configValueFromParam(gpuMode, PossibleGPUModeString, 'gpuMode')
     this.smartRounding = configValueFromParam(smartRounding, 'boolean', 'smartRounding')
-    this.matrixDetection = configValueFromParam(matrixDetection, 'boolean', 'matrixDetection')
-    this.matrixDetectionThreshold = configValueFromParam(matrixDetectionThreshold, 'number', 'matrixDetectionThreshold')
-    validateNumberToBeAtLeast(this.matrixDetectionThreshold, 'matrixDetectionThreshold', 1)
     this.evaluateNullToZero = configValueFromParam(evaluateNullToZero, 'boolean', 'evaluateNullToZero')
     this.nullYear = configValueFromParam(nullYear, 'number', 'nullYear')
     validateNumberToBeAtLeast(this.nullYear, 'nullYear', 0)

@@ -3,11 +3,11 @@
  * Copyright (c) 2021 Handsoncode. All rights reserved.
  */
 
-import {Transformer} from './Transformer'
 import {ErrorType, SimpleCellAddress} from '../Cell'
 import {CellAddress} from '../parser'
 import {ColumnAddress} from '../parser/ColumnAddress'
 import {RowAddress} from '../parser/RowAddress'
+import {Transformer} from './Transformer'
 
 export class CleanOutOfScopeDependenciesTransformer extends Transformer {
   constructor(
