@@ -501,53 +501,6 @@ describe('Removing columns - matrices', () => {
     expect(() => engine.removeColumns(0, [2, 1])).toThrowError('Cannot perform this operation, source location has a matrix inside.')
   })
 
-  it('should remove columns when partial overlap', () => {
-    const engine = HyperFormula.buildFromArray([
-      ['1', '2'],
-      ['3', '4'],
-    ], { /* TODO matrixDetectionThreshold: 1 */})
-
-    engine.removeColumns(0, [1, 3])
-    const matrix = engine.addressMapping.fetchCell(adr('A1')) as MatrixVertex
-    expect(matrix).toBeInstanceOf(MatrixVertex)
-    expect(matrix.width).toBe(1)
-  })
-
-  it('should remove MatrixVertex completely from graph', () => {
-    const engine = HyperFormula.buildFromArray([
-      ['1', '2'],
-      ['3', '4'],
-    ], { /* TODO matrixDetectionThreshold: 1 */})
-
-    expect(engine.matrixMapping.count()).toBe(1)
-    engine.removeColumns(0, [0, 2])
-    expect(engine.matrixMapping.count()).toBe(0)
-    expect(engine.graph.nodes.size).toBe(0)
-  })
-
-  it('should remove MatrixVertex completely from graph, more cols', () => {
-    const engine = HyperFormula.buildFromArray([
-      ['1', '2'],
-      ['3', '4'],
-      ['foo', 'bar'],
-    ], { /* TODO matrixDetectionThreshold: 1 */})
-
-    expect(engine.matrixMapping.count()).toBe(1)
-    engine.removeColumns(0, [0, 3])
-    expect(engine.matrixMapping.count()).toBe(0)
-    expect(engine.graph.nodes.size).toBe(0)
-  })
-
-  it('does not remove matrix vertices from graph', function() {
-    const engine = HyperFormula.buildFromArray([
-      ['1', '2', '3'],
-      ['1', '2', '3'],
-    ], { /* TODO matrixDetectionThreshold: 1 */})
-    expect(engine.graph.nodes.size).toBe(1)
-    engine.removeColumns(0, [1, 1])
-    expect(engine.graph.nodes.size).toBe(1)
-  })
-
   it('reevaluates cells dependent on matrix vertex', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '1', '1'],
