@@ -61,8 +61,8 @@ describe('Function EXACT', () => {
 
   it('should return error for range', () => {
     const engine = HyperFormula.buildFromArray([
-      ['=EXACT("foo",B1:B2)'],
-      ['=EXACT(B1:B2,"foo")'],
+      ['=EXACT("foo",B1:C1)'],
+      ['=EXACT(B1:C1,"foo")'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.WrongType))
