@@ -6,13 +6,13 @@ describe('Replace sheet content - checking if its possible', () => {
   it('no if theres no such sheet', () => {
     const engine = HyperFormula.buildFromArray([[]])
 
-    expect(engine.isItPossibleToReplaceSheetContent('foo', [])).toEqual(false)
+    expect(engine.isItPossibleToReplaceSheetContent(1, [])).toEqual(false)
   })
 
   it('yes otherwise', () => {
     const engine = HyperFormula.buildFromArray([[]])
 
-    expect(engine.isItPossibleToReplaceSheetContent('Sheet1', [])).toEqual(true)
+    expect(engine.isItPossibleToReplaceSheetContent(0, [])).toEqual(true)
   })
 })
 
@@ -24,9 +24,9 @@ describe('Replace sheet content', () => {
     ])
 
     expect(() => {
-      engine.setSheetContent('Sheet2', [['3', '4']])
+      engine.setSheetContent(1, [['3', '4']])
 
-    }).toThrowError("There's no sheet with name 'Sheet2'")
+    }).toThrowError("There's no sheet with id = 1")
   })
 
   it('should replace sheet content with new values', () => {
@@ -35,7 +35,7 @@ describe('Replace sheet content', () => {
       ['3', 'foo'],
     ])
 
-    engine.setSheetContent('Sheet1', [['3', '4']])
+    engine.setSheetContent(0, [['3', '4']])
 
     expect(engine.getCellValue(adr('A1'))).toEqual(3)
     expect(engine.getCellValue(adr('B1'))).toEqual(4)
@@ -50,7 +50,7 @@ describe('Replace sheet content', () => {
       ['3', 'foo'],
     ])
 
-    const changes = engine.setSheetContent('Sheet1', [['3', '4']])
+    const changes = engine.setSheetContent(0, [['3', '4']])
 
     expectArrayWithSameContent(changes, [
       new ExportedCellChange(simpleCellAddress(0, 0, 0), 3),
@@ -65,7 +65,7 @@ describe('Replace sheet content', () => {
       ['3', 'foo'],
     ])
 
-    const changes = engine.setSheetContent('Sheet1', [['3', '4']])
+    const changes = engine.setSheetContent(0, [['3', '4']])
 
     expect(changes.length).toEqual(4)
 
@@ -89,7 +89,7 @@ describe('Replace sheet content', () => {
       ],
     })
 
-    engine.setSheetContent('Sheet1', [
+    engine.setSheetContent(0, [
       ['3', '4'],
       ['foo', '5'],
     ])
@@ -109,7 +109,7 @@ describe('Replace sheet content', () => {
       ],
     })
 
-    engine.setSheetContent('Sheet1', [
+    engine.setSheetContent(0, [
       ['3', '4'],
       [null, '5'],
     ])

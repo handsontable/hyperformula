@@ -88,7 +88,7 @@ describe( 'unsupported types should result in error', () => {
       .toThrowError(/^Unable to parse value\: "(\(\) \=\> \{ \}|function \(\) \{\})"$/)
     // eslint-disable-next-line
     // @ts-ignore
-    expect(() => engine.setSheetContent('Sheet1', [[ () => {} ]]))
+    expect(() => engine.setSheetContent(0, [[ () => {} ]]))
       .toThrowError(/^Unable to parse value\: "(\(\) \=\> \{ \}|function \(\) \{\})"$/)
   })
 
@@ -99,11 +99,11 @@ describe( 'unsupported types should result in error', () => {
     const engine = HyperFormula.buildFromArray(sheet)
     // eslint-disable-next-line
     // @ts-ignore
-    expect( () => engine.setSheetContent('Sheet1', 1)
+    expect( () => engine.setSheetContent(0, 1)
     ).toThrowError('Invalid arguments, expected an array of arrays.')
     // eslint-disable-next-line
     // @ts-ignore
-    expect( () => engine.setSheetContent('Sheet1', [1])
+    expect( () => engine.setSheetContent(0, [1])
     ).toThrowError('Invalid arguments, expected an array of arrays.')
     // eslint-disable-next-line
     // @ts-ignore
