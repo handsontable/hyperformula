@@ -28,7 +28,7 @@ type GPUMode = 'gpu' | 'cpu' | 'dev'
 const PossibleGPUModeString: GPUMode[] = ['gpu', 'cpu', 'dev']
 
 export interface ConfigParams {
-  arrays: boolean, //FIXME
+  useArrayArithmetic: boolean, //FIXME
   /**
    * Specifies if the string comparison is accent sensitive or not.
    * Applies to comparison operators only.
@@ -381,7 +381,7 @@ type ConfigParamsList = keyof ConfigParams
 export class Config implements ConfigParams, ParserConfig {
 
   public static defaultConfig: ConfigParams = {
-    arrays: false,
+    useArrayArithmetic: false,
     accentSensitive: false,
     caseSensitive: false,
     caseFirst: 'lower',
@@ -422,7 +422,7 @@ export class Config implements ConfigParams, ParserConfig {
     currencySymbol: ['$'],
   }
 
-  public readonly arrays: boolean
+  public readonly useArrayArithmetic: boolean
   /** @inheritDoc */
   public readonly caseSensitive: boolean
   /** @inheritDoc */
@@ -527,7 +527,7 @@ export class Config implements ConfigParams, ParserConfig {
 
   constructor(
     {
-      arrays,
+      useArrayArithmetic,
       accentSensitive,
       caseSensitive,
       caseFirst,
@@ -568,7 +568,7 @@ export class Config implements ConfigParams, ParserConfig {
       currencySymbol,
     }: Partial<ConfigParams> = {},
   ) {
-    this.arrays = this.valueFromParam(arrays, 'boolean', 'arrays')
+    this.useArrayArithmetic = this.valueFromParam(useArrayArithmetic, 'boolean', 'useArrayArithmetic')
     this.accentSensitive = this.valueFromParam(accentSensitive, 'boolean', 'accentSensitive')
     this.caseSensitive = this.valueFromParam(caseSensitive, 'boolean', 'caseSensitive')
     this.caseFirst = this.valueFromParam(caseFirst, ['upper', 'lower', 'false'], 'caseFirst')
