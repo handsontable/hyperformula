@@ -14,8 +14,9 @@ export interface CellValueChange {
 }
 
 export interface ChangeExporter<T> {
-  exportChange: (arg: CellValueChange) => T,
+  exportChange: (arg: CellValueChange) => T | T[],
 }
+
 export type ChangeList = CellValueChange[]
 
 export class ContentChanges {
@@ -40,11 +41,13 @@ export class ContentChanges {
   }
 
   public exportChanges<T>(exporter: ChangeExporter<T>): T[] {
-    const ret: T[] = []
-    this.changes.forEach((e, i) => {
-      const exportedChange = exporter.exportChange(this.changes[i])
-      if (exportedChange !== undefined) {
-        ret.push(exportedChange)
+    let ret: T[] = []
+    this.changes.forEach((e) => {
+      const change = exporter.exportChange(e)
+      if (Array.isArray(change)) {
+        ret = ret.concat(change)
+      } else{
+        ret.push(change)
       }
     })
     return ret
