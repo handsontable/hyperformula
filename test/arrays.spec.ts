@@ -19,12 +19,12 @@ describe('without arrayformula, with useArrayArithmetic flag', () => {
   })
 
   it('binary op, array ret', () => {
-    const engine = HyperFormula.buildFromArray([[1, 2, 3], [4, 5, 6], ['=2*A1:C1+A2:C2']], {arrays: true})
+    const engine = HyperFormula.buildFromArray([[1, 2, 3], [4, 5, 6], ['=2*A1:C1+A2:C2']], {useArrayArithmetic: true})
     expect(engine.getSheetValues(0)).toEqual([[1, 2, 3], [4, 5, 6], [6, 9, 12]])
   })
 
   it('binary op, array ret, concat', () => {
-    const engine = HyperFormula.buildFromArray([['a', 'b', 'c'], ['d', 'e', 'f'], ['=A1:C1&A2:C2']], {arrays: true})
+    const engine = HyperFormula.buildFromArray([['a', 'b', 'c'], ['d', 'e', 'f'], ['=A1:C1&A2:C2']], {useArrayArithmetic: true})
     expect(engine.getSheetValues(0)).toEqual([['a', 'b', 'c'], ['d', 'e', 'f'], ['ad', 'be', 'cf']])
   })
 
