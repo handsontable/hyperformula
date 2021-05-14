@@ -279,10 +279,6 @@ export class DependencyGraph {
       }
     })
 
-    // this.stats.measure(StatType.ADJUSTING_MATRIX_MAPPING, () => {
-    //   this.truncateMatricesAfterRemovingRows(removedRows)
-    // })
-
     this.stats.measure(StatType.ADJUSTING_ADDRESS_MAPPING, () => {
       this.addressMapping.removeRows(removedRows)
     })
@@ -366,10 +362,6 @@ export class DependencyGraph {
       }
     })
 
-    // this.stats.measure(StatType.ADJUSTING_MATRIX_MAPPING, () => {
-    //   this.truncateMatricesAfterRemovingColumns(removedColumns)
-    // })
-
     this.stats.measure(StatType.ADJUSTING_ADDRESS_MAPPING, () => {
       this.addressMapping.removeColumns(removedColumns)
     })
@@ -385,10 +377,6 @@ export class DependencyGraph {
     this.stats.measure(StatType.ADJUSTING_ADDRESS_MAPPING, () => {
       this.addressMapping.addRows(addedRows.sheet, addedRows.rowStart, addedRows.numberOfRows)
     })
-
-    // this.stats.measure(StatType.ADJUSTING_MATRIX_MAPPING, () => {
-    //   this.expandMatricesAfterAddingRows(addedRows.sheet, addedRows.rowStart, addedRows.numberOfRows)
-    // })
 
     this.stats.measure(StatType.ADJUSTING_RANGES, () => {
       this.rangeMapping.moveAllRangesInSheetAfterRowByRows(addedRows.sheet, addedRows.rowStart, addedRows.numberOfRows)
@@ -406,10 +394,6 @@ export class DependencyGraph {
     this.stats.measure(StatType.ADJUSTING_ADDRESS_MAPPING, () => {
       this.addressMapping.addColumns(addedColumns.sheet, addedColumns.columnStart, addedColumns.numberOfColumns)
     })
-
-    // this.stats.measure(StatType.ADJUSTING_MATRIX_MAPPING, () => {
-    //   this.expandMatricesAfterAddingColumns(addedColumns.sheet, addedColumns.columnStart, addedColumns.numberOfColumns)
-    // })
 
     this.stats.measure(StatType.ADJUSTING_RANGES, () => {
       this.rangeMapping.moveAllRangesInSheetAfterColumnByColumns(addedColumns.sheet, addedColumns.columnStart, addedColumns.numberOfColumns)
@@ -850,13 +834,6 @@ export class DependencyGraph {
     }
   }
 
-  // private truncateMatricesAfterRemovingRows(removedRows: RowsSpan) {
-  //   const verticesToRemove = this.matrixMapping.truncateMatricesByRows(removedRows)
-  //   verticesToRemove.forEach((vertex) => {
-  //     this.removeVertex(vertex)
-  //   })
-  // }
-
   private truncateRanges(span: Span, coordinate: (address: SimpleCellAddress) => number) {
     const {verticesToRemove, verticesToMerge} = this.rangeMapping.truncateRanges(span, coordinate)
     for (const [existingVertex, mergedVertex] of verticesToMerge) {
@@ -866,33 +843,6 @@ export class DependencyGraph {
       this.removeVertexAndCleanupDependencies(rangeVertex)
     }
   }
-
-  // private truncateMatricesAfterRemovingColumns(removedColumns: ColumnsSpan) {
-  //   const verticesToRemove = this.matrixMapping.truncateMatricesByColumns(removedColumns)
-  //   verticesToRemove.forEach((vertex) => {
-  //     this.removeVertex(vertex)
-  //   })
-  // }
-
-  // private expandMatricesAfterAddingRows(sheet: number, rowStart: number, numberOfRows: number) {
-  //   for (const [, matrix] of this.matrixMapping.numericMatricesInRows(RowsSpan.fromRowStartAndEnd(sheet, rowStart, rowStart))) {
-  //     matrix.addRows(sheet, rowStart, numberOfRows)
-  //     const addedRange = AbsoluteCellRange.spanFrom(simpleCellAddress(sheet, matrix.getAddress(this.lazilyTransformingAstService).col, rowStart), matrix.width, numberOfRows)
-  //     for (const address of addedRange.addresses(this)) {
-  //       this.addressMapping.setCell(address, matrix)
-  //     }
-  //   }
-  // }
-  //
-  // private expandMatricesAfterAddingColumns(sheet: number, columnStart: number, numberOfColumns: number) {
-  //   for (const [, matrix] of this.matrixMapping.numericMatricesInColumns(ColumnsSpan.fromColumnStartAndEnd(sheet, columnStart, columnStart))) {
-  //     matrix.addColumns(sheet, columnStart, numberOfColumns)
-  //     const addedRange = AbsoluteCellRange.spanFrom(simpleCellAddress(sheet, columnStart, matrix.getAddress(this.lazilyTransformingAstService).row), numberOfColumns, matrix.height)
-  //     for (const address of addedRange.addresses(this)) {
-  //       this.addressMapping.setCell(address, matrix)
-  //     }
-  //   }
-  // }
 
   private removeVertex(vertex: Vertex) {
     this.removeVertexAndCleanupDependencies(vertex)
