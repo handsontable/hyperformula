@@ -130,7 +130,11 @@ export class MatrixVertex extends FormulaVertex {
     const col = address.col - this.cellAddress.col
     const row = address.row - this.cellAddress.row
 
-    return this.matrix.get(col, row)
+    try {
+      return this.matrix.get(col, row)
+    } catch (e) {
+      return new CellError(ErrorType.REF)
+    }
   }
 
   getMatrixCellRawValue(address: SimpleCellAddress): Maybe<RawCellContent> {
@@ -214,6 +218,11 @@ export class MatrixVertex extends FormulaVertex {
   rowsFromMatrix() {
     return RowsSpan.fromNumberOfRows(this.cellAddress.sheet, this.cellAddress.row, this.height)
   }
+
+  /**
+   * No-op as matrix vertices are transformed eagerly.
+   * */
+  ensureRecentData(updatingService: LazilyTransformingAstService) {}
 
   private setErrorValue(error: CellError) {
     this.matrix = new ErroredMatrix(error, this.matrix.size)

@@ -39,7 +39,7 @@ export class SimpleRangeValue {
     private readonly dependencyGraph?: DependencyGraph,
     private _hasOnlyNumbers?: boolean,
   ) {
-    if(_data===undefined) {
+    if (_data === undefined) {
       this.size = new MatrixSize(range!.width(), range!.height())
     } else {
       this.size = new MatrixSize(_data[0].length, _data.length)
@@ -64,7 +64,7 @@ export class SimpleRangeValue {
   }
 
   private ensureThatComputed() {
-    if(this._data !== undefined) {
+    if (this._data !== undefined) {
       return
     }
     this._hasOnlyNumbers = true
@@ -116,8 +116,8 @@ export class SimpleRangeValue {
   public hasOnlyNumbers() {
     if (this._hasOnlyNumbers === undefined) {
       this._hasOnlyNumbers = true
-      for(const row of this.data) {
-        for(const v of row) {
+      for (const row of this.data) {
+        for (const v of row) {
           if (typeof v !== 'number') {
             this._hasOnlyNumbers = false
             return false
