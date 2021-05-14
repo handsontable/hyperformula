@@ -75,6 +75,8 @@ export abstract class FormulaVertex {
    */
   public abstract getCellValue(): InterpreterValue
 
+  public abstract valueOrNull(): InterpreterValue | null
+
   public abstract isComputed(): boolean
 }
 
@@ -122,6 +124,13 @@ export class MatrixVertex extends FormulaVertex {
   getCellValue(): InterpreterValue {
     if (this.matrix instanceof NotComputedMatrix) {
       throw Error('Matrix not computed yet.')
+    }
+    return this.matrix.simpleRangeValue()
+  }
+
+  public valueOrNull(): InterpreterValue | null {
+    if (this.matrix instanceof NotComputedMatrix) {
+      return null
     }
     return this.matrix.simpleRangeValue()
   }

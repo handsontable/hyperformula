@@ -10,14 +10,12 @@ import {InterpreterState} from './interpreter/InterpreterState'
 import {Config} from './Config'
 import {ContentChanges} from './ContentChanges'
 import {DateTimeHelper} from './DateTimeHelper'
-import {DependencyGraph, FormulaCellVertex, MatrixVertex, RangeVertex, Vertex} from './DependencyGraph'
-import {ErrorMessage} from './error-message'
+import {DependencyGraph, RangeVertex, Vertex} from './DependencyGraph'
 import {FunctionRegistry} from './interpreter/FunctionRegistry'
 import {Interpreter} from './interpreter/Interpreter'
 import {EmptyValue, getRawValue, InterpreterValue} from './interpreter/InterpreterValue'
 import {SimpleRangeValue} from './interpreter/SimpleRangeValue'
 import {ColumnSearchStrategy} from './Lookup/SearchStrategy'
-import {Matrix} from './Matrix'
 import {NamedExpressions} from './NamedExpressions'
 import {NumberLiteralHelper} from './NumberLiteralHelper'
 import {Ast, RelativeDependency} from './parser'
@@ -83,7 +81,7 @@ export class Evaluator {
         (vertex: Vertex) => {
           if (vertex instanceof RangeVertex) {
             vertex.clearCache()
-          } else if (vertex instanceof FormulaCellVertex) {
+          } else if (vertex instanceof FormulaVertex) {
             const address = vertex.getAddress(this.dependencyGraph.lazilyTransformingAstService)
             this.columnSearch.remove(getRawValue(vertex.valueOrNull()), address)
             const error = new CellError(ErrorType.CYCLE, undefined, address)
@@ -126,12 +124,12 @@ export class Evaluator {
    */
   private recomputeFormulas(cycled: Vertex[], sorted: Vertex[]): void {
     cycled.forEach((vertex: Vertex) => {
-      if (vertex instanceof FormulaCellVertex) {
+      if (vertex instanceof FormulaVertex) {
         vertex.setCellValue(new CellError(ErrorType.CYCLE, undefined, vertex.getAddress(this.lazilyTransformingAstService)))
       }
     })
     sorted.forEach((vertex: Vertex) => {
-      if (vertex instanceof FormulaCellVertex || vertex instanceof MatrixVertex) {
+      if (vertex instanceof FormulaVertex) {
         const address = vertex.getAddress(this.lazilyTransformingAstService)
         const formula = vertex.getFormula(this.lazilyTransformingAstService)
         const newCellValue = this.evaluateAstToCellValue(formula, new InterpreterState(address, this.config.arrays))
@@ -151,17 +149,6 @@ export class Evaluator {
       return 0
     } else {
       return interpreterValue
-    }
-  }
-
-  private evaluateAstToRangeValue(ast: Ast, state: InterpreterState): SimpleRangeValue | CellError {
-    const interpreterValue = this.interpreter.evaluateAst(ast, state)
-    if (interpreterValue instanceof CellError) {
-      return interpreterValue
-    } else if (interpreterValue instanceof SimpleRangeValue) {
-      return interpreterValue
-    } else {
-      return SimpleRangeValue.fromScalar(interpreterValue)
     }
   }
 }
