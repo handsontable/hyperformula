@@ -136,6 +136,29 @@ export class MatrixSizePredictor {
             }
             return subChecks[0]
           }
+          case 'FILTER': {
+            if (ast.args.length <= 1) {
+              return undefined
+            }
+            for (const subcheck of subChecks) {
+              if (subcheck === undefined) {
+                return undefined
+              }
+            }
+            const width = Math.max(...(subChecks as MatrixSize[]).map(val => val.width))
+            const height = Math.max(...(subChecks as MatrixSize[]).map(val => val.height))
+            return new MatrixSize(width, height)
+          }
+          case 'SWITCH': {
+            if (ast.args.length === 0) {
+              return undefined
+            }
+            const size = subChecks[0]
+            if (size === undefined) {
+              return undefined
+            }
+            return new MatrixSize(size.width, size.height)
+          }
           case 'ARRAY_CONSTRAIN': {
             if (ast.args.length !== 3) {
               return undefined

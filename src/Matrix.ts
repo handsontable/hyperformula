@@ -4,7 +4,7 @@
  */
 
 import {CellError, SimpleCellAddress, simpleCellAddress} from './Cell'
-import {InternalScalarValue} from './interpreter/InterpreterValue'
+import {EmptyValue, InternalScalarValue} from './interpreter/InterpreterValue'
 import {MatrixSize} from './MatrixSize'
 
 export interface IMatrix {
@@ -45,13 +45,13 @@ export class Matrix implements IMatrix {
   }
 
   public addRows(aboveRow: number, numberOfRows: number) {
-    this.matrix.splice(aboveRow, 0, ...this.zeroArrays(numberOfRows, this.width()))
+    this.matrix.splice(aboveRow, 0, ...this.nullArrays(numberOfRows, this.width()))
     this.size.height += numberOfRows
   }
 
   public addColumns(aboveColumn: number, numberOfColumns: number) {
     for (let i = 0; i < this.height(); i++) {
-      this.matrix[i].splice(aboveColumn, 0, ...new Array(numberOfColumns).fill(0))
+      this.matrix[i].splice(aboveColumn, 0, ...new Array(numberOfColumns).fill(EmptyValue))
     }
     this.size.width += numberOfColumns
   }
@@ -76,10 +76,10 @@ export class Matrix implements IMatrix {
     this.size.width -= numberOfColumns
   }
 
-  public zeroArrays(count: number, size: number) {
+  public nullArrays(count: number, size: number) {
     const result = []
     for (let i = 0; i < count; ++i) {
-      result.push(new Array(size).fill(0))
+      result.push(new Array(size).fill(EmptyValue))
     }
     return result
   }
@@ -115,6 +115,21 @@ export class Matrix implements IMatrix {
       for (let col = 0; col < this.size.width; ++col) {
         yield [this.matrix[row][col], simpleCellAddress(leftCorner.sheet, leftCorner.col + col, leftCorner.row + row)]
       }
+    }
+  }
+
+  public resize(newSize: MatrixSize) {
+    if(this.height() < newSize.height) {
+      this.addRows(this.height(), newSize.height-this.height())
+    }
+    if(this.height() > newSize.height) {
+      throw 'Resizing to smaller matrix'
+    }
+    if(this.width() < newSize.width) {
+      this.addColumns(this.width(), newSize.width-this.width())
+    }
+    if(this.width() > newSize.width) {
+      throw 'Resizing to smaller matrix'
     }
   }
 

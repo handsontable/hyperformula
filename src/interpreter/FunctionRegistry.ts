@@ -164,6 +164,7 @@ export class FunctionRegistry {
   private readonly arrayFunctions: Set<string> = new Set()
   private readonly structuralChangeFunctions: Set<string> = new Set()
   private readonly functionsWhichDoesNotNeedArgumentsToBeComputed: Set<string> = new Set()
+  private readonly functionsMetadata: Map<string, FunctionMetadata> = new Map()
 
   constructor(private config: Config) {
     if (config.functionPlugins.length > 0) {
@@ -216,14 +217,7 @@ export class FunctionRegistry {
   }
 
   public getMetadata(functionId: string): Maybe<FunctionMetadata> {
-    const pluginEntry = this.functions.get(functionId)
-    if (pluginEntry !== undefined && this.config.translationPackage.isFunctionTranslated(functionId)) {
-      const [_pluginFunction, pluginInstance] = pluginEntry
-      const implementedFunctions = Object.getPrototypeOf(pluginInstance).constructor.implementedFunctions as ImplementedFunctions
-      return implementedFunctions[functionId]
-    } else {
-      return undefined
-    }
+    return this.functionsMetadata.get(functionId)
   }
 
   public getPlugins(): FunctionPluginDefinition[] {
@@ -261,5 +255,6 @@ export class FunctionRegistry {
     if (functionMetadata.isDependentOnSheetStructureChange) {
       this.structuralChangeFunctions.add(functionId)
     }
+    this.functionsMetadata.set(functionId, functionMetadata)
   }
 }
