@@ -134,6 +134,7 @@ export class SimpleRangeValue {
   }
 
   public rawData(): InternalScalarValue[][] {
+    this.ensureThatComputed()
     return this._data ?? []
   }
 
