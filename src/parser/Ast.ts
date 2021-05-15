@@ -39,6 +39,7 @@ export type Ast =
   | ErrorAst
   | ErrorWithRawInputAst
   | EmptyArgAst
+  | MatrixAst
 
 export interface ParsingError {
   type: ParsingErrorType,
@@ -97,6 +98,8 @@ export enum AstNodeType {
   ERROR = 'ERROR',
 
   ERROR_WITH_RAW_INPUT = 'ERROR_WITH_RAW_INPUT',
+
+  MATRIX = 'MATRIX',
 }
 
 export enum RangeSheetReferenceType {
@@ -388,6 +391,18 @@ export interface ProcedureAst extends AstWithInternalWhitespace {
 export const buildProcedureAst = (procedureName: string, args: Ast[], leadingWhitespace?: IToken, internalWhitespace?: IToken): ProcedureAst => ({
   type: AstNodeType.FUNCTION_CALL,
   procedureName,
+  args,
+  leadingWhitespace: leadingWhitespace?.image,
+  internalWhitespace: internalWhitespace?.image,
+})
+
+export interface MatrixAst extends AstWithInternalWhitespace {
+  type: AstNodeType.MATRIX,
+  args: Ast[][],
+}
+
+export const buildMatrixAst = (args: Ast[][], leadingWhitespace?: IToken, internalWhitespace?: IToken): MatrixAst => ({
+  type: AstNodeType.MATRIX,
   args,
   leadingWhitespace: leadingWhitespace?.image,
   internalWhitespace: internalWhitespace?.image,

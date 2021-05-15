@@ -38,7 +38,7 @@ import {
   buildGreaterThanOpAst,
   buildGreaterThanOrEqualOpAst,
   buildLessThanOpAst,
-  buildLessThanOrEqualOpAst,
+  buildLessThanOrEqualOpAst, buildMatrixAst,
   buildMinusOpAst,
   buildMinusUnaryOpAst,
   buildNamedExpressionAst,
@@ -76,7 +76,7 @@ import {
   ILexerConfig,
   LessThanOp,
   LessThanOrEqualOp,
-  LParen,
+  LParen, MatrixColSep, MatrixLParen, MatrixRowSep, MatrixRParen,
   MinusOp,
   MultiplicationOp,
   NamedExpression,
@@ -237,6 +237,7 @@ export class FormulaParser extends EmbeddedActionsParser {
     ])
   })
 
+
   /**
    * Rule for concatenation operator expression (e.g. "=" & A1)
    */
@@ -365,9 +366,9 @@ export class FormulaParser extends EmbeddedActionsParser {
    * Rule for positive atomic expressions
    */
   private positiveAtomicExpression: AstRule = this.RULE('positiveAtomicExpression', () => {
-    return this.OR(this.atomicExpCache || (this.atomicExpCache = [
+    return this.OR(this.atomicExpCache ?? (this.atomicExpCache = [
       {
-        ALT: () => this.SUBRULE(this.parenthesisExpression),
+        ALT: () => this.SUBRULE(this.matrixExpression),
       },
       {
         ALT: () => this.SUBRULE(this.cellRangeExpression),
@@ -505,9 +506,9 @@ export class FormulaParser extends EmbeddedActionsParser {
     return this.SUBRULE(this.endOfRangeExpression, {ARGS: [start]})
   })
 
-  /*
-  * Rule for column range, e.g. A:B, Sheet1!A:B, Sheet1!A:Sheet1!B
-  * */
+  /**
+   * Rule for column range, e.g. A:B, Sheet1!A:B, Sheet1!A:Sheet1!B
+   */
   private columnRangeExpression: AstRule = this.RULE('columnRangeExpression', () => {
     const range = this.CONSUME(ColumnRange) as IExtendedToken
     const [startImage, endImage] = range.image.split(':')
@@ -538,9 +539,9 @@ export class FormulaParser extends EmbeddedActionsParser {
     return buildColumnRangeAst(start, end, sheetReferenceType, range.leadingWhitespace)
   })
 
-  /*
-* Rule for row range, e.g. 1:2, Sheet1!1:2, Sheet1!1:Sheet1!2
-* */
+  /**
+   * Rule for row range, e.g. 1:2, Sheet1!1:2, Sheet1!1:Sheet1!2
+   */
   private rowRangeExpression: AstRule = this.RULE('rowRangeExpression', () => {
     const range = this.CONSUME(RowRange) as IExtendedToken
     const [startImage, endImage] = range.image.split(':')
@@ -716,6 +717,45 @@ export class FormulaParser extends EmbeddedActionsParser {
     return buildCellRangeAst(startAddress, endAddress, sheetReferenceType, leadingWhitespace)
   }
 
+  private matrixExpression: AstRule = this.RULE('matrixExpression', () => {
+    return this.OR([
+      {
+        ALT: () => {
+          this.CONSUME(MatrixLParen)
+          const ret = this.SUBRULE(this.insideMatrixExpression)
+          this.CONSUME(MatrixRParen)
+          return ret
+        }
+      },
+      {
+        ALT: () => this.SUBRULE(this.parenthesisExpression)
+      }
+    ])
+  })
+
+  private insideMatrixExpression: AstRule = this.RULE('insideMatrixExpression', () => {
+    const ret: Ast[][] = [[]]
+    ret[ret.length-1].push(this.SUBRULE(this.booleanExpression))
+    this.MANY( () => {
+      this.OR([
+        {
+          ALT: () => {
+            this.CONSUME(MatrixColSep)
+            ret[ret.length-1].push(this.SUBRULE2(this.booleanExpression))
+          }
+        },
+        {
+          ALT: () => {
+            this.CONSUME(MatrixRowSep)
+            ret.push([])
+            ret[ret.length-1].push(this.SUBRULE3(this.booleanExpression))
+          }
+        }
+      ])
+    })
+    return buildMatrixAst(ret)
+  })
+
   /**
    * Rule for parenthesis expression
    */
@@ -725,6 +765,9 @@ export class FormulaParser extends EmbeddedActionsParser {
     const rParenToken = this.CONSUME(RParen) as IExtendedToken
     return buildParenthesisAst(expression, lParenToken.leadingWhitespace, rParenToken.leadingWhitespace)
   })
+
+
+
 
   /**
    * Returns {@link CellReferenceAst} or {@link CellRangeAst} based on OFFSET function arguments

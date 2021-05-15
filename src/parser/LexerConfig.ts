@@ -4,6 +4,7 @@
  */
 
 import {createToken, Lexer, TokenType} from 'chevrotain'
+import {create} from 'domain'
 import {ErrorType} from '../Cell'
 import {ParserConfig} from './ParserConfig'
 
@@ -68,7 +69,13 @@ export const RangeSeparator = createToken({name: 'RangeSeparator', pattern: /:/}
 export const LParen = createToken({name: 'LParen', pattern: /\(/})
 export const RParen = createToken({name: 'RParen', pattern: /\)/})
 
-/* prcoedures */
+/* matrix parenthesis */
+export const MatrixLParen = createToken({name: 'MatrixLParen', pattern: /{/})
+export const MatrixRParen = createToken({name: 'MatrixRParen', pattern: /}/})
+export const MatrixRowSep = createToken({name: 'MatrixRowSep', pattern: /;/})
+export const MatrixColSep = createToken({name: 'MatrixColSep', pattern: /,/})
+
+/* procedures */
 export const ProcedureName = createToken({name: 'ProcedureName', pattern: /([A-Za-z\u00C0-\u02AF][A-Za-z0-9\u00C0-\u02AF._]*)\(/})
 
 /* named expressions */
@@ -104,7 +111,17 @@ export const buildLexerConfig = (config: ParserConfig): ILexerConfig => {
   const functionMapping = config.translationPackage.buildFunctionMapping()
 
   /* configurable tokens */
-  const ArgSeparator = createToken({name: 'ArgSeparator', pattern: config.functionArgSeparator})
+  let ArgSeparator, inject: TokenType[]
+  if(config.functionArgSeparator === ',') {
+    ArgSeparator = MatrixColSep
+    inject = []
+  } else if(config.functionArgSeparator === ';') {
+    ArgSeparator = MatrixRowSep
+    inject = []
+  } else {
+    ArgSeparator = createToken({name: 'ArgSeparator', pattern: config.functionArgSeparator})
+    inject = [ArgSeparator]
+  }
   const NumberLiteral = createToken({name: 'NumberLiteral', pattern: new RegExp(`(([${config.decimalSeparator}]\\d+)|(\\d+([${config.decimalSeparator}]\\d*)?))(e[+-]?\\d+)?`)})
   const OffsetProcedureName = createToken({name: 'OffsetProcedureName', pattern: new RegExp(offsetProcedureNameLiteral, 'i')})
 
@@ -125,10 +142,12 @@ export const buildLexerConfig = (config: ParserConfig): ILexerConfig => {
     LessThanOp,
     LParen,
     RParen,
+    MatrixLParen,
+    MatrixRParen,
     OffsetProcedureName,
     ProcedureName,
     RangeSeparator,
-    ArgSeparator,
+      ...inject,
     ColumnRange,
     RowRange,
     NumberLiteral,
@@ -140,6 +159,8 @@ export const buildLexerConfig = (config: ParserConfig): ILexerConfig => {
     MultiplicationOp,
     CellReference,
     NamedExpression,
+    MatrixRowSep,
+    MatrixColSep,
   ]
 
   return {
