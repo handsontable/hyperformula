@@ -12,6 +12,7 @@ import {MatrixVertex, ValueCellVertex} from '../index'
 import {CellVertex} from '../Vertex'
 import {ChooseAddressMapping} from './ChooseAddressMappingPolicy'
 import {IAddressMappingStrategy} from './IAddressMappingStrategy'
+import {Sheet, SheetBoundaries} from '../../Sheet'
 
 export class AddressMapping {
   private mapping: Map<number, IAddressMappingStrategy> = new Map()
