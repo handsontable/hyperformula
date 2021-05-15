@@ -116,6 +116,30 @@ describe('Matrix size check tests', () => {
     const size = matrixSizePredictor.checkMatrixSize(ast, adr('A1'))
     expect(size).toEqual(new MatrixSize(2, 3))
   })
+
+  it('check matrix parsing #1', () => {
+    const parser = buildEmptyParserWithCaching(config)
+    const ast = parser.parse('={1,2,3;4,5,6}', simpleCellAddress(0, 0, 0)).ast
+
+    const size = matrixSizePredictor.checkMatrixSize(ast, adr('A1'))
+    expect(size).toEqual(new MatrixSize(3, 2))
+  })
+
+  it('check matrix parsing #2', () => {
+    const parser = buildEmptyParserWithCaching(config)
+    const ast = parser.parse('={{1;2},{3;4}}', simpleCellAddress(0, 0, 0)).ast
+
+    const size = matrixSizePredictor.checkMatrixSize(ast, adr('A1'))
+    expect(size).toEqual(new MatrixSize(2, 2))
+  })
+
+  it('check matrix parsing #3', () => {
+    const parser = buildEmptyParserWithCaching(config)
+    const ast = parser.parse('={1,{2,3},4;{5;6},{7,8;9,10},{11;12};13,{14,15},16}', simpleCellAddress(0, 0, 0)).ast
+
+    const size = matrixSizePredictor.checkMatrixSize(ast, adr('A1'))
+    expect(size).toEqual(new MatrixSize(4, 4))
+  })
 })
 
 describe('Matrix size check tests, with different config', () => {

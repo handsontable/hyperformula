@@ -226,6 +226,9 @@ export class Interpreter {
       case AstNodeType.PARENTHESIS: {
         return this.evaluateAst(ast.expression, state)
       }
+      case AstNodeType.MATRIX: {
+
+      }
       case AstNodeType.ERROR_WITH_RAW_INPUT:
       case AstNodeType.ERROR: {
         return ast.error
