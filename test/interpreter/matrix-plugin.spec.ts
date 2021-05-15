@@ -257,14 +257,6 @@ describe('Function TRANSPOSE', () => {
     expect(engine.getCellValue(adr('B1'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
   })
 
-  it('transpose returns VALUE when wrong type', () => {
-    const engine = HyperFormula.buildFromArray([
-      ['=TRANSPOSE("fdsa")'],
-    ])
-
-    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.NumberRange))
-  })
-
   it('transpose without braces', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '2'],
