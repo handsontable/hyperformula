@@ -216,7 +216,7 @@ export class ParserWithCaching {
       }
       case AstNodeType.MATRIX: {
         const args = ast.args.map(row => row.map(val => this.computeHashOfAstNode(val)).join(',')).join(';')
-        return imageWithWhitespace('{'+args+imageWithWhitespace('}', ast.internalWhitespace),ast.leadingWhitespace)
+        return imageWithWhitespace('{'+args+imageWithWhitespace('}', ast.internalWhitespace), ast.leadingWhitespace)
       }
       case AstNodeType.PARENTHESIS: {
         const expression = this.computeHashOfAstNode(ast.expression)
