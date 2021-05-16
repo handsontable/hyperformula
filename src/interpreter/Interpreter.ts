@@ -231,10 +231,10 @@ export class Interpreter {
       case AstNodeType.MATRIX: {
         let totalWidth: Maybe<number> = undefined
         const ret: InternalScalarValue[][] = []
-        for(let astRow of ast.args) {
+        for(const astRow of ast.args) {
           let rowHeight: Maybe<number> = undefined
           const rowRet: InternalScalarValue[][] = []
-          for(let astIt of astRow) {
+          for(const astIt of astRow) {
             const arr = coerceToRange(this.evaluateAst(astIt, state))
             const height = arr.height()
             if(rowHeight===undefined) {
@@ -245,7 +245,7 @@ export class Interpreter {
                 rowRet[i].push(...arr.data[i])
               }
             } else {
-              return new CellError(ErrorType.REF,ErrorMessage.SizeMismatch)
+              return new CellError(ErrorType.REF, ErrorMessage.SizeMismatch)
             }
           }
           const width = rowRet[0].length
@@ -255,7 +255,7 @@ export class Interpreter {
           } else if(totalWidth === width) {
             ret.push(...rowRet)
           } else {
-            return new CellError(ErrorType.REF,ErrorMessage.SizeMismatch)
+            return new CellError(ErrorType.REF, ErrorMessage.SizeMismatch)
           }
         }
         return SimpleRangeValue.onlyValues(ret)
