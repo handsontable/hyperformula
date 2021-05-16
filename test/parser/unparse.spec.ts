@@ -582,8 +582,17 @@ describe('whitespaces', () => {
     expect(unparsed).toEqual(formula)
   })
 
-  it('should unparse empty argument with whiatespaces', () => {
+  it('should unparse empty argument with whitespaces', () => {
     const formula = '=PV(1,2,3,   ,)'
+    const ast = parser.parse(formula, adr('A1')).ast
+
+    const unparsed = unparser.unparse(ast, adr('A1'))
+
+    expect(unparsed).toEqual(formula)
+  })
+
+  it('should unparse arrays with whitespaces', () => {
+    const formula = '= {  1,   2;    3,     4   }'
     const ast = parser.parse(formula, adr('A1')).ast
 
     const unparsed = unparser.unparse(ast, adr('A1'))

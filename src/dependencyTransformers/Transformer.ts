@@ -70,14 +70,12 @@ export abstract class Transformer implements FormulaTransformer {
       case AstNodeType.PLUS_UNARY_OP: {
         return {
           ...ast,
-          type: ast.type,
           value: this.transformAst(ast.value, address),
         }
       }
       case AstNodeType.FUNCTION_CALL: {
         return {
           ...ast,
-          type: ast.type,
           procedureName: ast.procedureName,
           args: ast.args.map((arg) => this.transformAst(arg, address)),
         }
@@ -85,14 +83,18 @@ export abstract class Transformer implements FormulaTransformer {
       case AstNodeType.PARENTHESIS: {
         return {
           ...ast,
-          type: ast.type,
           expression: this.transformAst(ast.expression, address),
+        }
+      }
+      case AstNodeType.MATRIX: {
+        return {
+          ...ast,
+          args: ast.args.map((row) => row.map(val => this.transformAst(val, address)))
         }
       }
       default: {
         return {
           ...ast,
-          type: ast.type,
           left: this.transformAst(ast.left, address),
           right: this.transformAst(ast.right, address),
         } as Ast

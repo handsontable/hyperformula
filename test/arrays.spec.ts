@@ -212,3 +212,25 @@ describe('range interpolation', () => {
     expect(engine.getCellValue(adr('A1', 1))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.ScalarExpected))
   })
 })
+
+describe('array parsing', () => {
+  it('simple array', () => {
+    const engine = HyperFormula.buildFromArray([['={1,2;3,4}']])
+    expect(engine.getSheetValues(0)).toEqual([[1,2],[3,4]])
+  })
+
+  it('nested arrays', () => {
+    const engine = HyperFormula.buildFromArray([['={1,{2,3},4;{5;6},{7,8;9,10},{11;12};13,{14,15},16}']])
+    expect(engine.getSheetValues(0)).toEqual([[1,2,3,4],[5,7,8,11],[6,9,10,12],[13,14,15,16]])
+  })
+
+  it('size mismatch', () => {
+    const engine = HyperFormula.buildFromArray([['={1,2;3}']])
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.REF,ErrorMessage.SizeMismatch))
+  })
+
+  it('nested with ops', () => {
+    const engine = HyperFormula.buildFromArray([['=ARRAYFORMULA({1,{2,3}+{0,0},4;{5;6},2*{7,8;9,10},-{11;12};13,{14,15},16})']])
+    expect(engine.getSheetValues(0)).toEqual([[1,2,3,4],[5,14,16,-11],[6,18,20,-12],[13,14,15,16]])
+  })
+})

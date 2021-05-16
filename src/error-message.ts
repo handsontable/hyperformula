@@ -70,6 +70,7 @@ export class ErrorMessage {
   public static WrongOrder = 'Wrong order of values.'
   public static ComplexNumberExpected = 'Complex number expected.'
   public static ShouldBeIorJ = 'Should be \'i\' or \'j\'.'
+  public static SizeMismatch = 'Array dimensions mismatched.'
   public static FunctionName = (arg: string) => `Function name ${arg} not recognized.`
   public static NamedExpressionName = (arg: string) => `Named expression ${arg} not recognized.`
   public static LicenseKey = (arg: string) => `License key is ${arg}.`

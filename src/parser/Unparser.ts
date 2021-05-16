@@ -97,6 +97,10 @@ export class Unparser {
         const rightPart = '(' + expression + imageWithWhitespace(')', ast.internalWhitespace)
         return imageWithWhitespace(rightPart, ast.leadingWhitespace)
       }
+      case AstNodeType.MATRIX: {
+        const ret = '{'+ast.args.map(row => row.map(val => this.unparseAst(val, address)).join(',')).join(';') + imageWithWhitespace('}', ast.internalWhitespace)
+        return imageWithWhitespace(ret, ast.leadingWhitespace)
+      }
       default: {
         const left = this.unparseAst(ast.left, address)
         const right = this.unparseAst(ast.right, address)

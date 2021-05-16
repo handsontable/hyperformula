@@ -55,7 +55,7 @@ import {
   buildStringAst,
   buildTimesOpAst,
   CellReferenceAst,
-  ErrorAst,
+  ErrorAst, MatrixAst,
   parsingError,
   ParsingError,
   ParsingErrorType,
@@ -721,10 +721,10 @@ export class FormulaParser extends EmbeddedActionsParser {
     return this.OR([
       {
         ALT: () => {
-          this.CONSUME(MatrixLParen)
-          const ret = this.SUBRULE(this.insideMatrixExpression)
-          this.CONSUME(MatrixRParen)
-          return ret
+          const ltoken = this.CONSUME(MatrixLParen) as IExtendedToken
+          const ret = this.SUBRULE(this.insideMatrixExpression) as MatrixAst
+          const rtoken = this.CONSUME(MatrixRParen) as IExtendedToken
+          return buildMatrixAst(ret.args,ltoken.leadingWhitespace, rtoken.leadingWhitespace)
         }
       },
       {

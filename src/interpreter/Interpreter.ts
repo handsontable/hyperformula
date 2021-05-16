@@ -13,6 +13,7 @@ import {ErrorMessage} from '../error-message'
 import {LicenseKeyValidityState} from '../helpers/licenseKeyValidator'
 import {ColumnSearchStrategy} from '../Lookup/SearchStrategy'
 import {Matrix, NotComputedMatrix} from '../Matrix'
+import {Maybe} from '../Maybe'
 import {NamedExpressions} from '../NamedExpressions'
 import {NumberLiteralHelper} from '../NumberLiteralHelper'
 // noinspection TypeScriptPreferShortImport
@@ -23,6 +24,7 @@ import {
   ArithmeticHelper,
   coerceRangeToScalar,
   coerceScalarToString,
+  coerceToRange,
   fixNegativeZero,
   isNumberOverflow
 } from './ArithmeticHelper'
@@ -227,7 +229,36 @@ export class Interpreter {
         return this.evaluateAst(ast.expression, state)
       }
       case AstNodeType.MATRIX: {
-
+        let totalWidth: Maybe<number> = undefined
+        const ret: InternalScalarValue[][] = []
+        for(let astRow of ast.args) {
+          let rowHeight: Maybe<number> = undefined
+          const rowRet: InternalScalarValue[][] = []
+          for(let astIt of astRow) {
+            const arr = coerceToRange(this.evaluateAst(astIt, state))
+            const height = arr.height()
+            if(rowHeight===undefined) {
+              rowHeight = height
+              rowRet.push(...arr.data)
+            } else if(rowHeight === height) {
+              for(let i=0;i<height;i++) {
+                rowRet[i].push(...arr.data[i])
+              }
+            } else {
+              return new CellError(ErrorType.REF,ErrorMessage.SizeMismatch)
+            }
+          }
+          const width = rowRet[0].length
+          if(totalWidth===undefined) {
+            totalWidth = width
+            ret.push(...rowRet)
+          } else if(totalWidth === width) {
+            ret.push(...rowRet)
+          } else {
+            return new CellError(ErrorType.REF,ErrorMessage.SizeMismatch)
+          }
+        }
+        return SimpleRangeValue.onlyValues(ret)
       }
       case AstNodeType.ERROR_WITH_RAW_INPUT:
       case AstNodeType.ERROR: {
