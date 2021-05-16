@@ -90,5 +90,8 @@ export const doesContainFunctions = (ast: Ast, functionCriterion: (functionId: s
         doesContainFunctions(arg, functionCriterion)
       )
     }
+    case AstNodeType.MATRIX: {
+      return ast.args.some(row => row.some(arg => doesContainFunctions(arg, functionCriterion)))
+    }
   }
 }
