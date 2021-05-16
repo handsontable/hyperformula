@@ -165,19 +165,34 @@ describe('coercion of array to scalar', () => {
     expect(engine.getCellValue(adr('D1'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.WrongType))
   })
 
-  it('ad-hoc array + function', () => {
+  it('ad-hoc array + function #1', () => {
     const engine = HyperFormula.buildFromArray([[0, 2, 3], ['=SIN(ARRAYFORMULA(2*A1:C1))']])
     expect(engine.getCellValue(adr('A2'))).toEqual(0)
   })
 
-  it('ad-hoc array + binary op', () => {
-    const engine = HyperFormula.buildFromArray([[1, 2, 3], ['=ARRAYFORMULA(2*A1:C1)+ARRAYFORMULA(2*A1:C1)']])
-    expect(engine.getCellValue(adr('A2'))).toEqual(4)
+  it('ad-hoc array + function #2', () => {
+    const engine = HyperFormula.buildFromArray([['=SIN({0,2,3})']])
+    expect(engine.getCellValue(adr('A1'))).toEqual(0)
   })
 
-  it('ad-hoc array + unary op', () => {
+  it('ad-hoc array + binary op #1', () => {
+    const engine = HyperFormula.buildFromArray([[1, 2, 3], ['=ARRAYFORMULA(2*A1:C1)+ARRAYFORMULA(2*A1:C1)']])
+    expect(engine.getSheetValues(0)).toEqual([[1,2,3],[4]])
+  })
+
+  it('ad-hoc array + binary op #2', () => {
+    const engine = HyperFormula.buildFromArray([['={1,2,3}+{1,2,3}']])
+    expect(engine.getSheetValues(0)).toEqual([[2]])
+  })
+
+  it('ad-hoc array + unary op #1', () => {
     const engine = HyperFormula.buildFromArray([[1, 2, 3], ['=-ARRAYFORMULA(2*A1:C1)']])
-    expect(engine.getCellValue(adr('A2'))).toEqual(-2)
+    expect(engine.getSheetValues(0)).toEqual([[1,2,3],[-2]])
+  })
+
+  it('ad-hoc array + unary op #2', () => {
+    const engine = HyperFormula.buildFromArray([['=-{1,2,3}']])
+    expect(engine.getSheetValues(0)).toEqual([[-1]])
   })
 })
 
