@@ -291,7 +291,7 @@ export abstract class FunctionPlugin implements FunctionPluginTypecheck<Function
     state: InterpreterState,
     functionDefinition: FunctionArguments,
     fn: (...arg: any) => InternalScalarValue
-  ) => {
+  ): InternalScalarValue => {
     return this.runFunctionTemplate(args, state, functionDefinition, fn)
   }
 
@@ -300,7 +300,7 @@ export abstract class FunctionPlugin implements FunctionPluginTypecheck<Function
     state: InterpreterState,
     functionDefinition: FunctionArguments,
     fn: (...arg: any) => InterpreterValue
-  ) => {
+  ): InterpreterValue => {
     return this.runFunctionTemplate(args, state, functionDefinition, fn)
   }
 
@@ -310,7 +310,7 @@ export abstract class FunctionPlugin implements FunctionPluginTypecheck<Function
     functionDefinition: FunctionArguments,
     fn: (...arg: any) => any
   ) => {
-    const argumentDefinitions: FunctionArgument[] = functionDefinition.parameters!
+    let argumentDefinitions: FunctionArgument[] = functionDefinition.parameters!
     let scalarValues: [InterpreterValue, boolean][]
 
     if (functionDefinition.expandRanges) {
@@ -325,20 +325,19 @@ export abstract class FunctionPlugin implements FunctionPluginTypecheck<Function
     if (functionDefinition.repeatLastArgs === undefined && argumentDefinitions.length < scalarValues.length) {
       return new CellError(ErrorType.NA, ErrorMessage.WrongArgNumber)
     }
-    if (functionDefinition.repeatLastArgs !== undefined && scalarValues.length > argumentDefinitions.length &&
+    if (functionDefinition.repeatLastArgs !== undefined && argumentDefinitions.length < scalarValues.length &&
       (scalarValues.length - argumentDefinitions.length) % functionDefinition.repeatLastArgs !== 0) {
       return new CellError(ErrorType.NA, ErrorMessage.WrongArgNumber)
     }
-    for (let i = 0, j = 0; i < Math.max(scalarValues.length, argumentDefinitions.length); i++, j++) {
-      // i points to where are we in the scalarValues list,
-      // j points to where are we in the argumentDefinitions list
-      if (j === argumentDefinitions.length) {
-        j -= functionDefinition.repeatLastArgs!
-      }
+    argumentDefinitions = [...argumentDefinitions]
+    while(argumentDefinitions.length < scalarValues.length) {
+      argumentDefinitions.push(...argumentDefinitions.slice(argumentDefinitions.length-functionDefinition.repeatLastArgs!))
+    }
+    for (let i = 0; i < argumentDefinitions.length; i++) {
       const [val, ignorable] = scalarValues[i] ?? [undefined, undefined]
-      const arg = val ?? argumentDefinitions[j]?.defaultValue
+      const arg = val ?? argumentDefinitions[i]?.defaultValue
       if (arg === undefined) {
-        if (argumentDefinitions[j]?.optionalArg) {
+        if (argumentDefinitions[i]?.optionalArg) {
           coercedArguments.push(undefined)
         } else {
           //not enough values passed as arguments, and there was no default value and argument was not optional
@@ -346,9 +345,9 @@ export abstract class FunctionPlugin implements FunctionPluginTypecheck<Function
         }
       } else {
         //we apply coerce only to non-default values
-        const coercedArg = val !== undefined ? this.coerceToType(arg, argumentDefinitions[j], state) : arg
+        const coercedArg = val !== undefined ? this.coerceToType(arg, argumentDefinitions[i], state) : arg
         if (coercedArg !== undefined) {
-          if (coercedArg instanceof CellError && argumentDefinitions[j].argumentType !== ArgumentTypes.SCALAR) {
+          if (coercedArg instanceof CellError && argumentDefinitions[i].argumentType !== ArgumentTypes.SCALAR) {
             //if this is first error encountered, store it
             argCoerceFailure = argCoerceFailure ?? coercedArg
           }
