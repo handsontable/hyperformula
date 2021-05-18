@@ -7,7 +7,7 @@ import {CellError, ErrorType} from '../../Cell'
 import {ErrorMessage} from '../../error-message'
 import {ProcedureAst} from '../../parser'
 import {InterpreterState} from '../InterpreterState'
-import {InternalScalarValue} from '../InterpreterValue'
+import {InternalScalarValue, InterpreterValue} from '../InterpreterValue'
 import {ArgumentTypes, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
 
 const MAX_48BIT_INTEGER = 281474976710655
@@ -32,11 +32,11 @@ export class BitShiftPlugin extends FunctionPlugin implements FunctionPluginType
     },
   }
 
-  public bitlshift(ast: ProcedureAst, state: InterpreterState): InternalScalarValue  {
+  public bitlshift(ast: ProcedureAst, state: InterpreterState): InterpreterValue  {
     return this.runFunction(ast.args, state, this.metadata('BITLSHIFT'), shiftLeft)
   }
 
-  public bitrshift(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public bitrshift(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('BITRSHIFT'), shiftRight)
   }
 }

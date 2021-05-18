@@ -7,7 +7,7 @@ import {CellError, ErrorType} from '../../Cell'
 import {ErrorMessage} from '../../error-message'
 import {ProcedureAst} from '../../parser'
 import {InterpreterState} from '../InterpreterState'
-import {InternalScalarValue, RawScalarValue} from '../InterpreterValue'
+import {InternalScalarValue, InterpreterValue, RawScalarValue} from '../InterpreterValue'
 import {ArgumentTypes, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
 
 /**
@@ -152,7 +152,7 @@ export class TextPlugin extends FunctionPlugin implements FunctionPluginTypechec
    * @param ast
    * @param state
    */
-  public concatenate(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public concatenate(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('CONCATENATE'), (...args) => {
       return ''.concat(...args)
     })
@@ -166,7 +166,7 @@ export class TextPlugin extends FunctionPlugin implements FunctionPluginTypechec
    * @param ast
    * @param state
    */
-  public split(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public split(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('SPLIT'), (stringToSplit: string, indexToUse: number) => {
       const splittedString = stringToSplit.split(' ')
 
@@ -178,44 +178,44 @@ export class TextPlugin extends FunctionPlugin implements FunctionPluginTypechec
     })
   }
 
-  public len(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public len(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('LEN'), (arg: string) => {
       return arg.length
     })
   }
 
-  public lower(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public lower(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('LOWER'), (arg: string) => {
       return arg.toLowerCase()
     })
   }
 
-  public trim(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public trim(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('TRIM'), (arg: string) => {
       return arg.replace(/^ +| +$/g, '').replace(/ +/g, ' ')
     })
   }
 
-  public proper(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public proper(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('PROPER'), (arg: string) => {
       return arg.replace(/\w\S*/g, word => word.charAt(0).toUpperCase() + word.substring(1).toLowerCase())
     })
   }
 
-  public clean(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public clean(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('CLEAN'), (arg: string) => {
       // eslint-disable-next-line no-control-regex
       return arg.replace(/[\u0000-\u001F]/g, '')
     })
   }
 
-  public exact(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public exact(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('EXACT'), (left: string, right: string) => {
       return left === right
     })
   }
 
-  public rept(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public rept(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('REPT'), (text: string, count: number) => {
       if (count < 0) {
         return new CellError(ErrorType.VALUE, ErrorMessage.NegativeCount)
@@ -224,7 +224,7 @@ export class TextPlugin extends FunctionPlugin implements FunctionPluginTypechec
     })
   }
 
-  public right(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public right(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('RIGHT'), (text: string, length: number) => {
       if (length < 0) {
         return new CellError(ErrorType.VALUE, ErrorMessage.NegativeLength)
@@ -235,7 +235,7 @@ export class TextPlugin extends FunctionPlugin implements FunctionPluginTypechec
     })
   }
 
-  public left(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public left(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('LEFT'), (text: string, length: number) => {
       if (length < 0) {
         return new CellError(ErrorType.VALUE, ErrorMessage.NegativeLength)
@@ -244,7 +244,7 @@ export class TextPlugin extends FunctionPlugin implements FunctionPluginTypechec
     })
   }
 
-  public mid(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public mid(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('MID'), (text: string, startPosition: number, numberOfChars: number) => {
       if (startPosition < 1) {
         return new CellError(ErrorType.VALUE, ErrorMessage.LessThanOne)
@@ -256,7 +256,7 @@ export class TextPlugin extends FunctionPlugin implements FunctionPluginTypechec
     })
   }
 
-  public replace(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public replace(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('REPLACE'), (text: string, startPosition: number, numberOfChars: number, newText: string) => {
       if (startPosition < 1) {
         return new CellError(ErrorType.VALUE, ErrorMessage.LessThanOne)
@@ -268,7 +268,7 @@ export class TextPlugin extends FunctionPlugin implements FunctionPluginTypechec
     })
   }
 
-  public search(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public search(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('SEARCH'), (pattern, text: string, startIndex: number) => {
       if (startIndex < 1 || startIndex > text.length) {
         return new CellError(ErrorType.VALUE, ErrorMessage.LengthBounds)
@@ -288,7 +288,7 @@ export class TextPlugin extends FunctionPlugin implements FunctionPluginTypechec
     })
   }
 
-  public substitute(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public substitute(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('SUBSTITUTE'), (text: string, oldText: string, newText: string, occurrence: number | undefined) => {
       const oldTextRegexp = new RegExp(oldText, 'g')
 
@@ -312,7 +312,7 @@ export class TextPlugin extends FunctionPlugin implements FunctionPluginTypechec
     })
   }
 
-  public find(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public find(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('FIND'), (pattern, text: string, startIndex: number) => {
       if (startIndex < 1 || startIndex > text.length) {
         return new CellError(ErrorType.VALUE, ErrorMessage.IndexBounds)
@@ -325,7 +325,7 @@ export class TextPlugin extends FunctionPlugin implements FunctionPluginTypechec
     })
   }
 
-  public t(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public t(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('T'), (arg: RawScalarValue) => {
       if (arg instanceof CellError) {
         return arg
@@ -334,7 +334,7 @@ export class TextPlugin extends FunctionPlugin implements FunctionPluginTypechec
     })
   }
 
-  public upper(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public upper(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('UPPER'), (arg: string) => {
       return arg.toUpperCase()
     })

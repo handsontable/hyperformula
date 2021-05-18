@@ -69,7 +69,8 @@ export class BooleanPlugin extends FunctionPlugin implements FunctionPluginTypec
           {argumentType: ArgumentTypes.SCALAR, passSubtype: true},
           {argumentType: ArgumentTypes.SCALAR, passSubtype: true},
         ],
-        repeatLastArgs: 1,
+      repeatLastArgs: 1,
+      vectorizationForbidden: true,
     },
     'IFERROR': {
       method: 'iferror',
@@ -103,7 +104,7 @@ export class BooleanPlugin extends FunctionPlugin implements FunctionPluginTypec
    * @param ast
    * @param state
    */
-  public literalTrue(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public literalTrue(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('TRUE'), () => true)
   }
 
@@ -115,7 +116,7 @@ export class BooleanPlugin extends FunctionPlugin implements FunctionPluginTypec
    * @param ast
    * @param state
    */
-  public literalFalse(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public literalFalse(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('FALSE'), () => false)
   }
 
@@ -141,7 +142,7 @@ export class BooleanPlugin extends FunctionPlugin implements FunctionPluginTypec
    * @param ast
    * @param state
    */
-  public and(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public and(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('AND'),
       (...args) => !args.some((arg: boolean) => !arg)
     )
@@ -155,17 +156,17 @@ export class BooleanPlugin extends FunctionPlugin implements FunctionPluginTypec
    * @param ast
    * @param state
    */
-  public or(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public or(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('OR'),
       (...args) => args.some((arg: boolean) => arg)
     )
   }
 
-  public not(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public not(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('NOT'), (arg) => !arg)
   }
 
-  public xor(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public xor(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('XOR'), (...args) => {
       let cnt = 0
       args.forEach((arg: boolean) => {
@@ -177,8 +178,8 @@ export class BooleanPlugin extends FunctionPlugin implements FunctionPluginTypec
     })
   }
 
-  public switch(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
-    return this.runMatrixFunction(ast.args, state, this.metadata('SWITCH'), (selectorArr: SimpleRangeValue, ...args) => {
+  public switch(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('SWITCH'), (selectorArr: SimpleRangeValue, ...args) => {
       const n = args.length
       const ret: InternalScalarValue[][] = []
       for(const row of selectorArr.data) {
@@ -207,7 +208,7 @@ export class BooleanPlugin extends FunctionPlugin implements FunctionPluginTypec
     })
   }
 
-  public iferror(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public iferror(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('IFERROR'), (arg1: InternalScalarValue, arg2: InternalScalarValue) => {
       if (arg1 instanceof CellError) {
         return arg2
@@ -217,7 +218,7 @@ export class BooleanPlugin extends FunctionPlugin implements FunctionPluginTypec
     })
   }
 
-  public ifna(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public ifna(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('IFNA'), (arg1: InternalScalarValue, arg2: InternalScalarValue) => {
       if (arg1 instanceof CellError && arg1.type === ErrorType.NA) {
         return arg2
@@ -227,7 +228,7 @@ export class BooleanPlugin extends FunctionPlugin implements FunctionPluginTypec
     })
   }
 
-  public choose(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public choose(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('CHOOSE'), (selector, ...args) => {
       if (selector > args.length) {
         return new CellError(ErrorType.NUM, ErrorMessage.Selector)

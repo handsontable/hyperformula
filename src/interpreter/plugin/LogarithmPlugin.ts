@@ -5,7 +5,7 @@
 
 import {ProcedureAst} from '../../parser'
 import {InterpreterState} from '../InterpreterState'
-import {InternalScalarValue} from '../InterpreterValue'
+import {InternalScalarValue, InterpreterValue} from '../InterpreterValue'
 import {ArgumentTypes, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
 
 export class LogarithmPlugin extends FunctionPlugin implements FunctionPluginTypecheck<LogarithmPlugin>{
@@ -32,17 +32,17 @@ export class LogarithmPlugin extends FunctionPlugin implements FunctionPluginTyp
     },
   }
 
-  public log10(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public log10(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('LOG10'), Math.log10)
   }
 
-  public log(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public log(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('LOG'),
       (arg: number, base: number) => Math.log(arg) / Math.log(base)
     )
   }
 
-  public ln(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public ln(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('LN'), Math.log)
   }
 }

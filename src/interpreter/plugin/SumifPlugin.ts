@@ -9,7 +9,7 @@ import {Maybe} from '../../Maybe'
 import {ProcedureAst} from '../../parser'
 import {Condition, CriterionFunctionCompute} from '../CriterionFunctionCompute'
 import {InterpreterState} from '../InterpreterState'
-import {getRawValue, InternalScalarValue, isExtendedNumber, RawScalarValue} from '../InterpreterValue'
+import {getRawValue, InternalScalarValue, InterpreterValue, isExtendedNumber, RawScalarValue} from '../InterpreterValue'
 import {SimpleRangeValue} from '../SimpleRangeValue'
 import {ArgumentTypes, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
 
@@ -113,7 +113,7 @@ export class SumifPlugin extends FunctionPlugin implements FunctionPluginTypeche
    * @param ast
    * @param state
    */
-  public sumif(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public sumif(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('SUMIF'),
       (conditionArg: SimpleRangeValue, criterionValue: RawScalarValue, valuesArg: Maybe<SimpleRangeValue>) => {
         const criterion = this.interpreter.criterionBuilder.fromCellValue(criterionValue, this.interpreter.arithmeticHelper)
@@ -134,7 +134,7 @@ export class SumifPlugin extends FunctionPlugin implements FunctionPluginTypeche
     )
   }
 
-  public sumifs(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public sumifs(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('SUMIFS'), (values: SimpleRangeValue, ...args) => {
       const conditions: Condition[] = []
       for (let i = 0; i < args.length; i += 2) {
@@ -156,7 +156,7 @@ export class SumifPlugin extends FunctionPlugin implements FunctionPluginTypeche
     })
   }
 
-  public averageif(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public averageif(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('AVERAGEIF'),
       (conditionArg: SimpleRangeValue, criterionValue: RawScalarValue, valuesArg: Maybe<SimpleRangeValue>) => {
         const criterion = this.interpreter.criterionBuilder.fromCellValue(criterionValue, this.interpreter.arithmeticHelper)
@@ -199,7 +199,7 @@ export class SumifPlugin extends FunctionPlugin implements FunctionPluginTypeche
    * @param ast
    * @param state
    */
-  public countif(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public countif(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('COUNTIF'),
       (conditionArg: SimpleRangeValue, criterionValue: RawScalarValue) => {
         const criterion = this.interpreter.criterionBuilder.fromCellValue(criterionValue, this.interpreter.arithmeticHelper)
@@ -218,7 +218,7 @@ export class SumifPlugin extends FunctionPlugin implements FunctionPluginTypeche
     )
   }
 
-  public countifs(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public countifs(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('COUNTIFS'), (...args) => {
       const conditions: Condition[] = []
       for (let i = 0; i < args.length; i += 2) {

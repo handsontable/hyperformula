@@ -8,7 +8,7 @@ import {ErrorMessage} from '../../error-message'
 import {ProcedureAst} from '../../parser'
 import {coerceComplexToString, complex} from '../ArithmeticHelper'
 import {InterpreterState} from '../InterpreterState'
-import {InternalScalarValue, RawInterpreterValue} from '../InterpreterValue'
+import {InternalScalarValue, InterpreterValue, RawInterpreterValue} from '../InterpreterValue'
 import {ArgumentTypes, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
 
 export class ComplexPlugin extends  FunctionPlugin implements FunctionPluginTypecheck<ComplexPlugin>{
@@ -178,7 +178,7 @@ export class ComplexPlugin extends  FunctionPlugin implements FunctionPluginType
     },
   }
 
-  public complex(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public complex(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('COMPLEX'),
       (re: number, im: number, unit: string) => {
         if(unit !== 'i' && unit !== 'j') {
@@ -189,23 +189,23 @@ export class ComplexPlugin extends  FunctionPlugin implements FunctionPluginType
     )
   }
 
-  public imabs(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public imabs(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('IMABS'), abs)
   }
 
-  public imaginary(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public imaginary(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('IMAGINARY'),
       ([re, im]: complex) => im
     )
   }
 
-  public imreal(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public imreal(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('IMREAL'),
       ([re, im]: complex) => re
     )
   }
 
-  public imargument(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public imargument(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('IMARGUMENT'),
       ([re, im]: complex) => {
         if(re===0 && im===0) {
@@ -216,79 +216,79 @@ export class ComplexPlugin extends  FunctionPlugin implements FunctionPluginType
     )
   }
 
-  public imconjugate(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public imconjugate(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('IMCONJUGATE'),
       ([re, im]: complex) => coerceComplexToString([re, -im])
     )
   }
 
-  public imcos(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public imcos(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('IMCOS'),
       (arg: complex) => coerceComplexToString(cos(arg))
     )
   }
 
-  public imcosh(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public imcosh(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('IMCOSH'),
       (arg: complex) => coerceComplexToString(cosh(arg))
     )
   }
 
-  public imcot(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public imcot(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('IMCOT'),
       (arg: complex) => coerceComplexToString(div(cos(arg), sin(arg)))
     )
   }
 
-  public imcsc(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public imcsc(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('IMCSC'),
       (arg: complex) => coerceComplexToString(div([1, 0], sin(arg)))
     )
   }
 
-  public imcsch(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public imcsch(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('IMCSCH'),
       (arg: complex) => coerceComplexToString(div([1, 0], sinh(arg)))
     )
   }
 
-  public imsec(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public imsec(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('IMSEC'),
       (arg: complex) => coerceComplexToString(div([1, 0], cos(arg)))
     )
   }
 
-  public imsech(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public imsech(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('IMSECH'),
       (arg: complex) => coerceComplexToString(div([1, 0], cosh(arg)))
     )
   }
 
-  public imsin(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public imsin(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('IMSIN'),
       (arg: complex) => coerceComplexToString(sin(arg))
     )
   }
 
-  public imsinh(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public imsinh(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('IMSINH'),
       (arg: complex) => coerceComplexToString(sinh(arg))
     )
   }
 
-  public imtan(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public imtan(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('IMTAN'),
       (arg: complex) => coerceComplexToString(div(sin(arg), cos(arg)))
     )
   }
 
-  public imdiv(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public imdiv(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('IMDIV'),
       (arg1: complex, arg2: complex) => coerceComplexToString(div(arg1, arg2))
     )
   }
 
-  public improduct(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public improduct(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('IMPRODUCT'),
       (...args: RawInterpreterValue[]) => {
         const coerced = this.interpreter.arithmeticHelper.coerceComplexExactRanges(args)
@@ -304,7 +304,7 @@ export class ComplexPlugin extends  FunctionPlugin implements FunctionPluginType
     )
   }
 
-  public imsum(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public imsum(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('IMSUM'),
       (...args: RawInterpreterValue[]) => {
         const coerced = this.interpreter.arithmeticHelper.coerceComplexExactRanges(args)
@@ -320,25 +320,25 @@ export class ComplexPlugin extends  FunctionPlugin implements FunctionPluginType
     )
   }
 
-  public imsub(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public imsub(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('IMSUB'),
       (arg1: complex, arg2: complex) => coerceComplexToString(sub(arg1, arg2))
     )
   }
 
-  public imexp(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public imexp(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('IMEXP'),
       (arg: complex) => coerceComplexToString(exp(arg))
     )
   }
 
-  public imln(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public imln(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('IMLN'),
       (arg: complex) => coerceComplexToString(ln(arg))
     )
   }
 
-  public imlog10(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public imlog10(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('IMLOG10'),
       (arg: complex) => {
         const [re, im] = ln(arg)
@@ -348,7 +348,7 @@ export class ComplexPlugin extends  FunctionPlugin implements FunctionPluginType
     )
   }
 
-  public imlog2(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public imlog2(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('IMLOG2'),
       (arg: complex) => {
         const [re, im] = ln(arg)
@@ -358,13 +358,13 @@ export class ComplexPlugin extends  FunctionPlugin implements FunctionPluginType
     )
   }
 
-  public impower(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public impower(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('IMPOWER'),
       (arg: complex, n: number) => coerceComplexToString(power(arg, n))
     )
   }
 
-  public imsqrt(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public imsqrt(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('IMSQRT'),
       (arg: complex) => coerceComplexToString(power(arg, 0.5))
     )

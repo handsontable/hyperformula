@@ -7,7 +7,7 @@ import {CellError, ErrorType} from '../../Cell'
 import {ErrorMessage} from '../../error-message'
 import {ProcedureAst} from '../../parser'
 import {InterpreterState} from '../InterpreterState'
-import {InternalScalarValue, RawInterpreterValue} from '../InterpreterValue'
+import {InternalScalarValue, InterpreterValue, RawInterpreterValue} from '../InterpreterValue'
 import {SimpleRangeValue} from '../SimpleRangeValue'
 import {ArgumentTypes, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
 
@@ -113,7 +113,7 @@ export class MathPlugin extends FunctionPlugin implements FunctionPluginTypechec
     },
   }
 
-  public fact(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public fact(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('FACT'),
       (arg: number) => {
         arg = Math.trunc(arg)
@@ -125,7 +125,7 @@ export class MathPlugin extends FunctionPlugin implements FunctionPluginTypechec
       })
   }
 
-  public factdouble(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public factdouble(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('FACTDOUBLE'),
       (arg: number) => {
         arg = Math.trunc(arg)
@@ -138,7 +138,7 @@ export class MathPlugin extends FunctionPlugin implements FunctionPluginTypechec
     )
   }
 
-  public combin(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public combin(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('COMBIN'),
       (n: number, m: number) => {
         if(m>n) {
@@ -150,7 +150,7 @@ export class MathPlugin extends FunctionPlugin implements FunctionPluginTypechec
     })
   }
 
-  public combina(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public combina(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('COMBINA'),
       (n: number, m: number)  => {
         n = Math.trunc(n)
@@ -167,7 +167,7 @@ export class MathPlugin extends FunctionPlugin implements FunctionPluginTypechec
     )
   }
 
-  public gcd(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public gcd(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('GCD'),
       (...args: RawInterpreterValue[]) => {
         const processedArgs = this.interpreter.arithmeticHelper.coerceNumbersCoerceRangesDropNulls(args)
@@ -190,7 +190,7 @@ export class MathPlugin extends FunctionPlugin implements FunctionPluginTypechec
     )
   }
 
-  public lcm(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public lcm(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('LCM'),
       (...args: RawInterpreterValue[]) => {
         const processedArgs = this.interpreter.arithmeticHelper.coerceNumbersCoerceRangesDropNulls(args)
@@ -213,7 +213,7 @@ export class MathPlugin extends FunctionPlugin implements FunctionPluginTypechec
     )
   }
 
-  public mround(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public mround(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('MROUND'),
       (nom: number, denom: number) => {
         if(denom===0) {
@@ -227,7 +227,7 @@ export class MathPlugin extends FunctionPlugin implements FunctionPluginTypechec
     )
   }
 
-  public multinomial(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public multinomial(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('MULTINOMIAL'),
       (...args: number[]) => {
         let n = 0
@@ -247,7 +247,7 @@ export class MathPlugin extends FunctionPlugin implements FunctionPluginTypechec
     )
   }
 
-  public quotient(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public quotient(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('QUOTIENT'),
       (nom: number, denom: number) => {
         if(denom===0) {
@@ -258,7 +258,7 @@ export class MathPlugin extends FunctionPlugin implements FunctionPluginTypechec
     )
   }
 
-  public seriessum(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public seriessum(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('SERIESSUM'),
       (x: number, n: number, m: number, range: SimpleRangeValue) => {
         const coefs = this.interpreter.arithmeticHelper.manyToOnlyNumbersDropNulls(range.valuesFromTopLeftCorner())
@@ -276,7 +276,7 @@ export class MathPlugin extends FunctionPlugin implements FunctionPluginTypechec
     )
   }
 
-  public sign(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public sign(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('SIGN'),
       (arg: number) => {
         if(arg>0) {
@@ -290,7 +290,7 @@ export class MathPlugin extends FunctionPlugin implements FunctionPluginTypechec
     )
   }
 
-  public sumx2my2(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public sumx2my2(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('SUMX2MY2'),
       (rangeX: SimpleRangeValue, rangeY: SimpleRangeValue) => {
         const valsX = rangeX.valuesFromTopLeftCorner()
@@ -318,7 +318,7 @@ export class MathPlugin extends FunctionPlugin implements FunctionPluginTypechec
     )
   }
 
-  public sumx2py2(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public sumx2py2(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('SUMX2PY2'),
       (rangeX: SimpleRangeValue, rangeY: SimpleRangeValue) => {
         const valsX = rangeX.valuesFromTopLeftCorner()
@@ -346,7 +346,7 @@ export class MathPlugin extends FunctionPlugin implements FunctionPluginTypechec
     )
   }
 
-  public sumxmy2(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public sumxmy2(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('SUMXMY2'),
       (rangeX: SimpleRangeValue, rangeY: SimpleRangeValue) => {
         const valsX = rangeX.valuesFromTopLeftCorner()

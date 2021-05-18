@@ -5,7 +5,7 @@
 
 import {ProcedureAst} from '../../parser'
 import {InterpreterState} from '../InterpreterState'
-import {InternalScalarValue} from '../InterpreterValue'
+import {InternalScalarValue, InterpreterValue} from '../InterpreterValue'
 import {ArgumentTypes, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
 
 export class IsEvenPlugin extends FunctionPlugin implements FunctionPluginTypecheck<IsEvenPlugin>{
@@ -18,7 +18,7 @@ export class IsEvenPlugin extends FunctionPlugin implements FunctionPluginTypech
     },
   }
 
-  public iseven(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public iseven(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('ISEVEN'),
       (val) => (val % 2 === 0)
     )

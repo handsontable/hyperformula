@@ -5,7 +5,7 @@
 
 import {ProcedureAst} from '../../parser'
 import {InterpreterState} from '../InterpreterState'
-import {InternalScalarValue} from '../InterpreterValue'
+import {InternalScalarValue, InterpreterValue} from '../InterpreterValue'
 import {ArgumentTypes, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
 
 export class AbsPlugin extends FunctionPlugin implements FunctionPluginTypecheck<AbsPlugin>{
@@ -18,7 +18,7 @@ export class AbsPlugin extends FunctionPlugin implements FunctionPluginTypecheck
     },
   }
 
-  public abs(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public abs(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('ABS'), Math.abs)
   }
 }

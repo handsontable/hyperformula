@@ -36,12 +36,14 @@ export class MatrixPlugin extends FunctionPlugin implements FunctionPluginTypech
         {argumentType: ArgumentTypes.RANGE},
         {argumentType: ArgumentTypes.RANGE},
       ],
+      vectorizationForbidden: true,
     },
     'TRANSPOSE': {
       method: 'transpose',
       parameters: [
         {argumentType: ArgumentTypes.RANGE},
       ],
+      vectorizationForbidden: true,
     },
     'MAXPOOL': {
       method: 'maxpool',
@@ -50,6 +52,7 @@ export class MatrixPlugin extends FunctionPlugin implements FunctionPluginTypech
         {argumentType: ArgumentTypes.NUMBER},
         {argumentType: ArgumentTypes.NUMBER, optionalArg: true},
       ],
+      vectorizationForbidden: true,
     },
     'MEDIANPOOL': {
       method: 'medianpool',
@@ -58,6 +61,7 @@ export class MatrixPlugin extends FunctionPlugin implements FunctionPluginTypech
         {argumentType: ArgumentTypes.NUMBER},
         {argumentType: ArgumentTypes.NUMBER, optionalArg: true},
       ],
+      vectorizationForbidden: true,
     },
   }
 
@@ -73,7 +77,7 @@ export class MatrixPlugin extends FunctionPlugin implements FunctionPluginTypech
   }
 
   public mmult(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
-    return this.runMatrixFunction(ast.args, state, this.metadata('MMULT'), (leftMatrix: SimpleRangeValue, rightMatrix: SimpleRangeValue) => {
+    return this.runFunction(ast.args, state, this.metadata('MMULT'), (leftMatrix: SimpleRangeValue, rightMatrix: SimpleRangeValue) => {
       if (!leftMatrix.hasOnlyNumbers() || !rightMatrix.hasOnlyNumbers()) {
         return new CellError(ErrorType.VALUE, ErrorMessage.NumberRange)
       }
@@ -95,7 +99,7 @@ export class MatrixPlugin extends FunctionPlugin implements FunctionPluginTypech
   }
 
   public maxpool(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
-    return this.runMatrixFunction(ast.args, state, this.metadata('MAXPOOL'), (matrix: SimpleRangeValue, windowSize: number, stride: number = windowSize) => {
+    return this.runFunction(ast.args, state, this.metadata('MAXPOOL'), (matrix: SimpleRangeValue, windowSize: number, stride: number = windowSize) => {
       if (!matrix.hasOnlyNumbers()) {
         return new CellError(ErrorType.VALUE, ErrorMessage.NumberRange)
       }
@@ -118,7 +122,7 @@ export class MatrixPlugin extends FunctionPlugin implements FunctionPluginTypech
   }
 
   public medianpool(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
-    return this.runMatrixFunction(ast.args, state, this.metadata('MEDIANPOOL'), (matrix: SimpleRangeValue, windowSize: number, stride: number = windowSize) => {
+    return this.runFunction(ast.args, state, this.metadata('MEDIANPOOL'), (matrix: SimpleRangeValue, windowSize: number, stride: number = windowSize) => {
       if (!matrix.hasOnlyNumbers()) {
         return new CellError(ErrorType.VALUE, ErrorMessage.NumberRange)
       }
@@ -183,7 +187,7 @@ export class MatrixPlugin extends FunctionPlugin implements FunctionPluginTypech
   }
 
   public transpose(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
-    return this.runMatrixFunction(ast.args, state, this.metadata('TRANSPOSE'), (matrix: SimpleRangeValue) => {
+    return this.runFunction(ast.args, state, this.metadata('TRANSPOSE'), (matrix: SimpleRangeValue) => {
       if (!matrix.hasOnlyNumbers()) {
         return new CellError(ErrorType.VALUE, ErrorMessage.NumberRange)
       }

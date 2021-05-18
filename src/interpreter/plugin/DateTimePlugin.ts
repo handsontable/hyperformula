@@ -24,7 +24,7 @@ import {
   EmptyValue,
   getRawValue,
   InternalNoErrorScalarValue,
-  InternalScalarValue,
+  InternalScalarValue, InterpreterValue,
   isExtendedNumber,
   NumberType,
   RawNoErrorScalarValue,
@@ -242,7 +242,7 @@ export class DateTimePlugin extends FunctionPlugin implements FunctionPluginType
    * @param ast
    * @param state
    */
-  public date(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public date(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('DATE'), (year, month, day) => {
       const d = Math.trunc(day)
       let m = Math.trunc(month)
@@ -267,7 +267,7 @@ export class DateTimePlugin extends FunctionPlugin implements FunctionPluginType
     })
   }
 
-  public time(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public time(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('TIME'),
       (h, m, s) => {
         const ret = timeToNumber({hours: Math.trunc(h), minutes: Math.trunc(m), seconds: Math.trunc(s)})
@@ -279,7 +279,7 @@ export class DateTimePlugin extends FunctionPlugin implements FunctionPluginType
     )
   }
 
-  public eomonth(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public eomonth(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('EOMONTH'), (dateNumber, numberOfMonthsToShift) => {
       const date = this.interpreter.dateHelper.numberToSimpleDate(dateNumber)
       let ret: Maybe<number> = this.interpreter.dateHelper.dateToNumber(this.interpreter.dateHelper.endOfMonth(offsetMonth(date, numberOfMonthsToShift)))
@@ -291,13 +291,13 @@ export class DateTimePlugin extends FunctionPlugin implements FunctionPluginType
     })
   }
 
-  public day(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public day(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('DAY'),
       (dateNumber) => this.interpreter.dateHelper.numberToSimpleDate(dateNumber).day
     )
   }
 
-  public days(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public days(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('DAYS'), (endDate, startDate) => Math.trunc(endDate) - Math.trunc(startDate))
   }
 
@@ -309,7 +309,7 @@ export class DateTimePlugin extends FunctionPlugin implements FunctionPluginType
    * @param ast
    * @param state
    */
-  public month(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public month(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('MONTH'),
       (dateNumber) => this.interpreter.dateHelper.numberToSimpleDate(dateNumber).month
     )
@@ -323,25 +323,25 @@ export class DateTimePlugin extends FunctionPlugin implements FunctionPluginType
    * @param ast
    * @param state
    */
-  public year(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public year(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('YEAR'),
       (dateNumber) => this.interpreter.dateHelper.numberToSimpleDate(dateNumber).year
     )
   }
 
-  public hour(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public hour(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('HOUR'),
       (timeNumber) => numberToSimpleTime(roundToNearestSecond(timeNumber)%1).hours
     )
   }
 
-  public minute(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public minute(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('MINUTE'),
       (timeNumber) => numberToSimpleTime(roundToNearestSecond(timeNumber)%1).minutes
     )
   }
 
-  public second(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public second(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('SECOND'),
       (timeNumber) => numberToSimpleTime(roundToNearestSecond(timeNumber)%1).seconds
     )
@@ -355,13 +355,13 @@ export class DateTimePlugin extends FunctionPlugin implements FunctionPluginType
    * @param ast
    * @param state
    */
-  public text(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public text(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('TEXT'),
       (numberRepresentation, formatArg) => format(numberRepresentation, formatArg, this.config, this.interpreter.dateHelper)
     )
   }
 
-  public weekday(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public weekday(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('WEEKDAY'),
       (day: number, type: number) => {
         const absoluteDay = Math.floor(this.interpreter.dateHelper.relativeNumberToAbsoluteNumber(day))
@@ -377,7 +377,7 @@ export class DateTimePlugin extends FunctionPlugin implements FunctionPluginType
     )
   }
 
-  public weeknum(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public weeknum(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('WEEKNUM'),
       (day: number, type: number) => {
         const absoluteDay = Math.floor(this.interpreter.dateHelper.relativeNumberToAbsoluteNumber(day))
@@ -396,7 +396,7 @@ export class DateTimePlugin extends FunctionPlugin implements FunctionPluginType
     )
   }
 
-  public isoweeknum(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public isoweeknum(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('ISOWEEKNUM'), this.isoweeknumCore)
   }
 
@@ -413,7 +413,7 @@ export class DateTimePlugin extends FunctionPlugin implements FunctionPluginType
     return ret
   }
 
-  public datevalue(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public datevalue(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('DATEVALUE'),
       (date: string) => {
         const {dateTime} = this.interpreter.dateHelper.parseDateTimeFromConfigFormats(date)
@@ -429,7 +429,7 @@ export class DateTimePlugin extends FunctionPlugin implements FunctionPluginType
     )
   }
 
-  public timevalue(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public timevalue(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('TIMEVALUE'),
       (date: string) => {
         const dateNumber = this.interpreter.dateHelper.dateStringToDateNumber(date)
@@ -441,7 +441,7 @@ export class DateTimePlugin extends FunctionPlugin implements FunctionPluginType
     )
   }
 
-  public now(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public now(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('NOW'),
       () => {
         const now = new Date()
@@ -451,7 +451,7 @@ export class DateTimePlugin extends FunctionPlugin implements FunctionPluginType
     )
   }
 
-  public today(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public today(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('TODAY'),
       () => {
         const now = new Date()
@@ -460,7 +460,7 @@ export class DateTimePlugin extends FunctionPlugin implements FunctionPluginType
     )
   }
 
-  public edate(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public edate(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('EDATE'),
       (dateNumber: number, delta: number) => {
         const date = this.interpreter.dateHelper.numberToSimpleDate(dateNumber)
@@ -475,7 +475,7 @@ export class DateTimePlugin extends FunctionPlugin implements FunctionPluginType
     )
   }
 
-  public datedif(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public datedif(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('DATEDIF'),
       (startDate: number, endDate: number, unit: string) => {
         if(startDate > endDate) {
@@ -522,7 +522,7 @@ export class DateTimePlugin extends FunctionPlugin implements FunctionPluginType
     )
   }
 
-  public days360(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public days360(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('DAYS360'), this.days360Core)
   }
 
@@ -539,7 +539,7 @@ export class DateTimePlugin extends FunctionPlugin implements FunctionPluginType
     return 360 * (nEnd.year - nStart.year) + 30*(nEnd.month-nStart.month) + nEnd.day-nStart.day
   }
 
-  public yearfrac(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public yearfrac(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('YEARFRAC'),
       (startDate: number, endDate: number, mode: number) => {
         startDate = Math.trunc(startDate)
@@ -567,7 +567,7 @@ export class DateTimePlugin extends FunctionPlugin implements FunctionPluginType
     )
   }
 
-  public interval(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public interval(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('INTERVAL'),
       (arg: number) => {
         arg = Math.trunc(arg)
@@ -593,25 +593,25 @@ export class DateTimePlugin extends FunctionPlugin implements FunctionPluginType
     )
   }
 
-  public networkdays(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public networkdays(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('NETWORKDAYS'),
       (start, end, holidays) => this.networkdayscore(start, end, 1, holidays)
       )
   }
 
-  public networkdaysintl(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public networkdaysintl(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('NETWORKDAYS.INTL'),
       (start, end, weekend, holidays) => this.networkdayscore(start, end, weekend, holidays)
       )
   }
 
-  public workday(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public workday(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('WORKDAY'),
       (start, end, holidays) => this.workdaycore(start, end, 1, holidays)
     )
   }
 
-  public workdayintl(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public workdayintl(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('WORKDAY.INTL'),
       (start, end, weekend, holidays) => this.workdaycore(start, end, weekend, holidays)
     )

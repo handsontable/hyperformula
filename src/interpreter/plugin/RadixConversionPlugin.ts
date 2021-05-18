@@ -9,7 +9,7 @@ import {padLeft} from '../../format/format'
 import {Maybe} from '../../Maybe'
 import {ProcedureAst} from '../../parser'
 import {InterpreterState} from '../InterpreterState'
-import {InternalScalarValue} from '../InterpreterValue'
+import {InternalScalarValue, InterpreterValue} from '../InterpreterValue'
 import {ArgumentTypes, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
 
 const MAX_LENGTH = 10
@@ -118,25 +118,25 @@ export class RadixConversionPlugin extends FunctionPlugin implements FunctionPlu
     },
   }
 
-  public dec2bin(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public dec2bin(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('DEC2BIN'),
       (value, places) => decimalToBaseWithExactPadding(value, 2, places)
     )
   }
 
-  public dec2oct(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public dec2oct(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('DEC2OCT'),
       (value, places) => decimalToBaseWithExactPadding(value, 8, places)
     )
   }
 
-  public dec2hex(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public dec2hex(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('DEC2HEX'),
       (value, places) => decimalToBaseWithExactPadding(value, 16, places)
     )
   }
 
-  public bin2dec(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public bin2dec(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('BIN2DEC'), (binary) => {
         const binaryWithSign = coerceStringToBase(binary, 2, MAX_LENGTH)
         if(binaryWithSign === undefined) {
@@ -146,7 +146,7 @@ export class RadixConversionPlugin extends FunctionPlugin implements FunctionPlu
       })
   }
 
-  public bin2oct(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public bin2oct(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('BIN2OCT'), (binary, places) => {
       const binaryWithSign = coerceStringToBase(binary, 2, MAX_LENGTH)
       if(binaryWithSign === undefined) {
@@ -156,7 +156,7 @@ export class RadixConversionPlugin extends FunctionPlugin implements FunctionPlu
     })
   }
 
-  public bin2hex(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public bin2hex(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('BIN2HEX'), (binary, places) => {
       const binaryWithSign = coerceStringToBase(binary, 2, MAX_LENGTH)
       if(binaryWithSign === undefined) {
@@ -166,7 +166,7 @@ export class RadixConversionPlugin extends FunctionPlugin implements FunctionPlu
     })
   }
 
-  public oct2dec(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public oct2dec(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('OCT2DEC'), (octal) => {
         const octalWithSign = coerceStringToBase(octal, 8, MAX_LENGTH)
         if(octalWithSign === undefined) {
@@ -176,7 +176,7 @@ export class RadixConversionPlugin extends FunctionPlugin implements FunctionPlu
       })
   }
 
-  public oct2bin(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public oct2bin(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('OCT2BIN'), (octal, places) => {
       const octalWithSign = coerceStringToBase(octal, 8, MAX_LENGTH)
       if(octalWithSign === undefined) {
@@ -186,7 +186,7 @@ export class RadixConversionPlugin extends FunctionPlugin implements FunctionPlu
     })
   }
 
-  public oct2hex(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public oct2hex(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('OCT2HEX'), (octal, places) => {
       const octalWithSign = coerceStringToBase(octal, 8, MAX_LENGTH)
       if(octalWithSign === undefined) {
@@ -196,7 +196,7 @@ export class RadixConversionPlugin extends FunctionPlugin implements FunctionPlu
     })
   }
 
- public hex2dec(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+ public hex2dec(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('HEX2DEC'), (hexadecimal) => {
         const hexadecimalWithSign = coerceStringToBase(hexadecimal, 16, MAX_LENGTH)
         if(hexadecimalWithSign === undefined) {
@@ -206,7 +206,7 @@ export class RadixConversionPlugin extends FunctionPlugin implements FunctionPlu
       })
   }
 
-  public hex2bin(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public hex2bin(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('HEX2BIN'), (hexadecimal, places) => {
       const hexadecimalWithSign = coerceStringToBase(hexadecimal, 16, MAX_LENGTH)
       if(hexadecimalWithSign === undefined) {
@@ -216,7 +216,7 @@ export class RadixConversionPlugin extends FunctionPlugin implements FunctionPlu
     })
   }
 
-  public hex2oct(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public hex2oct(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('HEX2OCT'), (hexadecimal, places) => {
       const hexadecimalWithSign = coerceStringToBase(hexadecimal, 16, MAX_LENGTH)
       if(hexadecimalWithSign === undefined) {
@@ -226,11 +226,11 @@ export class RadixConversionPlugin extends FunctionPlugin implements FunctionPlu
     })
   }
 
-  public base(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public base(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('BASE'), decimalToBaseWithMinimumPadding)
   }
 
-  public decimal(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public decimal(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('DECIMAL'), (arg, base) => {
       const input = coerceStringToBase(arg, base, DECIMAL_NUMBER_OF_BITS)
       if(input === undefined) {
