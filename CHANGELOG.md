@@ -21,6 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added support for range interpolation. (#665)
 - Accepting time in JS Date() objects on the input. (#648)
 - Added parsing of arrays in formulas. (#671)
+- Added support for vectorization of scalar functions. (#673)
 
 ### Fixed
 - Fixed an issue with arrays and cruds. (#651)

@@ -347,6 +347,7 @@ export abstract class FunctionPlugin implements FunctionPluginTypecheck<Function
         let argCoerceFailure: Maybe<CellError> = undefined
         const coercedArguments: Maybe<InterpreterValue | complex | RawNoErrorScalarValue>[] = []
         for (let i = 0; i < argumentDefinitions.length; i++) {
+          // eslint-disable-next-line prefer-const
           let [val, ignorable] = argValues[i] ?? [undefined, undefined]
           if(val instanceof SimpleRangeValue && argumentDefinitions[i].argumentType !== ArgumentTypes.RANGE && argumentDefinitions[i].argumentType !== ArgumentTypes.ANY) {
             if(!functionDefinition.vectorizationForbidden && state.arraysFlag) {
@@ -377,7 +378,7 @@ export abstract class FunctionPlugin implements FunctionPluginTypecheck<Function
           return ret
         }
         if(ret instanceof SimpleRangeValue) {
-          throw "Function returning array cannot be vectorized."
+          throw 'Function returning array cannot be vectorized.'
         }
         rowArr.push(ret)
       }

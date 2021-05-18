@@ -175,7 +175,7 @@ export class MatrixSizePredictor {
             if(metadata === undefined || metadata.expandRanges || !state.arraysFlag || metadata.vectorizationForbidden || metadata.parameters === undefined) {
               return new MatrixSize(1, 1)
             }
-            let argumentDefinitions = [...metadata.parameters]
+            const argumentDefinitions = [...metadata.parameters]
             if (metadata.repeatLastArgs === undefined && argumentDefinitions.length < subChecks.length) {
               return MatrixSize.error()
             }
