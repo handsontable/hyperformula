@@ -19,7 +19,8 @@ export class FormulaTextPlugin extends FunctionPlugin implements FunctionPluginT
         {argumentType: ArgumentTypes.NOERROR}
       ],
       doesNotNeedArgumentsToBeComputed: true,
-      isDependentOnSheetStructureChange: true
+      isDependentOnSheetStructureChange: true,
+      vectorizationForbidden: true,
     },
   }
 

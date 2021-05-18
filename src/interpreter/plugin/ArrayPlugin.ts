@@ -38,7 +38,6 @@ export class ArrayPlugin extends FunctionPlugin implements FunctionPluginTypeche
         {argumentType: ArgumentTypes.RANGE},
       ],
       repeatLastArgs: 1,
-      vectorizationForbidden: true,
     }
   }
 

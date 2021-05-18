@@ -313,4 +313,12 @@ describe('vectorization', () => {
     const engine = HyperFormula.buildFromArray([['=IF({TRUE(),FALSE()},{1;2;3}, {2;3})']], {useArrayArithmetic: true})
     expect(engine.getSheetValues(0)).toEqual([[1,2],[2,3],[3,false]])
   })
+
+  it('should work with switch', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=SWITCH({1,2,3},1,2,3,4,5)']
+    ], {useArrayArithmetic: true})
+    expect(engine.getSheetValues(0)).toEqual([[2, 5, 4]])
+  })
+
 })

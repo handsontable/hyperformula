@@ -65,12 +65,11 @@ export class BooleanPlugin extends FunctionPlugin implements FunctionPluginTypec
     'SWITCH': {
       method: 'switch',
       parameters: [
-          {argumentType: ArgumentTypes.RANGE},
+          {argumentType: ArgumentTypes.NOERROR},
           {argumentType: ArgumentTypes.SCALAR, passSubtype: true},
           {argumentType: ArgumentTypes.SCALAR, passSubtype: true},
         ],
       repeatLastArgs: 1,
-      vectorizationForbidden: true,
     },
     'IFERROR': {
       method: 'iferror',
@@ -179,32 +178,22 @@ export class BooleanPlugin extends FunctionPlugin implements FunctionPluginTypec
   }
 
   public switch(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
-    return this.runFunction(ast.args, state, this.metadata('SWITCH'), (selectorArr: SimpleRangeValue, ...args) => {
+    return this.runFunction(ast.args, state, this.metadata('SWITCH'), (selector, ...args) => {
       const n = args.length
-      const ret: InternalScalarValue[][] = []
-      for(const row of selectorArr.data) {
-        const newrow: InternalScalarValue[] = row.map( (selector) => {
-          let i = 0
-          if(selector instanceof CellError) {
-            return selector
-          }
-          for (; i + 1 < n; i += 2) {
-            if (args[i] instanceof CellError) {
-              continue
-            }
-            if (this.interpreter.arithmeticHelper.eq(selector, args[i] as InternalNoErrorScalarValue)) {
-              return args[i + 1]
-            }
-          }
-          if (i < n) {
-            return args[i]
-          } else {
-            return new CellError(ErrorType.NA, ErrorMessage.NoDefault)
-          }
-        })
-        ret.push(newrow)
+      let i = 0
+      for (; i + 1 < n; i += 2) {
+        if (args[i] instanceof CellError) {
+          continue
+        }
+        if (this.interpreter.arithmeticHelper.eq(selector, args[i] as InternalNoErrorScalarValue)) {
+          return args[i + 1]
+        }
       }
-      return SimpleRangeValue.onlyValues(ret)
+      if (i < n) {
+        return args[i]
+      } else {
+        return new CellError(ErrorType.NA, ErrorMessage.NoDefault)
+      }
     })
   }
 

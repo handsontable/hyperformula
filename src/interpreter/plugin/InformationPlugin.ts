@@ -24,6 +24,7 @@ export class InformationPlugin extends FunctionPlugin implements FunctionPluginT
       ],
       isDependentOnSheetStructureChange: true,
       doesNotNeedArgumentsToBeComputed: true,
+      vectorizationForbidden: true,
     },
     'COLUMNS': {
       method: 'columns',
@@ -32,6 +33,7 @@ export class InformationPlugin extends FunctionPlugin implements FunctionPluginT
       ],
       isDependentOnSheetStructureChange: true,
       doesNotNeedArgumentsToBeComputed: true,
+      vectorizationForbidden: true,
     },
     'ISBINARY': {
       method: 'isbinary',
@@ -50,7 +52,8 @@ export class InformationPlugin extends FunctionPlugin implements FunctionPluginT
       parameters: [
         {argumentType: ArgumentTypes.NOERROR}
       ],
-      doesNotNeedArgumentsToBeComputed: true
+      doesNotNeedArgumentsToBeComputed: true,
+      vectorizationForbidden: true,
     },
     'ISNA': {
       method: 'isna',
@@ -62,7 +65,8 @@ export class InformationPlugin extends FunctionPlugin implements FunctionPluginT
       method: 'isref',
       parameters: [
         {argumentType: ArgumentTypes.SCALAR}
-      ]
+      ],
+      vectorizationForbidden: true,
     },
     'ISERROR': {
       method: 'iserror',
@@ -119,6 +123,7 @@ export class InformationPlugin extends FunctionPlugin implements FunctionPluginT
       ],
       isDependentOnSheetStructureChange: true,
       doesNotNeedArgumentsToBeComputed: true,
+      vectorizationForbidden: true,
     },
     'ROWS': {
       method: 'rows',
@@ -127,20 +132,23 @@ export class InformationPlugin extends FunctionPlugin implements FunctionPluginT
       ],
       isDependentOnSheetStructureChange: true,
       doesNotNeedArgumentsToBeComputed: true,
+      vectorizationForbidden: true,
     },
     'SHEET': {
       method: 'sheet',
       parameters: [
-        {argumentType: ArgumentTypes.NOERROR}
+        {argumentType: ArgumentTypes.STRING}
       ],
-      doesNotNeedArgumentsToBeComputed: true
+      doesNotNeedArgumentsToBeComputed: true,
+      vectorizationForbidden: true,
     },
     'SHEETS': {
       method: 'sheets',
       parameters: [
-        {argumentType: ArgumentTypes.NOERROR}
+        {argumentType: ArgumentTypes.STRING}
       ],
-      doesNotNeedArgumentsToBeComputed: true
+      doesNotNeedArgumentsToBeComputed: true,
+      vectorizationForbidden: true,
     }
   }
 
@@ -420,7 +428,7 @@ export class InformationPlugin extends FunctionPlugin implements FunctionPluginT
    * @param state
    * */
   public sheet(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
-    return this.runFunctionWithReferenceArgument(ast.args, state, {parameters: [{argumentType: ArgumentTypes.STRING}]},
+    return this.runFunctionWithReferenceArgument(ast.args, state, this.metadata('SHEET'),
       () => state.formulaAddress.sheet + 1,
       (reference: SimpleCellAddress) => reference.sheet + 1,
       (value: string) => {
@@ -444,7 +452,7 @@ export class InformationPlugin extends FunctionPlugin implements FunctionPluginT
    * @param state
    * */
   public sheets(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
-    return this.runFunctionWithReferenceArgument(ast.args, state, {parameters: [{argumentType: ArgumentTypes.STRING}]},
+    return this.runFunctionWithReferenceArgument(ast.args, state, this.metadata('SHEETS'),
       () => this.dependencyGraph.sheetMapping.numberOfSheets(), // return number of sheets if no argument
       () => 1, // return 1 for valid reference
       () => new CellError(ErrorType.VALUE, ErrorMessage.CellRefExpected) // error otherwise
