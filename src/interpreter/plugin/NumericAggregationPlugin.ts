@@ -3,7 +3,6 @@
  * Copyright (c) 2021 Handsoncode. All rights reserved.
  */
 
-import assert from 'assert'
 import {AbsoluteCellRange, DIFFERENT_SHEETS_ERROR} from '../../AbsoluteCellRange'
 import {CellError, ErrorType, SimpleCellAddress} from '../../Cell'
 import {ErrorMessage} from '../../error-message'
@@ -545,7 +544,10 @@ export class NumericAggregationPlugin extends FunctionPlugin {
     const rangeStart = range.start
     const rangeEnd = range.end
     const rangeVertex = this.dependencyGraph.getRange(rangeStart, rangeEnd)!
-    assert.ok(rangeVertex, 'Range does not exists in graph')
+
+    if (!rangeVertex) {
+      throw new Error('Range does not exists in graph');
+    }
 
     let value = rangeVertex.getFunctionValue(functionName) as (T | CellError)
     if (!value) {
@@ -629,4 +631,3 @@ function numbersBooleans(arg: InternalScalarValue): Maybe<CellError | ExtendedNu
     return undefined
   }
 }
-

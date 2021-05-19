@@ -3,7 +3,6 @@
  * Copyright (c) 2021 Handsoncode. All rights reserved.
  */
 
-import assert from 'assert'
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
 import {absolutizeDependencies} from '../absolutizeDependencies'
 import {
@@ -157,7 +156,9 @@ export class DependencyGraph {
   }
 
   public ensureThatVertexIsNonMatrixCellVertex(vertex: CellVertex | null) {
-    assert.ok(!(vertex instanceof MatrixVertex), 'Illegal operation')
+    if (vertex instanceof MatrixVertex) {
+      throw new Error('Illegal operation');
+    }
   }
 
   public clearRecentlyChangedVertices() {
