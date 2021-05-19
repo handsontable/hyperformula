@@ -72,8 +72,6 @@ export const RParen = createToken({name: 'RParen', pattern: /\)/})
 /* matrix parenthesis */
 export const MatrixLParen = createToken({name: 'MatrixLParen', pattern: /{/})
 export const MatrixRParen = createToken({name: 'MatrixRParen', pattern: /}/})
-export const MatrixRowSep = createToken({name: 'MatrixRowSep', pattern: /;/})
-export const MatrixColSep = createToken({name: 'MatrixColSep', pattern: /,/})
 
 /* procedures */
 export const ProcedureName = createToken({name: 'ProcedureName', pattern: /([A-Za-z\u00C0-\u02AF][A-Za-z0-9\u00C0-\u02AF._]*)\(/})
@@ -101,6 +99,8 @@ export interface ILexerConfig {
   errorMapping: Record<string, ErrorType>,
   functionMapping: Record<string, string>,
   decimalSeparator: '.' | ',',
+  MatrixColSeparator: TokenType,
+  MatrixRowSeparator: TokenType,
   maxColumns: number,
   maxRows: number,
 }
@@ -110,13 +110,16 @@ export const buildLexerConfig = (config: ParserConfig): ILexerConfig => {
   const errorMapping = config.errorMapping
   const functionMapping = config.translationPackage.buildFunctionMapping()
 
+  const MatrixRowSeparator = createToken({name: 'MatrixRowSep', pattern: config.matrixRowSeparator})
+  const MatrixColSeparator = createToken({name: 'MatrixColSep', pattern: config.matrixColumnSeparator})
+
   /* configurable tokens */
   let ArgSeparator, inject: TokenType[]
-  if(config.functionArgSeparator === ',') {
-    ArgSeparator = MatrixColSep
+  if(config.functionArgSeparator === config.matrixColumnSeparator) {
+    ArgSeparator = MatrixColSeparator
     inject = []
-  } else if(config.functionArgSeparator === ';') {
-    ArgSeparator = MatrixRowSep
+  } else if(config.functionArgSeparator === config.matrixRowSeparator) {
+    ArgSeparator = MatrixRowSeparator
     inject = []
   } else {
     ArgSeparator = createToken({name: 'ArgSeparator', pattern: config.functionArgSeparator})
@@ -159,14 +162,16 @@ export const buildLexerConfig = (config: ParserConfig): ILexerConfig => {
     MultiplicationOp,
     CellReference,
     NamedExpression,
-    MatrixRowSep,
-    MatrixColSep,
+    MatrixRowSeparator,
+    MatrixColSeparator,
   ]
 
   return {
     ArgSeparator,
     NumberLiteral,
     OffsetProcedureName,
+    MatrixRowSeparator,
+    MatrixColSeparator,
     allTokens,
     errorMapping,
     functionMapping,
