@@ -391,7 +391,7 @@ export abstract class FunctionPlugin implements FunctionPluginTypecheck<Function
     args: Ast[],
     state: InterpreterState,
     argumentDefinitions: FunctionArguments,
-    noArgCallback: () => InternalScalarValue | RawScalarValue,
+    noArgCallback: () => InternalScalarValue,
     referenceCallback: (reference: SimpleCellAddress) => InternalScalarValue,
     nonReferenceCallback: (...arg: any) => InternalScalarValue = () => new CellError(ErrorType.NA, ErrorMessage.CellRefExpected)
   ) => {
