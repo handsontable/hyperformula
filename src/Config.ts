@@ -205,6 +205,20 @@ export interface ConfigParams {
    */
   matchWholeCell: boolean,
   /**
+   * Column separator symbol for array notation.
+   *
+   * @default ','
+   * @category Formula syntax
+   */
+  matrixColumnSeparator: ',' | ';',
+  /**
+   * Row separator symbol for array notation.
+   *
+   * @default ';'
+   * @category Formula syntax
+   */
+  matrixRowSeparator: ';' | '|',
+  /**
    * Maximum number of rows
    *
    * @default 40,000
@@ -390,6 +404,8 @@ export class Config implements ConfigParams, ParserConfig {
     leapYear1900: false,
     localeLang: 'en',
     matchWholeCell: true,
+    matrixColumnSeparator: ',',
+    matrixRowSeparator: ';',
     maxRows: 40_000,
     maxColumns: 18_278,
     nullYear: 30,
@@ -426,6 +442,10 @@ export class Config implements ConfigParams, ParserConfig {
   public readonly timeFormats: string[]
   /** @inheritDoc */
   public readonly functionArgSeparator: string
+  /** @inheritDoc */
+  public readonly matrixColumnSeparator: ',' | ';'
+  /** @inheritDoc */
+  public readonly matrixRowSeparator: ';' | '|'
   /** @inheritDoc */
   public readonly decimalSeparator: '.' | ','
   /** @inheritDoc */
@@ -531,6 +551,8 @@ export class Config implements ConfigParams, ParserConfig {
       language,
       licenseKey,
       matchWholeCell,
+      matrixColumnSeparator,
+      matrixRowSeparator,
       maxRows,
       maxColumns,
       nullYear,
@@ -565,6 +587,8 @@ export class Config implements ConfigParams, ParserConfig {
     this.licenseKey = configValueFromParam(licenseKey, 'string', 'licenseKey')
     this.#licenseKeyValidityState = checkLicenseKeyValidity(this.licenseKey)
     this.thousandSeparator = configValueFromParam(thousandSeparator, ['', ',', ' ', '.'], 'thousandSeparator')
+    this.matrixColumnSeparator = configValueFromParam(matrixColumnSeparator, [',', ';'], 'matrixColumnSeparator')
+    this.matrixRowSeparator = configValueFromParam(matrixRowSeparator, [';', '|'], 'matrixRowSeparator')
     this.localeLang = configValueFromParam(localeLang, 'string', 'localeLang')
     this.functionPlugins = functionPlugins ?? Config.defaultConfig.functionPlugins
     this.gpujs = gpujs ?? Config.defaultConfig.gpujs
@@ -611,7 +635,12 @@ export class Config implements ConfigParams, ParserConfig {
     configCheckIfParametersNotInConflict(
       {value: this.decimalSeparator, name: 'decimalSeparator'},
       {value: this.functionArgSeparator, name: 'functionArgSeparator'},
-      {value: this.thousandSeparator, name: 'thousandSeparator'}
+      {value: this.thousandSeparator, name: 'thousandSeparator'},
+    )
+
+    configCheckIfParametersNotInConflict(
+      {value: this.matrixRowSeparator, name: 'matrixRowSeparator'},
+      {value: this.matrixColumnSeparator, name: 'matrixColumnSeparator'},
     )
   }
 

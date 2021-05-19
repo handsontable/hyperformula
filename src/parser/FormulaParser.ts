@@ -76,7 +76,7 @@ import {
   ILexerConfig,
   LessThanOp,
   LessThanOrEqualOp,
-  LParen, MatrixColSep, MatrixLParen, MatrixRowSep, MatrixRParen,
+  LParen, MatrixLParen, MatrixRParen,
   MinusOp,
   MultiplicationOp,
   NamedExpression,
@@ -740,13 +740,13 @@ export class FormulaParser extends EmbeddedActionsParser {
       this.OR([
         {
           ALT: () => {
-            this.CONSUME(MatrixColSep)
+            this.CONSUME(this.lexerConfig.MatrixColSeparator)
             ret[ret.length-1].push(this.SUBRULE2(this.booleanExpression))
           }
         },
         {
           ALT: () => {
-            this.CONSUME(MatrixRowSep)
+            this.CONSUME(this.lexerConfig.MatrixRowSeparator)
             ret.push([])
             ret[ret.length-1].push(this.SUBRULE3(this.booleanExpression))
           }
