@@ -3,6 +3,7 @@
  * Copyright (c) 2021 Handsoncode. All rights reserved.
  */
 
+import unorm from 'unorm'
 import {CellError, CellValueTypeOrd, ErrorType, getCellValueType} from '../Cell'
 import {Config} from '../Config'
 import {DateTimeHelper} from '../DateTimeHelper'
@@ -116,7 +117,7 @@ export class ArithmeticHelper {
       str = str.toLowerCase()
     }
     if(!this.config.accentSensitive) {
-      str = str.normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+      str = normalizeString(str, 'nfd').replace(/[\u0300-\u036f]/g, '')
     }
     return str
   }
@@ -758,7 +759,14 @@ function inferExtendedNumberTypeMultiplicative(leftArg: ExtendedNumber, rightArg
 }
 
 export function forceNormalizeString(str: string): string {
-  return str.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+  return normalizeString(str.toLowerCase(), 'nfd').replace(/[\u0300-\u036f]/g, '')
+}
+
+type NormalizationForm = 'nfc' | 'nfd' | 'nfkc' | 'nfkd'
+
+export function normalizeString(str: string, form: NormalizationForm): string {
+  return typeof str.normalize === 'function'
+    ? str.normalize(form.toUpperCase()) : unorm[form](str)
 }
 
 export function coerceRangeToScalar(arg: SimpleRangeValue, state: InterpreterState): Maybe<InternalScalarValue>{
@@ -781,4 +789,3 @@ export function coerceRangeToScalar(arg: SimpleRangeValue, state: InterpreterSta
   }
   return undefined
 }
-
