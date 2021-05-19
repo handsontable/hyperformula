@@ -4,13 +4,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+### Fixed
+- Fixed library support for IE11. (#674)
+
 ## [Unreleased]
 
 ### Changed
 - **Breaking change**: Changed API of many sheet-related methods to take sheetId instead of sheetName as an argument. (#645)
 - **Breaking change**: Removed support for matrix formulas (`{=FORMULA}`) notation. Engine now supports formulas returning array of values (instead of only scalars). (#652)
 - Changed SWITCH function so it takes array as its first argument.
-- **Breaking change**: Removed numeric matrix detection along with matrixDetection and matrixDetectionThreshold config options. (#669) 
+- **Breaking change**: Removed numeric matrix detection along with matrixDetection and matrixDetectionThreshold config options. (#669)
 
 ### Added
 - Added support for array arithmetic. (#628)
