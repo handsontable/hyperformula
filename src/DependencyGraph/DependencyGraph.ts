@@ -157,7 +157,7 @@ export class DependencyGraph {
 
   public ensureThatVertexIsNonMatrixCellVertex(vertex: CellVertex | null) {
     if (vertex instanceof MatrixVertex) {
-      throw new Error('Illegal operation');
+      throw new Error('Illegal operation')
     }
   }
 

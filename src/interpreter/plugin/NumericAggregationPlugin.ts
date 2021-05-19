@@ -546,7 +546,7 @@ export class NumericAggregationPlugin extends FunctionPlugin {
     const rangeVertex = this.dependencyGraph.getRange(rangeStart, rangeEnd)!
 
     if (!rangeVertex) {
-      throw new Error('Range does not exists in graph');
+      throw new Error('Range does not exists in graph')
     }
 
     let value = rangeVertex.getFunctionValue(functionName) as (T | CellError)
