@@ -116,7 +116,7 @@ export class ArithmeticHelper {
       str = str.toLowerCase()
     }
     if(!this.config.accentSensitive) {
-      normalizeString(str, 'nfd').replace(/[\u0300-\u036f]/g, '')
+      str = normalizeString(str, 'nfd').replace(/[\u0300-\u036f]/g, '')
     }
     return str
   }
