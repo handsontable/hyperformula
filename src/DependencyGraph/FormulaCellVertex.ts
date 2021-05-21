@@ -175,33 +175,6 @@ export class MatrixVertex extends FormulaVertex {
       (col < this.cellAddress.col + this.width)
   }
 
-  /* TODO cruds should ensure is recent data */
-  addRows(sheet: number, row: number, numberOfRows: number): void {
-    if (this.matrix instanceof Matrix) {
-      this.matrix.addRows(row - this.cellAddress.row, numberOfRows)
-    }
-  }
-
-  addColumns(sheet: number, column: number, numberOfColumns: number): void {
-    if (this.matrix instanceof Matrix) {
-      this.matrix.addColumns(column - this.cellAddress.col, numberOfColumns)
-    }
-  }
-
-  removeRows(removedRows: RowsSpan): void {
-    if (this.matrix instanceof Matrix) {
-      const removedRowsFromMatrix = this.rowsFromMatrix().intersect(removedRows)!
-      this.matrix.removeRows(removedRowsFromMatrix.rowStart - this.cellAddress.row, removedRowsFromMatrix.rowEnd - this.cellAddress.row)
-    }
-  }
-
-  removeColumns(removedColumns: ColumnsSpan): void {
-    if (this.matrix instanceof Matrix) {
-      const removedColumnsFromMatrix = this.columnsFromMatrix().intersect(removedColumns)!
-      this.matrix.removeColumns(removedColumnsFromMatrix.columnStart - this.cellAddress.col, removedColumnsFromMatrix.columnEnd - this.cellAddress.col)
-    }
-  }
-
   isComputed() {
     return (!(this.matrix instanceof NotComputedMatrix))
   }

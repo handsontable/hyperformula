@@ -129,14 +129,6 @@ export class Matrix implements IMatrix {
     return this.matrix
   }
 
-  public* generateValues(leftCorner: SimpleCellAddress): IterableIterator<[InternalScalarValue, SimpleCellAddress]> {
-    for (let row = 0; row < this.size.height; ++row) {
-      for (let col = 0; col < this.size.width; ++col) {
-        yield [this.matrix[row][col], simpleCellAddress(leftCorner.sheet, leftCorner.col + col, leftCorner.row + row)]
-      }
-    }
-  }
-
   public resize(newSize: MatrixSize) {
     if(this.height() < newSize.height) {
       this.addRows(this.height(), newSize.height-this.height())
