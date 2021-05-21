@@ -21,6 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added casting to scalars from non-range arrays. (#663)
 - Added support for range interpolation. (#665)
 - Accepting time in JS Date() objects on the input. (#648)
+- Added utility function for filling ranges with source from other range. (#678)
 
 ### Fixed
 - Fixed an issue with arrays and cruds. (#651)
