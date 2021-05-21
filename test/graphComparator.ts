@@ -47,6 +47,8 @@ export class EngineComparator {
     const actualWidth = this.actual.addressMapping.getWidth(sheet)
     const actualHeight = this.actual.addressMapping.getHeight(sheet)
 
+    deepStrictEqual(this.actual.matrixMapping, this.expected.matrixMapping)
+
     for (let x = 0; x < Math.max(expectedWidth, actualWidth); ++x) {
       for (let y = 0; y < Math.max(expectedHeight, actualHeight); ++y) {
         const address = simpleCellAddress(sheet, x, y)
