@@ -8,20 +8,39 @@ import {SimpleCellAddress} from '../Cell'
 import {Maybe} from '../Maybe'
 import {ColumnsSpan, RowsSpan} from '../Span'
 import {MatrixVertex} from './'
+import {simpleCellAddressToString} from '../parser'
+
+const mappingKey = (address: SimpleCellAddress) => `${address.sheet},${address.row},${address.col}`
 
 export class MatrixMapping {
   public readonly matrixMapping: Map<string, MatrixVertex> = new Map()
 
   public getMatrix(range: AbsoluteCellRange): Maybe<MatrixVertex> {
-    return this.matrixMapping.get(range.toString())
+    const matrix =  this.getMatrixByCorner(range.start)
+    if (matrix?.getRange().sameAs(range)) {
+      return matrix
+    }
+    return
+  }
+
+  public getMatrixByCorner(address: SimpleCellAddress): Maybe<MatrixVertex> {
+    return this.matrixMapping.get(mappingKey(address))
   }
 
   public setMatrix(range: AbsoluteCellRange, vertex: MatrixVertex) {
-    this.matrixMapping.set(range.toString(), vertex)
+    this.matrixMapping.set(mappingKey(range.start), vertex)
+  }
+
+  public setMatrixByCorner(address: SimpleCellAddress, vertex: MatrixVertex) {
+    this.matrixMapping.set(mappingKey(address), vertex)
   }
 
   public removeMatrix(range: string | AbsoluteCellRange) {
-    this.matrixMapping.delete(range.toString())
+    if (typeof range === 'string') {
+      this.matrixMapping.delete(range)
+    } else {
+      this.matrixMapping.delete(mappingKey(range.start))
+    }
   }
 
   public count(): number {
@@ -97,12 +116,12 @@ export class MatrixMapping {
   public moveMatrixVerticesAfterRowByRows(sheet: number, row: number, numberOfRows: number) {
     this.updateMatrixVerticesInSheet(sheet, (key: string, vertex: MatrixVertex) => {
       const range = vertex.getRange()
-      return row <= range.start.row ? [range.shifted(0, numberOfRows).toString(), vertex] : undefined
+      return row <= range.start.row ? [range.shifted(0, numberOfRows), vertex] : undefined
     })
   }
 
-  private updateMatrixVerticesInSheet(sheet: number, fn: (key: string, vertex: MatrixVertex) => Maybe<[string, MatrixVertex]>) {
-    const updated = Array<[string, MatrixVertex]>()
+  private updateMatrixVerticesInSheet(sheet: number, fn: (key: string, vertex: MatrixVertex) => Maybe<[AbsoluteCellRange, MatrixVertex]>) {
+    const updated = Array<[AbsoluteCellRange, MatrixVertex]>()
 
     for (const [key, vertex] of this.matrixMapping.entries()) {
       if (vertex.sheet !== sheet) {
@@ -115,8 +134,8 @@ export class MatrixMapping {
       }
     }
 
-    updated.forEach(([key, matrix]) => {
-      this.matrixMapping.set(key, matrix)
+    updated.forEach(([range, matrix]) => {
+      this.setMatrix(range, matrix)
     })
   }
 }

@@ -541,9 +541,6 @@ export class Operations {
     }
 
     const affectedMatrices = this.dependencyGraph.addRows(addedRows)
-    for (const affectedMatrix of affectedMatrices) {
-      this.dependencyGraph.setMatrixEmpty(affectedMatrix)
-    }
 
     this.stats.measure(StatType.TRANSFORM_ASTS, () => {
       const transformation = new AddRowsTransformer(addedRows)

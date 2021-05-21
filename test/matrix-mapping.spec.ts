@@ -52,9 +52,9 @@ describe('MatrixMapping', () => {
 
     matrixMapping.moveMatrixVerticesAfterRowByRows(0, 0, 2)
 
-    expect(matrixMapping.getMatrix(range1)).toBeUndefined()
-    expect(matrixMapping.getMatrix(range2)).toBeUndefined()
-    expect(matrixMapping.getMatrix(AbsoluteCellRange.spanFrom(adr('B3'), 2, 2))).toEqual(vertex1)
-    expect(matrixMapping.getMatrix(AbsoluteCellRange.spanFrom(adr('D4'), 2, 2))).toEqual(vertex2)
+    expect(matrixMapping.getMatrixByCorner(range1.start)).toBeUndefined()
+    expect(matrixMapping.getMatrixByCorner(range2.start)).toBeUndefined()
+    expect(matrixMapping.getMatrixByCorner(adr('B3'))).toEqual(vertex1)
+    expect(matrixMapping.getMatrixByCorner(adr('D4'))).toEqual(vertex2)
   })
 })

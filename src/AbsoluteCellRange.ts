@@ -3,7 +3,14 @@
  * Copyright (c) 2021 Handsoncode. All rights reserved.
  */
 
-import {CellRange, simpleCellAddress, SimpleCellAddress, SimpleColumnAddress, SimpleRowAddress} from './Cell'
+import {
+  CellRange,
+  equalSimpleCellAddress,
+  simpleCellAddress,
+  SimpleCellAddress,
+  SimpleColumnAddress,
+  SimpleRowAddress
+} from './Cell'
 import {DependencyGraph} from './DependencyGraph'
 import {Maybe} from './Maybe'
 import {AstNodeType, CellAddress, CellRangeAst} from './parser'
@@ -274,6 +281,10 @@ export class AbsoluteCellRange {
     return this.width() === other.width() && this.height() === other.height()
   }
 
+  public sameAs(other: AbsoluteCellRange) {
+    return equalSimpleCellAddress(this.start, other.start) && equalSimpleCellAddress(this.end, other.end)
+  }
+
   public addressesArrayMap<T>(dependencyGraph: DependencyGraph, op: (arg: SimpleCellAddress) => T): T[][] {
     const ret = []
     let currentRow = this.start.row
@@ -390,7 +401,6 @@ export class AbsoluteColumnRange extends AbsoluteCellRange {
   public shouldBeRemoved() {
     return this.width() <= 0
   }
-
 
   public shiftByRows(_numberOfRows: number) {
     return

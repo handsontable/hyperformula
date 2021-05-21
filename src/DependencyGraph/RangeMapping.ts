@@ -110,13 +110,13 @@ export class RangeMapping {
   }
 
   public moveAllRangesInSheetAfterRowByRows(sheet: number, row: number, numberOfRows: number): RangeVertex[] {
-    return this.updateVerticesFromSheet(sheet, (key: string, vertex: RangeVertex): Maybe<RangeVertex> => {
+    return this.updateVerticesFromSheet(sheet, (key: string, vertex: RangeVertex): Maybe<[boolean, RangeVertex]> => {
       if (row <= vertex.start.row) {
         vertex.range.shiftByRows(numberOfRows)
-        return vertex
+        return [false, vertex]
       } else if (row > vertex.start.row && row <= vertex.end.row) {
         vertex.range.expandByRows(numberOfRows)
-        return vertex
+        return [true, vertex]
       } else {
         return undefined
       }
@@ -124,13 +124,13 @@ export class RangeMapping {
   }
 
   public moveAllRangesInSheetAfterColumnByColumns(sheet: number, column: number, numberOfColumns: number) {
-    this.updateVerticesFromSheet(sheet, (key: string, vertex: RangeVertex): Maybe<RangeVertex> => {
+    this.updateVerticesFromSheet(sheet, (key: string, vertex: RangeVertex): Maybe<[boolean, RangeVertex]> => {
       if (column <= vertex.start.col) {
         vertex.range.shiftByColumns(numberOfColumns)
-        return vertex
+        return [false, vertex]
       } else if (column > vertex.start.col && column <= vertex.end.col) {
         vertex.range.expandByColumns(numberOfColumns)
-        return vertex
+        return [true, vertex]
       } else {
         return undefined
       }
@@ -138,12 +138,12 @@ export class RangeMapping {
   }
 
   public moveRangesInsideSourceRange(sourceRange: AbsoluteCellRange, toRight: number, toBottom: number, toSheet: number) {
-    this.updateVerticesFromSheet(sourceRange.sheet, (key: string, vertex: RangeVertex): Maybe<RangeVertex> => {
+    this.updateVerticesFromSheet(sourceRange.sheet, (key: string, vertex: RangeVertex): Maybe<[boolean, RangeVertex]> => {
       if (sourceRange.containsRange(vertex.range)) {
         vertex.range.shiftByColumns(toRight)
         vertex.range.shiftByRows(toBottom)
         vertex.range.moveToSheet(toSheet)
-        return vertex
+        return [false, vertex]
       } else {
         return undefined
       }
@@ -219,8 +219,8 @@ export class RangeMapping {
     return this.rangeMapping.get(sheet)?.get(key)
   }
 
-  private updateVerticesFromSheet(sheet: number, fn: (key: string, vertex: RangeVertex) => Maybe<RangeVertex>): RangeVertex[] {
-    const updated = Array<RangeVertex>()
+  private updateVerticesFromSheet(sheet: number, fn: (key: string, vertex: RangeVertex) => Maybe<[boolean, RangeVertex]>): RangeVertex[] {
+    const updated = Array<[boolean, RangeVertex]>()
 
     for (const [key, vertex] of this.entriesFromSheet(sheet)) {
       const result = fn(key, vertex)
@@ -230,11 +230,11 @@ export class RangeMapping {
       }
     }
 
-    updated.forEach((range) => {
+    updated.forEach(([_, range]) => {
       this.setRange(range)
     })
 
-    return updated
+    return updated.filter(entry => entry[0]).map(entry => entry[1])
   }
 }
 

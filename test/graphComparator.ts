@@ -47,7 +47,7 @@ export class EngineComparator {
     const actualWidth = this.actual.addressMapping.getWidth(sheet)
     const actualHeight = this.actual.addressMapping.getHeight(sheet)
 
-    deepStrictEqual(this.actual.matrixMapping, this.expected.matrixMapping)
+    this.compareMatrixMappings()
 
     for (let x = 0; x < Math.max(expectedWidth, actualWidth); ++x) {
       for (let y = 0; y < Math.max(expectedHeight, actualHeight); ++y) {
@@ -85,6 +85,20 @@ export class EngineComparator {
         const sheetMapping = this.expected.sheetMapping
         deepStrictEqual(actualAdjacentAddresses, expectedAdjacentAddresses, `Dependent vertices of ${simpleCellAddressToString(sheetMapping.fetchDisplayName, address, 0)} (Sheet '${sheetMapping.fetchDisplayName(address.sheet)}') are not same`)
       }
+    }
+  }
+
+  private compareMatrixMappings() {
+    const actual = this.actual.matrixMapping.matrixMapping
+    const expected = this.expected.matrixMapping.matrixMapping
+
+    expect(actual.size).toEqual(expected.size)
+
+    for (const [key, value] of expected.entries()) {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      const actualEntry = actual.get(key)!
+      expect(actualEntry).toBeDefined()
+      expect(value.getRange().sameAs(actualEntry.getRange())).toBe(true)
     }
   }
 
