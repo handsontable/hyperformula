@@ -1,6 +1,5 @@
 import {HyperFormula} from '../../src'
-import {adr, expectEngineToBeTheSameAs} from '../testUtils'
-import {AbsoluteCellRange} from '../../src/AbsoluteCellRange'
+import {expectEngineToBeTheSameAs} from '../testUtils'
 
 describe('Add rows', () => {
   it('should be possible to add row above matrix', () => {

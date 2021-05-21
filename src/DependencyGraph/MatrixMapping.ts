@@ -93,4 +93,30 @@ export class MatrixMapping {
   public destroy(): void {
     this.matrixMapping.clear()
   }
+
+  public moveMatrixVerticesAfterRowByRows(sheet: number, row: number, numberOfRows: number) {
+    this.updateMatrixVerticesInSheet(sheet, (key: string, vertex: MatrixVertex) => {
+      const range = vertex.getRange()
+      return row <= range.start.row ? [range.shifted(0, numberOfRows).toString(), vertex] : undefined
+    })
+  }
+
+  private updateMatrixVerticesInSheet(sheet: number, fn: (key: string, vertex: MatrixVertex) => Maybe<[string, MatrixVertex]>) {
+    const updated = Array<[string, MatrixVertex]>()
+
+    for (const [key, vertex] of this.matrixMapping.entries()) {
+      if (vertex.sheet !== sheet) {
+        continue
+      }
+      const result = fn(key, vertex)
+      if (result !== undefined) {
+        this.removeMatrix(key)
+        updated.push(result)
+      }
+    }
+
+    updated.forEach(([key, matrix]) => {
+      this.matrixMapping.set(key, matrix)
+    })
+  }
 }

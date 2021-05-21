@@ -378,13 +378,13 @@ export class DependencyGraph {
       this.addressMapping.addRows(addedRows.sheet, addedRows.rowStart, addedRows.numberOfRows)
     })
 
-    this.stats.measure(StatType.ADJUSTING_MATRIX_MAPPING, () => {
-      this.fixMatricesAfterAddingRow(addedRows.sheet, addedRows.rowStart, addedRows.numberOfRows)
-    })
-
     this.stats.measure(StatType.ADJUSTING_RANGES, () => {
       this.rangeMapping.moveAllRangesInSheetAfterRowByRows(addedRows.sheet, addedRows.rowStart, addedRows.numberOfRows)
       this.fixRangesWhenAddingRows(addedRows.sheet, addedRows.rowStart, addedRows.numberOfRows)
+    })
+
+    this.stats.measure(StatType.ADJUSTING_MATRIX_MAPPING, () => {
+      this.fixMatricesAfterAddingRow(addedRows.sheet, addedRows.rowStart, addedRows.numberOfRows)
     })
 
     for (const vertex of this.addressMapping.verticesFromRowsSpan(addedRows)) {
@@ -849,6 +849,7 @@ export class DependencyGraph {
   }
 
   private fixMatricesAfterAddingRow(sheet: number, rowStart: number, numberOfRows: number) {
+    this.matrixMapping.moveMatrixVerticesAfterRowByRows(sheet, rowStart, numberOfRows)
     if (rowStart <= 0) {
       return
     }
