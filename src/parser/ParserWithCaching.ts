@@ -154,9 +154,9 @@ export class ParserWithCaching {
     return hash
   }
 
-  public rememberNewAst(ast: Ast): Ast {
+  public rememberNewAst(ast: Ast): [string, Ast] {
     const hash = this.computeHashFromAst(ast)
-    return this.cache.maybeSetAndThenGet(hash, ast)
+    return [hash, this.cache.maybeSetAndThenGet(hash, ast)]
   }
 
   public computeHashFromAst(ast: Ast): string {

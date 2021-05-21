@@ -44,6 +44,7 @@ import {MatrixMapping} from './MatrixMapping'
 import {RangeMapping} from './RangeMapping'
 import {SheetMapping} from './SheetMapping'
 import {RawAndParsedValue} from './ValueCellVertex'
+import {Matrix} from '../Matrix'
 
 export class DependencyGraph {
   /*
@@ -373,15 +374,17 @@ export class DependencyGraph {
     this.addStructuralNodesToChangeSet()
   }
 
-  public addRows(addedRows: RowsSpan) {
+  public addRows(addedRows: RowsSpan): Set<MatrixVertex> {
     this.stats.measure(StatType.ADJUSTING_ADDRESS_MAPPING, () => {
       this.addressMapping.addRows(addedRows.sheet, addedRows.rowStart, addedRows.numberOfRows)
     })
 
-    this.stats.measure(StatType.ADJUSTING_RANGES, () => {
-      this.rangeMapping.moveAllRangesInSheetAfterRowByRows(addedRows.sheet, addedRows.rowStart, addedRows.numberOfRows)
+    const affectedMatrices = this.stats.measure(StatType.ADJUSTING_RANGES, () => {
+      const result = this.rangeMapping.moveAllRangesInSheetAfterRowByRows(addedRows.sheet, addedRows.rowStart, addedRows.numberOfRows)
       this.fixRangesWhenAddingRows(addedRows.sheet, addedRows.rowStart, addedRows.numberOfRows)
+      return this.getRangeRelatedMatrixVertices(result)
     })
+
 
     this.stats.measure(StatType.ADJUSTING_MATRIX_MAPPING, () => {
       this.fixMatricesAfterAddingRow(addedRows.sheet, addedRows.rowStart, addedRows.numberOfRows)
@@ -392,6 +395,8 @@ export class DependencyGraph {
     }
 
     this.addStructuralNodesToChangeSet()
+
+    return affectedMatrices
   }
 
   public addColumns(addedColumns: ColumnsSpan) {
@@ -614,6 +619,12 @@ export class DependencyGraph {
     this.matrixMapping.destroy()
   }
 
+  public getRangeRelatedMatrixVertices(ranges: RangeVertex[]): Set<MatrixVertex> {
+    const reduced = ranges
+      .map(range => Array.from(this.graph.adjacentNodes(range)).filter(node => node instanceof MatrixVertex)) as MatrixVertex[][]
+    return new Set(...reduced)
+  }
+
   public* verticesFromRange(range: AbsoluteCellRange): IterableIterator<CellVertex> {
     for (const address of range.addresses(this)) {
       const vertex = this.getCell(address)
@@ -809,9 +820,9 @@ export class DependencyGraph {
   private exchangeOrAddFormulaVertex(vertex: FormulaVertex): void {
     const range = AbsoluteCellRange.spanFrom(vertex.getAddress(this.lazilyTransformingAstService), vertex.width, vertex.height)
 
-    for (const vertex of this.verticesFromRange(range)) {
-      this.ensureThatVertexIsNonMatrixCellVertex(vertex)
-    }
+    // for (const vertex of this.verticesFromRange(range)) {
+    //   this.ensureThatVertexIsNonMatrixCellVertex(vertex)
+    // }
 
     if (vertex instanceof MatrixVertex) {
       this.setMatrix(range, vertex)

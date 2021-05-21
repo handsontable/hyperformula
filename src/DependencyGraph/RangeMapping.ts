@@ -109,8 +109,8 @@ export class RangeMapping {
     }
   }
 
-  public moveAllRangesInSheetAfterRowByRows(sheet: number, row: number, numberOfRows: number) {
-    this.updateVerticesFromSheet(sheet, (key: string, vertex: RangeVertex): Maybe<RangeVertex> => {
+  public moveAllRangesInSheetAfterRowByRows(sheet: number, row: number, numberOfRows: number): RangeVertex[] {
+    return this.updateVerticesFromSheet(sheet, (key: string, vertex: RangeVertex): Maybe<RangeVertex> => {
       if (row <= vertex.start.row) {
         vertex.range.shiftByRows(numberOfRows)
         return vertex
@@ -219,7 +219,7 @@ export class RangeMapping {
     return this.rangeMapping.get(sheet)?.get(key)
   }
 
-  private updateVerticesFromSheet(sheet: number, fn: (key: string, vertex: RangeVertex) => Maybe<RangeVertex>) {
+  private updateVerticesFromSheet(sheet: number, fn: (key: string, vertex: RangeVertex) => Maybe<RangeVertex>): RangeVertex[] {
     const updated = Array<RangeVertex>()
 
     for (const [key, vertex] of this.entriesFromSheet(sheet)) {
@@ -233,6 +233,8 @@ export class RangeMapping {
     updated.forEach((range) => {
       this.setRange(range)
     })
+
+    return updated
   }
 }
 
