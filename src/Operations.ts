@@ -522,6 +522,7 @@ export class Operations {
       transformation.performEagerTransformations(this.dependencyGraph, this.parser)
       version = this.lazilyTransformingAstService.addTransformation(transformation)
     })
+
     return {
       version: version!,
       removedCells,

@@ -836,6 +836,9 @@ export class DependencyGraph {
     if (vertex instanceof MatrixVertex) {
       this.setMatrix(range, vertex)
     }
+    if (oldNode instanceof MatrixVertex) {
+      this.shrinkMatrixToCorner(oldNode)
+    }
     this.exchangeOrAddGraphNode(oldNode, vertex)
 
     for (const address of range.addresses(this)) {
@@ -859,14 +862,14 @@ export class DependencyGraph {
   }
 
   private truncateRanges(span: Span, coordinate: (address: SimpleCellAddress) => number): RangeVertex[] {
-    const {verticesToRemove, verticesToMerge} = this.rangeMapping.truncateRanges(span, coordinate)
+    const {verticesToRemove, verticesToMerge, verticesWithChangedSize} = this.rangeMapping.truncateRanges(span, coordinate)
     for (const [existingVertex, mergedVertex] of verticesToMerge) {
       this.mergeRangeVertices(existingVertex, mergedVertex)
     }
     for (const rangeVertex of verticesToRemove) {
       this.removeVertexAndCleanupDependencies(rangeVertex)
     }
-    return [...verticesToRemove, ...verticesToMerge.map(v => v[1])]
+    return verticesWithChangedSize
   }
 
   private fixMatricesAfterAddingRow(sheet: number, rowStart: number, numberOfRows: number) {
@@ -898,6 +901,7 @@ export class DependencyGraph {
         }
       } else {
         this.shrinkMatrixToCorner(matrix)
+        matrix.setNoSpace()
       }
     }
   }
@@ -908,7 +912,6 @@ export class DependencyGraph {
       this.addressMapping.removeCellIfEqual(address, matrixVertex)
     }
     this.addressMapping.setCell(matrixRange.start, matrixVertex)
-    matrixVertex.setNoSpace()
   }
 
   private removeVertex(vertex: Vertex) {
