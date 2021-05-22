@@ -9,6 +9,16 @@ import {Maybe} from '../Maybe'
 import {Span} from '../Span'
 import {RangeVertex} from './'
 
+export interface AdjustRangesResult {
+  verticesWithChangedSize: RangeVertex[],
+}
+
+export interface TruncateRangesResult extends AdjustRangesResult {
+  verticesToRemove: RangeVertex[],
+  verticesToMerge: [RangeVertex, RangeVertex][],
+  verticesWithChangedSize: RangeVertex[],
+}
+
 /**
  * Mapping from address ranges to range vertices
  */
@@ -71,6 +81,7 @@ export class RangeMapping {
   public truncateRanges(span: Span, coordinate: (address: SimpleCellAddress) => number): TruncateRangesResult {
     const verticesToRemove = Array<RangeVertex>()
     const updated = Array<[string, RangeVertex]>()
+    const verticesWithChangedSize = Array<RangeVertex>()
 
     const sheet = span.sheet
     for (const [key, vertex] of this.entriesFromSheet(span.sheet)) {
@@ -83,6 +94,7 @@ export class RangeMapping {
         } else {
           updated.push([key, vertex])
         }
+        verticesWithChangedSize.push(vertex)
       }
     }
 
@@ -105,18 +117,25 @@ export class RangeMapping {
 
     return {
       verticesToRemove,
-      verticesToMerge
+      verticesToMerge,
+      verticesWithChangedSize
     }
   }
 
-  public moveAllRangesInSheetAfterRowByRows(sheet: number, row: number, numberOfRows: number): RangeVertex[] {
-    return this.updateVerticesFromSheet(sheet, (key: string, vertex: RangeVertex): Maybe<[boolean, RangeVertex]> => {
+  public moveAllRangesInSheetAfterRowByRows(sheet: number, row: number, numberOfRows: number): AdjustRangesResult {
+    return this.updateVerticesFromSheet(sheet, (key: string, vertex: RangeVertex) => {
       if (row <= vertex.start.row) {
         vertex.range.shiftByRows(numberOfRows)
-        return [false, vertex]
+        return {
+          changedSize: false,
+          vertex: vertex
+        }
       } else if (row > vertex.start.row && row <= vertex.end.row) {
         vertex.range.expandByRows(numberOfRows)
-        return [true, vertex]
+        return {
+          changedSize: true,
+          vertex: vertex
+        }
       } else {
         return undefined
       }
@@ -124,13 +143,19 @@ export class RangeMapping {
   }
 
   public moveAllRangesInSheetAfterColumnByColumns(sheet: number, column: number, numberOfColumns: number) {
-    this.updateVerticesFromSheet(sheet, (key: string, vertex: RangeVertex): Maybe<[boolean, RangeVertex]> => {
+    this.updateVerticesFromSheet(sheet, (key: string, vertex: RangeVertex) => {
       if (column <= vertex.start.col) {
         vertex.range.shiftByColumns(numberOfColumns)
-        return [false, vertex]
+        return {
+          changedSize: false,
+          vertex: vertex
+        }
       } else if (column > vertex.start.col && column <= vertex.end.col) {
         vertex.range.expandByColumns(numberOfColumns)
-        return [true, vertex]
+        return {
+          changedSize: true,
+          vertex: vertex
+        }
       } else {
         return undefined
       }
@@ -138,12 +163,15 @@ export class RangeMapping {
   }
 
   public moveRangesInsideSourceRange(sourceRange: AbsoluteCellRange, toRight: number, toBottom: number, toSheet: number) {
-    this.updateVerticesFromSheet(sourceRange.sheet, (key: string, vertex: RangeVertex): Maybe<[boolean, RangeVertex]> => {
+    this.updateVerticesFromSheet(sourceRange.sheet, (key: string, vertex: RangeVertex) => {
       if (sourceRange.containsRange(vertex.range)) {
         vertex.range.shiftByColumns(toRight)
         vertex.range.shiftByRows(toBottom)
         vertex.range.moveToSheet(toSheet)
-        return [false, vertex]
+        return {
+          changedSize: false,
+          vertex: vertex
+        }
       } else {
         return undefined
       }
@@ -219,8 +247,8 @@ export class RangeMapping {
     return this.rangeMapping.get(sheet)?.get(key)
   }
 
-  private updateVerticesFromSheet(sheet: number, fn: (key: string, vertex: RangeVertex) => Maybe<[boolean, RangeVertex]>): RangeVertex[] {
-    const updated = Array<[boolean, RangeVertex]>()
+  private updateVerticesFromSheet(sheet: number, fn: AdjustVerticesOperation): AdjustRangesResult {
+    const updated = Array<AdjustVeticesOperationResult>()
 
     for (const [key, vertex] of this.entriesFromSheet(sheet)) {
       const result = fn(key, vertex)
@@ -230,18 +258,24 @@ export class RangeMapping {
       }
     }
 
-    updated.forEach(([_, range]) => {
-      this.setRange(range)
+    updated.forEach(entry => {
+      this.setRange(entry.vertex)
     })
 
-    return updated.filter(entry => entry[0]).map(entry => entry[1])
+    return {
+      verticesWithChangedSize: updated
+        .filter(entry => entry.changedSize)
+        .map(entry => entry.vertex)
+    }
   }
 }
 
-export interface TruncateRangesResult {
-  verticesToRemove: RangeVertex[],
-  verticesToMerge: [RangeVertex, RangeVertex][],
+type AdjustVeticesOperationResult = {
+  changedSize: boolean,
+  vertex: RangeVertex,
 }
+
+type AdjustVerticesOperation = (key: string, vertex: RangeVertex) => Maybe<AdjustVeticesOperationResult>
 
 function keyFromAddresses(start: SimpleCellAddress, end: SimpleCellAddress): string {
   return `${start.col},${start.row},${end.col},${end.row}`

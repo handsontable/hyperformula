@@ -385,9 +385,8 @@ export class DependencyGraph {
     const affectedMatrices = this.stats.measure(StatType.ADJUSTING_RANGES, () => {
       const result = this.rangeMapping.moveAllRangesInSheetAfterRowByRows(addedRows.sheet, addedRows.rowStart, addedRows.numberOfRows)
       this.fixRangesWhenAddingRows(addedRows.sheet, addedRows.rowStart, addedRows.numberOfRows)
-      return this.getRangeRelatedMatrixVertices(result)
+      return this.getRangeRelatedMatrixVertices(result.verticesWithChangedSize)
     })
-
 
     this.stats.measure(StatType.ADJUSTING_MATRIX_MAPPING, () => {
       this.fixMatricesAfterAddingRow(addedRows.sheet, addedRows.rowStart, addedRows.numberOfRows)

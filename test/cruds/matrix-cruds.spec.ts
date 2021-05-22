@@ -117,7 +117,7 @@ describe('Remove rows', () => {
     ], { useArrayArithmetic: true }))
   })
 
-  it('adding row should shrink dependent array', () => {
+  it('removing row should shrink dependent array', () => {
     const engine = HyperFormula.buildFromArray([
       [1, 2],
       [],
