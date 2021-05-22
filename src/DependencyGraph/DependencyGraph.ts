@@ -282,7 +282,7 @@ export class DependencyGraph {
 
     const affectedMatrices = this.stats.measure(StatType.ADJUSTING_RANGES, () => {
       const affectedRanges = this.truncateRanges(removedRows, address => address.row)
-      return this.getRangeRelatedMatrixVertices(affectedRanges)
+      return this.getMatrixVerticesRelatedToRanges(affectedRanges)
     })
 
     this.stats.measure(StatType.ADJUSTING_MATRIX_MAPPING, () => {
@@ -385,7 +385,7 @@ export class DependencyGraph {
     const affectedMatrices = this.stats.measure(StatType.ADJUSTING_RANGES, () => {
       const result = this.rangeMapping.moveAllRangesInSheetAfterRowByRows(addedRows.sheet, addedRows.rowStart, addedRows.numberOfRows)
       this.fixRangesWhenAddingRows(addedRows.sheet, addedRows.rowStart, addedRows.numberOfRows)
-      return this.getRangeRelatedMatrixVertices(result.verticesWithChangedSize)
+      return this.getMatrixVerticesRelatedToRanges(result.verticesWithChangedSize)
     })
 
     this.stats.measure(StatType.ADJUSTING_MATRIX_MAPPING, () => {
@@ -631,10 +631,15 @@ export class DependencyGraph {
     this.matrixMapping.destroy()
   }
 
-  public getRangeRelatedMatrixVertices(ranges: RangeVertex[]): Set<MatrixVertex> {
-    const reduced = ranges
-      .map(range => Array.from(this.graph.adjacentNodes(range)).filter(node => node instanceof MatrixVertex)) as MatrixVertex[][]
-    return new Set(...reduced)
+  public getMatrixVerticesRelatedToRanges(ranges: RangeVertex[]): Set<MatrixVertex> {
+    const matrixVertices = ranges.map(range => {
+      if (this.graph.hasNode(range)) {
+        return Array.from(this.graph.adjacentNodes(range)).filter(node => node instanceof MatrixVertex)
+      } else {
+        return []
+      }
+    }) as MatrixVertex[][]
+    return new Set(...matrixVertices)
   }
 
   public* verticesFromRange(range: AbsoluteCellRange): IterableIterator<CellVertex> {
