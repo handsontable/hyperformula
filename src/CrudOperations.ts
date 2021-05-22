@@ -467,14 +467,9 @@ export class CrudOperations {
       if (rowEnd < rowStart) {
         throw new InvalidArgumentsError('starting row to be smaller than the ending row.')
       }
-      const rowsToRemove = RowsSpan.fromRowStartAndEnd(sheet, rowStart, rowEnd)
 
       if (!this.sheetMapping.hasSheetWithId(sheet)) {
         throw new NoSheetWithIdError(sheet)
-      }
-
-      if (this.dependencyGraph.matrixMapping.isFormulaMatrixInRows(rowsToRemove)) {
-        throw new SourceLocationHasMatrixError()
       }
     }
   }

@@ -481,7 +481,7 @@ export class Operations {
       removedCells.push({address, cellType: this.getClipboardCell(address)})
     }
 
-    this.dependencyGraph.removeRows(rowsToRemove)
+    const affectedMatrices = this.dependencyGraph.removeRows(rowsToRemove)
 
     let version: number
     this.stats.measure(StatType.TRANSFORM_ASTS, () => {
@@ -489,6 +489,9 @@ export class Operations {
       transformation.performEagerTransformations(this.dependencyGraph, this.parser)
       version = this.lazilyTransformingAstService.addTransformation(transformation)
     })
+
+    this.rewriteAffectedMatrices(affectedMatrices)
+
     return {version: version!, removedCells, rowFrom: rowsToRemove.rowStart, rowCount: rowsToRemove.numberOfRows}
   }
 

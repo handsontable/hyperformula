@@ -41,7 +41,7 @@ describe('Add rows', () => {
     ], { useArrayArithmetic: true }))
   })
 
-  it('Adding row should expand dependent array', () => {
+  it('adding row should expand dependent array', () => {
     const engine = HyperFormula.buildFromArray([
       [1, 2],
       [3, 4],
@@ -55,6 +55,98 @@ describe('Add rows', () => {
       [],
       [3, 4],
       ['=TRANSPOSE(A1:B3)']
+    ], { useArrayArithmetic: true }))
+  })
+
+  it('undo add row with dependent array', () => {
+    const engine = HyperFormula.buildFromArray([
+      [1, 2],
+      [3, 4],
+      ['=TRANSPOSE(A1:B2)']
+    ], { useArrayArithmetic: true })
+
+    engine.addRows(0, [1, 1])
+    engine.undo()
+
+    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
+      [1, 2],
+      [3, 4],
+      ['=TRANSPOSE(A1:B2)']
+    ], { useArrayArithmetic: true }))
+  })
+})
+
+describe('Remove rows', () => {
+  it('should be possible to remove row above matrix', () => {
+    const engine = HyperFormula.buildFromArray([
+      [],
+      ['=-C2:D4'],
+      [],
+      [],
+      ['foo']
+    ], {useArrayArithmetic: true})
+
+    engine.removeRows(0, [0, 1])
+
+    const expected = HyperFormula.buildFromArray([
+      ['=-C1:D3'],
+      [],
+      [],
+      ['foo']
+    ], {useArrayArithmetic: true})
+
+    expectEngineToBeTheSameAs(engine, expected)
+  })
+
+  it('removing row across array should not change array', () => {
+    const engine = HyperFormula.buildFromArray([
+      [1, 2], [3, 4], [5, 6],
+      ['=-A1:B3'],
+      [], [], [],
+      ['foo']
+    ], { useArrayArithmetic: true })
+
+    engine.removeRows(0, [4, 1])
+
+    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
+      [1, 2], [3, 4], [5, 6],
+      ['=-A1:B3'],
+      [], [],
+      ['foo']
+    ], { useArrayArithmetic: true }))
+  })
+
+  it('adding row should shrink dependent array', () => {
+    const engine = HyperFormula.buildFromArray([
+      [1, 2],
+      [],
+      [3, 4],
+      ['=TRANSPOSE(A1:B3)']
+    ], { useArrayArithmetic: true })
+
+    engine.removeRows(0, [1, 1])
+
+    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
+      [1, 2],
+      [3, 4],
+      ['=TRANSPOSE(A1:B2)']
+    ], { useArrayArithmetic: true }))
+  })
+
+  it('it should be REF if no space after removing row', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=-A3:A4'],
+      [],
+      [1],
+      [2],
+    ], { useArrayArithmetic: true })
+
+    engine.removeRows(0, [1, 1])
+
+    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
+      ['=#REF!'],
+      [1],
+      [2]
     ], { useArrayArithmetic: true }))
   })
 })

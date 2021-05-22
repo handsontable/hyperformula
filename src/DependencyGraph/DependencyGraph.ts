@@ -263,11 +263,7 @@ export class DependencyGraph {
     return vertex
   }
 
-  public removeRows(removedRows: RowsSpan) {
-    if (this.matrixMapping.isFormulaMatrixInRows(removedRows)) {
-      throw Error('It is not possible to remove row with matrix')
-    }
-
+  public removeRows(removedRows: RowsSpan): Set<MatrixVertex> {
     this.stats.measure(StatType.ADJUSTING_GRAPH, () => {
       for (const vertex of this.addressMapping.verticesFromRowsSpan(removedRows)) {
         for (const adjacentNode of this.graph.adjacentNodes(vertex)) {
@@ -284,11 +280,18 @@ export class DependencyGraph {
       this.addressMapping.removeRows(removedRows)
     })
 
-    this.stats.measure(StatType.ADJUSTING_RANGES, () => {
-      this.truncateRanges(removedRows, address => address.row)
+    const affectedMatrices = this.stats.measure(StatType.ADJUSTING_RANGES, () => {
+      const affectedRanges = this.truncateRanges(removedRows, address => address.row)
+      return this.getRangeRelatedMatrixVertices(affectedRanges)
+    })
+
+    this.stats.measure(StatType.ADJUSTING_MATRIX_MAPPING, () => {
+      this.fixMatricesAfterRemovingRows(removedRows.sheet, removedRows.rowStart, removedRows.numberOfRows)
     })
 
     this.addStructuralNodesToChangeSet()
+
+    return affectedMatrices
   }
 
   public removeSheet(removedSheetId: number) {
@@ -846,7 +849,7 @@ export class DependencyGraph {
     }
   }
 
-  private truncateRanges(span: Span, coordinate: (address: SimpleCellAddress) => number) {
+  private truncateRanges(span: Span, coordinate: (address: SimpleCellAddress) => number): RangeVertex[] {
     const {verticesToRemove, verticesToMerge} = this.rangeMapping.truncateRanges(span, coordinate)
     for (const [existingVertex, mergedVertex] of verticesToMerge) {
       this.mergeRangeVertices(existingVertex, mergedVertex)
@@ -854,6 +857,7 @@ export class DependencyGraph {
     for (const rangeVertex of verticesToRemove) {
       this.removeVertexAndCleanupDependencies(rangeVertex)
     }
+    return [...verticesToRemove, ...verticesToMerge.map(v => v[1])]
   }
 
   private fixMatricesAfterAddingRow(sheet: number, rowStart: number, numberOfRows: number) {
@@ -869,6 +873,19 @@ export class DependencyGraph {
           const source = simpleCellAddress(sheet, col, row + numberOfRows)
           this.addressMapping.moveCell(source, destination)
         }
+      }
+    }
+  }
+
+  private fixMatricesAfterRemovingRows(sheet: number, rowStart: number, numberOfRows: number) {
+    this.matrixMapping.moveMatrixVerticesAfterRowByRows(sheet, rowStart, -numberOfRows)
+    if (rowStart <= 0) {
+      return
+    }
+    for (const [, matrix] of this.matrixMapping.matricesInRows(RowsSpan.fromRowStartAndEnd(sheet, rowStart-1, rowStart-1))) {
+      const matrixRange = matrix.getRange()
+      for (const address of matrixRange.addresses(this)) {
+        this.addressMapping.setCell(address, matrix)
       }
     }
   }
