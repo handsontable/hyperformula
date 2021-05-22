@@ -13,6 +13,7 @@ import {MatrixSize} from '../MatrixSize'
 import {Maybe} from '../Maybe'
 import {Ast} from '../parser'
 import {ColumnsSpan, RowsSpan} from '../Span'
+import {ErrorMessage} from '../error-message'
 
 export abstract class FormulaVertex {
   static fromAst(formula: Ast, address: SimpleCellAddress, size: MatrixSize, version: number) {
@@ -149,6 +150,10 @@ export class MatrixVertex extends FormulaVertex {
     if (this.matrix instanceof Matrix) {
       this.matrix.set(col, row, value)
     }
+  }
+
+  setNoSpace() {
+    this.matrix = new ErroredMatrix(new CellError(ErrorType.REF, ErrorMessage.NoSpaceForArrayResult), MatrixSize.error())
   }
 
   getRange(): AbsoluteCellRange {

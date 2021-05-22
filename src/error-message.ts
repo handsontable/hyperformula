@@ -12,6 +12,7 @@ export class ErrorMessage {
   public static EmptyArg = 'Empty function argument.'
   public static EmptyArray = 'Empty array not allowed.'
   public static MatrixDimensions = 'Matrix dimensions are not compatible.'
+  public static NoSpaceForArrayResult = 'No space for array result.'
   public static ValueSmall = 'Value too small.'
   public static ValueLarge = 'Value too large.'
   public static BadCriterion = 'Incorrect criterion.'

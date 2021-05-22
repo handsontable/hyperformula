@@ -8,7 +8,7 @@ import {RawCellContent} from '../../CellContentParser'
 import {NoSheetWithIdError} from '../../errors'
 import {EmptyValue, InterpreterValue} from '../../interpreter/InterpreterValue'
 import {ColumnsSpan, RowsSpan} from '../../Span'
-import {MatrixVertex, ValueCellVertex} from '../index'
+import {MatrixVertex, ValueCellVertex, Vertex} from '../index'
 import {CellVertex} from '../Vertex'
 import {ChooseAddressMapping} from './ChooseAddressMappingPolicy'
 import {IAddressMappingStrategy} from './IAddressMappingStrategy'
@@ -123,6 +123,12 @@ export class AddressMapping {
       throw Error('Sheet not initialized')
     }
     sheetMapping.removeCell(address)
+  }
+
+  public removeCellIfEqual(address: SimpleCellAddress, vertex: CellVertex) {
+    if (this.getCell(address) === vertex) {
+      this.removeCell(address)
+    }
   }
 
   /** @inheritDoc */

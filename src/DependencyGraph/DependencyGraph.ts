@@ -425,6 +425,16 @@ export class DependencyGraph {
     }
   }
 
+  public isThereSpaceForMatrix(matrixVertex: MatrixVertex): boolean {
+    for (const address of matrixVertex.getRange().addresses(this)) {
+      const vertexUnderAddress = this.addressMapping.getCell(address)
+      if (vertexUnderAddress !== null && vertexUnderAddress !== matrixVertex) {
+        return false
+      }
+    }
+    return true
+  }
+
   public moveCells(sourceRange: AbsoluteCellRange, toRight: number, toBottom: number, toSheet: number) {
     for (const sourceAddress of sourceRange.addressesWithDirection(toRight, toBottom, this)) {
       const targetAddress = simpleCellAddress(toSheet, sourceAddress.col + toRight, sourceAddress.row + toBottom)
@@ -883,11 +893,23 @@ export class DependencyGraph {
       return
     }
     for (const [, matrix] of this.matrixMapping.matricesInRows(RowsSpan.fromRowStartAndEnd(sheet, rowStart-1, rowStart-1))) {
-      const matrixRange = matrix.getRange()
-      for (const address of matrixRange.addresses(this)) {
-        this.addressMapping.setCell(address, matrix)
+      if (this.isThereSpaceForMatrix(matrix)) {
+        for (const address of matrix.getRange().addresses(this)) {
+          this.addressMapping.setCell(address, matrix)
+        }
+      } else {
+        this.shrinkMatrixToCorner(matrix)
       }
     }
+  }
+
+  private shrinkMatrixToCorner(matrixVertex: MatrixVertex) {
+    const matrixRange = matrixVertex.getRange()
+    for (const address of matrixRange.addresses(this)) {
+      this.addressMapping.removeCellIfEqual(address, matrixVertex)
+    }
+    this.addressMapping.setCell(matrixRange.start, matrixVertex)
+    matrixVertex.setNoSpace()
   }
 
   private removeVertex(vertex: Vertex) {
