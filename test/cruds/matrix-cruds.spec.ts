@@ -180,3 +180,34 @@ describe('Remove rows', () => {
   })
 })
 
+describe('Set cell content', () => {
+  it('should be REF matrix if no space for result', () => {
+    const engine = HyperFormula.buildFromArray([
+      [],
+      [1],
+    ], { useArrayArithmetic: true })
+
+    engine.setCellContents(adr('A1'), [['=-B2:B3']])
+
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.REF, ErrorMessage.NoSpaceForArrayResult))
+    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
+      ['=-B2:B3'],
+      [1],
+    ], { useArrayArithmetic: true }))
+  })
+
+  it('should be REF matrix if no space and potential cycle', () => {
+    const engine = HyperFormula.buildFromArray([
+      [],
+      [1],
+    ], { useArrayArithmetic: true })
+
+    engine.setCellContents(adr('A1'), [['=-A2:A3']])
+
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.REF, ErrorMessage.NoSpaceForArrayResult))
+    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
+      ['=-A2:A3'],
+      [1],
+    ], { useArrayArithmetic: true }))
+  })
+})

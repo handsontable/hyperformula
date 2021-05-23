@@ -835,20 +835,25 @@ export class DependencyGraph {
   }
 
   private exchangeOrAddFormulaVertex(vertex: FormulaVertex): void {
-    const range = AbsoluteCellRange.spanFrom(vertex.getAddress(this.lazilyTransformingAstService), vertex.width, vertex.height)
+    const address = vertex.getAddress(this.lazilyTransformingAstService)
+    const range = AbsoluteCellRange.spanFrom(address, vertex.width, vertex.height)
+    const oldNode = this.getCell(address)
 
-    const oldNode = this.getCell(range.start)
     if (vertex instanceof MatrixVertex) {
       this.setMatrix(range, vertex)
     }
     if (oldNode instanceof MatrixVertex) {
       this.shrinkMatrixToCorner(oldNode)
     }
-
     this.exchangeOrAddGraphNode(oldNode, vertex)
+    this.addressMapping.setCell(address, vertex)
 
-    for (const address of range.addresses(this)) {
-      this.addressMapping.setCell(address, vertex)
+    if (vertex instanceof MatrixVertex && !this.isThereSpaceForMatrix(vertex)) {
+      return
+    }
+
+    for (const cellAddress of range.addresses(this)) {
+      this.addressMapping.setCell(cellAddress, vertex)
     }
   }
 
