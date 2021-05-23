@@ -24,6 +24,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - Fixed an issue with arrays and cruds. (#651)
+- Fixed an issue with nested namedexpressions. (#679)
 
 ## [0.6.0] - 2021-04-27
 
