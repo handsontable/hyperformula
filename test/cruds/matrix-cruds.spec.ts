@@ -156,5 +156,27 @@ describe('Remove rows', () => {
     ], { useArrayArithmetic: true })
     expectEngineToBeTheSameAs(engine, expected)
   })
+
+  it('it should be REF, not CYCLE, after removing rows', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=-A3:A4'],
+      [],
+      [1],
+      [2]
+    ], { useArrayArithmetic: true })
+
+    engine.removeRows(0, [1, 1])
+
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.REF, ErrorMessage.NoSpaceForArrayResult))
+    expect(engine.getCellValue(adr('A2'))).toEqual(1)
+    expect(engine.getCellValue(adr('A3'))).toEqual(2)
+
+    const expected = HyperFormula.buildFromArray([
+      ['=-A2:A3'],
+      [1],
+      [2]
+    ], { useArrayArithmetic: true })
+    expectEngineToBeTheSameAs(engine, expected)
+  })
 })
 
