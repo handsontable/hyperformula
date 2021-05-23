@@ -23,6 +23,7 @@ import {NumberLiteralHelper} from './NumberLiteralHelper'
 import {Ast, RelativeDependency} from './parser'
 import {Serialization} from './Serialization'
 import {Statistics, StatType} from './statistics'
+import {CellContent} from './CellContentParser'
 
 export class Evaluator {
   private interpreter: Interpreter
@@ -60,19 +61,12 @@ export class Evaluator {
       this.dependencyGraph.graph.getTopSortedWithSccSubgraphFrom(vertices,
         (vertex: Vertex) => {
           if (vertex instanceof FormulaVertex) {
-            const address = vertex.getAddress(this.dependencyGraph.lazilyTransformingAstService)
-            const formula = vertex.getFormula(this.dependencyGraph.lazilyTransformingAstService)
             const currentValue = vertex.isComputed() ? vertex.getCellValue() : null
-            const newCellValue = this.evaluateAstToCellValue(formula, new InterpreterState(address, this.config.useArrayArithmetic))
-            let setValue
-            if (vertex instanceof MatrixVertex && !this.dependencyGraph.isThereSpaceForMatrix(vertex)) {
-              setValue = vertex.setNoSpace()
-            } else {
-              setValue = vertex.setCellValue(newCellValue)
-            }
+            const newCellValue = this.recomputeFormulaVertexValue(vertex)
             if (newCellValue !== currentValue) {
+              const address = vertex.getAddress(this.lazilyTransformingAstService)
               changes.addChange(newCellValue, address)
-              this.columnSearch.change(getRawValue(currentValue), getRawValue(setValue), address)
+              this.columnSearch.change(getRawValue(currentValue), getRawValue(newCellValue), address)
               return true
             }
             return false
@@ -87,7 +81,7 @@ export class Evaluator {
           if (vertex instanceof RangeVertex) {
             vertex.clearCache()
           } else if (vertex instanceof FormulaVertex) {
-            const address = vertex.getAddress(this.dependencyGraph.lazilyTransformingAstService)
+            const address = vertex.getAddress(this.lazilyTransformingAstService)
             this.columnSearch.remove(getRawValue(vertex.valueOrNull()), address)
             const error = new CellError(ErrorType.CYCLE, undefined, address)
             vertex.setCellValue(error)
@@ -135,20 +129,24 @@ export class Evaluator {
     })
     sorted.forEach((vertex: Vertex) => {
       if (vertex instanceof FormulaVertex) {
+        const newCellValue = this.recomputeFormulaVertexValue(vertex)
         const address = vertex.getAddress(this.lazilyTransformingAstService)
-        const formula = vertex.getFormula(this.lazilyTransformingAstService)
-        const newCellValue = this.evaluateAstToCellValue(formula, new InterpreterState(address, this.config.useArrayArithmetic))
-        let setValue
-        if (vertex instanceof MatrixVertex && !this.dependencyGraph.isThereSpaceForMatrix(vertex)) {
-          setValue = vertex.setNoSpace()
-        } else {
-          setValue = vertex.setCellValue(newCellValue)
-        }
-        this.columnSearch.add(getRawValue(setValue), address)
+        this.columnSearch.add(getRawValue(newCellValue), address)
       } else if (vertex instanceof RangeVertex) {
         vertex.clearCache()
       }
     })
+  }
+
+  private recomputeFormulaVertexValue(vertex: FormulaVertex): InterpreterValue {
+    if (vertex instanceof MatrixVertex && !this.dependencyGraph.isThereSpaceForMatrix(vertex)) {
+      return vertex.setNoSpace()
+    } else {
+      const address = vertex.getAddress(this.lazilyTransformingAstService)
+      const formula = vertex.getFormula(this.lazilyTransformingAstService)
+      const newCellValue = this.evaluateAstToCellValue(formula, new InterpreterState(address, this.config.useArrayArithmetic))
+      return vertex.setCellValue(newCellValue)
+    }
   }
 
   private evaluateAstToCellValue(ast: Ast, state: InterpreterState): InterpreterValue {
