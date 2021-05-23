@@ -844,6 +844,7 @@ export class DependencyGraph {
     if (oldNode instanceof MatrixVertex) {
       this.shrinkMatrixToCorner(oldNode)
     }
+
     this.exchangeOrAddGraphNode(oldNode, vertex)
 
     for (const address of range.addresses(this)) {

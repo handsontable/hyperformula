@@ -136,21 +136,25 @@ describe('Remove rows', () => {
 
   it('it should be REF if no space after removing row', () => {
     const engine = HyperFormula.buildFromArray([
-      ['=-A3:A4'],
+      ['=-B3:B4'],
       [],
-      [1],
-      [2],
+      [1, 1],
+      [null, 2],
     ], { useArrayArithmetic: true })
 
     engine.removeRows(0, [1, 1])
 
     expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.REF, ErrorMessage.NoSpaceForArrayResult))
     expect(engine.getCellValue(adr('A2'))).toEqual(1)
-    expect(engine.getCellValue(adr('A3'))).toEqual(2)
-    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
-      ['=-A2:A3'],
-      [1],
-      [2]
-    ], { useArrayArithmetic: true }))
+    expect(engine.getCellValue(adr('B2'))).toEqual(1)
+    expect(engine.getCellValue(adr('B3'))).toEqual(2)
+
+    const expected = HyperFormula.buildFromArray([
+      ['=-B2:B3'],
+      [1, 1],
+      [null, 2]
+    ], { useArrayArithmetic: true })
+    expectEngineToBeTheSameAs(engine, expected)
   })
 })
+

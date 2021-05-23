@@ -84,7 +84,11 @@ export class MatrixVertex extends FormulaVertex {
 
   constructor(formula: Ast, cellAddress: SimpleCellAddress, size: MatrixSize, version: number = 0) {
     super(formula, cellAddress, version)
-    this.matrix = new NotComputedMatrix(size)
+    if (size.isRef) {
+      this.matrix = new ErroredMatrix(new CellError(ErrorType.REF, ErrorMessage.NoSpaceForArrayResult), MatrixSize.error())
+    } else {
+      this.matrix = new NotComputedMatrix(size)
+    }
   }
 
   get width(): number {
@@ -152,8 +156,9 @@ export class MatrixVertex extends FormulaVertex {
     }
   }
 
-  setNoSpace() {
+  setNoSpace(): InterpreterValue {
     this.matrix = new ErroredMatrix(new CellError(ErrorType.REF, ErrorMessage.NoSpaceForArrayResult), MatrixSize.error())
+    return this.getCellValue()
   }
 
   getRange(): AbsoluteCellRange {

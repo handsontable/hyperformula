@@ -9,7 +9,7 @@ import {CellError, ErrorType, SimpleCellAddress} from './Cell'
 import {Config} from './Config'
 import {ContentChanges} from './ContentChanges'
 import {DateTimeHelper} from './DateTimeHelper'
-import {DependencyGraph, RangeVertex, Vertex} from './DependencyGraph'
+import {DependencyGraph, MatrixVertex, RangeVertex, Vertex} from './DependencyGraph'
 import {FormulaVertex} from './DependencyGraph/FormulaCellVertex'
 import {FunctionRegistry} from './interpreter/FunctionRegistry'
 import {Interpreter} from './interpreter/Interpreter'
@@ -64,7 +64,12 @@ export class Evaluator {
             const formula = vertex.getFormula(this.dependencyGraph.lazilyTransformingAstService)
             const currentValue = vertex.isComputed() ? vertex.getCellValue() : null
             const newCellValue = this.evaluateAstToCellValue(formula, new InterpreterState(address, this.config.useArrayArithmetic))
-            const setValue = vertex.setCellValue(newCellValue)
+            let setValue
+            if (vertex instanceof MatrixVertex && !this.dependencyGraph.isThereSpaceForMatrix(vertex)) {
+              setValue = vertex.setNoSpace()
+            } else {
+              setValue = vertex.setCellValue(newCellValue)
+            }
             if (newCellValue !== currentValue) {
               changes.addChange(newCellValue, address)
               this.columnSearch.change(getRawValue(currentValue), getRawValue(setValue), address)
@@ -133,7 +138,12 @@ export class Evaluator {
         const address = vertex.getAddress(this.lazilyTransformingAstService)
         const formula = vertex.getFormula(this.lazilyTransformingAstService)
         const newCellValue = this.evaluateAstToCellValue(formula, new InterpreterState(address, this.config.useArrayArithmetic))
-        const setValue = vertex.setCellValue(newCellValue)
+        let setValue
+        if (vertex instanceof MatrixVertex && !this.dependencyGraph.isThereSpaceForMatrix(vertex)) {
+          setValue = vertex.setNoSpace()
+        } else {
+          setValue = vertex.setCellValue(newCellValue)
+        }
         this.columnSearch.add(getRawValue(setValue), address)
       } else if (vertex instanceof RangeVertex) {
         vertex.clearCache()

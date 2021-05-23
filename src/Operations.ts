@@ -557,6 +557,9 @@ export class Operations {
 
   private rewriteAffectedMatrices(affectedMatrices: Set<MatrixVertex>) {
     for (const matrixVertex of affectedMatrices.values()) {
+      if (matrixVertex.matrix.size.isRef) {
+        continue
+      }
       const ast = matrixVertex.getFormula(this.lazilyTransformingAstService)
       const address = matrixVertex.getAddress(this.lazilyTransformingAstService)
       const hash = this.parser.computeHashFromAst(ast)
