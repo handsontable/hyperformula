@@ -95,10 +95,21 @@ describe('ColumnIndex#add', () => {
     index.add('A', adr('A2'))
     index.add('ą', adr('A3'))
 
+    // Some strings don't have a canonical form, so for them, the index is created as usual.
+    index.add('l', adr('A4'))
+    index.add('ł', adr('A5'))
+    index.add('t', adr('A6'))
+    index.add('ŧ', adr('A7'))
+
     const columnMap = index.getColumnMap(0, 0)
 
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    // eslint-disable @typescript-eslint/no-non-null-assertion
     expect(columnMap.get('a')!.index.length).toBe(3)
+    expect(columnMap.get('l')!.index.length).toBe(1)
+    expect(columnMap.get('ł')!.index.length).toBe(1)
+    expect(columnMap.get('t')!.index.length).toBe(1)
+    expect(columnMap.get('ŧ')!.index.length).toBe(1)
+    // eslint-enable @typescript-eslint/no-non-null-assertion
   })
 })
 
