@@ -1,6 +1,8 @@
 import {ErrorType, HyperFormula} from '../../src'
 import {adr, detailedError, expectEngineToBeTheSameAs} from '../testUtils'
 import {ErrorMessage} from '../../src/error-message'
+import {MatrixVertex, ValueCellVertex} from '../../src/DependencyGraph'
+import {MatrixSize} from '../../src/MatrixSize'
 
 describe('Add rows', () => {
   it('should be possible to add row above matrix', () => {
@@ -23,7 +25,7 @@ describe('Add rows', () => {
 
     expectEngineToBeTheSameAs(engine, expected)
   })
-  
+
   it('adding row across array should not change array', () => {
     const engine = HyperFormula.buildFromArray([
       [], [], [],
@@ -181,6 +183,20 @@ describe('Remove rows', () => {
 })
 
 describe('Set cell content', () => {
+  it('should set matrix to cell', () => {
+    const engine = HyperFormula.buildFromArray([
+      [1, 2],
+      [3, 4],
+    ], { useArrayArithmetic: true})
+
+    engine.setCellContents(adr('C1'), [['=-A1:B2']])
+
+    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
+      [1, 2, '=-A1:B2'],
+      [3, 4],
+    ], { useArrayArithmetic: true}))
+  })
+
   it('should be REF matrix if no space for result', () => {
     const engine = HyperFormula.buildFromArray([
       [],
@@ -209,5 +225,20 @@ describe('Set cell content', () => {
       ['=-A2:A3'],
       [1],
     ], { useArrayArithmetic: true }))
+  })
+
+  it('should shrink to one vertex if there is more content colliding with matrix', () => {
+    const engine = HyperFormula.buildFromArray([], { useArrayArithmetic: true})
+
+    engine.setCellContents(adr('A1'), [
+      ['=-C1:D2', null],
+      [1, null]
+    ])
+
+    expect(engine.matrixMapping.getMatrixByCorner(adr('A1'))?.matrix.size).toEqual(MatrixSize.error())
+    expect(engine.addressMapping.getCell(adr('A1'))).toBeInstanceOf(MatrixVertex)
+    expect(engine.addressMapping.getCell(adr('B1'))).toBe(null)
+    expect(engine.addressMapping.getCell(adr('A2'))).toBeInstanceOf(ValueCellVertex)
+    expect(engine.addressMapping.getCell(adr('B2'))).toBe(null)
   })
 })

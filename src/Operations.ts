@@ -644,28 +644,24 @@ export class Operations {
 
     const vertex = this.dependencyGraph.getCell(address)
 
-    if (!(vertex instanceof MatrixVertex)) {
-      if (parsedCellContent instanceof CellContent.Formula) {
-        const {
-          ast,
-          errors,
-          hasVolatileFunction,
-          hasStructuralChangeFunction,
-          dependencies
-        } = this.parser.parse(parsedCellContent.formula, address)
-        if (errors.length > 0) {
-          this.dependencyGraph.setParsingErrorToCell(address, new ParsingErrorVertex(errors, parsedCellContent.formula))
-        } else {
-          const size = this.matrixSizePredictor.checkMatrixSize(ast, address)
-          this.dependencyGraph.setFormulaToCell(address, ast, absolutizeDependencies(dependencies, address), size, hasVolatileFunction, hasStructuralChangeFunction)
-        }
-      } else if (parsedCellContent instanceof CellContent.Empty) {
-        this.setCellEmpty(address)
+    if (parsedCellContent instanceof CellContent.Formula) {
+      const {
+        ast,
+        errors,
+        hasVolatileFunction,
+        hasStructuralChangeFunction,
+        dependencies
+      } = this.parser.parse(parsedCellContent.formula, address)
+      if (errors.length > 0) {
+        this.dependencyGraph.setParsingErrorToCell(address, new ParsingErrorVertex(errors, parsedCellContent.formula))
       } else {
-        this.setValueToCell({parsedValue: parsedCellContent.value, rawValue: newCellContent}, address)
+        const size = this.matrixSizePredictor.checkMatrixSize(ast, address)
+        this.dependencyGraph.setFormulaToCell(address, ast, absolutizeDependencies(dependencies, address), size, hasVolatileFunction, hasStructuralChangeFunction)
       }
+    } else if (parsedCellContent instanceof CellContent.Empty) {
+      this.setCellEmpty(address)
     } else {
-      throw new Error('Illegal operation')
+      this.setValueToCell({parsedValue: parsedCellContent.value, rawValue: newCellContent}, address)
     }
   }
 

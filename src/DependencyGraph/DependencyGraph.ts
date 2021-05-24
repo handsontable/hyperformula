@@ -101,7 +101,7 @@ export class DependencyGraph {
 
   public setParsingErrorToCell(address: SimpleCellAddress, errorVertex: ParsingErrorVertex) {
     const vertex = this.addressMapping.getCell(address)
-    this.ensureThatVertexIsNonMatrixCellVertex(vertex)
+    this.setNoSpaceIfMatrix(vertex)
     this.exchangeOrAddGraphNode(vertex, errorVertex)
     this.addressMapping.setCell(address, errorVertex)
     this.graph.markNodeAsSpecialRecentlyChanged(errorVertex)
@@ -110,7 +110,7 @@ export class DependencyGraph {
 
   public setValueToCell(address: SimpleCellAddress, value: RawAndParsedValue) {
     const vertex = this.addressMapping.getCell(address)
-    this.ensureThatVertexIsNonMatrixCellVertex(vertex)
+    this.setNoSpaceIfMatrix(vertex)
 
     if (vertex instanceof ValueCellVertex) {
       const oldValue = vertex.getValues()
@@ -130,10 +130,10 @@ export class DependencyGraph {
 
   public setCellEmpty(address: SimpleCellAddress) {
     const vertex = this.addressMapping.getCell(address)
+    this.setNoSpaceIfMatrix(vertex)
     if (vertex === null) {
       return
     }
-    this.ensureThatVertexIsNonMatrixCellVertex(vertex)
 
     if (this.graph.adjacentNodes(vertex).size > 0) {
       const emptyVertex = new EmptyCellVertex(address)
@@ -842,9 +842,7 @@ export class DependencyGraph {
     if (vertex instanceof MatrixVertex) {
       this.setMatrix(range, vertex)
     }
-    if (oldNode instanceof MatrixVertex) {
-      this.shrinkMatrixToCorner(oldNode)
-    }
+    this.setNoSpaceIfMatrix(oldNode)
     this.exchangeOrAddGraphNode(oldNode, vertex)
     this.addressMapping.setCell(address, vertex)
 
@@ -911,18 +909,24 @@ export class DependencyGraph {
           this.addressMapping.setCell(address, matrix)
         }
       } else {
-        this.shrinkMatrixToCorner(matrix)
-        matrix.setNoSpace()
+        this.setNoSpaceIfMatrix(matrix)
       }
     }
   }
 
-  private shrinkMatrixToCorner(matrixVertex: MatrixVertex) {
-    const matrixRange = matrixVertex.getRange()
-    for (const address of matrixRange.addresses(this)) {
-      this.addressMapping.removeCellIfEqual(address, matrixVertex)
+  private setNoSpaceIfMatrix(vertex: Vertex | null) {
+    if (vertex instanceof MatrixVertex) {
+      this.shrinkMatrixToCorner(vertex)
+      vertex.setNoSpace()
     }
-    this.addressMapping.setCell(matrixRange.start, matrixVertex)
+  }
+
+  private shrinkMatrixToCorner(vertex: MatrixVertex) {
+      const matrixRange = vertex.getRange()
+      for (const address of matrixRange.addresses(this)) {
+        this.addressMapping.removeCellIfEqual(address, vertex)
+      }
+      this.addressMapping.setCell(matrixRange.start, vertex)
   }
 
   private removeVertex(vertex: Vertex) {
