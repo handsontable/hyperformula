@@ -4,7 +4,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+### Fixed
+- Remove redundant `'assert'` dependency from the code. (#672)
+
 ## [Unreleased]
+
+## [0.6.1] - 2021-05-24
+
+### Changed
+- Remove redundant `'assert'` dependency from the code. (#672)
+
+### Fixed
+- Fixed library support for IE11. The `unorm` package is added to the dependencies (#675)
+
+## [0.6.0] - 2021-04-27
 
 ### Changed
 - **Breaking change**: Changed API of many sheet-related methods to take sheetId instead of sheetName as an argument. (#645)
@@ -25,6 +38,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - Fixed an issue with arrays and cruds. (#651)
+- Fixed an issue with nested namedexpressions. (#679)
 
 ## [0.6.0] - 2021-04-27
 
