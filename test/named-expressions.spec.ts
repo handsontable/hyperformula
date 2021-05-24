@@ -990,3 +990,12 @@ describe('Named expressions - options', () => {
     })
   })
 })
+
+describe('nested named expressions', () => {
+  it('should work', () => {
+    const engine = HyperFormula.buildFromArray([['=ABCD']])
+    engine.addNamedExpression('ABCD', '=EFGH')
+    engine.addNamedExpression('EFGH', 1)
+    expect(engine.getCellValue(adr('A1'))).toEqual(1)
+  })
+})

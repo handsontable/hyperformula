@@ -358,8 +358,8 @@ export class Operations {
   }
 
   public addNamedExpression(expressionName: string, expression: RawCellContent, sheetId?: number, options?: NamedExpressionOptions) {
-    this.storeNamedExpressionInCell(this.namedExpressions.lookupNextAddress(expressionName, sheetId), expression)
     const namedExpression = this.namedExpressions.addNamedExpression(expressionName, sheetId, options)
+    this.storeNamedExpressionInCell(namedExpression.address, expression)
     this.adjustNamedExpressionEdges(namedExpression, expressionName, sheetId)
   }
 
@@ -749,12 +749,10 @@ export class Operations {
       }
       const {ast, hasVolatileFunction, hasStructuralChangeFunction, dependencies} = parsingResult
       this.dependencyGraph.setFormulaToCell(address, ast, absolutizeDependencies(dependencies, address), MatrixSize.scalar(), hasVolatileFunction, hasStructuralChangeFunction)
+    } else if (parsedCellContent instanceof CellContent.Empty) {
+      this.setCellEmpty(address)
     } else {
-      if (parsedCellContent instanceof CellContent.Empty) {
-        this.setCellEmpty(address)
-      } else {
-        this.setValueToCell({parsedValue: parsedCellContent.value, rawValue: expression}, address)
-      }
+      this.setValueToCell({parsedValue: parsedCellContent.value, rawValue: expression}, address)
     }
   }
 
