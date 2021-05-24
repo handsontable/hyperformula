@@ -999,3 +999,20 @@ describe('nested named expressions', () => {
     expect(engine.getCellValue(adr('A1'))).toEqual(1)
   })
 })
+
+describe('serialization', () => {
+  it('should work', () => {
+    const engine = HyperFormula.buildFromArray([
+    ['42'],
+    ['50'],
+    ['60']])
+    engine.addNamedExpression('prettyName', '=Sheet1!$A$1+100')
+    engine.addNamedExpression('anotherPrettyName', '=Sheet1!$A$2+100')
+    engine.addNamedExpression('alsoPrettyName', '=Sheet1!$A$3+100', 0)
+    expect(engine.getAllNamedExpressionsSerialized()).toEqual([
+      {name: 'prettyName', expression: '=Sheet1!$A$1+100', options: undefined, scope: undefined},
+      {name: 'anotherPrettyName', expression: '=Sheet1!$A$2+100', options: undefined, scope: undefined},
+      {name: 'alsoPrettyName', expression: '=Sheet1!$A$3+100', options: undefined, scope: 0}
+    ])
+  })
+})

@@ -17,7 +17,7 @@ export interface SerializedNamedExpression {
   name: string,
   expression: RawCellContent,
   scope?: number,
-  options: Maybe<NamedExpressionOptions>,
+  options?: NamedExpressionOptions,
 }
 
 export class Serialization {
