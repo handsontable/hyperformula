@@ -394,8 +394,7 @@ export class CrudOperations {
   }
 
   public addNamedExpression(expressionName: string, expression: RawCellContent, sheetId?: number, options?: NamedExpressionOptions) {
-    this.ensureScopeIdIsValid(sheetId)
-    this.ensureNamedExpressionNameIsValid(expressionName, sheetId)
+    this.ensureItIsPossibleToAddNamedExpression(expressionName, expression, sheetId)
     this.operations.addNamedExpression(expressionName, expression, sheetId, options)
     this.undoRedo.clearRedoStack()
     this.clipboardOperations.abortCut()
@@ -403,7 +402,7 @@ export class CrudOperations {
   }
 
   public changeNamedExpressionExpression(expressionName: string, sheetId: number | undefined, newExpression: RawCellContent, options?: NamedExpressionOptions) {
-    this.ensureScopeIdIsValid(sheetId)
+    this.ensureItIsPossibleToChangeNamedExpression(expressionName, newExpression, sheetId)
     const [oldNamedExpression, content] = this.operations.changeNamedExpressionExpression(expressionName, newExpression, sheetId, options)
     this.undoRedo.clearRedoStack()
     this.clipboardOperations.abortCut()
