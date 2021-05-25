@@ -1024,7 +1024,7 @@ describe('serialization', () => {
     engine.removeSheet(1)
     expect(engine.getAllNamedExpressionsSerialized()).toEqual([
       {name: 'prettyName', expression: '=1', scope: 0},
-      {name: 'alsoPrettyName',expression: '=3',scope: 1}
+      {name: 'alsoPrettyName', expression: '=3', scope: 1}
     ])
   })
 })
