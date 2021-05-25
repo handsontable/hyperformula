@@ -95,4 +95,14 @@ describe('named expressions', () => {
     const engine = HyperFormula.buildFromSheets({sheet: [['=FALSE']]},{}, [{name: 'FALSE', expression: false}])
     expect(engine.getCellValue(adr('A1'))).toEqual(false)
   })
+
+  it('buildFromArray + scope', () => {
+    const engine = HyperFormula.buildFromArray([['=FALSE']],{}, [{name: 'FALSE', expression: false, scope: 0}])
+    expect(engine.getCellValue(adr('A1'))).toEqual(false)
+  })
+
+  it('buildFromSheets + scope', () => {
+    const engine = HyperFormula.buildFromSheets({sheet: [['=FALSE']]},{}, [{name: 'FALSE', expression: false, scope: 0}])
+    expect(engine.getCellValue(adr('A1'))).toEqual(false)
+  })
 })

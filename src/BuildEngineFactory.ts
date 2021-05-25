@@ -75,6 +75,7 @@ export class BuildEngineFactory {
     const matrixSizePredictor = new MatrixSizePredictor(config, functionRegistry)
     const crudOperations = new CrudOperations(config, stats, dependencyGraph, columnSearch, parser, cellContentParser, lazilyTransformingAstService, namedExpressions, matrixSizePredictor)
     inputNamedExpressions.forEach((entry: SerializedNamedExpression) => {
+      crudOperations.ensureItIsPossibleToAddNamedExpression(entry.name, entry.expression, entry.scope)
       crudOperations.operations.addNamedExpression(entry.name, entry.expression, entry.scope, entry.options)
     })
     stats.measure(StatType.GRAPH_BUILD, () => {

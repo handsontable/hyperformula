@@ -131,11 +131,18 @@ export class Serialization {
   }
 
   public getAllNamedExpressionsSerialized(): SerializedNamedExpression[] {
+    const idMap: number[] = []
+    let id = 0
+    for (const sheetName of this.dependencyGraph.sheetMapping.displayNames()) {
+      const sheetId = this.dependencyGraph.sheetMapping.fetch(sheetName)
+      idMap[sheetId] = id
+      id++
+    }
     return this.dependencyGraph.namedExpressions.getAllNamedExpressions().map((entry) => {
       return {
         name: entry.expression.displayName,
         expression: this.getCellSerialized(entry.expression.address),
-        scope: entry.scope,
+        scope: entry.scope !== undefined ? idMap[entry.scope] : undefined,
         options: entry.expression.options
       }
     })

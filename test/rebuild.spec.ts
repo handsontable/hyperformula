@@ -30,4 +30,15 @@ describe('Rebuilding engine', () => {
 
     expect(engine.getCellValue(adr('B1', 0))).toEqual(42)
   })
+
+  it('scopes are properly handled', () => {
+    const engine = HyperFormula.buildFromSheets({
+      'Sheet1': [['42']],
+      'Sheet2': [['42', '=FALSE']],
+    }, {}, [{name: 'FALSE', expression: false, scope: 1}])
+
+    engine.removeSheet(0)
+    engine.rebuildAndRecalculate()
+    expect(engine.getCellValue(adr('B1'))).toEqual(false)
+  })
 })

@@ -1015,4 +1015,16 @@ describe('serialization', () => {
       {name: 'alsoPrettyName', expression: '=Sheet1!$A$3+100', options: undefined, scope: 0}
     ])
   })
+
+  it('should update scopes', () => {
+    const engine = HyperFormula.buildFromSheets({sheet1: [[]], sheet2: [[]], sheet3: [[]]})
+    engine.addNamedExpression('prettyName', '=1', 0)
+    engine.addNamedExpression('anotherPrettyName', '=2', 1)
+    engine.addNamedExpression('alsoPrettyName', '=3', 2)
+    engine.removeSheet(1)
+    expect(engine.getAllNamedExpressionsSerialized()).toEqual([
+      {name: 'prettyName', expression: '=1', scope: 0},
+      {name: 'alsoPrettyName',expression: '=3',scope: 1}
+    ])
+  })
 })
