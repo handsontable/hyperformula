@@ -6,6 +6,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.6.1] - 2021-05-24
+
+### Changed
+- Remove redundant `'assert'` dependency from the code. (#672)
+
+### Fixed
+- Fixed library support for IE11. The `unorm` package is added to the dependencies. (#675)
+
 ## [0.6.0] - 2021-04-27
 
 ### Changed
