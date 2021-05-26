@@ -4,16 +4,16 @@
 **Release date: May 26, 2021**
 
 ### Changed
-- Modified a private field in one of the classes to ensure broader compatibility with older TypeScript versions. (#681)
+- Modified a private field in one of the classes to ensure broader compatibility with older TypeScript versions. [#681](https://github.com/handsontable/hyperformula/issues/681)
 
 ## 0.6.1
 **Release date: May 24, 2021**
 
 ### Changed
-- Remove redundant `'assert'` dependency from the code. (#672)
+- Remove redundant `'assert'` dependency from the code. [#672](https://github.com/handsontable/hyperformula/issues/672)
 
 ### Fixed
-- Fixed library support for IE11. The `unorm` package is added to the dependencies. (#675)
+- Fixed library support for IE11. The `unorm` package is added to the dependencies. [#675](https://github.com/handsontable/hyperformula/issues/675)
 
 ## 0.6.0
 **Release date: April 27, 2021**
