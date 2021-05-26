@@ -6,6 +6,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.6.2] - 2021-05-26
+
+### Changed
+- Modified a private field in one of the classes to ensure broader compatibility with older TypeScript versions. (#681)
+
 ## [0.6.1] - 2021-05-24
 
 ### Changed
