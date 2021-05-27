@@ -6,6 +6,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- **Breaking change**: Changed API of many sheet-related methods to take sheetId instead of sheetName as an argument. (#645)
+- **Breaking change**: Removed support for matrix formulas (`{=FORMULA}`) notation. Engine now supports formulas returning array of values (instead of only scalars). (#652)
+- Changed SWITCH function so it takes array as its first argument.
+- **Breaking change**: Removed numeric matrix detection along with matrixDetection and matrixDetectionThreshold config options. (#669)
+
+### Added
+- Added support for array arithmetic. (#628)
+- Added performance improvements for array handling. (#629)
+- Added ARRAYFORMULA function. (#630)
+- Added FILTER function. (#668)
+- Added ARRAY_CONSTRAIN function. (#661)
+- Added casting to scalars from non-range arrays. (#663)
+- Added support for range interpolation. (#665)
+- Accepting time in JS Date() objects on the input. (#648)
+
+### Fixed
+- Fixed an issue with arrays and cruds. (#651)
+- Fixed an issue with nested namedexpressions. (#679)
+
 ## [0.6.2] - 2021-05-26
 
 ### Changed
@@ -22,29 +42,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.6.0] - 2021-04-27
 
 ### Changed
-- **Breaking change**: Changed API of many sheet-related methods to take sheetId instead of sheetName as an argument. (#645)
-- **Breaking change**: Removed support for matrix formulas (`{=FORMULA}`) notation. Engine now supports formulas returning array of values (instead of only scalars). (#652)
-- Changed SWITCH function so it takes array as its first argument.
-- **Breaking change**: Removed numeric matrix detection along with matrixDetection and matrixDetectionThreshold config options. (#669)
 - **Breaking change**: Moved `GPU.js` from `dependencies` to `devDependencies` and `optionalDependencies`. (#642)
 
 ### Added
 - Added two new fired events, for suspending and resuming execution. (#637)
 - Added listing in scopes to `listNamedExpressions` method. (#638)
-- Added support for array arithmetic. (#628)
-- Added performance improvements for array handling. (#629)
-- Added ARRAYFORMULA function. (#630)
-- Added FILTER function. (#668)
-- Added ARRAY_CONSTRAIN function. (#661)
-- Added casting to scalars from non-range arrays. (#663)
-- Added support for range interpolation. (#665)
-- Accepting time in JS Date() objects on the input. (#648)
+- Validation of API arguments types for simple types. (#654)
 
 ### Fixed
 - Fixed issues with scoped named expression. (#646, #641)
 - Fixed an issue with losing formating info about DateTime numbers. (#626)
-- Fixed an issue with arrays and cruds. (#651)
-- Fixed an issue with nested namedexpressions. (#679)
 
 ## [0.5.0] - 2021-04-15
 
