@@ -766,9 +766,6 @@ export class FormulaParser extends EmbeddedActionsParser {
     return buildParenthesisAst(expression, lParenToken.leadingWhitespace, rParenToken.leadingWhitespace)
   })
 
-
-
-
   /**
    * Returns {@link CellReferenceAst} or {@link CellRangeAst} based on OFFSET function arguments
    *
