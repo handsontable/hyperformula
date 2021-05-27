@@ -24,6 +24,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added validation of API argument types for simple types. (#654)
 - Added named expression handling to engine factories. (#680)
 - Added `getAllNamedExpressionsSerialized` method. (#680)
+- Added utility function for filling ranges with source from other range. (#678)
 
 
 ### Fixed
