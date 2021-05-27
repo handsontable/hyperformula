@@ -9,8 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - **Breaking change**: Changed API of many sheet-related methods to take sheetId instead of sheetName as an argument. (#645)
 - **Breaking change**: Removed support for matrix formulas (`{=FORMULA}`) notation. Engine now supports formulas returning array of values (instead of only scalars). (#652)
-- Changed SWITCH function so it takes array as its first argument.
 - **Breaking change**: Removed numeric matrix detection along with matrixDetection and matrixDetectionThreshold config options. (#669)
+- Changed SWITCH function so it takes array as its first argument.
 
 ### Added
 - Added support for array arithmetic. (#628)
@@ -20,8 +20,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added ARRAY_CONSTRAIN function. (#661)
 - Added casting to scalars from non-range arrays. (#663)
 - Added support for range interpolation. (#665)
-- Accepting time in JS Date() objects on the input. (#648)
-- Validation of API arguments types for simple types. (#654)
+- Added support for time in JS `Date()` objects on the input. (#648)
+- Added validation of API argument types for simple types. (#654)
 
 ### Fixed
 - Fixed an issue with arrays and cruds. (#651)
