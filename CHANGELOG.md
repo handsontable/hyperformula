@@ -4,10 +4,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-### Fixed
-- Remove redundant `'assert'` dependency from the code. (#672)
-
 ## [Unreleased]
+
+## [0.6.2] - 2021-05-26
+
+### Changed
+- Modified a private field in one of the classes to ensure broader compatibility with older TypeScript versions. (#681)
 
 ## [0.6.1] - 2021-05-24
 
@@ -15,7 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Remove redundant `'assert'` dependency from the code. (#672)
 
 ### Fixed
-- Fixed library support for IE11. The `unorm` package is added to the dependencies (#675)
+- Fixed library support for IE11. The `unorm` package is added to the dependencies. (#675)
 
 ## [0.6.0] - 2021-04-27
 
@@ -24,8 +26,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Breaking change**: Removed support for matrix formulas (`{=FORMULA}`) notation. Engine now supports formulas returning array of values (instead of only scalars). (#652)
 - Changed SWITCH function so it takes array as its first argument.
 - **Breaking change**: Removed numeric matrix detection along with matrixDetection and matrixDetectionThreshold config options. (#669)
+- **Breaking change**: Moved `GPU.js` from `dependencies` to `devDependencies` and `optionalDependencies`. (#642)
 
 ### Added
+- Added two new fired events, for suspending and resuming execution. (#637)
+- Added listing in scopes to `listNamedExpressions` method. (#638)
 - Added support for array arithmetic. (#628)
 - Added performance improvements for array handling. (#629)
 - Added ARRAYFORMULA function. (#630)
@@ -37,24 +42,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added parsing of arrays in formulas (together with respective config options for separators). (#671)
 
 ### Fixed
-- Fixed an issue with arrays and cruds. (#651)
-- Fixed an issue with nested namedexpressions. (#679)
-
-## [0.6.0] - 2021-04-27
-
-### Added
-- Validation of API arguments types for simple types. (#654)
-
-### Changed
-- **Breaking change**: Moved `GPU.js` from `dependencies` to `devDependencies` and `optionalDependencies`. (#642)
-
-### Added
-- Added two new fired events, for suspending and resuming execution. (#637)
-- Added listing in scopes to `listNamedExpressions` method. (#638)
-
-### Fixed
 - Fixed issues with scoped named expression. (#646, #641)
 - Fixed an issue with losing formating info about DateTime numbers. (#626)
+- Fixed an issue with arrays and cruds. (#651)
+- Fixed an issue with nested namedexpressions. (#679)
 
 ## [0.5.0] - 2021-04-15
 
