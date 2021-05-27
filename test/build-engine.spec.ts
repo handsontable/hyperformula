@@ -77,3 +77,32 @@ describe('Building engine from arrays', () => {
     }).toThrowError('Invalid arguments, expected an array of arrays.')
   })
 })
+
+describe('named expressions', () => {
+  it('buildEmpty', () => {
+    const engine = HyperFormula.buildEmpty({}, [{name: 'FALSE', expression: false}])
+    engine.addSheet('sheet')
+    engine.setSheetContent(0, [['=FALSE']])
+    expect(engine.getCellValue(adr('A1'))).toEqual(false)
+  })
+
+  it('buildFromArray', () => {
+    const engine = HyperFormula.buildFromArray([['=FALSE']], {}, [{name: 'FALSE', expression: false}])
+    expect(engine.getCellValue(adr('A1'))).toEqual(false)
+  })
+
+  it('buildFromSheets', () => {
+    const engine = HyperFormula.buildFromSheets({sheet: [['=FALSE']]}, {}, [{name: 'FALSE', expression: false}])
+    expect(engine.getCellValue(adr('A1'))).toEqual(false)
+  })
+
+  it('buildFromArray + scope', () => {
+    const engine = HyperFormula.buildFromArray([['=FALSE']], {}, [{name: 'FALSE', expression: false, scope: 0}])
+    expect(engine.getCellValue(adr('A1'))).toEqual(false)
+  })
+
+  it('buildFromSheets + scope', () => {
+    const engine = HyperFormula.buildFromSheets({sheet: [['=FALSE']]}, {}, [{name: 'FALSE', expression: false, scope: 0}])
+    expect(engine.getCellValue(adr('A1'))).toEqual(false)
+  })
+})
