@@ -27,6 +27,7 @@ import {ParserConfig} from './parser/ParserConfig'
 type GPUMode = 'gpu' | 'cpu' | 'dev'
 
 const PossibleGPUModeString: GPUMode[] = ['gpu', 'cpu', 'dev']
+const privatePool: WeakMap<Config, {licenseKeyValidityState: LicenseKeyValidityState}> = new WeakMap()
 
 export interface ConfigParams {
   /**
@@ -514,12 +515,7 @@ export class Config implements ConfigParams, ParserConfig {
   public readonly useRegularExpressions: boolean
   public readonly useWildcards: boolean
   public readonly matchWholeCell: boolean
-  /**
-   * Set automatically based on licenseKey checking result.
-   *
-   * @internal
-   */
-  #licenseKeyValidityState: LicenseKeyValidityState
+
   /**
    * Proxied property to its private counterpart. This makes the property
    * as accessible as the other Config options but without ability to change the value.
@@ -527,7 +523,7 @@ export class Config implements ConfigParams, ParserConfig {
    * @internal
    */
   public get licenseKeyValidityState() {
-    return this.#licenseKeyValidityState
+    return privatePool.get(this)!.licenseKeyValidityState
   }
 
   constructor(
@@ -585,7 +581,6 @@ export class Config implements ConfigParams, ParserConfig {
     this.decimalSeparator = configValueFromParam(decimalSeparator, ['.', ','], 'decimalSeparator')
     this.language = configValueFromParam(language, 'string', 'language')
     this.licenseKey = configValueFromParam(licenseKey, 'string', 'licenseKey')
-    this.#licenseKeyValidityState = checkLicenseKeyValidity(this.licenseKey)
     this.thousandSeparator = configValueFromParam(thousandSeparator, ['', ',', ' ', '.'], 'thousandSeparator')
     this.matrixColumnSeparator = configValueFromParam(matrixColumnSeparator, [',', ';'], 'matrixColumnSeparator')
     this.matrixRowSeparator = configValueFromParam(matrixRowSeparator, [';', '|'], 'matrixRowSeparator')
@@ -631,6 +626,10 @@ export class Config implements ConfigParams, ParserConfig {
       }
     })
     validateNumberToBeAtLeast(this.maxColumns, 'maxColumns', 1)
+
+    privatePool.set(this, {
+      licenseKeyValidityState: checkLicenseKeyValidity(this.licenseKey)
+    })
 
     configCheckIfParametersNotInConflict(
       {value: this.decimalSeparator, name: 'decimalSeparator'},

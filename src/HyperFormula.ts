@@ -35,7 +35,7 @@ import {
   EvaluationSuspendedError,
   LanguageAlreadyRegisteredError,
   LanguageNotRegisteredError,
-  NotAFormulaError
+  NotAFormulaError, SheetsNotEqual
 } from './errors'
 import {Evaluator} from './Evaluator'
 import {ExportedChange, Exporter} from './Exporter'
@@ -235,8 +235,8 @@ export class HyperFormula implements TypedEmitter {
    *
    * @category Factories
    */
-  public static buildFromArray(sheet: Sheet, configInput?: Partial<ConfigParams>): HyperFormula {
-    return this.buildFromEngineState(BuildEngineFactory.buildFromSheet(sheet, configInput))
+  public static buildFromArray(sheet: Sheet, configInput: Partial<ConfigParams> = {}, namedExpressions: SerializedNamedExpression[] = []): HyperFormula {
+    return this.buildFromEngineState(BuildEngineFactory.buildFromSheet(sheet, configInput, namedExpressions))
   }
 
   /**
@@ -274,8 +274,8 @@ export class HyperFormula implements TypedEmitter {
    *
    * @category Factories
    */
-  public static buildFromSheets(sheets: Sheets, configInput?: Partial<ConfigParams>): HyperFormula {
-    return this.buildFromEngineState(BuildEngineFactory.buildFromSheets(sheets, configInput))
+  public static buildFromSheets(sheets: Sheets, configInput: Partial<ConfigParams> = {}, namedExpressions: SerializedNamedExpression[] = []): HyperFormula {
+    return this.buildFromEngineState(BuildEngineFactory.buildFromSheets(sheets, configInput, namedExpressions))
   }
 
   /**
@@ -293,8 +293,8 @@ export class HyperFormula implements TypedEmitter {
    *
    * @category Factories
    */
-  public static buildEmpty(configInput?: Partial<ConfigParams>): HyperFormula {
-    return this.buildFromEngineState(BuildEngineFactory.buildEmpty(configInput))
+  public static buildEmpty(configInput: Partial<ConfigParams> = {}, namedExpressions: SerializedNamedExpression[] = []): HyperFormula {
+    return this.buildFromEngineState(BuildEngineFactory.buildEmpty(configInput, namedExpressions))
   }
 
   private static registeredLanguages: Map<string, TranslationPackage> = new Map()
@@ -912,7 +912,7 @@ export class HyperFormula implements TypedEmitter {
     const serializedSheets = this._serialization.withNewConfig(configNewLanguage, this._namedExpressions).getAllSheetsSerialized()
     const serializedNamedExpressions = this._serialization.getAllNamedExpressionsSerialized()
 
-    const newEngine = BuildEngineFactory.rebuildWithConfig(newConfig, serializedSheets, this._stats)
+    const newEngine = BuildEngineFactory.rebuildWithConfig(newConfig, serializedSheets, serializedNamedExpressions, this._stats)
 
     this._config = newEngine.config
     this._stats = newEngine.stats
@@ -928,10 +928,6 @@ export class HyperFormula implements TypedEmitter {
     this._namedExpressions = newEngine.namedExpressions
     this._serialization = newEngine.serialization
     this._functionRegistry = newEngine.functionRegistry
-
-    serializedNamedExpressions.forEach((entry: SerializedNamedExpression) => {
-      this.addNamedExpression(entry.name, entry.expression, entry.scope, entry.options)
-    })
   }
 
   /**
@@ -2332,6 +2328,43 @@ export class HyperFormula implements TypedEmitter {
   }
 
   /**
+   * Returns values to fill target range using source range, with properly extending the range using wrap-around heuristic.
+   *
+   * @param {AbsoluteCellRange} source of data
+   * @param {AbsoluteCellRange} target range where data is intended to be put
+   *
+   * @throws [[SheetsNotEqual]] if both ranges are not from the same sheet
+   * @throws [[EvaluationSuspendedError]] when the evaluation is suspended
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromArray([[1, '=A1'], ['=$A$1', '2']]);
+   *
+   * // should return [['2', '=$A$1', '2'], ['=A3', 1, '=C3'], ['2', '=$A$1', '2']]
+   * hfInstance.getFillRangeData( {start: {sheet: 0, row: 0, col: 0}}, end: {sheet: 0, row: 1, col: 1}},
+   * {start: {sheet: 0, row: 1, col: 1}, end: {sheet: 0, row: 3, col: 3}});
+   * ```
+   *
+   * @category Ranges
+   */
+
+  public getFillRangeData(source: AbsoluteCellRange, target: AbsoluteCellRange): RawCellContent[][] {
+    if(source.sheet !== target.sheet) {
+      throw new SheetsNotEqual(source.sheet, target.sheet)
+    }
+    this.ensureEvaluationIsNotSuspended()
+    return target.arrayOfAddressesInRange().map(
+      (subarray) => subarray.map(
+        (address) => {
+          const row = ((address.row - source.start.row) % source.height() + source.height()) % source.height() + source.start.row
+          const col = ((address.col - source.start.col) % source.width() + source.width()) % source.width() + source.start.col
+          return this._serialization.getCellSerialized({row, col, sheet: target.sheet}, address)
+        }
+      )
+    )
+  }
+
+  /**
    * Returns information whether it is possible to add a sheet to the engine.
    * Checks against particular rules to ascertain that addSheet can be called.
    * If returns `true`, doing [[addSheet]] operation won't throw any errors and it possible to add sheet with provided name.
@@ -3650,14 +3683,14 @@ export class HyperFormula implements TypedEmitter {
    * ]);
    *
    * // add two named expressions and one scoped
-   * hfInstance.addNamedExpression('prettyName', '=Sheet1!A1+100');
-   * hfInstance.addNamedExpression('prettyName2', '=Sheet1!A2+100');
-   * hfInstance.addNamedExpression('prettyName3', '=Sheet1!A3+100', 0);
+   * hfInstance.addNamedExpression('prettyName', '=Sheet1!$A$1+100');
+   * hfInstance.addNamedExpression('anotherPrettyName', '=Sheet1!$A$2+100');
+   * hfInstance.addNamedExpression('alsoPrettyName', '=Sheet1!$A$3+100', 0);
    *
-   * // list the expressions, should return: ['prettyName', 'prettyName2'] for this example
+   * // list the expressions, should return: ['prettyName', 'anotherPrettyName'] for this example
    * const listOfExpressions = hfInstance.listNamedExpressions();
    *
-   *  // list the expressions, should return: ['prettyName3'] for this example
+   *  // list the expressions, should return: ['alsoPrettyName'] for this example
    * const listOfExpressions = hfInstance.listNamedExpressions(0);
    * ```
    *
@@ -3669,6 +3702,38 @@ export class HyperFormula implements TypedEmitter {
     }
     this._crudOperations.ensureScopeIdIsValid(scope)
     return this._namedExpressions.getAllNamedExpressionsNamesInScope(scope)
+  }
+
+  /**
+   * Returns all named expressions serialized.
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromArray([
+   *  ['42'],
+   *  ['50'],
+   *  ['60'],
+   * ]);
+   *
+   * // add two named expressions and one scoped
+   * hfInstance.addNamedExpression('prettyName', '=Sheet1!$A$1+100');
+   * hfInstance.addNamedExpression('anotherPrettyName', '=Sheet1!$A$2+100');
+   * hfInstance.addNamedExpression('prettyName3', '=Sheet1!$A$3+100', 0);
+   *
+   * // get all expressions serialized
+   * // should return:
+   * // [
+   * // {name: 'prettyName', expression: '=Sheet1!$A$1+100', options: undefined, scope: undefined},
+   * // {name: 'anotherPrettyName', expression: '=Sheet1!$A$2+100', options: undefined, scope: undefined},
+   * // {name: 'alsoPrettyName', expression: '=Sheet1!$A$3+100', options: undefined, scope: 0}
+   * // ]
+   * const allExpressions = hfInstance.getAllNamedExpressionsSerialized();
+   * ```
+   *
+   * @category Named Expressions
+   */
+  public getAllNamedExpressionsSerialized(): SerializedNamedExpression[] {
+    return this._serialization.getAllNamedExpressionsSerialized()
   }
 
   /**
@@ -3686,8 +3751,8 @@ export class HyperFormula implements TypedEmitter {
    *  ['50'],
    * ]);
    *
-   * // normalize the formula, should return '=Sheet1!A1+10' for this example
-   * const normalizedFormula = hfInstance.normalizeFormula('=SHEET1!A1+10');
+   * // normalize the formula, should return '=Sheet1!$A$1+10' for this example
+   * const normalizedFormula = hfInstance.normalizeFormula('=SHEET1!$A$1+10');
    * ```
    *
    * @category Helpers

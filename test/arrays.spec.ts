@@ -320,5 +320,4 @@ describe('vectorization', () => {
     ], {useArrayArithmetic: true})
     expect(engine.getSheetValues(0)).toEqual([[2, 5, 4]])
   })
-
 })
