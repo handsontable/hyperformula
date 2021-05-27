@@ -25,7 +25,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added named expression handling to engine factories. (#680)
 - Added `getAllNamedExpressionsSerialized` method. (#680)
 - Added parsing of arrays in formulas (together with respective config options for separators). (#671)
-
+- Added utility function for filling ranges with source from other range. (#678)
 
 ### Fixed
 - Fixed an issue with arrays and cruds. (#651)

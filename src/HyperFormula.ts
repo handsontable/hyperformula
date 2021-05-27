@@ -35,7 +35,7 @@ import {
   EvaluationSuspendedError,
   LanguageAlreadyRegisteredError,
   LanguageNotRegisteredError,
-  NotAFormulaError
+  NotAFormulaError, SheetsNotEqual
 } from './errors'
 import {Evaluator} from './Evaluator'
 import {ExportedChange, Exporter} from './Exporter'
@@ -2323,6 +2323,43 @@ export class HyperFormula implements TypedEmitter {
     return cellRange.arrayOfAddressesInRange().map(
       (subarray) => subarray.map(
         (address) => this.getCellSerialized(address)
+      )
+    )
+  }
+
+  /**
+   * Returns values to fill target range using source range, with properly extending the range using wrap-around heuristic.
+   *
+   * @param {AbsoluteCellRange} source of data
+   * @param {AbsoluteCellRange} target range where data is intended to be put
+   *
+   * @throws [[SheetsNotEqual]] if both ranges are not from the same sheet
+   * @throws [[EvaluationSuspendedError]] when the evaluation is suspended
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromArray([[1, '=A1'], ['=$A$1', '2']]);
+   *
+   * // should return [['2', '=$A$1', '2'], ['=A3', 1, '=C3'], ['2', '=$A$1', '2']]
+   * hfInstance.getFillRangeData( {start: {sheet: 0, row: 0, col: 0}}, end: {sheet: 0, row: 1, col: 1}},
+   * {start: {sheet: 0, row: 1, col: 1}, end: {sheet: 0, row: 3, col: 3}});
+   * ```
+   *
+   * @category Ranges
+   */
+
+  public getFillRangeData(source: AbsoluteCellRange, target: AbsoluteCellRange): RawCellContent[][] {
+    if(source.sheet !== target.sheet) {
+      throw new SheetsNotEqual(source.sheet, target.sheet)
+    }
+    this.ensureEvaluationIsNotSuspended()
+    return target.arrayOfAddressesInRange().map(
+      (subarray) => subarray.map(
+        (address) => {
+          const row = ((address.row - source.start.row) % source.height() + source.height()) % source.height() + source.start.row
+          const col = ((address.col - source.start.col) % source.width() + source.width()) % source.width() + source.start.col
+          return this._serialization.getCellSerialized({row, col, sheet: target.sheet}, address)
+        }
       )
     )
   }
