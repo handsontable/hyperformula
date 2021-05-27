@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Added named expression handling to engine factories. (#680)
 - Added `getAllNamedExpressionsSerialized` method. (#680)
+- Added parsing of arrays in formulas (together with respective config options for separators). (#671)
 
 ## [0.6.2] - 2021-05-26
 
@@ -43,7 +44,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added casting to scalars from non-range arrays. (#663)
 - Added support for range interpolation. (#665)
 - Accepting time in JS Date() objects on the input. (#648)
-- Added parsing of arrays in formulas (together with respective config options for separators). (#671)
 
 ### Fixed
 - Fixed issues with scoped named expression. (#646, #641)
