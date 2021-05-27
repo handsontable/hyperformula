@@ -57,6 +57,14 @@ class CountHF extends FunctionPlugin {
   };
 }
 ```
+
+Similarly, there are other useful properties. 
+`isDependentOnSheetStructureChange` marks functions that need to be recalculated with 
+each change of the shape of the engine sheets. 
+`doesNotNeedArgumentsToBeComputed` marks functions that treat references or ranges in their arguments
+as arguments that do not create dependency. Other arguments are properly evaluated.
+`arrayFunction` denotes functions that enable array arithmetic in its arguments and nested expressions.
+`vectorizationForbidden` when set prevents function from ever being vectorized (however, it is up to implementation of a function to properly handle vectorization).
 ## Aliases
 
 Aliases are available since the <Badge text="v0.4.0"  vertical="middle"/> version.

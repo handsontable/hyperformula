@@ -38,35 +38,55 @@ export interface ImplementedFunctions {
   [formulaId: string]: FunctionMetadata,
 }
 
-export interface FunctionArguments {
-  parameters?: FunctionArgument[],
+export interface FunctionMetadata {
   /**
+   * Internal and engine.
+   */
+  parameters?: FunctionArgument[],
+
+  /**
+   * Internal.
    * Used for functions with variable number of arguments -- tells how many last arguments can be repeated indefinitely.
    */
   repeatLastArgs?: number,
 
   /**
+   * Internal.
    * Ranges in arguments are inlined to (possibly multiple) scalar arguments.
    */
   expandRanges?: boolean,
 
   /**
+   * Internal.
    * Return number value is packed into this subtype.
    */
   returnNumberType?: NumberType,
+  /**
+   * Engine.
+   */
+  method: string,
+  /**
+   * Engine.
+   */
+  isVolatile?: boolean,
+  /**
+   * Engine.
+   */
+  isDependentOnSheetStructureChange?: boolean,
+  /**
+   * Engine.
+   */
+  doesNotNeedArgumentsToBeComputed?: boolean,
+  /**
+   * Engine.
+   */
+  arrayFunction?: boolean,
 
   /**
+   * Internal.
    * Some function do not allow vectorization: array-output, and special functions.
    */
   vectorizationForbidden?: boolean,
-}
-
-export interface FunctionMetadata extends FunctionArguments {
-  method: string,
-  isVolatile?: boolean,
-  isDependentOnSheetStructureChange?: boolean,
-  doesNotNeedArgumentsToBeComputed?: boolean,
-  arrayFunction?: boolean,
 }
 
 export interface FunctionPluginDefinition {
@@ -294,34 +314,34 @@ export abstract class FunctionPlugin implements FunctionPluginTypecheck<Function
   protected runFunction = (
     args: Ast[],
     state: InterpreterState,
-    functionDefinition: FunctionArguments,
+    metadata: FunctionMetadata,
     fn: (...arg: any) => InterpreterValue,
   ) => {
-    let argumentDefinitions: FunctionArgument[] = functionDefinition.parameters!
+    let argumentDefinitions: FunctionArgument[] = metadata.parameters!
     let argValues: [InterpreterValue, boolean][]
 
-    if (functionDefinition.expandRanges) {
+    if (metadata.expandRanges) {
       argValues = this.listOfScalarValues(args, state)
     } else {
       argValues = args.map((ast) => [this.evaluateAst(ast, state), false])
     }
 
 
-    if (functionDefinition.repeatLastArgs === undefined && argumentDefinitions.length < argValues.length) {
+    if (metadata.repeatLastArgs === undefined && argumentDefinitions.length < argValues.length) {
       return new CellError(ErrorType.NA, ErrorMessage.WrongArgNumber)
     }
-    if (functionDefinition.repeatLastArgs !== undefined && argumentDefinitions.length < argValues.length &&
-      (argValues.length - argumentDefinitions.length) % functionDefinition.repeatLastArgs !== 0) {
+    if (metadata.repeatLastArgs !== undefined && argumentDefinitions.length < argValues.length &&
+      (argValues.length - argumentDefinitions.length) % metadata.repeatLastArgs !== 0) {
       return new CellError(ErrorType.NA, ErrorMessage.WrongArgNumber)
     }
     argumentDefinitions = [...argumentDefinitions]
     while(argumentDefinitions.length < argValues.length) {
-      argumentDefinitions.push(...argumentDefinitions.slice(argumentDefinitions.length-functionDefinition.repeatLastArgs!))
+      argumentDefinitions.push(...argumentDefinitions.slice(argumentDefinitions.length-metadata.repeatLastArgs!))
     }
 
     let maxWidth = 1
     let maxHeight = 1
-    if(!functionDefinition.vectorizationForbidden && state.arraysFlag) {
+    if(!metadata.vectorizationForbidden && state.arraysFlag) {
       for(let i=0;i<argValues.length;i++) {
       const [val] = argValues[i]
       if(val instanceof SimpleRangeValue && argumentDefinitions[i].argumentType !== ArgumentTypes.RANGE && argumentDefinitions[i].argumentType !== ArgumentTypes.ANY) {
@@ -350,7 +370,7 @@ export abstract class FunctionPlugin implements FunctionPluginTypecheck<Function
           // eslint-disable-next-line prefer-const
           let [val, ignorable] = argValues[i] ?? [undefined, undefined]
           if(val instanceof SimpleRangeValue && argumentDefinitions[i].argumentType !== ArgumentTypes.RANGE && argumentDefinitions[i].argumentType !== ArgumentTypes.ANY) {
-            if(!functionDefinition.vectorizationForbidden && state.arraysFlag) {
+            if(!metadata.vectorizationForbidden && state.arraysFlag) {
               val = val.data[val.height()!==1 ? row : 0]?.[val.width()!==1 ? col : 0]
             }
           }
@@ -373,7 +393,7 @@ export abstract class FunctionPlugin implements FunctionPluginTypecheck<Function
           }
         }
 
-        const ret = argCoerceFailure ?? this.returnNumberWrapper(fn(...coercedArguments), functionDefinition.returnNumberType)
+        const ret = argCoerceFailure ?? this.returnNumberWrapper(fn(...coercedArguments), metadata.returnNumberType)
         if(maxHeight === 1 && maxWidth === 1) {
           return ret
         }
@@ -390,13 +410,13 @@ export abstract class FunctionPlugin implements FunctionPluginTypecheck<Function
   protected runFunctionWithReferenceArgument = (
     args: Ast[],
     state: InterpreterState,
-    argumentDefinitions: FunctionArguments,
+    metadata: FunctionMetadata,
     noArgCallback: () => InternalScalarValue | RawScalarValue,
     referenceCallback: (reference: SimpleCellAddress) => InternalScalarValue,
     nonReferenceCallback: (...arg: any) => InternalScalarValue = () => new CellError(ErrorType.NA, ErrorMessage.CellRefExpected)
   ) => {
     if (args.length === 0) {
-      return this.returnNumberWrapper(noArgCallback(), argumentDefinitions.returnNumberType)
+      return this.returnNumberWrapper(noArgCallback(), metadata.returnNumberType)
     } else if (args.length > 1) {
       return new CellError(ErrorType.NA, ErrorMessage.WrongArgNumber)
     }
@@ -419,10 +439,10 @@ export abstract class FunctionPlugin implements FunctionPluginTypecheck<Function
     }
 
     if (cellReference !== undefined) {
-      return this.returnNumberWrapper(referenceCallback(cellReference), argumentDefinitions.returnNumberType)
+      return this.returnNumberWrapper(referenceCallback(cellReference), metadata.returnNumberType)
     }
 
-    return this.runFunction(args, state, argumentDefinitions, nonReferenceCallback)
+    return this.runFunction(args, state, metadata, nonReferenceCallback)
   }
 
   protected metadata(name: string): FunctionMetadata {
