@@ -21,6 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added casting to scalars from non-range arrays. (#663)
 - Added support for range interpolation. (#665)
 - Accepting time in JS Date() objects on the input. (#648)
+- Validation of API arguments types for simple types. (#654)
 
 ### Fixed
 - Fixed an issue with arrays and cruds. (#651)
@@ -47,7 +48,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Added two new fired events, for suspending and resuming execution. (#637)
 - Added listing in scopes to `listNamedExpressions` method. (#638)
-- Validation of API arguments types for simple types. (#654)
 
 ### Fixed
 - Fixed issues with scoped named expression. (#646, #641)
