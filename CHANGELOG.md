@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- Added named expression handling to engine factories. (#680)
+- Added `getAllNamedExpressionsSerialized` method. (#680)
+
 ## [0.6.2] - 2021-05-26
 
 ### Changed
