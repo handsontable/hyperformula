@@ -20,7 +20,7 @@ import {MatrixSizePredictor} from './MatrixSize'
 import {NamedExpressions} from './NamedExpressions'
 import {NumberLiteralHelper} from './NumberLiteralHelper'
 import {buildLexerConfig, ParserWithCaching, Unparser} from './parser'
-import {Serialization} from './Serialization'
+import {Serialization, SerializedNamedExpression} from './Serialization'
 import {findBoundaries, Sheet, Sheets, validateAsSheet} from './Sheet'
 import {EmptyStatistics, Statistics, StatType} from './statistics'
 
@@ -42,7 +42,7 @@ export type EngineState = {
 }
 
 export class BuildEngineFactory {
-  private static buildEngine(config: Config, sheets: Sheets = {}, stats: Statistics = config.useStats ? new Statistics() : new EmptyStatistics()): EngineState {
+  private static buildEngine(config: Config, sheets: Sheets = {}, inputNamedExpressions: SerializedNamedExpression[] = [], stats: Statistics = config.useStats ? new Statistics() : new EmptyStatistics()): EngineState {
     stats.start(StatType.BUILD_ENGINE_TOTAL)
 
     const namedExpressions = new NamedExpressions()
@@ -74,6 +74,10 @@ export class BuildEngineFactory {
 
     const matrixSizePredictor = new MatrixSizePredictor(config, functionRegistry)
     const crudOperations = new CrudOperations(config, stats, dependencyGraph, columnSearch, parser, cellContentParser, lazilyTransformingAstService, namedExpressions, matrixSizePredictor)
+    inputNamedExpressions.forEach((entry: SerializedNamedExpression) => {
+      crudOperations.ensureItIsPossibleToAddNamedExpression(entry.name, entry.expression, entry.scope)
+      crudOperations.operations.addNamedExpression(entry.name, entry.expression, entry.scope, entry.options)
+    })
     stats.measure(StatType.GRAPH_BUILD, () => {
       const graphBuilder = new GraphBuilder(dependencyGraph, columnSearch, parser, cellContentParser, config, stats, matrixSizePredictor)
       graphBuilder.buildGraph(sheets)
@@ -108,22 +112,22 @@ export class BuildEngineFactory {
     }
   }
 
-  public static buildFromSheets(sheets: Sheets, configInput?: Partial<ConfigParams>): EngineState {
+  public static buildFromSheets(sheets: Sheets, configInput: Partial<ConfigParams> = {}, namedExpressions: SerializedNamedExpression[] = []): EngineState {
     const config = new Config(configInput)
-    return this.buildEngine(config, sheets)
+    return this.buildEngine(config, sheets, namedExpressions)
   }
 
-  public static buildFromSheet(sheet: Sheet, configInput?: Partial<ConfigParams>): EngineState {
+  public static buildFromSheet(sheet: Sheet, configInput: Partial<ConfigParams> = {}, namedExpressions: SerializedNamedExpression[] = []): EngineState {
     const config = new Config(configInput)
     const newsheetprefix = config.translationPackage.getUITranslation(UIElement.NEW_SHEET_PREFIX) + '1'
-    return this.buildEngine(config, {[newsheetprefix]: sheet})
+    return this.buildEngine(config, {[newsheetprefix]: sheet}, namedExpressions)
   }
 
-  public static buildEmpty(configInput?: Partial<ConfigParams>): EngineState {
-    return this.buildEngine(new Config(configInput))
+  public static buildEmpty(configInput: Partial<ConfigParams> = {}, namedExpressions: SerializedNamedExpression[] = []): EngineState {
+    return this.buildEngine(new Config(configInput), {}, namedExpressions)
   }
 
-  public static rebuildWithConfig(config: Config, sheets: Sheets, stats: Statistics): EngineState {
-    return this.buildEngine(config, sheets, stats)
+  public static rebuildWithConfig(config: Config, sheets: Sheets, namedExpressions: SerializedNamedExpression[], stats: Statistics): EngineState {
+    return this.buildEngine(config, sheets, namedExpressions, stats)
   }
 }

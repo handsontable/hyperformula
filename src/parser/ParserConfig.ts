@@ -9,6 +9,8 @@ import {TranslationPackage} from '../i18n'
 export interface ParserConfig {
   functionArgSeparator: string,
   decimalSeparator: '.' | ',',
+  matrixColumnSeparator: ',' | ';',
+  matrixRowSeparator: ';' | '|',
   translationPackage: TranslationPackage,
   errorMapping: Record<string, TranslatableErrorType>,
   maxColumns: number,

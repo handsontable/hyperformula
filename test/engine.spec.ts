@@ -1,4 +1,5 @@
 import {DetailedCellError, ErrorType, HyperFormula} from '../src'
+import {AbsoluteCellRange} from '../src/AbsoluteCellRange'
 import {CellType, CellValueDetailedType, CellValueType} from '../src/Cell'
 import {Config} from '../src/Config'
 import {ErrorMessage} from '../src/error-message'
@@ -771,5 +772,34 @@ describe('Graph dependency topological ordering module', () => {
       ['=A5+A4'],
       ['=A5'],
     ])).not.toThrowError()
+  })
+})
+
+describe('#getFillRangeData', () => {
+  it('should properly apply wrap-around #1', () => {
+    const engine = HyperFormula.buildFromArray([[], [undefined, 1, '=A1'], [undefined, '=$A$1', '2']])
+
+    expect(engine.getFillRangeData(
+      AbsoluteCellRange.fromCoordinates(0, 1, 1, 2, 2),
+      AbsoluteCellRange.fromCoordinates(0, 2, 2, 4, 4))
+    ).toEqual([['2', '=$A$1', '2'], ['=A3', 1, '=C3'], ['2', '=$A$1', '2']])
+  })
+
+  it('should properly apply wrap-around #2', () => {
+    const engine = HyperFormula.buildFromArray([[], [undefined, 1, '=A1'], [undefined, '=$A$1', '2']])
+
+    expect(engine.getFillRangeData(
+      AbsoluteCellRange.fromCoordinates(0, 1, 1, 2, 2),
+      AbsoluteCellRange.fromCoordinates(0, 1, 1, 3, 3))
+    ).toEqual([[1, '=A1', 1], ['=$A$1', '2', '=$A$1'], [1, '=A3', 1]])
+  })
+
+  it('should properly apply wrap-around #3', () => {
+    const engine = HyperFormula.buildFromArray([[], [undefined, 1, '=A1'], [undefined, '=$A$1', '2']])
+
+    expect(engine.getFillRangeData(
+      AbsoluteCellRange.fromCoordinates(0, 1, 1, 2, 2),
+      AbsoluteCellRange.fromCoordinates(0, 0, 0, 2, 2))
+    ).toEqual([['2', '=$A$1', '2'], ['=#REF!', 1, '=A1'], ['2', '=$A$1', '2'] ])
   })
 })

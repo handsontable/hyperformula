@@ -27,6 +27,7 @@ import {ParserConfig} from './parser/ParserConfig'
 type GPUMode = 'gpu' | 'cpu' | 'dev'
 
 const PossibleGPUModeString: GPUMode[] = ['gpu', 'cpu', 'dev']
+const privatePool: WeakMap<Config, {licenseKeyValidityState: LicenseKeyValidityState}> = new WeakMap()
 
 export interface ConfigParams {
   /**
@@ -204,6 +205,20 @@ export interface ConfigParams {
    * @category String
    */
   matchWholeCell: boolean,
+  /**
+   * Column separator symbol for array notation.
+   *
+   * @default ','
+   * @category Formula syntax
+   */
+  matrixColumnSeparator: ',' | ';',
+  /**
+   * Row separator symbol for array notation.
+   *
+   * @default ';'
+   * @category Formula syntax
+   */
+  matrixRowSeparator: ';' | '|',
   /**
    * Maximum number of rows
    *
@@ -390,6 +405,8 @@ export class Config implements ConfigParams, ParserConfig {
     leapYear1900: false,
     localeLang: 'en',
     matchWholeCell: true,
+    matrixColumnSeparator: ',',
+    matrixRowSeparator: ';',
     maxRows: 40_000,
     maxColumns: 18_278,
     nullYear: 30,
@@ -426,6 +443,10 @@ export class Config implements ConfigParams, ParserConfig {
   public readonly timeFormats: string[]
   /** @inheritDoc */
   public readonly functionArgSeparator: string
+  /** @inheritDoc */
+  public readonly matrixColumnSeparator: ',' | ';'
+  /** @inheritDoc */
+  public readonly matrixRowSeparator: ';' | '|'
   /** @inheritDoc */
   public readonly decimalSeparator: '.' | ','
   /** @inheritDoc */
@@ -494,12 +515,7 @@ export class Config implements ConfigParams, ParserConfig {
   public readonly useRegularExpressions: boolean
   public readonly useWildcards: boolean
   public readonly matchWholeCell: boolean
-  /**
-   * Set automatically based on licenseKey checking result.
-   *
-   * @internal
-   */
-  #licenseKeyValidityState: LicenseKeyValidityState
+
   /**
    * Proxied property to its private counterpart. This makes the property
    * as accessible as the other Config options but without ability to change the value.
@@ -507,7 +523,7 @@ export class Config implements ConfigParams, ParserConfig {
    * @internal
    */
   public get licenseKeyValidityState() {
-    return this.#licenseKeyValidityState
+    return privatePool.get(this)!.licenseKeyValidityState
   }
 
   constructor(
@@ -531,6 +547,8 @@ export class Config implements ConfigParams, ParserConfig {
       language,
       licenseKey,
       matchWholeCell,
+      matrixColumnSeparator,
+      matrixRowSeparator,
       maxRows,
       maxColumns,
       nullYear,
@@ -563,8 +581,9 @@ export class Config implements ConfigParams, ParserConfig {
     this.decimalSeparator = configValueFromParam(decimalSeparator, ['.', ','], 'decimalSeparator')
     this.language = configValueFromParam(language, 'string', 'language')
     this.licenseKey = configValueFromParam(licenseKey, 'string', 'licenseKey')
-    this.#licenseKeyValidityState = checkLicenseKeyValidity(this.licenseKey)
     this.thousandSeparator = configValueFromParam(thousandSeparator, ['', ',', ' ', '.'], 'thousandSeparator')
+    this.matrixColumnSeparator = configValueFromParam(matrixColumnSeparator, [',', ';'], 'matrixColumnSeparator')
+    this.matrixRowSeparator = configValueFromParam(matrixRowSeparator, [';', '|'], 'matrixRowSeparator')
     this.localeLang = configValueFromParam(localeLang, 'string', 'localeLang')
     this.functionPlugins = functionPlugins ?? Config.defaultConfig.functionPlugins
     this.gpujs = gpujs ?? Config.defaultConfig.gpujs
@@ -608,10 +627,19 @@ export class Config implements ConfigParams, ParserConfig {
     })
     validateNumberToBeAtLeast(this.maxColumns, 'maxColumns', 1)
 
+    privatePool.set(this, {
+      licenseKeyValidityState: checkLicenseKeyValidity(this.licenseKey)
+    })
+
     configCheckIfParametersNotInConflict(
       {value: this.decimalSeparator, name: 'decimalSeparator'},
       {value: this.functionArgSeparator, name: 'functionArgSeparator'},
-      {value: this.thousandSeparator, name: 'thousandSeparator'}
+      {value: this.thousandSeparator, name: 'thousandSeparator'},
+    )
+
+    configCheckIfParametersNotInConflict(
+      {value: this.matrixRowSeparator, name: 'matrixRowSeparator'},
+      {value: this.matrixColumnSeparator, name: 'matrixColumnSeparator'},
     )
   }
 

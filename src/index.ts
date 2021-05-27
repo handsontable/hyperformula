@@ -45,6 +45,7 @@ import {FunctionArgument, FunctionPlugin, FunctionPluginDefinition} from './inte
 import {FormatInfo} from './interpreter/InterpreterValue'
 import * as plugins from './interpreter/plugin'
 import {NamedExpression, NamedExpressionOptions} from './NamedExpressions'
+import {SerializedNamedExpression} from './Serialization'
 import {Sheet, SheetDimensions, Sheets} from './Sheet'
 
 /** @internal */
@@ -155,4 +156,5 @@ export {
   SourceLocationHasMatrixError,
   TargetLocationHasMatrixError,
   UnableToParseError,
+  SerializedNamedExpression,
 }

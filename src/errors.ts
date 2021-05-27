@@ -69,6 +69,15 @@ export class InvalidArgumentsError extends Error {
 }
 
 /**
+ * Error thrown when the given sheets are not equal.
+ */
+export class SheetsNotEqual extends Error {
+  constructor(sheet1: number, sheet2: number) {
+    super(`Sheets ${sheet1} and ${sheet2} are not equal.`)
+  }
+}
+
+/**
  * Error thrown when the given named expression already exists in the workbook and therefore it cannot be added.
  */
 export class NamedExpressionNameIsAlreadyTakenError extends Error {

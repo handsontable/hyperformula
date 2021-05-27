@@ -990,3 +990,41 @@ describe('Named expressions - options', () => {
     })
   })
 })
+
+describe('nested named expressions', () => {
+  it('should work', () => {
+    const engine = HyperFormula.buildFromArray([['=ABCD']])
+    engine.addNamedExpression('ABCD', '=EFGH')
+    engine.addNamedExpression('EFGH', 1)
+    expect(engine.getCellValue(adr('A1'))).toEqual(1)
+  })
+})
+
+describe('serialization', () => {
+  it('should work', () => {
+    const engine = HyperFormula.buildFromArray([
+    ['42'],
+    ['50'],
+    ['60']])
+    engine.addNamedExpression('prettyName', '=Sheet1!$A$1+100')
+    engine.addNamedExpression('anotherPrettyName', '=Sheet1!$A$2+100')
+    engine.addNamedExpression('alsoPrettyName', '=Sheet1!$A$3+100', 0)
+    expect(engine.getAllNamedExpressionsSerialized()).toEqual([
+      {name: 'prettyName', expression: '=Sheet1!$A$1+100', options: undefined, scope: undefined},
+      {name: 'anotherPrettyName', expression: '=Sheet1!$A$2+100', options: undefined, scope: undefined},
+      {name: 'alsoPrettyName', expression: '=Sheet1!$A$3+100', options: undefined, scope: 0}
+    ])
+  })
+
+  it('should update scopes', () => {
+    const engine = HyperFormula.buildFromSheets({sheet1: [[]], sheet2: [[]], sheet3: [[]]})
+    engine.addNamedExpression('prettyName', '=1', 0)
+    engine.addNamedExpression('anotherPrettyName', '=2', 1)
+    engine.addNamedExpression('alsoPrettyName', '=3', 2)
+    engine.removeSheet(1)
+    expect(engine.getAllNamedExpressionsSerialized()).toEqual([
+      {name: 'prettyName', expression: '=1', scope: 0, options: undefined},
+      {name: 'alsoPrettyName', expression: '=3', scope: 1, options: undefined}
+    ])
+  })
+})

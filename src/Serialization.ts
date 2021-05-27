@@ -17,7 +17,7 @@ export interface SerializedNamedExpression {
   name: string,
   expression: RawCellContent,
   scope?: number,
-  options: Maybe<NamedExpressionOptions>,
+  options?: NamedExpressionOptions,
 }
 
 export class Serialization {
@@ -29,19 +29,21 @@ export class Serialization {
   ) {
   }
 
-  public getCellFormula(address: SimpleCellAddress): Maybe<string> {
+  public getCellFormula(address: SimpleCellAddress, targetAddress?: SimpleCellAddress): Maybe<string> {
     const formulaVertex = this.dependencyGraph.getCell(address)
     if (formulaVertex instanceof FormulaCellVertex) {
       const formula = formulaVertex.getFormula(this.dependencyGraph.lazilyTransformingAstService)
-      return this.unparser.unparse(formula, address)
+      targetAddress = targetAddress ?? address
+      return this.unparser.unparse(formula, targetAddress)
     } else if (formulaVertex instanceof MatrixVertex) {
       const matrixVertexAddress = formulaVertex.getAddress(this.dependencyGraph.lazilyTransformingAstService)
       if(matrixVertexAddress.row !== address.row || matrixVertexAddress.col !== address.col || matrixVertexAddress.sheet !== address.sheet) {
         return undefined
       }
+      targetAddress = targetAddress ?? address
       const formula = formulaVertex.getFormula(this.dependencyGraph.lazilyTransformingAstService)
       if (formula !== undefined) {
-        return this.unparser.unparse(formula, matrixVertexAddress)
+        return this.unparser.unparse(formula, targetAddress)
       }
     } else if (formulaVertex instanceof ParsingErrorVertex) {
       return formulaVertex.getFormula()
@@ -49,13 +51,8 @@ export class Serialization {
     return undefined
   }
 
-  public getCellSerialized(address: SimpleCellAddress): RawCellContent {
-    const formula: Maybe<string> = this.getCellFormula(address)
-    if (formula !== undefined) {
-      return formula
-    } else {
-      return this.getRawValue(address)
-    }
+  public getCellSerialized(address: SimpleCellAddress, targetAddress?: SimpleCellAddress): RawCellContent {
+    return this.getCellFormula(address, targetAddress) ?? this.getRawValue(address)
   }
 
   public getCellValue(address: SimpleCellAddress): CellValue {
@@ -131,11 +128,18 @@ export class Serialization {
   }
 
   public getAllNamedExpressionsSerialized(): SerializedNamedExpression[] {
+    const idMap: number[] = []
+    let id = 0
+    for (const sheetName of this.dependencyGraph.sheetMapping.displayNames()) {
+      const sheetId = this.dependencyGraph.sheetMapping.fetch(sheetName)
+      idMap[sheetId] = id
+      id++
+    }
     return this.dependencyGraph.namedExpressions.getAllNamedExpressions().map((entry) => {
       return {
         name: entry.expression.displayName,
         expression: this.getCellSerialized(entry.expression.address),
-        scope: entry.scope,
+        scope: entry.scope !== undefined ? idMap[entry.scope] : undefined,
         options: entry.expression.options
       }
     })

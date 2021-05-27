@@ -803,6 +803,17 @@ describe('Matrices', () => {
     expect(ast2.args.length).toEqual(1)
     expect(ast2.args[0].length).toEqual(3)
   })
+
+  it('square matrix, other separators', () => {
+    const parser = buildEmptyParserWithCaching(new Config({matrixRowSeparator: '|', matrixColumnSeparator: ';'}))
+
+    const ast = parser.parse('={1;2;3|4;5;6|7;8;9}', simpleCellAddress(0, 0, 0)).ast as MatrixAst
+    expect(ast.type).toBe(AstNodeType.MATRIX)
+    expect(ast.args.length).toEqual(3)
+    expect(ast.args[0].length).toEqual(3)
+    expect(ast.args[1].length).toEqual(3)
+    expect(ast.args[2].length).toEqual(3)
+  })
 })
 
 describe('Parsing errors', () => {
