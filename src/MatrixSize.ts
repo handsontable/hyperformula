@@ -181,6 +181,20 @@ export class MatrixSizePredictor {
           return new MatrixSize(range.width(), range.height(), true)
         }
       }
+      case AstNodeType.MATRIX: {
+        const heights = []
+        const widths = []
+        for(const row of ast.args) {
+          const sizes = row.map(ast => this._checkMatrixSize(ast, state))
+          const h = Math.min(...sizes.map(size => size.height))
+          const w = sizes.reduce((total, size) => total+size.width, 0)
+          heights.push(h)
+          widths.push(w)
+        }
+        const height = heights.reduce((total, h) => total+h, 0)
+        const width = Math.min(...widths)
+        return new MatrixSize(width, height)
+      }
       case AstNodeType.STRING:
       case AstNodeType.NUMBER:
         return MatrixSize.scalar()
