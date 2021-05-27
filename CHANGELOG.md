@@ -22,6 +22,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added support for range interpolation. (#665)
 - Added support for time in JS `Date()` objects on the input. (#648)
 - Added validation of API argument types for simple types. (#654)
+- Added named expression handling to engine factories. (#680)
+- Added `getAllNamedExpressionsSerialized` method. (#680)
+
 
 ### Fixed
 - Fixed an issue with arrays and cruds. (#651)

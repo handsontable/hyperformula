@@ -55,4 +55,16 @@ describe('update config', () => {
     expect(engine.getCellFormula(adr('D1'))).toBe(undefined)
     expect(engine.getCellFormula(adr('E1'))).toBe('=SUM(')
   })
+
+  it('simple reload preserves namedexpressions', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=TRUE', '=FALSE'],
+    ])
+    engine.addNamedExpression('TRUE', true)
+    engine.addNamedExpression('FALSE', false)
+    engine.updateConfig({})
+
+    expect(engine.getCellValue(adr('A1'))).toBe(true)
+    expect(engine.getCellValue(adr('B1'))).toBe(false)
+  })
 })
