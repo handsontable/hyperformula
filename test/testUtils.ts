@@ -1,6 +1,6 @@
-import {CellValue, DetailedCellError, HyperFormula} from '../src'
+import {CellValue, DetailedCellError, ErrorType, HyperFormula} from '../src'
 import {AbsoluteCellRange, AbsoluteColumnRange, AbsoluteRowRange} from '../src/AbsoluteCellRange'
-import {CellError, ErrorType, SimpleCellAddress, simpleCellAddress} from '../src/Cell'
+import {CellError, SimpleCellAddress, simpleCellAddress} from '../src/Cell'
 import {Config} from '../src/Config'
 import {DateTimeHelper} from '../src/DateTimeHelper'
 import {FormulaCellVertex, MatrixVertex, RangeVertex} from '../src/DependencyGraph'
@@ -17,6 +17,7 @@ import {
 } from '../src/parser'
 import {ColumnRangeAst, RowRangeAst} from '../src/parser/Ast'
 import {EngineComparator} from './graphComparator'
+import {ErrorMessage} from '../src/error-message'
 
 export const extractReference = (engine: HyperFormula, address: SimpleCellAddress): CellAddress => {
   return ((engine.addressMapping.fetchCell(address) as FormulaCellVertex).getFormula(engine.lazilyTransformingAstService) as CellReferenceAst).reference
@@ -152,6 +153,10 @@ export function detailedError(errorType: ErrorType, message?: string, config?: C
   return new DetailedCellError(error, config.translationPackage.getErrorTranslation(errorType))
 }
 
+export function noSpace(): DetailedCellError {
+  return detailedError(ErrorType.REF, ErrorMessage.NoSpaceForArrayResult)
+}
+
 export function detailedErrorWithOrigin(errorType: ErrorType, address: string, message?: string, config?: Config): DetailedCellError {
   config = new Config(config)
   const error = new CellError(errorType, message)
@@ -184,5 +189,19 @@ export function timeNumberToString(timeNumber: CellValue, config: Config): strin
 export function unregisterAllLanguages() {
   for (const langCode of HyperFormula.getRegisteredLanguagesCodes()) {
     HyperFormula.unregisterLanguage(langCode)
+  }
+}
+
+export function expectVerticesOfTypes(engine: HyperFormula, types: any[][], sheet: number = 0) {
+  for (let row=0; row<types.length; ++row) {
+    for (let col=0; col<types[row].length; ++col) {
+      const expectedType = types[row][col]
+      const cell = engine.dependencyGraph.getCell(simpleCellAddress(sheet, col, row))
+      if (expectedType === null) {
+        expect(cell === null).toBe(true)
+      } else {
+        expect(cell instanceof types[row][col]).toBe(true)
+      }
+    }
   }
 }

@@ -518,7 +518,7 @@ export class DependencyGraph {
     this.addressMapping.setCell(address, vertex)
   }
 
-  public addMatrixVertex(address: SimpleCellAddress, vertex: CellVertex): void {
+  public addMatrixVertex(address: SimpleCellAddress, vertex: MatrixVertex): void {
     this.graph.addNode(vertex)
     this.setAddressMappingForMatrixVertex(vertex, address)
   }
@@ -738,6 +738,14 @@ export class DependencyGraph {
     return values
   }
 
+  public shrinkMatrixToCorner(vertex: MatrixVertex) {
+    const matrixRange = vertex.getRange()
+    for (const address of matrixRange.addresses(this)) {
+      this.addressMapping.removeCellIfEqual(address, vertex)
+    }
+    this.addressMapping.setCell(matrixRange.start, vertex)
+  }
+
   private rangeDependencyQuery = (vertex: RangeVertex) => {
     const allDeps: [(SimpleCellAddress | AbsoluteCellRange), Vertex][] = []
     const {smallerRangeVertex, restRange} = this.rangeMapping.findSmallerRange(vertex.range) //checking whether this range was splitted by bruteForce or not
@@ -865,6 +873,10 @@ export class DependencyGraph {
     const range = AbsoluteCellRange.spanFrom(formulaAddress, vertex.width, vertex.height)
     this.setMatrix(range, vertex)
 
+    if (!this.isThereSpaceForMatrix(vertex)) {
+        return
+    }
+
     for (const address of range.addresses(this)) {
       this.addressMapping.setCell(address, vertex)
     }
@@ -919,14 +931,6 @@ export class DependencyGraph {
       this.shrinkMatrixToCorner(vertex)
       vertex.setNoSpace()
     }
-  }
-
-  private shrinkMatrixToCorner(vertex: MatrixVertex) {
-      const matrixRange = vertex.getRange()
-      for (const address of matrixRange.addresses(this)) {
-        this.addressMapping.removeCellIfEqual(address, vertex)
-      }
-      this.addressMapping.setCell(matrixRange.start, vertex)
   }
 
   private removeVertex(vertex: Vertex) {

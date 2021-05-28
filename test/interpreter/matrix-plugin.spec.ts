@@ -78,8 +78,8 @@ describe('Matrix plugin', () => {
 
     it('mmult of other mmult', () => {
       const engine = HyperFormula.buildFromArray([
-        ['1', '2', '=MMULT(A1:B2, A1:B2)', '=MMULT(A1:B2, A1:B2)'],
-        ['3', '4', '=MMULT(A1:B2, A1:B2)', '=MMULT(A1:B2, A1:B2)'],
+        ['1', '2', '=MMULT(A1:B2, A1:B2)'],
+        ['3', '4'],
         ['=MMULT(A1:B2, C1:D2)'],
       ], config)
 
