@@ -7,7 +7,7 @@ import {CellError, ErrorType} from '../../Cell'
 import {ErrorMessage} from '../../error-message'
 import {ProcedureAst} from '../../parser'
 import {InterpreterState} from '../InterpreterState'
-import {InternalScalarValue} from '../InterpreterValue'
+import {InternalScalarValue, InterpreterValue} from '../InterpreterValue'
 import {ArgumentTypes, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
 
 export class CharPlugin extends FunctionPlugin implements FunctionPluginTypecheck<CharPlugin>{
@@ -26,7 +26,7 @@ export class CharPlugin extends FunctionPlugin implements FunctionPluginTypechec
     },
   }
 
-  public char(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public char(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('CHAR'), (value: number) => {
       if (value < 1 || value >= 256) {
         return new CellError(ErrorType.VALUE, ErrorMessage.CharacterCodeBounds)
@@ -36,7 +36,7 @@ export class CharPlugin extends FunctionPlugin implements FunctionPluginTypechec
     })
   }
 
-  public unichar(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public unichar(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('CHAR'), (value: number) => {
       if (value < 1 || value >= 1114112) {
         return new CellError(ErrorType.VALUE, ErrorMessage.CharacterCodeBounds)

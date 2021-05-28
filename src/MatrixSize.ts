@@ -4,10 +4,13 @@
  */
 
 import {AbsoluteCellRange} from './AbsoluteCellRange'
-import {SimpleCellAddress} from './Cell'
+import {CellError, ErrorType, SimpleCellAddress} from './Cell'
 import {Config} from './Config'
+import {ErrorMessage} from './error-message'
 import {FunctionRegistry} from './interpreter/FunctionRegistry'
 import {InterpreterState} from './interpreter/InterpreterState'
+import {ArgumentTypes} from './interpreter/plugin/FunctionPlugin'
+import {SimpleRangeValue} from './interpreter/SimpleRangeValue'
 import {Ast, AstNodeType} from './parser'
 
 export class MatrixSize {
@@ -169,7 +172,31 @@ export class MatrixSizePredictor {
             return new MatrixSize(width, height)
           }
           default: {
-            return new MatrixSize(1, 1)
+            if(metadata === undefined || metadata.expandRanges || !state.arraysFlag || metadata.vectorizationForbidden || metadata.parameters === undefined) {
+              return new MatrixSize(1, 1)
+            }
+            const argumentDefinitions = [...metadata.parameters]
+            if (metadata.repeatLastArgs === undefined && argumentDefinitions.length < subChecks.length) {
+              return MatrixSize.error()
+            }
+            if (metadata.repeatLastArgs !== undefined && argumentDefinitions.length < subChecks.length &&
+              (subChecks.length - argumentDefinitions.length) % metadata.repeatLastArgs !== 0) {
+              return MatrixSize.error()
+            }
+
+            while(argumentDefinitions.length < subChecks.length) {
+              argumentDefinitions.push(...argumentDefinitions.slice(argumentDefinitions.length-metadata.repeatLastArgs!))
+            }
+
+            let maxWidth = 1
+            let maxHeight = 1
+            for(let i=0;i<subChecks.length;i++) {
+              if(argumentDefinitions[i].argumentType !== ArgumentTypes.RANGE && argumentDefinitions[i].argumentType !== ArgumentTypes.ANY) {
+                maxHeight = Math.max(maxHeight, subChecks[i].height)
+                maxWidth = Math.max(maxWidth, subChecks[i].width)
+              }
+            }
+            return new MatrixSize(maxWidth, maxHeight)
           }
         }
       }

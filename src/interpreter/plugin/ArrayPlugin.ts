@@ -28,6 +28,7 @@ export class ArrayPlugin extends FunctionPlugin implements FunctionPluginTypeche
         {argumentType: ArgumentTypes.INTEGER, minValue: 1},
         {argumentType: ArgumentTypes.INTEGER, minValue: 1},
       ],
+      vectorizationForbidden: true,
     },
     'FILTER': {
       method: 'filter',
@@ -40,12 +41,12 @@ export class ArrayPlugin extends FunctionPlugin implements FunctionPluginTypeche
     }
   }
 
-  public arrayformula(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public arrayformula(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('ARRAYFORMULA'), (value) => value)
   }
 
   public arrayconstrain(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
-    return this.runMatrixFunction(ast.args, state, this.metadata('ARRAY_CONSTRAIN'), (range: SimpleRangeValue, numRows: number, numCols: number) => {
+    return this.runFunction(ast.args, state, this.metadata('ARRAY_CONSTRAIN'), (range: SimpleRangeValue, numRows: number, numCols: number) => {
       numRows = Math.min(numRows, range.height())
       numCols = Math.min(numCols, range.width())
       const data: InternalScalarValue[][] = range.data
@@ -58,7 +59,7 @@ export class ArrayPlugin extends FunctionPlugin implements FunctionPluginTypeche
   }
 
   public filter(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
-    return this.runMatrixFunction(ast.args, state, this.metadata('FILTER'), (rangeVals: SimpleRangeValue, ...rangeFilters: SimpleRangeValue[]) => {
+    return this.runFunction(ast.args, state, this.metadata('FILTER'), (rangeVals: SimpleRangeValue, ...rangeFilters: SimpleRangeValue[]) => {
       for(const filter of rangeFilters) {
         if (rangeVals.width() !== filter.width() || rangeVals.height() !== filter.height()) {
           return new CellError(ErrorType.NA, ErrorMessage.EqualLength)

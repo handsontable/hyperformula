@@ -20,6 +20,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added ARRAY_CONSTRAIN function. (#661)
 - Added casting to scalars from non-range arrays. (#663)
 - Added support for range interpolation. (#665)
+- Added parsing of arrays in formulas (together with respective config options for separators). (#671)
+- Added support for vectorization of scalar functions. (#673)
 - Added support for time in JS `Date()` objects on the input. (#648)
 - Added validation of API argument types for simple types. (#654)
 - Added named expression handling to engine factories. (#680)

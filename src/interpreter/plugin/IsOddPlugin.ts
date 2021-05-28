@@ -5,7 +5,7 @@
 
 import {ProcedureAst} from '../../parser'
 import {InterpreterState} from '../InterpreterState'
-import {InternalScalarValue} from '../InterpreterValue'
+import {InternalScalarValue, InterpreterValue} from '../InterpreterValue'
 import {ArgumentTypes, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
 
 export class IsOddPlugin extends FunctionPlugin implements FunctionPluginTypecheck<IsOddPlugin>{
@@ -18,7 +18,7 @@ export class IsOddPlugin extends FunctionPlugin implements FunctionPluginTypeche
     },
   }
 
-  public isodd(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public isodd(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('ISODD'),
       (val) => (val % 2 === 1)
     )

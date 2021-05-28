@@ -12,7 +12,7 @@ import {ProcedureAst} from '../../parser'
 import {StatType} from '../../statistics'
 import {zeroIfEmpty} from '../ArithmeticHelper'
 import {InterpreterState} from '../InterpreterState'
-import {InternalScalarValue, RawNoErrorScalarValue, } from '../InterpreterValue'
+import {InternalScalarValue, InterpreterValue, RawNoErrorScalarValue, } from '../InterpreterValue'
 import {SimpleRangeValue} from '../SimpleRangeValue'
 import {ArgumentTypes, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
 
@@ -54,7 +54,7 @@ export class LookupPlugin extends FunctionPlugin implements FunctionPluginTypech
    * @param ast
    * @param state
    */
-  public vlookup(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public vlookup(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('VLOOKUP'), (key: RawNoErrorScalarValue, rangeValue: SimpleRangeValue, index: number, sorted: boolean) => {
       const range = rangeValue.range
 
@@ -78,7 +78,7 @@ export class LookupPlugin extends FunctionPlugin implements FunctionPluginTypech
    * @param ast
    * @param formulaAddress
    */
-  public hlookup(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public hlookup(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('HLOOKUP'), (key: RawNoErrorScalarValue, rangeValue: SimpleRangeValue, index: number, sorted: boolean) => {
       const range = rangeValue.range
       if (range === undefined) {
@@ -95,7 +95,7 @@ export class LookupPlugin extends FunctionPlugin implements FunctionPluginTypech
     })
   }
 
-  public match(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public match(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('MATCH'), (key: RawNoErrorScalarValue, rangeValue: SimpleRangeValue, sorted: number) => {
       return this.doMatch(zeroIfEmpty(key), rangeValue, sorted)
     })

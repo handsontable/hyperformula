@@ -5,7 +5,7 @@
 
 import {ProcedureAst} from '../../parser'
 import {InterpreterState} from '../InterpreterState'
-import {InternalScalarValue} from '../InterpreterValue'
+import {InternalScalarValue, InterpreterValue} from '../InterpreterValue'
 import {ArgumentTypes, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
 
 export class BitwiseLogicOperationsPlugin extends FunctionPlugin implements FunctionPluginTypecheck<BitwiseLogicOperationsPlugin>{
@@ -33,19 +33,19 @@ export class BitwiseLogicOperationsPlugin extends FunctionPlugin implements Func
     },
   }
 
-  public bitand(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public bitand(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('BITAND'),
       (left: number, right: number) => left & right
     )
   }
 
-  public bitor(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public bitor(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('BITOR'),
       (left: number, right: number) => left | right
     )
   }
 
-  public bitxor(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public bitxor(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('BITXOR'),
       (left: number, right: number) => left ^ right
     )

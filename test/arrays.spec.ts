@@ -249,3 +249,75 @@ describe('array parsing', () => {
     expect(engine.getSheetValues(0)).toEqual([[1, 2, 3, 4], [5, 14, 16, -11], [6, 18, 20, -12], [13, 14, 15, 16]])
   })
 })
+
+describe('vectorization', () => {
+  it('1 arg function row', () => {
+    const engine = HyperFormula.buildFromArray([['=ABS({-2,-1,1,2})']], {useArrayArithmetic: true})
+    expect(engine.getSheetValues(0)).toEqual([[2, 1, 1, 2]])
+  })
+
+  it('1 arg function column', () => {
+    const engine = HyperFormula.buildFromArray([['=ABS({2;-2})']], {useArrayArithmetic: true})
+    expect(engine.getSheetValues(0)).toEqual([[2], [2]])
+  })
+
+  it('1 arg function square', () => {
+    const engine = HyperFormula.buildFromArray([['=ABS({1,2;-1,-2})']], {useArrayArithmetic: true})
+    expect(engine.getSheetValues(0)).toEqual([[1, 2], [1, 2]])
+  })
+
+  it('1 arg function no flag - should cast to scalar', () => {
+    const engine = HyperFormula.buildFromArray([['=ABS({-2,-1,1,2})']], {useArrayArithmetic: false})
+    expect(engine.getSheetValues(0)).toEqual([[2]])
+  })
+
+  it('multi arg function', () => {
+    const engine = HyperFormula.buildFromArray([['=DATE({1,2},1,1)']], {useArrayArithmetic: true})
+    expect(engine.getSheetValues(0)).toEqual([[367, 732]])
+  })
+
+  it('multi arg function #2', () => {
+    const engine = HyperFormula.buildFromArray([['=DATE({1,2},{1,2},{1,2})']], {useArrayArithmetic: true})
+    expect(engine.getSheetValues(0)).toEqual([[367, 764]])
+  })
+
+  it('multi arg function #3', () => {
+    const engine = HyperFormula.buildFromArray([['=DATE({1,2},{1;2},{1})']], {useArrayArithmetic: true})
+    expect(engine.getSheetValues(0)).toEqual([[367, 732], [398, 763]])
+  })
+
+  it('multi arg function #4', () => {
+    const engine = HyperFormula.buildFromArray([['=DATE({1,2},{1,2,3},{1})']], {useArrayArithmetic: true})
+    expect(engine.getSheetValues(0)).toEqual([[367, 763, detailedError(ErrorType.VALUE, ErrorMessage.InvalidDate)]])
+  })
+
+  it('mixed types', () => {
+    const engine = HyperFormula.buildFromArray([['=ZTEST({1,2,1},{2;3})']], {useArrayArithmetic: true})
+    const val = engine.getSheetValues(0)
+    expect(val.length).toEqual(2)
+    expect(val[0].length).toEqual(1)
+    expect(val[1].length).toEqual(1)
+  })
+
+  it('no vectorization here #1', () => {
+    const engine = HyperFormula.buildFromArray([['=SUM({1,2,1},{2;3})']], {useArrayArithmetic: true})
+    expect(engine.getSheetValues(0)).toEqual([[9]])
+  })
+
+  it('no vectorization here #2', () => {
+    const engine = HyperFormula.buildFromArray([['=AND({TRUE(),FALSE()},{TRUE();FALSE()})']], {useArrayArithmetic: true})
+    expect(engine.getSheetValues(0)).toEqual([[false]])
+  })
+
+  it('vectorize with defaults', () => {
+    const engine = HyperFormula.buildFromArray([['=IF({TRUE(),FALSE()},{1;2;3}, {2;3})']], {useArrayArithmetic: true})
+    expect(engine.getSheetValues(0)).toEqual([[1, 2], [2, 3], [3, false]])
+  })
+
+  it('should work with switch', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=SWITCH({1,2,3},1,2,3,4,5)']
+    ], {useArrayArithmetic: true})
+    expect(engine.getSheetValues(0)).toEqual([[2, 5, 4]])
+  })
+})

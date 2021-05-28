@@ -21,14 +21,6 @@ describe('Interpreter - SWITCH function', () => {
     expect(engine.getCellValue(adr('C1'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.NoDefault))
   })
 
-  it('Should work with arrays', () => {
-    const engine = HyperFormula.buildFromArray([
-      [1, 2, 3],
-      ['=SWITCH(A1:C1,1,2,3,4,5)']
-    ], {useArrayArithmetic: false})
-    expect(engine.getSheetValues(0)).toEqual([[1, 2, 3], [2, 5, 4]])
-  })
-
   it('Should work with precision', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '1.0000000001', '3', '1.0000000000001', '5'],

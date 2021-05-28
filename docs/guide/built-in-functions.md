@@ -216,7 +216,7 @@ Total number of functions: **{{ $page.functionsCount }}**
 | IFNA | Returns the value if the cell does not contains the #N/A (value not available) error value, or the alternative value if it does. | IFNA(Value; Alternate_value) |
 | IFERROR | Returns the value if the cell does not contains an error value, or the alternative value if it does. | IFERROR(Value; Alternate_value) |
 | NOT | Complements (inverts) a logical value. | NOT(Logicalvalue) |
-| SWITCH | For each value on the input array, tests its value against cases and returns corresponding value. | SWITCH(Array; Case1, Value1[, Case2, Value2[..., Case_n, Value_n[, Default]]]) |
+| SWITCH | Evaluates a list of arguments, consisting of an expression followed by a value. | SWITCH(Expression1, Value1[, Expression2, Value2[..., Expression_n, Value_n]]) |
 | OR | Returns TRUE if at least one argument is TRUE. | OR(Logicalvalue1; Logicalvalue2 ...Logicalvalue30) |
 | TRUE | The logical value is set to TRUE. | TRUE() |
 | XOR | Returns true if an odd number of arguments evaluates to TRUE. | XOR(Logicalvalue1; Logicalvalue2 ...Logicalvalue30) |

@@ -5,7 +5,7 @@
 
 import {ProcedureAst} from '../../parser'
 import {InterpreterState} from '../InterpreterState'
-import {InternalScalarValue} from '../InterpreterValue'
+import {InternalScalarValue, InterpreterValue} from '../InterpreterValue'
 import {ArgumentTypes, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
 
 export class SimpleArithmerticPlugin extends FunctionPlugin implements FunctionPluginTypecheck<SimpleArithmerticPlugin>{
@@ -114,91 +114,91 @@ export class SimpleArithmerticPlugin extends FunctionPlugin implements FunctionP
     },
   }
 
-  public add(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public add(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('HF.ADD'),
       this.interpreter.arithmeticHelper.addWithEpsilon
     )
   }
 
-  public concat(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public concat(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('HF.CONCAT'),
       this.interpreter.arithmeticHelper.concat
     )
   }
 
-  public divide(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public divide(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('HF.DIVIDE'),
       this.interpreter.arithmeticHelper.divide
     )
   }
 
-  public eq(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public eq(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('HF.EQ'),
         this.interpreter.arithmeticHelper.eq
     )
   }
 
-  public gt(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public gt(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('HF.GT'),
         this.interpreter.arithmeticHelper.gt
     )
   }
 
-  public gte(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public gte(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('HF.GTE'),
         this.interpreter.arithmeticHelper.geq
     )
   }
 
-  public lt(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public lt(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('HF.LT'),
         this.interpreter.arithmeticHelper.lt
     )
   }
 
-  public lte(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public lte(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('HF.LTE'),
         this.interpreter.arithmeticHelper.leq
     )
   }
 
-  public minus(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public minus(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('HF.MINUS'),
       this.interpreter.arithmeticHelper.subtract
     )
   }
 
-  public multiply(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public multiply(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('HF.MULTIPLY'),
       this.interpreter.arithmeticHelper.multiply
     )
   }
 
-  public ne(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public ne(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('HF.NE'),
       this.interpreter.arithmeticHelper.neq
     )
   }
 
-  public pow(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public pow(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('HF.POW'),
       this.interpreter.arithmeticHelper.pow
     )
   }
 
-  public uminus(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public uminus(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('HF.UMINUS'),
       this.interpreter.arithmeticHelper.unaryMinus
     )
   }
 
-  public upercent(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public upercent(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('HF.UNARY_PERCENT'),
       this.interpreter.arithmeticHelper.unaryPercent
     )
   }
 
-  public uplus(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public uplus(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('HF.UPLUS'),
       this.interpreter.arithmeticHelper.unaryPlus
     )

@@ -6,7 +6,7 @@
 import {CellError, ErrorType} from '../../Cell'
 import {ProcedureAst} from '../../parser'
 import {InterpreterState} from '../InterpreterState'
-import {InternalScalarValue} from '../InterpreterValue'
+import {InternalScalarValue, InterpreterValue} from '../InterpreterValue'
 import {ArgumentTypes, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
 
 export class ModuloPlugin extends FunctionPlugin implements FunctionPluginTypecheck<ModuloPlugin>{
@@ -20,7 +20,7 @@ export class ModuloPlugin extends FunctionPlugin implements FunctionPluginTypech
     },
   }
 
-  public mod(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public mod(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('MOD'), (dividend: number, divisor: number) => {
       if (divisor === 0) {
         return new CellError(ErrorType.DIV_BY_ZERO)

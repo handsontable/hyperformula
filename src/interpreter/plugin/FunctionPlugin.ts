@@ -38,30 +38,55 @@ export interface ImplementedFunctions {
   [formulaId: string]: FunctionMetadata,
 }
 
-export interface FunctionArguments {
-  parameters?: FunctionArgument[],
+export interface FunctionMetadata {
   /**
+   * Internal and engine.
+   */
+  parameters?: FunctionArgument[],
+
+  /**
+   * Internal.
    * Used for functions with variable number of arguments -- tells how many last arguments can be repeated indefinitely.
    */
   repeatLastArgs?: number,
 
   /**
+   * Internal.
    * Ranges in arguments are inlined to (possibly multiple) scalar arguments.
    */
   expandRanges?: boolean,
 
   /**
+   * Internal.
    * Return number value is packed into this subtype.
    */
   returnNumberType?: NumberType,
-}
-
-export interface FunctionMetadata extends FunctionArguments {
+  /**
+   * Engine.
+   */
   method: string,
+  /**
+   * Engine.
+   */
   isVolatile?: boolean,
+  /**
+   * Engine.
+   */
   isDependentOnSheetStructureChange?: boolean,
+  /**
+   * Engine.
+   */
   doesNotNeedArgumentsToBeComputed?: boolean,
+  /**
+   * Engine.
+   */
   arrayFunction?: boolean,
+
+  /**
+   * Internal.
+   * Some function do not allow vectorization: array-output, and special functions.
+   */
+  vectorizationForbidden?: boolean,
 }
 
 export interface FunctionPluginDefinition {
@@ -289,90 +314,109 @@ export abstract class FunctionPlugin implements FunctionPluginTypecheck<Function
   protected runFunction = (
     args: Ast[],
     state: InterpreterState,
-    functionDefinition: FunctionArguments,
-    fn: (...arg: any) => InternalScalarValue
+    metadata: FunctionMetadata,
+    fn: (...arg: any) => InterpreterValue,
   ) => {
-    return this.runFunctionTemplate(args, state, functionDefinition, fn)
-  }
+    let argumentDefinitions: FunctionArgument[] = metadata.parameters!
+    let argValues: [InterpreterValue, boolean][]
 
-  protected runMatrixFunction = (
-    args: Ast[],
-    state: InterpreterState,
-    functionDefinition: FunctionArguments,
-    fn: (...arg: any) => InterpreterValue
-  ) => {
-    return this.runFunctionTemplate(args, state, functionDefinition, fn)
-  }
-
-  private runFunctionTemplate = (
-    args: Ast[],
-    state: InterpreterState,
-    functionDefinition: FunctionArguments,
-    fn: (...arg: any) => any
-  ) => {
-    const argumentDefinitions: FunctionArgument[] = functionDefinition.parameters!
-    let scalarValues: [InterpreterValue, boolean][]
-
-    if (functionDefinition.expandRanges) {
-      scalarValues = this.listOfScalarValues(args, state)
+    if (metadata.expandRanges) {
+      argValues = this.listOfScalarValues(args, state)
     } else {
-      scalarValues = args.map((ast) => [this.evaluateAst(ast, state), false])
+      argValues = args.map((ast) => [this.evaluateAst(ast, state), false])
     }
 
-    const coercedArguments: Maybe<InterpreterValue | complex | RawNoErrorScalarValue>[] = []
 
-    let argCoerceFailure: Maybe<CellError> = undefined
-    if (functionDefinition.repeatLastArgs === undefined && argumentDefinitions.length < scalarValues.length) {
+    if (metadata.repeatLastArgs === undefined && argumentDefinitions.length < argValues.length) {
       return new CellError(ErrorType.NA, ErrorMessage.WrongArgNumber)
     }
-    if (functionDefinition.repeatLastArgs !== undefined && scalarValues.length > argumentDefinitions.length &&
-      (scalarValues.length - argumentDefinitions.length) % functionDefinition.repeatLastArgs !== 0) {
+    if (metadata.repeatLastArgs !== undefined && argumentDefinitions.length < argValues.length &&
+      (argValues.length - argumentDefinitions.length) % metadata.repeatLastArgs !== 0) {
       return new CellError(ErrorType.NA, ErrorMessage.WrongArgNumber)
     }
-    for (let i = 0, j = 0; i < Math.max(scalarValues.length, argumentDefinitions.length); i++, j++) {
-      // i points to where are we in the scalarValues list,
-      // j points to where are we in the argumentDefinitions list
-      if (j === argumentDefinitions.length) {
-        j -= functionDefinition.repeatLastArgs!
+    argumentDefinitions = [...argumentDefinitions]
+    while(argumentDefinitions.length < argValues.length) {
+      argumentDefinitions.push(...argumentDefinitions.slice(argumentDefinitions.length-metadata.repeatLastArgs!))
+    }
+
+    let maxWidth = 1
+    let maxHeight = 1
+    if(!metadata.vectorizationForbidden && state.arraysFlag) {
+      for(let i=0;i<argValues.length;i++) {
+      const [val] = argValues[i]
+      if(val instanceof SimpleRangeValue && argumentDefinitions[i].argumentType !== ArgumentTypes.RANGE && argumentDefinitions[i].argumentType !== ArgumentTypes.ANY) {
+          maxHeight = Math.max(maxHeight, val.height())
+          maxWidth = Math.max(maxWidth, val.width())
+        }
       }
-      const [val, ignorable] = scalarValues[i] ?? [undefined, undefined]
-      const arg = val ?? argumentDefinitions[j]?.defaultValue
-      if (arg === undefined) {
-        if (argumentDefinitions[j]?.optionalArg) {
-          coercedArguments.push(undefined)
-        } else {
+    }
+
+    for (let i = argValues.length; i < argumentDefinitions.length; i++) {
+      if (argumentDefinitions[i]?.defaultValue === undefined) {
+        if (!argumentDefinitions[i]?.optionalArg) {
           //not enough values passed as arguments, and there was no default value and argument was not optional
           return new CellError(ErrorType.NA, ErrorMessage.WrongArgNumber)
         }
-      } else {
-        //we apply coerce only to non-default values
-        const coercedArg = val !== undefined ? this.coerceToType(arg, argumentDefinitions[j], state) : arg
-        if (coercedArg !== undefined) {
-          if (coercedArg instanceof CellError && argumentDefinitions[j].argumentType !== ArgumentTypes.SCALAR) {
-            //if this is first error encountered, store it
-            argCoerceFailure = argCoerceFailure ?? coercedArg
-          }
-          coercedArguments.push(coercedArg)
-        } else if (!ignorable) {
-          //if this is first error encountered, store it
-          argCoerceFailure = argCoerceFailure ?? (new CellError(ErrorType.VALUE, ErrorMessage.WrongType))
-        }
       }
     }
 
-    return argCoerceFailure ?? this.returnNumberWrapper(fn(...coercedArguments), functionDefinition.returnNumberType)
+    const retArr: InternalScalarValue[][] = []
+    for(let row = 0; row<maxHeight; row++) {
+      const rowArr: InternalScalarValue[] = []
+      for(let col = 0; col<maxWidth; col++) {
+        let argCoerceFailure: Maybe<CellError> = undefined
+        const coercedArguments: Maybe<InterpreterValue | complex | RawNoErrorScalarValue>[] = []
+        for (let i = 0; i < argumentDefinitions.length; i++) {
+          // eslint-disable-next-line prefer-const
+          let [val, ignorable] = argValues[i] ?? [undefined, undefined]
+          if(val instanceof SimpleRangeValue && argumentDefinitions[i].argumentType !== ArgumentTypes.RANGE && argumentDefinitions[i].argumentType !== ArgumentTypes.ANY) {
+            if(!metadata.vectorizationForbidden && state.arraysFlag) {
+              val = val.data[val.height()!==1 ? row : 0]?.[val.width()!==1 ? col : 0]
+            }
+          }
+          const arg = val ?? argumentDefinitions[i]?.defaultValue
+          if (arg === undefined) {
+            coercedArguments.push(undefined) //we verified in previous loop that this arg is optional
+          } else {
+            //we apply coerce only to non-default values
+            const coercedArg = val !== undefined ? this.coerceToType(arg, argumentDefinitions[i], state) : arg
+            if (coercedArg !== undefined) {
+              if (coercedArg instanceof CellError && argumentDefinitions[i].argumentType !== ArgumentTypes.SCALAR) {
+                //if this is first error encountered, store it
+                argCoerceFailure = argCoerceFailure ?? coercedArg
+              }
+              coercedArguments.push(coercedArg)
+            } else if (!ignorable) {
+              //if this is first error encountered, store it
+              argCoerceFailure = argCoerceFailure ?? (new CellError(ErrorType.VALUE, ErrorMessage.WrongType))
+            }
+          }
+        }
+
+        const ret = argCoerceFailure ?? this.returnNumberWrapper(fn(...coercedArguments), metadata.returnNumberType)
+        if(maxHeight === 1 && maxWidth === 1) {
+          return ret
+        }
+        if(ret instanceof SimpleRangeValue) {
+          throw 'Function returning array cannot be vectorized.'
+        }
+        rowArr.push(ret)
+      }
+      retArr.push(rowArr)
+    }
+    return SimpleRangeValue.onlyValues(retArr)
   }
 
   protected runFunctionWithReferenceArgument = (
     args: Ast[],
     state: InterpreterState,
-    argumentDefinitions: FunctionArguments,
+    metadata: FunctionMetadata,
     noArgCallback: () => InternalScalarValue | RawScalarValue,
     referenceCallback: (reference: SimpleCellAddress) => InternalScalarValue,
     nonReferenceCallback: (...arg: any) => InternalScalarValue = () => new CellError(ErrorType.NA, ErrorMessage.CellRefExpected)
   ) => {
     if (args.length === 0) {
-      return this.returnNumberWrapper(noArgCallback(), argumentDefinitions.returnNumberType)
+      return this.returnNumberWrapper(noArgCallback(), metadata.returnNumberType)
     } else if (args.length > 1) {
       return new CellError(ErrorType.NA, ErrorMessage.WrongArgNumber)
     }
@@ -395,10 +439,10 @@ export abstract class FunctionPlugin implements FunctionPluginTypecheck<Function
     }
 
     if (cellReference !== undefined) {
-      return this.returnNumberWrapper(referenceCallback(cellReference), argumentDefinitions.returnNumberType)
+      return this.returnNumberWrapper(referenceCallback(cellReference), metadata.returnNumberType)
     }
 
-    return this.runFunction(args, state, argumentDefinitions, nonReferenceCallback)
+    return this.runFunction(args, state, metadata, nonReferenceCallback)
   }
 
   protected metadata(name: string): FunctionMetadata {
@@ -409,7 +453,7 @@ export abstract class FunctionPlugin implements FunctionPluginTypecheck<Function
     throw new Error(`No metadata for function ${name}.`)
   }
 
-  private returnNumberWrapper(val: InternalScalarValue, type?: NumberType, format?: FormatInfo): InternalScalarValue {
+  private returnNumberWrapper<T>(val: T | ExtendedNumber, type?: NumberType, format?: FormatInfo): T | ExtendedNumber {
     if(type !== undefined && isExtendedNumber(val)) {
       return this.interpreter.arithmeticHelper.ExtendedNumberFactory(getRawValue(val), {type, format})
     } else {

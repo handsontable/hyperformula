@@ -8,7 +8,7 @@ import {ErrorMessage} from '../../error-message'
 import {ProcedureAst} from '../../parser'
 import {FunctionPlugin} from '../index'
 import {InterpreterState} from '../InterpreterState'
-import {InternalScalarValue} from '../InterpreterValue'
+import {InternalScalarValue, InterpreterValue} from '../InterpreterValue'
 import {ArgumentTypes, FunctionPluginTypecheck} from './FunctionPlugin'
 
 export class FormulaTextPlugin extends FunctionPlugin implements FunctionPluginTypecheck<FormulaTextPlugin>{
@@ -19,7 +19,8 @@ export class FormulaTextPlugin extends FunctionPlugin implements FunctionPluginT
         {argumentType: ArgumentTypes.NOERROR}
       ],
       doesNotNeedArgumentsToBeComputed: true,
-      isDependentOnSheetStructureChange: true
+      isDependentOnSheetStructureChange: true,
+      vectorizationForbidden: true,
     },
   }
 
@@ -31,7 +32,7 @@ export class FormulaTextPlugin extends FunctionPlugin implements FunctionPluginT
    * @param ast
    * @param state
    */
-  public formulatext(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public formulatext(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunctionWithReferenceArgument(ast.args, state, this.metadata('FORMULATEXT'),
       () => new CellError(ErrorType.NA, ErrorMessage.WrongArgNumber),
       (cellReference: SimpleCellAddress) => this.serialization.getCellFormula(cellReference) ?? new CellError(ErrorType.NA, ErrorMessage.Formula)

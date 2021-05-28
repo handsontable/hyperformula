@@ -10,7 +10,7 @@ import {InterpreterState} from '../InterpreterState'
 import {
   EmptyValue,
   getRawValue,
-  InternalScalarValue,
+  InternalScalarValue, InterpreterValue,
   isExtendedNumber,
   NumberType,
   RawInterpreterValue
@@ -283,23 +283,23 @@ export class FinancialPlugin extends FunctionPlugin implements FunctionPluginTyp
     },
   }
 
-  public pmt(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public pmt(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('PMT'), pmtCore)
   }
 
-  public ipmt(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public ipmt(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('IPMT'), ipmtCore)
   }
 
-  public ppmt(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public ppmt(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('PPMT'), ppmtCore)
   }
 
-  public fv(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public fv(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('FV'), fvCore)
   }
 
-  public cumipmt(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public cumipmt(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('CUMIPMT'),
       (rate: number, periods: number, value: number, start: number, end: number, type: number) => {
         if (start > end) {
@@ -314,7 +314,7 @@ export class FinancialPlugin extends FunctionPlugin implements FunctionPluginTyp
     )
   }
 
-  public cumprinc(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public cumprinc(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('CUMPRINC'),
       (rate: number, periods: number, value: number, start: number, end: number, type: number) => {
         if (start > end) {
@@ -329,7 +329,7 @@ export class FinancialPlugin extends FunctionPlugin implements FunctionPluginTyp
     )
   }
 
-  public db(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public db(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('DB'),
       (cost: number, salvage: number, life: number, period: number, month: number) => {
         if ((month===12 && period > life) || (period > life+1)) {
@@ -361,7 +361,7 @@ export class FinancialPlugin extends FunctionPlugin implements FunctionPluginTyp
     )
   }
 
-  public ddb(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public ddb(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('DDB'),
       (cost: number, salvage: number, life: number, period: number, factor: number) => {
         if (period > life) {
@@ -385,7 +385,7 @@ export class FinancialPlugin extends FunctionPlugin implements FunctionPluginTyp
     )
   }
 
-  public dollarde(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public dollarde(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('DOLLARDE'),
       (dollar, fraction) => {
         if (fraction < 1) {
@@ -401,7 +401,7 @@ export class FinancialPlugin extends FunctionPlugin implements FunctionPluginTyp
     )
   }
 
-  public dollarfr(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public dollarfr(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('DOLLARFR'),
       (dollar, fraction) => {
         if (fraction < 1) {
@@ -417,7 +417,7 @@ export class FinancialPlugin extends FunctionPlugin implements FunctionPluginTyp
     )
   }
 
-  public effect(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public effect(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('EFFECT'),
       (rate: number, periods: number) => {
         periods = Math.trunc(periods)
@@ -426,7 +426,7 @@ export class FinancialPlugin extends FunctionPlugin implements FunctionPluginTyp
     )
   }
 
-  public ispmt(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public ispmt(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('ISPMT'),
       (rate, period, periods, value) => {
         if(periods===0) {
@@ -437,7 +437,7 @@ export class FinancialPlugin extends FunctionPlugin implements FunctionPluginTyp
     )
   }
 
-  public nominal(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public nominal(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('NOMINAL'),
       (rate: number, periods: number) => {
         periods = Math.trunc(periods)
@@ -446,7 +446,7 @@ export class FinancialPlugin extends FunctionPlugin implements FunctionPluginTyp
     )
   }
 
-  public nper(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public nper(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('NPER'),
       (rate, payment, present, future, type) => {
         if(rate === 0) {
@@ -463,7 +463,7 @@ export class FinancialPlugin extends FunctionPlugin implements FunctionPluginTyp
     )
   }
 
-  public rate(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public rate(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('RATE'),
       (periods, payment, present, future, type, guess) => {
         if(guess<=-1) {
@@ -505,7 +505,7 @@ export class FinancialPlugin extends FunctionPlugin implements FunctionPluginTyp
     )
   }
 
-  public pv(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public pv(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('PV'),
       (rate, periods, payment, future, type) => {
         type = type ? 1 : 0
@@ -525,7 +525,7 @@ export class FinancialPlugin extends FunctionPlugin implements FunctionPluginTyp
     )
   }
 
-  public rri(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public rri(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('RRI'),
       (periods, present, future) => {
         if (present === 0 || (future < 0 && present > 0) || (future > 0 && present < 0)) {
@@ -537,7 +537,7 @@ export class FinancialPlugin extends FunctionPlugin implements FunctionPluginTyp
     )
   }
 
-  public sln(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public sln(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('SLN'),
       (cost, salvage, life) => {
         if (life === 0) {
@@ -548,7 +548,7 @@ export class FinancialPlugin extends FunctionPlugin implements FunctionPluginTyp
     )
   }
 
-  public syd(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public syd(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('SYD'),
       (cost, salvage, life, period) => {
         if (period > life) {
@@ -559,7 +559,7 @@ export class FinancialPlugin extends FunctionPlugin implements FunctionPluginTyp
     )
   }
 
-  public tbilleq(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public tbilleq(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('TBILLEQ'),
       (settlement, maturity, discount) => {
         settlement = Math.round(settlement)
@@ -585,7 +585,7 @@ export class FinancialPlugin extends FunctionPlugin implements FunctionPluginTyp
     )
   }
 
-  public tbillprice(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public tbillprice(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('TBILLPRICE'),
       (settlement, maturity, discount) => {
         settlement = Math.round(settlement)
@@ -611,7 +611,7 @@ export class FinancialPlugin extends FunctionPlugin implements FunctionPluginTyp
     )
   }
 
-  public tbillyield(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public tbillyield(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('TBILLYIELD'),
       (settlement, maturity, price) => {
         settlement = Math.round(settlement)
@@ -630,7 +630,7 @@ export class FinancialPlugin extends FunctionPlugin implements FunctionPluginTyp
     )
   }
 
-  public fvschedule(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public fvschedule(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('FVSCHEDULE'),
       (value: number, ratios: SimpleRangeValue) => {
         const vals = ratios.valuesFromTopLeftCorner()
@@ -650,7 +650,7 @@ export class FinancialPlugin extends FunctionPlugin implements FunctionPluginTyp
       })
   }
 
-  public npv(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public npv(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('NPV'),
       (rate: number, ...args: RawInterpreterValue[]) => {
         const coerced = this.interpreter.arithmeticHelper.coerceNumbersExactRanges(args)
@@ -662,7 +662,7 @@ export class FinancialPlugin extends FunctionPlugin implements FunctionPluginTyp
     )
   }
 
-  public mirr(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public mirr(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('MIRR'),
       (range: SimpleRangeValue, frate: number, rrate: number) => {
         const vals = this.interpreter.arithmeticHelper.manyToExactNumbers(range.valuesFromTopLeftCorner())
@@ -707,13 +707,13 @@ export class FinancialPlugin extends FunctionPlugin implements FunctionPluginTyp
     )
   }
 
-  public pduration(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public pduration(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('PDURATION'),
       (rate: number, pv: number, fv: number) => (Math.log(fv) - Math.log(pv))/Math.log(1+rate)
     )
   }
 
-  public xnpv(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public xnpv(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('XNPV'),
       (rate: number, values: SimpleRangeValue, dates: SimpleRangeValue) => {
         const valArr = values.valuesFromTopLeftCorner()

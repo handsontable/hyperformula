@@ -7,7 +7,7 @@ import {CellError, ErrorType} from '../../Cell'
 import {ErrorMessage} from '../../error-message'
 import {ProcedureAst} from '../../parser'
 import {InterpreterState} from '../InterpreterState'
-import {getRawValue, InternalScalarValue, RawScalarValue} from '../InterpreterValue'
+import {getRawValue, InternalScalarValue, InterpreterValue, RawScalarValue} from '../InterpreterValue'
 import {ArgumentTypes, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
 
 export class RomanPlugin extends FunctionPlugin implements FunctionPluginTypecheck<RomanPlugin>{
@@ -27,7 +27,7 @@ export class RomanPlugin extends FunctionPlugin implements FunctionPluginTypeche
     },
   }
 
-  public roman(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public roman(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('ROMAN'),
       (val: number, mode: RawScalarValue) => {
         val = Math.trunc(val)
@@ -52,7 +52,7 @@ export class RomanPlugin extends FunctionPlugin implements FunctionPluginTypeche
     )
   }
 
-  public arabic(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public arabic(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('ARABIC'),
       (inputString: string) => {
         inputString = inputString.trim().toUpperCase()
