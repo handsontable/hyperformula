@@ -30,7 +30,7 @@ describe('Changing cell content - checking if its possible', () => {
     expect(engine.isItPossibleToSetCellContents(adr('A1', 1))).toEqual(false)
   })
 
-  it('no if in formula matrix', () => {
+  it('yes if there is an array', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '2'],
       ['3', '4'],
@@ -39,10 +39,10 @@ describe('Changing cell content - checking if its possible', () => {
       ['13'],
     ])
 
-    expect(engine.isItPossibleToSetCellContents(adr('A3'))).toBe(false)
-    expect(engine.isItPossibleToSetCellContents(adr('A3'), 1, 1)).toBe(false)
+    expect(engine.isItPossibleToSetCellContents(adr('A3'))).toBe(true)
+    expect(engine.isItPossibleToSetCellContents(adr('A3'), 1, 1)).toBe(true)
     expect(engine.isItPossibleToSetCellContents(adr('A1'), 2, 2)).toBe(true)
-    expect(engine.isItPossibleToSetCellContents(adr('A2'), 2, 2)).toBe(false)
+    expect(engine.isItPossibleToSetCellContents(adr('A2'), 2, 2)).toBe(true)
   })
 
   it('no if content exceeds sheet size limits', () => {
