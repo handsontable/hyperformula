@@ -4,7 +4,7 @@
  */
 
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
-import {CellError, ErrorType, SimpleCellAddress} from '../Cell'
+import {addressesEqual, CellError, ErrorType, SimpleCellAddress} from '../Cell'
 import {RawCellContent} from '../CellContentParser'
 import {EmptyValue, getRawValue, InternalScalarValue, InterpreterValue} from '../interpreter/InterpreterValue'
 import {LazilyTransformingAstService} from '../LazilyTransformingAstService'
@@ -201,6 +201,10 @@ export class MatrixVertex extends FormulaVertex {
    * No-op as matrix vertices are transformed eagerly.
    * */
   ensureRecentData(updatingService: LazilyTransformingAstService) {}
+
+  isLeftCorner(address: SimpleCellAddress): boolean {
+    return addressesEqual(this.cellAddress, address)
+  }
 
   private setErrorValue(error: CellError) {
     this.matrix = new ErroredMatrix(error, this.matrix.size)

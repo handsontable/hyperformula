@@ -265,12 +265,17 @@ export class DependencyGraph {
 
   public removeRows(removedRows: RowsSpan): Set<MatrixVertex> {
     this.stats.measure(StatType.ADJUSTING_GRAPH, () => {
-      for (const vertex of this.addressMapping.verticesFromRowsSpan(removedRows)) {
+      for (const [address, vertex] of this.addressMapping.entriesFromRowsSpan(removedRows)) {
         for (const adjacentNode of this.graph.adjacentNodes(vertex)) {
           this.graph.markNodeAsSpecialRecentlyChanged(adjacentNode)
         }
         if (vertex instanceof MatrixVertex) {
-          continue
+          if (vertex.isLeftCorner(address)) {
+            this.shrinkMatrixToCorner(vertex)
+            this.matrixMapping.removeMatrix(vertex.getRange())
+          } else {
+            continue
+          }
         }
         this.removeVertex(vertex)
       }
@@ -874,7 +879,7 @@ export class DependencyGraph {
     this.setMatrix(range, vertex)
 
     if (!this.isThereSpaceForMatrix(vertex)) {
-        return
+      return
     }
 
     for (const address of range.addresses(this)) {
@@ -883,7 +888,11 @@ export class DependencyGraph {
   }
 
   private truncateRanges(span: Span, coordinate: (address: SimpleCellAddress) => number): RangeVertex[] {
-    const {verticesToRemove, verticesToMerge, verticesWithChangedSize} = this.rangeMapping.truncateRanges(span, coordinate)
+    const {
+      verticesToRemove,
+      verticesToMerge,
+      verticesWithChangedSize
+    } = this.rangeMapping.truncateRanges(span, coordinate)
     for (const [existingVertex, mergedVertex] of verticesToMerge) {
       this.mergeRangeVertices(existingVertex, mergedVertex)
     }
@@ -898,7 +907,7 @@ export class DependencyGraph {
     if (rowStart <= 0) {
       return
     }
-    for (const [, matrix] of this.matrixMapping.matricesInRows(RowsSpan.fromRowStartAndEnd(sheet, rowStart-1, rowStart-1))) {
+    for (const [, matrix] of this.matrixMapping.matricesInRows(RowsSpan.fromRowStartAndEnd(sheet, rowStart - 1, rowStart - 1))) {
       const matrixRange = matrix.getRange()
       for (let col = matrixRange.start.col; col <= matrixRange.end.col; ++col) {
         for (let row = rowStart; row <= matrixRange.end.row; ++row) {
@@ -915,7 +924,7 @@ export class DependencyGraph {
     if (rowStart <= 0) {
       return
     }
-    for (const [, matrix] of this.matrixMapping.matricesInRows(RowsSpan.fromRowStartAndEnd(sheet, rowStart-1, rowStart-1))) {
+    for (const [, matrix] of this.matrixMapping.matricesInRows(RowsSpan.fromRowStartAndEnd(sheet, rowStart - 1, rowStart - 1))) {
       if (this.isThereSpaceForMatrix(matrix)) {
         for (const address of matrix.getRange().addresses(this)) {
           this.addressMapping.setCell(address, matrix)

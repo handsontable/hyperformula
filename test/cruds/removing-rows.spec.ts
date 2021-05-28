@@ -59,7 +59,7 @@ describe('Removing rows - checking if its possible', () => {
     expect(engine.isItPossibleToRemoveRows(-Infinity, [0, 1])).toEqual(false)
   })
 
-  it('no if theres a formula matrix in place where we remove', () => {
+  it('yes if theres an array in place where we remove', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '2'],
       ['3', '4'],
@@ -68,9 +68,9 @@ describe('Removing rows - checking if its possible', () => {
     ])
 
     expect(engine.isItPossibleToRemoveRows(0, [1, 1])).toEqual(true)
-    expect(engine.isItPossibleToRemoveRows(0, [1, 2])).toEqual(false)
-    expect(engine.isItPossibleToRemoveRows(0, [2, 1])).toEqual(false)
-    expect(engine.isItPossibleToRemoveRows(0, [3, 1])).toEqual(false)
+    expect(engine.isItPossibleToRemoveRows(0, [1, 2])).toEqual(true)
+    expect(engine.isItPossibleToRemoveRows(0, [2, 1])).toEqual(true)
+    expect(engine.isItPossibleToRemoveRows(0, [3, 1])).toEqual(true)
     expect(engine.isItPossibleToRemoveRows(0, [4, 1])).toEqual(true)
   })
 
@@ -549,16 +549,6 @@ describe('Removing rows - reevaluation', () => {
 })
 
 describe('Removing rows - arrays', () => {
-  it('should not remove row with formula matrix', () => {
-    const engine = HyperFormula.buildFromArray([
-      ['1', '2'],
-      ['3', '4'],
-      ['=MMULT(A1:B2, A1:B2)'],
-    ])
-
-    expect(() => engine.removeRows(0, [2, 1])).toThrowError('Cannot perform this operation, source location has a matrix inside.')
-  })
-
   it('MatrixVertex#formula should be updated', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '4'],
@@ -705,6 +695,36 @@ describe('Removing rows - arrays', () => {
       [2]
     ], {useArrayArithmetic: true})
     expectEngineToBeTheSameAs(engine, expected)
+  })
+
+  it('it should remove array when removing row with left corner', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1', '2'],
+      ['3', '4'],
+      ['=MMULT(A1:B2, A1:B2)'],
+    ])
+
+    engine.removeRows(0, [2, 1])
+
+    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
+      [1, 2],
+      [3, 4]
+    ]))
+  })
+
+  it('it should remove array when removing rows with whole matrix', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1', '2'],
+      ['3', '4'],
+      ['=MMULT(A1:B2, A1:B2)'],
+    ])
+
+    engine.removeRows(0, [2, 2])
+
+    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
+      [1, 2],
+      [3, 4]
+    ]))
   })
 })
 

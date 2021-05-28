@@ -142,7 +142,7 @@ export class RemoveRowsTransformer extends Transformer {
     if (newStart === false && newEnd === false) {
       return [actualStart, actualEnd]
     } else if (newStart === ErrorType.REF || newEnd === ErrorType.REF) {
-      throw Error('Cannot happen')
+      return ErrorType.REF
     } else {
       return [newStart || actualStart, newEnd || actualEnd]
     }

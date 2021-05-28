@@ -187,6 +187,10 @@ export const invalidSimpleCellAddress = (address: SimpleCellAddress): boolean =>
 export const movedSimpleCellAddress = (address: SimpleCellAddress, toSheet: number, toRight: number, toBottom: number): SimpleCellAddress => {
   return simpleCellAddress(toSheet, address.col + toRight, address.row + toBottom)
 }
+export const addressesEqual = (left: SimpleCellAddress, right: SimpleCellAddress) => {
+  return left.sheet === right.sheet && left.row === right.row && left.col === right.col
+}
+
 
 export const absoluteSheetReference = (address: AddressWithSheet, baseAddress: SimpleCellAddress): number => {
   return address.sheet === null ? baseAddress.sheet : address.sheet
