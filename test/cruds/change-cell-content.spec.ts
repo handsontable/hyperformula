@@ -1,11 +1,21 @@
 import {ExportedCellChange, HyperFormula, InvalidAddressError, NoSheetWithIdError} from '../../src'
 import {ErrorType, simpleCellAddress} from '../../src/Cell'
 import {Config} from '../../src/Config'
-import {EmptyCellVertex, MatrixVertex} from '../../src/DependencyGraph'
+import {EmptyCellVertex, MatrixVertex, ValueCellVertex} from '../../src/DependencyGraph'
 import {ErrorMessage} from '../../src/error-message'
 import {SheetSizeLimitExceededError} from '../../src/errors'
 import {ColumnIndex} from '../../src/Lookup/ColumnIndex'
-import {adr, colEnd, colStart, detailedError, expectArrayWithSameContent, rowEnd, rowStart} from '../testUtils'
+import {
+  adr,
+  colEnd,
+  colStart,
+  detailedError,
+  expectArrayWithSameContent,
+  expectEngineToBeTheSameAs, expectVerticesOfTypes, noSpace,
+  rowEnd,
+  rowStart
+} from '../testUtils'
+import {MatrixSize} from '../../src/MatrixSize'
 
 describe('Changing cell content - checking if its possible', () => {
   it('address should have valid coordinates', () => {
@@ -221,21 +231,6 @@ describe('changing cell content', () => {
     expect(engine.getCellFormula(adr('A1'))).toEqual('=SUM(')
   })
 
-  it('rewrite part of sheet with matrix', () => {
-    const sheet = [
-      ['1', '2'],
-      ['3', '4'],
-      ['=A1', null],
-      ['1', 'foo'],
-    ]
-    const engine = HyperFormula.buildFromArray(sheet)
-
-    engine.setCellContents(adr('A3'), '=MMULT(A1:B2,A1:B2)')
-    expect(engine.addressMapping.fetchCell(adr('A3'))).toBeInstanceOf(MatrixVertex)
-    expect(engine.addressMapping.fetchCell(adr('B4'))).toBeInstanceOf(MatrixVertex)
-    expect(engine.getCellValue(adr('A3'))).toBe(7)
-  })
-
   it('changing value inside range', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '0'],
@@ -395,17 +390,6 @@ describe('changing cell content', () => {
     engine.setCellContents(adr('A1'), '3')
     expect(a2setCellValueSpy).toHaveBeenCalled()
     expect(b2setCellValueSpy).not.toHaveBeenCalled()
-  })
-
-  it('should not be possible to edit part of a Matrix', () => {
-    const engine = HyperFormula.buildFromArray([
-      ['1', '2'],
-      [null, '=TRANSPOSE(A1:B1)'],
-    ])
-
-    expect(() => {
-      engine.setCellContents(adr('A2'), '=TRANSPOSE(C1:C2)')
-    }).toThrowError('Illegal operation')
   })
 
   it('is not possible to set cell content in sheet which does not exist', () => {
@@ -770,5 +754,128 @@ describe('row ranges', () => {
     expect(engine.graph.existsEdge(a2, range)).toEqual(true)
     expect(engine.graph.existsEdge(a3, range)).toEqual(true)
     expect(engine.getCellValue(adr('A1'))).toEqual(3)
+  })
+})
+
+describe('arrays', () => {
+  it('should set matrix to cell', () => {
+    const engine = HyperFormula.buildFromArray([
+      [1, 2],
+      [3, 4],
+    ], {useArrayArithmetic: true})
+
+    engine.setCellContents(adr('C1'), [['=-A1:B2']])
+
+    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
+      [1, 2, '=-A1:B2'],
+      [3, 4],
+    ], {useArrayArithmetic: true}))
+  })
+
+  it('should be REF matrix if no space for result', () => {
+    const engine = HyperFormula.buildFromArray([
+      [],
+      [1],
+    ], {useArrayArithmetic: true})
+
+    engine.setCellContents(adr('A1'), [['=-B2:B3']])
+
+    expect(engine.getCellValue(adr('A1'))).toEqual(noSpace())
+    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
+      ['=-B2:B3'],
+      [1],
+    ], {useArrayArithmetic: true}))
+  })
+
+  it('should be REF matrix if no space and potential cycle', () => {
+    const engine = HyperFormula.buildFromArray([
+      [],
+      [1],
+    ], {useArrayArithmetic: true})
+
+    engine.setCellContents(adr('A1'), [['=-A2:A3']])
+
+    expect(engine.getCellValue(adr('A1'))).toEqual(noSpace())
+    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
+      ['=-A2:A3'],
+      [1],
+    ], {useArrayArithmetic: true}))
+  })
+
+  it('should shrink to one vertex if there is more content colliding with matrix', () => {
+    const engine = HyperFormula.buildFromArray([], {useArrayArithmetic: true})
+
+    engine.setCellContents(adr('A1'), [
+      ['=-C1:D2', null],
+      [1, null]
+    ])
+
+    expect(engine.matrixMapping.getMatrixByCorner(adr('A1'))?.matrix.size).toEqual(MatrixSize.error())
+    expectVerticesOfTypes(engine, [
+      [MatrixVertex, null],
+      [ValueCellVertex, null],
+    ])
+    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
+      ['=-C1:D2', null],
+      [1, null]
+    ], {useArrayArithmetic: true}))
+  })
+
+  it('should be separate arrays', () => {
+    const engine = HyperFormula.buildFromArray([], {useArrayArithmetic: true})
+
+    engine.setCellContents(adr('A1'), [
+      ['=TRANSPOSE(D1:E2)', '=TRANSPOSE(D1:E2)'],
+      ['=TRANSPOSE(D1:E2)', '=TRANSPOSE(D1:E2)'],
+    ])
+
+    expectVerticesOfTypes(engine, [
+      [MatrixVertex, MatrixVertex, null],
+      [MatrixVertex, MatrixVertex, MatrixVertex],
+      [null, MatrixVertex, MatrixVertex],
+    ])
+    expect(engine.matrixMapping.matrixMapping.size).toEqual(4)
+    expect(engine.getSheetValues(0))
+  })
+
+  it('should REF last matrix', () => {
+    const engine = HyperFormula.buildFromArray([
+      [null, null, null, 1, 2],
+      [null, null, null, 1, 2],
+    ], {useArrayArithmetic: true})
+
+    engine.setCellContents(adr('A1'), [
+      ['=TRANSPOSE(D1:E2)', '=TRANSPOSE(D1:E2)'],
+      ['=TRANSPOSE(D1:E2)'],
+    ])
+
+    expectVerticesOfTypes(engine, [
+      [MatrixVertex, MatrixVertex, MatrixVertex],
+      [MatrixVertex, MatrixVertex, MatrixVertex],
+      [null, null],
+    ])
+    expect(engine.getSheetValues(0)).toEqual([
+      [noSpace(), 1, 1, 1, 2],
+      [noSpace(), 2, 2, 1, 2],
+    ])
+    expect(engine.matrixMapping.matrixMapping.size).toEqual(3)
+    expect(engine.getSheetValues(0))
+  })
+
+  it('should make existing matrix REF and change cell content', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1', '2'],
+      ['3', '4'],
+      ['=-A1:B2'],
+    ], {useArrayArithmetic: true})
+
+    engine.setCellContents(adr('B4'), [['foo']])
+
+    expect(engine.getSheetValues(0)).toEqual([
+      [1, 2],
+      [1, 2],
+      [noSpace(), null],
+      [null, 'foo']
+    ])
   })
 })
