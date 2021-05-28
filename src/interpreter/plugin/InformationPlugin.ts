@@ -331,18 +331,32 @@ export class InformationPlugin extends FunctionPlugin implements FunctionPluginT
    * @param ast
    * @param _state
    */
-  public columns(ast: ProcedureAst, _state: InterpreterState): InternalScalarValue {
+  public columns(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
     if (ast.args.length !== 1) {
       return new CellError(ErrorType.NA, ErrorMessage.WrongArgNumber)
     }
     if (ast.args.some((astIt) => astIt.type === AstNodeType.EMPTY)) {
       return new CellError(ErrorType.NUM, ErrorMessage.EmptyArg)
     }
-    const rangeAst = ast.args[0]
-    if (rangeAst.type === AstNodeType.CELL_RANGE) {
-      return rangeAst.end.col - rangeAst.start.col + 1
+    let argAst = ast.args[0]
+    while(argAst.type === AstNodeType.PARENTHESIS) {
+      argAst = argAst.expression
+    }
+    if (argAst.type === AstNodeType.CELL_RANGE || argAst.type === AstNodeType.COLUMN_RANGE) {
+      return argAst.end.col - argAst.start.col + 1
+    } else if(argAst.type === AstNodeType.CELL_REFERENCE) {
+      return 1
+    } else if(argAst.type === AstNodeType.ROW_RANGE) {
+      return this.config.maxColumns
     } else {
-      return new CellError(ErrorType.VALUE, ErrorMessage.CellRangeExpected)
+      const val = this.evaluateAst(argAst, state)
+      if(val instanceof SimpleRangeValue) {
+        return val.width()
+      } else if (val instanceof CellError){
+        return val
+      } else {
+        return 1
+      }
     }
   }
 
@@ -369,25 +383,39 @@ export class InformationPlugin extends FunctionPlugin implements FunctionPluginT
    * @param ast
    * @param _state
    */
-  public rows(ast: ProcedureAst, _state: InterpreterState): InternalScalarValue {
+  public rows(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
     if (ast.args.length !== 1) {
       return new CellError(ErrorType.NA, ErrorMessage.WrongArgNumber)
     }
     if (ast.args.some((astIt) => astIt.type === AstNodeType.EMPTY)) {
       return new CellError(ErrorType.NUM, ErrorMessage.EmptyArg)
     }
-    const rangeAst = ast.args[0]
-    if (rangeAst.type === AstNodeType.CELL_RANGE) {
-      return rangeAst.end.row - rangeAst.start.row + 1
+    let argAst = ast.args[0]
+    while(argAst.type === AstNodeType.PARENTHESIS) {
+      argAst = argAst.expression
+    }
+    if (argAst.type === AstNodeType.CELL_RANGE || argAst.type === AstNodeType.ROW_RANGE) {
+      return argAst.end.row - argAst.start.row + 1
+    } else if(argAst.type === AstNodeType.CELL_REFERENCE) {
+      return 1
+    } else if(argAst.type === AstNodeType.COLUMN_RANGE) {
+      return this.config.maxRows
     } else {
-      return new CellError(ErrorType.VALUE, ErrorMessage.CellRangeExpected)
+      const val = this.evaluateAst(argAst, state)
+      if(val instanceof SimpleRangeValue) {
+        return val.height()
+      } else if (val instanceof CellError){
+        return val
+      } else {
+        return 1
+      }
     }
   }
 
   /**
    * Corresponds to INDEX(range;)
    *
-   * Returns number of rows in provided range of cells
+   * Returns specific position in 2d array.
    *
    * @param ast
    * @param state
