@@ -758,7 +758,7 @@ describe('row ranges', () => {
 })
 
 describe('arrays', () => {
-  it('should set matrix to cell', () => {
+  it('should set array to cell', () => {
     const engine = HyperFormula.buildFromArray([
       [1, 2],
       [3, 4],
@@ -772,7 +772,7 @@ describe('arrays', () => {
     ], {useArrayArithmetic: true}))
   })
 
-  it('should be REF matrix if no space for result', () => {
+  it('should be REF array if no space for result', () => {
     const engine = HyperFormula.buildFromArray([
       [],
       [1],
@@ -787,7 +787,7 @@ describe('arrays', () => {
     ], {useArrayArithmetic: true}))
   })
 
-  it('should be REF matrix if no space and potential cycle', () => {
+  it('should be REF array if no space and potential cycle', () => {
     const engine = HyperFormula.buildFromArray([
       [],
       [1],
@@ -802,7 +802,7 @@ describe('arrays', () => {
     ], {useArrayArithmetic: true}))
   })
 
-  it('should shrink to one vertex if there is more content colliding with matrix', () => {
+  it('should shrink to one vertex if there is more content colliding with array', () => {
     const engine = HyperFormula.buildFromArray([], {useArrayArithmetic: true})
 
     engine.setCellContents(adr('A1'), [
@@ -838,7 +838,7 @@ describe('arrays', () => {
     expect(engine.getSheetValues(0))
   })
 
-  it('should REF last matrix', () => {
+  it('should REF last array', () => {
     const engine = HyperFormula.buildFromArray([
       [null, null, null, 1, 2],
       [null, null, null, 1, 2],
@@ -862,7 +862,7 @@ describe('arrays', () => {
     expect(engine.getSheetValues(0))
   })
 
-  it('should make existing matrix REF and change cell content', () => {
+  it('should make existing array REF and change cell content', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '2'],
       ['3', '4'],
@@ -876,6 +876,40 @@ describe('arrays', () => {
       [3, 4],
       [noSpace()],
       [null, 'foo']
+    ])
+  })
+
+  it('should make existing matrix REF and set new array', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1', '2'],
+      ['3', '4'],
+      ['=-A1:B2'],
+    ], {useArrayArithmetic: true})
+
+    engine.setCellContents(adr('B3'), [['=+A1:B2']])
+
+    expect(engine.getSheetValues(0)).toEqual([
+      [1, 2],
+      [3, 4],
+      [noSpace(), 1, 2],
+      [null, 3, 4]
+    ])
+  })
+
+  it('should replace one array with another', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1', '2'],
+      ['3', '4'],
+      ['=-A1:B2'],
+    ], {useArrayArithmetic: true})
+
+    engine.setCellContents(adr('A3'), [['=2*A1:B2']])
+
+    expect(engine.getSheetValues(0)).toEqual([
+      [1, 2],
+      [3, 4],
+      [2, 4],
+      [6, 8],
     ])
   })
 })
