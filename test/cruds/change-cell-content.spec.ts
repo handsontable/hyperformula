@@ -806,8 +806,8 @@ describe('arrays', () => {
     const engine = HyperFormula.buildFromArray([], {useArrayArithmetic: true})
 
     engine.setCellContents(adr('A1'), [
-      ['=-C1:D2', null],
-      [1, null]
+      ['=-C1:D2'],
+      [1]
     ])
 
     expect(engine.matrixMapping.getMatrixByCorner(adr('A1'))?.matrix.size).toEqual(MatrixSize.error())

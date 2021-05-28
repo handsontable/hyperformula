@@ -100,8 +100,7 @@ export class DependencyGraph {
   }
 
   public setParsingErrorToCell(address: SimpleCellAddress, errorVertex: ParsingErrorVertex) {
-    const vertex = this.addressMapping.getCell(address)
-    this.setNoSpaceIfMatrix(vertex)
+    const vertex = this.shrinkPossibleMatrixAndGetCell(address)
     this.exchangeOrAddGraphNode(vertex, errorVertex)
     this.addressMapping.setCell(address, errorVertex)
     this.graph.markNodeAsSpecialRecentlyChanged(errorVertex)
@@ -109,8 +108,7 @@ export class DependencyGraph {
   }
 
   public setValueToCell(address: SimpleCellAddress, value: RawAndParsedValue) {
-    const vertex = this.addressMapping.getCell(address)
-    this.setNoSpaceIfMatrix(vertex)
+    const vertex = this.shrinkPossibleMatrixAndGetCell(address)
 
     if (vertex instanceof ValueCellVertex) {
       const oldValue = vertex.getValues()
@@ -129,12 +127,10 @@ export class DependencyGraph {
   }
 
   public setCellEmpty(address: SimpleCellAddress) {
-    const vertex = this.addressMapping.getCell(address)
-    this.setNoSpaceIfMatrix(vertex)
+    const vertex = this.shrinkPossibleMatrixAndGetCell(address)
     if (vertex === null) {
       return
     }
-
     if (this.graph.adjacentNodes(vertex).size > 0) {
       const emptyVertex = new EmptyCellVertex(address)
       this.exchangeGraphNode(vertex, emptyVertex)
@@ -935,10 +931,22 @@ export class DependencyGraph {
     }
   }
 
+  private shrinkPossibleMatrixAndGetCell(address: SimpleCellAddress): CellVertex | null {
+    const vertex = this.getCell(address)
+    if (!(vertex instanceof MatrixVertex)) {
+      return vertex
+    }
+    this.setNoSpaceIfMatrix(vertex)
+    if (vertex.isLeftCorner(address)) {
+      return vertex
+    }
+    return null
+  }
+
   private setNoSpaceIfMatrix(vertex: Vertex | null) {
     if (vertex instanceof MatrixVertex) {
       this.shrinkMatrixToCorner(vertex)
-      vertex.setNoSpace()
+      vertex.setNoSpaceButPreserveSize()
     }
   }
 

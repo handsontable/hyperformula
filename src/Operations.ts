@@ -642,8 +642,6 @@ export class Operations {
   public setCellContent(address: SimpleCellAddress, newCellContent: RawCellContent): void {
     const parsedCellContent = this.cellContentParser.parse(newCellContent)
 
-    const vertex = this.dependencyGraph.getCell(address)
-
     if (parsedCellContent instanceof CellContent.Formula) {
       const {
         ast,
