@@ -862,10 +862,10 @@ describe('arrays', () => {
     expect(engine.getSheetValues(0))
   })
 
-  it('should make existing array REF and change cell content', () => {
+  it('should make existing array REF and change cell content to simple value', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '2'],
-      ['3', '4'],
+      ['3', '4', '=B4'],
       ['=-A1:B2'],
     ], {useArrayArithmetic: true})
 
@@ -873,16 +873,55 @@ describe('arrays', () => {
 
     expect(engine.getSheetValues(0)).toEqual([
       [1, 2],
-      [3, 4],
+      [3, 4, 'foo'],
       [noSpace()],
       [null, 'foo']
+    ])
+  })
+
+  it('should make existing array REF and change cell content empty', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1', '2'],
+      ['3', '4', '=B4'],
+      ['=-A1:B2'],
+    ], {useArrayArithmetic: true})
+
+    engine.setCellContents(adr('B4'), [[null]])
+
+    expect(engine.getSheetValues(0)).toEqual([
+      [1, 2],
+      [3, 4],
+      [noSpace()],
+    ])
+  })
+
+  it('should make existing array REF and change cell content to formula', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1', '2'],
+      ['3', '4', '=B4'],
+      ['=-A1:B2'],
+    ], {useArrayArithmetic: true})
+
+    engine.setCellContents(adr('B4'), [['=SUM(A1:B2)']])
+
+    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
+      [1, 2],
+      [3, 4, 10],
+      ['=-A1:B2'],
+      [null, 10]
+    ], {useArrayArithmetic: true}))
+    expect(engine.getSheetValues(0)).toEqual([
+      [1, 2],
+      [3, 4, 10],
+      [noSpace()],
+      [null, 10]
     ])
   })
 
   it('should make existing matrix REF and set new array', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '2'],
-      ['3', '4'],
+      ['3', '4', '=B4'],
       ['=-A1:B2'],
     ], {useArrayArithmetic: true})
 
@@ -890,7 +929,7 @@ describe('arrays', () => {
 
     expect(engine.getSheetValues(0)).toEqual([
       [1, 2],
-      [3, 4],
+      [3, 4, 3],
       [noSpace(), 1, 2],
       [null, 3, 4]
     ])
