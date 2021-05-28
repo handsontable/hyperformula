@@ -593,10 +593,6 @@ export class CrudOperations {
     if (!this.sheetMapping.hasSheetWithId(address.sheet)) {
       throw new NoSheetWithIdError(address.sheet)
     }
-
-    if (this.dependencyGraph.matrixMapping.isFormulaMatrixAtAddress(address)) {
-      throw new SourceLocationHasMatrixError()
-    }
   }
 
   public ensureItIsPossibleToChangeCellContents(inputAddress: SimpleCellAddress, content: RawCellContent[][]) {
