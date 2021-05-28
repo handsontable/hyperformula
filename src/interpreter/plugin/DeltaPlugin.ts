@@ -3,12 +3,12 @@
  * Copyright (c) 2021 Handsoncode. All rights reserved.
  */
 
-import {SimpleCellAddress} from '../../Cell'
 import {ProcedureAst} from '../../parser'
-import {InternalScalarValue} from '../InterpreterValue'
-import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
+import {InterpreterState} from '../InterpreterState'
+import {InternalScalarValue, InterpreterValue} from '../InterpreterValue'
+import {ArgumentTypes, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
 
-export class DeltaPlugin extends FunctionPlugin {
+export class DeltaPlugin extends FunctionPlugin implements FunctionPluginTypecheck<DeltaPlugin>{
   public static implementedFunctions = {
     'DELTA': {
       method: 'delta',
@@ -19,8 +19,8 @@ export class DeltaPlugin extends FunctionPlugin {
     },
   }
 
-  public delta(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('DELTA'),
+  public delta(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('DELTA'),
       (left: number, right: number) => (left === right ? 1 : 0)
     )
   }

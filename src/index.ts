@@ -3,7 +3,7 @@
  * Copyright (c) 2021 Handsoncode. All rights reserved.
  */
 
-import {CellType, CellValueDetailedType, CellValueType, ErrorType, SimpleCellAddress, CellValueJustNumber, CellValueNoNumber} from './Cell'
+import {CellType, CellValueDetailedType, CellValueType, ErrorType, SimpleCellAddress} from './Cell'
 import {RawCellContent} from './CellContentParser'
 import {CellValue, DetailedCellError, NoErrorCellValue} from './CellValue'
 import {Config, ConfigParams} from './Config'
@@ -19,7 +19,6 @@ import {
   InvalidArgumentsError,
   LanguageAlreadyRegisteredError,
   LanguageNotRegisteredError,
-  MatrixFormulasNotSupportedError,
   MissingTranslationError,
   NamedExpressionDoesNotExistError,
   NamedExpressionNameIsAlreadyTakenError,
@@ -43,10 +42,11 @@ import {HyperFormula} from './HyperFormula'
 import {RawTranslationPackage} from './i18n'
 import enGB from './i18n/languages/enGB'
 import {FunctionArgument, FunctionPlugin, FunctionPluginDefinition} from './interpreter'
+import {FormatInfo} from './interpreter/InterpreterValue'
 import * as plugins from './interpreter/plugin'
 import {NamedExpression, NamedExpressionOptions} from './NamedExpressions'
+import {SerializedNamedExpression} from './Serialization'
 import {Sheet, SheetDimensions, Sheets} from './Sheet'
-import {FormatInfo} from './interpreter/InterpreterValue'
 
 /** @internal */
 class HyperFormulaNS extends HyperFormula {
@@ -69,7 +69,6 @@ class HyperFormulaNS extends HyperFormula {
   public static InvalidArgumentsError = InvalidArgumentsError
   public static LanguageNotRegisteredError = LanguageNotRegisteredError
   public static LanguageAlreadyRegisteredError = LanguageAlreadyRegisteredError
-  public static MatrixFormulasNotSupportedError = MatrixFormulasNotSupportedError
   public static MissingTranslationError = MissingTranslationError
   public static NamedExpressionDoesNotExistError = NamedExpressionDoesNotExistError
   public static NamedExpressionNameIsAlreadyTakenError = NamedExpressionNameIsAlreadyTakenError
@@ -140,7 +139,6 @@ export {
   InvalidArgumentsError,
   LanguageAlreadyRegisteredError,
   LanguageNotRegisteredError,
-  MatrixFormulasNotSupportedError,
   MissingTranslationError,
   NamedExpressionDoesNotExistError,
   NamedExpressionNameIsAlreadyTakenError,
@@ -158,4 +156,5 @@ export {
   SourceLocationHasMatrixError,
   TargetLocationHasMatrixError,
   UnableToParseError,
+  SerializedNamedExpression,
 }

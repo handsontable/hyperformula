@@ -4,6 +4,7 @@
  */
 
 import {SheetCellAddress, simpleCellAddress, SimpleCellAddress} from '../../Cell'
+import {Maybe} from '../../Maybe'
 import {ColumnsSpan, RowsSpan} from '../../Span'
 import {CellVertex} from '../Vertex'
 import {IAddressMappingStrategy} from './IAddressMappingStrategy'
@@ -33,7 +34,7 @@ export class DenseStrategy implements IAddressMappingStrategy {
   }
 
   /** @inheritDoc */
-  public getCell(address: SheetCellAddress): CellVertex | null {
+  public getCell(address: SheetCellAddress): Maybe<CellVertex> {
     return this.getCellVertex(address.col, address.row)
   }
 
@@ -190,11 +191,7 @@ export class DenseStrategy implements IAddressMappingStrategy {
     }
   }
 
-  private getCellVertex(x: number, y: number): CellVertex | null {
-    const row = this.mapping[y]
-    if (row) {
-      return this.mapping[y][x] || null
-    }
-    return null
+  private getCellVertex(x: number, y: number): Maybe<CellVertex> {
+    return this.mapping[y]?.[x]
   }
 }

@@ -6,6 +6,46 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- **Breaking change**: Changed API of many sheet-related methods to take sheetId instead of sheetName as an argument. (#645)
+- **Breaking change**: Removed support for matrix formulas (`{=FORMULA}`) notation. Engine now supports formulas returning array of values (instead of only scalars). (#652)
+- **Breaking change**: Removed numeric matrix detection along with matrixDetection and matrixDetectionThreshold config options. (#669)
+- Changed SWITCH function so it takes array as its first argument.
+
+### Added
+- Added support for array arithmetic. (#628)
+- Added performance improvements for array handling. (#629)
+- Added ARRAYFORMULA function. (#630)
+- Added FILTER function. (#668)
+- Added ARRAY_CONSTRAIN function. (#661)
+- Added casting to scalars from non-range arrays. (#663)
+- Added support for range interpolation. (#665)
+- Added parsing of arrays in formulas (together with respective config options for separators). (#671)
+- Added support for vectorization of scalar functions. (#673)
+- Added support for time in JS `Date()` objects on the input. (#648)
+- Added validation of API argument types for simple types. (#654)
+- Added named expression handling to engine factories. (#680)
+- Added `getAllNamedExpressionsSerialized` method. (#680)
+- Added parsing of arrays in formulas (together with respective config options for separators). (#671)
+- Added utility function for filling ranges with source from other range. (#678)
+
+### Fixed
+- Fixed an issue with arrays and cruds. (#651)
+- Fixed an issue with nested namedexpressions. (#679)
+
+## [0.6.2] - 2021-05-26
+
+### Changed
+- Modified a private field in one of the classes to ensure broader compatibility with older TypeScript versions. (#681)
+
+## [0.6.1] - 2021-05-24
+
+### Changed
+- Remove redundant `'assert'` dependency from the code. (#672)
+
+### Fixed
+- Fixed library support for IE11. The `unorm` package is added to the dependencies. (#675)
+
 ## [0.6.0] - 2021-04-27
 
 ### Changed

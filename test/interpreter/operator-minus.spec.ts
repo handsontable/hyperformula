@@ -49,17 +49,19 @@ describe('Operator MINUS', () => {
     expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NAME, ErrorMessage.FunctionName('FOOBAR')))
   })
 
-  // Inconsistency with Product 1
   it('range value results in VALUE error', () => {
     const engine = HyperFormula.buildFromArray([
-      ['1', '=10 - A1:A3'],
-      ['8', '=A1:A3 - 10'],
+      ['1'],
+      ['8'],
       ['3'],
-    ])
+      ['=10 - A1:A3'],
+      ['=A1:A3 - 10'],
+    ], {useArrayArithmetic: false})
 
-    expect(engine.getCellValue(adr('B1'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.ScalarExpected))
-    expect(engine.getCellValue(adr('B2'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.ScalarExpected))
+    expect(engine.getCellValue(adr('A4'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.ScalarExpected))
+    expect(engine.getCellValue(adr('A5'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.ScalarExpected))
   })
+
   it('Minus propagates errors correctly', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '2', '=(1/0)-2', '=2-(1/0)', '=(A1:B1)-(1/0)', '=(1/0)-(A1:B1)'],

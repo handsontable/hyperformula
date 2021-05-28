@@ -6,7 +6,7 @@
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
 import {CellError, simpleCellAddress} from '../Cell'
 import {DependencyGraph} from '../DependencyGraph'
-import {EmptyValue, getRawValue, RawInterpreterValue, RawNoErrorScalarValue, RawScalarValue} from './InterpreterValue'
+import {EmptyValue, getRawValue, RawInterpreterValue, RawNoErrorScalarValue} from './InterpreterValue'
 
 /*
 * If key exists returns first index of key element in range of sorted values
@@ -30,7 +30,7 @@ export function rangeLowerBound(range: AbsoluteCellRange, key: RawNoErrorScalarV
     centerValueFn = (center: number) =>  getRawValue(dependencyGraph.getCellValue(simpleCellAddress(range.sheet, center, range.start.row)))
   }
 
-  return lowerBound(centerValueFn, key, start, end)
+  return lowerBound(centerValueFn, key, start, end) - start
 }
 
 /*

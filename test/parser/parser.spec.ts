@@ -23,7 +23,7 @@ import {
 import {columnIndexToLabel} from '../../src/parser/addressRepresentationConverters'
 import {
   ColumnRangeAst,
-  ErrorWithRawInputAst,
+  ErrorWithRawInputAst, MatrixAst,
   ParenthesisAst,
   RangeSheetReferenceType,
   RowRangeAst
@@ -180,7 +180,7 @@ describe('ParserWithCaching', () => {
     expect(ast.error).toEqual(new CellError(ErrorType.REF))
   })
 
-  it('refernece to address in unexsiting range returns ref error with raw input ast', () => {
+  it('reference to address in nonexisting range returns ref error with data input ast', () => {
     const sheetMapping = new SheetMapping(buildTranslationPackage(enGB))
     sheetMapping.addSheet('Sheet1')
     const parser = buildEmptyParserWithCaching(new Config(), sheetMapping)
@@ -502,7 +502,7 @@ describe('cell references and ranges', () => {
     expect(ast.reference.sheet).toBe(null)
   })
 
-  it('cell range with unexisting start sheet should return REF error with raw input', () => {
+  it('cell range with nonexsiting start sheet should return REF error with data input', () => {
     const sheetMapping = new SheetMapping(buildTranslationPackage(enGB))
     sheetMapping.addSheet('Sheet1')
     sheetMapping.addSheet('Sheet2')
@@ -515,7 +515,7 @@ describe('cell references and ranges', () => {
     expect(ast.error.type).toBe(ErrorType.REF)
   })
 
-  it('cell range with unexisting end sheet should return REF error with raw input', () => {
+  it('cell range with nonexsiting end sheet should return REF error with data input', () => {
     const sheetMapping = new SheetMapping(buildTranslationPackage(enGB))
     sheetMapping.addSheet('Sheet1')
     sheetMapping.addSheet('Sheet2')
@@ -737,6 +737,82 @@ describe('Named expressions', () => {
     expect(ast.type).toBe(AstNodeType.NAMED_EXPRESSION)
     expect(ast.expressionName).toBe('true')
     expect(ast.leadingWhitespace).toBe(' ')
+  })
+})
+
+describe('Matrices', () => {
+  it('simplest matrix', () => {
+    const parser = buildEmptyParserWithCaching(new Config())
+
+    const ast = parser.parse('={1}', simpleCellAddress(0, 0, 0)).ast as MatrixAst
+    expect(ast.type).toBe(AstNodeType.MATRIX)
+    expect(ast.args.length).toEqual(1)
+    expect(ast.args[0].length).toEqual(1)
+  })
+
+  it('row matrix', () => {
+    const parser = buildEmptyParserWithCaching(new Config())
+
+    const ast = parser.parse('={1,2,3}', simpleCellAddress(0, 0, 0)).ast as MatrixAst
+    expect(ast.type).toBe(AstNodeType.MATRIX)
+    expect(ast.args.length).toEqual(1)
+    expect(ast.args[0].length).toEqual(3)
+  })
+
+  it('column matrix', () => {
+    const parser = buildEmptyParserWithCaching(new Config())
+
+    const ast = parser.parse('={1;2;3}', simpleCellAddress(0, 0, 0)).ast as MatrixAst
+    expect(ast.type).toBe(AstNodeType.MATRIX)
+    expect(ast.args.length).toEqual(3)
+    expect(ast.args[0].length).toEqual(1)
+    expect(ast.args[1].length).toEqual(1)
+    expect(ast.args[2].length).toEqual(1)
+  })
+
+  it('square matrix', () => {
+    const parser = buildEmptyParserWithCaching(new Config())
+
+    const ast = parser.parse('={1,2,3;4,5,6;7,8,9}', simpleCellAddress(0, 0, 0)).ast as MatrixAst
+    expect(ast.type).toBe(AstNodeType.MATRIX)
+    expect(ast.args.length).toEqual(3)
+    expect(ast.args[0].length).toEqual(3)
+    expect(ast.args[1].length).toEqual(3)
+    expect(ast.args[2].length).toEqual(3)
+  })
+
+  it('longer matrix with extras', () => {
+    const parser = buildEmptyParserWithCaching(new Config())
+
+    const ast = parser.parse('={SUM(1,2,3),2,{1,2,3}}', simpleCellAddress(0, 0, 0)).ast as MatrixAst
+    expect(ast.type).toBe(AstNodeType.MATRIX)
+    expect(ast.args.length).toEqual(1)
+    expect(ast.args[0].length).toEqual(3)
+    const ast2 = ast.args[0][2] as MatrixAst
+    expect(ast2.type).toBe(AstNodeType.MATRIX)
+    expect(ast2.args.length).toEqual(1)
+    expect(ast2.args[0].length).toEqual(3)
+  })
+
+  it('matrix in other expressions', () => {
+    const parser = buildEmptyParserWithCaching(new Config())
+
+    const ast = parser.parse('=1+{1,2,3}', simpleCellAddress(0, 0, 0)).ast as PlusOpAst
+    const ast2 = ast.right as MatrixAst
+    expect(ast2.type).toBe(AstNodeType.MATRIX)
+    expect(ast2.args.length).toEqual(1)
+    expect(ast2.args[0].length).toEqual(3)
+  })
+
+  it('square matrix, other separators', () => {
+    const parser = buildEmptyParserWithCaching(new Config({matrixRowSeparator: '|', matrixColumnSeparator: ';'}))
+
+    const ast = parser.parse('={1;2;3|4;5;6|7;8;9}', simpleCellAddress(0, 0, 0)).ast as MatrixAst
+    expect(ast.type).toBe(AstNodeType.MATRIX)
+    expect(ast.args.length).toEqual(3)
+    expect(ast.args[0].length).toEqual(3)
+    expect(ast.args[1].length).toEqual(3)
+    expect(ast.args[2].length).toEqual(3)
   })
 })
 

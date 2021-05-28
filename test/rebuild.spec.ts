@@ -15,7 +15,7 @@ describe('Rebuilding engine', () => {
       'Sheet1': [['=FALSE']],
       'Sheet2': [['=FALSE']]
     })
-    engine.addNamedExpression('FALSE', '=FALSE()', 'Sheet1')
+    engine.addNamedExpression('FALSE', '=FALSE()', 0)
     engine.rebuildAndRecalculate()
     expect(engine.getCellValue(adr('A1', 0))).toEqual(false)
     expect(engine.getCellValue(adr('A1', 1))).toEqualError(detailedError(ErrorType.NAME, ErrorMessage.NamedExpressionName('FALSE')))
@@ -29,5 +29,16 @@ describe('Rebuilding engine', () => {
     engine.rebuildAndRecalculate()
 
     expect(engine.getCellValue(adr('B1', 0))).toEqual(42)
+  })
+
+  it('scopes are properly handled', () => {
+    const engine = HyperFormula.buildFromSheets({
+      'Sheet1': [['42']],
+      'Sheet2': [['42', '=FALSE']],
+    }, {}, [{name: 'FALSE', expression: false, scope: 1}])
+
+    engine.removeSheet(0)
+    engine.rebuildAndRecalculate()
+    expect(engine.getCellValue(adr('B1'))).toEqual(false)
   })
 })

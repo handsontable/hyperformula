@@ -3,12 +3,12 @@
  * Copyright (c) 2021 Handsoncode. All rights reserved.
  */
 
-import {SimpleCellAddress} from '../../Cell'
 import {ProcedureAst} from '../../parser'
-import {InternalScalarValue} from '../InterpreterValue'
-import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
+import {InterpreterState} from '../InterpreterState'
+import {InternalScalarValue, InterpreterValue} from '../InterpreterValue'
+import {ArgumentTypes, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
 
-export class DegreesPlugin extends FunctionPlugin {
+export class DegreesPlugin extends FunctionPlugin implements FunctionPluginTypecheck<DegreesPlugin>{
   public static implementedFunctions = {
     'DEGREES': {
       method: 'degrees',
@@ -18,8 +18,8 @@ export class DegreesPlugin extends FunctionPlugin {
     },
   }
 
-  public degrees(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('DEGREES'),
+  public degrees(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('DEGREES'),
       (arg) => arg * (180 / Math.PI)
     )
   }

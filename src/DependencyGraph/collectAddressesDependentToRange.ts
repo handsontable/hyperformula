@@ -3,19 +3,17 @@
  * Copyright (c) 2021 Handsoncode. All rights reserved.
  */
 
+import {AbsoluteCellRange} from '../AbsoluteCellRange'
 import {SimpleCellAddress} from '../Cell'
+import {FunctionRegistry} from '../interpreter/FunctionRegistry'
 import {LazilyTransformingAstService} from '../LazilyTransformingAstService'
 import {AddressDependency, Ast, collectDependencies} from '../parser'
-import {FormulaCellVertex} from './FormulaCellVertex'
-import {MatrixVertex} from './MatrixVertex'
+import {DependencyGraph} from './DependencyGraph'
+import {FormulaVertex} from './FormulaCellVertex'
 import {RangeVertex} from './RangeVertex'
 import {Vertex} from './Vertex'
-import {DependencyGraph} from './DependencyGraph'
-import {FunctionRegistry} from '../interpreter/FunctionRegistry'
 
-export const collectAddressesDependentToMatrix = (funcitonRegistry: FunctionRegistry, vertex: Vertex, matrix: MatrixVertex, lazilyTransformingAstService: LazilyTransformingAstService, dependencyGraph: DependencyGraph): SimpleCellAddress[] => {
-  const range = matrix.getRange()
-
+export const collectAddressesDependentToRange = (funcitonRegistry: FunctionRegistry, vertex: Vertex, range: AbsoluteCellRange, lazilyTransformingAstService: LazilyTransformingAstService, dependencyGraph: DependencyGraph): SimpleCellAddress[] => {
   if (vertex instanceof RangeVertex) {
     const intersection = vertex.range.intersectionWith(range)
     if (intersection !== null) {
@@ -28,12 +26,9 @@ export const collectAddressesDependentToMatrix = (funcitonRegistry: FunctionRegi
   let formula: Ast
   let address: SimpleCellAddress
 
-  if (vertex instanceof FormulaCellVertex) {
+  if (vertex instanceof FormulaVertex) {
     formula = vertex.getFormula(lazilyTransformingAstService)
     address = vertex.getAddress(lazilyTransformingAstService)
-  } else if (vertex instanceof MatrixVertex && vertex.isFormula()) {
-    formula = vertex.getFormula()!
-    address = vertex.getAddress()
   } else {
     return []
   }

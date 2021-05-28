@@ -3,14 +3,15 @@
  * Copyright (c) 2021 Handsoncode. All rights reserved.
  */
 
-import {CellError, ErrorType, SimpleCellAddress} from '../../Cell'
+import {CellError, ErrorType} from '../../Cell'
 import {ErrorMessage} from '../../error-message'
 import {ProcedureAst} from '../../parser'
-import {getRawValue, InternalScalarValue, isExtendedNumber} from '../InterpreterValue'
+import {InterpreterState} from '../InterpreterState'
+import {getRawValue, InternalScalarValue, InterpreterValue, isExtendedNumber} from '../InterpreterValue'
 import {SimpleRangeValue} from '../SimpleRangeValue'
-import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
+import {ArgumentTypes, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
 
-export class SumprodPlugin extends FunctionPlugin {
+export class SumprodPlugin extends FunctionPlugin implements FunctionPluginTypecheck<SumprodPlugin>{
   public static implementedFunctions = {
     'SUMPRODUCT': {
       method: 'sumproduct',
@@ -21,8 +22,8 @@ export class SumprodPlugin extends FunctionPlugin {
     },
   }
 
-  public sumproduct(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('SUMPRODUCT'), (left: SimpleRangeValue, right: SimpleRangeValue) => {
+  public sumproduct(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('SUMPRODUCT'), (left: SimpleRangeValue, right: SimpleRangeValue) => {
       if (left.numberOfElements() !== right.numberOfElements()) {
         return new CellError(ErrorType.VALUE, ErrorMessage.EqualLength)
       }

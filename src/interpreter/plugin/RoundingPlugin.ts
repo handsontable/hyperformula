@@ -3,11 +3,12 @@
  * Copyright (c) 2021 Handsoncode. All rights reserved.
  */
 
-import {CellError, ErrorType, SimpleCellAddress} from '../../Cell'
+import {CellError, ErrorType} from '../../Cell'
 import {ErrorMessage} from '../../error-message'
 import {ProcedureAst} from '../../parser'
-import {InternalScalarValue} from '../InterpreterValue'
-import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
+import {InterpreterState} from '../InterpreterState'
+import {InternalScalarValue, InterpreterValue} from '../InterpreterValue'
+import {ArgumentTypes, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
 
 export function findNextOddNumber(arg: number): number {
   const ceiled = Math.ceil(arg)
@@ -19,7 +20,7 @@ export function findNextEvenNumber(arg: number): number {
   return (ceiled % 2 === 0) ? ceiled : ceiled + 1
 }
 
-export class RoundingPlugin extends FunctionPlugin {
+export class RoundingPlugin extends FunctionPlugin implements FunctionPluginTypecheck<RoundingPlugin>{
   public static implementedFunctions = {
     'ROUNDUP': {
       method: 'roundup',
@@ -37,13 +38,6 @@ export class RoundingPlugin extends FunctionPlugin {
     },
     'ROUND': {
       method: 'round',
-      parameters: [
-        { argumentType: ArgumentTypes.NUMBER },
-        { argumentType: ArgumentTypes.NUMBER, defaultValue: 0},
-      ],
-    },
-    'TRUNC': {
-      method: 'trunc',
       parameters: [
         { argumentType: ArgumentTypes.NUMBER },
         { argumentType: ArgumentTypes.NUMBER, defaultValue: 0},
@@ -115,10 +109,11 @@ export class RoundingPlugin extends FunctionPlugin {
 
   public static aliases = {
     'ISO.CEILING': 'CEILING.PRECISE',
+    'TRUNC': 'ROUNDDOWN',
   }
 
-  public roundup(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('ROUNDDOWN'), (numberToRound: number, places: number): number => {
+  public roundup(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('ROUNDDOWN'), (numberToRound: number, places: number): number => {
       const placesMultiplier = Math.pow(10, places)
       if (numberToRound < 0) {
         return -Math.ceil(-numberToRound * placesMultiplier) / placesMultiplier
@@ -128,8 +123,8 @@ export class RoundingPlugin extends FunctionPlugin {
     })
   }
 
-  public rounddown(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('ROUNDDOWN'), (numberToRound: number, places: number): number => {
+  public rounddown(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('ROUNDDOWN'), (numberToRound: number, places: number): number => {
       const placesMultiplier = Math.pow(10, places)
       if (numberToRound < 0) {
         return -Math.floor(-numberToRound * placesMultiplier) / placesMultiplier
@@ -139,8 +134,8 @@ export class RoundingPlugin extends FunctionPlugin {
     })
   }
 
-  public round(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('ROUND'), (numberToRound: number, places: number): number => {
+  public round(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('ROUND'), (numberToRound: number, places: number): number => {
       const placesMultiplier = Math.pow(10, places)
       if (numberToRound < 0) {
         return -Math.round(-numberToRound * placesMultiplier) / placesMultiplier
@@ -150,12 +145,8 @@ export class RoundingPlugin extends FunctionPlugin {
     })
   }
 
-  public trunc(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.rounddown(ast, formulaAddress)
-  }
-
-  public intFunc(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('INT'), (coercedNumberToRound) => {
+  public intFunc(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('INT'), (coercedNumberToRound) => {
       if (coercedNumberToRound < 0) {
         return -Math.floor(-coercedNumberToRound)
       } else {
@@ -164,8 +155,8 @@ export class RoundingPlugin extends FunctionPlugin {
     })
   }
 
-  public even(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('EVEN'), (coercedNumberToRound) => {
+  public even(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('EVEN'), (coercedNumberToRound) => {
       if (coercedNumberToRound < 0) {
         return -findNextEvenNumber(-coercedNumberToRound)
       } else {
@@ -174,8 +165,8 @@ export class RoundingPlugin extends FunctionPlugin {
     })
   }
 
-  public odd(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('ODD'), (coercedNumberToRound) => {
+  public odd(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('ODD'), (coercedNumberToRound) => {
       if (coercedNumberToRound < 0) {
         return -findNextOddNumber(-coercedNumberToRound)
       } else {
@@ -184,8 +175,8 @@ export class RoundingPlugin extends FunctionPlugin {
     })
   }
 
-  public ceilingmath(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('CEILING.MATH'),
+  public ceilingmath(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('CEILING.MATH'),
       (value: number, significance: number, mode: number) => {
       if (significance === 0 || value === 0) {
         return 0
@@ -200,8 +191,8 @@ export class RoundingPlugin extends FunctionPlugin {
     })
   }
 
-  public ceiling(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('CEILING'),
+  public ceiling(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('CEILING'),
       (value: number, significance: number) => {
         if(value === 0) {
           return 0
@@ -218,8 +209,8 @@ export class RoundingPlugin extends FunctionPlugin {
     })
   }
 
-  public ceilingprecise(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('CEILING.PRECISE'),
+  public ceilingprecise(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('CEILING.PRECISE'),
       (value: number, significance: number) => {
         if (significance === 0 || value === 0) {
           return 0
@@ -229,8 +220,8 @@ export class RoundingPlugin extends FunctionPlugin {
       })
   }
 
-  public floormath(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('FLOOR.MATH'),
+  public floormath(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('FLOOR.MATH'),
       (value: number, significance: number, mode: number) => {
         if (significance === 0 || value === 0) {
           return 0
@@ -245,8 +236,8 @@ export class RoundingPlugin extends FunctionPlugin {
       })
   }
 
-  public floor(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('FLOOR'),
+  public floor(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('FLOOR'),
       (value: number, significance: number) => {
         if(value === 0) {
           return 0
@@ -263,8 +254,8 @@ export class RoundingPlugin extends FunctionPlugin {
       })
   }
 
-  public floorprecise(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('FLOOR.PRECISE'),
+  public floorprecise(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('FLOOR.PRECISE'),
       (value: number, significance: number) => {
         if (significance === 0 || value === 0) {
           return 0

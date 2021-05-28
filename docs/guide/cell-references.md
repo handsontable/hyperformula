@@ -62,12 +62,12 @@ scope of the expression:
 
 ```javascript
 // define for a global scope
-// sheet name not passed
+// sheet id not passed
 hfInstance.addNamedExpression('MyGlobal', '=SUM(100+10)');
 
 // define for a local scope
-// sheet name passed
-hfInstance.addNamedExpression('MyLocal', '=Sheet2!$A$1+100', 'Sheet2');
+// sheet id passed
+hfInstance.addNamedExpression('MyLocal', '=Sheet2!$A$1+100', 1);
 ```
 
 And now you can use 'MyGlobal' and 'MyLocal' names.

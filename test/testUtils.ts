@@ -41,7 +41,7 @@ export const extractRowRange = (engine: HyperFormula, address: SimpleCellAddress
 }
 
 export const extractMatrixRange = (engine: HyperFormula, address: SimpleCellAddress): AbsoluteCellRange => {
-  const formula = (engine.addressMapping.fetchCell(address) as MatrixVertex).getFormula() as ProcedureAst
+  const formula = (engine.addressMapping.fetchCell(address) as MatrixVertex).getFormula(engine.lazilyTransformingAstService) as ProcedureAst
   const rangeAst = formula.args[0] as CellRangeAst
   return AbsoluteCellRange.fromCellRange(rangeAst, address)
 }

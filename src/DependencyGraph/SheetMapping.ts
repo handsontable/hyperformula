@@ -3,9 +3,9 @@
  * Copyright (c) 2021 Handsoncode. All rights reserved.
  */
 
+import {NoSheetWithIdError, NoSheetWithNameError, SheetNameAlreadyTakenError} from '../errors'
 import {TranslationPackage, UIElement} from '../i18n'
 import {Maybe} from '../Maybe'
-import {NoSheetWithIdError, NoSheetWithNameError, SheetNameAlreadyTakenError} from '../errors'
 
 function canonicalize(sheetDisplayName: string): string {
   return sheetDisplayName.toLowerCase()
@@ -77,15 +77,6 @@ export class SheetMapping {
 
   public getDisplayName(sheetId: number): Maybe<string> {
     const sheet = this.mappingFromId.get(sheetId)
-    if (sheet) {
-      return sheet.displayName
-    } else {
-      return undefined
-    }
-  }
-
-  public getDisplayNameByName(sheetName: string): Maybe<string> {
-    const sheet = this.mappingFromCanonicalName.get(canonicalize(sheetName))
     if (sheet) {
       return sheet.displayName
     } else {

@@ -3,6 +3,7 @@
  * Copyright (c) 2021 Handsoncode. All rights reserved.
  */
 
+import unorm from 'unorm'
 import {CellError, CellValueTypeOrd, ErrorType, getCellValueType} from '../Cell'
 import {Config} from '../Config'
 import {DateTimeHelper} from '../DateTimeHelper'
@@ -10,6 +11,7 @@ import {ErrorMessage} from '../error-message'
 import {Maybe} from '../Maybe'
 import {NumberLiteralHelper} from '../NumberLiteralHelper'
 import {collatorFromConfig} from '../StringHelper'
+import {InterpreterState} from './InterpreterState'
 import {
   cloneNumber,
   CurrencyNumber,
@@ -115,7 +117,7 @@ export class ArithmeticHelper {
       str = str.toLowerCase()
     }
     if(!this.config.accentSensitive) {
-      str = str.normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+      str = normalizeString(str, 'nfd').replace(/[\u0300-\u036f]/g, '')
     }
     return str
   }
@@ -212,9 +214,8 @@ export class ArithmeticHelper {
     return cloneNumber(arg, -getRawValue(arg))
   }
 
-  public unaryPlus = (arg: ExtendedNumber): ExtendedNumber => {
-    return arg
-  }
+  public unaryPlus = (arg: InternalScalarValue): InternalScalarValue => arg
+
 
   public unaryPercent = (arg: ExtendedNumber): ExtendedNumber => {
     return new PercentNumber(getRawValue(arg)/100)
@@ -535,7 +536,7 @@ export function coerceComplexToString([re, im]: complex, symb?: string): string 
   return `${re}${im < 0 ? '-' : '+'}${imStr}`
 }
 
-export function coerceToRange(arg: RawInterpreterValue): SimpleRangeValue {
+export function coerceToRange(arg: InterpreterValue): SimpleRangeValue {
   if (arg instanceof SimpleRangeValue) {
     return arg
   } else {
@@ -758,6 +759,33 @@ function inferExtendedNumberTypeMultiplicative(leftArg: ExtendedNumber, rightArg
 }
 
 export function forceNormalizeString(str: string): string {
-  return str.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+  return normalizeString(str.toLowerCase(), 'nfd').replace(/[\u0300-\u036f]/g, '')
 }
 
+export function coerceRangeToScalar(arg: SimpleRangeValue, state: InterpreterState): Maybe<InternalScalarValue>{
+  if(arg.isAdHoc()) {
+    return arg.data[0]?.[0]
+  }
+  const range = arg.range!
+  if(state.formulaAddress.sheet === range.sheet) {
+    if (range.width() === 1) {
+      const offset = state.formulaAddress.row - range.start.row
+      if (offset >= 0 && offset < range.height()) {
+        return arg.data[offset][0]
+      }
+    } else if (range.height() === 1) {
+      const offset = state.formulaAddress.col - range.start.col
+      if (offset >= 0 && offset < range.width()) {
+        return arg.data[0][offset]
+      }
+    }
+  }
+  return undefined
+}
+
+type NormalizationForm = 'nfc' | 'nfd' | 'nfkc' | 'nfkd'
+
+export function normalizeString(str: string, form: NormalizationForm): string {
+  return typeof str.normalize === 'function'
+    ? str.normalize(form.toUpperCase()) : unorm[form](str)
+}

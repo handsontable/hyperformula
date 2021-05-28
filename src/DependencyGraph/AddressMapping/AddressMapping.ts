@@ -5,14 +5,14 @@
 
 import {SimpleCellAddress} from '../../Cell'
 import {RawCellContent} from '../../CellContentParser'
+import {NoSheetWithIdError} from '../../errors'
 import {EmptyValue, InterpreterValue} from '../../interpreter/InterpreterValue'
+import {Sheet, SheetBoundaries} from '../../Sheet'
 import {ColumnsSpan, RowsSpan} from '../../Span'
-import {EmptyCellVertex, MatrixVertex, ValueCellVertex} from '../index'
+import {MatrixVertex, ValueCellVertex} from '../index'
 import {CellVertex} from '../Vertex'
 import {ChooseAddressMapping} from './ChooseAddressMappingPolicy'
 import {IAddressMappingStrategy} from './IAddressMappingStrategy'
-import {NoSheetWithIdError} from '../../errors'
-import {Sheet, SheetBoundaries} from '../../Sheet'
 
 export class AddressMapping {
   private mapping: Map<number, IAddressMappingStrategy> = new Map()
@@ -28,7 +28,7 @@ export class AddressMapping {
     if (!sheetMapping) {
       throw new NoSheetWithIdError(address.sheet)
     }
-    return sheetMapping.getCell(address)
+    return sheetMapping.getCell(address) ?? null
   }
 
   public fetchCell(address: SimpleCellAddress): CellVertex {

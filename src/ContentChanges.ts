@@ -5,7 +5,6 @@
 
 import {SimpleCellAddress} from './Cell'
 import {InterpreterValue} from './interpreter/InterpreterValue'
-import {Matrix} from './Matrix'
 
 export interface CellValueChange {
   sheet: number,
@@ -15,8 +14,9 @@ export interface CellValueChange {
 }
 
 export interface ChangeExporter<T> {
-  exportChange: (arg: CellValueChange) => T,
+  exportChange: (arg: CellValueChange) => T | T[],
 }
+
 export type ChangeList = CellValueChange[]
 
 export class ContentChanges {
@@ -32,12 +32,6 @@ export class ContentChanges {
     return this
   }
 
-  public addMatrixChange(newValue: Matrix, address: SimpleCellAddress): void {
-    for (const [matrixValue, cellAddress] of newValue.generateValues(address)) {
-      this.addSingleCellValue(matrixValue, cellAddress)
-    }
-  }
-
   public addChange(newValue: InterpreterValue, address: SimpleCellAddress): void {
     this.addSingleCellValue(newValue, address)
   }
@@ -47,9 +41,14 @@ export class ContentChanges {
   }
 
   public exportChanges<T>(exporter: ChangeExporter<T>): T[] {
-    const ret: T[] = []
-    this.changes.forEach((e, i) => {
-      ret[i] = exporter.exportChange(this.changes[i])
+    let ret: T[] = []
+    this.changes.forEach((e) => {
+      const change = exporter.exportChange(e)
+      if (Array.isArray(change)) {
+        ret = ret.concat(change)
+      } else{
+        ret.push(change)
+      }
     })
     return ret
   }
@@ -59,7 +58,7 @@ export class ContentChanges {
   }
 
   public isEmpty(): boolean {
-    return this.changes === []
+    return this.changes.length === 0
   }
 
   private addSingleCellValue(value: InterpreterValue, address: SimpleCellAddress) {

@@ -3,12 +3,12 @@
  * Copyright (c) 2021 Handsoncode. All rights reserved.
  */
 
-import {SimpleCellAddress} from '../../Cell'
 import {ProcedureAst} from '../../parser'
-import {InternalScalarValue} from '../InterpreterValue'
-import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
+import {InterpreterState} from '../InterpreterState'
+import {InternalScalarValue, InterpreterValue} from '../InterpreterValue'
+import {ArgumentTypes, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
 
-export class PowerPlugin extends FunctionPlugin {
+export class PowerPlugin extends FunctionPlugin implements FunctionPluginTypecheck<PowerPlugin>{
   public static implementedFunctions = {
     'POWER': {
       method: 'power',
@@ -19,7 +19,7 @@ export class PowerPlugin extends FunctionPlugin {
     },
   }
 
-  public power(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('POWER'), Math.pow)
+  public power(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('POWER'), Math.pow)
   }
 }

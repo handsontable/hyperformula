@@ -8,7 +8,7 @@ describe('vertex counting', () => {
       ['3', '4']
     ])
     expect(engine.dependencyGraph.graph.nodesCount()).toBe(4)
-    engine.calculateFormula('=SUM(A1:B2)', 'Sheet1')
+    engine.calculateFormula('=SUM(A1:B2)', 0)
     expect(engine.dependencyGraph.graph.nodesCount()).toBe(4)
   })
 
@@ -32,7 +32,7 @@ describe('range mapping', () => {
       ['3', '4']
     ])
     expect(engine.dependencyGraph.rangeMapping.getMappingSize(0)).toBe(0)
-    engine.calculateFormula('=SUM(A1:B2)', 'Sheet1')
+    engine.calculateFormula('=SUM(A1:B2)', 0)
     expect(engine.dependencyGraph.rangeMapping.getMappingSize(0)).toBe(0)
   })
 

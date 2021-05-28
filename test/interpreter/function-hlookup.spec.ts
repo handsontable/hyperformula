@@ -23,7 +23,7 @@ describe('Function HLOOKUP', () => {
 
     it('wrong type of first argument', () => {
       const engine = HyperFormula.buildFromArray([
-        ['=HLOOKUP(D1:D2, A2:B3, 2, TRUE())'],
+        ['=HLOOKUP(D1:E1, A2:B3, 2, TRUE())'],
       ])
 
       expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.WrongType))
@@ -199,14 +199,6 @@ describe('Function HLOOKUP', () => {
       const engine = HyperFormula.buildFromArray([
         ['=HLOOKUP(3, C1:E1, 1, TRUE())', 'foo', '1', '2', '3']
       ])
-
-      expect(engine.getCellValue(adr('A1'))).toEqual(3)
-    })
-
-    it('should work for detected matrices', () => {
-      const engine = HyperFormula.buildFromArray([
-        ['=HLOOKUP(3, C1:E1, 1, TRUE())', '1', '2', '3']
-      ], {matrixDetection: true, matrixDetectionThreshold: 1})
 
       expect(engine.getCellValue(adr('A1'))).toEqual(3)
     })

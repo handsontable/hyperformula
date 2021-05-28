@@ -116,12 +116,13 @@ describe('Function COUNTIF', () => {
 
   it('works for matrices', () => {
     const engine =  HyperFormula.buildFromArray([
-      ['1'],
-      ['2'],
-      ['=COUNTIF(A1:A2, ">0")'],
-    ], { matrixDetection: true, matrixDetectionThreshold: 1 })
+      ['1', '2'],
+      ['=TRANSPOSE(A1:B1)'],
+      [],
+      ['=COUNTIF(A2:A3, ">0")'],
+    ])
 
-    expect(engine.getCellValue(adr('A3'))).toEqual(2)
+    expect(engine.getCellValue(adr('A4'))).toEqual(2)
   })
 
   it('ignore errors', () => {

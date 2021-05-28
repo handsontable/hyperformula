@@ -3,12 +3,12 @@
  * Copyright (c) 2021 Handsoncode. All rights reserved.
  */
 
-import {SimpleCellAddress} from '../../Cell'
 import {LicenseKeyValidityState} from '../../helpers/licenseKeyValidator'
 import {HyperFormula} from '../../HyperFormula'
 import {ProcedureAst} from '../../parser'
+import {InterpreterState} from '../InterpreterState'
 import {InterpreterValue} from '../InterpreterValue'
-import {FunctionPlugin} from './FunctionPlugin'
+import {FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
 
 const LICENSE_STATUS_MAP = new Map([
   ['agpl-v3', 1],
@@ -18,7 +18,7 @@ const LICENSE_STATUS_MAP = new Map([
   [LicenseKeyValidityState.EXPIRED, 5],
 ])
 
-export class VersionPlugin extends FunctionPlugin {
+export class VersionPlugin extends FunctionPlugin implements FunctionPluginTypecheck<VersionPlugin>{
   public static implementedFunctions = {
     'VERSION': {
       method: 'version',
@@ -26,8 +26,8 @@ export class VersionPlugin extends FunctionPlugin {
     },
   }
 
-  public version(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InterpreterValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('VERSION'), () => {
+  public version(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('VERSION'), () => {
       const {
         licenseKeyValidityState: validityState,
         licenseKey,
