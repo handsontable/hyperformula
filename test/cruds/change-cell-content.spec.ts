@@ -951,4 +951,18 @@ describe('arrays', () => {
       [6, 8],
     ])
   })
+
+  it('should handle dependent vertices after shrinking array', () => {
+    const engine = HyperFormula.buildFromArray([
+      [1, 2, 3, '=-A1:C1'],
+      ['=C1', '=D1', '=SUM(E1:E1)'],
+    ], {useArrayArithmetic: true})
+
+    engine.setCellContents(adr('E1'), [[null]])
+    engine.setCellContents(adr('D1'), [[4, 5, 6]])
+
+    expect(engine.getCellValue(adr('A2'))).toEqual(4)
+    expect(engine.getCellValue(adr('B2'))).toEqual(5)
+    expect(engine.getCellValue(adr('C2'))).toEqual(6)
+  })
 })
