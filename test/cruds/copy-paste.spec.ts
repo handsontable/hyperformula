@@ -380,7 +380,7 @@ describe('Copy - paste integration', () => {
     engine.copy(adr('A1'), 2, 1)
     engine.paste(adr('A1', 1))
 
-    expect(extractReference(engine, adr('A1', 1))).toEqual(CellAddress.relative(0, 0, 1))
+    expect(extractReference(engine, adr('A1', 1))).toEqual(CellAddress.relative(1, 0, 0))
     expect(extractReference(engine, adr('B1', 1))).toEqual(CellAddress.relative(1, -1, 1))
   })
 
@@ -393,7 +393,7 @@ describe('Copy - paste integration', () => {
     engine.copy(adr('A1'), 1, 1)
     engine.paste(adr('A1', 1))
 
-    expect(extractReference(engine, adr('A1', 1))).toEqual(CellAddress.relative(undefined, 0, 1))
+    expect(extractReference(engine, adr('A1', 1))).toEqual(CellAddress.relative(1, 0))
   })
 
   it('should throw error when trying to paste beyond sheet size limit', () => {

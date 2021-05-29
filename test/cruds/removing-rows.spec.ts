@@ -94,7 +94,7 @@ describe('Address dependencies, Case 1: same sheet', () => {
 
     engine.removeRows(0, [2, 1])
 
-    expect(extractReference(engine, adr('A3'))).toEqual(CellAddress.absoluteRow(undefined, 0, 1))
+    expect(extractReference(engine, adr('A3'))).toEqual(CellAddress.absoluteRow( 0, 1))
   })
 
   it('case Ab: absolute dependency below removed row should be shifted', () => {
@@ -106,7 +106,7 @@ describe('Address dependencies, Case 1: same sheet', () => {
 
     engine.removeRows(0, [1, 1])
 
-    expect(extractReference(engine, adr('A1'))).toEqual(CellAddress.absoluteRow(undefined, 0, 1))
+    expect(extractReference(engine, adr('A1'))).toEqual(CellAddress.absoluteRow( 0, 1))
   })
 
   it('case Ac: absolute dependency in removed row range should be replaced by #REF', () => {
@@ -129,7 +129,7 @@ describe('Address dependencies, Case 1: same sheet', () => {
 
     engine.removeRows(0, [2, 1])
 
-    expect(extractReference(engine, adr('A2'))).toEqual(CellAddress.relative(undefined, 0, -1))
+    expect(extractReference(engine, adr('A2'))).toEqual(CellAddress.relative(-1, 0))
   })
 
   it('case Rab: relative address should be shifted when only formula is moving', () => {
@@ -142,7 +142,7 @@ describe('Address dependencies, Case 1: same sheet', () => {
 
     engine.removeRows(0, [1, 2])
 
-    expect(extractReference(engine, adr('A2'))).toEqual(CellAddress.relative(undefined, 0, -1))
+    expect(extractReference(engine, adr('A2'))).toEqual(CellAddress.relative(-1, 0))
   })
 
   it('case Rba: relative address should be shifted when only dependency is moving', () => {
@@ -155,7 +155,7 @@ describe('Address dependencies, Case 1: same sheet', () => {
 
     engine.removeRows(0, [1, 2])
 
-    expect(extractReference(engine, adr('A1'))).toEqual(CellAddress.relative(undefined, 0, 1))
+    expect(extractReference(engine, adr('A1'))).toEqual(CellAddress.relative(1, 0))
   })
 
   it('case Rbb: relative address should not be affected when dependency and formula is moving', () => {
@@ -167,7 +167,7 @@ describe('Address dependencies, Case 1: same sheet', () => {
     ])
 
     engine.removeRows(0, [0, 2])
-    expect(extractReference(engine, adr('A1'))).toEqual(CellAddress.relative(undefined, 0, 1))
+    expect(extractReference(engine, adr('A1'))).toEqual(CellAddress.relative(1, 0))
   })
 
   it('case Rca: relative dependency in deleted row range should be replaced by #REF', () => {
@@ -217,9 +217,9 @@ describe('Address dependencies, Case 2: formula in sheet where we make crud with
       ],
     })
 
-    expect(extractReference(engine, adr('A2'))).toEqual(CellAddress.absoluteRow(1, 0, 0))
+    expect(extractReference(engine, adr('A2'))).toEqual(CellAddress.absoluteRow( 0, 0, 1))
     engine.removeRows(0, [0, 1])
-    expect(extractReference(engine, adr('A1'))).toEqual(CellAddress.absoluteRow(1, 0, 0))
+    expect(extractReference(engine, adr('A1'))).toEqual(CellAddress.absoluteRow( 0, 0, 1))
   })
 
   it('case Ra: removing row above formula should shift dependency', () => {
@@ -233,9 +233,9 @@ describe('Address dependencies, Case 2: formula in sheet where we make crud with
       ],
     })
 
-    expect(extractReference(engine, adr('A2'))).toEqual(CellAddress.relative(1, 0, -1))
+    expect(extractReference(engine, adr('A2'))).toEqual(CellAddress.relative(-1, 0, 1))
     engine.removeRows(0, [0, 1])
-    expect(extractReference(engine, adr('A1'))).toEqual(CellAddress.relative(1, 0, 0))
+    expect(extractReference(engine, adr('A1'))).toEqual(CellAddress.relative(0, 0, 1))
   })
 
   it('case Rb: removing row below formula should not affect dependency', () => {
@@ -249,9 +249,9 @@ describe('Address dependencies, Case 2: formula in sheet where we make crud with
       ],
     })
 
-    expect(extractReference(engine, adr('A1'))).toEqual(CellAddress.relative(1, 0, 0))
+    expect(extractReference(engine, adr('A1'))).toEqual(CellAddress.relative(0, 0, 1))
     engine.removeRows(0, [1, 1])
-    expect(extractReference(engine, adr('A1'))).toEqual(CellAddress.relative(1, 0, 0))
+    expect(extractReference(engine, adr('A1'))).toEqual(CellAddress.relative(0, 0, 1))
   })
 })
 
@@ -274,9 +274,9 @@ describe('Address dependencies, Case 3: formula in different sheet', () => {
     engine.removeRows(1, [1, 1])
 
     expect(extractReference(engine, adr('A1'))).toEqual(CellAddress.relative(1, 0, 1))
-    expect(extractReference(engine, adr('A2'))).toEqual(CellAddress.relative(1, 0, 0))
-    expect(extractReference(engine, adr('A3'))).toEqual(CellAddress.relative(1, 0, -1))
-    expect(extractReference(engine, adr('A4'))).toEqual(CellAddress.absoluteRow(1, 0, 1))
+    expect(extractReference(engine, adr('A2'))).toEqual(CellAddress.relative(0, 0, 1))
+    expect(extractReference(engine, adr('A3'))).toEqual(CellAddress.relative(-1, 0, 1))
+    expect(extractReference(engine, adr('A4'))).toEqual(CellAddress.absoluteRow( 0, 1, 1))
   })
 
   it('case ARb: relative/absolute dependency above removed row should not be affected', () => {
@@ -293,8 +293,8 @@ describe('Address dependencies, Case 3: formula in different sheet', () => {
 
     engine.removeRows(1, [1, 1])
 
-    expect(extractReference(engine, adr('A1'))).toEqual(CellAddress.relative(1, 0, 0))
-    expect(extractReference(engine, adr('A2'))).toEqual(CellAddress.absoluteRow(1, 0, 0))
+    expect(extractReference(engine, adr('A1'))).toEqual(CellAddress.relative(0, 0, 1))
+    expect(extractReference(engine, adr('A2'))).toEqual(CellAddress.absoluteRow( 0, 0, 1))
   })
 
   it('case ARc: relative/absolute dependency in removed range should be replaced by #REF', () => {
@@ -347,7 +347,7 @@ describe('Address dependencies, Case 4: remove rows in sheet different than form
 
     engine.removeRows(0, [0, 1])
 
-    expect(extractReference(engine, adr('A2', 1))).toEqual(CellAddress.relative(undefined, 0, -1))
+    expect(extractReference(engine, adr('A2', 1))).toEqual(CellAddress.relative(-1, 0))
   })
 
   it('should not affect dependency when removing rows in not relevant sheet, more sheets', function() {
@@ -366,7 +366,7 @@ describe('Address dependencies, Case 4: remove rows in sheet different than form
 
     engine.removeRows(0, [0, 1])
 
-    expect(extractReference(engine, adr('A2', 2))).toEqual(CellAddress.relative(1, 0, -1))
+    expect(extractReference(engine, adr('A2', 2))).toEqual(CellAddress.relative(-1, 0, 1))
   })
 })
 

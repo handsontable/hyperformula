@@ -294,7 +294,7 @@ describe('cell references and ranges', () => {
     const ast = parser.parse('=$B$3', simpleCellAddress(0, 1, 1)).ast as CellReferenceAst
 
     expect(ast.type).toBe(AstNodeType.CELL_REFERENCE)
-    expect(ast.reference).toEqual(CellAddress.absolute(undefined, 1, 2))
+    expect(ast.reference).toEqual(CellAddress.absolute( 1, 2))
   })
 
   it('relative cell reference', () => {
@@ -303,7 +303,7 @@ describe('cell references and ranges', () => {
     const ast = parser.parse('=B3', simpleCellAddress(0, 1, 1)).ast as CellReferenceAst
 
     expect(ast.type).toBe(AstNodeType.CELL_REFERENCE)
-    expect(ast.reference).toEqual(CellAddress.relative(undefined, 0, 1))
+    expect(ast.reference).toEqual(CellAddress.relative(1, 0))
   })
 
   it('absolute column cell reference', () => {
@@ -312,7 +312,7 @@ describe('cell references and ranges', () => {
     const ast = parser.parse('=$B3', simpleCellAddress(0, 1, 1)).ast as CellReferenceAst
 
     expect(ast.type).toBe(AstNodeType.CELL_REFERENCE)
-    expect(ast.reference).toEqual(CellAddress.absoluteCol(undefined, 1, 1))
+    expect(ast.reference).toEqual(CellAddress.absoluteCol( 1, 1))
   })
 
   it('absolute row cell reference', () => {
@@ -321,7 +321,7 @@ describe('cell references and ranges', () => {
     const ast = parser.parse('=B$3', simpleCellAddress(0, 1, 1)).ast as CellReferenceAst
 
     expect(ast.type).toBe(AstNodeType.CELL_REFERENCE)
-    expect(ast.reference).toEqual(CellAddress.absoluteRow(undefined, 0, 2))
+    expect(ast.reference).toEqual(CellAddress.absoluteRow( 0, 2))
   })
 
   it('cell references should not be case sensitive', () => {

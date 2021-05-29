@@ -42,13 +42,13 @@ export const cellAddressFromString = (sheetMapping: SheetMappingFn, stringAddres
 
   const row = Number(result[8]) - 1
   if (result[5] === '$' && result[7] === '$') {
-    return CellAddress.absolute(sheet, col, row)
+    return CellAddress.absolute(col, row, sheet)
   } else if (result[5] === '$') {
-    return CellAddress.absoluteCol(sheet, col, row - baseAddress.row)
+    return CellAddress.absoluteCol( col, row - baseAddress.row, sheet)
   } else if (result[7] === '$') {
-    return CellAddress.absoluteRow(sheet, col - baseAddress.col, row)
+    return CellAddress.absoluteRow(col - baseAddress.col, row, sheet)
   } else {
-    return CellAddress.relative(sheet, col - baseAddress.col, row - baseAddress.row)
+    return CellAddress.relative(row - baseAddress.row, col - baseAddress.col, sheet)
   }
 }
 

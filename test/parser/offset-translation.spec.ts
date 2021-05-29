@@ -10,7 +10,7 @@ describe('Parser - OFFSET to reference translation', () => {
 
     const ast = parser.parse('=OFFSET(F16, 0, 0)', simpleCellAddress(0, 1, 2)).ast as CellReferenceAst
     expect(ast.type).toBe(AstNodeType.CELL_REFERENCE)
-    expect(ast.reference).toEqual(CellAddress.relative(undefined, 4, 13))
+    expect(ast.reference).toEqual(CellAddress.relative(13, 4))
   })
 
   it('OFFSET parsing into cell reference with row shift', () => {
@@ -18,7 +18,7 @@ describe('Parser - OFFSET to reference translation', () => {
 
     const ast = parser.parse('=OFFSET(F16, 1, 0)', simpleCellAddress(0, 1, 2)).ast as CellReferenceAst
     expect(ast.type).toBe(AstNodeType.CELL_REFERENCE)
-    expect(ast.reference).toEqual(CellAddress.relative(undefined, 4, 14))
+    expect(ast.reference).toEqual(CellAddress.relative(14, 4))
   })
 
   it('OFFSET parsing into cell reference with negative row shift', () => {
@@ -26,7 +26,7 @@ describe('Parser - OFFSET to reference translation', () => {
 
     const ast = parser.parse('=OFFSET(C3, -1, 0)', simpleCellAddress(0, 1, 1)).ast as CellReferenceAst
     expect(ast.type).toBe(AstNodeType.CELL_REFERENCE)
-    expect(ast.reference).toEqual(CellAddress.relative(undefined, 1, 0))
+    expect(ast.reference).toEqual(CellAddress.relative(0, 1))
   })
 
   it('OFFSET parsing into cell reference with column shift', () => {
@@ -34,7 +34,7 @@ describe('Parser - OFFSET to reference translation', () => {
 
     const ast = parser.parse('=OFFSET(F16, 0, 1)', simpleCellAddress(0, 1, 2)).ast as CellReferenceAst
     expect(ast.type).toBe(AstNodeType.CELL_REFERENCE)
-    expect(ast.reference).toEqual(CellAddress.relative(undefined, 5, 13))
+    expect(ast.reference).toEqual(CellAddress.relative(13, 5))
   })
 
   it('OFFSET parsing into cell reference with negative column shift', () => {
@@ -42,7 +42,7 @@ describe('Parser - OFFSET to reference translation', () => {
 
     const ast = parser.parse('=OFFSET(C3, 0, -1)', simpleCellAddress(0, 1, 1)).ast as CellReferenceAst
     expect(ast.type).toBe(AstNodeType.CELL_REFERENCE)
-    expect(ast.reference).toEqual(CellAddress.relative(undefined, 0, 1))
+    expect(ast.reference).toEqual(CellAddress.relative(1, 0))
   })
 
   it('OFFSET parsing into cell reference with some height', () => {
@@ -50,8 +50,8 @@ describe('Parser - OFFSET to reference translation', () => {
 
     const ast = parser.parse('=OFFSET(F16, 2, 0, 3)', simpleCellAddress(0, 1, 2)).ast as CellRangeAst
     expect(ast.type).toBe(AstNodeType.CELL_RANGE)
-    expect(ast.start).toEqual(CellAddress.relative(undefined, 4, 15))
-    expect(ast.end).toEqual(CellAddress.relative(undefined, 4, 17))
+    expect(ast.start).toEqual(CellAddress.relative(15, 4))
+    expect(ast.end).toEqual(CellAddress.relative(17, 4))
   })
 
   it('OFFSET parsing into cell reference with some width', () => {
@@ -59,8 +59,8 @@ describe('Parser - OFFSET to reference translation', () => {
 
     const ast = parser.parse('=OFFSET(F16, 0, 2, 1, 3)', simpleCellAddress(0, 1, 2)).ast as CellRangeAst
     expect(ast.type).toBe(AstNodeType.CELL_RANGE)
-    expect(ast.start).toEqual(CellAddress.relative(undefined, 6, 13))
-    expect(ast.end).toEqual(CellAddress.relative(undefined, 8, 13))
+    expect(ast.start).toEqual(CellAddress.relative(13, 6))
+    expect(ast.end).toEqual(CellAddress.relative(13, 8))
   })
 
   it('OFFSET first argument need to be reference', () => {
@@ -172,6 +172,6 @@ describe('Parser - OFFSET to reference translation', () => {
 
     const ast = parser.parse('=oFfSeT(F16, 0, 0)', simpleCellAddress(0, 1, 2)).ast as CellReferenceAst
     expect(ast.type).toBe(AstNodeType.CELL_REFERENCE)
-    expect(ast.reference).toEqual(CellAddress.relative(undefined, 4, 13))
+    expect(ast.reference).toEqual(CellAddress.relative(13, 4))
   })
 })
