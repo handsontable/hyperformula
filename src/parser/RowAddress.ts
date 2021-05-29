@@ -16,16 +16,16 @@ import {ReferenceType} from './ColumnAddress'
 
 export class RowAddress implements AddressWithRow {
   private constructor(
-    public readonly sheet: number | null,
+    public readonly sheet: Maybe<number>,
     public readonly row: number,
     public readonly type: ReferenceType
   ) {}
 
-  public static absolute(sheet: number | null, row: number) {
+  public static absolute(sheet: Maybe<number>, row: number) {
     return new RowAddress(sheet, row, ReferenceType.ABSOLUTE)
   }
 
-  public static relative(sheet: number | null, row: number) {
+  public static relative(sheet: Maybe<number>, row: number) {
     return new RowAddress(sheet, row, ReferenceType.RELATIVE)
   }
 
@@ -38,11 +38,11 @@ export class RowAddress implements AddressWithRow {
   }
 
   public isAbsolute(): boolean {
-    return (this.type === ReferenceType.ABSOLUTE && this.sheet !== null)
+    return (this.type === ReferenceType.ABSOLUTE && this.sheet !== undefined)
   }
 
   public moved(toSheet: number, toRight: number, toBottom: number): RowAddress {
-    const newSheet = this.sheet === null ? null : toSheet
+    const newSheet = this.sheet === undefined ? undefined : toSheet
     return new RowAddress(newSheet, this.row + toBottom, this.type)
   }
 
@@ -78,7 +78,7 @@ export class RowAddress implements AddressWithRow {
   }
 
   public hash(withSheet: boolean): string {
-    const sheetPart = withSheet && this.sheet !== null ? `#${this.sheet}` : ''
+    const sheetPart = withSheet && this.sheet !== undefined ? `#${this.sheet}` : ''
     switch (this.type) {
       case ReferenceType.RELATIVE: {
         return `${sheetPart}#ROWR${this.row}`

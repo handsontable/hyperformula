@@ -188,7 +188,7 @@ describe('changing cell content', () => {
 
     expect(engine.getCellValue(adr('B1'))).toBe(2)
     engine.setCellContents(adr('B1'), null)
-    expect(engine.addressMapping.getCell(adr('B1'))).toBe(null)
+    expect(engine.addressMapping.getCell(adr('B1'))).toBe(undefined)
     expect(engine.getCellValue(adr('B1'))).toBe(null)
   })
 
@@ -294,7 +294,7 @@ describe('changing cell content', () => {
 
     engine.setCellContents(adr('A1'), null)
     const a1 = engine.addressMapping.getCell(adr('A1'))
-    expect(a1).toBe(null)
+    expect(a1).toBe(undefined)
     expect(engine.getCellValue(adr('A1'))).toBe(null)
   })
 

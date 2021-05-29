@@ -6,31 +6,31 @@ import {CellAddress, cellAddressFromString} from '../../src/parser'
 
 describe('cellAddressFromString', () => {
   it('is zero based', () => {
-    expect(cellAddressFromString(new SheetMapping(buildTranslationPackage(enGB)).get, 'A1', simpleCellAddress(0, 0, 0))).toEqual(CellAddress.relative(null, 0, 0))
+    expect(cellAddressFromString(new SheetMapping(buildTranslationPackage(enGB)).get, 'A1', simpleCellAddress(0, 0, 0))).toEqual(CellAddress.relative(undefined, 0, 0))
   })
 
   it('works for bigger rows', () => {
-    expect(cellAddressFromString(new SheetMapping(buildTranslationPackage(enGB)).get, 'A123', simpleCellAddress(0, 0, 0))).toEqual(CellAddress.relative(null, 0, 122))
+    expect(cellAddressFromString(new SheetMapping(buildTranslationPackage(enGB)).get, 'A123', simpleCellAddress(0, 0, 0))).toEqual(CellAddress.relative(undefined, 0, 122))
   })
 
   it('one letter', () => {
-    expect(cellAddressFromString(new SheetMapping(buildTranslationPackage(enGB)).get, 'Z1', simpleCellAddress(0, 0, 0))).toEqual(CellAddress.relative(null, 25, 0))
+    expect(cellAddressFromString(new SheetMapping(buildTranslationPackage(enGB)).get, 'Z1', simpleCellAddress(0, 0, 0))).toEqual(CellAddress.relative(undefined, 25, 0))
   })
 
   it('last letter is Z', () => {
-    expect(cellAddressFromString(new SheetMapping(buildTranslationPackage(enGB)).get, 'AA1', simpleCellAddress(0, 0, 0))).toEqual(CellAddress.relative(null, 26, 0))
+    expect(cellAddressFromString(new SheetMapping(buildTranslationPackage(enGB)).get, 'AA1', simpleCellAddress(0, 0, 0))).toEqual(CellAddress.relative(undefined, 26, 0))
   })
 
   it('works for many letters', () => {
-    expect(cellAddressFromString(new SheetMapping(buildTranslationPackage(enGB)).get, 'ABC1', simpleCellAddress(0, 0, 0))).toEqual(CellAddress.relative(null, 730, 0))
+    expect(cellAddressFromString(new SheetMapping(buildTranslationPackage(enGB)).get, 'ABC1', simpleCellAddress(0, 0, 0))).toEqual(CellAddress.relative(undefined, 730, 0))
   })
 
   it('is not case sensitive', () => {
-    expect(cellAddressFromString(new SheetMapping(buildTranslationPackage(enGB)).get, 'abc1', simpleCellAddress(0, 0, 0))).toEqual(CellAddress.relative(null, 730, 0))
+    expect(cellAddressFromString(new SheetMapping(buildTranslationPackage(enGB)).get, 'abc1', simpleCellAddress(0, 0, 0))).toEqual(CellAddress.relative(undefined, 730, 0))
   })
 
   it('when sheet is missing, its took from base address', () => {
-    expect(cellAddressFromString(new SheetMapping(buildTranslationPackage(enGB)).get, 'B3', simpleCellAddress(42, 0, 0))).toEqual(CellAddress.relative(null, 1, 2))
+    expect(cellAddressFromString(new SheetMapping(buildTranslationPackage(enGB)).get, 'B3', simpleCellAddress(42, 0, 0))).toEqual(CellAddress.relative(undefined, 1, 2))
   })
 
   it('can into sheets', () => {

@@ -22,7 +22,7 @@ describe('Adding column, fixing dependency', () => {
 
       engine.addColumns(0, [1, 1])
 
-      expect(extractReference(engine, adr('C1'))).toEqual(CellAddress.absoluteCol(null, 0, 0))
+      expect(extractReference(engine, adr('C1'))).toEqual(CellAddress.absoluteCol(undefined, 0, 0))
     })
 
     it('same sheet, case Aa, absolute row and col', () => {
@@ -32,7 +32,7 @@ describe('Adding column, fixing dependency', () => {
 
       engine.addColumns(0, [1, 1])
 
-      expect(extractReference(engine, adr('C1'))).toEqual(CellAddress.absolute(null, 0, 0))
+      expect(extractReference(engine, adr('C1'))).toEqual(CellAddress.absolute(undefined, 0, 0))
     })
 
     it('same sheet, case Ab', () => {
@@ -42,7 +42,7 @@ describe('Adding column, fixing dependency', () => {
 
       engine.addColumns(0, [1, 1])
 
-      expect(extractReference(engine, adr('A1'))).toEqual(CellAddress.absoluteCol(null, 2, 0))
+      expect(extractReference(engine, adr('A1'))).toEqual(CellAddress.absoluteCol(undefined, 2, 0))
     })
 
     it('same sheet, case Raa', () => {
@@ -52,7 +52,7 @@ describe('Adding column, fixing dependency', () => {
 
       engine.addColumns(0, [2, 1])
 
-      expect(extractReference(engine, adr('A1'))).toEqual(CellAddress.relative(null, 1, 0))
+      expect(extractReference(engine, adr('A1'))).toEqual(CellAddress.relative(undefined, 1, 0))
     })
 
     it('same sheet, case Rab', () => {
@@ -62,7 +62,7 @@ describe('Adding column, fixing dependency', () => {
 
       engine.addColumns(0, [2, 1])
 
-      expect(extractReference(engine, adr('D1'))).toEqual(CellAddress.relative(null, -2, 0))
+      expect(extractReference(engine, adr('D1'))).toEqual(CellAddress.relative(undefined, -2, 0))
     })
 
     it('same sheet, case Rba', () => {
@@ -72,7 +72,7 @@ describe('Adding column, fixing dependency', () => {
 
       engine.addColumns(0, [2, 1])
 
-      expect(extractReference(engine, adr('A1'))).toEqual(CellAddress.relative(null, 3, 0))
+      expect(extractReference(engine, adr('A1'))).toEqual(CellAddress.relative(undefined, 3, 0))
     })
 
     it('same sheet, case Rbb', () => {
@@ -82,7 +82,7 @@ describe('Adding column, fixing dependency', () => {
 
       engine.addColumns(0, [1, 1])
 
-      expect(extractReference(engine, adr('C1'))).toEqual(CellAddress.relative(null, 1, 0))
+      expect(extractReference(engine, adr('C1'))).toEqual(CellAddress.relative(undefined, 1, 0))
     })
 
     it('same sheet, same column', () => {
@@ -93,7 +93,7 @@ describe('Adding column, fixing dependency', () => {
 
       engine.addColumns(0, [1, 1])
 
-      expect(extractReference(engine, adr('C2'))).toEqual(CellAddress.relative(null, 0, -1))
+      expect(extractReference(engine, adr('C2'))).toEqual(CellAddress.relative(undefined, 0, -1))
     })
   })
 
@@ -219,7 +219,7 @@ describe('Adding column, fixing dependency', () => {
 
       engine.addColumns(1, [1, 1])
 
-      expect(extractReference(engine, adr('A1'))).toEqual(CellAddress.relative(null, 1, 0))
+      expect(extractReference(engine, adr('A1'))).toEqual(CellAddress.relative(undefined, 1, 0))
     })
   })
 
@@ -342,7 +342,7 @@ describe('Adding column, fixing ranges', () => {
     engine.addColumns(0, [1, 1])
 
     const b1 = engine.addressMapping.getCell(adr('B1'))
-    expect(b1).toBe(null)
+    expect(b1).toBe(undefined)
 
     expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
       ['1', null, '2', '3', '4'],
@@ -378,7 +378,7 @@ describe('Adding column, fixing ranges', () => {
     engine.addColumns(0, [1, 1])
 
     const b1 = engine.addressMapping.getCell(adr('B1'))
-    expect(b1).toBe(null)
+    expect(b1).toBe(undefined)
 
     expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
       ['1', null, '2', '3', '4'],
@@ -395,7 +395,7 @@ describe('Adding column, fixing ranges', () => {
     engine.addColumns(0, [1, 1])
 
     const b1 = engine.addressMapping.getCell(adr('B1'))
-    expect(b1).toBe(null)
+    expect(b1).toBe(undefined)
 
     expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
       ['1', null, '2', '3', '4'],
@@ -452,7 +452,7 @@ describe('Adding column, fixing ranges', () => {
     engine.addColumns(0, [1, 1])
 
     const b1 = engine.addressMapping.getCell(adr('B1'))
-    expect(b1).toBe(null)
+    expect(b1).toBe(undefined)
 
     expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
       ['1', null, '2', '3', '4'],

@@ -4,13 +4,11 @@
  */
 
 import {AbsoluteCellRange} from './AbsoluteCellRange'
-import {CellError, ErrorType, SimpleCellAddress} from './Cell'
+import {SimpleCellAddress} from './Cell'
 import {Config} from './Config'
-import {ErrorMessage} from './error-message'
 import {FunctionRegistry} from './interpreter/FunctionRegistry'
 import {InterpreterState} from './interpreter/InterpreterState'
 import {ArgumentTypes} from './interpreter/plugin/FunctionPlugin'
-import {SimpleRangeValue} from './interpreter/SimpleRangeValue'
 import {Ast, AstNodeType} from './parser'
 
 export class MatrixSize {

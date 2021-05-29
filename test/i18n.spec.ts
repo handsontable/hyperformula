@@ -54,8 +54,8 @@ describe('i18n', () => {
       ['=OFFSET(A1, 1, 1)'],
     ])
 
-    expect(extractReference(enginePL, adr('A1'))).toEqual(CellAddress.relative(null, 1, 1))
-    expect(extractReference(engineEN, adr('A1'))).toEqual(CellAddress.relative(null, 1, 1))
+    expect(extractReference(enginePL, adr('A1'))).toEqual(CellAddress.relative(undefined, 1, 1))
+    expect(extractReference(engineEN, adr('A1'))).toEqual(CellAddress.relative(undefined, 1, 1))
   })
 
   it('all function translation keys has to be upper cased', () => {

@@ -31,9 +31,13 @@ export const cellAddressFromString = (sheetMapping: SheetMappingFn, stringAddres
 
   const col = columnLabelToIndex(result[6])
 
-  const sheet = extractSheetNumber(result, sheetMapping)
+  let sheet = extractSheetNumber(result, sheetMapping)
   if (sheet === undefined) {
     return undefined
+  }
+
+  if(sheet === null) {
+    sheet = undefined
   }
 
   const row = Number(result[8]) - 1
@@ -51,9 +55,13 @@ export const cellAddressFromString = (sheetMapping: SheetMappingFn, stringAddres
 export const columnAddressFromString = (sheetMapping: SheetMappingFn, stringAddress: string, baseAddress: SimpleCellAddress): Maybe<ColumnAddress> => {
   const result = columnRegex.exec(stringAddress)!
 
-  const sheet = extractSheetNumber(result, sheetMapping)
+  let sheet = extractSheetNumber(result, sheetMapping)
   if (sheet === undefined) {
     return undefined
+  }
+
+  if(sheet === null) {
+    sheet = undefined
   }
 
   const col = columnLabelToIndex(result[6])
@@ -68,9 +76,13 @@ export const columnAddressFromString = (sheetMapping: SheetMappingFn, stringAddr
 export const rowAddressFromString = (sheetMapping: SheetMappingFn, stringAddress: string, baseAddress: SimpleCellAddress): Maybe<RowAddress> => {
   const result = rowRegex.exec(stringAddress)!
 
-  const sheet = extractSheetNumber(result, sheetMapping)
+  let sheet = extractSheetNumber(result, sheetMapping)
   if (sheet === undefined) {
     return undefined
+  }
+
+  if(sheet === null) {
+    sheet = undefined
   }
 
   const row = Number(result[6]) - 1
@@ -166,7 +178,7 @@ export function columnIndexToLabel(column: number) {
   return result.toUpperCase()
 }
 
-export function sheetIndexToString(sheetId: number, sheetMappingFn: SheetIndexMappingFn): string | undefined {
+export function sheetIndexToString(sheetId: number, sheetMappingFn: SheetIndexMappingFn): Maybe<string> {
   let sheetName = sheetMappingFn(sheetId)
   if (sheetName === undefined) {
     return undefined
@@ -183,15 +195,10 @@ export function sheetIndexToString(sheetId: number, sheetMappingFn: SheetIndexMa
 function extractSheetNumber(regexResult: RegExpExecArray, sheetMapping: SheetMappingFn): number | null | undefined {
   let maybeSheetName = regexResult[3] ?? regexResult[2]
 
-  let sheet = null
-
   if (maybeSheetName) {
     maybeSheetName = maybeSheetName.replace(/''/g, "'")
-    sheet = sheetMapping(maybeSheetName)
-    if (sheet === undefined) {
-      return undefined
-    }
+    return sheetMapping(maybeSheetName)
+  } else {
+    return null
   }
-
-  return sheet
 }

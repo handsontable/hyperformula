@@ -35,7 +35,8 @@ import {
   EvaluationSuspendedError,
   LanguageAlreadyRegisteredError,
   LanguageNotRegisteredError,
-  NotAFormulaError, SheetsNotEqual
+  NotAFormulaError,
+  SheetsNotEqual
 } from './errors'
 import {Evaluator} from './Evaluator'
 import {ExportedChange, Exporter} from './Exporter'
@@ -2709,7 +2710,7 @@ export class HyperFormula implements TypedEmitter {
       }
     } else {
       vertex = this._dependencyGraph.addressMapping.getCell(address)
-      if(vertex===null) {
+      if(vertex===undefined) {
         return []
       }
     }
@@ -2740,7 +2741,7 @@ export class HyperFormula implements TypedEmitter {
       }
     } else {
       vertex = this._dependencyGraph.addressMapping.getCell(address)
-      if(vertex===null) {
+      if(vertex===undefined) {
         return []
       }
     }

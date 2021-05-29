@@ -10,7 +10,7 @@ import {InterpreterState} from '../InterpreterState'
 import {
   EmptyValue,
   getRawValue,
-  InternalScalarValue, InterpreterValue,
+  InterpreterValue,
   isExtendedNumber,
   NumberType,
   RawInterpreterValue

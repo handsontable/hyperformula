@@ -131,10 +131,10 @@ describe('Address dependencies, moved formulas', () => {
 
     engine.moveCells(adr('A2'), 1, 4, adr('B1'))
 
-    expect(extractReference(engine, adr('B1'))).toEqual(CellAddress.relative(null, -1, 0))
-    expect(extractReference(engine, adr('B2'))).toEqual(CellAddress.absoluteCol(null, 0, -1))
-    expect(extractReference(engine, adr('B3'))).toEqual(CellAddress.absoluteRow(null, -1, 0))
-    expect(extractReference(engine, adr('B4'))).toEqual(CellAddress.absolute(null, 0, 0))
+    expect(extractReference(engine, adr('B1'))).toEqual(CellAddress.relative(undefined, -1, 0))
+    expect(extractReference(engine, adr('B2'))).toEqual(CellAddress.absoluteCol(undefined, 0, -1))
+    expect(extractReference(engine, adr('B3'))).toEqual(CellAddress.absoluteRow(undefined, -1, 0))
+    expect(extractReference(engine, adr('B4'))).toEqual(CellAddress.absolute(undefined, 0, 0))
   })
 
   it('should return #CYCLE when overriding referred dependency to external cell', () => {
@@ -177,7 +177,7 @@ describe('Address dependencies, moved formulas', () => {
 
     engine.moveCells(adr('A1'), 2, 2, adr('B2'))
 
-    expect(extractReference(engine, adr('B2'))).toEqual(CellAddress.absoluteRow(null, 1, 2))
+    expect(extractReference(engine, adr('B2'))).toEqual(CellAddress.absoluteRow(undefined, 1, 2))
   })
 
   it('should update coordinates to internal dependency', () => {
@@ -188,14 +188,14 @@ describe('Address dependencies, moved formulas', () => {
       ['4', '=$A$4'],
     ])
 
-    expect(extractReference(engine, adr('B3'))).toEqual(CellAddress.absoluteRow(null, -1, 2))
+    expect(extractReference(engine, adr('B3'))).toEqual(CellAddress.absoluteRow(undefined, -1, 2))
 
     engine.moveCells(adr('A1'), 2, 4, adr('B2'))
 
-    expect(extractReference(engine, adr('C2'))).toEqual(CellAddress.relative(null, -1, 0))
-    expect(extractReference(engine, adr('C3'))).toEqual(CellAddress.absoluteCol(null, 1, 0))
-    expect(extractReference(engine, adr('C4'))).toEqual(CellAddress.absoluteRow(null, -1, 3))
-    expect(extractReference(engine, adr('C5'))).toEqual(CellAddress.absolute(null, 1, 4))
+    expect(extractReference(engine, adr('C2'))).toEqual(CellAddress.relative(undefined, -1, 0))
+    expect(extractReference(engine, adr('C3'))).toEqual(CellAddress.absoluteCol(undefined, 1, 0))
+    expect(extractReference(engine, adr('C4'))).toEqual(CellAddress.absoluteRow(undefined, -1, 3))
+    expect(extractReference(engine, adr('C5'))).toEqual(CellAddress.absolute(undefined, 1, 4))
   })
 
   it('should evaluate formula when overriding external formula dependency', () => {
@@ -239,7 +239,7 @@ describe('Move cells', () => {
 
     engine.moveCells(adr('A2'), 1, 1, adr('B1', 1))
 
-    expect(extractReference(engine, adr('B1', 1))).toEqual(CellAddress.relative(null, -1, 0))
+    expect(extractReference(engine, adr('B1', 1))).toEqual(CellAddress.relative(undefined, -1, 0))
   })
 
   it('should update address in vertex', () => {
@@ -270,10 +270,10 @@ describe('Move cells', () => {
 
     engine.moveCells(adr('A1'), 1, 1, adr('B1'))
 
-    expect(extractReference(engine, adr('A2'))).toEqual(CellAddress.relative(null, 1, -1))
-    expect(extractReference(engine, adr('A3'))).toEqual(CellAddress.absoluteCol(null, 1, -2))
-    expect(extractReference(engine, adr('A4'))).toEqual(CellAddress.absoluteRow(null, 1, 0))
-    expect(extractReference(engine, adr('A5'))).toEqual(CellAddress.absolute(null, 1, 0))
+    expect(extractReference(engine, adr('A2'))).toEqual(CellAddress.relative(undefined, 1, -1))
+    expect(extractReference(engine, adr('A3'))).toEqual(CellAddress.absoluteCol(undefined, 1, -2))
+    expect(extractReference(engine, adr('A4'))).toEqual(CellAddress.absoluteRow(undefined, 1, 0))
+    expect(extractReference(engine, adr('A5'))).toEqual(CellAddress.absolute(undefined, 1, 0))
   })
 
   it('value moved has appropriate edges', () => {
@@ -300,7 +300,7 @@ describe('Move cells', () => {
     engine.moveCells(adr('A1'), 1, 1, adr('B1', 1))
 
     const reference = extractReference(engine, adr('A2'))
-    expect(reference).toEqual(CellAddress.relative(null, 1, -1))
+    expect(reference).toEqual(CellAddress.relative(undefined, 1, -1))
   })
 
   it('should override and remove formula', () => {
@@ -324,8 +324,8 @@ describe('Move cells', () => {
 
     engine.moveCells(adr('A1'), 1, 1, adr('B1'))
 
-    expect(engine.addressMapping.getCell(adr('A1'))).toBe(null)
-    expect(engine.addressMapping.getCell(adr('B1'))).toBe(null)
+    expect(engine.addressMapping.getCell(adr('A1'))).toBe(undefined)
+    expect(engine.addressMapping.getCell(adr('B1'))).toBe(undefined)
   })
 
   it('replacing formula dependency with null one', () => {
@@ -349,8 +349,8 @@ describe('Move cells', () => {
 
     engine.moveCells(adr('A1'), 1, 1, adr('B1'))
 
-    expect(engine.addressMapping.getCell(adr('A1'))).toBe(null)
-    expect(engine.addressMapping.getCell(adr('B1'))).toBe(null)
+    expect(engine.addressMapping.getCell(adr('A1'))).toBe(undefined)
+    expect(engine.addressMapping.getCell(adr('B1'))).toBe(undefined)
   })
 
   it('should adjust edges properly', () => {
@@ -374,7 +374,7 @@ describe('Move cells', () => {
         + 1, // A2
     )
 
-    expect(source).toBe(null)
+    expect(source).toBe(undefined)
     expect(engine.graph.existsEdge(target, b2)).toBe(true)
     expect(engine.graph.existsEdge(target, b1)).toBe(true)
     expect(engine.getCellValue(adr('A2'))).toBe(1)
@@ -439,8 +439,8 @@ describe('moving ranges', () => {
     expect(range.end).toEqual(adr('B2'))
     expect(engine.getCellValue(adr('A3'))).toEqual(3)
 
-    expect(engine.addressMapping.getCell(adr('A1'))).toBe(null)
-    expect(engine.addressMapping.getCell(adr('A2'))).toBe(null)
+    expect(engine.addressMapping.getCell(adr('A1'))).toBe(undefined)
+    expect(engine.addressMapping.getCell(adr('A2'))).toBe(undefined)
 
     expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
       [null, '1'],
@@ -525,8 +525,8 @@ describe('moving ranges', () => {
     const c2 = engine.addressMapping.fetchCell(adr('C2'))
     const range = engine.rangeMapping.fetchRange(adr('C1'), adr('C2'))
 
-    expect(a1).toBe(null)
-    expect(a2).toBe(null)
+    expect(a1).toBe(undefined)
+    expect(a2).toBe(undefined)
 
     expect(engine.graph.nodesCount()).toBe(
       +2 // formulas

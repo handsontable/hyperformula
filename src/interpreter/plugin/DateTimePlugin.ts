@@ -24,7 +24,7 @@ import {
   EmptyValue,
   getRawValue,
   InternalNoErrorScalarValue,
-  InternalScalarValue, InterpreterValue,
+  InterpreterValue,
   isExtendedNumber,
   NumberType,
   RawNoErrorScalarValue,
@@ -631,7 +631,7 @@ export class DateTimePlugin extends FunctionPlugin implements FunctionPluginType
       return weekendPattern
     }
 
-    const filteredHolidays = this.simpleRangeToFilteredHolidays(holidays, weekendPattern)
+    const filteredHolidays = this.simpleRangeToFilteredHolidays(weekendPattern, holidays)
     if(filteredHolidays instanceof CellError) {
       return filteredHolidays
     }
@@ -647,7 +647,7 @@ export class DateTimePlugin extends FunctionPlugin implements FunctionPluginType
       return weekendPattern
     }
 
-    const filteredHolidays = this.simpleRangeToFilteredHolidays(holidays, weekendPattern)
+    const filteredHolidays = this.simpleRangeToFilteredHolidays(weekendPattern, holidays)
     if(filteredHolidays instanceof CellError) {
       return filteredHolidays
     }
@@ -704,7 +704,7 @@ export class DateTimePlugin extends FunctionPlugin implements FunctionPluginType
     return ans
   }
 
-  private simpleRangeToFilteredHolidays(holidays: Maybe<SimpleRangeValue>, weekendPattern: string): number[] | CellError {
+  private simpleRangeToFilteredHolidays(weekendPattern: string, holidays?: SimpleRangeValue): number[] | CellError {
     const holidaysArr = holidays?.valuesFromTopLeftCorner() ?? []
     for(const val of holidaysArr) {
       if(val instanceof CellError) {

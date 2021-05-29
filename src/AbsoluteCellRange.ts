@@ -131,16 +131,16 @@ export class AbsoluteCellRange {
     return this.addressInRange(range.start) && this.addressInRange(range.end)
   }
 
-  public intersectionWith(other: AbsoluteCellRange): AbsoluteCellRange | null {
+  public intersectionWith(other: AbsoluteCellRange): Maybe<AbsoluteCellRange> {
     if (this.sheet !== other.start.sheet) {
-      return null
+      return undefined
     }
     const startRow = Math.max(this.start.row, other.start.row)
     const endRow = Math.min(this.end.row, other.end.row)
     const startCol = Math.max(this.start.col, other.start.col)
     const endCol = Math.min(this.end.col, other.end.col)
     if (startRow > endRow || startCol > endCol) {
-      return null
+      return undefined
     }
 
     return new AbsoluteCellRange(

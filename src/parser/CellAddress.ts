@@ -34,23 +34,23 @@ export enum CellReferenceType {
 
 export class CellAddress implements AddressWithColumn, AddressWithRow {
 
-  public static relative(sheet: number | null, col: number, row: number) {
+  public static relative(sheet: Maybe<number>, col: number, row: number) {
     return new CellAddress(sheet, col, row, CellReferenceType.CELL_REFERENCE_RELATIVE)
   }
 
-  public static absolute(sheet: number | null, col: number, row: number) {
+  public static absolute(sheet: Maybe<number>, col: number, row: number) {
     return new CellAddress(sheet, col, row, CellReferenceType.CELL_REFERENCE_ABSOLUTE)
   }
 
-  public static absoluteCol(sheet: number | null, col: number, row: number) {
+  public static absoluteCol(sheet: Maybe<number>, col: number, row: number) {
     return new CellAddress(sheet, col, row, CellReferenceType.CELL_REFERENCE_ABSOLUTE_COL)
   }
 
-  public static absoluteRow(sheet: number | null, col: number, row: number) {
+  public static absoluteRow(sheet: Maybe<number>, col: number, row: number) {
     return new CellAddress(sheet, col, row, CellReferenceType.CELL_REFERENCE_ABSOLUTE_ROW)
   }
   constructor(
-    public readonly sheet: number | null,
+    public readonly sheet: Maybe<number>,
     public readonly col: number,
     public readonly row: number,
     public readonly type: CellReferenceType,
@@ -110,7 +110,7 @@ export class CellAddress implements AddressWithColumn, AddressWithRow {
   }
 
   public isAbsolute(): boolean {
-    return (this.type === CellReferenceType.CELL_REFERENCE_ABSOLUTE && this.sheet !== null)
+    return (this.type === CellReferenceType.CELL_REFERENCE_ABSOLUTE && this.sheet !== undefined)
   }
 
   public shiftedByRows(numberOfRows: number): CellAddress {
@@ -122,7 +122,7 @@ export class CellAddress implements AddressWithColumn, AddressWithRow {
   }
 
   public moved(toSheet: number, toRight: number, toBottom: number): CellAddress {
-    const newSheet = this.sheet === null ? null : toSheet
+    const newSheet = this.sheet === undefined ? undefined : toSheet
     return new CellAddress(newSheet, this.col + toRight, this.row + toBottom, this.type)
   }
 
@@ -147,7 +147,7 @@ export class CellAddress implements AddressWithColumn, AddressWithRow {
   }
 
   public hash(withSheet: boolean): string {
-    const sheetPart = withSheet && this.sheet !== null ? `#${this.sheet}` : ''
+    const sheetPart = withSheet && this.sheet !== undefined ? `#${this.sheet}` : ''
     switch (this.type) {
       case CellReferenceType.CELL_REFERENCE_RELATIVE: {
         return `${sheetPart}#${this.row}R${this.col}`

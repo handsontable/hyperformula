@@ -21,16 +21,16 @@ export enum ReferenceType {
 
 export class ColumnAddress implements AddressWithColumn {
   public constructor(
-    public readonly sheet: number | null,
+    public readonly sheet: Maybe<number>,
     public readonly col: number,
     public readonly type: ReferenceType
   ) {}
 
-  public static absolute(sheet: number | null, column: number) {
+  public static absolute(sheet: Maybe<number>, column: number) {
     return new ColumnAddress(sheet, column, ReferenceType.ABSOLUTE)
   }
 
-  public static relative(sheet: number | null, column: number) {
+  public static relative(sheet: Maybe<number>, column: number) {
     return new ColumnAddress(sheet, column, ReferenceType.RELATIVE)
   }
 
@@ -43,11 +43,11 @@ export class ColumnAddress implements AddressWithColumn {
   }
 
   public isAbsolute(): boolean {
-    return (this.type === ReferenceType.ABSOLUTE && this.sheet !== null)
+    return (this.type === ReferenceType.ABSOLUTE && this.sheet !== undefined)
   }
 
   public moved(toSheet: number, toRight: number, _toBottom: number): ColumnAddress {
-    const newSheet = this.sheet === null ? null : toSheet
+    const newSheet = this.sheet === undefined ? undefined : toSheet
     return new ColumnAddress(newSheet, this.col + toRight, this.type)
   }
 
@@ -83,7 +83,7 @@ export class ColumnAddress implements AddressWithColumn {
   }
 
   public hash(withSheet: boolean): string {
-    const sheetPart = withSheet && this.sheet !== null ? `#${this.sheet}` : ''
+    const sheetPart = withSheet && this.sheet !== undefined ? `#${this.sheet}` : ''
     switch (this.type) {
       case ReferenceType.RELATIVE: {
         return `${sheetPart}#COLR${this.col}`

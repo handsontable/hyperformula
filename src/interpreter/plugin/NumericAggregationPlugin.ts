@@ -11,7 +11,7 @@ import {Ast, AstNodeType, CellRangeAst, ProcedureAst} from '../../parser'
 import {ColumnRangeAst, RowRangeAst} from '../../parser/Ast'
 import {coerceBooleanToNumber} from '../ArithmeticHelper'
 import {InterpreterState} from '../InterpreterState'
-import {EmptyValue, ExtendedNumber, getRawValue, InternalScalarValue, isExtendedNumber, } from '../InterpreterValue'
+import {EmptyValue, ExtendedNumber, getRawValue, InternalScalarValue, isExtendedNumber,} from '../InterpreterValue'
 import {SimpleRangeValue} from '../SimpleRangeValue'
 import {ArgumentTypes, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
 
