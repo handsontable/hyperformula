@@ -98,7 +98,7 @@ export class EngineComparator {
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       const actualEntry = actual.get(key)!
       expect(actualEntry).toBeDefined()
-      expect(value.getRange().sameAs(actualEntry.getRange())).toBe(true)
+      expect(actualEntry.matrix.size.isRef).toBe(value.matrix.size.isRef)
     }
   }
 
