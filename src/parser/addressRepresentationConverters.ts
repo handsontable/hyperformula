@@ -67,9 +67,9 @@ export const columnAddressFromString = (sheetMapping: SheetMappingFn, stringAddr
   const col = columnLabelToIndex(result[6])
 
   if (result[5] === '$') {
-    return ColumnAddress.absolute(sheet, col)
+    return ColumnAddress.absolute(col, sheet)
   } else {
-    return ColumnAddress.relative(sheet, col - baseAddress.col)
+    return ColumnAddress.relative(col - baseAddress.col, sheet)
   }
 }
 
@@ -88,9 +88,9 @@ export const rowAddressFromString = (sheetMapping: SheetMappingFn, stringAddress
   const row = Number(result[6]) - 1
 
   if (result[5] === '$') {
-    return RowAddress.absolute(sheet, row)
+    return RowAddress.absolute(row, sheet)
   } else {
-    return RowAddress.relative(sheet, row - baseAddress.row)
+    return RowAddress.relative(row - baseAddress.row, sheet)
   }
 }
 

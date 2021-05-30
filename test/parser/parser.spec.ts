@@ -22,6 +22,7 @@ import {
 } from '../../src/parser'
 import {columnIndexToLabel} from '../../src/parser/addressRepresentationConverters'
 import {
+  buildMatrixAst,
   ColumnRangeAst,
   ErrorWithRawInputAst, MatrixAst,
   ParenthesisAst,
@@ -329,8 +330,7 @@ describe('cell references and ranges', () => {
 
     const ast = parser.parse('=d1', simpleCellAddress(0, 0, 0)).ast as CellReferenceAst
     expect(ast.type).toBe(AstNodeType.CELL_REFERENCE)
-    expect(ast.reference.col).toBe(3)
-    expect(ast.reference.row).toBe(0)
+    expect(ast.reference).toEqual(CellAddress.relative(0,3))
   })
 
   it('cell reference by default has sheet from the sheet it is written', () => {
@@ -342,9 +342,7 @@ describe('cell references and ranges', () => {
     const ast = parser.parse('=D1', simpleCellAddress(1, 0, 0)).ast as CellReferenceAst
 
     expect(ast.type).toBe(AstNodeType.CELL_REFERENCE)
-    expect(ast.reference.sheet).toBe(undefined)
-    expect(ast.reference.col).toBe(3)
-    expect(ast.reference.row).toBe(0)
+    expect(ast.reference).toEqual(CellAddress.relative(0,3))
   })
 
   it('cell reference with sheet name', () => {
@@ -355,9 +353,7 @@ describe('cell references and ranges', () => {
 
     const ast = parser.parse('=Sheet2!D1', simpleCellAddress(0, 0, 0)).ast as CellReferenceAst
     expect(ast.type).toBe(AstNodeType.CELL_REFERENCE)
-    expect(ast.reference.sheet).toBe(1)
-    expect(ast.reference.col).toBe(3)
-    expect(ast.reference.row).toBe(0)
+    expect(ast.reference).toEqual(CellAddress.relative(0,3, 1))
   })
 
   it('using unknown sheet gives REF', () => {
@@ -607,40 +603,40 @@ describe('Column ranges', () => {
     const ast = parser.parse('=C:D', adr('A1')).ast as ColumnRangeAst
     expect(ast.type).toEqual(AstNodeType.COLUMN_RANGE)
     expect(ast.sheetReferenceType).toEqual(RangeSheetReferenceType.RELATIVE)
-    expect(ast.start).toEqual(ColumnAddress.relative(undefined, 2))
-    expect(ast.end).toEqual(ColumnAddress.relative(undefined, 3))
+    expect(ast.start).toEqual(ColumnAddress.relative(2))
+    expect(ast.end).toEqual(ColumnAddress.relative(3))
   })
 
   it('column range with sheet absolute', () => {
     const ast = parser.parse('=Sheet1!C:D', adr('A1')).ast as ColumnRangeAst
     expect(ast.type).toEqual(AstNodeType.COLUMN_RANGE)
     expect(ast.sheetReferenceType).toEqual(RangeSheetReferenceType.START_ABSOLUTE)
-    expect(ast.start).toEqual(ColumnAddress.relative(0, 2))
-    expect(ast.end).toEqual(ColumnAddress.relative(0, 3))
+    expect(ast.start).toEqual(ColumnAddress.relative(2, 0))
+    expect(ast.end).toEqual(ColumnAddress.relative(3, 0))
   })
 
   it('column range with both sheets absolute - same sheet', () => {
     const ast = parser.parse('=Sheet1!C:Sheet1!D', adr('A1')).ast as ColumnRangeAst
     expect(ast.type).toEqual(AstNodeType.COLUMN_RANGE)
     expect(ast.sheetReferenceType).toEqual(RangeSheetReferenceType.BOTH_ABSOLUTE)
-    expect(ast.start).toEqual(ColumnAddress.relative(0, 2))
-    expect(ast.end).toEqual(ColumnAddress.relative(0, 3))
+    expect(ast.start).toEqual(ColumnAddress.relative(2, 0))
+    expect(ast.end).toEqual(ColumnAddress.relative(3, 0))
   })
 
   it('column range with both sheets absolute - different sheet', () => {
     const ast = parser.parse('=Sheet1!C:Sheet2!D', adr('A1')).ast as ColumnRangeAst
     expect(ast.type).toEqual(AstNodeType.COLUMN_RANGE)
     expect(ast.sheetReferenceType).toEqual(RangeSheetReferenceType.BOTH_ABSOLUTE)
-    expect(ast.start).toEqual(ColumnAddress.relative(0, 2))
-    expect(ast.end).toEqual(ColumnAddress.relative(1, 3))
+    expect(ast.start).toEqual(ColumnAddress.relative(2, 0))
+    expect(ast.end).toEqual(ColumnAddress.relative(3, 1))
   })
 
   it('column range with absolute column address', () => {
     const ast = parser.parse('=$C:D', adr('A1')).ast as ColumnRangeAst
     expect(ast.type).toEqual(AstNodeType.COLUMN_RANGE)
     expect(ast.sheetReferenceType).toEqual(RangeSheetReferenceType.RELATIVE)
-    expect(ast.start).toEqual(ColumnAddress.absolute(undefined, 2))
-    expect(ast.end).toEqual(ColumnAddress.relative(undefined, 3))
+    expect(ast.start).toEqual(ColumnAddress.absolute(2))
+    expect(ast.end).toEqual(ColumnAddress.relative(3))
   })
 
   it('column range with absolute sheet only on end side is a parsing error', () => {
@@ -674,40 +670,40 @@ describe('Row ranges', () => {
     const ast = parser.parse('=3:4', adr('A1')).ast as RowRangeAst
     expect(ast.type).toEqual(AstNodeType.ROW_RANGE)
     expect(ast.sheetReferenceType).toEqual(RangeSheetReferenceType.RELATIVE)
-    expect(ast.start).toEqual(RowAddress.relative(undefined, 2))
-    expect(ast.end).toEqual(RowAddress.relative(undefined, 3))
+    expect(ast.start).toEqual(RowAddress.relative(2))
+    expect(ast.end).toEqual(RowAddress.relative(3))
   })
 
   it('row range with sheet absolute', () => {
     const ast = parser.parse('=Sheet1!3:4', adr('A1')).ast as RowRangeAst
     expect(ast.type).toEqual(AstNodeType.ROW_RANGE)
     expect(ast.sheetReferenceType).toEqual(RangeSheetReferenceType.START_ABSOLUTE)
-    expect(ast.start).toEqual(RowAddress.relative(0, 2))
-    expect(ast.end).toEqual(RowAddress.relative(0, 3))
+    expect(ast.start).toEqual(RowAddress.relative(2, 0))
+    expect(ast.end).toEqual(RowAddress.relative(3, 0))
   })
 
   it('row range with both sheets absolute - same sheet', () => {
     const ast = parser.parse('=Sheet1!3:Sheet1!4', adr('A1')).ast as RowRangeAst
     expect(ast.type).toEqual(AstNodeType.ROW_RANGE)
     expect(ast.sheetReferenceType).toEqual(RangeSheetReferenceType.BOTH_ABSOLUTE)
-    expect(ast.start).toEqual(RowAddress.relative(0, 2))
-    expect(ast.end).toEqual(RowAddress.relative(0, 3))
+    expect(ast.start).toEqual(RowAddress.relative(2, 0))
+    expect(ast.end).toEqual(RowAddress.relative(3, 0))
   })
 
   it('row range with both sheets absolute - different sheet', () => {
     const ast = parser.parse('=Sheet1!3:Sheet2!4', adr('A1')).ast as RowRangeAst
     expect(ast.type).toEqual(AstNodeType.ROW_RANGE)
     expect(ast.sheetReferenceType).toEqual(RangeSheetReferenceType.BOTH_ABSOLUTE)
-    expect(ast.start).toEqual(RowAddress.relative(0, 2))
-    expect(ast.end).toEqual(RowAddress.relative(1, 3))
+    expect(ast.start).toEqual(RowAddress.relative(2, 0))
+    expect(ast.end).toEqual(RowAddress.relative(3, 1))
   })
 
   it('row range with absolute row address', () => {
     const ast = parser.parse('=$3:4', adr('A1')).ast as RowRangeAst
     expect(ast.type).toEqual(AstNodeType.ROW_RANGE)
     expect(ast.sheetReferenceType).toEqual(RangeSheetReferenceType.RELATIVE)
-    expect(ast.start).toEqual(RowAddress.absolute(undefined, 2))
-    expect(ast.end).toEqual(RowAddress.relative(undefined, 3))
+    expect(ast.start).toEqual(RowAddress.absolute(2))
+    expect(ast.end).toEqual(RowAddress.relative(3))
   })
 
   it('row range with absolute sheet only on end side is a parsing error', () => {
