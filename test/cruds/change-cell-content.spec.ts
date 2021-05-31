@@ -906,9 +906,9 @@ describe('arrays', () => {
 
     expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
       [1, 2],
-      [3, 4, 10],
+      [3, 4, '=B4'],
       ['=-A1:B2'],
-      [null, 10]
+      [null, '=SUM(A1:B2)']
     ], {useArrayArithmetic: true}))
     expect(engine.getSheetValues(0)).toEqual([
       [1, 2],
@@ -954,15 +954,26 @@ describe('arrays', () => {
 
   it('should handle dependent vertices after shrinking array', () => {
     const engine = HyperFormula.buildFromArray([
-      [1, 2, 3, '=-A1:C1'],
-      ['=C1', '=D1', '=SUM(E1:E1)'],
+      [1, 2, 3, '=-A1:C1', null, null, 4],
+      ['=D1', '=E1', '=SUM(F1:F1)', '=SUM(F1:G1)'],
     ], {useArrayArithmetic: true})
+
+    expect(engine.getCellValue(adr('A2'))).toEqual(-1)
+    expect(engine.getCellValue(adr('B2'))).toEqual(-2)
+    expect(engine.getCellValue(adr('C2'))).toEqual(-3)
+    expect(engine.getCellValue(adr('D2'))).toEqual(1)
 
     engine.setCellContents(adr('E1'), [[null]])
     engine.setCellContents(adr('D1'), [[4, 5, 6]])
 
+    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
+      [1, 2, 3, 4, 5, 6, 4],
+      ['=D1', '=E1', '=SUM(F1:F1)', '=SUM(F1:G1)']
+    ], {useArrayArithmetic: true}))
+
     expect(engine.getCellValue(adr('A2'))).toEqual(4)
     expect(engine.getCellValue(adr('B2'))).toEqual(5)
     expect(engine.getCellValue(adr('C2'))).toEqual(6)
+    expect(engine.getCellValue(adr('D2'))).toEqual(10)
   })
 })

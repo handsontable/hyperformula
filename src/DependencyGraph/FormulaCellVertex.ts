@@ -103,6 +103,10 @@ export class MatrixVertex extends FormulaVertex {
     return this.cellAddress.sheet
   }
 
+  get leftCorner(): SimpleCellAddress {
+    return this.cellAddress
+  }
+
   setCellValue(value: InterpreterValue): InterpreterValue {
     if (value instanceof CellError) {
       this.setErrorValue(value)
@@ -162,7 +166,7 @@ export class MatrixVertex extends FormulaVertex {
   }
 
   setNoSpaceButPreserveSize(): InterpreterValue {
-    this.matrix = new ErroredMatrix(new CellError(ErrorType.REF, ErrorMessage.NoSpaceForArrayResult), this.matrix.size)
+    this.matrix = new ErroredMatrix(new CellError(ErrorType.REF, ErrorMessage.NoSpaceForArrayResult), new MatrixSize(this.width, this.height, true))
     return this.getCellValue()
   }
 

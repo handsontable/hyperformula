@@ -75,8 +75,8 @@ export class AbsoluteCellRange {
   }
 
   public static singleRangeFromCellAddress(cellAddress: CellAddress, baseAddress: SimpleCellAddress): AbsoluteCellRange {
-    const simpleCellAddress = cellAddress.toSimpleCellAddress(baseAddress)
-    return new AbsoluteCellRange(simpleCellAddress, simpleCellAddress)
+    const absoluteAddress = cellAddress.toSimpleCellAddress(baseAddress)
+    return new AbsoluteCellRange(absoluteAddress, absoluteAddress)
   }
 
   constructor(
@@ -112,12 +112,10 @@ export class AbsoluteCellRange {
       return false
     }
 
-    if (this.start.row <= address.row && this.end.row >= address.row
-        && this.start.col <= address.col && this.end.col >= address.col) {
-      return true
-    }
-
-    return false
+    return this.start.row <= address.row
+      && this.end.row >= address.row
+      && this.start.col <= address.col
+      && this.end.col >= address.col
   }
 
   public columnInRange(address: SimpleColumnAddress): boolean {
