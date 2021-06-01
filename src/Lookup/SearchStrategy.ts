@@ -22,9 +22,9 @@ export interface SearchStrategy {
 export interface ColumnSearchStrategy extends SearchStrategy {
   add(value: RawInterpreterValue, address: SimpleCellAddress): void,
 
-  remove(value: RawInterpreterValue | null, address: SimpleCellAddress): void,
+  remove(value: RawInterpreterValue | undefined, address: SimpleCellAddress): void,
 
-  change(oldValue: RawInterpreterValue | null, newValue: RawInterpreterValue, address: SimpleCellAddress): void,
+  change(oldValue: RawInterpreterValue | undefined, newValue: RawInterpreterValue, address: SimpleCellAddress): void,
 
   addColumns(columnsSpan: ColumnsSpan): void,
 
