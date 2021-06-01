@@ -217,7 +217,7 @@ export class MatrixVertex extends FormulaVertex {
   /**
    * No-op as matrix vertices are transformed eagerly.
    * */
-  ensureRecentData(updatingService: LazilyTransformingAstService) {}
+  ensureRecentData(_updatingService: LazilyTransformingAstService) {}
 
   private setErrorValue(error: CellError) {
     this.matrix = new ErroredMatrix(error, this.matrix.size)

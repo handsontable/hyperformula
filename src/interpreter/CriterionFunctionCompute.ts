@@ -59,7 +59,7 @@ export class CriterionFunctionCompute<T> {
     if (valuesRangeVertex && conditionsVertices.every((e) => e !== undefined)) {
       const fullCriterionString = conditions.map((c) => c.criterionPackage.raw).join(',')
       const cachedResult = this.findAlreadyComputedValueInCache(valuesRangeVertex, this.cacheKey(conditions), fullCriterionString)
-      if (cachedResult) {
+      if (cachedResult !== undefined) {
         this.interpreter.stats.incrementCriterionFunctionFullCacheUsed()
         return cachedResult
       }
