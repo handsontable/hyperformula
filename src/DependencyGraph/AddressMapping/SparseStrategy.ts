@@ -46,11 +46,7 @@ export class SparseStrategy implements IAddressMappingStrategy {
 
   /** @inheritDoc */
   public has(address: SheetCellAddress): boolean {
-    const colMapping = this.mapping.get(address.col)
-    if (!colMapping) {
-      return false
-    }
-    return !!colMapping.get(address.row)
+    return !!this.mapping.get(address.col)?.get(address.row)
   }
 
   /** @inheritDoc */
@@ -64,10 +60,7 @@ export class SparseStrategy implements IAddressMappingStrategy {
   }
 
   public removeCell(address: SimpleCellAddress): void {
-    const colMapping = this.mapping.get(address.col)
-    if (colMapping) {
-      colMapping.delete(address.row)
-    }
+    this.mapping.get(address.col)?.delete(address.row)
   }
 
   public addRows(row: number, numberOfRows: number): void {
@@ -148,7 +141,7 @@ export class SparseStrategy implements IAddressMappingStrategy {
 
   public* verticesFromColumn(column: number): IterableIterator<CellVertex> {
     const colMapping = this.mapping.get(column)
-    if (!colMapping) {
+    if (colMapping === undefined) {
       return
     }
     for (const [_, vertex] of colMapping) {
@@ -159,7 +152,7 @@ export class SparseStrategy implements IAddressMappingStrategy {
   public* verticesFromRow(row: number): IterableIterator<CellVertex> {
     for (const colMapping of this.mapping.values()) {
       const rowVertex = colMapping.get(row)
-      if (rowVertex) {
+      if (rowVertex !== undefined) {
         yield rowVertex
       }
     }
@@ -168,7 +161,7 @@ export class SparseStrategy implements IAddressMappingStrategy {
   public* verticesFromColumnsSpan(columnsSpan: ColumnsSpan): IterableIterator<CellVertex> {
     for (const column of columnsSpan.columns()) {
       const colMapping = this.mapping.get(column)
-      if (!colMapping) {
+      if (colMapping === undefined) {
         continue
       }
       for (const [_, vertex] of colMapping) {
@@ -181,7 +174,7 @@ export class SparseStrategy implements IAddressMappingStrategy {
     for (const colMapping of this.mapping.values()) {
       for (const row of rowsSpan.rows()) {
         const rowVertex = colMapping.get(row)
-        if (rowVertex) {
+        if (rowVertex !== undefined) {
           yield rowVertex
         }
       }
@@ -192,7 +185,7 @@ export class SparseStrategy implements IAddressMappingStrategy {
     for (const [col, colMapping] of this.mapping.entries()) {
       for (const row of rowsSpan.rows()) {
         const rowVertex = colMapping.get(row)
-        if (rowVertex) {
+        if (rowVertex !== undefined) {
           yield [simpleCellAddress(rowsSpan.sheet, col, row), rowVertex]
         }
       }
@@ -202,7 +195,7 @@ export class SparseStrategy implements IAddressMappingStrategy {
   public* entriesFromColumnsSpan(columnsSpan: ColumnsSpan): IterableIterator<[SimpleCellAddress, CellVertex]> {
     for (const col of columnsSpan.columns()) {
       const colMapping = this.mapping.get(col)
-      if (colMapping) {
+      if (colMapping !== undefined) {
         for (const [row, vertex] of colMapping.entries()) {
           yield [simpleCellAddress(columnsSpan.sheet, col, row), vertex]
         }
@@ -213,7 +206,7 @@ export class SparseStrategy implements IAddressMappingStrategy {
   public* vertices(): IterableIterator<CellVertex> {
     for (const [_, col] of this.mapping) {
       for (const [_, value] of col) {
-        if (value) {
+        if (value !== undefined) {
           yield value
         }
       }

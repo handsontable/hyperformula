@@ -181,7 +181,7 @@ export class DependencyGraph {
         }
 
         const {smallerRangeVertex, restRange} = this.rangeMapping.findSmallerRange(range)
-        if (smallerRangeVertex) {
+        if (smallerRangeVertex !== undefined) {
           this.graph.addEdge(smallerRangeVertex, rangeVertex)
           if (rangeVertex.bruteForce) {
             rangeVertex.bruteForce = false
@@ -710,7 +710,7 @@ export class DependencyGraph {
     const allDeps: [(SimpleCellAddress | AbsoluteCellRange), Vertex][] = []
     const {smallerRangeVertex, restRange} = this.rangeMapping.findSmallerRange(vertex.range) //checking whether this range was splitted by bruteForce or not
     let range
-    if (smallerRangeVertex !== null && this.graph.adjacentNodes(smallerRangeVertex).has(vertex)) {
+    if (smallerRangeVertex !== undefined && this.graph.adjacentNodes(smallerRangeVertex).has(vertex)) {
       range = restRange
       allDeps.push([new AbsoluteCellRange(smallerRangeVertex.start, smallerRangeVertex.end), smallerRangeVertex])
     } else { //did we ever need to use full range
@@ -759,10 +759,10 @@ export class DependencyGraph {
         } else {
           let currentRangeVertex = rangeVertex
           let find = this.rangeMapping.findSmallerRange(currentRangeVertex.range)
-          if (find.smallerRangeVertex !== null) {
+          if (find.smallerRangeVertex !== undefined) {
             continue
           }
-          while (find.smallerRangeVertex === null) {
+          while (find.smallerRangeVertex === undefined) {
             const newRangeVertex = new RangeVertex(AbsoluteCellRange.spanFrom(currentRangeVertex.range.start, currentRangeVertex.range.width(), currentRangeVertex.range.height() - 1))
             this.rangeMapping.setRange(newRangeVertex)
             this.graph.addNode(newRangeVertex)

@@ -14,7 +14,7 @@ import {Interpreter} from './Interpreter'
 import {getRawValue, InternalScalarValue, RawScalarValue} from './InterpreterValue'
 import {SimpleRangeValue} from './SimpleRangeValue'
 
-const findSmallerRangeForMany = (dependencyGraph: DependencyGraph, conditionRanges: AbsoluteCellRange[], valuesRange: AbsoluteCellRange): {smallerRangeVertex: RangeVertex | null, restConditionRanges: AbsoluteCellRange[], restValuesRange: AbsoluteCellRange} => {
+const findSmallerRangeForMany = (dependencyGraph: DependencyGraph, conditionRanges: AbsoluteCellRange[], valuesRange: AbsoluteCellRange): {smallerRangeVertex?: RangeVertex, restConditionRanges: AbsoluteCellRange[], restValuesRange: AbsoluteCellRange} => {
   if (valuesRange.end.row > valuesRange.start.row) {
     const valuesRangeEndRowLess = simpleCellAddress(valuesRange.end.sheet, valuesRange.end.col, valuesRange.end.row - 1)
     const rowLessVertex = dependencyGraph.getRange(valuesRange.start, valuesRangeEndRowLess)
@@ -27,7 +27,6 @@ const findSmallerRangeForMany = (dependencyGraph: DependencyGraph, conditionRang
     }
   }
   return {
-    smallerRangeVertex: null,
     restValuesRange: valuesRange,
     restConditionRanges: conditionRanges,
   }
@@ -120,7 +119,7 @@ export class CriterionFunctionCompute<T> {
     const {smallerRangeVertex, restConditionRanges, restValuesRange} = findSmallerRangeForMany(this.dependencyGraph, simpleConditionRanges, simpleValuesRange)
 
     let smallerCache
-    if (smallerRangeVertex && this.dependencyGraph.existsEdge(smallerRangeVertex, currentRangeVertex)) {
+    if (smallerRangeVertex !== undefined && this.dependencyGraph.existsEdge(smallerRangeVertex, currentRangeVertex)) {
       smallerCache = smallerRangeVertex.getCriterionFunctionValues(cacheKey)
     } else {
       smallerCache = new Map()

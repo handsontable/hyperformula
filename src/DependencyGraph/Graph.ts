@@ -180,7 +180,7 @@ export class Graph<T> {
    * return a topological sort order, but separates vertices that exist in some cycle
    */
   public topSortWithScc(): TopSortResult<T> {
-    return this.getTopSortedWithSccSubgraphFrom(Array.from(this.nodes), (_node: T) => true, (_node: T) => {})
+    return this.getTopSortedWithSccSubgraphFrom(Array.from(this.nodes), () => true, () => {})
   }
 
   /**
@@ -319,10 +319,7 @@ export class Graph<T> {
   }
 
   private removeDependencies(node: T): T[] {
-    const dependencies = this.dependencyQuery(node)
-    if (!dependencies) {
-      return []
-    }
+    const dependencies = this.dependencyQuery(node) ?? []
     for (const dependency of dependencies) {
       this.softRemoveEdge(dependency, node)
     }
