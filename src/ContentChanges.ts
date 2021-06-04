@@ -3,14 +3,16 @@
  * Copyright (c) 2021 Handsoncode. All rights reserved.
  */
 
-import {SimpleCellAddress} from './Cell'
+import {simpleCellAddress, SimpleCellAddress} from './Cell'
 import {InterpreterValue} from './interpreter/InterpreterValue'
+import {ClipboardCell} from './ClipboardOperations'
 
 export interface CellValueChange {
   sheet: number,
   row: number,
   col: number,
   value: InterpreterValue,
+  oldValue?: ClipboardCell,
 }
 
 export interface ChangeExporter<T> {
@@ -25,19 +27,27 @@ export class ContentChanges {
     return new ContentChanges()
   }
 
-  private changes: ChangeList = []
+  private changes: Map<SimpleCellAddress, CellValueChange> = new Map()
 
   public addAll(other: ContentChanges): ContentChanges {
-    this.changes.push(...other.changes)
+    for (const [key, value] of other.changes.entries()) {
+      this.changes.set(key, value)
+    }
     return this
+  }
+
+  public addChangeWithOldValue(newValue: InterpreterValue, oldValue: ClipboardCell, address: SimpleCellAddress): void {
+    this.addSingleCellValue(newValue, address, oldValue)
   }
 
   public addChange(newValue: InterpreterValue, address: SimpleCellAddress): void {
     this.addSingleCellValue(newValue, address)
   }
 
-  public add(...change: ChangeList) {
-    this.changes.push(...change)
+  public add(...changes: ChangeList) {
+    for (const change of changes) {
+      this.changes.set(simpleCellAddress(change.sheet, change.col, change.row), change)
+    }
   }
 
   public exportChanges<T>(exporter: ChangeExporter<T>): T[] {
@@ -54,19 +64,20 @@ export class ContentChanges {
   }
 
   public getChanges(): ChangeList {
-    return this.changes
+    return Array.from(this.changes.values())
   }
 
   public isEmpty(): boolean {
-    return this.changes.length === 0
+    return this.changes.size === 0
   }
 
-  private addSingleCellValue(value: InterpreterValue, address: SimpleCellAddress) {
+  private addSingleCellValue(value: InterpreterValue, address: SimpleCellAddress, oldValue?: ClipboardCell) {
     this.add({
       sheet: address.sheet,
       col: address.col,
       row: address.row,
       value,
+      oldValue
     })
   }
 }
