@@ -165,11 +165,6 @@ export class MatrixVertex extends FormulaVertex {
     return this.getCellValue()
   }
 
-  setNoSpaceButPreserveSize(): InterpreterValue {
-    this.matrix = new ErroredMatrix(new CellError(ErrorType.REF, ErrorMessage.NoSpaceForArrayResult), new MatrixSize(this.width, this.height, true))
-    return this.getCellValue()
-  }
-
   getRange(): AbsoluteCellRange {
     return AbsoluteCellRange.spanFrom(this.cellAddress, this.width, this.height)
   }

@@ -1026,7 +1026,7 @@ export class DependencyGraph {
   private setNoSpaceIfMatrix(vertex: Vertex | null) {
     if (vertex instanceof MatrixVertex) {
       this.shrinkMatrixToCorner(vertex)
-      vertex.setNoSpaceButPreserveSize()
+      vertex.setNoSpace()
     }
   }
 
