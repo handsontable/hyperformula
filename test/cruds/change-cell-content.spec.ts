@@ -976,4 +976,17 @@ describe('arrays', () => {
     expect(engine.getCellValue(adr('C2'))).toEqual(6)
     expect(engine.getCellValue(adr('D2'))).toEqual(10)
   })
+
+  it.skip('should recalculate matrix if space is available', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=+C1:D1', 'foo', 1, 2]
+    ], {useArrayArithmetic: true})
+    expect(engine.getCellValue(adr('A1'))).toEqual(noSpace())
+
+    engine.setCellContents(adr('B1'), null)
+
+    expect(engine.getSheetValues(0)).toEqual([
+      [1, 2, 1, 2]
+    ])
+  })
 })
