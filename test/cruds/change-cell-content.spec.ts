@@ -1,5 +1,5 @@
-import {ExportedCellChange, HyperFormula, InvalidAddressError, NoSheetWithIdError} from '../../src'
-import {ErrorType, simpleCellAddress} from '../../src/Cell'
+import {ErrorType, ExportedCellChange, HyperFormula, InvalidAddressError, NoSheetWithIdError} from '../../src'
+import {simpleCellAddress} from '../../src/Cell'
 import {Config} from '../../src/Config'
 import {EmptyCellVertex, MatrixVertex, ValueCellVertex} from '../../src/DependencyGraph'
 import {ErrorMessage} from '../../src/error-message'
@@ -11,7 +11,9 @@ import {
   colStart,
   detailedError,
   expectArrayWithSameContent,
-  expectEngineToBeTheSameAs, expectVerticesOfTypes, noSpace,
+  expectEngineToBeTheSameAs,
+  expectVerticesOfTypes,
+  noSpace,
   rowEnd,
   rowStart
 } from '../testUtils'
@@ -975,6 +977,40 @@ describe('arrays', () => {
     expect(engine.getCellValue(adr('B2'))).toEqual(5)
     expect(engine.getCellValue(adr('C2'))).toEqual(6)
     expect(engine.getCellValue(adr('D2'))).toEqual(10)
+  })
+
+  it('should return REF in changes', () => {
+    const engine = HyperFormula.buildFromArray([
+      [1, 2, 3, '=-A1:C1'],
+    ], {useArrayArithmetic: true})
+
+    const changes = engine.setCellContents(adr('E1'), [[null]])
+
+    expect(changes).toContainEqual(new ExportedCellChange(adr('D1'), noSpace()))
+    expect(changes).toContainEqual(new ExportedCellChange(adr('E1'), null))
+    expect(changes).toContainEqual(new ExportedCellChange(adr('F1'), null))
+  })
+
+  it('should undo REF', () => {
+    const engine = HyperFormula.buildFromArray([
+      [1, 2, 3, '=-A1:C1', null, null, 4],
+      ['=D1', '=E1', '=SUM(F1:F1)', '=SUM(F1:G1)'],
+    ], {useArrayArithmetic: true})
+    engine.setCellContents(adr('E1'), [[null]])
+    engine.setCellContents(adr('D1'), [[4, 5, 6]])
+
+    engine.undo()
+    engine.undo()
+
+    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
+      [1, 2, 3, '=-A1:C1', null, null, 4],
+      ['=D1', '=E1', '=SUM(F1:F1)', '=SUM(F1:G1)'],
+    ], {useArrayArithmetic: true}))
+
+    expect(engine.getCellValue(adr('A2'))).toEqual(-1)
+    expect(engine.getCellValue(adr('B2'))).toEqual(-2)
+    expect(engine.getCellValue(adr('C2'))).toEqual(-3)
+    expect(engine.getCellValue(adr('D2'))).toEqual(1)
   })
 
   it.skip('should recalculate matrix if space is available', () => {
