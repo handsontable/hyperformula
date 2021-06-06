@@ -2348,10 +2348,16 @@ export class HyperFormula implements TypedEmitter {
    * @category Ranges
    */
 
-  public getFillRangeData(source: AbsoluteCellRange, target: AbsoluteCellRange): RawCellContent[][] {
-    if(source.sheet !== target.sheet) {
-      throw new SheetsNotEqual(source.sheet, target.sheet)
+  public getFillRangeData(sourceLeftCorner: SimpleCellAddress, sourceWidth: number, sourceHeight: number, targetLeftCorner: SimpleCellAddress, targetWidth: number, targetHeigh: number): RawCellContent[][] {
+    if(sourceLeftCorner.sheet !== targetLeftCorner.sheet) {
+      throw new SheetsNotEqual(sourceLeftCorner.sheet, targetLeftCorner.sheet)
     }
+    validateArgToType(sourceWidth, 'number', 'sourceWidth')
+    validateArgToType(sourceHeight, 'number', 'sourceHeight')
+    validateArgToType(targetWidth, 'number', 'targetWidth')
+    validateArgToType(targetHeigh, 'number', 'targetHeigh')
+    const source = AbsoluteCellRange.spanFrom(sourceLeftCorner, sourceWidth, sourceHeight)
+    const target = AbsoluteCellRange.spanFrom(targetLeftCorner, targetWidth, targetHeigh)
     this.ensureEvaluationIsNotSuspended()
     return target.arrayOfAddressesInRange().map(
       (subarray) => subarray.map(

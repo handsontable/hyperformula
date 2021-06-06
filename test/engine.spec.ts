@@ -779,27 +779,21 @@ describe('#getFillRangeData', () => {
   it('should properly apply wrap-around #1', () => {
     const engine = HyperFormula.buildFromArray([[], [undefined, 1, '=A1'], [undefined, '=$A$1', '2']])
 
-    expect(engine.getFillRangeData(
-      AbsoluteCellRange.fromCoordinates(0, 1, 1, 2, 2),
-      AbsoluteCellRange.fromCoordinates(0, 2, 2, 4, 4))
+    expect(engine.getFillRangeData(adr('B2'), 2, 2, adr('C3'), 3, 3)
     ).toEqual([['2', '=$A$1', '2'], ['=A3', 1, '=C3'], ['2', '=$A$1', '2']])
   })
 
   it('should properly apply wrap-around #2', () => {
     const engine = HyperFormula.buildFromArray([[], [undefined, 1, '=A1'], [undefined, '=$A$1', '2']])
 
-    expect(engine.getFillRangeData(
-      AbsoluteCellRange.fromCoordinates(0, 1, 1, 2, 2),
-      AbsoluteCellRange.fromCoordinates(0, 1, 1, 3, 3))
+    expect(engine.getFillRangeData(adr('B2'), 2, 2, adr('B2'), 3, 3)
     ).toEqual([[1, '=A1', 1], ['=$A$1', '2', '=$A$1'], [1, '=A3', 1]])
   })
 
   it('should properly apply wrap-around #3', () => {
     const engine = HyperFormula.buildFromArray([[], [undefined, 1, '=A1'], [undefined, '=$A$1', '2']])
 
-    expect(engine.getFillRangeData(
-      AbsoluteCellRange.fromCoordinates(0, 1, 1, 2, 2),
-      AbsoluteCellRange.fromCoordinates(0, 0, 0, 2, 2))
+    expect(engine.getFillRangeData(adr('B2'), 2, 2, adr('A1'), 3, 3)
     ).toEqual([['2', '=$A$1', '2'], ['=#REF!', 1, '=A1'], ['2', '=$A$1', '2'] ])
   })
 })
