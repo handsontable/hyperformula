@@ -3,30 +3,31 @@ import {SheetMapping} from '../../src/DependencyGraph'
 import {buildTranslationPackage} from '../../src/i18n'
 import {enGB} from '../../src/i18n/languages'
 import {CellAddress, cellAddressFromString} from '../../src/parser'
+import {adr} from '../testUtils'
 
 describe('cellAddressFromString', () => {
   it('is zero based', () => {
-    expect(cellAddressFromString(new SheetMapping(buildTranslationPackage(enGB)).get, 'A1', simpleCellAddress(0, 0, 0))).toEqual(CellAddress.relative(null, 0, 0))
+    expect(cellAddressFromString(new SheetMapping(buildTranslationPackage(enGB)).get, 'A1', adr('A1'))).toEqual(CellAddress.relative(null, 0, 0))
   })
 
   it('works for bigger rows', () => {
-    expect(cellAddressFromString(new SheetMapping(buildTranslationPackage(enGB)).get, 'A123', simpleCellAddress(0, 0, 0))).toEqual(CellAddress.relative(null, 0, 122))
+    expect(cellAddressFromString(new SheetMapping(buildTranslationPackage(enGB)).get, 'A123', adr('A1'))).toEqual(CellAddress.relative(null, 0, 122))
   })
 
   it('one letter', () => {
-    expect(cellAddressFromString(new SheetMapping(buildTranslationPackage(enGB)).get, 'Z1', simpleCellAddress(0, 0, 0))).toEqual(CellAddress.relative(null, 25, 0))
+    expect(cellAddressFromString(new SheetMapping(buildTranslationPackage(enGB)).get, 'Z1', adr('A1'))).toEqual(CellAddress.relative(null, 25, 0))
   })
 
   it('last letter is Z', () => {
-    expect(cellAddressFromString(new SheetMapping(buildTranslationPackage(enGB)).get, 'AA1', simpleCellAddress(0, 0, 0))).toEqual(CellAddress.relative(null, 26, 0))
+    expect(cellAddressFromString(new SheetMapping(buildTranslationPackage(enGB)).get, 'AA1', adr('A1'))).toEqual(CellAddress.relative(null, 26, 0))
   })
 
   it('works for many letters', () => {
-    expect(cellAddressFromString(new SheetMapping(buildTranslationPackage(enGB)).get, 'ABC1', simpleCellAddress(0, 0, 0))).toEqual(CellAddress.relative(null, 730, 0))
+    expect(cellAddressFromString(new SheetMapping(buildTranslationPackage(enGB)).get, 'ABC1', adr('A1'))).toEqual(CellAddress.relative(null, 730, 0))
   })
 
   it('is not case sensitive', () => {
-    expect(cellAddressFromString(new SheetMapping(buildTranslationPackage(enGB)).get, 'abc1', simpleCellAddress(0, 0, 0))).toEqual(CellAddress.relative(null, 730, 0))
+    expect(cellAddressFromString(new SheetMapping(buildTranslationPackage(enGB)).get, 'abc1', adr('A1'))).toEqual(CellAddress.relative(null, 730, 0))
   })
 
   it('when sheet is missing, its took from base address', () => {

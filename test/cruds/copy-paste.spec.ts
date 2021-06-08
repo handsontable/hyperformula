@@ -81,7 +81,7 @@ describe('Copy - paste integration', () => {
     engine.copy(adr('A1'), 1, 1)
     const changes = engine.paste(adr('A2'))
 
-    expectArrayWithSameContent([new ExportedCellChange(simpleCellAddress(0, 0, 1), null)], changes)
+    expectArrayWithSameContent([new ExportedCellChange(adr('A2'), null)], changes)
   })
 
   it('should work for single number', () => {
@@ -321,8 +321,8 @@ describe('Copy - paste integration', () => {
     const changes = engine.paste(adr('A2'))
 
     expectArrayWithSameContent([
-      new ExportedCellChange(simpleCellAddress(0, 0, 1), 1),
-      new ExportedCellChange(simpleCellAddress(0, 1, 1), 1),
+      new ExportedCellChange(adr('A2'), 1),
+      new ExportedCellChange(adr('B2'), 1),
     ], changes)
   })
 

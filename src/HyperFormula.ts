@@ -3,7 +3,7 @@
  * Copyright (c) 2021 Handsoncode. All rights reserved.
  */
 
-import {AbsoluteCellRange} from './AbsoluteCellRange'
+import {AbsoluteCellRange, SimpleCellRange} from './AbsoluteCellRange'
 import {validateArgToType} from './ArgumentSanitization'
 import {BuildEngineFactory, EngineState} from './BuildEngineFactory'
 import {
@@ -13,7 +13,7 @@ import {
   getCellType,
   getCellValueDetailedType,
   getCellValueFormat,
-  getCellValueType,
+  getCellValueType, instanceOfSimpleCellAddress,
   SimpleCellAddress
 } from './Cell'
 import {CellContent, CellContentParser, RawCellContent} from './CellContentParser'
@@ -1082,9 +1082,7 @@ export class HyperFormula implements TypedEmitter {
    * If returns `true`, doing [[setCellContents]] operation won't throw any errors.
    * Returns `false` if the operation might be disrupted and causes side-effects by the fact that there is a matrix inside selected cells, the address is invalid or the sheet does not exist.
    *
-   * @param {SimpleCellAddress} topLeftCornerAddress -  top left corner of block of cells
-   * @param {number} width - width of the box
-   * @param {number} height - height of the box
+   * @param {SimpleCellAddress | SimpleCellRange} address - single cell or block of cells to check
    *
    * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
    * @example
@@ -1093,29 +1091,29 @@ export class HyperFormula implements TypedEmitter {
    *  ['1', '2'],
    * ]);
    *
-   * // choose the address and assign it to a variable
-   * const address = { col: 0, row: 0, sheet: 0 };
+   * // top left corner
+   * const address1 = { col: 0, row: 0, sheet: 0 };
+   * // bottom right corner
+   * const address2 = { col: 1, row: 0, sheet: 0 };
    *
    * // should return 'true' for this example, it is possible to set content of
    * // width 2, height 1 in the first row and column of sheet 0
-   * const isSettable = hfInstance.isItPossibleToSetCellContents(address, 2, 1);
+   * const isSettable = hfInstance.isItPossibleToSetCellContents({start: address1, end: address2});
    * ```
    *
    * @category Cells
    */
-  public isItPossibleToSetCellContents(topLeftCornerAddress: SimpleCellAddress, width: number = 1, height: number = 1): boolean {
-    validateArgToType(width, 'number', 'width')
-    validateArgToType(height, 'number', 'height')
+  public isItPossibleToSetCellContents(address: SimpleCellAddress | SimpleCellRange): boolean {
+    let range
+    if(instanceOfSimpleCellAddress(address)) {
+      range = new AbsoluteCellRange(address, address)
+    } else {
+      range = new AbsoluteCellRange(address.start, address.end)
+    }
     try {
-      this._crudOperations.ensureRangeInSizeLimits(AbsoluteCellRange.spanFrom(topLeftCornerAddress, width, height))
-      for (let i = 0; i < width; i++) {
-        for (let j = 0; j < height; j++) {
-          this._crudOperations.ensureItIsPossibleToChangeContent({
-            col: topLeftCornerAddress.col + i,
-            row: topLeftCornerAddress.row + j,
-            sheet: topLeftCornerAddress.sheet
-          })
-        }
+      this._crudOperations.ensureRangeInSizeLimits(range)
+      for(let it of range.addresses(this._dependencyGraph)) {
+        this._crudOperations.ensureItIsPossibleToChangeContent(it)
       }
     } catch (e) {
       return false
@@ -1468,7 +1466,7 @@ export class HyperFormula implements TypedEmitter {
    * Checks if it possible to reorder columns of a sheet according to a permutation.
    *
    * @param {number} sheetId - ID of a sheet to operate on
-   * @param {number[]} newRowOrder - permutation of columns
+   * @param {number[]} newColumnOrder - permutation of columns
    *
    * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
    * @example
@@ -1792,9 +1790,7 @@ export class HyperFormula implements TypedEmitter {
    * If returns `true`, doing [[moveCells]] operation won't throw any errors.
    * Returns `false` if the operation might be disrupted and causes side-effects by the fact that there is a matrix inside the selected columns, the target location has matrix or the provided address is invalid.
    *
-   * @param {SimpleCellAddress} sourceLeftCorner - address of the upper left corner of a moved block
-   * @param {number} width - width of the cell block that is being moved
-   * @param {number} height - height of the cell block that is being moved
+   * @param {SimpleCellRange} source - range for a moved block
    * @param {SimpleCellAddress} destinationLeftCorner - upper left address of the target cell block
    *
    * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
@@ -1812,15 +1808,14 @@ export class HyperFormula implements TypedEmitter {
    * // it is possible to move a block of width 1 and height 1
    * // from the corner: column 1 and row 0 of sheet 0
    * // into destination corner: column 3, row 0 of sheet 0
-   * const isMovable = hfInstance.isItPossibleToMoveCells(source, 1, 1, destination);
+   * const isMovable = hfInstance.isItPossibleToMoveCells({start: source, end: source}, destination);
    * ```
    * @category Cells
    */
-  public isItPossibleToMoveCells(sourceLeftCorner: SimpleCellAddress, width: number, height: number, destinationLeftCorner: SimpleCellAddress): boolean {
-    validateArgToType(width, 'number', 'width')
-    validateArgToType(height, 'number', 'height')
+  public isItPossibleToMoveCells(source: SimpleCellRange, destinationLeftCorner: SimpleCellAddress): boolean {
+    const range = new AbsoluteCellRange(source.start, source.end)
     try {
-      this._crudOperations.operations.ensureItIsPossibleToMoveCells(sourceLeftCorner, width, height, destinationLeftCorner)
+      this._crudOperations.operations.ensureItIsPossibleToMoveCells(range.start, range.width(), range.height(), destinationLeftCorner)
       return true
     } catch (e) {
       return false
@@ -1832,9 +1827,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * Note that this method may trigger dependency graph recalculation.
    *
-   * @param {SimpleCellAddress} sourceLeftCorner - address of the upper left corner of a moved block
-   * @param {number} width - width of the cell block that is being moved
-   * @param {number} height - height of the cell block that is being moved
+   * @param {SimpleCellRange} source - range for a moved block
    * @param {SimpleCellAddress} destinationLeftCorner - upper left address of the target cell block
    *
    * @fires [[valuesUpdated]] if recalculation was triggered by this change
@@ -1861,15 +1854,14 @@ export class HyperFormula implements TypedEmitter {
    * //   address: { sheet: 0, col: 0, row: 0 },
    * //   newValue: 0.93524248002062,
    * // }]
-   * const changes = hfInstance.moveCells(source, 1, 1, destination);
+   * const changes = hfInstance.moveCells({start: source, end: source}, destination);
    * ```
    *
    * @category Cells
    */
-  public moveCells(sourceLeftCorner: SimpleCellAddress, width: number, height: number, destinationLeftCorner: SimpleCellAddress): ExportedChange[] {
-    validateArgToType(width, 'number', 'width')
-    validateArgToType(height, 'number', 'height')
-    this._crudOperations.moveCells(sourceLeftCorner, width, height, destinationLeftCorner)
+  public moveCells(source: SimpleCellRange, destinationLeftCorner: SimpleCellAddress): ExportedChange[] {
+    const range = new AbsoluteCellRange(source.start, source.end)
+    this._crudOperations.moveCells(range.start, range.width(), range.height(), destinationLeftCorner)
     return this.recomputeIfDependencyGraphNeedsIt()
   }
 

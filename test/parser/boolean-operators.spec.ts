@@ -9,13 +9,14 @@ import {
   LessThanOrEqualOpAst,
   NotEqualOpAst,
 } from '../../src/parser'
+import {adr} from '../testUtils'
 import {buildEmptyParserWithCaching} from './common'
 
 describe('Parser - Boolean operators', () => {
   it('Equals operator', () => {
     const parser = buildEmptyParserWithCaching(new Config())
 
-    const ast = parser.parse('=1=2', simpleCellAddress(0, 0, 0)).ast as EqualsOpAst
+    const ast = parser.parse('=1=2', adr('A1')).ast as EqualsOpAst
 
     expect(ast.type).toBe(AstNodeType.EQUALS_OP)
   })
@@ -23,7 +24,7 @@ describe('Parser - Boolean operators', () => {
   it('Not equal operator', () => {
     const parser = buildEmptyParserWithCaching(new Config())
 
-    const ast = parser.parse('=1<>2', simpleCellAddress(0, 0, 0)).ast as NotEqualOpAst
+    const ast = parser.parse('=1<>2', adr('A1')).ast as NotEqualOpAst
 
     expect(ast.type).toBe(AstNodeType.NOT_EQUAL_OP)
   })
@@ -31,7 +32,7 @@ describe('Parser - Boolean operators', () => {
   it('Greater than operator', () => {
     const parser = buildEmptyParserWithCaching(new Config())
 
-    const ast = parser.parse('=1>2', simpleCellAddress(0, 0, 0)).ast as GreaterThanOpAst
+    const ast = parser.parse('=1>2', adr('A1')).ast as GreaterThanOpAst
 
     expect(ast.type).toBe(AstNodeType.GREATER_THAN_OP)
   })
@@ -39,7 +40,7 @@ describe('Parser - Boolean operators', () => {
   it('Less than operator', () => {
     const parser = buildEmptyParserWithCaching(new Config())
 
-    const ast = parser.parse('=1<2', simpleCellAddress(0, 0, 0)).ast as LessThanOpAst
+    const ast = parser.parse('=1<2', adr('A1')).ast as LessThanOpAst
 
     expect(ast.type).toBe(AstNodeType.LESS_THAN_OP)
   })
@@ -47,7 +48,7 @@ describe('Parser - Boolean operators', () => {
   it('Greater than or equal operator', () => {
     const parser = buildEmptyParserWithCaching(new Config())
 
-    const ast = parser.parse('=1>=2', simpleCellAddress(0, 0, 0)).ast as GreaterThanOrEqualOpAst
+    const ast = parser.parse('=1>=2', adr('A1')).ast as GreaterThanOrEqualOpAst
 
     expect(ast.type).toBe(AstNodeType.GREATER_THAN_OR_EQUAL_OP)
   })
@@ -55,7 +56,7 @@ describe('Parser - Boolean operators', () => {
   it('Less than or equal operator', () => {
     const parser = buildEmptyParserWithCaching(new Config())
 
-    const ast = parser.parse('=1<=2', simpleCellAddress(0, 0, 0)).ast as LessThanOrEqualOpAst
+    const ast = parser.parse('=1<=2', adr('A1')).ast as LessThanOrEqualOpAst
 
     expect(ast.type).toBe(AstNodeType.LESS_THAN_OR_EQUAL_OP)
   })
@@ -63,7 +64,7 @@ describe('Parser - Boolean operators', () => {
   it('Boolean operator with more complex childs', () => {
     const parser = buildEmptyParserWithCaching(new Config())
 
-    const ast = parser.parse('=1+2=1+2*6', simpleCellAddress(0, 0, 0)).ast as EqualsOpAst
+    const ast = parser.parse('=1+2=1+2*6', adr('A1')).ast as EqualsOpAst
 
     expect(ast.type).toBe(AstNodeType.EQUALS_OP)
     expect(ast.left.type).toBe(AstNodeType.PLUS_OP)

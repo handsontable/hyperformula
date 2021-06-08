@@ -61,7 +61,7 @@ describe('Address dependencies, moved formulas', () => {
       ['3', '2'],
     ])
 
-    engine.moveCells(adr('A1'), 1, 2, adr('B1'))
+    engine.moveCells(AbsoluteCellRange.spanFrom(adr('A1'), 1, 2), adr('B1'))
 
     expect(engine.getCellValue(adr('B1'))).toEqual(3)
     expect(engine.getCellValue(adr('B2'))).toEqual(3)
@@ -715,8 +715,8 @@ describe('overlapping areas', () => {
       ['=TRANSPOSE(A1:B2)'],
     ])
 
-    engine.cut(simpleCellAddress(0, 0, 0), 2, 2)
-    engine.paste(simpleCellAddress(0, 2, 0))
+    engine.cut(adr('A1'), 2, 2)
+    engine.paste(adr('C1', 0))
 
     expect(extractMatrixRange(engine, adr('A3'))).toEqual(new AbsoluteCellRange(adr('C1'), adr('D2')))
   })
@@ -734,8 +734,8 @@ describe('overlapping areas', () => {
 
     expect(extractMatrixRange(engine, adr('A1', 1))).toEqual(new AbsoluteCellRange(adr('A1'), adr('B2')))
 
-    engine.cut(simpleCellAddress(0, 0, 0), 2, 2)
-    engine.paste(simpleCellAddress(0, 2, 0))
+    engine.cut(adr('A1'), 2, 2)
+    engine.paste(adr('C1', 0))
 
     expect(extractMatrixRange(engine, adr('A1', 1))).toEqual(new AbsoluteCellRange(adr('C1'), adr('D2')))
   })
@@ -893,7 +893,7 @@ describe('aborting cut paste', () => {
     ])
 
     engine.cut(adr('A1'), 1, 1)
-    engine.moveCells(adr('B1'), 1, 1, adr('C1'))
+    engine.moveCells(AbsoluteCellRange.spanFrom(adr('B1'), 1, 1), adr('C1'))
 
     expect(engine.isClipboardEmpty()).toBe(true)
   })

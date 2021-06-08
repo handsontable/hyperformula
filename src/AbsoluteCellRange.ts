@@ -13,7 +13,24 @@ import {RowsSpan, Span} from './Span'
 export const DIFFERENT_SHEETS_ERROR = 'AbsoluteCellRange: Start and end are in different sheets'
 export const WRONG_RANGE_SIZE = 'AbsoluteCellRange: Wrong range size'
 
-export class AbsoluteCellRange {
+export interface SimpleCellRange {
+  start: SimpleCellAddress,
+  end: SimpleCellAddress,
+}
+
+export const simpleCellRange = (start: SimpleCellAddress, end: SimpleCellAddress) => ({start, end})
+
+export interface SimpleRowRange {
+  start: SimpleRowAddress,
+  end: SimpleRowAddress,
+}
+
+export interface SimpleColumnRange {
+  start: SimpleColumnAddress,
+  end: SimpleColumnAddress,
+}
+
+export class AbsoluteCellRange implements SimpleCellRange {
   public readonly start: SimpleCellAddress
   public readonly end: SimpleCellAddress
 
@@ -51,8 +68,14 @@ export class AbsoluteCellRange {
 
   public static spanFrom(topLeftCorner: SimpleCellAddress, width: number, height: number): AbsoluteCellRange {
     if (!Number.isFinite(width) && Number.isFinite(height)) {
+      if(topLeftCorner.col !== 0) {
+        throw new Error(WRONG_RANGE_SIZE)
+      }
       return new AbsoluteRowRange(topLeftCorner.sheet, topLeftCorner.row, topLeftCorner.row + height - 1)
     } else if (!Number.isFinite(height) && Number.isFinite(width)) {
+      if(topLeftCorner.row !== 0) {
+        throw new Error(WRONG_RANGE_SIZE)
+      }
       return new AbsoluteColumnRange(topLeftCorner.sheet, topLeftCorner.col, topLeftCorner.col + width - 1)
     } else if (Number.isFinite(height) && Number.isFinite(width)) {
       return new AbsoluteCellRange(

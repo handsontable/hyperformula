@@ -487,7 +487,7 @@ describe('Removing columns - reevaluation', () => {
     const changes = engine.removeColumns(0, [0, 1])
 
     expect(changes.length).toBe(1)
-    expect(changes).toEqual([new ExportedCellChange(simpleCellAddress(0, 1, 0), 2)])
+    expect(changes).toEqual([new ExportedCellChange(adr('B1'), 2)])
   })
 })
 

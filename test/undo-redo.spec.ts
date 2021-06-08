@@ -1,4 +1,5 @@
 import {ErrorType, HyperFormula, NoOperationToRedoError, NoOperationToUndoError} from '../src'
+import {AbsoluteCellRange} from '../src/AbsoluteCellRange'
 import {ErrorMessage} from '../src/error-message'
 import {adr, detailedError, expectEngineToBeTheSameAs} from './testUtils'
 
@@ -602,7 +603,7 @@ describe('Undo - moving cells', () => {
       [null],
     ]
     const engine = HyperFormula.buildFromArray(sheet)
-    engine.moveCells(adr('A1'), 1, 1, adr('A2'))
+    engine.moveCells(AbsoluteCellRange.spanFrom(adr('A1'), 1, 1), adr('A2'))
 
     engine.undo()
 
@@ -615,7 +616,7 @@ describe('Undo - moving cells', () => {
       ['42'],
     ]
     const engine = HyperFormula.buildFromArray(sheet)
-    engine.moveCells(adr('A1'), 1, 1, adr('A2'))
+    engine.moveCells(AbsoluteCellRange.spanFrom(adr('A1'), 1, 1), adr('A2'))
 
     engine.undo()
 
@@ -628,7 +629,7 @@ describe('Undo - moving cells', () => {
       ['42'],
     ]
     const engine = HyperFormula.buildFromArray(sheet)
-    engine.moveCells(adr('A1'), 1, 1, adr('A2'))
+    engine.moveCells(AbsoluteCellRange.spanFrom(adr('A1'), 1, 1), adr('A2'))
 
     engine.undo()
 
@@ -642,7 +643,7 @@ describe('Undo - moving cells', () => {
     ]
     const engine = HyperFormula.buildFromArray(sheet)
     engine.suspendEvaluation()
-    engine.moveCells(adr('A1'), 1, 1, adr('A2'))
+    engine.moveCells(AbsoluteCellRange.spanFrom(adr('A1'), 1, 1), adr('A2'))
 
     engine.undo()
     engine.resumeEvaluation()
@@ -657,7 +658,7 @@ describe('Undo - moving cells', () => {
     })
     engine.addNamedExpression('foo', 'bar', 0)
     engine.setCellContents(adr('A1'), '=foo')
-    engine.moveCells(adr('A1'), 1, 1, adr('A1', 1))
+    engine.moveCells(AbsoluteCellRange.spanFrom(adr('A1'), 1, 1), adr('A1', 1))
 
     engine.undo()
 
@@ -670,7 +671,7 @@ describe('Undo - moving cells', () => {
       'Sheet2': []
     })
     engine.addNamedExpression('foo', 'bar', 0)
-    engine.moveCells(adr('A1'), 1, 1, adr('A1', 1))
+    engine.moveCells(AbsoluteCellRange.spanFrom(adr('A1'), 1, 1), adr('A1', 1))
 
     engine.undo()
 
@@ -1125,7 +1126,7 @@ describe('Redo - moving cells', () => {
       ['42'],
       ['45'],
     ])
-    engine.moveCells(adr('A1'), 1, 1, adr('A2'))
+    engine.moveCells(AbsoluteCellRange.spanFrom(adr('A1'), 1, 1), adr('A2'))
     const snapshot = engine.getAllSheetsSerialized()
     engine.undo()
 
@@ -1139,7 +1140,7 @@ describe('Redo - moving cells', () => {
     engine.setCellContents(adr('A1'), 42)
     engine.undo()
 
-    engine.moveCells(adr('A1'), 1, 1, adr('A2'))
+    engine.moveCells(AbsoluteCellRange.spanFrom(adr('A1'), 1, 1), adr('A2'))
 
     expect(engine.isThereSomethingToRedo()).toBe(false)
   })
