@@ -5,7 +5,7 @@
 
 import {ProcedureAst} from '../../parser'
 import {InterpreterState} from '../InterpreterState'
-import {InternalScalarValue, InterpreterValue} from '../InterpreterValue'
+import {InterpreterValue} from '../InterpreterValue'
 import {ArgumentTypes, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
 
 export class SqrtPlugin extends  FunctionPlugin implements FunctionPluginTypecheck<SqrtPlugin>{

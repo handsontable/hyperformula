@@ -260,7 +260,7 @@ export interface ConfigParams {
    *
    * @category Date and Time
    */
-  parseDateTime: (dateTimeString: string, dateFormat: Maybe<string>, timeFormat: Maybe<string>) => Maybe<DateTime>,
+  parseDateTime: (dateTimeString: string, dateFormat?: string, timeFormat?: string) => Maybe<DateTime>,
   /**
    * Controls how far two numerical values need to be from each other to be treated as non-equal.
    * `a` and `b` are equal if they are of the same sign and:
@@ -473,7 +473,7 @@ export class Config implements ConfigParams, ParserConfig {
   /** @inheritDoc */
   public readonly nullYear: number
   /** @inheritDoc */
-  public readonly parseDateTime: (dateString: string, dateFormat: Maybe<string>, timeFormat: Maybe<string>) => Maybe<SimpleDateTime>
+  public readonly parseDateTime: (dateString: string, dateFormat?: string, timeFormat?: string) => Maybe<SimpleDateTime>
   /** @inheritDoc */
   public readonly stringifyDateTime: (date: SimpleDateTime, formatArg: string) => Maybe<string>
   /** @inheritDoc */

@@ -91,7 +91,7 @@ export class DateTimeHelper {
     }
   }
 
-  private parseSingleFormat(dateString: string, dateFormat: Maybe<string>, timeFormat: Maybe<string>): Maybe<DateTime> {
+  private parseSingleFormat(dateString: string, dateFormat?: string, timeFormat?: string): Maybe<DateTime> {
     const dateTime = this.parseDateTime(dateString, dateFormat, timeFormat)
     if(instanceOfSimpleDate(dateTime)) {
       if(dateTime.year >=0 && dateTime.year < 100) {

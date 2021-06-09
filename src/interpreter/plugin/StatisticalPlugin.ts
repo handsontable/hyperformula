@@ -7,7 +7,7 @@ import {CellError, ErrorType} from '../../Cell'
 import {ErrorMessage} from '../../error-message'
 import {ProcedureAst} from '../../parser'
 import {InterpreterState} from '../InterpreterState'
-import {InternalScalarValue, InterpreterValue} from '../InterpreterValue'
+import {InterpreterValue} from '../InterpreterValue'
 import {besseli, besselj, besselk, bessely} from './3rdparty/bessel/bessel'
 import {
   beta,

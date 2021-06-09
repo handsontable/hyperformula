@@ -8,7 +8,7 @@ import {ErrorMessage} from '../../error-message'
 import {ProcedureAst} from '../../parser'
 import {FunctionPlugin} from '../index'
 import {InterpreterState} from '../InterpreterState'
-import {InternalScalarValue, InterpreterValue} from '../InterpreterValue'
+import {InterpreterValue} from '../InterpreterValue'
 import {ArgumentTypes, FunctionPluginTypecheck} from './FunctionPlugin'
 
 export class FormulaTextPlugin extends FunctionPlugin implements FunctionPluginTypecheck<FormulaTextPlugin>{

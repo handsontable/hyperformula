@@ -35,7 +35,8 @@ import {
   EvaluationSuspendedError,
   LanguageAlreadyRegisteredError,
   LanguageNotRegisteredError,
-  NotAFormulaError, SheetsNotEqual
+  NotAFormulaError,
+  SheetsNotEqual
 } from './errors'
 import {Evaluator} from './Evaluator'
 import {ExportedChange, Exporter} from './Exporter'
@@ -46,7 +47,6 @@ import {FunctionRegistry, FunctionTranslationsPackage} from './interpreter/Funct
 import {FormatInfo} from './interpreter/InterpreterValue'
 import {LazilyTransformingAstService} from './LazilyTransformingAstService'
 import {ColumnSearchStrategy} from './Lookup/SearchStrategy'
-import {Maybe} from './Maybe'
 import {NamedExpression, NamedExpressionOptions, NamedExpressions} from './NamedExpressions'
 import {normalizeAddedIndexes, normalizeRemovedIndexes} from './Operations'
 import {
@@ -545,7 +545,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * @category Static Methods
    */
-  public static getFunctionPlugin(functionId: string): Maybe<FunctionPluginDefinition> {
+  public static getFunctionPlugin(functionId: string): FunctionPluginDefinition | undefined {
     validateArgToType(functionId, 'string', 'functionId')
     return FunctionRegistry.getFunctionPlugin(functionId)
   }
@@ -641,7 +641,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * @category Cells
    */
-  public getCellFormula(cellAddress: SimpleCellAddress): Maybe<string> {
+  public getCellFormula(cellAddress: SimpleCellAddress): string | undefined {
     return this._serialization.getCellFormula(cellAddress)
   }
 
@@ -729,7 +729,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * @category Sheets
    */
-  public getSheetFormulas(sheetId: number): Maybe<string>[][] {
+  public getSheetFormulas(sheetId: number): (string | undefined)[][] {
     validateArgToType(sheetId, 'number', 'sheetId')
     return this._serialization.getSheetFormulas(sheetId)
   }
@@ -861,7 +861,7 @@ export class HyperFormula implements TypedEmitter {
    * ```
    * @category Sheets
    */
-  public getAllSheetsFormulas(): Record<string, Maybe<string>[][]> {
+  public getAllSheetsFormulas(): Record<string, (string | undefined)[][]> {
     return this._serialization.getAllSheetsFormulas()
   }
 
@@ -2262,7 +2262,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * @category Ranges
    */
-  public getRangeFormulas(source: SimpleCellRange): Maybe<string>[][] {
+  public getRangeFormulas(source: SimpleCellRange): (string | undefined)[][] {
     const cellRange = new AbsoluteCellRange(source.start, source.end)
     return cellRange.arrayOfAddressesInRange().map(
       (subarray) => subarray.map(
@@ -2633,7 +2633,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * @category Helpers
    */
-  public simpleCellAddressFromString(cellAddress: string, sheetId: number): Maybe<SimpleCellAddress> {
+  public simpleCellAddressFromString(cellAddress: string, sheetId: number): SimpleCellAddress | undefined {
     validateArgToType(cellAddress, 'string', 'cellAddress')
     validateArgToType(sheetId, 'number', 'sheetId')
     return simpleCellAddressFromString(this.sheetMapping.get, cellAddress, sheetId)
@@ -2656,7 +2656,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * @category Helpers
    */
-  public simpleCellAddressToString(simpleCellAddress: SimpleCellAddress, sheetId: number): Maybe<string> {
+  public simpleCellAddressToString(simpleCellAddress: SimpleCellAddress, sheetId: number): string | undefined {
     validateArgToType(sheetId, 'number', 'sheetId')
     return simpleCellAddressToString(this.sheetMapping.fetchDisplayName, simpleCellAddress, sheetId)
   }
@@ -2680,14 +2680,11 @@ export class HyperFormula implements TypedEmitter {
     let vertex
     if(isSimpleCellAddress(address)) {
       vertex = this._dependencyGraph.addressMapping.getCell(address)
-      if(vertex===null) {
-        return []
-      }
     } else {
       vertex = this._dependencyGraph.rangeMapping.getRange(address.start, address.end)
-      if(vertex===undefined) {
-        return []
-      }
+    }
+    if(vertex===undefined) {
+      return []
     }
     return this._dependencyGraph.getAdjacentNodesAddresses(vertex)
   }
@@ -2711,14 +2708,11 @@ export class HyperFormula implements TypedEmitter {
     let vertex
     if(isSimpleCellAddress(address)) {
       vertex = this._dependencyGraph.addressMapping.getCell(address)
-      if(vertex===null) {
-        return []
-      }
     } else {
       vertex = this._dependencyGraph.rangeMapping.getRange(address.start, address.end)
-      if(vertex===undefined) {
-        return []
-      }
+    }
+    if(vertex===undefined) {
+      return []
     }
     return this._dependencyGraph.dependencyQueryAddresses(vertex)
   }
@@ -2742,7 +2736,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * @category Sheets
    */
-  public getSheetName(sheetId: number): Maybe<string> {
+  public getSheetName(sheetId: number): string | undefined {
     validateArgToType(sheetId, 'number', 'sheetId')
     return this.sheetMapping.getDisplayName(sheetId)
   }
@@ -2787,7 +2781,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * @category Sheets
    */
-  public getSheetId(sheetName: string): Maybe<number> {
+  public getSheetId(sheetName: string): number | undefined {
     validateArgToType(sheetName, 'string', 'sheetName')
     return this.sheetMapping.get(sheetName)
   }
@@ -3369,7 +3363,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * @category Named Expressions
    */
-  public getNamedExpressionValue(expressionName: string, scope?: number): Maybe<CellValue> {
+  public getNamedExpressionValue(expressionName: string, scope?: number): CellValue | undefined {
     validateArgToType(expressionName, 'string', 'expressionName')
     if(scope !== undefined) {
       validateArgToType(scope, 'number', 'scope')
@@ -3409,7 +3403,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * @category Named Expressions
    */
-  public getNamedExpressionFormula(expressionName: string, scope?: number): Maybe<string> {
+  public getNamedExpressionFormula(expressionName: string, scope?: number): string | undefined {
     validateArgToType(expressionName, 'string', 'expressionName')
     if(scope !== undefined) {
       validateArgToType(scope, 'number', 'scope')
@@ -3448,7 +3442,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * @category Named Expressions
    */
-  public getNamedExpression(expressionName: string, scope?: number): Maybe<NamedExpression> {
+  public getNamedExpression(expressionName: string, scope?: number): NamedExpression | undefined {
     validateArgToType(expressionName, 'string', 'expressionName')
     if(scope !== undefined) {
       validateArgToType(scope, 'number', 'scope')
@@ -3735,7 +3729,7 @@ export class HyperFormula implements TypedEmitter {
    */
   public normalizeFormula(formulaString: string): string {
     validateArgToType(formulaString, 'string', 'formulaString')
-    const [ast, address] = this.extractTemporaryFormula(formulaString)
+    const {ast, address} = this.extractTemporaryFormula(formulaString)
     if (ast === undefined) {
       throw new NotAFormulaError()
     }
@@ -3769,7 +3763,7 @@ export class HyperFormula implements TypedEmitter {
     validateArgToType(formulaString, 'string', 'formulaString')
     validateArgToType(sheetId, 'number', 'sheetId')
     this._crudOperations.ensureScopeIdIsValid(sheetId)
-    const [ast, address, dependencies] = this.extractTemporaryFormula(formulaString, sheetId)
+    const {ast, address, dependencies} = this.extractTemporaryFormula(formulaString, sheetId)
     if (ast === undefined) {
       throw new NotAFormulaError()
     }
@@ -3794,7 +3788,7 @@ export class HyperFormula implements TypedEmitter {
    */
   public validateFormula(formulaString: string): boolean {
     validateArgToType(formulaString, 'string', 'formulaString')
-    const [ast] = this.extractTemporaryFormula(formulaString)
+    const {ast} = this.extractTemporaryFormula(formulaString)
     if (ast === undefined) {
       return false
     }
@@ -3845,7 +3839,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * @category Custom Functions
    */
-  public getFunctionPlugin(functionId: string): Maybe<FunctionPluginDefinition> {
+  public getFunctionPlugin(functionId: string): FunctionPluginDefinition | undefined {
     validateArgToType(functionId, 'string', 'functionId')
     return this._functionRegistry.getFunctionPlugin(functionId)
   }
@@ -3936,20 +3930,20 @@ export class HyperFormula implements TypedEmitter {
     return numberToSimpleTime(inputNumber)
   }
 
-  private extractTemporaryFormula(formulaString: string, sheetId: number = 1): [Maybe<Ast>, SimpleCellAddress, RelativeDependency[]] {
+  private extractTemporaryFormula(formulaString: string, sheetId: number = 1): {ast?: Ast, address: SimpleCellAddress, dependencies: RelativeDependency[]} {
     const parsedCellContent = this._cellContentParser.parse(formulaString)
-    const exampleTemporaryFormulaAddress = {sheet: sheetId, col: 0, row: 0}
+    const address = {sheet: sheetId, col: 0, row: 0}
     if (!(parsedCellContent instanceof CellContent.Formula)) {
-      return [undefined, exampleTemporaryFormulaAddress, []]
+      return {address, dependencies: []}
     }
 
-    const {ast, errors, dependencies} = this._parser.parse(parsedCellContent.formula, exampleTemporaryFormulaAddress)
+    const {ast, errors, dependencies} = this._parser.parse(parsedCellContent.formula, address)
 
     if (errors.length > 0) {
-      return [undefined, exampleTemporaryFormulaAddress, []]
+      return {address, dependencies: []}
     }
 
-    return [ast, exampleTemporaryFormulaAddress, dependencies]
+    return {ast, address, dependencies}
   }
 
   /**

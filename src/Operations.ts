@@ -575,7 +575,7 @@ export class Operations {
   public getClipboardCell(address: SimpleCellAddress): ClipboardCell {
     const vertex = this.dependencyGraph.getCell(address)
 
-    if (vertex === null || vertex instanceof EmptyCellVertex) {
+    if (vertex === undefined || vertex instanceof EmptyCellVertex) {
       return {type: ClipboardCellType.EMPTY}
     } else if (vertex instanceof ValueCellVertex) {
       return {type: ClipboardCellType.VALUE, ...vertex.getValues()}

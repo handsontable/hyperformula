@@ -6,7 +6,7 @@
 import {DateTime, SimpleDate, SimpleTime} from './DateTimeHelper'
 import {Maybe} from './Maybe'
 
-export function defaultParseToDateTime(dateTimeString: string, dateFormat: Maybe<string>, timeFormat: Maybe<string>): Maybe<DateTime> {
+export function defaultParseToDateTime(dateTimeString: string, dateFormat?: string, timeFormat?: string): Maybe<DateTime> {
   dateTimeString = dateTimeString.replace(/\s\s+/g, ' ').trim().toLowerCase()
   let ampmtoken: Maybe<string> = dateTimeString.substring(dateTimeString.length - 2)
   if (ampmtoken === 'am' || ampmtoken === 'pm') {

@@ -5,7 +5,7 @@
 
 import {ProcedureAst} from '../../parser'
 import {InterpreterState} from '../InterpreterState'
-import {EmptyValue, InternalScalarValue, InterpreterValue, RawScalarValue} from '../InterpreterValue'
+import {EmptyValue, InterpreterValue, RawScalarValue} from '../InterpreterValue'
 import {ArgumentTypes, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
 
 /**

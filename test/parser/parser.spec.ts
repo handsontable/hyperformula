@@ -6,10 +6,10 @@ import {buildTranslationPackage} from '../../src/i18n'
 import {enGB, plPL} from '../../src/i18n/languages'
 import {
   AstNodeType,
+  buildCellErrorAst,
   CellAddress,
   CellRangeAst,
   CellReferenceAst,
-  ErrorAst,
   MinusOpAst,
   MinusUnaryOpAst,
   NamedExpressionAst,
@@ -22,11 +22,15 @@ import {
 } from '../../src/parser'
 import {columnIndexToLabel} from '../../src/parser/addressRepresentationConverters'
 import {
+  buildCellReferenceAst,
+  buildColumnRangeAst,
+  buildErrorWithRawInputAst,
+  buildNumberAst,
+  buildRowRangeAst,
   ColumnRangeAst,
-  ErrorWithRawInputAst, MatrixAst,
+  MatrixAst,
   ParenthesisAst,
   RangeSheetReferenceType,
-  RowRangeAst
 } from '../../src/parser/Ast'
 import {ColumnAddress} from '../../src/parser/ColumnAddress'
 import {RowAddress} from '../../src/parser/RowAddress'
@@ -43,9 +47,8 @@ describe('ParserWithCaching', () => {
   it('integer literal', () => {
     const parser = buildEmptyParserWithCaching(new Config())
 
-    const ast = parser.parse('=42', adr('A1')).ast as NumberAst
-    expect(ast.type).toBe(AstNodeType.NUMBER)
-    expect(ast.value).toBe(42)
+    const ast = parser.parse('=42', simpleCellAddress(0, 0, 0)).ast
+    expect(ast).toEqual(buildNumberAst(42))
   })
 
   it('negative integer literal', () => {
@@ -53,9 +56,7 @@ describe('ParserWithCaching', () => {
 
     const ast = parser.parse('=-42', adr('A1')).ast as MinusUnaryOpAst
     expect(ast.type).toBe(AstNodeType.MINUS_UNARY_OP)
-    const value = ast.value as NumberAst
-    expect(value.type).toBe(AstNodeType.NUMBER)
-    expect(value.value).toBe(42)
+    expect(ast.value).toEqual(buildNumberAst(42))
   })
 
   it('string literal', () => {
@@ -123,23 +124,19 @@ describe('ParserWithCaching', () => {
 
   it('float literal', () => {
     const parser = buildEmptyParserWithCaching(new Config())
-    const ast = parser.parse('=3.14', adr('A1')).ast as NumberAst
-    expect(ast.type).toBe(AstNodeType.NUMBER)
-    expect(ast.value).toBe(3.14)
+    const ast = parser.parse('=3.14', simpleCellAddress(0, 0, 0)).ast
+    expect(ast).toEqual(buildNumberAst(3.14))
   })
 
   it('float literal with different decimal separator', () => {
     const parser = buildEmptyParserWithCaching(new Config({ decimalSeparator: ',', functionArgSeparator: ';' }), new SheetMapping(buildTranslationPackage(enGB)))
-    const ast1 = parser.parse('=3,14', adr('A1')).ast as NumberAst
-    const ast2 = parser.parse('=03,14', adr('A1')).ast as NumberAst
-    const ast3 = parser.parse('=,14', adr('A1')).ast as NumberAst
+    const ast1 = parser.parse('=3,14', simpleCellAddress(0, 0, 0)).ast
+    const ast2 = parser.parse('=03,14', simpleCellAddress(0, 0, 0)).ast
+    const ast3 = parser.parse('=,14', simpleCellAddress(0, 0, 0)).ast
 
-    expect(ast1.type).toBe(AstNodeType.NUMBER)
-    expect(ast1.value).toBe(3.14)
-    expect(ast2.type).toBe(AstNodeType.NUMBER)
-    expect(ast2.value).toBe(3.14)
-    expect(ast3.type).toBe(AstNodeType.NUMBER)
-    expect(ast3.value).toBe(0.14)
+    expect(ast1).toEqual(buildNumberAst(3.14))
+    expect(ast2).toEqual(buildNumberAst(3.14))
+    expect(ast3).toEqual(buildNumberAst(0.14))
   })
 
   it('leading zeros of number literals', () => {
@@ -167,17 +164,15 @@ describe('ParserWithCaching', () => {
   it('error literal', () => {
     const parser = buildEmptyParserWithCaching(new Config())
 
-    const ast = parser.parse('=#REF!', adr('A1')).ast as ErrorAst
-    expect(ast.type).toBe(AstNodeType.ERROR)
-    expect(ast.error).toEqual(new CellError(ErrorType.REF))
+    const ast = parser.parse('=#REF!', simpleCellAddress(0, 0, 0)).ast
+    expect(ast).toEqual(buildCellErrorAst(new CellError(ErrorType.REF)))
   })
 
   it('error literals are case insensitive', () => {
     const parser = buildEmptyParserWithCaching(new Config())
 
-    const ast = parser.parse('=#rEf!', adr('A1')).ast as ErrorAst
-    expect(ast.type).toBe(AstNodeType.ERROR)
-    expect(ast.error).toEqual(new CellError(ErrorType.REF))
+    const ast = parser.parse('=#rEf!', simpleCellAddress(0, 0, 0)).ast
+    expect(ast).toEqual(buildCellErrorAst(new CellError(ErrorType.REF)))
   })
 
   it('reference to address in nonexisting range returns ref error with data input ast', () => {
@@ -185,11 +180,9 @@ describe('ParserWithCaching', () => {
     sheetMapping.addSheet('Sheet1')
     const parser = buildEmptyParserWithCaching(new Config(), sheetMapping)
 
-    const ast = parser.parse('=Sheet2!A1', adr('A1')).ast as ErrorWithRawInputAst
+    const ast = parser.parse('=Sheet2!A1', simpleCellAddress(0, 0, 0)).ast
 
-    expect(ast.type).toBe(AstNodeType.ERROR_WITH_RAW_INPUT)
-    expect(ast.rawInput).toBe('Sheet2!A1')
-    expect(ast.error.type).toBe(ErrorType.REF)
+    expect(ast).toEqual(buildErrorWithRawInputAst('Sheet2!A1', new CellError(ErrorType.REF)))
   })
 })
 
@@ -291,46 +284,41 @@ describe('cell references and ranges', () => {
   it('absolute cell reference', () => {
     const parser = buildEmptyParserWithCaching(new Config())
 
-    const ast = parser.parse('=$B$3', adr('B2')).ast as CellReferenceAst
+    const ast = parser.parse('=$B$3', simpleCellAddress(0, 1, 1)).ast
 
-    expect(ast.type).toBe(AstNodeType.CELL_REFERENCE)
-    expect(ast.reference).toEqual(CellAddress.absolute(null, 1, 2))
+    expect(ast).toEqual(buildCellReferenceAst(CellAddress.absolute( 1, 2)))
   })
 
   it('relative cell reference', () => {
     const parser = buildEmptyParserWithCaching(new Config())
 
-    const ast = parser.parse('=B3', adr('B2')).ast as CellReferenceAst
+    const ast = parser.parse('=B3', simpleCellAddress(0, 1, 1)).ast
 
-    expect(ast.type).toBe(AstNodeType.CELL_REFERENCE)
-    expect(ast.reference).toEqual(CellAddress.relative(null, 0, 1))
+    expect(ast).toEqual(buildCellReferenceAst(CellAddress.relative(1, 0)))
   })
 
   it('absolute column cell reference', () => {
     const parser = buildEmptyParserWithCaching(new Config())
 
-    const ast = parser.parse('=$B3', adr('B2')).ast as CellReferenceAst
+    const ast = parser.parse('=$B3', simpleCellAddress(0, 1, 1)).ast
 
-    expect(ast.type).toBe(AstNodeType.CELL_REFERENCE)
-    expect(ast.reference).toEqual(CellAddress.absoluteCol(null, 1, 1))
+    expect(ast).toEqual(buildCellReferenceAst(CellAddress.absoluteCol( 1, 1)))
   })
 
   it('absolute row cell reference', () => {
     const parser = buildEmptyParserWithCaching(new Config())
 
-    const ast = parser.parse('=B$3', adr('B2')).ast as CellReferenceAst
+    const ast = parser.parse('=B$3', simpleCellAddress(0, 1, 1)).ast
 
-    expect(ast.type).toBe(AstNodeType.CELL_REFERENCE)
-    expect(ast.reference).toEqual(CellAddress.absoluteRow(null, 0, 2))
+    expect(ast).toEqual(buildCellReferenceAst(CellAddress.absoluteRow( 0, 2)))
   })
 
   it('cell references should not be case sensitive', () => {
     const parser = buildEmptyParserWithCaching(new Config())
 
-    const ast = parser.parse('=d1', adr('A1')).ast as CellReferenceAst
-    expect(ast.type).toBe(AstNodeType.CELL_REFERENCE)
-    expect(ast.reference.col).toBe(3)
-    expect(ast.reference.row).toBe(0)
+    const ast = parser.parse('=d1', simpleCellAddress(0, 0, 0)).ast
+
+    expect(ast).toEqual(buildCellReferenceAst(CellAddress.relative(0, 3)))
   })
 
   it('cell reference by default has sheet from the sheet it is written', () => {
@@ -339,12 +327,9 @@ describe('cell references and ranges', () => {
     sheetMapping.addSheet('Sheet2')
     const parser = buildEmptyParserWithCaching(new Config(), sheetMapping)
 
-    const ast = parser.parse('=D1', adr('A1', 1)).ast as CellReferenceAst
+    const ast = parser.parse('=D1', simpleCellAddress(1, 0, 0)).ast
 
-    expect(ast.type).toBe(AstNodeType.CELL_REFERENCE)
-    expect(ast.reference.sheet).toBe(null)
-    expect(ast.reference.col).toBe(3)
-    expect(ast.reference.row).toBe(0)
+    expect(ast).toEqual(buildCellReferenceAst(CellAddress.relative(0, 3)))
   })
 
   it('cell reference with sheet name', () => {
@@ -353,21 +338,17 @@ describe('cell references and ranges', () => {
     sheetMapping.addSheet('Sheet2')
     const parser = buildEmptyParserWithCaching(new Config(), sheetMapping)
 
-    const ast = parser.parse('=Sheet2!D1', adr('A1')).ast as CellReferenceAst
-    expect(ast.type).toBe(AstNodeType.CELL_REFERENCE)
-    expect(ast.reference.sheet).toBe(1)
-    expect(ast.reference.col).toBe(3)
-    expect(ast.reference.row).toBe(0)
+    const ast = parser.parse('=Sheet2!D1', simpleCellAddress(0, 0, 0)).ast
+
+    expect(ast).toEqual(buildCellReferenceAst(CellAddress.relative(0, 3, 1)))
   })
 
   it('using unknown sheet gives REF', () => {
     const parser = buildEmptyParserWithCaching(new Config())
 
-    const ast = parser.parse('=Sheet2!A1', adr('A1')).ast as ErrorWithRawInputAst
+    const ast = parser.parse('=Sheet2!A1', simpleCellAddress(0, 0, 0)).ast
 
-    expect(ast.type).toBe(AstNodeType.ERROR_WITH_RAW_INPUT)
-    expect(ast.rawInput).toBe('Sheet2!A1')
-    expect(ast.error).toEqual(new CellError(ErrorType.REF))
+    expect(ast).toEqual(buildErrorWithRawInputAst('Sheet2!A1', new CellError(ErrorType.REF)))
   })
 
   it('sheet name with other characters', () => {
@@ -499,7 +480,7 @@ describe('cell references and ranges', () => {
     const parser = buildEmptyParserWithCaching(new Config(), sheetMapping)
     const ast = parser.parse('=OFFSET(A1, 1, 2)', adr('A1')).ast as CellReferenceAst
 
-    expect(ast.reference.sheet).toBe(null)
+    expect(ast.reference.sheet).toBe(undefined)
   })
 
   it('cell range with nonexsiting start sheet should return REF error with data input', () => {
@@ -508,11 +489,9 @@ describe('cell references and ranges', () => {
     sheetMapping.addSheet('Sheet2')
     const parser = buildEmptyParserWithCaching(new Config(), sheetMapping)
 
-    const ast = parser.parse('=Sheet3!A1:Sheet2!B2', adr('A1')).ast as ErrorWithRawInputAst
+    const ast = parser.parse('=Sheet3!A1:Sheet2!B2', simpleCellAddress(0, 0, 0)).ast
 
-    expect(ast.type).toBe(AstNodeType.ERROR_WITH_RAW_INPUT)
-    expect(ast.rawInput).toBe('Sheet3!A1:Sheet2!B2')
-    expect(ast.error.type).toBe(ErrorType.REF)
+    expect(ast).toEqual(buildErrorWithRawInputAst('Sheet3!A1:Sheet2!B2', new CellError(ErrorType.REF)))
   })
 
   it('cell range with nonexsiting end sheet should return REF error with data input', () => {
@@ -521,11 +500,9 @@ describe('cell references and ranges', () => {
     sheetMapping.addSheet('Sheet2')
     const parser = buildEmptyParserWithCaching(new Config(), sheetMapping)
 
-    const ast = parser.parse('=Sheet2!A1:Sheet3!B2', adr('A1')).ast as ErrorWithRawInputAst
+    const ast = parser.parse('=Sheet2!A1:Sheet3!B2', simpleCellAddress(0, 0, 0)).ast
 
-    expect(ast.type).toBe(AstNodeType.ERROR_WITH_RAW_INPUT)
-    expect(ast.rawInput).toBe('Sheet2!A1:Sheet3!B2')
-    expect(ast.error.type).toBe(ErrorType.REF)
+    expect(ast).toEqual(buildErrorWithRawInputAst('Sheet2!A1:Sheet3!B2', new CellError(ErrorType.REF)))
   })
 
   it('cell reference beyond maximum row limit is #NAME', () => {
@@ -535,13 +512,11 @@ describe('cell references and ranges', () => {
     const maxRow = Config.defaultConfig.maxRows
 
     const maxRowAst = parser.parse(`=A${maxRow}`, adr('A1')).ast as CellReferenceAst
-    const maxRowPlusOneAst = parser.parse(`=A${maxRow + 1}`, adr('A1')).ast as ErrorWithRawInputAst
+    const maxRowPlusOneAst = parser.parse(`=A${maxRow + 1}`, adr('A1')).ast
 
     expect(maxRowAst.type).toEqual(AstNodeType.CELL_REFERENCE)
     expect(maxRowAst.reference.row).toEqual(maxRow - 1)
-    expect(maxRowPlusOneAst.type).toEqual(AstNodeType.ERROR_WITH_RAW_INPUT)
-    expect(maxRowPlusOneAst.rawInput).toEqual(`A${maxRow + 1}`)
-    expect(maxRowPlusOneAst.error).toEqual(new CellError(ErrorType.NAME))
+    expect(maxRowPlusOneAst).toEqual(buildErrorWithRawInputAst(`A${maxRow + 1}`, new CellError(ErrorType.NAME)))
   })
 
   it('cell reference beyond maximum column limit is #NAME', () => {
@@ -551,13 +526,11 @@ describe('cell references and ranges', () => {
     const maxColumns = Config.defaultConfig.maxColumns
 
     const maxColumnAst = parser.parse(`=${columnIndexToLabel(maxColumns - 1)}1`, adr('A1')).ast as CellReferenceAst
-    const maxColumnPlusOneAst = parser.parse(`=${columnIndexToLabel(maxColumns)}1`, adr('A1')).ast as ErrorWithRawInputAst
+    const maxColumnPlusOneAst = parser.parse(`=${columnIndexToLabel(maxColumns)}1`, adr('A1')).ast
 
     expect(maxColumnAst.type).toEqual(AstNodeType.CELL_REFERENCE)
     expect(maxColumnAst.reference.col).toEqual(maxColumns - 1)
-    expect(maxColumnPlusOneAst.type).toEqual(AstNodeType.ERROR_WITH_RAW_INPUT)
-    expect(maxColumnPlusOneAst.rawInput).toEqual(`${columnIndexToLabel(maxColumns)}1`)
-    expect(maxColumnPlusOneAst.error).toEqual(new CellError(ErrorType.NAME))
+    expect(maxColumnPlusOneAst).toEqual(buildErrorWithRawInputAst(`${columnIndexToLabel(maxColumns)}1`, new CellError(ErrorType.NAME)))
   })
 
   it('cell range start beyond maximum column/row limit is #NAME', () => {
@@ -567,15 +540,11 @@ describe('cell references and ranges', () => {
     const maxRow = Config.defaultConfig.maxRows
     const maxColumns = Config.defaultConfig.maxColumns
 
-    const ast1 = parser.parse(`=A${maxRow + 1}:B2`, adr('A1')).ast as ErrorWithRawInputAst
-    const ast2 = parser.parse(`=${columnIndexToLabel(maxColumns)}1:B2`, adr('A1')).ast as ErrorWithRawInputAst
+    const ast1 = parser.parse(`=A${maxRow + 1}:B2`, adr('A1')).ast
+    const ast2 = parser.parse(`=${columnIndexToLabel(maxColumns)}1:B2`, adr('A1')).ast
 
-    expect(ast1.type).toEqual(AstNodeType.ERROR_WITH_RAW_INPUT)
-    expect(ast1.rawInput).toEqual(`A${maxRow + 1}:B2`)
-    expect(ast1.error).toEqual(new CellError(ErrorType.NAME))
-    expect(ast2.type).toEqual(AstNodeType.ERROR_WITH_RAW_INPUT)
-    expect(ast2.rawInput).toEqual(`${columnIndexToLabel(maxColumns)}1:B2`)
-    expect(ast2.error).toEqual(new CellError(ErrorType.NAME))
+    expect(ast1).toEqual(buildErrorWithRawInputAst(`A${maxRow + 1}:B2`, new CellError(ErrorType.NAME)))
+    expect(ast2).toEqual(buildErrorWithRawInputAst(`${columnIndexToLabel(maxColumns)}1:B2`, new CellError(ErrorType.NAME)))
   })
 
   it('cell range end beyond maximum column/row limit is #NAME', () => {
@@ -585,15 +554,11 @@ describe('cell references and ranges', () => {
     const maxRow = Config.defaultConfig.maxRows
     const maxColumns = Config.defaultConfig.maxColumns
 
-    const ast1 = parser.parse(`=A1:B${maxRow + 1}`, adr('A1')).ast as ErrorWithRawInputAst
-    const ast2 = parser.parse(`=A1:${columnIndexToLabel(maxColumns)}1`, adr('A1')).ast as ErrorWithRawInputAst
+    const ast1 = parser.parse(`=A1:B${maxRow + 1}`, adr('A1')).ast
+    const ast2 = parser.parse(`=A1:${columnIndexToLabel(maxColumns)}1`, adr('A1')).ast
 
-    expect(ast1.type).toEqual(AstNodeType.ERROR_WITH_RAW_INPUT)
-    expect(ast1.rawInput).toEqual(`A1:B${maxRow + 1}`)
-    expect(ast1.error).toEqual(new CellError(ErrorType.NAME))
-    expect(ast2.type).toEqual(AstNodeType.ERROR_WITH_RAW_INPUT)
-    expect(ast2.rawInput).toEqual(`A1:${columnIndexToLabel(maxColumns)}1`)
-    expect(ast2.error).toEqual(new CellError(ErrorType.NAME))
+    expect(ast1).toEqual(buildErrorWithRawInputAst(`A1:B${maxRow + 1}`, new CellError(ErrorType.NAME)))
+    expect(ast2).toEqual(buildErrorWithRawInputAst(`A1:${columnIndexToLabel(maxColumns)}1`, new CellError(ErrorType.NAME)))
   })
 })
 
@@ -604,43 +569,28 @@ describe('Column ranges', () => {
   const parser = buildEmptyParserWithCaching(new Config(), sheetMapping)
 
   it('column range', () => {
-    const ast = parser.parse('=C:D', adr('A1')).ast as ColumnRangeAst
-    expect(ast.type).toEqual(AstNodeType.COLUMN_RANGE)
-    expect(ast.sheetReferenceType).toEqual(RangeSheetReferenceType.RELATIVE)
-    expect(ast.start).toEqual(ColumnAddress.relative(null, 2))
-    expect(ast.end).toEqual(ColumnAddress.relative(null, 3))
+    const ast = parser.parse('=C:D', adr('A1')).ast
+    expect(ast).toEqual(buildColumnRangeAst(ColumnAddress.relative(2), ColumnAddress.relative(3), RangeSheetReferenceType.RELATIVE))
   })
 
   it('column range with sheet absolute', () => {
-    const ast = parser.parse('=Sheet1!C:D', adr('A1')).ast as ColumnRangeAst
-    expect(ast.type).toEqual(AstNodeType.COLUMN_RANGE)
-    expect(ast.sheetReferenceType).toEqual(RangeSheetReferenceType.START_ABSOLUTE)
-    expect(ast.start).toEqual(ColumnAddress.relative(0, 2))
-    expect(ast.end).toEqual(ColumnAddress.relative(0, 3))
+    const ast = parser.parse('=Sheet1!C:D', adr('A1')).ast
+    expect(ast).toEqual(buildColumnRangeAst(ColumnAddress.relative(2, 0), ColumnAddress.relative(3, 0), RangeSheetReferenceType.START_ABSOLUTE))
   })
 
   it('column range with both sheets absolute - same sheet', () => {
-    const ast = parser.parse('=Sheet1!C:Sheet1!D', adr('A1')).ast as ColumnRangeAst
-    expect(ast.type).toEqual(AstNodeType.COLUMN_RANGE)
-    expect(ast.sheetReferenceType).toEqual(RangeSheetReferenceType.BOTH_ABSOLUTE)
-    expect(ast.start).toEqual(ColumnAddress.relative(0, 2))
-    expect(ast.end).toEqual(ColumnAddress.relative(0, 3))
+    const ast = parser.parse('=Sheet1!C:Sheet1!D', adr('A1')).ast
+    expect(ast).toEqual(buildColumnRangeAst(ColumnAddress.relative(2, 0), ColumnAddress.relative(3, 0), RangeSheetReferenceType.BOTH_ABSOLUTE))
   })
 
   it('column range with both sheets absolute - different sheet', () => {
-    const ast = parser.parse('=Sheet1!C:Sheet2!D', adr('A1')).ast as ColumnRangeAst
-    expect(ast.type).toEqual(AstNodeType.COLUMN_RANGE)
-    expect(ast.sheetReferenceType).toEqual(RangeSheetReferenceType.BOTH_ABSOLUTE)
-    expect(ast.start).toEqual(ColumnAddress.relative(0, 2))
-    expect(ast.end).toEqual(ColumnAddress.relative(1, 3))
+    const ast = parser.parse('=Sheet1!C:Sheet2!D', adr('A1')).ast
+    expect(ast).toEqual(buildColumnRangeAst(ColumnAddress.relative(2, 0), ColumnAddress.relative(3, 1), RangeSheetReferenceType.BOTH_ABSOLUTE))
   })
 
   it('column range with absolute column address', () => {
-    const ast = parser.parse('=$C:D', adr('A1')).ast as ColumnRangeAst
-    expect(ast.type).toEqual(AstNodeType.COLUMN_RANGE)
-    expect(ast.sheetReferenceType).toEqual(RangeSheetReferenceType.RELATIVE)
-    expect(ast.start).toEqual(ColumnAddress.absolute(null, 2))
-    expect(ast.end).toEqual(ColumnAddress.relative(null, 3))
+    const ast = parser.parse('=$C:D', adr('A1')).ast
+    expect(ast).toEqual(buildColumnRangeAst(ColumnAddress.absolute(2), ColumnAddress.relative(3), RangeSheetReferenceType.RELATIVE))
   })
 
   it('column range with absolute sheet only on end side is a parsing error', () => {
@@ -651,16 +601,12 @@ describe('Column ranges', () => {
   it('column range beyond size limits is #NAME', () => {
     const maxColumns = Config.defaultConfig.maxColumns
     const ast1 = parser.parse(`=A:${columnIndexToLabel(maxColumns - 1)}`, adr('A1')).ast as ColumnRangeAst
-    const ast2 = parser.parse(`=A:${columnIndexToLabel(maxColumns)}`, adr('A1')).ast as ErrorWithRawInputAst
-    const ast3 = parser.parse(`=${columnIndexToLabel(maxColumns)}:B`, adr('A1')).ast as ErrorWithRawInputAst
+    const ast2 = parser.parse(`=A:${columnIndexToLabel(maxColumns)}`, adr('A1')).ast
+    const ast3 = parser.parse(`=${columnIndexToLabel(maxColumns)}:B`, adr('A1')).ast
 
     expect(ast1.type).toEqual(AstNodeType.COLUMN_RANGE)
-    expect(ast2.type).toEqual(AstNodeType.ERROR_WITH_RAW_INPUT)
-    expect(ast2.rawInput).toEqual(`A:${columnIndexToLabel(maxColumns)}`)
-    expect(ast2.error).toEqual(new CellError(ErrorType.NAME))
-    expect(ast3.type).toEqual(AstNodeType.ERROR_WITH_RAW_INPUT)
-    expect(ast3.rawInput).toEqual(`${columnIndexToLabel(maxColumns)}:B`)
-    expect(ast3.error).toEqual(new CellError(ErrorType.NAME))
+    expect(ast2).toEqual(buildErrorWithRawInputAst(`A:${columnIndexToLabel(maxColumns)}`, new CellError(ErrorType.NAME)))
+    expect(ast3).toEqual(buildErrorWithRawInputAst(`${columnIndexToLabel(maxColumns)}:B`, new CellError(ErrorType.NAME)))
   })
 })
 
@@ -671,43 +617,28 @@ describe('Row ranges', () => {
   const parser = buildEmptyParserWithCaching(new Config(), sheetMapping)
 
   it('row range', () => {
-    const ast = parser.parse('=3:4', adr('A1')).ast as RowRangeAst
-    expect(ast.type).toEqual(AstNodeType.ROW_RANGE)
-    expect(ast.sheetReferenceType).toEqual(RangeSheetReferenceType.RELATIVE)
-    expect(ast.start).toEqual(RowAddress.relative(null, 2))
-    expect(ast.end).toEqual(RowAddress.relative(null, 3))
+    const ast = parser.parse('=3:4', adr('A1')).ast
+    expect(ast).toEqual(buildRowRangeAst(RowAddress.relative(2), RowAddress.relative(3), RangeSheetReferenceType.RELATIVE))
   })
 
   it('row range with sheet absolute', () => {
-    const ast = parser.parse('=Sheet1!3:4', adr('A1')).ast as RowRangeAst
-    expect(ast.type).toEqual(AstNodeType.ROW_RANGE)
-    expect(ast.sheetReferenceType).toEqual(RangeSheetReferenceType.START_ABSOLUTE)
-    expect(ast.start).toEqual(RowAddress.relative(0, 2))
-    expect(ast.end).toEqual(RowAddress.relative(0, 3))
+    const ast = parser.parse('=Sheet1!3:4', adr('A1')).ast
+    expect(ast).toEqual(buildRowRangeAst(RowAddress.relative(2, 0), RowAddress.relative(3, 0), RangeSheetReferenceType.START_ABSOLUTE))
   })
 
   it('row range with both sheets absolute - same sheet', () => {
-    const ast = parser.parse('=Sheet1!3:Sheet1!4', adr('A1')).ast as RowRangeAst
-    expect(ast.type).toEqual(AstNodeType.ROW_RANGE)
-    expect(ast.sheetReferenceType).toEqual(RangeSheetReferenceType.BOTH_ABSOLUTE)
-    expect(ast.start).toEqual(RowAddress.relative(0, 2))
-    expect(ast.end).toEqual(RowAddress.relative(0, 3))
+    const ast = parser.parse('=Sheet1!3:Sheet1!4', adr('A1')).ast
+    expect(ast).toEqual(buildRowRangeAst(RowAddress.relative(2, 0), RowAddress.relative(3, 0), RangeSheetReferenceType.BOTH_ABSOLUTE))
   })
 
   it('row range with both sheets absolute - different sheet', () => {
-    const ast = parser.parse('=Sheet1!3:Sheet2!4', adr('A1')).ast as RowRangeAst
-    expect(ast.type).toEqual(AstNodeType.ROW_RANGE)
-    expect(ast.sheetReferenceType).toEqual(RangeSheetReferenceType.BOTH_ABSOLUTE)
-    expect(ast.start).toEqual(RowAddress.relative(0, 2))
-    expect(ast.end).toEqual(RowAddress.relative(1, 3))
+    const ast = parser.parse('=Sheet1!3:Sheet2!4', adr('A1')).ast
+    expect(ast).toEqual(buildRowRangeAst(RowAddress.relative(2, 0), RowAddress.relative(3, 1), RangeSheetReferenceType.BOTH_ABSOLUTE))
   })
 
   it('row range with absolute row address', () => {
-    const ast = parser.parse('=$3:4', adr('A1')).ast as RowRangeAst
-    expect(ast.type).toEqual(AstNodeType.ROW_RANGE)
-    expect(ast.sheetReferenceType).toEqual(RangeSheetReferenceType.RELATIVE)
-    expect(ast.start).toEqual(RowAddress.absolute(null, 2))
-    expect(ast.end).toEqual(RowAddress.relative(null, 3))
+    const ast = parser.parse('=$3:4', adr('A1')).ast
+    expect(ast).toEqual(buildRowRangeAst(RowAddress.absolute(2), RowAddress.relative(3), RangeSheetReferenceType.RELATIVE))
   })
 
   it('row range with absolute sheet only on end side is a parsing error', () => {

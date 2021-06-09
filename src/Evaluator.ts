@@ -37,7 +37,7 @@ export class Evaluator {
     private readonly numberLiteralsHelper: NumberLiteralHelper,
     private readonly functionRegistry: FunctionRegistry,
     private readonly namedExpressions: NamedExpressions,
-    private readonly serialization: Serialization
+    private readonly serialization: Serialization,
   ) {
     this.interpreter = new Interpreter(this.dependencyGraph, this.columnSearch, this.config, this.stats, this.dateHelper, this.numberLiteralsHelper, this.functionRegistry, this.namedExpressions, this.serialization)
     this.lazilyTransformingAstService = this.dependencyGraph.lazilyTransformingAstService
@@ -62,7 +62,7 @@ export class Evaluator {
           if (vertex instanceof FormulaVertex) {
             const address = vertex.getAddress(this.dependencyGraph.lazilyTransformingAstService)
             const formula = vertex.getFormula(this.dependencyGraph.lazilyTransformingAstService)
-            const currentValue = vertex.isComputed() ? vertex.getCellValue() : null
+            const currentValue = vertex.isComputed() ? vertex.getCellValue() : undefined
             const newCellValue = this.evaluateAstToCellValue(formula, new InterpreterState(address, this.config.useArrayArithmetic))
             const setValue = vertex.setCellValue(newCellValue)
             if (newCellValue !== currentValue) {

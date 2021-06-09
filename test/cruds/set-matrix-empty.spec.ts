@@ -41,7 +41,7 @@ describe('Set matrix empty', () => {
     expect(dependencyGraph.existsEdge(matrixVertex, formula)).toBe(false)
     expect(dependencyGraph.existsEdge(a1, formula)).toBe(true)
     expect(dependencyGraph.existsEdge(a2, formula)).toBe(true)
-    expect(a3).toBe(null)
+    expect(a3).toBe(undefined)
   })
 
   it('should adjust edges between matrix cells and formula matrix', () => {
@@ -115,7 +115,7 @@ describe('Set matrix empty', () => {
     expect(dependencyGraph.existsEdge(matrixVertex, rangeVertex)).toBe(false)
     expect(dependencyGraph.existsEdge(a1, rangeVertex)).toBe(true)
     expect(dependencyGraph.existsEdge(a2, rangeVertex)).toBe(true)
-    expect(a3).toBe(null)
+    expect(a3).toBe(undefined)
     expect(engine.getCellValue(adr('A1'))).toBe(1)
   })
 })

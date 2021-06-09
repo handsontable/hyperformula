@@ -52,8 +52,8 @@ export class ColumnIndex implements ColumnSearchStrategy {
     }
   }
 
-  public remove(value: RawInterpreterValue | null, address: SimpleCellAddress) {
-    if (!value) {
+  public remove(value: RawInterpreterValue | undefined, address: SimpleCellAddress) {
+    if (value === undefined) {
       return
     }
 
@@ -66,7 +66,7 @@ export class ColumnIndex implements ColumnSearchStrategy {
     }
   }
 
-  public change(oldValue: RawInterpreterValue | null, newValue: RawInterpreterValue, address: SimpleCellAddress) {
+  public change(oldValue: RawInterpreterValue | undefined, newValue: RawInterpreterValue, address: SimpleCellAddress) {
     if (oldValue === newValue) {
       return
     }
