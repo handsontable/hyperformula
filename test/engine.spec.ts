@@ -637,6 +637,15 @@ describe('#getCellValueFormat', () => {
   it('currency', () => {
     const engine = HyperFormula.buildFromArray([['1PLN']], {currencySymbol: ['PLN', '$']})
     expect(engine.getCellValueFormat(adr('A1'))).toEqual('PLN')
+    expect(engine.getCellValue(adr('A1'))).toEqual(1)
+    expect(engine.getCellValueDetailedType(adr('A1'))).toEqual(CellValueDetailedType.NUMBER_CURRENCY)
+  })
+
+  it('unicode currency', () => {
+    const engine = HyperFormula.buildFromArray([['1₪']], {currencySymbol: ['₪']})
+    expect(engine.getCellValueFormat(adr('A1'))).toEqual('₪')
+    expect(engine.getCellValue(adr('A1'))).toEqual(1)
+    expect(engine.getCellValueDetailedType(adr('A1'))).toEqual(CellValueDetailedType.NUMBER_CURRENCY)
   })
 })
 
