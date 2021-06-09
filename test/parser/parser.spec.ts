@@ -47,7 +47,7 @@ describe('ParserWithCaching', () => {
   it('integer literal', () => {
     const parser = buildEmptyParserWithCaching(new Config())
 
-    const ast = parser.parse('=42', simpleCellAddress(0, 0, 0)).ast
+    const ast = parser.parse('=42', adr('A1')).ast
     expect(ast).toEqual(buildNumberAst(42))
   })
 
@@ -124,15 +124,15 @@ describe('ParserWithCaching', () => {
 
   it('float literal', () => {
     const parser = buildEmptyParserWithCaching(new Config())
-    const ast = parser.parse('=3.14', simpleCellAddress(0, 0, 0)).ast
+    const ast = parser.parse('=3.14', adr('A1')).ast
     expect(ast).toEqual(buildNumberAst(3.14))
   })
 
   it('float literal with different decimal separator', () => {
     const parser = buildEmptyParserWithCaching(new Config({ decimalSeparator: ',', functionArgSeparator: ';' }), new SheetMapping(buildTranslationPackage(enGB)))
-    const ast1 = parser.parse('=3,14', simpleCellAddress(0, 0, 0)).ast
-    const ast2 = parser.parse('=03,14', simpleCellAddress(0, 0, 0)).ast
-    const ast3 = parser.parse('=,14', simpleCellAddress(0, 0, 0)).ast
+    const ast1 = parser.parse('=3,14', adr('A1')).ast
+    const ast2 = parser.parse('=03,14', adr('A1')).ast
+    const ast3 = parser.parse('=,14', adr('A1')).ast
 
     expect(ast1).toEqual(buildNumberAst(3.14))
     expect(ast2).toEqual(buildNumberAst(3.14))
@@ -164,14 +164,14 @@ describe('ParserWithCaching', () => {
   it('error literal', () => {
     const parser = buildEmptyParserWithCaching(new Config())
 
-    const ast = parser.parse('=#REF!', simpleCellAddress(0, 0, 0)).ast
+    const ast = parser.parse('=#REF!', adr('A1')).ast
     expect(ast).toEqual(buildCellErrorAst(new CellError(ErrorType.REF)))
   })
 
   it('error literals are case insensitive', () => {
     const parser = buildEmptyParserWithCaching(new Config())
 
-    const ast = parser.parse('=#rEf!', simpleCellAddress(0, 0, 0)).ast
+    const ast = parser.parse('=#rEf!', adr('A1')).ast
     expect(ast).toEqual(buildCellErrorAst(new CellError(ErrorType.REF)))
   })
 
@@ -180,7 +180,7 @@ describe('ParserWithCaching', () => {
     sheetMapping.addSheet('Sheet1')
     const parser = buildEmptyParserWithCaching(new Config(), sheetMapping)
 
-    const ast = parser.parse('=Sheet2!A1', simpleCellAddress(0, 0, 0)).ast
+    const ast = parser.parse('=Sheet2!A1', adr('A1')).ast
 
     expect(ast).toEqual(buildErrorWithRawInputAst('Sheet2!A1', new CellError(ErrorType.REF)))
   })
@@ -284,7 +284,7 @@ describe('cell references and ranges', () => {
   it('absolute cell reference', () => {
     const parser = buildEmptyParserWithCaching(new Config())
 
-    const ast = parser.parse('=$B$3', simpleCellAddress(0, 1, 1)).ast
+    const ast = parser.parse('=$B$3', adr('B2')).ast
 
     expect(ast).toEqual(buildCellReferenceAst(CellAddress.absolute( 1, 2)))
   })
@@ -292,7 +292,7 @@ describe('cell references and ranges', () => {
   it('relative cell reference', () => {
     const parser = buildEmptyParserWithCaching(new Config())
 
-    const ast = parser.parse('=B3', simpleCellAddress(0, 1, 1)).ast
+    const ast = parser.parse('=B3', adr('B2')).ast
 
     expect(ast).toEqual(buildCellReferenceAst(CellAddress.relative(1, 0)))
   })
@@ -300,7 +300,7 @@ describe('cell references and ranges', () => {
   it('absolute column cell reference', () => {
     const parser = buildEmptyParserWithCaching(new Config())
 
-    const ast = parser.parse('=$B3', simpleCellAddress(0, 1, 1)).ast
+    const ast = parser.parse('=$B3', adr('B2')).ast
 
     expect(ast).toEqual(buildCellReferenceAst(CellAddress.absoluteCol( 1, 1)))
   })
@@ -308,7 +308,7 @@ describe('cell references and ranges', () => {
   it('absolute row cell reference', () => {
     const parser = buildEmptyParserWithCaching(new Config())
 
-    const ast = parser.parse('=B$3', simpleCellAddress(0, 1, 1)).ast
+    const ast = parser.parse('=B$3', adr('B2')).ast
 
     expect(ast).toEqual(buildCellReferenceAst(CellAddress.absoluteRow( 0, 2)))
   })
@@ -316,7 +316,7 @@ describe('cell references and ranges', () => {
   it('cell references should not be case sensitive', () => {
     const parser = buildEmptyParserWithCaching(new Config())
 
-    const ast = parser.parse('=d1', simpleCellAddress(0, 0, 0)).ast
+    const ast = parser.parse('=d1', adr('A1')).ast
 
     expect(ast).toEqual(buildCellReferenceAst(CellAddress.relative(0, 3)))
   })
@@ -327,7 +327,7 @@ describe('cell references and ranges', () => {
     sheetMapping.addSheet('Sheet2')
     const parser = buildEmptyParserWithCaching(new Config(), sheetMapping)
 
-    const ast = parser.parse('=D1', simpleCellAddress(1, 0, 0)).ast
+    const ast = parser.parse('=D1', adr('A1', 1)).ast
 
     expect(ast).toEqual(buildCellReferenceAst(CellAddress.relative(0, 3)))
   })
@@ -338,7 +338,7 @@ describe('cell references and ranges', () => {
     sheetMapping.addSheet('Sheet2')
     const parser = buildEmptyParserWithCaching(new Config(), sheetMapping)
 
-    const ast = parser.parse('=Sheet2!D1', simpleCellAddress(0, 0, 0)).ast
+    const ast = parser.parse('=Sheet2!D1', adr('A1')).ast
 
     expect(ast).toEqual(buildCellReferenceAst(CellAddress.relative(0, 3, 1)))
   })
@@ -346,7 +346,7 @@ describe('cell references and ranges', () => {
   it('using unknown sheet gives REF', () => {
     const parser = buildEmptyParserWithCaching(new Config())
 
-    const ast = parser.parse('=Sheet2!A1', simpleCellAddress(0, 0, 0)).ast
+    const ast = parser.parse('=Sheet2!A1', adr('A1')).ast
 
     expect(ast).toEqual(buildErrorWithRawInputAst('Sheet2!A1', new CellError(ErrorType.REF)))
   })
@@ -489,7 +489,7 @@ describe('cell references and ranges', () => {
     sheetMapping.addSheet('Sheet2')
     const parser = buildEmptyParserWithCaching(new Config(), sheetMapping)
 
-    const ast = parser.parse('=Sheet3!A1:Sheet2!B2', simpleCellAddress(0, 0, 0)).ast
+    const ast = parser.parse('=Sheet3!A1:Sheet2!B2', adr('A1')).ast
 
     expect(ast).toEqual(buildErrorWithRawInputAst('Sheet3!A1:Sheet2!B2', new CellError(ErrorType.REF)))
   })
@@ -500,7 +500,7 @@ describe('cell references and ranges', () => {
     sheetMapping.addSheet('Sheet2')
     const parser = buildEmptyParserWithCaching(new Config(), sheetMapping)
 
-    const ast = parser.parse('=Sheet2!A1:Sheet3!B2', simpleCellAddress(0, 0, 0)).ast
+    const ast = parser.parse('=Sheet2!A1:Sheet3!B2', adr('A1')).ast
 
     expect(ast).toEqual(buildErrorWithRawInputAst('Sheet2!A1:Sheet3!B2', new CellError(ErrorType.REF)))
   })
