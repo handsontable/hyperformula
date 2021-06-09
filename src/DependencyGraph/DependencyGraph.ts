@@ -3,9 +3,9 @@
  * Copyright (c) 2021 Handsoncode. All rights reserved.
  */
 
-import {AbsoluteCellRange} from '../AbsoluteCellRange'
+import {AbsoluteCellRange, SimpleCellRange, simpleCellRange} from '../AbsoluteCellRange'
 import {absolutizeDependencies} from '../absolutizeDependencies'
-import {CellError, ErrorType, simpleCellAddress, SimpleCellAddress} from '../Cell'
+import {CellError, ErrorType, isSimpleCellAddress, simpleCellAddress, SimpleCellAddress} from '../Cell'
 import {RawCellContent} from '../CellContentParser'
 import {CellDependency} from '../CellDependency'
 import {Config} from '../Config'
@@ -653,7 +653,7 @@ export class DependencyGraph {
     }
   }
 
-  public dependencyQueryAddresses: (vertex: Vertex) => Maybe<(SimpleCellAddress | AbsoluteCellRange)[]> = (vertex: Vertex) => {
+  public dependencyQueryAddresses: (vertex: Vertex) => (SimpleCellAddress | SimpleCellRange)[] = (vertex: Vertex) => {
     if (vertex instanceof RangeVertex) {
       return this.rangeDependencyQuery(vertex).map(([address, _]) => address)
     } else {
@@ -662,19 +662,20 @@ export class DependencyGraph {
         const [address, dependencies] = dependenciesResult
         return dependencies.map((dependency: CellDependency) => {
           if (dependency instanceof NamedExpressionDependency) {
-            const namedExpression = this.namedExpressions.namedExpressionOrPlaceholder(dependency.name, address.sheet)
-            return namedExpression.address
-          } else {
+            return this.namedExpressions.namedExpressionOrPlaceholder(dependency.name, address.sheet).address
+          } else if (isSimpleCellAddress(dependency)) {
             return dependency
+          } else {
+            return simpleCellRange(dependency.start, dependency.end)
           }
         })
       } else {
-        return undefined
+        return []
       }
     }
   }
 
-  public dependencyQueryVertices: (vertex: Vertex) => Maybe<Vertex[]> = (vertex: Vertex) => {
+  public dependencyQueryVertices: (vertex: Vertex) => Vertex[] = (vertex: Vertex) => {
     if (vertex instanceof RangeVertex) {
       return this.rangeDependencyQuery(vertex).map(([_, v]) => v)
     } else {
@@ -692,7 +693,7 @@ export class DependencyGraph {
           }
         })
       } else {
-        return undefined
+        return []
       }
     }
   }
@@ -881,13 +882,13 @@ export class DependencyGraph {
     }
   }
 
-  public getAdjacentNodesAddresses(inputVertex: Vertex): (AbsoluteCellRange | SimpleCellAddress)[] {
+  public getAdjacentNodesAddresses(inputVertex: Vertex): (SimpleCellRange | SimpleCellAddress)[] {
     const deps = this.graph.adjacentNodes(inputVertex)
-    const ret: (AbsoluteCellRange | SimpleCellAddress)[] = []
+    const ret: (SimpleCellRange | SimpleCellAddress)[] = []
     deps.forEach((vertex: Vertex) => {
       const castVertex = vertex as RangeVertex | FormulaCellVertex | MatrixVertex
       if (castVertex instanceof RangeVertex) {
-        ret.push(new AbsoluteCellRange(castVertex.start, castVertex.end))
+        ret.push(simpleCellRange(castVertex.start, castVertex.end))
       } else {
         ret.push(castVertex.getAddress(this.lazilyTransformingAstService))
       }

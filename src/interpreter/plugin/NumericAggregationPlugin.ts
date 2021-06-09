@@ -3,9 +3,10 @@
  * Copyright (c) 2021 Handsoncode. All rights reserved.
  */
 
-import {AbsoluteCellRange, DIFFERENT_SHEETS_ERROR} from '../../AbsoluteCellRange'
+import {AbsoluteCellRange} from '../../AbsoluteCellRange'
 import {CellError, ErrorType} from '../../Cell'
 import {ErrorMessage} from '../../error-message'
+import {SheetsNotEqual} from '../../errors'
 import {Maybe} from '../../Maybe'
 import {Ast, AstNodeType, CellRangeAst, ProcedureAst} from '../../parser'
 import {ColumnRangeAst, RowRangeAst} from '../../parser/Ast'
@@ -614,7 +615,7 @@ export class NumericAggregationPlugin extends FunctionPlugin implements Function
     try {
       range = AbsoluteCellRange.fromAst(ast, state.formulaAddress)
     } catch (err) {
-      if (err.message === DIFFERENT_SHEETS_ERROR) {
+      if (err instanceof SheetsNotEqual) {
         return new CellError(ErrorType.REF, ErrorMessage.RangeManySheets)
       } else {
         throw err

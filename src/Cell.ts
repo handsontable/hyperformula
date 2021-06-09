@@ -187,9 +187,25 @@ export const movedSimpleCellAddress = (address: SimpleCellAddress, toSheet: numb
   return simpleCellAddress(toSheet, address.col + toRight, address.row + toBottom)
 }
 
-export function instanceOfSimpleCellAddress(obj: any): obj is SimpleCellAddress {
+export function isSimpleCellAddress(obj: any): obj is SimpleCellAddress {
   if( obj && (typeof obj === 'object' || typeof obj === 'function')) {
     return 'col' in obj && typeof obj.col === 'number' && 'row' in obj && typeof obj.row === 'number' && 'sheet' in obj && typeof obj.sheet === 'number'
+  } else {
+    return false
+  }
+}
+
+export function isSimpleColumnAddress(obj: any): obj is SimpleColumnAddress {
+  if( obj && (typeof obj === 'object' || typeof obj === 'function')) {
+    return 'col' in obj && typeof obj.col === 'number' && !('row' in obj) && 'sheet' in obj && typeof obj.sheet === 'number'
+  } else {
+    return false
+  }
+}
+
+export function isSimpleRowAddress(obj: any): obj is SimpleRowAddress {
+  if( obj && (typeof obj === 'object' || typeof obj === 'function')) {
+    return !('col' in obj) && 'row' in obj && typeof obj.row === 'number' && 'sheet' in obj && typeof obj.sheet === 'number'
   } else {
     return false
   }

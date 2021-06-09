@@ -3,14 +3,20 @@
  * Copyright (c) 2021 Handsoncode. All rights reserved.
  */
 
-import {CellRange, simpleCellAddress, SimpleCellAddress, SimpleColumnAddress, SimpleRowAddress} from './Cell'
+import {
+  CellRange,
+  simpleCellAddress,
+  SimpleCellAddress,
+  SimpleColumnAddress,
+  SimpleRowAddress
+} from './Cell'
 import {DependencyGraph} from './DependencyGraph'
+import {SheetsNotEqual} from './errors'
 import {Maybe} from './Maybe'
 import {AstNodeType, CellAddress, CellRangeAst} from './parser'
 import {ColumnRangeAst, RowRangeAst} from './parser/Ast'
 import {RowsSpan, Span} from './Span'
 
-export const DIFFERENT_SHEETS_ERROR = 'AbsoluteCellRange: Start and end are in different sheets'
 export const WRONG_RANGE_SIZE = 'AbsoluteCellRange: Wrong range size'
 
 export interface SimpleCellRange {
@@ -19,16 +25,6 @@ export interface SimpleCellRange {
 }
 
 export const simpleCellRange = (start: SimpleCellAddress, end: SimpleCellAddress) => ({start, end})
-
-export interface SimpleRowRange {
-  start: SimpleRowAddress,
-  end: SimpleRowAddress,
-}
-
-export interface SimpleColumnRange {
-  start: SimpleColumnAddress,
-  end: SimpleColumnAddress,
-}
 
 export class AbsoluteCellRange implements SimpleCellRange {
   public readonly start: SimpleCellAddress
@@ -44,7 +40,7 @@ export class AbsoluteCellRange implements SimpleCellRange {
     } else if (ast.type === AstNodeType.COLUMN_RANGE) {
       return AbsoluteColumnRange.fromColumnRange(ast, baseAddress)
     } else {
-      return AbsoluteRowRange.fromRowRange(ast, baseAddress)
+      return AbsoluteRowRange.fromRowRangeAst(ast, baseAddress)
     }
   }
 
@@ -100,7 +96,7 @@ export class AbsoluteCellRange implements SimpleCellRange {
     end: SimpleCellAddress,
   ) {
     if (start.sheet !== end.sheet) {
-      throw new Error(DIFFERENT_SHEETS_ERROR)
+      throw new SheetsNotEqual(start.sheet, end.sheet)
     }
     this.start = simpleCellAddress(start.sheet, start.col, start.row)
     this.end = simpleCellAddress(end.sheet, end.col, end.row)
@@ -398,7 +394,7 @@ export class AbsoluteColumnRange extends AbsoluteCellRange {
     const start = x.start.toSimpleColumnAddress(baseAddress)
     const end = x.end.toSimpleColumnAddress(baseAddress)
     if (start.sheet !== end.sheet) {
-      throw new Error(DIFFERENT_SHEETS_ERROR)
+      throw new SheetsNotEqual(start.sheet, end.sheet)
     }
     return new AbsoluteColumnRange(start.sheet, start.col, end.col)
   }
@@ -445,11 +441,11 @@ export class AbsoluteColumnRange extends AbsoluteCellRange {
 }
 
 export class AbsoluteRowRange extends AbsoluteCellRange {
-  public static fromRowRange(x: RowRangeAst, baseAddress: SimpleCellAddress): AbsoluteRowRange {
+  public static fromRowRangeAst(x: RowRangeAst, baseAddress: SimpleCellAddress): AbsoluteRowRange {
     const start = x.start.toSimpleRowAddress(baseAddress)
     const end = x.end.toSimpleRowAddress(baseAddress)
     if (start.sheet !== end.sheet) {
-      throw new Error(DIFFERENT_SHEETS_ERROR)
+      throw new SheetsNotEqual(start.sheet, end.sheet)
     }
     return new AbsoluteRowRange(start.sheet, start.row, end.row)
   }

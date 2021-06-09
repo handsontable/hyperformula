@@ -13,7 +13,7 @@ import {
   getCellType,
   getCellValueDetailedType,
   getCellValueFormat,
-  getCellValueType, instanceOfSimpleCellAddress,
+  getCellValueType, isSimpleCellAddress,
   SimpleCellAddress
 } from './Cell'
 import {CellContent, CellContentParser, RawCellContent} from './CellContentParser'
@@ -1105,7 +1105,7 @@ export class HyperFormula implements TypedEmitter {
    */
   public isItPossibleToSetCellContents(address: SimpleCellAddress | SimpleCellRange): boolean {
     let range
-    if(instanceOfSimpleCellAddress(address)) {
+    if(isSimpleCellAddress(address)) {
       range = new AbsoluteCellRange(address, address)
     } else {
       range = new AbsoluteCellRange(address.start, address.end)
@@ -1813,8 +1813,8 @@ export class HyperFormula implements TypedEmitter {
    * @category Cells
    */
   public isItPossibleToMoveCells(source: SimpleCellRange, destinationLeftCorner: SimpleCellAddress): boolean {
-    const range = new AbsoluteCellRange(source.start, source.end)
     try {
+      const range = new AbsoluteCellRange(source.start, source.end)
       this._crudOperations.operations.ensureItIsPossibleToMoveCells(range.start, range.width(), range.height(), destinationLeftCorner)
       return true
     } catch (e) {
@@ -2032,9 +2032,7 @@ export class HyperFormula implements TypedEmitter {
    * Stores a copy of the cell block in internal clipboard for the further paste.
    * Returns values of cells for use in external clipboard.
    *
-   * @param {SimpleCellAddress} sourceLeftCorner - address of the upper left corner of a copied block
-   * @param {number} width - width of the cell block being copied
-   * @param {number} height - height of the cell block being copied
+   * @param {SimpleCellRange} source - rectangle range to copy
    *
    * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
    * @throws an error while attempting to copy unsupported content type
@@ -2046,16 +2044,15 @@ export class HyperFormula implements TypedEmitter {
    * ]);
    *
    * // should return: [ [ 2 ] ]
-   * const clipboardContent = hfInstance.copy({ sheet: 0, col: 1, row: 0 }, 1, 1);
+   * const clipboardContent = hfInstance.copy({start: { sheet: 0, col: 1, row: 0 }, end: {sheet: 0, col: 1, row: 0}});
    * ```
    *
    * @category Clipboard
    */
-  public copy(sourceLeftCorner: SimpleCellAddress, width: number, height: number): CellValue[][] {
-    validateArgToType(width, 'number', 'width')
-    validateArgToType(height, 'number', 'height')
-    this._crudOperations.copy(sourceLeftCorner, width, height)
-    return this.getRangeValues(sourceLeftCorner, width, height)
+  public copy(source: SimpleCellRange): CellValue[][] {
+    const range = new AbsoluteCellRange(source.start, source.end)
+    this._crudOperations.copy(range.start, range.width(), range.height())
+    return this.getRangeValues(source)
   }
 
   /**
@@ -2064,9 +2061,7 @@ export class HyperFormula implements TypedEmitter {
    * Almost any CRUD operation called after this method will abort the cut operation.
    * Returns values of cells for use in external clipboard.
    *
-   * @param {SimpleCellAddress} sourceLeftCorner - address of the upper left corner of a copied block
-   * @param {number} width - width of the cell block being copied
-   * @param {number} height - height of the cell block being copied
+   * @param {SimpleCellRange} source - rectangle range to cut
    *
    * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
    * @example
@@ -2076,16 +2071,15 @@ export class HyperFormula implements TypedEmitter {
    * ]);
    *
    * // should return values that were cut: [ [ 1 ] ]
-   * const clipboardContent = hfInstance.cut({ sheet: 0, col: 0, row: 0 }, 1, 1);
+   * const clipboardContent = hfInstance.cut({start: { sheet: 0, col: 0, row: 0 }, end: { sheet: 0, col: 0, row: 0}});
    * ```
    *
    * @category Clipboard
    */
-  public cut(sourceLeftCorner: SimpleCellAddress, width: number, height: number): CellValue[][] {
-    validateArgToType(width, 'number', 'width')
-    validateArgToType(height, 'number', 'height')
-    this._crudOperations.cut(sourceLeftCorner, width, height)
-    return this.getRangeValues(sourceLeftCorner, width, height)
+  public cut(source: SimpleCellRange): CellValue[][] {
+    const range = new AbsoluteCellRange(source.start, source.end)
+    this._crudOperations.cut(range.start, range.width(), range.height())
+    return this.getRangeValues(source)
   }
 
   /**
@@ -2220,9 +2214,7 @@ export class HyperFormula implements TypedEmitter {
   /**
    * Returns the cell content of a given range in a [[CellValue]][][] format.
    *
-   * @param {SimpleCellAddress} leftCorner - address of the upper left corner of a range
-   * @param {number} width - width of a range
-   * @param {number} height - height of a range
+   * @param {SimpleCellRange} source - rectangular range
    *
    * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
    * @example
@@ -2235,15 +2227,13 @@ export class HyperFormula implements TypedEmitter {
    *
    *
    * // returns calculated cells content: [ [ 3, 2 ], [ 5, 6 ] ]
-   * const rangeValues = hfInstance.getRangeValues({ sheet: 0, col: 0, row: 0 }, 2, 2);
+   * const rangeValues = hfInstance.getRangeValues({start: { sheet: 0, col: 0, row: 0 }, end:{ sheet: 0, col: 1, row: 1 }});
    * ```
    *
    * @category Ranges
    */
-  public getRangeValues(leftCorner: SimpleCellAddress, width: number, height: number): CellValue[][] {
-    validateArgToType(width, 'number', 'width')
-    validateArgToType(height, 'number', 'height')
-    const cellRange = AbsoluteCellRange.spanFrom(leftCorner, width, height)
+  public getRangeValues(source: SimpleCellRange): CellValue[][] {
+    const cellRange = new AbsoluteCellRange(source.start, source.end)
     return cellRange.arrayOfAddressesInRange().map(
       (subarray) => subarray.map(
         (address) => this.getCellValue(address)
@@ -2254,9 +2244,7 @@ export class HyperFormula implements TypedEmitter {
   /**
    * Returns cell formulas in given range.
    *
-   * @param {SimpleCellAddress} leftCorner - address of the upper left corner of a range
-   * @param {number} width - width of a range
-   * @param {number} height - height of a range
+   * @param {SimpleCellRange} source - rectangular range
    *
    * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
    * @example
@@ -2274,10 +2262,8 @@ export class HyperFormula implements TypedEmitter {
    *
    * @category Ranges
    */
-  public getRangeFormulas(leftCorner: SimpleCellAddress, width: number, height: number): Maybe<string>[][] {
-    validateArgToType(width, 'number', 'width')
-    validateArgToType(height, 'number', 'height')
-    const cellRange = AbsoluteCellRange.spanFrom(leftCorner, width, height)
+  public getRangeFormulas(source: SimpleCellRange): Maybe<string>[][] {
+    const cellRange = new AbsoluteCellRange(source.start, source.end)
     return cellRange.arrayOfAddressesInRange().map(
       (subarray) => subarray.map(
         (address) => this.getCellFormula(address)
@@ -2288,9 +2274,7 @@ export class HyperFormula implements TypedEmitter {
   /**
    * Returns serialized cells in given range.
    *
-   * @param {SimpleCellAddress} leftCorner - address of the upper left corner of a range
-   * @param {number} width - width of a range
-   * @param {number} height - height of a range
+   * @param {SimpleCellRange} source - rectangular range
    *
    * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
    * @example
@@ -2308,10 +2292,8 @@ export class HyperFormula implements TypedEmitter {
    *
    * @category Ranges
    */
-  public getRangeSerialized(leftCorner: SimpleCellAddress, width: number, height: number): RawCellContent[][] {
-    validateArgToType(width, 'number', 'width')
-    validateArgToType(height, 'number', 'height')
-    const cellRange = AbsoluteCellRange.spanFrom(leftCorner, width, height)
+  public getRangeSerialized(source: SimpleCellRange): RawCellContent[][] {
+    const cellRange = new AbsoluteCellRange(source.start, source.end)
     return cellRange.arrayOfAddressesInRange().map(
       (subarray) => subarray.map(
         (address) => this.getCellSerialized(address)
@@ -2340,23 +2322,19 @@ export class HyperFormula implements TypedEmitter {
    * @category Ranges
    */
 
-  public getFillRangeData(sourceLeftCorner: SimpleCellAddress, sourceWidth: number, sourceHeight: number, targetLeftCorner: SimpleCellAddress, targetWidth: number, targetHeigh: number): RawCellContent[][] {
-    if(sourceLeftCorner.sheet !== targetLeftCorner.sheet) {
-      throw new SheetsNotEqual(sourceLeftCorner.sheet, targetLeftCorner.sheet)
+  public getFillRangeData(source: SimpleCellRange, target: SimpleCellRange): RawCellContent[][] {
+    const sourceRange = new AbsoluteCellRange(source.start, source.end)
+    const targetRange = new AbsoluteCellRange(target.start, target.end)
+    if(sourceRange.sheet !== targetRange.sheet) {
+      throw new SheetsNotEqual(sourceRange.sheet, targetRange.sheet)
     }
-    validateArgToType(sourceWidth, 'number', 'sourceWidth')
-    validateArgToType(sourceHeight, 'number', 'sourceHeight')
-    validateArgToType(targetWidth, 'number', 'targetWidth')
-    validateArgToType(targetHeigh, 'number', 'targetHeigh')
-    const source = AbsoluteCellRange.spanFrom(sourceLeftCorner, sourceWidth, sourceHeight)
-    const target = AbsoluteCellRange.spanFrom(targetLeftCorner, targetWidth, targetHeigh)
     this.ensureEvaluationIsNotSuspended()
-    return target.arrayOfAddressesInRange().map(
+    return targetRange.arrayOfAddressesInRange().map(
       (subarray) => subarray.map(
         (address) => {
-          const row = ((address.row - source.start.row) % source.height() + source.height()) % source.height() + source.start.row
-          const col = ((address.col - source.start.col) % source.width() + source.width()) % source.width() + source.start.col
-          return this._serialization.getCellSerialized({row, col, sheet: target.sheet}, address)
+          const row = ((address.row - source.start.row) % sourceRange.height() + sourceRange.height()) % sourceRange.height() + source.start.row
+          const col = ((address.col - source.start.col) % sourceRange.width() + sourceRange.width()) % sourceRange.width() + source.start.col
+          return this._serialization.getCellSerialized({row, col, sheet: targetRange.sheet}, address)
         }
       )
     )
@@ -2698,16 +2676,16 @@ export class HyperFormula implements TypedEmitter {
    *
    * @category Helpers
    */
-  public getCellDependents(address: SimpleCellAddress | AbsoluteCellRange): (AbsoluteCellRange | SimpleCellAddress)[] {
+  public getCellDependents(address: SimpleCellAddress | SimpleCellRange): (SimpleCellRange | SimpleCellAddress)[] {
     let vertex
-    if(address instanceof AbsoluteCellRange) {
-      vertex = this._dependencyGraph.rangeMapping.getRange(address.start, address.end)
-      if(vertex===undefined) {
+    if(isSimpleCellAddress(address)) {
+      vertex = this._dependencyGraph.addressMapping.getCell(address)
+      if(vertex===null) {
         return []
       }
     } else {
-      vertex = this._dependencyGraph.addressMapping.getCell(address)
-      if(vertex===null) {
+      vertex = this._dependencyGraph.rangeMapping.getRange(address.start, address.end)
+      if(vertex===undefined) {
         return []
       }
     }
@@ -2717,7 +2695,7 @@ export class HyperFormula implements TypedEmitter {
   /**
    * Returns all addresses and ranges necessary for computation of a given address or range.
    *
-   * @param {SimpleCellAddress | AbsoluteCellRange} address - object representation of an absolute address or range of addresses
+   * @param {SimpleCellAddress | SimpleCellRange} address - object representation of an absolute address or range of addresses
    *
    * @example
    * ```js
@@ -2729,20 +2707,20 @@ export class HyperFormula implements TypedEmitter {
    *
    * @category Helpers
    */
-  public getCellPrecedents(address: SimpleCellAddress | AbsoluteCellRange): (AbsoluteCellRange | SimpleCellAddress)[] {
+  public getCellPrecedents(address: SimpleCellAddress | SimpleCellRange): (SimpleCellRange | SimpleCellAddress)[] {
     let vertex
-    if(address instanceof AbsoluteCellRange) {
-      vertex = this._dependencyGraph.rangeMapping.getRange(address.start, address.end)
-      if(vertex===undefined) {
-        return []
-      }
-    } else {
+    if(isSimpleCellAddress(address)) {
       vertex = this._dependencyGraph.addressMapping.getCell(address)
       if(vertex===null) {
         return []
       }
+    } else {
+      vertex = this._dependencyGraph.rangeMapping.getRange(address.start, address.end)
+      if(vertex===undefined) {
+        return []
+      }
     }
-    return this._dependencyGraph.dependencyQueryAddresses(vertex) ?? []
+    return this._dependencyGraph.dependencyQueryAddresses(vertex)
   }
 
   /**

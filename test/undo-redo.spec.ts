@@ -687,7 +687,7 @@ describe('Undo - cut-paste', () => {
       ['bar'],
     ]
     const engine = HyperFormula.buildFromArray(sheet)
-    engine.cut(adr('A1'), 1, 1)
+    engine.cut(AbsoluteCellRange.spanFrom(adr('A1'), 1, 1))
     engine.paste(adr('A2'))
 
     engine.undo()
@@ -701,7 +701,7 @@ describe('Undo - cut-paste', () => {
       ['bar'],
     ]
     const engine = HyperFormula.buildFromArray(sheet)
-    engine.cut(adr('A1'), 1, 1)
+    engine.cut(AbsoluteCellRange.spanFrom(adr('A1'), 1, 1))
     engine.paste(adr('A2'))
     engine.undo()
 
@@ -715,7 +715,7 @@ describe('Undo - cut-paste', () => {
     })
     engine.addNamedExpression('foo', 'bar', 0)
     engine.setCellContents(adr('A1'), '=foo')
-    engine.cut(adr('A1'), 1, 1)
+    engine.cut(AbsoluteCellRange.spanFrom(adr('A1'), 1, 1))
     engine.paste(adr('A1', 1))
 
     engine.undo()
@@ -732,7 +732,7 @@ describe('Undo - copy-paste', () => {
       ['bar'],
     ]
     const engine = HyperFormula.buildFromArray(sheet)
-    engine.copy(adr('A1'), 1, 1)
+    engine.copy(AbsoluteCellRange.spanFrom(adr('A1'), 1, 1))
     engine.paste(adr('A2'))
 
     engine.undo()
@@ -747,7 +747,7 @@ describe('Undo - copy-paste', () => {
     })
     engine.addNamedExpression('foo', 'bar', 0)
     engine.setCellContents(adr('A1'), '=foo')
-    engine.copy(adr('A1'), 1, 1)
+    engine.copy(AbsoluteCellRange.spanFrom(adr('A1'), 1, 1))
     engine.paste(adr('A1', 1))
 
     engine.undo()
@@ -1440,7 +1440,7 @@ describe('Redo - cut-paste', () => {
       ['foo'],
       ['bar'],
     ])
-    engine.cut(adr('A1'), 1, 1)
+    engine.cut(AbsoluteCellRange.spanFrom(adr('A1'), 1, 1))
     engine.paste(adr('A2'))
     const snapshot = engine.getAllSheetsSerialized()
     engine.undo()
@@ -1455,7 +1455,7 @@ describe('Redo - cut-paste', () => {
     engine.setCellContents(adr('A1'), 42)
     engine.undo()
 
-    engine.cut(adr('A1'), 1, 1)
+    engine.cut(AbsoluteCellRange.spanFrom(adr('A1'), 1, 1))
 
     expect(engine.isThereSomethingToRedo()).toBe(true)
   })
@@ -1465,7 +1465,7 @@ describe('Redo - cut-paste', () => {
     engine.setCellContents(adr('A1'), 42)
     engine.undo()
 
-    engine.cut(adr('A1'), 1, 1)
+    engine.cut(AbsoluteCellRange.spanFrom(adr('A1'), 1, 1))
     engine.paste(adr('A2'))
 
     expect(engine.isThereSomethingToRedo()).toBe(false)
@@ -1478,7 +1478,7 @@ describe('Redo - copy-paste', () => {
       ['foo', 'baz'],
       ['bar', 'faz'],
     ])
-    engine.copy(adr('A1'), 2, 2)
+    engine.copy(AbsoluteCellRange.spanFrom(adr('A1'), 2, 2))
     engine.paste(adr('C3'))
     const snapshot = engine.getAllSheetsSerialized()
     engine.undo()
@@ -1493,7 +1493,7 @@ describe('Redo - copy-paste', () => {
     engine.setCellContents(adr('A1'), 42)
     engine.undo()
 
-    engine.copy(adr('A1'), 1, 1)
+    engine.copy(AbsoluteCellRange.spanFrom(adr('A1'), 1, 1))
 
     expect(engine.isThereSomethingToRedo()).toBe(true)
   })
@@ -1503,7 +1503,7 @@ describe('Redo - copy-paste', () => {
     engine.setCellContents(adr('A1'), 42)
     engine.undo()
 
-    engine.copy(adr('A1'), 1, 1)
+    engine.copy(AbsoluteCellRange.spanFrom(adr('A1'), 1, 1))
     engine.paste(adr('A2'))
 
     expect(engine.isThereSomethingToRedo()).toBe(false)
