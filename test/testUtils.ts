@@ -1,13 +1,6 @@
 import {CellValue, DetailedCellError, HyperFormula} from '../src'
 import {AbsoluteCellRange, AbsoluteColumnRange, AbsoluteRowRange} from '../src/AbsoluteCellRange'
-import {
-  CellError,
-  ErrorType,
-  SimpleCellAddress,
-  simpleCellAddress,
-  SimpleColumnAddress,
-  SimpleRowAddress
-} from '../src/Cell'
+import {CellError, ErrorType, SimpleCellAddress, simpleCellAddress} from '../src/Cell'
 import {Config} from '../src/Config'
 import {DateTimeHelper} from '../src/DateTimeHelper'
 import {FormulaCellVertex, MatrixVertex, RangeVertex} from '../src/DependencyGraph'
@@ -137,18 +130,10 @@ export const colEnd = (input: string, sheet: number = 0): SimpleCellAddress => {
 }
 
 export const adr = (stringAddress: string, sheet: number = 0): SimpleCellAddress => {
-  /**
-   *  this is a helper, it can parse e.g. 'A' as SimpleColumnAddress and '1' as SimpleRowAddress
-   *  for type simplicity the return type is forced to be SimpleCellAddress
-   *  typecast at your own discretion
-   */
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  const result = /^(\$([A-Za-z0-9_]+)\.)?((\$?)([A-Za-z]+))?((\$?)([0-9]+))?$/.exec(stringAddress)!
-  const rowToken = result[8]
-  const row = rowToken !== undefined ? Number(rowToken) - 1 : undefined
-  const colToken = result[5]
-  const col = colToken !== undefined ? colNumber(colToken) : undefined
-  return {sheet, col: col as number, row: row as number}
+  const result = /^(\$([A-Za-z0-9_]+)\.)?(\$?)([A-Za-z]+)(\$?)([0-9]+)$/.exec(stringAddress)!
+  const row = Number(result[6]) - 1
+  return simpleCellAddress(sheet, colNumber(result[4]), row)
 }
 
 const colNumber = (input: string): number => {
