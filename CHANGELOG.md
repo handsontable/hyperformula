@@ -33,6 +33,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed an issue with arrays and cruds. (#651)
 - Fixed handling of arrays for ROWS/COLUMNS functions. (#677)
 - Fixed an issue with nested namedexpressions. (#679)
+- Fixed an issue with matrixDetection + number parsing. (#686)
 
 ## [0.6.2] - 2021-05-26
 
