@@ -2107,7 +2107,6 @@ export class HyperFormula implements TypedEmitter {
    *
    * @fires [[valuesUpdated]] if recalculation was triggered by this change
    *
-   * @throws an error while attempting to paste onto a matrix
    * @throws [[EvaluationSuspendedError]] when the evaluation is suspended
    * @throws [[SheetSizeLimitExceededError]] when performing this operation would result in sheet size limits exceeding
    * @throws [[NothingToPasteError]] when clipboard is empty
