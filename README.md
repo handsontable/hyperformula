@@ -62,7 +62,7 @@ import { HyperFormula } from 'hyperformula';
 
 // define the options
 const options = {
-  licenseKey: 'agpl-v3',
+  licenseKey: 'gpl-v3',
 };
 
 // define the data
@@ -116,12 +116,8 @@ Your help is much appreciated in any of the following topics:
 
 ## License
 
-HyperFormula is a triple-licensed software. You can use it under the
-open source [AGPLv3 license](https://github.com/handsontable/hyperformula/blob/master/agpl-3.0.txt),
-or a [free license](https://github.com/handsontable/hyperformula/blob/master/non-commercial-license.pdf)
-in all your non-commercial projects. There is also a
-[commercial license](https://handsontable.github.io/hyperformula/guide/contact.html),
-and support services available.
+HyperFormula is a double-licensed software. In all your non-commercial projects, you can use it under the
+open source [GPLv3 license](https://github.com/handsontable/hyperformula/blob/master/gpl-3.0.txt). Additionally, there is also a [commercial license](https://handsontable.github.io/hyperformula/guide/contact.html), and support services available.
 
 ## Acknowledgements
 
