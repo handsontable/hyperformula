@@ -3,13 +3,7 @@
  * Copyright (c) 2021 Handsoncode. All rights reserved.
  */
 
-import {
-  CellRange,
-  simpleCellAddress,
-  SimpleCellAddress,
-  SimpleColumnAddress,
-  SimpleRowAddress
-} from './Cell'
+import {CellRange, simpleCellAddress, SimpleCellAddress, SimpleColumnAddress, SimpleRowAddress} from './Cell'
 import {DependencyGraph} from './DependencyGraph'
 import {SheetsNotEqual} from './errors'
 import {Maybe} from './Maybe'

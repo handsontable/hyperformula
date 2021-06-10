@@ -13,7 +13,8 @@ import {
   getCellType,
   getCellValueDetailedType,
   getCellValueFormat,
-  getCellValueType, isSimpleCellAddress,
+  getCellValueType,
+  isSimpleCellAddress,
   SimpleCellAddress
 } from './Cell'
 import {CellContent, CellContentParser, RawCellContent} from './CellContentParser'

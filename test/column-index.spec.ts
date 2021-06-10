@@ -1,6 +1,6 @@
 import {deepStrictEqual} from 'assert'
 import {AbsoluteCellRange} from '../src/AbsoluteCellRange'
-import {CellError, ErrorType, simpleCellAddress} from '../src/Cell'
+import {CellError, ErrorType} from '../src/Cell'
 import {Config} from '../src/Config'
 import {DependencyGraph} from '../src/DependencyGraph'
 import {AddRowsTransformer} from '../src/dependencyTransformers/AddRowsTransformer'

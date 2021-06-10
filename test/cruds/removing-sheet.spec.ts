@@ -1,6 +1,6 @@
 import {ExportedCellChange, HyperFormula, NoSheetWithIdError} from '../../src'
 import {AbsoluteCellRange} from '../../src/AbsoluteCellRange'
-import {ErrorType, simpleCellAddress} from '../../src/Cell'
+import {ErrorType} from '../../src/Cell'
 import {MatrixVertex} from '../../src/DependencyGraph'
 import {ColumnIndex} from '../../src/Lookup/ColumnIndex'
 import {CellAddress} from '../../src/parser'

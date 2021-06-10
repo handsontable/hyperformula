@@ -1,4 +1,3 @@
-import {simpleCellAddress} from '../../src/Cell'
 import {SheetMapping} from '../../src/DependencyGraph'
 import {buildTranslationPackage} from '../../src/i18n'
 import {enGB} from '../../src/i18n/languages'

@@ -1,4 +1,3 @@
-import {simpleCellAddress} from '../src/Cell'
 import {Config} from '../src/Config'
 import {FunctionRegistry} from '../src/interpreter/FunctionRegistry'
 import {Interpreter} from '../src/interpreter/Interpreter'

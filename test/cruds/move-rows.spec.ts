@@ -1,5 +1,5 @@
 import {ExportedCellChange, HyperFormula, InvalidArgumentsError} from '../../src'
-import {ErrorType, simpleCellAddress} from '../../src/Cell'
+import {ErrorType} from '../../src/Cell'
 import {CellAddress} from '../../src/parser'
 import {
   adr,

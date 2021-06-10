@@ -1,5 +1,4 @@
 import {ExportedCellChange, HyperFormula} from '../../src'
-import {simpleCellAddress} from '../../src/Cell'
 import {adr, expectArrayWithSameContent} from '../testUtils'
 
 describe('Replace sheet content - checking if its possible', () => {

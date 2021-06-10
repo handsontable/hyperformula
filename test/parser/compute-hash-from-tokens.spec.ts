@@ -1,5 +1,5 @@
 import {HyperFormula} from '../../src'
-import {simpleCellAddress, SimpleCellAddress} from '../../src/Cell'
+import {SimpleCellAddress} from '../../src/Cell'
 import {Config} from '../../src/Config'
 import {SheetMapping} from '../../src/DependencyGraph'
 import {enGB, plPL} from '../../src/i18n/languages'

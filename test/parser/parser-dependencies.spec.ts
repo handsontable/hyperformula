@@ -1,6 +1,5 @@
 import {AbsoluteCellRange} from '../../src/AbsoluteCellRange'
 import {absolutizeDependencies} from '../../src/absolutizeDependencies'
-import {simpleCellAddress} from '../../src/Cell'
 import {Config} from '../../src/Config'
 import {NamedExpressionDependency} from '../../src/parser'
 import {adr, expectArrayWithSameContent} from '../testUtils'

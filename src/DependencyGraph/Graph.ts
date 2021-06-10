@@ -3,8 +3,6 @@
  * Copyright (c) 2021 Handsoncode. All rights reserved.
  */
 
-import {Maybe} from '../Maybe'
-
 export type DependencyQuery<T> = (vertex: T) => T[]
 
 export interface TopSortResult<T> {
