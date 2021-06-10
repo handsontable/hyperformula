@@ -19,7 +19,7 @@ describe('simpleCellAddressFromString', () => {
   })
 
   it('should return address with overridden sheet', () => {
-    expect(simpleCellAddressFromString(sheetMappingFunction, 'A1', 1)).toEqual(adr('A1',1))
+    expect(simpleCellAddressFromString(sheetMappingFunction, 'A1', 1)).toEqual(adr('A1', 1))
   })
 
   it('should return address with sheet number from sheet mapping', () => {

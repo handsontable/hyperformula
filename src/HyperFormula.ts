@@ -1112,7 +1112,7 @@ export class HyperFormula implements TypedEmitter {
     }
     try {
       this._crudOperations.ensureRangeInSizeLimits(range)
-      for(let it of range.addresses(this._dependencyGraph)) {
+      for(const it of range.addresses(this._dependencyGraph)) {
         this._crudOperations.ensureItIsPossibleToChangeContent(it)
       }
     } catch (e) {
