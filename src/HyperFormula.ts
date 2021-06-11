@@ -2093,7 +2093,6 @@ export class HyperFormula implements TypedEmitter {
    *
    * @fires [[valuesUpdated]] if recalculation was triggered by this change
    *
-   * @throws an error while attempting to paste onto a matrix
    * @throws [[EvaluationSuspendedError]] when the evaluation is suspended
    * @throws [[SheetSizeLimitExceededError]] when performing this operation would result in sheet size limits exceeding
    * @throws [[NothingToPasteError]] when clipboard is empty
@@ -3953,8 +3952,9 @@ export class HyperFormula implements TypedEmitter {
   }
 
   /**
-   * A method that subscribes to an event.
-   *
+   * Subscribes to an event.
+   * For the list of all available events, see [[Listeners]].
+   * 
    * @param {Event} event the name of the event to subscribe to
    * @param {Listener} listener to be called when event is emitted
    *
@@ -3977,7 +3977,8 @@ export class HyperFormula implements TypedEmitter {
   }
 
   /**
-   * A method that subscribes to an event once.
+   * Subscribes to an event once.
+   * For the list of all available events, see [[Listeners]].
    *
    * @param {Event} event the name of the event to subscribe to
    * @param {Listener} listener to be called when event is emitted
@@ -4002,7 +4003,8 @@ export class HyperFormula implements TypedEmitter {
   }
 
   /**
-   * A method that unsubscribe from an event or all events.
+   * Unsubscribes from an event or from all events.
+   * For the list of all available events, see [[Listeners]].
    *
    * @param {Event} event the name of the event to subscribe to
    * @param {Listener} listener to be called when event is emitted
