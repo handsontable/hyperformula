@@ -5,7 +5,7 @@ import {SimpleCellAddress, simpleCellAddress} from '../src/Cell'
 import {
   EmptyCellVertex,
   FormulaCellVertex,
-  MatrixVertex,
+  MatrixVertex, ParsingErrorVertex,
   RangeVertex,
   ValueCellVertex,
   Vertex,
@@ -69,6 +69,8 @@ export class EngineComparator {
           deepStrictEqual(actualVertex.getCellValue(), expectedVertex.getCellValue(), `Different values. expected: ${expectedVertex.getCellValue().toString()}, actual: ${actualVertex.getCellValue().toString()}`)
         } else if (expectedVertex instanceof EmptyCellVertex && actualVertex instanceof EmptyCellVertex) {
           continue
+        } else if (expectedVertex instanceof ParsingErrorVertex && actualVertex instanceof ParsingErrorVertex) {
+          deepStrictEqual(expectedVertex.rawInput, actualVertex.rawInput, `Different raw input. expected: ${expectedVertex.rawInput}, actual: ${actualVertex.rawInput}`)
         } else {
           throw Error('Different vertex types')
         }
