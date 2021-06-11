@@ -5,7 +5,7 @@
 
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
 import {absolutizeDependencies} from '../absolutizeDependencies'
-import {CellError, equalSimpleCellAddress, ErrorType, simpleCellAddress, SimpleCellAddress} from '../Cell'
+import {CellError, ErrorType, simpleCellAddress, SimpleCellAddress} from '../Cell'
 import {RawCellContent} from '../CellContentParser'
 import {CellDependency} from '../CellDependency'
 import {Config} from '../Config'
@@ -44,7 +44,7 @@ import {MatrixMapping} from './MatrixMapping'
 import {RangeMapping} from './RangeMapping'
 import {SheetMapping} from './SheetMapping'
 import {RawAndParsedValue} from './ValueCellVertex'
-import {Matrix} from '../Matrix'
+import {ContentChanges} from '../ContentChanges'
 
 export class DependencyGraph {
   /*
@@ -66,6 +66,8 @@ export class DependencyGraph {
       namedExpressions
     )
   }
+
+  private changes: ContentChanges = ContentChanges.empty()
 
   public readonly graph: Graph<Vertex>
 
@@ -104,7 +106,7 @@ export class DependencyGraph {
     this.correctInfiniteRangesDependency(address)
   }
 
-  public setValueToCell(address: SimpleCellAddress, value: RawAndParsedValue) {
+  public setValueToCell(address: SimpleCellAddress, value: RawAndParsedValue): ContentChanges {
     const vertex = this.shrinkPossibleMatrixAndGetCell(address)
 
     if (vertex instanceof MatrixVertex) {
@@ -124,6 +126,8 @@ export class DependencyGraph {
     }
 
     this.correctInfiniteRangesDependency(address)
+
+    return this.getAndClearContentChanges()
   }
 
   public setCellEmpty(address: SimpleCellAddress) {
@@ -760,13 +764,17 @@ export class DependencyGraph {
         this.graph.removeEdge(matrix, adjacentVertex)
       }
     }
+    this.graph.markNodeAsSpecialRecentlyChanged(matrix)
   }
 
   private cleanAddressMappingUnderMatrix(vertex: MatrixVertex) {
     const matrixRange = vertex.getRange()
     for (const address of matrixRange.addresses(this)) {
       if (!vertex.isLeftCorner(address)) {
-        this.addressMapping.removeCellIfEqual(address, vertex)
+        if (this.getCell(address) === vertex) {
+          this.addressMapping.removeCell(address)
+          this.changes.addChange(EmptyValue, address)
+        }
       }
     }
   }
@@ -1065,6 +1073,12 @@ export class DependencyGraph {
         }
       }
     }
+  }
+
+  public getAndClearContentChanges(): ContentChanges {
+    const changes = this.changes
+    this.changes = ContentChanges.empty()
+    return changes
   }
 
   public getAdjacentNodesAddresses(inputVertex: Vertex): (AbsoluteCellRange | SimpleCellAddress)[] {

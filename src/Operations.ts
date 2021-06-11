@@ -675,8 +675,9 @@ export class Operations {
 
   public setValueToCell(value: RawAndParsedValue, address: SimpleCellAddress) {
     const oldValue = this.dependencyGraph.getCellValue(address)
-    this.dependencyGraph.setValueToCell(address, value)
+    const arrayChanges = this.dependencyGraph.setValueToCell(address, value)
     this.columnSearch.change(getRawValue(oldValue), getRawValue(value.parsedValue), address)
+    this.changes.addAll(arrayChanges)
     this.changes.addChange(value.parsedValue, address)
   }
 

@@ -125,12 +125,6 @@ export class AddressMapping {
     sheetMapping.removeCell(address)
   }
 
-  public removeCellIfEqual(address: SimpleCellAddress, vertex: CellVertex) {
-    if (this.getCell(address) === vertex) {
-      this.removeCell(address)
-    }
-  }
-
   /** @inheritDoc */
   public has(address: SimpleCellAddress): boolean {
     const sheetMapping = this.mapping.get(address.sheet)
