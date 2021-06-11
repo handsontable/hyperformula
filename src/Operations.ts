@@ -55,6 +55,7 @@ import {findBoundaries, Sheet} from './Sheet'
 import {ColumnsSpan, RowsSpan} from './Span'
 import {Statistics, StatType} from './statistics'
 import {ParsingResult} from './parser/ParserWithCaching'
+import {FormulaVertex} from './DependencyGraph/FormulaCellVertex'
 
 export class RemoveRowsCommand {
   constructor(
@@ -591,6 +592,25 @@ export class Operations {
     })
   }
 
+  public getOldContent(address: SimpleCellAddress): [SimpleCellAddress, ClipboardCell] {
+    const vertex = this.dependencyGraph.getCell(address)
+
+    if (vertex === null || vertex instanceof EmptyCellVertex) {
+      return [address, {type: ClipboardCellType.EMPTY}]
+    } else if (vertex instanceof ValueCellVertex) {
+      return [address, {type: ClipboardCellType.VALUE, ...vertex.getValues()}]
+    } else if (vertex instanceof FormulaVertex) {
+      return [vertex.getAddress(this.lazilyTransformingAstService), {
+        type: ClipboardCellType.FORMULA,
+        hash: this.parser.computeHashFromAst(vertex.getFormula(this.lazilyTransformingAstService))
+      }]
+    } else if (vertex instanceof ParsingErrorVertex) {
+      return [address, {type: ClipboardCellType.PARSING_ERROR, rawInput: vertex.rawInput, errors: vertex.errors}]
+    }
+
+    throw Error('Trying to copy unsupported type')
+  }
+
   public getClipboardCell(address: SimpleCellAddress): ClipboardCell {
     const vertex = this.dependencyGraph.getCell(address)
 
@@ -640,8 +660,9 @@ export class Operations {
     return result
   }
 
-  public setCellContent(address: SimpleCellAddress, newCellContent: RawCellContent): void {
+  public setCellContent(address: SimpleCellAddress, newCellContent: RawCellContent): [SimpleCellAddress, ClipboardCell] {
     const parsedCellContent = this.cellContentParser.parse(newCellContent)
+    const oldContent = this.getOldContent(address)
 
     if (parsedCellContent instanceof CellContent.Formula) {
       const parserResult = this.parser.parse(parsedCellContent.formula, address)
@@ -657,6 +678,8 @@ export class Operations {
     } else {
       this.setValueToCell({parsedValue: parsedCellContent.value, rawValue: newCellContent}, address)
     }
+
+    return oldContent
   }
 
   public setSheetContent(sheetId: number, newSheetContent: RawCellContent[][]) {

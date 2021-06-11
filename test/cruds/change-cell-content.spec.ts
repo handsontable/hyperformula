@@ -1119,9 +1119,9 @@ describe('arrays', () => {
       [1, 2, 3, '=-A1:C1', null, null, 4],
       ['=D1', '=E1', '=SUM(F1:F1)', '=SUM(F1:G1)'],
     ], {useArrayArithmetic: true})
-    engine.setCellContents(adr('E1'), [[null]])
-    engine.setCellContents(adr('D1'), [[4, 5, 6]])
 
+    engine.setCellContents(adr('E1'), [['foo']])
+    engine.setCellContents(adr('D1'), [[4, 5, 6]])
     engine.undo()
     engine.undo()
 
@@ -1134,6 +1134,22 @@ describe('arrays', () => {
     expect(engine.getCellValue(adr('B2'))).toEqual(-2)
     expect(engine.getCellValue(adr('C2'))).toEqual(-3)
     expect(engine.getCellValue(adr('D2'))).toEqual(1)
+  })
+
+  it('should redo REF', () => {
+    const engine = HyperFormula.buildFromArray([
+      [1, 2, 3, '=-A1:C1', null, null, 4],
+      ['=D1', '=E1', '=SUM(F1:F1)', '=SUM(F1:G1)'],
+    ], {useArrayArithmetic: true})
+
+    engine.setCellContents(adr('E1'), [['foo']])
+    engine.undo()
+    engine.redo()
+
+    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
+      [1, 2, 3, '=-A1:C1', 'foo', null, 4],
+      ['=D1', '=E1', '=SUM(F1:F1)', '=SUM(F1:G1)'],
+    ], {useArrayArithmetic: true}))
   })
 
   it.skip('should recalculate matrix if space is available', () => {

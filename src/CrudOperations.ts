@@ -39,7 +39,7 @@ import {
 import {AddColumnsCommand, AddRowsCommand, Operations, RemoveColumnsCommand, RemoveRowsCommand} from './Operations'
 import {ParserWithCaching} from './parser'
 import {findBoundaries, validateAsSheet} from './Sheet'
-import {ColumnsSpan, RowsSpan} from './Span'
+import {ColumnsSpan} from './Span'
 import {Statistics} from './statistics'
 import {
   AddColumnsUndoEntry,
@@ -257,7 +257,9 @@ export class CrudOperations {
     this.ensureItIsPossibleToChangeCellContents(topLeftCornerAddress, cellContents)
 
     this.undoRedo.clearRedoStack()
-    const modifiedCellContents: { address: SimpleCellAddress, newContent: RawCellContent, oldContent: ClipboardCell }[] = []
+
+    const oldContents: { address: SimpleCellAddress, newContent: RawCellContent, oldContent: [SimpleCellAddress, ClipboardCell] }[] = []
+
     for (let i = 0; i < cellContents.length; i++) {
       for (let j = 0; j < cellContents[i].length; j++) {
         const address = {
@@ -265,13 +267,14 @@ export class CrudOperations {
           row: topLeftCornerAddress.row + i,
           col: topLeftCornerAddress.col + j,
         }
+        const newContent = cellContents[i][j]
         this.clipboardOperations.abortCut()
-        const oldContent = this.operations.getClipboardCell(address)
-        this.operations.setCellContent(address, cellContents[i][j])
-        modifiedCellContents.push({address, newContent: cellContents[i][j], oldContent})
+        const oldContent = this.operations.setCellContent(address, newContent)
+        oldContents.push({address, newContent, oldContent})
       }
     }
-    this.undoRedo.saveOperation(new SetCellContentsUndoEntry(modifiedCellContents))
+
+    this.undoRedo.saveOperation(new SetCellContentsUndoEntry(oldContents))
   }
 
   public setSheetContent(sheetId: number, values: RawCellContent[][]): void {
