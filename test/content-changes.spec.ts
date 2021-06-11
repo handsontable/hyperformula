@@ -32,6 +32,17 @@ describe('ContentChanges', () => {
     expect(contentChanges.isEmpty()).toEqual(true)
   })
 
+  it('should replace simple value change', () => {
+    const contentChanges = ContentChanges.empty()
+
+    contentChanges.addChange(1, adr('A1'))
+    contentChanges.addChange(2, adr('A1'))
+
+    const exportedChanges = contentChanges.exportChanges(identityChangeExporter)
+    expect(exportedChanges.length).toEqual(1)
+    expect(exportedChanges).toContainEqual({ sheet: 0, col: 0, row: 0, value: 2})
+  })
+
   it('should export simple value change', () => {
     const contentChanges = ContentChanges.empty()
 

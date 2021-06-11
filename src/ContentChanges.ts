@@ -22,12 +22,11 @@ export interface ChangeExporter<T> {
 export type ChangeList = CellValueChange[]
 
 export class ContentChanges {
-
   public static empty() {
     return new ContentChanges()
   }
 
-  private changes: Map<SimpleCellAddress, CellValueChange> = new Map()
+  private changes: Map<string, CellValueChange> = new Map()
 
   public addAll(other: ContentChanges): ContentChanges {
     for (const [key, value] of other.changes.entries()) {
@@ -46,7 +45,7 @@ export class ContentChanges {
 
   private add(...changes: ChangeList) {
     for (const change of changes) {
-      this.changes.set(simpleCellAddress(change.sheet, change.col, change.row), change)
+      this.changes.set(`${change.sheet},${change.col},${change.row}`, change)
     }
   }
 
