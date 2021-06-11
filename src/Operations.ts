@@ -54,6 +54,7 @@ import {ParsingError} from './parser/Ast'
 import {findBoundaries, Sheet} from './Sheet'
 import {ColumnsSpan, RowsSpan} from './Span'
 import {Statistics, StatType} from './statistics'
+import {ParsingResult} from './parser/ParserWithCaching'
 
 export class RemoveRowsCommand {
   constructor(
@@ -643,18 +644,13 @@ export class Operations {
     const parsedCellContent = this.cellContentParser.parse(newCellContent)
 
     if (parsedCellContent instanceof CellContent.Formula) {
-      const {
-        ast,
-        errors,
-        hasVolatileFunction,
-        hasStructuralChangeFunction,
-        dependencies
-      } = this.parser.parse(parsedCellContent.formula, address)
+      const parserResult = this.parser.parse(parsedCellContent.formula, address)
+      const {ast, errors} = parserResult
       if (errors.length > 0) {
         this.dependencyGraph.setParsingErrorToCell(address, new ParsingErrorVertex(errors, parsedCellContent.formula))
       } else {
         const size = this.matrixSizePredictor.checkMatrixSize(ast, address)
-        this.dependencyGraph.setFormulaToCell(address, ast, absolutizeDependencies(dependencies, address), size, hasVolatileFunction, hasStructuralChangeFunction)
+        this.setFormulaToCell(address, size, parserResult)
       }
     } else if (parsedCellContent instanceof CellContent.Empty) {
       this.setCellEmpty(address)
@@ -671,6 +667,11 @@ export class Operations {
         this.setCellContent(address, newSheetContent[i][j])
       }
     }
+  }
+
+  public setFormulaToCell(address: SimpleCellAddress, size: MatrixSize, { ast, hasVolatileFunction, hasStructuralChangeFunction, dependencies}: ParsingResult) {
+    const arrayChanges = this.dependencyGraph.setFormulaToCell(address, ast, absolutizeDependencies(dependencies, address), size, hasVolatileFunction, hasStructuralChangeFunction)
+    this.changes.addAll(arrayChanges)
   }
 
   public setValueToCell(value: RawAndParsedValue, address: SimpleCellAddress) {

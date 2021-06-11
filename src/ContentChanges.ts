@@ -3,14 +3,13 @@
  * Copyright (c) 2021 Handsoncode. All rights reserved.
  */
 
-import {simpleCellAddress, SimpleCellAddress} from './Cell'
+import {SimpleCellAddress} from './Cell'
 import {InterpreterValue} from './interpreter/InterpreterValue'
 import {ClipboardCell} from './ClipboardOperations'
+import {SimpleRangeValue} from './interpreter/SimpleRangeValue'
 
 export interface CellValueChange {
-  sheet: number,
-  row: number,
-  col: number,
+  address: SimpleCellAddress,
   value: InterpreterValue,
   oldValue?: ClipboardCell,
 }
@@ -26,27 +25,23 @@ export class ContentChanges {
     return new ContentChanges()
   }
 
+  private constructor() {}
+
   private changes: Map<string, CellValueChange> = new Map()
 
   public addAll(other: ContentChanges): ContentChanges {
-    for (const [key, value] of other.changes.entries()) {
-      this.changes.set(key, value)
+    for (const change of other.changes.values()) {
+      this.add(change.address, change)
     }
     return this
   }
 
   public addChangeWithOldValue(newValue: InterpreterValue, oldValue: ClipboardCell, address: SimpleCellAddress): void {
-    this.addSingleCellValue(newValue, address, oldValue)
+    this.addInterpreterValue(newValue, address, oldValue)
   }
 
   public addChange(newValue: InterpreterValue, address: SimpleCellAddress): void {
-    this.addSingleCellValue(newValue, address)
-  }
-
-  private add(...changes: ChangeList) {
-    for (const change of changes) {
-      this.changes.set(`${change.sheet},${change.col},${change.row}`, change)
-    }
+    this.addInterpreterValue(newValue, address)
   }
 
   public exportChanges<T>(exporter: ChangeExporter<T>): T[] {
@@ -70,11 +65,19 @@ export class ContentChanges {
     return this.changes.size === 0
   }
 
-  private addSingleCellValue(value: InterpreterValue, address: SimpleCellAddress, oldValue?: ClipboardCell) {
-    this.add({
-      sheet: address.sheet,
-      col: address.col,
-      row: address.row,
+  private add(address: SimpleCellAddress, change: CellValueChange) {
+    const value = change.value
+    if (value instanceof SimpleRangeValue) {
+      for (const cellAddress of value.effectiveAddressesFromData(address)) {
+        this.changes.delete(`${cellAddress.sheet},${cellAddress.col},${cellAddress.row}`)
+      }
+    }
+    this.changes.set(`${address.sheet},${address.col},${address.row}`, change)
+  }
+
+  private addInterpreterValue(value: InterpreterValue, address: SimpleCellAddress, oldValue?: ClipboardCell) {
+    this.add(address, {
+      address,
       value,
       oldValue
     })

@@ -55,7 +55,7 @@ export class Evaluator {
   }
 
   public partialRun(vertices: Vertex[]): ContentChanges {
-    const changes = new ContentChanges()
+    const changes = ContentChanges.empty()
 
     this.stats.measure(StatType.EVALUATION, () => {
       this.dependencyGraph.graph.getTopSortedWithSccSubgraphFrom(vertices,

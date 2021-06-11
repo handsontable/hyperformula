@@ -1043,18 +1043,6 @@ describe('arrays', () => {
     expect(changes.length).toEqual(0)
   })
 
-  it('should return changed content when replacing array to smaller one', () => {
-    const engine = HyperFormula.buildFromArray([
-      ['1', '2', '3'],
-      ['=-A1:C1'],
-    ], { useArrayArithmetic: true})
-
-    const changes = engine.setCellContents(adr('A2'), [['=-A1:B1']])
-
-    expect(changes.length).toEqual(1)
-    expect(changes).toContainEqual(new ExportedCellChange(adr('C2'), null))
-  })
-
   it('should return changed content when replacing array to another smaller one', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '2', '3'],
@@ -1069,16 +1057,29 @@ describe('arrays', () => {
     expect(changes).toContainEqual(new ExportedCellChange(adr('C2'), null))
   })
 
+  it('should return changed content when replacing array to smaller one even if values are same', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1', '2', '3'],
+      ['=-A1:C1'],
+    ], { useArrayArithmetic: true})
+
+    const changes = engine.setCellContents(adr('A2'), [['=-A1:B1']])
+
+    expect(changes.length).toEqual(3)
+    expect(changes).toContainEqual(new ExportedCellChange(adr('A2'), -1))
+    expect(changes).toContainEqual(new ExportedCellChange(adr('B2'), -2))
+    expect(changes).toContainEqual(new ExportedCellChange(adr('C2'), null))
+  })
 
   it('should return REF in changes', () => {
     const engine = HyperFormula.buildFromArray([
       [1, 2, 3, '=-A1:C1'],
     ], {useArrayArithmetic: true})
 
-    const changes = engine.setCellContents(adr('E1'), [[null]])
+    const changes = engine.setCellContents(adr('E1'), [['foo']])
 
     expect(changes).toContainEqual(new ExportedCellChange(adr('D1'), noSpace()))
-    expect(changes).toContainEqual(new ExportedCellChange(adr('E1'), null))
+    expect(changes).toContainEqual(new ExportedCellChange(adr('E1'), 'foo'))
     expect(changes).toContainEqual(new ExportedCellChange(adr('F1'), null))
   })
 

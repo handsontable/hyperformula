@@ -2,6 +2,7 @@ import {simpleCellAddress} from '../src/Cell'
 import {CellValueChange, ChangeExporter, ContentChanges} from '../src/ContentChanges'
 import {SimpleRangeValue} from '../src/interpreter/SimpleRangeValue'
 import {adr} from './testUtils'
+import {HyperFormula} from '../src'
 
 class IdentityChangeExporter implements ChangeExporter<CellValueChange>{
   exportChange(change: CellValueChange): CellValueChange {
@@ -12,10 +13,10 @@ class IdentityChangeExporter implements ChangeExporter<CellValueChange>{
 class SpreadRangeExporter implements ChangeExporter<CellValueChange>{
   exportChange(change: CellValueChange): CellValueChange | CellValueChange[] {
     const value = change.value
-    const address = simpleCellAddress(change.sheet, change.col, change.row)
+    const address = change.address
     if (value instanceof SimpleRangeValue) {
       return Array.from(value.entriesFromTopLeftCorner(address)).map(([v, a]) => {
-        return { sheet: a.sheet, col: a.col, row: a.row, value: v }
+        return { address: a, value: v }
       })
     } else {
       return change
@@ -40,7 +41,7 @@ describe('ContentChanges', () => {
 
     const exportedChanges = contentChanges.exportChanges(identityChangeExporter)
     expect(exportedChanges.length).toEqual(1)
-    expect(exportedChanges).toContainEqual({ sheet: 0, col: 0, row: 0, value: 2})
+    expect(exportedChanges).toContainEqual({ address: {sheet: 0, col: 0, row: 0}, value: 2})
   })
 
   it('should export simple value change', () => {
@@ -52,7 +53,7 @@ describe('ContentChanges', () => {
 
     expect(contentChanges.isEmpty()).toEqual(false)
     expect(exportedChanges.length).toEqual(1)
-    expect(exportedChanges).toContainEqual({ sheet: 0, col: 0, row: 0, value: 1})
+    expect(exportedChanges).toContainEqual({ address: {sheet: 0, col: 0, row: 0}, value: 1})
   })
 
   it('should export SimpleRangeValue change', () => {
@@ -63,7 +64,7 @@ describe('ContentChanges', () => {
     const exportedChanges = contentChanges.exportChanges(identityChangeExporter)
 
     expect(exportedChanges.length).toEqual(1)
-    expect(exportedChanges).toContainEqual({ sheet: 0, col: 0, row: 0, value: SimpleRangeValue.onlyValues([['foo', 'bar']])})
+    expect(exportedChanges).toContainEqual({ address: {sheet: 0, col: 0, row: 0}, value: SimpleRangeValue.onlyValues([['foo', 'bar']])})
   })
 
   it('should add all changes', () => {
@@ -76,8 +77,8 @@ describe('ContentChanges', () => {
 
     const exportedChanges = contentChanges.exportChanges(identityChangeExporter)
     expect(exportedChanges.length).toEqual(2)
-    expect(exportedChanges).toContainEqual({ sheet: 0, col: 0, row: 0, value: 1})
-    expect(exportedChanges).toContainEqual({ sheet: 0, col: 0, row: 1, value: 2})
+    expect(exportedChanges).toContainEqual({ address: {sheet: 0, col: 0, row: 0}, value: 1})
+    expect(exportedChanges).toContainEqual({ address: {sheet: 0, col: 0, row: 1}, value: 2})
   })
 
   it('should handle array change', () => {
@@ -87,9 +88,9 @@ describe('ContentChanges', () => {
     const exportedChanges = contentChanges.exportChanges(new SpreadRangeExporter())
 
     expect(exportedChanges.length).toEqual(4)
-    expect(exportedChanges).toContainEqual({ sheet: 0, col: 0, row: 0, value: 1})
-    expect(exportedChanges).toContainEqual({ sheet: 0, col: 1, row: 0, value: 2})
-    expect(exportedChanges).toContainEqual({ sheet: 0, col: 0, row: 1, value: 'foo'})
-    expect(exportedChanges).toContainEqual({ sheet: 0, col: 1, row: 1, value: 'bar'})
+    expect(exportedChanges).toContainEqual({ address: {sheet: 0, col: 0, row: 0}, value: 1})
+    expect(exportedChanges).toContainEqual({ address: {sheet: 0, col: 1, row: 0}, value: 2})
+    expect(exportedChanges).toContainEqual({ address: {sheet: 0, col: 0, row: 1}, value: 'foo'})
+    expect(exportedChanges).toContainEqual({ address: {sheet: 0, col: 1, row: 1}, value: 'bar'})
   })
 })
