@@ -2,36 +2,36 @@
 
 HyperFormula comes with a dedicated, regularly-updated documentation portal.
 
-View the documentation's latest production version at https://handsontable.github.io/hyperformula/.
+View the documentation's latest production version at https://handsontable.com/docs/hyperformula.
 
 ## About HyperFormula documentation
 
 The HyperFormula documentation is built with [VuePress](https://vuepress.vuejs.org/), a Vue-powered Static Site Generator.
 
-Our VuePress setup:
-
-* Publishes the docs as a sleek, responsive single-page application (SPA).
-* Boasts a great search engine.
-* Lets us write the docs in Markdown (and use Vue inside Markdown!).
-* Lets us quickly build the docs output onto a local server.
-* [COMING SOON] Versions and deploys the docs together with the software.
+When editing the docs, you can use features described [here](https://vuepress.vuejs.org/guide/markdown.html).
 
 ## Getting started with HyperFormula documentation
 
 To start a local HyperFormula docs server:
 
-1. Get the right npm version:
-   * Later than 7.5
-   * Earlier than 16.0
-2. From the `hyperformula` directory, install the docs dependencies:
+1. Make sure you're running [Node.js](https://nodejs.org/en/) 14+.
+2. From the main `hyperformula` directory, install the docs dependencies:
     ```bash
     npm install
     ```
-3. From the `hyperformula` directory, start your local docs server:
+3. From the main `hyperformula` directory, build HyperFormula:
+   ```bash
+   npm run bundle-all
+   ```   
+4. From the main `hyperformula` directory, generate the API reference:
+   ```bash
+   npm run docs:api
+   ```   
+5. From the main `hyperformula` directory, start your local docs server:
    ```bash
    npm run docs:dev
    ```
-4. In your browser, go to: http://localhost:8080/hyperformula/.
+6. In your browser, go to: http://localhost:8080/hyperformula/.
 
 ## HyperFormula documentation npm scripts
 
