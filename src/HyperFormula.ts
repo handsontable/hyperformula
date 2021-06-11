@@ -3978,7 +3978,7 @@ export class HyperFormula implements TypedEmitter {
 
   /**
    * Subscribes to an event.
-   * To see all available events, see [[Listeners]].
+   * For the list of all available events, see [[Listeners]].
    * 
    * @param {Event} event the name of the event to subscribe to
    * @param {Listener} listener to be called when event is emitted
@@ -4003,7 +4003,7 @@ export class HyperFormula implements TypedEmitter {
 
   /**
    * Subscribes to an event once.
-   * To see all available events, see [[Listeners]].
+   * For the list of all available events, see [[Listeners]].
    *
    * @param {Event} event the name of the event to subscribe to
    * @param {Listener} listener to be called when event is emitted
@@ -4029,7 +4029,7 @@ export class HyperFormula implements TypedEmitter {
 
   /**
    * Unsubscribes from an event or from all events.
-   * To see all available events, see [[Listeners]].
+   * For the list of all available events, see [[Listeners]].
    *
    * @param {Event} event the name of the event to subscribe to
    * @param {Listener} listener to be called when event is emitted
