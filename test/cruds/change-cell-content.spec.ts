@@ -989,6 +989,88 @@ describe('arrays', () => {
     expect(changes).toContainEqual(new ExportedCellChange(adr('B2'), -2))
   })
 
+  it('should return changed content when replacing array left corner', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1', '2'],
+      ['=-A1:B1'],
+    ], { useArrayArithmetic: true})
+
+    const changes = engine.setCellContents(adr('A2'), [['foo']])
+
+    expect(changes.length).toEqual(2)
+    expect(changes).toContainEqual(new ExportedCellChange(adr('A2'), 'foo'))
+    expect(changes).toContainEqual(new ExportedCellChange(adr('B2'), null))
+  })
+
+  it('should return changed content when replacing any array cell', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1', '2', '3'],
+      ['=-A1:C1'],
+    ], { useArrayArithmetic: true})
+
+    const changes = engine.setCellContents(adr('B2'), [['foo']])
+
+    console.log(engine.getSheetValues(0))
+
+    expect(changes.length).toEqual(3)
+    expect(changes).toContainEqual(new ExportedCellChange(adr('A2'), noSpace()))
+    expect(changes).toContainEqual(new ExportedCellChange(adr('B2'), 'foo'))
+    expect(changes).toContainEqual(new ExportedCellChange(adr('C2'), null))
+  })
+
+  it('should return changed content when clearing array left corner', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1', '2'],
+      ['=-A1:B1'],
+    ], { useArrayArithmetic: true})
+
+    const changes = engine.setCellContents(adr('A2'), [[null]])
+
+    expect(changes.length).toEqual(2)
+    expect(changes).toContainEqual(new ExportedCellChange(adr('A2'), null))
+    expect(changes).toContainEqual(new ExportedCellChange(adr('B2'), null))
+  })
+
+  it('should return changed content when clearing any array cell', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1', '2'],
+      ['=-A1:B1'],
+    ], { useArrayArithmetic: true})
+
+    const changes = engine.setCellContents(adr('B2'), [[null]])
+
+    expect(changes.length).toEqual(2)
+    expect(changes).toContainEqual(new ExportedCellChange(adr('A2'), null))
+    expect(changes).toContainEqual(new ExportedCellChange(adr('B2'), null))
+  })
+
+  it('should return changed content when replacing array to smaller one', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1', '2', '3'],
+      ['=-A1:C1'],
+    ], { useArrayArithmetic: true})
+
+    const changes = engine.setCellContents(adr('A2'), [['=-A1:B1']])
+
+    expect(changes.length).toEqual(1)
+    expect(changes).toContainEqual(new ExportedCellChange(adr('C2'), null))
+  })
+
+  it('should return changed content when replacing array to another smaller one', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1', '2', '3'],
+      ['=-A1:C1'],
+    ], { useArrayArithmetic: true})
+
+    const changes = engine.setCellContents(adr('A2'), [['=+A1:B1']])
+
+    expect(changes.length).toEqual(3)
+    expect(changes).toContainEqual(new ExportedCellChange(adr('A2'), 1))
+    expect(changes).toContainEqual(new ExportedCellChange(adr('B2'), 2))
+    expect(changes).toContainEqual(new ExportedCellChange(adr('C2'), null))
+  })
+
+
   it('should return REF in changes', () => {
     const engine = HyperFormula.buildFromArray([
       [1, 2, 3, '=-A1:C1'],
