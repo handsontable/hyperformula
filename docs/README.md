@@ -1,12 +1,12 @@
-# HyperFormula docs
+# HyperFormula documentation
 
 HyperFormula comes with a dedicated, regularly-updated documentation portal.
 
-View the docs' latest production version at https://handsontable.github.io/hyperformula/.
+View the documentation's latest production version at https://handsontable.github.io/hyperformula/.
 
-## About HyperFormula docs
+## About HyperFormula documentation
 
-The HyperFormula docs are built with [VuePress](https://vuepress.vuejs.org/), a Vue-powered Static Site Generator.
+The HyperFormula documentation is built with [VuePress](https://vuepress.vuejs.org/), a Vue-powered Static Site Generator.
 
 Our VuePress setup:
 
@@ -15,7 +15,7 @@ Our VuePress setup:
 * Lets us write the docs in Markdown (and use Vue inside Markdown!).
 * [COMING SOON] Versions and deploys the docs together with the software.
 
-## Getting started with HyperFormula docs
+## Getting started with HyperFormula documentation
 
 To start a local HyperFormula docs server:
 
@@ -32,7 +32,7 @@ To start a local HyperFormula docs server:
    ```
 4. In your browser, go to: http://localhost:8080/docs/.
 
-## HyperFormula docs npm scripts
+## HyperFormula documentation npm scripts
 
 From the `hyperformula` directory, you can run the following npm scripts:
 
@@ -47,7 +47,7 @@ From the `hyperformula` directory, you can run the following npm scripts:
 docs                            # All documentation files
 ├── .vuepress                   # All VuePress files
 │   ├── components              # Vue components
-│   ├── dist                    # The docs' output. The docs and the API reference are built into this folder.
+│   ├── dist                    # The docs' output. Both the docs and the API reference are built into this folder.
 │   ├── public                  # Public assets
 │   ├── styles                  # Style-related files
 │   ├── subtheme                # Subtheme files
@@ -55,9 +55,9 @@ docs                            # All documentation files
 │   ├── config.js               # VuePress configuration
 │   ├── enhanceApp.js           # VuePress app-level enhancements
 │   └── highlight.js            # Code highlight configuration
-├── api                         # API reference files, generated automatically from JsDoc. Do not edit!
+├── api                         # The API reference files, generated automatically from JsDoc. Do not edit!
 ├── guide                       # The docs' source files: Markdown content
-├── api-template.md             # API reference welcome page
-├── index.md                    # Docs portal welcome page
+├── api-template.md             # The API reference welcome page
+├── index.md                    # The docs portal welcome page
 └── README.md                   # The file you're looking at right now!
 ```
