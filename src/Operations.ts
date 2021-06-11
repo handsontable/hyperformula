@@ -5,7 +5,7 @@
 
 import {AbsoluteCellRange} from './AbsoluteCellRange'
 import {absolutizeDependencies, filterDependenciesOutOfScope} from './absolutizeDependencies'
-import {invalidSimpleCellAddress, simpleCellAddress, SimpleCellAddress} from './Cell'
+import {CellError, ErrorType, invalidSimpleCellAddress, simpleCellAddress, SimpleCellAddress} from './Cell'
 import {CellContent, CellContentParser, RawCellContent} from './CellContentParser'
 import {ClipboardCell, ClipboardCellType} from './ClipboardOperations'
 import {Config} from './Config'
@@ -18,7 +18,7 @@ import {
   EmptyCellVertex,
   FormulaCellVertex,
   MatrixVertex,
-  ParsingErrorVertex, RangeVertex,
+  ParsingErrorVertex,
   SheetMapping,
   SparseStrategy,
   ValueCellVertex
@@ -647,7 +647,7 @@ export class Operations {
       const parserResult = this.parser.parse(parsedCellContent.formula, address)
       const {ast, errors} = parserResult
       if (errors.length > 0) {
-        this.dependencyGraph.setParsingErrorToCell(address, new ParsingErrorVertex(errors, parsedCellContent.formula))
+        this.setParsingErrorToCell(parsedCellContent.formula, errors, address)
       } else {
         const size = this.matrixSizePredictor.checkMatrixSize(ast, address)
         this.setFormulaToCell(address, size, parserResult)
@@ -709,7 +709,10 @@ export class Operations {
   }
 
   public setParsingErrorToCell(rawInput: string, errors: ParsingError[], address: SimpleCellAddress) {
-    this.dependencyGraph.setParsingErrorToCell(address, new ParsingErrorVertex(errors, rawInput))
+    const vertex = new ParsingErrorVertex(errors, rawInput)
+    const arrayChanges = this.dependencyGraph.setParsingErrorToCell(address, vertex)
+    this.changes.addAll(arrayChanges)
+    this.changes.addChange(vertex.getCellValue(), address)
   }
 
   /**

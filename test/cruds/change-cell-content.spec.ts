@@ -921,6 +921,23 @@ describe('arrays', () => {
     ])
   })
 
+  it('should make existing array REF and change cell content to parsing error', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1', '2'],
+      ['3', '4', '=B4'],
+      ['=-A1:B2'],
+    ], {useArrayArithmetic: true})
+
+    engine.setCellContents(adr('B4'), [['=SUM(']])
+
+    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
+      [1, 2],
+      [3, 4, '=B4'],
+      ['=-A1:B2'],
+      [null, '=SUM(']
+    ], {useArrayArithmetic: true}))
+  })
+
   it('should make existing matrix REF and set new array', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '2'],
@@ -1003,7 +1020,7 @@ describe('arrays', () => {
     expect(changes).toContainEqual(new ExportedCellChange(adr('B2'), null))
   })
 
-  it('should return changed content when replacing any array cell', () => {
+  it('should return changed content when replacing any array cell with simple value', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '2', '3'],
       ['=-A1:C1'],
@@ -1011,11 +1028,25 @@ describe('arrays', () => {
 
     const changes = engine.setCellContents(adr('B2'), [['foo']])
 
+    expect(changes.length).toEqual(3)
+    expect(changes).toContainEqual(new ExportedCellChange(adr('A2'), noSpace()))
+    expect(changes).toContainEqual(new ExportedCellChange(adr('B2'), 'foo'))
+    expect(changes).toContainEqual(new ExportedCellChange(adr('C2'), null))
+  })
+
+  it('should return changed content when replacing any array cell with parsing error', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1', '2', '3'],
+      ['=-A1:C1'],
+    ], { useArrayArithmetic: true})
+
+    const changes = engine.setCellContents(adr('B2'), [['=SUM(']])
+
     console.log(engine.getSheetValues(0))
 
     expect(changes.length).toEqual(3)
     expect(changes).toContainEqual(new ExportedCellChange(adr('A2'), noSpace()))
-    expect(changes).toContainEqual(new ExportedCellChange(adr('B2'), 'foo'))
+    expect(changes).toContainEqual(new ExportedCellChange(adr('B2'), detailedError(ErrorType.ERROR, ErrorMessage.ParseError)))
     expect(changes).toContainEqual(new ExportedCellChange(adr('C2'), null))
   })
 

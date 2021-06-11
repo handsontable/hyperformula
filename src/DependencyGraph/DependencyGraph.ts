@@ -99,12 +99,13 @@ export class DependencyGraph {
     return this.getAndClearContentChanges()
   }
 
-  public setParsingErrorToCell(address: SimpleCellAddress, errorVertex: ParsingErrorVertex) {
+  public setParsingErrorToCell(address: SimpleCellAddress, errorVertex: ParsingErrorVertex): ContentChanges {
     const vertex = this.shrinkPossibleMatrixAndGetCell(address)
     this.exchangeOrAddGraphNode(vertex, errorVertex)
     this.addressMapping.setCell(address, errorVertex)
     this.graph.markNodeAsSpecialRecentlyChanged(errorVertex)
     this.correctInfiniteRangesDependency(address)
+    return this.getAndClearContentChanges()
   }
 
   public setValueToCell(address: SimpleCellAddress, value: RawAndParsedValue): ContentChanges {
