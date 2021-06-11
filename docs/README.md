@@ -13,6 +13,7 @@ Our VuePress setup:
 * Publishes the docs as a sleek, responsive single-page application (SPA).
 * Boasts a great search engine.
 * Lets us write the docs in Markdown (and use Vue inside Markdown!).
+* Lets us quickly build the docs output onto a local server.
 * [COMING SOON] Versions and deploys the docs together with the software.
 
 ## Getting started with HyperFormula documentation
@@ -30,13 +31,13 @@ To start a local HyperFormula docs server:
    ```bash
    npm run docs:dev
    ```
-4. In your browser, go to: http://localhost:8080/docs/.
+4. In your browser, go to: http://localhost:8080/hyperformula/.
 
 ## HyperFormula documentation npm scripts
 
 From the `hyperformula` directory, you can run the following npm scripts:
 
-* `npm run docs:dev` - Starts a local docs server at http://localhost:8080/docs/.
+* `npm run docs:dev` - Starts a local docs server at http://localhost:8080/hyperformula/.
 * `npm run docs:api` - Generates the HyperFormula API reference into `/docs/api`.
 * `npm run docs:build` - Builds the docs output into `/docs/.vuepress/dist`.
 * `npm run docs` - Builds both the API reference and the docs output.
@@ -47,7 +48,7 @@ From the `hyperformula` directory, you can run the following npm scripts:
 docs                            # All documentation files
 ├── .vuepress                   # All VuePress files
 │   ├── components              # Vue components
-│   ├── dist                    # The docs' output. Both the docs and the API reference are built into this folder.
+│   ├── dist                    # The docs output. Both the docs and the API reference are built into this folder.
 │   ├── public                  # Public assets
 │   ├── styles                  # Style-related files
 │   ├── subtheme                # Subtheme files
@@ -56,8 +57,8 @@ docs                            # All documentation files
 │   ├── enhanceApp.js           # VuePress app-level enhancements
 │   └── highlight.js            # Code highlight configuration
 ├── api                         # The API reference files, generated automatically from JsDoc. Do not edit!
-├── guide                       # The docs' source files: Markdown content
+├── guide                       # The docs source files: Markdown content
 ├── api-template.md             # The API reference welcome page
-├── index.md                    # The docs portal welcome page
+├── index.md                    # The main docs portal welcome page
 └── README.md                   # The file you're looking at right now!
 ```
