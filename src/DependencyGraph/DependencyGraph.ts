@@ -130,10 +130,10 @@ export class DependencyGraph {
     return this.getAndClearContentChanges()
   }
 
-  public setCellEmpty(address: SimpleCellAddress) {
+  public setCellEmpty(address: SimpleCellAddress): ContentChanges {
     const vertex = this.shrinkPossibleMatrixAndGetCell(address)
     if (vertex === null) {
-      return
+      return ContentChanges.empty()
     }
     if (this.graph.adjacentNodes(vertex).size > 0) {
       const emptyVertex = new EmptyCellVertex(address)
@@ -149,6 +149,8 @@ export class DependencyGraph {
       this.removeVertex(vertex)
       this.addressMapping.removeCell(address)
     }
+
+    return this.getAndClearContentChanges()
   }
 
   public ensureThatVertexIsNonMatrixCellVertex(vertex: CellVertex | null) {
@@ -765,6 +767,11 @@ export class DependencyGraph {
       }
     }
     this.graph.markNodeAsSpecialRecentlyChanged(matrix)
+  }
+
+  public isArrayInternalCell(address: SimpleCellAddress): boolean {
+    const vertex = this.getCell(address)
+    return vertex instanceof MatrixVertex && !vertex.isLeftCorner(address)
   }
 
   private cleanAddressMappingUnderMatrix(vertex: MatrixVertex) {

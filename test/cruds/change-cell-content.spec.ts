@@ -881,7 +881,7 @@ describe('arrays', () => {
     ])
   })
 
-  it('should make existing array REF and change cell content empty', () => {
+  it('should not change cell to empty if part of an array', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '2'],
       ['3', '4', '=B4'],
@@ -892,8 +892,9 @@ describe('arrays', () => {
 
     expect(engine.getSheetValues(0)).toEqual([
       [1, 2],
-      [3, 4],
-      [noSpace()],
+      [3, 4, -4],
+      [-1, -2],
+      [-3, -4],
     ])
   })
 
@@ -1031,7 +1032,7 @@ describe('arrays', () => {
     expect(changes).toContainEqual(new ExportedCellChange(adr('B2'), null))
   })
 
-  it('should return changed content when clearing any array cell', () => {
+  it('should return on changes when trying to clear array cell', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '2'],
       ['=-A1:B1'],
@@ -1039,9 +1040,7 @@ describe('arrays', () => {
 
     const changes = engine.setCellContents(adr('B2'), [[null]])
 
-    expect(changes.length).toEqual(2)
-    expect(changes).toContainEqual(new ExportedCellChange(adr('A2'), null))
-    expect(changes).toContainEqual(new ExportedCellChange(adr('B2'), null))
+    expect(changes.length).toEqual(0)
   })
 
   it('should return changed content when replacing array to smaller one', () => {

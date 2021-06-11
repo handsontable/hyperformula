@@ -682,10 +682,14 @@ export class Operations {
   }
 
   public setCellEmpty(address: SimpleCellAddress) {
+    if (this.dependencyGraph.isArrayInternalCell(address)) {
+      return
+    }
     const oldValue = this.dependencyGraph.getCellValue(address)
+    const arrayChanges = this.dependencyGraph.setCellEmpty(address)
     this.columnSearch.remove(getRawValue(oldValue), address)
+    this.changes.addAll(arrayChanges)
     this.changes.addChange(EmptyValue, address)
-    this.dependencyGraph.setCellEmpty(address)
   }
 
   public setFormulaToCellFromCache(formulaHash: string, address: SimpleCellAddress) {
