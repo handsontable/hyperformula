@@ -979,6 +979,16 @@ describe('arrays', () => {
     expect(engine.getCellValue(adr('D2'))).toEqual(10)
   })
 
+  it('should return values of a range in changes', () => {
+    const engine = HyperFormula.buildFromArray([[1, 2]], { useArrayArithmetic: true})
+
+    const changes = engine.setCellContents(adr('A2'), [['=-A1:B1']])
+
+    expect(changes.length).toEqual(2)
+    expect(changes).toContainEqual(new ExportedCellChange(adr('A2'), -1))
+    expect(changes).toContainEqual(new ExportedCellChange(adr('B2'), -2))
+  })
+
   it('should return REF in changes', () => {
     const engine = HyperFormula.buildFromArray([
       [1, 2, 3, '=-A1:C1'],

@@ -44,7 +44,7 @@ export class ContentChanges {
     this.addSingleCellValue(newValue, address)
   }
 
-  public add(...changes: ChangeList) {
+  private add(...changes: ChangeList) {
     for (const change of changes) {
       this.changes.set(simpleCellAddress(change.sheet, change.col, change.row), change)
     }
