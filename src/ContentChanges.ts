@@ -3,15 +3,13 @@
  * Copyright (c) 2021 Handsoncode. All rights reserved.
  */
 
-import {SimpleCellAddress} from './Cell'
+import {addressKey, SimpleCellAddress} from './Cell'
 import {InterpreterValue} from './interpreter/InterpreterValue'
-import {ClipboardCell} from './ClipboardOperations'
 import {SimpleRangeValue} from './interpreter/SimpleRangeValue'
 
 export interface CellValueChange {
   address: SimpleCellAddress,
   value: InterpreterValue,
-  oldValue?: ClipboardCell,
 }
 
 export interface ChangeExporter<T> {
@@ -34,10 +32,6 @@ export class ContentChanges {
       this.add(change.address, change)
     }
     return this
-  }
-
-  public addChangeWithOldValue(newValue: InterpreterValue, oldValue: ClipboardCell, address: SimpleCellAddress): void {
-    this.addInterpreterValue(newValue, address, oldValue)
   }
 
   public addChange(newValue: InterpreterValue, address: SimpleCellAddress): void {
@@ -72,14 +66,13 @@ export class ContentChanges {
         this.changes.delete(`${cellAddress.sheet},${cellAddress.col},${cellAddress.row}`)
       }
     }
-    this.changes.set(`${address.sheet},${address.col},${address.row}`, change)
+    this.changes.set(addressKey((address)), change)
   }
 
-  private addInterpreterValue(value: InterpreterValue, address: SimpleCellAddress, oldValue?: ClipboardCell) {
+  private addInterpreterValue(value: InterpreterValue, address: SimpleCellAddress) {
     this.add(address, {
       address,
-      value,
-      oldValue
+      value
     })
   }
 }

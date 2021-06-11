@@ -4,13 +4,10 @@
  */
 
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
-import {SimpleCellAddress} from '../Cell'
+import {addressKey, SimpleCellAddress} from '../Cell'
 import {Maybe} from '../Maybe'
 import {ColumnsSpan, RowsSpan} from '../Span'
 import {MatrixVertex} from './'
-import {simpleCellAddressToString} from '../parser'
-
-const mappingKey = (address: SimpleCellAddress) => `${address.sheet},${address.row},${address.col}`
 
 export class MatrixMapping {
   public readonly matrixMapping: Map<string, MatrixVertex> = new Map()
@@ -24,22 +21,22 @@ export class MatrixMapping {
   }
 
   public getMatrixByCorner(address: SimpleCellAddress): Maybe<MatrixVertex> {
-    return this.matrixMapping.get(mappingKey(address))
+    return this.matrixMapping.get(addressKey(address))
   }
 
   public setMatrix(range: AbsoluteCellRange, vertex: MatrixVertex) {
-    this.matrixMapping.set(mappingKey(range.start), vertex)
+    this.matrixMapping.set(addressKey(range.start), vertex)
   }
 
   public setMatrixByCorner(address: SimpleCellAddress, vertex: MatrixVertex) {
-    this.matrixMapping.set(mappingKey(address), vertex)
+    this.matrixMapping.set(addressKey(address), vertex)
   }
 
   public removeMatrix(range: string | AbsoluteCellRange) {
     if (typeof range === 'string') {
       this.matrixMapping.delete(range)
     } else {
-      this.matrixMapping.delete(mappingKey(range.start))
+      this.matrixMapping.delete(addressKey(range.start))
     }
   }
 
