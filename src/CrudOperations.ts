@@ -39,7 +39,7 @@ import {
 import {AddColumnsCommand, AddRowsCommand, Operations, RemoveColumnsCommand, RemoveRowsCommand} from './Operations'
 import {ParserWithCaching} from './parser'
 import {findBoundaries, validateAsSheet} from './Sheet'
-import {ColumnsSpan} from './Span'
+import {ColumnsSpan, RowsSpan} from './Span'
 import {Statistics} from './statistics'
 import {
   AddColumnsUndoEntry,
@@ -135,7 +135,11 @@ export class CrudOperations {
   public moveCells(sourceLeftCorner: SimpleCellAddress, width: number, height: number, destinationLeftCorner: SimpleCellAddress): void {
     this.undoRedo.clearRedoStack()
     this.clipboardOperations.abortCut()
-    const {version, overwrittenCellsData, addedGlobalNamedExpressions} = this.operations.moveCells(sourceLeftCorner, width, height, destinationLeftCorner)
+    const {
+      version,
+      overwrittenCellsData,
+      addedGlobalNamedExpressions
+    } = this.operations.moveCells(sourceLeftCorner, width, height, destinationLeftCorner)
     this.undoRedo.saveOperation(new MoveCellsUndoEntry(sourceLeftCorner, width, height, destinationLeftCorner, overwrittenCellsData, addedGlobalNamedExpressions, version))
   }
 
@@ -306,8 +310,8 @@ export class CrudOperations {
   }
 
   public testColumnOrderForMatrices(sheetId: number, columnMapping: [number, number][]): void {
-    for(const [source, target] of columnMapping ) {
-      if(source!==target) {
+    for (const [source, target] of columnMapping) {
+      if (source !== target) {
         const rowRange = AbsoluteCellRange.spanFrom({sheet: sheetId, col: source, row: 0}, 1, Infinity)
         if (this.dependencyGraph.matrixMapping.isFormulaMatrixInRange(rowRange)) {
           throw new SourceLocationHasMatrixError()
@@ -334,8 +338,8 @@ export class CrudOperations {
   }
 
   public testRowOrderForMatrices(sheetId: number, rowMapping: [number, number][]): void {
-    for(const [source, target] of rowMapping ) {
-      if(source!==target) {
+    for (const [source, target] of rowMapping) {
+      if (source !== target) {
         const rowRange = AbsoluteCellRange.spanFrom({sheet: sheetId, col: 0, row: source}, Infinity, 1)
         if (this.dependencyGraph.matrixMapping.isFormulaMatrixInRange(rowRange)) {
           throw new SourceLocationHasMatrixError()
@@ -350,12 +354,12 @@ export class CrudOperations {
       throw new NoSheetWithIdError(sheetId)
     }
     const limit = rowOrColumn === 'row' ? this.dependencyGraph.getSheetHeight(sheetId) : this.dependencyGraph.getSheetWidth(sheetId)
-    if(newOrder.length !== limit) {
-      throw new InvalidArgumentsError(`number of ${rowOrColumn}s provided to be sheet ${rowOrColumn==='row'?'height':'width'}.`)
+    if (newOrder.length !== limit) {
+      throw new InvalidArgumentsError(`number of ${rowOrColumn}s provided to be sheet ${rowOrColumn === 'row' ? 'height' : 'width'}.`)
     }
     const ret: [number, number][] = []
-    for(let i=0;i<limit;i++) {
-      if(newOrder[i]!==i) {
+    for (let i = 0; i < limit; i++) {
+      if (newOrder[i] !== i) {
         ret.push([i, newOrder[i]])
       }
     }
@@ -364,17 +368,17 @@ export class CrudOperations {
 
   private validateRowOrColumnMapping(sheetId: number, rowMapping: [number, number][], rowOrColumn: 'row' | 'column'): void {
     const limit = rowOrColumn === 'row' ? this.dependencyGraph.getSheetHeight(sheetId) : this.dependencyGraph.getSheetWidth(sheetId)
-    const sources = rowMapping.map(([a, _])=>a).sort((a, b) => a-b)
-    const targets = rowMapping.map(([_, b])=>b).sort((a, b) => a-b)
+    const sources = rowMapping.map(([a, _]) => a).sort((a, b) => a - b)
+    const targets = rowMapping.map(([_, b]) => b).sort((a, b) => a - b)
 
-    for(let i=0;i<sources.length;i++) {
-      if(!isNonnegativeInteger(sources[i]) || sources[i] >= limit) {
-        throw new InvalidArgumentsError(`${rowOrColumn} numbers to be nonnegative integers and less than sheet ${rowOrColumn==='row'?'height':'width'}.`)
+    for (let i = 0; i < sources.length; i++) {
+      if (!isNonnegativeInteger(sources[i]) || sources[i] >= limit) {
+        throw new InvalidArgumentsError(`${rowOrColumn} numbers to be nonnegative integers and less than sheet ${rowOrColumn === 'row' ? 'height' : 'width'}.`)
       }
-      if(sources[i]===sources[i+1]) {
+      if (sources[i] === sources[i + 1]) {
         throw new InvalidArgumentsError(`source ${rowOrColumn} numbers to be unique.`)
       }
-      if(sources[i]!==targets[i]) {
+      if (sources[i] !== targets[i]) {
         throw new InvalidArgumentsError(`target ${rowOrColumn} numbers to be permutation of source ${rowOrColumn} numbers.`)
       }
     }
@@ -546,6 +550,9 @@ export class CrudOperations {
     if (this.dependencyGraph.matrixMapping.isFormulaMatrixInRange(sourceRange)) {
       throw new SourceLocationHasMatrixError()
     }
+    if (targetRow > 0 && this.dependencyGraph.matrixMapping.isFormulaMatrixInAllRows(RowsSpan.fromNumberOfRows(sheet, targetRow - 1, 2))) {
+      throw new TargetLocationHasMatrixError()
+    }
   }
 
   public ensureItIsPossibleToMoveColumns(sheet: number, startColumn: number, numberOfColumns: number, targetColumn: number): void {
@@ -632,7 +639,7 @@ export class CrudOperations {
   }
 
   public ensureScopeIdIsValid(scopeId?: number): void {
-    if(scopeId !== undefined && !this.sheetMapping.hasSheetWithId(scopeId)) {
+    if (scopeId !== undefined && !this.sheetMapping.hasSheetWithId(scopeId)) {
       throw new NoSheetWithIdError(scopeId)
     }
   }
