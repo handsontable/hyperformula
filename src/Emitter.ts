@@ -30,7 +30,7 @@ export interface Listeners {
    * const hfInstance = HyperFormula.buildEmpty();
    *
    * // define a function to be called when the event occurs
-   * const handler = ( ) => { console.log('baz') }
+   * const handler = (addedSheetDisplayName) => { console.log('baz') }
    *
    * // subscribe to the 'sheetAdded' event, pass the handler
    * hfInstance.on('sheetAdded', handler);
@@ -62,12 +62,12 @@ export interface Listeners {
    * @example
    * ```js
    * const hfInstance = HyperFormula.buildFromSheets({
-   *  MySheet1: [ ['=SUM(MySheet2!A1:A2)'] ],
-   *  MySheet2: [ ['10'] ],
+   *   MySheet1: [ ['=SUM(MySheet2!A1:A2)'] ],
+   *   MySheet2: [ ['10'] ],
    * });
    *
    * // define a function to be called when the event occurs
-   * const handler = ( ) => { console.log('baz') }
+   * const handler = (removedSheetDisplayName, changes) => { console.log('baz') }
    *
    * // subscribe to the 'sheetRemoved' event, pass the handler
    * hfInstance.on('sheetRemoved', handler);
@@ -99,12 +99,12 @@ export interface Listeners {
    * @example
    * ```js
    * const hfInstance = HyperFormula.buildFromSheets({
-   *  MySheet1: [ ['=SUM(MySheet2!A1:A2)'] ],
-   *  MySheet2: [ ['10'] ],
+   *   MySheet1: [ ['=SUM(MySheet2!A1:A2)'] ],
+   *   MySheet2: [ ['10'] ],
    * });
    *
    * // define a function to be called when the event occurs
-   * const handler = ( ) => { console.log('baz') }
+   * const handler = (oldName, newName) => { console.log(`Sheet ${oldName} was renamed to ${newName}`) }
    *
    * // subscribe to the 'sheetRenamed' event, pass the handler
    * hfInstance.on('sheetRenamed', handler);
@@ -136,11 +136,11 @@ export interface Listeners {
    * @example
    * ```js
    * const hfInstance = HyperFormula.buildFromArray([
-   * ['42'],
+   *   ['42'],
    * ]);
    *
    * // define a function to be called when the event occurs
-   * const handler = ( ) => { console.log('baz') }
+   * const handler = ( namedExpressionName, changes ) => { console.log('baz') }
    *
    * // subscribe to the 'namedExpressionAdded' event, pass the handler
    * hfInstance.on('namedExpressionAdded', handler);
@@ -172,11 +172,11 @@ export interface Listeners {
    * @example
    * ```js
    * const hfInstance = HyperFormula.buildFromArray([
-   * ['42'],
+   *   ['42'],
    * ]);
    *
    * // define a function to be called when the event occurs
-   * const handler = ( ) => { console.log('baz') }
+   * const handler = ( namedExpressionName, changes ) => { console.log('baz') }
    * 
    * // subscribe to the 'namedExpressionRemoved' event, pass the handler
    * hfInstance.on('namedExpressionRemoved', handler);
@@ -211,11 +211,11 @@ export interface Listeners {
    * @example
    * ```js
    * const hfInstance = HyperFormula.buildFromArray([
-   * ['1', '2', '=A1'],
+   *   ['1', '2', '=A1'],
    * ]);
    *
    * // define a function to be called when the event occurs
-   * const handler = ( ) => { console.log('baz') }
+   * const handler = ( changes ) => { console.log('baz') }
    * 
    * // subscribe to the 'valuesUpdated' event, pass the handler
    * hfInstance.on('valuesUpdated', handler);
@@ -244,8 +244,8 @@ export interface Listeners {
    * @example
    * ```js
    * const hfInstance = HyperFormula.buildFromSheets({
-   * MySheet1: [ ['1'] ],
-   * MySheet2: [ ['10'] ]
+   *   MySheet1: [ ['1'] ],
+   *   MySheet2: [ ['10'] ]
    * });
    *
    * // define a function to be called when the event occurs
@@ -283,12 +283,12 @@ export interface Listeners {
    * @example
    * ```js
    * const hfInstance = HyperFormula.buildFromSheets({
-   * MySheet1: [ ['1'] ],
-   * MySheet2: [ ['10'] ]
+   *   MySheet1: [ ['1'] ],
+   *   MySheet2: [ ['10'] ]
    * });
    *
    * // define a function to be called when the event occurs
-   * const handler = ( ) => { console.log('baz') }
+   * const handler = ( changes ) => { console.log('baz') }
    * 
    * // subscribe to the 'evaluationResumed' event, pass the handler
    * hfInstance.on('evaluationResumed', handler);
