@@ -9,17 +9,26 @@ function sleepFor( sleepDuration: number ){
 }
 
 describe('Interpreter - function NOW', () => {
+  let originalNow: () => number
+
+  beforeEach(() => {
+    originalNow = Date.now
+    let cnt = 0
+    Date.now = () => {
+      cnt += 1
+      return Date.UTC(1985, 8, 16, 3, 45, 20+cnt, 30)
+    }
+  })
+
   it('works',  () => {
     const engine =  HyperFormula.buildFromArray([
       ['=NOW()'],
     ])
-    const t1 = engine.getCellValue(adr('A1')) as number
+    expect(engine.getCellValue(adr('A1'))).toBeCloseTo(31306.2399189815, 6)
     expect(engine.getCellValueDetailedType(adr('A1'))).toBe(CellValueDetailedType.NUMBER_DATETIME)
-    sleepFor(1000)
     engine.setCellContents(adr('A2'), null)
-    const t2 = engine.getCellValue(adr('A1')) as number
-    const delta = (t2-t1)*(24*60*60)
-    expect(delta).toBeCloseTo(1)
+    expect(engine.getCellValue(adr('A1'))).toBeCloseTo(31306.2399652778, 6)
+    expect(engine.getCellValueDetailedType(adr('A1'))).toBe(CellValueDetailedType.NUMBER_DATETIME)
   })
 
   it('validates number of arguments', () => {
@@ -28,5 +37,9 @@ describe('Interpreter - function NOW', () => {
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
+  })
+
+  afterEach(() => {
+    Date.now = originalNow
   })
 })
