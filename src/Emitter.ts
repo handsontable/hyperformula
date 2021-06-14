@@ -140,7 +140,7 @@ export interface Listeners {
    * ]);
    *
    * // define a function to be called when the event occurs
-   * const handler = ( namedExpressionName, changes ) => { console.log('baz') }
+   * const handler = (namedExpressionName, changes) => { console.log('baz') }
    *
    * // subscribe to the 'namedExpressionAdded' event, pass the handler
    * hfInstance.on('namedExpressionAdded', handler);
@@ -176,7 +176,7 @@ export interface Listeners {
    * ]);
    *
    * // define a function to be called when the event occurs
-   * const handler = ( namedExpressionName, changes ) => { console.log('baz') }
+   * const handler = (namedExpressionName, changes) => { console.log('baz') }
    * 
    * // subscribe to the 'namedExpressionRemoved' event, pass the handler
    * hfInstance.on('namedExpressionRemoved', handler);
@@ -215,7 +215,7 @@ export interface Listeners {
    * ]);
    *
    * // define a function to be called when the event occurs
-   * const handler = ( changes ) => { console.log('baz') }
+   * const handler = (changes) => { console.log('baz') }
    * 
    * // subscribe to the 'valuesUpdated' event, pass the handler
    * hfInstance.on('valuesUpdated', handler);
@@ -288,7 +288,7 @@ export interface Listeners {
    * });
    *
    * // define a function to be called when the event occurs
-   * const handler = ( changes ) => { console.log('baz') }
+   * const handler = (changes) => { console.log('baz') }
    * 
    * // subscribe to the 'evaluationResumed' event, pass the handler
    * hfInstance.on('evaluationResumed', handler);
