@@ -110,7 +110,7 @@ export interface Listeners {
    * hfInstance.on('sheetRenamed', handler);
    *
    * // rename a sheet to trigger the 'sheetRenamed' event,
-   * // the console prints 'baz' each time a sheet is renamed
+   * // the console prints `Sheet ${oldName} was renamed to ${newName}` each time a sheet is renamed
    * hfInstance.renameSheet(0, 'MySheet0');
    *
    * // unsubscribe from the 'sheetRenamed' event
