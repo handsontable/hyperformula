@@ -1107,8 +1107,10 @@ export class HyperFormula implements TypedEmitter {
     let range
     if(isSimpleCellAddress(address)) {
       range = new AbsoluteCellRange(address, address)
-    } else {
+    } else if (isSimpleCellRange(address) {
       range = new AbsoluteCellRange(address.start, address.end)
+    } else {
+      throw new ExpectedValueOfTypeError()
     }
     try {
       this._crudOperations.ensureRangeInSizeLimits(range)
