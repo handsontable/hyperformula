@@ -1101,6 +1101,7 @@ export class HyperFormula implements TypedEmitter {
    * @param {SimpleCellAddress | SimpleCellRange} address - single cell or block of cells to check
    *
    * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
+   * @throws [[SheetsNotEqual]] if range provided has distinct sheet numbers for start and end
    *
    * @example
    * ```js
@@ -1814,6 +1815,8 @@ export class HyperFormula implements TypedEmitter {
    * @param {SimpleCellAddress} destinationLeftCorner - upper left address of the target cell block
    *
    * @throws [[ExpectedValueOfTypeError]] if destinationLeftCorner or source are of wrong type
+   * @throws [[SheetsNotEqual]] if range provided has distinct sheet numbers for start and end
+   *
    * @example
    * ```js
    * const hfInstance = HyperFormula.buildFromArray([
@@ -1863,6 +1866,7 @@ export class HyperFormula implements TypedEmitter {
    * @throws [[SheetSizeLimitExceededError]] when performing this operation would result in sheet size limits exceeding
    * @throws [[SourceLocationHasMatrixError]] when the source location has matrix inside - matrix cannot be moved
    * @throws [[TargetLocationHasMatrixError]] when the target location has matrix inside - cells cannot be replaced by the matrix
+   * @throws [[SheetsNotEqual]] if range provided has distinct sheet numbers for start and end
    *
    * @example
    * ```js
@@ -2068,6 +2072,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * @throws [[ExpectedValueOfTypeError]] if source is of wrong type
    * @throws an error while attempting to copy unsupported content type
+   * @throws [[SheetsNotEqual]] if range provided has distinct sheet numbers for start and end
    *
    * @example
    * ```js
@@ -2099,6 +2104,7 @@ export class HyperFormula implements TypedEmitter {
    * @param {SimpleCellRange} source - rectangle range to cut
    *
    * @throws [[ExpectedValueOfTypeError]] if source is of wrong type
+   * @throws [[SheetsNotEqual]] if range provided has distinct sheet numbers for start and end
    *
    * @example
    * ```js
@@ -2259,6 +2265,7 @@ export class HyperFormula implements TypedEmitter {
    * @param {SimpleCellRange} source - rectangular range
    *
    * @throws [[ExpectedValueOfTypeError]] if source is of wrong type
+   * @throws [[SheetsNotEqual]] if range provided has distinct sheet numbers for start and end
    *
    * @example
    * ```js
@@ -2293,6 +2300,7 @@ export class HyperFormula implements TypedEmitter {
    * @param {SimpleCellRange} source - rectangular range
    *
    * @throws [[ExpectedValueOfTypeError]] if source is of wrong type
+   * @throws [[SheetsNotEqual]] if range provided has distinct sheet numbers for start and end
    *
    * @example
    * ```js
@@ -2327,6 +2335,7 @@ export class HyperFormula implements TypedEmitter {
    * @param {SimpleCellRange} source - rectangular range
    *
    * @throws [[ExpectedValueOfTypeError]] if source is of wrong type
+   * @throws [[SheetsNotEqual]] if range provided has distinct sheet numbers for start and end
    *
    * @example
    * ```js
@@ -2358,12 +2367,13 @@ export class HyperFormula implements TypedEmitter {
   /**
    * Returns values to fill target range using source range, with properly extending the range using wrap-around heuristic.
    *
-   * @param {AbsoluteCellRange} source of data
-   * @param {AbsoluteCellRange} target range where data is intended to be put
+   * @param {SimpleCellRange} source of data
+   * @param {SimpleCellRange} target range where data is intended to be put
    *
    * @throws [[SheetsNotEqual]] if both ranges are not from the same sheet
    * @throws [[EvaluationSuspendedError]] when the evaluation is suspended
    * @throws [[ExpectedValueOfTypeError]] if source or target are of wrong type
+   * @throws [[SheetsNotEqual]] if range provided has distinct sheet numbers for start and end
    *
    * @example
    * ```js
@@ -2729,9 +2739,10 @@ export class HyperFormula implements TypedEmitter {
   /**
    * Returns all addresses and ranges whose computation depends on input address or range provided.
    *
-   * @param {SimpleCellAddress | AbsoluteCellRange} address - object representation of an absolute address or range of addresses
+   * @param {SimpleCellAddress | SimpleCellRange} address - object representation of an absolute address or range of addresses
    *
    * @throws [[ExpectedValueOfTypeError]] if address is of wrong type
+   * @throws [[SheetsNotEqual]] if range provided has distinct sheet numbers for start and end
    *
    * @example
    * ```js
