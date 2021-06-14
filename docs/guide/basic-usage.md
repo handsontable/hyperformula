@@ -27,7 +27,7 @@ this:
 ```javascript
 const options = {
     precisionRounding: 4,
-    licenseKey: 'agpl-v3'
+    licenseKey: 'gpl-v3'
 };
 ```
 
