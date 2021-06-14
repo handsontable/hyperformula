@@ -8,10 +8,10 @@ describe('Interpreter - function TODAY', () => {
 
   beforeEach(() => {
     originalNow = Date.now
-    let cnt = 0
+    let cnt = 20
     Date.now = () => {
       cnt += 1
-      return Date.UTC(1985, 8, 16, 3, 45, 20+cnt, 30)
+      return Date.parse(`1985-08-16T03:45:${cnt}`)
     }
   })
 
@@ -19,8 +19,29 @@ describe('Interpreter - function TODAY', () => {
     const engine =  HyperFormula.buildFromArray([
       ['=TODAY()'],
     ])
-    expect(engine.getCellValue(adr('A1'))).toEqual(31306)
+    expect(engine.getCellValue(adr('A1'))).toEqual(31275)
     expect(engine.getCellValueDetailedType(adr('A1'))).toBe(CellValueDetailedType.NUMBER_DATE)
+  })
+
+  it('works #2',  () => {
+    const engine =  HyperFormula.buildFromArray([
+      ['=YEAR(TODAY())'],
+    ])
+    expect(engine.getCellValue(adr('A1'))).toEqual(1985)
+  })
+
+  it('works #3',  () => {
+    const engine =  HyperFormula.buildFromArray([
+      ['=MONTH(TODAY())'],
+    ])
+    expect(engine.getCellValue(adr('A1'))).toEqual(8)
+  })
+
+  it('works #4',  () => {
+    const engine =  HyperFormula.buildFromArray([
+      ['=DAY(TODAY())'],
+    ])
+    expect(engine.getCellValue(adr('A1'))).toEqual(16)
   })
 
   it('validates number of arguments', () => {
