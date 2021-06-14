@@ -20,7 +20,7 @@ export class DetailedCellError {
     this.message = error.message ?? ''
   }
 
-  public toString() {
+  public toString(): string {
     return this.value
   }
 
