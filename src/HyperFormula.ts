@@ -3,7 +3,7 @@
  * Copyright (c) 2021 Handsoncode. All rights reserved.
  */
 
-import {AbsoluteCellRange, SimpleCellRange} from './AbsoluteCellRange'
+import {AbsoluteCellRange, isSimpleCellRange, SimpleCellRange} from './AbsoluteCellRange'
 import {validateArgToType} from './ArgumentSanitization'
 import {BuildEngineFactory, EngineState} from './BuildEngineFactory'
 import {
@@ -32,7 +32,7 @@ import {
 } from './DependencyGraph'
 import {Emitter, Events, Listeners, TypedEmitter} from './Emitter'
 import {
-  EvaluationSuspendedError,
+  EvaluationSuspendedError, ExpectedValueOfTypeError,
   LanguageAlreadyRegisteredError,
   LanguageNotRegisteredError,
   NotAFormulaError, SheetsNotEqual
@@ -592,6 +592,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * @param {SimpleCellAddress} cellAddress - cell coordinates
    *
+   * @throws [[ExpectedValueOfTypeError]] when cellAddress is of incorrect type
    * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
    * @throws [[EvaluationSuspendedError]] when the evaluation is suspended
    *
@@ -611,6 +612,9 @@ export class HyperFormula implements TypedEmitter {
    * @category Cells
    */
   public getCellValue(cellAddress: SimpleCellAddress): CellValue {
+    if(!isSimpleCellAddress(cellAddress)) {
+      throw new ExpectedValueOfTypeError('SimpleCellAddress', 'cellAddress')
+    }
     this.ensureEvaluationIsNotSuspended()
     return this._serialization.getCellValue(cellAddress)
   }
@@ -625,6 +629,8 @@ export class HyperFormula implements TypedEmitter {
    * Returns a normalized formula string from the cell of a given address or `undefined` for an address that does not exist and empty values.
    *
    * @param {SimpleCellAddress} cellAddress - cell coordinates
+   *
+   * @throws [[ExpectedValueOfTypeError]] when cellAddress is of incorrect type
    *
    * @example
    * ```js
@@ -642,6 +648,9 @@ export class HyperFormula implements TypedEmitter {
    * @category Cells
    */
   public getCellFormula(cellAddress: SimpleCellAddress): Maybe<string> {
+    if(!isSimpleCellAddress(cellAddress)) {
+      throw new ExpectedValueOfTypeError('SimpleCellAddress', 'cellAddress')
+    }
     return this._serialization.getCellFormula(cellAddress)
   }
 
@@ -651,6 +660,7 @@ export class HyperFormula implements TypedEmitter {
    * @param {SimpleCellAddress} cellAddress - cell coordinates
    *
    * @throws [[EvaluationSuspendedError]] when the evaluation is suspended
+   * @throws [[ExpectedValueOfTypeError]] when cellAddress is of incorrect type
    *
    * @example
    * ```js
@@ -668,6 +678,9 @@ export class HyperFormula implements TypedEmitter {
    * @category Cells
    */
   public getCellSerialized(cellAddress: SimpleCellAddress): RawCellContent {
+    if(!isSimpleCellAddress(cellAddress)) {
+      throw new ExpectedValueOfTypeError('SimpleCellAddress', 'cellAddress')
+    }
     this.ensureEvaluationIsNotSuspended()
     return this._serialization.getCellSerialized(cellAddress)
   }
@@ -892,6 +905,9 @@ export class HyperFormula implements TypedEmitter {
    *
    * @param {Partial<ConfigParams>} newParams configuration options to be updated or added
    *
+   * @throws [[ExpectedValueOfTypeError]] when some parameters of config are of wrong type (e.g. currencySymbol)
+   * @throws [[ConfigValueEmpty]] when some parameters of config are of invalid value (e.g. currencySymbol)
+   *
    * @example
    * ```js
    * const hfInstance = HyperFormula.buildFromArray([
@@ -1085,6 +1101,7 @@ export class HyperFormula implements TypedEmitter {
    * @param {SimpleCellAddress | SimpleCellRange} address - single cell or block of cells to check
    *
    * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
+   *
    * @example
    * ```js
    * const hfInstance = HyperFormula.buildFromArray([
@@ -1107,10 +1124,10 @@ export class HyperFormula implements TypedEmitter {
     let range
     if(isSimpleCellAddress(address)) {
       range = new AbsoluteCellRange(address, address)
-    } else if (isSimpleCellRange(address) {
+    } else if (isSimpleCellRange(address)) {
       range = new AbsoluteCellRange(address.start, address.end)
     } else {
-      throw new ExpectedValueOfTypeError()
+      throw new ExpectedValueOfTypeError('SimpleCellAddress | SimpleCellRange', 'address')
     }
     try {
       this._crudOperations.ensureRangeInSizeLimits(range)
@@ -1135,6 +1152,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * @throws [[InvalidArgumentsError]] when the value is not an array of arrays or a raw cell value
    * @throws [[SheetSizeLimitExceededError]] when performing this operation would result in sheet size limits exceeding
+   * @throws [[ExpectedValueOfTypeError]] if topLeftCornerAddress argument is of wrong type
    * @throws an error when it is an attempt to set cells content inside matrices during batch operation
    *
    * @example
@@ -1795,7 +1813,7 @@ export class HyperFormula implements TypedEmitter {
    * @param {SimpleCellRange} source - range for a moved block
    * @param {SimpleCellAddress} destinationLeftCorner - upper left address of the target cell block
    *
-   * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
+   * @throws [[ExpectedValueOfTypeError]] if destinationLeftCorner or source are of wrong type
    * @example
    * ```js
    * const hfInstance = HyperFormula.buildFromArray([
@@ -1815,6 +1833,12 @@ export class HyperFormula implements TypedEmitter {
    * @category Cells
    */
   public isItPossibleToMoveCells(source: SimpleCellRange, destinationLeftCorner: SimpleCellAddress): boolean {
+    if(!isSimpleCellAddress(destinationLeftCorner)) {
+      throw new ExpectedValueOfTypeError('SimpleCellAddress', 'destinationLeftCorner')
+    }
+    if(!isSimpleCellRange(source)) {
+      throw new ExpectedValueOfTypeError('SimpleCellRange', 'source')
+    }
     try {
       const range = new AbsoluteCellRange(source.start, source.end)
       this._crudOperations.operations.ensureItIsPossibleToMoveCells(range.start, range.width(), range.height(), destinationLeftCorner)
@@ -1834,7 +1858,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * @fires [[valuesUpdated]] if recalculation was triggered by this change
    *
-   * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
+   * @throws [[ExpectedValueOfTypeError]] if destinationLeftCorner or source are of wrong type
    * @throws [[InvalidArgumentsError]] when the given arguments are invalid
    * @throws [[SheetSizeLimitExceededError]] when performing this operation would result in sheet size limits exceeding
    * @throws [[SourceLocationHasMatrixError]] when the source location has matrix inside - matrix cannot be moved
@@ -1862,6 +1886,12 @@ export class HyperFormula implements TypedEmitter {
    * @category Cells
    */
   public moveCells(source: SimpleCellRange, destinationLeftCorner: SimpleCellAddress): ExportedChange[] {
+    if(!isSimpleCellAddress(destinationLeftCorner)) {
+      throw new ExpectedValueOfTypeError('SimpleCellAddress', 'destinationLeftCorner')
+    }
+    if(!isSimpleCellRange(source)) {
+      throw new ExpectedValueOfTypeError('SimpleCellRange', 'source')
+    }
     const range = new AbsoluteCellRange(source.start, source.end)
     this._crudOperations.moveCells(range.start, range.width(), range.height(), destinationLeftCorner)
     return this.recomputeIfDependencyGraphNeedsIt()
@@ -2036,7 +2066,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * @param {SimpleCellRange} source - rectangle range to copy
    *
-   * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
+   * @throws [[ExpectedValueOfTypeError]] if source is of wrong type
    * @throws an error while attempting to copy unsupported content type
    *
    * @example
@@ -2052,6 +2082,9 @@ export class HyperFormula implements TypedEmitter {
    * @category Clipboard
    */
   public copy(source: SimpleCellRange): CellValue[][] {
+    if(!isSimpleCellRange(source)) {
+      throw new ExpectedValueOfTypeError('SimpleCellRange', 'source')
+    }
     const range = new AbsoluteCellRange(source.start, source.end)
     this._crudOperations.copy(range.start, range.width(), range.height())
     return this.getRangeValues(source)
@@ -2065,7 +2098,8 @@ export class HyperFormula implements TypedEmitter {
    *
    * @param {SimpleCellRange} source - rectangle range to cut
    *
-   * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
+   * @throws [[ExpectedValueOfTypeError]] if source is of wrong type
+   *
    * @example
    * ```js
    * const hfInstance = HyperFormula.buildFromArray([
@@ -2079,6 +2113,9 @@ export class HyperFormula implements TypedEmitter {
    * @category Clipboard
    */
   public cut(source: SimpleCellRange): CellValue[][] {
+    if(!isSimpleCellRange(source)) {
+      throw new ExpectedValueOfTypeError('SimpleCellRange', 'source')
+    }
     const range = new AbsoluteCellRange(source.start, source.end)
     this._crudOperations.cut(range.start, range.width(), range.height())
     return this.getRangeValues(source)
@@ -2099,6 +2136,7 @@ export class HyperFormula implements TypedEmitter {
    * @throws [[SheetSizeLimitExceededError]] when performing this operation would result in sheet size limits exceeding
    * @throws [[NothingToPasteError]] when clipboard is empty
    * @throws [[TargetLocationHasMatrixError]] when the selected target area has matrix inside
+   * @throws [[ExpectedValueOfTypeError]] if targetLeftCorner is of wrong type
    *
    * @example
    * ```js
@@ -2117,6 +2155,9 @@ export class HyperFormula implements TypedEmitter {
    * @category Clipboard
    */
   public paste(targetLeftCorner: SimpleCellAddress): ExportedChange[] {
+    if(!isSimpleCellAddress(targetLeftCorner)) {
+      throw new ExpectedValueOfTypeError('SimpleCellAddress', 'targetLeftCorner')
+    }
     this.ensureEvaluationIsNotSuspended()
     this._crudOperations.paste(targetLeftCorner)
     return this.recomputeIfDependencyGraphNeedsIt()
@@ -2217,7 +2258,8 @@ export class HyperFormula implements TypedEmitter {
    *
    * @param {SimpleCellRange} source - rectangular range
    *
-   * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
+   * @throws [[ExpectedValueOfTypeError]] if source is of wrong type
+   *
    * @example
    * ```js
    * const hfInstance = HyperFormula.buildFromArray([
@@ -2234,6 +2276,9 @@ export class HyperFormula implements TypedEmitter {
    * @category Ranges
    */
   public getRangeValues(source: SimpleCellRange): CellValue[][] {
+    if(!isSimpleCellRange(source)) {
+      throw new ExpectedValueOfTypeError('SimpleCellRange', 'source')
+    }
     const cellRange = new AbsoluteCellRange(source.start, source.end)
     return cellRange.arrayOfAddressesInRange().map(
       (subarray) => subarray.map(
@@ -2247,7 +2292,8 @@ export class HyperFormula implements TypedEmitter {
    *
    * @param {SimpleCellRange} source - rectangular range
    *
-   * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
+   * @throws [[ExpectedValueOfTypeError]] if source is of wrong type
+   *
    * @example
    * ```js
    * const hfInstance = HyperFormula.buildFromArray([
@@ -2258,12 +2304,15 @@ export class HyperFormula implements TypedEmitter {
    *
    * // returns cell formulas of a given range only:
    * // [ [ '=SUM(1,2)', undefined ], [ undefined, undefined ] ]
-   * const rangeFormulas = hfInstance.getRangeFormulas({ sheet: 0, col: 0, row: 0 }, 2, 2);
+   * const rangeFormulas = hfInstance.getRangeFormulas({start: { sheet: 0, col: 0, row: 0 }, end: { sheet: 0, col: 1, row: 1 }});
    * ```
    *
    * @category Ranges
    */
   public getRangeFormulas(source: SimpleCellRange): Maybe<string>[][] {
+    if(!isSimpleCellRange(source)) {
+      throw new ExpectedValueOfTypeError('SimpleCellRange', 'source')
+    }
     const cellRange = new AbsoluteCellRange(source.start, source.end)
     return cellRange.arrayOfAddressesInRange().map(
       (subarray) => subarray.map(
@@ -2277,7 +2326,8 @@ export class HyperFormula implements TypedEmitter {
    *
    * @param {SimpleCellRange} source - rectangular range
    *
-   * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
+   * @throws [[ExpectedValueOfTypeError]] if source is of wrong type
+   *
    * @example
    * ```js
    * const hfInstance = HyperFormula.buildFromArray([
@@ -2288,12 +2338,15 @@ export class HyperFormula implements TypedEmitter {
    *
    * // should return serialized cell content for the given range:
    * // [ [ '=SUM(1,2)', 2 ], [ 5, 6 ] ]
-   * const rangeSerialized = hfInstance.getRangeSerialized({ sheet: 0, col: 0, row: 0 }, 2, 2);
+   * const rangeSerialized = hfInstance.getRangeSerialized({start: { sheet: 0, col: 0, row: 0 }, end: { sheet: 0, col: 1, row: 1 }});
    * ```
    *
    * @category Ranges
    */
   public getRangeSerialized(source: SimpleCellRange): RawCellContent[][] {
+    if(!isSimpleCellRange(source)) {
+      throw new ExpectedValueOfTypeError('SimpleCellRange', 'source')
+    }
     const cellRange = new AbsoluteCellRange(source.start, source.end)
     return cellRange.arrayOfAddressesInRange().map(
       (subarray) => subarray.map(
@@ -2310,6 +2363,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * @throws [[SheetsNotEqual]] if both ranges are not from the same sheet
    * @throws [[EvaluationSuspendedError]] when the evaluation is suspended
+   * @throws [[ExpectedValueOfTypeError]] if source or target are of wrong type
    *
    * @example
    * ```js
@@ -2324,6 +2378,12 @@ export class HyperFormula implements TypedEmitter {
    */
 
   public getFillRangeData(source: SimpleCellRange, target: SimpleCellRange): RawCellContent[][] {
+    if(!isSimpleCellRange(source)) {
+      throw new ExpectedValueOfTypeError('SimpleCellRange', 'source')
+    }
+    if(!isSimpleCellRange(target)) {
+      throw new ExpectedValueOfTypeError('SimpleCellRange', 'target')
+    }
     const sourceRange = new AbsoluteCellRange(source.start, source.end)
     const targetRange = new AbsoluteCellRange(target.start, target.end)
     if(sourceRange.sheet !== targetRange.sheet) {
@@ -2646,7 +2706,8 @@ export class HyperFormula implements TypedEmitter {
    * @param {SimpleCellAddress} simpleCellAddress - object representation of an absolute address
    * @param {number} sheetId - if is not equal with address sheet index, string representation will contain sheet name
    *
-   * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
+   * @throws [[ExpectedValueOfTypeError]] if simpleCellAddress is of wrong type
+   *
    * @example
    * ```js
    * const hfInstance = HyperFormula.buildEmpty();
@@ -2658,6 +2719,9 @@ export class HyperFormula implements TypedEmitter {
    * @category Helpers
    */
   public simpleCellAddressToString(simpleCellAddress: SimpleCellAddress, sheetId: number): Maybe<string> {
+    if(!isSimpleCellAddress(simpleCellAddress)) {
+      throw new ExpectedValueOfTypeError('SimpleCellAddress', 'simpleCellAddress')
+    }
     validateArgToType(sheetId, 'number', 'sheetId')
     return simpleCellAddressToString(this.sheetMapping.fetchDisplayName, simpleCellAddress, sheetId)
   }
@@ -2666,6 +2730,8 @@ export class HyperFormula implements TypedEmitter {
    * Returns all addresses and ranges whose computation depends on input address or range provided.
    *
    * @param {SimpleCellAddress | AbsoluteCellRange} address - object representation of an absolute address or range of addresses
+   *
+   * @throws [[ExpectedValueOfTypeError]] if address is of wrong type
    *
    * @example
    * ```js
@@ -2684,11 +2750,13 @@ export class HyperFormula implements TypedEmitter {
       if(vertex===null) {
         return []
       }
-    } else {
+    } else if(isSimpleCellRange(address)){
       vertex = this._dependencyGraph.rangeMapping.getRange(address.start, address.end)
       if(vertex===undefined) {
         return []
       }
+    } else {
+      throw new ExpectedValueOfTypeError('SimpleCellAddress | SimpleCellRange', address)
     }
     return this._dependencyGraph.getAdjacentNodesAddresses(vertex)
   }
@@ -2697,6 +2765,8 @@ export class HyperFormula implements TypedEmitter {
    * Returns all addresses and ranges necessary for computation of a given address or range.
    *
    * @param {SimpleCellAddress | SimpleCellRange} address - object representation of an absolute address or range of addresses
+   *
+   * @throws [[ExpectedValueOfTypeError]] if address is of wrong type
    *
    * @example
    * ```js
@@ -2715,11 +2785,13 @@ export class HyperFormula implements TypedEmitter {
       if(vertex===null) {
         return []
       }
-    } else {
+    } else  if(isSimpleCellRange(address)){
       vertex = this._dependencyGraph.rangeMapping.getRange(address.start, address.end)
       if(vertex===undefined) {
         return []
       }
+    } else {
+      throw new ExpectedValueOfTypeError('SimpleCellAddress | SimpleCellRange', address)
     }
     return this._dependencyGraph.dependencyQueryAddresses(vertex)
   }
@@ -2730,6 +2802,7 @@ export class HyperFormula implements TypedEmitter {
    * @param {number} sheetId - ID of the sheet, for which we want to retrieve name
    *
    * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
+   *
    * @example
    * ```js
    * const hfInstance = HyperFormula.buildFromSheets({
@@ -2775,6 +2848,7 @@ export class HyperFormula implements TypedEmitter {
    * @param {string} sheetName - name of the sheet, for which we want to retrieve ID, case insensitive.
    *
    * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
+   *
    * @example
    * ```js
    * const hfInstance = HyperFormula.buildFromSheets({
@@ -2799,6 +2873,7 @@ export class HyperFormula implements TypedEmitter {
    * @param {string} sheetName - name of the sheet, case insensitive.
    *
    * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
+   *
    * @example
    * ```js
    * const hfInstance = HyperFormula.buildFromSheets({
@@ -2824,6 +2899,7 @@ export class HyperFormula implements TypedEmitter {
    * @param {SimpleCellAddress} cellAddress - cell coordinates
    *
    * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
+   * @throws [[ExpectedValueOfTypeError]] if cellAddress is of wrong type
    *
    * @example
    * ```js
@@ -2841,6 +2917,9 @@ export class HyperFormula implements TypedEmitter {
    * @category Cells
    */
   public getCellType(cellAddress: SimpleCellAddress): CellType {
+    if(!isSimpleCellAddress(cellAddress)) {
+      throw new ExpectedValueOfTypeError('SimpleCellAddress', 'cellAddress')
+    }
     const vertex = this.dependencyGraph.getCell(cellAddress)
     return getCellType(vertex)
   }
@@ -2850,6 +2929,8 @@ export class HyperFormula implements TypedEmitter {
    * The methods accepts cell coordinates as object with column, row and sheet numbers.
    *
    * @param {SimpleCellAddress} cellAddress - cell coordinates
+   *
+   * @throws [[ExpectedValueOfTypeError]] if cellAddress is of wrong type
    *
    * @example
    * ```js
@@ -2867,6 +2948,9 @@ export class HyperFormula implements TypedEmitter {
    * @category Cells
    */
   public doesCellHaveSimpleValue(cellAddress: SimpleCellAddress): boolean {
+    if(!isSimpleCellAddress(cellAddress)) {
+      throw new ExpectedValueOfTypeError('SimpleCellAddress', 'cellAddress')
+    }
     return this.getCellType(cellAddress) === CellType.VALUE
   }
 
@@ -2875,6 +2959,8 @@ export class HyperFormula implements TypedEmitter {
    * The methods accepts cell coordinates as object with column, row and sheet numbers.
    *
    * @param {SimpleCellAddress} cellAddress - cell coordinates
+   *
+   * @throws [[ExpectedValueOfTypeError]] if cellAddress is of wrong type
    *
    * @example
    * ```js
@@ -2892,6 +2978,9 @@ export class HyperFormula implements TypedEmitter {
    * @category Cells
    */
   public doesCellHaveFormula(cellAddress: SimpleCellAddress): boolean {
+    if(!isSimpleCellAddress(cellAddress)) {
+      throw new ExpectedValueOfTypeError('SimpleCellAddress', 'cellAddress')
+    }
     return this.getCellType(cellAddress) === CellType.FORMULA
   }
 
@@ -2900,6 +2989,8 @@ export class HyperFormula implements TypedEmitter {
    * The methods accepts cell coordinates as object with column, row and sheet numbers.
    *
    * @param {SimpleCellAddress} cellAddress - cell coordinates
+   *
+   * @throws [[ExpectedValueOfTypeError]] if cellAddress is of wrong type
    *
    * @example
    * ```js
@@ -2917,6 +3008,9 @@ export class HyperFormula implements TypedEmitter {
    * @category Cells
    */
   public isCellEmpty(cellAddress: SimpleCellAddress): boolean {
+    if(!isSimpleCellAddress(cellAddress)) {
+      throw new ExpectedValueOfTypeError('SimpleCellAddress', 'cellAddress')
+    }
     return this.getCellType(cellAddress) === CellType.EMPTY
   }
 
@@ -2925,6 +3019,8 @@ export class HyperFormula implements TypedEmitter {
    * The methods accepts cell coordinates as object with column, row and sheet numbers.
    *
    * @param {SimpleCellAddress} cellAddress - cell coordinates
+   *
+   * @throws [[ExpectedValueOfTypeError]] if cellAddress is of wrong type
    *
    * @example
    * ```js
@@ -2939,6 +3035,9 @@ export class HyperFormula implements TypedEmitter {
    * @category Cells
    */
   public isCellPartOfMatrix(cellAddress: SimpleCellAddress): boolean {
+    if(!isSimpleCellAddress(cellAddress)) {
+      throw new ExpectedValueOfTypeError('SimpleCellAddress', 'cellAddress')
+    }
     return this.getCellType(cellAddress) === CellType.MATRIX
   }
 
@@ -2949,6 +3048,7 @@ export class HyperFormula implements TypedEmitter {
    * @param {SimpleCellAddress} cellAddress - cell coordinates
    *
    * @throws [[EvaluationSuspendedError]] when the evaluation is suspended
+   * @throws [[ExpectedValueOfTypeError]] if cellAddress is of wrong type
    *
    * @example
    * ```js
@@ -2966,6 +3066,9 @@ export class HyperFormula implements TypedEmitter {
    * @category Cells
    */
   public getCellValueType(cellAddress: SimpleCellAddress): CellValueType {
+    if(!isSimpleCellAddress(cellAddress)) {
+      throw new ExpectedValueOfTypeError('SimpleCellAddress', 'cellAddress')
+    }
     this.ensureEvaluationIsNotSuspended()
     const value = this.dependencyGraph.getCellValue(cellAddress)
     return getCellValueType(value)
@@ -2978,6 +3081,7 @@ export class HyperFormula implements TypedEmitter {
    * @param {SimpleCellAddress} cellAddress - cell coordinates
    *
    * @throws [[EvaluationSuspendedError]] when the evaluation is suspended
+   * @throws [[ExpectedValueOfTypeError]] if cellAddress is of wrong type
    *
    * @example
    * ```js
@@ -2995,6 +3099,9 @@ export class HyperFormula implements TypedEmitter {
    * @category Cells
    */
   public getCellValueDetailedType(cellAddress: SimpleCellAddress): CellValueDetailedType {
+    if(!isSimpleCellAddress(cellAddress)) {
+      throw new ExpectedValueOfTypeError('SimpleCellAddress', 'cellAddress')
+    }
     this.ensureEvaluationIsNotSuspended()
     const value = this.dependencyGraph.getCellValue(cellAddress)
     return getCellValueDetailedType(value)
@@ -3007,6 +3114,7 @@ export class HyperFormula implements TypedEmitter {
    * @param {SimpleCellAddress} cellAddress - cell coordinates
    *
    * @throws [[EvaluationSuspendedError]] when the evaluation is suspended
+   * @throws [[ExpectedValueOfTypeError]] if cellAddress is of wrong type
    *
    * @example
    * ```js
@@ -3024,6 +3132,9 @@ export class HyperFormula implements TypedEmitter {
    * @category Cells
    */
   public getCellValueFormat(cellAddress: SimpleCellAddress): FormatInfo {
+    if(!isSimpleCellAddress(cellAddress)) {
+      throw new ExpectedValueOfTypeError('SimpleCellAddress', 'cellAddress')
+    }
     this.ensureEvaluationIsNotSuspended()
     const value = this.dependencyGraph.getCellValue(cellAddress)
     return getCellValueFormat(value)
@@ -3057,6 +3168,7 @@ export class HyperFormula implements TypedEmitter {
    * @param {string} newName - a name of the sheet to be given
    *
    * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
+   *
    * @example
    * ```js
    * const hfInstance = HyperFormula.buildFromSheets({
@@ -3201,7 +3313,6 @@ export class HyperFormula implements TypedEmitter {
    *
    * @fires [[valuesUpdated]] if recalculation was triggered by this change
    * @fires [[evaluationResumed]] after the recomputation of necessary values
-   *
    *
    * @example
    * ```js
