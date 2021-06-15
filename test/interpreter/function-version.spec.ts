@@ -6,11 +6,11 @@ import {adr} from '../testUtils'
 
 describe('Function VERSION', () => {
   describe('getting version', () => {
-    it('AGPL license key', () => {
+    it('GPL license key', () => {
       const engine = HyperFormula.buildFromArray([
         ['=VERSION()'],
       ], {
-        licenseKey: 'agpl-v3',
+        licenseKey: 'gpl-v3',
       })
 
       expect(engine.getCellValue(adr('A1'))).toEqual(`HyperFormula v${HyperFormula.version}, 1`)
@@ -85,7 +85,7 @@ describe('Function VERSION', () => {
         HyperFormula.buildFromArray([
           ['=VERSION()'],
         ], {
-          licenseKey: 'agpl-v3',
+          licenseKey: 'gpl-v3',
           functionPlugins: [VersionExtra]
         })
       }).toThrow(ProtectedFunctionError.cannotRegisterFunctionWithId('VERSION'))
@@ -99,7 +99,7 @@ describe('Function VERSION', () => {
       const engine = HyperFormula.buildFromArray([
         ['=VERSION()'],
       ], {
-        licenseKey: 'agpl-v3',
+        licenseKey: 'gpl-v3',
       })
 
       expect(engine.getCellValue(adr('A1'))).toEqual(`HyperFormula v${HyperFormula.version}, 1`)

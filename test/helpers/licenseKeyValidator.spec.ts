@@ -3,9 +3,9 @@ import {LicenseKeyValidityState} from '../../src/helpers/licenseKeyValidator'
 
 describe('license key', () => {
   describe('valid key', () => {
-    it('should verify "agpl-v3" as a valid license key', () => {
+    it('should verify "gpl-v3" as a valid license key', () => {
       const hf = HyperFormula.buildEmpty({
-        licenseKey: 'agpl-v3',
+        licenseKey: 'gpl-v3',
       })
 
       expect(hf.licenseKeyValidityState).toEqual(LicenseKeyValidityState.VALID)
@@ -29,9 +29,9 @@ describe('license key', () => {
   })
 
   describe('invalid key', () => {
-    it('should verify "agpl" as an invalid license key', () => {
+    it('should verify "gpl" as an invalid license key', () => {
       const hf = HyperFormula.buildEmpty({
-        licenseKey: 'agpl-v1',
+        licenseKey: 'gpl-v1',
       })
 
       expect(hf.licenseKeyValidityState).toEqual(LicenseKeyValidityState.INVALID)
