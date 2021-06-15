@@ -2716,7 +2716,7 @@ export class HyperFormula implements TypedEmitter {
    * @param {SimpleCellAddress} simpleCellAddress - object representation of an absolute address
    * @param {number} sheetId - if is not equal with address sheet index, string representation will contain sheet name
    *
-   * @throws [[ExpectedValueOfTypeError]] if simpleCellAddress is of wrong type
+   * @throws [[ExpectedValueOfTypeError]] if its arguments are of wrong type
    *
    * @example
    * ```js
