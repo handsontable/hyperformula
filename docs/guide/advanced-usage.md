@@ -23,7 +23,7 @@ the configuration options:
 import { HyperFormula } from 'hyperformula';
 
 const options = {
-    licenseKey: 'agpl-v3'
+    licenseKey: 'gpl-v3'
 };
 ```
 
