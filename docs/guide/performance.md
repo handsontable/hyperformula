@@ -80,7 +80,7 @@ performance.
 
 ## GPU acceleration
 
-Some formulas, e.g. MMULT, MAXPOOL, MEDIANPOOL, benefit from
+Some formulas, e.g. MMULT, MAXPOOL, MEDIANPOOL, or TRANSPOSE, benefit from
 GPU acceleration. Thanks to the cores running thousands of threads
 at once, they calculate the input data sets up to 9x faster than
 when using the CPU. According to our observations the bigger the data set is,
