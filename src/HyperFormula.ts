@@ -2741,7 +2741,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * @param {SimpleCellAddress | SimpleCellRange} address - object representation of an absolute address or range of addresses
    *
-   * @throws [[ExpectedValueOfTypeError]] if address is of wrong type
+   * @throws [[ExpectedValueOfTypeError]] if address is not [[SimpleCellAddress]] or [[SimpleCellRange]]
    * @throws [[SheetsNotEqual]] if range provided has distinct sheet numbers for start and end
    *
    * @example
