@@ -3,7 +3,13 @@
  * Copyright (c) 2021 Handsoncode. All rights reserved.
  */
 
-import {CellRange, simpleCellAddress, SimpleCellAddress, SimpleColumnAddress, SimpleRowAddress} from './Cell'
+import {
+  CellRange, isSimpleCellAddress,
+  simpleCellAddress,
+  SimpleCellAddress,
+  SimpleColumnAddress,
+  SimpleRowAddress
+} from './Cell'
 import {DependencyGraph} from './DependencyGraph'
 import {SheetsNotEqual} from './errors'
 import {Maybe} from './Maybe'
@@ -16,6 +22,14 @@ export const WRONG_RANGE_SIZE = 'AbsoluteCellRange: Wrong range size'
 export interface SimpleCellRange {
   start: SimpleCellAddress,
   end: SimpleCellAddress,
+}
+
+export function isSimpleCellRange(obj: any): obj is SimpleCellRange {
+  if( obj && (typeof obj === 'object' || typeof obj === 'function')) {
+    return 'start' in obj && isSimpleCellAddress(obj.start) && 'end' in obj && isSimpleCellAddress(obj.end)
+  } else {
+    return false
+  }
 }
 
 export const simpleCellRange = (start: SimpleCellAddress, end: SimpleCellAddress) => ({start, end})
