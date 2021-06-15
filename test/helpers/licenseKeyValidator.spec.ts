@@ -18,14 +18,6 @@ describe('license key', () => {
 
       expect(hf.licenseKeyValidityState).toEqual(LicenseKeyValidityState.VALID)
     })
-
-    it('should verify "non-commercial-and-evaluation" as a valid license key', () => {
-      const hf = HyperFormula.buildEmpty({
-        licenseKey: 'non-commercial-and-evaluation',
-      })
-
-      expect(hf.licenseKeyValidityState).toEqual(LicenseKeyValidityState.VALID)
-    })
   })
 
   describe('invalid key', () => {

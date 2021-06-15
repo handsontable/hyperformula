@@ -16,16 +16,6 @@ describe('Function VERSION', () => {
       expect(engine.getCellValue(adr('A1'))).toEqual(`HyperFormula v${HyperFormula.version}, 1`)
     })
 
-    it('non-commercial license key', () => {
-      const engine = HyperFormula.buildFromArray([
-        ['=VERSION()'],
-      ], {
-        licenseKey: 'non-commercial-and-evaluation',
-      })
-
-      expect(engine.getCellValue(adr('A1'))).toEqual(`HyperFormula v${HyperFormula.version}, 2`)
-    })
-
     it('missing license key', () => {
       const engine = HyperFormula.buildFromArray([
         ['=VERSION()'],
