@@ -19,4 +19,12 @@ export class DetailedCellError {
     this.type = error.type
     this.message = error.message ?? ''
   }
+
+  public toString(): string {
+    return this.value
+  }
+
+  public valueOf(): string {
+    return this.value
+  }
 }
