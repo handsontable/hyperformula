@@ -3464,12 +3464,12 @@ export class HyperFormula implements TypedEmitter {
    * // add a named expression in 'Sheet1' (sheetId=0)
    * hfInstance.addNamedExpression('prettyName', '=Sheet1!$A$1+100', 0);
    *
-   * // returns a named expression corresponding to the passed name from 'Sheet1' (sheetId=0)
+   * // returns a named expression that corresponds to the passed name from 'Sheet1' (sheetId=0)
    * // for this example, returns:
    * // {name: 'prettyName', expression: '=Sheet1!$A$1+100', options: undefined, scope: 0}
    * const myFormula = hfInstance.getNamedExpression('prettyName', 0);
    * 
-   * // returns 'undefined' for a named expression that does not exist
+   * // for a named expression that doesn't exist, returns 'undefined':
    * const myFormulaTwo = hfInstance.getNamedExpression('uglyName', 0);
    * ```
    *
