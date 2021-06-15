@@ -3408,7 +3408,7 @@ export class HyperFormula implements TypedEmitter {
   }
 
   /**
-   * Returns a normalized formula string for given named expression or `undefined` for a named expression that does not exist or does not hold a formula.
+   * Returns a normalized formula string for given named expression, or `undefined` for a named expression that does not exist or does not hold a formula.
    *
    * @param {string} expressionName - expression name, case insensitive.
    * @param {number?} scope - scope definition, `sheetId` for local scope or `undefined` for global scope
@@ -3425,7 +3425,7 @@ export class HyperFormula implements TypedEmitter {
    * // add a named expression in 'Sheet1' (sheetId=0)
    * hfInstance.addNamedExpression('prettyName', '=Sheet1!$A$1+100', 0);
    *
-   * // returns a normalized formula string corresponding to a passed name from 'Sheet1' (sheetId=0),
+   * // returns a normalized formula string corresponding to the passed name from 'Sheet1' (sheetId=0),
    * // '=Sheet1!A1+100' for this example
    * const myFormula = hfInstance.getNamedExpressionFormula('prettyName', 0);
    * ```
@@ -3447,7 +3447,7 @@ export class HyperFormula implements TypedEmitter {
   }
 
   /**
-   * Returns named expression a normalized formula string for given named expression or `undefined` for a named expression that does not exist or does not hold a formula.
+   * Returns a named expression, or `undefined` for a named expression that does not exist or does not hold a formula.
    *
    * @param {string} expressionName - expression name, case insensitive.
    * @param {number?} scope - scope definition, `sheetId` for local scope or `undefined` for global scope
@@ -3464,9 +3464,13 @@ export class HyperFormula implements TypedEmitter {
    * // add a named expression in 'Sheet1' (sheetId=0)
    * hfInstance.addNamedExpression('prettyName', '=Sheet1!$A$1+100', 0);
    *
-   * // returns a normalized formula string corresponding to a passed name from 'Sheet1' (sheetId=0),
-   * // '=Sheet1!$A$1+100' for this example
+   * // returns a named expression that corresponds to the passed name from 'Sheet1' (sheetId=0)
+   * // for this example, returns:
+   * // {name: 'prettyName', expression: '=Sheet1!$A$1+100', options: undefined, scope: 0}
    * const myFormula = hfInstance.getNamedExpression('prettyName', 0);
+   * 
+   * // for a named expression that doesn't exist, returns 'undefined':
+   * const myFormulaTwo = hfInstance.getNamedExpression('uglyName', 0);
    * ```
    *
    * @category Named Expressions
