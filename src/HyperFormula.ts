@@ -1831,7 +1831,7 @@ export class HyperFormula implements TypedEmitter {
    * // it is possible to move a block of width 1 and height 1
    * // from the corner: column 1 and row 0 of sheet 0
    * // into destination corner: column 3, row 0 of sheet 0
-   * const isMovable = hfInstance.isItPossibleToMoveCells({start: source, end: source}, destination);
+   * const isMovable = hfInstance.isItPossibleToMoveCells({ start: source, end: source }, destination);
    * ```
    * @category Cells
    */
