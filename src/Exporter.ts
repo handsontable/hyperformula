@@ -4,7 +4,7 @@
  */
 
 import {CellError, ErrorType, SimpleCellAddress, simpleCellAddress} from './Cell'
-import {CellValue, DetailedCellError,} from './CellValue'
+import {CellValue, DetailedCellError} from './CellValue'
 import {Config} from './Config'
 import {CellValueChange, ChangeExporter} from './ContentChanges'
 import {ErrorMessage} from './error-message'
