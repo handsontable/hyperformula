@@ -203,7 +203,7 @@ describe('remove sheet - adjust formula dependencies', () => {
     const changes = engine.removeSheet(1)
 
     expect(changes.length).toBe(1)
-    expect(changes).toContainEqual(new ExportedCellChange(simpleCellAddress(0, 0, 0), detailedErrorWithOrigin(ErrorType.REF, 'Sheet1!A1')))
+    expect(changes).toContainEqual(new ExportedCellChange(adr('A1'), detailedErrorWithOrigin(ErrorType.REF, 'Sheet1!A1')))
   })
 })
 

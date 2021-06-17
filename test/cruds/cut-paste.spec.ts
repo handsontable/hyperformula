@@ -25,7 +25,7 @@ describe('Address dependencies, moved formulas', () => {
       ['=$A$1'],
     ])
 
-    engine.cut(adr('A2'), 1, 4)
+    engine.cut(AbsoluteCellRange.spanFrom(adr('A2'), 1, 4))
     engine.paste(adr('B1'))
 
     expect(extractReference(engine, adr('B1'))).toEqual(CellAddress.relative(null, -1, 0))
@@ -42,7 +42,7 @@ describe('Address dependencies, moved formulas', () => {
       ['=$B$4', '4'],
     ])
 
-    engine.cut(adr('A1'), 1, 4)
+    engine.cut(AbsoluteCellRange.spanFrom(adr('A1'), 1, 4))
     engine.paste(adr('B1'))
 
     expect(engine.getCellValue(adr('B1'))).toEqualError(detailedError(ErrorType.CYCLE))
@@ -61,7 +61,7 @@ describe('Address dependencies, moved formulas', () => {
       ['3', '2'],
     ])
 
-    engine.moveCells(adr('A1'), 1, 2, adr('B1'))
+    engine.moveCells(AbsoluteCellRange.spanFrom(adr('A1'), 1, 2), adr('B1'))
 
     expect(engine.getCellValue(adr('B1'))).toEqual(3)
     expect(engine.getCellValue(adr('B2'))).toEqual(3)
@@ -73,7 +73,7 @@ describe('Address dependencies, moved formulas', () => {
       [null, null],
     ])
 
-    engine.cut(adr('A1'), 2, 2)
+    engine.cut(AbsoluteCellRange.spanFrom(adr('A1'), 2, 2))
     engine.paste(adr('B2'))
 
     expect(extractReference(engine, adr('B2'))).toEqual(CellAddress.absoluteRow(null, 1, 2))
@@ -89,7 +89,7 @@ describe('Address dependencies, moved formulas', () => {
 
     expect(extractReference(engine, adr('B3'))).toEqual(CellAddress.absoluteRow(null, -1, 2))
 
-    engine.cut(adr('A1'), 2, 4)
+    engine.cut(AbsoluteCellRange.spanFrom(adr('A1'), 2, 4))
     engine.paste(adr('B2'))
 
     expect(extractReference(engine, adr('C2'))).toEqual(CellAddress.relative(null, -1, 0))
@@ -107,7 +107,7 @@ describe('Address dependencies, moved formulas', () => {
       ['=B3'],
     ])
 
-    engine.cut(adr('A1'), 1, 3)
+    engine.cut(AbsoluteCellRange.spanFrom(adr('A1'), 1, 3))
     engine.paste(adr('B1'))
 
     expect(engine.getCellValue(adr('A4'))).toEqual(4)
@@ -122,7 +122,7 @@ describe('Move cells', () => {
       [null],
     ])
 
-    engine.cut(adr('A1'), 1, 1)
+    engine.cut(AbsoluteCellRange.spanFrom(adr('A1'), 1, 1))
     engine.paste(adr('A2'))
 
     expect(engine.getCellValue(adr('A2'))).toEqual('foo')
@@ -139,7 +139,7 @@ describe('Move cells', () => {
       ],
     })
 
-    engine.cut(adr('A2'), 1, 1)
+    engine.cut(AbsoluteCellRange.spanFrom(adr('A2'), 1, 1))
     engine.paste(adr('B1', 1))
 
     expect(extractReference(engine, adr('B1', 1))).toEqual(CellAddress.relative(null, -1, 0))
@@ -154,7 +154,7 @@ describe('Move cells', () => {
       ['=$A$1'],
     ])
 
-    engine.cut(adr('A1'), 1, 1)
+    engine.cut(AbsoluteCellRange.spanFrom(adr('A1'), 1, 1))
     engine.paste(adr('B1'))
 
     expect(extractReference(engine, adr('A2'))).toEqual(CellAddress.relative(null, 1, -1))
@@ -169,7 +169,7 @@ describe('Move cells', () => {
       ['=A1'],
     ])
 
-    engine.cut(adr('A1'), 1, 1)
+    engine.cut(AbsoluteCellRange.spanFrom(adr('A1'), 1, 1))
     engine.paste(adr('B1'))
 
     const movedVertex = engine.dependencyGraph.fetchCell(adr('B1'))
@@ -185,7 +185,7 @@ describe('Move cells', () => {
       Sheet2: [],
     })
 
-    engine.cut(adr('A1'), 1, 1)
+    engine.cut(AbsoluteCellRange.spanFrom(adr('A1'), 1, 1))
     engine.paste(adr('B1', 1))
 
     const reference = extractReference(engine, adr('A2'))
@@ -198,7 +198,7 @@ describe('Move cells', () => {
       ['=A1'],
     ])
 
-    engine.cut(adr('A1'), 1, 1)
+    engine.cut(AbsoluteCellRange.spanFrom(adr('A1'), 1, 1))
     engine.paste(adr('A2'))
 
     expect(engine.graph.edgesCount()).toBe(0)
@@ -212,7 +212,7 @@ describe('Move cells', () => {
       [null, '42'],
     ])
 
-    engine.cut(adr('A1'), 1, 1)
+    engine.cut(AbsoluteCellRange.spanFrom(adr('A1'), 1, 1))
     engine.paste(adr('B1'))
 
     expect(engine.addressMapping.getCell(adr('A1'))).toBe(null)
@@ -225,7 +225,7 @@ describe('Move cells', () => {
       ['=B1'],
     ])
 
-    engine.cut(adr('A1'), 1, 1)
+    engine.cut(AbsoluteCellRange.spanFrom(adr('A1'), 1, 1))
     engine.paste(adr('B1'))
 
     expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
@@ -239,7 +239,7 @@ describe('Move cells', () => {
       [null, null],
     ])
 
-    engine.cut(adr('A1'), 1, 1)
+    engine.cut(AbsoluteCellRange.spanFrom(adr('A1'), 1, 1))
     engine.paste(adr('B1'))
 
     expect(engine.addressMapping.getCell(adr('A1'))).toBe(null)
@@ -252,7 +252,7 @@ describe('Move cells', () => {
       ['2', '=A2'],
     ])
 
-    engine.cut(adr('A1'), 1, 1)
+    engine.cut(AbsoluteCellRange.spanFrom(adr('A1'), 1, 1))
     engine.paste(adr('A2'))
 
     const b1 = engine.addressMapping.fetchCell(adr('B1'))
@@ -283,7 +283,7 @@ describe('moving ranges', () => {
       ['=SUM(A1:A2)'],
     ])
 
-    engine.cut(adr('A1'), 1, 1)
+    engine.cut(AbsoluteCellRange.spanFrom(adr('A1'), 1, 1))
     engine.paste(adr('B1'))
 
     const range = extractRange(engine, adr('A3'))
@@ -312,7 +312,7 @@ describe('moving ranges', () => {
       ['=SUM(A1:A2)'],
     ])
 
-    engine.cut(adr('A1'), 1, 2)
+    engine.cut(AbsoluteCellRange.spanFrom(adr('A1'), 1, 2))
     engine.paste(adr('B1'))
 
     expect(engine.rangeMapping.getRange(adr('B1'), adr('B2'))).not.toBe(undefined)
@@ -339,7 +339,7 @@ describe('moving ranges', () => {
     ])
 
     expect(() => {
-      engine.cut(adr('A2'), 2, 2)
+      engine.cut(AbsoluteCellRange.spanFrom(adr('A2'), 2, 2))
       engine.paste(adr('C1'))
     }).toThrowError('Cannot perform this operation, source location has a matrix inside.')
   })
@@ -351,7 +351,7 @@ describe('moving ranges', () => {
     ])
 
     expect(() => {
-      engine.cut(adr('A1'), 2, 1)
+      engine.cut(AbsoluteCellRange.spanFrom(adr('A1'), 2, 1))
       engine.paste(adr('A2'))
     }).toThrowError('Cannot perform this operation, target location has a matrix inside.')
   })
@@ -362,7 +362,7 @@ describe('moving ranges', () => {
       ['2', '=A2'],
     ])
 
-    engine.cut(adr('A1'), 1, 1)
+    engine.cut(AbsoluteCellRange.spanFrom(adr('A1'), 1, 1))
     engine.paste(adr('A2'))
 
     const b1 = engine.addressMapping.fetchCell(adr('B1'))
@@ -402,7 +402,7 @@ describe('moving ranges', () => {
       ['2', '=A2'],
     ])
 
-    engine.cut(adr('A1'), 1, 2)
+    engine.cut(AbsoluteCellRange.spanFrom(adr('A1'), 1, 2))
     engine.paste(adr('C1'))
 
     const a1 = engine.addressMapping.getCell(adr('A1'))
@@ -443,7 +443,7 @@ describe('moving ranges', () => {
       ['3', '=SUM(A1:A3)'],
     ])
 
-    engine.cut(adr('A1'), 1, 2)
+    engine.cut(AbsoluteCellRange.spanFrom(adr('A1'), 1, 2))
     engine.paste(adr('C1'))
 
     /* ranges in formulas*/
@@ -483,7 +483,7 @@ describe('moving ranges', () => {
       ['4', '=SUM(A1:A4)'],
     ])
 
-    engine.cut(adr('A1'), 1, 3)
+    engine.cut(AbsoluteCellRange.spanFrom(adr('A1'), 1, 3))
     engine.paste(adr('C1'))
 
     /* edges */
@@ -524,7 +524,7 @@ describe('moving ranges', () => {
       ['=SUM(A1:B1)', '=SUM(A1:B2)', '=SUM(A1:B3)'],
     ])
 
-    engine.cut(adr('A1'), 2, 2)
+    engine.cut(AbsoluteCellRange.spanFrom(adr('A1'), 2, 2))
     engine.paste(adr('C1'))
 
     expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
@@ -544,7 +544,7 @@ describe('overlapping areas', () => {
       ['5', '6'],
     ])
 
-    engine.cut(adr('A1'), 2, 2)
+    engine.cut(AbsoluteCellRange.spanFrom(adr('A1'), 2, 2))
     engine.paste(adr('A2'))
 
     expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
@@ -561,7 +561,7 @@ describe('overlapping areas', () => {
       ['5', '6'],
     ])
 
-    engine.cut(adr('A2'), 2, 2)
+    engine.cut(AbsoluteCellRange.spanFrom(adr('A2'), 2, 2))
     engine.paste(adr('A1'))
 
     expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
@@ -577,7 +577,7 @@ describe('overlapping areas', () => {
       ['4', '5', '6'],
     ])
 
-    engine.cut(adr('A1'), 2, 2)
+    engine.cut(AbsoluteCellRange.spanFrom(adr('A1'), 2, 2))
     engine.paste(adr('B1'))
 
     expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
@@ -592,7 +592,7 @@ describe('overlapping areas', () => {
       ['4', '5', '6'],
     ])
 
-    engine.cut(adr('B1'), 2, 2)
+    engine.cut(AbsoluteCellRange.spanFrom(adr('B1'), 2, 2))
     engine.paste(adr('A1'))
 
     expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
@@ -607,7 +607,7 @@ describe('overlapping areas', () => {
       ['4', '5', '6'],
     ])
 
-    engine.cut(adr('A1'), 3, 2)
+    engine.cut(AbsoluteCellRange.spanFrom(adr('A1'), 3, 2))
     engine.paste(adr('B2'))
 
     expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
@@ -625,7 +625,7 @@ describe('overlapping areas', () => {
       ['=SUM(A1:B2)', '=SUM(A1:B3)', '=SUM(A2:B2)'],
     ])
 
-    engine.cut(adr('A1'), 2, 2)
+    engine.cut(AbsoluteCellRange.spanFrom(adr('A1'), 2, 2))
     engine.paste(adr('A2'))
 
     expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
@@ -643,7 +643,7 @@ describe('overlapping areas', () => {
       ['=SUM(A1:B2)', '=SUM(A1:C2)', '=SUM(B1:B2)'],
     ])
 
-    engine.cut(adr('A1'), 2, 2)
+    engine.cut(AbsoluteCellRange.spanFrom(adr('A1'), 2, 2))
     engine.paste(adr('B1'))
 
     expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
@@ -661,7 +661,7 @@ describe('overlapping areas', () => {
       ['=SUM(A1:A3)'],
     ])
 
-    engine.cut(adr('A1'), 1, 1)
+    engine.cut(AbsoluteCellRange.spanFrom(adr('A1'), 1, 1))
     engine.paste(adr('A2'))
 
     expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
@@ -681,7 +681,7 @@ describe('overlapping areas', () => {
       ['=SUM(A1:A3)'],
     ])
 
-    engine.cut(adr('A1'), 1, 1)
+    engine.cut(AbsoluteCellRange.spanFrom(adr('A1'), 1, 1))
     engine.paste(adr('A4'))
 
     expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
@@ -699,7 +699,7 @@ describe('overlapping areas', () => {
       ['=SUM(A1:C1)'],
     ])
 
-    engine.cut(adr('A1'), 1, 1)
+    engine.cut(AbsoluteCellRange.spanFrom(adr('A1'), 1, 1))
     engine.paste(adr('D1'))
 
     expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
@@ -715,8 +715,8 @@ describe('overlapping areas', () => {
       ['=TRANSPOSE(A1:B2)'],
     ])
 
-    engine.cut(simpleCellAddress(0, 0, 0), 2, 2)
-    engine.paste(simpleCellAddress(0, 2, 0))
+    engine.cut(AbsoluteCellRange.spanFrom(adr('A1'), 2, 2))
+    engine.paste(adr('C1', 0))
 
     expect(extractMatrixRange(engine, adr('A3'))).toEqual(new AbsoluteCellRange(adr('C1'), adr('D2')))
   })
@@ -734,8 +734,8 @@ describe('overlapping areas', () => {
 
     expect(extractMatrixRange(engine, adr('A1', 1))).toEqual(new AbsoluteCellRange(adr('A1'), adr('B2')))
 
-    engine.cut(simpleCellAddress(0, 0, 0), 2, 2)
-    engine.paste(simpleCellAddress(0, 2, 0))
+    engine.cut(AbsoluteCellRange.spanFrom(adr('A1'), 2, 2))
+    engine.paste(adr('C1', 0))
 
     expect(extractMatrixRange(engine, adr('A1', 1))).toEqual(new AbsoluteCellRange(adr('C1'), adr('D2')))
   })
@@ -749,7 +749,7 @@ describe('column index', () => {
       ['=VLOOKUP(1, A1:A2, 1, TRUE())'],
     ], {useColumnIndex: true})
 
-    engine.cut(adr('A1'), 1, 1)
+    engine.cut(AbsoluteCellRange.spanFrom(adr('A1'), 1, 1))
     engine.paste(adr('B1'))
 
     const index = engine.columnSearch as ColumnIndex
@@ -763,7 +763,7 @@ describe('column index', () => {
       ['3', '2'],
     ], {useColumnIndex: true})
 
-    engine.cut(adr('A1'), 1, 2)
+    engine.cut(AbsoluteCellRange.spanFrom(adr('A1'), 1, 2))
     engine.paste(adr('B1'))
 
     const index = engine.columnSearch as ColumnIndex
@@ -780,7 +780,7 @@ describe('column index', () => {
       [null, '6', '7'],
     ], {useColumnIndex: true})
 
-    engine.cut(adr('A1'), 2, 2)
+    engine.cut(AbsoluteCellRange.spanFrom(adr('A1'), 2, 2))
     engine.paste(adr('B2'))
 
     const index = engine.columnSearch as ColumnIndex
@@ -800,7 +800,7 @@ describe('column index', () => {
       [null, '6', '7'],
     ], {useColumnIndex: true})
 
-    engine.cut(adr('B2'), 2, 2)
+    engine.cut(AbsoluteCellRange.spanFrom(adr('B2'), 2, 2))
     engine.paste(adr('A1'))
 
     const index = engine.columnSearch as ColumnIndex
@@ -822,7 +822,7 @@ describe('move cells with matrices', () => {
     ])
 
     expect(() => {
-      engine.cut(adr('A2'), 1, 1)
+      engine.cut(AbsoluteCellRange.spanFrom(adr('A2'), 1, 1))
       engine.paste(adr('A3'))
     }).toThrowError('Cannot perform this operation, source location has a matrix inside.')
   })
@@ -834,7 +834,7 @@ describe('move cells with matrices', () => {
     ])
 
     expect(() => {
-      engine.cut(adr('A2'), 2, 1)
+      engine.cut(AbsoluteCellRange.spanFrom(adr('A2'), 2, 1))
       engine.paste(adr('A3'))
     }).toThrowError('Cannot perform this operation, source location has a matrix inside.')
   })
@@ -847,7 +847,7 @@ describe('aborting cut paste', () => {
       ['2']
     ])
 
-    engine.cut(adr('A1'), 1, 1)
+    engine.cut(AbsoluteCellRange.spanFrom(adr('A1'), 1, 1))
     engine.addRows(0, [1, 1])
 
     expect(engine.isClipboardEmpty()).toBe(true)
@@ -859,7 +859,7 @@ describe('aborting cut paste', () => {
       ['2']
     ])
 
-    engine.cut(adr('A1'), 1, 1)
+    engine.cut(AbsoluteCellRange.spanFrom(adr('A1'), 1, 1))
     engine.removeRows(0, [1, 1])
 
     expect(engine.isClipboardEmpty()).toBe(true)
@@ -870,7 +870,7 @@ describe('aborting cut paste', () => {
       ['1', '2']
     ])
 
-    engine.cut(adr('A1'), 1, 1)
+    engine.cut(AbsoluteCellRange.spanFrom(adr('A1'), 1, 1))
     engine.addColumns(0, [1, 1])
 
     expect(engine.isClipboardEmpty()).toBe(true)
@@ -881,7 +881,7 @@ describe('aborting cut paste', () => {
       ['1', '2']
     ])
 
-    engine.cut(adr('A1'), 1, 1)
+    engine.cut(AbsoluteCellRange.spanFrom(adr('A1'), 1, 1))
     engine.removeColumns(0, [1, 1])
 
     expect(engine.isClipboardEmpty()).toBe(true)
@@ -892,8 +892,8 @@ describe('aborting cut paste', () => {
       ['1', '2']
     ])
 
-    engine.cut(adr('A1'), 1, 1)
-    engine.moveCells(adr('B1'), 1, 1, adr('C1'))
+    engine.cut(AbsoluteCellRange.spanFrom(adr('A1'), 1, 1))
+    engine.moveCells(AbsoluteCellRange.spanFrom(adr('B1'), 1, 1), adr('C1'))
 
     expect(engine.isClipboardEmpty()).toBe(true)
   })
@@ -904,7 +904,7 @@ describe('aborting cut paste', () => {
       'Sheet2': []
     })
 
-    engine.cut(adr('A1'), 1, 1)
+    engine.cut(AbsoluteCellRange.spanFrom(adr('A1'), 1, 1))
     engine.removeSheet(1)
 
     expect(engine.isClipboardEmpty()).toBe(true)
@@ -915,7 +915,7 @@ describe('aborting cut paste', () => {
       ['1']
     ])
 
-    engine.cut(adr('A1'), 1, 1)
+    engine.cut(AbsoluteCellRange.spanFrom(adr('A1'), 1, 1))
     engine.setCellContents(adr('B1'), 'foo')
 
     expect(engine.isClipboardEmpty()).toBe(true)
@@ -927,7 +927,7 @@ describe('aborting cut paste', () => {
       'Sheet2': []
     })
 
-    engine.cut(adr('A1'), 1, 1)
+    engine.cut(AbsoluteCellRange.spanFrom(adr('A1'), 1, 1))
     engine.clearSheet(1)
 
     expect(engine.isClipboardEmpty()).toBe(true)
@@ -939,7 +939,7 @@ describe('aborting cut paste', () => {
       'Sheet2': []
     })
 
-    engine.cut(adr('A1'), 1, 1)
+    engine.cut(AbsoluteCellRange.spanFrom(adr('A1'), 1, 1))
     engine.setSheetContent(1, [])
 
     expect(engine.isClipboardEmpty()).toBe(true)
@@ -948,7 +948,7 @@ describe('aborting cut paste', () => {
   it('should not be aborted when adding new sheet', () => {
     const engine = HyperFormula.buildFromArray([['1']])
 
-    engine.cut(adr('A1'), 1, 1)
+    engine.cut(AbsoluteCellRange.spanFrom(adr('A1'), 1, 1))
     engine.addSheet()
 
     expect(engine.isClipboardEmpty()).toBe(false)
@@ -957,7 +957,7 @@ describe('aborting cut paste', () => {
   it('should not be aborted when addRows is not successful', () => {
     const engine = HyperFormula.buildFromArray([['1']])
 
-    engine.cut(adr('A1'), 1, 1)
+    engine.cut(AbsoluteCellRange.spanFrom(adr('A1'), 1, 1))
 
     expect(() => {
       engine.addRows(1, [1, 1])
@@ -969,7 +969,7 @@ describe('aborting cut paste', () => {
   it('should be aborted when doing undo', () => {
     const engine = HyperFormula.buildFromArray([['1']])
     engine.setCellContents(adr('A1'), 42)
-    engine.cut(adr('A1'), 1, 1)
+    engine.cut(AbsoluteCellRange.spanFrom(adr('A1'), 1, 1))
 
     engine.undo()
 
@@ -980,7 +980,7 @@ describe('aborting cut paste', () => {
     const engine = HyperFormula.buildFromArray([['1']])
     engine.setCellContents(adr('A1'), 42)
     engine.undo()
-    engine.cut(adr('A1'), 1, 1)
+    engine.cut(AbsoluteCellRange.spanFrom(adr('A1'), 1, 1))
 
     engine.redo()
 
@@ -989,28 +989,28 @@ describe('aborting cut paste', () => {
 
   it('should be aborted when swapping rows', () => {
     const engine = HyperFormula.buildFromArray([['1']])
-    engine.cut(adr('A1'), 1, 1)
+    engine.cut(AbsoluteCellRange.spanFrom(adr('A1'), 1, 1))
     engine.swapRowIndexes(0, [[0, 0]])
     expect(engine.isClipboardEmpty()).toBe(true)
   })
 
   it('should be aborted when swapping columns', () => {
     const engine = HyperFormula.buildFromArray([['1']])
-    engine.cut(adr('A1'), 1, 1)
+    engine.cut(AbsoluteCellRange.spanFrom(adr('A1'), 1, 1))
     engine.swapColumnIndexes(0, [[0, 0]])
     expect(engine.isClipboardEmpty()).toBe(true)
   })
 
   it('should be aborted when setting row order', () => {
     const engine = HyperFormula.buildFromArray([['1']])
-    engine.cut(adr('A1'), 1, 1)
+    engine.cut(AbsoluteCellRange.spanFrom(adr('A1'), 1, 1))
     engine.setRowOrder(0, [0])
     expect(engine.isClipboardEmpty()).toBe(true)
   })
 
   it('should be aborted when setting column order', () => {
     const engine = HyperFormula.buildFromArray([['1']])
-    engine.cut(adr('A1'), 1, 1)
+    engine.cut(AbsoluteCellRange.spanFrom(adr('A1'), 1, 1))
     engine.setColumnOrder(0, [0])
     expect(engine.isClipboardEmpty()).toBe(true)
   })

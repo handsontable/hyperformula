@@ -1,4 +1,5 @@
 import {ExportedCellChange, ExportedNamedExpressionChange, HyperFormula, NoSheetWithIdError} from '../src'
+import {AbsoluteCellRange} from '../src/AbsoluteCellRange'
 import {ErrorType} from '../src/Cell'
 import {Vertex} from '../src/DependencyGraph/Vertex'
 import {ErrorMessage} from '../src/error-message'
@@ -676,7 +677,7 @@ describe('Named expressions - cross scope', () => {
 
     engine.addNamedExpression('expr', '=Sheet1!$A$1', 0)
 
-    engine.moveCells(adr('B1'), 1, 1, adr('B1', 1))
+    engine.moveCells(AbsoluteCellRange.spanFrom(adr('B1'), 1, 1), adr('B1', 1))
 
     expect(engine.getNamedExpressionFormula('expr', 0)).toEqual('=Sheet1!$A$1')
     expect(engine.getNamedExpressionFormula('expr')).toEqual('=Sheet1!$A$1')
@@ -693,7 +694,7 @@ describe('Named expressions - cross scope', () => {
 
     engine.addNamedExpression('expr', '=Sheet1!$A$1', 0)
 
-    engine.cut(adr('B1'), 1, 1)
+    engine.cut(AbsoluteCellRange.spanFrom(adr('B1'), 1, 1))
     engine.paste(adr('B1', 1))
 
     expect(engine.getNamedExpressionFormula('expr', 0)).toEqual('=Sheet1!$A$1')
@@ -711,7 +712,7 @@ describe('Named expressions - cross scope', () => {
 
     engine.addNamedExpression('expr', '=Sheet1!$A$1', 0)
 
-    engine.copy(adr('B1'), 1, 1)
+    engine.copy(AbsoluteCellRange.spanFrom(adr('B1'), 1, 1))
     engine.paste(adr('B1', 1))
 
     expect(engine.getNamedExpressionFormula('expr', 0)).toEqual('=Sheet1!$A$1')
@@ -729,7 +730,7 @@ describe('Named expressions - cross scope', () => {
 
     engine.addNamedExpression('expr', '=Sheet1!$A$1', 0)
 
-    engine.copy(adr('B1'), 1, 1)
+    engine.copy(AbsoluteCellRange.spanFrom(adr('B1'), 1, 1))
     engine.setCellContents(adr('B1'), [['baz']])
     engine.paste(adr('B1', 1))
 
@@ -748,7 +749,7 @@ describe('Named expressions - cross scope', () => {
     engine.addNamedExpression('expr', '=Sheet1!$A$1', 0)
     engine.addNamedExpression('expr', '=Sheet2!$A$1', 1)
 
-    engine.moveCells(adr('B1'), 1, 1, adr('B1', 1))
+    engine.moveCells(AbsoluteCellRange.spanFrom(adr('B1'), 1, 1), adr('B1', 1))
 
     expect(engine.getNamedExpressionFormula('expr')).toEqual(undefined)
     expect(engine.getNamedExpressionFormula('expr', 0)).toEqual('=Sheet1!$A$1')
@@ -773,7 +774,7 @@ describe('Named expressions - cross scope', () => {
     engine.addNamedExpression('expr', '=Sheet1!$A$1', 0)
     engine.addNamedExpression('expr', '=Sheet2!$A$1', 1)
 
-    engine.cut(adr('B1'), 1, 1)
+    engine.cut(AbsoluteCellRange.spanFrom(adr('B1'), 1, 1))
     engine.paste(adr('B1', 1))
 
     expect(engine.getNamedExpressionFormula('expr')).toEqual(undefined)
@@ -798,7 +799,7 @@ describe('Named expressions - cross scope', () => {
     engine.addNamedExpression('expr', '=Sheet1!$A$1', 0)
     engine.addNamedExpression('expr', '=Sheet2!$A$1', 1)
 
-    engine.copy(adr('B1'), 1, 1)
+    engine.copy(AbsoluteCellRange.spanFrom(adr('B1'), 1, 1))
     engine.paste(adr('B1', 1))
 
     expect(engine.getNamedExpressionFormula('expr')).toEqual(undefined)

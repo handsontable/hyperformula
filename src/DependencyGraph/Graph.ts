@@ -5,7 +5,7 @@
 
 import {Maybe} from '../Maybe'
 
-export type DependencyQuery<T> = (vertex: T) => Maybe<T[]>
+export type DependencyQuery<T> = (vertex: T) => T[]
 
 export interface TopSortResult<T> {
   sorted: T[], cycled: T[], 
@@ -320,9 +320,6 @@ export class Graph<T> {
 
   private removeDependencies(node: T): T[] {
     const dependencies = this.dependencyQuery(node)
-    if (!dependencies) {
-      return []
-    }
     for (const dependency of dependencies) {
       this.softRemoveEdge(dependency, node)
     }
