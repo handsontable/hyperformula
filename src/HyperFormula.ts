@@ -1884,7 +1884,7 @@ export class HyperFormula implements TypedEmitter {
    * //   address: { sheet: 0, col: 0, row: 0 },
    * //   newValue: 0.93524248002062,
    * // }]
-   * const changes = hfInstance.moveCells({start: source, end: source}, destination);
+   * const changes = hfInstance.moveCells({ start: source, end: source }, destination);
    * ```
    *
    * @category Cells
