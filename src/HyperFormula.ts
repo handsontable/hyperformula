@@ -2277,7 +2277,7 @@ export class HyperFormula implements TypedEmitter {
    *
    *
    * // returns calculated cells content: [ [ 3, 2 ], [ 5, 6 ] ]
-   * const rangeValues = hfInstance.getRangeValues({start: { sheet: 0, col: 0, row: 0 }, end:{ sheet: 0, col: 1, row: 1 }});
+   * const rangeValues = hfInstance.getRangeValues({ start: { sheet: 0, col: 0, row: 0 }, end: { sheet: 0, col: 1, row: 1 } });
    * ```
    *
    * @category Ranges
