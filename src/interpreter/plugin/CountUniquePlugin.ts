@@ -6,7 +6,7 @@
 import {CellError, ErrorType} from '../../Cell'
 import {ProcedureAst} from '../../parser'
 import {InterpreterState} from '../InterpreterState'
-import {EmptyValueType, InternalScalarValue, InterpreterValue, RawScalarValue} from '../InterpreterValue'
+import {EmptyValueType, InterpreterValue, RawScalarValue} from '../InterpreterValue'
 import {ArgumentTypes, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
 
 /**

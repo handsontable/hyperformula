@@ -73,7 +73,7 @@ export abstract class FormulaVertex {
    */
   public abstract getCellValue(): InterpreterValue
 
-  public abstract valueOrNull(): InterpreterValue | null
+  public abstract valueOrUndef(): Maybe<InterpreterValue>
 
   public abstract isComputed(): boolean
 }
@@ -116,9 +116,9 @@ export class MatrixVertex extends FormulaVertex {
     return this.matrix.simpleRangeValue()
   }
 
-  public valueOrNull(): InterpreterValue | null {
+  public valueOrUndef(): Maybe<InterpreterValue> {
     if (this.matrix instanceof NotComputedMatrix) {
-      return null
+      return undefined
     }
     return this.matrix.simpleRangeValue()
   }
@@ -217,7 +217,7 @@ export class MatrixVertex extends FormulaVertex {
   /**
    * No-op as matrix vertices are transformed eagerly.
    * */
-  ensureRecentData(updatingService: LazilyTransformingAstService) {}
+  ensureRecentData(_updatingService: LazilyTransformingAstService) {}
 
   private setErrorValue(error: CellError) {
     this.matrix = new ErroredMatrix(error, this.matrix.size)
@@ -229,7 +229,7 @@ export class MatrixVertex extends FormulaVertex {
  */
 export class FormulaCellVertex extends FormulaVertex {
   /** Most recently computed value of this formula. */
-  private cachedCellValue: InterpreterValue | null
+  private cachedCellValue?: InterpreterValue
 
   constructor(
     /** Formula in AST format */
@@ -241,10 +241,9 @@ export class FormulaCellVertex extends FormulaVertex {
     version: number,
   ) {
     super(formula, address, version)
-    this.cachedCellValue = null
   }
 
-  public valueOrNull(): InterpreterValue | null {
+  public valueOrUndef(): Maybe<InterpreterValue> {
     return this.cachedCellValue
   }
 
@@ -260,7 +259,7 @@ export class FormulaCellVertex extends FormulaVertex {
    * Returns cell value stored in vertex
    */
   public getCellValue(): InterpreterValue {
-    if (this.cachedCellValue !== null) {
+    if (this.cachedCellValue !== undefined) {
       return this.cachedCellValue
     } else {
       throw Error('Value of the formula cell is not computed.')
@@ -268,6 +267,6 @@ export class FormulaCellVertex extends FormulaVertex {
   }
 
   public isComputed() {
-    return (this.cachedCellValue !== null)
+    return (this.cachedCellValue !== undefined)
   }
 }

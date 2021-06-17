@@ -461,11 +461,11 @@ export const buildParsingErrorAst = (): ErrorAst => ({
 })
 
 function assertRangeConsistency(start: AddressWithSheet, end: AddressWithSheet, sheetReferenceType: RangeSheetReferenceType) {
-  if ((start.sheet !== null && end.sheet === null) || (start.sheet === null && end.sheet !== null)) {
+  if ((start.sheet !== undefined && end.sheet === undefined) || (start.sheet === undefined && end.sheet !== undefined)) {
     throw new Error('Start address inconsistent with end address')
   }
-  if ((start.sheet === null && sheetReferenceType !== RangeSheetReferenceType.RELATIVE)
-    || (start.sheet !== null && sheetReferenceType === RangeSheetReferenceType.RELATIVE)) {
+  if ((start.sheet === undefined && sheetReferenceType !== RangeSheetReferenceType.RELATIVE)
+    || (start.sheet !== undefined && sheetReferenceType === RangeSheetReferenceType.RELATIVE)) {
     throw new Error('Sheet address inconsistent with sheet reference type')
   }
 }

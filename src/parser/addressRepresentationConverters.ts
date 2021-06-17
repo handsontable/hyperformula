@@ -31,54 +31,66 @@ export const cellAddressFromString = (sheetMapping: SheetMappingFn, stringAddres
 
   const col = columnLabelToIndex(result[6])
 
-  const sheet = extractSheetNumber(result, sheetMapping)
+  let sheet = extractSheetNumber(result, sheetMapping)
   if (sheet === undefined) {
     return undefined
   }
 
+  if(sheet === null) {
+    sheet = undefined
+  }
+
   const row = Number(result[8]) - 1
   if (result[5] === '$' && result[7] === '$') {
-    return CellAddress.absolute(sheet, col, row)
+    return CellAddress.absolute(col, row, sheet)
   } else if (result[5] === '$') {
-    return CellAddress.absoluteCol(sheet, col, row - baseAddress.row)
+    return CellAddress.absoluteCol( col, row - baseAddress.row, sheet)
   } else if (result[7] === '$') {
-    return CellAddress.absoluteRow(sheet, col - baseAddress.col, row)
+    return CellAddress.absoluteRow(col - baseAddress.col, row, sheet)
   } else {
-    return CellAddress.relative(sheet, col - baseAddress.col, row - baseAddress.row)
+    return CellAddress.relative(row - baseAddress.row, col - baseAddress.col, sheet)
   }
 }
 
 export const columnAddressFromString = (sheetMapping: SheetMappingFn, stringAddress: string, baseAddress: SimpleCellAddress): Maybe<ColumnAddress> => {
   const result = columnRegex.exec(stringAddress)!
 
-  const sheet = extractSheetNumber(result, sheetMapping)
+  let sheet = extractSheetNumber(result, sheetMapping)
   if (sheet === undefined) {
     return undefined
+  }
+
+  if(sheet === null) {
+    sheet = undefined
   }
 
   const col = columnLabelToIndex(result[6])
 
   if (result[5] === '$') {
-    return ColumnAddress.absolute(sheet, col)
+    return ColumnAddress.absolute(col, sheet)
   } else {
-    return ColumnAddress.relative(sheet, col - baseAddress.col)
+    return ColumnAddress.relative(col - baseAddress.col, sheet)
   }
 }
 
 export const rowAddressFromString = (sheetMapping: SheetMappingFn, stringAddress: string, baseAddress: SimpleCellAddress): Maybe<RowAddress> => {
   const result = rowRegex.exec(stringAddress)!
 
-  const sheet = extractSheetNumber(result, sheetMapping)
+  let sheet = extractSheetNumber(result, sheetMapping)
   if (sheet === undefined) {
     return undefined
+  }
+
+  if(sheet === null) {
+    sheet = undefined
   }
 
   const row = Number(result[6]) - 1
 
   if (result[5] === '$') {
-    return RowAddress.absolute(sheet, row)
+    return RowAddress.absolute(row, sheet)
   } else {
-    return RowAddress.relative(sheet, row - baseAddress.row)
+    return RowAddress.relative(row - baseAddress.row, sheet)
   }
 }
 
@@ -166,7 +178,7 @@ export function columnIndexToLabel(column: number) {
   return result.toUpperCase()
 }
 
-export function sheetIndexToString(sheetId: number, sheetMappingFn: SheetIndexMappingFn): string | undefined {
+export function sheetIndexToString(sheetId: number, sheetMappingFn: SheetIndexMappingFn): Maybe<string> {
   let sheetName = sheetMappingFn(sheetId)
   if (sheetName === undefined) {
     return undefined
@@ -183,15 +195,10 @@ export function sheetIndexToString(sheetId: number, sheetMappingFn: SheetIndexMa
 function extractSheetNumber(regexResult: RegExpExecArray, sheetMapping: SheetMappingFn): number | null | undefined {
   let maybeSheetName = regexResult[3] ?? regexResult[2]
 
-  let sheet = null
-
   if (maybeSheetName) {
     maybeSheetName = maybeSheetName.replace(/''/g, "'")
-    sheet = sheetMapping(maybeSheetName)
-    if (sheet === undefined) {
-      return undefined
-    }
+    return sheetMapping(maybeSheetName)
+  } else {
+    return null
   }
-
-  return sheet
 }

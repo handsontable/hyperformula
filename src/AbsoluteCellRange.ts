@@ -54,16 +54,16 @@ export class AbsoluteCellRange implements SimpleCellRange {
 
   public static fromCellRange(x: CellRange, baseAddress: SimpleCellAddress): AbsoluteCellRange {
     return new AbsoluteCellRange(
-      new CellAddress(x.start.sheet, x.start.col, x.start.row, x.start.type).toSimpleCellAddress(baseAddress),
-      new CellAddress(x.end.sheet, x.end.col, x.end.row, x.end.type).toSimpleCellAddress(baseAddress),
+      x.start.toSimpleCellAddress(baseAddress),
+      x.end.toSimpleCellAddress(baseAddress),
     )
   }
 
   public static fromCellRangeOrUndef(x: CellRange, baseAddress: SimpleCellAddress): Maybe<AbsoluteCellRange> {
     try {
       return new AbsoluteCellRange(
-        new CellAddress(x.start.sheet, x.start.col, x.start.row, x.start.type).toSimpleCellAddress(baseAddress),
-        new CellAddress(x.end.sheet, x.end.col, x.end.row, x.end.type).toSimpleCellAddress(baseAddress),
+        x.start.toSimpleCellAddress(baseAddress),
+        x.end.toSimpleCellAddress(baseAddress),
       )
     } catch (e) {
       return undefined
@@ -158,16 +158,16 @@ export class AbsoluteCellRange implements SimpleCellRange {
     return this.addressInRange(range.start) && this.addressInRange(range.end)
   }
 
-  public intersectionWith(other: AbsoluteCellRange): AbsoluteCellRange | null {
+  public intersectionWith(other: AbsoluteCellRange): Maybe<AbsoluteCellRange> {
     if (this.sheet !== other.start.sheet) {
-      return null
+      return undefined
     }
     const startRow = Math.max(this.start.row, other.start.row)
     const endRow = Math.min(this.end.row, other.end.row)
     const startCol = Math.max(this.start.col, other.start.col)
     const endCol = Math.min(this.end.col, other.end.col)
     if (startRow > endRow || startCol > endCol) {
-      return null
+      return undefined
     }
 
     return new AbsoluteCellRange(

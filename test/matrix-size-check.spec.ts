@@ -1,4 +1,3 @@
-import {simpleCellAddress} from '../src/Cell'
 import {Config} from '../src/Config'
 import {FunctionRegistry} from '../src/interpreter/FunctionRegistry'
 import {Interpreter} from '../src/interpreter/Interpreter'
@@ -9,9 +8,10 @@ import {adr} from './testUtils'
 describe('Matrix size check tests', () => {
   const config = new Config()
   const functionRegistry = new FunctionRegistry(config)
-  // eslint-disable-next-line
+  /* eslint-disable */
   // @ts-ignore
   const interpreter = new Interpreter(undefined, undefined, config, undefined, undefined, undefined, functionRegistry, undefined)
+  /* eslint-enable */
   const matrixSizePredictor = new MatrixSizePredictor(config, functionRegistry)
   it('check', () => {
     const parser = buildEmptyParserWithCaching(config)
@@ -145,9 +145,10 @@ describe('Matrix size check tests', () => {
 describe('Matrix size check tests, with different config', () => {
   const config = new Config({useArrayArithmetic: true})
   const functionRegistry = new FunctionRegistry(config)
-  // eslint-disable-next-line
+  /* eslint-disable */
   // @ts-ignore
   const interpreter = new Interpreter(undefined, undefined, config, undefined, undefined, undefined, functionRegistry, undefined)
+  /* eslint-enable */
   const matrixSizePredictor = new MatrixSizePredictor(config, functionRegistry)
 
   it('check binary array arithmetic', () => {

@@ -3,8 +3,6 @@
  * Copyright (c) 2021 Handsoncode. All rights reserved.
  */
 
-import {Maybe} from '../Maybe'
-
 export type DependencyQuery<T> = (vertex: T) => T[]
 
 export interface TopSortResult<T> {
@@ -180,7 +178,7 @@ export class Graph<T> {
    * return a topological sort order, but separates vertices that exist in some cycle
    */
   public topSortWithScc(): TopSortResult<T> {
-    return this.getTopSortedWithSccSubgraphFrom(Array.from(this.nodes), (_node: T) => true, (_node: T) => {})
+    return this.getTopSortedWithSccSubgraphFrom(Array.from(this.nodes), () => true, () => {})
   }
 
   /**

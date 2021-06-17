@@ -1,6 +1,5 @@
 import {HyperFormula} from '../src'
 import {AbsoluteCellRange} from '../src/AbsoluteCellRange'
-import {simpleCellAddress} from '../src/Cell'
 import {adr} from './testUtils'
 
 describe('Interpreter - function RAND', () => {

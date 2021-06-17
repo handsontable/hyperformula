@@ -6,7 +6,7 @@
 import {SimpleCellAddress, SimpleColumnAddress, SimpleRowAddress} from '../Cell'
 
 export interface AddressWithSheet {
-  sheet: number | null,
+  sheet?: number,
   shiftRelativeDimensions(toRight: number, toBottom: number): AddressWithSheet,
   shiftAbsoluteDimensions(toRight: number, toBottom: number): AddressWithSheet,
   moved(toSheet: number, toRight: number, toBottom: number): AddressWithSheet,
