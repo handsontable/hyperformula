@@ -1116,7 +1116,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * // should return 'true' for this example, it is possible to set content of
    * // width 2, height 1 in the first row and column of sheet 0
-   * const isSettable = hfInstance.isItPossibleToSetCellContents({start: address1, end: address2});
+   * const isSettable = hfInstance.isItPossibleToSetCellContents({ start: address1, end: address2 });
    * ```
    *
    * @category Cells
