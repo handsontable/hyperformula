@@ -2347,7 +2347,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * // should return serialized cell content for the given range:
    * // [ [ '=SUM(1,2)', 2 ], [ 5, 6 ] ]
-   * const rangeSerialized = hfInstance.getRangeSerialized({start: { sheet: 0, col: 0, row: 0 }, end: { sheet: 0, col: 1, row: 1 }});
+   * const rangeSerialized = hfInstance.getRangeSerialized({ start: { sheet: 0, col: 0, row: 0 }, end: { sheet: 0, col: 1, row: 1 } });
    * ```
    *
    * @category Ranges
