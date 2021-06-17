@@ -2312,7 +2312,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * // returns cell formulas of a given range only:
    * // [ [ '=SUM(1,2)', undefined ], [ undefined, undefined ] ]
-   * const rangeFormulas = hfInstance.getRangeFormulas({start: { sheet: 0, col: 0, row: 0 }, end: { sheet: 0, col: 1, row: 1 }});
+   * const rangeFormulas = hfInstance.getRangeFormulas({ start: { sheet: 0, col: 0, row: 0 }, end: { sheet: 0, col: 1, row: 1 } });
    * ```
    *
    * @category Ranges
