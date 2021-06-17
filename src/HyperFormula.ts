@@ -2113,7 +2113,7 @@ export class HyperFormula implements TypedEmitter {
    * ]);
    *
    * // should return values that were cut: [ [ 1 ] ]
-   * const clipboardContent = hfInstance.cut({start: { sheet: 0, col: 0, row: 0 }, end: { sheet: 0, col: 0, row: 0}});
+   * const clipboardContent = hfInstance.cut({ start: { sheet: 0, col: 0, row: 0 }, end: { sheet: 0, col: 0, row: 0 } });
    * ```
    *
    * @category Clipboard
