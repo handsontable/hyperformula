@@ -216,6 +216,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * @param {Sheet} sheet - two-dimensional array representation of sheet
    * @param {Partial<ConfigParams>} configInput - engine configuration
+   * @param {SerializedNamedExpression[]} namedExpressions - starting named expressions
    *
    * @throws [[SheetSizeLimitExceededError]] when sheet size exceeds the limits
    * @throws [[InvalidArgumentsError]] when sheet is not an array of arrays
@@ -248,6 +249,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * @param {Sheet} sheets - object with sheets definition
    * @param {Partial<ConfigParams>} configInput - engine configuration
+   * @param {SerializedNamedExpression[]} namedExpressions - starting named expressions
    *
    * @throws [[SheetSizeLimitExceededError]] when sheet size exceeds the limits
    * @throws [[InvalidArgumentsError]] when any sheet is not an array of arrays
@@ -285,6 +287,7 @@ export class HyperFormula implements TypedEmitter {
    * If not specified the engine will be built with the default configuration.
    *
    * @param {Partial<ConfigParams>} configInput - engine configuration
+   * @param {SerializedNamedExpression[]} namedExpressions - starting named expressions
    *
    * @example
    * ```js
