@@ -7,8 +7,9 @@ import {SimpleCellAddress} from '../../Cell'
 import {RawCellContent} from '../../CellContentParser'
 import {NoSheetWithIdError} from '../../errors'
 import {EmptyValue, InterpreterValue} from '../../interpreter/InterpreterValue'
+import {Maybe} from '../../Maybe'
 import {ColumnsSpan, RowsSpan} from '../../Span'
-import {MatrixVertex, ValueCellVertex, Vertex} from '../index'
+import {MatrixVertex, ValueCellVertex} from '../index'
 import {CellVertex} from '../Vertex'
 import {ChooseAddressMapping} from './ChooseAddressMappingPolicy'
 import {IAddressMappingStrategy} from './IAddressMappingStrategy'
@@ -23,17 +24,17 @@ export class AddressMapping {
   }
 
   /** @inheritDoc */
-  public getCell(address: SimpleCellAddress): CellVertex | null {
+  public getCell(address: SimpleCellAddress): Maybe<CellVertex> {
     const sheetMapping = this.mapping.get(address.sheet)
-    if (!sheetMapping) {
+    if (sheetMapping === undefined) {
       throw new NoSheetWithIdError(address.sheet)
     }
-    return sheetMapping.getCell(address) ?? null
+    return sheetMapping.getCell(address)
   }
 
   public fetchCell(address: SimpleCellAddress): CellVertex {
     const sheetMapping = this.mapping.get(address.sheet)
-    if (!sheetMapping) {
+    if (sheetMapping === undefined) {
       throw  new NoSheetWithIdError(address.sheet)
     }
     const vertex = sheetMapping.getCell(address)
@@ -45,7 +46,7 @@ export class AddressMapping {
 
   public strategyFor(sheetId: number): IAddressMappingStrategy {
     const strategy = this.mapping.get(sheetId)
-    if (!strategy) {
+    if (strategy === undefined) {
       throw new NoSheetWithIdError(sheetId)
     }
 
@@ -69,7 +70,7 @@ export class AddressMapping {
   public getCellValue(address: SimpleCellAddress): InterpreterValue {
     const vertex = this.getCell(address)
 
-    if (vertex === null) {
+    if (vertex === undefined) {
       return EmptyValue
     } else if (vertex instanceof MatrixVertex) {
       return vertex.getMatrixCellValue(address)
@@ -128,7 +129,7 @@ export class AddressMapping {
   /** @inheritDoc */
   public has(address: SimpleCellAddress): boolean {
     const sheetMapping = this.mapping.get(address.sheet)
-    if (!sheetMapping) {
+    if (sheetMapping === undefined) {
       return false
     }
     return sheetMapping.has(address)
@@ -137,7 +138,7 @@ export class AddressMapping {
   /** @inheritDoc */
   public getHeight(sheetId: number): number {
     const sheetMapping = this.mapping.get(sheetId)
-    if (!sheetMapping) {
+    if (sheetMapping === undefined) {
       throw new NoSheetWithIdError(sheetId)
     }
     return sheetMapping.getHeight()
@@ -154,16 +155,16 @@ export class AddressMapping {
 
   public addRows(sheet: number, row: number, numberOfRows: number) {
     const sheetMapping = this.mapping.get(sheet)
-    if (!sheetMapping) {
-      throw Error('Sheet does not exist')
+    if (sheetMapping === undefined) {
+      throw new NoSheetWithIdError(sheet)
     }
     sheetMapping.addRows(row, numberOfRows)
   }
 
   public removeRows(removedRows: RowsSpan) {
     const sheetMapping = this.mapping.get(removedRows.sheet)
-    if (!sheetMapping) {
-      throw Error('Sheet does not exist')
+    if (sheetMapping === undefined) {
+      throw new NoSheetWithIdError(removedRows.sheet)
     }
     sheetMapping.removeRows(removedRows)
   }
@@ -174,16 +175,16 @@ export class AddressMapping {
 
   public addColumns(sheet: number, column: number, numberOfColumns: number) {
     const sheetMapping = this.mapping.get(sheet)
-    if (!sheetMapping) {
-      throw Error('Sheet does not exist')
+    if (sheetMapping === undefined) {
+      throw new NoSheetWithIdError(sheet)
     }
     sheetMapping.addColumns(column, numberOfColumns)
   }
 
   public removeColumns(removedColumns: ColumnsSpan) {
     const sheetMapping = this.mapping.get(removedColumns.sheet)
-    if (!sheetMapping) {
-      throw Error('Sheet does not exist')
+    if (sheetMapping === undefined) {
+      throw new NoSheetWithIdError(removedColumns.sheet)
     }
     sheetMapping.removeColumns(removedColumns)
   }
@@ -204,7 +205,7 @@ export class AddressMapping {
     yield* this.mapping.get(columnsSpan.sheet)!.entriesFromColumnsSpan(columnsSpan)
   }
 
-  public* entries(): IterableIterator<[SimpleCellAddress, CellVertex | null]> {
+  public* entries(): IterableIterator<[SimpleCellAddress, Maybe<CellVertex>]> {
     for (const [sheet, mapping] of this.mapping.entries()) {
       yield* mapping.getEntries(sheet)
     }
@@ -212,10 +213,10 @@ export class AddressMapping {
 
   public* sheetEntries(sheet: number): IterableIterator<[SimpleCellAddress, CellVertex]> {
     const sheetMapping = this.mapping.get(sheet)
-    if (sheetMapping) {
+    if (sheetMapping !== undefined) {
       yield* sheetMapping.getEntries(sheet)
     } else {
-      throw new Error('Sheet does not exists')
+      throw new NoSheetWithIdError(sheet)
     }
   }
 

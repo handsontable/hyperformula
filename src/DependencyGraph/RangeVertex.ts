@@ -51,7 +51,7 @@ export class RangeVertex {
    * @param functionName - name of the function
    */
   public getFunctionValue(functionName: string): any {
-    return this.functionCache.get(functionName) || null
+    return this.functionCache.get(functionName)
   }
 
   /**
@@ -70,10 +70,8 @@ export class RangeVertex {
    * @param cacheKey - key to retrieve from the cache
    * @param criterionString - criterion text (ex. '<=5')
    */
-  public getCriterionFunctionValue(cacheKey: string, criterionString: string): any | null {
-    const values = this.getCriterionFunctionValues(cacheKey)
-    const value = values.get(criterionString)
-    return value ? value[0] : null
+  public getCriterionFunctionValue(cacheKey: string, criterionString: string) {
+    return this.getCriterionFunctionValues(cacheKey).get(criterionString)?.[0]
   }
 
   /**
@@ -82,7 +80,7 @@ export class RangeVertex {
    * @param cacheKey - key to retrieve from the cache
    */
   public getCriterionFunctionValues(cacheKey: string): Map<string, [any, CriterionLambda[]]> {
-    return this.criterionFunctionCache.get(cacheKey) || new Map()
+    return this.criterionFunctionCache.get(cacheKey) ?? new Map()
   }
 
   /**

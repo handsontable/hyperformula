@@ -197,8 +197,8 @@ export function expectVerticesOfTypes(engine: HyperFormula, types: any[][], shee
     for (let col=0; col<types[row].length; ++col) {
       const expectedType = types[row][col]
       const cell = engine.dependencyGraph.getCell(simpleCellAddress(sheet, col, row))
-      if (expectedType === null) {
-        expect(cell === null).toBe(true)
+      if (expectedType === undefined) {
+        expect(cell === undefined).toBe(true)
       } else {
         expect(cell instanceof types[row][col]).toBe(true)
       }

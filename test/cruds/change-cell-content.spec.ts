@@ -201,7 +201,7 @@ describe('changing cell content', () => {
 
     expect(engine.getCellValue(adr('B1'))).toBe(2)
     engine.setCellContents(adr('B1'), null)
-    expect(engine.addressMapping.getCell(adr('B1'))).toBe(null)
+    expect(engine.addressMapping.getCell(adr('B1'))).toBe(undefined)
     expect(engine.getCellValue(adr('B1'))).toBe(null)
   })
 
@@ -292,7 +292,7 @@ describe('changing cell content', () => {
 
     engine.setCellContents(adr('A1'), null)
     const a1 = engine.addressMapping.getCell(adr('A1'))
-    expect(a1).toBe(null)
+    expect(a1).toBe(undefined)
     expect(engine.getCellValue(adr('A1'))).toBe(null)
   })
 
@@ -815,8 +815,8 @@ describe('arrays', () => {
 
     expect(engine.matrixMapping.getMatrixByCorner(adr('A1'))?.matrix.size).toEqual(MatrixSize.error())
     expectVerticesOfTypes(engine, [
-      [MatrixVertex, null],
-      [ValueCellVertex, null],
+      [MatrixVertex, undefined],
+      [ValueCellVertex, undefined],
     ])
     expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
       ['=-C1:D2', null],
@@ -833,9 +833,9 @@ describe('arrays', () => {
     ])
 
     expectVerticesOfTypes(engine, [
-      [MatrixVertex, MatrixVertex, null],
+      [MatrixVertex, MatrixVertex, undefined],
       [MatrixVertex, MatrixVertex, MatrixVertex],
-      [null, MatrixVertex, MatrixVertex],
+      [undefined, MatrixVertex, MatrixVertex],
     ])
     expect(engine.matrixMapping.matrixMapping.size).toEqual(4)
     expect(engine.getSheetValues(0))
@@ -855,7 +855,7 @@ describe('arrays', () => {
     expectVerticesOfTypes(engine, [
       [MatrixVertex, MatrixVertex, MatrixVertex],
       [MatrixVertex, MatrixVertex, MatrixVertex],
-      [null, null],
+      [undefined, undefined],
     ])
     expect(engine.getSheetValues(0)).toEqual([
       [noSpace(), 1, 1, 1, 2],
@@ -912,7 +912,7 @@ describe('arrays', () => {
       [1, 2],
       [3, 4, '=B4'],
       ['=-A1:B2'],
-      [null, '=SUM(A1:B2)']
+      [undefined, '=SUM(A1:B2)']
     ], {useArrayArithmetic: true}))
     expect(engine.getSheetValues(0)).toEqual([
       [1, 2],

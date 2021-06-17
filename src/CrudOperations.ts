@@ -209,7 +209,7 @@ export class CrudOperations {
   }
 
   public addSheet(name?: string): string {
-    if (name) {
+    if (name !== undefined) {
       this.ensureItIsPossibleToAddSheet(name)
     }
     this.undoRedo.clearRedoStack()

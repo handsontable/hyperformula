@@ -12,7 +12,7 @@ import {Ast, AstNodeType, CellRangeAst, ProcedureAst} from '../../parser'
 import {ColumnRangeAst, RowRangeAst} from '../../parser/Ast'
 import {coerceBooleanToNumber} from '../ArithmeticHelper'
 import {InterpreterState} from '../InterpreterState'
-import {EmptyValue, ExtendedNumber, getRawValue, InternalScalarValue, isExtendedNumber, } from '../InterpreterValue'
+import {EmptyValue, ExtendedNumber, getRawValue, InternalScalarValue, isExtendedNumber} from '../InterpreterValue'
 import {SimpleRangeValue} from '../SimpleRangeValue'
 import {ArgumentTypes, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
 
@@ -626,12 +626,12 @@ export class NumericAggregationPlugin extends FunctionPlugin implements Function
     const rangeEnd = range.end
     const rangeVertex = this.dependencyGraph.getRange(rangeStart, rangeEnd)!
 
-    if (!rangeVertex) {
+    if (rangeVertex === undefined) {
       throw new Error('Range does not exists in graph')
     }
 
-    let value = rangeVertex.getFunctionValue(functionName) as (T | CellError)
-    if (!value) {
+    let value = rangeVertex.getFunctionValue(functionName) as (T | CellError | undefined)
+    if (value === undefined) {
       const rangeValues = this.getRangeValues(functionName, range, mapFunction, coercionFunction)
       value = rangeValues.reduce((arg1, arg2) => {
         if (arg1 instanceof CellError) {
@@ -664,9 +664,9 @@ export class NumericAggregationPlugin extends FunctionPlugin implements Function
     const {smallerRangeVertex, restRange} = this.dependencyGraph.rangeMapping.findSmallerRange(range)
     const currentRangeVertex = this.dependencyGraph.getRange(range.start, range.end)!
     let actualRange: AbsoluteCellRange
-    if (smallerRangeVertex && this.dependencyGraph.existsEdge(smallerRangeVertex, currentRangeVertex)) {
-      const cachedValue: T = smallerRangeVertex.getFunctionValue(functionName) as T
-      if (cachedValue) {
+    if (smallerRangeVertex !== undefined && this.dependencyGraph.existsEdge(smallerRangeVertex, currentRangeVertex)) {
+      const cachedValue: Maybe<T> = smallerRangeVertex.getFunctionValue(functionName)
+      if (cachedValue !== undefined) {
         rangeResult.push(cachedValue)
       } else {
         for (const cellFromRange of smallerRangeVertex.range.addresses(this.dependencyGraph)) {

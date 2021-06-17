@@ -355,9 +355,9 @@ describe('build from array', () => {
     ], {useArrayArithmetic: true})
 
     expectVerticesOfTypes(engine, [
-      [MatrixVertex, MatrixVertex, null],
+      [MatrixVertex, MatrixVertex, undefined],
       [MatrixVertex, MatrixVertex, MatrixVertex],
-      [null, MatrixVertex, MatrixVertex],
+      [undefined, MatrixVertex, MatrixVertex],
     ])
     expect(engine.matrixMapping.matrixMapping.size).toEqual(4)
     expect(engine.getSheetValues(0))
@@ -372,7 +372,7 @@ describe('build from array', () => {
     expectVerticesOfTypes(engine, [
       [MatrixVertex, MatrixVertex, MatrixVertex],
       [MatrixVertex, MatrixVertex, MatrixVertex],
-      [null, null],
+      [undefined, undefined],
     ])
     expect(engine.getSheetValues(0)).toEqual([
       [noSpace(), 1, 1, 1, 2],
@@ -427,8 +427,8 @@ describe('build from array', () => {
 
     expect(engine.matrixMapping.getMatrixByCorner(adr('A1'))?.matrix.size).toEqual(MatrixSize.error())
     expectVerticesOfTypes(engine, [
-      [MatrixVertex, null],
-      [ValueCellVertex, null],
+      [MatrixVertex, undefined],
+      [ValueCellVertex, undefined],
     ])
   })
 })

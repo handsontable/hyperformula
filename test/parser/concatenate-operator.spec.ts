@@ -1,4 +1,3 @@
-import {simpleCellAddress} from '../../src/Cell'
 import {Config} from '../../src/Config'
 import {AstNodeType, ConcatenateOpAst, ProcedureAst} from '../../src/parser'
 import {adr} from '../testUtils'

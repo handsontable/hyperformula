@@ -54,7 +54,7 @@ export class EngineComparator {
         const address = simpleCellAddress(sheet, x, y)
         const expectedVertex = this.expected.addressMapping.getCell(address)
         const actualVertex = this.actual.addressMapping.getCell(address)
-        if (expectedVertex === null && actualVertex === null) {
+        if (expectedVertex === undefined && actualVertex === undefined) {
           continue
         } else if (
           (expectedVertex instanceof FormulaCellVertex  && actualVertex instanceof FormulaCellVertex) ||

@@ -38,7 +38,8 @@ import {
   buildGreaterThanOpAst,
   buildGreaterThanOrEqualOpAst,
   buildLessThanOpAst,
-  buildLessThanOrEqualOpAst, buildMatrixAst,
+  buildLessThanOrEqualOpAst,
+  buildMatrixAst,
   buildMinusOpAst,
   buildMinusUnaryOpAst,
   buildNamedExpressionAst,
@@ -55,7 +56,8 @@ import {
   buildStringAst,
   buildTimesOpAst,
   CellReferenceAst,
-  ErrorAst, MatrixAst,
+  ErrorAst,
+  MatrixAst,
   parsingError,
   ParsingError,
   ParsingErrorType,
@@ -76,7 +78,9 @@ import {
   ILexerConfig,
   LessThanOp,
   LessThanOrEqualOp,
-  LParen, MatrixLParen, MatrixRParen,
+  LParen,
+  MatrixLParen,
+  MatrixRParen,
   MinusOp,
   MultiplicationOp,
   NamedExpression,
@@ -526,13 +530,13 @@ export class FormulaParser extends EmbeddedActionsParser {
     if (start.exceedsSheetSizeLimits(this.lexerConfig.maxColumns) || end.exceedsSheetSizeLimits(this.lexerConfig.maxColumns)) {
       return buildErrorWithRawInputAst(range.image, new CellError(ErrorType.NAME), range.leadingWhitespace)
     }
-    if (start.sheet === null && end.sheet !== null) {
+    if (start.sheet === undefined && end.sheet !== undefined) {
       return this.parsingError(ParsingErrorType.ParserError, 'Malformed range expression')
     }
 
     const sheetReferenceType = this.rangeSheetReferenceType(start.sheet, end.sheet)
 
-    if (start.sheet !== null && end.sheet === null) {
+    if (start.sheet !== undefined && end.sheet === undefined) {
       end = end.withAbsoluteSheet(start.sheet)
     }
 
@@ -559,13 +563,13 @@ export class FormulaParser extends EmbeddedActionsParser {
     if (start.exceedsSheetSizeLimits(this.lexerConfig.maxRows) || end.exceedsSheetSizeLimits(this.lexerConfig.maxRows)) {
       return buildErrorWithRawInputAst(range.image, new CellError(ErrorType.NAME), range.leadingWhitespace)
     }
-    if (start.sheet === null && end.sheet !== null) {
+    if (start.sheet === undefined && end.sheet !== undefined) {
       return this.parsingError(ParsingErrorType.ParserError, 'Malformed range expression')
     }
 
     const sheetReferenceType = this.rangeSheetReferenceType(start.sheet, end.sheet)
 
-    if (start.sheet !== null && end.sheet === null) {
+    if (start.sheet !== undefined && end.sheet === undefined) {
       end = end.withAbsoluteSheet(start.sheet)
     }
 
@@ -613,7 +617,7 @@ export class FormulaParser extends EmbeddedActionsParser {
           if (offsetProcedure.type === AstNodeType.CELL_REFERENCE) {
             let end = offsetProcedure.reference
             let sheetReferenceType = RangeSheetReferenceType.RELATIVE
-            if (startAddress.sheet !== null) {
+            if (startAddress.sheet !== undefined) {
               sheetReferenceType = RangeSheetReferenceType.START_ABSOLUTE
               end = end.withAbsoluteSheet(startAddress.sheet)
             }
@@ -644,7 +648,7 @@ export class FormulaParser extends EmbeddedActionsParser {
           if (offsetProcedure.type === AstNodeType.CELL_REFERENCE) {
             let end = offsetProcedure.reference
             let sheetReferenceType = RangeSheetReferenceType.RELATIVE
-            if (start.reference.sheet !== null) {
+            if (start.reference.sheet !== undefined) {
               sheetReferenceType = RangeSheetReferenceType.START_ABSOLUTE
               end = end.withAbsoluteSheet(start.reference.sheet)
             }
@@ -704,13 +708,13 @@ export class FormulaParser extends EmbeddedActionsParser {
   })
 
   private buildCellRange(startAddress: CellAddress, endAddress: CellAddress, leadingWhitespace?: string): Ast {
-    if (startAddress.sheet === null && endAddress.sheet !== null) {
+    if (startAddress.sheet === undefined && endAddress.sheet !== undefined) {
       return this.parsingError(ParsingErrorType.ParserError, 'Malformed range expression')
     }
 
     const sheetReferenceType = this.rangeSheetReferenceType(startAddress.sheet, endAddress.sheet)
 
-    if (startAddress.sheet !== null && endAddress.sheet === null) {
+    if (startAddress.sheet !== undefined && endAddress.sheet === undefined) {
       endAddress = endAddress.withAbsoluteSheet(startAddress.sheet)
     }
 
@@ -831,7 +835,6 @@ export class FormulaParser extends EmbeddedActionsParser {
     }
 
     const topLeftCorner = new CellAddress(
-      null,
       cellArg.reference.col + colShift,
       cellArg.reference.row + rowShift,
       cellArg.reference.type,
@@ -857,7 +860,6 @@ export class FormulaParser extends EmbeddedActionsParser {
       return buildCellReferenceAst(topLeftCorner)
     } else {
       const bottomRightCorner = new CellAddress(
-        null,
         topLeftCorner.col + width - 1,
         topLeftCorner.row + height - 1,
         topLeftCorner.type,
@@ -871,10 +873,10 @@ export class FormulaParser extends EmbeddedActionsParser {
     return buildParsingErrorAst()
   }
 
-  private rangeSheetReferenceType(start: number | null, end: number | null): RangeSheetReferenceType {
-    if (start === null) {
+  private rangeSheetReferenceType(start?: number, end?: number): RangeSheetReferenceType {
+    if (start === undefined) {
       return RangeSheetReferenceType.RELATIVE
-    } else if (end === null) {
+    } else if (end === undefined) {
       return RangeSheetReferenceType.START_ABSOLUTE
     } else {
       return RangeSheetReferenceType.BOTH_ABSOLUTE

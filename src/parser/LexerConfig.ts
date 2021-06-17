@@ -4,7 +4,6 @@
  */
 
 import {createToken, Lexer, TokenType} from 'chevrotain'
-import {create} from 'domain'
 import {ErrorType} from '../Cell'
 import {ParserConfig} from './ParserConfig'
 

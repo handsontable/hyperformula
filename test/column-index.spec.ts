@@ -1,6 +1,6 @@
 import {deepStrictEqual} from 'assert'
 import {AbsoluteCellRange} from '../src/AbsoluteCellRange'
-import {CellError, ErrorType, simpleCellAddress} from '../src/Cell'
+import {CellError, ErrorType} from '../src/Cell'
 import {Config} from '../src/Config'
 import {DependencyGraph} from '../src/DependencyGraph'
 import {AddRowsTransformer} from '../src/dependencyTransformers/AddRowsTransformer'
@@ -134,13 +134,13 @@ describe('ColumnIndex change/remove', () => {
     expect(valueIndex.index).toContain(2)
   })
 
-  it('should do nothing if passed value is null', () => {
+  it('should do nothing if passed value is undefined', () => {
     const index = buildEmptyIndex(transformingService, new Config(), statistics)
     index.add(1, adr('A1'))
     index.add(1, adr('A2'))
     index.add(1, adr('A3'))
 
-    index.remove(null, adr('A2'))
+    index.remove(undefined, adr('A2'))
 
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const valueIndex = index.getColumnMap(0, 0).get(1)!

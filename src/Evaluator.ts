@@ -38,7 +38,7 @@ export class Evaluator {
     private readonly numberLiteralsHelper: NumberLiteralHelper,
     private readonly functionRegistry: FunctionRegistry,
     private readonly namedExpressions: NamedExpressions,
-    private readonly serialization: Serialization
+    private readonly serialization: Serialization,
   ) {
     this.interpreter = new Interpreter(this.dependencyGraph, this.columnSearch, this.config, this.stats, this.dateHelper, this.numberLiteralsHelper, this.functionRegistry, this.namedExpressions, this.serialization)
     this.lazilyTransformingAstService = this.dependencyGraph.lazilyTransformingAstService
@@ -61,7 +61,7 @@ export class Evaluator {
       this.dependencyGraph.graph.getTopSortedWithSccSubgraphFrom(vertices,
         (vertex: Vertex) => {
           if (vertex instanceof FormulaVertex) {
-            const currentValue = vertex.isComputed() ? vertex.getCellValue() : null
+            const currentValue = vertex.isComputed() ? vertex.getCellValue() : undefined
             const newCellValue = this.recomputeFormulaVertexValue(vertex)
             if (newCellValue !== currentValue) {
               const address = vertex.getAddress(this.lazilyTransformingAstService)
@@ -82,7 +82,7 @@ export class Evaluator {
             vertex.clearCache()
           } else if (vertex instanceof FormulaVertex) {
             const address = vertex.getAddress(this.lazilyTransformingAstService)
-            this.columnSearch.remove(getRawValue(vertex.valueOrNull()), address)
+            this.columnSearch.remove(getRawValue(vertex.valueOrUndef()), address)
             const error = new CellError(ErrorType.CYCLE, undefined, address)
             vertex.setCellValue(error)
             changes.addChange(error, address)

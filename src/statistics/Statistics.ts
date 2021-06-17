@@ -16,13 +16,13 @@ export class Statistics {
   protected readonly startTimes: Map<StatType, number> = new Map<StatType, number>()
 
   public incrementCriterionFunctionFullCacheUsed() {
-    const newValue = (this.stats.get(StatType.CRITERION_FUNCTION_FULL_CACHE_USED) || 0) + 1
+    const newValue = (this.stats.get(StatType.CRITERION_FUNCTION_FULL_CACHE_USED) ?? 0) + 1
 
     this.stats.set(StatType.CRITERION_FUNCTION_FULL_CACHE_USED, newValue)
   }
 
   public incrementCriterionFunctionPartialCacheUsed() {
-    const newValue = (this.stats.get(StatType.CRITERION_FUNCTION_PARTIAL_CACHE_USED) || 0) + 1
+    const newValue = (this.stats.get(StatType.CRITERION_FUNCTION_PARTIAL_CACHE_USED) ?? 0) + 1
 
     this.stats.set(StatType.CRITERION_FUNCTION_PARTIAL_CACHE_USED, newValue)
   }
@@ -61,7 +61,7 @@ export class Statistics {
     const startTime = this.startTimes.get(name)
 
     if (startTime) {
-      let values = this.stats.get(name) || 0
+      let values = this.stats.get(name) ?? 0
       values += (now - startTime)
       this.stats.set(name, values)
       this.startTimes.delete(name)
