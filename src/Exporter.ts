@@ -3,7 +3,7 @@
  * Copyright (c) 2021 Handsoncode. All rights reserved.
  */
 
-import {CellError, ErrorType, SimpleCellAddress, simpleCellAddress} from './Cell'
+import {CellError, ErrorType, SimpleCellAddress} from './Cell'
 import {CellValue, DetailedCellError} from './CellValue'
 import {Config} from './Config'
 import {CellValueChange, ChangeExporter} from './ContentChanges'

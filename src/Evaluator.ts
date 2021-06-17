@@ -23,7 +23,6 @@ import {NumberLiteralHelper} from './NumberLiteralHelper'
 import {Ast, RelativeDependency} from './parser'
 import {Serialization} from './Serialization'
 import {Statistics, StatType} from './statistics'
-import {CellContent} from './CellContentParser'
 
 export class Evaluator {
   private interpreter: Interpreter

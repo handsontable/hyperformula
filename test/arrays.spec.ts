@@ -1,8 +1,8 @@
 import {ErrorType, HyperFormula} from '../src'
-import {ErrorMessage} from '../src/error-message'
-import {adr, detailedError, detailedErrorWithOrigin, expectVerticesOfTypes, noSpace} from './testUtils'
 import {MatrixVertex, ValueCellVertex} from '../src/DependencyGraph'
+import {ErrorMessage} from '../src/error-message'
 import {MatrixSize} from '../src/MatrixSize'
+import {adr, detailedError, detailedErrorWithOrigin, expectVerticesOfTypes, noSpace} from './testUtils'
 
 describe('without arrayformula, with useArrayArithmetic flag', () => {
   it('unary op, scalar ret', () => {

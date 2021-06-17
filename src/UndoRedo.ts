@@ -5,7 +5,7 @@
 
 import {equalSimpleCellAddress, simpleCellAddress, SimpleCellAddress} from './Cell'
 import {RawCellContent} from './CellContentParser'
-import {ClipboardCell, ClipboardCellType} from './ClipboardOperations'
+import {ClipboardCell} from './ClipboardOperations'
 import {Config} from './Config'
 import {InternalNamedExpression, NamedExpressionOptions} from './NamedExpressions'
 import {

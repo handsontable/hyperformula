@@ -8,12 +8,12 @@ import {RawCellContent} from '../../CellContentParser'
 import {NoSheetWithIdError} from '../../errors'
 import {EmptyValue, InterpreterValue} from '../../interpreter/InterpreterValue'
 import {Maybe} from '../../Maybe'
+import {Sheet, SheetBoundaries} from '../../Sheet'
 import {ColumnsSpan, RowsSpan} from '../../Span'
 import {MatrixVertex, ValueCellVertex} from '../index'
 import {CellVertex} from '../Vertex'
 import {ChooseAddressMapping} from './ChooseAddressMappingPolicy'
 import {IAddressMappingStrategy} from './IAddressMappingStrategy'
-import {Sheet, SheetBoundaries} from '../../Sheet'
 
 export class AddressMapping {
   private mapping: Map<number, IAddressMappingStrategy> = new Map()

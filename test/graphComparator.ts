@@ -5,7 +5,8 @@ import {SimpleCellAddress, simpleCellAddress} from '../src/Cell'
 import {
   EmptyCellVertex,
   FormulaCellVertex,
-  MatrixVertex, ParsingErrorVertex,
+  MatrixVertex,
+  ParsingErrorVertex,
   RangeVertex,
   ValueCellVertex,
   Vertex,

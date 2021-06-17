@@ -5,7 +5,7 @@
 
 import {AbsoluteCellRange} from './AbsoluteCellRange'
 import {absolutizeDependencies, filterDependenciesOutOfScope} from './absolutizeDependencies'
-import {CellError, ErrorType, invalidSimpleCellAddress, simpleCellAddress, SimpleCellAddress} from './Cell'
+import {invalidSimpleCellAddress, simpleCellAddress, SimpleCellAddress} from './Cell'
 import {CellContent, CellContentParser, RawCellContent} from './CellContentParser'
 import {ClipboardCell, ClipboardCellType} from './ClipboardOperations'
 import {Config} from './Config'
@@ -23,6 +23,7 @@ import {
   SparseStrategy,
   ValueCellVertex
 } from './DependencyGraph'
+import {FormulaVertex} from './DependencyGraph/FormulaCellVertex'
 import {RawAndParsedValue} from './DependencyGraph/ValueCellVertex'
 import {AddColumnsTransformer} from './dependencyTransformers/AddColumnsTransformer'
 import {AddRowsTransformer} from './dependencyTransformers/AddRowsTransformer'
@@ -51,11 +52,10 @@ import {
 } from './NamedExpressions'
 import {NamedExpressionDependency, ParserWithCaching, RelativeDependency} from './parser'
 import {ParsingError} from './parser/Ast'
+import {ParsingResult} from './parser/ParserWithCaching'
 import {findBoundaries, Sheet} from './Sheet'
 import {ColumnsSpan, RowsSpan} from './Span'
 import {Statistics, StatType} from './statistics'
-import {ParsingResult} from './parser/ParserWithCaching'
-import {FormulaVertex} from './DependencyGraph/FormulaCellVertex'
 
 export class RemoveRowsCommand {
   constructor(

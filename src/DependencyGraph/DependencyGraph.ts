@@ -9,6 +9,7 @@ import {CellError, ErrorType, isSimpleCellAddress, simpleCellAddress, SimpleCell
 import {RawCellContent} from '../CellContentParser'
 import {CellDependency} from '../CellDependency'
 import {Config} from '../Config'
+import {ContentChanges} from '../ContentChanges'
 import {ErrorMessage} from '../error-message'
 import {FunctionRegistry} from '../interpreter/FunctionRegistry'
 import {
@@ -44,7 +45,6 @@ import {MatrixMapping} from './MatrixMapping'
 import {RangeMapping} from './RangeMapping'
 import {SheetMapping} from './SheetMapping'
 import {RawAndParsedValue} from './ValueCellVertex'
-import {ContentChanges} from '../ContentChanges'
 
 export class DependencyGraph {
   /**

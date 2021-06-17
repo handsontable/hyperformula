@@ -1,8 +1,6 @@
-import {simpleCellAddress} from '../src/Cell'
 import {CellValueChange, ChangeExporter, ContentChanges} from '../src/ContentChanges'
 import {SimpleRangeValue} from '../src/interpreter/SimpleRangeValue'
 import {adr} from './testUtils'
-import {HyperFormula} from '../src'
 
 class IdentityChangeExporter implements ChangeExporter<CellValueChange>{
   exportChange(change: CellValueChange): CellValueChange {

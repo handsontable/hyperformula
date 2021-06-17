@@ -3,7 +3,7 @@
  * Copyright (c) 2021 Handsoncode. All rights reserved.
  */
 
-import {CellError, SimpleCellAddress, simpleCellAddress} from './Cell'
+import {CellError} from './Cell'
 import {EmptyValue, InternalScalarValue, InterpreterValue} from './interpreter/InterpreterValue'
 import {SimpleRangeValue} from './interpreter/SimpleRangeValue'
 import {MatrixSize} from './MatrixSize'

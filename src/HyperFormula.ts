@@ -33,7 +33,8 @@ import {
 } from './DependencyGraph'
 import {Emitter, Events, Listeners, TypedEmitter} from './Emitter'
 import {
-  EvaluationSuspendedError, ExpectedValueOfTypeError,
+  EvaluationSuspendedError,
+  ExpectedValueOfTypeError,
   LanguageAlreadyRegisteredError,
   LanguageNotRegisteredError,
   NotAFormulaError,

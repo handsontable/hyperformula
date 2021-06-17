@@ -6,6 +6,7 @@
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
 import {addressesEqual, CellError, ErrorType, SimpleCellAddress} from '../Cell'
 import {RawCellContent} from '../CellContentParser'
+import {ErrorMessage} from '../error-message'
 import {EmptyValue, getRawValue, InternalScalarValue, InterpreterValue} from '../interpreter/InterpreterValue'
 import {LazilyTransformingAstService} from '../LazilyTransformingAstService'
 import {ErroredMatrix, IMatrix, Matrix, NotComputedMatrix} from '../Matrix'
@@ -13,7 +14,6 @@ import {MatrixSize} from '../MatrixSize'
 import {Maybe} from '../Maybe'
 import {Ast} from '../parser'
 import {ColumnsSpan, RowsSpan} from '../Span'
-import {ErrorMessage} from '../error-message'
 
 export abstract class FormulaVertex {
   static fromAst(formula: Ast, address: SimpleCellAddress, size: MatrixSize, version: number) {

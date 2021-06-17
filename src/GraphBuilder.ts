@@ -22,8 +22,6 @@ import {MatrixSize, MatrixSizePredictor} from './MatrixSize'
 import {ParserWithCaching} from './parser'
 import {Sheets} from './Sheet'
 import {Statistics, StatType} from './statistics'
-import {Matrix} from './Matrix'
-import {AbsoluteCellRange} from './AbsoluteCellRange'
 
 export type Dependencies = Map<Vertex, CellDependency[]>
 

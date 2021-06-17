@@ -1,8 +1,8 @@
-import {MatrixMapping, MatrixVertex} from '../src/DependencyGraph'
-import {adr} from './testUtils'
 import {AbsoluteCellRange} from '../src/AbsoluteCellRange'
-import {buildNumberAst} from '../src/parser/Ast'
+import {MatrixMapping, MatrixVertex} from '../src/DependencyGraph'
 import {MatrixSize} from '../src/MatrixSize'
+import {buildNumberAst} from '../src/parser/Ast'
+import {adr} from './testUtils'
 
 describe('MatrixMapping', () => {
   it('should be empty', () => {

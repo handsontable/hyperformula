@@ -2,9 +2,9 @@ import {ExportedCellChange, HyperFormula, SheetSizeLimitExceededError} from '../
 import {AbsoluteCellRange} from '../../src/AbsoluteCellRange'
 import {Config} from '../../src/Config'
 import {FormulaCellVertex, MatrixVertex} from '../../src/DependencyGraph'
+import {AlwaysDense} from '../../src/DependencyGraph/AddressMapping/ChooseAddressMappingPolicy'
 import {ColumnIndex} from '../../src/Lookup/ColumnIndex'
 import {adr, expectArrayWithSameContent, expectEngineToBeTheSameAs, extractMatrixRange} from '../testUtils'
-import {AlwaysDense} from '../../src/DependencyGraph/AddressMapping/ChooseAddressMappingPolicy'
 
 describe('Adding row - checking if its possible', () => {
   it('no if starting row is negative', () => {

@@ -6,6 +6,7 @@ import {EmptyCellVertex, MatrixVertex, ValueCellVertex} from '../../src/Dependen
 import {ErrorMessage} from '../../src/error-message'
 import {SheetSizeLimitExceededError} from '../../src/errors'
 import {ColumnIndex} from '../../src/Lookup/ColumnIndex'
+import {MatrixSize} from '../../src/MatrixSize'
 import {
   adr,
   colEnd,
@@ -18,7 +19,6 @@ import {
   rowEnd,
   rowStart
 } from '../testUtils'
-import {MatrixSize} from '../../src/MatrixSize'
 
 describe('Changing cell content - checking if its possible', () => {
   it('address should have valid coordinates', () => {
