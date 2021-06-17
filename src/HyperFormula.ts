@@ -2081,7 +2081,7 @@ export class HyperFormula implements TypedEmitter {
    * ]);
    *
    * // should return: [ [ 2 ] ]
-   * const clipboardContent = hfInstance.copy({start: { sheet: 0, col: 1, row: 0 }, end: {sheet: 0, col: 1, row: 0}});
+   * const clipboardContent = hfInstance.copy({ start: { sheet: 0, col: 1, row: 0 }, end: { sheet: 0, col: 1, row: 0 } });
    * ```
    *
    * @category Clipboard
