@@ -83,7 +83,7 @@ export class Evaluator {
             vertex.clearCache()
           } else if (vertex instanceof FormulaVertex) {
             const address = vertex.getAddress(this.dependencyGraph.lazilyTransformingAstService)
-            this.columnSearch.remove(getRawValue(vertex.valueOrNull()), address)
+            this.columnSearch.remove(getRawValue(vertex.valueOrUndef()), address)
             const error = new CellError(ErrorType.CYCLE, undefined, address)
             vertex.setCellValue(error)
             changes.addChange(error, address)

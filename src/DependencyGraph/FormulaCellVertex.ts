@@ -73,7 +73,7 @@ export abstract class FormulaVertex {
    */
   public abstract getCellValue(): InterpreterValue
 
-  public abstract valueOrNull(): Maybe<InterpreterValue>
+  public abstract valueOrUndef(): Maybe<InterpreterValue>
 
   public abstract isComputed(): boolean
 }
@@ -116,7 +116,7 @@ export class MatrixVertex extends FormulaVertex {
     return this.matrix.simpleRangeValue()
   }
 
-  public valueOrNull(): Maybe<InterpreterValue> {
+  public valueOrUndef(): Maybe<InterpreterValue> {
     if (this.matrix instanceof NotComputedMatrix) {
       return undefined
     }
@@ -243,7 +243,7 @@ export class FormulaCellVertex extends FormulaVertex {
     super(formula, address, version)
   }
 
-  public valueOrNull(): Maybe<InterpreterValue> {
+  public valueOrUndef(): Maybe<InterpreterValue> {
     return this.cachedCellValue
   }
 
