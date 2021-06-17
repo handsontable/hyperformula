@@ -444,9 +444,9 @@ export class DateTimePlugin extends FunctionPlugin implements FunctionPluginType
   public now(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('NOW'),
       () => {
-        const now = new Date()
+        const now = new Date(Date.now())
         return timeToNumber({hours: now.getHours(), minutes: now.getMinutes(), seconds: now.getSeconds()})+
-          this.interpreter.dateHelper.dateToNumber({year: now.getFullYear(), month: now.getMonth()+1, day: now.getDay()})
+          this.interpreter.dateHelper.dateToNumber({year: now.getFullYear(), month: now.getMonth()+1, day: now.getDate()})
       }
     )
   }
@@ -454,8 +454,8 @@ export class DateTimePlugin extends FunctionPlugin implements FunctionPluginType
   public today(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('TODAY'),
       () => {
-        const now = new Date()
-        return this.interpreter.dateHelper.dateToNumber({year: now.getFullYear(), month: now.getMonth()+1, day: now.getDay()})
+        const now = new Date(Date.now())
+        return this.interpreter.dateHelper.dateToNumber({year: now.getFullYear(), month: now.getMonth()+1, day: now.getDate()})
       }
     )
   }
