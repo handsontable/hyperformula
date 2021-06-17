@@ -1117,7 +1117,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * // should return 'true' for this example, it is possible to set content of
    * // width 2, height 1 in the first row and column of sheet 0
-   * const isSettable = hfInstance.isItPossibleToSetCellContents({start: address1, end: address2});
+   * const isSettable = hfInstance.isItPossibleToSetCellContents({ start: address1, end: address2 });
    * ```
    *
    * @category Cells
@@ -1832,7 +1832,7 @@ export class HyperFormula implements TypedEmitter {
    * // it is possible to move a block of width 1 and height 1
    * // from the corner: column 1 and row 0 of sheet 0
    * // into destination corner: column 3, row 0 of sheet 0
-   * const isMovable = hfInstance.isItPossibleToMoveCells({start: source, end: source}, destination);
+   * const isMovable = hfInstance.isItPossibleToMoveCells({ start: source, end: source }, destination);
    * ```
    * @category Cells
    */
@@ -1885,7 +1885,7 @@ export class HyperFormula implements TypedEmitter {
    * //   address: { sheet: 0, col: 0, row: 0 },
    * //   newValue: 0.93524248002062,
    * // }]
-   * const changes = hfInstance.moveCells({start: source, end: source}, destination);
+   * const changes = hfInstance.moveCells({ start: source, end: source }, destination);
    * ```
    *
    * @category Cells
@@ -2082,7 +2082,7 @@ export class HyperFormula implements TypedEmitter {
    * ]);
    *
    * // should return: [ [ 2 ] ]
-   * const clipboardContent = hfInstance.copy({start: { sheet: 0, col: 1, row: 0 }, end: {sheet: 0, col: 1, row: 0}});
+   * const clipboardContent = hfInstance.copy({ start: { sheet: 0, col: 1, row: 0 }, end: { sheet: 0, col: 1, row: 0 } });
    * ```
    *
    * @category Clipboard
@@ -2114,7 +2114,7 @@ export class HyperFormula implements TypedEmitter {
    * ]);
    *
    * // should return values that were cut: [ [ 1 ] ]
-   * const clipboardContent = hfInstance.cut({start: { sheet: 0, col: 0, row: 0 }, end: { sheet: 0, col: 0, row: 0}});
+   * const clipboardContent = hfInstance.cut({ start: { sheet: 0, col: 0, row: 0 }, end: { sheet: 0, col: 0, row: 0 } });
    * ```
    *
    * @category Clipboard
@@ -2278,7 +2278,7 @@ export class HyperFormula implements TypedEmitter {
    *
    *
    * // returns calculated cells content: [ [ 3, 2 ], [ 5, 6 ] ]
-   * const rangeValues = hfInstance.getRangeValues({start: { sheet: 0, col: 0, row: 0 }, end:{ sheet: 0, col: 1, row: 1 }});
+   * const rangeValues = hfInstance.getRangeValues({ start: { sheet: 0, col: 0, row: 0 }, end: { sheet: 0, col: 1, row: 1 } });
    * ```
    *
    * @category Ranges
@@ -2313,7 +2313,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * // returns cell formulas of a given range only:
    * // [ [ '=SUM(1,2)', undefined ], [ undefined, undefined ] ]
-   * const rangeFormulas = hfInstance.getRangeFormulas({start: { sheet: 0, col: 0, row: 0 }, end: { sheet: 0, col: 1, row: 1 }});
+   * const rangeFormulas = hfInstance.getRangeFormulas({ start: { sheet: 0, col: 0, row: 0 }, end: { sheet: 0, col: 1, row: 1 } });
    * ```
    *
    * @category Ranges
@@ -2348,7 +2348,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * // should return serialized cell content for the given range:
    * // [ [ '=SUM(1,2)', 2 ], [ 5, 6 ] ]
-   * const rangeSerialized = hfInstance.getRangeSerialized({start: { sheet: 0, col: 0, row: 0 }, end: { sheet: 0, col: 1, row: 1 }});
+   * const rangeSerialized = hfInstance.getRangeSerialized({ start: { sheet: 0, col: 0, row: 0 }, end: { sheet: 0, col: 1, row: 1 } });
    * ```
    *
    * @category Ranges
@@ -2717,7 +2717,7 @@ export class HyperFormula implements TypedEmitter {
    * @param {SimpleCellAddress} simpleCellAddress - object representation of an absolute address
    * @param {number} sheetId - if is not equal with address sheet index, string representation will contain sheet name
    *
-   * @throws [[ExpectedValueOfTypeError]] if simpleCellAddress is of wrong type
+   * @throws [[ExpectedValueOfTypeError]] if its arguments are of wrong type
    *
    * @example
    * ```js
@@ -2742,7 +2742,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * @param {SimpleCellAddress | SimpleCellRange} address - object representation of an absolute address or range of addresses
    *
-   * @throws [[ExpectedValueOfTypeError]] if address is of wrong type
+   * @throws [[ExpectedValueOfTypeError]] if address is not [[SimpleCellAddress]] or [[SimpleCellRange]]
    * @throws [[SheetsNotEqual]] if range provided has distinct sheet numbers for start and end
    *
    * @example
@@ -3503,7 +3503,7 @@ export class HyperFormula implements TypedEmitter {
   }
 
   /**
-   * Returns a normalized formula string for given named expression or `undefined` for a named expression that does not exist or does not hold a formula.
+   * Returns a normalized formula string for given named expression, or `undefined` for a named expression that does not exist or does not hold a formula.
    *
    * @param {string} expressionName - expression name, case insensitive.
    * @param {number?} scope - scope definition, `sheetId` for local scope or `undefined` for global scope
@@ -3520,7 +3520,7 @@ export class HyperFormula implements TypedEmitter {
    * // add a named expression in 'Sheet1' (sheetId=0)
    * hfInstance.addNamedExpression('prettyName', '=Sheet1!$A$1+100', 0);
    *
-   * // returns a normalized formula string corresponding to a passed name from 'Sheet1' (sheetId=0),
+   * // returns a normalized formula string corresponding to the passed name from 'Sheet1' (sheetId=0),
    * // '=Sheet1!A1+100' for this example
    * const myFormula = hfInstance.getNamedExpressionFormula('prettyName', 0);
    * ```
@@ -3542,7 +3542,7 @@ export class HyperFormula implements TypedEmitter {
   }
 
   /**
-   * Returns named expression a normalized formula string for given named expression or `undefined` for a named expression that does not exist or does not hold a formula.
+   * Returns a named expression, or `undefined` for a named expression that does not exist or does not hold a formula.
    *
    * @param {string} expressionName - expression name, case insensitive.
    * @param {number?} scope - scope definition, `sheetId` for local scope or `undefined` for global scope
@@ -3559,9 +3559,13 @@ export class HyperFormula implements TypedEmitter {
    * // add a named expression in 'Sheet1' (sheetId=0)
    * hfInstance.addNamedExpression('prettyName', '=Sheet1!$A$1+100', 0);
    *
-   * // returns a normalized formula string corresponding to a passed name from 'Sheet1' (sheetId=0),
-   * // '=Sheet1!$A$1+100' for this example
+   * // returns a named expression that corresponds to the passed name from 'Sheet1' (sheetId=0)
+   * // for this example, returns:
+   * // {name: 'prettyName', expression: '=Sheet1!$A$1+100', options: undefined, scope: 0}
    * const myFormula = hfInstance.getNamedExpression('prettyName', 0);
+   * 
+   * // for a named expression that doesn't exist, returns 'undefined':
+   * const myFormulaTwo = hfInstance.getNamedExpression('uglyName', 0);
    * ```
    *
    * @category Named Expressions

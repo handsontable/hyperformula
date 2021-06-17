@@ -514,7 +514,7 @@ export class NumericAggregationPlugin extends FunctionPlugin implements Function
   }
 
   private doMin(args: Ast[], state: InterpreterState): InternalScalarValue {
-    const value = this.reduce(args, state, Number.POSITIVE_INFINITY, 'MAX',
+    const value = this.reduce(args, state, Number.POSITIVE_INFINITY, 'MIN',
       (left: number, right: number) => Math.min(left, right),
       getRawValue, strictlyNumbers
     )
