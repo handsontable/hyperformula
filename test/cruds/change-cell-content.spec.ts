@@ -1,4 +1,5 @@
 import {ErrorType, ExportedCellChange, HyperFormula, InvalidAddressError, NoSheetWithIdError} from '../../src'
+import {AbsoluteCellRange} from '../../src/AbsoluteCellRange'
 import {simpleCellAddress} from '../../src/Cell'
 import {Config} from '../../src/Config'
 import {EmptyCellVertex, MatrixVertex, ValueCellVertex} from '../../src/DependencyGraph'
@@ -42,19 +43,19 @@ describe('Changing cell content - checking if its possible', () => {
     ])
 
     expect(engine.isItPossibleToSetCellContents(adr('A3'))).toBe(true)
-    expect(engine.isItPossibleToSetCellContents(adr('A3'), 1, 1)).toBe(true)
-    expect(engine.isItPossibleToSetCellContents(adr('A1'), 2, 2)).toBe(true)
-    expect(engine.isItPossibleToSetCellContents(adr('A2'), 2, 2)).toBe(true)
+    expect(engine.isItPossibleToSetCellContents(AbsoluteCellRange.spanFrom(adr('A3'), 1, 1))).toBe(true)
+    expect(engine.isItPossibleToSetCellContents(AbsoluteCellRange.spanFrom(adr('A1'), 2, 2))).toBe(true)
+    expect(engine.isItPossibleToSetCellContents(AbsoluteCellRange.spanFrom(adr('A2'), 2, 2))).toBe(true)
   })
 
   it('no if content exceeds sheet size limits', () => {
     const engine = HyperFormula.buildFromArray([])
     const cellInLastColumn = simpleCellAddress(0, Config.defaultConfig.maxColumns - 1, 0)
     const cellInLastRow = simpleCellAddress(0, 0, Config.defaultConfig.maxRows - 1)
-    expect(engine.isItPossibleToSetCellContents(cellInLastColumn, 1, 1)).toEqual(true)
-    expect(engine.isItPossibleToSetCellContents(cellInLastColumn, 2, 1)).toEqual(false)
-    expect(engine.isItPossibleToSetCellContents(cellInLastRow, 1, 1)).toEqual(true)
-    expect(engine.isItPossibleToSetCellContents(cellInLastRow, 1, 2)).toEqual(false)
+    expect(engine.isItPossibleToSetCellContents(AbsoluteCellRange.spanFrom(cellInLastColumn, 1, 1))).toEqual(true)
+    expect(engine.isItPossibleToSetCellContents(AbsoluteCellRange.spanFrom(cellInLastColumn, 2, 1))).toEqual(false)
+    expect(engine.isItPossibleToSetCellContents(AbsoluteCellRange.spanFrom(cellInLastRow, 1, 1))).toEqual(true)
+    expect(engine.isItPossibleToSetCellContents(AbsoluteCellRange.spanFrom(cellInLastRow, 1, 2))).toEqual(false)
   })
 
   it('yes otherwise', () => {
@@ -442,7 +443,7 @@ describe('changing cell content', () => {
     const changes = engine.setCellContents(adr('A1'), '2')
 
     expect(changes.length).toBe(1)
-    expect(changes).toContainEqual(new ExportedCellChange(simpleCellAddress(0, 0, 0), 2))
+    expect(changes).toContainEqual(new ExportedCellChange(adr('A1'), 2))
   })
 
   it('returns dependent formula value change', () => {
@@ -455,8 +456,8 @@ describe('changing cell content', () => {
     const changes = engine.setCellContents(adr('A1'), '2')
 
     expect(changes.length).toBe(2)
-    expect(changes[0]).toMatchObject(new ExportedCellChange(simpleCellAddress(0, 0, 0), 2))
-    expect(changes[1]).toMatchObject(new ExportedCellChange(simpleCellAddress(0, 1, 0), 2))
+    expect(changes[0]).toMatchObject(new ExportedCellChange(adr('A1'), 2))
+    expect(changes[1]).toMatchObject(new ExportedCellChange(adr('B1'), 2))
   })
 
   it('returns dependent matrix value changes', () => {

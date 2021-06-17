@@ -3,6 +3,7 @@
  * Copyright (c) 2021 Handsoncode. All rights reserved.
  */
 
+import {SimpleCellRange} from './AbsoluteCellRange'
 import {CellType, CellValueDetailedType, CellValueType, ErrorType, SimpleCellAddress} from './Cell'
 import {RawCellContent} from './CellContentParser'
 import {CellValue, DetailedCellError, NoErrorCellValue} from './CellValue'
@@ -114,6 +115,7 @@ export {
   Sheets,
   SheetDimensions,
   SimpleCellAddress,
+  SimpleCellRange,
   ColumnRowIndex,
   RawTranslationPackage,
   FunctionPluginDefinition,

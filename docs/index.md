@@ -71,7 +71,7 @@ to use tool for many types of software.
 * Written in TypeScript and extensively tested
 * Uses GPU acceleration for better performance
 * Function syntax compatible with Excel and Google Sheets
-* Triple-licensed: AGPL/Non-commercial/Commercial
+* Double-licensed: GPL/Commercial
 * Actively maintained and supported by the
 [Handsontable](https://handsontable.com/) team
 

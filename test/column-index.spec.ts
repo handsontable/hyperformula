@@ -125,7 +125,7 @@ describe('ColumnIndex change/remove', () => {
     index.add(1, adr('A2'))
     index.add(1, adr('A3'))
 
-    index.remove(1, simpleCellAddress(0, 0, 1))
+    index.remove(1, adr('A2'))
 
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const valueIndex = index.getColumnMap(0, 0).get(1)!
@@ -140,7 +140,7 @@ describe('ColumnIndex change/remove', () => {
     index.add(1, adr('A2'))
     index.add(1, adr('A3'))
 
-    index.remove(null, simpleCellAddress(0, 0, 1))
+    index.remove(null, adr('A2'))
 
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const valueIndex = index.getColumnMap(0, 0).get(1)!
@@ -154,7 +154,7 @@ describe('ColumnIndex change/remove', () => {
     const index = buildEmptyIndex(transformingService, new Config(), statistics)
     index.add(1, adr('A1'))
 
-    index.change(1, 2, simpleCellAddress(0, 0, 0))
+    index.change(1, 2, adr('A1'))
 
     expect(index.getColumnMap(0, 0).keys()).not.toContain(1)
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -169,7 +169,7 @@ describe('ColumnIndex change/remove', () => {
     const spyRemove = spyOn(index, 'remove')
     const spyAdd = spyOn(index, 'add')
 
-    index.change(1, 1, simpleCellAddress(0, 0, 0))
+    index.change(1, 1, adr('A1'))
 
     expect(spyRemove).not.toHaveBeenCalled()
     expect(spyAdd).not.toHaveBeenCalled()
@@ -181,7 +181,7 @@ describe('ColumnIndex change/remove', () => {
       [1, 2],
       [3, 4],
     ])
-    index.add(range, simpleCellAddress(0, 0, 0))
+    index.add(range, adr('A1'))
     deepStrictEqual(index.getColumnMap(0, 0), new Map([
       [1, {index: [0], version: 0}],
       [3, {index: [1], version: 0}],
@@ -194,7 +194,7 @@ describe('ColumnIndex change/remove', () => {
     index.change(range, SimpleRangeValue.onlyNumbers([
       [5, 6],
       [7, 8],
-    ]), simpleCellAddress(0, 0, 0))
+    ]), adr('A1'))
 
     deepStrictEqual(index.getColumnMap(0, 0), new Map([
       [5, {index: [0], version: 0}],
@@ -211,7 +211,7 @@ describe('ColumnIndex change/remove', () => {
     index.add(1, adr('A1'))
 
     const error = new CellError(ErrorType.DIV_BY_ZERO)
-    index.change(1, error, simpleCellAddress(0, 0, 0))
+    index.change(1, error, adr('A1'))
 
     expect(index.getColumnMap(0, 0).keys()).not.toContain(1)
     expect(index.getColumnMap(0, 0).keys()).not.toContain(error)

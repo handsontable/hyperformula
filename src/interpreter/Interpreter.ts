@@ -222,7 +222,7 @@ export class Interpreter {
         if (!this.rangeSpansOneSheet(ast)) {
           return new CellError(ErrorType.REF, ErrorMessage.RangeManySheets)
         }
-        const range = AbsoluteRowRange.fromRowRange(ast, state.formulaAddress)
+        const range = AbsoluteRowRange.fromRowRangeAst(ast, state.formulaAddress)
         return SimpleRangeValue.onlyRange(range, this.dependencyGraph)
       }
       case AstNodeType.PARENTHESIS: {

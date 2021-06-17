@@ -1,4 +1,5 @@
 import {HyperFormula} from '../src'
+import {AbsoluteCellRange} from '../src/AbsoluteCellRange'
 import {adr} from './testUtils'
 
 describe('vertex counting', () => {
@@ -320,7 +321,7 @@ describe('cruds', () => {
     ['=SUM(A1:A3)'],
     ['=SUM(A1:A4)'],
     ])
-    engine.moveCells(adr('A1'), 1, 3, adr('B1'))
+    engine.moveCells(AbsoluteCellRange.spanFrom(adr('A1'), 1, 3), adr('B1'))
     engine.setCellContents(adr('B1'), null)
     engine.setCellContents(adr('B2'), null)
     engine.setCellContents(adr('B3'), null)

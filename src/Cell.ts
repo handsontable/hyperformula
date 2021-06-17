@@ -191,6 +191,14 @@ export const addressesEqual = (left: SimpleCellAddress, right: SimpleCellAddress
 }
 export const addressKey = (address: SimpleCellAddress) => `${address.sheet},${address.row},${address.col}`
 
+export function isSimpleCellAddress(obj: any): obj is SimpleCellAddress {
+  if( obj && (typeof obj === 'object' || typeof obj === 'function')) {
+    return 'col' in obj && typeof obj.col === 'number' && 'row' in obj && typeof obj.row === 'number' && 'sheet' in obj && typeof obj.sheet === 'number'
+  } else {
+    return false
+  }
+}
+
 export const absoluteSheetReference = (address: AddressWithSheet, baseAddress: SimpleCellAddress): number => {
   return address.sheet === null ? baseAddress.sheet : address.sheet
 }

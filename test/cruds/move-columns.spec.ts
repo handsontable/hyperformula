@@ -195,7 +195,7 @@ describe('Move columns', () => {
     const changes = engine.moveColumns(0, 1, 1, 3)
 
     expect(changes.length).toEqual(1)
-    expect(changes).toContainEqual(new ExportedCellChange(simpleCellAddress(0, 2, 1), 0))
+    expect(changes).toContainEqual(new ExportedCellChange(adr('C2'), 0))
   })
 
   it('should return #CYCLE when moving formula onto referred range', () => {

@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Breaking change**: Changed API of many sheet-related methods to take sheetId instead of sheetName as an argument. (#645)
 - **Breaking change**: Removed support for matrix formulas (`{=FORMULA}`) notation. Engine now supports formulas returning array of values (instead of only scalars). (#652)
 - **Breaking change**: Removed numeric matrix detection along with matrixDetection and matrixDetectionThreshold config options. (#669)
+- **Breaking change**: Changed API of the following methods to take `SimpleCellRange` type argument: `copy`,  `cut`, `getCellDependents`, `getCellPrecedents`, `getFillRangeData`, `getRangeFormulas`,  `getRangeSerialized`, `getRangeValues`, `isItPossibleToMoveCells`, `isItPossibleToSetCellContents`, `moveCells`. (#687)
 - Changed SWITCH function so it takes array as its first argument.
 - Changed TRANSPOSE function, so it works with data of any type. (#670)
 
@@ -29,12 +30,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added `getAllNamedExpressionsSerialized` method. (#680)
 - Added parsing of arrays in formulas (together with respective config options for separators). (#671)
 - Added utility function for filling ranges with source from other range. (#678)
+- Added pretty print for detailedCellError. (#712)
 
 ### Fixed
 - Fixed an issue with arrays and cruds. (#651)
 - Fixed handling of arrays for ROWS/COLUMNS functions. (#677)
 - Fixed an issue with nested namedexpressions. (#679)
 - Fixed an issue with matrixDetection + number parsing. (#686)
+- Fixed an issue with NOW and TODAY functions. (#709)
+- Fixed an issue with MIN/MAX function caches. (#711)
 
 ## [0.6.2] - 2021-05-26
 

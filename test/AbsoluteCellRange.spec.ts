@@ -19,7 +19,7 @@ describe('AbsoluteCellRange', () => {
 
   describe('construct', () => {
     it('start should be copied when using static method', () => {
-      const start = simpleCellAddress(0, 0, 0)
+      const start = adr('A1')
       const range = AbsoluteCellRange.spanFrom(start, 1, 1)
 
       expect(start).not.toBe(range.start)
@@ -27,8 +27,8 @@ describe('AbsoluteCellRange', () => {
     })
 
     it('ends should be copied whe using constructor', () => {
-      const start = simpleCellAddress(0, 0, 0)
-      const end = simpleCellAddress(0, 1, 1)
+      const start = adr('A1')
+      const end = adr('B2')
 
       const range = new AbsoluteCellRange(start, end)
 
