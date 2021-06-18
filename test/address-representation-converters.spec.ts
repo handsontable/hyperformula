@@ -53,19 +53,19 @@ describe('simpleCellRangeFromString', () => {
   })
 
   it('should return address with overridden sheet', () => {
-    expect(simpleCellRangeFromString(sheetMappingFunction, 'A1:A2', 1)).toEqual(simpleCellRange(adr('A1', 1),adr('A2', 1)))
+    expect(simpleCellRangeFromString(sheetMappingFunction, 'A1:A2', 1)).toEqual(simpleCellRange(adr('A1', 1), adr('A2', 1)))
   })
 
   it('should return address with sheet number from sheet mapping', () => {
-    expect(simpleCellRangeFromString(sheetMappingFunction, 'Sheet2!A1:A2', 1)).toEqual(simpleCellRange(adr('A1', 1),adr('A2', 1)))
+    expect(simpleCellRangeFromString(sheetMappingFunction, 'Sheet2!A1:A2', 1)).toEqual(simpleCellRange(adr('A1', 1), adr('A2', 1)))
   })
 
   it('should return address with sheet number from sheet mapping for both start and end', () => {
-    expect(simpleCellRangeFromString(sheetMappingFunction, 'Sheet2!A1:Sheet2!A2', 1)).toEqual(simpleCellRange(adr('A1', 1),adr('A2', 1)))
+    expect(simpleCellRangeFromString(sheetMappingFunction, 'Sheet2!A1:Sheet2!A2', 1)).toEqual(simpleCellRange(adr('A1', 1), adr('A2', 1)))
   })
 
   it('should return address with sheet number from sheet mapping regardless of override parameter', () => {
-    expect(simpleCellRangeFromString(sheetMappingFunction, 'Sheet3!A1:Sheet3!A2', 1)).toEqual(simpleCellRange(adr('A1', 2),adr('A2', 2)))
+    expect(simpleCellRangeFromString(sheetMappingFunction, 'Sheet3!A1:Sheet3!A2', 1)).toEqual(simpleCellRange(adr('A1', 2), adr('A2', 2)))
   })
 
   it('should not accept distinct sheets', () => {
@@ -108,11 +108,11 @@ describe('simpleCellRangeToString', () => {
   }
 
   it('should return string representation', () => {
-    expect(simpleCellRangeToString(sheetIndexMappingFunction, simpleCellRange(adr('A1'),adr('A2')), 0)).toEqual('A1:A2')
+    expect(simpleCellRangeToString(sheetIndexMappingFunction, simpleCellRange(adr('A1'), adr('A2')), 0)).toEqual('A1:A2')
   })
 
   it('should return string representation with sheet name', () => {
-    expect(simpleCellRangeToString(sheetIndexMappingFunction, simpleCellRange(adr('A1'),adr('A2')), 1)).toEqual('Sheet1!A1:A2')
+    expect(simpleCellRangeToString(sheetIndexMappingFunction, simpleCellRange(adr('A1'), adr('A2')), 1)).toEqual('Sheet1!A1:A2')
   })
 
   it('should return undefined', () => {
