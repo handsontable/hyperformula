@@ -57,6 +57,8 @@ import {
   RelativeDependency,
   simpleCellAddressFromString,
   simpleCellAddressToString,
+  simpleCellRangeFromString,
+  simpleCellRangeToString,
   Unparser,
 } from './parser'
 import {Serialization, SerializedNamedExpression} from './Serialization'
@@ -2715,9 +2717,35 @@ export class HyperFormula implements TypedEmitter {
   }
 
   /**
+   * Computes simple (absolute) address of a cell range based on its string representation.
+   * If sheet name is present in string representation but not present in the engine, returns `undefined`.
+   * If sheet name is not present in string representation, returns the sheet number.
+   * Returns an absolute representation of a range.
+   *
+   * @param {string} cellRange - string representation of cell range in A1 notation
+   * @param {number} sheetId - override sheet index regardless of sheet mapping
+   *
+   * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildEmpty();
+   *
+   * // should return { start: { sheet: 0, col: 0, row: 0 }, end: { sheet: 0, col: 1, row: 0 } }
+   * const simpleCellAddress = hfInstance.simpleCellRangeFromString('A1:A2', 0);
+   * ```
+   *
+   * @category Helpers
+   */
+  public simpleCellRangeFromString(cellRange: string, sheetId: number): SimpleCellRange | undefined {
+    validateArgToType(cellRange, 'string', 'cellRange')
+    validateArgToType(sheetId, 'number', 'sheetId')
+    return simpleCellRangeFromString(this.sheetMapping.get, cellRange, sheetId)
+  }
+
+  /**
    * Returns string representation of an absolute address in A1 notation or `undefined` if the sheet index is not present in the engine.
    *
-   * @param {SimpleCellAddress} simpleCellAddress - object representation of an absolute address
+   * @param {SimpleCellAddress} cellAddress - object representation of an absolute address
    * @param {number} sheetId - if is not equal with address sheet index, string representation will contain sheet name
    *
    * @throws [[ExpectedValueOfTypeError]] if its arguments are of wrong type
@@ -2732,12 +2760,38 @@ export class HyperFormula implements TypedEmitter {
    *
    * @category Helpers
    */
-  public simpleCellAddressToString(simpleCellAddress: SimpleCellAddress, sheetId: number): string | undefined {
-    if(!isSimpleCellAddress(simpleCellAddress)) {
-      throw new ExpectedValueOfTypeError('SimpleCellAddress', 'simpleCellAddress')
+  public simpleCellAddressToString(cellAddress: SimpleCellAddress, sheetId: number): string | undefined {
+    if(!isSimpleCellAddress(cellAddress)) {
+      throw new ExpectedValueOfTypeError('SimpleCellAddress', 'cellAddress')
     }
     validateArgToType(sheetId, 'number', 'sheetId')
-    return simpleCellAddressToString(this.sheetMapping.fetchDisplayName, simpleCellAddress, sheetId)
+    return simpleCellAddressToString(this.sheetMapping.fetchDisplayName, cellAddress, sheetId)
+  }
+
+  /**
+   * Returns string representation of an absolute range in A1 notation or `undefined` if the sheet index is not present in the engine.
+   *
+   * @param {SimpleCellAddress} cellRange - object representation of an absolute range
+   * @param {number} sheetId - if is not equal with address sheet index, string representation will contain sheet name
+   *
+   * @throws [[ExpectedValueOfTypeError]] if its arguments are of wrong type
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildEmpty();
+   *
+   * // should return 'B2:C2'
+   * const A1Notation = hfInstance.simpleCellRangeToString({ start: { sheet: 0, col: 1, row: 1 }, end: { sheet: 0, col: 2, row: 1 } }, 0);
+   * ```
+   *
+   * @category Helpers
+   */
+  public simpleCellRangeToString(cellRange: SimpleCellRange, sheetId: number): string | undefined {
+    if(!isSimpleCellRange(cellRange)) {
+      throw new ExpectedValueOfTypeError('SimpleCellRange', 'cellRange')
+    }
+    validateArgToType(sheetId, 'number', 'sheetId')
+    return simpleCellRangeToString(this.sheetMapping.fetchDisplayName, cellRange, sheetId)
   }
 
   /**

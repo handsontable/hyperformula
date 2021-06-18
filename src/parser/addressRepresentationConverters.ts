@@ -3,6 +3,7 @@
  * Copyright (c) 2021 Handsoncode. All rights reserved.
  */
 
+import {simpleCellRange, SimpleCellRange} from '../AbsoluteCellRange'
 import {simpleCellAddress, SimpleCellAddress} from '../Cell'
 import {Maybe} from '../Maybe'
 import {CellAddress} from './CellAddress'
@@ -122,6 +123,26 @@ export const simpleCellAddressFromString = (sheetMapping: SheetMappingFn, string
   return simpleCellAddress(sheet, col, row)
 }
 
+export const simpleCellRangeFromString = (sheetMapping: SheetMappingFn, stringAddress: string, sheetContext: number): Maybe<SimpleCellRange> => {
+  const split = stringAddress.split(':')
+  if(split.length !== 2) {
+    return undefined
+  }
+  const [startString, endString] = split
+  const start = simpleCellAddressFromString(sheetMapping, startString, sheetContext)
+  if(start === undefined) {
+    return undefined
+  }
+  const end = simpleCellAddressFromString(sheetMapping, endString, start.sheet)
+  if(end === undefined) {
+    return undefined
+  }
+  if(start.sheet !== end.sheet) {
+    return undefined
+  }
+  return simpleCellRange(start, end)
+}
+
 /**
  * Returns string representation of absolute address
  * If sheet index is not present in sheet mapping, returns undefined
@@ -142,6 +163,16 @@ export const simpleCellAddressToString = (sheetIndexMapping: SheetIndexMappingFn
     return `${sheetName}!${column}${address.row + 1}`
   } else {
     return `${column}${address.row + 1}`
+  }
+}
+
+export const simpleCellRangeToString = (sheetIndexMapping: SheetIndexMappingFn, address: SimpleCellRange, sheetIndex: number): Maybe<string> => {
+  const startString = simpleCellAddressToString(sheetIndexMapping, address.start, sheetIndex)
+  const endString = simpleCellAddressToString(sheetIndexMapping, address.end, address.start.sheet)
+  if(startString === undefined || endString === undefined) {
+    return undefined
+  } else {
+    return `${startString}:${endString}`
   }
 }
 
