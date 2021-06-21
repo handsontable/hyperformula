@@ -48,7 +48,7 @@ describe('simpleCellRangeFromString', () => {
     expect(simpleCellRangeFromString(sheetMappingFunction, 'A1:B1:C1', 0)).toEqual(undefined)
   })
 
-  it('should return undefined', () => {
+  it('should return undefined when the Sheet4 does not exist or does not match sheetId = 0?', () => {
     expect(simpleCellRangeFromString(sheetMappingFunction, 'Sheet4!A1:A2', 0)).toEqual(undefined)
   })
 
