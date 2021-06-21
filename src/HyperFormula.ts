@@ -2703,6 +2703,7 @@ export class HyperFormula implements TypedEmitter {
    * @example
    * ```js
    * const hfInstance = HyperFormula.buildEmpty();
+   * hfInstance.addSheet('Sheet0'); //sheetId = 0
    *
    * // should return { sheet: 0, col: 0, row: 0 }
    * const simpleCellAddress = hfInstance.simpleCellAddressFromString('A1', 0);
@@ -2729,6 +2730,7 @@ export class HyperFormula implements TypedEmitter {
    * @example
    * ```js
    * const hfInstance = HyperFormula.buildEmpty();
+   * hfInstance.addSheet('Sheet0'); //sheetId = 0
    *
    * // should return { start: { sheet: 0, col: 0, row: 0 }, end: { sheet: 0, col: 1, row: 0 } }
    * const simpleCellAddress = hfInstance.simpleCellRangeFromString('A1:A2', 0);
@@ -2753,6 +2755,7 @@ export class HyperFormula implements TypedEmitter {
    * @example
    * ```js
    * const hfInstance = HyperFormula.buildEmpty();
+   * hfInstance.addSheet('Sheet0'); //sheetId = 0
    *
    * // should return 'B2'
    * const A1Notation = hfInstance.simpleCellAddressToString({ sheet: 0, col: 1, row: 1 }, 0);
@@ -2779,9 +2782,14 @@ export class HyperFormula implements TypedEmitter {
    * @example
    * ```js
    * const hfInstance = HyperFormula.buildEmpty();
+   * hfInstance.addSheet('Sheet0'); //sheetId = 0
+   * hfInstance.addSheet('Sheet1'); //sheetId = 1
    *
    * // should return 'B2:C2'
    * const A1Notation = hfInstance.simpleCellRangeToString({ start: { sheet: 0, col: 1, row: 1 }, end: { sheet: 0, col: 2, row: 1 } }, 0);
+   *
+   *  // should return 'Sheet1!B2:C2'
+   * const another = hfInstance.simpleCellRangeToString({ start: { sheet: 1, col: 1, row: 1 }, end: { sheet: 1, col: 2, row: 1 } }, 0);
    * ```
    *
    * @category Helpers

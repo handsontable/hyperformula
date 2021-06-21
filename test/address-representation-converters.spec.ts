@@ -115,7 +115,7 @@ describe('simpleCellRangeToString', () => {
     expect(simpleCellRangeToString(sheetIndexMappingFunction, simpleCellRange(adr('A1'), adr('A2')), 1)).toEqual('Sheet1!A1:A2')
   })
 
-  it('should return undefined', () => {
+  it('should return undefined when refering nonexistent sheet', () => {
     expect(simpleCellRangeToString(sheetIndexMappingFunction, simpleCellRange(adr('A1', 42), adr('A2', 42)), 42)).toBeUndefined()
     expect(simpleCellRangeToString(sheetIndexMappingFunction, simpleCellRange(adr('A1', 42), adr('A2', 42)), 1)).toBeUndefined()
   })
