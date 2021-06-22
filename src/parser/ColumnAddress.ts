@@ -21,17 +21,17 @@ export enum ReferenceType {
 
 export class ColumnAddress implements AddressWithColumn {
   public constructor(
-    public readonly sheet: number | null,
+    public readonly type: ReferenceType,
     public readonly col: number,
-    public readonly type: ReferenceType
+    public readonly sheet?: number
   ) {}
 
-  public static absolute(sheet: number | null, column: number) {
-    return new ColumnAddress(sheet, column, ReferenceType.ABSOLUTE)
+  public static absolute(column: number, sheet?: number) {
+    return new ColumnAddress(ReferenceType.ABSOLUTE, column, sheet)
   }
 
-  public static relative(sheet: number | null, column: number) {
-    return new ColumnAddress(sheet, column, ReferenceType.RELATIVE)
+  public static relative(column: number, sheet?: number) {
+    return new ColumnAddress(ReferenceType.RELATIVE, column, sheet)
   }
 
   public isColumnAbsolute(): boolean {
@@ -43,16 +43,16 @@ export class ColumnAddress implements AddressWithColumn {
   }
 
   public isAbsolute(): boolean {
-    return (this.type === ReferenceType.ABSOLUTE && this.sheet !== null)
+    return (this.type === ReferenceType.ABSOLUTE && this.sheet !== undefined)
   }
 
   public moved(toSheet: number, toRight: number, _toBottom: number): ColumnAddress {
-    const newSheet = this.sheet === null ? null : toSheet
-    return new ColumnAddress(newSheet, this.col + toRight, this.type)
+    const newSheet = this.sheet === undefined ? undefined : toSheet
+    return new ColumnAddress(this.type, this.col + toRight, newSheet)
   }
 
   public shiftedByColumns(numberOfColumns: number): ColumnAddress {
-    return new ColumnAddress(this.sheet, this.col + numberOfColumns, this.type)
+    return new ColumnAddress(this.type, this.col + numberOfColumns, this.sheet)
   }
 
   public toSimpleColumnAddress(baseAddress: SimpleCellAddress): SimpleColumnAddress {
@@ -66,16 +66,16 @@ export class ColumnAddress implements AddressWithColumn {
 
   public shiftRelativeDimensions(toRight: number, _toBottom: number): ColumnAddress {
     const col = this.isColumnRelative() ? this.col + toRight : this.col
-    return new ColumnAddress(this.sheet, col, this.type)
+    return new ColumnAddress(this.type, col, this.sheet)
   }
 
   public shiftAbsoluteDimensions(toRight: number, _toBottom: number): ColumnAddress {
     const col = this.isColumnAbsolute() ? this.col + toRight : this.col
-    return new ColumnAddress(this.sheet, col, this.type)
+    return new ColumnAddress(this.type, col, this.sheet)
   }
 
   public withAbsoluteSheet(sheet: number): ColumnAddress {
-    return new ColumnAddress(sheet, this.col, this.type)
+    return new ColumnAddress(this.type, this.col, sheet)
   }
 
   public isInvalid(baseAddress: SimpleCellAddress): boolean {
@@ -83,7 +83,7 @@ export class ColumnAddress implements AddressWithColumn {
   }
 
   public hash(withSheet: boolean): string {
-    const sheetPart = withSheet && this.sheet !== null ? `#${this.sheet}` : ''
+    const sheetPart = withSheet && this.sheet !== undefined ? `#${this.sheet}` : ''
     switch (this.type) {
       case ReferenceType.RELATIVE: {
         return `${sheetPart}#COLR${this.col}`

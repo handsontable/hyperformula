@@ -15,18 +15,18 @@ import {AddressWithRow} from './Address'
 import {ReferenceType} from './ColumnAddress'
 
 export class RowAddress implements AddressWithRow {
-  private constructor(
-    public readonly sheet: number | null,
+  constructor(
+    public readonly type: ReferenceType,
     public readonly row: number,
-    public readonly type: ReferenceType
+    public readonly sheet?: number,
   ) {}
 
-  public static absolute(sheet: number | null, row: number) {
-    return new RowAddress(sheet, row, ReferenceType.ABSOLUTE)
+  public static absolute(row: number, sheet?: number) {
+    return new RowAddress(ReferenceType.ABSOLUTE, row, sheet)
   }
 
-  public static relative(sheet: number | null, row: number) {
-    return new RowAddress(sheet, row, ReferenceType.RELATIVE)
+  public static relative(row: number, sheet?: number) {
+    return new RowAddress(ReferenceType.RELATIVE, row, sheet)
   }
 
   public isRowAbsolute(): boolean {
@@ -38,16 +38,16 @@ export class RowAddress implements AddressWithRow {
   }
 
   public isAbsolute(): boolean {
-    return (this.type === ReferenceType.ABSOLUTE && this.sheet !== null)
+    return (this.type === ReferenceType.ABSOLUTE && this.sheet !== undefined)
   }
 
   public moved(toSheet: number, toRight: number, toBottom: number): RowAddress {
-    const newSheet = this.sheet === null ? null : toSheet
-    return new RowAddress(newSheet, this.row + toBottom, this.type)
+    const newSheet = this.sheet === undefined ? undefined : toSheet
+    return new RowAddress(this.type, this.row + toBottom, newSheet)
   }
 
   public shiftedByRows(numberOfColumns: number): RowAddress {
-    return new RowAddress(this.sheet, this.row + numberOfColumns, this.type)
+    return new RowAddress(this.type, this.row + numberOfColumns, this.sheet)
   }
 
   public toSimpleRowAddress(baseAddress: SimpleCellAddress): SimpleRowAddress {
@@ -61,16 +61,16 @@ export class RowAddress implements AddressWithRow {
 
   public shiftRelativeDimensions(toRight: number, toBottom: number): RowAddress {
     const row = this.isRowRelative() ? this.row + toBottom : this.row
-    return new RowAddress(this.sheet, row, this.type)
+    return new RowAddress(this.type, row, this.sheet)
   }
 
   public shiftAbsoluteDimensions(toRight: number, toBottom: number): RowAddress {
     const row = this.isRowAbsolute() ? this.row + toBottom : this.row
-    return new RowAddress(this.sheet, row, this.type)
+    return new RowAddress(this.type, row, this.sheet)
   }
 
   public withAbsoluteSheet(sheet: number): RowAddress {
-    return new RowAddress(sheet, this.row, this.type)
+    return new RowAddress(this.type, this.row, sheet)
   }
 
   public isInvalid(baseAddress: SimpleCellAddress): boolean {
@@ -78,7 +78,7 @@ export class RowAddress implements AddressWithRow {
   }
 
   public hash(withSheet: boolean): string {
-    const sheetPart = withSheet && this.sheet !== null ? `#${this.sheet}` : ''
+    const sheetPart = withSheet && this.sheet !== undefined ? `#${this.sheet}` : ''
     switch (this.type) {
       case ReferenceType.RELATIVE: {
         return `${sheetPart}#ROWR${this.row}`

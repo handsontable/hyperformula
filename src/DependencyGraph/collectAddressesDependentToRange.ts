@@ -16,7 +16,7 @@ import {Vertex} from './Vertex'
 export const collectAddressesDependentToRange = (funcitonRegistry: FunctionRegistry, vertex: Vertex, range: AbsoluteCellRange, lazilyTransformingAstService: LazilyTransformingAstService, dependencyGraph: DependencyGraph): SimpleCellAddress[] => {
   if (vertex instanceof RangeVertex) {
     const intersection = vertex.range.intersectionWith(range)
-    if (intersection !== null) {
+    if (intersection !== undefined) {
       return Array.from(intersection.addresses(dependencyGraph))
     } else {
       return []

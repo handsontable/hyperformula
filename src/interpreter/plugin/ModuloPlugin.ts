@@ -6,7 +6,7 @@
 import {CellError, ErrorType} from '../../Cell'
 import {ProcedureAst} from '../../parser'
 import {InterpreterState} from '../InterpreterState'
-import {InternalScalarValue, InterpreterValue} from '../InterpreterValue'
+import {InterpreterValue} from '../InterpreterValue'
 import {ArgumentTypes, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
 
 export class ModuloPlugin extends FunctionPlugin implements FunctionPluginTypecheck<ModuloPlugin>{

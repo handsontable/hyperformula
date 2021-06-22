@@ -1,6 +1,5 @@
 import {ExportedCellChange, HyperFormula, SheetSizeLimitExceededError} from '../../src'
 import {AbsoluteCellRange} from '../../src/AbsoluteCellRange'
-import {simpleCellAddress} from '../../src/Cell'
 import {Config} from '../../src/Config'
 import {FormulaCellVertex, MatrixVertex} from '../../src/DependencyGraph'
 import {ColumnIndex} from '../../src/Lookup/ColumnIndex'
@@ -193,7 +192,7 @@ describe('Adding row - reevaluation', () => {
     const changes = engine.addRows(0, [1, 1])
 
     expect(changes.length).toBe(1)
-    expect(changes).toContainEqual(new ExportedCellChange(simpleCellAddress(0, 1, 2), 1))
+    expect(changes).toContainEqual(new ExportedCellChange(adr('B3'), 1))
   })
 })
 
@@ -269,9 +268,9 @@ describe('Adding row - FormulaCellVertex#address update', () => {
 
     const formulaVertex = engine.addressMapping.fetchCell(adr('A1', 1)) as FormulaCellVertex
 
-    expect(formulaVertex.getAddress(engine.lazilyTransformingAstService)).toEqual(simpleCellAddress(1, 0, 0))
+    expect(formulaVertex.getAddress(engine.lazilyTransformingAstService)).toEqual(adr('A1', 1))
     formulaVertex.getFormula(engine.lazilyTransformingAstService) // force transformations to be applied
-    expect(formulaVertex.getAddress(engine.lazilyTransformingAstService)).toEqual(simpleCellAddress(1, 0, 0))
+    expect(formulaVertex.getAddress(engine.lazilyTransformingAstService)).toEqual(adr('A1', 1))
   })
 })
 

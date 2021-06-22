@@ -178,10 +178,9 @@ export class RangeMapping {
   /**
    * Finds smaller range does have own vertex.
    *
-   * @param rangeMapping - range mapping dependency
-   * @param ranges - ranges to find smaller range in
+   * @param range
    */
-  public findSmallerRange(range: AbsoluteCellRange): { smallerRangeVertex: RangeVertex | null, restRange: AbsoluteCellRange } {
+  public findSmallerRange(range: AbsoluteCellRange): { smallerRangeVertex?: RangeVertex, restRange: AbsoluteCellRange } {
     if (range.height() > 1 && Number.isFinite(range.height())) {
       const valuesRangeEndRowLess = simpleCellAddress(range.end.sheet, range.end.col, range.end.row - 1)
       const rowLessVertex = this.getRange(range.start, valuesRangeEndRowLess)
@@ -194,7 +193,6 @@ export class RangeMapping {
       }
     }
     return {
-      smallerRangeVertex: null,
       restRange: range,
     }
   }

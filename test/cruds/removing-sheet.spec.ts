@@ -1,6 +1,6 @@
 import {ExportedCellChange, HyperFormula, NoSheetWithIdError} from '../../src'
 import {AbsoluteCellRange} from '../../src/AbsoluteCellRange'
-import {ErrorType, simpleCellAddress} from '../../src/Cell'
+import {ErrorType} from '../../src/Cell'
 import {MatrixVertex} from '../../src/DependencyGraph'
 import {ColumnIndex} from '../../src/Lookup/ColumnIndex'
 import {CellAddress} from '../../src/parser'
@@ -165,7 +165,7 @@ describe('remove sheet - adjust formula dependencies', () => {
 
     const reference = extractReference(engine, adr('B1'))
 
-    expect(reference).toEqual(CellAddress.relative(null, -1, 0))
+    expect(reference).toEqual(CellAddress.relative(0, -1))
     expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([['1', '=A1']]))
   })
 
@@ -203,7 +203,7 @@ describe('remove sheet - adjust formula dependencies', () => {
     const changes = engine.removeSheet(1)
 
     expect(changes.length).toBe(1)
-    expect(changes).toContainEqual(new ExportedCellChange(simpleCellAddress(0, 0, 0), detailedErrorWithOrigin(ErrorType.REF, 'Sheet1!A1')))
+    expect(changes).toContainEqual(new ExportedCellChange(adr('A1'), detailedErrorWithOrigin(ErrorType.REF, 'Sheet1!A1')))
   })
 })
 

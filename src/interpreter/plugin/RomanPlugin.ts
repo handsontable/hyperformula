@@ -7,7 +7,7 @@ import {CellError, ErrorType} from '../../Cell'
 import {ErrorMessage} from '../../error-message'
 import {ProcedureAst} from '../../parser'
 import {InterpreterState} from '../InterpreterState'
-import {getRawValue, InternalScalarValue, InterpreterValue, RawScalarValue} from '../InterpreterValue'
+import {getRawValue, InterpreterValue, RawScalarValue} from '../InterpreterValue'
 import {ArgumentTypes, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
 
 export class RomanPlugin extends FunctionPlugin implements FunctionPluginTypecheck<RomanPlugin>{
