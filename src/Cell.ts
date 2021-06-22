@@ -52,7 +52,7 @@ export enum CellType {
   EMPTY = 'EMPTY',
 }
 
-export const getCellType = (vertex: CellVertex | null): CellType => {
+export const getCellType = (vertex?: CellVertex): CellType => {
   if (vertex instanceof FormulaCellVertex || vertex instanceof ParsingErrorVertex) {
     return CellType.FORMULA
   }
@@ -187,8 +187,16 @@ export const movedSimpleCellAddress = (address: SimpleCellAddress, toSheet: numb
   return simpleCellAddress(toSheet, address.col + toRight, address.row + toBottom)
 }
 
+export function isSimpleCellAddress(obj: any): obj is SimpleCellAddress {
+  if( obj && (typeof obj === 'object' || typeof obj === 'function')) {
+    return 'col' in obj && typeof obj.col === 'number' && 'row' in obj && typeof obj.row === 'number' && 'sheet' in obj && typeof obj.sheet === 'number'
+  } else {
+    return false
+  }
+}
+
 export const absoluteSheetReference = (address: AddressWithSheet, baseAddress: SimpleCellAddress): number => {
-  return address.sheet === null ? baseAddress.sheet : address.sheet
+  return address.sheet ?? baseAddress.sheet
 }
 
 export interface SheetCellAddress {

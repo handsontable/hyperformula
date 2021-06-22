@@ -3,9 +3,7 @@
  * Copyright (c) 2021 Handsoncode. All rights reserved.
  */
 
-import {Maybe} from '../Maybe'
-
-export type DependencyQuery<T> = (vertex: T) => Maybe<T[]>
+export type DependencyQuery<T> = (vertex: T) => T[]
 
 export interface TopSortResult<T> {
   sorted: T[], cycled: T[], 
@@ -180,7 +178,7 @@ export class Graph<T> {
    * return a topological sort order, but separates vertices that exist in some cycle
    */
   public topSortWithScc(): TopSortResult<T> {
-    return this.getTopSortedWithSccSubgraphFrom(Array.from(this.nodes), (_node: T) => true, (_node: T) => {})
+    return this.getTopSortedWithSccSubgraphFrom(Array.from(this.nodes), () => true, () => {})
   }
 
   /**
@@ -320,9 +318,6 @@ export class Graph<T> {
 
   private removeDependencies(node: T): T[] {
     const dependencies = this.dependencyQuery(node)
-    if (!dependencies) {
-      return []
-    }
     for (const dependency of dependencies) {
       this.softRemoveEdge(dependency, node)
     }

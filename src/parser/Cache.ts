@@ -36,7 +36,7 @@ export class Cache {
 
   public maybeSetAndThenGet(hash: string, ast: Ast): Ast {
     const entryFromCache = this.cache.get(hash)
-    if (entryFromCache) {
+    if (entryFromCache !== undefined) {
       return entryFromCache.ast
     } else {
       this.set(hash, ast)

@@ -213,7 +213,7 @@ describe('Date helpers, other zero date', () => {
 })
 
 describe('Custom date parsing', () => {
-  function customParseDate(dateString: string, dateFormat: Maybe<string>): Maybe<SimpleDate> {
+  function customParseDate(dateString: string, dateFormat?: string): Maybe<SimpleDate> {
     const momentDate = moment(dateString, dateFormat, true)
     if(momentDate.isValid()){
       return {year: momentDate.year(), month: momentDate.month()+1, day: momentDate.date()}

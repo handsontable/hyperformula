@@ -1,6 +1,6 @@
 import {Graph, ValueCellVertex, Vertex} from '../src/DependencyGraph'
 
-const dummyGetDependenciesQuery = () => undefined
+const dummyGetDependenciesQuery: () => any[] = () => []
 
 describe('Graph with Vertex', () => {
   it('#addNode works correctly with Vertex instances', () => {

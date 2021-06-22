@@ -4,9 +4,11 @@
  */
 
 import {createToken, Lexer, TokenType} from 'chevrotain'
-import {create} from 'domain'
 import {ErrorType} from '../Cell'
 import {ParserConfig} from './ParserConfig'
+
+export const RANGE_OPERATOR = ':'
+export const ABSOLUTE_OPERATOR = '$'
 
 /* arithmetic */
 // abstract for + -
@@ -49,21 +51,21 @@ export const sheetNameRegexp = `(${simpleSheetName}|${quotedSheetName})!`
 
 export const CellReference = createToken({
   name: 'CellReference',
-  pattern: new RegExp(`(${sheetNameRegexp})?\\$?[A-Za-z]+\\$?[0-9]+`),
+  pattern: new RegExp(`(${sheetNameRegexp})?\\${ABSOLUTE_OPERATOR}?[A-Za-z]+\\${ABSOLUTE_OPERATOR}?[0-9]+`),
 })
 
 export const ColumnRange = createToken({
   name: 'ColumnRange',
-  pattern: new RegExp(`(${sheetNameRegexp})?\\$?[A-Za-z]+:\(${sheetNameRegexp}\)?\\$?[A-Za-z]+`),
+  pattern: new RegExp(`(${sheetNameRegexp})?\\${ABSOLUTE_OPERATOR}?[A-Za-z]+${RANGE_OPERATOR}\(${sheetNameRegexp}\)?\\${ABSOLUTE_OPERATOR}?[A-Za-z]+`),
 })
 
 export const RowRange = createToken({
   name: 'RowRange',
-  pattern: new RegExp(`(${sheetNameRegexp})?\\$?[0-9]+:\(${sheetNameRegexp}\)?\\$?[0-9]+`),
+  pattern: new RegExp(`(${sheetNameRegexp})?\\${ABSOLUTE_OPERATOR}?[0-9]+${RANGE_OPERATOR}\(${sheetNameRegexp}\)?\\${ABSOLUTE_OPERATOR}?[0-9]+`),
 })
 
 
-export const RangeSeparator = createToken({name: 'RangeSeparator', pattern: /:/})
+export const RangeSeparator = createToken({name: 'RangeSeparator', pattern: `${RANGE_OPERATOR}`})
 
 /* parenthesis */
 export const LParen = createToken({name: 'LParen', pattern: /\(/})
