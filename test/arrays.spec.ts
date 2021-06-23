@@ -431,4 +431,13 @@ describe('build from array', () => {
       [ValueCellVertex, undefined],
     ])
   })
+
+  it('DependencyGraph changes should be empty after building fresh engine', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=-C1:D2', null],
+      [1, null]
+    ], {useArrayArithmetic: true})
+
+    expect(engine.dependencyGraph.getAndClearContentChanges().isEmpty()).toEqual(true)
+  })
 })

@@ -51,6 +51,7 @@ export class GraphBuilder {
    */
   public buildGraph(sheets: Sheets) {
     const dependencies = this.buildStrategy.run(sheets)
+    this.dependencyGraph.getAndClearContentChanges()
     this.processDependencies(dependencies)
   }
 
