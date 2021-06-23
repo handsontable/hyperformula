@@ -64,7 +64,6 @@ describe('Removing rows - checking if its possible', () => {
       ['1', '2'],
       ['3', '4'],
       ['=TRANSPOSE(A1:B2)'],
-      ['13'],
     ])
 
     expect(engine.isItPossibleToRemoveRows(0, [1, 1])).toEqual(true)
