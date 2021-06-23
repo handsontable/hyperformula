@@ -308,8 +308,8 @@ You should know that this project wouldn’t exist without co-financing from Eur
 - Project name: “Development of the high-performance calculation engine for processing tabular data of the significant size on mobile devices and workstations using parallel computing and GPU.”
 - Project number: POIR.01.01.01-00-0223/18-00
 - Beneficiary: Handsoncode sp. z o.o.
-- Total budget: PLN 1 121 375.00 (USD ~295 000)
-- Amount of grant: PLN 774 742.00 (USD ~204 000)
+- Total budget: PLN 1 117 275,87 (USD ~295 000)
+- Amount of grant: PLN 771 807,73 (USD ~204 000)
 - Duration: 2018-2019
 
 ![eu-funds](resources/european-funds-logo.png)
