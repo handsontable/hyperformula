@@ -58,7 +58,7 @@ In most cases, the differences won't be observed by the end user, but we list th
 
 ### Built-in function implementation differences
 
-| Function      | Example                                                    | HyperFormula | GoogleSheets |      Excel |
+| Function      | Example                                                    | HyperFormula | Google Sheets |     Microsoft Excel |
 |---------------|------------------------------------------------------------|-------------:|-------------:|-----------:|
 | TBILLEQ       | =TBILLEQ(0, 180, 1.9)                                      |      38,5278 |          NUM |        NUM |
 | TBILLEQ       | =TBILLEQ(0, 180, 2)                                        |       0,0000 |          NUM |     0,0000 |
@@ -115,3 +115,4 @@ In most cases, the differences won't be observed by the end user, but we list th
 | BINOM.INV     | =BINOM.INV(10, 0, 0.5)                                     |       0,0000 |          NUM |        NUM |
 | BINOM.INV     | =BINOM.INV(10, 1, 0.5)                                     |      10,0000 |          NUM |        NUM |
 | DEVSQ         | =DEVSQ(A2,A3)                                              |       0,0000 |       0,0000 |        NUM |
+| NORMSDIST     | =NORMSDIST(0, TRUE())                                      |          0.5 | Wrong number | Wrong number | 
