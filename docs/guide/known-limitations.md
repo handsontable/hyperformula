@@ -116,5 +116,5 @@ To remove the differences, you can create custom implementations of those functi
 | BINOM.INV     | =BINOM.INV(-0.001, 0.5, 0.5)                               |          NUM |       0,0000 |        NUM |
 | BINOM.INV     | =BINOM.INV(10, 0, 0.5)                                     |       0,0000 |          NUM |        NUM |
 | BINOM.INV     | =BINOM.INV(10, 1, 0.5)                                     |      10,0000 |          NUM |        NUM |
-| DEVSQ         | =DEVSQ(A2,A3)                                              |       0,0000 |       0,0000 |        NUM |
+| DEVSQ         | =DEVSQ(A2, A3)                                             |       0,0000 |       0,0000 |        NUM |
 | NORMSDIST     | =NORMSDIST(0, TRUE())                                      |          0.5 | Wrong number | Wrong number | 
