@@ -64,7 +64,7 @@ To remove the differences, you can create custom implementations of those functi
 |---------------|------------------------------------------------------------|-------------:|-------------:|-----------:|
 | TBILLEQ       | =TBILLEQ(0, 180, 1.9)                                      |      38,5278 |          NUM |        NUM |
 | TBILLEQ       | =TBILLEQ(0, 180, 2)                                        |       0,0000 |          NUM |     0,0000 |
-| TBILLEQ       | =TBILLEQ("1/2/2000",<br>"31/1/2001", 0.1)                  |       0,1128 |        VALUE |      VALUE |
+| TBILLEQ       | =TBILLEQ("1/2/2000", "31/1/2001", 0.1)                  |       0,1128 |        VALUE |      VALUE |
 | TBILLEQ       | =TBILLEQ(0, 360, 0.1)                                      |       0,1127 |       0,1097 |     0,1097 |
 | TBILLEQ       | =TBILLEQ(0, 365, 0.1)                                      |       0,1128 |       0,1098 |     0,1098 |
 | GCD           | =GCD(1000000000000000000.0)                                |          NUM |        1E+18 |        NUM |
