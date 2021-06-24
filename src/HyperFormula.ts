@@ -2100,7 +2100,6 @@ export class HyperFormula implements TypedEmitter {
    *
    * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
    * @throws [[ExpectedValueOfTypeError]] if source is of wrong type
-   * @throws an error while attempting to copy unsupported content type
    * @throws [[SheetsNotEqual]] if range provided has distinct sheet numbers for start and end
    *
    * @example
