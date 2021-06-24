@@ -85,7 +85,7 @@ To remove the differences, you can create custom implementations of those functi
 | NPV           | =NPV(1,B1) where B1 = true                                 |       0,5000 |       0,0000 |     0,0000 |
 | POISSON.DIST  | =POISSON.DIST(-0.01, 0, FALSE())                           |          NUM |       1,0000 |        NUM |
 | POISSON.DIST  | =POISSON.DIST(0, -0.01, FALSE())                           |          NUM |          NUM |     1,0101 |
-| DB            | =DB(1000000,100000,6,7,7)                                  |   15845,1000 |          NUM | 15845,0985 |
+| DB            | =DB(1000000, 100000, 6, 7, 7)                              |   15845,1000 |          NUM | 15845,0985 |
 | BETA.DIST     | =BETA.DIST(1, 2, 3)                                        |          N/A |       1,0000 |        NUM |
 | BETA.DIST     | =BETA.DIST(0, 1, 1, FALSE())                               |          NUM |       0,0000 |        NUM |
 | BETA.DIST     | =BETA.DIST(0.6, 1, 1, FALSE(), 0.6, 0.7)                   |          NUM |       0,0000 |     0,0000 |
