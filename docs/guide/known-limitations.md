@@ -109,8 +109,8 @@ To remove the differences, you can create custom implementations of those functi
 | COUNTA        | =COUNTA(1,)                                                |       2,0000 |       1,0000 |     2,0000 |
 | XNPV          | =XNPV(-0.9, A2:D2, A3:D3)<br>where 2nd and 3rd row: 1,2,3,4 |      10,1272 |  10,12716959 |        NUM |
 | SKEW          | =SKEW(TRUE(),FALSE(),)                                     |       1,7321 |        DIV/0 |     1,7321 |
-| HARMEAN       | =HARMEAN(TRUE(),"4")                                       |       1,6000 |       4,0000 |     1,6000 |
-| GEOMEAN       | =GEOMEAN(TRUE(),"4")                                       |       2,0000 |       4,0000 |     2,0000 |
+| HARMEAN       | =HARMEAN(TRUE(), "4")                                      |       1,6000 |       4,0000 |     1,6000 |
+| GEOMEAN       | =GEOMEAN(TRUE(), "4")                                      |       2,0000 |       4,0000 |     2,0000 |
 | CHISQ.TEST    | =CHISQ.TEST(A1:C2, A1:F1)                                  |          N/A |          N/A |      DIV/0 |
 | BINOM.INV     | =BINOM.INV(1, 0.8, 0.2)                                    |       0,0000 |       1,0000 |     1,0000 |
 | BINOM.INV     | =BINOM.INV(-0.001, 0.5, 0.5)                               |          NUM |       0,0000 |        NUM |
