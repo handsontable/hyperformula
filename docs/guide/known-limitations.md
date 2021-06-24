@@ -104,8 +104,8 @@ To remove the differences, you can create custom implementations of those functi
 | TDIST         | =TDIST(0, 1, 1.5)                                          |          NUM |       0,5000 |     0,5000 |
 | T.INV.2T      | =T.INV.2T(0, 1)                                            |          NUM |          NUM |      DIV/0 |
 | T.DIST        | =T.DIST(1, 0.9, FALSE())                                   |          NUM |          NUM |      DIV/0 |
-| AVEDEV        | =AVEDEV(TRUE(),FALSE(),)                                   |       0,4444 |       0,0000 |     0,4444 |
-| LARGE         | =LARGE(TRUE(),1)                                           |          NUM |          NUM |     1,0000 |
+| AVEDEV        | =AVEDEV(TRUE(), FALSE())                                  |       0,4444 |       0,0000 |     0,4444 |
+| LARGE         | =LARGE(TRUE(), 1)                                          |          NUM |          NUM |     1,0000 |
 | COUNTA        | =COUNTA(1,)                                                |       2,0000 |       1,0000 |     2,0000 |
 | XNPV          | =XNPV(-0.9, A2:D2, A3:D3)<br>where 2nd and 3rd row: 1,2,3,4 |      10,1272 |  10,12716959 |        NUM |
 | SKEW          | =SKEW(TRUE(),FALSE(),)                                     |       1,7321 |        DIV/0 |     1,7321 |
