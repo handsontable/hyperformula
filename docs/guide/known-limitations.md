@@ -72,7 +72,7 @@ To remove the differences, you can create custom implementations of those functi
 | RRI           | =RRI(1, -1, -1)                                            |       0,0000 |          NUM |     0,0000 |
 | DAYS          | =DAYS(-1, 0)                                               |          NUM |      -1,0000 |        NUM |
 | DAYS          | =DAYS(0, -1)                                               |          NUM |       1,0000 |        NUM |
-| DATEDIF       | =DATEDIF(-1, 0,   "Y")                                     |          NUM |       0,0000 |        NUM |
+| DATEDIF       | =DATEDIF(-1, 0, "Y")                                       |          NUM |       0,0000 |        NUM |
 | RATE          | =RATE(12, -100, 400, 100, 1)                               |      -0,4997 |       0,3100 |    -0,4997 |
 | RATE          | =RATE(12, -100, 400, 1, 1)                                 |      -0,9901 |       0,3200 |    -0,9901 |
 | RATE          | =RATE(12, -100, 400, 0, 1)                                 |          NUM |       0,3200 |        NUM |
