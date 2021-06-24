@@ -3952,7 +3952,8 @@ export class HyperFormula implements TypedEmitter {
   }
 
   /**
-   * Returns a normalized formula.
+   * Parses and then unparses a formula.
+   * Returns a normalized formula (e.g. normalizes the capitalization of sheet names, function names and cell addresses).
    *
    * @param {string} formulaString - a formula in a proper format - it must start with "="
    *
@@ -3966,8 +3967,11 @@ export class HyperFormula implements TypedEmitter {
    *  ['50'],
    * ]);
    *
-   * // normalize the formula, should return '=Sheet1!$A$1+10' for this example
+   * // returns '=Sheet1!$A$1+10'
    * const normalizedFormula = hfInstance.normalizeFormula('=SHEET1!$A$1+10');
+   * 
+   * // returns '=3*$A$1'
+   * const normalizedFormula = hfInstance.normalizeFormula('=3*$a$1');
    * ```
    *
    * @category Helpers
