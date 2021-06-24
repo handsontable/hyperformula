@@ -36,14 +36,12 @@ you can't compare the arguments in a formula like this:
 
 ## Google Sheets and Microsoft Excel
 
-In certain situations, HyperFormula behaves slightly differently than Google Sheets or Microsoft Excel.
+In certain situations, HyperFormula behaves differently than Google Sheets or Microsoft Excel.
 
 The inconsistencies are due to:
 * Known limitations of Microsoft Excel or Google Sheets.
 * Known limitations of HyperFormula in its current development stage.
 * Inconsistencies between Microsoft Excel and Google Sheets.
-
-In most cases, the differences won't be observed by the end user, but we list them all for your reference:
 
 | Functionality                                        | Examples                                                                  | HyperFormula                                                                                                                                                                                                   | Google Sheets                                                                                                                    | Excel                                                             |
 |------------------------------------------------------|---------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------|
@@ -57,6 +55,10 @@ In most cases, the differences won't be observed by the end user, but we list th
 | Formatting inside the TEXT function                  | TEXT(A1,"dd-mm-yy")<br><br>TEXT(A1,"###.###”)                             | Not all formatting options are supported,<br>e.g. only some date formatting options: (`hh`, `mm`, `ss`, `am`, `pm`, `a`, `p`, `dd`, `yy`, and `yyyy`).<br><br>No currency formatting inside the TEXT function. | A wide variety of options for string formatting is supported.                                                                    | Same as Google Sheets.                                            |
 
 ### Built-in function implementation differences
+
+Some built-in functions are implemented differently than in Google Sheets or Microsoft Excel.
+
+To remove the differences, you can create custom implementations of those functions.
 
 | Function      | Example                                                    | HyperFormula | Google Sheets |     Microsoft Excel |
 |---------------|------------------------------------------------------------|-------------:|-------------:|-----------:|
