@@ -2134,8 +2134,8 @@ export class HyperFormula implements TypedEmitter {
   }
 
   /**
-   * When called after [[copy]] it will paste copied values and formulas into a cell block.
-   * When called after [[cut]] it will perform [[moveCells]] operation into the cell block.
+   * When called after [[copy]] it pastes copied values and formulas into a cell block.
+   * When called after [[cut]] it performs [[moveCells]] operation into the cell block.
    * Does nothing if the clipboard is empty.
    *
    * Note that this method may trigger dependency graph recalculation.
