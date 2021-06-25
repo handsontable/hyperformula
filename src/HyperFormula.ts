@@ -3953,7 +3953,7 @@ export class HyperFormula implements TypedEmitter {
 
   /**
    * Parses and then unparses a formula.
-   * Returns a normalized formula (e.g. restores the original capitalization of sheet names, function names, cell addresses and named expressions).
+   * Returns a normalized formula (e.g. restores the original capitalization of sheet names, function names, cell addresses, and named expressions).
    *
    * @param {string} formulaString - a formula in a proper format - it must start with "="
    *
