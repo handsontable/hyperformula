@@ -1836,8 +1836,7 @@ export class HyperFormula implements TypedEmitter {
    * @param {SimpleCellAddress} destinationLeftCorner - upper left address of the target cell block
    *
    * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
-   * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
-   * @throws [[ExpectedValueOfTypeError]] if destinationLeftCorner or source are of wrong type
+   * @throws [[ExpectedValueOfTypeError]] if destinationLeftCorner, source, or any of basic type arguments are of wrong type
    * @throws [[SheetsNotEqual]] if range provided has distinct sheet numbers for start and end
    *
    * @example
