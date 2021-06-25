@@ -13,6 +13,7 @@ import {SimpleRangeValue} from '../interpreter/SimpleRangeValue'
 import {ColumnsSpan} from '../Span'
 import {AdvancedFind} from './AdvancedFind'
 import {ColumnSearchStrategy} from './SearchStrategy'
+import {CellValueChange} from '../ContentChanges'
 
 export class ColumnBinarySearch extends AdvancedFind implements ColumnSearchStrategy {
   constructor(
@@ -28,6 +29,8 @@ export class ColumnBinarySearch extends AdvancedFind implements ColumnSearchStra
   public remove(value: RawScalarValue | undefined, address: SimpleCellAddress): void {}
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public change(oldValue: RawScalarValue | undefined, newValue: RawScalarValue, address: SimpleCellAddress): void {}
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  public applyChanges(contentChanges: CellValueChange[]): void {}
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public addColumns(columnsSpan: ColumnsSpan): void {}
   // eslint-disable-next-line @typescript-eslint/no-unused-vars

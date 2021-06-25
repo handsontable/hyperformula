@@ -5,7 +5,7 @@
 
 import {AbsoluteCellRange} from './AbsoluteCellRange'
 import {absolutizeDependencies, filterDependenciesOutOfScope} from './absolutizeDependencies'
-import {invalidSimpleCellAddress, simpleCellAddress, SimpleCellAddress} from './Cell'
+import {equalSimpleCellAddress, invalidSimpleCellAddress, simpleCellAddress, SimpleCellAddress} from './Cell'
 import {CellContent, CellContentParser, RawCellContent} from './CellContentParser'
 import {ClipboardCell, ClipboardCellType} from './ClipboardOperations'
 import {Config} from './Config'
@@ -23,7 +23,6 @@ import {
   SparseStrategy,
   ValueCellVertex
 } from './DependencyGraph'
-import {FormulaVertex} from './DependencyGraph/FormulaCellVertex'
 import {RawAndParsedValue} from './DependencyGraph/ValueCellVertex'
 import {AddColumnsTransformer} from './dependencyTransformers/AddColumnsTransformer'
 import {AddRowsTransformer} from './dependencyTransformers/AddRowsTransformer'
@@ -56,6 +55,7 @@ import {ParsingResult} from './parser/ParserWithCaching'
 import {findBoundaries, Sheet} from './Sheet'
 import {ColumnsSpan, RowsSpan} from './Span'
 import {Statistics, StatType} from './statistics'
+import {FormulaVertex} from './DependencyGraph/FormulaCellVertex'
 
 export class RemoveRowsCommand {
   constructor(
@@ -692,8 +692,26 @@ export class Operations {
     }
   }
 
-  public setFormulaToCell(address: SimpleCellAddress, size: MatrixSize, { ast, hasVolatileFunction, hasStructuralChangeFunction, dependencies}: ParsingResult) {
+  public setParsingErrorToCell(rawInput: string, errors: ParsingError[], address: SimpleCellAddress) {
+    const oldValue = this.dependencyGraph.getCellValue(address)
+    const vertex = new ParsingErrorVertex(errors, rawInput)
+    const arrayChanges = this.dependencyGraph.setParsingErrorToCell(address, vertex)
+    this.columnSearch.remove(getRawValue(oldValue), address)
+    this.columnSearch.applyChanges(arrayChanges.getChanges())
+    this.changes.addAll(arrayChanges)
+    this.changes.addChange(vertex.getCellValue(), address)
+  }
+
+  public setFormulaToCell(address: SimpleCellAddress, size: MatrixSize, {
+    ast,
+    hasVolatileFunction,
+    hasStructuralChangeFunction,
+    dependencies
+  }: ParsingResult) {
+    const oldValue = this.dependencyGraph.getCellValue(address)
     const arrayChanges = this.dependencyGraph.setFormulaToCell(address, ast, absolutizeDependencies(dependencies, address), size, hasVolatileFunction, hasStructuralChangeFunction)
+    this.columnSearch.remove(getRawValue(oldValue), address)
+    this.columnSearch.applyChanges(arrayChanges.getChanges())
     this.changes.addAll(arrayChanges)
   }
 
@@ -701,6 +719,7 @@ export class Operations {
     const oldValue = this.dependencyGraph.getCellValue(address)
     const arrayChanges = this.dependencyGraph.setValueToCell(address, value)
     this.columnSearch.change(getRawValue(oldValue), getRawValue(value.parsedValue), address)
+    this.columnSearch.applyChanges(arrayChanges.getChanges().filter(change => !equalSimpleCellAddress(change.address, address)))
     this.changes.addAll(arrayChanges)
     this.changes.addChange(value.parsedValue, address)
   }
@@ -712,6 +731,7 @@ export class Operations {
     const oldValue = this.dependencyGraph.getCellValue(address)
     const arrayChanges = this.dependencyGraph.setCellEmpty(address)
     this.columnSearch.remove(getRawValue(oldValue), address)
+    this.columnSearch.applyChanges(arrayChanges.getChanges())
     this.changes.addAll(arrayChanges)
     this.changes.addChange(EmptyValue, address)
   }
@@ -729,13 +749,6 @@ export class Operations {
     const cleanedDependencies = filterDependenciesOutOfScope(absoluteDependencies)
     const size = this.matrixSizePredictor.checkMatrixSize(ast, address)
     this.dependencyGraph.setFormulaToCell(address, cleanedAst, cleanedDependencies, size, hasVolatileFunction, hasStructuralChangeFunction)
-  }
-
-  public setParsingErrorToCell(rawInput: string, errors: ParsingError[], address: SimpleCellAddress) {
-    const vertex = new ParsingErrorVertex(errors, rawInput)
-    const arrayChanges = this.dependencyGraph.setParsingErrorToCell(address, vertex)
-    this.changes.addAll(arrayChanges)
-    this.changes.addChange(vertex.getCellValue(), address)
   }
 
   /**

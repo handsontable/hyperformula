@@ -619,6 +619,18 @@ describe('Arrays', () => {
     ], engine)
   })
 
+  it('shoud remove values when replacing array with parsing error', () => {
+    const engine = HyperFormula.buildFromArray([
+      [1, 2, '=-A1:B1'],
+    ], {useArrayArithmetic: true, useColumnIndex: true})
+
+    engine.setCellContents(adr('C1'), [['=SUM(']])
+
+    expectColumnIndexToMatchSheet([
+      [1, 2]
+    ], engine)
+  })
+
   it('should update index when replacing array with another one', () => {
     const engine = HyperFormula.buildFromArray([
       [1, 2, '=-A1:B1'],

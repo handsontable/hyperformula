@@ -23,6 +23,7 @@ import {ColumnsSpan, RowsSpan} from '../Span'
 import {Statistics, StatType} from '../statistics'
 import {ColumnBinarySearch} from './ColumnBinarySearch'
 import {ColumnSearchStrategy} from './SearchStrategy'
+import {CellValueChange} from '../ContentChanges'
 
 type ColumnMap = Map<RawInterpreterValue, ValueIndex>
 
@@ -80,6 +81,14 @@ export class ColumnIndex implements ColumnSearchStrategy {
     }
     this.remove(oldValue, address)
     this.add(newValue, address)
+  }
+
+  public applyChanges(contentChanges: CellValueChange[]) {
+    for (const change of contentChanges) {
+      if (change.oldValue !== undefined) {
+        this.change(getRawValue(change.oldValue), getRawValue(change.value), change.address)
+      }
+    }
   }
 
   public moveValues(sourceRange: IterableIterator<[RawScalarValue, SimpleCellAddress]>, toRight: number, toBottom: number, toSheet: number) {

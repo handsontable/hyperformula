@@ -10,6 +10,7 @@ import {SimpleRangeValue} from './interpreter/SimpleRangeValue'
 export interface CellValueChange {
   address: SimpleCellAddress,
   value: InterpreterValue,
+  oldValue?: InterpreterValue,
 }
 
 export interface ChangeExporter<T> {
@@ -36,6 +37,10 @@ export class ContentChanges {
 
   public addChange(newValue: InterpreterValue, address: SimpleCellAddress): void {
     this.addInterpreterValue(newValue, address)
+  }
+
+  public addChangeWithOldValue(newValue: InterpreterValue, address: SimpleCellAddress, oldValue: InterpreterValue): void {
+    this.addInterpreterValue(newValue, address, oldValue)
   }
 
   public exportChanges<T>(exporter: ChangeExporter<T>): T[] {
@@ -69,10 +74,11 @@ export class ContentChanges {
     this.changes.set(addressKey((address)), change)
   }
 
-  private addInterpreterValue(value: InterpreterValue, address: SimpleCellAddress) {
+  private addInterpreterValue(value: InterpreterValue, address: SimpleCellAddress, oldValue?: InterpreterValue) {
     this.add(address, {
       address,
-      value
+      value,
+      oldValue
     })
   }
 }

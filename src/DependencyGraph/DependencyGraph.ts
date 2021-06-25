@@ -115,8 +115,8 @@ export class DependencyGraph {
       this.matrixMapping.removeMatrix(vertex.getRange())
     }
     if (vertex instanceof ValueCellVertex) {
-      const oldValue = vertex.getValues()
-      if (oldValue.rawValue !== value.rawValue) {
+      const oldValues = vertex.getValues()
+      if (oldValues.rawValue !== value.rawValue) {
         vertex.setValues(value)
         this.graph.markNodeAsSpecialRecentlyChanged(vertex)
       }
@@ -780,10 +780,13 @@ export class DependencyGraph {
   private cleanAddressMappingUnderMatrix(vertex: MatrixVertex) {
     const matrixRange = vertex.getRange()
     for (const address of matrixRange.addresses(this)) {
-      if (!vertex.isLeftCorner(address)) {
-        if (this.getCell(address) === vertex) {
+      if (this.getCell(address) === vertex) {
+        const oldValue = vertex.getMatrixCellValue(address)
+        if (vertex.isLeftCorner(address)) {
+          this.changes.addChangeWithOldValue(new CellError(ErrorType.REF), address, oldValue)
+        } else {
           this.addressMapping.removeCell(address)
-          this.changes.addChange(EmptyValue, address)
+          this.changes.addChangeWithOldValue(EmptyValue, address, oldValue)
         }
       }
     }

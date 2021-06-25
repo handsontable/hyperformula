@@ -669,8 +669,39 @@ describe('updating column index', () => {
 
     engine.setCellContents(adr('B2'), '8')
 
-    expectArrayWithSameContent((engine.columnSearch as ColumnIndex).getValueIndex(0, 1, 4).index, [])
+    expectArrayWithSameContent((engine.columnSearch as ColumnIndex).getValueIndex(0, 1, 15).index, [])
     expectArrayWithSameContent((engine.columnSearch as ColumnIndex).getValueIndex(0, 1, 8).index, [1])
+  })
+
+  it('should update column index when clearing cell content', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1', '2'],
+    ], {binarySearchThreshold: 1, useColumnIndex: true})
+
+    engine.setCellContents(adr('B1'), null)
+
+    expectArrayWithSameContent((engine.columnSearch as ColumnIndex).getValueIndex(0, 1, 2).index, [])
+  })
+
+  it('should update column index when changing to ParsingError', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1', '2'],
+    ], {binarySearchThreshold: 1, useColumnIndex: true})
+
+    engine.setCellContents(adr('B1'), '=SUM(')
+
+    expectArrayWithSameContent((engine.columnSearch as ColumnIndex).getValueIndex(0, 1, 2).index, [])
+  })
+
+  it('should update column index when changing to formula', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1', '2'],
+    ], {binarySearchThreshold: 1, useColumnIndex: true})
+
+    engine.setCellContents(adr('B1'), '=SUM(A1)')
+
+    expectArrayWithSameContent((engine.columnSearch as ColumnIndex).getValueIndex(0, 1, 2).index, [])
+    expectArrayWithSameContent((engine.columnSearch as ColumnIndex).getValueIndex(0, 1, 1).index, [0])
   })
 })
 
@@ -1064,7 +1095,7 @@ describe('arrays', () => {
     expect(changes).toContainEqual(new ExportedCellChange(adr('B2'), null))
   })
 
-  it('should return on changes when trying to clear array cell', () => {
+  it('should return no changes when trying to clear array cell', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '2'],
       ['=-A1:B1'],
