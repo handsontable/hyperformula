@@ -10,7 +10,13 @@ import {AddRowsTransformer} from '../dependencyTransformers/AddRowsTransformer'
 import {RemoveRowsTransformer} from '../dependencyTransformers/RemoveRowsTransformer'
 import {FormulaTransformer} from '../dependencyTransformers/Transformer'
 import {forceNormalizeString} from '../interpreter/ArithmeticHelper'
-import {getRawValue, RawInterpreterValue, RawNoErrorScalarValue, RawScalarValue} from '../interpreter/InterpreterValue'
+import {
+  EmptyValue,
+  getRawValue,
+  RawInterpreterValue,
+  RawNoErrorScalarValue,
+  RawScalarValue
+} from '../interpreter/InterpreterValue'
 import {SimpleRangeValue} from '../interpreter/SimpleRangeValue'
 import {LazilyTransformingAstService} from '../LazilyTransformingAstService'
 import {ColumnsSpan, RowsSpan} from '../Span'
@@ -43,11 +49,13 @@ export class ColumnIndex implements ColumnSearchStrategy {
   }
 
   public add(value: RawInterpreterValue, address: SimpleCellAddress) {
-    if (value instanceof SimpleRangeValue) {
+    if (value === EmptyValue || value instanceof CellError) {
+      return
+    } else if (value instanceof SimpleRangeValue) {
       for (const [matrixValue, cellAddress] of value.entriesFromTopLeftCorner(address)) {
         this.addSingleCellValue(getRawValue(matrixValue), cellAddress)
       }
-    } else if (!(value instanceof CellError)) {
+    } else {
       this.addSingleCellValue(value, address)
     }
   }

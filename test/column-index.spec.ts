@@ -12,8 +12,9 @@ import {ColumnIndex} from '../src/Lookup/ColumnIndex'
 import {NamedExpressions} from '../src/NamedExpressions'
 import {ColumnsSpan, RowsSpan} from '../src/Span'
 import {Statistics} from '../src/statistics'
-import {adr, columnIndexToSheet, expectArrayWithSameContent, expectColumnIndexToMatchSheet} from './testUtils'
-import {HyperFormula, Sheet} from '../src'
+import {adr, expectColumnIndexToMatchSheet} from './testUtils'
+import {HyperFormula} from '../src'
+import {EmptyValue} from '../src/interpreter/InterpreterValue'
 
 function buildEmptyIndex(transformingService: LazilyTransformingAstService, config: Config, statistics: Statistics): ColumnIndex {
   const functionRegistry = new FunctionRegistry(config)
@@ -113,6 +114,12 @@ describe('ColumnIndex#add', () => {
     expect(columnMap.get('t')!.index.length).toBe(1)
     expect(columnMap.get('ŧ')!.index.length).toBe(1)
     // eslint-enable @typescript-eslint/no-non-null-assertion
+  })
+
+  it('should ignore EmptyValue', () => {
+    const index = buildEmptyIndex(transformingService, new Config(), statistics)
+    index.add(EmptyValue, adr('A1'))
+    expect(index.getColumnMap(0, 0).size).toBe(0)
   })
 })
 
@@ -217,6 +224,15 @@ describe('ColumnIndex change/remove', () => {
     expect(index.getColumnMap(0, 0).keys()).not.toContain(1)
     expect(index.getColumnMap(0, 0).keys()).not.toContain(error)
   })
+
+  it('should ignore EmptyValue', () => {
+    const index = buildEmptyIndex(transformingService, new Config(), statistics)
+    index.add(1, adr('A1'))
+
+    index.change(1, EmptyValue, adr('A1'))
+
+    expect(index.getColumnMap(0, 0).size).toBe(0)
+  })
 })
 
 describe('ColumnIndex#addColumns', () => {
@@ -311,7 +327,7 @@ describe('ColumnIndex#find', () => {
   const stats = new Statistics()
   const transformService = new LazilyTransformingAstService(stats)
 
-  it('should find row number', function() {
+  it('should find row number', function () {
     const index = buildEmptyIndex(transformService, new Config(), stats)
 
     index.add(1, adr('A2'))
@@ -320,7 +336,7 @@ describe('ColumnIndex#find', () => {
     expect(row).toBe(1)
   })
 
-  it('should find smallest row number for value', function() {
+  it('should find smallest row number for value', function () {
     const index = buildEmptyIndex(transformService, new Config(), stats)
 
     index.add(1, adr('A4'))
@@ -515,7 +531,7 @@ describe('ColumnIndex#removeRows', () => {
 })
 
 describe('ColumnIndex - lazy cruds', () => {
-  it('should add rows only in specific column after find', function() {
+  it('should add rows only in specific column after find', function () {
     const stats = new Statistics()
     const transformService = new LazilyTransformingAstService(stats)
     const index = buildEmptyIndex(transformService, new Config(), stats)
@@ -535,7 +551,7 @@ describe('ColumnIndex - lazy cruds', () => {
     expect(index.getValueIndex(0, 1, 1).index).toEqual([1])
   })
 
-  it('should add rows only for specific value after find', function() {
+  it('should add rows only for specific value after find', function () {
     const stats = new Statistics()
     const transformService = new LazilyTransformingAstService(stats)
     const index = buildEmptyIndex(transformService, new Config(), stats)
@@ -560,7 +576,7 @@ describe('Arrays', () => {
   it('should update column index with array values', () => {
     const engine = HyperFormula.buildFromArray([
       [1, 2, '=-A1:B1'],
-    ], {useArrayArithmetic: true, useColumnIndex: true })
+    ], {useArrayArithmetic: true, useColumnIndex: true})
 
     expectColumnIndexToMatchSheet([
       [1, 2, -1, -2]
@@ -570,7 +586,7 @@ describe('Arrays', () => {
   it('should remove values from index when REF', () => {
     const engine = HyperFormula.buildFromArray([
       [1, 2, '=-A1:B1'],
-    ], {useArrayArithmetic: true, useColumnIndex: true })
+    ], {useArrayArithmetic: true, useColumnIndex: true})
 
     engine.setCellContents(adr('D1'), [['foo']])
 
@@ -582,7 +598,7 @@ describe('Arrays', () => {
   it('should remove values from index when replacing array with scalar', () => {
     const engine = HyperFormula.buildFromArray([
       [1, 2, '=-A1:B1'],
-    ], {useArrayArithmetic: true, useColumnIndex: true })
+    ], {useArrayArithmetic: true, useColumnIndex: true})
 
     engine.setCellContents(adr('C1'), [['foo']])
 
@@ -594,7 +610,7 @@ describe('Arrays', () => {
   it('should remove values when replacing array with smaller one', () => {
     const engine = HyperFormula.buildFromArray([
       [1, 2, '=-A1:B1'],
-    ], {useArrayArithmetic: true, useColumnIndex: true })
+    ], {useArrayArithmetic: true, useColumnIndex: true})
 
     engine.setCellContents(adr('C1'), [['=2*A1:A1']])
 
@@ -606,7 +622,7 @@ describe('Arrays', () => {
   it('should update index when replacing array with another one', () => {
     const engine = HyperFormula.buildFromArray([
       [1, 2, '=-A1:B1'],
-    ], {useArrayArithmetic: true, useColumnIndex: true })
+    ], {useArrayArithmetic: true, useColumnIndex: true})
 
     engine.setCellContents(adr('C1'), [['=2*A1:B1']])
 
@@ -621,7 +637,7 @@ describe('Arrays', () => {
       [null, 'foo'],
       [null, 1],
       [null, 2],
-    ], {useArrayArithmetic: true, useColumnIndex: true })
+    ], {useArrayArithmetic: true, useColumnIndex: true})
 
     engine.addRows(0, [0, 1])
 
@@ -640,7 +656,7 @@ describe('Arrays', () => {
       [null, 'foo'],
       [-2, 1],
       [-1, 2],
-    ], {useArrayArithmetic: true, useColumnIndex: true })
+    ], {useArrayArithmetic: true, useColumnIndex: true})
 
     engine.addRows(0, [1, 1])
 
@@ -652,14 +668,14 @@ describe('Arrays', () => {
       [-1, 2],
     ], engine)
   })
-  
-    it('should move array values when removing rows above array', () => {
+
+  it('should move array values when removing rows above array', () => {
     const engine = HyperFormula.buildFromArray([
       [],
       ['=-B3:B4'],
       [null, 1],
       [null, 2],
-    ], {useArrayArithmetic: true, useColumnIndex: true })
+    ], {useArrayArithmetic: true, useColumnIndex: true})
 
     engine.removeRows(0, [0, 1])
 
@@ -677,7 +693,7 @@ describe('Arrays', () => {
       [null, 'foo'],
       [-2, 1],
       [-1, 2],
-    ], {useArrayArithmetic: true, useColumnIndex: true })
+    ], {useArrayArithmetic: true, useColumnIndex: true})
 
     engine.removeRows(0, [1, 1])
 
