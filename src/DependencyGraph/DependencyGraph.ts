@@ -267,7 +267,7 @@ export class DependencyGraph {
     return vertex
   }
 
-  public removeRows(removedRows: RowsSpan): Set<MatrixVertex> {
+  public removeRows(removedRows: RowsSpan): [Set<MatrixVertex>, ContentChanges]{
     this.stats.measure(StatType.ADJUSTING_GRAPH, () => {
       for (const [address, vertex] of this.addressMapping.entriesFromRowsSpan(removedRows)) {
         for (const adjacentNode of this.graph.adjacentNodes(vertex)) {
@@ -300,7 +300,7 @@ export class DependencyGraph {
 
     this.addStructuralNodesToChangeSet()
 
-    return affectedMatrices
+    return [affectedMatrices, this.getAndClearContentChanges()]
   }
 
   public removeSheet(removedSheetId: number) {
@@ -780,14 +780,16 @@ export class DependencyGraph {
   private cleanAddressMappingUnderMatrix(vertex: MatrixVertex) {
     const matrixRange = vertex.getRange()
     for (const address of matrixRange.addresses(this)) {
+      const oldValue = vertex.getMatrixCellValue(address)
       if (this.getCell(address) === vertex) {
-        const oldValue = vertex.getMatrixCellValue(address)
         if (vertex.isLeftCorner(address)) {
-          this.changes.addChangeWithOldValue(new CellError(ErrorType.REF), address, oldValue)
+          this.changes.addChange(new CellError(ErrorType.REF), address, oldValue)
         } else {
           this.addressMapping.removeCell(address)
-          this.changes.addChangeWithOldValue(EmptyValue, address, oldValue)
+          this.changes.addChange(EmptyValue, address, oldValue)
         }
+      } else {
+        this.changes.addChange(EmptyValue, address, oldValue)
       }
     }
   }

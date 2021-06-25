@@ -35,11 +35,7 @@ export class ContentChanges {
     return this
   }
 
-  public addChange(newValue: InterpreterValue, address: SimpleCellAddress): void {
-    this.addInterpreterValue(newValue, address)
-  }
-
-  public addChangeWithOldValue(newValue: InterpreterValue, address: SimpleCellAddress, oldValue: InterpreterValue): void {
+  public addChange(newValue: InterpreterValue, address: SimpleCellAddress, oldValue?: InterpreterValue): void {
     this.addInterpreterValue(newValue, address, oldValue)
   }
 
