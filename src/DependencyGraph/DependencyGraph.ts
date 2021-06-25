@@ -750,12 +750,12 @@ export class DependencyGraph {
 
   public shrinkMatrixToCorner(matrix: MatrixVertex) {
     this.cleanAddressMappingUnderMatrix(matrix)
-    for (const adjacentVertex of this.adjacentFormulas(matrix)) {
+    for (const adjacentVertex of this.adjacentMatrixVertices(matrix)) {
       let relevantDependencies
       if (adjacentVertex instanceof FormulaVertex) {
-        relevantDependencies = this.formulaDependenciesToMatrix(adjacentVertex, matrix)
+        relevantDependencies = this.formulaDirectDependenciesToMatrix(adjacentVertex, matrix)
       } else {
-        relevantDependencies = this.rangeDependenciesToMatrix(adjacentVertex, matrix)
+        relevantDependencies = this.rangeDirectDependenciesToMatrix(adjacentVertex, matrix)
       }
       let dependentToCorner = false
       for (const [address, vertex] of relevantDependencies) {
@@ -794,15 +794,7 @@ export class DependencyGraph {
     }
   }
 
-  private* rangeDependenciesToMatrix(range: RangeVertex, matrix: MatrixVertex): IterableIterator<[SimpleCellAddress, CellVertex]> {
-    for (const [address, vertex] of this.rangeDependencyQuery2(range)) {
-      if (matrix.getRange().addressInRange(address)) {
-        yield [address, vertex]
-      }
-    }
-  }
-
-  private* formulaDependenciesToMatrix(vertex: FormulaVertex, matrix: MatrixVertex): IterableIterator<[SimpleCellAddress, CellVertex]> {
+  private* formulaDirectDependenciesToMatrix(vertex: FormulaVertex, matrix: MatrixVertex): IterableIterator<[SimpleCellAddress, CellVertex]> {
     const [, formulaDependencies] = this.formulaDependencyQuery(vertex) ?? []
     if (formulaDependencies === undefined) {
       return
@@ -818,32 +810,23 @@ export class DependencyGraph {
     }
   }
 
-  private* adjacentFormulas(vertex: Vertex): IterableIterator<FormulaVertex | RangeVertex> {
+  private* rangeDirectDependenciesToMatrix(vertex: RangeVertex, matrix: MatrixVertex): IterableIterator<[SimpleCellAddress, CellVertex]> {
+    const { restRange: range } = this.rangeMapping.findSmallerRange(vertex.range)
+    for (const address of range.addresses(this)) {
+      if (matrix.getRange().addressInRange(address)) {
+        const cell = this.fetchCellOrCreateEmpty(address)
+        yield [address, cell]
+      }
+    }
+  }
+
+  private* adjacentMatrixVertices(vertex: MatrixVertex): IterableIterator<FormulaVertex | RangeVertex> {
     const adjacentNodes = this.graph.adjacentNodes(vertex)
     for (const item of adjacentNodes) {
       if (item instanceof FormulaVertex || item instanceof RangeVertex) {
         yield item
       }
     }
-  }
-
-  private rangeDependencyQuery2 = (vertex: RangeVertex) => {
-    const allDeps: [SimpleCellAddress, CellVertex][] = []
-    const {smallerRangeVertex, restRange} = this.rangeMapping.findSmallerRange(vertex.range) //checking whether this range was splitted by bruteForce or not
-    let range
-    if (smallerRangeVertex !== undefined && this.graph.adjacentNodes(smallerRangeVertex).has(vertex)) {
-      range = restRange
-    } else { //did we ever need to use full range
-      range = vertex.range
-    }
-    for (const address of range.addresses(this)) {
-      const cell = this.fetchCellOrCreateEmpty(address)
-      if (cell instanceof EmptyCellVertex) {
-        cell.address = address
-      }
-      allDeps.push([address, cell])
-    }
-    return allDeps
   }
 
   private rangeDependencyQuery = (vertex: RangeVertex) => {

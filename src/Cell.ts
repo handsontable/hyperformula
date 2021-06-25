@@ -109,11 +109,11 @@ export const getCellValueType = (cellValue: InterpreterValue): CellValueType => 
     return CellValueType.ERROR
   }
 
-  if(typeof cellValue === 'string') {
+  if (typeof cellValue === 'string') {
     return CellValueType.STRING
-  } else if(isExtendedNumber(cellValue)) {
+  } else if (isExtendedNumber(cellValue)) {
     return CellValueType.NUMBER
-  } else if(typeof cellValue === 'boolean') {
+  } else if (typeof cellValue === 'boolean') {
     return CellValueType.BOOLEAN
   }
 
@@ -121,7 +121,7 @@ export const getCellValueType = (cellValue: InterpreterValue): CellValueType => 
 }
 
 export const getCellValueDetailedType = (cellValue: InterpreterValue): CellValueDetailedType => {
-  if(isExtendedNumber(cellValue)) {
+  if (isExtendedNumber(cellValue)) {
     return getTypeOfExtendedNumber(cellValue)
   } else {
     return getCellValueType(cellValue) as CellValueDetailedType
@@ -129,7 +129,7 @@ export const getCellValueDetailedType = (cellValue: InterpreterValue): CellValue
 }
 
 export const getCellValueFormat = (cellValue: InterpreterValue): string | undefined => {
-  if(isExtendedNumber(cellValue)) {
+  if (isExtendedNumber(cellValue)) {
     return getFormatOfExtendedNumber(cellValue)
   } else {
     return undefined
@@ -145,7 +145,7 @@ export class CellError {
   }
 
   public attachAddress(address: SimpleCellAddress): CellError {
-    if(this.address === undefined) {
+    if (this.address === undefined) {
       return new CellError(this.type, this.message, address)
     } else {
       return this
@@ -192,7 +192,7 @@ export const addressesEqual = (left: SimpleCellAddress, right: SimpleCellAddress
 export const addressKey = (address: SimpleCellAddress) => `${address.sheet},${address.row},${address.col}`
 
 export function isSimpleCellAddress(obj: any): obj is SimpleCellAddress {
-  if( obj && (typeof obj === 'object' || typeof obj === 'function')) {
+  if (obj && (typeof obj === 'object' || typeof obj === 'function')) {
     return 'col' in obj && typeof obj.col === 'number' && 'row' in obj && typeof obj.row === 'number' && 'sheet' in obj && typeof obj.sheet === 'number'
   } else {
     return false

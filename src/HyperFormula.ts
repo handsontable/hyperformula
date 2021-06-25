@@ -617,7 +617,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Cells
    */
   public getCellValue(cellAddress: SimpleCellAddress): CellValue {
-    if(!isSimpleCellAddress(cellAddress)) {
+    if (!isSimpleCellAddress(cellAddress)) {
       throw new ExpectedValueOfTypeError('SimpleCellAddress', 'cellAddress')
     }
     this.ensureEvaluationIsNotSuspended()
@@ -653,7 +653,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Cells
    */
   public getCellFormula(cellAddress: SimpleCellAddress): string | undefined {
-    if(!isSimpleCellAddress(cellAddress)) {
+    if (!isSimpleCellAddress(cellAddress)) {
       throw new ExpectedValueOfTypeError('SimpleCellAddress', 'cellAddress')
     }
     return this._serialization.getCellFormula(cellAddress)
@@ -683,7 +683,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Cells
    */
   public getCellSerialized(cellAddress: SimpleCellAddress): RawCellContent {
-    if(!isSimpleCellAddress(cellAddress)) {
+    if (!isSimpleCellAddress(cellAddress)) {
       throw new ExpectedValueOfTypeError('SimpleCellAddress', 'cellAddress')
     }
     this.ensureEvaluationIsNotSuspended()
@@ -1128,7 +1128,7 @@ export class HyperFormula implements TypedEmitter {
    */
   public isItPossibleToSetCellContents(address: SimpleCellAddress | SimpleCellRange): boolean {
     let range
-    if(isSimpleCellAddress(address)) {
+    if (isSimpleCellAddress(address)) {
       range = new AbsoluteCellRange(address, address)
     } else if (isSimpleCellRange(address)) {
       range = new AbsoluteCellRange(address.start, address.end)
@@ -1137,7 +1137,7 @@ export class HyperFormula implements TypedEmitter {
     }
     try {
       this._crudOperations.ensureRangeInSizeLimits(range)
-      for(const it of range.addresses(this._dependencyGraph)) {
+      for (const it of range.addresses(this._dependencyGraph)) {
         this._crudOperations.ensureItIsPossibleToChangeContent(it)
       }
     } catch (e) {
@@ -1836,10 +1836,10 @@ export class HyperFormula implements TypedEmitter {
    * @category Cells
    */
   public isItPossibleToMoveCells(source: SimpleCellRange, destinationLeftCorner: SimpleCellAddress): boolean {
-    if(!isSimpleCellAddress(destinationLeftCorner)) {
+    if (!isSimpleCellAddress(destinationLeftCorner)) {
       throw new ExpectedValueOfTypeError('SimpleCellAddress', 'destinationLeftCorner')
     }
-    if(!isSimpleCellRange(source)) {
+    if (!isSimpleCellRange(source)) {
       throw new ExpectedValueOfTypeError('SimpleCellRange', 'source')
     }
     try {
@@ -1890,10 +1890,10 @@ export class HyperFormula implements TypedEmitter {
    * @category Cells
    */
   public moveCells(source: SimpleCellRange, destinationLeftCorner: SimpleCellAddress): ExportedChange[] {
-    if(!isSimpleCellAddress(destinationLeftCorner)) {
+    if (!isSimpleCellAddress(destinationLeftCorner)) {
       throw new ExpectedValueOfTypeError('SimpleCellAddress', 'destinationLeftCorner')
     }
-    if(!isSimpleCellRange(source)) {
+    if (!isSimpleCellRange(source)) {
       throw new ExpectedValueOfTypeError('SimpleCellRange', 'source')
     }
     const range = new AbsoluteCellRange(source.start, source.end)
@@ -2087,7 +2087,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Clipboard
    */
   public copy(source: SimpleCellRange): CellValue[][] {
-    if(!isSimpleCellRange(source)) {
+    if (!isSimpleCellRange(source)) {
       throw new ExpectedValueOfTypeError('SimpleCellRange', 'source')
     }
     const range = new AbsoluteCellRange(source.start, source.end)
@@ -2119,7 +2119,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Clipboard
    */
   public cut(source: SimpleCellRange): CellValue[][] {
-    if(!isSimpleCellRange(source)) {
+    if (!isSimpleCellRange(source)) {
       throw new ExpectedValueOfTypeError('SimpleCellRange', 'source')
     }
     const range = new AbsoluteCellRange(source.start, source.end)
@@ -2161,7 +2161,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Clipboard
    */
   public paste(targetLeftCorner: SimpleCellAddress): ExportedChange[] {
-    if(!isSimpleCellAddress(targetLeftCorner)) {
+    if (!isSimpleCellAddress(targetLeftCorner)) {
       throw new ExpectedValueOfTypeError('SimpleCellAddress', 'targetLeftCorner')
     }
     this.ensureEvaluationIsNotSuspended()
@@ -2283,7 +2283,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Ranges
    */
   public getRangeValues(source: SimpleCellRange): CellValue[][] {
-    if(!isSimpleCellRange(source)) {
+    if (!isSimpleCellRange(source)) {
       throw new ExpectedValueOfTypeError('SimpleCellRange', 'source')
     }
     const cellRange = new AbsoluteCellRange(source.start, source.end)
@@ -2318,7 +2318,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Ranges
    */
   public getRangeFormulas(source: SimpleCellRange): (string | undefined)[][] {
-    if(!isSimpleCellRange(source)) {
+    if (!isSimpleCellRange(source)) {
       throw new ExpectedValueOfTypeError('SimpleCellRange', 'source')
     }
     const cellRange = new AbsoluteCellRange(source.start, source.end)
@@ -2353,7 +2353,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Ranges
    */
   public getRangeSerialized(source: SimpleCellRange): RawCellContent[][] {
-    if(!isSimpleCellRange(source)) {
+    if (!isSimpleCellRange(source)) {
       throw new ExpectedValueOfTypeError('SimpleCellRange', 'source')
     }
     const cellRange = new AbsoluteCellRange(source.start, source.end)
@@ -2388,15 +2388,15 @@ export class HyperFormula implements TypedEmitter {
    */
 
   public getFillRangeData(source: SimpleCellRange, target: SimpleCellRange): RawCellContent[][] {
-    if(!isSimpleCellRange(source)) {
+    if (!isSimpleCellRange(source)) {
       throw new ExpectedValueOfTypeError('SimpleCellRange', 'source')
     }
-    if(!isSimpleCellRange(target)) {
+    if (!isSimpleCellRange(target)) {
       throw new ExpectedValueOfTypeError('SimpleCellRange', 'target')
     }
     const sourceRange = new AbsoluteCellRange(source.start, source.end)
     const targetRange = new AbsoluteCellRange(target.start, target.end)
-    if(sourceRange.sheet !== targetRange.sheet) {
+    if (sourceRange.sheet !== targetRange.sheet) {
       throw new SheetsNotEqual(sourceRange.sheet, targetRange.sheet)
     }
     this.ensureEvaluationIsNotSuspended()
@@ -2471,7 +2471,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Sheets
    */
   public addSheet(sheetName?: string): string {
-    if(sheetName !== undefined) {
+    if (sheetName !== undefined) {
       validateArgToType(sheetName, 'string', 'sheetName')
     }
     const addedSheetName = this._crudOperations.addSheet(sheetName)
@@ -2729,7 +2729,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Helpers
    */
   public simpleCellAddressToString(simpleCellAddress: SimpleCellAddress, sheetId: number): string | undefined {
-    if(!isSimpleCellAddress(simpleCellAddress)) {
+    if (!isSimpleCellAddress(simpleCellAddress)) {
       throw new ExpectedValueOfTypeError('SimpleCellAddress', 'simpleCellAddress')
     }
     validateArgToType(sheetId, 'number', 'sheetId')
@@ -2756,14 +2756,14 @@ export class HyperFormula implements TypedEmitter {
    */
   public getCellDependents(address: SimpleCellAddress | SimpleCellRange): (SimpleCellRange | SimpleCellAddress)[] {
     let vertex
-    if(isSimpleCellAddress(address)) {
+    if (isSimpleCellAddress(address)) {
       vertex = this._dependencyGraph.addressMapping.getCell(address)
-    } else if(isSimpleCellRange(address)){
+    } else if (isSimpleCellRange(address)) {
       vertex = this._dependencyGraph.rangeMapping.getRange(address.start, address.end)
     } else {
       throw new ExpectedValueOfTypeError('SimpleCellAddress | SimpleCellRange', address)
     }
-    if(vertex===undefined) {
+    if (vertex === undefined) {
       return []
     }
     return this._dependencyGraph.getAdjacentNodesAddresses(vertex)
@@ -2788,14 +2788,14 @@ export class HyperFormula implements TypedEmitter {
    */
   public getCellPrecedents(address: SimpleCellAddress | SimpleCellRange): (SimpleCellRange | SimpleCellAddress)[] {
     let vertex
-    if(isSimpleCellAddress(address)) {
+    if (isSimpleCellAddress(address)) {
       vertex = this._dependencyGraph.addressMapping.getCell(address)
-    } else  if(isSimpleCellRange(address)){
+    } else if (isSimpleCellRange(address)) {
       vertex = this._dependencyGraph.rangeMapping.getRange(address.start, address.end)
     } else {
       throw new ExpectedValueOfTypeError('SimpleCellAddress | SimpleCellRange', address)
     }
-    if(vertex===undefined) {
+    if (vertex === undefined) {
       return []
     }
     return this._dependencyGraph.dependencyQueryAddresses(vertex)
@@ -2922,7 +2922,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Cells
    */
   public getCellType(cellAddress: SimpleCellAddress): CellType {
-    if(!isSimpleCellAddress(cellAddress)) {
+    if (!isSimpleCellAddress(cellAddress)) {
       throw new ExpectedValueOfTypeError('SimpleCellAddress', 'cellAddress')
     }
     const vertex = this.dependencyGraph.getCell(cellAddress)
@@ -2953,7 +2953,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Cells
    */
   public doesCellHaveSimpleValue(cellAddress: SimpleCellAddress): boolean {
-    if(!isSimpleCellAddress(cellAddress)) {
+    if (!isSimpleCellAddress(cellAddress)) {
       throw new ExpectedValueOfTypeError('SimpleCellAddress', 'cellAddress')
     }
     return this.getCellType(cellAddress) === CellType.VALUE
@@ -2983,7 +2983,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Cells
    */
   public doesCellHaveFormula(cellAddress: SimpleCellAddress): boolean {
-    if(!isSimpleCellAddress(cellAddress)) {
+    if (!isSimpleCellAddress(cellAddress)) {
       throw new ExpectedValueOfTypeError('SimpleCellAddress', 'cellAddress')
     }
     return this.getCellType(cellAddress) === CellType.FORMULA
@@ -3013,7 +3013,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Cells
    */
   public isCellEmpty(cellAddress: SimpleCellAddress): boolean {
-    if(!isSimpleCellAddress(cellAddress)) {
+    if (!isSimpleCellAddress(cellAddress)) {
       throw new ExpectedValueOfTypeError('SimpleCellAddress', 'cellAddress')
     }
     return this.getCellType(cellAddress) === CellType.EMPTY
@@ -3040,7 +3040,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Cells
    */
   public isCellPartOfMatrix(cellAddress: SimpleCellAddress): boolean {
-    if(!isSimpleCellAddress(cellAddress)) {
+    if (!isSimpleCellAddress(cellAddress)) {
       throw new ExpectedValueOfTypeError('SimpleCellAddress', 'cellAddress')
     }
     return this.getCellType(cellAddress) === CellType.MATRIX
@@ -3071,7 +3071,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Cells
    */
   public getCellValueType(cellAddress: SimpleCellAddress): CellValueType {
-    if(!isSimpleCellAddress(cellAddress)) {
+    if (!isSimpleCellAddress(cellAddress)) {
       throw new ExpectedValueOfTypeError('SimpleCellAddress', 'cellAddress')
     }
     this.ensureEvaluationIsNotSuspended()
@@ -3104,7 +3104,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Cells
    */
   public getCellValueDetailedType(cellAddress: SimpleCellAddress): CellValueDetailedType {
-    if(!isSimpleCellAddress(cellAddress)) {
+    if (!isSimpleCellAddress(cellAddress)) {
       throw new ExpectedValueOfTypeError('SimpleCellAddress', 'cellAddress')
     }
     this.ensureEvaluationIsNotSuspended()
@@ -3137,7 +3137,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Cells
    */
   public getCellValueFormat(cellAddress: SimpleCellAddress): FormatInfo {
-    if(!isSimpleCellAddress(cellAddress)) {
+    if (!isSimpleCellAddress(cellAddress)) {
       throw new ExpectedValueOfTypeError('SimpleCellAddress', 'cellAddress')
     }
     this.ensureEvaluationIsNotSuspended()
@@ -3402,7 +3402,7 @@ export class HyperFormula implements TypedEmitter {
    */
   public isItPossibleToAddNamedExpression(expressionName: string, expression: RawCellContent, scope?: number): boolean {
     validateArgToType(expressionName, 'string', 'expressionName')
-    if(scope !== undefined) {
+    if (scope !== undefined) {
       validateArgToType(scope, 'number', 'scope')
     }
     try {
@@ -3452,7 +3452,7 @@ export class HyperFormula implements TypedEmitter {
    */
   public addNamedExpression(expressionName: string, expression: RawCellContent, scope?: number, options?: NamedExpressionOptions): ExportedChange[] {
     validateArgToType(expressionName, 'string', 'expressionName')
-    if(scope !== undefined) {
+    if (scope !== undefined) {
       validateArgToType(scope, 'number', 'scope')
     }
     this._crudOperations.addNamedExpression(expressionName, expression, scope, options)
@@ -3488,7 +3488,7 @@ export class HyperFormula implements TypedEmitter {
    */
   public getNamedExpressionValue(expressionName: string, scope?: number): CellValue | undefined {
     validateArgToType(expressionName, 'string', 'expressionName')
-    if(scope !== undefined) {
+    if (scope !== undefined) {
       validateArgToType(scope, 'number', 'scope')
     }
     this.ensureEvaluationIsNotSuspended()
@@ -3528,7 +3528,7 @@ export class HyperFormula implements TypedEmitter {
    */
   public getNamedExpressionFormula(expressionName: string, scope?: number): string | undefined {
     validateArgToType(expressionName, 'string', 'expressionName')
-    if(scope !== undefined) {
+    if (scope !== undefined) {
       validateArgToType(scope, 'number', 'scope')
     }
     this._crudOperations.ensureScopeIdIsValid(scope)
@@ -3562,7 +3562,7 @@ export class HyperFormula implements TypedEmitter {
    * // for this example, returns:
    * // {name: 'prettyName', expression: '=Sheet1!$A$1+100', options: undefined, scope: 0}
    * const myFormula = hfInstance.getNamedExpression('prettyName', 0);
-   * 
+   *
    * // for a named expression that doesn't exist, returns 'undefined':
    * const myFormulaTwo = hfInstance.getNamedExpression('uglyName', 0);
    * ```
@@ -3571,7 +3571,7 @@ export class HyperFormula implements TypedEmitter {
    */
   public getNamedExpression(expressionName: string, scope?: number): NamedExpression | undefined {
     validateArgToType(expressionName, 'string', 'expressionName')
-    if(scope !== undefined) {
+    if (scope !== undefined) {
       validateArgToType(scope, 'number', 'scope')
     }
     const namedExpression = this._namedExpressions.namedExpressionForScope(expressionName, scope)
@@ -3622,7 +3622,7 @@ export class HyperFormula implements TypedEmitter {
    */
   public isItPossibleToChangeNamedExpression(expressionName: string, newExpression: RawCellContent, scope?: number): boolean {
     validateArgToType(expressionName, 'string', 'expressionName')
-    if(scope !== undefined) {
+    if (scope !== undefined) {
       validateArgToType(scope, 'number', 'scope')
     }
     try {
@@ -3668,7 +3668,7 @@ export class HyperFormula implements TypedEmitter {
    */
   public changeNamedExpression(expressionName: string, newExpression: RawCellContent, scope?: number, options?: NamedExpressionOptions): ExportedChange[] {
     validateArgToType(expressionName, 'string', 'expressionName')
-    if(scope !== undefined) {
+    if (scope !== undefined) {
       validateArgToType(scope, 'number', 'scope')
     }
     this._crudOperations.changeNamedExpressionExpression(expressionName, scope, newExpression, options)
@@ -3706,7 +3706,7 @@ export class HyperFormula implements TypedEmitter {
    */
   public isItPossibleToRemoveNamedExpression(expressionName: string, scope?: number): boolean {
     validateArgToType(expressionName, 'string', 'expressionName')
-    if(scope !== undefined) {
+    if (scope !== undefined) {
       validateArgToType(scope, 'number', 'scope')
     }
     try {
@@ -3749,7 +3749,7 @@ export class HyperFormula implements TypedEmitter {
    */
   public removeNamedExpression(expressionName: string, scope?: number): ExportedChange[] {
     validateArgToType(expressionName, 'string', 'expressionName')
-    if(scope !== undefined) {
+    if (scope !== undefined) {
       validateArgToType(scope, 'number', 'scope')
     }
     const removedNamedExpression = this._crudOperations.removeNamedExpression(expressionName, scope)
@@ -3794,7 +3794,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Named Expressions
    */
   public listNamedExpressions(scope?: number): string[] {
-    if(scope !== undefined) {
+    if (scope !== undefined) {
       validateArgToType(scope, 'number', 'scope')
     }
     this._crudOperations.ensureScopeIdIsValid(scope)
@@ -4057,7 +4057,7 @@ export class HyperFormula implements TypedEmitter {
     return numberToSimpleTime(inputNumber)
   }
 
-  private extractTemporaryFormula(formulaString: string, sheetId: number = 1): {ast?: Ast, address: SimpleCellAddress, dependencies: RelativeDependency[]} {
+  private extractTemporaryFormula(formulaString: string, sheetId: number = 1): { ast?: Ast, address: SimpleCellAddress, dependencies: RelativeDependency[] } {
     const parsedCellContent = this._cellContentParser.parse(formulaString)
     const address = {sheet: sheetId, col: 0, row: 0}
     if (!(parsedCellContent instanceof CellContent.Formula)) {
@@ -4076,7 +4076,7 @@ export class HyperFormula implements TypedEmitter {
   /**
    * Subscribes to an event.
    * For the list of all available events, see [[Listeners]].
-   * 
+   *
    * @param {Event} event the name of the event to subscribe to
    * @param {Listener} listener to be called when event is emitted
    *

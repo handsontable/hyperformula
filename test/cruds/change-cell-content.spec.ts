@@ -1004,29 +1004,49 @@ describe('arrays', () => {
     ])
   })
 
-  it('should handle dependent vertices after shrinking array', () => {
+  it('should adjust dependent formulas after shrinking array', () => {
     const engine = HyperFormula.buildFromArray([
       [1, 2, 3, '=-A1:C1', null, null, 4],
-      ['=D1', '=E1', '=SUM(F1:F1)', '=SUM(F1:G1)'],
+      ['=D1', '=E1', '=SUM(E1, F1:G1)'],
     ], {useArrayArithmetic: true})
 
-    expect(engine.getCellValue(adr('A2'))).toEqual(-1)
-    expect(engine.getCellValue(adr('B2'))).toEqual(-2)
-    expect(engine.getCellValue(adr('C2'))).toEqual(-3)
-    expect(engine.getCellValue(adr('D2'))).toEqual(1)
-
-    engine.setCellContents(adr('E1'), [[null]])
+    engine.setCellContents(adr('E1'), [['foo']])
     engine.setCellContents(adr('D1'), [[4, 5, 6]])
 
     expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
       [1, 2, 3, 4, 5, 6, 4],
-      ['=D1', '=E1', '=SUM(F1:F1)', '=SUM(F1:G1)']
+      ['=D1', '=E1', '=SUM(E1, F1:G1)']
     ], {useArrayArithmetic: true}))
+  })
 
-    expect(engine.getCellValue(adr('A2'))).toEqual(4)
-    expect(engine.getCellValue(adr('B2'))).toEqual(5)
-    expect(engine.getCellValue(adr('C2'))).toEqual(6)
-    expect(engine.getCellValue(adr('D2'))).toEqual(10)
+  it('should adjust dependent ranges after shrinking array taking smaller vertices into account', () => {
+    const engine = HyperFormula.buildFromArray([
+      [1, '=-A1:A3', '=SUM(B1:B2)', '=SUM(B1:B3)'],
+      [2],
+      [3],
+    ], {useArrayArithmetic: true})
+
+    engine.setCellContents(adr('B1'), 'foo')
+    engine.setCellContents(adr('B1'), [[4], [5], [6]])
+
+    const b1 = engine.dependencyGraph.getCell(adr('b1'))!
+    const b2 = engine.dependencyGraph.getCell(adr('b2'))!
+    const b3 = engine.dependencyGraph.getCell(adr('b3'))!
+    const b1b2 = engine.rangeMapping.getRange(adr('b1'), adr('b2'))!
+    const b1b3 = engine.rangeMapping.getRange(adr('b1'), adr('b3'))!
+
+    expect(engine.graph.existsEdge(b1, b1b2)).toBe(true)
+    expect(engine.graph.existsEdge(b2, b1b2)).toBe(true)
+    expect(engine.graph.existsEdge(b1b2, b1b3)).toBe(true)
+    expect(engine.graph.existsEdge(b1, b1b3)).toBe(false)
+    expect(engine.graph.existsEdge(b2, b1b3)).toBe(false)
+    expect(engine.graph.existsEdge(b3, b1b3)).toBe(true)
+
+    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
+      [1, 4, '=SUM(B1:B2)', '=SUM(B1:B3)'],
+      [2, 5],
+      [3, 6],
+    ], {useArrayArithmetic: true}))
   })
 
   it('should return values of a range in changes', () => {
@@ -1088,7 +1108,7 @@ describe('arrays', () => {
       ['=-A1:B1'],
     ], { useArrayArithmetic: true})
 
-    const changes = engine.setCellContents(adr('A2'), [[null]])
+    const changes = engine.setCellContents(adr('A2'), null)
 
     expect(changes.length).toEqual(2)
     expect(changes).toContainEqual(new ExportedCellChange(adr('A2'), null))
@@ -1101,7 +1121,7 @@ describe('arrays', () => {
       ['=-A1:B1'],
     ], { useArrayArithmetic: true})
 
-    const changes = engine.setCellContents(adr('B2'), [[null]])
+    const changes = engine.setCellContents(adr('B2'), null)
 
     expect(changes.length).toEqual(0)
   })
