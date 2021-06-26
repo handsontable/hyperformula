@@ -45,7 +45,6 @@ import {MatrixMapping} from './MatrixMapping'
 import {RangeMapping} from './RangeMapping'
 import {SheetMapping} from './SheetMapping'
 import {RawAndParsedValue} from './ValueCellVertex'
-import internal from 'stream'
 
 export class DependencyGraph {
   /**
@@ -349,7 +348,7 @@ export class DependencyGraph {
     this.addStructuralNodesToChangeSet()
   }
 
-  public removeColumns(removedColumns: ColumnsSpan): [Set<MatrixVertex>, ContentChanges]  {
+  public removeColumns(removedColumns: ColumnsSpan): [Set<MatrixVertex>, ContentChanges, [SimpleCellAddress, InterpreterValue][]]  {
     this.stats.measure(StatType.ADJUSTING_GRAPH, () => {
       for (const [address, vertex] of this.addressMapping.entriesFromColumnsSpan(removedColumns)) {
         for (const adjacentNode of this.graph.adjacentNodes(vertex)) {
@@ -376,13 +375,13 @@ export class DependencyGraph {
       return this.getMatrixVerticesRelatedToRanges(affectedRanges)
     })
 
-    this.stats.measure(StatType.ADJUSTING_MATRIX_MAPPING, () => {
-      this.fixMatricesAfterRemovingColumns(removedColumns.sheet, removedColumns.columnStart, removedColumns.numberOfColumns)
+    const valuesToUdpateInIndex = this.stats.measure(StatType.ADJUSTING_MATRIX_MAPPING, () => {
+      return this.fixMatricesAfterRemovingColumns(removedColumns.sheet, removedColumns.columnStart, removedColumns.numberOfColumns)
     })
 
     this.addStructuralNodesToChangeSet()
 
-    return [affectedMatrices, this.getAndClearContentChanges()]
+    return [affectedMatrices, this.getAndClearContentChanges(), valuesToUdpateInIndex]
   }
 
   public addRows(addedRows: RowsSpan): AddRowsResult {
@@ -1068,20 +1067,24 @@ export class DependencyGraph {
     return valuesToRemoveFromIndex
   }
 
-  private fixMatricesAfterRemovingColumns(sheet: number, columnStart: number, numberOfColumns: number) {
+  private fixMatricesAfterRemovingColumns(sheet: number, columnStart: number, numberOfColumns: number): [SimpleCellAddress, InterpreterValue][] {
+    const valuesToUpdateInIndex: [SimpleCellAddress, InterpreterValue][] = []
     this.matrixMapping.moveMatrixVerticesAfterColumnByColumns(sheet, columnStart, -numberOfColumns)
     if (columnStart <= 0) {
-      return
+      return []
     }
     for (const [, matrix] of this.matrixMapping.matricesInCols(ColumnsSpan.fromColumnStartAndEnd(sheet, columnStart - 1, columnStart - 1))) {
       if (this.isThereSpaceForMatrix(matrix)) {
         for (const address of matrix.getRange().addresses(this)) {
+          const value = matrix.getMatrixCellValue(address)
+          valuesToUpdateInIndex.push([address, value])
           this.addressMapping.setCell(address, matrix)
         }
       } else {
         this.setNoSpaceIfMatrix(matrix)
       }
     }
+    return valuesToUpdateInIndex
   }
 
   private shrinkPossibleMatrixAndGetCell(address: SimpleCellAddress): Maybe<CellVertex> {

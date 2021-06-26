@@ -517,9 +517,12 @@ export class Operations {
       removedCells.push({address, cellType: this.getClipboardCell(address)})
     }
 
-    const [affectedMatrices, changes] = this.dependencyGraph.removeColumns(columnsToRemove)
-    this.columnSearch.removeColumns(columnsToRemove)
+    const [affectedMatrices, changes, valuesToUpdateInIndex] = this.dependencyGraph.removeColumns(columnsToRemove)
     this.columnSearch.applyChanges(changes.getChanges())
+    this.columnSearch.removeColumns(columnsToRemove)
+    for (const [address, value] of valuesToUpdateInIndex) {
+      this.columnSearch.add(getRawValue(value), address)
+    }
 
     let version: number
     this.stats.measure(StatType.TRANSFORM_ASTS, () => {
