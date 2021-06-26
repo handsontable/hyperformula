@@ -1094,8 +1094,6 @@ describe('arrays', () => {
 
     const changes = engine.setCellContents(adr('B2'), [['=SUM(']])
 
-    console.log(engine.getSheetValues(0))
-
     expect(changes.length).toEqual(3)
     expect(changes).toContainEqual(new ExportedCellChange(adr('A2'), noSpace()))
     expect(changes).toContainEqual(new ExportedCellChange(adr('B2'), detailedError(ErrorType.ERROR, ErrorMessage.ParseError)))
