@@ -400,14 +400,19 @@ export class DependencyGraph {
     return { affectedArrays }
   }
 
-  public addColumns(addedColumns: ColumnsSpan) {
+  public addColumns(addedColumns: ColumnsSpan): Set<MatrixVertex>  {
     this.stats.measure(StatType.ADJUSTING_ADDRESS_MAPPING, () => {
       this.addressMapping.addColumns(addedColumns.sheet, addedColumns.columnStart, addedColumns.numberOfColumns)
     })
 
-    this.stats.measure(StatType.ADJUSTING_RANGES, () => {
-      this.rangeMapping.moveAllRangesInSheetAfterColumnByColumns(addedColumns.sheet, addedColumns.columnStart, addedColumns.numberOfColumns)
+    const affectedMatrices = this.stats.measure(StatType.ADJUSTING_RANGES, () => {
+      const result = this.rangeMapping.moveAllRangesInSheetAfterColumnByColumns(addedColumns.sheet, addedColumns.columnStart, addedColumns.numberOfColumns)
       this.fixRangesWhenAddingColumns(addedColumns.sheet, addedColumns.columnStart, addedColumns.numberOfColumns)
+      return this.getMatrixVerticesRelatedToRanges(result.verticesWithChangedSize)
+    })
+
+    this.stats.measure(StatType.ADJUSTING_MATRIX_MAPPING, () => {
+      this.fixMatricesAfterAddingColumn(addedColumns.sheet, addedColumns.columnStart, addedColumns.numberOfColumns)
     })
 
     for (const vertex of this.addressMapping.verticesFromColumnsSpan(addedColumns)) {
@@ -415,6 +420,8 @@ export class DependencyGraph {
     }
 
     this.addStructuralNodesToChangeSet()
+
+    return affectedMatrices
   }
 
   public ensureNoMatrixInRange(range: AbsoluteCellRange) {
@@ -1026,6 +1033,24 @@ export class DependencyGraph {
         }
       } else {
         this.setNoSpaceIfMatrix(matrix)
+      }
+    }
+  }
+
+
+  private fixMatricesAfterAddingColumn(sheet: number, columnStart: number, numberOfColumns: number) {
+    this.matrixMapping.moveMatrixVerticesAfterColumnByColumns(sheet, columnStart, numberOfColumns)
+    if (columnStart <= 0) {
+      return
+    }
+    for (const [, matrix] of this.matrixMapping.matricesInCols(ColumnsSpan.fromColumnStartAndEnd(sheet, columnStart - 1, columnStart - 1))) {
+      const matrixRange = matrix.getRange()
+      for (let row = matrixRange.start.row; row <= matrixRange.end.row; ++row) {
+        for (let col = columnStart; col <= matrixRange.end.col; ++col) {
+          const destination = simpleCellAddress(sheet, col, row)
+          const source = simpleCellAddress(sheet, col + numberOfColumns, row)
+          this.addressMapping.moveCell(source, destination)
+        }
       }
     }
   }

@@ -584,7 +584,7 @@ export class Operations {
       return
     }
 
-    this.dependencyGraph.addColumns(addedColumns)
+    const affectedMatrices = this.dependencyGraph.addColumns(addedColumns)
     this.columnSearch.addColumns(addedColumns)
 
     this.stats.measure(StatType.TRANSFORM_ASTS, () => {
@@ -592,6 +592,8 @@ export class Operations {
       transformation.performEagerTransformations(this.dependencyGraph, this.parser)
       this.lazilyTransformingAstService.addTransformation(transformation)
     })
+
+    this.rewriteAffectedMatrices(affectedMatrices)
   }
 
   public getOldContent(address: SimpleCellAddress): [SimpleCellAddress, ClipboardCell] {

@@ -496,13 +496,6 @@ export class CrudOperations {
       if (!isNonnegativeInteger(column) || !isPositiveInteger(numberOfColumnsToAdd)) {
         throw new InvalidArgumentsError('column number to be nonnegative and number of columns to add to be positive.')
       }
-
-      if (isPositiveInteger(column)
-        && this.dependencyGraph.matrixMapping.isFormulaMatrixInColumn(sheet, column - 1)
-        && this.dependencyGraph.matrixMapping.isFormulaMatrixInColumn(sheet, column)
-      ) {
-        throw new TargetLocationHasMatrixError()
-      }
     }
   }
 
