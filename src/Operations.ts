@@ -584,8 +584,11 @@ export class Operations {
       return
     }
 
-    const affectedMatrices = this.dependencyGraph.addColumns(addedColumns)
+    const [affectedMatrices, valuesToRemoveFromIndex] = this.dependencyGraph.addColumns(addedColumns)
     this.columnSearch.addColumns(addedColumns)
+    for (const [address, value] of valuesToRemoveFromIndex) {
+      this.columnSearch.remove(getRawValue(value), address)
+    }
 
     this.stats.measure(StatType.TRANSFORM_ASTS, () => {
       const transformation = new AddColumnsTransformer(addedColumns)

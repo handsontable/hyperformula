@@ -45,6 +45,7 @@ import {MatrixMapping} from './MatrixMapping'
 import {RangeMapping} from './RangeMapping'
 import {SheetMapping} from './SheetMapping'
 import {RawAndParsedValue} from './ValueCellVertex'
+import internal from 'stream'
 
 export class DependencyGraph {
   /**
@@ -400,7 +401,7 @@ export class DependencyGraph {
     return { affectedArrays }
   }
 
-  public addColumns(addedColumns: ColumnsSpan): Set<MatrixVertex>  {
+  public addColumns(addedColumns: ColumnsSpan): [Set<MatrixVertex>, [SimpleCellAddress, InterpreterValue][]]  {
     this.stats.measure(StatType.ADJUSTING_ADDRESS_MAPPING, () => {
       this.addressMapping.addColumns(addedColumns.sheet, addedColumns.columnStart, addedColumns.numberOfColumns)
     })
@@ -411,8 +412,8 @@ export class DependencyGraph {
       return this.getMatrixVerticesRelatedToRanges(result.verticesWithChangedSize)
     })
 
-    this.stats.measure(StatType.ADJUSTING_MATRIX_MAPPING, () => {
-      this.fixMatricesAfterAddingColumn(addedColumns.sheet, addedColumns.columnStart, addedColumns.numberOfColumns)
+    const valuesToRemoveFromIndex = this.stats.measure(StatType.ADJUSTING_MATRIX_MAPPING, () => {
+      return this.fixMatricesAfterAddingColumn(addedColumns.sheet, addedColumns.columnStart, addedColumns.numberOfColumns)
     })
 
     for (const vertex of this.addressMapping.verticesFromColumnsSpan(addedColumns)) {
@@ -421,7 +422,7 @@ export class DependencyGraph {
 
     this.addStructuralNodesToChangeSet()
 
-    return affectedMatrices
+    return [affectedMatrices, valuesToRemoveFromIndex]
   }
 
   public ensureNoMatrixInRange(range: AbsoluteCellRange) {
@@ -1038,10 +1039,11 @@ export class DependencyGraph {
   }
 
 
-  private fixMatricesAfterAddingColumn(sheet: number, columnStart: number, numberOfColumns: number) {
+  private fixMatricesAfterAddingColumn(sheet: number, columnStart: number, numberOfColumns: number): [SimpleCellAddress, InterpreterValue][] {
+    const valuesToRemoveFromIndex: [SimpleCellAddress, InterpreterValue][] = []
     this.matrixMapping.moveMatrixVerticesAfterColumnByColumns(sheet, columnStart, numberOfColumns)
     if (columnStart <= 0) {
-      return
+      return []
     }
     for (const [, matrix] of this.matrixMapping.matricesInCols(ColumnsSpan.fromColumnStartAndEnd(sheet, columnStart - 1, columnStart - 1))) {
       const matrixRange = matrix.getRange()
@@ -1049,10 +1051,13 @@ export class DependencyGraph {
         for (let col = columnStart; col <= matrixRange.end.col; ++col) {
           const destination = simpleCellAddress(sheet, col, row)
           const source = simpleCellAddress(sheet, col + numberOfColumns, row)
+          const value = matrix.getMatrixCellValue(destination)
           this.addressMapping.moveCell(source, destination)
+          valuesToRemoveFromIndex.push([source, value])
         }
       }
     }
+    return valuesToRemoveFromIndex
   }
 
   private shrinkPossibleMatrixAndGetCell(address: SimpleCellAddress): Maybe<CellVertex> {

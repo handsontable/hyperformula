@@ -12,7 +12,7 @@ import {ColumnIndex} from '../src/Lookup/ColumnIndex'
 import {NamedExpressions} from '../src/NamedExpressions'
 import {ColumnsSpan, RowsSpan} from '../src/Span'
 import {Statistics} from '../src/statistics'
-import {adr, expectColumnIndexToMatchSheet} from './testUtils'
+import {adr, columnIndexToSheet, expectColumnIndexToMatchSheet} from './testUtils'
 import {HyperFormula} from '../src'
 import {EmptyValue} from '../src/interpreter/InterpreterValue'
 
@@ -714,6 +714,34 @@ describe('Arrays', () => {
       [-2, 'foo'],
       [-2, 1],
       [-1, 2],
+    ], engine)
+  })
+
+  it('should move array values when adding columns before array', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=-C2:D2'],
+      [null, 'foo', 1, 2]
+    ], {useArrayArithmetic: true, useColumnIndex: true})
+
+    engine.addColumns(0, [0, 1])
+
+    expectColumnIndexToMatchSheet([
+      [null, -1, -2],
+      [null, null, 'foo', 1, 2]
+    ], engine)
+  })
+
+  it('should not move array values when adding columns', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=-C2:E2', null, null, -3, -2, -1],
+      [null, 'foo', 1, 2, 3]
+    ], {useArrayArithmetic: true, useColumnIndex: true})
+
+    engine.addColumns(0, [1, 1])
+
+    expectColumnIndexToMatchSheet([
+      [-1, -2, -3, null, -3, -2, -1],
+      [null, null, 'foo', 1, 2, 3]
     ], engine)
   })
 
