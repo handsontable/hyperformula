@@ -349,18 +349,19 @@ export class DependencyGraph {
     this.addStructuralNodesToChangeSet()
   }
 
-  public removeColumns(removedColumns: ColumnsSpan) {
-    if (this.matrixMapping.isFormulaMatrixInColumns(removedColumns)) {
-      throw Error('It is not possible to remove column within matrix')
-    }
-
+  public removeColumns(removedColumns: ColumnsSpan): [Set<MatrixVertex>, ContentChanges]  {
     this.stats.measure(StatType.ADJUSTING_GRAPH, () => {
-      for (const vertex of this.addressMapping.verticesFromColumnsSpan(removedColumns)) {
+      for (const [address, vertex] of this.addressMapping.entriesFromColumnsSpan(removedColumns)) {
         for (const adjacentNode of this.graph.adjacentNodes(vertex)) {
           this.graph.markNodeAsSpecialRecentlyChanged(adjacentNode)
         }
         if (vertex instanceof MatrixVertex) {
-          continue
+          if (vertex.isLeftCorner(address)) {
+            this.shrinkMatrixToCorner(vertex)
+            this.matrixMapping.removeMatrix(vertex.getRange())
+          } else {
+            continue
+          }
         }
         this.removeVertex(vertex)
       }
@@ -370,11 +371,18 @@ export class DependencyGraph {
       this.addressMapping.removeColumns(removedColumns)
     })
 
-    this.stats.measure(StatType.ADJUSTING_RANGES, () => {
-      this.truncateRanges(removedColumns, address => address.col)
+    const affectedMatrices = this.stats.measure(StatType.ADJUSTING_RANGES, () => {
+      const affectedRanges = this.truncateRanges(removedColumns, address => address.col)
+      return this.getMatrixVerticesRelatedToRanges(affectedRanges)
+    })
+
+    this.stats.measure(StatType.ADJUSTING_MATRIX_MAPPING, () => {
+      this.fixMatricesAfterRemovingColumns(removedColumns.sheet, removedColumns.columnStart, removedColumns.numberOfColumns)
     })
 
     this.addStructuralNodesToChangeSet()
+
+    return [affectedMatrices, this.getAndClearContentChanges()]
   }
 
   public addRows(addedRows: RowsSpan): AddRowsResult {
@@ -398,10 +406,10 @@ export class DependencyGraph {
 
     this.addStructuralNodesToChangeSet()
 
-    return { affectedArrays }
+    return {affectedArrays}
   }
 
-  public addColumns(addedColumns: ColumnsSpan): [Set<MatrixVertex>, [SimpleCellAddress, InterpreterValue][]]  {
+  public addColumns(addedColumns: ColumnsSpan): [Set<MatrixVertex>, [SimpleCellAddress, InterpreterValue][]] {
     this.stats.measure(StatType.ADJUSTING_ADDRESS_MAPPING, () => {
       this.addressMapping.addColumns(addedColumns.sheet, addedColumns.columnStart, addedColumns.numberOfColumns)
     })
@@ -1058,6 +1066,22 @@ export class DependencyGraph {
       }
     }
     return valuesToRemoveFromIndex
+  }
+
+  private fixMatricesAfterRemovingColumns(sheet: number, columnStart: number, numberOfColumns: number) {
+    this.matrixMapping.moveMatrixVerticesAfterColumnByColumns(sheet, columnStart, -numberOfColumns)
+    if (columnStart <= 0) {
+      return
+    }
+    for (const [, matrix] of this.matrixMapping.matricesInCols(ColumnsSpan.fromColumnStartAndEnd(sheet, columnStart - 1, columnStart - 1))) {
+      if (this.isThereSpaceForMatrix(matrix)) {
+        for (const address of matrix.getRange().addresses(this)) {
+          this.addressMapping.setCell(address, matrix)
+        }
+      } else {
+        this.setNoSpaceIfMatrix(matrix)
+      }
+    }
   }
 
   private shrinkPossibleMatrixAndGetCell(address: SimpleCellAddress): Maybe<CellVertex> {

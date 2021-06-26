@@ -474,7 +474,6 @@ export class CrudOperations {
       if (rowEnd < rowStart) {
         throw new InvalidArgumentsError('starting row to be smaller than the ending row.')
       }
-
       if (!this.sheetMapping.hasSheetWithId(sheet)) {
         throw new NoSheetWithIdError(sheet)
       }
@@ -509,14 +508,8 @@ export class CrudOperations {
       if (columnEnd < columnStart) {
         throw new InvalidArgumentsError('starting column to be smaller than the ending column.')
       }
-      const columnsToRemove = ColumnsSpan.fromColumnStartAndEnd(sheet, columnStart, columnEnd)
-
       if (!this.sheetMapping.hasSheetWithId(sheet)) {
         throw new NoSheetWithIdError(sheet)
-      }
-
-      if (this.dependencyGraph.matrixMapping.isFormulaMatrixInColumns(columnsToRemove)) {
-        throw new SourceLocationHasMatrixError()
       }
     }
   }
