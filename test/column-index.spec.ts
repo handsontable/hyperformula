@@ -327,7 +327,7 @@ describe('ColumnIndex#find', () => {
   const stats = new Statistics()
   const transformService = new LazilyTransformingAstService(stats)
 
-  it('should find row number', function () {
+  it('should find row number', () => {
     const index = buildEmptyIndex(transformService, new Config(), stats)
 
     index.add(1, adr('A2'))
@@ -336,7 +336,7 @@ describe('ColumnIndex#find', () => {
     expect(row).toBe(1)
   })
 
-  it('should find smallest row number for value', function () {
+  it('should find smallest row number for value', () => {
     const index = buildEmptyIndex(transformService, new Config(), stats)
 
     index.add(1, adr('A4'))
@@ -531,7 +531,7 @@ describe('ColumnIndex#removeRows', () => {
 })
 
 describe('ColumnIndex - lazy cruds', () => {
-  it('should add rows only in specific column after find', function () {
+  it('should add rows only in specific column after find', () => {
     const stats = new Statistics()
     const transformService = new LazilyTransformingAstService(stats)
     const index = buildEmptyIndex(transformService, new Config(), stats)
@@ -551,7 +551,7 @@ describe('ColumnIndex - lazy cruds', () => {
     expect(index.getValueIndex(0, 1, 1).index).toEqual([1])
   })
 
-  it('should add rows only for specific value after find', function () {
+  it('should add rows only for specific value after find', () => {
     const stats = new Statistics()
     const transformService = new LazilyTransformingAstService(stats)
     const index = buildEmptyIndex(transformService, new Config(), stats)
