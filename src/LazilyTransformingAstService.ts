@@ -64,7 +64,7 @@ export class LazilyTransformingAstService {
       ast = newAst
       address = newAddress
     }
-    const [hash, cachedAst] = this.parser!.rememberNewAst(ast)
+    const cachedAst = this.parser!.rememberNewAst(ast)
 
     this.stats.end(StatType.TRANSFORM_ASTS_POSTPONED)
     return [cachedAst, address, this.transformations.length]

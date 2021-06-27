@@ -483,7 +483,7 @@ export class Operations {
       removedCells.push({address, cellType: this.getClipboardCell(address)})
     }
 
-    const { affectedArrays, contentChanges } = this.dependencyGraph.removeRows(rowsToRemove)
+    const {affectedArrays, contentChanges} = this.dependencyGraph.removeRows(rowsToRemove)
 
     this.columnSearch.applyChanges(contentChanges.getChanges())
 
@@ -548,7 +548,7 @@ export class Operations {
       return
     }
 
-    const { affectedArrays } = this.dependencyGraph.addRows(addedRows)
+    const {affectedArrays} = this.dependencyGraph.addRows(addedRows)
 
     this.stats.measure(StatType.TRANSFORM_ASTS, () => {
       const transformation = new AddRowsTransformer(addedRows)

@@ -31,7 +31,7 @@ export abstract class Transformer implements FormulaTransformer {
   public performEagerTransformations(graph: DependencyGraph, parser: ParserWithCaching): void {
     for (const node of graph.matrixFormulaNodes()) {
       const [newAst, newAddress] = this.transformSingleAst(node.getFormula(graph.lazilyTransformingAstService), node.getAddress(graph.lazilyTransformingAstService))
-      const [hash, cachedAst] = parser.rememberNewAst(newAst)
+      const cachedAst = parser.rememberNewAst(newAst)
       node.setFormula(cachedAst)
       node.setAddress(newAddress)
     }
