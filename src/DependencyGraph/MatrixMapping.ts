@@ -65,7 +65,7 @@ export class MatrixMapping {
     return false
   }
 
-  public isFormulaMatrixInAllRows(span: RowsSpan) {
+  public isFormulaMatrixInAllRows(span: RowsSpan): boolean {
     let result = true
     for (const row of span.rows()) {
       if (!this.isFormulaMatrixInRow(span.sheet, row)) {
@@ -84,13 +84,14 @@ export class MatrixMapping {
     return false
   }
 
-  public isFormulaMatrixInColumns(span: ColumnsSpan) {
+  public isFormulaMatrixInAllColumns(span: ColumnsSpan): boolean {
+    let result = true
     for (const col of span.columns()) {
-      if (this.isFormulaMatrixInColumn(span.sheet, col)) {
-        return true
+      if (!this.isFormulaMatrixInColumn(span.sheet, col)) {
+        result = false
       }
     }
-    return false
+    return result
   }
 
   public isFormulaMatrixInRange(range: AbsoluteCellRange) {

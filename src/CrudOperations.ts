@@ -563,6 +563,9 @@ export class CrudOperations {
     if (this.dependencyGraph.matrixMapping.isFormulaMatrixInRange(sourceRange)) {
       throw new SourceLocationHasMatrixError()
     }
+    if (targetColumn > 0 && this.dependencyGraph.matrixMapping.isFormulaMatrixInAllColumns(ColumnsSpan.fromNumberOfColumns(sheet, targetColumn - 1, 2))) {
+      throw new TargetLocationHasMatrixError()
+    }
   }
 
   public ensureItIsPossibleToAddSheet(name: string): void {
