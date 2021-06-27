@@ -41,6 +41,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed an issue with matrixDetection + number parsing. (#686)
 - Fixed an issue with NOW and TODAY functions. (#709)
 - Fixed an issue with MIN/MAX function caches. (#711)
+- Fixed an issue with caching and order of evaluation. (#735)
 
 ## [0.6.2] - 2021-05-26
 
