@@ -1202,7 +1202,7 @@ describe('arrays', () => {
     ], {useArrayArithmetic: true}))
   })
 
-  it.skip('should recalculate matrix if space is available', () => {
+  xit('should recalculate matrix if space is available', () => {
     const engine = HyperFormula.buildFromArray([
       ['=+C1:D1', 'foo', 1, 2]
     ], {useArrayArithmetic: true})
