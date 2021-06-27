@@ -329,7 +329,7 @@ const sharedExamples = (builder: (width: number, height: number) => AddressMappi
   it('should throw error when trying to move not existing vertex', () => {
     const mapping = builder(1, 2)
 
-    expect(() => mapping.moveCell(adr('A1'), adr('A2'))).toThrow(Error('Cannot move cell. No cell with such address.'))
+    expect(() => mapping.moveCell(adr('A1'), adr('A2'))).toThrowError('Cannot move cell. No cell with such address.')
   })
 
   it('should throw error when trying to move vertex onto occupied place', () => {
@@ -337,21 +337,21 @@ const sharedExamples = (builder: (width: number, height: number) => AddressMappi
     mapping.setCell(adr('A1'), new ValueCellVertex(42, 42))
     mapping.setCell(adr('A2'), new ValueCellVertex(42, 42))
 
-    expect(() => mapping.moveCell(adr('A1'), adr('A2'))).toThrow(Error('Cannot move cell. Destination already occupied.'))
+    expect(() => mapping.moveCell(adr('A1'), adr('A2'))).toThrowError('Cannot move cell. Destination already occupied.')
   })
 
   it('should throw error when trying to move vertices between sheets', () => {
     const mapping = builder(1, 2)
     mapping.setCell(adr('A1', 0), new ValueCellVertex(42, 42))
 
-    expect(() => mapping.moveCell(adr('A1', 0), adr('A2', 1))).toThrow('Cannot move cells between sheets.')
+    expect(() => mapping.moveCell(adr('A1', 0), adr('A2', 1))).toThrowError('Cannot move cells between sheets.')
   })
 
   it('should throw error when trying to move vertices in non-existing sheet', () => {
     const mapping = builder(1, 2)
     mapping.setCell(adr('A1', 0), new ValueCellVertex(42, 42))
 
-    expect(() => mapping.moveCell(adr('A1', 3), adr('A2', 3))).toThrow('Sheet not initialized.')
+    expect(() => mapping.moveCell(adr('A1', 3), adr('A2', 3))).toThrowError('Sheet not initialized.')
   })
 }
 
