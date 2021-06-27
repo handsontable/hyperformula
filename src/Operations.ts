@@ -517,12 +517,9 @@ export class Operations {
       removedCells.push({address, cellType: this.getClipboardCell(address)})
     }
 
-    const [affectedMatrices, changes, valuesToUpdateInIndex] = this.dependencyGraph.removeColumns(columnsToRemove)
-    this.columnSearch.applyChanges(changes.getChanges())
+    const {affectedArrays, contentChanges} = this.dependencyGraph.removeColumns(columnsToRemove)
+    this.columnSearch.applyChanges(contentChanges.getChanges())
     this.columnSearch.removeColumns(columnsToRemove)
-    for (const [address, value] of valuesToUpdateInIndex) {
-      this.columnSearch.add(getRawValue(value), address)
-    }
 
     let version: number
     this.stats.measure(StatType.TRANSFORM_ASTS, () => {
@@ -531,7 +528,7 @@ export class Operations {
       version = this.lazilyTransformingAstService.addTransformation(transformation)
     })
 
-    this.rewriteAffectedMatrices(affectedMatrices)
+    this.rewriteAffectedMatrices(affectedArrays)
 
     return {
       version: version!,
@@ -590,11 +587,9 @@ export class Operations {
       return
     }
 
-    const [affectedMatrices, valuesToRemoveFromIndex] = this.dependencyGraph.addColumns(addedColumns)
+    const {affectedArrays, contentChanges} = this.dependencyGraph.addColumns(addedColumns)
     this.columnSearch.addColumns(addedColumns)
-    for (const [address, value] of valuesToRemoveFromIndex) {
-      this.columnSearch.remove(getRawValue(value), address)
-    }
+    this.columnSearch.applyChanges(contentChanges.getChanges())
 
     this.stats.measure(StatType.TRANSFORM_ASTS, () => {
       const transformation = new AddColumnsTransformer(addedColumns)
@@ -602,7 +597,7 @@ export class Operations {
       this.lazilyTransformingAstService.addTransformation(transformation)
     })
 
-    this.rewriteAffectedMatrices(affectedMatrices)
+    this.rewriteAffectedMatrices(affectedArrays)
   }
 
   public getOldContent(address: SimpleCellAddress): [SimpleCellAddress, ClipboardCell] {

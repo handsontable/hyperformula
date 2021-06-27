@@ -254,7 +254,7 @@ export class DependencyGraph {
     return vertex
   }
 
-  public removeRows(removedRows: RowsSpan): RemoveRowsResult {
+  public removeRows(removedRows: RowsSpan): EagerChangesGraphChangeResult {
     this.stats.measure(StatType.ADJUSTING_GRAPH, () => {
       for (const [address, vertex] of this.addressMapping.entriesFromRowsSpan(removedRows)) {
         for (const adjacentNode of this.graph.adjacentNodes(vertex)) {
@@ -348,7 +348,7 @@ export class DependencyGraph {
     this.addStructuralNodesToChangeSet()
   }
 
-  public removeColumns(removedColumns: ColumnsSpan): [Set<MatrixVertex>, ContentChanges, [SimpleCellAddress, InterpreterValue][]]  {
+  public removeColumns(removedColumns: ColumnsSpan): EagerChangesGraphChangeResult {
     this.stats.measure(StatType.ADJUSTING_GRAPH, () => {
       for (const [address, vertex] of this.addressMapping.entriesFromColumnsSpan(removedColumns)) {
         for (const adjacentNode of this.graph.adjacentNodes(vertex)) {
@@ -370,21 +370,24 @@ export class DependencyGraph {
       this.addressMapping.removeColumns(removedColumns)
     })
 
-    const affectedMatrices = this.stats.measure(StatType.ADJUSTING_RANGES, () => {
+    const affectedArrays = this.stats.measure(StatType.ADJUSTING_RANGES, () => {
       const affectedRanges = this.truncateRanges(removedColumns, address => address.col)
       return this.getMatrixVerticesRelatedToRanges(affectedRanges)
     })
 
-    const valuesToUdpateInIndex = this.stats.measure(StatType.ADJUSTING_MATRIX_MAPPING, () => {
+    this.stats.measure(StatType.ADJUSTING_MATRIX_MAPPING, () => {
       return this.fixMatricesAfterRemovingColumns(removedColumns.sheet, removedColumns.columnStart, removedColumns.numberOfColumns)
     })
 
     this.addStructuralNodesToChangeSet()
 
-    return [affectedMatrices, this.getAndClearContentChanges(), valuesToUdpateInIndex]
+    return {
+      affectedArrays,
+      contentChanges: this.getAndClearContentChanges(),
+    }
   }
 
-  public addRows(addedRows: RowsSpan): AddRowsResult {
+  public addRows(addedRows: RowsSpan): ArrayAffectingGraphChangeResult {
     this.stats.measure(StatType.ADJUSTING_ADDRESS_MAPPING, () => {
       this.addressMapping.addRows(addedRows.sheet, addedRows.rowStart, addedRows.numberOfRows)
     })
@@ -408,18 +411,18 @@ export class DependencyGraph {
     return {affectedArrays}
   }
 
-  public addColumns(addedColumns: ColumnsSpan): [Set<MatrixVertex>, [SimpleCellAddress, InterpreterValue][]] {
+  public addColumns(addedColumns: ColumnsSpan): EagerChangesGraphChangeResult {
     this.stats.measure(StatType.ADJUSTING_ADDRESS_MAPPING, () => {
       this.addressMapping.addColumns(addedColumns.sheet, addedColumns.columnStart, addedColumns.numberOfColumns)
     })
 
-    const affectedMatrices = this.stats.measure(StatType.ADJUSTING_RANGES, () => {
+    const affectedArrays = this.stats.measure(StatType.ADJUSTING_RANGES, () => {
       const result = this.rangeMapping.moveAllRangesInSheetAfterColumnByColumns(addedColumns.sheet, addedColumns.columnStart, addedColumns.numberOfColumns)
       this.fixRangesWhenAddingColumns(addedColumns.sheet, addedColumns.columnStart, addedColumns.numberOfColumns)
       return this.getMatrixVerticesRelatedToRanges(result.verticesWithChangedSize)
     })
 
-    const valuesToRemoveFromIndex = this.stats.measure(StatType.ADJUSTING_MATRIX_MAPPING, () => {
+    this.stats.measure(StatType.ADJUSTING_MATRIX_MAPPING, () => {
       return this.fixMatricesAfterAddingColumn(addedColumns.sheet, addedColumns.columnStart, addedColumns.numberOfColumns)
     })
 
@@ -429,7 +432,7 @@ export class DependencyGraph {
 
     this.addStructuralNodesToChangeSet()
 
-    return [affectedMatrices, valuesToRemoveFromIndex]
+    return {affectedArrays, contentChanges: this.getAndClearContentChanges()}
   }
 
   public ensureNoMatrixInRange(range: AbsoluteCellRange) {
@@ -1023,7 +1026,9 @@ export class DependencyGraph {
         for (let row = rowStart; row <= matrixRange.end.row; ++row) {
           const destination = simpleCellAddress(sheet, col, row)
           const source = simpleCellAddress(sheet, col, row + numberOfRows)
+          const value = matrix.getMatrixCellValue(destination)
           this.addressMapping.moveCell(source, destination)
+          this.changes.addChange(EmptyValue, source, value)
         }
       }
     }
@@ -1046,11 +1051,10 @@ export class DependencyGraph {
   }
 
 
-  private fixMatricesAfterAddingColumn(sheet: number, columnStart: number, numberOfColumns: number): [SimpleCellAddress, InterpreterValue][] {
-    const valuesToRemoveFromIndex: [SimpleCellAddress, InterpreterValue][] = []
+  private fixMatricesAfterAddingColumn(sheet: number, columnStart: number, numberOfColumns: number) {
     this.matrixMapping.moveMatrixVerticesAfterColumnByColumns(sheet, columnStart, numberOfColumns)
     if (columnStart <= 0) {
-      return []
+      return
     }
     for (const [, matrix] of this.matrixMapping.matricesInCols(ColumnsSpan.fromColumnStartAndEnd(sheet, columnStart - 1, columnStart - 1))) {
       const matrixRange = matrix.getRange()
@@ -1060,31 +1064,26 @@ export class DependencyGraph {
           const source = simpleCellAddress(sheet, col + numberOfColumns, row)
           const value = matrix.getMatrixCellValue(destination)
           this.addressMapping.moveCell(source, destination)
-          valuesToRemoveFromIndex.push([source, value])
+          this.changes.addChange(EmptyValue, source, value)
         }
       }
     }
-    return valuesToRemoveFromIndex
   }
 
-  private fixMatricesAfterRemovingColumns(sheet: number, columnStart: number, numberOfColumns: number): [SimpleCellAddress, InterpreterValue][] {
-    const valuesToUpdateInIndex: [SimpleCellAddress, InterpreterValue][] = []
+  private fixMatricesAfterRemovingColumns(sheet: number, columnStart: number, numberOfColumns: number) {
     this.matrixMapping.moveMatrixVerticesAfterColumnByColumns(sheet, columnStart, -numberOfColumns)
     if (columnStart <= 0) {
-      return []
+      return
     }
     for (const [, matrix] of this.matrixMapping.matricesInCols(ColumnsSpan.fromColumnStartAndEnd(sheet, columnStart - 1, columnStart - 1))) {
       if (this.isThereSpaceForMatrix(matrix)) {
         for (const address of matrix.getRange().addresses(this)) {
-          const value = matrix.getMatrixCellValue(address)
-          valuesToUpdateInIndex.push([address, value])
           this.addressMapping.setCell(address, matrix)
         }
       } else {
         this.setNoSpaceIfMatrix(matrix)
       }
     }
-    return valuesToUpdateInIndex
   }
 
   private shrinkPossibleMatrixAndGetCell(address: SimpleCellAddress): Maybe<CellVertex> {
@@ -1141,11 +1140,10 @@ export class DependencyGraph {
   }
 }
 
-export interface AddRowsResult {
+export interface ArrayAffectingGraphChangeResult {
   affectedArrays: Set<MatrixVertex>,
 }
 
-export interface RemoveRowsResult {
-  affectedArrays: Set<MatrixVertex>,
+export interface EagerChangesGraphChangeResult extends ArrayAffectingGraphChangeResult {
   contentChanges: ContentChanges,
 }
