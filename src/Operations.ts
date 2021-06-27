@@ -483,9 +483,9 @@ export class Operations {
       removedCells.push({address, cellType: this.getClipboardCell(address)})
     }
 
-    const [affectedMatrices, changes] = this.dependencyGraph.removeRows(rowsToRemove)
+    const { affectedArrays, contentChanges } = this.dependencyGraph.removeRows(rowsToRemove)
 
-    this.columnSearch.applyChanges(changes.getChanges())
+    this.columnSearch.applyChanges(contentChanges.getChanges())
 
     let version: number
     this.stats.measure(StatType.TRANSFORM_ASTS, () => {
@@ -494,7 +494,7 @@ export class Operations {
       version = this.lazilyTransformingAstService.addTransformation(transformation)
     })
 
-    this.rewriteAffectedMatrices(affectedMatrices)
+    this.rewriteAffectedMatrices(affectedArrays)
 
     return {version: version!, removedCells, rowFrom: rowsToRemove.rowStart, rowCount: rowsToRemove.numberOfRows}
   }
@@ -548,7 +548,7 @@ export class Operations {
       return
     }
 
-    const affectedMatrices = this.dependencyGraph.addRows(addedRows)
+    const { affectedArrays } = this.dependencyGraph.addRows(addedRows)
 
     this.stats.measure(StatType.TRANSFORM_ASTS, () => {
       const transformation = new AddRowsTransformer(addedRows)
@@ -556,7 +556,7 @@ export class Operations {
       this.lazilyTransformingAstService.addTransformation(transformation)
     })
 
-    this.rewriteAffectedMatrices(affectedMatrices)
+    this.rewriteAffectedMatrices(affectedArrays)
   }
 
   private rewriteAffectedMatrices(affectedMatrices: Set<MatrixVertex>) {

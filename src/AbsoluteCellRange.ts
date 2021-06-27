@@ -96,11 +96,6 @@ export class AbsoluteCellRange implements SimpleCellRange {
     return new AbsoluteCellRange(simpleCellAddress(sheet, x1, y1), simpleCellAddress(sheet, x2, y2))
   }
 
-  public static singleRangeFromCellAddress(cellAddress: CellAddress, baseAddress: SimpleCellAddress): AbsoluteCellRange {
-    const absoluteAddress = cellAddress.toSimpleCellAddress(baseAddress)
-    return new AbsoluteCellRange(absoluteAddress, absoluteAddress)
-  }
-
   constructor(
     start: SimpleCellAddress,
     end: SimpleCellAddress,

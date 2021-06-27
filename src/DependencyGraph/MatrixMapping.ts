@@ -28,10 +28,6 @@ export class MatrixMapping {
     this.matrixMapping.set(addressKey(range.start), vertex)
   }
 
-  public setMatrixByCorner(address: SimpleCellAddress, vertex: MatrixVertex) {
-    this.matrixMapping.set(addressKey(address), vertex)
-  }
-
   public removeMatrix(range: string | AbsoluteCellRange) {
     if (typeof range === 'string') {
       this.matrixMapping.delete(range)

@@ -233,19 +233,6 @@ export class DependencyGraph {
     this.exchangeGraphNode(vertexFrom, vertexTo)
   }
 
-  private correctInfiniteRangesDependenciesByRangeVertex(vertex: RangeVertex) {
-    for (const range of this.graph.infiniteRanges) {
-      const infiniteRangeVertex = (range as RangeVertex)
-      const intersection = vertex.range.intersectionWith(infiniteRangeVertex.range)
-      if (intersection === undefined) {
-        continue
-      }
-      for (const address of intersection.addresses(this)) {
-        this.graph.addEdge(this.fetchCellOrCreateEmpty(address), range)
-      }
-    }
-  }
-
   public correctInfiniteRangesDependency(address: SimpleCellAddress) {
     let vertex: Maybe<Vertex> = undefined
     for (const range of this.graph.infiniteRanges) {
@@ -267,7 +254,7 @@ export class DependencyGraph {
     return vertex
   }
 
-  public removeRows(removedRows: RowsSpan): [Set<MatrixVertex>, ContentChanges]{
+  public removeRows(removedRows: RowsSpan): RemoveRowsResult {
     this.stats.measure(StatType.ADJUSTING_GRAPH, () => {
       for (const [address, vertex] of this.addressMapping.entriesFromRowsSpan(removedRows)) {
         for (const adjacentNode of this.graph.adjacentNodes(vertex)) {
@@ -289,7 +276,7 @@ export class DependencyGraph {
       this.addressMapping.removeRows(removedRows)
     })
 
-    const affectedMatrices = this.stats.measure(StatType.ADJUSTING_RANGES, () => {
+    const affectedArrays = this.stats.measure(StatType.ADJUSTING_RANGES, () => {
       const affectedRanges = this.truncateRanges(removedRows, address => address.row)
       return this.getMatrixVerticesRelatedToRanges(affectedRanges)
     })
@@ -300,7 +287,10 @@ export class DependencyGraph {
 
     this.addStructuralNodesToChangeSet()
 
-    return [affectedMatrices, this.getAndClearContentChanges()]
+    return {
+      affectedArrays,
+      contentChanges: this.getAndClearContentChanges()
+    }
   }
 
   public removeSheet(removedSheetId: number) {
@@ -386,12 +376,12 @@ export class DependencyGraph {
     this.addStructuralNodesToChangeSet()
   }
 
-  public addRows(addedRows: RowsSpan): Set<MatrixVertex> {
+  public addRows(addedRows: RowsSpan): AddRowsResult {
     this.stats.measure(StatType.ADJUSTING_ADDRESS_MAPPING, () => {
       this.addressMapping.addRows(addedRows.sheet, addedRows.rowStart, addedRows.numberOfRows)
     })
 
-    const affectedMatrices = this.stats.measure(StatType.ADJUSTING_RANGES, () => {
+    const affectedArrays = this.stats.measure(StatType.ADJUSTING_RANGES, () => {
       const result = this.rangeMapping.moveAllRangesInSheetAfterRowByRows(addedRows.sheet, addedRows.rowStart, addedRows.numberOfRows)
       this.fixRangesWhenAddingRows(addedRows.sheet, addedRows.rowStart, addedRows.numberOfRows)
       return this.getMatrixVerticesRelatedToRanges(result.verticesWithChangedSize)
@@ -407,7 +397,7 @@ export class DependencyGraph {
 
     this.addStructuralNodesToChangeSet()
 
-    return affectedMatrices
+    return { affectedArrays }
   }
 
   public addColumns(addedColumns: ColumnsSpan) {
@@ -584,10 +574,6 @@ export class DependencyGraph {
     return this.sheetMapping.fetch(sheetName)
   }
 
-  public getSheetName(sheetId: number): string {
-    return this.sheetMapping.fetchDisplayName(sheetId)
-  }
-
   public getSheetHeight(sheet: number): number {
     return this.addressMapping.getHeight(sheet)
   }
@@ -649,15 +635,6 @@ export class DependencyGraph {
       }
     }) as MatrixVertex[][]
     return new Set(...matrixVertices)
-  }
-
-  public* verticesFromRange(range: AbsoluteCellRange): IterableIterator<CellVertex> {
-    for (const address of range.addresses(this)) {
-      const vertex = this.getCell(address)
-      if (vertex) {
-        yield vertex
-      }
-    }
   }
 
   public* rawValuesFromRange(range: AbsoluteCellRange): IterableIterator<[RawScalarValue, SimpleCellAddress]> {
@@ -777,6 +754,39 @@ export class DependencyGraph {
     return vertex instanceof MatrixVertex && !vertex.isLeftCorner(address)
   }
 
+  public getAndClearContentChanges(): ContentChanges {
+    const changes = this.changes
+    this.changes = ContentChanges.empty()
+    return changes
+  }
+
+  public getAdjacentNodesAddresses(inputVertex: Vertex): (SimpleCellRange | SimpleCellAddress)[] {
+    const deps = this.graph.adjacentNodes(inputVertex)
+    const ret: (SimpleCellRange | SimpleCellAddress)[] = []
+    deps.forEach((vertex: Vertex) => {
+      const castVertex = vertex as RangeVertex | FormulaCellVertex | MatrixVertex
+      if (castVertex instanceof RangeVertex) {
+        ret.push(simpleCellRange(castVertex.start, castVertex.end))
+      } else {
+        ret.push(castVertex.getAddress(this.lazilyTransformingAstService))
+      }
+    })
+    return ret
+  }
+
+  private correctInfiniteRangesDependenciesByRangeVertex(vertex: RangeVertex) {
+    for (const range of this.graph.infiniteRanges) {
+      const infiniteRangeVertex = (range as RangeVertex)
+      const intersection = vertex.range.intersectionWith(infiniteRangeVertex.range)
+      if (intersection === undefined) {
+        continue
+      }
+      for (const address of intersection.addresses(this)) {
+        this.graph.addEdge(this.fetchCellOrCreateEmpty(address), range)
+      }
+    }
+  }
+
   private cleanAddressMappingUnderMatrix(vertex: MatrixVertex) {
     const matrixRange = vertex.getRange()
     for (const address of matrixRange.addresses(this)) {
@@ -811,7 +821,7 @@ export class DependencyGraph {
   }
 
   private* rangeDirectDependenciesToMatrix(vertex: RangeVertex, matrix: MatrixVertex): IterableIterator<[SimpleCellAddress, CellVertex]> {
-    const { restRange: range } = this.rangeMapping.findSmallerRange(vertex.range)
+    const {restRange: range} = this.rangeMapping.findSmallerRange(vertex.range)
     for (const address of range.addresses(this)) {
       if (matrix.getRange().addressInRange(address)) {
         const cell = this.fetchCellOrCreateEmpty(address)
@@ -1072,24 +1082,13 @@ export class DependencyGraph {
       }
     }
   }
+}
 
-  public getAndClearContentChanges(): ContentChanges {
-    const changes = this.changes
-    this.changes = ContentChanges.empty()
-    return changes
-  }
+export interface AddRowsResult {
+  affectedArrays: Set<MatrixVertex>,
+}
 
-  public getAdjacentNodesAddresses(inputVertex: Vertex): (SimpleCellRange | SimpleCellAddress)[] {
-    const deps = this.graph.adjacentNodes(inputVertex)
-    const ret: (SimpleCellRange | SimpleCellAddress)[] = []
-    deps.forEach((vertex: Vertex) => {
-      const castVertex = vertex as RangeVertex | FormulaCellVertex | MatrixVertex
-      if (castVertex instanceof RangeVertex) {
-        ret.push(simpleCellRange(castVertex.start, castVertex.end))
-      } else {
-        ret.push(castVertex.getAddress(this.lazilyTransformingAstService))
-      }
-    })
-    return ret
-  }
+export interface RemoveRowsResult {
+  affectedArrays: Set<MatrixVertex>,
+  contentChanges: ContentChanges,
 }

@@ -346,6 +346,13 @@ const sharedExamples = (builder: (width: number, height: number) => AddressMappi
 
     expect(() => mapping.moveCell(adr('A1', 0), adr('A2', 1))).toThrow('Cannot move cells between sheets.')
   })
+
+  it('should throw error when trying to move vertices in non-existing sheet', () => {
+    const mapping = builder(1, 2)
+    mapping.setCell(adr('A1', 0), new ValueCellVertex(42, 42))
+
+    expect(() => mapping.moveCell(adr('A1', 3), adr('A2', 3))).toThrow('Sheet not initialized.')
+  })
 }
 
 describe('SparseStrategy', () => {

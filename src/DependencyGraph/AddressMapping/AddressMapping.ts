@@ -102,7 +102,7 @@ export class AddressMapping {
   public moveCell(source: SimpleCellAddress, destination: SimpleCellAddress) {
     const sheetMapping = this.mapping.get(source.sheet)
     if (!sheetMapping) {
-      throw Error('Sheet not initialized')
+      throw Error('Sheet not initialized.')
     }
     if (source.sheet !== destination.sheet) {
       throw Error('Cannot move cells between sheets.')
