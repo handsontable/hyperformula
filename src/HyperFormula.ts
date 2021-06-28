@@ -666,7 +666,7 @@ export class HyperFormula implements TypedEmitter {
   }
 
   /**
-   * Returns [[CellValue]] which a serialized content of the cell of a given address either a cell formula, an explicit value, or an error.
+   * Returns [[RawCellContent]] with a serialized content of the cell of a given address: either a cell formula, an explicit value, or an error.
    *
    * @param {SimpleCellAddress} cellAddress - cell coordinates
    *
@@ -760,7 +760,7 @@ export class HyperFormula implements TypedEmitter {
   }
 
   /**
-   * Returns an array of arrays of [[NoErrorCellValue]] with serialized content of cells from [[Sheet]], either a cell formula or an explicit value.
+   * Returns an array of arrays of [[RawCellContent]] with serialized content of cells from [[Sheet]], either a cell formula or an explicit value.
    *
    * @param {SimpleCellAddress} sheetId - sheet ID number
    *
@@ -891,7 +891,7 @@ export class HyperFormula implements TypedEmitter {
   }
 
   /**
-   * Returns formulas or values of all sheets in a form of an object which property keys are strings and values are arrays of arrays of [[CellValue]].
+   * Returns formulas or values of all sheets in a form of an object which property keys are strings and values are arrays of arrays of [[RawCellContent]].
    *
    * @throws [[EvaluationSuspendedError]] when the evaluation is suspended
    *
