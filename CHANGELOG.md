@@ -12,6 +12,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Breaking change**: Removed numeric matrix detection along with matrixDetection and matrixDetectionThreshold config options. (#669)
 - **Breaking change**: Changed API of the following methods to take `SimpleCellRange` type argument: `copy`,  `cut`, `getCellDependents`, `getCellPrecedents`, `getFillRangeData`, `getRangeFormulas`,  `getRangeSerialized`, `getRangeValues`, `isItPossibleToMoveCells`, `isItPossibleToSetCellContents`, `moveCells`. (#687)
 - Changed SWITCH function so it takes array as its first argument.
+- **Breaking change**: Changed the AGPLv3 license to GPLv3.
+- **Breaking change**: Removed the free non-commercial license.
 
 ### Added
 - Added support for array arithmetic. (#628)
@@ -31,6 +33,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added utility function for filling ranges with source from other range. (#678)
 - Added pretty print for detailedCellError. (#712)
 - Added `simpleCellRangeFromString` and `simpleCellRangeToString` helpers. (#720)
+- Added `CellError` to exports. (#736)
 
 ### Fixed
 - Fixed an issue with arrays and cruds. (#651)
@@ -39,6 +42,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed an issue with matrixDetection + number parsing. (#686)
 - Fixed an issue with NOW and TODAY functions. (#709)
 - Fixed an issue with MIN/MAX function caches. (#711)
+- Fixed an issue with caching and order of evaluation. (#735)
 
 ## [0.6.2] - 2021-05-26
 

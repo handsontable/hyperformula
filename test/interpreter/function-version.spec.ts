@@ -6,24 +6,14 @@ import {adr} from '../testUtils'
 
 describe('Function VERSION', () => {
   describe('getting version', () => {
-    it('AGPL license key', () => {
+    it('GPL license key', () => {
       const engine = HyperFormula.buildFromArray([
         ['=VERSION()'],
       ], {
-        licenseKey: 'agpl-v3',
+        licenseKey: 'gpl-v3',
       })
 
       expect(engine.getCellValue(adr('A1'))).toEqual(`HyperFormula v${HyperFormula.version}, 1`)
-    })
-
-    it('non-commercial license key', () => {
-      const engine = HyperFormula.buildFromArray([
-        ['=VERSION()'],
-      ], {
-        licenseKey: 'non-commercial-and-evaluation',
-      })
-
-      expect(engine.getCellValue(adr('A1'))).toEqual(`HyperFormula v${HyperFormula.version}, 2`)
     })
 
     it('missing license key', () => {
@@ -33,7 +23,7 @@ describe('Function VERSION', () => {
         licenseKey: '',
       })
 
-      expect(engine.getCellValue(adr('A1'))).toEqual(`HyperFormula v${HyperFormula.version}, 3`)
+      expect(engine.getCellValue(adr('A1'))).toEqual(`HyperFormula v${HyperFormula.version}, 2`)
     })
 
     it('invalid license key', () => {
@@ -43,7 +33,7 @@ describe('Function VERSION', () => {
         licenseKey: '11111-11111-11111-11111-11111',
       })
 
-      expect(engine.getCellValue(adr('A1'))).toEqual(`HyperFormula v${HyperFormula.version}, 4`)
+      expect(engine.getCellValue(adr('A1'))).toEqual(`HyperFormula v${HyperFormula.version}, 3`)
     })
 
     it('expired license key', () => {
@@ -53,7 +43,7 @@ describe('Function VERSION', () => {
         licenseKey: '80584-cc272-2e7c4-06f16-4db00',
       })
 
-      expect(engine.getCellValue(adr('A1'))).toEqual(`HyperFormula v${HyperFormula.version}, 5`)
+      expect(engine.getCellValue(adr('A1'))).toEqual(`HyperFormula v${HyperFormula.version}, 4`)
     })
 
     it('correct license key', () => {
@@ -85,7 +75,7 @@ describe('Function VERSION', () => {
         HyperFormula.buildFromArray([
           ['=VERSION()'],
         ], {
-          licenseKey: 'agpl-v3',
+          licenseKey: 'gpl-v3',
           functionPlugins: [VersionExtra]
         })
       }).toThrow(ProtectedFunctionError.cannotRegisterFunctionWithId('VERSION'))
@@ -99,7 +89,7 @@ describe('Function VERSION', () => {
       const engine = HyperFormula.buildFromArray([
         ['=VERSION()'],
       ], {
-        licenseKey: 'agpl-v3',
+        licenseKey: 'gpl-v3',
       })
 
       expect(engine.getCellValue(adr('A1'))).toEqual(`HyperFormula v${HyperFormula.version}, 1`)
