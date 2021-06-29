@@ -1095,7 +1095,7 @@ export class HyperFormula implements TypedEmitter {
    * ```js
    * hfInstance.undo();
    *
-   * // when there is an action to redo, this will return 'true'
+   * // when there is an action to redo, this returns 'true'
    * const isSomethingToRedo = hfInstance.isThereSomethingToRedo();
    * ```
    *
