@@ -12,17 +12,24 @@ but without the constraints of the spreadsheet UI.
 
 The latest version of HyperFormula has an extensive collection of **{{ $page.functionsCount }}** functions grouped into 11 categories:
 
-* [Date and time](#date-and-time)
-* [Engineering](#engineering)
-* [Information](#information)
-* [Financial](#financial)
-* [Logical](#logical)
-* [Lookup and reference](#lookup-and-reference)
-* [Math and trigonometry](#math-and-trigonometry)
-* [Matrix functions](#matrix-functions)
-* [Operator](#operator)
-* [Statistical](#statistical)
-* [Text](#text)
+- [Built-in functions](#built-in-functions)
+  - [Overview](#overview)
+  - [Language packs](#language-packs)
+  - [Custom functions](#custom-functions)
+  - [Demo](#demo)
+  - [List of available functions](#list-of-available-functions)
+    - [Array manipulation](#array-manipulation)
+    - [Date and time](#date-and-time)
+    - [Engineering](#engineering)
+    - [Information](#information)
+    - [Financial](#financial)
+    - [Logical](#logical)
+    - [Lookup and reference](#lookup-and-reference)
+    - [Math and trigonometry](#math-and-trigonometry)
+    - [Matrix functions](#matrix-functions)
+    - [Operator](#operator)
+    - [Statistical](#statistical)
+    - [Text](#text)
 
 _Some categories such as compatibility, cube, and database
 are yet to be supported._
@@ -68,8 +75,8 @@ Total number of functions: **{{ $page.functionsCount }}**
 | Function ID | Description | Syntax |
 | :--- | :--- | :--- |
 | ARRAYFORMULA | Enables array arithmetic inside. | ARRAYFORMULA(Formula) |
-| FILTER | Filter input array based on boolean arrays. | FILTER(Array; BoolArray1[; BoolArray2[; ...]])
-| ARRAY_CONSTRAINT | Truncates array to given dimensions. | ARRAYFORMULA(Array; Height; Width) |
+| FILTER | Filters the array based on boolean arrays. | FILTER(Array; BoolArray1[; BoolArray2[; ...]])
+| ARRAY_CONSTRAIN | Truncates the array to given dimensions. | ARRAY_CONSTRAIN(Array; Height; Width) |
 
 ### Date and time
 
