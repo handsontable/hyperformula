@@ -20,15 +20,27 @@ description: HyperFormula® - Complex Calculations Made Easy
 
 HyperFormula is an open-source calculation engine that allows you
 to perform Excel-like calculations in your business applications.
-HyperFormula is written in TypeScript and works with major
+It is written in TypeScript and works with major
 JavaScript frameworks like [Vue](/guide/integration-with-vue.md),
 [React](/guide/integration-with-react.md), and [Angular](/guide/integration-with-angular.md). You can use it in a
-browser or as a service with Node.js as your back-end technology.
+browser or as a service, with Node.js as your back-end technology.
 
-It comes with a huge library of [{{ $page.functionsCount }} built-in functions](/guide/built-in-functions.md)
-grouped into different categories, such as Math and trigonometry,
-Engineering, Statistical, Financial, and Logical. The functions use
-A1 notation and are compatible with popular spreadsheet software like
+HyperFormula comes with a huge library of [{{ $page.functionsCount }} built-in functions](/guide/built-in-functions.md)
+grouped into categories:
+- Math and trigonometry
+- Engineering
+- Statistical
+- Financial
+- Logical
+- Array manipulation
+- Date and time
+- Information
+- Lookup and reference
+- Matrix functions
+- Text
+- Operator
+
+The functions use A1 notation and are compatible with popular spreadsheet software like
 Excel or Google Sheets, which means that you can easily transfer
 the data and formulas between them.
 
@@ -39,7 +51,7 @@ the use of cross-sheet references, [named expressions](/guide/named-ranges.md),
 [different data types](/guide/types-of-values.md),
 and [custom functions](/guide/custom-functions.md).
 
-## What can it be used for?
+## What can I use it for?
 
 HyperFormula doesn't assume any existing user interface \(UI\),
 which makes it a great general-purpose library that can be used in
@@ -76,7 +88,7 @@ to use tool for many types of software.
 * Actively maintained and supported by the
 [Handsontable](https://handsontable.com/) team
 
-## Useful resources
+## Resources
 
 * [Basic usage](/guide/basic-usage.md)
 * [Configuration options](/guide/configuration-options.md)
