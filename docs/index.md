@@ -2,7 +2,7 @@
 description: HyperFormula® - Complex Calculations Made Easy
 ---
 
-# Welcome
+# HyperFormula guide
 
 <div class="iframe-container">
   <iframe 
