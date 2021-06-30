@@ -435,7 +435,7 @@ export interface ConfigParams {
    */
   useRegularExpressions: boolean,
   /**
-   * When set to `true`, criteria in functions (SUMIF, COUNTIF, ...) can use the `*` and `?` wildcards.
+   * When set to `true`, criteria in functions (SUMIF, COUNTIF, ...) can use the `*` and `?`g wildcards.
    *
    * @default true
    * @category String
