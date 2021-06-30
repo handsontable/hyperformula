@@ -31,8 +31,9 @@ const privatePool: WeakMap<Config, {licenseKeyValidityState: LicenseKeyValidityS
 
 export interface ConfigParams {
   /**
-   * Specifies if the string comparison is accent sensitive or not.
-   * Applies to comparison operators only.
+   * When set to `true`, makes string comparison accent-sensitive.
+   * 
+   * Applies only to comparison operators.
    *
    * @default false
    *
@@ -40,9 +41,11 @@ export interface ConfigParams {
    */
   accentSensitive: boolean,
   /**
-   * Determines minimum number of elements a range must have in order to use binary search.
-   * Shorter ranges will be searched naively.
-   * Used by VLOOKUP, HLOOKUP and MATCH functions.
+   * Sets a minimum number of elements that a range must have to use binary search.
+   * 
+   * Shorter ranges are searched naively.
+   * 
+   * Used by the VLOOKUP, HLOOKUP and MATCH functions.
    *
    * @default 20
    *
@@ -50,7 +53,8 @@ export interface ConfigParams {
    */
   binarySearchThreshold: number,
   /**
-   * Specifies if the string comparison is case-sensitive or not.
+   * When set to `true`, makes string comparison case-sensitive.
+   * 
    * Applies to comparison operators only.
    *
    * @default false
@@ -59,8 +63,11 @@ export interface ConfigParams {
    */
   caseSensitive: boolean,
   /**
-   * Allows to define if upper case or lower case should sort first.
-   * When set to `false` uses the locale's default.
+   * When set to `upper`, upper case sorts first.
+   * 
+   * When set to `lower`, lower case sorts first.
+   * 
+   * When set to `false`, uses the locale's default.
    *
    * @default 'lower'
    *
@@ -68,10 +75,12 @@ export interface ConfigParams {
    */
   caseFirst: 'upper' | 'lower' | 'false',
   /**
-   * Determines which address mapping policy will be used. Built in implementations:
-   * - DenseSparseChooseBasedOnThreshold - will choose address mapping for each sheet separately based on fill ratio.
-   * - AlwaysDense - will use DenseStrategy for all sheets.
-   * - AlwaysSparse - will use SparseStrategy for all sheets.
+   * Sets the address mapping policy to be used.
+   * 
+   * Built-in implementations:
+   * - `DenseSparseChooseBasedOnThreshold`: sets the address mapping policy separately for each sheet, based on fill ratio.
+   * - `AlwaysDense`: uses `DenseStrategy` for all sheets.
+   * - `AlwaysSparse`: uses `SparseStrategy` for all sheets.
    *
    * @default AlwaysDense
    *
@@ -79,7 +88,7 @@ export interface ConfigParams {
    */
   chooseAddressMappingPolicy: ChooseAddressMapping,
   /**
-   * Symbols used to denote currency numbers.
+   * Sets symbols that denote currency numbers.
    *
    * @default ['$']
    *
@@ -87,11 +96,16 @@ export interface ConfigParams {
    */
   currencySymbol: string[],
   /**
-   * A list of date formats that are supported by date parsing functions.
+   * Sets date formats that are supported by date-parsing functions.
    *
-   * The separator is ignored and it can be any of '-' (dash), ' ' (empty space), '/' (slash).
+   * The separator is ignored and can be any of the following:
+   * - `-` (dash)
+   * - ` ` (empty space)
+   * - `/` (slash)
    *
-   * Any order of YY, MM, DD is accepted as a date, and YY can be replaced with YYYY.
+   * `YY` can be replaced with `YYYY`.
+   * 
+   * Any order of `YY`, `MM`, and `DD` is accepted as a date.
    *
    * @default ['MM/DD/YYYY', 'MM/DD/YY']
    *
@@ -99,7 +113,9 @@ export interface ConfigParams {
    */
   dateFormats: string[],
   /**
-   * A separator character used to separate arguments of procedures in formulas. Must be different from [[decimalSeparator]] and [[thousandSeparator]].
+   * Sets a separator character that separates procedure arguments in formulas.
+   * 
+   * Must be different from [[decimalSeparator]] and [[thousandSeparator]].
    *
    * @default ','
    *
@@ -107,8 +123,13 @@ export interface ConfigParams {
    */
   functionArgSeparator: string,
   /**
-   * A decimal separator used for parsing numeric literals.
-   * Can be either '.' (period) or ',' (comma) and must be different from [[thousandSeparator]] and [[functionArgSeparator]].
+   * Sets a decimal separator used for parsing numerical literals.
+   * 
+   * Can be one of the following:
+   * - `.` (period)
+   * - `,` (comma)
+   * 
+   * Must be different from [[thousandSeparator]] and [[functionArgSeparator]].
    *
    * @default '.'
    *
@@ -116,8 +137,7 @@ export interface ConfigParams {
    */
   decimalSeparator: '.' | ',',
   /**
-   * Sets the compatibility mode for behaviour of null value.
-   * If set, formula evaluating to null evaluates to 0 instead.
+   * When set to `true`, formulas evaluating to `null` evaluate to `0` instead.
    *
    * @default false
    *
@@ -125,7 +145,7 @@ export interface ConfigParams {
    */
   evaluateNullToZero: boolean,
   /**
-   * A list of additional function plugins to use by formula interpreter.
+   * Lists additional function plugins to be used by the formula interpreter.
    *
    * @default []
    *
@@ -134,7 +154,9 @@ export interface ConfigParams {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   functionPlugins: any[],
   /**
-   * A GPU.js constructor used by matrix functions. When not provided, plain cpu implementation will be used.
+   * A GPU.js constructor used by array functions.
+   * 
+   * When not provided, the plain CPU implementation is used.
    *
    * @default undefined
    *
@@ -142,9 +164,15 @@ export interface ConfigParams {
    */
   gpujs?: typeof GPU,
   /**
-   * Allows to set GPU or CPU for use in matrix calculations.
-   * When set to 'gpu' it will try to use GPU for matrix calculations. Setting it to 'cpu' will force CPU usage.
-   * Other values should be used for debugging purposes only. More info can be found in GPU.js documentation.
+   * Sets array calculations to use either GPU or CPU.
+   * 
+   * When set to `gpu`, tries to use GPU for array calculations.
+   * 
+   * When set to `cpu`, enforces CPU usage.
+   * 
+   * Use other values only for debugging purposes.
+   * 
+   * For more information, see the [GPU.js documentation](https://github.com/gpujs/gpu.js/#readme).
    *
    * @default 'gpu'
    *
@@ -152,7 +180,7 @@ export interface ConfigParams {
    */
   gpuMode: GPUMode,
   /**
-   * Specifies whether punctuation should be ignored in string comparison.
+   * When set to `true`, string comparison ignores punctuation.
    *
    * @default false
    *
@@ -160,7 +188,7 @@ export interface ConfigParams {
    */
   ignorePunctuation: boolean,
   /**
-   * Code for translation package with translations of function and error names.
+   * Sets a translation package for function and error names.
    *
    * @default 'enGB'
    *
@@ -168,9 +196,11 @@ export interface ConfigParams {
    */
   language: string,
   /**
-   * Preserves an option for setting 1900 as a leap year.
-   * 1900 was not a leap year, but in Lotus 1-2-3 it was faulty interpreted as a leap year.
-   * Set to `true` for compatibility with Lotus 1-2-3 and Excel. See [[nullDate]] for complete solution.
+   * Sets year 1900 as a leap year.
+   * 
+   * For compatibility with Lotus 1-2-3 and Microsoft Excel, set this option to `true`.
+   * 
+   * For more information, see [[nullDate]].
    *
    * @default false
    *
@@ -178,11 +208,13 @@ export interface ConfigParams {
    */
   leapYear1900: boolean,
   /**
-   * A license key of HyperFormula accepts the following values:
-   * * `gpl-v3` string if you want to use the software on GPL v3 license terms,
-   * * a valid license key string, if you bought the commercial license.
+   * Sets your HyperFormula license key.
+   * 
+   * To use HyperFormula on the GPLv3 license terms, set this option to `gpl-v3`.
+   * 
+   * To use HyperFormula with your commercial license, set this option to your valid license key string.
    *
-   * For more details visit [this guide](/guide/license-key.html)
+   * For more information, go [here](/guide/license-key.html).
    *
    * @default undefined
    *
@@ -190,7 +222,9 @@ export interface ConfigParams {
    */
   licenseKey: string,
   /**
-   * Sets the locale using a BCP 47 code language tag for language sensitive string comparison.
+   * Sets the locale for language-sensitive string comparison.
+   *
+   * Accepts **IETF BCP 47** language tags.
    *
    * @default 'en'
    *
@@ -198,28 +232,30 @@ export interface ConfigParams {
    */
   localeLang: string,
   /**
-   * Whether criterions in functions require whole cell to match the pattern, or just a subword.
+   * When set to `true`, function criteria require whole cells to match the pattern.
+   * 
+   * When set to `false`, function criteria require just a subword to match the pattern.
    *
    * @default true
    * @category String
    */
   matchWholeCell: boolean,
   /**
-   * Column separator symbol for array notation.
+   * Sets a column separator symbol for array notation.
    *
    * @default ','
    * @category Formula syntax
    */
   matrixColumnSeparator: ',' | ';',
   /**
-   * Row separator symbol for array notation.
+   * Sets a row separator symbol for array notation.
    *
    * @default ';'
    * @category Formula syntax
    */
   matrixRowSeparator: ';' | '|',
   /**
-   * Maximum number of rows
+   * Sets the maximum number of rows.
    *
    * @default 40,000
    *
@@ -227,7 +263,7 @@ export interface ConfigParams {
    * */
   maxRows: number,
   /**
-   * Maximum number of columns
+   * Sets the maximum number of columns.
    *
    * @default 18,278
    *
@@ -235,17 +271,23 @@ export interface ConfigParams {
    * */
   maxColumns: number,
   /**
-   * Allows to set a specific date from which the number of days will be counted.
-   * Dates are represented internally as a number of days that passed since this `nullDate`.
+   * Internally, each date is represented as a number of days that passed since `nullDate`.
    *
+   * This option sets a specific date from which that number of days is counted.
+   * 
    * @default {year: 1899, month: 12, day: 30}
    *
    * @category Date and Time
    */
   nullDate: SimpleDate,
   /**
-   * Two-digit values when interpreted as a year can be either 19xx or 20xx.
-   * If `xx <= nullYear` its latter, otherwise its former.
+   * Sets the interpretation of two-digit year values.
+   * 
+   * Two-digit year values (`xx`) can either become `19xx` or `20xx`.
+   * 
+   * If `xx` is less or equal to `nullYear`, two-digit year values become `20xx`.
+   * 
+   * If `xx` is more than `nullYear`, two-digit year values become `19xx`.
    *
    * @default 30
    *
@@ -253,7 +295,7 @@ export interface ConfigParams {
    */
   nullYear: number,
   /**
-   * Allows to provide a function that takes a string representing date-time and parses it into an actual date-time.
+   * Sets a function that parses strings representing date-time into actual date-time.
    *
    * @default defaultParseToDateTime
    *
@@ -261,13 +303,16 @@ export interface ConfigParams {
    */
   parseDateTime: (dateTimeString: string, dateFormat?: string, timeFormat?: string) => Maybe<DateTime>,
   /**
-   * Controls how far two numerical values need to be from each other to be treated as non-equal.
-   * `a` and `b` are equal if they are of the same sign and:
-   * `abs(a) <= (1+precisionEpsilon) * abs(b)`
-   * and
-   * `abs(b) <= (1+precisionEpsilon) * abs(a)`.
-   * It also controls snap-to-zero behavior for additions/subtractions:
-   * for `c=a+b` or `c=a-b`, if `abs(c) <= precisionEpsilon * abs(a)`, then `c` is set to `0`
+   * Sets how far two numerical values need to be from each other to be treated as non-equal.
+   * 
+   * `a` and `b` are equal if all three of the following conditions are met:
+   * - Both `a` and `b` are of the same sign
+   * - `abs(a)` <= `(1+precisionEpsilon) * abs(b)`
+   * - `abs(b)` <= `(1+precisionEpsilon) * abs(a)`
+   * 
+   * Additionally, this option controls the snap-to-zero behavior for additions and subtractions:
+   * - For `c=a+b`, if `abs(c)` <= `precisionEpsilon * abs(a)`, then `c` is set to `0`
+   * - For `c=a-b`, if `abs(c)` <= `precisionEpsilon * abs(a)`, then `c` is set to `0`
    *
    * @default 1e-13
    *
@@ -275,8 +320,9 @@ export interface ConfigParams {
    */
   precisionEpsilon: number,
   /**
-   * Sets how precise the calculation should be.
-   * Numerical outputs are rounded to `precisionRounding` many digits after the decimal.
+   * Sets calculations' precision level.
+   * 
+   * Numerical outputs are rounded to the `precisionRounding` number of digits after the decimal.
    *
    * @default 14
    *
@@ -284,7 +330,7 @@ export interface ConfigParams {
    */
   precisionRounding: number,
   /**
-   * Allows to provide a function that takes date and prints it into string.
+   * Sets a function that converts date-time into strings.
    *
    * @default defaultStringifyDateTime
    *
@@ -292,7 +338,7 @@ export interface ConfigParams {
    */
   stringifyDateTime: (dateTime: SimpleDateTime, dateTimeFormat: string) => Maybe<string>,
   /**
-   * Allows to provide a function that takes time duration prints it into string.
+   * Sets a function that converts time duration into strings.
    *
    * @default defaultStringifyDuration
    *
@@ -300,8 +346,9 @@ export interface ConfigParams {
    */
   stringifyDuration: (time: SimpleTime, timeFormat: string) => Maybe<string>,
   /**
-   * Sets the rounding.
-   * If `false`, no rounding happens, and numbers are equal if and only if they are truly identical value (see: [[precisionEpsilon]]).
+   * When set to `false`, no rounding happens, and numbers are equal if and only if they are of truly identical value.
+   * 
+   * For more information, see [[precisionEpsilon]].
    *
    * @default true
    *
@@ -309,8 +356,14 @@ export interface ConfigParams {
    */
   smartRounding: boolean,
   /**
-   * A thousand separator used for parsing numeric literals.
-   * Can be either empty, ',' (comma) or ' ' (empty space) and must be different from [[decimalSeparator]] and [[functionArgSeparator]].
+   * Sets a thousands separator symbol for parsing numerical literals.
+   * 
+   * Can be one of the following:
+   * - empty
+   * - `,` (comma)
+   * - ` ` (empty space)
+   * 
+   * Must be different from [[decimalSeparator]] and [[functionArgSeparator]].
    *
    * @default ''
    *
@@ -318,11 +371,14 @@ export interface ConfigParams {
    */
   thousandSeparator: '' | ',' | ' ' | '.',
   /**
-   * A list of time formats that are supported by time parsing functions.
+   * Sets time formats that will be supported by time-parsing functions.
    *
-   * The separator is ':' (colon).
+   * The separator is `:` (colon).
    *
-   * Any configuration of at least two of hh, mm, ss is accepted as a time, and they can be put in any order.
+   * Accepts any configuration of at least two of the following, in any order:
+   * - `hh`: hours
+   * - `mm`: minutes
+   * - `ss`: seconds
    *
    * @default ['hh:mm', 'hh:mm:ss.sss']
    *
@@ -330,19 +386,23 @@ export interface ConfigParams {
    */
   timeFormats: string[],
   /**
-   * Specifies if the array arithmetic operations are allowed globally, or only inside special function (like ARRAYFORMULA).
+   * When set to `true`, array arithmetic is enabled globally.
+   * 
+   * When set to `false`, array arithmetic is enabled only inside array functions (`ARRAYFORMULA`, `FILTER`, and `ARRAY_CONSTRAIN`).
    *
+   * For more information, see the [Arrays guide](/guide/arrays.html).
+   * 
    * @default false
    *
    * @category Engine
    */
   useArrayArithmetic: boolean,
   /**
-   * If set to `true`, switches column search strategy from **binary search** to **column index**.
+   * When set to `true`, switches column search strategy from binary search to column index.
    *
-   * Using column index improves efficiency for the `VLOOKUP` and `MATCH` functions, but increases memory usage.
+   * Using column index improves efficiency of the `VLOOKUP` and `MATCH` functions, but increases memory usage.
    * 
-   * When searching with **wildcards** or **regular expressions**, column search strategy falls back to binary search (even with `useColumnIndex` set to `true`).
+   * When searching with wildcards or regular expressions, column search strategy falls back to binary search (even with `useColumnIndex` set to `true`).
    *
    * @default false
    *
@@ -350,7 +410,9 @@ export interface ConfigParams {
    */
   useColumnIndex: boolean,
   /**
-   * Enables gathering engine statistics and timings. Useful for testing and benchmarking.
+   * When set to `true`, enables gathering engine statistics and timings.
+   * 
+   * Useful for testing and benchmarking.
    *
    * @default false
    *
@@ -358,7 +420,7 @@ export interface ConfigParams {
    */
   useStats: boolean,
   /**
-   * A number of kept elements in undo history.
+   * Sets the number of elements kept in the undo history.
    *
    * @default 20
    *
@@ -366,14 +428,14 @@ export interface ConfigParams {
    */
   undoLimit: number,
   /**
-   * If set true, then criterions in functions (SUMIF, COUNTIF, ...) can use regular expressions.
+   * When set to `true`, criteria in functions (SUMIF, COUNTIF, ...) are allowed to use regular expressions.
    *
    * @default false
    * @category String
    */
   useRegularExpressions: boolean,
   /**
-   * If set true, then criterions in functions (SUMIF, COUNTIF, ...) can use wildcards '*' and '?'.
+   * When set to `true`, criteria in functions (SUMIF, COUNTIF, ...) can use the `*` and `?` wildcards.
    *
    * @default true
    * @category String
