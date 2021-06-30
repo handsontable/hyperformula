@@ -25,7 +25,7 @@ JavaScript frameworks like [Vue](/guide/integration-with-vue.md),
 [React](/guide/integration-with-react.md), and [Angular](/guide/integration-with-angular.md). You can use it in a
 browser or as a service with Node.js as your back-end technology.
 
-It comes with a built-in [library of functions](/guide/built-in-functions.md)
+It comes with a huge library of [{{ $page.functionsCount }} built-in functions](/guide/built-in-functions.md)
 grouped into different categories, such as Math and trigonometry,
 Engineering, Statistical, Financial, and Logical. The functions use
 A1 notation and are compatible with popular spreadsheet software like
@@ -62,11 +62,12 @@ The features that HyperFormula offers make it a flexible and easy
 to use tool for many types of software.
 
 * High-speed formula calculations
-* A library of built-in functions available in 16 languages
+* A library of {{ $page.functionsCount }} built-in functions available in 16 languages
 * Support for cross-sheet references
 * Support for undo/redo
 * Support for copy/cut/paste
 * Support for wildcard characters
+* Support for data sorting
 * Works with popular JavaScript frameworks
 * Written in TypeScript and extensively tested
 * Uses GPU acceleration for better performance
