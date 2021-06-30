@@ -338,10 +338,11 @@ export interface ConfigParams {
    */
   useArrayArithmetic: boolean,
   /**
-   * Switches column search strategy from binary search to column index.
-   * Used by VLOOKUP and MATCH functions.
-   * Using column index may improve time efficiency but it will increase memory usage.
-   * In some scenarios column index may fall back to binary search despite this flag.
+   * If set to `true`, switches column search strategy from **binary search** to **column index**.
+   *
+   * Using column index improves efficiency for the `VLOOKUP` and `MATCH` functions, but increases memory usage.
+   * 
+   * When searching with **wildcards** or **regular expressions**, column search strategy falls back to binary search (even with `useColumnIndex` set to `true`).
    *
    * @default false
    *
