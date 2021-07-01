@@ -112,15 +112,15 @@ export class ArrayVertex extends FormulaVertex {
       this.setErrorValue(value)
       return value
     }
-    const matrix = ArrayValue.fromInterpreterValue(value)
-    matrix.resize(this.array.size)
-    this.array = matrix
+    const array = ArrayValue.fromInterpreterValue(value)
+    array.resize(this.array.size)
+    this.array = array
     return value
   }
 
   getCellValue(): InterpreterValue {
     if (this.array instanceof NotComputedArray) {
-      throw Error('Matrix not computed yet.')
+      throw Error('Array not computed yet.')
     }
     return this.array.simpleRangeValue()
   }
@@ -132,7 +132,7 @@ export class ArrayVertex extends FormulaVertex {
     return this.array.simpleRangeValue()
   }
 
-  getMatrixCellValue(address: SimpleCellAddress): InternalScalarValue {
+  getArrayCellValue(address: SimpleCellAddress): InternalScalarValue {
     const col = address.col - this.cellAddress.col
     const row = address.row - this.cellAddress.row
 
@@ -143,8 +143,8 @@ export class ArrayVertex extends FormulaVertex {
     }
   }
 
-  getMatrixCellRawValue(address: SimpleCellAddress): Maybe<RawCellContent> {
-    const val = this.getMatrixCellValue(address)
+  getArrayCellRawValue(address: SimpleCellAddress): Maybe<RawCellContent> {
+    const val = this.getArrayCellValue(address)
     if (val instanceof CellError || val === EmptyValue) {
       return undefined
     } else {
@@ -152,7 +152,7 @@ export class ArrayVertex extends FormulaVertex {
     }
   }
 
-  setMatrixCellValue(address: SimpleCellAddress, value: number): void {
+  setArrayCellValue(address: SimpleCellAddress, value: number): void {
     const col = address.col - this.cellAddress.col
     const row = address.row - this.cellAddress.row
     if (this.array instanceof ArrayValue) {
@@ -193,16 +193,16 @@ export class ArrayVertex extends FormulaVertex {
     return (!(this.array instanceof NotComputedArray))
   }
 
-  columnsFromMatrix() {
+  columnsFromArray() {
     return ColumnsSpan.fromNumberOfColumns(this.cellAddress.sheet, this.cellAddress.col, this.width)
   }
 
-  rowsFromMatrix() {
+  rowsFromArray() {
     return RowsSpan.fromNumberOfRows(this.cellAddress.sheet, this.cellAddress.row, this.height)
   }
 
   /**
-   * No-op as matrix vertices are transformed eagerly.
+   * No-op as array vertices are transformed eagerly.
    * */
   ensureRecentData(_updatingService: LazilyTransformingAstService) {}
 

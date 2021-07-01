@@ -84,8 +84,8 @@ class HyperFormulaNS extends HyperFormula {
   public static ProtectedFunctionTranslationError = ProtectedFunctionTranslationError
   public static SheetNameAlreadyTakenError = SheetNameAlreadyTakenError
   public static SheetSizeLimitExceededError = SheetSizeLimitExceededError
-  public static SourceLocationHasMatrixError = SourceLocationHasArrayError
-  public static TargetLocationHasMatrixError = TargetLocationHasArrayError
+  public static SourceLocationHasArrayError = SourceLocationHasArrayError
+  public static TargetLocationHasArrayError = TargetLocationHasArrayError
   public static UnableToParseError = UnableToParseError
 }
 

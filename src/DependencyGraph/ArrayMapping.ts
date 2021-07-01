@@ -12,23 +12,23 @@ import {ArrayVertex} from './'
 export class ArrayMapping {
   public readonly arrayMapping: Map<string, ArrayVertex> = new Map()
 
-  public getMatrix(range: AbsoluteCellRange): Maybe<ArrayVertex> {
-    const matrix =  this.getMatrixByCorner(range.start)
-    if (matrix?.getRange().sameAs(range)) {
-      return matrix
+  public getArray(range: AbsoluteCellRange): Maybe<ArrayVertex> {
+    const array =  this.getArrayByCorner(range.start)
+    if (array?.getRange().sameAs(range)) {
+      return array
     }
     return
   }
 
-  public getMatrixByCorner(address: SimpleCellAddress): Maybe<ArrayVertex> {
+  public getArrayByCorner(address: SimpleCellAddress): Maybe<ArrayVertex> {
     return this.arrayMapping.get(addressKey(address))
   }
 
-  public setMatrix(range: AbsoluteCellRange, vertex: ArrayVertex) {
+  public setArray(range: AbsoluteCellRange, vertex: ArrayVertex) {
     this.arrayMapping.set(addressKey(range.start), vertex)
   }
 
-  public removeMatrix(range: string | AbsoluteCellRange) {
+  public removeArray(range: string | AbsoluteCellRange) {
     if (typeof range === 'string') {
       this.arrayMapping.delete(range)
     } else {
@@ -40,7 +40,7 @@ export class ArrayMapping {
     return this.arrayMapping.size
   }
 
-  public* matricesInRows(rowsSpan: RowsSpan): IterableIterator<[string, ArrayVertex]> {
+  public* arraysInRows(rowsSpan: RowsSpan): IterableIterator<[string, ArrayVertex]> {
     for (const [mtxKey, mtx] of this.arrayMapping.entries()) {
       if (mtx.spansThroughSheetRows(rowsSpan.sheet, rowsSpan.rowStart, rowsSpan.rowEnd)) {
         yield [mtxKey, mtx]
@@ -48,7 +48,7 @@ export class ArrayMapping {
     }
   }
 
-  public* matricesInCols(col: ColumnsSpan): IterableIterator<[string, ArrayVertex]> {
+  public* arraysInCols(col: ColumnsSpan): IterableIterator<[string, ArrayVertex]> {
     for (const [mtxKey, mtx] of this.arrayMapping.entries()) {
       if (mtx.spansThroughSheetColumn(col.sheet, col.columnStart, col.columnEnd)) {
         yield [mtxKey, mtx]
@@ -56,7 +56,7 @@ export class ArrayMapping {
     }
   }
 
-  public isFormulaMatrixInRow(sheet: number, row: number): boolean {
+  public isFormulaArrayInRow(sheet: number, row: number): boolean {
     for (const mtx of this.arrayMapping.values()) {
       if (mtx.spansThroughSheetRows(sheet, row)) {
         return true
@@ -65,17 +65,17 @@ export class ArrayMapping {
     return false
   }
 
-  public isFormulaMatrixInAllRows(span: RowsSpan): boolean {
+  public isFormulaArrayInAllRows(span: RowsSpan): boolean {
     let result = true
     for (const row of span.rows()) {
-      if (!this.isFormulaMatrixInRow(span.sheet, row)) {
+      if (!this.isFormulaArrayInRow(span.sheet, row)) {
         result = false
       }
     }
     return result
   }
 
-  public isFormulaMatrixInColumn(sheet: number, column: number): boolean {
+  public isFormulaArrayInColumn(sheet: number, column: number): boolean {
     for (const mtx of this.arrayMapping.values()) {
       if (mtx.spansThroughSheetColumn(sheet, column)) {
         return true
@@ -84,17 +84,17 @@ export class ArrayMapping {
     return false
   }
 
-  public isFormulaMatrixInAllColumns(span: ColumnsSpan): boolean {
+  public isFormulaArrayInAllColumns(span: ColumnsSpan): boolean {
     let result = true
     for (const col of span.columns()) {
-      if (!this.isFormulaMatrixInColumn(span.sheet, col)) {
+      if (!this.isFormulaArrayInColumn(span.sheet, col)) {
         result = false
       }
     }
     return result
   }
 
-  public isFormulaMatrixInRange(range: AbsoluteCellRange) {
+  public isFormulaArrayInRange(range: AbsoluteCellRange) {
     for (const mtx of this.arrayMapping.values()) {
       if (mtx.getRange().doesOverlap(range)) {
         return true
@@ -103,7 +103,7 @@ export class ArrayMapping {
     return false
   }
 
-  public isFormulaMatrixAtAddress(address: SimpleCellAddress) {
+  public isFormulaArrayAtAddress(address: SimpleCellAddress) {
     for (const mtx of this.arrayMapping.values()) {
       if (mtx.getRange().addressInRange(address)) {
         return true
@@ -116,21 +116,21 @@ export class ArrayMapping {
     this.arrayMapping.clear()
   }
 
-  public moveMatrixVerticesAfterRowByRows(sheet: number, row: number, numberOfRows: number) {
-    this.updateMatrixVerticesInSheet(sheet, (key: string, vertex: ArrayVertex) => {
+  public moveArrayVerticesAfterRowByRows(sheet: number, row: number, numberOfRows: number) {
+    this.updateArrayVerticesInSheet(sheet, (key: string, vertex: ArrayVertex) => {
       const range = vertex.getRange()
       return row <= range.start.row ? [range.shifted(0, numberOfRows), vertex] : undefined
     })
   }
 
-  public moveMatrixVerticesAfterColumnByColumns(sheet: number, column: number, numberOfColumns: number) {
-    this.updateMatrixVerticesInSheet(sheet, (key: string, vertex: ArrayVertex) => {
+  public moveArrayVerticesAfterColumnByColumns(sheet: number, column: number, numberOfColumns: number) {
+    this.updateArrayVerticesInSheet(sheet, (key: string, vertex: ArrayVertex) => {
       const range = vertex.getRange()
       return column <= range.start.col ? [range.shifted(numberOfColumns, 0), vertex] : undefined
     })
   }
 
-  private updateMatrixVerticesInSheet(sheet: number, fn: (key: string, vertex: ArrayVertex) => Maybe<[AbsoluteCellRange, ArrayVertex]>) {
+  private updateArrayVerticesInSheet(sheet: number, fn: (key: string, vertex: ArrayVertex) => Maybe<[AbsoluteCellRange, ArrayVertex]>) {
     const updated = Array<[AbsoluteCellRange, ArrayVertex]>()
 
     for (const [key, vertex] of this.arrayMapping.entries()) {
@@ -139,13 +139,13 @@ export class ArrayMapping {
       }
       const result = fn(key, vertex)
       if (result !== undefined) {
-        this.removeMatrix(key)
+        this.removeArray(key)
         updated.push(result)
       }
     }
 
     updated.forEach(([range, matrix]) => {
-      this.setMatrix(range, matrix)
+      this.setArray(range, matrix)
     })
   }
 }

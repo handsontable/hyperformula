@@ -73,7 +73,7 @@ export class AddressMapping {
     if (vertex === undefined) {
       return EmptyValue
     } else if (vertex instanceof ArrayVertex) {
-      return vertex.getMatrixCellValue(address)
+      return vertex.getArrayCellValue(address)
     } else {
       return vertex.getCellValue()
     }
@@ -84,7 +84,7 @@ export class AddressMapping {
     if(vertex instanceof ValueCellVertex) {
       return vertex.getValues().rawValue
     } else if (vertex instanceof ArrayVertex) {
-      return vertex.getMatrixCellRawValue(address)
+      return vertex.getArrayCellRawValue(address)
     } else {
       return null
     }

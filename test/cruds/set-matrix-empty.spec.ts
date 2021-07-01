@@ -10,7 +10,7 @@ describe('Set matrix empty', () => {
     ])
     const dependencyGraph = engine.dependencyGraph
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const matrixVertex = dependencyGraph.arrayMapping.getMatrix(AbsoluteCellRange.spanFrom(adr('A2'), 1, 2))!
+    const matrixVertex = dependencyGraph.arrayMapping.getArray(AbsoluteCellRange.spanFrom(adr('A2'), 1, 2))!
 
     dependencyGraph.setArrayEmpty(matrixVertex)
 
@@ -26,7 +26,7 @@ describe('Set matrix empty', () => {
     ])
     const dependencyGraph = engine.dependencyGraph
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const matrixVertex = dependencyGraph.arrayMapping.getMatrix(AbsoluteCellRange.spanFrom(adr('A2'), 1, 2))!
+    const matrixVertex = dependencyGraph.arrayMapping.getArray(AbsoluteCellRange.spanFrom(adr('A2'), 1, 2))!
 
     dependencyGraph.setArrayEmpty(matrixVertex)
 
@@ -51,7 +51,7 @@ describe('Set matrix empty', () => {
     ])
     const dependencyGraph = engine.dependencyGraph
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const matrixVertex = dependencyGraph.arrayMapping.getMatrix(AbsoluteCellRange.spanFrom(adr('A2'), 1, 2))!
+    const matrixVertex = dependencyGraph.arrayMapping.getArray(AbsoluteCellRange.spanFrom(adr('A2'), 1, 2))!
 
     dependencyGraph.setArrayEmpty(matrixVertex)
 
@@ -72,7 +72,7 @@ describe('Set matrix empty', () => {
     ])
     const dependencyGraph = engine.dependencyGraph
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const matrixVertex = dependencyGraph.arrayMapping.getMatrix(AbsoluteCellRange.spanFrom(adr('A2'), 1, 2))!
+    const matrixVertex = dependencyGraph.arrayMapping.getArray(AbsoluteCellRange.spanFrom(adr('A2'), 1, 2))!
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const rangeVertex  = dependencyGraph.rangeMapping.getRange(adr('A2'), adr('A3'))!
     expect(dependencyGraph.existsEdge(matrixVertex, rangeVertex)).toBe(true)
@@ -98,7 +98,7 @@ describe('Set matrix empty', () => {
     ])
     const dependencyGraph = engine.dependencyGraph
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const matrixVertex = dependencyGraph.arrayMapping.getMatrix(AbsoluteCellRange.spanFrom(adr('A2'), 1, 2))!
+    const matrixVertex = dependencyGraph.arrayMapping.getArray(AbsoluteCellRange.spanFrom(adr('A2'), 1, 2))!
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const rangeVertex  = dependencyGraph.rangeMapping.getRange(adr('A1'), adr('A2'))!
     expect(dependencyGraph.existsEdge(matrixVertex, rangeVertex)).toBe(true)

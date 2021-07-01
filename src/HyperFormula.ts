@@ -1101,7 +1101,7 @@ export class HyperFormula implements TypedEmitter {
   /**
    * Returns information whether it is possible to change the content in a rectangular area bounded by the box.
    * If returns `true`, doing [[setCellContents]] operation won't throw any errors.
-   * Returns `false` if the operation might be disrupted and causes side-effects by the fact that there is a matrix inside selected cells, the address is invalid or the sheet does not exist.
+   * Returns `false` if the operation might be disrupted and causes side-effects by the fact that there is an array inside selected cells, the address is invalid or the sheet does not exist.
    *
    * @param {SimpleCellAddress | SimpleCellRange} address - single cell or block of cells to check
    *
@@ -1194,7 +1194,7 @@ export class HyperFormula implements TypedEmitter {
    * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
    * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
    * @throws [[InvalidArgumentsError]] when rowMapping does not define correct row permutation for some subset of rows of the given sheet
-   * @throws [[SourceLocationHasMatrixError]] when the selected position has matrix inside
+   * @throws [[SourceLocationHasArrayError]] when the selected position has array inside
    *
    * @example
    * ```js
@@ -1260,7 +1260,7 @@ export class HyperFormula implements TypedEmitter {
     validateArgToType(sheetId, 'number', 'sheetId')
     try {
       this._crudOperations.validateSwapRowIndexes(sheetId, rowMapping)
-      this._crudOperations.testRowOrderForMatrices(sheetId, rowMapping)
+      this._crudOperations.testRowOrderForArrays(sheetId, rowMapping)
       return true
     } catch (e) {
       return false
@@ -1280,7 +1280,7 @@ export class HyperFormula implements TypedEmitter {
    * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
    * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
    * @throws [[InvalidArgumentsError]] when rowMapping does not define correct row permutation for some subset of rows of the given sheet
-   * @throws [[SourceLocationHasMatrixError]] when the selected position has matrix inside
+   * @throws [[SourceLocationHasArrayError]] when the selected position has array inside
    *
    * @example
    * ```js
@@ -1347,7 +1347,7 @@ export class HyperFormula implements TypedEmitter {
     try {
       const rowMapping = this._crudOperations.mappingFromOrder(sheetId, newRowOrder, 'row')
       this._crudOperations.validateSwapRowIndexes(sheetId, rowMapping)
-      this._crudOperations.testRowOrderForMatrices(sheetId, rowMapping)
+      this._crudOperations.testRowOrderForArrays(sheetId, rowMapping)
       return true
     } catch (e) {
       return false
@@ -1367,7 +1367,7 @@ export class HyperFormula implements TypedEmitter {
    * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
    * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
    * @throws [[InvalidArgumentsError]] when columnMapping does not define correct column permutation for some subset of columns of the given sheet
-   * @throws [[SourceLocationHasMatrixError]] when the selected position has matrix inside
+   * @throws [[SourceLocationHasArrayError]] when the selected position has array inside
    *
    * @example
    * ```js
@@ -1430,7 +1430,7 @@ export class HyperFormula implements TypedEmitter {
     validateArgToType(sheetId, 'number', 'sheetId')
     try {
       this._crudOperations.validateSwapColumnIndexes(sheetId, columnMapping)
-      this._crudOperations.testColumnOrderForMatrices(sheetId, columnMapping)
+      this._crudOperations.testColumnOrderForArrays(sheetId, columnMapping)
       return true
     } catch (e) {
       return false
@@ -1450,7 +1450,7 @@ export class HyperFormula implements TypedEmitter {
    * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
    * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
    * @throws [[InvalidArgumentsError]] when columnMapping does not define correct column permutation for some subset of columns of the given sheet
-   * @throws [[SourceLocationHasMatrixError]] when the selected position has matrix inside
+   * @throws [[SourceLocationHasArrayError]] when the selected position has array inside
    *
    * @example
    * ```js
@@ -1515,7 +1515,7 @@ export class HyperFormula implements TypedEmitter {
     try {
       const columnMapping = this._crudOperations.mappingFromOrder(sheetId, newColumnOrder, 'column')
       this._crudOperations.validateSwapColumnIndexes(sheetId, columnMapping)
-      this._crudOperations.testColumnOrderForMatrices(sheetId, columnMapping)
+      this._crudOperations.testColumnOrderForArrays(sheetId, columnMapping)
       return true
     } catch (e) {
       return false
@@ -1662,7 +1662,7 @@ export class HyperFormula implements TypedEmitter {
    * Returns information whether it is possible to add columns into a specified position in a given sheet.
    * Checks against particular rules to ascertain that addColumns can be called.
    * If returns `true`, doing [[addColumns]] operation won't throw any errors.
-   * Returns `false` if the operation might be disrupted and causes side-effects by the fact that there is a matrix inside the selected columns.
+   * Returns `false` if the operation might be disrupted and causes side-effects by the fact that there is an array inside the selected columns.
    *
    * @param {number} sheetId - sheet ID in which columns will be added
    * @param {ColumnRowIndex[]} indexes - non-contiguous indexes with format: [column, amount], where column is a column number from which new columns will be added
@@ -1707,7 +1707,7 @@ export class HyperFormula implements TypedEmitter {
    * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
    * @throws [[InvalidArgumentsError]] when the given arguments are invalid
    * @throws [[SheetSizeLimitExceededError]] when performing this operation would result in sheet size limits exceeding
-   * @throws [[TargetLocationHasMatrixError]] when the selected position has matrix inside
+   * @throws [[TargetLocationHasArrayError]] when the selected position has array inside
    *
    * @example
    * ```js
@@ -1736,7 +1736,7 @@ export class HyperFormula implements TypedEmitter {
    * Returns information whether it is possible to remove columns from a specified position in a given sheet.
    * Checks against particular rules to ascertain that removeColumns can be called.
    * If returns `true`, doing [[removeColumns]] operation won't throw any errors.
-   * Returns `false` if the operation might be disrupted and causes side-effects by the fact that there is a matrix inside the selected columns.
+   * Returns `false` if the operation might be disrupted and causes side-effects by the fact that there is an array inside the selected columns.
    *
    * @param {number} sheetId - sheet ID from which columns will be removed
    * @param {ColumnRowIndex[]} indexes - non-contiguous indexes with format [column, amount]
@@ -1780,7 +1780,7 @@ export class HyperFormula implements TypedEmitter {
    * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
    * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
    * @throws [[InvalidArgumentsError]] when the given arguments are invalid
-   * @throws [[SourceLocationHasMatrixError]] when the selected position has matrix inside
+   * @throws [[SourceLocationHasArrayError]] when the selected position has array inside
    *
    * @example
    * ```js
@@ -1809,7 +1809,7 @@ export class HyperFormula implements TypedEmitter {
    * Returns information whether it is possible to move cells to a specified position in a given sheet.
    * Checks against particular rules to ascertain that moveCells can be called.
    * If returns `true`, doing [[moveCells]] operation won't throw any errors.
-   * Returns `false` if the operation might be disrupted and causes side-effects by the fact that there is a matrix inside the selected columns, the target location has matrix or the provided address is invalid.
+   * Returns `false` if the operation might be disrupted and causes side-effects by the fact that there is an array inside the selected columns, the target location has array or the provided address is invalid.
    *
    * @param {SimpleCellRange} source - range for a moved block
    * @param {SimpleCellAddress} destinationLeftCorner - upper left address of the target cell block
@@ -1864,8 +1864,8 @@ export class HyperFormula implements TypedEmitter {
    * @throws [[ExpectedValueOfTypeError]] if destinationLeftCorner or source are of wrong type
    * @throws [[InvalidArgumentsError]] when the given arguments are invalid
    * @throws [[SheetSizeLimitExceededError]] when performing this operation would result in sheet size limits exceeding
-   * @throws [[SourceLocationHasMatrixError]] when the source location has matrix inside - matrix cannot be moved
-   * @throws [[TargetLocationHasMatrixError]] when the target location has matrix inside - cells cannot be replaced by the matrix
+   * @throws [[SourceLocationHasArrayError]] when the source location has array inside - array cannot be moved
+   * @throws [[TargetLocationHasArrayError]] when the target location has array inside - cells cannot be replaced by the array
    * @throws [[SheetsNotEqual]] if range provided has distinct sheet numbers for start and end
    *
    * @example
@@ -1905,7 +1905,7 @@ export class HyperFormula implements TypedEmitter {
    * Returns information whether it is possible to move a particular number of rows to a specified position in a given sheet.
    * Checks against particular rules to ascertain that moveRows can be called.
    * If returns `true`, doing [[moveRows]] operation won't throw any errors.
-   * Returns `false` if the operation might be disrupted and causes side-effects by the fact that there is a matrix inside the selected rows, the target location has matrix or the provided address is invalid.
+   * Returns `false` if the operation might be disrupted and causes side-effects by the fact that there is an array inside the selected rows, the target location has array or the provided address is invalid.
    *
    * @param {number} sheetId - a sheet number in which the operation will be performed
    * @param {number} startRow - number of the first row to move
@@ -1954,8 +1954,8 @@ export class HyperFormula implements TypedEmitter {
    *
    * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
    * @throws [[InvalidArgumentsError]] when the given arguments are invalid
-   * @throws [[SourceLocationHasMatrixError]] when the source location has matrix inside - matrix cannot be moved
-   * @throws [[TargetLocationHasMatrixError]] when the target location has matrix inside - cells cannot be replaced by the matrix
+   * @throws [[SourceLocationHasArrayError]] when the source location has array inside - array cannot be moved
+   * @throws [[TargetLocationHasArrayError]] when the target location has array inside - cells cannot be replaced by the array
    *
    * @example
    * ```js
@@ -1984,7 +1984,7 @@ export class HyperFormula implements TypedEmitter {
    * Returns information whether it is possible to move a particular number of columns to a specified position in a given sheet.
    * Checks against particular rules to ascertain that moveColumns can be called.
    * If returns `true`, doing [[moveColumns]] operation won't throw any errors.
-   * Returns `false` if the operation might be disrupted and causes side-effects by the fact that there is a matrix inside the selected columns, the target location has matrix or the provided address is invalid.
+   * Returns `false` if the operation might be disrupted and causes side-effects by the fact that there is an array inside the selected columns, the target location has array or the provided address is invalid.
    *
    * @param {number} sheetId - a sheet number in which the operation will be performed
    * @param {number} startColumn - number of the first column to move
@@ -2032,8 +2032,8 @@ export class HyperFormula implements TypedEmitter {
    *
    * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
    * @throws [[InvalidArgumentsError]] when the given arguments are invalid
-   * @throws [[SourceLocationHasMatrixError]] when the source location has matrix inside - matrix cannot be moved
-   * @throws [[TargetLocationHasMatrixError]] when the target location has matrix inside - cells cannot be replaced by the matrix
+   * @throws [[SourceLocationHasArrayError]] when the source location has array inside - array cannot be moved
+   * @throws [[TargetLocationHasArrayError]] when the target location has array inside - cells cannot be replaced by the array
    *
    * @example
    * ```js
@@ -2141,7 +2141,7 @@ export class HyperFormula implements TypedEmitter {
    * @throws [[EvaluationSuspendedError]] when the evaluation is suspended
    * @throws [[SheetSizeLimitExceededError]] when performing this operation would result in sheet size limits exceeding
    * @throws [[NothingToPasteError]] when clipboard is empty
-   * @throws [[TargetLocationHasMatrixError]] when the selected target area has matrix inside
+   * @throws [[TargetLocationHasArrayError]] when the selected target area has array inside
    * @throws [[ExpectedValueOfTypeError]] if targetLeftCorner is of wrong type
    *
    * @example
@@ -3020,7 +3020,7 @@ export class HyperFormula implements TypedEmitter {
   }
 
   /**
-   * Returns `true` if a given cell is a part of a matrix.
+   * Returns `true` if a given cell is a part of a array.
    * The methods accepts cell coordinates as object with column, row and sheet numbers.
    *
    * @param {SimpleCellAddress} cellAddress - cell coordinates
@@ -3033,13 +3033,13 @@ export class HyperFormula implements TypedEmitter {
    *    ['{=TRANSPOSE(B1:B1)}'],
    * ]);
    *
-   * // should return 'true', cell of provided coordinates is a part of a matrix
-   * const isPartOfMatrix = hfInstance.isCellPartOfMatrix({ sheet: 0, col: 0, row: 0 });
+   * // should return 'true', cell of provided coordinates is a part of a array
+   * const isPartOfArray = hfInstance.isCellPartOfArray({ sheet: 0, col: 0, row: 0 });
    * ```
    *
    * @category Cells
    */
-  public isCellPartOfMatrix(cellAddress: SimpleCellAddress): boolean {
+  public isCellPartOfArray(cellAddress: SimpleCellAddress): boolean {
     if (!isSimpleCellAddress(cellAddress)) {
       throw new ExpectedValueOfTypeError('SimpleCellAddress', 'cellAddress')
     }
@@ -3648,7 +3648,7 @@ export class HyperFormula implements TypedEmitter {
    * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
    * @throws [[NamedExpressionDoesNotExistError]] when the given expression does not exist.
    * @throws [[NoSheetWithIdError]] if no sheet with given sheetId exists
-   * @throws [[MatrixFormulasNotSupportedError]] when the named expression formula is a Matrix formula
+   * @throws [[ArrayFormulasNotSupportedError]] when the named expression formula is an array formula
    * @throws [[NoRelativeAddressesAllowedError]] when the named expression formula contains relative references
    *
    * @example

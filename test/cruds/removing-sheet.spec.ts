@@ -252,12 +252,12 @@ describe('remove sheet - adjust matrix mapping', () => {
         ['=TRANSPOSE(A1:B1)'],
       ],
     })
-    expect(engine.arrayMapping.getMatrix(AbsoluteCellRange.spanFrom(adr('A2'), 1, 2))).toBeInstanceOf(ArrayVertex)
+    expect(engine.arrayMapping.getArray(AbsoluteCellRange.spanFrom(adr('A2'), 1, 2))).toBeInstanceOf(ArrayVertex)
 
     engine.removeSheet(0)
 
-    expect(engine.arrayMapping.getMatrix(AbsoluteCellRange.spanFrom(adr('A2'), 1, 2))).toBeUndefined()
-    expect(engine.arrayMapping.getMatrix(AbsoluteCellRange.spanFrom(adr('A2', 1), 1, 2))).toBeInstanceOf(ArrayVertex)
+    expect(engine.arrayMapping.getArray(AbsoluteCellRange.spanFrom(adr('A2'), 1, 2))).toBeUndefined()
+    expect(engine.arrayMapping.getArray(AbsoluteCellRange.spanFrom(adr('A2', 1), 1, 2))).toBeInstanceOf(ArrayVertex)
   })
 })
 

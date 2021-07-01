@@ -423,11 +423,11 @@ export class Operations {
       throw new SheetSizeLimitExceededError()
     }
 
-    if (this.dependencyGraph.arrayMapping.isFormulaMatrixInRange(sourceRange)) {
+    if (this.dependencyGraph.arrayMapping.isFormulaArrayInRange(sourceRange)) {
       throw new SourceLocationHasArrayError()
     }
 
-    if (this.dependencyGraph.arrayMapping.isFormulaMatrixInRange(targetRange)) {
+    if (this.dependencyGraph.arrayMapping.isFormulaArrayInRange(targetRange)) {
       throw new TargetLocationHasArrayError()
     }
   }
@@ -627,11 +627,11 @@ export class Operations {
     } else if (vertex instanceof ValueCellVertex) {
       return {type: ClipboardCellType.VALUE, ...vertex.getValues()}
     } else if (vertex instanceof ArrayVertex) {
-      const val = vertex.getMatrixCellValue(address)
+      const val = vertex.getArrayCellValue(address)
       if (val === EmptyValue) {
         return {type: ClipboardCellType.EMPTY}
       }
-      return {type: ClipboardCellType.VALUE, parsedValue: val, rawValue: vertex.getMatrixCellRawValue(address)}
+      return {type: ClipboardCellType.VALUE, parsedValue: val, rawValue: vertex.getArrayCellRawValue(address)}
     } else if (vertex instanceof FormulaCellVertex) {
       return {
         type: ClipboardCellType.FORMULA,

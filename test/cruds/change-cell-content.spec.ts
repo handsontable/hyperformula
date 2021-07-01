@@ -844,7 +844,7 @@ describe('arrays', () => {
       [1]
     ])
 
-    expect(engine.arrayMapping.getMatrixByCorner(adr('A1'))?.array.size).toEqual(ArraySize.error())
+    expect(engine.arrayMapping.getArrayByCorner(adr('A1'))?.array.size).toEqual(ArraySize.error())
     expectVerticesOfTypes(engine, [
       [ArrayVertex, undefined],
       [ValueCellVertex, undefined],

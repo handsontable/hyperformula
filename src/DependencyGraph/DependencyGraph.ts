@@ -100,7 +100,7 @@ export class DependencyGraph {
   }
 
   public setParsingErrorToCell(address: SimpleCellAddress, errorVertex: ParsingErrorVertex): ContentChanges {
-    const vertex = this.shrinkPossibleMatrixAndGetCell(address)
+    const vertex = this.shrinkPossibleArrayAndGetCell(address)
     this.exchangeOrAddGraphNode(vertex, errorVertex)
     this.addressMapping.setCell(address, errorVertex)
     this.graph.markNodeAsSpecialRecentlyChanged(errorVertex)
@@ -109,10 +109,10 @@ export class DependencyGraph {
   }
 
   public setValueToCell(address: SimpleCellAddress, value: RawAndParsedValue): ContentChanges {
-    const vertex = this.shrinkPossibleMatrixAndGetCell(address)
+    const vertex = this.shrinkPossibleArrayAndGetCell(address)
 
     if (vertex instanceof ArrayVertex) {
-      this.arrayMapping.removeMatrix(vertex.getRange())
+      this.arrayMapping.removeArray(vertex.getRange())
     }
     if (vertex instanceof ValueCellVertex) {
       const oldValues = vertex.getValues()
@@ -133,7 +133,7 @@ export class DependencyGraph {
   }
 
   public setCellEmpty(address: SimpleCellAddress): ContentChanges {
-    const vertex = this.shrinkPossibleMatrixAndGetCell(address)
+    const vertex = this.shrinkPossibleArrayAndGetCell(address)
     if (vertex === undefined) {
       return ContentChanges.empty()
     }
@@ -155,7 +155,7 @@ export class DependencyGraph {
     return this.getAndClearContentChanges()
   }
 
-  public ensureThatVertexIsNonMatrixCellVertex(vertex: Maybe<CellVertex>) {
+  public ensureThatVertexIsNonArrayCellVertex(vertex: Maybe<CellVertex>) {
     if (vertex instanceof ArrayVertex) {
       throw new Error('Illegal operation')
     }
@@ -198,9 +198,9 @@ export class DependencyGraph {
           rangeVertex.bruteForce = true
         }
 
-        const matrix = this.arrayMapping.getMatrix(restRange)
-        if (matrix !== undefined) {
-          this.graph.addEdge(matrix, rangeVertex)
+        const array = this.arrayMapping.getArray(restRange)
+        if (array !== undefined) {
+          this.graph.addEdge(array, rangeVertex)
         } else {
           for (const cellFromRange of restRange.addresses(this)) {
             this.graph.addEdge(this.fetchCellOrCreateEmpty(cellFromRange), rangeVertex)
@@ -262,13 +262,12 @@ export class DependencyGraph {
         }
         if (vertex instanceof ArrayVertex) {
           if (vertex.isLeftCorner(address)) {
-            this.shrinkMatrixToCorner(vertex)
-            this.arrayMapping.removeMatrix(vertex.getRange())
-          } else {
-            continue
+            this.shrinkArrayToCorner(vertex)
+            this.arrayMapping.removeArray(vertex.getRange())
           }
+        } else {
+          this.removeVertex(vertex)
         }
-        this.removeVertex(vertex)
       }
     })
 
@@ -278,11 +277,11 @@ export class DependencyGraph {
 
     const affectedArrays = this.stats.measure(StatType.ADJUSTING_RANGES, () => {
       const affectedRanges = this.truncateRanges(removedRows, address => address.row)
-      return this.getMatrixVerticesRelatedToRanges(affectedRanges)
+      return this.getArrayVerticesRelatedToRanges(affectedRanges)
     })
 
-    this.stats.measure(StatType.ADJUSTING_MATRIX_MAPPING, () => {
-      this.fixMatricesAfterRemovingRows(removedRows.sheet, removedRows.rowStart, removedRows.numberOfRows)
+    this.stats.measure(StatType.ADJUSTING_ARRAY_MAPPING, () => {
+      this.fixArraysAfterRemovingRows(removedRows.sheet, removedRows.rowStart, removedRows.numberOfRows)
     })
 
     this.addStructuralNodesToChangeSet()
@@ -294,14 +293,10 @@ export class DependencyGraph {
   }
 
   public removeSheet(removedSheetId: number) {
-    const matrices: Set<ArrayVertex> = new Set()
+    const arrays: Set<ArrayVertex> = new Set()
     for (const [adr, vertex] of this.addressMapping.sheetEntries(removedSheetId)) {
       if (vertex instanceof ArrayVertex) {
-        if (matrices.has(vertex)) {
-          continue
-        } else {
-          matrices.add(vertex)
-        }
+        arrays.add(vertex)
       }
       for (const adjacentNode of this.graph.adjacentNodes(vertex)) {
         this.graph.markNodeAsSpecialRecentlyChanged(adjacentNode)
@@ -310,9 +305,9 @@ export class DependencyGraph {
       this.addressMapping.removeCell(adr)
     }
 
-    this.stats.measure(StatType.ADJUSTING_MATRIX_MAPPING, () => {
-      for (const matrix of matrices.values()) {
-        this.arrayMapping.removeMatrix(matrix.getRange())
+    this.stats.measure(StatType.ADJUSTING_ARRAY_MAPPING, () => {
+      for (const array of arrays.values()) {
+        this.arrayMapping.removeArray(array.getRange())
       }
     })
 
@@ -332,17 +327,17 @@ export class DependencyGraph {
   }
 
   public clearSheet(sheetId: number) {
-    const matrices: Set<ArrayVertex> = new Set()
+    const arrays: Set<ArrayVertex> = new Set()
     for (const [address, vertex] of this.addressMapping.sheetEntries(sheetId)) {
       if (vertex instanceof ArrayVertex) {
-        matrices.add(vertex)
+        arrays.add(vertex)
       } else {
         this.setCellEmpty(address)
       }
     }
 
-    for (const matrix of matrices.values()) {
-      this.setArrayEmpty(matrix)
+    for (const array of arrays.values()) {
+      this.setArrayEmpty(array)
     }
 
     this.addStructuralNodesToChangeSet()
@@ -356,13 +351,12 @@ export class DependencyGraph {
         }
         if (vertex instanceof ArrayVertex) {
           if (vertex.isLeftCorner(address)) {
-            this.shrinkMatrixToCorner(vertex)
-            this.arrayMapping.removeMatrix(vertex.getRange())
-          } else {
-            continue
+            this.shrinkArrayToCorner(vertex)
+            this.arrayMapping.removeArray(vertex.getRange())
           }
+        } else {
+          this.removeVertex(vertex)
         }
-        this.removeVertex(vertex)
       }
     })
 
@@ -372,11 +366,11 @@ export class DependencyGraph {
 
     const affectedArrays = this.stats.measure(StatType.ADJUSTING_RANGES, () => {
       const affectedRanges = this.truncateRanges(removedColumns, address => address.col)
-      return this.getMatrixVerticesRelatedToRanges(affectedRanges)
+      return this.getArrayVerticesRelatedToRanges(affectedRanges)
     })
 
-    this.stats.measure(StatType.ADJUSTING_MATRIX_MAPPING, () => {
-      return this.fixMatricesAfterRemovingColumns(removedColumns.sheet, removedColumns.columnStart, removedColumns.numberOfColumns)
+    this.stats.measure(StatType.ADJUSTING_ARRAY_MAPPING, () => {
+      return this.fixArraysAfterRemovingColumns(removedColumns.sheet, removedColumns.columnStart, removedColumns.numberOfColumns)
     })
 
     this.addStructuralNodesToChangeSet()
@@ -395,11 +389,11 @@ export class DependencyGraph {
     const affectedArrays = this.stats.measure(StatType.ADJUSTING_RANGES, () => {
       const result = this.rangeMapping.moveAllRangesInSheetAfterRowByRows(addedRows.sheet, addedRows.rowStart, addedRows.numberOfRows)
       this.fixRangesWhenAddingRows(addedRows.sheet, addedRows.rowStart, addedRows.numberOfRows)
-      return this.getMatrixVerticesRelatedToRanges(result.verticesWithChangedSize)
+      return this.getArrayVerticesRelatedToRanges(result.verticesWithChangedSize)
     })
 
-    this.stats.measure(StatType.ADJUSTING_MATRIX_MAPPING, () => {
-      this.fixMatricesAfterAddingRow(addedRows.sheet, addedRows.rowStart, addedRows.numberOfRows)
+    this.stats.measure(StatType.ADJUSTING_ARRAY_MAPPING, () => {
+      this.fixArraysAfterAddingRow(addedRows.sheet, addedRows.rowStart, addedRows.numberOfRows)
     })
 
     for (const vertex of this.addressMapping.verticesFromRowsSpan(addedRows)) {
@@ -419,11 +413,11 @@ export class DependencyGraph {
     const affectedArrays = this.stats.measure(StatType.ADJUSTING_RANGES, () => {
       const result = this.rangeMapping.moveAllRangesInSheetAfterColumnByColumns(addedColumns.sheet, addedColumns.columnStart, addedColumns.numberOfColumns)
       this.fixRangesWhenAddingColumns(addedColumns.sheet, addedColumns.columnStart, addedColumns.numberOfColumns)
-      return this.getMatrixVerticesRelatedToRanges(result.verticesWithChangedSize)
+      return this.getArrayVerticesRelatedToRanges(result.verticesWithChangedSize)
     })
 
-    this.stats.measure(StatType.ADJUSTING_MATRIX_MAPPING, () => {
-      return this.fixMatricesAfterAddingColumn(addedColumns.sheet, addedColumns.columnStart, addedColumns.numberOfColumns)
+    this.stats.measure(StatType.ADJUSTING_ARRAY_MAPPING, () => {
+      return this.fixArraysAfterAddingColumn(addedColumns.sheet, addedColumns.columnStart, addedColumns.numberOfColumns)
     })
 
     for (const vertex of this.addressMapping.verticesFromColumnsSpan(addedColumns)) {
@@ -435,9 +429,9 @@ export class DependencyGraph {
     return {affectedArrays, contentChanges: this.getAndClearContentChanges()}
   }
 
-  public ensureNoMatrixInRange(range: AbsoluteCellRange) {
-    if (this.arrayMapping.isFormulaMatrixInRange(range)) {
-      throw Error('It is not possible to move / replace cells with matrix')
+  public ensureNoArrayInRange(range: AbsoluteCellRange) {
+    if (this.arrayMapping.isFormulaArrayInRange(range)) {
+      throw Error('It is not possible to move / replace cells with array')
     }
   }
 
@@ -527,7 +521,7 @@ export class DependencyGraph {
     }
 
     this.removeVertex(arrayVertex)
-    this.arrayMapping.removeMatrix(arrayVertex.getRange())
+    this.arrayMapping.removeArray(arrayVertex.getRange())
   }
 
   public addVertex(address: SimpleCellAddress, vertex: CellVertex): void {
@@ -535,9 +529,9 @@ export class DependencyGraph {
     this.addressMapping.setCell(address, vertex)
   }
 
-  public addMatrixVertex(address: SimpleCellAddress, vertex: ArrayVertex): void {
+  public addArrayVertex(address: SimpleCellAddress, vertex: ArrayVertex): void {
     this.graph.addNode(vertex)
-    this.setAddressMappingForMatrixVertex(vertex, address)
+    this.setAddressMappingForArrayVertex(vertex, address)
   }
 
   public* arrayFormulaNodes(): IterableIterator<ArrayVertex> {
@@ -600,12 +594,12 @@ export class DependencyGraph {
     return this.addressMapping.getWidth(sheet)
   }
 
-  public getMatrix(range: AbsoluteCellRange): Maybe<ArrayVertex> {
-    return this.arrayMapping.getMatrix(range)
+  public getArray(range: AbsoluteCellRange): Maybe<ArrayVertex> {
+    return this.arrayMapping.getArray(range)
   }
 
-  public setMatrix(range: AbsoluteCellRange, vertex: ArrayVertex): void {
-    this.arrayMapping.setMatrix(range, vertex)
+  public setArray(range: AbsoluteCellRange, vertex: ArrayVertex): void {
+    this.arrayMapping.setArray(range, vertex)
   }
 
   public getRange(start: SimpleCellAddress, end: SimpleCellAddress): Maybe<RangeVertex> {
@@ -644,15 +638,15 @@ export class DependencyGraph {
     this.arrayMapping.destroy()
   }
 
-  public getMatrixVerticesRelatedToRanges(ranges: RangeVertex[]): Set<ArrayVertex> {
-    const matrixVertices = ranges.map(range => {
+  public getArrayVerticesRelatedToRanges(ranges: RangeVertex[]): Set<ArrayVertex> {
+    const arrayVertices = ranges.map(range => {
       if (this.graph.hasNode(range)) {
         return Array.from(this.graph.adjacentNodes(range)).filter(node => node instanceof ArrayVertex)
       } else {
         return []
       }
     }) as ArrayVertex[][]
-    return new Set(...matrixVertices)
+    return new Set(...arrayVertices)
   }
 
   public* rawValuesFromRange(range: AbsoluteCellRange): IterableIterator<[RawScalarValue, SimpleCellAddress]> {
@@ -743,28 +737,28 @@ export class DependencyGraph {
     return values
   }
 
-  public shrinkMatrixToCorner(matrix: ArrayVertex) {
-    this.cleanAddressMappingUnderMatrix(matrix)
-    for (const adjacentVertex of this.adjacentMatrixVertices(matrix)) {
+  public shrinkArrayToCorner(array: ArrayVertex) {
+    this.cleanAddressMappingUnderArray(array)
+    for (const adjacentVertex of this.adjacentArrayVertices(array)) {
       let relevantDependencies
       if (adjacentVertex instanceof FormulaVertex) {
-        relevantDependencies = this.formulaDirectDependenciesToMatrix(adjacentVertex, matrix)
+        relevantDependencies = this.formulaDirectDependenciesToArray(adjacentVertex, array)
       } else {
-        relevantDependencies = this.rangeDirectDependenciesToMatrix(adjacentVertex, matrix)
+        relevantDependencies = this.rangeDirectDependenciesToArray(adjacentVertex, array)
       }
       let dependentToCorner = false
       for (const [address, vertex] of relevantDependencies) {
-        if (matrix.isLeftCorner(address)) {
+        if (array.isLeftCorner(address)) {
           dependentToCorner = true
         }
         this.graph.addEdge(vertex, adjacentVertex)
         this.graph.markNodeAsSpecialRecentlyChanged(vertex)
       }
       if (!dependentToCorner) {
-        this.graph.removeEdge(matrix, adjacentVertex)
+        this.graph.removeEdge(array, adjacentVertex)
       }
     }
-    this.graph.markNodeAsSpecialRecentlyChanged(matrix)
+    this.graph.markNodeAsSpecialRecentlyChanged(array)
   }
 
   public isArrayInternalCell(address: SimpleCellAddress): boolean {
@@ -805,10 +799,10 @@ export class DependencyGraph {
     }
   }
 
-  private cleanAddressMappingUnderMatrix(vertex: ArrayVertex) {
-    const matrixRange = vertex.getRange()
-    for (const address of matrixRange.addresses(this)) {
-      const oldValue = vertex.getMatrixCellValue(address)
+  private cleanAddressMappingUnderArray(vertex: ArrayVertex) {
+    const arrayRange = vertex.getRange()
+    for (const address of arrayRange.addresses(this)) {
+      const oldValue = vertex.getArrayCellValue(address)
       if (this.getCell(address) === vertex) {
         if (vertex.isLeftCorner(address)) {
           this.changes.addChange(new CellError(ErrorType.REF), address, oldValue)
@@ -822,7 +816,7 @@ export class DependencyGraph {
     }
   }
 
-  private* formulaDirectDependenciesToMatrix(vertex: FormulaVertex, matrix: ArrayVertex): IterableIterator<[SimpleCellAddress, CellVertex]> {
+  private* formulaDirectDependenciesToArray(vertex: FormulaVertex, array: ArrayVertex): IterableIterator<[SimpleCellAddress, CellVertex]> {
     const [, formulaDependencies] = this.formulaDependencyQuery(vertex) ?? []
     if (formulaDependencies === undefined) {
       return
@@ -831,24 +825,24 @@ export class DependencyGraph {
       if (dependency instanceof NamedExpressionDependency || dependency instanceof AbsoluteCellRange) {
         continue
       }
-      if (matrix.getRange().addressInRange(dependency)) {
+      if (array.getRange().addressInRange(dependency)) {
         const vertex = this.fetchCellOrCreateEmpty(dependency)
         yield [dependency, vertex]
       }
     }
   }
 
-  private* rangeDirectDependenciesToMatrix(vertex: RangeVertex, matrix: ArrayVertex): IterableIterator<[SimpleCellAddress, CellVertex]> {
+  private* rangeDirectDependenciesToArray(vertex: RangeVertex, array: ArrayVertex): IterableIterator<[SimpleCellAddress, CellVertex]> {
     const {restRange: range} = this.rangeMapping.findSmallerRange(vertex.range)
     for (const address of range.addresses(this)) {
-      if (matrix.getRange().addressInRange(address)) {
+      if (array.getRange().addressInRange(address)) {
         const cell = this.fetchCellOrCreateEmpty(address)
         yield [address, cell]
       }
     }
   }
 
-  private* adjacentMatrixVertices(vertex: ArrayVertex): IterableIterator<FormulaVertex | RangeVertex> {
+  private* adjacentArrayVertices(vertex: ArrayVertex): IterableIterator<FormulaVertex | RangeVertex> {
     const adjacentNodes = this.graph.adjacentNodes(vertex)
     for (const item of adjacentNodes) {
       if (item instanceof FormulaVertex || item instanceof RangeVertex) {
@@ -956,9 +950,9 @@ export class DependencyGraph {
   private exchangeOrAddFormulaVertex(vertex: FormulaVertex): void {
     const address = vertex.getAddress(this.lazilyTransformingAstService)
     const range = AbsoluteCellRange.spanFrom(address, vertex.width, vertex.height)
-    const oldNode = this.shrinkPossibleMatrixAndGetCell(address)
+    const oldNode = this.shrinkPossibleArrayAndGetCell(address)
     if (vertex instanceof ArrayVertex) {
-      this.setMatrix(range, vertex)
+      this.setArray(range, vertex)
     }
     this.exchangeOrAddGraphNode(oldNode, vertex)
     this.addressMapping.setCell(address, vertex)
@@ -981,7 +975,7 @@ export class DependencyGraph {
     }
   }
 
-  private setAddressMappingForMatrixVertex(vertex: CellVertex, formulaAddress: SimpleCellAddress): void {
+  private setAddressMappingForArrayVertex(vertex: CellVertex, formulaAddress: SimpleCellAddress): void {
     this.addressMapping.setCell(formulaAddress, vertex)
 
     if (!(vertex instanceof ArrayVertex)) {
@@ -989,7 +983,7 @@ export class DependencyGraph {
     }
 
     const range = AbsoluteCellRange.spanFrom(formulaAddress, vertex.width, vertex.height)
-    this.setMatrix(range, vertex)
+    this.setArray(range, vertex)
 
     if (!this.isThereSpaceForArray(vertex)) {
       return
@@ -1015,18 +1009,18 @@ export class DependencyGraph {
     return verticesWithChangedSize
   }
 
-  private fixMatricesAfterAddingRow(sheet: number, rowStart: number, numberOfRows: number) {
-    this.arrayMapping.moveMatrixVerticesAfterRowByRows(sheet, rowStart, numberOfRows)
+  private fixArraysAfterAddingRow(sheet: number, rowStart: number, numberOfRows: number) {
+    this.arrayMapping.moveArrayVerticesAfterRowByRows(sheet, rowStart, numberOfRows)
     if (rowStart <= 0) {
       return
     }
-    for (const [, matrix] of this.arrayMapping.matricesInRows(RowsSpan.fromRowStartAndEnd(sheet, rowStart - 1, rowStart - 1))) {
-      const matrixRange = matrix.getRange()
-      for (let col = matrixRange.start.col; col <= matrixRange.end.col; ++col) {
-        for (let row = rowStart; row <= matrixRange.end.row; ++row) {
+    for (const [, array] of this.arrayMapping.arraysInRows(RowsSpan.fromRowStartAndEnd(sheet, rowStart - 1, rowStart - 1))) {
+      const arrayRange = array.getRange()
+      for (let col = arrayRange.start.col; col <= arrayRange.end.col; ++col) {
+        for (let row = rowStart; row <= arrayRange.end.row; ++row) {
           const destination = simpleCellAddress(sheet, col, row)
           const source = simpleCellAddress(sheet, col, row + numberOfRows)
-          const value = matrix.getMatrixCellValue(destination)
+          const value = array.getArrayCellValue(destination)
           this.addressMapping.moveCell(source, destination)
           this.changes.addChange(EmptyValue, source, value)
         }
@@ -1034,35 +1028,35 @@ export class DependencyGraph {
     }
   }
 
-  private fixMatricesAfterRemovingRows(sheet: number, rowStart: number, numberOfRows: number) {
-    this.arrayMapping.moveMatrixVerticesAfterRowByRows(sheet, rowStart, -numberOfRows)
+  private fixArraysAfterRemovingRows(sheet: number, rowStart: number, numberOfRows: number) {
+    this.arrayMapping.moveArrayVerticesAfterRowByRows(sheet, rowStart, -numberOfRows)
     if (rowStart <= 0) {
       return
     }
-    for (const [, matrix] of this.arrayMapping.matricesInRows(RowsSpan.fromRowStartAndEnd(sheet, rowStart - 1, rowStart - 1))) {
-      if (this.isThereSpaceForArray(matrix)) {
-        for (const address of matrix.getRange().addresses(this)) {
-          this.addressMapping.setCell(address, matrix)
+    for (const [, array] of this.arrayMapping.arraysInRows(RowsSpan.fromRowStartAndEnd(sheet, rowStart - 1, rowStart - 1))) {
+      if (this.isThereSpaceForArray(array)) {
+        for (const address of array.getRange().addresses(this)) {
+          this.addressMapping.setCell(address, array)
         }
       } else {
-        this.setNoSpaceIfMatrix(matrix)
+        this.setNoSpaceIfArray(array)
       }
     }
   }
 
 
-  private fixMatricesAfterAddingColumn(sheet: number, columnStart: number, numberOfColumns: number) {
-    this.arrayMapping.moveMatrixVerticesAfterColumnByColumns(sheet, columnStart, numberOfColumns)
+  private fixArraysAfterAddingColumn(sheet: number, columnStart: number, numberOfColumns: number) {
+    this.arrayMapping.moveArrayVerticesAfterColumnByColumns(sheet, columnStart, numberOfColumns)
     if (columnStart <= 0) {
       return
     }
-    for (const [, matrix] of this.arrayMapping.matricesInCols(ColumnsSpan.fromColumnStartAndEnd(sheet, columnStart - 1, columnStart - 1))) {
-      const matrixRange = matrix.getRange()
-      for (let row = matrixRange.start.row; row <= matrixRange.end.row; ++row) {
-        for (let col = columnStart; col <= matrixRange.end.col; ++col) {
+    for (const [, array] of this.arrayMapping.arraysInCols(ColumnsSpan.fromColumnStartAndEnd(sheet, columnStart - 1, columnStart - 1))) {
+      const arrayRange = array.getRange()
+      for (let row = arrayRange.start.row; row <= arrayRange.end.row; ++row) {
+        for (let col = columnStart; col <= arrayRange.end.col; ++col) {
           const destination = simpleCellAddress(sheet, col, row)
           const source = simpleCellAddress(sheet, col + numberOfColumns, row)
-          const value = matrix.getMatrixCellValue(destination)
+          const value = array.getArrayCellValue(destination)
           this.addressMapping.moveCell(source, destination)
           this.changes.addChange(EmptyValue, source, value)
         }
@@ -1070,34 +1064,34 @@ export class DependencyGraph {
     }
   }
 
-  private fixMatricesAfterRemovingColumns(sheet: number, columnStart: number, numberOfColumns: number) {
-    this.arrayMapping.moveMatrixVerticesAfterColumnByColumns(sheet, columnStart, -numberOfColumns)
+  private fixArraysAfterRemovingColumns(sheet: number, columnStart: number, numberOfColumns: number) {
+    this.arrayMapping.moveArrayVerticesAfterColumnByColumns(sheet, columnStart, -numberOfColumns)
     if (columnStart <= 0) {
       return
     }
-    for (const [, matrix] of this.arrayMapping.matricesInCols(ColumnsSpan.fromColumnStartAndEnd(sheet, columnStart - 1, columnStart - 1))) {
-      if (this.isThereSpaceForArray(matrix)) {
-        for (const address of matrix.getRange().addresses(this)) {
-          this.addressMapping.setCell(address, matrix)
+    for (const [, array] of this.arrayMapping.arraysInCols(ColumnsSpan.fromColumnStartAndEnd(sheet, columnStart - 1, columnStart - 1))) {
+      if (this.isThereSpaceForArray(array)) {
+        for (const address of array.getRange().addresses(this)) {
+          this.addressMapping.setCell(address, array)
         }
       } else {
-        this.setNoSpaceIfMatrix(matrix)
+        this.setNoSpaceIfArray(array)
       }
     }
   }
 
-  private shrinkPossibleMatrixAndGetCell(address: SimpleCellAddress): Maybe<CellVertex> {
+  private shrinkPossibleArrayAndGetCell(address: SimpleCellAddress): Maybe<CellVertex> {
     const vertex = this.getCell(address)
     if (!(vertex instanceof ArrayVertex)) {
       return vertex
     }
-    this.setNoSpaceIfMatrix(vertex)
+    this.setNoSpaceIfArray(vertex)
     return this.getCell(address)
   }
 
-  private setNoSpaceIfMatrix(vertex: Maybe<Vertex>) {
+  private setNoSpaceIfArray(vertex: Maybe<Vertex>) {
     if (vertex instanceof ArrayVertex) {
-      this.shrinkMatrixToCorner(vertex)
+      this.shrinkArrayToCorner(vertex)
       vertex.setNoSpace()
     }
   }

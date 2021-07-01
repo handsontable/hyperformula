@@ -60,7 +60,7 @@ export function statsTreePrintCruds(stats: Stats): void {
 |   |TRANSFORM_ASTS:                        ${stats.get(EnrichedStatType.TRANSFORM_ASTS) || 0}
 |   |TRANSFORM_ASTS_POSTPONED:              ${stats.get(EnrichedStatType.TRANSFORM_ASTS_POSTPONED) || 0}
 |   |ADJUSTING_ADDRESS_MAPPING:             ${stats.get(EnrichedStatType.ADJUSTING_ADDRESS_MAPPING) || 0}
-|   |ADJUSTING_MATRIX_MAPPING:              ${stats.get(EnrichedStatType.ADJUSTING_MATRIX_MAPPING) || 0}
+|   |ADJUSTING_MATRIX_MAPPING:              ${stats.get(EnrichedStatType.ADJUSTING_ARRAY_MAPPING) || 0}
 |   |ADJUSTING_RANGES:                      ${stats.get(EnrichedStatType.ADJUSTING_RANGES) || 0}
 |   |ADJUSTING_GRAPH:                       ${stats.get(EnrichedStatType.ADJUSTING_GRAPH) || 0}
 |   |EVALUATION:                            ${stats.get(EnrichedStatType.EVALUATION) || 0}

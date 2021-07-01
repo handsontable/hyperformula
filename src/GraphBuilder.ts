@@ -113,7 +113,7 @@ export class SimpleStrategy implements GraphBuilderStrategy {
               } else {
                 const vertex = new ArrayVertex(parseResult.ast, address, new ArraySize(size.width, size.height))
                 dependencies.set(vertex, absolutizeDependencies(parseResult.dependencies, address))
-                this.dependencyGraph.addMatrixVertex(address, vertex)
+                this.dependencyGraph.addArrayVertex(address, vertex)
               }
             }
           } else if (parsedCellContent instanceof CellContent.Empty) {
@@ -134,7 +134,7 @@ export class SimpleStrategy implements GraphBuilderStrategy {
   private shrinkMatrixIfNeeded(address: SimpleCellAddress) {
     const vertex = this.dependencyGraph.getCell(address)
     if (vertex instanceof ArrayVertex) {
-      this.dependencyGraph.shrinkMatrixToCorner(vertex)
+      this.dependencyGraph.shrinkArrayToCorner(vertex)
     }
   }
 }

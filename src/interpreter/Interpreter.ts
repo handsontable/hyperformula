@@ -195,7 +195,7 @@ export class Interpreter {
           return new CellError(ErrorType.REF, ErrorMessage.RangeManySheets)
         }
         const range = AbsoluteCellRange.fromCellRange(ast, state.formulaAddress)
-        const arrayVertex = this.dependencyGraph.getMatrix(range)
+        const arrayVertex = this.dependencyGraph.getArray(range)
         if (arrayVertex) {
           const matrix = arrayVertex.array
           if (matrix instanceof NotComputedArray) {

@@ -734,18 +734,18 @@ describe('#isCellEmpty', () => {
   })
 })
 
-describe('#isCellPartOfMatrix', () => {
+describe('#isCellPartOfArray', () => {
   it('true', () => {
     const engine = HyperFormula.buildFromArray([['=TRANSPOSE(B1:C1)']])
-    expect(engine.isCellPartOfMatrix(adr('A1'))).toEqual(true)
+    expect(engine.isCellPartOfArray(adr('A1'))).toEqual(true)
   })
 
   it('false', () => {
     const engine = HyperFormula.buildFromArray([['1', '', '=SUM(1, 2)', 'foo']])
-    expect(engine.isCellPartOfMatrix(adr('A1'))).toEqual(false)
-    expect(engine.isCellPartOfMatrix(adr('B1'))).toEqual(false)
-    expect(engine.isCellPartOfMatrix(adr('C1'))).toEqual(false)
-    expect(engine.isCellPartOfMatrix(adr('D1'))).toEqual(false)
+    expect(engine.isCellPartOfArray(adr('A1'))).toEqual(false)
+    expect(engine.isCellPartOfArray(adr('B1'))).toEqual(false)
+    expect(engine.isCellPartOfArray(adr('C1'))).toEqual(false)
+    expect(engine.isCellPartOfArray(adr('D1'))).toEqual(false)
   })
 })
 
