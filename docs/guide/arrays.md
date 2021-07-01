@@ -16,6 +16,10 @@ There are two types of arrays in HyperFormula:
 
 Non-array values are **scalars**.
 
+By default, array arithmetic is disabled globally in HyperFormula.
+
+To use array arithmetic, either enable it globally ([set the `useArrayArithmetic` option to `true`](../api/interfaces/configparams.html#usearrayarithmetic)), or use the ARRAYFORMULA function.
+
 ## Operating on arrays
 
 When you perform an operation on an array, each output array value is a result of that operation on the corresponding input array value.
@@ -28,6 +32,8 @@ To enable array arithmetic for your formula, use the [`ARRAYFORMULA`](built-in-f
 
 If you don't use the `ARRAYFORMULA` function, HyperFormula treats [ad-hoc arrays](#about-arrays-in-hyperformula) as [scalars](#about-arrays-in-hyperformula), taking only your ad-hoc array's top-left value.
 
+To enable array arithmetic globally, set the `useArrayArithmetic` option to `true` in HyperFormula [configuration](../api/interfaces/configparams.html#usearrayarithmetic).
+
 ## Passing arrays to functions
 
 When you pass an array as a function's argument, the function returns an array as well.
@@ -39,6 +45,8 @@ To pass an array as an argument, enable the array arithmetic with the [`ARRAYFOR
 | `YOUR_FUNCTION(ARRAYFORMULA(your_formula))` | `=ISEVEN(ARRAYFORMULA(A2:A5*10))` |
 
 If you don't use the `ARRAYFORMULA` function, HyperFormula treats [ad-hoc arrays](#about-arrays-in-hyperformula) as [scalars](#about-arrays-in-hyperformula), taking only your ad-hoc array's top-left value.
+
+To enable array arithmetic globally, set the `useArrayArithmetic` option to `true` in HyperFormula [configuration](../api/interfaces/configparams.html#usearrayarithmetic).
 
 ## Constraining the output array's size
 
