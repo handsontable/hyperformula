@@ -11,7 +11,7 @@ You can:
 ## About arrays in HyperFormula
 
 There are two types of arrays in HyperFormula:
-* **Range**: a range of cell addresses (e.g. `A1:A10`)
+* **Range array**: a range of cell addresses (e.g. `A1:A10`)
 * **Ad-hoc array**: an array with no ground-truth range that defines the values (e.g. `5*A1:B5`)
 
 Non-array values are **scalars**.
