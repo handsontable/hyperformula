@@ -844,7 +844,7 @@ describe('arrays', () => {
       [1]
     ])
 
-    expect(engine.matrixMapping.getMatrixByCorner(adr('A1'))?.matrix.size).toEqual(ArraySize.error())
+    expect(engine.arrayMapping.getMatrixByCorner(adr('A1'))?.array.size).toEqual(ArraySize.error())
     expectVerticesOfTypes(engine, [
       [ArrayVertex, undefined],
       [ValueCellVertex, undefined],
@@ -868,7 +868,7 @@ describe('arrays', () => {
       [ArrayVertex, ArrayVertex, ArrayVertex],
       [undefined, ArrayVertex, ArrayVertex],
     ])
-    expect(engine.matrixMapping.matrixMapping.size).toEqual(4)
+    expect(engine.arrayMapping.arrayMapping.size).toEqual(4)
     expect(engine.getSheetValues(0))
   })
 
@@ -892,7 +892,7 @@ describe('arrays', () => {
       [noSpace(), 1, 1, 1, 2],
       [noSpace(), 2, 2, 1, 2],
     ])
-    expect(engine.matrixMapping.matrixMapping.size).toEqual(3)
+    expect(engine.arrayMapping.arrayMapping.size).toEqual(3)
     expect(engine.getSheetValues(0))
   })
 

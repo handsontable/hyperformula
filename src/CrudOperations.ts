@@ -23,8 +23,8 @@ import {
   NothingToPasteError,
   SheetNameAlreadyTakenError,
   SheetSizeLimitExceededError,
-  SourceLocationHasMatrixError,
-  TargetLocationHasMatrixError
+  SourceLocationHasArrayError,
+  TargetLocationHasArrayError
 } from './errors'
 import {LazilyTransformingAstService} from './LazilyTransformingAstService'
 import {ColumnSearchStrategy} from './Lookup/SearchStrategy'
@@ -313,8 +313,8 @@ export class CrudOperations {
     for (const [source, target] of columnMapping) {
       if (source !== target) {
         const rowRange = AbsoluteCellRange.spanFrom({sheet: sheetId, col: source, row: 0}, 1, Infinity)
-        if (this.dependencyGraph.matrixMapping.isFormulaMatrixInRange(rowRange)) {
-          throw new SourceLocationHasMatrixError()
+        if (this.dependencyGraph.arrayMapping.isFormulaMatrixInRange(rowRange)) {
+          throw new SourceLocationHasArrayError()
         }
       }
     }
@@ -341,8 +341,8 @@ export class CrudOperations {
     for (const [source, target] of rowMapping) {
       if (source !== target) {
         const rowRange = AbsoluteCellRange.spanFrom({sheet: sheetId, col: 0, row: source}, Infinity, 1)
-        if (this.dependencyGraph.matrixMapping.isFormulaMatrixInRange(rowRange)) {
-          throw new SourceLocationHasMatrixError()
+        if (this.dependencyGraph.arrayMapping.isFormulaMatrixInRange(rowRange)) {
+          throw new SourceLocationHasArrayError()
         }
       }
     }
@@ -533,11 +533,11 @@ export class CrudOperations {
     const width = this.dependencyGraph.getSheetWidth(sheet)
     const sourceRange = AbsoluteCellRange.spanFrom(sourceStart, width, numberOfRows)
 
-    if (this.dependencyGraph.matrixMapping.isFormulaMatrixInRange(sourceRange)) {
-      throw new SourceLocationHasMatrixError()
+    if (this.dependencyGraph.arrayMapping.isFormulaMatrixInRange(sourceRange)) {
+      throw new SourceLocationHasArrayError()
     }
-    if (targetRow > 0 && this.dependencyGraph.matrixMapping.isFormulaMatrixInAllRows(RowsSpan.fromNumberOfRows(sheet, targetRow - 1, 2))) {
-      throw new TargetLocationHasMatrixError()
+    if (targetRow > 0 && this.dependencyGraph.arrayMapping.isFormulaMatrixInAllRows(RowsSpan.fromNumberOfRows(sheet, targetRow - 1, 2))) {
+      throw new TargetLocationHasArrayError()
     }
   }
 
@@ -560,11 +560,11 @@ export class CrudOperations {
     const sheetHeight = this.dependencyGraph.getSheetHeight(sheet)
     const sourceRange = AbsoluteCellRange.spanFrom(sourceStart, numberOfColumns, sheetHeight)
 
-    if (this.dependencyGraph.matrixMapping.isFormulaMatrixInRange(sourceRange)) {
-      throw new SourceLocationHasMatrixError()
+    if (this.dependencyGraph.arrayMapping.isFormulaMatrixInRange(sourceRange)) {
+      throw new SourceLocationHasArrayError()
     }
-    if (targetColumn > 0 && this.dependencyGraph.matrixMapping.isFormulaMatrixInAllColumns(ColumnsSpan.fromNumberOfColumns(sheet, targetColumn - 1, 2))) {
-      throw new TargetLocationHasMatrixError()
+    if (targetColumn > 0 && this.dependencyGraph.arrayMapping.isFormulaMatrixInAllColumns(ColumnsSpan.fromNumberOfColumns(sheet, targetColumn - 1, 2))) {
+      throw new TargetLocationHasArrayError()
     }
   }
 

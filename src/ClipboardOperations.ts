@@ -129,7 +129,7 @@ export class ClipboardOperations {
       throw new SheetSizeLimitExceededError()
     }
 
-    if (this.dependencyGraph.matrixMapping.isFormulaMatrixInRange(targetRange)) {
+    if (this.dependencyGraph.arrayMapping.isFormulaMatrixInRange(targetRange)) {
       throw new Error('It is not possible to paste onto matrix')
     }
   }

@@ -46,6 +46,6 @@ describe('Matrix', () => {
     ])
     expect(() => {
       matrix.removeRows(1, 1)
-    }).toThrowError('Matrix index out of bound')
+    }).toThrowError('Array index out of bound')
   })
 })

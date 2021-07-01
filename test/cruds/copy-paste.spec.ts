@@ -333,12 +333,12 @@ describe('Copy - paste integration', () => {
       ['3', '4'],
       ['=TRANSPOSE(A1:B2)'],
     ])
-    expect(engine.matrixMapping.matrixMapping.size).toEqual(1)
+    expect(engine.matrixMapping.arrayMapping.size).toEqual(1)
 
     engine.copy(AbsoluteCellRange.spanFrom(adr('A3'), 2, 2))
     engine.paste(adr('A5'))
 
-    expect(engine.matrixMapping.matrixMapping.size).toEqual(1)
+    expect(engine.matrixMapping.arrayMapping.size).toEqual(1)
     expect(engine.getCellFormula(adr('A5'))).toBe(undefined)
     expect(engine.getCellValue(adr('A5'))).toEqual(1)
     expect(engine.getCellValue(adr('B5'))).toEqual(3)

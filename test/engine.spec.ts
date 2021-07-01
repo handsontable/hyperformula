@@ -556,8 +556,8 @@ describe('#getCellType', () => {
   it('formula matrix', () => {
     const engine = HyperFormula.buildFromArray([['=TRANSPOSE(C1:C2)']])
 
-    expect(engine.getCellType(adr('A1'))).toBe(CellType.MATRIX)
-    expect(engine.getCellType(adr('B1'))).toBe(CellType.MATRIX)
+    expect(engine.getCellType(adr('A1'))).toBe(CellType.ARRAY)
+    expect(engine.getCellType(adr('B1'))).toBe(CellType.ARRAY)
   })
 
   it('parsing error is a formula cell', () => {

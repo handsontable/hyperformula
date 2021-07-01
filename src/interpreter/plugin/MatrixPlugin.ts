@@ -5,7 +5,7 @@
 
 import {CellError, ErrorType} from '../../Cell'
 import {ErrorMessage} from '../../error-message'
-import {ArraySize, matrixSizeForMultiplication, matrixSizeForPoolFunction} from '../../ArraySize'
+import {ArraySize, arraySizeForMultiplication, arraySizeForPoolFunction} from '../../ArraySize'
 import {ProcedureAst} from '../../parser'
 import {Interpreter} from '../Interpreter'
 import {InterpreterState} from '../InterpreterState'
@@ -84,7 +84,7 @@ export class MatrixPlugin extends FunctionPlugin implements FunctionPluginTypech
       if( rightMatrix.height() !== leftMatrix.width()) {
         return new CellError(ErrorType.VALUE, ErrorMessage.MatrixDimensions)
       }
-      const outputSize = matrixSizeForMultiplication(leftMatrix.size, rightMatrix.size)
+      const outputSize = arraySizeForMultiplication(leftMatrix.size, rightMatrix.size)
 
       const result = this.createKernel(function(a: number[][], b: number[][], width: number): number {
         let sum = 0
@@ -103,7 +103,7 @@ export class MatrixPlugin extends FunctionPlugin implements FunctionPluginTypech
       if (!matrix.hasOnlyNumbers()) {
         return new CellError(ErrorType.VALUE, ErrorMessage.NumberRange)
       }
-      const outputSize = matrixSizeForPoolFunction(matrix.size, windowSize, stride)
+      const outputSize = arraySizeForPoolFunction(matrix.size, windowSize, stride)
 
       const result = this.createKernel(function(a: number[][], windowSize: number, stride: number): number {
         const leftCornerX = this.thread.x * stride
@@ -126,7 +126,7 @@ export class MatrixPlugin extends FunctionPlugin implements FunctionPluginTypech
       if (!matrix.hasOnlyNumbers()) {
         return new CellError(ErrorType.VALUE, ErrorMessage.NumberRange)
       }
-      const outputSize = matrixSizeForPoolFunction(matrix.size, windowSize, stride)
+      const outputSize = arraySizeForPoolFunction(matrix.size, windowSize, stride)
 
       const result = this.createKernel(function(a: number[][], windowSize: number, stride: number): number {
         const leftCornerX = this.thread.x * stride

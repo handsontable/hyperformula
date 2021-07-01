@@ -97,8 +97,8 @@ export class Unparser {
         const rightPart = '(' + expression + imageWithWhitespace(')', ast.internalWhitespace)
         return imageWithWhitespace(rightPart, ast.leadingWhitespace)
       }
-      case AstNodeType.MATRIX: {
-        const ret = '{'+ast.args.map(row => row.map(val => this.unparseAst(val, address)).join(this.config.matrixColumnSeparator)).join(this.config.matrixRowSeparator) + imageWithWhitespace('}', ast.internalWhitespace)
+      case AstNodeType.ARRAY: {
+        const ret = '{'+ast.args.map(row => row.map(val => this.unparseAst(val, address)).join(this.config.arrayColumnSeparator)).join(this.config.arrayRowSeparator) + imageWithWhitespace('}', ast.internalWhitespace)
         return imageWithWhitespace(ret, ast.leadingWhitespace)
       }
       default: {

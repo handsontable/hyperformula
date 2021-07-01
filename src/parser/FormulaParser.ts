@@ -39,7 +39,7 @@ import {
   buildGreaterThanOrEqualOpAst,
   buildLessThanOpAst,
   buildLessThanOrEqualOpAst,
-  buildMatrixAst,
+  buildArrayAst,
   buildMinusOpAst,
   buildMinusUnaryOpAst,
   buildNamedExpressionAst,
@@ -57,7 +57,7 @@ import {
   buildTimesOpAst,
   CellReferenceAst,
   ErrorAst,
-  MatrixAst,
+  ArrayAst,
   parsingError,
   ParsingError,
   ParsingErrorType,
@@ -79,8 +79,8 @@ import {
   LessThanOp,
   LessThanOrEqualOp,
   LParen,
-  MatrixLParen,
-  MatrixRParen,
+  ArrayLParen,
+  ArrayRParen,
   MinusOp,
   MultiplicationOp,
   NamedExpression,
@@ -725,10 +725,10 @@ export class FormulaParser extends EmbeddedActionsParser {
     return this.OR([
       {
         ALT: () => {
-          const ltoken = this.CONSUME(MatrixLParen) as IExtendedToken
-          const ret = this.SUBRULE(this.insideMatrixExpression) as MatrixAst
-          const rtoken = this.CONSUME(MatrixRParen) as IExtendedToken
-          return buildMatrixAst(ret.args, ltoken.leadingWhitespace, rtoken.leadingWhitespace)
+          const ltoken = this.CONSUME(ArrayLParen) as IExtendedToken
+          const ret = this.SUBRULE(this.insideMatrixExpression) as ArrayAst
+          const rtoken = this.CONSUME(ArrayRParen) as IExtendedToken
+          return buildArrayAst(ret.args, ltoken.leadingWhitespace, rtoken.leadingWhitespace)
         }
       },
       {
@@ -744,20 +744,20 @@ export class FormulaParser extends EmbeddedActionsParser {
       this.OR([
         {
           ALT: () => {
-            this.CONSUME(this.lexerConfig.MatrixColSeparator)
+            this.CONSUME(this.lexerConfig.ArrayColSeparator)
             ret[ret.length-1].push(this.SUBRULE2(this.booleanExpression))
           }
         },
         {
           ALT: () => {
-            this.CONSUME(this.lexerConfig.MatrixRowSeparator)
+            this.CONSUME(this.lexerConfig.ArrayRowSeparator)
             ret.push([])
             ret[ret.length-1].push(this.SUBRULE3(this.booleanExpression))
           }
         }
       ])
     })
-    return buildMatrixAst(ret)
+    return buildArrayAst(ret)
   })
 
   /**

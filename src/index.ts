@@ -34,8 +34,8 @@ import {
   ProtectedFunctionTranslationError,
   SheetNameAlreadyTakenError,
   SheetSizeLimitExceededError,
-  SourceLocationHasMatrixError,
-  TargetLocationHasMatrixError,
+  SourceLocationHasArrayError,
+  TargetLocationHasArrayError,
   UnableToParseError
 } from './errors'
 import {ExportedCellChange, ExportedChange, ExportedNamedExpressionChange} from './Exporter'
@@ -84,8 +84,8 @@ class HyperFormulaNS extends HyperFormula {
   public static ProtectedFunctionTranslationError = ProtectedFunctionTranslationError
   public static SheetNameAlreadyTakenError = SheetNameAlreadyTakenError
   public static SheetSizeLimitExceededError = SheetSizeLimitExceededError
-  public static SourceLocationHasMatrixError = SourceLocationHasMatrixError
-  public static TargetLocationHasMatrixError = TargetLocationHasMatrixError
+  public static SourceLocationHasMatrixError = SourceLocationHasArrayError
+  public static TargetLocationHasMatrixError = TargetLocationHasArrayError
   public static UnableToParseError = UnableToParseError
 }
 
@@ -155,8 +155,8 @@ export {
   ProtectedFunctionTranslationError,
   SheetNameAlreadyTakenError,
   SheetSizeLimitExceededError,
-  SourceLocationHasMatrixError,
-  TargetLocationHasMatrixError,
+  SourceLocationHasArrayError,
+  TargetLocationHasArrayError,
   UnableToParseError,
   SerializedNamedExpression,
 }

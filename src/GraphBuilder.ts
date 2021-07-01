@@ -99,7 +99,7 @@ export class SimpleStrategy implements GraphBuilderStrategy {
               this.dependencyGraph.addVertex(address, vertex)
             } else {
               this.shrinkMatrixIfNeeded(address)
-              const size = this.matrixSizePredictor.checkMatrixSize(parseResult.ast, address)
+              const size = this.matrixSizePredictor.checkArraySize(parseResult.ast, address)
               if (size.isScalar()) {
                 const vertex = new FormulaCellVertex(parseResult.ast, address, 0)
                 dependencies.set(vertex, absolutizeDependencies(parseResult.dependencies, address))

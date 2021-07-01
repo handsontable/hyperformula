@@ -12,7 +12,7 @@ import {DependencyGraph} from '../DependencyGraph'
 import {ErrorMessage} from '../error-message'
 import {LicenseKeyValidityState} from '../helpers/licenseKeyValidator'
 import {ColumnSearchStrategy} from '../Lookup/SearchStrategy'
-import {ArrayValue, NotComputedMatrix} from '../ArrayValue'
+import {ArrayValue, NotComputedArray} from '../ArrayValue'
 import {Maybe} from '../Maybe'
 import {NamedExpressions} from '../NamedExpressions'
 import {NumberLiteralHelper} from '../NumberLiteralHelper'
@@ -195,10 +195,10 @@ export class Interpreter {
           return new CellError(ErrorType.REF, ErrorMessage.RangeManySheets)
         }
         const range = AbsoluteCellRange.fromCellRange(ast, state.formulaAddress)
-        const matrixVertex = this.dependencyGraph.getMatrix(range)
-        if (matrixVertex) {
-          const matrix = matrixVertex.matrix
-          if (matrix instanceof NotComputedMatrix) {
+        const arrayVertex = this.dependencyGraph.getMatrix(range)
+        if (arrayVertex) {
+          const matrix = arrayVertex.array
+          if (matrix instanceof NotComputedArray) {
             throw new Error('Matrix should be already computed')
           } else if (matrix instanceof CellError) {
             return matrix
@@ -228,7 +228,7 @@ export class Interpreter {
       case AstNodeType.PARENTHESIS: {
         return this.evaluateAst(ast.expression, state)
       }
-      case AstNodeType.MATRIX: {
+      case AstNodeType.ARRAY: {
         let totalWidth: Maybe<number> = undefined
         const ret: InternalScalarValue[][] = []
         for(const astRow of ast.args) {

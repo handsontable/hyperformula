@@ -10,13 +10,13 @@ describe('Set matrix empty', () => {
     ])
     const dependencyGraph = engine.dependencyGraph
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const matrixVertex = dependencyGraph.matrixMapping.getMatrix(AbsoluteCellRange.spanFrom(adr('A2'), 1, 2))!
+    const matrixVertex = dependencyGraph.arrayMapping.getMatrix(AbsoluteCellRange.spanFrom(adr('A2'), 1, 2))!
 
-    dependencyGraph.setMatrixEmpty(matrixVertex)
+    dependencyGraph.setArrayEmpty(matrixVertex)
 
     expect(engine.getCellValue(adr('A2'))).toBe(null)
     expect(engine.getCellValue(adr('A3'))).toBe(null)
-    expect(dependencyGraph.matrixMapping.matrixMapping.size).toEqual(0)
+    expect(dependencyGraph.arrayMapping.arrayMapping.size).toEqual(0)
   })
 
   it('should adjust edges between matrix cells and formula', () => {
@@ -26,13 +26,13 @@ describe('Set matrix empty', () => {
     ])
     const dependencyGraph = engine.dependencyGraph
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const matrixVertex = dependencyGraph.matrixMapping.getMatrix(AbsoluteCellRange.spanFrom(adr('A2'), 1, 2))!
+    const matrixVertex = dependencyGraph.arrayMapping.getMatrix(AbsoluteCellRange.spanFrom(adr('A2'), 1, 2))!
 
-    dependencyGraph.setMatrixEmpty(matrixVertex)
+    dependencyGraph.setArrayEmpty(matrixVertex)
 
     expect(engine.getCellValue(adr('A2'))).toBe(null)
     expect(engine.getCellValue(adr('A3'))).toBe(null)
-    expect(dependencyGraph.matrixMapping.matrixMapping.size).toEqual(0)
+    expect(dependencyGraph.arrayMapping.arrayMapping.size).toEqual(0)
 
     const formula = dependencyGraph.fetchCell(adr('C1'))
     const a1 = dependencyGraph.fetchCell(adr('A1'))
@@ -51,13 +51,13 @@ describe('Set matrix empty', () => {
     ])
     const dependencyGraph = engine.dependencyGraph
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const matrixVertex = dependencyGraph.matrixMapping.getMatrix(AbsoluteCellRange.spanFrom(adr('A2'), 1, 2))!
+    const matrixVertex = dependencyGraph.arrayMapping.getMatrix(AbsoluteCellRange.spanFrom(adr('A2'), 1, 2))!
 
-    dependencyGraph.setMatrixEmpty(matrixVertex)
+    dependencyGraph.setArrayEmpty(matrixVertex)
 
     expect(engine.getCellValue(adr('A2'))).toBe(null)
     expect(engine.getCellValue(adr('A3'))).toBe(null)
-    expect(dependencyGraph.matrixMapping.matrixMapping.size).toEqual(1)
+    expect(dependencyGraph.arrayMapping.arrayMapping.size).toEqual(1)
 
     const formulaMatrix = dependencyGraph.fetchCell(adr('C1'))
     const a1 = dependencyGraph.fetchCell(adr('A1'))
@@ -72,14 +72,14 @@ describe('Set matrix empty', () => {
     ])
     const dependencyGraph = engine.dependencyGraph
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const matrixVertex = dependencyGraph.matrixMapping.getMatrix(AbsoluteCellRange.spanFrom(adr('A2'), 1, 2))!
+    const matrixVertex = dependencyGraph.arrayMapping.getMatrix(AbsoluteCellRange.spanFrom(adr('A2'), 1, 2))!
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const rangeVertex  = dependencyGraph.rangeMapping.getRange(adr('A2'), adr('A3'))!
     expect(dependencyGraph.existsEdge(matrixVertex, rangeVertex)).toBe(true)
 
-    dependencyGraph.setMatrixEmpty(matrixVertex)
+    dependencyGraph.setArrayEmpty(matrixVertex)
 
-    expect(dependencyGraph.matrixMapping.matrixMapping.size).toEqual(0)
+    expect(dependencyGraph.arrayMapping.arrayMapping.size).toEqual(0)
 
     const formula = dependencyGraph.fetchCell(adr('C1'))
     const a2 = dependencyGraph.fetchCell(adr('A2'))
@@ -98,14 +98,14 @@ describe('Set matrix empty', () => {
     ])
     const dependencyGraph = engine.dependencyGraph
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const matrixVertex = dependencyGraph.matrixMapping.getMatrix(AbsoluteCellRange.spanFrom(adr('A2'), 1, 2))!
+    const matrixVertex = dependencyGraph.arrayMapping.getMatrix(AbsoluteCellRange.spanFrom(adr('A2'), 1, 2))!
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const rangeVertex  = dependencyGraph.rangeMapping.getRange(adr('A1'), adr('A2'))!
     expect(dependencyGraph.existsEdge(matrixVertex, rangeVertex)).toBe(true)
 
-    dependencyGraph.setMatrixEmpty(matrixVertex)
+    dependencyGraph.setArrayEmpty(matrixVertex)
 
-    expect(dependencyGraph.matrixMapping.matrixMapping.size).toEqual(0)
+    expect(dependencyGraph.arrayMapping.arrayMapping.size).toEqual(0)
 
     const formula = dependencyGraph.fetchCell(adr('C1'))
     const a1 = dependencyGraph.fetchCell(adr('A1'))

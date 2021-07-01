@@ -139,7 +139,7 @@ export class Evaluator {
 
   private recomputeFormulaVertexValue(vertex: FormulaVertex): InterpreterValue {
     const address = vertex.getAddress(this.lazilyTransformingAstService)
-    if (vertex instanceof ArrayVertex && (vertex.matrix.size.isRef || !this.dependencyGraph.isThereSpaceForMatrix(vertex))) {
+    if (vertex instanceof ArrayVertex && (vertex.array.size.isRef || !this.dependencyGraph.isThereSpaceForArray(vertex))) {
       return vertex.setNoSpace()
     } else {
       const formula = vertex.getFormula(this.lazilyTransformingAstService)

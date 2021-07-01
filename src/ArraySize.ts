@@ -12,8 +12,8 @@ import {ArgumentTypes} from './interpreter/plugin/FunctionPlugin'
 import {Ast, AstNodeType, ProcedureAst} from './parser'
 
 export class ArraySize {
-  public static fromMatrix<T>(matrix: T[][]): ArraySize {
-    return new ArraySize(matrix.length > 0 ? matrix[0].length : 0, matrix.length)
+  public static fromArray<T>(array: T[][]): ArraySize {
+    return new ArraySize(array.length > 0 ? array[0].length : 0, array.length)
   }
 
   public static error() {
@@ -30,7 +30,7 @@ export class ArraySize {
     public isRef: boolean = false,
   ) {
     if (width <= 0 || height <= 0) {
-      throw Error('Incorrect matrix size')
+      throw Error('Incorrect array size')
     }
   }
 
@@ -39,27 +39,27 @@ export class ArraySize {
   }
 }
 
-export function matrixSizeForTranspose(inputSize: ArraySize): ArraySize {
+export function arraySizeForTranspose(inputSize: ArraySize): ArraySize {
   return new ArraySize(inputSize.height, inputSize.width)
 }
 
-export function matrixSizeForMultiplication(leftMatrixSize: ArraySize, rightMatrixSize: ArraySize): ArraySize {
-  return new ArraySize(rightMatrixSize.width, leftMatrixSize.height)
+export function arraySizeForMultiplication(leftArraySize: ArraySize, rightArraySize: ArraySize): ArraySize {
+  return new ArraySize(rightArraySize.width, leftArraySize.height)
 }
 
-export function matrixSizeForPoolFunction(inputMatrix: ArraySize, windowSize: number, stride: number): ArraySize {
+export function arraySizeForPoolFunction(inputArray: ArraySize, windowSize: number, stride: number): ArraySize {
   return new ArraySize(
-    1 + (inputMatrix.width - windowSize) / stride,
-    1 + (inputMatrix.height - windowSize) / stride,
+    1 + (inputArray.width - windowSize) / stride,
+    1 + (inputArray.height - windowSize) / stride,
   )
 }
 
-function matrixSizeForBinaryOp(leftMatrixSize: ArraySize, rightMatrixSize: ArraySize): ArraySize {
-  return new ArraySize(Math.max(leftMatrixSize.width, rightMatrixSize.width), Math.max(leftMatrixSize.height, rightMatrixSize.height))
+function arraySizeForBinaryOp(leftArraySize: ArraySize, rightArraySize: ArraySize): ArraySize {
+  return new ArraySize(Math.max(leftArraySize.width, rightArraySize.width), Math.max(leftArraySize.height, rightArraySize.height))
 }
 
-function matrixSizeForUnaryOp(matrixSize: ArraySize): ArraySize {
-  return new ArraySize(matrixSize.width, matrixSize.height)
+function arraySizeForUnaryOp(arraySize: ArraySize): ArraySize {
+  return new ArraySize(arraySize.width, arraySize.height)
 }
 
 export class ArraySizePredictor {
@@ -69,13 +69,13 @@ export class ArraySizePredictor {
   ) {
   }
 
-  public checkMatrixSize(ast: Ast, formulaAddress: SimpleCellAddress): ArraySize {
-    return this._checkMatrixSize(ast, {formulaAddress, arraysFlag: this.config.useArrayArithmetic})
+  public checkArraySize(ast: Ast, formulaAddress: SimpleCellAddress): ArraySize {
+    return this._checkArraySize(ast, {formulaAddress, arraysFlag: this.config.useArrayArithmetic})
   }
 
-  private checkMatrixSizeForFunction(ast: ProcedureAst, state: InterpreterState): ArraySize {
+  private checkArraySizeForFunction(ast: ProcedureAst, state: InterpreterState): ArraySize {
     const metadata = this.functionRegistry.getMetadata(ast.procedureName)
-    const subChecks = ast.args.map((arg) => this._checkMatrixSize(arg, new InterpreterState(state.formulaAddress, state.arraysFlag || (metadata?.arrayFunction ?? false))))
+    const subChecks = ast.args.map((arg) => this._checkArraySize(arg, new InterpreterState(state.formulaAddress, state.arraysFlag || (metadata?.arrayFunction ?? false))))
     switch (ast.procedureName) {
       case 'MMULT': {
         if (ast.args.length !== 2) {
@@ -84,7 +84,7 @@ export class ArraySizePredictor {
 
         const [left, right] = subChecks
 
-        return matrixSizeForMultiplication(left, right)
+        return arraySizeForMultiplication(left, right)
       }
       case 'MEDIANPOOL':
       case 'MAXPOOL': {
@@ -92,7 +92,7 @@ export class ArraySizePredictor {
           return ArraySize.error()
         }
 
-        const matrix = subChecks[0]
+        const array = subChecks[0]
         const windowArg = ast.args[1]
         let window
 
@@ -113,13 +113,13 @@ export class ArraySizePredictor {
           }
         }
 
-        if (window > matrix.width || window > matrix.height
+        if (window > array.width || window > array.height
           || stride > window
-          || (matrix.width - window) % stride !== 0 || (matrix.height - window) % stride !== 0) {
+          || (array.width - window) % stride !== 0 || (array.height - window) % stride !== 0) {
           return ArraySize.error()
         }
 
-        return matrixSizeForPoolFunction(matrix, window, stride)
+        return arraySizeForPoolFunction(array, window, stride)
       }
       case 'TRANSPOSE': {
         if (ast.args.length !== 1) {
@@ -128,7 +128,7 @@ export class ArraySizePredictor {
 
         const [size] = subChecks
 
-        return matrixSizeForTranspose(size)
+        return arraySizeForTranspose(size)
       }
       case 'ARRAYFORMULA': {
         if (ast.args.length !== 1) {
@@ -198,10 +198,10 @@ export class ArraySizePredictor {
 
   }
 
-  private _checkMatrixSize(ast: Ast, state: InterpreterState): ArraySize {
+  private _checkArraySize(ast: Ast, state: InterpreterState): ArraySize {
     switch (ast.type) {
       case AstNodeType.FUNCTION_CALL: {
-        return this.checkMatrixSizeForFunction(ast, state)
+        return this.checkArraySizeForFunction(ast, state)
       }
       case AstNodeType.CELL_RANGE: {
         const range = AbsoluteCellRange.fromCellRangeOrUndef(ast, state.formulaAddress)
@@ -211,11 +211,11 @@ export class ArraySizePredictor {
           return new ArraySize(range.width(), range.height(), true)
         }
       }
-      case AstNodeType.MATRIX: {
+      case AstNodeType.ARRAY: {
         const heights = []
         const widths = []
         for(const row of ast.args) {
-          const sizes = row.map(ast => this._checkMatrixSize(ast, state))
+          const sizes = row.map(ast => this._checkArraySize(ast, state))
           const h = Math.min(...sizes.map(size => size.height))
           const w = sizes.reduce((total, size) => total+size.width, 0)
           heights.push(h)
@@ -242,21 +242,21 @@ export class ArraySizePredictor {
       case AstNodeType.PLUS_OP:
       case AstNodeType.POWER_OP:
       case AstNodeType.TIMES_OP: {
-        const left = this._checkMatrixSize(ast.left, state)
-        const right = this._checkMatrixSize(ast.right, state)
+        const left = this._checkArraySize(ast.left, state)
+        const right = this._checkArraySize(ast.right, state)
         if (!state.arraysFlag && (left.height > 1 || left.width > 1 || right.height > 1 || right.width > 1)) {
           return ArraySize.error()
         }
-        return matrixSizeForBinaryOp(left, right)
+        return arraySizeForBinaryOp(left, right)
       }
       case AstNodeType.MINUS_UNARY_OP:
       case AstNodeType.PLUS_UNARY_OP:
       case AstNodeType.PERCENT_OP: {
-        const val = this._checkMatrixSize(ast.value, state)
+        const val = this._checkArraySize(ast.value, state)
         if (!state.arraysFlag && (val.height > 1 || val.width > 1)) {
           return ArraySize.error()
         }
-        return matrixSizeForUnaryOp(val)
+        return arraySizeForUnaryOp(val)
       }
       case AstNodeType.EMPTY:
         return ArraySize.error()

@@ -36,8 +36,8 @@ import {
   NamedExpressionDoesNotExistError,
   NoRelativeAddressesAllowedError,
   SheetSizeLimitExceededError,
-  SourceLocationHasMatrixError,
-  TargetLocationHasMatrixError
+  SourceLocationHasArrayError,
+  TargetLocationHasArrayError
 } from './errors'
 import {EmptyValue, getRawValue} from './interpreter/InterpreterValue'
 import {LazilyTransformingAstService} from './LazilyTransformingAstService'
@@ -166,7 +166,7 @@ export class Operations {
     private readonly lazilyTransformingAstService: LazilyTransformingAstService,
     private readonly namedExpressions: NamedExpressions,
     private readonly config: Config,
-    private readonly matrixSizePredictor: ArraySizePredictor,
+    private readonly arraySizePredictor: ArraySizePredictor,
   ) {
     this.allocateNamedExpressionAddressSpace()
   }
@@ -423,12 +423,12 @@ export class Operations {
       throw new SheetSizeLimitExceededError()
     }
 
-    if (this.dependencyGraph.matrixMapping.isFormulaMatrixInRange(sourceRange)) {
-      throw new SourceLocationHasMatrixError()
+    if (this.dependencyGraph.arrayMapping.isFormulaMatrixInRange(sourceRange)) {
+      throw new SourceLocationHasArrayError()
     }
 
-    if (this.dependencyGraph.matrixMapping.isFormulaMatrixInRange(targetRange)) {
-      throw new TargetLocationHasMatrixError()
+    if (this.dependencyGraph.arrayMapping.isFormulaMatrixInRange(targetRange)) {
+      throw new TargetLocationHasArrayError()
     }
   }
 
@@ -564,7 +564,7 @@ export class Operations {
 
   private rewriteAffectedMatrices(affectedMatrices: Set<ArrayVertex>) {
     for (const matrixVertex of affectedMatrices.values()) {
-      if (matrixVertex.matrix.size.isRef) {
+      if (matrixVertex.array.size.isRef) {
         continue
       }
       const ast = matrixVertex.getFormula(this.lazilyTransformingAstService)
@@ -678,7 +678,7 @@ export class Operations {
       if (errors.length > 0) {
         this.setParsingErrorToCell(parsedCellContent.formula, errors, address)
       } else {
-        const size = this.matrixSizePredictor.checkMatrixSize(ast, address)
+        const size = this.arraySizePredictor.checkArraySize(ast, address)
         this.setFormulaToCell(address, size, parserResult)
       }
     } else if (parsedCellContent instanceof CellContent.Empty) {
@@ -755,7 +755,7 @@ export class Operations {
     const [cleanedAst] = new CleanOutOfScopeDependenciesTransformer(address.sheet).transformSingleAst(ast, address)
     this.parser.rememberNewAst(cleanedAst)
     const cleanedDependencies = filterDependenciesOutOfScope(absoluteDependencies)
-    const size = this.matrixSizePredictor.checkMatrixSize(ast, address)
+    const size = this.arraySizePredictor.checkArraySize(ast, address)
     this.dependencyGraph.setFormulaToCell(address, cleanedAst, cleanedDependencies, size, hasVolatileFunction, hasStructuralChangeFunction)
   }
 

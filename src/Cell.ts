@@ -48,7 +48,7 @@ export type TranslatableErrorType = Exclude<ErrorType, ErrorType.LIC>
 export enum CellType {
   FORMULA = 'FORMULA',
   VALUE = 'VALUE',
-  MATRIX = 'MATRIX',
+  ARRAY = 'ARRAY',
   EMPTY = 'EMPTY',
 }
 
@@ -60,7 +60,7 @@ export const getCellType = (vertex?: CellVertex): CellType => {
     return CellType.VALUE
   }
   if (vertex instanceof ArrayVertex) {
-    return CellType.MATRIX
+    return CellType.ARRAY
   }
 
   return CellType.EMPTY

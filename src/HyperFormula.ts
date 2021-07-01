@@ -132,13 +132,13 @@ export class HyperFormula implements TypedEmitter {
   }
 
   /**
-   * Calls the `matrixMapping` method on the dependency graph.
-   * Allows to execute `matrixMapping` directly without a need to refer to `dependencyGraph`.
+   * Calls the `arrayMapping` method on the dependency graph.
+   * Allows to execute `arrayMapping` directly without a need to refer to `dependencyGraph`.
    *
    * @internal
    */
-  public get matrixMapping(): ArrayMapping {
-    return this.dependencyGraph.matrixMapping
+  public get arrayMapping(): ArrayMapping {
+    return this.dependencyGraph.arrayMapping
   }
 
   /**
@@ -3043,7 +3043,7 @@ export class HyperFormula implements TypedEmitter {
     if (!isSimpleCellAddress(cellAddress)) {
       throw new ExpectedValueOfTypeError('SimpleCellAddress', 'cellAddress')
     }
-    return this.getCellType(cellAddress) === CellType.MATRIX
+    return this.getCellType(cellAddress) === CellType.ARRAY
   }
 
   /**

@@ -9,7 +9,7 @@ import {RawCellContent} from '../CellContentParser'
 import {ErrorMessage} from '../error-message'
 import {EmptyValue, getRawValue, InternalScalarValue, InterpreterValue} from '../interpreter/InterpreterValue'
 import {LazilyTransformingAstService} from '../LazilyTransformingAstService'
-import {ErroredMatrix, IArray, ArrayValue, NotComputedMatrix} from '../ArrayValue'
+import {ErroredArray, IArray, ArrayValue, NotComputedArray} from '../ArrayValue'
 import {ArraySize} from '../ArraySize'
 import {Maybe} from '../Maybe'
 import {Ast} from '../parser'
@@ -80,23 +80,23 @@ export abstract class FormulaVertex {
 }
 
 export class ArrayVertex extends FormulaVertex {
-  matrix: IArray
+  array: IArray
 
   constructor(formula: Ast, cellAddress: SimpleCellAddress, size: ArraySize, version: number = 0) {
     super(formula, cellAddress, version)
     if (size.isRef) {
-      this.matrix = new ErroredMatrix(new CellError(ErrorType.REF, ErrorMessage.NoSpaceForArrayResult), ArraySize.error())
+      this.array = new ErroredArray(new CellError(ErrorType.REF, ErrorMessage.NoSpaceForArrayResult), ArraySize.error())
     } else {
-      this.matrix = new NotComputedMatrix(size)
+      this.array = new NotComputedArray(size)
     }
   }
 
   get width(): number {
-    return this.matrix.width()
+    return this.array.width()
   }
 
   get height(): number {
-    return this.matrix.height()
+    return this.array.height()
   }
 
   get sheet(): number {
@@ -113,23 +113,23 @@ export class ArrayVertex extends FormulaVertex {
       return value
     }
     const matrix = ArrayValue.fromInterpreterValue(value)
-    matrix.resize(this.matrix.size)
-    this.matrix = matrix
+    matrix.resize(this.array.size)
+    this.array = matrix
     return value
   }
 
   getCellValue(): InterpreterValue {
-    if (this.matrix instanceof NotComputedMatrix) {
+    if (this.array instanceof NotComputedArray) {
       throw Error('Matrix not computed yet.')
     }
-    return this.matrix.simpleRangeValue()
+    return this.array.simpleRangeValue()
   }
 
   public valueOrUndef(): Maybe<InterpreterValue> {
-    if (this.matrix instanceof NotComputedMatrix) {
+    if (this.array instanceof NotComputedArray) {
       return undefined
     }
-    return this.matrix.simpleRangeValue()
+    return this.array.simpleRangeValue()
   }
 
   getMatrixCellValue(address: SimpleCellAddress): InternalScalarValue {
@@ -137,7 +137,7 @@ export class ArrayVertex extends FormulaVertex {
     const row = address.row - this.cellAddress.row
 
     try {
-      return this.matrix.get(col, row)
+      return this.array.get(col, row)
     } catch (e) {
       return new CellError(ErrorType.REF)
     }
@@ -155,13 +155,13 @@ export class ArrayVertex extends FormulaVertex {
   setMatrixCellValue(address: SimpleCellAddress, value: number): void {
     const col = address.col - this.cellAddress.col
     const row = address.row - this.cellAddress.row
-    if (this.matrix instanceof ArrayValue) {
-      this.matrix.set(col, row, value)
+    if (this.array instanceof ArrayValue) {
+      this.array.set(col, row, value)
     }
   }
 
   setNoSpace(): InterpreterValue {
-    this.matrix = new ErroredMatrix(new CellError(ErrorType.REF, ErrorMessage.NoSpaceForArrayResult), ArraySize.error())
+    this.array = new ErroredArray(new CellError(ErrorType.REF, ErrorMessage.NoSpaceForArrayResult), ArraySize.error())
     return this.getCellValue()
   }
 
@@ -190,7 +190,7 @@ export class ArrayVertex extends FormulaVertex {
   }
 
   isComputed() {
-    return (!(this.matrix instanceof NotComputedMatrix))
+    return (!(this.array instanceof NotComputedArray))
   }
 
   columnsFromMatrix() {
@@ -211,7 +211,7 @@ export class ArrayVertex extends FormulaVertex {
   }
 
   private setErrorValue(error: CellError) {
-    this.matrix = new ErroredMatrix(error, this.matrix.size)
+    this.array = new ErroredArray(error, this.array.size)
   }
 }
 

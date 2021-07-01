@@ -92,8 +92,8 @@ export class EngineComparator {
   }
 
   private compareMatrixMappings() {
-    const actual = this.actual.matrixMapping.matrixMapping
-    const expected = this.expected.matrixMapping.matrixMapping
+    const actual = this.actual.arrayMapping.arrayMapping
+    const expected = this.expected.arrayMapping.arrayMapping
 
     expect(actual.size).toEqual(expected.size)
 
@@ -101,7 +101,7 @@ export class EngineComparator {
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       const actualEntry = actual.get(key)!
       expect(actualEntry).toBeDefined()
-      expect(actualEntry.matrix.size.isRef).toBe(value.matrix.size.isRef)
+      expect(actualEntry.array.size.isRef).toBe(value.array.size.isRef)
     }
   }
 

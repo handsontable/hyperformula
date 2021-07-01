@@ -359,7 +359,7 @@ describe('build from array', () => {
       [ArrayVertex, ArrayVertex, ArrayVertex],
       [undefined, ArrayVertex, ArrayVertex],
     ])
-    expect(engine.matrixMapping.matrixMapping.size).toEqual(4)
+    expect(engine.matrixMapping.arrayMapping.size).toEqual(4)
     expect(engine.getSheetValues(0))
   })
 
@@ -378,7 +378,7 @@ describe('build from array', () => {
       [noSpace(), 1, 1, 1, 2],
       [noSpace(), 2, 2, 1, 2],
     ])
-    expect(engine.matrixMapping.matrixMapping.size).toEqual(3)
+    expect(engine.matrixMapping.arrayMapping.size).toEqual(3)
     expect(engine.getSheetValues(0))
   })
 
