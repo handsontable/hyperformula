@@ -12,24 +12,18 @@ but without the constraints of the spreadsheet UI.
 
 The latest version of HyperFormula has an extensive collection of **{{ $page.functionsCount }}** functions grouped into 11 categories:
 
-- [Built-in functions](#built-in-functions)
-  - [Overview](#overview)
-  - [Language packs](#language-packs)
-  - [Custom functions](#custom-functions)
-  - [Demo](#demo)
-  - [List of available functions](#list-of-available-functions)
-    - [Array manipulation](#array-manipulation)
-    - [Date and time](#date-and-time)
-    - [Engineering](#engineering)
-    - [Information](#information)
-    - [Financial](#financial)
-    - [Logical](#logical)
-    - [Lookup and reference](#lookup-and-reference)
-    - [Math and trigonometry](#math-and-trigonometry)
-    - [Matrix functions](#matrix-functions)
-    - [Operator](#operator)
-    - [Statistical](#statistical)
-    - [Text](#text)
+- [Array manipulation](#array-manipulation)
+- [Date and time](#date-and-time)
+- [Engineering](#engineering)
+- [Information](#information)
+- [Financial](#financial)
+- [Logical](#logical)
+- [Lookup and reference](#lookup-and-reference)
+- [Math and trigonometry](#math-and-trigonometry)
+- [Matrix functions](#matrix-functions)
+- [Operator](#operator)
+- [Statistical](#statistical)
+- [Text](#text)
 
 _Some categories such as compatibility, cube, and database
 are yet to be supported._
