@@ -11,14 +11,14 @@ import {Config} from './Config'
 import {
   DependencyGraph,
   FormulaCellVertex,
-  MatrixVertex,
+  ArrayVertex,
   ParsingErrorVertex,
   ValueCellVertex,
   Vertex
 } from './DependencyGraph'
 import {getRawValue} from './interpreter/InterpreterValue'
 import {ColumnSearchStrategy} from './Lookup/SearchStrategy'
-import {MatrixSize, MatrixSizePredictor} from './MatrixSize'
+import {ArraySize, ArraySizePredictor} from './ArraySize'
 import {ParserWithCaching} from './parser'
 import {Sheets} from './Sheet'
 import {Statistics, StatType} from './statistics'
@@ -41,7 +41,7 @@ export class GraphBuilder {
     private readonly cellContentParser: CellContentParser,
     private readonly config: Config,
     private readonly stats: Statistics,
-    private readonly matrixSizePredictor: MatrixSizePredictor,
+    private readonly matrixSizePredictor: ArraySizePredictor,
   ) {
     this.buildStrategy = new SimpleStrategy(dependencyGraph, columnSearch, parser, stats, cellContentParser, matrixSizePredictor)
   }
@@ -73,7 +73,7 @@ export class SimpleStrategy implements GraphBuilderStrategy {
     private readonly parser: ParserWithCaching,
     private readonly stats: Statistics,
     private readonly cellContentParser: CellContentParser,
-    private readonly matrixSizePredictor: MatrixSizePredictor,
+    private readonly matrixSizePredictor: ArraySizePredictor,
   ) {
   }
 
@@ -111,7 +111,7 @@ export class SimpleStrategy implements GraphBuilderStrategy {
                   this.dependencyGraph.markAsDependentOnStructureChange(vertex)
                 }
               } else {
-                const vertex = new MatrixVertex(parseResult.ast, address, new MatrixSize(size.width, size.height))
+                const vertex = new ArrayVertex(parseResult.ast, address, new ArraySize(size.width, size.height))
                 dependencies.set(vertex, absolutizeDependencies(parseResult.dependencies, address))
                 this.dependencyGraph.addMatrixVertex(address, vertex)
               }
@@ -133,7 +133,7 @@ export class SimpleStrategy implements GraphBuilderStrategy {
 
   private shrinkMatrixIfNeeded(address: SimpleCellAddress) {
     const vertex = this.dependencyGraph.getCell(address)
-    if (vertex instanceof MatrixVertex) {
+    if (vertex instanceof ArrayVertex) {
       this.dependencyGraph.shrinkMatrixToCorner(vertex)
     }
   }

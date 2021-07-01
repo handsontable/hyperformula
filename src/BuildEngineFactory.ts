@@ -16,7 +16,7 @@ import {UIElement} from './i18n'
 import {FunctionRegistry} from './interpreter/FunctionRegistry'
 import {LazilyTransformingAstService} from './LazilyTransformingAstService'
 import {buildColumnSearchStrategy, ColumnSearchStrategy} from './Lookup/SearchStrategy'
-import {MatrixSizePredictor} from './MatrixSize'
+import {ArraySizePredictor} from './ArraySize'
 import {NamedExpressions} from './NamedExpressions'
 import {NumberLiteralHelper} from './NumberLiteralHelper'
 import {buildLexerConfig, ParserWithCaching, Unparser} from './parser'
@@ -72,14 +72,14 @@ export class BuildEngineFactory {
     const numberLiteralHelper = new NumberLiteralHelper(config)
     const cellContentParser = new CellContentParser(config, dateHelper, numberLiteralHelper)
 
-    const matrixSizePredictor = new MatrixSizePredictor(config, functionRegistry)
-    const crudOperations = new CrudOperations(config, stats, dependencyGraph, columnSearch, parser, cellContentParser, lazilyTransformingAstService, namedExpressions, matrixSizePredictor)
+    const arraySizePredictor = new ArraySizePredictor(config, functionRegistry)
+    const crudOperations = new CrudOperations(config, stats, dependencyGraph, columnSearch, parser, cellContentParser, lazilyTransformingAstService, namedExpressions, arraySizePredictor)
     inputNamedExpressions.forEach((entry: SerializedNamedExpression) => {
       crudOperations.ensureItIsPossibleToAddNamedExpression(entry.name, entry.expression, entry.scope)
       crudOperations.operations.addNamedExpression(entry.name, entry.expression, entry.scope, entry.options)
     })
     stats.measure(StatType.GRAPH_BUILD, () => {
-      const graphBuilder = new GraphBuilder(dependencyGraph, columnSearch, parser, cellContentParser, config, stats, matrixSizePredictor)
+      const graphBuilder = new GraphBuilder(dependencyGraph, columnSearch, parser, cellContentParser, config, stats, arraySizePredictor)
       graphBuilder.buildGraph(sheets)
     })
 

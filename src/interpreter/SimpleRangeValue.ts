@@ -7,11 +7,11 @@ import {AbsoluteCellRange} from '../AbsoluteCellRange'
 import {CellError, ErrorType, simpleCellAddress, SimpleCellAddress} from '../Cell'
 import {DependencyGraph} from '../DependencyGraph'
 import {ErrorMessage} from '../error-message'
-import {MatrixSize} from '../MatrixSize'
+import {ArraySize} from '../ArraySize'
 import {InternalScalarValue, isExtendedNumber} from './InterpreterValue'
 
 export class SimpleRangeValue {
-  public readonly size: MatrixSize
+  public readonly size: ArraySize
 
   public static fromRange(data: InternalScalarValue[][], range: AbsoluteCellRange, dependencyGraph: DependencyGraph): SimpleRangeValue {
     return new SimpleRangeValue(data, range, dependencyGraph, true)
@@ -40,9 +40,9 @@ export class SimpleRangeValue {
     private _hasOnlyNumbers?: boolean,
   ) {
     if (_data === undefined) {
-      this.size = new MatrixSize(range!.width(), range!.height())
+      this.size = new ArraySize(range!.width(), range!.height())
     } else {
-      this.size = new MatrixSize(_data[0].length, _data.length)
+      this.size = new ArraySize(_data[0].length, _data.length)
     }
   }
 

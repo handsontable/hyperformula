@@ -12,7 +12,7 @@ import {DependencyGraph} from '../DependencyGraph'
 import {ErrorMessage} from '../error-message'
 import {LicenseKeyValidityState} from '../helpers/licenseKeyValidator'
 import {ColumnSearchStrategy} from '../Lookup/SearchStrategy'
-import {Matrix, NotComputedMatrix} from '../Matrix'
+import {ArrayValue, NotComputedMatrix} from '../ArrayValue'
 import {Maybe} from '../Maybe'
 import {NamedExpressions} from '../NamedExpressions'
 import {NumberLiteralHelper} from '../NumberLiteralHelper'
@@ -202,7 +202,7 @@ export class Interpreter {
             throw new Error('Matrix should be already computed')
           } else if (matrix instanceof CellError) {
             return matrix
-          } else if (matrix instanceof Matrix) {
+          } else if (matrix instanceof ArrayValue) {
             return SimpleRangeValue.fromRange(matrix.raw(), range, this.dependencyGraph)
           } else {
             throw new Error('Unknown matrix')

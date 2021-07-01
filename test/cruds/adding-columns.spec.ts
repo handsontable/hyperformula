@@ -1,7 +1,7 @@
 import {ExportedCellChange, HyperFormula} from '../../src'
 import {AbsoluteCellRange} from '../../src/AbsoluteCellRange'
 import {Config} from '../../src/Config'
-import {FormulaCellVertex, MatrixVertex} from '../../src/DependencyGraph'
+import {FormulaCellVertex, ArrayVertex} from '../../src/DependencyGraph'
 import {SheetSizeLimitExceededError} from '../../src/errors'
 import {ColumnIndex} from '../../src/Lookup/ColumnIndex'
 import {
@@ -356,7 +356,7 @@ describe('Adding column - arrays', () => {
     ], {useArrayArithmetic: true}))
   })
 
-  it('MatrixVertex#formula should be updated', () => {
+  it('ArrayVertex#formula should be updated', () => {
     const engine = HyperFormula.buildFromArray([
       [1, 2, '=TRANSPOSE(A1:B2)'],
       [3, 4],
@@ -367,7 +367,7 @@ describe('Adding column - arrays', () => {
     expect(extractMatrixRange(engine, adr('D1'))).toEqual(new AbsoluteCellRange(adr('A1'), adr('C2')))
   })
 
-  it('MatrixVertex#formula should be updated when different sheets', () => {
+  it('ArrayVertex#formula should be updated when different sheets', () => {
     const engine = HyperFormula.buildFromSheets({
       Sheet1: [
         ['1', '2'],
@@ -383,7 +383,7 @@ describe('Adding column - arrays', () => {
     expect(extractMatrixRange(engine, adr('A1', 1))).toEqual(new AbsoluteCellRange(adr('A1'), adr('C2')))
   })
 
-  it('MatrixVertex#address should be updated', () => {
+  it('ArrayVertex#address should be updated', () => {
     const engine = HyperFormula.buildFromArray([
       [1, 2, '=TRANSPOSE(A1:B2)'],
       [3, 4],
@@ -391,7 +391,7 @@ describe('Adding column - arrays', () => {
 
     engine.addColumns(0, [1, 1])
 
-    const matrixVertex = engine.addressMapping.fetchCell(adr('D1')) as MatrixVertex
+    const matrixVertex = engine.addressMapping.fetchCell(adr('D1')) as ArrayVertex
     expect(matrixVertex.getAddress(engine.lazilyTransformingAstService)).toEqual(adr('D1'))
   })
 })

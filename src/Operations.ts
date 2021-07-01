@@ -17,7 +17,7 @@ import {
   DependencyGraph,
   EmptyCellVertex,
   FormulaCellVertex,
-  MatrixVertex,
+  ArrayVertex,
   ParsingErrorVertex,
   SheetMapping,
   SparseStrategy,
@@ -42,7 +42,7 @@ import {
 import {EmptyValue, getRawValue} from './interpreter/InterpreterValue'
 import {LazilyTransformingAstService} from './LazilyTransformingAstService'
 import {ColumnSearchStrategy} from './Lookup/SearchStrategy'
-import {MatrixSize, MatrixSizePredictor} from './MatrixSize'
+import {ArraySize, ArraySizePredictor} from './ArraySize'
 import {
   doesContainRelativeReferences,
   InternalNamedExpression,
@@ -166,7 +166,7 @@ export class Operations {
     private readonly lazilyTransformingAstService: LazilyTransformingAstService,
     private readonly namedExpressions: NamedExpressions,
     private readonly config: Config,
-    private readonly matrixSizePredictor: MatrixSizePredictor,
+    private readonly matrixSizePredictor: ArraySizePredictor,
   ) {
     this.allocateNamedExpressionAddressSpace()
   }
@@ -562,7 +562,7 @@ export class Operations {
     this.rewriteAffectedMatrices(affectedArrays)
   }
 
-  private rewriteAffectedMatrices(affectedMatrices: Set<MatrixVertex>) {
+  private rewriteAffectedMatrices(affectedMatrices: Set<ArrayVertex>) {
     for (const matrixVertex of affectedMatrices.values()) {
       if (matrixVertex.matrix.size.isRef) {
         continue
@@ -626,7 +626,7 @@ export class Operations {
       return {type: ClipboardCellType.EMPTY}
     } else if (vertex instanceof ValueCellVertex) {
       return {type: ClipboardCellType.VALUE, ...vertex.getValues()}
-    } else if (vertex instanceof MatrixVertex) {
+    } else if (vertex instanceof ArrayVertex) {
       const val = vertex.getMatrixCellValue(address)
       if (val === EmptyValue) {
         return {type: ClipboardCellType.EMPTY}
@@ -710,7 +710,7 @@ export class Operations {
     this.changes.addChange(vertex.getCellValue(), address)
   }
 
-  public setFormulaToCell(address: SimpleCellAddress, size: MatrixSize, {
+  public setFormulaToCell(address: SimpleCellAddress, size: ArraySize, {
     ast,
     hasVolatileFunction,
     hasStructuralChangeFunction,
@@ -825,7 +825,7 @@ export class Operations {
         throw new NoRelativeAddressesAllowedError()
       }
       const {ast, hasVolatileFunction, hasStructuralChangeFunction, dependencies} = parsingResult
-      this.dependencyGraph.setFormulaToCell(address, ast, absolutizeDependencies(dependencies, address), MatrixSize.scalar(), hasVolatileFunction, hasStructuralChangeFunction)
+      this.dependencyGraph.setFormulaToCell(address, ast, absolutizeDependencies(dependencies, address), ArraySize.scalar(), hasVolatileFunction, hasStructuralChangeFunction)
     } else if (parsedCellContent instanceof CellContent.Empty) {
       this.setCellEmpty(address)
     } else {
@@ -895,7 +895,7 @@ export class Operations {
       if (sourceVertex instanceof FormulaCellVertex) {
         const parsingResult = this.parser.fetchCachedResultForAst(sourceVertex.getFormula(this.lazilyTransformingAstService))
         const {ast, hasVolatileFunction, hasStructuralChangeFunction, dependencies} = parsingResult
-        this.dependencyGraph.setFormulaToCell(expression.address, ast, absolutizeDependencies(dependencies, expression.address), MatrixSize.scalar(), hasVolatileFunction, hasStructuralChangeFunction)
+        this.dependencyGraph.setFormulaToCell(expression.address, ast, absolutizeDependencies(dependencies, expression.address), ArraySize.scalar(), hasVolatileFunction, hasStructuralChangeFunction)
       } else if (sourceVertex instanceof EmptyCellVertex) {
         this.setCellEmpty(expression.address)
       } else if (sourceVertex instanceof ValueCellVertex) {

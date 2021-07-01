@@ -26,7 +26,7 @@ import {
   AddressMapping,
   DependencyGraph,
   Graph,
-  MatrixMapping,
+  ArrayMapping,
   RangeMapping,
   SheetMapping,
   Vertex,
@@ -137,7 +137,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * @internal
    */
-  public get matrixMapping(): MatrixMapping {
+  public get matrixMapping(): ArrayMapping {
     return this.dependencyGraph.matrixMapping
   }
 

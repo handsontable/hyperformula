@@ -7,12 +7,12 @@ import {AbsoluteCellRange} from '../AbsoluteCellRange'
 import {addressKey, SimpleCellAddress} from '../Cell'
 import {Maybe} from '../Maybe'
 import {ColumnsSpan, RowsSpan} from '../Span'
-import {MatrixVertex} from './'
+import {ArrayVertex} from './'
 
-export class MatrixMapping {
-  public readonly matrixMapping: Map<string, MatrixVertex> = new Map()
+export class ArrayMapping {
+  public readonly matrixMapping: Map<string, ArrayVertex> = new Map()
 
-  public getMatrix(range: AbsoluteCellRange): Maybe<MatrixVertex> {
+  public getMatrix(range: AbsoluteCellRange): Maybe<ArrayVertex> {
     const matrix =  this.getMatrixByCorner(range.start)
     if (matrix?.getRange().sameAs(range)) {
       return matrix
@@ -20,11 +20,11 @@ export class MatrixMapping {
     return
   }
 
-  public getMatrixByCorner(address: SimpleCellAddress): Maybe<MatrixVertex> {
+  public getMatrixByCorner(address: SimpleCellAddress): Maybe<ArrayVertex> {
     return this.matrixMapping.get(addressKey(address))
   }
 
-  public setMatrix(range: AbsoluteCellRange, vertex: MatrixVertex) {
+  public setMatrix(range: AbsoluteCellRange, vertex: ArrayVertex) {
     this.matrixMapping.set(addressKey(range.start), vertex)
   }
 
@@ -40,7 +40,7 @@ export class MatrixMapping {
     return this.matrixMapping.size
   }
 
-  public* matricesInRows(rowsSpan: RowsSpan): IterableIterator<[string, MatrixVertex]> {
+  public* matricesInRows(rowsSpan: RowsSpan): IterableIterator<[string, ArrayVertex]> {
     for (const [mtxKey, mtx] of this.matrixMapping.entries()) {
       if (mtx.spansThroughSheetRows(rowsSpan.sheet, rowsSpan.rowStart, rowsSpan.rowEnd)) {
         yield [mtxKey, mtx]
@@ -48,7 +48,7 @@ export class MatrixMapping {
     }
   }
 
-  public* matricesInCols(col: ColumnsSpan): IterableIterator<[string, MatrixVertex]> {
+  public* matricesInCols(col: ColumnsSpan): IterableIterator<[string, ArrayVertex]> {
     for (const [mtxKey, mtx] of this.matrixMapping.entries()) {
       if (mtx.spansThroughSheetColumn(col.sheet, col.columnStart, col.columnEnd)) {
         yield [mtxKey, mtx]
@@ -117,21 +117,21 @@ export class MatrixMapping {
   }
 
   public moveMatrixVerticesAfterRowByRows(sheet: number, row: number, numberOfRows: number) {
-    this.updateMatrixVerticesInSheet(sheet, (key: string, vertex: MatrixVertex) => {
+    this.updateMatrixVerticesInSheet(sheet, (key: string, vertex: ArrayVertex) => {
       const range = vertex.getRange()
       return row <= range.start.row ? [range.shifted(0, numberOfRows), vertex] : undefined
     })
   }
 
   public moveMatrixVerticesAfterColumnByColumns(sheet: number, column: number, numberOfColumns: number) {
-    this.updateMatrixVerticesInSheet(sheet, (key: string, vertex: MatrixVertex) => {
+    this.updateMatrixVerticesInSheet(sheet, (key: string, vertex: ArrayVertex) => {
       const range = vertex.getRange()
       return column <= range.start.col ? [range.shifted(numberOfColumns, 0), vertex] : undefined
     })
   }
 
-  private updateMatrixVerticesInSheet(sheet: number, fn: (key: string, vertex: MatrixVertex) => Maybe<[AbsoluteCellRange, MatrixVertex]>) {
-    const updated = Array<[AbsoluteCellRange, MatrixVertex]>()
+  private updateMatrixVerticesInSheet(sheet: number, fn: (key: string, vertex: ArrayVertex) => Maybe<[AbsoluteCellRange, ArrayVertex]>) {
+    const updated = Array<[AbsoluteCellRange, ArrayVertex]>()
 
     for (const [key, vertex] of this.matrixMapping.entries()) {
       if (vertex.sheet !== sheet) {

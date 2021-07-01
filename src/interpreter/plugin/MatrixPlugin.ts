@@ -5,7 +5,7 @@
 
 import {CellError, ErrorType} from '../../Cell'
 import {ErrorMessage} from '../../error-message'
-import {MatrixSize, matrixSizeForMultiplication, matrixSizeForPoolFunction} from '../../MatrixSize'
+import {ArraySize, matrixSizeForMultiplication, matrixSizeForPoolFunction} from '../../ArraySize'
 import {ProcedureAst} from '../../parser'
 import {Interpreter} from '../Interpreter'
 import {InterpreterState} from '../InterpreterState'
@@ -65,7 +65,7 @@ export class MatrixPlugin extends FunctionPlugin implements FunctionPluginTypech
     },
   }
 
-  private readonly createKernel: (kernel: KernelFunction, outputSize: MatrixSize) => KernelRunShortcut
+  private readonly createKernel: (kernel: KernelFunction, outputSize: ArraySize) => KernelRunShortcut
 
   constructor(interpreter: Interpreter) {
     super(interpreter)
@@ -202,7 +202,7 @@ export class MatrixPlugin extends FunctionPlugin implements FunctionPluginTypech
     })
   }
 
-  private createCpuKernel = (kernel: KernelFunction, outputSize: MatrixSize): KernelRunShortcut => {
+  private createCpuKernel = (kernel: KernelFunction, outputSize: ArraySize): KernelRunShortcut => {
     return function(...args: any[]) {
       const result: number[][] = []
       for (let y = 0; y < outputSize.height; ++y) {
@@ -215,7 +215,7 @@ export class MatrixPlugin extends FunctionPlugin implements FunctionPluginTypech
     }
   }
 
-  private createGpuJsKernel = (kernel: KernelFunction, outputSize: MatrixSize): KernelRunShortcut => {
+  private createGpuJsKernel = (kernel: KernelFunction, outputSize: ArraySize): KernelRunShortcut => {
     return this.interpreter.getGpuInstance()
       .createKernel(kernel)
       .setPrecision('unsigned')

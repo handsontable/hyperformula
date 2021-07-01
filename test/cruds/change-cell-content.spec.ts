@@ -2,11 +2,11 @@ import {ErrorType, ExportedCellChange, HyperFormula, InvalidAddressError, NoShee
 import {AbsoluteCellRange} from '../../src/AbsoluteCellRange'
 import {simpleCellAddress} from '../../src/Cell'
 import {Config} from '../../src/Config'
-import {EmptyCellVertex, MatrixVertex, ValueCellVertex} from '../../src/DependencyGraph'
+import {EmptyCellVertex, ArrayVertex, ValueCellVertex} from '../../src/DependencyGraph'
 import {ErrorMessage} from '../../src/error-message'
 import {SheetSizeLimitExceededError} from '../../src/errors'
 import {ColumnIndex} from '../../src/Lookup/ColumnIndex'
-import {MatrixSize} from '../../src/MatrixSize'
+import {ArraySize} from '../../src/ArraySize'
 import {
   adr,
   colEnd,
@@ -844,9 +844,9 @@ describe('arrays', () => {
       [1]
     ])
 
-    expect(engine.matrixMapping.getMatrixByCorner(adr('A1'))?.matrix.size).toEqual(MatrixSize.error())
+    expect(engine.matrixMapping.getMatrixByCorner(adr('A1'))?.matrix.size).toEqual(ArraySize.error())
     expectVerticesOfTypes(engine, [
-      [MatrixVertex, undefined],
+      [ArrayVertex, undefined],
       [ValueCellVertex, undefined],
     ])
     expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
@@ -864,9 +864,9 @@ describe('arrays', () => {
     ])
 
     expectVerticesOfTypes(engine, [
-      [MatrixVertex, MatrixVertex, undefined],
-      [MatrixVertex, MatrixVertex, MatrixVertex],
-      [undefined, MatrixVertex, MatrixVertex],
+      [ArrayVertex, ArrayVertex, undefined],
+      [ArrayVertex, ArrayVertex, ArrayVertex],
+      [undefined, ArrayVertex, ArrayVertex],
     ])
     expect(engine.matrixMapping.matrixMapping.size).toEqual(4)
     expect(engine.getSheetValues(0))
@@ -884,8 +884,8 @@ describe('arrays', () => {
     ])
 
     expectVerticesOfTypes(engine, [
-      [MatrixVertex, MatrixVertex, MatrixVertex],
-      [MatrixVertex, MatrixVertex, MatrixVertex],
+      [ArrayVertex, ArrayVertex, ArrayVertex],
+      [ArrayVertex, ArrayVertex, ArrayVertex],
       [undefined, undefined],
     ])
     expect(engine.getSheetValues(0)).toEqual([

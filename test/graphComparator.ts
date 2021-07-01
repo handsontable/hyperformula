@@ -5,7 +5,7 @@ import {SimpleCellAddress, simpleCellAddress} from '../src/Cell'
 import {
   EmptyCellVertex,
   FormulaCellVertex,
-  MatrixVertex,
+  ArrayVertex,
   ParsingErrorVertex,
   RangeVertex,
   ValueCellVertex,
@@ -59,7 +59,7 @@ export class EngineComparator {
           continue
         } else if (
           (expectedVertex instanceof FormulaCellVertex  && actualVertex instanceof FormulaCellVertex) ||
-          (expectedVertex instanceof MatrixVertex  && actualVertex instanceof MatrixVertex)
+          (expectedVertex instanceof ArrayVertex  && actualVertex instanceof ArrayVertex)
         ) {
           const actualVertexAddress = actualVertex.getAddress(this.actual.dependencyGraph.lazilyTransformingAstService)
           const expectedVertexAddress = expectedVertex.getAddress(this.expected.dependencyGraph.lazilyTransformingAstService)

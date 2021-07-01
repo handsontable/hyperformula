@@ -28,7 +28,7 @@ import {
 } from './errors'
 import {LazilyTransformingAstService} from './LazilyTransformingAstService'
 import {ColumnSearchStrategy} from './Lookup/SearchStrategy'
-import {MatrixSizePredictor} from './MatrixSize'
+import {ArraySizePredictor} from './ArraySize'
 import {Maybe} from './Maybe'
 import {
   doesContainRelativeReferences,
@@ -89,7 +89,7 @@ export class CrudOperations {
     private readonly lazilyTransformingAstService: LazilyTransformingAstService,
     /** Storage for named expressions */
     private readonly namedExpressions: NamedExpressions,
-    private readonly matrixSizePredictor: MatrixSizePredictor,
+    private readonly matrixSizePredictor: ArraySizePredictor,
   ) {
     this.operations = new Operations(dependencyGraph, columnSearch, cellContentParser, parser, stats, lazilyTransformingAstService, namedExpressions, config, matrixSizePredictor)
     this.clipboardOperations = new ClipboardOperations(dependencyGraph, this.operations, parser, lazilyTransformingAstService, config)
