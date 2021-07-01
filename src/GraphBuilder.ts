@@ -41,9 +41,9 @@ export class GraphBuilder {
     private readonly cellContentParser: CellContentParser,
     private readonly config: Config,
     private readonly stats: Statistics,
-    private readonly matrixSizePredictor: ArraySizePredictor,
+    private readonly arraySizePredictor: ArraySizePredictor,
   ) {
-    this.buildStrategy = new SimpleStrategy(dependencyGraph, columnSearch, parser, stats, cellContentParser, matrixSizePredictor)
+    this.buildStrategy = new SimpleStrategy(dependencyGraph, columnSearch, parser, stats, cellContentParser, arraySizePredictor)
   }
 
   /**
@@ -73,7 +73,7 @@ export class SimpleStrategy implements GraphBuilderStrategy {
     private readonly parser: ParserWithCaching,
     private readonly stats: Statistics,
     private readonly cellContentParser: CellContentParser,
-    private readonly matrixSizePredictor: ArraySizePredictor,
+    private readonly arraySizePredictor: ArraySizePredictor,
   ) {
   }
 
@@ -94,12 +94,12 @@ export class SimpleStrategy implements GraphBuilderStrategy {
           if (parsedCellContent instanceof CellContent.Formula) {
             const parseResult = this.stats.measure(StatType.PARSER, () => this.parser.parse(parsedCellContent.formula, address))
             if (parseResult.errors.length > 0) {
-              this.shrinkMatrixIfNeeded(address)
+              this.shrinkArrayIfNeeded(address)
               const vertex = new ParsingErrorVertex(parseResult.errors, parsedCellContent.formula)
               this.dependencyGraph.addVertex(address, vertex)
             } else {
-              this.shrinkMatrixIfNeeded(address)
-              const size = this.matrixSizePredictor.checkArraySize(parseResult.ast, address)
+              this.shrinkArrayIfNeeded(address)
+              const size = this.arraySizePredictor.checkArraySize(parseResult.ast, address)
               if (size.isScalar()) {
                 const vertex = new FormulaCellVertex(parseResult.ast, address, 0)
                 dependencies.set(vertex, absolutizeDependencies(parseResult.dependencies, address))
@@ -119,7 +119,7 @@ export class SimpleStrategy implements GraphBuilderStrategy {
           } else if (parsedCellContent instanceof CellContent.Empty) {
             /* we don't care about empty cells here */
           } else {
-            this.shrinkMatrixIfNeeded(address)
+            this.shrinkArrayIfNeeded(address)
             const vertex = new ValueCellVertex(parsedCellContent.value, cellContent)
             this.columnIndex.add(getRawValue(parsedCellContent.value), address)
             this.dependencyGraph.addVertex(address, vertex)
@@ -131,7 +131,7 @@ export class SimpleStrategy implements GraphBuilderStrategy {
     return dependencies
   }
 
-  private shrinkMatrixIfNeeded(address: SimpleCellAddress) {
+  private shrinkArrayIfNeeded(address: SimpleCellAddress) {
     const vertex = this.dependencyGraph.getCell(address)
     if (vertex instanceof ArrayVertex) {
       this.dependencyGraph.shrinkArrayToCorner(vertex)

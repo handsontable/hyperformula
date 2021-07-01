@@ -494,7 +494,7 @@ export class Operations {
       version = this.lazilyTransformingAstService.addTransformation(transformation)
     })
 
-    this.rewriteAffectedMatrices(affectedArrays)
+    this.rewriteAffectedArrays(affectedArrays)
 
     return {version: version!, removedCells, rowFrom: rowsToRemove.rowStart, rowCount: rowsToRemove.numberOfRows}
   }
@@ -528,7 +528,7 @@ export class Operations {
       version = this.lazilyTransformingAstService.addTransformation(transformation)
     })
 
-    this.rewriteAffectedMatrices(affectedArrays)
+    this.rewriteAffectedArrays(affectedArrays)
 
     return {
       version: version!,
@@ -559,16 +559,16 @@ export class Operations {
       this.lazilyTransformingAstService.addTransformation(transformation)
     })
 
-    this.rewriteAffectedMatrices(affectedArrays)
+    this.rewriteAffectedArrays(affectedArrays)
   }
 
-  private rewriteAffectedMatrices(affectedMatrices: Set<ArrayVertex>) {
-    for (const matrixVertex of affectedMatrices.values()) {
-      if (matrixVertex.array.size.isRef) {
+  private rewriteAffectedArrays(affectedArrays: Set<ArrayVertex>) {
+    for (const arrayVertex of affectedArrays.values()) {
+      if (arrayVertex.array.size.isRef) {
         continue
       }
-      const ast = matrixVertex.getFormula(this.lazilyTransformingAstService)
-      const address = matrixVertex.getAddress(this.lazilyTransformingAstService)
+      const ast = arrayVertex.getFormula(this.lazilyTransformingAstService)
+      const address = arrayVertex.getAddress(this.lazilyTransformingAstService)
       const hash = this.parser.computeHashFromAst(ast)
       this.setFormulaToCellFromCache(hash, address)
     }
@@ -597,7 +597,7 @@ export class Operations {
       this.lazilyTransformingAstService.addTransformation(transformation)
     })
 
-    this.rewriteAffectedMatrices(affectedArrays)
+    this.rewriteAffectedArrays(affectedArrays)
   }
 
   public getOldContent(address: SimpleCellAddress): [SimpleCellAddress, ClipboardCell] {

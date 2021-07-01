@@ -264,10 +264,11 @@ export class DependencyGraph {
           if (vertex.isLeftCorner(address)) {
             this.shrinkArrayToCorner(vertex)
             this.arrayMapping.removeArray(vertex.getRange())
+          } else {
+            continue
           }
-        } else {
-          this.removeVertex(vertex)
         }
+        this.removeVertex(vertex)
       }
     })
 
@@ -296,7 +297,11 @@ export class DependencyGraph {
     const arrays: Set<ArrayVertex> = new Set()
     for (const [adr, vertex] of this.addressMapping.sheetEntries(removedSheetId)) {
       if (vertex instanceof ArrayVertex) {
-        arrays.add(vertex)
+        if (arrays.has(vertex)) {
+          continue
+        } else {
+          arrays.add(vertex)
+        }
       }
       for (const adjacentNode of this.graph.adjacentNodes(vertex)) {
         this.graph.markNodeAsSpecialRecentlyChanged(adjacentNode)
@@ -353,10 +358,11 @@ export class DependencyGraph {
           if (vertex.isLeftCorner(address)) {
             this.shrinkArrayToCorner(vertex)
             this.arrayMapping.removeArray(vertex.getRange())
+          } else {
+            continue
           }
-        } else {
-          this.removeVertex(vertex)
         }
+        this.removeVertex(vertex)
       }
     })
 

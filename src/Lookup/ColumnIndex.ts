@@ -53,8 +53,8 @@ export class ColumnIndex implements ColumnSearchStrategy {
     if (value === EmptyValue || value instanceof CellError) {
       return
     } else if (value instanceof SimpleRangeValue) {
-      for (const [matrixValue, cellAddress] of value.entriesFromTopLeftCorner(address)) {
-        this.addSingleCellValue(getRawValue(matrixValue), cellAddress)
+      for (const [arrayValue, cellAddress] of value.entriesFromTopLeftCorner(address)) {
+        this.addSingleCellValue(getRawValue(arrayValue), cellAddress)
       }
     } else {
       this.addSingleCellValue(value, address)
@@ -67,8 +67,8 @@ export class ColumnIndex implements ColumnSearchStrategy {
     }
 
     if (value instanceof SimpleRangeValue) {
-      for (const [matrixValue, cellAddress] of value.entriesFromTopLeftCorner(address)) {
-        this.removeSingleValue(getRawValue(matrixValue), cellAddress)
+      for (const [arrayValue, cellAddress] of value.entriesFromTopLeftCorner(address)) {
+        this.removeSingleValue(getRawValue(arrayValue), cellAddress)
       }
     } else {
       this.removeSingleValue(value, address)

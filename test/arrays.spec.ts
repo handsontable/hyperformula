@@ -359,7 +359,7 @@ describe('build from array', () => {
       [ArrayVertex, ArrayVertex, ArrayVertex],
       [undefined, ArrayVertex, ArrayVertex],
     ])
-    expect(engine.matrixMapping.arrayMapping.size).toEqual(4)
+    expect(engine.arrayMapping.arrayMapping.size).toEqual(4)
     expect(engine.getSheetValues(0))
   })
 
@@ -378,7 +378,7 @@ describe('build from array', () => {
       [noSpace(), 1, 1, 1, 2],
       [noSpace(), 2, 2, 1, 2],
     ])
-    expect(engine.matrixMapping.arrayMapping.size).toEqual(3)
+    expect(engine.arrayMapping.arrayMapping.size).toEqual(3)
     expect(engine.getSheetValues(0))
   })
 
@@ -425,7 +425,7 @@ describe('build from array', () => {
       [1, null]
     ], {useArrayArithmetic: true})
 
-    expect(engine.matrixMapping.getMatrixByCorner(adr('A1'))?.matrix.size).toEqual(ArraySize.error())
+    expect(engine.arrayMapping.getArrayByCorner(adr('A1'))?.array.size).toEqual(ArraySize.error())
     expectVerticesOfTypes(engine, [
       [ArrayVertex, undefined],
       [ValueCellVertex, undefined],

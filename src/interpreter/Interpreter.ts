@@ -197,15 +197,15 @@ export class Interpreter {
         const range = AbsoluteCellRange.fromCellRange(ast, state.formulaAddress)
         const arrayVertex = this.dependencyGraph.getArray(range)
         if (arrayVertex) {
-          const matrix = arrayVertex.array
-          if (matrix instanceof NotComputedArray) {
-            throw new Error('Matrix should be already computed')
-          } else if (matrix instanceof CellError) {
-            return matrix
-          } else if (matrix instanceof ArrayValue) {
-            return SimpleRangeValue.fromRange(matrix.raw(), range, this.dependencyGraph)
+          const array = arrayVertex.array
+          if (array instanceof NotComputedArray) {
+            throw new Error('Array should be already computed')
+          } else if (array instanceof CellError) {
+            return array
+          } else if (array instanceof ArrayValue) {
+            return SimpleRangeValue.fromRange(array.raw(), range, this.dependencyGraph)
           } else {
-            throw new Error('Unknown matrix')
+            throw new Error('Unknown array')
           }
         } else {
           return SimpleRangeValue.onlyRange(range, this.dependencyGraph)

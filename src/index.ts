@@ -9,6 +9,7 @@ import {RawCellContent} from './CellContentParser'
 import {CellValue, DetailedCellError, NoErrorCellValue} from './CellValue'
 import {Config, ConfigParams} from './Config'
 import {ColumnRowIndex} from './CrudOperations'
+import {AlwaysDense, AlwaysSparse, DenseSparseChooseBasedOnThreshold} from './DependencyGraph/AddressMapping/ChooseAddressMappingPolicy'
 import {
   ConfigValueTooBigError,
   ConfigValueTooSmallError,
@@ -105,6 +106,9 @@ for (const pluginName of Object.getOwnPropertyNames(plugins)) {
 export default HyperFormulaNS
 
 export {
+  AlwaysDense,
+  AlwaysSparse,
+  DenseSparseChooseBasedOnThreshold,
   CellValue,
   NoErrorCellValue,
   ConfigParams,

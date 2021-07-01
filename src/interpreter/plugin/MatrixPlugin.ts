@@ -82,7 +82,7 @@ export class MatrixPlugin extends FunctionPlugin implements FunctionPluginTypech
         return new CellError(ErrorType.VALUE, ErrorMessage.NumberRange)
       }
       if( rightMatrix.height() !== leftMatrix.width()) {
-        return new CellError(ErrorType.VALUE, ErrorMessage.MatrixDimensions)
+        return new CellError(ErrorType.VALUE, ErrorMessage.ArrayDimensions)
       }
       const outputSize = arraySizeForMultiplication(leftMatrix.size, rightMatrix.size)
 

@@ -372,7 +372,7 @@ export class FormulaParser extends EmbeddedActionsParser {
   private positiveAtomicExpression: AstRule = this.RULE('positiveAtomicExpression', () => {
     return this.OR(this.atomicExpCache ?? (this.atomicExpCache = [
       {
-        ALT: () => this.SUBRULE(this.matrixExpression),
+        ALT: () => this.SUBRULE(this.arrayExpression),
       },
       {
         ALT: () => this.SUBRULE(this.cellRangeExpression),
@@ -721,12 +721,12 @@ export class FormulaParser extends EmbeddedActionsParser {
     return buildCellRangeAst(startAddress, endAddress, sheetReferenceType, leadingWhitespace)
   }
 
-  private matrixExpression: AstRule = this.RULE('matrixExpression', () => {
+  private arrayExpression: AstRule = this.RULE('arrayExpression', () => {
     return this.OR([
       {
         ALT: () => {
           const ltoken = this.CONSUME(ArrayLParen) as IExtendedToken
-          const ret = this.SUBRULE(this.insideMatrixExpression) as ArrayAst
+          const ret = this.SUBRULE(this.insideArrayExpression) as ArrayAst
           const rtoken = this.CONSUME(ArrayRParen) as IExtendedToken
           return buildArrayAst(ret.args, ltoken.leadingWhitespace, rtoken.leadingWhitespace)
         }
@@ -737,7 +737,7 @@ export class FormulaParser extends EmbeddedActionsParser {
     ])
   })
 
-  private insideMatrixExpression: AstRule = this.RULE('insideMatrixExpression', () => {
+  private insideArrayExpression: AstRule = this.RULE('insideArrayExpression', () => {
     const ret: Ast[][] = [[]]
     ret[ret.length-1].push(this.SUBRULE(this.booleanExpression))
     this.MANY( () => {

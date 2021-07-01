@@ -144,8 +144,8 @@ export class ArrayMapping {
       }
     }
 
-    updated.forEach(([range, matrix]) => {
-      this.setArray(range, matrix)
+    updated.forEach(([range, array]) => {
+      this.setArray(range, array)
     })
   }
 }
