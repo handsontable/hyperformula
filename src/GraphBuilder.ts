@@ -4,21 +4,21 @@
  */
 
 import {absolutizeDependencies} from './absolutizeDependencies'
+import {ArraySize, ArraySizePredictor} from './ArraySize'
 import {SimpleCellAddress, simpleCellAddress} from './Cell'
 import {CellContent, CellContentParser} from './CellContentParser'
 import {CellDependency} from './CellDependency'
 import {Config} from './Config'
 import {
+  ArrayVertex,
   DependencyGraph,
   FormulaCellVertex,
-  ArrayVertex,
   ParsingErrorVertex,
   ValueCellVertex,
   Vertex
 } from './DependencyGraph'
 import {getRawValue} from './interpreter/InterpreterValue'
 import {ColumnSearchStrategy} from './Lookup/SearchStrategy'
-import {ArraySize, ArraySizePredictor} from './ArraySize'
 import {ParserWithCaching} from './parser'
 import {Sheets} from './Sheet'
 import {Statistics, StatType} from './statistics'

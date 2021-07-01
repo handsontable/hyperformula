@@ -1,7 +1,7 @@
 import {ErrorType, HyperFormula} from '../src'
+import {ArraySize} from '../src/ArraySize'
 import {ArrayVertex, ValueCellVertex} from '../src/DependencyGraph'
 import {ErrorMessage} from '../src/error-message'
-import {ArraySize} from '../src/ArraySize'
 import {adr, detailedError, detailedErrorWithOrigin, expectVerticesOfTypes, noSpace} from './testUtils'
 
 describe('without arrayformula, with useArrayArithmetic flag', () => {

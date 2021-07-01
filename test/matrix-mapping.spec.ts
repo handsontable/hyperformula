@@ -1,6 +1,6 @@
 import {AbsoluteCellRange} from '../src/AbsoluteCellRange'
-import {ArrayMapping, ArrayVertex} from '../src/DependencyGraph'
 import {ArraySize} from '../src/ArraySize'
+import {ArrayMapping, ArrayVertex} from '../src/DependencyGraph'
 import {buildNumberAst} from '../src/parser/Ast'
 import {adr} from './testUtils'
 

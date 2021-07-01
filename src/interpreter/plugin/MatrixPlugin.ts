@@ -3,9 +3,9 @@
  * Copyright (c) 2021 Handsoncode. All rights reserved.
  */
 
+import {ArraySize, arraySizeForMultiplication, arraySizeForPoolFunction} from '../../ArraySize'
 import {CellError, ErrorType} from '../../Cell'
 import {ErrorMessage} from '../../error-message'
-import {ArraySize, arraySizeForMultiplication, arraySizeForPoolFunction} from '../../ArraySize'
 import {ProcedureAst} from '../../parser'
 import {Interpreter} from '../Interpreter'
 import {InterpreterState} from '../InterpreterState'

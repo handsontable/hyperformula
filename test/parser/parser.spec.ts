@@ -22,13 +22,13 @@ import {
 } from '../../src/parser'
 import {columnIndexToLabel} from '../../src/parser/addressRepresentationConverters'
 import {
+  ArrayAst,
   buildCellReferenceAst,
   buildColumnRangeAst,
   buildErrorWithRawInputAst,
   buildNumberAst,
   buildRowRangeAst,
   ColumnRangeAst,
-  ArrayAst,
   ParenthesisAst,
   RangeSheetReferenceType,
 } from '../../src/parser/Ast'

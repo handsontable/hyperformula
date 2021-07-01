@@ -3,10 +3,10 @@
  * Copyright (c) 2021 Handsoncode. All rights reserved.
  */
 
+import {ArraySize} from './ArraySize'
 import {CellError} from './Cell'
 import {EmptyValue, InternalScalarValue, InterpreterValue} from './interpreter/InterpreterValue'
 import {SimpleRangeValue} from './interpreter/SimpleRangeValue'
-import {ArraySize} from './ArraySize'
 
 export interface IArray {
   size: ArraySize,

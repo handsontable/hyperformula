@@ -5,6 +5,7 @@
 
 import {SimpleCellAddress} from '../Cell'
 import {Config} from '../Config'
+import {CellValueChange} from '../ContentChanges'
 import {DependencyGraph} from '../DependencyGraph'
 import {RawInterpreterValue, RawNoErrorScalarValue, RawScalarValue} from '../interpreter/InterpreterValue'
 import {SimpleRangeValue} from '../interpreter/SimpleRangeValue'
@@ -12,7 +13,6 @@ import {ColumnsSpan} from '../Span'
 import {Statistics} from '../statistics/Statistics'
 import {ColumnBinarySearch} from './ColumnBinarySearch'
 import {ColumnIndex} from './ColumnIndex'
-import {CellValueChange} from '../ContentChanges'
 
 export interface SearchStrategy {
   find(key: RawNoErrorScalarValue, range: SimpleRangeValue, sorted: boolean): number,

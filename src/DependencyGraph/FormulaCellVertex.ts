@@ -4,13 +4,13 @@
  */
 
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
+import {ArraySize} from '../ArraySize'
+import {ArrayValue, ErroredArray, IArray, NotComputedArray} from '../ArrayValue'
 import {addressesEqual, CellError, ErrorType, SimpleCellAddress} from '../Cell'
 import {RawCellContent} from '../CellContentParser'
 import {ErrorMessage} from '../error-message'
 import {EmptyValue, getRawValue, InternalScalarValue, InterpreterValue} from '../interpreter/InterpreterValue'
 import {LazilyTransformingAstService} from '../LazilyTransformingAstService'
-import {ErroredArray, IArray, ArrayValue, NotComputedArray} from '../ArrayValue'
-import {ArraySize} from '../ArraySize'
 import {Maybe} from '../Maybe'
 import {Ast} from '../parser'
 import {ColumnsSpan, RowsSpan} from '../Span'

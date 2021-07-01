@@ -24,8 +24,10 @@ import {
   SheetMappingFn,
 } from './addressRepresentationConverters'
 import {
+  ArrayAst,
   Ast,
   AstNodeType,
+  buildArrayAst,
   buildCellErrorAst,
   buildCellRangeAst,
   buildCellReferenceAst,
@@ -39,7 +41,6 @@ import {
   buildGreaterThanOrEqualOpAst,
   buildLessThanOpAst,
   buildLessThanOrEqualOpAst,
-  buildArrayAst,
   buildMinusOpAst,
   buildMinusUnaryOpAst,
   buildNamedExpressionAst,
@@ -57,7 +58,6 @@ import {
   buildTimesOpAst,
   CellReferenceAst,
   ErrorAst,
-  ArrayAst,
   parsingError,
   ParsingError,
   ParsingErrorType,
@@ -66,6 +66,8 @@ import {
 import {CellAddress, CellReferenceType} from './CellAddress'
 import {
   AdditionOp,
+  ArrayLParen,
+  ArrayRParen,
   BooleanOp,
   CellReference,
   ColumnRange,
@@ -79,8 +81,6 @@ import {
   LessThanOp,
   LessThanOrEqualOp,
   LParen,
-  ArrayLParen,
-  ArrayRParen,
   MinusOp,
   MultiplicationOp,
   NamedExpression,

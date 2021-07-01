@@ -24,9 +24,9 @@ import {ColumnRowIndex, CrudOperations} from './CrudOperations'
 import {DateTime, numberToSimpleTime} from './DateTimeHelper'
 import {
   AddressMapping,
+  ArrayMapping,
   DependencyGraph,
   Graph,
-  ArrayMapping,
   RangeMapping,
   SheetMapping,
   Vertex,

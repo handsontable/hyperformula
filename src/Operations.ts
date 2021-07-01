@@ -5,6 +5,7 @@
 
 import {AbsoluteCellRange} from './AbsoluteCellRange'
 import {absolutizeDependencies, filterDependenciesOutOfScope} from './absolutizeDependencies'
+import {ArraySize, ArraySizePredictor} from './ArraySize'
 import {equalSimpleCellAddress, invalidSimpleCellAddress, simpleCellAddress, SimpleCellAddress} from './Cell'
 import {CellContent, CellContentParser, RawCellContent} from './CellContentParser'
 import {ClipboardCell, ClipboardCellType} from './ClipboardOperations'
@@ -13,16 +14,17 @@ import {ContentChanges} from './ContentChanges'
 import {ColumnRowIndex} from './CrudOperations'
 import {
   AddressMapping,
+  ArrayVertex,
   CellVertex,
   DependencyGraph,
   EmptyCellVertex,
   FormulaCellVertex,
-  ArrayVertex,
   ParsingErrorVertex,
   SheetMapping,
   SparseStrategy,
   ValueCellVertex
 } from './DependencyGraph'
+import {FormulaVertex} from './DependencyGraph/FormulaCellVertex'
 import {RawAndParsedValue} from './DependencyGraph/ValueCellVertex'
 import {AddColumnsTransformer} from './dependencyTransformers/AddColumnsTransformer'
 import {AddRowsTransformer} from './dependencyTransformers/AddRowsTransformer'
@@ -42,7 +44,6 @@ import {
 import {EmptyValue, getRawValue} from './interpreter/InterpreterValue'
 import {LazilyTransformingAstService} from './LazilyTransformingAstService'
 import {ColumnSearchStrategy} from './Lookup/SearchStrategy'
-import {ArraySize, ArraySizePredictor} from './ArraySize'
 import {
   doesContainRelativeReferences,
   InternalNamedExpression,
@@ -55,7 +56,6 @@ import {ParsingResult} from './parser/ParserWithCaching'
 import {findBoundaries, Sheet} from './Sheet'
 import {ColumnsSpan, RowsSpan} from './Span'
 import {Statistics, StatType} from './statistics'
-import {FormulaVertex} from './DependencyGraph/FormulaCellVertex'
 
 export class RemoveRowsCommand {
   constructor(

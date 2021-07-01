@@ -5,6 +5,7 @@
 
 import {AbsoluteCellRange, SimpleCellRange, simpleCellRange} from '../AbsoluteCellRange'
 import {absolutizeDependencies} from '../absolutizeDependencies'
+import {ArraySize} from '../ArraySize'
 import {CellError, ErrorType, isSimpleCellAddress, simpleCellAddress, SimpleCellAddress} from '../Cell'
 import {RawCellContent} from '../CellContentParser'
 import {CellDependency} from '../CellDependency'
@@ -21,27 +22,26 @@ import {
 } from '../interpreter/InterpreterValue'
 import {SimpleRangeValue} from '../interpreter/SimpleRangeValue'
 import {LazilyTransformingAstService} from '../LazilyTransformingAstService'
-import {ArraySize} from '../ArraySize'
 import {Maybe} from '../Maybe'
 import {NamedExpressions} from '../NamedExpressions'
 import {Ast, collectDependencies, NamedExpressionDependency} from '../parser'
 import {ColumnsSpan, RowsSpan, Span} from '../Span'
 import {Statistics, StatType} from '../statistics'
 import {
+  ArrayVertex,
   CellVertex,
   EmptyCellVertex,
   FormulaCellVertex,
-  ArrayVertex,
   ParsingErrorVertex,
   RangeVertex,
   ValueCellVertex,
   Vertex,
 } from './'
 import {AddressMapping} from './AddressMapping/AddressMapping'
+import {ArrayMapping} from './ArrayMapping'
 import {collectAddressesDependentToRange} from './collectAddressesDependentToRange'
 import {FormulaVertex} from './FormulaCellVertex'
 import {Graph, TopSortResult} from './Graph'
-import {ArrayMapping} from './ArrayMapping'
 import {RangeMapping} from './RangeMapping'
 import {SheetMapping} from './SheetMapping'
 import {RawAndParsedValue} from './ValueCellVertex'

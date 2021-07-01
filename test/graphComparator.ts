@@ -3,9 +3,9 @@ import {HyperFormula} from '../src'
 import {AbsoluteCellRange} from '../src/AbsoluteCellRange'
 import {SimpleCellAddress, simpleCellAddress} from '../src/Cell'
 import {
+  ArrayVertex,
   EmptyCellVertex,
   FormulaCellVertex,
-  ArrayVertex,
   ParsingErrorVertex,
   RangeVertex,
   ValueCellVertex,

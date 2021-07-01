@@ -1,7 +1,7 @@
+import {ArraySize, ArraySizePredictor} from '../src/ArraySize'
 import {Config} from '../src/Config'
 import {FunctionRegistry} from '../src/interpreter/FunctionRegistry'
 import {Interpreter} from '../src/interpreter/Interpreter'
-import {ArraySize, ArraySizePredictor} from '../src/ArraySize'
 import {buildEmptyParserWithCaching} from './parser/common'
 import {adr} from './testUtils'
 

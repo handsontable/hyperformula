@@ -11,7 +11,8 @@ import {
   expectReferenceToHaveRefError,
   extractMatrixRange,
   extractRange,
-  extractReference, noSpace,
+  extractReference,
+  noSpace,
   verifyRangesInSheet,
   verifyValues,
 } from '../testUtils'

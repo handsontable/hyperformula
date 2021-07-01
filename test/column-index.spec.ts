@@ -1,4 +1,5 @@
 import {deepStrictEqual} from 'assert'
+import {HyperFormula} from '../src'
 import {AbsoluteCellRange} from '../src/AbsoluteCellRange'
 import {CellError, ErrorType} from '../src/Cell'
 import {Config} from '../src/Config'
@@ -6,15 +7,14 @@ import {DependencyGraph} from '../src/DependencyGraph'
 import {AddRowsTransformer} from '../src/dependencyTransformers/AddRowsTransformer'
 import {RemoveRowsTransformer} from '../src/dependencyTransformers/RemoveRowsTransformer'
 import {FunctionRegistry} from '../src/interpreter/FunctionRegistry'
+import {EmptyValue} from '../src/interpreter/InterpreterValue'
 import {SimpleRangeValue} from '../src/interpreter/SimpleRangeValue'
 import {LazilyTransformingAstService} from '../src/LazilyTransformingAstService'
 import {ColumnIndex} from '../src/Lookup/ColumnIndex'
 import {NamedExpressions} from '../src/NamedExpressions'
 import {ColumnsSpan, RowsSpan} from '../src/Span'
 import {Statistics} from '../src/statistics'
-import {adr, columnIndexToSheet, expectColumnIndexToMatchSheet} from './testUtils'
-import {HyperFormula} from '../src'
-import {EmptyValue} from '../src/interpreter/InterpreterValue'
+import {adr, expectColumnIndexToMatchSheet} from './testUtils'
 
 function buildEmptyIndex(transformingService: LazilyTransformingAstService, config: Config, statistics: Statistics): ColumnIndex {
   const functionRegistry = new FunctionRegistry(config)

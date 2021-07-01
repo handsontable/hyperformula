@@ -4,6 +4,7 @@
  */
 
 import {AbsoluteCellRange} from './AbsoluteCellRange'
+import {ArraySizePredictor} from './ArraySize'
 import {invalidSimpleCellAddress, simpleCellAddress, SimpleCellAddress} from './Cell'
 import {CellContent, CellContentParser, RawCellContent} from './CellContentParser'
 import {ClipboardCell, ClipboardOperations} from './ClipboardOperations'
@@ -28,7 +29,6 @@ import {
 } from './errors'
 import {LazilyTransformingAstService} from './LazilyTransformingAstService'
 import {ColumnSearchStrategy} from './Lookup/SearchStrategy'
-import {ArraySizePredictor} from './ArraySize'
 import {Maybe} from './Maybe'
 import {
   doesContainRelativeReferences,

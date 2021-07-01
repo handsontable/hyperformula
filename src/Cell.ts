@@ -3,7 +3,7 @@
  * Copyright (c) 2021 Handsoncode. All rights reserved.
  */
 
-import {CellVertex, FormulaCellVertex, ArrayVertex, ParsingErrorVertex, ValueCellVertex} from './DependencyGraph'
+import {ArrayVertex, CellVertex, FormulaCellVertex, ParsingErrorVertex, ValueCellVertex} from './DependencyGraph'
 import {ErrorMessage} from './error-message'
 import {
   EmptyValue,

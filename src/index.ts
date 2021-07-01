@@ -9,7 +9,11 @@ import {RawCellContent} from './CellContentParser'
 import {CellValue, DetailedCellError, NoErrorCellValue} from './CellValue'
 import {Config, ConfigParams} from './Config'
 import {ColumnRowIndex} from './CrudOperations'
-import {AlwaysDense, AlwaysSparse, DenseSparseChooseBasedOnThreshold} from './DependencyGraph/AddressMapping/ChooseAddressMappingPolicy'
+import {
+  AlwaysDense,
+  AlwaysSparse,
+  DenseSparseChooseBasedOnThreshold
+} from './DependencyGraph/AddressMapping/ChooseAddressMappingPolicy'
 import {
   ConfigValueTooBigError,
   ConfigValueTooSmallError,

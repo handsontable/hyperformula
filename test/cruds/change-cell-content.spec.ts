@@ -1,12 +1,12 @@
 import {ErrorType, ExportedCellChange, HyperFormula, InvalidAddressError, NoSheetWithIdError} from '../../src'
 import {AbsoluteCellRange} from '../../src/AbsoluteCellRange'
+import {ArraySize} from '../../src/ArraySize'
 import {simpleCellAddress} from '../../src/Cell'
 import {Config} from '../../src/Config'
-import {EmptyCellVertex, ArrayVertex, ValueCellVertex} from '../../src/DependencyGraph'
+import {ArrayVertex, EmptyCellVertex, ValueCellVertex} from '../../src/DependencyGraph'
 import {ErrorMessage} from '../../src/error-message'
 import {SheetSizeLimitExceededError} from '../../src/errors'
 import {ColumnIndex} from '../../src/Lookup/ColumnIndex'
-import {ArraySize} from '../../src/ArraySize'
 import {
   adr,
   colEnd,

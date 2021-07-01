@@ -1,5 +1,5 @@
-import {EmptyValue} from '../src/interpreter/InterpreterValue'
 import {ArrayValue} from '../src/ArrayValue'
+import {EmptyValue} from '../src/interpreter/InterpreterValue'
 
 describe('Matrix', () => {
   it('fill', () => {

@@ -3,6 +3,7 @@
  * Copyright (c) 2021 Handsoncode. All rights reserved.
  */
 
+import {ArraySizePredictor} from './ArraySize'
 import {CellContentParser} from './CellContentParser'
 import {Config, ConfigParams} from './Config'
 import {CrudOperations} from './CrudOperations'
@@ -16,7 +17,6 @@ import {UIElement} from './i18n'
 import {FunctionRegistry} from './interpreter/FunctionRegistry'
 import {LazilyTransformingAstService} from './LazilyTransformingAstService'
 import {buildColumnSearchStrategy, ColumnSearchStrategy} from './Lookup/SearchStrategy'
-import {ArraySizePredictor} from './ArraySize'
 import {NamedExpressions} from './NamedExpressions'
 import {NumberLiteralHelper} from './NumberLiteralHelper'
 import {buildLexerConfig, ParserWithCaching, Unparser} from './parser'
