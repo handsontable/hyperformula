@@ -27,18 +27,18 @@ browser or as a service, with Node.js as your back-end technology.
 
 HyperFormula comes with a huge library of [{{ $page.functionsCount }} built-in functions](/guide/built-in-functions.md)
 grouped into categories:
-- Math and trigonometry
-- Engineering
-- Statistical
-- Financial
-- Logical
 - Array manipulation
 - Date and time
+- Engineering
+- Financial
 - Information
+- Logical
 - Lookup and reference
+- Math and trigonometry
 - Matrix functions
-- Text
 - Operator
+- Statistical
+- Text
 
 The functions use A1 notation and are compatible with popular spreadsheet software like
 Excel or Google Sheets, which means that you can easily transfer
