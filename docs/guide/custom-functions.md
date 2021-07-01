@@ -140,8 +140,7 @@ the calculations.
 // arguments here are displayed just to show the structure
 public hyper(ast, state) {
     return 'Hyperformula'.length;
-  }
-};
+  };
 ```
 
 ## A complete example of the class definition
@@ -164,7 +163,6 @@ export class CountHF extends FunctionPlugin {
     return 'Hyperformula'.length
     }
   };
-}
 ```
 
 ## Registering a custom function
