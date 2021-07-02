@@ -1,5 +1,5 @@
 import {deepStrictEqual, equal} from 'assert'
-import {HyperFormula} from '../src'
+import {CellError, HyperFormula} from '../src'
 import {AbsoluteCellRange} from '../src/AbsoluteCellRange'
 import {SimpleCellAddress, simpleCellAddress} from '../src/Cell'
 import {
@@ -11,6 +11,7 @@ import {
   Vertex,
 } from '../src/DependencyGraph'
 import {simpleCellAddressToString} from '../src/parser'
+import {InterpreterValue} from '../src/interpreter/InterpreterValue'
 
 export class EngineComparator {
 
@@ -59,7 +60,7 @@ export class EngineComparator {
           const expectedVertexAddress = expectedVertex.getAddress(this.expected.dependencyGraph.lazilyTransformingAstService)
           deepStrictEqual(actualVertexAddress, expectedVertexAddress, `Different addresses in formulas. expected: ${actualVertexAddress}, actual: ${expectedVertexAddress}`)
           deepStrictEqual(actualVertex.getFormula(this.actual.lazilyTransformingAstService), expectedVertex.getFormula(this.expected.lazilyTransformingAstService), 'Different AST in formulas')
-          deepStrictEqual(actualVertex.getCellValue(), expectedVertex.getCellValue(), `Different values of formulas. expected: ${expectedVertex.getCellValue().toString()}, actual: ${actualVertex.getCellValue().toString()}`)
+          deepStrictEqual(this.normalizeCellValue(actualVertex.getCellValue()), this.normalizeCellValue(expectedVertex.getCellValue()), `Different values of formulas. expected: ${expectedVertex.getCellValue().toString()}, actual: ${actualVertex.getCellValue().toString()}`)
         } else if (expectedVertex instanceof ValueCellVertex && actualVertex instanceof ValueCellVertex) {
           deepStrictEqual(actualVertex.getCellValue(), expectedVertex.getCellValue(), `Different values. expected: ${expectedVertex.getCellValue().toString()}, actual: ${actualVertex.getCellValue().toString()}`)
         } else if (expectedVertex instanceof EmptyCellVertex && actualVertex instanceof EmptyCellVertex) {
@@ -83,6 +84,17 @@ export class EngineComparator {
         deepStrictEqual(actualAdjacentAddresses, expectedAdjacentAddresses, `Dependent vertices of ${simpleCellAddressToString(sheetMapping.fetchDisplayName, address, 0)} (Sheet '${sheetMapping.fetchDisplayName(address.sheet)}') are not same`)
       }
     }
+  }
+
+  private normalizeCellValue(value: InterpreterValue): any {
+    if (value instanceof CellError) {
+      return {
+        type: value.type,
+        message: value.message,
+        root: (value.root as any)?.cellAddress
+      }
+    }
+    return value
   }
 
   private getAddressOfVertex(engine: HyperFormula, vertex: Vertex): SimpleCellAddress | AbsoluteCellRange {

@@ -3,7 +3,14 @@
  * Copyright (c) 2021 Handsoncode. All rights reserved.
  */
 
-import {CellVertex, FormulaCellVertex, MatrixVertex, ParsingErrorVertex, ValueCellVertex} from './DependencyGraph'
+import {
+  CellVertex,
+  FormulaCellVertex,
+  MatrixVertex,
+  ParsingErrorVertex,
+  ValueCellVertex,
+  Vertex
+} from './DependencyGraph'
 import {ErrorMessage} from './error-message'
 import {
   EmptyValue,
@@ -16,6 +23,7 @@ import {
 import {SimpleRangeValue} from './interpreter/SimpleRangeValue'
 import {CellAddress} from './parser'
 import {AddressWithSheet} from './parser/Address'
+import {FormulaVertex} from './DependencyGraph/FormulaCellVertex'
 
 /**
  * Possible errors returned by our interpreter.
@@ -140,13 +148,13 @@ export class CellError {
   constructor(
     public readonly type: ErrorType,
     public readonly message?: string,
-    public readonly address?: SimpleCellAddress
+    public readonly root?: FormulaVertex
   ) {
   }
 
-  public attachAddress(address: SimpleCellAddress): CellError {
-    if(this.address === undefined) {
-      return new CellError(this.type, this.message, address)
+  public attachRootVertex(vertex: FormulaVertex): CellError {
+    if(this.root === undefined) {
+      return new CellError(this.type, this.message, vertex)
     } else {
       return this
     }
