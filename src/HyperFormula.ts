@@ -1725,7 +1725,6 @@ export class HyperFormula implements TypedEmitter {
    * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
    * @throws [[InvalidArgumentsError]] when the given arguments are invalid
    * @throws [[SheetSizeLimitExceededError]] when performing this operation would result in sheet size limits exceeding
-   * @throws [[TargetLocationHasMatrixError]] when the selected position has matrix inside
    *
    * @example
    * ```js
@@ -1799,7 +1798,6 @@ export class HyperFormula implements TypedEmitter {
    * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
    * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
    * @throws [[InvalidArgumentsError]] when the given arguments are invalid
-   * @throws [[SourceLocationHasMatrixError]] when the selected position has matrix inside
    *
    * @example
    * ```js
