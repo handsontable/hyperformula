@@ -537,7 +537,7 @@ export class NumericAggregationPlugin extends FunctionPlugin implements Function
    *
    * @param args
    * @param state
-   * @param initialAccValue - initial accumulator value for reducing function
+   * @param initialAccValue - "neutral" value (equivalent of 0)
    * @param functionName - function name to use as cache key
    * @param reducingFunction - reducing function
    * @param mapFunction
@@ -552,7 +552,11 @@ export class NumericAggregationPlugin extends FunctionPlugin implements Function
         return acc
       }
       if (arg.type === AstNodeType.CELL_RANGE || arg.type === AstNodeType.COLUMN_RANGE || arg.type === AstNodeType.ROW_RANGE) {
-        return this.evaluateRange(arg, state, acc, functionName, reducingFunction, mapFunction, coercionFunction)
+        const val = this.evaluateRange(arg, state, initialAccValue, functionName, reducingFunction, mapFunction, coercionFunction)
+        if(val instanceof CellError) {
+          return val
+        }
+        return reducingFunction(val, acc)
       }
       let value
       value = this.evaluateAst(arg, state)

@@ -15,7 +15,7 @@ Config.defaultConfig = Object.assign({}, Config.defaultConfig, {
   functionPlugins: [],
   gpuMode: 'cpu',
   useStats: true,
-  licenseKey: 'agpl-v3',
+  licenseKey: 'gpl-v3',
 })
 
 const jestPresent = (() => {
