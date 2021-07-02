@@ -18,8 +18,8 @@ export const toEqualErrorMatcher: CustomMatcherFactories = {
         let result
         if (typeof received === 'object' && typeof expected === 'object') {
           result = util.equals(
-            {...received, address: undefined},
-            {...expected, address: undefined}
+            {...received, root: undefined, address: undefined},
+            {...expected, root: undefined, address: undefined}
           )
         } else {
           result = util.equals(received, expected)
