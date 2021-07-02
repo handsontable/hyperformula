@@ -1662,7 +1662,7 @@ export class HyperFormula implements TypedEmitter {
    * Returns information whether it is possible to add columns into a specified position in a given sheet.
    * Checks against particular rules to ascertain that addColumns can be called.
    * If returns `true`, doing [[addColumns]] operation won't throw any errors.
-   * Returns `false` if the operation might be disrupted and causes side-effects by the fact that there is a matrix inside the selected columns.
+   * Returns `false` if adding columns would exceed the sheet size limit or given arguments are invalid.
    *
    * @param {number} sheetId - sheet ID in which columns will be added
    * @param {ColumnRowIndex[]} indexes - non-contiguous indexes with format: [column, amount], where column is a column number from which new columns will be added
@@ -1736,7 +1736,7 @@ export class HyperFormula implements TypedEmitter {
    * Returns information whether it is possible to remove columns from a specified position in a given sheet.
    * Checks against particular rules to ascertain that removeColumns can be called.
    * If returns `true`, doing [[removeColumns]] operation won't throw any errors.
-   * Returns `false` if the operation might be disrupted and causes side-effects by the fact that there is a matrix inside the selected columns.
+   * Returns `false` if given arguments are invalid.
    *
    * @param {number} sheetId - sheet ID from which columns will be removed
    * @param {ColumnRowIndex[]} indexes - non-contiguous indexes with format [column, amount]
