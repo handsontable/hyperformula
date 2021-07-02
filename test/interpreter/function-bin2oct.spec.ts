@@ -1,5 +1,6 @@
 import {HyperFormula} from '../../src'
 import {CellValueType, ErrorType} from '../../src/Cell'
+import {ErrorMessage} from '../../src/error-message'
 import {adr, detailedError} from '../testUtils'
 
 describe('function BIN2OCT', () => {
@@ -8,7 +9,7 @@ describe('function BIN2OCT', () => {
       ['=BIN2OCT("foo", 2, 3)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA))
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
   })
 
   it('should not work for non-binary arguments', () => {
@@ -18,9 +19,9 @@ describe('function BIN2OCT', () => {
       ['=BIN2OCT(TRUE())'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM))
-    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NUM))
-    expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.NUM))
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.NotBinary))
+    expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.NotBinary))
+    expect(engine.getCellValue(adr('A3'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.NotBinary))
   })
 
   it('should work', () => {
@@ -74,7 +75,7 @@ describe('function BIN2OCT', () => {
       ['=BIN2OCT(1010101010)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM))
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.NotBinary))
     expect(engine.getCellValue(adr('A2'))).toEqual('7777777252')
   })
 
@@ -104,17 +105,7 @@ describe('function BIN2OCT', () => {
       ['=BIN2OCT(-2, 12)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM))
-    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NUM))
-  })
-
-  // Inconsistency with Product 1
-  it('range value results in VALUE error', () => {
-    const engine = HyperFormula.buildFromArray([
-      ['=1'],
-      ['=2', '=BIN2OCT(A1:A2)'],
-    ])
-
-    expect(engine.getCellValue(adr('B2'))).toEqual(detailedError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.NotBinary))
+    expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.ValueLarge))
   })
 })

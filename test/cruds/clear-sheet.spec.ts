@@ -1,18 +1,17 @@
-import {HyperFormula} from '../../src'
-import {NoSheetWithNameError} from '../../src'
+import {HyperFormula, NoSheetWithIdError} from '../../src'
 import {adr} from '../testUtils'
 
 describe('Clear sheet - checking if its possible', () => {
   it('no if theres no such sheet', () => {
     const engine = HyperFormula.buildFromArray([[]])
 
-    expect(engine.isItPossibleToClearSheet('foo')).toEqual(false)
+    expect(engine.isItPossibleToClearSheet(1)).toEqual(false)
   })
 
   it('yes otherwise', () => {
     const engine = HyperFormula.buildFromArray([[]])
 
-    expect(engine.isItPossibleToClearSheet('Sheet1')).toEqual(true)
+    expect(engine.isItPossibleToClearSheet(0)).toEqual(true)
   })
 })
 
@@ -21,8 +20,8 @@ describe('Clear sheet content', () => {
     const engine = HyperFormula.buildFromArray([[]])
 
     expect(() => {
-      engine.clearSheet('foo')
-    }).toThrow(new NoSheetWithNameError('foo'))
+      engine.clearSheet(1)
+    }).toThrow(new NoSheetWithIdError(1))
   })
 
   it('should clear sheet content', () => {
@@ -30,7 +29,7 @@ describe('Clear sheet content', () => {
       ['1', 'foo'],
     ])
 
-    engine.clearSheet('Sheet1')
+    engine.clearSheet(0)
 
     expect(engine.getCellValue(adr('A1'))).toBe(null)
     expect(engine.getCellValue(adr('B1'))).toBe(null)
@@ -47,7 +46,7 @@ describe('Clear sheet content', () => {
       ],
     })
 
-    const changes = engine.clearSheet('Sheet1')
+    const changes = engine.clearSheet(0)
 
     expect(engine.getCellValue(adr('A1', 1))).toBe(null)
     expect(engine.getCellValue(adr('A2', 1))).toEqual(1)
@@ -55,30 +54,11 @@ describe('Clear sheet content', () => {
     expect(changes.length).toEqual(2)
   })
 
-  it('should clear sheet with numeric matrix', () => {
+  it('should clear sheet with matrix', () => {
     const engine = HyperFormula.buildFromSheets({
       Sheet1: [
         ['1', '2'],
-      ],
-      Sheet2: [
-        ['=Sheet1!A1'],
-        ['=Sheet1!B1'],
-      ],
-    }, { matrixDetection: true, matrixDetectionThreshold: 1 })
-
-    const changes = engine.clearSheet('Sheet1')
-
-    expect(engine.getCellValue(adr('A1', 1))).toBe(null)
-    expect(engine.getCellValue(adr('A2', 1))).toBe(null)
-
-    expect(changes.length).toEqual(2)
-  })
-
-  it('should clear sheet with formula matrix', () => {
-    const engine = HyperFormula.buildFromSheets({
-      Sheet1: [
-        ['1', '2'],
-        ['{=TRANSPOSE(A1:B1)}'],
+        ['=TRANSPOSE(A1:B1)'],
       ],
       Sheet2: [
         ['=Sheet1!A2'],
@@ -86,7 +66,7 @@ describe('Clear sheet content', () => {
       ],
     })
 
-    const changes = engine.clearSheet('Sheet1')
+    const changes = engine.clearSheet(0)
 
     expect(engine.getCellValue(adr('A1', 1))).toBe(null)
     expect(engine.getCellValue(adr('A2', 1))).toBe(null)
@@ -104,7 +84,7 @@ describe('Clear sheet content', () => {
       ],
     })
 
-    engine.clearSheet('Sheet1')
+    engine.clearSheet(0)
     engine.setCellContents(adr('A1'), '2')
 
     expect(engine.getCellValue(adr('A1', 1))).toEqual(2)
@@ -121,7 +101,7 @@ describe('Clear sheet content', () => {
     })
 
     // eslint-disable-next-line
-    const changes = engine.clearSheet('Sheet1')
+    const changes = engine.clearSheet(0)
 
     engine.setCellContents(adr('A1'), '2')
     engine.setCellContents(adr('B1'), '3')

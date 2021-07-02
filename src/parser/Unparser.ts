@@ -1,9 +1,12 @@
 /**
  * @license
- * Copyright (c) 2020 Handsoncode. All rights reserved.
+ * Copyright (c) 2021 Handsoncode. All rights reserved.
  */
 
 import {ErrorType, SimpleCellAddress} from '../Cell'
+import {NoSheetWithIdError} from '../index'
+import {NamedExpressions} from '../NamedExpressions'
+import {SheetIndexMappingFn, sheetIndexToString} from './addressRepresentationConverters'
 import {
   Ast,
   AstNodeType,
@@ -14,17 +17,14 @@ import {
   RowRangeAst,
 } from './Ast'
 import {binaryOpTokenMap} from './binaryOpTokenMap'
-import {additionalCharactersAllowedInQuotes, ILexerConfig} from './LexerConfig'
+import {ILexerConfig} from './LexerConfig'
 import {ParserConfig} from './ParserConfig'
-import {NamedExpressions} from '../NamedExpressions'
-
-export type SheetMappingFn = (sheetId: number) => string
 
 export class Unparser {
   constructor(
     private readonly config: ParserConfig,
     private readonly lexerConfig: ILexerConfig,
-    private readonly sheetMappingFn: SheetMappingFn,
+    private readonly sheetMappingFn: SheetIndexMappingFn,
     private readonly namedExpressions: NamedExpressions,
   ) {
   }
@@ -59,11 +59,12 @@ export class Unparser {
       }
       case AstNodeType.CELL_REFERENCE: {
         let image
-        if (ast.reference.sheet !== null) {
-          image = this.unparseSheetName(ast.reference.sheet) + '!' + ast.reference.unparse(address)
+        if (ast.reference.sheet !== undefined) {
+          image = this.unparseSheetName(ast.reference.sheet) + '!'
         } else {
-          image = ast.reference.unparse(address)
+          image = ''
         }
+        image += ast.reference.unparse(address) ?? this.config.translationPackage.getErrorTranslation(ErrorType.REF)
         return imageWithWhitespace(image, ast.leadingWhitespace)
       }
       case AstNodeType.COLUMN_RANGE:
@@ -96,6 +97,10 @@ export class Unparser {
         const rightPart = '(' + expression + imageWithWhitespace(')', ast.internalWhitespace)
         return imageWithWhitespace(rightPart, ast.leadingWhitespace)
       }
+      case AstNodeType.MATRIX: {
+        const ret = '{'+ast.args.map(row => row.map(val => this.unparseAst(val, address)).join(this.config.matrixColumnSeparator)).join(this.config.matrixRowSeparator) + imageWithWhitespace('}', ast.internalWhitespace)
+        return imageWithWhitespace(ret, ast.leadingWhitespace)
+      }
       default: {
         const left = this.unparseAst(ast.left, address)
         const right = this.unparseAst(ast.right, address)
@@ -105,27 +110,31 @@ export class Unparser {
   }
 
   private unparseSheetName(sheetId: number): string {
-    const sheet = this.sheetMappingFn(sheetId)
-    if (new RegExp(additionalCharactersAllowedInQuotes).exec(sheet)) {
-      return `'${sheet}'`
-    } else {
-      return sheet
+    const sheetName = sheetIndexToString(sheetId, this.sheetMappingFn)
+    if (sheetName === undefined) {
+      throw new NoSheetWithIdError(sheetId)
     }
+    return sheetName
   }
 
   private formatRange(ast: CellRangeAst | ColumnRangeAst | RowRangeAst, baseAddress: SimpleCellAddress): string {
     let startSheeet = ''
     let endSheet = ''
 
-    if (ast.start.sheet !== null && (ast.sheetReferenceType !== RangeSheetReferenceType.RELATIVE)) {
+    if (ast.start.sheet !== undefined && (ast.sheetReferenceType !== RangeSheetReferenceType.RELATIVE)) {
       startSheeet = this.unparseSheetName(ast.start.sheet) + '!'
     }
 
-    if (ast.end.sheet !== null && ast.sheetReferenceType === RangeSheetReferenceType.BOTH_ABSOLUTE) {
+    if (ast.end.sheet !== undefined && ast.sheetReferenceType === RangeSheetReferenceType.BOTH_ABSOLUTE) {
       endSheet = this.unparseSheetName(ast.end.sheet) + '!'
     }
 
-    return `${startSheeet}${ast.start.unparse(baseAddress)}:${endSheet}${ast.end.unparse(baseAddress)}`
+    const unparsedStart = ast.start.unparse(baseAddress)
+    const unparsedEnd = ast.end.unparse(baseAddress)
+    if(unparsedStart === undefined || unparsedEnd === undefined) {
+      return this.config.translationPackage.getErrorTranslation(ErrorType.REF)
+    }
+    return `${startSheeet}${unparsedStart}:${endSheet}${unparsedEnd}`
   }
 }
 

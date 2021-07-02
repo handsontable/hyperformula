@@ -53,7 +53,7 @@ removed. This method returns a list of cells whose values were affected
 by this operation together with their absolute addresses and new values.
 
 ```javascript
-// track the changes triggered by removing a sheet named 'SheetName'
+// track the changes triggered by removing the sheet named 'SheetName'
 const changes = hfInstance.removeSheet('SheetName');
 ```
 
@@ -87,7 +87,7 @@ operation together with their absolute addresses and new values.
 const changes = hfInstance.clearSheet('MySheet2');
 ```
 
-### Replace sheet content
+### Replacing sheet content
 
 Instead of removing and adding the content of a sheet you can replace
 it right away. To do so use `setSheetContent`, in which you can pass
@@ -363,7 +363,7 @@ This demo presents several basic operations integrated with a
 sample UI.
 
 <iframe
-     src="https://codesandbox.io/embed/github/handsontable/hyperformula-demos/tree/0.1.x/basic-operations?autoresize=1&fontsize=11&hidenavigation=1&theme=light&view=preview"
+     src="https://codesandbox.io/embed/github/handsontable/hyperformula-demos/tree/0.6.x/basic-operations?autoresize=1&fontsize=11&hidenavigation=1&theme=light&view=preview"
      style="width:100%; height:500px; border:0; border-radius: 4px; overflow:hidden;"
      title="handsontable/hyperformula-demos: basic-operations"
      allow="accelerometer; ambient-light-sensor; camera; encrypted-media; geolocation; gyroscope; hid; microphone; midi; payment; usb; vr; xr-spatial-tracking"

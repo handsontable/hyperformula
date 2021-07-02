@@ -1,5 +1,6 @@
 import {HyperFormula} from '../../src'
 import {CellValueType, ErrorType} from '../../src/Cell'
+import {ErrorMessage} from '../../src/error-message'
 import {adr, detailedError} from '../testUtils'
 
 describe('Function DECIMAL', () => {
@@ -9,8 +10,8 @@ describe('Function DECIMAL', () => {
       ['=DECIMAL("foo", 2, 3)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA))
-    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NA))
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
+    expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
   })
 
   it('should return error when value does not correspond to base', () => {
@@ -19,8 +20,8 @@ describe('Function DECIMAL', () => {
       ['=DECIMAL("123XYZ", 33)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM))
-    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NUM))
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.NotHex))
+    expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.NotHex))
   })
 
   it('should work', () => {
@@ -52,7 +53,7 @@ describe('Function DECIMAL', () => {
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqual(5.78960446186581e+76)
-    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NUM))
+    expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.NotHex))
   })
 
   it('should work only for bases from 2 to 36', () => {
@@ -63,10 +64,10 @@ describe('Function DECIMAL', () => {
       ['=DECIMAL("XYZ", 37)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM))
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.ValueSmall))
     expect(engine.getCellValue(adr('A2'))).toEqual(2)
     expect(engine.getCellValue(adr('A3'))).toEqual(44027)
-    expect(engine.getCellValue(adr('A4'))).toEqual(detailedError(ErrorType.NUM))
+    expect(engine.getCellValue(adr('A4'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.ValueLarge))
   })
 
   it('should return number', () => {

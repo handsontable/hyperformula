@@ -1,17 +1,18 @@
 import {ErrorType, HyperFormula} from '../src'
-import {FunctionPlugin} from '../src/interpreter/plugin/FunctionPlugin'
-import {adr, detailedError} from './testUtils'
+import {ErrorMessage} from '../src/error-message'
+import {InterpreterState} from '../src/interpreter/InterpreterState'
+import {FunctionPlugin, FunctionPluginTypecheck} from '../src/interpreter/plugin/FunctionPlugin'
 import {ProcedureAst} from '../src/parser'
-import {SimpleCellAddress} from '../src/Cell'
+import {adr, detailedError} from './testUtils'
 
-class FooPlugin extends FunctionPlugin {
+class FooPlugin extends FunctionPlugin implements FunctionPluginTypecheck<FooPlugin>{
   public static implementedFunctions = {
     'FOO': {
       method: 'foo',
     },
   }
 
-  public foo(_ast: ProcedureAst, _formulaAddress: SimpleCellAddress) {
+  public foo(_ast: ProcedureAst, _state: InterpreterState) {
     return 42
   }
 }
@@ -32,6 +33,6 @@ describe('Plugins', () => {
       ['=foo()'],
     ], {functionPlugins: [FooPlugin]})
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NAME))
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NAME, ErrorMessage.FunctionName('FOO')))
   })
 })

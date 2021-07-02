@@ -1,4 +1,6 @@
 import {ErrorType, HyperFormula} from '../../src'
+import {CellValueDetailedType} from '../../src/Cell'
+import {ErrorMessage} from '../../src/error-message'
 import {adr, detailedError} from '../testUtils'
 
 describe('Function TBILLEQ', () => {
@@ -7,8 +9,8 @@ describe('Function TBILLEQ', () => {
       ['=TBILLEQ(1,1)', '=TBILLEQ(1, 1, 1, 1)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA))
-    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.NA))
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
+    expect(engine.getCellValue(adr('B1'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
   })
 
   it('should calculate the correct value with correct arguments and defaults', () => {
@@ -22,6 +24,7 @@ describe('Function TBILLEQ', () => {
     ])
 
     expect(engine.getCellValue(adr('A1'))).toBeCloseTo(0.104285714285714, 6)
+    expect(engine.getCellValueDetailedType(adr('A1'))).toBe(CellValueDetailedType.NUMBER_PERCENT)
     //inconsistency with products #1 & #2
     expect(engine.getCellValue(adr('A2'))).toBeCloseTo(0.112654320987654, 6)
     //inconsistency with products #1 & #2
@@ -30,12 +33,12 @@ describe('Function TBILLEQ', () => {
     expect(engine.getCellValue(adr('A3'))).toBeCloseTo(38.5277777777778, 6)
     //inconsistency with product #1 (returns #NUM!)
     expect(engine.getCellValue(adr('B3'))).toEqual(0)
-    expect(engine.getCellValue(adr('C3'))).toEqual(detailedError(ErrorType.NUM))
+    expect(engine.getCellValue(adr('C3'))).toEqualError(detailedError(ErrorType.NUM))
     //inconsistency with products #1 & #2
     expect(engine.getCellValue(adr('A4'))).toBeCloseTo(0.112828438948995, 6)
     //inconsistency with products #1 & #2
     expect(engine.getCellValue(adr('B4'))).toBeCloseTo(0.112828438948995, 6)
-    expect(engine.getCellValue(adr('A5'))).toEqual(detailedError(ErrorType.NUM))
-    expect(engine.getCellValue(adr('A6'))).toEqual(detailedError(ErrorType.NUM))
+    expect(engine.getCellValue(adr('A5'))).toEqualError(detailedError(ErrorType.NUM))
+    expect(engine.getCellValue(adr('A6'))).toEqualError(detailedError(ErrorType.NUM))
   })
 })

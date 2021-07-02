@@ -1,18 +1,17 @@
 import {HyperFormula} from '../../src'
 import {ErrorType} from '../../src/Cell'
-import {adr, detailedError, expectCloseTo} from '../testUtils'
+import {ErrorMessage} from '../../src/error-message'
+import {adr, detailedError} from '../testUtils'
 
 describe('Function ERFC', () => {
-  const precision = 0.0000003
-
   it('should return error for wrong number of arguments', () => {
     const engine = HyperFormula.buildFromArray([
       ['=ERFC()'],
       ['=ERFC(1, 2)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA))
-    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NA))
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
+    expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
   })
 
   it('should return error for arguments of wrong type', () => {
@@ -20,7 +19,7 @@ describe('Function ERFC', () => {
       ['=ERFC("foo")'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.NumberCoercion))
   })
 
   it('should work', () => {
@@ -30,9 +29,9 @@ describe('Function ERFC', () => {
       ['=ERFC(0.5)'],
     ])
 
-    expectCloseTo(engine.getCellValue(adr('A1')), 1, precision)
-    expectCloseTo(engine.getCellValue(adr('A2')), 0.004677734981047288, precision)
-    expectCloseTo(engine.getCellValue(adr('A3')), 0.4795001221869535, precision)
+    expect(engine.getCellValue(adr('A1'))).toEqual(1)
+    expect(engine.getCellValue(adr('A2'))).toBeCloseTo(0.004677734981047288, 6)
+    expect(engine.getCellValue(adr('A3'))).toBeCloseTo(0.4795001221869535, 6)
   })
 
   it('should work for negative numbers', () => {
@@ -41,7 +40,7 @@ describe('Function ERFC', () => {
       ['=ERFC(-14.8)'],
     ])
 
-    expectCloseTo(engine.getCellValue(adr('A1')), 2, precision)
-    expectCloseTo(engine.getCellValue(adr('A2')), 2, precision)
+    expect(engine.getCellValue(adr('A1'))).toBe(2)
+    expect(engine.getCellValue(adr('A2'))).toBe(2)
   })
 })

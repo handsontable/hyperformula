@@ -1,6 +1,7 @@
 import {HyperFormula} from '../../src'
-import {ErrorType, SimpleCellAddress} from '../../src/Cell'
+import {CellValueDetailedType, ErrorType, SimpleCellAddress} from '../../src/Cell'
 import {Config} from '../../src/Config'
+import {ErrorMessage} from '../../src/error-message'
 import {adr, dateNumberToString, detailedError} from '../testUtils'
 
 const expectToHaveDate = (engine: HyperFormula, address: SimpleCellAddress, dateString: string) => {
@@ -17,10 +18,10 @@ describe('Function EDATE', () => {
       ['=EDATE(A1, "bar", "baz")'],
     ])
 
-    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.VALUE))
-    expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.VALUE))
-    expect(engine.getCellValue(adr('A4'))).toEqual(detailedError(ErrorType.NA))
-    expect(engine.getCellValue(adr('A5'))).toEqual(detailedError(ErrorType.NA))
+    expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.NumberCoercion))
+    expect(engine.getCellValue(adr('A3'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.NumberCoercion))
+    expect(engine.getCellValue(adr('A4'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
+    expect(engine.getCellValue(adr('A5'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
   })
 
   it('works for 0', () => {
@@ -30,6 +31,7 @@ describe('Function EDATE', () => {
     ])
 
     expectToHaveDate(engine, adr('A2'), '10/03/2019')
+    expect(engine.getCellValueDetailedType(adr('A2'))).toBe(CellValueDetailedType.NUMBER_DATE)
   })
 
   it('works for exact end of month', () => {
@@ -123,32 +125,8 @@ describe('Function EDATE', () => {
       ['=EDATE(4/0, FOOBAR())'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.DIV_BY_ZERO))
-    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.DIV_BY_ZERO))
-    expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.DIV_BY_ZERO))
-  })
-
-  // Inconsistency with Product 1
-  it('range value in 1st argument results in VALUE error', () => {
-    const engine = HyperFormula.buildFromArray([
-      ['=DATE(2019, 3, 31)', '=EDATE(A1:A3, 1)'],
-      ['=DATE(2018, 3, 31)', '=EDATE(A1:A3, 1)'],
-      ['=DATE(2018, 3, 31)'],
-    ])
-
-    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.VALUE))
-    expect(engine.getCellValue(adr('B2'))).toEqual(detailedError(ErrorType.VALUE))
-  })
-
-  // Inconsistency with Product 1
-  it('range value in 2nd argument results in VALUE error', () => {
-    const engine = HyperFormula.buildFromArray([
-      ['1', '=EDATE(DATE(2019, 3, 31), A1:A3)'],
-      ['2', '=EDATE(DATE(2019, 3, 31), A1:A3)'],
-      ['3'],
-    ])
-
-    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.VALUE))
-    expect(engine.getCellValue(adr('B2'))).toEqual(detailedError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.DIV_BY_ZERO))
+    expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.DIV_BY_ZERO))
+    expect(engine.getCellValue(adr('A3'))).toEqualError(detailedError(ErrorType.DIV_BY_ZERO))
   })
 })

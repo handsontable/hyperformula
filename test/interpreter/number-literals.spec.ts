@@ -1,7 +1,8 @@
 import {HyperFormula} from '../../src'
-import {adr, detailedError} from '../testUtils'
 import {ErrorType} from '../../src/Cell'
 import {Config} from '../../src/Config'
+import {ErrorMessage} from '../../src/error-message'
+import {adr, detailedError} from '../testUtils'
 
 describe('Number literals', () => {
   it('should work for integer', () => {
@@ -53,7 +54,7 @@ describe('Number literals', () => {
     const engine = HyperFormula.buildFromArray([['="1 000" + 2']], new Config({
       thousandSeparator: ',', functionArgSeparator: ';'
     }))
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.NumberCoercion))
   })
 
   it('should work for number with dot as thousand separator', () => {

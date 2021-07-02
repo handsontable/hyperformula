@@ -28,9 +28,9 @@ returns the negative value of that number.
 
 ## Binary arithmetic operators
 
-The binary arithmetic operators enable them to compute basic
+The binary arithmetic operators enable the computation of basic
 mathematical operations. They don't have to be wrapped with any
-functions. This table shows a basic behavior of the binary
+functions. This table shows the basic behavior of the binary
 arithmetic operators:
 
 | Operator | Meaning | Example | Description |
@@ -41,14 +41,13 @@ arithmetic operators:
 | / | Division | a / b | Divide the first argument by the second argument. |
 | ^ | Exponentiation | a ^ b | Raise the first argument by the power of the second argument. |
 
-You are probably wondering where the _modulo_ operator is missing.
+You are probably wondering why the _modulo_ operator is missing.
 It is supported by the function `MOD` so **instead of writing a % b**,
-as you would do in a regular mathematical equation, you should use a
-formula like this: **=MOD(a, b)**.
+as you would in a regular mathematical equation, you use a formula like this: **=MOD(a, b)**.
 
 ## Comparison operators
 
-The binary relational operators, when used in a formula, return the boolean or logical values. Here are very general rules:
+The binary relational operators, when used in a formula, return boolean or logical values. Here are some very general rules:
 
 | Operator | Meaning | Example | Description |
 | :--- | :--- | :--- | :--- |
@@ -63,7 +62,7 @@ The binary relational operators, when used in a formula, return the boolean or l
 
 HyperFormula does type coercion and it can have an impact on comparing,
 adding, or any other operation between **values of a different type**.
-The table represents some operations between different types and
+The tables represent some operations between different types and
 their results.
 
 ## Boolean to int coercion, basic arithmetic operations
@@ -225,7 +224,7 @@ their results.
 
 ## Comparing strings
 
-By default, HyperFormula is case and accent insensitive. It means
+By default, HyperFormula is case and accent insensitive. This means
 it will ignore upper and lower-case letters and accents during the
 comparison. For example, if you compare 'AsTrOnAuT' with `aStroNaut`
 they will be understood as identical, the same goes for 'Préservation'
@@ -234,8 +233,7 @@ configured with `accentSensitive` and `caseSensitive` options in the
 [configuration](configuration-options.md).
 
 Apart from accents and case sensitivity, you can also configure
-`caseFirst.` This option defines if the upper case or lower case
-should sort first. `ignorePunctuation`  specifies whether punctuation
+`caseFirst.` This option defines whether upper case or lower case should come first. Additionally the `ignorePunctuation` option specifies whether punctuation
 should be ignored in string comparison. By default `caseFirst` is set
 to 'lower' and `ignorePunctuation` is set to `false`. For more details
 see the official [API reference](../api) of HyperFormula.
@@ -243,7 +241,7 @@ see the official [API reference](../api) of HyperFormula.
 Here is an example configuration that overwrites default settings:
 
 ```javascript
-// this part of configuration shows options 
+// this part of the configuration shows options
 // related to strings only
 const options = {
     caseSensitive: true,
@@ -255,7 +253,7 @@ const options = {
 
 ## Concatenation operator
 
-It is used to combine multiple text strings into a single value.
+The concatenation operator is used to combine multiple text strings into a single value.
 
 | Operator | Meaning | Example | Description |
 | :--- | :--- | :--- | :--- |
@@ -270,5 +268,5 @@ combined ranges.
 | Operator | Meaning | Example | Description |
 | :--- | :--- | :--- | :--- |
 | : (colon) | Range operator | A1:B1 | Makes one reference to multiple cells between the two specified references. |
-| , (comma) | Union operator | A1:B1,A2:B2 | Return the intersection of multiple ranges. |
+| , (comma) | Union operator | A1:B1,A2:B2 | Returns the intersection of multiple ranges. |
 | (space) | Intersection operator | A1:B1 A2:B2 | Finds the intersection of the two ranges. |

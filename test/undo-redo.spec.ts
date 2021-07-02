@@ -1,4 +1,6 @@
 import {ErrorType, HyperFormula, NoOperationToRedoError, NoOperationToUndoError} from '../src'
+import {AbsoluteCellRange} from '../src/AbsoluteCellRange'
+import {ErrorMessage} from '../src/error-message'
 import {adr, detailedError, expectEngineToBeTheSameAs} from './testUtils'
 
 describe('Undo - removing rows', () => {
@@ -392,7 +394,7 @@ describe('Undo - removing columns', () => {
 describe('Undo - removing sheet', () => {
   it('works for empty sheet', () => {
     const engine = HyperFormula.buildFromArray([])
-    engine.removeSheet('Sheet1')
+    engine.removeSheet(0)
 
     engine.undo()
 
@@ -404,7 +406,7 @@ describe('Undo - removing sheet', () => {
       ['1'],
     ]
     const engine = HyperFormula.buildFromArray(sheet)
-    engine.removeSheet('Sheet1')
+    engine.removeSheet(0)
 
     engine.undo()
 
@@ -416,20 +418,11 @@ describe('Undo - removing sheet', () => {
       ['=42'],
     ]
     const engine = HyperFormula.buildFromArray(sheet)
-    engine.removeSheet('Sheet1')
+    engine.removeSheet(0)
 
     engine.undo()
 
     expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray(sheet))
-  })
-
-  it('restores original sheet name', () => {
-    const engine = HyperFormula.buildFromArray([])
-    engine.removeSheet('shEEt1')
-
-    engine.undo()
-
-    expect(engine.getSheetName(0)).toEqual('Sheet1')
   })
 
   it('restores dependent cell formulas', () => {
@@ -438,7 +431,7 @@ describe('Undo - removing sheet', () => {
       Sheet2: [['42']],
     }
     const engine = HyperFormula.buildFromSheets(sheets)
-    engine.removeSheet('Sheet2')
+    engine.removeSheet(1)
 
     engine.undo()
 
@@ -452,7 +445,7 @@ describe('Undo - removing sheet', () => {
     }
     const engine = HyperFormula.buildFromSheets(sheets)
     engine.suspendEvaluation()
-    engine.removeSheet('Sheet2')
+    engine.removeSheet(1)
 
     engine.undo()
     engine.resumeEvaluation()
@@ -547,7 +540,7 @@ describe('Undo - adding sheet', () => {
 describe('Undo - clearing sheet', () => {
   it('works for empty sheet', () => {
     const engine = HyperFormula.buildFromArray([])
-    engine.clearSheet('Sheet1')
+    engine.clearSheet(0)
 
     engine.undo()
 
@@ -559,7 +552,7 @@ describe('Undo - clearing sheet', () => {
       ['1'],
     ]
     const engine = HyperFormula.buildFromArray(sheet)
-    engine.clearSheet('Sheet1')
+    engine.clearSheet(0)
 
     engine.undo()
 
@@ -571,7 +564,7 @@ describe('Undo - clearing sheet', () => {
       ['=42'],
     ]
     const engine = HyperFormula.buildFromArray(sheet)
-    engine.clearSheet('Sheet1')
+    engine.clearSheet(0)
 
     engine.undo()
 
@@ -583,7 +576,7 @@ describe('Undo - setting sheet contents', () => {
   it('works for basic case', () => {
     const sheet = [['13']]
     const engine = HyperFormula.buildFromArray(sheet)
-    engine.setSheetContent('Sheet1', [['42']])
+    engine.setSheetContent(0, [['42']])
 
     engine.undo()
 
@@ -595,7 +588,7 @@ describe('Undo - setting sheet contents', () => {
       ['1'],
     ]
     const engine = HyperFormula.buildFromArray(sheet)
-    engine.setSheetContent('Sheet1', [['42', '43']])
+    engine.setSheetContent(0, [['42', '43']])
 
     engine.undo()
 
@@ -610,7 +603,7 @@ describe('Undo - moving cells', () => {
       [null],
     ]
     const engine = HyperFormula.buildFromArray(sheet)
-    engine.moveCells(adr('A1'), 1, 1, adr('A2'))
+    engine.moveCells(AbsoluteCellRange.spanFrom(adr('A1'), 1, 1), adr('A2'))
 
     engine.undo()
 
@@ -623,7 +616,7 @@ describe('Undo - moving cells', () => {
       ['42'],
     ]
     const engine = HyperFormula.buildFromArray(sheet)
-    engine.moveCells(adr('A1'), 1, 1, adr('A2'))
+    engine.moveCells(AbsoluteCellRange.spanFrom(adr('A1'), 1, 1), adr('A2'))
 
     engine.undo()
 
@@ -636,7 +629,7 @@ describe('Undo - moving cells', () => {
       ['42'],
     ]
     const engine = HyperFormula.buildFromArray(sheet)
-    engine.moveCells(adr('A1'), 1, 1, adr('A2'))
+    engine.moveCells(AbsoluteCellRange.spanFrom(adr('A1'), 1, 1), adr('A2'))
 
     engine.undo()
 
@@ -650,7 +643,7 @@ describe('Undo - moving cells', () => {
     ]
     const engine = HyperFormula.buildFromArray(sheet)
     engine.suspendEvaluation()
-    engine.moveCells(adr('A1'), 1, 1, adr('A2'))
+    engine.moveCells(AbsoluteCellRange.spanFrom(adr('A1'), 1, 1), adr('A2'))
 
     engine.undo()
     engine.resumeEvaluation()
@@ -663,9 +656,9 @@ describe('Undo - moving cells', () => {
       'Sheet1': [],
       'Sheet2': []
     })
-    engine.addNamedExpression('foo', 'bar', 'Sheet1')
+    engine.addNamedExpression('foo', 'bar', 0)
     engine.setCellContents(adr('A1'), '=foo')
-    engine.moveCells(adr('A1'), 1, 1, adr('A1', 1))
+    engine.moveCells(AbsoluteCellRange.spanFrom(adr('A1'), 1, 1), adr('A1', 1))
 
     engine.undo()
 
@@ -677,12 +670,12 @@ describe('Undo - moving cells', () => {
       'Sheet1': [['=foo']],
       'Sheet2': []
     })
-    engine.addNamedExpression('foo', 'bar', 'Sheet1')
-    engine.moveCells(adr('A1'), 1, 1, adr('A1', 1))
+    engine.addNamedExpression('foo', 'bar', 0)
+    engine.moveCells(AbsoluteCellRange.spanFrom(adr('A1'), 1, 1), adr('A1', 1))
 
     engine.undo()
 
-    expect(engine.getNamedExpressionValue('foo', 'Sheet1')).toEqual('bar')
+    expect(engine.getNamedExpressionValue('foo', 0)).toEqual('bar')
     expect(engine.getNamedExpressionValue('foo')).toEqual(undefined)
   })
 })
@@ -694,7 +687,7 @@ describe('Undo - cut-paste', () => {
       ['bar'],
     ]
     const engine = HyperFormula.buildFromArray(sheet)
-    engine.cut(adr('A1'), 1, 1)
+    engine.cut(AbsoluteCellRange.spanFrom(adr('A1'), 1, 1))
     engine.paste(adr('A2'))
 
     engine.undo()
@@ -708,7 +701,7 @@ describe('Undo - cut-paste', () => {
       ['bar'],
     ]
     const engine = HyperFormula.buildFromArray(sheet)
-    engine.cut(adr('A1'), 1, 1)
+    engine.cut(AbsoluteCellRange.spanFrom(adr('A1'), 1, 1))
     engine.paste(adr('A2'))
     engine.undo()
 
@@ -720,14 +713,14 @@ describe('Undo - cut-paste', () => {
       'Sheet1': [],
       'Sheet2': []
     })
-    engine.addNamedExpression('foo', 'bar', 'Sheet1')
+    engine.addNamedExpression('foo', 'bar', 0)
     engine.setCellContents(adr('A1'), '=foo')
-    engine.cut(adr('A1'), 1, 1)
+    engine.cut(AbsoluteCellRange.spanFrom(adr('A1'), 1, 1))
     engine.paste(adr('A1', 1))
 
     engine.undo()
 
-    expect(engine.getNamedExpressionValue('foo', 'Sheet1')).toEqual('bar')
+    expect(engine.getNamedExpressionValue('foo', 0)).toEqual('bar')
     expect(engine.getNamedExpressionValue('foo')).toEqual(undefined)
   })
 })
@@ -739,7 +732,7 @@ describe('Undo - copy-paste', () => {
       ['bar'],
     ]
     const engine = HyperFormula.buildFromArray(sheet)
-    engine.copy(adr('A1'), 1, 1)
+    engine.copy(AbsoluteCellRange.spanFrom(adr('A1'), 1, 1))
     engine.paste(adr('A2'))
 
     engine.undo()
@@ -752,14 +745,14 @@ describe('Undo - copy-paste', () => {
       'Sheet1': [],
       'Sheet2': []
     })
-    engine.addNamedExpression('foo', 'bar', 'Sheet1')
+    engine.addNamedExpression('foo', 'bar', 0)
     engine.setCellContents(adr('A1'), '=foo')
-    engine.copy(adr('A1'), 1, 1)
+    engine.copy(AbsoluteCellRange.spanFrom(adr('A1'), 1, 1))
     engine.paste(adr('A1', 1))
 
     engine.undo()
 
-    expect(engine.getNamedExpressionValue('foo', 'Sheet1')).toEqual('bar')
+    expect(engine.getNamedExpressionValue('foo', 0)).toEqual('bar')
     expect(engine.getNamedExpressionValue('foo')).toEqual(undefined)
   })
 })
@@ -775,7 +768,7 @@ describe('Undo - add named expression', () => {
     engine.undo()
 
     expect(engine.listNamedExpressions().length).toEqual(0)
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NAME))
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NAME, ErrorMessage.NamedExpressionName('foo')))
   })
 })
 
@@ -1133,7 +1126,7 @@ describe('Redo - moving cells', () => {
       ['42'],
       ['45'],
     ])
-    engine.moveCells(adr('A1'), 1, 1, adr('A2'))
+    engine.moveCells(AbsoluteCellRange.spanFrom(adr('A1'), 1, 1), adr('A2'))
     const snapshot = engine.getAllSheetsSerialized()
     engine.undo()
 
@@ -1147,7 +1140,7 @@ describe('Redo - moving cells', () => {
     engine.setCellContents(adr('A1'), 42)
     engine.undo()
 
-    engine.moveCells(adr('A1'), 1, 1, adr('A2'))
+    engine.moveCells(AbsoluteCellRange.spanFrom(adr('A1'), 1, 1), adr('A2'))
 
     expect(engine.isThereSomethingToRedo()).toBe(false)
   })
@@ -1222,7 +1215,7 @@ describe('Redo - removing sheet', () => {
     const engine = HyperFormula.buildFromArray([
       ['1']
     ])
-    engine.removeSheet('Sheet1')
+    engine.removeSheet(0)
     const snapshot = engine.getAllSheetsSerialized()
     engine.undo()
 
@@ -1236,7 +1229,7 @@ describe('Redo - removing sheet', () => {
     engine.setCellContents(adr('A1'), 42)
     engine.undo()
 
-    engine.removeSheet('Sheet1')
+    engine.removeSheet(0)
 
     expect(engine.isThereSomethingToRedo()).toBe(false)
   })
@@ -1305,7 +1298,7 @@ describe('Redo - clearing sheet', () => {
     const engine = HyperFormula.buildFromArray([
       ['1']
     ])
-    engine.clearSheet('Sheet1')
+    engine.clearSheet(0)
     const snapshot = engine.getAllSheetsSerialized()
     engine.undo()
 
@@ -1319,7 +1312,7 @@ describe('Redo - clearing sheet', () => {
     engine.setCellContents(adr('A1'), 42)
     engine.undo()
 
-    engine.clearSheet('Sheet1')
+    engine.clearSheet(0)
 
     expect(engine.isThereSomethingToRedo()).toBe(false)
   })
@@ -1447,7 +1440,7 @@ describe('Redo - cut-paste', () => {
       ['foo'],
       ['bar'],
     ])
-    engine.cut(adr('A1'), 1, 1)
+    engine.cut(AbsoluteCellRange.spanFrom(adr('A1'), 1, 1))
     engine.paste(adr('A2'))
     const snapshot = engine.getAllSheetsSerialized()
     engine.undo()
@@ -1462,7 +1455,7 @@ describe('Redo - cut-paste', () => {
     engine.setCellContents(adr('A1'), 42)
     engine.undo()
 
-    engine.cut(adr('A1'), 1, 1)
+    engine.cut(AbsoluteCellRange.spanFrom(adr('A1'), 1, 1))
 
     expect(engine.isThereSomethingToRedo()).toBe(true)
   })
@@ -1472,7 +1465,7 @@ describe('Redo - cut-paste', () => {
     engine.setCellContents(adr('A1'), 42)
     engine.undo()
 
-    engine.cut(adr('A1'), 1, 1)
+    engine.cut(AbsoluteCellRange.spanFrom(adr('A1'), 1, 1))
     engine.paste(adr('A2'))
 
     expect(engine.isThereSomethingToRedo()).toBe(false)
@@ -1485,7 +1478,7 @@ describe('Redo - copy-paste', () => {
       ['foo', 'baz'],
       ['bar', 'faz'],
     ])
-    engine.copy(adr('A1'), 2, 2)
+    engine.copy(AbsoluteCellRange.spanFrom(adr('A1'), 2, 2))
     engine.paste(adr('C3'))
     const snapshot = engine.getAllSheetsSerialized()
     engine.undo()
@@ -1500,7 +1493,7 @@ describe('Redo - copy-paste', () => {
     engine.setCellContents(adr('A1'), 42)
     engine.undo()
 
-    engine.copy(adr('A1'), 1, 1)
+    engine.copy(AbsoluteCellRange.spanFrom(adr('A1'), 1, 1))
 
     expect(engine.isThereSomethingToRedo()).toBe(true)
   })
@@ -1510,7 +1503,7 @@ describe('Redo - copy-paste', () => {
     engine.setCellContents(adr('A1'), 42)
     engine.undo()
 
-    engine.copy(adr('A1'), 1, 1)
+    engine.copy(AbsoluteCellRange.spanFrom(adr('A1'), 1, 1))
     engine.paste(adr('A2'))
 
     expect(engine.isThereSomethingToRedo()).toBe(false)
@@ -1520,7 +1513,7 @@ describe('Redo - copy-paste', () => {
 describe('Redo - setting sheet contents', () => {
   it('works for basic case', () => {
     const engine = HyperFormula.buildFromArray([['13']])
-    engine.setSheetContent('Sheet1', [['42']])
+    engine.setSheetContent(0, [['42']])
     const snapshot = engine.getAllSheetsSerialized()
     engine.undo()
 
@@ -1531,7 +1524,7 @@ describe('Redo - setting sheet contents', () => {
 
   it('also clears sheet when redoing', () => {
     const engine = HyperFormula.buildFromArray([['13', '14']])
-    engine.setSheetContent('Sheet1', [['42']])
+    engine.setSheetContent(0, [['42']])
     const snapshot = engine.getAllSheetsSerialized()
     engine.undo()
 
@@ -1545,7 +1538,7 @@ describe('Redo - setting sheet contents', () => {
     engine.setCellContents(adr('A1'), 42)
     engine.undo()
 
-    engine.setSheetContent('Sheet1', [['42']])
+    engine.setSheetContent(0, [['42']])
 
     expect(engine.isThereSomethingToRedo()).toBe(false)
   })
@@ -1590,7 +1583,7 @@ describe('Redo - remove named expression', () => {
     engine.redo()
 
     expect(engine.listNamedExpressions().length).toEqual(0)
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NAME))
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NAME, ErrorMessage.NamedExpressionName('foo')))
   })
 
   it('clears redo stack', () => {

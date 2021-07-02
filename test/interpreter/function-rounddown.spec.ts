@@ -1,5 +1,6 @@
 import {HyperFormula} from '../../src'
 import {ErrorType} from '../../src/Cell'
+import {ErrorMessage} from '../../src/error-message'
 import {adr, detailedError} from '../testUtils'
 
 describe('Function ROUNDDOWN', () => {
@@ -8,8 +9,8 @@ describe('Function ROUNDDOWN', () => {
       ['=ROUNDDOWN()', '=ROUNDDOWN(1, 2, 3)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA))
-    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.NA))
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
+    expect(engine.getCellValue(adr('B1'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
   })
 
   it('works for positive numbers', () => {
@@ -62,28 +63,8 @@ describe('Function ROUNDDOWN', () => {
       ['=ROUNDDOWN(A1)', '=ROUNDDOWN(42, A1)', '=ROUNDDOWN(A1, FOO())'],
     ])
 
-    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.DIV_BY_ZERO))
-    expect(engine.getCellValue(adr('B2'))).toEqual(detailedError(ErrorType.DIV_BY_ZERO))
-    expect(engine.getCellValue(adr('C2'))).toEqual(detailedError(ErrorType.DIV_BY_ZERO))
-  })
-
-  // Inconsistency with Product 1
-  it('range value results in VALUE error', () => {
-    const engine = HyperFormula.buildFromArray([
-      ['=1'],
-      ['=2', '=ROUNDDOWN(A1:A2)'],
-    ])
-
-    expect(engine.getCellValue(adr('B2'))).toEqual(detailedError(ErrorType.VALUE))
-  })
-
-  // Inconsistency with Product 1
-  it('range value results in VALUE error', () => {
-    const engine = HyperFormula.buildFromArray([
-      ['=1'],
-      ['=2', '=ROUNDDOWN(42.234, A1:A2)'],
-    ])
-
-    expect(engine.getCellValue(adr('B2'))).toEqual(detailedError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.DIV_BY_ZERO))
+    expect(engine.getCellValue(adr('B2'))).toEqualError(detailedError(ErrorType.DIV_BY_ZERO))
+    expect(engine.getCellValue(adr('C2'))).toEqualError(detailedError(ErrorType.DIV_BY_ZERO))
   })
 })

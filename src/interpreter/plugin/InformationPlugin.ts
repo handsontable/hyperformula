@@ -1,24 +1,39 @@
 /**
  * @license
- * Copyright (c) 2020 Handsoncode. All rights reserved.
+ * Copyright (c) 2021 Handsoncode. All rights reserved.
  */
 
-import {AbsoluteCellRange} from '../../AbsoluteCellRange'
-import {CellError, EmptyValue, ErrorType, InternalScalarValue, SimpleCellAddress} from '../../Cell'
-import {FormulaCellVertex, MatrixVertex} from '../../DependencyGraph'
+import {CellError, ErrorType, SimpleCellAddress} from '../../Cell'
+import {FormulaVertex} from '../../DependencyGraph/FormulaCellVertex'
+import {ErrorMessage} from '../../error-message'
 import {AstNodeType, ProcedureAst} from '../../parser'
-import {InterpreterValue} from '../InterpreterValue'
-import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
+import {InterpreterState} from '../InterpreterState'
+import {EmptyValue, InternalScalarValue, InterpreterValue, isExtendedNumber} from '../InterpreterValue'
+import {SimpleRangeValue} from '../SimpleRangeValue'
+import {ArgumentTypes, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
 
 /**
  * Interpreter plugin containing information functions
  */
-export class InformationPlugin extends FunctionPlugin {
+export class InformationPlugin extends FunctionPlugin implements FunctionPluginTypecheck<InformationPlugin> {
   public static implementedFunctions = {
-    'COLUMNS': {
-      method: 'columns',
+    'COLUMN': {
+      method: 'column',
+      parameters: [
+        {argumentType: ArgumentTypes.NOERROR, optional: true}
+      ],
       isDependentOnSheetStructureChange: true,
       doesNotNeedArgumentsToBeComputed: true,
+      vectorizationForbidden: true,
+    },
+    'COLUMNS': {
+      method: 'columns',
+      parameters: [
+        {argumentType: ArgumentTypes.RANGE}
+      ],
+      isDependentOnSheetStructureChange: true,
+      doesNotNeedArgumentsToBeComputed: true,
+      vectorizationForbidden: true,
     },
     'ISBINARY': {
       method: 'isbinary',
@@ -28,16 +43,17 @@ export class InformationPlugin extends FunctionPlugin {
     },
     'ISERR': {
       method: 'iserr',
-      parameters:  [
+      parameters: [
         {argumentType: ArgumentTypes.SCALAR}
       ]
     },
     'ISFORMULA': {
       method: 'isformula',
-      parameters:  [
+      parameters: [
         {argumentType: ArgumentTypes.NOERROR}
       ],
-      doesNotNeedArgumentsToBeComputed: true
+      doesNotNeedArgumentsToBeComputed: true,
+      vectorizationForbidden: true,
     },
     'ISNA': {
       method: 'isna',
@@ -47,70 +63,92 @@ export class InformationPlugin extends FunctionPlugin {
     },
     'ISREF': {
       method: 'isref',
-      parameters:[
+      parameters: [
         {argumentType: ArgumentTypes.SCALAR}
-      ]
+      ],
+      vectorizationForbidden: true,
     },
     'ISERROR': {
       method: 'iserror',
       parameters: [
-        { argumentType: ArgumentTypes.SCALAR}
+        {argumentType: ArgumentTypes.SCALAR}
       ]
     },
     'ISBLANK': {
       method: 'isblank',
       parameters: [
-        { argumentType: ArgumentTypes.SCALAR}
+        {argumentType: ArgumentTypes.SCALAR}
       ]
     },
     'ISNUMBER': {
       method: 'isnumber',
       parameters: [
-        { argumentType: ArgumentTypes.SCALAR}
+        {argumentType: ArgumentTypes.SCALAR}
       ]
     },
     'ISLOGICAL': {
       method: 'islogical',
       parameters: [
-        { argumentType: ArgumentTypes.SCALAR}
+        {argumentType: ArgumentTypes.SCALAR}
       ]
     },
     'ISTEXT': {
       method: 'istext',
       parameters: [
-        { argumentType: ArgumentTypes.SCALAR}
+        {argumentType: ArgumentTypes.SCALAR}
       ]
     },
     'ISNONTEXT': {
       method: 'isnontext',
       parameters: [
-        { argumentType: ArgumentTypes.SCALAR}
+        {argumentType: ArgumentTypes.SCALAR}
       ]
     },
     'INDEX': {
       method: 'index',
+      parameters: [
+        {argumentType: ArgumentTypes.RANGE},
+        {argumentType: ArgumentTypes.NUMBER},
+        {argumentType: ArgumentTypes.NUMBER, defaultValue: 1},
+      ]
     },
     'NA': {
-      method: 'na'
+      method: 'na',
+      parameters: [],
+    },
+    'ROW': {
+      method: 'row',
+      parameters: [
+        {argumentType: ArgumentTypes.NOERROR, optional: true}
+      ],
+      isDependentOnSheetStructureChange: true,
+      doesNotNeedArgumentsToBeComputed: true,
+      vectorizationForbidden: true,
     },
     'ROWS': {
       method: 'rows',
+      parameters: [
+        {argumentType: ArgumentTypes.RANGE}
+      ],
       isDependentOnSheetStructureChange: true,
       doesNotNeedArgumentsToBeComputed: true,
+      vectorizationForbidden: true,
     },
     'SHEET': {
       method: 'sheet',
-      parameters:  [
-        {argumentType: ArgumentTypes.NOERROR}
+      parameters: [
+        {argumentType: ArgumentTypes.STRING}
       ],
-      doesNotNeedArgumentsToBeComputed: true
+      doesNotNeedArgumentsToBeComputed: true,
+      vectorizationForbidden: true,
     },
     'SHEETS': {
       method: 'sheets',
       parameters: [
-        {argumentType: ArgumentTypes.NOERROR}
+        {argumentType: ArgumentTypes.STRING}
       ],
-      doesNotNeedArgumentsToBeComputed: true
+      doesNotNeedArgumentsToBeComputed: true,
+      vectorizationForbidden: true,
     }
   }
 
@@ -120,10 +158,10 @@ export class InformationPlugin extends FunctionPlugin {
    * Returns true if provided value is a valid binary number
    *
    * @param ast
-   * @param formulaAddress
+   * @param state
    */
-  public isbinary(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('ISBINARY'), (arg: string) =>
+  public isbinary(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('ISBINARY'), (arg: string) =>
       /^[01]{1,10}$/.test(arg)
     )
   }
@@ -134,10 +172,10 @@ export class InformationPlugin extends FunctionPlugin {
    * Returns true if provided value is an error except #N/A!
    *
    * @param ast
-   * @param formulaAddress
+   * @param state
    */
-  public iserr(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('ISERR'), (arg: InternalScalarValue) =>
+  public iserr(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('ISERR'), (arg: InternalScalarValue) =>
       (arg instanceof CellError && arg.type !== ErrorType.NA)
     )
   }
@@ -148,10 +186,10 @@ export class InformationPlugin extends FunctionPlugin {
    * Checks whether provided value is an error
    *
    * @param ast
-   * @param formulaAddress
+   * @param state
    */
-  public iserror(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('ISERROR'), (arg: InternalScalarValue) =>
+  public iserror(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('ISERROR'), (arg: InternalScalarValue) =>
       (arg instanceof CellError)
     )
   }
@@ -162,16 +200,15 @@ export class InformationPlugin extends FunctionPlugin {
    * Checks whether referenced cell is a formula
    *
    * @param ast
-   * @param formulaAddress
+   * @param state
    */
-  public isformula(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunctionWithReferenceArgument(ast.args, formulaAddress, this.metadata('ISFORMULA'),
-      () => new CellError(ErrorType.NA),
+  public isformula(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunctionWithReferenceArgument(ast.args, state, this.metadata('ISFORMULA'),
+      () => new CellError(ErrorType.NA, ErrorMessage.WrongArgNumber),
       (reference: SimpleCellAddress) => {
         const vertex = this.dependencyGraph.addressMapping.getCell(reference)
-        return vertex instanceof FormulaCellVertex || (vertex instanceof MatrixVertex && vertex.isFormula())
-      },
-      () => new CellError(ErrorType.NA)
+        return vertex instanceof FormulaVertex
+      }
     )
   }
 
@@ -181,10 +218,10 @@ export class InformationPlugin extends FunctionPlugin {
    * Checks whether provided cell reference is empty
    *
    * @param ast
-   * @param formulaAddress
+   * @param state
    */
-  public isblank(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('ISBLANK'), (arg: InternalScalarValue) =>
+  public isblank(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('ISBLANK'), (arg: InternalScalarValue) =>
       (arg === EmptyValue)
     )
   }
@@ -195,10 +232,10 @@ export class InformationPlugin extends FunctionPlugin {
    * Returns true if provided value is #N/A! error
    *
    * @param ast
-   * @param formulaAddress
+   * @param state
    */
-  public isna(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('ISNA'), (arg: InternalScalarValue) =>
+  public isna(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('ISNA'), (arg: InternalScalarValue) =>
       (arg instanceof CellError && arg.type == ErrorType.NA)
     )
   }
@@ -209,12 +246,10 @@ export class InformationPlugin extends FunctionPlugin {
    * Checks whether provided cell reference is a number
    *
    * @param ast
-   * @param formulaAddress
+   * @param state
    */
-  public isnumber(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('ISNUMBER'), (arg: InternalScalarValue) =>
-      (typeof arg === 'number')
-    )
+  public isnumber(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('ISNUMBER'), isExtendedNumber)
   }
 
   /**
@@ -223,10 +258,10 @@ export class InformationPlugin extends FunctionPlugin {
    * Checks whether provided cell reference is of logical type
    *
    * @param ast
-   * @param formulaAddress
+   * @param state
    */
-  public islogical(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('ISLOGICAL'), (arg: InternalScalarValue) =>
+  public islogical(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('ISLOGICAL'), (arg: InternalScalarValue) =>
       (typeof arg === 'boolean')
     )
   }
@@ -237,14 +272,13 @@ export class InformationPlugin extends FunctionPlugin {
    * Returns true if provided value is #REF! error
    *
    * @param ast
-   * @param formulaAddress
+   * @param state
    */
-  public isref(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('ISREF'), (arg: InternalScalarValue) =>
+  public isref(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('ISREF'), (arg: InternalScalarValue) =>
       (arg instanceof CellError && (arg.type == ErrorType.REF || arg.type == ErrorType.CYCLE))
     )
   }
-
 
   /**
    * Corresponds to ISTEXT(value)
@@ -252,10 +286,10 @@ export class InformationPlugin extends FunctionPlugin {
    * Checks whether provided cell reference is of logical type
    *
    * @param ast
-   * @param formulaAddress
+   * @param state
    */
-  public istext(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('ISTEXT'), (arg: InternalScalarValue) =>
+  public istext(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('ISTEXT'), (arg: InternalScalarValue) =>
       (typeof arg === 'string')
     )
   }
@@ -266,35 +300,79 @@ export class InformationPlugin extends FunctionPlugin {
    * Checks whether provided cell reference is of logical type
    *
    * @param ast
-   * @param formulaAddress
+   * @param state
    */
-  public isnontext(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('ISNONTEXT'), (arg: InternalScalarValue) =>
-      (typeof arg !== 'string')
+  public isnontext(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('ISNONTEXT'), (arg: InternalScalarValue) =>
+      !(typeof arg === 'string')
     )
   }
+
+  /**
+   * Corresponds to COLUMN(reference)
+   *
+   * Returns column number of a reference or a formula cell if reference not provided
+   *
+   * @param ast
+   * @param state
+   */
+  public column(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunctionWithReferenceArgument(ast.args, state, this.metadata('COLUMN'),
+      () => state.formulaAddress.col + 1,
+      (reference: SimpleCellAddress) => reference.col + 1
+    )
+  }
+
   /**
    * Corresponds to COLUMNS(range)
    *
    * Returns number of columns in provided range of cells
    *
    * @param ast
-   * @param formulaAddress
+   * @param _state
    */
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  public columns(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+  public columns(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
     if (ast.args.length !== 1) {
-      return new CellError(ErrorType.NA)
+      return new CellError(ErrorType.NA, ErrorMessage.WrongArgNumber)
     }
-    if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
-      return new CellError(ErrorType.NUM)
+    if (ast.args.some((astIt) => astIt.type === AstNodeType.EMPTY)) {
+      return new CellError(ErrorType.NUM, ErrorMessage.EmptyArg)
     }
-    const rangeAst = ast.args[0]
-    if (rangeAst.type === AstNodeType.CELL_RANGE) {
-      return (rangeAst.end.col - rangeAst.start.col + 1)
+    let argAst = ast.args[0]
+    while(argAst.type === AstNodeType.PARENTHESIS) {
+      argAst = argAst.expression
+    }
+    if (argAst.type === AstNodeType.CELL_RANGE || argAst.type === AstNodeType.COLUMN_RANGE) {
+      return argAst.end.col - argAst.start.col + 1
+    } else if(argAst.type === AstNodeType.CELL_REFERENCE) {
+      return 1
+    } else if(argAst.type === AstNodeType.ROW_RANGE) {
+      return this.config.maxColumns
     } else {
-      return new CellError(ErrorType.VALUE)
+      const val = this.evaluateAst(argAst, state)
+      if(val instanceof SimpleRangeValue) {
+        return val.width()
+      } else if (val instanceof CellError){
+        return val
+      } else {
+        return 1
+      }
     }
+  }
+
+  /**
+   * Corresponds to ROW(reference)
+   *
+   * Returns row number of a reference or a formula cell if reference not provided
+   *
+   * @param ast
+   * @param state
+   */
+  public row(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunctionWithReferenceArgument(ast.args, state, this.metadata('ROW'),
+      () => state.formulaAddress.row + 1,
+      (reference: SimpleCellAddress) => reference.row + 1
+    )
   }
 
   /**
@@ -303,62 +381,58 @@ export class InformationPlugin extends FunctionPlugin {
    * Returns number of rows in provided range of cells
    *
    * @param ast
-   * @param formulaAddress
+   * @param _state
    */
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  public rows(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
+  public rows(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
     if (ast.args.length !== 1) {
-      return new CellError(ErrorType.NA)
+      return new CellError(ErrorType.NA, ErrorMessage.WrongArgNumber)
     }
-    if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
-      return new CellError(ErrorType.NUM)
+    if (ast.args.some((astIt) => astIt.type === AstNodeType.EMPTY)) {
+      return new CellError(ErrorType.NUM, ErrorMessage.EmptyArg)
     }
-    const rangeAst = ast.args[0]
-    if (rangeAst.type === AstNodeType.CELL_RANGE) {
-      return (rangeAst.end.row - rangeAst.start.row + 1)
+    let argAst = ast.args[0]
+    while(argAst.type === AstNodeType.PARENTHESIS) {
+      argAst = argAst.expression
+    }
+    if (argAst.type === AstNodeType.CELL_RANGE || argAst.type === AstNodeType.ROW_RANGE) {
+      return argAst.end.row - argAst.start.row + 1
+    } else if(argAst.type === AstNodeType.CELL_REFERENCE) {
+      return 1
+    } else if(argAst.type === AstNodeType.COLUMN_RANGE) {
+      return this.config.maxRows
     } else {
-      return new CellError(ErrorType.VALUE)
+      const val = this.evaluateAst(argAst, state)
+      if(val instanceof SimpleRangeValue) {
+        return val.height()
+      } else if (val instanceof CellError){
+        return val
+      } else {
+        return 1
+      }
     }
   }
 
-  public index(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InterpreterValue {
-    const rangeArg = ast.args[0]
-    if (ast.args.length < 1 || ast.args.length > 3) {
-      return new CellError(ErrorType.NA)
-    }
-    if (ast.args.some((ast) => ast.type === AstNodeType.EMPTY)) {
-      return new CellError(ErrorType.NUM)
-    }
+  /**
+   * Corresponds to INDEX(range;)
+   *
+   * Returns specific position in 2d array.
+   *
+   * @param ast
+   * @param state
+   */
+  public index(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('INDEX'), (rangeValue: SimpleRangeValue, row: number, col: number) => {
+      if (col < 1 || row < 1) {
+        return new CellError(ErrorType.VALUE, ErrorMessage.LessThanOne)
+      }
+      if (col > rangeValue.width() || row > rangeValue.height()) {
+        return new CellError(ErrorType.NUM, ErrorMessage.ValueLarge)
+      }
+      return rangeValue?.data?.[row-1]?.[col-1] ?? rangeValue?.data?.[0]?.[0] ?? new CellError(ErrorType.VALUE, ErrorMessage.CellRangeExpected)
 
-    let width, height
-    let range
-    if (rangeArg.type === AstNodeType.CELL_RANGE) {
-      range = AbsoluteCellRange.fromCellRange(rangeArg, formulaAddress)
-      width = range.width()
-      height = range.height()
-    } else {
-      width = 1
-      height = 1
-    }
-
-    const rowArg = ast.args[1]
-    const rowValue = this.evaluateAst(rowArg, formulaAddress)
-    if (typeof rowValue !== 'number' || rowValue < 0 || rowValue > height) {
-      return new CellError(ErrorType.NUM)
-    }
-
-    const columnArg = ast.args[2]
-    const columnValue = this.evaluateAst(columnArg, formulaAddress)
-    if (typeof columnValue !== 'number' || columnValue < 0 || columnValue > width) {
-      return new CellError(ErrorType.NUM)
-    }
-
-    if (columnValue === 0 || rowValue === 0 || range === undefined) {
-      throw Error('Not implemented yet')
-    }
-
-    const address = range.getAddress(columnValue - 1, rowValue - 1)
-    return this.dependencyGraph.getCellValue(address)
+      const address = rangeValue.range!.getAddress(col - 1, row - 1)
+      return this.dependencyGraph.getScalarValue(address)
+    })
   }
 
   /**
@@ -367,9 +441,9 @@ export class InformationPlugin extends FunctionPlugin {
    * Returns #N/A!
    *
    * @param _ast
-   * @param _formulaAddress
+   * @param _state
    */
-  public na(_ast: ProcedureAst, _formulaAddress: SimpleCellAddress): CellError {
+  public na(_ast: ProcedureAst, _state: InterpreterState): CellError {
     return new CellError(ErrorType.NA)
   }
 
@@ -379,18 +453,18 @@ export class InformationPlugin extends FunctionPlugin {
    * Returns sheet number of a given value or a formula sheet number if no argument is provided
    *
    * @param ast
-   * @param formulaAddress
+   * @param state
    * */
-  public sheet(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunctionWithReferenceArgument(ast.args, formulaAddress, {parameters: [{argumentType: ArgumentTypes.STRING}]},
-      () => formulaAddress.sheet + 1,
+  public sheet(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunctionWithReferenceArgument(ast.args, state, this.metadata('SHEET'),
+      () => state.formulaAddress.sheet + 1,
       (reference: SimpleCellAddress) => reference.sheet + 1,
       (value: string) => {
         const sheetNumber = this.dependencyGraph.sheetMapping.get(value)
         if (sheetNumber !== undefined) {
           return sheetNumber + 1
         } else {
-          return new CellError(ErrorType.NA)
+          return new CellError(ErrorType.NA, ErrorMessage.SheetRef)
         }
       }
     )
@@ -403,13 +477,13 @@ export class InformationPlugin extends FunctionPlugin {
    * It returns always 1 for a valid reference as 3D references are not supported.
    *
    * @param ast
-   * @param formulaAddress
+   * @param state
    * */
-  public sheets(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunctionWithReferenceArgument(ast.args, formulaAddress, {parameters: [{argumentType: ArgumentTypes.STRING}]},
+  public sheets(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunctionWithReferenceArgument(ast.args, state, this.metadata('SHEETS'),
       () => this.dependencyGraph.sheetMapping.numberOfSheets(), // return number of sheets if no argument
       () => 1, // return 1 for valid reference
-      () => new CellError(ErrorType.VALUE) // error otherwise
+      () => new CellError(ErrorType.VALUE, ErrorMessage.CellRefExpected) // error otherwise
     )
   }
 }

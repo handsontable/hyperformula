@@ -1,14 +1,14 @@
 /**
  * @license
- * Copyright (c) 2020 Handsoncode. All rights reserved.
+ * Copyright (c) 2021 Handsoncode. All rights reserved.
  */
 
-import {Transformer} from './Transformer'
-import {Ast, CellAddress} from '../parser'
+import {AbsoluteCellRange} from '../AbsoluteCellRange'
 import {ErrorType, simpleCellAddress, SimpleCellAddress} from '../Cell'
+import {Ast, CellAddress} from '../parser'
 import {ColumnAddress} from '../parser/ColumnAddress'
 import {RowAddress} from '../parser/RowAddress'
-import {AbsoluteCellRange} from '../AbsoluteCellRange'
+import {Transformer} from './Transformer'
 
 export class MoveCellsTransformer extends Transformer {
   private dependentFormulaTransformer: DependentFormulaTransformer

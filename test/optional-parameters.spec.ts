@@ -1,10 +1,11 @@
 import {ErrorType, HyperFormula} from '../src'
-import {SimpleCellAddress} from '../src/Cell'
-import {ArgumentTypes, FunctionPlugin} from '../src/interpreter/plugin/FunctionPlugin'
+import {ErrorMessage} from '../src/error-message'
+import {InterpreterState} from '../src/interpreter/InterpreterState'
+import {ArgumentTypes, FunctionPlugin, FunctionPluginTypecheck} from '../src/interpreter/plugin/FunctionPlugin'
 import {ProcedureAst} from '../src/parser'
 import {adr, detailedError} from './testUtils'
 
-class FooPlugin extends FunctionPlugin {
+class FooPlugin extends FunctionPlugin implements FunctionPluginTypecheck<FooPlugin>{
   public static implementedFunctions = {
     'FOO': {
       method: 'foo',
@@ -15,8 +16,8 @@ class FooPlugin extends FunctionPlugin {
     },
   }
 
-  public foo(ast: ProcedureAst, formulaAddress: SimpleCellAddress) {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('FOO'),
+  public foo(ast: ProcedureAst, state: InterpreterState) {
+    return this.runFunction(ast.args, state, this.metadata('FOO'),
       (arg1, arg2) => arg1+'+'+arg2
     )
   }
@@ -49,7 +50,7 @@ describe('Nonexistent metadata', () => {
       ['=LOG(10,)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM))
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.ValueSmall))
   })
 
   it('other function coerce EmptyValue', () => {
@@ -60,7 +61,7 @@ describe('Nonexistent metadata', () => {
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqual(1901)
-    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NUM)) //TODO when SUM() is fixed, it should evaluate to 1
+    expect(engine.getCellValue(adr('A2'))).toEqual(1)
     expect(engine.getCellValue(adr('A3'))).toEqual('abcd')
   })
 

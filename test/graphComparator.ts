@@ -1,4 +1,4 @@
-import {equal, deepStrictEqual} from 'assert'
+import {deepStrictEqual, equal} from 'assert'
 import {HyperFormula} from '../src'
 import {AbsoluteCellRange} from '../src/AbsoluteCellRange'
 import {SimpleCellAddress, simpleCellAddress} from '../src/Cell'
@@ -52,11 +52,12 @@ export class EngineComparator {
         const address = simpleCellAddress(sheet, x, y)
         const expectedVertex = this.expected.addressMapping.getCell(address)
         const actualVertex = this.actual.addressMapping.getCell(address)
-
-        if (expectedVertex === null && actualVertex === null) {
+        if (expectedVertex === undefined && actualVertex === undefined) {
           continue
         } else if (expectedVertex instanceof FormulaCellVertex && actualVertex instanceof FormulaCellVertex) {
-          deepStrictEqual(actualVertex.address, expectedVertex.address, `Different addresses in formulas. expected: ${expectedVertex.address}, actual: ${actualVertex.address}`)
+          const actualVertexAddress = actualVertex.getAddress(this.actual.dependencyGraph.lazilyTransformingAstService)
+          const expectedVertexAddress = expectedVertex.getAddress(this.expected.dependencyGraph.lazilyTransformingAstService)
+          deepStrictEqual(actualVertexAddress, expectedVertexAddress, `Different addresses in formulas. expected: ${actualVertexAddress}, actual: ${expectedVertexAddress}`)
           deepStrictEqual(actualVertex.getFormula(this.actual.lazilyTransformingAstService), expectedVertex.getFormula(this.expected.lazilyTransformingAstService), 'Different AST in formulas')
           deepStrictEqual(actualVertex.getCellValue(), expectedVertex.getCellValue(), `Different values of formulas. expected: ${expectedVertex.getCellValue().toString()}, actual: ${actualVertex.getCellValue().toString()}`)
         } else if (expectedVertex instanceof ValueCellVertex && actualVertex instanceof ValueCellVertex) {

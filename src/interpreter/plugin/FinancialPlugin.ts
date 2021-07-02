@@ -1,13 +1,24 @@
 /**
  * @license
- * Copyright (c) 2020 Handsoncode. All rights reserved.
+ * Copyright (c) 2021 Handsoncode. All rights reserved.
  */
 
-import {CellError, ErrorType, InternalScalarValue, SimpleCellAddress} from '../../Cell'
+import {CellError, ErrorType} from '../../Cell'
+import {ErrorMessage} from '../../error-message'
 import {ProcedureAst} from '../../parser'
-import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
+import {InterpreterState} from '../InterpreterState'
+import {
+  EmptyValue,
+  getRawValue,
+  InterpreterValue,
+  isExtendedNumber,
+  NumberType,
+  RawInterpreterValue
+} from '../InterpreterValue'
+import {SimpleRangeValue} from '../SimpleRangeValue'
+import {ArgumentTypes, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
 
-export class FinancialPlugin extends FunctionPlugin {
+export class FinancialPlugin extends FunctionPlugin implements FunctionPluginTypecheck<FinancialPlugin>{
   public static implementedFunctions = {
     'PMT': {
       method: 'pmt',
@@ -17,7 +28,8 @@ export class FinancialPlugin extends FunctionPlugin {
           {argumentType: ArgumentTypes.NUMBER},
           {argumentType: ArgumentTypes.NUMBER, defaultValue: 0},
           {argumentType: ArgumentTypes.NUMBER, defaultValue: 0},
-        ]
+        ],
+      returnNumberType: NumberType.NUMBER_CURRENCY
     },
     'IPMT': {
       method: 'ipmt',
@@ -28,7 +40,8 @@ export class FinancialPlugin extends FunctionPlugin {
           {argumentType: ArgumentTypes.NUMBER},
           {argumentType: ArgumentTypes.NUMBER, defaultValue: 0},
           {argumentType: ArgumentTypes.NUMBER, defaultValue: 0},
-        ]
+        ],
+      returnNumberType: NumberType.NUMBER_CURRENCY
     },
     'PPMT': {
       method: 'ppmt',
@@ -39,7 +52,8 @@ export class FinancialPlugin extends FunctionPlugin {
           {argumentType: ArgumentTypes.NUMBER},
           {argumentType: ArgumentTypes.NUMBER, defaultValue: 0},
           {argumentType: ArgumentTypes.NUMBER, defaultValue: 0},
-        ]
+        ],
+      returnNumberType: NumberType.NUMBER_CURRENCY
     },
     'FV': {
       method: 'fv',
@@ -49,7 +63,8 @@ export class FinancialPlugin extends FunctionPlugin {
           {argumentType: ArgumentTypes.NUMBER},
           {argumentType: ArgumentTypes.NUMBER, defaultValue: 0},
           {argumentType: ArgumentTypes.NUMBER, defaultValue: 0},
-        ]
+        ],
+      returnNumberType: NumberType.NUMBER_CURRENCY
     },
     'CUMIPMT': {
       method: 'cumipmt',
@@ -60,7 +75,8 @@ export class FinancialPlugin extends FunctionPlugin {
         {argumentType: ArgumentTypes.INTEGER, minValue: 1},
         {argumentType: ArgumentTypes.INTEGER, minValue: 1},
         {argumentType: ArgumentTypes.INTEGER, minValue: 0, maxValue: 1},
-      ]
+      ],
+      returnNumberType: NumberType.NUMBER_CURRENCY
     },
     'CUMPRINC': {
       method: 'cumprinc',
@@ -71,7 +87,8 @@ export class FinancialPlugin extends FunctionPlugin {
         {argumentType: ArgumentTypes.INTEGER, minValue: 1},
         {argumentType: ArgumentTypes.INTEGER, minValue: 1},
         {argumentType: ArgumentTypes.INTEGER, minValue: 0, maxValue: 1},
-      ]
+      ],
+      returnNumberType: NumberType.NUMBER_CURRENCY
     },
     'DB': {
       method: 'db',
@@ -81,7 +98,8 @@ export class FinancialPlugin extends FunctionPlugin {
         {argumentType: ArgumentTypes.INTEGER, minValue: 0},
         {argumentType: ArgumentTypes.INTEGER, minValue: 0},
         {argumentType: ArgumentTypes.INTEGER, minValue: 1, maxValue: 12, defaultValue: 12},
-      ]
+      ],
+      returnNumberType: NumberType.NUMBER_CURRENCY
     },
     'DDB': {
       method: 'ddb',
@@ -91,28 +109,30 @@ export class FinancialPlugin extends FunctionPlugin {
         {argumentType: ArgumentTypes.INTEGER, minValue: 0},
         {argumentType: ArgumentTypes.NUMBER, minValue: 0},
         {argumentType: ArgumentTypes.NUMBER, greaterThan: 0, defaultValue: 2},
-      ]
+      ],
+      returnNumberType: NumberType.NUMBER_CURRENCY
     },
     'DOLLARDE': {
       method: 'dollarde',
       parameters: [
         {argumentType: ArgumentTypes.NUMBER},
         {argumentType: ArgumentTypes.NUMBER, minValue: 0},
-      ]
+      ],
     },
     'DOLLARFR': {
       method: 'dollarfr',
       parameters: [
         {argumentType: ArgumentTypes.NUMBER},
         {argumentType: ArgumentTypes.NUMBER, minValue: 0},
-      ]
+      ],
     },
     'EFFECT': {
       method: 'effect',
       parameters: [
         {argumentType: ArgumentTypes.NUMBER, minValue: 0},
         {argumentType: ArgumentTypes.NUMBER, minValue: 1},
-      ]
+      ],
+      returnNumberType: NumberType.NUMBER_PERCENT
     },
     'ISPMT': {
       method: 'ispmt',
@@ -121,14 +141,15 @@ export class FinancialPlugin extends FunctionPlugin {
         {argumentType: ArgumentTypes.NUMBER},
         {argumentType: ArgumentTypes.NUMBER},
         {argumentType: ArgumentTypes.NUMBER},
-      ]
+      ],
     },
     'NOMINAL': {
       method: 'nominal',
       parameters: [
         {argumentType: ArgumentTypes.NUMBER, minValue: 0},
         {argumentType: ArgumentTypes.NUMBER, minValue: 1},
-      ]
+      ],
+      returnNumberType: NumberType.NUMBER_PERCENT
     },
     'NPER': {
       method: 'nper',
@@ -138,7 +159,7 @@ export class FinancialPlugin extends FunctionPlugin {
         {argumentType: ArgumentTypes.NUMBER},
         {argumentType: ArgumentTypes.NUMBER, defaultValue: 0},
         {argumentType: ArgumentTypes.NUMBER, defaultValue: 0},
-      ]
+      ],
     },
     'PV': {
       method: 'pv',
@@ -148,7 +169,8 @@ export class FinancialPlugin extends FunctionPlugin {
         {argumentType: ArgumentTypes.NUMBER},
         {argumentType: ArgumentTypes.NUMBER, defaultValue: 0},
         {argumentType: ArgumentTypes.NUMBER, defaultValue: 0},
-      ]
+      ],
+      returnNumberType: NumberType.NUMBER_CURRENCY
     },
     'RATE': {
       method: 'rate',
@@ -159,7 +181,8 @@ export class FinancialPlugin extends FunctionPlugin {
         {argumentType: ArgumentTypes.NUMBER, defaultValue: 0},
         {argumentType: ArgumentTypes.NUMBER, defaultValue: 0},
         {argumentType: ArgumentTypes.NUMBER, defaultValue: 0.1},
-      ]
+      ],
+      returnNumberType: NumberType.NUMBER_PERCENT
     },
     'RRI': {
       method: 'rri',
@@ -167,7 +190,8 @@ export class FinancialPlugin extends FunctionPlugin {
         {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
         {argumentType: ArgumentTypes.NUMBER},
         {argumentType: ArgumentTypes.NUMBER},
-      ]
+      ],
+      returnNumberType: NumberType.NUMBER_PERCENT
     },
     'SLN': {
       method: 'sln',
@@ -175,7 +199,8 @@ export class FinancialPlugin extends FunctionPlugin {
         {argumentType: ArgumentTypes.NUMBER},
         {argumentType: ArgumentTypes.NUMBER},
         {argumentType: ArgumentTypes.NUMBER},
-      ]
+      ],
+      returnNumberType: NumberType.NUMBER_CURRENCY
     },
     'SYD': {
       method: 'syd',
@@ -184,7 +209,8 @@ export class FinancialPlugin extends FunctionPlugin {
         {argumentType: ArgumentTypes.NUMBER},
         {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
         {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
-      ]
+      ],
+      returnNumberType: NumberType.NUMBER_CURRENCY
     },
     'TBILLEQ': {
       method: 'tbilleq',
@@ -192,7 +218,8 @@ export class FinancialPlugin extends FunctionPlugin {
         {argumentType: ArgumentTypes.NUMBER, minValue: 0},
         {argumentType: ArgumentTypes.NUMBER, minValue: 0},
         {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
-      ]
+      ],
+      returnNumberType: NumberType.NUMBER_PERCENT
     },
     'TBILLPRICE': {
       method: 'tbillprice',
@@ -200,7 +227,8 @@ export class FinancialPlugin extends FunctionPlugin {
         {argumentType: ArgumentTypes.NUMBER, minValue: 0},
         {argumentType: ArgumentTypes.NUMBER, minValue: 0},
         {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
-      ]
+      ],
+      returnNumberType: NumberType.NUMBER_CURRENCY
     },
     'TBILLYIELD': {
       method: 'tbillyield',
@@ -208,31 +236,74 @@ export class FinancialPlugin extends FunctionPlugin {
         {argumentType: ArgumentTypes.NUMBER, minValue: 0},
         {argumentType: ArgumentTypes.NUMBER, minValue: 0},
         {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
-      ]
+      ],
+      returnNumberType: NumberType.NUMBER_PERCENT
+    },
+    'FVSCHEDULE': {
+      method: 'fvschedule',
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER},
+        {argumentType: ArgumentTypes.RANGE},
+      ],
+      returnNumberType: NumberType.NUMBER_CURRENCY
+    },
+    'NPV': {
+      method: 'npv',
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER},
+        {argumentType: ArgumentTypes.ANY},
+      ],
+      repeatLastArgs: 1,
+      returnNumberType: NumberType.NUMBER_CURRENCY
+    },
+    'MIRR': {
+      method: 'mirr',
+      parameters: [
+        {argumentType: ArgumentTypes.RANGE},
+        {argumentType: ArgumentTypes.NUMBER},
+        {argumentType: ArgumentTypes.NUMBER},
+      ],
+      returnNumberType: NumberType.NUMBER_PERCENT
+    },
+    'PDURATION': {
+      method: 'pduration',
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
+        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
+        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
+      ],
+    },
+    'XNPV': {
+      method: 'xnpv',
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER, greaterThan: -1},
+        {argumentType: ArgumentTypes.RANGE},
+        {argumentType: ArgumentTypes.RANGE},
+      ],
     },
   }
 
-  public pmt(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('PMT'), pmtCore)
+  public pmt(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('PMT'), pmtCore)
   }
 
-  public ipmt(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('IPMT'), ipmtCore)
+  public ipmt(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('IPMT'), ipmtCore)
   }
 
-  public ppmt(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('PPMT'), ppmtCore)
+  public ppmt(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('PPMT'), ppmtCore)
   }
 
-  public fv(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('FV'), fvCore)
+  public fv(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('FV'), fvCore)
   }
 
-  public cumipmt(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('CUMIPMT'),
+  public cumipmt(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('CUMIPMT'),
       (rate: number, periods: number, value: number, start: number, end: number, type: number) => {
         if (start > end) {
-          return new CellError(ErrorType.NUM)
+          return new CellError(ErrorType.NUM, ErrorMessage.EndStartPeriod)
         }
         let acc = 0
         for(let i = start; i <= end; i++) {
@@ -243,11 +314,11 @@ export class FinancialPlugin extends FunctionPlugin {
     )
   }
 
-  public cumprinc(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('CUMPRINC'),
+  public cumprinc(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('CUMPRINC'),
       (rate: number, periods: number, value: number, start: number, end: number, type: number) => {
         if (start > end) {
-          return new CellError(ErrorType.NUM)
+          return new CellError(ErrorType.NUM, ErrorMessage.EndStartPeriod)
         }
         let acc = 0
         for(let i = start; i <= end; i++) {
@@ -258,11 +329,11 @@ export class FinancialPlugin extends FunctionPlugin {
     )
   }
 
-  public db(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('DB'),
+  public db(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('DB'),
       (cost: number, salvage: number, life: number, period: number, month: number) => {
         if ((month===12 && period > life) || (period > life+1)) {
-          return new CellError(ErrorType.NUM)
+          return new CellError(ErrorType.NUM, ErrorMessage.PeriodLong)
         }
 
         if (salvage >= cost) {
@@ -290,8 +361,8 @@ export class FinancialPlugin extends FunctionPlugin {
     )
   }
 
-  public ddb(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('DDB'),
+  public ddb(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('DDB'),
       (cost: number, salvage: number, life: number, period: number, factor: number) => {
         if (period > life) {
           return new CellError(ErrorType.NUM)
@@ -314,8 +385,8 @@ export class FinancialPlugin extends FunctionPlugin {
     )
   }
 
-  public dollarde(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('DOLLARDE'),
+  public dollarde(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('DOLLARDE'),
       (dollar, fraction) => {
         if (fraction < 1) {
           return new CellError(ErrorType.DIV_BY_ZERO)
@@ -330,8 +401,8 @@ export class FinancialPlugin extends FunctionPlugin {
     )
   }
 
-  public dollarfr(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('DOLLARFR'),
+  public dollarfr(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('DOLLARFR'),
       (dollar, fraction) => {
         if (fraction < 1) {
           return new CellError(ErrorType.DIV_BY_ZERO)
@@ -346,8 +417,8 @@ export class FinancialPlugin extends FunctionPlugin {
     )
   }
 
-  public effect(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('EFFECT'),
+  public effect(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('EFFECT'),
       (rate: number, periods: number) => {
         periods = Math.trunc(periods)
         return Math.pow(1 + rate / periods, periods) - 1
@@ -355,8 +426,8 @@ export class FinancialPlugin extends FunctionPlugin {
     )
   }
 
-  public ispmt(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('ISPMT'),
+  public ispmt(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('ISPMT'),
       (rate, period, periods, value) => {
         if(periods===0) {
           return new CellError(ErrorType.DIV_BY_ZERO)
@@ -366,8 +437,8 @@ export class FinancialPlugin extends FunctionPlugin {
     )
   }
 
-  public nominal(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('NOMINAL'),
+  public nominal(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('NOMINAL'),
       (rate: number, periods: number) => {
         periods = Math.trunc(periods)
         return (Math.pow(rate + 1, 1 / periods) - 1) * periods
@@ -375,8 +446,8 @@ export class FinancialPlugin extends FunctionPlugin {
     )
   }
 
-  public nper(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('NPER'),
+  public nper(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('NPER'),
       (rate, payment, present, future, type) => {
         if(rate === 0) {
           if(payment === 0) {
@@ -392,8 +463,8 @@ export class FinancialPlugin extends FunctionPlugin {
     )
   }
 
-  public rate(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('RATE'),
+  public rate(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('RATE'),
       (periods, payment, present, future, type, guess) => {
         if(guess<=-1) {
           return new CellError(ErrorType.VALUE)
@@ -434,8 +505,8 @@ export class FinancialPlugin extends FunctionPlugin {
     )
   }
 
-  public pv(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('PV'),
+  public pv(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('PV'),
       (rate, periods, payment, future, type) => {
         type = type ? 1 : 0
         if(rate === -1) {
@@ -454,8 +525,8 @@ export class FinancialPlugin extends FunctionPlugin {
     )
   }
 
-  public rri(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('RRI'),
+  public rri(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('RRI'),
       (periods, present, future) => {
         if (present === 0 || (future < 0 && present > 0) || (future > 0 && present < 0)) {
           return new CellError(ErrorType.NUM)
@@ -466,8 +537,8 @@ export class FinancialPlugin extends FunctionPlugin {
     )
   }
 
-  public sln(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('SLN'),
+  public sln(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('SLN'),
       (cost, salvage, life) => {
         if (life === 0) {
           return new CellError(ErrorType.DIV_BY_ZERO)
@@ -477,8 +548,8 @@ export class FinancialPlugin extends FunctionPlugin {
     )
   }
 
-  public syd(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('SYD'),
+  public syd(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('SYD'),
       (cost, salvage, life, period) => {
         if (period > life) {
           return new CellError(ErrorType.NUM)
@@ -488,8 +559,8 @@ export class FinancialPlugin extends FunctionPlugin {
     )
   }
 
-  public tbilleq(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('TBILLEQ'),
+  public tbilleq(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('TBILLEQ'),
       (settlement, maturity, discount) => {
         settlement = Math.round(settlement)
         maturity = Math.round(maturity)
@@ -514,8 +585,8 @@ export class FinancialPlugin extends FunctionPlugin {
     )
   }
 
-  public tbillprice(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('TBILLPRICE'),
+  public tbillprice(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('TBILLPRICE'),
       (settlement, maturity, discount) => {
         settlement = Math.round(settlement)
         maturity = Math.round(maturity)
@@ -540,8 +611,8 @@ export class FinancialPlugin extends FunctionPlugin {
     )
   }
 
-  public tbillyield(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('TBILLYIELD'),
+  public tbillyield(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('TBILLYIELD'),
       (settlement, maturity, price) => {
         settlement = Math.round(settlement)
         maturity = Math.round(maturity)
@@ -555,6 +626,126 @@ export class FinancialPlugin extends FunctionPlugin {
           return new CellError(ErrorType.NUM)
         }
         return (100 - price) * 360 / (price * (maturity - settlement))
+      }
+    )
+  }
+
+  public fvschedule(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('FVSCHEDULE'),
+      (value: number, ratios: SimpleRangeValue) => {
+        const vals = ratios.valuesFromTopLeftCorner()
+        for(const val of vals) {
+          if(val instanceof CellError) {
+            return val
+          }
+        }
+        for(const val of vals) {
+          if(isExtendedNumber(val)) {
+            value *= 1+getRawValue(val)
+          } else if(val !== EmptyValue) {
+            return new CellError(ErrorType.VALUE, ErrorMessage.NumberExpected)
+          }
+        }
+        return value
+      })
+  }
+
+  public npv(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('NPV'),
+      (rate: number, ...args: RawInterpreterValue[]) => {
+        const coerced = this.interpreter.arithmeticHelper.coerceNumbersExactRanges(args)
+        if(coerced instanceof CellError) {
+          return coerced
+        }
+        return npvCore(rate, coerced)
+      }
+    )
+  }
+
+  public mirr(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('MIRR'),
+      (range: SimpleRangeValue, frate: number, rrate: number) => {
+        const vals = this.interpreter.arithmeticHelper.manyToExactNumbers(range.valuesFromTopLeftCorner())
+        if(vals instanceof CellError) {
+          return vals
+        }
+        let posFlag = false
+        let negFlag = false
+        const posValues: number[] = []
+        const negValues: number[] = []
+        for(const val of vals) {
+          if(val>0) {
+            posFlag = true
+            posValues.push(val)
+            negValues.push(0)
+          } else if(val<0) {
+            negFlag = true
+            negValues.push(val)
+            posValues.push(0)
+          } else {
+            negValues.push(0)
+            posValues.push(0)
+          }
+        }
+        if(!posFlag || !negFlag) {
+          return new CellError(ErrorType.DIV_BY_ZERO)
+        }
+        const n = vals.length
+        const nom = npvCore(rrate, posValues)
+        if(nom instanceof CellError) {
+          return nom
+        }
+        const denom = npvCore(frate, negValues)
+        if(denom instanceof CellError) {
+          return denom
+        }
+        return Math.pow(
+          (-nom*Math.pow(1+rrate, n)/denom/(1+frate)),
+          1/(n-1)
+        )-1
+      }
+    )
+  }
+
+  public pduration(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('PDURATION'),
+      (rate: number, pv: number, fv: number) => (Math.log(fv) - Math.log(pv))/Math.log(1+rate)
+    )
+  }
+
+  public xnpv(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('XNPV'),
+      (rate: number, values: SimpleRangeValue, dates: SimpleRangeValue) => {
+        const valArr = values.valuesFromTopLeftCorner()
+        for(const val of valArr) {
+          if(typeof val !== 'number') {
+            return new CellError(ErrorType.VALUE, ErrorMessage.NumberExpected)
+          }
+        }
+        const valArrNum = valArr as number[]
+        const dateArr = dates.valuesFromTopLeftCorner()
+        for(const date of dateArr) {
+          if(typeof date !== 'number') {
+            return new CellError(ErrorType.VALUE, ErrorMessage.NumberExpected)
+          }
+        }
+        const dateArrNum = dateArr as number[]
+        if(dateArrNum.length !== valArrNum.length) {
+          return new CellError(ErrorType.NUM, ErrorMessage.EqualLength)
+        }
+        const n = dateArrNum.length
+        let ret = 0
+        if(dateArrNum[0]  < 0) {
+          return new CellError(ErrorType.NUM, ErrorMessage.ValueSmall)
+        }
+        for(let i=0;i<n;i++) {
+          dateArrNum[i] = Math.floor(dateArrNum[i])
+          if(dateArrNum[i]<dateArrNum[0]) {
+            return new CellError(ErrorType.NUM, ErrorMessage.ValueSmall)
+          }
+          ret += valArrNum[i] / Math.pow(1+rate, (dateArrNum[i]-dateArrNum[0])/365)
+        }
+        return ret
       }
     )
   }
@@ -589,4 +780,20 @@ function fvCore(rate: number, periods: number, payment: number, value: number, t
 
 function ppmtCore(rate: number, period: number, periods: number, present: number, future: number, type: number): number {
   return pmtCore(rate, periods, present, future, type) - ipmtCore(rate, period, periods, present, future, type)
+}
+
+function npvCore(rate: number, args: number[]): number | CellError {
+  let acc = 0
+  for(let i=args.length-1;i>=0;i--) {
+    acc += args[i]
+    if(rate===-1) {
+      if (acc === 0) {
+        continue
+      } else {
+        return new CellError(ErrorType.DIV_BY_ZERO)
+      }
+    }
+    acc /= 1+rate
+  }
+  return acc
 }

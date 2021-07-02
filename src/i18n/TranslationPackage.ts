@@ -1,11 +1,11 @@
 /**
  * @license
- * Copyright (c) 2020 Handsoncode. All rights reserved.
+ * Copyright (c) 2021 Handsoncode. All rights reserved.
  */
 
-import {ErrorType} from '../Cell'
-import {Maybe} from '../Maybe'
+import {ErrorType, TranslatableErrorType} from '../Cell'
 import {MissingTranslationError, ProtectedFunctionTranslationError} from '../errors'
+import {Maybe} from '../Maybe'
 import {ErrorTranslationSet, TranslationSet, UIElement, UITranslationSet} from './index'
 
 export interface RawTranslationPackage {
@@ -43,11 +43,11 @@ export class TranslationPackage {
     }, {} as Record<string, string>)
   }
 
-  public buildErrorMapping(): Record<string, ErrorType> {
+  public buildErrorMapping(): Record<string, TranslatableErrorType> {
     return Object.keys(this.errors).reduce((ret, key) => {
-      ret[this.errors[key as ErrorType]] = key as ErrorType
+      ret[this.errors[key as TranslatableErrorType]] = key as TranslatableErrorType
       return ret
-    }, {} as Record<string, ErrorType>)
+    }, {} as Record<string, TranslatableErrorType>)
   }
 
   public isFunctionTranslated(key: string): boolean {
@@ -78,6 +78,9 @@ export class TranslationPackage {
   }
 
   public getErrorTranslation(key: ErrorType): string {
+    if(key === ErrorType.LIC) {
+      return `#${ErrorType.LIC}!`
+    }
     const val = this.errors[key]
     if (val === undefined) {
       throw new MissingTranslationError(`errors.${key}`)
@@ -104,8 +107,8 @@ export class TranslationPackage {
   }
 
   private checkErrors(): void {
-    for (const key of Object.values(ErrorType)) {
-      if (!(key in this.errors)) {
+    for(const key of Object.values(ErrorType)){
+      if(! (key in this.errors) && (key !== ErrorType.LIC)){
         throw new MissingTranslationError(`errors.${key}`)
       }
     }

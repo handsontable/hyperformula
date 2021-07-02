@@ -1,5 +1,6 @@
 import {HyperFormula} from '../../src'
 import {ErrorType} from '../../src/Cell'
+import {ErrorMessage} from '../../src/error-message'
 import {adr, detailedError} from '../testUtils'
 
 describe('Function ISBLANK', () => {
@@ -30,8 +31,8 @@ describe('Function ISBLANK', () => {
     const engine = HyperFormula.buildFromArray([
       ['=ISBLANK(A3, A2)', '=ISBLANK()'],
     ])
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA))
-    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.NA))
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
+    expect(engine.getCellValue(adr('B1'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
   })
 
   it('no error propagation', () => {
@@ -42,15 +43,14 @@ describe('Function ISBLANK', () => {
     expect(engine.getCellValue(adr('A1'))).toEqual(false)
   })
 
-  // Inconsistency with Product 1
   it('range value results in VALUE error', () => {
     const engine = HyperFormula.buildFromArray([
-      ['0', '=ISBLANK(A1:A3)'],
-      [null, '=ISBLANK(A1:A3)'],
+      ['0'],
       [null],
+      [null],
+      ['=ISBLANK(A1:A3)'],
     ])
 
-    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.VALUE))
-    expect(engine.getCellValue(adr('B2'))).toEqual(detailedError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A4'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.WrongType))
   })
 })

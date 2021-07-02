@@ -2,7 +2,7 @@
 
 HyperFormula can be customized through easy-to-setup `options`.
 
-The only mandatory option is `licenseKey`. It has a
+The only mandatory key is `licenseKey`. It has a
 [dedicated section](license-key.md) in which you can find all allowed
 types of key values.
 
@@ -16,7 +16,7 @@ static method called to initiate a new instance of HyperFormula.
 ```javascript
 // define options 
 const options = {
-    licenseKey: 'agpl-v3',
+    licenseKey: 'gpl-v3',
     precisionRounding: 10,
     nullDate: { year: 1900, month: 1, day: 1 },
     functionArgSeparator: '.'

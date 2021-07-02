@@ -1,4 +1,5 @@
 import {ErrorType, HyperFormula} from '../../src'
+import {ErrorMessage} from '../../src/error-message'
 import {adr, detailedError} from '../testUtils'
 
 describe('Function DOLLARDE', () => {
@@ -7,8 +8,8 @@ describe('Function DOLLARDE', () => {
       ['=DOLLARDE(1)', '=DOLLARDE(1, 1, 1)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA))
-    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.NA))
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
+    expect(engine.getCellValue(adr('B1'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
   })
 
   it('div/0 when second argument too small', () => {
@@ -16,8 +17,8 @@ describe('Function DOLLARDE', () => {
       ['=DOLLARDE(1,0)', '=DOLLARDE(1, 0.9)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.DIV_BY_ZERO))
-    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.DIV_BY_ZERO))
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.DIV_BY_ZERO))
+    expect(engine.getCellValue(adr('B1'))).toEqualError(detailedError(ErrorType.DIV_BY_ZERO))
   })
 
   it('should calculate the correct value with correct arguments and defaults', () => {

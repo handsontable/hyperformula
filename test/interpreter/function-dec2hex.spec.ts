@@ -1,5 +1,6 @@
 import {HyperFormula} from '../../src'
 import {CellValueType, ErrorType} from '../../src/Cell'
+import {ErrorMessage} from '../../src/error-message'
 import {adr, detailedError} from '../testUtils'
 
 describe('function DEC2HEX', () => {
@@ -8,7 +9,7 @@ describe('function DEC2HEX', () => {
       ['=DEC2HEX("foo")'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.NumberCoercion))
   })
 
   it('should return error when wrong number of argument', () => {
@@ -16,7 +17,7 @@ describe('function DEC2HEX', () => {
       ['=DEC2HEX("foo", 2, 3)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA))
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
   })
 
   it('should work', () => {
@@ -68,10 +69,10 @@ describe('function DEC2HEX', () => {
       ['=DEC2HEX(549755813888)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM))
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.ValueBaseSmall))
     expect(engine.getCellValue(adr('A2'))).toEqual('8000000000')
     expect(engine.getCellValue(adr('A3'))).toEqual('7FFFFFFFFF')
-    expect(engine.getCellValue(adr('A4'))).toEqual(detailedError(ErrorType.NUM))
+    expect(engine.getCellValue(adr('A4'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.ValueBaseLarge))
   })
 
   it('should respect second argument and fill with zeros for positive arguments', () => {
@@ -100,17 +101,7 @@ describe('function DEC2HEX', () => {
       ['=DEC2HEX(-2, 12)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM))
-    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NUM))
-  })
-
-  // Inconsistency with Product 1
-  it('range value results in VALUE error', () => {
-    const engine = HyperFormula.buildFromArray([
-      ['=1'],
-      ['=2', '=DEC2HEX(A1:A2)'],
-    ])
-
-    expect(engine.getCellValue(adr('B2'))).toEqual(detailedError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.ValueSmall))
+    expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.ValueLarge))
   })
 })

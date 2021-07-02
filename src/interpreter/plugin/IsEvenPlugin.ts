@@ -1,13 +1,14 @@
 /**
  * @license
- * Copyright (c) 2020 Handsoncode. All rights reserved.
+ * Copyright (c) 2021 Handsoncode. All rights reserved.
  */
 
-import {InternalScalarValue, SimpleCellAddress} from '../../Cell'
 import {ProcedureAst} from '../../parser'
-import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
+import {InterpreterState} from '../InterpreterState'
+import {InterpreterValue} from '../InterpreterValue'
+import {ArgumentTypes, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
 
-export class IsEvenPlugin extends FunctionPlugin {
+export class IsEvenPlugin extends FunctionPlugin implements FunctionPluginTypecheck<IsEvenPlugin>{
   public static implementedFunctions = {
     'ISEVEN': {
       method: 'iseven',
@@ -17,8 +18,8 @@ export class IsEvenPlugin extends FunctionPlugin {
     },
   }
 
-  public iseven(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('ISEVEN'),
+  public iseven(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('ISEVEN'),
       (val) => (val % 2 === 0)
     )
   }

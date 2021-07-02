@@ -1,5 +1,6 @@
 import {HyperFormula} from '../../src'
 import {CellValueType, ErrorType} from '../../src/Cell'
+import {ErrorMessage} from '../../src/error-message'
 import {adr, detailedError} from '../testUtils'
 
 describe('function HEX2DEC', () => {
@@ -8,7 +9,7 @@ describe('function HEX2DEC', () => {
       ['=HEX2DEC("foo", 2, 3)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA))
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
   })
 
   it('should not work for non-hex arguments', () => {
@@ -18,9 +19,9 @@ describe('function HEX2DEC', () => {
       ['=HEX2DEC(TRUE())'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM))
-    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NUM))
-    expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.NUM))
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.NotHex))
+    expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.NotHex))
+    expect(engine.getCellValue(adr('A3'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.NotHex))
   })
 
   it('should work', () => {
@@ -82,17 +83,7 @@ describe('function HEX2DEC', () => {
       ['=HEX2DEC("7777EE70D2")'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM))
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.NotHex))
     expect(engine.getCellValue(adr('A2'))).toEqual(513113223378)
-  })
-
-  // Inconsistency with Product 1
-  it('range value results in VALUE error', () => {
-    const engine = HyperFormula.buildFromArray([
-      ['=1'],
-      ['=2', '=HEX2DEC(A1:A2)'],
-    ])
-
-    expect(engine.getCellValue(adr('B2'))).toEqual(detailedError(ErrorType.VALUE))
   })
 })

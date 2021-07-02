@@ -1,8 +1,9 @@
 /**
  * @license
- * Copyright (c) 2020 Handsoncode. All rights reserved.
+ * Copyright (c) 2021 Handsoncode. All rights reserved.
  */
 
+import {FunctionTranslationsPackage} from './FunctionRegistry'
 import {
   FunctionArgument,
   FunctionMetadata,
@@ -10,7 +11,6 @@ import {
   FunctionPluginDefinition,
   ImplementedFunctions
 } from './plugin/FunctionPlugin'
-import {FunctionTranslationsPackage} from './FunctionRegistry'
 
 export { 
   FunctionPluginDefinition,

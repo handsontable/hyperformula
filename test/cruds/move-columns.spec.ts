@@ -1,5 +1,5 @@
 import {ExportedCellChange, HyperFormula, InvalidArgumentsError} from '../../src'
-import {ErrorType, simpleCellAddress} from '../../src/Cell'
+import {ErrorType} from '../../src/Cell'
 import {CellAddress} from '../../src/parser'
 import {
   adr,
@@ -59,7 +59,7 @@ describe('Ensure it is possible to move columns', () => {
 
   it('should not be possible to move row with formula matrix', () => {
     const engine = HyperFormula.buildFromArray([
-      ['1', '{=TRANSPOSE(A1:A2)}', '{=TRANSPOSE(A1:A2)}'],
+      ['1', '=TRANSPOSE(A1:A2)'],
       ['2'],
     ])
 
@@ -69,7 +69,7 @@ describe('Ensure it is possible to move columns', () => {
 
   it('should not be possible to move row inside formula matrix', () => {
     const engine = HyperFormula.buildFromArray([
-      ['1', '', '{=TRANSPOSE(A1:A2)}', '{=TRANSPOSE(A1:A2)}'],
+      ['1', '', '=TRANSPOSE(A1:A2)'],
       ['2'],
     ])
 
@@ -158,8 +158,8 @@ describe('Move columns', () => {
     expect(engine.getCellValue(adr('A2'))).toEqual(1)
     expect(engine.getCellValue(adr('B1'))).toEqual(1)
     expect(engine.getCellValue(adr('B2'))).toEqual(1)
-    expect(extractReference(engine, adr('A1'))).toEqual(CellAddress.relative(null, 1, 0))
-    expect(extractReference(engine, adr('B2'))).toEqual(CellAddress.relative(null, -1, 0))
+    expect(extractReference(engine, adr('A1'))).toEqual(CellAddress.relative(0, 1))
+    expect(extractReference(engine, adr('B2'))).toEqual(CellAddress.relative(0, -1))
   })
 
   it('should adjust absolute references', () => {
@@ -170,8 +170,8 @@ describe('Move columns', () => {
 
     engine.moveColumns(0, 0, 1, 2)
 
-    expect(extractReference(engine, adr('B1'))).toEqual(CellAddress.absolute(null, 0, 0))
-    expect(extractReference(engine, adr('B2'))).toEqual(CellAddress.relative(null, -1, 0))
+    expect(extractReference(engine, adr('B1'))).toEqual(CellAddress.absolute( 0, 0))
+    expect(extractReference(engine, adr('B2'))).toEqual(CellAddress.relative(0, -1))
   })
 
   it('should adjust range', () => {
@@ -195,7 +195,7 @@ describe('Move columns', () => {
     const changes = engine.moveColumns(0, 1, 1, 3)
 
     expect(changes.length).toEqual(1)
-    expect(changes).toContainEqual(new ExportedCellChange(simpleCellAddress(0, 2, 1), 0))
+    expect(changes).toContainEqual(new ExportedCellChange(adr('C2'), 0))
   })
 
   it('should return #CYCLE when moving formula onto referred range', () => {
@@ -205,8 +205,8 @@ describe('Move columns', () => {
 
     engine.moveColumns(0, 3, 1, 1)
 
-    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.CYCLE))
-    expect(engine.getCellValue(adr('E1'))).toEqual(detailedError(ErrorType.CYCLE))
+    expect(engine.getCellValue(adr('B1'))).toEqualError(detailedError(ErrorType.CYCLE))
+    expect(engine.getCellValue(adr('E1'))).toEqualError(detailedError(ErrorType.CYCLE))
   })
 
   it('should work with moving formulas', () => {
@@ -226,7 +226,7 @@ describe('Move columns', () => {
 
     engine.moveColumns(0, 0, 1, 2)
 
-    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.CYCLE))
+    expect(engine.getCellValue(adr('B1'))).toEqualError(detailedError(ErrorType.CYCLE))
     expect(engine.getCellFormula(adr('B1'))).toEqual('=SUM(A1:C1)')
   })
 
@@ -275,7 +275,7 @@ describe('Move columns - column ranges', () => {
 
     engine.moveColumns(0, 0, 1, 2)
 
-    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.CYCLE))
+    expect(engine.getCellValue(adr('B1'))).toEqualError(detailedError(ErrorType.CYCLE))
     expect(engine.getCellFormula(adr('B1'))).toEqual('=SUM(A:C)')
   })
 })

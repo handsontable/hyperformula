@@ -1,4 +1,6 @@
 import {ErrorType, HyperFormula} from '../../src'
+import {CellValueDetailedType} from '../../src/Cell'
+import {ErrorMessage} from '../../src/error-message'
 import {adr, detailedError} from '../testUtils'
 
 describe('Function RATE', () => {
@@ -7,8 +9,8 @@ describe('Function RATE', () => {
       ['=RATE(1,1)', '=RATE(1, 1, 1, 1, 1, 1, 1)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA))
-    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.NA))
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
+    expect(engine.getCellValue(adr('B1'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
   })
 
   it('should calculate the correct value with correct arguments and defaults', () => {
@@ -23,15 +25,16 @@ describe('Function RATE', () => {
     ])
 
     expect(engine.getCellValue(adr('A1'))).toBeCloseTo(0.228933070977096)
+    expect(engine.getCellValueDetailedType(adr('A1'))).toBe(CellValueDetailedType.NUMBER_PERCENT)
     //inconsistency with product #1 (returns different value)
     expect(engine.getCellValue(adr('A2'))).toBeCloseTo(-0.499692679085513)
     //inconsistency with product #1 (returns different value)
     expect(engine.getCellValue(adr('A3'))).toBeCloseTo(-0.99009900990099)
     //inconsistency with product #1 (returns value)
-    expect(engine.getCellValue(adr('A4'))).toEqual(detailedError(ErrorType.NUM))
+    expect(engine.getCellValue(adr('A4'))).toEqualError(detailedError(ErrorType.NUM))
     //inconsistency with product #1 (returns value)
-    expect(engine.getCellValue(adr('A5'))).toEqual(detailedError(ErrorType.NUM))
-    expect(engine.getCellValue(adr('A6'))).toEqual(detailedError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A5'))).toEqualError(detailedError(ErrorType.NUM))
+    expect(engine.getCellValue(adr('A6'))).toEqualError(detailedError(ErrorType.VALUE))
     //inconsistency with product #1 (returns #NUM!)
     expect(engine.getCellValue(adr('A7'))).toBeCloseTo(-0.8)
   })

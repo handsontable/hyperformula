@@ -1,15 +1,15 @@
 /**
  * @license
- * Copyright (c) 2020 Handsoncode. All rights reserved.
+ * Copyright (c) 2021 Handsoncode. All rights reserved.
  */
 
 import {IToken} from 'chevrotain'
 import {CellError} from '../Cell'
+import {AddressWithSheet} from './Address'
 import {CellAddress} from './CellAddress'
 import {ColumnAddress} from './ColumnAddress'
 import {IExtendedToken} from './FormulaParser'
 import {RowAddress} from './RowAddress'
-import {AddressWithSheet} from './Address'
 
 export type Ast =
   NumberAst
@@ -39,6 +39,7 @@ export type Ast =
   | ErrorAst
   | ErrorWithRawInputAst
   | EmptyArgAst
+  | MatrixAst
 
 export interface ParsingError {
   type: ParsingErrorType,
@@ -97,6 +98,8 @@ export enum AstNodeType {
   ERROR = 'ERROR',
 
   ERROR_WITH_RAW_INPUT = 'ERROR_WITH_RAW_INPUT',
+
+  MATRIX = 'MATRIX',
 }
 
 export enum RangeSheetReferenceType {
@@ -393,6 +396,18 @@ export const buildProcedureAst = (procedureName: string, args: Ast[], leadingWhi
   internalWhitespace: internalWhitespace?.image,
 })
 
+export interface MatrixAst extends AstWithInternalWhitespace {
+  type: AstNodeType.MATRIX,
+  args: Ast[][],
+}
+
+export const buildMatrixAst = (args: Ast[][], leadingWhitespace?: IToken, internalWhitespace?: IToken): MatrixAst => ({
+  type: AstNodeType.MATRIX,
+  args,
+  leadingWhitespace: leadingWhitespace?.image,
+  internalWhitespace: internalWhitespace?.image,
+})
+
 export interface NamedExpressionAst extends AstWithInternalWhitespace {
   type: AstNodeType.NAMED_EXPRESSION,
   expressionName: string,
@@ -446,11 +461,11 @@ export const buildParsingErrorAst = (): ErrorAst => ({
 })
 
 function assertRangeConsistency(start: AddressWithSheet, end: AddressWithSheet, sheetReferenceType: RangeSheetReferenceType) {
-  if ((start.sheet !== null && end.sheet === null) || (start.sheet === null && end.sheet !== null)) {
+  if ((start.sheet !== undefined && end.sheet === undefined) || (start.sheet === undefined && end.sheet !== undefined)) {
     throw new Error('Start address inconsistent with end address')
   }
-  if ((start.sheet === null && sheetReferenceType !== RangeSheetReferenceType.RELATIVE)
-    || (start.sheet !== null && sheetReferenceType === RangeSheetReferenceType.RELATIVE)) {
+  if ((start.sheet === undefined && sheetReferenceType !== RangeSheetReferenceType.RELATIVE)
+    || (start.sheet !== undefined && sheetReferenceType === RangeSheetReferenceType.RELATIVE)) {
     throw new Error('Sheet address inconsistent with sheet reference type')
   }
 }

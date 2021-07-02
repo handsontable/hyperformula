@@ -1,4 +1,5 @@
 import {ErrorType, HyperFormula} from '../../src'
+import {ErrorMessage} from '../../src/error-message'
 import {adr, detailedError} from '../testUtils'
 
 describe('Function CSCH', () => {
@@ -11,14 +12,14 @@ describe('Function CSCH', () => {
   it('when value not numeric', () => {
     const engine = HyperFormula.buildFromArray([['=CSCH("foo")']])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.NumberCoercion))
   })
 
   it('wrong number of arguments', () => {
     const engine = HyperFormula.buildFromArray([['=CSCH()', '=CSCH(1,-1)']])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA))
-    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.NA))
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
+    expect(engine.getCellValue(adr('B1'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
   })
 
   it('use number coercion',  () => {
@@ -34,7 +35,7 @@ describe('Function CSCH', () => {
       [0, '=CSCH(A1)'],
     ])
 
-    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.DIV_BY_ZERO))
+    expect(engine.getCellValue(adr('B1'))).toEqualError(detailedError(ErrorType.DIV_BY_ZERO))
   })
 
   it('errors propagation', () => {
@@ -42,17 +43,6 @@ describe('Function CSCH', () => {
       ['=CSCH(4/0)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.DIV_BY_ZERO))
-  })
-
-  // Inconsistency with Product 1
-  it('range value results in VALUE error', () => {
-    const engine = HyperFormula.buildFromArray([
-      ['0'],
-      ['1', '=CSCH(A1:A3)'],
-      ['-1'],
-    ])
-
-    expect(engine.getCellValue(adr('B2'))).toEqual(detailedError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.DIV_BY_ZERO))
   })
 })

@@ -1,13 +1,14 @@
 /**
  * @license
- * Copyright (c) 2020 Handsoncode. All rights reserved.
+ * Copyright (c) 2021 Handsoncode. All rights reserved.
  */
 
-import {InternalScalarValue, SimpleCellAddress} from '../../Cell'
 import {ProcedureAst} from '../../parser'
-import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
+import {InterpreterState} from '../InterpreterState'
+import {InterpreterValue} from '../InterpreterValue'
+import {ArgumentTypes, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
 
-export class ExpPlugin extends FunctionPlugin {
+export class ExpPlugin extends FunctionPlugin implements FunctionPluginTypecheck<ExpPlugin>{
   public static implementedFunctions = {
     'EXP': {
       method: 'exp',
@@ -23,9 +24,9 @@ export class ExpPlugin extends FunctionPlugin {
    * Calculates the exponent for basis e
    *
    * @param ast
-   * @param formulaAddress
+   * @param state
    */
-  public exp(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('EXP'), Math.exp)
+  public exp(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('EXP'), Math.exp)
   }
 }

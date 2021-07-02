@@ -1,24 +1,14 @@
 /**
  * @license
- * Copyright (c) 2020 Handsoncode. All rights reserved.
+ * Copyright (c) 2021 Handsoncode. All rights reserved.
  */
 
-import {CellType, CellValueType, ErrorType, SimpleCellAddress} from './Cell'
-import {
-  CellValue,
-  DetailedCellError,
-  ExportedCellChange,
-  ExportedChange,
-  ExportedNamedExpressionChange,
-  NoErrorCellValue
-} from './CellValue'
-import {HyperFormula} from './HyperFormula'
-import {Config, ConfigParams} from './Config'
-import {RawTranslationPackage} from './i18n'
-import enGB from './i18n/languages/enGB'
-import {Sheet, SheetDimensions, Sheets} from './Sheet'
+import {SimpleCellRange} from './AbsoluteCellRange'
+import {CellError, CellType, CellValueDetailedType, CellValueType, ErrorType, SimpleCellAddress} from './Cell'
 import {RawCellContent} from './CellContentParser'
-import {NamedExpression, NamedExpressionOptions} from './NamedExpressions'
+import {CellValue, DetailedCellError, NoErrorCellValue} from './CellValue'
+import {Config, ConfigParams} from './Config'
+import {ColumnRowIndex} from './CrudOperations'
 import {
   ConfigValueTooBigError,
   ConfigValueTooSmallError,
@@ -30,7 +20,6 @@ import {
   InvalidArgumentsError,
   LanguageAlreadyRegisteredError,
   LanguageNotRegisteredError,
-  MatrixFormulasNotSupportedError,
   MissingTranslationError,
   NamedExpressionDoesNotExistError,
   NamedExpressionNameIsAlreadyTakenError,
@@ -49,9 +38,16 @@ import {
   TargetLocationHasMatrixError,
   UnableToParseError
 } from './errors'
-import * as plugins from './interpreter/plugin'
+import {ExportedCellChange, ExportedChange, ExportedNamedExpressionChange} from './Exporter'
+import {HyperFormula} from './HyperFormula'
+import {RawTranslationPackage} from './i18n'
+import enGB from './i18n/languages/enGB'
 import {FunctionArgument, FunctionPlugin, FunctionPluginDefinition} from './interpreter'
-import {ColumnRowIndex} from './CrudOperations'
+import {FormatInfo} from './interpreter/InterpreterValue'
+import * as plugins from './interpreter/plugin'
+import {NamedExpression, NamedExpressionOptions} from './NamedExpressions'
+import {SerializedNamedExpression} from './Serialization'
+import {Sheet, SheetDimensions, Sheets} from './Sheet'
 
 /** @internal */
 class HyperFormulaNS extends HyperFormula {
@@ -59,6 +55,7 @@ class HyperFormulaNS extends HyperFormula {
   public static ErrorType = ErrorType
   public static CellType = CellType
   public static CellValueType = CellValueType
+  public static CellValueDetailedType = CellValueDetailedType
   public static DetailedCellError = DetailedCellError
   public static ExportedCellChange = ExportedCellChange
   public static ExportedNamedExpressionChange = ExportedNamedExpressionChange
@@ -73,7 +70,6 @@ class HyperFormulaNS extends HyperFormula {
   public static InvalidArgumentsError = InvalidArgumentsError
   public static LanguageNotRegisteredError = LanguageNotRegisteredError
   public static LanguageAlreadyRegisteredError = LanguageAlreadyRegisteredError
-  public static MatrixFormulasNotSupportedError = MatrixFormulasNotSupportedError
   public static MissingTranslationError = MissingTranslationError
   public static NamedExpressionDoesNotExistError = NamedExpressionDoesNotExistError
   public static NamedExpressionNameIsAlreadyTakenError = NamedExpressionNameIsAlreadyTakenError
@@ -114,10 +110,12 @@ export {
   ConfigParams,
   ExportedChange,
   RawCellContent,
+  FormatInfo,
   Sheet,
   Sheets,
   SheetDimensions,
   SimpleCellAddress,
+  SimpleCellRange,
   ColumnRowIndex,
   RawTranslationPackage,
   FunctionPluginDefinition,
@@ -127,10 +125,12 @@ export {
   HyperFormula,
   CellType,
   CellValueType,
+  CellValueDetailedType,
   ErrorType,
   ExportedCellChange,
   ExportedNamedExpressionChange,
   DetailedCellError,
+  CellError,
   ConfigValueTooBigError,
   ConfigValueTooSmallError,
   EvaluationSuspendedError,
@@ -142,7 +142,6 @@ export {
   InvalidArgumentsError,
   LanguageAlreadyRegisteredError,
   LanguageNotRegisteredError,
-  MatrixFormulasNotSupportedError,
   MissingTranslationError,
   NamedExpressionDoesNotExistError,
   NamedExpressionNameIsAlreadyTakenError,
@@ -160,4 +159,5 @@ export {
   SourceLocationHasMatrixError,
   TargetLocationHasMatrixError,
   UnableToParseError,
+  SerializedNamedExpression,
 }

@@ -5,16 +5,18 @@ import {Config} from '../src/Config'
 import {DateTimeHelper} from '../src/DateTimeHelper'
 import {FormulaCellVertex, MatrixVertex, RangeVertex} from '../src/DependencyGraph'
 import {defaultStringifyDateTime} from '../src/format/format'
+import {complex} from '../src/interpreter/ArithmeticHelper'
 import {
   AstNodeType,
-  buildCellErrorAst,
   CellAddress,
   CellRangeAst,
   CellReferenceAst,
-  ProcedureAst, simpleCellAddressToString,
+  ErrorAst,
+  ProcedureAst,
+  simpleCellAddressToString,
 } from '../src/parser'
-import {EngineComparator} from './graphComparator'
 import {ColumnRangeAst, RowRangeAst} from '../src/parser/Ast'
+import {EngineComparator} from './graphComparator'
 
 export const extractReference = (engine: HyperFormula, address: SimpleCellAddress): CellAddress => {
   return ((engine.addressMapping.fetchCell(address) as FormulaCellVertex).getFormula(engine.lazilyTransformingAstService) as CellReferenceAst).reference
@@ -35,23 +37,26 @@ export const extractColumnRange = (engine: HyperFormula, address: SimpleCellAddr
 export const extractRowRange = (engine: HyperFormula, address: SimpleCellAddress): AbsoluteRowRange => {
   const formula = (engine.addressMapping.fetchCell(address) as FormulaCellVertex).getFormula(engine.lazilyTransformingAstService) as ProcedureAst
   const rangeAst = formula.args[0] as RowRangeAst
-  return AbsoluteRowRange.fromRowRange(rangeAst, address)
+  return AbsoluteRowRange.fromRowRangeAst(rangeAst, address)
 }
 
 export const extractMatrixRange = (engine: HyperFormula, address: SimpleCellAddress): AbsoluteCellRange => {
-  const formula = (engine.addressMapping.fetchCell(address) as MatrixVertex).getFormula() as ProcedureAst
+  const formula = (engine.addressMapping.fetchCell(address) as MatrixVertex).getFormula(engine.lazilyTransformingAstService) as ProcedureAst
   const rangeAst = formula.args[0] as CellRangeAst
   return AbsoluteCellRange.fromCellRange(rangeAst, address)
 }
 
 export const expectReferenceToHaveRefError = (engine: HyperFormula, address: SimpleCellAddress) => {
-  const formula = (engine.addressMapping.fetchCell(address) as FormulaCellVertex).getFormula(engine.lazilyTransformingAstService)
-  expect(formula).toEqual(buildCellErrorAst(new CellError(ErrorType.REF)))
+  const errorAst = (engine.addressMapping.fetchCell(address) as FormulaCellVertex).getFormula(engine.lazilyTransformingAstService) as ErrorAst
+  expect(errorAst.type).toEqual(AstNodeType.ERROR)
+  expect(errorAst.error).toEqualError(new CellError(ErrorType.REF))
 }
 
 export const expectFunctionToHaveRefError = (engine: HyperFormula, address: SimpleCellAddress) => {
   const formula = (engine.addressMapping.fetchCell(address) as FormulaCellVertex).getFormula(engine.lazilyTransformingAstService) as ProcedureAst
-  expect(formula.args.find((arg) => arg!==undefined && arg.type === AstNodeType.ERROR)).toEqual(buildCellErrorAst(new CellError(ErrorType.REF)))
+  const errorAst = formula.args.find((arg) => arg !== undefined && arg.type === AstNodeType.ERROR) as ErrorAst
+  expect(errorAst.type).toEqual(AstNodeType.ERROR)
+  expect(errorAst.error).toEqualError(new CellError(ErrorType.REF))
 }
 
 export const rangeAddr = (range: AbsoluteCellRange) => {
@@ -60,7 +65,7 @@ export const rangeAddr = (range: AbsoluteCellRange) => {
   return `${start}:${end}`
 }
 
-export const verifyRangesInSheet = (engine: HyperFormula, sheet: number,  ranges: string[]) => {
+export const verifyRangesInSheet = (engine: HyperFormula, sheet: number, ranges: string[]) => {
   const rangeVerticesInMapping = Array.from(engine.rangeMapping.rangesInSheet(sheet))
     .map((vertex) => rangeAddr(vertex.range))
 
@@ -81,11 +86,21 @@ export const expectNoDuplicates = (array: any[]) => {
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const expectArrayWithSameContent = (expected: any[], actual: any[]) => {
   expect(actual.length).toBe(expected.length)
-  for(const iter of expected) {
+  for (const iter of expected) {
     // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
     // @ts-ignore
     expect(actual).toContainEqual(iter)
   }
+}
+
+export const expectToBeCloseForComplex = (engine: HyperFormula, cell: string, expected: string, precision?: number) => {
+  // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+  // @ts-ignore
+  const coerce = (arg: CellValue): complex => engine.evaluator.interpreter.arithmeticHelper.coerceScalarToComplex(arg)
+  const actualVal: complex = coerce(engine.getCellValue(adr(cell)))
+  const expectedVal: complex = coerce(expected)
+  expect(expectedVal[0]).toBeCloseTo(actualVal[0], precision)
+  expect(expectedVal[1]).toBeCloseTo(actualVal[1], precision)
 }
 
 export const verifyValues = (engine: HyperFormula) => {
@@ -137,13 +152,19 @@ export function detailedError(errorType: ErrorType, message?: string, config?: C
   return new DetailedCellError(error, config.translationPackage.getErrorTranslation(errorType))
 }
 
+export function detailedErrorWithOrigin(errorType: ErrorType, address: string, message?: string, config?: Config): DetailedCellError {
+  config = new Config(config)
+  const error = new CellError(errorType, message)
+  return new DetailedCellError(error, config.translationPackage.getErrorTranslation(errorType), address)
+}
+
 export const expectEngineToBeTheSameAs = (actual: HyperFormula, expected: HyperFormula) => {
   const comparator = new EngineComparator(expected, actual)
   comparator.compare()
 }
 
 export function dateNumberToString(dateNumber: CellValue, config: Config): string | DetailedCellError {
-  if(dateNumber instanceof DetailedCellError) {
+  if (dateNumber instanceof DetailedCellError) {
     return dateNumber
   }
   const dateTimeHelper = new DateTimeHelper(config)
@@ -152,20 +173,12 @@ export function dateNumberToString(dateNumber: CellValue, config: Config): strin
 }
 
 export function timeNumberToString(timeNumber: CellValue, config: Config): string | DetailedCellError {
-  if(timeNumber instanceof DetailedCellError) {
+  if (timeNumber instanceof DetailedCellError) {
     return timeNumber
   }
   const dateTimeHelper = new DateTimeHelper(config)
   const timeString = defaultStringifyDateTime(dateTimeHelper.numberToSimpleDateTime(timeNumber as number), 'hh:mm:ss.sss')
   return timeString ?? ''
-}
-
-export function expectCloseTo(actual: CellValue, expected: number, precision: number = 0.000001) {
-  if (typeof actual !== 'number') {
-    expect(true).toBe(false)
-  } else {
-    expect(Math.abs(actual - expected)).toBeLessThan(precision)
-  }
 }
 
 export function unregisterAllLanguages() {

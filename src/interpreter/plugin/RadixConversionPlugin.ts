@@ -1,13 +1,16 @@
 /**
  * @license
- * Copyright (c) 2020 Handsoncode. All rights reserved.
+ * Copyright (c) 2021 Handsoncode. All rights reserved.
  */
 
-import {CellError, ErrorType, InternalScalarValue, SimpleCellAddress} from '../../Cell'
+import {CellError, ErrorType} from '../../Cell'
+import {ErrorMessage} from '../../error-message'
 import {padLeft} from '../../format/format'
 import {Maybe} from '../../Maybe'
 import {ProcedureAst} from '../../parser'
-import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
+import {InterpreterState} from '../InterpreterState'
+import {InterpreterValue} from '../InterpreterValue'
+import {ArgumentTypes, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
 
 const MAX_LENGTH = 10
 const DECIMAL_NUMBER_OF_BITS = 255
@@ -15,7 +18,7 @@ const MIN_BASE = 2
 const MAX_BASE = 36
 const ALPHABET = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'
 
-export class RadixConversionPlugin extends FunctionPlugin {
+export class RadixConversionPlugin extends FunctionPlugin implements FunctionPluginTypecheck<RadixConversionPlugin>{
   public static implementedFunctions = {
     'DEC2BIN': {
       method: 'dec2bin',
@@ -115,123 +118,123 @@ export class RadixConversionPlugin extends FunctionPlugin {
     },
   }
 
-  public dec2bin(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('DEC2BIN'),
+  public dec2bin(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('DEC2BIN'),
       (value, places) => decimalToBaseWithExactPadding(value, 2, places)
     )
   }
 
-  public dec2oct(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('DEC2OCT'),
+  public dec2oct(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('DEC2OCT'),
       (value, places) => decimalToBaseWithExactPadding(value, 8, places)
     )
   }
 
-  public dec2hex(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('DEC2HEX'),
+  public dec2hex(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('DEC2HEX'),
       (value, places) => decimalToBaseWithExactPadding(value, 16, places)
     )
   }
 
-  public bin2dec(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('BIN2DEC'), (binary) => {
+  public bin2dec(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('BIN2DEC'), (binary) => {
         const binaryWithSign = coerceStringToBase(binary, 2, MAX_LENGTH)
         if(binaryWithSign === undefined) {
-          return new CellError(ErrorType.NUM)
+          return new CellError(ErrorType.NUM, ErrorMessage.NotBinary)
         }
         return twoComplementToDecimal(binaryWithSign, 2)
       })
   }
 
-  public bin2oct(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('BIN2OCT'), (binary, places) => {
+  public bin2oct(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('BIN2OCT'), (binary, places) => {
       const binaryWithSign = coerceStringToBase(binary, 2, MAX_LENGTH)
       if(binaryWithSign === undefined) {
-        return new CellError(ErrorType.NUM)
+        return new CellError(ErrorType.NUM, ErrorMessage.NotBinary)
       }
       return decimalToBaseWithExactPadding(twoComplementToDecimal(binaryWithSign, 2), 8, places)
     })
   }
 
-  public bin2hex(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('BIN2HEX'), (binary, places) => {
+  public bin2hex(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('BIN2HEX'), (binary, places) => {
       const binaryWithSign = coerceStringToBase(binary, 2, MAX_LENGTH)
       if(binaryWithSign === undefined) {
-        return new CellError(ErrorType.NUM)
+        return new CellError(ErrorType.NUM, ErrorMessage.NotBinary)
       }
       return decimalToBaseWithExactPadding(twoComplementToDecimal(binaryWithSign, 2), 16, places)
     })
   }
 
-  public oct2dec(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('OCT2DEC'), (octal) => {
+  public oct2dec(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('OCT2DEC'), (octal) => {
         const octalWithSign = coerceStringToBase(octal, 8, MAX_LENGTH)
         if(octalWithSign === undefined) {
-          return new CellError(ErrorType.NUM)
+          return new CellError(ErrorType.NUM, ErrorMessage.NotOctal)
         }
         return twoComplementToDecimal(octalWithSign, 8)
       })
   }
 
-  public oct2bin(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('OCT2BIN'), (octal, places) => {
+  public oct2bin(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('OCT2BIN'), (octal, places) => {
       const octalWithSign = coerceStringToBase(octal, 8, MAX_LENGTH)
       if(octalWithSign === undefined) {
-        return new CellError(ErrorType.NUM)
+        return new CellError(ErrorType.NUM, ErrorMessage.NotOctal)
       }
       return decimalToBaseWithExactPadding(twoComplementToDecimal(octalWithSign, 8), 2, places)
     })
   }
 
-  public oct2hex(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('OCT2HEX'), (octal, places) => {
+  public oct2hex(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('OCT2HEX'), (octal, places) => {
       const octalWithSign = coerceStringToBase(octal, 8, MAX_LENGTH)
       if(octalWithSign === undefined) {
-        return new CellError(ErrorType.NUM)
+        return new CellError(ErrorType.NUM, ErrorMessage.NotOctal)
       }
       return decimalToBaseWithExactPadding(twoComplementToDecimal(octalWithSign, 8), 16, places)
     })
   }
 
- public hex2dec(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('HEX2DEC'), (hexadecimal) => {
+ public hex2dec(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('HEX2DEC'), (hexadecimal) => {
         const hexadecimalWithSign = coerceStringToBase(hexadecimal, 16, MAX_LENGTH)
         if(hexadecimalWithSign === undefined) {
-          return new CellError(ErrorType.NUM)
+          return new CellError(ErrorType.NUM, ErrorMessage.NotHex)
         }
         return twoComplementToDecimal(hexadecimalWithSign, 16)
       })
   }
 
-  public hex2bin(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('HEX2BIN'), (hexadecimal, places) => {
+  public hex2bin(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('HEX2BIN'), (hexadecimal, places) => {
       const hexadecimalWithSign = coerceStringToBase(hexadecimal, 16, MAX_LENGTH)
       if(hexadecimalWithSign === undefined) {
-        return new CellError(ErrorType.NUM)
+        return new CellError(ErrorType.NUM, ErrorMessage.NotHex)
       }
       return decimalToBaseWithExactPadding(twoComplementToDecimal(hexadecimalWithSign, 16), 2, places)
     })
   }
 
-  public hex2oct(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('HEX2OCT'), (hexadecimal, places) => {
+  public hex2oct(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('HEX2OCT'), (hexadecimal, places) => {
       const hexadecimalWithSign = coerceStringToBase(hexadecimal, 16, MAX_LENGTH)
       if(hexadecimalWithSign === undefined) {
-        return new CellError(ErrorType.NUM)
+        return new CellError(ErrorType.NUM, ErrorMessage.NotHex)
       }
       return decimalToBaseWithExactPadding(twoComplementToDecimal(hexadecimalWithSign, 16), 8, places)
     })
   }
 
-  public base(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('BASE'), decimalToBaseWithMinimumPadding)
+  public base(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('BASE'), decimalToBaseWithMinimumPadding)
   }
 
-  public decimal(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('DECIMAL'), (arg, base) => {
+  public decimal(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('DECIMAL'), (arg, base) => {
       const input = coerceStringToBase(arg, base, DECIMAL_NUMBER_OF_BITS)
       if(input === undefined) {
-        return new CellError(ErrorType.NUM)
+        return new CellError(ErrorType.NUM, ErrorMessage.NotHex)
       }
       return parseInt(input, base)
     })
@@ -248,14 +251,17 @@ function coerceStringToBase(value: string, base: number, maxLength: number): May
 }
 
 function decimalToBaseWithExactPadding(value: number, base: number, places?: number): string | CellError {
-  if (value > maxValFromBase(base) || value < minValFromBase(base) ) {
-    return new CellError(ErrorType.NUM)
+  if (value > maxValFromBase(base)) {
+    return new CellError(ErrorType.NUM, ErrorMessage.ValueBaseLarge)
+  }
+  if (value < minValFromBase(base) ) {
+    return new CellError(ErrorType.NUM, ErrorMessage.ValueBaseSmall)
   }
   const result = decimalToRadixComplement(value, base)
   if (places === undefined || value < 0) {
     return result
   } else if (result.length > places) {
-    return new CellError(ErrorType.NUM)
+    return new CellError(ErrorType.NUM, ErrorMessage.ValueBaseLong)
   } else {
     return padLeft(result, places)
   }

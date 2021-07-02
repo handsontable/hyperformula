@@ -1,9 +1,10 @@
 /**
  * @license
- * Copyright (c) 2020 Handsoncode. All rights reserved.
+ * Copyright (c) 2021 Handsoncode. All rights reserved.
  */
 
 import {SheetCellAddress, SimpleCellAddress} from '../../Cell'
+import {Maybe} from '../../Maybe'
 import {ColumnsSpan, RowsSpan} from '../../Span'
 import {CellVertex} from '../Vertex'
 
@@ -17,7 +18,7 @@ export interface IAddressMappingStrategy {
    *
    * @param address - cell address
    */
-  getCell(address: SheetCellAddress): CellVertex | null,
+  getCell(address: SheetCellAddress): Maybe<CellVertex>,
 
   /**
    * Set vertex for given address

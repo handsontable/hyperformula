@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright (c) 2020 Handsoncode. All rights reserved.
+ * Copyright (c) 2021 Handsoncode. All rights reserved.
  */
 
 import {CellError, ErrorType, SimpleCellAddress} from '../Cell'
@@ -30,7 +30,7 @@ export abstract class Transformer implements FormulaTransformer {
 
   public performEagerTransformations(graph: DependencyGraph, parser: ParserWithCaching): void {
     for (const node of graph.matrixFormulaNodes()) {
-      const [newAst, newAddress] = this.transformSingleAst(node.getFormula()!, node.getAddress())
+      const [newAst, newAddress] = this.transformSingleAst(node.getFormula(graph.lazilyTransformingAstService), node.getAddress(graph.lazilyTransformingAstService))
       const cachedAst = parser.rememberNewAst(newAst)
       node.setFormula(cachedAst)
       node.setAddress(newAddress)
@@ -65,31 +65,17 @@ export abstract class Transformer implements FormulaTransformer {
       case AstNodeType.STRING: {
         return ast
       }
-      case AstNodeType.PERCENT_OP: {
-        return {
-          ...ast,
-          type: ast.type,
-          value: this.transformAst(ast.value, address),
-        }
-      }
-      case AstNodeType.MINUS_UNARY_OP: {
-        return {
-          ...ast,
-          type: ast.type,
-          value: this.transformAst(ast.value, address),
-        }
-      }
+      case AstNodeType.PERCENT_OP:
+      case AstNodeType.MINUS_UNARY_OP:
       case AstNodeType.PLUS_UNARY_OP: {
         return {
           ...ast,
-          type: ast.type,
           value: this.transformAst(ast.value, address),
         }
       }
       case AstNodeType.FUNCTION_CALL: {
         return {
           ...ast,
-          type: ast.type,
           procedureName: ast.procedureName,
           args: ast.args.map((arg) => this.transformAst(arg, address)),
         }
@@ -97,14 +83,18 @@ export abstract class Transformer implements FormulaTransformer {
       case AstNodeType.PARENTHESIS: {
         return {
           ...ast,
-          type: ast.type,
           expression: this.transformAst(ast.expression, address),
+        }
+      }
+      case AstNodeType.MATRIX: {
+        return {
+          ...ast,
+          args: ast.args.map((row) => row.map(val => this.transformAst(val, address)))
         }
       }
       default: {
         return {
           ...ast,
-          type: ast.type,
           left: this.transformAst(ast.left, address),
           right: this.transformAst(ast.right, address),
         } as Ast

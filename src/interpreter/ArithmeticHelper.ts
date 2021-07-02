@@ -1,24 +1,46 @@
 /**
  * @license
- * Copyright (c) 2020 Handsoncode. All rights reserved.
+ * Copyright (c) 2021 Handsoncode. All rights reserved.
  */
 
-import {
-  CellError,
-  CellValueTypeOrd,
-  EmptyValue,
-  ErrorType,
-  getCellValueType,
-  InternalNoErrorCellValue,
-  InternalScalarValue
-} from '../Cell'
+import unorm from 'unorm'
+import {CellError, CellValueTypeOrd, ErrorType, getCellValueType} from '../Cell'
 import {Config} from '../Config'
 import {DateTimeHelper} from '../DateTimeHelper'
+import {ErrorMessage} from '../error-message'
 import {Maybe} from '../Maybe'
 import {NumberLiteralHelper} from '../NumberLiteralHelper'
 import {collatorFromConfig} from '../StringHelper'
-import {InterpreterValue, SimpleRangeValue} from './InterpreterValue'
+import {InterpreterState} from './InterpreterState'
+import {
+  cloneNumber,
+  CurrencyNumber,
+  DateNumber,
+  DateTimeNumber,
+  EmptyValue,
+  ExtendedNumber,
+  getRawValue,
+  getTypeFormatOfExtendedNumber,
+  InternalNoErrorScalarValue,
+  InternalScalarValue,
+  InterpreterValue,
+  isExtendedNumber,
+  NumberType,
+  NumberTypeWithFormat,
+  PercentNumber,
+  RawInterpreterValue,
+  RawNoErrorScalarValue,
+  RawScalarValue,
+  TimeNumber
+} from './InterpreterValue'
+import {SimpleRangeValue} from './SimpleRangeValue'
 import Collator = Intl.Collator
+
+export type complex = [number, number]
+
+const COMPLEX_NUMBER_SYMBOL = 'i'
+const complexParsingRegexp = /^\s*([+-]?)\s*(([\d\.,]+(e[+-]?\d+)?)\s*([ij]?)|([ij]))\s*(([+-])\s*([+-]?)\s*(([\d\.,]+(e[+-]?\d+)?)\s*([ij]?)|([ij])))?$/
+
 
 export class ArithmeticHelper {
   private readonly collator: Collator
@@ -32,15 +54,15 @@ export class ArithmeticHelper {
     this.actualEps = config.smartRounding ? config.precisionEpsilon : 0
   }
 
-  public eqMatcherFunction(pattern: string): (arg: InterpreterValue) => boolean {
+  public eqMatcherFunction(pattern: string): (arg: RawInterpreterValue) => boolean {
     const regexp = this.buildRegex(pattern)
     return (cellValue) => (typeof cellValue === 'string' && regexp.test(this.normalizeString(cellValue)))
   }
 
-  public neqMatcherFunction(pattern: string): (arg: InterpreterValue) => boolean {
+  public neqMatcherFunction(pattern: string): (arg: RawInterpreterValue) => boolean {
     const regexp = this.buildRegex(pattern)
     return (cellValue) => {
-      return (typeof cellValue !== 'string' || !regexp.test(this.normalizeString(cellValue)))
+      return (!(typeof cellValue === 'string') || !regexp.test(this.normalizeString(cellValue)))
     }
   }
 
@@ -95,16 +117,40 @@ export class ArithmeticHelper {
       str = str.toLowerCase()
     }
     if(!this.config.accentSensitive) {
-      str = str.normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+      str = normalizeString(str, 'nfd').replace(/[\u0300-\u036f]/g, '')
     }
     return str
   }
 
-  public compare(left: InternalNoErrorCellValue, right: InternalNoErrorCellValue): number {
+  public lt = (left: InternalNoErrorScalarValue, right: InternalNoErrorScalarValue): boolean => {
+    return this.compare(left, right) < 0
+  }
+
+  public leq = (left: InternalNoErrorScalarValue, right: InternalNoErrorScalarValue): boolean => {
+    return this.compare(left, right) <= 0
+  }
+
+  public gt = (left: InternalNoErrorScalarValue, right: InternalNoErrorScalarValue): boolean => {
+    return this.compare(left, right) > 0
+  }
+
+  public geq = (left: InternalNoErrorScalarValue, right: InternalNoErrorScalarValue): boolean => {
+    return this.compare(left, right) >= 0
+  }
+
+  public eq = (left: InternalNoErrorScalarValue, right: InternalNoErrorScalarValue): boolean => {
+    return this.compare(left, right) === 0
+  }
+
+  public neq = (left: InternalNoErrorScalarValue, right: InternalNoErrorScalarValue): boolean => {
+    return this.compare(left, right) !== 0
+  }
+
+  private compare(left: InternalNoErrorScalarValue, right: InternalNoErrorScalarValue): number {
     if (typeof left === 'string' || typeof right === 'string') {
       const leftTmp = typeof left === 'string' ? this.dateTimeHelper.dateStringToDateNumber(left) : left
       const rightTmp = typeof right === 'string' ? this.dateTimeHelper.dateStringToDateNumber(right) : right
-      if (typeof leftTmp === 'number' && typeof rightTmp === 'number') {
+      if (isExtendedNumber(leftTmp) && isExtendedNumber(rightTmp)) {
         return this.floatCmp(leftTmp, rightTmp)
       }
     }
@@ -115,11 +161,11 @@ export class ArithmeticHelper {
       right = coerceEmptyToValue(left)
     }
 
-    if ( typeof left === 'string' && typeof right === 'string') {
+    if ( typeof left === 'string' && typeof right === 'string' ) {
       return this.stringCmp(left, right)
     } else if ( typeof left === 'boolean' && typeof right === 'boolean' ) {
       return numberCmp(coerceBooleanToNumber(left), coerceBooleanToNumber(right))
-    } else if ( typeof left === 'number' && typeof right === 'number' ) {
+    } else if ( isExtendedNumber(left) && isExtendedNumber(right) ) {
       return this.floatCmp(left, right)
     } else if ( left === EmptyValue && right === EmptyValue ) {
       return 0
@@ -128,7 +174,9 @@ export class ArithmeticHelper {
     }
   }
 
-  public floatCmp(left: number, right: number): number {
+  public floatCmp(leftArg: ExtendedNumber, rightArg: ExtendedNumber): number {
+    const left = getRawValue(leftArg)
+    const right = getRawValue(rightArg)
     const mod = (1 + this.actualEps)
     if ((right >= 0) && (left * mod >= right) && (left <= right * mod)) {
       return 0
@@ -141,11 +189,15 @@ export class ArithmeticHelper {
     }
   }
 
-  public stringCmp(left: string, right: string): number {
+  private stringCmp(left: string, right: string): number {
     return this.collator.compare(left, right)
   }
 
-  public addWithEpsilon = (left: number, right: number) => {
+  public pow = (left: ExtendedNumber, right: ExtendedNumber) => {
+    return Math.pow(getRawValue(left), getRawValue(right))
+  }
+
+  public addWithEpsilonRaw = (left: number, right: number): number => {
     const ret = left + right
     if (Math.abs(ret) < this.actualEps * Math.abs(left)) {
       return 0
@@ -153,23 +205,34 @@ export class ArithmeticHelper {
       return ret
     }
   }
+  public addWithEpsilon = (left: ExtendedNumber, right: ExtendedNumber): ExtendedNumber => {
+    const typeOfResult = inferExtendedNumberTypeAdditive(left, right)
+    return this.ExtendedNumberFactory(this.addWithEpsilonRaw(getRawValue(left), getRawValue(right)), typeOfResult)
+  }
 
-  /**
-   * Adds two numbers
-   *
-   * Implementation of adding which is used in interpreter.
-   *
-   * @param left - left operand of addition
-   * @param right - right operand of addition
-   */
-  public nonstrictadd = (left: InternalScalarValue, right: InternalScalarValue): number | CellError => {
+  public unaryMinus = (arg: ExtendedNumber): ExtendedNumber => {
+    return cloneNumber(arg, -getRawValue(arg))
+  }
+
+  public unaryPlus = (arg: InternalScalarValue): InternalScalarValue => arg
+
+
+  public unaryPercent = (arg: ExtendedNumber): ExtendedNumber => {
+    return new PercentNumber(getRawValue(arg)/100)
+  }
+
+  public concat = (left: string, right: string): string => {
+    return left.concat(right)
+  }
+
+  public nonstrictadd = (left: RawScalarValue, right: RawScalarValue): number | CellError => {
     if (left instanceof CellError) {
       return left
     } else if (right instanceof CellError) {
       return right
     } else if (typeof left === 'number') {
       if (typeof right === 'number') {
-        return this.addWithEpsilon(left, right)
+        return this.addWithEpsilonRaw(left, right)
       } else {
         return left
       }
@@ -189,45 +252,288 @@ export class ArithmeticHelper {
    * @param right - right operand of subtraction
    * @param eps - precision of comparison
    */
-  public subtract = (left: number, right: number) => {
-    const ret = left - right
+  public subtract = (leftArg: ExtendedNumber, rightArg: ExtendedNumber): ExtendedNumber => {
+    const typeOfResult = inferExtendedNumberTypeAdditive(leftArg, rightArg)
+    const left = getRawValue(leftArg)
+    const right = getRawValue(rightArg)
+    let ret = left - right
     if (Math.abs(ret) < this.actualEps * Math.abs(left)) {
-      return 0
+      ret = 0
+    }
+    return this.ExtendedNumberFactory(ret, typeOfResult)
+  }
+
+  public divide = (leftArg: ExtendedNumber, rightArg: ExtendedNumber): ExtendedNumber | CellError => {
+    const left = getRawValue(leftArg)
+    const right = getRawValue(rightArg)
+    if (right === 0) {
+      return new CellError(ErrorType.DIV_BY_ZERO)
     } else {
-      return ret
+      const typeOfResult = inferExtendedNumberTypeMultiplicative(leftArg, rightArg)
+      return this.ExtendedNumberFactory(left / right, typeOfResult)
     }
   }
 
-  public coerceScalarToNumberOrError(arg: InternalScalarValue): number | CellError {
+  public multiply = (left: ExtendedNumber, right: ExtendedNumber): ExtendedNumber => {
+    const typeOfResult = inferExtendedNumberTypeMultiplicative(left, right)
+    return this.ExtendedNumberFactory(getRawValue(left)*getRawValue(right), typeOfResult)
+  }
+
+  public coerceScalarToNumberOrError(arg: InternalScalarValue): ExtendedNumber | CellError {
     if (arg instanceof CellError) {
       return arg
     }
-    return this.coerceToMaybeNumber(arg) ?? new CellError(ErrorType.VALUE)
+    return this.coerceToMaybeNumber(arg) ?? new CellError(ErrorType.VALUE, ErrorMessage.NumberCoercion)
   }
 
-  public coerceToMaybeNumber(arg: InternalScalarValue): Maybe<number> {
+  public coerceToMaybeNumber(arg: InternalScalarValue): Maybe<ExtendedNumber> {
     return this.coerceNonDateScalarToMaybeNumber(arg) ?? (
       typeof arg === 'string' ? this.dateTimeHelper.dateStringToDateNumber(arg) : undefined
     )
   }
 
-  public coerceNonDateScalarToMaybeNumber(arg: InternalScalarValue): Maybe<number> {
+  public coerceNonDateScalarToMaybeNumber(arg: InternalScalarValue): Maybe<ExtendedNumber> {
     if (arg === EmptyValue) {
       return 0
-    } else if (typeof arg === 'string' && this.numberLiteralsHelper.isNumber(arg)) {
-      return this.numberLiteralsHelper.numericStringToNumber(arg)
+    } else if (typeof arg === 'string') {
+      if(arg === '') {
+        return 0
+      }
+      return this.numberLiteralsHelper.numericStringToMaybeNumber(arg.trim())
+    } else if(isExtendedNumber(arg)) {
+      return arg
+    } else if(typeof arg === 'boolean') {
+      return Number(arg)
     } else {
-      if(typeof arg === 'string' && arg.length>0 && arg.trim() === '') {
-        return undefined
-      }
-      const coercedNumber = Number(arg)
-      if (isNaN(coercedNumber)) {
-        return undefined
-      } else {
-        return coercedNumber
-      }
+      return undefined
     }
   }
+
+  public coerceComplexExactRanges(args: InterpreterValue[]): complex[] | CellError {
+    const vals: (complex | SimpleRangeValue)[] = []
+    for(const arg of args) {
+      if(arg instanceof SimpleRangeValue) {
+        vals.push(arg)
+      } else if(arg !== EmptyValue) {
+        const coerced = this.coerceScalarToComplex(arg)
+        if(coerced instanceof CellError) {
+          return coerced
+        } else {
+          vals.push(coerced)
+        }
+      }
+    }
+    const expandedVals: complex[] = []
+    for(const val of vals) {
+      if(val instanceof SimpleRangeValue) {
+        const arr = this.manyToExactComplex(val.valuesFromTopLeftCorner())
+        if(arr instanceof CellError) {
+          return arr
+        } else {
+          expandedVals.push(...arr)
+        }
+      } else {
+        expandedVals.push(val)
+      }
+    }
+    return expandedVals
+
+  }
+
+  public manyToExactComplex = (args: InternalScalarValue[]): complex[] | CellError => {
+    const ret: complex[] = []
+    for(const arg of args) {
+      if(arg instanceof CellError) {
+        return arg
+      } else if (isExtendedNumber(arg) || typeof arg === 'string') {
+        const coerced = this.coerceScalarToComplex(arg)
+        if(!(coerced instanceof CellError)) {
+          ret.push(coerced)
+        }
+      }
+    }
+    return ret
+  }
+
+  public coerceNumbersExactRanges = (args: InterpreterValue[]): number[] | CellError =>  this.manyToNumbers(args, this.manyToExactNumbers)
+
+  public coerceNumbersCoerceRangesDropNulls = (args: InterpreterValue[]): number[] | CellError =>  this.manyToNumbers(args, this.manyToCoercedNumbersDropNulls)
+
+  private manyToNumbers(args: InterpreterValue[], rangeFn: (args: InternalScalarValue[]) => number[] | CellError): number[] | CellError {
+    const vals: (number | SimpleRangeValue)[] = []
+    for(const arg of args) {
+      if(arg instanceof SimpleRangeValue) {
+        vals.push(arg)
+      } else {
+        const coerced = getRawValue(this.coerceScalarToNumberOrError(arg))
+        if(coerced instanceof CellError) {
+          return coerced
+        } else {
+          vals.push(coerced)
+        }
+      }
+    }
+    const expandedVals: number[] = []
+    for(const val of vals) {
+      if(val instanceof SimpleRangeValue) {
+        const arr = rangeFn(val.valuesFromTopLeftCorner())
+        if(arr instanceof CellError) {
+          return arr
+        } else {
+          expandedVals.push(...arr)
+        }
+      } else {
+        expandedVals.push(val)
+      }
+    }
+    return expandedVals
+  }
+
+  public manyToExactNumbers = (args: InternalScalarValue[]): number[] | CellError => {
+    const ret: number[] = []
+    for(const arg of args) {
+      if(arg instanceof CellError) {
+        return arg
+      } else if (isExtendedNumber(arg)) {
+        ret.push(getRawValue(arg))
+      }
+    }
+    return ret
+  }
+
+  public manyToOnlyNumbersDropNulls = (args: InterpreterValue[]): number[] | CellError => {
+    const ret: number[] = []
+    for(const arg of args) {
+      if(arg instanceof CellError) {
+        return arg
+      } else if(arg === EmptyValue) {
+        continue
+      } else if (isExtendedNumber(arg)) {
+        ret.push(getRawValue(arg))
+      } else {
+        return new CellError(ErrorType.VALUE, ErrorMessage.NumberExpected)
+      }
+    }
+    return ret
+  }
+
+  public manyToCoercedNumbersDropNulls = (args: InternalScalarValue[]): number[] | CellError => {
+    const ret: number[] = []
+    for(const arg of args) {
+      if(arg instanceof CellError) {
+        return arg
+      }
+      if(arg === EmptyValue) {
+        continue
+      }
+      const coerced = this.coerceScalarToNumberOrError(arg)
+      if (isExtendedNumber(coerced)) {
+        ret.push(getRawValue(coerced))
+      }
+    }
+    return ret
+  }
+
+  public coerceScalarToComplex(arg: InternalScalarValue): complex | CellError {
+    if(arg instanceof CellError) {
+      return arg
+    } else if(arg === EmptyValue) {
+      return [0, 0]
+    } else if(isExtendedNumber(arg)) {
+      return [getRawValue(arg), 0]
+    } else if(typeof arg === 'string') {
+      return this.coerceStringToComplex(arg)
+    } else {
+      return new CellError(ErrorType.NUM, ErrorMessage.ComplexNumberExpected)
+    }
+  }
+
+  private coerceStringToComplex(arg: string): complex | CellError {
+    const match = complexParsingRegexp.exec(arg)
+    if(match === null) {
+      return new CellError(ErrorType.NUM, ErrorMessage.ComplexNumberExpected)
+    }
+
+    let val1
+    if(match[6]!==undefined) {
+      val1 = (match[1]==='-'?[0, -1]:[0, 1]) as complex
+    } else {
+      val1 = this.parseComplexToken(match[1] + match[3], match[5])
+    }
+
+    if(val1 instanceof CellError) {
+      return val1
+    }
+
+    if(match[8] === undefined) {
+      return val1
+    }
+
+    let val2
+    if(match[14]!==undefined) {
+      val2 = (match[9]==='-'?[0, -1]:[0, 1]) as complex
+    } else {
+      val2 = this.parseComplexToken(match[9] + match[11], match[13])
+    }
+    if(val2 instanceof CellError) {
+      return val2
+    }
+    if((match[5]!=='') || (match[13]==='')) {
+      return new CellError(ErrorType.NUM, ErrorMessage.ComplexNumberExpected)
+    }
+
+    if(match[8] === '+') {
+      return [val1[0]+val2[0], val1[1]+val2[1]]
+    } else {
+      return [val1[0]-val2[0], val1[1]-val2[1]]
+    }
+  }
+
+  private parseComplexToken(arg: string, mod: string): complex | CellError {
+    const val = getRawValue(this.coerceNonDateScalarToMaybeNumber(arg))
+    if(val === undefined) {
+      return new CellError(ErrorType.NUM, ErrorMessage.ComplexNumberExpected)
+    }
+    if(mod === '') {
+      return [val, 0]
+    } else {
+      return [0, val]
+    }
+  }
+
+  public ExtendedNumberFactory(value: number, typeFormat: NumberTypeWithFormat): ExtendedNumber {
+    const {type, format} = typeFormat
+    switch (type) {
+      case NumberType.NUMBER_RAW:
+        return value
+      case NumberType.NUMBER_CURRENCY: {
+        return new CurrencyNumber(value, format ?? this.config.currencySymbol[0])
+      }
+      case NumberType.NUMBER_DATE:
+        return new DateNumber(value, format)
+      case NumberType.NUMBER_DATETIME:
+        return new DateTimeNumber(value, format)
+      case NumberType.NUMBER_TIME:
+        return new TimeNumber(value, format)
+      case NumberType.NUMBER_PERCENT:
+        return new PercentNumber(value, format)
+    }
+  }
+}
+
+export function coerceComplexToString([re, im]: complex, symb?: string): string | CellError {
+  if(!isFinite(re) || !isFinite(im)) {
+    return new CellError(ErrorType.NUM, ErrorMessage.NaN)
+  }
+  symb = symb ?? COMPLEX_NUMBER_SYMBOL
+  if(im===0) {
+    return `${re}`
+  }
+  const imStr = `${im === -1 || im === 1 ? '' : Math.abs(im)}${symb}`
+  if(re===0) {
+    return `${im < 0 ? '-' : ''}${imStr}`
+  }
+  return `${re}${im < 0 ? '-' : '+'}${imStr}`
 }
 
 export function coerceToRange(arg: InterpreterValue): SimpleRangeValue {
@@ -241,7 +547,7 @@ export function coerceToRange(arg: InterpreterValue): SimpleRangeValue {
 export function coerceToRangeNumbersOrError(arg: InterpreterValue): SimpleRangeValue | CellError | null {
   if ((arg instanceof SimpleRangeValue && arg.hasOnlyNumbers()) || arg instanceof CellError) {
     return arg
-  } else if (typeof arg === 'number') {
+  } else if (isExtendedNumber(arg)) {
     return SimpleRangeValue.fromScalar(arg)
   } else {
     return null
@@ -252,10 +558,10 @@ export function coerceBooleanToNumber(arg: boolean): number {
   return Number(arg)
 }
 
-export function coerceEmptyToValue(arg: InternalNoErrorCellValue): InternalNoErrorCellValue {
+export function coerceEmptyToValue(arg: InternalNoErrorScalarValue): RawNoErrorScalarValue {
   if (typeof arg === 'string') {
     return ''
-  } else if (typeof arg === 'number') {
+  } else if (isExtendedNumber(arg)) {
     return 0
   } else if (typeof arg === 'boolean') {
     return false
@@ -274,8 +580,8 @@ export function coerceScalarToBoolean(arg: InternalScalarValue): boolean | CellE
     return arg
   } else if (arg === EmptyValue) {
     return false
-  } else if (typeof arg === 'number') {
-    return arg !== 0
+  } else if (isExtendedNumber(arg)) {
+    return getRawValue(arg) !== 0
   } else {
     const argUppered = arg.toUpperCase()
     if (argUppered === 'TRUE') {
@@ -295,134 +601,20 @@ export function coerceScalarToString(arg: InternalScalarValue): string | CellErr
     return arg
   } else if (arg === EmptyValue) {
     return ''
-  } else if (typeof arg === 'number') {
-    return arg.toString()
+  } else if (isExtendedNumber(arg)) {
+    return getRawValue(arg).toString()
   } else {
     return arg ? 'TRUE' : 'FALSE'
   }
 }
 
-export function divide(left: number, right: number): number | CellError {
-  if (right === 0) {
-    return new CellError(ErrorType.DIV_BY_ZERO)
-  } else {
-    return (left / right)
-  }
+export function zeroIfEmpty(arg: RawNoErrorScalarValue): RawNoErrorScalarValue {
+  return arg === EmptyValue ? 0 : arg
 }
 
-/**
- * Returns max from two numbers
- *
- * Implementation of max function which is used in interpreter.
- *
- * Errors are propagated, non-numerical values are neutral.
- *
- * @param left - left operand of addition
- * @param right - right operand of addition
- */
-export function max(left: InternalScalarValue, right: InternalScalarValue): InternalScalarValue {
-  if (left instanceof CellError) {
-    return left
-  }
-  if (right instanceof CellError) {
-    return right
-  }
-  if (typeof left === 'number') {
-    if (typeof right === 'number') {
-      return Math.max(left, right)
-    } else {
-      return left
-    }
-  } else if (typeof right === 'number') {
-    return right
-  } else {
-    return Number.NEGATIVE_INFINITY
-  }
-}
-
-export function maxa(left: InternalScalarValue, right: InternalScalarValue): InternalScalarValue {
-  if (left instanceof CellError) {
-    return left
-  }
-  if (right instanceof CellError) {
-    return right
-  }
-  if (typeof left === 'boolean') {
-    left = coerceBooleanToNumber(left)
-  }
-  if (typeof right === 'boolean') {
-    right = coerceBooleanToNumber(right)
-  }
-  if (typeof left === 'number') {
-    if (typeof right === 'number') {
-      return Math.max(left, right)
-    } else {
-      return left
-    }
-  } else if (typeof right === 'number') {
-    return right
-  } else {
-    return Number.NEGATIVE_INFINITY
-  }
-}
-
-/**
- * Returns min from two numbers
- *
- * Implementation of min function which is used in interpreter.
- *
- * Errors are propagated, non-numerical values are neutral.
- *
- * @param left - left operand of addition
- * @param right - right operand of addition
- */
-export function min(left: InternalScalarValue, right: InternalScalarValue): InternalScalarValue {
-  if (left instanceof CellError) {
-    return left
-  }
-  if (right instanceof CellError) {
-    return right
-  }
-  if (typeof left === 'number') {
-    if (typeof right === 'number') {
-      return Math.min(left, right)
-    } else {
-      return left
-    }
-  } else if (typeof right === 'number') {
-    return right
-  } else {
-    return Number.POSITIVE_INFINITY
-  }
-}
-
-export function mina(left: InternalScalarValue, right: InternalScalarValue): InternalScalarValue {
-  if (left instanceof CellError) {
-    return left
-  }
-  if (right instanceof CellError) {
-    return right
-  }
-  if (typeof left === 'boolean') {
-    left = coerceBooleanToNumber(left)
-  }
-  if (typeof right === 'boolean') {
-    right = coerceBooleanToNumber(right)
-  }
-  if (typeof left === 'number') {
-    if (typeof right === 'number') {
-      return Math.min(left, right)
-    } else {
-      return left
-    }
-  } else if (typeof right === 'number') {
-    return right
-  } else {
-    return Number.POSITIVE_INFINITY
-  }
-}
-
-export function numberCmp(left: number, right: number): number {
+export function numberCmp(leftArg: ExtendedNumber, rightArg: ExtendedNumber): number {
+  const left = getRawValue(leftArg)
+  const right = getRawValue(rightArg)
   if (left > right) {
     return 1
   } else if (left < right) {
@@ -512,4 +704,88 @@ function escapeNoCharacters(pattern: string, caseSensitive: boolean): string {
     }
   }
   return str
+}
+
+function inferExtendedNumberTypeAdditive(leftArg: ExtendedNumber, rightArg: ExtendedNumber): NumberTypeWithFormat {
+  const {type: leftType, format: leftFormat} = getTypeFormatOfExtendedNumber(leftArg)
+  const {type: rightType, format: rightFormat} = getTypeFormatOfExtendedNumber(rightArg)
+  if(leftType === NumberType.NUMBER_RAW) {
+    return {type: rightType, format: rightFormat}
+  }
+  if(rightType === NumberType.NUMBER_RAW) {
+    return {type: leftType, format: leftFormat}
+  }
+  if((leftType === NumberType.NUMBER_DATETIME || leftType === NumberType.NUMBER_DATE)
+    && (rightType === NumberType.NUMBER_DATETIME || rightType === NumberType.NUMBER_DATE)) {
+    return {type: NumberType.NUMBER_RAW}
+  }
+  if(leftType === NumberType.NUMBER_TIME) {
+    if(rightType === NumberType.NUMBER_DATE) {
+      return {type: NumberType.NUMBER_DATETIME, format: rightFormat + ' ' + leftFormat}
+    }
+    if(rightType === NumberType.NUMBER_DATETIME) {
+      return {type: NumberType.NUMBER_DATETIME, format: rightFormat}
+    }
+  }
+  if(rightType === NumberType.NUMBER_TIME) {
+    if(leftType === NumberType.NUMBER_DATE) {
+      return {type: NumberType.NUMBER_DATETIME, format: leftFormat + ' ' + rightFormat}
+    }
+    if(leftType === NumberType.NUMBER_DATETIME) {
+      return {type: NumberType.NUMBER_DATETIME, format: leftFormat}
+    }
+  }
+  return {type: leftType, format: leftFormat}
+}
+
+function inferExtendedNumberTypeMultiplicative(leftArg: ExtendedNumber, rightArg: ExtendedNumber): NumberTypeWithFormat {
+  let {type: leftType, format: leftFormat} = getTypeFormatOfExtendedNumber(leftArg)
+  let {type: rightType, format: rightFormat} = getTypeFormatOfExtendedNumber(rightArg)
+  if(leftType === NumberType.NUMBER_PERCENT) {
+    leftType = NumberType.NUMBER_RAW
+    leftFormat = undefined
+  }
+  if(rightType === NumberType.NUMBER_PERCENT) {
+    rightType = NumberType.NUMBER_RAW
+    rightFormat = undefined
+  }
+  if(leftType === NumberType.NUMBER_RAW) {
+    return {type: rightType, format: rightFormat}
+  }
+  if(rightType === NumberType.NUMBER_RAW) {
+    return {type: leftType, format: leftFormat}
+  }
+  return {type: NumberType.NUMBER_RAW}
+}
+
+export function forceNormalizeString(str: string): string {
+  return normalizeString(str.toLowerCase(), 'nfd').replace(/[\u0300-\u036f]/g, '')
+}
+
+export function coerceRangeToScalar(arg: SimpleRangeValue, state: InterpreterState): Maybe<InternalScalarValue>{
+  if(arg.isAdHoc()) {
+    return arg.data[0]?.[0]
+  }
+  const range = arg.range!
+  if(state.formulaAddress.sheet === range.sheet) {
+    if (range.width() === 1) {
+      const offset = state.formulaAddress.row - range.start.row
+      if (offset >= 0 && offset < range.height()) {
+        return arg.data[offset][0]
+      }
+    } else if (range.height() === 1) {
+      const offset = state.formulaAddress.col - range.start.col
+      if (offset >= 0 && offset < range.width()) {
+        return arg.data[0][offset]
+      }
+    }
+  }
+  return undefined
+}
+
+type NormalizationForm = 'nfc' | 'nfd' | 'nfkc' | 'nfkd'
+
+export function normalizeString(str: string, form: NormalizationForm): string {
+  return typeof str.normalize === 'function'
+    ? str.normalize(form.toUpperCase()) : unorm[form](str)
 }

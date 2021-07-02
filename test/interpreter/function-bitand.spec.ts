@@ -1,5 +1,6 @@
 import {HyperFormula} from '../../src'
 import {CellValueType, ErrorType} from '../../src/Cell'
+import {ErrorMessage} from '../../src/error-message'
 import {adr, detailedError} from '../testUtils'
 
 describe('function BITAND', () => {
@@ -9,20 +10,20 @@ describe('function BITAND', () => {
       ['=BITAND(1, 2, 3)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA))
-    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NA))
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
+    expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
   })
 
-  it('should not work for arguemnts of wrong type', () => {
+  it('should not work for arguments of wrong type', () => {
     const engine = HyperFormula.buildFromArray([
       ['=BITAND(1, "foo")'],
       ['=BITAND("bar", 4)'],
       ['=BITAND("foo", "baz")'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE))
-    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.VALUE))
-    expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.NumberCoercion))
+    expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.NumberCoercion))
+    expect(engine.getCellValue(adr('A3'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.NumberCoercion))
   })
 
   it('should not work for negative numbers', () => {
@@ -31,8 +32,8 @@ describe('function BITAND', () => {
       ['=BITAND(-1, 2)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM))
-    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NUM))
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.ValueSmall))
+    expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.ValueSmall))
   })
 
   it('should not work for non-integers', () => {
@@ -41,8 +42,8 @@ describe('function BITAND', () => {
       ['=BITAND(3.14, 5)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM))
-    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NUM))
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.IntegerExpected))
+    expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.IntegerExpected))
   })
 
   it('should work', () => {

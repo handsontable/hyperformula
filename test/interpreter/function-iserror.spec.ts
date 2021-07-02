@@ -1,5 +1,6 @@
 import {HyperFormula} from '../../src'
 import {ErrorType} from '../../src/Cell'
+import {ErrorMessage} from '../../src/error-message'
 import {adr, detailedError} from '../testUtils'
 
 describe('Function ISERROR', () => {
@@ -28,18 +29,18 @@ describe('Function ISERROR', () => {
     const engine = HyperFormula.buildFromArray([
       ['=ISERROR(1, 2)', '=ISERROR()'],
     ])
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA))
-    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.NA))
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
+    expect(engine.getCellValue(adr('B1'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
   })
 
-  // Inconsistency with Product 1
   it('range value results in VALUE error', () => {
     const engine = HyperFormula.buildFromArray([
       ['=4/1'],
-      ['=4/0', '=ISERROR(A1:A3)'],
+      ['=4/0'],
       ['=4/2'],
+      ['=ISERROR(A1:A3)'],
     ])
 
-    expect(engine.getCellValue(adr('B2'))).toEqual(detailedError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A4'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.WrongType))
   })
 })

@@ -1,4 +1,5 @@
 import {ErrorType, HyperFormula} from '../../src'
+import {ErrorMessage} from '../../src/error-message'
 import {adr, detailedError} from '../testUtils'
 
 describe('Function ISFORMULA', () => {
@@ -33,7 +34,7 @@ describe('Function ISFORMULA', () => {
       ['=ISFORMULA(1/0)']
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.DIV_BY_ZERO))
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.DIV_BY_ZERO))
   })
 
   it('should return NA otherwise', () => {
@@ -41,10 +42,10 @@ describe('Function ISFORMULA', () => {
       ['=ISFORMULA()', '=ISFORMULA(A1, A2)', '=ISFORMULA("foo")', '=ISFORMULA(42)']
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA))
-    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.NA))
-    expect(engine.getCellValue(adr('C1'))).toEqual(detailedError(ErrorType.NA))
-    expect(engine.getCellValue(adr('D1'))).toEqual(detailedError(ErrorType.NA))
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
+    expect(engine.getCellValue(adr('B1'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
+    expect(engine.getCellValue(adr('C1'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.CellRefExpected))
+    expect(engine.getCellValue(adr('D1'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.CellRefExpected))
   })
 
   it('should work for itself', () => {
@@ -53,5 +54,35 @@ describe('Function ISFORMULA', () => {
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqual(true)
+  })
+
+  it('should collect dependencies of inner function and return argument type error', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=SIN(1)'],
+      ['=ISFORMULA(SUM(A1,A3))'],
+      ['=SIN(1)'],
+    ])
+
+    expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.CellRefExpected))
+  })
+
+  it('should propagate error of inner function', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=1/0'],
+      ['=ISFORMULA(SUM(A1, A3))'],
+      ['=1/0']
+    ])
+
+    expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.DIV_BY_ZERO))
+  })
+
+  it('should return #CYCLE! when cyclic reference occurs not directly in COLUMN', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=ISFORMULA(SUM(A1))'],
+      ['=ISFORMULA(A1+A2)'],
+    ])
+
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.CYCLE))
+    expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.CYCLE))
   })
 })

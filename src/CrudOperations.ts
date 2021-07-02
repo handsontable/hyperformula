@@ -1,27 +1,18 @@
 /**
  * @license
- * Copyright (c) 2020 Handsoncode. All rights reserved.
+ * Copyright (c) 2021 Handsoncode. All rights reserved.
  */
 
 import {AbsoluteCellRange} from './AbsoluteCellRange'
 import {invalidSimpleCellAddress, simpleCellAddress, SimpleCellAddress} from './Cell'
-import {CellContent, CellContentParser, isMatrix, RawCellContent} from './CellContentParser'
+import {CellContent, CellContentParser, RawCellContent} from './CellContentParser'
 import {ClipboardCell, ClipboardOperations} from './ClipboardOperations'
-import {AddColumnsCommand, AddRowsCommand, Operations, RemoveColumnsCommand, RemoveRowsCommand} from './Operations'
-import {ColumnSearchStrategy} from './ColumnSearch/ColumnSearchStrategy'
 import {Config} from './Config'
 import {ContentChanges} from './ContentChanges'
 import {DependencyGraph, SheetMapping} from './DependencyGraph'
 import {
-  doesContainRelativeReferences,
-  InternalNamedExpression,
-  NamedExpressionOptions,
-  NamedExpressions
-} from './NamedExpressions'
-import {
   InvalidAddressError,
   InvalidArgumentsError,
-  MatrixFormulasNotSupportedError,
   NamedExpressionDoesNotExistError,
   NamedExpressionNameIsAlreadyTakenError,
   NamedExpressionNameIsInvalidError,
@@ -29,7 +20,6 @@ import {
   NoOperationToUndoError,
   NoRelativeAddressesAllowedError,
   NoSheetWithIdError,
-  NoSheetWithNameError,
   NothingToPasteError,
   SheetNameAlreadyTakenError,
   SheetSizeLimitExceededError,
@@ -37,7 +27,18 @@ import {
   TargetLocationHasMatrixError
 } from './errors'
 import {LazilyTransformingAstService} from './LazilyTransformingAstService'
+import {ColumnSearchStrategy} from './Lookup/SearchStrategy'
+import {MatrixSizePredictor} from './MatrixSize'
+import {Maybe} from './Maybe'
+import {
+  doesContainRelativeReferences,
+  InternalNamedExpression,
+  NamedExpressionOptions,
+  NamedExpressions
+} from './NamedExpressions'
+import {AddColumnsCommand, AddRowsCommand, Operations, RemoveColumnsCommand, RemoveRowsCommand} from './Operations'
 import {ParserWithCaching} from './parser'
+import {findBoundaries, validateAsSheet} from './Sheet'
 import {ColumnsSpan, RowsSpan} from './Span'
 import {Statistics} from './statistics'
 import {
@@ -57,11 +58,11 @@ import {
   RemoveSheetUndoEntry,
   RenameSheetUndoEntry,
   SetCellContentsUndoEntry,
+  SetColumnOrderUndoEntry,
+  SetRowOrderUndoEntry,
   SetSheetContentUndoEntry,
   UndoRedo
 } from './UndoRedo'
-import {findBoundaries, validateAsSheet} from './Sheet'
-import {Maybe} from './Maybe'
 
 export type ColumnRowIndex = [number, number]
 
@@ -88,10 +89,11 @@ export class CrudOperations {
     private readonly lazilyTransformingAstService: LazilyTransformingAstService,
     /** Storage for named expressions */
     private readonly namedExpressions: NamedExpressions,
+    private readonly matrixSizePredictor: MatrixSizePredictor,
   ) {
-    this.operations = new Operations(this.dependencyGraph, this.columnSearch, this.cellContentParser, this.parser, this.stats, this.lazilyTransformingAstService, this.namedExpressions, this.config)
-    this.clipboardOperations = new ClipboardOperations(this.dependencyGraph, this.operations, this.parser, this.lazilyTransformingAstService, this.config)
-    this.undoRedo = new UndoRedo(this.config, this.operations)
+    this.operations = new Operations(dependencyGraph, columnSearch, cellContentParser, parser, stats, lazilyTransformingAstService, namedExpressions, config, matrixSizePredictor)
+    this.clipboardOperations = new ClipboardOperations(dependencyGraph, this.operations, parser, lazilyTransformingAstService, config)
+    this.undoRedo = new UndoRedo(config, this.operations)
   }
 
   public addRows(sheet: number, ...indexes: ColumnRowIndex[]): void {
@@ -181,7 +183,6 @@ export class CrudOperations {
       const targetRange = AbsoluteCellRange.spanFrom(targetLeftCorner, clipboard.width, clipboard.height)
       const oldContent = this.operations.getRangeClipboardCells(targetRange)
       this.undoRedo.clearRedoStack()
-      this.dependencyGraph.breakNumericMatricesInRange(targetRange)
       const addedGlobalNamedExpressions = this.operations.restoreClipboardCells(clipboard.sourceLeftCorner.sheet, clipboard.getContent(targetLeftCorner))
       this.undoRedo.saveOperation(new PasteUndoEntry(targetLeftCorner, oldContent, clipboard.content!, addedGlobalNamedExpressions))
     }
@@ -204,7 +205,7 @@ export class CrudOperations {
   }
 
   public addSheet(name?: string): string {
-    if (name) {
+    if (name !== undefined) {
       this.ensureItIsPossibleToAddSheet(name)
     }
     this.undoRedo.clearRedoStack()
@@ -213,15 +214,14 @@ export class CrudOperations {
     return addedSheetName
   }
 
-  public removeSheet(sheetName: string): void {
-    this.ensureSheetExists(sheetName)
+  public removeSheet(sheetId: number): void {
+    this.ensureScopeIdIsValid(sheetId)
     this.undoRedo.clearRedoStack()
     this.clipboardOperations.abortCut()
-    const sheetId = this.sheetMapping.fetch(sheetName)
     const originalName = this.sheetMapping.fetchDisplayName(sheetId)
     const oldSheetContent = this.operations.getSheetClipboardCells(sheetId)
-    const version = this.operations.removeSheet(sheetName)
-    this.undoRedo.saveOperation(new RemoveSheetUndoEntry(originalName, sheetId, oldSheetContent, version))
+    const {version, scopedNamedExpressions} = this.operations.removeSheet(sheetId)
+    this.undoRedo.saveOperation(new RemoveSheetUndoEntry(originalName, sheetId, oldSheetContent, scopedNamedExpressions, version))
   }
 
   public renameSheet(sheetId: number, newName: string): Maybe<string> {
@@ -234,11 +234,10 @@ export class CrudOperations {
     return oldName
   }
 
-  public clearSheet(sheetName: string): void {
-    this.ensureSheetExists(sheetName)
+  public clearSheet(sheetId: number): void {
+    this.ensureScopeIdIsValid(sheetId)
     this.undoRedo.clearRedoStack()
     this.clipboardOperations.abortCut()
-    const sheetId = this.sheetMapping.fetch(sheetName)
     const oldSheetContent = this.operations.getSheetClipboardCells(sheetId)
     this.operations.clearSheet(sheetId)
     this.undoRedo.saveOperation(new ClearSheetUndoEntry(sheetId, oldSheetContent))
@@ -251,11 +250,6 @@ export class CrudOperations {
       for (let i = 0; i < cellContents.length; i++) {
         if (!(cellContents[i] instanceof Array)) {
           throw new InvalidArgumentsError('an array of arrays or a raw cell value.')
-        }
-        for (let j = 0; j < cellContents[i].length; j++) {
-          if (isMatrix(cellContents[i][j])) {
-            throw new Error('Cant change matrices in batch operation')
-          }
         }
       }
     }
@@ -280,9 +274,8 @@ export class CrudOperations {
     this.undoRedo.saveOperation(new SetCellContentsUndoEntry(modifiedCellContents))
   }
 
-  public setSheetContent(sheetName: string, values: RawCellContent[][]): void {
-    this.ensureSheetExists(sheetName)
-    const sheetId = this.sheetMapping.fetch(sheetName)
+  public setSheetContent(sheetId: number, values: RawCellContent[][]): void {
+    this.ensureScopeIdIsValid(sheetId)
     this.ensureItIsPossibleToChangeSheetContents(sheetId, values)
 
     validateAsSheet(values)
@@ -291,6 +284,97 @@ export class CrudOperations {
     const oldSheetContent = this.operations.getSheetClipboardCells(sheetId)
     this.operations.setSheetContent(sheetId, values)
     this.undoRedo.saveOperation(new SetSheetContentUndoEntry(sheetId, oldSheetContent, values))
+  }
+
+  public setRowOrder(sheetId: number, rowMapping: [number, number][]): void {
+    this.validateSwapRowIndexes(sheetId, rowMapping)
+    this.testRowOrderForMatrices(sheetId, rowMapping)
+    this.undoRedo.clearRedoStack()
+    this.clipboardOperations.abortCut()
+    const oldContent = this.operations.setRowOrder(sheetId, rowMapping)
+    this.undoRedo.saveOperation(new SetRowOrderUndoEntry(sheetId, rowMapping, oldContent))
+  }
+
+  public validateSwapRowIndexes(sheetId: number, rowMapping: [number, number][]): void {
+    if (!this.sheetMapping.hasSheetWithId(sheetId)) {
+      throw new NoSheetWithIdError(sheetId)
+    }
+    this.validateRowOrColumnMapping(sheetId, rowMapping, 'row')
+  }
+
+  public testColumnOrderForMatrices(sheetId: number, columnMapping: [number, number][]): void {
+    for(const [source, target] of columnMapping ) {
+      if(source!==target) {
+        const rowRange = AbsoluteCellRange.spanFrom({sheet: sheetId, col: source, row: 0}, 1, Infinity)
+        if (this.dependencyGraph.matrixMapping.isFormulaMatrixInRange(rowRange)) {
+          throw new SourceLocationHasMatrixError()
+        }
+      }
+    }
+  }
+
+
+  public setColumnOrder(sheetId: number, columnMapping: [number, number][]): void {
+    this.validateSwapColumnIndexes(sheetId, columnMapping)
+    this.testColumnOrderForMatrices(sheetId, columnMapping)
+    this.undoRedo.clearRedoStack()
+    this.clipboardOperations.abortCut()
+    const oldContent = this.operations.setColumnOrder(sheetId, columnMapping)
+    this.undoRedo.saveOperation(new SetColumnOrderUndoEntry(sheetId, columnMapping, oldContent))
+  }
+
+  public validateSwapColumnIndexes(sheetId: number, columnMapping: [number, number][]): void {
+    if (!this.sheetMapping.hasSheetWithId(sheetId)) {
+      throw new NoSheetWithIdError(sheetId)
+    }
+    this.validateRowOrColumnMapping(sheetId, columnMapping, 'column')
+  }
+
+  public testRowOrderForMatrices(sheetId: number, rowMapping: [number, number][]): void {
+    for(const [source, target] of rowMapping ) {
+      if(source!==target) {
+        const rowRange = AbsoluteCellRange.spanFrom({sheet: sheetId, col: 0, row: source}, Infinity, 1)
+        if (this.dependencyGraph.matrixMapping.isFormulaMatrixInRange(rowRange)) {
+          throw new SourceLocationHasMatrixError()
+        }
+      }
+    }
+  }
+
+
+  public mappingFromOrder(sheetId: number, newOrder: number[], rowOrColumn: 'row' | 'column'): [number, number][] {
+    if (!this.sheetMapping.hasSheetWithId(sheetId)) {
+      throw new NoSheetWithIdError(sheetId)
+    }
+    const limit = rowOrColumn === 'row' ? this.dependencyGraph.getSheetHeight(sheetId) : this.dependencyGraph.getSheetWidth(sheetId)
+    if(newOrder.length !== limit) {
+      throw new InvalidArgumentsError(`number of ${rowOrColumn}s provided to be sheet ${rowOrColumn==='row'?'height':'width'}.`)
+    }
+    const ret: [number, number][] = []
+    for(let i=0;i<limit;i++) {
+      if(newOrder[i]!==i) {
+        ret.push([i, newOrder[i]])
+      }
+    }
+    return ret
+  }
+
+  private validateRowOrColumnMapping(sheetId: number, rowMapping: [number, number][], rowOrColumn: 'row' | 'column'): void {
+    const limit = rowOrColumn === 'row' ? this.dependencyGraph.getSheetHeight(sheetId) : this.dependencyGraph.getSheetWidth(sheetId)
+    const sources = rowMapping.map(([a, _])=>a).sort((a, b) => a-b)
+    const targets = rowMapping.map(([_, b])=>b).sort((a, b) => a-b)
+
+    for(let i=0;i<sources.length;i++) {
+      if(!isNonnegativeInteger(sources[i]) || sources[i] >= limit) {
+        throw new InvalidArgumentsError(`${rowOrColumn} numbers to be nonnegative integers and less than sheet ${rowOrColumn==='row'?'height':'width'}.`)
+      }
+      if(sources[i]===sources[i+1]) {
+        throw new InvalidArgumentsError(`source ${rowOrColumn} numbers to be unique.`)
+      }
+      if(sources[i]!==targets[i]) {
+        throw new InvalidArgumentsError(`target ${rowOrColumn} numbers to be permutation of source ${rowOrColumn} numbers.`)
+      }
+    }
   }
 
   public undo() {
@@ -309,25 +393,24 @@ export class CrudOperations {
     this.undoRedo.redo()
   }
 
-  public addNamedExpression(expressionName: string, expression: RawCellContent, sheetScope?: string, options?: NamedExpressionOptions) {
-    const sheetId = this.scopeId(sheetScope)
-    this.ensureNamedExpressionNameIsValid(expressionName, sheetId)
+  public addNamedExpression(expressionName: string, expression: RawCellContent, sheetId?: number, options?: NamedExpressionOptions) {
+    this.ensureItIsPossibleToAddNamedExpression(expressionName, expression, sheetId)
     this.operations.addNamedExpression(expressionName, expression, sheetId, options)
     this.undoRedo.clearRedoStack()
     this.clipboardOperations.abortCut()
     this.undoRedo.saveOperation(new AddNamedExpressionUndoEntry(expressionName, expression, sheetId, options))
   }
 
-  public changeNamedExpressionExpression(expressionName: string, sheetScope: string | undefined, newExpression: RawCellContent, options?: NamedExpressionOptions) {
-    const sheetId = this.scopeId(sheetScope)
+  public changeNamedExpressionExpression(expressionName: string, sheetId: number | undefined, newExpression: RawCellContent, options?: NamedExpressionOptions) {
+    this.ensureItIsPossibleToChangeNamedExpression(expressionName, newExpression, sheetId)
     const [oldNamedExpression, content] = this.operations.changeNamedExpressionExpression(expressionName, newExpression, sheetId, options)
     this.undoRedo.clearRedoStack()
     this.clipboardOperations.abortCut()
     this.undoRedo.saveOperation(new ChangeNamedExpressionUndoEntry(oldNamedExpression, newExpression, content, sheetId, options))
   }
 
-  public removeNamedExpression(expressionName: string, sheetScope: string | undefined): InternalNamedExpression {
-    const sheetId = this.scopeId(sheetScope)
+  public removeNamedExpression(expressionName: string, sheetId?: number): InternalNamedExpression {
+    this.ensureScopeIdIsValid(sheetId)
     const [namedExpression, content] = this.operations.removeNamedExpression(expressionName, sheetId)
     this.undoRedo.clearRedoStack()
     this.clipboardOperations.abortCut()
@@ -336,23 +419,23 @@ export class CrudOperations {
     return namedExpression
   }
 
-  public ensureItIsPossibleToAddNamedExpression(expressionName: string, expression: RawCellContent, sheetScope?: string): void {
-    const scopeId = this.scopeId(sheetScope)
-    this.ensureNamedExpressionNameIsValid(expressionName, scopeId)
+  public ensureItIsPossibleToAddNamedExpression(expressionName: string, expression: RawCellContent, sheetId?: number): void {
+    this.ensureScopeIdIsValid(sheetId)
+    this.ensureNamedExpressionNameIsValid(expressionName, sheetId)
     this.ensureNamedExpressionIsValid(expression)
   }
 
-  public ensureItIsPossibleToChangeNamedExpression(expressionName: string, expression: RawCellContent, sheetScope?: string): void {
-    const scopeId = this.scopeId(sheetScope)
-    if (this.namedExpressions.namedExpressionForScope(expressionName, scopeId) === undefined) {
+  public ensureItIsPossibleToChangeNamedExpression(expressionName: string, expression: RawCellContent, sheetId?: number): void {
+    this.ensureScopeIdIsValid(sheetId)
+    if (this.namedExpressions.namedExpressionForScope(expressionName, sheetId) === undefined) {
       throw new NamedExpressionDoesNotExistError(expressionName)
     }
     this.ensureNamedExpressionIsValid(expression)
   }
 
-  public isItPossibleToRemoveNamedExpression(expressionName: string, sheetScope?: string): void {
-    const scopeId = this.scopeId(sheetScope)
-    if (this.namedExpressions.namedExpressionForScope(expressionName, scopeId) === undefined) {
+  public isItPossibleToRemoveNamedExpression(expressionName: string, sheetId?: number): void {
+    this.ensureScopeIdIsValid(sheetId)
+    if (this.namedExpressions.namedExpressionForScope(expressionName, sheetId) === undefined) {
       throw new NamedExpressionDoesNotExistError(expressionName)
     }
   }
@@ -528,9 +611,9 @@ export class CrudOperations {
     }
   }
 
-  public ensureItIsPossibleToChangeCellContents(address: SimpleCellAddress, content: RawCellContent[][]) {
+  public ensureItIsPossibleToChangeCellContents(inputAddress: SimpleCellAddress, content: RawCellContent[][]) {
     const boundaries = findBoundaries(content)
-    const targetRange = AbsoluteCellRange.spanFrom(address, boundaries.width, boundaries.height)
+    const targetRange = AbsoluteCellRange.spanFrom(inputAddress, boundaries.width, boundaries.height)
     this.ensureRangeInSizeLimits(targetRange)
     for (const address of targetRange.addresses(this.dependencyGraph)) {
       this.ensureItIsPossibleToChangeContent(address)
@@ -561,18 +644,10 @@ export class CrudOperations {
     return this.operations.getAndClearContentChanges()
   }
 
-  public ensureSheetExists(sheetName: string): void {
-    if (!this.sheetMapping.hasSheetWithName(sheetName)) {
-      throw new NoSheetWithNameError(sheetName)
+  public ensureScopeIdIsValid(scopeId?: number): void {
+    if(scopeId !== undefined && !this.sheetMapping.hasSheetWithId(scopeId)) {
+      throw new NoSheetWithIdError(scopeId)
     }
-  }
-
-  public scopeId(sheetName: string | undefined): number | undefined {
-    if (sheetName !== undefined) {
-      this.ensureSheetExists(sheetName)
-      return this.sheetMapping.fetch(sheetName)
-    }
-    return undefined
   }
 
   private get sheetMapping(): SheetMapping {
@@ -590,9 +665,7 @@ export class CrudOperations {
 
   private ensureNamedExpressionIsValid(expression: RawCellContent): void {
     const parsedExpression = this.cellContentParser.parse(expression)
-    if (parsedExpression instanceof CellContent.MatrixFormula) {
-      throw new MatrixFormulasNotSupportedError()
-    } else if (parsedExpression instanceof CellContent.Formula) {
+    if (parsedExpression instanceof CellContent.Formula) {
       const parsingResult = this.parser.parse(parsedExpression.formula, simpleCellAddress(-1, 0, 0))
       if (doesContainRelativeReferences(parsingResult.ast)) {
         throw new NoRelativeAddressesAllowedError()

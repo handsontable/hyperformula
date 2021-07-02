@@ -1,5 +1,6 @@
 import {HyperFormula} from '../../src'
 import {ErrorType} from '../../src/Cell'
+import {ErrorMessage} from '../../src/error-message'
 import {adr, detailedError} from '../testUtils'
 
 describe('Function YEAR', () => {
@@ -10,9 +11,9 @@ describe('Function YEAR', () => {
       ['=YEAR("foo")'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA))
-    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NA))
-    expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
+    expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
+    expect(engine.getCellValue(adr('A3'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.NumberCoercion))
   })
 
   it('with numerical arguments', () => {
@@ -46,18 +47,6 @@ describe('Function YEAR', () => {
       ['=YEAR(4/0)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.DIV_BY_ZERO))
-  })
-
-  // Inconsistency with Product 1
-  it('range value in 1st argument results in VALUE error', () => {
-    const engine = HyperFormula.buildFromArray([
-      ['=DATE(2019, 3, 31)', '=YEAR(A1:A3)'],
-      ['=DATE(2018, 3, 31)', '=YEAR(A1:A3)'],
-      ['=DATE(2017, 3, 31)'],
-    ])
-
-    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.VALUE))
-    expect(engine.getCellValue(adr('B2'))).toEqual(detailedError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.DIV_BY_ZERO))
   })
 })

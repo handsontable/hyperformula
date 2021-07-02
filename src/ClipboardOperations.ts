@@ -1,18 +1,19 @@
 /**
  * @license
- * Copyright (c) 2020 Handsoncode. All rights reserved.
+ * Copyright (c) 2021 Handsoncode. All rights reserved.
  */
 
 import {AbsoluteCellRange} from './AbsoluteCellRange'
 import {invalidSimpleCellAddress, simpleCellAddress, SimpleCellAddress} from './Cell'
-import {Operations} from './Operations'
+import {RawCellContent} from './CellContentParser'
+import {Config} from './Config'
 import {DependencyGraph} from './DependencyGraph'
 import {ValueCellVertexValue} from './DependencyGraph/ValueCellVertex'
 import {InvalidArgumentsError, SheetSizeLimitExceededError} from './errors'
 import {LazilyTransformingAstService} from './LazilyTransformingAstService'
+import {Operations} from './Operations'
 import {ParserWithCaching} from './parser'
 import {ParsingError} from './parser/Ast'
-import {Config} from './Config'
 
 export type ClipboardCell = ClipboardCellValue | ClipboardCellFormula | ClipboardCellEmpty | ClipboardCellParsingError
 
@@ -30,7 +31,8 @@ export enum ClipboardCellType {
 
 export interface ClipboardCellValue {
   type: ClipboardCellType.VALUE,
-  value: ValueCellVertexValue,
+  parsedValue: ValueCellVertexValue,
+  rawValue: RawCellContent,
 }
 
 export interface ClipboardCellEmpty {

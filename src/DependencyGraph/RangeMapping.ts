@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright (c) 2020 Handsoncode. All rights reserved.
+ * Copyright (c) 2021 Handsoncode. All rights reserved.
  */
 
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
@@ -87,7 +87,8 @@ export class RangeMapping {
     }
 
     const verticesToMerge: [RangeVertex, RangeVertex][] = []
-    for (const [oldKey, vertex] of updated.sort((left, right) => compareBy(left[1], right[1], coordinate))) {
+    updated.sort((left, right) => compareBy(left[1], right[1], coordinate))
+    for (const [oldKey, vertex] of updated) {
       const newKey = keyFromRange(vertex.range)
       if (newKey === oldKey) {
         continue
@@ -177,10 +178,9 @@ export class RangeMapping {
   /**
    * Finds smaller range does have own vertex.
    *
-   * @param rangeMapping - range mapping dependency
-   * @param ranges - ranges to find smaller range in
+   * @param range
    */
-  public findSmallerRange(range: AbsoluteCellRange): { smallerRangeVertex: RangeVertex | null, restRange: AbsoluteCellRange } {
+  public findSmallerRange(range: AbsoluteCellRange): { smallerRangeVertex?: RangeVertex, restRange: AbsoluteCellRange } {
     if (range.height() > 1 && Number.isFinite(range.height())) {
       const valuesRangeEndRowLess = simpleCellAddress(range.end.sheet, range.end.col, range.end.row - 1)
       const rowLessVertex = this.getRange(range.start, valuesRangeEndRowLess)
@@ -193,7 +193,6 @@ export class RangeMapping {
       }
     }
     return {
-      smallerRangeVertex: null,
       restRange: range,
     }
   }

@@ -1,5 +1,6 @@
 import {HyperFormula} from '../../src'
 import {ErrorType} from '../../src/Cell'
+import {ErrorMessage} from '../../src/error-message'
 import {adr, detailedError} from '../testUtils'
 
 describe('Unary operator PLUS', () => {
@@ -28,19 +29,19 @@ describe('Unary operator PLUS', () => {
 
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NAME))
-    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.DIV_BY_ZERO))
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NAME, ErrorMessage.FunctionName('FOOBAR')))
+    expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.DIV_BY_ZERO))
   })
 
-  // Inconsistency with Product 1
   it('range value results in VALUE error', () => {
     const engine = HyperFormula.buildFromArray([
       ['1'],
-      ['9', '=+A1:A3'],
+      ['9'],
       ['3'],
-    ])
+      ['=+A1:A3'],
+    ], {useArrayArithmetic: false})
 
-    expect(engine.getCellValue(adr('B2'))).toEqual(detailedError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A4'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.ScalarExpected))
   })
 
   it('string given by reference should return string with UNARY+', () => {

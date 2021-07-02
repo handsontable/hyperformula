@@ -1,11 +1,13 @@
 /**
  * @license
- * Copyright (c) 2020 Handsoncode. All rights reserved.
+ * Copyright (c) 2021 Handsoncode. All rights reserved.
  */
 
 import {simpleCellAddress, SimpleCellAddress} from './Cell'
-import {ClipboardCell} from './ClipboardOperations'
 import {RawCellContent} from './CellContentParser'
+import {ClipboardCell} from './ClipboardOperations'
+import {Config} from './Config'
+import {InternalNamedExpression, NamedExpressionOptions} from './NamedExpressions'
 import {
   AddColumnsCommand,
   AddRowsCommand,
@@ -15,18 +17,35 @@ import {
   RemoveRowsCommand,
   RowsRemoval
 } from './Operations'
-import {Config} from './Config'
-import {InternalNamedExpression, NamedExpressionOptions} from './NamedExpressions'
 
-export class RemoveRowsUndoEntry {
+export interface UndoEntry {
+  doUndo(undoRedo: UndoRedo): void,
+  doRedo(undoRedo: UndoRedo): void,
+}
+
+export abstract class BaseUndoEntry implements UndoEntry {
+  abstract doUndo(undoRedo: UndoRedo): void
+  abstract doRedo(undoRedo: UndoRedo): void
+}
+
+export class RemoveRowsUndoEntry extends BaseUndoEntry {
   constructor(
     public readonly command: RemoveRowsCommand,
     public readonly rowsRemovals: RowsRemoval[],
   ) {
+    super()
+  }
+
+  public doUndo(undoRedo: UndoRedo): void {
+    undoRedo.undoRemoveRows(this)
+  }
+
+  public doRedo(undoRedo: UndoRedo): void {
+    undoRedo.redoRemoveRows(this)
   }
 }
 
-export class MoveCellsUndoEntry {
+export class MoveCellsUndoEntry extends BaseUndoEntry {
   constructor(
     public readonly sourceLeftCorner: SimpleCellAddress,
     public readonly width: number,
@@ -36,26 +55,89 @@ export class MoveCellsUndoEntry {
     public readonly addedGlobalNamedExpressions: string[],
     public readonly version: number,
   ) {
+    super()
+  }
+
+  public doUndo(undoRedo: UndoRedo): void {
+    undoRedo.undoMoveCells(this)
+  }
+
+  public doRedo(undoRedo: UndoRedo): void {
+    undoRedo.redoMoveCells(this)
   }
 }
 
-export class AddRowsUndoEntry {
+export class AddRowsUndoEntry extends BaseUndoEntry {
   constructor(
     public readonly command: AddRowsCommand,
   ) {
+    super()
+  }
+
+  public doUndo(undoRedo: UndoRedo): void {
+    undoRedo.undoAddRows(this)
+  }
+
+  public doRedo(undoRedo: UndoRedo): void {
+    undoRedo.redoAddRows(this)
   }
 }
 
-export class SetSheetContentUndoEntry {
+export class SetRowOrderUndoEntry extends BaseUndoEntry {
+  constructor(
+    public readonly sheetId: number,
+    public readonly rowMapping: [number, number][],
+    public readonly oldContent: [SimpleCellAddress, ClipboardCell][]
+  ) {
+    super()
+  }
+
+  public doUndo(undoRedo: UndoRedo): void {
+    undoRedo.undoSetRowOrder(this)
+  }
+
+  public doRedo(undoRedo: UndoRedo): void {
+    undoRedo.redoSetRowOrder(this)
+  }
+}
+
+export class SetColumnOrderUndoEntry extends BaseUndoEntry {
+  constructor(
+    public readonly sheetId: number,
+    public readonly columnMapping: [number, number][],
+    public readonly oldContent: [SimpleCellAddress, ClipboardCell][]
+  ) {
+    super()
+  }
+
+  public doUndo(undoRedo: UndoRedo): void {
+    undoRedo.undoSetColumnOrder(this)
+  }
+
+  public doRedo(undoRedo: UndoRedo): void {
+    undoRedo.redoSetColumnOrder(this)
+  }
+}
+
+export class SetSheetContentUndoEntry extends BaseUndoEntry {
   constructor(
     public readonly sheetId: number,
     public readonly oldSheetContent: ClipboardCell[][],
     public readonly newSheetContent: RawCellContent[][],
   ) {
+    super()
+  }
+
+  public doUndo(undoRedo: UndoRedo): void {
+    undoRedo.undoSetSheetContent(this)
+  }
+
+  public doRedo(undoRedo: UndoRedo): void {
+    undoRedo.redoSetSheetContent(this)
   }
 }
 
-export class MoveRowsUndoEntry {
+export class MoveRowsUndoEntry extends BaseUndoEntry {
   public readonly undoStart: number
   public readonly undoEnd: number
 
@@ -66,12 +148,21 @@ export class MoveRowsUndoEntry {
     public readonly targetRow: number,
     public readonly version: number,
   ) {
+    super()
     this.undoStart = this.startRow < this.targetRow ? this.targetRow - this.numberOfRows : this.targetRow
     this.undoEnd = this.startRow > this.targetRow ? this.startRow + this.numberOfRows : this.startRow
   }
+
+  public doUndo(undoRedo: UndoRedo): void {
+    undoRedo.undoMoveRows(this)
+  }
+
+  public doRedo(undoRedo: UndoRedo): void {
+    undoRedo.redoMoveRows(this)
+  }
 }
 
-export class MoveColumnsUndoEntry {
+export class MoveColumnsUndoEntry extends BaseUndoEntry {
   public readonly undoStart: number
   public readonly undoEnd: number
 
@@ -82,61 +173,125 @@ export class MoveColumnsUndoEntry {
     public readonly targetColumn: number,
     public readonly version: number,
   ) {
+    super()
     this.undoStart = this.startColumn < this.targetColumn ? this.targetColumn - this.numberOfColumns : this.targetColumn
     this.undoEnd = this.startColumn > this.targetColumn ? this.startColumn + this.numberOfColumns : this.startColumn
   }
-}
 
-export class AddColumnsUndoEntry {
-  constructor(
-    public readonly command: AddColumnsCommand,
-  ) {
+  public doUndo(undoRedo: UndoRedo): void {
+    undoRedo.undoMoveColumns(this)
+  }
+
+  public doRedo(undoRedo: UndoRedo): void {
+    undoRedo.redoMoveColumns(this)
   }
 }
 
-export class RemoveColumnsUndoEntry {
+export class AddColumnsUndoEntry extends BaseUndoEntry {
+  constructor(
+    public readonly command: AddColumnsCommand,
+  ) {
+    super()
+  }
+
+  public doUndo(undoRedo: UndoRedo): void {
+    undoRedo.undoAddColumns(this)
+  }
+
+  public doRedo(undoRedo: UndoRedo): void {
+    undoRedo.redoAddColumns(this)
+  }
+}
+
+export class RemoveColumnsUndoEntry extends BaseUndoEntry {
   constructor(
     public readonly command: RemoveColumnsCommand,
     public readonly columnsRemovals: ColumnsRemoval[],
   ) {
+    super()
+  }
+
+  public doUndo(undoRedo: UndoRedo): void {
+    undoRedo.undoRemoveColumns(this)
+  }
+
+  public doRedo(undoRedo: UndoRedo): void {
+    undoRedo.redoRemoveColumns(this)
   }
 }
 
-export class AddSheetUndoEntry {
+export class AddSheetUndoEntry extends BaseUndoEntry {
   constructor(
     public readonly sheetName: string,
   ) {
+    super()
+  }
+
+  public doUndo(undoRedo: UndoRedo): void {
+    undoRedo.undoAddSheet(this)
+  }
+
+  public doRedo(undoRedo: UndoRedo): void {
+    undoRedo.redoAddSheet(this)
   }
 }
 
-export class RemoveSheetUndoEntry {
+export class RemoveSheetUndoEntry extends BaseUndoEntry {
   constructor(
     public readonly sheetName: string,
     public readonly sheetId: number,
     public readonly oldSheetContent: ClipboardCell[][],
+    public readonly scopedNamedExpressions: [InternalNamedExpression, ClipboardCell][],
     public readonly version: number,
   ) {
+    super()
+  }
+
+  public doUndo(undoRedo: UndoRedo): void {
+    undoRedo.undoRemoveSheet(this)
+  }
+
+  public doRedo(undoRedo: UndoRedo): void {
+    undoRedo.redoRemoveSheet(this)
   }
 }
 
-export class RenameSheetUndoEntry {
+export class RenameSheetUndoEntry extends BaseUndoEntry {
   constructor(
     public readonly sheetId: number,
     public readonly oldName: string,
     public readonly newName: string,
   ) {
+    super()
+  }
+
+  public doUndo(undoRedo: UndoRedo): void {
+    undoRedo.undoRenameSheet(this)
+  }
+
+  public doRedo(undoRedo: UndoRedo): void {
+    undoRedo.redoRenameSheet(this)
   }
 }
 
-export class ClearSheetUndoEntry {
+export class ClearSheetUndoEntry extends BaseUndoEntry {
   constructor(
     public readonly sheetId: number,
     public readonly oldSheetContent: ClipboardCell[][],
   ) {
+    super()
+  }
+
+  public doUndo(undoRedo: UndoRedo): void {
+    undoRedo.undoClearSheet(this)
+  }
+
+  public doRedo(undoRedo: UndoRedo): void {
+    undoRedo.redoClearSheet(this)
   }
 }
 
-export class SetCellContentsUndoEntry {
+export class SetCellContentsUndoEntry extends BaseUndoEntry {
   constructor(
     public readonly cellContents: {
       address: SimpleCellAddress,
@@ -144,39 +299,75 @@ export class SetCellContentsUndoEntry {
       oldContent: ClipboardCell,
     }[],
   ) {
+    super()
+  }
+
+  public doUndo(undoRedo: UndoRedo): void {
+    undoRedo.undoSetCellContents(this)
+  }
+
+  public doRedo(undoRedo: UndoRedo): void {
+    undoRedo.redoSetCellContents(this)
   }
 }
 
-export class PasteUndoEntry {
+export class PasteUndoEntry extends BaseUndoEntry {
   constructor(
     public readonly targetLeftCorner: SimpleCellAddress,
     public readonly oldContent: [SimpleCellAddress, ClipboardCell][],
     public readonly newContent: ClipboardCell[][],
     public readonly addedGlobalNamedExpressions: string[],
   ) {
+    super()
+  }
+
+  public doUndo(undoRedo: UndoRedo): void {
+    undoRedo.undoPaste(this)
+  }
+
+  public doRedo(undoRedo: UndoRedo): void {
+    undoRedo.redoPaste(this)
   }
 }
 
-export class AddNamedExpressionUndoEntry {
+export class AddNamedExpressionUndoEntry extends BaseUndoEntry {
   constructor(
     public readonly name: string,
     public readonly newContent: RawCellContent,
     public readonly scope?: number,
     public readonly options?: NamedExpressionOptions
   ) {
+    super()
+  }
+
+  public doUndo(undoRedo: UndoRedo): void {
+    undoRedo.undoAddNamedExpression(this)
+  }
+
+  public doRedo(undoRedo: UndoRedo): void {
+    undoRedo.redoAddNamedExpression(this)
   }
 }
 
-export class RemoveNamedExpressionUndoEntry {
+export class RemoveNamedExpressionUndoEntry extends BaseUndoEntry {
   constructor(
     public readonly namedExpression: InternalNamedExpression,
     public readonly content: ClipboardCell,
     public readonly scope?: number,
   ) {
+    super()
+  }
+
+  public doUndo(undoRedo: UndoRedo): void {
+    undoRedo.undoRemoveNamedExpression(this)
+  }
+
+  public doRedo(undoRedo: UndoRedo): void {
+    undoRedo.redoRemoveNamedExpression(this)
   }
 }
 
-export class ChangeNamedExpressionUndoEntry {
+export class ChangeNamedExpressionUndoEntry extends BaseUndoEntry {
   constructor(
     public readonly namedExpression: InternalNamedExpression,
     public readonly newContent: RawCellContent,
@@ -184,13 +375,22 @@ export class ChangeNamedExpressionUndoEntry {
     public readonly scope?: number,
     public readonly options?: NamedExpressionOptions
   ) {
+    super()
+  }
+
+  public doUndo(undoRedo: UndoRedo): void {
+    undoRedo.undoChangeNamedExpression(this)
+  }
+
+  public doRedo(undoRedo: UndoRedo): void {
+    undoRedo.redoChangeNamedExpression(this)
   }
 }
 
-export class BatchUndoEntry {
-  public readonly operations: UndoStackEntry[] = []
+export class BatchUndoEntry extends BaseUndoEntry {
+  public readonly operations: UndoEntry[] = []
 
-  public add(operation: UndoStackEntry) {
+  public add(operation: UndoEntry) {
     this.operations.push(operation)
   }
 
@@ -199,31 +399,19 @@ export class BatchUndoEntry {
       yield this.operations[i]
     }
   }
+
+  public doUndo(undoRedo: UndoRedo): void {
+    undoRedo.undoBatch(this)
+  }
+
+  public doRedo(undoRedo: UndoRedo): void {
+    undoRedo.redoBatch(this)
+  }
 }
 
-type UndoStackEntry
-  = RemoveRowsUndoEntry
-  | AddRowsUndoEntry
-  | MoveRowsUndoEntry
-  | MoveColumnsUndoEntry
-  | AddColumnsUndoEntry
-  | RemoveColumnsUndoEntry
-  | SetCellContentsUndoEntry
-  | AddSheetUndoEntry
-  | RemoveSheetUndoEntry
-  | RenameSheetUndoEntry
-  | ClearSheetUndoEntry
-  | MoveCellsUndoEntry
-  | SetSheetContentUndoEntry
-  | PasteUndoEntry
-  | BatchUndoEntry
-  | AddNamedExpressionUndoEntry
-  | RemoveNamedExpressionUndoEntry
-  | ChangeNamedExpressionUndoEntry
-
 export class UndoRedo {
-  private undoStack: UndoStackEntry[] = []
-  private redoStack: UndoStackEntry[] = []
+  private undoStack: UndoEntry[] = []
+  private redoStack: UndoEntry[] = []
   private readonly undoLimit: number
   private batchUndoEntry?: BatchUndoEntry
 
@@ -236,7 +424,7 @@ export class UndoRedo {
 
   public oldData: Map<number, [SimpleCellAddress, string][]> = new Map()
 
-  public saveOperation(operation: UndoStackEntry) {
+  public saveOperation(operation: UndoEntry) {
     if (this.batchUndoEntry !== undefined) {
       this.batchUndoEntry.add(operation)
     } else {
@@ -248,7 +436,7 @@ export class UndoRedo {
     this.batchUndoEntry = new BatchUndoEntry()
   }
 
-  private addUndoEntry(operation: UndoStackEntry) {
+  private addUndoEntry(operation: UndoEntry) {
     this.undoStack.push(operation)
     this.undoStack.splice(0, Math.max(0, this.undoStack.length - this.undoLimit))
   }
@@ -296,55 +484,17 @@ export class UndoRedo {
     this.redoStack.push(operation)
   }
 
-  private undoEntry(operation: UndoStackEntry) {
-    if (operation instanceof RemoveRowsUndoEntry) {
-      this.undoRemoveRows(operation)
-    } else if (operation instanceof AddRowsUndoEntry) {
-      this.undoAddRows(operation)
-    } else if (operation instanceof SetCellContentsUndoEntry) {
-      this.undoSetCellContents(operation)
-    } else if (operation instanceof MoveRowsUndoEntry) {
-      this.undoMoveRows(operation)
-    } else if (operation instanceof AddSheetUndoEntry) {
-      this.undoAddSheet(operation)
-    } else if (operation instanceof RemoveSheetUndoEntry) {
-      this.undoRemoveSheet(operation)
-    } else if (operation instanceof RenameSheetUndoEntry) {
-      this.undoRenameSheet(operation)
-    } else if (operation instanceof ClearSheetUndoEntry) {
-      this.undoClearSheet(operation)
-    } else if (operation instanceof AddColumnsUndoEntry) {
-      this.undoAddColumns(operation)
-    } else if (operation instanceof RemoveColumnsUndoEntry) {
-      this.undoRemoveColumns(operation)
-    } else if (operation instanceof MoveColumnsUndoEntry) {
-      this.undoMoveColumns(operation)
-    } else if (operation instanceof MoveCellsUndoEntry) {
-      this.undoMoveCells(operation)
-    } else if (operation instanceof SetSheetContentUndoEntry) {
-      this.undoSetSheetContent(operation)
-    } else if (operation instanceof PasteUndoEntry) {
-      this.undoPaste(operation)
-    } else if (operation instanceof BatchUndoEntry) {
-      this.undoBatch(operation)
-    } else if (operation instanceof AddNamedExpressionUndoEntry) {
-      this.undoAddNamedExpression(operation)
-    } else if (operation instanceof RemoveNamedExpressionUndoEntry) {
-      this.undoRemoveNamedExpression(operation)
-    } else if (operation instanceof ChangeNamedExpressionUndoEntry) {
-      this.undoChangeNamedExpression(operation)
-    } else {
-      throw 'Unknown element'
-    }
+  private undoEntry(operation: UndoEntry) {
+    operation.doUndo(this)
   }
 
-  private undoBatch(batchOperation: BatchUndoEntry) {
+  public undoBatch(batchOperation: BatchUndoEntry) {
     for (const operation of batchOperation.reversedOperations()) {
       this.undoEntry(operation)
     }
   }
 
-  private undoRemoveRows(operation: RemoveRowsUndoEntry) {
+  public undoRemoveRows(operation: RemoveRowsUndoEntry) {
     this.operations.forceApplyPostponedTransformations()
 
     const {command: {sheet}, rowsRemovals} = operation
@@ -360,7 +510,7 @@ export class UndoRedo {
     }
   }
 
-  private undoRemoveColumns(operation: RemoveColumnsUndoEntry) {
+  public undoRemoveColumns(operation: RemoveColumnsUndoEntry) {
     this.operations.forceApplyPostponedTransformations()
 
     const {command: {sheet}, columnsRemovals} = operation
@@ -376,7 +526,7 @@ export class UndoRedo {
     }
   }
 
-  private undoAddRows(operation: AddRowsUndoEntry) {
+  public undoAddRows(operation: AddRowsUndoEntry) {
     const addedRowsSpans = operation.command.rowsSpans()
     for (let i = addedRowsSpans.length - 1; i >= 0; --i) {
       const addedRows = addedRowsSpans[i]
@@ -384,7 +534,7 @@ export class UndoRedo {
     }
   }
 
-  private undoAddColumns(operation: AddColumnsUndoEntry) {
+  public undoAddColumns(operation: AddColumnsUndoEntry) {
     const addedColumnsSpans = operation.command.columnsSpans()
     for (let i = addedColumnsSpans.length - 1; i >= 0; --i) {
       const addedColumns = addedColumnsSpans[i]
@@ -392,28 +542,26 @@ export class UndoRedo {
     }
   }
 
-  private undoSetCellContents(operation: SetCellContentsUndoEntry) {
+  public undoSetCellContents(operation: SetCellContentsUndoEntry) {
     for (const cellContentData of operation.cellContents) {
       this.operations.restoreCell(cellContentData.address, cellContentData.oldContent)
     }
   }
 
-  private undoPaste(operation: PasteUndoEntry) {
-    for (const [address, clipboardCell] of operation.oldContent) {
-      this.operations.restoreCell(address, clipboardCell)
-    }
+  public undoPaste(operation: PasteUndoEntry) {
+    this.restoreOperationOldContent(operation.oldContent)
     for (const namedExpression of operation.addedGlobalNamedExpressions) {
       this.operations.removeNamedExpression(namedExpression)
     }
   }
 
-  private undoMoveRows(operation: MoveRowsUndoEntry) {
+  public undoMoveRows(operation: MoveRowsUndoEntry) {
     const {sheet} = operation
     this.operations.moveRows(sheet, operation.undoStart, operation.numberOfRows, operation.undoEnd)
     this.restoreOldDataFromVersion(operation.version - 1)
   }
 
-  private undoMoveColumns(operation: MoveColumnsUndoEntry) {
+  public undoMoveColumns(operation: MoveColumnsUndoEntry) {
     const {sheet} = operation
     this.operations.moveColumns(sheet, operation.undoStart, operation.numberOfColumns, operation.undoEnd)
     this.restoreOldDataFromVersion(operation.version - 1)
@@ -423,9 +571,7 @@ export class UndoRedo {
     this.operations.forceApplyPostponedTransformations()
     this.operations.moveCells(operation.destinationLeftCorner, operation.width, operation.height, operation.sourceLeftCorner)
 
-    for (const [address, clipboardCell] of operation.overwrittenCellsData) {
-      this.operations.restoreCell(address, clipboardCell)
-    }
+    this.restoreOperationOldContent(operation.overwrittenCellsData)
 
     this.restoreOldDataFromVersion(operation.version - 1)
     for (const namedExpression of operation.addedGlobalNamedExpressions) {
@@ -433,12 +579,12 @@ export class UndoRedo {
     }
   }
 
-  private undoAddSheet(operation: AddSheetUndoEntry) {
+  public undoAddSheet(operation: AddSheetUndoEntry) {
     const {sheetName} = operation
-    this.operations.removeSheet(sheetName)
+    this.operations.removeSheetByName(sheetName)
   }
 
-  private undoRemoveSheet(operation: RemoveSheetUndoEntry) {
+  public undoRemoveSheet(operation: RemoveSheetUndoEntry) {
     this.operations.forceApplyPostponedTransformations()
     const {oldSheetContent, sheetId} = operation
     this.operations.addSheet(operation.sheetName)
@@ -451,6 +597,10 @@ export class UndoRedo {
       }
     }
 
+    for(const [namedexpression, content] of operation.scopedNamedExpressions) {
+      this.operations.restoreNamedExpression(namedexpression, content, sheetId)
+    }
+
     this.restoreOldDataFromVersion(operation.version - 1)
   }
 
@@ -458,7 +608,7 @@ export class UndoRedo {
     this.operations.renameSheet(operation.sheetId, operation.oldName)
   }
 
-  private undoClearSheet(operation: ClearSheetUndoEntry) {
+  public undoClearSheet(operation: ClearSheetUndoEntry) {
     const {oldSheetContent, sheetId} = operation
     for (let rowIndex = 0; rowIndex < oldSheetContent.length; rowIndex++) {
       const row = oldSheetContent[rowIndex]
@@ -470,8 +620,8 @@ export class UndoRedo {
     }
   }
 
-  private undoSetSheetContent(operation: SetSheetContentUndoEntry) {
-    const {oldSheetContent, newSheetContent, sheetId} = operation
+  public undoSetSheetContent(operation: SetSheetContentUndoEntry) {
+    const {oldSheetContent, sheetId} = operation
     this.operations.clearSheet(sheetId)
     for (let rowIndex = 0; rowIndex < oldSheetContent.length; rowIndex++) {
       const row = oldSheetContent[rowIndex]
@@ -483,16 +633,30 @@ export class UndoRedo {
     }
   }
 
-  private undoAddNamedExpression(operation: AddNamedExpressionUndoEntry) {
+  public undoAddNamedExpression(operation: AddNamedExpressionUndoEntry) {
     this.operations.removeNamedExpression(operation.name, operation.scope)
   }
 
-  private undoRemoveNamedExpression(operation: RemoveNamedExpressionUndoEntry) {
+  public undoRemoveNamedExpression(operation: RemoveNamedExpressionUndoEntry) {
     this.operations.restoreNamedExpression(operation.namedExpression, operation.content, operation.scope)
   }
 
-  private undoChangeNamedExpression(operation: ChangeNamedExpressionUndoEntry) {
+  public undoChangeNamedExpression(operation: ChangeNamedExpressionUndoEntry) {
     this.operations.restoreNamedExpression(operation.namedExpression, operation.oldContent, operation.scope)
+  }
+
+  public undoSetRowOrder(operation: SetRowOrderUndoEntry) {
+    this.restoreOperationOldContent(operation.oldContent)
+  }
+
+  public undoSetColumnOrder(operation: SetColumnOrderUndoEntry) {
+    this.restoreOperationOldContent(operation.oldContent)
+  }
+
+  private restoreOperationOldContent(oldContent: [SimpleCellAddress, ClipboardCell][]) {
+    for (const [address, clipboardCell] of oldContent) {
+      this.operations.restoreCell(address, clipboardCell)
+    }
   }
 
   public redo() {
@@ -507,69 +671,29 @@ export class UndoRedo {
     this.undoStack.push(operation)
   }
 
-  private redoEntry(operation: UndoStackEntry) {
-    if (operation instanceof RemoveRowsUndoEntry) {
-      this.redoRemoveRows(operation)
-    } else if (operation instanceof RemoveRowsUndoEntry) {
-      this.redoRemoveRows(operation)
-    } else if (operation instanceof AddRowsUndoEntry) {
-      this.redoAddRows(operation)
-    } else if (operation instanceof SetCellContentsUndoEntry) {
-      this.redoSetCellContents(operation)
-    } else if (operation instanceof MoveRowsUndoEntry) {
-      this.redoMoveRows(operation)
-    } else if (operation instanceof AddSheetUndoEntry) {
-      this.redoAddSheet(operation)
-    } else if (operation instanceof RemoveSheetUndoEntry) {
-      this.redoRemoveSheet(operation)
-    } else if (operation instanceof RenameSheetUndoEntry) {
-      this.redoRenameSheet(operation)
-    } else if (operation instanceof ClearSheetUndoEntry) {
-      this.redoClearSheet(operation)
-    } else if (operation instanceof AddColumnsUndoEntry) {
-      this.redoAddColumns(operation)
-    } else if (operation instanceof RemoveColumnsUndoEntry) {
-      this.redoRemoveColumns(operation)
-    } else if (operation instanceof MoveColumnsUndoEntry) {
-      this.redoMoveColumns(operation)
-    } else if (operation instanceof MoveCellsUndoEntry) {
-      this.redoMoveCells(operation)
-    } else if (operation instanceof SetSheetContentUndoEntry) {
-      this.redoSetSheetContent(operation)
-    } else if (operation instanceof PasteUndoEntry) {
-      this.redoPaste(operation)
-    } else if (operation instanceof BatchUndoEntry) {
-      this.redoBatch(operation)
-    } else if (operation instanceof AddNamedExpressionUndoEntry) {
-      this.redoAddNamedExpression(operation)
-    } else if (operation instanceof RemoveNamedExpressionUndoEntry) {
-      this.redoRemoveNamedExpression(operation)
-    } else if (operation instanceof ChangeNamedExpressionUndoEntry) {
-      this.redoChangeNamedExpression(operation)
-    } else {
-      throw 'Unknown element'
-    }
+  private redoEntry(operation: UndoEntry) {
+    operation.doRedo(this)
   }
 
-  private redoBatch(batchOperation: BatchUndoEntry) {
+  public redoBatch(batchOperation: BatchUndoEntry) {
     for (const operation of batchOperation.operations) {
       this.redoEntry(operation)
     }
   }
 
-  private redoRemoveRows(operation: RemoveRowsUndoEntry) {
+  public redoRemoveRows(operation: RemoveRowsUndoEntry) {
     this.operations.removeRows(operation.command)
   }
 
-  private redoMoveCells(operation: MoveCellsUndoEntry) {
+  public redoMoveCells(operation: MoveCellsUndoEntry) {
     this.operations.moveCells(operation.sourceLeftCorner, operation.width, operation.height, operation.destinationLeftCorner)
   }
 
-  private redoRemoveColumns(operation: RemoveColumnsUndoEntry) {
+  public redoRemoveColumns(operation: RemoveColumnsUndoEntry) {
     this.operations.removeColumns(operation.command)
   }
 
-  private redoPaste(operation: PasteUndoEntry) {
+  public redoPaste(operation: PasteUndoEntry) {
     const {targetLeftCorner, newContent} = operation
     const height = newContent.length
     const width = newContent[0].length
@@ -581,59 +705,67 @@ export class UndoRedo {
     }
   }
 
-  private redoSetCellContents(operation: SetCellContentsUndoEntry) {
+  public redoSetCellContents(operation: SetCellContentsUndoEntry) {
     for (const cellContentData of operation.cellContents) {
       this.operations.setCellContent(cellContentData.address, cellContentData.newContent)
     }
   }
 
-  private redoAddRows(operation: AddRowsUndoEntry) {
+  public redoAddRows(operation: AddRowsUndoEntry) {
     this.operations.addRows(operation.command)
   }
 
-  private redoAddColumns(operation: AddColumnsUndoEntry) {
+  public redoAddColumns(operation: AddColumnsUndoEntry) {
     this.operations.addColumns(operation.command)
   }
 
-  private redoRemoveSheet(operation: RemoveSheetUndoEntry) {
-    this.operations.removeSheet(operation.sheetName)
+  public redoRemoveSheet(operation: RemoveSheetUndoEntry) {
+    this.operations.removeSheetByName(operation.sheetName)
   }
 
-  private redoAddSheet(operation: AddSheetUndoEntry) {
+  public redoAddSheet(operation: AddSheetUndoEntry) {
     this.operations.addSheet(operation.sheetName)
   }
 
-  private redoRenameSheet(operation: RenameSheetUndoEntry) {
+  public redoRenameSheet(operation: RenameSheetUndoEntry) {
     this.operations.renameSheet(operation.sheetId, operation.newName)
   }
 
-  private redoMoveRows(operation: MoveRowsUndoEntry) {
+  public redoMoveRows(operation: MoveRowsUndoEntry) {
     this.operations.moveRows(operation.sheet, operation.startRow, operation.numberOfRows, operation.targetRow)
   }
 
-  private redoMoveColumns(operation: MoveColumnsUndoEntry) {
+  public redoMoveColumns(operation: MoveColumnsUndoEntry) {
     this.operations.moveColumns(operation.sheet, operation.startColumn, operation.numberOfColumns, operation.targetColumn)
   }
 
-  private redoClearSheet(operation: ClearSheetUndoEntry) {
+  public redoClearSheet(operation: ClearSheetUndoEntry) {
     this.operations.clearSheet(operation.sheetId)
   }
 
-  private redoSetSheetContent(operation: SetSheetContentUndoEntry) {
+  public redoSetSheetContent(operation: SetSheetContentUndoEntry) {
     const {sheetId, newSheetContent} = operation
     this.operations.setSheetContent(sheetId, newSheetContent)
   }
 
-  private redoAddNamedExpression(operation: AddNamedExpressionUndoEntry) {
+  public redoAddNamedExpression(operation: AddNamedExpressionUndoEntry) {
     this.operations.addNamedExpression(operation.name, operation.newContent, operation.scope, operation.options)
   }
 
-  private redoRemoveNamedExpression(operation: RemoveNamedExpressionUndoEntry) {
+  public redoRemoveNamedExpression(operation: RemoveNamedExpressionUndoEntry) {
     this.operations.removeNamedExpression(operation.namedExpression.displayName, operation.scope)
   }
 
-  private redoChangeNamedExpression(operation: ChangeNamedExpressionUndoEntry) {
+  public redoChangeNamedExpression(operation: ChangeNamedExpressionUndoEntry) {
     this.operations.changeNamedExpressionExpression(operation.namedExpression.displayName, operation.newContent, operation.scope, operation.options)
+  }
+
+  public redoSetRowOrder(operation: SetRowOrderUndoEntry) {
+    this.operations.setRowOrder(operation.sheetId, operation.rowMapping)
+  }
+
+  public redoSetColumnOrder(operation: SetColumnOrderUndoEntry) {
+    this.operations.setColumnOrder(operation.sheetId, operation.columnMapping)
   }
 
   private restoreOldDataFromVersion(version: number) {

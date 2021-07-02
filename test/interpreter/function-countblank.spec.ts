@@ -1,11 +1,16 @@
 import {HyperFormula} from '../../src'
 import {ErrorType} from '../../src/Cell'
+import {ErrorMessage} from '../../src/error-message'
 import {adr, detailedError} from '../testUtils'
 
 describe('COUNTBLANK', () => {
   it('with empty args', () => {
-    const engine = HyperFormula.buildFromArray([['=COUNTBLANK()']])
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA))
+    const engine = HyperFormula.buildFromArray([
+      ['=COUNTBLANK()'],
+      ['=COUNTBLANK(,)']
+    ])
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
+    expect(engine.getCellValue(adr('A2'))).toEqual(2)
   })
 
   it('with args', () => {
@@ -49,7 +54,7 @@ describe('COUNTBLANK', () => {
       ['=COUNTBLANK(A1:A3)']
     ])
 
-    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.CYCLE))
+    expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.CYCLE))
     expect(engine.getCellValue(adr('A4'))).toEqual(1)
   })
 })

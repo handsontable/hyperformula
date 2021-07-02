@@ -1,13 +1,17 @@
 import {AddressMapping, DenseStrategy, EmptyCellVertex, SparseStrategy, ValueCellVertex} from '../src/DependencyGraph'
-import {AlwaysDense, AlwaysSparse, DenseSparseChooseBasedOnThreshold} from '../src/DependencyGraph/AddressMapping/ChooseAddressMappingPolicy'
+import {
+  AlwaysDense,
+  AlwaysSparse,
+  DenseSparseChooseBasedOnThreshold
+} from '../src/DependencyGraph/AddressMapping/ChooseAddressMappingPolicy'
+import {findBoundaries} from '../src/Sheet'
 import {ColumnsSpan, RowsSpan} from '../src/Span'
 import {adr} from './testUtils'
-import {findBoundaries} from '../src/Sheet'
 
 const sharedExamples = (builder: (width: number, height: number) => AddressMapping) => {
   it('simple set', () => {
     const mapping = builder(1, 1)
-    const vertex = new ValueCellVertex(42)
+    const vertex = new ValueCellVertex(42, 42)
     const address = adr('A1')
 
     mapping.setCell(address, vertex)
@@ -17,7 +21,7 @@ const sharedExamples = (builder: (width: number, height: number) => AddressMappi
 
   it('set and using different reference when get', () => {
     const mapping = builder(1, 1)
-    const vertex = new ValueCellVertex(42)
+    const vertex = new ValueCellVertex(42, 42)
 
     mapping.setCell(adr('A1'), vertex)
 
@@ -27,27 +31,27 @@ const sharedExamples = (builder: (width: number, height: number) => AddressMappi
   it("get when there's even no column", () => {
     const mapping = builder(1, 1)
 
-    expect(mapping.getCell(adr('A1'))).toBe(null)
+    expect(mapping.getCell(adr('A1'))).toBe(undefined)
   })
 
   it('get when there was already something in that column', () => {
     const mapping = builder(1, 2)
 
-    mapping.setCell(adr('A2'), new ValueCellVertex(42))
+    mapping.setCell(adr('A2'), new ValueCellVertex(42, 42))
 
-    expect(mapping.getCell(adr('A1'))).toBe(null)
+    expect(mapping.getCell(adr('A1'))).toBe(undefined)
   })
 
   it('get when asking for out of the row bound cell', () => {
     const mapping = builder(1, 1)
 
-    expect(mapping.getCell(adr('A2'))).toBe(null)
+    expect(mapping.getCell(adr('A2'))).toBe(undefined)
   })
 
   it("set when there's already something in that column", () => {
     const mapping = builder(1, 2)
-    const vertex0 = new ValueCellVertex(42)
-    const vertex1 = new ValueCellVertex(42)
+    const vertex0 = new ValueCellVertex(42, 42)
+    const vertex1 = new ValueCellVertex(42, 42)
     mapping.setCell(adr('A1'), vertex0)
 
     mapping.setCell(adr('A2'), vertex1)
@@ -58,8 +62,8 @@ const sharedExamples = (builder: (width: number, height: number) => AddressMappi
 
   it('set overrides old value', () => {
     const mapping = builder(1, 1)
-    const vertex0 = new ValueCellVertex(42)
-    const vertex1 = new ValueCellVertex(42)
+    const vertex0 = new ValueCellVertex(42, 42)
+    const vertex1 = new ValueCellVertex(42, 42)
     mapping.setCell(adr('A1'), vertex0)
 
     mapping.setCell(adr('A1'), vertex1)
@@ -82,7 +86,7 @@ const sharedExamples = (builder: (width: number, height: number) => AddressMappi
   it('has when there was already something in that column', () => {
     const mapping = builder(1, 2)
 
-    mapping.setCell(adr('A2'), new ValueCellVertex(42))
+    mapping.setCell(adr('A2'), new ValueCellVertex(42, 42))
 
     expect(mapping.has(adr('A1'))).toBe(false)
   })
@@ -90,7 +94,7 @@ const sharedExamples = (builder: (width: number, height: number) => AddressMappi
   it('has when there is a value', () => {
     const mapping = builder(1, 1)
 
-    mapping.setCell(adr('A1'), new ValueCellVertex(42))
+    mapping.setCell(adr('A1'), new ValueCellVertex(42, 42))
 
     expect(mapping.has(adr('A1'))).toBe(true)
   })
@@ -98,82 +102,82 @@ const sharedExamples = (builder: (width: number, height: number) => AddressMappi
   it('addRows in the beginning of a mapping', () => {
     const mapping = builder(1, 1)
 
-    mapping.setCell(adr('A1'), new ValueCellVertex(42))
+    mapping.setCell(adr('A1'), new ValueCellVertex(42, 42))
 
     mapping.addRows(0, 0, 1)
 
-    expect(mapping.getCell(adr('A1'))).toBe(null)
-    expect(mapping.fetchCell(adr('A2'))).toEqual(new ValueCellVertex(42))
+    expect(mapping.getCell(adr('A1'))).toBe(undefined)
+    expect(mapping.fetchCell(adr('A2'))).toEqual(new ValueCellVertex(42, 42))
     expect(mapping.getHeight(0)).toEqual(2)
   })
 
   it('addRows in the middle of a mapping', () => {
     const mapping = builder(1, 2)
 
-    mapping.setCell(adr('A1'), new ValueCellVertex(42))
-    mapping.setCell(adr('A2'), new ValueCellVertex(43))
+    mapping.setCell(adr('A1'), new ValueCellVertex(42, 42))
+    mapping.setCell(adr('A2'), new ValueCellVertex(43, 43))
 
     mapping.addRows(0, 1, 1)
 
-    expect(mapping.fetchCell(adr('A1'))).toEqual(new ValueCellVertex(42))
-    expect(mapping.getCell(adr('A2'))).toBe(null)
-    expect(mapping.fetchCell(adr('A3'))).toEqual(new ValueCellVertex(43))
+    expect(mapping.fetchCell(adr('A1'))).toEqual(new ValueCellVertex(42, 42))
+    expect(mapping.getCell(adr('A2'))).toBe(undefined)
+    expect(mapping.fetchCell(adr('A3'))).toEqual(new ValueCellVertex(43, 43))
     expect(mapping.getHeight(0)).toEqual(3)
   })
 
   it('addRows in the end of a mapping', () => {
     const mapping = builder(1, 1)
 
-    mapping.setCell(adr('A1'), new ValueCellVertex(42))
+    mapping.setCell(adr('A1'), new ValueCellVertex(42, 42))
 
     mapping.addRows(0, 1, 1)
 
-    expect(mapping.fetchCell(adr('A1'))).toEqual(new ValueCellVertex(42))
-    expect(mapping.getCell(adr('A2'))).toBe(null)
+    expect(mapping.fetchCell(adr('A1'))).toEqual(new ValueCellVertex(42, 42))
+    expect(mapping.getCell(adr('A2'))).toBe(undefined)
     expect(mapping.getHeight(0)).toEqual(2)
   })
 
   it('addRows more than one row', () => {
     const mapping = builder(1, 2)
 
-    mapping.setCell(adr('A1'), new ValueCellVertex(42))
-    mapping.setCell(adr('A2'), new ValueCellVertex(43))
+    mapping.setCell(adr('A1'), new ValueCellVertex(42, 42))
+    mapping.setCell(adr('A2'), new ValueCellVertex(43, 43))
 
     mapping.addRows(0, 1, 3)
 
-    expect(mapping.fetchCell(adr('A1'))).toEqual(new ValueCellVertex(42))
-    expect(mapping.getCell(adr('A2'))).toBe(null)
-    expect(mapping.getCell(adr('A3'))).toBe(null)
-    expect(mapping.getCell(adr('A4'))).toBe(null)
-    expect(mapping.fetchCell(adr('A5'))).toEqual(new ValueCellVertex(43))
+    expect(mapping.fetchCell(adr('A1'))).toEqual(new ValueCellVertex(42, 42))
+    expect(mapping.getCell(adr('A2'))).toBe(undefined)
+    expect(mapping.getCell(adr('A3'))).toBe(undefined)
+    expect(mapping.getCell(adr('A4'))).toBe(undefined)
+    expect(mapping.fetchCell(adr('A5'))).toEqual(new ValueCellVertex(43, 43))
     expect(mapping.getHeight(0)).toEqual(5)
   })
 
   it('addRows when more than one column present', () => {
     const mapping = builder(2, 2)
 
-    mapping.setCell(adr('A1'), new ValueCellVertex(11))
-    mapping.setCell(adr('B1'), new ValueCellVertex(12))
-    mapping.setCell(adr('A2'), new ValueCellVertex(21))
-    mapping.setCell(adr('B2'), new ValueCellVertex(22))
+    mapping.setCell(adr('A1'), new ValueCellVertex(11, 11))
+    mapping.setCell(adr('B1'), new ValueCellVertex(12, 12))
+    mapping.setCell(adr('A2'), new ValueCellVertex(21, 21))
+    mapping.setCell(adr('B2'), new ValueCellVertex(22, 22))
 
     mapping.addRows(0, 1, 1)
 
-    expect(mapping.fetchCell(adr('A1'))).toEqual(new ValueCellVertex(11))
-    expect(mapping.fetchCell(adr('B1'))).toEqual(new ValueCellVertex(12))
-    expect(mapping.getCell(adr('A2'))).toBe(null)
-    expect(mapping.getCell(adr('B2'))).toBe(null)
-    expect(mapping.fetchCell(adr('A3'))).toEqual(new ValueCellVertex(21))
-    expect(mapping.fetchCell(adr('B3'))).toEqual(new ValueCellVertex(22))
+    expect(mapping.fetchCell(adr('A1'))).toEqual(new ValueCellVertex(11, 11))
+    expect(mapping.fetchCell(adr('B1'))).toEqual(new ValueCellVertex(12, 12))
+    expect(mapping.getCell(adr('A2'))).toBe(undefined)
+    expect(mapping.getCell(adr('B2'))).toBe(undefined)
+    expect(mapping.fetchCell(adr('A3'))).toEqual(new ValueCellVertex(21, 21))
+    expect(mapping.fetchCell(adr('B3'))).toEqual(new ValueCellVertex(22, 22))
     expect(mapping.getHeight(0)).toEqual(3)
   })
 
   it('removeRows - one row', () => {
     const mapping = builder(2, 2)
-    mapping.setCell(adr('A1'), new ValueCellVertex(11)) // to remove
-    mapping.setCell(adr('B1'), new ValueCellVertex(12)) // to remove
-    mapping.setCell(adr('A2'), new ValueCellVertex(21))
-    mapping.setCell(adr('B2'), new ValueCellVertex(22))
+    mapping.setCell(adr('A1'), new ValueCellVertex(11, 11)) // to remove
+    mapping.setCell(adr('B1'), new ValueCellVertex(12, 12)) // to remove
+    mapping.setCell(adr('A2'), new ValueCellVertex(21, 21))
+    mapping.setCell(adr('B2'), new ValueCellVertex(22, 22))
 
     expect(mapping.getHeight(0)).toBe(2)
     mapping.removeRows(new RowsSpan(0, 0, 0))
@@ -184,14 +188,14 @@ const sharedExamples = (builder: (width: number, height: number) => AddressMappi
 
   it('removeRows - more than one row', () => {
     const mapping = builder(2, 4)
-    mapping.setCell(adr('A1'), new ValueCellVertex(11))
-    mapping.setCell(adr('B1'), new ValueCellVertex(12))
-    mapping.setCell(adr('A2'), new ValueCellVertex(21)) // to
-    mapping.setCell(adr('B2'), new ValueCellVertex(22)) // re
-    mapping.setCell(adr('A3'), new ValueCellVertex(31)) // mo
-    mapping.setCell(adr('B3'), new ValueCellVertex(32)) // ve
-    mapping.setCell(adr('A4'), new ValueCellVertex(41))
-    mapping.setCell(adr('B4'), new ValueCellVertex(42))
+    mapping.setCell(adr('A1'), new ValueCellVertex(11, 11))
+    mapping.setCell(adr('B1'), new ValueCellVertex(12, 12))
+    mapping.setCell(adr('A2'), new ValueCellVertex(21, 21)) // to
+    mapping.setCell(adr('B2'), new ValueCellVertex(22, 22)) // re
+    mapping.setCell(adr('A3'), new ValueCellVertex(31, 31)) // mo
+    mapping.setCell(adr('B3'), new ValueCellVertex(32, 32)) // ve
+    mapping.setCell(adr('A4'), new ValueCellVertex(41, 41))
+    mapping.setCell(adr('B4'), new ValueCellVertex(42, 42))
 
     expect(mapping.getHeight(0)).toBe(4)
     mapping.removeRows(new RowsSpan(0, 1, 2))
@@ -202,10 +206,10 @@ const sharedExamples = (builder: (width: number, height: number) => AddressMappi
 
   it('removeRows - remove more rows thant mapping size', () => {
     const mapping = builder(2, 2)
-    mapping.setCell(adr('A1'), new ValueCellVertex(11))
-    mapping.setCell(adr('B1'), new ValueCellVertex(12))
-    mapping.setCell(adr('A2'), new ValueCellVertex(21))
-    mapping.setCell(adr('B2'), new ValueCellVertex(22))
+    mapping.setCell(adr('A1'), new ValueCellVertex(11, 11))
+    mapping.setCell(adr('B1'), new ValueCellVertex(12, 12))
+    mapping.setCell(adr('A2'), new ValueCellVertex(21, 21))
+    mapping.setCell(adr('B2'), new ValueCellVertex(22, 22))
 
     expect(mapping.getHeight(0)).toBe(2)
     mapping.removeRows(new RowsSpan(0, 0, 5))
@@ -215,10 +219,10 @@ const sharedExamples = (builder: (width: number, height: number) => AddressMappi
 
   it('removeRows - remove more cols than size, but still something left', () => {
     const mapping = builder(2, 2)
-    mapping.setCell(adr('A1'), new ValueCellVertex(11))
-    mapping.setCell(adr('B1'), new ValueCellVertex(12))
-    mapping.setCell(adr('A2'), new ValueCellVertex(21))
-    mapping.setCell(adr('B2'), new ValueCellVertex(22))
+    mapping.setCell(adr('A1'), new ValueCellVertex(11, 11))
+    mapping.setCell(adr('B1'), new ValueCellVertex(12, 12))
+    mapping.setCell(adr('A2'), new ValueCellVertex(21, 21))
+    mapping.setCell(adr('B2'), new ValueCellVertex(22, 22))
 
     mapping.removeRows(new RowsSpan(0, 1, 5))
 
@@ -229,10 +233,10 @@ const sharedExamples = (builder: (width: number, height: number) => AddressMappi
 
   it('removeRows - sometimes nothing is removed', () => {
     const mapping = builder(2, 2)
-    mapping.setCell(adr('A1'), new ValueCellVertex(11))
-    mapping.setCell(adr('B1'), new ValueCellVertex(12))
-    mapping.setCell(adr('A2'), new ValueCellVertex(21))
-    mapping.setCell(adr('B2'), new ValueCellVertex(22))
+    mapping.setCell(adr('A1'), new ValueCellVertex(11, 11))
+    mapping.setCell(adr('B1'), new ValueCellVertex(12, 12))
+    mapping.setCell(adr('A2'), new ValueCellVertex(21, 21))
+    mapping.setCell(adr('B2'), new ValueCellVertex(22, 22))
 
     mapping.removeRows(new RowsSpan(0, 2, 3))
 
@@ -243,14 +247,14 @@ const sharedExamples = (builder: (width: number, height: number) => AddressMappi
 
   it('removeColumns - more than one col', () => {
     const mapping = builder(4, 2)
-    mapping.setCell(adr('A1'), new ValueCellVertex(11))
-    mapping.setCell(adr('A2'), new ValueCellVertex(12))
-    mapping.setCell(adr('B1'), new ValueCellVertex(21)) // to
-    mapping.setCell(adr('B2'), new ValueCellVertex(22)) // re
-    mapping.setCell(adr('C1'), new ValueCellVertex(31)) // mo
-    mapping.setCell(adr('C2'), new ValueCellVertex(32)) // ve
-    mapping.setCell(adr('D1'), new ValueCellVertex(41))
-    mapping.setCell(adr('D2'), new ValueCellVertex(42))
+    mapping.setCell(adr('A1'), new ValueCellVertex(11, 11))
+    mapping.setCell(adr('A2'), new ValueCellVertex(12, 12))
+    mapping.setCell(adr('B1'), new ValueCellVertex(21, 21)) // to
+    mapping.setCell(adr('B2'), new ValueCellVertex(22, 22)) // re
+    mapping.setCell(adr('C1'), new ValueCellVertex(31, 31)) // mo
+    mapping.setCell(adr('C2'), new ValueCellVertex(32, 32)) // ve
+    mapping.setCell(adr('D1'), new ValueCellVertex(41, 41))
+    mapping.setCell(adr('D2'), new ValueCellVertex(42, 42))
 
     expect(mapping.getWidth(0)).toBe(4)
     mapping.removeColumns(new ColumnsSpan(0, 1, 2))
@@ -261,10 +265,10 @@ const sharedExamples = (builder: (width: number, height: number) => AddressMappi
 
   it('removeColumns - remove more cols thant mapping size', () => {
     const mapping = builder(2, 2)
-    mapping.setCell(adr('A1'), new ValueCellVertex(11))
-    mapping.setCell(adr('B1'), new ValueCellVertex(12))
-    mapping.setCell(adr('A2'), new ValueCellVertex(21))
-    mapping.setCell(adr('B2'), new ValueCellVertex(22))
+    mapping.setCell(adr('A1'), new ValueCellVertex(11, 11))
+    mapping.setCell(adr('B1'), new ValueCellVertex(12, 12))
+    mapping.setCell(adr('A2'), new ValueCellVertex(21, 21))
+    mapping.setCell(adr('B2'), new ValueCellVertex(22, 22))
 
     expect(mapping.getHeight(0)).toBe(2)
     mapping.removeColumns(new ColumnsSpan(0, 0, 5))
@@ -274,10 +278,10 @@ const sharedExamples = (builder: (width: number, height: number) => AddressMappi
 
   it('removeColumns - remove more cols than size, but still something left', () => {
     const mapping = builder(2, 2)
-    mapping.setCell(adr('A1'), new ValueCellVertex(11))
-    mapping.setCell(adr('B1'), new ValueCellVertex(12))
-    mapping.setCell(adr('A2'), new ValueCellVertex(21))
-    mapping.setCell(adr('B2'), new ValueCellVertex(22))
+    mapping.setCell(adr('A1'), new ValueCellVertex(11, 11))
+    mapping.setCell(adr('B1'), new ValueCellVertex(12, 12))
+    mapping.setCell(adr('A2'), new ValueCellVertex(21, 21))
+    mapping.setCell(adr('B2'), new ValueCellVertex(22, 22))
 
     mapping.removeColumns(new ColumnsSpan(0, 1, 5))
 
@@ -288,10 +292,10 @@ const sharedExamples = (builder: (width: number, height: number) => AddressMappi
 
   it('removeColumns - sometimes nothing is removed', () => {
     const mapping = builder(2, 2)
-    mapping.setCell(adr('A1'), new ValueCellVertex(11))
-    mapping.setCell(adr('B1'), new ValueCellVertex(12))
-    mapping.setCell(adr('A2'), new ValueCellVertex(21))
-    mapping.setCell(adr('B2'), new ValueCellVertex(22))
+    mapping.setCell(adr('A1'), new ValueCellVertex(11, 11))
+    mapping.setCell(adr('B1'), new ValueCellVertex(12, 12))
+    mapping.setCell(adr('A2'), new ValueCellVertex(21, 21))
+    mapping.setCell(adr('B2'), new ValueCellVertex(22, 22))
 
     mapping.removeColumns(new ColumnsSpan(0, 2, 3))
 
@@ -324,7 +328,7 @@ describe('SparseStrategy', () => {
     const mapping = new AddressMapping(new AlwaysSparse())
     mapping.addSheet(0, new SparseStrategy(4, 16))
 
-    mapping.setCell(adr('D16'), new ValueCellVertex(42))
+    mapping.setCell(adr('D16'), new ValueCellVertex(42, 42))
 
     expect(mapping.getHeight(0)).toEqual(16)
     expect(mapping.getWidth(0)).toEqual(4)

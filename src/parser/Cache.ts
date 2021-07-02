@@ -1,11 +1,11 @@
 /**
  * @license
- * Copyright (c) 2020 Handsoncode. All rights reserved.
+ * Copyright (c) 2021 Handsoncode. All rights reserved.
  */
 
+import {FunctionRegistry} from '../interpreter/FunctionRegistry'
 import {AstNodeType, collectDependencies, RelativeDependency} from './'
 import {Ast} from './Ast'
-import {FunctionRegistry} from '../interpreter/FunctionRegistry'
 
 export interface CacheEntry {
   ast: Ast,
@@ -36,7 +36,7 @@ export class Cache {
 
   public maybeSetAndThenGet(hash: string, ast: Ast): Ast {
     const entryFromCache = this.cache.get(hash)
-    if (entryFromCache) {
+    if (entryFromCache !== undefined) {
       return entryFromCache.ast
     } else {
       this.set(hash, ast)
@@ -89,6 +89,9 @@ export const doesContainFunctions = (ast: Ast, functionCriterion: (functionId: s
       return ast.args.some((arg) =>
         doesContainFunctions(arg, functionCriterion)
       )
+    }
+    case AstNodeType.MATRIX: {
+      return ast.args.some(row => row.some(arg => doesContainFunctions(arg, functionCriterion)))
     }
   }
 }

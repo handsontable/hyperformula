@@ -1,29 +1,33 @@
 /**
  * @license
- * Copyright (c) 2020 Handsoncode. All rights reserved.
+ * Copyright (c) 2021 Handsoncode. All rights reserved.
  */
 
-import {ErrorType} from './Cell'
+import {GPU} from 'gpu.js'
+import {
+  configCheckIfParametersNotInConflict,
+  configValueFromParam,
+  configValueFromParamCheck,
+  validateNumberToBeAtLeast,
+  validateNumberToBeAtMost
+} from './ArgumentSanitization'
+import {TranslatableErrorType} from './Cell'
 import {defaultParseToDateTime} from './DateTimeDefault'
 import {DateTime, instanceOfSimpleDate, SimpleDate, SimpleDateTime, SimpleTime} from './DateTimeHelper'
-import {
-  ConfigValueTooSmallError,
-  ConfigValueTooBigError,
-  ExpectedValueOfTypeError,
-  ExpectedOneOfValuesError
-} from './errors'
 import {AlwaysDense, ChooseAddressMapping} from './DependencyGraph/AddressMapping/ChooseAddressMappingPolicy'
+import {ConfigValueEmpty, ExpectedValueOfTypeError} from './errors'
 import {defaultStringifyDateTime, defaultStringifyDuration} from './format/format'
+import {checkLicenseKeyValidity, LicenseKeyValidityState} from './helpers/licenseKeyValidator'
 import {HyperFormula} from './HyperFormula'
 import {TranslationPackage} from './i18n'
+import {FunctionPluginDefinition} from './interpreter'
 import {Maybe} from './Maybe'
 import {ParserConfig} from './parser/ParserConfig'
-import {checkLicenseKeyValidity, LicenseKeyValidityState} from './helpers/licenseKeyValidator'
-import {FunctionPluginDefinition} from './interpreter/plugin/FunctionPlugin'
 
 type GPUMode = 'gpu' | 'cpu' | 'dev'
 
 const PossibleGPUModeString: GPUMode[] = ['gpu', 'cpu', 'dev']
+const privatePool: WeakMap<Config, {licenseKeyValidityState: LicenseKeyValidityState}> = new WeakMap()
 
 export interface ConfigParams {
   /**
@@ -35,6 +39,16 @@ export interface ConfigParams {
    * @category String
    */
   accentSensitive: boolean,
+  /**
+   * Determines minimum number of elements a range must have in order to use binary search.
+   * Shorter ranges will be searched naively.
+   * Used by VLOOKUP, HLOOKUP and MATCH functions.
+   *
+   * @default 20
+   *
+   * @category Engine
+   */
+  binarySearchThreshold: number,
   /**
    * Specifies if the string comparison is case-sensitive or not.
    * Applies to comparison operators only.
@@ -65,6 +79,14 @@ export interface ConfigParams {
    */
   chooseAddressMappingPolicy: ChooseAddressMapping,
   /**
+   * Symbols used to denote currency numbers.
+   *
+   * @default ['$']
+   *
+   * @category Number
+   */
+  currencySymbol: string[],
+  /**
    * A list of date formats that are supported by date parsing functions.
    *
    * The separator is ignored and it can be any of '-' (dash), ' ' (empty space), '/' (slash).
@@ -76,18 +98,6 @@ export interface ConfigParams {
    * @category Date and Time
    */
   dateFormats: string[],
-  /**
-   * A list of time formats that are supported by time parsing functions.
-   *
-   * The separator is ':' (colon).
-   *
-   * Any configuration of at least two of hh, mm, ss is accepted as a time, and they can be put in any order.
-   *
-   * @default ['hh:mm', 'hh:mm:ss.sss']
-   *
-   * @category Date and Time
-   */
-  timeFormats: string[],
   /**
    * A separator character used to separate arguments of procedures in formulas. Must be different from [[decimalSeparator]] and [[thousandSeparator]].
    *
@@ -106,35 +116,14 @@ export interface ConfigParams {
    */
   decimalSeparator: '.' | ',',
   /**
-   * Code for translation package with translations of function and error names.
+   * Sets the compatibility mode for behaviour of null value.
+   * If set, formula evaluating to null evaluates to 0 instead.
    *
-   * @default 'enGB'
+   * @default false
    *
-   * @category Formula Syntax
+   * @category Engine
    */
-  language: string,
-  /**
-   * A license key of HyperFormula accepts the following values:
-   * * `agpl-v3` string if you want to use the software on AGPL v3 license terms,
-   * * `non-commercial-and-evaluation` string if you want to use our limited versions,
-   * * a valid license key string, if you bought the commercial license.
-   *
-   * For more details visit [this guide](/guide/license-key.html)
-   *
-   * @default undefined
-   *
-   * @category License
-   */
-  licenseKey: string,
-  /**
-   * A thousand separator used for parsing numeric literals.
-   * Can be either empty, ',' (comma) or ' ' (empty space) and must be different from [[decimalSeparator]] and [[functionArgSeparator]].
-   *
-   * @default ''
-   *
-   * @category Number
-   */
-  thousandSeparator: '' | ',' | ' ' | '.',
+  evaluateNullToZero: boolean,
   /**
    * A list of additional function plugins to use by formula interpreter.
    *
@@ -144,6 +133,14 @@ export interface ConfigParams {
    */
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   functionPlugins: any[],
+  /**
+   * A GPU.js constructor used by matrix functions. When not provided, plain cpu implementation will be used.
+   *
+   * @default undefined
+   *
+   * @category Engine
+   */
+  gpujs?: typeof GPU,
   /**
    * Allows to set GPU or CPU for use in matrix calculations.
    * When set to 'gpu' it will try to use GPU for matrix calculations. Setting it to 'cpu' will force CPU usage.
@@ -163,6 +160,14 @@ export interface ConfigParams {
    */
   ignorePunctuation: boolean,
   /**
+   * Code for translation package with translations of function and error names.
+   *
+   * @default 'enGB'
+   *
+   * @category Formula Syntax
+   */
+  language: string,
+  /**
    * Preserves an option for setting 1900 as a leap year.
    * 1900 was not a leap year, but in Lotus 1-2-3 it was faulty interpreted as a leap year.
    * Set to `true` for compatibility with Lotus 1-2-3 and Excel. See [[nullDate]] for complete solution.
@@ -173,6 +178,18 @@ export interface ConfigParams {
    */
   leapYear1900: boolean,
   /**
+   * A license key of HyperFormula accepts the following values:
+   * * `gpl-v3` string if you want to use the software on GPL v3 license terms,
+   * * a valid license key string, if you bought the commercial license.
+   *
+   * For more details visit [this guide](/guide/license-key.html)
+   *
+   * @default undefined
+   *
+   * @category License
+   */
+  licenseKey: string,
+  /**
    * Sets the locale using a BCP 47 code language tag for language sensitive string comparison.
    *
    * @default 'en'
@@ -181,32 +198,51 @@ export interface ConfigParams {
    */
   localeLang: string,
   /**
-   * Enables numeric matrix detection feature when set to 'true'.
-   * During build phase each rectangular area of numbers will be treated as one matrix vertex in order to optimize further calculations.
-   * Some CRUD operations may break numeric matrices into individual vertices if needed.
+   * Whether criterions in functions require whole cell to match the pattern, or just a subword.
    *
    * @default true
-   *
-   * @category Engine
+   * @category String
    */
-  matrixDetection: boolean,
+  matchWholeCell: boolean,
   /**
-   * Specifies how many cells an area must have in order to be treated as a matrix. Relevant only if [[matrixDetection]] is set to `true`.
+   * Column separator symbol for array notation.
    *
-   * @default 100
-   *
-   * @category Engine
+   * @default ','
+   * @category Formula syntax
    */
-  matrixDetectionThreshold: number,
+  matrixColumnSeparator: ',' | ';',
   /**
-   * Sets the compatibility mode for behaviour of null value.
-   * If set, formula evaluating to null evaluates to 0 instead.
+   * Row separator symbol for array notation.
    *
-   * @default false
+   * @default ';'
+   * @category Formula syntax
+   */
+  matrixRowSeparator: ';' | '|',
+  /**
+   * Maximum number of rows
+   *
+   * @default 40,000
    *
    * @category Engine
+   * */
+  maxRows: number,
+  /**
+   * Maximum number of columns
+   *
+   * @default 18,278
+   *
+   * @category Engine
+   * */
+  maxColumns: number,
+  /**
+   * Allows to set a specific date from which the number of days will be counted.
+   * Dates are represented internally as a number of days that passed since this `nullDate`.
+   *
+   * @default {year: 1899, month: 12, day: 30}
+   *
+   * @category Date and Time
    */
-  evaluateNullToZero: boolean,
+  nullDate: SimpleDate,
   /**
    * Two-digit values when interpreted as a year can be either 19xx or 20xx.
    * If `xx <= nullYear` its latter, otherwise its former.
@@ -223,7 +259,7 @@ export interface ConfigParams {
    *
    * @category Date and Time
    */
-  parseDateTime: (dateTimeString: string, dateFormat: string, timeFormat: string) => Maybe<DateTime>,
+  parseDateTime: (dateTimeString: string, dateFormat?: string, timeFormat?: string) => Maybe<DateTime>,
   /**
    * Controls how far two numerical values need to be from each other to be treated as non-equal.
    * `a` and `b` are equal if they are of the same sign and:
@@ -273,6 +309,35 @@ export interface ConfigParams {
    */
   smartRounding: boolean,
   /**
+   * A thousand separator used for parsing numeric literals.
+   * Can be either empty, ',' (comma) or ' ' (empty space) and must be different from [[decimalSeparator]] and [[functionArgSeparator]].
+   *
+   * @default ''
+   *
+   * @category Number
+   */
+  thousandSeparator: '' | ',' | ' ' | '.',
+  /**
+   * A list of time formats that are supported by time parsing functions.
+   *
+   * The separator is ':' (colon).
+   *
+   * Any configuration of at least two of hh, mm, ss is accepted as a time, and they can be put in any order.
+   *
+   * @default ['hh:mm', 'hh:mm:ss.sss']
+   *
+   * @category Date and Time
+   */
+  timeFormats: string[],
+  /**
+   * Specifies if the array arithmetic operations are allowed globally, or only inside special function (like ARRAYFORMULA).
+   *
+   * @default false
+   *
+   * @category Engine
+   */
+  useArrayArithmetic: boolean,
+  /**
    * Switches column search strategy from binary search to column index.
    * Used by VLOOKUP and MATCH functions.
    * Using column index may improve time efficiency but it will increase memory usage.
@@ -291,25 +356,6 @@ export interface ConfigParams {
    * @category Engine
    */
   useStats: boolean,
-  /**
-   * Determines minimum number of elements a range must have in order to use binary search.
-   * Shorter ranges will be searched naively.
-   * Used by VLOOKUP and MATCH functions.
-   *
-   * @default 20
-   *
-   * @category Engine
-   */
-  vlookupThreshold: number,
-  /**
-   * Allows to set a specific date from which the number of days will be counted.
-   * Dates are represented internally as a number of days that passed since this `nullDate`.
-   *
-   * @default {year: 1899, month: 12, day: 30}
-   *
-   * @category Date and Time
-   */
-  nullDate: SimpleDate,
   /**
    * A number of kept elements in undo history.
    *
@@ -332,74 +378,56 @@ export interface ConfigParams {
    * @category String
    */
   useWildcards: boolean,
-  /**
-   * Whether criterions in functions require whole cell to match the pattern, or just a subword.
-   *
-   * @default true
-   * @category String
-   */
-  matchWholeCell: boolean,
-  /**
-   * Maximum number of rows
-   *
-   * @default 40,000
-   *
-   * @category Engine
-   * */
-  maxRows: number,
-  /**
-   * Maximum number of columns
-   *
-   * @default 18,278
-   *
-   * @category Engine
-   * */
-  maxColumns: number,
 }
 
-type ConfigParamsList = keyof ConfigParams
+export type ConfigParamsList = keyof ConfigParams
 
 export class Config implements ConfigParams, ParserConfig {
 
   public static defaultConfig: ConfigParams = {
     accentSensitive: false,
+    binarySearchThreshold: 20,
+    currencySymbol: ['$'],
     caseSensitive: false,
     caseFirst: 'lower',
-    ignorePunctuation: false,
     chooseAddressMappingPolicy: new AlwaysDense(),
     dateFormats: ['DD/MM/YYYY', 'DD/MM/YY'],
-    timeFormats: ['hh:mm', 'hh:mm:ss.sss'],
-    functionArgSeparator: ',',
     decimalSeparator: '.',
-    thousandSeparator: '',
+    evaluateNullToZero: false,
+    functionArgSeparator: ',',
+    functionPlugins: [],
+    gpujs: undefined,
+    gpuMode: 'gpu',
+    ignorePunctuation: false,
     language: 'enGB',
     licenseKey: '',
-    functionPlugins: [],
-    gpuMode: 'gpu',
     leapYear1900: false,
-    smartRounding: true,
     localeLang: 'en',
-    matrixDetection: true,
-    matrixDetectionThreshold: 100,
-    evaluateNullToZero: false,
+    matchWholeCell: true,
+    matrixColumnSeparator: ',',
+    matrixRowSeparator: ';',
+    maxRows: 40_000,
+    maxColumns: 18_278,
     nullYear: 30,
+    nullDate: {year: 1899, month: 12, day: 30},
     parseDateTime: defaultParseToDateTime,
-    stringifyDateTime: defaultStringifyDateTime,
-    stringifyDuration: defaultStringifyDuration,
     precisionEpsilon: 1e-13,
     precisionRounding: 14,
-    useColumnIndex: false,
-    useStats: false,
-    vlookupThreshold: 20,
-    nullDate: {year: 1899, month: 12, day: 30},
+    smartRounding: true,
+    stringifyDateTime: defaultStringifyDateTime,
+    stringifyDuration: defaultStringifyDuration,
+    timeFormats: ['hh:mm', 'hh:mm:ss.sss'],
+    thousandSeparator: '',
     undoLimit: 20,
     useRegularExpressions: false,
     useWildcards: true,
-    matchWholeCell: true,
-    maxRows: 40_000,
-    maxColumns: 18_278
+    useColumnIndex: false,
+    useStats: false,
+    useArrayArithmetic: false,
   }
 
+  /** @inheritDoc */
+  public readonly useArrayArithmetic: boolean
   /** @inheritDoc */
   public readonly caseSensitive: boolean
   /** @inheritDoc */
@@ -415,6 +443,10 @@ export class Config implements ConfigParams, ParserConfig {
   /** @inheritDoc */
   public readonly functionArgSeparator: string
   /** @inheritDoc */
+  public readonly matrixColumnSeparator: ',' | ';'
+  /** @inheritDoc */
+  public readonly matrixRowSeparator: ';' | '|'
+  /** @inheritDoc */
   public readonly decimalSeparator: '.' | ','
   /** @inheritDoc */
   public readonly thousandSeparator: '' | ',' | ' ' | '.'
@@ -423,26 +455,24 @@ export class Config implements ConfigParams, ParserConfig {
   /** @inheritDoc */
   public readonly licenseKey: string
   /** @inheritDoc */
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   public readonly functionPlugins: FunctionPluginDefinition[]
+  /** @inheritDoc */
+  public readonly gpujs?: typeof GPU
   /** @inheritDoc */
   public readonly gpuMode: GPUMode
   /** @inheritDoc */
   public readonly leapYear1900: boolean
   /** @inheritDoc */
-  public readonly matrixDetection: boolean
-  /** @inheritDoc */
   public readonly ignorePunctuation: boolean
   /** @inheritDoc */
   public readonly localeLang: string
-  /** @inheritDoc */
-  public readonly matrixDetectionThreshold: number
   /** @inheritDoc */
   public readonly evaluateNullToZero: boolean
   /** @inheritDoc */
   public readonly nullYear: number
   /** @inheritDoc */
-  public readonly parseDateTime: (dateString: string, dateFormats: string) => Maybe<SimpleDateTime>
+  public readonly parseDateTime: (dateString: string, dateFormat?: string, timeFormat?: string) => Maybe<SimpleDateTime>
   /** @inheritDoc */
   public readonly stringifyDateTime: (date: SimpleDateTime, formatArg: string) => Maybe<string>
   /** @inheritDoc */
@@ -458,9 +488,11 @@ export class Config implements ConfigParams, ParserConfig {
   /** @inheritDoc */
   public readonly useStats: boolean
   /** @inheritDoc */
-  public readonly vlookupThreshold: number
+  public readonly binarySearchThreshold: number
   /** @inheritDoc */
   public readonly nullDate: SimpleDate
+  /** @inheritDoc */
+  public readonly currencySymbol: string[]
   /** @inheritDoc */
   public readonly undoLimit: number
   /**
@@ -468,7 +500,7 @@ export class Config implements ConfigParams, ParserConfig {
    *
    * @internal
    */
-  public readonly errorMapping: Record<string, ErrorType>
+  public readonly errorMapping: Record<string, TranslatableErrorType>
   /** @inheritDoc */
   public readonly maxRows: number
   /** @inheritDoc */
@@ -482,12 +514,7 @@ export class Config implements ConfigParams, ParserConfig {
   public readonly useRegularExpressions: boolean
   public readonly useWildcards: boolean
   public readonly matchWholeCell: boolean
-  /**
-   * Set automatically based on licenseKey checking result.
-   *
-   * @internal
-   */
-  #licenseKeyValidityState: LicenseKeyValidityState
+
   /**
    * Proxied property to its private counterpart. This makes the property
    * as accessible as the other Config options but without ability to change the value.
@@ -495,109 +522,139 @@ export class Config implements ConfigParams, ParserConfig {
    * @internal
    */
   public get licenseKeyValidityState() {
-    return this.#licenseKeyValidityState
+    return privatePool.get(this)!.licenseKeyValidityState
   }
 
   constructor(
     {
       accentSensitive,
+      binarySearchThreshold,
       caseSensitive,
       caseFirst,
       chooseAddressMappingPolicy,
+      currencySymbol,
       dateFormats,
-      timeFormats,
-      functionArgSeparator,
       decimalSeparator,
-      thousandSeparator,
-      language,
-      licenseKey,
+      evaluateNullToZero,
+      functionArgSeparator,
       functionPlugins,
+      gpujs,
       gpuMode,
       ignorePunctuation,
       leapYear1900,
       localeLang,
-      smartRounding,
-      matrixDetection,
-      matrixDetectionThreshold,
-      evaluateNullToZero,
+      language,
+      licenseKey,
+      matchWholeCell,
+      matrixColumnSeparator,
+      matrixRowSeparator,
+      maxRows,
+      maxColumns,
       nullYear,
+      nullDate,
       parseDateTime,
-      stringifyDateTime,
-      stringifyDuration,
       precisionEpsilon,
       precisionRounding,
-      useColumnIndex,
-      vlookupThreshold,
-      nullDate,
+      stringifyDateTime,
+      stringifyDuration,
+      smartRounding,
+      timeFormats,
+      thousandSeparator,
+      useArrayArithmetic,
       useStats,
       undoLimit,
+      useColumnIndex,
       useRegularExpressions,
       useWildcards,
-      matchWholeCell,
-      maxRows,
-      maxColumns
     }: Partial<ConfigParams> = {},
   ) {
-    this.accentSensitive = this.valueFromParam(accentSensitive, 'boolean', 'accentSensitive')
-    this.caseSensitive = this.valueFromParam(caseSensitive, 'boolean', 'caseSensitive')
-    this.caseFirst = this.valueFromParam(caseFirst, ['upper', 'lower', 'false'], 'caseFirst')
-    this.ignorePunctuation = this.valueFromParam(ignorePunctuation, 'boolean', 'ignorePunctuation')
+    this.useArrayArithmetic = configValueFromParam(useArrayArithmetic, 'boolean', 'useArrayArithmetic')
+    this.accentSensitive = configValueFromParam(accentSensitive, 'boolean', 'accentSensitive')
+    this.caseSensitive = configValueFromParam(caseSensitive, 'boolean', 'caseSensitive')
+    this.caseFirst = configValueFromParam(caseFirst, ['upper', 'lower', 'false'], 'caseFirst')
+    this.ignorePunctuation = configValueFromParam(ignorePunctuation, 'boolean', 'ignorePunctuation')
     this.chooseAddressMappingPolicy = chooseAddressMappingPolicy ?? Config.defaultConfig.chooseAddressMappingPolicy
-    this.dateFormats = this.valueFromParamCheck(dateFormats, Array.isArray, 'array', 'dateFormats')
-    this.timeFormats = this.valueFromParamCheck(timeFormats, Array.isArray, 'array', 'timeFormats')
-    this.functionArgSeparator = this.valueFromParam(functionArgSeparator, 'string', 'functionArgSeparator')
-    this.decimalSeparator = this.valueFromParam(decimalSeparator, ['.', ','], 'decimalSeparator')
-    this.language = this.valueFromParam(language, 'string', 'language')
-    this.licenseKey = this.valueFromParam(licenseKey, 'string', 'licenseKey')
-    this.#licenseKeyValidityState = checkLicenseKeyValidity(this.licenseKey)
-    this.thousandSeparator = this.valueFromParam(thousandSeparator, ['', ',', ' ', '.'], 'thousandSeparator')
-    this.localeLang = this.valueFromParam(localeLang, 'string', 'localeLang')
+    this.dateFormats = configValueFromParamCheck(dateFormats, Array.isArray, 'array', 'dateFormats')
+    this.timeFormats = configValueFromParamCheck(timeFormats, Array.isArray, 'array', 'timeFormats')
+    this.functionArgSeparator = configValueFromParam(functionArgSeparator, 'string', 'functionArgSeparator')
+    this.decimalSeparator = configValueFromParam(decimalSeparator, ['.', ','], 'decimalSeparator')
+    this.language = configValueFromParam(language, 'string', 'language')
+    this.licenseKey = configValueFromParam(licenseKey, 'string', 'licenseKey')
+    this.thousandSeparator = configValueFromParam(thousandSeparator, ['', ',', ' ', '.'], 'thousandSeparator')
+    this.matrixColumnSeparator = configValueFromParam(matrixColumnSeparator, [',', ';'], 'matrixColumnSeparator')
+    this.matrixRowSeparator = configValueFromParam(matrixRowSeparator, [';', '|'], 'matrixRowSeparator')
+    this.localeLang = configValueFromParam(localeLang, 'string', 'localeLang')
     this.functionPlugins = functionPlugins ?? Config.defaultConfig.functionPlugins
-    this.gpuMode = this.valueFromParam(gpuMode, PossibleGPUModeString, 'gpuMode')
-    this.smartRounding = this.valueFromParam(smartRounding, 'boolean', 'smartRounding')
-    this.matrixDetection = this.valueFromParam(matrixDetection, 'boolean', 'matrixDetection')
-    this.matrixDetectionThreshold = this.valueFromParam(matrixDetectionThreshold, 'number', 'matrixDetectionThreshold')
-    this.validateNumberToBeAtLeast(this.matrixDetectionThreshold, 'matrixDetectionThreshold', 1)
-    this.evaluateNullToZero = this.valueFromParam(evaluateNullToZero, 'boolean', 'evaluateNullToZero')
-    this.nullYear = this.valueFromParam(nullYear, 'number', 'nullYear')
-    this.validateNumberToBeAtLeast(this.nullYear, 'nullYear', 0)
-    this.validateNumberToBeAtMost(this.nullYear, 'nullYear', 100)
-    this.precisionRounding = this.valueFromParam(precisionRounding, 'number', 'precisionRounding')
-    this.validateNumberToBeAtLeast(this.precisionRounding, 'precisionRounding', 0)
-    this.precisionEpsilon = this.valueFromParam(precisionEpsilon, 'number', 'precisionEpsilon')
-    this.validateNumberToBeAtLeast(this.precisionEpsilon, 'precisionEpsilon', 0)
-    this.useColumnIndex = this.valueFromParam(useColumnIndex, 'boolean', 'useColumnIndex')
-    this.useStats = this.valueFromParam(useStats, 'boolean', 'useStats')
-    this.vlookupThreshold = this.valueFromParam(vlookupThreshold, 'number', 'vlookupThreshold')
-    this.validateNumberToBeAtLeast(this.vlookupThreshold, 'vlookupThreshold', 1)
-    this.parseDateTime = this.valueFromParam(parseDateTime, 'function', 'parseDateTime')
-    this.stringifyDateTime = this.valueFromParam(stringifyDateTime, 'function', 'stringifyDateTime')
-    this.stringifyDuration = this.valueFromParam(stringifyDuration, 'function', 'stringifyDuration')
+    this.gpujs = gpujs ?? Config.defaultConfig.gpujs
+    this.gpuMode = configValueFromParam(gpuMode, PossibleGPUModeString, 'gpuMode')
+    this.smartRounding = configValueFromParam(smartRounding, 'boolean', 'smartRounding')
+    this.evaluateNullToZero = configValueFromParam(evaluateNullToZero, 'boolean', 'evaluateNullToZero')
+    this.nullYear = configValueFromParam(nullYear, 'number', 'nullYear')
+    validateNumberToBeAtLeast(this.nullYear, 'nullYear', 0)
+    validateNumberToBeAtMost(this.nullYear, 'nullYear', 100)
+    this.precisionRounding = configValueFromParam(precisionRounding, 'number', 'precisionRounding')
+    validateNumberToBeAtLeast(this.precisionRounding, 'precisionRounding', 0)
+    this.precisionEpsilon = configValueFromParam(precisionEpsilon, 'number', 'precisionEpsilon')
+    validateNumberToBeAtLeast(this.precisionEpsilon, 'precisionEpsilon', 0)
+    this.useColumnIndex = configValueFromParam(useColumnIndex, 'boolean', 'useColumnIndex')
+    this.useStats = configValueFromParam(useStats, 'boolean', 'useStats')
+    this.binarySearchThreshold = configValueFromParam(binarySearchThreshold, 'number', 'binarySearchThreshold')
+    validateNumberToBeAtLeast(this.binarySearchThreshold, 'binarySearchThreshold', 1)
+    this.parseDateTime = configValueFromParam(parseDateTime, 'function', 'parseDateTime')
+    this.stringifyDateTime = configValueFromParam(stringifyDateTime, 'function', 'stringifyDateTime')
+    this.stringifyDuration = configValueFromParam(stringifyDuration, 'function', 'stringifyDuration')
     this.translationPackage = HyperFormula.getLanguage(this.language)
     this.errorMapping = this.translationPackage.buildErrorMapping()
-    this.nullDate = this.valueFromParamCheck(nullDate, instanceOfSimpleDate, 'IDate', 'nullDate')
-    this.leapYear1900 = this.valueFromParam(leapYear1900, 'boolean', 'leapYear1900')
-    this.undoLimit = this.valueFromParam(undoLimit, 'number', 'undoLimit')
-    this.useRegularExpressions = this.valueFromParam(useRegularExpressions, 'boolean', 'useRegularExpressions')
-    this.useWildcards = this.valueFromParam(useWildcards, 'boolean', 'useWildcards')
-    this.matchWholeCell = this.valueFromParam(matchWholeCell, 'boolean', 'matchWholeCell')
-    this.validateNumberToBeAtLeast(this.undoLimit, 'undoLimit', 0)
-    this.maxRows = this.valueFromParam(maxRows, 'number', 'maxRows')
-    this.validateNumberToBeAtLeast(this.maxRows, 'maxRows', 1)
-    this.maxColumns = this.valueFromParam(maxColumns, 'number', 'maxColumns')
-    this.validateNumberToBeAtLeast(this.maxColumns, 'maxColumns', 1)
+    this.nullDate = configValueFromParamCheck(nullDate, instanceOfSimpleDate, 'IDate', 'nullDate')
+    this.leapYear1900 = configValueFromParam(leapYear1900, 'boolean', 'leapYear1900')
+    this.undoLimit = configValueFromParam(undoLimit, 'number', 'undoLimit')
+    this.useRegularExpressions = configValueFromParam(useRegularExpressions, 'boolean', 'useRegularExpressions')
+    this.useWildcards = configValueFromParam(useWildcards, 'boolean', 'useWildcards')
+    this.matchWholeCell = configValueFromParam(matchWholeCell, 'boolean', 'matchWholeCell')
+    validateNumberToBeAtLeast(this.undoLimit, 'undoLimit', 0)
+    this.maxRows = configValueFromParam(maxRows, 'number', 'maxRows')
+    validateNumberToBeAtLeast(this.maxRows, 'maxRows', 1)
+    this.maxColumns = configValueFromParam(maxColumns, 'number', 'maxColumns')
+    this.currencySymbol = configValueFromParamCheck(currencySymbol, Array.isArray, 'array',  'currencySymbol')
+    this.currencySymbol.forEach((val) => {
+      if(typeof val !== 'string') {
+        throw new ExpectedValueOfTypeError('string[]', 'currencySymbol')
+      }
+      if(val === '') {
+        throw new ConfigValueEmpty('currencySymbol')
+      }
+    })
+    validateNumberToBeAtLeast(this.maxColumns, 'maxColumns', 1)
 
+    privatePool.set(this, {
+      licenseKeyValidityState: checkLicenseKeyValidity(this.licenseKey)
+    })
 
-    this.checkIfParametersNotInConflict(
+    configCheckIfParametersNotInConflict(
       {value: this.decimalSeparator, name: 'decimalSeparator'},
       {value: this.functionArgSeparator, name: 'functionArgSeparator'},
-      {value: this.thousandSeparator, name: 'thousandSeparator'}
+      {value: this.thousandSeparator, name: 'thousandSeparator'},
+    )
+
+    configCheckIfParametersNotInConflict(
+      {value: this.matrixRowSeparator, name: 'matrixRowSeparator'},
+      {value: this.matrixColumnSeparator, name: 'matrixColumnSeparator'},
     )
   }
 
-  public getConfig(): ConfigParams { //TODO: avoid pollution
-    return this
+  public getConfig(): ConfigParams {
+    const ret: { [key: string]: any } = {}
+    for (const key in Config.defaultConfig) {
+      const val = this[key as ConfigParamsList]
+      if (Array.isArray(val)) {
+        ret[key] = [...val]
+      } else {
+        ret[key] = val
+      }
+    }
+    return ret as ConfigParams
   }
+
 
   public mergeConfig(init: Partial<ConfigParams>): Config {
     const mergedConfig: ConfigParams = Object.assign({}, this.getConfig(), init)
@@ -605,67 +662,9 @@ export class Config implements ConfigParams, ParserConfig {
     return new Config(mergedConfig)
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  private valueFromParam(inputValue: any, expectedType: string | string[], paramName: ConfigParamsList) {
-    if (typeof inputValue === 'undefined') {
-      return Config.defaultConfig[paramName]
-    } else if (typeof expectedType === 'string') {
-      if (typeof inputValue === expectedType) {
-        return inputValue
-      } else {
-        throw new ExpectedValueOfTypeError(expectedType, paramName)
-      }
-    } else {
-      if (expectedType.includes(inputValue)) {
-        return inputValue
-      } else {
-        throw new ExpectedOneOfValuesError(expectedType.map((val: string) => '\'' + val + '\'').join(' '), paramName)
-      }
-    }
-  }
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  private valueFromParamCheck(inputValue: any, typeCheck: (object: any) => boolean, expectedType: string, paramName: ConfigParamsList) {
-    if (typeCheck(inputValue)) {
-      return inputValue
-    } else if (typeof inputValue === 'undefined') {
-      return Config.defaultConfig[paramName]
-    } else {
-      throw new ExpectedValueOfTypeError(expectedType, paramName)
-    }
-  }
-
-  private checkIfParametersNotInConflict(...params: { value: number | string | boolean, name: string }[]) {
-    const valuesMap: Map<number | string | boolean, string[]> = new Map()
-
-    params.forEach((param) => {
-      const names = valuesMap.get(param.value) || []
-      names.push(param.name)
-      valuesMap.set(param.value, names)
-    })
-
-    const duplicates: string[][] = []
-    for (const entry of valuesMap.values()) {
-      if (entry.length > 1) {
-        duplicates.push(entry)
-      }
-    }
-
-    if (duplicates.length > 0) {
-      const paramNames = duplicates.map(entry => `[${entry.sort()}]`).join('; ')
-      throw new Error(`Config initialization failed. Parameters in conflict: ${paramNames}`)
-    }
-  }
-
-  private validateNumberToBeAtLeast(value: number, paramName: string, minimum: number) {
-    if (value < minimum) {
-      throw new ConfigValueTooSmallError(paramName, minimum)
-    }
-  }
-
-  private validateNumberToBeAtMost(value: number, paramName: string, maximum: number) {
-    if (value > maximum) {
-      throw new ConfigValueTooBigError(paramName, maximum)
+  private warnDeprecatedIfUsed(inputValue: any, paramName: string, fromVersion: string, replacementName: string) {
+    if (inputValue !== undefined) {
+      console.warn(`${paramName} option is deprecated since ${fromVersion}, please use ${replacementName}`)
     }
   }
 }

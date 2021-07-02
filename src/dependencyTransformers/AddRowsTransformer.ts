@@ -1,16 +1,16 @@
 /**
  * @license
- * Copyright (c) 2020 Handsoncode. All rights reserved.
+ * Copyright (c) 2021 Handsoncode. All rights reserved.
  */
 
-import {Ast, CellAddress} from '../parser'
 import {absoluteSheetReference, ErrorType, SimpleCellAddress} from '../Cell'
-import {ColumnRangeAst} from '../parser/Ast'
-import {Transformer} from './Transformer'
-import {RowsSpan} from '../Span'
-import {RowAddress} from '../parser/RowAddress'
-import {ColumnAddress} from '../parser/ColumnAddress'
+import {Ast, CellAddress} from '../parser'
 import {AddressWithRow} from '../parser/Address'
+import {ColumnRangeAst} from '../parser/Ast'
+import {ColumnAddress} from '../parser/ColumnAddress'
+import {RowAddress} from '../parser/RowAddress'
+import {RowsSpan} from '../Span'
+import {Transformer} from './Transformer'
 
 export class AddRowsTransformer extends Transformer {
   constructor(

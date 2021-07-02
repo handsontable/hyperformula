@@ -1,5 +1,6 @@
 import {HyperFormula} from '../../src'
 import {ErrorType} from '../../src/Cell'
+import {ErrorMessage} from '../../src/error-message'
 import {adr, detailedError} from '../testUtils'
 
 describe('Function OR', () => {
@@ -11,7 +12,7 @@ describe('Function OR', () => {
     expect(engine.getCellValue(adr('A1'))).toBe(true)
     expect(engine.getCellValue(adr('B1'))).toBe(false)
     expect(engine.getCellValue(adr('C1'))).toBe(true)
-    expect(engine.getCellValue(adr('D1'))).toEqual(detailedError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('D1'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.WrongType))
   })
 
   it('use coercion #1', () => {
@@ -21,7 +22,7 @@ describe('Function OR', () => {
     ])
 
     expect(engine.getCellValue(adr('A1'))).toBe(true)
-    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.WrongType))
   })
 
   it('use coercion #2', () => {
@@ -34,7 +35,7 @@ describe('Function OR', () => {
 
     expect(engine.getCellValue(adr('A1'))).toBe(true)
     expect(engine.getCellValue(adr('A2'))).toBe(true)
-    expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A3'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.WrongType))
   })
 
   it('function OR with numerical arguments', () => {
@@ -52,7 +53,7 @@ describe('Function OR', () => {
       ['=OR()'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA))
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
   })
 
   it('if error in range found, returns first one in row-by-row order', () => {
@@ -62,7 +63,7 @@ describe('Function OR', () => {
       ['=OR(A1:B2)'],
     ])
 
-    expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.DIV_BY_ZERO))
+    expect(engine.getCellValue(adr('A3'))).toEqualError(detailedError(ErrorType.DIV_BY_ZERO))
   })
 
   it('works with ranges', () => {
@@ -82,6 +83,6 @@ describe('Function OR', () => {
       ['=OR(A1:B2)'],
     ])
 
-    expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.DIV_BY_ZERO))
+    expect(engine.getCellValue(adr('A3'))).toEqualError(detailedError(ErrorType.DIV_BY_ZERO))
   })
 })

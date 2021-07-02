@@ -1,5 +1,6 @@
 import {HyperFormula} from '../../src'
 import {ErrorType} from '../../src/Cell'
+import {ErrorMessage} from '../../src/error-message'
 import {adr, detailedError} from '../testUtils'
 
 describe('Percent operator', () => {
@@ -19,7 +20,7 @@ describe('Percent operator', () => {
     ])
 
     expect(engine.getCellValue(adr('A1'))).toBe(0.03)
-    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.NumberCoercion))
     expect(engine.getCellValue(adr('A3'))).toEqual(0.01)
   })
 
@@ -38,7 +39,7 @@ describe('Percent operator', () => {
       ['=FOOBAR()'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NAME))
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NAME, ErrorMessage.FunctionName('FOOBAR')))
   })
 
   it('works with other operator and coercion', () => {
@@ -47,14 +48,14 @@ describe('Percent operator', () => {
     expect(engine.getCellValue(adr('A1'))).toEqual(0.01)
   })
 
-  // Inconsistency with Product 1
   it('range value results in VALUE error', () => {
     const engine = HyperFormula.buildFromArray([
       ['1'],
-      ['9', '=A1:A3%'],
+      ['9'],
       ['3'],
-    ])
+      ['=A1:A3%'],
+    ], {useArrayArithmetic: false})
 
-    expect(engine.getCellValue(adr('B2'))).toEqual(detailedError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A4'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.ScalarExpected))
   })
 })

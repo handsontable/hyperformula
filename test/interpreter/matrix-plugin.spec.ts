@@ -1,5 +1,7 @@
-import {HyperFormula} from '../../src'
-import {ErrorType} from '../../src/Cell'
+import GPU from 'gpu.js'
+import {ErrorType, HyperFormula} from '../../src'
+import {ConfigParams} from '../../src/Config'
+import {ErrorMessage} from '../../src/error-message'
 import {MatrixPlugin} from '../../src/interpreter/plugin/MatrixPlugin'
 import {adr, detailedError} from '../testUtils'
 
@@ -8,202 +10,209 @@ describe('Matrix plugin', () => {
     HyperFormula.registerFunctionPlugin(MatrixPlugin)
   })
 
-  it('matrix multiplication', () => {
-    const engine = HyperFormula.buildFromArray([
-      ['1', '2'],
-      ['3', '4'],
-      ['5', '6'],
-      ['1', '2'],
-      ['3', '4'],
-      ['{=MMULT(A1:B3,A4:B5)}'],
-    ])
+  const sharedExamples = (config: Partial<ConfigParams>) => {
+    it('matrix multiplication', () => {
+      const engine = HyperFormula.buildFromArray([
+        ['1', '2'],
+        ['3', '4'],
+        ['5', '6'],
+        ['1', '2'],
+        ['3', '4'],
+        ['=MMULT(A1:B3,A4:B5)'],
+      ], config)
 
-    expect(engine.getCellValue(adr('A6'))).toBeCloseTo(7)
-    expect(engine.getCellValue(adr('B6'))).toBeCloseTo(10)
-    expect(engine.getCellValue(adr('A7'))).toBeCloseTo(15)
-    expect(engine.getCellValue(adr('B7'))).toBeCloseTo(22)
-    expect(engine.getCellValue(adr('A8'))).toBeCloseTo(23)
-    expect(engine.getCellValue(adr('B8'))).toBeCloseTo(34)
-  })
 
-  it('matrix multiplication wrong size', () => {
-    const engine = HyperFormula.buildFromArray([
-      ['1', '2'],
-      ['3', '4'],
-      ['5', '6'],
-      ['1', '2', '3'],
-      ['4', '5', '6'],
-      ['7', '8', '9'],
-      ['{=mmult(A1:B3,A4:C6)}'],
-    ])
+      expect(engine.getCellValue(adr('A6'))).toBeCloseTo(7)
+      expect(engine.getCellValue(adr('B6'))).toBeCloseTo(10)
+      expect(engine.getCellValue(adr('A7'))).toBeCloseTo(15)
+      expect(engine.getCellValue(adr('B7'))).toBeCloseTo(22)
+      expect(engine.getCellValue(adr('A8'))).toBeCloseTo(23)
+      expect(engine.getCellValue(adr('B8'))).toBeCloseTo(34)
+    })
 
-    expect(engine.getCellValue(adr('A7'))).toEqual(detailedError(ErrorType.VALUE))
-    expect(engine.getCellValue(adr('B7'))).toBe(null)
-  })
+    it('matrix multiplication wrong size', () => {
+      const engine = HyperFormula.buildFromArray([
+        ['1', '2'],
+        ['3', '4'],
+        ['5', '6'],
+        ['1', '2', '3'],
+        ['4', '5', '6'],
+        ['7', '8', '9'],
+        ['=mmult(A1:B3,A4:C6)'],
+      ], config)
 
-  it('matrix multiplication with string in data', () => {
-    const engine = HyperFormula.buildFromArray([
-      ['1', '2', '{=MMULT(A1:B2,A3:B4)}'],
-      ['3', 'foo'],
-      ['1', '2', '{=MMULT(A3:B4,A1:B2)}'],
-      ['3', '4'],
-    ])
+      expect(engine.getCellValue(adr('A7'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.MatrixDimensions))
+      expect(engine.getCellValue(adr('B7'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.MatrixDimensions))
+    })
 
-    expect(engine.getCellValue(adr('C1'))).toEqual(detailedError(ErrorType.VALUE))
-    expect(engine.getCellValue(adr('D1'))).toEqual(detailedError(ErrorType.VALUE))
-    expect(engine.getCellValue(adr('C2'))).toEqual(detailedError(ErrorType.VALUE))
-    expect(engine.getCellValue(adr('D2'))).toEqual(detailedError(ErrorType.VALUE))
-    expect(engine.getCellValue(adr('C3'))).toEqual(detailedError(ErrorType.VALUE))
-    expect(engine.getCellValue(adr('D4'))).toEqual(detailedError(ErrorType.VALUE))
-    expect(engine.getCellValue(adr('C3'))).toEqual(detailedError(ErrorType.VALUE))
-    expect(engine.getCellValue(adr('D4'))).toEqual(detailedError(ErrorType.VALUE))
-  })
+    it('matrix multiplication with string in data', () => {
+      const engine = HyperFormula.buildFromArray([
+        ['1', '2', '=MMULT(A1:B2,A3:B4)'],
+        ['3', 'foo'],
+        ['1', '2', '=MMULT(A3:B4,A1:B2)'],
+        ['3', '4'],
+      ], config)
 
-  it('nested matrix multiplication', () => {
-    const engine = HyperFormula.buildFromArray([
-      ['1', '2'],
-      ['3', '4'],
-      ['{=MMULT(A1:B2, MMULT(A1:B2,A1:B2))}'],
-    ])
+      expect(engine.getCellValue(adr('C1'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.NumberRange))
+      expect(engine.getCellValue(adr('D1'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.NumberRange))
+      expect(engine.getCellValue(adr('C2'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.NumberRange))
+      expect(engine.getCellValue(adr('D2'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.NumberRange))
+      expect(engine.getCellValue(adr('C3'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.NumberRange))
+      expect(engine.getCellValue(adr('D4'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.NumberRange))
+      expect(engine.getCellValue(adr('C3'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.NumberRange))
+      expect(engine.getCellValue(adr('D4'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.NumberRange))
+    })
 
-    expect(engine.getCellValue(adr('A3'))).toEqual(37)
-    expect(engine.getCellValue(adr('B3'))).toEqual(54)
-    expect(engine.getCellValue(adr('A4'))).toEqual(81)
-    expect(engine.getCellValue(adr('B4'))).toEqual(118)
-  })
+    it('nested matrix multiplication', () => {
+      const engine = HyperFormula.buildFromArray([
+        ['1', '2'],
+        ['3', '4'],
+        ['=MMULT(A1:B2, MMULT(A1:B2,A1:B2))'],
+      ], config)
 
-  it('mmult of other mmult', () => {
-    const engine = HyperFormula.buildFromArray([
-      ['1', '2', '{=MMULT(A1:B2, A1:B2)}', '{=MMULT(A1:B2, A1:B2)}'],
-      ['3', '4', '{=MMULT(A1:B2, A1:B2)}', '{=MMULT(A1:B2, A1:B2)}'],
-      ['{=MMULT(A1:B2, C1:D2)}'],
-    ])
+      expect(engine.getCellValue(adr('A3'))).toEqual(37)
+      expect(engine.getCellValue(adr('B3'))).toEqual(54)
+      expect(engine.getCellValue(adr('A4'))).toEqual(81)
+      expect(engine.getCellValue(adr('B4'))).toEqual(118)
+    })
 
-    expect(engine.getCellValue(adr('A3'))).toEqual(37)
-    expect(engine.getCellValue(adr('B3'))).toEqual(54)
-    expect(engine.getCellValue(adr('A4'))).toEqual(81)
-    expect(engine.getCellValue(adr('B4'))).toEqual(118)
-  })
+    it('mmult of other mmult', () => {
+      const engine = HyperFormula.buildFromArray([
+        ['1', '2', '=MMULT(A1:B2, A1:B2)', '=MMULT(A1:B2, A1:B2)'],
+        ['3', '4', '=MMULT(A1:B2, A1:B2)', '=MMULT(A1:B2, A1:B2)'],
+        ['=MMULT(A1:B2, C1:D2)'],
+      ], config)
 
-  it('mmult of a number', () => {
-    const engine = HyperFormula.buildFromArray([
-      ['{=MMULT(3, 4)}'],
-    ])
+      expect(engine.getCellValue(adr('A3'))).toEqual(37)
+      expect(engine.getCellValue(adr('B3'))).toEqual(54)
+      expect(engine.getCellValue(adr('A4'))).toEqual(81)
+      expect(engine.getCellValue(adr('B4'))).toEqual(118)
+    })
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(12)
-  })
+    it('mmult of a number', () => {
+      const engine = HyperFormula.buildFromArray([
+        ['=MMULT(3, 4)'],
+      ], config)
 
-  it('mmult wrong number of arguments', () => {
-    const engine = HyperFormula.buildFromArray([
-      ['{=MMULT(A1:A2)}', '{=MMULT(A1:A2, B1:B2, C1:C2)}'],
-    ])
+      expect(engine.getCellValue(adr('A1'))).toEqual(12)
+    })
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA))
-    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.NA))
-  })
+    it('mmult wrong number of arguments', () => {
+      const engine = HyperFormula.buildFromArray([
+        ['=MMULT(0)', '=MMULT(0,0,0)'],
+      ], config)
 
-  it('matrix multiplication by sumproduct', () => {
-    const engine = HyperFormula.buildFromArray([
-      ['1', '2'],
-      ['3', '4'],
-      ['5', '6'],
-      ['1', '2'],
-      ['3', '4'],
-      ['=SUMPRODUCT($A1:$B1,transpose(A$4:A$5))', '=SUMPRODUCT($A1:$B1,transpose(B$4:B$5))'],
-      ['=SUMPRODUCT($A2:$B2,transpose(A$4:A$5))', '=SUMPRODUCT($A2:$B2,transpose(B$4:B$5))'],
-      ['=SUMPRODUCT($A3:$B3,transpose(A$4:A$5))', '=SUMPRODUCT($A3:$B3,transpose(B$4:B$5))'],
-    ])
+      expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
+      expect(engine.getCellValue(adr('B1'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
+    })
 
-    expect(engine.getCellValue(adr('A6'))).toBeCloseTo(7)
-    expect(engine.getCellValue(adr('B6'))).toBeCloseTo(10)
-    expect(engine.getCellValue(adr('A7'))).toBeCloseTo(15)
-    expect(engine.getCellValue(adr('B7'))).toBeCloseTo(22)
-    expect(engine.getCellValue(adr('A8'))).toBeCloseTo(23)
-    expect(engine.getCellValue(adr('B8'))).toBeCloseTo(34)
-  })
+    it('matrix multiplication by sumproduct', () => {
+      const engine = HyperFormula.buildFromArray([
+        ['1', '2'],
+        ['3', '4'],
+        ['5', '6'],
+        ['1', '2'],
+        ['3', '4'],
+        ['=SUMPRODUCT($A1:$B1,transpose(A$4:A$5))', '=SUMPRODUCT($A1:$B1,transpose(B$4:B$5))'],
+        ['=SUMPRODUCT($A2:$B2,transpose(A$4:A$5))', '=SUMPRODUCT($A2:$B2,transpose(B$4:B$5))'],
+        ['=SUMPRODUCT($A3:$B3,transpose(A$4:A$5))', '=SUMPRODUCT($A3:$B3,transpose(B$4:B$5))'],
+      ], config)
 
-  it('matrix maxpool', () => {
-    const engine = HyperFormula.buildFromArray([
-      ['1', '2', '3', '4', '5', '6'],
-      ['11', '12', '13', '14', '15', '16'],
-      ['21', '22', '23', '24', '25', '26'],
-      ['{=maxpool(A1:F3,3)}'],
-    ])
+      expect(engine.getCellValue(adr('A6'))).toBeCloseTo(7)
+      expect(engine.getCellValue(adr('B6'))).toBeCloseTo(10)
+      expect(engine.getCellValue(adr('A7'))).toBeCloseTo(15)
+      expect(engine.getCellValue(adr('B7'))).toBeCloseTo(22)
+      expect(engine.getCellValue(adr('A8'))).toBeCloseTo(23)
+      expect(engine.getCellValue(adr('B8'))).toBeCloseTo(34)
+    })
 
-    expect(engine.getCellValue(adr('A4'))).toBeCloseTo(23)
-    expect(engine.getCellValue(adr('B4'))).toBeCloseTo(26)
-  })
+    it('matrix maxpool', () => {
+      const engine = HyperFormula.buildFromArray([
+        ['1', '2', '3', '4', '5', '6'],
+        ['11', '12', '13', '14', '15', '16'],
+        ['21', '22', '23', '24', '25', '26'],
+        ['=maxpool(A1:F3,3)'],
+      ], config)
 
-  it('matrix maxpool, custom stride', () => {
-    const engine = HyperFormula.buildFromArray([
-      ['1', '2', '3', '4', '5', '6'],
-      ['11', '12', '13', '14', '15', '16'],
-      ['21', '22', '23', '24', '25', '26'],
-      ['28', '29', '30', '31', '32', '33'],
-      ['{=maxpool(A1:F4,3,1)}'],
-    ])
+      expect(engine.getCellValue(adr('A4'))).toBeCloseTo(23)
+      expect(engine.getCellValue(adr('B4'))).toBeCloseTo(26)
+    })
 
-    expect(engine.getCellValue(adr('A5'))).toBeCloseTo(23)
-    expect(engine.getCellValue(adr('A6'))).toBeCloseTo(30)
-    expect(engine.getCellValue(adr('B5'))).toBeCloseTo(24)
-    expect(engine.getCellValue(adr('B6'))).toBeCloseTo(31)
-    expect(engine.getCellValue(adr('C5'))).toBeCloseTo(25)
-    expect(engine.getCellValue(adr('C6'))).toBeCloseTo(32)
-    expect(engine.getCellValue(adr('D5'))).toBeCloseTo(26)
-    expect(engine.getCellValue(adr('D6'))).toBeCloseTo(33)
-  })
+    it('matrix maxpool, custom stride', () => {
+      const engine = HyperFormula.buildFromArray([
+        ['1', '2', '3', '4', '5', '6'],
+        ['11', '12', '13', '14', '15', '16'],
+        ['21', '22', '23', '24', '25', '26'],
+        ['28', '29', '30', '31', '32', '33'],
+        ['=maxpool(A1:F4,3,1)'],
+      ], config)
 
-  it('maxpool wrong number of arguments', () => {
-    const engine = HyperFormula.buildFromArray([
-      ['{=MAXPOOL(A1:A2)}', '{=MAXPOOL(A1:A2, 0,0,0)}'],
-    ])
+      expect(engine.getCellValue(adr('A5'))).toBeCloseTo(23)
+      expect(engine.getCellValue(adr('A6'))).toBeCloseTo(30)
+      expect(engine.getCellValue(adr('B5'))).toBeCloseTo(24)
+      expect(engine.getCellValue(adr('B6'))).toBeCloseTo(31)
+      expect(engine.getCellValue(adr('C5'))).toBeCloseTo(25)
+      expect(engine.getCellValue(adr('C6'))).toBeCloseTo(32)
+      expect(engine.getCellValue(adr('D5'))).toBeCloseTo(26)
+      expect(engine.getCellValue(adr('D6'))).toBeCloseTo(33)
+    })
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA))
-    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.NA))
-  })
+    it('maxpool wrong number of arguments', () => {
+      const engine = HyperFormula.buildFromArray([
+        ['=MAXPOOL(0)', '=MAXPOOL(0, 0,0,0)'],
+      ], config)
 
-  it('matrix medianpool on even square', () => {
-    const engine = HyperFormula.buildFromArray([
-      ['1', '2', '1', '2', '1', '5'],
-      ['3', '4', '3', '7', '6', '7'],
-      ['{=medianpool(A1:F2,2)}'],
-    ])
+      expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
+      expect(engine.getCellValue(adr('B1'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
+    })
 
-    expect(engine.getCellValue(adr('A3'))).toBeCloseTo(2.5)
-    expect(engine.getCellValue(adr('B3'))).toBeCloseTo(2.5)
-    expect(engine.getCellValue(adr('C3'))).toBeCloseTo(5.5)
-  })
+    it('matrix medianpool on even square', () => {
+      const engine = HyperFormula.buildFromArray([
+        ['1', '2', '1', '2', '1', '5'],
+        ['3', '4', '3', '7', '6', '7'],
+        ['=medianpool(A1:F2,2)'],
+      ], config)
 
-  it('medianpool wrong number of arguments', () => {
-    const engine = HyperFormula.buildFromArray([
-      ['{=MEDIANPOOL(A1:A2)}', '{=MEDIANPOOL(A1:A2, 0,0,0)}'],
-    ])
+      expect(engine.getCellValue(adr('A3'))).toBeCloseTo(2.5)
+      expect(engine.getCellValue(adr('B3'))).toBeCloseTo(2.5)
+      expect(engine.getCellValue(adr('C3'))).toBeCloseTo(5.5)
+    })
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA))
-    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.NA))
-  })
+    it('medianpool wrong number of arguments', () => {
+      const engine = HyperFormula.buildFromArray([
+        ['=MEDIANPOOL(0)', '=MEDIANPOOL(0,0,0,0)'],
+      ], config)
 
-  it('matrix medianpool on odd square', () => {
-    const engine = HyperFormula.buildFromArray([
-      ['1', '1', '1'], // right shot from the beginning
-      ['1', '2', '3'],
-      ['3', '3', '3'],
+      expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
+      expect(engine.getCellValue(adr('B1'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
+    })
 
-      ['2', '2', '2'], // need one step to the left
-      ['3', '4', '6'],
-      ['10', '10', '10'],
+    it('matrix medianpool on odd square', () => {
+      const engine = HyperFormula.buildFromArray([
+        ['1', '1', '1'], // right shot from the beginning
+        ['1', '2', '3'],
+        ['3', '3', '3'],
 
-      ['0', '0', '0'], // need one step to the right
-      ['4', '6', '7'],
-      ['8', '8', '8'],
+        ['2', '2', '2'], // need one step to the left
+        ['3', '4', '6'],
+        ['10', '10', '10'],
 
-      ['{=medianpool(A1:C9,3)}'],
-    ])
+        ['0', '0', '0'], // need one step to the right
+        ['4', '6', '7'],
+        ['8', '8', '8'],
 
-    expect(engine.getCellValue(adr('A10'))).toBeCloseTo(2)
-    expect(engine.getCellValue(adr('A11'))).toBeCloseTo(4)
-    expect(engine.getCellValue(adr('A12'))).toBeCloseTo(6)
-  })
+        ['=medianpool(A1:C9,3)'],
+      ], config)
+
+      expect(engine.getCellValue(adr('A10'))).toBeCloseTo(2)
+      expect(engine.getCellValue(adr('A11'))).toBeCloseTo(4)
+      expect(engine.getCellValue(adr('A12'))).toBeCloseTo(6)
+    })
+  }
+
+  describe('GPU.js', () => sharedExamples({gpujs: GPU.GPU ?? GPU, gpuMode: 'cpu'}))
+
+  describe('CPU fallback', () => sharedExamples({}))
 })
 
 describe('Function TRANSPOSE', () => {
@@ -212,7 +221,7 @@ describe('Function TRANSPOSE', () => {
       ['1', '2'],
       ['3', '4'],
       ['5', '6'],
-      ['{=TRANSPOSE(A1:B3)}'],
+      ['=TRANSPOSE(A1:B3)'],
     ])
 
     expect(engine.getCellValue(adr('A4'))).toBeCloseTo(1)
@@ -225,7 +234,7 @@ describe('Function TRANSPOSE', () => {
 
   it('transpose works for scalar', () => {
     const engine = HyperFormula.buildFromArray([
-      ['{=TRANSPOSE(1)}'],
+      ['=TRANSPOSE(1)'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toBeCloseTo(1)
@@ -233,26 +242,26 @@ describe('Function TRANSPOSE', () => {
 
   it('transpose returns error if argument evaluates to error', () => {
     const engine = HyperFormula.buildFromArray([
-      ['{=TRANSPOSE(4/0)}'],
+      ['=TRANSPOSE(4/0)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.DIV_BY_ZERO))
   })
 
   it('transpose wrong number of arguments', () => {
     const engine = HyperFormula.buildFromArray([
-      ['{=TRANSPOSE()}', '{=TRANSPOSE(A1:A2, B1:B2)}'],
+      ['=TRANSPOSE()', '=TRANSPOSE(C1:C2, D1:D2)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA))
-    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.NA))
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
+    expect(engine.getCellValue(adr('B1'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
   })
   it('transpose returns VALUE when wrong type', () => {
     const engine = HyperFormula.buildFromArray([
-      ['{=TRANSPOSE("fdsa")}'],
+      ['=TRANSPOSE("fdsa")'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.NumberRange))
   })
 
   it('transpose without braces', () => {
@@ -263,8 +272,8 @@ describe('Function TRANSPOSE', () => {
       ['=TRANSPOSE(A1:B3)'],
     ])
 
-    expect(engine.getCellValue(adr('A4'))).toEqual(detailedError(ErrorType.VALUE))
-    expect(engine.getCellValue(adr('A5'))).toBe(null)
-    expect(engine.getCellValue(adr('B4'))).toBe(null)
+    expect(engine.getCellValue(adr('A4'))).toBe(1)
+    expect(engine.getCellValue(adr('A5'))).toBe(2)
+    expect(engine.getCellValue(adr('B4'))).toBe(3)
   })
 })

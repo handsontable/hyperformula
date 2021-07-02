@@ -1,9 +1,9 @@
-import {HyperFormula, ExportedCellChange, ExportedNamedExpressionChange} from '../src'
-import {Events} from '../src/Emitter'
+import {ExportedCellChange, ExportedNamedExpressionChange, HyperFormula} from '../src'
 import {ErrorType} from '../src/Cell'
-
-import { adr, detailedError } from './testUtils'
+import {Events} from '../src/Emitter'
 import {NamedExpressionDoesNotExistError} from '../src/errors'
+
+import {adr, detailedErrorWithOrigin} from './testUtils'
 
 describe('Events', () => {
   it('sheetAdded works', function() {
@@ -25,10 +25,10 @@ describe('Events', () => {
     const handler = jasmine.createSpy()
 
     engine.on(Events.SheetRemoved, handler)
-    engine.removeSheet('Sheet2')
+    engine.removeSheet(1)
 
     expect(handler).toHaveBeenCalledTimes(1)
-    expect(handler).toHaveBeenCalledWith('Sheet2', [new ExportedCellChange(adr('A1'), detailedError(ErrorType.REF))])
+    expect(handler).toHaveBeenCalledWith('Sheet2', [new ExportedCellChange(adr('A1'), detailedErrorWithOrigin(ErrorType.REF, 'Sheet1!A1'))])
   })
 
   it('sheetRemoved name contains actual display name', function() {
@@ -39,10 +39,10 @@ describe('Events', () => {
     const handler = jasmine.createSpy()
 
     engine.on(Events.SheetRemoved, handler)
-    engine.removeSheet('sheet2')
+    engine.removeSheet(1)
 
     expect(handler).toHaveBeenCalledTimes(1)
-    expect(handler).toHaveBeenCalledWith('Sheet2', [new ExportedCellChange(adr('A1'), detailedError(ErrorType.REF))])
+    expect(handler).toHaveBeenCalledWith('Sheet2', [new ExportedCellChange(adr('A1'), detailedErrorWithOrigin(ErrorType.REF, 'Sheet1!A1'))])
   })
 
   it('sheetRenamed works', () => {
@@ -136,6 +136,54 @@ describe('Events', () => {
     expect(handler).toHaveBeenCalledTimes(1)
     expect(handler).toHaveBeenCalledWith([new ExportedCellChange(adr('A1'), 42)])
   })
+
+  it('suspension and resuming of evaluation', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['42']
+    ])
+    const handlerUpdated = jasmine.createSpy()
+    const handlerSuspended = jasmine.createSpy()
+    const handlerResumed = jasmine.createSpy()
+
+    engine.on(Events.ValuesUpdated, handlerUpdated)
+    engine.on(Events.EvaluationSuspended, handlerSuspended)
+    engine.on(Events.EvaluationResumed, handlerResumed)
+
+    engine.suspendEvaluation()
+    expect(handlerUpdated).toHaveBeenCalledTimes(0)
+    expect(handlerSuspended).toHaveBeenCalledTimes(1)
+    expect(handlerResumed).toHaveBeenCalledTimes(0)
+
+    engine.setCellContents(adr('A1'), [['13']])
+    expect(handlerUpdated).toHaveBeenCalledTimes(0)
+    expect(handlerSuspended).toHaveBeenCalledTimes(1)
+    expect(handlerResumed).toHaveBeenCalledTimes(0)
+
+    engine.resumeEvaluation()
+    expect(handlerUpdated).toHaveBeenCalledTimes(1)
+    expect(handlerSuspended).toHaveBeenCalledTimes(1)
+    expect(handlerResumed).toHaveBeenCalledTimes(1)
+    expect(handlerResumed).toHaveBeenCalledWith([new ExportedCellChange(adr('A1'), 13)])
+  })
+
+  it('batching', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['42']
+    ])
+    const handlerUpdated = jasmine.createSpy()
+    const handlerSuspended = jasmine.createSpy()
+    const handlerResumed = jasmine.createSpy()
+
+    engine.on(Events.ValuesUpdated, handlerUpdated)
+    engine.on(Events.EvaluationSuspended, handlerSuspended)
+    engine.on(Events.EvaluationResumed, handlerResumed)
+
+    engine.batch(() => engine.setCellContents(adr('A1'), [['13']]))
+    expect(handlerUpdated).toHaveBeenCalledTimes(1)
+    expect(handlerSuspended).toHaveBeenCalledTimes(1)
+    expect(handlerResumed).toHaveBeenCalledTimes(1)
+    expect(handlerResumed).toHaveBeenCalledWith([new ExportedCellChange(adr('A1'), 13)])
+  })
 })
 
 describe('Subscribing only once', () => {
@@ -151,7 +199,7 @@ describe('Subscribing only once', () => {
   })
 })
 
-describe('Unsubsribing', () => {
+describe('Unsubscribing', () => {
   it('works', function() {
     const engine = HyperFormula.buildEmpty()
     const handler = jasmine.createSpy()

@@ -1,13 +1,13 @@
 /**
  * @license
- * Copyright (c) 2020 Handsoncode. All rights reserved.
+ * Copyright (c) 2021 Handsoncode. All rights reserved.
  */
 
+import {AbsoluteCellRange, AbsoluteColumnRange, AbsoluteRowRange} from '../AbsoluteCellRange'
 import {SimpleCellAddress} from '../Cell'
 import {CellAddress} from './'
 import {ColumnAddress} from './ColumnAddress'
 import {RowAddress} from './RowAddress'
-import {AbsoluteCellRange, AbsoluteColumnRange, AbsoluteRowRange} from '../AbsoluteCellRange'
 
 export type RangeDependency = CellRangeDependency | ColumnRangeDependency | RowRangeDependency
 export type RelativeDependency = AddressDependency | RangeDependency | NamedExpressionDependency

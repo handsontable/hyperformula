@@ -1,15 +1,16 @@
 import {CellValue, ConfigParams, HyperFormula, Sheet} from '../../src'
+import {Maybe} from '../../src/Maybe'
 import {
   average,
   EnrichedStatType,
   enrichStatistics,
   ExtStatType,
   measureCruds,
-  reduceStats, Stats,
+  reduceStats,
+  Stats,
   statsTreePrint,
   statsTreePrintCruds
 } from './utils/stats'
-import {Maybe} from '../../src/Maybe'
 
 export interface Config {
   expectedTime?: number,
@@ -19,6 +20,11 @@ export interface Config {
 
 export const defaultConfig: Config = {
   numberOfRuns: 1,
+}
+
+export const defaultEngineConfig: Partial<ConfigParams> = {
+  useStats: true,
+  licenseKey: 'gpl-v3'
 }
 
 export interface ExpectedValue {
@@ -43,7 +49,7 @@ export function benchmarkCruds(name: string, sheet: Sheet, cruds: (engine: Hyper
   console.info(`=== Benchmark - ${name} === `)
 
   const config = Object.assign({}, defaultConfig, userConfig)
-  const engineConfig = Object.assign({}, config.engineConfig, { useStats: true})
+  const engineConfig = Object.assign({}, config.engineConfig, defaultEngineConfig)
 
   const engine = HyperFormula.buildFromArray(sheet, engineConfig)
 
@@ -82,7 +88,7 @@ function benchmarkBuild(name: string, runEngine: (engineConfig?: Partial<ConfigP
   console.info(`=== Benchmark - ${name} === `)
 
   const config = Object.assign({}, defaultConfig, userConfig)
-  const engineConfig = Object.assign({}, config.engineConfig, { useStats: true})
+  const engineConfig = Object.assign({}, config.engineConfig, defaultEngineConfig)
 
   const statistics: Map<EnrichedStatType, number>[] = []
 

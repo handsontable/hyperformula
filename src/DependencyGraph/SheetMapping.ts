@@ -1,11 +1,11 @@
 /**
  * @license
- * Copyright (c) 2020 Handsoncode. All rights reserved.
+ * Copyright (c) 2021 Handsoncode. All rights reserved.
  */
 
+import {NoSheetWithIdError, NoSheetWithNameError, SheetNameAlreadyTakenError} from '../errors'
 import {TranslationPackage, UIElement} from '../i18n'
 import {Maybe} from '../Maybe'
-import {NoSheetWithIdError, NoSheetWithNameError, SheetNameAlreadyTakenError} from '../errors'
 
 function canonicalize(sheetDisplayName: string): string {
   return sheetDisplayName.toLowerCase()
@@ -63,12 +63,7 @@ export class SheetMapping {
   }
 
   public get = (sheetName: string): Maybe<number> => {
-    const sheet = this.mappingFromCanonicalName.get(canonicalize(sheetName))
-    if (sheet) {
-      return sheet.id
-    } else {
-      return undefined
-    }
+    return this.mappingFromCanonicalName.get(canonicalize(sheetName))?.id
   }
 
   public fetchDisplayName = (sheetId: number): string => {
@@ -76,21 +71,7 @@ export class SheetMapping {
   }
 
   public getDisplayName(sheetId: number): Maybe<string> {
-    const sheet = this.mappingFromId.get(sheetId)
-    if (sheet) {
-      return sheet.displayName
-    } else {
-      return undefined
-    }
-  }
-
-  public getDisplayNameByName(sheetName: string): Maybe<string> {
-    const sheet = this.mappingFromCanonicalName.get(canonicalize(sheetName))
-    if (sheet) {
-      return sheet.displayName
-    } else {
-      return undefined
-    }
+    return this.mappingFromId.get(sheetId)?.displayName
   }
 
   public* displayNames(): IterableIterator<string> {
@@ -120,7 +101,7 @@ export class SheetMapping {
     }
 
     const sheetWithThisCanonicalName = this.mappingFromCanonicalName.get(canonicalize(newDisplayName))
-    if (sheetWithThisCanonicalName && sheetWithThisCanonicalName.id !== sheet.id) {
+    if (sheetWithThisCanonicalName !== undefined && sheetWithThisCanonicalName.id !== sheet.id) {
       throw new SheetNameAlreadyTakenError(newDisplayName)
     }
 

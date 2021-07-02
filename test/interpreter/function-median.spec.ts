@@ -1,5 +1,5 @@
-import {HyperFormula} from '../../src'
-import {ErrorType} from '../../src/Cell'
+import {ErrorType, HyperFormula} from '../../src'
+import {ErrorMessage} from '../../src/error-message'
 import {adr, detailedError} from '../testUtils'
 
 describe('Function MEDIAN', () => {
@@ -49,7 +49,7 @@ describe('Function MEDIAN', () => {
       ['=3/0', '=MEDIAN(A1)'],
     ])
 
-    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.DIV_BY_ZERO))
+    expect(engine.getCellValue(adr('B1'))).toEqualError(detailedError(ErrorType.DIV_BY_ZERO))
   })
 
   it('propagates first error from range argument', () => {
@@ -57,7 +57,7 @@ describe('Function MEDIAN', () => {
       ['=3/0', '=FOO(', '=MEDIAN(A1:B1)'],
     ])
 
-    expect(engine.getCellValue(adr('C1'))).toEqual(detailedError(ErrorType.DIV_BY_ZERO))
+    expect(engine.getCellValue(adr('C1'))).toEqualError(detailedError(ErrorType.DIV_BY_ZERO))
   })
 
   it('return error when no arguments', () => {
@@ -65,17 +65,19 @@ describe('Function MEDIAN', () => {
       ['=MEDIAN()'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA))
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
   })
 
-  it('doesnt do coercions of nonnumeric arguments', () => {
+  it('coerces only explicit arguments, ignores provided via reference', () => {
     const engine = HyperFormula.buildFromArray([
       ['="12"', '="11"', '="13"', '=MEDIAN(A1:C1)'],
       ['=MEDIAN(TRUE())'],
+      ['=MEDIAN(1,2,3,B3:C3)'],
     ])
 
-    expect(engine.getCellValue(adr('D1'))).toEqual(detailedError(ErrorType.NUM))
-    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NUM))
+    expect(engine.getCellValue(adr('D1'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.OneValue))
+    expect(engine.getCellValue(adr('A2'))).toEqual(1)
+    expect(engine.getCellValue(adr('A3'))).toEqual(2)
   })
 
   it('ignores nonnumeric values as long as theres at least one numeric value', () => {
@@ -83,15 +85,24 @@ describe('Function MEDIAN', () => {
       ['=MEDIAN(TRUE(), "foobar", 42)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(42)
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.NumberCoercion))
   })
 
-  // Inconsistency with Product 1
-  it('doesnt do coercions of given string arguments', () => {
+  it('coerces given string arguments', () => {
     const engine = HyperFormula.buildFromArray([
       ['=MEDIAN("12", "11", "13")'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM))
+    expect(engine.getCellValue(adr('A1'))).toEqualError(12)
+  })
+
+  it('empty args as 0', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=MEDIAN(1,2,3,,)'],
+      ['=MEDIAN(,)']
+    ])
+
+    expect(engine.getCellValue(adr('A1'))).toEqual(1)
+    expect(engine.getCellValue(adr('A2'))).toEqual(0)
   })
 })

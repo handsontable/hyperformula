@@ -1,16 +1,16 @@
 /**
  * @license
- * Copyright (c) 2020 Handsoncode. All rights reserved.
+ * Copyright (c) 2021 Handsoncode. All rights reserved.
  */
 
-import {InternalScalarValue} from '../Cell'
 import {Config} from '../Config'
 import {secondsExtendedRegexp} from '../DateTimeDefault'
 import {DateTimeHelper, numberToSimpleTime, SimpleDateTime, SimpleTime} from '../DateTimeHelper'
+import {RawScalarValue} from '../interpreter/InterpreterValue'
 import {Maybe} from '../Maybe'
 import {FormatToken, parseForDateTimeFormat, parseForNumberFormat, TokenType} from './parser'
 
-export function format(value: number, formatArg: string, config: Config, dateHelper: DateTimeHelper): InternalScalarValue {
+export function format(value: number, formatArg: string, config: Config, dateHelper: DateTimeHelper): RawScalarValue {
   const tryDateTime = config.stringifyDateTime(dateHelper.numberToSimpleDateTime(value), formatArg) // default points to defaultStringifyDateTime()
   if (tryDateTime !== undefined) {
     return tryDateTime
@@ -46,7 +46,7 @@ function countChars(text: string, char: string) {
   return text.split(char).length - 1
 }
 
-function numberFormat(tokens: FormatToken[], value: number): InternalScalarValue {
+function numberFormat(tokens: FormatToken[], value: number): RawScalarValue {
   let result = ''
 
   for (let i = 0; i < tokens.length; ++i) {
@@ -67,12 +67,12 @@ function numberFormat(tokens: FormatToken[], value: number): InternalScalarValue
     let decimalPart = valueParts[1] || ''
 
     if (integerFormat.length > integerPart.length) {
-      const padSize = countChars(integerFormat.substr(0, integerFormat.length - integerPart.length), '0')
-      integerPart = padLeft(integerPart, padSize + integerPart.length)
+      const padSizeInteger = countChars(integerFormat.substr(0, integerFormat.length - integerPart.length), '0')
+      integerPart = padLeft(integerPart, padSizeInteger + integerPart.length)
     }
 
-    const padSize = countChars(decimalFormat.substr(decimalPart.length, decimalFormat.length - decimalPart.length), '0')
-    decimalPart = padRight(decimalPart, padSize + decimalPart.length)
+    const padSizeDecimal = countChars(decimalFormat.substr(decimalPart.length, decimalFormat.length - decimalPart.length), '0')
+    decimalPart = padRight(decimalPart, padSizeDecimal + decimalPart.length)
 
     result += integerPart + separator + decimalPart
   }

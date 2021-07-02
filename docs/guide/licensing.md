@@ -12,8 +12,7 @@ a generated commercial license key in the
 
 | Name | Type |
 | :--- | :--- |
-| [AGPL v3](https://github.com/handsontable/hyperformula/blob/master/agpl-3.0.txt) | Open-source |
-| [Non-Commercial License](https://github.com/handsontable/hyperformula/blob/master/non-commercial-license.pdf) | Proprietary |
+| [GPL v3](https://github.com/handsontable/hyperformula/blob/master/gpl-3.0.txt) | Open-source |
 | Commercial License Agreement | Proprietary |
 
 ## Open source and non-commercial use

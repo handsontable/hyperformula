@@ -1,13 +1,14 @@
 /**
  * @license
- * Copyright (c) 2020 Handsoncode. All rights reserved.
+ * Copyright (c) 2021 Handsoncode. All rights reserved.
  */
 
-import {InternalScalarValue, SimpleCellAddress} from '../../Cell'
 import {ProcedureAst} from '../../parser'
-import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
+import {InterpreterState} from '../InterpreterState'
+import {InterpreterValue} from '../InterpreterValue'
+import {ArgumentTypes, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
 
-export class LogarithmPlugin extends FunctionPlugin {
+export class LogarithmPlugin extends FunctionPlugin implements FunctionPluginTypecheck<LogarithmPlugin>{
 
   public static implementedFunctions = {
     'LOG10': {
@@ -31,17 +32,17 @@ export class LogarithmPlugin extends FunctionPlugin {
     },
   }
 
-  public log10(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('LOG10'), Math.log10)
+  public log10(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('LOG10'), Math.log10)
   }
 
-  public log(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('LOG'),
+  public log(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('LOG'),
       (arg: number, base: number) => Math.log(arg) / Math.log(base)
     )
   }
 
-  public ln(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('LN'), Math.log)
+  public ln(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('LN'), Math.log)
   }
 }

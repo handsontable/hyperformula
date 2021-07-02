@@ -1,11 +1,14 @@
 /**
  * @license
- * Copyright (c) 2020 Handsoncode. All rights reserved.
+ * Copyright (c) 2021 Handsoncode. All rights reserved.
  */
 
 import {createToken, Lexer, TokenType} from 'chevrotain'
 import {ErrorType} from '../Cell'
 import {ParserConfig} from './ParserConfig'
+
+export const RANGE_OPERATOR = ':'
+export const ABSOLUTE_OPERATOR = '$'
 
 /* arithmetic */
 // abstract for + -
@@ -42,36 +45,41 @@ export const LessThanOrEqualOp = createToken({name: 'LessThanOrEqualOp', pattern
 export const ConcatenateOp = createToken({name: 'ConcatenateOp', pattern: /&/})
 
 /* addresses */
-export const additionalCharactersAllowedInQuotes = ' ' // It's included in regexps, so escape characters which have special regexp semantics
-export const sheetNameRegexp = `([A-Za-z0-9_\u00C0-\u02AF]+|'[A-Za-z0-9${additionalCharactersAllowedInQuotes}_\u00C0-\u02AF]+')!`
+export const simpleSheetName = '[A-Za-z0-9_\u00C0-\u02AF]+'
+export const quotedSheetName = "'(((?!').|'')*)'"
+export const sheetNameRegexp = `(${simpleSheetName}|${quotedSheetName})!`
 
 export const CellReference = createToken({
   name: 'CellReference',
-  pattern: new RegExp(`\(${sheetNameRegexp}\)?\\$?[A-Za-z]+\\$?[0-9]+`),
+  pattern: new RegExp(`(${sheetNameRegexp})?\\${ABSOLUTE_OPERATOR}?[A-Za-z]+\\${ABSOLUTE_OPERATOR}?[0-9]+`),
 })
 
 export const ColumnRange = createToken({
   name: 'ColumnRange',
-  pattern: new RegExp(`\(${sheetNameRegexp}\)?\\$?[A-Za-z]+:\(${sheetNameRegexp}\)?\\$?[A-Za-z]+`),
+  pattern: new RegExp(`(${sheetNameRegexp})?\\${ABSOLUTE_OPERATOR}?[A-Za-z]+${RANGE_OPERATOR}\(${sheetNameRegexp}\)?\\${ABSOLUTE_OPERATOR}?[A-Za-z]+`),
 })
 
 export const RowRange = createToken({
   name: 'RowRange',
-  pattern: new RegExp(`\(${sheetNameRegexp}\)?\\$?[0-9]+:\(${sheetNameRegexp}\)?\\$?[0-9]+`),
+  pattern: new RegExp(`(${sheetNameRegexp})?\\${ABSOLUTE_OPERATOR}?[0-9]+${RANGE_OPERATOR}\(${sheetNameRegexp}\)?\\${ABSOLUTE_OPERATOR}?[0-9]+`),
 })
 
 
-export const RangeSeparator = createToken({name: 'RangeSeparator', pattern: /:/})
+export const RangeSeparator = createToken({name: 'RangeSeparator', pattern: `${RANGE_OPERATOR}`})
 
 /* parenthesis */
 export const LParen = createToken({name: 'LParen', pattern: /\(/})
 export const RParen = createToken({name: 'RParen', pattern: /\)/})
 
-/* prcoedures */
-export const ProcedureName = createToken({name: 'ProcedureName', pattern: /(\.?[0-9A-Za-z\u00C0-\u02AF]+)+\(/})
+/* matrix parenthesis */
+export const MatrixLParen = createToken({name: 'MatrixLParen', pattern: /{/})
+export const MatrixRParen = createToken({name: 'MatrixRParen', pattern: /}/})
+
+/* procedures */
+export const ProcedureName = createToken({name: 'ProcedureName', pattern: /([A-Za-z\u00C0-\u02AF][A-Za-z0-9\u00C0-\u02AF._]*)\(/})
 
 /* named expressions */
-export const NamedExpression = createToken({name: 'NamedExpression', pattern: /[A-Za-z\u00C0-\u02AF_][0-9\.A-Za-z_\u00C0-\u02AF_]+/})
+export const NamedExpression = createToken({name: 'NamedExpression', pattern: /[A-Za-z\u00C0-\u02AF_][A-Za-z0-9\u00C0-\u02AF._]*/})
 
 /* string literal */
 export const StringLiteral = createToken({name: 'StringLiteral', pattern: /"([^"\\]*(\\.[^"\\]*)*)"/})
@@ -93,6 +101,8 @@ export interface ILexerConfig {
   errorMapping: Record<string, ErrorType>,
   functionMapping: Record<string, string>,
   decimalSeparator: '.' | ',',
+  MatrixColSeparator: TokenType,
+  MatrixRowSeparator: TokenType,
   maxColumns: number,
   maxRows: number,
 }
@@ -102,9 +112,22 @@ export const buildLexerConfig = (config: ParserConfig): ILexerConfig => {
   const errorMapping = config.errorMapping
   const functionMapping = config.translationPackage.buildFunctionMapping()
 
+  const MatrixRowSeparator = createToken({name: 'MatrixRowSep', pattern: config.matrixRowSeparator})
+  const MatrixColSeparator = createToken({name: 'MatrixColSep', pattern: config.matrixColumnSeparator})
+
   /* configurable tokens */
-  const ArgSeparator = createToken({name: 'ArgSeparator', pattern: config.functionArgSeparator})
-  const NumberLiteral = createToken({name: 'NumberLiteral', pattern: new RegExp(`[\\d]*[${config.decimalSeparator}]?[\\d]+`)})
+  let ArgSeparator, inject: TokenType[]
+  if(config.functionArgSeparator === config.matrixColumnSeparator) {
+    ArgSeparator = MatrixColSeparator
+    inject = []
+  } else if(config.functionArgSeparator === config.matrixRowSeparator) {
+    ArgSeparator = MatrixRowSeparator
+    inject = []
+  } else {
+    ArgSeparator = createToken({name: 'ArgSeparator', pattern: config.functionArgSeparator})
+    inject = [ArgSeparator]
+  }
+  const NumberLiteral = createToken({name: 'NumberLiteral', pattern: new RegExp(`(([${config.decimalSeparator}]\\d+)|(\\d+([${config.decimalSeparator}]\\d*)?))(e[+-]?\\d+)?`)})
   const OffsetProcedureName = createToken({name: 'OffsetProcedureName', pattern: new RegExp(offsetProcedureNameLiteral, 'i')})
 
   /* order is important, first pattern is used */
@@ -124,10 +147,12 @@ export const buildLexerConfig = (config: ParserConfig): ILexerConfig => {
     LessThanOp,
     LParen,
     RParen,
+    MatrixLParen,
+    MatrixRParen,
     OffsetProcedureName,
     ProcedureName,
     RangeSeparator,
-    ArgSeparator,
+      ...inject,
     ColumnRange,
     RowRange,
     NumberLiteral,
@@ -139,12 +164,16 @@ export const buildLexerConfig = (config: ParserConfig): ILexerConfig => {
     MultiplicationOp,
     CellReference,
     NamedExpression,
+    MatrixRowSeparator,
+    MatrixColSeparator,
   ]
 
   return {
     ArgSeparator,
     NumberLiteral,
     OffsetProcedureName,
+    MatrixRowSeparator,
+    MatrixColSeparator,
     allTokens,
     errorMapping,
     functionMapping,

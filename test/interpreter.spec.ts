@@ -1,5 +1,6 @@
 import {HyperFormula} from '../src'
 import {ErrorType} from '../src/Cell'
+import {ErrorMessage} from '../src/error-message'
 import {adr, detailedError} from './testUtils'
 
 describe('Interpreter', () => {
@@ -24,7 +25,7 @@ describe('Interpreter', () => {
   it('negative number literal - non numeric value', () => {
     const engine = HyperFormula.buildFromArray([['=-"foo"']])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.NumberCoercion))
   })
 
   it('string literals - faulty tests', () => {
@@ -49,7 +50,7 @@ describe('Interpreter', () => {
 
   it('ranges - VALUE error when evaluating without context', () => {
     const engine = HyperFormula.buildFromArray([['1'], ['2'], ['=A1:A2']])
-    expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A3'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.ScalarExpected))
   })
 
   it('procedures - SUM with bad args', () => {
@@ -61,17 +62,15 @@ describe('Interpreter', () => {
   it('procedures - not known procedure', () => {
     const engine = HyperFormula.buildFromArray([['=FOO()']])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NAME))
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NAME, ErrorMessage.FunctionName('FOO')))
   })
 
   it('errors - parsing errors', () => {
-    const engine = HyperFormula.buildFromArray([['=A', '=A1C1', '=SUM(A)', '=foo(', '=)(asdf']])
+    const engine = HyperFormula.buildFromArray([['=A1C1', '=foo(', '=)(asdf']])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.ERROR, 'Parsing error'))
-    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.ERROR, 'Parsing error'))
-    expect(engine.getCellValue(adr('C1'))).toEqual(detailedError(ErrorType.ERROR, 'Parsing error'))
-    expect(engine.getCellValue(adr('D1'))).toEqual(detailedError(ErrorType.ERROR, 'Parsing error'))
-    expect(engine.getCellValue(adr('E1'))).toEqual(detailedError(ErrorType.ERROR, 'Parsing error'))
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.ERROR, ErrorMessage.ParseError))
+    expect(engine.getCellValue(adr('B1'))).toEqualError(detailedError(ErrorType.ERROR, ErrorMessage.ParseError))
+    expect(engine.getCellValue(adr('C1'))).toEqualError(detailedError(ErrorType.ERROR, ErrorMessage.ParseError))
   })
 
   it('function OFFSET basic use', () => {
@@ -84,8 +83,8 @@ describe('Interpreter', () => {
   it('function OFFSET out of range', () => {
     const engine = HyperFormula.buildFromArray([['=OFFSET(A1, -1, 0)', '=OFFSET(A1, 0, -1)']])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.REF, 'Resulting reference is out of the sheet'))
-    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.REF, 'Resulting reference is out of the sheet'))
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.REF, ErrorMessage.OutOfSheet))
+    expect(engine.getCellValue(adr('B1'))).toEqualError(detailedError(ErrorType.REF, ErrorMessage.OutOfSheet))
   })
 
   it('function OFFSET returns bigger range', () => {
@@ -102,7 +101,7 @@ describe('Interpreter', () => {
       ['=OFFSET(A1, 0, 1,2,1))'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.ERROR, 'Parsing error'))
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.ERROR, ErrorMessage.ParseError))
   })
 
   it('function OFFSET used twice in a range', () => {
@@ -147,7 +146,7 @@ describe('Interpreter', () => {
         [''],
       ],
     })
-    expect(engine.getCellValue(adr('A1', 1))).toEqual(detailedError(ErrorType.REF))
+    expect(engine.getCellValue(adr('A1', 1))).toEqualError(detailedError(ErrorType.REF, ErrorMessage.RangeManySheets))
   })
 
   it('expression with parenthesis', () => {
@@ -172,11 +171,11 @@ describe('Interpreter', () => {
       ]
     })
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.REF))
-    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.REF))
-    expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.REF))
-    expect(engine.getCellValue(adr('A4'))).toEqual(detailedError(ErrorType.REF))
-    expect(engine.getCellValue(adr('A5'))).toEqual(detailedError(ErrorType.REF))
-    expect(engine.getCellValue(adr('A6'))).toEqual(detailedError(ErrorType.REF))
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.REF, ErrorMessage.RangeManySheets))
+    expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.REF, ErrorMessage.RangeManySheets))
+    expect(engine.getCellValue(adr('A3'))).toEqualError(detailedError(ErrorType.REF, ErrorMessage.RangeManySheets))
+    expect(engine.getCellValue(adr('A4'))).toEqualError(detailedError(ErrorType.REF, ErrorMessage.RangeManySheets))
+    expect(engine.getCellValue(adr('A5'))).toEqualError(detailedError(ErrorType.REF, ErrorMessage.RangeManySheets))
+    expect(engine.getCellValue(adr('A6'))).toEqualError(detailedError(ErrorType.REF, ErrorMessage.RangeManySheets))
   })
 })

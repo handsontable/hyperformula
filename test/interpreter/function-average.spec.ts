@@ -1,12 +1,13 @@
 import {HyperFormula} from '../../src'
 import {ErrorType} from '../../src/Cell'
+import {ErrorMessage} from '../../src/error-message'
 import {adr, detailedError} from '../testUtils'
 
 describe('AVERAGE', () => {
   it('AVERAGE with empty args', () => {
     const engine = HyperFormula.buildFromArray([['=AVERAGE()']])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA))
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
   })
 
   it('AVERAGE with args', () => {
@@ -47,7 +48,7 @@ describe('AVERAGE', () => {
       ['=AVERAGE(A1:A2)']
     ])
 
-    expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.DIV_BY_ZERO))
+    expect(engine.getCellValue(adr('A3'))).toEqualError(detailedError(ErrorType.DIV_BY_ZERO))
   })
 
   it('over a range value', () => {
@@ -67,6 +68,6 @@ describe('AVERAGE', () => {
       ['=AVERAGE(A1:B2)'],
     ])
 
-    expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.DIV_BY_ZERO))
+    expect(engine.getCellValue(adr('A3'))).toEqualError(detailedError(ErrorType.DIV_BY_ZERO))
   })
 })

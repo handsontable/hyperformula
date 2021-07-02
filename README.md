@@ -6,6 +6,8 @@
 
 [![GitHub Workflow Status](https://img.shields.io/github/workflow/status/handsontable/hyperformula/Test)](https://github.com/handsontable/hyperformula/actions?query=workflow%3ATest+branch%3Amaster)
 [![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fhandsontable%2Fhyperformula.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fhandsontable%2Fhyperformula?ref=badge_shield)
+[![codecov](https://codecov.io/gh/handsontable/hyperformula/branch/master/graph/badge.svg?token=5k9ZQv8azO)](https://codecov.io/gh/handsontable/hyperformula)
+[![Language grade: JavaScript](https://img.shields.io/lgtm/grade/javascript/g/handsontable/hyperformula.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/handsontable/hyperformula/context:javascript)
 [![Known Vulnerabilities](https://snyk.io/test/github/handsontable/hyperformula/badge.svg?targetFile=package.json)](https://snyk.io/test/github/handsontable/hyperformula?targetFile=package.json)
 [![GitHub contributors](https://img.shields.io/github/contributors/handsontable/hyperformula)](https://github.com/handsontable/hyperformula/graphs/contributors)
 
@@ -35,8 +37,8 @@ and [custom functions](https://handsontable.github.io/hyperformula/guide/custom-
 - Demos
   - [JavaScript](https://handsontable.github.io/hyperformula/guide/demo.html)
   - [React](https://handsontable.github.io/hyperformula/guide/integration-with-react.html)
-  - [Vue.js](https://handsontable.github.io/hyperformula/guide/integration-with-vue.html)
-  - [Angular.js](https://handsontable.github.io/hyperformula/guide/integration-with-angular.html)
+  - [Vue](https://handsontable.github.io/hyperformula/guide/integration-with-vue.html)
+  - [Angular](https://handsontable.github.io/hyperformula/guide/integration-with-angular.html)
 - [Installation](https://handsontable.github.io/hyperformula/guide/client-side-installation.html)
 - [Basic usage](https://handsontable.github.io/hyperformula/guide/basic-usage.html)
 - [API Reference](https://handsontable.github.io/hyperformula/api/)
@@ -60,7 +62,7 @@ import { HyperFormula } from 'hyperformula';
 
 // define the options
 const options = {
-  licenseKey: 'agpl-v3',
+  licenseKey: 'gpl-v3',
 };
 
 // define the data
@@ -114,16 +116,26 @@ Your help is much appreciated in any of the following topics:
 
 ## License
 
-HyperFormula is a triple-licensed software. You can use it under the
-open source [AGPLv3 license](https://github.com/handsontable/hyperformula/blob/master/agpl-3.0.txt),
-or a [free license](https://github.com/handsontable/hyperformula/blob/master/non-commercial-license.pdf)
-in all your non-commercial projects. There is also a
-[commercial license](https://handsontable.github.io/hyperformula/guide/contact.html),
-and support services available.
+HyperFormula is a double-licensed software. In all your non-commercial projects, you can use it under the
+open source [GPLv3 license](https://github.com/handsontable/hyperformula/blob/master/gpl-3.0.txt). Additionally, there is also a [commercial license](https://handsontable.github.io/hyperformula/guide/contact.html), and support services available.
+
+## Acknowledgements
+
+You should know that this project wouldn’t exist without co-financing from European Union funds under the European Regional Development Funds as a part of the Smart Growth Operational Programme. Project implemented as a part of the Polish National Centre for Research and Development: “Fast Track”.
+
+- Name of the programme: Smart Growth Operational Programme 2014-2020
+- Project name: “Development of the high-performance calculation engine for processing tabular data of the significant size on mobile devices and workstations using parallel computing and GPU.”
+- Project number: POIR.01.01.01-00-0223/18-00
+- Beneficiary: Handsoncode sp. z o.o.
+- Total budget: PLN 1 117 275.87 (USD ~295 000)
+- Amount of grant: PLN 771 807.73 (USD ~204 000)
+- Duration: 2018-2019
+
+![eu-funds](docs/.vuepress/public/eu-logos.png)
 
 ## Authors
 
 Created by [Handsontable](https://handsontable.com), [NavAlgo](https://www.navalgo.com/en/),
 and [Contributors](https://github.com/handsontable/hyperformula/graphs/contributors).
 
-© 2020 Handsoncode
+© 2021 Handsoncode

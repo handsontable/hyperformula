@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright (c) 2020 Handsoncode. All rights reserved.
+ * Copyright (c) 2021 Handsoncode. All rights reserved.
  */
 
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
@@ -24,9 +24,13 @@ export class MatrixMapping {
     this.matrixMapping.delete(range.toString())
   }
 
+  public count(): number {
+    return this.matrixMapping.size
+  }
+
   public isFormulaMatrixInRow(sheet: number, row: number): boolean {
     for (const mtx of this.matrixMapping.values()) {
-      if (mtx.spansThroughSheetRows(sheet, row) && mtx.isFormula()) {
+      if (mtx.spansThroughSheetRows(sheet, row)) {
         return true
       }
     }
@@ -44,7 +48,7 @@ export class MatrixMapping {
 
   public isFormulaMatrixInColumn(sheet: number, column: number): boolean {
     for (const mtx of this.matrixMapping.values()) {
-      if (mtx.spansThroughSheetColumn(sheet, column) && mtx.isFormula()) {
+      if (mtx.spansThroughSheetColumn(sheet, column)) {
         return true
       }
     }
@@ -62,7 +66,7 @@ export class MatrixMapping {
 
   public isFormulaMatrixInRange(range: AbsoluteCellRange) {
     for (const mtx of this.matrixMapping.values()) {
-      if (mtx.isFormula() && mtx.getRange().doesOverlap(range)) {
+      if (mtx.getRange().doesOverlap(range)) {
         return true
       }
     }
@@ -71,67 +75,11 @@ export class MatrixMapping {
 
   public isFormulaMatrixAtAddress(address: SimpleCellAddress) {
     for (const mtx of this.matrixMapping.values()) {
-      if (mtx.getRange().addressInRange(address) && mtx.isFormula()) {
+      if (mtx.getRange().addressInRange(address)) {
         return true
       }
     }
     return false
-  }
-
-  public* numericMatrices(): IterableIterator<[string, MatrixVertex]> {
-    for (const [mtxKey, mtx] of this.matrixMapping.entries()) {
-      if (!mtx.isFormula()) {
-        yield [mtxKey, mtx]
-      }
-    }
-  }
-
-  public* numericMatricesInRows(rowsSpan: RowsSpan): IterableIterator<[string, MatrixVertex]> {
-    for (const [mtxKey, mtx] of this.matrixMapping.entries()) {
-      if (mtx.spansThroughSheetRows(rowsSpan.sheet, rowsSpan.rowStart, rowsSpan.rowEnd) && !mtx.isFormula()) {
-        yield [mtxKey, mtx]
-      }
-    }
-  }
-
-  public* numericMatricesInColumns(columnsSpan: ColumnsSpan): IterableIterator<[string, MatrixVertex]> {
-    for (const [mtxKey, mtx] of this.matrixMapping.entries()) {
-      if (mtx.spansThroughSheetColumn(columnsSpan.sheet, columnsSpan.columnStart, columnsSpan.columnEnd) && !mtx.isFormula()) {
-        yield [mtxKey, mtx]
-      }
-    }
-  }
-
-  public* numericMatricesInRange(range: AbsoluteCellRange): IterableIterator<[string, MatrixVertex]> {
-    for (const [mtxKey, mtx] of this.matrixMapping.entries()) {
-      if (mtx.getRange().doesOverlap(range)) {
-        yield [mtxKey, mtx]
-      }
-    }
-  }
-
-  public truncateMatricesByRows(rowsSpan: RowsSpan): MatrixVertex[] {
-    const verticesToRemove = Array<MatrixVertex>()
-    for (const [key, matrix] of this.numericMatricesInRows(rowsSpan)) {
-      matrix.removeRows(rowsSpan)
-      if (matrix.height === 0) {
-        this.removeMatrix(key)
-        verticesToRemove.push(matrix)
-      }
-    }
-    return verticesToRemove
-  }
-
-  public truncateMatricesByColumns(columnsSpan: ColumnsSpan): MatrixVertex[] {
-    const verticesToRemove = Array<MatrixVertex>()
-    for (const [key, matrix] of this.numericMatricesInColumns(columnsSpan)) {
-      matrix.removeColumns(columnsSpan)
-      if (matrix.width === 0) {
-        this.removeMatrix(key)
-        verticesToRemove.push(matrix)
-      }
-    }
-    return verticesToRemove
   }
 
   public destroy(): void {

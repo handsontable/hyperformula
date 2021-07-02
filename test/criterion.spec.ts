@@ -1,10 +1,9 @@
-import {ErrorType} from '../src/Cell'
+import {CellError, ErrorType} from '../src/Cell'
 import {Config} from '../src/Config'
 import {DateTimeHelper} from '../src/DateTimeHelper'
 import {ArithmeticHelper} from '../src/interpreter/ArithmeticHelper'
 import {buildCriterion, CriterionBuilder, CriterionType} from '../src/interpreter/Criterion'
 import {NumberLiteralHelper} from '../src/NumberLiteralHelper'
-import {detailedError} from './testUtils'
 
 describe('Criterion', () => {
   const config = new Config()
@@ -48,6 +47,10 @@ describe('Criterion', () => {
     expect(criterionBuilder.parseCriterion('>=100.5', arithmeticHelper)).toEqual(buildCriterion(CriterionType.GREATER_THAN_OR_EQUAL, 100.5))
   })
 
+  it('works with scientific notation', () => {
+    expect(criterionBuilder.parseCriterion('>=1e5', arithmeticHelper)).toEqual(buildCriterion(CriterionType.GREATER_THAN_OR_EQUAL, 100000))
+  })
+
   it('works with strings', () => {
     expect(criterionBuilder.parseCriterion('=asdf', arithmeticHelper)).toEqual(buildCriterion(CriterionType.EQUAL, 'asdf'))
   })
@@ -70,7 +73,7 @@ describe('Criterion', () => {
   })
 
   it('null when criterion being error', () => {
-    expect(criterionBuilder.parseCriterion(detailedError(ErrorType.VALUE), arithmeticHelper)).toEqual(undefined)
+    expect(criterionBuilder.parseCriterion(new CellError(ErrorType.VALUE), arithmeticHelper)).toEqual(undefined)
   })
 
   it('works with criterion being just value', () => {

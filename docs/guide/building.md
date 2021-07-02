@@ -1,6 +1,6 @@
 # Building
 
-The build process is using Webpack and Babel and as well as npm tasks
+The build process uses Webpack and Babel, as well as npm tasks
 listed in package.json. During this process, the source located in
 the `src/*` directory is transformed into the output files.
 
@@ -15,8 +15,8 @@ have  dependencies, they need to be added manually
 dependencies
 
 There are also versions of builds in CommonJS, ES6, and TypeScript
-definitions. They are marked in the package.json file. Based on the
-tools used - Webpack, parsers, etc. a proper build will be
+definitions. They are marked in the package.json file. Based on
+the tools used (Webpack, parsers, etc.), a proper build will be
 respectively chosen.
 
 The library is developed in TypeScript and the exact configuration
@@ -49,7 +49,7 @@ dependencies
 * `verify:umd:full` - verifies umd version with dependencies
 * `verify:umd:full.min` - verifies minified umd version with
 dependencies
-* `verify:publish-package` -  checks if npm builds the package
+* `verify:publish-package` -  checks if npm built the package
 correctly
 
 ## Build the documentation
@@ -57,7 +57,7 @@ correctly
 Most likely, you will want to document the code, so you can use the
 following commands to generate the documentation:
 
-* `npm run docs` - builds HyperFormula and then, all of the docs;
-* `npm run docs:api` - builds API part of the documentation;
-* `npm run docs:dev` - runs development build of docs;
+* `npm run docs` - builds HyperFormula, then all of the docs
+* `npm run docs:api` - builds API part of the documentation
+* `npm run docs:dev` - runs development build of docs
 * `npm run docs:build` - builds the docs.

@@ -1,13 +1,15 @@
 /**
  * @license
- * Copyright (c) 2020 Handsoncode. All rights reserved.
+ * Copyright (c) 2021 Handsoncode. All rights reserved.
  */
 
-import {CellError, ErrorType, InternalScalarValue, SimpleCellAddress} from '../../Cell'
+import {CellError, ErrorType} from '../../Cell'
 import {ProcedureAst} from '../../parser'
-import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
+import {InterpreterState} from '../InterpreterState'
+import {InterpreterValue} from '../InterpreterValue'
+import {ArgumentTypes, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
 
-export class ModuloPlugin extends FunctionPlugin {
+export class ModuloPlugin extends FunctionPlugin implements FunctionPluginTypecheck<ModuloPlugin>{
   public static implementedFunctions = {
     'MOD': {
       method: 'mod',
@@ -18,8 +20,8 @@ export class ModuloPlugin extends FunctionPlugin {
     },
   }
 
-  public mod(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('MOD'), (dividend: number, divisor: number) => {
+  public mod(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('MOD'), (dividend: number, divisor: number) => {
       if (divisor === 0) {
         return new CellError(ErrorType.DIV_BY_ZERO)
       } else {

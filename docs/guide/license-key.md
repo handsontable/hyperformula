@@ -10,28 +10,14 @@ to specify which terms exactly apply to your case. You can do that by
 passing a license key in the `options` object alongside other
 settings you want to apply.
 
-## GNU Affero General Public License (AGPL) v3.0
+## GNU General Public License (GPL) v3.0
 
 If you use the open-source version of HyperFormula, simply pass the
-string `agpl-v3`.
+string `gpl-v3`.
 
 ```javascript
 const options = {
-  licenseKey: 'agpl-v3',
-  //... other options
-}
-```
-
-## HyperFormula Non-Commercial License
-
-If you use HyperFormula for purposes not intended for monetary
-compensation such as, but not limited to, teaching, academic research,
-evaluation, testing, and experimentation, pass the string
-`non-commercial-and-evaluation`.
-
-```javascript
-const options = {
-  licenseKey: 'non-commercial-and-evaluation',
+  licenseKey: 'gpl-v3',
   //... other options
 }
 ```
@@ -54,9 +40,8 @@ const options = {
 To determine whether a user is still entitled to use a particular
 version of the software, HyperFormula simply compares the time between
 two dates. These dates come from two sources of information. One is
-the license key which stores the date that it was first generated.
-The other is the source code which contains information about the
-date of release.
+the library build date, and the other one is the date taken from the license key.
+This process does not require any connections to the server.
 
 ## Notifications
 
