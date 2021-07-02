@@ -1526,6 +1526,7 @@ export class HyperFormula implements TypedEmitter {
    * Returns information whether it is possible to add rows into a specified position in a given sheet.
    * Checks against particular rules to ascertain that addRows can be called.
    * If returns `true`, doing [[addRows]] operation won't throw any errors.
+   * Returns `false` if adding rows would exceed the sheet size limit or given arguments are invalid.
    *
    * @param {number} sheetId - sheet ID in which rows will be added
    * @param {ColumnRowIndex[]} indexes - non-contiguous indexes with format [row, amount], where row is a row number above which the rows will be added
@@ -1594,6 +1595,7 @@ export class HyperFormula implements TypedEmitter {
    * Returns information whether it is possible to remove rows from a specified position in a given sheet.
    * Checks against particular rules to ascertain that removeRows can be called.
    * If returns `true`, doing [[removeRows]] operation won't throw any errors.
+   * Returns `false` if given arguments are invalid.
    *
    * @param {number} sheetId - sheet ID from which rows will be removed
    * @param {ColumnRowIndex[]} indexes - non-contiguous indexes with format: [row, amount]
