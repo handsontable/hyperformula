@@ -762,14 +762,16 @@ describe('Removing rows - row range', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '2'],
       ['1', '2'],
-      ['1', '2', '=SUM(1:3)']
+      ['1', '2'],
+      ['=SUM(1:3)']
     ])
 
     engine.removeRows(0, [0, 1])
 
     expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
       ['1', '2'],
-      ['1', '2', '=SUM(1:2)']
+      ['1', '2'],
+      ['=SUM(1:2)']
     ]))
   })
 
@@ -777,29 +779,33 @@ describe('Removing rows - row range', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '2'],
       ['1', '2'],
-      ['1', '2', '=SUM(1:3)']
+      ['1', '2'],
+      ['=SUM(1:3)']
     ])
 
     engine.removeRows(0, [1, 1])
 
     expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
       ['1', '2'],
-      ['1', '2', '=SUM(1:2)']
+      ['1', '2'],
+      ['=SUM(1:2)']
     ]))
   })
 
   it('removing rows - end of row range', () => {
     const engine = HyperFormula.buildFromArray([
-      ['1', '2', '=SUM(1:3)'],
       ['1', '2'],
-      ['1', '2']
+      ['1', '2'],
+      ['1', '2'],
+      ['=SUM(1:3)']
     ])
 
     engine.removeRows(0, [2, 1])
 
     expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
-      ['1', '2', '=SUM(1:2)'],
-      ['1', '2']
+      ['1', '2'],
+      ['1', '2'],
+      ['=SUM(1:2)']
     ]))
   })
 })
