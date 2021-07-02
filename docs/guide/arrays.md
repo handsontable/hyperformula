@@ -74,6 +74,6 @@ When operating on arrays, or passing arrays as function arguments, the following
 
 * Array dimensions need to be consistent (e.g. every row needs to be of the same length).
 * Input array dimensions can't be larger than output array dimensions (unless you're using the [`ARRAY_CONSTRAIN`](#constraining-the-output-array-s-size) function).
-* If an input array value is missing (due to a difference in dimensions), the corresponding output array value is `#N/A`.
+* If a value in one of the input arrays is missing (due to a difference in their dimensions), the corresponding value in the output array is `#N/A`.
 * If a cell evaluates to an array, the array values are spilled into neighboring cells.<br>This behavior doesn't apply to ranges, which return a `#VALUE!` error in this case.
 * If one or both of input array dimensions is `1` (`1`x`1` or `1`x`n` or `n`x`1`), the array is repeated, to match the output array dimensions (in Google Sheets and Microsoft Excel, this behavior is different: `1`x`1` arrays are treated as [scalars](#about-arrays-in-hyperformula)).
