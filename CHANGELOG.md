@@ -13,6 +13,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Breaking change**: Changed API of the following methods to take `SimpleCellRange` type argument: `copy`,  `cut`, `getCellDependents`, `getCellPrecedents`, `getFillRangeData`, `getRangeFormulas`,  `getRangeSerialized`, `getRangeValues`, `isItPossibleToMoveCells`, `isItPossibleToSetCellContents`, `moveCells`. (#687)
 - Changed SWITCH function so it takes array as its first argument.
 - Changed TRANSPOSE function, so it works with data of any type. (#670)
+- Changed config options (#747):
+| before                | after                |
+|-----------------------|----------------------|
+| matrixColumnSeparator | arrayColumnSeparator |
+| matrixRowSeparator    | arrayRowSeparator    |
+- Changed CellType.MATRIX to CellType.ARRAY (#747)
+- Changed API methods (#747):
+| before             | after             |
+|--------------------|-------------------|
+| matrixMapping      | arrrayMapping     |
+| isCellPartOfMatrix | isCellPartOfArray |
+- Changed Exceptions (#747):
+| before                       | after                       |
+|------------------------------|-----------------------------|
+| SourceLocationHasMatrixError | SourceLocationHasArrayError |
+| TargetLocationHasMatrixError | TargetLocationHasArrayError |
 
 ### Added
 - Added support for array arithmetic. (#628)
@@ -31,6 +47,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added parsing of arrays in formulas (together with respective config options for separators). (#671)
 - Added utility function for filling ranges with source from other range. (#678)
 - Added pretty print for detailedCellError. (#712)
+- Added mapping policies to the exports:   `AlwaysDense`, `AlwaysSparse`, `DenseSparseChooseBasedOnThreshold`. (#747)
 
 ### Fixed
 - Fixed an issue with arrays and cruds. (#651)
