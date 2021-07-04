@@ -11,11 +11,10 @@ import {InterpreterValue} from '../InterpreterValue'
 import {FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
 
 const LICENSE_STATUS_MAP = new Map([
-  ['agpl-v3', 1],
-  ['non-commercial-and-evaluation', 2],
-  [LicenseKeyValidityState.MISSING, 3],
-  [LicenseKeyValidityState.INVALID, 4],
-  [LicenseKeyValidityState.EXPIRED, 5],
+  ['gpl-v3', 1],
+  [LicenseKeyValidityState.MISSING, 2],
+  [LicenseKeyValidityState.INVALID, 3],
+  [LicenseKeyValidityState.EXPIRED, 4],
 ])
 
 export class VersionPlugin extends FunctionPlugin implements FunctionPluginTypecheck<VersionPlugin>{

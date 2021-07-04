@@ -39,7 +39,7 @@ describe('ContentChanges', () => {
 
     const exportedChanges = contentChanges.exportChanges(simpleChangeExporter)
     expect(exportedChanges.length).toEqual(1)
-    expect(exportedChanges).toContainEqual({address: {sheet: 0, col: 0, row: 0}, value: 2})
+    expect(exportedChanges).toContainEqual({address: adr('A1'), value: 2})
   })
 
   it('should export simple value change', () => {
@@ -51,7 +51,7 @@ describe('ContentChanges', () => {
 
     expect(contentChanges.isEmpty()).toEqual(false)
     expect(exportedChanges.length).toEqual(1)
-    expect(exportedChanges).toContainEqual({address: {sheet: 0, col: 0, row: 0}, value: 1})
+    expect(exportedChanges).toContainEqual({address: adr('A1'), value: 1})
   })
 
   it('should export SimpleRangeValue change', () => {
@@ -62,7 +62,7 @@ describe('ContentChanges', () => {
     const exportedChanges = contentChanges.exportChanges(simpleChangeExporter)
 
     expect(exportedChanges.length).toEqual(1)
-    expect(exportedChanges).toContainEqual({address: {sheet: 0, col: 0, row: 0}, value: SimpleRangeValue.onlyValues([['foo', 'bar']])})
+    expect(exportedChanges).toContainEqual({address: adr('A1'), value: SimpleRangeValue.onlyValues([['foo', 'bar']])})
   })
 
   it('should add all changes', () => {
@@ -75,8 +75,8 @@ describe('ContentChanges', () => {
 
     const exportedChanges = contentChanges.exportChanges(simpleChangeExporter)
     expect(exportedChanges.length).toEqual(2)
-    expect(exportedChanges).toContainEqual({address: {sheet: 0, col: 0, row: 0}, value: 1})
-    expect(exportedChanges).toContainEqual({address: {sheet: 0, col: 0, row: 1}, value: 2})
+    expect(exportedChanges).toContainEqual({address: adr('A1'), value: 1})
+    expect(exportedChanges).toContainEqual({address: adr('A2'), value: 2})
   })
 
   it('should handle array change', () => {
@@ -86,9 +86,9 @@ describe('ContentChanges', () => {
     const exportedChanges = contentChanges.exportChanges(new SpreadRangeExporter())
 
     expect(exportedChanges.length).toEqual(4)
-    expect(exportedChanges).toContainEqual({address: {sheet: 0, col: 0, row: 0}, value: 1})
-    expect(exportedChanges).toContainEqual({address: {sheet: 0, col: 1, row: 0}, value: 2})
-    expect(exportedChanges).toContainEqual({address: {sheet: 0, col: 0, row: 1}, value: 'foo'})
-    expect(exportedChanges).toContainEqual({address: {sheet: 0, col: 1, row: 1}, value: 'bar'})
+    expect(exportedChanges).toContainEqual({address: adr('A1'), value: 1})
+    expect(exportedChanges).toContainEqual({address: adr('B1'), value: 2})
+    expect(exportedChanges).toContainEqual({address: adr('A2'), value: 'foo'})
+    expect(exportedChanges).toContainEqual({address: adr('B2'), value: 'bar'})
   })
 })

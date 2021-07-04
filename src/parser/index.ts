@@ -7,6 +7,8 @@ export {
   cellAddressFromString,
   simpleCellAddressFromString,
   simpleCellAddressToString,
+  simpleCellRangeFromString,
+  simpleCellRangeToString,
 } from './addressRepresentationConverters'
 
 export {CellAddress} from './CellAddress'

@@ -1,4 +1,4 @@
-Welcome to HyperFormula `v{{ $page.version }}` API!
+Welcome to the HyperFormula `v{{ $page.version }}` API!
 
 The API reference documentation provides detailed information for methods, error types, event types, and all the configuration options available in HyperFormula.
 
