@@ -19,17 +19,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Changed SWITCH function, so it takes array as its first argument.
 - Changed TRANSPOSE function, so it works with data of any type. (#670)
 - Changed config options (#747):
+
 | before                | after                |
 |-----------------------|----------------------|
 | matrixColumnSeparator | arrayColumnSeparator |
 | matrixRowSeparator    | arrayRowSeparator    |
+
 - Changed CellType.MATRIX to CellType.ARRAY (#747)
 - Changed API methods (#747):
+
 | before             | after             |
 |--------------------|-------------------|
 | matrixMapping      | arrrayMapping     |
 | isCellPartOfMatrix | isCellPartOfArray |
+
 - Changed Exceptions (#747):
+
 | before                       | after                       |
 |------------------------------|-----------------------------|
 | SourceLocationHasMatrixError | SourceLocationHasArrayError |
